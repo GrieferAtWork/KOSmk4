@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2b057555 */
+/* HASH CRC-32:0x4496b676 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -45,19 +45,26 @@ INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_munmap)(void *addr, size_t len
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_mprotect)(void *addr, size_t len, __STDC_INT_AS_UINT_T prot);
 /* @param flags: Set of `MS_ASYNC | MS_INVALIDATE | MS_SYNC' */
 INTDEF NONNULL((1)) int NOTHROW_RPC(LIBDCALL libd_msync)(void *addr, size_t len, __STDC_INT_AS_UINT_T flags);
+/* >> mlock(2) */
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_mlock)(void const *addr, size_t len);
+/* >> munlock(2) */
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_munlock)(void const *addr, size_t len);
-/* @param flags: Set of `MCL_CURRENT | MCL_FUTURE | MCL_ONFAULT' */
+/* >> mlockall(2)
+ * @param flags: Set of `MCL_CURRENT | MCL_FUTURE | MCL_ONFAULT' */
 INTDEF int NOTHROW_NCX(LIBDCALL libd_mlockall)(__STDC_INT_AS_UINT_T flags);
+/* >> shm_open(3) */
 INTDEF NONNULL((1)) fd_t NOTHROW_RPC(LIBDCALL libd_shm_open)(char const *name, oflag_t oflags, mode_t mode);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
+/* >> shm_open(3) */
 INTDEF NONNULL((1)) fd_t NOTHROW_RPC(LIBCCALL libc_shm_open)(char const *name, oflag_t oflags, mode_t mode);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* >> shm_unlink(3) */
 INTDEF NONNULL((1)) int NOTHROW_RPC(LIBDCALL libd_shm_unlink)(char const *name);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
+/* >> shm_unlink(3) */
 INTDEF NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_shm_unlink)(char const *name);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)

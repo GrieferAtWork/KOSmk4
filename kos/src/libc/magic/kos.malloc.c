@@ -38,13 +38,13 @@ __SYSDECL_BEGIN
 }
 
 
-[[throws(E_BADALLOC), decl_include("<hybrid/typecore.h>")]]
+[[libc, throws(E_BADALLOC), decl_include("<hybrid/typecore.h>")]]
 Malloc:(size_t num_bytes) -> [[nonnull, malloc(num_bytes)]] void *;
 
-[[throws(E_BADALLOC), decl_include("<hybrid/typecore.h>")]]
+[[libc, throws(E_BADALLOC), decl_include("<hybrid/typecore.h>")]]
 Calloc:(size_t count, size_t num_bytes) -> [[nonnull, malloc(count * num_bytes)]] void *;
 
-[[throws(E_BADALLOC), decl_include("<hybrid/typecore.h>")]]
+[[libc, throws(E_BADALLOC), decl_include("<hybrid/typecore.h>")]]
 Realloc:(void *mallptr, size_t num_bytes) -> [[nonnull, realloc(mallptr, num_bytes)]] void *;
 
 [[throws(E_BADALLOC), decl_include("<hybrid/typecore.h>")]]

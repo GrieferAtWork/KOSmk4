@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x979e4b6a */
+/* HASH CRC-32:0x800e56fd */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,12 +18,26 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef __local_shm_unlink_defined
-#define __local_shm_unlink_defined 1
+#ifndef __local_ShmUnlink_defined
+#define __local_ShmUnlink_defined 1
 #include <__crt.h>
 #include <asm/os/fcntl.h>
-#if defined(__CRT_HAVE_unlink) || defined(__CRT_HAVE__unlink) || (defined(__AT_FDCWD) && defined(__CRT_HAVE_unlinkat))
+#if defined(__CRT_HAVE_Unlink) || (defined(__AT_FDCWD) && defined(__CRT_HAVE_UnlinkAt))
+#include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
+#ifndef __local___localdep_Unlink_defined
+#define __local___localdep_Unlink_defined 1
+#ifdef __CRT_HAVE_Unlink
+__CREDIRECT_VOID(__ATTR_NONNULL((1)),__THROWING,__localdep_Unlink,(char const *__file),Unlink,(__file))
+#elif defined(__AT_FDCWD) && defined(__CRT_HAVE_UnlinkAt)
+__NAMESPACE_LOCAL_END
+#include <libc/local/kos.unistd/Unlink.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_Unlink __LIBC_LOCAL_NAME(Unlink)
+#else /* ... */
+#undef __local___localdep_Unlink_defined
+#endif /* !... */
+#endif /* !__local___localdep_Unlink_defined */
 #ifndef __local___localdep_memcpy_defined
 #define __local___localdep_memcpy_defined 1
 #ifdef __CRT_HAVE_memcpy
@@ -71,29 +85,13 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_strlen __LIBC_LOCAL_NAME(strlen)
 #endif /* !__CRT_HAVE_strlen */
 #endif /* !__local___localdep_strlen_defined */
-#ifndef __local___localdep_unlink_defined
-#define __local___localdep_unlink_defined 1
-#ifdef __CRT_HAVE_unlink
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_unlink,(char const *__file),unlink,(__file))
-#elif defined(__CRT_HAVE__unlink)
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_unlink,(char const *__file),_unlink,(__file))
-#elif defined(__AT_FDCWD) && defined(__CRT_HAVE_unlinkat)
-__NAMESPACE_LOCAL_END
-#include <libc/local/unistd/unlink.h>
-__NAMESPACE_LOCAL_BEGIN
-#define __localdep_unlink __LIBC_LOCAL_NAME(unlink)
-#else /* ... */
-#undef __local___localdep_unlink_defined
-#endif /* !... */
-#endif /* !__local___localdep_unlink_defined */
 __NAMESPACE_LOCAL_END
 #include <asm/os/paths.h>
 #include <hybrid/typecore.h>
-#include <parts/malloca.h>
+#include <kos/parts/malloca.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(shm_unlink) __ATTR_NONNULL((1)) int
-__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(shm_unlink))(char const *__name) {
-	int __result;
+__LOCAL_LIBC(ShmUnlink) __ATTR_NONNULL((1)) void
+(__LIBCCALL __LIBC_LOCAL_NAME(ShmUnlink))(char const *__name) __THROWS(...) {
 	char *__fullname;
 	__SIZE_TYPE__ __namelen;
 #ifdef _WIN32
@@ -104,27 +102,24 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(shm_unlink))(char const *__name) {
 		++__name;
 #endif /* !_WIN32 */
 	__namelen  = (__NAMESPACE_LOCAL_SYM __localdep_strlen)(__name);
-	__fullname = (char *)__malloca((__COMPILER_STRLEN(__PATH_SHM) + 1 +
+	__fullname = (char *)__Malloca((__COMPILER_STRLEN(__PATH_SHM) + 1 +
 	                              __namelen + 1) *
 	                             sizeof(char));
-	if __unlikely(!__fullname)
-		return -1;
 	(__NAMESPACE_LOCAL_SYM __localdep_memcpy)((__NAMESPACE_LOCAL_SYM __localdep_mempcpy)(__fullname, __PATH_SHM "/",
 	               (__COMPILER_STRLEN(__PATH_SHM) + 1) *
 	               sizeof(char)),
 	       __fullname,
 	       (__namelen + 1) *
 	       sizeof(char));
-	__result = (__NAMESPACE_LOCAL_SYM __localdep_unlink)(__fullname);
+	(__NAMESPACE_LOCAL_SYM __localdep_Unlink)(__fullname);
 	__freea(__fullname);
-	return __result;
 }
 __NAMESPACE_LOCAL_END
-#ifndef __local___localdep_shm_unlink_defined
-#define __local___localdep_shm_unlink_defined 1
-#define __localdep_shm_unlink __LIBC_LOCAL_NAME(shm_unlink)
-#endif /* !__local___localdep_shm_unlink_defined */
-#else /* __CRT_HAVE_unlink || __CRT_HAVE__unlink || (__AT_FDCWD && __CRT_HAVE_unlinkat) */
-#undef __local_shm_unlink_defined
-#endif /* !__CRT_HAVE_unlink && !__CRT_HAVE__unlink && (!__AT_FDCWD || !__CRT_HAVE_unlinkat) */
-#endif /* !__local_shm_unlink_defined */
+#ifndef __local___localdep_ShmUnlink_defined
+#define __local___localdep_ShmUnlink_defined 1
+#define __localdep_ShmUnlink __LIBC_LOCAL_NAME(ShmUnlink)
+#endif /* !__local___localdep_ShmUnlink_defined */
+#else /* __CRT_HAVE_Unlink || (__AT_FDCWD && __CRT_HAVE_UnlinkAt) */
+#undef __local_ShmUnlink_defined
+#endif /* !__CRT_HAVE_Unlink && (!__AT_FDCWD || !__CRT_HAVE_UnlinkAt) */
+#endif /* !__local_ShmUnlink_defined */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7f162d3f */
+/* HASH CRC-32:0x3c32fe7c */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,15 +18,15 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_LIBC_USER_SYS_MMAN_H
-#define GUARD_LIBC_USER_SYS_MMAN_H 1
+#ifndef GUARD_LIBC_USER_KOS_SYS_MMAN_H
+#define GUARD_LIBC_USER_KOS_SYS_MMAN_H 1
 
 #include "../api.h"
-#include "../auto/sys.mman.h"
+#include "../auto/kos.sys.mman.h"
 
 #include <hybrid/typecore.h>
 #include <kos/types.h>
-#include <sys/mman.h>
+#include <kos/sys/mman.h>
 
 DECL_BEGIN
 
@@ -37,54 +37,54 @@ DECL_BEGIN
  *               with a set of `MAP_ANONYMOUS | MAP_FIXED | MAP_GROWSDOWN | MAP_LOCKED|
  *               MAP_NONBLOCK | MAP_NORESERVE | MAP_POPULATE  | MAP_STACK | MAP_SYNC  |
  *               MAP_UNINITIALIZED | MAP_DONT_MAP | MAP_FIXED_NOREPLACE' */
-INTDEF WUNUSED void *NOTHROW_NCX(LIBCCALL libc_mmap)(void *addr, size_t len, __STDC_INT_AS_UINT_T prot, __STDC_INT_AS_UINT_T flags, fd_t fd, __PIO_OFFSET offset);
+INTDEF WUNUSED void *(LIBCCALL libc_MMap)(void *addr, size_t len, __STDC_INT_AS_UINT_T prot, __STDC_INT_AS_UINT_T flags, fd_t fd, pos_t offset) THROWS(...);
 /* Unmap memory from `addr...+=len' */
-INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_munmap)(void *addr, size_t len);
+INTDEF NONNULL((1)) void (LIBCCALL libc_MUnmap)(void *addr, size_t len) THROWS(...);
 /* @param prot: Either `PROT_NONE', or set of `PROT_EXEC | PROT_WRITE |
  *              PROT_READ | PROT_SEM | PROT_LOOSE | PROT_SHARED |
  *              PROT_GROWSUP | PROT_GROWSDOWN' */
-INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_mprotect)(void *addr, size_t len, __STDC_INT_AS_UINT_T prot);
+INTDEF NONNULL((1)) void (LIBCCALL libc_MProtect)(void *addr, size_t len, __STDC_INT_AS_UINT_T prot) THROWS(...);
 /* @param flags: Set of `MS_ASYNC | MS_INVALIDATE | MS_SYNC' */
-INTDEF NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_msync)(void *addr, size_t len, __STDC_INT_AS_UINT_T flags);
+INTDEF NONNULL((1)) void (LIBCCALL libc_MSync)(void *addr, size_t len, __STDC_INT_AS_UINT_T flags) THROWS(...);
 /* >> mlock(2) */
-INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_mlock)(void const *addr, size_t len);
+INTDEF NONNULL((1)) void (LIBCCALL libc_MLock)(void const *addr, size_t len) THROWS(...);
 /* >> munlock(2) */
-INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_munlock)(void const *addr, size_t len);
+INTDEF NONNULL((1)) void (LIBCCALL libc_MUnlock)(void const *addr, size_t len) THROWS(...);
 /* >> mlockall(2)
  * @param flags: Set of `MCL_CURRENT | MCL_FUTURE | MCL_ONFAULT' */
-INTDEF int NOTHROW_NCX(LIBCCALL libc_mlockall)(__STDC_INT_AS_UINT_T flags);
+INTDEF void (LIBCCALL libc_MLockAll)(__STDC_INT_AS_UINT_T flags) THROWS(...);
 /* >> munlockall(2) */
-INTDEF int NOTHROW_NCX(LIBCCALL libc_munlockall)(void);
-INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_madvise)(void *addr, size_t len, __STDC_INT_AS_UINT_T advice);
-INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_mincore)(void *start, size_t len, unsigned char *vec);
+INTDEF void (LIBCCALL libc_MUnlockAll)(void) THROWS(...);
+INTDEF NONNULL((1)) void (LIBCCALL libc_MAdvise)(void *addr, size_t len, __STDC_INT_AS_UINT_T advice) THROWS(...);
+INTDEF NONNULL((1)) void (LIBCCALL libc_MInCore)(void *start, size_t len, unsigned char *vec) THROWS(...);
 /* >> mmap(2), mmap64(2)
  * @param prot:  Either `PROT_NONE', or set of `PROT_EXEC | PROT_WRITE | PROT_READ | PROT_SEM | PROT_LOOSE | PROT_SHARED'
  * @param flags: One of `MAP_SHARED`, 'MAP_SHARED_VALIDATE' or `MAP_PRIVATE', optionally or'd
  *               with a set of `MAP_ANONYMOUS | MAP_FIXED | MAP_GROWSDOWN | MAP_LOCKED|
  *               MAP_NONBLOCK | MAP_NORESERVE | MAP_POPULATE  | MAP_STACK | MAP_SYNC  |
  *               MAP_UNINITIALIZED | MAP_DONT_MAP | MAP_FIXED_NOREPLACE' */
-INTDEF WUNUSED void *NOTHROW_NCX(LIBCCALL libc_mmap64)(void *addr, size_t len, __STDC_INT_AS_UINT_T prot, __STDC_INT_AS_UINT_T flags, fd_t fd, __PIO_OFFSET64 offset);
-INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_posix_madvise)(void *addr, size_t len, __STDC_INT_AS_UINT_T advice);
+INTDEF WUNUSED void *(LIBCCALL libc_MMap64)(void *addr, size_t len, __STDC_INT_AS_UINT_T prot, __STDC_INT_AS_UINT_T flags, fd_t fd, pos64_t offset) THROWS(...);
+INTDEF NONNULL((1)) void (LIBCCALL libc_PosixMAdvise)(void *addr, size_t len, __STDC_INT_AS_UINT_T advice) THROWS(...);
 /* >> mremap(2)
  * @param flags: Set of `MREMAP_MAYMOVE | MREMAP_FIXED' */
-INTDEF void *NOTHROW_NCX(VLIBCCALL libc_mremap)(void *addr, size_t old_len, size_t new_len, __STDC_INT_AS_UINT_T flags, ...);
+INTDEF void *(VLIBCCALL libc_MRemap)(void *addr, size_t old_len, size_t new_len, __STDC_INT_AS_UINT_T flags, ...) THROWS(...);
 /* >> remap_file_pages(2) */
-INTDEF int NOTHROW_NCX(LIBCCALL libc_remap_file_pages)(void *start, size_t size, __STDC_INT_AS_UINT_T prot, size_t pgoff, __STDC_INT_AS_UINT_T flags);
+INTDEF void (LIBCCALL libc_RemapFilePages)(void *start, size_t size, __STDC_INT_AS_UINT_T prot, size_t pgoff, __STDC_INT_AS_UINT_T flags) THROWS(...);
 /* >> memfd_create(2) */
-INTDEF fd_t NOTHROW_NCX(LIBCCALL libc_memfd_create)(char const *name, unsigned int flags);
+INTDEF fd_t (LIBCCALL libc_MemFdCreate)(char const *name, unsigned int flags) THROWS(...);
 /* >> mlock2(2) */
-INTDEF int NOTHROW_NCX(LIBCCALL libc_mlock2)(void const *addr, size_t length, unsigned int flags);
+INTDEF void (LIBCCALL libc_MLock2)(void const *addr, size_t length, unsigned int flags) THROWS(...);
 #endif /* !__KERNEL__ */
 #include <asm/pkey.h>
 #if !defined(__KERNEL__) && defined(__ARCH_HAVE_PKEY)
 /* >> pkey_alloc(2) */
-INTDEF int NOTHROW_NCX(LIBCCALL libc_pkey_alloc)(unsigned int flags, unsigned int access_rights);
+INTDEF int (LIBCCALL libc_PKeyAlloc)(unsigned int flags, unsigned int access_rights) THROWS(...);
 /* >> pkey_free(2) */
-INTDEF int NOTHROW_NCX(LIBCCALL libc_pkey_free)(int pkey);
+INTDEF void (LIBCCALL libc_PKeyFree)(int pkey) THROWS(...);
 /* >> pkey_mprotect(2) */
-INTDEF int NOTHROW_NCX(LIBCCALL libc_pkey_mprotect)(void *addr, size_t len, __STDC_INT_AS_UINT_T prot, int pkey);
+INTDEF void (LIBCCALL libc_PKeyMprotect)(void *addr, size_t len, __STDC_INT_AS_UINT_T prot, int pkey) THROWS(...);
 #endif /* !__KERNEL__ && __ARCH_HAVE_PKEY */
 
 DECL_END
 
-#endif /* !GUARD_LIBC_USER_SYS_MMAN_H */
+#endif /* !GUARD_LIBC_USER_KOS_SYS_MMAN_H */

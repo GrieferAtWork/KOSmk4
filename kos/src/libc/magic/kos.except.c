@@ -1405,6 +1405,7 @@ __ATTR_WUNUSED __BOOL __NOTHROW(was_thrown)(error_code_t __code);
 
 @@Throw an exception and fill exception pointers with all zeroes
 [[guard, decl_prefix(
+#include <kos/bits/exception_data.h>
 #ifndef __ERROR_THROW_CC
 #define __ERROR_THROW_CC __LIBKCALL
 #endif /* !__ERROR_THROW_CC */
@@ -1415,6 +1416,7 @@ void error_throw(error_code_t code);
 
 @@Throw an exception and load `argc' pointers from varargs
 [[guard, decl_prefix(
+#include <kos/bits/exception_data.h>
 #ifndef __ERROR_THROWN_CC
 #define __ERROR_THROWN_CC __LIBKCALL
 #endif /* !__ERROR_THROWN_CC */

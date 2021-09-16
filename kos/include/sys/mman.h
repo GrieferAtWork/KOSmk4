@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x37d449be */
+/* HASH CRC-32:0x70280ddc */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -611,27 +611,35 @@ __CDECLARE_OPT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,munmap,(void *__addr, size_
 __CDECLARE_OPT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,mprotect,(void *__addr, size_t __len, __STDC_INT_AS_UINT_T __prot),(__addr,__len,__prot))
 /* @param flags: Set of `MS_ASYNC | MS_INVALIDATE | MS_SYNC' */
 __CDECLARE_OPT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,msync,(void *__addr, size_t __len, __STDC_INT_AS_UINT_T __flags),(__addr,__len,__flags))
+/* >> mlock(2) */
 __CDECLARE_OPT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,mlock,(void const *__addr, size_t __len),(__addr,__len))
+/* >> munlock(2) */
 __CDECLARE_OPT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,munlock,(void const *__addr, size_t __len),(__addr,__len))
-/* @param flags: Set of `MCL_CURRENT | MCL_FUTURE | MCL_ONFAULT' */
+/* >> mlockall(2)
+ * @param flags: Set of `MCL_CURRENT | MCL_FUTURE | MCL_ONFAULT' */
 __CDECLARE_OPT(,int,__NOTHROW_NCX,mlockall,(__STDC_INT_AS_UINT_T __flags),(__flags))
+/* >> munlockall(2) */
 __CDECLARE_OPT(,int,__NOTHROW_NCX,munlockall,(void),())
 #ifdef __CRT_HAVE_shm_open
+/* >> shm_open(3) */
 __CDECLARE(__ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,shm_open,(char const *__name, __oflag_t __oflags, mode_t __mode),(__name,__oflags,__mode))
 #else /* __CRT_HAVE_shm_open */
 #include <asm/os/oflags.h>
 #include <asm/os/fcntl.h>
 #if defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))
 #include <libc/local/sys.mman/shm_open.h>
+/* >> shm_open(3) */
 __NAMESPACE_LOCAL_USING_OR_IMPL(shm_open, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __fd_t __NOTHROW_RPC(__LIBCCALL shm_open)(char const *__name, __oflag_t __oflags, mode_t __mode) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(shm_open))(__name, __oflags, __mode); })
 #endif /* __CRT_HAVE_open64 || __CRT_HAVE___open64 || __CRT_HAVE_open || __CRT_HAVE__open || __CRT_HAVE___open || (__AT_FDCWD && (__CRT_HAVE_openat64 || __CRT_HAVE_openat)) */
 #endif /* !__CRT_HAVE_shm_open */
 #ifdef __CRT_HAVE_shm_unlink
+/* >> shm_unlink(3) */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,shm_unlink,(char const *__name),(__name))
 #else /* __CRT_HAVE_shm_unlink */
 #include <asm/os/fcntl.h>
 #if defined(__CRT_HAVE_unlink) || defined(__CRT_HAVE__unlink) || (defined(__AT_FDCWD) && defined(__CRT_HAVE_unlinkat))
 #include <libc/local/sys.mman/shm_unlink.h>
+/* >> shm_unlink(3) */
 __NAMESPACE_LOCAL_USING_OR_IMPL(shm_unlink, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL shm_unlink)(char const *__name) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(shm_unlink))(__name); })
 #endif /* __CRT_HAVE_unlink || __CRT_HAVE__unlink || (__AT_FDCWD && __CRT_HAVE_unlinkat) */
 #endif /* !__CRT_HAVE_shm_unlink */

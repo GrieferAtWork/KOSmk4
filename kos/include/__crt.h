@@ -1069,9 +1069,9 @@ __DECL_END
 #endif /* __CC__ */
 
 /* Include __stub_XXX definitions (checked by configure scripts) */
-#ifdef __CRT_KOS
+#if defined(__CRT_KOS) && !defined(__CRT_KOS_KERNEL)
 #include <gnu/stubs.h>
-#endif /* __CRT_KOS */
+#endif /* __CRT_KOS && !__CRT_KOS_KERNEL */
 
 /* Configure SSP *_chk bindings
  * NOTE: SSP requires compiler support in the form of `__builtin_object_size()'

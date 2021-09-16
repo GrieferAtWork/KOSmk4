@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8ca36169 */
+/* HASH CRC-32:0x32729b97 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,31 +18,31 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_LIBC_AUTO_SYS_MMAN_C
-#define GUARD_LIBC_AUTO_SYS_MMAN_C 1
+#ifndef GUARD_LIBC_AUTO_KOS_SYS_MMAN_C
+#define GUARD_LIBC_AUTO_KOS_SYS_MMAN_C 1
 
 #include "../api.h"
 #include <hybrid/typecore.h>
 #include <kos/types.h>
-#include "../user/sys.mman.h"
-#include "../user/fcntl.h"
+#include "../user/kos.sys.mman.h"
+#include "../user/kos.except.h"
+#include "../user/kos.fcntl.h"
+#include "../user/kos.sys.stat.h"
+#include "../user/kos.unistd.h"
 #include "../user/string.h"
-#include "../user/sys.stat.h"
-#include "../user/unistd.h"
 
 DECL_BEGIN
 
 #ifndef __KERNEL__
 #include <asm/os/paths.h>
 #include <asm/os/oflags.h>
-#include <parts/malloca.h>
+#include <kos/parts/malloca.h>
 #include <libc/errno.h>
 #include <bits/types.h>
-/* >> shm_open(3) */
-INTERN ATTR_SECTION(".text.crt.system.mman") NONNULL((1)) fd_t
-NOTHROW_RPC(LIBCCALL libc_shm_open)(char const *name,
-                                    oflag_t oflags,
-                                    mode_t mode) {
+INTERN ATTR_SECTION(".text.crt.except.system.mman") NONNULL((1)) fd_t
+(LIBCCALL libc_ShmOpen)(char const *name,
+                        oflag_t oflags,
+                        mode_t mode) THROWS(...) {
 	fd_t result;
 	char *fullname;
 	size_t namelen;
@@ -62,36 +62,32 @@ NOTHROW_RPC(LIBCCALL libc_shm_open)(char const *name,
 		++name;
 #endif /* !... */
 	namelen  = libc_strlen(name);
-	fullname = (char *)__malloca((__COMPILER_STRLEN(__PATH_SHM) + 1 +
+	fullname = (char *)__Malloca((__COMPILER_STRLEN(__PATH_SHM) + 1 +
 	                              namelen + 1) *
 	                             sizeof(char));
-	if unlikely(!fullname)
-		return -1;
 	libc_memcpy(libc_mempcpy(fullname, __PATH_SHM "/",
 	               (__COMPILER_STRLEN(__PATH_SHM) + 1) *
 	               sizeof(char)),
 	       fullname,
 	       (namelen + 1) *
 	       sizeof(char));
-	result = libc_open(fullname, oflags, mode);
-#if defined(ENOENT) && defined(O_CREAT) && (defined(__CRT_HAVE_mkdir) || (defined(__CRT_DOS_PRIMARY) && defined(__CRT_HAVE__mkdir)))
+	result = libc_Open(fullname, oflags, mode);
+#if defined(ENOENT) && defined(O_CREAT) && defined(__CRT_HAVE_Mkdir)
 	if (result < 0 && (oflags & O_CREAT) != 0 && __libc_geterrno_or(ENOENT) == ENOENT) {
 		/* Lazily create the SHM directory (/dev/shm), if it hadn't been created already.
 		 * XXX:   This    assumes    that    `headof(__PATH_SHM)'    already    exists... */
-		libc_mkdir(__PATH_SHM, 0777);
-		result = libc_open(fullname, oflags, mode);
+		libc_Mkdir(__PATH_SHM, 0777);
+		result = libc_Open(fullname, oflags, mode);
 	}
-#endif /* ENOENT && O_CREAT && (__CRT_HAVE_mkdir || (__CRT_DOS_PRIMARY && __CRT_HAVE__mkdir)) */
+#endif /* ENOENT && O_CREAT && __CRT_HAVE_Mkdir */
 	__freea(fullname);
 	return result;
 }
 #include <asm/os/paths.h>
 #include <hybrid/typecore.h>
-#include <parts/malloca.h>
-/* >> shm_unlink(3) */
-INTERN ATTR_SECTION(".text.crt.system.mman") NONNULL((1)) int
-NOTHROW_RPC(LIBCCALL libc_shm_unlink)(char const *name) {
-	int result;
+#include <kos/parts/malloca.h>
+INTERN ATTR_SECTION(".text.crt.except.system.mman") NONNULL((1)) void
+(LIBCCALL libc_ShmUnlink)(char const *name) THROWS(...) {
 	char *fullname;
 	size_t namelen;
 #ifdef _WIN32
@@ -102,66 +98,53 @@ NOTHROW_RPC(LIBCCALL libc_shm_unlink)(char const *name) {
 		++name;
 #endif /* !_WIN32 */
 	namelen  = libc_strlen(name);
-	fullname = (char *)__malloca((__COMPILER_STRLEN(__PATH_SHM) + 1 +
+	fullname = (char *)__Malloca((__COMPILER_STRLEN(__PATH_SHM) + 1 +
 	                              namelen + 1) *
 	                             sizeof(char));
-	if unlikely(!fullname)
-		return -1;
 	libc_memcpy(libc_mempcpy(fullname, __PATH_SHM "/",
 	               (__COMPILER_STRLEN(__PATH_SHM) + 1) *
 	               sizeof(char)),
 	       fullname,
 	       (namelen + 1) *
 	       sizeof(char));
-	result = libc_unlink(fullname);
+	libc_Unlink(fullname);
 	__freea(fullname);
-	return result;
 }
 #endif /* !__KERNEL__ */
 #include <asm/pkey.h>
 #if !defined(__KERNEL__) && defined(__ARCH_HAVE_PKEY)
-#include <libc/errno.h>
+#include <kos/except/codes.h>
+#include <kos/except/reason/inval.h>
 /* >> pkey_set(3) */
-INTERN ATTR_SECTION(".text.crt.system.mman") int
-NOTHROW_NCX(LIBCCALL libc_pkey_set)(int pkey,
-                                    unsigned int access_rights) {
-	if unlikely(!__arch_pkey_verify_key(pkey) ||
-	            !__arch_pkey_verify_rights(access_rights))
-		goto badkey_or_rights;
-	__arch_pkey_set(pkey, access_rights);
-	return 0;
-badkey_or_rights:
-#ifdef EINVAL
-	return __libc_seterrno(EINVAL);
-#else /* EINVAL */
-	return -1;
-#endif /* !EINVAL */
-}
-#include <libc/errno.h>
-/* >> pkey_get(3) */
-INTERN ATTR_SECTION(".text.crt.system.mman") int
-NOTHROW_NCX(LIBCCALL libc_pkey_get)(int pkey) {
+INTERN ATTR_SECTION(".text.crt.except.system.mman") void
+(LIBCCALL libc_PKeySet)(int pkey,
+                        unsigned int access_rights) THROWS(...) {
 	if unlikely(!__arch_pkey_verify_key(pkey))
-		goto badkey;
+		libc_error_thrown(ERROR_CODEOF(E_INVALID_ARGUMENT_BAD_VALUE), 2, E_INVALID_ARGUMENT_CONTEXT_PKEY_SET_PKEY, pkey);
+	if unlikely(!__arch_pkey_verify_rights(access_rights))
+		libc_error_thrown(ERROR_CODEOF(E_INVALID_ARGUMENT_BAD_VALUE), 2, E_INVALID_ARGUMENT_CONTEXT_PKEY_SET_ACCESS_RIGHTS, access_rights);
+	__arch_pkey_set(pkey, access_rights);
+}
+#include <kos/except/codes.h>
+#include <kos/except/reason/inval.h>
+/* >> pkey_get(3) */
+INTERN ATTR_SECTION(".text.crt.except.system.mman") unsigned int
+(LIBCCALL libc_PKeyGet)(int pkey) THROWS(...) {
+	if unlikely(!__arch_pkey_verify_key(pkey))
+		libc_error_thrown(ERROR_CODEOF(E_INVALID_ARGUMENT_BAD_VALUE), 2, E_INVALID_ARGUMENT_CONTEXT_PKEY_GET_PKEY, pkey);
 	return __arch_pkey_get(pkey);
-badkey:
-#ifdef EINVAL
-	return __libc_seterrno(EINVAL);
-#else /* EINVAL */
-	return -1;
-#endif /* !EINVAL */
 }
 #endif /* !__KERNEL__ && __ARCH_HAVE_PKEY */
 
 DECL_END
 
 #ifndef __KERNEL__
-DEFINE_PUBLIC_ALIAS(shm_open, libc_shm_open);
-DEFINE_PUBLIC_ALIAS(shm_unlink, libc_shm_unlink);
+DEFINE_PUBLIC_ALIAS(ShmOpen, libc_ShmOpen);
+DEFINE_PUBLIC_ALIAS(ShmUnlink, libc_ShmUnlink);
 #endif /* !__KERNEL__ */
 #if !defined(__KERNEL__) && defined(__ARCH_HAVE_PKEY)
-DEFINE_PUBLIC_ALIAS(pkey_set, libc_pkey_set);
-DEFINE_PUBLIC_ALIAS(pkey_get, libc_pkey_get);
+DEFINE_PUBLIC_ALIAS(PKeySet, libc_PKeySet);
+DEFINE_PUBLIC_ALIAS(PKeyGet, libc_PKeyGet);
 #endif /* !__KERNEL__ && __ARCH_HAVE_PKEY */
 
-#endif /* !GUARD_LIBC_AUTO_SYS_MMAN_C */
+#endif /* !GUARD_LIBC_AUTO_KOS_SYS_MMAN_C */

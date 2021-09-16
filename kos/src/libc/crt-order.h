@@ -381,6 +381,7 @@
 	CB(PREFIX.crt.except.sched.param) \
 	CB(PREFIX.crt.except.sched.process) \
 	CB(PREFIX.crt.except.sched.user) \
+	CB(PREFIX.crt.except.heap.mman) \
 	CB(PREFIX.crt.except.heap.malloc) \
 	CB(PREFIX.crt.except.heap.rare_helpers) \
 	CB(PREFIX.crt.except.io.read PREFIX.crt.except.io.large.read PREFIX.crt.except.io.write PREFIX.crt.except.io.large.write) \
@@ -390,7 +391,7 @@
 	CB(PREFIX.crt.except.fs.modify) \
 	CB(PREFIX.crt.except.fs.utility) \
 	CB(PREFIX.crt.except.fs.modify_time) \
-	CB(PREFIX.crt.except.system.utility) \
+	CB(PREFIX.crt.except.system.mman PREFIX.crt.except.system.utility) \
 	CB(PREFIX.crt.except.system.configuration) \
 	CB(PREFIX.crt.dos.application.init) \
 	CB(PREFIX.crt.dos.errno_access) \

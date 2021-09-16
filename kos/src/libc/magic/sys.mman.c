@@ -592,7 +592,7 @@ typedef __mode_t mode_t; /* INode type (Set of `S_*' from `<fcntl.h>' or `<sys/s
 %[insert:prefix(DEFINE_PIO_OFFSET)]
 
 
-[[decl_include("<features.h>")]]
+[[decl_include("<features.h>", "<bits/types.h>")]]
 [[doc_alias("mmap"), ignore, nocrt, alias("mmap")]]
 void *mmap32(void *addr, size_t len, __STDC_INT_AS_UINT_T prot,
              __STDC_INT_AS_UINT_T flags, $fd_t fd, $off32_t offset);
@@ -603,7 +603,7 @@ void *mmap32(void *addr, size_t len, __STDC_INT_AS_UINT_T prot,
 @@              with a set of `MAP_ANONYMOUS | MAP_FIXED | MAP_GROWSDOWN | MAP_LOCKED|
 @@              MAP_NONBLOCK | MAP_NORESERVE | MAP_POPULATE  | MAP_STACK | MAP_SYNC  |
 @@              MAP_UNINITIALIZED | MAP_DONT_MAP | MAP_FIXED_NOREPLACE'
-[[wunused, decl_include("<features.h>"), decl_prefix(DEFINE_PIO_OFFSET), no_crt_self_import]]
+[[wunused, decl_include("<features.h>", "<bits/types.h>"), decl_prefix(DEFINE_PIO_OFFSET), no_crt_self_import]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__), alias("mmap")]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__), alias("mmap64")]]
 [[userimpl, requires($has_function(mmap32) || $has_function(mmap64))]]
@@ -619,30 +619,40 @@ void *mmap(void *addr, size_t len, __STDC_INT_AS_UINT_T prot,
 
 @@Unmap memory from `addr...+=len'
 [[section(".text.crt{|.dos}.heap.mman")]]
+[[decl_include("<hybrid/typecore.h>")]]
 int munmap([[nonnull]] void *addr, size_t len);
 
 @@@param prot: Either `PROT_NONE', or set of `PROT_EXEC | PROT_WRITE |
 @@             PROT_READ | PROT_SEM | PROT_LOOSE | PROT_SHARED |
 @@             PROT_GROWSUP | PROT_GROWSDOWN'
-[[decl_include("<features.h>"), section(".text.crt{|.dos}.system.mman")]]
+[[decl_include("<features.h>", "<hybrid/typecore.h>"), section(".text.crt{|.dos}.system.mman")]]
 int mprotect([[nonnull]] void *addr, size_t len, __STDC_INT_AS_UINT_T prot);
 
 @@@param flags: Set of `MS_ASYNC | MS_INVALIDATE | MS_SYNC'
-[[cp, decl_include("<features.h>")]]
+[[cp, decl_include("<features.h>", "<hybrid/typecore.h>")]]
 int msync([[nonnull]] void *addr, size_t len, __STDC_INT_AS_UINT_T flags);
 
+@@>> mlock(2)
+[[decl_include("<hybrid/typecore.h>")]]
 int mlock([[nonnull]] void const *addr, size_t len);
+
+@@>> munlock(2)
+[[decl_include("<hybrid/typecore.h>")]]
 int munlock([[nonnull]] void const *addr, size_t len);
 
+@@>> mlockall(2)
 @@@param flags: Set of `MCL_CURRENT | MCL_FUTURE | MCL_ONFAULT'
 [[decl_include("<features.h>")]]
 int mlockall(__STDC_INT_AS_UINT_T flags);
 
+@@>> munlockall(2)
 int munlockall();
 
-[[cp, requires_function(open)]]
+@@>> shm_open(3)
+[[cp, decl_include("<bits/types.h>"), requires_function(open)]]
 [[impl_include("<asm/os/paths.h>", "<asm/os/oflags.h>")]]
 [[impl_include("<parts/malloca.h>", "<libc/errno.h>")]]
+[[impl_include("<bits/types.h>")]]
 $fd_t shm_open([[nonnull]] char const *name,
                $oflag_t oflags, mode_t mode) {
 	fd_t result;
@@ -688,8 +698,10 @@ $fd_t shm_open([[nonnull]] char const *name,
 	return result;
 }
 
+@@>> shm_unlink(3)
 [[cp, requires_function(unlink)]]
 [[impl_include("<asm/os/paths.h>")]]
+[[impl_include("<hybrid/typecore.h>")]]
 [[impl_include("<parts/malloca.h>")]]
 int shm_unlink([[nonnull]] char const *name) {
 	int result;
@@ -723,11 +735,12 @@ int shm_unlink([[nonnull]] char const *name) {
 %
 %#ifdef __USE_MISC
 
-[[decl_include("<features.h>")]]
+[[decl_include("<features.h>", "<hybrid/typecore.h>")]]
 [[userimpl, export_alias("__madvise")]]
 int madvise([[nonnull]] void *addr, size_t len,
             __STDC_INT_AS_UINT_T advice) {
 	/* Implement as a no-op, since this function is merely meant as a hint */
+	COMPILER_IMPURE();
 	(void)addr;
 	(void)len;
 	(void)advice;
@@ -741,7 +754,7 @@ int mincore([[nonnull]] void *start, size_t len, unsigned char *vec);
 
 %
 %#ifdef __USE_LARGEFILE64
-[[decl_include("<features.h>")]]
+[[decl_include("<features.h>", "<bits/types.h>")]]
 [[wunused, section(".text.crt{|.dos}.heap.mman")]]
 [[doc_alias("mmap"), preferred_off64_variant_of(mmap)]]
 [[userimpl, requires_function(mmap32), decl_prefix(DEFINE_PIO_OFFSET)]]
@@ -755,7 +768,7 @@ void *mmap64(void *addr, size_t len, __STDC_INT_AS_UINT_T prot,
 %
 %#ifdef __USE_XOPEN2K
 
-[[userimpl, decl_include("<features.h>")]]
+[[userimpl, decl_include("<features.h>", "<hybrid/typecore.h>")]]
 int posix_madvise([[nonnull]] void *addr, size_t len,
                   __STDC_INT_AS_UINT_T advice) {
 	/* Implement as a no-op, since this function is merely meant as a hint */
@@ -774,12 +787,12 @@ int posix_madvise([[nonnull]] void *addr, size_t len,
 @@>> mremap(2)
 @@@param flags: Set of `MREMAP_MAYMOVE | MREMAP_FIXED'
 [[section(".text.crt{|.dos}.heap.mman"), vartypes(void *)]]
-[[decl_include("<features.h>")]]
+[[decl_include("<features.h>", "<hybrid/typecore.h>")]]
 void *mremap(void *addr, size_t old_len, size_t new_len,
              __STDC_INT_AS_UINT_T flags, ... /* void *new_address */);
 
 @@>> remap_file_pages(2)
-[[decl_include("<features.h>")]]
+[[decl_include("<features.h>", "<hybrid/typecore.h>")]]
 int remap_file_pages(void *start, size_t size,
                      __STDC_INT_AS_UINT_T prot, size_t pgoff,
                      __STDC_INT_AS_UINT_T flags);
@@ -788,6 +801,7 @@ int remap_file_pages(void *start, size_t size,
 $fd_t memfd_create(char const *name, unsigned int flags);
 
 @@>> mlock2(2)
+[[decl_include("<hybrid/typecore.h>")]]
 int mlock2(void const *addr, size_t length, unsigned int flags);
 
 @@>> pkey_alloc(2)
@@ -831,7 +845,7 @@ badkey:
 int pkey_free(int pkey);
 
 @@>> pkey_mprotect(2)
-[[decl_include("<features.h>")]]
+[[decl_include("<features.h>", "<hybrid/typecore.h>")]]
 [[crt_impl_if($extended_include_prefix("<asm/pkey.h>")!defined(__KERNEL__) && defined(__ARCH_HAVE_PKEY))]]
 int pkey_mprotect(void *addr, size_t len, __STDC_INT_AS_UINT_T prot, int pkey);
 

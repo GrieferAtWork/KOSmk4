@@ -22,6 +22,7 @@
 
 #include <hybrid/host.h>
 
+#include <asm/pkey.h>
 #include <asm/unistd.h>
 #include <bits/types.h>
 
@@ -97,6 +98,30 @@ DEFINE_XSYSCALL_EXPORT(FMkdirAt, sys_Xfmkdirat)
 DEFINE_XSYSCALL_EXPORT(FMknodAt, sys_Xfmknodat)
 DEFINE_XSYSCALL_EXPORT(MkdirAt, sys_Xmkdirat)
 DEFINE_XSYSCALL_EXPORT(MknodAt, sys_Xmknodat)
+DEFINE_XSYSCALL_EXPORT(MMap, sys_Xmmap)
+#if __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
+DEFINE_XSYSCALL_EXPORT(MMap64, sys_Xmmap)
+#endif /* __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__ */
+DEFINE_XSYSCALL_EXPORT(MUnmap, sys_Xmunmap)
+DEFINE_XSYSCALL_EXPORT(MProtect, sys_Xmprotect)
+DEFINE_XSYSCALL_EXPORT(MSync, sys_Xmsync)
+DEFINE_XSYSCALL_EXPORT(MLock, sys_Xmlock)
+DEFINE_XSYSCALL_EXPORT(MUnlock, sys_Xmunlock)
+DEFINE_XSYSCALL_EXPORT(MLockAll, sys_Xmlockall)
+DEFINE_XSYSCALL_EXPORT(MUnlockAll, sys_Xmunlockall)
+DEFINE_XSYSCALL_EXPORT(MAdvise, sys_Xmadvise)
+DEFINE_XSYSCALL_EXPORT(MInCore, sys_Xmincore)
+DEFINE_XSYSCALL_EXPORT(MRemap, sys_Xmremap)
+DEFINE_XSYSCALL_EXPORT(RemapFilePages, sys_Xremap_file_pages)
+DEFINE_XSYSCALL_EXPORT(MemFdCreate, sys_Xmemfd_create)
+DEFINE_XSYSCALL_EXPORT(MLock2, sys_Xmlock2)
+
+#ifdef __ARCH_HAVE_PKEY
+DEFINE_XSYSCALL_EXPORT(PKeyAlloc, sys_Xpkey_alloc)
+DEFINE_XSYSCALL_EXPORT(PKeyFree, sys_Xpkey_free)
+DEFINE_XSYSCALL_EXPORT(PKeyMProtect, sys_Xpkey_mprotect)
+#endif /* __ARCH_HAVE_PKEY */
+
 
 #ifdef SYS_getresuid32
 DEFINE_XSYSCALL_EXPORT(GetResUid, sys_Xgetresuid32)

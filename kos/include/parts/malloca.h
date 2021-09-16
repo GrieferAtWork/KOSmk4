@@ -29,22 +29,22 @@
 #include <libc/malloc.h>
 #include <libc/string.h>
 
-__SYSDECL_BEGIN
-
 #ifdef __CC__
+__SYSDECL_BEGIN
 
 /* A hybrid between alloca and malloc, using alloca for
  * small  allocations,  but malloc()  for  larger ones.
  * NOTE: In all cases, 'afree()' should be used to clean up a
  *       pointer previously allocated  using 'amalloc()'  and
  *       friends. */
-#if (((defined(__CRT_HAVE_malloc) && defined(__CRT_HAVE_free)) || \
-      (defined(__KOS__) && defined(__KERNEL__))) &&               \
+#if (((defined(____libc_malloc_defined) && defined(____libc_free_defined)) || \
+      (defined(__KOS__) && defined(__KERNEL__))) &&                           \
      defined(__hybrid_alloca))
 /* Best case: Both heap & stack allocation is possible. */
 #ifndef __MALLOCA_ALIGN
 #define __MALLOCA_ALIGN __SIZEOF_POINTER__
 #endif /* !__MALLOCA_ALIGN */
+#ifndef __MALLOCA_MAX
 #ifdef __KERNEL__
 #define __MALLOCA_MAX 256 /* Without guard pages, don't be excessive */
 #else /* __KERNEL__ */
@@ -55,6 +55,8 @@ __SYSDECL_BEGIN
 #define __MALLOCA_MAX 256
 #endif /* !__ARCH_PAGESIZE */
 #endif /* !__KERNEL__ */
+#endif /* !__MALLOCA_MAX */
+#ifndef __MALLOCA_MUSTFREE
 #ifdef NDEBUG
 #define __MALLOCA_KEY_ALLOCA        0
 #define __MALLOCA_KEY_MALLOC        1
@@ -72,6 +74,7 @@ __SYSDECL_BEGIN
 	 __MALLOCA_GETKEY(p) == __MALLOCA_KEY_MALLOC)
 #define __MALLOCA_SKEW_ALLOCA(p, s) __libc_memset(p, 0xcd, s)
 #endif /* !NDEBUG */
+#endif /* !__MALLOCA_MUSTFREE */
 
 
 #ifndef __NO_XBLOCK
@@ -479,7 +482,7 @@ __NAMESPACE_INT_END
 		__SIZE_TYPE__ const __calloca_num_bytes = (num_bytes);                                   \
 		*(void **)&(result) = __libc_memset(__hybrid_alloca(num_bytes), 0, __calloca_num_bytes); \
 	} __WHILE0
-#elif defined(__CRT_HAVE_malloc) && defined(__CRT_HAVE_free)
+#elif defined(____libc_malloc_defined) && defined(____libc_free_defined)
 /* Fallback: Only heap allocation is possible. */
 #define __malloca_mayfail                    1
 #define __malloca(num_bytes)                 __libc_malloc(num_bytes)
@@ -502,8 +505,7 @@ __NAMESPACE_INT_END
 #define __calloca_tryhard(result, num_bytes) (void)(*(void **)&(result) = __NULLPTR)
 #endif /* !... */
 
-#endif /* __CC__ */
-
 __SYSDECL_END
+#endif /* __CC__ */
 
 #endif /* !_PARTS_MALLOCA_H */

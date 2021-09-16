@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc374ffe0 */
+/* HASH CRC-32:0xa402173c */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,36 +18,24 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef __local_mmap64_defined
-#define __local_mmap64_defined 1
+#ifndef __local_PosixMAdvise_defined
+#define __local_PosixMAdvise_defined 1
 #include <__crt.h>
-#ifdef __CRT_HAVE_mmap
+#include <kos/anno.h>
 #include <features.h>
-#include <bits/types.h>
-#ifndef __PIO_OFFSET
-#ifdef __USE_KOS_ALTERATIONS
-#define __PIO_OFFSET   __FS_TYPE(pos)
-#define __PIO_OFFSET64 __pos64_t
-#else /* __USE_KOS_ALTERATIONS */
-#define __PIO_OFFSET   __FS_TYPE(off)
-#define __PIO_OFFSET64 __off64_t
-#endif /* !__USE_KOS_ALTERATIONS */
-#endif /* !__PIO_OFFSET */
+#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-#ifndef __local___localdep_mmap32_defined
-#define __local___localdep_mmap32_defined 1
-__CREDIRECT(,void *,__NOTHROW_NCX,__localdep_mmap32,(void *__addr, __SIZE_TYPE__ __len, __STDC_INT_AS_UINT_T __prot, __STDC_INT_AS_UINT_T __flags, __fd_t __fd, __off32_t __offset),mmap,(__addr,__len,__prot,__flags,__fd,__offset))
-#endif /* !__local___localdep_mmap32_defined */
-__LOCAL_LIBC(mmap64) __ATTR_WUNUSED void *
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(mmap64))(void *__addr, __SIZE_TYPE__ __len, __STDC_INT_AS_UINT_T __prot, __STDC_INT_AS_UINT_T __flags, __fd_t __fd, __PIO_OFFSET64 __offset) {
-	return (__NAMESPACE_LOCAL_SYM __localdep_mmap32)(__addr, __len, __prot, __flags, __fd, (__off32_t)(__pos32_t)(__pos64_t)__offset);
+__LOCAL_LIBC(PosixMAdvise) __ATTR_NONNULL((1)) void
+(__LIBCCALL __LIBC_LOCAL_NAME(PosixMAdvise))(void *__addr, __SIZE_TYPE__ __len, __STDC_INT_AS_UINT_T __advice) __THROWS(...) {
+	/* Implement as a no-op, since this function is merely meant as a hint */
+	__COMPILER_IMPURE();
+	(void)__addr;
+	(void)__len;
+	(void)__advice;
 }
 __NAMESPACE_LOCAL_END
-#ifndef __local___localdep_mmap64_defined
-#define __local___localdep_mmap64_defined 1
-#define __localdep_mmap64 __LIBC_LOCAL_NAME(mmap64)
-#endif /* !__local___localdep_mmap64_defined */
-#else /* __CRT_HAVE_mmap */
-#undef __local_mmap64_defined
-#endif /* !__CRT_HAVE_mmap */
-#endif /* !__local_mmap64_defined */
+#ifndef __local___localdep_PosixMAdvise_defined
+#define __local___localdep_PosixMAdvise_defined 1
+#define __localdep_PosixMAdvise __LIBC_LOCAL_NAME(PosixMAdvise)
+#endif /* !__local___localdep_PosixMAdvise_defined */
+#endif /* !__local_PosixMAdvise_defined */

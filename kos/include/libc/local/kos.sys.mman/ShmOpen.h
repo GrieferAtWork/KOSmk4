@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x979e4b6a */
+/* HASH CRC-32:0xc945c41d */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,12 +18,33 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef __local_shm_unlink_defined
-#define __local_shm_unlink_defined 1
+#ifndef __local_ShmOpen_defined
+#define __local_ShmOpen_defined 1
 #include <__crt.h>
+#include <features.h>
+#include <asm/os/oflags.h>
 #include <asm/os/fcntl.h>
-#if defined(__CRT_HAVE_unlink) || defined(__CRT_HAVE__unlink) || (defined(__AT_FDCWD) && defined(__CRT_HAVE_unlinkat))
+#if defined(__CRT_HAVE_Open64) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_OpenAt64) || defined(__CRT_HAVE_OpenAt))) || defined(__CRT_HAVE_Open)
+#include <kos/anno.h>
+#include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
+#if !defined(__local___localdep_Mkdir_defined) && defined(__CRT_HAVE_Mkdir)
+#define __local___localdep_Mkdir_defined 1
+__CREDIRECT_VOID(__ATTR_NONNULL((1)),__THROWING,__localdep_Mkdir,(char const *__pathname, __mode_t __mode),Mkdir,(__pathname,__mode))
+#endif /* !__local___localdep_Mkdir_defined && __CRT_HAVE_Mkdir */
+#ifndef __local___localdep_Open_defined
+#define __local___localdep_Open_defined 1
+#if defined(__CRT_HAVE_Open) && (!defined(__USE_FILE_OFFSET64) || !defined(__O_LARGEFILE) || !__O_LARGEFILE)
+__CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__THROWING,__localdep_Open,(char const *__filename, __oflag_t __oflags),Open,(__filename,__oflags),__oflags,1,(__mode_t))
+#elif defined(__CRT_HAVE_Open64) && (defined(__USE_FILE_OFFSET64) || !defined(__O_LARGEFILE) || !__O_LARGEFILE)
+__CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__THROWING,__localdep_Open,(char const *__filename, __oflag_t __oflags),Open64,(__filename,__oflags),__oflags,1,(__mode_t))
+#else /* ... */
+__NAMESPACE_LOCAL_END
+#include <libc/local/kos.fcntl/Open.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_Open __LIBC_LOCAL_NAME(Open)
+#endif /* !... */
+#endif /* !__local___localdep_Open_defined */
 #ifndef __local___localdep_memcpy_defined
 #define __local___localdep_memcpy_defined 1
 #ifdef __CRT_HAVE_memcpy
@@ -71,60 +92,59 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_strlen __LIBC_LOCAL_NAME(strlen)
 #endif /* !__CRT_HAVE_strlen */
 #endif /* !__local___localdep_strlen_defined */
-#ifndef __local___localdep_unlink_defined
-#define __local___localdep_unlink_defined 1
-#ifdef __CRT_HAVE_unlink
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_unlink,(char const *__file),unlink,(__file))
-#elif defined(__CRT_HAVE__unlink)
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_unlink,(char const *__file),_unlink,(__file))
-#elif defined(__AT_FDCWD) && defined(__CRT_HAVE_unlinkat)
-__NAMESPACE_LOCAL_END
-#include <libc/local/unistd/unlink.h>
-__NAMESPACE_LOCAL_BEGIN
-#define __localdep_unlink __LIBC_LOCAL_NAME(unlink)
-#else /* ... */
-#undef __local___localdep_unlink_defined
-#endif /* !... */
-#endif /* !__local___localdep_unlink_defined */
 __NAMESPACE_LOCAL_END
 #include <asm/os/paths.h>
-#include <hybrid/typecore.h>
-#include <parts/malloca.h>
+#include <kos/parts/malloca.h>
+#include <libc/errno.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(shm_unlink) __ATTR_NONNULL((1)) int
-__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(shm_unlink))(char const *__name) {
-	int __result;
+__LOCAL_LIBC(ShmOpen) __ATTR_NONNULL((1)) __fd_t
+(__LIBCCALL __LIBC_LOCAL_NAME(ShmOpen))(char const *__name, __oflag_t __oflags, __mode_t __mode) __THROWS(...) {
+	__fd_t __result;
 	char *__fullname;
 	__SIZE_TYPE__ __namelen;
-#ifdef _WIN32
+#ifdef __O_DOSPATH
+	if (__oflags & __O_DOSPATH) {
+		while (*__name == '/' || *__name == '\\')
+			++__name;
+	} else {
+		while (*__name == '/')
+			++__name;
+	}
+#elif defined(_WIN32)
 	while (*__name == '/' || *__name == '\\')
 		++__name;
-#else /* _WIN32 */
+#else /* ... */
 	while (*__name == '/')
 		++__name;
-#endif /* !_WIN32 */
+#endif /* !... */
 	__namelen  = (__NAMESPACE_LOCAL_SYM __localdep_strlen)(__name);
-	__fullname = (char *)__malloca((__COMPILER_STRLEN(__PATH_SHM) + 1 +
+	__fullname = (char *)__Malloca((__COMPILER_STRLEN(__PATH_SHM) + 1 +
 	                              __namelen + 1) *
 	                             sizeof(char));
-	if __unlikely(!__fullname)
-		return -1;
 	(__NAMESPACE_LOCAL_SYM __localdep_memcpy)((__NAMESPACE_LOCAL_SYM __localdep_mempcpy)(__fullname, __PATH_SHM "/",
 	               (__COMPILER_STRLEN(__PATH_SHM) + 1) *
 	               sizeof(char)),
 	       __fullname,
 	       (__namelen + 1) *
 	       sizeof(char));
-	__result = (__NAMESPACE_LOCAL_SYM __localdep_unlink)(__fullname);
+	__result = (__NAMESPACE_LOCAL_SYM __localdep_Open)(__fullname, __oflags, __mode);
+#if defined(__ENOENT) && defined(__O_CREAT) && defined(__CRT_HAVE_Mkdir)
+	if (__result < 0 && (__oflags & __O_CREAT) != 0 && __libc_geterrno_or(__ENOENT) == __ENOENT) {
+		/* Lazily create the SHM directory (/dev/shm), if it hadn't been created already.
+		 * XXX:   This    assumes    that    `headof(__PATH_SHM)'    already    exists... */
+		(__NAMESPACE_LOCAL_SYM __localdep_Mkdir)(__PATH_SHM, 0777);
+		__result = (__NAMESPACE_LOCAL_SYM __localdep_Open)(__fullname, __oflags, __mode);
+	}
+#endif /* __ENOENT && __O_CREAT && __CRT_HAVE_Mkdir */
 	__freea(__fullname);
 	return __result;
 }
 __NAMESPACE_LOCAL_END
-#ifndef __local___localdep_shm_unlink_defined
-#define __local___localdep_shm_unlink_defined 1
-#define __localdep_shm_unlink __LIBC_LOCAL_NAME(shm_unlink)
-#endif /* !__local___localdep_shm_unlink_defined */
-#else /* __CRT_HAVE_unlink || __CRT_HAVE__unlink || (__AT_FDCWD && __CRT_HAVE_unlinkat) */
-#undef __local_shm_unlink_defined
-#endif /* !__CRT_HAVE_unlink && !__CRT_HAVE__unlink && (!__AT_FDCWD || !__CRT_HAVE_unlinkat) */
-#endif /* !__local_shm_unlink_defined */
+#ifndef __local___localdep_ShmOpen_defined
+#define __local___localdep_ShmOpen_defined 1
+#define __localdep_ShmOpen __LIBC_LOCAL_NAME(ShmOpen)
+#endif /* !__local___localdep_ShmOpen_defined */
+#else /* __CRT_HAVE_Open64 || (__AT_FDCWD && (__CRT_HAVE_OpenAt64 || __CRT_HAVE_OpenAt)) || __CRT_HAVE_Open */
+#undef __local_ShmOpen_defined
+#endif /* !__CRT_HAVE_Open64 && (!__AT_FDCWD || (!__CRT_HAVE_OpenAt64 && !__CRT_HAVE_OpenAt)) && !__CRT_HAVE_Open */
+#endif /* !__local_ShmOpen_defined */

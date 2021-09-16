@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7b24e857 */
+/* HASH CRC-32:0x3f5a2370 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,24 +18,29 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef __local_madvise_defined
-#define __local_madvise_defined 1
-#include <__crt.h>
-#include <features.h>
+#ifndef GUARD_LIBC_AUTO_KOS_SYS_MMAN_H
+#define GUARD_LIBC_AUTO_KOS_SYS_MMAN_H 1
+
+#include "../api.h"
+
 #include <hybrid/typecore.h>
-__NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(madvise) __ATTR_NONNULL((1)) int
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(madvise))(void *__addr, __SIZE_TYPE__ __len, __STDC_INT_AS_UINT_T __advice) {
-	/* Implement as a no-op, since this function is merely meant as a hint */
-	__COMPILER_IMPURE();
-	(void)__addr;
-	(void)__len;
-	(void)__advice;
-	return 0;
-}
-__NAMESPACE_LOCAL_END
-#ifndef __local___localdep_madvise_defined
-#define __local___localdep_madvise_defined 1
-#define __localdep_madvise __LIBC_LOCAL_NAME(madvise)
-#endif /* !__local___localdep_madvise_defined */
-#endif /* !__local_madvise_defined */
+#include <kos/types.h>
+#include <kos/sys/mman.h>
+
+DECL_BEGIN
+
+#ifndef __KERNEL__
+INTDEF NONNULL((1)) fd_t (LIBCCALL libc_ShmOpen)(char const *name, oflag_t oflags, mode_t mode) THROWS(...);
+INTDEF NONNULL((1)) void (LIBCCALL libc_ShmUnlink)(char const *name) THROWS(...);
+#endif /* !__KERNEL__ */
+#include <asm/pkey.h>
+#if !defined(__KERNEL__) && defined(__ARCH_HAVE_PKEY)
+/* >> pkey_set(3) */
+INTDEF void (LIBCCALL libc_PKeySet)(int pkey, unsigned int access_rights) THROWS(...);
+/* >> pkey_get(3) */
+INTDEF unsigned int (LIBCCALL libc_PKeyGet)(int pkey) THROWS(...);
+#endif /* !__KERNEL__ && __ARCH_HAVE_PKEY */
+
+DECL_END
+
+#endif /* !GUARD_LIBC_AUTO_KOS_SYS_MMAN_H */

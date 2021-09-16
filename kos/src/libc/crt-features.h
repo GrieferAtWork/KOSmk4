@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc9bb1725 */
+/* HASH CRC-32:0xee50dc2d */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2975,7 +2975,21 @@
 #define __CRT_HAVE_LSeek64
 #define __CRT_HAVE_Link
 #define __CRT_HAVE_LinkAt
+#define __CRT_HAVE_MAdvise
+#define __CRT_HAVE_MInCore
+#define __CRT_HAVE_MLock
+#define __CRT_HAVE_MLock2
+#define __CRT_HAVE_MLockAll
+#define __CRT_HAVE_MMap
+#define __CRT_HAVE_MMap64
+#define __CRT_HAVE_MProtect
+#define __CRT_HAVE_MRemap
+#define __CRT_HAVE_MSync
+#define __CRT_HAVE_MUnlock
+#define __CRT_HAVE_MUnlockAll
+#define __CRT_HAVE_MUnmap
 #define __CRT_HAVE_Malloc
+#define __CRT_HAVE_MemFdCreate
 #define __CRT_HAVE_Memalign
 #define __CRT_HAVE_Memcdup
 #define __CRT_HAVE_Memdup
@@ -2990,6 +3004,15 @@
 #define __CRT_HAVE_Open64
 #define __CRT_HAVE_OpenAt
 #define __CRT_HAVE_OpenAt64
+#endif /* !__KERNEL__ */
+#if !defined(__KERNEL__) && defined(__ARCH_HAVE_PKEY)
+#define __CRT_HAVE_PKeyAlloc
+#define __CRT_HAVE_PKeyFree
+#define __CRT_HAVE_PKeyGet
+#define __CRT_HAVE_PKeyMprotect
+#define __CRT_HAVE_PKeySet
+#endif /* !__KERNEL__ && __ARCH_HAVE_PKEY */
+#ifndef __KERNEL__
 #define __CRT_HAVE_PRead
 #define __CRT_HAVE_PRead64
 #define __CRT_HAVE_PReadAll
@@ -2999,11 +3022,13 @@
 #define __CRT_HAVE_PWrite64
 #define __CRT_HAVE_Pipe
 #define __CRT_HAVE_Pipe2
+#define __CRT_HAVE_PosixMAdvise
 #define __CRT_HAVE_Read
 #define __CRT_HAVE_ReadAll
 #define __CRT_HAVE_Readlink
 #define __CRT_HAVE_ReadlinkAt
 #define __CRT_HAVE_Realloc
+#define __CRT_HAVE_RemapFilePages
 #define __CRT_HAVE_Rmdir
 #define __CRT_HAVE_SetDomainName
 #define __CRT_HAVE_SetEGid
@@ -3018,6 +3043,8 @@
 #define __CRT_HAVE_SetResUid
 #define __CRT_HAVE_SetSid
 #define __CRT_HAVE_SetUid
+#define __CRT_HAVE_ShmOpen
+#define __CRT_HAVE_ShmUnlink
 #define __CRT_HAVE_Symlink
 #define __CRT_HAVE_SymlinkAt
 #define __CRT_HAVE_SyncFs

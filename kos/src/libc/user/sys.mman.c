@@ -105,7 +105,8 @@ NOTHROW_RPC(LIBCCALL libc_msync)(void *addr,
 }
 /*[[[end:libc_msync]]]*/
 
-/*[[[head:libc_mlock,hash:CRC-32=0xc9f34cf2]]]*/
+/*[[[head:libc_mlock,hash:CRC-32=0xcadbb65c]]]*/
+/* >> mlock(2) */
 INTERN ATTR_SECTION(".text.crt.system.mman") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_mlock)(void const *addr,
                                  size_t len)
@@ -121,7 +122,8 @@ NOTHROW_NCX(LIBCCALL libc_mlock)(void const *addr,
 }
 /*[[[end:libc_mlock]]]*/
 
-/*[[[head:libc_munlock,hash:CRC-32=0xf01c7204]]]*/
+/*[[[head:libc_munlock,hash:CRC-32=0xc5e033ae]]]*/
+/* >> munlock(2) */
 INTERN ATTR_SECTION(".text.crt.system.mman") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_munlock)(void const *addr,
                                    size_t len)
@@ -133,8 +135,9 @@ NOTHROW_NCX(LIBCCALL libc_munlock)(void const *addr,
 }
 /*[[[end:libc_munlock]]]*/
 
-/*[[[head:libc_mlockall,hash:CRC-32=0xeb39f473]]]*/
-/* @param flags: Set of `MCL_CURRENT | MCL_FUTURE | MCL_ONFAULT' */
+/*[[[head:libc_mlockall,hash:CRC-32=0x70ffe875]]]*/
+/* >> mlockall(2)
+ * @param flags: Set of `MCL_CURRENT | MCL_FUTURE | MCL_ONFAULT' */
 INTERN ATTR_SECTION(".text.crt.system.mman") int
 NOTHROW_NCX(LIBCCALL libc_mlockall)(__STDC_INT_AS_UINT_T flags)
 /*[[[body:libc_mlockall]]]*/
@@ -145,7 +148,8 @@ NOTHROW_NCX(LIBCCALL libc_mlockall)(__STDC_INT_AS_UINT_T flags)
 }
 /*[[[end:libc_mlockall]]]*/
 
-/*[[[head:libc_munlockall,hash:CRC-32=0x616b898c]]]*/
+/*[[[head:libc_munlockall,hash:CRC-32=0xcbad3ced]]]*/
+/* >> munlockall(2) */
 INTERN ATTR_SECTION(".text.crt.system.mman") int
 NOTHROW_NCX(LIBCCALL libc_munlockall)(void)
 /*[[[body:libc_munlockall]]]*/
