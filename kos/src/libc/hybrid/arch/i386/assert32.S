@@ -35,9 +35,11 @@
 #define ASSERTION_SECTION   .text.crt.assert
 #endif /* !__KERNEL__ */
 
-#define ADJUST_ESP(additional_offset, argument_size) \
+/* Fix  the `kcs_gpregs.gp_esp' field after a PUSHAL  which was used to complete a
+ * `struct kcpustate', such that it points at `END(kcpustate) + additional_offset' */
+#define ADJUST_KCPUSTATE_ESP_AFTER_PUSHAL(additional_offset)                                                  \
 	addl   $(((SIZEOF_KCPUSTATE - OFFSET_KCPUSTATE_GPREGS) - OFFSET_KCPUSTATE_EFLAGS) + (additional_offset)), \
-	          OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_ESP(%esp)
+	       OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_ESP(%esp)
 
 .section ASSERTION_SECTION
 PUBLIC_FUNCTION(__stack_chk_fail)
@@ -45,7 +47,7 @@ PUBLIC_FUNCTION(__stack_chk_fail)
 	/* Generate a full `struct kcpustate' */
 	pushfl_cfi_r
 	pushal_cfi_r
-	ADJUST_ESP(0, 0)
+	ADJUST_KCPUSTATE_ESP_AFTER_PUSHAL(0)
 	movl   %esp, %ecx
 	INTERN(libc_stack_failure_core)
 	call   libc_stack_failure_core
@@ -59,7 +61,7 @@ INTERN_FUNCTION(libc_abort)
 	/* Generate a full `struct kcpustate' */
 	pushfl_cfi_r
 	pushal_cfi_r
-	ADJUST_ESP(0, 0)
+	ADJUST_KCPUSTATE_ESP_AFTER_PUSHAL(0)
 	movl   %esp, %ecx
 	INTERN(libc_abort_failure_core)
 	call   libc_abort_failure_core
@@ -85,7 +87,7 @@ INTERN_FUNCTION(libc___afail)
 	.cfi_rel_offset %eip, 0
 	pushfl_cfi_r
 	pushal_cfi_r
-	ADJUST_ESP(4, 16)
+	ADJUST_KCPUSTATE_ESP_AFTER_PUSHAL(4)
 	movl   (SIZEOF_KCPUSTATE + 4)(%esp), %eax  /* char const *expr */
 	movl   %eax, (SIZEOF_KCPUSTATE + 0)(%esp)  /* aa_expr */
 	movl   (SIZEOF_KCPUSTATE + 8)(%esp), %eax  /* char const *file */
@@ -109,7 +111,7 @@ INTERN_FUNCTION(libc___afailf)
 	/* char const *expr, char const *file, unsigned int line, char const *func, char const *format */
 	pushfl_cfi_r
 	pushal_cfi_r
-	ADJUST_ESP(0, 0) /* This one is CDECL, so we never need to adjust for argument count! */
+	ADJUST_KCPUSTATE_ESP_AFTER_PUSHAL(0)
 	leal   (SIZEOF_KCPUSTATE + 20)(%esp), %eax
 	pushl_cfi %eax                         /* aa_args */
 	movl   %esp, %ecx
@@ -134,7 +136,7 @@ INTERN_FUNCTION(libc___acheck)
 	.cfi_rel_offset %eip, 0
 	pushfl_cfi_r
 	pushal_cfi_r
-	ADJUST_ESP(4, 0) /* `__acheck()' is CDECL */
+	ADJUST_KCPUSTATE_ESP_AFTER_PUSHAL(4)
 	movl   (SIZEOF_KCPUSTATE + 4)(%esp), %eax  /* char const *expr */
 	movl   %eax, (SIZEOF_KCPUSTATE + 0)(%esp)  /* aa_expr */
 	movl   (SIZEOF_KCPUSTATE + 8)(%esp), %eax  /* char const *file */
@@ -144,7 +146,7 @@ INTERN_FUNCTION(libc___acheck)
 	movl   (SIZEOF_KCPUSTATE + 16)(%esp), %eax /* char const *func */
 	movl   %eax, (SIZEOF_KCPUSTATE + 12)(%esp) /* aa_func */
 	movl   $(0), (SIZEOF_KCPUSTATE + 16)(%esp) /* aa_format */
-	pushl_cfi $(0)                         /* aa_args */
+	pushl_cfi $(0)                             /* aa_args */
 	movl   %esp, %ecx
 	INTERN(libc_assertion_check_core)
 	call   libc_assertion_check_core
@@ -200,7 +202,7 @@ INTERN_FUNCTION(libc___acheckf)
 	/* char const *expr, char const *file, unsigned int line, char const *func, char const *format */
 	pushfl_cfi_r
 	pushal_cfi_r
-	ADJUST_ESP(0, 0) /* This one is CDECL, so we never need to adjust for argument count! */
+	ADJUST_KCPUSTATE_ESP_AFTER_PUSHAL(0)
 	leal   (SIZEOF_KCPUSTATE + 20)(%esp), %eax
 	pushl_cfi %eax                         /* aa_args */
 	movl   %esp, %ecx
@@ -227,7 +229,7 @@ INTERN_FUNCTION(libc___assert_func)
 	.cfi_rel_offset %eip, 0
 	pushfl_cfi_r
 	pushal_cfi_r
-	ADJUST_ESP(4, 16)
+	ADJUST_KCPUSTATE_ESP_AFTER_PUSHAL(4)
 	movl   (SIZEOF_KCPUSTATE + 16)(%esp), %eax /* char const *expr */
 	movl   %eax, (SIZEOF_KCPUSTATE + 0)(%esp)  /* aa_expr */
 	movl   $(0), (SIZEOF_KCPUSTATE + 16)(%esp) /* aa_format */
@@ -246,7 +248,7 @@ INTERN_FUNCTION(libc___assertfail)
 	/* char const *expr, char const *file, unsigned int line, char const *func, size_t charsize */
 	pushfl_cfi_r
 	pushal_cfi_r
-	ADJUST_ESP(0, 20)
+	ADJUST_KCPUSTATE_ESP_AFTER_PUSHAL(0)
 	movl   $(0), (SIZEOF_KCPUSTATE + 16)(%esp) /* aa_format */
 	pushl_cfi $(0)                             /* aa_args */
 	movl   %esp, %ecx
@@ -269,7 +271,7 @@ INTERN_FUNCTION(libc___assert)
 	.cfi_rel_offset %eip, 0
 	pushfl_cfi_r
 	pushal_cfi_r
-	ADJUST_ESP(8, 12)
+	ADJUST_KCPUSTATE_ESP_AFTER_PUSHAL(8)
 	/*                -,                -, char const  *file, unsigned int line, char const *expr */
 	/* char const *expr, char const *file, unsigned int line, char const  *func, char const *format */
 	movl   (SIZEOF_KCPUSTATE + 8)(%esp), %eax  /* char const *file */
@@ -301,7 +303,7 @@ INTERN_FUNCTION(libc__assert)
 	.cfi_rel_offset %eip, 0
 	pushfl_cfi_r
 	pushal_cfi_r
-	ADJUST_ESP(8, 12)
+	ADJUST_KCPUSTATE_ESP_AFTER_PUSHAL(8)
 	/*                -,                -, char const  *expr, char const *file, unsigned int line */
 	/* char const *expr, char const *file, unsigned int line, char const *func, char const  *format */
 	movl   (SIZEOF_KCPUSTATE + 8)(%esp), %eax  /* char const *expr */
