@@ -172,7 +172,8 @@ got_time:
 			year += 100; /* 100 years into the future. */
 		year += (__DATE_YEAR__ - (__DATE_YEAR__ % 100));
 	}
-	result = YEARS2DAYS((time_t)((s32)year - UNIX_TIME_START_YEAR));
+	result = YEARS2DAYS((time_t)((s32)year)) -
+	         YEARS2DAYS(UNIX_TIME_START_YEAR);
 	result += MONTH_STARTING_DAY_OF_YEAR(ISLEAPYEAR(year), (u8)(cmos_month - 1) % 12);
 	result += cmos_day - 1;
 	result *= SECONDS_PER_DAY;

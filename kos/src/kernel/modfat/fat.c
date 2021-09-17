@@ -1007,16 +1007,10 @@ NOTHROW(KCALL Fat_FinalizeNode)(struct inode *__restrict self) {
 }
 
 #define UNIX_TIME_START_YEAR 1970
-
-#define SECONDS_PER_DAY 86400
-
-#define DAYS2YEARS(n_days)  ((400 * ((n_days) + 1)) / 146097)
-#define YEARS2DAYS(n_years) (((146097 * (n_years)) / 400) /*-1*/) // rounding error?
-#define ISLEAPYEAR(year) \
-	(__builtin_constant_p(year)                                                   \
-	 ? ((year) % 400 == 0 || ((year) % 100 != 0 && (year) % 4 == 0))              \
-	 : XBLOCK({ __typeof__(year) const _year = (year);                            \
-	            XRETURN _year % 400 == 0 || (_year % 100 != 0 && _year % 4 == 0); }))
+#define SECONDS_PER_DAY      86400
+#define DAYS2YEARS(n_days)   __daystoyears(n_days)
+#define YEARS2DAYS(n_years)  __yearstodays(n_years)
+#define ISLEAPYEAR(year)     __isleap(year)
 
 PRIVATE time_t const time_monthstart_yday[2][13] = {
 	{ 0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334, 365 },
@@ -1033,7 +1027,7 @@ Fat_DecodeFileDate(FatFileDate self)
 	time_t result;
 	unsigned int year;
 	year   = self.fd_year + 1980;
-	result = YEARS2DAYS(year - UNIX_TIME_START_YEAR);
+	result = YEARS2DAYS(year) - YEARS2DAYS(UNIX_TIME_START_YEAR);
 	result += MONTH_STARTING_DAY_OF_YEAR(ISLEAPYEAR(year), (self.fd_month - 1) % 12);
 	result += self.fd_day - 1;
 	return result * SECONDS_PER_DAY;
