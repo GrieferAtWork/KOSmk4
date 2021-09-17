@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb08d26aa */
+/* HASH CRC-32:0xb878bbb3 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -992,14 +992,24 @@ __LOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL _toupper)(int __ch)
 #endif /* __USE_MISC || __USE_XOPEN || __USE_DOS */
 
 #ifdef __USE_DOS
-#if !defined(___isctype_defined) && defined(__CRT_HAVE__isctype)
+#ifndef ___isctype_defined
 #define ___isctype_defined 1
+#ifdef __CRT_HAVE__isctype
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,_isctype,(int __ch, int __mask),(__ch,__mask))
-#endif /* !___isctype_defined && __CRT_HAVE__isctype */
-#if !defined(___isctype_l_defined) && defined(__CRT_HAVE__isctype_l)
+#else /* __CRT_HAVE__isctype */
+#include <libc/local/ctype/_isctype.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(_isctype, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL _isctype)(int __ch, int __mask) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_isctype))(__ch, __mask); })
+#endif /* !__CRT_HAVE__isctype */
+#endif /* !___isctype_defined */
+#ifndef ___isctype_l_defined
 #define ___isctype_l_defined 1
+#ifdef __CRT_HAVE__isctype_l
 __CDECLARE(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,_isctype_l,(int __ch, int __mask, __locale_t __locale),(__ch,__mask,__locale))
-#endif /* !___isctype_l_defined && __CRT_HAVE__isctype_l */
+#else /* __CRT_HAVE__isctype_l */
+#include <libc/local/ctype/_isctype_l.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(_isctype_l, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL _isctype_l)(int __ch, int __mask, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_isctype_l))(__ch, __mask, __locale); })
+#endif /* !__CRT_HAVE__isctype_l */
+#endif /* !___isctype_l_defined */
 #if defined(__crt_isalpha_l) && defined(__CRT_HAVE_isalpha_l)
 /* >> isalpha_l(3) */
 __CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,_isalpha_l,(int __ch, __locale_t __locale),isalpha_l,{ return __crt_isalpha_l(__ch, __locale); })

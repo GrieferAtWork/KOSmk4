@@ -758,36 +758,44 @@ $wint_t towupper_l($wint_t ch, $locale_t locale) {
 [[dos_only_export_alias("_iswctype_l"), export_alias("__iswctype_l")]]
 [[wchar, pure, wunused, decl_include("<hybrid/typecore.h>", "<bits/crt/wctype.h>")]]
 [[requires_function(iswctype)]]
+[[if(defined(__LIBKCALL_CALLER_CLEANUP)), crt_intern_kos_alias("libc_iswctype")]]
+[[if(defined(__LIBDCALL_CALLER_CLEANUP)), crt_intern_dos_alias("libd_iswctype")]]
 int iswctype_l($wint_t wc, $wctype_t type, $locale_t locale) {
-	(void)locale;
 	COMPILER_IMPURE();
+	(void)locale;
 	return iswctype(wc, type);
 }
 
 [[decl_include("<bits/crt/wctype.h>")]]
 [[wunused, export_alias("__wctype_l")]]
 [[requires_function(wctype)]]
+[[if(defined(__LIBKCALL_CALLER_CLEANUP)), crt_intern_kos_alias("libc_wctype")]]
+[[if(defined(__LIBDCALL_CALLER_CLEANUP)), crt_intern_dos_alias("libd_wctype")]]
 $wctype_t wctype_l([[nonnull]] char const *prop, $locale_t locale) {
-	(void)locale;
 	COMPILER_IMPURE();
+	(void)locale;
 	return wctype(prop);
 }
 
 [[decl_include("<hybrid/typecore.h>", "<bits/crt/wctype.h>")]]
 [[wchar, wunused, export_alias("__towctrans_l")]]
 [[requires_function(towctrans)]]
+[[if(defined(__LIBKCALL_CALLER_CLEANUP)), crt_intern_kos_alias("libc_towctrans")]]
+[[if(defined(__LIBDCALL_CALLER_CLEANUP)), crt_intern_dos_alias("libd_towctrans")]]
 $wint_t towctrans_l($wint_t wc, $wctrans_t desc, $locale_t locale) {
-	(void)locale;
 	COMPILER_IMPURE();
+	(void)locale;
 	return towctrans(wc, desc);
 }
 
 [[decl_include("<bits/crt/wctype.h>")]]
 [[wunused, export_alias("__wctrans_l")]]
 [[requires_function(wctrans)]]
+[[if(defined(__LIBKCALL_CALLER_CLEANUP)), crt_intern_kos_alias("libc_wctrans")]]
+[[if(defined(__LIBDCALL_CALLER_CLEANUP)), crt_intern_dos_alias("libd_wctrans")]]
 $wctrans_t wctrans_l([[nonnull]] char const *prop, $locale_t locale) {
-	(void)locale;
 	COMPILER_IMPURE();
+	(void)locale;
 	return wctrans(prop);
 }
 
@@ -828,10 +836,12 @@ int iswsymcont($wint_t wc) {
 
 [[wchar, pure, wunused, decl_include("<hybrid/typecore.h>")]]
 [[crt_name("_iswcsymf_l"), doc_alias("iswsymstrt")]]
+[[if(defined(__LIBKCALL_CALLER_CLEANUP)), crt_intern_kos_alias("libc___iswcsymf")]]
+[[if(defined(__LIBDCALL_CALLER_CLEANUP)), crt_intern_dos_alias("libd___iswcsymf")]]
 int iswsymstrt_l($wint_t wc, $locale_t locale) {
 @@pp_if defined(__CRT_KOS) && $has_function(__unicode_descriptor)@@
-	(void)locale;
 	COMPILER_IMPURE();
+	(void)locale;
 	return __iswcsymf(wc);
 @@pp_else@@
 	return iswalpha_l(wc, locale) || wc == '_' || wc == '$';
@@ -840,10 +850,12 @@ int iswsymstrt_l($wint_t wc, $locale_t locale) {
 
 [[wchar, pure, wunused, decl_include("<hybrid/typecore.h>")]]
 [[crt_name("_iswcsym_l"), doc_alias("iswsymcont")]]
+[[if(defined(__LIBKCALL_CALLER_CLEANUP)), crt_intern_kos_alias("libc___iswcsym")]]
+[[if(defined(__LIBDCALL_CALLER_CLEANUP)), crt_intern_dos_alias("libd___iswcsym")]]
 int iswsymcont_l($wint_t wc, $locale_t locale) {
 @@pp_if defined(__CRT_KOS) && $has_function(__unicode_descriptor)@@
-	(void)locale;
 	COMPILER_IMPURE();
+	(void)locale;
 	return __iswcsym(wc);
 @@pp_else@@
 	return iswalnum_l(wc, locale) || wc == '_' || wc == '$';
@@ -892,9 +904,11 @@ int isleadbyte(int wc) {
 
 [[pure, wunused]]
 [[section(".text.crt{|.dos}.wchar.unicode.locale.mbs")]]
+[[if(defined(__LIBKCALL_CALLER_CLEANUP)), crt_intern_kos_alias("libc_isleadbyte")]]
+[[if(defined(__LIBDCALL_CALLER_CLEANUP)), crt_intern_dos_alias("libd_isleadbyte")]]
 int _isleadbyte_l(int wc, $locale_t locale) {
-	(void)locale;
 	COMPILER_IMPURE();
+	(void)locale;
 	return isleadbyte(wc);
 }
 

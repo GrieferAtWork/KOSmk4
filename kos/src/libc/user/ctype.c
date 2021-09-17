@@ -1355,48 +1355,18 @@ NOTHROW_NCX(LIBCCALL libc___locale_ctype_ptr_l)(locale_t locale)
 }
 /*[[[end:libc___locale_ctype_ptr_l]]]*/
 
-/*[[[head:libc__isctype,hash:CRC-32=0xc520f632]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.unicode.static.ctype") ATTR_CONST WUNUSED int
-NOTHROW(LIBCCALL libc__isctype)(int ch,
-                                int mask)
-/*[[[body:libc__isctype]]]*/
-/*AUTO*/{
-	(void)ch;
-	(void)mask;
-	CRT_UNIMPLEMENTEDF("_isctype(%x, %x)", ch, mask); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
-}
-/*[[[end:libc__isctype]]]*/
-
-/*[[[head:libc__isctype_l,hash:CRC-32=0xa30114a7]]]*/
-INTERN ATTR_SECTION(".text.crt.unicode.locale.ctype") ATTR_PURE WUNUSED int
-NOTHROW_NCX(LIBCCALL libc__isctype_l)(int ch,
-                                      int mask,
-                                      locale_t locale)
-/*[[[body:libc__isctype_l]]]*/
-/*AUTO*/{
-	(void)ch;
-	(void)mask;
-	(void)locale;
-	CRT_UNIMPLEMENTEDF("_isctype_l(%x, %x, %p)", ch, mask, locale); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
-}
-/*[[[end:libc__isctype_l]]]*/
 
 
 
 
 
-/*[[[start:exports,hash:CRC-32=0x617f98de]]]*/
+
+/*[[[start:exports,hash:CRC-32=0xe57a21f9]]]*/
 DEFINE_PUBLIC_ALIAS(__locale_ctype_ptr, libc___locale_ctype_ptr);
 DEFINE_PUBLIC_ALIAS(__locale_ctype_ptr_l, libc___locale_ctype_ptr_l);
 DEFINE_PUBLIC_ALIAS(__ctype_b_loc, libc___ctype_b_loc);
 DEFINE_PUBLIC_ALIAS(__ctype_tolower_loc, libc___ctype_tolower_loc);
 DEFINE_PUBLIC_ALIAS(__ctype_toupper_loc, libc___ctype_toupper_loc);
-DEFINE_PUBLIC_ALIAS(_isctype, libc__isctype);
-DEFINE_PUBLIC_ALIAS(_isctype_l, libc__isctype_l);
 /*[[[end:exports]]]*/
 
 DECL_END

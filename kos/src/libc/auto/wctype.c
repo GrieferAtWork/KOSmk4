@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4b6101d6 */
+/* HASH CRC-32:0x68543bab */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -742,52 +742,76 @@ NOTHROW_NCX(LIBKCALL libc_towupper_l)(wint32_t ch,
 	return libc_towupper(ch);
 }
 #endif /* !__LIBKCALL_CALLER_CLEANUP */
+#ifdef __LIBDCALL_CALLER_CLEANUP
+DEFINE_INTERN_ALIAS(libd_iswctype_l, libd_iswctype);
+#else /* __LIBDCALL_CALLER_CLEANUP */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.ctype") ATTR_PURE WUNUSED int
 NOTHROW_NCX(LIBDCALL libd_iswctype_l)(wint16_t wc,
                                       wctype_t type,
                                       locale_t locale) {
-	(void)locale;
 	COMPILER_IMPURE();
+	(void)locale;
 	return libd_iswctype(wc, type);
 }
+#endif /* !__LIBDCALL_CALLER_CLEANUP */
+#ifdef __LIBKCALL_CALLER_CLEANUP
+DEFINE_INTERN_ALIAS(libc_iswctype_l, libc_iswctype);
+#else /* __LIBKCALL_CALLER_CLEANUP */
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.locale.ctype") ATTR_PURE WUNUSED int
 NOTHROW_NCX(LIBKCALL libc_iswctype_l)(wint32_t wc,
                                       wctype_t type,
                                       locale_t locale) {
-	(void)locale;
 	COMPILER_IMPURE();
+	(void)locale;
 	return libc_iswctype(wc, type);
 }
+#endif /* !__LIBKCALL_CALLER_CLEANUP */
+#ifdef __LIBKCALL_CALLER_CLEANUP
+DEFINE_INTERN_ALIAS(libc_wctype_l, libc_wctype);
+#else /* __LIBKCALL_CALLER_CLEANUP */
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.locale.ctype") WUNUSED NONNULL((1)) wctype_t
 NOTHROW_NCX(LIBCCALL libc_wctype_l)(char const *prop,
                                     locale_t locale) {
-	(void)locale;
 	COMPILER_IMPURE();
+	(void)locale;
 	return libc_wctype(prop);
 }
+#endif /* !__LIBKCALL_CALLER_CLEANUP */
+#ifdef __LIBDCALL_CALLER_CLEANUP
+DEFINE_INTERN_ALIAS(libd_towctrans_l, libd_towctrans);
+#else /* __LIBDCALL_CALLER_CLEANUP */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.ctype") WUNUSED wint16_t
 NOTHROW_NCX(LIBDCALL libd_towctrans_l)(wint16_t wc,
                                        wctrans_t desc,
                                        locale_t locale) {
-	(void)locale;
 	COMPILER_IMPURE();
+	(void)locale;
 	return libd_towctrans(wc, desc);
 }
+#endif /* !__LIBDCALL_CALLER_CLEANUP */
+#ifdef __LIBKCALL_CALLER_CLEANUP
+DEFINE_INTERN_ALIAS(libc_towctrans_l, libc_towctrans);
+#else /* __LIBKCALL_CALLER_CLEANUP */
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.locale.ctype") WUNUSED wint32_t
 NOTHROW_NCX(LIBKCALL libc_towctrans_l)(wint32_t wc,
                                        wctrans_t desc,
                                        locale_t locale) {
-	(void)locale;
 	COMPILER_IMPURE();
+	(void)locale;
 	return libc_towctrans(wc, desc);
 }
+#endif /* !__LIBKCALL_CALLER_CLEANUP */
+#ifdef __LIBKCALL_CALLER_CLEANUP
+DEFINE_INTERN_ALIAS(libc_wctrans_l, libc_wctrans);
+#else /* __LIBKCALL_CALLER_CLEANUP */
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.locale.ctype") WUNUSED NONNULL((1)) wctrans_t
 NOTHROW_NCX(LIBCCALL libc_wctrans_l)(char const *prop,
                                      locale_t locale) {
-	(void)locale;
 	COMPILER_IMPURE();
+	(void)locale;
 	return libc_wctrans(prop);
 }
+#endif /* !__LIBKCALL_CALLER_CLEANUP */
 #include <bits/crt/unicode.h>
 /* >> iswsymstrt(3), iswsymstrt_l(3)
  * Check if `wc' may appear at the start of a symbol/keyword/identifier */
@@ -836,70 +860,90 @@ NOTHROW_NCX(LIBKCALL libc___iswcsym)(wint32_t wc) {
 	return libc_iswalnum(wc) || wc == '_' || wc == '$';
 #endif /* !__CRT_KOS || !__CRT_HAVE___unicode_descriptor */
 }
+#ifdef __LIBDCALL_CALLER_CLEANUP
+DEFINE_INTERN_ALIAS(libd__iswcsymf_l, libd___iswcsymf);
+#else /* __LIBDCALL_CALLER_CLEANUP */
 /* >> iswsymstrt(3), iswsymstrt_l(3)
  * Check if `wc' may appear at the start of a symbol/keyword/identifier */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.mbs") ATTR_PURE WUNUSED int
 NOTHROW_NCX(LIBDCALL libd__iswcsymf_l)(wint16_t wc,
                                        locale_t locale) {
 #if defined(__CRT_KOS) && defined(__CRT_HAVE___unicode_descriptor)
-	(void)locale;
 	COMPILER_IMPURE();
+	(void)locale;
 	return __iswcsymf(wc);
 #else /* __CRT_KOS && __CRT_HAVE___unicode_descriptor */
 	return libd_iswalpha_l(wc, locale) || wc == '_' || wc == '$';
 #endif /* !__CRT_KOS || !__CRT_HAVE___unicode_descriptor */
 }
+#endif /* !__LIBDCALL_CALLER_CLEANUP */
+#ifdef __LIBKCALL_CALLER_CLEANUP
+DEFINE_INTERN_ALIAS(libc__iswcsymf_l, libc___iswcsymf);
+#else /* __LIBKCALL_CALLER_CLEANUP */
 /* >> iswsymstrt(3), iswsymstrt_l(3)
  * Check if `wc' may appear at the start of a symbol/keyword/identifier */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.mbs") ATTR_PURE WUNUSED int
 NOTHROW_NCX(LIBKCALL libc__iswcsymf_l)(wint32_t wc,
                                        locale_t locale) {
 #if defined(__CRT_KOS) && defined(__CRT_HAVE___unicode_descriptor)
-	(void)locale;
 	COMPILER_IMPURE();
+	(void)locale;
 	return __iswcsymf(wc);
 #else /* __CRT_KOS && __CRT_HAVE___unicode_descriptor */
 	return libc_iswalpha_l(wc, locale) || wc == '_' || wc == '$';
 #endif /* !__CRT_KOS || !__CRT_HAVE___unicode_descriptor */
 }
+#endif /* !__LIBKCALL_CALLER_CLEANUP */
+#ifdef __LIBDCALL_CALLER_CLEANUP
+DEFINE_INTERN_ALIAS(libd__iswcsym_l, libd___iswcsym);
+#else /* __LIBDCALL_CALLER_CLEANUP */
 /* >> iswsymcont(3), iswsymcont_l(3)
  * Check if `wc' may appear in the middle of a symbol/keyword/identifier */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.mbs") ATTR_PURE WUNUSED int
 NOTHROW_NCX(LIBDCALL libd__iswcsym_l)(wint16_t wc,
                                       locale_t locale) {
 #if defined(__CRT_KOS) && defined(__CRT_HAVE___unicode_descriptor)
-	(void)locale;
 	COMPILER_IMPURE();
+	(void)locale;
 	return __iswcsym(wc);
 #else /* __CRT_KOS && __CRT_HAVE___unicode_descriptor */
 	return libd_iswalnum_l(wc, locale) || wc == '_' || wc == '$';
 #endif /* !__CRT_KOS || !__CRT_HAVE___unicode_descriptor */
 }
+#endif /* !__LIBDCALL_CALLER_CLEANUP */
+#ifdef __LIBKCALL_CALLER_CLEANUP
+DEFINE_INTERN_ALIAS(libc__iswcsym_l, libc___iswcsym);
+#else /* __LIBKCALL_CALLER_CLEANUP */
 /* >> iswsymcont(3), iswsymcont_l(3)
  * Check if `wc' may appear in the middle of a symbol/keyword/identifier */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.mbs") ATTR_PURE WUNUSED int
 NOTHROW_NCX(LIBKCALL libc__iswcsym_l)(wint32_t wc,
                                       locale_t locale) {
 #if defined(__CRT_KOS) && defined(__CRT_HAVE___unicode_descriptor)
-	(void)locale;
 	COMPILER_IMPURE();
+	(void)locale;
 	return __iswcsym(wc);
 #else /* __CRT_KOS && __CRT_HAVE___unicode_descriptor */
 	return libc_iswalnum_l(wc, locale) || wc == '_' || wc == '$';
 #endif /* !__CRT_KOS || !__CRT_HAVE___unicode_descriptor */
 }
+#endif /* !__LIBKCALL_CALLER_CLEANUP */
 /* >> isleadbyte(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.mbs") ATTR_CONST WUNUSED int
 NOTHROW_NCX(LIBCCALL libc_isleadbyte)(int wc) {
 	return wc >= 192 && wc <= 255;
 }
+#ifdef __LIBKCALL_CALLER_CLEANUP
+DEFINE_INTERN_ALIAS(libc__isleadbyte_l, libc_isleadbyte);
+#else /* __LIBKCALL_CALLER_CLEANUP */
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.locale.mbs") ATTR_PURE WUNUSED int
 NOTHROW_NCX(LIBCCALL libc__isleadbyte_l)(int wc,
                                          locale_t locale) {
-	(void)locale;
 	COMPILER_IMPURE();
+	(void)locale;
 	return libc_isleadbyte(wc);
 }
+#endif /* !__LIBKCALL_CALLER_CLEANUP */
 #endif /* !__KERNEL__ */
 
 DECL_END

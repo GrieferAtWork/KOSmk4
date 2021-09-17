@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe48d9b6 */
+/* HASH CRC-32:0xd778e546 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -65,8 +65,8 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(issymstrt32_l) __ATTR_PURE __ATTR_WUNUSED int
 __NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(issymstrt32_l))(__WINT32_TYPE__ __wc, __locale_t __locale) {
 #if defined(__CRT_KOS) && defined(__CRT_HAVE___unicode_descriptor)
-	(void)__locale;
 	__COMPILER_IMPURE();
+	(void)__locale;
 	return __iswcsymf(__wc);
 #else /* __CRT_KOS && __CRT_HAVE___unicode_descriptor */
 	return (__NAMESPACE_LOCAL_SYM __localdep_isalpha32_l)(__wc, __locale) || __wc == '_' || __wc == '$';

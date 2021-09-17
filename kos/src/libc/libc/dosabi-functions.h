@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe31cc725 */
+/* HASH CRC-32:0x1f230d41 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -283,7 +283,11 @@ DFUN(".text.crt.dos.unicode.static.ctype", libd_toascii, libc_toascii, TD, 1, TD
 DFUN(".text.crt.dos.unicode.static.ctype", libd__tolower, libc__tolower, TD, 1, TD)
 DFUN(".text.crt.dos.unicode.static.ctype", libd__toupper, libc__toupper, TD, 1, TD)
 DFUN(".text.crt.dos.unicode.static.ctype", libd__isctype, libc__isctype, TD, 2, TD, TD)
+#ifdef __LIBDCALL_CALLER_CLEANUP
+DEFINE_INTERN_ALIAS(libd__isctype_l, libd__isctype);
+#else /* __LIBDCALL_CALLER_CLEANUP */
 DFUN(".text.crt.dos.unicode.locale.ctype", libd__isctype_l, libc__isctype_l, TD, 3, TD, TD, TP)
+#endif /* !__LIBDCALL_CALLER_CLEANUP */
 
 /* direct */
 DFUN(".text.crt.dos.fs.property", libd__getdcwd, libc__getdcwd, TP, 3, TD, TP, TI)
@@ -2443,7 +2447,19 @@ DFUN(".text.crt.dos.wchar.FILE.locked.utility", libd_fwide, libc_fwide, TD, 2, T
 /* wctype */
 DFUN(".text.crt.dos.wchar.unicode.static.ctype", libd_wctrans, libc_wctrans, TIn(__SIZEOF_WCTRANS_T__), 1, TP)
 DFUN(".text.crt.dos.wchar.unicode.static.ctype", libd_wctype, libc_wctype, TIn(__SIZEOF_WCTYPE_T__), 1, TP)
+#ifdef __LIBDCALL_CALLER_CLEANUP
+DEFINE_INTERN_ALIAS(libd_wctype_l, libd_wctype);
+#else /* __LIBDCALL_CALLER_CLEANUP */
 DFUN(".text.crt.dos.wchar.unicode.locale.ctype", libd_wctype_l, libc_wctype_l, TIn(__SIZEOF_WCTYPE_T__), 2, TP, TP)
+#endif /* !__LIBDCALL_CALLER_CLEANUP */
+#ifdef __LIBDCALL_CALLER_CLEANUP
+DEFINE_INTERN_ALIAS(libd_wctrans_l, libd_wctrans);
+#else /* __LIBDCALL_CALLER_CLEANUP */
 DFUN(".text.crt.dos.wchar.unicode.locale.ctype", libd_wctrans_l, libc_wctrans_l, TIn(__SIZEOF_WCTRANS_T__), 2, TP, TP)
+#endif /* !__LIBDCALL_CALLER_CLEANUP */
 DFUN(".text.crt.dos.wchar.unicode.static.mbs", libd_isleadbyte, libc_isleadbyte, TD, 1, TD)
+#ifdef __LIBDCALL_CALLER_CLEANUP
+DEFINE_INTERN_ALIAS(libd__isleadbyte_l, libd_isleadbyte);
+#else /* __LIBDCALL_CALLER_CLEANUP */
 DFUN(".text.crt.dos.wchar.unicode.locale.mbs", libd__isleadbyte_l, libc__isleadbyte_l, TD, 2, TD, TP)
+#endif /* !__LIBDCALL_CALLER_CLEANUP */

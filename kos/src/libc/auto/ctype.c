@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf0223eeb */
+/* HASH CRC-32:0x334d87e8 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -431,6 +431,26 @@ INTERN ATTR_SECTION(".text.crt.unicode.static.ctype") ATTR_CONST WUNUSED int
 NOTHROW(LIBCCALL libc__toupper)(int ch) {
 	return ch - 0x20;
 }
+INTERN ATTR_SECTION(".text.crt.dos.unicode.static.ctype") ATTR_CONST WUNUSED int
+NOTHROW(LIBCCALL libc__isctype)(int ch,
+                                int mask) {
+	/* TODO */
+	(void)ch;
+	(void)mask;
+	return 0;
+}
+#ifdef __LIBKCALL_CALLER_CLEANUP
+DEFINE_INTERN_ALIAS(libc__isctype_l, libc__isctype);
+#else /* __LIBKCALL_CALLER_CLEANUP */
+INTERN ATTR_SECTION(".text.crt.unicode.locale.ctype") ATTR_PURE WUNUSED int
+NOTHROW_NCX(LIBCCALL libc__isctype_l)(int ch,
+                                      int mask,
+                                      locale_t locale) {
+	COMPILER_IMPURE();
+	(void)locale;
+	return libc__isctype(ch, mask);
+}
+#endif /* !__LIBKCALL_CALLER_CLEANUP */
 #endif /* !__KERNEL__ */
 
 DECL_END
@@ -532,6 +552,8 @@ DEFINE_PUBLIC_ALIAS(__toascii, libc_toascii);
 DEFINE_PUBLIC_ALIAS(toascii, libc_toascii);
 DEFINE_PUBLIC_ALIAS(_tolower, libc__tolower);
 DEFINE_PUBLIC_ALIAS(_toupper, libc__toupper);
+DEFINE_PUBLIC_ALIAS(_isctype, libc__isctype);
+DEFINE_PUBLIC_ALIAS(_isctype_l, libc__isctype_l);
 #endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_CTYPE_C */

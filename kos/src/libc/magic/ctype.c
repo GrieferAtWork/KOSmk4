@@ -955,11 +955,22 @@ int _toupper(int ch) {
 %[default:section(".text.crt.dos.unicode.static.ctype")];
 
 [[guard, const, wunused, nothrow]]
-int _isctype(int ch, int mask);
+int _isctype(int ch, int mask) {
+	/* TODO */
+	(void)ch;
+	(void)mask;
+	return 0;
+}
 
 [[guard, pure, wunused]]
 [[section(".text.crt{|.dos}.unicode.locale.ctype")]]
-int _isctype_l(int ch, int mask, $locale_t locale);
+[[if(defined(__LIBKCALL_CALLER_CLEANUP)), crt_intern_kos_alias("libc__isctype")]]
+[[if(defined(__LIBDCALL_CALLER_CLEANUP)), crt_intern_dos_alias("libd__isctype")]]
+int _isctype_l(int ch, int mask, $locale_t locale) {
+	COMPILER_IMPURE();
+	(void)locale;
+	return _isctype(ch, mask);
+}
 
 
 %[insert:function(_isalpha_l = isalpha_l)]

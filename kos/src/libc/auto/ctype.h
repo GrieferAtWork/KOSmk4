@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf523fa5d */
+/* HASH CRC-32:0x3deb8a5 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -328,8 +328,16 @@ INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBCCALL libc__toupper)(int ch);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBDCALL libd__isctype)(int ch, int mask);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBCCALL libc__isctype)(int ch, int mask);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF ATTR_PURE WUNUSED int NOTHROW_NCX(LIBDCALL libd__isctype_l)(int ch, int mask, locale_t locale);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+INTDEF ATTR_PURE WUNUSED int NOTHROW_NCX(LIBCCALL libc__isctype_l)(int ch, int mask, locale_t locale);
+#endif /* !__KERNEL__ */
 
 DECL_END
 

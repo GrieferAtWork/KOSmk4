@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x57eca2d8 */
+/* HASH CRC-32:0x4dcbfe28 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -68,8 +68,6 @@
 #define __stub__get_purecall_handler
 #define __stub__getdiskfree
 #define __stub__getmaxstdio
-#define __stub__isctype
-#define __stub__isctype_l
 #define __stub__mktemp_s
 #define __stub__rmtmp
 #define __stub__searchenv_s
