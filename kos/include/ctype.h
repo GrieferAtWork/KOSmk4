@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb878bbb3 */
+/* HASH CRC-32:0x411e2efd */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -375,12 +375,12 @@ __NAMESPACE_STD_USING(isblank)
 #if defined(__crt_iscntrl_l) && defined(__CRT_HAVE_iscntrl_l)
 /* >> iscntrl_l(3) */
 __CEIDECLARE(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,iscntrl_l,(int __ch, __locale_t __locale),{ return __crt_iscntrl_l(__ch, __locale); })
-#elif defined(__crt_iscntrl_l) && defined(__CRT_HAVE___iscntrl_l)
-/* >> iscntrl_l(3) */
-__CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,iscntrl_l,(int __ch, __locale_t __locale),__iscntrl_l,{ return __crt_iscntrl_l(__ch, __locale); })
 #elif defined(__crt_iscntrl_l) && defined(__CRT_HAVE__iscntrl_l)
 /* >> iscntrl_l(3) */
 __CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,iscntrl_l,(int __ch, __locale_t __locale),_iscntrl_l,{ return __crt_iscntrl_l(__ch, __locale); })
+#elif defined(__crt_iscntrl_l) && defined(__CRT_HAVE___iscntrl_l)
+/* >> iscntrl_l(3) */
+__CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,iscntrl_l,(int __ch, __locale_t __locale),__iscntrl_l,{ return __crt_iscntrl_l(__ch, __locale); })
 #elif defined(__crt_iscntrl_l)
 /* >> iscntrl_l(3) */
 __LOCAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL iscntrl_l)(int __ch, __locale_t __locale) { return __crt_iscntrl_l(__ch, __locale); }
@@ -401,12 +401,12 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(iscntrl_l, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR
 #if defined(__crt_isspace_l) && defined(__CRT_HAVE_isspace_l)
 /* >> isspace_l(3) */
 __CEIDECLARE(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,isspace_l,(int __ch, __locale_t __locale),{ return __crt_isspace_l(__ch, __locale); })
-#elif defined(__crt_isspace_l) && defined(__CRT_HAVE___isspace_l)
-/* >> isspace_l(3) */
-__CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,isspace_l,(int __ch, __locale_t __locale),__isspace_l,{ return __crt_isspace_l(__ch, __locale); })
 #elif defined(__crt_isspace_l) && defined(__CRT_HAVE__isspace_l)
 /* >> isspace_l(3) */
 __CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,isspace_l,(int __ch, __locale_t __locale),_isspace_l,{ return __crt_isspace_l(__ch, __locale); })
+#elif defined(__crt_isspace_l) && defined(__CRT_HAVE___isspace_l)
+/* >> isspace_l(3) */
+__CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,isspace_l,(int __ch, __locale_t __locale),__isspace_l,{ return __crt_isspace_l(__ch, __locale); })
 #elif defined(__crt_isspace_l)
 /* >> isspace_l(3) */
 __LOCAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL isspace_l)(int __ch, __locale_t __locale) { return __crt_isspace_l(__ch, __locale); }
@@ -427,12 +427,12 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(isspace_l, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR
 #if defined(__crt_isupper_l) && defined(__CRT_HAVE_isupper_l)
 /* >> isupper_l(3) */
 __CEIDECLARE(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,isupper_l,(int __ch, __locale_t __locale),{ return __crt_isupper_l(__ch, __locale); })
-#elif defined(__crt_isupper_l) && defined(__CRT_HAVE___isupper_l)
-/* >> isupper_l(3) */
-__CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,isupper_l,(int __ch, __locale_t __locale),__isupper_l,{ return __crt_isupper_l(__ch, __locale); })
 #elif defined(__crt_isupper_l) && defined(__CRT_HAVE__isupper_l)
 /* >> isupper_l(3) */
 __CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,isupper_l,(int __ch, __locale_t __locale),_isupper_l,{ return __crt_isupper_l(__ch, __locale); })
+#elif defined(__crt_isupper_l) && defined(__CRT_HAVE___isupper_l)
+/* >> isupper_l(3) */
+__CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,isupper_l,(int __ch, __locale_t __locale),__isupper_l,{ return __crt_isupper_l(__ch, __locale); })
 #elif defined(__crt_isupper_l)
 /* >> isupper_l(3) */
 __LOCAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL isupper_l)(int __ch, __locale_t __locale) { return __crt_isupper_l(__ch, __locale); }
@@ -453,12 +453,12 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(isupper_l, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR
 #if defined(__crt_islower_l) && defined(__CRT_HAVE_islower_l)
 /* >> islower_l(3) */
 __CEIDECLARE(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,islower_l,(int __ch, __locale_t __locale),{ return __crt_islower_l(__ch, __locale); })
-#elif defined(__crt_islower_l) && defined(__CRT_HAVE___islower_l)
-/* >> islower_l(3) */
-__CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,islower_l,(int __ch, __locale_t __locale),__islower_l,{ return __crt_islower_l(__ch, __locale); })
 #elif defined(__crt_islower_l) && defined(__CRT_HAVE__islower_l)
 /* >> islower_l(3) */
 __CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,islower_l,(int __ch, __locale_t __locale),_islower_l,{ return __crt_islower_l(__ch, __locale); })
+#elif defined(__crt_islower_l) && defined(__CRT_HAVE___islower_l)
+/* >> islower_l(3) */
+__CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,islower_l,(int __ch, __locale_t __locale),__islower_l,{ return __crt_islower_l(__ch, __locale); })
 #elif defined(__crt_islower_l)
 /* >> islower_l(3) */
 __LOCAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL islower_l)(int __ch, __locale_t __locale) { return __crt_islower_l(__ch, __locale); }
@@ -479,12 +479,12 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(islower_l, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR
 #if defined(__crt_isalpha_l) && defined(__CRT_HAVE_isalpha_l)
 /* >> isalpha_l(3) */
 __CEIDECLARE(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,isalpha_l,(int __ch, __locale_t __locale),{ return __crt_isalpha_l(__ch, __locale); })
-#elif defined(__crt_isalpha_l) && defined(__CRT_HAVE___isalpha_l)
-/* >> isalpha_l(3) */
-__CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,isalpha_l,(int __ch, __locale_t __locale),__isalpha_l,{ return __crt_isalpha_l(__ch, __locale); })
 #elif defined(__crt_isalpha_l) && defined(__CRT_HAVE__isalpha_l)
 /* >> isalpha_l(3) */
 __CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,isalpha_l,(int __ch, __locale_t __locale),_isalpha_l,{ return __crt_isalpha_l(__ch, __locale); })
+#elif defined(__crt_isalpha_l) && defined(__CRT_HAVE___isalpha_l)
+/* >> isalpha_l(3) */
+__CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,isalpha_l,(int __ch, __locale_t __locale),__isalpha_l,{ return __crt_isalpha_l(__ch, __locale); })
 #elif defined(__crt_isalpha_l)
 /* >> isalpha_l(3) */
 __LOCAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL isalpha_l)(int __ch, __locale_t __locale) { return __crt_isalpha_l(__ch, __locale); }
@@ -505,12 +505,12 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(isalpha_l, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR
 #if defined(__crt_isdigit_l) && defined(__CRT_HAVE_isdigit_l)
 /* >> isdigit_l(3) */
 __CEIDECLARE(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,isdigit_l,(int __ch, __locale_t __locale),{ return __crt_isdigit_l(__ch, __locale); })
-#elif defined(__crt_isdigit_l) && defined(__CRT_HAVE___isdigit_l)
-/* >> isdigit_l(3) */
-__CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,isdigit_l,(int __ch, __locale_t __locale),__isdigit_l,{ return __crt_isdigit_l(__ch, __locale); })
 #elif defined(__crt_isdigit_l) && defined(__CRT_HAVE__isdigit_l)
 /* >> isdigit_l(3) */
 __CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,isdigit_l,(int __ch, __locale_t __locale),_isdigit_l,{ return __crt_isdigit_l(__ch, __locale); })
+#elif defined(__crt_isdigit_l) && defined(__CRT_HAVE___isdigit_l)
+/* >> isdigit_l(3) */
+__CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,isdigit_l,(int __ch, __locale_t __locale),__isdigit_l,{ return __crt_isdigit_l(__ch, __locale); })
 #elif defined(__crt_isdigit_l)
 /* >> isdigit_l(3) */
 __LOCAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL isdigit_l)(int __ch, __locale_t __locale) { return __crt_isdigit_l(__ch, __locale); }
@@ -531,12 +531,12 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(isdigit_l, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR
 #if defined(__crt_isxdigit_l) && defined(__CRT_HAVE_isxdigit_l)
 /* >> isxdigit_l(3) */
 __CEIDECLARE(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,isxdigit_l,(int __ch, __locale_t __locale),{ return __crt_isxdigit_l(__ch, __locale); })
-#elif defined(__crt_isxdigit_l) && defined(__CRT_HAVE___isxdigit_l)
-/* >> isxdigit_l(3) */
-__CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,isxdigit_l,(int __ch, __locale_t __locale),__isxdigit_l,{ return __crt_isxdigit_l(__ch, __locale); })
 #elif defined(__crt_isxdigit_l) && defined(__CRT_HAVE__isxdigit_l)
 /* >> isxdigit_l(3) */
 __CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,isxdigit_l,(int __ch, __locale_t __locale),_isxdigit_l,{ return __crt_isxdigit_l(__ch, __locale); })
+#elif defined(__crt_isxdigit_l) && defined(__CRT_HAVE___isxdigit_l)
+/* >> isxdigit_l(3) */
+__CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,isxdigit_l,(int __ch, __locale_t __locale),__isxdigit_l,{ return __crt_isxdigit_l(__ch, __locale); })
 #elif defined(__crt_isxdigit_l)
 /* >> isxdigit_l(3) */
 __LOCAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL isxdigit_l)(int __ch, __locale_t __locale) { return __crt_isxdigit_l(__ch, __locale); }
@@ -557,12 +557,12 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(isxdigit_l, __FORCELOCAL __ATTR_ARTIFICIAL __ATT
 #if defined(__crt_isalnum_l) && defined(__CRT_HAVE_isalnum_l)
 /* >> isalnum_l(3) */
 __CEIDECLARE(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,isalnum_l,(int __ch, __locale_t __locale),{ return __crt_isalnum_l(__ch, __locale); })
-#elif defined(__crt_isalnum_l) && defined(__CRT_HAVE___isalnum_l)
-/* >> isalnum_l(3) */
-__CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,isalnum_l,(int __ch, __locale_t __locale),__isalnum_l,{ return __crt_isalnum_l(__ch, __locale); })
 #elif defined(__crt_isalnum_l) && defined(__CRT_HAVE__isalnum_l)
 /* >> isalnum_l(3) */
 __CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,isalnum_l,(int __ch, __locale_t __locale),_isalnum_l,{ return __crt_isalnum_l(__ch, __locale); })
+#elif defined(__crt_isalnum_l) && defined(__CRT_HAVE___isalnum_l)
+/* >> isalnum_l(3) */
+__CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,isalnum_l,(int __ch, __locale_t __locale),__isalnum_l,{ return __crt_isalnum_l(__ch, __locale); })
 #elif defined(__crt_isalnum_l)
 /* >> isalnum_l(3) */
 __LOCAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL isalnum_l)(int __ch, __locale_t __locale) { return __crt_isalnum_l(__ch, __locale); }
@@ -583,12 +583,12 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(isalnum_l, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR
 #if defined(__crt_ispunct_l) && defined(__CRT_HAVE_ispunct_l)
 /* >> ispunct_l(3) */
 __CEIDECLARE(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,ispunct_l,(int __ch, __locale_t __locale),{ return __crt_ispunct_l(__ch, __locale); })
-#elif defined(__crt_ispunct_l) && defined(__CRT_HAVE___ispunct_l)
-/* >> ispunct_l(3) */
-__CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,ispunct_l,(int __ch, __locale_t __locale),__ispunct_l,{ return __crt_ispunct_l(__ch, __locale); })
 #elif defined(__crt_ispunct_l) && defined(__CRT_HAVE__ispunct_l)
 /* >> ispunct_l(3) */
 __CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,ispunct_l,(int __ch, __locale_t __locale),_ispunct_l,{ return __crt_ispunct_l(__ch, __locale); })
+#elif defined(__crt_ispunct_l) && defined(__CRT_HAVE___ispunct_l)
+/* >> ispunct_l(3) */
+__CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,ispunct_l,(int __ch, __locale_t __locale),__ispunct_l,{ return __crt_ispunct_l(__ch, __locale); })
 #elif defined(__crt_ispunct_l)
 /* >> ispunct_l(3) */
 __LOCAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL ispunct_l)(int __ch, __locale_t __locale) { return __crt_ispunct_l(__ch, __locale); }
@@ -609,12 +609,12 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(ispunct_l, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR
 #if defined(__crt_isgraph_l) && defined(__CRT_HAVE_isgraph_l)
 /* >> isgraph_l(3) */
 __CEIDECLARE(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,isgraph_l,(int __ch, __locale_t __locale),{ return __crt_isgraph_l(__ch, __locale); })
-#elif defined(__crt_isgraph_l) && defined(__CRT_HAVE___isgraph_l)
-/* >> isgraph_l(3) */
-__CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,isgraph_l,(int __ch, __locale_t __locale),__isgraph_l,{ return __crt_isgraph_l(__ch, __locale); })
 #elif defined(__crt_isgraph_l) && defined(__CRT_HAVE__isgraph_l)
 /* >> isgraph_l(3) */
 __CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,isgraph_l,(int __ch, __locale_t __locale),_isgraph_l,{ return __crt_isgraph_l(__ch, __locale); })
+#elif defined(__crt_isgraph_l) && defined(__CRT_HAVE___isgraph_l)
+/* >> isgraph_l(3) */
+__CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,isgraph_l,(int __ch, __locale_t __locale),__isgraph_l,{ return __crt_isgraph_l(__ch, __locale); })
 #elif defined(__crt_isgraph_l)
 /* >> isgraph_l(3) */
 __LOCAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL isgraph_l)(int __ch, __locale_t __locale) { return __crt_isgraph_l(__ch, __locale); }
@@ -635,12 +635,12 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(isgraph_l, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR
 #if defined(__crt_isprint_l) && defined(__CRT_HAVE_isprint_l)
 /* >> isprint_l(3) */
 __CEIDECLARE(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,isprint_l,(int __ch, __locale_t __locale),{ return __crt_isprint_l(__ch, __locale); })
-#elif defined(__crt_isprint_l) && defined(__CRT_HAVE___isprint_l)
-/* >> isprint_l(3) */
-__CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,isprint_l,(int __ch, __locale_t __locale),__isprint_l,{ return __crt_isprint_l(__ch, __locale); })
 #elif defined(__crt_isprint_l) && defined(__CRT_HAVE__isprint_l)
 /* >> isprint_l(3) */
 __CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,isprint_l,(int __ch, __locale_t __locale),_isprint_l,{ return __crt_isprint_l(__ch, __locale); })
+#elif defined(__crt_isprint_l) && defined(__CRT_HAVE___isprint_l)
+/* >> isprint_l(3) */
+__CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,isprint_l,(int __ch, __locale_t __locale),__isprint_l,{ return __crt_isprint_l(__ch, __locale); })
 #elif defined(__crt_isprint_l)
 /* >> isprint_l(3) */
 __LOCAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL isprint_l)(int __ch, __locale_t __locale) { return __crt_isprint_l(__ch, __locale); }
@@ -661,12 +661,12 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(isprint_l, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR
 #if defined(__crt_isblank_l) && defined(__CRT_HAVE_isblank_l)
 /* >> isblank_l(3) */
 __CEIDECLARE(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,isblank_l,(int __ch, __locale_t __locale),{ return __crt_isblank_l(__ch, __locale); })
-#elif defined(__crt_isblank_l) && defined(__CRT_HAVE___isblank_l)
-/* >> isblank_l(3) */
-__CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,isblank_l,(int __ch, __locale_t __locale),__isblank_l,{ return __crt_isblank_l(__ch, __locale); })
 #elif defined(__crt_isblank_l) && defined(__CRT_HAVE__isblank_l)
 /* >> isblank_l(3) */
 __CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,isblank_l,(int __ch, __locale_t __locale),_isblank_l,{ return __crt_isblank_l(__ch, __locale); })
+#elif defined(__crt_isblank_l) && defined(__CRT_HAVE___isblank_l)
+/* >> isblank_l(3) */
+__CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,isblank_l,(int __ch, __locale_t __locale),__isblank_l,{ return __crt_isblank_l(__ch, __locale); })
 #elif defined(__crt_isblank_l)
 /* >> isblank_l(3) */
 __LOCAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL isblank_l)(int __ch, __locale_t __locale) { return __crt_isblank_l(__ch, __locale); }
@@ -687,12 +687,12 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(isblank_l, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR
 #if defined(__crt_tolower_l) && defined(__CRT_HAVE_tolower_l)
 /* >> tolower_l(3) */
 __CEIDECLARE(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,tolower_l,(int __ch, __locale_t __locale),{ return __crt_tolower_l(__ch, __locale); })
-#elif defined(__crt_tolower_l) && defined(__CRT_HAVE___tolower_l)
-/* >> tolower_l(3) */
-__CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,tolower_l,(int __ch, __locale_t __locale),__tolower_l,{ return __crt_tolower_l(__ch, __locale); })
 #elif defined(__crt_tolower_l) && defined(__CRT_HAVE__tolower_l)
 /* >> tolower_l(3) */
 __CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,tolower_l,(int __ch, __locale_t __locale),_tolower_l,{ return __crt_tolower_l(__ch, __locale); })
+#elif defined(__crt_tolower_l) && defined(__CRT_HAVE___tolower_l)
+/* >> tolower_l(3) */
+__CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,tolower_l,(int __ch, __locale_t __locale),__tolower_l,{ return __crt_tolower_l(__ch, __locale); })
 #elif defined(__crt_tolower_l)
 /* >> tolower_l(3) */
 __LOCAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL tolower_l)(int __ch, __locale_t __locale) { return __crt_tolower_l(__ch, __locale); }
@@ -713,12 +713,12 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(tolower_l, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR
 #if defined(__crt_toupper_l) && defined(__CRT_HAVE_toupper_l)
 /* >> toupper_l(3) */
 __CEIDECLARE(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,toupper_l,(int __ch, __locale_t __locale),{ return __crt_toupper_l(__ch, __locale); })
-#elif defined(__crt_toupper_l) && defined(__CRT_HAVE___toupper_l)
-/* >> toupper_l(3) */
-__CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,toupper_l,(int __ch, __locale_t __locale),__toupper_l,{ return __crt_toupper_l(__ch, __locale); })
 #elif defined(__crt_toupper_l) && defined(__CRT_HAVE__toupper_l)
 /* >> toupper_l(3) */
 __CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,toupper_l,(int __ch, __locale_t __locale),_toupper_l,{ return __crt_toupper_l(__ch, __locale); })
+#elif defined(__crt_toupper_l) && defined(__CRT_HAVE___toupper_l)
+/* >> toupper_l(3) */
+__CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,toupper_l,(int __ch, __locale_t __locale),__toupper_l,{ return __crt_toupper_l(__ch, __locale); })
 #elif defined(__crt_toupper_l)
 /* >> toupper_l(3) */
 __LOCAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL toupper_l)(int __ch, __locale_t __locale) { return __crt_toupper_l(__ch, __locale); }
@@ -1013,12 +1013,12 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_isctype_l, __FORCELOCAL __ATTR_ARTIFICIAL __ATT
 #if defined(__crt_isalpha_l) && defined(__CRT_HAVE_isalpha_l)
 /* >> isalpha_l(3) */
 __CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,_isalpha_l,(int __ch, __locale_t __locale),isalpha_l,{ return __crt_isalpha_l(__ch, __locale); })
-#elif defined(__crt_isalpha_l) && defined(__CRT_HAVE___isalpha_l)
-/* >> isalpha_l(3) */
-__CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,_isalpha_l,(int __ch, __locale_t __locale),__isalpha_l,{ return __crt_isalpha_l(__ch, __locale); })
 #elif defined(__crt_isalpha_l) && defined(__CRT_HAVE__isalpha_l)
 /* >> isalpha_l(3) */
 __CEIDECLARE(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,_isalpha_l,(int __ch, __locale_t __locale),{ return __crt_isalpha_l(__ch, __locale); })
+#elif defined(__crt_isalpha_l) && defined(__CRT_HAVE___isalpha_l)
+/* >> isalpha_l(3) */
+__CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,_isalpha_l,(int __ch, __locale_t __locale),__isalpha_l,{ return __crt_isalpha_l(__ch, __locale); })
 #elif defined(__crt_isalpha_l)
 /* >> isalpha_l(3) */
 __LOCAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL _isalpha_l)(int __ch, __locale_t __locale) { return __crt_isalpha_l(__ch, __locale); }
@@ -1039,12 +1039,12 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LI
 #if defined(__crt_isupper_l) && defined(__CRT_HAVE_isupper_l)
 /* >> isupper_l(3) */
 __CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,_isupper_l,(int __ch, __locale_t __locale),isupper_l,{ return __crt_isupper_l(__ch, __locale); })
-#elif defined(__crt_isupper_l) && defined(__CRT_HAVE___isupper_l)
-/* >> isupper_l(3) */
-__CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,_isupper_l,(int __ch, __locale_t __locale),__isupper_l,{ return __crt_isupper_l(__ch, __locale); })
 #elif defined(__crt_isupper_l) && defined(__CRT_HAVE__isupper_l)
 /* >> isupper_l(3) */
 __CEIDECLARE(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,_isupper_l,(int __ch, __locale_t __locale),{ return __crt_isupper_l(__ch, __locale); })
+#elif defined(__crt_isupper_l) && defined(__CRT_HAVE___isupper_l)
+/* >> isupper_l(3) */
+__CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,_isupper_l,(int __ch, __locale_t __locale),__isupper_l,{ return __crt_isupper_l(__ch, __locale); })
 #elif defined(__crt_isupper_l)
 /* >> isupper_l(3) */
 __LOCAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL _isupper_l)(int __ch, __locale_t __locale) { return __crt_isupper_l(__ch, __locale); }
@@ -1065,12 +1065,12 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LI
 #if defined(__crt_islower_l) && defined(__CRT_HAVE_islower_l)
 /* >> islower_l(3) */
 __CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,_islower_l,(int __ch, __locale_t __locale),islower_l,{ return __crt_islower_l(__ch, __locale); })
-#elif defined(__crt_islower_l) && defined(__CRT_HAVE___islower_l)
-/* >> islower_l(3) */
-__CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,_islower_l,(int __ch, __locale_t __locale),__islower_l,{ return __crt_islower_l(__ch, __locale); })
 #elif defined(__crt_islower_l) && defined(__CRT_HAVE__islower_l)
 /* >> islower_l(3) */
 __CEIDECLARE(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,_islower_l,(int __ch, __locale_t __locale),{ return __crt_islower_l(__ch, __locale); })
+#elif defined(__crt_islower_l) && defined(__CRT_HAVE___islower_l)
+/* >> islower_l(3) */
+__CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,_islower_l,(int __ch, __locale_t __locale),__islower_l,{ return __crt_islower_l(__ch, __locale); })
 #elif defined(__crt_islower_l)
 /* >> islower_l(3) */
 __LOCAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL _islower_l)(int __ch, __locale_t __locale) { return __crt_islower_l(__ch, __locale); }
@@ -1091,12 +1091,12 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LI
 #if defined(__crt_isdigit_l) && defined(__CRT_HAVE_isdigit_l)
 /* >> isdigit_l(3) */
 __CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,_isdigit_l,(int __ch, __locale_t __locale),isdigit_l,{ return __crt_isdigit_l(__ch, __locale); })
-#elif defined(__crt_isdigit_l) && defined(__CRT_HAVE___isdigit_l)
-/* >> isdigit_l(3) */
-__CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,_isdigit_l,(int __ch, __locale_t __locale),__isdigit_l,{ return __crt_isdigit_l(__ch, __locale); })
 #elif defined(__crt_isdigit_l) && defined(__CRT_HAVE__isdigit_l)
 /* >> isdigit_l(3) */
 __CEIDECLARE(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,_isdigit_l,(int __ch, __locale_t __locale),{ return __crt_isdigit_l(__ch, __locale); })
+#elif defined(__crt_isdigit_l) && defined(__CRT_HAVE___isdigit_l)
+/* >> isdigit_l(3) */
+__CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,_isdigit_l,(int __ch, __locale_t __locale),__isdigit_l,{ return __crt_isdigit_l(__ch, __locale); })
 #elif defined(__crt_isdigit_l)
 /* >> isdigit_l(3) */
 __LOCAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL _isdigit_l)(int __ch, __locale_t __locale) { return __crt_isdigit_l(__ch, __locale); }
@@ -1117,12 +1117,12 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LI
 #if defined(__crt_isxdigit_l) && defined(__CRT_HAVE_isxdigit_l)
 /* >> isxdigit_l(3) */
 __CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,_isxdigit_l,(int __ch, __locale_t __locale),isxdigit_l,{ return __crt_isxdigit_l(__ch, __locale); })
-#elif defined(__crt_isxdigit_l) && defined(__CRT_HAVE___isxdigit_l)
-/* >> isxdigit_l(3) */
-__CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,_isxdigit_l,(int __ch, __locale_t __locale),__isxdigit_l,{ return __crt_isxdigit_l(__ch, __locale); })
 #elif defined(__crt_isxdigit_l) && defined(__CRT_HAVE__isxdigit_l)
 /* >> isxdigit_l(3) */
 __CEIDECLARE(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,_isxdigit_l,(int __ch, __locale_t __locale),{ return __crt_isxdigit_l(__ch, __locale); })
+#elif defined(__crt_isxdigit_l) && defined(__CRT_HAVE___isxdigit_l)
+/* >> isxdigit_l(3) */
+__CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,_isxdigit_l,(int __ch, __locale_t __locale),__isxdigit_l,{ return __crt_isxdigit_l(__ch, __locale); })
 #elif defined(__crt_isxdigit_l)
 /* >> isxdigit_l(3) */
 __LOCAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL _isxdigit_l)(int __ch, __locale_t __locale) { return __crt_isxdigit_l(__ch, __locale); }
@@ -1143,12 +1143,12 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LI
 #if defined(__crt_isspace_l) && defined(__CRT_HAVE_isspace_l)
 /* >> isspace_l(3) */
 __CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,_isspace_l,(int __ch, __locale_t __locale),isspace_l,{ return __crt_isspace_l(__ch, __locale); })
-#elif defined(__crt_isspace_l) && defined(__CRT_HAVE___isspace_l)
-/* >> isspace_l(3) */
-__CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,_isspace_l,(int __ch, __locale_t __locale),__isspace_l,{ return __crt_isspace_l(__ch, __locale); })
 #elif defined(__crt_isspace_l) && defined(__CRT_HAVE__isspace_l)
 /* >> isspace_l(3) */
 __CEIDECLARE(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,_isspace_l,(int __ch, __locale_t __locale),{ return __crt_isspace_l(__ch, __locale); })
+#elif defined(__crt_isspace_l) && defined(__CRT_HAVE___isspace_l)
+/* >> isspace_l(3) */
+__CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,_isspace_l,(int __ch, __locale_t __locale),__isspace_l,{ return __crt_isspace_l(__ch, __locale); })
 #elif defined(__crt_isspace_l)
 /* >> isspace_l(3) */
 __LOCAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL _isspace_l)(int __ch, __locale_t __locale) { return __crt_isspace_l(__ch, __locale); }
@@ -1169,12 +1169,12 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LI
 #if defined(__crt_ispunct_l) && defined(__CRT_HAVE_ispunct_l)
 /* >> ispunct_l(3) */
 __CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,_ispunct_l,(int __ch, __locale_t __locale),ispunct_l,{ return __crt_ispunct_l(__ch, __locale); })
-#elif defined(__crt_ispunct_l) && defined(__CRT_HAVE___ispunct_l)
-/* >> ispunct_l(3) */
-__CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,_ispunct_l,(int __ch, __locale_t __locale),__ispunct_l,{ return __crt_ispunct_l(__ch, __locale); })
 #elif defined(__crt_ispunct_l) && defined(__CRT_HAVE__ispunct_l)
 /* >> ispunct_l(3) */
 __CEIDECLARE(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,_ispunct_l,(int __ch, __locale_t __locale),{ return __crt_ispunct_l(__ch, __locale); })
+#elif defined(__crt_ispunct_l) && defined(__CRT_HAVE___ispunct_l)
+/* >> ispunct_l(3) */
+__CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,_ispunct_l,(int __ch, __locale_t __locale),__ispunct_l,{ return __crt_ispunct_l(__ch, __locale); })
 #elif defined(__crt_ispunct_l)
 /* >> ispunct_l(3) */
 __LOCAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL _ispunct_l)(int __ch, __locale_t __locale) { return __crt_ispunct_l(__ch, __locale); }
@@ -1195,12 +1195,12 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LI
 #if defined(__crt_isblank_l) && defined(__CRT_HAVE_isblank_l)
 /* >> isblank_l(3) */
 __CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,_isblank_l,(int __ch, __locale_t __locale),isblank_l,{ return __crt_isblank_l(__ch, __locale); })
-#elif defined(__crt_isblank_l) && defined(__CRT_HAVE___isblank_l)
-/* >> isblank_l(3) */
-__CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,_isblank_l,(int __ch, __locale_t __locale),__isblank_l,{ return __crt_isblank_l(__ch, __locale); })
 #elif defined(__crt_isblank_l) && defined(__CRT_HAVE__isblank_l)
 /* >> isblank_l(3) */
 __CEIDECLARE(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,_isblank_l,(int __ch, __locale_t __locale),{ return __crt_isblank_l(__ch, __locale); })
+#elif defined(__crt_isblank_l) && defined(__CRT_HAVE___isblank_l)
+/* >> isblank_l(3) */
+__CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,_isblank_l,(int __ch, __locale_t __locale),__isblank_l,{ return __crt_isblank_l(__ch, __locale); })
 #elif defined(__crt_isblank_l)
 /* >> isblank_l(3) */
 __LOCAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL _isblank_l)(int __ch, __locale_t __locale) { return __crt_isblank_l(__ch, __locale); }
@@ -1221,12 +1221,12 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LI
 #if defined(__crt_isalnum_l) && defined(__CRT_HAVE_isalnum_l)
 /* >> isalnum_l(3) */
 __CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,_isalnum_l,(int __ch, __locale_t __locale),isalnum_l,{ return __crt_isalnum_l(__ch, __locale); })
-#elif defined(__crt_isalnum_l) && defined(__CRT_HAVE___isalnum_l)
-/* >> isalnum_l(3) */
-__CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,_isalnum_l,(int __ch, __locale_t __locale),__isalnum_l,{ return __crt_isalnum_l(__ch, __locale); })
 #elif defined(__crt_isalnum_l) && defined(__CRT_HAVE__isalnum_l)
 /* >> isalnum_l(3) */
 __CEIDECLARE(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,_isalnum_l,(int __ch, __locale_t __locale),{ return __crt_isalnum_l(__ch, __locale); })
+#elif defined(__crt_isalnum_l) && defined(__CRT_HAVE___isalnum_l)
+/* >> isalnum_l(3) */
+__CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,_isalnum_l,(int __ch, __locale_t __locale),__isalnum_l,{ return __crt_isalnum_l(__ch, __locale); })
 #elif defined(__crt_isalnum_l)
 /* >> isalnum_l(3) */
 __LOCAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL _isalnum_l)(int __ch, __locale_t __locale) { return __crt_isalnum_l(__ch, __locale); }
@@ -1247,12 +1247,12 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LI
 #if defined(__crt_isprint_l) && defined(__CRT_HAVE_isprint_l)
 /* >> isprint_l(3) */
 __CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,_isprint_l,(int __ch, __locale_t __locale),isprint_l,{ return __crt_isprint_l(__ch, __locale); })
-#elif defined(__crt_isprint_l) && defined(__CRT_HAVE___isprint_l)
-/* >> isprint_l(3) */
-__CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,_isprint_l,(int __ch, __locale_t __locale),__isprint_l,{ return __crt_isprint_l(__ch, __locale); })
 #elif defined(__crt_isprint_l) && defined(__CRT_HAVE__isprint_l)
 /* >> isprint_l(3) */
 __CEIDECLARE(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,_isprint_l,(int __ch, __locale_t __locale),{ return __crt_isprint_l(__ch, __locale); })
+#elif defined(__crt_isprint_l) && defined(__CRT_HAVE___isprint_l)
+/* >> isprint_l(3) */
+__CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,_isprint_l,(int __ch, __locale_t __locale),__isprint_l,{ return __crt_isprint_l(__ch, __locale); })
 #elif defined(__crt_isprint_l)
 /* >> isprint_l(3) */
 __LOCAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL _isprint_l)(int __ch, __locale_t __locale) { return __crt_isprint_l(__ch, __locale); }
@@ -1273,12 +1273,12 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LI
 #if defined(__crt_isgraph_l) && defined(__CRT_HAVE_isgraph_l)
 /* >> isgraph_l(3) */
 __CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,_isgraph_l,(int __ch, __locale_t __locale),isgraph_l,{ return __crt_isgraph_l(__ch, __locale); })
-#elif defined(__crt_isgraph_l) && defined(__CRT_HAVE___isgraph_l)
-/* >> isgraph_l(3) */
-__CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,_isgraph_l,(int __ch, __locale_t __locale),__isgraph_l,{ return __crt_isgraph_l(__ch, __locale); })
 #elif defined(__crt_isgraph_l) && defined(__CRT_HAVE__isgraph_l)
 /* >> isgraph_l(3) */
 __CEIDECLARE(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,_isgraph_l,(int __ch, __locale_t __locale),{ return __crt_isgraph_l(__ch, __locale); })
+#elif defined(__crt_isgraph_l) && defined(__CRT_HAVE___isgraph_l)
+/* >> isgraph_l(3) */
+__CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,_isgraph_l,(int __ch, __locale_t __locale),__isgraph_l,{ return __crt_isgraph_l(__ch, __locale); })
 #elif defined(__crt_isgraph_l)
 /* >> isgraph_l(3) */
 __LOCAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL _isgraph_l)(int __ch, __locale_t __locale) { return __crt_isgraph_l(__ch, __locale); }
@@ -1299,12 +1299,12 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LI
 #if defined(__crt_iscntrl_l) && defined(__CRT_HAVE_iscntrl_l)
 /* >> iscntrl_l(3) */
 __CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,_iscntrl_l,(int __ch, __locale_t __locale),iscntrl_l,{ return __crt_iscntrl_l(__ch, __locale); })
-#elif defined(__crt_iscntrl_l) && defined(__CRT_HAVE___iscntrl_l)
-/* >> iscntrl_l(3) */
-__CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,_iscntrl_l,(int __ch, __locale_t __locale),__iscntrl_l,{ return __crt_iscntrl_l(__ch, __locale); })
 #elif defined(__crt_iscntrl_l) && defined(__CRT_HAVE__iscntrl_l)
 /* >> iscntrl_l(3) */
 __CEIDECLARE(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,_iscntrl_l,(int __ch, __locale_t __locale),{ return __crt_iscntrl_l(__ch, __locale); })
+#elif defined(__crt_iscntrl_l) && defined(__CRT_HAVE___iscntrl_l)
+/* >> iscntrl_l(3) */
+__CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,_iscntrl_l,(int __ch, __locale_t __locale),__iscntrl_l,{ return __crt_iscntrl_l(__ch, __locale); })
 #elif defined(__crt_iscntrl_l)
 /* >> iscntrl_l(3) */
 __LOCAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL _iscntrl_l)(int __ch, __locale_t __locale) { return __crt_iscntrl_l(__ch, __locale); }
@@ -1325,12 +1325,12 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LI
 #if defined(__crt_tolower_l) && defined(__CRT_HAVE_tolower_l)
 /* >> tolower_l(3) */
 __CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,_tolower_l,(int __ch, __locale_t __locale),tolower_l,{ return __crt_tolower_l(__ch, __locale); })
-#elif defined(__crt_tolower_l) && defined(__CRT_HAVE___tolower_l)
-/* >> tolower_l(3) */
-__CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,_tolower_l,(int __ch, __locale_t __locale),__tolower_l,{ return __crt_tolower_l(__ch, __locale); })
 #elif defined(__crt_tolower_l) && defined(__CRT_HAVE__tolower_l)
 /* >> tolower_l(3) */
 __CEIDECLARE(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,_tolower_l,(int __ch, __locale_t __locale),{ return __crt_tolower_l(__ch, __locale); })
+#elif defined(__crt_tolower_l) && defined(__CRT_HAVE___tolower_l)
+/* >> tolower_l(3) */
+__CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,_tolower_l,(int __ch, __locale_t __locale),__tolower_l,{ return __crt_tolower_l(__ch, __locale); })
 #elif defined(__crt_tolower_l)
 /* >> tolower_l(3) */
 __LOCAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL _tolower_l)(int __ch, __locale_t __locale) { return __crt_tolower_l(__ch, __locale); }
@@ -1351,12 +1351,12 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LI
 #if defined(__crt_toupper_l) && defined(__CRT_HAVE_toupper_l)
 /* >> toupper_l(3) */
 __CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,_toupper_l,(int __ch, __locale_t __locale),toupper_l,{ return __crt_toupper_l(__ch, __locale); })
-#elif defined(__crt_toupper_l) && defined(__CRT_HAVE___toupper_l)
-/* >> toupper_l(3) */
-__CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,_toupper_l,(int __ch, __locale_t __locale),__toupper_l,{ return __crt_toupper_l(__ch, __locale); })
 #elif defined(__crt_toupper_l) && defined(__CRT_HAVE__toupper_l)
 /* >> toupper_l(3) */
 __CEIDECLARE(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,_toupper_l,(int __ch, __locale_t __locale),{ return __crt_toupper_l(__ch, __locale); })
+#elif defined(__crt_toupper_l) && defined(__CRT_HAVE___toupper_l)
+/* >> toupper_l(3) */
+__CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,_toupper_l,(int __ch, __locale_t __locale),__toupper_l,{ return __crt_toupper_l(__ch, __locale); })
 #elif defined(__crt_toupper_l)
 /* >> toupper_l(3) */
 __LOCAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL _toupper_l)(int __ch, __locale_t __locale) { return __crt_toupper_l(__ch, __locale); }
