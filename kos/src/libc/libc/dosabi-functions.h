@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd31b13a3 */
+/* HASH CRC-32:0xe31cc725 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -206,20 +206,76 @@ DFUN(".text.crt.dos.unicode.static.ctype", libd_isprint, libc_isprint, TD, 1, TD
 DFUN(".text.crt.dos.unicode.static.ctype", libd_tolower, libc_tolower, TD, 1, TD)
 DFUN(".text.crt.dos.unicode.static.ctype", libd_toupper, libc_toupper, TD, 1, TD)
 DFUN(".text.crt.dos.unicode.static.ctype", libd_isblank, libc_isblank, TD, 1, TD)
+#ifdef __LIBDCALL_CALLER_CLEANUP
+DEFINE_INTERN_ALIAS(libd_iscntrl_l, libd_iscntrl);
+#else /* __LIBDCALL_CALLER_CLEANUP */
 DFUN(".text.crt.dos.unicode.locale.ctype", libd_iscntrl_l, libc_iscntrl_l, TD, 2, TD, TP)
+#endif /* !__LIBDCALL_CALLER_CLEANUP */
+#ifdef __LIBDCALL_CALLER_CLEANUP
+DEFINE_INTERN_ALIAS(libd_isspace_l, libd_isspace);
+#else /* __LIBDCALL_CALLER_CLEANUP */
 DFUN(".text.crt.dos.unicode.locale.ctype", libd_isspace_l, libc_isspace_l, TD, 2, TD, TP)
+#endif /* !__LIBDCALL_CALLER_CLEANUP */
+#ifdef __LIBDCALL_CALLER_CLEANUP
+DEFINE_INTERN_ALIAS(libd_isupper_l, libd_isupper);
+#else /* __LIBDCALL_CALLER_CLEANUP */
 DFUN(".text.crt.dos.unicode.locale.ctype", libd_isupper_l, libc_isupper_l, TD, 2, TD, TP)
+#endif /* !__LIBDCALL_CALLER_CLEANUP */
+#ifdef __LIBDCALL_CALLER_CLEANUP
+DEFINE_INTERN_ALIAS(libd_islower_l, libd_islower);
+#else /* __LIBDCALL_CALLER_CLEANUP */
 DFUN(".text.crt.dos.unicode.locale.ctype", libd_islower_l, libc_islower_l, TD, 2, TD, TP)
+#endif /* !__LIBDCALL_CALLER_CLEANUP */
+#ifdef __LIBDCALL_CALLER_CLEANUP
+DEFINE_INTERN_ALIAS(libd_isalpha_l, libd_isalpha);
+#else /* __LIBDCALL_CALLER_CLEANUP */
 DFUN(".text.crt.dos.unicode.locale.ctype", libd_isalpha_l, libc_isalpha_l, TD, 2, TD, TP)
+#endif /* !__LIBDCALL_CALLER_CLEANUP */
+#ifdef __LIBDCALL_CALLER_CLEANUP
+DEFINE_INTERN_ALIAS(libd_isdigit_l, libd_isdigit);
+#else /* __LIBDCALL_CALLER_CLEANUP */
 DFUN(".text.crt.dos.unicode.locale.ctype", libd_isdigit_l, libc_isdigit_l, TD, 2, TD, TP)
+#endif /* !__LIBDCALL_CALLER_CLEANUP */
+#ifdef __LIBDCALL_CALLER_CLEANUP
+DEFINE_INTERN_ALIAS(libd_isxdigit_l, libd_isxdigit);
+#else /* __LIBDCALL_CALLER_CLEANUP */
 DFUN(".text.crt.dos.unicode.locale.ctype", libd_isxdigit_l, libc_isxdigit_l, TD, 2, TD, TP)
+#endif /* !__LIBDCALL_CALLER_CLEANUP */
+#ifdef __LIBDCALL_CALLER_CLEANUP
+DEFINE_INTERN_ALIAS(libd_isalnum_l, libd_isalnum);
+#else /* __LIBDCALL_CALLER_CLEANUP */
 DFUN(".text.crt.dos.unicode.locale.ctype", libd_isalnum_l, libc_isalnum_l, TD, 2, TD, TP)
+#endif /* !__LIBDCALL_CALLER_CLEANUP */
+#ifdef __LIBDCALL_CALLER_CLEANUP
+DEFINE_INTERN_ALIAS(libd_ispunct_l, libd_ispunct);
+#else /* __LIBDCALL_CALLER_CLEANUP */
 DFUN(".text.crt.dos.unicode.locale.ctype", libd_ispunct_l, libc_ispunct_l, TD, 2, TD, TP)
+#endif /* !__LIBDCALL_CALLER_CLEANUP */
+#ifdef __LIBDCALL_CALLER_CLEANUP
+DEFINE_INTERN_ALIAS(libd_isgraph_l, libd_isgraph);
+#else /* __LIBDCALL_CALLER_CLEANUP */
 DFUN(".text.crt.dos.unicode.locale.ctype", libd_isgraph_l, libc_isgraph_l, TD, 2, TD, TP)
+#endif /* !__LIBDCALL_CALLER_CLEANUP */
+#ifdef __LIBDCALL_CALLER_CLEANUP
+DEFINE_INTERN_ALIAS(libd_isprint_l, libd_isprint);
+#else /* __LIBDCALL_CALLER_CLEANUP */
 DFUN(".text.crt.dos.unicode.locale.ctype", libd_isprint_l, libc_isprint_l, TD, 2, TD, TP)
+#endif /* !__LIBDCALL_CALLER_CLEANUP */
+#ifdef __LIBDCALL_CALLER_CLEANUP
+DEFINE_INTERN_ALIAS(libd_isblank_l, libd_isblank);
+#else /* __LIBDCALL_CALLER_CLEANUP */
 DFUN(".text.crt.dos.unicode.locale.ctype", libd_isblank_l, libc_isblank_l, TD, 2, TD, TP)
+#endif /* !__LIBDCALL_CALLER_CLEANUP */
+#ifdef __LIBDCALL_CALLER_CLEANUP
+DEFINE_INTERN_ALIAS(libd_tolower_l, libd_tolower);
+#else /* __LIBDCALL_CALLER_CLEANUP */
 DFUN(".text.crt.dos.unicode.locale.ctype", libd_tolower_l, libc_tolower_l, TD, 2, TD, TP)
+#endif /* !__LIBDCALL_CALLER_CLEANUP */
+#ifdef __LIBDCALL_CALLER_CLEANUP
+DEFINE_INTERN_ALIAS(libd_toupper_l, libd_toupper);
+#else /* __LIBDCALL_CALLER_CLEANUP */
 DFUN(".text.crt.dos.unicode.locale.ctype", libd_toupper_l, libc_toupper_l, TD, 2, TD, TP)
+#endif /* !__LIBDCALL_CALLER_CLEANUP */
 DFUN(".text.crt.dos.unicode.static.ctype", libd___iscsymf, libc___iscsymf, TD, 1, TD)
 DFUN(".text.crt.dos.unicode.static.ctype", libd___iscsym, libc___iscsym, TD, 1, TD)
 DFUN(".text.crt.dos.unicode.static.ctype", libd_isascii, libc_isascii, TD, 1, TD)

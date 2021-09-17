@@ -830,9 +830,15 @@ function doPrint_src_libc_libc_dosabiFunctions(fp: File) {
 					continue;
 				CWriter_ppIfEscaped(cWriter, part.ppCond, ESCAPE_MODE_NONE);
 				local proto: FunctionPrototype = part.functionPrototype;
+				local isFirst = true;
 				for (local b /*: LibraryFunctionBinding */: usedBindings) {
 					local bind = b.functionBinding;
-					CWriter_ppIfEscaped(cWriter, b.ppCond, ESCAPE_MODE_NONE);
+					if (isFirst) {
+						CWriter_ppIfEscaped(cWriter, b.ppCond, ESCAPE_MODE_NONE);
+						isFirst = false;
+					} else {
+						CWriter_ppElifEscaped(cWriter, b.ppCond, ESCAPE_MODE_NONE);
+					}
 					if (bind is FunctionImplementation) {
 						local baseFunction = bind.name;
 						/* #define DFUN(section, libd_name, libc_name, returnType, argc, argvTypes...) */
@@ -865,8 +871,9 @@ function doPrint_src_libc_libc_dosabiFunctions(fp: File) {
 							<< part.name << ", "
 							<< bind << ");\n";
 					}
-					cWriter.ppEndif();
 				}
+				if (!isFirst)
+					cWriter.ppEndif();
 				cWriter.ppEndif();
 			} catch (...) {
 				print "... While printing DFUN-binding for", repr(part.name);

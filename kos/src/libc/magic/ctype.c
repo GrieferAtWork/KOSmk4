@@ -504,6 +504,8 @@ function printTrait(name) {
 	print("[[if($extended_include_prefix(\"<bits/crt/ctype.h>\")defined(__crt_", name, "_l)), preferred_extern_inline(\"_", name, "_l\", { return __crt_", name, "_l(ch, locale); })]]");
 	print("[[if($extended_include_prefix(\"<bits/crt/ctype.h>\")defined(__crt_", name, "_l)), preferred_inline({ return __crt_", name, "_l(ch, locale); })]]");
 	print("[[pure, wunused, dos_only_export_alias(\"_", name, "_l\"), export_alias(\"__", name, "_l\")]]");
+	print("[[if(defined(__LIBKCALL_CALLER_CLEANUP)), crt_intern_kos_alias(\"libc_", name, "\")]]");
+	print("[[if(defined(__LIBDCALL_CALLER_CLEANUP)), crt_intern_dos_alias(\"libd_", name, "\")]]");
 	print("int ", name, "_l(int ch, $locale_t locale) {");
 	print("	COMPILER_IMPURE();");
 	print("	(void)locale;");
@@ -519,6 +521,8 @@ for (local name: TRAITS)
 [[if($extended_include_prefix("<bits/crt/ctype.h>")defined(__crt_iscntrl_l)), preferred_extern_inline("_iscntrl_l", { return __crt_iscntrl_l(ch, locale); })]]
 [[if($extended_include_prefix("<bits/crt/ctype.h>")defined(__crt_iscntrl_l)), preferred_inline({ return __crt_iscntrl_l(ch, locale); })]]
 [[pure, wunused, dos_only_export_alias("_iscntrl_l"), export_alias("__iscntrl_l")]]
+[[if(defined(__LIBKCALL_CALLER_CLEANUP)), crt_intern_kos_alias("libc_iscntrl")]]
+[[if(defined(__LIBDCALL_CALLER_CLEANUP)), crt_intern_dos_alias("libd_iscntrl")]]
 int iscntrl_l(int ch, $locale_t locale) {
 	COMPILER_IMPURE();
 	(void)locale;
@@ -530,6 +534,8 @@ int iscntrl_l(int ch, $locale_t locale) {
 [[if($extended_include_prefix("<bits/crt/ctype.h>")defined(__crt_isspace_l)), preferred_extern_inline("_isspace_l", { return __crt_isspace_l(ch, locale); })]]
 [[if($extended_include_prefix("<bits/crt/ctype.h>")defined(__crt_isspace_l)), preferred_inline({ return __crt_isspace_l(ch, locale); })]]
 [[pure, wunused, dos_only_export_alias("_isspace_l"), export_alias("__isspace_l")]]
+[[if(defined(__LIBKCALL_CALLER_CLEANUP)), crt_intern_kos_alias("libc_isspace")]]
+[[if(defined(__LIBDCALL_CALLER_CLEANUP)), crt_intern_dos_alias("libd_isspace")]]
 int isspace_l(int ch, $locale_t locale) {
 	COMPILER_IMPURE();
 	(void)locale;
@@ -541,6 +547,8 @@ int isspace_l(int ch, $locale_t locale) {
 [[if($extended_include_prefix("<bits/crt/ctype.h>")defined(__crt_isupper_l)), preferred_extern_inline("_isupper_l", { return __crt_isupper_l(ch, locale); })]]
 [[if($extended_include_prefix("<bits/crt/ctype.h>")defined(__crt_isupper_l)), preferred_inline({ return __crt_isupper_l(ch, locale); })]]
 [[pure, wunused, dos_only_export_alias("_isupper_l"), export_alias("__isupper_l")]]
+[[if(defined(__LIBKCALL_CALLER_CLEANUP)), crt_intern_kos_alias("libc_isupper")]]
+[[if(defined(__LIBDCALL_CALLER_CLEANUP)), crt_intern_dos_alias("libd_isupper")]]
 int isupper_l(int ch, $locale_t locale) {
 	COMPILER_IMPURE();
 	(void)locale;
@@ -552,6 +560,8 @@ int isupper_l(int ch, $locale_t locale) {
 [[if($extended_include_prefix("<bits/crt/ctype.h>")defined(__crt_islower_l)), preferred_extern_inline("_islower_l", { return __crt_islower_l(ch, locale); })]]
 [[if($extended_include_prefix("<bits/crt/ctype.h>")defined(__crt_islower_l)), preferred_inline({ return __crt_islower_l(ch, locale); })]]
 [[pure, wunused, dos_only_export_alias("_islower_l"), export_alias("__islower_l")]]
+[[if(defined(__LIBKCALL_CALLER_CLEANUP)), crt_intern_kos_alias("libc_islower")]]
+[[if(defined(__LIBDCALL_CALLER_CLEANUP)), crt_intern_dos_alias("libd_islower")]]
 int islower_l(int ch, $locale_t locale) {
 	COMPILER_IMPURE();
 	(void)locale;
@@ -563,6 +573,8 @@ int islower_l(int ch, $locale_t locale) {
 [[if($extended_include_prefix("<bits/crt/ctype.h>")defined(__crt_isalpha_l)), preferred_extern_inline("_isalpha_l", { return __crt_isalpha_l(ch, locale); })]]
 [[if($extended_include_prefix("<bits/crt/ctype.h>")defined(__crt_isalpha_l)), preferred_inline({ return __crt_isalpha_l(ch, locale); })]]
 [[pure, wunused, dos_only_export_alias("_isalpha_l"), export_alias("__isalpha_l")]]
+[[if(defined(__LIBKCALL_CALLER_CLEANUP)), crt_intern_kos_alias("libc_isalpha")]]
+[[if(defined(__LIBDCALL_CALLER_CLEANUP)), crt_intern_dos_alias("libd_isalpha")]]
 int isalpha_l(int ch, $locale_t locale) {
 	COMPILER_IMPURE();
 	(void)locale;
@@ -574,6 +586,8 @@ int isalpha_l(int ch, $locale_t locale) {
 [[if($extended_include_prefix("<bits/crt/ctype.h>")defined(__crt_isdigit_l)), preferred_extern_inline("_isdigit_l", { return __crt_isdigit_l(ch, locale); })]]
 [[if($extended_include_prefix("<bits/crt/ctype.h>")defined(__crt_isdigit_l)), preferred_inline({ return __crt_isdigit_l(ch, locale); })]]
 [[pure, wunused, dos_only_export_alias("_isdigit_l"), export_alias("__isdigit_l")]]
+[[if(defined(__LIBKCALL_CALLER_CLEANUP)), crt_intern_kos_alias("libc_isdigit")]]
+[[if(defined(__LIBDCALL_CALLER_CLEANUP)), crt_intern_dos_alias("libd_isdigit")]]
 int isdigit_l(int ch, $locale_t locale) {
 	COMPILER_IMPURE();
 	(void)locale;
@@ -585,6 +599,8 @@ int isdigit_l(int ch, $locale_t locale) {
 [[if($extended_include_prefix("<bits/crt/ctype.h>")defined(__crt_isxdigit_l)), preferred_extern_inline("_isxdigit_l", { return __crt_isxdigit_l(ch, locale); })]]
 [[if($extended_include_prefix("<bits/crt/ctype.h>")defined(__crt_isxdigit_l)), preferred_inline({ return __crt_isxdigit_l(ch, locale); })]]
 [[pure, wunused, dos_only_export_alias("_isxdigit_l"), export_alias("__isxdigit_l")]]
+[[if(defined(__LIBKCALL_CALLER_CLEANUP)), crt_intern_kos_alias("libc_isxdigit")]]
+[[if(defined(__LIBDCALL_CALLER_CLEANUP)), crt_intern_dos_alias("libd_isxdigit")]]
 int isxdigit_l(int ch, $locale_t locale) {
 	COMPILER_IMPURE();
 	(void)locale;
@@ -596,6 +612,8 @@ int isxdigit_l(int ch, $locale_t locale) {
 [[if($extended_include_prefix("<bits/crt/ctype.h>")defined(__crt_isalnum_l)), preferred_extern_inline("_isalnum_l", { return __crt_isalnum_l(ch, locale); })]]
 [[if($extended_include_prefix("<bits/crt/ctype.h>")defined(__crt_isalnum_l)), preferred_inline({ return __crt_isalnum_l(ch, locale); })]]
 [[pure, wunused, dos_only_export_alias("_isalnum_l"), export_alias("__isalnum_l")]]
+[[if(defined(__LIBKCALL_CALLER_CLEANUP)), crt_intern_kos_alias("libc_isalnum")]]
+[[if(defined(__LIBDCALL_CALLER_CLEANUP)), crt_intern_dos_alias("libd_isalnum")]]
 int isalnum_l(int ch, $locale_t locale) {
 	COMPILER_IMPURE();
 	(void)locale;
@@ -607,6 +625,8 @@ int isalnum_l(int ch, $locale_t locale) {
 [[if($extended_include_prefix("<bits/crt/ctype.h>")defined(__crt_ispunct_l)), preferred_extern_inline("_ispunct_l", { return __crt_ispunct_l(ch, locale); })]]
 [[if($extended_include_prefix("<bits/crt/ctype.h>")defined(__crt_ispunct_l)), preferred_inline({ return __crt_ispunct_l(ch, locale); })]]
 [[pure, wunused, dos_only_export_alias("_ispunct_l"), export_alias("__ispunct_l")]]
+[[if(defined(__LIBKCALL_CALLER_CLEANUP)), crt_intern_kos_alias("libc_ispunct")]]
+[[if(defined(__LIBDCALL_CALLER_CLEANUP)), crt_intern_dos_alias("libd_ispunct")]]
 int ispunct_l(int ch, $locale_t locale) {
 	COMPILER_IMPURE();
 	(void)locale;
@@ -618,6 +638,8 @@ int ispunct_l(int ch, $locale_t locale) {
 [[if($extended_include_prefix("<bits/crt/ctype.h>")defined(__crt_isgraph_l)), preferred_extern_inline("_isgraph_l", { return __crt_isgraph_l(ch, locale); })]]
 [[if($extended_include_prefix("<bits/crt/ctype.h>")defined(__crt_isgraph_l)), preferred_inline({ return __crt_isgraph_l(ch, locale); })]]
 [[pure, wunused, dos_only_export_alias("_isgraph_l"), export_alias("__isgraph_l")]]
+[[if(defined(__LIBKCALL_CALLER_CLEANUP)), crt_intern_kos_alias("libc_isgraph")]]
+[[if(defined(__LIBDCALL_CALLER_CLEANUP)), crt_intern_dos_alias("libd_isgraph")]]
 int isgraph_l(int ch, $locale_t locale) {
 	COMPILER_IMPURE();
 	(void)locale;
@@ -629,6 +651,8 @@ int isgraph_l(int ch, $locale_t locale) {
 [[if($extended_include_prefix("<bits/crt/ctype.h>")defined(__crt_isprint_l)), preferred_extern_inline("_isprint_l", { return __crt_isprint_l(ch, locale); })]]
 [[if($extended_include_prefix("<bits/crt/ctype.h>")defined(__crt_isprint_l)), preferred_inline({ return __crt_isprint_l(ch, locale); })]]
 [[pure, wunused, dos_only_export_alias("_isprint_l"), export_alias("__isprint_l")]]
+[[if(defined(__LIBKCALL_CALLER_CLEANUP)), crt_intern_kos_alias("libc_isprint")]]
+[[if(defined(__LIBDCALL_CALLER_CLEANUP)), crt_intern_dos_alias("libd_isprint")]]
 int isprint_l(int ch, $locale_t locale) {
 	COMPILER_IMPURE();
 	(void)locale;
@@ -640,6 +664,8 @@ int isprint_l(int ch, $locale_t locale) {
 [[if($extended_include_prefix("<bits/crt/ctype.h>")defined(__crt_isblank_l)), preferred_extern_inline("_isblank_l", { return __crt_isblank_l(ch, locale); })]]
 [[if($extended_include_prefix("<bits/crt/ctype.h>")defined(__crt_isblank_l)), preferred_inline({ return __crt_isblank_l(ch, locale); })]]
 [[pure, wunused, dos_only_export_alias("_isblank_l"), export_alias("__isblank_l")]]
+[[if(defined(__LIBKCALL_CALLER_CLEANUP)), crt_intern_kos_alias("libc_isblank")]]
+[[if(defined(__LIBDCALL_CALLER_CLEANUP)), crt_intern_dos_alias("libd_isblank")]]
 int isblank_l(int ch, $locale_t locale) {
 	COMPILER_IMPURE();
 	(void)locale;
@@ -651,6 +677,8 @@ int isblank_l(int ch, $locale_t locale) {
 [[if($extended_include_prefix("<bits/crt/ctype.h>")defined(__crt_tolower_l)), preferred_extern_inline("_tolower_l", { return __crt_tolower_l(ch, locale); })]]
 [[if($extended_include_prefix("<bits/crt/ctype.h>")defined(__crt_tolower_l)), preferred_inline({ return __crt_tolower_l(ch, locale); })]]
 [[pure, wunused, dos_only_export_alias("_tolower_l"), export_alias("__tolower_l")]]
+[[if(defined(__LIBKCALL_CALLER_CLEANUP)), crt_intern_kos_alias("libc_tolower")]]
+[[if(defined(__LIBDCALL_CALLER_CLEANUP)), crt_intern_dos_alias("libd_tolower")]]
 int tolower_l(int ch, $locale_t locale) {
 	COMPILER_IMPURE();
 	(void)locale;
@@ -662,6 +690,8 @@ int tolower_l(int ch, $locale_t locale) {
 [[if($extended_include_prefix("<bits/crt/ctype.h>")defined(__crt_toupper_l)), preferred_extern_inline("_toupper_l", { return __crt_toupper_l(ch, locale); })]]
 [[if($extended_include_prefix("<bits/crt/ctype.h>")defined(__crt_toupper_l)), preferred_inline({ return __crt_toupper_l(ch, locale); })]]
 [[pure, wunused, dos_only_export_alias("_toupper_l"), export_alias("__toupper_l")]]
+[[if(defined(__LIBKCALL_CALLER_CLEANUP)), crt_intern_kos_alias("libc_toupper")]]
+[[if(defined(__LIBDCALL_CALLER_CLEANUP)), crt_intern_dos_alias("libd_toupper")]]
 int toupper_l(int ch, $locale_t locale) {
 	COMPILER_IMPURE();
 	(void)locale;

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1b0d1d3a */
+/* HASH CRC-32:0xf0223eeb */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -229,6 +229,9 @@ NOTHROW(LIBCCALL libc_isblank)(int ch) {
 	return __ascii_isblank(ch);
 #endif /* !__crt_isblank */
 }
+#ifdef __LIBKCALL_CALLER_CLEANUP
+DEFINE_INTERN_ALIAS(libc_iscntrl_l, libc_iscntrl);
+#else /* __LIBKCALL_CALLER_CLEANUP */
 /* >> iscntrl_l(3) */
 INTERN ATTR_SECTION(".text.crt.unicode.locale.ctype") ATTR_PURE WUNUSED int
 NOTHROW_NCX(LIBCCALL libc_iscntrl_l)(int ch,
@@ -237,6 +240,10 @@ NOTHROW_NCX(LIBCCALL libc_iscntrl_l)(int ch,
 	(void)locale;
 	return libc_iscntrl(ch);
 }
+#endif /* !__LIBKCALL_CALLER_CLEANUP */
+#ifdef __LIBKCALL_CALLER_CLEANUP
+DEFINE_INTERN_ALIAS(libc_isspace_l, libc_isspace);
+#else /* __LIBKCALL_CALLER_CLEANUP */
 /* >> isspace_l(3) */
 INTERN ATTR_SECTION(".text.crt.unicode.locale.ctype") ATTR_PURE WUNUSED int
 NOTHROW_NCX(LIBCCALL libc_isspace_l)(int ch,
@@ -245,6 +252,10 @@ NOTHROW_NCX(LIBCCALL libc_isspace_l)(int ch,
 	(void)locale;
 	return libc_isspace(ch);
 }
+#endif /* !__LIBKCALL_CALLER_CLEANUP */
+#ifdef __LIBKCALL_CALLER_CLEANUP
+DEFINE_INTERN_ALIAS(libc_isupper_l, libc_isupper);
+#else /* __LIBKCALL_CALLER_CLEANUP */
 /* >> isupper_l(3) */
 INTERN ATTR_SECTION(".text.crt.unicode.locale.ctype") ATTR_PURE WUNUSED int
 NOTHROW_NCX(LIBCCALL libc_isupper_l)(int ch,
@@ -253,6 +264,10 @@ NOTHROW_NCX(LIBCCALL libc_isupper_l)(int ch,
 	(void)locale;
 	return libc_isupper(ch);
 }
+#endif /* !__LIBKCALL_CALLER_CLEANUP */
+#ifdef __LIBKCALL_CALLER_CLEANUP
+DEFINE_INTERN_ALIAS(libc_islower_l, libc_islower);
+#else /* __LIBKCALL_CALLER_CLEANUP */
 /* >> islower_l(3) */
 INTERN ATTR_SECTION(".text.crt.unicode.locale.ctype") ATTR_PURE WUNUSED int
 NOTHROW_NCX(LIBCCALL libc_islower_l)(int ch,
@@ -261,6 +276,10 @@ NOTHROW_NCX(LIBCCALL libc_islower_l)(int ch,
 	(void)locale;
 	return libc_islower(ch);
 }
+#endif /* !__LIBKCALL_CALLER_CLEANUP */
+#ifdef __LIBKCALL_CALLER_CLEANUP
+DEFINE_INTERN_ALIAS(libc_isalpha_l, libc_isalpha);
+#else /* __LIBKCALL_CALLER_CLEANUP */
 /* >> isalpha_l(3) */
 INTERN ATTR_SECTION(".text.crt.unicode.locale.ctype") ATTR_PURE WUNUSED int
 NOTHROW_NCX(LIBCCALL libc_isalpha_l)(int ch,
@@ -269,6 +288,10 @@ NOTHROW_NCX(LIBCCALL libc_isalpha_l)(int ch,
 	(void)locale;
 	return libc_isalpha(ch);
 }
+#endif /* !__LIBKCALL_CALLER_CLEANUP */
+#ifdef __LIBKCALL_CALLER_CLEANUP
+DEFINE_INTERN_ALIAS(libc_isdigit_l, libc_isdigit);
+#else /* __LIBKCALL_CALLER_CLEANUP */
 /* >> isdigit_l(3) */
 INTERN ATTR_SECTION(".text.crt.unicode.locale.ctype") ATTR_PURE WUNUSED int
 NOTHROW_NCX(LIBCCALL libc_isdigit_l)(int ch,
@@ -277,6 +300,10 @@ NOTHROW_NCX(LIBCCALL libc_isdigit_l)(int ch,
 	(void)locale;
 	return libc_isdigit(ch);
 }
+#endif /* !__LIBKCALL_CALLER_CLEANUP */
+#ifdef __LIBKCALL_CALLER_CLEANUP
+DEFINE_INTERN_ALIAS(libc_isxdigit_l, libc_isxdigit);
+#else /* __LIBKCALL_CALLER_CLEANUP */
 /* >> isxdigit_l(3) */
 INTERN ATTR_SECTION(".text.crt.unicode.locale.ctype") ATTR_PURE WUNUSED int
 NOTHROW_NCX(LIBCCALL libc_isxdigit_l)(int ch,
@@ -285,6 +312,10 @@ NOTHROW_NCX(LIBCCALL libc_isxdigit_l)(int ch,
 	(void)locale;
 	return libc_isxdigit(ch);
 }
+#endif /* !__LIBKCALL_CALLER_CLEANUP */
+#ifdef __LIBKCALL_CALLER_CLEANUP
+DEFINE_INTERN_ALIAS(libc_isalnum_l, libc_isalnum);
+#else /* __LIBKCALL_CALLER_CLEANUP */
 /* >> isalnum_l(3) */
 INTERN ATTR_SECTION(".text.crt.unicode.locale.ctype") ATTR_PURE WUNUSED int
 NOTHROW_NCX(LIBCCALL libc_isalnum_l)(int ch,
@@ -293,6 +324,10 @@ NOTHROW_NCX(LIBCCALL libc_isalnum_l)(int ch,
 	(void)locale;
 	return libc_isalnum(ch);
 }
+#endif /* !__LIBKCALL_CALLER_CLEANUP */
+#ifdef __LIBKCALL_CALLER_CLEANUP
+DEFINE_INTERN_ALIAS(libc_ispunct_l, libc_ispunct);
+#else /* __LIBKCALL_CALLER_CLEANUP */
 /* >> ispunct_l(3) */
 INTERN ATTR_SECTION(".text.crt.unicode.locale.ctype") ATTR_PURE WUNUSED int
 NOTHROW_NCX(LIBCCALL libc_ispunct_l)(int ch,
@@ -301,6 +336,10 @@ NOTHROW_NCX(LIBCCALL libc_ispunct_l)(int ch,
 	(void)locale;
 	return libc_ispunct(ch);
 }
+#endif /* !__LIBKCALL_CALLER_CLEANUP */
+#ifdef __LIBKCALL_CALLER_CLEANUP
+DEFINE_INTERN_ALIAS(libc_isgraph_l, libc_isgraph);
+#else /* __LIBKCALL_CALLER_CLEANUP */
 /* >> isgraph_l(3) */
 INTERN ATTR_SECTION(".text.crt.unicode.locale.ctype") ATTR_PURE WUNUSED int
 NOTHROW_NCX(LIBCCALL libc_isgraph_l)(int ch,
@@ -309,6 +348,10 @@ NOTHROW_NCX(LIBCCALL libc_isgraph_l)(int ch,
 	(void)locale;
 	return libc_isgraph(ch);
 }
+#endif /* !__LIBKCALL_CALLER_CLEANUP */
+#ifdef __LIBKCALL_CALLER_CLEANUP
+DEFINE_INTERN_ALIAS(libc_isprint_l, libc_isprint);
+#else /* __LIBKCALL_CALLER_CLEANUP */
 /* >> isprint_l(3) */
 INTERN ATTR_SECTION(".text.crt.unicode.locale.ctype") ATTR_PURE WUNUSED int
 NOTHROW_NCX(LIBCCALL libc_isprint_l)(int ch,
@@ -317,6 +360,10 @@ NOTHROW_NCX(LIBCCALL libc_isprint_l)(int ch,
 	(void)locale;
 	return libc_isprint(ch);
 }
+#endif /* !__LIBKCALL_CALLER_CLEANUP */
+#ifdef __LIBKCALL_CALLER_CLEANUP
+DEFINE_INTERN_ALIAS(libc_isblank_l, libc_isblank);
+#else /* __LIBKCALL_CALLER_CLEANUP */
 /* >> isblank_l(3) */
 INTERN ATTR_SECTION(".text.crt.unicode.locale.ctype") ATTR_PURE WUNUSED int
 NOTHROW_NCX(LIBCCALL libc_isblank_l)(int ch,
@@ -325,6 +372,10 @@ NOTHROW_NCX(LIBCCALL libc_isblank_l)(int ch,
 	(void)locale;
 	return libc_isblank(ch);
 }
+#endif /* !__LIBKCALL_CALLER_CLEANUP */
+#ifdef __LIBKCALL_CALLER_CLEANUP
+DEFINE_INTERN_ALIAS(libc_tolower_l, libc_tolower);
+#else /* __LIBKCALL_CALLER_CLEANUP */
 /* >> tolower_l(3) */
 INTERN ATTR_SECTION(".text.crt.unicode.locale.ctype") ATTR_PURE WUNUSED int
 NOTHROW_NCX(LIBCCALL libc_tolower_l)(int ch,
@@ -333,6 +384,10 @@ NOTHROW_NCX(LIBCCALL libc_tolower_l)(int ch,
 	(void)locale;
 	return libc_tolower(ch);
 }
+#endif /* !__LIBKCALL_CALLER_CLEANUP */
+#ifdef __LIBKCALL_CALLER_CLEANUP
+DEFINE_INTERN_ALIAS(libc_toupper_l, libc_toupper);
+#else /* __LIBKCALL_CALLER_CLEANUP */
 /* >> toupper_l(3) */
 INTERN ATTR_SECTION(".text.crt.unicode.locale.ctype") ATTR_PURE WUNUSED int
 NOTHROW_NCX(LIBCCALL libc_toupper_l)(int ch,
@@ -341,6 +396,7 @@ NOTHROW_NCX(LIBCCALL libc_toupper_l)(int ch,
 	(void)locale;
 	return libc_toupper(ch);
 }
+#endif /* !__LIBKCALL_CALLER_CLEANUP */
 /* >> issymstrt(3)
  * Test if `ch' can appear at the start of a symbol/keyword/identifier */
 INTERN ATTR_SECTION(".text.crt.dos.unicode.static.ctype") ATTR_CONST WUNUSED int

@@ -22,6 +22,7 @@
 #define __ASSEMBLER__ 1
 #define _KOS_KERNEL_SOURCE 1
 
+#include <__crt.h>
 #include <hybrid/compiler.h>
 
 #include <hybrid/typecore.h>

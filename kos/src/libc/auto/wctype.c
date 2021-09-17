@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8beadd57 */
+/* HASH CRC-32:0x4b6101d6 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -406,6 +406,9 @@ INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.ctype") ATTR_CONST WUNUSED i
 NOTHROW(LIBKCALL libc_iswascii)(wint32_t wc) {
 	return wc >= 0 && wc <= 0x7f;
 }
+#ifdef __LIBDCALL_CALLER_CLEANUP
+DEFINE_INTERN_ALIAS(libd_iswcntrl_l, libd_iswcntrl);
+#else /* __LIBDCALL_CALLER_CLEANUP */
 /* >> iswcntrl_l(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.ctype") ATTR_PURE WUNUSED int
 NOTHROW_NCX(LIBDCALL libd_iswcntrl_l)(wint16_t ch,
@@ -414,6 +417,10 @@ NOTHROW_NCX(LIBDCALL libd_iswcntrl_l)(wint16_t ch,
 	(void)locale;
 	return libd_iswcntrl(ch);
 }
+#endif /* !__LIBDCALL_CALLER_CLEANUP */
+#ifdef __LIBKCALL_CALLER_CLEANUP
+DEFINE_INTERN_ALIAS(libc_iswcntrl_l, libc_iswcntrl);
+#else /* __LIBKCALL_CALLER_CLEANUP */
 /* >> iswcntrl_l(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.locale.ctype") ATTR_PURE WUNUSED int
 NOTHROW_NCX(LIBKCALL libc_iswcntrl_l)(wint32_t ch,
@@ -422,6 +429,10 @@ NOTHROW_NCX(LIBKCALL libc_iswcntrl_l)(wint32_t ch,
 	(void)locale;
 	return libc_iswcntrl(ch);
 }
+#endif /* !__LIBKCALL_CALLER_CLEANUP */
+#ifdef __LIBDCALL_CALLER_CLEANUP
+DEFINE_INTERN_ALIAS(libd_iswspace_l, libd_iswspace);
+#else /* __LIBDCALL_CALLER_CLEANUP */
 /* >> iswspace_l(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.ctype") ATTR_PURE WUNUSED int
 NOTHROW_NCX(LIBDCALL libd_iswspace_l)(wint16_t ch,
@@ -430,6 +441,10 @@ NOTHROW_NCX(LIBDCALL libd_iswspace_l)(wint16_t ch,
 	(void)locale;
 	return libd_iswspace(ch);
 }
+#endif /* !__LIBDCALL_CALLER_CLEANUP */
+#ifdef __LIBKCALL_CALLER_CLEANUP
+DEFINE_INTERN_ALIAS(libc_iswspace_l, libc_iswspace);
+#else /* __LIBKCALL_CALLER_CLEANUP */
 /* >> iswspace_l(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.locale.ctype") ATTR_PURE WUNUSED int
 NOTHROW_NCX(LIBKCALL libc_iswspace_l)(wint32_t ch,
@@ -438,6 +453,10 @@ NOTHROW_NCX(LIBKCALL libc_iswspace_l)(wint32_t ch,
 	(void)locale;
 	return libc_iswspace(ch);
 }
+#endif /* !__LIBKCALL_CALLER_CLEANUP */
+#ifdef __LIBDCALL_CALLER_CLEANUP
+DEFINE_INTERN_ALIAS(libd_iswupper_l, libd_iswupper);
+#else /* __LIBDCALL_CALLER_CLEANUP */
 /* >> iswupper_l(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.ctype") ATTR_PURE WUNUSED int
 NOTHROW_NCX(LIBDCALL libd_iswupper_l)(wint16_t ch,
@@ -446,6 +465,10 @@ NOTHROW_NCX(LIBDCALL libd_iswupper_l)(wint16_t ch,
 	(void)locale;
 	return libd_iswupper(ch);
 }
+#endif /* !__LIBDCALL_CALLER_CLEANUP */
+#ifdef __LIBKCALL_CALLER_CLEANUP
+DEFINE_INTERN_ALIAS(libc_iswupper_l, libc_iswupper);
+#else /* __LIBKCALL_CALLER_CLEANUP */
 /* >> iswupper_l(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.locale.ctype") ATTR_PURE WUNUSED int
 NOTHROW_NCX(LIBKCALL libc_iswupper_l)(wint32_t ch,
@@ -454,6 +477,10 @@ NOTHROW_NCX(LIBKCALL libc_iswupper_l)(wint32_t ch,
 	(void)locale;
 	return libc_iswupper(ch);
 }
+#endif /* !__LIBKCALL_CALLER_CLEANUP */
+#ifdef __LIBDCALL_CALLER_CLEANUP
+DEFINE_INTERN_ALIAS(libd_iswlower_l, libd_iswlower);
+#else /* __LIBDCALL_CALLER_CLEANUP */
 /* >> iswlower_l(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.ctype") ATTR_PURE WUNUSED int
 NOTHROW_NCX(LIBDCALL libd_iswlower_l)(wint16_t ch,
@@ -462,6 +489,10 @@ NOTHROW_NCX(LIBDCALL libd_iswlower_l)(wint16_t ch,
 	(void)locale;
 	return libd_iswlower(ch);
 }
+#endif /* !__LIBDCALL_CALLER_CLEANUP */
+#ifdef __LIBKCALL_CALLER_CLEANUP
+DEFINE_INTERN_ALIAS(libc_iswlower_l, libc_iswlower);
+#else /* __LIBKCALL_CALLER_CLEANUP */
 /* >> iswlower_l(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.locale.ctype") ATTR_PURE WUNUSED int
 NOTHROW_NCX(LIBKCALL libc_iswlower_l)(wint32_t ch,
@@ -470,6 +501,10 @@ NOTHROW_NCX(LIBKCALL libc_iswlower_l)(wint32_t ch,
 	(void)locale;
 	return libc_iswlower(ch);
 }
+#endif /* !__LIBKCALL_CALLER_CLEANUP */
+#ifdef __LIBDCALL_CALLER_CLEANUP
+DEFINE_INTERN_ALIAS(libd_iswalpha_l, libd_iswalpha);
+#else /* __LIBDCALL_CALLER_CLEANUP */
 /* >> iswalpha_l(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.ctype") ATTR_PURE WUNUSED int
 NOTHROW_NCX(LIBDCALL libd_iswalpha_l)(wint16_t ch,
@@ -478,6 +513,10 @@ NOTHROW_NCX(LIBDCALL libd_iswalpha_l)(wint16_t ch,
 	(void)locale;
 	return libd_iswalpha(ch);
 }
+#endif /* !__LIBDCALL_CALLER_CLEANUP */
+#ifdef __LIBKCALL_CALLER_CLEANUP
+DEFINE_INTERN_ALIAS(libc_iswalpha_l, libc_iswalpha);
+#else /* __LIBKCALL_CALLER_CLEANUP */
 /* >> iswalpha_l(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.locale.ctype") ATTR_PURE WUNUSED int
 NOTHROW_NCX(LIBKCALL libc_iswalpha_l)(wint32_t ch,
@@ -486,6 +525,10 @@ NOTHROW_NCX(LIBKCALL libc_iswalpha_l)(wint32_t ch,
 	(void)locale;
 	return libc_iswalpha(ch);
 }
+#endif /* !__LIBKCALL_CALLER_CLEANUP */
+#ifdef __LIBDCALL_CALLER_CLEANUP
+DEFINE_INTERN_ALIAS(libd_iswdigit_l, libd_iswdigit);
+#else /* __LIBDCALL_CALLER_CLEANUP */
 /* >> iswdigit_l(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.ctype") ATTR_PURE WUNUSED int
 NOTHROW_NCX(LIBDCALL libd_iswdigit_l)(wint16_t ch,
@@ -494,6 +537,10 @@ NOTHROW_NCX(LIBDCALL libd_iswdigit_l)(wint16_t ch,
 	(void)locale;
 	return libd_iswdigit(ch);
 }
+#endif /* !__LIBDCALL_CALLER_CLEANUP */
+#ifdef __LIBKCALL_CALLER_CLEANUP
+DEFINE_INTERN_ALIAS(libc_iswdigit_l, libc_iswdigit);
+#else /* __LIBKCALL_CALLER_CLEANUP */
 /* >> iswdigit_l(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.locale.ctype") ATTR_PURE WUNUSED int
 NOTHROW_NCX(LIBKCALL libc_iswdigit_l)(wint32_t ch,
@@ -502,6 +549,10 @@ NOTHROW_NCX(LIBKCALL libc_iswdigit_l)(wint32_t ch,
 	(void)locale;
 	return libc_iswdigit(ch);
 }
+#endif /* !__LIBKCALL_CALLER_CLEANUP */
+#ifdef __LIBDCALL_CALLER_CLEANUP
+DEFINE_INTERN_ALIAS(libd_iswxdigit_l, libd_iswxdigit);
+#else /* __LIBDCALL_CALLER_CLEANUP */
 /* >> iswxdigit_l(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.ctype") ATTR_PURE WUNUSED int
 NOTHROW_NCX(LIBDCALL libd_iswxdigit_l)(wint16_t ch,
@@ -510,6 +561,10 @@ NOTHROW_NCX(LIBDCALL libd_iswxdigit_l)(wint16_t ch,
 	(void)locale;
 	return libd_iswxdigit(ch);
 }
+#endif /* !__LIBDCALL_CALLER_CLEANUP */
+#ifdef __LIBKCALL_CALLER_CLEANUP
+DEFINE_INTERN_ALIAS(libc_iswxdigit_l, libc_iswxdigit);
+#else /* __LIBKCALL_CALLER_CLEANUP */
 /* >> iswxdigit_l(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.locale.ctype") ATTR_PURE WUNUSED int
 NOTHROW_NCX(LIBKCALL libc_iswxdigit_l)(wint32_t ch,
@@ -518,6 +573,10 @@ NOTHROW_NCX(LIBKCALL libc_iswxdigit_l)(wint32_t ch,
 	(void)locale;
 	return libc_iswxdigit(ch);
 }
+#endif /* !__LIBKCALL_CALLER_CLEANUP */
+#ifdef __LIBDCALL_CALLER_CLEANUP
+DEFINE_INTERN_ALIAS(libd_iswalnum_l, libd_iswalnum);
+#else /* __LIBDCALL_CALLER_CLEANUP */
 /* >> iswalnum_l(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.ctype") ATTR_PURE WUNUSED int
 NOTHROW_NCX(LIBDCALL libd_iswalnum_l)(wint16_t ch,
@@ -526,6 +585,10 @@ NOTHROW_NCX(LIBDCALL libd_iswalnum_l)(wint16_t ch,
 	(void)locale;
 	return libd_iswalnum(ch);
 }
+#endif /* !__LIBDCALL_CALLER_CLEANUP */
+#ifdef __LIBKCALL_CALLER_CLEANUP
+DEFINE_INTERN_ALIAS(libc_iswalnum_l, libc_iswalnum);
+#else /* __LIBKCALL_CALLER_CLEANUP */
 /* >> iswalnum_l(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.locale.ctype") ATTR_PURE WUNUSED int
 NOTHROW_NCX(LIBKCALL libc_iswalnum_l)(wint32_t ch,
@@ -534,6 +597,10 @@ NOTHROW_NCX(LIBKCALL libc_iswalnum_l)(wint32_t ch,
 	(void)locale;
 	return libc_iswalnum(ch);
 }
+#endif /* !__LIBKCALL_CALLER_CLEANUP */
+#ifdef __LIBDCALL_CALLER_CLEANUP
+DEFINE_INTERN_ALIAS(libd_iswpunct_l, libd_iswpunct);
+#else /* __LIBDCALL_CALLER_CLEANUP */
 /* >> iswpunct_l(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.ctype") ATTR_PURE WUNUSED int
 NOTHROW_NCX(LIBDCALL libd_iswpunct_l)(wint16_t ch,
@@ -542,6 +609,10 @@ NOTHROW_NCX(LIBDCALL libd_iswpunct_l)(wint16_t ch,
 	(void)locale;
 	return libd_iswpunct(ch);
 }
+#endif /* !__LIBDCALL_CALLER_CLEANUP */
+#ifdef __LIBKCALL_CALLER_CLEANUP
+DEFINE_INTERN_ALIAS(libc_iswpunct_l, libc_iswpunct);
+#else /* __LIBKCALL_CALLER_CLEANUP */
 /* >> iswpunct_l(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.locale.ctype") ATTR_PURE WUNUSED int
 NOTHROW_NCX(LIBKCALL libc_iswpunct_l)(wint32_t ch,
@@ -550,6 +621,10 @@ NOTHROW_NCX(LIBKCALL libc_iswpunct_l)(wint32_t ch,
 	(void)locale;
 	return libc_iswpunct(ch);
 }
+#endif /* !__LIBKCALL_CALLER_CLEANUP */
+#ifdef __LIBDCALL_CALLER_CLEANUP
+DEFINE_INTERN_ALIAS(libd_iswgraph_l, libd_iswgraph);
+#else /* __LIBDCALL_CALLER_CLEANUP */
 /* >> iswgraph_l(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.ctype") ATTR_PURE WUNUSED int
 NOTHROW_NCX(LIBDCALL libd_iswgraph_l)(wint16_t ch,
@@ -558,6 +633,10 @@ NOTHROW_NCX(LIBDCALL libd_iswgraph_l)(wint16_t ch,
 	(void)locale;
 	return libd_iswgraph(ch);
 }
+#endif /* !__LIBDCALL_CALLER_CLEANUP */
+#ifdef __LIBKCALL_CALLER_CLEANUP
+DEFINE_INTERN_ALIAS(libc_iswgraph_l, libc_iswgraph);
+#else /* __LIBKCALL_CALLER_CLEANUP */
 /* >> iswgraph_l(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.locale.ctype") ATTR_PURE WUNUSED int
 NOTHROW_NCX(LIBKCALL libc_iswgraph_l)(wint32_t ch,
@@ -566,6 +645,10 @@ NOTHROW_NCX(LIBKCALL libc_iswgraph_l)(wint32_t ch,
 	(void)locale;
 	return libc_iswgraph(ch);
 }
+#endif /* !__LIBKCALL_CALLER_CLEANUP */
+#ifdef __LIBDCALL_CALLER_CLEANUP
+DEFINE_INTERN_ALIAS(libd_iswprint_l, libd_iswprint);
+#else /* __LIBDCALL_CALLER_CLEANUP */
 /* >> iswprint_l(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.ctype") ATTR_PURE WUNUSED int
 NOTHROW_NCX(LIBDCALL libd_iswprint_l)(wint16_t ch,
@@ -574,6 +657,10 @@ NOTHROW_NCX(LIBDCALL libd_iswprint_l)(wint16_t ch,
 	(void)locale;
 	return libd_iswprint(ch);
 }
+#endif /* !__LIBDCALL_CALLER_CLEANUP */
+#ifdef __LIBKCALL_CALLER_CLEANUP
+DEFINE_INTERN_ALIAS(libc_iswprint_l, libc_iswprint);
+#else /* __LIBKCALL_CALLER_CLEANUP */
 /* >> iswprint_l(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.locale.ctype") ATTR_PURE WUNUSED int
 NOTHROW_NCX(LIBKCALL libc_iswprint_l)(wint32_t ch,
@@ -582,6 +669,10 @@ NOTHROW_NCX(LIBKCALL libc_iswprint_l)(wint32_t ch,
 	(void)locale;
 	return libc_iswprint(ch);
 }
+#endif /* !__LIBKCALL_CALLER_CLEANUP */
+#ifdef __LIBDCALL_CALLER_CLEANUP
+DEFINE_INTERN_ALIAS(libd_iswblank_l, libd_iswblank);
+#else /* __LIBDCALL_CALLER_CLEANUP */
 /* >> iswblank_l(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.ctype") ATTR_PURE WUNUSED int
 NOTHROW_NCX(LIBDCALL libd_iswblank_l)(wint16_t ch,
@@ -590,6 +681,10 @@ NOTHROW_NCX(LIBDCALL libd_iswblank_l)(wint16_t ch,
 	(void)locale;
 	return libd_iswblank(ch);
 }
+#endif /* !__LIBDCALL_CALLER_CLEANUP */
+#ifdef __LIBKCALL_CALLER_CLEANUP
+DEFINE_INTERN_ALIAS(libc_iswblank_l, libc_iswblank);
+#else /* __LIBKCALL_CALLER_CLEANUP */
 /* >> iswblank_l(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.locale.ctype") ATTR_PURE WUNUSED int
 NOTHROW_NCX(LIBKCALL libc_iswblank_l)(wint32_t ch,
@@ -598,6 +693,10 @@ NOTHROW_NCX(LIBKCALL libc_iswblank_l)(wint32_t ch,
 	(void)locale;
 	return libc_iswblank(ch);
 }
+#endif /* !__LIBKCALL_CALLER_CLEANUP */
+#ifdef __LIBDCALL_CALLER_CLEANUP
+DEFINE_INTERN_ALIAS(libd_towlower_l, libd_towlower);
+#else /* __LIBDCALL_CALLER_CLEANUP */
 /* >> towlower_l(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.ctype") ATTR_PURE WUNUSED wint16_t
 NOTHROW_NCX(LIBDCALL libd_towlower_l)(wint16_t ch,
@@ -606,6 +705,10 @@ NOTHROW_NCX(LIBDCALL libd_towlower_l)(wint16_t ch,
 	(void)locale;
 	return libd_towlower(ch);
 }
+#endif /* !__LIBDCALL_CALLER_CLEANUP */
+#ifdef __LIBKCALL_CALLER_CLEANUP
+DEFINE_INTERN_ALIAS(libc_towlower_l, libc_towlower);
+#else /* __LIBKCALL_CALLER_CLEANUP */
 /* >> towlower_l(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.locale.ctype") ATTR_PURE WUNUSED wint32_t
 NOTHROW_NCX(LIBKCALL libc_towlower_l)(wint32_t ch,
@@ -614,6 +717,10 @@ NOTHROW_NCX(LIBKCALL libc_towlower_l)(wint32_t ch,
 	(void)locale;
 	return libc_towlower(ch);
 }
+#endif /* !__LIBKCALL_CALLER_CLEANUP */
+#ifdef __LIBDCALL_CALLER_CLEANUP
+DEFINE_INTERN_ALIAS(libd_towupper_l, libd_towupper);
+#else /* __LIBDCALL_CALLER_CLEANUP */
 /* >> towupper_l(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.ctype") ATTR_PURE WUNUSED wint16_t
 NOTHROW_NCX(LIBDCALL libd_towupper_l)(wint16_t ch,
@@ -622,6 +729,10 @@ NOTHROW_NCX(LIBDCALL libd_towupper_l)(wint16_t ch,
 	(void)locale;
 	return libd_towupper(ch);
 }
+#endif /* !__LIBDCALL_CALLER_CLEANUP */
+#ifdef __LIBKCALL_CALLER_CLEANUP
+DEFINE_INTERN_ALIAS(libc_towupper_l, libc_towupper);
+#else /* __LIBKCALL_CALLER_CLEANUP */
 /* >> towupper_l(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.locale.ctype") ATTR_PURE WUNUSED wint32_t
 NOTHROW_NCX(LIBKCALL libc_towupper_l)(wint32_t ch,
@@ -630,6 +741,7 @@ NOTHROW_NCX(LIBKCALL libc_towupper_l)(wint32_t ch,
 	(void)locale;
 	return libc_towupper(ch);
 }
+#endif /* !__LIBKCALL_CALLER_CLEANUP */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.ctype") ATTR_PURE WUNUSED int
 NOTHROW_NCX(LIBDCALL libd_iswctype_l)(wint16_t wc,
                                       wctype_t type,

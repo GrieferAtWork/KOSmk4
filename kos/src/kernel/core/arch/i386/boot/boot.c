@@ -714,6 +714,14 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 
 	/* TODO: iconv extensions (take a look at FreeBSD's <iconv.h> header) */
 
+	/* TODO: The "include-everything.h" test has grown so large that there might be
+	 *       a  risk of getting out-of-memory compiler errors when trying to build.
+	 * Solution: The act of building these files should be opt-in, probably based
+	 *           on the presence of some kind of  file not part of the git.  That
+	 *           way,  someone trying to  build KOS for the  first time won't run
+	 *           into  this  issue, and  I can  continue to  have this  test run,
+	 *           knowing how to deal with the out-of-memory issue. */
+
 	return state;
 }
 
