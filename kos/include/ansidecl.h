@@ -17,35 +17,23 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _BITS_CRT_SETJMP_H
-#define _BITS_CRT_SETJMP_H 1
+/* (#) Portability: libc4/5 (/include/ansidecl.h) */
+#ifndef _ANSIDECL_H
+#define _ANSIDECL_H 1
 
-#include <__stdinc.h>
+#include <sys/cdefs.h>
 
-#include <hybrid/typecore.h>
+#define PTR         _PTR
+#define PTRCONST    _PTR _CONST
+#define LONG_DOUBLE __LONGDOUBLE
+#define AND         _AND
+#define NOARGS      _NOARGS
+#define CONST       _CONST
+#define VOLATILE    _VOLATILE
+#define SIGNED      _SIGNED
+#define DOTS        _DOTS
+#define EXFUN       _EXFUN
+#define DEFUN       _DEFUN
+#define DEFUN_VOID  _DEFUN_VOID
 
-#include <bits/os/sigset.h> /* struct __sigset_struct */
-
-#ifdef __CC__
-__DECL_BEGIN
-
-/* Define like suggested here:
- * https://gcc.gnu.org/onlinedocs/gcc/Nonlocal-Gotos.html */
-struct __jmp_buf {
-	__INTPTR_TYPE__ __jb_regs[5];
-};
-
-#ifndef __KERNEL__
-struct __sigjmp_buf {
-	struct __jmp_buf       __sj_buf;
-	/* Guess... */
-	__UINTPTR_TYPE__       __sj_hassig;
-	struct __sigset_struct __sj_sig;
-};
-#endif /* !__KERNEL__ */
-
-__DECL_END
-#endif /* __CC__ */
-
-
-#endif /* !_BITS_CRT_SETJMP_H */
+#endif /* !_ANSIDECL_H */

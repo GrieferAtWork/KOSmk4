@@ -96,8 +96,8 @@
 #endif /* __USE_MISC */
 
 
-/* Math constants */
-#if defined(__USE_MISC) || defined(__USE_XOPEN)
+/* Math constants (`_USE_MATH_DEFINES' is the DOS feature macro to expose these) */
+#if defined(__USE_MISC) || defined(__USE_XOPEN) || defined(_USE_MATH_DEFINES)
 #define M_E        2.7182818284590452354  /* e */
 #define M_LOG2E    1.4426950408889634074  /* log_2 e */
 #define M_LOG10E   0.43429448190325182765 /* log_10 e */
@@ -111,7 +111,7 @@
 #define M_2_SQRTPI 1.12837916709551257390 /* 2/sqrt(pi) */
 #define M_SQRT2    1.41421356237309504880 /* sqrt(2) */
 #define M_SQRT1_2  0.70710678118654752440 /* 1/sqrt(2) */
-#endif /* __USE_MISC || __USE_XOPEN */
+#endif /* __USE_MISC || __USE_XOPEN || _USE_MATH_DEFINES */
 
 /* Math constants with long-double precision. */
 #if defined(__USE_GNU) && defined(__COMPILER_HAVE_LONGDOUBLE)
@@ -131,26 +131,26 @@
 #endif /* __USE_GNU && __COMPILER_HAVE_LONGDOUBLE */
 
 
-#ifdef __HUGE_VAL
+#if !defined(HUGE_VAL) && defined(__HUGE_VAL)
 #define HUGE_VAL __HUGE_VAL /* double HUGE_VAL; */
-#endif /* __HUGE_VAL */
+#endif /* !HUGE_VAL && __HUGE_VAL */
 
 #ifdef __USE_ISOC99
-#ifdef __HUGE_VALF
+#if !defined(HUGE_VALF) && defined(__HUGE_VALF)
 #define HUGE_VALF __HUGE_VALF /* double HUGE_VALF; */
-#endif /* __HUGE_VALF */
+#endif /* !HUGE_VALF && __HUGE_VALF */
 
-#ifdef __HUGE_VALL
+#if !defined(HUGE_VALL) && defined(__HUGE_VALL)
 #define HUGE_VALL __HUGE_VALL /* double HUGE_VALL; */
-#endif /* __HUGE_VALL */
+#endif /* !HUGE_VALL && __HUGE_VALL */
 
-#ifdef __INFINITYF
+#if !defined(INFINITY) && defined(__INFINITYF)
 #define INFINITY __INFINITYF /* float INFINITY; */
-#endif /* __INFINITYF */
+#endif /* !INFINITY && __INFINITYF */
 
-#ifdef __NANF
+#if !defined(NAN) && defined(__NANF)
 #define NAN __NANF /* float NAN; */
-#endif /* __NANF */
+#endif /* !NAN && __NANF */
 
 /* This value is returned by `ilogb(0)'. */
 #ifdef __FP_ILOGB0

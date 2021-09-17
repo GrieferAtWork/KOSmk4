@@ -140,6 +140,21 @@ typedef union __ATTR_ALIGNED(8) __ATTR_PACKED {
 
 __DECL_END
 #endif /* __CC__ */
+
+/* From libc4/5 */
+#include <bits/math-constants.h>
+#if !defined(NAN) && defined(__NANF)
+#define NAN __NANF /* float NAN; */
+#endif /* !NAN && __NANF */
+#include <hybrid/host.h>
+#if defined(__i386__) || defined(__x86_64__)
+/* TODO: double _SNAN;  // signaling NAN */
+/* TODO: double _QNAN;  // quiet NAN */
+/* TODO: float  _SNANF; // signaling NAN */
+/* TODO: float  _QNANF; // quiet NAN */
+#endif /* __i386__ || __x86_64__ */
+
+
 #else /* _IEEE_754 */
 #error "Unsupported floating-mode data model"
 #endif /* !_IEEE_754 */

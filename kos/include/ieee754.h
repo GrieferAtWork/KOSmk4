@@ -27,46 +27,38 @@
 #include <features.h>
 
 #include <hybrid/byteorder.h>
+#include <hybrid/host.h>
 #include <hybrid/typecore.h>
 
 #ifdef __USE_GLIBC
 #include <endian.h>
 #endif /* __USE_GLIBC */
 
-/* Partially derived from GNU C /usr/include/i386-linux-gnu/ieee754.h */
-
-/* Copyright (C) 1992-2016 Free Software Foundation, Inc.
-   This file is part of the GNU C Library.
-
-   The GNU C Library is free software; you can redistribute it and/or
-   modify it under the terms of the GNU Lesser General Public
-   License as published by the Free Software Foundation; either
-   version 2.1 of the License, or (at your option) any later version.
-
-   The GNU C Library is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-   Lesser General Public License for more details.
-
-   You should have received a copy of the GNU Lesser General Public
-   License along with the GNU C Library; if not, see
-   <http://www.gnu.org/licenses/>. */
-
+/* For `union ieee754_float' */
 #define IEEE754_FLOAT_MAXEXP 0xff
 #define IEEE754_FLOAT_BIAS   0x7f /* Added to exponent. */
 #define IEEE754_FLOAT_SHIFT  23
 
+/* For `union ieee754_double' */
 #define IEEE754_DOUBLE_MAXEXP 0x7ff
 #define IEEE754_DOUBLE_BIAS   0x3ff /* Added to exponent. */
 #define IEEE754_DOUBLE_SHIFT  20
+#define _IEEE754_DOUBLE_BIAS  IEEE754_DOUBLE_BIAS
 
+/* For `union ieee854_long_double' */
 #define IEEE854_LONG_DOUBLE_MAXEXP 0x7fff
 #define IEEE854_LONG_DOUBLE_BIAS   0x3fff /* Added to exponent. */
 #define IEEE854_LONG_DOUBLE_SHIFT  0
 
-__SYSDECL_BEGIN
+#if defined(__i386__) || defined(__x86_64__)
+#undef i387_float
+#define i387_float       ieee754_float
+#define _I387_FLOAT_BIAS IEEE754_FLOAT_BIAS
+#endif /* __i387__ || __x86_64__ */
+
 
 #ifdef __CC__
+__DECL_BEGIN
 
 #ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
 #pragma push_macro("f")
@@ -168,7 +160,7 @@ union __ATTR_ALIGNED(4) __ATTR_PACKED ieee754_float {
 	__IEEE754_FLOAT_TYPE__ f; /* 32-bit */
 #endif /* __IEEE754_FLOAT_TYPE__ */
 
-	/* This is the IEEE 754 single-precision format. */
+	/* IEEE 754 single-precision. */
 	struct __ATTR_PACKED {
 #if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
 		unsigned int negative : 1;
@@ -181,7 +173,8 @@ union __ATTR_ALIGNED(4) __ATTR_PACKED ieee754_float {
 #endif
 	} ieee;
 
-	/* This format makes it easier to see if a NaN is a signaling NaN. */
+	/* Same, but `quiet_nan' makes it easier to
+	 * tell non-signaling-  and signaling  NaN. */
 	struct __ATTR_PACKED {
 #if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
 		unsigned int negative : 1;
@@ -195,6 +188,15 @@ union __ATTR_ALIGNED(4) __ATTR_PACKED ieee754_float {
 		unsigned int negative : 1;
 #endif
 	} ieee_nan;
+
+#if defined(__i386__) || defined(__x86_64__)
+	/* i387 single-precision. */
+	struct {
+		unsigned int mantissa : 23;
+		unsigned int exponent : 8;
+		unsigned int negative : 1;
+	} i387;
+#endif /* __i387__ || __x86_64__ */
 };
 
 
@@ -203,7 +205,7 @@ union __ATTR_ALIGNED(8) __ATTR_PACKED ieee754_double {
 	__IEEE754_DOUBLE_TYPE__ d; /* 64-bit */
 #endif /* __IEEE754_DOUBLE_TYPE__ */
 
-	/* This is the IEEE 754 double-precision format. */
+	/* IEEE 754 double-precision. */
 	struct __ATTR_PACKED {
 #if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
 		unsigned int negative : 1;
@@ -227,7 +229,8 @@ union __ATTR_ALIGNED(8) __ATTR_PACKED ieee754_double {
 #endif /* ... */
 	} ieee;
 
-	/* This format makes it easier to see if a NaN is a signaling NaN. */
+	/* Same, but `quiet_nan' makes it easier to
+	 * tell non-signaling-  and signaling  NaN. */
 	struct __ATTR_PACKED {
 #if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
 		unsigned int negative : 1;
@@ -265,7 +268,7 @@ union __ATTR_ALIGNED(16) __ATTR_PACKED ieee854_long_double {
 	__BYTE_TYPE__ __pad[16];
 #endif
 
-	/* This is the IEEE 854 double-extended-precision format. */
+	/* IEEE 854 double-extended-precision. */
 	struct __ATTR_PACKED {
 #if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
 		unsigned int negative : 1;
@@ -290,7 +293,8 @@ union __ATTR_ALIGNED(16) __ATTR_PACKED ieee854_long_double {
 #endif
 	} ieee;
 
-	/* This is for NaNs in the IEEE 854 double-extended-precision format. */
+	/* Same, but `quiet_nan' makes it easier to
+	 * tell non-signaling-  and signaling  NaN. */
 	struct __ATTR_PACKED {
 #if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
 		unsigned int negative : 1;
@@ -327,7 +331,7 @@ union __ATTR_ALIGNED(16) __ATTR_PACKED ieee854_long_double {
 /* 80-bit long double format (this one simply excludes the 16-bit empty field) */
 union __ATTR_PACKED ieee854_float80 {
 
-	/* This is the IEEE 854 double-extended-precision format. */
+	/* IEEE 854 double-extended-precision */
 	struct __ATTR_PACKED {
 #if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
 		unsigned int negative : 1;
@@ -349,7 +353,8 @@ union __ATTR_PACKED ieee854_float80 {
 #endif
 	} ieee;
 
-	/* This is for NaNs in the IEEE 854 double-extended-precision format. */
+	/* Same, but `quiet_nan' makes it easier to
+	 * tell non-signaling-  and signaling  NaN. */
 	struct __ATTR_PACKED {
 #if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
 		unsigned int negative : 1;
@@ -390,8 +395,7 @@ union __ATTR_PACKED ieee854_float80 {
 #pragma pop_macro("f")
 #endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
 
+__DECL_END
 #endif /* __CC__ */
-
-__SYSDECL_END
 
 #endif /* !_IEEE754_H */

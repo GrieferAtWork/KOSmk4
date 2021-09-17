@@ -125,6 +125,7 @@ incdir("");
 #include <aliases.h>
 #include <alloc.h>
 #include <alloca.h>
+#include <ansidecl.h>
 #include <ar.h>
 #include <argz.h>
 #include <arpa/inet.h>
@@ -397,6 +398,8 @@ incdir("");
 #include <bsd/tzfile.h>
 #include <bsd/unistd.h>
 #include <bsd/wchar.h>
+#include <bstring.h>
+#include <bytesex.h>
 #include <byteswap.h>
 #include <compat/bits/os/cmsghdr.h>
 #include <compat/bits/os/flock.h>
@@ -451,6 +454,8 @@ incdir("");
 #include <compat/signal.h>
 #include <compat/sys/ucontext.h>
 #include <complex.h>
+#include <confname.h>
+#include <confstr.h>
 #include <corecrt.h>
 #include <cpio.h>
 #include <crtdbg.h>
@@ -486,6 +491,7 @@ incdir("");
 #include <gnu/lib-names.h>
 #include <gnu/stubs.h>
 #include <grp.h>
+#include <huge_val.h>
 #include <hw/bus/pci.h>
 #include <hw/bus/serial.h>
 #include <hw/disk/ata.h>
@@ -558,12 +564,14 @@ incdir("");
 #include <hybrid/wordbits.h>
 #include <iconv.h>
 #include <ieee754.h>
+#include <ieee854.h>
 #include <ieeefp.h>
 #include <ifaddrs.h>
 #include <int128.h>
 #include <inttypes.h>
 #include <io.h>
 #include <iso646.h>
+#include <jmp_buf.h>
 #include <kos/anno.h>
 #include <kos/aref.h>
 #include <kos/asm/rtm.h>
@@ -1177,6 +1185,8 @@ incdir("");
 #include <values.h>
 #include <vfork.h>
 #include <wait.h>
+#include <waitflags.h>
+#include <waitstatus.h>
 #include <wchar.h>
 #include <wctype.h>
 #include <xlocale.h>

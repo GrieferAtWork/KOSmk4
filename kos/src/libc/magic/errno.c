@@ -1235,9 +1235,9 @@ typedef __errno_t error_t;
 
 __SYSDECL_END
 
-#ifdef __USE_NETBSD
+#if defined(__USE_BSD) || defined(__USE_GNU)
 #include <bits/crt/sys_errlist.h>
-#endif /* __USE_NETBSD */
+#endif /* __USE_BSD || __USE_GNU */
 
 #endif /* __CC__ */
 

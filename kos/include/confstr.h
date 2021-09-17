@@ -17,35 +17,15 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _BITS_CRT_SETJMP_H
-#define _BITS_CRT_SETJMP_H 1
+/* (#) Portability: GNU C Library (/sysdeps/[...]/confstr.h) */
+/* (#) Portability: libc4/5       (/include/confstr.h) */
+#ifndef _CONFSTR_H
+#define _CONFSTR_H 1
 
-#include <__stdinc.h>
+#include <paths.h> /* _PATH_DEFPATH */
 
-#include <hybrid/typecore.h>
+#ifndef CS_PATH
+#define CS_PATH _PATH_DEFPATH
+#endif /* !CS_PATH */
 
-#include <bits/os/sigset.h> /* struct __sigset_struct */
-
-#ifdef __CC__
-__DECL_BEGIN
-
-/* Define like suggested here:
- * https://gcc.gnu.org/onlinedocs/gcc/Nonlocal-Gotos.html */
-struct __jmp_buf {
-	__INTPTR_TYPE__ __jb_regs[5];
-};
-
-#ifndef __KERNEL__
-struct __sigjmp_buf {
-	struct __jmp_buf       __sj_buf;
-	/* Guess... */
-	__UINTPTR_TYPE__       __sj_hassig;
-	struct __sigset_struct __sj_sig;
-};
-#endif /* !__KERNEL__ */
-
-__DECL_END
-#endif /* __CC__ */
-
-
-#endif /* !_BITS_CRT_SETJMP_H */
+#endif /* !_CONFSTR_H */

@@ -17,35 +17,15 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _BITS_CRT_SETJMP_H
-#define _BITS_CRT_SETJMP_H 1
+/* (#) Portability: libc4/5 (/include/ieee854.h) */
+#ifndef _IEEE854_H
+#define _IEEE854_H 1
 
 #include <__stdinc.h>
 
-#include <hybrid/typecore.h>
+#include <ieee754.h>
 
-#include <bits/os/sigset.h> /* struct __sigset_struct */
+#define ieee854_double       ieee854_long_double
+#define _IEEE854_DOUBLE_BIAS IEEE854_LONG_DOUBLE_BIAS
 
-#ifdef __CC__
-__DECL_BEGIN
-
-/* Define like suggested here:
- * https://gcc.gnu.org/onlinedocs/gcc/Nonlocal-Gotos.html */
-struct __jmp_buf {
-	__INTPTR_TYPE__ __jb_regs[5];
-};
-
-#ifndef __KERNEL__
-struct __sigjmp_buf {
-	struct __jmp_buf       __sj_buf;
-	/* Guess... */
-	__UINTPTR_TYPE__       __sj_hassig;
-	struct __sigset_struct __sj_sig;
-};
-#endif /* !__KERNEL__ */
-
-__DECL_END
-#endif /* __CC__ */
-
-
-#endif /* !_BITS_CRT_SETJMP_H */
+#endif /* !_IEEE854_H */

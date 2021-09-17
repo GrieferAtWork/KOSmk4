@@ -102,6 +102,10 @@ __LIBC int sys_nerr;
 %#endif /* __USE_GNU || __USE_DOS */
 
 
+/* NOTE: libc4/5 exports `sys_errlist' under `__USE_BSD', which
+ *       implies `__USE_MISC', so we also export it under that
+ *       same SOURCE control macro! */
+
 %
 %#if defined(__USE_MISC) || defined(__USE_DOS)
 %{

@@ -27,7 +27,7 @@
 
 #include <bits/os/sigset.h> /* struct __sigset_struct */
 
-__SYSDECL_BEGIN
+__DECL_BEGIN
 
 #ifdef __CRT_DOS_PRIMARY
 #if defined(__x86_64__)
@@ -37,42 +37,45 @@ __SYSDECL_BEGIN
 #define __JMP_BUF_SIZE  64
 #elif defined(__arm__)
 #define __JMP_BUF_SIZE  112
-#endif
+#endif /* ... */
 
 #ifdef __CC__
 #ifdef __JMP_BUF_ALIGN
 __ATTR_ALIGNED(__JMP_BUF_ALIGN)
-#else
+#else /* __JMP_BUF_ALIGN */
 __ATTR_ALIGNED(__SIZEOF_POINTER__)
-#endif
+#endif /* !__JMP_BUF_ALIGN */
 struct __jmp_buf {
 	__BYTE_TYPE__ __data[__JMP_BUF_SIZE];
 };
 #endif /* __CC__ */
+
 #elif defined(__x86_64__)
+
+/************************************************************************/
+/* 64-bit                                                               */
+/************************************************************************/
 #ifdef __CC__
 struct __jmp_buf {
-	__UINTPTR_TYPE__ __rbx,__rbp,__r12,__r13;
-	__UINTPTR_TYPE__ __r14,__r15,__rsp,__rip;
+	__UINTPTR_TYPE__ __rbx, __rbp, __r12, __r13;
+	__UINTPTR_TYPE__ __r14, __r15, __rsp, __rip;
 };
-#define __JMP_BUF_STATIC_INIT      \
-	{                              \
-		{ 0, 0, 0, 0, 0, 0, 0, 0 } \
-	}
 #endif /* __CC__ */
-#else
+
+#else /* ... */
+
+/************************************************************************/
+/* 32-bit                                                               */
+/************************************************************************/
 #ifdef __CC__
 struct __jmp_buf {
-	__UINTPTR_TYPE__ __ebx,__esp,__ebp;
-	__UINTPTR_TYPE__ __esi,__edi,__eip;
+	__UINTPTR_TYPE__ __ebx, __esp, __ebp;
+	__UINTPTR_TYPE__ __esi, __edi, __eip;
 	__UINTPTR_TYPE__ __padding[2];
 };
-#define __JMP_BUF_STATIC_INIT      \
-	{                              \
-		{ 0, 0, 0, 0, 0, 0, 0, 0 } \
-	}
 #endif /* __CC__ */
-#endif
+
+#endif /* !... */
 
 
 #ifdef __CC__
@@ -88,6 +91,6 @@ struct __sigjmp_buf {
 #endif /* !__KERNEL__ */
 #endif /* __CC__ */
 
-__SYSDECL_END
+__DECL_END
 
 #endif /* !_I386_KOS_BITS_CRT_SETJMP_H */
