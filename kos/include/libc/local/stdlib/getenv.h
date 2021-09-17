@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x60268b7 */
+/* HASH CRC-32:0xb30bca82 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -59,6 +59,9 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__local___localdep_strlen_defined */
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
+#ifndef __OPTIMIZE_SIZE__
+#include <hybrid/__unaligned.h>
+#endif /* !__OPTIMIZE_SIZE__ */
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(getenv) __ATTR_WUNUSED __ATTR_NONNULL((1)) char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(getenv))(char const *__varname) {
@@ -69,15 +72,66 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(getenv))(char const *__varname) {
 	if __unlikely(!___envp)
 		__result = __NULLPTR;
 	else {
-		__SIZE_TYPE__ __namelen;
-		__namelen = (__NAMESPACE_LOCAL_SYM __localdep_strlen)(__varname);
+		__SIZE_TYPE__ __namelen = (__NAMESPACE_LOCAL_SYM __localdep_strlen)(__varname);
+#ifdef __OPTIMIZE_SIZE__
 		for (; (__result = *___envp) != __NULLPTR; ++___envp) {
-			if ((__NAMESPACE_LOCAL_SYM __localdep_memcmp)(__result, __varname, __namelen * sizeof(char)) != 0 ||
-			    __result[__namelen] != '=')
+			if ((__NAMESPACE_LOCAL_SYM __localdep_memcmp)(__result, __varname, __namelen * sizeof(char)) != 0)
+				continue;
+			if (__result[__namelen] != '=')
 				continue;
 			__result += __namelen + 1;
 			break;
 		}
+#else /* __OPTIMIZE_SIZE__ */
+		union {
+			__UINT16_TYPE__      __word;
+			unsigned char __chr[2];
+		} __pattern;
+
+		/* Following the assumption that no environment variable string
+		 * (should)  ever consist of an empty string, we can infer that
+		 *
+		 * all  variable strings  should consist  of at  least 2 bytes,
+		 * namely the first character of the name, followed by at least
+		 * the terminating NUL character.
+		 *
+		 * As such, when walking the table of strings, we can speed up
+		 * operation via an initial dismissal check that compares  the
+		 * first 2 characters from the environ-string against the  the
+		 * expected pattern based on the caller's `varname'.
+		 *
+		 * As far as portability goes, gLibc makes the same assumption. */
+		if __unlikely(!__namelen) {
+			__result = __NULLPTR;
+		} else {
+			__pattern.__word = __hybrid_unaligned_get16((__UINT16_TYPE__ const *)__varname);
+			if __unlikely(__namelen == 1) {
+				/* Single-character variable name -> Only need to search for
+				 * that specific character,  as well as  the follow-up  '='! */
+				__pattern.__chr[1] = '=';
+				for (; (__result = *___envp) != __NULLPTR; ++___envp) {
+					if (__hybrid_unaligned_get16((__UINT16_TYPE__ const *)__result) != __pattern.__word)
+						continue;
+					__result += 2;
+					break;
+				}
+			} else {
+				__SIZE_TYPE__ __tail_namelen;
+				__varname += 2;
+				__tail_namelen = __namelen - 2;
+				for (; (__result = *___envp) != __NULLPTR; ++___envp) {
+					if (__hybrid_unaligned_get16((__UINT16_TYPE__ const *)__result) != __pattern.__word)
+						continue; /* First 2 characters don't match. */
+					if ((__NAMESPACE_LOCAL_SYM __localdep_memcmp)(__result + 2, __varname, __tail_namelen * sizeof(char)) != 0)
+						continue; /* Rest of string didn't match */
+					if (__result[__namelen] != '=')
+						continue; /* It's not the complete string. */
+					__result += __namelen + 1;
+					break;
+				}
+			}
+		}
+#endif /* !__OPTIMIZE_SIZE__ */
 	}
 	return __result;
 }

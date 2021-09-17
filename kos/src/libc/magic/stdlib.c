@@ -530,6 +530,11 @@ struct __div_struct div(int numer, int denom) {
 [[std, wunused, section(".text.crt{|.dos}.fs.environ")]]
 [[requires_include("<libc/local/environ.h>")]]
 [[userimpl, requires(defined(__LOCAL_environ))]]
+[[impl_prefix(
+@@pp_ifndef __OPTIMIZE_SIZE__@@
+#include <hybrid/__unaligned.h>
+@@pp_endif@@
+)]]
 char *getenv([[nonnull]] char const *varname) {
 	char *result, **envp;
 	if unlikely(!varname)
@@ -538,15 +543,66 @@ char *getenv([[nonnull]] char const *varname) {
 	if unlikely(!envp)
 		result = NULL;
 	else {
-		size_t namelen;
-		namelen = strlen(varname);
+		size_t namelen = strlen(varname);
+@@pp_ifdef __OPTIMIZE_SIZE__@@
 		for (; (result = *envp) != NULL; ++envp) {
-			if (memcmp(result, varname, namelen * sizeof(char)) != 0 ||
-			    result[namelen] != '=')
+			if (memcmp(result, varname, namelen * sizeof(char)) != 0)
+				continue;
+			if (result[namelen] != '=')
 				continue;
 			result += namelen + 1;
 			break;
 		}
+@@pp_else@@
+		union {
+			uint16_t      word;
+			unsigned char chr[2];
+		} pattern;
+
+		/* Following the assumption that no environment variable string
+		 * (should)  ever consist of an empty string, we can infer that
+		 *
+		 * all  variable strings  should consist  of at  least 2 bytes,
+		 * namely the first character of the name, followed by at least
+		 * the terminating NUL character.
+		 *
+		 * As such, when walking the table of strings, we can speed up
+		 * operation via an initial dismissal check that compares  the
+		 * first 2 characters from the environ-string against the  the
+		 * expected pattern based on the caller's `varname'.
+		 *
+		 * As far as portability goes, gLibc makes the same assumption. */
+		if unlikely(!namelen) {
+			result = NULL;
+		} else {
+			pattern.word = __hybrid_unaligned_get16((uint16_t const *)varname);
+			if unlikely(namelen == 1) {
+				/* Single-character variable name -> Only need to search for
+				 * that specific character,  as well as  the follow-up  '='! */
+				pattern.chr[1] = '=';
+				for (; (result = *envp) != NULL; ++envp) {
+					if (__hybrid_unaligned_get16((uint16_t const *)result) != pattern.word)
+						continue;
+					result += 2;
+					break;
+				}
+			} else {
+				size_t tail_namelen;
+				varname += 2;
+				tail_namelen = namelen - 2;
+				for (; (result = *envp) != NULL; ++envp) {
+					if (__hybrid_unaligned_get16((uint16_t const *)result) != pattern.word)
+						continue; /* First 2 characters don't match. */
+					if (memcmp(result + 2, varname, tail_namelen * sizeof(char)) != 0)
+						continue; /* Rest of string didn't match */
+					if (result[namelen] != '=')
+						continue; /* It's not the complete string. */
+					result += namelen + 1;
+					break;
+				}
+			}
+		}
+@@pp_endif@@
 	}
 	return result;
 }
