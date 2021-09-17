@@ -473,7 +473,6 @@ incdir("");
 #include <float.h>
 #include <fnmatch.h>
 #include <format-printer.h>
-#include <format-reader.h>
 #include <fts.h>
 #include <ftw.h>
 #include <getopt.h>

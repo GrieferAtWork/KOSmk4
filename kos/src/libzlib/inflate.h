@@ -26,7 +26,6 @@
 #include <kos/types.h>
 
 #include <format-printer.h>
-#include <format-reader.h>
 
 #include <libzlib/inflate.h>
 
