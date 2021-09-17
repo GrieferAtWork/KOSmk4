@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6036f8cf */
+/* HASH CRC-32:0x17e05f09 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -112,22 +112,22 @@ enum {
 /* >> __fbufsize(3)
  * Return the size of the buffer of `stream' in
  * bytes  currently in use  by the given stream */
-__CDECLARE_OPT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__fbufsize,(__FILE *__stream),(__stream))
+__CDECLARE_OPT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__fbufsize,(__FILE __KOS_FIXED_CONST *__stream),(__stream))
 /* >> __freading(3)
  * Return  non-zero value when  `stream' is opened readonly,
  * or if the last operation on `stream' was a read operation */
-__CDECLARE_OPT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,__freading,(__FILE *__stream),(__stream))
+__CDECLARE_OPT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,__freading,(__FILE __KOS_FIXED_CONST *__stream),(__stream))
 /* >> __fwriting(3)
  * Return non-zero value when  `stream' is opened write-only  or
  * append-only, or if the last operation on `stream' was a write
  * operation */
-__CDECLARE_OPT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,__fwriting,(__FILE *__stream),(__stream))
+__CDECLARE_OPT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,__fwriting,(__FILE __KOS_FIXED_CONST *__stream),(__stream))
 /* >> __freadable(3)
  * Return non-zero value when `stream' is not opened write-only or append-only */
-__CDECLARE_OPT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,__freadable,(__FILE *__stream),(__stream))
+__CDECLARE_OPT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,__freadable,(__FILE __KOS_FIXED_CONST *__stream),(__stream))
 /* >> __fwritable(3)
  * Return non-zero value when `stream' is not opened read-only */
-__CDECLARE_OPT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,__fwritable,(__FILE *__stream),(__stream))
+__CDECLARE_OPT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,__fwritable,(__FILE __KOS_FIXED_CONST *__stream),(__stream))
 /* >> __flbf(3)
  * Return non-zero value when `stream' is line-buffered */
 __CDECLARE_OPT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,__flbf,(__FILE *__stream),(__stream))
@@ -142,7 +142,7 @@ __CREDIRECT_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,__fpurge,(__FILE *__stream),f
 #endif /* ... */
 /* >> __fpending(3)
  * Return amount of output in bytes pending on a `stream' */
-__CDECLARE_OPT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),size_t,__NOTHROW_NCX,__fpending,(__FILE *__stream),(__stream))
+__CDECLARE_OPT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),size_t,__NOTHROW_NCX,__fpending,(__FILE __KOS_FIXED_CONST *__stream),(__stream))
 #ifdef __CRT_HAVE__flushlbf
 /* >> _flushlbf(3)
  * Flush all line-buffered files */
@@ -153,7 +153,8 @@ __CDECLARE_VOID(,__THROWING,_flushlbf,(void),())
 __CREDIRECT_VOID(,__THROWING,_flushlbf,(void),_IO_flush_all_linebuffere,())
 #endif /* ... */
 /* >> __fsetlocking(3)
- * Set locking status of `stream' to `type' */
+ * Set locking status of `stream' to `type'
+ * @param: type: One of `FSETLOCKING_*' */
 __CDECLARE_OPT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__fsetlocking,(__FILE *__stream, int __type),(__stream,__type))
 #endif /* __CC__ */
 

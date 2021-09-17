@@ -209,7 +209,7 @@ int addmntent([[nonnull]] $FILE *__restrict stream,
 @@Check if `mnt->mnt_opts' contains an option matching `opt'.
 @@@return: * :   Address of the `opt'-string in `mnt->mnt_opts'
 @@@return: NULL: No option `opt' found in `mnt->mnt_opts'
-[[wunused, ATTR_PURE, decl_include("<bits/crt/db/mntent.h>")]]
+[[pure, wunused, decl_include("<bits/crt/db/mntent.h>")]]
 char *hasmntopt([[nullable]] struct mntent const *mnt,
                 [[nullable]] char const *opt) {
 	char *str;

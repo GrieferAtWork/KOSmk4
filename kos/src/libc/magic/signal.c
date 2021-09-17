@@ -1422,7 +1422,7 @@ int siggetmask(void) {
 #define sys_siglist _sys_siglist
 #else /* _sys_siglist */
 }
-[[guard, nothrow, wunused, const, nonnull]]
+[[guard, nothrow, const, wunused, nonnull]]
 char const *const *__p_sys_siglist();
 %{
 #ifdef ____p_sys_siglist_defined
@@ -1588,7 +1588,7 @@ int sigdelset([[nonnull]] $sigset_t *set, $signo_t signo) {
 @@@return:  0: The given `signo' isn't apart of `set'
 @@@return: -1: [errno=EINVAL] invalid `signo'.
 @@             Not returned by the kernel-version of this function!
-[[kernel, extern_inline, wunused, ATTR_PURE, alias("__sigismember")]]
+[[kernel, extern_inline, pure, wunused, alias("__sigismember")]]
 [[if(!defined(__KERNEL__)), export_as("__sigismember")]]
 [[decl_include("<bits/types.h>", "<bits/os/sigset.h>")]]
 [[impl_prefix(DEFINE___PRIVATE_SIGSET_VALIDATE_SIGNO)]]
@@ -1710,7 +1710,7 @@ int sigwait([[nonnull]] sigset_t const *__restrict set,
 @@Check if the given signal set is empty
 @@@return: != 0: The given `set' is non-empty
 @@@return: == 0: The given `set' is empty
-[[kernel, wunused, ATTR_PURE, decl_include("<bits/os/sigset.h>")]]
+[[kernel, pure, wunused, decl_include("<bits/os/sigset.h>")]]
 int sigisemptyset([[nonnull]] $sigset_t const *__restrict set) {
 	size_t i;
 	for (i = 0; i < sizeof(sigset_t) / sizeof($ulongptr_t); ++i) {
@@ -2012,7 +2012,7 @@ void psiginfo([[nonnull]] siginfo_t const *pinfo,
 @@Return a textual description of `code', as read from `siginfo_t::si_code',
 @@and used in conjunction with a given signal `signo'. This function is used
 @@for the implementation of `psiginfo(3)'
-[[wunused, const]]
+[[const, wunused]]
 [[impl_include("<asm/os/signal.h>", "<asm/os/siginfo.h>")]]
 char const *strsigcode_s($signo_t signo, int code) {
 	char const *result = NULL;
@@ -2732,7 +2732,7 @@ DEFINE___PRIVATE_SIGSET_VALIDATE_SIGNO
 @@prefix of `name', and  do a case-insensitive compare  between
 @@the   given   `name',   and   the   signal's   actual   name.
 @@When   `name'   isn't   recognized,   return   `0'   instead.
-[[wunused, pure, impl_include("<asm/os/signal.h>")]]
+[[pure, wunused, impl_include("<asm/os/signal.h>")]]
 $signo_t signalnumber([[nonnull]] const char *name) {
 	$signo_t i, result = 0;
 	if ((name[0] == 'S' || name[0] == 's') &&
@@ -2753,7 +2753,7 @@ $signo_t signalnumber([[nonnull]] const char *name) {
 @@Return the next-greater signal number that comes after `signo'
 @@When  no such signal number exists, return `0'. When the given
 @@`signo' is `0', return the lowest valid signal number.
-[[wunused, const, impl_include("<asm/os/signal.h>")]]
+[[const, wunused, impl_include("<asm/os/signal.h>")]]
 $signo_t signalnext($signo_t signo) {
 	if (signo >= (__NSIG - 1))
 		return 0;

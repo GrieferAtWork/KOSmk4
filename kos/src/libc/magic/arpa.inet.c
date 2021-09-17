@@ -58,7 +58,7 @@ typedef __socklen_t socklen_t;
 
 @@>> inet_netof(3)
 @@Return the network-number-part of the Internet address `INADDR'
-[[wunused, ATTR_CONST]]
+[[const, wunused]]
 [[decl_include("<hybrid/typecore.h>", "<netinet/bits/in.h>")]]
 [[impl_include("<netinet/in.h>", "<hybrid/__byteswap.h>")]]
 $uint32_t inet_netof(struct in_addr inaddr) {
@@ -74,7 +74,7 @@ $uint32_t inet_netof(struct in_addr inaddr) {
 
 @@>> inet_lnaof(3)
 @@Return the local-host-address-part of the Internet address `INADDR'
-[[wunused, ATTR_CONST]]
+[[const, wunused]]
 [[decl_include("<hybrid/typecore.h>", "<netinet/bits/in.h>")]]
 [[impl_include("<netinet/in.h>", "<hybrid/__byteswap.h>")]]
 $uint32_t inet_lnaof(struct in_addr inaddr) {
@@ -93,7 +93,7 @@ $uint32_t inet_lnaof(struct in_addr inaddr) {
 @@the combination of its network (`net'), and host (`host') number.
 @@The `net' and `host' arguments  can later be re-extracted by  use
 @@of `inet_netof(3)' and `inet_lnaof(3)'
-[[wunused, ATTR_CONST]]
+[[const, wunused]]
 [[decl_include("<hybrid/typecore.h>", "<netinet/bits/in.h>")]]
 [[impl_include("<netinet/in.h>", "<hybrid/__byteswap.h>")]]
 struct in_addr inet_makeaddr($uint32_t net, $uint32_t host) {
@@ -124,7 +124,7 @@ struct in_addr inet_makeaddr($uint32_t net, $uint32_t host) {
 @@    123      (decimal)
 @@    0x123 (hex)
 @@    0123  (oct)
-[[ATTR_PURE, impl_include("<netinet/in.h>"), decl_include("<net/bits/types.h>")]]
+[[pure, impl_include("<netinet/in.h>"), decl_include("<net/bits/types.h>")]]
 in_addr_t inet_addr([[nonnull]] char const *__restrict cp) {
 	struct @in_addr@ addr;
 	if (!inet_paton((char const **)&cp, &addr, 0) || *cp)
@@ -166,7 +166,7 @@ char *inet_ntoa_r(struct in_addr inaddr, [[nonnull]] char buf[16]) {
 @@This function is  the same as  `inet_addr()', except  that
 @@the return value is in host-endian, rather than net-endian
 [[decl_include("<hybrid/typecore.h>")]]
-[[ATTR_PURE, impl_include("<netinet/in.h>", "<hybrid/__byteswap.h>")]]
+[[pure, impl_include("<netinet/in.h>", "<hybrid/__byteswap.h>")]]
 $uint32_t inet_network([[nonnull]] char const *__restrict cp) {
 	struct @in_addr@ addr;
 	if (!inet_paton((char const **)&cp, &addr, 1) || *cp)

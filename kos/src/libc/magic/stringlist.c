@@ -124,8 +124,8 @@ void sl_free([[nullable]] struct _stringlist *sl, int freeit) {
 @@return a  pointer to  the equivalent  string within  `sl' (i.e.  the
 @@pointer originally  passed to  `sl_add()'  to insert  that  string).
 @@If `sl' doesn't contain an equivalent string, return `NULL' instead.
-[[decl_include("<features.h>")]]
-[[ATTR_PURE, decl_include("<hybrid/typecore.h>"), decl_prefix(DEFINE_STRINGLIST)]]
+[[decl_include("<features.h>", "<hybrid/typecore.h>")]]
+[[pure, decl_prefix(DEFINE_STRINGLIST)]]
 [[nullable]] char *sl_find([[nonnull]] struct _stringlist __KOS_FIXED_CONST *sl,
                            [[nonnull]] char const *name) {
 	size_t i, count = sl->@sl_cur@;

@@ -395,7 +395,7 @@ void _free_dbg([[nullable]] void *ptr, int block_type) {
 	free(ptr);
 }
 
-[[guard, wunused, ATTR_PURE]]
+[[guard, pure, wunused]]
 [[crt_dos_only, requires_function(malloc_usable_size)]]
 [[decl_include("<hybrid/typecore.h>")]]
 $size_t _msize_dbg([[nonnull]] void *ptr, int block_type) {
@@ -403,7 +403,7 @@ $size_t _msize_dbg([[nonnull]] void *ptr, int block_type) {
 	return malloc_usable_size(ptr);
 }
 
-[[guard, wunused, ATTR_PURE]]
+[[guard, pure, wunused]]
 [[crt_dos_only, requires_function(_aligned_msize)]]
 [[decl_include("<hybrid/typecore.h>")]]
 $size_t _aligned_msize_dbg([[nonnull]] void *ptr, $size_t min_alignment, $size_t offset) {
@@ -641,7 +641,7 @@ void _CrtDoForAllClientObjects([[nonnull]] _PFNCRTDOFORALLCLIENTOBJECTS pfn, voi
 	(void)context;
 }
 
-[[wunused, ATTR_PURE, crt_dos_only, decl_include("<features.h>")]]
+[[pure, wunused, crt_dos_only, decl_include("<features.h>")]]
 int _CrtIsValidPointer(void const *ptr, __STDC_UINT_AS_SIZE_T num_bytes, int writable) {
 	COMPILER_IMPURE();
 	(void)num_bytes;
@@ -649,7 +649,7 @@ int _CrtIsValidPointer(void const *ptr, __STDC_UINT_AS_SIZE_T num_bytes, int wri
 	return ptr != NULL;
 }
 
-[[wunused, ATTR_PURE, crt_dos_only]]
+[[pure, wunused, crt_dos_only]]
 int _CrtIsValidHeapPointer(void const *heap_ptr) {
 	COMPILER_IMPURE();
 	return heap_ptr != NULL;
@@ -670,7 +670,7 @@ int _CrtIsMemoryBlock(void const *ptr, __STDC_UINT_AS_SIZE_T num_bytes,
 	return 0;
 }
 
-[[wunused, ATTR_PURE, crt_dos_only]]
+[[pure, wunused, crt_dos_only]]
 int _CrtReportBlockType(void const *ptr) {
 	COMPILER_IMPURE();
 	return ptr ? 1 /*_NORMAL_BLOCK*/ : 0 /*_FREE_BLOCK*/;
@@ -716,7 +716,7 @@ int _CrtSetCheckCount(int check_count) {
 	return 0;
 }
 
-[[ATTR_PURE, crt_dos_only]]
+[[pure, crt_dos_only]]
 int _CrtGetCheckCount() {
 	COMPILER_IMPURE();
 	return 0;

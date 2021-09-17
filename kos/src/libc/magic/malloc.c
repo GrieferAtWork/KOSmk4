@@ -182,8 +182,8 @@ int malloc_trim(size_t pad) {
 }
 
 %
-[[decl_include("<hybrid/typecore.h>")]]
-[[libc, wunused, ATTR_PURE, dos_only_export_alias("_msize")]]
+[[libc, pure, wunused, decl_include("<hybrid/typecore.h>")]]
+[[dos_only_export_alias("_msize")]]
 [[section(".text.crt{|.dos}.heap.helpers")]]
 size_t malloc_usable_size(void *__restrict mallptr);
 

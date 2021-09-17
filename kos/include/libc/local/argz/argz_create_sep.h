@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6512b343 */
+/* HASH CRC-32:0x1c0c8ace */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,7 @@
 #ifndef __local_argz_create_sep_defined
 #define __local_argz_create_sep_defined 1
 #include <__crt.h>
-#if (defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign)) && (defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree))
+#if defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign)
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_free_defined
@@ -116,7 +116,9 @@ __again_check_ch:
 	}
 	if __unlikely(__dst == __result_string) {
 		/* Empty string. (this can happen if `string' only consisted of `sep' characters) */
+#if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree)
 		(__NAMESPACE_LOCAL_SYM __localdep_free)(__result_string);
+#endif /* __CRT_HAVE_free || __CRT_HAVE_cfree */
 		goto __empty_argz;
 	}
 	/* Write the terminating NUL-byte (if there isn't one already) */
@@ -130,7 +132,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_argz_create_sep_defined 1
 #define __localdep_argz_create_sep __LIBC_LOCAL_NAME(argz_create_sep)
 #endif /* !__local___localdep_argz_create_sep_defined */
-#else /* (__CRT_HAVE_malloc || __CRT_HAVE_calloc || __CRT_HAVE_realloc || __CRT_HAVE_memalign || __CRT_HAVE_aligned_alloc || __CRT_HAVE_posix_memalign) && (__CRT_HAVE_free || __CRT_HAVE_cfree) */
+#else /* __CRT_HAVE_malloc || __CRT_HAVE_calloc || __CRT_HAVE_realloc || __CRT_HAVE_memalign || __CRT_HAVE_aligned_alloc || __CRT_HAVE_posix_memalign */
 #undef __local_argz_create_sep_defined
-#endif /* (!__CRT_HAVE_malloc && !__CRT_HAVE_calloc && !__CRT_HAVE_realloc && !__CRT_HAVE_memalign && !__CRT_HAVE_aligned_alloc && !__CRT_HAVE_posix_memalign) || (!__CRT_HAVE_free && !__CRT_HAVE_cfree) */
+#endif /* !__CRT_HAVE_malloc && !__CRT_HAVE_calloc && !__CRT_HAVE_realloc && !__CRT_HAVE_memalign && !__CRT_HAVE_aligned_alloc && !__CRT_HAVE_posix_memalign */
 #endif /* !__local_argz_create_sep_defined */

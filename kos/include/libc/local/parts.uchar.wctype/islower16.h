@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9fc7689e */
+/* HASH CRC-32:0x283ba2db */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -41,6 +41,26 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_c16tob __LIBC_LOCAL_NAME(c16tob)
 #endif /* !... */
 #endif /* !__local___localdep_c16tob_defined */
+#ifndef __local___localdep_islower_defined
+#define __local___localdep_islower_defined 1
+__NAMESPACE_LOCAL_END
+#include <bits/crt/ctype.h>
+__NAMESPACE_LOCAL_BEGIN
+#if defined(__crt_islower) && defined(__CRT_HAVE_islower)
+__CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_islower,(int __ch),islower,{ return __crt_islower(__ch); })
+#elif defined(__crt_islower)
+__LOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __localdep_islower)(int __ch) { return __crt_islower(__ch); }
+#elif __has_builtin(__builtin_islower) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_islower)
+__CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_islower,(int __ch),islower,{ return __builtin_islower(__ch); })
+#elif defined(__CRT_HAVE_islower)
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_islower,(int __ch),islower,(__ch))
+#else /* ... */
+__NAMESPACE_LOCAL_END
+#include <libc/local/ctype/islower.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_islower __LIBC_LOCAL_NAME(islower)
+#endif /* !... */
+#endif /* !__local___localdep_islower_defined */
 __NAMESPACE_LOCAL_END
 #include <bits/crt/wctype.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -49,7 +69,7 @@ __NOTHROW(__LIBDCALL __LIBC_LOCAL_NAME(islower16))(__WINT16_TYPE__ __wc) {
 #ifdef __crt_iswlower
 	return __crt_iswlower(__wc);
 #else /* __crt_iswlower */
-	return __LIBC_LOCAL_NAME(islower16)((__NAMESPACE_LOCAL_SYM __localdep_c16tob)(__wc));
+	return (__NAMESPACE_LOCAL_SYM __localdep_islower)((__NAMESPACE_LOCAL_SYM __localdep_c16tob)(__wc));
 #endif /* !__crt_iswlower */
 }
 __NAMESPACE_LOCAL_END

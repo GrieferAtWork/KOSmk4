@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc4a54365 */
+/* HASH CRC-32:0xe00278ca */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -819,6 +819,9 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(isascii32, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR
 #if defined(__crt_iswcntrl_l) && defined(__CRT_HAVE_iswcntrl_l) && __SIZEOF_WCHAR_T__ == 2
 /* >> iswcntrl_l(3) */
 __COMPILER_EIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,__LIBDCALL,iscntrl16_l,(__WINT16_TYPE__ __ch, __locale_t __locale),iswcntrl_l,{ return __crt_iswcntrl_l(__ch, __locale); })
+#elif defined(__crt_iswcntrl_l) && defined(__CRT_HAVE__iswcntrl_l) && __SIZEOF_WCHAR_T__ == 2
+/* >> iswcntrl_l(3) */
+__COMPILER_EIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,__LIBDCALL,iscntrl16_l,(__WINT16_TYPE__ __ch, __locale_t __locale),_iswcntrl_l,{ return __crt_iswcntrl_l(__ch, __locale); })
 #elif defined(__crt_iswcntrl_l) && defined(__CRT_HAVE___iswcntrl_l) && __SIZEOF_WCHAR_T__ == 2
 /* >> iswcntrl_l(3) */
 __COMPILER_EIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,__LIBDCALL,iscntrl16_l,(__WINT16_TYPE__ __ch, __locale_t __locale),__iswcntrl_l,{ return __crt_iswcntrl_l(__ch, __locale); })
@@ -843,6 +846,9 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,iscntrl16_l,(__WINT16_T
 #elif defined(__CRT_HAVE_DOS$__iswcntrl_l)
 /* >> iswcntrl_l(3) */
 __CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,iscntrl16_l,(__WINT16_TYPE__ __ch, __locale_t __locale),__iswcntrl_l,(__ch,__locale))
+#elif defined(__crt_iswcntrl) && __SIZEOF_WCHAR_T__ == 2
+/* >> iswcntrl_l(3) */
+__LOCAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LIBDCALL iscntrl16_l)(__WINT16_TYPE__ __ch, __locale_t __locale) { __COMPILER_IMPURE(); (void)__locale; return __crt_iswcntrl(__ch); }
 #elif __SIZEOF_WCHAR_T__ == 2
 #include <libc/local/wctype/iswcntrl_l.h>
 /* >> iswcntrl_l(3) */
@@ -855,6 +861,9 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(iscntrl16_l, __FORCELOCAL __ATTR_ARTIFICIAL __AT
 #if defined(__crt_iswcntrl_l) && defined(__CRT_HAVE_iswcntrl_l) && __SIZEOF_WCHAR_T__ == 4
 /* >> iswcntrl_l(3) */
 __COMPILER_EIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,__LIBKCALL,iscntrl32_l,(__WINT32_TYPE__ __ch, __locale_t __locale),iswcntrl_l,{ return __crt_iswcntrl_l(__ch, __locale); })
+#elif defined(__crt_iswcntrl_l) && defined(__CRT_HAVE__iswcntrl_l) && __SIZEOF_WCHAR_T__ == 4
+/* >> iswcntrl_l(3) */
+__COMPILER_EIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,__LIBKCALL,iscntrl32_l,(__WINT32_TYPE__ __ch, __locale_t __locale),_iswcntrl_l,{ return __crt_iswcntrl_l(__ch, __locale); })
 #elif defined(__crt_iswcntrl_l) && defined(__CRT_HAVE___iswcntrl_l) && __SIZEOF_WCHAR_T__ == 4
 /* >> iswcntrl_l(3) */
 __COMPILER_EIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,__LIBKCALL,iscntrl32_l,(__WINT32_TYPE__ __ch, __locale_t __locale),__iswcntrl_l,{ return __crt_iswcntrl_l(__ch, __locale); })
@@ -879,6 +888,9 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,iscntrl32_l,(__WINT32_T
 #elif defined(__CRT_HAVE_KOS$__iswcntrl_l)
 /* >> iswcntrl_l(3) */
 __CREDIRECT_KOS(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,iscntrl32_l,(__WINT32_TYPE__ __ch, __locale_t __locale),__iswcntrl_l,(__ch,__locale))
+#elif defined(__crt_iswcntrl) && __SIZEOF_WCHAR_T__ == 4
+/* >> iswcntrl_l(3) */
+__LOCAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LIBKCALL iscntrl32_l)(__WINT32_TYPE__ __ch, __locale_t __locale) { __COMPILER_IMPURE(); (void)__locale; return __crt_iswcntrl(__ch); }
 #elif __SIZEOF_WCHAR_T__ == 4
 #include <libc/local/wctype/iswcntrl_l.h>
 /* >> iswcntrl_l(3) */
@@ -891,6 +903,9 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(iscntrl32_l, __FORCELOCAL __ATTR_ARTIFICIAL __AT
 #if defined(__crt_iswspace_l) && defined(__CRT_HAVE_iswspace_l) && __SIZEOF_WCHAR_T__ == 2
 /* >> iswspace_l(3) */
 __COMPILER_EIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,__LIBDCALL,isspace16_l,(__WINT16_TYPE__ __ch, __locale_t __locale),iswspace_l,{ return __crt_iswspace_l(__ch, __locale); })
+#elif defined(__crt_iswspace_l) && defined(__CRT_HAVE__iswspace_l) && __SIZEOF_WCHAR_T__ == 2
+/* >> iswspace_l(3) */
+__COMPILER_EIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,__LIBDCALL,isspace16_l,(__WINT16_TYPE__ __ch, __locale_t __locale),_iswspace_l,{ return __crt_iswspace_l(__ch, __locale); })
 #elif defined(__crt_iswspace_l) && defined(__CRT_HAVE___iswspace_l) && __SIZEOF_WCHAR_T__ == 2
 /* >> iswspace_l(3) */
 __COMPILER_EIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,__LIBDCALL,isspace16_l,(__WINT16_TYPE__ __ch, __locale_t __locale),__iswspace_l,{ return __crt_iswspace_l(__ch, __locale); })
@@ -915,6 +930,9 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,isspace16_l,(__WINT16_T
 #elif defined(__CRT_HAVE_DOS$__iswspace_l)
 /* >> iswspace_l(3) */
 __CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,isspace16_l,(__WINT16_TYPE__ __ch, __locale_t __locale),__iswspace_l,(__ch,__locale))
+#elif defined(__crt_iswspace) && __SIZEOF_WCHAR_T__ == 2
+/* >> iswspace_l(3) */
+__LOCAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LIBDCALL isspace16_l)(__WINT16_TYPE__ __ch, __locale_t __locale) { __COMPILER_IMPURE(); (void)__locale; return __crt_iswspace(__ch); }
 #elif __SIZEOF_WCHAR_T__ == 2
 #include <libc/local/wctype/iswspace_l.h>
 /* >> iswspace_l(3) */
@@ -927,6 +945,9 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(isspace16_l, __FORCELOCAL __ATTR_ARTIFICIAL __AT
 #if defined(__crt_iswspace_l) && defined(__CRT_HAVE_iswspace_l) && __SIZEOF_WCHAR_T__ == 4
 /* >> iswspace_l(3) */
 __COMPILER_EIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,__LIBKCALL,isspace32_l,(__WINT32_TYPE__ __ch, __locale_t __locale),iswspace_l,{ return __crt_iswspace_l(__ch, __locale); })
+#elif defined(__crt_iswspace_l) && defined(__CRT_HAVE__iswspace_l) && __SIZEOF_WCHAR_T__ == 4
+/* >> iswspace_l(3) */
+__COMPILER_EIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,__LIBKCALL,isspace32_l,(__WINT32_TYPE__ __ch, __locale_t __locale),_iswspace_l,{ return __crt_iswspace_l(__ch, __locale); })
 #elif defined(__crt_iswspace_l) && defined(__CRT_HAVE___iswspace_l) && __SIZEOF_WCHAR_T__ == 4
 /* >> iswspace_l(3) */
 __COMPILER_EIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,__LIBKCALL,isspace32_l,(__WINT32_TYPE__ __ch, __locale_t __locale),__iswspace_l,{ return __crt_iswspace_l(__ch, __locale); })
@@ -951,6 +972,9 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,isspace32_l,(__WINT32_T
 #elif defined(__CRT_HAVE_KOS$__iswspace_l)
 /* >> iswspace_l(3) */
 __CREDIRECT_KOS(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,isspace32_l,(__WINT32_TYPE__ __ch, __locale_t __locale),__iswspace_l,(__ch,__locale))
+#elif defined(__crt_iswspace) && __SIZEOF_WCHAR_T__ == 4
+/* >> iswspace_l(3) */
+__LOCAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LIBKCALL isspace32_l)(__WINT32_TYPE__ __ch, __locale_t __locale) { __COMPILER_IMPURE(); (void)__locale; return __crt_iswspace(__ch); }
 #elif __SIZEOF_WCHAR_T__ == 4
 #include <libc/local/wctype/iswspace_l.h>
 /* >> iswspace_l(3) */
@@ -963,6 +987,9 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(isspace32_l, __FORCELOCAL __ATTR_ARTIFICIAL __AT
 #if defined(__crt_iswupper_l) && defined(__CRT_HAVE_iswupper_l) && __SIZEOF_WCHAR_T__ == 2
 /* >> iswupper_l(3) */
 __COMPILER_EIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,__LIBDCALL,isupper16_l,(__WINT16_TYPE__ __ch, __locale_t __locale),iswupper_l,{ return __crt_iswupper_l(__ch, __locale); })
+#elif defined(__crt_iswupper_l) && defined(__CRT_HAVE__iswupper_l) && __SIZEOF_WCHAR_T__ == 2
+/* >> iswupper_l(3) */
+__COMPILER_EIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,__LIBDCALL,isupper16_l,(__WINT16_TYPE__ __ch, __locale_t __locale),_iswupper_l,{ return __crt_iswupper_l(__ch, __locale); })
 #elif defined(__crt_iswupper_l) && defined(__CRT_HAVE___iswupper_l) && __SIZEOF_WCHAR_T__ == 2
 /* >> iswupper_l(3) */
 __COMPILER_EIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,__LIBDCALL,isupper16_l,(__WINT16_TYPE__ __ch, __locale_t __locale),__iswupper_l,{ return __crt_iswupper_l(__ch, __locale); })
@@ -987,6 +1014,9 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,isupper16_l,(__WINT16_T
 #elif defined(__CRT_HAVE_DOS$__iswupper_l)
 /* >> iswupper_l(3) */
 __CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,isupper16_l,(__WINT16_TYPE__ __ch, __locale_t __locale),__iswupper_l,(__ch,__locale))
+#elif defined(__crt_iswupper) && __SIZEOF_WCHAR_T__ == 2
+/* >> iswupper_l(3) */
+__LOCAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LIBDCALL isupper16_l)(__WINT16_TYPE__ __ch, __locale_t __locale) { __COMPILER_IMPURE(); (void)__locale; return __crt_iswupper(__ch); }
 #elif __SIZEOF_WCHAR_T__ == 2
 #include <libc/local/wctype/iswupper_l.h>
 /* >> iswupper_l(3) */
@@ -999,6 +1029,9 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(isupper16_l, __FORCELOCAL __ATTR_ARTIFICIAL __AT
 #if defined(__crt_iswupper_l) && defined(__CRT_HAVE_iswupper_l) && __SIZEOF_WCHAR_T__ == 4
 /* >> iswupper_l(3) */
 __COMPILER_EIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,__LIBKCALL,isupper32_l,(__WINT32_TYPE__ __ch, __locale_t __locale),iswupper_l,{ return __crt_iswupper_l(__ch, __locale); })
+#elif defined(__crt_iswupper_l) && defined(__CRT_HAVE__iswupper_l) && __SIZEOF_WCHAR_T__ == 4
+/* >> iswupper_l(3) */
+__COMPILER_EIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,__LIBKCALL,isupper32_l,(__WINT32_TYPE__ __ch, __locale_t __locale),_iswupper_l,{ return __crt_iswupper_l(__ch, __locale); })
 #elif defined(__crt_iswupper_l) && defined(__CRT_HAVE___iswupper_l) && __SIZEOF_WCHAR_T__ == 4
 /* >> iswupper_l(3) */
 __COMPILER_EIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,__LIBKCALL,isupper32_l,(__WINT32_TYPE__ __ch, __locale_t __locale),__iswupper_l,{ return __crt_iswupper_l(__ch, __locale); })
@@ -1023,6 +1056,9 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,isupper32_l,(__WINT32_T
 #elif defined(__CRT_HAVE_KOS$__iswupper_l)
 /* >> iswupper_l(3) */
 __CREDIRECT_KOS(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,isupper32_l,(__WINT32_TYPE__ __ch, __locale_t __locale),__iswupper_l,(__ch,__locale))
+#elif defined(__crt_iswupper) && __SIZEOF_WCHAR_T__ == 4
+/* >> iswupper_l(3) */
+__LOCAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LIBKCALL isupper32_l)(__WINT32_TYPE__ __ch, __locale_t __locale) { __COMPILER_IMPURE(); (void)__locale; return __crt_iswupper(__ch); }
 #elif __SIZEOF_WCHAR_T__ == 4
 #include <libc/local/wctype/iswupper_l.h>
 /* >> iswupper_l(3) */
@@ -1035,6 +1071,9 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(isupper32_l, __FORCELOCAL __ATTR_ARTIFICIAL __AT
 #if defined(__crt_iswlower_l) && defined(__CRT_HAVE_iswlower_l) && __SIZEOF_WCHAR_T__ == 2
 /* >> iswlower_l(3) */
 __COMPILER_EIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,__LIBDCALL,islower16_l,(__WINT16_TYPE__ __ch, __locale_t __locale),iswlower_l,{ return __crt_iswlower_l(__ch, __locale); })
+#elif defined(__crt_iswlower_l) && defined(__CRT_HAVE__iswlower_l) && __SIZEOF_WCHAR_T__ == 2
+/* >> iswlower_l(3) */
+__COMPILER_EIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,__LIBDCALL,islower16_l,(__WINT16_TYPE__ __ch, __locale_t __locale),_iswlower_l,{ return __crt_iswlower_l(__ch, __locale); })
 #elif defined(__crt_iswlower_l) && defined(__CRT_HAVE___iswlower_l) && __SIZEOF_WCHAR_T__ == 2
 /* >> iswlower_l(3) */
 __COMPILER_EIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,__LIBDCALL,islower16_l,(__WINT16_TYPE__ __ch, __locale_t __locale),__iswlower_l,{ return __crt_iswlower_l(__ch, __locale); })
@@ -1059,6 +1098,9 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,islower16_l,(__WINT16_T
 #elif defined(__CRT_HAVE_DOS$__iswlower_l)
 /* >> iswlower_l(3) */
 __CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,islower16_l,(__WINT16_TYPE__ __ch, __locale_t __locale),__iswlower_l,(__ch,__locale))
+#elif defined(__crt_iswlower) && __SIZEOF_WCHAR_T__ == 2
+/* >> iswlower_l(3) */
+__LOCAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LIBDCALL islower16_l)(__WINT16_TYPE__ __ch, __locale_t __locale) { __COMPILER_IMPURE(); (void)__locale; return __crt_iswlower(__ch); }
 #elif __SIZEOF_WCHAR_T__ == 2
 #include <libc/local/wctype/iswlower_l.h>
 /* >> iswlower_l(3) */
@@ -1071,6 +1113,9 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(islower16_l, __FORCELOCAL __ATTR_ARTIFICIAL __AT
 #if defined(__crt_iswlower_l) && defined(__CRT_HAVE_iswlower_l) && __SIZEOF_WCHAR_T__ == 4
 /* >> iswlower_l(3) */
 __COMPILER_EIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,__LIBKCALL,islower32_l,(__WINT32_TYPE__ __ch, __locale_t __locale),iswlower_l,{ return __crt_iswlower_l(__ch, __locale); })
+#elif defined(__crt_iswlower_l) && defined(__CRT_HAVE__iswlower_l) && __SIZEOF_WCHAR_T__ == 4
+/* >> iswlower_l(3) */
+__COMPILER_EIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,__LIBKCALL,islower32_l,(__WINT32_TYPE__ __ch, __locale_t __locale),_iswlower_l,{ return __crt_iswlower_l(__ch, __locale); })
 #elif defined(__crt_iswlower_l) && defined(__CRT_HAVE___iswlower_l) && __SIZEOF_WCHAR_T__ == 4
 /* >> iswlower_l(3) */
 __COMPILER_EIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,__LIBKCALL,islower32_l,(__WINT32_TYPE__ __ch, __locale_t __locale),__iswlower_l,{ return __crt_iswlower_l(__ch, __locale); })
@@ -1095,6 +1140,9 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,islower32_l,(__WINT32_T
 #elif defined(__CRT_HAVE_KOS$__iswlower_l)
 /* >> iswlower_l(3) */
 __CREDIRECT_KOS(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,islower32_l,(__WINT32_TYPE__ __ch, __locale_t __locale),__iswlower_l,(__ch,__locale))
+#elif defined(__crt_iswlower) && __SIZEOF_WCHAR_T__ == 4
+/* >> iswlower_l(3) */
+__LOCAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LIBKCALL islower32_l)(__WINT32_TYPE__ __ch, __locale_t __locale) { __COMPILER_IMPURE(); (void)__locale; return __crt_iswlower(__ch); }
 #elif __SIZEOF_WCHAR_T__ == 4
 #include <libc/local/wctype/iswlower_l.h>
 /* >> iswlower_l(3) */
@@ -1107,6 +1155,9 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(islower32_l, __FORCELOCAL __ATTR_ARTIFICIAL __AT
 #if defined(__crt_iswalpha_l) && defined(__CRT_HAVE_iswalpha_l) && __SIZEOF_WCHAR_T__ == 2
 /* >> iswalpha_l(3) */
 __COMPILER_EIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,__LIBDCALL,isalpha16_l,(__WINT16_TYPE__ __ch, __locale_t __locale),iswalpha_l,{ return __crt_iswalpha_l(__ch, __locale); })
+#elif defined(__crt_iswalpha_l) && defined(__CRT_HAVE__iswalpha_l) && __SIZEOF_WCHAR_T__ == 2
+/* >> iswalpha_l(3) */
+__COMPILER_EIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,__LIBDCALL,isalpha16_l,(__WINT16_TYPE__ __ch, __locale_t __locale),_iswalpha_l,{ return __crt_iswalpha_l(__ch, __locale); })
 #elif defined(__crt_iswalpha_l) && defined(__CRT_HAVE___iswalpha_l) && __SIZEOF_WCHAR_T__ == 2
 /* >> iswalpha_l(3) */
 __COMPILER_EIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,__LIBDCALL,isalpha16_l,(__WINT16_TYPE__ __ch, __locale_t __locale),__iswalpha_l,{ return __crt_iswalpha_l(__ch, __locale); })
@@ -1131,6 +1182,9 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,isalpha16_l,(__WINT16_T
 #elif defined(__CRT_HAVE_DOS$__iswalpha_l)
 /* >> iswalpha_l(3) */
 __CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,isalpha16_l,(__WINT16_TYPE__ __ch, __locale_t __locale),__iswalpha_l,(__ch,__locale))
+#elif defined(__crt_iswalpha) && __SIZEOF_WCHAR_T__ == 2
+/* >> iswalpha_l(3) */
+__LOCAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LIBDCALL isalpha16_l)(__WINT16_TYPE__ __ch, __locale_t __locale) { __COMPILER_IMPURE(); (void)__locale; return __crt_iswalpha(__ch); }
 #elif __SIZEOF_WCHAR_T__ == 2
 #include <libc/local/wctype/iswalpha_l.h>
 /* >> iswalpha_l(3) */
@@ -1143,6 +1197,9 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(isalpha16_l, __FORCELOCAL __ATTR_ARTIFICIAL __AT
 #if defined(__crt_iswalpha_l) && defined(__CRT_HAVE_iswalpha_l) && __SIZEOF_WCHAR_T__ == 4
 /* >> iswalpha_l(3) */
 __COMPILER_EIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,__LIBKCALL,isalpha32_l,(__WINT32_TYPE__ __ch, __locale_t __locale),iswalpha_l,{ return __crt_iswalpha_l(__ch, __locale); })
+#elif defined(__crt_iswalpha_l) && defined(__CRT_HAVE__iswalpha_l) && __SIZEOF_WCHAR_T__ == 4
+/* >> iswalpha_l(3) */
+__COMPILER_EIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,__LIBKCALL,isalpha32_l,(__WINT32_TYPE__ __ch, __locale_t __locale),_iswalpha_l,{ return __crt_iswalpha_l(__ch, __locale); })
 #elif defined(__crt_iswalpha_l) && defined(__CRT_HAVE___iswalpha_l) && __SIZEOF_WCHAR_T__ == 4
 /* >> iswalpha_l(3) */
 __COMPILER_EIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,__LIBKCALL,isalpha32_l,(__WINT32_TYPE__ __ch, __locale_t __locale),__iswalpha_l,{ return __crt_iswalpha_l(__ch, __locale); })
@@ -1167,6 +1224,9 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,isalpha32_l,(__WINT32_T
 #elif defined(__CRT_HAVE_KOS$__iswalpha_l)
 /* >> iswalpha_l(3) */
 __CREDIRECT_KOS(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,isalpha32_l,(__WINT32_TYPE__ __ch, __locale_t __locale),__iswalpha_l,(__ch,__locale))
+#elif defined(__crt_iswalpha) && __SIZEOF_WCHAR_T__ == 4
+/* >> iswalpha_l(3) */
+__LOCAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LIBKCALL isalpha32_l)(__WINT32_TYPE__ __ch, __locale_t __locale) { __COMPILER_IMPURE(); (void)__locale; return __crt_iswalpha(__ch); }
 #elif __SIZEOF_WCHAR_T__ == 4
 #include <libc/local/wctype/iswalpha_l.h>
 /* >> iswalpha_l(3) */
@@ -1179,6 +1239,9 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(isalpha32_l, __FORCELOCAL __ATTR_ARTIFICIAL __AT
 #if defined(__crt_iswdigit_l) && defined(__CRT_HAVE_iswdigit_l) && __SIZEOF_WCHAR_T__ == 2
 /* >> iswdigit_l(3) */
 __COMPILER_EIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,__LIBDCALL,isdigit16_l,(__WINT16_TYPE__ __ch, __locale_t __locale),iswdigit_l,{ return __crt_iswdigit_l(__ch, __locale); })
+#elif defined(__crt_iswdigit_l) && defined(__CRT_HAVE__iswdigit_l) && __SIZEOF_WCHAR_T__ == 2
+/* >> iswdigit_l(3) */
+__COMPILER_EIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,__LIBDCALL,isdigit16_l,(__WINT16_TYPE__ __ch, __locale_t __locale),_iswdigit_l,{ return __crt_iswdigit_l(__ch, __locale); })
 #elif defined(__crt_iswdigit_l) && defined(__CRT_HAVE___iswdigit_l) && __SIZEOF_WCHAR_T__ == 2
 /* >> iswdigit_l(3) */
 __COMPILER_EIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,__LIBDCALL,isdigit16_l,(__WINT16_TYPE__ __ch, __locale_t __locale),__iswdigit_l,{ return __crt_iswdigit_l(__ch, __locale); })
@@ -1203,6 +1266,9 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,isdigit16_l,(__WINT16_T
 #elif defined(__CRT_HAVE_DOS$__iswdigit_l)
 /* >> iswdigit_l(3) */
 __CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,isdigit16_l,(__WINT16_TYPE__ __ch, __locale_t __locale),__iswdigit_l,(__ch,__locale))
+#elif defined(__crt_iswdigit) && __SIZEOF_WCHAR_T__ == 2
+/* >> iswdigit_l(3) */
+__LOCAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LIBDCALL isdigit16_l)(__WINT16_TYPE__ __ch, __locale_t __locale) { __COMPILER_IMPURE(); (void)__locale; return __crt_iswdigit(__ch); }
 #elif __SIZEOF_WCHAR_T__ == 2
 #include <libc/local/wctype/iswdigit_l.h>
 /* >> iswdigit_l(3) */
@@ -1215,6 +1281,9 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(isdigit16_l, __FORCELOCAL __ATTR_ARTIFICIAL __AT
 #if defined(__crt_iswdigit_l) && defined(__CRT_HAVE_iswdigit_l) && __SIZEOF_WCHAR_T__ == 4
 /* >> iswdigit_l(3) */
 __COMPILER_EIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,__LIBKCALL,isdigit32_l,(__WINT32_TYPE__ __ch, __locale_t __locale),iswdigit_l,{ return __crt_iswdigit_l(__ch, __locale); })
+#elif defined(__crt_iswdigit_l) && defined(__CRT_HAVE__iswdigit_l) && __SIZEOF_WCHAR_T__ == 4
+/* >> iswdigit_l(3) */
+__COMPILER_EIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,__LIBKCALL,isdigit32_l,(__WINT32_TYPE__ __ch, __locale_t __locale),_iswdigit_l,{ return __crt_iswdigit_l(__ch, __locale); })
 #elif defined(__crt_iswdigit_l) && defined(__CRT_HAVE___iswdigit_l) && __SIZEOF_WCHAR_T__ == 4
 /* >> iswdigit_l(3) */
 __COMPILER_EIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,__LIBKCALL,isdigit32_l,(__WINT32_TYPE__ __ch, __locale_t __locale),__iswdigit_l,{ return __crt_iswdigit_l(__ch, __locale); })
@@ -1239,6 +1308,9 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,isdigit32_l,(__WINT32_T
 #elif defined(__CRT_HAVE_KOS$__iswdigit_l)
 /* >> iswdigit_l(3) */
 __CREDIRECT_KOS(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,isdigit32_l,(__WINT32_TYPE__ __ch, __locale_t __locale),__iswdigit_l,(__ch,__locale))
+#elif defined(__crt_iswdigit) && __SIZEOF_WCHAR_T__ == 4
+/* >> iswdigit_l(3) */
+__LOCAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LIBKCALL isdigit32_l)(__WINT32_TYPE__ __ch, __locale_t __locale) { __COMPILER_IMPURE(); (void)__locale; return __crt_iswdigit(__ch); }
 #elif __SIZEOF_WCHAR_T__ == 4
 #include <libc/local/wctype/iswdigit_l.h>
 /* >> iswdigit_l(3) */
@@ -1251,6 +1323,9 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(isdigit32_l, __FORCELOCAL __ATTR_ARTIFICIAL __AT
 #if defined(__crt_iswxdigit_l) && defined(__CRT_HAVE_iswxdigit_l) && __SIZEOF_WCHAR_T__ == 2
 /* >> iswxdigit_l(3) */
 __COMPILER_EIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,__LIBDCALL,isxdigit16_l,(__WINT16_TYPE__ __ch, __locale_t __locale),iswxdigit_l,{ return __crt_iswxdigit_l(__ch, __locale); })
+#elif defined(__crt_iswxdigit_l) && defined(__CRT_HAVE__iswxdigit_l) && __SIZEOF_WCHAR_T__ == 2
+/* >> iswxdigit_l(3) */
+__COMPILER_EIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,__LIBDCALL,isxdigit16_l,(__WINT16_TYPE__ __ch, __locale_t __locale),_iswxdigit_l,{ return __crt_iswxdigit_l(__ch, __locale); })
 #elif defined(__crt_iswxdigit_l) && defined(__CRT_HAVE___iswxdigit_l) && __SIZEOF_WCHAR_T__ == 2
 /* >> iswxdigit_l(3) */
 __COMPILER_EIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,__LIBDCALL,isxdigit16_l,(__WINT16_TYPE__ __ch, __locale_t __locale),__iswxdigit_l,{ return __crt_iswxdigit_l(__ch, __locale); })
@@ -1275,6 +1350,9 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,isxdigit16_l,(__WINT16_
 #elif defined(__CRT_HAVE_DOS$__iswxdigit_l)
 /* >> iswxdigit_l(3) */
 __CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,isxdigit16_l,(__WINT16_TYPE__ __ch, __locale_t __locale),__iswxdigit_l,(__ch,__locale))
+#elif defined(__crt_iswxdigit) && __SIZEOF_WCHAR_T__ == 2
+/* >> iswxdigit_l(3) */
+__LOCAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LIBDCALL isxdigit16_l)(__WINT16_TYPE__ __ch, __locale_t __locale) { __COMPILER_IMPURE(); (void)__locale; return __crt_iswxdigit(__ch); }
 #elif __SIZEOF_WCHAR_T__ == 2
 #include <libc/local/wctype/iswxdigit_l.h>
 /* >> iswxdigit_l(3) */
@@ -1287,6 +1365,9 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(isxdigit16_l, __FORCELOCAL __ATTR_ARTIFICIAL __A
 #if defined(__crt_iswxdigit_l) && defined(__CRT_HAVE_iswxdigit_l) && __SIZEOF_WCHAR_T__ == 4
 /* >> iswxdigit_l(3) */
 __COMPILER_EIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,__LIBKCALL,isxdigit32_l,(__WINT32_TYPE__ __ch, __locale_t __locale),iswxdigit_l,{ return __crt_iswxdigit_l(__ch, __locale); })
+#elif defined(__crt_iswxdigit_l) && defined(__CRT_HAVE__iswxdigit_l) && __SIZEOF_WCHAR_T__ == 4
+/* >> iswxdigit_l(3) */
+__COMPILER_EIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,__LIBKCALL,isxdigit32_l,(__WINT32_TYPE__ __ch, __locale_t __locale),_iswxdigit_l,{ return __crt_iswxdigit_l(__ch, __locale); })
 #elif defined(__crt_iswxdigit_l) && defined(__CRT_HAVE___iswxdigit_l) && __SIZEOF_WCHAR_T__ == 4
 /* >> iswxdigit_l(3) */
 __COMPILER_EIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,__LIBKCALL,isxdigit32_l,(__WINT32_TYPE__ __ch, __locale_t __locale),__iswxdigit_l,{ return __crt_iswxdigit_l(__ch, __locale); })
@@ -1311,6 +1392,9 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,isxdigit32_l,(__WINT32_
 #elif defined(__CRT_HAVE_KOS$__iswxdigit_l)
 /* >> iswxdigit_l(3) */
 __CREDIRECT_KOS(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,isxdigit32_l,(__WINT32_TYPE__ __ch, __locale_t __locale),__iswxdigit_l,(__ch,__locale))
+#elif defined(__crt_iswxdigit) && __SIZEOF_WCHAR_T__ == 4
+/* >> iswxdigit_l(3) */
+__LOCAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LIBKCALL isxdigit32_l)(__WINT32_TYPE__ __ch, __locale_t __locale) { __COMPILER_IMPURE(); (void)__locale; return __crt_iswxdigit(__ch); }
 #elif __SIZEOF_WCHAR_T__ == 4
 #include <libc/local/wctype/iswxdigit_l.h>
 /* >> iswxdigit_l(3) */
@@ -1323,6 +1407,9 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(isxdigit32_l, __FORCELOCAL __ATTR_ARTIFICIAL __A
 #if defined(__crt_iswalnum_l) && defined(__CRT_HAVE_iswalnum_l) && __SIZEOF_WCHAR_T__ == 2
 /* >> iswalnum_l(3) */
 __COMPILER_EIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,__LIBDCALL,isalnum16_l,(__WINT16_TYPE__ __ch, __locale_t __locale),iswalnum_l,{ return __crt_iswalnum_l(__ch, __locale); })
+#elif defined(__crt_iswalnum_l) && defined(__CRT_HAVE__iswalnum_l) && __SIZEOF_WCHAR_T__ == 2
+/* >> iswalnum_l(3) */
+__COMPILER_EIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,__LIBDCALL,isalnum16_l,(__WINT16_TYPE__ __ch, __locale_t __locale),_iswalnum_l,{ return __crt_iswalnum_l(__ch, __locale); })
 #elif defined(__crt_iswalnum_l) && defined(__CRT_HAVE___iswalnum_l) && __SIZEOF_WCHAR_T__ == 2
 /* >> iswalnum_l(3) */
 __COMPILER_EIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,__LIBDCALL,isalnum16_l,(__WINT16_TYPE__ __ch, __locale_t __locale),__iswalnum_l,{ return __crt_iswalnum_l(__ch, __locale); })
@@ -1347,6 +1434,9 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,isalnum16_l,(__WINT16_T
 #elif defined(__CRT_HAVE_DOS$__iswalnum_l)
 /* >> iswalnum_l(3) */
 __CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,isalnum16_l,(__WINT16_TYPE__ __ch, __locale_t __locale),__iswalnum_l,(__ch,__locale))
+#elif defined(__crt_iswalnum) && __SIZEOF_WCHAR_T__ == 2
+/* >> iswalnum_l(3) */
+__LOCAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LIBDCALL isalnum16_l)(__WINT16_TYPE__ __ch, __locale_t __locale) { __COMPILER_IMPURE(); (void)__locale; return __crt_iswalnum(__ch); }
 #elif __SIZEOF_WCHAR_T__ == 2
 #include <libc/local/wctype/iswalnum_l.h>
 /* >> iswalnum_l(3) */
@@ -1359,6 +1449,9 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(isalnum16_l, __FORCELOCAL __ATTR_ARTIFICIAL __AT
 #if defined(__crt_iswalnum_l) && defined(__CRT_HAVE_iswalnum_l) && __SIZEOF_WCHAR_T__ == 4
 /* >> iswalnum_l(3) */
 __COMPILER_EIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,__LIBKCALL,isalnum32_l,(__WINT32_TYPE__ __ch, __locale_t __locale),iswalnum_l,{ return __crt_iswalnum_l(__ch, __locale); })
+#elif defined(__crt_iswalnum_l) && defined(__CRT_HAVE__iswalnum_l) && __SIZEOF_WCHAR_T__ == 4
+/* >> iswalnum_l(3) */
+__COMPILER_EIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,__LIBKCALL,isalnum32_l,(__WINT32_TYPE__ __ch, __locale_t __locale),_iswalnum_l,{ return __crt_iswalnum_l(__ch, __locale); })
 #elif defined(__crt_iswalnum_l) && defined(__CRT_HAVE___iswalnum_l) && __SIZEOF_WCHAR_T__ == 4
 /* >> iswalnum_l(3) */
 __COMPILER_EIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,__LIBKCALL,isalnum32_l,(__WINT32_TYPE__ __ch, __locale_t __locale),__iswalnum_l,{ return __crt_iswalnum_l(__ch, __locale); })
@@ -1383,6 +1476,9 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,isalnum32_l,(__WINT32_T
 #elif defined(__CRT_HAVE_KOS$__iswalnum_l)
 /* >> iswalnum_l(3) */
 __CREDIRECT_KOS(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,isalnum32_l,(__WINT32_TYPE__ __ch, __locale_t __locale),__iswalnum_l,(__ch,__locale))
+#elif defined(__crt_iswalnum) && __SIZEOF_WCHAR_T__ == 4
+/* >> iswalnum_l(3) */
+__LOCAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LIBKCALL isalnum32_l)(__WINT32_TYPE__ __ch, __locale_t __locale) { __COMPILER_IMPURE(); (void)__locale; return __crt_iswalnum(__ch); }
 #elif __SIZEOF_WCHAR_T__ == 4
 #include <libc/local/wctype/iswalnum_l.h>
 /* >> iswalnum_l(3) */
@@ -1395,6 +1491,9 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(isalnum32_l, __FORCELOCAL __ATTR_ARTIFICIAL __AT
 #if defined(__crt_iswpunct_l) && defined(__CRT_HAVE_iswpunct_l) && __SIZEOF_WCHAR_T__ == 2
 /* >> iswpunct_l(3) */
 __COMPILER_EIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,__LIBDCALL,ispunct16_l,(__WINT16_TYPE__ __ch, __locale_t __locale),iswpunct_l,{ return __crt_iswpunct_l(__ch, __locale); })
+#elif defined(__crt_iswpunct_l) && defined(__CRT_HAVE__iswpunct_l) && __SIZEOF_WCHAR_T__ == 2
+/* >> iswpunct_l(3) */
+__COMPILER_EIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,__LIBDCALL,ispunct16_l,(__WINT16_TYPE__ __ch, __locale_t __locale),_iswpunct_l,{ return __crt_iswpunct_l(__ch, __locale); })
 #elif defined(__crt_iswpunct_l) && defined(__CRT_HAVE___iswpunct_l) && __SIZEOF_WCHAR_T__ == 2
 /* >> iswpunct_l(3) */
 __COMPILER_EIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,__LIBDCALL,ispunct16_l,(__WINT16_TYPE__ __ch, __locale_t __locale),__iswpunct_l,{ return __crt_iswpunct_l(__ch, __locale); })
@@ -1419,6 +1518,9 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,ispunct16_l,(__WINT16_T
 #elif defined(__CRT_HAVE_DOS$__iswpunct_l)
 /* >> iswpunct_l(3) */
 __CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,ispunct16_l,(__WINT16_TYPE__ __ch, __locale_t __locale),__iswpunct_l,(__ch,__locale))
+#elif defined(__crt_iswpunct) && __SIZEOF_WCHAR_T__ == 2
+/* >> iswpunct_l(3) */
+__LOCAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LIBDCALL ispunct16_l)(__WINT16_TYPE__ __ch, __locale_t __locale) { __COMPILER_IMPURE(); (void)__locale; return __crt_iswpunct(__ch); }
 #elif __SIZEOF_WCHAR_T__ == 2
 #include <libc/local/wctype/iswpunct_l.h>
 /* >> iswpunct_l(3) */
@@ -1431,6 +1533,9 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(ispunct16_l, __FORCELOCAL __ATTR_ARTIFICIAL __AT
 #if defined(__crt_iswpunct_l) && defined(__CRT_HAVE_iswpunct_l) && __SIZEOF_WCHAR_T__ == 4
 /* >> iswpunct_l(3) */
 __COMPILER_EIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,__LIBKCALL,ispunct32_l,(__WINT32_TYPE__ __ch, __locale_t __locale),iswpunct_l,{ return __crt_iswpunct_l(__ch, __locale); })
+#elif defined(__crt_iswpunct_l) && defined(__CRT_HAVE__iswpunct_l) && __SIZEOF_WCHAR_T__ == 4
+/* >> iswpunct_l(3) */
+__COMPILER_EIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,__LIBKCALL,ispunct32_l,(__WINT32_TYPE__ __ch, __locale_t __locale),_iswpunct_l,{ return __crt_iswpunct_l(__ch, __locale); })
 #elif defined(__crt_iswpunct_l) && defined(__CRT_HAVE___iswpunct_l) && __SIZEOF_WCHAR_T__ == 4
 /* >> iswpunct_l(3) */
 __COMPILER_EIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,__LIBKCALL,ispunct32_l,(__WINT32_TYPE__ __ch, __locale_t __locale),__iswpunct_l,{ return __crt_iswpunct_l(__ch, __locale); })
@@ -1455,6 +1560,9 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,ispunct32_l,(__WINT32_T
 #elif defined(__CRT_HAVE_KOS$__iswpunct_l)
 /* >> iswpunct_l(3) */
 __CREDIRECT_KOS(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,ispunct32_l,(__WINT32_TYPE__ __ch, __locale_t __locale),__iswpunct_l,(__ch,__locale))
+#elif defined(__crt_iswpunct) && __SIZEOF_WCHAR_T__ == 4
+/* >> iswpunct_l(3) */
+__LOCAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LIBKCALL ispunct32_l)(__WINT32_TYPE__ __ch, __locale_t __locale) { __COMPILER_IMPURE(); (void)__locale; return __crt_iswpunct(__ch); }
 #elif __SIZEOF_WCHAR_T__ == 4
 #include <libc/local/wctype/iswpunct_l.h>
 /* >> iswpunct_l(3) */
@@ -1467,6 +1575,9 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(ispunct32_l, __FORCELOCAL __ATTR_ARTIFICIAL __AT
 #if defined(__crt_iswgraph_l) && defined(__CRT_HAVE_iswgraph_l) && __SIZEOF_WCHAR_T__ == 2
 /* >> iswgraph_l(3) */
 __COMPILER_EIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,__LIBDCALL,isgraph16_l,(__WINT16_TYPE__ __ch, __locale_t __locale),iswgraph_l,{ return __crt_iswgraph_l(__ch, __locale); })
+#elif defined(__crt_iswgraph_l) && defined(__CRT_HAVE__iswgraph_l) && __SIZEOF_WCHAR_T__ == 2
+/* >> iswgraph_l(3) */
+__COMPILER_EIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,__LIBDCALL,isgraph16_l,(__WINT16_TYPE__ __ch, __locale_t __locale),_iswgraph_l,{ return __crt_iswgraph_l(__ch, __locale); })
 #elif defined(__crt_iswgraph_l) && defined(__CRT_HAVE___iswgraph_l) && __SIZEOF_WCHAR_T__ == 2
 /* >> iswgraph_l(3) */
 __COMPILER_EIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,__LIBDCALL,isgraph16_l,(__WINT16_TYPE__ __ch, __locale_t __locale),__iswgraph_l,{ return __crt_iswgraph_l(__ch, __locale); })
@@ -1491,6 +1602,9 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,isgraph16_l,(__WINT16_T
 #elif defined(__CRT_HAVE_DOS$__iswgraph_l)
 /* >> iswgraph_l(3) */
 __CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,isgraph16_l,(__WINT16_TYPE__ __ch, __locale_t __locale),__iswgraph_l,(__ch,__locale))
+#elif defined(__crt_iswgraph) && __SIZEOF_WCHAR_T__ == 2
+/* >> iswgraph_l(3) */
+__LOCAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LIBDCALL isgraph16_l)(__WINT16_TYPE__ __ch, __locale_t __locale) { __COMPILER_IMPURE(); (void)__locale; return __crt_iswgraph(__ch); }
 #elif __SIZEOF_WCHAR_T__ == 2
 #include <libc/local/wctype/iswgraph_l.h>
 /* >> iswgraph_l(3) */
@@ -1503,6 +1617,9 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(isgraph16_l, __FORCELOCAL __ATTR_ARTIFICIAL __AT
 #if defined(__crt_iswgraph_l) && defined(__CRT_HAVE_iswgraph_l) && __SIZEOF_WCHAR_T__ == 4
 /* >> iswgraph_l(3) */
 __COMPILER_EIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,__LIBKCALL,isgraph32_l,(__WINT32_TYPE__ __ch, __locale_t __locale),iswgraph_l,{ return __crt_iswgraph_l(__ch, __locale); })
+#elif defined(__crt_iswgraph_l) && defined(__CRT_HAVE__iswgraph_l) && __SIZEOF_WCHAR_T__ == 4
+/* >> iswgraph_l(3) */
+__COMPILER_EIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,__LIBKCALL,isgraph32_l,(__WINT32_TYPE__ __ch, __locale_t __locale),_iswgraph_l,{ return __crt_iswgraph_l(__ch, __locale); })
 #elif defined(__crt_iswgraph_l) && defined(__CRT_HAVE___iswgraph_l) && __SIZEOF_WCHAR_T__ == 4
 /* >> iswgraph_l(3) */
 __COMPILER_EIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,__LIBKCALL,isgraph32_l,(__WINT32_TYPE__ __ch, __locale_t __locale),__iswgraph_l,{ return __crt_iswgraph_l(__ch, __locale); })
@@ -1527,6 +1644,9 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,isgraph32_l,(__WINT32_T
 #elif defined(__CRT_HAVE_KOS$__iswgraph_l)
 /* >> iswgraph_l(3) */
 __CREDIRECT_KOS(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,isgraph32_l,(__WINT32_TYPE__ __ch, __locale_t __locale),__iswgraph_l,(__ch,__locale))
+#elif defined(__crt_iswgraph) && __SIZEOF_WCHAR_T__ == 4
+/* >> iswgraph_l(3) */
+__LOCAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LIBKCALL isgraph32_l)(__WINT32_TYPE__ __ch, __locale_t __locale) { __COMPILER_IMPURE(); (void)__locale; return __crt_iswgraph(__ch); }
 #elif __SIZEOF_WCHAR_T__ == 4
 #include <libc/local/wctype/iswgraph_l.h>
 /* >> iswgraph_l(3) */
@@ -1539,6 +1659,9 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(isgraph32_l, __FORCELOCAL __ATTR_ARTIFICIAL __AT
 #if defined(__crt_iswprint_l) && defined(__CRT_HAVE_iswprint_l) && __SIZEOF_WCHAR_T__ == 2
 /* >> iswprint_l(3) */
 __COMPILER_EIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,__LIBDCALL,isprint16_l,(__WINT16_TYPE__ __ch, __locale_t __locale),iswprint_l,{ return __crt_iswprint_l(__ch, __locale); })
+#elif defined(__crt_iswprint_l) && defined(__CRT_HAVE__iswprint_l) && __SIZEOF_WCHAR_T__ == 2
+/* >> iswprint_l(3) */
+__COMPILER_EIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,__LIBDCALL,isprint16_l,(__WINT16_TYPE__ __ch, __locale_t __locale),_iswprint_l,{ return __crt_iswprint_l(__ch, __locale); })
 #elif defined(__crt_iswprint_l) && defined(__CRT_HAVE___iswprint_l) && __SIZEOF_WCHAR_T__ == 2
 /* >> iswprint_l(3) */
 __COMPILER_EIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,__LIBDCALL,isprint16_l,(__WINT16_TYPE__ __ch, __locale_t __locale),__iswprint_l,{ return __crt_iswprint_l(__ch, __locale); })
@@ -1563,6 +1686,9 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,isprint16_l,(__WINT16_T
 #elif defined(__CRT_HAVE_DOS$__iswprint_l)
 /* >> iswprint_l(3) */
 __CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,isprint16_l,(__WINT16_TYPE__ __ch, __locale_t __locale),__iswprint_l,(__ch,__locale))
+#elif defined(__crt_iswprint) && __SIZEOF_WCHAR_T__ == 2
+/* >> iswprint_l(3) */
+__LOCAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LIBDCALL isprint16_l)(__WINT16_TYPE__ __ch, __locale_t __locale) { __COMPILER_IMPURE(); (void)__locale; return __crt_iswprint(__ch); }
 #elif __SIZEOF_WCHAR_T__ == 2
 #include <libc/local/wctype/iswprint_l.h>
 /* >> iswprint_l(3) */
@@ -1575,6 +1701,9 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(isprint16_l, __FORCELOCAL __ATTR_ARTIFICIAL __AT
 #if defined(__crt_iswprint_l) && defined(__CRT_HAVE_iswprint_l) && __SIZEOF_WCHAR_T__ == 4
 /* >> iswprint_l(3) */
 __COMPILER_EIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,__LIBKCALL,isprint32_l,(__WINT32_TYPE__ __ch, __locale_t __locale),iswprint_l,{ return __crt_iswprint_l(__ch, __locale); })
+#elif defined(__crt_iswprint_l) && defined(__CRT_HAVE__iswprint_l) && __SIZEOF_WCHAR_T__ == 4
+/* >> iswprint_l(3) */
+__COMPILER_EIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,__LIBKCALL,isprint32_l,(__WINT32_TYPE__ __ch, __locale_t __locale),_iswprint_l,{ return __crt_iswprint_l(__ch, __locale); })
 #elif defined(__crt_iswprint_l) && defined(__CRT_HAVE___iswprint_l) && __SIZEOF_WCHAR_T__ == 4
 /* >> iswprint_l(3) */
 __COMPILER_EIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,__LIBKCALL,isprint32_l,(__WINT32_TYPE__ __ch, __locale_t __locale),__iswprint_l,{ return __crt_iswprint_l(__ch, __locale); })
@@ -1599,6 +1728,9 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,isprint32_l,(__WINT32_T
 #elif defined(__CRT_HAVE_KOS$__iswprint_l)
 /* >> iswprint_l(3) */
 __CREDIRECT_KOS(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,isprint32_l,(__WINT32_TYPE__ __ch, __locale_t __locale),__iswprint_l,(__ch,__locale))
+#elif defined(__crt_iswprint) && __SIZEOF_WCHAR_T__ == 4
+/* >> iswprint_l(3) */
+__LOCAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LIBKCALL isprint32_l)(__WINT32_TYPE__ __ch, __locale_t __locale) { __COMPILER_IMPURE(); (void)__locale; return __crt_iswprint(__ch); }
 #elif __SIZEOF_WCHAR_T__ == 4
 #include <libc/local/wctype/iswprint_l.h>
 /* >> iswprint_l(3) */
@@ -1611,6 +1743,9 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(isprint32_l, __FORCELOCAL __ATTR_ARTIFICIAL __AT
 #if defined(__crt_iswblank_l) && defined(__CRT_HAVE_iswblank_l) && __SIZEOF_WCHAR_T__ == 2
 /* >> iswblank_l(3) */
 __COMPILER_EIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,__LIBDCALL,isblank16_l,(__WINT16_TYPE__ __ch, __locale_t __locale),iswblank_l,{ return __crt_iswblank_l(__ch, __locale); })
+#elif defined(__crt_iswblank_l) && defined(__CRT_HAVE__iswblank_l) && __SIZEOF_WCHAR_T__ == 2
+/* >> iswblank_l(3) */
+__COMPILER_EIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,__LIBDCALL,isblank16_l,(__WINT16_TYPE__ __ch, __locale_t __locale),_iswblank_l,{ return __crt_iswblank_l(__ch, __locale); })
 #elif defined(__crt_iswblank_l) && defined(__CRT_HAVE___iswblank_l) && __SIZEOF_WCHAR_T__ == 2
 /* >> iswblank_l(3) */
 __COMPILER_EIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,__LIBDCALL,isblank16_l,(__WINT16_TYPE__ __ch, __locale_t __locale),__iswblank_l,{ return __crt_iswblank_l(__ch, __locale); })
@@ -1635,6 +1770,9 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,isblank16_l,(__WINT16_T
 #elif defined(__CRT_HAVE_DOS$__iswblank_l)
 /* >> iswblank_l(3) */
 __CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,isblank16_l,(__WINT16_TYPE__ __ch, __locale_t __locale),__iswblank_l,(__ch,__locale))
+#elif defined(__crt_iswblank) && __SIZEOF_WCHAR_T__ == 2
+/* >> iswblank_l(3) */
+__LOCAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LIBDCALL isblank16_l)(__WINT16_TYPE__ __ch, __locale_t __locale) { __COMPILER_IMPURE(); (void)__locale; return __crt_iswblank(__ch); }
 #elif __SIZEOF_WCHAR_T__ == 2
 #include <libc/local/wctype/iswblank_l.h>
 /* >> iswblank_l(3) */
@@ -1647,6 +1785,9 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(isblank16_l, __FORCELOCAL __ATTR_ARTIFICIAL __AT
 #if defined(__crt_iswblank_l) && defined(__CRT_HAVE_iswblank_l) && __SIZEOF_WCHAR_T__ == 4
 /* >> iswblank_l(3) */
 __COMPILER_EIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,__LIBKCALL,isblank32_l,(__WINT32_TYPE__ __ch, __locale_t __locale),iswblank_l,{ return __crt_iswblank_l(__ch, __locale); })
+#elif defined(__crt_iswblank_l) && defined(__CRT_HAVE__iswblank_l) && __SIZEOF_WCHAR_T__ == 4
+/* >> iswblank_l(3) */
+__COMPILER_EIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,__LIBKCALL,isblank32_l,(__WINT32_TYPE__ __ch, __locale_t __locale),_iswblank_l,{ return __crt_iswblank_l(__ch, __locale); })
 #elif defined(__crt_iswblank_l) && defined(__CRT_HAVE___iswblank_l) && __SIZEOF_WCHAR_T__ == 4
 /* >> iswblank_l(3) */
 __COMPILER_EIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,__LIBKCALL,isblank32_l,(__WINT32_TYPE__ __ch, __locale_t __locale),__iswblank_l,{ return __crt_iswblank_l(__ch, __locale); })
@@ -1671,6 +1812,9 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,isblank32_l,(__WINT32_T
 #elif defined(__CRT_HAVE_KOS$__iswblank_l)
 /* >> iswblank_l(3) */
 __CREDIRECT_KOS(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,isblank32_l,(__WINT32_TYPE__ __ch, __locale_t __locale),__iswblank_l,(__ch,__locale))
+#elif defined(__crt_iswblank) && __SIZEOF_WCHAR_T__ == 4
+/* >> iswblank_l(3) */
+__LOCAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LIBKCALL isblank32_l)(__WINT32_TYPE__ __ch, __locale_t __locale) { __COMPILER_IMPURE(); (void)__locale; return __crt_iswblank(__ch); }
 #elif __SIZEOF_WCHAR_T__ == 4
 #include <libc/local/wctype/iswblank_l.h>
 /* >> iswblank_l(3) */
@@ -1683,6 +1827,9 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(isblank32_l, __FORCELOCAL __ATTR_ARTIFICIAL __AT
 #if defined(__crt_towlower_l) && defined(__CRT_HAVE_towlower_l) && __SIZEOF_WCHAR_T__ == 2
 /* >> towlower_l(3) */
 __COMPILER_EIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,__WINT16_TYPE__,__NOTHROW_NCX,__LIBDCALL,tolower16_l,(__WINT16_TYPE__ __ch, __locale_t __locale),towlower_l,{ return __crt_towlower_l(__ch, __locale); })
+#elif defined(__crt_towlower_l) && defined(__CRT_HAVE__towlower_l) && __SIZEOF_WCHAR_T__ == 2
+/* >> towlower_l(3) */
+__COMPILER_EIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,__WINT16_TYPE__,__NOTHROW_NCX,__LIBDCALL,tolower16_l,(__WINT16_TYPE__ __ch, __locale_t __locale),_towlower_l,{ return __crt_towlower_l(__ch, __locale); })
 #elif defined(__crt_towlower_l) && defined(__CRT_HAVE___towlower_l) && __SIZEOF_WCHAR_T__ == 2
 /* >> towlower_l(3) */
 __COMPILER_EIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,__WINT16_TYPE__,__NOTHROW_NCX,__LIBDCALL,tolower16_l,(__WINT16_TYPE__ __ch, __locale_t __locale),__towlower_l,{ return __crt_towlower_l(__ch, __locale); })
@@ -1707,6 +1854,9 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,__WINT16_TYPE__,__NOTHROW_NCX,tolower16_l
 #elif defined(__CRT_HAVE_DOS$__towlower_l)
 /* >> towlower_l(3) */
 __CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED,__WINT16_TYPE__,__NOTHROW_NCX,tolower16_l,(__WINT16_TYPE__ __ch, __locale_t __locale),__towlower_l,(__ch,__locale))
+#elif defined(__crt_towlower) && __SIZEOF_WCHAR_T__ == 2
+/* >> towlower_l(3) */
+__LOCAL __ATTR_PURE __ATTR_WUNUSED __WINT16_TYPE__ __NOTHROW_NCX(__LIBDCALL tolower16_l)(__WINT16_TYPE__ __ch, __locale_t __locale) { __COMPILER_IMPURE(); (void)__locale; return __crt_towlower(__ch); }
 #elif __SIZEOF_WCHAR_T__ == 2
 #include <libc/local/wctype/towlower_l.h>
 /* >> towlower_l(3) */
@@ -1719,6 +1869,9 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(tolower16_l, __FORCELOCAL __ATTR_ARTIFICIAL __AT
 #if defined(__crt_towlower_l) && defined(__CRT_HAVE_towlower_l) && __SIZEOF_WCHAR_T__ == 4
 /* >> towlower_l(3) */
 __COMPILER_EIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,__WINT32_TYPE__,__NOTHROW_NCX,__LIBKCALL,tolower32_l,(__WINT32_TYPE__ __ch, __locale_t __locale),towlower_l,{ return __crt_towlower_l(__ch, __locale); })
+#elif defined(__crt_towlower_l) && defined(__CRT_HAVE__towlower_l) && __SIZEOF_WCHAR_T__ == 4
+/* >> towlower_l(3) */
+__COMPILER_EIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,__WINT32_TYPE__,__NOTHROW_NCX,__LIBKCALL,tolower32_l,(__WINT32_TYPE__ __ch, __locale_t __locale),_towlower_l,{ return __crt_towlower_l(__ch, __locale); })
 #elif defined(__crt_towlower_l) && defined(__CRT_HAVE___towlower_l) && __SIZEOF_WCHAR_T__ == 4
 /* >> towlower_l(3) */
 __COMPILER_EIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,__WINT32_TYPE__,__NOTHROW_NCX,__LIBKCALL,tolower32_l,(__WINT32_TYPE__ __ch, __locale_t __locale),__towlower_l,{ return __crt_towlower_l(__ch, __locale); })
@@ -1743,6 +1896,9 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,__WINT32_TYPE__,__NOTHROW_NCX,tolower32_l
 #elif defined(__CRT_HAVE_KOS$__towlower_l)
 /* >> towlower_l(3) */
 __CREDIRECT_KOS(__ATTR_PURE __ATTR_WUNUSED,__WINT32_TYPE__,__NOTHROW_NCX,tolower32_l,(__WINT32_TYPE__ __ch, __locale_t __locale),__towlower_l,(__ch,__locale))
+#elif defined(__crt_towlower) && __SIZEOF_WCHAR_T__ == 4
+/* >> towlower_l(3) */
+__LOCAL __ATTR_PURE __ATTR_WUNUSED __WINT32_TYPE__ __NOTHROW_NCX(__LIBKCALL tolower32_l)(__WINT32_TYPE__ __ch, __locale_t __locale) { __COMPILER_IMPURE(); (void)__locale; return __crt_towlower(__ch); }
 #elif __SIZEOF_WCHAR_T__ == 4
 #include <libc/local/wctype/towlower_l.h>
 /* >> towlower_l(3) */
@@ -1755,6 +1911,9 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(tolower32_l, __FORCELOCAL __ATTR_ARTIFICIAL __AT
 #if defined(__crt_towupper_l) && defined(__CRT_HAVE_towupper_l) && __SIZEOF_WCHAR_T__ == 2
 /* >> towupper_l(3) */
 __COMPILER_EIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,__WINT16_TYPE__,__NOTHROW_NCX,__LIBDCALL,toupper16_l,(__WINT16_TYPE__ __ch, __locale_t __locale),towupper_l,{ return __crt_towupper_l(__ch, __locale); })
+#elif defined(__crt_towupper_l) && defined(__CRT_HAVE__towupper_l) && __SIZEOF_WCHAR_T__ == 2
+/* >> towupper_l(3) */
+__COMPILER_EIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,__WINT16_TYPE__,__NOTHROW_NCX,__LIBDCALL,toupper16_l,(__WINT16_TYPE__ __ch, __locale_t __locale),_towupper_l,{ return __crt_towupper_l(__ch, __locale); })
 #elif defined(__crt_towupper_l) && defined(__CRT_HAVE___towupper_l) && __SIZEOF_WCHAR_T__ == 2
 /* >> towupper_l(3) */
 __COMPILER_EIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,__WINT16_TYPE__,__NOTHROW_NCX,__LIBDCALL,toupper16_l,(__WINT16_TYPE__ __ch, __locale_t __locale),__towupper_l,{ return __crt_towupper_l(__ch, __locale); })
@@ -1779,6 +1938,9 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,__WINT16_TYPE__,__NOTHROW_NCX,toupper16_l
 #elif defined(__CRT_HAVE_DOS$__towupper_l)
 /* >> towupper_l(3) */
 __CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED,__WINT16_TYPE__,__NOTHROW_NCX,toupper16_l,(__WINT16_TYPE__ __ch, __locale_t __locale),__towupper_l,(__ch,__locale))
+#elif defined(__crt_towupper) && __SIZEOF_WCHAR_T__ == 2
+/* >> towupper_l(3) */
+__LOCAL __ATTR_PURE __ATTR_WUNUSED __WINT16_TYPE__ __NOTHROW_NCX(__LIBDCALL toupper16_l)(__WINT16_TYPE__ __ch, __locale_t __locale) { __COMPILER_IMPURE(); (void)__locale; return __crt_towupper(__ch); }
 #elif __SIZEOF_WCHAR_T__ == 2
 #include <libc/local/wctype/towupper_l.h>
 /* >> towupper_l(3) */
@@ -1791,6 +1953,9 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(toupper16_l, __FORCELOCAL __ATTR_ARTIFICIAL __AT
 #if defined(__crt_towupper_l) && defined(__CRT_HAVE_towupper_l) && __SIZEOF_WCHAR_T__ == 4
 /* >> towupper_l(3) */
 __COMPILER_EIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,__WINT32_TYPE__,__NOTHROW_NCX,__LIBKCALL,toupper32_l,(__WINT32_TYPE__ __ch, __locale_t __locale),towupper_l,{ return __crt_towupper_l(__ch, __locale); })
+#elif defined(__crt_towupper_l) && defined(__CRT_HAVE__towupper_l) && __SIZEOF_WCHAR_T__ == 4
+/* >> towupper_l(3) */
+__COMPILER_EIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,__WINT32_TYPE__,__NOTHROW_NCX,__LIBKCALL,toupper32_l,(__WINT32_TYPE__ __ch, __locale_t __locale),_towupper_l,{ return __crt_towupper_l(__ch, __locale); })
 #elif defined(__crt_towupper_l) && defined(__CRT_HAVE___towupper_l) && __SIZEOF_WCHAR_T__ == 4
 /* >> towupper_l(3) */
 __COMPILER_EIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,__WINT32_TYPE__,__NOTHROW_NCX,__LIBKCALL,toupper32_l,(__WINT32_TYPE__ __ch, __locale_t __locale),__towupper_l,{ return __crt_towupper_l(__ch, __locale); })
@@ -1815,6 +1980,9 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,__WINT32_TYPE__,__NOTHROW_NCX,toupper32_l
 #elif defined(__CRT_HAVE_KOS$__towupper_l)
 /* >> towupper_l(3) */
 __CREDIRECT_KOS(__ATTR_PURE __ATTR_WUNUSED,__WINT32_TYPE__,__NOTHROW_NCX,toupper32_l,(__WINT32_TYPE__ __ch, __locale_t __locale),__towupper_l,(__ch,__locale))
+#elif defined(__crt_towupper) && __SIZEOF_WCHAR_T__ == 4
+/* >> towupper_l(3) */
+__LOCAL __ATTR_PURE __ATTR_WUNUSED __WINT32_TYPE__ __NOTHROW_NCX(__LIBKCALL toupper32_l)(__WINT32_TYPE__ __ch, __locale_t __locale) { __COMPILER_IMPURE(); (void)__locale; return __crt_towupper(__ch); }
 #elif __SIZEOF_WCHAR_T__ == 4
 #include <libc/local/wctype/towupper_l.h>
 /* >> towupper_l(3) */

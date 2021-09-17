@@ -1098,7 +1098,7 @@ $errno_t pthread_setname_np(pthread_t target_thread,
 @@If the given `target_thread' has already terminated, 0 is returned
 @@@return: * : The TID of the given thread
 @@@return: 0 : The given `target_thread' has already terminated
-[[guard, wunused, pure]]
+[[guard, pure, wunused]]
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
 $pid_t pthread_gettid_np(pthread_t target_thread);
 %#endif /* __USE_KOS */

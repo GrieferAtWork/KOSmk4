@@ -75,7 +75,7 @@ __SYSDECL_BEGIN
 @@@param: match_flags:   Set of `FNM_*'
 @@@return: 0           : `name' is matched by `pattern'
 @@@return: FNM_NOMATCH : `name' is not matched by `pattern'
-[[wunused, ATTR_PURE, decl_include("<features.h>")]]
+[[pure, wunused, decl_include("<features.h>")]]
 int fnmatch([[nonnull]] char const *pattern,
             [[nonnull]] char const *name,
             __STDC_INT_AS_UINT_T match_flags) {

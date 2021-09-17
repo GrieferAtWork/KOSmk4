@@ -143,10 +143,9 @@ void rtm_abort(unsigned int code) {
 @@Check if a transaction is currently in progress
 @@@return: 0 : No RTM operation in progress
 @@@return: 1 : An RTM operation is currently in progress
-[[nothrow, crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_RTM_TEST))]]
+[[pure, wunused, nothrow, crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_RTM_TEST))]]
 [[if($extended_include_prefix("<kos/bits/rtm.h>")defined(__arch_rtm_test)), preferred_fast_extern_inline("rtm_test", { return __arch_rtm_test(); })]]
 [[userimpl, requires_include("<kos/bits/rtm.h>"), requires(defined(__arch_rtm_test))]]
-[[wunused, ATTR_PURE]]
 int rtm_test() {
 	return __arch_rtm_test();
 }

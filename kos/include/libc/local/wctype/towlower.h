@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xafed983c */
+/* HASH CRC-32:0xb2c5f3a6 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -34,6 +34,26 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_btowc __LIBC_LOCAL_NAME(btowc)
 #endif /* !__CRT_HAVE_btowc */
 #endif /* !__local___localdep_btowc_defined */
+#ifndef __local___localdep_tolower_defined
+#define __local___localdep_tolower_defined 1
+__NAMESPACE_LOCAL_END
+#include <bits/crt/ctype.h>
+__NAMESPACE_LOCAL_BEGIN
+#if defined(__crt_tolower) && defined(__CRT_HAVE_tolower)
+__CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_tolower,(int __ch),tolower,{ return __crt_tolower(__ch); })
+#elif defined(__crt_tolower)
+__LOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __localdep_tolower)(int __ch) { return __crt_tolower(__ch); }
+#elif __has_builtin(__builtin_tolower) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_tolower)
+__CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_tolower,(int __ch),tolower,{ return __builtin_tolower(__ch); })
+#elif defined(__CRT_HAVE_tolower)
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_tolower,(int __ch),tolower,(__ch))
+#else /* ... */
+__NAMESPACE_LOCAL_END
+#include <libc/local/ctype/tolower.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_tolower __LIBC_LOCAL_NAME(tolower)
+#endif /* !... */
+#endif /* !__local___localdep_tolower_defined */
 #ifndef __local___localdep_wctob_defined
 #define __local___localdep_wctob_defined 1
 #ifdef __CRT_HAVE_wctob
@@ -53,7 +73,7 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(towlower))(__WINT_TYPE__ __wc) {
 #ifdef __crt_towlower
 	return __crt_towlower(__wc);
 #else /* __crt_towlower */
-	return (__NAMESPACE_LOCAL_SYM __localdep_btowc)(__LIBC_LOCAL_NAME(towlower)((__NAMESPACE_LOCAL_SYM __localdep_wctob)(__wc)));
+	return (__NAMESPACE_LOCAL_SYM __localdep_btowc)((__NAMESPACE_LOCAL_SYM __localdep_tolower)((__NAMESPACE_LOCAL_SYM __localdep_wctob)(__wc)));
 #endif /* !__crt_towlower */
 }
 __NAMESPACE_LOCAL_END

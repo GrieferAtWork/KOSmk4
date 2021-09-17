@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2f0882b9 */
+/* HASH CRC-32:0x8beadd57 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,6 +25,7 @@
 #include <hybrid/typecore.h>
 #include <kos/types.h>
 #include "wctype.h"
+#include "../user/ctype.h"
 #include "../user/string.h"
 #include "../user/unicode.h"
 #include "../user/wchar.h"
@@ -39,7 +40,7 @@ NOTHROW(LIBDCALL libd_iswcntrl)(wint16_t wc) {
 #ifdef __crt_iswcntrl
 	return __crt_iswcntrl(wc);
 #else /* __crt_iswcntrl */
-	return libd_iswcntrl(libd_wctob(wc));
+	return libc_iscntrl(libd_wctob(wc));
 #endif /* !__crt_iswcntrl */
 }
 #include <bits/crt/wctype.h>
@@ -49,7 +50,7 @@ NOTHROW(LIBKCALL libc_iswcntrl)(wint32_t wc) {
 #ifdef __crt_iswcntrl
 	return __crt_iswcntrl(wc);
 #else /* __crt_iswcntrl */
-	return libc_iswcntrl(libc_wctob(wc));
+	return libc_iscntrl(libc_wctob(wc));
 #endif /* !__crt_iswcntrl */
 }
 #include <bits/crt/wctype.h>
@@ -59,7 +60,7 @@ NOTHROW(LIBDCALL libd_iswspace)(wint16_t wc) {
 #ifdef __crt_iswspace
 	return __crt_iswspace(wc);
 #else /* __crt_iswspace */
-	return libd_iswspace(libd_wctob(wc));
+	return libc_isspace(libd_wctob(wc));
 #endif /* !__crt_iswspace */
 }
 #include <bits/crt/wctype.h>
@@ -69,7 +70,7 @@ NOTHROW(LIBKCALL libc_iswspace)(wint32_t wc) {
 #ifdef __crt_iswspace
 	return __crt_iswspace(wc);
 #else /* __crt_iswspace */
-	return libc_iswspace(libc_wctob(wc));
+	return libc_isspace(libc_wctob(wc));
 #endif /* !__crt_iswspace */
 }
 #include <bits/crt/wctype.h>
@@ -79,7 +80,7 @@ NOTHROW(LIBDCALL libd_iswupper)(wint16_t wc) {
 #ifdef __crt_iswupper
 	return __crt_iswupper(wc);
 #else /* __crt_iswupper */
-	return libd_iswupper(libd_wctob(wc));
+	return libc_isupper(libd_wctob(wc));
 #endif /* !__crt_iswupper */
 }
 #include <bits/crt/wctype.h>
@@ -89,7 +90,7 @@ NOTHROW(LIBKCALL libc_iswupper)(wint32_t wc) {
 #ifdef __crt_iswupper
 	return __crt_iswupper(wc);
 #else /* __crt_iswupper */
-	return libc_iswupper(libc_wctob(wc));
+	return libc_isupper(libc_wctob(wc));
 #endif /* !__crt_iswupper */
 }
 #include <bits/crt/wctype.h>
@@ -99,7 +100,7 @@ NOTHROW(LIBDCALL libd_iswlower)(wint16_t wc) {
 #ifdef __crt_iswlower
 	return __crt_iswlower(wc);
 #else /* __crt_iswlower */
-	return libd_iswlower(libd_wctob(wc));
+	return libc_islower(libd_wctob(wc));
 #endif /* !__crt_iswlower */
 }
 #include <bits/crt/wctype.h>
@@ -109,7 +110,7 @@ NOTHROW(LIBKCALL libc_iswlower)(wint32_t wc) {
 #ifdef __crt_iswlower
 	return __crt_iswlower(wc);
 #else /* __crt_iswlower */
-	return libc_iswlower(libc_wctob(wc));
+	return libc_islower(libc_wctob(wc));
 #endif /* !__crt_iswlower */
 }
 #include <bits/crt/wctype.h>
@@ -119,7 +120,7 @@ NOTHROW(LIBDCALL libd_iswalpha)(wint16_t wc) {
 #ifdef __crt_iswalpha
 	return __crt_iswalpha(wc);
 #else /* __crt_iswalpha */
-	return libd_iswalpha(libd_wctob(wc));
+	return libc_isalpha(libd_wctob(wc));
 #endif /* !__crt_iswalpha */
 }
 #include <bits/crt/wctype.h>
@@ -129,7 +130,7 @@ NOTHROW(LIBKCALL libc_iswalpha)(wint32_t wc) {
 #ifdef __crt_iswalpha
 	return __crt_iswalpha(wc);
 #else /* __crt_iswalpha */
-	return libc_iswalpha(libc_wctob(wc));
+	return libc_isalpha(libc_wctob(wc));
 #endif /* !__crt_iswalpha */
 }
 #include <bits/crt/wctype.h>
@@ -139,7 +140,7 @@ NOTHROW(LIBDCALL libd_iswdigit)(wint16_t wc) {
 #ifdef __crt_iswdigit
 	return __crt_iswdigit(wc);
 #else /* __crt_iswdigit */
-	return libd_iswdigit(libd_wctob(wc));
+	return libc_isdigit(libd_wctob(wc));
 #endif /* !__crt_iswdigit */
 }
 #include <bits/crt/wctype.h>
@@ -149,7 +150,7 @@ NOTHROW(LIBKCALL libc_iswdigit)(wint32_t wc) {
 #ifdef __crt_iswdigit
 	return __crt_iswdigit(wc);
 #else /* __crt_iswdigit */
-	return libc_iswdigit(libc_wctob(wc));
+	return libc_isdigit(libc_wctob(wc));
 #endif /* !__crt_iswdigit */
 }
 #include <bits/crt/wctype.h>
@@ -159,7 +160,7 @@ NOTHROW(LIBDCALL libd_iswxdigit)(wint16_t wc) {
 #ifdef __crt_iswxdigit
 	return __crt_iswxdigit(wc);
 #else /* __crt_iswxdigit */
-	return libd_iswxdigit(libd_wctob(wc));
+	return libc_isxdigit(libd_wctob(wc));
 #endif /* !__crt_iswxdigit */
 }
 #include <bits/crt/wctype.h>
@@ -169,7 +170,7 @@ NOTHROW(LIBKCALL libc_iswxdigit)(wint32_t wc) {
 #ifdef __crt_iswxdigit
 	return __crt_iswxdigit(wc);
 #else /* __crt_iswxdigit */
-	return libc_iswxdigit(libc_wctob(wc));
+	return libc_isxdigit(libc_wctob(wc));
 #endif /* !__crt_iswxdigit */
 }
 #include <bits/crt/wctype.h>
@@ -179,7 +180,7 @@ NOTHROW(LIBDCALL libd_iswalnum)(wint16_t wc) {
 #ifdef __crt_iswalnum
 	return __crt_iswalnum(wc);
 #else /* __crt_iswalnum */
-	return libd_iswalnum(libd_wctob(wc));
+	return libc_isalnum(libd_wctob(wc));
 #endif /* !__crt_iswalnum */
 }
 #include <bits/crt/wctype.h>
@@ -189,7 +190,7 @@ NOTHROW(LIBKCALL libc_iswalnum)(wint32_t wc) {
 #ifdef __crt_iswalnum
 	return __crt_iswalnum(wc);
 #else /* __crt_iswalnum */
-	return libc_iswalnum(libc_wctob(wc));
+	return libc_isalnum(libc_wctob(wc));
 #endif /* !__crt_iswalnum */
 }
 #include <bits/crt/wctype.h>
@@ -199,7 +200,7 @@ NOTHROW(LIBDCALL libd_iswpunct)(wint16_t wc) {
 #ifdef __crt_iswpunct
 	return __crt_iswpunct(wc);
 #else /* __crt_iswpunct */
-	return libd_iswpunct(libd_wctob(wc));
+	return libc_ispunct(libd_wctob(wc));
 #endif /* !__crt_iswpunct */
 }
 #include <bits/crt/wctype.h>
@@ -209,7 +210,7 @@ NOTHROW(LIBKCALL libc_iswpunct)(wint32_t wc) {
 #ifdef __crt_iswpunct
 	return __crt_iswpunct(wc);
 #else /* __crt_iswpunct */
-	return libc_iswpunct(libc_wctob(wc));
+	return libc_ispunct(libc_wctob(wc));
 #endif /* !__crt_iswpunct */
 }
 #include <bits/crt/wctype.h>
@@ -219,7 +220,7 @@ NOTHROW(LIBDCALL libd_iswgraph)(wint16_t wc) {
 #ifdef __crt_iswgraph
 	return __crt_iswgraph(wc);
 #else /* __crt_iswgraph */
-	return libd_iswgraph(libd_wctob(wc));
+	return libc_isgraph(libd_wctob(wc));
 #endif /* !__crt_iswgraph */
 }
 #include <bits/crt/wctype.h>
@@ -229,7 +230,7 @@ NOTHROW(LIBKCALL libc_iswgraph)(wint32_t wc) {
 #ifdef __crt_iswgraph
 	return __crt_iswgraph(wc);
 #else /* __crt_iswgraph */
-	return libc_iswgraph(libc_wctob(wc));
+	return libc_isgraph(libc_wctob(wc));
 #endif /* !__crt_iswgraph */
 }
 #include <bits/crt/wctype.h>
@@ -239,7 +240,7 @@ NOTHROW(LIBDCALL libd_iswprint)(wint16_t wc) {
 #ifdef __crt_iswprint
 	return __crt_iswprint(wc);
 #else /* __crt_iswprint */
-	return libd_iswprint(libd_wctob(wc));
+	return libc_isprint(libd_wctob(wc));
 #endif /* !__crt_iswprint */
 }
 #include <bits/crt/wctype.h>
@@ -249,7 +250,7 @@ NOTHROW(LIBKCALL libc_iswprint)(wint32_t wc) {
 #ifdef __crt_iswprint
 	return __crt_iswprint(wc);
 #else /* __crt_iswprint */
-	return libc_iswprint(libc_wctob(wc));
+	return libc_isprint(libc_wctob(wc));
 #endif /* !__crt_iswprint */
 }
 #include <bits/crt/wctype.h>
@@ -259,7 +260,7 @@ NOTHROW(LIBDCALL libd_towlower)(wint16_t wc) {
 #ifdef __crt_towlower
 	return __crt_towlower(wc);
 #else /* __crt_towlower */
-	return libd_btowc(libd_towlower(libd_wctob(wc)));
+	return libd_btowc(libc_tolower(libd_wctob(wc)));
 #endif /* !__crt_towlower */
 }
 #include <bits/crt/wctype.h>
@@ -269,7 +270,7 @@ NOTHROW(LIBKCALL libc_towlower)(wint32_t wc) {
 #ifdef __crt_towlower
 	return __crt_towlower(wc);
 #else /* __crt_towlower */
-	return libc_btowc(libc_towlower(libc_wctob(wc)));
+	return libc_btowc(libc_tolower(libc_wctob(wc)));
 #endif /* !__crt_towlower */
 }
 #include <bits/crt/wctype.h>
@@ -279,7 +280,7 @@ NOTHROW(LIBDCALL libd_towupper)(wint16_t wc) {
 #ifdef __crt_towupper
 	return __crt_towupper(wc);
 #else /* __crt_towupper */
-	return libd_btowc(libd_towupper(libd_wctob(wc)));
+	return libd_btowc(libc_toupper(libd_wctob(wc)));
 #endif /* !__crt_towupper */
 }
 #include <bits/crt/wctype.h>
@@ -289,7 +290,7 @@ NOTHROW(LIBKCALL libc_towupper)(wint32_t wc) {
 #ifdef __crt_towupper
 	return __crt_towupper(wc);
 #else /* __crt_towupper */
-	return libc_btowc(libc_towupper(libc_wctob(wc)));
+	return libc_btowc(libc_toupper(libc_wctob(wc)));
 #endif /* !__crt_towupper */
 }
 #include <bits/crt/wctype.h>
@@ -299,7 +300,7 @@ NOTHROW(LIBDCALL libd_iswblank)(wint16_t wc) {
 #ifdef __crt_iswblank
 	return __crt_iswblank(wc);
 #else /* __crt_iswblank */
-	return libd_iswblank(libd_wctob(wc));
+	return libc_isblank(libd_wctob(wc));
 #endif /* !__crt_iswblank */
 }
 #include <bits/crt/wctype.h>
@@ -309,7 +310,7 @@ NOTHROW(LIBKCALL libc_iswblank)(wint32_t wc) {
 #ifdef __crt_iswblank
 	return __crt_iswblank(wc);
 #else /* __crt_iswblank */
-	return libc_iswblank(libc_wctob(wc));
+	return libc_isblank(libc_wctob(wc));
 #endif /* !__crt_iswblank */
 }
 #include <bits/crt/unicode.h>

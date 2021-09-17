@@ -639,13 +639,13 @@ typedef __pid_t pid_t;
 }
 
 @@>> cfgetospeed(3)
-[[wunused, ATTR_PURE, decl_include("<bits/os/termios.h>", "<bits/types.h>")]]
+[[pure, wunused, decl_include("<bits/os/termios.h>", "<bits/types.h>")]]
 speed_t cfgetospeed([[nonnull]] struct termios const *__restrict termios_p) {
 	return termios_p->@c_ospeed@;
 }
 
 @@>> cfgetispeed(3)
-[[wunused, ATTR_PURE, decl_include("<bits/os/termios.h>", "<bits/types.h>")]]
+[[pure, wunused, decl_include("<bits/os/termios.h>", "<bits/types.h>")]]
 speed_t cfgetispeed([[nonnull]] struct termios const *__restrict termios_p) {
 	return termios_p->@c_ispeed@;
 }

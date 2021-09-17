@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa2a2cfa */
+/* HASH CRC-32:0x43f9d68d */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -33,22 +33,22 @@ DECL_BEGIN
 /* >> __fbufsize(3)
  * Return the size of the buffer of `stream' in
  * bytes  currently in use  by the given stream */
-INTDEF ATTR_PURE WUNUSED NONNULL((1)) size_t NOTHROW_NCX(LIBDCALL libd___fbufsize)(FILE *stream);
+INTDEF ATTR_PURE WUNUSED NONNULL((1)) size_t NOTHROW_NCX(LIBDCALL libd___fbufsize)(FILE __KOS_FIXED_CONST *stream);
 /* >> __freading(3)
  * Return  non-zero value when  `stream' is opened readonly,
  * or if the last operation on `stream' was a read operation */
-INTDEF ATTR_PURE WUNUSED NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd___freading)(FILE *stream);
+INTDEF ATTR_PURE WUNUSED NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd___freading)(FILE __KOS_FIXED_CONST *stream);
 /* >> __fwriting(3)
  * Return non-zero value when  `stream' is opened write-only  or
  * append-only, or if the last operation on `stream' was a write
  * operation */
-INTDEF ATTR_PURE WUNUSED NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd___fwriting)(FILE *stream);
+INTDEF ATTR_PURE WUNUSED NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd___fwriting)(FILE __KOS_FIXED_CONST *stream);
 /* >> __freadable(3)
  * Return non-zero value when `stream' is not opened write-only or append-only */
-INTDEF ATTR_PURE WUNUSED NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd___freadable)(FILE *stream);
+INTDEF ATTR_PURE WUNUSED NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd___freadable)(FILE __KOS_FIXED_CONST *stream);
 /* >> __fwritable(3)
  * Return non-zero value when `stream' is not opened read-only */
-INTDEF ATTR_PURE WUNUSED NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd___fwritable)(FILE *stream);
+INTDEF ATTR_PURE WUNUSED NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd___fwritable)(FILE __KOS_FIXED_CONST *stream);
 /* >> __flbf(3)
  * Return non-zero value when `stream' is line-buffered */
 INTDEF ATTR_PURE WUNUSED NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd___flbf)(FILE *stream);
@@ -57,9 +57,10 @@ INTDEF ATTR_PURE WUNUSED NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd___flbf)(FILE
 INTDEF NONNULL((1)) void NOTHROW_NCX(LIBDCALL libd___fpurge)(FILE *stream);
 /* >> __fpending(3)
  * Return amount of output in bytes pending on a `stream' */
-INTDEF ATTR_PURE WUNUSED NONNULL((1)) size_t NOTHROW_NCX(LIBDCALL libd___fpending)(FILE *stream);
+INTDEF ATTR_PURE WUNUSED NONNULL((1)) size_t NOTHROW_NCX(LIBDCALL libd___fpending)(FILE __KOS_FIXED_CONST *stream);
 /* >> __fsetlocking(3)
- * Set locking status of `stream' to `type' */
+ * Set locking status of `stream' to `type'
+ * @param: type: One of `FSETLOCKING_*' */
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd___fsetlocking)(FILE *stream, int type);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 

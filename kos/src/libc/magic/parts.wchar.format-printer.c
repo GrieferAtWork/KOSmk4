@@ -232,7 +232,7 @@ $ssize_t format_wsnprintf_printer([[nonnull]] /*struct format_wsnprintf_data**/ 
                                   $size_t datalen)
 	%{generate(str2wcs("format_snprintf_printer"))}
 
-[[wchar, doc_alias("format_width"), ATTR_PURE]]
+[[wchar, pure, doc_alias("format_width")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 4), preferred_alias("format_length")]]
 /* Don't export in KOS-mode (in that mode, we're an alias for `libc_format_length') */
 [[crt_kos_impl_if(0), crt_dos_impl_if(!defined(__KERNEL__))]]
@@ -259,15 +259,15 @@ $ssize_t format_wwidth(void *arg, [[nonnull]] wchar_t const *__restrict data, $s
 	/* XXX: Not necessarily correct, as the 32-bit variant is actually ATTR_CONST.
 	 *
 	 * However, magic  headers  don't support  conditional  attributes,  so we  can't  just  do
-	 * [if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 2), ATTR_PURE]
-	 * [if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ != 2), ATTR_CONST] */
+	 * [if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 2), pure]
+	 * [if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ != 2), const] */
 	COMPILER_IMPURE();
 	return (ssize_t)datalen;
 @@pp_endif@@
 }
 
 
-[[ATTR_CONST, cc(__WFORMATPRINTER_CC), decl_include("<bits/crt/wformat-printer.h>")]]
+[[const, cc(__WFORMATPRINTER_CC), decl_include("<bits/crt/wformat-printer.h>")]]
 $ssize_t format_wlength(void *arg, wchar_t const *__restrict data,
                         $size_t datalen) = format_length;
 

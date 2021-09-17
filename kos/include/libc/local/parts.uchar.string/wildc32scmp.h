@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc7721bac */
+/* HASH CRC-32:0xe56e32c9 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -47,7 +47,7 @@ __NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(wildc32scmp))(__CHAR32_TYPE__ const *
 				__CHAR32_TYPE__ __ch = *__string++;
 				if (__ch == __card_post) {
 					/* Recursively check if the rest of the string and pattern match */
-					if (!__LIBC_LOCAL_NAME(wildc32scmp)(__string, __pattern))
+					if (!(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wildc32scmp))(__string, __pattern))
 						return 0;
 				} else if (!__ch) {
 					return -(int)(__CHAR32_TYPE__)__card_post; /* Wildcard suffix not found */

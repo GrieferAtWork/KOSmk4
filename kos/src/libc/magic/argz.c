@@ -86,8 +86,8 @@ typedef __errno_t error_t;
 @@many other functions in this header) to `free(3)'
 @@@return: 0 :     Success
 @@@return: ENOMEM: Insufficient heap memory
-[[export_alias("__argz_create"), requires_function(malloc)]]
 [[decl_include("<bits/types.h>")]]
+[[export_alias("__argz_create"), requires_function(malloc)]]
 [[impl_include("<libc/errno.h>", "<hybrid/__assert.h>")]]
 error_t argz_create([[nonnull]] char *const argv[],
                     [[nonnull]] char **__restrict pargz,
@@ -133,9 +133,10 @@ error_t argz_create([[nonnull]] char *const argv[],
 @@documentation of `argz_create()'
 @@@return: 0 :     Success
 @@@return: ENOMEM: Insufficient heap memory
-[[requires($has_function(malloc) && $has_function(free))]]
 [[decl_include("<bits/types.h>")]]
-[[export_alias("__argz_create_sep"), impl_include("<libc/errno.h>")]]
+[[export_alias("__argz_create_sep")]]
+[[requires_function(malloc)]]
+[[impl_include("<libc/errno.h>")]]
 error_t argz_create_sep([[nonnull]] char const *__restrict string, int sep,
                         [[nonnull]] char **__restrict pargz,
                         [[nonnull]] size_t *__restrict pargz_len) {
@@ -179,7 +180,9 @@ again_check_ch:
 	}
 	if unlikely(dst == result_string) {
 		/* Empty string. (this can happen if `string' only consisted of `sep' characters) */
+@@pp_if $has_function(free)@@
 		free(result_string);
+@@pp_endif@@
 		goto empty_argz;
 	}
 	/* Write the terminating NUL-byte (if there isn't one already) */
@@ -194,7 +197,8 @@ again_check_ch:
 @@>> argz_count(3)
 @@Count and return the # of strings in `argz'
 @@Simply count the number of`NUL-characters within `argz...+=argz_len'
-[[ATTR_PURE, export_alias("__argz_count"), decl_include("<hybrid/typecore.h>")]]
+[[pure, decl_include("<hybrid/typecore.h>")]]
+[[export_alias("__argz_count")]]
 size_t argz_count([[inp_opt(argz_len)]] char const *argz, size_t argz_len) {
 	size_t result = 0;
 	if likely(argz_len) {
@@ -217,7 +221,8 @@ size_t argz_count([[inp_opt(argz_len)]] char const *argz, size_t argz_len) {
 @@Extend pointers to  individual string  from `argz',  and sequentially  write them  to
 @@`argv',  for which the caller is responsivle to provide sufficient space to hold them
 @@all (i.e. `argv' must be able to hold AT least `argz_count(argz, argz_len)' elements)
-[[export_alias("__argz_extract"), decl_include("<hybrid/typecore.h>")]]
+[[decl_include("<hybrid/typecore.h>")]]
+[[export_alias("__argz_extract")]]
 void argz_extract([[inp(argz_len)]] char const *__restrict argz, size_t argz_len, [[nonnull]] char **__restrict argv)
 	[[([inp(argz_len)] char *__restrict argz, size_t argz_len, [[nonnull]] char **__restrict argv)]]
 	[[([inp(argz_len)] char const *__restrict argz, size_t argz_len, [[nonnull]] char const **__restrict argv)]]
@@ -243,7 +248,8 @@ void argz_extract([[inp(argz_len)]] char const *__restrict argz, size_t argz_len
 @@with a total `strlen(argz) == len - 1', by replacing all of
 @@the NUL-characters separating  the individual  argz-strings
 @@with `sep'.
-[[export_alias("__argz_stringify"), decl_include("<hybrid/typecore.h>")]]
+[[decl_include("<hybrid/typecore.h>")]]
+[[export_alias("__argz_stringify")]]
 void argz_stringify(char *argz, size_t len, int sep) {
 	/* replace(base: argz, count: len - 1, old: '\0', new: sep); */
 	if unlikely(!len)
@@ -266,8 +272,10 @@ void argz_stringify(char *argz, size_t len, int sep) {
 @@Increase allocated memory of `*pargz' and append `buf...+=buf_len'
 @@@return: 0 :     Success
 @@@return: ENOMEM: Insufficient heap memory
-[[export_alias("__argz_create_sep"), impl_include("<libc/errno.h>")]]
-[[requires_function(realloc), decl_include("<bits/types.h>")]]
+[[decl_include("<bits/types.h>")]]
+[[requires_function(realloc)]]
+[[export_alias("__argz_create_sep")]]
+[[impl_include("<libc/errno.h>")]]
 error_t argz_append([[nonnull]] char **__restrict pargz,
                     [[nonnull]] size_t *__restrict pargz_len,
                     [[inp_opt(buf_len)]] char const *__restrict buf,
@@ -295,7 +303,8 @@ error_t argz_append([[nonnull]] char **__restrict pargz,
 @@This    is    the   same    as   `argz_append(pargz, pargz_len, str, strlen(str) + 1)'
 @@@return: 0 :     Success
 @@@return: ENOMEM: Insufficient heap memory
-[[export_alias("__argz_add"), decl_include("<bits/types.h>")]]
+[[decl_include("<bits/types.h>")]]
+[[export_alias("__argz_add")]]
 [[requires_function(argz_append)]]
 error_t argz_add([[nonnull]] char **__restrict pargz,
                  [[nonnull]] size_t *__restrict pargz_len,
@@ -314,8 +323,10 @@ error_t argz_add([[nonnull]] char **__restrict pargz,
 @@strings will be present in the resulting argz-string.
 @@@return: 0 :     Success
 @@@return: ENOMEM: Insufficient heap memory
-[[export_alias("__argz_add_sep"), impl_include("<libc/errno.h>")]]
-[[requires_function(realloc), decl_include("<bits/types.h>")]]
+[[decl_include("<bits/types.h>")]]
+[[export_alias("__argz_add_sep")]]
+[[requires_function(realloc)]]
+[[impl_include("<libc/errno.h>")]]
 error_t argz_add_sep([[nonnull]] char **__restrict pargz,
                      [[nonnull]] size_t *__restrict pargz_len,
                      [[nonnull]] char const *__restrict string,
@@ -393,7 +404,8 @@ again_check_ch:
 @@Note that `entry' must  be the actual pointer  to one of the  elements
 @@of the given `pargz...+=pargz_len', and not just a string equal to one
 @@of the elements... (took me a while to realize this one)
-[[export_alias("__argz_add_sep"), decl_include("<hybrid/typecore.h>")]]
+[[decl_include("<hybrid/typecore.h>")]]
+[[export_alias("__argz_add_sep")]]
 void argz_delete([[nonnull]] char **__restrict pargz,
                  [[nonnull]] size_t *__restrict pargz_len,
                  [[nullable]] char *entry) {
@@ -426,8 +438,10 @@ void argz_delete([[nonnull]] char **__restrict pargz,
 @@@return: 0 :     Success
 @@@return: ENOMEM: Insufficient heap memory
 @@@return: EINVAL: The given `before' is either `NULL', or apart of `*pargz'
-[[export_alias("__argz_insert"), impl_include("<libc/errno.h>")]]
-[[requires_function(realloc, argz_add), decl_include("<bits/types.h>")]]
+[[decl_include("<bits/types.h>")]]
+[[export_alias("__argz_insert")]]
+[[requires_function(realloc, argz_add)]]
+[[impl_include("<libc/errno.h>")]]
 error_t argz_insert([[nonnull]] char **__restrict pargz,
                     [[nonnull]] size_t *__restrict pargz_len,
                     [[nullable]] char *before,
@@ -498,8 +512,10 @@ error_t argz_insert([[nonnull]] char **__restrict pargz,
 @@@return: ENOMEM: Insufficient heap memory (can only happen when `strlen(with) > strlen(str)',
 @@                 but  note  that  the GLibc  implementation  of this  function  is completely
 @@                 unreadable and may be able to return this for other cases as well...)
-[[export_alias("__argz_replace"), impl_include("<libc/errno.h>")]]
-[[requires_function(realloc, free), decl_include("<bits/types.h>")]]
+[[decl_include("<bits/types.h>")]]
+[[export_alias("__argz_replace")]]
+[[requires_function(realloc, free)]]
+[[impl_include("<libc/errno.h>")]]
 error_t argz_replace([[nonnull]] char **__restrict pargz,
                      [[nonnull]] size_t *__restrict pargz_len,
                      [[nullable]] char const *__restrict str,
@@ -612,7 +628,8 @@ error_t argz_replace([[nonnull]] char **__restrict pargz,
 @@ - If `entry' points at, or past the end of `argz', return `NULL'
 @@ - If the successor of `entry' points at, or past the end of `argz', return `NULL'
 @@ - Return the successor of `entry' (i.e. `strend(entry) + 1')
-[[export_alias("__argz_next"), wunused, ATTR_PURE, decl_include("<hybrid/typecore.h>")]]
+[[pure, wunused, decl_include("<hybrid/typecore.h>")]]
+[[export_alias("__argz_next")]]
 char *argz_next([[inp_opt(argz_len)]] char const *__restrict argz, size_t argz_len, [[nullable]] char const *__restrict entry)
 	[[([[inp_opt(argz_len)]] char *__restrict argz, size_t argz_len, [[nullable]] char *__restrict entry): char *]]
 	[[([[inp_opt(argz_len)]] char const *__restrict argz, size_t argz_len, [[nullable]] char const *__restrict entry): char const *]]

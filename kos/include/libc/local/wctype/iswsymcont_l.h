@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4e4a8922 */
+/* HASH CRC-32:0x6f4fcca1 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,6 +30,8 @@ __NAMESPACE_LOCAL_END
 __NAMESPACE_LOCAL_BEGIN
 #if defined(__crt_iswalnum_l) && defined(__CRT_HAVE_iswalnum_l)
 __CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep_iswalnum_l,(__WINT_TYPE__ __ch, __locale_t __locale),iswalnum_l,{ return __crt_iswalnum_l(__ch, __locale); })
+#elif defined(__crt_iswalnum_l) && defined(__CRT_HAVE__iswalnum_l)
+__CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep_iswalnum_l,(__WINT_TYPE__ __ch, __locale_t __locale),_iswalnum_l,{ return __crt_iswalnum_l(__ch, __locale); })
 #elif defined(__crt_iswalnum_l) && defined(__CRT_HAVE___iswalnum_l)
 __CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep_iswalnum_l,(__WINT_TYPE__ __ch, __locale_t __locale),__iswalnum_l,{ return __crt_iswalnum_l(__ch, __locale); })
 #elif defined(__crt_iswalnum_l)
@@ -40,6 +42,8 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep_iswalnum_l,(
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep_iswalnum_l,(__WINT_TYPE__ __ch, __locale_t __locale),_iswalnum_l,(__ch,__locale))
 #elif defined(__CRT_HAVE___iswalnum_l)
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep_iswalnum_l,(__WINT_TYPE__ __ch, __locale_t __locale),__iswalnum_l,(__ch,__locale))
+#elif defined(__crt_iswalnum)
+__LOCAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL __localdep_iswalnum_l)(__WINT_TYPE__ __ch, __locale_t __locale) { __COMPILER_IMPURE(); (void)__locale; return __crt_iswalnum(__ch); }
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/wctype/iswalnum_l.h>

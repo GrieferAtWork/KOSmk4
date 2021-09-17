@@ -1008,7 +1008,7 @@ $ssize_t format_snprintf_printer([[nonnull]] /*struct format_snprintf_data**/ vo
 @@>> format_width(3)
 @@Returns the width (number of characters; not bytes) of the given unicode string
 @@The  `arg'   argument   is   ignored,   and  you   may   safely   pass   `NULL'
-[[kernel, ATTR_PURE, impl_include("<libc/local/unicode_utf8seqlen.h>")]]
+[[kernel, pure, impl_include("<libc/local/unicode_utf8seqlen.h>")]]
 [[kernel, no_crt_dos_wrapper, cc(__FORMATPRINTER_CC)]]
 [[decl_include("<bits/crt/format-printer.h>", "<hybrid/typecore.h>")]]
 $ssize_t format_width(void *arg,
@@ -1032,7 +1032,7 @@ $ssize_t format_width(void *arg,
 @@>> format_length(3)
 @@Always re-return `datalen' and ignore all other arguments
 @@Both the `arg'  and `data' arguments  are simply  ignored
-[[kernel, ATTR_CONST, no_crt_dos_wrapper, cc(__FORMATPRINTER_CC)]]
+[[kernel, const, no_crt_dos_wrapper, cc(__FORMATPRINTER_CC)]]
 [[if(!defined(__KERNEL__)), kos_export_alias("format_wwidth")]]
 [[decl_include("<bits/crt/format-printer.h>", "<hybrid/typecore.h>")]]
 $ssize_t format_length(void *arg,

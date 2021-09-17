@@ -553,7 +553,7 @@ time_t time(time_t *timer) {
 %(std)#ifndef __NO_FPU
 @@>> difftime(3), difftime64(3)
 @@Return the difference between `time1' and `time0'
-[[wunused, const, std, guard, decl_include("<bits/types.h>"), no_crt_self_import]]
+[[const, wunused, std, guard, decl_include("<bits/types.h>"), no_crt_self_import]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("difftime", "_difftime32")]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("difftime64", "_difftime64")]]
 double difftime(time_t time1, time_t time0) {
@@ -759,7 +759,7 @@ $time64_t time64($time64_t *timer) {
 }
 
 %#ifndef __NO_FPU
-[[wunused, const, guard, decl_include("<bits/types.h>")]]
+[[const, wunused, guard, decl_include("<bits/types.h>")]]
 [[preferred_time64_variant_of(difftime), doc_alias("difftime")]]
 [[dos_only_export_alias("_difftime64"), export_alias("__difftime64")]]
 double difftime64($time64_t time1, $time64_t time0) {

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x60167f5f */
+/* HASH CRC-32:0xdc57d612 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -41,6 +41,26 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_c32tob __LIBC_LOCAL_NAME(c32tob)
 #endif /* !... */
 #endif /* !__local___localdep_c32tob_defined */
+#ifndef __local___localdep_isspace_defined
+#define __local___localdep_isspace_defined 1
+__NAMESPACE_LOCAL_END
+#include <bits/crt/ctype.h>
+__NAMESPACE_LOCAL_BEGIN
+#if defined(__crt_isspace) && defined(__CRT_HAVE_isspace)
+__CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isspace,(int __ch),isspace,{ return __crt_isspace(__ch); })
+#elif defined(__crt_isspace)
+__LOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __localdep_isspace)(int __ch) { return __crt_isspace(__ch); }
+#elif __has_builtin(__builtin_isspace) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_isspace)
+__CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isspace,(int __ch),isspace,{ return __builtin_isspace(__ch); })
+#elif defined(__CRT_HAVE_isspace)
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isspace,(int __ch),isspace,(__ch))
+#else /* ... */
+__NAMESPACE_LOCAL_END
+#include <libc/local/ctype/isspace.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_isspace __LIBC_LOCAL_NAME(isspace)
+#endif /* !... */
+#endif /* !__local___localdep_isspace_defined */
 __NAMESPACE_LOCAL_END
 #include <bits/crt/wctype.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -49,7 +69,7 @@ __NOTHROW(__LIBKCALL __LIBC_LOCAL_NAME(isspace32))(__WINT32_TYPE__ __wc) {
 #ifdef __crt_iswspace
 	return __crt_iswspace(__wc);
 #else /* __crt_iswspace */
-	return __LIBC_LOCAL_NAME(isspace32)((__NAMESPACE_LOCAL_SYM __localdep_c32tob)(__wc));
+	return (__NAMESPACE_LOCAL_SYM __localdep_isspace)((__NAMESPACE_LOCAL_SYM __localdep_c32tob)(__wc));
 #endif /* !__crt_iswspace */
 }
 __NAMESPACE_LOCAL_END

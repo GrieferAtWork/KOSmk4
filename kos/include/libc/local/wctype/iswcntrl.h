@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf7a07c95 */
+/* HASH CRC-32:0xae0e0b19 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,6 +23,26 @@
 #include <__crt.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
+#ifndef __local___localdep_iscntrl_defined
+#define __local___localdep_iscntrl_defined 1
+__NAMESPACE_LOCAL_END
+#include <bits/crt/ctype.h>
+__NAMESPACE_LOCAL_BEGIN
+#if defined(__crt_iscntrl) && defined(__CRT_HAVE_iscntrl)
+__CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_iscntrl,(int __ch),iscntrl,{ return __crt_iscntrl(__ch); })
+#elif defined(__crt_iscntrl)
+__LOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __localdep_iscntrl)(int __ch) { return __crt_iscntrl(__ch); }
+#elif __has_builtin(__builtin_iscntrl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_iscntrl)
+__CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_iscntrl,(int __ch),iscntrl,{ return __builtin_iscntrl(__ch); })
+#elif defined(__CRT_HAVE_iscntrl)
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_iscntrl,(int __ch),iscntrl,(__ch))
+#else /* ... */
+__NAMESPACE_LOCAL_END
+#include <libc/local/ctype/iscntrl.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_iscntrl __LIBC_LOCAL_NAME(iscntrl)
+#endif /* !... */
+#endif /* !__local___localdep_iscntrl_defined */
 #ifndef __local___localdep_wctob_defined
 #define __local___localdep_wctob_defined 1
 #ifdef __CRT_HAVE_wctob
@@ -42,7 +62,7 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(iswcntrl))(__WINT_TYPE__ __wc) {
 #ifdef __crt_iswcntrl
 	return __crt_iswcntrl(__wc);
 #else /* __crt_iswcntrl */
-	return __LIBC_LOCAL_NAME(iswcntrl)((__NAMESPACE_LOCAL_SYM __localdep_wctob)(__wc));
+	return (__NAMESPACE_LOCAL_SYM __localdep_iscntrl)((__NAMESPACE_LOCAL_SYM __localdep_wctob)(__wc));
 #endif /* !__crt_iswcntrl */
 }
 __NAMESPACE_LOCAL_END

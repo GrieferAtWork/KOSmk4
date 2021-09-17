@@ -856,10 +856,10 @@ struct osockaddr {
 /* struct cmsghdr *CMSG_NXTHDR(struct msghdr *mhdr, struct cmsghdr *cmsg) */
 #define CMSG_NXTHDR(mhdr, cmsg) __cmsg_nxthdr(mhdr, cmsg)
 }
-[[decl_include("<bits/os/cmsghdr.h>")]]
-[[decl_include("<bits/os/msghdr.h>")]]
+
+[[decl_include("<bits/os/cmsghdr.h>", "<bits/os/msghdr.h>")]]
+[[pure, wunused, nullable, no_inline_truncate, extern_inline]]
 [[impl_include("<bits/types.h>")]]
-[[no_inline_truncate, extern_inline, ATTR_PURE, wunused, nullable]]
 struct cmsghdr *__cmsg_nxthdr([[nonnull]] struct msghdr *mhdr,
                               [[nonnull]] struct cmsghdr *cmsg) {
 	$byte_t *ctrl_end;

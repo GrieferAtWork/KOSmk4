@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb98d091d */
+/* HASH CRC-32:0x7c0266c */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -235,7 +235,7 @@ __CDECLARE(__ATTR_NONNULL((1, 3, 4)),error_t,__NOTHROW_NCX,argz_create_sep,(char
  * @return: 0 :     Success
  * @return: ENOMEM: Insufficient heap memory */
 __CREDIRECT(__ATTR_NONNULL((1, 3, 4)),error_t,__NOTHROW_NCX,argz_create_sep,(char const *__restrict __string, int __sep, char **__restrict __pargz, size_t *__restrict __pargz_len),__argz_create_sep,(__string,__sep,__pargz,__pargz_len))
-#elif (defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign)) && (defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree))
+#elif defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign)
 #include <libc/local/argz/argz_create_sep.h>
 /* >> argz_create_sep(3)
  * Create an argz-string from `string' by splitting that string at each
@@ -279,7 +279,7 @@ __CREDIRECT(__ATTR_NONNULL((1, 3, 4)),error_t,__NOTHROW_NCX,__argz_create_sep,(c
  * @return: 0 :     Success
  * @return: ENOMEM: Insufficient heap memory */
 __CDECLARE(__ATTR_NONNULL((1, 3, 4)),error_t,__NOTHROW_NCX,__argz_create_sep,(char const *__restrict __string, int __sep, char **__restrict __pargz, size_t *__restrict __pargz_len),(__string,__sep,__pargz,__pargz_len))
-#elif (defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign)) && (defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree))
+#elif defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign)
 #include <libc/local/argz/argz_create_sep.h>
 /* >> argz_create_sep(3)
  * Create an argz-string from `string' by splitting that string at each

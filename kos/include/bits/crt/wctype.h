@@ -51,7 +51,7 @@ __DECL_END
 #include <bits/crt/unicode.h>
 #include <libc/core/unicode.h>
 
-/* Implement <ctype.h> functions in terms of `__unicode_descriptor' */
+/* Implement <wctype.h> functions in terms of `__unicode_descriptor' */
 #ifdef ____libc_core___unicode_descriptor_defined
 #define __crt_iswcntrl(ch)  ((__libc_core___unicode_descriptor(ch)->__ut_flags & __UNICODE_ISCNTRL) != 0)
 #define __crt_iswspace(ch)  ((__libc_core___unicode_descriptor(ch)->__ut_flags & __UNICODE_ISSPACE) != 0)

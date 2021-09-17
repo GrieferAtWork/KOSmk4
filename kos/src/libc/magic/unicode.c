@@ -1898,11 +1898,11 @@ struct __unitraits const *__unicode_descriptor(char32_t ch);
 @@Return the integer constant associated  with a given digit  index
 @@Returns `0' if the given index is invalid
 @@@param: digit_idx: As read from `__unitraits::__ut_digit_idx'
-[[guard, libc, wunused, const, nothrow]]
+[[guard, libc, const, wunused, nothrow]]
 $uint8_t __unicode_descriptor_digit($uint8_t digit_idx);
 
 %#ifdef __UINT64_TYPE__
-[[guard, libc, wunused, const, nothrow]]
+[[guard, libc, const, wunused, nothrow]]
 [[doc_alias("__unicode_descriptor_digit")]]
 $uint64_t __unicode_descriptor_digit64($uint8_t digit_idx);
 %#endif /* __UINT64_TYPE__ */
@@ -1912,11 +1912,11 @@ $uint64_t __unicode_descriptor_digit64($uint8_t digit_idx);
 @@Return the floating-point constant associated with a given digit index
 @@Returns `0.0' if the given index is invalid
 @@@param: digit_idx: As read from `__unitraits::__ut_digit_idx'
-[[guard, libc, wunused, const, nothrow]]
+[[guard, libc, const, wunused, nothrow]]
 double __unicode_descriptor_digitd($uint8_t digit_idx);
 
 %#ifdef __COMPILER_HAVE_LONGDOUBLE
-[[guard, libc, wunused, const, nothrow]]
+[[guard, libc, const, wunused, nothrow]]
 [[doc_alias("__unicode_descriptor_digitd")]]
 __LONGDOUBLE __unicode_descriptor_digitld($uint8_t digit_idx);
 %#endif /* __COMPILER_HAVE_LONGDOUBLE */

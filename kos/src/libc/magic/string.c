@@ -7063,7 +7063,7 @@ $size_t strnlen_s([[nullable]] char const *str, $size_t maxlen) {
 %[insert:function(_strnicoll_l = strncasecoll_l)]
 
 [[cp, wunused, section(".text.crt.dos.errno")]]
-[[requires($has_function(_strerror_s))]]
+[[requires_function(_strerror_s)]]
 char *_strerror(char const *message) {
 	static char strerror_buf[64];
 	if (_strerror_s(strerror_buf,

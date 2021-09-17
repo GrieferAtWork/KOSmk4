@@ -2019,7 +2019,7 @@ __issignalingl(*) %{generate(double2ldouble("__issignaling"))}
 %#endif /* __COMPILER_HAVE_LONGDOUBLE */
 %#endif /* __USE_GNU */
 
-[[wunused, const, ignore, nocrt, alias("_dpcomp")]]
+[[const, wunused, ignore, nocrt, alias("_dpcomp")]]
 int _dpcomp(double x, double y) /* TODO */;
 
 [[ignore, nocrt, alias("_fdpcomp")]] _fdpcomp(*) %{generate(double2float("_dpcomp"))}

@@ -45,7 +45,7 @@ __SYSDECL_BEGIN
 @@Find and return the entry for `name' in `envz', or `NULL' if not found.
 @@If `name' contains a `=' character, only characters leading up to  this
 @@position are actually compared!
-[[wunused, ATTR_PURE, decl_include("<hybrid/typecore.h>")]]
+[[pure, wunused, decl_include("<hybrid/typecore.h>")]]
 char *envz_entry([inp_opt(envz_len)] char const *__restrict envz, size_t envz_len, [[nonnull]] char const *__restrict name)
 	[([inp_opt(envz_len)] char *__restrict envz, size_t envz_len, [[nonnull]] char const *__restrict name): char *]
 	[([inp_opt(envz_len)] char const *__restrict envz, size_t envz_len, [[nonnull]] char const *__restrict name): char const *]
@@ -66,7 +66,7 @@ char *envz_entry([inp_opt(envz_len)] char const *__restrict envz, size_t envz_le
 @@Return the value in `envz'  attached to `name', or  `NULL'
 @@if no such entry exists, or the entry doesn't have a value
 @@portion (i.e. doesn't contain a `='-character)
-[[wunused, ATTR_PURE, decl_include("<hybrid/typecore.h>")]]
+[[pure, wunused, decl_include("<hybrid/typecore.h>")]]
 char *envz_get([inp_opt(envz_len)] char const *__restrict envz, size_t envz_len, [[nonnull]] char const *__restrict name)
 	[([inp_opt(envz_len)] char *__restrict envz, size_t envz_len, [[nonnull]] char const *__restrict name): char *]
 	[([inp_opt(envz_len)] char const *__restrict envz, size_t envz_len, [[nonnull]] char const *__restrict name): char const *]

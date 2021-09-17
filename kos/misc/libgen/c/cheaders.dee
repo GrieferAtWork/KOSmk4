@@ -1508,8 +1508,13 @@ class FunctionImplementation {
 		local selfName = this.name;
 		escapeTextIntoFile(fp, body, escapeMode,
 			keyEscape: [](keyword: string): string {
-				if (keyword == selfName)
+				if (keyword == selfName) {
+					if (LOCAL_NAMESPACE.prefix) {
+						/* Must always wrap in parenthesis to guard against user-defined function-like macros. */
+						return "({} {})".format({ LOCAL_NAMESPACE.prefix, csymbolName });
+					}
 					return csymbolName;
+				}
 				if (keyword in deps) {
 					/* Always prefix with the  LOCAL namespace prefix. We  can't rely on the  compiler
 					 * being able to figure out what we want to do by using relative names. It doesn't

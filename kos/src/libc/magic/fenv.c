@@ -130,7 +130,7 @@ int fesetexceptflag([[nonnull]] fexcept_t const *flagp, int excepts) {
 }
 
 @@>> fetestexcept(3)
-[[std, nothrow, wunused, ATTR_PURE]]
+[[std, nothrow, pure, wunused]]
 [[preferred_fastbind, impl_include("<bits/crt/fenv-inline.h>")]]
 int fetestexcept(int excepts) {
 	return __inline_fetestexcept(excepts);
@@ -143,7 +143,7 @@ int fetestexcept(int excepts) {
 @@            ... `FE_DOWNWARD':   floor()
 @@            ... `FE_UPWARD':     ceil()
 @@            ... `FE_TOWARDZERO': trunc()
-[[std, nothrow, wunused, ATTR_PURE, libc]]
+[[std, nothrow, pure, wunused, libc]]
 [[preferred_fastbind, impl_include("<bits/crt/fenv-inline.h>")]]
 int fegetround() {
 	return __inline_fegetround();
@@ -205,7 +205,7 @@ int fedisableexcept(int excepts) {
 }
 
 @@>> fegetexcept(3)
-[[wunused, nothrow, ATTR_PURE]]
+[[wunused, nothrow, pure]]
 [[preferred_fastbind, impl_include("<bits/crt/fenv-inline.h>")]]
 int fegetexcept() {
 	return __inline_fegetexcept();

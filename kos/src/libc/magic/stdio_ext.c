@@ -114,36 +114,36 @@ enum {
 @@>> __fbufsize(3)
 @@Return the size of the buffer of `stream' in
 @@bytes  currently in use  by the given stream
-[[wunused, ATTR_PURE]]
-$size_t __fbufsize([[nonnull]] $FILE *stream);
+[[pure, wunused, decl_include("<features.h>")]]
+$size_t __fbufsize([[nonnull]] $FILE __KOS_FIXED_CONST *stream);
 
 @@>> __freading(3)
 @@Return  non-zero value when  `stream' is opened readonly,
 @@or if the last operation on `stream' was a read operation
-[[wunused, ATTR_PURE]]
-int __freading([[nonnull]] $FILE *stream);
+[[pure, wunused, decl_include("<features.h>")]]
+int __freading([[nonnull]] $FILE __KOS_FIXED_CONST *stream);
 
 @@>> __fwriting(3)
 @@Return non-zero value when  `stream' is opened write-only  or
 @@append-only, or if the last operation on `stream' was a write
 @@operation
-[[wunused, ATTR_PURE]]
-int __fwriting([[nonnull]] $FILE *stream);
+[[pure, wunused, decl_include("<features.h>")]]
+int __fwriting([[nonnull]] $FILE __KOS_FIXED_CONST *stream);
 
 @@>> __freadable(3)
 @@Return non-zero value when `stream' is not opened write-only or append-only
-[[wunused, ATTR_PURE]]
-int __freadable([[nonnull]] $FILE *stream);
+[[pure, wunused, decl_include("<features.h>")]]
+int __freadable([[nonnull]] $FILE __KOS_FIXED_CONST *stream);
 
 @@>> __fwritable(3)
 @@Return non-zero value when `stream' is not opened read-only
-[[wunused, ATTR_PURE]]
-int __fwritable([[nonnull]] $FILE *stream);
+[[pure, wunused, decl_include("<features.h>")]]
+int __fwritable([[nonnull]] $FILE __KOS_FIXED_CONST *stream);
 
 @@>> __flbf(3)
 @@Return non-zero value when `stream' is line-buffered
-[[wunused, ATTR_PURE]]
-int __flbf([[nonnull]] $FILE *stream);
+[[pure, wunused, decl_include("<features.h>")]]
+int __flbf([[nonnull]] $FILE *stream); /* Can't be const because lazily determined on KOS... */
 
 @@>> __fpurge(3)
 @@Discard all pending buffered I/O on `stream'
@@ -152,8 +152,8 @@ void __fpurge([[nonnull]] $FILE *stream);
 
 @@>> __fpending(3)
 @@Return amount of output in bytes pending on a `stream'
-[[wunused, ATTR_PURE]]
-size_t __fpending([[nonnull]] $FILE *stream);
+[[pure, wunused, decl_include("<features.h>", "<hybrid/typecore.h>")]]
+size_t __fpending([[nonnull]] $FILE __KOS_FIXED_CONST *stream);
 
 @@>> _flushlbf(3)
 @@Flush all line-buffered files
@@ -164,6 +164,7 @@ void _flushlbf();
 
 @@>> __fsetlocking(3)
 @@Set locking status of `stream' to `type'
+@@@param: type: One of `FSETLOCKING_*'
 int __fsetlocking([[nonnull]] $FILE *stream, int type);
 
 %{

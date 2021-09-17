@@ -45,7 +45,7 @@
 #define __IO_FILE_IOCOMMIT  0x00004000 /* Invoke fsync() during fflush() */
 #define __IO_FILE_IOLOCKED  0x00008000 /* ??? */
 #define __IO_FILE_IONOLOCK  0x08000000 /* NOT ORIGINALLY DEFINED IN DOS: The buffer does not perform any locking (s.a. `__fsetlocking()') */
-#define __IO_FILE_IOLNIFTYY 0x80000000 /* NOT ORIGINALLY DEFINED IN DOS: Determine 'isatty()' on first access and set `__IO_FILE_IOLNBUF' accordingly. */
+#define __IO_FILE_IOLNIFTYY 0x80000000 /* NOT ORIGINALLY DEFINED IN DOS: Determine `isatty()' on first access and set `__IO_FILE_IOLNBUF' accordingly. */
 #define __IO_FILE_IOREADING 0x40000000 /* NOT ORIGINALLY DEFINED IN DOS: The buffer is currently being read into and must not be changed or resized. */
 #define __IO_FILE_IOISATTY  0x20000000 /* NOT ORIGINALLY DEFINED IN DOS: The buffer refers to a TTY */
 #define __IO_FILE_IONOTATTY 0x10000000 /* NOT ORIGINALLY DEFINED IN DOS: The buffer doesn't refer to a TTY */

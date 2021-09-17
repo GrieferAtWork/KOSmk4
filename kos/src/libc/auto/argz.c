@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x113a011b */
+/* HASH CRC-32:0x7d617f1b */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -143,7 +143,9 @@ again_check_ch:
 	}
 	if unlikely(dst == result_string) {
 		/* Empty string. (this can happen if `string' only consisted of `sep' characters) */
+#if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree)
 		libc_free(result_string);
+#endif /* __CRT_HAVE_free || __CRT_HAVE_cfree */
 		goto empty_argz;
 	}
 	/* Write the terminating NUL-byte (if there isn't one already) */

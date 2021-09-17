@@ -1055,7 +1055,7 @@ void clearerr([[nonnull]] $FILE *__restrict stream);
 @@Check if end-of-file has been reached in `stream'
 [[decl_include("<features.h>")]]
 [[section(".text.crt{|.dos}.FILE.locked.read.utility")]]
-[[std, wunused, ATTR_PURE, export_alias("_IO_feof", "feof_unlocked")]]
+[[std, pure, wunused, export_alias("_IO_feof", "feof_unlocked")]]
 [[if($extended_include_prefix("<features.h>")defined(__USE_STDIO_UNLOCKED)), preferred_alias("feof_unlocked")]]
 int feof([[nonnull]] $FILE __KOS_FIXED_CONST *__restrict stream);
 
@@ -1064,7 +1064,7 @@ int feof([[nonnull]] $FILE __KOS_FIXED_CONST *__restrict stream);
 @@Check if an I/O error occurred in `stream'
 [[decl_include("<features.h>")]]
 [[section(".text.crt{|.dos}.FILE.locked.utility")]]
-[[std, wunused, ATTR_PURE, export_alias("_IO_ferror", "ferror_unlocked")]]
+[[std, pure, wunused, export_alias("_IO_ferror", "ferror_unlocked")]]
 [[if($extended_include_prefix("<features.h>")defined(__USE_STDIO_UNLOCKED)), preferred_alias("ferror_unlocked")]]
 int ferror([[nonnull]] $FILE __KOS_FIXED_CONST *__restrict stream);
 

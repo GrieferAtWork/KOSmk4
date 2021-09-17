@@ -148,7 +148,7 @@ typedef __error_subclass_t error_subclass_t;
 [[kernel, cc(LIBKCALL)]]
 [[if($extended_include_prefix("<kos/bits/fastexcept.h>")defined(__arch_error_data)),
   preferred_fast_extern_inline("error_data", { return __arch_error_data(); })]]
-[[wunused, const, nothrow, nonnull, decl_prefix(struct exception_data;)]]
+[[const, wunused, nothrow, nonnull, decl_prefix(struct exception_data;)]]
 [[userimpl, requires_include("<kos/bits/fastexcept.h>"), requires(defined(__arch_error_data))]]
 struct exception_data *error_data(void) {
 	return __arch_error_data();
@@ -157,7 +157,7 @@ struct exception_data *error_data(void) {
 [[kernel, cc(LIBKCALL)]]
 [[if($extended_include_prefix("<kos/bits/fastexcept.h>")defined(__arch_error_code)),
   preferred_fast_extern_inline("error_code", { return __arch_error_code(); })]]
-[[wunused, pure, nothrow, decl_include("<kos/bits/exception_data.h>")]]
+[[pure, wunused, nothrow, decl_include("<kos/bits/exception_data.h>")]]
 [[userimpl, requires_include("<kos/bits/fastexcept.h>")]]
 [[requires(defined(__arch_error_code) || $has_function(error_data))]]
 error_code_t error_code(void) {
@@ -171,7 +171,7 @@ error_code_t error_code(void) {
 [[kernel, cc(LIBKCALL)]]
 [[if($extended_include_prefix("<kos/bits/fastexcept.h>")defined(__arch_error_active)),
   preferred_fast_extern_inline("error_active", { return __arch_error_active(); })]]
-[[wunused, pure, nothrow, userimpl, requires_function(error_code)]]
+[[pure, wunused, nothrow, userimpl, requires_function(error_code)]]
 [[impl_include("<kos/except/codes.h>")]]
 [[userimpl, requires_include("<kos/bits/fastexcept.h>")]]
 [[requires(defined(__arch_error_active) || $has_function(error_code))]]
@@ -186,7 +186,7 @@ $bool error_active(void) {
 [[kernel, cc(LIBKCALL)]]
 [[if($extended_include_prefix("<kos/bits/fastexcept.h>")defined(__arch_error_class)),
   preferred_fast_extern_inline("error_class", { return __arch_error_class(); })]]
-[[wunused, pure, nothrow, decl_include("<kos/bits/exception_data.h>")]]
+[[pure, wunused, nothrow, decl_include("<kos/bits/exception_data.h>")]]
 [[impl_include("<kos/except/codes.h>")]]
 [[userimpl, requires_include("<kos/bits/fastexcept.h>")]]
 [[requires(defined(__arch_error_class) || $has_function(error_code))]]
@@ -201,7 +201,7 @@ error_class_t error_class(void) {
 [[kernel, cc(LIBKCALL)]]
 [[if($extended_include_prefix("<kos/bits/fastexcept.h>")defined(__arch_error_subclass)),
   preferred_fast_extern_inline("error_subclass", { return __arch_error_subclass(); })]]
-[[wunused, pure, nothrow, decl_include("<kos/bits/exception_data.h>")]]
+[[pure, wunused, nothrow, decl_include("<kos/bits/exception_data.h>")]]
 [[impl_include("<kos/except/codes.h>")]]
 [[userimpl, requires_include("<kos/bits/fastexcept.h>")]]
 [[requires(defined(__arch_error_subclass) || $has_function(error_code))]]
@@ -216,7 +216,7 @@ error_subclass_t error_subclass(void) {
 [[kernel, cc(LIBKCALL)]]
 [[if($extended_include_prefix("<kos/bits/fastexcept.h>")defined(__arch_error_register_state)),
   preferred_fast_extern_inline("error_register_state", { return __arch_error_register_state(); })]]
-[[wunused, const, nothrow, nonnull, decl_include("<kos/bits/except.h>")]]
+[[const, wunused, nothrow, nonnull, decl_include("<kos/bits/except.h>")]]
 [[decl_prefix(
 #ifndef __ERROR_REGISTER_STATE_TYPE
 #include <bits/os/mcontext.h>
@@ -232,7 +232,7 @@ error_register_state_t *error_register_state(void) {
 
 @@Transform the given exception into a posix errno value
 [[kernel, cc(LIBKCALL)]]
-[[wunused, pure, decl_include("<bits/types.h>")]]
+[[pure, wunused, decl_include("<bits/types.h>")]]
 [[decl_prefix(struct exception_data;)]]
 [[impl_include("<asm/os/errno.h>")]]
 [[impl_include("<hybrid/host.h>")]]
@@ -1013,7 +1013,7 @@ $bool error_as_signal([[nonnull]] struct exception_data const *__restrict self,
 @@This  name  is   the  same  as   the  `E_*'   identifier.
 @@E.g.: `error_name(ERROR_CODEOF(E_BADALLOC))' -> "E_BADALLOC"
 [[kernel, cc(LIBKCALL)]]
-[[wunused, const, nothrow, decl_include("<kos/bits/exception_data.h>")]]
+[[const, wunused, nothrow, decl_include("<kos/bits/exception_data.h>")]]
 [[impl_include("<hybrid/host.h>", "<kos/except/codes.h>")]]
 char const *error_name(error_code_t code) {
 	error_class_t err_class       = @ERROR_CLASS@(code);
@@ -1299,7 +1299,7 @@ non_linear_prefix:
 @@lower priorities in  situations where multiple  simultaneous
 @@errors can't be prevented.
 [[kernel, cc(LIBKCALL)]]
-[[wunused, const, nothrow]]
+[[const, wunused, nothrow]]
 [[impl_include("<kos/except/codes.h>")]]
 [[impl_include("<kos/bits/exception_data.h>")]]
 [[decl_include("<kos/bits/exception_data.h>")]]
@@ -1323,7 +1323,7 @@ unsigned int error_priority(error_code_t code) {
 [[kernel, cc(LIBKCALL)]]
 [[if($extended_include_prefix("<kos/bits/fastexcept.h>")defined(__arch_error_info)),
   preferred_fast_extern_inline("error_info", { return __arch_error_info(); })]]
-[[wunused, const, nothrow, nonnull, decl_prefix(struct exception_info;)]]
+[[const, wunused, nothrow, nonnull, decl_prefix(struct exception_info;)]]
 [[userimpl, requires_include("<kos/bits/fastexcept.h>")]]
 [[requires(defined(__arch_error_info))]]
 struct exception_info *error_info(void) {

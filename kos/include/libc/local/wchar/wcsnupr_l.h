@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x46799d8b */
+/* HASH CRC-32:0xf4a12e54 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,6 +30,8 @@ __NAMESPACE_LOCAL_END
 __NAMESPACE_LOCAL_BEGIN
 #if defined(__crt_towupper_l) && defined(__CRT_HAVE_towupper_l)
 __CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,__WINT_TYPE__,__NOTHROW_NCX,__localdep_towupper_l,(__WINT_TYPE__ __ch, __locale_t __locale),towupper_l,{ return __crt_towupper_l(__ch, __locale); })
+#elif defined(__crt_towupper_l) && defined(__CRT_HAVE__towupper_l)
+__CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,__WINT_TYPE__,__NOTHROW_NCX,__localdep_towupper_l,(__WINT_TYPE__ __ch, __locale_t __locale),_towupper_l,{ return __crt_towupper_l(__ch, __locale); })
 #elif defined(__crt_towupper_l) && defined(__CRT_HAVE___towupper_l)
 __CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,__WINT_TYPE__,__NOTHROW_NCX,__localdep_towupper_l,(__WINT_TYPE__ __ch, __locale_t __locale),__towupper_l,{ return __crt_towupper_l(__ch, __locale); })
 #elif defined(__crt_towupper_l)
@@ -40,6 +42,8 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,__WINT_TYPE__,__NOTHROW_NCX,__localdep_to
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,__WINT_TYPE__,__NOTHROW_NCX,__localdep_towupper_l,(__WINT_TYPE__ __ch, __locale_t __locale),_towupper_l,(__ch,__locale))
 #elif defined(__CRT_HAVE___towupper_l)
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,__WINT_TYPE__,__NOTHROW_NCX,__localdep_towupper_l,(__WINT_TYPE__ __ch, __locale_t __locale),__towupper_l,(__ch,__locale))
+#elif defined(__crt_towupper)
+__LOCAL __ATTR_PURE __ATTR_WUNUSED __WINT_TYPE__ __NOTHROW_NCX(__LIBCCALL __localdep_towupper_l)(__WINT_TYPE__ __ch, __locale_t __locale) { __COMPILER_IMPURE(); (void)__locale; return __crt_towupper(__ch); }
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/wctype/towupper_l.h>

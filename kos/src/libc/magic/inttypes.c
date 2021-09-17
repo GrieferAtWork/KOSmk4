@@ -520,7 +520,7 @@ __NAMESPACE_STD_USING(imaxdiv_t)
 %[insert:std]
 
 
-[[std, nothrow, ATTR_CONST, crtbuiltin, section(".text.crt{|.dos}.math.utility")]]
+[[std, nothrow, const, crtbuiltin, section(".text.crt{|.dos}.math.utility")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INTMAX_T__ == __SIZEOF_INT__),       alias("abs")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INTMAX_T__ == __SIZEOF_LONG__),      alias("labs")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INTMAX_T__ == __SIZEOF_LONG_LONG__), alias("llabs")]]
@@ -533,7 +533,7 @@ $intmax_t imaxabs($intmax_t x) {
 	return x < 0 ? -x : x;
 }
 
-[[std, nothrow, ATTR_CONST, section(".text.crt{|.dos}.math.utility")]]
+[[std, nothrow, const, section(".text.crt{|.dos}.math.utility")]]
 [[decl_include("<hybrid/typecore.h>"), decl_prefix(DEFINE_IMAXDIV_STRUCT)]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INTMAX_T__ == __SIZEOF_INT__),       alias("div")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INTMAX_T__ == __SIZEOF_LONG__),      alias("ldiv")]]

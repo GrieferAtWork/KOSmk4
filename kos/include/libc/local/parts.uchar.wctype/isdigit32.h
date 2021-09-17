@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd528401 */
+/* HASH CRC-32:0x120f9108 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -41,6 +41,26 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_c32tob __LIBC_LOCAL_NAME(c32tob)
 #endif /* !... */
 #endif /* !__local___localdep_c32tob_defined */
+#ifndef __local___localdep_isdigit_defined
+#define __local___localdep_isdigit_defined 1
+__NAMESPACE_LOCAL_END
+#include <bits/crt/ctype.h>
+__NAMESPACE_LOCAL_BEGIN
+#if defined(__crt_isdigit) && defined(__CRT_HAVE_isdigit)
+__CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isdigit,(int __ch),isdigit,{ return __crt_isdigit(__ch); })
+#elif defined(__crt_isdigit)
+__LOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __localdep_isdigit)(int __ch) { return __crt_isdigit(__ch); }
+#elif __has_builtin(__builtin_isdigit) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_isdigit)
+__CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isdigit,(int __ch),isdigit,{ return __builtin_isdigit(__ch); })
+#elif defined(__CRT_HAVE_isdigit)
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isdigit,(int __ch),isdigit,(__ch))
+#else /* ... */
+__NAMESPACE_LOCAL_END
+#include <libc/local/ctype/isdigit.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_isdigit __LIBC_LOCAL_NAME(isdigit)
+#endif /* !... */
+#endif /* !__local___localdep_isdigit_defined */
 __NAMESPACE_LOCAL_END
 #include <bits/crt/wctype.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -49,7 +69,7 @@ __NOTHROW(__LIBKCALL __LIBC_LOCAL_NAME(isdigit32))(__WINT32_TYPE__ __wc) {
 #ifdef __crt_iswdigit
 	return __crt_iswdigit(__wc);
 #else /* __crt_iswdigit */
-	return __LIBC_LOCAL_NAME(isdigit32)((__NAMESPACE_LOCAL_SYM __localdep_c32tob)(__wc));
+	return (__NAMESPACE_LOCAL_SYM __localdep_isdigit)((__NAMESPACE_LOCAL_SYM __localdep_c32tob)(__wc));
 #endif /* !__crt_iswdigit */
 }
 __NAMESPACE_LOCAL_END
