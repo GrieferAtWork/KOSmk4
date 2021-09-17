@@ -19,6 +19,7 @@
  */
 %(c_prefix){
 /* (#) Portability: GNU C Library (/inet/aliases.h) */
+/* (#) Portability: libc6         (/include/aliases.h) */
 }
 
 /* Declare a couple of crt-functions that are _always_ exported by the  kernel,

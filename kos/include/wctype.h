@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcf67c021 */
+/* HASH CRC-32:0x8bc16724 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,6 +32,7 @@
 /* (#) Portability: OpenSolaris   (/usr/src/head/wctype.h) */
 /* (#) Portability: Windows Kits  (/ucrt/wctype.h) */
 /* (#) Portability: diet libc     (/include/wctype.h) */
+/* (#) Portability: libc6         (/include/wctype.h) */
 /* (#) Portability: musl libc     (/include/wctype.h) */
 /* (#) Portability: uClibc        (/include/wctype.h) */
 #ifndef _WCTYPE_H

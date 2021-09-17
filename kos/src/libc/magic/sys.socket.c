@@ -26,6 +26,7 @@
 /* (#) Portability: OpenBSD       (/sys/sys/socket.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/uts/common/sys/socket.h) */
 /* (#) Portability: diet libc     (/include/sys/socket.h) */
+/* (#) Portability: libc4/5       (/include/sys/socket.h) */
 /* (#) Portability: musl libc     (/include/sys/socket.h) */
 /* (#) Portability: uClibc        (/include/sys/socket.h) */
 }

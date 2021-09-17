@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3f3bce22 */
+/* HASH CRC-32:0x4bd27767 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,6 +23,7 @@
 /* (#) Portability: NetBSD        (/sys/sys/ptrace.h) */
 /* (#) Portability: OpenBSD       (/sys/sys/ptrace.h) */
 /* (#) Portability: diet libc     (/include/sys/ptrace.h) */
+/* (#) Portability: libc4/5       (/include/sys/ptrace.h) */
 /* (#) Portability: musl libc     (/include/sys/ptrace.h) */
 #ifndef _SYS_PTRACE_H
 #define _SYS_PTRACE_H 1

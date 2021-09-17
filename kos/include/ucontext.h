@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa5721afb */
+/* HASH CRC-32:0x7168d7ba */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,6 +24,7 @@
 /* (#) Portability: NetBSD        (/include/ucontext.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/ucontext.h) */
 /* (#) Portability: diet libc     (/include/ucontext.h) */
+/* (#) Portability: libc6         (/include/ucontext.h) */
 /* (#) Portability: musl libc     (/include/ucontext.h) */
 /* (#) Portability: uClibc        (/include/ucontext.h) */
 #ifndef _UCONTEXT_H

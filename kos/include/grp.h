@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xaa39e695 */
+/* HASH CRC-32:0xc393b30 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,6 +29,8 @@
 /* (#) Portability: OpenSolaris   (/usr/src/head/grp.h) */
 /* (#) Portability: diet libc     (/include/grp.h) */
 /* (#) Portability: libbsd        (/include/bsd/grp.h) */
+/* (#) Portability: libc4/5       (/include/grp.h) */
+/* (#) Portability: libc6         (/include/grp.h) */
 /* (#) Portability: musl libc     (/include/grp.h) */
 /* (#) Portability: uClibc        (/include/grp.h) */
 #ifndef _GRP_H

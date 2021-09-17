@@ -27,6 +27,7 @@
 /* (#) Portability: OpenBSD       (/sys/sys/mman.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/uts/common/sys/mman.h) */
 /* (#) Portability: diet libc     (/include/sys/mman.h) */
+/* (#) Portability: libc4/5       (/include/sys/mman.h) */
 /* (#) Portability: musl libc     (/include/sys/mman.h) */
 /* (#) Portability: uClibc        (/include/sys/mman.h) */
 }

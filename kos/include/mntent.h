@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfc681282 */
+/* HASH CRC-32:0x2f0ff11 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,6 +23,8 @@
 /* (#) Portability: GNU C Library (/misc/mntent.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/lib/libbc/inc/include/mntent.h) */
 /* (#) Portability: diet libc     (/include/mntent.h) */
+/* (#) Portability: libc4/5       (/include/mntent.h) */
+/* (#) Portability: libc6         (/include/mntent.h) */
 /* (#) Portability: musl libc     (/include/mntent.h) */
 /* (#) Portability: uClibc        (/include/mntent.h) */
 #ifndef _MNTENT_H

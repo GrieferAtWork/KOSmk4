@@ -20,6 +20,7 @@
 %(c_prefix){
 /* (#) Portability: GNU C Library (/inet/rpc/netdb.h) */
 /* (#) Portability: diet libc     (/include/rpc/netdb.h) */
+/* (#) Portability: libc6         (/include/rpc/netdb.h) */
 /* (#) Portability: uClibc        (/include/rpc/netdb.h) */
 }
 

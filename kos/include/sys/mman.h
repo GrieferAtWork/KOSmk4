@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x70280ddc */
+/* HASH CRC-32:0x4549beb2 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,6 +27,7 @@
 /* (#) Portability: OpenBSD       (/sys/sys/mman.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/uts/common/sys/mman.h) */
 /* (#) Portability: diet libc     (/include/sys/mman.h) */
+/* (#) Portability: libc4/5       (/include/sys/mman.h) */
 /* (#) Portability: musl libc     (/include/sys/mman.h) */
 /* (#) Portability: uClibc        (/include/sys/mman.h) */
 #ifndef _SYS_MMAN_H

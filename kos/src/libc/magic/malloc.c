@@ -29,6 +29,8 @@
 /* (#) Portability: OpenSolaris   (/usr/src/head/malloc.h) */
 /* (#) Portability: Windows Kits  (/ucrt/malloc.h) */
 /* (#) Portability: diet libc     (/include/malloc.h) */
+/* (#) Portability: libc4/5       (/include/malloc.h) */
+/* (#) Portability: libc6         (/include/malloc.h) */
 /* (#) Portability: musl libc     (/include/malloc.h) */
 /* (#) Portability: uClibc        (/include/malloc.h) */
 }

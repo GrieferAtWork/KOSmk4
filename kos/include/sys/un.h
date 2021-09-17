@@ -25,6 +25,7 @@
 /* (#) Portability: OpenBSD       (/sys/sys/un.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/uts/common/sys/un.h) */
 /* (#) Portability: diet libc     (/include/sys/un.h) */
+/* (#) Portability: libc4/5       (/include/sys/un.h) */
 /* (#) Portability: musl libc     (/include/sys/un.h) */
 /* (#) Portability: uClibc        (/include/sys/un.h) */
 #ifndef _SYS_UN_H

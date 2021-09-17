@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9c8536f2 */
+/* HASH CRC-32:0xfa0bc50a */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,6 +26,7 @@
 /* (#) Portability: OpenBSD       (/sys/sys/msg.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/uts/common/sys/msg.h) */
 /* (#) Portability: diet libc     (/include/sys/msg.h) */
+/* (#) Portability: libc4/5       (/include/sys/msg.h) */
 /* (#) Portability: musl libc     (/include/sys/msg.h) */
 /* (#) Portability: uClibc        (/include/sys/msg.h) */
 #ifndef _SYS_MSG_H

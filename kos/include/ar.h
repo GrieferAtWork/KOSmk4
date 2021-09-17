@@ -26,6 +26,8 @@
 /* (#) Portability: OpenBSD       (/include/ar.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/ar.h) */
 /* (#) Portability: diet libc     (/include/ar.h) */
+/* (#) Portability: libc4/5       (/include/ar.h) */
+/* (#) Portability: libc6         (/include/ar.h) */
 /* (#) Portability: musl libc     (/include/ar.h) */
 /* (#) Portability: uClibc        (/include/ar.h) */
 #ifndef _AR_H

@@ -30,6 +30,7 @@
 /* (#) Portability: OpenSolaris   (/usr/src/uts/common/sys/types.h) */
 /* (#) Portability: Windows Kits  (/ucrt/sys/types.h) */
 /* (#) Portability: diet libc     (/include/sys/types.h) */
+/* (#) Portability: libc4/5       (/include/sys/types.h) */
 /* (#) Portability: musl libc     (/include/sys/types.h) */
 /* (#) Portability: uClibc        (/include/sys/types.h) */
 #ifndef _SYS_TYPES_H

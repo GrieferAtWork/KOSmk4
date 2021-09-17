@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd12f17cb */
+/* HASH CRC-32:0xb08d26aa */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,6 +32,8 @@
 /* (#) Portability: OpenSolaris   (/usr/src/head/ctype.h) */
 /* (#) Portability: Windows Kits  (/ucrt/ctype.h) */
 /* (#) Portability: diet libc     (/include/ctype.h) */
+/* (#) Portability: libc4/5       (/include/ctype.h) */
+/* (#) Portability: libc6         (/include/ctype.h) */
 /* (#) Portability: musl libc     (/include/ctype.h) */
 /* (#) Portability: uClibc        (/include/ctype.h) */
 #ifndef _CTYPE_H

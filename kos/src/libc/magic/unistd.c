@@ -30,6 +30,8 @@
 /* (#) Portability: OpenSolaris   (/usr/src/head/unistd.h) */
 /* (#) Portability: diet libc     (/include/unistd.h) */
 /* (#) Portability: libbsd        (/include/bsd/unistd.h) */
+/* (#) Portability: libc4/5       (/include/unistd.h) */
+/* (#) Portability: libc6         (/include/unistd.h) */
 /* (#) Portability: musl libc     (/include/unistd.h) */
 /* (#) Portability: uClibc        (/include/unistd.h) */
 }

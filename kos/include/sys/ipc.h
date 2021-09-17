@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x75f9fd8f */
+/* HASH CRC-32:0xa6ad7f00 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,6 +26,7 @@
 /* (#) Portability: OpenBSD       (/sys/sys/ipc.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/uts/common/sys/ipc.h) */
 /* (#) Portability: diet libc     (/include/sys/ipc.h) */
+/* (#) Portability: libc4/5       (/include/sys/ipc.h) */
 /* (#) Portability: musl libc     (/include/sys/ipc.h) */
 /* (#) Portability: uClibc        (/include/sys/ipc.h) */
 #ifndef _SYS_IPC_H

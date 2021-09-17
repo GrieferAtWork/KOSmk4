@@ -25,6 +25,7 @@
 /* (#) Portability: NetBSD        (/include/utmpx.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/utmpx.h) */
 /* (#) Portability: diet libc     (/include/utmpx.h) */
+/* (#) Portability: libc6         (/include/utmpx.h) */
 /* (#) Portability: musl libc     (/include/utmpx.h) */
 /* (#) Portability: uClibc        (/include/utmpx.h) */
 }

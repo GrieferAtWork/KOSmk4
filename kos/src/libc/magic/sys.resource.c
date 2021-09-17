@@ -28,6 +28,7 @@
 /* (#) Portability: OpenBSD       (/sys/sys/resource.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/uts/common/sys/resource.h) */
 /* (#) Portability: diet libc     (/include/sys/resource.h) */
+/* (#) Portability: libc4/5       (/include/sys/resource.h) */
 /* (#) Portability: musl libc     (/include/sys/resource.h) */
 /* (#) Portability: uClibc        (/include/sys/resource.h) */
 }

@@ -18,6 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 /* (#) Portability: OpenSolaris (/usr/src/head/nan.h) */
+/* (#) Portability: libc4/5     (/include/nan.h) */
 #ifndef _NAN_H
 #define _NAN_H 1
 

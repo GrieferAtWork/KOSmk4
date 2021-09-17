@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x11004703 */
+/* HASH CRC-32:0x9e9f8770 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,6 +32,8 @@
 /* (#) Portability: OpenSolaris   (/usr/src/head/time.h) */
 /* (#) Portability: Windows Kits  (/ucrt/time.h) */
 /* (#) Portability: diet libc     (/include/time.h) */
+/* (#) Portability: libc4/5       (/include/time.h) */
+/* (#) Portability: libc6         (/include/time.h) */
 /* (#) Portability: musl libc     (/include/time.h) */
 /* (#) Portability: uClibc        (/include/time.h) */
 #ifndef _TIME_H
@@ -265,15 +267,15 @@ __NAMESPACE_STD_USING(timespec_get)
 #endif /* __USE_ISOC11 */
 
 #ifndef __isleap
-#define __isleap(year) ((year)%4 == 0 && ((year)%100 != 0 || (year)%400 == 0))
+#define __isleap(year) ((year) % 4 == 0 && ((year) % 100 != 0 || (year) % 400 == 0))
 #endif /* !__isleap */
 
 #ifndef __daystoyears
-#define __daystoyears(n_days)  ((400*((n_days)+1))/146097)
+#define __daystoyears(n_days) ((400 * ((n_days) + 1)) / 146097)
 #endif /* !__daystoyears */
 
 #ifndef __yearstodays
-#define __yearstodays(n_years) (((146097*(n_years))/400)/*-1*/) /* rounding error? */
+#define __yearstodays(n_years) (((146097 * (n_years)) / 400) /*-1*/) /* rounding error? */
 #endif /* !__yearstodays */
 
 #ifndef NULL

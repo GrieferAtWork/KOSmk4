@@ -27,6 +27,7 @@
 /* (#) Portability: OpenBSD       (/sys/sys/utsname.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/uts/common/sys/utsname.h) */
 /* (#) Portability: diet libc     (/include/sys/utsname.h) */
+/* (#) Portability: libc4/5       (/include/sys/utsname.h) */
 /* (#) Portability: musl libc     (/include/sys/utsname.h) */
 /* (#) Portability: uClibc        (/include/sys/utsname.h) */
 }

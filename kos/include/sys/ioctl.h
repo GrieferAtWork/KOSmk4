@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x203ffe0b */
+/* HASH CRC-32:0x89d7f286 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,6 +26,7 @@
 /* (#) Portability: OpenBSD       (/sys/sys/ioctl.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/uts/common/sys/ioctl.h) */
 /* (#) Portability: diet libc     (/include/sys/ioctl.h) */
+/* (#) Portability: libc4/5       (/include/sys/ioctl.h) */
 /* (#) Portability: musl libc     (/include/sys/ioctl.h) */
 /* (#) Portability: uClibc        (/include/sys/ioctl.h) */
 #ifndef _SYS_IOCTL_H

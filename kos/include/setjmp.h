@@ -30,6 +30,8 @@
 /* (#) Portability: OpenBSD       (/include/setjmp.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/setjmp.h) */
 /* (#) Portability: diet libc     (/include/setjmp.h) */
+/* (#) Portability: libc4/5       (/include/setjmp.h) */
+/* (#) Portability: libc6         (/include/setjmp.h) */
 /* (#) Portability: musl libc     (/include/setjmp.h) */
 /* (#) Portability: uClibc        (/include/setjmp.h) */
 #ifndef _SETJMP_H

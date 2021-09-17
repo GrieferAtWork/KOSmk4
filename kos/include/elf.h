@@ -25,6 +25,8 @@
 /* (#) Portability: OpenBSD       (/include/elf.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/elf.h) */
 /* (#) Portability: diet libc     (/include/elf.h) */
+/* (#) Portability: libc4/5       (/include/elf.h) */
+/* (#) Portability: libc6         (/include/elf.h) */
 /* (#) Portability: musl libc     (/include/elf.h) */
 /* (#) Portability: uClibc        (/include/elf.h) */
 #ifndef _ELF_H

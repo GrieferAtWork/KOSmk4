@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe7f9ebb7 */
+/* HASH CRC-32:0xc16ae84f */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,6 +28,7 @@
 /* (#) Portability: OpenBSD       (/include/libgen.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/libgen.h) */
 /* (#) Portability: diet libc     (/include/libgen.h) */
+/* (#) Portability: libc6         (/include/libgen.h) */
 /* (#) Portability: musl libc     (/include/libgen.h) */
 /* (#) Portability: uClibc        (/include/libgen.h) */
 #ifndef _LIBGEN_H

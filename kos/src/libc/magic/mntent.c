@@ -23,6 +23,8 @@
 /* (#) Portability: GNU C Library (/misc/mntent.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/lib/libbc/inc/include/mntent.h) */
 /* (#) Portability: diet libc     (/include/mntent.h) */
+/* (#) Portability: libc4/5       (/include/mntent.h) */
+/* (#) Portability: libc6         (/include/mntent.h) */
 /* (#) Portability: musl libc     (/include/mntent.h) */
 /* (#) Portability: uClibc        (/include/mntent.h) */
 }

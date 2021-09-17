@@ -21,6 +21,8 @@
 /* (#) Portability: GNU C Library (/sysdeps/unix/sysv/linux/termio.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/termio.h) */
 /* (#) Portability: diet libc     (/include/termio.h) */
+/* (#) Portability: libc4/5       (/include/termio.h) */
+/* (#) Portability: libc6         (/include/termio.h) */
 /* (#) Portability: uClibc        (/include/termio.h) */
 #ifndef _TERMIO_H
 #define _TERMIO_H 1

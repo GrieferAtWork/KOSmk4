@@ -21,6 +21,7 @@
 /* (#) Portability: Cygwin        (/winsup/cygwin/include/error.h) */
 /* (#) Portability: GNU C Library (/misc/error.h) */
 /* (#) Portability: MinGW         (/mingw-w64-headers/include/error.h) */
+/* (#) Portability: libc6         (/include/error.h) */
 /* (#) Portability: uClibc        (/include/error.h) */
 }
 

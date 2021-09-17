@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4018dd2a */
+/* HASH CRC-32:0x5b0b36ab */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,6 +28,7 @@
 /* (#) Portability: OpenBSD       (/sys/sys/file.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/uts/common/sys/file.h) */
 /* (#) Portability: diet libc     (/include/sys/file.h) */
+/* (#) Portability: libc4/5       (/include/sys/file.h) */
 /* (#) Portability: musl libc     (/include/sys/file.h) */
 /* (#) Portability: uClibc        (/include/sys/file.h) */
 #ifndef _SYS_FILE_H

@@ -30,6 +30,8 @@
 /* (#) Portability: OpenBSD       (/include/limits.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/limits.h) */
 /* (#) Portability: diet libc     (/include/limits.h) */
+/* (#) Portability: libc4/5       (/include/limits.h) */
+/* (#) Portability: libc6         (/include/limits.h) */
 /* (#) Portability: musl libc     (/include/limits.h) */
 /* (#) Portability: uClibc        (/include/limits.h) */
 #ifndef _LIMITS_H

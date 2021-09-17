@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdd8bafdd */
+/* HASH CRC-32:0x99a49946 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,6 +23,7 @@
 /* (#) Portability: GNU C Library (/misc/sys/sysmacros.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/uts/common/sys/sysmacros.h) */
 /* (#) Portability: diet libc     (/include/sys/sysmacros.h) */
+/* (#) Portability: libc4/5       (/include/sys/sysmacros.h) */
 /* (#) Portability: musl libc     (/include/sys/sysmacros.h) */
 /* (#) Portability: uClibc        (/include/sys/sysmacros.h) */
 #ifndef _SYS_SYSMACROS_H

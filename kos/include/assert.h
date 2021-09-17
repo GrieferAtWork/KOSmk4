@@ -31,6 +31,8 @@
 /* (#) Portability: OpenSolaris   (/usr/src/head/assert.h) */
 /* (#) Portability: Windows Kits  (/ucrt/assert.h) */
 /* (#) Portability: diet libc     (/include/assert.h) */
+/* (#) Portability: libc4/5       (/include/assert.h) */
+/* (#) Portability: libc6         (/include/assert.h) */
 /* (#) Portability: musl libc     (/include/assert.h) */
 /* (#) Portability: uClibc        (/include/assert.h) */
 /**/

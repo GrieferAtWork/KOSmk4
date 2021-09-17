@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd15f78c2 */
+/* HASH CRC-32:0x9c7bb9fd */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,6 +32,8 @@
 /* (#) Portability: OpenSolaris   (/usr/src/head/signal.h) */
 /* (#) Portability: Windows Kits  (/ucrt/signal.h) */
 /* (#) Portability: diet libc     (/include/signal.h) */
+/* (#) Portability: libc4/5       (/include/signal.h) */
+/* (#) Portability: libc6         (/include/signal.h) */
 /* (#) Portability: musl libc     (/include/signal.h) */
 /* (#) Portability: uClibc        (/include/signal.h) */
 #ifndef _SIGNAL_H
@@ -43,7 +45,7 @@
 #else /* __CXX_SYSTEM_HEADER */
 /* Import all symbols into the global namespace when re-including "signal.h" after "csignal" */
 #ifndef __sig_atomic_t_defined
-#define __sig_atomic_t_defined 1
+#define __sig_atomic_t_defined
 __NAMESPACE_STD_USING(sig_atomic_t)
 #endif /* !__sig_atomic_t_defined */
 #if defined(__USE_XOPEN_EXTENDED) || defined(__USE_XOPEN2K8)
@@ -1114,28 +1116,28 @@ enum {
 
 #if (defined(__USE_POSIX199309) || defined(__USE_XOPEN_EXTENDED) || defined(__USE_KOS))
 #ifndef __sigevent_t_defined
-#define __sigevent_t_defined 1
+#define __sigevent_t_defined
 typedef struct sigevent sigevent_t;
 #endif /* !__sigevent_t_defined */
 #ifndef __siginfo_t_defined
-#define __siginfo_t_defined 1
+#define __siginfo_t_defined
 typedef struct __siginfo_struct siginfo_t;
 #endif /* !__siginfo_t_defined */
 #ifndef __sigval_t_defined
-#define __sigval_t_defined 1
+#define __sigval_t_defined
 typedef union sigval sigval_t;
 #endif /* !__sigval_t_defined */
 #endif /* __USE_POSIX199309 || __USE_XOPEN_EXTENDED || __USE_KOS */
 
 #if defined(__USE_XOPEN_EXTENDED) || defined(__USE_XOPEN2K8)
 #ifndef __stack_t_defined
-#define __stack_t_defined 1
+#define __stack_t_defined
 typedef struct sigaltstack stack_t;
 #endif /* !__stack_t_defined */
 #endif /* __USE_XOPEN_EXTENDED || __USE_XOPEN2K8 */
 
 #ifndef __std_sig_atomic_t_defined
-#define __std_sig_atomic_t_defined 1
+#define __std_sig_atomic_t_defined
 __NAMESPACE_STD_BEGIN
 /* An integral type  that can be  modified atomically, without  the
  * possibility of a signal arriving in the middle of the operation. */
@@ -1144,37 +1146,37 @@ __NAMESPACE_STD_END
 #endif /* !__std_sig_atomic_t_defined */
 #ifndef __CXX_SYSTEM_HEADER
 #ifndef __sig_atomic_t_defined
-#define __sig_atomic_t_defined 1
+#define __sig_atomic_t_defined
 __NAMESPACE_STD_USING(sig_atomic_t)
 #endif /* !__sig_atomic_t_defined */
 #endif /* !__CXX_SYSTEM_HEADER */
 
 #ifdef __USE_POSIX
 #ifndef __sigset_t_defined
-#define __sigset_t_defined 1
+#define __sigset_t_defined
 typedef struct __sigset_struct sigset_t;
 #endif /* !__sigset_t_defined */
 #endif /* __USE_POSIX */
 
 #if defined(__USE_XOPEN) || defined(__USE_XOPEN2K)
 #ifndef __pid_t_defined
-#define __pid_t_defined 1
+#define __pid_t_defined
 typedef __pid_t pid_t;
 #endif /* !__pid_t_defined */
 #ifndef __uid_t_defined
-#define __uid_t_defined 1
+#define __uid_t_defined
 typedef __uid_t uid_t;
 #endif /* !__uid_t_defined */
 #endif /* __USE_XOPEN || __USE_XOPEN2K */
 
 #ifndef ____sighandler_t_defined
-#define ____sighandler_t_defined 1
+#define ____sighandler_t_defined
 typedef void (__LIBKCALL *__sighandler_t)(int __signo);
 #endif /* !____sighandler_t_defined */
 
 #ifdef __USE_GNU
 #ifndef __sighandler_t_defined
-#define __sighandler_t_defined 1
+#define __sighandler_t_defined
 typedef __sighandler_t sighandler_t;
 #endif /* !__sighandler_t_defined */
 #endif /* __USE_GNU */
@@ -1183,7 +1185,10 @@ typedef __sighandler_t sighandler_t;
 #ifndef NSIG
 #define NSIG _NSIG
 #endif /* !NSIG */
+#ifndef __sig_t_defined
+#define __sig_t_defined
 typedef __sighandler_t sig_t;
+#endif /* !__sig_t_defined */
 #endif /* __USE_MISC */
 
 #ifndef __PRIVATE_SIGSET_VALIDATE_SIGNO

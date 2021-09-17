@@ -26,6 +26,7 @@
 /* (#) Portability: OpenBSD       (/include/cpio.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/cpio.h) */
 /* (#) Portability: diet libc     (/include/cpio.h) */
+/* (#) Portability: libc6         (/include/cpio.h) */
 /* (#) Portability: musl libc     (/include/cpio.h) */
 /* (#) Portability: uClibc        (/include/cpio.h) */
 #ifndef _CPIO_H

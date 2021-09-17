@@ -27,6 +27,7 @@
 /* (#) Portability: OpenBSD       (/sys/sys/cdefs.h) */
 /* (#) Portability: diet libc     (/include/sys/cdefs.h) */
 /* (#) Portability: libbsd        (/include/bsd/sys/cdefs.h) */
+/* (#) Portability: libc4/5       (/include/sys/cdefs.h) */
 /* (#) Portability: uClibc        (/include/sys/cdefs.h) */
 #ifndef _SYS_CDEFS_H
 #define _SYS_CDEFS_H 1

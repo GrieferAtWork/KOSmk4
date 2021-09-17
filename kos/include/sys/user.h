@@ -21,6 +21,7 @@
 /* (#) Portability: GNU C Library (/sysdeps/unix/sysv/linux/sys/user.h) */
 /* (#) Portability: OpenBSD       (/sys/sys/user.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/uts/common/sys/user.h) */
+/* (#) Portability: libc4/5       (/include/sys/user.h) */
 /* (#) Portability: musl libc     (/include/sys/user.h) */
 #ifndef _SYS_USER_H
 #define _SYS_USER_H 1

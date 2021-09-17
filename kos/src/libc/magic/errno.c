@@ -31,6 +31,8 @@
 /* (#) Portability: OpenSolaris   (/usr/src/head/errno.h) */
 /* (#) Portability: Windows Kits  (/ucrt/errno.h) */
 /* (#) Portability: diet libc     (/include/errno.h) */
+/* (#) Portability: libc4/5       (/include/errno.h) */
+/* (#) Portability: libc6         (/include/errno.h) */
 /* (#) Portability: musl libc     (/include/errno.h) */
 /* (#) Portability: uClibc        (/include/errno.h) */
 }

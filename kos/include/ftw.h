@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc86cd505 */
+/* HASH CRC-32:0xf8cb6a38 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,6 +28,8 @@
 /* (#) Portability: OpenBSD       (/include/ftw.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/ftw.h) */
 /* (#) Portability: diet libc     (/include/ftw.h) */
+/* (#) Portability: libc4/5       (/include/ftw.h) */
+/* (#) Portability: libc6         (/include/ftw.h) */
 /* (#) Portability: musl libc     (/include/ftw.h) */
 /* (#) Portability: uClibc        (/include/ftw.h) */
 #ifndef _FTW_H

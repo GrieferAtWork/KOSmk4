@@ -25,6 +25,7 @@
 /* (#) Portability: OpenBSD       (/sys/sys/mount.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/uts/common/sys/mount.h) */
 /* (#) Portability: diet libc     (/include/sys/mount.h) */
+/* (#) Portability: libc4/5       (/include/sys/mount.h) */
 /* (#) Portability: musl libc     (/include/sys/mount.h) */
 /* (#) Portability: uClibc        (/include/sys/mount.h) */
 }

@@ -26,6 +26,7 @@
 /* (#) Portability: OpenBSD       (/sys/sys/ioctl.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/uts/common/sys/ioctl.h) */
 /* (#) Portability: diet libc     (/include/sys/ioctl.h) */
+/* (#) Portability: libc4/5       (/include/sys/ioctl.h) */
 /* (#) Portability: musl libc     (/include/sys/ioctl.h) */
 /* (#) Portability: uClibc        (/include/sys/ioctl.h) */
 }

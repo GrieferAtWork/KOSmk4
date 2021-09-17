@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb91bf0aa */
+/* HASH CRC-32:0x4cbf5f95 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,6 +25,7 @@
 /* (#) Portability: OpenBSD       (/sys/sys/mount.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/uts/common/sys/mount.h) */
 /* (#) Portability: diet libc     (/include/sys/mount.h) */
+/* (#) Portability: libc4/5       (/include/sys/mount.h) */
 /* (#) Portability: musl libc     (/include/sys/mount.h) */
 /* (#) Portability: uClibc        (/include/sys/mount.h) */
 #ifndef _SYS_MOUNT_H

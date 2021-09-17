@@ -22,6 +22,8 @@
 /* (#) Portability: Newlib        (/newlib/libc/include/alloca.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/alloca.h) */
 /* (#) Portability: diet libc     (/include/alloca.h) */
+/* (#) Portability: libc4/5       (/include/alloca.h) */
+/* (#) Portability: libc6         (/include/alloca.h) */
 /* (#) Portability: musl libc     (/include/alloca.h) */
 /* (#) Portability: uClibc        (/include/alloca.h) */
 #ifndef _ALLOCA_H

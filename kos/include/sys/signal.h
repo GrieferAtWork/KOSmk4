@@ -25,6 +25,7 @@
 /* (#) Portability: OpenBSD       (/sys/sys/signal.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/uts/common/sys/signal.h) */
 /* (#) Portability: diet libc     (/include/sys/signal.h) */
+/* (#) Portability: libc4/5       (/include/sys/signal.h) */
 /* (#) Portability: musl libc     (/include/sys/signal.h) */
 /* (#) Portability: uClibc        (/include/sys/signal.h) */
 #ifndef _SYS_SIGNAL_H

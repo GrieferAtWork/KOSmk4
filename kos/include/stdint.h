@@ -27,6 +27,7 @@
 /* (#) Portability: Newlib        (/newlib/libc/include/stdint.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/stdint.h) */
 /* (#) Portability: diet libc     (/include/stdint.h) */
+/* (#) Portability: libc6         (/include/stdint.h) */
 /* (#) Portability: musl libc     (/include/stdint.h) */
 /* (#) Portability: uClibc        (/include/stdint.h) */
 #ifndef _STDINT_H

@@ -23,6 +23,8 @@
 /* (#) Portability: OpenBSD       (/sys/net/if_arp.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/uts/common/net/if_arp.h) */
 /* (#) Portability: diet libc     (/include/net/if_arp.h) */
+/* (#) Portability: libc4/5       (/include/net/if_arp.h) */
+/* (#) Portability: libc6         (/include/net/if_arp.h) */
 /* (#) Portability: musl libc     (/include/net/if_arp.h) */
 /* (#) Portability: uClibc        (/include/net/if_arp.h) */
 #ifndef _NET_IF_ARP_H

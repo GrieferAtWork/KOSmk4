@@ -25,6 +25,7 @@
 /* (#) Portability: OpenBSD       (/sys/sys/syslog.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/uts/common/sys/syslog.h) */
 /* (#) Portability: diet libc     (/include/sys/syslog.h) */
+/* (#) Portability: libc4/5       (/include/sys/syslog.h) */
 /* (#) Portability: musl libc     (/include/sys/syslog.h) */
 /* (#) Portability: uClibc        (/include/sys/syslog.h) */
 }

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9705cccc */
+/* HASH CRC-32:0x353b62c5 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,6 +30,7 @@
 /* (#) Portability: OpenSolaris   (/usr/src/uts/common/sys/time.h) */
 /* (#) Portability: diet libc     (/include/sys/time.h) */
 /* (#) Portability: libbsd        (/include/bsd/sys/time.h) */
+/* (#) Portability: libc4/5       (/include/sys/time.h) */
 /* (#) Portability: musl libc     (/include/sys/time.h) */
 /* (#) Portability: uClibc        (/include/sys/time.h) */
 #ifndef _SYS_TIME_H

@@ -21,6 +21,7 @@
 /* (#) Portability: GNU C Library (/misc/sgtty.h) */
 /* (#) Portability: NetBSD        (/include/sgtty.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/sgtty.h) */
+/* (#) Portability: libc6         (/include/sgtty.h) */
 /* (#) Portability: uClibc        (/include/sgtty.h) */
 }
 

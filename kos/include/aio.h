@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x450d8770 */
+/* HASH CRC-32:0xd1272258 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,6 +23,7 @@
 /* (#) Portability: GNU C Library (/rt/aio.h) */
 /* (#) Portability: NetBSD        (/include/aio.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/aio.h) */
+/* (#) Portability: libc6         (/include/aio.h) */
 /* (#) Portability: musl libc     (/include/aio.h) */
 #ifndef _AIO_H
 #define _AIO_H 1

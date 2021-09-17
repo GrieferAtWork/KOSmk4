@@ -28,6 +28,8 @@
 /* (#) Portability: OpenSolaris   (/usr/src/head/fcntl.h) */
 /* (#) Portability: Windows Kits  (/ucrt/fcntl.h) */
 /* (#) Portability: diet libc     (/include/fcntl.h) */
+/* (#) Portability: libc4/5       (/include/fcntl.h) */
+/* (#) Portability: libc6         (/include/fcntl.h) */
 /* (#) Portability: musl libc     (/include/fcntl.h) */
 /* (#) Portability: uClibc        (/include/fcntl.h) */
 }

@@ -20,6 +20,7 @@
 %(c_prefix){
 /* (>) Standard: POSIX.2 (Issue 4, IEEE Std 1003.2-1992) */
 /* (#) Portability: OpenSolaris (/usr/src/head/stropts.h) */
+/* (#) Portability: libc6       (/include/stropts.h) */
 /* (#) Portability: musl libc   (/include/stropts.h) */
 }
 

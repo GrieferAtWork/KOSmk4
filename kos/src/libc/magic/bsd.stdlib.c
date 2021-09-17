@@ -18,7 +18,8 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 %(c_prefix){
-/* (#) Portability: libbsd (/include/bsd/stdlib.h) */
+/* (#) Portability: libbsd  (/include/bsd/stdlib.h) */
+/* (#) Portability: libc4/5 (/include/bsd/stdlib.h) */
 }
 
 %[insert:prefix(

@@ -28,6 +28,7 @@
 /* (#) Portability: OpenBSD       (/sys/sys/wait.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/uts/common/sys/wait.h) */
 /* (#) Portability: diet libc     (/include/sys/wait.h) */
+/* (#) Portability: libc4/5       (/include/sys/wait.h) */
 /* (#) Portability: musl libc     (/include/sys/wait.h) */
 /* (#) Portability: uClibc        (/include/sys/wait.h) */
 }

@@ -129,6 +129,17 @@ install_header termcap.h
 install_header_ex "$SRCPATH/include/tic.h" tic.h
 install_header unctrl.h
 
+# The following header is actually derived from libc4/5,
+# but references curses, so we can only install it now!
+install_rawfile_stdin "$KOS_ROOT/kos/include/bsd/curses.h" <<EOF
+/* (#) Portability: libc4/5 (/include/bsd/curses.h) */
+#include "../curses.h"
+#include "../sgtty.h"
+EOF
+
+
+
+
 # C++ headers
 install_header_ex "$SRCPATH/c++/cursesapp.h" cursesapp.h
 install_header_ex "$SRCPATH/c++/cursesf.h" cursesf.h

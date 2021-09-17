@@ -23,6 +23,7 @@
 /* (#) Portability: Newlib        (/newlib/libc/include/stdio_ext.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/stdio_ext.h) */
 /* (#) Portability: diet libc     (/include/stdio_ext.h) */
+/* (#) Portability: libc6         (/include/stdio_ext.h) */
 /* (#) Portability: musl libc     (/include/stdio_ext.h) */
 /* (#) Portability: uClibc        (/include/stdio_ext.h) */
 }

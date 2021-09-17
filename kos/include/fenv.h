@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7381c9aa */
+/* HASH CRC-32:0x865bac73 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,6 +29,7 @@
 /* (#) Portability: OpenBSD       (/include/fenv.h) */
 /* (#) Portability: Windows Kits  (/ucrt/fenv.h) */
 /* (#) Portability: diet libc     (/include/fenv.h) */
+/* (#) Portability: libc6         (/include/fenv.h) */
 /* (#) Portability: musl libc     (/include/fenv.h) */
 /* (#) Portability: uClibc        (/include/fenv.h) */
 #ifndef _FENV_H

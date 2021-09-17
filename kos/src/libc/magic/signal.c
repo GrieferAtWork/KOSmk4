@@ -32,6 +32,8 @@
 /* (#) Portability: OpenSolaris   (/usr/src/head/signal.h) */
 /* (#) Portability: Windows Kits  (/ucrt/signal.h) */
 /* (#) Portability: diet libc     (/include/signal.h) */
+/* (#) Portability: libc4/5       (/include/signal.h) */
+/* (#) Portability: libc6         (/include/signal.h) */
 /* (#) Portability: musl libc     (/include/signal.h) */
 /* (#) Portability: uClibc        (/include/signal.h) */
 }
@@ -1124,28 +1126,28 @@ enum {
 
 #if (defined(__USE_POSIX199309) || defined(__USE_XOPEN_EXTENDED) || defined(__USE_KOS))
 #ifndef __sigevent_t_defined
-#define __sigevent_t_defined 1
+#define __sigevent_t_defined
 typedef struct sigevent sigevent_t;
 #endif /* !__sigevent_t_defined */
 #ifndef __siginfo_t_defined
-#define __siginfo_t_defined 1
+#define __siginfo_t_defined
 typedef struct __siginfo_struct siginfo_t;
 #endif /* !__siginfo_t_defined */
 #ifndef __sigval_t_defined
-#define __sigval_t_defined 1
+#define __sigval_t_defined
 typedef union sigval sigval_t;
 #endif /* !__sigval_t_defined */
 #endif /* __USE_POSIX199309 || __USE_XOPEN_EXTENDED || __USE_KOS */
 
 #if defined(__USE_XOPEN_EXTENDED) || defined(__USE_XOPEN2K8)
 #ifndef __stack_t_defined
-#define __stack_t_defined 1
+#define __stack_t_defined
 typedef struct sigaltstack stack_t;
 #endif /* !__stack_t_defined */
 #endif /* __USE_XOPEN_EXTENDED || __USE_XOPEN2K8 */
 
 #ifndef __std_sig_atomic_t_defined
-#define __std_sig_atomic_t_defined 1
+#define __std_sig_atomic_t_defined
 __NAMESPACE_STD_BEGIN
 /* An integral type  that can be  modified atomically, without  the
  * possibility of a signal arriving in the middle of the operation. */
@@ -1155,7 +1157,7 @@ __NAMESPACE_STD_END
 #ifndef __CXX_SYSTEM_HEADER
 }%(c, ccompat){
 #ifndef __sig_atomic_t_defined
-#define __sig_atomic_t_defined 1
+#define __sig_atomic_t_defined
 __NAMESPACE_STD_USING(sig_atomic_t)
 #endif /* !__sig_atomic_t_defined */
 }%{
@@ -1163,30 +1165,30 @@ __NAMESPACE_STD_USING(sig_atomic_t)
 
 #ifdef __USE_POSIX
 #ifndef __sigset_t_defined
-#define __sigset_t_defined 1
+#define __sigset_t_defined
 typedef struct __sigset_struct sigset_t;
 #endif /* !__sigset_t_defined */
 #endif /* __USE_POSIX */
 
 #if defined(__USE_XOPEN) || defined(__USE_XOPEN2K)
 #ifndef __pid_t_defined
-#define __pid_t_defined 1
+#define __pid_t_defined
 typedef __pid_t pid_t;
 #endif /* !__pid_t_defined */
 #ifndef __uid_t_defined
-#define __uid_t_defined 1
+#define __uid_t_defined
 typedef __uid_t uid_t;
 #endif /* !__uid_t_defined */
 #endif /* __USE_XOPEN || __USE_XOPEN2K */
 
 #ifndef ____sighandler_t_defined
-#define ____sighandler_t_defined 1
+#define ____sighandler_t_defined
 typedef void (__LIBKCALL *__sighandler_t)(int __signo);
 #endif /* !____sighandler_t_defined */
 
 #ifdef __USE_GNU
 #ifndef __sighandler_t_defined
-#define __sighandler_t_defined 1
+#define __sighandler_t_defined
 typedef __sighandler_t sighandler_t;
 #endif /* !__sighandler_t_defined */
 #endif /* __USE_GNU */
@@ -1195,7 +1197,10 @@ typedef __sighandler_t sighandler_t;
 #ifndef NSIG
 #define NSIG _NSIG
 #endif /* !NSIG */
+#ifndef __sig_t_defined
+#define __sig_t_defined
 typedef __sighandler_t sig_t;
+#endif /* !__sig_t_defined */
 #endif /* __USE_MISC */
 
 }
@@ -1369,13 +1374,13 @@ int gsignal($signo_t signo) {
 @@@return: 0: Success
 [[deprecated("Using `sigprocmask(SIG_BLOCK)' instead")]]
 [[requires_include("<asm/os/signal.h>")]]
-[[requires(defined(@__SIG_BLOCK@) && $has_function(sigprocmask))]]
+[[requires(defined(__SIG_BLOCK) && $has_function(sigprocmask))]]
 [[impl_include("<asm/os/signal.h>", "<bits/os/sigset.h>")]]
 int sigblock(int mask) {
 	sigset_t sigset;
 	sigemptyset(&sigset);
 	sigset.@__val@[0] = (uintptr_t)(unsigned int)mask;
-	return sigprocmask(@__SIG_BLOCK@, &sigset, NULL);
+	return sigprocmask(__SIG_BLOCK, &sigset, NULL);
 }
 
 @@>> sigsetmask(3)
@@ -1384,13 +1389,13 @@ int sigblock(int mask) {
 @@@return: 0: Success
 [[deprecated("Using `sigprocmask()' instead")]]
 [[requires_include("<asm/os/signal.h>")]]
-[[requires(defined(@__SIG_SETMASK@) && $has_function(sigprocmask))]]
+[[requires(defined(__SIG_SETMASK) && $has_function(sigprocmask))]]
 [[impl_include("<asm/os/signal.h>", "<bits/os/sigset.h>")]]
 int sigsetmask(int mask) {
 	sigset_t sigset;
 	sigemptyset(&sigset);
 	sigset.@__val@[0] = (uintptr_t)(unsigned int)mask;
-	return sigprocmask(@__SIG_SETMASK@, &sigset, NULL);
+	return sigprocmask(__SIG_SETMASK, &sigset, NULL);
 }
 
 @@>> sigsetmask(3)
@@ -1404,8 +1409,8 @@ int sigsetmask(int mask) {
 [[impl_include("<asm/os/signal.h>", "<bits/os/sigset.h>", "<hybrid/typecore.h>")]]
 int siggetmask(void) {
 	sigset_t sigset;
-@@pp_if defined(@__SIG_SETMASK@)@@
-	if (sigprocmask(@__SIG_SETMASK@, NULL, &sigset))
+@@pp_if defined(__SIG_SETMASK)@@
+	if (sigprocmask(__SIG_SETMASK, NULL, &sigset))
 		return -1;
 @@pp_else@@
 	if (sigprocmask(0, NULL, &sigset))
@@ -1422,7 +1427,7 @@ int siggetmask(void) {
 #define sys_siglist _sys_siglist
 #else /* _sys_siglist */
 }
-[[guard, nothrow, const, wunused, nonnull]]
+[[guard, const, wunused, nothrow, nonnull]]
 char const *const *__p_sys_siglist();
 %{
 #ifdef ____p_sys_siglist_defined

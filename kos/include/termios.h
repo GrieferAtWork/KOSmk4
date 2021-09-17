@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x239dba80 */
+/* HASH CRC-32:0xcc025712 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,6 +26,8 @@
 /* (#) Portability: Newlib        (/newlib/libc/include/termios.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/termios.h) */
 /* (#) Portability: diet libc     (/include/termios.h) */
+/* (#) Portability: libc4/5       (/include/termios.h) */
+/* (#) Portability: libc6         (/include/termios.h) */
 /* (#) Portability: musl libc     (/include/termios.h) */
 /* (#) Portability: uClibc        (/include/termios.h) */
 #ifndef _TERMIOS_H

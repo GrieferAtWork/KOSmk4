@@ -26,6 +26,7 @@
 /* (#) Portability: OpenBSD       (/sys/sys/sem.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/uts/common/sys/sem.h) */
 /* (#) Portability: diet libc     (/include/sys/sem.h) */
+/* (#) Portability: libc4/5       (/include/sys/sem.h) */
 /* (#) Portability: musl libc     (/include/sys/sem.h) */
 /* (#) Portability: uClibc        (/include/sys/sem.h) */
 }

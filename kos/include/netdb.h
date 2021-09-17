@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xec36259f */
+/* HASH CRC-32:0x8271b1a6 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,6 +26,8 @@
 /* (#) Portability: OpenBSD       (/include/netdb.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/netdb.h) */
 /* (#) Portability: diet libc     (/include/netdb.h) */
+/* (#) Portability: libc4/5       (/include/netdb.h) */
+/* (#) Portability: libc6         (/include/netdb.h) */
 /* (#) Portability: musl libc     (/include/netdb.h) */
 /* (#) Portability: uClibc        (/include/netdb.h) */
 #ifndef _NETDB_H

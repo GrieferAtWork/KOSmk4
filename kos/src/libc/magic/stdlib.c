@@ -33,6 +33,8 @@
 /* (#) Portability: Windows Kits  (/ucrt/stdlib.h) */
 /* (#) Portability: diet libc     (/include/stdlib.h) */
 /* (#) Portability: libbsd        (/include/bsd/stdlib.h) */
+/* (#) Portability: libc4/5       (/include/stdlib.h) */
+/* (#) Portability: libc6         (/include/stdlib.h) */
 /* (#) Portability: musl libc     (/include/stdlib.h) */
 /* (#) Portability: uClibc        (/include/stdlib.h) */
 }
@@ -4900,7 +4902,7 @@ int _atoldbl_l([[nonnull]] __LONGDOUBLE *__restrict result,
 %#endif /* !__NO_FPU */
 
 
-[[nothrow, const, section(".text.crt.dos.math.utility")]]
+[[const, nothrow, section(".text.crt.dos.math.utility")]]
 [[impl_include("<hybrid/__rotate.h>")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == __SIZEOF_LONG__), alias("_lrotl")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == 8), alias("_rotl64")]]
@@ -4908,7 +4910,7 @@ unsigned int _rotl(unsigned int val, int shift) {
 	return __hybrid_rol(val, shift);
 }
 
-[[nothrow, const, section(".text.crt.dos.math.utility")]]
+[[const, nothrow, section(".text.crt.dos.math.utility")]]
 [[impl_include("<hybrid/__rotate.h>")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == __SIZEOF_LONG__), alias("_lrotr")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == 8), alias("_rotr64")]]
@@ -4917,7 +4919,7 @@ unsigned int _rotr(unsigned int val, int shift) {
 }
 
 %#ifdef __UINT64_TYPE__
-[[nothrow, const, section(".text.crt.dos.math.utility")]]
+[[const, nothrow, section(".text.crt.dos.math.utility")]]
 [[impl_include("<hybrid/__rotate.h>")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 8), alias("_lrotl")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == 8), alias("_rotl")]]
@@ -4925,7 +4927,7 @@ $u64 _rotl64($u64 val, int shift) {
 	return __hybrid_rol64(val, shift);
 }
 
-[[nothrow, const, section(".text.crt.dos.math.utility")]]
+[[const, nothrow, section(".text.crt.dos.math.utility")]]
 [[impl_include("<hybrid/__rotate.h>")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 8), alias("_lrotr")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == 8), alias("_rotr")]]
@@ -4934,7 +4936,7 @@ $u64 _rotr64($u64 val, int shift) {
 }
 %#endif /* __UINT64_TYPE__ */
 
-[[nothrow, const, section(".text.crt.dos.math.utility")]]
+[[const, nothrow, section(".text.crt.dos.math.utility")]]
 [[impl_include("<hybrid/__rotate.h>")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == __SIZEOF_INT__), alias("_rotl")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 8), alias("_rotl64")]]
@@ -4942,7 +4944,7 @@ unsigned long _lrotl(unsigned long val, int shift) {
 	return __hybrid_rol(val, shift);
 }
 
-[[nothrow, const, section(".text.crt.dos.math.utility")]]
+[[const, nothrow, section(".text.crt.dos.math.utility")]]
 [[impl_include("<hybrid/__rotate.h>")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == __SIZEOF_INT__), alias("_rotr")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 8), alias("_rotr64")]]

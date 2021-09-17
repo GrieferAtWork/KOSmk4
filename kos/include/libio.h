@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1e811814 */
+/* HASH CRC-32:0x64e1adce */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,6 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 /* (#) Portability: GNU C Library (/libio/libio.h) */
+/* (#) Portability: libc4/5       (/include/libio.h) */
 #ifndef _LIBIO_H
 #define _LIBIO_H 1
 

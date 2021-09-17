@@ -32,6 +32,8 @@
 /* (#) Portability: OpenSolaris   (/usr/src/head/locale.h) */
 /* (#) Portability: Windows Kits  (/ucrt/locale.h) */
 /* (#) Portability: diet libc     (/include/locale.h) */
+/* (#) Portability: libc4/5       (/include/locale.h) */
+/* (#) Portability: libc6         (/include/locale.h) */
 /* (#) Portability: musl libc     (/include/locale.h) */
 /* (#) Portability: uClibc        (/include/locale.h) */
 }

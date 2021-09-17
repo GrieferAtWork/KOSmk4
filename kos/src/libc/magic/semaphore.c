@@ -27,6 +27,7 @@
 /* (#) Portability: OpenBSD       (/include/semaphore.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/semaphore.h) */
 /* (#) Portability: diet libc     (/include/semaphore.h) */
+/* (#) Portability: libc6         (/include/semaphore.h) */
 /* (#) Portability: musl libc     (/include/semaphore.h) */
 /* (#) Portability: uClibc        (/libpthread/nptl/semaphore.h) */
 }

@@ -25,6 +25,7 @@
 /* (#) Portability: NetBSD        (/include/mqueue.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/mqueue.h) */
 /* (#) Portability: diet libc     (/include/mqueue.h) */
+/* (#) Portability: libc6         (/include/mqueue.h) */
 /* (#) Portability: musl libc     (/include/mqueue.h) */
 /* (#) Portability: uClibc        (/include/mqueue.h) */
 }

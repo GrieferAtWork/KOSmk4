@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc65251e5 */
+/* HASH CRC-32:0x4cd4b7a */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,6 +26,8 @@
 /* (#) Portability: OpenBSD       (/sys/net/if.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/uts/common/net/if.h) */
 /* (#) Portability: diet libc     (/include/net/if.h) */
+/* (#) Portability: libc4/5       (/include/net/if.h) */
+/* (#) Portability: libc6         (/include/net/if.h) */
 /* (#) Portability: musl libc     (/include/net/if.h) */
 /* (#) Portability: uClibc        (/include/net/if.h) */
 #ifndef _NET_IF_H

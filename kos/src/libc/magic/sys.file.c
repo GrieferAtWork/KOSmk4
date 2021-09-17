@@ -28,6 +28,7 @@
 /* (#) Portability: OpenBSD       (/sys/sys/file.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/uts/common/sys/file.h) */
 /* (#) Portability: diet libc     (/include/sys/file.h) */
+/* (#) Portability: libc4/5       (/include/sys/file.h) */
 /* (#) Portability: musl libc     (/include/sys/file.h) */
 /* (#) Portability: uClibc        (/include/sys/file.h) */
 }

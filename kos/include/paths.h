@@ -24,6 +24,8 @@
 /* (#) Portability: Newlib        (/newlib/libc/include/paths.h) */
 /* (#) Portability: OpenBSD       (/include/paths.h) */
 /* (#) Portability: diet libc     (/include/paths.h) */
+/* (#) Portability: libc4/5       (/include/paths.h) */
+/* (#) Portability: libc6         (/include/paths.h) */
 /* (#) Portability: musl libc     (/include/paths.h) */
 /* (#) Portability: uClibc        (/include/paths.h) */
 #ifndef _PATHS_H

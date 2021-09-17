@@ -21,6 +21,7 @@
 /* (#) Portability: GNU C Library (/sysdeps/unix/sysv/linux/sys/kd.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/uts/common/sys/kd.h) */
 /* (#) Portability: diet libc     (/include/sys/kd.h) */
+/* (#) Portability: libc4/5       (/include/sys/kd.h) */
 /* (#) Portability: musl libc     (/include/sys/kd.h) */
 /* (#) Portability: uClibc        (/include/sys/kd.h) */
 #ifndef _SYS_KD_H

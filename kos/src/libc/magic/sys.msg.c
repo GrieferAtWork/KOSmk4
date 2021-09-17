@@ -26,6 +26,7 @@
 /* (#) Portability: OpenBSD       (/sys/sys/msg.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/uts/common/sys/msg.h) */
 /* (#) Portability: diet libc     (/include/sys/msg.h) */
+/* (#) Portability: libc4/5       (/include/sys/msg.h) */
 /* (#) Portability: musl libc     (/include/sys/msg.h) */
 /* (#) Portability: uClibc        (/include/sys/msg.h) */
 }

@@ -26,6 +26,8 @@
 /* (#) Portability: Newlib        (/newlib/libc/include/termios.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/termios.h) */
 /* (#) Portability: diet libc     (/include/termios.h) */
+/* (#) Portability: libc4/5       (/include/termios.h) */
+/* (#) Portability: libc6         (/include/termios.h) */
 /* (#) Portability: musl libc     (/include/termios.h) */
 /* (#) Portability: uClibc        (/include/termios.h) */
 }

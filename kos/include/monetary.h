@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x134842f2 */
+/* HASH CRC-32:0x12f6f199 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,6 +24,7 @@
 /* (#) Portability: GNU C Library (/stdlib/monetary.h) */
 /* (#) Portability: NetBSD        (/include/monetary.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/monetary.h) */
+/* (#) Portability: libc6         (/include/monetary.h) */
 /* (#) Portability: musl libc     (/include/monetary.h) */
 #ifndef _MONETARY_H
 #define _MONETARY_H 1

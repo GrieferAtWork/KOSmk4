@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf07aea12 */
+/* HASH CRC-32:0x76b1e358 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,6 +28,7 @@
 /* (#) Portability: OpenBSD       (/sys/sys/wait.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/uts/common/sys/wait.h) */
 /* (#) Portability: diet libc     (/include/sys/wait.h) */
+/* (#) Portability: libc4/5       (/include/sys/wait.h) */
 /* (#) Portability: musl libc     (/include/sys/wait.h) */
 /* (#) Portability: uClibc        (/include/sys/wait.h) */
 #ifndef _SYS_WAIT_H

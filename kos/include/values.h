@@ -21,6 +21,8 @@
 /* (#) Portability: GNU C Library (/include/values.h) */
 /* (#) Portability: MinGW         (/include/values.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/values.h) */
+/* (#) Portability: libc4/5       (/include/values.h) */
+/* (#) Portability: libc6         (/include/values.h) */
 /* (#) Portability: musl libc     (/include/values.h) */
 /* (#) Portability: uClibc        (/include/values.h) */
 #ifndef _VALUES_H

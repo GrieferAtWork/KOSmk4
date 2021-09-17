@@ -23,6 +23,7 @@
 /* (#) Portability: OpenBSD       (/sys/netinet/if_ether.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/uts/common/netinet/if_ether.h) */
 /* (#) Portability: diet libc     (/include/netinet/if_ether.h) */
+/* (#) Portability: libc6         (/include/netinet/if_ether.h) */
 /* (#) Portability: musl libc     (/include/netinet/if_ether.h) */
 /* (#) Portability: uClibc        (/include/netinet/if_ether.h) */
 #ifndef _NETINET_IF_ETHER_H

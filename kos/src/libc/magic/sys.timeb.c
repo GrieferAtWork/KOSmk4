@@ -29,6 +29,7 @@
 /* (#) Portability: OpenSolaris   (/usr/src/uts/common/sys/timeb.h) */
 /* (#) Portability: Windows Kits  (/ucrt/sys/timeb.h) */
 /* (#) Portability: diet libc     (/include/sys/timeb.h) */
+/* (#) Portability: libc4/5       (/include/sys/timeb.h) */
 /* (#) Portability: musl libc     (/include/sys/timeb.h) */
 /* (#) Portability: uClibc        (/include/sys/timeb.h) */
 }

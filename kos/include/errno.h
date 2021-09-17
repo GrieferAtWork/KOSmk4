@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x393de74e */
+/* HASH CRC-32:0x7d1fefa3 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,6 +31,8 @@
 /* (#) Portability: OpenSolaris   (/usr/src/head/errno.h) */
 /* (#) Portability: Windows Kits  (/ucrt/errno.h) */
 /* (#) Portability: diet libc     (/include/errno.h) */
+/* (#) Portability: libc4/5       (/include/errno.h) */
+/* (#) Portability: libc6         (/include/errno.h) */
 /* (#) Portability: musl libc     (/include/errno.h) */
 /* (#) Portability: uClibc        (/include/errno.h) */
 #ifndef _ERRNO_H

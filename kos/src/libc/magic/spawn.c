@@ -26,6 +26,7 @@
 /* (#) Portability: Newlib        (/newlib/libc/include/spawn.h) */
 /* (#) Portability: OpenBSD       (/include/spawn.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/spawn.h) */
+/* (#) Portability: libc6         (/include/spawn.h) */
 /* (#) Portability: musl libc     (/include/spawn.h) */
 /* (#) Portability: uClibc        (/include/spawn.h) */
 }

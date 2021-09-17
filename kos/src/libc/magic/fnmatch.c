@@ -28,6 +28,8 @@
 /* (#) Portability: OpenBSD       (/include/fnmatch.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/fnmatch.h) */
 /* (#) Portability: diet libc     (/include/fnmatch.h) */
+/* (#) Portability: libc4/5       (/include/fnmatch.h) */
+/* (#) Portability: libc6         (/include/fnmatch.h) */
 /* (#) Portability: musl libc     (/include/fnmatch.h) */
 /* (#) Portability: uClibc        (/include/fnmatch.h) */
 }

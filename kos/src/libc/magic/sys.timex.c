@@ -23,6 +23,7 @@
 /* (#) Portability: NetBSD        (/sys/sys/timex.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/uts/common/sys/timex.h) */
 /* (#) Portability: diet libc     (/include/sys/timex.h) */
+/* (#) Portability: libc4/5       (/include/sys/timex.h) */
 /* (#) Portability: musl libc     (/include/sys/timex.h) */
 /* (#) Portability: uClibc        (/include/sys/timex.h) */
 }

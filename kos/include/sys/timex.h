@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbd1e8b53 */
+/* HASH CRC-32:0x3a276ad5 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,6 +23,7 @@
 /* (#) Portability: NetBSD        (/sys/sys/timex.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/uts/common/sys/timex.h) */
 /* (#) Portability: diet libc     (/include/sys/timex.h) */
+/* (#) Portability: libc4/5       (/include/sys/timex.h) */
 /* (#) Portability: musl libc     (/include/sys/timex.h) */
 /* (#) Portability: uClibc        (/include/sys/timex.h) */
 #ifndef _SYS_TIMEX_H

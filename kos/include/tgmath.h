@@ -24,6 +24,7 @@
 /* (#) Portability: Newlib        (/newlib/libc/include/tgmath.h) */
 /* (#) Portability: OpenBSD       (/include/tgmath.h) */
 /* (#) Portability: Windows Kits  (/ucrt/tgmath.h) */
+/* (#) Portability: libc6         (/include/tgmath.h) */
 /* (#) Portability: musl libc     (/include/tgmath.h) */
 /* (#) Portability: uClibc        (/include/tgmath.h) */
 #ifndef _TGMATH_H

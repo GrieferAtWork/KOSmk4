@@ -24,6 +24,7 @@
 /* (#) Portability: GNU C Library (/sysdeps/[...]/threads.h) */
 /* (#) Portability: Newlib        (/newlib/libc/include/threads.h) */
 /* (#) Portability: diet libc     (/include/threads.h) */
+/* (#) Portability: libc6         (/include/threads.h) */
 /* (#) Portability: musl libc     (/include/threads.h) */
 }
 

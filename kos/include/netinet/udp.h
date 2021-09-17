@@ -24,6 +24,8 @@
 /* (#) Portability: OpenBSD       (/sys/netinet/udp.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/uts/common/netinet/udp.h) */
 /* (#) Portability: diet libc     (/include/netinet/udp.h) */
+/* (#) Portability: libc4/5       (/include/netinet/udp.h) */
+/* (#) Portability: libc6         (/include/netinet/udp.h) */
 /* (#) Portability: musl libc     (/include/netinet/udp.h) */
 /* (#) Portability: uClibc        (/include/netinet/udp.h) */
 #ifndef __NETINET_UDP_H

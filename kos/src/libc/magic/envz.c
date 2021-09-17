@@ -21,6 +21,7 @@
 /* (#) Portability: Cygwin        (/newlib/libc/include/envz.h) */
 /* (#) Portability: GNU C Library (/string/envz.h) */
 /* (#) Portability: Newlib        (/newlib/libc/include/envz.h) */
+/* (#) Portability: libc6         (/include/envz.h) */
 }
 
 %[default:section(".text.crt{|.dos}.string.envz")]

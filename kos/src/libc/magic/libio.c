@@ -19,6 +19,7 @@
  */
 %(c_prefix){
 /* (#) Portability: GNU C Library (/libio/libio.h) */
+/* (#) Portability: libc4/5       (/include/libio.h) */
 }
 
 %[define_replacement(fd_t = __fd_t)]

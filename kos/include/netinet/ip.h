@@ -24,6 +24,8 @@
 /* (#) Portability: OpenBSD       (/sys/netinet/ip.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/uts/common/netinet/ip.h) */
 /* (#) Portability: diet libc     (/include/netinet/ip.h) */
+/* (#) Portability: libc4/5       (/include/netinet/ip.h) */
+/* (#) Portability: libc6         (/include/netinet/ip.h) */
 /* (#) Portability: musl libc     (/include/netinet/ip.h) */
 /* (#) Portability: uClibc        (/include/netinet/ip.h) */
 #ifndef _NETINET_IP_H

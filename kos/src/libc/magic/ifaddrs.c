@@ -23,6 +23,7 @@
 /* (#) Portability: GNU C Library (/inet/ifaddrs.h) */
 /* (#) Portability: NetBSD        (/include/ifaddrs.h) */
 /* (#) Portability: OpenBSD       (/include/ifaddrs.h) */
+/* (#) Portability: libc6         (/include/ifaddrs.h) */
 /* (#) Portability: musl libc     (/include/ifaddrs.h) */
 /* (#) Portability: uClibc        (/include/ifaddrs.h) */
 }

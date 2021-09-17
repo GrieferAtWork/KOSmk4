@@ -29,6 +29,8 @@
 /* (#) Portability: OpenBSD       (/include/utime.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/utime.h) */
 /* (#) Portability: diet libc     (/include/utime.h) */
+/* (#) Portability: libc4/5       (/include/utime.h) */
+/* (#) Portability: libc6         (/include/utime.h) */
 /* (#) Portability: musl libc     (/include/utime.h) */
 /* (#) Portability: uClibc        (/include/utime.h) */
 }

@@ -32,6 +32,8 @@
 /* (#) Portability: OpenSolaris   (/usr/src/head/ctype.h) */
 /* (#) Portability: Windows Kits  (/ucrt/ctype.h) */
 /* (#) Portability: diet libc     (/include/ctype.h) */
+/* (#) Portability: libc4/5       (/include/ctype.h) */
+/* (#) Portability: libc6         (/include/ctype.h) */
 /* (#) Portability: musl libc     (/include/ctype.h) */
 /* (#) Portability: uClibc        (/include/ctype.h) */
 }
@@ -880,13 +882,13 @@ int issymcont(int ch) {
 %[default:section(".text.crt{|.dos}.unicode.static.ctype")];
 
 @@Returns non-zero if `(C & ~0x7f) == 0'
-[[nothrow, const, inline, dos_only_export_alias("__isascii")]]
+[[const, nothrow, inline, dos_only_export_alias("__isascii")]]
 int isascii(int c) {
 	return (c & ~0x7f) == 0;
 }
 
 @@Re-returns `C & 0x7f'
-[[nothrow, const, inline, dos_only_export_alias("__toascii")]]
+[[const, nothrow, inline, dos_only_export_alias("__toascii")]]
 int toascii(int c) {
 	return c & 0x7f;
 }

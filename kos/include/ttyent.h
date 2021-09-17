@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb49653d1 */
+/* HASH CRC-32:0x77eb92b7 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,6 +23,7 @@
 /* (#) Portability: NetBSD        (/include/ttyent.h) */
 /* (#) Portability: OpenBSD       (/include/ttyent.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/lib/libbc/inc/include/ttyent.h) */
+/* (#) Portability: libc6         (/include/ttyent.h) */
 /* (#) Portability: uClibc        (/include/ttyent.h) */
 #ifndef _TTYENT_H
 #define _TTYENT_H 1

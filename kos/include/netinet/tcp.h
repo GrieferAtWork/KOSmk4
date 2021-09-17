@@ -25,6 +25,8 @@
 /* (#) Portability: OpenBSD       (/sys/netinet/tcp.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/uts/common/netinet/tcp.h) */
 /* (#) Portability: diet libc     (/include/netinet/tcp.h) */
+/* (#) Portability: libc4/5       (/include/netinet/tcp.h) */
+/* (#) Portability: libc6         (/include/netinet/tcp.h) */
 /* (#) Portability: musl libc     (/include/netinet/tcp.h) */
 /* (#) Portability: uClibc        (/include/netinet/tcp.h) */
 #ifndef _NETINET_TCP_H

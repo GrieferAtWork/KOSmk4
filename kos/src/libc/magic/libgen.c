@@ -28,6 +28,7 @@
 /* (#) Portability: OpenBSD       (/include/libgen.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/libgen.h) */
 /* (#) Portability: diet libc     (/include/libgen.h) */
+/* (#) Portability: libc6         (/include/libgen.h) */
 /* (#) Portability: musl libc     (/include/libgen.h) */
 /* (#) Portability: uClibc        (/include/libgen.h) */
 }

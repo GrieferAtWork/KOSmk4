@@ -23,6 +23,7 @@
 /* (#) Portability: GNU C Library (/rt/aio.h) */
 /* (#) Portability: NetBSD        (/include/aio.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/aio.h) */
+/* (#) Portability: libc6         (/include/aio.h) */
 /* (#) Portability: musl libc     (/include/aio.h) */
 }
 

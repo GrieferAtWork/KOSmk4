@@ -29,6 +29,8 @@
 /* (#) Portability: OpenBSD       (/include/dirent.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/dirent.h) */
 /* (#) Portability: diet libc     (/include/dirent.h) */
+/* (#) Portability: libc4/5       (/include/dirent.h) */
+/* (#) Portability: libc6         (/include/dirent.h) */
 /* (#) Portability: musl libc     (/include/dirent.h) */
 /* (#) Portability: uClibc        (/include/dirent.h) */
 }

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe805be3d */
+/* HASH CRC-32:0x3dff2d75 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,6 +27,7 @@
 /* (#) Portability: OpenBSD       (/include/sched.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/sched.h) */
 /* (#) Portability: diet libc     (/include/sched.h) */
+/* (#) Portability: libc6         (/include/sched.h) */
 /* (#) Portability: musl libc     (/include/sched.h) */
 /* (#) Portability: uClibc        (/include/sched.h) */
 #ifndef _SCHED_H

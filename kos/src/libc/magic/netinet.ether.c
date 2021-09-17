@@ -20,6 +20,7 @@
 %(c_prefix){
 /* (#) Portability: GNU C Library (/inet/netinet/ether.h) */
 /* (#) Portability: diet libc     (/include/netinet/ether.h) */
+/* (#) Portability: libc6         (/include/netinet/ether.h) */
 /* (#) Portability: musl libc     (/include/netinet/ether.h) */
 /* (#) Portability: uClibc        (/include/netinet/ether.h) */
 }

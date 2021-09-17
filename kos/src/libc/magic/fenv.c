@@ -29,6 +29,7 @@
 /* (#) Portability: OpenBSD       (/include/fenv.h) */
 /* (#) Portability: Windows Kits  (/ucrt/fenv.h) */
 /* (#) Portability: diet libc     (/include/fenv.h) */
+/* (#) Portability: libc6         (/include/fenv.h) */
 /* (#) Portability: musl libc     (/include/fenv.h) */
 /* (#) Portability: uClibc        (/include/fenv.h) */
 }

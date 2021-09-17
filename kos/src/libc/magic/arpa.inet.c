@@ -26,6 +26,8 @@
 /* (#) Portability: OpenBSD       (/include/arpa/inet.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/arpa/inet.h) */
 /* (#) Portability: diet libc     (/include/arpa/inet.h) */
+/* (#) Portability: libc4/5       (/include/arpa/inet.h) */
+/* (#) Portability: libc6         (/include/arpa/inet.h) */
 /* (#) Portability: musl libc     (/include/arpa/inet.h) */
 /* (#) Portability: uClibc        (/include/arpa/inet.h) */
 }

@@ -2,7 +2,6 @@
 ### Missing headers
 <a.out.h>              (GLibc!)
 <argp.h>               (GLibc!)
-<bsd/signal.h>         (linux (like <signal.h>), but signal(2) defaults to bsd_signal(3))
 <bsd/netinet/ip_icmp.h>(libbsd)
 <bsd/md5.h>            (libbsd)
 <bsd/sys/tree.h>       (libbsd)

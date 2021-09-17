@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8f6fad1f */
+/* HASH CRC-32:0x92217b2 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,6 +28,8 @@
 /* (#) Portability: OpenSolaris   (/usr/src/head/fcntl.h) */
 /* (#) Portability: Windows Kits  (/ucrt/fcntl.h) */
 /* (#) Portability: diet libc     (/include/fcntl.h) */
+/* (#) Portability: libc4/5       (/include/fcntl.h) */
+/* (#) Portability: libc6         (/include/fcntl.h) */
 /* (#) Portability: musl libc     (/include/fcntl.h) */
 /* (#) Portability: uClibc        (/include/fcntl.h) */
 #ifndef _FCNTL_H

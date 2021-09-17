@@ -29,6 +29,8 @@
 /* (#) Portability: OpenSolaris   (/usr/src/head/grp.h) */
 /* (#) Portability: diet libc     (/include/grp.h) */
 /* (#) Portability: libbsd        (/include/bsd/grp.h) */
+/* (#) Portability: libc4/5       (/include/grp.h) */
+/* (#) Portability: libc6         (/include/grp.h) */
 /* (#) Portability: musl libc     (/include/grp.h) */
 /* (#) Portability: uClibc        (/include/grp.h) */
 }

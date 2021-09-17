@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9dd23a42 */
+/* HASH CRC-32:0x11b2b494 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -33,6 +33,7 @@
 /* (#) Portability: Windows Kits  (/ucrt/inttypes.h) */
 /* (#) Portability: diet libc     (/include/inttypes.h) */
 /* (#) Portability: libbsd        (/include/bsd/inttypes.h) */
+/* (#) Portability: libc6         (/include/inttypes.h) */
 /* (#) Portability: musl libc     (/include/inttypes.h) */
 /* (#) Portability: uClibc        (/include/inttypes.h) */
 #ifndef _INTTYPES_H

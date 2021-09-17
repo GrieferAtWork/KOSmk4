@@ -29,6 +29,8 @@
 /* (#) Portability: OpenSolaris   (/usr/src/head/memory.h) */
 /* (#) Portability: Windows Kits  (/ucrt/memory.h) */
 /* (#) Portability: diet libc     (/include/memory.h) */
+/* (#) Portability: libc4/5       (/include/memory.h) */
+/* (#) Portability: libc6         (/include/memory.h) */
 /* (#) Portability: musl libc     (/include/memory.h) */
 /* (#) Portability: uClibc        (/include/memory.h) */
 #ifndef _MEMORY_H

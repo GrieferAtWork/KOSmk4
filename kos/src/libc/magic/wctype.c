@@ -32,6 +32,7 @@
 /* (#) Portability: OpenSolaris   (/usr/src/head/wctype.h) */
 /* (#) Portability: Windows Kits  (/ucrt/wctype.h) */
 /* (#) Portability: diet libc     (/include/wctype.h) */
+/* (#) Portability: libc6         (/include/wctype.h) */
 /* (#) Portability: musl libc     (/include/wctype.h) */
 /* (#) Portability: uClibc        (/include/wctype.h) */
 }

@@ -28,6 +28,8 @@
 /* (#) Portability: OpenSolaris   (/usr/src/head/getopt.h) */
 /* (#) Portability: diet libc     (/include/getopt.h) */
 /* (#) Portability: libbsd        (/include/bsd/getopt.h) */
+/* (#) Portability: libc4/5       (/include/getopt.h) */
+/* (#) Portability: libc6         (/include/getopt.h) */
 /* (#) Portability: musl libc     (/include/getopt.h) */
 /* (#) Portability: uClibc        (/include/getopt.h) */
 }

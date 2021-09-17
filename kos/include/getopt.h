@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfb64ea9c */
+/* HASH CRC-32:0x8d3edad7 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,6 +28,8 @@
 /* (#) Portability: OpenSolaris   (/usr/src/head/getopt.h) */
 /* (#) Portability: diet libc     (/include/getopt.h) */
 /* (#) Portability: libbsd        (/include/bsd/getopt.h) */
+/* (#) Portability: libc4/5       (/include/getopt.h) */
+/* (#) Portability: libc6         (/include/getopt.h) */
 /* (#) Portability: musl libc     (/include/getopt.h) */
 /* (#) Portability: uClibc        (/include/getopt.h) */
 #ifndef _GETOPT_H

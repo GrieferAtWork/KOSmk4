@@ -28,6 +28,7 @@
 /* (#) Portability: OpenBSD       (/sys/sys/times.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/uts/common/sys/times.h) */
 /* (#) Portability: diet libc     (/include/sys/times.h) */
+/* (#) Portability: libc4/5       (/include/sys/times.h) */
 /* (#) Portability: musl libc     (/include/sys/times.h) */
 /* (#) Portability: uClibc        (/include/sys/times.h) */
 }

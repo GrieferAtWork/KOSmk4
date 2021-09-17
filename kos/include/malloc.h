@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3d98419c */
+/* HASH CRC-32:0x79c4518 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,6 +29,8 @@
 /* (#) Portability: OpenSolaris   (/usr/src/head/malloc.h) */
 /* (#) Portability: Windows Kits  (/ucrt/malloc.h) */
 /* (#) Portability: diet libc     (/include/malloc.h) */
+/* (#) Portability: libc4/5       (/include/malloc.h) */
+/* (#) Portability: libc6         (/include/malloc.h) */
 /* (#) Portability: musl libc     (/include/malloc.h) */
 /* (#) Portability: uClibc        (/include/malloc.h) */
 #ifndef _MALLOC_H

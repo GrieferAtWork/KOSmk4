@@ -27,6 +27,7 @@
 /* (#) Portability: OpenBSD       (/include/pthread.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/pthread.h) */
 /* (#) Portability: diet libc     (/include/pthread.h) */
+/* (#) Portability: libc6         (/include/pthread.h) */
 /* (#) Portability: musl libc     (/include/pthread.h) */
 /* (#) Portability: uClibc        (/libpthread/nptl/sysdeps/pthread/pthread.h) */
 }

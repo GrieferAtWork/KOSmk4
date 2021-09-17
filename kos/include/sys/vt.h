@@ -19,6 +19,7 @@
  */
 /* (#) Portability: GNU C Library (/sysdeps/unix/sysv/linux/sys/vt.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/uts/common/sys/vt.h) */
+/* (#) Portability: libc4/5       (/include/sys/vt.h) */
 /* (#) Portability: musl libc     (/include/sys/vt.h) */
 /* (#) Portability: uClibc        (/include/sys/vt.h) */
 #ifndef _SYS_VT_H

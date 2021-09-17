@@ -23,6 +23,7 @@
 /* (#) Portability: NetBSD        (/sys/sys/termios.h) */
 /* (#) Portability: OpenBSD       (/sys/sys/termios.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/uts/common/sys/termios.h) */
+/* (#) Portability: libc4/5       (/include/sys/termios.h) */
 /* (#) Portability: musl libc     (/include/sys/termios.h) */
 /* (#) Portability: uClibc        (/include/sys/termios.h) */
 #ifndef _SYS_TERMIOS_H

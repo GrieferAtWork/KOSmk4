@@ -25,6 +25,8 @@
 /* (#) Portability: OpenSolaris   (/usr/src/uts/common/netinet/ip_icmp.h) */
 /* (#) Portability: diet libc     (/include/netinet/ip_icmp.h) */
 /* (#) Portability: libbsd        (/include/bsd/netinet/ip_icmp.h) */
+/* (#) Portability: libc4/5       (/include/netinet/ip_icmp.h) */
+/* (#) Portability: libc6         (/include/netinet/ip_icmp.h) */
 /* (#) Portability: musl libc     (/include/netinet/ip_icmp.h) */
 /* (#) Portability: uClibc        (/include/netinet/ip_icmp.h) */
 #ifndef _NETINET_IP_ICMP_H

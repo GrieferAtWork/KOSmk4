@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe172f246 */
+/* HASH CRC-32:0xef9be52a */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,6 +32,8 @@
 /* (#) Portability: OpenSolaris   (/usr/src/head/locale.h) */
 /* (#) Portability: Windows Kits  (/ucrt/locale.h) */
 /* (#) Portability: diet libc     (/include/locale.h) */
+/* (#) Portability: libc4/5       (/include/locale.h) */
+/* (#) Portability: libc6         (/include/locale.h) */
 /* (#) Portability: musl libc     (/include/locale.h) */
 /* (#) Portability: uClibc        (/include/locale.h) */
 #ifndef _LOCALE_H

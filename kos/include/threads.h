@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4104731e */
+/* HASH CRC-32:0xab2724c1 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,6 +24,7 @@
 /* (#) Portability: GNU C Library (/sysdeps/[...]/threads.h) */
 /* (#) Portability: Newlib        (/newlib/libc/include/threads.h) */
 /* (#) Portability: diet libc     (/include/threads.h) */
+/* (#) Portability: libc6         (/include/threads.h) */
 /* (#) Portability: musl libc     (/include/threads.h) */
 #ifndef _THREADS_H
 #define _THREADS_H 1

@@ -20,6 +20,7 @@
 /* (#) Portability: Cygwin        (/winsup/cygwin/include/wait.h) */
 /* (#) Portability: GNU C Library (/posix/wait.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/wait.h) */
+/* (#) Portability: libc6         (/include/wait.h) */
 /* (#) Portability: musl libc     (/include/wait.h) */
 /* (#) Portability: uClibc        (/include/wait.h) */
 #ifndef _WAIT_H

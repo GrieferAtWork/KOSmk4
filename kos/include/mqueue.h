@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd3a922c */
+/* HASH CRC-32:0x377ad2f5 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,6 +25,7 @@
 /* (#) Portability: NetBSD        (/include/mqueue.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/mqueue.h) */
 /* (#) Portability: diet libc     (/include/mqueue.h) */
+/* (#) Portability: libc6         (/include/mqueue.h) */
 /* (#) Portability: musl libc     (/include/mqueue.h) */
 /* (#) Portability: uClibc        (/include/mqueue.h) */
 #ifndef _MQUEUE_H

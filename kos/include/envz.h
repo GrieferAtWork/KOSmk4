@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x76360a9a */
+/* HASH CRC-32:0xf44ef50f */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 /* (#) Portability: Cygwin        (/newlib/libc/include/envz.h) */
 /* (#) Portability: GNU C Library (/string/envz.h) */
 /* (#) Portability: Newlib        (/newlib/libc/include/envz.h) */
+/* (#) Portability: libc6         (/include/envz.h) */
 #ifndef _ENVZ_H
 #define _ENVZ_H 1
 

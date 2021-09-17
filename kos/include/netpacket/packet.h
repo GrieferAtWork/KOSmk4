@@ -19,6 +19,7 @@
  */
 /* (#) Portability: GNU C Library (/sysdeps/unix/sysv/linux/netpacket/packet.h) */
 /* (#) Portability: diet libc     (/include/netpacket/packet.h) */
+/* (#) Portability: libc6         (/include/netpacket/packet.h) */
 /* (#) Portability: musl libc     (/include/netpacket/packet.h) */
 /* (#) Portability: uClibc        (/include/netpacket/packet.h) */
 #ifndef _NETPACKET_PACKET_H

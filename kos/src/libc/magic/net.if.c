@@ -26,6 +26,8 @@
 /* (#) Portability: OpenBSD       (/sys/net/if.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/uts/common/net/if.h) */
 /* (#) Portability: diet libc     (/include/net/if.h) */
+/* (#) Portability: libc4/5       (/include/net/if.h) */
+/* (#) Portability: libc6         (/include/net/if.h) */
 /* (#) Portability: musl libc     (/include/net/if.h) */
 /* (#) Portability: uClibc        (/include/net/if.h) */
 }

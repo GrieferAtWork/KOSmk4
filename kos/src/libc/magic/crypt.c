@@ -21,6 +21,7 @@
 /* (#) Portability: FreeBSD       (/lib/libcrypt/crypt.h) */
 /* (#) Portability: GNU C Library (/crypt/crypt.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/crypt.h) */
+/* (#) Portability: libc6         (/include/crypt.h) */
 /* (#) Portability: musl libc     (/include/crypt.h) */
 /* (#) Portability: uClibc        (/include/crypt.h) */
 }

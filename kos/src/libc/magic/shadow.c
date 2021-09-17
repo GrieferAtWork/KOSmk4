@@ -21,6 +21,8 @@
 /* (#) Portability: GNU C Library (/shadow/shadow.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/shadow.h) */
 /* (#) Portability: diet libc     (/include/shadow.h) */
+/* (#) Portability: libc4/5       (/include/shadow.h) */
+/* (#) Portability: libc6         (/include/shadow.h) */
 /* (#) Portability: musl libc     (/include/shadow.h) */
 /* (#) Portability: uClibc        (/include/shadow.h) */
 }

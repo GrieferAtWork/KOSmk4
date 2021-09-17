@@ -21,6 +21,7 @@
 /* (#) Portability: GNU C Library (/intl/libintl.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/libintl.h) */
 /* (#) Portability: diet libc     (/include/libintl.h) */
+/* (#) Portability: libc6         (/include/libintl.h) */
 /* (#) Portability: musl libc     (/include/libintl.h) */
 /* (#) Portability: uClibc        (/include/libintl.h) */
 }

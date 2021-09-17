@@ -26,6 +26,7 @@
 /* (#) Portability: OpenSolaris   (/usr/src/head/err.h) */
 /* (#) Portability: diet libc     (/include/err.h) */
 /* (#) Portability: libbsd        (/include/bsd/err.h) */
+/* (#) Portability: libc6         (/include/err.h) */
 /* (#) Portability: musl libc     (/include/err.h) */
 /* (#) Portability: uClibc        (/include/err.h) */
 }

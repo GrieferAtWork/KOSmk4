@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5d8fb140 */
+/* HASH CRC-32:0xbeab7c95 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 /* (#) Portability: Cygwin        (/winsup/cygwin/include/pty.h) */
 /* (#) Portability: GNU C Library (/login/pty.h) */
 /* (#) Portability: diet libc     (/include/pty.h) */
+/* (#) Portability: libc6         (/include/pty.h) */
 /* (#) Portability: musl libc     (/include/pty.h) */
 /* (#) Portability: uClibc        (/include/pty.h) */
 #ifndef _PTY_H

@@ -22,6 +22,8 @@
 /* (#) Portability: GNU C Library (/misc/syslog.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/syslog.h) */
 /* (#) Portability: diet libc     (/include/syslog.h) */
+/* (#) Portability: libc4/5       (/include/syslog.h) */
+/* (#) Portability: libc6         (/include/syslog.h) */
 /* (#) Portability: musl libc     (/include/syslog.h) */
 /* (#) Portability: uClibc        (/include/syslog.h) */
 #ifndef _SYSLOG_H

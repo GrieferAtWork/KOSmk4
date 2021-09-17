@@ -22,6 +22,7 @@
 /* (#) Portability: NetBSD        (/sys/netinet/icmp6.h) */
 /* (#) Portability: OpenBSD       (/sys/netinet/icmp6.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/uts/common/netinet/icmp6.h) */
+/* (#) Portability: libc6         (/include/netinet/icmp6.h) */
 /* (#) Portability: musl libc     (/include/netinet/icmp6.h) */
 /* (#) Portability: uClibc        (/include/netinet/icmp6.h) */
 #ifndef _NETINET_ICMP6_H

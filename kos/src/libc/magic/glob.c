@@ -29,6 +29,8 @@
 /* (#) Portability: OpenBSD       (/include/glob.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/glob.h) */
 /* (#) Portability: diet libc     (/include/glob.h) */
+/* (#) Portability: libc4/5       (/include/glob.h) */
+/* (#) Portability: libc6         (/include/glob.h) */
 /* (#) Portability: musl libc     (/include/glob.h) */
 /* (#) Portability: uClibc        (/include/glob.h) */
 }

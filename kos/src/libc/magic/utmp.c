@@ -25,6 +25,8 @@
 /* (#) Portability: OpenBSD       (/include/utmp.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/utmp.h) */
 /* (#) Portability: diet libc     (/include/utmp.h) */
+/* (#) Portability: libc4/5       (/include/utmp.h) */
+/* (#) Portability: libc6         (/include/utmp.h) */
 /* (#) Portability: musl libc     (/include/utmp.h) */
 /* (#) Portability: uClibc        (/include/utmp.h) */
 }

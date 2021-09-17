@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6d7872f9 */
+/* HASH CRC-32:0x79e51587 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 /* (#) Portability: GNU C Library (/debug/execinfo.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/execinfo.h) */
+/* (#) Portability: libc6         (/include/execinfo.h) */
 /* (#) Portability: uClibc        (/include/execinfo.h) */
 #ifndef _EXECINFO_H
 #define _EXECINFO_H 1

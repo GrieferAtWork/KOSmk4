@@ -40,7 +40,7 @@ __SYSDECL_BEGIN
 #else /* sys_errlist */
 }
 [[guard, crt_dos_variant]]
-[[nothrow, wunused, nonnull, const]]
+[[const, wunused, nothrow, nonnull]]
 char const *const *__sys_errlist();
 %{
 #ifdef ____sys_errlist_defined
@@ -74,7 +74,7 @@ __LIBC char const *const sys_errlist[];
 #else /* sys_nerr */
 }
 [[guard, crt_dos_variant]]
-[[nothrow, wunused, nonnull, const]]
+[[const, wunused, nothrow, nonnull]]
 int *__sys_nerr();
 %{
 #ifdef ____sys_nerr_defined

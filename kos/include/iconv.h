@@ -18,6 +18,16 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 /* TODO: Portability notes! */
+/* (#) Portability: Cygwin        (/newlib/libc/include/iconv.h) */
+/* (#) Portability: FreeBSD       (/include/iconv.h) */
+/* (#) Portability: GNU C Library (/iconv/iconv.h) */
+/* (#) Portability: NetBSD        (/include/iconv.h) */
+/* (#) Portability: Newlib        (/newlib/libc/include/iconv.h) */
+/* (#) Portability: OpenSolaris   (/usr/src/head/iconv.h) */
+/* (#) Portability: diet libc     (/include/iconv.h) */
+/* (#) Portability: libc6         (/include/iconv.h) */
+/* (#) Portability: musl libc     (/include/iconv.h) */
+/* (#) Portability: uClibc        (/include/iconv.h) */
 #ifndef _ICONV_H
 #define _ICONV_H 1
 

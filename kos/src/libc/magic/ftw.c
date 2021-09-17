@@ -28,6 +28,8 @@
 /* (#) Portability: OpenBSD       (/include/ftw.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/ftw.h) */
 /* (#) Portability: diet libc     (/include/ftw.h) */
+/* (#) Portability: libc4/5       (/include/ftw.h) */
+/* (#) Portability: libc6         (/include/ftw.h) */
 /* (#) Portability: musl libc     (/include/ftw.h) */
 /* (#) Portability: uClibc        (/include/ftw.h) */
 }

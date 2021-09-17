@@ -20,6 +20,8 @@
 /* (#) Portability: Cygwin        (/winsup/cygwin/include/lastlog.h) */
 /* (#) Portability: GNU C Library (/login/lastlog.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/lastlog.h) */
+/* (#) Portability: libc4/5       (/include/lastlog.h) */
+/* (#) Portability: libc6         (/include/lastlog.h) */
 /* (#) Portability: musl libc     (/include/lastlog.h) */
 /* (#) Portability: uClibc        (/include/lastlog.h) */
 #ifndef _LASTLOG_H

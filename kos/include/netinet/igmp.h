@@ -22,6 +22,7 @@
 /* (#) Portability: NetBSD        (/sys/netinet/igmp.h) */
 /* (#) Portability: OpenBSD       (/sys/netinet/igmp.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/uts/common/netinet/igmp.h) */
+/* (#) Portability: libc6         (/include/netinet/igmp.h) */
 /* (#) Portability: musl libc     (/include/netinet/igmp.h) */
 /* (#) Portability: uClibc        (/include/netinet/igmp.h) */
 #ifndef _NETINET_IGMP_H

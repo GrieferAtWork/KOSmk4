@@ -18,6 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 /* (#) Portability: GNU C Library (/resolv/sys/bitypes.h) */
+/* (#) Portability: libc4/5       (/include/sys/bitypes.h) */
 /* (#) Portability: uClibc        (/include/sys/bitypes.h) */
 #ifndef _SYS_BITTYPES_H
 #define _SYS_BITTYPES_H 1

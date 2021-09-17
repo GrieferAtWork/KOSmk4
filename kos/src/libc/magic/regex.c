@@ -28,6 +28,8 @@
 /* (#) Portability: OpenBSD       (/include/regex.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/regex.h) */
 /* (#) Portability: diet libc     (/include/regex.h) */
+/* (#) Portability: libc4/5       (/include/regex.h) */
+/* (#) Portability: libc6         (/include/regex.h) */
 /* (#) Portability: musl libc     (/include/regex.h) */
 /* (#) Portability: uClibc        (/include/regex.h) */
 }

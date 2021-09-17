@@ -19,6 +19,7 @@
  */
 /* (#) Portability: GNU C Library (/sysdeps/unix/sysv/linux/[...]/sys/debugreg.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/uts/[...]/sys/debugreg.h) */
+/* (#) Portability: libc4/5       (/include/sys/debugreg.h) */
 #ifndef _I386_KOS_SYS_DEBUGREG_H
 #define _I386_KOS_SYS_DEBUGREG_H 1
 #define _SYS_DEBUGREG_H 1

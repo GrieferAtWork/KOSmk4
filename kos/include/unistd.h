@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x76457c99 */
+/* HASH CRC-32:0x54e01dae */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,6 +30,8 @@
 /* (#) Portability: OpenSolaris   (/usr/src/head/unistd.h) */
 /* (#) Portability: diet libc     (/include/unistd.h) */
 /* (#) Portability: libbsd        (/include/bsd/unistd.h) */
+/* (#) Portability: libc4/5       (/include/unistd.h) */
+/* (#) Portability: libc6         (/include/unistd.h) */
 /* (#) Portability: musl libc     (/include/unistd.h) */
 /* (#) Portability: uClibc        (/include/unistd.h) */
 #ifndef _UNISTD_H

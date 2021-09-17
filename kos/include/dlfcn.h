@@ -27,6 +27,8 @@
 /* (#) Portability: OpenBSD       (/include/dlfcn.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/dlfcn.h) */
 /* (#) Portability: diet libc     (/include/dlfcn.h) */
+/* (#) Portability: libc4/5       (/include/dlfcn.h) */
+/* (#) Portability: libc6         (/include/dlfcn.h) */
 /* (#) Portability: musl libc     (/include/dlfcn.h) */
 /* (#) Portability: uClibc        (/include/dlfcn.h) */
 #ifndef _DLFCN_H

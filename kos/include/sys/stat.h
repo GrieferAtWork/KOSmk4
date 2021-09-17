@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa2767111 */
+/* HASH CRC-32:0xf53c421f */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,6 +31,7 @@
 /* (#) Portability: OpenSolaris   (/usr/src/uts/common/sys/stat.h) */
 /* (#) Portability: Windows Kits  (/ucrt/sys/stat.h) */
 /* (#) Portability: diet libc     (/include/sys/stat.h) */
+/* (#) Portability: libc4/5       (/include/sys/stat.h) */
 /* (#) Portability: musl libc     (/include/sys/stat.h) */
 /* (#) Portability: uClibc        (/include/sys/stat.h) */
 #ifndef _SYS_STAT_H

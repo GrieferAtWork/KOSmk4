@@ -33,6 +33,8 @@
 /* (#) Portability: Windows Kits  (/ucrt/string.h) */
 /* (#) Portability: diet libc     (/include/string.h) */
 /* (#) Portability: libbsd        (/include/bsd/string.h) */
+/* (#) Portability: libc4/5       (/include/string.h) */
+/* (#) Portability: libc6         (/include/string.h) */
 /* (#) Portability: musl libc     (/include/string.h) */
 /* (#) Portability: uClibc        (/include/string.h) */
 }
@@ -1355,7 +1357,7 @@ int strncasecmp_l([[nonnull]] char const *s1,
 	return strncasecmp(s1, s2, maxlen);
 }
 
-[[wunused, nothrow, const, crt_dos_variant]]
+[[const, wunused, nothrow, crt_dos_variant]]
 [[userimpl, decl_include("<bits/types.h>"), impl_prefix(
 #ifndef ___local_sys_errlist_defined
 #define ___local_sys_errlist_defined 1
@@ -1819,7 +1821,7 @@ char const *strerrordesc_np($errno_t errnum) {
 }
 
 [[decl_include("<bits/types.h>")]]
-[[wunused, nothrow, const, section(".text.crt{|.dos}.errno")]]
+[[const, wunused, nothrow, section(".text.crt{|.dos}.errno")]]
 [[userimpl, crt_dos_variant, impl_include("<libc/errno.h>")]]
 char const *strerrorname_np($errno_t errnum) {
 	char const *result;
@@ -2263,7 +2265,7 @@ char const *strerrorname_np($errno_t errnum) {
 @@Return the name of a given signal, without the leading `SIG*' prefix.
 @@If the  given  `signum'  isn't  recognized,  return  `NULL'  instead.
 [[decl_include("<bits/types.h>"), export_alias("signalname")]]
-[[wunused, nothrow, const, section(".text.crt{|.dos}.errno")]]
+[[const, wunused, nothrow, section(".text.crt{|.dos}.errno")]]
 [[userimpl, crt_dos_variant, impl_include("<asm/os/signal.h>"), impl_prefix(
 #ifndef ___local_sys_siglist_defined
 #define ___local_sys_siglist_defined 1
@@ -2550,7 +2552,7 @@ char const *sigabbrev_np($signo_t signum) {
 @@Return a description for the given signal.
 @@If the given `signum' isn't recognized, return `NULL' instead.
 [[decl_include("<bits/types.h>")]]
-[[wunused, nothrow, const, section(".text.crt{|.dos}.errno")]]
+[[const, wunused, nothrow, section(".text.crt{|.dos}.errno")]]
 [[userimpl, crt_dos_variant, impl_include("<asm/os/signal.h>")]]
 char const *sigdescr_np($signo_t signum) {
 	char const *result;
@@ -3055,7 +3057,7 @@ int strncasecmp([[nonnull]] char const *s1, [[nonnull]] char const *s2, $size_t 
 
 
 [[decl_include("<features.h>")]]
-[[guard, wunused, nothrow, const, crtbuiltin]]
+[[guard, const, wunused, nothrow, crtbuiltin]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == __SIZEOF_LONG__ && !defined(LIBC_ARCH_HAVE_FFSL)),       crt_intern_kos_alias("libc_ffsl")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == __SIZEOF_LONG_LONG__ && !defined(LIBC_ARCH_HAVE_FFSLL)), crt_intern_kos_alias("libc_ffsll")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == __SIZEOF_LONG__),                                        alias("ffsl")]]
@@ -3081,7 +3083,7 @@ __STDC_INT_AS_UINT_T ffs(int i) {
 
 %#ifdef __USE_GNU
 [[decl_include("<features.h>")]]
-[[wunused, nothrow, const, crtbuiltin]]
+[[const, wunused, nothrow, crtbuiltin]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__ && !defined(LIBC_ARCH_HAVE_FFSLL)), crt_intern_kos_alias("libc_ffsll")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == __SIZEOF_INT__),                                         alias("ffs")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__),                                   alias("ffsll")]]
@@ -3092,7 +3094,7 @@ __STDC_INT_AS_UINT_T ffsl(long i) {
 }
 
 [[decl_include("<features.h>")]]
-[[wunused, nothrow, const, crtbuiltin]]
+[[const, wunused, nothrow, crtbuiltin]]
 [[impl_include("<hybrid/__bit.h>")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == __SIZEOF_INT__),  alias("ffs")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == __SIZEOF_LONG__), alias("ffsl")]]

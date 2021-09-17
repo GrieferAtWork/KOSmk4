@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2f70310b */
+/* HASH CRC-32:0x1212b9ae */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,7 +18,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-/* (#) Portability: libbsd (/include/bsd/unistd.h) */
+/* (#) Portability: libbsd  (/include/bsd/unistd.h) */
+/* (#) Portability: libc4/5 (/include/bsd/unistd.h) */
 #ifndef _BSD_UNISTD_H
 #define _BSD_UNISTD_H 1
 
@@ -30,6 +31,9 @@
 #endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
 
 #include <unistd.h>
+#include <fcntl.h> /* As seen in `libc4/5' */
+#include <sys/stat.h> /* As seen in `libc4/5' */
+#include <sys/time.h> /* As seen in `libc4/5' */
 
 #ifdef __CC__
 __SYSDECL_BEGIN

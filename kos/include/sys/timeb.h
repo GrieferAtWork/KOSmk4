@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x15b0ffa5 */
+/* HASH CRC-32:0x619907bf */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,6 +29,7 @@
 /* (#) Portability: OpenSolaris   (/usr/src/uts/common/sys/timeb.h) */
 /* (#) Portability: Windows Kits  (/ucrt/sys/timeb.h) */
 /* (#) Portability: diet libc     (/include/sys/timeb.h) */
+/* (#) Portability: libc4/5       (/include/sys/timeb.h) */
 /* (#) Portability: musl libc     (/include/sys/timeb.h) */
 /* (#) Portability: uClibc        (/include/sys/timeb.h) */
 #ifndef _SYS_TIMEB_H

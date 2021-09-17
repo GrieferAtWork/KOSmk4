@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x76d9510a */
+/* HASH CRC-32:0xca63f633 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,6 +26,7 @@
 /* (#) Portability: OpenBSD       (/sys/sys/sem.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/uts/common/sys/sem.h) */
 /* (#) Portability: diet libc     (/include/sys/sem.h) */
+/* (#) Portability: libc4/5       (/include/sys/sem.h) */
 /* (#) Portability: musl libc     (/include/sys/sem.h) */
 /* (#) Portability: uClibc        (/include/sys/sem.h) */
 #ifndef _SYS_SEM_H

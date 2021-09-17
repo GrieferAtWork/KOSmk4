@@ -17,18 +17,41 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-/* (#) Portability: libbsd (/include/bsd/bsd.h) */
+/* (#) Portability: libbsd  (/include/bsd/bsd.h) */
+/* (#) Portability: libc4/5 (/include/bsd/bsd.h) */
 #ifndef _BSD_BSD_H
 #define _BSD_BSD_H 1
 
+/* libc4/5 */
+#undef _BSD_SOURCE
+#define _BSD_SOURCE
+#include <features.h>
+
+#include <hybrid/minmax.h>
+
+#include <asm/os/oflags.h>
+#include <sys/file.h>
+#include <sys/param.h> /* NCARGS, NBBY */
+
+#include <endian.h>
+#include <limits.h>
+
+#if !defined(FAPPEND) && defined(__O_APPEND)
+#define FAPPEND __O_APPEND
+#endif /* !FAPPEND && __O_APPEND */
+
+
+
+/* libbsd */
 #include <bsd/sys/cdefs.h>
 #include <bsd/sys/queue.h>
-//TODO:#include <bsd/sys/tree.h>
-//TODO:#include <bsd/netinet/ip_icmp.h>
+/* TODO:#include <bsd/sys/tree.h> */
+/* TODO:#include <bsd/netinet/ip_icmp.h> */
 #include <bsd/stdlib.h>
 #include <bsd/string.h>
 #include <bsd/err.h>
 #include <bsd/getopt.h>
-//TODO:#include <bsd/md5.h>
+/* TODO:#include <bsd/md5.h> */
+
 
 #endif /* !_BSD_BSD_H */

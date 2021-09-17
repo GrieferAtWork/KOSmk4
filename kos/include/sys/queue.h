@@ -25,6 +25,7 @@
 /* (#) Portability: OpenBSD       (/sys/sys/queue.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/uts/common/sys/queue.h) */
 /* (#) Portability: libbsd        (/include/bsd/sys/queue.h) */
+/* (#) Portability: libc4/5       (/include/sys/queue.h) */
 /* (#) Portability: uClibc        (/include/sys/queue.h) */
 #ifndef _SYS_QUEUE_H
 #define _SYS_QUEUE_H 1

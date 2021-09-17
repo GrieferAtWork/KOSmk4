@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5c3ca415 */
+/* HASH CRC-32:0xc2271cbc */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 /* (>) Standard: POSIX.2 (Issue 4, IEEE Std 1003.2-1992) */
 /* (#) Portability: OpenSolaris (/usr/src/head/stropts.h) */
+/* (#) Portability: libc6       (/include/stropts.h) */
 /* (#) Portability: musl libc   (/include/stropts.h) */
 #ifndef _STROPTS_H
 #define _STROPTS_H 1

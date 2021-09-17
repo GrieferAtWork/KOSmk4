@@ -24,6 +24,8 @@
 /* (#) Portability: OpenBSD       (/sys/netinet/in_systm.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/uts/common/netinet/in_systm.h) */
 /* (#) Portability: diet libc     (/include/netinet/in_systm.h) */
+/* (#) Portability: libc4/5       (/include/netinet/in_systm.h) */
+/* (#) Portability: libc6         (/include/netinet/in_systm.h) */
 /* (#) Portability: musl libc     (/include/netinet/in_systm.h) */
 /* (#) Portability: uClibc        (/include/netinet/in_systm.h) */
 #ifndef _NETINET_IN_SYSTM_H

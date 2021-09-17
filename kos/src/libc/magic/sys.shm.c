@@ -26,6 +26,7 @@
 /* (#) Portability: OpenBSD       (/sys/sys/shm.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/uts/common/sys/shm.h) */
 /* (#) Portability: diet libc     (/include/sys/shm.h) */
+/* (#) Portability: libc4/5       (/include/sys/shm.h) */
 /* (#) Portability: musl libc     (/include/sys/shm.h) */
 /* (#) Portability: uClibc        (/include/sys/shm.h) */
 }

@@ -382,7 +382,7 @@ int __control87_2($uint32_t newval, $uint32_t mask,
 
 %[insert:function(_copysign = copysign)]
 
-[[wunused, nothrow, const]]
+[[const, wunused, nothrow]]
 double _chgsign(double x) {
 	return -x;
 }
@@ -394,7 +394,7 @@ double _chgsign(double x) {
 %[insert:function(_isnan = isnan)]
 
 @@@return: * : Set of `_FPCLASS_*'
-[[wunused, nothrow, const]]
+[[const, wunused, nothrow]]
 int _fpclass(double x);
 
 %#if defined(__x86_64__) || defined(__i386__)

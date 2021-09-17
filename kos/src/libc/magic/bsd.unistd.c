@@ -18,13 +18,20 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 %(c_prefix){
-/* (#) Portability: libbsd (/include/bsd/unistd.h) */
+/* (#) Portability: libbsd  (/include/bsd/unistd.h) */
+/* (#) Portability: libc4/5 (/include/bsd/unistd.h) */
 }
 
 %[define_replacement(errno_t = __errno_t)]
 
 %[insert:prefix(
 #include <unistd.h>
+)]%[insert:prefix(
+#include <fcntl.h> /* As seen in `libc4/5' */
+)]%[insert:prefix(
+#include <sys/stat.h> /* As seen in `libc4/5' */
+)]%[insert:prefix(
+#include <sys/time.h> /* As seen in `libc4/5' */
 )]%{
 
 #ifdef __CC__

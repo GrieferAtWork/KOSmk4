@@ -31,6 +31,8 @@
 /* (#) Portability: OpenSolaris   (/usr/src/head/search.h) */
 /* (#) Portability: Windows Kits  (/ucrt/search.h) */
 /* (#) Portability: diet libc     (/include/search.h) */
+/* (#) Portability: libc4/5       (/include/search.h) */
+/* (#) Portability: libc6         (/include/search.h) */
 /* (#) Portability: musl libc     (/include/search.h) */
 /* (#) Portability: uClibc        (/include/search.h) */
 }

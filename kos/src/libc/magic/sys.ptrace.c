@@ -23,6 +23,7 @@
 /* (#) Portability: NetBSD        (/sys/sys/ptrace.h) */
 /* (#) Portability: OpenBSD       (/sys/sys/ptrace.h) */
 /* (#) Portability: diet libc     (/include/sys/ptrace.h) */
+/* (#) Portability: libc4/5       (/include/sys/ptrace.h) */
 /* (#) Portability: musl libc     (/include/sys/ptrace.h) */
 }
 

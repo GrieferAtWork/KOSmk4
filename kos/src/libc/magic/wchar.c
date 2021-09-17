@@ -33,6 +33,7 @@
 /* (#) Portability: Windows Kits  (/ucrt/wchar.h) */
 /* (#) Portability: diet libc     (/include/wchar.h) */
 /* (#) Portability: libbsd        (/include/bsd/wchar.h) */
+/* (#) Portability: libc6         (/include/wchar.h) */
 /* (#) Portability: musl libc     (/include/wchar.h) */
 /* (#) Portability: uClibc        (/include/wchar.h) */
 }

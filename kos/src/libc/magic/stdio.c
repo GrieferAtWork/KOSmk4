@@ -33,6 +33,8 @@
 /* (#) Portability: Windows Kits  (/ucrt/stdio.h) */
 /* (#) Portability: diet libc     (/include/stdio.h) */
 /* (#) Portability: libbsd        (/include/bsd/stdio.h) */
+/* (#) Portability: libc4/5       (/include/stdio.h) */
+/* (#) Portability: libc6         (/include/stdio.h) */
 /* (#) Portability: musl libc     (/include/stdio.h) */
 /* (#) Portability: uClibc        (/include/stdio.h) */
 }

@@ -26,6 +26,7 @@
 /* (#) Portability: Newlib        (/newlib/libc/include/complex.h) */
 /* (#) Portability: OpenBSD       (/include/complex.h) */
 /* (#) Portability: Windows Kits  (/ucrt/complex.h) */
+/* (#) Portability: libc6         (/include/complex.h) */
 /* (#) Portability: musl libc     (/include/complex.h) */
 /* (#) Portability: uClibc        (/include/complex.h) */
 }

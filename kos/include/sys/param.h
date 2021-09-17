@@ -28,6 +28,7 @@
 /* (#) Portability: OpenSolaris   (/usr/src/uts/common/sys/param.h) */
 /* (#) Portability: diet libc     (/include/sys/param.h) */
 /* (#) Portability: libbsd        (/include/bsd/sys/param.h) */
+/* (#) Portability: libc4/5       (/include/sys/param.h) */
 /* (#) Portability: musl libc     (/include/sys/param.h) */
 /* (#) Portability: uClibc        (/include/sys/param.h) */
 #ifndef _SYS_PARAM_H

@@ -24,6 +24,7 @@
 /* (#) Portability: GNU C Library (/stdlib/monetary.h) */
 /* (#) Portability: NetBSD        (/include/monetary.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/monetary.h) */
+/* (#) Portability: libc6         (/include/monetary.h) */
 /* (#) Portability: musl libc     (/include/monetary.h) */
 }
 

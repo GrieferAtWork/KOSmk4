@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3c54b409 */
+/* HASH CRC-32:0x7bcae9c */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -33,6 +33,8 @@
 /* (#) Portability: Windows Kits  (/ucrt/stdio.h) */
 /* (#) Portability: diet libc     (/include/stdio.h) */
 /* (#) Portability: libbsd        (/include/bsd/stdio.h) */
+/* (#) Portability: libc4/5       (/include/stdio.h) */
+/* (#) Portability: libc6         (/include/stdio.h) */
 /* (#) Portability: musl libc     (/include/stdio.h) */
 /* (#) Portability: uClibc        (/include/stdio.h) */
 #ifndef _STDIO_H

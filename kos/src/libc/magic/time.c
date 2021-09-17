@@ -32,6 +32,8 @@
 /* (#) Portability: OpenSolaris   (/usr/src/head/time.h) */
 /* (#) Portability: Windows Kits  (/ucrt/time.h) */
 /* (#) Portability: diet libc     (/include/time.h) */
+/* (#) Portability: libc4/5       (/include/time.h) */
+/* (#) Portability: libc6         (/include/time.h) */
 /* (#) Portability: musl libc     (/include/time.h) */
 /* (#) Portability: uClibc        (/include/time.h) */
 }
@@ -233,15 +235,15 @@
 #endif /* __USE_ISOC11 */
 
 #ifndef __isleap
-#define __isleap(year) ((year)%4 == 0 && ((year)%100 != 0 || (year)%400 == 0))
+#define __isleap(year) ((year) % 4 == 0 && ((year) % 100 != 0 || (year) % 400 == 0))
 #endif /* !__isleap */
 
 #ifndef __daystoyears
-#define __daystoyears(n_days)  ((400*((n_days)+1))/146097)
+#define __daystoyears(n_days) ((400 * ((n_days) + 1)) / 146097)
 #endif /* !__daystoyears */
 
 #ifndef __yearstodays
-#define __yearstodays(n_years) (((146097*(n_years))/400)/*-1*/) /* rounding error? */
+#define __yearstodays(n_years) (((146097 * (n_years)) / 400) /*-1*/) /* rounding error? */
 #endif /* !__yearstodays */
 
 #ifndef NULL
@@ -500,7 +502,7 @@ $errno_t dos_ctime64_s([[nonnull]] char buf[26], $size_t bufsize,
 $time32_t time32([[nullable]] $time32_t *timer);
 
 [[decl_include("<bits/types.h>")]]
-[[ignore, nocrt, wunused, nothrow, const]]
+[[ignore, nocrt, const, wunused, nothrow]]
 [[doc_alias("difftime"), alias("difftime", "_difftime32")]]
 double difftime32($time32_t time1, $time32_t time0);
 

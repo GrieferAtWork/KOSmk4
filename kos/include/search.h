@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb4f35a0 */
+/* HASH CRC-32:0x702a4397 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,6 +31,8 @@
 /* (#) Portability: OpenSolaris   (/usr/src/head/search.h) */
 /* (#) Portability: Windows Kits  (/ucrt/search.h) */
 /* (#) Portability: diet libc     (/include/search.h) */
+/* (#) Portability: libc4/5       (/include/search.h) */
+/* (#) Portability: libc6         (/include/search.h) */
 /* (#) Portability: musl libc     (/include/search.h) */
 /* (#) Portability: uClibc        (/include/search.h) */
 #ifndef _SEARCH_H

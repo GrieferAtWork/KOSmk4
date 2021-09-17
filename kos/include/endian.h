@@ -23,6 +23,8 @@
 /* (#) Portability: NetBSD        (/include/endian.h) */
 /* (#) Portability: OpenBSD       (/sys/arch/[...]/include/endian.h) */
 /* (#) Portability: diet libc     (/include/endian.h) */
+/* (#) Portability: libc4/5       (/include/endian.h) */
+/* (#) Portability: libc6         (/include/endian.h) */
 /* (#) Portability: musl libc     (/include/endian.h) */
 /* (#) Portability: uClibc        (/include/endian.h) */
 #ifndef _ENDIAN_H

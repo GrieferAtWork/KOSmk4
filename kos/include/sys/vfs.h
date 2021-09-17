@@ -22,6 +22,7 @@
 /* (#) Portability: GNU C Library (/io/sys/vfs.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/uts/common/sys/vfs.h) */
 /* (#) Portability: diet libc     (/include/sys/vfs.h) */
+/* (#) Portability: libc4/5       (/include/sys/vfs.h) */
 /* (#) Portability: musl libc     (/include/sys/vfs.h) */
 /* (#) Portability: uClibc        (/include/sys/vfs.h) */
 #ifndef _SYS_VFS_H

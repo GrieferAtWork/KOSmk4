@@ -23,6 +23,7 @@
 /* (#) Portability: NetBSD        (/include/ttyent.h) */
 /* (#) Portability: OpenBSD       (/include/ttyent.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/lib/libbc/inc/include/ttyent.h) */
+/* (#) Portability: libc6         (/include/ttyent.h) */
 /* (#) Portability: uClibc        (/include/ttyent.h) */
 }
 

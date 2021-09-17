@@ -18,6 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 /* (#) Portability: GNU C Library (/sysdeps/unix/sysv/linux/net/if_packet.h) */
+/* (#) Portability: libc6         (/include/net/if_packet.h) */
 /* (#) Portability: uClibc        (/include/net/if_packet.h) */
 #ifndef _NET_IF_PACKET_H
 #define _NET_IF_PACKET_H 1

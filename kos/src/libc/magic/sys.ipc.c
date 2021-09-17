@@ -26,6 +26,7 @@
 /* (#) Portability: OpenBSD       (/sys/sys/ipc.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/uts/common/sys/ipc.h) */
 /* (#) Portability: diet libc     (/include/sys/ipc.h) */
+/* (#) Portability: libc4/5       (/include/sys/ipc.h) */
 /* (#) Portability: musl libc     (/include/sys/ipc.h) */
 /* (#) Portability: uClibc        (/include/sys/ipc.h) */
 }

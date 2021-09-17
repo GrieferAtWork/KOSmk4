@@ -29,6 +29,8 @@
 /* (#) Portability: OpenSolaris   (/usr/src/head/pwd.h) */
 /* (#) Portability: diet libc     (/include/pwd.h) */
 /* (#) Portability: libbsd        (/include/bsd/pwd.h) */
+/* (#) Portability: libc4/5       (/include/pwd.h) */
+/* (#) Portability: libc6         (/include/pwd.h) */
 /* (#) Portability: musl libc     (/include/pwd.h) */
 /* (#) Portability: uClibc        (/include/pwd.h) */
 }

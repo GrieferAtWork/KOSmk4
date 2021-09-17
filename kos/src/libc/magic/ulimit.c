@@ -23,6 +23,8 @@
 /* (#) Portability: GNU C Library (/resource/ulimit.h) */
 /* (#) Portability: NetBSD        (/include/ulimit.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/ulimit.h) */
+/* (#) Portability: libc4/5       (/include/ulimit.h) */
+/* (#) Portability: libc6         (/include/ulimit.h) */
 /* (#) Portability: musl libc     (/include/ulimit.h) */
 /* (#) Portability: uClibc        (/include/ulimit.h) */
 }

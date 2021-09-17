@@ -25,6 +25,8 @@
 /* (#) Portability: OpenBSD       (/include/sysexits.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/sysexits.h) */
 /* (#) Portability: diet libc     (/include/sysexits.h) */
+/* (#) Portability: libc4/5       (/include/sysexits.h) */
+/* (#) Portability: libc6         (/include/sysexits.h) */
 /* (#) Portability: musl libc     (/include/sysexits.h) */
 /* (#) Portability: uClibc        (/include/sysexits.h) */
 #ifndef _SYSEXITS_H

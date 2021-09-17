@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4bcd715f */
+/* HASH CRC-32:0x95df3d7f */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,6 +26,7 @@
 /* (#) Portability: Newlib        (/newlib/libc/include/spawn.h) */
 /* (#) Portability: OpenBSD       (/include/spawn.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/spawn.h) */
+/* (#) Portability: libc6         (/include/spawn.h) */
 /* (#) Portability: musl libc     (/include/spawn.h) */
 /* (#) Portability: uClibc        (/include/spawn.h) */
 #ifndef _SPAWN_H

@@ -31,6 +31,7 @@
 /* (#) Portability: OpenSolaris   (/usr/src/uts/common/sys/stat.h) */
 /* (#) Portability: Windows Kits  (/ucrt/sys/stat.h) */
 /* (#) Portability: diet libc     (/include/sys/stat.h) */
+/* (#) Portability: libc4/5       (/include/sys/stat.h) */
 /* (#) Portability: musl libc     (/include/sys/stat.h) */
 /* (#) Portability: uClibc        (/include/sys/stat.h) */
 }

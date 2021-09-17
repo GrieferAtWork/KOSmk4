@@ -21,6 +21,7 @@
 /* (#) Portability: Cygwin        (/newlib/libc/include/argz.h) */
 /* (#) Portability: GNU C Library (/string/argz.h) */
 /* (#) Portability: Newlib        (/newlib/libc/include/argz.h) */
+/* (#) Portability: libc6         (/include/argz.h) */
 }
 
 %[default:section(".text.crt{|.dos}.string.argz")]

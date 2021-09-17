@@ -26,6 +26,8 @@
 /* (#) Portability: OpenBSD       (/include/netdb.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/netdb.h) */
 /* (#) Portability: diet libc     (/include/netdb.h) */
+/* (#) Portability: libc4/5       (/include/netdb.h) */
+/* (#) Portability: libc6         (/include/netdb.h) */
 /* (#) Portability: musl libc     (/include/netdb.h) */
 /* (#) Portability: uClibc        (/include/netdb.h) */
 }

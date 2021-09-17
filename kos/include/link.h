@@ -23,6 +23,8 @@
 /* (#) Portability: OpenBSD       (/include/link.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/link.h) */
 /* (#) Portability: diet libc     (/include/link.h) */
+/* (#) Portability: libc4/5       (/include/link.h) */
+/* (#) Portability: libc6         (/include/link.h) */
 /* (#) Portability: musl libc     (/include/link.h) */
 /* (#) Portability: uClibc        (/include/link.h) */
 #ifndef _LINK_H

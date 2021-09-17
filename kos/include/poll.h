@@ -23,6 +23,7 @@
 /* (#) Portability: OpenBSD       (/include/poll.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/poll.h) */
 /* (#) Portability: diet libc     (/include/poll.h) */
+/* (#) Portability: libc6         (/include/poll.h) */
 /* (#) Portability: musl libc     (/include/poll.h) */
 /* (#) Portability: uClibc        (/include/poll.h) */
 #ifndef _POLL_H

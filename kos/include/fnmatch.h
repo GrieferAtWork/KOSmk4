@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x50df48f5 */
+/* HASH CRC-32:0x81f70bb9 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,6 +28,8 @@
 /* (#) Portability: OpenBSD       (/include/fnmatch.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/fnmatch.h) */
 /* (#) Portability: diet libc     (/include/fnmatch.h) */
+/* (#) Portability: libc4/5       (/include/fnmatch.h) */
+/* (#) Portability: libc6         (/include/fnmatch.h) */
 /* (#) Portability: musl libc     (/include/fnmatch.h) */
 /* (#) Portability: uClibc        (/include/fnmatch.h) */
 #ifndef _FNMATCH_H

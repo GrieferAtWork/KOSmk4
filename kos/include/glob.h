@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5ab780fc */
+/* HASH CRC-32:0xb23ef05 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,6 +29,8 @@
 /* (#) Portability: OpenBSD       (/include/glob.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/glob.h) */
 /* (#) Portability: diet libc     (/include/glob.h) */
+/* (#) Portability: libc4/5       (/include/glob.h) */
+/* (#) Portability: libc6         (/include/glob.h) */
 /* (#) Portability: musl libc     (/include/glob.h) */
 /* (#) Portability: uClibc        (/include/glob.h) */
 #ifndef _GLOB_H

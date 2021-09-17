@@ -373,12 +373,15 @@ incdir("");
 #include <bsd/bitstring.h>
 #include <bsd/bsd.h>
 #include <bsd/err.h>
+#include <bsd/errno.h>
 #include <bsd/getopt.h>
 #include <bsd/grp.h>
 #include <bsd/inttypes.h>
 #include <bsd/libutil.h>
 #include <bsd/pwd.h>
 #include <bsd/readpassphrase.h>
+#include <bsd/sgtty.h>
+#include <bsd/signal.h>
 #include <bsd/stdio.h>
 #include <bsd/stdlib.h>
 #include <bsd/string.h>
@@ -390,6 +393,8 @@ incdir("");
 #include <bsd/sys/poll.h>
 #include <bsd/sys/queue.h>
 #include <bsd/sys/time.h>
+#include <bsd/sys/ttychars.h>
+#include <bsd/tzfile.h>
 #include <bsd/unistd.h>
 #include <bsd/wchar.h>
 #include <byteswap.h>

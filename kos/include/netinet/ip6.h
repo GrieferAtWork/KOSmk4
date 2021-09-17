@@ -23,6 +23,7 @@
 /* (#) Portability: NetBSD        (/sys/netinet/ip6.h) */
 /* (#) Portability: OpenBSD       (/sys/netinet/ip6.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/uts/common/netinet/ip6.h) */
+/* (#) Portability: libc6         (/include/netinet/ip6.h) */
 /* (#) Portability: musl libc     (/include/netinet/ip6.h) */
 /* (#) Portability: uClibc        (/include/netinet/ip6.h) */
 #ifndef _NETINET_IP6_H
