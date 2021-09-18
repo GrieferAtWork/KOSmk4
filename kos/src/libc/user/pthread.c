@@ -362,6 +362,9 @@ NOTHROW_NCX(LIBCCALL libc_pthread_do_create)(pthread_t *__restrict newthread,
 	 * such  that it will  lazily initialize it  the first time it
 	 * performs a call to `sigprocmask(2)'. */
 	memset(&pt->pt_pmask, 0, offsetof(struct userprocmask, pm_pending));
+#if USERPROCMASK_FLAG_NORMAL != 0
+	pt->pt_pmask.lpm_pmask.pm_flags = USERPROCMASK_FLAG_NORMAL;
+#endif /* USERPROCMASK_FLAG_NORMAL != 0 */
 	pt->pt_pmask.lpm_pmask.pm_sigsize = sizeof(sigset_t);
 /*	pt->pt_pmask.lpm_pmask.pm_sigmask = NULL; */ /* Already done by the memset (NULL means not-yet-initialized) */
 #endif /* __LIBC_CONFIG_HAVE_USERPROCMASK */

@@ -3081,6 +3081,16 @@ setcp_USASCII:
 			SET_CP(CP_PORTUGUESE);
 			break;
 
+		case 'G':
+			/* UTF-8 (referenced here: https://man7.org/linux/man-pages/man7/utf-8.7.html) */
+			SET_CP(CP_UTF8);
+			break;
+
+//		case '@':
+//			/* ISO-2022-* (referenced here: https://man7.org/linux/man-pages/man7/utf-8.7.html) */
+//			SET_CP(???);
+//			break;
+
 		case CC_NUL:
 			/* NUL should be ignored by ansi ttys in all situations. */
 			break;

@@ -31,11 +31,17 @@
 #define __OFFSET_USERPROCMASK_MYTID   0
 #define __OFFSET_USERPROCMASK_SIGSIZE 8
 #define __OFFSET_USERPROCMASK_SIGMASK 16
-#define __OFFSET_USERPROCMASK_PENDING 24
-#define __SIZEOF_USERPROCMASK         (24 + __SIZEOF_SIGSET_T__)
+#define __OFFSET_USERPROCMASK_FLAGS   24
+#define __OFFSET_USERPROCMASK_PENDING 32
+#define __SIZEOF_USERPROCMASK         (32 + __SIZEOF_SIGSET_T__)
 
 #ifdef __CC__
 __DECL_BEGIN
+
+#define USERPROCMASK_FLAG_NORMAL     0x0000 /* Normal flags. */
+#define USERPROCMASK_FLAG_HASPENDING 0x0001 /* FLAG: `pm_pending' may contain non-zero entries.
+                                             * Set by the kernel and expected to be cleared by userspace. */
+
 
 /* User-space sigprocmask() control structure (this structure should be
  * placed in TLS memory, and its  contents are shared with the  kernel)
@@ -52,6 +58,7 @@ struct userprocmask /*[PREFIX(pm_)]*/ {
 	                                     * The  kernel may or' this with another mask when a signal handler is invoked
 	                                     * that contains a non-empty `sa_mask'.
 	                                     * Set to `NULL' to indicate that `sys_set_userprocmask_address(2)' wasn't called, yet. */
+	__UINT64_TYPE__         pm_flags;   /* [KERNEL:WRITE, USER:READWRITE] Set of `USERPROCMASK_FLAG_*' */
 #else /* __x86_64__ */
 	__UINT32_TYPE__         pm_sigsize; /* [const] == sizeof(sigset_t) */
 	__UINT32_TYPE__        _pm_pad1;    /* ... */
@@ -60,6 +67,8 @@ struct userprocmask /*[PREFIX(pm_)]*/ {
 	                                     * that contains a non-empty `sa_mask'.
 	                                     * Set to `NULL' to indicate that `sys_set_userprocmask_address(2)' wasn't called, yet. */
 	__UINT32_TYPE__        _pm_pad2;    /* ... */
+	__UINT32_TYPE__         pm_flags;   /* [KERNEL:WRITE, USER:READWRITE] Set of `USERPROCMASK_FLAG_*' */
+	__UINT32_TYPE__         pm_pad2;    /* ... */
 #endif /* !__x86_64__ */
 	struct __sigset_struct  pm_pending; /* [KERNEL:WRITE, USER:READWRITE][sizeof(== pm_sigsize)] Set of pending signals
 	                                     * When a currently masked signal arrives, the kernel
@@ -67,11 +76,11 @@ struct userprocmask /*[PREFIX(pm_)]*/ {
 };
 
 #ifdef __x86_64__
-#define USERPROCMASK_INIT(mytid, sigsize, sigmask, pending) \
-	{ mytid, 0, sigsize, sigmask, pending }
+#define USERPROCMASK_INIT(mytid, sigsize, sigmask, flags, pending) \
+	{ mytid, 0, sigsize, sigmask, flags, pending }
 #else /* __x86_64__ */
-#define USERPROCMASK_INIT(mytid, sigsize, sigmask, pending) \
-	{ mytid, 0, sigsize, 0, sigmask, 0, pending }
+#define USERPROCMASK_INIT(mytid, sigsize, sigmask, flags, pending) \
+	{ mytid, 0, sigsize, 0, sigmask, 0, flags, 0, pending }
 #endif /* !__x86_64__ */
 
 

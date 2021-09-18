@@ -388,14 +388,9 @@ NOTHROW_NCX(LIBCCALL libc_sigprocmask)(__STDC_INT_AS_UINT_T how,
 	 * From this point forth, signals sent to our thread will be masked by `new_set' */
 	ATOMIC_WRITE(me->pt_pmask.lpm_pmask.pm_sigmask, new_set);
 
-	/* Optimization: If we know that no signal became unmasked, we don't
-	 *               have  to search for  any pending, unmasked signals! */
-	if (how == SIG_BLOCK)
-		return 0;
-
 	/* Check if previously pending signals became available.
 	 *
-	 * Q: It the below ~really~ reentrant-safe (in terms of a  signal
+	 * Q: Is the below ~really~ reentrant-safe (in terms of a  signal
 	 *    handler being invoked while we're down below, which in turn
 	 *    ends up doing yet another call to sigprocmask(2))?
 	 * A: I think it's reentrant-safe (as far as signal-masking logic
@@ -406,17 +401,24 @@ NOTHROW_NCX(LIBCCALL libc_sigprocmask)(__STDC_INT_AS_UINT_T how,
 	 *    would allow us to argue  that the signal may have  actually
 	 *    been  delivered  _after_ the  signal handler  re-masked the
 	 *    associates signal! */
-	{
+	if (me->pt_pmask.lpm_pmask.pm_flags & USERPROCMASK_FLAG_HASPENDING) {
 		unsigned int i;
+
+		/* Optimization: If we know that no signal became unmasked, we don't
+		 *               have  to search for  any pending, unmasked signals! */
+		if (how == SIG_BLOCK)
+			return 0;
+
+		ATOMIC_AND(me->pt_pmask.lpm_pmask.pm_flags, ~USERPROCMASK_FLAG_HASPENDING);
 		for (i = 0; i < __SIGSET_NWORDS; ++i) {
 			ulongptr_t pending_word;
 			ulongptr_t newmask_word;
 			pending_word = ATOMIC_READ(me->pt_pmask.lpm_pmask.pm_pending.__val[i]);
 			if (!pending_word)
 				continue; /* Nothing pending in here. */
-			newmask_word = new_set->__val[i];
 
 			/* Check if any of the pending signals are currently unmasked. */
+			newmask_word = new_set->__val[i];
 			if ((pending_word & ~newmask_word) != 0) {
 
 				/* Clear the set of pending signals (because the kernel won't do this)
@@ -534,26 +536,32 @@ NOTHROW_NCX(LIBCCALL libc_setsigmaskptr)(sigset_t *sigmaskptr)
 		if unlikely(sys_set_userprocmask_address(&me->pt_pmask.lpm_pmask) != -EOK)
 			goto do_legacy_sigprocmask;
 	}
+
 	/* Atomically switch over to the new signal mask. */
 	ATOMIC_WRITE(me->pt_pmask.lpm_pmask.pm_sigmask, sigmaskptr);
+
 	/* Check previously pending signals became available */
-	{
+	if (me->pt_pmask.lpm_pmask.pm_flags & USERPROCMASK_FLAG_HASPENDING) {
 		unsigned int i;
+		ATOMIC_AND(me->pt_pmask.lpm_pmask.pm_flags, ~USERPROCMASK_FLAG_HASPENDING);
 		for (i = 0; i < __SIGSET_NWORDS; ++i) {
 			ulongptr_t pending_word;
 			ulongptr_t newmask_word;
 			pending_word = ATOMIC_READ(me->pt_pmask.lpm_pmask.pm_pending.__val[i]);
 			if (!pending_word)
 				continue; /* Nothing pending in here. */
-			newmask_word = sigmaskptr->__val[i];
+
 			/* Check if any of the pending signals are currently unmasked. */
+			newmask_word = sigmaskptr->__val[i];
 			if ((pending_word & ~newmask_word) != 0) {
+
 				/* Clear the set of pending signals (because the kernel won't do this)
 				 * Also  note that  there is no  guaranty that the  signal that became
 				 * available in the mean time is still available now. - The signal may
 				 * have  been directed at  our process as a  whole, and another thread
 				 * may have already handled it. */
 				sigemptyset(&me->pt_pmask.lpm_pmask.pm_pending);
+
 				/* Calls the kernel's `sigmask_check()' function */
 				sys_sigmask_check();
 				break;

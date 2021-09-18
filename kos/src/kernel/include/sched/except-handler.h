@@ -213,6 +213,7 @@ DATDEF ATTR_PERTASK USER CHECKED pid_t *this_tid_address;
  * >>                            // The kernel may or' this with another mask when a signal handler is invoked
  * >>                            // that contains a non-empty `sa_mask'.
  * >>                            // Set to `NULL' to indicate that `sys_set_userprocmask_address()' wasn't called, yet.
+ * >>     uintptr_t pm_flags;    // [KERNEL:WRITE, USER:READWRITE] Set of `USERPROCMASK_FLAG_*'
  * >>     sigset_t  pm_pending;  // [KERNEL:WRITE, USER:READWRITE] Set of pending signals
  * >>                            // When a currently masked signal arrives, the kernel
  * >>                            // will set its associated bit to 1 within this set

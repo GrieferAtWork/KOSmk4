@@ -479,12 +479,16 @@ NOTHROW(KCALL restore_perthread_pending_signals)(struct sigqueue *__restrict myq
 	}
 }
 
-/* Gather the set of pending signals. */
-PRIVATE void KCALL
+/* Gather the set of pending signals.
+ * @return: true:  At least one signal was added to `these'
+ * @return: false: No signals were added to `these' */
+PRIVATE bool KCALL
 gather_pending_signals(sigset_t *__restrict these) {
 	struct sigqueue *myqueue;
 	struct process_sigqueue *prqueue;
 	struct sigqueue_entry *pending, **piter, *iter;
+	bool result;
+	result  = false;
 	myqueue = &THIS_SIGQUEUE;
 	/* Temporarily steal all pending per-thread signals. */
 	do {
@@ -492,12 +496,13 @@ gather_pending_signals(sigset_t *__restrict these) {
 		if (!pending)
 			goto no_perthread_pending; /* No signals are pending for the calling thread */
 		if unlikely(pending == SIGQUEUE_SQ_QUEUE_TERMINATED)
-			return; /* Shouldn't happen: The calling thread is currently terminating. */
+			return false; /* Shouldn't happen: The calling thread is currently terminating. */
 	} while (!ATOMIC_CMPXCH_WEAK(myqueue->sq_queue, pending, NULL));
 	iter  = pending;
 	piter = &pending;
 	do {
 		sigaddset(these, iter->sqe_info.si_signo);
+		result = true;
 	} while ((iter = *(piter = &iter->sqe_next)) != NULL);
 	/* Restore all signals pending for the calling thread. */
 	restore_perthread_pending_signals(myqueue, pending);
@@ -505,9 +510,12 @@ no_perthread_pending:
 	/* With per-task signals checked, also check for per-process signals */
 	prqueue = &THIS_PROCESS_SIGQUEUE;
 	sync_read(&prqueue->psq_lock);
-	for (iter = prqueue->psq_queue.sq_queue; iter; iter = iter->sqe_next)
+	for (iter = prqueue->psq_queue.sq_queue; iter; iter = iter->sqe_next) {
 		sigaddset(these, iter->sqe_info.si_signo);
+		result = true;
+	}
 	sync_endread(&prqueue->psq_lock);
+	return result;
 }
 
 
@@ -561,10 +569,15 @@ DEFINE_SYSCALL1(errno_t, set_userprocmask_address,
 		/* Fill in the initial set of pending signals for user-space. */
 		{
 			sigset_t pending;
+			uintptr_t flags;
 			sigemptyset(&pending);
-			gather_pending_signals(&pending);
+			flags = USERPROCMASK_FLAG_NORMAL;
+			if (gather_pending_signals(&pending))
+				flags |= USERPROCMASK_FLAG_HASPENDING;
 			COMPILER_BARRIER();
 			memcpy(&ctl->pm_pending, &pending, sizeof(sigset_t));
+			COMPILER_BARRIER();
+			ATOMIC_WRITE(ctl->pm_flags, flags);
 			COMPILER_BARRIER();
 		}
 

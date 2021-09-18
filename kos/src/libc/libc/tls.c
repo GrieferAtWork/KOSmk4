@@ -41,6 +41,7 @@ INTERN ATTR_THREAD struct pthread current = {
 		/* .lpm_pmask = */ USERPROCMASK_INIT(/* mytid:   */ 0,
 		                                     /* sigsize: */ sizeof(sigset_t),
 		                                     /* sigmask: */ NULL,
+		                                     /* flags:   */ USERPROCMASK_FLAG_NORMAL,
 		                                     /* pending: */ SIGSET_INIT_EMPTY),
 		/* .lpm_masks = */ {
 			/* [0] = */ SIGSET_INIT_EMPTY,

@@ -722,6 +722,9 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *           into  this  issue, and  I can  continue to  have this  test run,
 	 *           knowing how to deal with the out-of-memory issue. */
 
+	/* TODO: Look into how best to protect from "over-long" utf-8 encodings
+	 *       when it comes to our implementation of functions from <unicode.h> */
+
 	return state;
 }
 

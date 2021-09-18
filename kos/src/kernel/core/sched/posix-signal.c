@@ -219,6 +219,7 @@ usersigmask_ismasked_chk(signo_t signo) {
 		 * checked, and  that the  signal may  be pending  at this  point. */
 		if ((ATOMIC_READ(umask->pm_pending.__val[word]) & mask) == 0) {
 			ATOMIC_OR(umask->pm_pending.__val[word], mask);
+			ATOMIC_OR(umask->pm_flags, USERPROCMASK_FLAG_HASPENDING);
 			printk(KERN_DEBUG "[userprocmask:%p] Mark signal %d as pending\n",
 			       umask, signo);
 		}
@@ -313,6 +314,8 @@ set_maybe_and_return:
 				 * bit in `um->pm_pending'! */
 #ifdef atomic_or_nopf
 				if unlikely(!atomic_or_nopf(&um->pm_pending.__val[word], mask))
+					goto set_maybe_and_return;
+				if unlikely(!atomic_or_nopf(&um->pm_flags, USERPROCMASK_FLAG_HASPENDING))
 					goto set_maybe_and_return;
 				printk(KERN_DEBUG "[userprocmask:%p] Mark signal %d as pending "
 				                  "[tid=%" PRIuN(__SIZEOF_PID_T__) "]\n",
