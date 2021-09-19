@@ -38,11 +38,16 @@ INTERN_FUNCTION(_start)
 	INTERN(main)
 	call   main
 	movl   %eax, 0(%esp)
-	EXTERN(exit)
+
+	/* %ebx isn't required when we're not generating position-independent code. */
+#if defined(__pic__) || defined(__PIC__) || defined(__pie__) || defined(__PIE__)
 	/* @PLT requires %ebx to be loaded, so load it now */
 	call   1f
 1:	popl   %ebx
 	addl   $(_GLOBAL_OFFSET_TABLE_ + (. - 1b)), %ebx
+#endif /* ... */
+
+	EXTERN(exit)
 	call   exit@PLT
 END(_start)
 
