@@ -1542,7 +1542,7 @@ nextop_nocomma:
 				case OPC_LJMP: {
 					u16 segment;
 					u32 offset;
-					if (op_flags & EMU86_F_AD16) {
+					if (!!DA86_IS16(self) ^ !!(op_flags & EMU86_F_AD16)) {
 						offset = UNALIGNED_GET16((u16 const *)self->d_pc);
 						self->d_pc += 2;
 					} else {

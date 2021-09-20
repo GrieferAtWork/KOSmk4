@@ -722,8 +722,19 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *           into  this  issue, and  I can  continue to  have this  test run,
 	 *           knowing how to deal with the out-of-memory issue. */
 
-	/* TODO: Look into how best to protect from "over-long" utf-8 encodings
+	/* TODO: Look into how  best to protect  from "over-long" utf-8  encodings
 	 *       when it comes to our implementation of functions from <unicode.h> */
+
+	/* TODO: Standardize the lockop system in a new header  <kos/lockop.h>
+	 *       and mode all of the runtime back-end functionality into libc.
+	 * Now  that the proposed  data model for  libservice includes its own
+	 * variant of  lockops, it  stands to  reason to  provide an  official
+	 * interface and mode all of the implementation into libc.  Especially
+	 * given the obvious advantages provided by the async nature of lockop
+	 * systems, which will probably get used  again when it comes to  libc
+	 * getting its own,  custom heap implementation  (that isn't  dlmalloc
+	 * in disguise)
+	 */
 
 	return state;
 }

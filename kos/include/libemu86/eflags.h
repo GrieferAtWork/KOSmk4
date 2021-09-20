@@ -60,7 +60,7 @@ __DECL_BEGIN
 /* Parity flag (s.a. `https://en.wikipedia.org/wiki/Parity_flag') */
 __LOCAL __ATTR_CONST __uint32_t
 __NOTHROW(LIBEMU86_CC emu86_geteflags_PFb)(__uint8_t value) {
-	/* == POPCOUNT(value) & 1 */
+	/* == POPCOUNT(value) & 1 ? 0 : EFLAGS_PF */
 	value ^= value >> 4; /* 0xff -> 0x0f */
 	value ^= value >> 2; /* 0x0f -> 0x03 */
 	value ^= value >> 1; /* 0x03 -> 0x01 */

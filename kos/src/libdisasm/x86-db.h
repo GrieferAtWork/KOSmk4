@@ -813,9 +813,9 @@ PRIVATE struct instruction const ops[] = {
 	I(0x6a, 0,               "pushl\t" OP_S8),
 	I(0x6a, IF_REXW,         "pushq\t" OP_S8),
 
-	I(0x6b, IF_66|IF_MODRM,  "imulw\t" OP_U8 OP_RM16 OP_R16),
-	I(0x6b, IF_MODRM,        "imull\t" OP_U8 OP_RM32 OP_R32),
-	I(0x6b, IF_MODRM|IF_REXW,"imulq\t" OP_U8 OP_RM64 OP_R64),
+	I(0x6b, IF_66|IF_MODRM,  "imulw\t" OP_S8 OP_RM16 OP_R16),
+	I(0x6b, IF_MODRM,        "imull\t" OP_S8 OP_RM32 OP_R32),
+	I(0x6b, IF_MODRM|IF_REXW,"imulq\t" OP_S8 OP_RM64 OP_R64),
 
 	I(0x6c, 0,               "insb"),
 	I(0x6c, IF_F3,           "rep insb"),
@@ -3273,9 +3273,9 @@ PRIVATE struct instruction const ops_0f[] = {
 	I(0xae, IF_BYTE2, "\xf0" "mfence"), /* 0xf0: [mod=3,reg=6,rm=0] (aka. `foo [rm]:%ax, [reg]:%si') */
 	I(0xae, IF_BYTE2, "\xf8" "sfence"), /* 0xf8: [mod=3,reg=7,rm=0] (aka. `foo [rm]:%ax, [reg]:%di') */
 
-	I(0xaf, IF_66|IF_MODRM,  "imulb\t" OP_RM8 OP_R8),
-	I(0xaf, IF_MODRM,        "imulw\t" OP_RM16 OP_R16),
-	I(0xaf, IF_MODRM|IF_REXW,"imull\t" OP_RM32 OP_R32),
+	I(0xaf, IF_66|IF_MODRM,  "imulw\t" OP_RM16 OP_R16),
+	I(0xaf, IF_MODRM,        "imull\t" OP_RM32 OP_R32),
+	I(0xaf, IF_MODRM|IF_REXW,"imulq\t" OP_RM64 OP_R64),
 
 	I(0xb0, IF_MODRM,        "cmpxchgb\t" OP_R8 OP_RM8),
 	I(0xb1, IF_66|IF_MODRM,  "cmpxchgw\t" OP_R16 OP_RM16),
