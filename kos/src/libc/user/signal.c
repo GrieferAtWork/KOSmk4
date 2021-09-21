@@ -629,6 +629,72 @@ do_legacy_sigprocmask:
 }
 /*[[[end:libc_setsigmaskfullptr]]]*/
 
+/*[[[head:libc_getuserprocmask,hash:CRC-32=0xeb19345]]]*/
+#ifdef __LIBC_CONFIG_HAVE_USERPROCMASK
+/* >> getuserprocmask(3)
+ * Return a pointer to the calling thread's userprocmask
+ * This function is only  declared if supported by  libc */
+INTERN ATTR_SECTION(".text.crt.sched.signal") ATTR_CONST ATTR_RETNONNULL WUNUSED struct userprocmask *
+NOTHROW(LIBCCALL libc_getuserprocmask)(void)
+/*[[[body:libc_getuserprocmask]]]*/
+{
+	struct pthread *me = &current;
+	if unlikely(!me->pt_pmask.lpm_pmask.pm_sigmask) {
+		/* Lazily initialize the userprocmask sub-system. */
+		me->pt_pmask.lpm_pmask.pm_sigmask = &me->pt_pmask.lpm_masks[0];
+		sys_Xset_userprocmask_address(&me->pt_pmask.lpm_pmask);
+	}
+	return &me->pt_pmask.lpm_pmask;
+}
+#endif /* MAGIC:impl_if */
+/*[[[end:libc_getuserprocmask]]]*/
+
+/*[[[head:libc_chkuserprocmask,hash:CRC-32=0xa0ac36f3]]]*/
+#ifdef __LIBC_CONFIG_HAVE_USERPROCMASK
+/* >> chkuserprocmask(3)
+ * Following the calling thread's userprocmask becoming less
+ * restrictive, check for pending signals and handle them if
+ * necessary
+ * This function is only declared if supported by libc */
+INTERN ATTR_SECTION(".text.crt.sched.signal") void
+NOTHROW(LIBCCALL libc_chkuserprocmask)(void)
+/*[[[body:libc_chkuserprocmask]]]*/
+{
+	struct pthread *me = &current;
+	/* Check previously pending signals became available */
+	if (me->pt_pmask.lpm_pmask.pm_flags & USERPROCMASK_FLAG_HASPENDING) {
+		sigset_t *sigmaskptr;
+		unsigned int i;
+		ATOMIC_AND(me->pt_pmask.lpm_pmask.pm_flags, ~USERPROCMASK_FLAG_HASPENDING);
+		sigmaskptr = me->pt_pmask.lpm_pmask.pm_sigmask;
+		for (i = 0; i < __SIGSET_NWORDS; ++i) {
+			ulongptr_t pending_word;
+			ulongptr_t newmask_word;
+			pending_word = ATOMIC_READ(me->pt_pmask.lpm_pmask.pm_pending.__val[i]);
+			if (!pending_word)
+				continue; /* Nothing pending in here. */
+
+			/* Check if any of the pending signals are currently unmasked. */
+			newmask_word = sigmaskptr->__val[i];
+			if ((pending_word & ~newmask_word) != 0) {
+
+				/* Clear the set of pending signals (because the kernel won't do this)
+				 * Also  note that  there is no  guaranty that the  signal that became
+				 * available in the mean time is still available now. - The signal may
+				 * have  been directed at  our process as a  whole, and another thread
+				 * may have already handled it. */
+				sigemptyset(&me->pt_pmask.lpm_pmask.pm_pending);
+
+				/* Calls the kernel's `sigmask_check()' function */
+				sys_sigmask_check();
+				break;
+			}
+		}
+	}
+}
+#endif /* MAGIC:impl_if */
+/*[[[end:libc_chkuserprocmask]]]*/
+
 
 /*[[[head:libc_sigsuspend,hash:CRC-32=0x7d1515b8]]]*/
 /* >> sigsuspend(2)
@@ -1036,7 +1102,7 @@ DEFINE_INTERN_ALIAS(libd_gsignal, libd_raise);
 
 
 
-/*[[[start:exports,hash:CRC-32=0x875fcea2]]]*/
+/*[[[start:exports,hash:CRC-32=0x73d37d1d]]]*/
 DEFINE_PUBLIC_ALIAS(DOS$raise, libd_raise);
 DEFINE_PUBLIC_ALIAS(raise, libc_raise);
 DEFINE_PUBLIC_ALIAS(DOS$__sysv_signal, libd_sysv_signal);
@@ -1060,6 +1126,10 @@ DEFINE_PUBLIC_ALIAS(sigprocmask, libc_sigprocmask);
 DEFINE_PUBLIC_ALIAS(getsigmaskptr, libc_getsigmaskptr);
 DEFINE_PUBLIC_ALIAS(setsigmaskptr, libc_setsigmaskptr);
 DEFINE_PUBLIC_ALIAS(setsigmaskfullptr, libc_setsigmaskfullptr);
+#ifdef __LIBC_CONFIG_HAVE_USERPROCMASK
+DEFINE_PUBLIC_ALIAS(getuserprocmask, libc_getuserprocmask);
+DEFINE_PUBLIC_ALIAS(chkuserprocmask, libc_chkuserprocmask);
+#endif /* __LIBC_CONFIG_HAVE_USERPROCMASK */
 DEFINE_PUBLIC_ALIAS(__sigsuspend, libc_sigsuspend);
 DEFINE_PUBLIC_ALIAS(sigsuspend, libc_sigsuspend);
 DEFINE_PUBLIC_ALIAS(__sigaction, libc_sigaction);

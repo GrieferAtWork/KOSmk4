@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x45ab5eb */
+/* HASH CRC-32:0x1f457b8e */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -227,6 +227,20 @@ INTDEF ATTR_RETNONNULL NONNULL((1)) sigset_t *NOTHROW_NCX(LIBCCALL libc_setsigma
  * >> ...
  * >> setsigmaskptr(os); */
 INTDEF ATTR_RETNONNULL sigset_t *NOTHROW_NCX(LIBCCALL libc_setsigmaskfullptr)(void);
+#endif /* !__KERNEL__ */
+#if !defined(__KERNEL__) && defined(__LIBC_CONFIG_HAVE_USERPROCMASK)
+/* >> getuserprocmask(3)
+ * Return a pointer to the calling thread's userprocmask
+ * This function is only  declared if supported by  libc */
+INTDEF ATTR_CONST ATTR_RETNONNULL WUNUSED struct userprocmask *NOTHROW(LIBCCALL libc_getuserprocmask)(void);
+/* >> chkuserprocmask(3)
+ * Following the calling thread's userprocmask becoming less
+ * restrictive, check for pending signals and handle them if
+ * necessary
+ * This function is only declared if supported by libc */
+INTDEF void NOTHROW(LIBCCALL libc_chkuserprocmask)(void);
+#endif /* !__KERNEL__ && __LIBC_CONFIG_HAVE_USERPROCMASK */
+#ifndef __KERNEL__
 /* >> sigsuspend(2)
  * Atomically save and  set the caller's  signal mask to  `set', then wait  for
  * one of the contained signals to arrive before restoring the old signal mask.

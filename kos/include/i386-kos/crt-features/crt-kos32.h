@@ -1519,6 +1519,7 @@
 #define __CRT_HAVE_cfsetospeed
 #define __CRT_HAVE_cfsetspeed
 #define __CRT_HAVE_chdir
+#define __CRT_HAVE_chkuserprocmask
 #define __CRT_HAVE_chmod
 #define __CRT_HAVE_chown
 #define __CRT_HAVE_chroot
@@ -2275,6 +2276,7 @@
 #define __CRT_HAVE_getttynam
 #define __CRT_HAVE_getuid
 #define __CRT_HAVE_getumask
+#define __CRT_HAVE_getuserprocmask
 #define __CRT_HAVE_getusershell
 #define __CRT_HAVE_getutent
 #define __CRT_HAVE_getutent_r

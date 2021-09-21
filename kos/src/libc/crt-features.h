@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xee50dc2d */
+/* HASH CRC-32:0x98422791 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3751,6 +3751,11 @@
 #define __CRT_HAVE_cfsetospeed
 #define __CRT_HAVE_cfsetspeed
 #define __CRT_HAVE_chdir
+#endif /* !__KERNEL__ */
+#if !defined(__KERNEL__) && defined(__LIBC_CONFIG_HAVE_USERPROCMASK)
+#define __CRT_HAVE_chkuserprocmask
+#endif /* !__KERNEL__ && __LIBC_CONFIG_HAVE_USERPROCMASK */
+#ifndef __KERNEL__
 #define __CRT_HAVE_chmod
 #define __CRT_HAVE_chown
 #define __CRT_HAVE_chroot
@@ -4468,6 +4473,11 @@
 #define __CRT_HAVE_getttynam
 #define __CRT_HAVE_getuid
 #define __CRT_HAVE_getumask
+#endif /* !__KERNEL__ */
+#if !defined(__KERNEL__) && defined(__LIBC_CONFIG_HAVE_USERPROCMASK)
+#define __CRT_HAVE_getuserprocmask
+#endif /* !__KERNEL__ && __LIBC_CONFIG_HAVE_USERPROCMASK */
+#ifndef __KERNEL__
 #define __CRT_HAVE_getusershell
 #define __CRT_HAVE_getutent
 #define __CRT_HAVE_getutent_r

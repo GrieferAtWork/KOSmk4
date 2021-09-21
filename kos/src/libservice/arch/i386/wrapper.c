@@ -20,7 +20,6 @@
 #ifndef GUARD_LIBSERVICE_ARCH_I386_WRAPPER_C
 #define GUARD_LIBSERVICE_ARCH_I386_WRAPPER_C 1
 #define _KOS_SOURCE 1
-#define _LIBC_SOURCE 1 /* For `__USE_PTHREAD_INTERNALS' */
 
 #include "../../api.h"
 /**/
@@ -28,7 +27,7 @@
 #include <hybrid/align.h>
 #include <hybrid/host.h>
 
-#include <bits/crt/pthreadtypes.h>
+#include <kos/bits/userprocmask.h>
 #include <kos/except.h>
 #include <kos/syscalls.h>
 #include <kos/types.h>
@@ -45,9 +44,9 @@
 
 DECL_BEGIN
 
-#ifndef __LIBC_CONFIG_HAVE_USERPROCMASK
+#ifndef __getuserprocmask_defined
 #error "Generated wrapper functions assume that userprocmask is available and supported!"
-#endif /* !__LIBC_CONFIG_HAVE_USERPROCMASK */
+#endif /* !__getuserprocmask_defined */
 
 /*
  * Function arguments are serialized (and potentially deserialized) as follows:
@@ -93,38 +92,6 @@ static uint8_t const sysvabi_registers[] = {
 #define USE_STOS_THRESHOLD 4 /* Use `stosP' when there are at least this many word-sized writes */
 
 
-/* Auxiliary helper function called by wrapper functions. */
-PRIVATE void FCALL
-aux_check_pending_signals(struct pthread *__restrict me) {
-	unsigned int i;
-	sigset_t *sigmaskptr;
-	ATOMIC_AND(me->pt_pmask.lpm_pmask.pm_flags, ~USERPROCMASK_FLAG_HASPENDING);
-	sigmaskptr = me->pt_pmask.lpm_pmask.pm_sigmask;
-	for (i = 0; i < __SIGSET_NWORDS; ++i) {
-		ulongptr_t pending_word;
-		ulongptr_t newmask_word;
-		pending_word = ATOMIC_READ(me->pt_pmask.lpm_pmask.pm_pending.__val[i]);
-		if (!pending_word)
-			continue; /* Nothing pending in here. */
-
-		/* Check if any of the pending signals are currently unmasked. */
-		newmask_word = sigmaskptr->__val[i];
-		if ((pending_word & ~newmask_word) != 0) {
-
-			/* Clear the set of pending signals (because the kernel won't do this)
-			 * Also  note that  there is no  guaranty that the  signal that became
-			 * available in the mean time is still available now. - The signal may
-			 * have  been directed at  our process as a  whole, and another thread
-			 * may have already handled it. */
-			sigemptyset(&me->pt_pmask.lpm_pmask.pm_pending);
-
-			/* Calls the kernel's `sigmask_check()' function */
-			sys_sigmask_check();
-			break;
-		}
-	}
-}
-
 
 
 
@@ -145,9 +112,9 @@ NOTHROW(CC libservice_dlsym_create_wrapper)(struct service *__restrict self,
 	/* The stack-frame of a wrapper function looks like this:
 	 *
 	 *      CFA+locvar_cfa_offset              [<start of locals>]
-	 *                           +0*P           sigset_t *oldset;   # Old signal maks pointer (return value of `setsigmaskfullptr()')
-	 *                           +1*P           pthread_t me;       # Return value of `pthread_self()'
-	 *                                          ...                 # TODO: Information about user-buffer locations
+	 *                           +0*P           sigset_t *oldset;         # Old signal maks pointer
+	 *                           +1*P           struct userprocmask *upm; # Return value of `getuserprocmask()'
+	 *                                          ...                       # TODO: Information about user-buffer locations
 	 *      CFA+locvar_cfa_offset+locvar_size  [<end of locals>]
 	 *                                          ...                 # Additional register/argument save area
 	 *  /   CFA-3*P                            [SAVED: %Pbx]        # %Pbx is used for `R_service_com'
@@ -165,21 +132,6 @@ NOTHROW(CC libservice_dlsym_create_wrapper)(struct service *__restrict self,
 	 * Assembly implementation of wrapper functions:
 	 *
 	 * >>     .cfi_startproc
-	 * >> .Ltx_lazy_init_userprocmask_entry:
-	 * >>     .cfi_def_cfa_offset <...>
-	 * >>     .cfi_offset ...  // For registered also pushed below...
-	 * >>     leaP   {offsetof(struct pthread, pt_pmask.lpm_masks[0])}(%Pax), %Pdx
-	 * >>     movP   %Pdx, {offsetof(struct pthread, pt_pmask.lpm_pmask.pm_sigmask)}(%Pax)
-	 * >>     leaP   {offsetof(struct pthread, pt_pmask.lpm_pmask)}(%Pax), %PSYSCALL_REG0
-	 * >>     movP   $SYS_set_userprocmask_address, %Pax
-	 * >>     std
-	 * >>     .cfi_escape  [[[{register='%Pflags'} push %Pflags; and ~$EFLAGS_DF;]]]
-	 * >>     syscall  // Or int80h
-	 * >>     .cfi_restore %Pflags
-	 * >>     cld
-	 * >>     movP   0(%Psp), %Pax
-	 * >>     jmp    .Ltx_lazy_init_userprocmask_ret
-	 * >>
 	 * >> ENTRY:
 	 * >>     .cfi_def_cfa_offset 0
 	 * >>
@@ -190,19 +142,11 @@ NOTHROW(CC libservice_dlsym_create_wrapper)(struct service *__restrict self,
 	 * >>     subP   $<LOCVAR_SPACE>, %Psp
 	 * >>
 	 * >> // Disable preemption
-	 * >>     // TODO: Instead of all of this libc-internals-reliant nonsense, export 2 functions
-	 * >>     //       from libc under [crt_impl_if(defined(__LIBC_CONFIG_HAVE_USERPROCMASK))]:
-	 * >>     //       >> struct userprocmask *getuserprocmask(void); // Returns initialized `&pthread_self()->pt_pmask.lpm_pmask'
-	 * >>     //       >> void chkuserprocmask(void);                 // Does the job of `aux_check_pending_signals(pthread_self())'
-	 * >>     // Unlike the other sigmaskptr functions, these only get exported when the kernel is
-	 * >>     // configured for userprocmask support (iow: `#ifdef __NR_set_userprocmask_address')!
-	 * >>     call   pthread_self
-	 * >>     pushP_cfi %Pax          # Local variable: `pthread_t me'
-	 * >>     movP   {offsetof(struct pthread, pt_pmask.lpm_pmask.pm_sigmask)}(%Pax), %Pdx
-	 * >>     testP  %Pdx, %Pdx
-	 * >>     jz     .Ltx_lazy_init_userprocmask_entry
-	 * >>     pushP_cfi %Pdx          # Local variable: `sigset_t *oldset'
-	 * >>     movP   $ss_full, {offsetof(struct pthread, pt_pmask.lpm_pmask.pm_sigmask)}(%Pax)
+	 * >>     call   getuserprocmask
+	 * >>     pushP_cfi %Pax                                                     # Local variable: `struct userprocmask *upm'
+	 * >>     pushP_cfi {offsetof(struct userprocmask, pm_sigmask)}(%Pax)        # Local variable: `sigset_t *oldset'
+	 * >>     movP   $ss_full, {offsetof(struct userprocmask, pm_sigmask)}(%Pax) # Disable preemption
+	 * >>     .cfi_remember_state
 	 * >> .Leh_preemption_pop_begin:
 	 * >>
 	 * >> // Allocate the com buffer
@@ -211,29 +155,26 @@ NOTHROW(CC libservice_dlsym_create_wrapper)(struct service *__restrict self,
 	 * >>
 	 * >>
 	 * >> .Leh_preemption_pop_end:
+	 * >>     popP_cfi %Pdx              # `sigset_t *oldset'
+	 * >>     popP_cfi %Pax              # `struct userprocmask *upm'
 	 * >>     .cfi_remember_state
-	 * >>     movP   0(%Psp), %Pdx       # `oldset'
-	 * >>     movP   P(%Psp), %R_fcall0P # `me'
-	 * >>     movP   %Pdx, {offsetof(struct pthread, pt_pmask.lpm_pmask.pm_sigmask)}(%R_fcall0P)
-	 * >>     test   $USERPROCMASK_FLAG_HASPENDING, {offsetof(struct pthread, pt_pmask.lpm_pmask.pm_flags)}(%R_fcall0P)
+	 * >>     movP   %Pdx, {offsetof(struct userprocmask, pm_sigmask)}(%Pax)
+	 * >>     test   $USERPROCMASK_FLAG_HASPENDING, {offsetof(struct userprocmask, pm_flags)}(%Pax)
 	 * >>     jnz    1f
 	 * >> 2:  addP   $<LOCVAR_SPACE+...>, %Psp
 	 * >>     popP_cfi_r %Pbx            # Only on i386
 	 * >>     popP_cfi_r %Pbp            # Only on i386
 	 * >>     ret
-	 * >>
 	 * >>     .cfi_restore_state
-	 * >> 1:  call   aux_check_pending_signals
+	 * >> 1:  call   chkuserprocmask
 	 * >>     jmp    2b
 	 * >>
+	 * >>     .cfi_restore_state
 	 * >> .Leh_preemption_pop_entry:
-	 * >>     movP   0(%Psp), %Pdx       # `oldset'
-	 * >>     movP   P(%Psp), %R_fcall0P # `me'
-	 * >>     movP   %Pdx, {offsetof(struct pthread, pt_pmask.lpm_pmask.pm_sigmask)}(%R_fcall0P)
-	 * >>     test   $USERPROCMASK_FLAG_HASPENDING, {offsetof(struct pthread, pt_pmask.lpm_pmask.pm_flags)}(%R_fcall0P)
-	 * >>     jnz    1f
-	 * >>     call   error_rethrow
-	 * >> 1:  call   aux_check_pending_signals
+	 * >>     popP_cfi %Pdx              # `sigset_t *oldset'
+	 * >>     popP_cfi %Pax              # `struct userprocmask *upm'
+	 * >>     movP   %Pdx, {offsetof(struct userprocmask, pm_sigmask)}(%Pax)
+	 * >>     call   chkuserprocmask
 	 * >>     call   error_rethrow
 	 * >>     .cfi_endproc
 	 *
@@ -241,8 +182,6 @@ NOTHROW(CC libservice_dlsym_create_wrapper)(struct service *__restrict self,
 
 #define except_enabled ((flags & SERVICE_WRAPPER_FLAG_EXCEPT) != 0)
 	byte_t *tx_ptr, *tx_end;
-	byte_t *Ltx_lazy_init_userprocmask_entry; /* Entry point for lazy userprocmask initialization */
-	int8_t *Ltx_lazy_init_userprocmask_ret;   /* Relocation for return-jump */
 	size_t serial_alloc;
 	size_t serial_alloc_with_extra;
 	size_t cfa_offset;         /* Offset from `%Psp' until _after_ the return-pc */
@@ -300,13 +239,6 @@ NOTHROW(CC libservice_dlsym_create_wrapper)(struct service *__restrict self,
 
 	/* TODO: CFI instrumentation */
 
-	/* Generate the lazy userprocmask initialization stub (see above) */
-	Ltx_lazy_init_userprocmask_entry = tx_ptr;
-	/* TODO: proper `cfa_offset' */
-	/* TODO: instructions */
-	Ltx_lazy_init_userprocmask_ret;
-
-
 	cfa_offset = 1 * sizeof(void *); /* 1x return addr */
 	buffers->swb_entry = tx_ptr;
 	putinstr(gen86_pushP_r(&tx_ptr, R_service_com));
@@ -357,26 +289,9 @@ NOTHROW(CC libservice_dlsym_create_wrapper)(struct service *__restrict self,
 		cfa_offset += locvar_size - (2 * sizeof(void *));
 	}
 
-	/* Disable preemption (~ala `setsigmaskfullptr()') */
-	putinstr(gen86_call(&tx_ptr, &pthread_self));
-	putinstr(gen86_pushP_r(&tx_ptr, GEN86_R_PAX)); /* Local variable: `pthread_t me;' */
-	cfa_offset += sizeof(void *);
-	putinstr(gen86_movP_db_r(&tx_ptr, offsetof(struct pthread, pt_pmask.lpm_pmask.pm_sigmask), GEN86_R_PAX, GEN86_R_PDX));
-	putinstr(gen86_testP_r_r(&tx_ptr, GEN86_R_PDX, GEN86_R_PDX));
-	putinstr(gen86_jz8(&tx_ptr, Ltx_lazy_init_userprocmask_entry));
-	/* Resolve the return-jump relocation for the lazy userprocmask initializer. */
-	*Ltx_lazy_init_userprocmask_ret = (int8_t)(intptr_t)(tx_ptr - ((byte_t *)Ltx_lazy_init_userprocmask_ret + 1));
-	/* At this point, %Pax == pthread_self(), %Pdx = pt_pmask.lpm_pmask.pm_sigmask(%Pax) */
-	putinstr(gen86_pushP_r(&tx_ptr, GEN86_R_PDX)); /* Local variable: `sigset_t *oldset;' */
-	cfa_offset += sizeof(void *);
-	{ /* Set the full signal mask. */
-		static sigset_t const ss_full = __SIGSET_INIT((__ULONGPTR_TYPE__)-1);
-		putinstr(gen86_movP_imm_db(&tx_ptr, &ss_full, /* movP $ss_full, pt_pmask.lpm_pmask.pm_sigmask(%Pax) */
-		                           offsetof(struct pthread, pt_pmask.lpm_pmask.pm_sigmask), GEN86_R_PAX));
-	}
+	/* TODO: Disable preemption */
 
 	/* TODO: Exception handling: begin try (restore the old signal mask via finally) */
-
 
 	/* Call the buffer allocation function. */
 	putinstr(gen86_movP_imm_r(&tx_ptr, self, GEN86_R_FCALL0P));
@@ -426,12 +341,12 @@ NOTHROW(CC libservice_dlsym_create_wrapper)(struct service *__restrict self,
 	/* TODO: Load the com return value */
 
 	/* TODO: Free the dynamically allocated com-buffer */
-	abort();
 
-	if (code_flags & CODE_F_SAVED_PSI) {
-		putinstr(gen86_pushP_r(&tx_ptr, GEN86_R_PSI));
-		cfa_offset -= sizeof(void *);
-	}
+	/* TODO: Free local variable space */
+
+	/* TODO: Restore additional registers */
+
+	abort();
 
 	putinstr(gen86_popP_r(&tx_ptr, R_service_shm_handle));
 	putinstr(gen86_popP_r(&tx_ptr, R_service_com));

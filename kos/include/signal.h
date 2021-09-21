@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9c7bb9fd */
+/* HASH CRC-32:0x62042547 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -102,6 +102,10 @@ __NAMESPACE_STD_USING(signal)
 #ifdef __USE_POSIX
 #include <bits/os/sigaction.h>
 #endif /* __USE_POSIX */
+
+#if defined(__USE_KOS) && defined(__KOS__)
+#include <kos/bits/userprocmask.h>
+#endif /* __USE_KOS && __KOS__ */
 
 #if (defined(__USE_POSIX199309) || defined(__USE_XOPEN_EXTENDED) || defined(__USE_KOS))
 #include <asm/os/sigevent.h>
@@ -1745,6 +1749,23 @@ __CDECLARE(__ATTR_RETNONNULL,sigset_t *,__NOTHROW_NCX,setsigmaskfullptr,(void),(
  * >> setsigmaskptr(os); */
 __NAMESPACE_LOCAL_USING_OR_IMPL(setsigmaskfullptr, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_RETNONNULL sigset_t *__NOTHROW_NCX(__LIBCCALL setsigmaskfullptr)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(setsigmaskfullptr))(); })
 #endif /* ... */
+struct userprocmask;
+#if !defined(__getuserprocmask_defined) && defined(__CRT_HAVE_getuserprocmask)
+#define __getuserprocmask_defined 1
+/* >> getuserprocmask(3)
+ * Return a pointer to the calling thread's userprocmask
+ * This function is only  declared if supported by  libc */
+__CDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,struct userprocmask *,__NOTHROW,getuserprocmask,(void),())
+#endif /* !__getuserprocmask_defined && __CRT_HAVE_getuserprocmask */
+#if !defined(__chkuserprocmask_defined) && defined(__CRT_HAVE_chkuserprocmask)
+#define __chkuserprocmask_defined 1
+/* >> chkuserprocmask(3)
+ * Following the calling thread's userprocmask becoming less
+ * restrictive, check for pending signals and handle them if
+ * necessary
+ * This function is only declared if supported by libc */
+__CDECLARE_VOID(,__NOTHROW,chkuserprocmask,(void),())
+#endif /* !__chkuserprocmask_defined && __CRT_HAVE_chkuserprocmask */
 #endif /* __USE_KOS */
 #ifdef __CRT_HAVE_sigsuspend
 /* >> sigsuspend(2)

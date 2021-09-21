@@ -111,6 +111,10 @@
 #include <bits/os/sigaction.h>
 #endif /* __USE_POSIX */
 
+#if defined(__USE_KOS) && defined(__KOS__)
+#include <kos/bits/userprocmask.h>
+#endif /* __USE_KOS && __KOS__ */
+
 #if (defined(__USE_POSIX199309) || defined(__USE_XOPEN_EXTENDED) || defined(__USE_KOS))
 #include <asm/os/sigevent.h>
 #include <asm/os/siginfo.h>
@@ -1674,6 +1678,25 @@ sigset_t *setsigmaskptr([[nonnull]] sigset_t *sigmaskptr);
 	static sigset_t const ss_full = __SIGSET_INIT((__ULONGPTR_TYPE__)-1);
 	return setsigmaskptr((sigset_t *)&ss_full);
 }
+
+%struct userprocmask;
+
+@@>> getuserprocmask(3)
+@@Return a pointer to the calling thread's userprocmask
+@@This function is only  declared if supported by  libc
+[[guard, const, nonnull, wunused, nothrow, decl_prefix(struct userprocmask;)]]
+[[crt_impl_if(!defined(__KERNEL__) && defined(__LIBC_CONFIG_HAVE_USERPROCMASK))]]
+struct userprocmask *getuserprocmask(void);
+
+@@>> chkuserprocmask(3)
+@@Following the calling thread's userprocmask becoming less
+@@restrictive, check for pending signals and handle them if
+@@necessary
+@@This function is only declared if supported by libc
+[[guard, nothrow]]
+[[crt_impl_if(!defined(__KERNEL__) && defined(__LIBC_CONFIG_HAVE_USERPROCMASK))]]
+void chkuserprocmask(void);
+
 %#endif /* __USE_KOS */
 
 @@>> sigsuspend(2)
