@@ -30,6 +30,7 @@
 #include <hybrid/compiler.h>
 
 #include <hybrid/atomic.h>
+#include <hybrid/host.h>
 #include <hybrid/sequence/list.h>
 #include <hybrid/sequence/rbtree.h>
 #include <hybrid/sync/atomic-lock.h>
@@ -230,8 +231,8 @@ typedef sigset_t *pflag_t;
 struct service_com_funinfo {
 	uintptr_t                dl_comid;                    /* Command ID to invoke this function */
 	union service_com_retval dl_error_return;             /* Return value for errors/exceptions. (usually `-1') */
-	uint32_t                 dl_return;                   /* Function return type code (one of `SERVICE_TYPE_*') */
-	uint32_t                 dl_params[SERVICE_ARGC_MAX]; /* Function parameter types (ends on EOF or first `SERVICE_TYPE_VOID') */
+	service_typeid_t         dl_return;                   /* Function return type code (one of `SERVICE_TYPE_*') */
+	service_typeid_t         dl_params[SERVICE_ARGC_MAX]; /* Function parameter types (ends on EOF or first `SERVICE_TYPE_VOID') */
 };
 
 struct service_com_exceptinfo {
@@ -295,11 +296,11 @@ struct service_shm {
 struct service;
 struct service_shm_handle {
 	WEAK refcnt_t       ssh_refcnt;  /* Reference counter. */
-	struct service_shm *ssh_shm;     /* [1..ssh_size][owned][const] Shared memory region base  address.
+	struct service_shm *ssh_shm;     /* [1..(ssh_endp-.)][owned][const] Shared memory region base  address.
 	                                  * This pointer is the result of `mmap(fd: ssh_service->s_fd_shm)' */
-	size_t              ssh_size;    /* [lock(READ(ATOMIC), WRITE(ATOMIC && INCREASE_ONLY &&
+	byte_t             *ssh_endp;    /* [lock(READ(ATOMIC), WRITE(ATOMIC && INCREASE_ONLY &&
 	                                  *                           ssh_service->s_shmlock)]
-	                                  * Shared memory region size may not be reduced */
+	                                  * Shared memory region end pointer may not be reduced */
 	uintptr_t           ssh_isred;   /* [lock(ssh_service->s_shmlock)] Non-zero  if  this is  a  red node
 	                                  * within the tree of all SHM handles (using the SHM mapping address
 	                                  * ranges) */
@@ -314,7 +315,7 @@ __DEFINE_REFCOUNT_FUNCTIONS(struct service_shm_handle, ssh_refcnt, service_shm_h
 
 /* Helpers for operating with SHM handle tree functions. */
 #define service_shm_handle_getminaddr(self) ((byte_t *)(self)->ssh_shm)
-#define service_shm_handle_getmaxaddr(self) ((byte_t *)(self)->ssh_shm + (self)->ssh_size - 1)
+#define service_shm_handle_getmaxaddr(self) ((self)->ssh_endp - 1)
 
 
 
@@ -414,10 +415,11 @@ NOTHROW(CC _libservice_shmlock_reap)(struct service *__restrict self);
 	} __WHILE0
 
 struct service_wrapper_buffer {
-	byte_t *swb_txbuf; /* [1..swb_txsiz] Text buffer. */
-	size_t  swb_txsiz; /* [>= SERVICE_ARCH_MIN_TXBUF_SIZE] */
-	byte_t *swb_ehbuf; /* [1..swb_ehsiz] Text buffer. */
-	size_t  swb_ehsiz; /* [>= SERVICE_ARCH_MIN_EHBUF_SIZE] */
+	byte_t *swb_txbuf; /* [1..swb_txsiz] .text buffer */
+	size_t  swb_txsiz; /* .text buffer size */
+	byte_t *swb_ehbuf; /* [1..swb_ehsiz] .eh_frame buffer */
+	size_t  swb_ehsiz; /* .eh_frame buffer size */
+	byte_t *swb_entry; /* [out][1..1] Function entry point */
 };
 
 /* Bits for `libservice_dlsym_create_wrapper::flags' */
@@ -467,21 +469,41 @@ libservice_dlsym_getinfo(struct service *__restrict self, char const *__restrict
 
 /* Return the SHM base address of the region that contains
  * `addr'. If no  such SHM region  exists, return  `NULL'. */
-INTDEF NOBLOCK WUNUSED NONNULL((1)) struct service_shm *
+INTDEF NOBLOCK WUNUSED NONNULL((1)) struct service_shm_handle *
 NOTHROW(CC libservice_shm_ataddr)(struct service *__restrict self,
                                   void const *addr);
-INTDEF NOBLOCK NOPREEMPT WUNUSED NONNULL((1)) struct service_shm *
+INTDEF NOBLOCK NOPREEMPT WUNUSED NONNULL((1)) struct service_shm_handle *
 NOTHROW(CC libservice_shm_ataddr_nopr)(struct service *__restrict self,
                                        void const *addr);
 
 
 
 /* Buffer allocation descriptor. */
+#ifdef __x86_64__
+typedef __UINT128_TYPE__ service_buf_t;
+#define service_buf_make(ptr, shm)              \
+	((__UINT128_TYPE__)(__UINT64_TYPE__)(ptr) | \
+	 (__UINT128_TYPE__)(__UINT64_TYPE__)(shm) << 64)
+#define service_buf_getptr(self) ((void *)(__UINT64_TYPE__)(self))
+#define service_buf_getshm(self) ((REF struct service_shm_handle *)(__UINT64_TYPE__)((self) >> 64))
+#elif defined(__i386__)
+typedef __UINT64_TYPE__ service_buf_t;
+#define service_buf_make(ptr, shm)             \
+	((__UINT64_TYPE__)(__UINT32_TYPE__)(ptr) | \
+	 (__UINT64_TYPE__)(__UINT32_TYPE__)(shm) << 32)
+#define service_buf_getptr(self) ((void *)(__UINT32_TYPE__)(self))
+#define service_buf_getshm(self) ((REF struct service_shm_handle *)(__UINT32_TYPE__)((self) >> 32))
+#else /* ... */
 struct service_buf {
-	void               *sb_ptr; /* [0..1] Allocated pointer. (Until free'd,  holds
-	                             * a reference to `HANDLE_OF(sb_shm)->ssh_refcnt') */
-	struct service_shm *sb_shm; /* [1..1][valid_if(sb_ptr)] The SHM mapping containing `sb_ptr' */
+	void                          *sb_ptr; /* [0..1] Allocated pointer. */
+	REF struct service_shm_handle *sb_shm; /* [1..1][valid_if(sb_ptr)] The SHM mapping containing `sb_ptr' */
 };
+#define service_buf_make(ptr, shm) ((struct service_buf) { ptr, shm })
+#define service_buf_getptr(self)   ((self).sb_ptr)
+#define service_buf_getshm(self)   ((self).sb_shm)
+#endif /* !... */
+
+
 #define libservice_shmbuf_get_base_addr(ptr)     (((size_t *)(ptr)) - 1)
 #define libservice_shmbuf_get_total_size(ptr)    (((size_t const *)(ptr))[-1])
 #define libservice_shmbuf_set_total_size(ptr, v) (void)(((size_t *)(ptr))[-1] = (v))
@@ -493,9 +515,9 @@ struct service_buf {
  * >>                            CEIL_ALIGN(num_bytes, SERVICE_SHM_ALLOC_ALIGN) +
  * >>                            SERVICE_SHM_ALLOC_EXTRA); */
 INTDEF NOBLOCK NOPREEMPT WUNUSED NONNULL((1)) struct service_buf
-NOTHROW(CC libservice_shmbuf_alloc_nopr_nx)(struct service *__restrict self,
-                                            size_t num_bytes_with_extra);
-INTDEF NOBLOCK NOPREEMPT WUNUSED NONNULL((1)) struct service_buf CC
+NOTHROW(FCALL libservice_shmbuf_alloc_nopr_nx)(struct service *__restrict self,
+                                               size_t num_bytes_with_extra);
+INTDEF NOBLOCK NOPREEMPT WUNUSED NONNULL((1)) struct service_buf FCALL
 libservice_shmbuf_alloc_nopr(struct service *__restrict self,
                              size_t num_bytes_with_extra)
 		THROWS(E_BADALLOC);
@@ -514,7 +536,7 @@ libservice_shmbuf_alloc_nopr(struct service *__restrict self,
  * This function is simply used to implement `service_buffer_realloc'. */
 INTDEF NOBLOCK NOPREEMPT WUNUSED NONNULL((1, 3)) size_t
 NOTHROW(CC libservice_shmbuf_allocat_nopr)(struct service *__restrict self,
-                                           struct service_shm *__restrict shm,
+                                           struct service_shm_handle *__restrict shm,
                                            void *ptr, size_t num_bytes);
 
 /* Mark the given buffer range as free.
@@ -523,7 +545,7 @@ NOTHROW(CC libservice_shmbuf_allocat_nopr)(struct service *__restrict self,
  * @assume(shm == libservice_shm_ataddr(self, ptr)); */
 INTDEF NOBLOCK NOPREEMPT NONNULL((1, 3)) void
 NOTHROW(CC libservice_shmbuf_freeat_nopr)(struct service *__restrict self,
-                                          struct service_shm *__restrict shm,
+                                          REF struct service_shm_handle *__restrict shm,
                                           void *ptr, size_t num_bytes);
 #define libservice_shmbuf_free_nopr(self, shm, ptr)                     \
 	libservice_shmbuf_freeat_nopr(self, shm,                            \

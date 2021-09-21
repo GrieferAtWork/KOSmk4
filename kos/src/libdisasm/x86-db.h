@@ -792,9 +792,9 @@ PRIVATE struct instruction const ops[] = {
 	I(0x62, IF_MODRM,        "boundl\t" OP_RM64 OP_R32),
 
 	I(0x63, IF_X32|IF_MODRM,         "arpl\t" OP_R16 OP_RM16),
-	I(0x63, IF_X64|IF_MODRM|IF_66,   "movsww\t" OP_R16 OP_RM16), /* Nothing should ever encode this instruction */
-	I(0x63, IF_X64|IF_MODRM,         "movsll\t" OP_R32 OP_RM32), /* Nothing should ever encode this instruction */
-	I(0x63, IF_X64|IF_MODRM|IF_REXW, "movslq\t" OP_R32 OP_RM64),
+	I(0x63, IF_X64|IF_MODRM|IF_66,   "movsww\t" OP_RM16 OP_R16), /* Nothing should ever encode this instruction */
+	I(0x63, IF_X64|IF_MODRM,         "movsll\t" OP_RM32 OP_R32), /* Nothing should ever encode this instruction */
+	I(0x63, IF_X64|IF_MODRM|IF_REXW, "movslq\t" OP_RM64 OP_R32),
 
 	/* 0x64 -- PREFIX (%fs:...) */
 	/* 0x65 -- PREFIX (%gs:...) */

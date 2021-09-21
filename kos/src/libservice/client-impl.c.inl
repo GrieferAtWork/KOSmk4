@@ -129,7 +129,7 @@ libservice_buffer_realloc(struct service *__restrict self, void *ptr, size_t num
 		size_t num_free;
 		num_free = oldsize - num_bytes;
 		if (num_free >= SERVICE_SHM_ALLOC_MINSIZE) {
-			struct service_shm *shm;
+			struct service_shm_handle *shm;
 			pflag_t was;
 			was = PREEMPTION_PUSHOFF();
 			shm = libservice_shm_ataddr_nopr(self, ptr);
@@ -139,7 +139,7 @@ libservice_buffer_realloc(struct service *__restrict self, void *ptr, size_t num
 			libservice_shmbuf_set_total_size(ptr, num_bytes);
 		}
 	} else if (oldsize < num_bytes) {
-		struct service_shm *shm;
+		struct service_shm_handle *shm;
 		pflag_t was;
 		size_t extra;
 		was = PREEMPTION_PUSHOFF();

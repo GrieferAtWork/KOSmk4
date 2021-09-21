@@ -29,6 +29,9 @@
 #include <__stdcxx.h>
 #endif /* __cplusplus */
 
+#define _SERVICE_TYPE_CLASSMASK __UINT32_C(0xffff0000)
+#define _SERVICE_TYPE_PARAMMASK __UINT32_C(0x0000ffff)
+
 /* Standard types */
 #define SERVICE_TYPE_VOID      0x000000 /* [TYPE(void)] Void (only for return types) */
 #define SERVICE_TYPE_STR_IN    0x000001 /* [TYPE(char const *)] NUL-terminated string pointer */
@@ -46,18 +49,24 @@
 #define SERVICE_TYPE_ARGBUF_IN(in_sizearg_index) \
 	(0x010000 | (in_sizearg_index))
 
-/* Special index for `out_sizearg_index', as taken by `SERVICE_TYPE_ARGBUF_OUT()'
- * and `SERVICE_TYPE_ARGBUF_INOUT()' to specify that the function's return value
- * should specify the output buffer size. */
-#define SERVICE_OUT_SIZEARG_RETURN_INDEX 0xff
+/* Flag for `sizearg_index' in `SERVICE_TYPE_ARGBUF_OUT'
+ * and `SERVICE_TYPE_ARGBUF_INOUT' to specify that the
+ * function's return value represents may be used to
+ * indicate an upper bound on output buffer size.
+ *
+ * As such, the buffer size potentially copied back to
+ * the caller is `MIN(return, PARAMS[sizearg_index])' */
+#define SERVICE_OUT_SIZEARG_RETURN_MINVAL 0x8000
 
-/* [TYPE(void *)] Output buffer (with size argument) */
-#define SERVICE_TYPE_ARGBUF_OUT(out_sizearg_index) \
-	(0x020000 | (out_sizearg_index))
+/* [TYPE(void *)] Output buffer (with size argument)
+ * NOTE: Accepts `SERVICE_OUT_SIZEARG_RETURN_MINVAL'! */
+#define SERVICE_TYPE_ARGBUF_OUT(sizearg_index) \
+	(0x020000 | (sizearg_index))
 
-/* [TYPE(void *)] Input/output buffer (with size argument) */
-#define SERVICE_TYPE_ARGBUF_INOUT(in_sizearg_index, out_sizearg_index) \
-	(0x030000 | (in_sizearg_index) | ((out_sizearg_index) << 8))
+/* [TYPE(void *)] Input/output buffer (with size argument)
+ * NOTE: Accepts `SERVICE_OUT_SIZEARG_RETURN_MINVAL'! */
+#define SERVICE_TYPE_ARGBUF_INOUT(sizearg_index) \
+	(0x030000 | (sizearg_index))
 
 /* Fixed-size buffer arguments. */
 #define SERVICE_TYPE_FIXBUF_IN(size)    (0x040000 | (size))

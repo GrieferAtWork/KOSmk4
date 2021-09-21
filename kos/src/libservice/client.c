@@ -133,7 +133,7 @@ libservice_open(char const *filename) THROWS(E_FSERROR, E_BADALLOC, E_INTERRUPT)
 INTERN NOBLOCK NONNULL((1)) void
 NOTHROW(CC libservice_buffer_free)(struct service *__restrict self,
                                    void *ptr) {
-	struct service_shm *shm;
+	struct service_shm_handle *shm;
 	pflag_t was;
 	if (!ptr)
 		return;

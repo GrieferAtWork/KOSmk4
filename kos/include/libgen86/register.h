@@ -154,6 +154,29 @@
 #endif /* LIBGEN86_TARGET_BITS != ... */
 
 
+#if LIBGEN86_TARGET_BITS == 64
+#define GEN86_R_FCALL0B GEN86_R_DIL
+#define GEN86_R_FCALL0W GEN86_R_DI
+#define GEN86_R_FCALL0L GEN86_R_EDI
+#define GEN86_R_FCALL0Q GEN86_R_RDI
+#define GEN86_R_FCALL0P GEN86_R_RDI
+#define GEN86_R_FCALL1B GEN86_R_SIL
+#define GEN86_R_FCALL1W GEN86_R_SI
+#define GEN86_R_FCALL1L GEN86_R_RSI
+#define GEN86_R_FCALL1Q GEN86_R_RSI
+#define GEN86_R_FCALL1P GEN86_R_RSI
+#elif LIBGEN86_TARGET_BITS == 32
+#define GEN86_R_FCALL0B GEN86_R_CL
+#define GEN86_R_FCALL0W GEN86_R_CX
+#define GEN86_R_FCALL0L GEN86_R_ECX
+#define GEN86_R_FCALL0P GEN86_R_ECX
+#define GEN86_R_FCALL1B GEN86_R_DL
+#define GEN86_R_FCALL1W GEN86_R_DX
+#define GEN86_R_FCALL1L GEN86_R_EDX
+#define GEN86_R_FCALL1P GEN86_R_EDX
+#endif /* LIBGEN86_TARGET_BITS != ... */
+
+
 
 #ifdef __CC__
 __DECL_BEGIN
@@ -172,8 +195,12 @@ __DECL_BEGIN
 #define _gen86_putl(p_pc, l)  (void)(__hybrid_unaligned_setle32((__UINT32_TYPE__ *)*(p_pc), (__UINT32_TYPE__)(l)), *(p_pc) += 4)
 #define _gen86_putsl(p_pc, l) (void)(__hybrid_unaligned_setle32((__UINT32_TYPE__ *)*(p_pc), (__UINT32_TYPE__)(__INT32_TYPE__)(l)), *(p_pc) += 4)
 #define _gen86_putq(p_pc, q)  (void)(__hybrid_unaligned_setle64((__UINT64_TYPE__ *)*(p_pc), (__UINT64_TYPE__)(q)), *(p_pc) += 8)
-#define _gen86_putb2(p_pc, b1, b2)     _gen86_putw(p_pc, (__UINT16_TYPE__)(b) << 8 | (a))
+#define _gen86_putb2(p_pc, b1, b2)     _gen86_putw(p_pc, (__UINT16_TYPE__)(b2) << 8 | (b1))
 #define _gen86_putb3(p_pc, b1, b2, b3) (_gen86_putb2(p_pc, b1, b2), _gen86_putb(p_pc, b3))
+
+#define _gen86_putsb_pcrel(p_pc, addr) _gen86_putsb(p_pc, (__INTPTR_TYPE__)((__UINTPTR_TYPE__)(addr) - ((__UINTPTR_TYPE__)(*(p_pc)) + 2)))
+#define _gen86_putsw_pcrel(p_pc, addr) _gen86_putsw(p_pc, (__INTPTR_TYPE__)((__UINTPTR_TYPE__)(addr) - ((__UINTPTR_TYPE__)(*(p_pc)) + 2)))
+#define _gen86_putsl_pcrel(p_pc, addr) _gen86_putsl(p_pc, (__INTPTR_TYPE__)((__UINTPTR_TYPE__)(addr) - ((__UINTPTR_TYPE__)(*(p_pc)) + 4)))
 
 #if LIBGEN86_TARGET_BITS == 64
 #define _gen86_regmsk(reg) ((reg)&7)
@@ -308,7 +335,7 @@ __DECL_BEGIN
 	          _gen86_putsb(p_pc, 0))                               \
 	       : _gen86_regmsk(breg) == GEN86_R_ESP                    \
 	         ? (_gen86_modrm(p_pc, 0, reg, 4),                     \
-	            _gen86_putsb(p_pc, 4, GEN86_R_ESP))                \
+	            _gen86_modrm(p_pc, 0, 4, GEN86_R_ESP))             \
 	         : _gen86_modrm(p_pc, 0, reg, breg),                   \
 	       _putimm)
 #endif /* LIBGEN86_TARGET_BITS >= 32 */
@@ -443,6 +470,10 @@ __DECL_BEGIN
 #define gen86_modrm32_d8bi(p_pc, _rex, _putinstr, reg, disp8s, breg, index, _putimm) \
 	gen86_modrm32_d8bis(p_pc, _rex, _putinstr, reg, disp8s, breg, index, 1, _putimm)
 
+/* <instr> %reg, disp32s(,%index) */
+#define gen86_modrm32_d32i(p_pc, _rex, _putinstr, reg, disp32s, index, _putimm) \
+	gen86_modrm32_d32is(p_pc, _rex, _putinstr, reg, disp32s, index, 1, _putimm)
+
 /* <instr> %reg, disp32s(%breg,%index) */
 #define gen86_modrm32_d32bi(p_pc, _rex, _putinstr, reg, disp32s, breg, index, _putimm) \
 	gen86_modrm32_d32bis(p_pc, _rex, _putinstr, reg, disp32s, breg, index, 1, _putimm)
@@ -452,10 +483,14 @@ __DECL_BEGIN
 
 
 /* <instr> %reg, (%breg,%index,scale) */
-#define gen86_modrm32_bis(p_pc, _rex, _putinstr, reg, breg, index, scale, _putimm) \
-	(void)(_gen86_rex_(p_pc, _rex, reg, breg, 0) _putinstr,                        \
-	       _gen86_modrm(p_pc, 0, reg, 4),                                          \
-	       _gen86_modrm(p_pc, _gen86_modrm32_scaleval(scale), index, breg), _putimm)
+#define gen86_modrm32_bis(p_pc, _rex, _putinstr, reg, breg, index, scale, _putimm)          \
+	(void)(_gen86_rex_(p_pc, _rex, reg, breg, 0) _putinstr,                                 \
+	       (breg) == 5 ? (_gen86_modrm(p_pc, 1, reg, 4),                                    \
+	                      _gen86_modrm(p_pc, _gen86_modrm32_scaleval(scale), index, 5),     \
+	                      _gen86_putsb(p_pc, 0))                                            \
+	                   : (_gen86_modrm(p_pc, 0, reg, 4),                                    \
+	                      _gen86_modrm(p_pc, _gen86_modrm32_scaleval(scale), index, breg)), \
+	       _putimm)
 
 /* <instr> %reg, disp8s(%breg,%index,scale) */
 #define gen86_modrm32_d8bis(p_pc, _rex, _putinstr, reg, disp8s, breg, index, scale, _putimm) \
@@ -463,6 +498,14 @@ __DECL_BEGIN
 	       _gen86_modrm(p_pc, 1, reg, 4),                                                    \
 	       _gen86_modrm(p_pc, _gen86_modrm32_scaleval(scale), index, breg),                  \
 	       _gen86_putsb(p_pc, disp8s), _putimm)
+
+/* <instr> %reg, disps(,%index,scale) */
+#define gen86_modrm32_d32is(p_pc, _rex, _putinstr, reg, disps, index, scale, _putimm) \
+	(void)(_gen86_rex_(p_pc, _rex, reg, 0, 0) _putinstr,                              \
+	       _gen86_modrm(p_pc, 0, reg, 4),                                             \
+	       _gen86_modrm(p_pc, _gen86_modrm32_scaleval(scale), index, 5),              \
+	       _gen86_putsl(p_pc, disps),                                                 \
+	       _putimm)
 
 /* <instr> %reg, disp32s(%breg,%index,scale) */
 #define gen86_modrm32_d32bis(p_pc, _rex, _putinstr, reg, disp32s, breg, index, scale, _putimm) \
@@ -479,7 +522,11 @@ __DECL_BEGIN
 	    : gen86_modrm32_d8bi(p_pc, _rex, _putinstr, reg, disp, breg, index, _putimm)) \
 	 : gen86_modrm32_d32bi(p_pc, _rex, _putinstr, reg, disp, breg, index, _putimm))
 
-/* <instr> %reg, disp(%breg,%index, scale)    # Autoselect optimal encoding for `disp' */
+/* <instr> %reg, disp(,%index, scale)  # Autoselect optimal encoding for `disp' */
+#define gen86_modrm32_dis(p_pc, _rex, _putinstr, reg, disp, index, scale, _putimm) \
+	gen86_modrm32_d32is(p_pc, _rex, _putinstr, reg, disp, index, scale, _putimm)
+
+/* <instr> %reg, disp(%breg,%index, scale) # Autoselect optimal encoding for `disp' */
 #define gen86_modrm32_dbis(p_pc, _rex, _putinstr, reg, disp, breg, index, scale, _putimm)     \
 	((disp) >= __INT8_MIN__ && (disp) <= __INT8_MAX__                                         \
 	 ? ((disp) == 0                                                                           \
@@ -527,9 +574,18 @@ __DECL_BEGIN
 #define gen86_modrm_d8bis(p_pc, _rex, _putinstr, reg, disp8s, breg, index, scale, _putimm) \
 	gen86_modrm32_d8bis(p_pc, _rex, _putinstr, reg, disp8s, breg, index, scale, _putimm)
 
-/* <instr> %reg, disps(%breg,%index,scale)    # `disps' must `int16_t' (in 16-bit mode) or `int32_t' */
+/* <instr> %reg, disps(%breg,%index,scale) */
 #define gen86_modrm_dbis(p_pc, _rex, _putinstr, reg, disps, breg, index, scale, _putimm) \
 	gen86_modrm32_dbis(p_pc, _rex, _putinstr, reg, disps, breg, index, scale, _putimm)
+
+/* <instr> %reg, disps(,%index,scale) */
+#define gen86_modrm_dis(p_pc, _rex, _putinstr, reg, disps, index, scale, _putimm) \
+	gen86_modrm32_dis(p_pc, _rex, _putinstr, reg, disps, index, scale, _putimm)
+
+/* Index-only aliases */
+#define gen86_modrm_i(p_pc, _rex, _putinstr, reg, index, _putimm)         gen86_modrm_dis(p_pc, _rex, _putinstr, reg, 0, index, 1, _putimm)
+#define gen86_modrm_is(p_pc, _rex, _putinstr, reg, index, scale, _putimm) gen86_modrm_dis(p_pc, _rex, _putinstr, reg, 0, index, scale, _putimm)
+#define gen86_modrm_di(p_pc, _rex, _putinstr, reg, disps, index, _putimm) gen86_modrm_dis(p_pc, _rex, _putinstr, reg, disps, index, 1, _putimm)
 #endif /* LIBGEN86_TARGET_BITS >= 32 */
 
 

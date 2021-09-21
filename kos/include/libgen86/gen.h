@@ -23,6 +23,8 @@
 #include "api.h"
 /**/
 
+#include <hybrid/limitcore.h>
+
 #include "register.h"
 
 /* NOTE: `gen_modrm' is one of:
@@ -49,33 +51,47 @@
 #endif /* LIBGEN86_TARGET_BITS != 16 */
 
 
+/* Max # of bytes which may be written by any single
+ * invocation  of one of the `gen86_*' macros below. */
+#define GEN86_INSTRLEN_MAX 15
+
+#if LIBGEN86_TARGET_BITS == 16
+#define _GEN86_JMPP_EXTRA 1 /* == sizeof(gen86_jmpP) - sizeof(gen86_jmp8) */
+#else /* LIBGEN86_TARGET_BITS == 16 */
+#define _GEN86_JMPP_EXTRA 3 /* == sizeof(gen86_jmpP) - sizeof(gen86_jmp8) */
+#endif /* LIBGEN86_TARGET_BITS != 16 */
+
+
+
 /*[[[deemon
 #define hex2(x) ("0x" + (x).hex()[2:].zfill(2))
 function genArithBlock(name, start) {
 	local pad = " " * (3 - #name);
 	local reg = start / 8;
-	print("#define gen86_", name, "b_r_mod(p_pc, gen_modrm, src_reg, ...) ", pad, "/" "* ", name, "b", pad, "  %src_reg, ... *" "/ gen_modrm(p_pc, 0, _gen86_putb(p_pc, ", hex2(start), "), src_reg, __VA_ARGS__, (void)0)");
-	print("#define gen86_", name, "w_r_mod(p_pc, gen_modrm, src_reg, ...) ", pad, "/" "* ", name, "w", pad, "  %src_reg, ... *" "/ (_gen86_pfx16_(p_pc) gen_modrm(p_pc, 0, _gen86_putb(p_pc, ", hex2(start+1), "), src_reg, __VA_ARGS__, (void)0))");
-	print("#define gen86_", name, "l_r_mod(p_pc, gen_modrm, src_reg, ...) ", pad, "/" "* ", name, "l", pad, "  %src_reg, ... *" "/ (_gen86_pfx32_(p_pc) gen_modrm(p_pc, 0, _gen86_putb(p_pc, ", hex2(start+1), "), src_reg, __VA_ARGS__, (void)0))");
-	print("#define gen86_", name, "b_mod_r(p_pc, gen_modrm, dst_reg, ...) ", pad, "/" "* ", name, "b", pad, "  ..., %dst_reg *" "/ gen_modrm(p_pc, 0, _gen86_putb(p_pc, ", hex2(start+2), "), dst_reg, __VA_ARGS__, (void)0)");
-	print("#define gen86_", name, "w_mod_r(p_pc, gen_modrm, dst_reg, ...) ", pad, "/" "* ", name, "w", pad, "  ..., %dst_reg *" "/ (_gen86_pfx16_(p_pc) gen_modrm(p_pc, 0, _gen86_putb(p_pc, ", hex2(start+3), "), src_reg, __VA_ARGS__, (void)0))");
-	print("#define gen86_", name, "l_mod_r(p_pc, gen_modrm, dst_reg, ...) ", pad, "/" "* ", name, "l", pad, "  ..., %dst_reg *" "/ (_gen86_pfx32_(p_pc) gen_modrm(p_pc, 0, _gen86_putb(p_pc, ", hex2(start+3), "), src_reg, __VA_ARGS__, (void)0))");
-	print("#define gen86_", name, "b_imm_al(p_pc, imm)                    ", pad, "/" "* ", name, "b", pad, "  $imm, %al     *" "/ (_gen86_putb(p_pc, ", hex2(start+4), "), _gen86_putb(p_pc, imm))");
-	print("#define gen86_", name, "w_imm_ax(p_pc, imm)                    ", pad, "/" "* ", name, "w", pad, "  $imm, %ax     *" "/ (_gen86_pfx16_(p_pc) _gen86_putb(p_pc, ", hex2(start+5), "), _gen86_putw(p_pc, imm))");
-	print("#define gen86_", name, "l_imm_eax(p_pc, imm)                   ", pad, "/" "* ", name, "l", pad, "  $imm, %eax    *" "/ (_gen86_pfx32_(p_pc) _gen86_putb(p_pc, ", hex2(start+5), "), _gen86_putl(p_pc, imm))");
-	print("#define gen86_", name, "b_imm_mod(p_pc, gen_modrm, imm, ...)   ", pad, "/" "* ", name, "b", pad, "  $imm, ...     *" "/ gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x80), ", reg, ", __VA_ARGS__, _gen86_putb(p_pc, imm))");
-	print("#define gen86_", name, "w_imm_mod(p_pc, gen_modrm, imm, ...)   ", pad, "/" "* ", name, "w", pad, "  $imm, ...     *" "/ (_gen86_pfx16_(p_pc) gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x81), ", reg, ", __VA_ARGS__, _gen86_putw(p_pc, imm)))");
-	print("#define gen86_", name, "l_imm_mod(p_pc, gen_modrm, imm, ...)   ", pad, "/" "* ", name, "l", pad, "  $imm, ...     *" "/ (_gen86_pfx32_(p_pc) gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x81), ", reg, ", __VA_ARGS__, _gen86_putl(p_pc, imm)))");
-	print("#define gen86_", name, "w_imms8_mod(p_pc, gen_modrm, imm, ...) ", pad, "/" "* ", name, "w", pad, "  $imm, ...     *" "/ (_gen86_pfx16_(p_pc) gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x83), ", reg, ", __VA_ARGS__, _gen86_putsb(p_pc, imm)))");
-	print("#define gen86_", name, "l_imms8_mod(p_pc, gen_modrm, imm, ...) ", pad, "/" "* ", name, "l", pad, "  $imm, ...     *" "/ (_gen86_pfx32_(p_pc) gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x83), ", reg, ", __VA_ARGS__, _gen86_putsb(p_pc, imm)))");
+	print("#define gen86_", name, "b_r_mod(p_pc, gen_modrm, src_reg, ...)  ", pad, "/" "* ", name, "b", pad, "  %src_reg, ... *" "/ gen_modrm(p_pc, 0, _gen86_putb(p_pc, ", hex2(start), "), src_reg, __VA_ARGS__, (void)0)");
+	print("#define gen86_", name, "w_r_mod(p_pc, gen_modrm, src_reg, ...)  ", pad, "/" "* ", name, "w", pad, "  %src_reg, ... *" "/ (_gen86_pfx16_(p_pc) gen_modrm(p_pc, 0, _gen86_putb(p_pc, ", hex2(start+1), "), src_reg, __VA_ARGS__, (void)0))");
+	print("#define gen86_", name, "l_r_mod(p_pc, gen_modrm, src_reg, ...)  ", pad, "/" "* ", name, "l", pad, "  %src_reg, ... *" "/ (_gen86_pfx32_(p_pc) gen_modrm(p_pc, 0, _gen86_putb(p_pc, ", hex2(start+1), "), src_reg, __VA_ARGS__, (void)0))");
+	print("#define gen86_", name, "b_mod_r(p_pc, gen_modrm, dst_reg, ...)  ", pad, "/" "* ", name, "b", pad, "  ..., %dst_reg *" "/ gen_modrm(p_pc, 0, _gen86_putb(p_pc, ", hex2(start+2), "), dst_reg, __VA_ARGS__, (void)0)");
+	print("#define gen86_", name, "w_mod_r(p_pc, gen_modrm, dst_reg, ...)  ", pad, "/" "* ", name, "w", pad, "  ..., %dst_reg *" "/ (_gen86_pfx16_(p_pc) gen_modrm(p_pc, 0, _gen86_putb(p_pc, ", hex2(start+3), "), src_reg, __VA_ARGS__, (void)0))");
+	print("#define gen86_", name, "l_mod_r(p_pc, gen_modrm, dst_reg, ...)  ", pad, "/" "* ", name, "l", pad, "  ..., %dst_reg *" "/ (_gen86_pfx32_(p_pc) gen_modrm(p_pc, 0, _gen86_putb(p_pc, ", hex2(start+3), "), src_reg, __VA_ARGS__, (void)0))");
+	print("#define gen86_", name, "b_imm_al(p_pc, imm)                     ", pad, "/" "* ", name, "b", pad, "  $imm, %al     *" "/ (_gen86_putb(p_pc, ", hex2(start+4), "), _gen86_putb(p_pc, imm))");
+	print("#define gen86_", name, "w_imm_ax(p_pc, imm)                     ", pad, "/" "* ", name, "w", pad, "  $imm, %ax     *" "/ (_gen86_pfx16_(p_pc) _gen86_putb(p_pc, ", hex2(start+5), "), _gen86_putw(p_pc, imm))");
+	print("#define gen86_", name, "l_imm_eax(p_pc, imm)                    ", pad, "/" "* ", name, "l", pad, "  $imm, %eax    *" "/ (_gen86_pfx32_(p_pc) _gen86_putb(p_pc, ", hex2(start+5), "), _gen86_putl(p_pc, imm))");
+	print("#define gen86_", name, "b_imm_mod(p_pc, gen_modrm, imm, ...)    ", pad, "/" "* ", name, "b", pad, "  $imm, ...     *" "/ gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x80), ", reg, ", __VA_ARGS__, _gen86_putb(p_pc, imm))");
+	print("#define gen86_", name, "w_imm16u_mod(p_pc, gen_modrm, imm, ...) ", pad, "/" "* ", name, "w", pad, "  $imm, ...     *" "/ (_gen86_pfx16_(p_pc) gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x81), ", reg, ", __VA_ARGS__, _gen86_putw(p_pc, imm)))");
+	print("#define gen86_", name, "l_imm32s_mod(p_pc, gen_modrm, imm, ...) ", pad, "/" "* ", name, "l", pad, "  $imm, ...     *" "/ (_gen86_pfx32_(p_pc) gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x81), ", reg, ", __VA_ARGS__, _gen86_putl(p_pc, imm)))");
+	print("#define gen86_", name, "w_imm8s_mod(p_pc, gen_modrm, imm, ...)  ", pad, "/" "* ", name, "w", pad, "  $imm, ...     *" "/ (_gen86_pfx16_(p_pc) gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x83), ", reg, ", __VA_ARGS__, _gen86_putsb(p_pc, imm)))");
+	print("#define gen86_", name, "l_imm8s_mod(p_pc, gen_modrm, imm, ...)  ", pad, "/" "* ", name, "l", pad, "  $imm, ...     *" "/ (_gen86_pfx32_(p_pc) gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x83), ", reg, ", __VA_ARGS__, _gen86_putsb(p_pc, imm)))");
+	print("#define gen86_", name, "w_imm_mod(p_pc, gen_modrm, imm, ...)    ", pad, "/" "* ", name, "w", pad, "  $imm, ...     *" "/ (((__INT32_TYPE__)(imm) >= __INT8_MIN__ && (__INT32_TYPE__)(imm) <= __INT8_MAX__) ? gen86_", name, "w_imm8s_mod(p_pc, gen_modrm, imm, __VA_ARGS__) : gen86_", name, "w_imm16u_mod(p_pc, gen_modrm, imm, __VA_ARGS__))");
+	print("#define gen86_", name, "l_imm_mod(p_pc, gen_modrm, imm, ...)    ", pad, "/" "* ", name, "l", pad, "  $imm, ...     *" "/ (((__INT32_TYPE__)(imm) >= __INT8_MIN__ && (__INT32_TYPE__)(imm) <= __INT8_MAX__) ? gen86_", name, "l_imm8s_mod(p_pc, gen_modrm, imm, __VA_ARGS__) : gen86_", name, "l_imm32s_mod(p_pc, gen_modrm, imm, __VA_ARGS__))");
 	print("#if LIBGEN86_TARGET_BITS == 64");
-	print("#define gen86_", name, "q_r_mod(p_pc, gen_modrm, src_reg, ...) ", pad, "/" "* ", name, "q", pad, "  %src_reg, ... *" "/ gen_modrm(p_pc, GEN86_REX_W, _gen86_putb(p_pc, ", hex2(start+1), "), src_reg, __VA_ARGS__, (void)0)");
-	print("#define gen86_", name, "q_mod_r(p_pc, gen_modrm, dst_reg, ...) ", pad, "/" "* ", name, "q", pad, "  ..., %dst_reg *" "/ gen_modrm(p_pc, GEN86_REX_W, _gen86_putb(p_pc, ", hex2(start+3), "), src_reg, __VA_ARGS__, (void)0)");
-	print("#define gen86_", name, "q_imm_rax(p_pc, imm)                   ", pad, "/" "* ", name, "q", pad, "  $imm, %rax    *" "/ (_gen86_putb(p_pc, 0x40 | GEN86_REX_W), _gen86_putb(p_pc, ", hex2(start+5), "), _gen86_putsl(p_pc, imm))");
-	print("#define gen86_", name, "q_imm_mod(p_pc, gen_modrm, imm, ...)   ", pad, "/" "* ", name, "b", pad, "  $imm, ...     *" "/ gen_modrm(p_pc, GEN86_REX_W, _gen86_putb(p_pc, 0x81), ", reg, ", __VA_ARGS__, _gen86_putsb(p_pc, imm))");
-	print("#define gen86_", name, "q_imms8_mod(p_pc, gen_modrm, imm, ...) ", pad, "/" "* ", name, "b", pad, "  $imm, ...     *" "/ gen_modrm(p_pc, GEN86_REX_W, _gen86_putb(p_pc, 0x83), ", reg, ", __VA_ARGS__, _gen86_putsb(p_pc, imm))");
+	print("#define gen86_", name, "q_r_mod(p_pc, gen_modrm, src_reg, ...)  ", pad, "/" "* ", name, "q", pad, "  %src_reg, ... *" "/ gen_modrm(p_pc, GEN86_REX_W, _gen86_putb(p_pc, ", hex2(start+1), "), src_reg, __VA_ARGS__, (void)0)");
+	print("#define gen86_", name, "q_mod_r(p_pc, gen_modrm, dst_reg, ...)  ", pad, "/" "* ", name, "q", pad, "  ..., %dst_reg *" "/ gen_modrm(p_pc, GEN86_REX_W, _gen86_putb(p_pc, ", hex2(start+3), "), src_reg, __VA_ARGS__, (void)0)");
+	print("#define gen86_", name, "q_imm_rax(p_pc, imm)                    ", pad, "/" "* ", name, "q", pad, "  $imm, %rax    *" "/ (_gen86_putb(p_pc, 0x40 | GEN86_REX_W), _gen86_putb(p_pc, ", hex2(start+5), "), _gen86_putsl(p_pc, imm))");
+	print("#define gen86_", name, "q_imm32s_mod(p_pc, gen_modrm, imm, ...) ", pad, "/" "* ", name, "q", pad, "  $imm, ...     *" "/ gen_modrm(p_pc, GEN86_REX_W, _gen86_putb(p_pc, 0x81), ", reg, ", __VA_ARGS__, _gen86_putsb(p_pc, imm))");
+	print("#define gen86_", name, "q_imm8s_mod(p_pc, gen_modrm, imm, ...)  ", pad, "/" "* ", name, "q", pad, "  $imm, ...     *" "/ gen_modrm(p_pc, GEN86_REX_W, _gen86_putb(p_pc, 0x83), ", reg, ", __VA_ARGS__, _gen86_putsb(p_pc, imm))");
+	print("#define gen86_", name, "q_imm_mod(p_pc, gen_modrm, imm, ...)    ", pad, "/" "* ", name, "q", pad, "  $imm, ...     *" "/ (((__INT32_TYPE__)(imm) >= __INT8_MIN__ && (__INT32_TYPE__)(imm) <= __INT8_MAX__) ? gen86_", name, "q_imm8s_mod(p_pc, gen_modrm, imm, __VA_ARGS__) : gen86_", name, "q_imm32s_mod(p_pc, gen_modrm, imm, __VA_ARGS__))");
 	print("#endif /" "* LIBGEN86_TARGET_BITS == 64 *" "/");
-
 }
 genArithBlock("add", 0x00);
 genArithBlock("or",  0x08);
@@ -86,173 +102,197 @@ genArithBlock("sub", 0x28);
 genArithBlock("xor", 0x30);
 genArithBlock("cmp", 0x38);
 ]]]*/
-#define gen86_addb_r_mod(p_pc, gen_modrm, src_reg, ...) /* addb  %src_reg, ... */ gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x00), src_reg, __VA_ARGS__, (void)0)
-#define gen86_addw_r_mod(p_pc, gen_modrm, src_reg, ...) /* addw  %src_reg, ... */ (_gen86_pfx16_(p_pc) gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x01), src_reg, __VA_ARGS__, (void)0))
-#define gen86_addl_r_mod(p_pc, gen_modrm, src_reg, ...) /* addl  %src_reg, ... */ (_gen86_pfx32_(p_pc) gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x01), src_reg, __VA_ARGS__, (void)0))
-#define gen86_addb_mod_r(p_pc, gen_modrm, dst_reg, ...) /* addb  ..., %dst_reg */ gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x02), dst_reg, __VA_ARGS__, (void)0)
-#define gen86_addw_mod_r(p_pc, gen_modrm, dst_reg, ...) /* addw  ..., %dst_reg */ (_gen86_pfx16_(p_pc) gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x03), src_reg, __VA_ARGS__, (void)0))
-#define gen86_addl_mod_r(p_pc, gen_modrm, dst_reg, ...) /* addl  ..., %dst_reg */ (_gen86_pfx32_(p_pc) gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x03), src_reg, __VA_ARGS__, (void)0))
-#define gen86_addb_imm_al(p_pc, imm)                    /* addb  $imm, %al     */ (_gen86_putb(p_pc, 0x04), _gen86_putb(p_pc, imm))
-#define gen86_addw_imm_ax(p_pc, imm)                    /* addw  $imm, %ax     */ (_gen86_pfx16_(p_pc) _gen86_putb(p_pc, 0x05), _gen86_putw(p_pc, imm))
-#define gen86_addl_imm_eax(p_pc, imm)                   /* addl  $imm, %eax    */ (_gen86_pfx32_(p_pc) _gen86_putb(p_pc, 0x05), _gen86_putl(p_pc, imm))
-#define gen86_addb_imm_mod(p_pc, gen_modrm, imm, ...)   /* addb  $imm, ...     */ gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x80), 0, __VA_ARGS__, _gen86_putb(p_pc, imm))
-#define gen86_addw_imm_mod(p_pc, gen_modrm, imm, ...)   /* addw  $imm, ...     */ (_gen86_pfx16_(p_pc) gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x81), 0, __VA_ARGS__, _gen86_putw(p_pc, imm)))
-#define gen86_addl_imm_mod(p_pc, gen_modrm, imm, ...)   /* addl  $imm, ...     */ (_gen86_pfx32_(p_pc) gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x81), 0, __VA_ARGS__, _gen86_putl(p_pc, imm)))
-#define gen86_addw_imms8_mod(p_pc, gen_modrm, imm, ...) /* addw  $imm, ...     */ (_gen86_pfx16_(p_pc) gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x83), 0, __VA_ARGS__, _gen86_putsb(p_pc, imm)))
-#define gen86_addl_imms8_mod(p_pc, gen_modrm, imm, ...) /* addl  $imm, ...     */ (_gen86_pfx32_(p_pc) gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x83), 0, __VA_ARGS__, _gen86_putsb(p_pc, imm)))
+#define gen86_addb_r_mod(p_pc, gen_modrm, src_reg, ...)  /* addb  %src_reg, ... */ gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x00), src_reg, __VA_ARGS__, (void)0)
+#define gen86_addw_r_mod(p_pc, gen_modrm, src_reg, ...)  /* addw  %src_reg, ... */ (_gen86_pfx16_(p_pc) gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x01), src_reg, __VA_ARGS__, (void)0))
+#define gen86_addl_r_mod(p_pc, gen_modrm, src_reg, ...)  /* addl  %src_reg, ... */ (_gen86_pfx32_(p_pc) gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x01), src_reg, __VA_ARGS__, (void)0))
+#define gen86_addb_mod_r(p_pc, gen_modrm, dst_reg, ...)  /* addb  ..., %dst_reg */ gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x02), dst_reg, __VA_ARGS__, (void)0)
+#define gen86_addw_mod_r(p_pc, gen_modrm, dst_reg, ...)  /* addw  ..., %dst_reg */ (_gen86_pfx16_(p_pc) gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x03), src_reg, __VA_ARGS__, (void)0))
+#define gen86_addl_mod_r(p_pc, gen_modrm, dst_reg, ...)  /* addl  ..., %dst_reg */ (_gen86_pfx32_(p_pc) gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x03), src_reg, __VA_ARGS__, (void)0))
+#define gen86_addb_imm_al(p_pc, imm)                     /* addb  $imm, %al     */ (_gen86_putb(p_pc, 0x04), _gen86_putb(p_pc, imm))
+#define gen86_addw_imm_ax(p_pc, imm)                     /* addw  $imm, %ax     */ (_gen86_pfx16_(p_pc) _gen86_putb(p_pc, 0x05), _gen86_putw(p_pc, imm))
+#define gen86_addl_imm_eax(p_pc, imm)                    /* addl  $imm, %eax    */ (_gen86_pfx32_(p_pc) _gen86_putb(p_pc, 0x05), _gen86_putl(p_pc, imm))
+#define gen86_addb_imm_mod(p_pc, gen_modrm, imm, ...)    /* addb  $imm, ...     */ gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x80), 0, __VA_ARGS__, _gen86_putb(p_pc, imm))
+#define gen86_addw_imm16u_mod(p_pc, gen_modrm, imm, ...) /* addw  $imm, ...     */ (_gen86_pfx16_(p_pc) gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x81), 0, __VA_ARGS__, _gen86_putw(p_pc, imm)))
+#define gen86_addl_imm32s_mod(p_pc, gen_modrm, imm, ...) /* addl  $imm, ...     */ (_gen86_pfx32_(p_pc) gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x81), 0, __VA_ARGS__, _gen86_putl(p_pc, imm)))
+#define gen86_addw_imm8s_mod(p_pc, gen_modrm, imm, ...)  /* addw  $imm, ...     */ (_gen86_pfx16_(p_pc) gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x83), 0, __VA_ARGS__, _gen86_putsb(p_pc, imm)))
+#define gen86_addl_imm8s_mod(p_pc, gen_modrm, imm, ...)  /* addl  $imm, ...     */ (_gen86_pfx32_(p_pc) gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x83), 0, __VA_ARGS__, _gen86_putsb(p_pc, imm)))
+#define gen86_addw_imm_mod(p_pc, gen_modrm, imm, ...)    /* addw  $imm, ...     */ (((__INT32_TYPE__)(imm) >= __INT8_MIN__ && (__INT32_TYPE__)(imm) <= __INT8_MAX__) ? gen86_addw_imm8s_mod(p_pc, gen_modrm, imm, __VA_ARGS__) : gen86_addw_imm16u_mod(p_pc, gen_modrm, imm, __VA_ARGS__))
+#define gen86_addl_imm_mod(p_pc, gen_modrm, imm, ...)    /* addl  $imm, ...     */ (((__INT32_TYPE__)(imm) >= __INT8_MIN__ && (__INT32_TYPE__)(imm) <= __INT8_MAX__) ? gen86_addl_imm8s_mod(p_pc, gen_modrm, imm, __VA_ARGS__) : gen86_addl_imm32s_mod(p_pc, gen_modrm, imm, __VA_ARGS__))
 #if LIBGEN86_TARGET_BITS == 64
-#define gen86_addq_r_mod(p_pc, gen_modrm, src_reg, ...) /* addq  %src_reg, ... */ gen_modrm(p_pc, GEN86_REX_W, _gen86_putb(p_pc, 0x01), src_reg, __VA_ARGS__, (void)0)
-#define gen86_addq_mod_r(p_pc, gen_modrm, dst_reg, ...) /* addq  ..., %dst_reg */ gen_modrm(p_pc, GEN86_REX_W, _gen86_putb(p_pc, 0x03), src_reg, __VA_ARGS__, (void)0)
-#define gen86_addq_imm_rax(p_pc, imm)                   /* addq  $imm, %rax    */ (_gen86_putb(p_pc, 0x40 | GEN86_REX_W), _gen86_putb(p_pc, 0x05), _gen86_putsl(p_pc, imm))
-#define gen86_addq_imm_mod(p_pc, gen_modrm, imm, ...)   /* addb  $imm, ...     */ gen_modrm(p_pc, GEN86_REX_W, _gen86_putb(p_pc, 0x81), 0, __VA_ARGS__, _gen86_putsb(p_pc, imm))
-#define gen86_addq_imms8_mod(p_pc, gen_modrm, imm, ...) /* addb  $imm, ...     */ gen_modrm(p_pc, GEN86_REX_W, _gen86_putb(p_pc, 0x83), 0, __VA_ARGS__, _gen86_putsb(p_pc, imm))
+#define gen86_addq_r_mod(p_pc, gen_modrm, src_reg, ...)  /* addq  %src_reg, ... */ gen_modrm(p_pc, GEN86_REX_W, _gen86_putb(p_pc, 0x01), src_reg, __VA_ARGS__, (void)0)
+#define gen86_addq_mod_r(p_pc, gen_modrm, dst_reg, ...)  /* addq  ..., %dst_reg */ gen_modrm(p_pc, GEN86_REX_W, _gen86_putb(p_pc, 0x03), src_reg, __VA_ARGS__, (void)0)
+#define gen86_addq_imm_rax(p_pc, imm)                    /* addq  $imm, %rax    */ (_gen86_putb(p_pc, 0x40 | GEN86_REX_W), _gen86_putb(p_pc, 0x05), _gen86_putsl(p_pc, imm))
+#define gen86_addq_imm32s_mod(p_pc, gen_modrm, imm, ...) /* addq  $imm, ...     */ gen_modrm(p_pc, GEN86_REX_W, _gen86_putb(p_pc, 0x81), 0, __VA_ARGS__, _gen86_putsb(p_pc, imm))
+#define gen86_addq_imm8s_mod(p_pc, gen_modrm, imm, ...)  /* addq  $imm, ...     */ gen_modrm(p_pc, GEN86_REX_W, _gen86_putb(p_pc, 0x83), 0, __VA_ARGS__, _gen86_putsb(p_pc, imm))
+#define gen86_addq_imm_mod(p_pc, gen_modrm, imm, ...)    /* addq  $imm, ...     */ (((__INT32_TYPE__)(imm) >= __INT8_MIN__ && (__INT32_TYPE__)(imm) <= __INT8_MAX__) ? gen86_addq_imm8s_mod(p_pc, gen_modrm, imm, __VA_ARGS__) : gen86_addq_imm32s_mod(p_pc, gen_modrm, imm, __VA_ARGS__))
 #endif /* LIBGEN86_TARGET_BITS == 64 */
-#define gen86_orb_r_mod(p_pc, gen_modrm, src_reg, ...)  /* orb   %src_reg, ... */ gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x08), src_reg, __VA_ARGS__, (void)0)
-#define gen86_orw_r_mod(p_pc, gen_modrm, src_reg, ...)  /* orw   %src_reg, ... */ (_gen86_pfx16_(p_pc) gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x09), src_reg, __VA_ARGS__, (void)0))
-#define gen86_orl_r_mod(p_pc, gen_modrm, src_reg, ...)  /* orl   %src_reg, ... */ (_gen86_pfx32_(p_pc) gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x09), src_reg, __VA_ARGS__, (void)0))
-#define gen86_orb_mod_r(p_pc, gen_modrm, dst_reg, ...)  /* orb   ..., %dst_reg */ gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x0a), dst_reg, __VA_ARGS__, (void)0)
-#define gen86_orw_mod_r(p_pc, gen_modrm, dst_reg, ...)  /* orw   ..., %dst_reg */ (_gen86_pfx16_(p_pc) gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x0b), src_reg, __VA_ARGS__, (void)0))
-#define gen86_orl_mod_r(p_pc, gen_modrm, dst_reg, ...)  /* orl   ..., %dst_reg */ (_gen86_pfx32_(p_pc) gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x0b), src_reg, __VA_ARGS__, (void)0))
-#define gen86_orb_imm_al(p_pc, imm)                     /* orb   $imm, %al     */ (_gen86_putb(p_pc, 0x0c), _gen86_putb(p_pc, imm))
-#define gen86_orw_imm_ax(p_pc, imm)                     /* orw   $imm, %ax     */ (_gen86_pfx16_(p_pc) _gen86_putb(p_pc, 0x0d), _gen86_putw(p_pc, imm))
-#define gen86_orl_imm_eax(p_pc, imm)                    /* orl   $imm, %eax    */ (_gen86_pfx32_(p_pc) _gen86_putb(p_pc, 0x0d), _gen86_putl(p_pc, imm))
-#define gen86_orb_imm_mod(p_pc, gen_modrm, imm, ...)    /* orb   $imm, ...     */ gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x80), 1, __VA_ARGS__, _gen86_putb(p_pc, imm))
-#define gen86_orw_imm_mod(p_pc, gen_modrm, imm, ...)    /* orw   $imm, ...     */ (_gen86_pfx16_(p_pc) gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x81), 1, __VA_ARGS__, _gen86_putw(p_pc, imm)))
-#define gen86_orl_imm_mod(p_pc, gen_modrm, imm, ...)    /* orl   $imm, ...     */ (_gen86_pfx32_(p_pc) gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x81), 1, __VA_ARGS__, _gen86_putl(p_pc, imm)))
-#define gen86_orw_imms8_mod(p_pc, gen_modrm, imm, ...)  /* orw   $imm, ...     */ (_gen86_pfx16_(p_pc) gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x83), 1, __VA_ARGS__, _gen86_putsb(p_pc, imm)))
-#define gen86_orl_imms8_mod(p_pc, gen_modrm, imm, ...)  /* orl   $imm, ...     */ (_gen86_pfx32_(p_pc) gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x83), 1, __VA_ARGS__, _gen86_putsb(p_pc, imm)))
+#define gen86_orb_r_mod(p_pc, gen_modrm, src_reg, ...)   /* orb   %src_reg, ... */ gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x08), src_reg, __VA_ARGS__, (void)0)
+#define gen86_orw_r_mod(p_pc, gen_modrm, src_reg, ...)   /* orw   %src_reg, ... */ (_gen86_pfx16_(p_pc) gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x09), src_reg, __VA_ARGS__, (void)0))
+#define gen86_orl_r_mod(p_pc, gen_modrm, src_reg, ...)   /* orl   %src_reg, ... */ (_gen86_pfx32_(p_pc) gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x09), src_reg, __VA_ARGS__, (void)0))
+#define gen86_orb_mod_r(p_pc, gen_modrm, dst_reg, ...)   /* orb   ..., %dst_reg */ gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x0a), dst_reg, __VA_ARGS__, (void)0)
+#define gen86_orw_mod_r(p_pc, gen_modrm, dst_reg, ...)   /* orw   ..., %dst_reg */ (_gen86_pfx16_(p_pc) gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x0b), src_reg, __VA_ARGS__, (void)0))
+#define gen86_orl_mod_r(p_pc, gen_modrm, dst_reg, ...)   /* orl   ..., %dst_reg */ (_gen86_pfx32_(p_pc) gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x0b), src_reg, __VA_ARGS__, (void)0))
+#define gen86_orb_imm_al(p_pc, imm)                      /* orb   $imm, %al     */ (_gen86_putb(p_pc, 0x0c), _gen86_putb(p_pc, imm))
+#define gen86_orw_imm_ax(p_pc, imm)                      /* orw   $imm, %ax     */ (_gen86_pfx16_(p_pc) _gen86_putb(p_pc, 0x0d), _gen86_putw(p_pc, imm))
+#define gen86_orl_imm_eax(p_pc, imm)                     /* orl   $imm, %eax    */ (_gen86_pfx32_(p_pc) _gen86_putb(p_pc, 0x0d), _gen86_putl(p_pc, imm))
+#define gen86_orb_imm_mod(p_pc, gen_modrm, imm, ...)     /* orb   $imm, ...     */ gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x80), 1, __VA_ARGS__, _gen86_putb(p_pc, imm))
+#define gen86_orw_imm16u_mod(p_pc, gen_modrm, imm, ...)  /* orw   $imm, ...     */ (_gen86_pfx16_(p_pc) gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x81), 1, __VA_ARGS__, _gen86_putw(p_pc, imm)))
+#define gen86_orl_imm32s_mod(p_pc, gen_modrm, imm, ...)  /* orl   $imm, ...     */ (_gen86_pfx32_(p_pc) gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x81), 1, __VA_ARGS__, _gen86_putl(p_pc, imm)))
+#define gen86_orw_imm8s_mod(p_pc, gen_modrm, imm, ...)   /* orw   $imm, ...     */ (_gen86_pfx16_(p_pc) gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x83), 1, __VA_ARGS__, _gen86_putsb(p_pc, imm)))
+#define gen86_orl_imm8s_mod(p_pc, gen_modrm, imm, ...)   /* orl   $imm, ...     */ (_gen86_pfx32_(p_pc) gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x83), 1, __VA_ARGS__, _gen86_putsb(p_pc, imm)))
+#define gen86_orw_imm_mod(p_pc, gen_modrm, imm, ...)     /* orw   $imm, ...     */ (((__INT32_TYPE__)(imm) >= __INT8_MIN__ && (__INT32_TYPE__)(imm) <= __INT8_MAX__) ? gen86_orw_imm8s_mod(p_pc, gen_modrm, imm, __VA_ARGS__) : gen86_orw_imm16u_mod(p_pc, gen_modrm, imm, __VA_ARGS__))
+#define gen86_orl_imm_mod(p_pc, gen_modrm, imm, ...)     /* orl   $imm, ...     */ (((__INT32_TYPE__)(imm) >= __INT8_MIN__ && (__INT32_TYPE__)(imm) <= __INT8_MAX__) ? gen86_orl_imm8s_mod(p_pc, gen_modrm, imm, __VA_ARGS__) : gen86_orl_imm32s_mod(p_pc, gen_modrm, imm, __VA_ARGS__))
 #if LIBGEN86_TARGET_BITS == 64
-#define gen86_orq_r_mod(p_pc, gen_modrm, src_reg, ...)  /* orq   %src_reg, ... */ gen_modrm(p_pc, GEN86_REX_W, _gen86_putb(p_pc, 0x09), src_reg, __VA_ARGS__, (void)0)
-#define gen86_orq_mod_r(p_pc, gen_modrm, dst_reg, ...)  /* orq   ..., %dst_reg */ gen_modrm(p_pc, GEN86_REX_W, _gen86_putb(p_pc, 0x0b), src_reg, __VA_ARGS__, (void)0)
-#define gen86_orq_imm_rax(p_pc, imm)                    /* orq   $imm, %rax    */ (_gen86_putb(p_pc, 0x40 | GEN86_REX_W), _gen86_putb(p_pc, 0x0d), _gen86_putsl(p_pc, imm))
-#define gen86_orq_imm_mod(p_pc, gen_modrm, imm, ...)    /* orb   $imm, ...     */ gen_modrm(p_pc, GEN86_REX_W, _gen86_putb(p_pc, 0x81), 1, __VA_ARGS__, _gen86_putsb(p_pc, imm))
-#define gen86_orq_imms8_mod(p_pc, gen_modrm, imm, ...)  /* orb   $imm, ...     */ gen_modrm(p_pc, GEN86_REX_W, _gen86_putb(p_pc, 0x83), 1, __VA_ARGS__, _gen86_putsb(p_pc, imm))
+#define gen86_orq_r_mod(p_pc, gen_modrm, src_reg, ...)   /* orq   %src_reg, ... */ gen_modrm(p_pc, GEN86_REX_W, _gen86_putb(p_pc, 0x09), src_reg, __VA_ARGS__, (void)0)
+#define gen86_orq_mod_r(p_pc, gen_modrm, dst_reg, ...)   /* orq   ..., %dst_reg */ gen_modrm(p_pc, GEN86_REX_W, _gen86_putb(p_pc, 0x0b), src_reg, __VA_ARGS__, (void)0)
+#define gen86_orq_imm_rax(p_pc, imm)                     /* orq   $imm, %rax    */ (_gen86_putb(p_pc, 0x40 | GEN86_REX_W), _gen86_putb(p_pc, 0x0d), _gen86_putsl(p_pc, imm))
+#define gen86_orq_imm32s_mod(p_pc, gen_modrm, imm, ...)  /* orq   $imm, ...     */ gen_modrm(p_pc, GEN86_REX_W, _gen86_putb(p_pc, 0x81), 1, __VA_ARGS__, _gen86_putsb(p_pc, imm))
+#define gen86_orq_imm8s_mod(p_pc, gen_modrm, imm, ...)   /* orq   $imm, ...     */ gen_modrm(p_pc, GEN86_REX_W, _gen86_putb(p_pc, 0x83), 1, __VA_ARGS__, _gen86_putsb(p_pc, imm))
+#define gen86_orq_imm_mod(p_pc, gen_modrm, imm, ...)     /* orq   $imm, ...     */ (((__INT32_TYPE__)(imm) >= __INT8_MIN__ && (__INT32_TYPE__)(imm) <= __INT8_MAX__) ? gen86_orq_imm8s_mod(p_pc, gen_modrm, imm, __VA_ARGS__) : gen86_orq_imm32s_mod(p_pc, gen_modrm, imm, __VA_ARGS__))
 #endif /* LIBGEN86_TARGET_BITS == 64 */
-#define gen86_adcb_r_mod(p_pc, gen_modrm, src_reg, ...) /* adcb  %src_reg, ... */ gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x10), src_reg, __VA_ARGS__, (void)0)
-#define gen86_adcw_r_mod(p_pc, gen_modrm, src_reg, ...) /* adcw  %src_reg, ... */ (_gen86_pfx16_(p_pc) gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x11), src_reg, __VA_ARGS__, (void)0))
-#define gen86_adcl_r_mod(p_pc, gen_modrm, src_reg, ...) /* adcl  %src_reg, ... */ (_gen86_pfx32_(p_pc) gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x11), src_reg, __VA_ARGS__, (void)0))
-#define gen86_adcb_mod_r(p_pc, gen_modrm, dst_reg, ...) /* adcb  ..., %dst_reg */ gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x12), dst_reg, __VA_ARGS__, (void)0)
-#define gen86_adcw_mod_r(p_pc, gen_modrm, dst_reg, ...) /* adcw  ..., %dst_reg */ (_gen86_pfx16_(p_pc) gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x13), src_reg, __VA_ARGS__, (void)0))
-#define gen86_adcl_mod_r(p_pc, gen_modrm, dst_reg, ...) /* adcl  ..., %dst_reg */ (_gen86_pfx32_(p_pc) gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x13), src_reg, __VA_ARGS__, (void)0))
-#define gen86_adcb_imm_al(p_pc, imm)                    /* adcb  $imm, %al     */ (_gen86_putb(p_pc, 0x14), _gen86_putb(p_pc, imm))
-#define gen86_adcw_imm_ax(p_pc, imm)                    /* adcw  $imm, %ax     */ (_gen86_pfx16_(p_pc) _gen86_putb(p_pc, 0x15), _gen86_putw(p_pc, imm))
-#define gen86_adcl_imm_eax(p_pc, imm)                   /* adcl  $imm, %eax    */ (_gen86_pfx32_(p_pc) _gen86_putb(p_pc, 0x15), _gen86_putl(p_pc, imm))
-#define gen86_adcb_imm_mod(p_pc, gen_modrm, imm, ...)   /* adcb  $imm, ...     */ gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x80), 2, __VA_ARGS__, _gen86_putb(p_pc, imm))
-#define gen86_adcw_imm_mod(p_pc, gen_modrm, imm, ...)   /* adcw  $imm, ...     */ (_gen86_pfx16_(p_pc) gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x81), 2, __VA_ARGS__, _gen86_putw(p_pc, imm)))
-#define gen86_adcl_imm_mod(p_pc, gen_modrm, imm, ...)   /* adcl  $imm, ...     */ (_gen86_pfx32_(p_pc) gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x81), 2, __VA_ARGS__, _gen86_putl(p_pc, imm)))
-#define gen86_adcw_imms8_mod(p_pc, gen_modrm, imm, ...) /* adcw  $imm, ...     */ (_gen86_pfx16_(p_pc) gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x83), 2, __VA_ARGS__, _gen86_putsb(p_pc, imm)))
-#define gen86_adcl_imms8_mod(p_pc, gen_modrm, imm, ...) /* adcl  $imm, ...     */ (_gen86_pfx32_(p_pc) gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x83), 2, __VA_ARGS__, _gen86_putsb(p_pc, imm)))
+#define gen86_adcb_r_mod(p_pc, gen_modrm, src_reg, ...)  /* adcb  %src_reg, ... */ gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x10), src_reg, __VA_ARGS__, (void)0)
+#define gen86_adcw_r_mod(p_pc, gen_modrm, src_reg, ...)  /* adcw  %src_reg, ... */ (_gen86_pfx16_(p_pc) gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x11), src_reg, __VA_ARGS__, (void)0))
+#define gen86_adcl_r_mod(p_pc, gen_modrm, src_reg, ...)  /* adcl  %src_reg, ... */ (_gen86_pfx32_(p_pc) gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x11), src_reg, __VA_ARGS__, (void)0))
+#define gen86_adcb_mod_r(p_pc, gen_modrm, dst_reg, ...)  /* adcb  ..., %dst_reg */ gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x12), dst_reg, __VA_ARGS__, (void)0)
+#define gen86_adcw_mod_r(p_pc, gen_modrm, dst_reg, ...)  /* adcw  ..., %dst_reg */ (_gen86_pfx16_(p_pc) gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x13), src_reg, __VA_ARGS__, (void)0))
+#define gen86_adcl_mod_r(p_pc, gen_modrm, dst_reg, ...)  /* adcl  ..., %dst_reg */ (_gen86_pfx32_(p_pc) gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x13), src_reg, __VA_ARGS__, (void)0))
+#define gen86_adcb_imm_al(p_pc, imm)                     /* adcb  $imm, %al     */ (_gen86_putb(p_pc, 0x14), _gen86_putb(p_pc, imm))
+#define gen86_adcw_imm_ax(p_pc, imm)                     /* adcw  $imm, %ax     */ (_gen86_pfx16_(p_pc) _gen86_putb(p_pc, 0x15), _gen86_putw(p_pc, imm))
+#define gen86_adcl_imm_eax(p_pc, imm)                    /* adcl  $imm, %eax    */ (_gen86_pfx32_(p_pc) _gen86_putb(p_pc, 0x15), _gen86_putl(p_pc, imm))
+#define gen86_adcb_imm_mod(p_pc, gen_modrm, imm, ...)    /* adcb  $imm, ...     */ gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x80), 2, __VA_ARGS__, _gen86_putb(p_pc, imm))
+#define gen86_adcw_imm16u_mod(p_pc, gen_modrm, imm, ...) /* adcw  $imm, ...     */ (_gen86_pfx16_(p_pc) gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x81), 2, __VA_ARGS__, _gen86_putw(p_pc, imm)))
+#define gen86_adcl_imm32s_mod(p_pc, gen_modrm, imm, ...) /* adcl  $imm, ...     */ (_gen86_pfx32_(p_pc) gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x81), 2, __VA_ARGS__, _gen86_putl(p_pc, imm)))
+#define gen86_adcw_imm8s_mod(p_pc, gen_modrm, imm, ...)  /* adcw  $imm, ...     */ (_gen86_pfx16_(p_pc) gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x83), 2, __VA_ARGS__, _gen86_putsb(p_pc, imm)))
+#define gen86_adcl_imm8s_mod(p_pc, gen_modrm, imm, ...)  /* adcl  $imm, ...     */ (_gen86_pfx32_(p_pc) gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x83), 2, __VA_ARGS__, _gen86_putsb(p_pc, imm)))
+#define gen86_adcw_imm_mod(p_pc, gen_modrm, imm, ...)    /* adcw  $imm, ...     */ (((__INT32_TYPE__)(imm) >= __INT8_MIN__ && (__INT32_TYPE__)(imm) <= __INT8_MAX__) ? gen86_adcw_imm8s_mod(p_pc, gen_modrm, imm, __VA_ARGS__) : gen86_adcw_imm16u_mod(p_pc, gen_modrm, imm, __VA_ARGS__))
+#define gen86_adcl_imm_mod(p_pc, gen_modrm, imm, ...)    /* adcl  $imm, ...     */ (((__INT32_TYPE__)(imm) >= __INT8_MIN__ && (__INT32_TYPE__)(imm) <= __INT8_MAX__) ? gen86_adcl_imm8s_mod(p_pc, gen_modrm, imm, __VA_ARGS__) : gen86_adcl_imm32s_mod(p_pc, gen_modrm, imm, __VA_ARGS__))
 #if LIBGEN86_TARGET_BITS == 64
-#define gen86_adcq_r_mod(p_pc, gen_modrm, src_reg, ...) /* adcq  %src_reg, ... */ gen_modrm(p_pc, GEN86_REX_W, _gen86_putb(p_pc, 0x11), src_reg, __VA_ARGS__, (void)0)
-#define gen86_adcq_mod_r(p_pc, gen_modrm, dst_reg, ...) /* adcq  ..., %dst_reg */ gen_modrm(p_pc, GEN86_REX_W, _gen86_putb(p_pc, 0x13), src_reg, __VA_ARGS__, (void)0)
-#define gen86_adcq_imm_rax(p_pc, imm)                   /* adcq  $imm, %rax    */ (_gen86_putb(p_pc, 0x40 | GEN86_REX_W), _gen86_putb(p_pc, 0x15), _gen86_putsl(p_pc, imm))
-#define gen86_adcq_imm_mod(p_pc, gen_modrm, imm, ...)   /* adcb  $imm, ...     */ gen_modrm(p_pc, GEN86_REX_W, _gen86_putb(p_pc, 0x81), 2, __VA_ARGS__, _gen86_putsb(p_pc, imm))
-#define gen86_adcq_imms8_mod(p_pc, gen_modrm, imm, ...) /* adcb  $imm, ...     */ gen_modrm(p_pc, GEN86_REX_W, _gen86_putb(p_pc, 0x83), 2, __VA_ARGS__, _gen86_putsb(p_pc, imm))
+#define gen86_adcq_r_mod(p_pc, gen_modrm, src_reg, ...)  /* adcq  %src_reg, ... */ gen_modrm(p_pc, GEN86_REX_W, _gen86_putb(p_pc, 0x11), src_reg, __VA_ARGS__, (void)0)
+#define gen86_adcq_mod_r(p_pc, gen_modrm, dst_reg, ...)  /* adcq  ..., %dst_reg */ gen_modrm(p_pc, GEN86_REX_W, _gen86_putb(p_pc, 0x13), src_reg, __VA_ARGS__, (void)0)
+#define gen86_adcq_imm_rax(p_pc, imm)                    /* adcq  $imm, %rax    */ (_gen86_putb(p_pc, 0x40 | GEN86_REX_W), _gen86_putb(p_pc, 0x15), _gen86_putsl(p_pc, imm))
+#define gen86_adcq_imm32s_mod(p_pc, gen_modrm, imm, ...) /* adcq  $imm, ...     */ gen_modrm(p_pc, GEN86_REX_W, _gen86_putb(p_pc, 0x81), 2, __VA_ARGS__, _gen86_putsb(p_pc, imm))
+#define gen86_adcq_imm8s_mod(p_pc, gen_modrm, imm, ...)  /* adcq  $imm, ...     */ gen_modrm(p_pc, GEN86_REX_W, _gen86_putb(p_pc, 0x83), 2, __VA_ARGS__, _gen86_putsb(p_pc, imm))
+#define gen86_adcq_imm_mod(p_pc, gen_modrm, imm, ...)    /* adcq  $imm, ...     */ (((__INT32_TYPE__)(imm) >= __INT8_MIN__ && (__INT32_TYPE__)(imm) <= __INT8_MAX__) ? gen86_adcq_imm8s_mod(p_pc, gen_modrm, imm, __VA_ARGS__) : gen86_adcq_imm32s_mod(p_pc, gen_modrm, imm, __VA_ARGS__))
 #endif /* LIBGEN86_TARGET_BITS == 64 */
-#define gen86_sbbb_r_mod(p_pc, gen_modrm, src_reg, ...) /* sbbb  %src_reg, ... */ gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x18), src_reg, __VA_ARGS__, (void)0)
-#define gen86_sbbw_r_mod(p_pc, gen_modrm, src_reg, ...) /* sbbw  %src_reg, ... */ (_gen86_pfx16_(p_pc) gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x19), src_reg, __VA_ARGS__, (void)0))
-#define gen86_sbbl_r_mod(p_pc, gen_modrm, src_reg, ...) /* sbbl  %src_reg, ... */ (_gen86_pfx32_(p_pc) gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x19), src_reg, __VA_ARGS__, (void)0))
-#define gen86_sbbb_mod_r(p_pc, gen_modrm, dst_reg, ...) /* sbbb  ..., %dst_reg */ gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x1a), dst_reg, __VA_ARGS__, (void)0)
-#define gen86_sbbw_mod_r(p_pc, gen_modrm, dst_reg, ...) /* sbbw  ..., %dst_reg */ (_gen86_pfx16_(p_pc) gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x1b), src_reg, __VA_ARGS__, (void)0))
-#define gen86_sbbl_mod_r(p_pc, gen_modrm, dst_reg, ...) /* sbbl  ..., %dst_reg */ (_gen86_pfx32_(p_pc) gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x1b), src_reg, __VA_ARGS__, (void)0))
-#define gen86_sbbb_imm_al(p_pc, imm)                    /* sbbb  $imm, %al     */ (_gen86_putb(p_pc, 0x1c), _gen86_putb(p_pc, imm))
-#define gen86_sbbw_imm_ax(p_pc, imm)                    /* sbbw  $imm, %ax     */ (_gen86_pfx16_(p_pc) _gen86_putb(p_pc, 0x1d), _gen86_putw(p_pc, imm))
-#define gen86_sbbl_imm_eax(p_pc, imm)                   /* sbbl  $imm, %eax    */ (_gen86_pfx32_(p_pc) _gen86_putb(p_pc, 0x1d), _gen86_putl(p_pc, imm))
-#define gen86_sbbb_imm_mod(p_pc, gen_modrm, imm, ...)   /* sbbb  $imm, ...     */ gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x80), 3, __VA_ARGS__, _gen86_putb(p_pc, imm))
-#define gen86_sbbw_imm_mod(p_pc, gen_modrm, imm, ...)   /* sbbw  $imm, ...     */ (_gen86_pfx16_(p_pc) gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x81), 3, __VA_ARGS__, _gen86_putw(p_pc, imm)))
-#define gen86_sbbl_imm_mod(p_pc, gen_modrm, imm, ...)   /* sbbl  $imm, ...     */ (_gen86_pfx32_(p_pc) gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x81), 3, __VA_ARGS__, _gen86_putl(p_pc, imm)))
-#define gen86_sbbw_imms8_mod(p_pc, gen_modrm, imm, ...) /* sbbw  $imm, ...     */ (_gen86_pfx16_(p_pc) gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x83), 3, __VA_ARGS__, _gen86_putsb(p_pc, imm)))
-#define gen86_sbbl_imms8_mod(p_pc, gen_modrm, imm, ...) /* sbbl  $imm, ...     */ (_gen86_pfx32_(p_pc) gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x83), 3, __VA_ARGS__, _gen86_putsb(p_pc, imm)))
+#define gen86_sbbb_r_mod(p_pc, gen_modrm, src_reg, ...)  /* sbbb  %src_reg, ... */ gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x18), src_reg, __VA_ARGS__, (void)0)
+#define gen86_sbbw_r_mod(p_pc, gen_modrm, src_reg, ...)  /* sbbw  %src_reg, ... */ (_gen86_pfx16_(p_pc) gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x19), src_reg, __VA_ARGS__, (void)0))
+#define gen86_sbbl_r_mod(p_pc, gen_modrm, src_reg, ...)  /* sbbl  %src_reg, ... */ (_gen86_pfx32_(p_pc) gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x19), src_reg, __VA_ARGS__, (void)0))
+#define gen86_sbbb_mod_r(p_pc, gen_modrm, dst_reg, ...)  /* sbbb  ..., %dst_reg */ gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x1a), dst_reg, __VA_ARGS__, (void)0)
+#define gen86_sbbw_mod_r(p_pc, gen_modrm, dst_reg, ...)  /* sbbw  ..., %dst_reg */ (_gen86_pfx16_(p_pc) gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x1b), src_reg, __VA_ARGS__, (void)0))
+#define gen86_sbbl_mod_r(p_pc, gen_modrm, dst_reg, ...)  /* sbbl  ..., %dst_reg */ (_gen86_pfx32_(p_pc) gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x1b), src_reg, __VA_ARGS__, (void)0))
+#define gen86_sbbb_imm_al(p_pc, imm)                     /* sbbb  $imm, %al     */ (_gen86_putb(p_pc, 0x1c), _gen86_putb(p_pc, imm))
+#define gen86_sbbw_imm_ax(p_pc, imm)                     /* sbbw  $imm, %ax     */ (_gen86_pfx16_(p_pc) _gen86_putb(p_pc, 0x1d), _gen86_putw(p_pc, imm))
+#define gen86_sbbl_imm_eax(p_pc, imm)                    /* sbbl  $imm, %eax    */ (_gen86_pfx32_(p_pc) _gen86_putb(p_pc, 0x1d), _gen86_putl(p_pc, imm))
+#define gen86_sbbb_imm_mod(p_pc, gen_modrm, imm, ...)    /* sbbb  $imm, ...     */ gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x80), 3, __VA_ARGS__, _gen86_putb(p_pc, imm))
+#define gen86_sbbw_imm16u_mod(p_pc, gen_modrm, imm, ...) /* sbbw  $imm, ...     */ (_gen86_pfx16_(p_pc) gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x81), 3, __VA_ARGS__, _gen86_putw(p_pc, imm)))
+#define gen86_sbbl_imm32s_mod(p_pc, gen_modrm, imm, ...) /* sbbl  $imm, ...     */ (_gen86_pfx32_(p_pc) gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x81), 3, __VA_ARGS__, _gen86_putl(p_pc, imm)))
+#define gen86_sbbw_imm8s_mod(p_pc, gen_modrm, imm, ...)  /* sbbw  $imm, ...     */ (_gen86_pfx16_(p_pc) gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x83), 3, __VA_ARGS__, _gen86_putsb(p_pc, imm)))
+#define gen86_sbbl_imm8s_mod(p_pc, gen_modrm, imm, ...)  /* sbbl  $imm, ...     */ (_gen86_pfx32_(p_pc) gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x83), 3, __VA_ARGS__, _gen86_putsb(p_pc, imm)))
+#define gen86_sbbw_imm_mod(p_pc, gen_modrm, imm, ...)    /* sbbw  $imm, ...     */ (((__INT32_TYPE__)(imm) >= __INT8_MIN__ && (__INT32_TYPE__)(imm) <= __INT8_MAX__) ? gen86_sbbw_imm8s_mod(p_pc, gen_modrm, imm, __VA_ARGS__) : gen86_sbbw_imm16u_mod(p_pc, gen_modrm, imm, __VA_ARGS__))
+#define gen86_sbbl_imm_mod(p_pc, gen_modrm, imm, ...)    /* sbbl  $imm, ...     */ (((__INT32_TYPE__)(imm) >= __INT8_MIN__ && (__INT32_TYPE__)(imm) <= __INT8_MAX__) ? gen86_sbbl_imm8s_mod(p_pc, gen_modrm, imm, __VA_ARGS__) : gen86_sbbl_imm32s_mod(p_pc, gen_modrm, imm, __VA_ARGS__))
 #if LIBGEN86_TARGET_BITS == 64
-#define gen86_sbbq_r_mod(p_pc, gen_modrm, src_reg, ...) /* sbbq  %src_reg, ... */ gen_modrm(p_pc, GEN86_REX_W, _gen86_putb(p_pc, 0x19), src_reg, __VA_ARGS__, (void)0)
-#define gen86_sbbq_mod_r(p_pc, gen_modrm, dst_reg, ...) /* sbbq  ..., %dst_reg */ gen_modrm(p_pc, GEN86_REX_W, _gen86_putb(p_pc, 0x1b), src_reg, __VA_ARGS__, (void)0)
-#define gen86_sbbq_imm_rax(p_pc, imm)                   /* sbbq  $imm, %rax    */ (_gen86_putb(p_pc, 0x40 | GEN86_REX_W), _gen86_putb(p_pc, 0x1d), _gen86_putsl(p_pc, imm))
-#define gen86_sbbq_imm_mod(p_pc, gen_modrm, imm, ...)   /* sbbb  $imm, ...     */ gen_modrm(p_pc, GEN86_REX_W, _gen86_putb(p_pc, 0x81), 3, __VA_ARGS__, _gen86_putsb(p_pc, imm))
-#define gen86_sbbq_imms8_mod(p_pc, gen_modrm, imm, ...) /* sbbb  $imm, ...     */ gen_modrm(p_pc, GEN86_REX_W, _gen86_putb(p_pc, 0x83), 3, __VA_ARGS__, _gen86_putsb(p_pc, imm))
+#define gen86_sbbq_r_mod(p_pc, gen_modrm, src_reg, ...)  /* sbbq  %src_reg, ... */ gen_modrm(p_pc, GEN86_REX_W, _gen86_putb(p_pc, 0x19), src_reg, __VA_ARGS__, (void)0)
+#define gen86_sbbq_mod_r(p_pc, gen_modrm, dst_reg, ...)  /* sbbq  ..., %dst_reg */ gen_modrm(p_pc, GEN86_REX_W, _gen86_putb(p_pc, 0x1b), src_reg, __VA_ARGS__, (void)0)
+#define gen86_sbbq_imm_rax(p_pc, imm)                    /* sbbq  $imm, %rax    */ (_gen86_putb(p_pc, 0x40 | GEN86_REX_W), _gen86_putb(p_pc, 0x1d), _gen86_putsl(p_pc, imm))
+#define gen86_sbbq_imm32s_mod(p_pc, gen_modrm, imm, ...) /* sbbq  $imm, ...     */ gen_modrm(p_pc, GEN86_REX_W, _gen86_putb(p_pc, 0x81), 3, __VA_ARGS__, _gen86_putsb(p_pc, imm))
+#define gen86_sbbq_imm8s_mod(p_pc, gen_modrm, imm, ...)  /* sbbq  $imm, ...     */ gen_modrm(p_pc, GEN86_REX_W, _gen86_putb(p_pc, 0x83), 3, __VA_ARGS__, _gen86_putsb(p_pc, imm))
+#define gen86_sbbq_imm_mod(p_pc, gen_modrm, imm, ...)    /* sbbq  $imm, ...     */ (((__INT32_TYPE__)(imm) >= __INT8_MIN__ && (__INT32_TYPE__)(imm) <= __INT8_MAX__) ? gen86_sbbq_imm8s_mod(p_pc, gen_modrm, imm, __VA_ARGS__) : gen86_sbbq_imm32s_mod(p_pc, gen_modrm, imm, __VA_ARGS__))
 #endif /* LIBGEN86_TARGET_BITS == 64 */
-#define gen86_andb_r_mod(p_pc, gen_modrm, src_reg, ...) /* andb  %src_reg, ... */ gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x20), src_reg, __VA_ARGS__, (void)0)
-#define gen86_andw_r_mod(p_pc, gen_modrm, src_reg, ...) /* andw  %src_reg, ... */ (_gen86_pfx16_(p_pc) gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x21), src_reg, __VA_ARGS__, (void)0))
-#define gen86_andl_r_mod(p_pc, gen_modrm, src_reg, ...) /* andl  %src_reg, ... */ (_gen86_pfx32_(p_pc) gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x21), src_reg, __VA_ARGS__, (void)0))
-#define gen86_andb_mod_r(p_pc, gen_modrm, dst_reg, ...) /* andb  ..., %dst_reg */ gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x22), dst_reg, __VA_ARGS__, (void)0)
-#define gen86_andw_mod_r(p_pc, gen_modrm, dst_reg, ...) /* andw  ..., %dst_reg */ (_gen86_pfx16_(p_pc) gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x23), src_reg, __VA_ARGS__, (void)0))
-#define gen86_andl_mod_r(p_pc, gen_modrm, dst_reg, ...) /* andl  ..., %dst_reg */ (_gen86_pfx32_(p_pc) gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x23), src_reg, __VA_ARGS__, (void)0))
-#define gen86_andb_imm_al(p_pc, imm)                    /* andb  $imm, %al     */ (_gen86_putb(p_pc, 0x24), _gen86_putb(p_pc, imm))
-#define gen86_andw_imm_ax(p_pc, imm)                    /* andw  $imm, %ax     */ (_gen86_pfx16_(p_pc) _gen86_putb(p_pc, 0x25), _gen86_putw(p_pc, imm))
-#define gen86_andl_imm_eax(p_pc, imm)                   /* andl  $imm, %eax    */ (_gen86_pfx32_(p_pc) _gen86_putb(p_pc, 0x25), _gen86_putl(p_pc, imm))
-#define gen86_andb_imm_mod(p_pc, gen_modrm, imm, ...)   /* andb  $imm, ...     */ gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x80), 4, __VA_ARGS__, _gen86_putb(p_pc, imm))
-#define gen86_andw_imm_mod(p_pc, gen_modrm, imm, ...)   /* andw  $imm, ...     */ (_gen86_pfx16_(p_pc) gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x81), 4, __VA_ARGS__, _gen86_putw(p_pc, imm)))
-#define gen86_andl_imm_mod(p_pc, gen_modrm, imm, ...)   /* andl  $imm, ...     */ (_gen86_pfx32_(p_pc) gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x81), 4, __VA_ARGS__, _gen86_putl(p_pc, imm)))
-#define gen86_andw_imms8_mod(p_pc, gen_modrm, imm, ...) /* andw  $imm, ...     */ (_gen86_pfx16_(p_pc) gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x83), 4, __VA_ARGS__, _gen86_putsb(p_pc, imm)))
-#define gen86_andl_imms8_mod(p_pc, gen_modrm, imm, ...) /* andl  $imm, ...     */ (_gen86_pfx32_(p_pc) gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x83), 4, __VA_ARGS__, _gen86_putsb(p_pc, imm)))
+#define gen86_andb_r_mod(p_pc, gen_modrm, src_reg, ...)  /* andb  %src_reg, ... */ gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x20), src_reg, __VA_ARGS__, (void)0)
+#define gen86_andw_r_mod(p_pc, gen_modrm, src_reg, ...)  /* andw  %src_reg, ... */ (_gen86_pfx16_(p_pc) gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x21), src_reg, __VA_ARGS__, (void)0))
+#define gen86_andl_r_mod(p_pc, gen_modrm, src_reg, ...)  /* andl  %src_reg, ... */ (_gen86_pfx32_(p_pc) gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x21), src_reg, __VA_ARGS__, (void)0))
+#define gen86_andb_mod_r(p_pc, gen_modrm, dst_reg, ...)  /* andb  ..., %dst_reg */ gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x22), dst_reg, __VA_ARGS__, (void)0)
+#define gen86_andw_mod_r(p_pc, gen_modrm, dst_reg, ...)  /* andw  ..., %dst_reg */ (_gen86_pfx16_(p_pc) gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x23), src_reg, __VA_ARGS__, (void)0))
+#define gen86_andl_mod_r(p_pc, gen_modrm, dst_reg, ...)  /* andl  ..., %dst_reg */ (_gen86_pfx32_(p_pc) gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x23), src_reg, __VA_ARGS__, (void)0))
+#define gen86_andb_imm_al(p_pc, imm)                     /* andb  $imm, %al     */ (_gen86_putb(p_pc, 0x24), _gen86_putb(p_pc, imm))
+#define gen86_andw_imm_ax(p_pc, imm)                     /* andw  $imm, %ax     */ (_gen86_pfx16_(p_pc) _gen86_putb(p_pc, 0x25), _gen86_putw(p_pc, imm))
+#define gen86_andl_imm_eax(p_pc, imm)                    /* andl  $imm, %eax    */ (_gen86_pfx32_(p_pc) _gen86_putb(p_pc, 0x25), _gen86_putl(p_pc, imm))
+#define gen86_andb_imm_mod(p_pc, gen_modrm, imm, ...)    /* andb  $imm, ...     */ gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x80), 4, __VA_ARGS__, _gen86_putb(p_pc, imm))
+#define gen86_andw_imm16u_mod(p_pc, gen_modrm, imm, ...) /* andw  $imm, ...     */ (_gen86_pfx16_(p_pc) gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x81), 4, __VA_ARGS__, _gen86_putw(p_pc, imm)))
+#define gen86_andl_imm32s_mod(p_pc, gen_modrm, imm, ...) /* andl  $imm, ...     */ (_gen86_pfx32_(p_pc) gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x81), 4, __VA_ARGS__, _gen86_putl(p_pc, imm)))
+#define gen86_andw_imm8s_mod(p_pc, gen_modrm, imm, ...)  /* andw  $imm, ...     */ (_gen86_pfx16_(p_pc) gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x83), 4, __VA_ARGS__, _gen86_putsb(p_pc, imm)))
+#define gen86_andl_imm8s_mod(p_pc, gen_modrm, imm, ...)  /* andl  $imm, ...     */ (_gen86_pfx32_(p_pc) gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x83), 4, __VA_ARGS__, _gen86_putsb(p_pc, imm)))
+#define gen86_andw_imm_mod(p_pc, gen_modrm, imm, ...)    /* andw  $imm, ...     */ (((__INT32_TYPE__)(imm) >= __INT8_MIN__ && (__INT32_TYPE__)(imm) <= __INT8_MAX__) ? gen86_andw_imm8s_mod(p_pc, gen_modrm, imm, __VA_ARGS__) : gen86_andw_imm16u_mod(p_pc, gen_modrm, imm, __VA_ARGS__))
+#define gen86_andl_imm_mod(p_pc, gen_modrm, imm, ...)    /* andl  $imm, ...     */ (((__INT32_TYPE__)(imm) >= __INT8_MIN__ && (__INT32_TYPE__)(imm) <= __INT8_MAX__) ? gen86_andl_imm8s_mod(p_pc, gen_modrm, imm, __VA_ARGS__) : gen86_andl_imm32s_mod(p_pc, gen_modrm, imm, __VA_ARGS__))
 #if LIBGEN86_TARGET_BITS == 64
-#define gen86_andq_r_mod(p_pc, gen_modrm, src_reg, ...) /* andq  %src_reg, ... */ gen_modrm(p_pc, GEN86_REX_W, _gen86_putb(p_pc, 0x21), src_reg, __VA_ARGS__, (void)0)
-#define gen86_andq_mod_r(p_pc, gen_modrm, dst_reg, ...) /* andq  ..., %dst_reg */ gen_modrm(p_pc, GEN86_REX_W, _gen86_putb(p_pc, 0x23), src_reg, __VA_ARGS__, (void)0)
-#define gen86_andq_imm_rax(p_pc, imm)                   /* andq  $imm, %rax    */ (_gen86_putb(p_pc, 0x40 | GEN86_REX_W), _gen86_putb(p_pc, 0x25), _gen86_putsl(p_pc, imm))
-#define gen86_andq_imm_mod(p_pc, gen_modrm, imm, ...)   /* andb  $imm, ...     */ gen_modrm(p_pc, GEN86_REX_W, _gen86_putb(p_pc, 0x81), 4, __VA_ARGS__, _gen86_putsb(p_pc, imm))
-#define gen86_andq_imms8_mod(p_pc, gen_modrm, imm, ...) /* andb  $imm, ...     */ gen_modrm(p_pc, GEN86_REX_W, _gen86_putb(p_pc, 0x83), 4, __VA_ARGS__, _gen86_putsb(p_pc, imm))
+#define gen86_andq_r_mod(p_pc, gen_modrm, src_reg, ...)  /* andq  %src_reg, ... */ gen_modrm(p_pc, GEN86_REX_W, _gen86_putb(p_pc, 0x21), src_reg, __VA_ARGS__, (void)0)
+#define gen86_andq_mod_r(p_pc, gen_modrm, dst_reg, ...)  /* andq  ..., %dst_reg */ gen_modrm(p_pc, GEN86_REX_W, _gen86_putb(p_pc, 0x23), src_reg, __VA_ARGS__, (void)0)
+#define gen86_andq_imm_rax(p_pc, imm)                    /* andq  $imm, %rax    */ (_gen86_putb(p_pc, 0x40 | GEN86_REX_W), _gen86_putb(p_pc, 0x25), _gen86_putsl(p_pc, imm))
+#define gen86_andq_imm32s_mod(p_pc, gen_modrm, imm, ...) /* andq  $imm, ...     */ gen_modrm(p_pc, GEN86_REX_W, _gen86_putb(p_pc, 0x81), 4, __VA_ARGS__, _gen86_putsb(p_pc, imm))
+#define gen86_andq_imm8s_mod(p_pc, gen_modrm, imm, ...)  /* andq  $imm, ...     */ gen_modrm(p_pc, GEN86_REX_W, _gen86_putb(p_pc, 0x83), 4, __VA_ARGS__, _gen86_putsb(p_pc, imm))
+#define gen86_andq_imm_mod(p_pc, gen_modrm, imm, ...)    /* andq  $imm, ...     */ (((__INT32_TYPE__)(imm) >= __INT8_MIN__ && (__INT32_TYPE__)(imm) <= __INT8_MAX__) ? gen86_andq_imm8s_mod(p_pc, gen_modrm, imm, __VA_ARGS__) : gen86_andq_imm32s_mod(p_pc, gen_modrm, imm, __VA_ARGS__))
 #endif /* LIBGEN86_TARGET_BITS == 64 */
-#define gen86_subb_r_mod(p_pc, gen_modrm, src_reg, ...) /* subb  %src_reg, ... */ gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x28), src_reg, __VA_ARGS__, (void)0)
-#define gen86_subw_r_mod(p_pc, gen_modrm, src_reg, ...) /* subw  %src_reg, ... */ (_gen86_pfx16_(p_pc) gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x29), src_reg, __VA_ARGS__, (void)0))
-#define gen86_subl_r_mod(p_pc, gen_modrm, src_reg, ...) /* subl  %src_reg, ... */ (_gen86_pfx32_(p_pc) gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x29), src_reg, __VA_ARGS__, (void)0))
-#define gen86_subb_mod_r(p_pc, gen_modrm, dst_reg, ...) /* subb  ..., %dst_reg */ gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x2a), dst_reg, __VA_ARGS__, (void)0)
-#define gen86_subw_mod_r(p_pc, gen_modrm, dst_reg, ...) /* subw  ..., %dst_reg */ (_gen86_pfx16_(p_pc) gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x2b), src_reg, __VA_ARGS__, (void)0))
-#define gen86_subl_mod_r(p_pc, gen_modrm, dst_reg, ...) /* subl  ..., %dst_reg */ (_gen86_pfx32_(p_pc) gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x2b), src_reg, __VA_ARGS__, (void)0))
-#define gen86_subb_imm_al(p_pc, imm)                    /* subb  $imm, %al     */ (_gen86_putb(p_pc, 0x2c), _gen86_putb(p_pc, imm))
-#define gen86_subw_imm_ax(p_pc, imm)                    /* subw  $imm, %ax     */ (_gen86_pfx16_(p_pc) _gen86_putb(p_pc, 0x2d), _gen86_putw(p_pc, imm))
-#define gen86_subl_imm_eax(p_pc, imm)                   /* subl  $imm, %eax    */ (_gen86_pfx32_(p_pc) _gen86_putb(p_pc, 0x2d), _gen86_putl(p_pc, imm))
-#define gen86_subb_imm_mod(p_pc, gen_modrm, imm, ...)   /* subb  $imm, ...     */ gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x80), 5, __VA_ARGS__, _gen86_putb(p_pc, imm))
-#define gen86_subw_imm_mod(p_pc, gen_modrm, imm, ...)   /* subw  $imm, ...     */ (_gen86_pfx16_(p_pc) gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x81), 5, __VA_ARGS__, _gen86_putw(p_pc, imm)))
-#define gen86_subl_imm_mod(p_pc, gen_modrm, imm, ...)   /* subl  $imm, ...     */ (_gen86_pfx32_(p_pc) gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x81), 5, __VA_ARGS__, _gen86_putl(p_pc, imm)))
-#define gen86_subw_imms8_mod(p_pc, gen_modrm, imm, ...) /* subw  $imm, ...     */ (_gen86_pfx16_(p_pc) gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x83), 5, __VA_ARGS__, _gen86_putsb(p_pc, imm)))
-#define gen86_subl_imms8_mod(p_pc, gen_modrm, imm, ...) /* subl  $imm, ...     */ (_gen86_pfx32_(p_pc) gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x83), 5, __VA_ARGS__, _gen86_putsb(p_pc, imm)))
+#define gen86_subb_r_mod(p_pc, gen_modrm, src_reg, ...)  /* subb  %src_reg, ... */ gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x28), src_reg, __VA_ARGS__, (void)0)
+#define gen86_subw_r_mod(p_pc, gen_modrm, src_reg, ...)  /* subw  %src_reg, ... */ (_gen86_pfx16_(p_pc) gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x29), src_reg, __VA_ARGS__, (void)0))
+#define gen86_subl_r_mod(p_pc, gen_modrm, src_reg, ...)  /* subl  %src_reg, ... */ (_gen86_pfx32_(p_pc) gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x29), src_reg, __VA_ARGS__, (void)0))
+#define gen86_subb_mod_r(p_pc, gen_modrm, dst_reg, ...)  /* subb  ..., %dst_reg */ gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x2a), dst_reg, __VA_ARGS__, (void)0)
+#define gen86_subw_mod_r(p_pc, gen_modrm, dst_reg, ...)  /* subw  ..., %dst_reg */ (_gen86_pfx16_(p_pc) gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x2b), src_reg, __VA_ARGS__, (void)0))
+#define gen86_subl_mod_r(p_pc, gen_modrm, dst_reg, ...)  /* subl  ..., %dst_reg */ (_gen86_pfx32_(p_pc) gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x2b), src_reg, __VA_ARGS__, (void)0))
+#define gen86_subb_imm_al(p_pc, imm)                     /* subb  $imm, %al     */ (_gen86_putb(p_pc, 0x2c), _gen86_putb(p_pc, imm))
+#define gen86_subw_imm_ax(p_pc, imm)                     /* subw  $imm, %ax     */ (_gen86_pfx16_(p_pc) _gen86_putb(p_pc, 0x2d), _gen86_putw(p_pc, imm))
+#define gen86_subl_imm_eax(p_pc, imm)                    /* subl  $imm, %eax    */ (_gen86_pfx32_(p_pc) _gen86_putb(p_pc, 0x2d), _gen86_putl(p_pc, imm))
+#define gen86_subb_imm_mod(p_pc, gen_modrm, imm, ...)    /* subb  $imm, ...     */ gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x80), 5, __VA_ARGS__, _gen86_putb(p_pc, imm))
+#define gen86_subw_imm16u_mod(p_pc, gen_modrm, imm, ...) /* subw  $imm, ...     */ (_gen86_pfx16_(p_pc) gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x81), 5, __VA_ARGS__, _gen86_putw(p_pc, imm)))
+#define gen86_subl_imm32s_mod(p_pc, gen_modrm, imm, ...) /* subl  $imm, ...     */ (_gen86_pfx32_(p_pc) gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x81), 5, __VA_ARGS__, _gen86_putl(p_pc, imm)))
+#define gen86_subw_imm8s_mod(p_pc, gen_modrm, imm, ...)  /* subw  $imm, ...     */ (_gen86_pfx16_(p_pc) gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x83), 5, __VA_ARGS__, _gen86_putsb(p_pc, imm)))
+#define gen86_subl_imm8s_mod(p_pc, gen_modrm, imm, ...)  /* subl  $imm, ...     */ (_gen86_pfx32_(p_pc) gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x83), 5, __VA_ARGS__, _gen86_putsb(p_pc, imm)))
+#define gen86_subw_imm_mod(p_pc, gen_modrm, imm, ...)    /* subw  $imm, ...     */ (((__INT32_TYPE__)(imm) >= __INT8_MIN__ && (__INT32_TYPE__)(imm) <= __INT8_MAX__) ? gen86_subw_imm8s_mod(p_pc, gen_modrm, imm, __VA_ARGS__) : gen86_subw_imm16u_mod(p_pc, gen_modrm, imm, __VA_ARGS__))
+#define gen86_subl_imm_mod(p_pc, gen_modrm, imm, ...)    /* subl  $imm, ...     */ (((__INT32_TYPE__)(imm) >= __INT8_MIN__ && (__INT32_TYPE__)(imm) <= __INT8_MAX__) ? gen86_subl_imm8s_mod(p_pc, gen_modrm, imm, __VA_ARGS__) : gen86_subl_imm32s_mod(p_pc, gen_modrm, imm, __VA_ARGS__))
 #if LIBGEN86_TARGET_BITS == 64
-#define gen86_subq_r_mod(p_pc, gen_modrm, src_reg, ...) /* subq  %src_reg, ... */ gen_modrm(p_pc, GEN86_REX_W, _gen86_putb(p_pc, 0x29), src_reg, __VA_ARGS__, (void)0)
-#define gen86_subq_mod_r(p_pc, gen_modrm, dst_reg, ...) /* subq  ..., %dst_reg */ gen_modrm(p_pc, GEN86_REX_W, _gen86_putb(p_pc, 0x2b), src_reg, __VA_ARGS__, (void)0)
-#define gen86_subq_imm_rax(p_pc, imm)                   /* subq  $imm, %rax    */ (_gen86_putb(p_pc, 0x40 | GEN86_REX_W), _gen86_putb(p_pc, 0x2d), _gen86_putsl(p_pc, imm))
-#define gen86_subq_imm_mod(p_pc, gen_modrm, imm, ...)   /* subb  $imm, ...     */ gen_modrm(p_pc, GEN86_REX_W, _gen86_putb(p_pc, 0x81), 5, __VA_ARGS__, _gen86_putsb(p_pc, imm))
-#define gen86_subq_imms8_mod(p_pc, gen_modrm, imm, ...) /* subb  $imm, ...     */ gen_modrm(p_pc, GEN86_REX_W, _gen86_putb(p_pc, 0x83), 5, __VA_ARGS__, _gen86_putsb(p_pc, imm))
+#define gen86_subq_r_mod(p_pc, gen_modrm, src_reg, ...)  /* subq  %src_reg, ... */ gen_modrm(p_pc, GEN86_REX_W, _gen86_putb(p_pc, 0x29), src_reg, __VA_ARGS__, (void)0)
+#define gen86_subq_mod_r(p_pc, gen_modrm, dst_reg, ...)  /* subq  ..., %dst_reg */ gen_modrm(p_pc, GEN86_REX_W, _gen86_putb(p_pc, 0x2b), src_reg, __VA_ARGS__, (void)0)
+#define gen86_subq_imm_rax(p_pc, imm)                    /* subq  $imm, %rax    */ (_gen86_putb(p_pc, 0x40 | GEN86_REX_W), _gen86_putb(p_pc, 0x2d), _gen86_putsl(p_pc, imm))
+#define gen86_subq_imm32s_mod(p_pc, gen_modrm, imm, ...) /* subq  $imm, ...     */ gen_modrm(p_pc, GEN86_REX_W, _gen86_putb(p_pc, 0x81), 5, __VA_ARGS__, _gen86_putsb(p_pc, imm))
+#define gen86_subq_imm8s_mod(p_pc, gen_modrm, imm, ...)  /* subq  $imm, ...     */ gen_modrm(p_pc, GEN86_REX_W, _gen86_putb(p_pc, 0x83), 5, __VA_ARGS__, _gen86_putsb(p_pc, imm))
+#define gen86_subq_imm_mod(p_pc, gen_modrm, imm, ...)    /* subq  $imm, ...     */ (((__INT32_TYPE__)(imm) >= __INT8_MIN__ && (__INT32_TYPE__)(imm) <= __INT8_MAX__) ? gen86_subq_imm8s_mod(p_pc, gen_modrm, imm, __VA_ARGS__) : gen86_subq_imm32s_mod(p_pc, gen_modrm, imm, __VA_ARGS__))
 #endif /* LIBGEN86_TARGET_BITS == 64 */
-#define gen86_xorb_r_mod(p_pc, gen_modrm, src_reg, ...) /* xorb  %src_reg, ... */ gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x30), src_reg, __VA_ARGS__, (void)0)
-#define gen86_xorw_r_mod(p_pc, gen_modrm, src_reg, ...) /* xorw  %src_reg, ... */ (_gen86_pfx16_(p_pc) gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x31), src_reg, __VA_ARGS__, (void)0))
-#define gen86_xorl_r_mod(p_pc, gen_modrm, src_reg, ...) /* xorl  %src_reg, ... */ (_gen86_pfx32_(p_pc) gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x31), src_reg, __VA_ARGS__, (void)0))
-#define gen86_xorb_mod_r(p_pc, gen_modrm, dst_reg, ...) /* xorb  ..., %dst_reg */ gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x32), dst_reg, __VA_ARGS__, (void)0)
-#define gen86_xorw_mod_r(p_pc, gen_modrm, dst_reg, ...) /* xorw  ..., %dst_reg */ (_gen86_pfx16_(p_pc) gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x33), src_reg, __VA_ARGS__, (void)0))
-#define gen86_xorl_mod_r(p_pc, gen_modrm, dst_reg, ...) /* xorl  ..., %dst_reg */ (_gen86_pfx32_(p_pc) gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x33), src_reg, __VA_ARGS__, (void)0))
-#define gen86_xorb_imm_al(p_pc, imm)                    /* xorb  $imm, %al     */ (_gen86_putb(p_pc, 0x34), _gen86_putb(p_pc, imm))
-#define gen86_xorw_imm_ax(p_pc, imm)                    /* xorw  $imm, %ax     */ (_gen86_pfx16_(p_pc) _gen86_putb(p_pc, 0x35), _gen86_putw(p_pc, imm))
-#define gen86_xorl_imm_eax(p_pc, imm)                   /* xorl  $imm, %eax    */ (_gen86_pfx32_(p_pc) _gen86_putb(p_pc, 0x35), _gen86_putl(p_pc, imm))
-#define gen86_xorb_imm_mod(p_pc, gen_modrm, imm, ...)   /* xorb  $imm, ...     */ gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x80), 6, __VA_ARGS__, _gen86_putb(p_pc, imm))
-#define gen86_xorw_imm_mod(p_pc, gen_modrm, imm, ...)   /* xorw  $imm, ...     */ (_gen86_pfx16_(p_pc) gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x81), 6, __VA_ARGS__, _gen86_putw(p_pc, imm)))
-#define gen86_xorl_imm_mod(p_pc, gen_modrm, imm, ...)   /* xorl  $imm, ...     */ (_gen86_pfx32_(p_pc) gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x81), 6, __VA_ARGS__, _gen86_putl(p_pc, imm)))
-#define gen86_xorw_imms8_mod(p_pc, gen_modrm, imm, ...) /* xorw  $imm, ...     */ (_gen86_pfx16_(p_pc) gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x83), 6, __VA_ARGS__, _gen86_putsb(p_pc, imm)))
-#define gen86_xorl_imms8_mod(p_pc, gen_modrm, imm, ...) /* xorl  $imm, ...     */ (_gen86_pfx32_(p_pc) gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x83), 6, __VA_ARGS__, _gen86_putsb(p_pc, imm)))
+#define gen86_xorb_r_mod(p_pc, gen_modrm, src_reg, ...)  /* xorb  %src_reg, ... */ gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x30), src_reg, __VA_ARGS__, (void)0)
+#define gen86_xorw_r_mod(p_pc, gen_modrm, src_reg, ...)  /* xorw  %src_reg, ... */ (_gen86_pfx16_(p_pc) gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x31), src_reg, __VA_ARGS__, (void)0))
+#define gen86_xorl_r_mod(p_pc, gen_modrm, src_reg, ...)  /* xorl  %src_reg, ... */ (_gen86_pfx32_(p_pc) gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x31), src_reg, __VA_ARGS__, (void)0))
+#define gen86_xorb_mod_r(p_pc, gen_modrm, dst_reg, ...)  /* xorb  ..., %dst_reg */ gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x32), dst_reg, __VA_ARGS__, (void)0)
+#define gen86_xorw_mod_r(p_pc, gen_modrm, dst_reg, ...)  /* xorw  ..., %dst_reg */ (_gen86_pfx16_(p_pc) gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x33), src_reg, __VA_ARGS__, (void)0))
+#define gen86_xorl_mod_r(p_pc, gen_modrm, dst_reg, ...)  /* xorl  ..., %dst_reg */ (_gen86_pfx32_(p_pc) gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x33), src_reg, __VA_ARGS__, (void)0))
+#define gen86_xorb_imm_al(p_pc, imm)                     /* xorb  $imm, %al     */ (_gen86_putb(p_pc, 0x34), _gen86_putb(p_pc, imm))
+#define gen86_xorw_imm_ax(p_pc, imm)                     /* xorw  $imm, %ax     */ (_gen86_pfx16_(p_pc) _gen86_putb(p_pc, 0x35), _gen86_putw(p_pc, imm))
+#define gen86_xorl_imm_eax(p_pc, imm)                    /* xorl  $imm, %eax    */ (_gen86_pfx32_(p_pc) _gen86_putb(p_pc, 0x35), _gen86_putl(p_pc, imm))
+#define gen86_xorb_imm_mod(p_pc, gen_modrm, imm, ...)    /* xorb  $imm, ...     */ gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x80), 6, __VA_ARGS__, _gen86_putb(p_pc, imm))
+#define gen86_xorw_imm16u_mod(p_pc, gen_modrm, imm, ...) /* xorw  $imm, ...     */ (_gen86_pfx16_(p_pc) gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x81), 6, __VA_ARGS__, _gen86_putw(p_pc, imm)))
+#define gen86_xorl_imm32s_mod(p_pc, gen_modrm, imm, ...) /* xorl  $imm, ...     */ (_gen86_pfx32_(p_pc) gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x81), 6, __VA_ARGS__, _gen86_putl(p_pc, imm)))
+#define gen86_xorw_imm8s_mod(p_pc, gen_modrm, imm, ...)  /* xorw  $imm, ...     */ (_gen86_pfx16_(p_pc) gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x83), 6, __VA_ARGS__, _gen86_putsb(p_pc, imm)))
+#define gen86_xorl_imm8s_mod(p_pc, gen_modrm, imm, ...)  /* xorl  $imm, ...     */ (_gen86_pfx32_(p_pc) gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x83), 6, __VA_ARGS__, _gen86_putsb(p_pc, imm)))
+#define gen86_xorw_imm_mod(p_pc, gen_modrm, imm, ...)    /* xorw  $imm, ...     */ (((__INT32_TYPE__)(imm) >= __INT8_MIN__ && (__INT32_TYPE__)(imm) <= __INT8_MAX__) ? gen86_xorw_imm8s_mod(p_pc, gen_modrm, imm, __VA_ARGS__) : gen86_xorw_imm16u_mod(p_pc, gen_modrm, imm, __VA_ARGS__))
+#define gen86_xorl_imm_mod(p_pc, gen_modrm, imm, ...)    /* xorl  $imm, ...     */ (((__INT32_TYPE__)(imm) >= __INT8_MIN__ && (__INT32_TYPE__)(imm) <= __INT8_MAX__) ? gen86_xorl_imm8s_mod(p_pc, gen_modrm, imm, __VA_ARGS__) : gen86_xorl_imm32s_mod(p_pc, gen_modrm, imm, __VA_ARGS__))
 #if LIBGEN86_TARGET_BITS == 64
-#define gen86_xorq_r_mod(p_pc, gen_modrm, src_reg, ...) /* xorq  %src_reg, ... */ gen_modrm(p_pc, GEN86_REX_W, _gen86_putb(p_pc, 0x31), src_reg, __VA_ARGS__, (void)0)
-#define gen86_xorq_mod_r(p_pc, gen_modrm, dst_reg, ...) /* xorq  ..., %dst_reg */ gen_modrm(p_pc, GEN86_REX_W, _gen86_putb(p_pc, 0x33), src_reg, __VA_ARGS__, (void)0)
-#define gen86_xorq_imm_rax(p_pc, imm)                   /* xorq  $imm, %rax    */ (_gen86_putb(p_pc, 0x40 | GEN86_REX_W), _gen86_putb(p_pc, 0x35), _gen86_putsl(p_pc, imm))
-#define gen86_xorq_imm_mod(p_pc, gen_modrm, imm, ...)   /* xorb  $imm, ...     */ gen_modrm(p_pc, GEN86_REX_W, _gen86_putb(p_pc, 0x81), 6, __VA_ARGS__, _gen86_putsb(p_pc, imm))
-#define gen86_xorq_imms8_mod(p_pc, gen_modrm, imm, ...) /* xorb  $imm, ...     */ gen_modrm(p_pc, GEN86_REX_W, _gen86_putb(p_pc, 0x83), 6, __VA_ARGS__, _gen86_putsb(p_pc, imm))
+#define gen86_xorq_r_mod(p_pc, gen_modrm, src_reg, ...)  /* xorq  %src_reg, ... */ gen_modrm(p_pc, GEN86_REX_W, _gen86_putb(p_pc, 0x31), src_reg, __VA_ARGS__, (void)0)
+#define gen86_xorq_mod_r(p_pc, gen_modrm, dst_reg, ...)  /* xorq  ..., %dst_reg */ gen_modrm(p_pc, GEN86_REX_W, _gen86_putb(p_pc, 0x33), src_reg, __VA_ARGS__, (void)0)
+#define gen86_xorq_imm_rax(p_pc, imm)                    /* xorq  $imm, %rax    */ (_gen86_putb(p_pc, 0x40 | GEN86_REX_W), _gen86_putb(p_pc, 0x35), _gen86_putsl(p_pc, imm))
+#define gen86_xorq_imm32s_mod(p_pc, gen_modrm, imm, ...) /* xorq  $imm, ...     */ gen_modrm(p_pc, GEN86_REX_W, _gen86_putb(p_pc, 0x81), 6, __VA_ARGS__, _gen86_putsb(p_pc, imm))
+#define gen86_xorq_imm8s_mod(p_pc, gen_modrm, imm, ...)  /* xorq  $imm, ...     */ gen_modrm(p_pc, GEN86_REX_W, _gen86_putb(p_pc, 0x83), 6, __VA_ARGS__, _gen86_putsb(p_pc, imm))
+#define gen86_xorq_imm_mod(p_pc, gen_modrm, imm, ...)    /* xorq  $imm, ...     */ (((__INT32_TYPE__)(imm) >= __INT8_MIN__ && (__INT32_TYPE__)(imm) <= __INT8_MAX__) ? gen86_xorq_imm8s_mod(p_pc, gen_modrm, imm, __VA_ARGS__) : gen86_xorq_imm32s_mod(p_pc, gen_modrm, imm, __VA_ARGS__))
 #endif /* LIBGEN86_TARGET_BITS == 64 */
-#define gen86_cmpb_r_mod(p_pc, gen_modrm, src_reg, ...) /* cmpb  %src_reg, ... */ gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x38), src_reg, __VA_ARGS__, (void)0)
-#define gen86_cmpw_r_mod(p_pc, gen_modrm, src_reg, ...) /* cmpw  %src_reg, ... */ (_gen86_pfx16_(p_pc) gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x39), src_reg, __VA_ARGS__, (void)0))
-#define gen86_cmpl_r_mod(p_pc, gen_modrm, src_reg, ...) /* cmpl  %src_reg, ... */ (_gen86_pfx32_(p_pc) gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x39), src_reg, __VA_ARGS__, (void)0))
-#define gen86_cmpb_mod_r(p_pc, gen_modrm, dst_reg, ...) /* cmpb  ..., %dst_reg */ gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x3a), dst_reg, __VA_ARGS__, (void)0)
-#define gen86_cmpw_mod_r(p_pc, gen_modrm, dst_reg, ...) /* cmpw  ..., %dst_reg */ (_gen86_pfx16_(p_pc) gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x3b), src_reg, __VA_ARGS__, (void)0))
-#define gen86_cmpl_mod_r(p_pc, gen_modrm, dst_reg, ...) /* cmpl  ..., %dst_reg */ (_gen86_pfx32_(p_pc) gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x3b), src_reg, __VA_ARGS__, (void)0))
-#define gen86_cmpb_imm_al(p_pc, imm)                    /* cmpb  $imm, %al     */ (_gen86_putb(p_pc, 0x3c), _gen86_putb(p_pc, imm))
-#define gen86_cmpw_imm_ax(p_pc, imm)                    /* cmpw  $imm, %ax     */ (_gen86_pfx16_(p_pc) _gen86_putb(p_pc, 0x3d), _gen86_putw(p_pc, imm))
-#define gen86_cmpl_imm_eax(p_pc, imm)                   /* cmpl  $imm, %eax    */ (_gen86_pfx32_(p_pc) _gen86_putb(p_pc, 0x3d), _gen86_putl(p_pc, imm))
-#define gen86_cmpb_imm_mod(p_pc, gen_modrm, imm, ...)   /* cmpb  $imm, ...     */ gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x80), 7, __VA_ARGS__, _gen86_putb(p_pc, imm))
-#define gen86_cmpw_imm_mod(p_pc, gen_modrm, imm, ...)   /* cmpw  $imm, ...     */ (_gen86_pfx16_(p_pc) gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x81), 7, __VA_ARGS__, _gen86_putw(p_pc, imm)))
-#define gen86_cmpl_imm_mod(p_pc, gen_modrm, imm, ...)   /* cmpl  $imm, ...     */ (_gen86_pfx32_(p_pc) gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x81), 7, __VA_ARGS__, _gen86_putl(p_pc, imm)))
-#define gen86_cmpw_imms8_mod(p_pc, gen_modrm, imm, ...) /* cmpw  $imm, ...     */ (_gen86_pfx16_(p_pc) gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x83), 7, __VA_ARGS__, _gen86_putsb(p_pc, imm)))
-#define gen86_cmpl_imms8_mod(p_pc, gen_modrm, imm, ...) /* cmpl  $imm, ...     */ (_gen86_pfx32_(p_pc) gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x83), 7, __VA_ARGS__, _gen86_putsb(p_pc, imm)))
+#define gen86_cmpb_r_mod(p_pc, gen_modrm, src_reg, ...)  /* cmpb  %src_reg, ... */ gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x38), src_reg, __VA_ARGS__, (void)0)
+#define gen86_cmpw_r_mod(p_pc, gen_modrm, src_reg, ...)  /* cmpw  %src_reg, ... */ (_gen86_pfx16_(p_pc) gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x39), src_reg, __VA_ARGS__, (void)0))
+#define gen86_cmpl_r_mod(p_pc, gen_modrm, src_reg, ...)  /* cmpl  %src_reg, ... */ (_gen86_pfx32_(p_pc) gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x39), src_reg, __VA_ARGS__, (void)0))
+#define gen86_cmpb_mod_r(p_pc, gen_modrm, dst_reg, ...)  /* cmpb  ..., %dst_reg */ gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x3a), dst_reg, __VA_ARGS__, (void)0)
+#define gen86_cmpw_mod_r(p_pc, gen_modrm, dst_reg, ...)  /* cmpw  ..., %dst_reg */ (_gen86_pfx16_(p_pc) gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x3b), src_reg, __VA_ARGS__, (void)0))
+#define gen86_cmpl_mod_r(p_pc, gen_modrm, dst_reg, ...)  /* cmpl  ..., %dst_reg */ (_gen86_pfx32_(p_pc) gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x3b), src_reg, __VA_ARGS__, (void)0))
+#define gen86_cmpb_imm_al(p_pc, imm)                     /* cmpb  $imm, %al     */ (_gen86_putb(p_pc, 0x3c), _gen86_putb(p_pc, imm))
+#define gen86_cmpw_imm_ax(p_pc, imm)                     /* cmpw  $imm, %ax     */ (_gen86_pfx16_(p_pc) _gen86_putb(p_pc, 0x3d), _gen86_putw(p_pc, imm))
+#define gen86_cmpl_imm_eax(p_pc, imm)                    /* cmpl  $imm, %eax    */ (_gen86_pfx32_(p_pc) _gen86_putb(p_pc, 0x3d), _gen86_putl(p_pc, imm))
+#define gen86_cmpb_imm_mod(p_pc, gen_modrm, imm, ...)    /* cmpb  $imm, ...     */ gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x80), 7, __VA_ARGS__, _gen86_putb(p_pc, imm))
+#define gen86_cmpw_imm16u_mod(p_pc, gen_modrm, imm, ...) /* cmpw  $imm, ...     */ (_gen86_pfx16_(p_pc) gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x81), 7, __VA_ARGS__, _gen86_putw(p_pc, imm)))
+#define gen86_cmpl_imm32s_mod(p_pc, gen_modrm, imm, ...) /* cmpl  $imm, ...     */ (_gen86_pfx32_(p_pc) gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x81), 7, __VA_ARGS__, _gen86_putl(p_pc, imm)))
+#define gen86_cmpw_imm8s_mod(p_pc, gen_modrm, imm, ...)  /* cmpw  $imm, ...     */ (_gen86_pfx16_(p_pc) gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x83), 7, __VA_ARGS__, _gen86_putsb(p_pc, imm)))
+#define gen86_cmpl_imm8s_mod(p_pc, gen_modrm, imm, ...)  /* cmpl  $imm, ...     */ (_gen86_pfx32_(p_pc) gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x83), 7, __VA_ARGS__, _gen86_putsb(p_pc, imm)))
+#define gen86_cmpw_imm_mod(p_pc, gen_modrm, imm, ...)    /* cmpw  $imm, ...     */ (((__INT32_TYPE__)(imm) >= __INT8_MIN__ && (__INT32_TYPE__)(imm) <= __INT8_MAX__) ? gen86_cmpw_imm8s_mod(p_pc, gen_modrm, imm, __VA_ARGS__) : gen86_cmpw_imm16u_mod(p_pc, gen_modrm, imm, __VA_ARGS__))
+#define gen86_cmpl_imm_mod(p_pc, gen_modrm, imm, ...)    /* cmpl  $imm, ...     */ (((__INT32_TYPE__)(imm) >= __INT8_MIN__ && (__INT32_TYPE__)(imm) <= __INT8_MAX__) ? gen86_cmpl_imm8s_mod(p_pc, gen_modrm, imm, __VA_ARGS__) : gen86_cmpl_imm32s_mod(p_pc, gen_modrm, imm, __VA_ARGS__))
 #if LIBGEN86_TARGET_BITS == 64
-#define gen86_cmpq_r_mod(p_pc, gen_modrm, src_reg, ...) /* cmpq  %src_reg, ... */ gen_modrm(p_pc, GEN86_REX_W, _gen86_putb(p_pc, 0x39), src_reg, __VA_ARGS__, (void)0)
-#define gen86_cmpq_mod_r(p_pc, gen_modrm, dst_reg, ...) /* cmpq  ..., %dst_reg */ gen_modrm(p_pc, GEN86_REX_W, _gen86_putb(p_pc, 0x3b), src_reg, __VA_ARGS__, (void)0)
-#define gen86_cmpq_imm_rax(p_pc, imm)                   /* cmpq  $imm, %rax    */ (_gen86_putb(p_pc, 0x40 | GEN86_REX_W), _gen86_putb(p_pc, 0x3d), _gen86_putsl(p_pc, imm))
-#define gen86_cmpq_imm_mod(p_pc, gen_modrm, imm, ...)   /* cmpb  $imm, ...     */ gen_modrm(p_pc, GEN86_REX_W, _gen86_putb(p_pc, 0x81), 7, __VA_ARGS__, _gen86_putsb(p_pc, imm))
-#define gen86_cmpq_imms8_mod(p_pc, gen_modrm, imm, ...) /* cmpb  $imm, ...     */ gen_modrm(p_pc, GEN86_REX_W, _gen86_putb(p_pc, 0x83), 7, __VA_ARGS__, _gen86_putsb(p_pc, imm))
+#define gen86_cmpq_r_mod(p_pc, gen_modrm, src_reg, ...)  /* cmpq  %src_reg, ... */ gen_modrm(p_pc, GEN86_REX_W, _gen86_putb(p_pc, 0x39), src_reg, __VA_ARGS__, (void)0)
+#define gen86_cmpq_mod_r(p_pc, gen_modrm, dst_reg, ...)  /* cmpq  ..., %dst_reg */ gen_modrm(p_pc, GEN86_REX_W, _gen86_putb(p_pc, 0x3b), src_reg, __VA_ARGS__, (void)0)
+#define gen86_cmpq_imm_rax(p_pc, imm)                    /* cmpq  $imm, %rax    */ (_gen86_putb(p_pc, 0x40 | GEN86_REX_W), _gen86_putb(p_pc, 0x3d), _gen86_putsl(p_pc, imm))
+#define gen86_cmpq_imm32s_mod(p_pc, gen_modrm, imm, ...) /* cmpq  $imm, ...     */ gen_modrm(p_pc, GEN86_REX_W, _gen86_putb(p_pc, 0x81), 7, __VA_ARGS__, _gen86_putsb(p_pc, imm))
+#define gen86_cmpq_imm8s_mod(p_pc, gen_modrm, imm, ...)  /* cmpq  $imm, ...     */ gen_modrm(p_pc, GEN86_REX_W, _gen86_putb(p_pc, 0x83), 7, __VA_ARGS__, _gen86_putsb(p_pc, imm))
+#define gen86_cmpq_imm_mod(p_pc, gen_modrm, imm, ...)    /* cmpq  $imm, ...     */ (((__INT32_TYPE__)(imm) >= __INT8_MIN__ && (__INT32_TYPE__)(imm) <= __INT8_MAX__) ? gen86_cmpq_imm8s_mod(p_pc, gen_modrm, imm, __VA_ARGS__) : gen86_cmpq_imm32s_mod(p_pc, gen_modrm, imm, __VA_ARGS__))
 #endif /* LIBGEN86_TARGET_BITS == 64 */
 /*[[[end]]]*/
 
@@ -297,8 +337,10 @@ genArithBlock("cmp", 0x38);
 #if LIBGEN86_TARGET_BITS == 64
 #define gen86_incw_r(p_pc, reg) /* incw %reg */ gen86_incw_mod(p_pc, gen86_modrm_r, reg)
 #define gen86_incl_r(p_pc, reg) /* incl %reg */ gen86_incl_mod(p_pc, gen86_modrm_r, reg)
+#define gen86_incq_r(p_pc, reg) /* incq %reg */ gen86_incq_mod(p_pc, gen86_modrm_r, reg)
 #define gen86_decw_r(p_pc, reg) /* decw %reg */ gen86_decw_mod(p_pc, gen86_modrm_r, reg)
 #define gen86_decl_r(p_pc, reg) /* decl %reg */ gen86_decl_mod(p_pc, gen86_modrm_r, reg)
+#define gen86_decq_r(p_pc, reg) /* decq %reg */ gen86_decq_mod(p_pc, gen86_modrm_r, reg)
 #else /* LIBGEN86_TARGET_BITS == 64 */
 #define gen86_incw_r(p_pc, reg) /* incw %reg */ (_gen86_pfx16_(p_pc) _gen86_putb(p_pc, 0x40 + (reg)))
 #define gen86_decw_r(p_pc, reg) /* decw %reg */ (_gen86_pfx32_(p_pc) _gen86_putb(p_pc, 0x48 + (reg)))
@@ -307,11 +349,11 @@ genArithBlock("cmp", 0x38);
 #endif /* LIBGEN86_TARGET_BITS != 64 */
 
 #if LIBGEN86_TARGET_BITS == 64
-#define gen86_pushw_r(p_pc, reg) /* pushw %reg */ (_gen86_pfx16_(p_pc) !((reg) & 8) || (_gen86_putb(0x40 | GEN86_REX_B), 0), _gen86_putb(p_pc, 0x50 + ((reg) & 7)))
-#define gen86_pushq_r(p_pc, reg) /* pushq %reg */ (_gen86_pfx32_(p_pc) !((reg) & 8) || (_gen86_putb(0x40 | GEN86_REX_B), 0), _gen86_putb(p_pc, 0x50 + ((reg) & 7)))
-#define gen86_popw_r(p_pc, reg)  /* popw  %reg */ (_gen86_pfx16_(p_pc) !((reg) & 8) || (_gen86_putb(0x40 | GEN86_REX_B), 0), _gen86_putb(p_pc, 0x58 + ((reg) & 7)))
-#define gen86_popq_r(p_pc, reg)  /* popq  %reg */ (_gen86_pfx32_(p_pc) !((reg) & 8) || (_gen86_putb(0x40 | GEN86_REX_B), 0), _gen86_putb(p_pc, 0x58 + ((reg) & 7)))
-#define gen86_movslq_r(p_pc, gen_modrm, src_reg, ...) /* movslq  %src_reg, ... */ gen_modrm(p_pc, GEN86_REX_W, _gen86_putb(p_pc, 0x63), src_reg, __VA_ARGS__, (void)0)
+#define gen86_pushw_r(p_pc, reg) /* pushw %reg */ (_gen86_pfx16_(p_pc) !((reg) & 8) || (_gen86_putb(p_pc, 0x40 | GEN86_REX_B), 0), _gen86_putb(p_pc, 0x50 + ((reg) & 7)))
+#define gen86_pushq_r(p_pc, reg) /* pushq %reg */ (_gen86_pfx32_(p_pc) !((reg) & 8) || (_gen86_putb(p_pc, 0x40 | GEN86_REX_B), 0), _gen86_putb(p_pc, 0x50 + ((reg) & 7)))
+#define gen86_popw_r(p_pc, reg)  /* popw  %reg */ (_gen86_pfx16_(p_pc) !((reg) & 8) || (_gen86_putb(p_pc, 0x40 | GEN86_REX_B), 0), _gen86_putb(p_pc, 0x58 + ((reg) & 7)))
+#define gen86_popq_r(p_pc, reg)  /* popq  %reg */ (_gen86_pfx32_(p_pc) !((reg) & 8) || (_gen86_putb(p_pc, 0x40 | GEN86_REX_B), 0), _gen86_putb(p_pc, 0x58 + ((reg) & 7)))
+#define gen86_movslq_mod_r(p_pc, gen_modrm, dst_reg, ...) /* movslq  ..., %dst_reg */ gen_modrm(p_pc, GEN86_REX_W, _gen86_putb(p_pc, 0x63), src_reg, __VA_ARGS__, (void)0)
 #else /* LIBGEN86_TARGET_BITS == 64 */
 #define gen86_pushw_r(p_pc, reg) /* pushw %reg */ (_gen86_pfx16_(p_pc) _gen86_putb(p_pc, 0x50 + (reg)))
 #define gen86_pushl_r(p_pc, reg) /* pushl %reg */ (_gen86_pfx32_(p_pc) _gen86_putb(p_pc, 0x50 + (reg)))
@@ -331,20 +373,20 @@ genArithBlock("cmp", 0x38);
 
 #define gen86_pushw_imm(p_pc, imm)   /* pushw $imm */ (_gen86_pfx16_(p_pc) _gen86_putb(p_pc, 0x68), _gen86_putw(p_pc, imm))
 #define gen86_pushl_imm(p_pc, imm)   /* pushl $imm */ (_gen86_pfx32_(p_pc) _gen86_putb(p_pc, 0x68), _gen86_putl(p_pc, imm))
-#define gen86_pushw_imms8(p_pc, imm) /* pushw $imm */ (_gen86_pfx16_(p_pc) _gen86_putb(p_pc, 0x6a), _gen86_putsb(p_pc, imm))
-#define gen86_pushl_imms8(p_pc, imm) /* pushl $imm */ (_gen86_pfx32_(p_pc) _gen86_putb(p_pc, 0x6a), _gen86_putsb(p_pc, imm))
+#define gen86_pushw_imm8s(p_pc, imm) /* pushw $imm */ (_gen86_pfx16_(p_pc) _gen86_putb(p_pc, 0x6a), _gen86_putsb(p_pc, imm))
+#define gen86_pushl_imm8s(p_pc, imm) /* pushl $imm */ (_gen86_pfx32_(p_pc) _gen86_putb(p_pc, 0x6a), _gen86_putsb(p_pc, imm))
 #if LIBGEN86_TARGET_BITS == 64
 #define gen86_pushq_imm(p_pc, imm)   /* pushq $imm */ (_gen86_putb(p_pc, 0x40 | GEN86_REX_W), _gen86_putb(p_pc, 0x68), _gen86_putsl(p_pc, imm))
-#define gen86_pushq_imms8(p_pc, imm) /* pushq $imm */ (_gen86_putb(p_pc, 0x40 | GEN86_REX_W), _gen86_putb(p_pc, 0x6a), _gen86_putsb(p_pc, imm))
+#define gen86_pushq_imm8s(p_pc, imm) /* pushq $imm */ (_gen86_putb(p_pc, 0x40 | GEN86_REX_W), _gen86_putb(p_pc, 0x6a), _gen86_putsb(p_pc, imm))
 #endif /* LIBGEN86_TARGET_BITS == 64 */
 
-#define gen86_imulw(p_pc, gen_modrm, imm, dst_reg, ...)    /* imulw $imm, ..., %dst_reg */ (_gen86_pfx16_(p_pc) gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x69), dst_reg, __VA_ARGS__, _gen86_putw(p_pc, imm)))
-#define gen86_imulws8(p_pc, gen_modrm, imm, dst_reg, ...)  /* imulw $imm, ..., %dst_reg */ (_gen86_pfx16_(p_pc) gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x6b), dst_reg, __VA_ARGS__, _gen86_putsb(p_pc, imm)))
-#define gen86_imull(p_pc, gen_modrm, imm, dst_reg, ...)    /* imull $imm, ..., %dst_reg */ (_gen86_pfx32_(p_pc) gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x69), dst_reg, __VA_ARGS__, _gen86_putl(p_pc, imm)))
-#define gen86_imulls8(p_pc, gen_modrm, imm, dst_reg, ...)  /* imull $imm, ..., %dst_reg */ (_gen86_pfx32_(p_pc) gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x6b), dst_reg, __VA_ARGS__, _gen86_putsb(p_pc, imm)))
+#define gen86_imulw_imm_mod_r(p_pc, gen_modrm, imm, dst_reg, ...)   /* imulw $imm, ..., %dst_reg */ (_gen86_pfx16_(p_pc) gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x69), dst_reg, __VA_ARGS__, _gen86_putw(p_pc, imm)))
+#define gen86_imulw_imm8s_mod_r(p_pc, gen_modrm, imm, dst_reg, ...) /* imulw $imm, ..., %dst_reg */ (_gen86_pfx16_(p_pc) gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x6b), dst_reg, __VA_ARGS__, _gen86_putsb(p_pc, imm)))
+#define gen86_imull_imm_mod_r(p_pc, gen_modrm, imm, dst_reg, ...)   /* imull $imm, ..., %dst_reg */ (_gen86_pfx32_(p_pc) gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x69), dst_reg, __VA_ARGS__, _gen86_putl(p_pc, imm)))
+#define gen86_imull_imm8s_mod_r(p_pc, gen_modrm, imm, dst_reg, ...) /* imull $imm, ..., %dst_reg */ (_gen86_pfx32_(p_pc) gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x6b), dst_reg, __VA_ARGS__, _gen86_putsb(p_pc, imm)))
 #if LIBGEN86_TARGET_BITS == 64
-#define gen86_imulq(p_pc, gen_modrm, imm, dst_reg, ...)   /* imull $imm, ..., %dst_reg */ gen_modrm(p_pc, GEN86_REX_W, _gen86_putb(p_pc, 0x69), dst_reg, __VA_ARGS__, _gen86_putsl(p_pc, imm))
-#define gen86_imulqs8(p_pc, gen_modrm, imm, dst_reg, ...)  /* imull $imm, ..., %dst_reg */ gen_modrm(p_pc, GEN86_REX_W, _gen86_putb(p_pc, 0x6b), dst_reg, __VA_ARGS__, _gen86_putssb(p_pc, imm))
+#define gen86_imulq_imm_mod_r(p_pc, gen_modrm, imm, dst_reg, ...)   /* imull $imm, ..., %dst_reg */ gen_modrm(p_pc, GEN86_REX_W, _gen86_putb(p_pc, 0x69), dst_reg, __VA_ARGS__, _gen86_putsl(p_pc, imm))
+#define gen86_imulq_imm8s_mod_r(p_pc, gen_modrm, imm, dst_reg, ...) /* imull $imm, ..., %dst_reg */ gen_modrm(p_pc, GEN86_REX_W, _gen86_putb(p_pc, 0x6b), dst_reg, __VA_ARGS__, _gen86_putssb(p_pc, imm))
 #endif /* LIBGEN86_TARGET_BITS == 64 */
 
 #define gen86_insb(p_pc)      /* insb      */ _gen86_putb(p_pc, 0x6c)
@@ -394,12 +436,35 @@ genArithBlock("cmp", 0x38);
 
 /* Conditional jumps
  * @param: cc: One of `GEN86_CC_*' */
-#define gen86_jcc8(p_pc, cc, offset)  /* jcc 1f+offset; 1: */ (_gen86_putb(p_pc, 0x70 + (cc)), _gen86_putsb(offset))
+#define gen86_jcc8(p_pc, cc, addr)          /* jcc8 addr          */ (_gen86_putb(p_pc, 0x70 + (cc)), _gen86_putsb_pcrel(p_pc, addr))
+#define gen86_jcc8_offset(p_pc, cc, offset) /* jcc8 1f+offset; 1: */ (_gen86_putb(p_pc, 0x70 + (cc)), _gen86_putsb(p_pc, offset))
 #if LIBGEN86_TARGET_BITS == 16
-#define gen86_jcc16(p_pc, cc, offset) /* jcc 1f+offset; 1: */ (_gen86_putb2(p_pc, 0x0f, 0x80 + (cc)), _gen86_putsw(offset))
+#define gen86_jccP(p_pc, cc, addr)          /* jccP addr          */ (_gen86_putb2(p_pc, 0x0f, 0x80 + (cc)), _gen86_putsw_pcrel(p_pc, addr))
+#define gen86_jccP_offset(p_pc, cc, offset) /* jccP 1f+offset; 1: */ (_gen86_putb2(p_pc, 0x0f, 0x80 + (cc)), _gen86_putsw(p_pc, offset))
+#define gen86_jccw                          gen86_jccP
+#define gen86_jccw_offset                   gen86_jccP_offset
 #else /* LIBGEN86_TARGET_BITS == 16 */
-#define gen86_jcc32(p_pc, cc, offset) /* jcc 1f+offset; 1: */ (_gen86_putb2(p_pc, 0x0f, 0x80 + (cc)), _gen86_putsl(offset))
+#define gen86_jccP(p_pc, cc, addr)          /* jccP addr          */ (_gen86_putb2(p_pc, 0x0f, 0x80 + (cc)), _gen86_putsl_pcrel(p_pc, offset))
+#define gen86_jccP_offset(p_pc, cc, offset) /* jccP 1f+offset; 1: */ (_gen86_putb2(p_pc, 0x0f, 0x80 + (cc)), _gen86_putsl(p_pc, offset))
+#define gen86_jccl                          gen86_jccP
+#define gen86_jccl_offset                   gen86_jccP_offset
 #endif /* LIBGEN86_TARGET_BITS != 16 */
+#define gen86_jcc(p_pc, cc, addr)                                                                         \
+	__XBLOCK({                                                                                            \
+		__INT32_TYPE__ __g86_joff = (__INT32_TYPE__)(__INTPTR_TYPE__)((__UINTPTR_TYPE__)(addr) -          \
+		                                                              ((__UINTPTR_TYPE__)(*(p_pc)) + 2)); \
+		if (__g86_joff >= __INT8_MIN__ && __g86_joff <= __INT8_MAX__) {                                   \
+			gen86_jcc8_offset(p_pc, cc, __g86_joff);                                                      \
+		} else {                                                                                          \
+			__g86_joff -= _GEN86_JMPP_EXTRA;                                                              \
+			gen86_jccP_offset(p_pc, cc, __g86_joff);                                                      \
+		}                                                                                                 \
+		(void)0;                                                                                          \
+	})
+#define gen86_jcc_offset(p_pc, cc, offset)                \
+	((offset) >= __INT8_MIN__ && (offset) <= __INT8_MAX__ \
+	 ? gen86_jcc8_offset(p_pc, cc, offset)                \
+	 : gen86_jccP_offset(p_pc, cc, offset))
 
 #define gen86_testb_r_mod(p_pc, gen_modrm, r1, ...) /* testb %r1, ... */ gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x84), r1, __VA_ARGS__, (void)0)
 #define gen86_testw_r_mod(p_pc, gen_modrm, r1, ...) /* testw %r1, ... */ (_gen86_pfx16_(p_pc) gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x85), r1, __VA_ARGS__, (void)0))
@@ -457,9 +522,9 @@ genArithBlock("cmp", 0x38);
 #define gen86_pause(p_pc) (_gen86_putb(p_pc, 0xf3), _gen86_putb(p_pc, 0x90))
 
 #if LIBGEN86_TARGET_BITS == 64
-#define gen86_xchgw_r_ax(p_pc, reg)  /* xchgw %reg, %ax  */ (_gen86_pfx16_(p_pc) !((reg) & 8) || (_gen86_putb(0x40 | GEN86_REX_B), 0), _gen86_putb(p_pc, 0x90 + (reg)&7))
-#define gen86_xchgl_r_eax(p_pc, reg) /* xchgl %reg, %eax */ (_gen86_pfx32_(p_pc) !((reg) & 8) || (_gen86_putb(0x40 | GEN86_REX_B), 0), _gen86_putb(p_pc, 0x90 + (reg)&7))
-#define gen86_xchgq_r_rax(p_pc, reg) /* xchgq %reg, %rax */ (_gen86_putb(0x40 | ((reg) & 8 ? GEN86_REX_B : 0) | GEN86_REX_W), _gen86_putb(p_pc, 0x90 + (reg)&7))
+#define gen86_xchgw_r_ax(p_pc, reg)  /* xchgw %reg, %ax  */ (_gen86_pfx16_(p_pc) !((reg) & 8) || (_gen86_putb(p_pc, 0x40 | GEN86_REX_B), 0), _gen86_putb(p_pc, 0x90 + (reg)&7))
+#define gen86_xchgl_r_eax(p_pc, reg) /* xchgl %reg, %eax */ (_gen86_pfx32_(p_pc) !((reg) & 8) || (_gen86_putb(p_pc, 0x40 | GEN86_REX_B), 0), _gen86_putb(p_pc, 0x90 + (reg)&7))
+#define gen86_xchgq_r_rax(p_pc, reg) /* xchgq %reg, %rax */ (_gen86_putb(p_pc, 0x40 | ((reg) & 8 ? GEN86_REX_B : 0) | GEN86_REX_W), _gen86_putb(p_pc, 0x90 + (reg)&7))
 #else /* LIBGEN86_TARGET_BITS == 64 */
 #define gen86_xchgw_r_ax(p_pc, reg)  /* xchgw %reg, %ax  */ (_gen86_pfx16_(p_pc) _gen86_putb(p_pc, 0x90 + (reg)))
 #define gen86_xchgl_r_eax(p_pc, reg) /* xchgl %reg, %eax */ (_gen86_pfx32_(p_pc) _gen86_putb(p_pc, 0x90 + (reg)))
@@ -545,10 +610,15 @@ genArithBlock("cmp", 0x38);
 
 
 #if LIBGEN86_TARGET_BITS == 64
-#define gen86_movb_imm_r(p_pc, imm, reg)   /* movb   $imm, %reg */ (!((reg) & 0x18) || (_gen86_putb(0x40 | ((reg)&8 ? GEN86_REX_B : 0)), 0), _gen86_putb(p_pc, 0xb0 + (reg)&7), _gen86_putb(p_pc, imm))
-#define gen86_movw_imm_r(p_pc, imm, reg)   /* movw   $imm, %reg */ (_gen86_pfx16_(p_pc) !((reg) & 8) || (_gen86_putb(0x40 | GEN86_REX_B), 0), _gen86_putb(p_pc, 0xb8 + (reg)&7), _gen86_putw(p_pc, imm))
-#define gen86_movl_imm_r(p_pc, imm, reg)   /* movl   $imm, %reg */ (_gen86_pfx32_(p_pc) !((reg) & 8) || (_gen86_putb(0x40 | GEN86_REX_B), 0), _gen86_putb(p_pc, 0xb8 + (reg)&7), _gen86_putl(p_pc, imm))
-#define gen86_mobabs_imm_r(p_pc, imm, reg) /* movabs $imm, %reg */ (_gen86_putb(0x40 | GEN86_REX_W | ((reg)&8 ? GEN86_REX_B : 0), _gen86_putb(p_pc, 0xb8 + (reg)&7), _gen86_putq(p_pc, imm))
+#define gen86_movb_imm_r(p_pc, imm, reg)   /* movb   $imm, %reg */ (!((reg) & 0x18) || (_gen86_putb(p_pc, 0x40 | ((reg)&8 ? GEN86_REX_B : 0)), 0), _gen86_putb(p_pc, 0xb0 + (reg)&7), _gen86_putb(p_pc, imm))
+#define gen86_movw_imm_r(p_pc, imm, reg)   /* movw   $imm, %reg */ (_gen86_pfx16_(p_pc) !((reg) & 8) || (_gen86_putb(p_pc, 0x40 | GEN86_REX_B), 0), _gen86_putb(p_pc, 0xb8 + (reg)&7), _gen86_putw(p_pc, imm))
+#define gen86_movl_imm_r(p_pc, imm, reg)   /* movl   $imm, %reg */ (_gen86_pfx32_(p_pc) !((reg) & 8) || (_gen86_putb(p_pc, 0x40 | GEN86_REX_B), 0), _gen86_putb(p_pc, 0xb8 + (reg)&7), _gen86_putl(p_pc, imm))
+#define gen86_movabs_imm_r(p_pc, imm, reg) /* movabs $imm, %reg */ (_gen86_putb(p_pc, 0x40 | GEN86_REX_W | ((reg)&8 ? GEN86_REX_B : 0)), _gen86_putb(p_pc, 0xb8 + (reg)&7), _gen86_putq(p_pc, imm))
+#define gen86_movq_imm_r(p_pc, imm, reg)                                    \
+	((__INT64_TYPE__)(__UINT64_TYPE__)(imm) >= __INT32_MIN__ &&             \
+	 (__INT64_TYPE__)(__UINT64_TYPE__)(imm) <= __INT32_MAX__                \
+	 ? gen86_movq_imm_mod(p_pc, gen86_modrm_r, (__UINT32_TYPE__)(imm), reg) \
+	 : gen86_movabs_imm_r(p_pc, imm, reg))
 #else /* LIBGEN86_TARGET_BITS == 64 */
 #define gen86_movb_imm_r(p_pc, imm, reg) /* movb $imm, %reg */ (_gen86_putb(p_pc, 0xb0 + (reg)), _gen86_putb(p_pc, imm))
 #define gen86_movw_imm_r(p_pc, imm, reg) /* movw $imm, %reg */ (_gen86_pfx16_(p_pc) _gen86_putb(p_pc, 0xb8 + (reg)), _gen86_putw(p_pc, imm))
@@ -710,10 +780,10 @@ genShift("sar", 7);
 #endif /* LIBGEN86_TARGET_BITS == 64 */
 
 #define gen86_movb_imm_mod(p_pc, gen_modrm, imm, ...) /* movb $imm, ... */ gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0xc6), 0, __VA_ARGS__, _gen86_putb(p_pc, imm))
-#define gen86_movw_imm_mod(p_pc, gen_modrm, imm, ...) /* movw $imm, ... */ (_gen86_pfx16_(p_pc) gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0xc7), 0, __VA_ARGS__, _gen86_putb(p_pc, imm)))
-#define gen86_movl_imm_mod(p_pc, gen_modrm, imm, ...) /* movl $imm, ... */ (_gen86_pfx32_(p_pc) gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0xc7), 0, __VA_ARGS__, _gen86_putb(p_pc, imm)))
+#define gen86_movw_imm_mod(p_pc, gen_modrm, imm, ...) /* movw $imm, ... */ (_gen86_pfx16_(p_pc) gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0xc7), 0, __VA_ARGS__, _gen86_putw(p_pc, imm)))
+#define gen86_movl_imm_mod(p_pc, gen_modrm, imm, ...) /* movl $imm, ... */ (_gen86_pfx32_(p_pc) gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0xc7), 0, __VA_ARGS__, _gen86_putl(p_pc, imm)))
 #if LIBGEN86_TARGET_BITS == 64
-#define gen86_movq_imm_mod(p_pc, gen_modrm, imm, ...) /* movq $imm, ... */ gen_modrm(p_pc, GEN86_REX_W, _gen86_putb(p_pc, 0xc7), 0, __VA_ARGS__, _gen86_putb(p_pc, imm))
+#define gen86_movq_imm_mod(p_pc, gen_modrm, imm, ...) /* movq $imm, ... */ gen_modrm(p_pc, GEN86_REX_W, _gen86_putb(p_pc, 0xc7), 0, __VA_ARGS__, _gen86_putsl(p_pc, imm))
 #endif /* LIBGEN86_TARGET_BITS == 64 */
 
 #define gen86_enter(p_pc, size, nesting) /* enter $size, $nesting */ (_gen86_putb(p_pc, 0xc8), _gen86_putw(p_pc, size), _gen86_putb(p_pc, nesting))
@@ -736,15 +806,25 @@ genShift("sar", 7);
 #define gen86_aad(p_pc, imm) /* aad $imm */ (_gen86_putb(p_pc, 0xd5), _gen86_putb(p_pc, imm))
 #define gen86_xlatb(p_pc)    /* xlatb    */ _gen86_putb(p_pc, 0xd7)
 
-#define gen86_loopnz(p_pc, offset) /* loopnz 1f+offset; 1: */ (_gen86_putb(p_pc, 0xe0), _gen86_putsb(p_pc, offset))
-#define gen86_loopz(p_pc, offset)  /* loopz  1f+offset; 1: */ (_gen86_putb(p_pc, 0xe1), _gen86_putsb(p_pc, offset))
-#define gen86_loop(p_pc, offset)   /* loop   1f+offset; 1: */ (_gen86_putb(p_pc, 0xe2), _gen86_putsb(p_pc, offset))
-#define gen86_jcxz(p_pc, offset)   /* jcxz   1f+offset; 1: */ (_gen86_pfx16_(p_pc) _gen86_putb(p_pc, 0xe3), _gen86_putsb(p_pc, offset))
-#define gen86_jecxz(p_pc, offset)  /* jecxz  1f+offset; 1: */ (_gen86_pfx32_(p_pc) _gen86_putb(p_pc, 0xe3), _gen86_putsb(p_pc, offset))
+#define gen86_loopnz(p_pc, addr)          /* loopnz addr          */ (_gen86_putb(p_pc, 0xe0), _gen86_putsb_pcrel(p_pc, addr))
+#define gen86_loopz(p_pc, addr)           /* loopz  addr          */ (_gen86_putb(p_pc, 0xe1), _gen86_putsb_pcrel(p_pc, addr))
+#define gen86_loop(p_pc, addr)            /* loop   addr          */ (_gen86_putb(p_pc, 0xe2), _gen86_putsb_pcrel(p_pc, addr))
+#define gen86_jcxz(p_pc, addr)            /* jcxz   addr          */ (_gen86_pfx16_(p_pc) _gen86_putb(p_pc, 0xe3), _gen86_putsb_pcrel(p_pc, addr))
+#define gen86_jecxz(p_pc, addr)           /* jecxz  addr          */ (_gen86_pfx32_(p_pc) _gen86_putb(p_pc, 0xe3), _gen86_putsb_pcrel(p_pc, addr))
+#define gen86_loopnz_offset(p_pc, offset) /* loopnz 1f+offset; 1: */ (_gen86_putb(p_pc, 0xe0), _gen86_putsb(p_pc, offset))
+#define gen86_loopz_offset(p_pc, offset)  /* loopz  1f+offset; 1: */ (_gen86_putb(p_pc, 0xe1), _gen86_putsb(p_pc, offset))
+#define gen86_loop_offset(p_pc, offset)   /* loop   1f+offset; 1: */ (_gen86_putb(p_pc, 0xe2), _gen86_putsb(p_pc, offset))
+#define gen86_jcxz_offset(p_pc, offset)   /* jcxz   1f+offset; 1: */ (_gen86_pfx16_(p_pc) _gen86_putb(p_pc, 0xe3), _gen86_putsb(p_pc, offset))
+#define gen86_jecxz_offset(p_pc, offset)  /* jecxz  1f+offset; 1: */ (_gen86_pfx32_(p_pc) _gen86_putb(p_pc, 0xe3), _gen86_putsb(p_pc, offset))
 #if LIBGEN86_TARGET_BITS == 64
-#define gen86_jrcxz(p_pc, offset)  /* jrcxz  1f+offset; 1: */ (_gen86_putb2(p_pc, 0x40 | GEN86_REX_W, 0xe3), _gen86_putsb(p_pc, offset))
-#endif /* LIBGEN86_TARGET_BITS == 64 */
-
+#define gen86_jrcxz(p_pc, addr)          /* jrcxz  addr          */ (_gen86_putb2(p_pc, 0x40 | GEN86_REX_W, 0xe3), _gen86_putsb_pcrel(p_pc, addr))
+#define gen86_jrcxz_offset(p_pc, offset) /* jrcxz  1f+offset; 1: */ (_gen86_putb2(p_pc, 0x40 | GEN86_REX_W, 0xe3), _gen86_putsb(p_pc, offset))
+#define gen86_jPcxz                      gen86_jrcxz
+#define gen86_jPcxz_offset               gen86_jrcxz_offset
+#else /* LIBGEN86_TARGET_BITS == 64 */
+#define gen86_jPcxz        gen86_jecxz
+#define gen86_jPcxz_offset gen86_jecxz_offset
+#endif /* LIBGEN86_TARGET_BITS != 64 */
 
 #define gen86_inb_imm_al(p_pc, imm)   /* inb  $imm, %al  */ (_gen86_putb(p_pc, 0xe4), _gen86_putb(p_pc, imm))
 #define gen86_inw_imm_ax(p_pc, imm)   /* inw  $imm, %ax  */ (_gen86_pfx16_(p_pc) _gen86_putb(p_pc, 0xe5), _gen86_putb(p_pc, imm))
@@ -754,26 +834,58 @@ genShift("sar", 7);
 #define gen86_outl_eax_imm(p_pc, imm) /* outl %eax, $imm */ (_gen86_pfx32_(p_pc) _gen86_putb(p_pc, 0xe7), _gen86_putb(p_pc, imm))
 
 #if LIBGEN86_TARGET_BITS == 16
-#define gen86_callw(p_pc, offset) /* callw 1f+offset; 1: */ (_gen86_putb(p_pc, 0xe8), _gen86_putsw(p_pc, imm))
-#define gen86_call(p_pc, offset)  /* call  1f+offset; 1: */ (_gen86_putb(p_pc, 0xe8), _gen86_putsw(p_pc, imm))
-#define gen86_jmpw(p_pc, offset)  /* jmpw  1f+offset; 1: */ (_gen86_putb(p_pc, 0xe9), _gen86_putsw(p_pc, imm))
-#define gen86_jmp(p_pc, offset)   /* jmp   1f+offset; 1: */ (_gen86_putb(p_pc, 0xe9), _gen86_putsw(p_pc, imm))
+#define gen86_callP(p_pc, addr)          /* call  addr          */ (_gen86_putb(p_pc, 0xe8), _gen86_putsw_pcrel(p_pc, addr))
+#define gen86_jmpP(p_pc, addr)           /* jmp   addr          */ (_gen86_putb(p_pc, 0xe9), _gen86_putsw_pcrel(p_pc, addr))
+#define gen86_callP_offset(p_pc, offset) /* call  1f+offset; 1: */ (_gen86_putb(p_pc, 0xe8), _gen86_putsw(p_pc, offset))
+#define gen86_jmpP_offset(p_pc, offset)  /* jmp   1f+offset; 1: */ (_gen86_putb(p_pc, 0xe9), _gen86_putsw(p_pc, offset))
+#define gen86_callw                     gen86_callP
+#define gen86_jmpw                      gen86_jmpP
+#define gen86_callw_offset              gen86_callP_offset
+#define gen86_jmpw_offset               gen86_jmpP_offset
 #elif LIBGEN86_TARGET_BITS == 32
-#define gen86_calll(p_pc, offset) /* calll 1f+offset; 1: */ (_gen86_putb(p_pc, 0xe8), _gen86_putsl(p_pc, imm))
-#define gen86_call(p_pc, offset)  /* call  1f+offset; 1: */ (_gen86_putb(p_pc, 0xe8), _gen86_putsl(p_pc, imm))
-#define gen86_jmpl(p_pc, offset)  /* jmpl  1f+offset; 1: */ (_gen86_putb(p_pc, 0xe9), _gen86_putsl(p_pc, imm))
-#define gen86_jmp(p_pc, offset)   /* jmp   1f+offset; 1: */ (_gen86_putb(p_pc, 0xe9), _gen86_putsl(p_pc, imm))
+#define gen86_callP(p_pc, addr)          /* call  addr          */ (_gen86_putb(p_pc, 0xe8), _gen86_putsl_pcrel(p_pc, addr))
+#define gen86_jmpP(p_pc, addr)           /* jmp   addr          */ (_gen86_putb(p_pc, 0xe9), _gen86_putsl_pcrel(p_pc, addr))
+#define gen86_callP_offset(p_pc, offset) /* call  1f+offset; 1: */ (_gen86_putb(p_pc, 0xe8), _gen86_putsl(p_pc, offset))
+#define gen86_jmpP_offset(p_pc, offset)  /* jmp   1f+offset; 1: */ (_gen86_putb(p_pc, 0xe9), _gen86_putsl(p_pc, offset))
+#define gen86_calll                     gen86_callP
+#define gen86_jmpl                      gen86_jmpP
+#define gen86_calll_offset              gen86_callP_offset
+#define gen86_jmpl_offset               gen86_jmpP_offset
 #else /* LIBGEN86_TARGET_BITS == ... */
-#define gen86_callq(p_pc, offset) /* callq 1f+offset; 1: */ (_gen86_putb(p_pc, 0xe8), _gen86_putsl(p_pc, imm))
-#define gen86_call(p_pc, offset)  /* call  1f+offset; 1: */ (_gen86_putb(p_pc, 0xe8), _gen86_putsl(p_pc, imm))
-#define gen86_jmpq(p_pc, offset)  /* jmpq  1f+offset; 1: */ (_gen86_putb(p_pc, 0xe9), _gen86_putsl(p_pc, imm))
-#define gen86_jmp(p_pc, offset)   /* jmp   1f+offset; 1: */ (_gen86_putb(p_pc, 0xe9), _gen86_putsl(p_pc, imm))
+#define gen86_callP(p_pc, addr)          /* call  addr          */ (_gen86_putb(p_pc, 0xe8), _gen86_putsl_pcrel(p_pc, addr))
+#define gen86_jmpP(p_pc, addr)           /* jmp   addr          */ (_gen86_putb(p_pc, 0xe9), _gen86_putsl_pcrel(p_pc, addr))
+#define gen86_callP_offset(p_pc, offset) /* call  1f+offset; 1: */ (_gen86_putb(p_pc, 0xe8), _gen86_putsl(p_pc, offset))
+#define gen86_jmpP_offset(p_pc, offset)  /* jmp   1f+offset; 1: */ (_gen86_putb(p_pc, 0xe9), _gen86_putsl(p_pc, offset))
+#define gen86_callq                     gen86_callP
+#define gen86_jmpq                      gen86_jmpP
+#define gen86_callq_offset              gen86_callP_offset
+#define gen86_jmpq_offset               gen86_jmpP_offset
 #endif /* LIBGEN86_TARGET_BITS != ... */
+#define gen86_call        gen86_callP
+#define gen86_call_offset gen86_callP_offset
+
+#define gen86_jmp8(p_pc, addr)          /* jmp8 addr          */ (_gen86_putb(p_pc, 0xeb), _gen86_putsb_pcrel(p_pc, addr))
+#define gen86_jmp8_offset(p_pc, offset) /* jmp8 1f+offset; 1: */ (_gen86_putb(p_pc, 0xeb), _gen86_putsb(p_pc, offset))
+
+#define gen86_jmp_offset(p_pc, offset)                    \
+	((offset) >= __INT8_MIN__ && (offset) <= __INT8_MAX__ \
+	 ? gen86_jmp8_offset(p_pc, offset)                    \
+	 : gen86_jmpP_offset(p_pc, offset))
+#define gen86_jmp(p_pc, addr)                                                                             \
+	__XBLOCK({                                                                                            \
+		__INT32_TYPE__ __g86_joff = (__INT32_TYPE__)(__INTPTR_TYPE__)((__UINTPTR_TYPE__)(addr) -          \
+		                                                              ((__UINTPTR_TYPE__)(*(p_pc)) + 2)); \
+		if (__g86_joff >= __INT8_MIN__ && __g86_joff <= __INT8_MAX__) {                                   \
+			gen86_jmp8_offset(p_pc, __g86_joff);                                                          \
+		} else {                                                                                          \
+			__g86_joff -= _GEN86_JMPP_EXTRA;                                                              \
+			gen86_jmpP_offset(p_pc, __g86_joff);                                                          \
+		}                                                                                                 \
+		(void)0;                                                                                          \
+	})
 
 #define gen86_ljmpw(p_pc, segment, offset) /* ljmpw $segment:$offset */ (_gen86_adr16_(p_pc) _gen86_putb(p_pc, 0xea) _gen86_putw(p_pc, offset), _gen86_putw(p_pc, segment))
 #define gen86_ljmpl(p_pc, segment, offset) /* ljmpl $segment:$offset */ (_gen86_adr32_(p_pc) _gen86_putb(p_pc, 0xea) _gen86_putl(p_pc, offset), _gen86_putw(p_pc, segment))
-
-#define gen86_jmp8(p_pc, offset) /* jmp 1f+offset; 1: */ (_gen86_putb(p_pc, 0xeb), _gen86_putsb(p_pc, offset))
 
 #define gen86_inb_dx_al(p_pc)   /* inb  %dx, %al  */ _gen86_putb(p_pc, 0xec)
 #define gen86_inw_dx_ax(p_pc)   /* inw  %dx, %ax  */ (_gen86_pfx16_(p_pc) _gen86_putb(p_pc, 0xed))
@@ -920,12 +1032,12 @@ genShift("sar", 7);
 #define gen86_clzero(p_pc)                 /* clzero %Pax               */ _gen86_putb3(p_pc, 0x0f, 0x01, 0xfc)
 #define gen86_rdpru(p_pc)                  /* rdpru"                    */ _gen86_putb3(p_pc, 0x0f, 0x01, 0xfd)
 
-#define gen86_lar(p_pc, gen_modrm, reg, ...) /* lar ..., %reg */ gen_modrm(p_pc, 0, _gen86_putb2(p_pc, 0x0f, 0x02), reg, __VA_ARGS__, (void)0)
+#define gen86_lar_mod_r(p_pc, gen_modrm, reg, ...) /* lar ..., %reg */ gen_modrm(p_pc, 0, _gen86_putb2(p_pc, 0x0f, 0x02), reg, __VA_ARGS__, (void)0)
 
-#define gen86_lslw(p_pc, gen_modrm, reg, ...) /* lslw ..., %reg */ (_gen86_pfx16_(p_pc) gen_modrm(p_pc, 0, _gen86_putb2(p_pc, 0x0f, 0x03), reg, __VA_ARGS__, (void)0))
-#define gen86_lsll(p_pc, gen_modrm, reg, ...) /* lsll ..., %reg */ (_gen86_pfx32_(p_pc) gen_modrm(p_pc, 0, _gen86_putb2(p_pc, 0x0f, 0x03), reg, __VA_ARGS__, (void)0))
+#define gen86_lslw_mod_r(p_pc, gen_modrm, reg, ...) /* lslw ..., %reg */ (_gen86_pfx16_(p_pc) gen_modrm(p_pc, 0, _gen86_putb2(p_pc, 0x0f, 0x03), reg, __VA_ARGS__, (void)0))
+#define gen86_lsll_mod_r(p_pc, gen_modrm, reg, ...) /* lsll ..., %reg */ (_gen86_pfx32_(p_pc) gen_modrm(p_pc, 0, _gen86_putb2(p_pc, 0x0f, 0x03), reg, __VA_ARGS__, (void)0))
 #if LIBGEN86_TARGET_BITS == 64
-#define gen86_lslq(p_pc, gen_modrm, reg, ...) /* lslq ..., %reg */ gen_modrm(p_pc, GEN86_REX_W, _gen86_putb2(p_pc, 0x0f, 0x03), reg, __VA_ARGS__, (void)0)
+#define gen86_lslq_mod_r(p_pc, gen_modrm, reg, ...) /* lslq ..., %reg */ gen_modrm(p_pc, GEN86_REX_W, _gen86_putb2(p_pc, 0x0f, 0x03), reg, __VA_ARGS__, (void)0)
 #endif /* LIBGEN86_TARGET_BITS == 64 */
 
 #if LIBGEN86_TARGET_BITS == 64
@@ -1164,12 +1276,12 @@ genShift("sar", 7);
 
 #define gen86_rdrandw_mod(p_pc, gen_modrm, ...) /* rdrandw ... */ (_gen86_pfx16_(p_pc) gen_modrm(p_pc, 0, _gen86_putb2(p_pc, 0x0f, 0xc7), 6, __VA_ARGS__, (void)0))
 #define gen86_rdrandl_mod(p_pc, gen_modrm, ...) /* rdrandl ... */ (_gen86_pfx32_(p_pc) gen_modrm(p_pc, 0, _gen86_putb2(p_pc, 0x0f, 0xc7), 6, __VA_ARGS__, (void)0))
-#define gen86_rdrandq_mod(p_pc, gen_modrm, ...) /* rdrandq ... */ gen_modrm(p_pc, GEN86_REX_W, _gen86_putb2(p_pc, 0x0f, 0xc7), 6, __VA_ARGS__, (void)0)
 #define gen86_rdseedw_mod(p_pc, gen_modrm, ...) /* rdseedw ... */ (_gen86_pfx16_(p_pc) gen_modrm(p_pc, 0, _gen86_putb2(p_pc, 0x0f, 0xc7), 7, __VA_ARGS__, (void)0))
 #define gen86_rdseedl_mod(p_pc, gen_modrm, ...) /* rdseedl ... */ (_gen86_pfx32_(p_pc) gen_modrm(p_pc, 0, _gen86_putb2(p_pc, 0x0f, 0xc7), 7, __VA_ARGS__, (void)0))
-#define gen86_rdseedq_mod(p_pc, gen_modrm, ...) /* rdseedq ... */ gen_modrm(p_pc, GEN86_REX_W, _gen86_putb2(p_pc, 0x0f, 0xc7), 7, __VA_ARGS__, (void)0)
 #define gen86_rdpidP_mod(p_pc, gen_modrm, ...)  /* rdpidP  ... */ (_gen86_putb(p_pc, 0xf3), gen_modrm(p_pc, 0, _gen86_putb2(p_pc, 0x0f, 0xc7), 7, __VA_ARGS__, (void)0))
 #if LIBGEN86_TARGET_BITS == 64
+#define gen86_rdrandq_mod(p_pc, gen_modrm, ...) /* rdrandq ... */ gen_modrm(p_pc, GEN86_REX_W, _gen86_putb2(p_pc, 0x0f, 0xc7), 6, __VA_ARGS__, (void)0)
+#define gen86_rdseedq_mod(p_pc, gen_modrm, ...) /* rdseedq ... */ gen_modrm(p_pc, GEN86_REX_W, _gen86_putb2(p_pc, 0x0f, 0xc7), 7, __VA_ARGS__, (void)0)
 #define gen86_rdpidq_mod gen86_rdpidP_mod
 #else /* LIBGEN86_TARGET_BITS == 64 */
 #define gen86_rdpidl_mod gen86_rdpidP_mod
@@ -1183,5 +1295,1091 @@ genShift("sar", 7);
 #endif /* LIBGEN86_TARGET_BITS != 64 */
 
 #define gen86_ud0(p_pc) /* ud0 */ _gen86_putb2(0xf0, 0xff)
+
+
+
+/* Compatibility/pointer-sized instructions */
+#if LIBGEN86_TARGET_BITS == 64
+#define gen86_movzbP_mod_r      gen86_movzbq_mod_r
+#define gen86_movzwP_mod_r      gen86_movzwq_mod_r
+#define gen86_movzlP_mod_r      gen86_movl_mod_r
+#define gen86_movsbP_mod_r      gen86_movsbq_mod_r
+#define gen86_movswP_mod_r      gen86_movswq_mod_r
+#define gen86_movslP_mod_r      gen86_movslq_mod_r
+#define gen86_addP_r_mod        gen86_addq_r_mod
+#define gen86_addP_mod_r        gen86_addq_mod_r
+#define gen86_addP_imm_Pax      gen86_addq_imm_rax
+#define gen86_addP_imm_mod      gen86_addq_imm_mod
+#define gen86_addP_imm8s_mod    gen86_addq_imm8s_mod
+#define gen86_orP_r_mod         gen86_orq_r_mod
+#define gen86_orP_mod_r         gen86_orq_mod_r
+#define gen86_orP_imm_Pax       gen86_orq_imm_rax
+#define gen86_orP_imm_mod       gen86_orq_imm_mod
+#define gen86_orP_imm8s_mod     gen86_orq_imm8s_mod
+#define gen86_adcP_r_mod        gen86_adcq_r_mod
+#define gen86_adcP_mod_r        gen86_adcq_mod_r
+#define gen86_adcP_imm_Pax      gen86_adcq_imm_rax
+#define gen86_adcP_imm_mod      gen86_adcq_imm_mod
+#define gen86_adcP_imm8s_mod    gen86_adcq_imm8s_mod
+#define gen86_sbbP_r_mod        gen86_sbbq_r_mod
+#define gen86_sbbP_mod_r        gen86_sbbq_mod_r
+#define gen86_sbbP_imm_Pax      gen86_sbbq_imm_rax
+#define gen86_sbbP_imm_mod      gen86_sbbq_imm_mod
+#define gen86_sbbP_imm8s_mod    gen86_sbbq_imm8s_mod
+#define gen86_andP_r_mod        gen86_andq_r_mod
+#define gen86_andP_mod_r        gen86_andq_mod_r
+#define gen86_andP_imm_Pax      gen86_andq_imm_rax
+#define gen86_andP_imm_mod      gen86_andq_imm_mod
+#define gen86_andP_imm8s_mod    gen86_andq_imm8s_mod
+#define gen86_subP_r_mod        gen86_subq_r_mod
+#define gen86_subP_mod_r        gen86_subq_mod_r
+#define gen86_subP_imm_Pax      gen86_subq_imm_rax
+#define gen86_subP_imm_mod      gen86_subq_imm_mod
+#define gen86_subP_imm8s_mod    gen86_subq_imm8s_mod
+#define gen86_xorP_r_mod        gen86_xorq_r_mod
+#define gen86_xorP_mod_r        gen86_xorq_mod_r
+#define gen86_xorP_imm_Pax      gen86_xorq_imm_rax
+#define gen86_xorP_imm_mod      gen86_xorq_imm_mod
+#define gen86_xorP_imm8s_mod    gen86_xorq_imm8s_mod
+#define gen86_cmpP_r_mod        gen86_cmpq_r_mod
+#define gen86_cmpP_mod_r        gen86_cmpq_mod_r
+#define gen86_cmpP_imm_Pax      gen86_cmpq_imm_rax
+#define gen86_cmpP_imm_mod      gen86_cmpq_imm_mod
+#define gen86_cmpP_imm8s_mod    gen86_cmpq_imm8s_mod
+#define gen86_incP_r            gen86_incq_r
+#define gen86_decP_r            gen86_decq_r
+#define gen86_pushP_r           gen86_pushq_r
+#define gen86_popP_r            gen86_popq_r
+#define gen86_pushP_imm         gen86_pushq_imm
+#define gen86_pushP_imm8s       gen86_pushq_imm8s
+#define gen86_imulP_imm_mod_r   gen86_imulq_imm_mod_r
+#define gen86_imulP_imm8s_mod_r gen86_imulq_imm8s_mod_r
+#define gen86_testP_r_mod       gen86_testq_r_mod
+#define gen86_xchgP_r_mod       gen86_xchgq_r_mod
+#define gen86_movP_r_mod        gen86_movq_r_mod
+#define gen86_movP_mod_r        gen86_movq_mod_r
+#define gen86_movP_sgr_mod      gen86_movq_sgr_mod
+#define gen86_movP_mod_sgr      gen86_movq_mod_sgr
+#define gen86_leaP_mod_r        gen86_leaq_mod_r
+#define gen86_popP_mod          gen86_popq_mod
+#define gen86_xchgP_r_Pax       gen86_xchgq_r_rax
+#define gen86_pushfP            gen86_pushfq
+#define gen86_popfP             gen86_popfq
+#define gen86_movsP             gen86_movsq
+#define gen86_rep_movsP         gen86_rep_movsq
+#define gen86_stosP             gen86_stosq
+#define gen86_rep_stosP         gen86_rep_stosq
+#define gen86_lodsP             gen86_lodsq
+#define gen86_rep_lodsP         gen86_rep_lodsq
+#define gen86_cmpsP             gen86_cmpsq
+#define gen86_repe_cmpsP        gen86_repe_cmpsq
+#define gen86_repne_cmpsP       gen86_repne_cmpsq
+#define gen86_scasP             gen86_scasq
+#define gen86_repe_scasP        gen86_repe_scasq
+#define gen86_repne_scasP       gen86_repne_scasq
+#define gen86_testP_imm_Pax     gen86_testq_imm_rax
+#define gen86_movP_imm_r        gen86_movq_imm_r
+#define gen86_rolP_imm_mod      gen86_rolq_imm_mod
+#define gen86_rolP_1_mod        gen86_rolq_1_mod
+#define gen86_rolP_cl_mod       gen86_rolq_cl_mod
+#define gen86_rorP_imm_mod      gen86_rorq_imm_mod
+#define gen86_rorP_1_mod        gen86_rorq_1_mod
+#define gen86_rorP_cl_mod       gen86_rorq_cl_mod
+#define gen86_rclP_imm_mod      gen86_rclq_imm_mod
+#define gen86_rclP_1_mod        gen86_rclq_1_mod
+#define gen86_rclP_cl_mod       gen86_rclq_cl_mod
+#define gen86_rcrP_imm_mod      gen86_rcrq_imm_mod
+#define gen86_rcrP_1_mod        gen86_rcrq_1_mod
+#define gen86_rcrP_cl_mod       gen86_rcrq_cl_mod
+#define gen86_shlP_imm_mod      gen86_shlq_imm_mod
+#define gen86_shlP_1_mod        gen86_shlq_1_mod
+#define gen86_shlP_cl_mod       gen86_shlq_cl_mod
+#define gen86_shrP_imm_mod      gen86_shrq_imm_mod
+#define gen86_shrP_1_mod        gen86_shrq_1_mod
+#define gen86_shrP_cl_mod       gen86_shrq_cl_mod
+#define gen86_salP_imm_mod      gen86_salq_imm_mod
+#define gen86_salP_1_mod        gen86_salq_1_mod
+#define gen86_salP_cl_mod       gen86_salq_cl_mod
+#define gen86_sarP_imm_mod      gen86_sarq_imm_mod
+#define gen86_sarP_1_mod        gen86_sarq_1_mod
+#define gen86_sarP_cl_mod       gen86_sarq_cl_mod
+#define gen86_retP_imm          gen86_retq_imm
+#define gen86_retP              gen86_retq
+#define gen86_movP_imm_mod      gen86_movq_imm_mod
+#define gen86_iretP             gen86_iretq
+#define gen86_testP_imm_mod     gen86_testq_imm_mod
+#define gen86_notP_mod          gen86_notq_mod
+#define gen86_negP_mod          gen86_negq_mod
+#define gen86_mulP_mod          gen86_mulq_mod
+#define gen86_imulP_mod         gen86_imulq_mod
+#define gen86_divP_mod          gen86_divq_mod
+#define gen86_idivP_mod         gen86_idivq_mod
+#define gen86_incP_mod          gen86_incq_mod
+#define gen86_decP_mod          gen86_decq_mod
+#define gen86_callP_mod         gen86_callq_mod
+#define gen86_lcallP_mod        gen86_lcallq_mod
+#define gen86_jmpP_mod          gen86_jmpq_mod
+#define gen86_ljmpP_mod         gen86_ljmpq_mod
+#define gen86_pushP_mod         gen86_pushq_mod
+#define gen86_smswP             gen86_smswq
+#define gen86_lmswP             gen86_lmswq
+#define gen86_lslP_mod_r        gen86_lslq_mod_r
+#define gen86_movP_cr_mod       gen86_movq_cr_mod
+#define gen86_movP_dr_mod       gen86_movq_dr_mod
+#define gen86_movP_mod_cr       gen86_movq_mod_cr
+#define gen86_movP_mod_dr       gen86_movq_mod_dr
+#define gen86_cmovccP_mod_r     gen86_cmovccq_mod_r
+#define gen86_btP_r_mod         gen86_btq_r_mod
+#define gen86_shldP_imm_r_mod   gen86_shldq_imm_r_mod
+#define gen86_shldP_cl_r_mod    gen86_shldq_cl_r_mod
+#define gen86_btsP_r_mod        gen86_btsq_r_mod
+#define gen86_shrdP_imm_r_mod   gen86_shrdq_imm_r_mod
+#define gen86_shrdP_cl_r_mod    gen86_shrdq_cl_r_mod
+#define gen86_rdfsbaseP         gen86_rdfsbaseq
+#define gen86_rdgsbaseP         gen86_rdgsbaseq
+#define gen86_wrfsbaseP         gen86_wrfsbaseq
+#define gen86_wrgsbaseP         gen86_wrgsbaseq
+#define gen86_imulP_mod_r       gen86_imulq_mod_r
+#define gen86_cmpxchgP_r_mod    gen86_cmpxchgq_r_mod
+#define gen86_btrP_r_mod        gen86_btrq_r_mod
+#define gen86_popcntP_mod_r     gen86_popcntq_mod_r
+#define gen86_btP_imm_mod       gen86_btq_imm_mod
+#define gen86_btsP_imm_mod      gen86_btsq_imm_mod
+#define gen86_btrP_imm_mod      gen86_btrq_imm_mod
+#define gen86_btcP_imm_mod      gen86_btcq_imm_mod
+#define gen86_btcP_r_mod        gen86_btcq_r_mod
+#define gen86_bsfP_mod_r        gen86_bsfq_mod_r
+#define gen86_tzcntP_mod_r      gen86_tzcntq_mod_r
+#define gen86_bsrP_mod_r        gen86_bsrq_mod_r
+#define gen86_lzcntP_mod_r      gen86_lzcntq_mod_r
+#define gen86_xaddP_r_mod       gen86_xaddq_r_mod
+#define gen86_rdrandP_mod       gen86_rdrandq_mod
+#define gen86_rdseedP_mod       gen86_rdseedq_mod
+#define gen86_bswapP            gen86_bswapq
+#elif LIBGEN86_TARGET_BITS == 32
+#define gen86_movzbP_mod_r      gen86_movzbl_mod_r
+#define gen86_movzwP_mod_r      gen86_movzwl_mod_r
+#define gen86_movzlP_mod_r      gen86_movl_mod_r
+#define gen86_movsbP_mod_r      gen86_movsbl_mod_r
+#define gen86_movswP_mod_r      gen86_movswl_mod_r
+#define gen86_movslP_mod_r      gen86_movl_mod_r
+#define gen86_addP_r_mod        gen86_addl_r_mod
+#define gen86_addP_mod_r        gen86_addl_mod_r
+#define gen86_addP_imm_Pax      gen86_addl_imm_eax
+#define gen86_addP_imm_mod      gen86_addl_imm_mod
+#define gen86_addP_imm8s_mod    gen86_addl_imm8s_mod
+#define gen86_orP_r_mod         gen86_orl_r_mod
+#define gen86_orP_mod_r         gen86_orl_mod_r
+#define gen86_orP_imm_Pax       gen86_orl_imm_eax
+#define gen86_orP_imm_mod       gen86_orl_imm_mod
+#define gen86_orP_imm8s_mod     gen86_orl_imm8s_mod
+#define gen86_adcP_r_mod        gen86_adcl_r_mod
+#define gen86_adcP_mod_r        gen86_adcl_mod_r
+#define gen86_adcP_imm_Pax      gen86_adcl_imm_eax
+#define gen86_adcP_imm_mod      gen86_adcl_imm_mod
+#define gen86_adcP_imm8s_mod    gen86_adcl_imm8s_mod
+#define gen86_sbbP_r_mod        gen86_sbbl_r_mod
+#define gen86_sbbP_mod_r        gen86_sbbl_mod_r
+#define gen86_sbbP_imm_Pax      gen86_sbbl_imm_eax
+#define gen86_sbbP_imm_mod      gen86_sbbl_imm_mod
+#define gen86_sbbP_imm8s_mod    gen86_sbbl_imm8s_mod
+#define gen86_andP_r_mod        gen86_andl_r_mod
+#define gen86_andP_mod_r        gen86_andl_mod_r
+#define gen86_andP_imm_Pax      gen86_andl_imm_eax
+#define gen86_andP_imm_mod      gen86_andl_imm_mod
+#define gen86_andP_imm8s_mod    gen86_andl_imm8s_mod
+#define gen86_subP_r_mod        gen86_subl_r_mod
+#define gen86_subP_mod_r        gen86_subl_mod_r
+#define gen86_subP_imm_Pax      gen86_subl_imm_eax
+#define gen86_subP_imm_mod      gen86_subl_imm_mod
+#define gen86_subP_imm8s_mod    gen86_subl_imm8s_mod
+#define gen86_xorP_r_mod        gen86_xorl_r_mod
+#define gen86_xorP_mod_r        gen86_xorl_mod_r
+#define gen86_xorP_imm_Pax      gen86_xorl_imm_eax
+#define gen86_xorP_imm_mod      gen86_xorl_imm_mod
+#define gen86_xorP_imm8s_mod    gen86_xorl_imm8s_mod
+#define gen86_cmpP_r_mod        gen86_cmpl_r_mod
+#define gen86_cmpP_mod_r        gen86_cmpl_mod_r
+#define gen86_cmpP_imm_Pax      gen86_cmpl_imm_eax
+#define gen86_cmpP_imm_mod      gen86_cmpl_imm_mod
+#define gen86_cmpP_imm8s_mod    gen86_cmpl_imm8s_mod
+#define gen86_incP_r            gen86_incl_r
+#define gen86_decP_r            gen86_decl_r
+#define gen86_pushP_r           gen86_pushl_r
+#define gen86_popP_r            gen86_popl_r
+#define gen86_pushP_imm         gen86_pushl_imm
+#define gen86_pushP_imm8s       gen86_pushl_imm8s
+#define gen86_imulP_imm_mod_r   gen86_imull_imm_mod_r
+#define gen86_imulP_imm8s_mod_r gen86_imull_imm8s_mod_r
+#define gen86_testP_r_mod       gen86_testl_r_mod
+#define gen86_xchgP_r_mod       gen86_xchgl_r_mod
+#define gen86_movP_r_mod        gen86_movl_r_mod
+#define gen86_movP_mod_r        gen86_movl_mod_r
+#define gen86_movP_sgr_mod      gen86_movl_sgr_mod
+#define gen86_movP_mod_sgr      gen86_movl_mod_sgr
+#define gen86_leaP_mod_r        gen86_leal_mod_r
+#define gen86_popP_mod          gen86_popl_mod
+#define gen86_xchgP_r_Pax       gen86_xchgl_r_eax
+#define gen86_pushfP            gen86_pushfl
+#define gen86_popfP             gen86_popfl
+#define gen86_movsP             gen86_movsl
+#define gen86_rep_movsP         gen86_rep_movsl
+#define gen86_stosP             gen86_stosl
+#define gen86_rep_stosP         gen86_rep_stosl
+#define gen86_lodsP             gen86_lodsl
+#define gen86_rep_lodsP         gen86_rep_lodsl
+#define gen86_cmpsP             gen86_cmpsl
+#define gen86_repe_cmpsP        gen86_repe_cmpsl
+#define gen86_repne_cmpsP       gen86_repne_cmpsl
+#define gen86_scasP             gen86_scasl
+#define gen86_repe_scasP        gen86_repe_scasl
+#define gen86_repne_scasP       gen86_repne_scasl
+#define gen86_testP_imm_Pax     gen86_testl_imm_eax
+#define gen86_movP_imm_r        gen86_movl_imm_r
+#define gen86_rolP_imm_mod      gen86_roll_imm_mod
+#define gen86_rolP_1_mod        gen86_roll_1_mod
+#define gen86_rolP_cl_mod       gen86_roll_cl_mod
+#define gen86_rorP_imm_mod      gen86_rorl_imm_mod
+#define gen86_rorP_1_mod        gen86_rorl_1_mod
+#define gen86_rorP_cl_mod       gen86_rorl_cl_mod
+#define gen86_rclP_imm_mod      gen86_rcll_imm_mod
+#define gen86_rclP_1_mod        gen86_rcll_1_mod
+#define gen86_rclP_cl_mod       gen86_rcll_cl_mod
+#define gen86_rcrP_imm_mod      gen86_rcrl_imm_mod
+#define gen86_rcrP_1_mod        gen86_rcrl_1_mod
+#define gen86_rcrP_cl_mod       gen86_rcrl_cl_mod
+#define gen86_shlP_imm_mod      gen86_shll_imm_mod
+#define gen86_shlP_1_mod        gen86_shll_1_mod
+#define gen86_shlP_cl_mod       gen86_shll_cl_mod
+#define gen86_shrP_imm_mod      gen86_shrl_imm_mod
+#define gen86_shrP_1_mod        gen86_shrl_1_mod
+#define gen86_shrP_cl_mod       gen86_shrl_cl_mod
+#define gen86_salP_imm_mod      gen86_sall_imm_mod
+#define gen86_salP_1_mod        gen86_sall_1_mod
+#define gen86_salP_cl_mod       gen86_sall_cl_mod
+#define gen86_sarP_imm_mod      gen86_sarl_imm_mod
+#define gen86_sarP_1_mod        gen86_sarl_1_mod
+#define gen86_sarP_cl_mod       gen86_sarl_cl_mod
+#define gen86_retP_imm          gen86_retl_imm
+#define gen86_retP              gen86_retl
+#define gen86_movP_imm_mod      gen86_movl_imm_mod
+#define gen86_iretP             gen86_iretl
+#define gen86_testP_imm_mod     gen86_testl_imm_mod
+#define gen86_notP_mod          gen86_notl_mod
+#define gen86_negP_mod          gen86_negl_mod
+#define gen86_mulP_mod          gen86_mull_mod
+#define gen86_imulP_mod         gen86_imull_mod
+#define gen86_divP_mod          gen86_divl_mod
+#define gen86_idivP_mod         gen86_idivl_mod
+#define gen86_incP_mod          gen86_incl_mod
+#define gen86_decP_mod          gen86_decl_mod
+#define gen86_callP_mod         gen86_calll_mod
+#define gen86_lcallP_mod        gen86_lcalll_mod
+#define gen86_jmpP_mod          gen86_jmpl_mod
+#define gen86_ljmpP_mod         gen86_ljmpl_mod
+#define gen86_pushP_mod         gen86_pushl_mod
+#define gen86_smswP             gen86_smswl
+#define gen86_lmswP             gen86_lmswl
+#define gen86_lslP_mod_r        gen86_lsll_mod_r
+#define gen86_movP_cr_mod       gen86_movl_cr_mod
+#define gen86_movP_dr_mod       gen86_movl_dr_mod
+#define gen86_movP_mod_cr       gen86_movl_mod_cr
+#define gen86_movP_mod_dr       gen86_movl_mod_dr
+#define gen86_cmovccP_mod_r     gen86_cmovccl_mod_r
+#define gen86_btP_r_mod         gen86_btl_r_mod
+#define gen86_shldP_imm_r_mod   gen86_shldl_imm_r_mod
+#define gen86_shldP_cl_r_mod    gen86_shldl_cl_r_mod
+#define gen86_btsP_r_mod        gen86_btsl_r_mod
+#define gen86_shrdP_imm_r_mod   gen86_shrdl_imm_r_mod
+#define gen86_shrdP_cl_r_mod    gen86_shrdl_cl_r_mod
+#define gen86_rdfsbaseP         gen86_rdfsbasel
+#define gen86_rdgsbaseP         gen86_rdgsbasel
+#define gen86_wrfsbaseP         gen86_wrfsbasel
+#define gen86_wrgsbaseP         gen86_wrgsbasel
+#define gen86_imulP_mod_r       gen86_imull_mod_r
+#define gen86_cmpxchgP_r_mod    gen86_cmpxchgl_r_mod
+#define gen86_btrP_r_mod        gen86_btrl_r_mod
+#define gen86_popcntP_mod_r     gen86_popcntl_mod_r
+#define gen86_btP_imm_mod       gen86_btl_imm_mod
+#define gen86_btsP_imm_mod      gen86_btsl_imm_mod
+#define gen86_btrP_imm_mod      gen86_btrl_imm_mod
+#define gen86_btcP_imm_mod      gen86_btcl_imm_mod
+#define gen86_btcP_r_mod        gen86_btcl_r_mod
+#define gen86_bsfP_mod_r        gen86_bsfl_mod_r
+#define gen86_tzcntP_mod_r      gen86_tzcntl_mod_r
+#define gen86_bsrP_mod_r        gen86_bsrl_mod_r
+#define gen86_lzcntP_mod_r      gen86_lzcntl_mod_r
+#define gen86_xaddP_r_mod       gen86_xaddl_r_mod
+#define gen86_rdrandP_mod       gen86_rdrandl_mod
+#define gen86_rdseedP_mod       gen86_rdseedl_mod
+#define gen86_bswapP            gen86_bswapl
+#else /* LIBGEN86_TARGET_BITS == ... */
+#define gen86_movzbP_mod_r      gen86_movzbw_mod_r
+#define gen86_movzwP_mod_r      gen86_movw_mod_r
+#define gen86_movsbP_mod_r      gen86_movsbw_mod_r
+#define gen86_movswP_mod_r      gen86_movw_mod_r
+#define gen86_addP_r_mod        gen86_addw_r_mod
+#define gen86_addP_mod_r        gen86_addw_mod_r
+#define gen86_addP_imm_Pax      gen86_addw_imm_ax
+#define gen86_addP_imm_mod      gen86_addw_imm_mod
+#define gen86_addP_imm8s_mod    gen86_addw_imm8s_mod
+#define gen86_orP_r_mod         gen86_orw_r_mod
+#define gen86_orP_mod_r         gen86_orw_mod_r
+#define gen86_orP_imm_Pax       gen86_orw_imm_ax
+#define gen86_orP_imm_mod       gen86_orw_imm_mod
+#define gen86_orP_imm8s_mod     gen86_orw_imm8s_mod
+#define gen86_adcP_r_mod        gen86_adcw_r_mod
+#define gen86_adcP_mod_r        gen86_adcw_mod_r
+#define gen86_adcP_imm_Pax      gen86_adcw_imm_ax
+#define gen86_adcP_imm_mod      gen86_adcw_imm_mod
+#define gen86_adcP_imm8s_mod    gen86_adcw_imm8s_mod
+#define gen86_sbbP_r_mod        gen86_sbbw_r_mod
+#define gen86_sbbP_mod_r        gen86_sbbw_mod_r
+#define gen86_sbbP_imm_Pax      gen86_sbbw_imm_ax
+#define gen86_sbbP_imm_mod      gen86_sbbw_imm_mod
+#define gen86_sbbP_imm8s_mod    gen86_sbbw_imm8s_mod
+#define gen86_andP_r_mod        gen86_andw_r_mod
+#define gen86_andP_mod_r        gen86_andw_mod_r
+#define gen86_andP_imm_Pax      gen86_andw_imm_ax
+#define gen86_andP_imm_mod      gen86_andw_imm_mod
+#define gen86_andP_imm8s_mod    gen86_andw_imm8s_mod
+#define gen86_subP_r_mod        gen86_subw_r_mod
+#define gen86_subP_mod_r        gen86_subw_mod_r
+#define gen86_subP_imm_Pax      gen86_subw_imm_ax
+#define gen86_subP_imm_mod      gen86_subw_imm_mod
+#define gen86_subP_imm8s_mod    gen86_subw_imm8s_mod
+#define gen86_xorP_r_mod        gen86_xorw_r_mod
+#define gen86_xorP_mod_r        gen86_xorw_mod_r
+#define gen86_xorP_imm_Pax      gen86_xorw_imm_ax
+#define gen86_xorP_imm_mod      gen86_xorw_imm_mod
+#define gen86_xorP_imm8s_mod    gen86_xorw_imm8s_mod
+#define gen86_cmpP_r_mod        gen86_cmpw_r_mod
+#define gen86_cmpP_mod_r        gen86_cmpw_mod_r
+#define gen86_cmpP_imm_Pax      gen86_cmpw_imm_ax
+#define gen86_cmpP_imm_mod      gen86_cmpw_imm_mod
+#define gen86_cmpP_imm8s_mod    gen86_cmpw_imm8s_mod
+#define gen86_incP_r            gen86_incw_r
+#define gen86_decP_r            gen86_decw_r
+#define gen86_pushP_r           gen86_pushw_r
+#define gen86_popP_r            gen86_popw_r
+#define gen86_pushP_imm         gen86_pushw_imm
+#define gen86_pushP_imm8s       gen86_pushw_imm8s
+#define gen86_imulP_imm_mod_r   gen86_imulw_imm_mod_r
+#define gen86_imulP_imm8s_mod_r gen86_imulw_imm8s_mod_r
+#define gen86_testP_r_mod       gen86_testw_r_mod
+#define gen86_xchgP_r_mod       gen86_xchgw_r_mod
+#define gen86_movP_r_mod        gen86_movw_r_mod
+#define gen86_movP_mod_r        gen86_movw_mod_r
+#define gen86_movP_sgr_mod      gen86_movw_sgr_mod
+#define gen86_movP_mod_sgr      gen86_movw_mod_sgr
+#define gen86_leaP_mod_r        gen86_leaw_mod_r
+#define gen86_popP_mod          gen86_popw_mod
+#define gen86_xchgP_r_Pax       gen86_xchgw_r_ax
+#define gen86_pushfP            gen86_pushfw
+#define gen86_popfP             gen86_popfw
+#define gen86_movsP             gen86_movsw
+#define gen86_rep_movsP         gen86_rep_movsw
+#define gen86_stosP             gen86_stosw
+#define gen86_rep_stosP         gen86_rep_stosw
+#define gen86_lodsP             gen86_lodsw
+#define gen86_rep_lodsP         gen86_rep_lodsw
+#define gen86_cmpsP             gen86_cmpsw
+#define gen86_repe_cmpsP        gen86_repe_cmpsw
+#define gen86_repne_cmpsP       gen86_repne_cmpsw
+#define gen86_scasP             gen86_scasw
+#define gen86_repe_scasP        gen86_repe_scasw
+#define gen86_repne_scasP       gen86_repne_scasw
+#define gen86_testP_imm_Pax     gen86_testw_imm_ax
+#define gen86_movP_imm_r        gen86_movw_imm_r
+#define gen86_rolP_imm_mod      gen86_rolw_imm_mod
+#define gen86_rolP_1_mod        gen86_rolw_1_mod
+#define gen86_rolP_cl_mod       gen86_rolw_cl_mod
+#define gen86_rorP_imm_mod      gen86_rorw_imm_mod
+#define gen86_rorP_1_mod        gen86_rorw_1_mod
+#define gen86_rorP_cl_mod       gen86_rorw_cl_mod
+#define gen86_rclP_imm_mod      gen86_rclw_imm_mod
+#define gen86_rclP_1_mod        gen86_rclw_1_mod
+#define gen86_rclP_cl_mod       gen86_rclw_cl_mod
+#define gen86_rcrP_imm_mod      gen86_rcrw_imm_mod
+#define gen86_rcrP_1_mod        gen86_rcrw_1_mod
+#define gen86_rcrP_cl_mod       gen86_rcrw_cl_mod
+#define gen86_shlP_imm_mod      gen86_shlw_imm_mod
+#define gen86_shlP_1_mod        gen86_shlw_1_mod
+#define gen86_shlP_cl_mod       gen86_shlw_cl_mod
+#define gen86_shrP_imm_mod      gen86_shrw_imm_mod
+#define gen86_shrP_1_mod        gen86_shrw_1_mod
+#define gen86_shrP_cl_mod       gen86_shrw_cl_mod
+#define gen86_salP_imm_mod      gen86_salw_imm_mod
+#define gen86_salP_1_mod        gen86_salw_1_mod
+#define gen86_salP_cl_mod       gen86_salw_cl_mod
+#define gen86_sarP_imm_mod      gen86_sarw_imm_mod
+#define gen86_sarP_1_mod        gen86_sarw_1_mod
+#define gen86_sarP_cl_mod       gen86_sarw_cl_mod
+#define gen86_retP_imm          gen86_retw_imm
+#define gen86_retP              gen86_retw
+#define gen86_movP_imm_mod      gen86_movw_imm_mod
+#define gen86_iretP             gen86_iretw
+#define gen86_testP_imm_mod     gen86_testw_imm_mod
+#define gen86_notP_mod          gen86_notw_mod
+#define gen86_negP_mod          gen86_negw_mod
+#define gen86_mulP_mod          gen86_mulw_mod
+#define gen86_imulP_mod         gen86_imulw_mod
+#define gen86_divP_mod          gen86_divw_mod
+#define gen86_idivP_mod         gen86_idivw_mod
+#define gen86_incP_mod          gen86_incw_mod
+#define gen86_decP_mod          gen86_decw_mod
+#define gen86_callP_mod         gen86_callw_mod
+#define gen86_lcallP_mod        gen86_lcallw_mod
+#define gen86_jmpP_mod          gen86_jmpw_mod
+#define gen86_ljmpP_mod         gen86_ljmpw_mod
+#define gen86_pushP_mod         gen86_pushw_mod
+#define gen86_smswP             gen86_smsww
+#define gen86_lmswP             gen86_lmsww
+#define gen86_lslP_mod_r        gen86_lslw_mod_r
+#define gen86_cmovccP_mod_r     gen86_cmovccw_mod_r
+#define gen86_btP_r_mod         gen86_btw_r_mod
+#define gen86_shldP_imm_r_mod   gen86_shldw_imm_r_mod
+#define gen86_shldP_cl_r_mod    gen86_shldw_cl_r_mod
+#define gen86_btsP_r_mod        gen86_btsw_r_mod
+#define gen86_shrdP_imm_r_mod   gen86_shrdw_imm_r_mod
+#define gen86_shrdP_cl_r_mod    gen86_shrdw_cl_r_mod
+#define gen86_imulP_mod_r       gen86_imulw_mod_r
+#define gen86_cmpxchgP_r_mod    gen86_cmpxchgw_r_mod
+#define gen86_btrP_r_mod        gen86_btrw_r_mod
+#define gen86_popcntP_mod_r     gen86_popcntw_mod_r
+#define gen86_btP_imm_mod       gen86_btw_imm_mod
+#define gen86_btsP_imm_mod      gen86_btsw_imm_mod
+#define gen86_btrP_imm_mod      gen86_btrw_imm_mod
+#define gen86_btcP_imm_mod      gen86_btcw_imm_mod
+#define gen86_btcP_r_mod        gen86_btcw_r_mod
+#define gen86_bsfP_mod_r        gen86_bsfw_mod_r
+#define gen86_tzcntP_mod_r      gen86_tzcntw_mod_r
+#define gen86_bsrP_mod_r        gen86_bsrw_mod_r
+#define gen86_lzcntP_mod_r      gen86_lzcntw_mod_r
+#define gen86_xaddP_r_mod       gen86_xaddw_r_mod
+#define gen86_rdrandP_mod       gen86_rdrandw_mod
+#define gen86_rdseedP_mod       gen86_rdseedw_mod
+#endif /* LIBGEN86_TARGET_BITS != ... */
+
+
+/* Helper macros */
+
+#define gen86_setcc_r(p_pc, cc, reg) /* setcc %reg */ gen86_setcc_mod(p_pc, cc, gen86_modrm_r, reg)
+
+/*[[[deemon
+local names = { "add", "or", "adc", "sbb", "and", "sub", "xor" };
+for (local n: names) {
+	local pad = " " * (4 - #n);
+	print("#define gen86_", n, "b_r_r(p_pc, src_reg, dst_reg)", pad, " /" "* ", n, "b", pad, " %src_reg, %dst_reg *" "/ gen86_", n, "b_r_mod(p_pc, gen86_modrm_r, src_reg, dst_reg)");
+	print("#define gen86_", n, "w_r_r(p_pc, src_reg, dst_reg)", pad, " /" "* ", n, "w", pad, " %src_reg, %dst_reg *" "/ gen86_", n, "w_r_mod(p_pc, gen86_modrm_r, src_reg, dst_reg)");
+	print("#define gen86_", n, "l_r_r(p_pc, src_reg, dst_reg)", pad, " /" "* ", n, "l", pad, " %src_reg, %dst_reg *" "/ gen86_", n, "l_r_mod(p_pc, gen86_modrm_r, src_reg, dst_reg)");
+	print("#define gen86_", n, "P_r_r(p_pc, src_reg, dst_reg)", pad, " /" "* ", n, "P", pad, " %src_reg, %dst_reg *" "/ gen86_", n, "P_r_mod(p_pc, gen86_modrm_r, src_reg, dst_reg)");
+}
+print("#if LIBGEN86_TARGET_BITS == 64");
+for (local n: names) {
+	local pad = " " * (4 - #n);
+	print("#define gen86_", n, "q_r_r(p_pc, src_reg, dst_reg)", pad, " /" "* ", n, "q", pad, " %src_reg, %dst_reg *" "/ gen86_", n, "q_r_mod(p_pc, gen86_modrm_r, src_reg, dst_reg)");
+}
+print("#endif /" "* LIBGEN86_TARGET_BITS == 64 *" "/");
+]]]*/
+#define gen86_addb_r_r(p_pc, src_reg, dst_reg)  /* addb  %src_reg, %dst_reg */ gen86_addb_r_mod(p_pc, gen86_modrm_r, src_reg, dst_reg)
+#define gen86_addw_r_r(p_pc, src_reg, dst_reg)  /* addw  %src_reg, %dst_reg */ gen86_addw_r_mod(p_pc, gen86_modrm_r, src_reg, dst_reg)
+#define gen86_addl_r_r(p_pc, src_reg, dst_reg)  /* addl  %src_reg, %dst_reg */ gen86_addl_r_mod(p_pc, gen86_modrm_r, src_reg, dst_reg)
+#define gen86_addP_r_r(p_pc, src_reg, dst_reg)  /* addP  %src_reg, %dst_reg */ gen86_addP_r_mod(p_pc, gen86_modrm_r, src_reg, dst_reg)
+#define gen86_orb_r_r(p_pc, src_reg, dst_reg)   /* orb   %src_reg, %dst_reg */ gen86_orb_r_mod(p_pc, gen86_modrm_r, src_reg, dst_reg)
+#define gen86_orw_r_r(p_pc, src_reg, dst_reg)   /* orw   %src_reg, %dst_reg */ gen86_orw_r_mod(p_pc, gen86_modrm_r, src_reg, dst_reg)
+#define gen86_orl_r_r(p_pc, src_reg, dst_reg)   /* orl   %src_reg, %dst_reg */ gen86_orl_r_mod(p_pc, gen86_modrm_r, src_reg, dst_reg)
+#define gen86_orP_r_r(p_pc, src_reg, dst_reg)   /* orP   %src_reg, %dst_reg */ gen86_orP_r_mod(p_pc, gen86_modrm_r, src_reg, dst_reg)
+#define gen86_adcb_r_r(p_pc, src_reg, dst_reg)  /* adcb  %src_reg, %dst_reg */ gen86_adcb_r_mod(p_pc, gen86_modrm_r, src_reg, dst_reg)
+#define gen86_adcw_r_r(p_pc, src_reg, dst_reg)  /* adcw  %src_reg, %dst_reg */ gen86_adcw_r_mod(p_pc, gen86_modrm_r, src_reg, dst_reg)
+#define gen86_adcl_r_r(p_pc, src_reg, dst_reg)  /* adcl  %src_reg, %dst_reg */ gen86_adcl_r_mod(p_pc, gen86_modrm_r, src_reg, dst_reg)
+#define gen86_adcP_r_r(p_pc, src_reg, dst_reg)  /* adcP  %src_reg, %dst_reg */ gen86_adcP_r_mod(p_pc, gen86_modrm_r, src_reg, dst_reg)
+#define gen86_sbbb_r_r(p_pc, src_reg, dst_reg)  /* sbbb  %src_reg, %dst_reg */ gen86_sbbb_r_mod(p_pc, gen86_modrm_r, src_reg, dst_reg)
+#define gen86_sbbw_r_r(p_pc, src_reg, dst_reg)  /* sbbw  %src_reg, %dst_reg */ gen86_sbbw_r_mod(p_pc, gen86_modrm_r, src_reg, dst_reg)
+#define gen86_sbbl_r_r(p_pc, src_reg, dst_reg)  /* sbbl  %src_reg, %dst_reg */ gen86_sbbl_r_mod(p_pc, gen86_modrm_r, src_reg, dst_reg)
+#define gen86_sbbP_r_r(p_pc, src_reg, dst_reg)  /* sbbP  %src_reg, %dst_reg */ gen86_sbbP_r_mod(p_pc, gen86_modrm_r, src_reg, dst_reg)
+#define gen86_andb_r_r(p_pc, src_reg, dst_reg)  /* andb  %src_reg, %dst_reg */ gen86_andb_r_mod(p_pc, gen86_modrm_r, src_reg, dst_reg)
+#define gen86_andw_r_r(p_pc, src_reg, dst_reg)  /* andw  %src_reg, %dst_reg */ gen86_andw_r_mod(p_pc, gen86_modrm_r, src_reg, dst_reg)
+#define gen86_andl_r_r(p_pc, src_reg, dst_reg)  /* andl  %src_reg, %dst_reg */ gen86_andl_r_mod(p_pc, gen86_modrm_r, src_reg, dst_reg)
+#define gen86_andP_r_r(p_pc, src_reg, dst_reg)  /* andP  %src_reg, %dst_reg */ gen86_andP_r_mod(p_pc, gen86_modrm_r, src_reg, dst_reg)
+#define gen86_subb_r_r(p_pc, src_reg, dst_reg)  /* subb  %src_reg, %dst_reg */ gen86_subb_r_mod(p_pc, gen86_modrm_r, src_reg, dst_reg)
+#define gen86_subw_r_r(p_pc, src_reg, dst_reg)  /* subw  %src_reg, %dst_reg */ gen86_subw_r_mod(p_pc, gen86_modrm_r, src_reg, dst_reg)
+#define gen86_subl_r_r(p_pc, src_reg, dst_reg)  /* subl  %src_reg, %dst_reg */ gen86_subl_r_mod(p_pc, gen86_modrm_r, src_reg, dst_reg)
+#define gen86_subP_r_r(p_pc, src_reg, dst_reg)  /* subP  %src_reg, %dst_reg */ gen86_subP_r_mod(p_pc, gen86_modrm_r, src_reg, dst_reg)
+#define gen86_xorb_r_r(p_pc, src_reg, dst_reg)  /* xorb  %src_reg, %dst_reg */ gen86_xorb_r_mod(p_pc, gen86_modrm_r, src_reg, dst_reg)
+#define gen86_xorw_r_r(p_pc, src_reg, dst_reg)  /* xorw  %src_reg, %dst_reg */ gen86_xorw_r_mod(p_pc, gen86_modrm_r, src_reg, dst_reg)
+#define gen86_xorl_r_r(p_pc, src_reg, dst_reg)  /* xorl  %src_reg, %dst_reg */ gen86_xorl_r_mod(p_pc, gen86_modrm_r, src_reg, dst_reg)
+#define gen86_xorP_r_r(p_pc, src_reg, dst_reg)  /* xorP  %src_reg, %dst_reg */ gen86_xorP_r_mod(p_pc, gen86_modrm_r, src_reg, dst_reg)
+#if LIBGEN86_TARGET_BITS == 64
+#define gen86_addq_r_r(p_pc, src_reg, dst_reg)  /* addq  %src_reg, %dst_reg */ gen86_addq_r_mod(p_pc, gen86_modrm_r, src_reg, dst_reg)
+#define gen86_orq_r_r(p_pc, src_reg, dst_reg)   /* orq   %src_reg, %dst_reg */ gen86_orq_r_mod(p_pc, gen86_modrm_r, src_reg, dst_reg)
+#define gen86_adcq_r_r(p_pc, src_reg, dst_reg)  /* adcq  %src_reg, %dst_reg */ gen86_adcq_r_mod(p_pc, gen86_modrm_r, src_reg, dst_reg)
+#define gen86_sbbq_r_r(p_pc, src_reg, dst_reg)  /* sbbq  %src_reg, %dst_reg */ gen86_sbbq_r_mod(p_pc, gen86_modrm_r, src_reg, dst_reg)
+#define gen86_andq_r_r(p_pc, src_reg, dst_reg)  /* andq  %src_reg, %dst_reg */ gen86_andq_r_mod(p_pc, gen86_modrm_r, src_reg, dst_reg)
+#define gen86_subq_r_r(p_pc, src_reg, dst_reg)  /* subq  %src_reg, %dst_reg */ gen86_subq_r_mod(p_pc, gen86_modrm_r, src_reg, dst_reg)
+#define gen86_xorq_r_r(p_pc, src_reg, dst_reg)  /* xorq  %src_reg, %dst_reg */ gen86_xorq_r_mod(p_pc, gen86_modrm_r, src_reg, dst_reg)
+#endif /* LIBGEN86_TARGET_BITS == 64 */
+/*[[[end]]]*/
+
+#define gen86_movb_r_r(p_pc, src_reg, dst_reg) /* movb %src_reg, %dst_reg */ ((src_reg) == (dst_reg) ? (void)0 : gen86_movb_r_mod(p_pc, gen86_modrm_r, src_reg, dst_reg))
+#define gen86_movw_r_r(p_pc, src_reg, dst_reg) /* movw %src_reg, %dst_reg */ ((src_reg) == (dst_reg) ? (void)0 : gen86_movw_r_mod(p_pc, gen86_modrm_r, src_reg, dst_reg))
+#define gen86_movP_r_r(p_pc, src_reg, dst_reg) /* movP %src_reg, %dst_reg */ ((src_reg) == (dst_reg) ? (void)0 : gen86_movP_r_mod(p_pc, gen86_modrm_r, src_reg, dst_reg))
+#if LIBGEN86_TARGET_BITS == 64
+#define gen86_movl_r_r(p_pc, src_reg, dst_reg) /* movl %src_reg, %dst_reg */ gen86_movl_r_mod(p_pc, gen86_modrm_r, src_reg, dst_reg) /* mov to same register here actually zeroes out the upper 32 bits! */
+#define gen86_movq_r_r(p_pc, src_reg, dst_reg) /* movq %src_reg, %dst_reg */ gen86_movq_r_mod(p_pc, gen86_modrm_r, src_reg, dst_reg)
+#else /* LIBGEN86_TARGET_BITS == 64 */
+#define gen86_movl_r_r(p_pc, src_reg, dst_reg) /* movl %src_reg, %dst_reg */ ((src_reg) == (dst_reg) ? (void)0 : gen86_movl_r_mod(p_pc, gen86_modrm_r, src_reg, dst_reg))
+#endif /* LIBGEN86_TARGET_BITS != 64 */
+
+#define gen86_testb_r_r(p_pc, r1, r2)  /* testb %r1, %r2   */ gen86_testb_r_mod(p_pc, gen86_modrm_r, r1, r2)
+#define gen86_testw_r_r(p_pc, r1, r2)  /* testw %r1, %r2   */ gen86_testw_r_mod(p_pc, gen86_modrm_r, r1, r2)
+#define gen86_testl_r_r(p_pc, r1, r2)  /* testl %r1, %r2   */ gen86_testl_r_mod(p_pc, gen86_modrm_r, r1, r2)
+#define gen86_testP_r_r(p_pc, r1, r2)  /* testP %r1, %r2   */ gen86_testP_r_mod(p_pc, gen86_modrm_r, r1, r2)
+#define gen86_cmpb_r_r(p_pc, rhs, lhs) /* cmpb  %rhs, %lhs */ gen86_cmpb_r_mod(p_pc, gen86_modrm_r, rhs, lhs)
+#define gen86_cmpw_r_r(p_pc, rhs, lhs) /* cmpw  %rhs, %lhs */ gen86_cmpw_r_mod(p_pc, gen86_modrm_r, rhs, lhs)
+#define gen86_cmpl_r_r(p_pc, rhs, lhs) /* cmpl  %rhs, %lhs */ gen86_cmpl_r_mod(p_pc, gen86_modrm_r, rhs, lhs)
+#define gen86_cmpP_r_r(p_pc, rhs, lhs) /* cmpP  %rhs, %lhs */ gen86_cmpP_r_mod(p_pc, gen86_modrm_r, rhs, lhs)
+#if LIBGEN86_TARGET_BITS == 64
+#define gen86_testq_r_r(p_pc, r1, r2)  /* testq %r1, %r2   */ gen86_testq_r_mod(p_pc, gen86_modrm_r, r1, r2)
+#define gen86_cmpq_r_r(p_pc, rhs, lhs) /* cmpq  %rhs, %lhs */ gen86_cmpq_r_mod(p_pc, gen86_modrm_r, rhs, lhs)
+#endif /* LIBGEN86_TARGET_BITS == 64 */
+
+#define gen86_mov_cr_r(p_pc, crN, reg) /* mov %crN, %reg */ gen86_mov_cr_mod(p_pc, gen86_modrm_r, crN, reg)
+#define gen86_mov_dr_r(p_pc, reg, drN) /* mov %reg, %drN */ gen86_mov_dr_mod(p_pc, gen86_modrm_r, drN, reg)
+#define gen86_mov_r_cr(p_pc, crN, reg) /* mov %crN, %reg */ gen86_mov_mod_cr(p_pc, gen86_modrm_r, crN, reg)
+#define gen86_mov_r_dr(p_pc, reg, drN) /* mov %reg, %drN */ gen86_mov_mod_dr(p_pc, gen86_modrm_r, drN, reg)
+#if LIBGEN86_TARGET_BITS == 64
+#define gen86_movq_cr_r gen86_mov_cr_r
+#define gen86_movq_dr_r gen86_mov_dr_r
+#define gen86_movq_r_cr gen86_mov_r_cr
+#define gen86_movq_r_dr gen86_mov_r_dr
+#else /* LIBGEN86_TARGET_BITS == 64 */
+#define gen86_movl_cr_r gen86_mov_cr_r
+#define gen86_movl_dr_r gen86_mov_dr_r
+#define gen86_movl_r_cr gen86_mov_r_cr
+#define gen86_movl_r_dr gen86_mov_r_dr
+#endif /* LIBGEN86_TARGET_BITS != 64 */
+
+
+#define _gen86_xchgX_select(p_pc, r1, r2, gen86_xchgX_r_mod, gen86_xchgX_r_Xax) \
+	((r1) == (r2)                                                               \
+	 ? (void)0                                                                  \
+	 : (r1) == GEN86_R_AX                                                       \
+	   ? gen86_xchgX_r_Xax(p_pc, r2)                                            \
+	   : (r2) == GEN86_R_AX                                                     \
+	     ? gen86_xchgX_r_Xax(p_pc, r1)                                          \
+	     : gen86_xchgX_r_mod(p_pc, gen86_modrm_r, r1, r2))
+#define gen86_xchgb_r_r(p_pc, r1, r2) /* xchgb  %r1, %r2 */ gen86_xchgb_r_mod(p_pc, gen86_modrm_r, r1, r2)
+#define gen86_xchgw_r_r(p_pc, r1, r2) /* xchgw  %r1, %r2 */ _gen86_xchgX_select(p_pc, r1, r2, gen86_xchgw_r_mod, gen86_xchgw_r_ax)
+#define gen86_xchgl_r_r(p_pc, r1, r2) /* xchgl  %r1, %r2 */ _gen86_xchgX_select(p_pc, r1, r2, gen86_xchgl_r_mod, gen86_xchgl_r_eax)
+#define gen86_xchgP_r_r(p_pc, r1, r2) /* xchgP  %r1, %r2 */ _gen86_xchgX_select(p_pc, r1, r2, gen86_xchgP_r_mod, gen86_xchgP_r_Pax)
+#if LIBGEN86_TARGET_BITS == 64
+#define gen86_xchgq_r_r(p_pc, r1, r2) /* xchgq  %r1, %r2 */ _gen86_xchgX_select(p_pc, r1, r2, gen86_xchgq_r_mod, gen86_xchgq_r_rax)
+#endif /* LIBGEN86_TARGET_BITS == 64 */
+
+/*[[[deemon
+local tests = {
+	"o"   : "GEN86_CC_O",
+	"no"  : "GEN86_CC_NO",
+	"b"   : "GEN86_CC_B",
+	"c"   : "GEN86_CC_C",
+	"nae" : "GEN86_CC_NAE",
+	"ae"  : "GEN86_CC_AE",
+	"nb"  : "GEN86_CC_NB",
+	"nc"  : "GEN86_CC_NC",
+	"z"   : "GEN86_CC_Z",
+	"e"   : "GEN86_CC_E",
+	"nz"  : "GEN86_CC_NZ",
+	"ne"  : "GEN86_CC_NE",
+	"be"  : "GEN86_CC_BE",
+	"na"  : "GEN86_CC_NA",
+	"a"   : "GEN86_CC_A",
+	"nbe" : "GEN86_CC_NBE",
+	"s"   : "GEN86_CC_S",
+	"ns"  : "GEN86_CC_NS",
+	"p"   : "GEN86_CC_P",
+	"pe"  : "GEN86_CC_PE",
+	"np"  : "GEN86_CC_NP",
+	"po"  : "GEN86_CC_PO",
+	"l"   : "GEN86_CC_L",
+	"nge" : "GEN86_CC_NGE",
+	"ge"  : "GEN86_CC_GE",
+	"nl"  : "GEN86_CC_NL",
+	"le"  : "GEN86_CC_LE",
+	"ng"  : "GEN86_CC_NG",
+	"g"   : "GEN86_CC_G",
+	"nle" : "GEN86_CC_NLE",
+};
+local macros = [];
+function printInstruction(name, params) {
+	local param_names = ", ".join(params);
+	local arg_names   = ", ".join(for (local p: params) { "..." : "__VA_ARGS__" }.get(p, p));
+	for (local tname, cc: tests) {
+		local a = "gen86_{}(p_pc, {})".format({ name.format({ tname }), param_names });
+		local b = "gen86_{}(p_pc, {}, {})".format({ name.format({ "cc" }), cc, arg_names });
+		macros.append((a, b));
+	}
+}
+printInstruction("j{}8", ["addr"]);
+printInstruction("j{}8_offset", ["offset"]);
+printInstruction("j{}P", ["addr"]);
+printInstruction("j{}P_offset", ["offset"]);
+printInstruction("j{}", ["addr"]);
+printInstruction("j{}_offset", ["offset"]);
+printInstruction("set{}_r", ["reg"]);
+printInstruction("set{}_mod", ["gen_modrm", "..."]);
+local longestName = (macros.each.first.length > ...) + 1;
+for (local a, b: macros) {
+	print("#define ", a.ljust(longestName), b);
+}
+]]]*/
+#define gen86_jae8(p_pc, addr)                 gen86_jcc8(p_pc, GEN86_CC_AE, addr)
+#define gen86_jbe8(p_pc, addr)                 gen86_jcc8(p_pc, GEN86_CC_BE, addr)
+#define gen86_jb8(p_pc, addr)                  gen86_jcc8(p_pc, GEN86_CC_B, addr)
+#define gen86_jna8(p_pc, addr)                 gen86_jcc8(p_pc, GEN86_CC_NA, addr)
+#define gen86_jnae8(p_pc, addr)                gen86_jcc8(p_pc, GEN86_CC_NAE, addr)
+#define gen86_jpe8(p_pc, addr)                 gen86_jcc8(p_pc, GEN86_CC_PE, addr)
+#define gen86_jne8(p_pc, addr)                 gen86_jcc8(p_pc, GEN86_CC_NE, addr)
+#define gen86_jng8(p_pc, addr)                 gen86_jcc8(p_pc, GEN86_CC_NG, addr)
+#define gen86_jg8(p_pc, addr)                  gen86_jcc8(p_pc, GEN86_CC_G, addr)
+#define gen86_jz8(p_pc, addr)                  gen86_jcc8(p_pc, GEN86_CC_Z, addr)
+#define gen86_jns8(p_pc, addr)                 gen86_jcc8(p_pc, GEN86_CC_NS, addr)
+#define gen86_jp8(p_pc, addr)                  gen86_jcc8(p_pc, GEN86_CC_P, addr)
+#define gen86_jnb8(p_pc, addr)                 gen86_jcc8(p_pc, GEN86_CC_NB, addr)
+#define gen86_jc8(p_pc, addr)                  gen86_jcc8(p_pc, GEN86_CC_C, addr)
+#define gen86_jnge8(p_pc, addr)                gen86_jcc8(p_pc, GEN86_CC_NGE, addr)
+#define gen86_jnbe8(p_pc, addr)                gen86_jcc8(p_pc, GEN86_CC_NBE, addr)
+#define gen86_jnle8(p_pc, addr)                gen86_jcc8(p_pc, GEN86_CC_NLE, addr)
+#define gen86_jpo8(p_pc, addr)                 gen86_jcc8(p_pc, GEN86_CC_PO, addr)
+#define gen86_je8(p_pc, addr)                  gen86_jcc8(p_pc, GEN86_CC_E, addr)
+#define gen86_jnl8(p_pc, addr)                 gen86_jcc8(p_pc, GEN86_CC_NL, addr)
+#define gen86_jnz8(p_pc, addr)                 gen86_jcc8(p_pc, GEN86_CC_NZ, addr)
+#define gen86_jl8(p_pc, addr)                  gen86_jcc8(p_pc, GEN86_CC_L, addr)
+#define gen86_jnc8(p_pc, addr)                 gen86_jcc8(p_pc, GEN86_CC_NC, addr)
+#define gen86_jno8(p_pc, addr)                 gen86_jcc8(p_pc, GEN86_CC_NO, addr)
+#define gen86_js8(p_pc, addr)                  gen86_jcc8(p_pc, GEN86_CC_S, addr)
+#define gen86_ja8(p_pc, addr)                  gen86_jcc8(p_pc, GEN86_CC_A, addr)
+#define gen86_jo8(p_pc, addr)                  gen86_jcc8(p_pc, GEN86_CC_O, addr)
+#define gen86_jle8(p_pc, addr)                 gen86_jcc8(p_pc, GEN86_CC_LE, addr)
+#define gen86_jnp8(p_pc, addr)                 gen86_jcc8(p_pc, GEN86_CC_NP, addr)
+#define gen86_jge8(p_pc, addr)                 gen86_jcc8(p_pc, GEN86_CC_GE, addr)
+#define gen86_jae8_offset(p_pc, offset)        gen86_jcc8_offset(p_pc, GEN86_CC_AE, offset)
+#define gen86_jbe8_offset(p_pc, offset)        gen86_jcc8_offset(p_pc, GEN86_CC_BE, offset)
+#define gen86_jb8_offset(p_pc, offset)         gen86_jcc8_offset(p_pc, GEN86_CC_B, offset)
+#define gen86_jna8_offset(p_pc, offset)        gen86_jcc8_offset(p_pc, GEN86_CC_NA, offset)
+#define gen86_jnae8_offset(p_pc, offset)       gen86_jcc8_offset(p_pc, GEN86_CC_NAE, offset)
+#define gen86_jpe8_offset(p_pc, offset)        gen86_jcc8_offset(p_pc, GEN86_CC_PE, offset)
+#define gen86_jne8_offset(p_pc, offset)        gen86_jcc8_offset(p_pc, GEN86_CC_NE, offset)
+#define gen86_jng8_offset(p_pc, offset)        gen86_jcc8_offset(p_pc, GEN86_CC_NG, offset)
+#define gen86_jg8_offset(p_pc, offset)         gen86_jcc8_offset(p_pc, GEN86_CC_G, offset)
+#define gen86_jz8_offset(p_pc, offset)         gen86_jcc8_offset(p_pc, GEN86_CC_Z, offset)
+#define gen86_jns8_offset(p_pc, offset)        gen86_jcc8_offset(p_pc, GEN86_CC_NS, offset)
+#define gen86_jp8_offset(p_pc, offset)         gen86_jcc8_offset(p_pc, GEN86_CC_P, offset)
+#define gen86_jnb8_offset(p_pc, offset)        gen86_jcc8_offset(p_pc, GEN86_CC_NB, offset)
+#define gen86_jc8_offset(p_pc, offset)         gen86_jcc8_offset(p_pc, GEN86_CC_C, offset)
+#define gen86_jnge8_offset(p_pc, offset)       gen86_jcc8_offset(p_pc, GEN86_CC_NGE, offset)
+#define gen86_jnbe8_offset(p_pc, offset)       gen86_jcc8_offset(p_pc, GEN86_CC_NBE, offset)
+#define gen86_jnle8_offset(p_pc, offset)       gen86_jcc8_offset(p_pc, GEN86_CC_NLE, offset)
+#define gen86_jpo8_offset(p_pc, offset)        gen86_jcc8_offset(p_pc, GEN86_CC_PO, offset)
+#define gen86_je8_offset(p_pc, offset)         gen86_jcc8_offset(p_pc, GEN86_CC_E, offset)
+#define gen86_jnl8_offset(p_pc, offset)        gen86_jcc8_offset(p_pc, GEN86_CC_NL, offset)
+#define gen86_jnz8_offset(p_pc, offset)        gen86_jcc8_offset(p_pc, GEN86_CC_NZ, offset)
+#define gen86_jl8_offset(p_pc, offset)         gen86_jcc8_offset(p_pc, GEN86_CC_L, offset)
+#define gen86_jnc8_offset(p_pc, offset)        gen86_jcc8_offset(p_pc, GEN86_CC_NC, offset)
+#define gen86_jno8_offset(p_pc, offset)        gen86_jcc8_offset(p_pc, GEN86_CC_NO, offset)
+#define gen86_js8_offset(p_pc, offset)         gen86_jcc8_offset(p_pc, GEN86_CC_S, offset)
+#define gen86_ja8_offset(p_pc, offset)         gen86_jcc8_offset(p_pc, GEN86_CC_A, offset)
+#define gen86_jo8_offset(p_pc, offset)         gen86_jcc8_offset(p_pc, GEN86_CC_O, offset)
+#define gen86_jle8_offset(p_pc, offset)        gen86_jcc8_offset(p_pc, GEN86_CC_LE, offset)
+#define gen86_jnp8_offset(p_pc, offset)        gen86_jcc8_offset(p_pc, GEN86_CC_NP, offset)
+#define gen86_jge8_offset(p_pc, offset)        gen86_jcc8_offset(p_pc, GEN86_CC_GE, offset)
+#define gen86_jaeP(p_pc, addr)                 gen86_jccP(p_pc, GEN86_CC_AE, addr)
+#define gen86_jbeP(p_pc, addr)                 gen86_jccP(p_pc, GEN86_CC_BE, addr)
+#define gen86_jbP(p_pc, addr)                  gen86_jccP(p_pc, GEN86_CC_B, addr)
+#define gen86_jnaP(p_pc, addr)                 gen86_jccP(p_pc, GEN86_CC_NA, addr)
+#define gen86_jnaeP(p_pc, addr)                gen86_jccP(p_pc, GEN86_CC_NAE, addr)
+#define gen86_jpeP(p_pc, addr)                 gen86_jccP(p_pc, GEN86_CC_PE, addr)
+#define gen86_jneP(p_pc, addr)                 gen86_jccP(p_pc, GEN86_CC_NE, addr)
+#define gen86_jngP(p_pc, addr)                 gen86_jccP(p_pc, GEN86_CC_NG, addr)
+#define gen86_jgP(p_pc, addr)                  gen86_jccP(p_pc, GEN86_CC_G, addr)
+#define gen86_jzP(p_pc, addr)                  gen86_jccP(p_pc, GEN86_CC_Z, addr)
+#define gen86_jnsP(p_pc, addr)                 gen86_jccP(p_pc, GEN86_CC_NS, addr)
+#define gen86_jpP(p_pc, addr)                  gen86_jccP(p_pc, GEN86_CC_P, addr)
+#define gen86_jnbP(p_pc, addr)                 gen86_jccP(p_pc, GEN86_CC_NB, addr)
+#define gen86_jcP(p_pc, addr)                  gen86_jccP(p_pc, GEN86_CC_C, addr)
+#define gen86_jngeP(p_pc, addr)                gen86_jccP(p_pc, GEN86_CC_NGE, addr)
+#define gen86_jnbeP(p_pc, addr)                gen86_jccP(p_pc, GEN86_CC_NBE, addr)
+#define gen86_jnleP(p_pc, addr)                gen86_jccP(p_pc, GEN86_CC_NLE, addr)
+#define gen86_jpoP(p_pc, addr)                 gen86_jccP(p_pc, GEN86_CC_PO, addr)
+#define gen86_jeP(p_pc, addr)                  gen86_jccP(p_pc, GEN86_CC_E, addr)
+#define gen86_jnlP(p_pc, addr)                 gen86_jccP(p_pc, GEN86_CC_NL, addr)
+#define gen86_jnzP(p_pc, addr)                 gen86_jccP(p_pc, GEN86_CC_NZ, addr)
+#define gen86_jlP(p_pc, addr)                  gen86_jccP(p_pc, GEN86_CC_L, addr)
+#define gen86_jncP(p_pc, addr)                 gen86_jccP(p_pc, GEN86_CC_NC, addr)
+#define gen86_jnoP(p_pc, addr)                 gen86_jccP(p_pc, GEN86_CC_NO, addr)
+#define gen86_jsP(p_pc, addr)                  gen86_jccP(p_pc, GEN86_CC_S, addr)
+#define gen86_jaP(p_pc, addr)                  gen86_jccP(p_pc, GEN86_CC_A, addr)
+#define gen86_joP(p_pc, addr)                  gen86_jccP(p_pc, GEN86_CC_O, addr)
+#define gen86_jleP(p_pc, addr)                 gen86_jccP(p_pc, GEN86_CC_LE, addr)
+#define gen86_jnpP(p_pc, addr)                 gen86_jccP(p_pc, GEN86_CC_NP, addr)
+#define gen86_jgeP(p_pc, addr)                 gen86_jccP(p_pc, GEN86_CC_GE, addr)
+#define gen86_jaeP_offset(p_pc, offset)        gen86_jccP_offset(p_pc, GEN86_CC_AE, offset)
+#define gen86_jbeP_offset(p_pc, offset)        gen86_jccP_offset(p_pc, GEN86_CC_BE, offset)
+#define gen86_jbP_offset(p_pc, offset)         gen86_jccP_offset(p_pc, GEN86_CC_B, offset)
+#define gen86_jnaP_offset(p_pc, offset)        gen86_jccP_offset(p_pc, GEN86_CC_NA, offset)
+#define gen86_jnaeP_offset(p_pc, offset)       gen86_jccP_offset(p_pc, GEN86_CC_NAE, offset)
+#define gen86_jpeP_offset(p_pc, offset)        gen86_jccP_offset(p_pc, GEN86_CC_PE, offset)
+#define gen86_jneP_offset(p_pc, offset)        gen86_jccP_offset(p_pc, GEN86_CC_NE, offset)
+#define gen86_jngP_offset(p_pc, offset)        gen86_jccP_offset(p_pc, GEN86_CC_NG, offset)
+#define gen86_jgP_offset(p_pc, offset)         gen86_jccP_offset(p_pc, GEN86_CC_G, offset)
+#define gen86_jzP_offset(p_pc, offset)         gen86_jccP_offset(p_pc, GEN86_CC_Z, offset)
+#define gen86_jnsP_offset(p_pc, offset)        gen86_jccP_offset(p_pc, GEN86_CC_NS, offset)
+#define gen86_jpP_offset(p_pc, offset)         gen86_jccP_offset(p_pc, GEN86_CC_P, offset)
+#define gen86_jnbP_offset(p_pc, offset)        gen86_jccP_offset(p_pc, GEN86_CC_NB, offset)
+#define gen86_jcP_offset(p_pc, offset)         gen86_jccP_offset(p_pc, GEN86_CC_C, offset)
+#define gen86_jngeP_offset(p_pc, offset)       gen86_jccP_offset(p_pc, GEN86_CC_NGE, offset)
+#define gen86_jnbeP_offset(p_pc, offset)       gen86_jccP_offset(p_pc, GEN86_CC_NBE, offset)
+#define gen86_jnleP_offset(p_pc, offset)       gen86_jccP_offset(p_pc, GEN86_CC_NLE, offset)
+#define gen86_jpoP_offset(p_pc, offset)        gen86_jccP_offset(p_pc, GEN86_CC_PO, offset)
+#define gen86_jeP_offset(p_pc, offset)         gen86_jccP_offset(p_pc, GEN86_CC_E, offset)
+#define gen86_jnlP_offset(p_pc, offset)        gen86_jccP_offset(p_pc, GEN86_CC_NL, offset)
+#define gen86_jnzP_offset(p_pc, offset)        gen86_jccP_offset(p_pc, GEN86_CC_NZ, offset)
+#define gen86_jlP_offset(p_pc, offset)         gen86_jccP_offset(p_pc, GEN86_CC_L, offset)
+#define gen86_jncP_offset(p_pc, offset)        gen86_jccP_offset(p_pc, GEN86_CC_NC, offset)
+#define gen86_jnoP_offset(p_pc, offset)        gen86_jccP_offset(p_pc, GEN86_CC_NO, offset)
+#define gen86_jsP_offset(p_pc, offset)         gen86_jccP_offset(p_pc, GEN86_CC_S, offset)
+#define gen86_jaP_offset(p_pc, offset)         gen86_jccP_offset(p_pc, GEN86_CC_A, offset)
+#define gen86_joP_offset(p_pc, offset)         gen86_jccP_offset(p_pc, GEN86_CC_O, offset)
+#define gen86_jleP_offset(p_pc, offset)        gen86_jccP_offset(p_pc, GEN86_CC_LE, offset)
+#define gen86_jnpP_offset(p_pc, offset)        gen86_jccP_offset(p_pc, GEN86_CC_NP, offset)
+#define gen86_jgeP_offset(p_pc, offset)        gen86_jccP_offset(p_pc, GEN86_CC_GE, offset)
+#define gen86_jae(p_pc, addr)                  gen86_jcc(p_pc, GEN86_CC_AE, addr)
+#define gen86_jbe(p_pc, addr)                  gen86_jcc(p_pc, GEN86_CC_BE, addr)
+#define gen86_jb(p_pc, addr)                   gen86_jcc(p_pc, GEN86_CC_B, addr)
+#define gen86_jna(p_pc, addr)                  gen86_jcc(p_pc, GEN86_CC_NA, addr)
+#define gen86_jnae(p_pc, addr)                 gen86_jcc(p_pc, GEN86_CC_NAE, addr)
+#define gen86_jpe(p_pc, addr)                  gen86_jcc(p_pc, GEN86_CC_PE, addr)
+#define gen86_jne(p_pc, addr)                  gen86_jcc(p_pc, GEN86_CC_NE, addr)
+#define gen86_jng(p_pc, addr)                  gen86_jcc(p_pc, GEN86_CC_NG, addr)
+#define gen86_jg(p_pc, addr)                   gen86_jcc(p_pc, GEN86_CC_G, addr)
+#define gen86_jz(p_pc, addr)                   gen86_jcc(p_pc, GEN86_CC_Z, addr)
+#define gen86_jns(p_pc, addr)                  gen86_jcc(p_pc, GEN86_CC_NS, addr)
+#define gen86_jp(p_pc, addr)                   gen86_jcc(p_pc, GEN86_CC_P, addr)
+#define gen86_jnb(p_pc, addr)                  gen86_jcc(p_pc, GEN86_CC_NB, addr)
+#define gen86_jc(p_pc, addr)                   gen86_jcc(p_pc, GEN86_CC_C, addr)
+#define gen86_jnge(p_pc, addr)                 gen86_jcc(p_pc, GEN86_CC_NGE, addr)
+#define gen86_jnbe(p_pc, addr)                 gen86_jcc(p_pc, GEN86_CC_NBE, addr)
+#define gen86_jnle(p_pc, addr)                 gen86_jcc(p_pc, GEN86_CC_NLE, addr)
+#define gen86_jpo(p_pc, addr)                  gen86_jcc(p_pc, GEN86_CC_PO, addr)
+#define gen86_je(p_pc, addr)                   gen86_jcc(p_pc, GEN86_CC_E, addr)
+#define gen86_jnl(p_pc, addr)                  gen86_jcc(p_pc, GEN86_CC_NL, addr)
+#define gen86_jnz(p_pc, addr)                  gen86_jcc(p_pc, GEN86_CC_NZ, addr)
+#define gen86_jl(p_pc, addr)                   gen86_jcc(p_pc, GEN86_CC_L, addr)
+#define gen86_jnc(p_pc, addr)                  gen86_jcc(p_pc, GEN86_CC_NC, addr)
+#define gen86_jno(p_pc, addr)                  gen86_jcc(p_pc, GEN86_CC_NO, addr)
+#define gen86_js(p_pc, addr)                   gen86_jcc(p_pc, GEN86_CC_S, addr)
+#define gen86_ja(p_pc, addr)                   gen86_jcc(p_pc, GEN86_CC_A, addr)
+#define gen86_jo(p_pc, addr)                   gen86_jcc(p_pc, GEN86_CC_O, addr)
+#define gen86_jle(p_pc, addr)                  gen86_jcc(p_pc, GEN86_CC_LE, addr)
+#define gen86_jnp(p_pc, addr)                  gen86_jcc(p_pc, GEN86_CC_NP, addr)
+#define gen86_jge(p_pc, addr)                  gen86_jcc(p_pc, GEN86_CC_GE, addr)
+#define gen86_jae_offset(p_pc, offset)         gen86_jcc_offset(p_pc, GEN86_CC_AE, offset)
+#define gen86_jbe_offset(p_pc, offset)         gen86_jcc_offset(p_pc, GEN86_CC_BE, offset)
+#define gen86_jb_offset(p_pc, offset)          gen86_jcc_offset(p_pc, GEN86_CC_B, offset)
+#define gen86_jna_offset(p_pc, offset)         gen86_jcc_offset(p_pc, GEN86_CC_NA, offset)
+#define gen86_jnae_offset(p_pc, offset)        gen86_jcc_offset(p_pc, GEN86_CC_NAE, offset)
+#define gen86_jpe_offset(p_pc, offset)         gen86_jcc_offset(p_pc, GEN86_CC_PE, offset)
+#define gen86_jne_offset(p_pc, offset)         gen86_jcc_offset(p_pc, GEN86_CC_NE, offset)
+#define gen86_jng_offset(p_pc, offset)         gen86_jcc_offset(p_pc, GEN86_CC_NG, offset)
+#define gen86_jg_offset(p_pc, offset)          gen86_jcc_offset(p_pc, GEN86_CC_G, offset)
+#define gen86_jz_offset(p_pc, offset)          gen86_jcc_offset(p_pc, GEN86_CC_Z, offset)
+#define gen86_jns_offset(p_pc, offset)         gen86_jcc_offset(p_pc, GEN86_CC_NS, offset)
+#define gen86_jp_offset(p_pc, offset)          gen86_jcc_offset(p_pc, GEN86_CC_P, offset)
+#define gen86_jnb_offset(p_pc, offset)         gen86_jcc_offset(p_pc, GEN86_CC_NB, offset)
+#define gen86_jc_offset(p_pc, offset)          gen86_jcc_offset(p_pc, GEN86_CC_C, offset)
+#define gen86_jnge_offset(p_pc, offset)        gen86_jcc_offset(p_pc, GEN86_CC_NGE, offset)
+#define gen86_jnbe_offset(p_pc, offset)        gen86_jcc_offset(p_pc, GEN86_CC_NBE, offset)
+#define gen86_jnle_offset(p_pc, offset)        gen86_jcc_offset(p_pc, GEN86_CC_NLE, offset)
+#define gen86_jpo_offset(p_pc, offset)         gen86_jcc_offset(p_pc, GEN86_CC_PO, offset)
+#define gen86_je_offset(p_pc, offset)          gen86_jcc_offset(p_pc, GEN86_CC_E, offset)
+#define gen86_jnl_offset(p_pc, offset)         gen86_jcc_offset(p_pc, GEN86_CC_NL, offset)
+#define gen86_jnz_offset(p_pc, offset)         gen86_jcc_offset(p_pc, GEN86_CC_NZ, offset)
+#define gen86_jl_offset(p_pc, offset)          gen86_jcc_offset(p_pc, GEN86_CC_L, offset)
+#define gen86_jnc_offset(p_pc, offset)         gen86_jcc_offset(p_pc, GEN86_CC_NC, offset)
+#define gen86_jno_offset(p_pc, offset)         gen86_jcc_offset(p_pc, GEN86_CC_NO, offset)
+#define gen86_js_offset(p_pc, offset)          gen86_jcc_offset(p_pc, GEN86_CC_S, offset)
+#define gen86_ja_offset(p_pc, offset)          gen86_jcc_offset(p_pc, GEN86_CC_A, offset)
+#define gen86_jo_offset(p_pc, offset)          gen86_jcc_offset(p_pc, GEN86_CC_O, offset)
+#define gen86_jle_offset(p_pc, offset)         gen86_jcc_offset(p_pc, GEN86_CC_LE, offset)
+#define gen86_jnp_offset(p_pc, offset)         gen86_jcc_offset(p_pc, GEN86_CC_NP, offset)
+#define gen86_jge_offset(p_pc, offset)         gen86_jcc_offset(p_pc, GEN86_CC_GE, offset)
+#define gen86_setae_r(p_pc, reg)               gen86_setcc_r(p_pc, GEN86_CC_AE, reg)
+#define gen86_setbe_r(p_pc, reg)               gen86_setcc_r(p_pc, GEN86_CC_BE, reg)
+#define gen86_setb_r(p_pc, reg)                gen86_setcc_r(p_pc, GEN86_CC_B, reg)
+#define gen86_setna_r(p_pc, reg)               gen86_setcc_r(p_pc, GEN86_CC_NA, reg)
+#define gen86_setnae_r(p_pc, reg)              gen86_setcc_r(p_pc, GEN86_CC_NAE, reg)
+#define gen86_setpe_r(p_pc, reg)               gen86_setcc_r(p_pc, GEN86_CC_PE, reg)
+#define gen86_setne_r(p_pc, reg)               gen86_setcc_r(p_pc, GEN86_CC_NE, reg)
+#define gen86_setng_r(p_pc, reg)               gen86_setcc_r(p_pc, GEN86_CC_NG, reg)
+#define gen86_setg_r(p_pc, reg)                gen86_setcc_r(p_pc, GEN86_CC_G, reg)
+#define gen86_setz_r(p_pc, reg)                gen86_setcc_r(p_pc, GEN86_CC_Z, reg)
+#define gen86_setns_r(p_pc, reg)               gen86_setcc_r(p_pc, GEN86_CC_NS, reg)
+#define gen86_setp_r(p_pc, reg)                gen86_setcc_r(p_pc, GEN86_CC_P, reg)
+#define gen86_setnb_r(p_pc, reg)               gen86_setcc_r(p_pc, GEN86_CC_NB, reg)
+#define gen86_setc_r(p_pc, reg)                gen86_setcc_r(p_pc, GEN86_CC_C, reg)
+#define gen86_setnge_r(p_pc, reg)              gen86_setcc_r(p_pc, GEN86_CC_NGE, reg)
+#define gen86_setnbe_r(p_pc, reg)              gen86_setcc_r(p_pc, GEN86_CC_NBE, reg)
+#define gen86_setnle_r(p_pc, reg)              gen86_setcc_r(p_pc, GEN86_CC_NLE, reg)
+#define gen86_setpo_r(p_pc, reg)               gen86_setcc_r(p_pc, GEN86_CC_PO, reg)
+#define gen86_sete_r(p_pc, reg)                gen86_setcc_r(p_pc, GEN86_CC_E, reg)
+#define gen86_setnl_r(p_pc, reg)               gen86_setcc_r(p_pc, GEN86_CC_NL, reg)
+#define gen86_setnz_r(p_pc, reg)               gen86_setcc_r(p_pc, GEN86_CC_NZ, reg)
+#define gen86_setl_r(p_pc, reg)                gen86_setcc_r(p_pc, GEN86_CC_L, reg)
+#define gen86_setnc_r(p_pc, reg)               gen86_setcc_r(p_pc, GEN86_CC_NC, reg)
+#define gen86_setno_r(p_pc, reg)               gen86_setcc_r(p_pc, GEN86_CC_NO, reg)
+#define gen86_sets_r(p_pc, reg)                gen86_setcc_r(p_pc, GEN86_CC_S, reg)
+#define gen86_seta_r(p_pc, reg)                gen86_setcc_r(p_pc, GEN86_CC_A, reg)
+#define gen86_seto_r(p_pc, reg)                gen86_setcc_r(p_pc, GEN86_CC_O, reg)
+#define gen86_setle_r(p_pc, reg)               gen86_setcc_r(p_pc, GEN86_CC_LE, reg)
+#define gen86_setnp_r(p_pc, reg)               gen86_setcc_r(p_pc, GEN86_CC_NP, reg)
+#define gen86_setge_r(p_pc, reg)               gen86_setcc_r(p_pc, GEN86_CC_GE, reg)
+#define gen86_setae_mod(p_pc, gen_modrm, ...)  gen86_setcc_mod(p_pc, GEN86_CC_AE, gen_modrm, __VA_ARGS__)
+#define gen86_setbe_mod(p_pc, gen_modrm, ...)  gen86_setcc_mod(p_pc, GEN86_CC_BE, gen_modrm, __VA_ARGS__)
+#define gen86_setb_mod(p_pc, gen_modrm, ...)   gen86_setcc_mod(p_pc, GEN86_CC_B, gen_modrm, __VA_ARGS__)
+#define gen86_setna_mod(p_pc, gen_modrm, ...)  gen86_setcc_mod(p_pc, GEN86_CC_NA, gen_modrm, __VA_ARGS__)
+#define gen86_setnae_mod(p_pc, gen_modrm, ...) gen86_setcc_mod(p_pc, GEN86_CC_NAE, gen_modrm, __VA_ARGS__)
+#define gen86_setpe_mod(p_pc, gen_modrm, ...)  gen86_setcc_mod(p_pc, GEN86_CC_PE, gen_modrm, __VA_ARGS__)
+#define gen86_setne_mod(p_pc, gen_modrm, ...)  gen86_setcc_mod(p_pc, GEN86_CC_NE, gen_modrm, __VA_ARGS__)
+#define gen86_setng_mod(p_pc, gen_modrm, ...)  gen86_setcc_mod(p_pc, GEN86_CC_NG, gen_modrm, __VA_ARGS__)
+#define gen86_setg_mod(p_pc, gen_modrm, ...)   gen86_setcc_mod(p_pc, GEN86_CC_G, gen_modrm, __VA_ARGS__)
+#define gen86_setz_mod(p_pc, gen_modrm, ...)   gen86_setcc_mod(p_pc, GEN86_CC_Z, gen_modrm, __VA_ARGS__)
+#define gen86_setns_mod(p_pc, gen_modrm, ...)  gen86_setcc_mod(p_pc, GEN86_CC_NS, gen_modrm, __VA_ARGS__)
+#define gen86_setp_mod(p_pc, gen_modrm, ...)   gen86_setcc_mod(p_pc, GEN86_CC_P, gen_modrm, __VA_ARGS__)
+#define gen86_setnb_mod(p_pc, gen_modrm, ...)  gen86_setcc_mod(p_pc, GEN86_CC_NB, gen_modrm, __VA_ARGS__)
+#define gen86_setc_mod(p_pc, gen_modrm, ...)   gen86_setcc_mod(p_pc, GEN86_CC_C, gen_modrm, __VA_ARGS__)
+#define gen86_setnge_mod(p_pc, gen_modrm, ...) gen86_setcc_mod(p_pc, GEN86_CC_NGE, gen_modrm, __VA_ARGS__)
+#define gen86_setnbe_mod(p_pc, gen_modrm, ...) gen86_setcc_mod(p_pc, GEN86_CC_NBE, gen_modrm, __VA_ARGS__)
+#define gen86_setnle_mod(p_pc, gen_modrm, ...) gen86_setcc_mod(p_pc, GEN86_CC_NLE, gen_modrm, __VA_ARGS__)
+#define gen86_setpo_mod(p_pc, gen_modrm, ...)  gen86_setcc_mod(p_pc, GEN86_CC_PO, gen_modrm, __VA_ARGS__)
+#define gen86_sete_mod(p_pc, gen_modrm, ...)   gen86_setcc_mod(p_pc, GEN86_CC_E, gen_modrm, __VA_ARGS__)
+#define gen86_setnl_mod(p_pc, gen_modrm, ...)  gen86_setcc_mod(p_pc, GEN86_CC_NL, gen_modrm, __VA_ARGS__)
+#define gen86_setnz_mod(p_pc, gen_modrm, ...)  gen86_setcc_mod(p_pc, GEN86_CC_NZ, gen_modrm, __VA_ARGS__)
+#define gen86_setl_mod(p_pc, gen_modrm, ...)   gen86_setcc_mod(p_pc, GEN86_CC_L, gen_modrm, __VA_ARGS__)
+#define gen86_setnc_mod(p_pc, gen_modrm, ...)  gen86_setcc_mod(p_pc, GEN86_CC_NC, gen_modrm, __VA_ARGS__)
+#define gen86_setno_mod(p_pc, gen_modrm, ...)  gen86_setcc_mod(p_pc, GEN86_CC_NO, gen_modrm, __VA_ARGS__)
+#define gen86_sets_mod(p_pc, gen_modrm, ...)   gen86_setcc_mod(p_pc, GEN86_CC_S, gen_modrm, __VA_ARGS__)
+#define gen86_seta_mod(p_pc, gen_modrm, ...)   gen86_setcc_mod(p_pc, GEN86_CC_A, gen_modrm, __VA_ARGS__)
+#define gen86_seto_mod(p_pc, gen_modrm, ...)   gen86_setcc_mod(p_pc, GEN86_CC_O, gen_modrm, __VA_ARGS__)
+#define gen86_setle_mod(p_pc, gen_modrm, ...)  gen86_setcc_mod(p_pc, GEN86_CC_LE, gen_modrm, __VA_ARGS__)
+#define gen86_setnp_mod(p_pc, gen_modrm, ...)  gen86_setcc_mod(p_pc, GEN86_CC_NP, gen_modrm, __VA_ARGS__)
+#define gen86_setge_mod(p_pc, gen_modrm, ...)  gen86_setcc_mod(p_pc, GEN86_CC_GE, gen_modrm, __VA_ARGS__)
+/*[[[end]]]*/
+
+/*[[[deemon
+local names = { "add", "or",  "adc", "sbb", "and", "sub", "xor", "cmp" };
+for (local n: names) {
+	local pad = " " * (3 - #n);
+	print("#define gen86_", n, "b_imm_r(p_pc, imm, reg)", pad, " /" "* ", n, "b", pad, " $imm, %reg *" "/ gen86_", n, "b_imm_mod(p_pc, gen86_modrm_r, imm, reg)");
+	print("#define gen86_", n, "w_imm_r(p_pc, imm, reg)", pad, " /" "* ", n, "w", pad, " $imm, %reg *" "/ gen86_", n, "w_imm_mod(p_pc, gen86_modrm_r, imm, reg)");
+	print("#define gen86_", n, "l_imm_r(p_pc, imm, reg)", pad, " /" "* ", n, "l", pad, " $imm, %reg *" "/ gen86_", n, "l_imm_mod(p_pc, gen86_modrm_r, imm, reg)");
+	print("#define gen86_", n, "P_imm_r(p_pc, imm, reg)", pad, " /" "* ", n, "P", pad, " $imm, %reg *" "/ gen86_", n, "P_imm_mod(p_pc, gen86_modrm_r, imm, reg)");
+}
+print("#if LIBGEN86_TARGET_BITS == 64");
+for (local n: names) {
+	local pad = " " * (3 - #n);
+	print("#define gen86_", n, "q_imm_r(p_pc, imm, reg)", pad, " /" "* ", n, "q", pad, " $imm, %reg *" "/ gen86_", n, "q_imm_mod(p_pc, gen86_modrm_r, imm, reg)");
+}
+print("#endif /" "* LIBGEN86_TARGET_BITS == 64 *" "/");
+]]]*/
+#define gen86_addb_imm_r(p_pc, imm, reg) /* addb $imm, %reg */ gen86_addb_imm_mod(p_pc, gen86_modrm_r, imm, reg)
+#define gen86_addw_imm_r(p_pc, imm, reg) /* addw $imm, %reg */ gen86_addw_imm_mod(p_pc, gen86_modrm_r, imm, reg)
+#define gen86_addl_imm_r(p_pc, imm, reg) /* addl $imm, %reg */ gen86_addl_imm_mod(p_pc, gen86_modrm_r, imm, reg)
+#define gen86_addP_imm_r(p_pc, imm, reg) /* addP $imm, %reg */ gen86_addP_imm_mod(p_pc, gen86_modrm_r, imm, reg)
+#define gen86_orb_imm_r(p_pc, imm, reg)  /* orb  $imm, %reg */ gen86_orb_imm_mod(p_pc, gen86_modrm_r, imm, reg)
+#define gen86_orw_imm_r(p_pc, imm, reg)  /* orw  $imm, %reg */ gen86_orw_imm_mod(p_pc, gen86_modrm_r, imm, reg)
+#define gen86_orl_imm_r(p_pc, imm, reg)  /* orl  $imm, %reg */ gen86_orl_imm_mod(p_pc, gen86_modrm_r, imm, reg)
+#define gen86_orP_imm_r(p_pc, imm, reg)  /* orP  $imm, %reg */ gen86_orP_imm_mod(p_pc, gen86_modrm_r, imm, reg)
+#define gen86_adcb_imm_r(p_pc, imm, reg) /* adcb $imm, %reg */ gen86_adcb_imm_mod(p_pc, gen86_modrm_r, imm, reg)
+#define gen86_adcw_imm_r(p_pc, imm, reg) /* adcw $imm, %reg */ gen86_adcw_imm_mod(p_pc, gen86_modrm_r, imm, reg)
+#define gen86_adcl_imm_r(p_pc, imm, reg) /* adcl $imm, %reg */ gen86_adcl_imm_mod(p_pc, gen86_modrm_r, imm, reg)
+#define gen86_adcP_imm_r(p_pc, imm, reg) /* adcP $imm, %reg */ gen86_adcP_imm_mod(p_pc, gen86_modrm_r, imm, reg)
+#define gen86_sbbb_imm_r(p_pc, imm, reg) /* sbbb $imm, %reg */ gen86_sbbb_imm_mod(p_pc, gen86_modrm_r, imm, reg)
+#define gen86_sbbw_imm_r(p_pc, imm, reg) /* sbbw $imm, %reg */ gen86_sbbw_imm_mod(p_pc, gen86_modrm_r, imm, reg)
+#define gen86_sbbl_imm_r(p_pc, imm, reg) /* sbbl $imm, %reg */ gen86_sbbl_imm_mod(p_pc, gen86_modrm_r, imm, reg)
+#define gen86_sbbP_imm_r(p_pc, imm, reg) /* sbbP $imm, %reg */ gen86_sbbP_imm_mod(p_pc, gen86_modrm_r, imm, reg)
+#define gen86_andb_imm_r(p_pc, imm, reg) /* andb $imm, %reg */ gen86_andb_imm_mod(p_pc, gen86_modrm_r, imm, reg)
+#define gen86_andw_imm_r(p_pc, imm, reg) /* andw $imm, %reg */ gen86_andw_imm_mod(p_pc, gen86_modrm_r, imm, reg)
+#define gen86_andl_imm_r(p_pc, imm, reg) /* andl $imm, %reg */ gen86_andl_imm_mod(p_pc, gen86_modrm_r, imm, reg)
+#define gen86_andP_imm_r(p_pc, imm, reg) /* andP $imm, %reg */ gen86_andP_imm_mod(p_pc, gen86_modrm_r, imm, reg)
+#define gen86_subb_imm_r(p_pc, imm, reg) /* subb $imm, %reg */ gen86_subb_imm_mod(p_pc, gen86_modrm_r, imm, reg)
+#define gen86_subw_imm_r(p_pc, imm, reg) /* subw $imm, %reg */ gen86_subw_imm_mod(p_pc, gen86_modrm_r, imm, reg)
+#define gen86_subl_imm_r(p_pc, imm, reg) /* subl $imm, %reg */ gen86_subl_imm_mod(p_pc, gen86_modrm_r, imm, reg)
+#define gen86_subP_imm_r(p_pc, imm, reg) /* subP $imm, %reg */ gen86_subP_imm_mod(p_pc, gen86_modrm_r, imm, reg)
+#define gen86_xorb_imm_r(p_pc, imm, reg) /* xorb $imm, %reg */ gen86_xorb_imm_mod(p_pc, gen86_modrm_r, imm, reg)
+#define gen86_xorw_imm_r(p_pc, imm, reg) /* xorw $imm, %reg */ gen86_xorw_imm_mod(p_pc, gen86_modrm_r, imm, reg)
+#define gen86_xorl_imm_r(p_pc, imm, reg) /* xorl $imm, %reg */ gen86_xorl_imm_mod(p_pc, gen86_modrm_r, imm, reg)
+#define gen86_xorP_imm_r(p_pc, imm, reg) /* xorP $imm, %reg */ gen86_xorP_imm_mod(p_pc, gen86_modrm_r, imm, reg)
+#define gen86_cmpb_imm_r(p_pc, imm, reg) /* cmpb $imm, %reg */ gen86_cmpb_imm_mod(p_pc, gen86_modrm_r, imm, reg)
+#define gen86_cmpw_imm_r(p_pc, imm, reg) /* cmpw $imm, %reg */ gen86_cmpw_imm_mod(p_pc, gen86_modrm_r, imm, reg)
+#define gen86_cmpl_imm_r(p_pc, imm, reg) /* cmpl $imm, %reg */ gen86_cmpl_imm_mod(p_pc, gen86_modrm_r, imm, reg)
+#define gen86_cmpP_imm_r(p_pc, imm, reg) /* cmpP $imm, %reg */ gen86_cmpP_imm_mod(p_pc, gen86_modrm_r, imm, reg)
+#if LIBGEN86_TARGET_BITS == 64
+#define gen86_addq_imm_r(p_pc, imm, reg) /* addq $imm, %reg */ gen86_addq_imm_mod(p_pc, gen86_modrm_r, imm, reg)
+#define gen86_orq_imm_r(p_pc, imm, reg)  /* orq  $imm, %reg */ gen86_orq_imm_mod(p_pc, gen86_modrm_r, imm, reg)
+#define gen86_adcq_imm_r(p_pc, imm, reg) /* adcq $imm, %reg */ gen86_adcq_imm_mod(p_pc, gen86_modrm_r, imm, reg)
+#define gen86_sbbq_imm_r(p_pc, imm, reg) /* sbbq $imm, %reg */ gen86_sbbq_imm_mod(p_pc, gen86_modrm_r, imm, reg)
+#define gen86_andq_imm_r(p_pc, imm, reg) /* andq $imm, %reg */ gen86_andq_imm_mod(p_pc, gen86_modrm_r, imm, reg)
+#define gen86_subq_imm_r(p_pc, imm, reg) /* subq $imm, %reg */ gen86_subq_imm_mod(p_pc, gen86_modrm_r, imm, reg)
+#define gen86_xorq_imm_r(p_pc, imm, reg) /* xorq $imm, %reg */ gen86_xorq_imm_mod(p_pc, gen86_modrm_r, imm, reg)
+#define gen86_cmpq_imm_r(p_pc, imm, reg) /* cmpq $imm, %reg */ gen86_cmpq_imm_mod(p_pc, gen86_modrm_r, imm, reg)
+#endif /* LIBGEN86_TARGET_BITS == 64 */
+/*[[[end]]]*/
+
+/* For convenience, define inlined modr/m versions of `mov' */
+#define gen86_movb_d_r(p_pc, src_disps, dst_reg)                                    /* movb src_disps, %dst_reg                                 */ gen86_movb_mod_r(p_pc, gen86_modrm_d, dst_reg, src_disps)
+#define gen86_movw_d_r(p_pc, src_disps, dst_reg)                                    /* movw src_disps, %dst_reg                                 */ gen86_movw_mod_r(p_pc, gen86_modrm_d, dst_reg, src_disps)
+#define gen86_movl_d_r(p_pc, src_disps, dst_reg)                                    /* movl src_disps, %dst_reg                                 */ gen86_movl_mod_r(p_pc, gen86_modrm_d, dst_reg, src_disps)
+#define gen86_movP_d_r(p_pc, src_disps, dst_reg)                                    /* movP src_disps, %dst_reg                                 */ gen86_movP_mod_r(p_pc, gen86_modrm_d, dst_reg, src_disps)
+#define gen86_movb_b_r(p_pc, src_breg, dst_reg)                                     /* movb (%src_breg), %dst_reg                               */ gen86_movb_mod_r(p_pc, gen86_modrm_b, dst_reg, src_breg)
+#define gen86_movw_b_r(p_pc, src_breg, dst_reg)                                     /* movw (%src_breg), %dst_reg                               */ gen86_movw_mod_r(p_pc, gen86_modrm_b, dst_reg, src_breg)
+#define gen86_movl_b_r(p_pc, src_breg, dst_reg)                                     /* movl (%src_breg), %dst_reg                               */ gen86_movl_mod_r(p_pc, gen86_modrm_b, dst_reg, src_breg)
+#define gen86_movP_b_r(p_pc, src_breg, dst_reg)                                     /* movP (%src_breg), %dst_reg                               */ gen86_movP_mod_r(p_pc, gen86_modrm_b, dst_reg, src_breg)
+#define gen86_movb_db_r(p_pc, src_disps, src_breg, dst_reg)                         /* movb src_disps(%src_breg), %dst_reg                      */ gen86_movb_mod_r(p_pc, gen86_modrm_db, dst_reg, src_disps, src_breg)
+#define gen86_movw_db_r(p_pc, src_disps, src_breg, dst_reg)                         /* movw src_disps(%src_breg), %dst_reg                      */ gen86_movw_mod_r(p_pc, gen86_modrm_db, dst_reg, src_disps, src_breg)
+#define gen86_movl_db_r(p_pc, src_disps, src_breg, dst_reg)                         /* movl src_disps(%src_breg), %dst_reg                      */ gen86_movl_mod_r(p_pc, gen86_modrm_db, dst_reg, src_disps, src_breg)
+#define gen86_movP_db_r(p_pc, src_disps, src_breg, dst_reg)                         /* movP src_disps(%src_breg), %dst_reg                      */ gen86_movP_mod_r(p_pc, gen86_modrm_db, dst_reg, src_disps, src_breg)
+#define gen86_movb_bi_r(p_pc, src_breg, src_index, dst_reg)                         /* movb (%src_breg,%src_index), %dst_reg                    */ gen86_movb_mod_r(p_pc, gen86_modrm_bi, dst_reg, src_breg, src_index)
+#define gen86_movw_bi_r(p_pc, src_breg, src_index, dst_reg)                         /* movw (%src_breg,%src_index), %dst_reg                    */ gen86_movw_mod_r(p_pc, gen86_modrm_bi, dst_reg, src_breg, src_index)
+#define gen86_movl_bi_r(p_pc, src_breg, src_index, dst_reg)                         /* movl (%src_breg,%src_index), %dst_reg                    */ gen86_movl_mod_r(p_pc, gen86_modrm_bi, dst_reg, src_breg, src_index)
+#define gen86_movP_bi_r(p_pc, src_breg, src_index, dst_reg)                         /* movP (%src_breg,%src_index), %dst_reg                    */ gen86_movP_mod_r(p_pc, gen86_modrm_bi, dst_reg, src_breg, src_index)
+#define gen86_movb_dbi_r(p_pc, src_disps, src_breg, src_index, dst_reg)             /* movb src_disps(%src_breg,%src_index), %dst_reg           */ gen86_movb_mod_r(p_pc, gen86_modrm_dbi, dst_reg, src_disps, src_breg, src_index)
+#define gen86_movw_dbi_r(p_pc, src_disps, src_breg, src_index, dst_reg)             /* movw src_disps(%src_breg,%src_index), %dst_reg           */ gen86_movw_mod_r(p_pc, gen86_modrm_dbi, dst_reg, src_disps, src_breg, src_index)
+#define gen86_movl_dbi_r(p_pc, src_disps, src_breg, src_index, dst_reg)             /* movl src_disps(%src_breg,%src_index), %dst_reg           */ gen86_movl_mod_r(p_pc, gen86_modrm_dbi, dst_reg, src_disps, src_breg, src_index)
+#define gen86_movP_dbi_r(p_pc, src_disps, src_breg, src_index, dst_reg)             /* movP src_disps(%src_breg,%src_index), %dst_reg           */ gen86_movP_mod_r(p_pc, gen86_modrm_dbi, dst_reg, src_disps, src_breg, src_index)
+#define gen86_movb_bis_r(p_pc, src_breg, src_index, src_scale, dst_reg)             /* movb (%src_breg,%src_index,src_scale), %dst_reg          */ gen86_movb_mod_r(p_pc, gen86_modrm_bis, dst_reg, src_breg, src_index, src_scale)
+#define gen86_movw_bis_r(p_pc, src_breg, src_index, src_scale, dst_reg)             /* movw (%src_breg,%src_index,src_scale), %dst_reg          */ gen86_movw_mod_r(p_pc, gen86_modrm_bis, dst_reg, src_breg, src_index, src_scale)
+#define gen86_movl_bis_r(p_pc, src_breg, src_index, src_scale, dst_reg)             /* movl (%src_breg,%src_index,src_scale), %dst_reg          */ gen86_movl_mod_r(p_pc, gen86_modrm_bis, dst_reg, src_breg, src_index, src_scale)
+#define gen86_movP_bis_r(p_pc, src_breg, src_index, src_scale, dst_reg)             /* movP (%src_breg,%src_index,src_scale), %dst_reg          */ gen86_movP_mod_r(p_pc, gen86_modrm_bis, dst_reg, src_breg, src_index, src_scale)
+#define gen86_movb_dbis_r(p_pc, src_disps, src_breg, src_index, src_scale, dst_reg) /* movb src_disps(%src_breg,%src_index,src_scale), %dst_reg */ gen86_movb_mod_r(p_pc, gen86_modrm_dbis, dst_reg, src_disps, src_breg, src_index, src_scale)
+#define gen86_movw_dbis_r(p_pc, src_disps, src_breg, src_index, src_scale, dst_reg) /* movw src_disps(%src_breg,%src_index,src_scale), %dst_reg */ gen86_movw_mod_r(p_pc, gen86_modrm_dbis, dst_reg, src_disps, src_breg, src_index, src_scale)
+#define gen86_movl_dbis_r(p_pc, src_disps, src_breg, src_index, src_scale, dst_reg) /* movl src_disps(%src_breg,%src_index,src_scale), %dst_reg */ gen86_movl_mod_r(p_pc, gen86_modrm_dbis, dst_reg, src_disps, src_breg, src_index, src_scale)
+#define gen86_movP_dbis_r(p_pc, src_disps, src_breg, src_index, src_scale, dst_reg) /* movP src_disps(%src_breg,%src_index,src_scale), %dst_reg */ gen86_movP_mod_r(p_pc, gen86_modrm_dbis, dst_reg, src_disps, src_breg, src_index, src_scale)
+#define gen86_movb_r_d(p_pc, src_reg, dst_disps)                                    /* movb %src_reg, dst_disps                                 */ gen86_movb_r_mod(p_pc, gen86_modrm_d, src_reg, dst_disps)
+#define gen86_movw_r_d(p_pc, src_reg, dst_disps)                                    /* movw %src_reg, dst_disps                                 */ gen86_movw_r_mod(p_pc, gen86_modrm_d, src_reg, dst_disps)
+#define gen86_movl_r_d(p_pc, src_reg, dst_disps)                                    /* movl %src_reg, dst_disps                                 */ gen86_movl_r_mod(p_pc, gen86_modrm_d, src_reg, dst_disps)
+#define gen86_movP_r_d(p_pc, src_reg, dst_disps)                                    /* movP %src_reg, dst_disps                                 */ gen86_movP_r_mod(p_pc, gen86_modrm_d, src_reg, dst_disps)
+#define gen86_movb_r_b(p_pc, src_reg, dst_breg)                                     /* movb %src_reg, (%dst_breg)                               */ gen86_movb_r_mod(p_pc, gen86_modrm_b, src_reg, dst_breg)
+#define gen86_movw_r_b(p_pc, src_reg, dst_breg)                                     /* movw %src_reg, (%dst_breg)                               */ gen86_movw_r_mod(p_pc, gen86_modrm_b, src_reg, dst_breg)
+#define gen86_movl_r_b(p_pc, src_reg, dst_breg)                                     /* movl %src_reg, (%dst_breg)                               */ gen86_movl_r_mod(p_pc, gen86_modrm_b, src_reg, dst_breg)
+#define gen86_movP_r_b(p_pc, src_reg, dst_breg)                                     /* movP %src_reg, (%dst_breg)                               */ gen86_movP_r_mod(p_pc, gen86_modrm_b, src_reg, dst_breg)
+#define gen86_movb_r_db(p_pc, src_reg, dst_disps, dst_breg)                         /* movb %src_reg, dst_disps(%dst_breg)                      */ gen86_movb_r_mod(p_pc, gen86_modrm_db, src_reg, dst_disps, dst_breg)
+#define gen86_movw_r_db(p_pc, src_reg, dst_disps, dst_breg)                         /* movw %src_reg, dst_disps(%dst_breg)                      */ gen86_movw_r_mod(p_pc, gen86_modrm_db, src_reg, dst_disps, dst_breg)
+#define gen86_movl_r_db(p_pc, src_reg, dst_disps, dst_breg)                         /* movl %src_reg, dst_disps(%dst_breg)                      */ gen86_movl_r_mod(p_pc, gen86_modrm_db, src_reg, dst_disps, dst_breg)
+#define gen86_movP_r_db(p_pc, src_reg, dst_disps, dst_breg)                         /* movP %src_reg, dst_disps(%dst_breg)                      */ gen86_movP_r_mod(p_pc, gen86_modrm_db, src_reg, dst_disps, dst_breg)
+#define gen86_movb_r_bi(p_pc, src_reg, dst_breg, dst_index)                         /* movb %src_reg, (%dst_breg,%dst_index)                    */ gen86_movb_r_mod(p_pc, gen86_modrm_bi, src_reg, dst_breg, dst_index)
+#define gen86_movw_r_bi(p_pc, src_reg, dst_breg, dst_index)                         /* movw %src_reg, (%dst_breg,%dst_index)                    */ gen86_movw_r_mod(p_pc, gen86_modrm_bi, src_reg, dst_breg, dst_index)
+#define gen86_movl_r_bi(p_pc, src_reg, dst_breg, dst_index)                         /* movl %src_reg, (%dst_breg,%dst_index)                    */ gen86_movl_r_mod(p_pc, gen86_modrm_bi, src_reg, dst_breg, dst_index)
+#define gen86_movP_r_bi(p_pc, src_reg, dst_breg, dst_index)                         /* movP %src_reg, (%dst_breg,%dst_index)                    */ gen86_movP_r_mod(p_pc, gen86_modrm_bi, src_reg, dst_breg, dst_index)
+#define gen86_movb_r_dbi(p_pc, src_reg, dst_disps, dst_breg, dst_index)             /* movb %src_reg, dst_disps(%dst_breg,%dst_index)           */ gen86_movb_r_mod(p_pc, gen86_modrm_dbi, src_reg, dst_disps, dst_breg, dst_index)
+#define gen86_movw_r_dbi(p_pc, src_reg, dst_disps, dst_breg, dst_index)             /* movw %src_reg, dst_disps(%dst_breg,%dst_index)           */ gen86_movw_r_mod(p_pc, gen86_modrm_dbi, src_reg, dst_disps, dst_breg, dst_index)
+#define gen86_movl_r_dbi(p_pc, src_reg, dst_disps, dst_breg, dst_index)             /* movl %src_reg, dst_disps(%dst_breg,%dst_index)           */ gen86_movl_r_mod(p_pc, gen86_modrm_dbi, src_reg, dst_disps, dst_breg, dst_index)
+#define gen86_movP_r_dbi(p_pc, src_reg, dst_disps, dst_breg, dst_index)             /* movP %src_reg, dst_disps(%dst_breg,%dst_index)           */ gen86_movP_r_mod(p_pc, gen86_modrm_dbi, src_reg, dst_disps, dst_breg, dst_index)
+#define gen86_movb_r_bis(p_pc, src_reg, dst_breg, dst_index, dst_scale)             /* movb %src_reg, (%dst_breg,%dst_index,dst_scale)          */ gen86_movb_r_mod(p_pc, gen86_modrm_bis, src_reg, dst_breg, dst_index, dst_scale)
+#define gen86_movw_r_bis(p_pc, src_reg, dst_breg, dst_index, dst_scale)             /* movw %src_reg, (%dst_breg,%dst_index,dst_scale)          */ gen86_movw_r_mod(p_pc, gen86_modrm_bis, src_reg, dst_breg, dst_index, dst_scale)
+#define gen86_movl_r_bis(p_pc, src_reg, dst_breg, dst_index, dst_scale)             /* movl %src_reg, (%dst_breg,%dst_index,dst_scale)          */ gen86_movl_r_mod(p_pc, gen86_modrm_bis, src_reg, dst_breg, dst_index, dst_scale)
+#define gen86_movP_r_bis(p_pc, src_reg, dst_breg, dst_index, dst_scale)             /* movP %src_reg, (%dst_breg,%dst_index,dst_scale)          */ gen86_movP_r_mod(p_pc, gen86_modrm_bis, src_reg, dst_breg, dst_index, dst_scale)
+#define gen86_movb_r_dbis(p_pc, src_reg, dst_disps, dst_breg, dst_index, dst_scale) /* movb %src_reg, dst_disps(%dst_breg,%dst_index,dst_scale) */ gen86_movb_r_mod(p_pc, gen86_modrm_dbis, src_reg, dst_disps, dst_breg, dst_index, dst_scale)
+#define gen86_movw_r_dbis(p_pc, src_reg, dst_disps, dst_breg, dst_index, dst_scale) /* movw %src_reg, dst_disps(%dst_breg,%dst_index,dst_scale) */ gen86_movw_r_mod(p_pc, gen86_modrm_dbis, src_reg, dst_disps, dst_breg, dst_index, dst_scale)
+#define gen86_movl_r_dbis(p_pc, src_reg, dst_disps, dst_breg, dst_index, dst_scale) /* movl %src_reg, dst_disps(%dst_breg,%dst_index,dst_scale) */ gen86_movl_r_mod(p_pc, gen86_modrm_dbis, src_reg, dst_disps, dst_breg, dst_index, dst_scale)
+#define gen86_movP_r_dbis(p_pc, src_reg, dst_disps, dst_breg, dst_index, dst_scale) /* movP %src_reg, dst_disps(%dst_breg,%dst_index,dst_scale) */ gen86_movP_r_mod(p_pc, gen86_modrm_dbis, src_reg, dst_disps, dst_breg, dst_index, dst_scale)
+#define gen86_movb_imm_d(p_pc, imm, dst_disps)                                      /* movb $imm, dst_disps                                     */ gen86_movb_imm_mod(p_pc, gen86_modrm_d, imm, dst_disps)
+#define gen86_movw_imm_d(p_pc, imm, dst_disps)                                      /* movw $imm, dst_disps                                     */ gen86_movw_imm_mod(p_pc, gen86_modrm_d, imm, dst_disps)
+#define gen86_movl_imm_d(p_pc, imm, dst_disps)                                      /* movl $imm, dst_disps                                     */ gen86_movl_imm_mod(p_pc, gen86_modrm_d, imm, dst_disps)
+#define gen86_movP_imm_d(p_pc, imm, dst_disps)                                      /* movP $imm, dst_disps                                     */ gen86_movP_imm_mod(p_pc, gen86_modrm_d, imm, dst_disps)
+#define gen86_movb_imm_b(p_pc, imm, dst_breg)                                       /* movb $imm, (%dst_breg)                                   */ gen86_movb_imm_mod(p_pc, gen86_modrm_b, imm, dst_breg)
+#define gen86_movw_imm_b(p_pc, imm, dst_breg)                                       /* movw $imm, (%dst_breg)                                   */ gen86_movw_imm_mod(p_pc, gen86_modrm_b, imm, dst_breg)
+#define gen86_movl_imm_b(p_pc, imm, dst_breg)                                       /* movl $imm, (%dst_breg)                                   */ gen86_movl_imm_mod(p_pc, gen86_modrm_b, imm, dst_breg)
+#define gen86_movP_imm_b(p_pc, imm, dst_breg)                                       /* movP $imm, (%dst_breg)                                   */ gen86_movP_imm_mod(p_pc, gen86_modrm_b, imm, dst_breg)
+#define gen86_movb_imm_db(p_pc, imm, dst_disps, dst_breg)                           /* movb $imm, dst_disps(%dst_breg)                          */ gen86_movb_imm_mod(p_pc, gen86_modrm_db, imm, dst_disps, dst_breg)
+#define gen86_movw_imm_db(p_pc, imm, dst_disps, dst_breg)                           /* movw $imm, dst_disps(%dst_breg)                          */ gen86_movw_imm_mod(p_pc, gen86_modrm_db, imm, dst_disps, dst_breg)
+#define gen86_movl_imm_db(p_pc, imm, dst_disps, dst_breg)                           /* movl $imm, dst_disps(%dst_breg)                          */ gen86_movl_imm_mod(p_pc, gen86_modrm_db, imm, dst_disps, dst_breg)
+#define gen86_movP_imm_db(p_pc, imm, dst_disps, dst_breg)                           /* movP $imm, dst_disps(%dst_breg)                          */ gen86_movP_imm_mod(p_pc, gen86_modrm_db, imm, dst_disps, dst_breg)
+#define gen86_movb_imm_bi(p_pc, imm, dst_breg, dst_index)                           /* movb $imm, (%dst_breg,%dst_index)                        */ gen86_movb_imm_mod(p_pc, gen86_modrm_bi, imm, dst_breg, dst_index)
+#define gen86_movw_imm_bi(p_pc, imm, dst_breg, dst_index)                           /* movw $imm, (%dst_breg,%dst_index)                        */ gen86_movw_imm_mod(p_pc, gen86_modrm_bi, imm, dst_breg, dst_index)
+#define gen86_movl_imm_bi(p_pc, imm, dst_breg, dst_index)                           /* movl $imm, (%dst_breg,%dst_index)                        */ gen86_movl_imm_mod(p_pc, gen86_modrm_bi, imm, dst_breg, dst_index)
+#define gen86_movP_imm_bi(p_pc, imm, dst_breg, dst_index)                           /* movP $imm, (%dst_breg,%dst_index)                        */ gen86_movP_imm_mod(p_pc, gen86_modrm_bi, imm, dst_breg, dst_index)
+#define gen86_movb_imm_dbi(p_pc, imm, dst_disps, dst_breg, dst_index)               /* movb $imm, dst_disps(%dst_breg,%dst_index)               */ gen86_movb_imm_mod(p_pc, gen86_modrm_dbi, imm, dst_disps, dst_breg, dst_index)
+#define gen86_movw_imm_dbi(p_pc, imm, dst_disps, dst_breg, dst_index)               /* movw $imm, dst_disps(%dst_breg,%dst_index)               */ gen86_movw_imm_mod(p_pc, gen86_modrm_dbi, imm, dst_disps, dst_breg, dst_index)
+#define gen86_movl_imm_dbi(p_pc, imm, dst_disps, dst_breg, dst_index)               /* movl $imm, dst_disps(%dst_breg,%dst_index)               */ gen86_movl_imm_mod(p_pc, gen86_modrm_dbi, imm, dst_disps, dst_breg, dst_index)
+#define gen86_movP_imm_dbi(p_pc, imm, dst_disps, dst_breg, dst_index)               /* movP $imm, dst_disps(%dst_breg,%dst_index)               */ gen86_movP_imm_mod(p_pc, gen86_modrm_dbi, imm, dst_disps, dst_breg, dst_index)
+#define gen86_movb_imm_bis(p_pc, imm, dst_breg, dst_index, dst_scale)               /* movb $imm, (%dst_breg,%dst_index,dst_scale)              */ gen86_movb_imm_mod(p_pc, gen86_modrm_bis, imm, dst_breg, dst_index, dst_scale)
+#define gen86_movw_imm_bis(p_pc, imm, dst_breg, dst_index, dst_scale)               /* movw $imm, (%dst_breg,%dst_index,dst_scale)              */ gen86_movw_imm_mod(p_pc, gen86_modrm_bis, imm, dst_breg, dst_index, dst_scale)
+#define gen86_movl_imm_bis(p_pc, imm, dst_breg, dst_index, dst_scale)               /* movl $imm, (%dst_breg,%dst_index,dst_scale)              */ gen86_movl_imm_mod(p_pc, gen86_modrm_bis, imm, dst_breg, dst_index, dst_scale)
+#define gen86_movP_imm_bis(p_pc, imm, dst_breg, dst_index, dst_scale)               /* movP $imm, (%dst_breg,%dst_index,dst_scale)              */ gen86_movP_imm_mod(p_pc, gen86_modrm_bis, imm, dst_breg, dst_index, dst_scale)
+#define gen86_movb_imm_dbis(p_pc, imm, dst_disps, dst_breg, dst_index, dst_scale)   /* movb $imm, dst_disps(%dst_breg,%dst_index,dst_scale)     */ gen86_movb_imm_mod(p_pc, gen86_modrm_dbis, imm, dst_disps, dst_breg, dst_index, dst_scale)
+#define gen86_movw_imm_dbis(p_pc, imm, dst_disps, dst_breg, dst_index, dst_scale)   /* movw $imm, dst_disps(%dst_breg,%dst_index,dst_scale)     */ gen86_movw_imm_mod(p_pc, gen86_modrm_dbis, imm, dst_disps, dst_breg, dst_index, dst_scale)
+#define gen86_movl_imm_dbis(p_pc, imm, dst_disps, dst_breg, dst_index, dst_scale)   /* movl $imm, dst_disps(%dst_breg,%dst_index,dst_scale)     */ gen86_movl_imm_mod(p_pc, gen86_modrm_dbis, imm, dst_disps, dst_breg, dst_index, dst_scale)
+#define gen86_movP_imm_dbis(p_pc, imm, dst_disps, dst_breg, dst_index, dst_scale)   /* movP $imm, dst_disps(%dst_breg,%dst_index,dst_scale)     */ gen86_movP_imm_mod(p_pc, gen86_modrm_dbis, imm, dst_disps, dst_breg, dst_index, dst_scale)
+#if LIBGEN86_TARGET_BITS == 64
+#define gen86_movq_d_r(p_pc, src_disps, dst_reg)                                    /* movq src_disps, %dst_reg                                 */ gen86_movq_mod_r(p_pc, gen86_modrm_d, dst_reg, src_disps)
+#define gen86_movq_b_r(p_pc, src_breg, dst_reg)                                     /* movq (%src_breg), %dst_reg                               */ gen86_movq_mod_r(p_pc, gen86_modrm_b, dst_reg, src_breg)
+#define gen86_movq_db_r(p_pc, src_disps, src_breg, dst_reg)                         /* movq src_disps(%src_breg), %dst_reg                      */ gen86_movq_mod_r(p_pc, gen86_modrm_db, dst_reg, src_disps, src_breg)
+#define gen86_movq_bi_r(p_pc, src_breg, src_index, dst_reg)                         /* movq src_disps(%src_breg,%src_index), %dst_reg           */ gen86_movq_mod_r(p_pc, gen86_modrm_bi, dst_reg, src_breg, src_index)
+#define gen86_movq_dbi_r(p_pc, src_disps, src_breg, src_index, dst_reg)             /* movq src_disps(%src_breg,%src_index), %dst_reg           */ gen86_movq_mod_r(p_pc, gen86_modrm_dbi, dst_reg, src_disps, src_breg, src_index)
+#define gen86_movq_bis_r(p_pc, src_breg, src_index, src_scale, dst_reg)             /* movq (%src_breg,%src_index,src_scale), %dst_reg          */ gen86_movq_mod_r(p_pc, gen86_modrm_bis, dst_reg, src_breg, src_index, src_scale)
+#define gen86_movq_dbis_r(p_pc, src_disps, src_breg, src_index, src_scale, dst_reg) /* movq src_disps(%src_breg,%src_index,src_scale), %dst_reg */ gen86_movq_mod_r(p_pc, gen86_modrm_dbis, dst_reg, src_disps, src_breg, src_index, src_scale)
+#define gen86_movq_r_d(p_pc, src_reg, dst_disps)                                    /* movq %src_reg, dst_disps                                 */ gen86_movq_r_mod(p_pc, gen86_modrm_d, src_reg, dst_disps)
+#define gen86_movq_r_b(p_pc, src_reg, dst_breg)                                     /* movq %src_reg, (%dst_breg)                               */ gen86_movq_r_mod(p_pc, gen86_modrm_b, src_reg, dst_breg)
+#define gen86_movq_r_db(p_pc, src_reg, dst_disps, dst_breg)                         /* movq %src_reg, dst_disps(%dst_breg)                      */ gen86_movq_r_mod(p_pc, gen86_modrm_db, src_reg, dst_disps, dst_breg)
+#define gen86_movq_r_bi(p_pc, src_reg, dst_breg, dst_index)                         /* movq %src_reg, dst_disps(%dst_breg,%dst_index)           */ gen86_movq_r_mod(p_pc, gen86_modrm_bi, src_reg, dst_breg, dst_index)
+#define gen86_movq_r_dbi(p_pc, src_reg, dst_disps, dst_breg, dst_index)             /* movq %src_reg, dst_disps(%dst_breg,%dst_index)           */ gen86_movq_r_mod(p_pc, gen86_modrm_dbi, src_reg, dst_disps, dst_breg, dst_index)
+#define gen86_movq_r_bis(p_pc, src_reg, dst_breg, dst_index, dst_scale)             /* movq %src_reg, (%dst_breg,%dst_index,dst_scale)          */ gen86_movq_r_mod(p_pc, gen86_modrm_bis, src_reg, dst_breg, dst_index, dst_scale)
+#define gen86_movq_r_dbis(p_pc, src_reg, dst_disps, dst_breg, dst_index, dst_scale) /* movq %src_reg, dst_disps(%dst_breg,%dst_index,dst_scale) */ gen86_movq_r_mod(p_pc, gen86_modrm_dbis, src_reg, dst_disps, dst_breg, dst_index, dst_scale)
+#define gen86_movq_imm_d(p_pc, imm, dst_disps)                                      /* movq $imm, dst_disps                                     */ gen86_movq_imm_mod(p_pc, gen86_modrm_d, imm, dst_disps)
+#define gen86_movq_imm_b(p_pc, imm, dst_breg)                                       /* movq $imm, (%dst_breg)                                   */ gen86_movq_imm_mod(p_pc, gen86_modrm_b, imm, dst_breg)
+#define gen86_movq_imm_db(p_pc, imm, dst_disps, dst_breg)                           /* movq $imm, dst_disps(%dst_breg)                          */ gen86_movq_imm_mod(p_pc, gen86_modrm_db, imm, dst_disps, dst_breg)
+#define gen86_movq_imm_bi(p_pc, imm, dst_breg, dst_index)                           /* movq $imm, dst_disps(%dst_breg,%dst_index)               */ gen86_movq_imm_mod(p_pc, gen86_modrm_bi, imm, dst_breg, dst_index)
+#define gen86_movq_imm_dbi(p_pc, imm, dst_disps, dst_breg, dst_index)               /* movq $imm, dst_disps(%dst_breg,%dst_index)               */ gen86_movq_imm_mod(p_pc, gen86_modrm_dbi, imm, dst_disps, dst_breg, dst_index)
+#define gen86_movq_imm_bis(p_pc, imm, dst_breg, dst_index, dst_scale)               /* movq $imm, (%dst_breg,%dst_index,dst_scale)              */ gen86_movq_imm_mod(p_pc, gen86_modrm_bis, imm, dst_breg, dst_index, dst_scale)
+#define gen86_movq_imm_dbis(p_pc, imm, dst_disps, dst_breg, dst_index, dst_scale)   /* movq $imm, dst_disps(%dst_breg,%dst_index,dst_scale)     */ gen86_movq_imm_mod(p_pc, gen86_modrm_dbis, imm, dst_disps, dst_breg, dst_index, dst_scale)
+#endif /* LIBGEN86_TARGET_BITS == 64 */
+
+/* For convenience, define inlined modr/m versions of `lea' */
+#define gen86_leaw_db_r(p_pc, disps, breg, dst_reg)                 /* leaw disps(%breg), %dst_reg              */ ((disps) == 0 ? gen86_movw_r_r(p_pc, breg, dst_reg) : gen86_leaw_mod_r(p_pc, gen86_modrm_db, dst_reg, disps, breg))
+#define gen86_leal_db_r(p_pc, disps, breg, dst_reg)                 /* leal disps(%breg), %dst_reg              */ ((disps) == 0 ? gen86_movl_r_r(p_pc, breg, dst_reg) : gen86_leal_mod_r(p_pc, gen86_modrm_db, dst_reg, disps, breg))
+#define gen86_leaP_db_r(p_pc, disps, breg, dst_reg)                 /* leaP disps(%breg), %dst_reg              */ ((disps) == 0 ? gen86_movP_r_r(p_pc, breg, dst_reg) : gen86_leaP_mod_r(p_pc, gen86_modrm_db, dst_reg, disps, breg))
+#define gen86_leaw_bi_r(p_pc, breg, index, dst_reg)                 /* leaw (%breg,%index), %dst_reg            */ gen86_leaw_mod_r(p_pc, gen86_modrm_bi, dst_reg, breg, index)
+#define gen86_leal_bi_r(p_pc, breg, index, dst_reg)                 /* leal (%breg,%index), %dst_reg            */ gen86_leal_mod_r(p_pc, gen86_modrm_bi, dst_reg, breg, index)
+#define gen86_leaP_bi_r(p_pc, breg, index, dst_reg)                 /* leaP (%breg,%index), %dst_reg            */ gen86_leaP_mod_r(p_pc, gen86_modrm_bi, dst_reg, breg, index)
+#define gen86_leaw_dbi_r(p_pc, disps, breg, index, dst_reg)         /* leaw disps(%breg,%index), %dst_reg       */ gen86_leaw_mod_r(p_pc, gen86_modrm_dbi, dst_reg, disps, breg, index)
+#define gen86_leal_dbi_r(p_pc, disps, breg, index, dst_reg)         /* leal disps(%breg,%index), %dst_reg       */ gen86_leal_mod_r(p_pc, gen86_modrm_dbi, dst_reg, disps, breg, index)
+#define gen86_leaP_dbi_r(p_pc, disps, breg, index, dst_reg)         /* leaP disps(%breg,%index), %dst_reg       */ gen86_leaP_mod_r(p_pc, gen86_modrm_dbi, dst_reg, disps, breg, index)
+#define gen86_leaw_bis_r(p_pc, breg, index, scale, dst_reg)         /* leaw (%breg,%index,scale), %dst_reg      */ gen86_leaw_mod_r(p_pc, gen86_modrm_bis, dst_reg, breg, index, scale)
+#define gen86_leal_bis_r(p_pc, breg, index, scale, dst_reg)         /* leal (%breg,%index,scale), %dst_reg      */ gen86_leal_mod_r(p_pc, gen86_modrm_bis, dst_reg, breg, index, scale)
+#define gen86_leaP_bis_r(p_pc, breg, index, scale, dst_reg)         /* leaP (%breg,%index,scale), %dst_reg      */ gen86_leaP_mod_r(p_pc, gen86_modrm_bis, dst_reg, breg, index, scale)
+#define gen86_leaw_dbis_r(p_pc, disps, breg, index, scale, dst_reg) /* leaw disps(%breg,%index,scale), %dst_reg */ gen86_leaw_mod_r(p_pc, gen86_modrm_dbis, dst_reg, disps, breg, index, scale)
+#define gen86_leal_dbis_r(p_pc, disps, breg, index, scale, dst_reg) /* leal disps(%breg,%index,scale), %dst_reg */ gen86_leal_mod_r(p_pc, gen86_modrm_dbis, dst_reg, disps, breg, index, scale)
+#define gen86_leaP_dbis_r(p_pc, disps, breg, index, scale, dst_reg) /* leaP disps(%breg,%index,scale), %dst_reg */ gen86_leaP_mod_r(p_pc, gen86_modrm_dbis, dst_reg, disps, breg, index, scale)
+#define gen86_leaw_di_r(p_pc, disps, index, dst_reg)                /* leaw disps(,%index), %dst_reg            */ gen86_leaw_mod_r(p_pc, gen86_modrm_di, dst_reg, disps, index)
+#define gen86_leal_di_r(p_pc, disps, index, dst_reg)                /* leal disps(,%index), %dst_reg            */ gen86_leal_mod_r(p_pc, gen86_modrm_di, dst_reg, disps, index)
+#define gen86_leaP_di_r(p_pc, disps, index, dst_reg)                /* leaP disps(,%index), %dst_reg            */ gen86_leaP_mod_r(p_pc, gen86_modrm_di, dst_reg, disps, index)
+#define gen86_leaw_is_r(p_pc, index, scale, dst_reg)                /* leaw (,%index,scale), %dst_reg           */ gen86_leaw_mod_r(p_pc, gen86_modrm_is, dst_reg, index, scale)
+#define gen86_leal_is_r(p_pc, index, scale, dst_reg)                /* leal (,%index,scale), %dst_reg           */ gen86_leal_mod_r(p_pc, gen86_modrm_is, dst_reg, index, scale)
+#define gen86_leaP_is_r(p_pc, index, scale, dst_reg)                /* leaP (,%index,scale), %dst_reg           */ gen86_leaP_mod_r(p_pc, gen86_modrm_is, dst_reg, index, scale)
+#define gen86_leaw_dis_r(p_pc, disps, index, scale, dst_reg)        /* leaw disps(,%index,scale), %dst_reg      */ gen86_leaw_mod_r(p_pc, gen86_modrm_dis, dst_reg, disps, index, scale)
+#define gen86_leal_dis_r(p_pc, disps, index, scale, dst_reg)        /* leal disps(,%index,scale), %dst_reg      */ gen86_leal_mod_r(p_pc, gen86_modrm_dis, dst_reg, disps, index, scale)
+#define gen86_leaP_dis_r(p_pc, disps, index, scale, dst_reg)        /* leaP disps(,%index,scale), %dst_reg      */ gen86_leaP_mod_r(p_pc, gen86_modrm_dis, dst_reg, disps, index, scale)
+#if LIBGEN86_TARGET_BITS == 64
+#define gen86_leaq_db_r(p_pc, disps, breg, dst_reg)                 /* leaq disps(%breg), %dst_reg              */ ((disps) == 0 ? gen86_movq_r_r(p_pc, breg, dst_reg) : gen86_leaq_mod_r(p_pc, gen86_modrm_db, dst_reg, disps, breg))
+#define gen86_leaq_bi_r(p_pc, breg, index, dst_reg)                 /* leaq disps(%breg,%index), %dst_reg       */ gen86_leaq_mod_r(p_pc, gen86_modrm_bi, dst_reg, breg, index)
+#define gen86_leaq_dbi_r(p_pc, disps, breg, index, dst_reg)         /* leaq disps(%breg,%index), %dst_reg       */ gen86_leaq_mod_r(p_pc, gen86_modrm_dbi, dst_reg, disps, breg, index)
+#define gen86_leaq_bis_r(p_pc, breg, index, scale, dst_reg)         /* leaq (%breg,%index,scale), %dst_reg      */ gen86_leaq_mod_r(p_pc, gen86_modrm_bis, dst_reg, breg, index, scale)
+#define gen86_leaq_dbis_r(p_pc, disps, breg, index, scale, dst_reg) /* leaq disps(%breg,%index,scale), %dst_reg */ gen86_leaq_mod_r(p_pc, gen86_modrm_dbis, dst_reg, disps, breg, index, scale)
+#define gen86_leaq_di_r(p_pc, disps, index, dst_reg)                /* leaq disps(,%index), %dst_reg            */ gen86_leaq_mod_r(p_pc, gen86_modrm_di, dst_reg, disps, index)
+#define gen86_leaq_is_r(p_pc, index, scale, dst_reg)                /* leaq (,%index,scale), %dst_reg           */ gen86_leaq_mod_r(p_pc, gen86_modrm_is, dst_reg, index, scale)
+#define gen86_leaq_dis_r(p_pc, disps, index, scale, dst_reg)        /* leaq disps(,%index,scale), %dst_reg      */ gen86_leaq_mod_r(p_pc, gen86_modrm_dis, dst_reg, disps, index, scale)
+#endif /* LIBGEN86_TARGET_BITS == 64 */
+
+
 
 #endif /* !_LIBGEN86_GEN_H */

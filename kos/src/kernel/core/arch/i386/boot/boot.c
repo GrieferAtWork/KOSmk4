@@ -736,6 +736,11 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 * in disguise)
 	 */
 
+	/* TODO: Kernel functions that return `struct heapptr' should be altered
+	 *       to use the same return-through-register  trick as is also  used
+	 *       in  `/kos/src/libservice/com.h'  for  `service_buf_t',  as   it
+	 *       allows GCC to make better use of registers! */
+
 	return state;
 }
 

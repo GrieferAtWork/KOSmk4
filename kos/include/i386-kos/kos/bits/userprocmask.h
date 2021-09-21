@@ -68,7 +68,7 @@ struct userprocmask /*[PREFIX(pm_)]*/ {
 	                                     * Set to `NULL' to indicate that `sys_set_userprocmask_address(2)' wasn't called, yet. */
 	__UINT32_TYPE__        _pm_pad2;    /* ... */
 	__UINT32_TYPE__         pm_flags;   /* [KERNEL:WRITE, USER:READWRITE] Set of `USERPROCMASK_FLAG_*' */
-	__UINT32_TYPE__         pm_pad2;    /* ... */
+	__UINT32_TYPE__        _pm_pad3;    /* ... */
 #endif /* !__x86_64__ */
 	struct __sigset_struct  pm_pending; /* [KERNEL:WRITE, USER:READWRITE][sizeof(== pm_sigsize)] Set of pending signals
 	                                     * When a currently masked signal arrives, the kernel

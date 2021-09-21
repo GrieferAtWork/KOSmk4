@@ -42,7 +42,6 @@ union service_com_retval {
 
 #define SERVICE_COM_RETVAL_INIT(value) { (__UINT64_TYPE__)(value) }
 
-
 __DECL_END
 #endif /* __CC__ */
 
