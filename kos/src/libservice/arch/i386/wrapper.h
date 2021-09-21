@@ -29,12 +29,37 @@
 
 #include <kos/types.h>
 
+#include <stdint.h>
+
+#include <libgen86/gen.h> /* GEN86_INSTRLEN_MAX */
+
 #include "../../com.h"
 
 DECL_BEGIN
 
+#ifdef __x86_64__
+/* Alter the call generator macro such that it will compile code as
+ * >> movabs $addr, %rax
+ * >> call   *%rax
+ * ... when the delta between `*p_pc' and `addr' is too large. */
+#undef gen86_call
+#define gen86_call(p_pc, addr)                                 \
+	do {                                                       \
+		int64_t _c_delta = (int64_t)((uint64_t)(addr) -        \
+		                             (uint64_t)(*(p_pc) + 5)); \
+		if (_c_delta >= INT32_MIN && _c_delta <= INT32_MAX) {  \
+			gen86_call_offset(p_pc, (int32_t)_c_delta);        \
+		} else {                                               \
+			gen86_movabs_imm_r(p_pc, addr, GEN86_R_RAX);       \
+			gen86_callP_mod(p_pc, gen86_modrm_r, GEN86_R_RAX); \
+		}                                                      \
+	}	__WHILE0
+#endif /* __x86_64__ */
+
+
+
 /*
- * Function arguments are serialized (and potentially deserialized) as follows:
+ * Function arguments are serialized (and deserialized) as follows:
  *   - SERVICE_TYPE_386_R32:      putl(VALUE);
  *   - SERVICE_TYPE_386_R64:      putl(VALUE & 0xffffffff); putl((VALUE >> 32) & 0xffffffff);
  *   - SERVICE_TYPE_X86_64_R64:   putq(VALUE);
@@ -45,6 +70,10 @@ DECL_BEGIN
  *   - SERVICE_TYPE_FIXBUF_IN:    putP(MAP_BUFFER_DATA(VALUE, BUFFER_SIZE).offset_in_shm);
  *   - SERVICE_TYPE_FIXBUF_OUT:   putP(ALLOC_BUFFER_DATA(BUFFER_SIZE).offset_in_shm);
  *   - SERVICE_TYPE_FIXBUF_INOUT: putP(MAP_BUFFER_DATA(VALUE, BUFFER_SIZE).offset_in_shm);
+ * Where:
+ *   - putl writes a 32-bit word
+ *   - putq writes a 64-bit word
+ *   - putP writes a pointer-sized word
  *
  * Deserialization only does anything for out and in/out buffer arguments, where it will
  * copy back data from the SHM buffer to the user's buffer (unless the user's buffer was
@@ -72,18 +101,18 @@ STATIC_ASSERT(IS_ALIGNED(offsetof(struct service_com, sc_generic.g_data), 4));
 /* ================================================================================================
  * Buffer   argument   indices   are    calculated   as   follows   (s.a.    LOC_bufparam_handles):
  *   - All fixed-length buffers with a fixed data size <= COM_FIXBUF_INLINE_THRESHOLD
- *     are moved into a separate buffer list `INLINE_BUFFERS'
+ *     are   moved   into    a   separate    buffer   list    `cg_inline_buf_paramv'.
  *   - Take the list of all parameters that operate on buffers
  *   - Sort such such that buffers are ordered as in,inout,out
  *   - All  out/inout  buffers that  have `SERVICE_OUT_SIZEARG_RETURN_MINVAL',
  *     are moved to the back of their respective sub-list of buffers elements.
  *   - Positions within the resulting list are used as buffer indices within
  *     generated code.
- *   - INLINE_BUFFERS_COUNT:  # of buffer arguments in `INLINE_BUFFERS'
- *   - BUF_PARAM_COUNT:       # of buffer arguments
- *   - IN_BUF_ARGUMENT_COUNT: # of in buffers (== index of first inout buffer)
- *   - INOUT_BUF_PARAM_COUNT: # of inout buffers
- *   - OUT_BUF_PARAM_COUNT:   # of out buffers
+ *   - cg_inline_buf_paramc: # of buffer arguments in `cg_inline_buf_paramv'
+ *   - cg_buf_paramc:        # of buffer arguments
+ *   - cg_inbuf_paramc:      # of in buffers (== index of first inout buffer)
+ *   - cg_inoutbuf_paramc:   # of inout buffers
+ *   - cg_outbuf_paramc:     # of out buffers
  * ================================================================================================
  *
  *
@@ -92,27 +121,20 @@ STATIC_ASSERT(IS_ALIGNED(offsetof(struct service_com, sc_generic.g_data), 4));
  * The stack-frame of a wrapper function looks like this:
  *
  * ------------------------------------------------------------------------------------------------
- *      {SP-RELATIVE OFFSET}               {CONTENS}
+ *      {SP-RELATIVE OFFSET}               {CONTENTS}
  * ------------------------------------------------------------------------------------------------
  *      CFA-cg_locvar_offset               [<start of locals>]
  *      CFA-cg_locvar_offset+0*P           sigset_t *LOC_oldset;         # [1..1] Old signal maks pointer
  *      CFA-cg_locvar_offset+1*P           struct userprocmask *LOC_upm; # [1..1] Return value of `getuserprocmask()'
  *
- * #if BUF_PARAM_COUNT != 0
- *                                         # [0..1] Non-shm buffer temporary storage
- *      CFA-cg_locvar_offset+2*P           void *LOC_bufpar_ptr;
- *
- *                                         # [1..1][valid_if(LOC_bufpar_ptr)] SHM for `LOC_bufpar_ptr'
- *      CFA-cg_locvar_offset+3*P           REF struct service_shm_handle *LOC_bufpar_shm;
- *
- *                                         # [0..1][*] SHM handles for user buffers (NULL for buffers that need to be copied)
- *      CFA-cg_locvar_offset+4*P           struct service_shm_handle *LOC_bufparam_handles[BUF_PARAM_COUNT];
- *
- *                                         # [0..1][*] SHM handles for user buffers (NULL for buffers that need to be copied)
- * #if IN_BUF_PARAM_COUNT != 0 && (INOUT_BUF_PARAM_COUNT != 0 || OUT_BUF_PARAM_COUNT != 0)
+ * #if cg_buf_paramc != 0
+ *      CFA-cg_locvar_offset+2*P           void                          *LOC_bufpar_ptr;                        # [0..1] Non-shm buffer temporary storage
+ *      CFA-cg_locvar_offset+3*P           REF struct service_shm_handle *LOC_bufpar_shm;                        # [1..1][valid_if(LOC_bufpar_ptr)] SHM for `LOC_bufpar_ptr'
+ *      CFA-cg_locvar_offset+4*P           struct service_shm_handle     *LOC_bufparam_handles[cg_buf_paramc]; # [0..1][*] SHM handles for user buffers (NULL for buffers that need to be copied)
+ * #if cg_inbuf_paramc != 0 && (cg_inoutbuf_paramc != 0 || cg_outbuf_paramc != 0)
  *      CFA-cg_locvar_offset+...           byte_t *LOC_outbuffers_start; # [1..1] Base address for output buffers (see below)
- * #endif // IN_BUF_PARAM_COUNT != 0 && (INOUT_BUF_PARAM_COUNT != 0 || OUT_BUF_PARAM_COUNT != 0)
- * #endif // BUF_PARAM_COUNT != 0
+ * #endif // cg_inbuf_paramc != 0 && (cg_inoutbuf_paramc != 0 || cg_outbuf_paramc != 0)
+ * #endif // cg_buf_paramc != 0
  *
  *      CFA-cg_locvar_offset+cg_locvar_size [<end of locals>]
  *
@@ -136,7 +158,7 @@ STATIC_ASSERT(IS_ALIGNED(offsetof(struct service_com, sc_generic.g_data), 4));
  *  |                                       ...
  *  \   CFA+n*P                            [STACK_ARG[n]]
  * ------------------------------------------------------------------------------------------------
- * Where CFA == %Psp + cfa_offset   (and `cfa_offset' is adjusted as %Psp is altered)
+ * Where CFA == %Psp + cg_cfa_offset   (and `cg_cfa_offset' is adjusted as %Psp is altered)
  * Where P   == sizeof(void *)
  * ================================================================================================
  *
@@ -149,7 +171,7 @@ STATIC_ASSERT(IS_ALIGNED(offsetof(struct service_com, sc_generic.g_data), 4));
  * #ifndef __x86_64__
  *    + PARAM_COUNT_OF(SERVICE_TYPE_386_R64) * sizeof(uintptr_t)  # On i386, 64-bit arguments take 2 serial words
  * #endif // !__x86_64__
- *    + SUM(INLINE_BUFFERS_COUNT.each.buffer_size)                # Inline buffers are allocated alongside com
+ *    + SUM(cg_inline_buf_paramc.each.buffer_size)                # Inline buffers are allocated alongside com
  * Afterwards, apply the size requirements detailed in `libservice_shmbuf_alloc_nopr()'
  * to   the   calculated   size   to   generate   the   effective   allocation    size.
  *
@@ -232,13 +254,13 @@ STATIC_ASSERT(IS_ALIGNED(offsetof(struct service_com, sc_generic.g_data), 4));
  * >> // Allocate the com buffer
  * >>     movP   $<struct service *self>, %R_fcall0P   # Input constant (hard-coded)
  * >>     movP   $<ALLOC_SIZE>,           %R_fcall1P   # Input constant (hard-coded)
- * >> #if !EXCEPT_ENABLED
+ * >> #if !COM_GENERATOR_FEATURE_FEXCEPT
  * >>     call   libservice_shmbuf_alloc_nopr_nx
  * >>     testP  %Pax, %Pax
  * >>     jz     .Lerr_pop_preemption
- * >> #else // !EXCEPT_ENABLED
+ * >> #else // !COM_GENERATOR_FEATURE_FEXCEPT
  * >>     call   libservice_shmbuf_alloc_nopr
- * >> #endif // EXCEPT_ENABLED
+ * >> #endif // COM_GENERATOR_FEATURE_FEXCEPT
  * >>     movP   %Pax, %R_service_shm_handle   # %R_service_shm_handle == %Pbp
  * >>     movP   %Pdx, %R_service_com          # %R_service_com        == %Pbx
  * >>
@@ -250,7 +272,7 @@ STATIC_ASSERT(IS_ALIGNED(offsetof(struct service_com, sc_generic.g_data), 4));
  * >>
  * >>
  * >> // Serialize buffer arguments (if they exist)
- * >> #if BUF_PARAM_COUNT == 0
+ * >> #if cg_buf_paramc == 0
  * >>     # Re-enable preemption
  * >>     movP   LOC_oldset(%Psp), %Pax  # `sigset_t *oldset'
  * >>     movP   LOC_upm(%Psp),    %Pdx  # `struct userprocmask *upm'
@@ -258,7 +280,7 @@ STATIC_ASSERT(IS_ALIGNED(offsetof(struct service_com, sc_generic.g_data), 4));
  * >>     test   $USERPROCMASK_FLAG_HASPENDING, userprocmask::pm_flags(%Pdx)
  * >>     jnz    .Ltest_pending_signals_after_com_buffer_alloc
  * >> .Ltest_pending_signals_after_com_buffer_alloc_return:
- * >> #elif BUF_PARAM_COUNT == 1
+ * >> #elif cg_buf_paramc == 1
  * >>     movP   $0, LOC_bufpar_ptr(%Psp)
  * >>     movP   $<struct service *self>,                                                         %R_fcall0P
  * >>     movP   SP_OFFSET_OF_PARAM(BUFFER_INDEX_TO_PARAM_INDEX(BUFFER_ARGUMENT(0).INDEX))(%Psp), %R_fcall1P
@@ -280,13 +302,13 @@ STATIC_ASSERT(IS_ALIGNED(offsetof(struct service_com, sc_generic.g_data), 4));
  * >>     cmpP   %Pax, %R_fcall1P   # if (%R_fcall1P < SERVICE_SHM_ALLOC_MINSIZE)
  * >>     cmovbP %R_fcall1P, %Pax   #     %R_fcall1P = SERVICE_SHM_ALLOC_MINSIZE;
  * >> #endif // !BUFFER_ARGUMENT(0).HAS_FIXED_BUFFER_SIZE
- * >> #if !EXCEPT_ENABLED
+ * >> #if !COM_GENERATOR_FEATURE_FEXCEPT
  * >>     call   libservice_shmbuf_alloc_nopr_nx
  * >>     testP  %Pax, %Pax
  * >>     jz     .Lerr_free_service_com
- * >> #else // !EXCEPT_ENABLED
+ * >> #else // !COM_GENERATOR_FEATURE_FEXCEPT
  * >>     call   libservice_shmbuf_alloc_nopr
- * >> #endif // EXCEPT_ENABLED
+ * >> #endif // COM_GENERATOR_FEATURE_FEXCEPT
  * >>     movP   %Pax, LOC_bufpar_ptr(%Psp)
  * >>     movP   %Pdx, LOC_bufpar_shm(%Psp)
  * >> .Leh_free_xbuf_begin:
@@ -329,7 +351,7 @@ STATIC_ASSERT(IS_ALIGNED(offsetof(struct service_com, sc_generic.g_data), 4));
  * >>     movP   %Pdx, BUFFER_ARGUMENT(0).SERIAL_OFFSET(%Psp)
  * >> .Lsingle_buffers_done:
  * >>
- * >> #else // #elif BUF_PARAM_COUNT >= 2
+ * >> #else // #elif cg_buf_paramc >= 2
  * >>     # >> %R_temp_exbuf_size is %edi on i386 and %r12 on x86_64
  * >>     # NOTE: On x86_64, compilation getting here imples `COM_GENERATOR_FEATURE_USES_R12'!
  * >>     xorP   %R_temp_exbuf_size, %R_temp_exbuf_size
@@ -360,19 +382,19 @@ STATIC_ASSERT(IS_ALIGNED(offsetof(struct service_com, sc_generic.g_data), 4));
  * >>     movP   $SERVICE_SHM_ALLOC_MINSIZE, %Pax
  * >>     cmpP   %Pax, %R_fcall1P   # if (%R_fcall1P < SERVICE_SHM_ALLOC_MINSIZE)
  * >>     cmovbP %R_fcall1P, %Pax   #     %R_fcall1P = SERVICE_SHM_ALLOC_MINSIZE;
- * >> #if !EXCEPT_ENABLED
+ * >> #if !COM_GENERATOR_FEATURE_FEXCEPT
  * >>     call   libservice_shmbuf_alloc_nopr_nx
  * >>     testP  %Pax, %Pax
  * >>     jz     .Lerr_free_service_com
- * >> #else // !EXCEPT_ENABLED
+ * >> #else // !COM_GENERATOR_FEATURE_FEXCEPT
  * >>     call   libservice_shmbuf_alloc_nopr
- * >> #endif // EXCEPT_ENABLED
+ * >> #endif // COM_GENERATOR_FEATURE_FEXCEPT
  * >>     movP   %Pax, LOC_bufpar_ptr(%Psp)
  * >>     movP   %Pdx, LOC_bufpar_shm(%Psp)
  * >> .Leh_free_xbuf_begin:
  * >>
  * >> // Copy out-of-band in/inout buffers into SHM memory
- * >> #if IN_BUF_ARGUMENT_COUNT != 0 || INOUT_BUF_PARAM_COUNT != 0
+ * >> #if cg_inbuf_paramc != 0 || cg_inoutbuf_paramc != 0
  * >>     # Re-enable preemption
  * >>     movP   LOC_oldset(%Psp), %Pdi  # `sigset_t *oldset'
  * >>     movP   LOC_upm(%Psp),    %Pcx  # `struct userprocmask *upm'
@@ -386,11 +408,11 @@ STATIC_ASSERT(IS_ALIGNED(offsetof(struct service_com, sc_generic.g_data), 4));
  * >>     # NOTE: INDEX is the index within `LOC_bufparam_handles'
  * >>     cmpP   $0, LOC_bufparam_handles[INDEX](%Psp)
  * >>     jne    1f
- * >> #if IN_BUF_PARAM_COUNT != 0 && INOUT_BUF_PARAM_COUNT != 0 && OUT_BUF_PARAM_COUNT != 0
+ * >> #if cg_inbuf_paramc != 0 && cg_inoutbuf_paramc != 0 && cg_outbuf_paramc != 0
  * >> #if IS_FIRST_INOUT_BUFFER(INDEX)
  * >>     movP   %Pdi, LOC_outbuffers_start(%Psp)         # `LOC_outbuffers_start' contains the start of the first inout/out buffer
  * >> #endif
- * >> #endif // IN_BUF_PARAM_COUNT != 0 && INOUT_BUF_PARAM_COUNT != 0 && OUT_BUF_PARAM_COUNT != 0
+ * >> #endif // cg_inbuf_paramc != 0 && cg_inoutbuf_paramc != 0 && cg_outbuf_paramc != 0
  * >>
  * >>     # Set: %Pax = SHM_ADDR - SHM_BASE  (offset in SHM to input buffer)
  * >>     # NOTE: We don't have to about output buffers, since those appear after in/inout buffers
@@ -403,11 +425,11 @@ STATIC_ASSERT(IS_ALIGNED(offsetof(struct service_com, sc_generic.g_data), 4));
  * >>     rep    movsb                                    # Copy input buffers into SHM
  * >> 1:
  * >> }}
- * >> #if IN_BUF_PARAM_COUNT != 0 && INOUT_BUF_PARAM_COUNT == 0 && OUT_BUF_PARAM_COUNT != 0
+ * >> #if cg_inbuf_paramc != 0 && cg_inoutbuf_paramc == 0 && cg_outbuf_paramc != 0
  * >>     movP   %Pdi, LOC_outbuffers_start(%Psp)         # `LOC_outbuffers_start' contains the start of the first inout/out buffer
- * >> #endif // IN_BUF_PARAM_COUNT != 0 && INOUT_BUF_PARAM_COUNT == 0 && OUT_BUF_PARAM_COUNT != 0
+ * >> #endif // cg_inbuf_paramc != 0 && cg_inoutbuf_paramc == 0 && cg_outbuf_paramc != 0
  * >>     jmp    .Lall_buffers_are_in_band_preemption_reenabled
- * >> #endif // IN_BUF_ARGUMENT_COUNT != 0 || INOUT_BUF_PARAM_COUNT != 0
+ * >> #endif // cg_inbuf_paramc != 0 || cg_inoutbuf_paramc != 0
  * >> .Lall_buffers_are_in_band:
  * >>     # Re-enable preemption
  * >>     movP   LOC_oldset(%Psp), %Pdx  # `sigset_t *oldset'
@@ -416,7 +438,7 @@ STATIC_ASSERT(IS_ALIGNED(offsetof(struct service_com, sc_generic.g_data), 4));
  * >>     test   $USERPROCMASK_FLAG_HASPENDING, userprocmask::pm_flags(%Pax)
  * >>     jnz    .Ltest_pending_signals_after_all_buffers_are_in_band
  * >> .Lall_buffers_are_in_band_preemption_reenabled:
- * >> #endif // #endif BUF_PARAM_COUNT >= 2
+ * >> #endif // #endif cg_buf_paramc >= 2
  * >>
  * >>
  * >>
@@ -482,7 +504,7 @@ STATIC_ASSERT(IS_ALIGNED(offsetof(struct service_com, sc_generic.g_data), 4));
  * >>
  * >>
  * >> // Serialize fixed-length inline buffers
- * >> #if INLINE_BUFFERS_COUNT != 0
+ * >> #if cg_inline_buf_paramc != 0
  * >> {foreach[INLINE_BUFFER_ARGUMENT: <INLINE_BUFFERS_OFFSET>, <INLINE_BUFFER_SIZE>, <PARAM_OFFSET>, <SERIAL_OFFSET>]: {
  * >>     # NOTE: `INLINE_BUFFERS_OFFSET' (>= `INLINE_BUFFERS_OFFSET') is the
  * >>     #       offsets from service_com to where inline buffer data is stored.
@@ -506,7 +528,7 @@ STATIC_ASSERT(IS_ALIGNED(offsetof(struct service_com, sc_generic.g_data), 4));
  * >> #endif // !ARGUMENT_USES_MOVS_FOR_COPY
  * >> #endif // ARGUMENT_IS_IN_OR_INOUT_BUFFER
  * >> }}
- * >> #endif // INLINE_BUFFERS_COUNT != 0
+ * >> #endif // cg_inline_buf_paramc != 0
  * >>
  * >>
  * >>
@@ -533,26 +555,26 @@ STATIC_ASSERT(IS_ALIGNED(offsetof(struct service_com, sc_generic.g_data), 4));
  * >>     leaq   service_shm::s_commands(%Pcx), %rdi   # NOTE: %Pcx was already initialized above!
  * >>     movq   $LFUTEX_WAKE,                  %rsi
  * >>     movq   $1,                            %rdx
- * >> #if EXCEPT_ENABLED
+ * >> #if COM_GENERATOR_FEATURE_FEXCEPT
  * >>     std
  * >>     .cfi_escape 56,22,49,7,146,49,0,11,255,251,26  # Disable EFLAGS.DF during unwind & landing
  * >>     syscall
  * >>     cld
  * >>     .cfi_escape 57
- * >> #else // EXCEPT_ENABLED
+ * >> #else // COM_GENERATOR_FEATURE_FEXCEPT
  * >>     syscall
- * >> #endif // !EXCEPT_ENABLED
+ * >> #endif // !COM_GENERATOR_FEATURE_FEXCEPT
  * >> #else // __x86_64__
  * >>     pushl_cfi %ebx
  * >>     .cfi_escape DW_CFA_GNU_args_size, 4
  * >>     leal   service_shm::s_commands(%Pcx), %ebx   # NOTE: %Pcx was already initialized above!
  * >>     movl   $LFUTEX_WAKE,                  %ecx
  * >>     movl   $1,                            %edx
- * >> #if EXCEPT_ENABLED
+ * >> #if COM_GENERATOR_FEATURE_FEXCEPT
  * >>     call   __i386_Xsyscall
- * >> #else // EXCEPT_ENABLED
+ * >> #else // COM_GENERATOR_FEATURE_FEXCEPT
  * >>     call   __i386_syscall
- * >> #endif // !EXCEPT_ENABLED
+ * >> #endif // !COM_GENERATOR_FEATURE_FEXCEPT
  * >>     popl_cfi %ebx
  * >>     .cfi_escape DW_CFA_GNU_args_size, 0
  * >> #endif // !__x86_64__
@@ -570,33 +592,33 @@ STATIC_ASSERT(IS_ALIGNED(offsetof(struct service_com, sc_generic.g_data), 4));
  * >>     leaq   service_com::sc_code(%R_service_com), %rdi
  * >>     movq   $LFUTEX_WAIT_WHILE,                   %rsi
  * >>     movq   $<info->dl_comid>,                    %rdx
- * >> #if EXCEPT_ENABLED
+ * >> #if COM_GENERATOR_FEATURE_FEXCEPT
  * >>     std
  * >>     .cfi_escape 56,22,49,7,146,49,0,11,255,251,26  # Disable EFLAGS.DF during unwind & landing
  * >>     syscall
  * >>     cld
  * >>     .cfi_escape 57
- * >> #else // EXCEPT_ENABLED
+ * >> #else // COM_GENERATOR_FEATURE_FEXCEPT
  * >>     syscall
- * >> #endif // !EXCEPT_ENABLED
+ * >> #endif // !COM_GENERATOR_FEATURE_FEXCEPT
  * >> #else // __x86_64__
  * >>     pushl_cfi %ebx
  * >>     .cfi_escape DW_CFA_GNU_args_size, 4
  * >>     leaq   service_com::sc_code(%R_service_com), %ebx
  * >>     movl   $LFUTEX_WAIT_WHILE,                   %ecx
  * >>     movl   $<info->dl_comid>,                    %edx
- * >> #if EXCEPT_ENABLED
+ * >> #if COM_GENERATOR_FEATURE_FEXCEPT
  * >>     call   __i386_Xsyscall
- * >> #else // EXCEPT_ENABLED
+ * >> #else // COM_GENERATOR_FEATURE_FEXCEPT
  * >>     call   __i386_syscall
- * >> #endif // !EXCEPT_ENABLED
+ * >> #endif // !COM_GENERATOR_FEATURE_FEXCEPT
  * >>     popl_cfi %ebx
  * >>     .cfi_escape DW_CFA_GNU_args_size, 0
  * >> #endif // !__x86_64__
- * >> #if !EXCEPT_ENABLED
+ * >> #if !COM_GENERATOR_FEATURE_FEXCEPT
  * >>     cmpP   $(-ELIMIT), %Pax
  * >>     ja     .Lerr_com_abort_errno
- * >> #endif // !EXCEPT_ENABLED
+ * >> #endif // !COM_GENERATOR_FEATURE_FEXCEPT
  * >>     # Check if the operation has completed
  * >>     cmpP   $<info->dl_comid>, service_com::sc_code(%R_service_com)
  * >>     je     .Lwaitfor_completion
@@ -628,14 +650,14 @@ STATIC_ASSERT(IS_ALIGNED(offsetof(struct service_com, sc_generic.g_data), 4));
  * >>
  * >>
  * >> // Copy out-of-band inout/out buffers into user-provided storage
- * >> #if INOUT_BUF_PARAM_COUNT != 0 || OUT_BUF_PARAM_COUNT != 0
+ * >> #if cg_inoutbuf_paramc != 0 || cg_outbuf_paramc != 0
  * >>     # Load %Psi with the SHM address of the first out-of-band inout/out buffer
  * >>     # NOTE: We unconditionally use %Psi for copying!
- * >> #if IN_BUF_PARAM_COUNT != 0
+ * >> #if cg_inbuf_paramc != 0
  * >>     movP   LOC_outbuffers_start(%Psp), %Psi
- * >> #else // IN_BUF_PARAM_COUNT != 0
+ * >> #else // cg_inbuf_paramc != 0
  * >>     movP   LOC_bufpar_ptr(%Psp), %Psi
- * >> #endif // IN_BUF_PARAM_COUNT == 0
+ * >> #endif // cg_inbuf_paramc == 0
  * >>
  * >>     # Copy out-of-band SHM buffers for inout/out arguments back to user-memory
  * >> {foreach[INOUT_OUT_BUFFER_ARGUMENT: <INDEX>, <PARAM_OFFSET>, <SERIAL_OFFSET>]: {
@@ -655,11 +677,11 @@ STATIC_ASSERT(IS_ALIGNED(offsetof(struct service_com, sc_generic.g_data), 4));
  * >> #endif
  * >> 1:
  * >> }}
- * >> #endif // INOUT_BUF_PARAM_COUNT != 0 || OUT_BUF_PARAM_COUNT != 0
+ * >> #endif // cg_inoutbuf_paramc != 0 || cg_outbuf_paramc != 0
  * >>
  * >>
  * >>
- * >> #if BUF_PARAM_COUNT != 0
+ * >> #if cg_buf_paramc != 0
  * >> // Free the xbuf buffer
  * >> .Leh_free_xbuf_end:
  * >>     movP   LOC_bufpar_ptr(%Psp), %Pdx
@@ -681,7 +703,7 @@ STATIC_ASSERT(IS_ALIGNED(offsetof(struct service_com, sc_generic.g_data), 4));
  * >>     .cfi_adjust_cfa_offset -8
  * >> #endif // !__x86_64__
  * >> 1:
- * >> #endif // BUF_PARAM_COUNT != 0
+ * >> #endif // cg_buf_paramc != 0
  * >>
  * >>
  * >>
@@ -703,10 +725,10 @@ STATIC_ASSERT(IS_ALIGNED(offsetof(struct service_com, sc_generic.g_data), 4));
  * >>     movl   service_com::sc_retval::scr_eax+<sizeof(size_t)>(%R_service_com), %ebp # Load return values
  * >>     movl   service_com::sc_retval::scr_edx+<sizeof(size_t)>(%R_service_com), %ebx # *ditto*
  * >> #endif // !__x86_64__
- * >> #if BUF_PARAM_COUNT == 0
+ * >> #if cg_buf_paramc == 0
  * >>     movP   LOC_upm(%Psp), %Pax
  * >>     movP   $ss_full, userprocmask::pm_sigmask(%Pax) # re-disable preemption
- * >> #endif // BUF_PARAM_COUNT == 0
+ * >> #endif // cg_buf_paramc == 0
  * >>     call   libservice_shmbuf_freeat_nopr
  * >> #ifndef __x86_64__
  * >>     .cfi_adjust_cfa_offset -8
@@ -774,11 +796,11 @@ STATIC_ASSERT(IS_ALIGNED(offsetof(struct service_com, sc_generic.g_data), 4));
  * >>
  * >>
  * >>
- * >> #if BUF_PARAM_COUNT == 0
+ * >> #if cg_buf_paramc == 0
  * >> .Ltest_pending_signals_after_com_buffer_alloc:
  * >>     call   chkuserprocmask
  * >>     jmp    .Ltest_pending_signals_after_com_buffer_alloc_return
- * >> #elif BUF_PARAM_COUNT == 1
+ * >> #elif cg_buf_paramc == 1
  * >> .Ltest_pending_signals_after_single_buffer_alloc:
  * >>     call   chkuserprocmask
  * >>     jmp    .Ltest_pending_signals_after_single_buffer_alloc_return
@@ -787,8 +809,8 @@ STATIC_ASSERT(IS_ALIGNED(offsetof(struct service_com, sc_generic.g_data), 4));
  * >>     call   chkuserprocmask
  * >>     popP_cfi_r %Pax
  * >>     jmp .Ltest_pending_signals_after_single_buffers_is_in_band_return
- * >> #else // #elif BUF_PARAM_COUNT >= 2
- * >> #if IN_BUF_ARGUMENT_COUNT != 0 || INOUT_BUF_PARAM_COUNT != 0
+ * >> #else // #elif cg_buf_paramc >= 2
+ * >> #if cg_inbuf_paramc != 0 || cg_inoutbuf_paramc != 0
  * >> .Ltest_pending_signals_after_xbuf_alloc:
  * >>     pushP_cfi_r %Pax
  * >>     pushP_cfi_r %Pdx
@@ -796,17 +818,17 @@ STATIC_ASSERT(IS_ALIGNED(offsetof(struct service_com, sc_generic.g_data), 4));
  * >>     popP_cfi_r %Pdx
  * >>     popP_cfi_r %Pax
  * >>     jmp .Ltest_pending_signals_after_xbuf_alloc_return
- * >> #endif // IN_BUF_ARGUMENT_COUNT != 0 || INOUT_BUF_PARAM_COUNT != 0
+ * >> #endif // cg_inbuf_paramc != 0 || cg_inoutbuf_paramc != 0
  * >> .Ltest_pending_signals_after_all_buffers_are_in_band:
  * >>     call   chkuserprocmask
  * >>     jmp    .Lall_buffers_are_in_band_preemption_reenabled:
- * >> #endif // #endif BUF_PARAM_COUNT >= 2
+ * >> #endif // #endif cg_buf_paramc >= 2
  * >>
  * >>
  * >>
  * >>
  * >>
- * >> #if !EXCEPT_ENABLED
+ * >> #if !COM_GENERATOR_FEATURE_FEXCEPT
  * >> .Lerr_com_abort_errno:
  * >>     negP   %Pax
  * >>     movP   %Pax, %R_fcall0P
@@ -827,11 +849,11 @@ STATIC_ASSERT(IS_ALIGNED(offsetof(struct service_com, sc_generic.g_data), 4));
  * >>     SET_ERROR_RETURN_VALUE()
  * >>     jmp    .Leh_free_service_com_end
  * >>
- * >> //NEVER_USED:#if BUF_PARAM_COUNT != 0
+ * >> //NEVER_USED:#if cg_buf_paramc != 0
  * >> //NEVER_USED:.Lerr_free_xbuf:
  * >> //NEVER_USED:    SET_ERROR_RETURN_VALUE()
  * >> //NEVER_USED:    jmp   .Leh_free_xbuf_end
- * >> //NEVER_USED:#endif // BUF_PARAM_COUNT != 0
+ * >> //NEVER_USED:#endif // cg_buf_paramc != 0
  * >>
  * >> .Lerr_free_service_com:
  * >>     SET_ERROR_RETURN_VALUE()
@@ -840,7 +862,7 @@ STATIC_ASSERT(IS_ALIGNED(offsetof(struct service_com, sc_generic.g_data), 4));
  * >> .Lerr_pop_preemption:
  * >>     SET_ERROR_RETURN_VALUE()
  * >>     jmp   .Leh_preemption_pop_end
- * >> #endif // !EXCEPT_ENABLED
+ * >> #endif // !COM_GENERATOR_FEATURE_FEXCEPT
  * >>
  * >>
  * >>
@@ -922,9 +944,75 @@ STATIC_ASSERT(IS_ALIGNED(offsetof(struct service_com, sc_generic.g_data), 4));
  * >> #endif // !__x86_64__
  * >>     call   _Unwind_Resume
  * >>     .cfi_endproc
- * ================================================================================================
  *
+ * NOTES:
+ *  - Every `call foo' instruction above can  either be encoded as itself,  or
+ *    (if doing so would result in an integer overflow on x86_64), it can also
+ *    be encoded as:
+ *    >> movabs $foo, %rax
+ *    >> call   *%rax
+ *    Though obviously, normal `call' instructions are preferred!
+ *
+ * ================================================================================================
  */
+
+
+
+/* Internal IDs for special locations with wrapper texts.
+ * When wrappers are generated, it is possible to  define
+ * relocations against any of these symbols */
+enum {
+	COM_SYM_Leh_preemption_pop_begin,                                     /* `.Leh_preemption_pop_begin' */
+	COM_SYM_Leh_free_service_com_begin,                                   /* `.Leh_free_service_com_begin' */
+	COM_SYM_Ltest_pending_signals_after_com_buffer_alloc_return,          /* `.Ltest_pending_signals_after_com_buffer_alloc_return'          [valid_if(cg_buf_paramc == 0)] */
+	COM_SYM_Leh_free_xbuf_begin,                                          /* `.Leh_free_xbuf_begin'                                          [valid_if(cg_buf_paramc == 1)] */
+	COM_SYM_Ltest_pending_signals_after_single_buffer_alloc_return,       /* `.Ltest_pending_signals_after_single_buffer_alloc_return'       [valid_if(cg_buf_paramc == 1)] */
+	COM_SYM_Lsingle_buffers_is_in_band,                                   /* `.Lsingle_buffers_is_in_band'                                   [valid_if(cg_buf_paramc == 1)] */
+	COM_SYM_Ltest_pending_signals_after_single_buffers_is_in_band_return, /* `.Ltest_pending_signals_after_single_buffers_is_in_band_return' [valid_if(cg_buf_paramc == 1)] */
+	COM_SYM_Lsingle_buffers_done,                                         /* `.Lsingle_buffers_done'                                         [valid_if(cg_buf_paramc == 1)] */
+	COM_SYM_Leh_free_xbuf_begin,                                          /* `.Leh_free_xbuf_begin'                                          [valid_if(cg_buf_paramc >= 2)] */
+	COM_SYM_Ltest_pending_signals_after_xbuf_alloc_return,                /* `.Ltest_pending_signals_after_xbuf_alloc_return'                [valid_if(cg_buf_paramc >= 2 && (cg_inbuf_paramc != 0 || cg_inoutbuf_paramc != 0))] */
+	COM_SYM_Lall_buffers_are_in_band,                                     /* `.Lall_buffers_are_in_band'                                     [valid_if(cg_buf_paramc >= 2)] */
+	COM_SYM_Lall_buffers_are_in_band_preemption_reenabled,                /* `.Lall_buffers_are_in_band_preemption_reenabled'                [valid_if(cg_buf_paramc >= 2)] */
+	COM_SYM_Leh_com_waitfor_begin,                                        /* `.Leh_com_waitfor_begin' */
+	COM_SYM_Lwaitfor_completion,                                          /* `.Lwaitfor_completion' */
+	COM_SYM_Leh_com_waitfor_end,                                          /* `.Leh_com_waitfor_end' */
+	COM_SYM_Leh_free_xbuf_end,                                            /* `.Leh_free_xbuf_end'                                            [valid_if(cg_buf_paramc != 0)] */
+	COM_SYM_Leh_free_service_com_end,                                     /* `.Leh_free_service_com_end' */
+	COM_SYM_Leh_preemption_pop_end,                                       /* `.Leh_preemption_pop_end' */
+	COM_SYM_Lafter_check_signals_before_return,                           /* `.Lafter_check_signals_before_return' */
+	COM_SYM_Lcheck_signals_before_return,                                 /* `.Lcheck_signals_before_return' */
+	COM_SYM_Ltest_pending_signals_after_com_buffer_alloc,                 /* `.Ltest_pending_signals_after_com_buffer_alloc'                 [valid_if(cg_buf_paramc == 0)] */
+	COM_SYM_Ltest_pending_signals_after_single_buffer_alloc,              /* `.Ltest_pending_signals_after_single_buffer_alloc'              [valid_if(cg_buf_paramc == 1)] */
+	COM_SYM_Ltest_pending_signals_after_single_buffers_is_in_band,        /* `.Ltest_pending_signals_after_single_buffers_is_in_band'        [valid_if(cg_buf_paramc == 1)] */
+	COM_SYM_Ltest_pending_signals_after_xbuf_alloc,                       /* `.Ltest_pending_signals_after_xbuf_alloc'                       [valid_if(cg_buf_paramc >= 2 && (cg_inbuf_paramc != 0 || cg_inoutbuf_paramc != 0))] */
+	COM_SYM_Ltest_pending_signals_after_all_buffers_are_in_band,          /* `.Ltest_pending_signals_after_all_buffers_are_in_band'          [valid_if(cg_buf_paramc >= 2)] */
+	COM_SYM_Lerr_com_abort_errno,                                         /* `.Lerr_com_abort_errno'                                         [valid_if(!COM_GENERATOR_FEATURE_FEXCEPT)] */
+	COM_SYM_Lerr_free_service_com,                                        /* `.Lerr_free_service_com'                                        [valid_if(!COM_GENERATOR_FEATURE_FEXCEPT)] */
+	COM_SYM_Lerr_pop_preemption,                                          /* `.Lerr_pop_preemption'                                          [valid_if(!COM_GENERATOR_FEATURE_FEXCEPT)] */
+	COM_SYM_Leh_com_waitfor_entry,                                        /* `.Leh_com_waitfor_entry' */
+	COM_SYM_Leh_free_xbuf_entry,                                          /* `.Leh_free_xbuf_entry' */
+	COM_SYM_Leh_free_service_com_entry,                                   /* `.Leh_free_service_com_entry' */
+	COM_SYM_Leh_preemption_pop_entry,                                     /* `.Leh_preemption_pop_entry' */
+	COM_SYM_COUNT                                                         /* # of COM symbols */
+};
+
+
+/* COM Relocation types */
+#define COM_R_PCREL32 0 /* [*(s32 *)ADDR += VALUE]       PC-relative, 32-bit */
+#define COM_R_ABSPTR  1 /* [*(uintptr_t *)ADDR += VALUE] Absolute, pointer-sized */
+
+/* Com relocation descriptor */
+struct com_reloc {
+	uint16_t cr_offset; /* .text or .eh_frame offset where relocation should be applied */
+	uint8_t  cr_symbol; /* Symbol against which to relocate (one of `COM_SYM_*') */
+	uint8_t  cr_type;   /* Relocation type (one of `COM_R_*') */
+};
+
+/* Max number of relocations in com wrapper functions */
+#define COM_RELOC_MAXCOUNT (COM_SYM_COUNT + (COM_SYM_COUNT / 4))
+
+
 
 
 /* Flags for `com_inline_buffer_param::cibp_flags' */
@@ -955,8 +1043,9 @@ struct com_buffer_param {
 
 /* Flags for `struct com_generator::cg_features' */
 #define COM_GENERATOR_FEATURE_FNORMAL                       0x00 /* Normal flags. */
-#define COM_GENERATOR_FEATURE_NONBUFFER_ARGUMENTS_USES_LODS 0x01 /* Use `lodsP' to load non-buffer arguments */
-#define COM_GENERATOR_FEATURE_NONBUFFER_ARGUMENTS_USES_STOS 0x02 /* Use `stosP' to write non-buffer arguments */
+#define COM_GENERATOR_FEATURE_FEXCEPT                       0x01 /* Wrapper function uses exceptions */
+#define COM_GENERATOR_FEATURE_NONBUFFER_ARGUMENTS_USES_LODS 0x02 /* Use `lodsP' to load non-buffer arguments */
+#define COM_GENERATOR_FEATURE_NONBUFFER_ARGUMENTS_USES_STOS 0x03 /* Use `stosP' to write non-buffer arguments */
 #ifdef __x86_64__
 #define COM_GENERATOR_FEATURE_USES_R12 0x80 /* %r12 is used and must be saved/restored */
 #else /* __x86_64__ */
@@ -966,62 +1055,121 @@ struct com_buffer_param {
 
 
 struct com_generator {
-	byte_t                     *cg_txptr;                /* [1..1][<= cg_txend] .text writer pointer */
-	byte_t                     *cg_ehptr;                /* [1..1][<= cg_ehend] .eh_frame writer pointer */
-	byte_t                     *cg_txend;                /* [1..1][const] .text buffer end pointer */
-	byte_t                     *cg_ehend;                /* [1..1][const] .eh_frame buffer end pointer */
-	struct service_com_funinfo  cg_info;                 /* [const] Function information. */
-	intptr_t                    cg_cfa_offset;           /* Current offset to-be applied to %Psp to find CFA
-	                                                      * All stack-offset variables are actually relative
-	                                                      * to CFA, and  cg_cfa_offset itself always  points
-	                                                      * just after the return-PC:
-	                                                      * >> RETURN_PC == ((void **)(%Psp + cg_cfa_offset))[-1]; */
-	intptr_t                    cg_locvar_offset;        /* [const] Offset from CFA to the start of local variables */
-	size_t                      cg_locvar_size;          /* [const] Total size of the local variables area */
-	struct com_inline_buffer_param cg_inline_buffer_paramv[SERVICE_ARGC_MAX];
-	                                                     /* [cg_inline_buffer_paramc] Fixed-length inline buffers */
-	struct com_buffer_param     cg_buffer_paramv[SERVICE_ARGC_MAX];
-	                                                     /* [cg_buffer_paramc] Buffer parameters. Sorted by
-	                                                      * buffer type in  order of `in, inout, out'.  Out
-	                                                      * buffers with  SERVICE_OUT_SIZEARG_RETURN_MINVAL
-	                                                      * come after those without. */
-	byte_t                      cg_inline_buffer_paramc; /* [const] # of inline buffer parameters */
-	byte_t                      cg_buffer_paramc;        /* [const] # of buffer parameters */
-	byte_t                      cg_inbuf_paramc;         /* [const] # of in-buffer parameters     (cg_buffer_paramv[0..cg_inbuf_paramc-1]) */
-	byte_t                      cg_inoutbuf_paramc;      /* [const] # of inout-buffer parameters  (cg_buffer_paramv[cg_inbuf_paramc..cg_inoutbuf_paramc+cg_inbuf_paramc-1]) */
-	byte_t                      cg_outbuf_paramc;        /* [const] # of out-buffer parameters    (cg_buffer_paramv[cg_inoutbuf_paramc+cg_inbuf_paramc..cg_inoutbuf_paramc+cg_inbuf_paramc+cg_outbuf_paramc-1]) */
-	byte_t                      cg_features;             /* [const] Code features (set of `COM_GENERATOR_FEATURE_F*') */
+	byte_t                     *cg_txptr;             /* [1..1][>= cg_txbas && <= cg_txend] .text writer pointer */
+	byte_t                     *cg_ehptr;             /* [1..1][>= cg_ehbas && <= cg_ehend] .eh_frame writer pointer */
+	byte_t                     *cg_txbas;             /* [1..1][const] .text base pointer */
+	byte_t                     *cg_ehbas;             /* [1..1][const] .eh_frame base pointer */
+	byte_t                     *cg_txend;             /* [1..1][const] .text buffer end pointer */
+	byte_t                     *cg_ehend;             /* [1..1][const] .eh_frame buffer end pointer */
+	struct service_com_funinfo  cg_info;              /* [const] Function information. */
+	intptr_t                    cg_cfa_offset;        /* Current offset to-be applied to %Psp to find CFA
+	                                                   * All stack-offset variables are actually relative
+	                                                   * to CFA, and  cg_cfa_offset itself always  points
+	                                                   * just after the return-PC:
+	                                                   * >> RETURN_PC == ((void **)(%Psp + cg_cfa_offset))[-1]; */
+	intptr_t                    cg_locvar_offset;     /* [const] Offset from CFA to the start of local variables */
+	size_t                      cg_locvar_size;       /* [const] Total size of the local variables area */
+	struct com_inline_buffer_param cg_inline_buf_paramv[SERVICE_ARGC_MAX];
+	                                                  /* [cg_inline_buf_paramc][const] Fixed-length inline buffers */
+	struct com_buffer_param     cg_buf_paramv[SERVICE_ARGC_MAX];
+	                                                  /* [cg_buf_paramc][const] Buffer parameters. Sorted
+	                                                   * by buffer type in order of `in, inout, out'. Out
+	                                                   * buffers  with  SERVICE_OUT_SIZEARG_RETURN_MINVAL
+	                                                   * come after those without. */
+	byte_t                      cg_inline_buf_paramc; /* [const] # of inline buffer parameters */
+	byte_t                      cg_buf_paramc;        /* [const] # of buffer parameters */
+	byte_t                      cg_inbuf_paramc;      /* [const] # of in-buffer parameters     (cg_buf_paramv[0..cg_inbuf_paramc-1]) */
+	byte_t                      cg_inoutbuf_paramc;   /* [const] # of inout-buffer parameters  (cg_buf_paramv[cg_inbuf_paramc..cg_inoutbuf_paramc+cg_inbuf_paramc-1]) */
+	byte_t                      cg_outbuf_paramc;     /* [const] # of out-buffer parameters    (cg_buf_paramv[cg_inoutbuf_paramc+cg_inbuf_paramc..cg_inoutbuf_paramc+cg_inbuf_paramc+cg_outbuf_paramc-1]) */
+	byte_t                      cg_features;          /* [const] Code features (set of `COM_GENERATOR_FEATURE_F*') */
+	byte_t                      cg_nrelocs;           /* [<= COM_RELOC_MAXCOUNT] # of relocations in use */
+	uint16_t                    cg_symbols[COM_SYM_COUNT]; /* Symbol definitions (relative to `cg_txbas') */
+	struct com_reloc            cg_relocs[COM_RELOC_MAXCOUNT]; /* Relocations */
 };
 
-/* Helper macros for generating offsets */
-#define com_generator_spoffsetof_LOCALS(self)     ((self)->cg_cfa_offset + (self)->cg_locvar_offset)
-#define com_generator_spoffsetof_LOC_oldset(self) (com_generator_spoffsetof_LOCALS(self) + 0)                  /* sigset_t *LOC_oldset; */
-#define com_generator_spoffsetof_LOC_upm(self)    (com_generator_spoffsetof_LOCALS(self) + __SIZEOF_POINTER__) /* struct userprocmask *LOC_upm; */
+
+/* Initialize the given com generator. Prior to calling
+ * this function, the  caller must already  initialize:
+ *  - self->cg_info
+ * NOTE: This  function will leave the following fields
+ *       uninitialized (which must be set-up by a later
+ *       call to `comgen_reset()'):
+ *  - self->cg_txptr, self->cg_ehptr
+ *  - self->cg_txbas, self->cg_ehbas
+ *  - self->cg_txend, self->cg_ehend */
+INTDEF NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL comgen_init)(struct com_generator *__restrict self);
 
 
-// #if BUF_PARAM_COUNT != 0
-//                                         # [0..1] Non-shm buffer temporary storage
-//      CFA-cg_locvar_offset+2*P           void *LOC_bufpar_ptr;
-//
-//                                         # [1..1][valid_if(LOC_bufpar_ptr)] SHM for `LOC_bufpar_ptr'
-//      CFA-cg_locvar_offset+3*P           REF struct service_shm_handle *LOC_bufpar_shm;
-//
-//                                         # [0..1][*] SHM handles for user buffers (NULL for buffers that need to be copied)
-//      CFA-cg_locvar_offset+4*P           struct service_shm_handle *LOC_bufparam_handles[BUF_PARAM_COUNT];
-//
-//                                         # [0..1][*] SHM handles for user buffers (NULL for buffers that need to be copied)
-// #if IN_BUF_PARAM_COUNT != 0 && (INOUT_BUF_PARAM_COUNT != 0 || OUT_BUF_PARAM_COUNT != 0)
-//      CFA-cg_locvar_offset+...           byte_t *LOC_outbuffers_start; # [1..1] Base address for output buffers (see below)
-// #endif // IN_BUF_PARAM_COUNT != 0 && (INOUT_BUF_PARAM_COUNT != 0 || OUT_BUF_PARAM_COUNT != 0)
-// #endif // BUF_PARAM_COUNT != 0
+/* Compile  the  com generator  wrapper function.  Upon return,
+ * the caller must check the status using `comgen_compile_st_*'
+ * Only with both *_moretx and *_moreeh return `false' may  the
+ * compile operation be  considered successful. Otherwise,  the
+ * respective need-more-memory condition should be handled. */
+INTDEF NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL comgen_compile)(struct com_generator *__restrict self);
+#define comgen_compile_st_moretx(self) (!comgen_txok1(self))
+#define comgen_compile_st_moreeh(self) ((self)->cg_ehptr >= (self)->cg_ehend)
+
+/* Helper to check if compilation should continue */
+#define comgen_compile_isok(self)       \
+	(!comgen_compile_st_moretx(self) && \
+	 !comgen_compile_st_moreeh(self))
+
+
+/* Alter the state of `self' such that the caller of `comgen_compile()'
+ * will notice a need-more-eh error condition. */
+#define comgen_need_more_eh(self) \
+	(void)((self)->cg_ehptr = (self)->cg_ehend)
+
+
+/* Reset all  fields that  are not  [const] in  `self'
+ * This must be called whenever code generation has to
+ * be restarted as the result of insufficient .text or
+ * .eh_frame space. */
+#define comgen_reset(self, txbas, txend, ehbas, ehend)             \
+	(void)((self)->cg_txptr = (txbas), (self)->cg_ehptr = (ehbas), \
+	       (self)->cg_txbas = (txbas), (self)->cg_ehbas = (ehbas), \
+	       (self)->cg_txend = (txend), (self)->cg_ehend = (ehend), \
+	       (self)->cg_cfa_offset = sizeof(void *), /* RETURN_PC */ \
+	       (self)->cg_nrelocs    = 0)
+
+
+/* Helper macros for generating offsets to local variables (from %Psp) */
+#define comgen_spoffsetof_LOCALS(self)                ((self)->cg_cfa_offset + (self)->cg_locvar_offset)
+#define comgen_spoffsetof_LOC_oldset(self)            (comgen_spoffsetof_LOCALS(self) + 0)                              /* sigset_t                      *LOC_oldset; */
+#define comgen_spoffsetof_LOC_upm(self)               (comgen_spoffsetof_LOCALS(self) + __SIZEOF_POINTER__)             /* struct userprocmask           *LOC_upm; */
+#define comgen_spoffsetof_LOC_bufpar_ptr(self)        (comgen_spoffsetof_LOCALS(self) + 2 * __SIZEOF_POINTER__)         /* void                          *LOC_bufpar_ptr;                      // [valid_if(cg_inbuf_paramc != 0)] */
+#define comgen_spoffsetof_LOC_bufpar_shm(self)        (comgen_spoffsetof_LOCALS(self) + 3 * __SIZEOF_POINTER__)         /* REF struct service_shm_handle *LOC_bufpar_shm;                      // [valid_if(cg_inbuf_paramc != 0)] */
+#define comgen_spoffsetof_LOC_bufpar_handles(self, i) (comgen_spoffsetof_LOCALS(self) + (4 + (i)) * __SIZEOF_POINTER__) /* struct service_shm_handle     *LOC_bufparam_handles[cg_buf_paramc]; // [valid_if(cg_inbuf_paramc != 0)] */
+#define comgen_spoffsetof_LOC_outbuffers_start(self)  comgen_spoffsetof_LOC_bufpar_handles(self, (self)->cg_buf_paramc) /* byte_t                        *LOC_outbuffers_start;                // [valid_if(cg_inbuf_paramc != 0 && (cg_inoutbuf_paramc != 0 || cg_outbuf_paramc != 0))] */
+
+
+/* Check if  sufficient text  memory remains  available.
+ * When this  macro  returns  `false',  `comgen_instr()'
+ * becomes a no-op,  and the  generator function  should
+ * return with `LIBSERVICE_DLSYM_CREATE_WRAPPER_MORE_TX' */
+#define comgen_txok1(self) \
+	((self)->cg_txptr + GEN86_INSTRLEN_MAX <= (self)->cg_txend)
+#define comgen_txok(self, n_instr) \
+	((self)->cg_txptr + ((n_instr) * GEN86_INSTRLEN_MAX) <= (self)->cg_txend)
+
+/* Helper macro to safely generate instructions:
+ * >> comgen_instr(self, gen86_movb_r_r(&self->cg_txptr, GEN86_R_AL, GEN86_R_AH)); */
+#define comgen_instr(self, ...)         \
+	do {                                \
+		if likely(comgen_txok1(self)) { \
+			__VA_ARGS__;                \
+		}                               \
+	}	__WHILE0
 
 
 
 
 
 
-/* When the currently set exception is RT-level, return `false'.
- * Otherwise,   clear   the   exception   and   return   `true'. */
+/* When  the currently set  exception is RT-level, return
+ * false. Otherwise, clear the exception and return true. */
 INTDEF bool NOTHROW(FCALL libservice_aux_com_discard_nonrt_exception)(void);
 
 
