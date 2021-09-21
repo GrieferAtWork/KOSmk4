@@ -33,7 +33,6 @@
 #include <kos/types.h>
 
 #include <assert.h>
-#include <pthread.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -109,77 +108,6 @@ NOTHROW(CC libservice_dlsym_create_wrapper)(struct service *__restrict self,
                                             struct service_com_funinfo const *__restrict info,
                                             struct service_wrapper_buffer *__restrict buffers,
                                             unsigned int flags) {
-	/* The stack-frame of a wrapper function looks like this:
-	 *
-	 *      CFA+locvar_cfa_offset              [<start of locals>]
-	 *                           +0*P           sigset_t *oldset;         # Old signal maks pointer
-	 *                           +1*P           struct userprocmask *upm; # Return value of `getuserprocmask()'
-	 *                                          ...                       # TODO: Information about user-buffer locations
-	 *      CFA+locvar_cfa_offset+locvar_size  [<end of locals>]
-	 *                                          ...                 # Additional register/argument save area
-	 *  /   CFA-3*P                            [SAVED: %Pbx]        # %Pbx is used for `R_service_com'
-	 *  |   CFA-2*P                            [SAVED: %Pbp]        # %Pbp is used for `R_service_shm_handle'
-	 *  |   CFA-1*P                            [RETURN_PC]
-	 *  |   CFA                                [STACK_ARG[0]]
-	 *  |   CFA+1*P                            [STACK_ARG[1]]
-	 *  |                                       ...
-	 *  \   CFA+n*P                            [STACK_ARG[n]]
-	 *
-	 * Where CFA == (%Psp + cfa_offset)
-	 * Where P   == sizeof(void *)
-	 *
-	 *
-	 * Assembly implementation of wrapper functions:
-	 *
-	 * >>     .cfi_startproc
-	 * >> ENTRY:
-	 * >>     .cfi_def_cfa_offset 0
-	 * >>
-	 * >> // Save registers & allocate stack space
-	 * >>     pushP_cfi_r %Pbp        # %Pbp is used for `R_service_shm_handle'
-	 * >>     pushP_cfi_r %Pbx        # %Pbx is used for `R_service_com'
-	 * >>     ...                     # Additional registers are pushed here (including all argument registers on x86_64)
-	 * >>     subP   $<LOCVAR_SPACE>, %Psp
-	 * >>
-	 * >> // Disable preemption
-	 * >>     call   getuserprocmask
-	 * >>     pushP_cfi %Pax                                                     # Local variable: `struct userprocmask *upm'
-	 * >>     pushP_cfi {offsetof(struct userprocmask, pm_sigmask)}(%Pax)        # Local variable: `sigset_t *oldset'
-	 * >>     movP   $ss_full, {offsetof(struct userprocmask, pm_sigmask)}(%Pax) # Disable preemption
-	 * >>     .cfi_remember_state
-	 * >> .Leh_preemption_pop_begin:
-	 * >>
-	 * >> // Allocate the com buffer
-	 * >>     TODO
-	 * >>
-	 * >>
-	 * >>
-	 * >> .Leh_preemption_pop_end:
-	 * >>     popP_cfi %Pdx              # `sigset_t *oldset'
-	 * >>     popP_cfi %Pax              # `struct userprocmask *upm'
-	 * >>     .cfi_remember_state
-	 * >>     movP   %Pdx, {offsetof(struct userprocmask, pm_sigmask)}(%Pax)
-	 * >>     test   $USERPROCMASK_FLAG_HASPENDING, {offsetof(struct userprocmask, pm_flags)}(%Pax)
-	 * >>     jnz    1f
-	 * >> 2:  addP   $<LOCVAR_SPACE+...>, %Psp
-	 * >>     popP_cfi_r %Pbx            # Only on i386
-	 * >>     popP_cfi_r %Pbp            # Only on i386
-	 * >>     ret
-	 * >>     .cfi_restore_state
-	 * >> 1:  call   chkuserprocmask
-	 * >>     jmp    2b
-	 * >>
-	 * >>     .cfi_restore_state
-	 * >> .Leh_preemption_pop_entry:
-	 * >>     popP_cfi %Pdx              # `sigset_t *oldset'
-	 * >>     popP_cfi %Pax              # `struct userprocmask *upm'
-	 * >>     movP   %Pdx, {offsetof(struct userprocmask, pm_sigmask)}(%Pax)
-	 * >>     call   chkuserprocmask
-	 * >>     call   error_rethrow
-	 * >>     .cfi_endproc
-	 *
-	 */
-
 #define except_enabled ((flags & SERVICE_WRAPPER_FLAG_EXCEPT) != 0)
 	byte_t *tx_ptr, *tx_end;
 	size_t serial_alloc;

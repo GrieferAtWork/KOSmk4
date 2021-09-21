@@ -138,7 +138,7 @@ NOTHROW(CC libservice_buffer_free)(struct service *__restrict self,
 	if (!ptr)
 		return;
 	was = PREEMPTION_PUSHOFF();
-	shm = libservice_shm_ataddr_nopr(self, ptr);
+	shm = libservice_shm_handle_ataddr_nopr(self, ptr);
 	assertf(shm, "service_buffer_free(%p): Invalid pointer", ptr);
 	libservice_shmbuf_free_nopr(self, shm, ptr);
 	PREEMPTION_POP(was);

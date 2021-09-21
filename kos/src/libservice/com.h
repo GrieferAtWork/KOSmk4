@@ -87,13 +87,13 @@ typedef sigset_t *pflag_t;
  * >>         FREE_COMMAND(shm, com);
  * >>         RETHROW();
  * >>     }
- * >>     lfutex_wake((lfutex_t *)&shm->s_commands, 1); // Wake up server
+ * >>     futex_wake((lfutex_t *)&shm->s_commands, 1); // Wake up server
  * >>
  * >>     // Wait for completion
- * >>     if (lfutex_waitwhile(&com->sc_code, cmd) != 0) {
+ * >>     if (futex_waitwhile(&com->sc_code, cmd) != 0) {
  * >>         // Interrupted (abort the operation)
  * >>         assert(errno == EINTR);
- * >>         if (ATOMIC_CMPXCH(com->sc_code, cmd, SERVICE_COM_NOOP)) {
+ * >>         if (ATOMIC_CMPXCH(com->sc_code, cmd, SERVICE_COM_ECHO)) {
  * >>
  * >>             // The following sends an out-of-band command to the server which
  * >>             // will cause the thread servicing our command to receive a sporadic,
@@ -101,16 +101,21 @@ typedef sigset_t *pflag_t;
  * >>             // current blocking operation to be interrupted.
  * >>             INTERRUPT_SERVICE_OPERATION(shm, com);
  * >>
- * >>             // Wait for the `SERVICE_COM_NOOP' to complete.
- * >>             while (lfutex_waitwhile(&com->sc_code, cmd) != 0)
+ * >>             // Wait for the `SERVICE_COM_ECHO' to complete.
+ * >>             while (futex_waitwhile(&com->sc_code, SERVICE_COM_ECHO) != 0)
  * >>                 ;
- * >>             FREE_COMMAND(shm, com);
+ * >>             // Something different may get written if the command completes before
+ * >>             // the interrupt could be received, in which case we'll read the success
+ * >>             // return code rather than anything else.
+ * >>             if (com->sc_code == SERVICE_COM_ST_ECHO) {
+ * >>                 FREE_COMMAND(shm, com);
  * >> #if EXCEPT_ENABLED
- * >>             THROW(E_INTERRUPT);
+ * >>                 THROW(E_INTERRUPT);
  * >> #else // EXCEPT_ENABLED
- * >>             errno = EINTR;
- * >>             return <dl_error_return>; // As returned by `SERVICE_COM_DLSYM'
+ * >>                 errno = EINTR;
+ * >>                 return <dl_error_return>; // As returned by `SERVICE_COM_DLSYM'
  * >> #endif // !EXCEPT_ENABLED
+ * >>             }
  * >>         }
  * >>     }
  * >>
@@ -157,9 +162,12 @@ typedef sigset_t *pflag_t;
  * >>             switch (code) {
  * >>             case SERVICE_COM_DLSYM:
  * >>                ...;
+ * >>                ATOMIC_WRITE(com->sc_code, SERVICE_COM_ST_SUCCESS);
+ * >>                futex_wakeall(&com->sc_code);
  * >>                continue;
- * >>             case SERVICE_COM_NOOP:
- * >>                ...;
+ * >>             case SERVICE_COM_ECHO:
+ * >>                ATOMIC_WRITE(com->sc_code, SERVICE_COM_ST_ECHO);
+ * >>                futex_wakeall(&com->sc_code);
  * >>                continue;
  * >>             default:
  * >>                 break;
@@ -180,7 +188,7 @@ typedef sigset_t *pflag_t;
  * >>             if (!ATOMIC_CMPXCH(com->sc_code, code, SERVICE_COM_ST_EXCEPT))
  * >>                 goto again;
  * >>         }
- * >>         lfutex_wakeall(&com->sc_code); // Should only be 1, but better be safe and broadcast!
+ * >>         futex_wakeall(&com->sc_code); // Should only be 1, but better be safe and broadcast!
  * >>     }
  * >> }
  *
@@ -208,7 +216,7 @@ typedef sigset_t *pflag_t;
 #define SERVICE_COM_EXIT           ((uintptr_t)0)     /* Terminate  the connection. Treated  as an invalid command
                                                        * by the server, who in response, will kill the connection. */
 #define SERVICE_COM_DLSYM          ((uintptr_t)-4094) /* Special command: query symbol */
-#define SERVICE_COM_NOOP           ((uintptr_t)-4093) /* Special command: do nothing */
+#define SERVICE_COM_ECHO           ((uintptr_t)-4093) /* Special command: respond with `SERVICE_COM_ST_ECHO' */
 /*      SERVICE_COM_               ((uintptr_t)-4092)  * ... */
 /************************************************************************/
 
@@ -223,6 +231,7 @@ typedef sigset_t *pflag_t;
                                                          * An  errno being set doesn't necessarily mean that
                                                          * the command failed, but when non-zero, the client
                                                          * will modify its own errno to match this value. */
+#define SERVICE_COM_ST_ECHO        ((uintptr_t)-4094)   /* Always (and only) returned by `SERVICE_COM_ECHO' */
 #define SERVICE_COM_ST_EXCEPT      ((uintptr_t)-4095)   /* Error by means of a KOS exception that will be
                                                          * re-thrown within  the context  of the  client. */
 /************************************************************************/
@@ -465,16 +474,32 @@ libservice_dlsym_getinfo(struct service *__restrict self, char const *__restrict
 		THROWS(E_NO_SUCH_OBJECT, E_BADALLOC, E_INTERRUPT);
 
 
+/* Abort the given command by trying to CMPXCH the command code of `com'
+ * from `orig_code' to `SERVICE_COM_NOOP', before sending an interrupt to
+ * the server and forcing the thread currently serving this command to
+ * restart (at which point the NOOP will be able to complete without any
+ * further blocking)
+ * This function then waits until the operation stops blocking doing that,
+ * and only returns once it is safe to deallocate `com'
+ * @return: true:  The command was aborted.
+ * @return: false: The command complete before it could be aborted. */
+INTDEF WUNUSED NONNULL((1, 2)) bool
+NOTHROW(FCALL libservice_aux_com_abort)(struct service *__restrict self,
+                                        struct service_com *__restrict com,
+                                        uintptr_t orig_code);
+
+
+
 
 
 /* Return the SHM base address of the region that contains
  * `addr'. If no  such SHM region  exists, return  `NULL'. */
 INTDEF NOBLOCK WUNUSED NONNULL((1)) struct service_shm_handle *
-NOTHROW(CC libservice_shm_ataddr)(struct service *__restrict self,
-                                  void const *addr);
+NOTHROW(FCALL libservice_shm_handle_ataddr)(struct service *__restrict self,
+                                            void const *addr);
 INTDEF NOBLOCK NOPREEMPT WUNUSED NONNULL((1)) struct service_shm_handle *
-NOTHROW(CC libservice_shm_ataddr_nopr)(struct service *__restrict self,
-                                       void const *addr);
+NOTHROW(FCALL libservice_shm_handle_ataddr_nopr)(struct service *__restrict self,
+                                                 void const *addr);
 
 
 
@@ -535,18 +560,18 @@ libservice_shmbuf_alloc_nopr(struct service *__restrict self,
  *
  * This function is simply used to implement `service_buffer_realloc'. */
 INTDEF NOBLOCK NOPREEMPT WUNUSED NONNULL((1, 3)) size_t
-NOTHROW(CC libservice_shmbuf_allocat_nopr)(struct service *__restrict self,
-                                           struct service_shm_handle *__restrict shm,
-                                           void *ptr, size_t num_bytes);
+NOTHROW(FCALL libservice_shmbuf_allocat_nopr)(struct service *__restrict self,
+                                              struct service_shm_handle *__restrict shm,
+                                              void *ptr, size_t num_bytes);
 
 /* Mark the given buffer range as free.
  * @assume(num_bytes >= SERVICE_SHM_ALLOC_MINSIZE);
  * @assume(IS_ALIGNED(ptr, SERVICE_SHM_ALLOC_ALIGN));
  * @assume(shm == libservice_shm_ataddr(self, ptr)); */
 INTDEF NOBLOCK NOPREEMPT NONNULL((1, 3)) void
-NOTHROW(CC libservice_shmbuf_freeat_nopr)(struct service *__restrict self,
-                                          REF struct service_shm_handle *__restrict shm,
-                                          void *ptr, size_t num_bytes);
+NOTHROW(FCALL libservice_shmbuf_freeat_nopr)(struct service *__restrict self,
+                                             REF struct service_shm_handle *__restrict shm,
+                                             void *ptr, size_t num_bytes);
 #define libservice_shmbuf_free_nopr(self, shm, ptr)                     \
 	libservice_shmbuf_freeat_nopr(self, shm,                            \
 	                              libservice_shmbuf_get_base_addr(ptr), \

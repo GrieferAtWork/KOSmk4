@@ -102,6 +102,18 @@
 __SYSDECL_BEGIN
 #ifdef __x86_64__
 
+
+/* syscall is called like:
+ *    SYSNO:   %rax
+ *    ARG0:    %rdi
+ *    ARG1:    %rsi
+ *    ARG2:    %rdx
+ *    ARG3:    %r10    # NOTE: This argument differs from SysVAbi!
+ *    ARG4:    %r8
+ *    ARG5:    %r9
+ *    RETURN:  %rax
+ *    CLOBBER: %rcx, %r11 */
+
 #define __X86_SYSCALL_ASSEMBLY \
 	"syscall"
 
@@ -201,6 +213,18 @@ __asm__(".hidden libc___i386_syscall\n\t.global libc___i386_syscall\n\t"
 #define __X86_XSYSCALL_ASSEMBLY  "call __i386_Xsyscall@PLT"
 #define __X86_SYSCALL_MAY_CLOBBER_ECX_EDX 1
 #endif /* ... */
+
+/* __i386_syscall is called like:
+ *    SYSNO:   %eax
+ *    ARG0:    %ebx
+ *    ARG1:    %ecx
+ *    ARG2:    %edx
+ *    ARG3:    %esi
+ *    ARG4:    %edi
+ *    ARG5:    %ebp
+ *    RETURN:  %eax or %eax:%edx
+ *    CLOBBER: %ecx, %edx */
+
 
 #ifndef __X86_SYSCALL_ASSEMBLY
 #define __X86_SYSCALL_ASSEMBLY "int {$0x80|80h}"
