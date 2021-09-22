@@ -47,7 +47,7 @@ DECL_BEGIN
 	do {                                                       \
 		int64_t _c_delta = (int64_t)((uint64_t)(addr) -        \
 		                             (uint64_t)(*(p_pc) + 5)); \
-		if (_c_delta >= INT32_MIN && _c_delta <= INT32_MAX) {  \
+		if (_gen86_fitsl(_c_delta)) {                          \
 			gen86_call_offset(p_pc, (int32_t)_c_delta);        \
 		} else {                                               \
 			gen86_movabs_imm_r(p_pc, addr, GEN86_R_RAX);       \
@@ -295,13 +295,13 @@ STATIC_ASSERT(IS_ALIGNED(offsetof(struct service_com, sc_generic.g_data), 4));
  * >>     movP   $<cg_service>,                               %R_fcall0P
  * >>     movP   <cg_buf_paramv[0].cbp_param_offset>(%Psp), %R_fcall1P
  * >>     call   libservice_shm_handle_ataddr_nopr
- * >>     movP   %Pax, LOC_bufparam_handles[cg_buf_paramv[0].INDEX](%Psp)
+ * >>     movP   %Pax, LOC_bufparam_handles[0](%Psp)
  * >>     testP  %Pax, %Pax
  * >>     jnz    .Lsingle_buffers_is_in_band
  * >>     movP   $<cg_service>,                                         %R_fcall0P
  * >> #if cg_buf_paramv[0].HAS_FIXED_BUFFER_SIZE
  * >>     movP   $<cg_buf_paramv[0].FIXED_BUFFER_SIZE_WITH_ADJUSTMENT>, %R_fcall1P
- * >> #else !cg_buf_paramv[0].HAS_FIXED_BUFFER_SIZE
+ * >> #else // cg_buf_paramv[0].HAS_FIXED_BUFFER_SIZE
  * >>     movP   ...,                                                   %R_fcall1P  # Buffer size requirements of cg_buf_paramv[0]
  * >> #if cg_buf_paramv[0].IS_IN_OR_INOUT_BUFFER
  * >>     movP   %R_fcall1P, %Psi    # Used by the out-of-band copy-in loop below!
@@ -332,7 +332,7 @@ STATIC_ASSERT(IS_ALIGNED(offsetof(struct service_com, sc_generic.g_data), 4));
  * >>     movP   LOC_oldset(%Psp), %Pcx  # `sigset_t *oldset'
  * >>     movP   LOC_upm(%Psp),    %Pdx  # `struct userprocmask *upm'
  * >>     movP   %Pcx, userprocmask::pm_sigmask(%Pdx)
- * >>     movP   %Pax, <cg_buf_paramv[0].cbp_serial_offset>(%Psp)
+ * >>     movP   %Pax, <cg_buf_paramv[0].cbp_serial_offset>(%R_service_com)
  * >>     test   $USERPROCMASK_FLAG_HASPENDING, userprocmask::pm_flags(%Pdx)
  * >>     jnz    .Ltest_pending_signals_after_single_buffer_alloc
  * >> .Ltest_pending_signals_after_single_buffer_alloc_return:
@@ -358,7 +358,7 @@ STATIC_ASSERT(IS_ALIGNED(offsetof(struct service_com, sc_generic.g_data), 4));
  * >>     # %Pax == libservice_shm_handle_ataddr_nopr(<cg_service>, <cg_buf_paramv[0].cbp_param_offset>(%Psp))
  * >>     movP   <cg_buf_paramv[0].cbp_param_offset>(%Psp), %Pdx
  * >>     subP   service_shm_handle::ssh_shm(%Pax), %Pdx
- * >>     movP   %Pdx, <cg_buf_paramv[0].cbp_serial_offset>(%Psp)
+ * >>     movP   %Pdx, <cg_buf_paramv[0].cbp_serial_offset>(%R_service_com)
  * >> .Lsingle_buffers_done:
  * >>
  * >> #else // #elif cg_buf_paramc >= 2
@@ -986,9 +986,7 @@ enum {
 	COM_SYM_Ltest_pending_signals_after_com_buffer_alloc_return,          /* `.Ltest_pending_signals_after_com_buffer_alloc_return'          [valid_if(cg_buf_paramc == 0)] */
 	COM_SYM_Leh_free_xbuf_begin,                                          /* `.Leh_free_xbuf_begin'                                          [valid_if(cg_buf_paramc == 1)] */
 	COM_SYM_Ltest_pending_signals_after_single_buffer_alloc_return,       /* `.Ltest_pending_signals_after_single_buffer_alloc_return'       [valid_if(cg_buf_paramc == 1)] */
-	COM_SYM_Lsingle_buffers_is_in_band,                                   /* `.Lsingle_buffers_is_in_band'                                   [valid_if(cg_buf_paramc == 1)] */
 	COM_SYM_Ltest_pending_signals_after_single_buffers_is_in_band_return, /* `.Ltest_pending_signals_after_single_buffers_is_in_band_return' [valid_if(cg_buf_paramc == 1)] */
-	COM_SYM_Lsingle_buffers_done,                                         /* `.Lsingle_buffers_done'                                         [valid_if(cg_buf_paramc == 1)] */
 	COM_SYM_Ltest_pending_signals_after_xbuf_alloc_return,                /* `.Ltest_pending_signals_after_xbuf_alloc_return'                [valid_if(cg_buf_paramc >= 2 && (cg_inbuf_paramc != 0 || cg_inoutbuf_paramc != 0))] */
 	COM_SYM_Lall_buffers_are_in_band,                                     /* `.Lall_buffers_are_in_band'                                     [valid_if(cg_buf_paramc >= 2)] */
 	COM_SYM_Lall_buffers_are_in_band_preemption_reenabled,                /* `.Lall_buffers_are_in_band_preemption_reenabled'                [valid_if(cg_buf_paramc >= 2)] */
@@ -1058,6 +1056,10 @@ struct com_int_param {
 #else /* __x86_64__ */
 #define COM_USEMOVS_THRESHOLD 9
 #endif /* !__x86_64__ */
+
+/* Try to use `rep movsX' when at least this many identical
+ * consecutive movsX instructions would have to be generated. */
+#define COM_USEREP_THRESHOLD 8
 
 
 /* Flags for `com_inline_buffer_param::cibp_flags' */
@@ -1295,7 +1297,7 @@ struct ATTR_PACKED com_eh_frame {
 /* Minimum buffer sizes which must be set in a call to `comgen_reset()'
  * Note that less than this  may end up being  used, but these are  the
  * minimum requirements imposed on input buffer sizes. */
-#define COM_GENERATOR_INITIAL_TX_BUFSIZ (256)
+#define COM_GENERATOR_INITIAL_TX_BUFSIZ (512)
 #define COM_GENERATOR_INITIAL_EH_BUFSIZ (offsetof(struct com_eh_frame, cef_fde_text) + 64)
 
 

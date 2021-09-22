@@ -23,7 +23,6 @@
 #include "api.h"
 
 #include <hybrid/__unaligned.h>
-#include <hybrid/limitcore.h>
 
 /* Register indices */
 #define GEN86_R_AL   0  /* Accumulator. (lower byte) */
@@ -179,15 +178,24 @@
 
 
 
-#ifdef __CC__
-__DECL_BEGIN
-
 #define GEN86_MODRM_MOD_MASK  0xc0 /* 0b11000000 */
 #define GEN86_MODRM_REG_MASK  0x38 /* 0b00111000 */
 #define GEN86_MODRM_RM_MASK   0x07 /* 0b00000111 */
 #define GEN86_MODRM_MOD_SHIFT 6
 #define GEN86_MODRM_REG_SHIFT 3
 #define GEN86_MODRM_RM_SHIFT  0
+
+#ifdef __CC__
+
+/* Check if `value' fits into a signed 8-bit integer */
+#define _gen86_fitsb(value) ((__INT8_TYPE__)(value) == (value))
+
+#if LIBGEN86_TARGET_BITS == 64
+/* Check if `value' fits into a signed 32-bit integer */
+#define _gen86_fitsl(value)                                      \
+	((__INT32_TYPE__)(__INT64_TYPE__)(__UINT64_TYPE__)(value) == \
+	 (__INT64_TYPE__)(__UINT64_TYPE__)(value))
+#endif /* LIBGEN86_TARGET_BITS != 64 */
 
 #define _gen86_putb(p_pc, b)  (void)(*(*(p_pc))++ = (__UINT8_TYPE__)(b))
 #define _gen86_putsb(p_pc, b) (void)(*(*(p_pc))++ = (__UINT8_TYPE__)(__INT8_TYPE__)(b))
@@ -367,7 +375,7 @@ __DECL_BEGIN
 
 /* <instr> %reg, disp(%breg)     # Autoselect optimal encoding for `disp' */
 #define gen86_modrm16_db(p_pc, _rex, _putinstr, reg, disp, breg, _putimm)     \
-	((disp) >= __INT8_MIN__ && (disp) <= __INT8_MAX__                         \
+	(_gen86_fitsb(disp)                                                       \
 	 ? ((disp) == 0                                                           \
 	    ? gen86_modrm16_b(p_pc, _rex, _putinstr, reg, breg, _putimm)          \
 	    : gen86_modrm16_d8b(p_pc, _rex, _putinstr, reg, disp, breg, _putimm)) \
@@ -396,7 +404,7 @@ __DECL_BEGIN
 
 /* <instr> %reg, disp32s(%breg)   # `disp32s' must `int32_t'; Autoselect optimal encoding for `disp' */
 #define gen86_modrm32_db(p_pc, _rex, _putinstr, reg, disp32s, breg, _putimm)     \
-	((disp32s) >= __INT8_MIN__ && (disp32s) <= __INT8_MAX__                      \
+	(_gen86_fitsb(disp32s)                                                       \
 	 ? ((disp32s) == 0                                                           \
 	    ? gen86_modrm32_b(p_pc, _rex, _putinstr, reg, breg, _putimm)             \
 	    : gen86_modrm32_d8b(p_pc, _rex, _putinstr, reg, disp32s, breg, _putimm)) \
@@ -453,7 +461,7 @@ __DECL_BEGIN
 
 /* <instr> %reg, disp(%breg,%index)    # Autoselect optimal encoding for `disp' */
 #define gen86_modrm16_dbi(p_pc, _rex, _putinstr, reg, disp, breg, index, _putimm)     \
-	((disp) >= __INT8_MIN__ && (disp) <= __INT8_MAX__                                 \
+	(_gen86_fitsb(disp)                                                               \
 	 ? ((disp) == 0                                                                   \
 	    ? gen86_modrm16_bi(p_pc, _rex, _putinstr, reg, breg, index, _putimm)          \
 	    : gen86_modrm16_d8bi(p_pc, _rex, _putinstr, reg, disp, breg, index, _putimm)) \
@@ -517,7 +525,7 @@ __DECL_BEGIN
 
 /* <instr> %reg, disp(%breg,%index)    # Autoselect optimal encoding for `disp' */
 #define gen86_modrm32_dbi(p_pc, _rex, _putinstr, reg, disp, breg, index, _putimm)     \
-	((disp) >= __INT8_MIN__ && (disp) <= __INT8_MAX__                                 \
+	(_gen86_fitsb(disp)                                                               \
 	 ? ((disp) == 0                                                                   \
 	    ? gen86_modrm32_bi(p_pc, _rex, _putinstr, reg, breg, index, _putimm)          \
 	    : gen86_modrm32_d8bi(p_pc, _rex, _putinstr, reg, disp, breg, index, _putimm)) \
@@ -529,7 +537,7 @@ __DECL_BEGIN
 
 /* <instr> %reg, disp(%breg,%index, scale) # Autoselect optimal encoding for `disp' */
 #define gen86_modrm32_dbis(p_pc, _rex, _putinstr, reg, disp, breg, index, scale, _putimm)     \
-	((disp) >= __INT8_MIN__ && (disp) <= __INT8_MAX__                                         \
+	(_gen86_fitsb(disp)                                                                       \
 	 ? ((disp) == 0                                                                           \
 	    ? gen86_modrm32_bis(p_pc, _rex, _putinstr, reg, breg, index, scale, _putimm)          \
 	    : gen86_modrm32_d8bis(p_pc, _rex, _putinstr, reg, disp, breg, index, scale, _putimm)) \
@@ -590,8 +598,6 @@ __DECL_BEGIN
 #endif /* LIBGEN86_TARGET_BITS >= 32 */
 
 
-
-__DECL_END
 #endif /* __CC__ */
 
 
