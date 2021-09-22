@@ -79,11 +79,11 @@ PRIVATE ATTR_NORETURN ATTR_COLD ATTR_SECTION(".text.crt.assert") void LIBCCALL
 trap_application(struct kcpustate *__restrict state,
                  union coredump_info *info,
                  unsigned int unwind_error) {
-	struct ucpustate ustate;
-	kcpustate_to_ucpustate(state, &ustate);
+	struct ucpustate uc;
+	kcpustate_to_ucpustate(state, &uc);
 
 	/* Try to do a coredump */
-	sys_coredump(&ustate, NULL, NULL, 0, info, unwind_error);
+	sys_coredump(&uc, NULL, NULL, 0, info, unwind_error);
 
 	/* If even the coredump  failed (which it shouldn't  have,
 	 * consequently meaning that shouldn't actually get here),
@@ -92,7 +92,7 @@ trap_application(struct kcpustate *__restrict state,
 }
 
 
-INTERN ATTR_NORETURN ATTR_COLD ATTR_SECTION(".text.crt.assert") void __FCALL
+INTERN ATTR_NORETURN ATTR_COLD ATTR_SECTION(".text.crt.assert") void FCALL
 libc_stack_failure_core(struct kcpustate *__restrict state) {
 	format_printf(&assert_printer, NULL,
 	              "User-space stack check failure [pc=%p]\n",
@@ -100,8 +100,58 @@ libc_stack_failure_core(struct kcpustate *__restrict state) {
 	trap_application(state, NULL, UNWIND_USER_SSP);
 }
 
-INTERN ATTR_NORETURN ATTR_COLD ATTR_SECTION(".text.crt.assert") void __FCALL
+
+/* If a custom signal handler for SIGABRT has been set,
+ * sys_raiseat(2) that  signal  at  the  given  `state' */
+PRIVATE ATTR_NOINLINE ATTR_SECTION(".text.crt.assert") void FCALL
+maybe_raise_SIGABRT(struct kcpustate *__restrict state) {
+	struct sigaction sa;
+	struct ucpustate uc;
+	siginfo_t si;
+	if (sys_rt_sigaction(SIGABRT, NULL, &sa, sizeof(sigset_t)) != EOK)
+		return; /* Shouldn't happen */
+	if (sa.sa_handler == SIG_DFL)
+		return; /* No custom handling defined */
+	if (sa.sa_handler == SIG_CORE) {
+		/* Custom handling _is_  to trigger a  coredump.
+		 * Since that's what we want to do anyways, just
+		 * go the normal route so we can include as much
+		 * meta-data as possible! */
+		return;
+	}
+
+	/* The specs say that abort() should also unmask SIGABRT, so
+	 * we  do that, too.  Note that we  just use the sigprocmask
+	 * system call, which always does the right thing, even when
+	 * userprocmask has been enabled. */
+	{
+		sigset_t unblock;
+		sigemptyset(&unblock);
+		sigaddset(&unblock, SIGABRT);
+		sys_rt_sigprocmask(SIG_UNBLOCK, &unblock,
+		                   NULL, sizeof(unblock));
+	}
+
+	/* Custom handler has been defined. -> Raise a signal. */
+	kcpustate_to_ucpustate(state, &uc);
+	memset(&si, 0, sizeof(si));
+	si.si_signo = SIGABRT;
+	si.si_code  = SI_USER;
+	sys_raiseat(&uc, &si);
+
+	/* Probably shouldn't get here, but if we do, we'll just
+	 * end up trigger  a coredump anyways,  which is  pretty
+	 * much all we could do at this point in any case. */
+}
+
+INTERN ATTR_NORETURN ATTR_COLD ATTR_SECTION(".text.crt.assert") void FCALL
 libc_abort_failure_core(struct kcpustate *__restrict state) {
+	/* If the user has defined a custom sigaction for `SIGABRT',
+	 * then instead of directly  triggering a coredump, we  must
+	 * sys_raiseat(2) that signal at the given `state'! */
+	maybe_raise_SIGABRT(state);
+
+	/* Normal abort handling. */
 	format_printf(&assert_printer, NULL,
 	              "abort() called [pc=%p]\n",
 	              kcpustate_getpc(state));
