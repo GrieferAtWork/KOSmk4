@@ -614,10 +614,10 @@ genArithBlock("cmp", 0x38);
 #define gen86_movw_imm_r(p_pc, imm, reg)   /* movw   $imm, %reg */ (_gen86_pfx16_(p_pc) !((reg) & 8) || (_gen86_putb(p_pc, 0x40 | GEN86_REX_B), 0), _gen86_putb(p_pc, 0xb8 + (reg)&7), _gen86_putw(p_pc, imm))
 #define gen86_movl_imm_r(p_pc, imm, reg)   /* movl   $imm, %reg */ (_gen86_pfx32_(p_pc) !((reg) & 8) || (_gen86_putb(p_pc, 0x40 | GEN86_REX_B), 0), _gen86_putb(p_pc, 0xb8 + (reg)&7), _gen86_putl(p_pc, imm))
 #define gen86_movabs_imm_r(p_pc, imm, reg) /* movabs $imm, %reg */ (_gen86_putb(p_pc, 0x40 | GEN86_REX_W | ((reg)&8 ? GEN86_REX_B : 0)), _gen86_putb(p_pc, 0xb8 + (reg)&7), _gen86_putq(p_pc, imm))
-#define gen86_movq_imm_r(p_pc, imm, reg)                                    \
-	((__INT64_TYPE__)(__UINT64_TYPE__)(imm) >= __INT32_MIN__ &&             \
-	 (__INT64_TYPE__)(__UINT64_TYPE__)(imm) <= __INT32_MAX__                \
-	 ? gen86_movq_imm_mod(p_pc, gen86_modrm_r, (__UINT32_TYPE__)(imm), reg) \
+#define gen86_movq_imm_r(p_pc, imm, reg)                                                     \
+	((__INT64_TYPE__)(__UINT64_TYPE__)(imm) >= __INT32_MIN__ &&                              \
+	 (__INT64_TYPE__)(__UINT64_TYPE__)(imm) <= __INT32_MAX__                                 \
+	 ? gen86_movq_imm_mod(p_pc, gen86_modrm_r, (__UINT32_TYPE__)(__UINT64_TYPE__)(imm), reg) \
 	 : gen86_movabs_imm_r(p_pc, imm, reg))
 #else /* LIBGEN86_TARGET_BITS == 64 */
 #define gen86_movb_imm_r(p_pc, imm, reg) /* movb $imm, %reg */ (_gen86_putb(p_pc, 0xb0 + (reg)), _gen86_putb(p_pc, imm))

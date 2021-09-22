@@ -161,9 +161,9 @@ STATIC_ASSERT(IS_ALIGNED(offsetof(struct service_com, sc_generic.g_data), 4));
  * #ifndef __x86_64__
  *    + PARAM_COUNT_OF(SERVICE_TYPE_386_R64) * sizeof(uintptr_t)  # On i386, 64-bit arguments take 2 serial words
  * #endif // !__x86_64__
- *    + SUM(cg_inline_buf_paramc.each.buffer_size)                # Inline buffers are allocated alongside com
+ *    + SUM(cg_inline_buf_paramv.each.buffer_size.ceil_align(sizeof(void *))) # Inline buffers are allocated within com
  * Afterwards, apply the size requirements detailed in `libservice_shmbuf_alloc_nopr()'
- * to  the calculated  size to generate  the effective allocation  size. The unadjusted
+ * to the calculated size to generate the effective allocation size. The unadjusted
  * value is stored in `cg_sizeof_service_com'
  *
  * <cibp_buffer_offset> is calculated as:
@@ -190,6 +190,10 @@ STATIC_ASSERT(IS_ALIGNED(offsetof(struct service_com, sc_generic.g_data), 4));
  *
  * ================================================================================================
  * Wrapper functions are implemented as follows:
+ * WARNING: The below documentation isn't an aproximation; it is the _real_ _thing_!
+ *          Any modification made below _MUST_  be mirrored in the appropriate  code
+ *          generation  sub-routines. If the two ever fall  out of sync too much, it
+ *          might become impossible to navigate and update either!
  *
  * >>
  * >> #ifdef __x86_64__
@@ -240,15 +244,20 @@ STATIC_ASSERT(IS_ALIGNED(offsetof(struct service_com, sc_generic.g_data), 4));
  * >> #endif // COM_GENERATOR_FEATURE_USES_EDI
  * >> #endif // !__x86_64__
  * >>
- * >>     subP   $<cg_locvar_size>, %Psp
- * >>     .cfi_adjust_cfa_offset <cg_locvar_size>
+ * >>     subP   $<cg_locvar_size - 2 * sizeof(void*)>, %Psp
+ * >>     .cfi_adjust_cfa_offset <cg_locvar_size - 2 * sizeof(void*)>
  * >>
  * >> // Disable preemption
  * >>     call   getuserprocmask
- * >>     pushP_cfi %Pax                                                     # LOC_upm
+ * >>     pushP_cfi %Pax                                  # LOC_upm
  * >>     pushP_cfi userprocmask::pm_sigmask(%Pax)        # LOC_oldset
- * >>     movP   $ss_full, userprocmask::pm_sigmask(%Pax) # Disable preemption
  * >>     .cfi_remember_state
+ * >> #if defined(__x86_64__) && $full_sigset > 0xffffffff
+ * >>     movabs $full_sigset, %Pcx
+ * >>     movP   %Pcx,         userprocmask::pm_sigmask(%Pax) # Disable preemption
+ * >> #else // __x86_64__ && $full_sigset > 0xffffffff
+ * >>     movP   $full_sigset, userprocmask::pm_sigmask(%Pax) # Disable preemption
+ * >> #endif // !__x86_64__ || $full_sigset <= 0xffffffff
  * >> .Leh_preemption_pop_begin:
  * >>
  * >>
@@ -264,11 +273,11 @@ STATIC_ASSERT(IS_ALIGNED(offsetof(struct service_com, sc_generic.g_data), 4));
  * >> #endif // COM_GENERATOR_FEATURE_FEXCEPT
  * >>     movP   %Pax, %R_service_shm_handle   # %R_service_shm_handle == %Pbp
  * >>     movP   %Pdx, %R_service_com          # %R_service_com        == %Pbx
+ * >> .Leh_free_service_com_begin:
  * >>
  * >>
  * >>
  * >> // Initialize the command descriptor
- * >> .Leh_free_service_com_begin:
  * >>
  * >>
  * >>
@@ -440,6 +449,7 @@ STATIC_ASSERT(IS_ALIGNED(offsetof(struct service_com, sc_generic.g_data), 4));
  * >>     jnz    .Ltest_pending_signals_after_all_buffers_are_in_band
  * >> .Lall_buffers_are_in_band_preemption_reenabled:
  * >> #endif // #endif cg_buf_paramc >= 2
+ * >>
  * >>
  * >>
  * >>
@@ -690,9 +700,15 @@ STATIC_ASSERT(IS_ALIGNED(offsetof(struct service_com, sc_generic.g_data), 4));
  * >>     pushP_cfi %Pdx
  * >> #endif // !__x86_64__
  * >>     movP   LOC_bufpar_shm(%Psp), %R_fcall1P
- * >>     movP   $<cg_service>,        %R_fcall0P
  * >>     movP   LOC_upm(%Psp), %Pax
- * >>     movP   $ss_full, userprocmask::pm_sigmask(%Pax) # re-disable preemption
+ * >> #if defined(__x86_64__) && $full_sigset > 0xffffffff
+ * >>     movabs $full_sigset,  %R_fcall0P
+ * >>     movP   %R_fcall0P,    userprocmask::pm_sigmask(%Pax) # re-disable preemption
+ * >>     movP   $<cg_service>, %R_fcall0P
+ * >> #else // __x86_64__ && $full_sigset > 0xffffffff
+ * >>     movP   $<cg_service>, %R_fcall0P
+ * >>     movP   $full_sigset,  userprocmask::pm_sigmask(%Pax) # re-disable preemption
+ * >> #endif // !__x86_64__ || $full_sigset <= 0xffffffff
  * >>     call   libservice_shmbuf_freeat_nopr
  * >> #ifndef __x86_64__
  * >>     .cfi_adjust_cfa_offset -8
@@ -713,7 +729,6 @@ STATIC_ASSERT(IS_ALIGNED(offsetof(struct service_com, sc_generic.g_data), 4));
  * >>     pushl_cfi %R_service_com
  * >> #endif // !__x86_64__
  * >>     movP   %R_service_shm_handle, %R_fcall1P
- * >>     movP   $<cg_service>,         %R_fcall0P
  * >> #ifdef __x86_64__
  * >>     movq   service_com::sc_retval::scr_rax+<sizeof(size_t)>(%R_service_com), %rbp # Load return values
  * >> #else // __x86_64__
@@ -722,8 +737,17 @@ STATIC_ASSERT(IS_ALIGNED(offsetof(struct service_com, sc_generic.g_data), 4));
  * >> #endif // !__x86_64__
  * >> #if cg_buf_paramc == 0
  * >>     movP   LOC_upm(%Psp), %Pax
- * >>     movP   $ss_full, userprocmask::pm_sigmask(%Pax) # re-disable preemption
- * >> #endif // cg_buf_paramc == 0
+ * >> #if defined(__x86_64__) && $full_sigset > 0xffffffff
+ * >>     movabs $full_sigset,  %R_fcall0P
+ * >>     movP   %R_fcall0P,    userprocmask::pm_sigmask(%Pax) # re-disable preemption
+ * >>     movP   $<cg_service>, %R_fcall0P
+ * >> #else // __x86_64__ && $full_sigset > 0xffffffff
+ * >>     movP   $<cg_service>, %R_fcall0P
+ * >>     movP   $full_sigset,  userprocmask::pm_sigmask(%Pax) # re-disable preemption
+ * >> #endif // !__x86_64__ || $full_sigset <= 0xffffffff
+ * >> #else // cg_buf_paramc == 0
+ * >>     movP   $<cg_service>, %R_fcall0P
+ * >> #endif // cg_buf_paramc != 0
  * >>     call   libservice_shmbuf_freeat_nopr
  * >> #ifndef __x86_64__
  * >>     .cfi_adjust_cfa_offset -8
@@ -993,14 +1017,14 @@ enum {
 
 
 /* COM Relocation types */
-#define COM_R_PCREL32 0 /* [*(s32 *)ADDR += VALUE]       PC-relative, 32-bit */
+#define COM_R_PCREL32 0 /* [*(s32 *)ADDR += (32)(u32)(VALUE - (uintptr_t)ADDR)] PC-relative, 32-bit */
 #define COM_R_ABSPTR  1 /* [*(uintptr_t *)ADDR += VALUE] Absolute, pointer-sized */
 
 /* Com relocation descriptor */
 struct com_reloc {
-	uint16_t cr_offset; /* .text or .eh_frame offset where relocation should be applied */
-	uint8_t  cr_symbol; /* Symbol against which to relocate (one of `COM_SYM_*') */
+	uint16_t cr_offset; /* .text offset where relocation should be applied */
 	uint8_t  cr_type;   /* Relocation type (one of `COM_R_*') */
+	uint8_t  cr_symbol; /* Symbol against which to relocate (one of `COM_SYM_*') */
 };
 
 /* Max number of relocations in com wrapper functions */
@@ -1079,19 +1103,12 @@ struct com_buffer_param {
 
 
 struct com_generator {
-	byte_t                     *cg_txptr;             /* [1..1][>= cg_txbas && <= cg_txend] .text writer pointer */
-	byte_t                     *cg_ehptr;             /* [1..1][>= cg_ehbas && <= cg_ehend] .eh_frame writer pointer */
 	byte_t                     *cg_txbas;             /* [1..1][const] .text base pointer */
 	byte_t                     *cg_ehbas;             /* [1..1][const] .eh_frame base pointer */
 	byte_t                     *cg_txend;             /* [1..1][const] .text buffer end pointer */
 	byte_t                     *cg_ehend;             /* [1..1][const] .eh_frame buffer end pointer */
 	struct service             *cg_service;           /* [1..1][const] The service in question. */
 	struct service_com_funinfo  cg_info;              /* [const] Function information. */
-	int16_t                     cg_cfa_offset;        /* Current offset to-be applied to %Psp to find CFA
-	                                                   * All stack-offset variables are actually relative
-	                                                   * to CFA, and  cg_cfa_offset itself always  points
-	                                                   * just after the return-PC:
-	                                                   * >> RETURN_PC == ((void **)(%Psp + cg_cfa_offset))[-1]; */
 	int16_t                     cg_locvar_offset;     /* [const] Offset from CFA to the start of local variables */
 	uint16_t                    cg_locvar_size;       /* [const] Total size of the local variables area */
 	struct com_int_param        cg_intpar[SERVICE_INTPAR_MACOUNT]; /* [cg_int_paramc][const] Word-sized integer parameters */
@@ -1111,9 +1128,19 @@ struct com_generator {
 	uint8_t                     cg_int_paramc;        /* [const] # of integer parameters */
 	uint8_t                     cg_paramc;            /* [const] # of parameters (index of first SERVICE_TYPE_VOID param, or SERVICE_ARGC_MAX when all params are used) */
 	uint8_t                     cg_features;          /* [const] Code features (set of `COM_GENERATOR_FEATURE_F*') */
+	/* Fields used internally  by `comgen_compile()'.  These don't  require
+	 * any special initialization and are left undefined by `comgen_init()' */
 	uint8_t                     cg_nrelocs;           /* [<= COM_RELOC_MAXCOUNT] # of relocations in use */
+	int16_t                     cg_cfa_offset;        /* Current offset to-be applied to %Psp to find CFA
+	                                                   * All stack-offset variables are actually relative
+	                                                   * to CFA, and  cg_cfa_offset itself always  points
+	                                                   * just after the return-PC:
+	                                                   * >> RETURN_PC == ((void **)(%Psp + cg_cfa_offset))[-1]; */
 	uint16_t                    cg_symbols[COM_SYM_COUNT]; /* Symbol definitions (relative to `cg_txbas') */
 	struct com_reloc            cg_relocs[COM_RELOC_MAXCOUNT]; /* Relocations */
+	byte_t                     *cg_txptr;             /* [1..1][>= cg_txbas && <= cg_txend] .text writer pointer */
+	byte_t                     *cg_ehptr;             /* [1..1][>= cg_ehbas && <= cg_ehend] .eh_frame writer pointer */
+	byte_t                     *cg_CFA_loc;           /* [1..1][>= cg_txbas && <= cg_txend] Last CFA instrumentation location. */
 };
 
 
@@ -1123,14 +1150,12 @@ struct com_generator {
  * NOTE: This  function will leave the following fields
  *       uninitialized (which must be set-up by a later
  *       call to `comgen_reset()'):
- *  - self->cg_txptr, self->cg_ehptr
  *  - self->cg_txbas, self->cg_ehbas
- *  - self->cg_txend, self->cg_ehend
- *  - self->cg_cfa_offset, self->cg_nrelocs */
+ *  - self->cg_txend, self->cg_ehend */
 INTDEF NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL _comgen_init)(struct com_generator *__restrict self);
-#define comgen_init(self, service, enable_except)           \
-	((self)->cg_service  = (service),                       \
+#define comgen_init(self, svc, enable_except)               \
+	((self)->cg_service  = (svc),                           \
 	 (self)->cg_features = (enable_except)                  \
 	                       ? COM_GENERATOR_FEATURE_FEXCEPT  \
 	                       : COM_GENERATOR_FEATURE_FNORMAL, \
@@ -1141,11 +1166,29 @@ NOTHROW(FCALL _comgen_init)(struct com_generator *__restrict self);
  * the caller must check the status using `comgen_compile_st_*'
  * Only with both *_moretx and *_moreeh return `false' may  the
  * compile operation be  considered successful. Otherwise,  the
- * respective need-more-memory condition should be handled. */
-INTDEF NOBLOCK NONNULL((1)) void
+ * respective need-more-memory condition should be handled.
+ *
+ * @return: true:  Compilation succeed (you may assume `comgen_compile_isok(self) == true')
+ * @return: false: Compilation failed due to lack of .text- or  .eh_frame-memory
+ *                 Check which is the case with `comgen_compile_st_moretx()' and
+ *                 `comgen_compile_st_moreeh()'
+ *
+ * NOTE: Upon  success, the  used EH  buffer size  will indicate 4
+ *       bytes more than should actually be accounted as belonging
+ *       to the associated function. These bytes may not be freed,
+ *       but should be overwritten  (iow: passed as `cg_ehbas'  in
+ *       some  future compilation operation),  as they represent a
+ *       sentinel marker in unwind debug data.
+ *       The implementation of  this function takes  care to  maintain
+ *       the  sentinel until the  point in time when  eh data has been
+ *       finalized, at which point other threads may immediately begin
+ *       parsing generated debug data.
+ *       Until  that point,  the sentinel  must be  kept to prevent
+ *       other threads from accessing incomplete debug information! */
+INTDEF NOBLOCK WUNUSED NONNULL((1)) bool
 NOTHROW(FCALL comgen_compile)(struct com_generator *__restrict self);
 #define comgen_compile_st_moretx(self) (!comgen_txok1(self))
-#define comgen_compile_st_moreeh(self) ((self)->cg_ehptr >= (self)->cg_ehend)
+#define comgen_compile_st_moreeh(self) (!comgen_ehok(self))
 
 /* Helper to check if compilation should continue */
 #define comgen_compile_isok(self)       \
@@ -1153,22 +1196,14 @@ NOTHROW(FCALL comgen_compile)(struct com_generator *__restrict self);
 	 !comgen_compile_st_moreeh(self))
 
 
-/* Alter the state of `self' such that the caller of `comgen_compile()'
- * will notice a need-more-eh error condition. */
-#define comgen_need_more_eh(self) \
-	(void)((self)->cg_ehptr = (self)->cg_ehend)
-
 
 /* Reset all  fields that  are not  [const] in  `self'
  * This must be called whenever code generation has to
  * be restarted as the result of insufficient .text or
  * .eh_frame space. */
 #define comgen_reset(self, txbas, txend, ehbas, ehend)             \
-	(void)((self)->cg_txptr = (txbas), (self)->cg_ehptr = (ehbas), \
-	       (self)->cg_txbas = (txbas), (self)->cg_ehbas = (ehbas), \
-	       (self)->cg_txend = (txend), (self)->cg_ehend = (ehend), \
-	       (self)->cg_cfa_offset = sizeof(void *), /* RETURN_PC */ \
-	       (self)->cg_nrelocs    = 0)
+	(void)((self)->cg_txbas = (txbas), (self)->cg_ehbas = (ehbas), \
+	       (self)->cg_txend = (txend), (self)->cg_ehend = (ehend))
 
 
 /* Helper macros for generating offsets to local variables (from %Psp) */
@@ -1180,9 +1215,12 @@ NOTHROW(FCALL comgen_compile)(struct com_generator *__restrict self);
 #define comgen_spoffsetof_LOC_bufpar_handles(self, i) (comgen_spoffsetof_LOCALS(self) + (4 + (i)) * __SIZEOF_POINTER__) /* struct service_shm_handle     *LOC_bufparam_handles[cg_buf_paramc]; // [valid_if(cg_buf_paramc != 0)] */
 #define comgen_spoffsetof_LOC_outbuffers_start(self)  comgen_spoffsetof_LOC_bufpar_handles(self, (self)->cg_buf_paramc) /* byte_t                        *LOC_outbuffers_start;                // [valid_if(cg_inbuf_paramc != 0 && (cg_inoutbuf_paramc != 0 || cg_outbuf_paramc != 0))] */
 
+/* Returns the number of available .text or .eh_frame bytes. */
+#define comgen_txavail(self) ((size_t)((self)->cg_txend - (self)->cg_txptr))
+#define comgen_ehavail(self) ((size_t)((self)->cg_ehend - (self)->cg_ehptr))
 
-/* Check if  sufficient text  memory remains  available.
- * When this  macro  returns  `false',  `comgen_instr()'
+/* Check if sufficient  text memory remains  available.
+ * When  this  macro returns  `false', `comgen_instr()'
  * becomes a no-op, and the caller should allocate more
  * text memory. */
 #define comgen_txok1(self) \
@@ -1190,7 +1228,9 @@ NOTHROW(FCALL comgen_compile)(struct com_generator *__restrict self);
 #define comgen_txok(self, n_instr) \
 	((self)->cg_txptr + ((n_instr) * GEN86_INSTRLEN_MAX) <= (self)->cg_txend)
 
-/* Helper macro to safely generate instructions:
+#ifdef GUARD_LIBSERVICE_ARCH_I386_WRAPPER_C
+
+ /* Helper macro to safely generate instructions:
  * >> comgen_instr(self, gen86_movb_r_r(&self->cg_txptr, GEN86_R_AL, GEN86_R_AH)); */
 #define comgen_instr(self, ...)         \
 	do {                                \
@@ -1199,6 +1239,187 @@ NOTHROW(FCALL comgen_compile)(struct com_generator *__restrict self);
 		}                               \
 	}	__WHILE0
 
+/* Return the current text location as a function-relative offset */
+#define comgen_funcrel_offsetat(self, ptr) ((uint16_t)(uintptr_t)((ptr) - (self)->cg_txbas))
+#define comgen_funcrel_offset(self)        comgen_funcrel_offsetat(self, (self)->cg_txptr)
+
+/* Define the symbol `id' at the current text location. */
+#define comgen_defsym(self, id) \
+	(void)((self)->cg_symbols[id] = comgen_funcrel_offset(self))
+
+#define comgen_reloc(self, addr, type, symbol)                                                    \
+	(void)((self)->cg_relocs[(self)->cg_nrelocs].cr_offset = comgen_funcrel_offsetat(self, addr), \
+	       (self)->cg_relocs[(self)->cg_nrelocs].cr_type   = (type),                              \
+	       (self)->cg_relocs[(self)->cg_nrelocs].cr_symbol = (symbol),                            \
+	       ++(self)->cg_nrelocs)
+#endif /* GUARD_LIBSERVICE_ARCH_I386_WRAPPER_C */
+
+
+
+/* Structural representation of the .eh_frame
+ * segment  generated  by the  com generator. */
+struct ATTR_PACKED com_eh_frame {
+	/* CIE */
+	uint32_t  cef_cie_size;      /* [== offsetof(cef_fde_size)] CIE::cie_size */
+	uint32_t  cef_cie_id;        /* [== 0]                      CIE::cie_id */
+	uint8_t   cef_cie_version;   /* [== 1]                      CIE::cie_version */
+	char      cef_cie_augstr[3]; /* [== {'z', 'L', 'P'}]        CIE::cie_augstr */
+	uint8_t   cef_cie_codealign; /* [== 1]                      CIE::cie_codealign */
+#ifdef __x86_64__
+	uint8_t   cef_cie_dataalign; /* [== 0x78] (decodes to: -8)  CIE::cie_dataalign */
+	uint8_t   cef_cie_retreg;    /* [== CFI_X86_64_UNWIND_REGISTER_RIP] CIE::cie_retreg */
+	uint8_t   cef_cie_auglen;    /* [== 10]                     CIE::cie_auglen */
+#else /* __x86_64__ */
+	uint8_t   cef_cie_dataalign; /* [== 0x7c] (decodes to: -4)  CIE::cie_dataalign */
+	uint8_t   cef_cie_retreg;    /* [== CFI_386_UNWIND_REGISTER_EIP] CIE::cie_retreg */
+	uint8_t   cef_cie_auglen;    /* [== 6]                      CIE::cie_auglen */
+#endif /* !__x86_64__ */
+	uint8_t   cef_cie_lsdaenc;   /* [== DW_EH_PE_absptr]        CIE::cie_lsdaenc */
+	uint8_t   cef_cie_persoenc;  /* [== DW_EH_PE_absptr]        CIE::cie_persoenc */
+	void     *cef_cie_persoptr;  /* <Flexible>                  CIE::cie_persoptr */
+	/* CIE init text would go here... */
+
+	/* FDE */
+	uint32_t  cef_fde_size;      /* <Flexible>                     FDE::fde_size */
+	uint32_t  cef_fde_cie_off;   /* [== offsetof(cef_fde_cie_off)] FDE::fde_cie_off */
+	void     *cef_fde_funbase;   /* <Flexible>                     FDE::fde_funbase */
+	size_t    cef_fde_funsize;   /* <Flexible>                     FDE::fde_funsize */
+	uint8_t   cef_fde_auglen;    /* [== sizeof(void *)]            FDE::fde_auglen */
+	void     *cef_fde_lsda;      /* <Flexible>                     FDE::fde_lsda */
+
+	/* FDE unwind instrumentation text */
+	COMPILER_FLEXIBLE_ARRAY(byte_t, cef_fde_text); /* FDE::fde_text */
+};
+
+
+/* Minimum buffer sizes which must be set in a call to `comgen_reset()'
+ * Note that less than this  may end up being  used, but these are  the
+ * minimum requirements imposed on input buffer sizes. */
+#define COM_GENERATOR_INITIAL_TX_BUFSIZ (256)
+#define COM_GENERATOR_INITIAL_EH_BUFSIZ (offsetof(struct com_eh_frame, cef_fde_text) + 64)
+
+
+
+/* Helper macros for generating .eh_frame instrumentation */
+#define COMGEN_EH_FRAME_INSTRLEN_MAX (1 + __SIZEOF_POINTER__ + (__SIZEOF_POINTER__ / 8)) /* # of bytes which must remain available in .eh_frame */
+
+#define comgen_ehav(self, n) likely((self)->cg_ehptr + (n) <= (self)->cg_ehend)
+#define comgen_ehok(self)    comgen_ehav(self, COMGEN_EH_FRAME_INSTRLEN_MAX)
+
+/* Generate various CFA instructions. */
+#ifdef GUARD_LIBSERVICE_ARCH_I386_WRAPPER_C
+#define comgen_eh_putb(self, b) (void)(*(self)->cg_ehptr++ = (__UINT8_TYPE__)(b))
+#define comgen_eh_putw(self, w) (void)(__hybrid_unaligned_set16((self)->cg_ehptr, (__UINT16_TYPE__)(w)), (self)->cg_ehptr += 2)
+#define comgen_eh_putl(self, l) (void)(__hybrid_unaligned_set32((self)->cg_ehptr, (__UINT32_TYPE__)(l)), (self)->cg_ehptr += 4)
+#define comgen_eh_putq(self, q) (void)(__hybrid_unaligned_set64((self)->cg_ehptr, (__UINT64_TYPE__)(q)), (self)->cg_ehptr += 8)
+PRIVATE NONNULL((1)) void NOTHROW(FCALL comgen_eh_putsleb128)(struct com_generator *__restrict self, intptr_t value);
+PRIVATE NONNULL((1)) void NOTHROW(FCALL comgen_eh_putuleb128)(struct com_generator *__restrict self, uintptr_t value);
+
+#define comgen_eh_DW_CFA_advance_loc(self, pc_offset)                \
+	(void)(!comgen_ehav(self, 5) ||                                  \
+	       ((pc_offset) <= 0x3f                                      \
+	        ? comgen_eh_putb(self, DW_CFA_advance_loc | (pc_offset)) \
+	        : (pc_offset) <= 0xff                                    \
+	          ? (comgen_eh_putb(self, DW_CFA_advance_loc1),          \
+	             comgen_eh_putb(self, pc_offset))                    \
+	          : (pc_offset) <= 0xffff                                \
+	            ? (comgen_eh_putb(self, DW_CFA_advance_loc2),        \
+	               comgen_eh_putw(self, pc_offset))                  \
+	            : (comgen_eh_putb(self, DW_CFA_advance_loc4),        \
+	               comgen_eh_putl(self, pc_offset)),                 \
+	        0))
+/* Generate instrumentation to move the CFA PC to the current position.
+ * The  .cfi_* macros in  GNU AS automatically do  this whenever any of
+ * them are used, and will  also move the CFA  PC such that it  equates
+ * the current PC.
+ * >> if (self->cg_CFA_loc < self->cg_txptr) {
+ * >>     uint32_t delta;
+ * >>     delta = (uint32_t)(uintptr_t)(self->cg_txptr - self->cg_CFA_loc);
+ * >>     comgen_eh_DW_CFA_advance_loc(self, delta);
+ * >>     self->cg_CFA_loc = self->cg_txptr;
+ * >> }
+ * NOTE: For all of the below macros, this function must be called _explicitly_! */
+PRIVATE NONNULL((1)) void
+NOTHROW(FCALL comgen_eh_movehere)(struct com_generator *__restrict self);
+
+
+/* .cfi_offset <regno>, <offset> */
+#define comgen_eh_DW_CFA_offset(self, regno, offset)                         \
+	(void)(!comgen_ehok(self) ||                                             \
+	       (assert((offset) < 0 && ((-(offset)) % __SIZEOF_POINTER__) == 0), \
+	        (regno) <= 0x3f                                                  \
+	        ? (comgen_eh_putb(self, DW_CFA_offset | (regno)))                \
+	        : (comgen_eh_putb(self, DW_CFA_offset_extended),                 \
+	           comgen_eh_putuleb128(self, regno)),                           \
+	        comgen_eh_putuleb128(self, (-(offset)) / __SIZEOF_POINTER__),    \
+	        0))
+
+/* .cfi_rel_offset <regno>, <offset> */
+#define comgen_eh_DW_CFA_rel_offset(self, regno, rel_offset) \
+	comgen_eh_DW_CFA_offset(self, regno, (rel_offset) - (self)->cg_cfa_offset)
+
+/* .cfi_restore <regno> */
+#define comgen_eh_DW_CFA_restore(self, regno)                  \
+	(void)(!comgen_ehok(self) ||                               \
+	       ((regno) <= 0x3f                                    \
+	        ? (comgen_eh_putb(self, DW_CFA_restore | (regno))) \
+	        : (comgen_eh_putb(self, DW_CFA_restore_extended),  \
+	           comgen_eh_putuleb128(self, regno)),             \
+	        0))
+
+/* .cfi_remember_state */
+#define comgen_eh_DW_CFA_remember_state(self) \
+	(void)(!comgen_ehav(self, 1) || (comgen_eh_putb(self, DW_CFA_remember_state), 0))
+
+/* .cfi_restore_state */
+#define comgen_eh_DW_CFA_restore_state(self) \
+	(void)(!comgen_ehav(self, 1) || (comgen_eh_putb(self, DW_CFA_restore_state), 0))
+
+/* .cfi_def_cfa <regno>, <offset> */
+#define comgen_eh_DW_CFA_def_cfa(self, regno, offset)                     \
+	(void)(assert(((offset) % __SIZEOF_POINTER__) == 0),                  \
+	       !comgen_ehok(self) ||                                          \
+	       (comgen_eh_putb(self, DW_CFA_def_cfa_sf),                      \
+	        comgen_eh_putuleb128(self, regno),                            \
+	        comgen_eh_putsleb128(self, -((offset) / __SIZEOF_POINTER__)), \
+	        0),                                                           \
+	       (self)->cg_cfa_offset = (offset))
+
+/* .cfi_def_cfa_offset <offset> */
+PRIVATE NONNULL((1)) void
+NOTHROW(FCALL comgen_eh_DW_CFA_def_cfa_offset)(struct com_generator *__restrict self,
+                                               int16_t offset);
+
+/* .cfi_adjust_cfa_offset <delta> */
+#define comgen_eh_DW_CFA_adjust_cfa_offset(self, delta) \
+	comgen_eh_DW_CFA_def_cfa_offset(self, (self)->cg_cfa_offset + (delta))
+
+
+/* Portable register names */
+#ifdef __x86_64__
+#define CFI_X86_UNWIND_REGISTER_PAX    CFI_X86_64_UNWIND_REGISTER_RAX
+#define CFI_X86_UNWIND_REGISTER_PCX    CFI_X86_64_UNWIND_REGISTER_RCX
+#define CFI_X86_UNWIND_REGISTER_PDX    CFI_X86_64_UNWIND_REGISTER_RDX
+#define CFI_X86_UNWIND_REGISTER_PBX    CFI_X86_64_UNWIND_REGISTER_RBX
+#define CFI_X86_UNWIND_REGISTER_PSP    CFI_X86_64_UNWIND_REGISTER_RSP
+#define CFI_X86_UNWIND_REGISTER_PBP    CFI_X86_64_UNWIND_REGISTER_RBP
+#define CFI_X86_UNWIND_REGISTER_PSI    CFI_X86_64_UNWIND_REGISTER_RSI
+#define CFI_X86_UNWIND_REGISTER_PDI    CFI_X86_64_UNWIND_REGISTER_RDI
+#define CFI_X86_UNWIND_REGISTER_PIP    CFI_X86_64_UNWIND_REGISTER_RIP
+#define CFI_X86_UNWIND_REGISTER_PFLAGS CFI_X86_64_UNWIND_REGISTER_RFLAGS
+#else /* __x86_64__ */
+#define CFI_X86_UNWIND_REGISTER_PAX    CFI_386_UNWIND_REGISTER_EAX
+#define CFI_X86_UNWIND_REGISTER_PCX    CFI_386_UNWIND_REGISTER_ECX
+#define CFI_X86_UNWIND_REGISTER_PDX    CFI_386_UNWIND_REGISTER_EDX
+#define CFI_X86_UNWIND_REGISTER_PBX    CFI_386_UNWIND_REGISTER_EBX
+#define CFI_X86_UNWIND_REGISTER_PSP    CFI_386_UNWIND_REGISTER_ESP
+#define CFI_X86_UNWIND_REGISTER_PBP    CFI_386_UNWIND_REGISTER_EBP
+#define CFI_X86_UNWIND_REGISTER_PSI    CFI_386_UNWIND_REGISTER_ESI
+#define CFI_X86_UNWIND_REGISTER_PDI    CFI_386_UNWIND_REGISTER_EDI
+#define CFI_X86_UNWIND_REGISTER_PIP    CFI_386_UNWIND_REGISTER_EIP
+#define CFI_X86_UNWIND_REGISTER_PFLAGS CFI_386_UNWIND_REGISTER_EFLAGS
+#endif /* !__x86_64__ */
+#endif /* GUARD_LIBSERVICE_ARCH_I386_WRAPPER_C */
 
 
 

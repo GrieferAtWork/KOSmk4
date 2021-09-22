@@ -330,14 +330,14 @@
 
 /* Call Frame Information (section 7.23) */
 #define DW_CFA_advance_loc          0x40 /* upc += opcode & 0x3f */
-#define DW_CFA_offset               0x80 /* register[opcode & 0x3f] = { DW_CFA_register_rule_offsetn, dwarf_decode_uleb128(&pc) }; */
+#define DW_CFA_offset               0x80 /* register[opcode & 0x3f] = { DW_CFA_register_rule_offsetn, dwarf_decode_uleb128(&pc) * fde.f_dataalign }; */
 #define DW_CFA_restore              0xc0 /* register[opcode & 0x3f] = init_regs[opcode & 0x3f]; */
 #define DW_CFA_nop                  0x00 /* nop(); */
 #define DW_CFA_set_loc              0x01 /* upc = fde.f_pcstart + dwarf_decode_pointer(&pc, fde.f_ptrenc, ...); */
 #define DW_CFA_advance_loc1         0x02 /* upc += *(u8 const *)pc; pc += 1; */
 #define DW_CFA_advance_loc2         0x03 /* upc += *(u16 const *)pc; pc += 2; */
 #define DW_CFA_advance_loc4         0x04 /* upc += *(u32 const *)pc; pc += 4; */
-#define DW_CFA_offset_extended      0x05 /* register[dwarf_decode_uleb128(&pc)] = { DW_CFA_register_rule_offsetn, dwarf_decode_uleb128(&pc) }; */
+#define DW_CFA_offset_extended      0x05 /* register[dwarf_decode_uleb128(&pc)] = { DW_CFA_register_rule_offsetn, dwarf_decode_uleb128(&pc) * fde.f_dataalign }; */
 #define DW_CFA_restore_extended     0x06 /* r = dwarf_decode_uleb128(&pc); register[r] = init_regs[r]; */
 #define DW_CFA_undefined            0x07 /* register[dwarf_decode_uleb128(&pc)] = { DW_CFA_register_rule_undefined }; */
 #define DW_CFA_same_value           0x08 /* register[dwarf_decode_uleb128(&pc)] = { DW_CFA_register_rule_same_value }; */
@@ -353,7 +353,7 @@
 #define DW_CFA_def_cfa_sf           0x12 /* cfa = { type: UNWIND_CFA_VALUE_REGISTER, reg: dwarf_decode_uleb128(&pc), offset: dwarf_decode_sleb128(&pc) * fde.f_dataalign }; */
 #define DW_CFA_def_cfa_offset_sf    0x13 /* assert(cfa.type == UNWIND_CFA_VALUE_REGISTER); cfa.offset = dwarf_decode_sleb128(&pc) * fde.f_dataalign; */
 #define DW_CFA_val_offset           0x14 /* register[dwarf_decode_uleb128(&pc)] = { DW_CFA_register_rule_val_offsetn, dwarf_decode_uleb128(&pc) }; */
-#define DW_CFA_val_offset_sf        0x15 /* register[dwarf_decode_uleb128(&pc)] = { DW_CFA_register_rule_val_offsetn, dwarf_decode_sleb128(&pc) * self->f_dataalign }; */
+#define DW_CFA_val_offset_sf        0x15 /* register[dwarf_decode_uleb128(&pc)] = { DW_CFA_register_rule_val_offsetn, dwarf_decode_sleb128(&pc) * fde.f_dataalign }; */
 #define DW_CFA_val_expression       0x16 /* reg = dwarf_decode_uleb128(&pc); expr_size = dwarf_decode_uleb128(&pc); register[reg] = { type: DW_CFA_register_rule_val_expression, expr: { pc, pc + expr_size } }; pc += expr_size; */
 /*      DW_CFA_                     0x17  * ... */
 /*      DW_CFA_                     0x18  * ... */
@@ -383,7 +383,7 @@
 #define DW_CFA_GNU_window_save              0x2d /* ??? */
 #define DW_CFA_AARCH64_negate_ra_state      0x2d /* ??? */
 #define DW_CFA_GNU_args_size                0x2e /* landing_pad_adjustment = dwarf_decode_uleb128(&pc); */
-#define DW_CFA_GNU_negative_offset_extended 0x2f /* register[dwarf_decode_uleb128(&pc)] = { DW_CFA_register_rule_offsetn, -((signed)dwarf_decode_uleb128(&pc) * self->f_dataalign) }; */
+#define DW_CFA_GNU_negative_offset_extended 0x2f /* register[dwarf_decode_uleb128(&pc)] = { DW_CFA_register_rule_offsetn, -((signed)dwarf_decode_uleb128(&pc) * fde.f_dataalign) }; */
 /*      DW_CFA_                             0x30  * ... */
 /*      DW_CFA_                             0x31  * ... */
 /*      DW_CFA_                             0x32  * ... */
