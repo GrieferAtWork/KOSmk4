@@ -34,16 +34,155 @@
  * shall be aligned to an addressing unit sized boundary. */
 
 
-#undef SIZEOF_UNWIND_ORDER_INDEX_T
-#if (((CFI_UNWIND_COMMON_REGISTER_MAXCOUNT + CFI_UNWIND_UNCOMMON_REGISTER_MAXCOUNT) > 0xffff) || \
-     ((CFI_UNWIND_SIGFRAME_COMMON_REGISTER_MAXCOUNT + CFI_UNWIND_SIGFRAME_UNCOMMON_REGISTER_MAXCOUNT) > 0xffff))
-#define SIZEOF_UNWIND_ORDER_INDEX_T 4
-#elif (((CFI_UNWIND_COMMON_REGISTER_MAXCOUNT + CFI_UNWIND_UNCOMMON_REGISTER_MAXCOUNT) > 0xff) || \
-       ((CFI_UNWIND_SIGFRAME_COMMON_REGISTER_MAXCOUNT + CFI_UNWIND_SIGFRAME_UNCOMMON_REGISTER_MAXCOUNT) > 0xff))
-#define SIZEOF_UNWIND_ORDER_INDEX_T 2
-#else /* ... */
-#define SIZEOF_UNWIND_ORDER_INDEX_T 1
-#endif /* !... */
+/* The .eh_frame section consists of the concatenation of each compilation unit's
+ * .eh_frame section. In turn, each compilation unit's .eh_frame looks as follows
+ * (note that any single CU will usually include the following pattern at least 2
+ * times (one CIE and one FDE), but may not do so at all, or may do so more  than
+ * once  (or maybe even manage to re-use the CIE of another CU), meaning that the
+ * number of repeats of the following pattern can't be assumed to correlate  with
+ * the number of CUs):
+ *
+ * ```
+ * +----------------------------------------------------------------------------------------
+ * | HEADER
+ * +----------------------------------------------------------------------------------------
+ * |     uint32_t             eh_chunk_size;      # Chunk size (including _all_ fields)
+ * | #if eh_chunk_size == 0xffffffff
+ * |     uint64_t             eh_chunk_size64;    # 64-bit chunk size override. This only exists (and must be
+ * |                                              # be used instead of `eh_chunk_size'), when `eh_chunk_size'
+ * |                                              # is equal to `0xffffffff'
+ * | #endif
+ * | #if <SECTION_IS_EH_FRAME>
+ * |     uint32_t             eh_cie_offset;      # Offset to CIE metadata-descriptor block. The absolute CIE start address
+ * |                                              # is calculated as `(CIE *)((byte_t *)&eh_cie_offset - eh_cie_offset)'.
+ * |                                              # iow: the CIE always comes before an FDE
+ * |                                              # When equal to `0' what follows is a chunk of out-of-band data (which
+ * |                                              # usually contains CIE descriptors), and is simply skipped and ignored
+ * |                                              # during unwind parsing.
+ * | #elif <SECTION_IS_DEBUG_FRAME>
+ * |     uint32_t             eh_cie_offset;      # Same as when `SECTION_IS_EH_FRAME', except:
+ * |                                              #  - For CIE location calculation:
+ * |                                              #    Instead of: `(CIE *)((byte_t *)&eh_cie_offset - eh_cie_offset)'
+ * |                                              #    use:        `(CIE *)((byte_t *)debug_frame_start + eh_cie_offset)'
+ * |                                              #  - For FDE vs. skip-chunk determination:
+ * |                                              #    Instead of: `0xffffffff'
+ * |                                              #    use:        `0'
+ * | #endif
+ * +----------------------------------------------------------------------------------------
+ *
+ *
+ *
+ * +----------------------------------------------------------------------------------------
+ * | CIE (as pointed to by `eh_cie_offset')
+ * +----------------------------------------------------------------------------------------
+ * |     uint32_t             cie_size;      # CIE chunk size
+ * | #if cie_size == 0xffffffff
+ * |     uint64_t             cie_size64;    # 64-bit chunk size override
+ * | #endif
+ * |     uint32_t             cie_id;        # CIE record id (always `0' in .eh_frame / `0xffffffff' in .debug_frame)
+ * |     uint8_t              cie_version;   # CIE descriptor version (see below)
+ * |     char                 cie_augstr[];  # inline, NUL-terminated c-string of augmentation options. (see below)
+ * | #if cie_version >= 4
+ * |     uint8_t              cie_addrsize;  # Address size (for `dwarf_decode_pointer(3)')
+ * |                                         # When not present, use `sizeof(void *)' instead!
+ * |     uint8_t              cie_segsize;   # Segment selector size (for `dwarf_decode_pointer(3)')
+ * |                                         # When not present, use `0' instead!
+ * | #endif
+ * |     uleb128_t            cie_codealign; # Code alignment (s.a. `unwind_fde_t::f_codealign')
+ * |     sleb128_t            cie_dataalign; # Data alignment (s.a. `unwind_fde_t::f_dataalign')
+ * | #if cie_version == 1
+ * |     uint8_t              cie_retreg;    # Return register (s.a. `unwind_fde_t::f_retreg')
+ * | #else
+ * |     uleb128_t            cie_retreg;    # Return register (s.a. `unwind_fde_t::f_retreg')
+ * | #endif
+ * |
+ * |     // Augmentation data
+ * | #if cie_augstr[0] == 'z'
+ * |     uleb128_t            cie_auglen;    # Augmentation data length
+ * |     union {
+ * |         byte_t cie_augdat[cie_auglen];  # Augmentation data
+ * |         union {
+ * |
+ * |             uint8_t      cie_lsdaenc;   # [CH == 'L'] Encoding for `cie_lsdaaddr'
+ * |                                         # When not present, use `DW_EH_PE_absptr'
+ * |
+ * |             struct {
+ * |                 uint8_t  cie_persoenc;  # Encoding for `cie_persoptr'
+ * |                 [PTR]    cie_persoptr;  # Personality function pointer (s.a. `dwarf_decode_pointer(3)')
+ * |             }            cie_persofun;  # [CH == 'P'] Personality info (s.a. `unwind_fde_t::f_persofun')
+ * |
+ * |             uint8_t      cie_ptrenc;    # [CH == 'R'] Encoding for pointers (s.a. `unwind_fde_t::f_ptrenc')
+ * |                                         # When not present, use `DW_EH_PE_absptr'
+ * |
+ * |         } cie_augfields[*];             # Augmentation fields are parsed based on the order
+ * |                                         # of characters in `cie_augstr', with one field for
+ * |                                         # every character, starting with `cie_augstr[1]',
+ * |                                         # and ending once '\0' is reached.
+ * |     };
+ * | #endif
+ * |
+ * |     // Function instrumentation init text (this field extends until the end of the CIE)
+ * |     // s.a. `unwind_fde_t::f_inittext' and `unwind_fde_t::f_inittextend'
+ * |     byte_t               cie_inittext[cie_size - offsetof(cie_inittext)];
+ * |
+ * +----------------------------------------------------------------------------------------
+ *
+ *
+ *
+ * +----------------------------------------------------------------------------------------
+ * | FDE (as it appears immediately after `eh_cie_offset' when a CIE is not indicated)
+ * +----------------------------------------------------------------------------------------
+ * |
+ * |     // Fields already seen within the header
+ * |     uint32_t             fde_size;      # FDE Chunk size
+ * | #if fde_size == 0xffffffff
+ * |     uint64_t             fde_size64;    # 64-bit chunk size override
+ * | #endif
+ * |     uint32_t             fde_cie_off;   # s.a. `HEADER::eh_cie_offset' (points to a `CIE *cie')
+ * |
+ * |     [PTR]                fde_funbase;   # Function base address (encoding is `cie->cie_ptrenc'; s.a. `unwind_fde_t::f_pcstart')
+ * |     [PTR]                fde_funsize;   # Function size (encoding is `DW_EH_PE_OFF(cie->cie_ptrenc)'; s.a. `unwind_fde_t::f_pcend')
+ * |
+ * |     // Additional augmentation data
+ * | #if cie->cie_augstr[0] == 'z'
+ * |     uleb128_t            fde_auglen;    # Augmentation data length
+ * |     union {
+ * |         byte_t fde_augdat[fde_auglen];  # Augmentation data
+ * |         union {
+ * |
+ * |             [PTR]        fde_lsda;      # [CH == 'L'] s.a. `unwind_fde_t::f_lsdaaddr' (encoding is `cie->cie_lsdaenc')
+ * |
+ * |             void         fde_sigframe;  # [CH == 'S'] Mark this function as a signal frame (s.a. `unwind_fde_t::f_sigframe')
+ * |                                         #             Note that this is only an imaginary field which depends entirely on
+ * |                                         #             the associated CIE!
+ * |
+ * |         } fde_augfields[*];             # Augmentation fields are parsed based on the order of
+ * |                                         # characters in `cie->cie_augstr', with one field for
+ * |                                         # every character, starting with `cie->cie_augstr[1]',
+ * |                                         # and ending once '\0' is reached.
+ * |     };
+ * | #endif
+ * |
+ * |     // Function instrumentation text (this field extends until the end of the FDE)
+ * |     // s.a. `unwind_fde_t::f_evaltext' and `unwind_fde_t::f_evaltextend'
+ * |     byte_t               fde_text[fde_size - offsetof(fde_text)];
+ * |
+ * +----------------------------------------------------------------------------------------
+ * ```
+ *
+ * Both  `CIE::cie_inittext', as well  as `FDE::fde_text' contain pseudo-instruction
+ * sequences in the form of `DW_CFA_*' (s.a. <libunwind/cfi.h>) that are interpreted
+ * by:
+ *   - `unwind_fde_exec(3)'
+ *   - `unwind_fde_sigframe_exec(3)'
+ *   - `unwind_fde_landing_exec(3)'
+ *   - `unwind_fde_rule(3)'
+ *   - `unwind_fde_exec_cfa(3)'
+ *
+ */
+
+
+
 
 
 /* Figure  out  if  libunwind  (should)  support  CFI capsules.
@@ -61,6 +200,19 @@
 #undef LIBUNWIND_CONFIG_SUPPORT_CFI_CAPSULES
 #else /* ... */
 #define LIBUNWIND_CONFIG_SUPPORT_CFI_CAPSULES 1
+#endif /* !... */
+
+
+/* Size for the unwind-register-order type (see below) */
+#undef SIZEOF_UNWIND_ORDER_INDEX_T
+#if (((CFI_UNWIND_COMMON_REGISTER_MAXCOUNT + CFI_UNWIND_UNCOMMON_REGISTER_MAXCOUNT) > 0xffff) || \
+     ((CFI_UNWIND_SIGFRAME_COMMON_REGISTER_MAXCOUNT + CFI_UNWIND_SIGFRAME_UNCOMMON_REGISTER_MAXCOUNT) > 0xffff))
+#define SIZEOF_UNWIND_ORDER_INDEX_T 4
+#elif (((CFI_UNWIND_COMMON_REGISTER_MAXCOUNT + CFI_UNWIND_UNCOMMON_REGISTER_MAXCOUNT) > 0xff) || \
+       ((CFI_UNWIND_SIGFRAME_COMMON_REGISTER_MAXCOUNT + CFI_UNWIND_SIGFRAME_UNCOMMON_REGISTER_MAXCOUNT) > 0xff))
+#define SIZEOF_UNWIND_ORDER_INDEX_T 2
+#else /* ... */
+#define SIZEOF_UNWIND_ORDER_INDEX_T 1
 #endif /* !... */
 
 
@@ -107,7 +259,7 @@ typedef struct unwind_fde_struct {
 	__byte_t const         *f_evaltext;    /* [0..1] Pointer to FDE-specific EH instructions (This is the meat of it all) (absolute) */
 	__byte_t const         *f_evaltextend; /* [0..1] End address of `f_evaltext'. */
 	unwind_regno_t          f_retreg;      /* Return-address register number (One of `CFI_[ARCH]_UNWIND_REGISTER_[NAME]'). */
-	__uint8_t               f_encptr;      /* Encoding used for pointers (One of `DW_EH_PE_*') */
+	__uint8_t               f_ptrenc;      /* Encoding used for pointers (One of `DW_EH_PE_*') */
 	__uint8_t               f_sigframe;    /* Non-zero if this is a signal frame. */
 	__uint8_t               f_addrsize;    /* Size of an address. */
 } unwind_fde_t;

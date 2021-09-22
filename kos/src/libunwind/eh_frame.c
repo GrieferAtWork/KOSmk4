@@ -625,7 +625,7 @@ NOTHROW_NCX(CC read_capsule_instruction)(struct cfa_parser *__restrict parser) {
 			CASE(DW_CFA_set_loc)
 				/* Decode the PC pointer according to FDE pointer encoding. */
 				current_pc = (uintptr_t)dwarf_decode_pointer((byte_t const **)&cfa_reader,
-				                                             parser->cp_fde->f_encptr,
+				                                             parser->cp_fde->f_ptrenc,
 				                                             parser->cp_fde->f_addrsize,
 				                                             &parser->cp_fde->f_bases);
 				current_pc += (uintptr_t)parser->cp_fde->f_pcstart;
@@ -967,7 +967,7 @@ NOTHROW_NCX(CC libuw_unwind_fde_landing_exec)(unwind_fde_t *__restrict self, /* 
 			CASE(DW_CFA_set_loc)
 				/* Decode the PC pointer according to FDE pointer encoding. */
 				current_pc = (uintptr_t)dwarf_decode_pointer((byte_t const **)&cfa_reader,
-				                                             self->f_encptr,
+				                                             self->f_ptrenc,
 				                                             self->f_addrsize,
 				                                             &self->f_bases);
 				current_pc += (uintptr_t)self->f_pcstart;

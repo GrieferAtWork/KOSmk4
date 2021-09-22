@@ -333,7 +333,7 @@
 #define DW_CFA_offset               0x80 /* register[opcode & 0x3f] = { DW_CFA_register_rule_offsetn, dwarf_decode_uleb128(&pc) }; */
 #define DW_CFA_restore              0xc0 /* register[opcode & 0x3f] = init_regs[opcode & 0x3f]; */
 #define DW_CFA_nop                  0x00 /* nop(); */
-#define DW_CFA_set_loc              0x01 /* upc = fde.f_pcstart + dwarf_decode_pointer(&pc, fde.f_encptr, ...); */
+#define DW_CFA_set_loc              0x01 /* upc = fde.f_pcstart + dwarf_decode_pointer(&pc, fde.f_ptrenc, ...); */
 #define DW_CFA_advance_loc1         0x02 /* upc += *(u8 const *)pc; pc += 1; */
 #define DW_CFA_advance_loc2         0x03 /* upc += *(u16 const *)pc; pc += 2; */
 #define DW_CFA_advance_loc4         0x04 /* upc += *(u32 const *)pc; pc += 4; */

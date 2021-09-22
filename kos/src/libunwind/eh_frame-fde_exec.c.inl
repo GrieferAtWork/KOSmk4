@@ -477,7 +477,7 @@ NOTHROW_NCX(CC libuw_unwind_fde_exec_rule_until)(unwind_fde_t *__restrict self, 
 			CASE(DW_CFA_set_loc)
 				/* Decode the PC pointer according to FDE pointer encoding. */
 				current_pc = (uintptr_t)dwarf_decode_pointer((byte_t const **)&reader,
-				                                             self->f_encptr,
+				                                             self->f_ptrenc,
 				                                             self->f_addrsize,
 				                                             &self->f_bases);
 				current_pc += (uintptr_t)self->f_pcstart;
