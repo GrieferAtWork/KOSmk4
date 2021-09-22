@@ -385,8 +385,8 @@ genArithBlock("cmp", 0x38);
 #define gen86_imull_imm_mod_r(p_pc, gen_modrm, imm, dst_reg, ...)   /* imull $imm, ..., %dst_reg */ (_gen86_pfx32_(p_pc) gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x69), dst_reg, __VA_ARGS__, _gen86_putl(p_pc, imm)))
 #define gen86_imull_imm8s_mod_r(p_pc, gen_modrm, imm, dst_reg, ...) /* imull $imm, ..., %dst_reg */ (_gen86_pfx32_(p_pc) gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0x6b), dst_reg, __VA_ARGS__, _gen86_putsb(p_pc, imm)))
 #if LIBGEN86_TARGET_BITS == 64
-#define gen86_imulq_imm_mod_r(p_pc, gen_modrm, imm, dst_reg, ...)   /* imull $imm, ..., %dst_reg */ gen_modrm(p_pc, GEN86_REX_W, _gen86_putb(p_pc, 0x69), dst_reg, __VA_ARGS__, _gen86_putsl(p_pc, imm))
-#define gen86_imulq_imm8s_mod_r(p_pc, gen_modrm, imm, dst_reg, ...) /* imull $imm, ..., %dst_reg */ gen_modrm(p_pc, GEN86_REX_W, _gen86_putb(p_pc, 0x6b), dst_reg, __VA_ARGS__, _gen86_putssb(p_pc, imm))
+#define gen86_imulq_imm_mod_r(p_pc, gen_modrm, imm, dst_reg, ...)   /* imulq $imm, ..., %dst_reg */ gen_modrm(p_pc, GEN86_REX_W, _gen86_putb(p_pc, 0x69), dst_reg, __VA_ARGS__, _gen86_putsl(p_pc, imm))
+#define gen86_imulq_imm8s_mod_r(p_pc, gen_modrm, imm, dst_reg, ...) /* imulq $imm, ..., %dst_reg */ gen_modrm(p_pc, GEN86_REX_W, _gen86_putb(p_pc, 0x6b), dst_reg, __VA_ARGS__, _gen86_putssb(p_pc, imm))
 #endif /* LIBGEN86_TARGET_BITS == 64 */
 
 #define gen86_insb(p_pc)      /* insb      */ _gen86_putb(p_pc, 0x6c)
@@ -952,19 +952,21 @@ genShift("sar", 7);
 
 #define gen86_callw_mod(p_pc, gen_modrm, ...)  /* callw  *... */ (_gen86_pfx16_(p_pc) gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0xff), 2, __VA_ARGS__, (void)0))
 #define gen86_calll_mod(p_pc, gen_modrm, ...)  /* calll  *... */ (_gen86_pfx32_(p_pc) gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0xff), 2, __VA_ARGS__, (void)0))
-#define gen86_callq_mod(p_pc, gen_modrm, ...)  /* callq  *... */ gen_modrm(p_pc, GEN86_REX_W, _gen86_putb(p_pc, 0xff), 2, __VA_ARGS__, (void)0)
 #define gen86_lcallw_mod(p_pc, gen_modrm, ...) /* lcallw ...  */ (_gen86_pfx16_(p_pc) gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0xff), 3, __VA_ARGS__, (void)0))
 #define gen86_lcalll_mod(p_pc, gen_modrm, ...) /* lcalll ...  */ (_gen86_pfx32_(p_pc) gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0xff), 3, __VA_ARGS__, (void)0))
-#define gen86_lcallq_mod(p_pc, gen_modrm, ...) /* lcallq ...  */ gen_modrm(p_pc, GEN86_REX_W, _gen86_putb(p_pc, 0xff), 3, __VA_ARGS__, (void)0)
 #define gen86_jmpw_mod(p_pc, gen_modrm, ...)   /* jmpw   *... */ (_gen86_pfx16_(p_pc) gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0xff), 4, __VA_ARGS__, (void)0))
 #define gen86_jmpl_mod(p_pc, gen_modrm, ...)   /* jmpl   *... */ (_gen86_pfx32_(p_pc) gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0xff), 4, __VA_ARGS__, (void)0))
-#define gen86_jmpq_mod(p_pc, gen_modrm, ...)   /* jmpq   *... */ gen_modrm(p_pc, GEN86_REX_W, _gen86_putb(p_pc, 0xff), 4, __VA_ARGS__, (void)0)
 #define gen86_ljmpw_mod(p_pc, gen_modrm, ...)  /* ljmpw  ...  */ (_gen86_pfx16_(p_pc) gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0xff), 5, __VA_ARGS__, (void)0))
 #define gen86_ljmpl_mod(p_pc, gen_modrm, ...)  /* ljmpl  ...  */ (_gen86_pfx32_(p_pc) gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0xff), 5, __VA_ARGS__, (void)0))
-#define gen86_ljmpq_mod(p_pc, gen_modrm, ...)  /* ljmpq  ...  */ gen_modrm(p_pc, GEN86_REX_W, _gen86_putb(p_pc, 0xff), 5, __VA_ARGS__, (void)0)
 #define gen86_pushw_mod(p_pc, gen_modrm, ...)  /* pushw  ...  */ (_gen86_pfx16_(p_pc) gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0xff), 6, __VA_ARGS__, (void)0))
 #define gen86_pushl_mod(p_pc, gen_modrm, ...)  /* pushl  ...  */ (_gen86_pfx32_(p_pc) gen_modrm(p_pc, 0, _gen86_putb(p_pc, 0xff), 6, __VA_ARGS__, (void)0))
+#if LIBGEN86_TARGET_BITS == 64
+#define gen86_callq_mod(p_pc, gen_modrm, ...)  /* callq  *... */ gen_modrm(p_pc, GEN86_REX_W, _gen86_putb(p_pc, 0xff), 2, __VA_ARGS__, (void)0)
+#define gen86_lcallq_mod(p_pc, gen_modrm, ...) /* lcallq ...  */ gen_modrm(p_pc, GEN86_REX_W, _gen86_putb(p_pc, 0xff), 3, __VA_ARGS__, (void)0)
+#define gen86_jmpq_mod(p_pc, gen_modrm, ...)   /* jmpq   *... */ gen_modrm(p_pc, GEN86_REX_W, _gen86_putb(p_pc, 0xff), 4, __VA_ARGS__, (void)0)
+#define gen86_ljmpq_mod(p_pc, gen_modrm, ...)  /* ljmpq  ...  */ gen_modrm(p_pc, GEN86_REX_W, _gen86_putb(p_pc, 0xff), 5, __VA_ARGS__, (void)0)
 #define gen86_pushq_mod(p_pc, gen_modrm, ...)  /* pushq  ...  */ gen_modrm(p_pc, GEN86_REX_W, _gen86_putb(p_pc, 0xff), 6, __VA_ARGS__, (void)0)
+#endif /* LIBGEN86_TARGET_BITS == 64 */
 
 
 /************************************************************************/
@@ -978,9 +980,9 @@ genShift("sar", 7);
 #define gen86_verr(p_pc, gen_modrm, ...) /* verr ... */ gen_modrm(p_pc, 0, _gen86_putb2(p_pc, 0x0f, 0x00), 4, __VA_ARGS__, (void)0)
 #define gen86_verw(p_pc, gen_modrm, ...) /* verw ... */ gen_modrm(p_pc, 0, _gen86_putb2(p_pc, 0x0f, 0x00), 5, __VA_ARGS__, (void)0)
 #define gen86_sgdt(p_pc, gen_modrm, ...) /* sgdt ... */ gen_modrm(p_pc, 0, _gen86_putb2(p_pc, 0x0f, 0x01), 0, __VA_ARGS__, (void)0)
-#define gen86_sidt(p_pc, gen_modrm, ...) /* sgdt ... */ gen_modrm(p_pc, 0, _gen86_putb2(p_pc, 0x0f, 0x01), 1, __VA_ARGS__, (void)0)
-#define gen86_lgdt(p_pc, gen_modrm, ...) /* sgdt ... */ gen_modrm(p_pc, 0, _gen86_putb2(p_pc, 0x0f, 0x01), 2, __VA_ARGS__, (void)0)
-#define gen86_lidt(p_pc, gen_modrm, ...) /* sgdt ... */ gen_modrm(p_pc, 0, _gen86_putb2(p_pc, 0x0f, 0x01), 3, __VA_ARGS__, (void)0)
+#define gen86_sidt(p_pc, gen_modrm, ...) /* sidt ... */ gen_modrm(p_pc, 0, _gen86_putb2(p_pc, 0x0f, 0x01), 1, __VA_ARGS__, (void)0)
+#define gen86_lgdt(p_pc, gen_modrm, ...) /* lgdt ... */ gen_modrm(p_pc, 0, _gen86_putb2(p_pc, 0x0f, 0x01), 2, __VA_ARGS__, (void)0)
+#define gen86_lidt(p_pc, gen_modrm, ...) /* lidt ... */ gen_modrm(p_pc, 0, _gen86_putb2(p_pc, 0x0f, 0x01), 3, __VA_ARGS__, (void)0)
 
 #define gen86_smsww(p_pc, gen_modrm, ...) /* smsww ... */ (_gen86_pfx16_(p_pc) gen_modrm(p_pc, 0, _gen86_putb2(p_pc, 0x0f, 0x01), 4, __VA_ARGS__, (void)0))
 #define gen86_smswl(p_pc, gen_modrm, ...) /* smswl ... */ (_gen86_pfx32_(p_pc) gen_modrm(p_pc, 0, _gen86_putb2(p_pc, 0x0f, 0x01), 4, __VA_ARGS__, (void)0))
@@ -1030,7 +1032,7 @@ genShift("sar", 7);
 #define gen86_mcommit(p_pc)                /* mcommit                   */ _gen86_putb3(p_pc, 0x0f, 0x01, 0xfa)
 #define gen86_mwaitx(p_pc)                 /* mwaitx %Pax, %Pcx         */ _gen86_putb3(p_pc, 0x0f, 0x01, 0xfb)
 #define gen86_clzero(p_pc)                 /* clzero %Pax               */ _gen86_putb3(p_pc, 0x0f, 0x01, 0xfc)
-#define gen86_rdpru(p_pc)                  /* rdpru"                    */ _gen86_putb3(p_pc, 0x0f, 0x01, 0xfd)
+#define gen86_rdpru(p_pc)                  /* rdpru                     */ _gen86_putb3(p_pc, 0x0f, 0x01, 0xfd)
 
 #define gen86_lar_mod_r(p_pc, gen_modrm, reg, ...) /* lar ..., %reg */ gen_modrm(p_pc, 0, _gen86_putb2(p_pc, 0x0f, 0x02), reg, __VA_ARGS__, (void)0)
 

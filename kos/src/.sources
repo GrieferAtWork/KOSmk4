@@ -126,6 +126,7 @@ BEGIN
 	DEFINE_SIMPLE_ARCH_LIBRARY("libregdump", USELIB("libdl"))
 	DEFINE_SIMPLE_ARCH_LIBRARY("libcpustate")
 	DEFINE_SIMPLE_ARCH_LIBRARY("libviocore", USELIB("libvio") USELIB("libinstrlen"))
+	DEFINE_SIMPLE_ARCH_LIBRARY("libservice")
 
 	if (TARGET_ARCH in ["i386", "x86_64"]) {
 		DEFINE_SIMPLE_LIBRARY("libvm86")

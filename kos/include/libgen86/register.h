@@ -154,6 +154,7 @@
 #endif /* LIBGEN86_TARGET_BITS != ... */
 
 
+/* Register names for FCALL functions */
 #if LIBGEN86_TARGET_BITS == 64
 #define GEN86_R_FCALL0B GEN86_R_DIL
 #define GEN86_R_FCALL0W GEN86_R_DI

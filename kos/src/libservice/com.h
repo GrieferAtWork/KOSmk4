@@ -48,7 +48,6 @@
 #include <libservice/bits/com.h>
 #include <libservice/types.h>
 
-
 DECL_BEGIN
 
 #ifndef __sigset_t_defined
@@ -269,7 +268,8 @@ struct service_com {
 		 *      depends on the type codes of the command being invoked, as well
 		 *      as the current architecture. */
 		struct {
-			COMPILER_FLEXIBLE_ARRAY(byte_t, g_data);
+			byte_t g_data[1024]; /* Should be flexible, but can't be because g++ sucks... */
+/*			COMPILER_FLEXIBLE_ARRAY(byte_t, g_data); */
 		} sc_generic;
 
 		/* [out] Response to all commands that aren't `SERVICE_COM_ISSPECIAL()' on
@@ -278,7 +278,8 @@ struct service_com {
 
 		/* [in][SERVICE_COM_DLSYM] NUL-terminated name of the symbol being queried. */
 		struct {
-			COMPILER_FLEXIBLE_ARRAY(char, dl_name);
+			char dl_name[1024]; /* Should be flexible, but can't be because g++ sucks... */
+/*			COMPILER_FLEXIBLE_ARRAY(char, dl_name); */
 		} sc_dlsym;
 
 		/* [out][SERVICE_COM_ST_SUCCESS] Success return value for `SERVICE_COM_DLSYM'.
@@ -437,26 +438,6 @@ struct service_wrapper_buffer {
                                             * using `errno'. For differences, see the mock for
                                             * `CLIENT' above. */
 
-/* Return values of `libservice_dlsym_create_wrapper' */
-#define LIBSERVICE_DLSYM_CREATE_WRAPPER_SUCCESS 0 /* Success */
-#define LIBSERVICE_DLSYM_CREATE_WRAPPER_MORE_TX 1 /* Need more space in .text */
-#define LIBSERVICE_DLSYM_CREATE_WRAPPER_MORE_EH 2 /* Need more space in .eh_frame */
-
-/* Implemented  by  arch-specific code:  Assemble  a custom
- * function that invokes a function as specified by `info',
- * returning a pointer to the  base of said function.
- * @param: info:   Information about the function to-be called.
- * @param: result: [in|out] Buffer storage info. Actually used buffer
- *                 sizes are written back to `swb_txsiz' and `swb_ehsiz'
- *                 prior to returning `LIBSERVICE_DLSYM_CREATE_WRAPPER_SUCCESS'
- * @param: flags:  Set of `SERVICE_WRAPPER_FLAG_*'
- * @return: * : One of `LIBSERVICE_DLSYM_CREATE_WRAPPER_*' */
-INTDEF WUNUSED NONNULL((1, 2, 3)) unsigned int
-NOTHROW(CC libservice_dlsym_create_wrapper)(struct service *__restrict self,
-                                            struct service_com_funinfo const *__restrict info,
-                                            struct service_wrapper_buffer *__restrict buffers,
-                                            unsigned int flags);
-
 
 /* Lookup a function exported by the service, and if not already loaded, ask the
  * server for information about the function before creating a wrapper for it,
@@ -468,7 +449,7 @@ libservice_dlsym_lookup_or_create(struct service *__restrict self,
 		THROWS(E_NO_SUCH_OBJECT, E_BADALLOC, E_INTERRUPT);
 
 /* Ask the server for information about the function `name', and store it in `*info' */
-INTDEF WUNUSED NONNULL((1, 2, 3)) void CC
+INTDEF NONNULL((1, 2, 3)) void CC
 libservice_dlsym_getinfo(struct service *__restrict self, char const *__restrict name,
                          /*out*/ struct service_com_funinfo *__restrict info)
 		THROWS(E_NO_SUCH_OBJECT, E_BADALLOC, E_INTERRUPT);
@@ -494,9 +475,6 @@ NOTHROW(FCALL libservice_aux_com_abort)(struct service *__restrict self,
 
 /* Return the SHM base address of the region that contains
  * `addr'. If no  such SHM region  exists, return  `NULL'. */
-INTDEF NOBLOCK WUNUSED NONNULL((1)) struct service_shm_handle *
-NOTHROW(FCALL libservice_shm_handle_ataddr)(struct service *__restrict self,
-                                            void const *addr);
 INTDEF NOBLOCK NOPREEMPT WUNUSED NONNULL((1)) struct service_shm_handle *
 NOTHROW(FCALL libservice_shm_handle_ataddr_nopr)(struct service *__restrict self,
                                                  void const *addr);
@@ -519,10 +497,10 @@ typedef __UINT64_TYPE__ service_buf_t;
 #define service_buf_getptr(self) ((void *)(__UINT32_TYPE__)(self))
 #define service_buf_getshm(self) ((REF struct service_shm_handle *)(__UINT32_TYPE__)((self) >> 32))
 #else /* ... */
-struct service_buf {
+typedef struct service_buf {
 	void                          *sb_ptr; /* [0..1] Allocated pointer. */
 	REF struct service_shm_handle *sb_shm; /* [1..1][valid_if(sb_ptr)] The SHM mapping containing `sb_ptr' */
-};
+} service_buf_t;
 #define service_buf_make(ptr, shm) ((struct service_buf) { ptr, shm })
 #define service_buf_getptr(self)   ((self).sb_ptr)
 #define service_buf_getshm(self)   ((self).sb_shm)
@@ -539,10 +517,10 @@ struct service_buf {
  * >> num_bytes_with_extra = MAX(SERVICE_SHM_ALLOC_MINSIZE,
  * >>                            CEIL_ALIGN(num_bytes, SERVICE_SHM_ALLOC_ALIGN) +
  * >>                            SERVICE_SHM_ALLOC_EXTRA); */
-INTDEF NOBLOCK NOPREEMPT WUNUSED NONNULL((1)) struct service_buf
+INTDEF NOBLOCK NOPREEMPT WUNUSED NONNULL((1)) service_buf_t
 NOTHROW(FCALL libservice_shmbuf_alloc_nopr_nx)(struct service *__restrict self,
                                                size_t num_bytes_with_extra);
-INTDEF NOBLOCK NOPREEMPT WUNUSED NONNULL((1)) struct service_buf FCALL
+INTDEF NOBLOCK NOPREEMPT WUNUSED NONNULL((1)) service_buf_t FCALL
 libservice_shmbuf_alloc_nopr(struct service *__restrict self,
                              size_t num_bytes_with_extra)
 		THROWS(E_BADALLOC);

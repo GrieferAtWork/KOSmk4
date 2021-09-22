@@ -146,7 +146,7 @@ libservice_buffer_realloc(struct service *__restrict self, void *ptr, size_t num
 		shm = libservice_shm_handle_ataddr_nopr(self, ptr);
 		assertf(shm, "service_buffer_realloc(%p): Invalid pointer", ptr);
 		extra = num_bytes - oldsize;
-		extra = libservice_shmbuf_allocat_nopr(self, shm, ptr + oldsize, extra);
+		extra = libservice_shmbuf_allocat_nopr(self, shm, (byte_t *)ptr + oldsize, extra);
 		if (extra != 0) {
 			assert(extra >= (num_bytes - oldsize));
 			oldsize += extra;
