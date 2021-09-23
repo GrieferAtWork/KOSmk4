@@ -92,6 +92,8 @@ extern "C++" { namespace __intern {
 template<class __T> struct __libservice_typeof;
 
 template<> struct __libservice_typeof<void> { enum { __v = SERVICE_TYPE_VOID }; };
+template<> struct __libservice_typeof<void *> { };       /* Explicitly disallowed */
+template<> struct __libservice_typeof<void const *> { }; /* Explicitly disallowed */
 template<> struct __libservice_typeof<char const *> { enum { __v = SERVICE_TYPE_STR_IN }; };
 template<class __T> struct __libservice_typeof<__T *> { enum { __v = SERVICE_TYPE_FIXBUF_OUT(sizeof(__T)) }; };
 template<class __T> struct __libservice_typeof<__T const *> { enum { __v = SERVICE_TYPE_FIXBUF_IN(sizeof(__T)) }; };

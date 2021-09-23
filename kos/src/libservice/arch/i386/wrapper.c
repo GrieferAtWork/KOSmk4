@@ -125,6 +125,13 @@ compar_com_buffer_param(void const *_a, void const *_b) {
 	if ((a->cbp_flags & COM_BUFFER_PARAM_FRETMIN) > (b->cbp_flags & COM_BUFFER_PARAM_FRETMIN))
 		return 1; /* Greater than */
 
+	/* Fixed-length buffers should come before those with flexible length.
+	 * This way, we may have to re-align required buffer sizes less often! */
+	if ((a->cbp_flags & COM_BUFFER_PARAM_FFIXED) < (b->cbp_flags & COM_BUFFER_PARAM_FFIXED))
+		return 1; /* Greater than */
+	if ((a->cbp_flags & COM_BUFFER_PARAM_FFIXED) > (b->cbp_flags & COM_BUFFER_PARAM_FFIXED))
+		return -1; /* Less than */
+
 	/* Lastly, sort by serial argument stream offsets. */
 	if (a->cbp_serial_offset < b->cbp_serial_offset)
 		return -1; /* Less than */
@@ -134,6 +141,33 @@ compar_com_buffer_param(void const *_a, void const *_b) {
 	/* Shouldn't get here! */
 	return 0;
 #undef _MASK
+}
+
+
+/* Return the SP-offset of where the `param_index'th parameter is saved.
+ * The returned value can be used as-is as an offset from %Psp. */
+PRIVATE NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) int16_t
+NOTHROW(FCALL comgen_spoffsetof_param)(struct com_generator const *__restrict self,
+                                       uint8_t param_index) {
+	int16_t result;
+	assert(param_index <= self->cg_paramc);
+#ifdef __x86_64__
+	if (param_index < 6) {
+		result = self->cg_buf_paramc;
+		if (result > 6)
+			result = 6;
+		result = -((3 + result) * 8);
+		if (self->cg_features & COM_GENERATOR_FEATURE_USES_R12)
+			result -= 8;
+		result += param_index * 8;
+	} else {
+		result = (param_index - 6) * 8;
+	}
+#else /* __x86_64__ */
+	result = param_index * 4;
+#endif /* !__x86_64__ */
+	result += self->cg_cfa_offset;
+	return result;
 }
 
 
@@ -288,7 +322,7 @@ do_flexible_inbuf_argument:
 				STATIC_ASSERT(COM_INLINE_BUFFER_PARAM_FIN == COM_BUFFER_PARAM_FIN);
 				STATIC_ASSERT(COM_INLINE_BUFFER_PARAM_FOUT == COM_BUFFER_PARAM_FOUT);
 				par = &self->cg_buf_paramv[self->cg_buf_paramc++];
-				par->cbp_flags         = flags;
+				par->cbp_flags         = flags | COM_BUFFER_PARAM_FFIXED;
 				par->cbp_param_index   = i;
 				par->cbp_param_offset  = param_offset;
 				par->cbp_serial_offset = serial_offset;
@@ -831,7 +865,7 @@ NOTHROW(FCALL comgen_serialize_buffer_arguments_0)(struct com_generator *__restr
  * >>     andP   $~(SERVICE_SHM_ALLOC_ALIGN - 1), %R_fcall1P
  * >>     movP   $SERVICE_SHM_ALLOC_MINSIZE, %Pax
  * >>     cmpP   %Pax, %R_fcall1P   # if (%R_fcall1P < SERVICE_SHM_ALLOC_MINSIZE)
- * >>     cmovbP %R_fcall1P, %Pax   #     %R_fcall1P = SERVICE_SHM_ALLOC_MINSIZE;
+ * >>     cmovbP %Pax, %R_fcall1P   #     %R_fcall1P = SERVICE_SHM_ALLOC_MINSIZE;
  * >> #endif // !cg_buf_paramv[0].HAS_FIXED_BUFFER_SIZE
  * >>     movP   $<cg_service>, %R_fcall0P
  * >> #if !COM_GENERATOR_FEATURE_FEXCEPT
@@ -915,7 +949,8 @@ NOTHROW(FCALL comgen_serialize_buffer_arguments_1)(struct com_generator *__restr
 	gen86_movP_imm_r(&self->cg_txptr, self->cg_service, GEN86_R_FCALL0P);
 
 	/* >>     movP   <cg_buf_paramv[0].cbp_param_offset>(%Psp), %R_fcall1P */
-	gen86_movP_db_r(&self->cg_txptr, self->cg_buf_paramv[0].cbp_param_offset,
+	gen86_movP_db_r(&self->cg_txptr,
+	                self->cg_cfa_offset + self->cg_buf_paramv[0].cbp_param_offset,
 	                GEN86_R_PSP, GEN86_R_FCALL1P);
 
 	/* >>     call   libservice_shm_handle_ataddr_nopr */
@@ -946,8 +981,39 @@ NOTHROW(FCALL comgen_serialize_buffer_arguments_1)(struct com_generator *__restr
 	} else {
 		/* >>     movP   ..., %R_fcall1P  # Buffer size requirements of cg_buf_paramv[0]
 		 * >>                             # Allowed to clobber %Pax, %Pcx, %Pdi, %Psi */
-		/* TODO */
-		abort();
+		switch (param_typ) {
+
+		case SERVICE_TYPE_STR_IN: {
+			/* Encode an inlined call to `strlen()+1' and store the result in %R_fcall1P:
+			 * >> movP   <self->cg_buf_paramv[0].cbp_param_offset>(%Psp), %Pdi
+			 * >> movP   $-1,  %Pcx
+			 * >> xorP   %Pax, %Pax
+			 * >> repne  scasb
+			 * >> subP   %Pcx,     %Pax
+			 * >> leaP   -1(%Pax), %R_fcall1P # Yes: this -1 is correct, even though we
+			 * >>                             #      do want +1 more than strlen() would
+			 * >>                             #      return. For reference, the asm impl
+			 * >>                             #      of strlen subtracts `2'! */
+			gen86_movP_db_r(&self->cg_txptr,
+			                self->cg_cfa_offset + self->cg_buf_paramv[0].cbp_param_offset,
+			                GEN86_R_PSP, GEN86_R_PDI);
+			gen86_movP_imm_r(&self->cg_txptr, -1, GEN86_R_PCX);
+			gen86_xorP_r_r(&self->cg_txptr, GEN86_R_PAX, GEN86_R_PAX);
+			gen86_repne_scasb(&self->cg_txptr);
+			gen86_subP_r_r(&self->cg_txptr, GEN86_R_PCX, GEN86_R_PAX);
+			gen86_leaP_db_r(&self->cg_txptr, -1, GEN86_R_PAX, GEN86_R_FCALL1P);
+		}	break;
+
+		default: {
+			/* Buffer size is given through another argument. */
+			uint16_t bufsize_argid;
+			int16_t bufsize_sp_offset;
+			bufsize_argid     = (param_typ & (_SERVICE_TYPE_PARAMMASK & ~SERVICE_OUT_SIZEARG_RETURN_MINVAL));
+			bufsize_sp_offset = comgen_spoffsetof_param(self, bufsize_argid);
+			gen86_movP_db_r(&self->cg_txptr, bufsize_sp_offset, GEN86_R_PSP, GEN86_R_FCALL1P);
+		}	break;
+
+		}
 
 		if (self->cg_buf_paramv[0].cbp_flags & COM_BUFFER_PARAM_FIN) {
 			/* >>     movP   %R_fcall1P, %Psi    # Used by the out-of-band copy-in loop below! */
@@ -966,7 +1032,7 @@ NOTHROW(FCALL comgen_serialize_buffer_arguments_1)(struct com_generator *__restr
 		/* >>     cmpP   %Pax, %R_fcall1P   # if (%R_fcall1P < SERVICE_SHM_ALLOC_MINSIZE) */
 		gen86_cmpP_r_r(&self->cg_txptr, GEN86_R_PAX, GEN86_R_FCALL1P);
 
-		/* >>     cmovbP %R_fcall1P, %Pax   #     %R_fcall1P = SERVICE_SHM_ALLOC_MINSIZE; */
+		/* >>     cmovbP %Pax, %R_fcall1P   #     %R_fcall1P = SERVICE_SHM_ALLOC_MINSIZE; */
 		gen86_cmovbP_r_r(&self->cg_txptr, GEN86_R_PAX, GEN86_R_FCALL1P);
 	}
 
@@ -1046,7 +1112,7 @@ NOTHROW(FCALL comgen_serialize_buffer_arguments_1)(struct com_generator *__restr
 		if (fixed_buffer_size != (size_t)-1) {
 			/* >>     movP   <cg_buf_paramv[0].cbp_param_offset>(%Psp), %Psi # Unconditionally use %Psi for copying! */
 			gen86_movP_db_r(&self->cg_txptr,
-			                self->cg_buf_paramv[0].cbp_param_offset,
+			                self->cg_cfa_offset + self->cg_buf_paramv[0].cbp_param_offset,
 			                GEN86_R_PSP, GEN86_R_PSI);
 
 			/* >>     movP   $<cg_buf_paramv[0].FIXED_BUFFER_SIZE>, %Pcx */
@@ -1057,7 +1123,7 @@ NOTHROW(FCALL comgen_serialize_buffer_arguments_1)(struct com_generator *__restr
 
 			/* >>     movP   <cg_buf_paramv[0].cbp_param_offset>(%Psp), %Psi # Unconditionally use %Psi for copying! */
 			gen86_movP_db_r(&self->cg_txptr,
-			                self->cg_buf_paramv[0].cbp_param_offset,
+			                self->cg_cfa_offset + self->cg_buf_paramv[0].cbp_param_offset,
 			                GEN86_R_PSP, GEN86_R_PSI);
 
 			/* >>     rep    movsb */
@@ -1100,7 +1166,7 @@ NOTHROW(FCALL comgen_serialize_buffer_arguments_1)(struct com_generator *__restr
 
 	/* >>     movP   <cg_buf_paramv[0].cbp_param_offset>(%Psp), %Pdx */
 	gen86_movP_db_r(&self->cg_txptr,
-	                self->cg_buf_paramv[0].cbp_param_offset,
+	                self->cg_cfa_offset + self->cg_buf_paramv[0].cbp_param_offset,
 	                GEN86_R_PSP, GEN86_R_PDX);
 
 	/* >>     subP   service_shm_handle::ssh_shm(%Pax), %Pdx */
@@ -1120,6 +1186,11 @@ NOTHROW(FCALL comgen_serialize_buffer_arguments_1)(struct com_generator *__restr
 
 
 
+#ifdef __x86_64__
+#define GEN86_R_temp_exbuf_size GEN86_R_R12
+#else /* __x86_64__ */
+#define GEN86_R_temp_exbuf_size GEN86_R_ESI
+#endif /* !__x86_64__ */
 
 /* Generate instructions for the "#if cg_buf_paramc >= 2"
  * case     of     `comgen_serialize_buffer_arguments()':
@@ -1137,12 +1208,14 @@ NOTHROW(FCALL comgen_serialize_buffer_arguments_1)(struct com_generator *__restr
  * >>     jz     1f
  * >>     movP   <cbp_param_offset>(%Psp),          %Pdx
  * >>     subP   service_shm_handle::ssh_shm(%Pax), %Pdx
- * >>     movP   %Pdx, <cbp_serial_offset>(%Psp)
+ * >>     movP   %Pdx, <cbp_serial_offset>(%R_service_com)
  * >>     jmp    2f
  * >> 1:  # NOTE: When only 1 buffer argument exists, %R_temp_exbuf_size isn't
  * >>     #       used and the allocated+initialization is done inline.
  * >>     addP   ..., %R_temp_exbuf_size  # Account for required buffer size (depending on buffer type)
- * >>                                     # NOTE: The buffer size calculated here must be ceil-aligned by sizeof(void *)!
+ * >>                                     # NOTE: The buffer size calculated here must be ceil-aligned by sizeof(void *),
+ * >>                                     #       unless INDEX == self->cg_buf_paramc - 1, in which case this alignment
+ * >>                                     #       is optional.
  * >>                                     # Allowed to clobber: %Pax, %Pcx, %Pdx, %Pdi (on i386, %Psi must be preserved!)
  * >> 2:
  * >> }}
@@ -1154,7 +1227,7 @@ NOTHROW(FCALL comgen_serialize_buffer_arguments_1)(struct com_generator *__restr
  * >>     andP   $~(SERVICE_SHM_ALLOC_ALIGN - 1), %R_fcall1P
  * >>     movP   $SERVICE_SHM_ALLOC_MINSIZE, %Pax
  * >>     cmpP   %Pax, %R_fcall1P   # if (%R_fcall1P < SERVICE_SHM_ALLOC_MINSIZE)
- * >>     cmovbP %R_fcall1P, %Pax   #     %R_fcall1P = SERVICE_SHM_ALLOC_MINSIZE;
+ * >>     cmovbP %Pax, %R_fcall1P   #     %R_fcall1P = SERVICE_SHM_ALLOC_MINSIZE;
  * >> #if !COM_GENERATOR_FEATURE_FEXCEPT
  * >>     call   libservice_shmbuf_alloc_nopr_nx
  * >>     testP  %Pax, %Pax
@@ -1191,13 +1264,13 @@ NOTHROW(FCALL comgen_serialize_buffer_arguments_1)(struct com_generator *__restr
  * >>     # NOTE: We don't have to about output buffers, since those appear after in/inout buffers
  * >>     movP   %Pdi, %Pax
  * >>     subP   %Pdx, %Pax
- * >>     movP   %Pax, <cbp_serial_offset>(%Psp)          # Store SHM offset in serial data
+ * >>     movP   %Pax, <cbp_serial_offset>(%R_service_com) # Store SHM offset in serial data
  * >>
- * >>     movP   ...,                      %Pcx           # required buffer size (depending on buffer type)
- * >>                                                     # Allowed to clobber: %Pax, %Pdx, %Pcx, %Psi
- * >>     movP   <cbp_param_offset>(%Psp), %Psi           # Unconditionally use %Psi for copying!
- * >>     rep    movsb                                    # Copy input buffers into SHM
- * >> #if INDEX != cg_paramc - 1                          # If %Pdi will still be used, it must be re-aligned
+ * >>     movP   ...,                      %Pcx            # required buffer size (depending on buffer type)
+ * >>                                                      # Allowed to clobber: %Pax, %Pdx, %Pcx, %Psi
+ * >>     movP   <cbp_param_offset>(%Psp), %Psi            # Unconditionally use %Psi for copying!
+ * >>     rep    movsb                                     # Copy input buffers into SHM
+ * >> #if INDEX != cg_paramc - 1                           # If %Pdi will still be used, it must be re-aligned
  * >> #if cg_buf_paramv[INDEX].HAS_FIXED_BUFFER_SIZE
  * >> #if !IS_ALIGNED(cg_buf_paramv[INDEX].FIXED_BUFFER_SIZE, sizeof(void *))
  * >>     addP   $<sizeof(void *) - (cg_buf_paramv[INDEX].FIXED_BUFFER_SIZE & (sizeof(void *) - 1))>, %Pdi
@@ -1226,9 +1299,396 @@ NOTHROW(FCALL comgen_serialize_buffer_arguments_1)(struct com_generator *__restr
  * >> .Lall_buffers_are_in_band_preemption_reenabled: */
 PRIVATE NONNULL((1)) void
 NOTHROW(FCALL comgen_serialize_buffer_arguments_n)(struct com_generator *__restrict self) {
-	/* TODO */
-	(void)self;
-	abort();
+	uint8_t i;
+	int32_t *pdisp_Lall_buffers_are_in_band; /* Relocate PC32 */
+
+	/* NOTE: Because of `COM_GENERATOR_INITIAL_TX_BUFSIZ', we don't
+	 *       have to worry about running out of buffer space  (yet) */
+	/* >>     xorP   %R_temp_exbuf_size, %R_temp_exbuf_size */
+	gen86_xorP_r_r(&self->cg_txptr, GEN86_R_temp_exbuf_size, GEN86_R_temp_exbuf_size);
+
+	/* >>     movP   %R_temp_exbuf_size, LOC_bufpar_ptr(%Psp) */
+	gen86_movP_r_db(&self->cg_txptr, GEN86_R_temp_exbuf_size,
+	                comgen_spoffsetof_LOC_bufpar_ptr(self), GEN86_R_PSP);
+
+	/* >> {foreach[BUFFER_ARGUMENT: <INDEX>, <cbp_param_offset>, <cbp_serial_offset>]: { */
+	for (i = 0; i < self->cg_buf_paramc; ++i) {
+		int8_t *pdisp_1; /* Relocate PC8 */
+		int8_t *pdisp_2; /* Relocate PC8 */
+
+		/* >>     movP   $<cg_service>, %R_fcall0P */
+		comgen_instr(self, gen86_movP_imm_r(&self->cg_txptr, self->cg_service, GEN86_R_FCALL0P));
+
+		/* >>     movP   <cbp_param_offset>(%Psp), %R_fcall1P */
+		comgen_instr(self, gen86_movP_db_r(&self->cg_txptr,
+		                                   self->cg_cfa_offset + self->cg_buf_paramv[i].cbp_param_offset,
+		                                   GEN86_R_PSP, GEN86_R_FCALL1P));
+
+		/* >>     call   libservice_shm_handle_ataddr_nopr */
+		comgen_instr(self, gen86_call(&self->cg_txptr, &libservice_shm_handle_ataddr_nopr));
+
+		/* >>     movP   %Pax, LOC_bufparam_handles[INDEX](%Psp) */
+		comgen_instr(self, gen86_movP_r_db(&self->cg_txptr, GEN86_R_PAX,
+		                                   comgen_spoffsetof_LOC_bufpar_handles(self, i),
+		                                   GEN86_R_PSP));
+
+		/* >>     testP  %Pax, %Pax */
+		comgen_instr(self, gen86_testP_r_r(&self->cg_txptr, GEN86_R_PAX, GEN86_R_PAX));
+
+		/* >>     jz     1f */
+		comgen_instr(self, gen86_jcc8_offset(&self->cg_txptr, GEN86_CC_Z, -1));
+		pdisp_1 = (int8_t *)(self->cg_txptr - 1);
+
+		/* >>     movP   <cbp_param_offset>(%Psp),          %Pdx */
+		comgen_instr(self, gen86_movP_db_r(&self->cg_txptr,
+		                                   self->cg_cfa_offset + self->cg_buf_paramv[i].cbp_param_offset,
+		                                   GEN86_R_PSP, GEN86_R_PDX));
+
+		/* >>     subP   service_shm_handle::ssh_shm(%Pax), %Pdx */
+		comgen_instr(self, gen86_subP_mod_r(&self->cg_txptr, gen86_modrm_db, GEN86_R_PDX,
+		                                    offsetof(struct service_shm_handle, ssh_shm),
+		                                    GEN86_R_PAX));
+
+		/* >>     movP   %Pdx, <cbp_serial_offset>(%R_service_com) */
+		comgen_instr(self, gen86_movP_r_db(&self->cg_txptr, GEN86_R_PDX,
+		                                   self->cg_buf_paramv[i].cbp_serial_offset,
+		                                   GEN86_R_service_com));
+
+		/* >>     jmp    2f */
+		comgen_instr(self, gen86_jmp8_offset(&self->cg_txptr, -1));
+		pdisp_2 = (int8_t *)(self->cg_txptr - 1);
+
+		/* >> 1: */
+		*pdisp_1 += (int8_t)(uint8_t)(uintptr_t)
+		            (self->cg_txptr - (byte_t *)pdisp_1);
+
+		if (self->cg_buf_paramv[i].cbp_flags & COM_BUFFER_PARAM_FFIXED) {
+			uint16_t fixed_size;
+			fixed_size = self->cg_info.dl_params[self->cg_buf_paramv[i].cbp_param_index] & _SERVICE_TYPE_PARAMMASK;
+			fixed_size = CEIL_ALIGN(fixed_size, sizeof(void *));
+			/* >>     addP   ..., %R_temp_exbuf_size  # Account for required buffer size (depending on buffer type)
+			 * >>                                     # NOTE: The buffer size calculated here must be ceil-aligned by sizeof(void *) */
+			comgen_instr(self, gen86_addP_imm_r(&self->cg_txptr, fixed_size, GEN86_R_temp_exbuf_size));
+		} else {
+			service_typeid_t param_typ;
+			/* >>     addP   ..., %R_temp_exbuf_size  # Account for required buffer size (depending on buffer type)
+			 * >>                                     # NOTE: The buffer size calculated here must be ceil-aligned by sizeof(void *),
+			 * >>                                     #       unless INDEX == self->cg_buf_paramc - 1, in which case this alignment
+			 * >>                                     #       is optional.
+			 * >>                                     # Allowed to clobber: %Pax, %Pcx, %Pdx, %Pdi (on i386, %Psi must be preserved!) */
+			param_typ = self->cg_info.dl_params[self->cg_buf_paramv[i].cbp_param_index];
+			switch (param_typ) {
+
+			case SERVICE_TYPE_STR_IN: {
+				/* Encode an inlined call to `strlen()+1' and add the result to %GEN86_R_temp_exbuf_size:
+				 * >> movP   <self->cg_buf_paramv[i].cbp_param_offset>(%Psp), %Pdi
+				 * >> movP   $-1,  %Pcx
+				 * >> xorP   %Pax, %Pax
+				 * >> repne  scasb
+				 * >> subP   %Pcx, %Pax
+				 * >> leaP   -1(%GEN86_R_temp_exbuf_size,%Pax), \
+				 * >>        %GEN86_R_temp_exbuf_size # Yes: this -1 is correct, even though we
+				 * >>                                 #      do want +1 more than strlen() would
+				 * >>                                 #      return. For reference, the asm impl
+				 * >>                                 #      of strlen subtracts `2'! */
+				gen86_movP_db_r(&self->cg_txptr,
+				                self->cg_cfa_offset + self->cg_buf_paramv[i].cbp_param_offset,
+				                GEN86_R_PSP, GEN86_R_PDI);
+				gen86_movP_imm_r(&self->cg_txptr, -1, GEN86_R_PCX);
+				gen86_xorP_r_r(&self->cg_txptr, GEN86_R_PAX, GEN86_R_PAX);
+				gen86_repne_scasb(&self->cg_txptr);
+				gen86_subP_r_r(&self->cg_txptr, GEN86_R_PCX, GEN86_R_PAX);
+				gen86_leaP_dbi_r(&self->cg_txptr, -1, GEN86_R_temp_exbuf_size,
+				                 GEN86_R_PAX, GEN86_R_temp_exbuf_size);
+			}	break;
+
+			default: {
+				/* Buffer size is given through another argument. */
+				uint16_t bufsize_argid;
+				int16_t bufsize_sp_offset;
+				bufsize_argid     = (param_typ & (_SERVICE_TYPE_PARAMMASK & ~SERVICE_OUT_SIZEARG_RETURN_MINVAL));
+				bufsize_sp_offset = comgen_spoffsetof_param(self, bufsize_argid);
+				gen86_addP_mod_r(&self->cg_txptr, gen86_modrm_db, GEN86_R_temp_exbuf_size,
+				                 bufsize_sp_offset, GEN86_R_PSP);
+			}	break;
+
+			}
+
+			/* Re-align the required buffer size. */
+			if (i != self->cg_buf_paramc - 1) {
+				comgen_instr(self, gen86_addP_imm_r(&self->cg_txptr, sizeof(void *) - 1, GEN86_R_temp_exbuf_size));
+				comgen_instr(self, gen86_andP_imm_r(&self->cg_txptr, ~(sizeof(void *) - 1), GEN86_R_temp_exbuf_size));
+			}
+		}
+
+		/* >> 2: */
+		*pdisp_2 += (int8_t)(uint8_t)(uintptr_t)
+		            (self->cg_txptr - (byte_t *)pdisp_2);
+	}
+	/* >> }} */
+
+	/* >>     testP  %R_temp_exbuf_size, %R_temp_exbuf_size */
+	comgen_instr(self, gen86_testP_r_r(&self->cg_txptr,
+	                                   GEN86_R_temp_exbuf_size,
+	                                   GEN86_R_temp_exbuf_size));
+
+	/* >>     jz     .Lall_buffers_are_in_band */
+	comgen_instr(self, gen86_jccl_offset(&self->cg_txptr, GEN86_CC_Z, -4));
+	pdisp_Lall_buffers_are_in_band = (int32_t *)(self->cg_txptr - 4);
+
+	/* >>     movP   $<cg_service>,      %R_fcall0P */
+	comgen_instr(self, gen86_movP_imm_r(&self->cg_txptr, self->cg_service, GEN86_R_FCALL0P));
+
+	/* >>     movP   %R_temp_exbuf_size, %R_fcall1P */
+	comgen_instr(self, gen86_movP_r_r(&self->cg_txptr, GEN86_R_temp_exbuf_size, GEN86_R_FCALL1P));
+
+	/* >>     addP   $(SERVICE_SHM_ALLOC_EXTRA + SERVICE_SHM_ALLOC_ALIGN - 1), %R_fcall1P */
+	comgen_instr(self, gen86_addP_imm_r(&self->cg_txptr,
+	                                    SERVICE_SHM_ALLOC_EXTRA +
+	                                    SERVICE_SHM_ALLOC_ALIGN - 1,
+	                                    GEN86_R_FCALL1P));
+
+	/* >>     andP   $~(SERVICE_SHM_ALLOC_ALIGN - 1), %R_fcall1P */
+	comgen_instr(self, gen86_andP_imm_r(&self->cg_txptr,
+	                                    ~(SERVICE_SHM_ALLOC_ALIGN - 1),
+	                                    GEN86_R_FCALL1P));
+
+	/* >>     movP   $SERVICE_SHM_ALLOC_MINSIZE, %Pax */
+	comgen_instr(self, gen86_movP_imm_r(&self->cg_txptr, SERVICE_SHM_ALLOC_MINSIZE, GEN86_R_PAX));
+
+	/* >>     cmpP   %Pax, %R_fcall1P   # if (%R_fcall1P < SERVICE_SHM_ALLOC_MINSIZE) */
+	comgen_instr(self, gen86_cmpP_r_r(&self->cg_txptr, GEN86_R_PAX, GEN86_R_FCALL1P));
+
+	/* >>     cmovbP %Pax, %R_fcall1P   #     %R_fcall1P = SERVICE_SHM_ALLOC_MINSIZE; */
+	comgen_instr(self, gen86_cmovbP_r_r(&self->cg_txptr, GEN86_R_PAX, GEN86_R_FCALL1P));
+
+	if (!(self->cg_features & COM_GENERATOR_FEATURE_FEXCEPT)) {
+		/* >>     call   libservice_shmbuf_alloc_nopr_nx */
+		comgen_instr(self, gen86_call(&self->cg_txptr, &libservice_shmbuf_alloc_nopr_nx));
+
+		/* >>     testP  %Pax, %Pax */
+		comgen_instr(self, gen86_testP_r_r(&self->cg_txptr, GEN86_R_PAX, GEN86_R_PAX));
+
+		/* >>     jz     .Lerr_free_service_com */
+		comgen_instr(self, gen86_jccl_offset(&self->cg_txptr, GEN86_CC_Z, -4));
+		comgen_reloc(self, self->cg_txptr - 4, COM_R_PCREL32, COM_SYM_Lerr_free_service_com);
+	} else {
+		/* >>     call   libservice_shmbuf_alloc_nopr */
+		comgen_instr(self, gen86_call(&self->cg_txptr, &libservice_shmbuf_alloc_nopr));
+	}
+
+	/* >>     movP   %Pax, LOC_bufpar_ptr(%Psp) */
+	comgen_instr(self, gen86_movP_r_db(&self->cg_txptr, GEN86_R_PAX,
+	                                   comgen_spoffsetof_LOC_bufpar_ptr(self),
+	                                   GEN86_R_PSP));
+
+	/* >>     movP   %Pdx, LOC_bufpar_shm(%Psp) */
+	comgen_instr(self, gen86_movP_r_db(&self->cg_txptr, GEN86_R_PDX,
+	                                   comgen_spoffsetof_LOC_bufpar_shm(self),
+	                                   GEN86_R_PSP));
+
+	/* >> .Leh_free_xbuf_begin: */
+	comgen_defsym(self, COM_SYM_Leh_free_xbuf_begin);
+
+	/* Copy out-of-band in/inout buffers into SHM memory */
+	if (self->cg_inbuf_paramc != 0 || self->cg_inoutbuf_paramc != 0) {
+		/* Re-enable preemption */
+		/* >>     movP   LOC_oldset(%Psp), %Pdi  # `sigset_t *oldset' */
+		comgen_instr(self, gen86_movP_db_r(&self->cg_txptr,
+		                                   comgen_spoffsetof_LOC_oldset(self),
+		                                   GEN86_R_PSP, GEN86_R_PDI));
+
+		/* >>     movP   LOC_upm(%Psp),    %Pcx  # `struct userprocmask *upm' */
+		comgen_instr(self, gen86_movP_db_r(&self->cg_txptr,
+		                                   comgen_spoffsetof_LOC_upm(self),
+		                                   GEN86_R_PSP, GEN86_R_PCX));
+
+		/* >>     movP   %Pdi, userprocmask::pm_sigmask(%Pcx) */
+		comgen_instr(self, gen86_movP_db_r(&self->cg_txptr, GEN86_R_PDI,
+		                                   offsetof(struct userprocmask, pm_sigmask),
+		                                   GEN86_R_PCX));
+
+		/* >>     test   $USERPROCMASK_FLAG_HASPENDING, userprocmask::pm_flags(%Pcx) */
+		comgen_instr(self, gen86_testP_imm_mod(&self->cg_txptr, gen86_modrm_db,
+		                                       USERPROCMASK_FLAG_HASPENDING,
+		                                       offsetof(struct userprocmask, pm_flags),
+		                                       GEN86_R_PCX));
+
+		/* >>     jnz    .Ltest_pending_signals_after_xbuf_alloc */
+		comgen_instr(self, gen86_jccl_offset(&self->cg_txptr, GEN86_CC_NZ, -4));
+		comgen_reloc(self, self->cg_txptr - 4, COM_R_PCREL32, COM_SYM_Ltest_pending_signals_after_xbuf_alloc);
+
+		/* >> .Ltest_pending_signals_after_xbuf_alloc_return: */
+		comgen_defsym(self, COM_SYM_Ltest_pending_signals_after_xbuf_alloc_return);
+
+		/* >>     movP   %Pax, %Pdi # Unconditionally use %Pdi for copying! */
+		comgen_instr(self, gen86_movP_r_r(&self->cg_txptr, GEN86_R_PAX, GEN86_R_PDI));
+
+		/* >>     movP   service_shm_handle::ssh_shm(%Pdx), %Pdx  # %Pdx is the base address of the out-of-band buffer SHM mapping */
+		comgen_instr(self, gen86_movP_db_r(&self->cg_txptr,
+		                                   offsetof(struct service_shm_handle, ssh_shm),
+		                                   GEN86_R_PDX, GEN86_R_PDX));
+
+		/* >> {foreach[IN_INOUT_BUFFER_ARGUMENT: <INDEX>, <cbp_param_offset>, <cbp_serial_offset>]: { */
+		for (i = 0; i < self->cg_inbuf_paramc + self->cg_inoutbuf_paramc; ++i) {
+			int8_t *pdisp_1; /* Relocate PC8 */
+			/* >>     cmpP   $0, LOC_bufparam_handles[INDEX](%Psp) */
+			comgen_instr(self, gen86_cmpP_imm_mod(&self->cg_txptr, gen86_modrm_db, 0,
+			                                      comgen_spoffsetof_LOC_bufpar_handles(self, i),
+			                                      GEN86_R_PSP));
+
+			/* >>     jne    1f */
+			comgen_instr(self, gen86_jcc8_offset(&self->cg_txptr, GEN86_CC_NE, -1));
+			pdisp_1 = (int8_t *)(self->cg_txptr - 1);
+
+			if (self->cg_inbuf_paramc != 0 && self->cg_inoutbuf_paramc != 0 &&
+			    self->cg_outbuf_paramc != 0 &&
+			    i == self->cg_inbuf_paramc /* IS_FIRST_INOUT_BUFFER */ &&
+			    !(self->cg_features & COM_GENERATOR_FEATURE_IN_BUFFERS_FIXLEN)) {
+				/* `LOC_outbuffers_start' contains the start of the first inout/out buffer  */
+				/* >>     movP   %Pdi, LOC_outbuffers_start(%Psp) */
+				comgen_instr(self, gen86_movP_r_db(&self->cg_txptr, GEN86_R_PDI,
+				                                   comgen_spoffsetof_LOC_outbuffers_start(self),
+				                                   GEN86_R_PSP));
+			}
+
+			/* >>     movP   %Pdi, %Pax */
+			comgen_instr(self, gen86_movP_r_r(&self->cg_txptr, GEN86_R_PDI, GEN86_R_PAX));
+
+			/* >>     subP   %Pdx, %Pax */
+			comgen_instr(self, gen86_subP_r_r(&self->cg_txptr, GEN86_R_PDX, GEN86_R_PAX));
+
+			/* >>     movP   %Pax, <cbp_serial_offset>(%R_service_com) # Store SHM offset in serial data */
+			comgen_instr(self, gen86_movP_r_db(&self->cg_txptr, GEN86_R_PAX,
+			                                   self->cg_buf_paramv[i].cbp_serial_offset,
+			                                   GEN86_R_service_com));
+
+			if (self->cg_buf_paramv[i].cbp_flags & COM_BUFFER_PARAM_FFIXED) {
+				uint16_t fixed_size;
+				fixed_size = self->cg_info.dl_params[self->cg_buf_paramv[i].cbp_param_index] & _SERVICE_TYPE_PARAMMASK;
+				/* >>     movP   <cbp_param_offset>(%Psp), %Psi            # Unconditionally use %Psi for copying! */
+				comgen_instr(self, gen86_movP_db_r(&self->cg_txptr,
+				                                   self->cg_cfa_offset + self->cg_buf_paramv[i].cbp_param_offset,
+				                                   GEN86_R_PSP, GEN86_R_PSI));
+				comgen_memcpy_with_rep_movs(self, fixed_size);
+			} else {
+				service_typeid_t param_typ;
+				/* >>     movP   ..., %Pcx # required buffer size (depending on buffer type)
+				 * >>                      # Allowed to clobber: %Pax, %Pdx, %Pcx, %Psi */
+				param_typ = self->cg_info.dl_params[self->cg_buf_paramv[i].cbp_param_index];
+				switch (param_typ) {
+
+				case SERVICE_TYPE_STR_IN: {
+					/* Encode an inlined call to `strlen()+1' and add the result to %GEN86_R_temp_exbuf_size:
+					 * >> movP   <self->cg_buf_paramv[i].cbp_param_offset>(%Psp), %Pdi
+					 * >> movP   $-1,  %Pcx
+					 * >> xorP   %Pax, %Pax
+					 * >> repne  scasb
+					 * >> negP   %Pcx
+					 * >> decP   %Pcx # Yes: this -1 is correct, even though we
+					 * >>             #      do want +1 more than strlen() would
+					 * >>             #      return. For reference, the asm impl
+					 * >>             #      of strlen subtracts `2'! */
+					gen86_movP_db_r(&self->cg_txptr,
+					                self->cg_cfa_offset + self->cg_buf_paramv[i].cbp_param_offset,
+					                GEN86_R_PSP, GEN86_R_PDI);
+					gen86_movP_imm_r(&self->cg_txptr, -1, GEN86_R_PCX);
+					gen86_xorP_r_r(&self->cg_txptr, GEN86_R_PAX, GEN86_R_PAX);
+					gen86_repne_scasb(&self->cg_txptr);
+					gen86_negP_r(&self->cg_txptr, GEN86_R_PCX);
+					gen86_decP_r(&self->cg_txptr, GEN86_R_PCX);
+				}	break;
+
+				default: {
+					/* Buffer size is given through another argument. */
+					uint16_t bufsize_argid;
+					int16_t bufsize_sp_offset;
+					bufsize_argid     = (param_typ & (_SERVICE_TYPE_PARAMMASK & ~SERVICE_OUT_SIZEARG_RETURN_MINVAL));
+					bufsize_sp_offset = comgen_spoffsetof_param(self, bufsize_argid);
+					gen86_movP_db_r(&self->cg_txptr, bufsize_sp_offset, GEN86_R_PSP, GEN86_R_PCX);
+				}	break;
+
+				}
+	
+				/* >>     movP   <cbp_param_offset>(%Psp), %Psi            # Unconditionally use %Psi for copying! */
+				comgen_instr(self, gen86_movP_db_r(&self->cg_txptr,
+				                                   self->cg_cfa_offset + self->cg_buf_paramv[i].cbp_param_offset,
+				                                   GEN86_R_PSP, GEN86_R_PSI));
+	
+				/* >>     rep    movsb                                     # Copy input buffers into SHM */
+				comgen_instr(self, gen86_rep_movsb(&self->cg_txptr));
+			}
+
+			/* If %Pdi will still be used, it must be re-aligned  */
+			if (i != self->cg_buf_paramc - 1) {
+				if (self->cg_buf_paramv[i].cbp_flags & COM_BUFFER_PARAM_FFIXED) {
+					uint16_t fixed_size;
+					fixed_size = self->cg_info.dl_params[self->cg_buf_paramv[i].cbp_param_index] & _SERVICE_TYPE_PARAMMASK;
+					if (!IS_ALIGNED(fixed_size, sizeof(void *))) {
+						uint8_t align = sizeof(void *) - (fixed_size & (sizeof(void *) - 1));
+						/* >>     addP   $<sizeof(void *) - (cg_buf_paramv[INDEX].FIXED_BUFFER_SIZE & (sizeof(void *) - 1))>, %Pdi */
+						comgen_instr(self, gen86_addP_imm_r(&self->cg_txptr, align, GEN86_R_PDI));
+					}
+				} else {
+					/* >>     addP   $<sizeof(void *)-1>,    %Pdi */
+					comgen_instr(self, gen86_addP_imm_r(&self->cg_txptr, sizeof(void *) - 1, GEN86_R_PDI));
+
+					/* >>     andP   $<~(sizeof(void *)-1)>, %Pdi */
+					comgen_instr(self, gen86_andP_imm_r(&self->cg_txptr, ~(sizeof(void *) - 1), GEN86_R_PDI));
+				}
+			}
+
+			/* >> 1: */
+			*pdisp_1 += (int8_t)(uint8_t)(uintptr_t)
+			            (self->cg_txptr - (byte_t *)pdisp_1);
+		}
+		/* >> }} */
+
+		if (self->cg_inbuf_paramc != 0 && self->cg_inoutbuf_paramc == 0 &&
+		    self->cg_outbuf_paramc != 0 && !(self->cg_features & COM_GENERATOR_FEATURE_IN_BUFFERS_FIXLEN)) {
+			/* >>     movP   %Pdi, LOC_outbuffers_start(%Psp) # `LOC_outbuffers_start' contains the start of the first inout/out buffer */
+			comgen_instr(self, gen86_movP_r_db(&self->cg_txptr, GEN86_R_PDI,
+			                                   comgen_spoffsetof_LOC_outbuffers_start(self),
+			                                   GEN86_R_PSP));
+		}
+
+		/* >>     jmp    .Lall_buffers_are_in_band_preemption_reenabled */
+		comgen_instr(self, gen86_jmpl_offset(&self->cg_txptr, -4));
+		comgen_reloc(self, self->cg_txptr - 4, COM_R_PCREL32, COM_SYM_Lall_buffers_are_in_band_preemption_reenabled);
+	}
+
+	/* >> .Lall_buffers_are_in_band: */
+	*pdisp_Lall_buffers_are_in_band += (int32_t)(uint32_t)(uintptr_t)
+	                                   (self->cg_txptr - (byte_t *)pdisp_Lall_buffers_are_in_band);
+
+	/* Re-enable preemption */
+	/* >>     movP   LOC_oldset(%Psp), %Pdx  # `sigset_t *oldset' */
+	comgen_instr(self, gen86_movP_db_r(&self->cg_txptr,
+	                                   comgen_spoffsetof_LOC_oldset(self),
+	                                   GEN86_R_PSP, GEN86_R_PDX));
+
+	/* >>     movP   LOC_upm(%Psp),    %Pax  # `struct userprocmask *upm' */
+	comgen_instr(self, gen86_movP_db_r(&self->cg_txptr,
+	                                   comgen_spoffsetof_LOC_upm(self),
+	                                   GEN86_R_PSP, GEN86_R_PAX));
+
+	/* >>     movP   %Pdx, userprocmask::pm_sigmask(%Pax) */
+	comgen_instr(self, gen86_movP_r_db(&self->cg_txptr, GEN86_R_PDX,
+	                                   offsetof(struct userprocmask, pm_sigmask),
+	                                   GEN86_R_PAX));
+
+	/* >>     test   $USERPROCMASK_FLAG_HASPENDING, userprocmask::pm_flags(%Pax) */
+	comgen_instr(self, gen86_testP_imm_mod(&self->cg_txptr, gen86_modrm_db,
+	                                       USERPROCMASK_FLAG_HASPENDING,
+	                                       offsetof(struct userprocmask, pm_flags),
+	                                       GEN86_R_PAX));
+
+	/* >>     jnz    .Ltest_pending_signals_after_all_buffers_are_in_band */
+	comgen_instr(self, gen86_jccl_offset(&self->cg_txptr, GEN86_CC_NZ, -4));
+	comgen_reloc(self, self->cg_txptr - 4, COM_R_PCREL32, COM_SYM_Ltest_pending_signals_after_all_buffers_are_in_band);
+
+	/* >> .Lall_buffers_are_in_band_preemption_reenabled: */
+	comgen_defsym(self, COM_SYM_Lall_buffers_are_in_band_preemption_reenabled);
 }
 
 

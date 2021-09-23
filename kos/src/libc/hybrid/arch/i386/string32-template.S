@@ -597,7 +597,7 @@ INTERN_FUNCTION(F_STRING(len))
 	xorl   %eax, %eax
 	repne  I(scas)
 	subl   %ecx, %eax /* result = 0 - ECX; */
-	subl   $(2), %eax   /* result = (0 - ECX) - 2; */
+	subl   $(2), %eax /* result = (0 - ECX) - 2; */
 	END_CLD
 	popl_cfi_r %edi
 	RET(4)

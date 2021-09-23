@@ -472,8 +472,8 @@
 #if LIBGEN86_TARGET_BITS >= 32
 
 /* <instr> %reg, (%breg,%index) */
-#define gen86_modrm32_bi(p_pc, _rex, _putinstr, reg, disp8s, breg, index, _putimm) \
-	gen86_modrm32_bis(p_pc, _rex, _putinstr, reg, disp8s, breg, index, 1, _putimm)
+#define gen86_modrm32_bi(p_pc, _rex, _putinstr, reg, breg, index, _putimm) \
+	gen86_modrm32_bis(p_pc, _rex, _putinstr, reg, breg, index, 1, _putimm)
 
 /* <instr> %reg, disp8s(%breg,%index) */
 #define gen86_modrm32_d8bi(p_pc, _rex, _putinstr, reg, disp8s, breg, index, _putimm) \
