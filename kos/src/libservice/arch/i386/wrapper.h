@@ -471,8 +471,8 @@ STATIC_ASSERT(IS_ALIGNED(offsetof(struct service_com, sc_generic.g_data), 4));
  * >>
  * >>
  * >>
- * >> // Serialize non-buffer arguments (if they exist)
- * >> #if NON_BUFFER_ARGUMENT_COUNT != 0
+ * >> // Serialize integer arguments (if they exist)
+ * >> #if cg_int_paramc != 0
  * >> #if COM_GENERATOR_FEATURE_INT_PARAMS_USE_LODS
  * >> #set _GENERATOR_VAR_Psi_offset = FIRST_NON_BUFFER_ARGUMENT.cip_param_offset  # Stack-offset of first argument
  * >>     leaP   <FIRST_NON_BUFFER_ARGUMENT.cip_param_offset>(%Psp), %Psi
@@ -510,7 +510,7 @@ STATIC_ASSERT(IS_ALIGNED(offsetof(struct service_com, sc_generic.g_data), 4));
  * >>     movP   %Pax, <cip_serial_offset>(%R_service_com)
  * >> #endif // !COM_GENERATOR_FEATURE_INT_PARAMS_USE_STOS
  * >> }}
- * >> #endif // NON_BUFFER_ARGUMENT_COUNT != 0
+ * >> #endif // cg_int_paramc != 0
  * >>
  * >>
  * >>
@@ -1256,6 +1256,8 @@ NOTHROW(FCALL comgen_compile)(struct com_generator *__restrict self);
 	((self)->cg_txptr + GEN86_INSTRLEN_MAX <= (self)->cg_txend)
 #define comgen_txok(self, n_instr) \
 	((self)->cg_txptr + ((n_instr) * GEN86_INSTRLEN_MAX) <= (self)->cg_txend)
+#define comgen_txav(self, n_bytes) \
+	((self)->cg_txptr + (n_bytes) <= (self)->cg_txend)
 
 #ifdef GUARD_LIBSERVICE_ARCH_I386_WRAPPER_C
 
