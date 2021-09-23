@@ -121,9 +121,9 @@ STATIC_ASSERT(IS_ALIGNED(offsetof(struct service_com, sc_generic.g_data), 4));
  *      CFA-cg_locvar_offset+2*P           void                          *LOC_bufpar_ptr;                        # [0..1] Non-shm buffer temporary storage
  *      CFA-cg_locvar_offset+3*P           REF struct service_shm_handle *LOC_bufpar_shm;                        # [1..1][valid_if(LOC_bufpar_ptr)] SHM for `LOC_bufpar_ptr'
  *      CFA-cg_locvar_offset+4*P           struct service_shm_handle     *LOC_bufparam_handles[cg_buf_paramc]; # [0..1][*] SHM handles for user buffers (NULL for buffers that need to be copied)
- * #if cg_inbuf_paramc != 0 && (cg_inoutbuf_paramc != 0 || cg_outbuf_paramc != 0)
- *      CFA-cg_locvar_offset+...           byte_t *LOC_outbuffers_start; # [1..1] Base address for output buffers (see below)
- * #endif // cg_inbuf_paramc != 0 && (cg_inoutbuf_paramc != 0 || cg_outbuf_paramc != 0)
+ * #if cg_inbuf_paramc != 0 && (cg_inoutbuf_paramc != 0 || cg_outbuf_paramc != 0) && !COM_GENERATOR_FEATURE_IN_BUFFERS_FIXLEN
+ *      CFA-cg_locvar_offset+...           byte_t *LOC_outbuffers_start; # [1..1] Base address for inout/out buffers (see below)
+ * #endif // cg_inbuf_paramc != 0 && (cg_inoutbuf_paramc != 0 || cg_outbuf_paramc != 0) && !COM_GENERATOR_FEATURE_IN_BUFFERS_FIXLEN
  * #endif // cg_buf_paramc != 0
  *
  *      CFA-cg_locvar_offset+cg_locvar_size [<end of locals>]
@@ -292,17 +292,17 @@ STATIC_ASSERT(IS_ALIGNED(offsetof(struct service_com, sc_generic.g_data), 4));
  * >> .Ltest_pending_signals_after_com_buffer_alloc_return:
  * >> #elif cg_buf_paramc == 1
  * >>     movP   $0, LOC_bufpar_ptr(%Psp)
- * >>     movP   $<cg_service>,                               %R_fcall0P
+ * >>     movP   $<cg_service>,                             %R_fcall0P
  * >>     movP   <cg_buf_paramv[0].cbp_param_offset>(%Psp), %R_fcall1P
  * >>     call   libservice_shm_handle_ataddr_nopr
  * >>     movP   %Pax, LOC_bufparam_handles[0](%Psp)
  * >>     testP  %Pax, %Pax
  * >>     jnz    .Lsingle_buffers_is_in_band
- * >>     movP   $<cg_service>,                                         %R_fcall0P
  * >> #if cg_buf_paramv[0].HAS_FIXED_BUFFER_SIZE
  * >>     movP   $<cg_buf_paramv[0].FIXED_BUFFER_SIZE_WITH_ADJUSTMENT>, %R_fcall1P
  * >> #else // cg_buf_paramv[0].HAS_FIXED_BUFFER_SIZE
- * >>     movP   ...,                                                   %R_fcall1P  # Buffer size requirements of cg_buf_paramv[0]
+ * >>     movP   ..., %R_fcall1P  # Buffer size requirements of cg_buf_paramv[0]
+ * >>                             # Allowed to clobber: %Pax, %Pcx, %Pdi, %Psi
  * >> #if cg_buf_paramv[0].IS_IN_OR_INOUT_BUFFER
  * >>     movP   %R_fcall1P, %Psi    # Used by the out-of-band copy-in loop below!
  * >> #endif // cg_buf_paramv[0].IS_IN_OR_INOUT_BUFFER
@@ -312,6 +312,7 @@ STATIC_ASSERT(IS_ALIGNED(offsetof(struct service_com, sc_generic.g_data), 4));
  * >>     cmpP   %Pax, %R_fcall1P   # if (%R_fcall1P < SERVICE_SHM_ALLOC_MINSIZE)
  * >>     cmovbP %R_fcall1P, %Pax   #     %R_fcall1P = SERVICE_SHM_ALLOC_MINSIZE;
  * >> #endif // !cg_buf_paramv[0].HAS_FIXED_BUFFER_SIZE
+ * >>     movP   $<cg_service>, %R_fcall0P
  * >> #if !COM_GENERATOR_FEATURE_FEXCEPT
  * >>     call   libservice_shmbuf_alloc_nopr_nx
  * >>     testP  %Pax, %Pax
@@ -362,7 +363,7 @@ STATIC_ASSERT(IS_ALIGNED(offsetof(struct service_com, sc_generic.g_data), 4));
  * >> .Lsingle_buffers_done:
  * >>
  * >> #else // #elif cg_buf_paramc >= 2
- * >>     # >> %R_temp_exbuf_size is %edi on i386 and %r12 on x86_64
+ * >>     # >> %R_temp_exbuf_size is %esi on i386 and %r12 on x86_64
  * >>     # NOTE: On x86_64, compilation getting here imples `COM_GENERATOR_FEATURE_USES_R12'!
  * >>     xorP   %R_temp_exbuf_size, %R_temp_exbuf_size
  * >>     movP   %R_temp_exbuf_size, LOC_bufpar_ptr(%Psp)
@@ -381,6 +382,8 @@ STATIC_ASSERT(IS_ALIGNED(offsetof(struct service_com, sc_generic.g_data), 4));
  * >> 1:  # NOTE: When only 1 buffer argument exists, %R_temp_exbuf_size isn't
  * >>     #       used and the allocated+initialization is done inline.
  * >>     addP   ..., %R_temp_exbuf_size  # Account for required buffer size (depending on buffer type)
+ * >>                                     # NOTE: The buffer size calculated here must be ceil-aligned by sizeof(void *)!
+ * >>                                     # Allowed to clobber: %Pax, %Pcx, %Pdx, %Pdi (on i386, %Psi must be preserved!)
  * >> 2:
  * >> }}
  * >>     testP  %R_temp_exbuf_size, %R_temp_exbuf_size
@@ -419,9 +422,9 @@ STATIC_ASSERT(IS_ALIGNED(offsetof(struct service_com, sc_generic.g_data), 4));
  * >>     cmpP   $0, LOC_bufparam_handles[INDEX](%Psp)
  * >>     jne    1f
  * >> #if cg_inbuf_paramc != 0 && cg_inoutbuf_paramc != 0 && cg_outbuf_paramc != 0
- * >> #if IS_FIRST_INOUT_BUFFER(INDEX)
+ * >> #if IS_FIRST_INOUT_BUFFER(INDEX) && !COM_GENERATOR_FEATURE_IN_BUFFERS_FIXLEN
  * >>     movP   %Pdi, LOC_outbuffers_start(%Psp)         # `LOC_outbuffers_start' contains the start of the first inout/out buffer
- * >> #endif
+ * >> #endif // IS_FIRST_INOUT_BUFFER(INDEX) && !COM_GENERATOR_FEATURE_IN_BUFFERS_FIXLEN
  * >> #endif // cg_inbuf_paramc != 0 && cg_inoutbuf_paramc != 0 && cg_outbuf_paramc != 0
  * >>
  * >>     # Set: %Pax = SHM_ADDR - SHM_BASE  (offset in SHM to input buffer)
@@ -430,13 +433,26 @@ STATIC_ASSERT(IS_ALIGNED(offsetof(struct service_com, sc_generic.g_data), 4));
  * >>     subP   %Pdx, %Pax
  * >>     movP   %Pax, <cbp_serial_offset>(%Psp)          # Store SHM offset in serial data
  * >>
- * >>     movP   <cbp_param_offset>(%Psp), %Psi           # Unconditionally use %Psi for copying!
  * >>     movP   ...,                      %Pcx           # required buffer size (depending on buffer type)
+ * >>                                                     # Allowed to clobber: %Pax, %Pdx, %Pcx, %Psi
+ * >>     movP   <cbp_param_offset>(%Psp), %Psi           # Unconditionally use %Psi for copying!
  * >>     rep    movsb                                    # Copy input buffers into SHM
+ * >> #if INDEX != cg_paramc - 1                          # If %Pdi will still be used, it must be re-aligned
+ * >> #if cg_buf_paramv[INDEX].HAS_FIXED_BUFFER_SIZE
+ * >> #if !IS_ALIGNED(cg_buf_paramv[INDEX].FIXED_BUFFER_SIZE, sizeof(void *))
+ * >>     addP   $<sizeof(void *) - (cg_buf_paramv[INDEX].FIXED_BUFFER_SIZE & (sizeof(void *) - 1))>, %Pdi
+ * >> #endif // !IS_ALIGNED(cg_buf_paramv[INDEX].FIXED_BUFFER_SIZE, sizeof(void *))
+ * >> #else // cg_buf_paramv[INDEX].HAS_FIXED_BUFFER_SIZE
+ * >>     addP   $<sizeof(void *)-1>,    %Pdi
+ * >>     andP   $<~(sizeof(void *)-1)>, %Pdi
+ * >> #endif // !cg_buf_paramv[INDEX].HAS_FIXED_BUFFER_SIZE
+ * >> #endif // INDEX != cg_paramc - 1
  * >> 1:
  * >> }}
  * >> #if cg_inbuf_paramc != 0 && cg_inoutbuf_paramc == 0 && cg_outbuf_paramc != 0
+ * >> #if !COM_GENERATOR_FEATURE_IN_BUFFERS_FIXLEN
  * >>     movP   %Pdi, LOC_outbuffers_start(%Psp)         # `LOC_outbuffers_start' contains the start of the first inout/out buffer
+ * >> #endif // !COM_GENERATOR_FEATURE_IN_BUFFERS_FIXLEN
  * >> #endif // cg_inbuf_paramc != 0 && cg_inoutbuf_paramc == 0 && cg_outbuf_paramc != 0
  * >>     jmp    .Lall_buffers_are_in_band_preemption_reenabled
  * >> #endif // cg_inbuf_paramc != 0 || cg_inoutbuf_paramc != 0
@@ -659,7 +675,12 @@ STATIC_ASSERT(IS_ALIGNED(offsetof(struct service_com, sc_generic.g_data), 4));
  * >>     # Load %Psi with the SHM address of the first out-of-band inout/out buffer
  * >>     # NOTE: We unconditionally use %Psi for copying!
  * >> #if cg_inbuf_paramc != 0
+ * >> #if COM_GENERATOR_FEATURE_IN_BUFFERS_FIXLEN
+ * >>     movP   LOC_bufpar_ptr(%Psp), %Psi
+ * >>     addP   $<SUM(IN_BUFFERS.each.FIXED_BUFFER_SIZE.ceil_align(sizeof(void *))>, %Psi
+ * >> #else // COM_GENERATOR_FEATURE_IN_BUFFERS_FIXLEN
  * >>     movP   LOC_outbuffers_start(%Psp), %Psi
+ * >> #endif // !COM_GENERATOR_FEATURE_IN_BUFFERS_FIXLEN
  * >> #else // cg_inbuf_paramc != 0
  * >>     movP   LOC_bufpar_ptr(%Psp), %Psi
  * >> #endif // cg_inbuf_paramc == 0
@@ -669,17 +690,20 @@ STATIC_ASSERT(IS_ALIGNED(offsetof(struct service_com, sc_generic.g_data), 4));
  * >>     # NOTE: INDEX is the index within `LOC_bufparam_handles' and `cg_buf_paramv'
  * >>     cmpP   $0, LOC_bufparam_handles[INDEX](%Psp)
  * >>     jne    1f
- * >>     movP   <cbp_param_offset>(%Psp), %Pdi # Unconditionally use %Psi for copying!
  * >>     movP   ...,                      %Pcx # required buffer size (depending on buffer type)
+ * >>                                           # Allowed to clobber: %Pax, %Pdx, %Pdi
+ * >>     movP   <cbp_param_offset>(%Psp), %Pdi # Unconditionally use %Psi for copying!
  * >>     rep    movsb
- * >> #if ...
- * >>     addP   $..., %Psi  # When this isn't the last inout/out buffer that needs to be copied,
- * >>                        # but the copy size loaded into %Pcx above is less than what was
- * >>                        # allocated for the buffer prior to the call (iow: the buffer has the
- * >>                        # `SERVICE_OUT_SIZEARG_RETURN_MINVAL' flag set), then adjust the source
- * >>                        # pointer to load data from the correct location at the start of the
- * >>                        # next buffer.
- * >> #endif
+ * >> #if INDEX != cg_buf_paramc -1
+ * >> #if cg_buf_paramv[INDEX].HAS_FIXED_BUFFER_SIZE
+ * >> #if !IS_ALIGNED(cg_buf_paramv[INDEX].FIXED_BUFFER_SIZE, sizeof(void *))
+ * >>     addP   $<sizeof(void *) - (cg_buf_paramv[INDEX].FIXED_BUFFER_SIZE & (sizeof(void *) - 1))>, %Psi   # Re-align by pointer size
+ * >> #endif // !IS_ALIGNED(cg_buf_paramv[INDEX].FIXED_BUFFER_SIZE, sizeof(void *))
+ * >> #else // cg_buf_paramv[INDEX].HAS_FIXED_BUFFER_SIZE
+ * >>     addP   $<sizeof(void *)-1>,    %Psi   # Re-align by pointer size
+ * >>     andP   $<~(sizeof(void *)-1)>, %Psi   # *ditto*
+ * >> #endif // !cg_buf_paramv[INDEX].HAS_FIXED_BUFFER_SIZE
+ * >> #endif // INDEX != cg_buf_paramc -1
  * >> 1:
  * >> }}
  * >> #endif // cg_inoutbuf_paramc != 0 || cg_outbuf_paramc != 0
@@ -1057,7 +1081,7 @@ struct com_int_param {
 #define COM_USEMOVS_THRESHOLD 9
 #endif /* !__x86_64__ */
 
-/* Try to use `rep movsX' when at least this many identical
+/* Try to use `rep movsX' when  at least this many  identical
  * consecutive movsX instructions would have to be generated. */
 #define COM_USEREP_THRESHOLD 8
 
@@ -1096,6 +1120,7 @@ struct com_buffer_param {
 #define COM_GENERATOR_FEATURE_INT_PARAMS_USE_LODS 0x02 /* Use `lodsP' to load integer parameters from the stack */
 #define COM_GENERATOR_FEATURE_INT_PARAMS_USE_STOS 0x04 /* Use `stosP' to write integer parameters to SHM */
 #define COM_GENERATOR_FEATURE_INLINE_BUFFERS_MOVS 0x08 /* Use `movs' to copy inline buffers */
+#define COM_GENERATOR_FEATURE_IN_BUFFERS_FIXLEN   0x10 /* All in buffers have fixed lengths */
 #ifdef __x86_64__
 #define COM_GENERATOR_FEATURE_USES_R12 0x80 /* %r12 is used and must be saved/restored */
 #else /* __x86_64__ */
@@ -1215,7 +1240,7 @@ NOTHROW(FCALL comgen_compile)(struct com_generator *__restrict self);
 #define comgen_spoffsetof_LOC_bufpar_ptr(self)        (comgen_spoffsetof_LOCALS(self) + 2 * __SIZEOF_POINTER__)         /* void                          *LOC_bufpar_ptr;                      // [valid_if(cg_buf_paramc != 0)] */
 #define comgen_spoffsetof_LOC_bufpar_shm(self)        (comgen_spoffsetof_LOCALS(self) + 3 * __SIZEOF_POINTER__)         /* REF struct service_shm_handle *LOC_bufpar_shm;                      // [valid_if(cg_buf_paramc != 0)] */
 #define comgen_spoffsetof_LOC_bufpar_handles(self, i) (comgen_spoffsetof_LOCALS(self) + (4 + (i)) * __SIZEOF_POINTER__) /* struct service_shm_handle     *LOC_bufparam_handles[cg_buf_paramc]; // [valid_if(cg_buf_paramc != 0)] */
-#define comgen_spoffsetof_LOC_outbuffers_start(self)  comgen_spoffsetof_LOC_bufpar_handles(self, (self)->cg_buf_paramc) /* byte_t                        *LOC_outbuffers_start;                // [valid_if(cg_inbuf_paramc != 0 && (cg_inoutbuf_paramc != 0 || cg_outbuf_paramc != 0))] */
+#define comgen_spoffsetof_LOC_outbuffers_start(self)  comgen_spoffsetof_LOC_bufpar_handles(self, (self)->cg_buf_paramc) /* byte_t                        *LOC_outbuffers_start;                // [valid_if(cg_inbuf_paramc != 0 && (cg_inoutbuf_paramc != 0 || cg_outbuf_paramc != 0) && !COM_GENERATOR_FEATURE_IN_BUFFERS_FIXLEN)] */
 
 /* Returns the number of available .text or .eh_frame bytes. */
 #define comgen_txavail(self) ((size_t)((self)->cg_txend - (self)->cg_txptr))
