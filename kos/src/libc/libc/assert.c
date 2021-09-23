@@ -140,8 +140,8 @@ maybe_raise_SIGABRT(struct kcpustate *__restrict state) {
 	sys_raiseat(&uc, &si);
 
 	/* Probably shouldn't get here, but if we do, we'll just
-	 * end up trigger  a coredump anyways,  which is  pretty
-	 * much all we could do at this point in any case. */
+	 * end up triggering a coredump anyways, which is pretty
+	 * much all we can even do at this point. */
 }
 
 INTERN ATTR_NORETURN ATTR_COLD ATTR_SECTION(".text.crt.assert") void FCALL

@@ -274,7 +274,7 @@ rtm_memory_schedule_sys_syslog(struct rtm_memory *__restrict self,
  * memory  that is used  for backing the lock's  is-acquired state will have
  * been cached in the  RTM memory controller, such  that even if some  other
  * thread  ends up releasing the lock while our thread is still in RTM mode,
- * we may not  necessarily to see  this this  when it happens  since RTM  is
+ * we may not  necessarily get  to see  this when  it happens  since RTM  is
  * designed  to only read from any memory  location once, in order to ensure
  * a consistent memory view (such that  any modifications made to memory  by
  * other threads are hidden until the very end when memory is synced)

@@ -465,16 +465,16 @@ struct rtm_machstate {
 	struct rtm_memory       r_mem;         /* RTM memory buffer. */
 	union {
 #ifdef __x86_64__
-		u64                 r_gpregs[16];  /* General purpose registers */
-		u8                  r_gpregsb[64]; /* ... */
-		u16                 r_gpregsw[32]; /* ... */
-		u32                 r_gpregsl[16]; /* ... */
-		u64                 r_gpregsq[8];  /* ... */
+		u64                 r_gpregs[16];   /* General purpose registers */
+		u8                  r_gpregsb[128]; /* ... */
+		u16                 r_gpregsw[64];  /* ... */
+		u32                 r_gpregsl[32];  /* ... */
+		u64                 r_gpregsq[16];  /* ... */
 #else /* __x86_64__ */
-		u32                 r_gpregs[8];   /* General purpose registers */
-		u8                  r_gpregsb[32]; /* ... */
-		u16                 r_gpregsw[16]; /* ... */
-		u32                 r_gpregsl[8];  /* ... */
+		u32                 r_gpregs[8];    /* General purpose registers */
+		u8                  r_gpregsb[32];  /* ... */
+		u16                 r_gpregsw[16];  /* ... */
+		u32                 r_gpregsl[8];   /* ... */
 #endif /* !__x86_64__ */
 		struct {
 			DEFINE_REGISTERx(a);
