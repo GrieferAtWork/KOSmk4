@@ -702,8 +702,8 @@ STATIC_ASSERT(IS_ALIGNED(offsetof(struct service_com, sc_generic.g_data), 4));
  * >>
  * >>
  * >>
- * >> #if cg_buf_paramc != 0
  * >> // Free the xbuf buffer
+ * >> #if cg_buf_paramc != 0
  * >> .Leh_free_xbuf_end:
  * >>     movP   LOC_bufpar_ptr(%Psp), %Pdx
  * >>     testP  %Pdx, %Pdx
@@ -712,8 +712,10 @@ STATIC_ASSERT(IS_ALIGNED(offsetof(struct service_com, sc_generic.g_data), 4));
  * >> #ifdef __x86_64__
  * >>     movP   0(%Pdx), %Pcx
  * >> #else // __x86_64__
- * >>     pushP_cfi 0(%Pdx)
- * >>     pushP_cfi %Pdx
+ * >>     pushl_cfi 0(%Pdx)
+ * >>     .cfi_escape DW_CFA_GNU_args_size, 4
+ * >>     pushl_cfi %Pdx
+ * >>     .cfi_escape DW_CFA_GNU_args_size, 8
  * >> #endif // !__x86_64__
  * >>     movP   LOC_bufpar_shm(%Psp), %R_fcall1P
  * >>     movP   LOC_upm(%Psp), %Pax
@@ -728,6 +730,7 @@ STATIC_ASSERT(IS_ALIGNED(offsetof(struct service_com, sc_generic.g_data), 4));
  * >>     call   libservice_shmbuf_freeat_nopr
  * >> #ifndef __x86_64__
  * >>     .cfi_adjust_cfa_offset -8
+ * >>     .cfi_escape DW_CFA_GNU_args_size, 0
  * >> #endif // !__x86_64__
  * >> 1:
  * >> #endif // cg_buf_paramc != 0
@@ -742,7 +745,9 @@ STATIC_ASSERT(IS_ALIGNED(offsetof(struct service_com, sc_generic.g_data), 4));
  * >>     movq   %R_service_com,    %rdx
  * >> #else // __x86_64__
  * >>     pushl_cfi 0(%R_service_com)
+ * >>     .cfi_escape DW_CFA_GNU_args_size, 4
  * >>     pushl_cfi %R_service_com
+ * >>     .cfi_escape DW_CFA_GNU_args_size, 8
  * >> #endif // !__x86_64__
  * >>     movP   LOC_shm(%Psp), %R_fcall1P
  * >> #ifdef __x86_64__
@@ -767,6 +772,7 @@ STATIC_ASSERT(IS_ALIGNED(offsetof(struct service_com, sc_generic.g_data), 4));
  * >>     call   libservice_shmbuf_freeat_nopr
  * >> #ifndef __x86_64__
  * >>     .cfi_adjust_cfa_offset -8
+ * >>     .cfi_escape DW_CFA_GNU_args_size, 0
  * >> #endif // !__x86_64__
  * >>
  * >>
@@ -980,6 +986,7 @@ STATIC_ASSERT(IS_ALIGNED(offsetof(struct service_com, sc_generic.g_data), 4));
  * >>     pushl_cfi $0
  * >> #endif // !__x86_64__
  * >>     call   _Unwind_Resume
+ * >>     nop
  * >>     .cfi_endproc
  *
  * NOTES:

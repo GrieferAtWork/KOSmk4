@@ -726,7 +726,13 @@ NOTHROW(FCALL comgen_disable_preemption)(struct com_generator *__restrict self) 
 	/* >> .cfi_remember_state */
 	comgen_eh_DW_CFA_remember_state(self);
 
-#ifdef __x86_64__
+	/* NOTE: `__code_model_large__' is defined when `-mcmodel=large' is passed
+	 *       to GCC on the commandline. In all other modes, this library would
+	 *       already  be broken when _ANY_ of its symbols were located outside
+	 *       of the signed 32-bit address range.
+	 * As such, we only need to handle overly-large symbol addresses when the
+	 * library was built for that configuration. */
+#if defined(__x86_64__) && defined(__code_model_large__)
 	if ((uintptr_t)&full_sigset > UINT64_C(0x00000000ffffffff)) {
 		/* >> movabs $full_sigset, %Pcx */
 		gen86_movabs_imm_r(&self->cg_txptr, &full_sigset, GEN86_R_PCX);
@@ -736,7 +742,7 @@ NOTHROW(FCALL comgen_disable_preemption)(struct com_generator *__restrict self) 
 		                offsetof(struct userprocmask, pm_sigmask),
 		                GEN86_R_PAX);
 	} else
-#endif /* __x86_64__ */
+#endif /* __x86_64__ && __code_model_large__ */
 	{
 		/* >>     movP   $full_sigset, userprocmask::pm_sigmask(%Pax) # Disable preemption */
 		gen86_movP_imm_db(&self->cg_txptr, (uintptr_t)&full_sigset,
@@ -2153,8 +2159,6 @@ NOTHROW(FCALL comgen_do_syscall)(struct com_generator *__restrict self) {
 		comgen_instr(self, gen86_std(&self->cg_txptr));
 
 		/* >> .cfi_escape 56,22,49,7,146,49,0,11,255,251,26  # Disable EFLAGS.DF during unwind & landing */
-		if unlikely(!comgen_ehok(self))
-			return;
 		comgen_eh_movehere(self);
 		if unlikely(!comgen_ehav(self, sizeof(cfi_clear_eflags_ef_on_unwind))) {
 			self->cg_ehptr = self->cg_ehend;
@@ -2171,8 +2175,6 @@ NOTHROW(FCALL comgen_do_syscall)(struct com_generator *__restrict self) {
 		comgen_instr(self, gen86_cld(&self->cg_txptr));
 
 		/* >> .cfi_escape 57 */
-		if unlikely(!comgen_ehok(self))
-			return;
 		comgen_eh_movehere(self);
 		comgen_eh_putb(self, DW_CFA_KOS_endcapsule);
 	} else {
@@ -2594,7 +2596,7 @@ NOTHROW(FCALL comgen_deserialize_buffer_arguments)(struct com_generator *__restr
 			uint16_t bufsize_argid;
 			int16_t bufsize_sp_offset;
 			/* Non-fixed-length output buffer means that the buffer's size
-			 * depends on some parameter, optionally also affected by the
+			 * depends on some parameter, optionally also affected by  the
 			 * return value posted by the server. */
 
 			bufsize_argid     = (param_typ & (_SERVICE_TYPE_PARAMMASK & ~SERVICE_OUT_SIZEARG_RETURN_MINVAL));
@@ -2651,6 +2653,151 @@ NOTHROW(FCALL comgen_deserialize_buffer_arguments)(struct com_generator *__restr
 		            (self->cg_txptr - (byte_t *)pdisp_1);
 	}
 	/* >> }} */
+}
+
+
+
+/* Generate    instructions:
+ * >> #if cg_buf_paramc != 0
+ * >> .Leh_free_xbuf_end:
+ * >>     movP   LOC_bufpar_ptr(%Psp), %Pdx
+ * >>     testP  %Pdx, %Pdx
+ * >>     jz     1f
+ * >>     subP   $<sizeof(size_t)>, %Pdx
+ * >> #ifdef __x86_64__
+ * >>     movP   0(%Pdx), %Pcx
+ * >> #else // __x86_64__
+ * >>     pushl_cfi 0(%Pdx)
+ * >>     .cfi_escape DW_CFA_GNU_args_size, 4
+ * >>     pushl_cfi %Pdx
+ * >>     .cfi_escape DW_CFA_GNU_args_size, 8
+ * >> #endif // !__x86_64__
+ * >>     movP   LOC_bufpar_shm(%Psp), %R_fcall1P
+ * >>     movP   LOC_upm(%Psp), %Pax
+ * >> #if defined(__x86_64__) && $full_sigset > 0xffffffff
+ * >>     movabs $full_sigset,  %R_fcall0P
+ * >>     movP   %R_fcall0P,    userprocmask::pm_sigmask(%Pax) # re-disable preemption
+ * >>     movP   $<cg_service>, %R_fcall0P
+ * >> #else // __x86_64__ && $full_sigset > 0xffffffff
+ * >>     movP   $<cg_service>, %R_fcall0P
+ * >>     movP   $full_sigset,  userprocmask::pm_sigmask(%Pax) # re-disable preemption
+ * >> #endif // !__x86_64__ || $full_sigset <= 0xffffffff
+ * >>     call   libservice_shmbuf_freeat_nopr
+ * >> #ifndef __x86_64__
+ * >>     .cfi_adjust_cfa_offset -8
+ * >>     .cfi_escape DW_CFA_GNU_args_size, 0
+ * >> #endif // !__x86_64__
+ * >> 1:
+ * >> #endif // cg_buf_paramc != 0 */
+PRIVATE NONNULL((1)) void
+NOTHROW(FCALL comgen_free_xbuf)(struct com_generator *__restrict self) {
+	int8_t *pdisp_1;
+	if (self->cg_buf_paramc == 0)
+		return;
+
+	/* >> .Leh_free_xbuf_end: */
+	comgen_defsym(self, COM_SYM_Leh_free_xbuf_end);
+
+	/* >> movP   LOC_bufpar_ptr(%Psp), %Pdx */
+	comgen_instr(self, gen86_movP_db_r(&self->cg_txptr,
+	                                   comgen_spoffsetof_LOC_bufpar_ptr(self),
+	                                   GEN86_R_PSP, GEN86_R_PDX));
+
+	/* >> testP  %Pdx, %Pdx */
+	comgen_instr(self, gen86_testP_r_r(&self->cg_txptr, GEN86_R_PDX, GEN86_R_PDX));
+
+	/* >> jz     1f */
+	comgen_instr(self, gen86_jcc8_offset(&self->cg_txptr, GEN86_CC_Z, -1));
+	pdisp_1 = (int8_t *)(self->cg_txptr - 1);
+
+	/* >> subP   $<sizeof(size_t)>, %Pdx */
+	comgen_instr(self, gen86_subP_imm_r(&self->cg_txptr, sizeof(size_t), GEN86_R_PDX));
+
+#ifdef __x86_64__
+	/* >> movP   0(%Pdx), %Pcx */
+	comgen_instr(self, gen86_movP_b_r(&self->cg_txptr, GEN86_R_PDX, GEN86_R_PCX));
+#else /* __x86_64__ */
+	/* >> pushl_cfi 0(%Pdx) */
+	comgen_instr(self, gen86_pushl_mod(&self->cg_txptr, gen86_modrm_b, GEN86_R_PDX));
+	comgen_eh_movehere(self);
+	comgen_eh_DW_CFA_adjust_cfa_offset(self, 4);
+
+	/* >> .cfi_escape DW_CFA_GNU_args_size, 4 */
+	if (!comgen_ehav(self, 2))
+		return;
+	comgen_eh_putb(self, DW_CFA_GNU_args_size);
+	comgen_eh_putb(self, 4);
+
+	/* >> pushl_cfi %Pdx */
+	comgen_instr(self, gen86_pushl_r(&self->cg_txptr, GEN86_R_PDX));
+	comgen_eh_movehere(self);
+	comgen_eh_DW_CFA_adjust_cfa_offset(self, 4);
+
+	/* >> .cfi_escape DW_CFA_GNU_args_size, 8 */
+	if (!comgen_ehav(self, 2))
+		return;
+	comgen_eh_putb(self, DW_CFA_GNU_args_size);
+	comgen_eh_putb(self, 8);
+#endif /* !__x86_64__ */
+
+	/* >> movP   LOC_bufpar_shm(%Psp), %R_fcall1P */
+	comgen_instr(self, gen86_movP_db_r(&self->cg_txptr,
+	                                   comgen_spoffsetof_LOC_bufpar_shm(self),
+	                                   GEN86_R_PSP, GEN86_R_FCALL1P));
+
+	/* >> movP   LOC_upm(%Psp), %Pax */
+	comgen_instr(self, gen86_movP_db_r(&self->cg_txptr,
+	                                   comgen_spoffsetof_LOC_upm(self),
+	                                   GEN86_R_PSP, GEN86_R_PAX));
+
+	/* NOTE: `__code_model_large__' is defined when `-mcmodel=large' is passed
+	 *       to GCC on the commandline. In all other modes, this library would
+	 *       already  be broken when _ANY_ of its symbols were located outside
+	 *       of the signed 32-bit address range.
+	 * As such, we only need to handle overly-large symbol addresses when the
+	 * library was built for that configuration. */
+#if defined(__x86_64__) && defined(__code_model_large__)
+	if ((uintptr_t)&full_sigset > UINT64_C(0x00000000ffffffff)) {
+		/* >> movabs $full_sigset,  %R_fcall0P */
+		comgen_instr(self, gen86_movabs_imm_r(&self->cg_txptr, &full_sigset, GEN86_R_FCALL0P));
+
+		/* >> movP   %R_fcall0P,    userprocmask::pm_sigmask(%Pax) # re-disable preemption */
+		comgen_instr(self, gen86_movP_r_db(&self->cg_txptr, GEN86_R_FCALL0P,
+		                                   offsetof(struct userprocmask, pm_sigmask),
+		                                   GEN86_R_PAX));
+
+		/* >> movP   $<cg_service>, %R_fcall0P */
+		comgen_instr(self, gen86_movP_imm_r(&self->cg_txptr, self->cg_service, GEN86_R_FCALL0P));
+	} else
+#endif /* __x86_64__ && __code_model_large__ */
+	{
+		/* >> movP   $<cg_service>, %R_fcall0P */
+		comgen_instr(self, gen86_movP_imm_r(&self->cg_txptr, self->cg_service, GEN86_R_FCALL0P));
+
+		/* >> movP   $full_sigset,  userprocmask::pm_sigmask(%Pax) # re-disable preemption */
+		comgen_instr(self, gen86_movP_imm_db(&self->cg_txptr, (uintptr_t)&full_sigset,
+		                                     offsetof(struct userprocmask, pm_sigmask),
+		                                     GEN86_R_PAX));
+	}
+
+	/* >> call   libservice_shmbuf_freeat_nopr */
+	comgen_instr(self, gen86_call(&self->cg_txptr, &libservice_shmbuf_freeat_nopr));
+
+#ifndef __x86_64__
+	/* >> .cfi_adjust_cfa_offset -8 */
+	comgen_eh_movehere(self);
+	comgen_eh_DW_CFA_adjust_cfa_offset(self, -8);
+
+	/* >> .cfi_escape DW_CFA_GNU_args_size, 0 */
+	if (!comgen_ehav(self, 2))
+		return;
+	comgen_eh_putb(self, DW_CFA_GNU_args_size);
+	comgen_eh_putb(self, 0);
+#endif /* !__x86_64__ */
+
+	/* >> 1: */
+	*pdisp_1 += (int8_t)(uint8_t)(uintptr_t)
+	            (self->cg_txptr - (byte_t *)pdisp_1);
 }
 
 
@@ -2879,10 +3026,14 @@ NOTHROW(FCALL comgen_compile)(struct com_generator *__restrict self) {
 #endif /* !__x86_64__ */
 	if unlikely(!comgen_txok1(self))
 		goto fail;
+	if unlikely(!comgen_ehok(self))
+		goto fail;
 
 	/* Wait for the command to complete */
 	comgen_waitfor_command(self);
 	if unlikely(!comgen_txok1(self))
+		goto fail;
+	if unlikely(!comgen_ehok(self))
 		goto fail;
 
 	/* Deserialize fixed-length inline buffers */
@@ -2894,6 +3045,15 @@ NOTHROW(FCALL comgen_compile)(struct com_generator *__restrict self) {
 	comgen_deserialize_buffer_arguments(self);
 	if unlikely(!comgen_txok1(self))
 		goto fail;
+
+	/* Free the xbuf buffer */
+	comgen_free_xbuf(self);
+	if unlikely(!comgen_txok1(self))
+		goto fail;
+#ifndef __x86_64__
+	if unlikely(!comgen_ehok(self))
+		goto fail;
+#endif /* !__x86_64__ */
 
 	/* TODO: All of the stuff that's missing */
 	(void)self;
