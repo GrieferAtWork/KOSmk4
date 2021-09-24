@@ -797,11 +797,11 @@ STATIC_ASSERT(IS_ALIGNED(offsetof(struct service_com, sc_generic.g_data), 4));
  * >> #ifdef __x86_64__
  * >>     # local variables + register argument storage After this, %Psp
  * >>     # points at the first registers which needs to be restored.
- * >>     addP   $<cg_locvar_size + (MIN(cg_paramc, 6) * 8)>, %Psp
- * >>     .cfi_adjust_cfa_offset -<cg_locvar_size + (MIN(cg_paramc, 6) * 8)>
+ * >>     addP   $<cg_locvar_size + (MIN(cg_paramc, 6) * 8) - 2 * 8>, %Psp
+ * >>     .cfi_adjust_cfa_offset -<cg_locvar_size + (MIN(cg_paramc, 6) * 8) - 2 * 8>
  * >> #else // __x86_64__
- * >>     addP   $<cg_locvar_size>, %Psp        # local variables
- * >>     .cfi_adjust_cfa_offset -<cg_locvar_size>
+ * >>     addP   $<cg_locvar_size - 2 * 4>, %Psp        # local variables
+ * >>     .cfi_adjust_cfa_offset -<cg_locvar_size - 2 * 4>
  * >> #endif // !__x86_64__
  * >> #ifdef __x86_64__
  * >> #if COM_GENERATOR_FEATURE_USES_RBX
@@ -822,7 +822,7 @@ STATIC_ASSERT(IS_ALIGNED(offsetof(struct service_com, sc_generic.g_data), 4));
  * >>     movl   %ebp, %eax
  * >>     movl   %ebx, %edx
  * >> #endif // !__x86_64__
- * >>     // Normal return
+ * >>     // Restore preserved registers
  * >> #ifndef __x86_64__
  * >>     popP_cfi_r %Pbx
  * >> #endif // !__x86_64__

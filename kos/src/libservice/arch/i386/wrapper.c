@@ -36,7 +36,8 @@
 
 #include <assert.h>
 #include <errno.h>
-#include <stdlib.h>
+#include <inttypes.h>
+#include <stdlib.h> /* qsort() */
 #include <string.h>
 #include <syscall.h>
 
@@ -2963,6 +2964,115 @@ NOTHROW(FCALL comgen_restore_preemption)(struct com_generator *__restrict self) 
 
 
 
+/* Generate instructions:
+ * >> #ifdef __x86_64__
+ * >>     addP   $<cg_locvar_size + (MIN(cg_paramc, 6) * 8) - 2 * 8>, %Psp
+ * >>     .cfi_adjust_cfa_offset -<cg_locvar_size + (MIN(cg_paramc, 6) * 8) - 2 * 8>
+ * >> #else // __x86_64__
+ * >>     addP   $<cg_locvar_size - 2 * 4>, %Psp        # local variables
+ * >>     .cfi_adjust_cfa_offset -<cg_locvar_size - 2 * 4>
+ * >> #endif // !__x86_64__
+ * >> #ifdef __x86_64__
+ * >> #if COM_GENERATOR_FEATURE_USES_RBX
+ * >>     popP_cfi_r %rbx        # Only if used anywhere above
+ * >> #endif // COM_GENERATOR_FEATURE_USES_RBX
+ * >> #else // __x86_64__
+ * >> #if COM_GENERATOR_FEATURE_USES_EDI
+ * >>     popP_cfi_r %Pdi        # Only if used anywhere above
+ * >> #endif // COM_GENERATOR_FEATURE_USES_EDI
+ * >> #if COM_GENERATOR_FEATURE_USES_ESI
+ * >>     popP_cfi_r %Psi        # Only if used anywhere above
+ * >> #endif // COM_GENERATOR_FEATURE_USES_ESI
+ * >> #endif // !__x86_64__
+ * >>     // Set return values
+ * >> #ifdef __x86_64__
+ * >>     movq   %rbp, %rax
+ * >> #else // __x86_64__
+ * >>     movl   %ebp, %eax
+ * >>     movl   %ebx, %edx
+ * >> #endif // !__x86_64__
+ * >>     // Restore preserved registers
+ * >> #ifndef __x86_64__
+ * >>     popP_cfi_r %Pbx
+ * >> #endif // !__x86_64__
+ * >>     popP_cfi_r %Pbp
+ * >>     ret */
+PRIVATE NONNULL((1)) void
+NOTHROW(FCALL comgen_normal_return)(struct com_generator *__restrict self) {
+	int16_t sp_delta;
+#ifdef __x86_64__
+	/* >> addP   $<cg_locvar_size + (MIN(cg_paramc, 6) * 8)>, %Psp */
+	sp_delta = (int16_t)self->cg_locvar_size;
+	sp_delta += MIN(self->cg_paramc, 6) * 8;
+	sp_delta -= 2 * 8;
+#else /* __x86_64__ */
+	/* >> addP   $<cg_locvar_size - 2 * 4>, %Psp        # local variables */
+	sp_delta = (int16_t)self->cg_locvar_size;
+	sp_delta -= 2 * 4;
+#endif /* !__x86_64__ */
+	if (sp_delta != 0) {
+		/* >> addP   $<sp_delta>, %Psp        # local variables */
+		comgen_instr(self, gen86_addP_imm_r(&self->cg_txptr, sp_delta, GEN86_R_PSP));
+
+		/* >> .cfi_adjust_cfa_offset -<sp_delta> */
+		comgen_eh_movehere(self);
+		comgen_eh_DW_CFA_adjust_cfa_offset(self, -sp_delta);
+	}
+
+#ifdef __x86_64__
+	if (self->cg_features & COM_GENERATOR_FEATURE_USES_RBX) {
+		/* >> popP_cfi_r %rbx        # Only if used anywhere above */
+		comgen_instr(self, gen86_popP_r(&self->cg_txptr, GEN86_R_PBX));
+		comgen_eh_movehere(self);
+		comgen_eh_DW_CFA_restore(self, CFI_X86_UNWIND_REGISTER_PBX);
+		comgen_eh_DW_CFA_adjust_cfa_offset(self, -SIZEOF_POINTER);
+	}
+#else /* __x86_64__ */
+	if (self->cg_features & COM_GENERATOR_FEATURE_USES_EDI) {
+		/* >> popP_cfi_r %Pdi        # Only if used anywhere above */
+		comgen_instr(self, gen86_popP_r(&self->cg_txptr, GEN86_R_PDI));
+		comgen_eh_movehere(self);
+		comgen_eh_DW_CFA_restore(self, CFI_X86_UNWIND_REGISTER_PDI);
+		comgen_eh_DW_CFA_adjust_cfa_offset(self, -SIZEOF_POINTER);
+	}
+	if (self->cg_features & COM_GENERATOR_FEATURE_USES_ESI) {
+		/* >> popP_cfi_r %Psi        # Only if used anywhere above */
+		comgen_instr(self, gen86_popP_r(&self->cg_txptr, GEN86_R_PSI));
+		comgen_eh_movehere(self);
+		comgen_eh_DW_CFA_restore(self, CFI_X86_UNWIND_REGISTER_PSI);
+		comgen_eh_DW_CFA_adjust_cfa_offset(self, -SIZEOF_POINTER);
+	}
+#endif /* !__x86_64__ */
+
+	/* Set return values */
+#ifdef __x86_64__
+	comgen_instr(self, gen86_movq_r_r(&self->cg_txptr, GEN86_R_RBP, GEN86_R_RAX));
+#else /* __x86_64__ */
+	comgen_instr(self, gen86_movl_r_r(&self->cg_txptr, GEN86_R_EBP, GEN86_R_EAX));
+	comgen_instr(self, gen86_movl_r_r(&self->cg_txptr, GEN86_R_EBX, GEN86_R_EDX));
+#endif /* !__x86_64__ */
+
+	/* Restore preserved registers */
+#ifndef __x86_64__
+	/* >> popP_cfi_r %Pbx */
+	comgen_instr(self, gen86_popP_r(&self->cg_txptr, GEN86_R_PBX));
+	comgen_eh_movehere(self);
+	comgen_eh_DW_CFA_restore(self, CFI_X86_UNWIND_REGISTER_PBX);
+	comgen_eh_DW_CFA_adjust_cfa_offset(self, -SIZEOF_POINTER);
+#endif /* !__x86_64__ */
+
+	/* >> popP_cfi_r %Pbp */
+	comgen_instr(self, gen86_popP_r(&self->cg_txptr, GEN86_R_PBP));
+	comgen_eh_movehere(self);
+	comgen_eh_DW_CFA_restore(self, CFI_X86_UNWIND_REGISTER_PBP);
+	comgen_eh_DW_CFA_adjust_cfa_offset(self, -SIZEOF_POINTER);
+
+	/* >> ret */
+	comgen_instr(self, gen86_ret(&self->cg_txptr));
+}
+
+
+
 
 
 
@@ -3240,8 +3350,18 @@ NOTHROW(FCALL comgen_compile)(struct com_generator *__restrict self) {
 	if unlikely(!comgen_ehok1(self))
 		goto fail;
 
+	/* Normal return */
+	comgen_normal_return(self);
+	if unlikely(!comgen_txok1(self))
+		goto fail;
+	if unlikely(!comgen_ehok1(self))
+		goto fail;
+
+	assertf(self->cg_cfa_offset == SIZEOF_POINTER,
+	        "self->cg_cfa_offset = %" PRId16,
+	        self->cg_cfa_offset);
+
 	/* TODO: All of the stuff that's missing */
-	(void)self;
 	abort();
 
 	/* TODO: Generate  LSDA (like it would appear in .gcc_except_table)
