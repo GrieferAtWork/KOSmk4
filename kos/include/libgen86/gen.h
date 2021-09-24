@@ -885,6 +885,7 @@ genShift("sar", 7);
 #define gen86_outw_ax_dx(p_pc)  /* outw %ax, %dx  */ (_gen86_pfx16_(p_pc) _gen86_putb(p_pc, 0xef))
 #define gen86_outl_eax_dx(p_pc) /* outl %eax, %dx */ (_gen86_pfx32_(p_pc) _gen86_putb(p_pc, 0xef))
 
+#define gen86_lock(p_pc) /* lock */ _gen86_putb(p_pc, 0xf0)
 #define gen86_int1(p_pc) /* int1 */ _gen86_putb(p_pc, 0xf1)
 #define gen86_hlt(p_pc)  /* hlt  */ _gen86_putb(p_pc, 0xf4)
 #define gen86_cmc(p_pc)  /* cmc  */ _gen86_putb(p_pc, 0xf5)

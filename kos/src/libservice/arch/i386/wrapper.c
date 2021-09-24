@@ -2040,6 +2040,47 @@ NOTHROW(FCALL comgen_serialize_inline_buffers)(struct com_generator *__restrict 
 
 
 
+/* Generate instructions:
+ * >>     # Atomically insert the new command into the list
+ * >>     # HINT: At this point, %Pdx == (%R_service_com - service_shm_handle::ssh_shm(%R_service_shm_handle))
+ * >>     movP   service_shm_handle::ssh_shm(%R_service_shm_handle), %Pcx
+ * >>     movP   service_shm::s_commands(%Pcx), %Pax
+ * >> 1:  movP   %Pax, service_com::sc_link(%R_service_com)
+ * >>     lock   cmpxchgP %Pdx, service_shm::s_commands(%Pcx)
+ * >>     jne    1b */
+PRIVATE NONNULL((1)) void
+NOTHROW(FCALL comgen_schedule_command)(struct com_generator *__restrict self) {
+	byte_t *loc_1;
+	/* >> movP   service_shm_handle::ssh_shm(%R_service_shm_handle), %Pcx */
+	comgen_instr(self, gen86_movP_db_r(&self->cg_txptr,
+	                                   offsetof(struct service_shm_handle, ssh_shm),
+	                                   GEN86_R_service_shm_handle, GEN86_R_PCX));
+
+	/* >> movP   service_shm::s_commands(%Pcx), %Pax */
+	comgen_instr(self, gen86_movP_db_r(&self->cg_txptr,
+	                                   offsetof(struct service_shm, s_commands),
+	                                   GEN86_R_PCX, GEN86_R_PAX));
+
+	/* >> 1: */
+	loc_1 = self->cg_txptr;
+
+	/* >> movP   %Pax, service_com::sc_link(%R_service_com) */
+	comgen_instr(self, gen86_movP_r_db(&self->cg_txptr, GEN86_R_PAX,
+	                                   offsetof(struct service_com, sc_link),
+	                                   GEN86_R_service_com));
+
+	/* >> lock   cmpxchgP %Pdx, service_shm::s_commands(%Pcx) */
+	comgen_instr(self, gen86_lock(&self->cg_txptr));
+	gen86_cmpxchgP_r_mod(&self->cg_txptr, gen86_modrm_db, GEN86_R_PDX,
+	                     offsetof(struct service_com, sc_link),
+	                     GEN86_R_service_com);
+
+	/* >> jne    1b */
+	comgen_instr(self, gen86_jcc8(&self->cg_txptr, GEN86_CC_NE, loc_1));
+}
+
+
+
 
 
 
@@ -2220,6 +2261,10 @@ NOTHROW(FCALL comgen_compile)(struct com_generator *__restrict self) {
 
 	/* Serialize fixed-length inline buffers */
 	comgen_serialize_inline_buffers(self);
+
+	/* Insert the command into the server's pending list */
+	comgen_schedule_command(self);
+
 
 	/* TODO: All of the stuff that's missing */
 	(void)self;

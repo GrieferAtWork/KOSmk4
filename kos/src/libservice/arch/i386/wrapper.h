@@ -558,8 +558,8 @@ STATIC_ASSERT(IS_ALIGNED(offsetof(struct service_com, sc_generic.g_data), 4));
  * >>     # Atomically insert the new command into the list
  * >>     # HINT: At this point, %Pdx == (%R_service_com - service_shm_handle::ssh_shm(%R_service_shm_handle))
  * >>     movP   service_shm_handle::ssh_shm(%R_service_shm_handle), %Pcx
- * >> 1:  movP   service_shm::s_commands(%Pcx), %Pax
- * >>     movP   %Pax, service_com::sc_link(%R_service_com)
+ * >>     movP   service_shm::s_commands(%Pcx), %Pax
+ * >> 1:  movP   %Pax, service_com::sc_link(%R_service_com)
  * >>     lock   cmpxchgP %Pdx, service_shm::s_commands(%Pcx)
  * >>     jne    1b
  * >>
