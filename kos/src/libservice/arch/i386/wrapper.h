@@ -515,7 +515,7 @@ STATIC_ASSERT(IS_ALIGNED(offsetof(struct service_com, sc_generic.g_data), 4));
  * >>
  * >>
  * >> // Set the function code within the com descriptor
- * >>     movP   $<info->dl_comid>, sc_code(%R_service_com)
+ * >>     movP   $<info->dl_comid>, service_com::sc_code(%R_service_com)
  * >>
  * >>
  * >>
