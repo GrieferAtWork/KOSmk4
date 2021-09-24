@@ -2781,6 +2781,140 @@ NOTHROW(FCALL comgen_free_xbuf)(struct com_generator *__restrict self) {
 
 
 
+/* Generate instructions:
+ * >> .Leh_free_service_com_end:
+ * >>     subP   $<sizeof(size_t)>, %R_service_com
+ * >> #ifdef __x86_64__
+ * >>     movq   0(%R_service_com), %rcx
+ * >>     movq   %R_service_com,    %rdx
+ * >> #else // __x86_64__
+ * >>     pushl_cfi 0(%R_service_com)
+ * >>     pushl_cfi %R_service_com
+ * >> #endif // !__x86_64__
+ * >>     movP   LOC_shm(%Psp), %R_fcall1P
+ * >> #ifdef __x86_64__
+ * >>     movq   service_com::sc_retval::scr_rax+<sizeof(size_t)>(%R_service_com), %rbp # Load return values
+ * >> #else // __x86_64__
+ * >> #if cg_info.dl_return == SERVICE_TYPE_386_R64
+ * >>     movl   service_com::sc_retval::scr_edx+<sizeof(size_t)>(%R_service_com), %ebx # Load return values
+ * >> #endif // cg_info.dl_return == SERVICE_TYPE_386_R64
+ * >>     movl   service_com::sc_retval::scr_eax+<sizeof(size_t)>(%R_service_com), %ebp # *ditto*
+ * >> #endif // !__x86_64__
+ * >> #if cg_buf_paramc == 0
+ * >>     movP   LOC_upm(%Psp), %Pax
+ * >> #if defined(__x86_64__) && $full_sigset > 0xffffffff
+ * >>     movabs $full_sigset,  %R_fcall0P
+ * >>     movP   %R_fcall0P,    userprocmask::pm_sigmask(%Pax) # re-disable preemption
+ * >>     movP   $<cg_service>, %R_fcall0P
+ * >> #else // __x86_64__ && $full_sigset > 0xffffffff
+ * >>     movP   $<cg_service>, %R_fcall0P
+ * >>     movP   $full_sigset,  userprocmask::pm_sigmask(%Pax) # re-disable preemption
+ * >> #endif // !__x86_64__ || $full_sigset <= 0xffffffff
+ * >> #else // cg_buf_paramc == 0
+ * >>     movP   $<cg_service>, %R_fcall0P
+ * >> #endif // cg_buf_paramc != 0
+ * >>     call   libservice_shmbuf_freeat_nopr
+ * >> #ifndef __x86_64__
+ * >>     .cfi_adjust_cfa_offset -8
+ * >> #endif // !__x86_64__ */
+PRIVATE NONNULL((1)) void
+NOTHROW(FCALL comgen_free_combuf)(struct com_generator *__restrict self) {
+	/* >> .Leh_free_service_com_end: */
+	comgen_defsym(self, COM_SYM_Leh_free_service_com_end);
+
+	/* >> subP   $<sizeof(size_t)>, %R_service_com */
+	comgen_instr(self, gen86_subP_imm_r(&self->cg_txptr, sizeof(size_t),
+	                                    GEN86_R_service_com));
+
+#ifdef __x86_64__
+	/* >> movq   0(%R_service_com), %rcx */
+	comgen_instr(self, gen86_movq_b_r(&self->cg_txptr, GEN86_R_service_com, GEN86_R_RCX));
+
+	/* >> movq   %R_service_com,    %rdx */
+	comgen_instr(self, gen86_movq_r_r(&self->cg_txptr, GEN86_R_service_com, GEN86_R_RDX));
+#else /* __x86_64__ */
+	/* >> pushl_cfi 0(%R_service_com) */
+	comgen_instr(self, gen86_pushl_mod(&self->cg_txptr, gen86_modrm_b, GEN86_R_service_com));
+	comgen_eh_movehere(self);
+	comgen_eh_DW_CFA_adjust_cfa_offset(self, 4);
+
+	/* >> pushl_cfi %R_service_com */
+	comgen_instr(self, gen86_pushl_r(&self->cg_txptr, GEN86_R_service_com));
+	comgen_eh_movehere(self);
+	comgen_eh_DW_CFA_adjust_cfa_offset(self, 4);
+#endif /* !__x86_64__ */
+
+	/* >> movP   LOC_shm(%Psp), %R_fcall1P */
+	comgen_instr(self, gen86_movP_db_r(&self->cg_txptr,
+	                                   comgen_spoffsetof_LOC_shm(self),
+	                                   GEN86_R_PSP, GEN86_R_FCALL1P));
+
+	/* <comgen_load_return_value_from_service_com(sizeof(size_t))> */
+#ifdef __x86_64__
+	/* >> movq   service_com::sc_retval::scr_rax+<sizeof(size_t)>(%R_service_com), %rbp # Load return values */
+	comgen_instr(self, gen86_movq_db_r(&self->cg_txptr,
+	                                   offsetof(struct service_com, sc_retval.scr_rax) + sizeof(size_t),
+	                                   GEN86_R_service_com, GEN86_R_RBP));
+#else /* __x86_64__ */
+	if (self->cg_info.dl_return == SERVICE_TYPE_386_R64) {
+		/* >> movl   service_com::sc_retval::scr_edx+<sizeof(size_t)>(%R_service_com), %ebx # Load return values */
+		comgen_instr(self, gen86_movl_db_r(&self->cg_txptr,
+		                                   offsetof(struct service_com, sc_retval.scr_edx) + sizeof(size_t),
+		                                   GEN86_R_service_com, GEN86_R_EBX));
+	}
+
+	/* >> movl   service_com::sc_retval::scr_eax+<sizeof(size_t)>(%R_service_com), %ebp # *ditto* */
+	comgen_instr(self, gen86_movl_db_r(&self->cg_txptr,
+	                                   offsetof(struct service_com, sc_retval.scr_eax) + sizeof(size_t),
+	                                   GEN86_R_service_com, GEN86_R_EBP));
+#endif /* !__x86_64__ */
+
+	if (self->cg_buf_paramc == 0) {
+		/* >> movP   LOC_upm(%Psp), %Pax */
+		comgen_instr(self, gen86_movP_db_r(&self->cg_txptr,
+		                                   comgen_spoffsetof_LOC_upm(self),
+		                                   GEN86_R_PSP, GEN86_R_PAX));
+
+#if defined(__x86_64__) && defined(__code_model_large__)
+		if ((uintptr_t)&full_sigset > UINT64_C(0x00000000ffffffff)) {
+			/* >> movabs $full_sigset,  %R_fcall0P */
+			comgen_instr(self, gen86_movabs_imm_r(&self->cg_txptr, &full_sigset, GEN86_R_FCALL0P));
+
+			/* >> movP   %R_fcall0P,    userprocmask::pm_sigmask(%Pax) # re-disable preemption */
+			comgen_instr(self, gen86_movP_r_db(&self->cg_txptr, GEN86_R_FCALL0P,
+			                                   offsetof(struct userprocmask, pm_sigmask),
+			                                   GEN86_R_PAX));
+
+			/* >> movP   $<cg_service>, %R_fcall0P */
+			comgen_instr(self, gen86_movP_imm_r(&self->cg_txptr, self->cg_service, GEN86_R_FCALL0P));
+		} else
+#endif /* __x86_64__ && __code_model_large__ */
+		{
+			/* >> movP   $<cg_service>, %R_fcall0P */
+			comgen_instr(self, gen86_movP_imm_r(&self->cg_txptr, self->cg_service, GEN86_R_FCALL0P));
+
+			/* >> movP   $full_sigset,  userprocmask::pm_sigmask(%Pax) # re-disable preemption */
+			comgen_instr(self, gen86_movP_imm_db(&self->cg_txptr, (uintptr_t)&full_sigset,
+			                                     offsetof(struct userprocmask, pm_sigmask),
+			                                     GEN86_R_PAX));
+		}
+	} else {
+		/* >> movP   $<cg_service>, %R_fcall0P */
+		comgen_instr(self, gen86_movP_imm_r(&self->cg_txptr, self->cg_service, GEN86_R_FCALL0P));
+	}
+
+	/* >> call   libservice_shmbuf_freeat_nopr */
+	comgen_instr(self, gen86_call(&self->cg_txptr, &libservice_shmbuf_freeat_nopr));
+
+#ifndef __x86_64__
+	/* >> .cfi_adjust_cfa_offset -8 */
+	comgen_eh_movehere(self);
+	comgen_eh_DW_CFA_adjust_cfa_offset(self, -8);
+#endif /* !__x86_64__ */
+}
+
+
+
 
 
 
@@ -3027,6 +3161,15 @@ NOTHROW(FCALL comgen_compile)(struct com_generator *__restrict self) {
 
 	/* Free the xbuf buffer */
 	comgen_free_xbuf(self);
+	if unlikely(!comgen_txok1(self))
+		goto fail;
+#ifndef __x86_64__
+	if unlikely(!comgen_ehok(self))
+		goto fail;
+#endif /* !__x86_64__ */
+
+	/* Free the com buffer */
+	comgen_free_combuf(self);
 	if unlikely(!comgen_txok1(self))
 		goto fail;
 #ifndef __x86_64__

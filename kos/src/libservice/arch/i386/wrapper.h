@@ -199,11 +199,13 @@ STATIC_ASSERT(IS_ALIGNED(offsetof(struct service_com, sc_generic.g_data), 4));
  * >>
  * >> #ifdef __x86_64__
  * >> #define SET_ERROR_RETURN_VALUE() \
- * >>     movq $<info->dl_error_return.scr_rax>, service_com::sc_retval::scr_rax(%R_service_com)
+ * >>     movq $<cg_info.dl_error_return.scr_rax>, service_com::sc_retval::scr_rax(%R_service_com)
  * >> #else // __x86_64__
- * >> #define SET_ERROR_RETURN_VALUE()                                                           \
- * >>     movq $<info->dl_error_return.scr_eax>, service_com::sc_retval::scr_eax(%R_service_com) \
- * >>     movq $<info->dl_error_return.scr_edx>, service_com::sc_retval::scr_edx(%R_service_com)
+ * >> #define SET_ERROR_RETURN_VALUE()                                                                 \
+ * >>     #if cg_info.dl_return == SERVICE_TYPE_386_R64                                                \
+ * >>         movq $<cg_info.dl_error_return.scr_eax>, service_com::sc_retval::scr_eax(%R_service_com) \
+ * >>     #endif // cg_info.dl_return == SERVICE_TYPE_386_R64                                          \
+ * >>     movq $<cg_info.dl_error_return.scr_edx>, service_com::sc_retval::scr_edx(%R_service_com)
  * >> #endif // !__x86_64__
  * >>
  * >>
@@ -753,8 +755,10 @@ STATIC_ASSERT(IS_ALIGNED(offsetof(struct service_com, sc_generic.g_data), 4));
  * >> #ifdef __x86_64__
  * >>     movq   service_com::sc_retval::scr_rax+<sizeof(size_t)>(%R_service_com), %rbp # Load return values
  * >> #else // __x86_64__
+ * >> #if cg_info.dl_return == SERVICE_TYPE_386_R64
+ * >>     movl   service_com::sc_retval::scr_edx+<sizeof(size_t)>(%R_service_com), %ebx # Load return values
+ * >> #endif // cg_info.dl_return == SERVICE_TYPE_386_R64
  * >>     movl   service_com::sc_retval::scr_eax+<sizeof(size_t)>(%R_service_com), %ebp # Load return values
- * >>     movl   service_com::sc_retval::scr_edx+<sizeof(size_t)>(%R_service_com), %ebx # *ditto*
  * >> #endif // !__x86_64__
  * >> #if cg_buf_paramc == 0
  * >>     movP   LOC_upm(%Psp), %Pax
