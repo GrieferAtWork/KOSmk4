@@ -690,7 +690,9 @@ STATIC_ASSERT(IS_ALIGNED(offsetof(struct service_com, sc_generic.g_data), 4));
  * >>     addP   $<SERVICE_BUFFER_ALIGNMENT - (cg_buf_paramv[INDEX].FIXED_BUFFER_SIZE & (SERVICE_BUFFER_ALIGNMENT - 1))>, %Psi   # Re-align by pointer size
  * >> #endif // !IS_ALIGNED(cg_buf_paramv[INDEX].FIXED_BUFFER_SIZE, SERVICE_BUFFER_ALIGNMENT)
  * >> #else // cg_buf_paramv[INDEX].HAS_FIXED_BUFFER_SIZE
- * >>     addP   $<SERVICE_BUFFER_ALIGNMENT-1>,    %Psi   # Re-align by pointer size
+ * >>     ... # NOTE: In case of a `COM_BUFFER_PARAM_FRETMIN' param, also add the difference
+ * >>         #       between `bufsize' and `return' to `%Psi' (when `return < bufsize')
+ * >>     addP   $<SERVICE_BUFFER_ALIGNMENT-1>,    %Psi   # Re-align buffer pointer
  * >>     andP   $<~(SERVICE_BUFFER_ALIGNMENT-1)>, %Psi   # *ditto*
  * >> #endif // !cg_buf_paramv[INDEX].HAS_FIXED_BUFFER_SIZE
  * >> #endif // INDEX != cg_buf_paramc -1

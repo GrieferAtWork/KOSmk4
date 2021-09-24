@@ -2471,6 +2471,190 @@ NOTHROW(FCALL comgen_deserialize_inline_buffers)(struct com_generator *__restric
 
 
 
+/* Generate instructions:
+ * >> #if cg_inoutbuf_paramc != 0 || cg_outbuf_paramc != 0
+ * >>     # Load %Psi with the SHM address of the first out-of-band inout/out buffer
+ * >>     # NOTE: We unconditionally use %Psi for copying!
+ * >> #if cg_inbuf_paramc != 0
+ * >> #if COM_GENERATOR_FEATURE_IN_BUFFERS_FIXLEN
+ * >>     movP   LOC_bufpar_ptr(%Psp), %Psi
+ * >>     addP   $<SUM(IN_BUFFERS.each.FIXED_BUFFER_SIZE.ceil_align(SERVICE_BUFFER_ALIGNMENT)>, %Psi
+ * >> #else // COM_GENERATOR_FEATURE_IN_BUFFERS_FIXLEN
+ * >>     movP   LOC_outbuffers_start(%Psp), %Psi
+ * >> #endif // !COM_GENERATOR_FEATURE_IN_BUFFERS_FIXLEN
+ * >> #else // cg_inbuf_paramc != 0
+ * >>     movP   LOC_bufpar_ptr(%Psp), %Psi
+ * >> #endif // cg_inbuf_paramc == 0
+ * >>
+ * >>     # Copy out-of-band SHM buffers for inout/out arguments back to user-memory
+ * >> {foreach[INOUT_OUT_BUFFER_ARGUMENT: <INDEX>, <cbp_param_offset>]: {
+ * >>     # NOTE: INDEX is the index within `LOC_bufparam_handles' and `cg_buf_paramv'
+ * >>     cmpP   $0, LOC_bufparam_handles[INDEX](%Psp)
+ * >>     jne    1f
+ * >>     movP   ...,                      %Pcx # required buffer size (depending on buffer type)
+ * >>                                           # Allowed to clobber: %Pax, %Pdx, %Pdi
+ * >>     movP   <cbp_param_offset>(%Psp), %Pdi # Unconditionally use %Psi for copying!
+ * >>     rep    movsb
+ * >> #if INDEX != cg_buf_paramc -1
+ * >> #if cg_buf_paramv[INDEX].HAS_FIXED_BUFFER_SIZE
+ * >> #if !IS_ALIGNED(cg_buf_paramv[INDEX].FIXED_BUFFER_SIZE, SERVICE_BUFFER_ALIGNMENT)
+ * >>     addP   $<SERVICE_BUFFER_ALIGNMENT - (cg_buf_paramv[INDEX].FIXED_BUFFER_SIZE & (SERVICE_BUFFER_ALIGNMENT - 1))>, %Psi   # Re-align by pointer size
+ * >> #endif // !IS_ALIGNED(cg_buf_paramv[INDEX].FIXED_BUFFER_SIZE, SERVICE_BUFFER_ALIGNMENT)
+ * >> #else // cg_buf_paramv[INDEX].HAS_FIXED_BUFFER_SIZE
+ * >>     ... # NOTE: In case of a `COM_BUFFER_PARAM_FRETMIN' param, also add the difference
+ * >>         #       between `bufsize' and `return' to `%Psi' (when `return < bufsize')
+ * >>     addP   $<SERVICE_BUFFER_ALIGNMENT-1>,    %Psi   # Re-align buffer pointer
+ * >>     andP   $<~(SERVICE_BUFFER_ALIGNMENT-1)>, %Psi   # *ditto*
+ * >> #endif // !cg_buf_paramv[INDEX].HAS_FIXED_BUFFER_SIZE
+ * >> #endif // INDEX != cg_buf_paramc -1
+ * >> 1:
+ * >> }}
+ * >> #endif // cg_inoutbuf_paramc != 0 || cg_outbuf_paramc != 0 */
+PRIVATE NONNULL((1)) void
+NOTHROW(FCALL comgen_deserialize_buffer_arguments)(struct com_generator *__restrict self) {
+	uint8_t i;
+	if (self->cg_inoutbuf_paramc == 0 && self->cg_outbuf_paramc == 0)
+		return;
+
+	if (self->cg_inbuf_paramc != 0) {
+		if (self->cg_features & COM_GENERATOR_FEATURE_IN_BUFFERS_FIXLEN) {
+			uint16_t total_aligned_in_buffer_size;
+
+			/* >> movP   LOC_bufpar_ptr(%Psp), %Psi */
+			comgen_instr(self, gen86_movP_db_r(&self->cg_txptr,
+			                                   comgen_spoffsetof_LOC_bufpar_ptr(self),
+			                                   GEN86_R_PSP, GEN86_R_PSI));
+
+			/* >> addP   $<SUM(IN_BUFFERS.each.FIXED_BUFFER_SIZE.ceil_align(SERVICE_BUFFER_ALIGNMENT)>, %Psi */
+			total_aligned_in_buffer_size = 0;
+			for (i = 0; i < self->cg_inbuf_paramc; ++i) {
+				uint8_t param_index;
+				uint16_t param_size;
+				assert(self->cg_buf_paramv[i].cbp_flags & COM_BUFFER_PARAM_FFIXED);
+				param_index = self->cg_buf_paramv[i].cbp_param_offset;
+				param_size  = self->cg_info.dl_params[param_index] & _SERVICE_TYPE_PARAMMASK;
+				param_size  = CEIL_ALIGN(param_size, SERVICE_BUFFER_ALIGNMENT);
+				total_aligned_in_buffer_size += param_size;
+			}
+			if (total_aligned_in_buffer_size != 0) {
+				comgen_instr(self, gen86_addP_imm_r(&self->cg_txptr,
+				                                    total_aligned_in_buffer_size,
+				                                    GEN86_R_PSI));
+			}
+		} else {
+			/* >> movP   LOC_outbuffers_start(%Psp), %Psi */
+			comgen_instr(self, gen86_movP_db_r(&self->cg_txptr,
+			                                   comgen_spoffsetof_LOC_outbuffers_start(self),
+			                                   GEN86_R_PSP, GEN86_R_PSI));
+		}
+	} else {
+		/* >> movP   LOC_bufpar_ptr(%Psp), %Psi */
+		comgen_instr(self, gen86_movP_db_r(&self->cg_txptr,
+		                                   comgen_spoffsetof_LOC_bufpar_ptr(self),
+		                                   GEN86_R_PSP, GEN86_R_PSI));
+	}
+
+	/* >> {foreach[INOUT_OUT_BUFFER_ARGUMENT: <INDEX>, <cbp_param_offset>]: { */
+	for (i = self->cg_inbuf_paramc; i < self->cg_buf_paramc; ++i) {
+		int16_t param_offset;
+		int8_t *pdisp_1;
+		uint8_t param_index;
+		service_typeid_t param_typ;
+		param_offset = self->cg_buf_paramv[i].cbp_param_offset + self->cg_cfa_offset;
+		param_index  = self->cg_buf_paramv[i].cbp_param_index;
+		param_typ          = self->cg_info.dl_params[param_index];
+		assert(self->cg_buf_paramv[i].cbp_flags & COM_BUFFER_PARAM_FOUT);
+
+		/* >> cmpP   $0, LOC_bufparam_handles[INDEX](%Psp) */
+		comgen_instr(self, gen86_cmpP_imm_mod(&self->cg_txptr, gen86_modrm_db, 0,
+		                                      comgen_spoffsetof_LOC_bufpar_handles(self, i),
+		                                      GEN86_R_PSP));
+
+		/* >> jne    1f */
+		comgen_instr(self, gen86_jcc8_offset(&self->cg_txptr, GEN86_CC_NE, -1));
+		pdisp_1 = (int8_t *)(self->cg_txptr - 1);
+
+		if (self->cg_buf_paramv[i].cbp_flags & COM_BUFFER_PARAM_FFIXED) {
+			uint16_t param_size;
+			param_size = param_typ & _SERVICE_TYPE_PARAMMASK;
+			/* >> movP   ...,                      %Pcx
+			 * >> movP   <cbp_param_offset>(%Psp), %Pdi
+			 * >> rep    movsb */
+			comgen_instr(self, gen86_movP_db_r(&self->cg_txptr, param_offset,
+			                                   GEN86_R_PSP, GEN86_R_PDI));
+			comgen_memcpy_with_rep_movs(self, param_size);
+
+			if (i != self->cg_buf_paramc - 1 && !IS_ALIGNED(param_size, SERVICE_BUFFER_ALIGNMENT)) {
+				/* Re-align buffer pointer */
+				comgen_instr(self, gen86_addP_imm_r(&self->cg_txptr,
+				                                    SERVICE_BUFFER_ALIGNMENT - (param_size & (SERVICE_BUFFER_ALIGNMENT - 1)),
+				                                    GEN86_R_PSI));
+			}
+		} else {
+			uint16_t bufsize_argid;
+			int16_t bufsize_sp_offset;
+			/* Non-fixed-length output buffer means that the buffer's size
+			 * depends on some parameter, optionally also affected by the
+			 * return value posted by the server. */
+
+			bufsize_argid     = (param_typ & (_SERVICE_TYPE_PARAMMASK & ~SERVICE_OUT_SIZEARG_RETURN_MINVAL));
+			bufsize_sp_offset = comgen_spoffsetof_param(self, bufsize_argid);
+			if (self->cg_buf_paramv[i].cbp_flags & COM_BUFFER_PARAM_FRETMIN) {
+				/* Must minimize `%Pcx' by the function's return value:
+				 * >>     movP   service_com::sc_retval(%R_service_com), %Pcx
+				 * >>     movP   bufsize_sp_offset(%Psp), %Pax
+				 * >>     cmpP   %Pax, %Pcx
+				 * >>     cmovbP %Pax, %Pcx
+				 * >> #if i != self->cg_buf_paramc - 1
+				 * >>     addP   %Psi, %Pax
+				 * >> #endif // i != self->cg_buf_paramc - 1
+				 * >>     movP   param_offset(%Psp), %Pdi
+				 * >>     rep    movsb
+				 * >> #if i != self->cg_buf_paramc - 1
+				 * >>     movP   %Pax, %Psi
+				 * >> #endif // i != self->cg_buf_paramc - 1 */
+				comgen_instr(self, gen86_movP_db_r(&self->cg_txptr,
+				                                   offsetof(struct service_com, sc_retval),
+				                                   GEN86_R_service_com, GEN86_R_PCX));
+				comgen_instr(self, gen86_movP_db_r(&self->cg_txptr, bufsize_sp_offset, GEN86_R_PSP, GEN86_R_PAX));
+				comgen_instr(self, gen86_cmpP_r_r(&self->cg_txptr, GEN86_R_PAX, GEN86_R_PCX));
+				comgen_instr(self, gen86_cmovbP_r_r(&self->cg_txptr, GEN86_R_PAX, GEN86_R_PCX));
+				if (i != self->cg_buf_paramc - 1)
+					comgen_instr(self, gen86_addP_r_r(&self->cg_txptr, GEN86_R_PSI, GEN86_R_PAX));
+				comgen_instr(self, gen86_movP_db_r(&self->cg_txptr, param_offset, GEN86_R_PSP, GEN86_R_PDI));
+				comgen_instr(self, gen86_rep_movsb(&self->cg_txptr));
+				if (i != self->cg_buf_paramc - 1)
+					comgen_instr(self, gen86_movP_r_r(&self->cg_txptr, GEN86_R_PAX, GEN86_R_PSI));
+			} else {
+				/* >> movP   ..., %Pcx # required buffer size (depending on buffer type)
+				 * >>                  # Allowed to clobber: %Pax, %Pdx, %Pdi */
+				comgen_instr(self, gen86_movP_db_r(&self->cg_txptr, bufsize_sp_offset, GEN86_R_PSP, GEN86_R_PCX));
+
+				/* >> movP   <cbp_param_offset>(%Psp), %Pdi # Unconditionally use %Psi for copying! */
+				comgen_instr(self, gen86_movP_db_r(&self->cg_txptr, param_offset,
+				                                   GEN86_R_PSP, GEN86_R_PDI));
+
+				/* >> rep    movsb */
+				comgen_instr(self, gen86_rep_movsb(&self->cg_txptr));
+			}
+			if (i != self->cg_buf_paramc - 1) {
+				/* >> addP   $<SERVICE_BUFFER_ALIGNMENT-1>,    %Psi   # Re-align buffer pointer */
+				comgen_instr(self, gen86_addP_imm_r(&self->cg_txptr, SERVICE_BUFFER_ALIGNMENT - 1, GEN86_R_PSI));
+
+				/* >> andP   $<~(SERVICE_BUFFER_ALIGNMENT-1)>, %Psi   # *ditto* */
+				comgen_instr(self, gen86_andP_imm_r(&self->cg_txptr, ~(SERVICE_BUFFER_ALIGNMENT - 1), GEN86_R_PSI));
+			}
+		}
+
+		/* >> 1: */
+		*pdisp_1 += (int8_t)(uint8_t)(uintptr_t)
+		            (self->cg_txptr - (byte_t *)pdisp_1);
+	}
+	/* >> }} */
+}
+
+
+
 
 
 
