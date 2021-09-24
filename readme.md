@@ -203,7 +203,7 @@ All ported applications can be installed onto your KOS disk image by using `bash
 		- `P64` (4-level) paging on x86_64
 		- `P64.2MiB` and `P64.1GiB` large pages (the later being selected using `cpuid`)
 		- `P64.NX` (No-execute) (selected using `cpuid`)
-		- Lazily identity-mapping (most of) physical memory on x86_64
+		- Lazy identity-mapping (most of) physical memory on x86_64
 	- `mmap()` with support for lazily-initialized and write-back file mappings
 		- Lazy file mappings / Copy-on-write
 	- Emulated memory access (VIO)
@@ -215,11 +215,11 @@ All ported applications can be installed onto your KOS disk image by using `bash
 			- The result is the ability to seamlessly inject custom, runtime behavior at arbitrary memory locations
 			- Here are a couple of examples which KOS makes possible with this:
 				- A memory-mapped identity-copy of the current register state
-					- What I find really funny about this is I remember seeing this video on YouTube about that mov-only C compiler, and the dev having to do some questionable hacking to be able to actually have his program loop around. - Well. With this, you can now literally do a `movl $SOME_ADDRESS, %gs:OFFSETOF_REGISTER_MAP_EIP` as an alias for `jmp SOME_ADDRESS`
+					- What I find really funny about this is I remember seeing this video on YouTube about that mov-only C compiler, and the dev having to do some questionable hacking to be able to actually have his program loop around. - Well. With this, you can now literally do a `movl $SOME_ADDRESS, OFFSETOF_REGISTER_MAP_EIP` as an alias for `jmp SOME_ADDRESS`
 				- A page of memory that always returns a random value when read
 					- You're literally able to `mmap("/dev/urandom")`, and the result is a memory mapping where every read, regardless of where is't made, will return a random value each time it is made.
-					- And just to re-emphasize: reads from the same location will return different values each time they're read from!
-				- An address that, when written to, will terminate the calling thread/process
+					- And just to re-emphasize: reads from the same location will return different values each time they're performed!
+				- An address that, when written to, will terminate the calling thread/process with a status code equal to the written value
 				- Fields for reading (and for some: writing) the uid/gid/tid/pid/pgid/sid of the current thread
 			- Really though: the possibilities are endless here, and this really isn't something that I've seen before (probably because of the insanity that is emulating every x86 instruction that may access memory), I call dips on naming it VIO!
 - Kernel heap system
@@ -262,13 +262,14 @@ All ported applications can be installed onto your KOS disk image by using `bash
 	- `lcall $7, $0` (as required by SysV)
 		- As a KOS extension, you can also use `lcall $7, $<sysno>` instead of having to use `%eax`
 	- `sysenter`
-		- This one isn't compatible with linux's ABI
+		- This one isn't compatible with linux's ABI (the internals of which aren't publicly documented and could easily be changed and need to be called through VDSO, which is something that KOS doesn't have)
 	- `syscall`
 		- (x86_64 only) Same ABI as `int 80h`
 	- Custom mechanism: Call into ukern segment (s.a. `/kos/include/kos/ukern.h:userkern_syscall()`)
 	- System call tracing
 		- Every time a system call is invoked, its name and arguments can be logged in a human-readable format
 		- s.a. `/kos/src/kernel/modsctrace` and `/kos/src/libsctrace`
+	- The most efficient way to perform a system call on KOS is [`call __i386_syscall`](https://github.com/GrieferAtWork/KOSmk4/blob/32d59252432d35c8df8c43768e4f8f12e560ecc7/kos/include/i386-kos/kos/asm/syscall.h#L217) on i386 and [`syscall`](https://github.com/GrieferAtWork/KOSmk4/blob/32d59252432d35c8df8c43768e4f8f12e560ecc7/kos/include/i386-kos/kos/asm/syscall.h#L106) on x86_64
 - Modular kernel
 	- Allow drivers to be loaded into the kernel at runtime
 	- Drivers are ELF binaries
