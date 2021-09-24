@@ -114,13 +114,14 @@ STATIC_ASSERT(IS_ALIGNED(offsetof(struct service_com, sc_generic.g_data), 4));
  *      {SP-RELATIVE OFFSET}               {CONTENTS}
  * ------------------------------------------------------------------------------------------------
  *      CFA-cg_locvar_offset               [<start of locals>]
- *      CFA-cg_locvar_offset+0*P           sigset_t *LOC_oldset;         # [1..1] Old signal maks pointer
- *      CFA-cg_locvar_offset+1*P           struct userprocmask *LOC_upm; # [1..1] Return value of `getuserprocmask()'
+ *      CFA-cg_locvar_offset+0*P           sigset_t *LOC_oldset;                   # [1..1] Old signal maks pointer
+ *      CFA-cg_locvar_offset+1*P           struct userprocmask *LOC_upm;           # [1..1] Return value of `getuserprocmask()'
+ *      CFA-cg_locvar_offset+2*P           REF struct service_shm_handle *LOC_shm; # [1..1] SHM for `R_service_com'
  *
  * #if cg_buf_paramc != 0
- *      CFA-cg_locvar_offset+2*P           void                          *LOC_bufpar_ptr;                        # [0..1] Non-shm buffer temporary storage
- *      CFA-cg_locvar_offset+3*P           REF struct service_shm_handle *LOC_bufpar_shm;                        # [1..1][valid_if(LOC_bufpar_ptr)] SHM for `LOC_bufpar_ptr'
- *      CFA-cg_locvar_offset+4*P           struct service_shm_handle     *LOC_bufparam_handles[cg_buf_paramc]; # [0..1][*] SHM handles for user buffers (NULL for buffers that need to be copied)
+ *      CFA-cg_locvar_offset+3*P           void                          *LOC_bufpar_ptr;                        # [0..1] Non-shm buffer temporary storage
+ *      CFA-cg_locvar_offset+4*P           REF struct service_shm_handle *LOC_bufpar_shm;                        # [1..1][valid_if(LOC_bufpar_ptr)] SHM for `LOC_bufpar_ptr'
+ *      CFA-cg_locvar_offset+5*P           struct service_shm_handle     *LOC_bufparam_handles[cg_buf_paramc]; # [0..1][*] SHM handles for user buffers (NULL for buffers that need to be copied)
  * #if cg_inbuf_paramc != 0 && (cg_inoutbuf_paramc != 0 || cg_outbuf_paramc != 0) && !COM_GENERATOR_FEATURE_IN_BUFFERS_FIXLEN
  *      CFA-cg_locvar_offset+...           byte_t *LOC_outbuffers_start; # [1..1] Base address for inout/out buffers (see below)
  * #endif // cg_inbuf_paramc != 0 && (cg_inoutbuf_paramc != 0 || cg_outbuf_paramc != 0) && !COM_GENERATOR_FEATURE_IN_BUFFERS_FIXLEN
@@ -129,19 +130,19 @@ STATIC_ASSERT(IS_ALIGNED(offsetof(struct service_com, sc_generic.g_data), 4));
  *      CFA-cg_locvar_offset+cg_locvar_size [<end of locals>]
  *
  * #ifdef __x86_64__
- *  /   CFA-10*P                           REGPAR: %rdi        # Only if cg_paramc >= 1  (NOT RESTORED!)
- *  |   CFA-9*P                            REGPAR: %rsi        # Only if cg_paramc >= 2  (NOT RESTORED!)
- *  |   CFA-8*P                            REGPAR: %rdx        # Only if cg_paramc >= 3  (NOT RESTORED!)
- *  |   CFA-7*P                            REGPAR: %rcx        # Only if cg_paramc >= 4  (NOT RESTORED!)
- *  |   CFA-6*P                            REGPAR: %r8         # Only if cg_paramc >= 5  (NOT RESTORED!)
- *  \   CFA-5*P                            REGPAR: %r9         # Only if cg_paramc >= 6  (NOT RESTORED!)
- *  -   CFA-4*P                            SAVED: %r12         # Only if `COM_GENERATOR_FEATURE_USES_R12' (restored on exit)
+ *  /   CFA-9*P                            REGPAR: %rdi        # Only if cg_paramc >= 1  (NOT RESTORED!)
+ *  |   CFA-8*P                            REGPAR: %rsi        # Only if cg_paramc >= 2  (NOT RESTORED!)
+ *  |   CFA-7*P                            REGPAR: %rdx        # Only if cg_paramc >= 3  (NOT RESTORED!)
+ *  |   CFA-6*P                            REGPAR: %rcx        # Only if cg_paramc >= 4  (NOT RESTORED!)
+ *  |   CFA-5*P                            REGPAR: %r8         # Only if cg_paramc >= 5  (NOT RESTORED!)
+ *  \   CFA-4*P                            REGPAR: %r9         # Only if cg_paramc >= 6  (NOT RESTORED!)
+ *  -   CFA-3*P                            SAVED: %rbx         # Only if `COM_GENERATOR_FEATURE_USES_RBX' (restored on exit)
  * #else // __x86_64__
  *  /   CFA-5*P                            SAVED: %Pdi         # Only if `COM_GENERATOR_FEATURE_USES_EDI' (restored on exit)
- *  \   CFA-4*P                            SAVED: %Psi         # Only if `COM_GENERATOR_FEATURE_USES_ESI' (restored on exit)
+ *  |   CFA-4*P                            SAVED: %Psi         # Only if `COM_GENERATOR_FEATURE_USES_ESI' (restored on exit)
+ *  \   CFA-3*P                            SAVED: %Pbx         # %Pbx is needed for system calls
  * #endif // !__x86_64__
- *  /   CFA-3*P                            SAVED: %Pbx         # %Pbx is used for `struct service_com            *R_service_com'
- *  \   CFA-2*P                            SAVED: %Pbp         # %Pbp is used for `REF struct service_shm_handle *R_service_shm_handle'
+ *  \   CFA-2*P                            SAVED: %Pbp         # %Pbp is used for `struct service_com *R_service_com'
  *  -   CFA-1*P                            RETURN_PC
  *  /   CFA                                [STACK_ARG[0]]
  *  |   CFA+1*P                            [STACK_ARG[1]]
@@ -181,7 +182,7 @@ STATIC_ASSERT(IS_ALIGNED(offsetof(struct service_com, sc_generic.g_data), 4));
  * Note that regardless of which features are enabled/disabled, code always works correctly!
  *   - COM_GENERATOR_FEATURE_INT_PARAMS_USE_LODS  # Use `lodsP' to load integer parameters from the stack
  *   - COM_GENERATOR_FEATURE_INT_PARAMS_USE_STOS  # Use `stosP' to write integer parameters to SHM
- *   - COM_GENERATOR_FEATURE_USES_R12             # x86_64-only: Set when %r12 is used by the implementation
+ *   - COM_GENERATOR_FEATURE_USES_RBX             # x86_64-only: Set when %rbx is used by the implementation
  *   - COM_GENERATOR_FEATURE_USES_EDI             # i386-only:   Set when %edi is used by the implementation
  *   - COM_GENERATOR_FEATURE_USES_ESI             # i386-only:   Set when %esi is used by the implementation
  * ================================================================================================
@@ -211,12 +212,11 @@ STATIC_ASSERT(IS_ALIGNED(offsetof(struct service_com, sc_generic.g_data), 4));
  * >>     .cfi_def_cfa_offset 0
  * >>
  * >> // Save registers & allocate stack space
- * >>     pushP_cfi_r %Pbp        # %Pbp is used for `REF struct service_shm_handle *R_service_shm_handle'
- * >>     pushP_cfi_r %Pbx        # %Pbx is used for `struct service_com            *R_service_com'
+ * >>     pushP_cfi_r %Pbp        # %Pbp is used for `struct service_com *R_service_com'
  * >> #ifdef __x86_64__
- * >> #if COM_GENERATOR_FEATURE_USES_R12
- * >>     pushP_cfi_r %r12        # Only if used anywhere below (restored on exit)
- * >> #endif // COM_GENERATOR_FEATURE_USES_R12
+ * >> #if COM_GENERATOR_FEATURE_USES_RBX
+ * >>     pushP_cfi_r %rbx        # Only if used anywhere below (restored on exit)
+ * >> #endif // COM_GENERATOR_FEATURE_USES_RBX
  * >> #if cg_paramc >= 6
  * >>     pushP_cfi %r9           # Only if cg_paramc >= 6  (NOT RESTORED!)
  * >> #endif // cg_paramc >= 6
@@ -236,6 +236,7 @@ STATIC_ASSERT(IS_ALIGNED(offsetof(struct service_com, sc_generic.g_data), 4));
  * >>     pushP_cfi %rdi          # Only if cg_paramc >= 1  (NOT RESTORED!)
  * >> #endif // cg_paramc >= 1
  * >> #else // __x86_64__
+ * >>     pushP_cfi_r %Pbx        # %Pbx is needed for system calls
  * >> #if COM_GENERATOR_FEATURE_USES_ESI
  * >>     pushP_cfi_r %Psi        # Only if used anywhere below (restored on exit)
  * >> #endif // COM_GENERATOR_FEATURE_USES_ESI
@@ -271,13 +272,9 @@ STATIC_ASSERT(IS_ALIGNED(offsetof(struct service_com, sc_generic.g_data), 4));
  * >> #else // !COM_GENERATOR_FEATURE_FEXCEPT
  * >>     call   libservice_shmbuf_alloc_nopr
  * >> #endif // COM_GENERATOR_FEATURE_FEXCEPT
- * >>     movP   %Pax, %R_service_shm_handle   # %R_service_shm_handle == %Pbp
- * >>     movP   %Pdx, %R_service_com          # %R_service_com        == %Pbx
+ * >>     movP   %Pax, %R_service_com       # %R_service_com == %Pbx
+ * >>     movP   %Pdx, LOC_shm(%Psp)
  * >> .Leh_free_service_com_begin:
- * >>
- * >>
- * >>
- * >> // Initialize the command descriptor
  * >>
  * >>
  * >>
@@ -363,8 +360,8 @@ STATIC_ASSERT(IS_ALIGNED(offsetof(struct service_com, sc_generic.g_data), 4));
  * >> .Lsingle_buffers_done:
  * >>
  * >> #else // #elif cg_buf_paramc >= 2
- * >>     # >> %R_temp_exbuf_size is %esi on i386 and %r12 on x86_64
- * >>     # NOTE: On x86_64, compilation getting here imples `COM_GENERATOR_FEATURE_USES_R12'!
+ * >>     # >> %R_temp_exbuf_size is %esi on i386 and %rbx on x86_64
+ * >>     # NOTE: On x86_64, compilation getting here imples `COM_GENERATOR_FEATURE_USES_RBX'!
  * >>     xorP   %R_temp_exbuf_size, %R_temp_exbuf_size
  * >>     movP   %R_temp_exbuf_size, LOC_bufpar_ptr(%Psp)
  * >> {foreach[BUFFER_ARGUMENT: <INDEX>, <cbp_param_offset>, <cbp_serial_offset>]: {
@@ -520,8 +517,12 @@ STATIC_ASSERT(IS_ALIGNED(offsetof(struct service_com, sc_generic.g_data), 4));
  * >>
  * >>
  * >> // Calculate the SHM-relative address of `service_com'
- * >>     movP   %R_service_com,                                     %Pdx
- * >>     subP   service_shm_handle::ssh_shm(%R_service_shm_handle), %Pdx
+ * >>     # On i386, `%R_shmbase' is '%Pbx'. On x86_64, `%R_shmbase' is:
+ * >>     # (cg_inline_buf_paramc && COM_GENERATOR_FEATURE_INLINE_BUFFERS_MOVS) ? '%r8' : '%Pdi'
+ * >>     movP   %R_service_com,                          %Pdx
+ * >>     movP   LOC_shm(%Psp),                           %R_shmbase
+ * >>     movP   service_shm_handle::ssh_shm(%R_shmbase), %R_shmbase
+ * >>     subP   %R_shmbase,                              %Pdx
  * >>
  * >>
  * >>
@@ -556,15 +557,11 @@ STATIC_ASSERT(IS_ALIGNED(offsetof(struct service_com, sc_generic.g_data), 4));
  * >>
  * >> // Insert the command into the server's pending list
  * >>     # Atomically insert the new command into the list
- * >>     # HINT: At this point, %Pdx == (%R_service_com - service_shm_handle::ssh_shm(%R_service_shm_handle))
- * >>     movP   service_shm_handle::ssh_shm(%R_service_shm_handle), %Pcx
- * >>     movP   service_shm::s_commands(%Pcx), %Pax
+ * >>     # HINT: At this point, %Pdx == (%R_service_com - service_shm_handle::ssh_shm(%R_temp_shm_handle))
+ * >>     movP   service_shm::s_commands(%R_shmbase), %Pax
  * >> 1:  movP   %Pax, service_com::sc_link(%R_service_com)
- * >>     lock   cmpxchgP %Pdx, service_shm::s_commands(%Pcx)
+ * >>     lock   cmpxchgP %Pdx, service_shm::s_commands(%R_shmbase)
  * >>     jne    1b
- * >>
- * >>
- * >>
  * >> .Leh_com_waitfor_begin:
  * >>
  * >>
@@ -574,9 +571,9 @@ STATIC_ASSERT(IS_ALIGNED(offsetof(struct service_com, sc_generic.g_data), 4));
  * >>     # <=> syscall(SYS_lfutex, &shm->s_commands, LFUTEX_WAKE, 1)
  * >>     movP   $SYS_lfutex, %Pax
  * >> #ifdef __x86_64__
- * >>     leaq   service_shm::s_commands(%Pcx), %rdi   # NOTE: %Pcx was already initialized above!
- * >>     movq   $LFUTEX_WAKE,                  %rsi
- * >>     movq   $1,                            %rdx
+ * >>     leaq   service_shm::s_commands(%R_shmbase), %rdi # NOTE: %R_shmbase was already initialized above!
+ * >>     movq   $LFUTEX_WAKE,                        %rsi
+ * >>     movq   $1,                                  %rdx
  * >> #if COM_GENERATOR_FEATURE_FEXCEPT
  * >>     std
  * >>     .cfi_escape 56,22,49,7,146,49,0,11,255,251,26  # Disable EFLAGS.DF during unwind & landing
@@ -587,18 +584,16 @@ STATIC_ASSERT(IS_ALIGNED(offsetof(struct service_com, sc_generic.g_data), 4));
  * >>     syscall
  * >> #endif // !COM_GENERATOR_FEATURE_FEXCEPT
  * >> #else // __x86_64__
- * >>     pushl_cfi %ebx
- * >>     .cfi_escape DW_CFA_GNU_args_size, 4
- * >>     leal   service_shm::s_commands(%Pcx), %ebx   # NOTE: %Pcx was already initialized above!
- * >>     movl   $LFUTEX_WAKE,                  %ecx
- * >>     movl   $1,                            %edx
+ * >> #if offsetof(service_shm, s_commands) != 0  # HINT: `%R_shmbase' is `%ebx' on i386!
+ * >>     addl   $<service_shm::s_commands>, %ebx # NOTE: %R_shmbase was already initialized above!
+ * >> #endif // offsetof(service_shm, s_commands) != 0
+ * >>     movl   $LFUTEX_WAKE, %ecx
+ * >>     movl   $1,           %edx
  * >> #if COM_GENERATOR_FEATURE_FEXCEPT
  * >>     call   __i386_Xsyscall
  * >> #else // COM_GENERATOR_FEATURE_FEXCEPT
  * >>     call   __i386_syscall
  * >> #endif // !COM_GENERATOR_FEATURE_FEXCEPT
- * >>     popl_cfi %ebx
- * >>     .cfi_escape DW_CFA_GNU_args_size, 0
  * >> #endif // !__x86_64__
  * >>     # No need to check for errors here: There
  * >>     # should be no reason for the above to fail!
@@ -624,8 +619,6 @@ STATIC_ASSERT(IS_ALIGNED(offsetof(struct service_com, sc_generic.g_data), 4));
  * >>     syscall
  * >> #endif // !COM_GENERATOR_FEATURE_FEXCEPT
  * >> #else // __x86_64__
- * >>     pushl_cfi %ebx
- * >>     .cfi_escape DW_CFA_GNU_args_size, 4
  * >>     leaq   service_com::sc_code(%R_service_com), %ebx
  * >>     movl   $LFUTEX_WAIT_WHILE,                   %ecx
  * >>     movl   $<info->dl_comid>,                    %edx
@@ -634,8 +627,6 @@ STATIC_ASSERT(IS_ALIGNED(offsetof(struct service_com, sc_generic.g_data), 4));
  * >> #else // COM_GENERATOR_FEATURE_FEXCEPT
  * >>     call   __i386_syscall
  * >> #endif // !COM_GENERATOR_FEATURE_FEXCEPT
- * >>     popl_cfi %ebx
- * >>     .cfi_escape DW_CFA_GNU_args_size, 0
  * >> #endif // !__x86_64__
  * >> #if !COM_GENERATOR_FEATURE_FEXCEPT
  * >>     cmpP   $(-ELIMIT), %Pax
@@ -754,7 +745,7 @@ STATIC_ASSERT(IS_ALIGNED(offsetof(struct service_com, sc_generic.g_data), 4));
  * >>     pushl_cfi 0(%R_service_com)
  * >>     pushl_cfi %R_service_com
  * >> #endif // !__x86_64__
- * >>     movP   %R_service_shm_handle, %R_fcall1P
+ * >>     movP   LOC_shm(%Psp), %R_fcall1P
  * >> #ifdef __x86_64__
  * >>     movq   service_com::sc_retval::scr_rax+<sizeof(size_t)>(%R_service_com), %rbp # Load return values
  * >> #else // __x86_64__
@@ -800,9 +791,9 @@ STATIC_ASSERT(IS_ALIGNED(offsetof(struct service_com, sc_generic.g_data), 4));
  * >>     .cfi_adjust_cfa_offset -<cg_locvar_size>
  * >> #endif // !__x86_64__
  * >> #ifdef __x86_64__
- * >> #if COM_GENERATOR_FEATURE_USES_R12
- * >>     popP_cfi_r %r12        # Only if used anywhere above
- * >> #endif // COM_GENERATOR_FEATURE_USES_R12
+ * >> #if COM_GENERATOR_FEATURE_USES_RBX
+ * >>     popP_cfi_r %rbx        # Only if used anywhere above
+ * >> #endif // COM_GENERATOR_FEATURE_USES_RBX
  * >> #else // __x86_64__
  * >> #if COM_GENERATOR_FEATURE_USES_EDI
  * >>     popP_cfi_r %Pdi        # Only if used anywhere above
@@ -825,7 +816,9 @@ STATIC_ASSERT(IS_ALIGNED(offsetof(struct service_com, sc_generic.g_data), 4));
  * >>
  * >>
  * >> // Normal return
+ * >> #ifndef __x86_64__
  * >>     popP_cfi_r %Pbx
+ * >> #endif // !__x86_64__
  * >>     popP_cfi_r %Pbp
  * >>     ret
  * >>
@@ -966,8 +959,8 @@ STATIC_ASSERT(IS_ALIGNED(offsetof(struct service_com, sc_generic.g_data), 4));
  * >>     pushl_cfi 0(%R_service_com)
  * >>     pushl_cfi %R_service_com
  * >> #endif // !__x86_64__
- * >>     movP   %R_service_shm_handle, %R_fcall1P
- * >>     movP   $<cg_service>,         %R_fcall0P
+ * >>     movP   LOC_shm(%Psp), %R_fcall1P
+ * >>     movP   $<cg_service>, %R_fcall0P
  * >>     call   libservice_shmbuf_freeat_nopr
  * >> #ifndef __x86_64__
  * >>     .cfi_adjust_cfa_offset -8
@@ -1124,7 +1117,7 @@ struct com_buffer_param {
 #define COM_GENERATOR_FEATURE_INLINE_BUFFERS_MOVS 0x08 /* Use `movs' to copy inline buffers */
 #define COM_GENERATOR_FEATURE_IN_BUFFERS_FIXLEN   0x10 /* All in buffers have fixed lengths */
 #ifdef __x86_64__
-#define COM_GENERATOR_FEATURE_USES_R12 0x80 /* %r12 is used and must be saved/restored */
+#define COM_GENERATOR_FEATURE_USES_RBX 0x80 /* %rbx is used and must be saved/restored */
 #else /* __x86_64__ */
 #define COM_GENERATOR_FEATURE_USES_EDI 0x40 /* %edi is used and must be saved/restored */
 #define COM_GENERATOR_FEATURE_USES_ESI 0x80 /* %esi is used and must be saved/restored */
@@ -1239,9 +1232,10 @@ NOTHROW(FCALL comgen_compile)(struct com_generator *__restrict self);
 #define comgen_spoffsetof_LOCALS(self)                ((self)->cg_cfa_offset + (self)->cg_locvar_offset)
 #define comgen_spoffsetof_LOC_oldset(self)            (comgen_spoffsetof_LOCALS(self) + 0)                              /* sigset_t                      *LOC_oldset; */
 #define comgen_spoffsetof_LOC_upm(self)               (comgen_spoffsetof_LOCALS(self) + __SIZEOF_POINTER__)             /* struct userprocmask           *LOC_upm; */
-#define comgen_spoffsetof_LOC_bufpar_ptr(self)        (comgen_spoffsetof_LOCALS(self) + 2 * __SIZEOF_POINTER__)         /* void                          *LOC_bufpar_ptr;                      // [valid_if(cg_buf_paramc != 0)] */
-#define comgen_spoffsetof_LOC_bufpar_shm(self)        (comgen_spoffsetof_LOCALS(self) + 3 * __SIZEOF_POINTER__)         /* REF struct service_shm_handle *LOC_bufpar_shm;                      // [valid_if(cg_buf_paramc != 0)] */
-#define comgen_spoffsetof_LOC_bufpar_handles(self, i) (comgen_spoffsetof_LOCALS(self) + (4 + (i)) * __SIZEOF_POINTER__) /* struct service_shm_handle     *LOC_bufparam_handles[cg_buf_paramc]; // [valid_if(cg_buf_paramc != 0)] */
+#define comgen_spoffsetof_LOC_shm(self)               (comgen_spoffsetof_LOCALS(self) + 2 * __SIZEOF_POINTER__)         /* struct service_shm_handle     *LOC_shm; */
+#define comgen_spoffsetof_LOC_bufpar_ptr(self)        (comgen_spoffsetof_LOCALS(self) + 3 * __SIZEOF_POINTER__)         /* void                          *LOC_bufpar_ptr;                      // [valid_if(cg_buf_paramc != 0)] */
+#define comgen_spoffsetof_LOC_bufpar_shm(self)        (comgen_spoffsetof_LOCALS(self) + 4 * __SIZEOF_POINTER__)         /* REF struct service_shm_handle *LOC_bufpar_shm;                      // [valid_if(cg_buf_paramc != 0)] */
+#define comgen_spoffsetof_LOC_bufpar_handles(self, i) (comgen_spoffsetof_LOCALS(self) + (5 + (i)) * __SIZEOF_POINTER__) /* struct service_shm_handle     *LOC_bufparam_handles[cg_buf_paramc]; // [valid_if(cg_buf_paramc != 0)] */
 #define comgen_spoffsetof_LOC_outbuffers_start(self)  comgen_spoffsetof_LOC_bufpar_handles(self, (self)->cg_buf_paramc) /* byte_t                        *LOC_outbuffers_start;                // [valid_if(cg_inbuf_paramc != 0 && (cg_inoutbuf_paramc != 0 || cg_outbuf_paramc != 0) && !COM_GENERATOR_FEATURE_IN_BUFFERS_FIXLEN)] */
 
 /* Returns the number of available .text or .eh_frame bytes. */

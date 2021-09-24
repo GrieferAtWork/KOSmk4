@@ -64,6 +64,7 @@ DECL_BEGIN
 
 
 
+
 /* When the currently set exception is RT-level, return `false'.
  * Otherwise,   clear   the   exception   and   return   `true'. */
 INTERN bool NOTHROW(FCALL libservice_aux_com_discard_nonrt_exception)(void) {
@@ -90,8 +91,8 @@ compar_com_inline_buffer_param(void const *_a, void const *_b) {
 	 * That way, the number of buffers following those which leave %Pdi unaligned
 	 * may be reduced by 1. */
 	{
-		bool is_a_aligned = IS_ALIGNED(a->cibp_sizeof, sizeof(void *));
-		bool is_b_aligned = IS_ALIGNED(b->cibp_sizeof, sizeof(void *));
+		bool is_a_aligned = IS_ALIGNED(a->cibp_sizeof, SIZEOF_POINTER);
+		bool is_b_aligned = IS_ALIGNED(b->cibp_sizeof, SIZEOF_POINTER);
 		if (is_a_aligned && !is_b_aligned)
 			return -1; /* Less than */
 		if (!is_a_aligned && is_b_aligned)
@@ -160,8 +161,8 @@ NOTHROW(FCALL comgen_spoffsetof_param)(struct com_generator const *__restrict se
 		result = self->cg_buf_paramc;
 		if (result > 6)
 			result = 6;
-		result = -((3 + result) * 8);
-		if (self->cg_features & COM_GENERATOR_FEATURE_USES_R12)
+		result = -((2 + result) * 8);
+		if (self->cg_features & COM_GENERATOR_FEATURE_USES_RBX)
 			result -= 8;
 		result += param_index * 8;
 	} else {
@@ -191,7 +192,7 @@ NOTHROW(FCALL comgen_count_consecutive_intpar)(struct com_generator const *__res
 			++i;
 			if (i >= self->cg_int_paramc)
 				break;
-			next += sizeof(void *);
+			next += SIZEOF_POINTER;
 			if (*(u16 const *)((byte_t const *)&self->cg_intpar[i] + u16_field_offset) != next)
 				break;
 			++count;
@@ -228,12 +229,12 @@ NOTHROW(FCALL _comgen_init)(struct com_generator *__restrict self) {
 
 	/* On  x86_64, register parameters  are pushed at the  start of the function
 	 * and therefor have negative offsets. Note  that for the time being,  these
-	 * offsets are only correct when `COM_GENERATOR_FEATURE_USES_R12' isn't set.
-	 * Code  that may eventually set `COM_GENERATOR_FEATURE_USES_R12' knows this
+	 * offsets are only correct when `COM_GENERATOR_FEATURE_USES_RBX' isn't set.
+	 * Code  that may eventually set `COM_GENERATOR_FEATURE_USES_RBX' knows this
 	 * and will adjust offsets to account for 8 more bytes of offset. */
 	if (i > 6) /* First 6 arguments are passed through registers (and are therefor saved) */
 		i = 6;
-	param_offset = -((3 + i) * sizeof(void *));
+	param_offset = -((2 + i) * SIZEOF_POINTER);
 #else /* __x86_64__ */
 
 	/* On  i386, there only exist stack arguments which being immediately after
@@ -367,8 +368,8 @@ do_flexible_inbuf_argument:
 				self->cg_intpar[self->cg_int_paramc].cip_param_offset  = param_offset;
 				self->cg_intpar[self->cg_int_paramc].cip_serial_offset = serial_offset;
 				++self->cg_int_paramc;
-				param_offset += sizeof(void *);
-				serial_offset += sizeof(void *);
+				param_offset += SIZEOF_POINTER;
+				serial_offset += SIZEOF_POINTER;
 				ATTR_FALLTHROUGH
 #endif /* !__x86_64__ */
 			default:
@@ -382,14 +383,14 @@ do_flexible_inbuf_argument:
 		}
 
 		/* Adjust offsets for the next argument. */
-		param_offset += sizeof(void *);
-		serial_offset += sizeof(void *);
+		param_offset += SIZEOF_POINTER;
+		serial_offset += SIZEOF_POINTER;
 
 #ifdef __x86_64__
-		/* Special case: Once we hit the `SAVED: %Pbx'-field, we've
+		/* Special case: Once we hit the `SAVED: %Pbp'-field, we've
 		 * handled all register parameters  and must jump ahead  to
 		 * continue on with stack-based arguments. */
-		if (param_offset == -3 * (int16_t)sizeof(void *))
+		if (param_offset == -2 * SIZEOF_POINTER)
 			param_offset = 0;
 #endif /* __x86_64__ */
 	}
@@ -399,13 +400,13 @@ done_params:
 #endif /* !__x86_64__ */
 
 #ifdef __x86_64__
-	/* When  at least  2 buffer parameters  exist, then `%r12'  will be used
+	/* When  at least  2 buffer parameters  exist, then `%rbx'  will be used
 	 * by the implementation. As such, we  need to set the appropriate  code
 	 * feature flag, as well as  adjust parameter offsets since all  offsets
 	 * pointing into the argument save area will be shifted down by 8 bytes. */
 	if (self->cg_buf_paramc >= 2) {
 #define reloc_param_offset(x) ((x) < 0 ? (void)((x) -= 8) : (void)0)
-		self->cg_features |= COM_GENERATOR_FEATURE_USES_R12;
+		self->cg_features |= COM_GENERATOR_FEATURE_USES_RBX;
 		for (i = 0; i < self->cg_int_paramc; ++i)
 			reloc_param_offset(self->cg_intpar[i].cip_param_offset);
 		for (i = 0; i < self->cg_inline_buf_paramc; ++i)
@@ -425,7 +426,7 @@ done_params:
 	/* Assign `self->cg_inline_buf_paramv[*].cibp_buffer_offset' */
 	for (i = 0; i < self->cg_inline_buf_paramc; ++i) {
 		/* Inline buffers are always pointer-aligned. */
-		serial_offset = CEIL_ALIGN(serial_offset, sizeof(void *));
+		serial_offset = CEIL_ALIGN(serial_offset, SIZEOF_POINTER);
 		self->cg_inline_buf_paramv[i].cibp_buffer_offset = serial_offset;
 		serial_offset += self->cg_inline_buf_paramv[i].cibp_sizeof;
 	}
@@ -468,24 +469,25 @@ done_params:
 	}
 
 	/* Figure out the local variable area size. */
-	self->cg_locvar_size = 2 * sizeof(void *); /* LOC_oldset, LOC_upm */
+	self->cg_locvar_size = 3 * SIZEOF_POINTER; /* LOC_oldset, LOC_upm, LOC_shm */
 	if (self->cg_buf_paramc != 0) {
-		self->cg_locvar_size += 2 * sizeof(void *);                   /* LOC_bufpar_ptr, LOC_bufpar_shm */
-		self->cg_locvar_size += self->cg_buf_paramc * sizeof(void *); /* LOC_bufparam_handles */
+		self->cg_locvar_size += 2 * SIZEOF_POINTER;                   /* LOC_bufpar_ptr, LOC_bufpar_shm */
+		self->cg_locvar_size += self->cg_buf_paramc * SIZEOF_POINTER; /* LOC_bufparam_handles */
 		if (self->cg_inbuf_paramc != 0 && (self->cg_inoutbuf_paramc != 0 || self->cg_outbuf_paramc != 0) &&
 		    !(self->cg_features & COM_GENERATOR_FEATURE_IN_BUFFERS_FIXLEN))
-			self->cg_locvar_size += sizeof(void *); /* LOC_outbuffers_start */
+			self->cg_locvar_size += SIZEOF_POINTER; /* LOC_outbuffers_start */
 	}
 
 	/* Figure out where local variables end, which in turn determines where they start. */
 	{
 		int16_t locend;
-		locend = -3 * (int16_t)sizeof(void *); /* RETURN_PC, saved %Pbp, saved %Pbx */
 #ifdef __x86_64__
-		if (self->cg_features & COM_GENERATOR_FEATURE_USES_R12)
-			locend -= 8;                       /* Saved %r12 */
+		locend = -2 * SIZEOF_POINTER; /* RETURN_PC, saved %Pbp */
+		if (self->cg_features & COM_GENERATOR_FEATURE_USES_RBX)
+			locend -= 8;                       /* Saved %rbx */
 		locend -= MIN(self->cg_paramc, 6) * 8; /* Saved register params */
 #else /* __x86_64__ */
+		locend = -3 * SIZEOF_POINTER; /* RETURN_PC, saved %Pbp, saved %Pbx */
 		if (self->cg_features & COM_GENERATOR_FEATURE_USES_ESI)
 			locend -= 4; /* Saved %esi */
 		if (self->cg_features & COM_GENERATOR_FEATURE_USES_EDI)
@@ -594,7 +596,7 @@ NOTHROW(FCALL comgen_memcpy_with_rep_movs)(struct com_generator *__restrict self
 	size_t pwords;
 	if (!comgen_txok1(self))
 		return;
-	pwords = num_bytes / sizeof(void *);
+	pwords = num_bytes / SIZEOF_POINTER;
 	/* Because `num_bytes' is fixed, we can encode a super-efficient memcpy */
 	if (pwords >= COM_USEREP_THRESHOLD) {
 		gen86_movP_imm_r(&self->cg_txptr, pwords, GEN86_R_PCX);
@@ -619,10 +621,9 @@ NOTHROW(FCALL comgen_memcpy_with_rep_movs)(struct com_generator *__restrict self
 
 
 /* Generate instructions:
- * >>     pushP_cfi_r %Pbp        # %Pbp is used for `REF struct service_shm_handle *R_service_shm_handle'
- * >>     pushP_cfi_r %Pbx        # %Pbx is used for `struct service_com            *R_service_com'
+ * >>     pushP_cfi_r %Pbp        # %Pbp is used for `struct service_com            *R_service_com'
  * >> #ifdef __x86_64__
- * >>     pushP_cfi_r %r12        # only if COM_GENERATOR_FEATURE_USES_R12
+ * >>     pushP_cfi_r %rbx        # only if COM_GENERATOR_FEATURE_USES_RBX
  * >>     pushP_cfi %r9           # only if cg_paramc >= 6
  * >>     pushP_cfi %r8           # only if cg_paramc >= 5
  * >>     pushP_cfi %rcx          # only if cg_paramc >= 4
@@ -630,6 +631,7 @@ NOTHROW(FCALL comgen_memcpy_with_rep_movs)(struct com_generator *__restrict self
  * >>     pushP_cfi %rsi          # only if cg_paramc >= 2
  * >>     pushP_cfi %rdi          # only if cg_paramc >= 1
  * >> #else // __x86_64__
+ * >>     pushP_cfi_r %Pbx        # %Pbx is needed for system calls
  * >>     pushP_cfi_r %Psi        # only if COM_GENERATOR_FEATURE_USES_ESI
  * >>     pushP_cfi_r %Pdi        # only if COM_GENERATOR_FEATURE_USES_EDI
  * >> #endif // !__x86_64__ */
@@ -638,7 +640,7 @@ NOTHROW(FCALL comgen_push_registers_on_entry)(struct com_generator *__restrict s
 #define generate_pushP_cfi(GEN86_R_NAME)           \
 	(gen86_pushP_r(&self->cg_txptr, GEN86_R_NAME), \
 	 comgen_eh_movehere(self),                     \
-	 comgen_eh_DW_CFA_adjust_cfa_offset(self, sizeof(void *)))
+	 comgen_eh_DW_CFA_adjust_cfa_offset(self, SIZEOF_POINTER))
 #define generate_pushP_cfi_r(GEN86_R_NAME, CFI_X86_UNWIND_REGISTER_NAME) \
 	(generate_pushP_cfi(GEN86_R_NAME),     \
 	 comgen_eh_DW_CFA_rel_offset(self, CFI_X86_UNWIND_REGISTER_NAME, 0))
@@ -646,11 +648,10 @@ NOTHROW(FCALL comgen_push_registers_on_entry)(struct com_generator *__restrict s
 	/* NOTE: Because of `COM_GENERATOR_INITIAL_TX_BUFSIZ', we don't
 	 *       have to worry about running out of buffer space  (yet) */
 	generate_pushP_cfi_r(GEN86_R_PBP, CFI_X86_UNWIND_REGISTER_PBP); /* pushP_cfi_r %Pbp */
-	generate_pushP_cfi_r(GEN86_R_PBX, CFI_X86_UNWIND_REGISTER_PBX); /* pushP_cfi_r %Pbx */
 
 #ifdef __x86_64__
-	if (self->cg_features & COM_GENERATOR_FEATURE_USES_R12)
-		generate_pushP_cfi_r(GEN86_R_R12, CFI_X86_64_UNWIND_REGISTER_R12); /* pushP_cfi_r %r12 */
+	if (self->cg_features & COM_GENERATOR_FEATURE_USES_RBX)
+		generate_pushP_cfi_r(GEN86_R_RBX, CFI_X86_64_UNWIND_REGISTER_RBX); /* pushP_cfi_r %rbx */
 	/* Push argument registers. */
 	{
 		unsigned int i;
@@ -659,6 +660,7 @@ NOTHROW(FCALL comgen_push_registers_on_entry)(struct com_generator *__restrict s
 		}
 	}
 #else /* __x86_64__ */
+	generate_pushP_cfi_r(GEN86_R_PBX, CFI_X86_UNWIND_REGISTER_PBX); /* pushP_cfi_r %Pbx */
 	if (self->cg_features & COM_GENERATOR_FEATURE_USES_ESI)
 		generate_pushP_cfi_r(GEN86_R_ESI, CFI_386_UNWIND_REGISTER_ESI); /* pushP_cfi_r %Psi */
 	if (self->cg_features & COM_GENERATOR_FEATURE_USES_EDI)
@@ -671,14 +673,14 @@ NOTHROW(FCALL comgen_push_registers_on_entry)(struct com_generator *__restrict s
 
 
 /* Generate instructions:
- * >>     subP   $<cg_locvar_size - 2 * sizeof(void*)>, %Psp
- * >>     .cfi_adjust_cfa_offset <cg_locvar_size - 2 * sizeof(void*)> */
+ * >> subP   $<cg_locvar_size - 2 * sizeof(void*)>, %Psp
+ * >> .cfi_adjust_cfa_offset <cg_locvar_size - 2 * sizeof(void*)> */
 PRIVATE NONNULL((1)) void
 NOTHROW(FCALL comgen_allocate_stack_space)(struct com_generator *__restrict self) {
 	uint16_t delta;
 	/* NOTE: Because of `COM_GENERATOR_INITIAL_TX_BUFSIZ', we don't
 	 *       have to worry about running out of buffer space  (yet) */
-	delta = self->cg_locvar_size - 2 * sizeof(void *);
+	delta = self->cg_locvar_size - 2 * SIZEOF_POINTER;
 	if (delta != 0) {
 		gen86_subP_imm_r(&self->cg_txptr, delta, GEN86_R_PSP);
 		comgen_eh_movehere(self);
@@ -688,7 +690,6 @@ NOTHROW(FCALL comgen_allocate_stack_space)(struct com_generator *__restrict self
 
 
 /* Generate instructions:
- * >> // Disable preemption
  * >>     call   getuserprocmask
  * >>     pushP_cfi %Pax                                  # LOC_upm
  * >>     pushP_cfi userprocmask::pm_sigmask(%Pax)        # LOC_oldset
@@ -705,30 +706,30 @@ NOTHROW(FCALL comgen_disable_preemption)(struct com_generator *__restrict self) 
 	/* NOTE: Because of `COM_GENERATOR_INITIAL_TX_BUFSIZ', we don't
 	 *       have to worry about running out of buffer space  (yet) */
 
-	/* >>     call   getuserprocmask */
+	/* >> call   getuserprocmask */
 	gen86_call(&self->cg_txptr, &getuserprocmask);
 
-	/* >>     pushP_cfi %Pax                                  # LOC_upm */
+	/* >> pushP_cfi %Pax                                  # LOC_upm */
 	gen86_pushP_r(&self->cg_txptr, GEN86_R_PAX);
 	comgen_eh_movehere(self);
-	comgen_eh_DW_CFA_adjust_cfa_offset(self, sizeof(void *));
+	comgen_eh_DW_CFA_adjust_cfa_offset(self, SIZEOF_POINTER);
 
-	/* >>     pushP_cfi userprocmask::pm_sigmask(%Pax)        # LOC_oldset */
+	/* >> pushP_cfi userprocmask::pm_sigmask(%Pax)        # LOC_oldset */
 	gen86_pushP_mod(&self->cg_txptr, gen86_modrm_db,
 	                offsetof(struct userprocmask, pm_sigmask),
 	                GEN86_R_PAX);
 	comgen_eh_movehere(self);
-	comgen_eh_DW_CFA_adjust_cfa_offset(self, sizeof(void *));
+	comgen_eh_DW_CFA_adjust_cfa_offset(self, SIZEOF_POINTER);
 
-	/* >>     .cfi_remember_state */
+	/* >> .cfi_remember_state */
 	comgen_eh_DW_CFA_remember_state(self);
 
 #ifdef __x86_64__
 	if ((uintptr_t)&full_sigset > UINT64_C(0x00000000ffffffff)) {
-		/* >>     movabs $full_sigset, %Pcx */
+		/* >> movabs $full_sigset, %Pcx */
 		gen86_movabs_imm_r(&self->cg_txptr, &full_sigset, GEN86_R_PCX);
 
-		/* >>     movP   %Pcx,         userprocmask::pm_sigmask(%Pax) # Disable preemption */
+		/* >> movP   %Pcx,         userprocmask::pm_sigmask(%Pax) # Disable preemption */
 		gen86_movP_r_db(&self->cg_txptr, GEN86_R_PCX,
 		                offsetof(struct userprocmask, pm_sigmask),
 		                GEN86_R_PAX);
@@ -748,8 +749,10 @@ NOTHROW(FCALL comgen_disable_preemption)(struct com_generator *__restrict self) 
 
 
 /* Convenience register names. */
-#define GEN86_R_service_shm_handle GEN86_R_PBP
-#define GEN86_R_service_com        GEN86_R_PBX
+#define GEN86_R_service_com GEN86_R_PBP
+#ifndef __x86_64__
+#define GEN86_R_shmbase GEN86_R_PBX
+#endif /* __x86_64__ */
 
 
 /* Generate instructions:
@@ -763,8 +766,8 @@ NOTHROW(FCALL comgen_disable_preemption)(struct com_generator *__restrict self) 
  * >> #else // !COM_GENERATOR_FEATURE_FEXCEPT
  * >>     call   libservice_shmbuf_alloc_nopr
  * >> #endif // COM_GENERATOR_FEATURE_FEXCEPT
- * >>     movP   %Pax, %R_service_shm_handle   # %R_service_shm_handle == %Pbp
- * >>     movP   %Pdx, %R_service_com          # %R_service_com        == %Pbx
+ * >>     movP   %Pax, %R_service_com       # %R_service_com == %Pbx
+ * >>     movP   %Pdx, LOC_shm(%Psp)
  * >> .Leh_free_service_com_begin: */
 PRIVATE NONNULL((1)) void
 NOTHROW(FCALL comgen_allocate_com_buffer)(struct com_generator *__restrict self) {
@@ -772,10 +775,10 @@ NOTHROW(FCALL comgen_allocate_com_buffer)(struct com_generator *__restrict self)
 	/* NOTE: Because of `COM_GENERATOR_INITIAL_TX_BUFSIZ', we don't
 	 *       have to worry about running out of buffer space  (yet) */
 
-	/* >>     movP   $<cg_service>, %R_fcall0P   # Input constant (hard-coded) */
+	/* >> movP   $<cg_service>, %R_fcall0P   # Input constant (hard-coded) */
 	gen86_movP_imm_r(&self->cg_txptr, self->cg_service, GEN86_R_FCALL0P);
 
-	/* >>     movP   $<ALLOC_SIZE>, %R_fcall1P   # Input constant (hard-coded) */
+	/* >> movP   $<ALLOC_SIZE>, %R_fcall1P   # Input constant (hard-coded) */
 	alloc_size = self->cg_sizeof_service_com;
 	alloc_size = CEIL_ALIGN(alloc_size, SERVICE_SHM_ALLOC_ALIGN);
 	alloc_size += SERVICE_SHM_ALLOC_EXTRA;
@@ -784,25 +787,27 @@ NOTHROW(FCALL comgen_allocate_com_buffer)(struct com_generator *__restrict self)
 	gen86_movP_imm_r(&self->cg_txptr, alloc_size, GEN86_R_FCALL1P);
 
 	if (!(self->cg_features & COM_GENERATOR_FEATURE_FEXCEPT)) {
-		/* >>     call   libservice_shmbuf_alloc_nopr_nx */
+		/* >> call   libservice_shmbuf_alloc_nopr_nx */
 		gen86_call(&self->cg_txptr, &libservice_shmbuf_alloc_nopr_nx);
 
-		/* >>     testP  %Pax, %Pax */
+		/* >> testP  %Pax, %Pax */
 		gen86_testP_r_r(&self->cg_txptr, GEN86_R_PAX, GEN86_R_PAX);
 
-		/* >>     jz     .Lerr_pop_preemption */
+		/* >> jz     .Lerr_pop_preemption */
 		gen86_jccl_offset(&self->cg_txptr, GEN86_CC_Z, -4);
 		comgen_reloc(self, self->cg_txptr - 4, COM_R_PCREL32, COM_SYM_Lerr_pop_preemption);
 	} else {
-		/* >>     call   libservice_shmbuf_alloc_nopr */
+		/* >> call   libservice_shmbuf_alloc_nopr */
 		gen86_call(&self->cg_txptr, &libservice_shmbuf_alloc_nopr);
 	}
 
-	/* >>     movP   %Pax, %R_service_shm_handle   # %R_service_shm_handle == %Pbp */
-	gen86_movP_r_r(&self->cg_txptr, GEN86_R_PAX, GEN86_R_service_shm_handle);
+	/* >> movP   %Pax, %R_service_com       # %R_service_com == %Pbx */
+	gen86_movP_r_r(&self->cg_txptr, GEN86_R_PAX, GEN86_R_service_com);
 
-	/* >>     movP   %Pdx, %R_service_com          # %R_service_com        == %Pbx */
-	gen86_movP_r_r(&self->cg_txptr, GEN86_R_PDX, GEN86_R_service_com);
+	/* >> movP   %Pdx, LOC_shm(%Psp) */
+	gen86_movP_r_db(&self->cg_txptr, GEN86_R_PDX,
+	                comgen_spoffsetof_LOC_shm(self),
+	                GEN86_R_PSP);
 
 	/* >> .Leh_free_service_com_begin: */
 	comgen_defsym(self, COM_SYM_Leh_free_service_com_begin);
@@ -1195,15 +1200,15 @@ NOTHROW(FCALL comgen_serialize_buffer_arguments_1)(struct com_generator *__restr
 
 
 #ifdef __x86_64__
-#define GEN86_R_temp_exbuf_size GEN86_R_R12
+#define GEN86_R_temp_exbuf_size GEN86_R_RBX
 #else /* __x86_64__ */
 #define GEN86_R_temp_exbuf_size GEN86_R_ESI
 #endif /* !__x86_64__ */
 
 /* Generate instructions for the "#if cg_buf_paramc >= 2"
  * case     of     `comgen_serialize_buffer_arguments()':
- * >>     # >> %R_temp_exbuf_size is %esi on i386 and %r12 on x86_64
- * >>     # NOTE: On x86_64, compilation getting here imples `COM_GENERATOR_FEATURE_USES_R12'!
+ * >>     # >> %R_temp_exbuf_size is %esi on i386 and %rbx on x86_64
+ * >>     # NOTE: On x86_64, compilation getting here imples `COM_GENERATOR_FEATURE_USES_RBX'!
  * >>     xorP   %R_temp_exbuf_size, %R_temp_exbuf_size
  * >>     movP   %R_temp_exbuf_size, LOC_bufpar_ptr(%Psp)
  * >> {foreach[BUFFER_ARGUMENT: <INDEX>, <cbp_param_offset>, <cbp_serial_offset>]: {
@@ -1221,7 +1226,7 @@ NOTHROW(FCALL comgen_serialize_buffer_arguments_1)(struct com_generator *__restr
  * >> 1:  # NOTE: When only 1 buffer argument exists, %R_temp_exbuf_size isn't
  * >>     #       used and the allocated+initialization is done inline.
  * >>     addP   ..., %R_temp_exbuf_size  # Account for required buffer size (depending on buffer type)
- * >>                                     # NOTE: The buffer size calculated here must be ceil-aligned by sizeof(void *),
+ * >>                                     # NOTE: The buffer size calculated here must be ceil-aligned by SIZEOF_POINTER,
  * >>                                     #       unless INDEX == self->cg_buf_paramc - 1, in which case this alignment
  * >>                                     #       is optional.
  * >>                                     # Allowed to clobber: %Pax, %Pcx, %Pdx, %Pdi (on i386, %Psi must be preserved!)
@@ -1280,12 +1285,12 @@ NOTHROW(FCALL comgen_serialize_buffer_arguments_1)(struct com_generator *__restr
  * >>     rep    movsb                                     # Copy input buffers into SHM
  * >> #if INDEX != cg_paramc - 1                           # If %Pdi will still be used, it must be re-aligned
  * >> #if cg_buf_paramv[INDEX].HAS_FIXED_BUFFER_SIZE
- * >> #if !IS_ALIGNED(cg_buf_paramv[INDEX].FIXED_BUFFER_SIZE, sizeof(void *))
- * >>     addP   $<sizeof(void *) - (cg_buf_paramv[INDEX].FIXED_BUFFER_SIZE & (sizeof(void *) - 1))>, %Pdi
- * >> #endif // !IS_ALIGNED(cg_buf_paramv[INDEX].FIXED_BUFFER_SIZE, sizeof(void *))
+ * >> #if !IS_ALIGNED(cg_buf_paramv[INDEX].FIXED_BUFFER_SIZE, SIZEOF_POINTER)
+ * >>     addP   $<SIZEOF_POINTER - (cg_buf_paramv[INDEX].FIXED_BUFFER_SIZE & (SIZEOF_POINTER - 1))>, %Pdi
+ * >> #endif // !IS_ALIGNED(cg_buf_paramv[INDEX].FIXED_BUFFER_SIZE, SIZEOF_POINTER)
  * >> #else // cg_buf_paramv[INDEX].HAS_FIXED_BUFFER_SIZE
- * >>     addP   $<sizeof(void *)-1>,    %Pdi
- * >>     andP   $<~(sizeof(void *)-1)>, %Pdi
+ * >>     addP   $<SIZEOF_POINTER-1>,    %Pdi
+ * >>     andP   $<~(SIZEOF_POINTER-1)>, %Pdi
  * >> #endif // !cg_buf_paramv[INDEX].HAS_FIXED_BUFFER_SIZE
  * >> #endif // INDEX != cg_paramc - 1
  * >> 1:
@@ -1373,14 +1378,14 @@ NOTHROW(FCALL comgen_serialize_buffer_arguments_n)(struct com_generator *__restr
 		if (self->cg_buf_paramv[i].cbp_flags & COM_BUFFER_PARAM_FFIXED) {
 			uint16_t fixed_size;
 			fixed_size = self->cg_info.dl_params[self->cg_buf_paramv[i].cbp_param_index] & _SERVICE_TYPE_PARAMMASK;
-			fixed_size = CEIL_ALIGN(fixed_size, sizeof(void *));
+			fixed_size = CEIL_ALIGN(fixed_size, SIZEOF_POINTER);
 			/* >>     addP   ..., %R_temp_exbuf_size  # Account for required buffer size (depending on buffer type)
-			 * >>                                     # NOTE: The buffer size calculated here must be ceil-aligned by sizeof(void *) */
+			 * >>                                     # NOTE: The buffer size calculated here must be ceil-aligned by SIZEOF_POINTER */
 			comgen_instr(self, gen86_addP_imm_r(&self->cg_txptr, fixed_size, GEN86_R_temp_exbuf_size));
 		} else {
 			service_typeid_t param_typ;
 			/* >>     addP   ..., %R_temp_exbuf_size  # Account for required buffer size (depending on buffer type)
-			 * >>                                     # NOTE: The buffer size calculated here must be ceil-aligned by sizeof(void *),
+			 * >>                                     # NOTE: The buffer size calculated here must be ceil-aligned by SIZEOF_POINTER,
 			 * >>                                     #       unless INDEX == self->cg_buf_paramc - 1, in which case this alignment
 			 * >>                                     #       is optional.
 			 * >>                                     # Allowed to clobber: %Pax, %Pcx, %Pdx, %Pdi (on i386, %Psi must be preserved!) */
@@ -1424,8 +1429,8 @@ NOTHROW(FCALL comgen_serialize_buffer_arguments_n)(struct com_generator *__restr
 
 			/* Re-align the required buffer size. */
 			if (i != self->cg_buf_paramc - 1) {
-				comgen_instr(self, gen86_addP_imm_r(&self->cg_txptr, sizeof(void *) - 1, GEN86_R_temp_exbuf_size));
-				comgen_instr(self, gen86_andP_imm_r(&self->cg_txptr, ~(sizeof(void *) - 1), GEN86_R_temp_exbuf_size));
+				comgen_instr(self, gen86_addP_imm_r(&self->cg_txptr, SIZEOF_POINTER - 1, GEN86_R_temp_exbuf_size));
+				comgen_instr(self, gen86_andP_imm_r(&self->cg_txptr, ~(SIZEOF_POINTER - 1), GEN86_R_temp_exbuf_size));
 			}
 		}
 
@@ -1632,17 +1637,17 @@ NOTHROW(FCALL comgen_serialize_buffer_arguments_n)(struct com_generator *__restr
 				if (self->cg_buf_paramv[i].cbp_flags & COM_BUFFER_PARAM_FFIXED) {
 					uint16_t fixed_size;
 					fixed_size = self->cg_info.dl_params[self->cg_buf_paramv[i].cbp_param_index] & _SERVICE_TYPE_PARAMMASK;
-					if (!IS_ALIGNED(fixed_size, sizeof(void *))) {
-						uint8_t align = sizeof(void *) - (fixed_size & (sizeof(void *) - 1));
-						/* >>     addP   $<sizeof(void *) - (cg_buf_paramv[INDEX].FIXED_BUFFER_SIZE & (sizeof(void *) - 1))>, %Pdi */
+					if (!IS_ALIGNED(fixed_size, SIZEOF_POINTER)) {
+						uint8_t align = SIZEOF_POINTER - (fixed_size & (SIZEOF_POINTER - 1));
+						/* >>     addP   $<SIZEOF_POINTER - (cg_buf_paramv[INDEX].FIXED_BUFFER_SIZE & (SIZEOF_POINTER - 1))>, %Pdi */
 						comgen_instr(self, gen86_addP_imm_r(&self->cg_txptr, align, GEN86_R_PDI));
 					}
 				} else {
-					/* >>     addP   $<sizeof(void *)-1>,    %Pdi */
-					comgen_instr(self, gen86_addP_imm_r(&self->cg_txptr, sizeof(void *) - 1, GEN86_R_PDI));
+					/* >>     addP   $<SIZEOF_POINTER-1>,    %Pdi */
+					comgen_instr(self, gen86_addP_imm_r(&self->cg_txptr, SIZEOF_POINTER - 1, GEN86_R_PDI));
 
-					/* >>     andP   $<~(sizeof(void *)-1)>, %Pdi */
-					comgen_instr(self, gen86_andP_imm_r(&self->cg_txptr, ~(sizeof(void *) - 1), GEN86_R_PDI));
+					/* >>     andP   $<~(SIZEOF_POINTER-1)>, %Pdi */
+					comgen_instr(self, gen86_andP_imm_r(&self->cg_txptr, ~(SIZEOF_POINTER - 1), GEN86_R_PDI));
 				}
 			}
 
@@ -1733,7 +1738,7 @@ NOTHROW(FCALL comgen_serialize_buffer_arguments)(struct com_generator *__restric
 PRIVATE NONNULL((1)) void
 NOTHROW(FCALL comgen_output_movsP_times_n)(struct com_generator *__restrict self,
                                            uint8_t n) {
-	comgen_memcpy_with_rep_movs(self, n * sizeof(void *));
+	comgen_memcpy_with_rep_movs(self, n * SIZEOF_POINTER);
 }
 
 /* Generate    instructions:
@@ -1760,7 +1765,7 @@ NOTHROW(FCALL comgen_output_movsP_times_n)(struct com_generator *__restrict self
  * >>     addP   $(<cip_param_offset - _GENERATOR_VAR_Psi_offset>), %Psi # Or subP
  * >> #endif
  * >>     lodsP
- * >> #set _GENERATOR_VAR_Psi_offset += sizeof(void *)
+ * >> #set _GENERATOR_VAR_Psi_offset += SIZEOF_POINTER
  * >> #else // COM_GENERATOR_FEATURE_INT_PARAMS_USE_LODS
  * >>     movP   <cip_param_offset>(%Psp), %Pax
  * >> #endif // !COM_GENERATOR_FEATURE_INT_PARAMS_USE_LODS
@@ -1771,7 +1776,7 @@ NOTHROW(FCALL comgen_output_movsP_times_n)(struct com_generator *__restrict self
  * >>     addP   $(<cip_serial_offset - _GENERATOR_VAR_Pdi_offset>), %Pdi # Or subP
  * >> #endif
  * >>     stosP
- * >> #set _GENERATOR_VAR_Pdi_offset += sizeof(void *)
+ * >> #set _GENERATOR_VAR_Pdi_offset += SIZEOF_POINTER
  * >> #else // COM_GENERATOR_FEATURE_INT_PARAMS_USE_STOS
  * >>     movP   %Pax, <cip_serial_offset>(%R_service_com)
  * >> #endif // !COM_GENERATOR_FEATURE_INT_PARAMS_USE_STOS
@@ -1797,7 +1802,7 @@ NOTHROW(FCALL comgen_serialize_integer_arguments)(struct com_generator *__restri
 		       self->cg_intpar[i + num_consecutive].cip_param_offset == param.cip_param_offset + num_consecutive * SIZEOF_POINTER &&
 		       self->cg_intpar[i + num_consecutive].cip_serial_offset == param.cip_serial_offset + num_consecutive * SIZEOF_POINTER)
 			++num_consecutive;
-		/* At this point, essentially generate code to copy `num_consecutive * sizeof(void *)'
+		/* At this point, essentially generate code to copy `num_consecutive * SIZEOF_POINTER'
 		 * bytes  of   memory  from   `param.cip_param_offset'  to   `param.cip_serial_offset' */
 		spoffset = self->cg_cfa_offset + param.cip_param_offset;
 		if (self->cg_features & (COM_GENERATOR_FEATURE_INT_PARAMS_USE_LODS |
@@ -1908,8 +1913,8 @@ do_word_wise_copy:
 				comgen_instr(self, gen86_movP_db_r(&self->cg_txptr, spoffset, GEN86_R_PSP, GEN86_R_PAX));
 				/* >> movP   %Pax, <param.cip_serial_offset>(%R_service_com) */
 				comgen_instr(self, gen86_movP_r_db(&self->cg_txptr, GEN86_R_PAX, param.cip_serial_offset, GEN86_R_service_com));
-				spoffset += sizeof(void *);
-				param.cip_serial_offset += sizeof(void *);
+				spoffset += SIZEOF_POINTER;
+				param.cip_serial_offset += SIZEOF_POINTER;
 			}
 		}
 		i += num_consecutive;
@@ -2041,25 +2046,25 @@ NOTHROW(FCALL comgen_serialize_inline_buffers)(struct com_generator *__restrict 
 
 
 /* Generate instructions:
- * >>     # Atomically insert the new command into the list
- * >>     # HINT: At this point, %Pdx == (%R_service_com - service_shm_handle::ssh_shm(%R_service_shm_handle))
- * >>     movP   service_shm_handle::ssh_shm(%R_service_shm_handle), %Pcx
- * >>     movP   service_shm::s_commands(%Pcx), %Pax
+ * >>     movP   service_shm::s_commands(%R_shmbase), %Pax
  * >> 1:  movP   %Pax, service_com::sc_link(%R_service_com)
- * >>     lock   cmpxchgP %Pdx, service_shm::s_commands(%Pcx)
- * >>     jne    1b */
+ * >>     lock   cmpxchgP %Pdx, service_shm::s_commands(%R_shmbase)
+ * >>     jne    1b
+ * >> .Leh_com_waitfor_begin: */
+#ifdef __x86_64__
 PRIVATE NONNULL((1)) void
-NOTHROW(FCALL comgen_schedule_command)(struct com_generator *__restrict self) {
+NOTHROW(FCALL comgen_schedule_command)(struct com_generator *__restrict self,
+                                       uint8_t GEN86_R_shmbase)
+#else /* __x86_64__ */
+PRIVATE NONNULL((1)) void
+NOTHROW(FCALL comgen_schedule_command)(struct com_generator *__restrict self)
+#endif /* !__x86_64__ */
+{
 	byte_t *loc_1;
-	/* >> movP   service_shm_handle::ssh_shm(%R_service_shm_handle), %Pcx */
-	comgen_instr(self, gen86_movP_db_r(&self->cg_txptr,
-	                                   offsetof(struct service_shm_handle, ssh_shm),
-	                                   GEN86_R_service_shm_handle, GEN86_R_PCX));
-
-	/* >> movP   service_shm::s_commands(%Pcx), %Pax */
+	/* >> movP   service_shm::s_commands(%R_shmbase), %Pax */
 	comgen_instr(self, gen86_movP_db_r(&self->cg_txptr,
 	                                   offsetof(struct service_shm, s_commands),
-	                                   GEN86_R_PCX, GEN86_R_PAX));
+	                                   GEN86_R_shmbase, GEN86_R_PAX));
 
 	/* >> 1: */
 	loc_1 = self->cg_txptr;
@@ -2069,14 +2074,17 @@ NOTHROW(FCALL comgen_schedule_command)(struct com_generator *__restrict self) {
 	                                   offsetof(struct service_com, sc_link),
 	                                   GEN86_R_service_com));
 
-	/* >> lock   cmpxchgP %Pdx, service_shm::s_commands(%Pcx) */
+	/* >> lock   cmpxchgP %Pdx, service_shm::s_commands(%R_shmbase) */
 	comgen_instr(self, gen86_lock(&self->cg_txptr));
 	gen86_cmpxchgP_r_mod(&self->cg_txptr, gen86_modrm_db, GEN86_R_PDX,
 	                     offsetof(struct service_com, sc_link),
-	                     GEN86_R_service_com);
+	                     GEN86_R_shmbase);
 
 	/* >> jne    1b */
 	comgen_instr(self, gen86_jcc8(&self->cg_txptr, GEN86_CC_NE, loc_1));
+
+	/* >> .Leh_com_waitfor_begin: */
+	comgen_defsym(self, COM_SYM_Leh_com_waitfor_begin);
 }
 
 
@@ -2152,7 +2160,7 @@ PRIVATE struct com_eh_frame const eh_frame_pattern = {
 	.cef_fde_cie_off   = offsetof(struct com_eh_frame, cef_fde_cie_off),
 	.cef_fde_funbase   = NULL, /* Dynamically filled */
 	.cef_fde_funsize   = 0,    /* Dynamically filled */
-	.cef_fde_auglen    = sizeof(void *),
+	.cef_fde_auglen    = SIZEOF_POINTER,
 	.cef_fde_lsda      = NULL, /* Dynamically filled */
 };
 
@@ -2211,6 +2219,10 @@ NOTHROW(FCALL comgen_eh_frame_finish)(struct com_generator *__restrict self) {
  *       other threads from accessing incomplete debug information! */
 INTERN NOBLOCK WUNUSED NONNULL((1)) bool
 NOTHROW(FCALL comgen_compile)(struct com_generator *__restrict self) {
+#ifdef __x86_64__
+	uint8_t GEN86_R_shmbase;
+#endif /* __x86_64__ */
+
 	/* Assert that the given buffer meets the minimum size requirements. */
 	assert((size_t)(self->cg_txend - self->cg_txbas) >= COM_GENERATOR_INITIAL_TX_BUFSIZ);
 	assert((size_t)(self->cg_ehend - self->cg_ehbas) >= COM_GENERATOR_INITIAL_EH_BUFSIZ);
@@ -2218,7 +2230,7 @@ NOTHROW(FCALL comgen_compile)(struct com_generator *__restrict self) {
 	self->cg_nrelocs    = 0;
 	self->cg_CFA_loc    = self->cg_txptr;
 	comgen_eh_frame_setup(self);
-	comgen_eh_DW_CFA_def_cfa(self, CFI_X86_UNWIND_REGISTER_PSP, sizeof(void *));
+	comgen_eh_DW_CFA_def_cfa(self, CFI_X86_UNWIND_REGISTER_PSP, SIZEOF_POINTER);
 
 	/* Generate the unconditional push instructions at the start of the wrapper. */
 	comgen_push_registers_on_entry(self);
@@ -2246,24 +2258,48 @@ NOTHROW(FCALL comgen_compile)(struct com_generator *__restrict self) {
 	                  offsetof(struct service_com, sc_code),
 	                  GEN86_R_service_com);
 
+#ifdef __x86_64__
+	/* On i386, `%R_shmbase' is '%Pbx'. On x86_64, `%R_shmbase' is:
+	 * (cg_inline_buf_paramc && COM_GENERATOR_FEATURE_INLINE_BUFFERS_MOVS) ? '%r8' : '%Pdi' */
+	GEN86_R_shmbase = GEN86_R_PDI;
+	if (self->cg_inline_buf_paramc != 0 &&
+	    (self->cg_features & COM_GENERATOR_FEATURE_INLINE_BUFFERS_MOVS))
+		GEN86_R_shmbase = GEN86_R_R8;
+#endif /* __x86_64__ */
+
 	/* Calculate the SHM-relative address of `service_com' */
 	/* >> movP   %R_service_com, %Pdx */
 	if unlikely(!comgen_txok1(self))
 		goto fail;
 	gen86_movP_r_r(&self->cg_txptr, GEN86_R_service_com, GEN86_R_PDX);
 
-	/* >> subP   service_shm_handle::ssh_shm(%R_service_shm_handle), %Pdx */
+	/* >>     movP   LOC_shm(%Psp), %R_shmbase */
 	if unlikely(!comgen_txok1(self))
 		goto fail;
-	gen86_subP_mod_r(&self->cg_txptr, gen86_modrm_db, GEN86_R_PDX,
-	                 offsetof(struct service_shm_handle, ssh_shm),
-	                 GEN86_R_service_shm_handle);
+	gen86_movP_db_r(&self->cg_txptr, comgen_spoffsetof_LOC_shm(self),
+	                GEN86_R_PSP, GEN86_R_shmbase);
+
+	/* >>     movP   service_shm_handle::ssh_shm(%R_shmbase), %R_shmbase */
+	if unlikely(!comgen_txok1(self))
+		goto fail;
+	gen86_movP_db_r(&self->cg_txptr,
+	                offsetof(struct service_shm_handle, ssh_shm),
+	                GEN86_R_shmbase, GEN86_R_shmbase);
+
+	/* >>     subP   %R_shmbase, %Pdx */
+	if unlikely(!comgen_txok1(self))
+		goto fail;
+	gen86_subP_r_r(&self->cg_txptr, GEN86_R_shmbase, GEN86_R_PDX);
 
 	/* Serialize fixed-length inline buffers */
 	comgen_serialize_inline_buffers(self);
 
 	/* Insert the command into the server's pending list */
+#ifdef __x86_64__
+	comgen_schedule_command(self, GEN86_R_shmbase);
+#else /* __x86_64__ */
 	comgen_schedule_command(self);
+#endif /* !__x86_64__ */
 
 
 	/* TODO: All of the stuff that's missing */
