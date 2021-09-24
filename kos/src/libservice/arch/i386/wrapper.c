@@ -89,12 +89,12 @@ compar_com_inline_buffer_param(void const *_a, void const *_b) {
 	if ((a->cibp_flags & _MASK) > (b->cibp_flags & _MASK))
 		return 1; /* Greater than */
 
-	/* Non-pointer-aligned buffer sizes go after those that are  pointer-aligned.
-	 * That way, the number of buffers following those which leave %Pdi unaligned
-	 * may be reduced by 1. */
+	/* Non-aligned buffer sizes go after those that are pointer-aligned.
+	 * That  way, the number of buffers following those which leave %Pdi
+	 * unaligned may be reduced by 1. */
 	{
-		bool is_a_aligned = IS_ALIGNED(a->cibp_sizeof, SIZEOF_POINTER);
-		bool is_b_aligned = IS_ALIGNED(b->cibp_sizeof, SIZEOF_POINTER);
+		bool is_a_aligned = IS_ALIGNED(a->cibp_sizeof, SERVICE_BUFFER_ALIGNMENT);
+		bool is_b_aligned = IS_ALIGNED(b->cibp_sizeof, SERVICE_BUFFER_ALIGNMENT);
 		if (is_a_aligned && !is_b_aligned)
 			return -1; /* Less than */
 		if (!is_a_aligned && is_b_aligned)
@@ -427,8 +427,8 @@ done_params:
 
 	/* Assign `self->cg_inline_buf_paramv[*].cibp_buffer_offset' */
 	for (i = 0; i < self->cg_inline_buf_paramc; ++i) {
-		/* Inline buffers are always pointer-aligned. */
-		serial_offset = CEIL_ALIGN(serial_offset, SIZEOF_POINTER);
+		/* Inline buffers are always aligned. */
+		serial_offset = CEIL_ALIGN(serial_offset, SERVICE_BUFFER_ALIGNMENT);
 		self->cg_inline_buf_paramv[i].cibp_buffer_offset = serial_offset;
 		serial_offset += self->cg_inline_buf_paramv[i].cibp_sizeof;
 	}
@@ -1228,7 +1228,7 @@ NOTHROW(FCALL comgen_serialize_buffer_arguments_1)(struct com_generator *__restr
  * >> 1:  # NOTE: When only 1 buffer argument exists, %R_temp_exbuf_size isn't
  * >>     #       used and the allocated+initialization is done inline.
  * >>     addP   ..., %R_temp_exbuf_size  # Account for required buffer size (depending on buffer type)
- * >>                                     # NOTE: The buffer size calculated here must be ceil-aligned by SIZEOF_POINTER,
+ * >>                                     # NOTE: The buffer size calculated here must be ceil-aligned by SERVICE_BUFFER_ALIGNMENT,
  * >>                                     #       unless INDEX == self->cg_buf_paramc - 1, in which case this alignment
  * >>                                     #       is optional.
  * >>                                     # Allowed to clobber: %Pax, %Pcx, %Pdx, %Pdi (on i386, %Psi must be preserved!)
@@ -1287,12 +1287,12 @@ NOTHROW(FCALL comgen_serialize_buffer_arguments_1)(struct com_generator *__restr
  * >>     rep    movsb                                     # Copy input buffers into SHM
  * >> #if INDEX != cg_paramc - 1                           # If %Pdi will still be used, it must be re-aligned
  * >> #if cg_buf_paramv[INDEX].HAS_FIXED_BUFFER_SIZE
- * >> #if !IS_ALIGNED(cg_buf_paramv[INDEX].FIXED_BUFFER_SIZE, SIZEOF_POINTER)
- * >>     addP   $<SIZEOF_POINTER - (cg_buf_paramv[INDEX].FIXED_BUFFER_SIZE & (SIZEOF_POINTER - 1))>, %Pdi
- * >> #endif // !IS_ALIGNED(cg_buf_paramv[INDEX].FIXED_BUFFER_SIZE, SIZEOF_POINTER)
+ * >> #if !IS_ALIGNED(cg_buf_paramv[INDEX].FIXED_BUFFER_SIZE, SERVICE_BUFFER_ALIGNMENT)
+ * >>     addP   $<SERVICE_BUFFER_ALIGNMENT - (cg_buf_paramv[INDEX].FIXED_BUFFER_SIZE & (SERVICE_BUFFER_ALIGNMENT - 1))>, %Pdi
+ * >> #endif // !IS_ALIGNED(cg_buf_paramv[INDEX].FIXED_BUFFER_SIZE, SERVICE_BUFFER_ALIGNMENT)
  * >> #else // cg_buf_paramv[INDEX].HAS_FIXED_BUFFER_SIZE
- * >>     addP   $<SIZEOF_POINTER-1>,    %Pdi
- * >>     andP   $<~(SIZEOF_POINTER-1)>, %Pdi
+ * >>     addP   $<SERVICE_BUFFER_ALIGNMENT-1>,    %Pdi
+ * >>     andP   $<~(SERVICE_BUFFER_ALIGNMENT-1)>, %Pdi
  * >> #endif // !cg_buf_paramv[INDEX].HAS_FIXED_BUFFER_SIZE
  * >> #endif // INDEX != cg_paramc - 1
  * >> 1:
@@ -1380,14 +1380,14 @@ NOTHROW(FCALL comgen_serialize_buffer_arguments_n)(struct com_generator *__restr
 		if (self->cg_buf_paramv[i].cbp_flags & COM_BUFFER_PARAM_FFIXED) {
 			uint16_t fixed_size;
 			fixed_size = self->cg_info.dl_params[self->cg_buf_paramv[i].cbp_param_index] & _SERVICE_TYPE_PARAMMASK;
-			fixed_size = CEIL_ALIGN(fixed_size, SIZEOF_POINTER);
+			fixed_size = CEIL_ALIGN(fixed_size, SERVICE_BUFFER_ALIGNMENT);
 			/* >>     addP   ..., %R_temp_exbuf_size  # Account for required buffer size (depending on buffer type)
-			 * >>                                     # NOTE: The buffer size calculated here must be ceil-aligned by SIZEOF_POINTER */
+			 * >>                                     # NOTE: The buffer size calculated here must be ceil-aligned by SERVICE_BUFFER_ALIGNMENT */
 			comgen_instr(self, gen86_addP_imm_r(&self->cg_txptr, fixed_size, GEN86_R_temp_exbuf_size));
 		} else {
 			service_typeid_t param_typ;
 			/* >>     addP   ..., %R_temp_exbuf_size  # Account for required buffer size (depending on buffer type)
-			 * >>                                     # NOTE: The buffer size calculated here must be ceil-aligned by SIZEOF_POINTER,
+			 * >>                                     # NOTE: The buffer size calculated here must be ceil-aligned by SERVICE_BUFFER_ALIGNMENT,
 			 * >>                                     #       unless INDEX == self->cg_buf_paramc - 1, in which case this alignment
 			 * >>                                     #       is optional.
 			 * >>                                     # Allowed to clobber: %Pax, %Pcx, %Pdx, %Pdi (on i386, %Psi must be preserved!) */
@@ -1431,8 +1431,8 @@ NOTHROW(FCALL comgen_serialize_buffer_arguments_n)(struct com_generator *__restr
 
 			/* Re-align the required buffer size. */
 			if (i != self->cg_buf_paramc - 1) {
-				comgen_instr(self, gen86_addP_imm_r(&self->cg_txptr, SIZEOF_POINTER - 1, GEN86_R_temp_exbuf_size));
-				comgen_instr(self, gen86_andP_imm_r(&self->cg_txptr, ~(SIZEOF_POINTER - 1), GEN86_R_temp_exbuf_size));
+				comgen_instr(self, gen86_addP_imm_r(&self->cg_txptr, SERVICE_BUFFER_ALIGNMENT - 1, GEN86_R_temp_exbuf_size));
+				comgen_instr(self, gen86_andP_imm_r(&self->cg_txptr, ~(SERVICE_BUFFER_ALIGNMENT - 1), GEN86_R_temp_exbuf_size));
 			}
 		}
 
@@ -1639,17 +1639,17 @@ NOTHROW(FCALL comgen_serialize_buffer_arguments_n)(struct com_generator *__restr
 				if (self->cg_buf_paramv[i].cbp_flags & COM_BUFFER_PARAM_FFIXED) {
 					uint16_t fixed_size;
 					fixed_size = self->cg_info.dl_params[self->cg_buf_paramv[i].cbp_param_index] & _SERVICE_TYPE_PARAMMASK;
-					if (!IS_ALIGNED(fixed_size, SIZEOF_POINTER)) {
-						uint8_t align = SIZEOF_POINTER - (fixed_size & (SIZEOF_POINTER - 1));
-						/* >>     addP   $<SIZEOF_POINTER - (cg_buf_paramv[INDEX].FIXED_BUFFER_SIZE & (SIZEOF_POINTER - 1))>, %Pdi */
+					if (!IS_ALIGNED(fixed_size, SERVICE_BUFFER_ALIGNMENT)) {
+						uint8_t align = SERVICE_BUFFER_ALIGNMENT - (fixed_size & (SERVICE_BUFFER_ALIGNMENT - 1));
+						/* >>     addP   $<SERVICE_BUFFER_ALIGNMENT - (cg_buf_paramv[INDEX].FIXED_BUFFER_SIZE & (SERVICE_BUFFER_ALIGNMENT - 1))>, %Pdi */
 						comgen_instr(self, gen86_addP_imm_r(&self->cg_txptr, align, GEN86_R_PDI));
 					}
 				} else {
-					/* >>     addP   $<SIZEOF_POINTER-1>,    %Pdi */
-					comgen_instr(self, gen86_addP_imm_r(&self->cg_txptr, SIZEOF_POINTER - 1, GEN86_R_PDI));
+					/* >>     addP   $<SERVICE_BUFFER_ALIGNMENT-1>,    %Pdi */
+					comgen_instr(self, gen86_addP_imm_r(&self->cg_txptr, SERVICE_BUFFER_ALIGNMENT - 1, GEN86_R_PDI));
 
-					/* >>     andP   $<~(SIZEOF_POINTER-1)>, %Pdi */
-					comgen_instr(self, gen86_andP_imm_r(&self->cg_txptr, ~(SIZEOF_POINTER - 1), GEN86_R_PDI));
+					/* >>     andP   $<~(SERVICE_BUFFER_ALIGNMENT-1)>, %Pdi */
+					comgen_instr(self, gen86_andP_imm_r(&self->cg_txptr, ~(SERVICE_BUFFER_ALIGNMENT - 1), GEN86_R_PDI));
 				}
 			}
 
@@ -2189,6 +2189,7 @@ NOTHROW(FCALL comgen_do_syscall)(struct com_generator *__restrict self) {
 }
 
 
+
 /* Generate instructions:
  * >>     movP   $SYS_lfutex, %Pax
  * >> #ifdef __x86_64__
@@ -2257,6 +2258,7 @@ NOTHROW(FCALL comgen_wake_server)(struct com_generator *__restrict self)
 	/* Invoke the system call. */
 	comgen_do_syscall(self);
 }
+
 
 
 /* Generate instructions:
@@ -2340,6 +2342,7 @@ NOTHROW(FCALL comgen_waitfor_command)(struct com_generator *__restrict self) {
 	/* >> .Leh_com_waitfor_end: */
 	comgen_defsym(self, COM_SYM_Leh_com_waitfor_end);
 }
+
 
 
 /* Generate instructions:
@@ -2672,6 +2675,8 @@ NOTHROW(FCALL comgen_compile)(struct com_generator *__restrict self) {
 
 	/* Serialize fixed-length inline buffers */
 	comgen_serialize_inline_buffers(self);
+	if unlikely(!comgen_txok1(self))
+		goto fail;
 
 	/* Insert the command into the server's pending list */
 #ifdef __x86_64__
@@ -2679,6 +2684,8 @@ NOTHROW(FCALL comgen_compile)(struct com_generator *__restrict self) {
 #else /* __x86_64__ */
 	comgen_schedule_command(self);
 #endif /* !__x86_64__ */
+	if unlikely(!comgen_txok1(self))
+		goto fail;
 
 	/* Tell the server that a new command has become available */
 #ifdef __x86_64__
@@ -2686,12 +2693,23 @@ NOTHROW(FCALL comgen_compile)(struct com_generator *__restrict self) {
 #else /* __x86_64__ */
 	comgen_wake_server(self);
 #endif /* !__x86_64__ */
+	if unlikely(!comgen_txok1(self))
+		goto fail;
 
 	/* Wait for the command to complete */
 	comgen_waitfor_command(self);
+	if unlikely(!comgen_txok1(self))
+		goto fail;
 
 	/* Deserialize fixed-length inline buffers */
 	comgen_deserialize_inline_buffers(self);
+	if unlikely(!comgen_txok1(self))
+		goto fail;
+
+	/* Copy out-of-band inout/out buffers back into user-provided storage */
+	comgen_deserialize_buffer_arguments(self);
+	if unlikely(!comgen_txok1(self))
+		goto fail;
 
 	/* TODO: All of the stuff that's missing */
 	(void)self;

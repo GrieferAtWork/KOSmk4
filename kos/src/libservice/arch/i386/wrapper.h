@@ -162,7 +162,7 @@ STATIC_ASSERT(IS_ALIGNED(offsetof(struct service_com, sc_generic.g_data), 4));
  * #ifndef __x86_64__
  *    + PARAM_COUNT_OF(SERVICE_TYPE_386_R64) * sizeof(uintptr_t)  # On i386, 64-bit arguments take 2 serial words
  * #endif // !__x86_64__
- *    + SUM(cg_inline_buf_paramv.each.buffer_size.ceil_align(sizeof(void *))) # Inline buffers are allocated within com
+ *    + SUM(cg_inline_buf_paramv.each.buffer_size.ceil_align(SERVICE_BUFFER_ALIGNMENT)) # Inline buffers are allocated within com
  * Afterwards, apply the size requirements detailed in `libservice_shmbuf_alloc_nopr()'
  * to the calculated size to generate the effective allocation size. The unadjusted
  * value is stored in `cg_sizeof_service_com'
@@ -379,7 +379,7 @@ STATIC_ASSERT(IS_ALIGNED(offsetof(struct service_com, sc_generic.g_data), 4));
  * >> 1:  # NOTE: When only 1 buffer argument exists, %R_temp_exbuf_size isn't
  * >>     #       used and the allocated+initialization is done inline.
  * >>     addP   ..., %R_temp_exbuf_size  # Account for required buffer size (depending on buffer type)
- * >>                                     # NOTE: The buffer size calculated here must be ceil-aligned by sizeof(void *),
+ * >>                                     # NOTE: The buffer size calculated here must be ceil-aligned by SERVICE_BUFFER_ALIGNMENT,
  * >>                                     #       unless INDEX == self->cg_buf_paramc - 1, in which case this alignment
  * >>                                     #       is optional.
  * >>                                     # Allowed to clobber: %Pax, %Pcx, %Pdx, %Pdi (on i386, %Psi must be preserved!)
@@ -438,12 +438,12 @@ STATIC_ASSERT(IS_ALIGNED(offsetof(struct service_com, sc_generic.g_data), 4));
  * >>     rep    movsb                                     # Copy input buffers into SHM
  * >> #if INDEX != cg_paramc - 1                           # If %Pdi will still be used, it must be re-aligned
  * >> #if cg_buf_paramv[INDEX].HAS_FIXED_BUFFER_SIZE
- * >> #if !IS_ALIGNED(cg_buf_paramv[INDEX].FIXED_BUFFER_SIZE, sizeof(void *))
- * >>     addP   $<sizeof(void *) - (cg_buf_paramv[INDEX].FIXED_BUFFER_SIZE & (sizeof(void *) - 1))>, %Pdi
- * >> #endif // !IS_ALIGNED(cg_buf_paramv[INDEX].FIXED_BUFFER_SIZE, sizeof(void *))
+ * >> #if !IS_ALIGNED(cg_buf_paramv[INDEX].FIXED_BUFFER_SIZE, SERVICE_BUFFER_ALIGNMENT)
+ * >>     addP   $<SERVICE_BUFFER_ALIGNMENT - (cg_buf_paramv[INDEX].FIXED_BUFFER_SIZE & (SERVICE_BUFFER_ALIGNMENT - 1))>, %Pdi
+ * >> #endif // !IS_ALIGNED(cg_buf_paramv[INDEX].FIXED_BUFFER_SIZE, SERVICE_BUFFER_ALIGNMENT)
  * >> #else // cg_buf_paramv[INDEX].HAS_FIXED_BUFFER_SIZE
- * >>     addP   $<sizeof(void *)-1>,    %Pdi
- * >>     andP   $<~(sizeof(void *)-1)>, %Pdi
+ * >>     addP   $<SERVICE_BUFFER_ALIGNMENT-1>,    %Pdi
+ * >>     andP   $<~(SERVICE_BUFFER_ALIGNMENT-1)>, %Pdi
  * >> #endif // !cg_buf_paramv[INDEX].HAS_FIXED_BUFFER_SIZE
  * >> #endif // INDEX != cg_paramc - 1
  * >> 1:
@@ -667,7 +667,7 @@ STATIC_ASSERT(IS_ALIGNED(offsetof(struct service_com, sc_generic.g_data), 4));
  * >> #if cg_inbuf_paramc != 0
  * >> #if COM_GENERATOR_FEATURE_IN_BUFFERS_FIXLEN
  * >>     movP   LOC_bufpar_ptr(%Psp), %Psi
- * >>     addP   $<SUM(IN_BUFFERS.each.FIXED_BUFFER_SIZE.ceil_align(sizeof(void *))>, %Psi
+ * >>     addP   $<SUM(IN_BUFFERS.each.FIXED_BUFFER_SIZE.ceil_align(SERVICE_BUFFER_ALIGNMENT)>, %Psi
  * >> #else // COM_GENERATOR_FEATURE_IN_BUFFERS_FIXLEN
  * >>     movP   LOC_outbuffers_start(%Psp), %Psi
  * >> #endif // !COM_GENERATOR_FEATURE_IN_BUFFERS_FIXLEN
@@ -686,12 +686,12 @@ STATIC_ASSERT(IS_ALIGNED(offsetof(struct service_com, sc_generic.g_data), 4));
  * >>     rep    movsb
  * >> #if INDEX != cg_buf_paramc -1
  * >> #if cg_buf_paramv[INDEX].HAS_FIXED_BUFFER_SIZE
- * >> #if !IS_ALIGNED(cg_buf_paramv[INDEX].FIXED_BUFFER_SIZE, sizeof(void *))
- * >>     addP   $<sizeof(void *) - (cg_buf_paramv[INDEX].FIXED_BUFFER_SIZE & (sizeof(void *) - 1))>, %Psi   # Re-align by pointer size
- * >> #endif // !IS_ALIGNED(cg_buf_paramv[INDEX].FIXED_BUFFER_SIZE, sizeof(void *))
+ * >> #if !IS_ALIGNED(cg_buf_paramv[INDEX].FIXED_BUFFER_SIZE, SERVICE_BUFFER_ALIGNMENT)
+ * >>     addP   $<SERVICE_BUFFER_ALIGNMENT - (cg_buf_paramv[INDEX].FIXED_BUFFER_SIZE & (SERVICE_BUFFER_ALIGNMENT - 1))>, %Psi   # Re-align by pointer size
+ * >> #endif // !IS_ALIGNED(cg_buf_paramv[INDEX].FIXED_BUFFER_SIZE, SERVICE_BUFFER_ALIGNMENT)
  * >> #else // cg_buf_paramv[INDEX].HAS_FIXED_BUFFER_SIZE
- * >>     addP   $<sizeof(void *)-1>,    %Psi   # Re-align by pointer size
- * >>     andP   $<~(sizeof(void *)-1)>, %Psi   # *ditto*
+ * >>     addP   $<SERVICE_BUFFER_ALIGNMENT-1>,    %Psi   # Re-align by pointer size
+ * >>     andP   $<~(SERVICE_BUFFER_ALIGNMENT-1)>, %Psi   # *ditto*
  * >> #endif // !cg_buf_paramv[INDEX].HAS_FIXED_BUFFER_SIZE
  * >> #endif // INDEX != cg_buf_paramc -1
  * >> 1:

@@ -50,12 +50,12 @@
 	(0x010000 | (in_sizearg_index))
 
 /* Flag for `sizearg_index' in `SERVICE_TYPE_ARGBUF_OUT'
- * and `SERVICE_TYPE_ARGBUF_INOUT' to specify that the
- * function's return value represents may be used to
+ * and `SERVICE_TYPE_ARGBUF_INOUT' to  specify that  the
+ * function's  return  value represents  may be  used to
  * indicate an upper bound on output buffer size.
  *
  * As such, the buffer size potentially copied back to
- * the caller is `MIN(return, PARAMS[sizearg_index])' */
+ * the caller is  `MIN(return, PARAMS[sizearg_index])' */
 #define SERVICE_OUT_SIZEARG_RETURN_MINVAL 0x8000
 
 /* [TYPE(void *)] Output buffer (with size argument)
@@ -78,6 +78,22 @@
  * a  `SERVICE_TYPE_FIXBUF_IN()' argument referring to some sort
  * of buffer struct. */
 #define SERVICE_ARGC_MAX 8
+
+
+/* Minimum guarantied alignment for out-of-band buffers.
+ *
+ * Generally speaking, this is the alignment which you should strive
+ * to have all buffers passed to/from service functions (both  those
+ * that are fixed-length, and those that aren't). Note however  that
+ * this is no  strict requirement, and  that service functions  will
+ * continue to operate normally even when this alignment isn't  met.
+ *
+ * As far as semantics go, this is simply the alignment used  by
+ * wrapper functions when allocating storage for out-of-band, as
+ * well as inline buffers. */
+#define SERVICE_BUFFER_ALIGNMENT __SIZEOF_POINTER__
+
+
 
 #ifdef __CC__
 __DECL_BEGIN
