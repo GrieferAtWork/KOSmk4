@@ -1304,6 +1304,7 @@ NOTHROW(FCALL comgen_compile)(struct com_generator *__restrict self);
 /* Return the absolute address of the given symbol `id'.
  * The caller must ensure that `id' has already been defined. */
 #define comgen_symaddr(self, id) ((self)->cg_txbas + (self)->cg_symbols[id])
+#define comgen_symreladdr(self, id) (self)->cg_symbols[id]
 
 #define comgen_reloc(self, addr, type, symbol)                                                    \
 	(void)((self)->cg_relocs[(self)->cg_nrelocs].cr_offset = comgen_funcrel_offsetat(self, addr), \
@@ -1318,7 +1319,7 @@ NOTHROW(FCALL comgen_compile)(struct com_generator *__restrict self);
 
 /* Structural representation of the .eh_frame
  * segment  generated  by the  com generator. */
-struct ATTR_PACKED com_eh_frame {
+struct ATTR_PACKED ATTR_ALIGNED(1) com_eh_frame {
 	/* CIE */
 	uint32_t  cef_cie_size;      /* [== offsetof(cef_fde_size)] CIE::cie_size */
 	uint32_t  cef_cie_id;        /* [== 0]                      CIE::cie_id */
@@ -1372,8 +1373,10 @@ struct ATTR_PACKED com_eh_frame {
 #define comgen_eh_putw(self, w) (void)(__hybrid_unaligned_set16((self)->cg_ehptr, (__UINT16_TYPE__)(w)), (self)->cg_ehptr += 2)
 #define comgen_eh_putl(self, l) (void)(__hybrid_unaligned_set32((self)->cg_ehptr, (__UINT32_TYPE__)(l)), (self)->cg_ehptr += 4)
 #define comgen_eh_putq(self, q) (void)(__hybrid_unaligned_set64((self)->cg_ehptr, (__UINT64_TYPE__)(q)), (self)->cg_ehptr += 8)
-PRIVATE NONNULL((1)) void NOTHROW(FCALL comgen_eh_putsleb128)(struct com_generator *__restrict self, intptr_t value);
-PRIVATE NONNULL((1)) void NOTHROW(FCALL comgen_eh_putuleb128)(struct com_generator *__restrict self, uintptr_t value);
+#define comgen_eh_putsleb128(self, value) (void)((self)->cg_ehptr = _eh_putsleb128((self)->cg_ehptr, value))
+#define comgen_eh_putuleb128(self, value) (void)((self)->cg_ehptr = _eh_putuleb128((self)->cg_ehptr, value))
+PRIVATE WUNUSED NONNULL((1)) byte_t *NOTHROW(FCALL _eh_putsleb128)(byte_t *__restrict writer, intptr_t value);
+PRIVATE WUNUSED NONNULL((1)) byte_t *NOTHROW(FCALL _eh_putuleb128)(byte_t *__restrict writer, uintptr_t value);
 
 #define comgen_eh_DW_CFA_advance_loc(self, pc_offset)                \
 	(void)(!comgen_ehav(self, 5) ||                                  \

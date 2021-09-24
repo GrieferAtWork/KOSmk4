@@ -28,6 +28,7 @@
 #include <hybrid/align.h>
 #include <hybrid/host.h>
 #include <hybrid/minmax.h>
+#include <hybrid/unaligned.h>
 
 #include <kos/bits/userprocmask.h>
 #include <kos/except.h>
@@ -66,7 +67,16 @@ DECL_BEGIN
 #error "Generated wrapper functions assume that userprocmask is available and supported!"
 #endif /* !__getuserprocmask_defined */
 
+#ifdef __GNUC__
+/* GCC  complains that we're "taking the address of a packed struct memory" in all of
+ * the `UNALIGNED_SET()' calls below. WELL YES I'M TAKING AN UNALIGNED ADDRESS!  WHAT
+ * ELSE IS NEW IN? But seriously: I wish  there was some kind of way to disable  this
+ * warning when the "unaligned address" is passed to one of the macros that are there
+ * only to safely deal with reading/writing unaligned addresses. *sigh* */
+#pragma GCC diagnostic ignored "-Waddress-of-packed-member"
+#endif /* __GNUC__ */
 
+STATIC_ASSERT(SIZEOF_POINTER == sizeof(void *));
 
 
 /* When the currently set exception is RT-level, return `false'.
@@ -559,9 +569,9 @@ NOTHROW(FCALL comgen_eh_DW_CFA_def_cfa_offset)(struct com_generator *__restrict 
 	}
 }
 
-PRIVATE NONNULL((1)) void
-NOTHROW(FCALL comgen_eh_putsleb128)(struct com_generator *__restrict self,
-                                    intptr_t value) {
+PRIVATE WUNUSED NONNULL((1)) byte_t *
+NOTHROW(FCALL _eh_putsleb128)(byte_t *__restrict writer,
+                              intptr_t value) {
 	byte_t byte;
 	for (;;) {
 		byte = value & 0x7f;
@@ -570,14 +580,15 @@ NOTHROW(FCALL comgen_eh_putsleb128)(struct com_generator *__restrict self,
 		    (value == -1 && (byte & 0x40) != 0))
 			break;
 		byte |= 0x80; /* more bytes to come */
-		comgen_eh_putb(self, byte);
+		*writer++ = byte;
 	}
-	comgen_eh_putb(self, byte);
+	*writer++ = byte;
+	return writer;
 }
 
-PRIVATE NONNULL((1)) void
-NOTHROW(FCALL comgen_eh_putuleb128)(struct com_generator *__restrict self,
-                                    uintptr_t value) {
+PRIVATE WUNUSED NONNULL((1)) byte_t *
+NOTHROW(FCALL _eh_putuleb128)(byte_t *writer,
+                              uintptr_t value) {
 	uint8_t byte;
 	for (;;) {
 		byte = value & 0x7f;
@@ -585,9 +596,10 @@ NOTHROW(FCALL comgen_eh_putuleb128)(struct com_generator *__restrict self,
 		if (value == 0)
 			break;
 		byte |= 0x80; /* more bytes to come */
-		comgen_eh_putb(self, byte);
+		*writer++ = byte;
 	}
-	comgen_eh_putb(self, byte);
+	*writer++ = byte;
+	return writer;
 }
 
 
@@ -3082,6 +3094,7 @@ NOTHROW(FCALL comgen_normal_return)(struct com_generator *__restrict self) {
 }
 
 #ifndef NDEBUG
+#define ASSERT_SYMBOL_DEFINED(self, id) assert((self)->cg_symbols[id] != 0)
 #define comgen_gen86_jmp_symbol(self, id)                    \
 	comgen_instr(self, (assert((self)->cg_symbols[id] != 0), \
 	                    gen86_jmp(&(self)->cg_txptr,         \
@@ -3091,6 +3104,7 @@ NOTHROW(FCALL comgen_normal_return)(struct com_generator *__restrict self) {
 	                    gen86_jcc(&(self)->cg_txptr, cc,     \
 	                              comgen_symaddr(self, id))))
 #else /* !NDEBUG */
+#define ASSERT_SYMBOL_DEFINED(self, id) (void)0
 #define comgen_gen86_jmp_symbol(self, id) \
 	comgen_instr(self, gen86_jmp(&(self)->cg_txptr, comgen_symaddr(self, id)))
 #define comgen_gen86_jcc_symbol(self, cc, id) \
@@ -3648,16 +3662,50 @@ NOTHROW(FCALL comgen_eh_preemption_pop_entry)(struct com_generator *__restrict s
 }
 
 
-
 /* Generate the .gcc_except_table and return a pointer to its base address. */
 PRIVATE NONNULL((1)) uint8_t *
 NOTHROW(FCALL comgen_gcc_except_table)(struct com_generator *__restrict self) {
 	uint8_t *result;
+	uintptr_t sizeof_handlers;
+
 	result = self->cg_txptr;
+	if unlikely(!comgen_txok1(self))
+		goto done;
 
-	/* TODO */
-	abort();
+	/* The following configuration makes offsets function-relative, using 2-byte offsets. */
+	_gen86_putb(&self->cg_txptr, DW_EH_PE_omit);   /* gcc_lsda::gl_landing_enc */
+	_gen86_putb(&self->cg_txptr, DW_EH_PE_omit);   /* gcc_lsda::gl_typetab_enc */
+	_gen86_putb(&self->cg_txptr, DW_EH_PE_udata2); /* gcc_lsda::gl_callsite_enc */
 
+	/* 8 == 4*2  // 2 because of `DW_EH_PE_udata2'; 4 because # of fields
+	 *           // in `gcc_lsda_callsite', s.a.: `DEFINE_HANDLER' below. */
+	sizeof_handlers = 3 * 8;
+	if (self->cg_buf_paramc != 0)
+		sizeof_handlers += 8; /* +1 additional handler */
+	self->cg_txptr = _eh_putuleb128(self->cg_txptr, sizeof_handlers); /* gcc_lsda::gl_callsite_siz */
+	if unlikely(!comgen_txav(self, sizeof_handlers)) {
+		self->cg_txptr = self->cg_txend;
+		goto done;
+	}
+
+#define DEFINE_HANDLER(name)                                                               \
+	(ASSERT_SYMBOL_DEFINED(self, name##begin),                                             \
+	 ASSERT_SYMBOL_DEFINED(self, name##end),                                               \
+	 ASSERT_SYMBOL_DEFINED(self, name##entry),                                             \
+	 /* gcs_start   */ _gen86_putw(&self->cg_txptr, comgen_symreladdr(self, name##begin)), \
+	 /* gcs_size    */ _gen86_putw(&self->cg_txptr, comgen_symreladdr(self, name##end)),   \
+	 /* gcs_handler */ _gen86_putw(&self->cg_txptr, comgen_symreladdr(self, name##entry)), \
+	 /* gcs_action  */ _gen86_putw(&self->cg_txptr, 1))
+
+	/* Define exception handlers... */
+	DEFINE_HANDLER(COM_SYM_Leh_com_waitfor_);
+	if (self->cg_buf_paramc != 0)
+		DEFINE_HANDLER(COM_SYM_Leh_free_xbuf_);
+	DEFINE_HANDLER(COM_SYM_Leh_free_service_com_);
+	DEFINE_HANDLER(COM_SYM_Leh_preemption_pop_);
+#undef DEFINE_HANDLER
+
+done:
 	return result;
 }
 
@@ -3753,15 +3801,10 @@ NOTHROW(FCALL comgen_eh_frame_setup)(struct com_generator *__restrict self) {
 	self->cg_ehptr = eh_hdr->cef_fde_text;
 }
 
-#define comgen_eh_frame(self) \
-	((struct com_eh_frame *)(self)->cg_ehbas)
-#define comgen_eh_frame_startproc(self) \
-	(void)(comgen_eh_frame(self)->cef_fde_funbase = (self)->cg_txptr)
-#define comgen_eh_frame_endproc(self) \
-	(void)(comgen_eh_frame(self)->cef_fde_funsize = (size_t)((self)->cg_txptr - (self)->cg_txbas))
-#define comgen_eh_set_lsda(self, ptr) \
-	(void)(comgen_eh_frame(self)->cef_fde_lsda = (ptr))
-
+#define comgen_eh_frame(self)           ((struct com_eh_frame *)(self)->cg_ehbas)
+#define comgen_eh_frame_startproc(self) UNALIGNED_SET((uintptr_t *)&comgen_eh_frame(self)->cef_fde_funbase, (uintptr_t)(self)->cg_txptr)
+#define comgen_eh_frame_endproc(self)   UNALIGNED_SET(&comgen_eh_frame(self)->cef_fde_funsize, (size_t)((self)->cg_txptr - (self)->cg_txbas))
+#define comgen_eh_set_lsda(self, ptr)   UNALIGNED_SET((uintptr_t *)&comgen_eh_frame(self)->cef_fde_lsda, (uintptr_t)(ptr))
 
 __LIBC void __gcc_personality_v0(void);
 
@@ -3769,15 +3812,15 @@ PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL comgen_eh_frame_finish)(struct com_generator *__restrict self) {
 	/* Finalize the .eh_frame description header. */
 	struct com_eh_frame *eh_hdr = (struct com_eh_frame *)self->cg_ehbas;
-	eh_hdr->cef_cie_persoptr = (void *)&__gcc_personality_v0;
-	eh_hdr->cef_fde_size     = (uint32_t)(size_t)(self->cg_ehptr - (byte_t *)&eh_hdr->cef_fde_size);
+	UNALIGNED_SET((uintptr_t *)&eh_hdr->cef_cie_persoptr, (uintptr_t)(void *)&__gcc_personality_v0);
+	UNALIGNED_SET(&eh_hdr->cef_fde_size, (uint32_t)(size_t)(self->cg_ehptr - (byte_t *)&eh_hdr->cef_fde_size));
 
 	/* After the following write has been done, other threads may _immediatly_
 	 * start to parse our newly generated unwind data, _as_ _well_ _as_ access
 	 * the generated wrapper function.
 	 * In a sense, making this write is a point-of-no-return */
 	COMPILER_BARRIER();
-	eh_hdr->cef_cie_size = offsetof(struct com_eh_frame, cef_fde_size);
+	UNALIGNED_SET(&eh_hdr->cef_cie_size, offsetof(struct com_eh_frame, cef_fde_size));
 	COMPILER_BARRIER();
 }
 
