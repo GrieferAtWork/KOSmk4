@@ -734,7 +734,7 @@ NOTHROW(FCALL comgen_disable_preemption)(struct com_generator *__restrict self) 
 	 * As such, we only need to handle overly-large symbol addresses when the
 	 * library was built for that configuration. */
 #if defined(__x86_64__) && defined(__code_model_large__)
-	if ((uintptr_t)&full_sigset > UINT64_C(0x00000000ffffffff)) {
+	if (!_gen86_fitsl((uintptr_t)&full_sigset)) {
 		/* >> movabs $full_sigset, %Pcx */
 		gen86_movabs_imm_r(&self->cg_txptr, &full_sigset, GEN86_R_PCX);
 
@@ -2743,7 +2743,7 @@ NOTHROW(FCALL comgen_free_xbuf)(struct com_generator *__restrict self) {
 	 * As such, we only need to handle overly-large symbol addresses when the
 	 * library was built for that configuration. */
 #if defined(__x86_64__) && defined(__code_model_large__)
-	if ((uintptr_t)&full_sigset > UINT64_C(0x00000000ffffffff)) {
+	if (!_gen86_fitsl((uintptr_t)&full_sigset)) {
 		/* >> movabs $full_sigset,  %R_fcall0P */
 		comgen_instr(self, gen86_movabs_imm_r(&self->cg_txptr, &full_sigset, GEN86_R_FCALL0P));
 
@@ -2877,7 +2877,7 @@ NOTHROW(FCALL comgen_free_combuf)(struct com_generator *__restrict self) {
 		                                   GEN86_R_PSP, GEN86_R_PAX));
 
 #if defined(__x86_64__) && defined(__code_model_large__)
-		if ((uintptr_t)&full_sigset > UINT64_C(0x00000000ffffffff)) {
+		if (!_gen86_fitsl((uintptr_t)&full_sigset)) {
 			/* >> movabs $full_sigset,  %R_fcall0P */
 			comgen_instr(self, gen86_movabs_imm_r(&self->cg_txptr, &full_sigset, GEN86_R_FCALL0P));
 
@@ -3069,6 +3069,35 @@ NOTHROW(FCALL comgen_normal_return)(struct com_generator *__restrict self) {
 
 	/* >> ret */
 	comgen_instr(self, gen86_ret(&self->cg_txptr));
+}
+
+
+
+/* Generate instructions:
+ * >>     .cfi_restore_state
+ * >> .Lcheck_signals_before_return:
+ * >>     call   chkuserprocmask
+ * >>     jmp    .Lafter_check_signals_before_return
+ * >>     .cfi_restore_state */
+PRIVATE NONNULL((1)) void
+NOTHROW(FCALL comgen_sigcheck_before_return)(struct com_generator *__restrict self) {
+	/* >> .cfi_restore_state */
+	comgen_eh_movehere(self);
+	comgen_eh_DW_CFA_restore_state(self);
+
+	/* >> .Lcheck_signals_before_return: */
+	comgen_defsym(self, COM_SYM_Lcheck_signals_before_return);
+
+	/* >> call   chkuserprocmask */
+	comgen_instr(self, gen86_call(&self->cg_txptr, &chkuserprocmask));
+
+	/* >> jmp    .Lafter_check_signals_before_return */
+	comgen_instr(self, gen86_jmp8_offset(&self->cg_txptr, -1));
+	comgen_reloc(self, self->cg_txptr - 1, COM_R_PCREL8, COM_SYM_Lcheck_signals_before_return);
+
+	/* >> .cfi_restore_state */
+	comgen_eh_movehere(self);
+	comgen_eh_DW_CFA_restore_state(self);
 }
 
 
@@ -3360,6 +3389,25 @@ NOTHROW(FCALL comgen_compile)(struct com_generator *__restrict self) {
 	assertf(self->cg_cfa_offset == SIZEOF_POINTER,
 	        "self->cg_cfa_offset = %" PRId16,
 	        self->cg_cfa_offset);
+
+	/* NOTE: Technically,  we'd need to restore our `cg_cfa_offset' member
+	 *       to  equal its value prior to `comgen_restore_preemption()' at
+	 *       this point. However, that isn't needed because nothing within
+	 *       `comgen_sigcheck_before_return()' makes use of it! */
+
+	/* Check signals */
+	comgen_sigcheck_before_return(self);
+	if unlikely(!comgen_txok1(self))
+		goto fail;
+	if unlikely(!comgen_ehok1(self))
+		goto fail;
+
+	/* Error/Exception  handlers all run  in the context of  the normal CFA offset.
+	 * As far as  unwind information  goes, this  value has  already been  restored
+	 * by the second `.cfi_restore_state' inside `comgen_sigcheck_before_return()',
+	 * but that didn't update our  notion of the CFA  offset, yet. As such,  simply
+	 * do that now so we're up to date once again! */
+	self->cg_cfa_offset = normal_cfa_offset;
 
 	/* TODO: All of the stuff that's missing */
 	abort();
