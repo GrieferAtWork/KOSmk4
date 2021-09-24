@@ -17,11 +17,16 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_INCLUDE_SCHED_LOCKOP_H
-#define GUARD_KERNEL_INCLUDE_SCHED_LOCKOP_H 1
+#ifndef _I386_KOS_KOS_BITS_LOCKOP_H
+#define _I386_KOS_KOS_BITS_LOCKOP_H 1
 
-/* Deprecated header; moved into libc (for availability in user-space)
- * Just use the following header instead: */
-#include <kos/lockop.h>
+#include <__stdinc.h>
 
-#endif /* !GUARD_KERNEL_INCLUDE_SCHED_LOCKOP_H */
+#include <hybrid/host.h>
+
+#ifndef __x86_64__
+/* Use fastcall calling convention on i386 */
+#define __LOCKOP_CC __ATTR_FASTCALL
+#endif /* !__x86_64__ */
+
+#endif /* !_I386_KOS_KOS_BITS_LOCKOP_H */

@@ -1,3 +1,4 @@
+/* HASH CRC-32:0xeabd7290 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -17,11 +18,24 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_INCLUDE_SCHED_LOCKOP_H
-#define GUARD_KERNEL_INCLUDE_SCHED_LOCKOP_H 1
+#ifndef GUARD_LIBC_AUTO_KOS_LOCKOP_H
+#define GUARD_LIBC_AUTO_KOS_LOCKOP_H 1
 
-/* Deprecated header; moved into libc (for availability in user-space)
- * Just use the following header instead: */
+#include "../api.h"
+
+#include <hybrid/typecore.h>
+#include <kos/types.h>
 #include <kos/lockop.h>
 
-#endif /* !GUARD_KERNEL_INCLUDE_SCHED_LOCKOP_H */
+DECL_BEGIN
+
+INTDEF __NOBLOCK NONNULL((1, 2, 3)) void NOTHROW(__LOCKOP_CC libc_lockop_reap_ex)(struct lockop_slist *__restrict self, __BOOL (__LOCKOP_CC *trylock)(void *cookie), void (__LOCKOP_CC *unlock)(void *cookie), void *cookie);
+INTDEF __NOBLOCK NONNULL((1, 2, 3, 5)) void NOTHROW(__LOCKOP_CC libc_oblockop_reap_ex)(struct oblockop_slist *__restrict self, __BOOL (__LOCKOP_CC *trylock)(void *cookie), void (__LOCKOP_CC *unlock)(void *cookie), void *cookie, void *__restrict obj);
+INTDEF __NOBLOCK NONNULL((1, 2)) void NOTHROW(__LOCKOP_CC libc_lockop_reap_atomic_lock)(struct lockop_slist *__restrict self, struct atomic_lock *__restrict lock);
+INTDEF __NOBLOCK NONNULL((1, 2, 3)) void NOTHROW(__LOCKOP_CC libc_oblockop_reap_atomic_lock)(struct oblockop_slist *__restrict self, struct atomic_lock *__restrict lock, void *__restrict obj);
+INTDEF __NOBLOCK NONNULL((1, 2)) void NOTHROW(__LOCKOP_CC libc_lockop_reap_atomic_rwlock)(struct lockop_slist *__restrict self, struct atomic_rwlock *__restrict lock);
+INTDEF __NOBLOCK NONNULL((1, 2, 3)) void NOTHROW(__LOCKOP_CC libc_oblockop_reap_atomic_rwlock)(struct oblockop_slist *__restrict self, struct atomic_rwlock *__restrict lock, void *__restrict obj);
+
+DECL_END
+
+#endif /* !GUARD_LIBC_AUTO_KOS_LOCKOP_H */

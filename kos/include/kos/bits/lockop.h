@@ -17,11 +17,9 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_INCLUDE_SCHED_LOCKOP_H
-#define GUARD_KERNEL_INCLUDE_SCHED_LOCKOP_H 1
+#ifndef _KOS_BITS_LOCKOP_H
+#define _KOS_BITS_LOCKOP_H 1
 
-/* Deprecated header; moved into libc (for availability in user-space)
- * Just use the following header instead: */
-#include <kos/lockop.h>
+/* #define __LOCKOP_CC ... */
 
-#endif /* !GUARD_KERNEL_INCLUDE_SCHED_LOCKOP_H */
+#endif /* !_KOS_BITS_LOCKOP_H */

@@ -1,3 +1,4 @@
+/* HASH CRC-32:0x8f9a6900 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -17,11 +18,34 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_INCLUDE_SCHED_LOCKOP_H
-#define GUARD_KERNEL_INCLUDE_SCHED_LOCKOP_H 1
-
-/* Deprecated header; moved into libc (for availability in user-space)
- * Just use the following header instead: */
+#ifndef __local__oblockop_reap_atomic_lock_defined
+#define __local__oblockop_reap_atomic_lock_defined 1
+#include <__crt.h>
+#include <kos/anno.h>
+#ifndef __LOCKOP_CC
+#define __LOCKOP_CC __LIBKCALL
+#endif /* !__LOCKOP_CC */
+struct oblockop_slist;
+struct atomic_lock;
+#ifndef _KOS_LOCKOP_H
 #include <kos/lockop.h>
-
-#endif /* !GUARD_KERNEL_INCLUDE_SCHED_LOCKOP_H */
+#endif /* !_KOS_LOCKOP_H */
+#include <hybrid/__atomic.h>
+#include <hybrid/sync/atomic-lock.h>
+__NAMESPACE_LOCAL_BEGIN
+__LOCAL_LIBC(_oblockop_reap_atomic_lock) __NOBLOCK __ATTR_NONNULL((1, 2, 3)) void
+__NOTHROW(__LOCKOP_CC __LIBC_LOCAL_NAME(_oblockop_reap_atomic_lock))(struct oblockop_slist *__restrict __self, struct atomic_lock *__restrict __lock, void *__restrict __obj) {
+#ifndef __INTELLISENSE__
+#define __LOCAL_self      __self
+#define __LOCAL_obj       __obj
+#define __LOCAL_trylock() atomic_lock_tryacquire(__lock)
+#define __LOCAL_unlock()  atomic_lock_release(__lock)
+#include <libc/template/lockop.h>
+#endif /* !__INTELLISENSE__ */
+}
+__NAMESPACE_LOCAL_END
+#ifndef __local___localdep__oblockop_reap_atomic_lock_defined
+#define __local___localdep__oblockop_reap_atomic_lock_defined 1
+#define __localdep__oblockop_reap_atomic_lock __LIBC_LOCAL_NAME(_oblockop_reap_atomic_lock)
+#endif /* !__local___localdep__oblockop_reap_atomic_lock_defined */
+#endif /* !__local__oblockop_reap_atomic_lock_defined */

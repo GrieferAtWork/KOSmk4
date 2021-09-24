@@ -2532,6 +2532,9 @@
 #define __CRT_HAVE_localtime_r
 #define __CRT_HAVE_lockf
 #define __CRT_HAVE_lockf64
+#define __CRT_HAVE_lockop_reap_atomic_lock
+#define __CRT_HAVE_lockop_reap_atomic_rwlock
+#define __CRT_HAVE_lockop_reap_ex
 #define __CRT_HAVE_log
 #define __CRT_HAVE_log10
 #define __CRT_HAVE_log10f
@@ -2807,6 +2810,9 @@
 #define __CRT_HAVE_ntp_adjtime64
 #define __CRT_HAVE_ntp_gettimex
 #define __CRT_HAVE_ntp_gettimex64
+#define __CRT_HAVE_oblockop_reap_atomic_lock
+#define __CRT_HAVE_oblockop_reap_atomic_rwlock
+#define __CRT_HAVE_oblockop_reap_ex
 #define __CRT_HAVE_obstack_printf
 #define __CRT_HAVE_obstack_vprintf
 #define __CRT_HAVE_on_exit

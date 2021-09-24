@@ -71,6 +71,7 @@ local badFiles = List({
 	"compat/bits/os/",
 	"i386-kos",
 	"libc/local",
+	"libc/template",
 	"c++",
 	"compiler",
 	"crt-features",
@@ -462,6 +463,7 @@ incdir("");
 #include <crtdefs.h>
 #include <crypt.h>
 #include <ctype.h>
+#include <daemon.h>
 #include <dir.h>
 #include <direct.h>
 #include <dirent.h>
@@ -586,6 +588,7 @@ incdir("");
 #include <kos/bits/fastexcept.h>
 #include <kos/bits/futex-expr.h>
 #include <kos/bits/futex.h>
+#include <kos/bits/lockop.h>
 #include <kos/bits/rtm.h>
 #include <kos/bits/thread.h>
 #include <kos/bits/ukern-struct.h>
@@ -651,6 +654,7 @@ incdir("");
 #include <kos/kernel/types.h>
 #include <kos/keyboard.h>
 #include <kos/ksysctl.h>
+#include <kos/lockop.h>
 #include <kos/malloc.h>
 #include <kos/malloca.h>
 #include <kos/net/printf.h>
@@ -736,6 +740,9 @@ incdir("");
 #include <libemu86/emu86.h>
 #include <libemu86/helpers.h>
 #include <libgen.h>
+#include <libgen86/api.h>
+#include <libgen86/gen.h>
+#include <libgen86/register.h>
 #include <libiconv/api.h>
 #include <libiconv/codec.h>
 #include <libiconv/iconv.h>
@@ -827,6 +834,10 @@ incdir("");
 #include <libsctrace/api.h>
 #include <libsctrace/repr-types.h>
 #include <libsctrace/sctrace.h>
+#include <libservice/api.h>
+#include <libservice/client.h>
+#include <libservice/server.h>
+#include <libservice/types.h>
 #include <libterm/api.h>
 #include <libterm/termio.h>
 #include <libunwind/api.h>

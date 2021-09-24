@@ -1,3 +1,4 @@
+/* HASH CRC-32:0x85a419a */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -17,11 +18,32 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_INCLUDE_SCHED_LOCKOP_H
-#define GUARD_KERNEL_INCLUDE_SCHED_LOCKOP_H 1
-
-/* Deprecated header; moved into libc (for availability in user-space)
- * Just use the following header instead: */
+#ifndef __local__lockop_reap_ex_defined
+#define __local__lockop_reap_ex_defined 1
+#include <__crt.h>
+#include <kos/anno.h>
+#ifndef __LOCKOP_CC
+#define __LOCKOP_CC __LIBKCALL
+#endif /* !__LOCKOP_CC */
+struct lockop_slist;
+#ifndef _KOS_LOCKOP_H
 #include <kos/lockop.h>
-
-#endif /* !GUARD_KERNEL_INCLUDE_SCHED_LOCKOP_H */
+#endif /* !_KOS_LOCKOP_H */
+#include <hybrid/__atomic.h>
+__NAMESPACE_LOCAL_BEGIN
+__LOCAL_LIBC(_lockop_reap_ex) __NOBLOCK __ATTR_NONNULL((1, 2, 3)) void
+__NOTHROW(__LOCKOP_CC __LIBC_LOCAL_NAME(_lockop_reap_ex))(struct lockop_slist *__restrict __self, __BOOL (__LOCKOP_CC *__trylock)(void *__cookie), void (__LOCKOP_CC *__unlock)(void *__cookie), void *__cookie) {
+#ifndef __INTELLISENSE__
+#define __LOCAL_self      __self
+#undef __LOCAL_obj
+#define __LOCAL_trylock() (*__trylock)(__cookie)
+#define __LOCAL_unlock()  (*__unlock)(__cookie)
+#include <libc/template/lockop.h>
+#endif /* !__INTELLISENSE__ */
+}
+__NAMESPACE_LOCAL_END
+#ifndef __local___localdep__lockop_reap_ex_defined
+#define __local___localdep__lockop_reap_ex_defined 1
+#define __localdep__lockop_reap_ex __LIBC_LOCAL_NAME(_lockop_reap_ex)
+#endif /* !__local___localdep__lockop_reap_ex_defined */
+#endif /* !__local__lockop_reap_ex_defined */

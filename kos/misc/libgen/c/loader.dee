@@ -245,7 +245,7 @@ continue_typename_expression:
 				}
 				if (tok in cLanguageKeywords)
 					continue;
-				if (tok.issymbol() && tok.isupper() && ("CALL" in tok || "CC" in tok))
+				if (tok.issymbol() && ("CALL" in tok || "CC" in tok) && tok.upper() == tok)
 					continue; /* Calling convention macro... */
 				break;
 			}

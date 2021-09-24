@@ -62,6 +62,7 @@
 	.sched.pthread
 	.sched.futex .sched.futexlock .sched.futexexpr .sched.futexlockexpr
 	.sched.semaphore
+	.sched.lockop
 	.sched.param
 	.sched.process
 	.sched.signal
@@ -230,6 +231,7 @@
 	CB(PREFIX.crt.sched.pthread) \
 	CB(PREFIX.crt.sched.futex PREFIX.crt.sched.futexlock PREFIX.crt.sched.futexexpr PREFIX.crt.sched.futexlockexpr) \
 	CB(PREFIX.crt.sched.semaphore) \
+	CB(PREFIX.crt.sched.lockop) \
 	CB(PREFIX.crt.sched.param) \
 	CB(PREFIX.crt.sched.process) \
 	CB(PREFIX.crt.sched.signal) \

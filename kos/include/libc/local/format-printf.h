@@ -17,6 +17,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/* TODO: Refactor this file to <libc/template/format-printf.h> */
 #ifdef __INTELLISENSE__
 #ifndef _FORMAT_PRINTER_H
 #include <format-printer.h>
