@@ -199,13 +199,13 @@ STATIC_ASSERT(IS_ALIGNED(offsetof(struct service_com, sc_generic.g_data), 4));
  * >>
  * >> #ifdef __x86_64__
  * >> #define SET_ERROR_RETURN_VALUE() \
- * >>     movq $<cg_info.dl_error_return.scr_rax>, service_com::sc_retval::scr_rax(%R_service_com)
+ * >>     movq   $<cg_info.dl_error_return.scr_rax>, service_com::sc_retval::scr_rax(%R_service_com)
  * >> #else // __x86_64__
- * >> #define SET_ERROR_RETURN_VALUE()                                                                 \
- * >>     #if cg_info.dl_return == SERVICE_TYPE_386_R64                                                \
- * >>         movq $<cg_info.dl_error_return.scr_eax>, service_com::sc_retval::scr_eax(%R_service_com) \
- * >>     #endif // cg_info.dl_return == SERVICE_TYPE_386_R64                                          \
- * >>     movq $<cg_info.dl_error_return.scr_edx>, service_com::sc_retval::scr_edx(%R_service_com)
+ * >> #define SET_ERROR_RETURN_VALUE()                                                                   \
+ * >>     #if cg_info.dl_return == SERVICE_TYPE_386_R64                                                  \
+ * >>         movl   $<cg_info.dl_error_return.scr_edx>, service_com::sc_retval::scr_edx(%R_service_com) \
+ * >>     #endif // cg_info.dl_return == SERVICE_TYPE_386_R64                                            \
+ * >>     movl   $<cg_info.dl_error_return.scr_eax>, service_com::sc_retval::scr_eax(%R_service_com)
  * >> #endif // !__x86_64__
  * >>
  * >>
@@ -897,14 +897,7 @@ STATIC_ASSERT(IS_ALIGNED(offsetof(struct service_com, sc_generic.g_data), 4));
  * >> #endif // !__x86_64__
  * >>     testb  %al, %al                   # Check if command completed before it could be aborted
  * >>     jz     .Leh_free_service_com_end  # if (COMPLETED_BEFORE_ABORT) goto .Leh_free_service_com_end;
- * >>     SET_ERROR_RETURN_VALUE()
- * >>     jmp    .Leh_free_service_com_end
- * >>
- * >> //NEVER_USED:#if cg_buf_paramc != 0
- * >> //NEVER_USED:.Lerr_free_xbuf:
- * >> //NEVER_USED:    SET_ERROR_RETURN_VALUE()
- * >> //NEVER_USED:    jmp   .Leh_free_xbuf_end
- * >> //NEVER_USED:#endif // cg_buf_paramc != 0
+ * >>     // fallthru...
  * >>
  * >> .Lerr_free_service_com:
  * >>     SET_ERROR_RETURN_VALUE()
@@ -1062,7 +1055,7 @@ struct com_reloc {
 /* Max number of relocations in com wrapper functions */
 /*[[[deemon print("#define COM_RELOC_MAXCOUNT ", (File from deemon)
 	.open("./wrapper.c", "r").read().decode("utf-8").count("comgen_reloc"));]]]*/
-#define COM_RELOC_MAXCOUNT 12
+#define COM_RELOC_MAXCOUNT 7
 /*[[[end]]]*/
 
 
@@ -1288,8 +1281,11 @@ NOTHROW(FCALL comgen_compile)(struct com_generator *__restrict self);
 #define comgen_funcrel_offset(self)        comgen_funcrel_offsetat(self, (self)->cg_txptr)
 
 /* Define the symbol `id' at the current text location. */
-#define comgen_defsym(self, id) \
-	(void)((self)->cg_symbols[id] = comgen_funcrel_offset(self))
+#define comgen_defsym(self, id) (void)((self)->cg_symbols[id] = comgen_funcrel_offset(self))
+
+/* Return the absolute address of the given symbol `id'.
+ * The caller must ensure that `id' has already been defined. */
+#define comgen_symaddr(self, id) ((self)->cg_txbas + (self)->cg_symbols[id])
 
 #define comgen_reloc(self, addr, type, symbol)                                                    \
 	(void)((self)->cg_relocs[(self)->cg_nrelocs].cr_offset = comgen_funcrel_offsetat(self, addr), \

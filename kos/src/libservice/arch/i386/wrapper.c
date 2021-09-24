@@ -3071,6 +3071,21 @@ NOTHROW(FCALL comgen_normal_return)(struct com_generator *__restrict self) {
 	comgen_instr(self, gen86_ret(&self->cg_txptr));
 }
 
+#ifndef NDEBUG
+#define comgen_gen86_jmp_symbol(self, id)                    \
+	comgen_instr(self, (assert((self)->cg_symbols[id] != 0), \
+	                    gen86_jmp(&(self)->cg_txptr,         \
+	                              comgen_symaddr(self, id))))
+#define comgen_gen86_jcc_symbol(self, cc, id)                \
+	comgen_instr(self, (assert((self)->cg_symbols[id] != 0), \
+	                    gen86_jcc(&(self)->cg_txptr, cc,     \
+	                              comgen_symaddr(self, id))))
+#else /* !NDEBUG */
+#define comgen_gen86_jmp_symbol(self, id) \
+	comgen_instr(self, gen86_jmp(&(self)->cg_txptr, comgen_symaddr(self, id)))
+#define comgen_gen86_jcc_symbol(self, cc, id) \
+	comgen_instr(self, gen86_jcc(&(self)->cg_txptr, cc, comgen_symaddr(self, id)))
+#endif /* NDEBUG */
 
 
 /* Generate instructions:
@@ -3092,8 +3107,7 @@ NOTHROW(FCALL comgen_sigcheck_before_return)(struct com_generator *__restrict se
 	comgen_instr(self, gen86_call(&self->cg_txptr, &chkuserprocmask));
 
 	/* >> jmp    .Lafter_check_signals_before_return */
-	comgen_instr(self, gen86_jmp8_offset(&self->cg_txptr, -1));
-	comgen_reloc(self, self->cg_txptr - 1, COM_R_PCREL8, COM_SYM_Lcheck_signals_before_return);
+	comgen_gen86_jmp_symbol(self, COM_SYM_Lcheck_signals_before_return);
 
 	/* >> .cfi_restore_state */
 	comgen_eh_movehere(self);
@@ -3102,7 +3116,7 @@ NOTHROW(FCALL comgen_sigcheck_before_return)(struct com_generator *__restrict se
 
 
 
-/* Generate instructions:
+/* Generate    instructions:
  * >> #if cg_buf_paramc == 0
  * >> .Ltest_pending_signals_after_com_buffer_alloc:
  * >>     call   chkuserprocmask
@@ -3148,9 +3162,7 @@ NOTHROW(FCALL comgen_sigcheck_for_buffers)(struct com_generator *__restrict self
 		comgen_instr(self, gen86_call(&self->cg_txptr, &chkuserprocmask));
 
 		/* >>     jmp    .Ltest_pending_signals_after_com_buffer_alloc_return */
-		comgen_instr(self, gen86_jmpl_offset(&self->cg_txptr, -4));
-		comgen_hidden_reloc(self, self->cg_txptr - 4, COM_R_PCREL32,
-		                    COM_SYM_Ltest_pending_signals_after_com_buffer_alloc_return);
+		comgen_gen86_jmp_symbol(self, COM_SYM_Ltest_pending_signals_after_com_buffer_alloc_return);
 		break;
 
 	case 1:
@@ -3161,9 +3173,7 @@ NOTHROW(FCALL comgen_sigcheck_for_buffers)(struct com_generator *__restrict self
 		comgen_instr(self, gen86_call(&self->cg_txptr, &chkuserprocmask));
 
 		/* >> jmp    .Ltest_pending_signals_after_single_buffer_alloc_return */
-		comgen_instr(self, gen86_jmpl_offset(&self->cg_txptr, -4));
-		comgen_hidden_reloc(self, self->cg_txptr - 4, COM_R_PCREL32,
-		                    COM_SYM_Ltest_pending_signals_after_single_buffer_alloc_return);
+		comgen_gen86_jmp_symbol(self, COM_SYM_Ltest_pending_signals_after_single_buffer_alloc_return);
 
 		/* >> .Ltest_pending_signals_after_single_buffers_is_in_band: */
 		comgen_defsym(self, COM_SYM_Ltest_pending_signals_after_single_buffers_is_in_band);
@@ -3182,9 +3192,7 @@ NOTHROW(FCALL comgen_sigcheck_for_buffers)(struct com_generator *__restrict self
 		comgen_eh_DW_CFA_adjust_cfa_offset(self, -SIZEOF_POINTER);
 
 		/* >> jmp .Ltest_pending_signals_after_single_buffers_is_in_band_return */
-		comgen_instr(self, gen86_jmpl_offset(&self->cg_txptr, -4));
-		comgen_hidden_reloc(self, self->cg_txptr - 4, COM_R_PCREL32,
-		                    COM_SYM_Ltest_pending_signals_after_single_buffers_is_in_band_return);
+		comgen_gen86_jmp_symbol(self, COM_SYM_Ltest_pending_signals_after_single_buffers_is_in_band_return);
 		break;
 
 	default:
@@ -3216,9 +3224,7 @@ NOTHROW(FCALL comgen_sigcheck_for_buffers)(struct com_generator *__restrict self
 			comgen_eh_DW_CFA_adjust_cfa_offset(self, -SIZEOF_POINTER);
 
 			/* >> jmp .Ltest_pending_signals_after_xbuf_alloc_return */
-			comgen_instr(self, gen86_jmpl_offset(&self->cg_txptr, -4));
-			comgen_reloc(self, self->cg_txptr - 4, COM_R_PCREL32,
-			             COM_SYM_Ltest_pending_signals_after_xbuf_alloc_return);
+			comgen_gen86_jmp_symbol(self, COM_SYM_Ltest_pending_signals_after_xbuf_alloc_return);
 		}
 
 		/* >> .Ltest_pending_signals_after_all_buffers_are_in_band: */
@@ -3228,12 +3234,145 @@ NOTHROW(FCALL comgen_sigcheck_for_buffers)(struct com_generator *__restrict self
 		comgen_instr(self, gen86_call(&self->cg_txptr, &chkuserprocmask));
 
 		/* >> jmp    .Lall_buffers_are_in_band_preemption_reenabled: */
-		comgen_instr(self, gen86_jmpl_offset(&self->cg_txptr, -4));
-		comgen_reloc(self, self->cg_txptr - 4, COM_R_PCREL32,
-		             COM_SYM_Lall_buffers_are_in_band_preemption_reenabled);
+		comgen_gen86_jmp_symbol(self, COM_SYM_Lall_buffers_are_in_band_preemption_reenabled);
 		break;
 	}
 
+}
+
+
+
+/* Generate instructions:
+ * >> #ifdef __x86_64__
+ * >>     movq   $<cg_info.dl_error_return.scr_rax>, service_com::sc_retval::scr_rax(%R_service_com)
+ * >> #else // __x86_64__
+ * >> #if cg_info.dl_return == SERVICE_TYPE_386_R64
+ * >>     movl   $<cg_info.dl_error_return.scr_eax>, service_com::sc_retval::scr_eax(%R_service_com)
+ * >> #endif // cg_info.dl_return == SERVICE_TYPE_386_R64
+ * >>     movl   $<cg_info.dl_error_return.scr_edx>, service_com::sc_retval::scr_edx(%R_service_com)
+ * >> #endif // !__x86_64__ */
+PRIVATE NONNULL((1)) void
+NOTHROW(FCALL comgen_set_error_return_value)(struct com_generator *__restrict self) {
+#ifdef __x86_64__
+	/* >> movq $<cg_info.dl_error_return.scr_rax>, service_com::sc_retval::scr_rax(%R_service_com) */
+	comgen_instr(self, gen86_movq_imm_db(&self->cg_txptr, self->cg_info.dl_error_return.scr_rax,
+	                                     offsetof(struct service_com, sc_retval.scr_rax),
+	                                     GEN86_R_service_com));
+#else /* __x86_64__ */
+	if (self->cg_info.dl_return == SERVICE_TYPE_386_R64) {
+		/* >> movl $<cg_info.dl_error_return.scr_eax>, service_com::sc_retval::scr_eax(%R_service_com) */
+		comgen_instr(self, gen86_movl_imm_db(&self->cg_txptr, self->cg_info.dl_error_return.scr_edx,
+		                                     offsetof(struct service_com, sc_retval.scr_edx),
+		                                     GEN86_R_service_com));
+	}
+	/* >> movl $<cg_info.dl_error_return.scr_edx>, service_com::sc_retval::scr_edx(%R_service_com) */
+	comgen_instr(self, gen86_movl_imm_db(&self->cg_txptr, self->cg_info.dl_error_return.scr_eax,
+	                                     offsetof(struct service_com, sc_retval.scr_eax),
+	                                     GEN86_R_service_com));
+#endif /* !__x86_64__ */
+}
+
+
+
+#ifndef __x86_64__
+#define USED_SET_ERRNO __set_errno_f
+#ifndef ____set_errno_f_defined
+#define ____set_errno_f_defined 1
+__LIBC syscall_slong_t FCALL __set_errno_f(errno_t value);
+#endif /* !____set_errno_f_defined */
+#else /* !__x86_64__ */
+#define USED_SET_ERRNO __set_errno
+#ifndef ____set_errno_defined
+#define ____set_errno_defined 1
+__LIBC syscall_slong_t __set_errno(errno_t value);
+#endif /* !____set_errno_defined */
+#endif /* __x86_64__ */
+
+/* Generate instructions:
+ * >> .Lerr_com_abort_errno:
+ * >>     negP   %Pax
+ * >>     movP   %Pax, %R_fcall0P
+ * >>     call   __set_errno_f
+ * >>     movP   $<cg_service>,  %R_fcall0P
+ * >>     movP   %R_service_com, %R_fcall1P
+ * >> #ifdef __x86_64__
+ * >>     movP   $<cg_info.dl_comid>, %rdx
+ * >> #else // __x86_64__
+ * >>     pushP_cfi $<cg_info.dl_comid>
+ * >> #endif // !__x86_64__
+ * >>     call   libservice_aux_com_abort
+ * >> #ifndef __x86_64__
+ * >>     .cfi_adjust_cfa_offset -4
+ * >> #endif // !__x86_64__
+ * >>     testb  %al, %al                   # Check if command completed before it could be aborted
+ * >>     jz     .Leh_free_service_com_end  # if (COMPLETED_BEFORE_ABORT) goto .Leh_free_service_com_end;
+ * >>     // fallthru...
+ * >>
+ * >> .Lerr_free_service_com:
+ * >>     SET_ERROR_RETURN_VALUE()
+ * >>     jmp   .Leh_free_service_com_end
+ * >>
+ * >> .Lerr_pop_preemption:
+ * >>     SET_ERROR_RETURN_VALUE()
+ * >>     jmp   .Leh_preemption_pop_end */
+PRIVATE NONNULL((1)) void
+NOTHROW(FCALL comgen_handle_errno_problems)(struct com_generator *__restrict self) {
+	/* >> .Lerr_com_abort_errno: */
+	comgen_defsym(self, COM_SYM_Lerr_com_abort_errno);
+
+	/* >> negP   %Pax */
+	comgen_instr(self, gen86_negP_r(&self->cg_txptr, GEN86_R_PAX));
+
+	/* >> movP   %Pax, %R_fcall0P */
+	comgen_instr(self, gen86_movP_r_r(&self->cg_txptr, GEN86_R_PAX, GEN86_R_FCALL0P));
+
+	/* >> call   __set_errno_f */
+	comgen_instr(self, gen86_call(&self->cg_txptr, &USED_SET_ERRNO));
+
+	/* >> movP   $<cg_service>,  %R_fcall0P */
+	comgen_instr(self, gen86_movP_imm_r(&self->cg_txptr, self->cg_service, GEN86_R_FCALL0P));
+
+	/* >> movP   %R_service_com, %R_fcall1P */
+	comgen_instr(self, gen86_movP_r_r(&self->cg_txptr, GEN86_R_service_com, GEN86_R_FCALL1P));
+
+#ifdef __x86_64__
+	/* >> movP   $<cg_info.dl_comid>, %rdx */
+#else /* __x86_64__ */
+	/* >> pushP_cfi $<cg_info.dl_comid> */
+#endif /* !__x86_64__ */
+
+	/* >> call   libservice_aux_com_abort */
+	comgen_instr(self, gen86_call(&self->cg_txptr, &libservice_aux_com_abort));
+
+	/* >> #ifndef __x86_64__ */
+#ifndef __x86_64__
+	comgen_eh_movehere(self);
+	comgen_eh_DW_CFA_adjust_cfa_offset(self, -4);
+#endif /* !__x86_64__ */
+
+	/* >> testb  %al, %al # Check if command completed before it could be aborted */
+	comgen_instr(self, gen86_testb_r_r(&self->cg_txptr, GEN86_R_AL, GEN86_R_AL));
+
+	/* >> jz     .Leh_free_service_com_end  # if (COMPLETED_BEFORE_ABORT) goto .Leh_free_service_com_end; */
+	comgen_gen86_jcc_symbol(self, GEN86_CC_Z, COM_SYM_Leh_free_service_com_end);
+
+	/* >> .Lerr_free_service_com: */
+	comgen_defsym(self, COM_SYM_Lerr_free_service_com);
+
+	/* >> SET_ERROR_RETURN_VALUE() */
+	comgen_set_error_return_value(self);
+
+	/* >> jmp   .Leh_free_service_com_end */
+	comgen_gen86_jmp_symbol(self, COM_SYM_Leh_free_service_com_end);
+
+	/* >> .Lerr_pop_preemption: */
+	comgen_defsym(self, COM_SYM_Lerr_pop_preemption);
+
+	/* >> SET_ERROR_RETURN_VALUE() */
+	comgen_set_error_return_value(self);
+
+	/* >> jmp   .Leh_preemption_pop_end */
+	comgen_gen86_jmp_symbol(self, COM_SYM_Leh_preemption_pop_end);
 }
 
 
@@ -3381,6 +3520,11 @@ NOTHROW(FCALL comgen_compile)(struct com_generator *__restrict self) {
 	/* Assert that the given buffer meets the minimum size requirements. */
 	assert((size_t)(self->cg_txend - self->cg_txbas) >= COM_GENERATOR_INITIAL_TX_BUFSIZ);
 	assert((size_t)(self->cg_ehend - self->cg_ehbas) >= COM_GENERATOR_INITIAL_EH_BUFSIZ);
+#ifndef NDEBUG
+	/* So that we can detect uninitialized symbols in assertions. */
+	memset(self->cg_symbols, 0, sizeof(self->cg_symbols));
+#endif /* !NDEBUG */
+
 	self->cg_txptr      = self->cg_txbas;
 	self->cg_nrelocs    = 0;
 	self->cg_CFA_loc    = self->cg_txptr;
@@ -3538,6 +3682,13 @@ NOTHROW(FCALL comgen_compile)(struct com_generator *__restrict self) {
 	if unlikely(!comgen_ehok1(self))
 		goto fail;
 
+	/* Error/Exception  handlers all run  in the context of  the normal CFA offset.
+	 * As far as  unwind information  goes, this  value has  already been  restored
+	 * by the second `.cfi_restore_state' inside `comgen_sigcheck_before_return()',
+	 * but that didn't update our  notion of the CFA  offset, yet. As such,  simply
+	 * do that now so we're up to date once again! */
+	self->cg_cfa_offset = normal_cfa_offset;
+
 	/* Check signals when re-enabling preemption after buffer xbuf alloc */
 	comgen_sigcheck_for_buffers(self);
 	if unlikely(!comgen_txok1(self))
@@ -3545,13 +3696,16 @@ NOTHROW(FCALL comgen_compile)(struct com_generator *__restrict self) {
 	if unlikely(!comgen_ehok1(self))
 		goto fail;
 
+	/* Define non-exception errno handles. */
+	if (!(self->cg_features & COM_GENERATOR_FEATURE_FEXCEPT)) {
+		comgen_handle_errno_problems(self);
+		if unlikely(!comgen_txok1(self))
+			goto fail;
+		if unlikely(!comgen_ehok1(self))
+			goto fail;
+	}
 
-	/* Error/Exception  handlers all run  in the context of  the normal CFA offset.
-	 * As far as  unwind information  goes, this  value has  already been  restored
-	 * by the second `.cfi_restore_state' inside `comgen_sigcheck_before_return()',
-	 * but that didn't update our  notion of the CFA  offset, yet. As such,  simply
-	 * do that now so we're up to date once again! */
-	self->cg_cfa_offset = normal_cfa_offset;
+	/* Define exception handlers. */
 
 	/* TODO: All of the stuff that's missing */
 	abort();
