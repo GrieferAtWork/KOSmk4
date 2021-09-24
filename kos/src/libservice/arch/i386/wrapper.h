@@ -512,7 +512,7 @@ STATIC_ASSERT(IS_ALIGNED(offsetof(struct service_com, sc_generic.g_data), 4));
  * >>
  * >>
  * >> // Set the function code within the com descriptor
- * >>     movP   $<info->dl_comid>, service_com::sc_code(%R_service_com)
+ * >>     movP   $<cg_info.dl_comid>, service_com::sc_code(%R_service_com)
  * >>
  * >>
  * >>
@@ -601,14 +601,14 @@ STATIC_ASSERT(IS_ALIGNED(offsetof(struct service_com, sc_generic.g_data), 4));
  * >>
  * >>
  * >> // Wait for the command to complete
- * >>     #     futex_waitwhile(&com->sc_code, <info->dl_comid>)
- * >>     # <=> syscall(SYS_lfutx, &com->sc_code, LFUTEX_WAIT_WHILE, <info->dl_comid>)
+ * >>     #     futex_waitwhile(&com->sc_code, <cg_info.dl_comid>)
+ * >>     # <=> syscall(SYS_lfutx, &com->sc_code, LFUTEX_WAIT_WHILE, <cg_info.dl_comid>)
  * >> .Lwaitfor_completion:
  * >>     movP   $SYS_lfutex, %Pax
  * >> #ifdef __x86_64__
  * >>     leaq   service_com::sc_code(%R_service_com), %rdi
  * >>     movq   $LFUTEX_WAIT_WHILE,                   %rsi
- * >>     movq   $<info->dl_comid>,                    %rdx
+ * >>     movq   $<cg_info.dl_comid>,                  %rdx
  * >> #if COM_GENERATOR_FEATURE_FEXCEPT
  * >>     std
  * >>     .cfi_escape 56,22,49,7,146,49,0,11,255,251,26  # Disable EFLAGS.DF during unwind & landing
@@ -621,7 +621,7 @@ STATIC_ASSERT(IS_ALIGNED(offsetof(struct service_com, sc_generic.g_data), 4));
  * >> #else // __x86_64__
  * >>     leaq   service_com::sc_code(%R_service_com), %ebx
  * >>     movl   $LFUTEX_WAIT_WHILE,                   %ecx
- * >>     movl   $<info->dl_comid>,                    %edx
+ * >>     movl   $<cg_info.dl_comid>,                  %edx
  * >> #if COM_GENERATOR_FEATURE_FEXCEPT
  * >>     call   __i386_Xsyscall
  * >> #else // COM_GENERATOR_FEATURE_FEXCEPT
@@ -633,11 +633,8 @@ STATIC_ASSERT(IS_ALIGNED(offsetof(struct service_com, sc_generic.g_data), 4));
  * >>     ja     .Lerr_com_abort_errno
  * >> #endif // !COM_GENERATOR_FEATURE_FEXCEPT
  * >>     # Check if the operation has completed
- * >>     cmpP   $<info->dl_comid>, service_com::sc_code(%R_service_com)
+ * >>     cmpP   $<cg_info.dl_comid>, service_com::sc_code(%R_service_com)
  * >>     je     .Lwaitfor_completion
- * >>
- * >>
- * >>
  * >> .Leh_com_waitfor_end:
  * >>
  * >>
@@ -874,9 +871,9 @@ STATIC_ASSERT(IS_ALIGNED(offsetof(struct service_com, sc_generic.g_data), 4));
  * >>     movP   $<cg_service>,  %R_fcall0P
  * >>     movP   %R_service_com, %R_fcall1P
  * >> #ifdef __x86_64__
- * >>     movP   $<info->dl_comid>, %rdx
+ * >>     movP   $<cg_info.dl_comid>, %rdx
  * >> #else // __x86_64__
- * >>     pushP_cfi $<info->dl_comid>
+ * >>     pushP_cfi $<cg_info.dl_comid>
  * >> #endif // !__x86_64__
  * >>     call   libservice_aux_com_abort
  * >> #ifndef __x86_64__
@@ -910,9 +907,9 @@ STATIC_ASSERT(IS_ALIGNED(offsetof(struct service_com, sc_generic.g_data), 4));
  * >>     movP   $<cg_service>,  %R_fcall0P
  * >>     movP   %R_service_com, %R_fcall1P
  * >> #ifdef __x86_64__
- * >>     movP   $<info->dl_comid>, %rdx
+ * >>     movP   $<cg_info.dl_comid>, %rdx
  * >> #else // __x86_64__
- * >>     pushP_cfi $<info->dl_comid>
+ * >>     pushP_cfi $<cg_info.dl_comid>
  * >> #endif // !__x86_64__
  * >>     call   libservice_aux_com_abort
  * >> #ifndef __x86_64__
@@ -1009,7 +1006,6 @@ enum {
 	COM_SYM_Ltest_pending_signals_after_xbuf_alloc_return,                /* `.Ltest_pending_signals_after_xbuf_alloc_return'                [valid_if(cg_buf_paramc >= 2 && (cg_inbuf_paramc != 0 || cg_inoutbuf_paramc != 0))] */
 	COM_SYM_Lall_buffers_are_in_band_preemption_reenabled,                /* `.Lall_buffers_are_in_band_preemption_reenabled'                [valid_if(cg_buf_paramc >= 2)] */
 	COM_SYM_Leh_com_waitfor_begin,                                        /* `.Leh_com_waitfor_begin' */
-	COM_SYM_Lwaitfor_completion,                                          /* `.Lwaitfor_completion' */
 	COM_SYM_Leh_com_waitfor_end,                                          /* `.Leh_com_waitfor_end' */
 	COM_SYM_Leh_free_xbuf_end,                                            /* `.Leh_free_xbuf_end'                                            [valid_if(cg_buf_paramc != 0)] */
 	COM_SYM_Leh_free_service_com_end,                                     /* `.Leh_free_service_com_end' */

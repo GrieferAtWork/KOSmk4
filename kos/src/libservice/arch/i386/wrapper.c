@@ -35,6 +35,7 @@
 #include <sys/param.h>
 
 #include <assert.h>
+#include <errno.h>
 #include <stdlib.h>
 #include <string.h>
 #include <syscall.h>
@@ -2105,13 +2106,8 @@ extern void __i386_Xsyscall(void);
 extern void __i386_syscall(void);
 #endif /* !__x86_64__ */
 
-
-/* Generate instructions:
- * >>     movP   $SYS_lfutex, %Pax
+/* Generate assembly to perform a system call:
  * >> #ifdef __x86_64__
- * >>     leaq   service_shm::s_commands(%R_shmbase), %rdi # NOTE: %R_shmbase was already initialized above!
- * >>     movq   $LFUTEX_WAKE,                        %rsi
- * >>     movq   $1,                                  %rdx
  * >> #if COM_GENERATOR_FEATURE_FEXCEPT
  * >>     std
  * >>     .cfi_escape 56,22,49,7,146,49,0,11,255,251,26  # Disable EFLAGS.DF during unwind & landing
@@ -2122,17 +2118,70 @@ extern void __i386_syscall(void);
  * >>     syscall
  * >> #endif // !COM_GENERATOR_FEATURE_FEXCEPT
  * >> #else // __x86_64__
- * >> #if offsetof(service_shm, s_commands) != 0  # HINT: `%R_shmbase' is `%ebx' on i386!
- * >>     addl   $<service_shm::s_commands>, %ebx # NOTE: %R_shmbase was already initialized above!
- * >> #endif // offsetof(service_shm, s_commands) != 0
- * >>     movl   $LFUTEX_WAKE, %ecx
- * >>     movl   $1,           %edx
  * >> #if COM_GENERATOR_FEATURE_FEXCEPT
  * >>     call   __i386_Xsyscall
  * >> #else // COM_GENERATOR_FEATURE_FEXCEPT
  * >>     call   __i386_syscall
  * >> #endif // !COM_GENERATOR_FEATURE_FEXCEPT
  * >> #endif // !__x86_64__ */
+PRIVATE NONNULL((1)) void
+NOTHROW(FCALL comgen_do_syscall)(struct com_generator *__restrict self) {
+#ifdef __x86_64__
+	if (self->cg_features & COM_GENERATOR_FEATURE_FEXCEPT) {
+		/* >> std */
+		comgen_instr(self, gen86_std(&self->cg_txptr));
+
+		/* >> .cfi_escape 56,22,49,7,146,49,0,11,255,251,26  # Disable EFLAGS.DF during unwind & landing */
+		if unlikely(!comgen_ehok(self))
+			return;
+		comgen_eh_movehere(self);
+		if unlikely(!comgen_ehav(self, sizeof(cfi_clear_eflags_ef_on_unwind))) {
+			self->cg_ehptr = self->cg_ehend;
+			return;
+		}
+		self->cg_ehptr = (byte_t *)mempcpy(self->cg_ehptr,
+		                                   cfi_clear_eflags_ef_on_unwind,
+		                                   sizeof(cfi_clear_eflags_ef_on_unwind));
+
+		/* >> syscall */
+		comgen_instr(self, gen86_syscall(&self->cg_txptr));
+
+		/* >> cld */
+		comgen_instr(self, gen86_cld(&self->cg_txptr));
+
+		/* >> .cfi_escape 57 */
+		if unlikely(!comgen_ehok(self))
+			return;
+		comgen_eh_movehere(self);
+		comgen_eh_putb(self, DW_CFA_KOS_endcapsule);
+	} else {
+		/* >> syscall */
+		comgen_instr(self, gen86_syscall(&self->cg_txptr));
+	}
+#else /* __x86_64__ */
+	if (self->cg_features & COM_GENERATOR_FEATURE_FEXCEPT) {
+		comgen_instr(self, gen86_call(&self->cg_txptr, &__i386_Xsyscall));
+	} else {
+		comgen_instr(self, gen86_call(&self->cg_txptr, &__i386_syscall));
+	}
+#endif /* !__x86_64__ */
+}
+
+
+/* Generate instructions:
+ * >>     movP   $SYS_lfutex, %Pax
+ * >> #ifdef __x86_64__
+ * >>     leaq   service_shm::s_commands(%R_shmbase), %rdi # NOTE: %R_shmbase was already initialized above!
+ * >>     movq   $LFUTEX_WAKE,                        %rsi
+ * >>     movq   $1,                                  %rdx
+ * >> #else // __x86_64__
+ * >> #if offsetof(service_shm, s_commands) != 0  # HINT: `%R_shmbase' is `%ebx' on i386!
+ * >>     addl   $<service_shm::s_commands>, %ebx # NOTE: %R_shmbase was already initialized above!
+ * >> #endif // offsetof(service_shm, s_commands) != 0
+ * >>     movl   $LFUTEX_WAKE, %ecx
+ * >>     movl   $1,           %edx
+ * >> #endif // !__x86_64__
+ * >>     <comgen_do_syscall> */
 #ifdef __x86_64__
 PRIVATE NONNULL((1)) void
 NOTHROW(FCALL comgen_wake_server)(struct com_generator *__restrict self,
@@ -2166,39 +2215,6 @@ NOTHROW(FCALL comgen_wake_server)(struct com_generator *__restrict self)
 
 	/* >> movq   $1, %rdx */
 	comgen_instr(self, gen86_movP_imm_r(&self->cg_txptr, 1, GEN86_R_RDX));
-
-	if (self->cg_features & COM_GENERATOR_FEATURE_FEXCEPT) {
-
-		/* >> std */
-		comgen_instr(self, gen86_std(&self->cg_txptr));
-
-		/* >> .cfi_escape 56,22,49,7,146,49,0,11,255,251,26  # Disable EFLAGS.DF during unwind & landing */
-		if unlikely(!comgen_ehok(self))
-			return;
-		comgen_eh_movehere(self);
-		if unlikely(!comgen_ehav(self, sizeof(cfi_clear_eflags_ef_on_unwind))) {
-			self->cg_ehptr = self->cg_ehend;
-			return;
-		}
-		self->cg_ehptr = (byte_t *)mempcpy(self->cg_ehptr,
-		                                   cfi_clear_eflags_ef_on_unwind,
-		                                   sizeof(cfi_clear_eflags_ef_on_unwind));
-
-		/* >> syscall */
-		comgen_instr(self, gen86_syscall(&self->cg_txptr));
-
-		/* >> cld */
-		comgen_instr(self, gen86_cld(&self->cg_txptr));
-
-		/* >> .cfi_escape 57 */
-		if unlikely(!comgen_ehok(self))
-			return;
-		comgen_eh_movehere(self);
-		comgen_eh_putb(self, DW_CFA_KOS_endcapsule);
-	} else {
-		/* >> syscall */
-		comgen_instr(self, gen86_syscall(&self->cg_txptr));
-	}
 #else /* __x86_64__ */
 	if (offsetof(struct service_shm, s_commands) != 0) {
 		comgen_instr(self, gen86_addP_imm_r(&self->cg_txptr,
@@ -2215,13 +2231,93 @@ NOTHROW(FCALL comgen_wake_server)(struct com_generator *__restrict self)
 
 	/* >> movl   $1,           %edx */
 	comgen_instr(self, gen86_movl_imm_r(&self->cg_txptr, 1, GEN86_R_EDX));
-
-	if (self->cg_features & COM_GENERATOR_FEATURE_FEXCEPT) {
-		comgen_instr(self, gen86_call(&self->cg_txptr, &__i386_Xsyscall));
-	} else {
-		comgen_instr(self, gen86_call(&self->cg_txptr, &__i386_syscall));
-	}
 #endif /* !__x86_64__ */
+
+	/* Invoke the system call. */
+	comgen_do_syscall(self);
+}
+
+
+/* Generate instructions:
+ * >> .Lwaitfor_completion:
+ * >>     movP   $SYS_lfutex, %Pax
+ * >> #ifdef __x86_64__
+ * >>     leaq   service_com::sc_code(%R_service_com), %rdi
+ * >>     movq   $LFUTEX_WAIT_WHILE,                   %rsi
+ * >>     movq   $<cg_info.dl_comid>,                  %rdx
+ * >> #else // __x86_64__
+ * >>     leaq   service_com::sc_code(%R_service_com), %ebx
+ * >>     movl   $LFUTEX_WAIT_WHILE,                   %ecx
+ * >>     movl   $<cg_info.dl_comid>,                  %edx
+ * >> #endif // !__x86_64__
+ * >>     <comgen_do_syscall>
+ * >> #if !COM_GENERATOR_FEATURE_FEXCEPT
+ * >>     cmpP   $(-ELIMIT), %Pax
+ * >>     ja     .Lerr_com_abort_errno
+ * >> #endif // !COM_GENERATOR_FEATURE_FEXCEPT
+ * >>     # Check if the operation has completed
+ * >>     cmpP   $<cg_info.dl_comid>, service_com::sc_code(%R_service_com)
+ * >>     je     .Lwaitfor_completion
+ * >> .Leh_com_waitfor_end: */
+PRIVATE NONNULL((1)) void
+NOTHROW(FCALL comgen_waitfor_command)(struct com_generator *__restrict self) {
+	byte_t *loc_Lwaitfor_completion;
+
+	/* .Lwaitfor_completion: */
+	loc_Lwaitfor_completion = self->cg_txptr;
+
+	/* >> movP   $SYS_lfutex, %Pax */
+	comgen_instr(self, gen86_movP_imm_r(&self->cg_txptr, SYS_lfutex, GEN86_R_PAX));
+
+#ifdef __x86_64__
+	/* >> leaq   service_com::sc_code(%R_service_com), %rdi */
+	comgen_instr(self, gen86_leaq_db_r(&self->cg_txptr,
+	                                   offsetof(struct service_com, sc_code),
+	                                   GEN86_R_service_com, GEN86_R_RDI));
+
+	/* >> movq   $LFUTEX_WAIT_WHILE, %rsi */
+	comgen_instr(self, gen86_movq_imm_r(&self->cg_txptr, LFUTEX_WAIT_WHILE, GEN86_R_RSI));
+
+	/* >> movq   $<cg_info.dl_comid>, %rdx */
+	comgen_instr(self, gen86_movq_imm_r(&self->cg_txptr, self->cg_info.dl_comid, GEN86_R_RSI));
+
+#else /* __x86_64__ */
+	/* >> leaq   service_com::sc_code(%R_service_com), %ebx */
+	comgen_instr(self, gen86_leal_db_r(&self->cg_txptr,
+	                                   offsetof(struct service_com, sc_code),
+	                                   GEN86_R_service_com, GEN86_R_EBX));
+
+	/* >> movl   $LFUTEX_WAIT_WHILE, %ecx */
+	comgen_instr(self, gen86_movl_imm_r(&self->cg_txptr, LFUTEX_WAIT_WHILE, GEN86_R_ECX));
+
+	/* >> movl   $<cg_info.dl_comid>, %edx */
+	comgen_instr(self, gen86_movl_imm_r(&self->cg_txptr, self->cg_info.dl_comid, GEN86_R_EDX));
+#endif /* !__x86_64__ */
+
+	/* Invoke the system call. */
+	comgen_do_syscall(self);
+
+	if (!(self->cg_features & COM_GENERATOR_FEATURE_FEXCEPT)) {
+		/* >> cmpP   $(-ELIMIT), %Pax */
+		comgen_instr(self, gen86_cmpP_imm_r(&self->cg_txptr, -ELIMIT, GEN86_R_PAX));
+
+		/* >> ja     .Lerr_com_abort_errno */
+		comgen_instr(self, gen86_jccl_offset(&self->cg_txptr, GEN86_CC_A, -4));
+		comgen_reloc(self, self->cg_txptr - 4, COM_R_PCREL32, COM_SYM_Lerr_com_abort_errno);
+	}
+
+	/* Check if the operation has completed */
+	/* >> cmpP   $<cg_info.dl_comid>, service_com::sc_code(%R_service_com) */
+	comgen_instr(self, gen86_cmpP_imm_mod(&self->cg_txptr, gen86_modrm_db,
+	                                      self->cg_info.dl_comid,
+	                                      offsetof(struct service_com, sc_code),
+	                                      GEN86_R_service_com));
+
+	/* >> je     .Lwaitfor_completion */
+	comgen_instr(self, gen86_je(&self->cg_txptr, loc_Lwaitfor_completion));
+
+	/* >> .Leh_com_waitfor_end: */
+	comgen_defsym(self, COM_SYM_Leh_com_waitfor_end);
 }
 
 
@@ -2388,7 +2484,7 @@ NOTHROW(FCALL comgen_compile)(struct com_generator *__restrict self) {
 	comgen_serialize_integer_arguments(self);
 
 	/* Set the function code within the com descriptor */
-	/* >> movP   $<info->dl_comid>, service_com::sc_code(%R_service_com) */
+	/* >> movP   $<cg_info.dl_comid>, service_com::sc_code(%R_service_com) */
 	if unlikely(!comgen_txok1(self))
 		goto fail;
 	gen86_movP_imm_db(&self->cg_txptr, self->cg_info.dl_comid,
@@ -2445,6 +2541,8 @@ NOTHROW(FCALL comgen_compile)(struct com_generator *__restrict self) {
 	comgen_wake_server(self);
 #endif /* !__x86_64__ */
 
+	/* Wait for the command to complete */
+	comgen_waitfor_command(self);
 
 	/* TODO: All of the stuff that's missing */
 	(void)self;
