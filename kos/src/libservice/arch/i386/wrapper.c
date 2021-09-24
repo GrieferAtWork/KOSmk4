@@ -1998,22 +1998,28 @@ NOTHROW(FCALL comgen_serialize_inline_buffers)(struct com_generator *__restrict 
 				/* >> movP   $<cibp_sizeof>, %Pcx
 				 * >> rep    movsb */
 				comgen_memcpy_with_rep_movs(self, bufsiz);
+				current_pdi_offset += bufsiz;
 			} else if (bufsiz != 0) {
 				uint16_t srcoff;
 				/* >> movP   <cibp_param_offset>(%Psp), %Pcx */
 				comgen_instr(self, gen86_movP_db_r(&self->cg_txptr, spoffset,
 				                                   GEN86_R_PSP, GEN86_R_PCX));
 
-				/* >> {INLINE_MEMCPY(_OFF, _BWLQ, <cibp_sizeof>) { */
-				/* >>     mov{_BWLQ} _OFF(%Pcx), %{_BWLQ}ax */
-				/* >>     mov{_BWLQ} %{_BWLQ}ax, <cibp_buffer_offset>+_OFF(%R_service_com) */
-				/* >> }} */
+				/* >> {INLINE_MEMCPY(_OFF, _BWLQ, <cibp_sizeof>) {
+				 * >>     mov{_BWLQ} _OFF(%Pcx), %{_BWLQ}ax
+				 * >>     mov{_BWLQ} %{_BWLQ}ax, <cibp_buffer_offset>+_OFF(%R_service_com)
+				 * >> }} */
 				srcoff = 0;
 				while (bufsiz) {
 #ifdef __x86_64__
 					if (bufsiz >= 8) {
 						comgen_instr(self, gen86_movq_db_r(&self->cg_txptr, srcoff, GEN86_R_PCX, GEN86_R_RAX));
-						comgen_instr(self, gen86_movq_r_db(&self->cg_txptr, GEN86_R_RAX, bufoff, GEN86_R_service_com));
+						if (bufoff == current_pdi_offset) {
+							comgen_instr(self, gen86_stosq(&self->cg_txptr));
+							current_pdi_offset += 8;
+						} else {
+							comgen_instr(self, gen86_movq_r_db(&self->cg_txptr, GEN86_R_RAX, bufoff, GEN86_R_service_com));
+						}
 						bufsiz -= 8;
 						bufoff += 8;
 						srcoff += 8;
@@ -2022,7 +2028,12 @@ NOTHROW(FCALL comgen_serialize_inline_buffers)(struct com_generator *__restrict 
 #endif /* __x86_64__ */
 					if (bufsiz >= 4) {
 						comgen_instr(self, gen86_movl_db_r(&self->cg_txptr, srcoff, GEN86_R_PCX, GEN86_R_EAX));
-						comgen_instr(self, gen86_movl_r_db(&self->cg_txptr, GEN86_R_EAX, bufoff, GEN86_R_service_com));
+						if (bufoff == current_pdi_offset) {
+							comgen_instr(self, gen86_stosl(&self->cg_txptr));
+							current_pdi_offset += 4;
+						} else {
+							comgen_instr(self, gen86_movl_r_db(&self->cg_txptr, GEN86_R_EAX, bufoff, GEN86_R_service_com));
+						}
 						bufsiz -= 4;
 						bufoff += 4;
 						srcoff += 4;
@@ -2030,14 +2041,24 @@ NOTHROW(FCALL comgen_serialize_inline_buffers)(struct com_generator *__restrict 
 					}
 					if (bufsiz >= 2) {
 						comgen_instr(self, gen86_movw_db_r(&self->cg_txptr, srcoff, GEN86_R_PCX, GEN86_R_AX));
-						comgen_instr(self, gen86_movw_r_db(&self->cg_txptr, GEN86_R_AX, bufoff, GEN86_R_service_com));
+						if (bufoff == current_pdi_offset) {
+							comgen_instr(self, gen86_stosw(&self->cg_txptr));
+							current_pdi_offset += 2;
+						} else {
+							comgen_instr(self, gen86_movw_r_db(&self->cg_txptr, GEN86_R_AX, bufoff, GEN86_R_service_com));
+						}
 						bufsiz -= 2;
 						bufoff += 2;
 						srcoff += 2;
 						continue;
 					}
 					comgen_instr(self, gen86_movb_db_r(&self->cg_txptr, srcoff, GEN86_R_PCX, GEN86_R_AL));
-					comgen_instr(self, gen86_movb_r_db(&self->cg_txptr, GEN86_R_AL, bufoff, GEN86_R_service_com));
+					if (bufoff == current_pdi_offset) {
+						comgen_instr(self, gen86_stosb(&self->cg_txptr));
+						current_pdi_offset += 1;
+					} else {
+						comgen_instr(self, gen86_movb_r_db(&self->cg_txptr, GEN86_R_AL, bufoff, GEN86_R_service_com));
+					}
 					break;
 				}
 			}
@@ -2321,6 +2342,131 @@ NOTHROW(FCALL comgen_waitfor_command)(struct com_generator *__restrict self) {
 }
 
 
+/* Generate instructions:
+ * >> {foreach[INLINE_INOUT_OUT_BUFFER_ARGUMENT: <cibp_buffer_offset>, <cibp_sizeof>, <cibp_param_offset>]: {
+ * >> #if COM_GENERATOR_FEATURE_INLINE_BUFFERS_MOVS
+ * >>     leaP   <cibp_buffer_offset>(%R_service_com), %Psi # This instruction is skipped if `Psi' already has the
+ * >>                                                       # correct value, which may be the case if a preceding
+ * >>                                                       # inline buffer already set it up correctly.
+ * >>                                                       # May also be encoded as `addP $..., %Psi' if appropriate
+ * >>     movP   <cibp_param_offset>(%Psp),            %Pdi
+ * >>     movP   $<cibp_sizeof>,                       %Pcx # Or an equivalent series of inline `[rep] movsX' instructions
+ * >>     rep    movsb
+ * >> #else // COM_GENERATOR_FEATURE_INLINE_BUFFERS_MOVS
+ * >>     movP   <cibp_param_offset>(%Psp), %Pcx
+ * >>     {INLINE_MEMCPY(_OFF, _BWLQ, <cibp_sizeof>) {
+ * >>         mov{_BWLQ} <cibp_buffer_offset>+_OFF(%R_service_com), %{_BWLQ}ax
+ * >>         mov{_BWLQ} %{_BWLQ}ax,                                 _OFF(%Pcx)
+ * >>     }}
+ * >> #endif // !COM_GENERATOR_FEATURE_INLINE_BUFFERS_MOVS
+ * >> }} */
+PRIVATE NONNULL((1)) void
+NOTHROW(FCALL comgen_deserialize_inline_buffers)(struct com_generator *__restrict self) {
+	uint8_t i;
+	uint16_t current_psi_offset = (uint16_t)-1;
+	for (i = 0; i < self->cg_inline_buf_paramc; ++i) {
+		int16_t spoffset;
+		uint16_t bufsiz, bufoff;
+		if (!(self->cg_inline_buf_paramv[i].cibp_flags & COM_INLINE_BUFFER_PARAM_FOUT))
+			continue;
+		bufsiz = self->cg_inline_buf_paramv[i].cibp_sizeof;
+		if unlikely(bufsiz == 0)
+			continue;
+		bufoff   = self->cg_inline_buf_paramv[i].cibp_buffer_offset;
+		spoffset = self->cg_inline_buf_paramv[i].cibp_param_offset + self->cg_cfa_offset;
+		if ((bufsiz >= COM_USEMOVS_THRESHOLD) &&
+		    (self->cg_features & COM_GENERATOR_FEATURE_INLINE_BUFFERS_MOVS)) {
+			/* >> leaP   <cibp_buffer_offset>(%R_service_com), %Psi # This instruction is skipped if `Psi' already has the
+			 * >>                                                   # correct value, which may be the case if a preceding
+			 * >>                                                   # inline buffer already set it up correctly.
+			 * >>                                                   # May also be encoded as `addP $..., %Psi' if appropriate */
+			if (current_psi_offset == (uint16_t)-1) {
+				comgen_instr(self, gen86_leaP_db_r(&self->cg_txptr, bufoff,
+				                                   GEN86_R_service_com, GEN86_R_PSI));
+			} else if (current_psi_offset < bufoff) {
+				uint16_t delta = bufoff - current_psi_offset;
+				comgen_instr(self, gen86_addP_imm_r(&self->cg_txptr, delta, GEN86_R_PSI));
+			} else if (current_psi_offset > bufoff) {
+				uint16_t delta = current_psi_offset - bufoff;
+				comgen_instr(self, gen86_subP_imm_r(&self->cg_txptr, delta, GEN86_R_PSI));
+			}
+			current_psi_offset = bufoff;
+
+			/* >> movP   <cibp_param_offset>(%Psp), %Pdi */
+			comgen_instr(self, gen86_movP_db_r(&self->cg_txptr, spoffset,
+			                                   GEN86_R_PSP, GEN86_R_PDI));
+
+			/* >> movP   $<cibp_sizeof>, %Pcx
+			 * >> rep    movsb */
+			comgen_memcpy_with_rep_movs(self, bufsiz);
+			current_psi_offset += bufsiz;
+		} else {
+			uint16_t dstoff;
+			/* >> movP   <cibp_param_offset>(%Psp), %Pcx */
+			comgen_instr(self, gen86_movP_db_r(&self->cg_txptr, spoffset,
+			                                   GEN86_R_PSP, GEN86_R_PCX));
+
+			/* >> {INLINE_MEMCPY(_OFF, _BWLQ, <cibp_sizeof>) {
+			 * >>         mov{_BWLQ} <cibp_buffer_offset>+_OFF(%R_service_com), %{_BWLQ}ax
+			 * >>         mov{_BWLQ} %{_BWLQ}ax,                                 _OFF(%Pcx)
+			 * >> }} */
+			dstoff = 0;
+			while (bufsiz) {
+#ifdef __x86_64__
+				if (bufsiz >= 8) {
+					if (bufoff == current_psi_offset) {
+						comgen_instr(self, gen86_lodsq(&self->cg_txptr));
+						current_psi_offset += 8;
+					} else {
+						comgen_instr(self, gen86_movq_db_r(&self->cg_txptr, bufoff, GEN86_R_service_com, GEN86_R_RAX));
+					}
+					comgen_instr(self, gen86_movq_r_db(&self->cg_txptr, GEN86_R_RAX, dstoff, GEN86_R_PCX));
+					bufsiz -= 8;
+					bufoff += 8;
+					dstoff += 8;
+					continue;
+				}
+#endif /* __x86_64__ */
+				if (bufsiz >= 4) {
+					if (bufoff == current_psi_offset) {
+						comgen_instr(self, gen86_lodsl(&self->cg_txptr));
+						current_psi_offset += 4;
+					} else {
+						comgen_instr(self, gen86_movl_db_r(&self->cg_txptr, bufoff, GEN86_R_service_com, GEN86_R_EAX));
+					}
+					comgen_instr(self, gen86_movl_r_db(&self->cg_txptr, GEN86_R_EAX, dstoff, GEN86_R_PCX));
+					bufsiz -= 4;
+					bufoff += 4;
+					dstoff += 4;
+					continue;
+				}
+				if (bufsiz >= 2) {
+					if (bufoff == current_psi_offset) {
+						comgen_instr(self, gen86_lodsw(&self->cg_txptr));
+						current_psi_offset += 2;
+					} else {
+						comgen_instr(self, gen86_movw_db_r(&self->cg_txptr, bufoff, GEN86_R_service_com, GEN86_R_AX));
+					}
+					comgen_instr(self, gen86_movw_r_db(&self->cg_txptr, GEN86_R_AX, dstoff, GEN86_R_PCX));
+					bufsiz -= 2;
+					bufoff += 2;
+					dstoff += 2;
+					continue;
+				}
+				if (bufoff == current_psi_offset) {
+					comgen_instr(self, gen86_lodsb(&self->cg_txptr));
+					current_psi_offset += 1;
+				} else {
+					comgen_instr(self, gen86_movb_db_r(&self->cg_txptr, bufoff, GEN86_R_service_com, GEN86_R_AL));
+				}
+				comgen_instr(self, gen86_movb_r_db(&self->cg_txptr, GEN86_R_AL, dstoff, GEN86_R_PCX));
+				break;
+			}
+		}
+	}
+}
+
+
 
 
 
@@ -2543,6 +2689,9 @@ NOTHROW(FCALL comgen_compile)(struct com_generator *__restrict self) {
 
 	/* Wait for the command to complete */
 	comgen_waitfor_command(self);
+
+	/* Deserialize fixed-length inline buffers */
+	comgen_deserialize_inline_buffers(self);
 
 	/* TODO: All of the stuff that's missing */
 	(void)self;
