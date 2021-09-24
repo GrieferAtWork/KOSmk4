@@ -3393,7 +3393,7 @@ NOTHROW(FCALL comgen_handle_errno_problems)(struct com_generator *__restrict sel
 
 
 
-/* Generate instructions:
+/* Generate     instructions:
  * >> .Leh_com_waitfor_entry:
  * >>     movP   $<cg_service>,  %R_fcall0P
  * >>     movP   %R_service_com, %R_fcall1P
@@ -3469,7 +3469,7 @@ NOTHROW(FCALL comgen_eh_com_waitfor_entry)(struct com_generator *__restrict self
 
 
 
-/* Generate instructions:
+/* Generate    instructions:
  * >> #if cg_buf_paramc != 0
  * >> .Leh_free_xbuf_entry:
  * >>     movP   LOC_bufpar_ptr(%Psp), %Pdx
@@ -3742,13 +3742,25 @@ NOTHROW(FCALL comgen_eh_frame_setup)(struct com_generator *__restrict self) {
 extern void __gcc_personality_v0(void);
 
 PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL comgen_eh_frame_startproc)(struct com_generator *__restrict self) {
+	struct com_eh_frame *eh_hdr;
+	eh_hdr                  = (struct com_eh_frame *)self->cg_ehbas;
+	eh_hdr->cef_fde_funbase = self->cg_txptr;
+}
+
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL comgen_eh_frame_endproc)(struct com_generator *__restrict self) {
+	struct com_eh_frame *eh_hdr;
+	eh_hdr                  = (struct com_eh_frame *)self->cg_ehbas;
+	eh_hdr->cef_fde_funsize = (size_t)(self->cg_txptr - self->cg_txbas);
+}
+
+PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL comgen_eh_frame_finish)(struct com_generator *__restrict self) {
 	/* Finalize the .eh_frame description header. */
 	struct com_eh_frame *eh_hdr = (struct com_eh_frame *)self->cg_ehbas;
 	eh_hdr->cef_cie_persoptr = (void *)&__gcc_personality_v0;
 	eh_hdr->cef_fde_size     = (uint32_t)(size_t)(self->cg_ehptr - (byte_t *)&eh_hdr->cef_fde_size);
-	eh_hdr->cef_fde_funbase  = self->cg_txbas;
-	eh_hdr->cef_fde_funsize  = (size_t)(self->cg_txptr - self->cg_txbas);
 
 	/* After the following write has been done, other threads may _immediatly_
 	 * start to parse our newly generated unwind data, _as_ _well_ _as_ access
@@ -3801,6 +3813,7 @@ NOTHROW(FCALL comgen_compile)(struct com_generator *__restrict self) {
 	self->cg_nrelocs    = 0;
 	self->cg_CFA_loc    = self->cg_txptr;
 	comgen_eh_frame_setup(self);
+	comgen_eh_frame_startproc(self);
 	comgen_eh_DW_CFA_def_cfa(self, CFI_X86_UNWIND_REGISTER_PSP, SIZEOF_POINTER);
 
 	/* Generate the unconditional push instructions at the start of the wrapper. */
@@ -3883,10 +3896,6 @@ NOTHROW(FCALL comgen_compile)(struct com_generator *__restrict self) {
 #else /* __x86_64__ */
 	comgen_wake_server(self);
 #endif /* !__x86_64__ */
-	if unlikely(!comgen_txok1(self))
-		goto fail;
-	if unlikely(!comgen_ehok1(self))
-		goto fail;
 
 	/* Wait for the command to complete */
 	comgen_waitfor_command(self);
@@ -3907,12 +3916,6 @@ NOTHROW(FCALL comgen_compile)(struct com_generator *__restrict self) {
 
 	/* Free the xbuf buffer */
 	comgen_free_xbuf(self);
-	if unlikely(!comgen_txok1(self))
-		goto fail;
-#ifndef __x86_64__
-	if unlikely(!comgen_ehok1(self))
-		goto fail;
-#endif /* !__x86_64__ */
 
 	/* Free the com buffer */
 	comgen_free_combuf(self);
@@ -3926,10 +3929,6 @@ NOTHROW(FCALL comgen_compile)(struct com_generator *__restrict self) {
 	/* Restore preemption */
 	assert(normal_cfa_offset == self->cg_cfa_offset);
 	comgen_restore_preemption(self);
-	if unlikely(!comgen_txok1(self))
-		goto fail;
-	if unlikely(!comgen_ehok1(self))
-		goto fail;
 
 	/* Normal return */
 	comgen_normal_return(self);
@@ -3949,10 +3948,6 @@ NOTHROW(FCALL comgen_compile)(struct com_generator *__restrict self) {
 
 	/* Check signals */
 	comgen_sigcheck_before_return(self);
-	if unlikely(!comgen_txok1(self))
-		goto fail;
-	if unlikely(!comgen_ehok1(self))
-		goto fail;
 
 	/* Error/Exception  handlers all run  in the context of  the normal CFA offset.
 	 * As far as  unwind information  goes, this  value has  already been  restored
@@ -3982,6 +3977,12 @@ NOTHROW(FCALL comgen_compile)(struct com_generator *__restrict self) {
 	comgen_eh_free_xbuf_entry(self);
 	comgen_eh_free_service_com_entry(self);
 	comgen_eh_preemption_pop_entry(self);
+	if (!comgen_compile_isok(self))
+		goto fail;
+
+	/* Mark the end of the .eh_frame procedure.
+	 * The rest of the .text section is (ab-)used as .gcc_except_table. */
+	comgen_eh_frame_endproc(self);
 
 	/* TODO: Generate  LSDA (like it would appear in .gcc_except_table)
 	 *       This data we simply put into .text (even though it doesn't
