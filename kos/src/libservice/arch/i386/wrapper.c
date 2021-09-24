@@ -2668,9 +2668,7 @@ NOTHROW(FCALL comgen_deserialize_buffer_arguments)(struct com_generator *__restr
  * >>     movP   0(%Pdx), %Pcx
  * >> #else // __x86_64__
  * >>     pushl_cfi 0(%Pdx)
- * >>     .cfi_escape DW_CFA_GNU_args_size, 4
  * >>     pushl_cfi %Pdx
- * >>     .cfi_escape DW_CFA_GNU_args_size, 8
  * >> #endif // !__x86_64__
  * >>     movP   LOC_bufpar_shm(%Psp), %R_fcall1P
  * >>     movP   LOC_upm(%Psp), %Pax
@@ -2685,7 +2683,6 @@ NOTHROW(FCALL comgen_deserialize_buffer_arguments)(struct com_generator *__restr
  * >>     call   libservice_shmbuf_freeat_nopr
  * >> #ifndef __x86_64__
  * >>     .cfi_adjust_cfa_offset -8
- * >>     .cfi_escape DW_CFA_GNU_args_size, 0
  * >> #endif // !__x86_64__
  * >> 1:
  * >> #endif // cg_buf_paramc != 0 */
@@ -2722,22 +2719,10 @@ NOTHROW(FCALL comgen_free_xbuf)(struct com_generator *__restrict self) {
 	comgen_eh_movehere(self);
 	comgen_eh_DW_CFA_adjust_cfa_offset(self, 4);
 
-	/* >> .cfi_escape DW_CFA_GNU_args_size, 4 */
-	if (!comgen_ehav(self, 2))
-		return;
-	comgen_eh_putb(self, DW_CFA_GNU_args_size);
-	comgen_eh_putb(self, 4);
-
 	/* >> pushl_cfi %Pdx */
 	comgen_instr(self, gen86_pushl_r(&self->cg_txptr, GEN86_R_PDX));
 	comgen_eh_movehere(self);
 	comgen_eh_DW_CFA_adjust_cfa_offset(self, 4);
-
-	/* >> .cfi_escape DW_CFA_GNU_args_size, 8 */
-	if (!comgen_ehav(self, 2))
-		return;
-	comgen_eh_putb(self, DW_CFA_GNU_args_size);
-	comgen_eh_putb(self, 8);
 #endif /* !__x86_64__ */
 
 	/* >> movP   LOC_bufpar_shm(%Psp), %R_fcall1P */
@@ -2787,12 +2772,6 @@ NOTHROW(FCALL comgen_free_xbuf)(struct com_generator *__restrict self) {
 	/* >> .cfi_adjust_cfa_offset -8 */
 	comgen_eh_movehere(self);
 	comgen_eh_DW_CFA_adjust_cfa_offset(self, -8);
-
-	/* >> .cfi_escape DW_CFA_GNU_args_size, 0 */
-	if (!comgen_ehav(self, 2))
-		return;
-	comgen_eh_putb(self, DW_CFA_GNU_args_size);
-	comgen_eh_putb(self, 0);
 #endif /* !__x86_64__ */
 
 	/* >> 1: */
