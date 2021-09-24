@@ -2131,8 +2131,8 @@ PRIVATE byte_t const cfi_clear_eflags_ef_on_unwind[] = {
 /*[[[end]]]*/
 };
 #else /* __x86_64__ */
-extern void __i386_Xsyscall(void);
-extern void __i386_syscall(void);
+__LIBC void __i386_Xsyscall(void);
+__LIBC void __i386_syscall(void);
 #endif /* !__x86_64__ */
 
 /* Generate assembly to perform a system call:
@@ -3649,6 +3649,20 @@ NOTHROW(FCALL comgen_eh_preemption_pop_entry)(struct com_generator *__restrict s
 
 
 
+/* Generate the .gcc_except_table and return a pointer to its base address. */
+PRIVATE NONNULL((1)) uint8_t *
+NOTHROW(FCALL comgen_gcc_except_table)(struct com_generator *__restrict self) {
+	uint8_t *result;
+	result = self->cg_txptr;
+
+	/* TODO */
+	abort();
+
+	return result;
+}
+
+
+
 
 
 
@@ -3739,21 +3753,17 @@ NOTHROW(FCALL comgen_eh_frame_setup)(struct com_generator *__restrict self) {
 	self->cg_ehptr = eh_hdr->cef_fde_text;
 }
 
-extern void __gcc_personality_v0(void);
+#define comgen_eh_frame(self) \
+	((struct com_eh_frame *)(self)->cg_ehbas)
+#define comgen_eh_frame_startproc(self) \
+	(void)(comgen_eh_frame(self)->cef_fde_funbase = (self)->cg_txptr)
+#define comgen_eh_frame_endproc(self) \
+	(void)(comgen_eh_frame(self)->cef_fde_funsize = (size_t)((self)->cg_txptr - (self)->cg_txbas))
+#define comgen_eh_set_lsda(self, ptr) \
+	(void)(comgen_eh_frame(self)->cef_fde_lsda = (ptr))
 
-PRIVATE NOBLOCK NONNULL((1)) void
-NOTHROW(FCALL comgen_eh_frame_startproc)(struct com_generator *__restrict self) {
-	struct com_eh_frame *eh_hdr;
-	eh_hdr                  = (struct com_eh_frame *)self->cg_ehbas;
-	eh_hdr->cef_fde_funbase = self->cg_txptr;
-}
 
-PRIVATE NOBLOCK NONNULL((1)) void
-NOTHROW(FCALL comgen_eh_frame_endproc)(struct com_generator *__restrict self) {
-	struct com_eh_frame *eh_hdr;
-	eh_hdr                  = (struct com_eh_frame *)self->cg_ehbas;
-	eh_hdr->cef_fde_funsize = (size_t)(self->cg_txptr - self->cg_txbas);
-}
+__LIBC void __gcc_personality_v0(void);
 
 PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL comgen_eh_frame_finish)(struct com_generator *__restrict self) {
@@ -3984,11 +3994,15 @@ NOTHROW(FCALL comgen_compile)(struct com_generator *__restrict self) {
 	 * The rest of the .text section is (ab-)used as .gcc_except_table. */
 	comgen_eh_frame_endproc(self);
 
-	/* TODO: Generate  LSDA (like it would appear in .gcc_except_table)
-	 *       This data we simply put into .text (even though it doesn't
-	 *       need to be executable, doing so is the easiest way for  us
-	 *       to define it) */
-	abort();
+	/* Generate  LSDA (like it would appear in .gcc_except_table)
+	 * This data we simply put into .text (even though it doesn't
+	 * need to be executable, doing so is the easiest way for  us
+	 * to define it) */
+	{
+		uint8_t *gcc_except_table;
+		gcc_except_table = comgen_gcc_except_table(self);
+		comgen_eh_set_lsda(self, gcc_except_table);
+	}
 
 	/* Do one last check if everything went OK */
 	if (!comgen_compile_isok(self))
