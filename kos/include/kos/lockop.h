@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4f626112 */
+/* HASH CRC-32:0x665a7070 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -270,7 +270,18 @@ struct atomic_lock;
 struct atomic_rwlock;
 
 
-/* Functions to reap pending lock operations. */
+/* >> ATTR_PURE WUNUSED bool lockop_mustreap(struct lockop_slist const *__restrict self);
+ * >> ATTR_PURE WUNUSED bool lockop_mustreap(struct oblockop_slist const *__restrict self);
+ * >> ATTR_PURE WUNUSED bool lockop_mustreap(struct Toblockop_slist(T) const *__restrict self);
+ * Check if the given lockop-list `self' must be reaped (that is: contains pending callbacks) */
+#define lockop_mustreap(self) \
+	(__hybrid_atomic_load((self)->slh_first, __ATOMIC_ACQUIRE) != __NULLPTR)
+#define oblockop_mustreap(self) lockop_mustreap(self)
+
+/* >> void lockop_reap_ex(struct lockop_slist *__restrict self, bool (LOCKOP_CC *trylock)(void *cookie), void (LOCKOP_CC *unlock)(void *cookie), void *cookie);
+ * >> void oblockop_reap_ex(struct oblockop_slist *__restrict self, bool (LOCKOP_CC *trylock)(void *cookie), void (LOCKOP_CC *unlock)(void *cookie), void *cookie, void *obj);
+ * >> void oblockop_reap_ex(struct Toblockop_slist(T) *__restrict self, bool (LOCKOP_CC *trylock)(void *cookie), void (LOCKOP_CC *unlock)(void *cookie), void *cookie, T *obj);
+ * Functions to reap pending lock operations. */
 #ifdef __OPTIMIZE_SIZE__
 #define lockop_reap_ex(self, trylock, unlock, cookie) \
 	_lockop_reap_ex(self, trylock, unlock, cookie)
@@ -296,6 +307,11 @@ __COMPILER_REDIRECT_VOID(__LIBC,__NOBLOCK __ATTR_NONNULL((1, 2, 3, 5)),__NOTHROW
 __NAMESPACE_LOCAL_USING_OR_IMPL(_oblockop_reap_ex, __FORCELOCAL __ATTR_ARTIFICIAL __NOBLOCK __ATTR_NONNULL((1, 2, 3, 5)) void __NOTHROW(__LOCKOP_CC _oblockop_reap_ex)(struct oblockop_slist *__restrict __self, __BOOL (__LOCKOP_CC *__trylock)(void *__cookie), void (__LOCKOP_CC *__unlock)(void *__cookie), void *__cookie, void *__restrict __obj) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_oblockop_reap_ex))(__self, __trylock, __unlock, __cookie, __obj); })
 #endif /* !__CRT_HAVE_oblockop_reap_ex */
 
+/* >> void lockop_reap_atomic_lock(struct lockop_slist *__restrict self, struct atomic_lock *__restrict lock);
+ * >> void lockop_reap_atomic_rwlock(struct lockop_slist *__restrict self, struct atomic_rwlock *__restrict lock);
+ * >> void oblockop_reap_atomic_lock(struct oblockop_slist *__restrict self, struct atomic_lock *__restrict lock, void *obj);
+ * >> void oblockop_reap_atomic_rwlock(struct oblockop_slist *__restrict self, struct atomic_rwlock *__restrict lock, void *obj);
+ * Functions to reap pending lock operations. */
 #ifdef __OPTIMIZE_SIZE__
 #define lockop_reap_atomic_lock(self, lock)          _lockop_reap_atomic_lock(self, lock)
 #define lockop_reap_atomic_rwlock(self, lock)        _lockop_reap_atomic_rwlock(self, lock)
@@ -334,6 +350,12 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_oblockop_reap_atomic_rwlock, __FORCELOCAL __ATT
 #endif /* !__CRT_HAVE_oblockop_reap_atomic_rwlock */
 
 #ifdef __cplusplus
+
+/* >> void lockop_reap(struct lockop_slist *__restrict self, struct atomic_lock *__restrict lock);
+ * >> void lockop_reap(struct lockop_slist *__restrict self, struct atomic_rwlock *__restrict lock);
+ * >> void oblockop_reap(struct oblockop_slist *__restrict self, struct atomic_lock *__restrict lock, void *obj);
+ * >> void oblockop_reap(struct oblockop_slist *__restrict self, struct atomic_rwlock *__restrict lock, void *obj);
+ * Functions to reap pending lock operations. */
 #ifdef __OPTIMIZE_SIZE__
 #define lockop_reap(self, lock)        _lockop_reap(self, lock)
 #define oblockop_reap(self, lock, obj) _oblockop_reap(self, lock, obj)

@@ -279,7 +279,18 @@ struct atomic_rwlock;
 
 %{
 
-/* Functions to reap pending lock operations. */
+/* >> ATTR_PURE WUNUSED bool lockop_mustreap(struct lockop_slist const *__restrict self);
+ * >> ATTR_PURE WUNUSED bool lockop_mustreap(struct oblockop_slist const *__restrict self);
+ * >> ATTR_PURE WUNUSED bool lockop_mustreap(struct Toblockop_slist(T) const *__restrict self);
+ * Check if the given lockop-list `self' must be reaped (that is: contains pending callbacks) */
+#define lockop_mustreap(self) \
+	(__hybrid_atomic_load((self)->slh_first, __ATOMIC_ACQUIRE) != __NULLPTR)
+#define oblockop_mustreap(self) lockop_mustreap(self)
+
+/* >> void lockop_reap_ex(struct lockop_slist *__restrict self, bool (LOCKOP_CC *trylock)(void *cookie), void (LOCKOP_CC *unlock)(void *cookie), void *cookie);
+ * >> void oblockop_reap_ex(struct oblockop_slist *__restrict self, bool (LOCKOP_CC *trylock)(void *cookie), void (LOCKOP_CC *unlock)(void *cookie), void *cookie, void *obj);
+ * >> void oblockop_reap_ex(struct Toblockop_slist(T) *__restrict self, bool (LOCKOP_CC *trylock)(void *cookie), void (LOCKOP_CC *unlock)(void *cookie), void *cookie, T *obj);
+ * Functions to reap pending lock operations. */
 #ifdef __OPTIMIZE_SIZE__
 #define lockop_reap_ex(self, trylock, unlock, cookie) \
 	_lockop_reap_ex(self, trylock, unlock, cookie)
@@ -347,6 +358,11 @@ void _oblockop_reap_ex([[nonnull]] struct oblockop_slist *__restrict self,
 
 %{
 
+/* >> void lockop_reap_atomic_lock(struct lockop_slist *__restrict self, struct atomic_lock *__restrict lock);
+ * >> void lockop_reap_atomic_rwlock(struct lockop_slist *__restrict self, struct atomic_rwlock *__restrict lock);
+ * >> void oblockop_reap_atomic_lock(struct oblockop_slist *__restrict self, struct atomic_lock *__restrict lock, void *obj);
+ * >> void oblockop_reap_atomic_rwlock(struct oblockop_slist *__restrict self, struct atomic_rwlock *__restrict lock, void *obj);
+ * Functions to reap pending lock operations. */
 #ifdef __OPTIMIZE_SIZE__
 #define lockop_reap_atomic_lock(self, lock)          _lockop_reap_atomic_lock(self, lock)
 #define lockop_reap_atomic_rwlock(self, lock)        _lockop_reap_atomic_rwlock(self, lock)
@@ -440,6 +456,12 @@ void _oblockop_reap_atomic_rwlock([[nonnull]] struct oblockop_slist *__restrict 
 %
 %#ifdef __cplusplus
 %{
+
+/* >> void lockop_reap(struct lockop_slist *__restrict self, struct atomic_lock *__restrict lock);
+ * >> void lockop_reap(struct lockop_slist *__restrict self, struct atomic_rwlock *__restrict lock);
+ * >> void oblockop_reap(struct oblockop_slist *__restrict self, struct atomic_lock *__restrict lock, void *obj);
+ * >> void oblockop_reap(struct oblockop_slist *__restrict self, struct atomic_rwlock *__restrict lock, void *obj);
+ * Functions to reap pending lock operations. */
 #ifdef __OPTIMIZE_SIZE__
 #define lockop_reap(self, lock)        _lockop_reap(self, lock)
 #define oblockop_reap(self, lock, obj) _oblockop_reap(self, lock, obj)
