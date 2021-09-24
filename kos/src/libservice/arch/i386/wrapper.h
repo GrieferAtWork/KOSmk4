@@ -1326,7 +1326,7 @@ struct ATTR_PACKED com_eh_frame {
 
 
 /* Helper macros for generating .eh_frame instrumentation */
-#define COMGEN_EH_FRAME_INSTRLEN_MAX (1 + __SIZEOF_POINTER__ + (__SIZEOF_POINTER__ / 8)) /* # of bytes which must remain available in .eh_frame */
+#define COMGEN_EH_FRAME_INSTRLEN_MAX (1 + __SIZEOF_POINTER__ + ((__SIZEOF_POINTER__ + 7) / 8)) /* # of bytes which must remain available in .eh_frame */
 
 #define comgen_ehav(self, n) likely((self)->cg_ehptr + (n) <= (self)->cg_ehend)
 #define comgen_ehok(self)    comgen_ehav(self, COMGEN_EH_FRAME_INSTRLEN_MAX)

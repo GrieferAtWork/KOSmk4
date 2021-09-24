@@ -132,9 +132,18 @@ function main(parser: Autom8Parser, body: string) {
 	}
 	if (mode == "default") {
 		CFI.outputForAssembly(arch, register, body, outputFile: parser.newText);
-	} else if (mode.startswith("asm")) {
+	} else if (mode == "asm") {
 		CFI.outputForAssembly(arch, register, body, outputFile: parser.newText,
 			linePrefix: "", lineSuffix: "", asmArgPrefix: "", asmArgSuffix: "");
+	} else if (mode == "bytes") {
+		local asm = CFI.Assembler(arch, body);
+		local data = List(asm.assemble(register));
+		if (#data != 1 || data.first.first != "1")
+			throw Error("CFI bytes contain conditional code (cannot output)");
+		data = data.first.last;
+		parser.newText << "\t" << ",\n\t".join(
+			for (local line: data.segments(16))
+				",".join(line)) << "\n";
 	} else if (mode.startswith("macro:")) {
 		local macroName = mode[6:];
 		if (!macroName.issymbol())

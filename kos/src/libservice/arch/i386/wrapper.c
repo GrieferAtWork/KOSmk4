@@ -19,6 +19,7 @@
  */
 #ifndef GUARD_LIBSERVICE_ARCH_I386_WRAPPER_C
 #define GUARD_LIBSERVICE_ARCH_I386_WRAPPER_C 1
+#define _GNU_SOURCE 1
 #define _KOS_SOURCE 1
 
 #include "../../api.h"
@@ -2089,6 +2090,142 @@ NOTHROW(FCALL comgen_schedule_command)(struct com_generator *__restrict self)
 
 
 
+#ifdef __x86_64__
+PRIVATE byte_t const cfi_clear_eflags_ef_on_unwind[] = {
+	DW_CFA_KOS_startcapsule,
+/*[[[cfi{arch='x86_64', register='%rflags', mode='bytes'}
+	push   %rflags
+	and    ~$EFLAGS_DF
+]]]*/
+	22,49,7,146,49,0,11,255,251,26
+/*[[[end]]]*/
+};
+#else /* __x86_64__ */
+extern void __i386_Xsyscall(void);
+extern void __i386_syscall(void);
+#endif /* !__x86_64__ */
+
+
+/* Generate instructions:
+ * >>     movP   $SYS_lfutex, %Pax
+ * >> #ifdef __x86_64__
+ * >>     leaq   service_shm::s_commands(%R_shmbase), %rdi # NOTE: %R_shmbase was already initialized above!
+ * >>     movq   $LFUTEX_WAKE,                        %rsi
+ * >>     movq   $1,                                  %rdx
+ * >> #if COM_GENERATOR_FEATURE_FEXCEPT
+ * >>     std
+ * >>     .cfi_escape 56,22,49,7,146,49,0,11,255,251,26  # Disable EFLAGS.DF during unwind & landing
+ * >>     syscall
+ * >>     cld
+ * >>     .cfi_escape 57
+ * >> #else // COM_GENERATOR_FEATURE_FEXCEPT
+ * >>     syscall
+ * >> #endif // !COM_GENERATOR_FEATURE_FEXCEPT
+ * >> #else // __x86_64__
+ * >> #if offsetof(service_shm, s_commands) != 0  # HINT: `%R_shmbase' is `%ebx' on i386!
+ * >>     addl   $<service_shm::s_commands>, %ebx # NOTE: %R_shmbase was already initialized above!
+ * >> #endif // offsetof(service_shm, s_commands) != 0
+ * >>     movl   $LFUTEX_WAKE, %ecx
+ * >>     movl   $1,           %edx
+ * >> #if COM_GENERATOR_FEATURE_FEXCEPT
+ * >>     call   __i386_Xsyscall
+ * >> #else // COM_GENERATOR_FEATURE_FEXCEPT
+ * >>     call   __i386_syscall
+ * >> #endif // !COM_GENERATOR_FEATURE_FEXCEPT
+ * >> #endif // !__x86_64__ */
+#ifdef __x86_64__
+PRIVATE NONNULL((1)) void
+NOTHROW(FCALL comgen_wake_server)(struct com_generator *__restrict self,
+                                  uint8_t GEN86_R_shmbase)
+#else /* __x86_64__ */
+PRIVATE NONNULL((1)) void
+NOTHROW(FCALL comgen_wake_server)(struct com_generator *__restrict self)
+#endif /* !__x86_64__ */
+{
+	/* >> movP   $SYS_lfutex, %Pax */
+	comgen_instr(self, gen86_movP_imm_r(&self->cg_txptr, SYS_lfutex, GEN86_R_PAX));
+
+#ifdef __x86_64__
+	/* >> leaq   service_shm::s_commands(%R_shmbase), %rdi */
+	if (GEN86_R_shmbase != GEN86_R_RDI) {
+		comgen_instr(self, gen86_leaP_db_r(&self->cg_txptr,
+		                                   offsetof(struct service_shm, s_commands),
+		                                   GEN86_R_shmbase, GEN86_R_RDI));
+	} else if (offsetof(struct service_shm, s_commands) != 0) {
+		comgen_instr(self, gen86_addP_imm_r(&self->cg_txptr,
+		                                    offsetof(struct service_shm, s_commands),
+		                                    GEN86_R_RDI));
+	}
+
+	/* >> movq   $LFUTEX_WAKE, %rsi */
+#if LFUTEX_WAKE == 0
+	comgen_instr(self, gen86_xorq_r_r(&self->cg_txptr, GEN86_R_RSI, GEN86_R_RSI));
+#else /* LFUTEX_WAKE == 0 */
+	comgen_instr(self, gen86_movq_imm_r(&self->cg_txptr, LFUTEX_WAKE, GEN86_R_RSI));
+#endif /* LFUTEX_WAKE != 0 */
+
+	/* >> movq   $1, %rdx */
+	comgen_instr(self, gen86_movP_imm_r(&self->cg_txptr, 1, GEN86_R_RDX));
+
+	if (self->cg_features & COM_GENERATOR_FEATURE_FEXCEPT) {
+
+		/* >> std */
+		comgen_instr(self, gen86_std(&self->cg_txptr));
+
+		/* >> .cfi_escape 56,22,49,7,146,49,0,11,255,251,26  # Disable EFLAGS.DF during unwind & landing */
+		if unlikely(!comgen_ehok(self))
+			return;
+		comgen_eh_movehere(self);
+		if unlikely(!comgen_ehav(self, sizeof(cfi_clear_eflags_ef_on_unwind))) {
+			self->cg_ehptr = self->cg_ehend;
+			return;
+		}
+		self->cg_ehptr = (byte_t *)mempcpy(self->cg_ehptr,
+		                                   cfi_clear_eflags_ef_on_unwind,
+		                                   sizeof(cfi_clear_eflags_ef_on_unwind));
+
+		/* >> syscall */
+		comgen_instr(self, gen86_syscall(&self->cg_txptr));
+
+		/* >> cld */
+		comgen_instr(self, gen86_cld(&self->cg_txptr));
+
+		/* >> .cfi_escape 57 */
+		if unlikely(!comgen_ehok(self))
+			return;
+		comgen_eh_movehere(self);
+		comgen_eh_putb(self, DW_CFA_KOS_endcapsule);
+	} else {
+		/* >> syscall */
+		comgen_instr(self, gen86_syscall(&self->cg_txptr));
+	}
+#else /* __x86_64__ */
+	if (offsetof(struct service_shm, s_commands) != 0) {
+		comgen_instr(self, gen86_addP_imm_r(&self->cg_txptr,
+		                                    offsetof(struct service_shm, s_commands),
+		                                    GEN86_R_EBX));
+	}
+
+	/* >> movl   $LFUTEX_WAKE, %ecx */
+#if LFUTEX_WAKE == 0
+	comgen_instr(self, gen86_xorl_r_r(&self->cg_txptr, GEN86_R_ECX, GEN86_R_ECX));
+#else /* LFUTEX_WAKE == 0 */
+	comgen_instr(self, gen86_movl_imm_r(&self->cg_txptr, LFUTEX_WAKE, GEN86_R_ECX));
+#endif /* LFUTEX_WAKE != 0 */
+
+	/* >> movl   $1,           %edx */
+	comgen_instr(self, gen86_movl_imm_r(&self->cg_txptr, 1, GEN86_R_EDX));
+
+	if (self->cg_features & COM_GENERATOR_FEATURE_FEXCEPT) {
+		comgen_instr(self, gen86_call(&self->cg_txptr, &__i386_Xsyscall));
+	} else {
+		comgen_instr(self, gen86_call(&self->cg_txptr, &__i386_syscall));
+	}
+#endif /* !__x86_64__ */
+}
+
+
+
 
 
 
@@ -2299,6 +2436,13 @@ NOTHROW(FCALL comgen_compile)(struct com_generator *__restrict self) {
 	comgen_schedule_command(self, GEN86_R_shmbase);
 #else /* __x86_64__ */
 	comgen_schedule_command(self);
+#endif /* !__x86_64__ */
+
+	/* Tell the server that a new command has become available */
+#ifdef __x86_64__
+	comgen_wake_server(self, GEN86_R_shmbase);
+#else /* __x86_64__ */
+	comgen_wake_server(self);
 #endif /* !__x86_64__ */
 
 

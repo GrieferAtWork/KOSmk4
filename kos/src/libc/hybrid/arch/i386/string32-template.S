@@ -61,8 +61,8 @@
 #if !defined(__KERNEL__) || 1
 
 /*[[[cfi{register='%eflags', mode='macro:CFI_RESTORE_EFLAGS_CLEARDF'}
-	push %eflags
-	and  ~$EFLAGS_DF
+	push   %eflags
+	and    ~$EFLAGS_DF
 ]]]*/
 #define CFI_RESTORE_EFLAGS_CLEARDF \
 	__ASM_L(	.cfi_escape 22,9,6,121,0,11,255,251,26)
