@@ -57,7 +57,26 @@ typedef struct __sigset_struct sigset_t;
 
 /* Helpers for preemption (iow: signal masking) control.
  * These may be used the same way that the kernel macros
- * of the same name are used. */
+ * of the same name are used.
+ *
+ * NOTE: For userspace, the term "preemption" is kind-of
+ *       missleading: userspace can't turn preemption off
+ *       in a literal sense, however in kernel-space, the
+ *       act  of disabling preemption  also has the side-
+ *       effect  of disabling all other interrupts, which
+ *       allows code to run uninterrupted.
+ *
+ * For user-space, terminology somewhat differs, in that
+ * instead of calling  them interrupts, they're  calling
+ * signals. And using  these macros,  you actually  just
+ * set the current thread's signal mask to full, or will
+ * restore the previously set mask.
+ *
+ * Thanks to  userprocmask, this  can be  done entirely  in
+ * user-space (no syscalls needed  on the most common  code
+ * path; the only syscall possibly invoke is during restore
+ * when  the kernel signaled  that signals became available
+ * in the mean time) */
 typedef sigset_t *pflag_t;
 #define PREEMPTION_PUSHOFF()           __libc_setsigmaskfullptr()
 #define PREEMPTION_POP(was)            __libc_setsigmaskptr(was)
@@ -306,8 +325,8 @@ struct service_shm {
 struct service;
 struct service_shm_handle {
 	WEAK refcnt_t       ssh_refcnt;  /* Reference counter. */
-	struct service_shm *ssh_shm;     /* [1..(ssh_endp-.)][owned][const] Shared memory region base  address.
-	                                  * This pointer is the result of `mmap(fd: ssh_service->s_fd_shm)' */
+	struct service_shm *ssh_shm;     /* [1..(ssh_endp-.)][owned][const] Shared memory region base address.
+	                                  * This pointer  is the  result of  `mmap(fd: ssh_service->s_fd_shm)' */
 	byte_t             *ssh_endp;    /* [lock(READ(ATOMIC), WRITE(ATOMIC && INCREASE_ONLY &&
 	                                  *                           ssh_service->s_shmlock)]
 	                                  * Shared memory region end pointer may not be reduced */
@@ -388,7 +407,7 @@ struct service {
 	fd_t                                   s_fd_shm;       /* [const][owned] File descriptor for the shared memory region. */
 	/* TODO: Allocation helpers for mapping PROT_EXEC memory (for use by arch-specific wrapper function generators) */
 	/* TODO: Allocation helpers for creating `.eh_frame' data (registered via `__register_frame()') (for use by arch-specific wrapper function generators)
-	 * NOTE: For  */
+	 * NOTE: For */
 	/* TODO: Cache of already-loaded service functions (such that `service_dlsym()'  can
 	 *       re-return identical pointers for symbols after they've already been loaded) */
 };
@@ -440,7 +459,7 @@ struct service_wrapper_buffer {
 
 
 /* Lookup a function exported by the service, and if not already loaded, ask the
- * server for information about the function before creating a wrapper for it,
+ * server for information about the function  before creating a wrapper for  it,
  * which is then cached before also being returned. */
 INTDEF WUNUSED NONNULL((1, 2)) void *CC
 libservice_dlsym_lookup_or_create(struct service *__restrict self,
@@ -455,10 +474,10 @@ libservice_dlsym_getinfo(struct service *__restrict self, char const *__restrict
 		THROWS(E_NO_SUCH_OBJECT, E_BADALLOC, E_INTERRUPT);
 
 
-/* Abort the given command by trying to CMPXCH the command code of `com'
+/* Abort the given command by trying to CMPXCH the command code of  `com'
  * from `orig_code' to `SERVICE_COM_NOOP', before sending an interrupt to
- * the server and forcing the thread currently serving this command to
- * restart (at which point the NOOP will be able to complete without any
+ * the  server and forcing  the thread currently  serving this command to
+ * restart (at which point the NOOP will be able to complete without  any
  * further blocking)
  * This function then waits until the operation stops blocking doing that,
  * and only returns once it is safe to deallocate `com'

@@ -790,6 +790,10 @@ STATIC_ASSERT(IS_ALIGNED(offsetof(struct service_com, sc_generic.g_data), 4));
  * >>     test   $USERPROCMASK_FLAG_HASPENDING, userprocmask::pm_flags(%Pax)
  * >>     jnz    .Lcheck_signals_before_return
  * >> .Lafter_check_signals_before_return:
+ * >>
+ * >>
+ * >>
+ * >> // Normal return
  * >> #ifdef __x86_64__
  * >>     # local variables + register argument storage After this, %Psp
  * >>     # points at the first registers which needs to be restored.
@@ -811,20 +815,14 @@ STATIC_ASSERT(IS_ALIGNED(offsetof(struct service_com, sc_generic.g_data), 4));
  * >>     popP_cfi_r %Psi        # Only if used anywhere above
  * >> #endif // COM_GENERATOR_FEATURE_USES_ESI
  * >> #endif // !__x86_64__
- * >>
- * >>
- * >>
- * >> // Set return values
+ * >>     // Set return values
  * >> #ifdef __x86_64__
  * >>     movq   %rbp, %rax
  * >> #else // __x86_64__
  * >>     movl   %ebp, %eax
  * >>     movl   %ebx, %edx
  * >> #endif // !__x86_64__
- * >>
- * >>
- * >>
- * >> // Normal return
+ * >>     // Normal return
  * >> #ifndef __x86_64__
  * >>     popP_cfi_r %Pbx
  * >> #endif // !__x86_64__
@@ -1042,8 +1040,9 @@ enum {
 
 
 /* COM Relocation types */
-#define COM_R_PCREL32 0 /* [*(s32 *)ADDR += (32)(u32)(VALUE - (uintptr_t)ADDR)] PC-relative, 32-bit */
-#define COM_R_ABSPTR  1 /* [*(uintptr_t *)ADDR += VALUE] Absolute, pointer-sized */
+#define COM_R_PCREL32 0 /* [*(s32 *)ADDR += (s32)(u32)(VALUE - (uintptr_t)ADDR)] PC-relative, 32-bit */
+#define COM_R_PCREL8  1 /* [*(s8 *)ADDR += (s8)(u8)(VALUE - (uintptr_t)ADDR)] PC-relative, 8-bit */
+#define COM_R_ABSPTR  2 /* [*(uintptr_t *)ADDR += VALUE] Absolute, pointer-sized */
 
 /* Com relocation descriptor */
 struct com_reloc {
@@ -1219,7 +1218,7 @@ NOTHROW(FCALL _comgen_init)(struct com_generator *__restrict self);
 INTDEF NOBLOCK WUNUSED NONNULL((1)) bool
 NOTHROW(FCALL comgen_compile)(struct com_generator *__restrict self);
 #define comgen_compile_st_moretx(self) (!comgen_txok1(self))
-#define comgen_compile_st_moreeh(self) (!comgen_ehok(self))
+#define comgen_compile_st_moreeh(self) (!comgen_ehok1(self))
 
 /* Helper to check if compilation should continue */
 #define comgen_compile_isok(self)       \
@@ -1338,7 +1337,7 @@ struct ATTR_PACKED com_eh_frame {
 #define COMGEN_EH_FRAME_INSTRLEN_MAX (1 + __SIZEOF_POINTER__ + ((__SIZEOF_POINTER__ + 7) / 8)) /* # of bytes which must remain available in .eh_frame */
 
 #define comgen_ehav(self, n) likely((self)->cg_ehptr + (n) <= (self)->cg_ehend)
-#define comgen_ehok(self)    comgen_ehav(self, COMGEN_EH_FRAME_INSTRLEN_MAX)
+#define comgen_ehok1(self)   comgen_ehav(self, COMGEN_EH_FRAME_INSTRLEN_MAX)
 
 /* Generate various CFA instructions. */
 #ifdef GUARD_LIBSERVICE_ARCH_I386_WRAPPER_C
@@ -1379,7 +1378,7 @@ NOTHROW(FCALL comgen_eh_movehere)(struct com_generator *__restrict self);
 
 /* .cfi_offset <regno>, <offset> */
 #define comgen_eh_DW_CFA_offset(self, regno, offset)                         \
-	(void)(!comgen_ehok(self) ||                                             \
+	(void)(!comgen_ehok1(self) ||                                             \
 	       (assert((offset) < 0 && ((-(offset)) % __SIZEOF_POINTER__) == 0), \
 	        (regno) <= 0x3f                                                  \
 	        ? (comgen_eh_putb(self, DW_CFA_offset | (regno)))                \
@@ -1394,7 +1393,7 @@ NOTHROW(FCALL comgen_eh_movehere)(struct com_generator *__restrict self);
 
 /* .cfi_restore <regno> */
 #define comgen_eh_DW_CFA_restore(self, regno)                  \
-	(void)(!comgen_ehok(self) ||                               \
+	(void)(!comgen_ehok1(self) ||                               \
 	       ((regno) <= 0x3f                                    \
 	        ? (comgen_eh_putb(self, DW_CFA_restore | (regno))) \
 	        : (comgen_eh_putb(self, DW_CFA_restore_extended),  \
@@ -1412,7 +1411,7 @@ NOTHROW(FCALL comgen_eh_movehere)(struct com_generator *__restrict self);
 /* .cfi_def_cfa <regno>, <offset> */
 #define comgen_eh_DW_CFA_def_cfa(self, regno, offset)                     \
 	(void)(assert(((offset) % __SIZEOF_POINTER__) == 0),                  \
-	       !comgen_ehok(self) ||                                          \
+	       !comgen_ehok1(self) ||                                          \
 	       (comgen_eh_putb(self, DW_CFA_def_cfa_sf),                      \
 	        comgen_eh_putuleb128(self, regno),                            \
 	        comgen_eh_putsleb128(self, -((offset) / __SIZEOF_POINTER__)), \

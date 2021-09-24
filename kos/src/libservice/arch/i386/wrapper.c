@@ -548,7 +548,7 @@ PRIVATE NONNULL((1)) void
 NOTHROW(FCALL comgen_eh_DW_CFA_def_cfa_offset)(struct com_generator *__restrict self,
                                                int16_t offset) {
 	assert((offset % SIZEOF_POINTER) == 0);
-	if (!comgen_ehok(self))
+	if (!comgen_ehok1(self))
 		return;
 	if (offset != self->cg_cfa_offset) {
 		comgen_eh_putb(self, DW_CFA_def_cfa_offset_sf);
@@ -2915,6 +2915,54 @@ NOTHROW(FCALL comgen_free_combuf)(struct com_generator *__restrict self) {
 
 
 
+/* Generate instructions:
+ * >> .Leh_preemption_pop_end:
+ * >>     popP_cfi %Pdx              # `sigset_t *oldset'
+ * >>     popP_cfi %Pax              # `struct userprocmask *upm'
+ * >>     .cfi_remember_state
+ * >>     movP   %Pdx, userprocmask::pm_sigmask(%Pax)
+ * >>     test   $USERPROCMASK_FLAG_HASPENDING, userprocmask::pm_flags(%Pax)
+ * >>     jnz    .Lcheck_signals_before_return
+ * >> .Lafter_check_signals_before_return: */
+PRIVATE NONNULL((1)) void
+NOTHROW(FCALL comgen_restore_preemption)(struct com_generator *__restrict self) {
+	/* >> .Leh_preemption_pop_end: */
+	comgen_defsym(self, COM_SYM_Leh_preemption_pop_end);
+
+	/* >> popP_cfi %Pdx              # `sigset_t *oldset' */
+	comgen_instr(self, gen86_popP_r(&self->cg_txptr, GEN86_R_PDX));
+	comgen_eh_movehere(self);
+	comgen_eh_DW_CFA_adjust_cfa_offset(self, -SIZEOF_POINTER);
+
+	/* >> popP_cfi %Pax              # `struct userprocmask *upm' */
+	comgen_instr(self, gen86_popP_r(&self->cg_txptr, GEN86_R_PAX));
+	comgen_eh_movehere(self);
+	comgen_eh_DW_CFA_adjust_cfa_offset(self, -SIZEOF_POINTER);
+
+	/* >> .cfi_remember_state */
+	comgen_eh_DW_CFA_remember_state(self);
+
+	/* >> movP   %Pdx, userprocmask::pm_sigmask(%Pax) */
+	comgen_instr(self, gen86_movP_r_db(&self->cg_txptr, GEN86_R_PDX,
+	                                   offsetof(struct userprocmask, pm_sigmask),
+	                                   GEN86_R_PAX));
+
+	/* >> test   $USERPROCMASK_FLAG_HASPENDING, userprocmask::pm_flags(%Pax) */
+	comgen_instr(self, gen86_testP_imm_mod(&self->cg_txptr, gen86_modrm_db,
+	                                       USERPROCMASK_FLAG_HASPENDING,
+	                                       offsetof(struct userprocmask, pm_flags),
+	                                       GEN86_R_PAX));
+
+	/* >> jnz    .Lcheck_signals_before_return */
+	comgen_instr(self, gen86_jcc8_offset(&self->cg_txptr, GEN86_CC_NZ, -1));
+	comgen_reloc(self, self->cg_txptr - 1, COM_R_PCREL8, COM_SYM_Lcheck_signals_before_return);
+
+	/* >> .Lafter_check_signals_before_return: */
+	comgen_defsym(self, COM_SYM_Lafter_check_signals_before_return);
+}
+
+
+
 
 
 
@@ -2941,6 +2989,11 @@ NOTHROW(FCALL comgen_apply_relocations)(struct com_generator *__restrict self) {
 		case COM_R_PCREL32:
 			/* [*(s32 *)ADDR += (32)(u32)(VALUE - (uintptr_t)ADDR)] PC-relative, 32-bit */
 			*(s32 *)addr += (s32)(u32)(value - (uintptr_t)addr);
+			break;
+
+		case COM_R_PCREL8:
+			/* [*(s8 *)ADDR += (s8)(u8)(VALUE - (uintptr_t)ADDR)] PC-relative, 8-bit */
+			*(s8 *)addr += (s8)(u8)(value - (uintptr_t)addr);
 			break;
 
 		case COM_R_ABSPTR:
@@ -3048,6 +3101,7 @@ NOTHROW(FCALL comgen_compile)(struct com_generator *__restrict self) {
 #ifdef __x86_64__
 	uint8_t GEN86_R_shmbase;
 #endif /* __x86_64__ */
+	int16_t normal_cfa_offset; /* "normal" CFA offset (as set following the first ".cfi_remember_state") */
 
 	/* Assert that the given buffer meets the minimum size requirements. */
 	assert((size_t)(self->cg_txend - self->cg_txbas) >= COM_GENERATOR_INITIAL_TX_BUFSIZ);
@@ -3066,6 +3120,7 @@ NOTHROW(FCALL comgen_compile)(struct com_generator *__restrict self) {
 
 	/* Disable preemption */
 	comgen_disable_preemption(self);
+	normal_cfa_offset = self->cg_cfa_offset;
 
 	/* Allocate the com buffer */
 	comgen_allocate_com_buffer(self);
@@ -3139,14 +3194,14 @@ NOTHROW(FCALL comgen_compile)(struct com_generator *__restrict self) {
 #endif /* !__x86_64__ */
 	if unlikely(!comgen_txok1(self))
 		goto fail;
-	if unlikely(!comgen_ehok(self))
+	if unlikely(!comgen_ehok1(self))
 		goto fail;
 
 	/* Wait for the command to complete */
 	comgen_waitfor_command(self);
 	if unlikely(!comgen_txok1(self))
 		goto fail;
-	if unlikely(!comgen_ehok(self))
+	if unlikely(!comgen_ehok1(self))
 		goto fail;
 
 	/* Deserialize fixed-length inline buffers */
@@ -3164,7 +3219,7 @@ NOTHROW(FCALL comgen_compile)(struct com_generator *__restrict self) {
 	if unlikely(!comgen_txok1(self))
 		goto fail;
 #ifndef __x86_64__
-	if unlikely(!comgen_ehok(self))
+	if unlikely(!comgen_ehok1(self))
 		goto fail;
 #endif /* !__x86_64__ */
 
@@ -3173,9 +3228,17 @@ NOTHROW(FCALL comgen_compile)(struct com_generator *__restrict self) {
 	if unlikely(!comgen_txok1(self))
 		goto fail;
 #ifndef __x86_64__
-	if unlikely(!comgen_ehok(self))
+	if unlikely(!comgen_ehok1(self))
 		goto fail;
 #endif /* !__x86_64__ */
+
+	/* Restore preemption */
+	assert(normal_cfa_offset == self->cg_cfa_offset);
+	comgen_restore_preemption(self);
+	if unlikely(!comgen_txok1(self))
+		goto fail;
+	if unlikely(!comgen_ehok1(self))
+		goto fail;
 
 	/* TODO: All of the stuff that's missing */
 	(void)self;
