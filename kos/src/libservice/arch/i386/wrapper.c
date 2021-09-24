@@ -3542,6 +3542,56 @@ NOTHROW(FCALL comgen_eh_free_xbuf_entry)(struct com_generator *__restrict self) 
 
 
 
+/* Generate instructions:
+ * >> .Leh_free_service_com_entry:
+ * >>     subP   $<sizeof(size_t)>, %R_service_com
+ * >> #ifdef __x86_64__
+ * >>     movq   0(%R_service_com), %rcx
+ * >>     movq   %R_service_com,    %rdx
+ * >> #else // __x86_64__
+ * >>     pushl_cfi 0(%R_service_com)
+ * >>     pushl_cfi %R_service_com
+ * >> #endif // !__x86_64__
+ * >>     movP   LOC_shm(%Psp), %R_fcall1P
+ * >>     <comgen_disable_preemption_and_call_libservice_shmbuf_freeat_nopr> */
+PRIVATE NONNULL((1)) void
+NOTHROW(FCALL comgen_eh_free_service_com_entry)(struct com_generator *__restrict self) {
+	/* >> .Leh_free_service_com_entry: */
+	comgen_defsym(self, COM_SYM_Leh_free_service_com_entry);
+
+	/* >> subP   $<sizeof(size_t)>, %R_service_com */
+	comgen_instr(self, gen86_subP_imm_r(&self->cg_txptr, sizeof(size_t),
+	                                    GEN86_R_service_com));
+
+#ifdef __x86_64__
+	/* >> movq   0(%R_service_com), %rcx */
+	comgen_instr(self, gen86_movq_b_r(&self->cg_txptr, GEN86_R_service_com, GEN86_R_RCX));
+
+	/* >> movq   %R_service_com,    %rdx */
+	comgen_instr(self, gen86_movq_r_r(&self->cg_txptr, GEN86_R_service_com, GEN86_R_RDX));
+#else /* __x86_64__ */
+	/* >> pushl_cfi 0(%R_service_com) */
+	comgen_instr(self, gen86_pushl_mod(&self->cg_txptr, gen86_modrm_b, GEN86_R_service_com));
+	comgen_eh_movehere(self);
+	comgen_eh_DW_CFA_adjust_cfa_offset(self, 4);
+
+	/* >> pushl_cfi %R_service_com */
+	comgen_instr(self, gen86_pushl_r(&self->cg_txptr, GEN86_R_service_com));
+	comgen_eh_movehere(self);
+	comgen_eh_DW_CFA_adjust_cfa_offset(self, 4);
+#endif /* !__x86_64__ */
+
+	/* >> movP   LOC_shm(%Psp), %R_fcall1P */
+	comgen_instr(self, gen86_movP_db_r(&self->cg_txptr,
+	                                   comgen_spoffsetof_LOC_shm(self),
+	                                   GEN86_R_PSP, GEN86_R_FCALL1P));
+
+	/* >> <comgen_disable_preemption_and_call_libservice_shmbuf_freeat_nopr> */
+	comgen_disable_preemption_and_call_libservice_shmbuf_freeat_nopr(self);
+}
+
+
+
 
 
 
@@ -3873,6 +3923,7 @@ NOTHROW(FCALL comgen_compile)(struct com_generator *__restrict self) {
 	/* Define exception handlers. */
 	comgen_eh_com_waitfor_entry(self);
 	comgen_eh_free_xbuf_entry(self);
+	comgen_eh_free_service_com_entry(self);
 
 	/* TODO: All of the stuff that's missing */
 	abort();
