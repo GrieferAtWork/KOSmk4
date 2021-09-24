@@ -934,6 +934,7 @@ STATIC_ASSERT(IS_ALIGNED(offsetof(struct service_com, sc_generic.g_data), 4));
  * >>
  * >>
  * >> // Except handler to free xbuf
+ * >> #if cg_buf_paramc != 0
  * >> .Leh_free_xbuf_entry:
  * >>     movP   LOC_bufpar_ptr(%Psp), %Pdx
  * >>     testP  %Pdx, %Pdx
@@ -946,12 +947,21 @@ STATIC_ASSERT(IS_ALIGNED(offsetof(struct service_com, sc_generic.g_data), 4));
  * >>     pushP_cfi %Pdx
  * >> #endif // !__x86_64__
  * >>     movP   LOC_bufpar_shm(%Psp), %R_fcall1P
- * >>     movP   $<cg_service>,        %R_fcall0P
+ * >>     movP   LOC_upm(%Psp), %Pax
+ * >> #if defined(__x86_64__) && $full_sigset > 0xffffffff
+ * >>     movabs $full_sigset,  %R_fcall0P
+ * >>     movP   %R_fcall0P,    userprocmask::pm_sigmask(%Pax) # re-disable preemption
+ * >>     movP   $<cg_service>, %R_fcall0P
+ * >> #else // __x86_64__ && $full_sigset > 0xffffffff
+ * >>     movP   $<cg_service>, %R_fcall0P
+ * >>     movP   $full_sigset,  userprocmask::pm_sigmask(%Pax) # re-disable preemption
+ * >> #endif // !__x86_64__ || $full_sigset <= 0xffffffff
  * >>     call   libservice_shmbuf_freeat_nopr
  * >> #ifndef __x86_64__
  * >>     .cfi_adjust_cfa_offset -8
  * >> #endif // !__x86_64__
  * >> 1:  // fallthru...
+ * >> #endif // cg_buf_paramc != 0
  * >>
  * >>
  * >>
@@ -966,7 +976,15 @@ STATIC_ASSERT(IS_ALIGNED(offsetof(struct service_com, sc_generic.g_data), 4));
  * >>     pushl_cfi %R_service_com
  * >> #endif // !__x86_64__
  * >>     movP   LOC_shm(%Psp), %R_fcall1P
+ * >>     movP   LOC_upm(%Psp), %Pax
+ * >> #if defined(__x86_64__) && $full_sigset > 0xffffffff
+ * >>     movabs $full_sigset,  %R_fcall0P
+ * >>     movP   %R_fcall0P,    userprocmask::pm_sigmask(%Pax) # re-disable preemption
  * >>     movP   $<cg_service>, %R_fcall0P
+ * >> #else // __x86_64__ && $full_sigset > 0xffffffff
+ * >>     movP   $<cg_service>, %R_fcall0P
+ * >>     movP   $full_sigset,  userprocmask::pm_sigmask(%Pax) # re-disable preemption
+ * >> #endif // !__x86_64__ || $full_sigset <= 0xffffffff
  * >>     call   libservice_shmbuf_freeat_nopr
  * >> #ifndef __x86_64__
  * >>     .cfi_adjust_cfa_offset -8
@@ -1025,7 +1043,7 @@ enum {
 	COM_SYM_Lerr_free_service_com,                               /* `.Lerr_free_service_com'                                        [valid_if(!COM_GENERATOR_FEATURE_FEXCEPT)] */
 	COM_SYM_Lerr_pop_preemption,                                 /* `.Lerr_pop_preemption'                                          [valid_if(!COM_GENERATOR_FEATURE_FEXCEPT)] */
 	COM_SYM_Leh_com_waitfor_entry,                               /* `.Leh_com_waitfor_entry' */
-	COM_SYM_Leh_free_xbuf_entry,                                 /* `.Leh_free_xbuf_entry' */
+	COM_SYM_Leh_free_xbuf_entry,                                 /* `.Leh_free_xbuf_entry'                                          [valid_if(cg_buf_paramc != 0)] */
 	COM_SYM_Leh_free_service_com_entry,                          /* `.Leh_free_service_com_entry' */
 	COM_SYM_Leh_preemption_pop_entry,                            /* `.Leh_preemption_pop_entry' */
 	COM_SYM_COUNT,                                               /* # of COM symbols */

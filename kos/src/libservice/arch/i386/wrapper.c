@@ -2658,6 +2658,68 @@ NOTHROW(FCALL comgen_deserialize_buffer_arguments)(struct com_generator *__restr
 
 
 
+/* Generate instructions:
+ * >>     movP   LOC_upm(%Psp), %Pax
+ * >> #if defined(__x86_64__) && $full_sigset > 0xffffffff
+ * >>     movabs $full_sigset,  %R_fcall0P
+ * >>     movP   %R_fcall0P,    userprocmask::pm_sigmask(%Pax) # re-disable preemption
+ * >>     movP   $<cg_service>, %R_fcall0P
+ * >> #else // __x86_64__ && $full_sigset > 0xffffffff
+ * >>     movP   $<cg_service>, %R_fcall0P
+ * >>     movP   $full_sigset,  userprocmask::pm_sigmask(%Pax) # re-disable preemption
+ * >> #endif // !__x86_64__ || $full_sigset <= 0xffffffff
+ * >>     call   libservice_shmbuf_freeat_nopr
+ * >> #ifndef __x86_64__
+ * >>     .cfi_adjust_cfa_offset -8
+ * >> #endif // !__x86_64__ */
+PRIVATE NONNULL((1)) void
+NOTHROW(FCALL comgen_disable_preemption_and_call_libservice_shmbuf_freeat_nopr)(struct com_generator *__restrict self) {
+	/* >> movP   LOC_upm(%Psp), %Pax */
+	comgen_instr(self, gen86_movP_db_r(&self->cg_txptr,
+	                                   comgen_spoffsetof_LOC_upm(self),
+	                                   GEN86_R_PSP, GEN86_R_PAX));
+
+	/* NOTE: `__code_model_large__' is defined when `-mcmodel=large' is passed
+	 *       to GCC on the commandline. In all other modes, this library would
+	 *       already  be broken when _ANY_ of its symbols were located outside
+	 *       of the signed 32-bit address range.
+	 * As such, we only need to handle overly-large symbol addresses when the
+	 * library was built for that configuration. */
+#if defined(__x86_64__) && defined(__code_model_large__)
+	if (!_gen86_fitsl((uintptr_t)&full_sigset)) {
+		/* >> movabs $full_sigset,  %R_fcall0P */
+		comgen_instr(self, gen86_movabs_imm_r(&self->cg_txptr, &full_sigset, GEN86_R_FCALL0P));
+
+		/* >> movP   %R_fcall0P,    userprocmask::pm_sigmask(%Pax) # re-disable preemption */
+		comgen_instr(self, gen86_movP_r_db(&self->cg_txptr, GEN86_R_FCALL0P,
+		                                   offsetof(struct userprocmask, pm_sigmask),
+		                                   GEN86_R_PAX));
+
+		/* >> movP   $<cg_service>, %R_fcall0P */
+		comgen_instr(self, gen86_movP_imm_r(&self->cg_txptr, self->cg_service, GEN86_R_FCALL0P));
+	} else
+#endif /* __x86_64__ && __code_model_large__ */
+	{
+		/* >> movP   $<cg_service>, %R_fcall0P */
+		comgen_instr(self, gen86_movP_imm_r(&self->cg_txptr, self->cg_service, GEN86_R_FCALL0P));
+
+		/* >> movP   $full_sigset,  userprocmask::pm_sigmask(%Pax) # re-disable preemption */
+		comgen_instr(self, gen86_movP_imm_db(&self->cg_txptr, (uintptr_t)&full_sigset,
+		                                     offsetof(struct userprocmask, pm_sigmask),
+		                                     GEN86_R_PAX));
+	}
+
+	/* >> call   libservice_shmbuf_freeat_nopr */
+	comgen_instr(self, gen86_call(&self->cg_txptr, &libservice_shmbuf_freeat_nopr));
+
+#ifndef __x86_64__
+	/* >> .cfi_adjust_cfa_offset -8 */
+	comgen_eh_movehere(self);
+	comgen_eh_DW_CFA_adjust_cfa_offset(self, -8);
+#endif /* !__x86_64__ */
+}
+
+
 /* Generate    instructions:
  * >> #if cg_buf_paramc != 0
  * >> .Leh_free_xbuf_end:
@@ -2672,19 +2734,7 @@ NOTHROW(FCALL comgen_deserialize_buffer_arguments)(struct com_generator *__restr
  * >>     pushl_cfi %Pdx
  * >> #endif // !__x86_64__
  * >>     movP   LOC_bufpar_shm(%Psp), %R_fcall1P
- * >>     movP   LOC_upm(%Psp), %Pax
- * >> #if defined(__x86_64__) && $full_sigset > 0xffffffff
- * >>     movabs $full_sigset,  %R_fcall0P
- * >>     movP   %R_fcall0P,    userprocmask::pm_sigmask(%Pax) # re-disable preemption
- * >>     movP   $<cg_service>, %R_fcall0P
- * >> #else // __x86_64__ && $full_sigset > 0xffffffff
- * >>     movP   $<cg_service>, %R_fcall0P
- * >>     movP   $full_sigset,  userprocmask::pm_sigmask(%Pax) # re-disable preemption
- * >> #endif // !__x86_64__ || $full_sigset <= 0xffffffff
- * >>     call   libservice_shmbuf_freeat_nopr
- * >> #ifndef __x86_64__
- * >>     .cfi_adjust_cfa_offset -8
- * >> #endif // !__x86_64__
+ * >>     <comgen_disable_preemption_and_call_libservice_shmbuf_freeat_nopr>
  * >> 1:
  * >> #endif // cg_buf_paramc != 0 */
 PRIVATE NONNULL((1)) void
@@ -2731,49 +2781,8 @@ NOTHROW(FCALL comgen_free_xbuf)(struct com_generator *__restrict self) {
 	                                   comgen_spoffsetof_LOC_bufpar_shm(self),
 	                                   GEN86_R_PSP, GEN86_R_FCALL1P));
 
-	/* >> movP   LOC_upm(%Psp), %Pax */
-	comgen_instr(self, gen86_movP_db_r(&self->cg_txptr,
-	                                   comgen_spoffsetof_LOC_upm(self),
-	                                   GEN86_R_PSP, GEN86_R_PAX));
-
-	/* NOTE: `__code_model_large__' is defined when `-mcmodel=large' is passed
-	 *       to GCC on the commandline. In all other modes, this library would
-	 *       already  be broken when _ANY_ of its symbols were located outside
-	 *       of the signed 32-bit address range.
-	 * As such, we only need to handle overly-large symbol addresses when the
-	 * library was built for that configuration. */
-#if defined(__x86_64__) && defined(__code_model_large__)
-	if (!_gen86_fitsl((uintptr_t)&full_sigset)) {
-		/* >> movabs $full_sigset,  %R_fcall0P */
-		comgen_instr(self, gen86_movabs_imm_r(&self->cg_txptr, &full_sigset, GEN86_R_FCALL0P));
-
-		/* >> movP   %R_fcall0P,    userprocmask::pm_sigmask(%Pax) # re-disable preemption */
-		comgen_instr(self, gen86_movP_r_db(&self->cg_txptr, GEN86_R_FCALL0P,
-		                                   offsetof(struct userprocmask, pm_sigmask),
-		                                   GEN86_R_PAX));
-
-		/* >> movP   $<cg_service>, %R_fcall0P */
-		comgen_instr(self, gen86_movP_imm_r(&self->cg_txptr, self->cg_service, GEN86_R_FCALL0P));
-	} else
-#endif /* __x86_64__ && __code_model_large__ */
-	{
-		/* >> movP   $<cg_service>, %R_fcall0P */
-		comgen_instr(self, gen86_movP_imm_r(&self->cg_txptr, self->cg_service, GEN86_R_FCALL0P));
-
-		/* >> movP   $full_sigset,  userprocmask::pm_sigmask(%Pax) # re-disable preemption */
-		comgen_instr(self, gen86_movP_imm_db(&self->cg_txptr, (uintptr_t)&full_sigset,
-		                                     offsetof(struct userprocmask, pm_sigmask),
-		                                     GEN86_R_PAX));
-	}
-
-	/* >> call   libservice_shmbuf_freeat_nopr */
-	comgen_instr(self, gen86_call(&self->cg_txptr, &libservice_shmbuf_freeat_nopr));
-
-#ifndef __x86_64__
-	/* >> .cfi_adjust_cfa_offset -8 */
-	comgen_eh_movehere(self);
-	comgen_eh_DW_CFA_adjust_cfa_offset(self, -8);
-#endif /* !__x86_64__ */
+	/* >> <comgen_disable_preemption_and_call_libservice_shmbuf_freeat_nopr> */
+	comgen_disable_preemption_and_call_libservice_shmbuf_freeat_nopr(self);
 
 	/* >> 1: */
 	*pdisp_1 += (int8_t)(uint8_t)(uintptr_t)
@@ -3351,6 +3360,7 @@ NOTHROW(FCALL comgen_handle_errno_problems)(struct com_generator *__restrict sel
 	comgen_instr(self, gen86_call(&self->cg_txptr, &libservice_aux_com_abort));
 
 #ifndef __x86_64__
+	/* >> .cfi_adjust_cfa_offset -4 */
 	comgen_eh_movehere(self);
 	comgen_eh_DW_CFA_adjust_cfa_offset(self, -4);
 #endif /* !__x86_64__ */
@@ -3430,6 +3440,7 @@ NOTHROW(FCALL comgen_eh_com_waitfor_entry)(struct com_generator *__restrict self
 	comgen_instr(self, gen86_call(&self->cg_txptr, &libservice_aux_com_abort));
 
 #ifndef __x86_64__
+	/* >> .cfi_adjust_cfa_offset -4 */
 	comgen_eh_movehere(self);
 	comgen_eh_DW_CFA_adjust_cfa_offset(self, -4);
 #endif /* !__x86_64__ */
@@ -3449,6 +3460,80 @@ NOTHROW(FCALL comgen_eh_com_waitfor_entry)(struct com_generator *__restrict self
 
 	/* >> jnz    .Leh_com_waitfor_end */
 	comgen_gen86_jcc_symbol(self, GEN86_CC_NZ, COM_SYM_Leh_com_waitfor_end);
+
+	/* >> 1: */
+	*pdisp_1 += (int8_t)(uint8_t)(uintptr_t)
+	            (self->cg_txptr - (byte_t *)pdisp_1);
+}
+
+
+
+/* Generate instructions:
+ * >> #if cg_buf_paramc != 0
+ * >> .Leh_free_xbuf_entry:
+ * >>     movP   LOC_bufpar_ptr(%Psp), %Pdx
+ * >>     testP  %Pdx, %Pdx
+ * >>     jz     1f
+ * >>     subP   $<sizeof(size_t)>, %Pdx
+ * >> #ifdef __x86_64__
+ * >>     movP   0(%Pdx), %Pcx
+ * >> #else // __x86_64__
+ * >>     pushP_cfi 0(%Pdx)
+ * >>     pushP_cfi %Pdx
+ * >> #endif // !__x86_64__
+ * >>     movP   LOC_bufpar_shm(%Psp), %R_fcall1P
+ * >>     <comgen_disable_preemption_and_call_libservice_shmbuf_freeat_nopr>
+ * >> #ifndef __x86_64__
+ * >>     .cfi_adjust_cfa_offset -8
+ * >> #endif // !__x86_64__
+ * >> 1:
+ * >> #endif // cg_buf_paramc != 0 */
+PRIVATE NONNULL((1)) void
+NOTHROW(FCALL comgen_eh_free_xbuf_entry)(struct com_generator *__restrict self) {
+	int8_t *pdisp_1;
+	if (self->cg_buf_paramc == 0)
+		return;
+
+	/* >> .Leh_free_xbuf_entry: */
+	comgen_defsym(self, COM_SYM_Leh_free_xbuf_entry);
+
+	/* >> movP   LOC_bufpar_ptr(%Psp), %Pdx */
+	comgen_instr(self, gen86_movP_db_r(&self->cg_txptr,
+	                                   comgen_spoffsetof_LOC_bufpar_ptr(self),
+	                                   GEN86_R_PSP, GEN86_R_PDX));
+
+	/* >> testP  %Pdx, %Pdx */
+	comgen_instr(self, gen86_testP_r_r(&self->cg_txptr, GEN86_R_PDX, GEN86_R_PDX));
+
+	/* >> jz     1f */
+	comgen_instr(self, gen86_jcc8_offset(&self->cg_txptr, GEN86_CC_Z, -1));
+	pdisp_1 = (int8_t *)(self->cg_txptr - 1);
+
+	/* >> subP   $<sizeof(size_t)>, %Pdx */
+	comgen_instr(self, gen86_subP_imm_r(&self->cg_txptr, sizeof(size_t), GEN86_R_PDX));
+
+#ifdef __x86_64__
+	/* >> movP   0(%Pdx), %Pcx */
+	comgen_instr(self, gen86_movP_b_r(&self->cg_txptr, GEN86_R_PDX, GEN86_R_PCX));
+#else /* __x86_64__ */
+	/* >> pushl_cfi 0(%Pdx) */
+	comgen_instr(self, gen86_pushl_mod(&self->cg_txptr, gen86_modrm_b, GEN86_R_PDX));
+	comgen_eh_movehere(self);
+	comgen_eh_DW_CFA_adjust_cfa_offset(self, 4);
+
+	/* >> pushl_cfi %Pdx */
+	comgen_instr(self, gen86_pushl_r(&self->cg_txptr, GEN86_R_PDX));
+	comgen_eh_movehere(self);
+	comgen_eh_DW_CFA_adjust_cfa_offset(self, 4);
+#endif /* !__x86_64__ */
+
+	/* >> movP   LOC_bufpar_shm(%Psp), %R_fcall1P */
+	comgen_instr(self, gen86_movP_db_r(&self->cg_txptr,
+	                                   comgen_spoffsetof_LOC_bufpar_shm(self),
+	                                   GEN86_R_PSP, GEN86_R_FCALL1P));
+
+	/* >> <comgen_disable_preemption_and_call_libservice_shmbuf_freeat_nopr> */
+	comgen_disable_preemption_and_call_libservice_shmbuf_freeat_nopr(self);
 
 	/* >> 1: */
 	*pdisp_1 += (int8_t)(uint8_t)(uintptr_t)
@@ -3787,7 +3872,7 @@ NOTHROW(FCALL comgen_compile)(struct com_generator *__restrict self) {
 
 	/* Define exception handlers. */
 	comgen_eh_com_waitfor_entry(self);
-
+	comgen_eh_free_xbuf_entry(self);
 
 	/* TODO: All of the stuff that's missing */
 	abort();
