@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x788ff0c5 */
+/* HASH CRC-32:0x16664ae1 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -92,7 +92,7 @@ INTDEF WUNUSED FILE *NOTHROW_RPC(LIBCCALL libc_tmpfile)(void);
  * Create and return a new file-stream for accessing `filename' */
 INTDEF WUNUSED NONNULL((1, 2)) FILE *NOTHROW_RPC(LIBCCALL libc_fopen)(char const *__restrict filename, char const *__restrict modes);
 /* >> freopen(3), freopen64(3), freopen_unlocked(3), freopen64_unlocked(3)
- * Re-open the given `stream' as a file-stream for accessing `filename' */
+ * Re-open the given  `stream' as a  file-stream for accessing  `filename' */
 INTDEF NONNULL((1, 2, 3)) FILE *NOTHROW_RPC(LIBCCALL libc_freopen)(char const *__restrict filename, char const *__restrict modes, FILE *__restrict stream);
 /* >> fgetpos(3), fgetpos64(3)
  * Initialize   an   opaque  descriptor   `pos'   for  the   current   in-file  position   of  `stream'
@@ -150,15 +150,19 @@ INTDEF NONNULL((1)) void NOTHROW_NCX(LIBCCALL libc_funlockfile)(FILE *__restrict
  * Try to acquire a lock to `stream' */
 INTDEF WUNUSED NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_ftrylockfile)(FILE *__restrict stream);
 /* >> popen(3)
- * Open and return a new process I/O stream for executing `COMMAND' */
+ * Open and return a new process I/O stream for executing `command'
+ * @param: command: The command to execute (s.a. `shexec(3)')
+ * @param: modes:   One of "r", "w", "re" or "we" ('e' sets  O_CLOEXEC
+ *                  for the internal file descriptor within the parent
+ *                  process) */
 INTDEF WUNUSED NONNULL((1, 2)) FILE *NOTHROW_RPC(LIBCCALL libc_popen)(char const *command, char const *modes);
 /* >> pclose(3)
  * Close a process I/O file `stream' (s.a. `popen(3)') */
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_pclose)(FILE *stream);
 /* >> popenve(3)
- * Similar to `popen(3)', but rather than running `execl("/bin/sh", "-c", command)',
- * this function will  `execve(path, argv, envp)'. The returned  FILE must still  be
- * closed using `pclose(3)', rather than `fclose(3)' */
+ * Similar to `popen(3)', but rather than running `shexec(command)', this
+ * function will `execve(path, argv, envp)'. The returned FILE must still
+ * be closed using `pclose(3)', rather than `fclose(3)' */
 INTDEF WUNUSED NONNULL((1, 2, 3, 4)) FILE *NOTHROW_RPC(LIBCCALL libc_popenve)(char const *path, __TARGV, __TENVP, char const *modes);
 /* >> fcloseall(3)
  * Close all opened files */
@@ -183,7 +187,7 @@ INTDEF WUNUSED NONNULL((1)) off64_t (LIBCCALL libc_ftello64)(FILE *__restrict st
  * Create and return a new file-stream for accessing `filename' */
 INTDEF WUNUSED NONNULL((1, 2)) FILE *NOTHROW_RPC(LIBCCALL libc_fopen64)(char const *__restrict filename, char const *__restrict modes);
 /* >> freopen(3), freopen64(3), freopen_unlocked(3), freopen64_unlocked(3)
- * Re-open the given `stream' as a file-stream for accessing `filename' */
+ * Re-open the given  `stream' as a  file-stream for accessing  `filename' */
 INTDEF NONNULL((1, 2, 3)) FILE *NOTHROW_RPC(LIBCCALL libc_freopen64)(char const *__restrict filename, char const *__restrict modes, FILE *__restrict stream);
 /* >> fgetpos(3), fgetpos64(3)
  * Initialize   an   opaque  descriptor   `pos'   for  the   current   in-file  position   of  `stream'
@@ -205,10 +209,10 @@ INTDEF NONNULL((2, 3)) FILE *NOTHROW_RPC(LIBCCALL libc_fdreopen)(fd_t fd, char c
  * Re-open the given `stream' as a file-stream for accessing `fd' */
 INTDEF NONNULL((2, 3)) FILE *NOTHROW_RPC(LIBCCALL libc_fdreopen_unlocked)(fd_t fd, char const *__restrict modes, FILE *__restrict stream);
 /* >> freopen(3), freopen64(3), freopen_unlocked(3), freopen64_unlocked(3)
- * Re-open the given `stream' as a file-stream for accessing `filename' */
+ * Re-open the given  `stream' as a  file-stream for accessing  `filename' */
 INTDEF NONNULL((1, 2, 3)) FILE *NOTHROW_RPC(LIBCCALL libc_freopen_unlocked)(char const *__restrict filename, char const *__restrict modes, FILE *__restrict stream);
 /* >> freopen(3), freopen64(3), freopen_unlocked(3), freopen64_unlocked(3)
- * Re-open the given `stream' as a file-stream for accessing `filename' */
+ * Re-open the given  `stream' as a  file-stream for accessing  `filename' */
 INTDEF NONNULL((1, 2, 3)) FILE *NOTHROW_RPC(LIBCCALL libc_freopen64_unlocked)(char const *__restrict filename, char const *__restrict modes, FILE *__restrict stream);
 INTDEF NONNULL((1)) int (LIBCCALL libc_fseek_unlocked)(FILE *__restrict stream, long int off, int whence) THROWS(...);
 INTDEF WUNUSED NONNULL((1)) long int (LIBCCALL libc_ftell_unlocked)(FILE *__restrict stream) THROWS(...);

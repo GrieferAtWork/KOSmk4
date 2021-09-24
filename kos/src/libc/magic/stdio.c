@@ -1124,7 +1124,7 @@ FILE *fopen([[nonnull]] char const *__restrict filename,
             [[nonnull]] char const *__restrict modes);
 
 @@>> freopen(3), freopen64(3), freopen_unlocked(3), freopen64_unlocked(3)
-@@Re-open the given `stream' as a file-stream for accessing `filename'
+@@Re-open the given  `stream' as a  file-stream for accessing  `filename'
 [[cp, std, section(".text.crt{|.dos}.FILE.locked.access"), no_crt_self_import]]
 [[if($extended_include_prefix("<features.h>", "<asm/os/oflags.h>")defined(__USE_STDIO_UNLOCKED) && (!defined(__USE_FILE_OFFSET64) || !defined(__O_LARGEFILE) || (__O_LARGEFILE+0) == 0)), alias("freopen_unlocked")]]
 [[if($extended_include_prefix("<features.h>"                     )defined(__USE_STDIO_UNLOCKED)                                                                                        ), alias("freopen64_unlocked")]]
@@ -1934,7 +1934,11 @@ int ftrylockfile([[nonnull]] $FILE *__restrict stream);
 %[default:section(".text.crt{|.dos}.FILE.locked.access")]
 
 @@>> popen(3)
-@@Open and return a new process I/O stream for executing `COMMAND'
+@@Open and return a new process I/O stream for executing `command'
+@@@param: command: The command to execute (s.a. `shexec(3)')
+@@@param: modes:   One of "r", "w", "re" or "we" ('e' sets  O_CLOEXEC
+@@                 for the internal file descriptor within the parent
+@@                 process)
 [[cp, wunused, dos_only_export_alias("_popen"), export_alias("_IO_popen")]]
 $FILE *popen([[nonnull]] char const *command,
              [[nonnull]] char const *modes);
@@ -1973,9 +1977,9 @@ int pclose([[nonnull]] $FILE *stream);
 )]
 
 @@>> popenve(3)
-@@Similar to `popen(3)', but rather than running `execl("/bin/sh", "-c", command)',
-@@this function will  `execve(path, argv, envp)'. The returned  FILE must still  be
-@@closed using `pclose(3)', rather than `fclose(3)'
+@@Similar to `popen(3)', but rather than running `shexec(command)', this
+@@function will `execve(path, argv, envp)'. The returned FILE must still
+@@be closed using `pclose(3)', rather than `fclose(3)'
 [[cp, wunused, argument_names(path, ___argv, ___envp, modes)]]
 [[decl_include("<features.h>"), decl_prefix(DEFINE_TARGV)]]
 $FILE *popenve([[nonnull]] char const *path,

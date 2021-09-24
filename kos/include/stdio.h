@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7bcae9c */
+/* HASH CRC-32:0xebcf7c4 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1330,27 +1330,27 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),FILE *,__NOTHROW_RPC,fopen,(ch
 #endif /* ... */
 #if defined(__CRT_HAVE_freopen_unlocked) && defined(__USE_STDIO_UNLOCKED) && (!defined(__USE_FILE_OFFSET64) || !defined(__O_LARGEFILE) || !__O_LARGEFILE)
 /* >> freopen(3), freopen64(3), freopen_unlocked(3), freopen64_unlocked(3)
- * Re-open the given `stream' as a file-stream for accessing `filename' */
+ * Re-open the given  `stream' as a  file-stream for accessing  `filename' */
 __CREDIRECT(__ATTR_NONNULL((1, 2, 3)),FILE *,__NOTHROW_RPC,freopen,(char const *__restrict __filename, char const *__restrict __modes, FILE *__restrict __stream),freopen_unlocked,(__filename,__modes,__stream))
 #elif defined(__CRT_HAVE_freopen64_unlocked) && defined(__USE_STDIO_UNLOCKED)
 /* >> freopen(3), freopen64(3), freopen_unlocked(3), freopen64_unlocked(3)
- * Re-open the given `stream' as a file-stream for accessing `filename' */
+ * Re-open the given  `stream' as a  file-stream for accessing  `filename' */
 __CREDIRECT(__ATTR_NONNULL((1, 2, 3)),FILE *,__NOTHROW_RPC,freopen,(char const *__restrict __filename, char const *__restrict __modes, FILE *__restrict __stream),freopen64_unlocked,(__filename,__modes,__stream))
 #elif defined(__CRT_HAVE_freopen) && (!defined(__USE_FILE_OFFSET64) || !defined(__O_LARGEFILE) || !__O_LARGEFILE)
 /* >> freopen(3), freopen64(3), freopen_unlocked(3), freopen64_unlocked(3)
- * Re-open the given `stream' as a file-stream for accessing `filename' */
+ * Re-open the given  `stream' as a  file-stream for accessing  `filename' */
 __CDECLARE(__ATTR_NONNULL((1, 2, 3)),FILE *,__NOTHROW_RPC,freopen,(char const *__restrict __filename, char const *__restrict __modes, FILE *__restrict __stream),(__filename,__modes,__stream))
 #elif defined(__CRT_HAVE_freopen64)
 /* >> freopen(3), freopen64(3), freopen_unlocked(3), freopen64_unlocked(3)
- * Re-open the given `stream' as a file-stream for accessing `filename' */
+ * Re-open the given  `stream' as a  file-stream for accessing  `filename' */
 __CREDIRECT(__ATTR_NONNULL((1, 2, 3)),FILE *,__NOTHROW_RPC,freopen,(char const *__restrict __filename, char const *__restrict __modes, FILE *__restrict __stream),freopen64,(__filename,__modes,__stream))
 #elif defined(__CRT_HAVE_freopen_unlocked) && (!defined(__USE_FILE_OFFSET64) || !defined(__O_LARGEFILE) || !__O_LARGEFILE)
 /* >> freopen(3), freopen64(3), freopen_unlocked(3), freopen64_unlocked(3)
- * Re-open the given `stream' as a file-stream for accessing `filename' */
+ * Re-open the given  `stream' as a  file-stream for accessing  `filename' */
 __CREDIRECT(__ATTR_NONNULL((1, 2, 3)),FILE *,__NOTHROW_RPC,freopen,(char const *__restrict __filename, char const *__restrict __modes, FILE *__restrict __stream),freopen_unlocked,(__filename,__modes,__stream))
 #elif defined(__CRT_HAVE_freopen64_unlocked)
 /* >> freopen(3), freopen64(3), freopen_unlocked(3), freopen64_unlocked(3)
- * Re-open the given `stream' as a file-stream for accessing `filename' */
+ * Re-open the given  `stream' as a  file-stream for accessing  `filename' */
 __CREDIRECT(__ATTR_NONNULL((1, 2, 3)),FILE *,__NOTHROW_RPC,freopen,(char const *__restrict __filename, char const *__restrict __modes, FILE *__restrict __stream),freopen64_unlocked,(__filename,__modes,__stream))
 #endif /* ... */
 __NAMESPACE_STD_END
@@ -2760,15 +2760,27 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(cuserid, __FORCELOCAL __ATTR_ARTIFICIAL char *__
 #ifdef __USE_POSIX2
 #ifdef __CRT_HAVE_popen
 /* >> popen(3)
- * Open and return a new process I/O stream for executing `COMMAND' */
+ * Open and return a new process I/O stream for executing `command'
+ * @param: command: The command to execute (s.a. `shexec(3)')
+ * @param: modes:   One of "r", "w", "re" or "we" ('e' sets  O_CLOEXEC
+ *                  for the internal file descriptor within the parent
+ *                  process) */
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__FILE *,__NOTHROW_RPC,popen,(char const *__command, char const *__modes),(__command,__modes))
 #elif defined(__CRT_HAVE__popen)
 /* >> popen(3)
- * Open and return a new process I/O stream for executing `COMMAND' */
+ * Open and return a new process I/O stream for executing `command'
+ * @param: command: The command to execute (s.a. `shexec(3)')
+ * @param: modes:   One of "r", "w", "re" or "we" ('e' sets  O_CLOEXEC
+ *                  for the internal file descriptor within the parent
+ *                  process) */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__FILE *,__NOTHROW_RPC,popen,(char const *__command, char const *__modes),_popen,(__command,__modes))
 #elif defined(__CRT_HAVE__IO_popen)
 /* >> popen(3)
- * Open and return a new process I/O stream for executing `COMMAND' */
+ * Open and return a new process I/O stream for executing `command'
+ * @param: command: The command to execute (s.a. `shexec(3)')
+ * @param: modes:   One of "r", "w", "re" or "we" ('e' sets  O_CLOEXEC
+ *                  for the internal file descriptor within the parent
+ *                  process) */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__FILE *,__NOTHROW_RPC,popen,(char const *__command, char const *__modes),_IO_popen,(__command,__modes))
 #endif /* ... */
 #ifdef __CRT_HAVE_pclose
@@ -2793,9 +2805,9 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,pclose,(__FILE *__stream),_pcl
 #endif /* !__USE_DOS_ALTERATIONS */
 #endif /* !__TARGV */
 /* >> popenve(3)
- * Similar to `popen(3)', but rather than running `execl("/bin/sh", "-c", command)',
- * this function will  `execve(path, argv, envp)'. The returned  FILE must still  be
- * closed using `pclose(3)', rather than `fclose(3)' */
+ * Similar to `popen(3)', but rather than running `shexec(command)', this
+ * function will `execve(path, argv, envp)'. The returned FILE must still
+ * be closed using `pclose(3)', rather than `fclose(3)' */
 __CDECLARE_OPT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2, 3, 4)),__FILE *,__NOTHROW_RPC,popenve,(char const *__path, __TARGV, __TENVP, char const *__modes),(__path,___argv,___envp,__modes))
 #endif /* __USE_NETBSD */
 
@@ -3237,27 +3249,27 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__FILE *,__NOTHROW_RPC,fopen64,
 #endif /* ... */
 #if defined(__CRT_HAVE_freopen_unlocked) && defined(__USE_STDIO_UNLOCKED) && (!defined(__O_LARGEFILE) || !__O_LARGEFILE)
 /* >> freopen(3), freopen64(3), freopen_unlocked(3), freopen64_unlocked(3)
- * Re-open the given `stream' as a file-stream for accessing `filename' */
+ * Re-open the given  `stream' as a  file-stream for accessing  `filename' */
 __CREDIRECT(__ATTR_NONNULL((1, 2, 3)),__FILE *,__NOTHROW_RPC,freopen64,(char const *__restrict __filename, char const *__restrict __modes, __FILE *__restrict __stream),freopen_unlocked,(__filename,__modes,__stream))
 #elif defined(__CRT_HAVE_freopen64_unlocked) && defined(__USE_STDIO_UNLOCKED)
 /* >> freopen(3), freopen64(3), freopen_unlocked(3), freopen64_unlocked(3)
- * Re-open the given `stream' as a file-stream for accessing `filename' */
+ * Re-open the given  `stream' as a  file-stream for accessing  `filename' */
 __CREDIRECT(__ATTR_NONNULL((1, 2, 3)),__FILE *,__NOTHROW_RPC,freopen64,(char const *__restrict __filename, char const *__restrict __modes, __FILE *__restrict __stream),freopen64_unlocked,(__filename,__modes,__stream))
 #elif defined(__CRT_HAVE_freopen) && (!defined(__O_LARGEFILE) || !__O_LARGEFILE)
 /* >> freopen(3), freopen64(3), freopen_unlocked(3), freopen64_unlocked(3)
- * Re-open the given `stream' as a file-stream for accessing `filename' */
+ * Re-open the given  `stream' as a  file-stream for accessing  `filename' */
 __CREDIRECT(__ATTR_NONNULL((1, 2, 3)),__FILE *,__NOTHROW_RPC,freopen64,(char const *__restrict __filename, char const *__restrict __modes, __FILE *__restrict __stream),freopen,(__filename,__modes,__stream))
 #elif defined(__CRT_HAVE_freopen64)
 /* >> freopen(3), freopen64(3), freopen_unlocked(3), freopen64_unlocked(3)
- * Re-open the given `stream' as a file-stream for accessing `filename' */
+ * Re-open the given  `stream' as a  file-stream for accessing  `filename' */
 __CDECLARE(__ATTR_NONNULL((1, 2, 3)),__FILE *,__NOTHROW_RPC,freopen64,(char const *__restrict __filename, char const *__restrict __modes, __FILE *__restrict __stream),(__filename,__modes,__stream))
 #elif defined(__CRT_HAVE_freopen_unlocked) && (!defined(__O_LARGEFILE) || !__O_LARGEFILE)
 /* >> freopen(3), freopen64(3), freopen_unlocked(3), freopen64_unlocked(3)
- * Re-open the given `stream' as a file-stream for accessing `filename' */
+ * Re-open the given  `stream' as a  file-stream for accessing  `filename' */
 __CREDIRECT(__ATTR_NONNULL((1, 2, 3)),__FILE *,__NOTHROW_RPC,freopen64,(char const *__restrict __filename, char const *__restrict __modes, __FILE *__restrict __stream),freopen_unlocked,(__filename,__modes,__stream))
 #elif defined(__CRT_HAVE_freopen64_unlocked)
 /* >> freopen(3), freopen64(3), freopen_unlocked(3), freopen64_unlocked(3)
- * Re-open the given `stream' as a file-stream for accessing `filename' */
+ * Re-open the given  `stream' as a  file-stream for accessing  `filename' */
 __CREDIRECT(__ATTR_NONNULL((1, 2, 3)),__FILE *,__NOTHROW_RPC,freopen64,(char const *__restrict __filename, char const *__restrict __modes, __FILE *__restrict __stream),freopen64_unlocked,(__filename,__modes,__stream))
 #endif /* ... */
 #if defined(__CRT_HAVE_fgetpos_unlocked) && defined(__USE_STDIO_UNLOCKED) && __SIZEOF_FPOS64_T__ == __SIZEOF_FPOS32_T__
@@ -3451,36 +3463,36 @@ __CREDIRECT(__ATTR_NONNULL((2, 3)),__FILE *,__NOTHROW_RPC,fdreopen_unlocked,(__f
 #endif /* ... */
 #if defined(__CRT_HAVE_freopen_unlocked) && (!defined(__USE_FILE_OFFSET64) || !defined(__O_LARGEFILE) || !__O_LARGEFILE)
 /* >> freopen(3), freopen64(3), freopen_unlocked(3), freopen64_unlocked(3)
- * Re-open the given `stream' as a file-stream for accessing `filename' */
+ * Re-open the given  `stream' as a  file-stream for accessing  `filename' */
 __CDECLARE(__ATTR_NONNULL((1, 2, 3)),__FILE *,__NOTHROW_RPC,freopen_unlocked,(char const *__restrict __filename, char const *__restrict __modes, __FILE *__restrict __stream),(__filename,__modes,__stream))
 #elif defined(__CRT_HAVE_freopen64_unlocked)
 /* >> freopen(3), freopen64(3), freopen_unlocked(3), freopen64_unlocked(3)
- * Re-open the given `stream' as a file-stream for accessing `filename' */
+ * Re-open the given  `stream' as a  file-stream for accessing  `filename' */
 __CREDIRECT(__ATTR_NONNULL((1, 2, 3)),__FILE *,__NOTHROW_RPC,freopen_unlocked,(char const *__restrict __filename, char const *__restrict __modes, __FILE *__restrict __stream),freopen64_unlocked,(__filename,__modes,__stream))
 #elif defined(__CRT_HAVE_freopen) && (!defined(__USE_FILE_OFFSET64) || !defined(__O_LARGEFILE) || !__O_LARGEFILE)
 /* >> freopen(3), freopen64(3), freopen_unlocked(3), freopen64_unlocked(3)
- * Re-open the given `stream' as a file-stream for accessing `filename' */
+ * Re-open the given  `stream' as a  file-stream for accessing  `filename' */
 __CREDIRECT(__ATTR_NONNULL((1, 2, 3)),__FILE *,__NOTHROW_RPC,freopen_unlocked,(char const *__restrict __filename, char const *__restrict __modes, __FILE *__restrict __stream),freopen,(__filename,__modes,__stream))
 #elif defined(__CRT_HAVE_freopen64)
 /* >> freopen(3), freopen64(3), freopen_unlocked(3), freopen64_unlocked(3)
- * Re-open the given `stream' as a file-stream for accessing `filename' */
+ * Re-open the given  `stream' as a  file-stream for accessing  `filename' */
 __CREDIRECT(__ATTR_NONNULL((1, 2, 3)),__FILE *,__NOTHROW_RPC,freopen_unlocked,(char const *__restrict __filename, char const *__restrict __modes, __FILE *__restrict __stream),freopen64,(__filename,__modes,__stream))
 #endif /* ... */
 #if defined(__CRT_HAVE_freopen_unlocked) && (!defined(__O_LARGEFILE) || !__O_LARGEFILE)
 /* >> freopen(3), freopen64(3), freopen_unlocked(3), freopen64_unlocked(3)
- * Re-open the given `stream' as a file-stream for accessing `filename' */
+ * Re-open the given  `stream' as a  file-stream for accessing  `filename' */
 __CREDIRECT(__ATTR_NONNULL((1, 2, 3)),__FILE *,__NOTHROW_RPC,freopen64_unlocked,(char const *__restrict __filename, char const *__restrict __modes, __FILE *__restrict __stream),freopen_unlocked,(__filename,__modes,__stream))
 #elif defined(__CRT_HAVE_freopen64_unlocked)
 /* >> freopen(3), freopen64(3), freopen_unlocked(3), freopen64_unlocked(3)
- * Re-open the given `stream' as a file-stream for accessing `filename' */
+ * Re-open the given  `stream' as a  file-stream for accessing  `filename' */
 __CDECLARE(__ATTR_NONNULL((1, 2, 3)),__FILE *,__NOTHROW_RPC,freopen64_unlocked,(char const *__restrict __filename, char const *__restrict __modes, __FILE *__restrict __stream),(__filename,__modes,__stream))
 #elif defined(__CRT_HAVE_freopen) && (!defined(__O_LARGEFILE) || !__O_LARGEFILE)
 /* >> freopen(3), freopen64(3), freopen_unlocked(3), freopen64_unlocked(3)
- * Re-open the given `stream' as a file-stream for accessing `filename' */
+ * Re-open the given  `stream' as a  file-stream for accessing  `filename' */
 __CREDIRECT(__ATTR_NONNULL((1, 2, 3)),__FILE *,__NOTHROW_RPC,freopen64_unlocked,(char const *__restrict __filename, char const *__restrict __modes, __FILE *__restrict __stream),freopen,(__filename,__modes,__stream))
 #elif defined(__CRT_HAVE_freopen64)
 /* >> freopen(3), freopen64(3), freopen_unlocked(3), freopen64_unlocked(3)
- * Re-open the given `stream' as a file-stream for accessing `filename' */
+ * Re-open the given  `stream' as a  file-stream for accessing  `filename' */
 __CREDIRECT(__ATTR_NONNULL((1, 2, 3)),__FILE *,__NOTHROW_RPC,freopen64_unlocked,(char const *__restrict __filename, char const *__restrict __modes, __FILE *__restrict __stream),freopen64,(__filename,__modes,__stream))
 #endif /* ... */
 #ifdef __CRT_HAVE_fseek_unlocked
@@ -4488,15 +4500,27 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL 
 #define _STDIO_DEFINED 1
 #ifdef __CRT_HAVE_popen
 /* >> popen(3)
- * Open and return a new process I/O stream for executing `COMMAND' */
+ * Open and return a new process I/O stream for executing `command'
+ * @param: command: The command to execute (s.a. `shexec(3)')
+ * @param: modes:   One of "r", "w", "re" or "we" ('e' sets  O_CLOEXEC
+ *                  for the internal file descriptor within the parent
+ *                  process) */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__FILE *,__NOTHROW_RPC,_popen,(char const *__command, char const *__modes),popen,(__command,__modes))
 #elif defined(__CRT_HAVE__popen)
 /* >> popen(3)
- * Open and return a new process I/O stream for executing `COMMAND' */
+ * Open and return a new process I/O stream for executing `command'
+ * @param: command: The command to execute (s.a. `shexec(3)')
+ * @param: modes:   One of "r", "w", "re" or "we" ('e' sets  O_CLOEXEC
+ *                  for the internal file descriptor within the parent
+ *                  process) */
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__FILE *,__NOTHROW_RPC,_popen,(char const *__command, char const *__modes),(__command,__modes))
 #elif defined(__CRT_HAVE__IO_popen)
 /* >> popen(3)
- * Open and return a new process I/O stream for executing `COMMAND' */
+ * Open and return a new process I/O stream for executing `command'
+ * @param: command: The command to execute (s.a. `shexec(3)')
+ * @param: modes:   One of "r", "w", "re" or "we" ('e' sets  O_CLOEXEC
+ *                  for the internal file descriptor within the parent
+ *                  process) */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__FILE *,__NOTHROW_RPC,_popen,(char const *__command, char const *__modes),_IO_popen,(__command,__modes))
 #endif /* ... */
 #ifdef __CRT_HAVE_pclose

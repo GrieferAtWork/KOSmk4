@@ -2962,9 +2962,13 @@ INTERN ATTR_SECTION(".text.crt.FILE.unlocked.read.getc") NONNULL((1)) int
 
 
 
-/*[[[head:libc_popen,hash:CRC-32=0x1aef4101]]]*/
+/*[[[head:libc_popen,hash:CRC-32=0x85e8707a]]]*/
 /* >> popen(3)
- * Open and return a new process I/O stream for executing `COMMAND' */
+ * Open and return a new process I/O stream for executing `command'
+ * @param: command: The command to execute (s.a. `shexec(3)')
+ * @param: modes:   One of "r", "w", "re" or "we" ('e' sets  O_CLOEXEC
+ *                  for the internal file descriptor within the parent
+ *                  process) */
 INTERN ATTR_SECTION(".text.crt.FILE.locked.access") WUNUSED NONNULL((1, 2)) FILE *
 NOTHROW_RPC(LIBCCALL libc_popen)(char const *command,
                                  char const *modes)
@@ -2978,11 +2982,11 @@ NOTHROW_RPC(LIBCCALL libc_popen)(char const *command,
 }
 /*[[[end:libc_popen]]]*/
 
-/*[[[head:libc_popenve,hash:CRC-32=0x71bba238]]]*/
+/*[[[head:libc_popenve,hash:CRC-32=0x5a75552d]]]*/
 /* >> popenve(3)
- * Similar to `popen(3)', but rather than running `execl("/bin/sh", "-c", command)',
- * this function will  `execve(path, argv, envp)'. The returned  FILE must still  be
- * closed using `pclose(3)', rather than `fclose(3)' */
+ * Similar to `popen(3)', but rather than running `shexec(command)', this
+ * function will `execve(path, argv, envp)'. The returned FILE must still
+ * be closed using `pclose(3)', rather than `fclose(3)' */
 INTERN ATTR_SECTION(".text.crt.FILE.locked.access") WUNUSED NONNULL((1, 2, 3, 4)) FILE *
 NOTHROW_RPC(LIBCCALL libc_popenve)(char const *path,
                                    __TARGV,
@@ -3553,9 +3557,9 @@ done:
 }
 /*[[[end:libc_fdreopen_unlocked]]]*/
 
-/*[[[head:libc_freopen,hash:CRC-32=0x98fd620c]]]*/
+/*[[[head:libc_freopen,hash:CRC-32=0xf2a17dd0]]]*/
 /* >> freopen(3), freopen64(3), freopen_unlocked(3), freopen64_unlocked(3)
- * Re-open the given `stream' as a file-stream for accessing `filename' */
+ * Re-open the given  `stream' as a  file-stream for accessing  `filename' */
 INTERN ATTR_SECTION(".text.crt.FILE.locked.access") NONNULL((1, 2, 3)) FILE *
 NOTHROW_RPC(LIBCCALL libc_freopen)(char const *__restrict filename,
                                    char const *__restrict modes,
@@ -3583,9 +3587,9 @@ NOTHROW_RPC(LIBCCALL libc_freopen)(char const *__restrict filename,
 }
 /*[[[end:libc_freopen]]]*/
 
-/*[[[head:libc_freopen_unlocked,hash:CRC-32=0xce123472]]]*/
+/*[[[head:libc_freopen_unlocked,hash:CRC-32=0x6c3a9bd8]]]*/
 /* >> freopen(3), freopen64(3), freopen_unlocked(3), freopen64_unlocked(3)
- * Re-open the given `stream' as a file-stream for accessing `filename' */
+ * Re-open the given  `stream' as a  file-stream for accessing  `filename' */
 INTERN ATTR_SECTION(".text.crt.FILE.unlocked.access") NONNULL((1, 2, 3)) FILE *
 NOTHROW_RPC(LIBCCALL libc_freopen_unlocked)(char const *__restrict filename,
                                             char const *__restrict modes,
