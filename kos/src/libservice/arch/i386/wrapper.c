@@ -40,6 +40,7 @@
 #include <stdlib.h> /* qsort() */
 #include <string.h>
 #include <syscall.h>
+#include <unwind.h> /* _Unwind_Resume() */
 
 #include <libgen86/gen.h>
 #include <libservice/client.h>
@@ -3592,6 +3593,62 @@ NOTHROW(FCALL comgen_eh_free_service_com_entry)(struct com_generator *__restrict
 
 
 
+/* Generate instructions:
+ * >> .Leh_preemption_pop_entry:
+ * >>     popP_cfi %Pdx              # `sigset_t *oldset'
+ * >>     popP_cfi %Pax              # `struct userprocmask *upm'
+ * >>     movP   %Pdx, userprocmask::pm_sigmask(%Pax)
+ * >>     call   chkuserprocmask
+ * >> #ifdef __x86_64__
+ * >>     xorq   %rdi, %rdi
+ * >> #else // __x86_64__
+ * >>     pushl_cfi $0
+ * >> #endif // !__x86_64__
+ * >>     call   _Unwind_Resume
+ * >>     nop */
+PRIVATE NONNULL((1)) void
+NOTHROW(FCALL comgen_eh_preemption_pop_entry)(struct com_generator *__restrict self) {
+	/* >> .Leh_preemption_pop_entry: */
+	comgen_defsym(self, COM_SYM_Leh_preemption_pop_entry);
+
+	/* >> popP_cfi %Pdx              # `sigset_t *oldset' */
+	comgen_instr(self, gen86_popP_r(&self->cg_txptr, GEN86_R_PDX));
+	comgen_eh_movehere(self);
+	comgen_eh_DW_CFA_adjust_cfa_offset(self, -SIZEOF_POINTER);
+
+	/* >> popP_cfi %Pax              # `struct userprocmask *upm' */
+	comgen_instr(self, gen86_popP_r(&self->cg_txptr, GEN86_R_PAX));
+	comgen_eh_movehere(self);
+	comgen_eh_DW_CFA_adjust_cfa_offset(self, -SIZEOF_POINTER);
+
+	/* >> movP   %Pdx, userprocmask::pm_sigmask(%Pax) */
+	comgen_instr(self, gen86_movP_r_db(&self->cg_txptr, GEN86_R_PDX,
+	                                   offsetof(struct userprocmask, pm_sigmask),
+	                                   GEN86_R_PAX));
+
+	/* >> call   chkuserprocmask */
+	comgen_instr(self, gen86_call(&self->cg_txptr, &chkuserprocmask));
+
+#ifdef __x86_64__
+	/* >> xorq   %rdi, %rdi */
+	comgen_instr(self, gen86_xorq_r_r(&self->cg_txptr, GEN86_R_RDI, GEN86_R_RDI));
+#else /* __x86_64__ */
+
+	/* >> pushl_cfi $0 */
+	comgen_instr(self, gen86_pushl_imm(&self->cg_txptr, 0));
+	comgen_eh_movehere(self);
+	comgen_eh_DW_CFA_adjust_cfa_offset(self, 4);
+#endif /* !__x86_64__ */
+
+	/* >> call   _Unwind_Resume */
+	comgen_instr(self, gen86_call(&self->cg_txptr, &_Unwind_Resume));
+
+	/* >> nop */
+	comgen_instr(self, gen86_nop(&self->cg_txptr));
+}
+
+
+
 
 
 
@@ -3924,14 +3981,13 @@ NOTHROW(FCALL comgen_compile)(struct com_generator *__restrict self) {
 	comgen_eh_com_waitfor_entry(self);
 	comgen_eh_free_xbuf_entry(self);
 	comgen_eh_free_service_com_entry(self);
-
-	/* TODO: All of the stuff that's missing */
-	abort();
+	comgen_eh_preemption_pop_entry(self);
 
 	/* TODO: Generate  LSDA (like it would appear in .gcc_except_table)
 	 *       This data we simply put into .text (even though it doesn't
 	 *       need to be executable, doing so is the easiest way for  us
 	 *       to define it) */
+	abort();
 
 	/* Do one last check if everything went OK */
 	if (!comgen_compile_isok(self))
