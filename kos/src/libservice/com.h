@@ -336,7 +336,11 @@ struct service_shm_handle {
 	uintptr_t                  ssh_tree_red; /* [lock(ssh_service->s_shm_lock)] Non-zero  if  this is  a  red node
 	                                          * within the tree of all SHM handles (using the SHM mapping address
 	                                          * ranges) */
-	struct service            *ssh_service;  /* [1..1][const] The associated service. */
+	union {
+		Toblockop(service)     ssh_lop;      /* Lockop used to this handle from the service's tree. */
+		Tobpostlockop(service) ssh_plop;     /* Lockop used to this handle from the service's tree. */
+		struct service        *ssh_service;  /* [1..1][const] The associated service. */
+	};
 };
 
 /* Destroy the given handle.
@@ -387,14 +391,14 @@ struct service {
 	                                                   *       the  libservice client API  reentrance-safe, as there are
 	                                                   *       cases  where this lock needs to be acquired when a client
 	                                                   *       invokes a server function. */
-	struct oblockop_slist             s_shm_lops;     /* Lock operations for `s_shm_lock' */
+	Toblockop_slist(service)          s_shm_lops;     /* Lock operations for `s_shm_lock' */
 	REF struct service_shm_handle    *s_shm;          /* [1..1][lock(s_shm_lock)]
 	                                                   * Current SHM  mapping. (may  be altered  when size  needs to  be
 	                                                   * increased, yet doing so isn't possible due to size constraints) */
 	LLRBTREE_ROOT(service_shm_handle) s_shm_tree;     /* [1..n][owned][lock(s_shm_lock)] Tree of all (non-free'd) SHM handles. */
-	RBTREE_ROOT(service_shm_free)     s_shm_freetree; /* [lock(s_shm_lock)] Tree of free nodes. */
+	RBTREE_ROOT(service_shm_free)     s_shm_freetree; /* [lock(s_shm_lock)] Tree of free nodes. (Pointers within all of these are relative to `s_shm') */
 	struct service_shm_free_list      s_shm_freelist[SERVICE_FREE_LIST_COUNT];
-	                                                  /* [lock(s_shm_lock)] Free list by size. */
+	                                                  /* [lock(s_shm_lock)] Free list by size. (Pointers within all of these are relative to `s_shm') */
 	fd_t                              s_fd_srv;       /* [const][owned] File descriptor for the unix domain socket connected to the server. */
 	fd_t                              s_fd_shm;       /* [const][owned] File descriptor for the shared memory region. */
 	/* TODO: Allocation helpers for mapping PROT_EXEC memory (for use by arch-specific wrapper function generators) */
@@ -406,7 +410,7 @@ struct service {
 
 /* Reap lock operations of `self->s_shm_lops' */
 #define libservice_shmlock_mustreap(self) lockop_mustreap(&(self)->s_shm_lops)
-#define libservice_shmlock_reap(self)     oblockop_reap_atomic_lock(&(self)->s_shm_lops, &(self)->s_shm_lock, self)
+#define libservice_shmlock_reap_nopr(self)     oblockop_reap_atomic_lock(&(self)->s_shm_lops, &(self)->s_shm_lock, self)
 
 /* Acquire or release a lock to `self->s_shm_lops'
  * Note that these functions must only be called when preemption is disabled,
@@ -418,7 +422,7 @@ struct service {
 #define libservice_shmlock_tryacquire_nopr(self) atomic_lock_tryacquire(&(self)->s_shm_lock)
 #define libservice_shmlock_acquire_nopr(self)    atomic_lock_acquire_nopr(&(self)->s_shm_lock)
 #define _libservice_shmlock_release_nopr(self)   atomic_lock_release(&(self)->s_shm_lock)
-#define libservice_shmlock_release_nopr(self)    (_libservice_shmlock_release_nopr(self), libservice_shmlock_reap(self))
+#define libservice_shmlock_release_nopr(self)    (_libservice_shmlock_release_nopr(self), libservice_shmlock_reap_nopr(self))
 
 /* Helpers to automatically  disable preemption before  acquire,
  * and re-enable after release. Note that the disable here works
@@ -427,10 +431,9 @@ struct service {
 	do {                                     \
 		pflag_t _was = PREEMPTION_PUSHOFF(); \
 		libservice_shmlock_acquire_nopr(self)
-#define libservice_shmlock_release(self)        \
-		_libservice_shmlock_release_nopr(self); \
-		PREEMPTION_POP(_was);                   \
-		libservice_shmlock_reap(self);          \
+#define libservice_shmlock_release(self)       \
+		libservice_shmlock_release_nopr(self); \
+		PREEMPTION_POP(_was);                  \
 	} __WHILE0
 
 struct service_wrapper_buffer {

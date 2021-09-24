@@ -19,6 +19,7 @@
  */
 #ifndef GUARD_LIBSERVICE_COM_C
 #define GUARD_LIBSERVICE_COM_C 1
+#define _KOS_SOURCE 1
 
 #include "api.h"
 /**/
@@ -76,14 +77,54 @@
 
 DECL_BEGIN
 
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL service_shm_handle_free)(struct service_shm_handle *__restrict self) {
+	/* FIXME: Need a custom allocator for SHM handles that provides a re-entrant-safe
+	 *        malloc() function for data-blocks with sizeof(service_shm_handle), as
+	 *        SHM handles may need to be allocated from com wrappers. A dedicated
+	 *        slab-allocator would be perfect for this case! */
+	free(self);
+}
+
+
+PRIVATE NOBLOCK NONNULL((1, 2)) void
+NOTHROW(LOCKOP_CC service_shm_handle_destroy_postlop)(Tobpostlockop(service) *__restrict self,
+                                                      struct service *__restrict UNUSED(obj)) {
+	struct service_shm_handle *me;
+	me = container_of(self, struct service_shm_handle, ssh_plop);
+	service_shm_handle_free(me);
+}
+
+PRIVATE NOBLOCK NONNULL((1, 2)) Tobpostlockop(service) *
+NOTHROW(LOCKOP_CC service_shm_handle_destroy_lop)(Toblockop(service) *__restrict self,
+                                                  struct service *__restrict obj) {
+	struct service_shm_handle *me;
+	me = container_of(self, struct service_shm_handle, ssh_lop);
+	sshtree_removenode(&obj->s_shm_tree, me);
+	me->ssh_plop.oplo_func = &service_shm_handle_destroy_postlop;
+	return &me->ssh_plop;
+}
 
 /* Destroy the given handle.
  * HINT: This function uses lockops to remove `self' from `self->ssh_service->s_shm_tree'! */
 INTERN NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL service_shm_handle_destroy)(struct service_shm_handle *__restrict self) {
-	/* TODO */
-	(void)self;
-	abort();
+	pflag_t was;
+	struct service *svc;
+	svc = self->ssh_service;
+	was = PREEMPTION_PUSHOFF();
+	if (libservice_shmlock_tryacquire_nopr(svc)) {
+		sshtree_removenode(&svc->s_shm_tree, self);
+		libservice_shmlock_release_nopr(svc);
+		PREEMPTION_POP(was);
+		service_shm_handle_free(self);
+		return;
+	}
+	/* Enqueue a lockop to remove `self' from `svc->s_shm_tree' */
+	self->ssh_lop.olo_func = &service_shm_handle_destroy_lop;
+	oblockop_enqueue(&svc->s_shm_lops, &self->ssh_lop);
+	libservice_shmlock_reap_nopr(svc);
+	PREEMPTION_POP(was);
 }
 
 

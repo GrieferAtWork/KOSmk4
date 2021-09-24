@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x665a7070 */
+/* HASH CRC-32:0xf8480dc5 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -130,7 +130,7 @@ __SYSDECL_BEGIN
  * >>         service();
  * >>     } else {
  * >>         self->lop.lo_func = &myobj_destroy_lop;
- * >>         SLIST_ATOMIC_INSERT(&lockops, &self->lop, lo_link);
+ * >>         lockop_enqueue(&lockops, &self->lop); // or `SLIST_ATOMIC_INSERT(&lockops, &self->lop, lo_link)'
  * >>         _service();
  * >>     }
  * >> }
@@ -166,6 +166,15 @@ typedef __NOBLOCK __ATTR_NONNULL((1)) struct postlockop *
 typedef __NOBLOCK __ATTR_NONNULL((1, 2)) struct obpostlockop *
 /*NOTHROW*/ (LOCKOP_CC *oblockop_callback_t)(struct oblockop *__restrict __self, void *__restrict __obj);
 
+/* Helper template for copy+paste:
+PRIVATE NOBLOCK NONNULL((1, 2)) void
+NOTHROW(LOCKOP_CC mystruct_action_postlop)(Tobpostlockop(mystruct) *__restrict self,
+                                           struct mystruct *__restrict obj);
+PRIVATE NOBLOCK NONNULL((1, 2)) Tobpostlockop(mystruct) *
+NOTHROW(LOCKOP_CC mystruct_action_lop)(Toblockop(mystruct) *__restrict self,
+                                       struct mystruct *__restrict obj);
+*/
+
 struct postlockop {
 /*	SLIST_ENTRY(postlockop)                 plo_link; */
 	struct { struct postlockop *sle_next; } plo_link; /* [0..1] Next post-lock operation. */
@@ -189,8 +198,6 @@ struct oblockop {
 	struct { struct oblockop *sle_next; } olo_link; /* [0..1] Next lock operation. */
 	oblockop_callback_t                   olo_func; /* [1..1][const] Operation to perform. */
 };
-
-/* NOTE: To add lock ops to a pending list, use `SLIST_ATOMIC_INSERT()'! */
 
 /* Should be `SLIST_HEAD(lockop_slist, lockop);' (but isn't to prevent dependency on <hybrid/sequence/list.h>) */
 struct lockop_slist {
@@ -268,6 +275,23 @@ template<class __T> struct _Tobpostlockop_slist { struct _Tobpostlockop<__T> *sl
 
 struct atomic_lock;
 struct atomic_rwlock;
+
+
+/* >> void lockop_enqueue(struct lockop_slist *__restrict self, struct lockop *__restrict lop);
+ * >> void oblockop_enqueue(struct oblockop_slist *__restrict self, struct oblockop *__restrict lop);
+ * >> void oblockop_enqueue(struct Toblockop_slist(T) *__restrict self, struct Toblockop(T) *__restrict lop);
+ * NOTE: To add lock ops to a pending list, use `lockop_enqueue(self, lop)',
+ *       which is equivalent to `SLIST_ATOMIC_INSERT(self, lop, lo_link)' */
+#define lockop_enqueue(self, lop)   __lockop_enqueue(self, lop, (lop)->lo_link)
+#define oblockop_enqueue(self, lop) __lockop_enqueue(self, lop, (lop)->olo_link)
+#define __lockop_enqueue(self, lop, lop_link)                                          \
+	do {                                                                               \
+		lop_link.sle_next = __hybrid_atomic_load((self)->slh_first, __ATOMIC_ACQUIRE); \
+		__COMPILER_WRITE_BARRIER();                                                    \
+	} while (!__hybrid_atomic_cmpxch((self)->slh_first, lop_link.sle_next, lop,        \
+	                                 __ATOMIC_RELEASE, __ATOMIC_RELAXED))
+
+
 
 
 /* >> ATTR_PURE WUNUSED bool lockop_mustreap(struct lockop_slist const *__restrict self);
