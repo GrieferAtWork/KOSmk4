@@ -23,10 +23,11 @@
 #include <kernel/compiler.h>
 
 #include <kernel/types.h>
-#include <sched/lockop.h>
 
 #include <hybrid/sequence/list.h>
 #include <hybrid/sync/atomic-lock.h>
+
+#include <kos/lockop.h>
 
 /* Module section cache. */
 

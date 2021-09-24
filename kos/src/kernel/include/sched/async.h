@@ -25,18 +25,19 @@
 #include <kernel/types.h>
 
 #ifdef CONFIG_USE_NEW_ASYNC
-#include <sched/lockop.h>
 #include <sched/signal-completion.h>
 
 #include <hybrid/sequence/list.h>
 #include <hybrid/sync/atomic-lock.h>
+
+#include <kos/lockop.h>
 
 #ifdef __cplusplus
 #include <kos/kernel/handle.h>
 #endif /* __cplusplus */
 
 /* TODO: DEPRECATED: BEGIN */
-#define async_job_t struct async *
+#define async_job_t             struct async *
 #define ASYNC_JOB_WORK_COMPLETE ASYNC_FINISHED
 #define ASYNC_JOB_WORK_AGAIN    ASYNC_RESUME
 #define async_job_free          async_free

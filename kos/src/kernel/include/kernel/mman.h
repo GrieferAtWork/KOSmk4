@@ -24,12 +24,13 @@
 
 #include <kernel/paging.h>
 #include <kernel/types.h>
-#include <sched/lockop.h>
 
 #include <hybrid/__assert.h>
 #include <hybrid/sequence/list.h>   /* LIST_HEAD, SLIST_HEAD, ... */
 #include <hybrid/sequence/rbtree.h> /* RBTREE_ROOT */
 #include <hybrid/sync/atomic-lock.h>
+
+#include <kos/lockop.h>
 
 /* Configuration option: Use a read/write lock for `struct mman::mm_lock' */
 #ifdef CONFIG_NO_USE_RWLOCK_FOR_MMAN

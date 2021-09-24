@@ -36,7 +36,6 @@
 #include <kernel/mman/sync.h>
 #include <kernel/paging.h>
 #include <kernel/printk.h>
-#include <sched/lockop.h>
 #include <sched/rpc.h>
 #include <sched/task.h>
 #include <sched/userkern.h>
@@ -44,6 +43,7 @@
 #include <hybrid/atomic.h>
 
 #include <kos/except.h>
+#include <kos/lockop.h>
 
 #include <assert.h>
 #include <stddef.h>

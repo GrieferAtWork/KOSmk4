@@ -26,11 +26,12 @@
 
 #include <kernel/mman/mfile.h>
 #include <kernel/mman/mpart.h>
-#include <sched/lockop.h>
 #include <sched/signal-completion.h>
 #include <sched/task.h>
 
 #include <hybrid/atomic.h>
+
+#include <kos/lockop.h>
 
 #include <assert.h>
 #include <stdbool.h>

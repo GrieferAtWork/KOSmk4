@@ -38,13 +38,13 @@
 #include <kernel/paging.h>
 #include <kernel/panic.h>
 #include <kernel/swap.h>
-#include <sched/lockop.h>
 
 #include <hybrid/align.h>
 #include <hybrid/atomic.h>
 #include <hybrid/minmax.h>
 
 #include <kos/except.h>
+#include <kos/lockop.h>
 
 #include <assert.h>
 #include <inttypes.h>

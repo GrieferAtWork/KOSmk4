@@ -19,7 +19,7 @@
  */
 
 /* !!!THIS HEADER IS DEPRECATED!!!
- * Replacement (kernel-only): <sched/lockop.h>
+ * Replacement: <kos/lockop.h>
  *
  * The service-lock mechanism is a good idea, however it has been proven more efficient
  * to only ever service lock operations just after having released a lock, which can be

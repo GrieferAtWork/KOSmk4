@@ -26,7 +26,6 @@
 #include <kernel/types.h>
 #include <misc/unlockinfo.h>
 #include <sched/atomic64.h>
-#include <sched/lockop.h>
 #include <sched/signal.h>
 
 #include <hybrid/__minmax.h>
@@ -35,6 +34,7 @@
 #include <hybrid/sync/atomic-rwlock.h>
 
 #include <bits/os/timespec.h>
+#include <kos/lockop.h>
 
 #include <libvio/api.h> /* LIBVIO_CONFIG_ENABLED */
 
@@ -481,13 +481,6 @@ struct mfile_ops {
 #endif /* !CONFIG_USE_NEW_FS */
 };
 
-struct oblockop;
-
-#ifndef __oblockop_slist_defined
-#define __oblockop_slist_defined 1
-SLIST_HEAD(oblockop_slist, oblockop);
-#endif /* !__oblockop_slist_defined */
-
 #ifdef CONFIG_USE_NEW_FS
 /* Flags defined here also map to:
  *  - `ST_*' from <sys/statvfs.h>
@@ -760,7 +753,7 @@ NOTHROW(mfile_changed)(struct mfile *__restrict self, uintptr_t what) {
 	((self)->mf_refcnt = 1,                \
 	 (self)->mf_ops    = (ops),            \
 	 __mfile_init_vio(self)                \
-	 __mfile_init_wrlockpc(self)             \
+	 __mfile_init_wrlockpc(self)           \
 	 atomic_rwlock_init(&(self)->mf_lock), \
 	 (self)->mf_parts = __NULLPTR,         \
 	 sig_init(&(self)->mf_initdone),       \

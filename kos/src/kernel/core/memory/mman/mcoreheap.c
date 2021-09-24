@@ -36,12 +36,12 @@
 #include <kernel/paging.h>
 #include <kernel/printk.h>
 #include <kernel/types.h>
-#include <sched/lockop.h>
 
 #include <hybrid/align.h>
 
 #include <kos/except.h>
 #include <kos/kernel/paging.h>
+#include <kos/lockop.h>
 #include <sys/param.h>
 
 #include <assert.h>

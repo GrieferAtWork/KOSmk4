@@ -35,13 +35,13 @@
 #include <kernel/mman/mpart.h>
 #include <kernel/mman/mpartmeta.h>
 #include <kernel/swap.h>
-#include <sched/lockop.h>
 
 #include <hybrid/align.h>
 #include <hybrid/atomic.h>
 #include <hybrid/overflow.h>
 
 #include <kos/except.h>
+#include <kos/lockop.h>
 
 #include <assert.h>
 #include <inttypes.h>

@@ -49,7 +49,6 @@
 #include <kernel/mman/module.h>
 #include <kernel/mman/ramfile.h> /* `struct mramfile' */
 #include <kernel/panic.h>
-#include <sched/lockop.h>
 
 #include <hybrid/align.h>
 #include <hybrid/atomic.h>
@@ -60,6 +59,7 @@
 #include <kos/except.h>
 #include <kos/exec/rtld.h>
 #include <kos/kernel/paging.h>
+#include <kos/lockop.h>
 
 #include <alloca.h>
 #include <assert.h>

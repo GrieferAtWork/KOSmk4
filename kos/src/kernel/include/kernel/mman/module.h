@@ -31,7 +31,7 @@
 #include <compat/config.h>
 
 #ifdef __WANT_MODULE__md_mmlop
-#include <sched/lockop.h>
+#include <kos/lockop.h>
 #endif /* __WANT_MODULE__md_mmlop */
 
 #ifdef __CC__

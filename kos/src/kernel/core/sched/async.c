@@ -29,13 +29,14 @@
 #include <kernel/malloc.h>
 #include <sched/async-intern.h>
 #include <sched/async.h>
-#include <sched/lockop.h>
 #include <sched/signal.h>
 #include <sched/task.h>
 #include <sched/tsc.h>
 
 #include <hybrid/atomic.h>
 #include <hybrid/sequence/bsearch.h>
+
+#include <kos/lockop.h>
 
 #include <assert.h>
 #include <stddef.h>

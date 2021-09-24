@@ -34,7 +34,8 @@
 
 #ifdef __WANT_DRIVER__d_internals
 #include <hybrid/sync/atomic-rwlock.h>
-#include <sched/lockop.h>
+
+#include <kos/lockop.h>
 #endif /* __WANT_DRIVER__d_internals */
 
 #ifdef __CC__

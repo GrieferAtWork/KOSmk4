@@ -24,12 +24,12 @@
 
 #include <kernel/paging.h>
 #include <kernel/types.h>
-#include <sched/lockop.h>
 
 #include <hybrid/host.h> /* __ARCH_STACK_GROWS_DOWNWARDS */
 
 #include <asm/os/mman.h>       /* __MAP_FAILED */
 #include <kos/kernel/paging.h> /* KERNEL_MHINT_HEAP */
+#include <kos/lockop.h>
 
 #ifdef __CC__
 DECL_BEGIN

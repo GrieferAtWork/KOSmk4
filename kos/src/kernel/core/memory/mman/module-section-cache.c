@@ -28,10 +28,11 @@
 #include <kernel/mman/cache.h>
 #include <kernel/mman/module-section-cache.h>
 #include <kernel/mman/module.h>
-#include <sched/lockop.h>
 
 #include <hybrid/atomic.h>
 #include <hybrid/sync/atomic-lock.h>
+
+#include <kos/lockop.h>
 
 DECL_BEGIN
 

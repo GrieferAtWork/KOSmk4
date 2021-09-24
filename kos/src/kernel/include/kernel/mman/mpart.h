@@ -25,7 +25,6 @@
 #include <kernel/memory.h>
 #include <kernel/types.h>
 #include <misc/unlockinfo.h>
-#include <sched/lockop.h>
 
 #include <hybrid/__assert.h>
 #include <hybrid/__atomic.h>
@@ -34,6 +33,8 @@
 #include <hybrid/sequence/list.h>
 #include <hybrid/sequence/rbtree.h>
 #include <hybrid/sync/atomic-lock.h>
+
+#include <kos/lockop.h>
 
 #include <libvio/api.h> /* LIBVIO_CONFIG_ENABLED */
 

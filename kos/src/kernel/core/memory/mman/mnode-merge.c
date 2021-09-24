@@ -35,9 +35,10 @@
 #include <kernel/mman/mpart.h>
 #include <kernel/mman/mpartmeta.h>
 #include <kernel/printk.h>
-#include <sched/lockop.h>
 
 #include <hybrid/atomic.h>
+
+#include <kos/lockop.h>
 
 #include <assert.h>
 #include <inttypes.h>

@@ -25,7 +25,6 @@
 #include <kernel/arch/mman/rtm.h>
 #include <kernel/mman/mpart.h>
 #include <kernel/types.h>
-#include <sched/lockop.h>
 #include <sched/signal.h>
 
 #include <hybrid/sequence/list.h>
@@ -33,6 +32,7 @@
 #include <hybrid/sync/atomic-rwlock.h>
 
 #include <kos/aref.h>
+#include <kos/lockop.h>
 
 /* NOTE: Unlike `mpart' and its other fields, `mpartmeta', as well
  *       `mfutex' objects may  be allocated without  `GFP_LOCKED'!

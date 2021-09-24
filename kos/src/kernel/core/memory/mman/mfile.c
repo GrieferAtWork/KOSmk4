@@ -28,7 +28,6 @@
 #include <kernel/mman/mfile.h>
 #include <kernel/mman/mpart.h>
 #include <kernel/mman/phys.h>
-#include <sched/lockop.h>
 #include <sched/task.h>
 
 #include <hybrid/align.h>
@@ -36,6 +35,7 @@
 #include <hybrid/overflow.h>
 
 #include <kos/except.h>
+#include <kos/lockop.h>
 #include <sys/param.h>
 
 #include <assert.h>

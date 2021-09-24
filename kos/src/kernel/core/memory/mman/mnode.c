@@ -36,11 +36,11 @@
 #include <kernel/mman/sync.h>
 #include <kernel/paging.h>
 #include <kernel/panic.h>
-#include <sched/lockop.h>
 
 #include <hybrid/atomic.h>
 
 #include <kos/except.h>
+#include <kos/lockop.h>
 
 #include <assert.h>
 #include <stddef.h>

@@ -32,13 +32,13 @@
 
 #if (defined(CONFIG_HAVE_USERELF_MODULES) || !defined(CONFIG_BUILDING_KERNEL_CORE))
 #include <kernel/mman/module.h>
-#include <sched/lockop.h>
 
 #include <hybrid/sequence/list.h>
 
 #include <compat/kos/exec/elf.h> /* COMPAT_ELF_ARCH_CLASS */
 #include <kos/aref.h>
 #include <kos/exec/elf.h> /* ELF_ARCH_CLASS */
+#include <kos/lockop.h>
 
 #include <elf.h>
 
