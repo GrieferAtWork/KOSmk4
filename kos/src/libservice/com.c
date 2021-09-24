@@ -87,15 +87,6 @@ NOTHROW(FCALL service_shm_handle_destroy)(struct service_shm_handle *__restrict 
 }
 
 
-/* Reap lock operations of `self->s_shmlock_lop' */
-INTERN NOBLOCK WUNUSED NONNULL((1)) void
-NOTHROW(CC _libservice_shmlock_reap)(struct service *__restrict self) {
-	/* TODO */
-	(void)self;
-	abort();
-}
-
-
 /* Lookup a function exported by the service, and if not already loaded, ask the
  * server for information about the function before creating a wrapper for it,
  * which is then cached before also being returned. */
