@@ -29,6 +29,7 @@
 
 #include <kos/types.h>
 
+#include <stdbool.h>
 #include <stdint.h>
 
 #include <libgen86/gen.h> /* GEN86_INSTRLEN_MAX */

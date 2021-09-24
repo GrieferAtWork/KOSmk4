@@ -324,16 +324,18 @@ struct service_shm {
 
 struct service;
 struct service_shm_handle {
-	WEAK refcnt_t       ssh_refcnt;  /* Reference counter. */
-	struct service_shm *ssh_shm;     /* [1..(ssh_endp-.)][owned][const] Shared memory region base address.
-	                                  * This pointer  is the  result of  `mmap(fd: ssh_service->s_fd_shm)' */
-	byte_t             *ssh_endp;    /* [lock(READ(ATOMIC), WRITE(ATOMIC && INCREASE_ONLY &&
-	                                  *                           ssh_service->s_shmlock)]
-	                                  * Shared memory region end pointer may not be reduced */
-	uintptr_t           ssh_isred;   /* [lock(ssh_service->s_shmlock)] Non-zero  if  this is  a  red node
-	                                  * within the tree of all SHM handles (using the SHM mapping address
-	                                  * ranges) */
-	struct service     *ssh_service; /* [1..1][const] The associated service. */
+	WEAK refcnt_t              ssh_refcnt;   /* Reference counter. */
+	struct service_shm        *ssh_shm;      /* [1..(ssh_endp-.)][owned][const] Shared memory region base address.
+	                                          * This pointer  is the  result of  `mmap(fd: ssh_service->s_fd_shm)' */
+	byte_t                    *ssh_endp;     /* [lock(READ(ATOMIC), WRITE(ATOMIC && INCREASE_ONLY &&
+	                                          *                           ssh_service->s_shmlock)]
+	                                          * Shared memory region end pointer may not be reduced */
+	struct service_shm_handle *ssh_tree_lhs; /* [lock(ssh_service->s_shmlock)][0..1] LHS branch. */
+	struct service_shm_handle *ssh_tree_rhs; /* [lock(ssh_service->s_shmlock)][0..1] RHS branch. */
+	uintptr_t                  ssh_tree_red; /* [lock(ssh_service->s_shmlock)] Non-zero  if  this is  a  red node
+	                                          * within the tree of all SHM handles (using the SHM mapping address
+	                                          * ranges) */
+	struct service            *ssh_service;  /* [1..1][const] The associated service. */
 };
 
 /* Destroy the given handle.
@@ -389,25 +391,24 @@ struct service_shm_free {
 	 : (size) >> _SERVICE_FREE_LIST_SHIFT)
 
 struct service {
-	struct atomic_lock                     s_shmlock;      /* Lock for `s_shm' and related members.
-	                                                        * NOTE: This lock may only be acquired/released while the calling
-	                                                        *       thread is masking _all_ signals! This is required to keep
-	                                                        *       the  libservice client API  reentrance-safe, as there are
-	                                                        *       cases  where this lock needs to be acquired when a client
-	                                                        *       invokes a server function. */
-	struct lockop_slist                    s_shmlock_lop;  /* Lock operations for `s_shmlock' */
-	REF struct service_shm_handle         *s_shm;          /* [1..1][lock(s_shmlock)]
-	                                                        * Current SHM  mapping. (may  be altered  when size  needs to  be
-	                                                        * increased, yet doing so isn't possible due to size constraints) */
-	LLRBTREE_ROOT(service_shm_handle_list) s_shm_tree;     /* [1..n][owned][lock(s_shmlock)] Tree of all (non-free'd) SHM handles. */
-	RBTREE_ROOT(service_shm_free)          s_shm_freetree; /* [lock(s_shmlock)] Tree of free nodes. */
-	struct service_shm_free_list           s_shm_freelist[SERVICE_FREE_LIST_COUNT];
-	                                                       /* [lock(s_shmlock)] Free list by size. */
-	fd_t                                   s_fd_srv;       /* [const][owned] File descriptor for the unix domain socket connected to the server. */
-	fd_t                                   s_fd_shm;       /* [const][owned] File descriptor for the shared memory region. */
+	struct atomic_lock                s_shmlock;      /* Lock for `s_shm' and related members.
+	                                                   * NOTE: This lock may only be acquired/released while the calling
+	                                                   *       thread is masking _all_ signals! This is required to keep
+	                                                   *       the  libservice client API  reentrance-safe, as there are
+	                                                   *       cases  where this lock needs to be acquired when a client
+	                                                   *       invokes a server function. */
+	struct lockop_slist               s_shmlock_lop;  /* Lock operations for `s_shmlock' */
+	REF struct service_shm_handle    *s_shm;          /* [1..1][lock(s_shmlock)]
+	                                                   * Current SHM  mapping. (may  be altered  when size  needs to  be
+	                                                   * increased, yet doing so isn't possible due to size constraints) */
+	LLRBTREE_ROOT(service_shm_handle) s_shm_tree;     /* [1..n][owned][lock(s_shmlock)] Tree of all (non-free'd) SHM handles. */
+	RBTREE_ROOT(service_shm_free)     s_shm_freetree; /* [lock(s_shmlock)] Tree of free nodes. */
+	struct service_shm_free_list      s_shm_freelist[SERVICE_FREE_LIST_COUNT];
+	                                                  /* [lock(s_shmlock)] Free list by size. */
+	fd_t                              s_fd_srv;       /* [const][owned] File descriptor for the unix domain socket connected to the server. */
+	fd_t                              s_fd_shm;       /* [const][owned] File descriptor for the shared memory region. */
 	/* TODO: Allocation helpers for mapping PROT_EXEC memory (for use by arch-specific wrapper function generators) */
-	/* TODO: Allocation helpers for creating `.eh_frame' data (registered via `__register_frame()') (for use by arch-specific wrapper function generators)
-	 * NOTE: For */
+	/* TODO: Allocation helpers for creating `.eh_frame' data (registered via `__register_frame()') (for use by arch-specific wrapper function generators) */
 	/* TODO: Cache of already-loaded service functions (such that `service_dlsym()'  can
 	 *       re-return identical pointers for symbols after they've already been loaded) */
 };
@@ -564,7 +565,7 @@ NOTHROW(FCALL libservice_shmbuf_allocat_nopr)(struct service *__restrict self,
 /* Mark the given buffer range as free.
  * @assume(num_bytes >= SERVICE_SHM_ALLOC_MINSIZE);
  * @assume(IS_ALIGNED(ptr, SERVICE_SHM_ALLOC_ALIGN));
- * @assume(shm == libservice_shm_ataddr(self, ptr)); */
+ * @assume(shm == libservice_shm_handle_ataddr_nopr(self, ptr)); */
 INTDEF NOBLOCK NOPREEMPT NONNULL((1, 3)) void
 NOTHROW(FCALL libservice_shmbuf_freeat_nopr)(struct service *__restrict self,
                                              REF struct service_shm_handle *__restrict shm,

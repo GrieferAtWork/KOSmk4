@@ -3959,8 +3959,6 @@ NOTHROW(FCALL comgen_compile)(struct com_generator *__restrict self) {
 
 	/* Deserialize fixed-length inline buffers */
 	comgen_deserialize_inline_buffers(self);
-	if unlikely(!comgen_txok1(self))
-		goto fail;
 
 	/* Copy out-of-band inout/out buffers back into user-provided storage */
 	comgen_deserialize_buffer_arguments(self);

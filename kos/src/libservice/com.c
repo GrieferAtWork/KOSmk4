@@ -25,6 +25,7 @@
 
 #include <hybrid/compiler.h>
 
+#include <hybrid/align.h>
 #include <hybrid/atomic.h>
 #include <hybrid/host.h>
 #include <hybrid/sequence/list.h>
@@ -37,6 +38,7 @@
 #include <kos/refcnt.h>
 #include <kos/types.h>
 
+#include <assert.h>
 #include <signal.h>
 #include <stddef.h>
 #include <stdlib.h>
@@ -46,6 +48,31 @@
 #include <libservice/types.h>
 
 #include "com.h"
+
+
+/* R/B-tree ABI for `struct service_shm_handle' */
+
+#define RBTREE_LEFT_LEANING
+#define RBTREE_OMIT_REMOVE
+#define RBTREE_DECL                PRIVATE
+#define RBTREE_IMPL                PRIVATE
+#define RBTREE(name)               sshtree_##name
+#define RBTREE_T                   struct service_shm_handle
+#define RBTREE_Tkey                void const *
+#define RBTREE_CC                  FCALL
+#define RBTREE_NOTHROW             NOTHROW
+#define RBTREE_GETLHS(self)        (self)->ssh_tree_lhs
+#define RBTREE_GETRHS(self)        (self)->ssh_tree_rhs
+#define RBTREE_SETLHS(self, v)     (void)((self)->ssh_tree_lhs = (v))
+#define RBTREE_SETRHS(self, v)     (void)((self)->ssh_tree_rhs = (v))
+#define RBTREE_ISRED(self)         ((self)->ssh_tree_red)
+#define RBTREE_SETRED(self)        (void)((self)->ssh_tree_red = 1)
+#define RBTREE_SETBLACK(self)      (void)((self)->ssh_tree_red = 0)
+#define RBTREE_FLIPCOLOR(self)     (void)((self)->ssh_tree_red ^= (uintptr_t)-1)
+#define RBTREE_COPYCOLOR(dst, src) (void)((dst)->ssh_tree_red = (src)->ssh_tree_red)
+#define RBTREE_GETMINKEY(node)     ((byte_t *)(node)->ssh_shm)
+#define RBTREE_GETMAXKEY(node)     ((byte_t *)(node)->ssh_endp - 1)
+#include <hybrid/sequence/rbtree-abi.h>
 
 DECL_BEGIN
 
@@ -126,10 +153,11 @@ NOTHROW(FCALL libservice_aux_com_abort)(struct service *__restrict self,
 INTERN NOBLOCK NOPREEMPT WUNUSED NONNULL((1)) struct service_shm_handle *
 NOTHROW(FCALL libservice_shm_handle_ataddr_nopr)(struct service *__restrict self,
                                                  void const *addr) {
-	/* TODO */
-	(void)self;
-	(void)addr;
-	abort();
+	struct service_shm_handle *result;
+	libservice_shmlock_acquire_nopr(self);
+	result = sshtree_locate(self->s_shm_tree, addr);
+	libservice_shmlock_release_nopr(self);
+	return result;
 }
 
 
@@ -162,11 +190,16 @@ NOTHROW(FCALL libservice_shmbuf_allocat_nopr)(struct service *__restrict self,
 /* Mark the given buffer range as free.
  * @assume(num_bytes >= SERVICE_SHM_ALLOC_MINSIZE);
  * @assume(IS_ALIGNED(ptr, SERVICE_SHM_ALLOC_ALIGN));
- * @assume(shm == libservice_shm_ataddr(self, ptr)); */
+ * @assume(shm == libservice_shm_handle_ataddr_nopr(self, ptr)); */
 INTERN NOBLOCK NOPREEMPT NONNULL((1, 3)) void
 NOTHROW(FCALL libservice_shmbuf_freeat_nopr)(struct service *__restrict self,
                                              REF struct service_shm_handle *__restrict shm,
                                              void *ptr, size_t num_bytes) {
+	assert(num_bytes >= SERVICE_SHM_ALLOC_MINSIZE);
+	assert(IS_ALIGNED((uintptr_t)ptr, SERVICE_SHM_ALLOC_ALIGN));
+	assert(shm == libservice_shm_handle_ataddr_nopr(self, ptr));
+
+
 	/* TODO */
 	(void)self;
 	(void)shm;
