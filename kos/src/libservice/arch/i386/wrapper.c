@@ -857,7 +857,7 @@ NOTHROW(FCALL comgen_serialize_buffer_arguments_0)(struct com_generator *__restr
 
 	/* >>     jnz    .Ltest_pending_signals_after_com_buffer_alloc */
 	gen86_jccl_offset(&self->cg_txptr, GEN86_CC_NZ, -4);
-	comgen_reloc(self, self->cg_txptr - 4, COM_R_PCREL32, COM_SYM_Ltest_pending_signals_after_com_buffer_alloc);
+	comgen_hidden_reloc(self, self->cg_txptr - 4, COM_R_PCREL32, COM_SYM_Ltest_pending_signals_after_com_buffer_alloc);
 
 	/* >> .Ltest_pending_signals_after_com_buffer_alloc_return: */
 	comgen_defsym(self, COM_SYM_Ltest_pending_signals_after_com_buffer_alloc_return);
@@ -1070,7 +1070,7 @@ NOTHROW(FCALL comgen_serialize_buffer_arguments_1)(struct com_generator *__restr
 
 		/* >>     jz     .Lerr_free_service_com */
 		gen86_jccl_offset(&self->cg_txptr, GEN86_CC_Z, -4);
-		comgen_reloc(self, self->cg_txptr - 4, COM_R_PCREL32, COM_SYM_Lerr_free_service_com);
+		comgen_hidden_reloc(self, self->cg_txptr - 4, COM_R_PCREL32, COM_SYM_Lerr_free_service_com);
 	} else {
 		/* >>     call   libservice_shmbuf_alloc_nopr */
 		gen86_call(&self->cg_txptr, &libservice_shmbuf_alloc_nopr);
@@ -1125,7 +1125,7 @@ NOTHROW(FCALL comgen_serialize_buffer_arguments_1)(struct com_generator *__restr
 
 	/* >>     jnz    .Ltest_pending_signals_after_single_buffer_alloc */
 	gen86_jccl_offset(&self->cg_txptr, GEN86_CC_NZ, -4);
-	comgen_reloc(self, self->cg_txptr - 4, COM_R_PCREL32, COM_SYM_Ltest_pending_signals_after_single_buffer_alloc);
+	comgen_hidden_reloc(self, self->cg_txptr - 4, COM_R_PCREL32, COM_SYM_Ltest_pending_signals_after_single_buffer_alloc);
 
 	/* >> .Ltest_pending_signals_after_single_buffer_alloc_return: */
 	comgen_defsym(self, COM_SYM_Ltest_pending_signals_after_single_buffer_alloc_return);
@@ -1181,7 +1181,7 @@ NOTHROW(FCALL comgen_serialize_buffer_arguments_1)(struct com_generator *__restr
 
 	/* >>     jnz    .Ltest_pending_signals_after_single_buffers_is_in_band */
 	gen86_jccl_offset(&self->cg_txptr, GEN86_CC_NZ, -4);
-	comgen_reloc(self, self->cg_txptr - 4, COM_R_PCREL32, COM_SYM_Ltest_pending_signals_after_single_buffers_is_in_band);
+	comgen_hidden_reloc(self, self->cg_txptr - 4, COM_R_PCREL32, COM_SYM_Ltest_pending_signals_after_single_buffers_is_in_band);
 
 	/* >> .Ltest_pending_signals_after_single_buffers_is_in_band_return: */
 	comgen_defsym(self, COM_SYM_Ltest_pending_signals_after_single_buffers_is_in_band_return);
@@ -3102,6 +3102,142 @@ NOTHROW(FCALL comgen_sigcheck_before_return)(struct com_generator *__restrict se
 
 
 
+/* Generate instructions:
+ * >> #if cg_buf_paramc == 0
+ * >> .Ltest_pending_signals_after_com_buffer_alloc:
+ * >>     call   chkuserprocmask
+ * >>     jmp    .Ltest_pending_signals_after_com_buffer_alloc_return
+ * >> #elif cg_buf_paramc == 1
+ * >> .Ltest_pending_signals_after_single_buffer_alloc:
+ * >>     call   chkuserprocmask
+ * >>     jmp    .Ltest_pending_signals_after_single_buffer_alloc_return
+ * >> .Ltest_pending_signals_after_single_buffers_is_in_band:
+ * >>     pushP_cfi %Pax
+ * >> //  .cfi_escape DW_CFA_GNU_args_size, SIZEOF_POINTER   # Not needed because `chkuserprocmask()' is NOTHROW
+ * >>     call   chkuserprocmask
+ * >>     popP_cfi %Pax
+ * >> //  .cfi_escape DW_CFA_GNU_args_size, 0                # Not needed because `chkuserprocmask()' is NOTHROW
+ * >>     jmp .Ltest_pending_signals_after_single_buffers_is_in_band_return
+ * >> #else // #elif cg_buf_paramc >= 2
+ * >> #if cg_inbuf_paramc != 0 || cg_inoutbuf_paramc != 0
+ * >> .Ltest_pending_signals_after_xbuf_alloc:
+ * >>     pushP_cfi %Pax
+ * >> //  .cfi_escape DW_CFA_GNU_args_size, SIZEOF_POINTER   # Not needed because `chkuserprocmask()' is NOTHROW
+ * >>     pushP_cfi %Pdx
+ * >> //  .cfi_escape DW_CFA_GNU_args_size, 2*SIZEOF_POINTER # Not needed because `chkuserprocmask()' is NOTHROW
+ * >>     call   chkuserprocmask
+ * >>     popP_cfi %Pdx
+ * >> //  .cfi_escape DW_CFA_GNU_args_size, SIZEOF_POINTER   # Not needed because `chkuserprocmask()' is NOTHROW
+ * >>     popP_cfi %Pax
+ * >> //  .cfi_escape DW_CFA_GNU_args_size, 0                # Not needed because `chkuserprocmask()' is NOTHROW
+ * >>     jmp .Ltest_pending_signals_after_xbuf_alloc_return
+ * >> #endif // cg_inbuf_paramc != 0 || cg_inoutbuf_paramc != 0
+ * >> .Ltest_pending_signals_after_all_buffers_are_in_band:
+ * >>     call   chkuserprocmask
+ * >>     jmp    .Lall_buffers_are_in_band_preemption_reenabled:
+ * >> #endif // #endif cg_buf_paramc >= 2 */
+PRIVATE NONNULL((1)) void
+NOTHROW(FCALL comgen_sigcheck_for_buffers)(struct com_generator *__restrict self) {
+	switch (self->cg_buf_paramc) {
+
+	case 0:
+		/* >> .Ltest_pending_signals_after_com_buffer_alloc: */
+		comgen_defsym(self, COM_SYM_Ltest_pending_signals_after_com_buffer_alloc);
+
+		/* >>     call   chkuserprocmask */
+		comgen_instr(self, gen86_call(&self->cg_txptr, &chkuserprocmask));
+
+		/* >>     jmp    .Ltest_pending_signals_after_com_buffer_alloc_return */
+		comgen_instr(self, gen86_jmpl_offset(&self->cg_txptr, -4));
+		comgen_hidden_reloc(self, self->cg_txptr - 4, COM_R_PCREL32,
+		                    COM_SYM_Ltest_pending_signals_after_com_buffer_alloc_return);
+		break;
+
+	case 1:
+		/* >> .Ltest_pending_signals_after_single_buffer_alloc: */
+		comgen_defsym(self, COM_SYM_Ltest_pending_signals_after_single_buffer_alloc);
+
+		/* >> call   chkuserprocmask */
+		comgen_instr(self, gen86_call(&self->cg_txptr, &chkuserprocmask));
+
+		/* >> jmp    .Ltest_pending_signals_after_single_buffer_alloc_return */
+		comgen_instr(self, gen86_jmpl_offset(&self->cg_txptr, -4));
+		comgen_hidden_reloc(self, self->cg_txptr - 4, COM_R_PCREL32,
+		                    COM_SYM_Ltest_pending_signals_after_single_buffer_alloc_return);
+
+		/* >> .Ltest_pending_signals_after_single_buffers_is_in_band: */
+		comgen_defsym(self, COM_SYM_Ltest_pending_signals_after_single_buffers_is_in_band);
+
+		/* >> pushP_cfi %Pax */
+		comgen_instr(self, gen86_pushP_r(&self->cg_txptr, GEN86_R_PAX));
+		comgen_eh_movehere(self);
+		comgen_eh_DW_CFA_adjust_cfa_offset(self, SIZEOF_POINTER);
+
+		/* >> call   chkuserprocmask */
+		comgen_instr(self, gen86_call(&self->cg_txptr, &chkuserprocmask));
+
+		/* >> popP_cfi %Pax */
+		comgen_instr(self, gen86_popP_r(&self->cg_txptr, GEN86_R_PAX));
+		comgen_eh_movehere(self);
+		comgen_eh_DW_CFA_adjust_cfa_offset(self, -SIZEOF_POINTER);
+
+		/* >> jmp .Ltest_pending_signals_after_single_buffers_is_in_band_return */
+		comgen_instr(self, gen86_jmpl_offset(&self->cg_txptr, -4));
+		comgen_hidden_reloc(self, self->cg_txptr - 4, COM_R_PCREL32,
+		                    COM_SYM_Ltest_pending_signals_after_single_buffers_is_in_band_return);
+		break;
+
+	default:
+		if (self->cg_inbuf_paramc != 0 || self->cg_inoutbuf_paramc != 0) {
+			/* >> .Ltest_pending_signals_after_xbuf_alloc: */
+			comgen_defsym(self, COM_SYM_Ltest_pending_signals_after_xbuf_alloc);
+
+			/* >> pushP_cfi %Pax */
+			comgen_instr(self, gen86_pushP_r(&self->cg_txptr, GEN86_R_PAX));
+			comgen_eh_movehere(self);
+			comgen_eh_DW_CFA_adjust_cfa_offset(self, SIZEOF_POINTER);
+
+			/* >> pushP_cfi %Pdx */
+			comgen_instr(self, gen86_pushP_r(&self->cg_txptr, GEN86_R_PDX));
+			comgen_eh_movehere(self);
+			comgen_eh_DW_CFA_adjust_cfa_offset(self, SIZEOF_POINTER);
+
+			/* >> call   chkuserprocmask */
+			comgen_instr(self, gen86_call(&self->cg_txptr, &chkuserprocmask));
+
+			/* >> popP_cfi %Pdx */
+			comgen_instr(self, gen86_popP_r(&self->cg_txptr, GEN86_R_PDX));
+			comgen_eh_movehere(self);
+			comgen_eh_DW_CFA_adjust_cfa_offset(self, -SIZEOF_POINTER);
+
+			/* >> popP_cfi %Pax */
+			comgen_instr(self, gen86_popP_r(&self->cg_txptr, GEN86_R_PAX));
+			comgen_eh_movehere(self);
+			comgen_eh_DW_CFA_adjust_cfa_offset(self, -SIZEOF_POINTER);
+
+			/* >> jmp .Ltest_pending_signals_after_xbuf_alloc_return */
+			comgen_instr(self, gen86_jmpl_offset(&self->cg_txptr, -4));
+			comgen_reloc(self, self->cg_txptr - 4, COM_R_PCREL32,
+			             COM_SYM_Ltest_pending_signals_after_xbuf_alloc_return);
+		}
+
+		/* >> .Ltest_pending_signals_after_all_buffers_are_in_band: */
+		comgen_defsym(self, COM_SYM_Ltest_pending_signals_after_all_buffers_are_in_band);
+
+		/* >> call   chkuserprocmask */
+		comgen_instr(self, gen86_call(&self->cg_txptr, &chkuserprocmask));
+
+		/* >> jmp    .Lall_buffers_are_in_band_preemption_reenabled: */
+		comgen_instr(self, gen86_jmpl_offset(&self->cg_txptr, -4));
+		comgen_reloc(self, self->cg_txptr - 4, COM_R_PCREL32,
+		             COM_SYM_Lall_buffers_are_in_band_preemption_reenabled);
+		break;
+	}
+
+}
+
+
+
 
 
 
@@ -3401,6 +3537,14 @@ NOTHROW(FCALL comgen_compile)(struct com_generator *__restrict self) {
 		goto fail;
 	if unlikely(!comgen_ehok1(self))
 		goto fail;
+
+	/* Check signals when re-enabling preemption after buffer xbuf alloc */
+	comgen_sigcheck_for_buffers(self);
+	if unlikely(!comgen_txok1(self))
+		goto fail;
+	if unlikely(!comgen_ehok1(self))
+		goto fail;
+
 
 	/* Error/Exception  handlers all run  in the context of  the normal CFA offset.
 	 * As far as  unwind information  goes, this  value has  already been  restored

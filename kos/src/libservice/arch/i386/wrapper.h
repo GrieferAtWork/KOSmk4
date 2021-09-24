@@ -850,18 +850,24 @@ STATIC_ASSERT(IS_ALIGNED(offsetof(struct service_com, sc_generic.g_data), 4));
  * >>     call   chkuserprocmask
  * >>     jmp    .Ltest_pending_signals_after_single_buffer_alloc_return
  * >> .Ltest_pending_signals_after_single_buffers_is_in_band:
- * >>     pushP_cfi_r %Pax
+ * >>     pushP_cfi %Pax
+ * >> //  .cfi_escape DW_CFA_GNU_args_size, SIZEOF_POINTER   # Not needed because `chkuserprocmask()' is NOTHROW
  * >>     call   chkuserprocmask
- * >>     popP_cfi_r %Pax
+ * >>     popP_cfi %Pax
+ * >> //  .cfi_escape DW_CFA_GNU_args_size, 0                # Not needed because `chkuserprocmask()' is NOTHROW
  * >>     jmp .Ltest_pending_signals_after_single_buffers_is_in_band_return
  * >> #else // #elif cg_buf_paramc >= 2
  * >> #if cg_inbuf_paramc != 0 || cg_inoutbuf_paramc != 0
  * >> .Ltest_pending_signals_after_xbuf_alloc:
- * >>     pushP_cfi_r %Pax
- * >>     pushP_cfi_r %Pdx
+ * >>     pushP_cfi %Pax
+ * >> //  .cfi_escape DW_CFA_GNU_args_size, SIZEOF_POINTER   # Not needed because `chkuserprocmask()' is NOTHROW
+ * >>     pushP_cfi %Pdx
+ * >> //  .cfi_escape DW_CFA_GNU_args_size, 2*SIZEOF_POINTER # Not needed because `chkuserprocmask()' is NOTHROW
  * >>     call   chkuserprocmask
- * >>     popP_cfi_r %Pdx
- * >>     popP_cfi_r %Pax
+ * >>     popP_cfi %Pdx
+ * >> //  .cfi_escape DW_CFA_GNU_args_size, SIZEOF_POINTER   # Not needed because `chkuserprocmask()' is NOTHROW
+ * >>     popP_cfi %Pax
+ * >> //  .cfi_escape DW_CFA_GNU_args_size, 0                # Not needed because `chkuserprocmask()' is NOTHROW
  * >>     jmp .Ltest_pending_signals_after_xbuf_alloc_return
  * >> #endif // cg_inbuf_paramc != 0 || cg_inoutbuf_paramc != 0
  * >> .Ltest_pending_signals_after_all_buffers_are_in_band:
@@ -1008,34 +1014,36 @@ STATIC_ASSERT(IS_ALIGNED(offsetof(struct service_com, sc_generic.g_data), 4));
  * When wrappers are generated, it is possible to  define
  * relocations against any of these symbols */
 enum {
-	COM_SYM_Leh_preemption_pop_begin,                                     /* `.Leh_preemption_pop_begin' */
-	COM_SYM_Leh_free_service_com_begin,                                   /* `.Leh_free_service_com_begin' */
-	COM_SYM_Ltest_pending_signals_after_com_buffer_alloc_return,          /* `.Ltest_pending_signals_after_com_buffer_alloc_return'          [valid_if(cg_buf_paramc == 0)] */
-	COM_SYM_Leh_free_xbuf_begin,                                          /* `.Leh_free_xbuf_begin'                                          [valid_if(cg_buf_paramc == 1)] */
-	COM_SYM_Ltest_pending_signals_after_single_buffer_alloc_return,       /* `.Ltest_pending_signals_after_single_buffer_alloc_return'       [valid_if(cg_buf_paramc == 1)] */
-	COM_SYM_Ltest_pending_signals_after_single_buffers_is_in_band_return, /* `.Ltest_pending_signals_after_single_buffers_is_in_band_return' [valid_if(cg_buf_paramc == 1)] */
-	COM_SYM_Ltest_pending_signals_after_xbuf_alloc_return,                /* `.Ltest_pending_signals_after_xbuf_alloc_return'                [valid_if(cg_buf_paramc >= 2 && (cg_inbuf_paramc != 0 || cg_inoutbuf_paramc != 0))] */
-	COM_SYM_Lall_buffers_are_in_band_preemption_reenabled,                /* `.Lall_buffers_are_in_band_preemption_reenabled'                [valid_if(cg_buf_paramc >= 2)] */
-	COM_SYM_Leh_com_waitfor_begin,                                        /* `.Leh_com_waitfor_begin' */
-	COM_SYM_Leh_com_waitfor_end,                                          /* `.Leh_com_waitfor_end' */
-	COM_SYM_Leh_free_xbuf_end,                                            /* `.Leh_free_xbuf_end'                                            [valid_if(cg_buf_paramc != 0)] */
-	COM_SYM_Leh_free_service_com_end,                                     /* `.Leh_free_service_com_end' */
-	COM_SYM_Leh_preemption_pop_end,                                       /* `.Leh_preemption_pop_end' */
-	COM_SYM_Lafter_check_signals_before_return,                           /* `.Lafter_check_signals_before_return' */
-	COM_SYM_Lcheck_signals_before_return,                                 /* `.Lcheck_signals_before_return' */
-	COM_SYM_Ltest_pending_signals_after_com_buffer_alloc,                 /* `.Ltest_pending_signals_after_com_buffer_alloc'                 [valid_if(cg_buf_paramc == 0)] */
-	COM_SYM_Ltest_pending_signals_after_single_buffer_alloc,              /* `.Ltest_pending_signals_after_single_buffer_alloc'              [valid_if(cg_buf_paramc == 1)] */
-	COM_SYM_Ltest_pending_signals_after_single_buffers_is_in_band,        /* `.Ltest_pending_signals_after_single_buffers_is_in_band'        [valid_if(cg_buf_paramc == 1)] */
-	COM_SYM_Ltest_pending_signals_after_xbuf_alloc,                       /* `.Ltest_pending_signals_after_xbuf_alloc'                       [valid_if(cg_buf_paramc >= 2 && (cg_inbuf_paramc != 0 || cg_inoutbuf_paramc != 0))] */
-	COM_SYM_Ltest_pending_signals_after_all_buffers_are_in_band,          /* `.Ltest_pending_signals_after_all_buffers_are_in_band'          [valid_if(cg_buf_paramc >= 2)] */
-	COM_SYM_Lerr_com_abort_errno,                                         /* `.Lerr_com_abort_errno'                                         [valid_if(!COM_GENERATOR_FEATURE_FEXCEPT)] */
-	COM_SYM_Lerr_free_service_com,                                        /* `.Lerr_free_service_com'                                        [valid_if(!COM_GENERATOR_FEATURE_FEXCEPT)] */
-	COM_SYM_Lerr_pop_preemption,                                          /* `.Lerr_pop_preemption'                                          [valid_if(!COM_GENERATOR_FEATURE_FEXCEPT)] */
-	COM_SYM_Leh_com_waitfor_entry,                                        /* `.Leh_com_waitfor_entry' */
-	COM_SYM_Leh_free_xbuf_entry,                                          /* `.Leh_free_xbuf_entry' */
-	COM_SYM_Leh_free_service_com_entry,                                   /* `.Leh_free_service_com_entry' */
-	COM_SYM_Leh_preemption_pop_entry,                                     /* `.Leh_preemption_pop_entry' */
-	COM_SYM_COUNT                                                         /* # of COM symbols */
+	COM_SYM_Leh_preemption_pop_begin,                            /* `.Leh_preemption_pop_begin' */
+	COM_SYM_Leh_free_service_com_begin,                          /* `.Leh_free_service_com_begin' */
+	COM_SYM_Leh_free_xbuf_begin,                                 /* `.Leh_free_xbuf_begin'                                          [valid_if(cg_buf_paramc == 1)] */
+	COM_SYM_Ltest_pending_signals_after_xbuf_alloc_return,       /* `.Ltest_pending_signals_after_xbuf_alloc_return'                [valid_if(cg_buf_paramc >= 2 && (cg_inbuf_paramc != 0 || cg_inoutbuf_paramc != 0))] */
+	COM_SYM_Lall_buffers_are_in_band_preemption_reenabled,       /* `.Lall_buffers_are_in_band_preemption_reenabled'                [valid_if(cg_buf_paramc >= 2)] */
+	COM_SYM_Leh_com_waitfor_begin,                               /* `.Leh_com_waitfor_begin' */
+	COM_SYM_Leh_com_waitfor_end,                                 /* `.Leh_com_waitfor_end' */
+	COM_SYM_Leh_free_xbuf_end,                                   /* `.Leh_free_xbuf_end'                                            [valid_if(cg_buf_paramc != 0)] */
+	COM_SYM_Leh_free_service_com_end,                            /* `.Leh_free_service_com_end' */
+	COM_SYM_Leh_preemption_pop_end,                              /* `.Leh_preemption_pop_end' */
+	COM_SYM_Lafter_check_signals_before_return,                  /* `.Lafter_check_signals_before_return' */
+	COM_SYM_Lcheck_signals_before_return,                        /* `.Lcheck_signals_before_return' */
+	COM_SYM_Ltest_pending_signals_after_xbuf_alloc,              /* `.Ltest_pending_signals_after_xbuf_alloc'                       [valid_if(cg_buf_paramc >= 2 && (cg_inbuf_paramc != 0 || cg_inoutbuf_paramc != 0))] */
+	COM_SYM_Ltest_pending_signals_after_all_buffers_are_in_band, /* `.Ltest_pending_signals_after_all_buffers_are_in_band'          [valid_if(cg_buf_paramc >= 2)] */
+	COM_SYM_Lerr_com_abort_errno,                                /* `.Lerr_com_abort_errno'                                         [valid_if(!COM_GENERATOR_FEATURE_FEXCEPT)] */
+	COM_SYM_Lerr_free_service_com,                               /* `.Lerr_free_service_com'                                        [valid_if(!COM_GENERATOR_FEATURE_FEXCEPT)] */
+	COM_SYM_Lerr_pop_preemption,                                 /* `.Lerr_pop_preemption'                                          [valid_if(!COM_GENERATOR_FEATURE_FEXCEPT)] */
+	COM_SYM_Leh_com_waitfor_entry,                               /* `.Leh_com_waitfor_entry' */
+	COM_SYM_Leh_free_xbuf_entry,                                 /* `.Leh_free_xbuf_entry' */
+	COM_SYM_Leh_free_service_com_entry,                          /* `.Leh_free_service_com_entry' */
+	COM_SYM_Leh_preemption_pop_entry,                            /* `.Leh_preemption_pop_entry' */
+	COM_SYM_COUNT,                                               /* # of COM symbols */
+
+	/* Reused symbol IDs. */
+	COM_SYM_Ltest_pending_signals_after_com_buffer_alloc_return          = COM_SYM_Lall_buffers_are_in_band_preemption_reenabled,       /* `.Ltest_pending_signals_after_com_buffer_alloc_return'          [valid_if(cg_buf_paramc == 0)] */
+	COM_SYM_Ltest_pending_signals_after_single_buffer_alloc_return       = COM_SYM_Ltest_pending_signals_after_xbuf_alloc_return,       /* `.Ltest_pending_signals_after_single_buffer_alloc_return'       [valid_if(cg_buf_paramc == 1)] */
+	COM_SYM_Ltest_pending_signals_after_single_buffers_is_in_band_return = COM_SYM_Lall_buffers_are_in_band_preemption_reenabled,       /* `.Ltest_pending_signals_after_single_buffers_is_in_band_return' [valid_if(cg_buf_paramc == 1)] */
+	COM_SYM_Ltest_pending_signals_after_com_buffer_alloc                 = COM_SYM_Ltest_pending_signals_after_xbuf_alloc,              /* `.Ltest_pending_signals_after_com_buffer_alloc'                 [valid_if(cg_buf_paramc == 0)] */
+	COM_SYM_Ltest_pending_signals_after_single_buffer_alloc              = COM_SYM_Ltest_pending_signals_after_xbuf_alloc,              /* `.Ltest_pending_signals_after_single_buffer_alloc'              [valid_if(cg_buf_paramc == 1)] */
+	COM_SYM_Ltest_pending_signals_after_single_buffers_is_in_band        = COM_SYM_Ltest_pending_signals_after_all_buffers_are_in_band, /* `.Ltest_pending_signals_after_single_buffers_is_in_band'        [valid_if(cg_buf_paramc == 1)] */
 };
 
 
@@ -1052,7 +1060,10 @@ struct com_reloc {
 };
 
 /* Max number of relocations in com wrapper functions */
-#define COM_RELOC_MAXCOUNT (COM_SYM_COUNT + (COM_SYM_COUNT / 4))
+/*[[[deemon print("#define COM_RELOC_MAXCOUNT ", (File from deemon)
+	.open("./wrapper.c", "r").read().decode("utf-8").count("comgen_reloc"));]]]*/
+#define COM_RELOC_MAXCOUNT 12
+/*[[[end]]]*/
 
 
 #ifdef __x86_64__
@@ -1285,6 +1296,8 @@ NOTHROW(FCALL comgen_compile)(struct com_generator *__restrict self);
 	       (self)->cg_relocs[(self)->cg_nrelocs].cr_type   = (type),                              \
 	       (self)->cg_relocs[(self)->cg_nrelocs].cr_symbol = (symbol),                            \
 	       ++(self)->cg_nrelocs)
+/* Same as `comgen_reloc()', but hidden from `COM_RELOC_MAXCOUNT' (Use with caution!) */
+#define comgen_hidden_reloc comgen_reloc
 #endif /* GUARD_LIBSERVICE_ARCH_I386_WRAPPER_C */
 
 
