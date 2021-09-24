@@ -887,9 +887,9 @@ STATIC_ASSERT(IS_ALIGNED(offsetof(struct service_com, sc_generic.g_data), 4));
  * >>     movP   $<cg_service>,  %R_fcall0P
  * >>     movP   %R_service_com, %R_fcall1P
  * >> #ifdef __x86_64__
- * >>     movP   $<cg_info.dl_comid>, %rdx
+ * >>     movq   $<cg_info.dl_comid>, %rdx
  * >> #else // __x86_64__
- * >>     pushP_cfi $<cg_info.dl_comid>
+ * >>     pushl_cfi $<cg_info.dl_comid>
  * >> #endif // !__x86_64__
  * >>     call   libservice_aux_com_abort
  * >> #ifndef __x86_64__
@@ -916,9 +916,9 @@ STATIC_ASSERT(IS_ALIGNED(offsetof(struct service_com, sc_generic.g_data), 4));
  * >>     movP   $<cg_service>,  %R_fcall0P
  * >>     movP   %R_service_com, %R_fcall1P
  * >> #ifdef __x86_64__
- * >>     movP   $<cg_info.dl_comid>, %rdx
+ * >>     movq   $<cg_info.dl_comid>, %rdx
  * >> #else // __x86_64__
- * >>     pushP_cfi $<cg_info.dl_comid>
+ * >>     pushl_cfi $<cg_info.dl_comid>
  * >> #endif // !__x86_64__
  * >>     call   libservice_aux_com_abort
  * >> #ifndef __x86_64__
@@ -929,7 +929,7 @@ STATIC_ASSERT(IS_ALIGNED(offsetof(struct service_com, sc_generic.g_data), 4));
  * >>     call   libservice_aux_com_discard_nonrt_exception # Try to clear non-RT exceptions
  * >>     testb  %al, %al
  * >>     jnz    .Leh_com_waitfor_end
- * >>1:   // fallthru...
+ * >> 1:  // fallthru...
  * >>
  * >>
  * >>

@@ -3296,9 +3296,9 @@ __LIBC syscall_slong_t __set_errno(errno_t value);
  * >>     movP   $<cg_service>,  %R_fcall0P
  * >>     movP   %R_service_com, %R_fcall1P
  * >> #ifdef __x86_64__
- * >>     movP   $<cg_info.dl_comid>, %rdx
+ * >>     movq   $<cg_info.dl_comid>, %rdx
  * >> #else // __x86_64__
- * >>     pushP_cfi $<cg_info.dl_comid>
+ * >>     pushl_cfi $<cg_info.dl_comid>
  * >> #endif // !__x86_64__
  * >>     call   libservice_aux_com_abort
  * >> #ifndef __x86_64__
@@ -3336,15 +3336,20 @@ NOTHROW(FCALL comgen_handle_errno_problems)(struct com_generator *__restrict sel
 	comgen_instr(self, gen86_movP_r_r(&self->cg_txptr, GEN86_R_service_com, GEN86_R_FCALL1P));
 
 #ifdef __x86_64__
-	/* >> movP   $<cg_info.dl_comid>, %rdx */
+	/* >> movq   $<cg_info.dl_comid>, %rdx */
+	comgen_instr(self, gen86_movq_imm_r(&self->cg_txptr,
+	                                    self->cg_info.dl_comid,
+	                                    GEN86_R_RDX));
 #else /* __x86_64__ */
-	/* >> pushP_cfi $<cg_info.dl_comid> */
+	/* >> pushl_cfi $<cg_info.dl_comid> */
+	comgen_instr(self, gen86_pushl_imm(&self->cg_txptr, self->cg_info.dl_comid));
+	comgen_eh_movehere(self);
+	comgen_eh_DW_CFA_adjust_cfa_offset(self, 4);
 #endif /* !__x86_64__ */
 
 	/* >> call   libservice_aux_com_abort */
 	comgen_instr(self, gen86_call(&self->cg_txptr, &libservice_aux_com_abort));
 
-	/* >> #ifndef __x86_64__ */
 #ifndef __x86_64__
 	comgen_eh_movehere(self);
 	comgen_eh_DW_CFA_adjust_cfa_offset(self, -4);
@@ -3373,6 +3378,81 @@ NOTHROW(FCALL comgen_handle_errno_problems)(struct com_generator *__restrict sel
 
 	/* >> jmp   .Leh_preemption_pop_end */
 	comgen_gen86_jmp_symbol(self, COM_SYM_Leh_preemption_pop_end);
+}
+
+
+
+/* Generate instructions:
+ * >> .Leh_com_waitfor_entry:
+ * >>     movP   $<cg_service>,  %R_fcall0P
+ * >>     movP   %R_service_com, %R_fcall1P
+ * >> #ifdef __x86_64__
+ * >>     movq   $<cg_info.dl_comid>, %rdx
+ * >> #else // __x86_64__
+ * >>     pushl_cfi $<cg_info.dl_comid>
+ * >> #endif // !__x86_64__
+ * >>     call   libservice_aux_com_abort
+ * >> #ifndef __x86_64__
+ * >>     .cfi_adjust_cfa_offset -4
+ * >> #endif // !__x86_64__
+ * >>     testb  %al, %al   # Check if command completed before it could be aborted
+ * >>     jnz    1f         # if (ABORTED) goto 1f;
+ * >>     call   libservice_aux_com_discard_nonrt_exception # Try to clear non-RT exceptions
+ * >>     testb  %al, %al
+ * >>     jnz    .Leh_com_waitfor_end
+ * >> 1: */
+PRIVATE NONNULL((1)) void
+NOTHROW(FCALL comgen_eh_com_waitfor_entry)(struct com_generator *__restrict self) {
+	int8_t *pdisp_1;
+
+	/* >> .Leh_com_waitfor_entry: */
+	comgen_defsym(self, COM_SYM_Leh_com_waitfor_entry);
+
+	/* >> movP   $<cg_service>,  %R_fcall0P */
+	comgen_instr(self, gen86_movP_imm_r(&self->cg_txptr, self->cg_service, GEN86_R_FCALL0P));
+
+	/* >> movP   %R_service_com, %R_fcall1P */
+	comgen_instr(self, gen86_movP_r_r(&self->cg_txptr, GEN86_R_service_com, GEN86_R_FCALL1P));
+
+#ifdef __x86_64__
+	/* >> movq   $<cg_info.dl_comid>, %rdx */
+	comgen_instr(self, gen86_movq_imm_r(&self->cg_txptr,
+	                                    self->cg_info.dl_comid,
+	                                    GEN86_R_RDX));
+#else /* __x86_64__ */
+	/* >> pushl_cfi $<cg_info.dl_comid> */
+	comgen_instr(self, gen86_pushl_imm(&self->cg_txptr, self->cg_info.dl_comid));
+	comgen_eh_movehere(self);
+	comgen_eh_DW_CFA_adjust_cfa_offset(self, 4);
+#endif /* !__x86_64__ */
+
+	/* >> call   libservice_aux_com_abort */
+	comgen_instr(self, gen86_call(&self->cg_txptr, &libservice_aux_com_abort));
+
+#ifndef __x86_64__
+	comgen_eh_movehere(self);
+	comgen_eh_DW_CFA_adjust_cfa_offset(self, -4);
+#endif /* !__x86_64__ */
+
+	/* >> testb  %al, %al   # Check if command completed before it could be aborted */
+	comgen_instr(self, gen86_testb_r_r(&self->cg_txptr, GEN86_R_AL, GEN86_R_AL));
+
+	/* >> jnz    1f         # if (ABORTED) goto 1f; */
+	comgen_instr(self, gen86_jcc8_offset(&self->cg_txptr, GEN86_CC_NZ, -1));
+	pdisp_1 = (int8_t *)(self->cg_txptr - 1);
+
+	/* >> call   libservice_aux_com_discard_nonrt_exception # Try to clear non-RT exceptions */
+	comgen_instr(self, gen86_call(&self->cg_txptr, &libservice_aux_com_discard_nonrt_exception));
+
+	/* >> testb  %al, %al */
+	comgen_instr(self, gen86_testb_r_r(&self->cg_txptr, GEN86_R_AL, GEN86_R_AL));
+
+	/* >> jnz    .Leh_com_waitfor_end */
+	comgen_gen86_jcc_symbol(self, GEN86_CC_NZ, COM_SYM_Leh_com_waitfor_end);
+
+	/* >> 1: */
+	*pdisp_1 += (int8_t)(uint8_t)(uintptr_t)
+	            (self->cg_txptr - (byte_t *)pdisp_1);
 }
 
 
@@ -3706,6 +3786,8 @@ NOTHROW(FCALL comgen_compile)(struct com_generator *__restrict self) {
 	}
 
 	/* Define exception handlers. */
+	comgen_eh_com_waitfor_entry(self);
+
 
 	/* TODO: All of the stuff that's missing */
 	abort();
