@@ -3469,8 +3469,8 @@ return_pointer:
 		.ds_module_lock = ATOMIC_RWLOCK_INIT,                                                                          \
 		.ds_module      = NULL, /* Initialized later */                                                                \
 		.ds_dangling    = NULL,                                                                                        \
-		.ds_flags = DLSECTION_FLAG_OWNED,                                                                              \
-		.ds_index = index,                                                                                             \
+		.ds_flags       = DLSECTION_FLAG_OWNED,                                                                        \
+		.ds_index       = index,                                                                                       \
 	}
 
 

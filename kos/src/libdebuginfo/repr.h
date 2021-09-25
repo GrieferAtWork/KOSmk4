@@ -101,7 +101,7 @@ libdl_debug_repr_cfi_expression_ex(pformatprinter printer, void *arg,
 /* Same as `debug_repr_cfi_expression_ex(3)', but wrap the expression in
  * a pair of `{ ... }', either  like `{ nop }' when the expression  only
  * contains a single instruction, or
- *     [\t * (indent)] {
+ *                     {
  *     [\t * (indent+1)] nop
  *     [\t * (indent+1)] nop
  *     [\t * (indent)] }

@@ -39,18 +39,6 @@
 
 DECL_BEGIN
 
-/* TODO: libc's __gxx_personality_v0 is entirely broken because we're always
- *       just discarding the `.data.rel.local.DW.ref.__gxx_personality_v0'
- *       section!
- *  - As a result, libunwind will decode an indirect personality location
- *    that points to an entirely unrelated location, which currently always
- *    dereferences to a pointer `0x00002CFF' (in i386)
- *    As a result, `libc_error_unwind()' will try to call that address which
- *    in turn results in a segfault, resulting in another exception that
- *    then results in the same...
- *  - Iow: trying to propagate an exception through libc is broken!
- */
-
 DEFINE_TEST(aio) {
 	char buf[512];
 	fd_t pipefds[2];

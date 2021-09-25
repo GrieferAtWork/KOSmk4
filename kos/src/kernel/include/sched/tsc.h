@@ -208,8 +208,8 @@ NOTHROW(FCALL tsc_offset_to_ktime)(struct cpu const *__restrict me,
  * WARNING: The results of  this function may  be inconsistent when  called
  *          from different CPUs (CPU#2 may return a lower value after CPU#1
  *          already returned a greater value)
- *          If  this  is a  problem,  you should  instead  use `ktime_stable()',
- *          but not that for timeouts and the like, the scheduler uses `ktime()'
+ *          If this  is  a  problem, you  should  instead  use  `ktime_stable()',
+ *          but note that for timeouts and the like, the scheduler uses `ktime()'
  * NOTE: This function is the same as doing `tsc_now_to_ktime(tsc_now())'
  *       while having preemption disabled. */
 FUNDEF NOBLOCK WUNUSED ktime_t NOTHROW(KCALL ktime)(void);
@@ -227,8 +227,8 @@ DATDEF ATTR_PERTASK ktime_t this_starttime;
  * Used to implement thread priorities, where a thread with the
  * lowest `this_stoptime' will be the one to get executed next.
  *
- * For the current thread, this is indicates the point in time
- * since when the caller has ran uninterrupted. */
+ * For the current thread, this indicates the point in
+ * time  since when the  caller has ran uninterrupted. */
 DATDEF ATTR_PERTASK ktime_t this_stoptime;
 
 /* [lock(PRIVATE(THIS_CPU))]

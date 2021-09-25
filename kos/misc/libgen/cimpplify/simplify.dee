@@ -1424,7 +1424,7 @@ function simpOptimizeElems(config: SimpConfig, assume: PPAssume, elems: {SimpPPE
 			 * >> #if BAR            >> #else
 			 * >> B                  >> C
 			 * >> #endif             >> #endif
-			 * >> #else              >>
+			 * >> #else              >> #endif
 			 * >> #if BAR            >>
 			 * >> C                  >>
 			 * >> #endif             >>

@@ -60,11 +60,16 @@ PUBLIC ATTR_PERTASK ktime_t this_starttime = 0;
  * Used to implement thread priorities, where a thread with the
  * lowest `this_stoptime' will be the one to get executed next.
  *
- * For the current thread, this is indicates the point in time
- * since when the caller has ran uninterrupted. */
+ * For the current thread, this indicates the point in
+ * time  since when the  caller has ran uninterrupted. */
 PUBLIC ATTR_PERTASK ktime_t this_stoptime = 0;
 
-/* [lock(PRIVATE(THIS_CPU))] Total time this thread spent being active. */
+/* [lock(PRIVATE(THIS_CPU))]
+ * Total time  this thread  spent being  active, as  measured  since
+ * the  thread's creation, up  until the start  of the thread's most
+ * recent quantum  (iow:  for  your own  thread,  to  calculate  the
+ * correct value, use `this_activetime + (ktime() - this_stoptime)',
+ * but make  sure to  disable preemption  during this  calculation). */
 PUBLIC ATTR_PERTASK ktime_t this_activetime = 0;
 
 
@@ -594,10 +599,10 @@ NOTHROW(FCALL tsc_offset_to_ktime)(struct cpu const *__restrict me,
  * WARNING: The results of  this function may  be inconsistent when  called
  *          from different CPUs (CPU#2 may return a lower value after CPU#1
  *          already returned a greater value)
- *          If  this  is a  problem,  you should  instead  use `ktime_stable()',
- *          but not that for timeouts and the like, the scheduler uses `ktime()'
- * NOTE: This function is the same as doing `tsc_now_to_ktime(tsc_now())' while
- *       having preemption disabled. */
+ *          If this  is  a  problem, you  should  instead  use  `ktime_stable()',
+ *          but note that for timeouts and the like, the scheduler uses `ktime()'
+ * NOTE: This function is the same as doing `tsc_now_to_ktime(tsc_now())'
+ *       while having preemption disabled. */
 PUBLIC NOBLOCK WUNUSED ktime_t
 NOTHROW(KCALL ktime)(void) {
 	ktime_t result;

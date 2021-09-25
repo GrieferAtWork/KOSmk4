@@ -204,7 +204,7 @@ extern "C++" {namespace __local_imp {
  * also  allowing (read: requiring)  the caller to  prefix the entire expression
  * with `__NAMESPACE_LOCAL_SYM'
  *
- * Used by `cheaders.dee' when generating macro for linking against functions
+ * Used by `cheaders.dee' when generating macros for linking against functions
  * from the __local_imp namespace. */
 template<class __T> using __loc_T = __T;
 #define __NAMESPACE_LOCAL_TYPEHAX(Tp, Tr, x) __loc_T<Tr>(::__local_imp::x)
