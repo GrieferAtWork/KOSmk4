@@ -220,11 +220,11 @@ NOTHROW(FCALL entropy_give_nopr)(void const *buf, size_t num_bits) {
 	size_t new_entropy_bits;
 	entropy_lock_acquire_nopr();
 	if (OVERFLOW_UADD(entropy_bits, num_bits, &new_entropy_bits) ||
-	    new_entropy_bits > CONFIG_ENTROPY_BUFFER_SIZE) {
+	    new_entropy_bits > ENTROPY_BITS) {
 		size_t buf_offset = 0;
-		if (entropy_bits < CONFIG_ENTROPY_BUFFER_SIZE) {
+		if (entropy_bits < ENTROPY_BITS) {
 			/* Fill remaining entropy bits. */
-			size_t remain = CONFIG_ENTROPY_BUFFER_SIZE - entropy_bits;
+			size_t remain = ENTROPY_BITS - entropy_bits;
 			assert(num_bits > remain);
 			bitcpy(entropy_data, entropy_bits, buf, 0, remain);
 			entropy_bits += remain;
@@ -418,15 +418,19 @@ DBG_COMMAND(entropy,
 	}
 	zerobits = entropy_bits - onebits;
 
-	dbg_printf(DBGSTR("entropy_bits: " AC_WHITE("%" PRIuSIZ) " bits (%" PRIuSIZ "b+%u)%s\n"),
-	           entropy_bits, entropy_bits / NBBY, (unsigned int)(entropy_bits % NBBY),
+	dbg_printf(DBGSTR("entropy_bits: " AC_WHITE("%" PRIuSIZ) "/" AC_WHITE("%u")
+	                  " bits (" AC_WHITE("%u") "%%, " AC_WHITE("%" PRIuSIZ)
+	                  "+" AC_WHITE("%u") "/" AC_WHITE("8") ")%s\n"),
+	           entropy_bits, (size_t)ENTROPY_BITS,
+	           (unsigned int)((entropy_bits * 100) / ENTROPY_BITS),
+	           entropy_bits / NBBY, (unsigned int)(entropy_bits % NBBY),
 	           entropy_bits == ENTROPY_BITS ? DBGSTR(" (" AC_GREEN("full") ")") : DBGSTR(""));
 	dbg_printf(DBGSTR("bits: [0=" AC_WHITE("%" PRIuSIZ) " (%u%%),1=" AC_WHITE("%" PRIuSIZ) " (%u%%)]\n"),
-	           onebits, !entropy_bits ? 0 : (onebits * 100) / entropy_bits,
-	           zerobits, !entropy_bits ? 0 : (zerobits * 100) / entropy_bits);
-	if (onebits * 2 >= entropy_bits * 3)
+	           zerobits, !entropy_bits ? 0 : (zerobits * 100) / entropy_bits,
+	           onebits, !entropy_bits ? 0 : (onebits * 100) / entropy_bits);
+	if (onebits * 3 >= entropy_bits * 2)
 		dbg_print(DBGSTR(AC_YELLOW("WARNING: More than 2/3 are 1-bits") "\n"));
-	if (zerobits * 2 >= entropy_bits * 3)
+	if (zerobits * 3 >= entropy_bits * 2)
 		dbg_print(DBGSTR(AC_YELLOW("WARNING: More than 2/3 are 0-bits") "\n"));
 
 	dbg_print(DBGSTR("   "));
