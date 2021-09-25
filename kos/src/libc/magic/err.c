@@ -51,6 +51,10 @@ __SYSDECL_BEGIN
 
 }
 
+/* These are defined in <libc/template/program_invocation_name.h> */
+%[define_replacement(program_invocation_name       = __LOCAL_program_invocation_name)]
+%[define_replacement(program_invocation_short_name = __LOCAL_program_invocation_short_name)]
+
 
 @@>> warn(3), vwarn(3)
 @@Print to stderr: `<program_invocation_short_name>: <format...>: strerror(errno)\n'
@@ -83,7 +87,7 @@ void vwarnc($errno_t used_errno, char const *format, $va_list args) {
 @@pp_if $has_function(flockfile) && $has_function(funlockfile)@@
 	flockfile(stderr);
 @@pp_endif@@
-	fprintf(stderr, "%s: ", __LOCAL_program_invocation_short_name);
+	fprintf(stderr, "%s: ", program_invocation_short_name);
 	if (format) {
 		vfprintf(stderr, format, args);
 		fprintf(stderr, ": %s\n", strerror(used_errno));
@@ -114,7 +118,7 @@ void vwarnx(char const *format, $va_list args) {
 @@pp_if $has_function(flockfile) && $has_function(funlockfile)@@
 	flockfile(stderr);
 @@pp_endif@@
-	fprintf(stderr, "%s: ", @__LOCAL_program_invocation_short_name@);
+	fprintf(stderr, "%s: ", program_invocation_short_name);
 	if (format)
 		vfprintf(stderr, format, args);
 	fputc('\n', stderr);

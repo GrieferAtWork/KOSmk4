@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb3221094 */
+/* HASH CRC-32:0x47bd32cc */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -37,10 +37,6 @@
 #include <stdint.h>
 #include <stdio.h>
 
-#ifdef __CC__
-__SYSDECL_BEGIN
-
-
 /* Flags for `humanize_number(3)::flags' */
 #if !defined(HN_DECIMAL) && defined(__HN_DECIMAL)
 #define HN_DECIMAL      __HN_DECIMAL
@@ -65,6 +61,9 @@ __SYSDECL_BEGIN
 #if !defined(HN_AUTOSCALE) && defined(__HN_AUTOSCALE)
 #define HN_AUTOSCALE    __HN_AUTOSCALE
 #endif /* !HN_AUTOSCALE && __HN_AUTOSCALE */
+
+#ifdef __CC__
+__SYSDECL_BEGIN
 
 #if !defined(__humanize_number_defined) && defined(__CRT_HAVE_humanize_number)
 #define __humanize_number_defined 1

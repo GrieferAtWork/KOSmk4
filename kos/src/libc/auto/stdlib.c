@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xab8bb8ff */
+/* HASH CRC-32:0x628a2a4b */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2282,7 +2282,7 @@ NOTHROW_NCX(LIBCCALL libc_l64a_r)(long n,
 /* >> getprogname(3), setprogname(3) */
 INTERN ATTR_SECTION(".text.crt.bsd") ATTR_CONST WUNUSED char const *
 NOTHROW_NCX(LIBCCALL libc_getprogname)(void) {
-	return __LOCAL_program_invocation_short_name;
+	return program_invocation_short_name;
 }
 /* >> getprogname(3), setprogname(3) */
 INTERN ATTR_SECTION(".text.crt.bsd") void

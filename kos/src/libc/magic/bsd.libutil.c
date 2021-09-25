@@ -39,10 +39,6 @@
 #include <stdio.h>
 )]%{
 
-#ifdef __CC__
-__SYSDECL_BEGIN
-
-
 /* Flags for `humanize_number(3)::flags' */
 #if !defined(HN_DECIMAL) && defined(__HN_DECIMAL)
 #define HN_DECIMAL      __HN_DECIMAL
@@ -67,6 +63,9 @@ __SYSDECL_BEGIN
 #if !defined(HN_AUTOSCALE) && defined(__HN_AUTOSCALE)
 #define HN_AUTOSCALE    __HN_AUTOSCALE
 #endif /* !HN_AUTOSCALE && __HN_AUTOSCALE */
+
+#ifdef __CC__
+__SYSDECL_BEGIN
 
 }
 

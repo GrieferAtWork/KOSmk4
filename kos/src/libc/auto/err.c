@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x48b374d6 */
+/* HASH CRC-32:0xe9d983a */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -100,7 +100,7 @@ INTERN ATTR_SECTION(".text.crt.error") ATTR_LIBC_PRINTF(1, 0) void
 #if (defined(__CRT_HAVE_flockfile) || defined(__CRT_HAVE__lock_file) || defined(__CRT_HAVE__IO_flockfile)) && (defined(__CRT_HAVE_funlockfile) || defined(__CRT_HAVE__unlock_file) || defined(__CRT_HAVE__IO_funlockfile))
 	libc_flockfile(stderr);
 #endif /* (__CRT_HAVE_flockfile || __CRT_HAVE__lock_file || __CRT_HAVE__IO_flockfile) && (__CRT_HAVE_funlockfile || __CRT_HAVE__unlock_file || __CRT_HAVE__IO_funlockfile) */
-	libc_fprintf(stderr, "%s: ", __LOCAL_program_invocation_short_name);
+	libc_fprintf(stderr, "%s: ", program_invocation_short_name);
 	if (format) {
 		libc_vfprintf(stderr, format, args);
 		libc_fprintf(stderr, ": %s\n", libc_strerror(used_errno));
@@ -145,7 +145,7 @@ INTERN ATTR_SECTION(".text.crt.error") ATTR_LIBC_PRINTF(1, 0) void
 #if (defined(__CRT_HAVE_flockfile) || defined(__CRT_HAVE__lock_file) || defined(__CRT_HAVE__IO_flockfile)) && (defined(__CRT_HAVE_funlockfile) || defined(__CRT_HAVE__unlock_file) || defined(__CRT_HAVE__IO_funlockfile))
 	libc_flockfile(stderr);
 #endif /* (__CRT_HAVE_flockfile || __CRT_HAVE__lock_file || __CRT_HAVE__IO_flockfile) && (__CRT_HAVE_funlockfile || __CRT_HAVE__unlock_file || __CRT_HAVE__IO_funlockfile) */
-	libc_fprintf(stderr, "%s: ", __LOCAL_program_invocation_short_name);
+	libc_fprintf(stderr, "%s: ", program_invocation_short_name);
 	if (format)
 		libc_vfprintf(stderr, format, args);
 	libc_fputc('\n', stderr);

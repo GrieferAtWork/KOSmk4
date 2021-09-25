@@ -99,6 +99,10 @@ __LIBC int error_one_per_line;
 @@pp_endif@@
 )]
 
+/* These are defined in <libc/template/program_invocation_name.h> */
+%[define_replacement(program_invocation_name       = __LOCAL_program_invocation_name)]
+%[define_replacement(program_invocation_short_name = __LOCAL_program_invocation_short_name)]
+
 
 @@>> error(3)
 @@Helper  function  for printing  an error  message to  `stderr' and  possibly exiting  the program
@@ -124,7 +128,7 @@ void error(int status, $errno_t errnum, const char *format, ...) {
 @@pp_endif@@
 	{
 		fflush(stdout);
-		fprintf(stderr, "%s: ", __LOCAL_program_invocation_short_name);
+		fprintf(stderr, "%s: ", program_invocation_short_name);
 	}
 	if (format) {
 		va_list args;
@@ -183,7 +187,7 @@ void error_at_line(int status, $errno_t errnum, char const *filename,
 @@pp_endif@@
 		{
 			fflush(stdout);
-			fprintf(stderr, "%s:", __LOCAL_program_invocation_short_name);
+			fprintf(stderr, "%s:", program_invocation_short_name);
 		}
 		fprintf(stderr, "%s:%u: ", filename, line);
 		if (format) {

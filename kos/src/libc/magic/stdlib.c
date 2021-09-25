@@ -3314,12 +3314,17 @@ int l64a_r(long n, char *buf, __STDC_INT_AS_SIZE_T bufsize) {
 }
 
 
+/* These are defined in <libc/template/program_invocation_name.h> */
+%[define_replacement(program_invocation_name       = __LOCAL_program_invocation_name)]
+%[define_replacement(program_invocation_short_name = __LOCAL_program_invocation_short_name)]
+
+
 @@>> getprogname(3), setprogname(3)
 [[guard, const, wunused]]
 [[requires_include("<libc/template/program_invocation_name.h>")]]
 [[requires(defined(__LOCAL_program_invocation_short_name))]]
 char const *getprogname(void) {
-	return __LOCAL_program_invocation_short_name;
+	return program_invocation_short_name;
 }
 
 [[guard, doc_alias("getprogname")]]

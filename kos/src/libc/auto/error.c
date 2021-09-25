@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6e6c5b78 */
+/* HASH CRC-32:0x4bad9029 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -83,7 +83,7 @@ INTERN ATTR_SECTION(".text.crt.dos.error") ATTR_LIBC_PRINTF(3, 4) void
 #endif /* __LOCAL_error_print_progname */
 	{
 		libc_fflush(stdout);
-		libc_fprintf(stderr, "%s: ", __LOCAL_program_invocation_short_name);
+		libc_fprintf(stderr, "%s: ", program_invocation_short_name);
 	}
 	if (format) {
 		va_list args;
@@ -147,7 +147,7 @@ INTERN ATTR_SECTION(".text.crt.error") ATTR_LIBC_PRINTF(3, 4) void
 #endif /* __LOCAL_error_print_progname */
 	{
 		libc_fflush(stdout);
-		libc_fprintf(stderr, "%s: ", __LOCAL_program_invocation_short_name);
+		libc_fprintf(stderr, "%s: ", program_invocation_short_name);
 	}
 	if (format) {
 		va_list args;
@@ -240,7 +240,7 @@ INTERN ATTR_SECTION(".text.crt.dos.error") ATTR_LIBC_PRINTF(5, 6) void
 #endif /* __LOCAL_error_print_progname */
 		{
 			libc_fflush(stdout);
-			libc_fprintf(stderr, "%s:", __LOCAL_program_invocation_short_name);
+			libc_fprintf(stderr, "%s:", program_invocation_short_name);
 		}
 		libc_fprintf(stderr, "%s:%u: ", filename, line);
 		if (format) {
@@ -337,7 +337,7 @@ INTERN ATTR_SECTION(".text.crt.error") ATTR_LIBC_PRINTF(5, 6) void
 #endif /* __LOCAL_error_print_progname */
 		{
 			libc_fflush(stdout);
-			libc_fprintf(stderr, "%s:", __LOCAL_program_invocation_short_name);
+			libc_fprintf(stderr, "%s:", program_invocation_short_name);
 		}
 		libc_fprintf(stderr, "%s:%u: ", filename, line);
 		if (format) {
