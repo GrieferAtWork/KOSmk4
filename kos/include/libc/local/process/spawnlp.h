@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd670c4ac */
+/* HASH CRC-32:0xb8cf4807 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,7 @@
 #ifndef __local_spawnlp_defined
 #define __local_spawnlp_defined 1
 #include <__crt.h>
-#include <libc/local/environ.h>
+#include <libc/template/environ.h>
 #include <hybrid/__alloca.h>
 #include <features.h>
 #include <asm/os/oflags.h>

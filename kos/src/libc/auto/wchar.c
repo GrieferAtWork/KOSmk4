@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x735e7df1 */
+/* HASH CRC-32:0xfdf46526 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -643,25 +643,25 @@ NOTHROW_NCX(LIBKCALL libc_wcsxfrm)(char32_t *dst,
 	libc_memcpy(dst, src, n * sizeof(char32_t));
 	return n;
 }
-#include <libc/local/stdstreams.h>
+#include <libc/template/stdstreams.h>
 /* >> getwchar(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.read.getc") wint16_t
 (LIBDCALL libd_getwchar)(void) THROWS(...) {
 	return libd_fgetwc(stdin);
 }
-#include <libc/local/stdstreams.h>
+#include <libc/template/stdstreams.h>
 /* >> getwchar(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.FILE.locked.read.getc") wint32_t
 (LIBKCALL libc_getwchar)(void) THROWS(...) {
 	return libc_fgetwc(stdin);
 }
-#include <libc/local/stdstreams.h>
+#include <libc/template/stdstreams.h>
 /* >> putwchar(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.write.putc") wint16_t
 (LIBDCALL libd_putwchar)(char16_t wc) THROWS(...) {
 	return libd_fputwc(wc, stdout);
 }
-#include <libc/local/stdstreams.h>
+#include <libc/template/stdstreams.h>
 /* >> putwchar(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.FILE.locked.write.putc") wint32_t
 (LIBKCALL libc_putwchar)(char32_t wc) THROWS(...) {
@@ -1094,14 +1094,14 @@ INTERN ATTR_SECTION(".text.crt.wchar.FILE.locked.write.printf") ATTR_LIBC_WPRINT
 	va_end(args);
 	return result;
 }
-#include <libc/local/stdstreams.h>
+#include <libc/template/stdstreams.h>
 /* >> vwprintf(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.write.printf") ATTR_LIBC_WPRINTF(1, 0) NONNULL((1)) __STDC_INT_AS_SIZE_T
 (LIBDCALL libd_vwprintf)(char16_t const *__restrict format,
                          va_list args) THROWS(...) {
 	return libd_vfwprintf(stdout, format, args);
 }
-#include <libc/local/stdstreams.h>
+#include <libc/template/stdstreams.h>
 /* >> vwprintf(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.FILE.locked.write.printf") ATTR_LIBC_WPRINTF(1, 0) NONNULL((1)) __STDC_INT_AS_SIZE_T
 (LIBKCALL libc_vwprintf)(char32_t const *__restrict format,
@@ -1780,14 +1780,14 @@ NOTHROW_NCX(LIBKCALL libc_wcstoull)(char32_t const *__restrict nptr,
 	return (__ULONGLONG)libc_wcstou64(nptr, endptr, base);
 #endif /* __SIZEOF_LONG_LONG__ > 4 */
 }
-#include <libc/local/stdstreams.h>
+#include <libc/template/stdstreams.h>
 /* >> vwscanf(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.read.scanf") WUNUSED ATTR_LIBC_WSCANF(1, 0) NONNULL((1)) __STDC_INT_AS_SIZE_T
 (LIBDCALL libd_vwscanf)(char16_t const *__restrict format,
                         va_list args) THROWS(...) {
 	return libd_vfwscanf(stdin, format, args);
 }
-#include <libc/local/stdstreams.h>
+#include <libc/template/stdstreams.h>
 /* >> vwscanf(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.FILE.locked.read.scanf") WUNUSED ATTR_LIBC_WSCANF(1, 0) NONNULL((1)) __STDC_INT_AS_SIZE_T
 (LIBKCALL libc_vwscanf)(char32_t const *__restrict format,
@@ -2220,25 +2220,25 @@ NOTHROW_NCX(LIBKCALL libc_wcstold_l)(char32_t const *__restrict nptr,
 	(void)locale;
 	return libc_wcstold(nptr, endptr);
 }
-#include <libc/local/stdstreams.h>
+#include <libc/template/stdstreams.h>
 /* >> getwchar_unlocked(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.unlocked.read.getc") wint16_t
 (LIBDCALL libd_getwchar_unlocked)(void) THROWS(...) {
 	return libd_fgetwc_unlocked(stdin);
 }
-#include <libc/local/stdstreams.h>
+#include <libc/template/stdstreams.h>
 /* >> getwchar_unlocked(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.FILE.unlocked.read.getc") wint32_t
 (LIBKCALL libc_getwchar_unlocked)(void) THROWS(...) {
 	return libc_fgetwc_unlocked(stdin);
 }
-#include <libc/local/stdstreams.h>
+#include <libc/template/stdstreams.h>
 /* >> putwchar_unlocked(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.unlocked.write.putc") wint16_t
 (LIBDCALL libd_putwchar_unlocked)(char16_t wc) THROWS(...) {
 	return libd_fputwc_unlocked(wc, stdin);
 }
-#include <libc/local/stdstreams.h>
+#include <libc/template/stdstreams.h>
 /* >> putwchar_unlocked(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.FILE.unlocked.write.putc") wint32_t
 (LIBKCALL libc_putwchar_unlocked)(char32_t wc) THROWS(...) {
@@ -2428,28 +2428,28 @@ INTERN ATTR_SECTION(".text.crt.wchar.FILE.unlocked.write.printf") ATTR_LIBC_WPRI
 	va_end(args);
 	return result;
 }
-#include <libc/local/stdstreams.h>
+#include <libc/template/stdstreams.h>
 /* >> vwprintf_unlocked(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.unlocked.write.printf") ATTR_LIBC_WPRINTF(1, 0) NONNULL((1)) __STDC_INT_AS_SIZE_T
 (LIBDCALL libd_vwprintf_unlocked)(char16_t const *__restrict format,
                                   va_list args) THROWS(...) {
 	return libd_vfwprintf_unlocked(stdout, format, args);
 }
-#include <libc/local/stdstreams.h>
+#include <libc/template/stdstreams.h>
 /* >> vwprintf_unlocked(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.FILE.unlocked.write.printf") ATTR_LIBC_WPRINTF(1, 0) NONNULL((1)) __STDC_INT_AS_SIZE_T
 (LIBKCALL libc_vwprintf_unlocked)(char32_t const *__restrict format,
                                   va_list args) THROWS(...) {
 	return libc_vfwprintf_unlocked(stdout, format, args);
 }
-#include <libc/local/stdstreams.h>
+#include <libc/template/stdstreams.h>
 /* >> vwscanf_unlocked(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.unlocked.read.scanf") WUNUSED ATTR_LIBC_SCANF(1, 0) NONNULL((1)) __STDC_INT_AS_SIZE_T
 (LIBDCALL libd_vwscanf_unlocked)(char16_t const *__restrict format,
                                  va_list args) THROWS(...) {
 	return libd_vfwscanf_unlocked(stdin, format, args);
 }
-#include <libc/local/stdstreams.h>
+#include <libc/template/stdstreams.h>
 /* >> vwscanf_unlocked(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.FILE.unlocked.read.scanf") WUNUSED ATTR_LIBC_SCANF(1, 0) NONNULL((1)) __STDC_INT_AS_SIZE_T
 (LIBKCALL libc_vwscanf_unlocked)(char32_t const *__restrict format,
@@ -5924,13 +5924,13 @@ INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.write.printf") NONNULL((1, 
 	va_end(args);
 	return result;
 }
-#include <libc/local/stdstreams.h>
+#include <libc/template/stdstreams.h>
 INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.write.printf") NONNULL((1)) __STDC_INT_AS_SSIZE_T
 (LIBDCALL libd__vwprintf_p)(char16_t const *format,
                             va_list args) THROWS(...) {
 	return libd__vfwprintf_p(stdout, format, args);
 }
-#include <libc/local/stdstreams.h>
+#include <libc/template/stdstreams.h>
 INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.write.printf") NONNULL((1)) __STDC_INT_AS_SSIZE_T
 (LIBKCALL libc__vwprintf_p)(char32_t const *format,
                             va_list args) THROWS(...) {
@@ -6712,24 +6712,24 @@ INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.read.scanf") WUNUSED NONNUL
 	va_end(args);
 	return result;
 }
-#include <libc/local/stdstreams.h>
+#include <libc/template/stdstreams.h>
 INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.read.read") char16_t *
 NOTHROW_NCX(LIBDCALL libd__getws_s)(char16_t *buf,
                                     size_t buflen) {
 	return libd_fgetws(buf, buflen, stdin);
 }
-#include <libc/local/stdstreams.h>
+#include <libc/template/stdstreams.h>
 INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.read.read") char32_t *
 NOTHROW_NCX(LIBKCALL libc__getws_s)(char32_t *buf,
                                     size_t buflen) {
 	return libc_fgetws(buf, buflen, stdin);
 }
-#include <libc/local/stdstreams.h>
+#include <libc/template/stdstreams.h>
 INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.write.write") NONNULL((1)) __STDC_INT_AS_SIZE_T
 NOTHROW_NCX(LIBDCALL libd__putws)(char16_t const *str) {
 	return libd_fputws(str, stdout);
 }
-#include <libc/local/stdstreams.h>
+#include <libc/template/stdstreams.h>
 INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.write.write") NONNULL((1)) __STDC_INT_AS_SIZE_T
 NOTHROW_NCX(LIBKCALL libc__putws)(char32_t const *str) {
 	return libc_fputws(str, stdout);

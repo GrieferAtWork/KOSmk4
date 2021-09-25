@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x176d4274 */
+/* HASH CRC-32:0x42386a52 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -40,7 +40,7 @@ __CREDIRECT_DOS(__ATTR_NONNULL((2)),__WINT16_TYPE__,__THROWING,__localdep_fputc1
 #endif /* !... */
 #endif /* !__local___localdep_fputc16_defined */
 __NAMESPACE_LOCAL_END
-#include <libc/local/stdstreams.h>
+#include <libc/template/stdstreams.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(putchar16) __WINT16_TYPE__
 (__LIBDCALL __LIBC_LOCAL_NAME(putchar16))(__CHAR16_TYPE__ __wc) __THROWS(...) {

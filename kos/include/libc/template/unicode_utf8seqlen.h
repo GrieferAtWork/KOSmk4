@@ -18,20 +18,20 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __LOCAL_unicode_utf8seqlen
-#ifdef __utf8_seqlen_defined
+#ifdef __unicode_utf8seqlen_defined
 #define __LOCAL_unicode_utf8seqlen unicode_utf8seqlen
-#else /* __utf8_seqlen_defined */
+#else /* __unicode_utf8seqlen_defined */
 #include <__crt.h>
 #include <hybrid/typecore.h>
-#ifdef __utf8_seqlen_defined
+#ifdef __unicode_utf8seqlen_defined
 #define __LOCAL_unicode_utf8seqlen unicode_utf8seqlen
-#else /* __utf8_seqlen_defined */
+#else /* __unicode_utf8seqlen_defined */
 #ifdef __CRT_HAVE_unicode_utf8seqlen
 #ifndef __NO_ASMNAME
 __LIBC __UINT8_TYPE__ const __LOCAL_unicode_utf8seqlen[256] __CASMNAME("unicode_utf8seqlen");
 #define __LOCAL_unicode_utf8seqlen __LOCAL_unicode_utf8seqlen
 #else /* !__NO_ASMNAME */
-#define __utf8_seqlen_defined      1
+#define __unicode_utf8seqlen_defined
 __LIBC __UINT8_TYPE__ const unicode_utf8seqlen[256] __CASMNAME_SAME("unicode_utf8seqlen");
 #define __LOCAL_unicode_utf8seqlen unicode_utf8seqlen
 #endif /* __NO_ASMNAME */
@@ -53,6 +53,6 @@ __UINT8_TYPE__ const unicode_utf8seqlen[256] =
 #include "utf8-seqlen.h"
 ;
 #endif /* !... */
-#endif /* !__utf8_seqlen_defined */
-#endif /* !__utf8_seqlen_defined */
+#endif /* !__unicode_utf8seqlen_defined */
+#endif /* !__unicode_utf8seqlen_defined */
 #endif /* !__LOCAL_unicode_utf8seqlen */

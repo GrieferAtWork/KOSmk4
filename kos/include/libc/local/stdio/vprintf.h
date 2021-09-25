@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd858537a */
+/* HASH CRC-32:0x70b74410 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -49,7 +49,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_vfprintf_defined */
 __NAMESPACE_LOCAL_END
-#include <libc/local/stdstreams.h>
+#include <libc/template/stdstreams.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(vprintf) __ATTR_LIBC_PRINTF(1, 0) __ATTR_NONNULL((1)) __STDC_INT_AS_SSIZE_T
 (__LIBCCALL __LIBC_LOCAL_NAME(vprintf))(char const *__restrict __format, __builtin_va_list __args) __THROWS(...) {

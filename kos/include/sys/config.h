@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x11fc0ef */
+/* HASH CRC-32:0x4bd2628e */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -387,7 +387,7 @@
 #endif /* __CRT_HAVE_rmdir || __CRT_HAVE__rmdir || (__AT_FDCWD && __CRT_HAVE_unlinkat) */
 
 #undef HAVE_SETENV
-#include <libc/local/environ.h>
+#include <libc/template/environ.h>
 #if defined(__CRT_HAVE_setenv) || ((defined(__CRT_HAVE_getenv) || defined(__LOCAL_environ)) && defined(__CRT_HAVE__putenv_s))
 #define HAVE_SETENV 1
 #endif /* __CRT_HAVE_setenv || ((__CRT_HAVE_getenv || __LOCAL_environ) && __CRT_HAVE__putenv_s) */

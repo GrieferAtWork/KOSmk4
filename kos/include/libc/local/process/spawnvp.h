@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x54446e9b */
+/* HASH CRC-32:0x72480754 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,7 @@
 #ifndef __local_spawnvp_defined
 #define __local_spawnvp_defined 1
 #include <__crt.h>
-#include <libc/local/environ.h>
+#include <libc/template/environ.h>
 #include <hybrid/__alloca.h>
 #include <features.h>
 #include <asm/os/oflags.h>

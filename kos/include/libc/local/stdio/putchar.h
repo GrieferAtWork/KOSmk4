@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa78c8ef0 */
+/* HASH CRC-32:0xa0b57284 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -53,7 +53,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_fputc_defined */
 __NAMESPACE_LOCAL_END
-#include <libc/local/stdstreams.h>
+#include <libc/template/stdstreams.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(putchar) int
 (__LIBCCALL __LIBC_LOCAL_NAME(putchar))(int __ch) __THROWS(...) {

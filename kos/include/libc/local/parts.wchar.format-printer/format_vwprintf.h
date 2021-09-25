@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3a226393 */
+/* HASH CRC-32:0xc35e5f7a */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -387,7 +387,7 @@ __LOCAL_LIBC(format_vwprintf) __ATTR_LIBC_WPRINTF(3, 0) __ATTR_NONNULL((1, 3)) _
 #define __FORMAT_UNICODE_FORMAT8    (__NAMESPACE_LOCAL_SYM __localdep_format_8to32)
 #define __FORMAT_UNICODE_FORMAT16   (__NAMESPACE_LOCAL_SYM __localdep_format_16to32)
 #endif /* __SIZEOF_WCHAR_T__ != 2 */
-#include <libc/local/format-printf.h>
+#include <libc/template/format-printf.h>
 #endif /* !__INTELLISENSE__ */
 }
 __NAMESPACE_LOCAL_END

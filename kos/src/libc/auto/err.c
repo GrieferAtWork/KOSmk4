@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8184193c */
+/* HASH CRC-32:0x48b374d6 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -89,8 +89,8 @@ INTERN ATTR_SECTION(".text.crt.error") ATTR_LIBC_PRINTF(1, 2) void
 	libc_vwarnc(used_errno, format, args);
 	va_end(args);
 }
-#include <libc/local/stdstreams.h>
-#include <libc/local/program_invocation_name.h>
+#include <libc/template/stdstreams.h>
+#include <libc/template/program_invocation_name.h>
 /* >> warnc(3), vwarnc(3)
  * Print to stderr: `<program_invocation_short_name>: <format...>: strerror(used_errno)\n' */
 INTERN ATTR_SECTION(".text.crt.error") ATTR_LIBC_PRINTF(1, 0) void
@@ -135,8 +135,8 @@ INTERN ATTR_SECTION(".text.crt.error") ATTR_LIBC_PRINTF(1, 2) void
 	libc_vwarnx(format, args);
 	va_end(args);
 }
-#include <libc/local/stdstreams.h>
-#include <libc/local/program_invocation_name.h>
+#include <libc/template/stdstreams.h>
+#include <libc/template/program_invocation_name.h>
 /* >> warnx(3), vwarnx(3)
  * Print to stderr: `<program_invocation_short_name>: <format...>\n' */
 INTERN ATTR_SECTION(".text.crt.error") ATTR_LIBC_PRINTF(1, 0) void

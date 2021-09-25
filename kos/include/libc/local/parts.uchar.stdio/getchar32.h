@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x51f78c0d */
+/* HASH CRC-32:0xf2ee9ea */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -40,7 +40,7 @@ __CREDIRECT_KOS(__ATTR_NONNULL((1)),__WINT32_TYPE__,__THROWING,__localdep_fgetc3
 #endif /* !... */
 #endif /* !__local___localdep_fgetc32_defined */
 __NAMESPACE_LOCAL_END
-#include <libc/local/stdstreams.h>
+#include <libc/template/stdstreams.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(getchar32) __WINT32_TYPE__
 (__LIBKCALL __LIBC_LOCAL_NAME(getchar32))(void) __THROWS(...) {

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2d055381 */
+/* HASH CRC-32:0x41e1303e */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,7 @@
 #ifndef __local_getprogname_defined
 #define __local_getprogname_defined 1
 #include <__crt.h>
-#include <libc/local/program_invocation_name.h>
+#include <libc/template/program_invocation_name.h>
 #ifdef __LOCAL_program_invocation_short_name
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(getprogname) __ATTR_CONST __ATTR_WUNUSED char const *

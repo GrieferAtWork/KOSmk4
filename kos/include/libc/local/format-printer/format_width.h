@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3a981a52 */
+/* HASH CRC-32:0xe58d0ebd */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@
 #include <__crt.h>
 #include <bits/crt/format-printer.h>
 #include <hybrid/typecore.h>
-#include <libc/local/unicode_utf8seqlen.h>
+#include <libc/template/unicode_utf8seqlen.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(format_width) __ATTR_PURE __ATTR_NONNULL((2)) __SSIZE_TYPE__
 __NOTHROW_NCX(__FORMATPRINTER_CC __LIBC_LOCAL_NAME(format_width))(void *__arg, char const *__restrict __data, __SIZE_TYPE__ __datalen) {

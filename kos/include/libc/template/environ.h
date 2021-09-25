@@ -19,6 +19,7 @@
  */
 #ifndef __LOCAL_environ
 #include <__crt.h>
+#ifndef __LOCAL_environ
 __DECL_BEGIN
 #if defined(__environ_defined) || defined(environ)
 #define __LOCAL_environ environ
@@ -31,7 +32,7 @@ __LIBC char **__LOCAL_environ __ASMNAME("environ");
 #define __LOCAL_environ __LOCAL_environ
 #elif defined(__CRT_HAVE_environ)
 __LIBC char **environ;
-#define __environ_defined 1
+#define __environ_defined
 #define environ         environ
 #define __LOCAL_environ environ
 #elif defined(__CRT_HAVE__environ) && !defined(__NO_ASMNAME)
@@ -39,7 +40,7 @@ __LIBC char **__LOCAL_environ __ASMNAME("_environ");
 #define __LOCAL_environ __LOCAL_environ
 #elif defined(__CRT_HAVE__environ)
 __LIBC char **_environ;
-#define ___environ_defined 1
+#define ___environ_defined
 #define _environ        _environ
 #define __LOCAL_environ _environ
 #elif defined(__CRT_HAVE___environ) && !defined(__NO_ASMNAME)
@@ -47,15 +48,16 @@ __LIBC char **__LOCAL_environ __ASMNAME("__environ");
 #define __LOCAL_environ __LOCAL_environ
 #elif defined(__CRT_HAVE___environ)
 __LIBC char **__environ;
-#define ____environ_defined 1
+#define ____environ_defined
 #define __environ       __environ
 #define __LOCAL_environ __environ
 #elif defined(__CRT_HAVE___p__environ)
 #ifndef ____p__environ_defined
-#define ____p__environ_defined 1
+#define ____p__environ_defined
 __CDECLARE(__ATTR_WUNUSED __ATTR_CONST __ATTR_RETNONNULL,char ***,__NOTHROW,__p__environ,(void),())
 #endif /* !____p__environ_defined */
 #define __LOCAL_environ (*__p__environ())
 #endif /* ... */
 __DECL_END
+#endif /* !__LOCAL_environ */
 #endif /* !__LOCAL_environ */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcee62b33 */
+/* HASH CRC-32:0x818e9822 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -36,7 +36,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),__WINT_TYPE__,__THROWING,__localdep_fgetwc,(__FI
 #endif /* !... */
 #endif /* !__local___localdep_fgetwc_defined */
 __NAMESPACE_LOCAL_END
-#include <libc/local/stdstreams.h>
+#include <libc/template/stdstreams.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(getwchar) __WINT_TYPE__
 (__LIBCCALL __LIBC_LOCAL_NAME(getwchar))(void) __THROWS(...) {

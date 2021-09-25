@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcf9857ca */
+/* HASH CRC-32:0x9bc49a2e */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -53,7 +53,7 @@ __CDECLARE(,int,__NOTHROW_NCX,dehumanize_number,(char const *__str, __INT64_TYPE
 /* >> getprogname(3), setprogname(3) */
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,char const *,__NOTHROW_NCX,getprogname,(void),())
 #else /* __CRT_HAVE_getprogname */
-#include <libc/local/program_invocation_name.h>
+#include <libc/template/program_invocation_name.h>
 #ifdef __LOCAL_program_invocation_short_name
 #include <libc/local/stdlib/getprogname.h>
 /* >> getprogname(3), setprogname(3) */
@@ -69,7 +69,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(getprogname, __FORCELOCAL __ATTR_ARTIFICIAL __AT
 /* >> getprogname(3), setprogname(3) */
 __CDECLARE_VOID(,__NOTHROW_NCX,setprogname,(char const *__name),(__name))
 #else /* __CRT_HAVE_setprogname */
-#include <libc/local/program_invocation_name.h>
+#include <libc/template/program_invocation_name.h>
 #ifdef __LOCAL_program_invocation_short_name_p
 #include <libc/local/stdlib/setprogname.h>
 /* >> getprogname(3), setprogname(3) */

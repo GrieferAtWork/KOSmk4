@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc0b2105e */
+/* HASH CRC-32:0xfc0af361 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 #define __local_execvpe_defined 1
 #include <__crt.h>
 #include <hybrid/__alloca.h>
-#include <libc/local/environ.h>
+#include <libc/template/environ.h>
 #if (defined(__CRT_HAVE_getenv) || defined(__LOCAL_environ)) && (defined(__CRT_HAVE_execve) || defined(__CRT_HAVE__execve)) && defined(__hybrid_alloca)
 #include <features.h>
 #ifndef __TARGV

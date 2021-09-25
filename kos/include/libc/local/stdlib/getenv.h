@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb30bca82 */
+/* HASH CRC-32:0xacd65355 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,7 @@
 #ifndef __local_getenv_defined
 #define __local_getenv_defined 1
 #include <__crt.h>
-#include <libc/local/environ.h>
+#include <libc/template/environ.h>
 #ifdef __LOCAL_environ
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_memcmp_defined

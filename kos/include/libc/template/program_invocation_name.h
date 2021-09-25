@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_program_invocation_name_defined
-#define __local_program_invocation_name_defined 1
+#define __local_program_invocation_name_defined
 #include <__crt.h>
 
 __SYSDECL_BEGIN
@@ -71,7 +71,7 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,char /*const*/ *,__NOTHROW_NCX,__LOCAL_g
 #define __LOCAL_program_invocation_name __LOCAL_getexecname()
 #else /* ... */
 #ifndef ____p__pgmptr_defined
-#define ____p__pgmptr_defined 1
+#define ____p__pgmptr_defined
 #ifdef __CRT_HAVE___p__pgmptr
 /* Alias for argv[0], as passed to main() */
 __CDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,char **,__NOTHROW_NCX,__p__pgmptr,(void),())
@@ -121,7 +121,7 @@ __LIBC char *__progname;
 #endif /* __NO_ASMNAME */
 #else /* ... */
 #ifndef ____p_program_invocation_short_name_defined
-#define ____p_program_invocation_short_name_defined 1
+#define ____p_program_invocation_short_name_defined
 #ifdef __CRT_HAVE___p_program_invocation_short_name
 /* Alias for `strchr(argv[0], '/') ? strchr(argv[0], '/') + 1 : argv[0]', as passed to main() */
 __CDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,char **,__NOTHROW_NCX,__p_program_invocation_short_name,(void),())

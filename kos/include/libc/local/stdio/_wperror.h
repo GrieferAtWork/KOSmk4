@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf529ad6 */
+/* HASH CRC-32:0x13b75a3a */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -65,7 +65,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__CRT_HAVE_strerror */
 #endif /* !__local___localdep_strerror_defined */
 __NAMESPACE_LOCAL_END
-#include <libc/local/stdstreams.h>
+#include <libc/template/stdstreams.h>
 #include <parts/printf-config.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(_wperror) __ATTR_COLD void

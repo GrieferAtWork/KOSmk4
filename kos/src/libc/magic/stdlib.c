@@ -528,7 +528,7 @@ struct __div_struct div(int numer, int denom) {
 
 [[impl_include("<hybrid/typecore.h>")]]
 [[std, wunused, section(".text.crt{|.dos}.fs.environ")]]
-[[requires_include("<libc/local/environ.h>")]]
+[[requires_include("<libc/template/environ.h>")]]
 [[userimpl, requires(defined(__LOCAL_environ))]]
 [[impl_prefix(
 @@pp_ifndef __OPTIMIZE_SIZE__@@
@@ -2711,7 +2711,7 @@ __LONGDOUBLE strtold_l([[nonnull]] char const *__restrict nptr,
 
 [[wunused, section(".text.crt{|.dos}.fs.environ")]]
 [[export_alias("__secure_getenv"), alias("getenv")]]
-[[if($extended_include_prefix("<libc/local/environ.h>")defined(__LOCAL_environ)), bind_local_function(getenv)]]
+[[if($extended_include_prefix("<libc/template/environ.h>")defined(__LOCAL_environ)), bind_local_function(getenv)]]
 char *secure_getenv([[nonnull]] char const *varname);
 
 [[cp, section(".text.crt{|.dos}.io.tty")]]
@@ -3086,9 +3086,9 @@ int shexec([[nullable]] char const *command) {
 
 @@Returns the absolute filename of the main executable (s.a. `program_invocation_name')
 [[const, wunused]]
-[[requires_include("<libc/local/program_invocation_name.h>")]]
+[[requires_include("<libc/template/program_invocation_name.h>")]]
 [[requires(defined(__LOCAL_program_invocation_name))]]
-[[impl_include("<libc/local/program_invocation_name.h>")]]
+[[impl_include("<libc/template/program_invocation_name.h>")]]
 char const *getexecname() {
 	return __LOCAL_program_invocation_name;
 }
@@ -3316,14 +3316,14 @@ int l64a_r(long n, char *buf, __STDC_INT_AS_SIZE_T bufsize) {
 
 @@>> getprogname(3), setprogname(3)
 [[guard, const, wunused]]
-[[requires_include("<libc/local/program_invocation_name.h>")]]
+[[requires_include("<libc/template/program_invocation_name.h>")]]
 [[requires(defined(__LOCAL_program_invocation_short_name))]]
 char const *getprogname(void) {
 	return __LOCAL_program_invocation_short_name;
 }
 
 [[guard, doc_alias("getprogname")]]
-[[requires_include("<libc/local/program_invocation_name.h>")]]
+[[requires_include("<libc/template/program_invocation_name.h>")]]
 [[requires(defined(__LOCAL_program_invocation_short_name_p))]]
 void setprogname(char const *name) {
 	__LOCAL_program_invocation_short_name_p = (char *)name;
@@ -3923,8 +3923,8 @@ __LIBC char *__progname_full;
 @@Alias for argv[0], as passed to main()
 [[guard, const, wunused]]
 [[export_alias("__p_program_invocation_name")]]
-[[impl_include("<libc/local/program_invocation_name.h>")]]
-[[requires_include("<libc/local/program_invocation_name.h>")]]
+[[impl_include("<libc/template/program_invocation_name.h>")]]
+[[requires_include("<libc/template/program_invocation_name.h>")]]
 [[requires(defined(__LOCAL_program_invocation_name_p))]]
 [[nonnull, section(".text.crt.dos.application.init")]]
 char **__p__pgmptr() {
@@ -4035,8 +4035,8 @@ _invalid_parameter_handler _get_invalid_parameter_handler();
 
 [[decl_include("<bits/types.h>")]]
 [[section(".text.crt.dos.application.init")]]
-[[impl_include("<libc/local/program_invocation_name.h>")]]
-[[requires_include("<libc/local/program_invocation_name.h>")]]
+[[impl_include("<libc/template/program_invocation_name.h>")]]
+[[requires_include("<libc/template/program_invocation_name.h>")]]
 [[requires(defined(__LOCAL_program_invocation_name))]]
 errno_t _get_pgmptr(char **pvalue) {
 	*pvalue = __LOCAL_program_invocation_name;

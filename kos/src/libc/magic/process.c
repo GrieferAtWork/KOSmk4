@@ -444,8 +444,8 @@ $pid_t cwait(int *tstat, $pid_t pid, __STDC_INT_AS_UINT_T action) {
 
 [[cp, guard, argument_names(mode, path, ___argv), dos_only_export_alias("_spawnv")]]
 [[decl_include("<features.h>", "<bits/types.h>"), decl_prefix(DEFINE_TARGV)]]
-[[requires_include("<libc/local/environ.h>"), requires($has_function(spawnve) && defined(__LOCAL_environ))]]
-[[impl_include("<libc/local/environ.h>")]]
+[[requires_include("<libc/template/environ.h>"), requires($has_function(spawnve) && defined(__LOCAL_environ))]]
+[[impl_include("<libc/template/environ.h>")]]
 $pid_t spawnv(__STDC_INT_AS_UINT_T mode, [[nonnull]] char const *__restrict path, [[nonnull]] __TARGV) {
 	return spawnve(mode, path, ___argv, __LOCAL_environ);
 }
@@ -453,9 +453,9 @@ $pid_t spawnv(__STDC_INT_AS_UINT_T mode, [[nonnull]] char const *__restrict path
 [[cp, guard, argument_names(mode, file, ___argv)]]
 [[dos_only_export_alias("_spawnvp")]]
 [[decl_include("<features.h>", "<bits/types.h>"), decl_prefix(DEFINE_TARGV)]]
-[[requires_include("<libc/local/environ.h>")]]
+[[requires_include("<libc/template/environ.h>")]]
 [[requires($has_function(spawnvpe) && defined(__LOCAL_environ))]]
-[[impl_include("<libc/local/environ.h>")]]
+[[impl_include("<libc/template/environ.h>")]]
 $pid_t spawnvp(__STDC_INT_AS_UINT_T mode, [[nonnull]] char const *__restrict file, [[nonnull]] __TARGV) {
 	return spawnvpe(mode, file, ___argv, __LOCAL_environ);
 }

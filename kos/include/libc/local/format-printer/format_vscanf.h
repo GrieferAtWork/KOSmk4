@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7137ab65 */
+/* HASH CRC-32:0xa73cbe51 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -72,7 +72,7 @@ __LOCAL_LIBC(format_vscanf) __ATTR_LIBC_SCANF(4, 0) __ATTR_NONNULL((1, 2, 4)) __
 #define __FORMAT_ARG     __arg
 #define __FORMAT_FORMAT  __format
 #define __FORMAT_ARGS    __args
-#include <libc/local/format-scanf.h>
+#include <libc/template/format-scanf.h>
 #endif /* !__INTELLISENSE__ */
 }
 __NAMESPACE_LOCAL_END

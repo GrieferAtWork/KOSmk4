@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xefc34948 */
+/* HASH CRC-32:0x281dfa70 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,7 @@
 #ifndef __local_execv_defined
 #define __local_execv_defined 1
 #include <__crt.h>
-#include <libc/local/environ.h>
+#include <libc/template/environ.h>
 #if (defined(__CRT_HAVE_execve) || defined(__CRT_HAVE__execve)) && defined(__LOCAL_environ)
 #include <features.h>
 #ifndef __TARGV

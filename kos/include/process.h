@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc0d55766 */
+/* HASH CRC-32:0xa3c0b3cb */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -221,7 +221,7 @@ __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,_execv,(char const *__restr
  * and execute it's `main()' method, passing the given `argv', and setting `environ' to `envp' */
 __CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,_execv,(char const *__restrict __path, char const *const *___argv),(__path,___argv))
 #else /* ... */
-#include <libc/local/environ.h>
+#include <libc/template/environ.h>
 #if (defined(__CRT_HAVE_execve) || defined(__CRT_HAVE__execve)) && defined(__LOCAL_environ)
 #include <libc/local/unistd/execv.h>
 /* >> execv(3)
@@ -246,7 +246,7 @@ __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,_execvp,(char const *__rest
  * and execute it's `main()' method, passing the given `argv', and setting `environ' to `envp' */
 __CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,_execvp,(char const *__restrict __file, char const *const *___argv),(__file,___argv))
 #else /* ... */
-#include <libc/local/environ.h>
+#include <libc/template/environ.h>
 #include <hybrid/__alloca.h>
 #if (defined(__CRT_HAVE_execvpe) || defined(__CRT_HAVE__execvpe) || ((defined(__CRT_HAVE_execve) || defined(__CRT_HAVE__execve)) && defined(__hybrid_alloca))) && defined(__LOCAL_environ)
 #include <libc/local/unistd/execvp.h>
@@ -284,7 +284,7 @@ __CREDIRECT(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_NCX,_execvpe,(char const *__
 __CDECLARE(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_NCX,_execvpe,(char const *__restrict __file, char const *const *___argv, char const *const *___envp),(__file,___argv,___envp))
 #else /* ... */
 #include <hybrid/__alloca.h>
-#include <libc/local/environ.h>
+#include <libc/template/environ.h>
 #if (defined(__CRT_HAVE_getenv) || defined(__LOCAL_environ)) && (defined(__CRT_HAVE_execve) || defined(__CRT_HAVE__execve)) && defined(__hybrid_alloca)
 #include <libc/local/unistd/execvpe.h>
 /* >> execvpe(3)
@@ -309,7 +309,7 @@ __LIBC __ATTR_SENTINEL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL _execl)
  * and execute it's  `main()' method,  passing the list  of NULL-terminated  `args'-list */
 __LIBC __ATTR_SENTINEL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL _execl)(char const *__restrict __path, char const *__args, ...) __CASMNAME_SAME("_execl");
 #else /* ... */
-#include <libc/local/environ.h>
+#include <libc/template/environ.h>
 #if defined(__CRT_HAVE_execv) || defined(__CRT_HAVE__execv) || ((defined(__CRT_HAVE_execve) || defined(__CRT_HAVE__execve)) && defined(__LOCAL_environ))
 #include <libc/local/unistd/execl.h>
 /* >> execl(3)
@@ -334,7 +334,7 @@ __LIBC __ATTR_SENTINEL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL _execlp
  * and execute it's  `main()' method,  passing the list  of NULL-terminated  `args'-list */
 __LIBC __ATTR_SENTINEL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL _execlp)(char const *__restrict __file, char const *__args, ...) __CASMNAME_SAME("_execlp");
 #else /* ... */
-#include <libc/local/environ.h>
+#include <libc/template/environ.h>
 #include <hybrid/__alloca.h>
 #if defined(__CRT_HAVE_execvp) || defined(__CRT_HAVE__execvp) || ((defined(__CRT_HAVE_execvpe) || defined(__CRT_HAVE__execvpe) || ((defined(__CRT_HAVE_execve) || defined(__CRT_HAVE__execve)) && defined(__hybrid_alloca))) && defined(__LOCAL_environ))
 #include <libc/local/unistd/execlp.h>
@@ -384,7 +384,7 @@ __LIBC __ATTR_SENTINEL_O(1) __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL _e
 __LIBC __ATTR_SENTINEL_O(1) __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL _execlpe)(char const *__restrict __file, char const *__args, ...) __CASMNAME_SAME("_execlpe");
 #else /* ... */
 #include <hybrid/__alloca.h>
-#include <libc/local/environ.h>
+#include <libc/template/environ.h>
 #if defined(__CRT_HAVE_execvpe) || defined(__CRT_HAVE__execvpe) || ((defined(__CRT_HAVE_getenv) || defined(__LOCAL_environ)) && (defined(__CRT_HAVE_execve) || defined(__CRT_HAVE__execve)) && defined(__hybrid_alloca))
 #include <libc/local/unistd/execlpe.h>
 /* >> execlpe(3)
@@ -407,7 +407,7 @@ __CREDIRECT(__ATTR_NONNULL((2, 3)),intptr_t,__NOTHROW_NCX,_spawnv,(__STDC_INT_AS
 #elif defined(__CRT_HAVE__spawnv)
 __CDECLARE(__ATTR_NONNULL((2, 3)),intptr_t,__NOTHROW_NCX,_spawnv,(__STDC_INT_AS_UINT_T __mode, char const *__restrict __path, char const *const *___argv),(__mode,__path,___argv))
 #else /* ... */
-#include <libc/local/environ.h>
+#include <libc/template/environ.h>
 #include <asm/os/oflags.h>
 #include <asm/os/fcntl.h>
 #include <asm/os/vfork.h>
@@ -421,7 +421,7 @@ __CREDIRECT(__ATTR_NONNULL((2, 3)),intptr_t,__NOTHROW_NCX,_spawnvp,(__STDC_INT_A
 #elif defined(__CRT_HAVE__spawnvp)
 __CDECLARE(__ATTR_NONNULL((2, 3)),intptr_t,__NOTHROW_NCX,_spawnvp,(__STDC_INT_AS_UINT_T __mode, char const *__restrict __file, char const *const *___argv),(__mode,__file,___argv))
 #else /* ... */
-#include <libc/local/environ.h>
+#include <libc/template/environ.h>
 #include <hybrid/__alloca.h>
 #include <asm/os/oflags.h>
 #include <asm/os/fcntl.h>
@@ -450,7 +450,7 @@ __CREDIRECT(__ATTR_NONNULL((2, 3, 4)),intptr_t,__NOTHROW_NCX,_spawnvpe,(__STDC_I
 __CDECLARE(__ATTR_NONNULL((2, 3, 4)),intptr_t,__NOTHROW_NCX,_spawnvpe,(__STDC_INT_AS_UINT_T __mode, char const *__restrict __file, char const *const *___argv, char const *const *___envp),(__mode,__file,___argv,___envp))
 #else /* ... */
 #include <hybrid/__alloca.h>
-#include <libc/local/environ.h>
+#include <libc/template/environ.h>
 #include <asm/os/oflags.h>
 #include <asm/os/fcntl.h>
 #include <asm/os/vfork.h>
@@ -464,7 +464,7 @@ __LIBC __ATTR_SENTINEL __ATTR_NONNULL((2)) intptr_t __NOTHROW_NCX(__VLIBCCALL _s
 #elif defined(__CRT_HAVE__spawnl)
 __LIBC __ATTR_SENTINEL __ATTR_NONNULL((2)) intptr_t __NOTHROW_NCX(__VLIBCCALL _spawnl)(__STDC_INT_AS_UINT_T __mode, char const *__restrict __path, char const *__args, ...) __CASMNAME_SAME("_spawnl");
 #else /* ... */
-#include <libc/local/environ.h>
+#include <libc/template/environ.h>
 #include <asm/os/oflags.h>
 #include <asm/os/fcntl.h>
 #include <asm/os/vfork.h>
@@ -478,7 +478,7 @@ __LIBC __ATTR_SENTINEL __ATTR_NONNULL((2)) intptr_t __NOTHROW_NCX(__VLIBCCALL _s
 #elif defined(__CRT_HAVE__spawnlp)
 __LIBC __ATTR_SENTINEL __ATTR_NONNULL((2)) intptr_t __NOTHROW_NCX(__VLIBCCALL _spawnlp)(__STDC_INT_AS_UINT_T __mode, char const *__restrict __file, char const *__args, ...) __CASMNAME_SAME("_spawnlp");
 #else /* ... */
-#include <libc/local/environ.h>
+#include <libc/template/environ.h>
 #include <hybrid/__alloca.h>
 #include <asm/os/oflags.h>
 #include <asm/os/fcntl.h>
@@ -507,7 +507,7 @@ __LIBC __ATTR_SENTINEL_O(1) __ATTR_NONNULL((2)) intptr_t __NOTHROW_NCX(__VLIBCCA
 __LIBC __ATTR_SENTINEL_O(1) __ATTR_NONNULL((2)) intptr_t __NOTHROW_NCX(__VLIBCCALL _spawnlpe)(__STDC_INT_AS_UINT_T __mode, char const *__restrict __file, char const *__args, ...) __CASMNAME_SAME("_spawnlpe");
 #else /* ... */
 #include <hybrid/__alloca.h>
-#include <libc/local/environ.h>
+#include <libc/template/environ.h>
 #include <asm/os/oflags.h>
 #include <asm/os/fcntl.h>
 #include <asm/os/vfork.h>
@@ -533,7 +533,7 @@ __NAMESPACE_STD_USING(system)
  * When  no   system   interpreter   is  available,   `127'   is   returned. */
 __CDECLARE(,int,__NOTHROW_RPC,system,(char const *__command),(__command))
 #else /* ... */
-#include <libc/local/environ.h>
+#include <libc/template/environ.h>
 #if (defined(__CRT_HAVE_shexec) || defined(__CRT_HAVE_execl) || defined(__CRT_HAVE__execl) || defined(__CRT_HAVE_execv) || defined(__CRT_HAVE__execv) || ((defined(__CRT_HAVE_execve) || defined(__CRT_HAVE__execve)) && defined(__LOCAL_environ))) && (defined(__CRT_HAVE__Exit) || defined(__CRT_HAVE__exit) || defined(__CRT_HAVE_quick_exit) || defined(__CRT_HAVE_exit)) && (defined(__CRT_HAVE_waitpid) || defined(__CRT_HAVE___waitpid)) && (defined(__CRT_HAVE_vfork) || defined(__CRT_HAVE___vfork) || defined(__CRT_HAVE_fork) || defined(__CRT_HAVE___fork))
 #include <libc/local/stdlib/system.h>
 /* >> system(3)
@@ -764,7 +764,7 @@ __CDECLARE_GCCNCX(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,execv,(char const *__
  * and execute it's `main()' method, passing the given `argv', and setting `environ' to `envp' */
 __CREDIRECT_GCCNCX(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,execv,(char const *__restrict __path, __TARGV),_execv,(__path,___argv))
 #else /* ... */
-#include <libc/local/environ.h>
+#include <libc/template/environ.h>
 #if (defined(__CRT_HAVE_execve) || defined(__CRT_HAVE__execve)) && defined(__LOCAL_environ)
 #include <libc/local/unistd/execv.h>
 /* >> execv(3)
@@ -794,7 +794,7 @@ __CDECLARE_GCCNCX(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,execvp,(char const *_
  * and execute it's `main()' method, passing the given `argv', and setting `environ' to `envp' */
 __CREDIRECT_GCCNCX(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,execvp,(char const *__restrict __file, __TARGV),_execvp,(__file,___argv))
 #else /* ... */
-#include <libc/local/environ.h>
+#include <libc/template/environ.h>
 #include <hybrid/__alloca.h>
 #if (defined(__CRT_HAVE_execvpe) || defined(__CRT_HAVE__execvpe) || ((defined(__CRT_HAVE_execve) || defined(__CRT_HAVE__execve)) && defined(__hybrid_alloca))) && defined(__LOCAL_environ)
 #include <libc/local/unistd/execvp.h>
@@ -842,7 +842,7 @@ __CDECLARE(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,execvpe,(char const *__re
 __CREDIRECT(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,execvpe,(char const *__restrict __file, __TARGV, __TENVP),_execvpe,(__file,___argv,___envp))
 #else /* ... */
 #include <hybrid/__alloca.h>
-#include <libc/local/environ.h>
+#include <libc/template/environ.h>
 #if (defined(__CRT_HAVE_getenv) || defined(__LOCAL_environ)) && (defined(__CRT_HAVE_execve) || defined(__CRT_HAVE__execve)) && defined(__hybrid_alloca)
 #include <libc/local/unistd/execvpe.h>
 /* >> execvpe(3)
@@ -884,7 +884,7 @@ __LIBC __ATTR_SENTINEL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL execl)(
 } /* extern "C++" */
 #endif /* __COMPILER_HAVE_GCCNCX_BUILTIN_BUG */
 #else /* ... */
-#include <libc/local/environ.h>
+#include <libc/template/environ.h>
 #if defined(__CRT_HAVE_execv) || defined(__CRT_HAVE__execv) || ((defined(__CRT_HAVE_execve) || defined(__CRT_HAVE__execve)) && defined(__LOCAL_environ))
 #include <libc/local/unistd/execl.h>
 /* >> execl(3)
@@ -930,7 +930,7 @@ __LIBC __ATTR_SENTINEL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL execlp)
 } /* extern "C++" */
 #endif /* __COMPILER_HAVE_GCCNCX_BUILTIN_BUG */
 #else /* ... */
-#include <libc/local/environ.h>
+#include <libc/template/environ.h>
 #include <hybrid/__alloca.h>
 #if defined(__CRT_HAVE_execvp) || defined(__CRT_HAVE__execvp) || ((defined(__CRT_HAVE_execvpe) || defined(__CRT_HAVE__execvpe) || ((defined(__CRT_HAVE_execve) || defined(__CRT_HAVE__execve)) && defined(__hybrid_alloca))) && defined(__LOCAL_environ))
 #include <libc/local/unistd/execlp.h>
@@ -1010,7 +1010,7 @@ __LIBC __ATTR_SENTINEL_O(1) __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL ex
 __LIBC __ATTR_SENTINEL_O(1) __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL execlpe)(char const *__restrict __file, char const *__args, ...) __CASMNAME("_execlpe");
 #else /* ... */
 #include <hybrid/__alloca.h>
-#include <libc/local/environ.h>
+#include <libc/template/environ.h>
 #if defined(__CRT_HAVE_execvpe) || defined(__CRT_HAVE__execvpe) || ((defined(__CRT_HAVE_getenv) || defined(__LOCAL_environ)) && (defined(__CRT_HAVE_execve) || defined(__CRT_HAVE__execve)) && defined(__hybrid_alloca))
 #include <libc/local/unistd/execlpe.h>
 /* >> execlpe(3)
@@ -1042,7 +1042,7 @@ __CDECLARE(__ATTR_NONNULL((2, 3)),__pid_t,__NOTHROW_RPC,spawnv,(__STDC_INT_AS_UI
 #elif defined(__CRT_HAVE__spawnv)
 __CREDIRECT(__ATTR_NONNULL((2, 3)),__pid_t,__NOTHROW_RPC,spawnv,(__STDC_INT_AS_UINT_T __mode, char const *__restrict __path, __TARGV),_spawnv,(__mode,__path,___argv))
 #else /* ... */
-#include <libc/local/environ.h>
+#include <libc/template/environ.h>
 #include <asm/os/oflags.h>
 #include <asm/os/fcntl.h>
 #include <asm/os/vfork.h>
@@ -1061,7 +1061,7 @@ __CDECLARE(__ATTR_NONNULL((2, 3)),__pid_t,__NOTHROW_RPC,spawnvp,(__STDC_INT_AS_U
 #elif defined(__CRT_HAVE__spawnvp)
 __CREDIRECT(__ATTR_NONNULL((2, 3)),__pid_t,__NOTHROW_RPC,spawnvp,(__STDC_INT_AS_UINT_T __mode, char const *__restrict __file, __TARGV),_spawnvp,(__mode,__file,___argv))
 #else /* ... */
-#include <libc/local/environ.h>
+#include <libc/template/environ.h>
 #include <hybrid/__alloca.h>
 #include <asm/os/oflags.h>
 #include <asm/os/fcntl.h>
@@ -1100,7 +1100,7 @@ __CDECLARE(__ATTR_NONNULL((2, 3, 4)),__pid_t,__NOTHROW_RPC,spawnvpe,(__STDC_INT_
 __CREDIRECT(__ATTR_NONNULL((2, 3, 4)),__pid_t,__NOTHROW_RPC,spawnvpe,(__STDC_INT_AS_UINT_T __mode, char const *__restrict __file, __TARGV, __TENVP),_spawnvpe,(__mode,__file,___argv,___envp))
 #else /* ... */
 #include <hybrid/__alloca.h>
-#include <libc/local/environ.h>
+#include <libc/template/environ.h>
 #include <asm/os/oflags.h>
 #include <asm/os/fcntl.h>
 #include <asm/os/vfork.h>
@@ -1119,7 +1119,7 @@ __LIBC __ATTR_SENTINEL __ATTR_NONNULL((2)) __pid_t __NOTHROW_RPC(__VLIBCCALL spa
 #elif defined(__CRT_HAVE__spawnl)
 __LIBC __ATTR_SENTINEL __ATTR_NONNULL((2)) __pid_t __NOTHROW_RPC(__VLIBCCALL spawnl)(__STDC_INT_AS_UINT_T __mode, char const *__restrict __path, char const *__args, ...) __CASMNAME("_spawnl");
 #else /* ... */
-#include <libc/local/environ.h>
+#include <libc/template/environ.h>
 #include <asm/os/oflags.h>
 #include <asm/os/fcntl.h>
 #include <asm/os/vfork.h>
@@ -1142,7 +1142,7 @@ __LIBC __ATTR_SENTINEL __ATTR_NONNULL((2)) __pid_t __NOTHROW_RPC(__VLIBCCALL spa
 #elif defined(__CRT_HAVE__spawnlp)
 __LIBC __ATTR_SENTINEL __ATTR_NONNULL((2)) __pid_t __NOTHROW_RPC(__VLIBCCALL spawnlp)(__STDC_INT_AS_UINT_T __mode, char const *__restrict __file, char const *__args, ...) __CASMNAME("_spawnlp");
 #else /* ... */
-#include <libc/local/environ.h>
+#include <libc/template/environ.h>
 #include <hybrid/__alloca.h>
 #include <asm/os/oflags.h>
 #include <asm/os/fcntl.h>
@@ -1189,7 +1189,7 @@ __LIBC __ATTR_SENTINEL_O(1) __ATTR_NONNULL((2)) __pid_t __NOTHROW_RPC(__VLIBCCAL
 __LIBC __ATTR_SENTINEL_O(1) __ATTR_NONNULL((2)) __pid_t __NOTHROW_RPC(__VLIBCCALL spawnlpe)(__STDC_INT_AS_UINT_T __mode, char const *__restrict __file, char const *__args, ...) __CASMNAME("_spawnlpe");
 #else /* ... */
 #include <hybrid/__alloca.h>
-#include <libc/local/environ.h>
+#include <libc/template/environ.h>
 #include <asm/os/oflags.h>
 #include <asm/os/fcntl.h>
 #include <asm/os/vfork.h>

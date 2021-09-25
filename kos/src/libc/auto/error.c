@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbc75c515 */
+/* HASH CRC-32:0x6e6c5b78 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -38,7 +38,7 @@ DECL_BEGIN
 #define libc_strerror   libc_strerrordesc_np
 #include "../libc/globals.h" /* For norel access to global variables */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-#include <libc/local/stdstreams.h>
+#include <libc/template/stdstreams.h>
 #ifndef __LOCAL_error_print_progname
 #ifdef error_print_progname
 #define __LOCAL_error_print_progname error_print_progname
@@ -65,7 +65,7 @@ __LIBC unsigned int error_message_count;
 #endif /* !__NO_ASMNAME */
 #endif /* ... */
 #endif /* !__LOCAL_error_message_count */
-#include <libc/local/program_invocation_name.h>
+#include <libc/template/program_invocation_name.h>
 /* >> error(3)
  * Helper  function  for printing  an error  message to  `stderr' and  possibly exiting  the program
  * The message is printed as: `<program_invocation_short_name>: <format...>[: <strerror(errnum)>]\n'
@@ -102,7 +102,7 @@ INTERN ATTR_SECTION(".text.crt.dos.error") ATTR_LIBC_PRINTF(3, 4) void
 }
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-#include <libc/local/stdstreams.h>
+#include <libc/template/stdstreams.h>
 #ifndef __LOCAL_error_print_progname
 #ifdef error_print_progname
 #define __LOCAL_error_print_progname error_print_progname
@@ -129,7 +129,7 @@ __LIBC unsigned int error_message_count;
 #endif /* !__NO_ASMNAME */
 #endif /* ... */
 #endif /* !__LOCAL_error_message_count */
-#include <libc/local/program_invocation_name.h>
+#include <libc/template/program_invocation_name.h>
 /* >> error(3)
  * Helper  function  for printing  an error  message to  `stderr' and  possibly exiting  the program
  * The message is printed as: `<program_invocation_short_name>: <format...>[: <strerror(errnum)>]\n'
@@ -166,8 +166,8 @@ INTERN ATTR_SECTION(".text.crt.error") ATTR_LIBC_PRINTF(3, 4) void
 }
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-#include <libc/local/stdstreams.h>
-#include <libc/local/program_invocation_name.h>
+#include <libc/template/stdstreams.h>
+#include <libc/template/program_invocation_name.h>
 #ifndef __LOCAL_error_print_progname
 #ifdef error_print_progname
 #define __LOCAL_error_print_progname error_print_progname
@@ -263,8 +263,8 @@ INTERN ATTR_SECTION(".text.crt.dos.error") ATTR_LIBC_PRINTF(5, 6) void
 }
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-#include <libc/local/stdstreams.h>
-#include <libc/local/program_invocation_name.h>
+#include <libc/template/stdstreams.h>
+#include <libc/template/program_invocation_name.h>
 #ifndef __LOCAL_error_print_progname
 #ifdef error_print_progname
 #define __LOCAL_error_print_progname error_print_progname

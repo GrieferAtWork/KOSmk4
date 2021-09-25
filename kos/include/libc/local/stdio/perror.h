@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6b7bce84 */
+/* HASH CRC-32:0x943adc43 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -82,7 +82,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__local___localdep_strerror_defined */
 __NAMESPACE_LOCAL_END
 #include <parts/printf-config.h>
-#include <libc/local/stdstreams.h>
+#include <libc/template/stdstreams.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(perror) void
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(perror))(char const *__message) {

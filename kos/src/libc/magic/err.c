@@ -74,9 +74,9 @@ void warnc($errno_t used_errno, char const *format, ...)
 	%{printf("vwarnc")}
 
 [[guard, cp_stdio, doc_alias("warnc"), ATTR_LIBC_PRINTF(1, 0)]]
-[[impl_include("<libc/local/stdstreams.h>"), decl_include("<bits/types.h>")]]
-[[impl_include("<libc/local/program_invocation_name.h>")]]
-[[requires_include("<__crt.h>", "<libc/local/program_invocation_name.h>")]]
+[[impl_include("<libc/template/stdstreams.h>"), decl_include("<bits/types.h>")]]
+[[impl_include("<libc/template/program_invocation_name.h>")]]
+[[requires_include("<__crt.h>", "<libc/template/program_invocation_name.h>")]]
 [[requires(!defined(__NO_STDSTREAMS) && defined(__LOCAL_program_invocation_short_name) &&
            $has_function(fprintf) && $has_function(vfprintf) && $has_function(strerror))]]
 void vwarnc($errno_t used_errno, char const *format, $va_list args) {
@@ -105,9 +105,9 @@ void warnx(char const *format, ...)
 	%{printf("vwarnx")}
 
 [[cp_stdio, doc_alias("warnx"), ATTR_LIBC_PRINTF(1, 0)]]
-[[impl_include("<libc/local/stdstreams.h>")]]
-[[impl_include("<libc/local/program_invocation_name.h>")]]
-[[requires_include("<__crt.h>", "<libc/local/program_invocation_name.h>")]]
+[[impl_include("<libc/template/stdstreams.h>")]]
+[[impl_include("<libc/template/program_invocation_name.h>")]]
+[[requires_include("<__crt.h>", "<libc/template/program_invocation_name.h>")]]
 [[requires(!defined(__NO_STDSTREAMS) && defined(__LOCAL_program_invocation_short_name) &&
            $has_function(fprintf) && $has_function(vfprintf) && $has_function(fputc))]]
 void vwarnx(char const *format, $va_list args) {

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4b979567 */
+/* HASH CRC-32:0x2426a32a */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,7 @@
 #ifndef __local_cuserid_defined
 #define __local_cuserid_defined 1
 #include <__crt.h>
-#include <libc/local/environ.h>
+#include <libc/template/environ.h>
 #if defined(__CRT_HAVE_getlogin_r) || defined(__CRT_HAVE_getenv) || defined(__LOCAL_environ) || (defined(__CRT_HAVE_getpwuid_r) && defined(__CRT_HAVE_geteuid))
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_getlogin_r_defined

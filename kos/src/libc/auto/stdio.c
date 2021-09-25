@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8a318290 */
+/* HASH CRC-32:0xe058b7f9 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -45,14 +45,14 @@ NOTHROW_NCX(LIBCCALL libc_setbuf)(FILE *__restrict stream,
 	        buf ? ___IOFBF : ___IONBF,
 	        buf ? __BUFSIZ : 0);
 }
-#include <libc/local/stdstreams.h>
+#include <libc/template/stdstreams.h>
 /* >> getchar(3)
  * Alias for `fgetc(stdin)' */
 INTERN ATTR_SECTION(".text.crt.FILE.locked.read.getc") int
 (LIBCCALL libc_getchar)(void) THROWS(...) {
 	return libc_fgetc(stdin);
 }
-#include <libc/local/stdstreams.h>
+#include <libc/template/stdstreams.h>
 /* >> putchar(3)
  * Alias for `fputc(ch, stdout)' */
 INTERN ATTR_SECTION(".text.crt.FILE.locked.write.putc") int
@@ -118,7 +118,7 @@ INTERN ATTR_SECTION(".text.crt.FILE.locked.write.write") NONNULL((1, 2)) __STDC_
 	                stream);
 	return result;
 }
-#include <libc/local/stdstreams.h>
+#include <libc/template/stdstreams.h>
 /* >> puts(3)
  * Print a given string `string', followed by a line-feed to `stdout'. This is identical to:
  * >> fputs(string, stdout);
@@ -138,7 +138,7 @@ INTERN ATTR_SECTION(".text.crt.FILE.locked.write.write") NONNULL((1)) __STDC_INT
 	return result;
 }
 #include <parts/printf-config.h>
-#include <libc/local/stdstreams.h>
+#include <libc/template/stdstreams.h>
 #include <libc/errno.h>
 /* >> perror(3)
  * Print a given `message' alongside `strerror(errno)' to stderr:
@@ -208,7 +208,7 @@ INTERN ATTR_SECTION(".text.crt.FILE.locked.write.printf") ATTR_LIBC_PRINTF(2, 3)
 	va_end(args);
 	return result;
 }
-#include <libc/local/stdstreams.h>
+#include <libc/template/stdstreams.h>
 /* >> printf(3), vprintf(3)
  * Print  data  to  `stdout',  following  `format'
  * Return the number of successfully printed bytes */
@@ -279,7 +279,7 @@ INTERN ATTR_SECTION(".text.crt.FILE.locked.read.scanf") WUNUSED ATTR_LIBC_SCANF(
 	                     format, args);
 #endif /* !__LIBCCALL_IS_FORMATPRINTER_CC || __SIZEOF_SIZE_T__ != __SIZEOF_INT__ */
 }
-#include <libc/local/stdstreams.h>
+#include <libc/template/stdstreams.h>
 /* >> scanf(3), vscanf(3)
  * Scan data from `stdin', following `format'
  * Return the number of successfully scanned data items */
@@ -350,7 +350,7 @@ INTERN ATTR_SECTION(".text.crt.FILE.locked.read.scanf") WUNUSED ATTR_LIBC_SCANF(
 	va_end(args);
 	return result;
 }
-#include <libc/local/stdstreams.h>
+#include <libc/template/stdstreams.h>
 #include <hybrid/typecore.h>
 INTERN ATTR_SECTION(".text.crt.FILE.locked.read.read") WUNUSED ATTR_DEPRECATED("No buffer size checks (use `fgets\' instead)") NONNULL((1)) char *
 (LIBCCALL libc_gets)(char *__restrict buf) THROWS(...) {
@@ -692,14 +692,14 @@ INTERN ATTR_SECTION(".text.crt.FILE.locked.read.read") WUNUSED NONNULL((1, 2, 3)
                         FILE *__restrict stream) THROWS(...) {
 	return libc_getdelim(lineptr, pcount, '\n', stream);
 }
-#include <libc/local/stdstreams.h>
+#include <libc/template/stdstreams.h>
 /* >> getchar_unlocked(3)
  * Same as `getchar()', but performs I/O without acquiring a lock to `stdin' */
 INTERN ATTR_SECTION(".text.crt.FILE.unlocked.read.getc") int
 (LIBCCALL libc_getchar_unlocked)(void) THROWS(...) {
 	return libc_fgetc_unlocked(stdin);
 }
-#include <libc/local/stdstreams.h>
+#include <libc/template/stdstreams.h>
 /* >> putchar_unlocked(3)
  * Same as `putchar()', but performs I/O without acquiring a lock to `stdout' */
 INTERN ATTR_SECTION(".text.crt.FILE.unlocked.write.putc") int
@@ -1344,7 +1344,7 @@ INTERN ATTR_SECTION(".text.crt.FILE.unlocked.read.read") WUNUSED NONNULL((1, 2, 
                                  FILE *__restrict stream) THROWS(...) {
 	return libc_getdelim_unlocked(lineptr, pcount, '\n', stream);
 }
-#include <libc/local/stdstreams.h>
+#include <libc/template/stdstreams.h>
 INTERN ATTR_SECTION(".text.crt.FILE.unlocked.write.write") NONNULL((1)) __STDC_INT_AS_SSIZE_T
 (LIBCCALL libc_puts_unlocked)(char const *__restrict string) THROWS(...) {
 	__STDC_INT_AS_SSIZE_T result, temp;
@@ -1393,7 +1393,7 @@ INTERN ATTR_SECTION(".text.crt.FILE.unlocked.write.printf") ATTR_LIBC_PRINTF(2, 
 	va_end(args);
 	return result;
 }
-#include <libc/local/stdstreams.h>
+#include <libc/template/stdstreams.h>
 /* >> printf_unlocked(3), vprintf_unlocked(3) */
 INTERN ATTR_SECTION(".text.crt.FILE.unlocked.write.printf") ATTR_LIBC_PRINTF(1, 0) NONNULL((1)) __STDC_INT_AS_SSIZE_T
 (LIBCCALL libc_vprintf_unlocked)(char const *__restrict format,
@@ -1456,7 +1456,7 @@ INTERN ATTR_SECTION(".text.crt.FILE.unlocked.read.scanf") WUNUSED ATTR_LIBC_SCAN
 	                     format, args);
 #endif /* !__LIBCCALL_IS_FORMATPRINTER_CC || __SIZEOF_SIZE_T__ != __SIZEOF_INT__ */
 }
-#include <libc/local/stdstreams.h>
+#include <libc/template/stdstreams.h>
 /* >> scanf_unlocked(3), vscanf_unlocked(3) */
 INTERN ATTR_SECTION(".text.crt.FILE.unlocked.read.scanf") WUNUSED ATTR_LIBC_SCANF(1, 0) NONNULL((1)) __STDC_INT_AS_SIZE_T
 (LIBCCALL libc_vscanf_unlocked)(char const *__restrict format,
@@ -2827,7 +2827,7 @@ INTERN ATTR_SECTION(".text.crt.dos.unicode.locale.format.printf") ATTR_LIBC_PRIN
 	(void)locale;
 	return libc_vprintf(format, args);
 }
-#include <libc/local/stdstreams.h>
+#include <libc/template/stdstreams.h>
 INTERN ATTR_SECTION(".text.crt.dos.unicode.static.format.printf") ATTR_LIBC_PRINTF_P(1, 0) NONNULL((1)) __STDC_INT_AS_SIZE_T
 (LIBCCALL libc__vprintf_p)(char const *__restrict format,
                            va_list args) THROWS(...) {
@@ -3211,7 +3211,7 @@ NOTHROW_RPC(LIBCCALL libc_fread_s)(void *__restrict buf,
 	}
 	return libc_fread(buf, elemsize, elemcount, stream);
 }
-#include <libc/local/stdstreams.h>
+#include <libc/template/stdstreams.h>
 #include <libc/errno.h>
 INTERN ATTR_SECTION(".text.crt.dos.FILE.locked.read.read") WUNUSED NONNULL((1)) char *
 NOTHROW_RPC(LIBCCALL libc_gets_s)(char *__restrict buf,
@@ -3232,7 +3232,7 @@ NOTHROW_NCX(LIBCCALL libc_vsnprintf_s)(char *__restrict buf,
                                        va_list args) {
 	return libc_vsnprintf(buf, buflen < bufsize ? buflen : bufsize, format, args);
 }
-#include <libc/local/stdstreams.h>
+#include <libc/template/stdstreams.h>
 #include <libc/errno.h>
 #include <parts/printf-config.h>
 INTERN ATTR_SECTION(".text.crt.dos.errno.utility") ATTR_COLD void
@@ -3261,7 +3261,7 @@ INTERN ATTR_SECTION(".text.crt.dos.errno.utility") ATTR_COLD void
 	}
 #endif /* !__NO_PRINTF_STRERROR */
 }
-#include <libc/local/stdstreams.h>
+#include <libc/template/stdstreams.h>
 #include <libc/errno.h>
 #include <parts/printf-config.h>
 INTERN ATTR_SECTION(".text.crt.dos.errno.utility") ATTR_COLD void

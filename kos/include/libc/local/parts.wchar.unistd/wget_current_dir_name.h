@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf9bf5e6e */
+/* HASH CRC-32:0x42aac619 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,7 +29,7 @@ __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_getenv,(char const *__varname),getenv,(__varname))
 #else /* __CRT_HAVE_getenv */
 __NAMESPACE_LOCAL_END
-#include <libc/local/environ.h>
+#include <libc/template/environ.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifdef __LOCAL_environ
 __NAMESPACE_LOCAL_END

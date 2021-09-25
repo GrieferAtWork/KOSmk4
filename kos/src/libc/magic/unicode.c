@@ -101,15 +101,15 @@ typedef __pc32formatprinter pc32formatprinter;
 #ifdef __CC__
 __SYSDECL_BEGIN
 
-#ifndef __utf8_seqlen_defined
-#define __utf8_seqlen_defined
+#ifndef __unicode_utf8seqlen_defined
+#define __unicode_utf8seqlen_defined
 #ifdef __CRT_HAVE_unicode_utf8seqlen
 __LIBC __uint8_t const unicode_utf8seqlen[256] __CASMNAME_SAME("unicode_utf8seqlen");
 #else /* __CRT_HAVE_unicode_utf8seqlen */
-#include <libc/local/unicode_utf8seqlen.h>
+#include <libc/template/unicode_utf8seqlen.h>
 #define unicode_utf8seqlen __LOCAL_unicode_utf8seqlen
 #endif /* !__CRT_HAVE_unicode_utf8seqlen */
-#endif /* !__utf8_seqlen_defined */
+#endif /* !__unicode_utf8seqlen_defined */
 
 /* The max length of any UTF-8 byte sequence describing a single unicode character. */
 #define UNICODE_UTF8_MAXLEN   8   /* == unicode_utf8seqlen[0xff] */
@@ -192,7 +192,7 @@ typedef __CHAR32_TYPE__ char32_t;
 
 @@>> unicode_readutf8(3)
 @@Read a single Unicode character from a given UTF-8 string
-[[libc, kernel, impl_include("<libc/local/unicode_utf8seqlen.h>")]]
+[[libc, kernel, impl_include("<libc/template/unicode_utf8seqlen.h>")]]
 char32_t unicode_readutf8([[nonnull]] /*utf-8*/ char const **__restrict ptext)
 	[([[nonnull]] /*utf-8*/ char const **__restrict ptext): char32_t]
 	[([[nonnull]] /*utf-8*/ char **__restrict ptext): char32_t]
@@ -367,7 +367,7 @@ char32_t unicode_readutf8_rev([[nonnull]] /*utf-8*/ char const **__restrict ptex
 
 @@>> unicode_readutf8_n(3)
 @@Same as `unicode_readutf8()', but don't read past `text_end'
-[[libc, kernel, impl_include("<libc/local/unicode_utf8seqlen.h>")]]
+[[libc, kernel, impl_include("<libc/template/unicode_utf8seqlen.h>")]]
 char32_t unicode_readutf8_n([[nonnull]] /*utf-8*/ char const **__restrict ptext, [[nonnull]] char const *text_end)
 	[([[nonnull]] /*utf-8*/ char const **__restrict ptext, [[nonnull]] char const *text_end): char32_t]
 	[([[nonnull]] /*utf-8*/ char **__restrict ptext, [[nonnull]] char const *text_end): char32_t]

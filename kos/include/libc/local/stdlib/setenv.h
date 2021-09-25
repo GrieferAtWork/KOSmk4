@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x792d048 */
+/* HASH CRC-32:0x9b8dc81c */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,7 @@
 #ifndef __local_setenv_defined
 #define __local_setenv_defined 1
 #include <__crt.h>
-#include <libc/local/environ.h>
+#include <libc/template/environ.h>
 #if (defined(__CRT_HAVE_getenv) || defined(__LOCAL_environ)) && defined(__CRT_HAVE__putenv_s)
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_dos_putenv_s_defined

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x54543ae2 */
+/* HASH CRC-32:0x4552e842 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -41,7 +41,7 @@ DECL_BEGIN
 
 #include "../libc/globals.h"
 #ifndef __KERNEL__
-#include <libc/local/environ.h>
+#include <libc/template/environ.h>
 /* >> execv(3)
  * Replace the calling  process with  the application  image referred  to by  `path' /  `file'
  * and execute it's `main()' method, passing the given `argv', and setting `environ' to `envp' */
@@ -50,7 +50,7 @@ NOTHROW_RPC(LIBCCALL libc_execv)(char const *__restrict path,
                                  __TARGV) {
 	return libc_execve(path, ___argv, __LOCAL_environ);
 }
-#include <libc/local/environ.h>
+#include <libc/template/environ.h>
 /* >> execvp(3)
  * Replace the calling  process with  the application  image referred  to by  `path' /  `file'
  * and execute it's `main()' method, passing the given `argv', and setting `environ' to `envp' */

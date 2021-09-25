@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x95df3d7f */
+/* HASH CRC-32:0x5ca91bff */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -233,7 +233,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(posix_spawn, __FORCELOCAL __ATTR_ARTIFICIAL __AT
 __CDECLARE(__ATTR_NONNULL((1, 2, 5, 6)),__errno_t,__NOTHROW_RPC,posix_spawnp,(pid_t *__restrict __pid, const char *__restrict __file, posix_spawn_file_actions_t const *__file_actions, posix_spawnattr_t const *__attrp, __TARGV, __TENVP),(__pid,__file,__file_actions,__attrp,___argv,___envp))
 #else /* __CRT_HAVE_posix_spawnp */
 #include <hybrid/__alloca.h>
-#include <libc/local/environ.h>
+#include <libc/template/environ.h>
 #include <asm/os/oflags.h>
 #include <asm/os/fcntl.h>
 #include <asm/os/vfork.h>

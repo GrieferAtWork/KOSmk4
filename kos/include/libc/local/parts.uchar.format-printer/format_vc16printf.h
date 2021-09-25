@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7ade6cb3 */
+/* HASH CRC-32:0xd88b5663 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -369,7 +369,7 @@ __LOCAL_LIBC(format_vc16printf) __ATTR_LIBC_WPRINTF(3, 0) __ATTR_NONNULL((1, 3))
 
 
 
-#include <libc/local/format-printf.h>
+#include <libc/template/format-printf.h>
 #endif /* !__INTELLISENSE__ */
 }
 __NAMESPACE_LOCAL_END

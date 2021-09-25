@@ -107,11 +107,11 @@ __LIBC int error_one_per_line;
 @@If `STATUS' is non-zero, follow up with a call to `exit(status)'
 [[ATTR_LIBC_PRINTF(3, 4), fast, libc, throws]]
 [[decl_include("<bits/types.h>")]]
-[[impl_include("<libc/local/stdstreams.h>")]]
+[[impl_include("<libc/template/stdstreams.h>")]]
 [[impl_prefix(DEFINE_LOCAL_error_print_progname)]]
 [[impl_prefix(DEFINE_LOCAL_error_message_count)]]
-[[impl_include("<libc/local/program_invocation_name.h>")]]
-[[requires_include("<__crt.h>", "<libc/local/program_invocation_name.h>")]]
+[[impl_include("<libc/template/program_invocation_name.h>")]]
+[[requires_include("<__crt.h>", "<libc/template/program_invocation_name.h>")]]
 [[requires(!defined(__NO_STDSTREAMS) && $has_function(exit) &&
            $has_function(fprintf) && $has_function(vfprintf) && $has_function(fputc) &&
            defined(__LOCAL_program_invocation_short_name) &&
@@ -150,9 +150,9 @@ void error(int status, $errno_t errnum, const char *format, ...) {
 @@pass the same values for `filename' and `line' will not produce the error message.
 [[fast, libc, throws, ATTR_LIBC_PRINTF(5, 6)]]
 [[decl_include("<bits/types.h>")]]
-[[impl_include("<libc/local/stdstreams.h>")]]
-[[impl_include("<libc/local/program_invocation_name.h>")]]
-[[requires_include("<__crt.h>", "<libc/local/program_invocation_name.h>")]]
+[[impl_include("<libc/template/stdstreams.h>")]]
+[[impl_include("<libc/template/program_invocation_name.h>")]]
+[[requires_include("<__crt.h>", "<libc/template/program_invocation_name.h>")]]
 [[requires(!defined(__NO_STDSTREAMS) && $has_function(exit) &&
            $has_function(fprintf) && $has_function(vfprintf) &&
            $has_function(fputc) && defined(__LOCAL_program_invocation_short_name) &&

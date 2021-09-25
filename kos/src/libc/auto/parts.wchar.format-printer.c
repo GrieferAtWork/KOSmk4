@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x65052198 */
+/* HASH CRC-32:0x39e5f07f */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -35,8 +35,8 @@
 DECL_BEGIN
 
 #include "../libc/dl.h"      /* Use libc's relocation-optimized dl* functions. */
-#include "../libc/string.h"  /* Dependency of `#include <libc/local/format-printf.h>' */
-#include "../libc/unicode.h" /* Dependency of `#include <libc/local/format-scanf.h>' */
+#include "../libc/string.h"  /* Dependency of `#include <libc/template/format-printf.h>' */
+#include "../libc/unicode.h" /* Dependency of `#include <libc/template/format-scanf.h>' */
 #include <bits/math-constants.h>
 
 #include <libdisasm/disassembler.h>
@@ -1278,7 +1278,7 @@ INTERN ATTR_SECTION(".text.crt.dos.wchar.string.format") ATTR_LIBC_WPRINTF(3, 0)
 
 
 
-#include <libc/local/format-printf.h>
+#include <libc/template/format-printf.h>
 #endif /* !__INTELLISENSE__ */
 }
 #include <parts/printf-config.h>
@@ -1421,7 +1421,7 @@ INTERN ATTR_SECTION(".text.crt.wchar.string.format") ATTR_LIBC_WPRINTF(3, 0) NON
 #define __FORMAT_UNICODE_FORMAT8    libc_format_8to32
 #define __FORMAT_UNICODE_FORMAT16   libd_format_wto32
 
-#include <libc/local/format-printf.h>
+#include <libc/template/format-printf.h>
 #endif /* !__INTELLISENSE__ */
 }
 /* >> format_printf(3), format_vprintf(3)

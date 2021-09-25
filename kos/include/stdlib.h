@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x48647272 */
+/* HASH CRC-32:0x9af26c7c */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -81,7 +81,7 @@ __NAMESPACE_STD_USING(lldiv)
 #endif /* __USE_ISOC99 */
 __NAMESPACE_STD_USING(abs)
 __NAMESPACE_STD_USING(div)
-#include <libc/local/environ.h>
+#include <libc/template/environ.h>
 #if defined(__CRT_HAVE_getenv) || defined(__LOCAL_environ)
 __NAMESPACE_STD_USING(getenv)
 #endif /* __CRT_HAVE_getenv || __LOCAL_environ */
@@ -677,7 +677,7 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE __NOTHRO
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,getenv,(char const *__varname),(__varname))
 #else /* __CRT_HAVE_getenv */
 __NAMESPACE_STD_END
-#include <libc/local/environ.h>
+#include <libc/template/environ.h>
 __NAMESPACE_STD_BEGIN
 #ifdef __LOCAL_environ
 __NAMESPACE_STD_END
@@ -744,7 +744,7 @@ __NAMESPACE_GLB_USING_OR_IMPL(system, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHR
 __CDECLARE(,int,__NOTHROW_RPC,system,(char const *__command),(__command))
 #else /* ... */
 __NAMESPACE_STD_END
-#include <libc/local/environ.h>
+#include <libc/template/environ.h>
 __NAMESPACE_STD_BEGIN
 #if (defined(__CRT_HAVE_shexec) || defined(__CRT_HAVE_execl) || defined(__CRT_HAVE__execl) || defined(__CRT_HAVE_execv) || defined(__CRT_HAVE__execv) || ((defined(__CRT_HAVE_execve) || defined(__CRT_HAVE__execve)) && defined(__LOCAL_environ))) && (defined(__CRT_HAVE__Exit) || defined(__CRT_HAVE__exit) || defined(__CRT_HAVE_quick_exit) || defined(__CRT_HAVE_exit)) && (defined(__CRT_HAVE_waitpid) || defined(__CRT_HAVE___waitpid)) && (defined(__CRT_HAVE_vfork) || defined(__CRT_HAVE___vfork) || defined(__CRT_HAVE_fork) || defined(__CRT_HAVE___fork))
 __NAMESPACE_STD_END
@@ -1178,7 +1178,7 @@ __NAMESPACE_STD_USING(lldiv)
 #ifndef __CXX_SYSTEM_HEADER
 __NAMESPACE_STD_USING(abs)
 __NAMESPACE_STD_USING(div)
-#include <libc/local/environ.h>
+#include <libc/template/environ.h>
 #if defined(__CRT_HAVE_getenv) || defined(__LOCAL_environ)
 __NAMESPACE_STD_USING(getenv)
 #endif /* __CRT_HAVE_getenv || __LOCAL_environ */
@@ -3303,7 +3303,7 @@ __CDECLARE(__ATTR_WUNUSED,char *,__NOTHROW_RPC,ttyname,(__fd_t __fd),(__fd))
 /* Returns the absolute filename of the main executable (s.a. `program_invocation_name') */
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,char const *,__NOTHROW_NCX,getexecname,(void),())
 #else /* __CRT_HAVE_getexecname */
-#include <libc/local/program_invocation_name.h>
+#include <libc/template/program_invocation_name.h>
 #ifdef __LOCAL_program_invocation_name
 #include <libc/local/stdlib/getexecname.h>
 /* Returns the absolute filename of the main executable (s.a. `program_invocation_name') */
@@ -3442,7 +3442,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(l64a_r, __FORCELOCAL __ATTR_ARTIFICIAL int __NOT
 /* >> getprogname(3), setprogname(3) */
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,char const *,__NOTHROW_NCX,getprogname,(void),())
 #else /* __CRT_HAVE_getprogname */
-#include <libc/local/program_invocation_name.h>
+#include <libc/template/program_invocation_name.h>
 #ifdef __LOCAL_program_invocation_short_name
 #include <libc/local/stdlib/getprogname.h>
 /* >> getprogname(3), setprogname(3) */
@@ -3458,7 +3458,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(getprogname, __FORCELOCAL __ATTR_ARTIFICIAL __AT
 /* >> getprogname(3), setprogname(3) */
 __CDECLARE_VOID(,__NOTHROW_NCX,setprogname,(char const *__name),(__name))
 #else /* __CRT_HAVE_setprogname */
-#include <libc/local/program_invocation_name.h>
+#include <libc/template/program_invocation_name.h>
 #ifdef __LOCAL_program_invocation_short_name_p
 #include <libc/local/stdlib/setprogname.h>
 /* >> getprogname(3), setprogname(3) */
@@ -3727,7 +3727,7 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__LONGLONG,__NOTHROW_NCX,strsuftoll,(char const *__desc, char const *__val, __LONGLONG __lo, __LONGLONG __hi),(__desc,__val,__lo,__hi))
 #else /* __CRT_HAVE_strsuftoll */
 #include <__crt.h>
-#include <libc/local/program_invocation_name.h>
+#include <libc/template/program_invocation_name.h>
 #if defined(__CRT_HAVE_errx) || defined(__CRT_HAVE_verrx) || ((defined(__CRT_HAVE_vwarnx) || (!defined(__NO_STDSTREAMS) && defined(__LOCAL_program_invocation_short_name) && (defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE_putc) || defined(__CRT_HAVE__IO_putc) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE_putc_unlocked) || (defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE__IO_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock)))) && (defined(__CRT_HAVE_exit) || defined(__CRT_HAVE_quick_exit) || defined(__CRT_HAVE__exit) || defined(__CRT_HAVE__Exit)))
 #include <libc/local/stdlib/strsuftoll.h>
 /* >> strsuftoll(3)
@@ -4086,7 +4086,7 @@ __CDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,char **,__NOTHROW_NCX,_
 /* Alias for argv[0], as passed to main() */
 __CREDIRECT(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,char **,__NOTHROW_NCX,__p__pgmptr,(void),__p_program_invocation_name,())
 #else /* ... */
-#include <libc/local/program_invocation_name.h>
+#include <libc/template/program_invocation_name.h>
 #ifdef __LOCAL_program_invocation_name_p
 #include <libc/local/stdlib/__p__pgmptr.h>
 /* Alias for argv[0], as passed to main() */
@@ -4153,7 +4153,7 @@ __CDECLARE_OPT(,_invalid_parameter_handler,__NOTHROW_NCX,_get_invalid_parameter_
 #ifdef __CRT_HAVE__get_pgmptr
 __CDECLARE(,errno_t,__NOTHROW_NCX,_get_pgmptr,(char **__pvalue),(__pvalue))
 #else /* __CRT_HAVE__get_pgmptr */
-#include <libc/local/program_invocation_name.h>
+#include <libc/template/program_invocation_name.h>
 #ifdef __LOCAL_program_invocation_name
 #include <libc/local/stdlib/_get_pgmptr.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(_get_pgmptr, __FORCELOCAL __ATTR_ARTIFICIAL errno_t __NOTHROW_NCX(__LIBCCALL _get_pgmptr)(char **__pvalue) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_get_pgmptr))(__pvalue); })
