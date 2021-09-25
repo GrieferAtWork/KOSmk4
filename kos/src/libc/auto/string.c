@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe411f498 */
+/* HASH CRC-32:0xfda98598 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -372,6 +372,8 @@ NOTHROW_NCX(LIBDCALL libd_strerror)(errno_t errnum) {
 
 
 
+
+
 	}
 	return result;
 }
@@ -389,6 +391,8 @@ NOTHROW_NCX(LIBCCALL libc_strerror)(errno_t errnum) {
 	} else {
 
 		libc_sprintf(result, "Unknown error %d", errnum);
+
+
 
 
 

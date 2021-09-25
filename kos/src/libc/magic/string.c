@@ -884,6 +884,8 @@ char *strerror($errno_t errnum) {
 		 * loop with format_vprintf() which uses strerror() in order
 		 * to implement %m! */
 		$errno_t iter = errnum;
+		if (iter < 0)
+			iter = -iter;
 		result = COMPILER_ENDOF(strerror_buf);
 		*--result = '\0';
 		do {

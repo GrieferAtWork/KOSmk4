@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3f9727e8 */
+/* HASH CRC-32:0xd5df120b */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -110,6 +110,8 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strerror))(__errno_t __errnum) {
 		 * loop with format_vprintf() which uses strerror() in order
 		 * to implement %m! */
 		__errno_t __iter = __errnum;
+		if (__iter < 0)
+			__iter = -__iter;
 		__result = __COMPILER_ENDOF(__strerror_buf);
 		*--__result = '\0';
 		do {
