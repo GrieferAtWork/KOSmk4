@@ -730,6 +730,12 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *       in  `/kos/src/libservice/com.h'  for  `service_buf_t',  as   it
 	 *       allows GCC to make better use of registers! */
 
+	/* TODO: Change `format_escape()' to include explicit configuration options
+	 *       for  data being UTF-8 or raw bytes, with the default configuration
+	 *       being to determine automatically (that is: assume utf-8 unless the
+	 *       string contains byte-sequences  not allowed  for utf-8,  including
+	 *       incorrect multi-character sequences, as well as overly long chars) */
+
 	return state;
 }
 
