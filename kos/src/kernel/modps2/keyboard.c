@@ -50,8 +50,20 @@ PRIVATE REF struct ps2_keyboard *ps2_keyboards[PS2_PORTCOUNT];
 
 PRIVATE NOBLOCK NOPREEMPT void
 NOTHROW(FCALL ps2_keyboard_postkey)(struct ps2_keyboard *__restrict self, u16 key) {
+	unsigned int bits;
 	assert(key != KEY_NONE); /* Use KEY_UNKNOWN instead! */
-	entropy_giveint_nopr(tsc_get(THIS_CPU), 3); /* Feed a little bit of entropy */
+
+	/* Feed a little bit of entropy based on the current timestamp.
+	 * We  feed more data during down-up since key-down may just be
+	 * the result of a key-repeat (in  which case we can only  feed
+	 * data relating to timing inaccuracies)
+	 * Otherwise,  we rely on the human element, going off on the
+	 * presumption that a human typing will have inherent random-
+	 * ness when it comes to how fast they type. */
+	bits = 3;
+	if (KEY_ISUP(key))
+		bits = 9;
+	entropy_giveint_nopr(tsc_get(THIS_CPU), bits);
 
 #if 1
 	printk(KERN_DEBUG "[ps2:%q] Post key %#.4I16x [state=%u]\n",

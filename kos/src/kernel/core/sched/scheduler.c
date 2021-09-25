@@ -1141,8 +1141,8 @@ NOTHROW(FCALL tsc_deadline_passed)(struct cpu *__restrict me,
 	sched_assert();
 	/* Calculate the current scheduler time. */
 again_with_tsc_now:
+	entropy_giveint_nopr(tsc_now, 3); /* Feed a little bit of entropy */
 	now = tsc_now_to_ktime(me, tsc_now);
-	entropy_giveint_nopr(now, 3); /* Feed a little bit of entropy */
 again:
 	/* Select the thread with the lowest stop-time as successor. */
 	next          = sched_s_running_first;

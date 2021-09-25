@@ -23,18 +23,22 @@
 
 #include <kernel/compiler.h>
 
+#include <debugger/debugger.h>
 #include <kernel/entropy.h>
 #include <kernel/types.h>
 #include <sched/signal.h>
 #include <sched/task.h>
 
 #include <hybrid/atomic.h>
+#include <hybrid/bit.h>
 #include <hybrid/byteorder.h>
 #include <hybrid/overflow.h>
 
 #include <sys/param.h>
 
 #include <assert.h>
+#include <ctype.h>
+#include <inttypes.h>
 #include <stdbool.h>
 #include <string.h>
 
@@ -157,7 +161,10 @@ NOTHROW(FCALL entropy_take_nopr)(void *buf, size_t num_bits) {
  *          RANDOM! NO PRNG ALLOWED! And  also make sure that  it's
  *          not predictable. (e.g.: if the source of randomness  is
  *          timing, only feed the least  significant few bits of  a
- *          nano-second counter!) */
+ *          nano-second counter!)
+ * Also: Don't feed security-critical data (such as which buffers a
+ *       user is pressing)  to this function,  as this  information
+ *       may otherwise be reverse-engineered by a malicious entity! */
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL entropy_give)(void const *buf, size_t num_bits) {
 	pflag_t was;
@@ -244,11 +251,79 @@ NOTHROW(FCALL entropy_give_nopr)(void const *buf, size_t num_bits) {
 
 
 
+#ifdef CONFIG_HAVE_DEBUGGER
+/* Debugger functions to display  entropy information (including a  representation
+ * of how well entropy bits are distributed, as in: count how often any given byte
+ * appears within the entropy  buffer and check if  some bytes exist that  deviate
+ * from the expected norm) */
 
-/* TODO: Debugger functions to display entropy information (including a representation
- *       of how well entropy bits are distributed, as in: count how often any given byte
- *       appears within the entropy buffer and check if some bytes exist that deviate
- *       from the expected norm) */
+DBG_COMMAND(entropy,
+            "entropy\n"
+            "\tDisplay information on entropy collected by the kernel") {
+	size_t i, j;
+	uint8_t bytevalues[256];
+	size_t onebits;
+	size_t zerobits;
+
+	/* Collect statistical information on which bytes appear how often. */
+	memset(bytevalues, 0, sizeof(bytevalues));
+	onebits = 0;
+	for (i = 0; i < entropy_bits / NBBY; ++i) {
+		byte_t val = entropy_data[i];
+		if (bytevalues[val] != 0xff)
+			++bytevalues[val];
+		onebits += POPCOUNT(val);
+	}
+	{
+		unsigned int tail_bits = entropy_bits % NBBY;
+		if (tail_bits) {
+			byte_t tail_byte = entropy_data[entropy_bits / NBBY];
+			tail_byte &= (1 << tail_bits) - 1;
+			onebits += POPCOUNT(tail_byte);
+		}
+	}
+	zerobits = entropy_bits - onebits;
+
+	dbg_printf(DBGSTR("entropy_bits: " AC_WHITE("%" PRIuSIZ) " bits (%" PRIuSIZ "b+%u)%s\n"),
+	           entropy_bits, entropy_bits / NBBY, (unsigned int)(entropy_bits % NBBY),
+	           entropy_bits == ENTROPY_BITS ? DBGSTR(" (" AC_GREEN("full") ")") : DBGSTR(""));
+	dbg_printf(DBGSTR("bits: [0=" AC_WHITE("%" PRIuSIZ) " (%u%%),1=" AC_WHITE("%" PRIuSIZ) " (%u%%)]\n"),
+	           onebits, !entropy_bits ? 0 : (onebits * 100) / entropy_bits,
+	           zerobits, !entropy_bits ? 0 : (zerobits * 100) / entropy_bits);
+	if (onebits * 2 >= entropy_bits * 3)
+		dbg_print(DBGSTR(AC_YELLOW("WARNING: More than 2/3 are 1-bits") "\n"));
+	if (zerobits * 2 >= entropy_bits * 3)
+		dbg_print(DBGSTR(AC_YELLOW("WARNING: More than 2/3 are 0-bits") "\n"));
+
+	dbg_print(DBGSTR("   "));
+	for (i = 0; i < 16; ++i)
+		dbg_printf(DBGSTR(" x%x"), i);
+	dbg_putc('\n');
+	for (i = 0; i < 16; ++i) {
+		dbg_printf(DBGSTR("%xx "), i);
+		dbg_savecolor();
+		for (j = 0; j < 16; ++j) {
+			byte_t b = (i * 16) + j;
+			uint8_t count = bytevalues[b];
+			if (count == 0) {
+				dbg_print(DBGSTR("   "));
+			} else {
+				if (count == 1) {
+					dbg_setfgcolor(ANSITTY_CL_DARK_GRAY);
+				} else if (count == 2) {
+					dbg_setfgcolor(ANSITTY_CL_LIGHT_GRAY);
+				} else {
+					dbg_setfgcolor(ANSITTY_CL_WHITE);
+				}
+				dbg_printf(DBGSTR("%3" PRIu8), count);
+			}
+		}
+		dbg_loadcolor();
+		dbg_putc('\n');
+	}
+	return 0;
+}
+#endif /* CONFIG_HAVE_DEBUGGER */
 
 
 
