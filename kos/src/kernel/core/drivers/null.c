@@ -24,19 +24,21 @@
 
 #include <dev/char.h>
 #include <kernel/driver.h>
+#include <kernel/entropy.h>
 #include <kernel/except.h>
 #include <kernel/handle.h>
 #include <kernel/mman/mfile.h>
 #include <kernel/mman/phys.h>
-#include <kernel/rand.h>
 #include <kernel/syslog.h>
 #include <kernel/types.h>
 #include <sched/cred.h>
 
+#include <hybrid/atomic.h>
 #include <hybrid/unaligned.h>
 
 #include <kos/dev.h>
 #include <sys/io.h>
+#include <sys/param.h>
 #include <sys/poll.h>
 #include <sys/stat.h>
 
@@ -48,56 +50,56 @@
 DECL_BEGIN
 
 PRIVATE NONNULL((1)) size_t KCALL
-null_read(struct character_device *__restrict UNUSED(self),
-          USER CHECKED void *UNUSED(dst), size_t UNUSED(num_bytes),
-          iomode_t UNUSED(mode)) THROWS(...) {
+dev_null_read(struct character_device *__restrict UNUSED(self),
+              USER CHECKED void *UNUSED(dst), size_t UNUSED(num_bytes),
+              iomode_t UNUSED(mode)) THROWS(...) {
 	return 0;
 }
 
 PRIVATE NONNULL((1)) size_t KCALL
-null_write(struct character_device *__restrict UNUSED(self),
-           USER CHECKED void const *UNUSED(src), size_t num_bytes,
-           iomode_t UNUSED(mode)) THROWS(...) {
+dev_null_write(struct character_device *__restrict UNUSED(self),
+               USER CHECKED void const *UNUSED(src), size_t num_bytes,
+               iomode_t UNUSED(mode)) THROWS(...) {
 	return num_bytes;
 }
 
 PRIVATE NONNULL((1)) size_t KCALL
-null_pread(struct character_device *__restrict UNUSED(self),
-           USER CHECKED void *UNUSED(dst), size_t UNUSED(num_bytes),
-           pos_t UNUSED(addr), iomode_t UNUSED(mode)) THROWS(...) {
+dev_null_pread(struct character_device *__restrict UNUSED(self),
+               USER CHECKED void *UNUSED(dst), size_t UNUSED(num_bytes),
+               pos_t UNUSED(addr), iomode_t UNUSED(mode)) THROWS(...) {
 	return 0;
 }
 
 PRIVATE NONNULL((1)) size_t KCALL
-null_pwrite(struct character_device *__restrict UNUSED(self),
-            USER CHECKED void const *UNUSED(src), size_t num_bytes,
-            pos_t UNUSED(addr), iomode_t UNUSED(mode)) THROWS(...) {
+dev_null_pwrite(struct character_device *__restrict UNUSED(self),
+                USER CHECKED void const *UNUSED(src), size_t num_bytes,
+                pos_t UNUSED(addr), iomode_t UNUSED(mode)) THROWS(...) {
 	return num_bytes;
 }
 
 PRIVATE NONNULL((1)) void KCALL
-null_pollconnect(struct character_device *__restrict UNUSED(self),
-                 poll_mode_t UNUSED(what))
+dev_null_pollconnect(struct character_device *__restrict UNUSED(self),
+                     poll_mode_t UNUSED(what))
 		THROWS(...) {
 }
 
 PRIVATE NONNULL((1)) poll_mode_t KCALL
-null_polltest(struct character_device *__restrict UNUSED(self),
-              poll_mode_t what)
+dev_null_polltest(struct character_device *__restrict UNUSED(self),
+                  poll_mode_t what)
 		THROWS(...) {
 	return what & (POLLINMASK | POLLOUTMASK);
 }
 
 PRIVATE NONNULL((1, 2)) void KCALL
-phys_mmap(struct character_device *__restrict UNUSED(self),
-          struct handle_mmap_info *__restrict info)
+dev_phys_mmap(struct character_device *__restrict UNUSED(self),
+              struct handle_mmap_info *__restrict info)
 		THROWS(...) {
 	info->hmi_file = incref(&mfile_phys);
 }
 
 PRIVATE NONNULL((1, 2)) void KCALL
-zero_mmap(struct character_device *__restrict UNUSED(self),
-          struct handle_mmap_info *__restrict info)
+dev_zero_mmap(struct character_device *__restrict UNUSED(self),
+              struct handle_mmap_info *__restrict info)
 		THROWS(...) {
 	info->hmi_file = incref(&mfile_zero);
 }
@@ -105,64 +107,65 @@ zero_mmap(struct character_device *__restrict UNUSED(self),
 
 
 PRIVATE NONNULL((1)) size_t KCALL
-zero_read(struct character_device *__restrict UNUSED(self),
-          USER CHECKED void *dst, size_t num_bytes,
-          iomode_t UNUSED(mode)) THROWS(...) {
+dev_zero_read(struct character_device *__restrict UNUSED(self),
+              USER CHECKED void *dst, size_t num_bytes,
+              iomode_t UNUSED(mode)) THROWS(...) {
 	memset(dst, 0, num_bytes);
 	return num_bytes;
 }
 
 PRIVATE NONNULL((1)) size_t KCALL
-zero_pread(struct character_device *__restrict UNUSED(self),
-           USER CHECKED void *dst, size_t num_bytes,
-           pos_t UNUSED(addr), iomode_t UNUSED(mode)) THROWS(...) {
+dev_zero_pread(struct character_device *__restrict UNUSED(self),
+               USER CHECKED void *dst, size_t num_bytes,
+               pos_t UNUSED(addr), iomode_t UNUSED(mode)) THROWS(...) {
 	memset(dst, 0, num_bytes);
 	return num_bytes;
 }
 
 
 PRIVATE NONNULL((1)) size_t KCALL
-full_write(struct character_device *__restrict UNUSED(self),
-           USER CHECKED void const *UNUSED(src), size_t UNUSED(num_bytes),
-           iomode_t UNUSED(mode)) THROWS(...) {
+dev_full_write(struct character_device *__restrict UNUSED(self),
+               USER CHECKED void const *UNUSED(src), size_t UNUSED(num_bytes),
+               iomode_t UNUSED(mode)) THROWS(...) {
 	THROW(E_FSERROR_DISK_FULL);
 }
 
 PRIVATE NONNULL((1)) size_t KCALL
-full_pwrite(struct character_device *__restrict UNUSED(self),
-            USER CHECKED void const *UNUSED(src), size_t UNUSED(num_bytes),
-            pos_t UNUSED(addr), iomode_t UNUSED(mode)) THROWS(...) {
+dev_full_pwrite(struct character_device *__restrict UNUSED(self),
+                USER CHECKED void const *UNUSED(src), size_t UNUSED(num_bytes),
+                pos_t UNUSED(addr), iomode_t UNUSED(mode)) THROWS(...) {
 	THROW(E_FSERROR_DISK_FULL);
 }
 
 
 PRIVATE NONNULL((1)) size_t KCALL
-mem_pread(struct character_device *__restrict UNUSED(self),
-          USER CHECKED void *dst, size_t num_bytes,
-          pos_t addr, iomode_t UNUSED(mode)) THROWS(...) {
+dev_mem_pread(struct character_device *__restrict UNUSED(self),
+              USER CHECKED void *dst, size_t num_bytes,
+              pos_t addr, iomode_t UNUSED(mode)) THROWS(...) {
 	copyfromphys(dst, (physaddr_t)addr, num_bytes);
 	return num_bytes;
 }
 
 PRIVATE NONNULL((1)) size_t KCALL
-mem_pwrite(struct character_device *__restrict UNUSED(self),
-           USER CHECKED void const *src, size_t num_bytes,
-           pos_t addr, iomode_t UNUSED(mode)) THROWS(...) {
+dev_mem_pwrite(struct character_device *__restrict UNUSED(self),
+               USER CHECKED void const *src, size_t num_bytes,
+               pos_t addr, iomode_t UNUSED(mode)) THROWS(...) {
 	copytophys((physaddr_t)addr, src, num_bytes);
 	return num_bytes;
 }
 
 PRIVATE NONNULL((1)) size_t KCALL
-kmem_pread(struct character_device *__restrict UNUSED(self),
-           USER CHECKED void *dst, size_t num_bytes,
-           pos_t addr, iomode_t UNUSED(mode)) THROWS(...) {
+dev_kmem_pread(struct character_device *__restrict UNUSED(self),
+               USER CHECKED void *dst, size_t num_bytes,
+               pos_t addr, iomode_t UNUSED(mode)) THROWS(...) {
 	memcpy(dst, (void *)(uintptr_t)addr, num_bytes);
 	return num_bytes;
 }
+
 PRIVATE NONNULL((1)) size_t KCALL
-kmem_pwrite(struct character_device *__restrict UNUSED(self),
-            USER CHECKED void const *src, size_t num_bytes,
-            pos_t addr, iomode_t UNUSED(mode)) THROWS(...) {
+dev_kmem_pwrite(struct character_device *__restrict UNUSED(self),
+                USER CHECKED void const *src, size_t num_bytes,
+                pos_t addr, iomode_t UNUSED(mode)) THROWS(...) {
 	memcpy((void *)(uintptr_t)addr, src, num_bytes);
 	return num_bytes;
 }
@@ -170,9 +173,9 @@ kmem_pwrite(struct character_device *__restrict UNUSED(self),
 
 
 PRIVATE NONNULL((1)) size_t KCALL
-port_pread(struct character_device *__restrict UNUSED(self),
-           USER CHECKED void *dst, size_t num_bytes,
-           pos_t addr, iomode_t UNUSED(mode)) THROWS(...) {
+dev_port_pread(struct character_device *__restrict UNUSED(self),
+               USER CHECKED void *dst, size_t num_bytes,
+               pos_t addr, iomode_t UNUSED(mode)) THROWS(...) {
 	size_t i;
 	for (i = 0; i < num_bytes; ++i)
 		((u8 *)dst)[i] = inb((port_t)(addr + i));
@@ -180,9 +183,9 @@ port_pread(struct character_device *__restrict UNUSED(self),
 }
 
 PRIVATE NONNULL((1)) size_t KCALL
-port_pwrite(struct character_device *__restrict UNUSED(self),
-            USER CHECKED void const *src, size_t num_bytes,
-            pos_t addr, iomode_t UNUSED(mode)) THROWS(...) {
+dev_port_pwrite(struct character_device *__restrict UNUSED(self),
+                USER CHECKED void const *src, size_t num_bytes,
+                pos_t addr, iomode_t UNUSED(mode)) THROWS(...) {
 	size_t i;
 	for (i = 0; i < num_bytes; ++i)
 		outb((port_t)(addr + i), ((u8 const *)src)[i]);
@@ -190,8 +193,8 @@ port_pwrite(struct character_device *__restrict UNUSED(self),
 }
 
 PRIVATE NONNULL((1, 2)) void KCALL
-port_open(struct character_device *__restrict UNUSED(self),
-          struct handle *__restrict UNUSED(hand)) THROWS(...) {
+dev_port_open(struct character_device *__restrict UNUSED(self),
+              struct handle *__restrict UNUSED(hand)) THROWS(...) {
 	require(CAP_SYS_RAWIO);
 }
 
@@ -199,109 +202,87 @@ port_open(struct character_device *__restrict UNUSED(self),
 
 
 PRIVATE NONNULL((1)) size_t KCALL
-urandom_read(struct character_device *__restrict UNUSED(self),
-             USER CHECKED void *dst, size_t num_bytes,
-             iomode_t UNUSED(mode)) THROWS(...) {
-	size_t result = num_bytes;
-	while (num_bytes >= 4) {
-		*(u32 *)dst = krand32();
-		dst         = (byte_t *)dst + 4;
-		num_bytes -= 4;
-	}
-	if (num_bytes) {
-		union {
-			u32 r;
-			u8 b[4];
-		} x;
-		x.r = krand32();
-		while (num_bytes--)
-			((u8 *)dst)[num_bytes] = x.b[num_bytes];
-	}
-	return result;
+dev_urandom_read(struct character_device *__restrict UNUSED(self),
+                 USER CHECKED void *dst, size_t num_bytes,
+                 iomode_t UNUSED(mode)) THROWS(...) {
+	urandom_read(dst, num_bytes);
+	return num_bytes;
 }
 
 PRIVATE NONNULL((1)) size_t KCALL
-urandom_pread(struct character_device *__restrict self,
-              USER CHECKED void *dst, size_t num_bytes,
-              pos_t UNUSED(addr), iomode_t mode) THROWS(...) {
-	return urandom_read(self, dst, num_bytes, mode);
+dev_urandom_pread(struct character_device *__restrict self,
+                  USER CHECKED void *dst, size_t num_bytes,
+                  pos_t UNUSED(addr), iomode_t mode) THROWS(...) {
+	return dev_urandom_read(self, dst, num_bytes, mode);
 }
 
-#define urandom_pollconnect null_pollconnect
+#define urandom_pollconnect dev_null_pollconnect
 PRIVATE NONNULL((1)) poll_mode_t KCALL
-urandom_polltest(struct character_device *__restrict UNUSED(self),
-                 poll_mode_t what)
+dev_urandom_polltest(struct character_device *__restrict UNUSED(self),
+                     poll_mode_t what)
 		THROWS(...) {
 	return what & POLLINMASK;
 }
 
 
-PRIVATE u32 KCALL krand32_nondeterministic(void) {
-	/* TODO */
-	return krand32();
-}
-
-PRIVATE u16 KCALL krand16_nondeterministic(void) {
-	return (u16)krand32_nondeterministic();
-}
-
-PRIVATE u8 KCALL krand8_nondeterministic(void) {
-	return (u8)krand32_nondeterministic();
+PRIVATE NONNULL((1)) size_t KCALL
+dev_random_read(struct character_device *__restrict UNUSED(self),
+                USER CHECKED void *dst, size_t num_bytes,
+                iomode_t mode) THROWS(...) {
+	return entropy_read(dst, num_bytes, mode);
 }
 
 PRIVATE NONNULL((1)) size_t KCALL
-random_read(struct character_device *__restrict UNUSED(self),
-            USER CHECKED void *dst, size_t num_bytes,
-            iomode_t UNUSED(mode)) THROWS(...) {
-	size_t result = num_bytes;
-	while (num_bytes >= 4) {
-		UNALIGNED_SET32((u32 *)dst, krand32_nondeterministic());
-		dst = (byte_t *)dst + 4;
-		num_bytes -= 4;
-	}
-	switch (num_bytes) {
-	case 3:
-		((u8 *)dst)[2] = krand8_nondeterministic();
-		ATTR_FALLTHROUGH
-	case 2:
-		UNALIGNED_SET16((u16 *)dst, krand16_nondeterministic());
-		break;
-	case 1:
-		*(u8 *)dst = krand8_nondeterministic();
-		break;
-	default: break;
-	}
-	return result;
+dev_random_pread(struct character_device *__restrict UNUSED(self),
+                 USER CHECKED void *dst, size_t num_bytes,
+                 pos_t UNUSED(addr), iomode_t mode) THROWS(...) {
+	return entropy_read(dst, num_bytes, mode);
 }
 
-PRIVATE NONNULL((1)) size_t KCALL
-random_pread(struct character_device *__restrict self,
-             USER CHECKED void *dst, size_t num_bytes,
-             pos_t UNUSED(addr), iomode_t mode) THROWS(...) {
-	return random_read(self, dst, num_bytes, mode);
-}
-
-#define random_pollconnect null_pollconnect
-PRIVATE NONNULL((1)) poll_mode_t KCALL
-random_polltest(struct character_device *__restrict UNUSED(self),
-                poll_mode_t what)
+PRIVATE NONNULL((1)) void KCALL
+dev_random_pollconnect(struct character_device *__restrict UNUSED(self),
+                       poll_mode_t what)
 		THROWS(...) {
-	/* TODO: Wait for non-deterministic random data to become available! */
-	return what & POLLINMASK;
+	if (what & POLLINMASK) {
+		task_connect_for_poll(&entropy_request_sig);
+		/* Make sure that the signal is broadcast once
+		 * at least NBBY  bits have become  available. */
+		for (;;) {
+			size_t oldval;
+			oldval = ATOMIC_READ(entropy_request_bits);
+			if (oldval <= NBBY)
+				break;
+			if (ATOMIC_CMPXCH_WEAK(entropy_request_bits,
+			                       oldval, NBBY))
+				break;
+		}
+	}
+}
+
+PRIVATE NONNULL((1)) poll_mode_t KCALL
+dev_random_polltest(struct character_device *__restrict UNUSED(self),
+                    poll_mode_t what)
+		THROWS(...) {
+	/* Wait for non-deterministic random data to become available! */
+	if (what & POLLINMASK) {
+		if (ATOMIC_READ(entropy_bits) >= NBBY)
+			return what & POLLINMASK;
+	}
+	return 0;
 }
 
 
 PRIVATE NONNULL((1)) size_t KCALL
-kmsg_write(struct character_device *__restrict UNUSED(self),
-           USER CHECKED void const *src, size_t num_bytes,
-           iomode_t UNUSED(mode)) THROWS(...) {
+dev_kmsg_write(struct character_device *__restrict UNUSED(self),
+               USER CHECKED void const *src, size_t num_bytes,
+               iomode_t UNUSED(mode)) THROWS(...) {
 	return (size_t)syslog_printer(SYSLOG_LEVEL_RAW, (char const *)src, num_bytes);
 }
 
-#define kmsg_pollconnect null_pollconnect
+#define dev_kmsg_pollconnect dev_null_pollconnect
 PRIVATE NONNULL((1)) poll_mode_t KCALL
-kmsg_polltest(struct character_device *__restrict UNUSED(self),
-              poll_mode_t what)
+dev_kmsg_polltest(struct character_device *__restrict UNUSED(self),
+                  poll_mode_t what)
 		THROWS(...) {
 	return what & POLLOUTMASK;
 }
@@ -310,139 +291,157 @@ kmsg_polltest(struct character_device *__restrict UNUSED(self),
 
 #ifdef LIBVIO_CONFIG_ENABLED
 PRIVATE u8 KCALL
-port_rdb(struct vioargs *__restrict UNUSED(args),
-         vio_addr_t addr) {
+dev_port_rdb(struct vioargs *__restrict UNUSED(args),
+             vio_addr_t addr) {
 	return inb((port_t)addr);
 }
 
 PRIVATE u16 KCALL
-port_rdw(struct vioargs *__restrict UNUSED(args),
-         vio_addr_t addr) {
+dev_port_rdw(struct vioargs *__restrict UNUSED(args),
+             vio_addr_t addr) {
 	return inw((port_t)addr);
 }
 
 PRIVATE u32 KCALL
-port_rdl(struct vioargs *__restrict UNUSED(args),
-         vio_addr_t addr) {
+dev_port_rdl(struct vioargs *__restrict UNUSED(args),
+             vio_addr_t addr) {
 	return inl((port_t)addr);
 }
 
 PRIVATE void KCALL
-port_wrb(struct vioargs *__restrict UNUSED(args),
-         vio_addr_t addr, u8 value) {
+dev_port_wrb(struct vioargs *__restrict UNUSED(args),
+             vio_addr_t addr, u8 value) {
 	outb((port_t)addr, value);
 }
 
 PRIVATE void KCALL
-port_wrw(struct vioargs *__restrict UNUSED(args),
-         vio_addr_t addr, u16 value) {
+dev_port_wrw(struct vioargs *__restrict UNUSED(args),
+             vio_addr_t addr, u16 value) {
 	outw((port_t)addr, value);
 }
 
 PRIVATE void KCALL
-port_wrl(struct vioargs *__restrict UNUSED(args),
-         vio_addr_t addr, u32 value) {
+dev_port_wrl(struct vioargs *__restrict UNUSED(args),
+             vio_addr_t addr, u32 value) {
 	outl((port_t)addr, value);
 }
 
-PRIVATE struct vio_operators const port_vio =
-VIO_OPERATORS_INIT(VIO_CALLBACK_INIT_READ(&port_rdb, &port_rdw, &port_rdl, NULL),
-                   VIO_CALLBACK_INIT_WRITE(&port_wrb, &port_wrw, &port_wrl, NULL));
-PRIVATE struct mfile port_datablock = MFILE_INIT_VIO(&port_vio);
+PRIVATE struct vio_operators const dev_port_vio =
+VIO_OPERATORS_INIT(VIO_CALLBACK_INIT_READ(&dev_port_rdb, &dev_port_rdw, &dev_port_rdl, NULL),
+                   VIO_CALLBACK_INIT_WRITE(&dev_port_wrb, &dev_port_wrw, &dev_port_wrl, NULL));
+PRIVATE struct mfile dev_port_datablock = MFILE_INIT_VIO(&dev_port_vio);
 
-#define PORT_MMAP_POINTER (&port_mmap)
+#define DEV_PORT_MMAP_POINTER (&dev_port_mmap)
 PRIVATE NONNULL((1, 2)) void KCALL
-port_mmap(struct character_device *__restrict UNUSED(self),
-          struct handle_mmap_info *__restrict info)
+dev_port_mmap(struct character_device *__restrict UNUSED(self),
+              struct handle_mmap_info *__restrict info)
 		THROWS(...) {
-	info->hmi_file = incref(&port_datablock);
+	info->hmi_file = incref(&dev_port_datablock);
 	/* TODO: Don't limit `hmi_maxaddr' here, but pureply rely on the file's size instead! */
 	info->hmi_maxaddr = (pos_t)((port_t)-1);
 }
 
 
 PRIVATE u8 KCALL
-random_rdb(struct vioargs *__restrict UNUSED(args),
-           pos_t UNUSED(addr)) {
-	return krand8_nondeterministic();
+dev_random_rdb(struct vioargs *__restrict UNUSED(args),
+               pos_t UNUSED(addr)) {
+	u8 result;
+	entropy_readall(&result, sizeof(result));
+	return result;
 }
 
 PRIVATE u16 KCALL
-random_rdw(struct vioargs *__restrict UNUSED(args),
-           pos_t UNUSED(addr)) {
-	return krand16_nondeterministic();
+dev_random_rdw(struct vioargs *__restrict UNUSED(args),
+               pos_t UNUSED(addr)) {
+	u16 result;
+	entropy_readall(&result, sizeof(result));
+	return result;
 }
 
 PRIVATE u32 KCALL
-random_rdl(struct vioargs *__restrict UNUSED(args),
-           pos_t UNUSED(addr)) {
-	return krand32_nondeterministic();
+dev_random_rdl(struct vioargs *__restrict UNUSED(args),
+               pos_t UNUSED(addr)) {
+	u32 result;
+	entropy_readall(&result, sizeof(result));
+	return result;
 }
 
 #ifdef LIBVIO_CONFIG_HAVE_QWORD
 PRIVATE u64 KCALL
-random_rdq(struct vioargs *__restrict UNUSED(args),
-           pos_t UNUSED(addr)) {
-	return ((u64)krand32_nondeterministic()) |
-	       ((u64)krand32_nondeterministic() << 32);
+dev_random_rdq(struct vioargs *__restrict UNUSED(args),
+               pos_t UNUSED(addr)) {
+	u64 result;
+	entropy_readall(&result, sizeof(result));
+	return result;
 }
 #endif /* LIBVIO_CONFIG_HAVE_QWORD */
 
-PRIVATE struct vio_operators const random_vio =
-VIO_OPERATORS_INIT(VIO_CALLBACK_INIT_READ(&random_rdb,
-                                          &random_rdw,
-                                          &random_rdl,
-                                          &random_rdq),
+PRIVATE struct vio_operators const dev_random_vio =
+VIO_OPERATORS_INIT(VIO_CALLBACK_INIT_READ(&dev_random_rdb, &dev_random_rdw,
+                                          &dev_random_rdl, &dev_random_rdq),
                    VIO_CALLBACK_INIT_WRITE(NULL, NULL, NULL, NULL));
-PRIVATE struct mfile random_datablock = MFILE_INIT_VIO(&random_vio);
+PRIVATE struct mfile dev_random_datablock = MFILE_INIT_VIO(&dev_random_vio);
 
-#define RANDOM_MMAP_POINTER (&random_mmap)
+#define DEV_RANDOM_MMAP_POINTER (&dev_random_mmap)
 PRIVATE NONNULL((1, 2)) void KCALL
-random_mmap(struct character_device *__restrict UNUSED(self),
-            struct handle_mmap_info *__restrict info)
+dev_random_mmap(struct character_device *__restrict UNUSED(self),
+                struct handle_mmap_info *__restrict info)
 		THROWS(...) {
-	info->hmi_file = incref(&random_datablock);
+	info->hmi_file = incref(&dev_random_datablock);
 }
 
 PRIVATE u8 KCALL
-urandom_rdb(struct vioargs *__restrict UNUSED(args), pos_t UNUSED(addr)) {
-	return (u8)krand32();
+dev_urandom_rdb(struct vioargs *__restrict UNUSED(args),
+                pos_t UNUSED(addr)) {
+	u8 result;
+	urandom_read(&result, sizeof(result));
+	return result;
 }
 
 PRIVATE u16 KCALL
-urandom_rdw(struct vioargs *__restrict UNUSED(args), pos_t UNUSED(addr)) {
-	return (u16)krand32();
+dev_urandom_rdw(struct vioargs *__restrict UNUSED(args),
+                pos_t UNUSED(addr)) {
+	u16 result;
+	urandom_read(&result, sizeof(result));
+	return result;
 }
 
 PRIVATE u32 KCALL
-urandom_rdl(struct vioargs *__restrict UNUSED(args), pos_t UNUSED(addr)) {
-	return krand32();
+dev_urandom_rdl(struct vioargs *__restrict UNUSED(args),
+                pos_t UNUSED(addr)) {
+	u32 result;
+	urandom_read(&result, sizeof(result));
+	return result;
 }
 
 #ifdef LIBVIO_CONFIG_HAVE_QWORD
 PRIVATE u64 KCALL
-urandom_rdq(struct vioargs *__restrict UNUSED(args), pos_t UNUSED(addr)) {
-	return krand64();
+dev_urandom_rdq(struct vioargs *__restrict UNUSED(args),
+                pos_t UNUSED(addr)) {
+	u64 result;
+	urandom_read(&result, sizeof(result));
+	return result;
 }
 #endif /* LIBVIO_CONFIG_HAVE_QWORD */
 
-PRIVATE struct vio_operators const urandom_vio =
-VIO_OPERATORS_INIT(VIO_CALLBACK_INIT_READ(&urandom_rdb, &urandom_rdw, &urandom_rdl, &urandom_rdq),
+PRIVATE struct vio_operators const dev_urandom_vio =
+VIO_OPERATORS_INIT(VIO_CALLBACK_INIT_READ(&dev_urandom_rdb, &dev_urandom_rdw,
+                                          &dev_urandom_rdl, &dev_urandom_rdq),
                    VIO_CALLBACK_INIT_WRITE(NULL, NULL, NULL, NULL));
-PRIVATE struct mfile urandom_datablock = MFILE_INIT_VIO(&urandom_vio);
+PRIVATE struct mfile dev_urandom_datablock = MFILE_INIT_VIO(&dev_urandom_vio);
 
-#define URANDOM_MMAP_POINTER (&urandom_mmap)
+#define DEV_URANDOM_MMAP_POINTER (&dev_urandom_mmap)
 PRIVATE NONNULL((1, 2)) void KCALL
-urandom_mmap(struct character_device *__restrict UNUSED(self),
-             struct handle_mmap_info *__restrict info)
+dev_urandom_mmap(struct character_device *__restrict UNUSED(self),
+                 struct handle_mmap_info *__restrict info)
 		THROWS(...) {
-	info->hmi_file = incref(&urandom_datablock);
+	info->hmi_file = incref(&dev_urandom_datablock);
 }
 
 #else /* LIBVIO_CONFIG_ENABLED */
-#define PORT_MMAP_POINTER    NULL
-#define RANDOM_MMAP_POINTER  NULL
-#define URANDOM_MMAP_POINTER NULL
+#define DEV_PORT_MMAP_POINTER    NULL
+#define DEV_RANDOM_MMAP_POINTER  NULL
+#define DEV_URANDOM_MMAP_POINTER NULL
 #endif /* !LIBVIO_CONFIG_ENABLED */
 
 
@@ -478,15 +477,15 @@ urandom_mmap(struct character_device *__restrict UNUSED(self),
 
 
 PRIVATE struct character_device null_devices[] = {
-	INIT_DEVICE("mem", MKDEV(1, 1), NULL, NULL, &mem_pread, &mem_pwrite, &phys_mmap, NULL, &null_pollconnect, &null_polltest, NULL),
-	INIT_DEVICE("kmem", MKDEV(1, 2), NULL, NULL, &kmem_pread, &kmem_pwrite, NULL, NULL, &null_pollconnect, &null_polltest, NULL),
-	INIT_DEVICE("null", MKDEV(1, 3), &null_read, &null_write, &null_pread, &null_pwrite, &zero_mmap, NULL, &null_pollconnect, &null_polltest, NULL),
-	INIT_DEVICE("port", MKDEV(1, 4), NULL, NULL, &port_pread, &port_pwrite, PORT_MMAP_POINTER, NULL, &null_pollconnect, &null_polltest, &port_open),
-	INIT_DEVICE("zero", MKDEV(1, 5), &zero_read, &null_write, &zero_pread, &null_pwrite, &zero_mmap, NULL, &null_pollconnect, &null_polltest, NULL),
-	INIT_DEVICE("full", MKDEV(1, 7), &zero_read, &full_write, &zero_pread, &full_pwrite, &zero_mmap, NULL, &null_pollconnect, &null_polltest, NULL),
-	INIT_DEVICE("random", MKDEV(1, 8), &random_read, NULL, &random_pread, NULL, RANDOM_MMAP_POINTER, NULL, &random_pollconnect, &random_polltest, NULL),
-	INIT_DEVICE("urandom", MKDEV(1, 9), &urandom_read, NULL, &urandom_pread, NULL, URANDOM_MMAP_POINTER, NULL, &urandom_pollconnect, &urandom_polltest, NULL),
-	INIT_DEVICE("kmsg", MKDEV(1, 11), NULL, &kmsg_write, NULL, NULL, NULL, NULL, &kmsg_pollconnect, &kmsg_polltest, NULL),
+	INIT_DEVICE("mem", MKDEV(1, 1), NULL, NULL, &dev_mem_pread, &dev_mem_pwrite, &dev_phys_mmap, NULL, &dev_null_pollconnect, &dev_null_polltest, NULL),
+	INIT_DEVICE("kmem", MKDEV(1, 2), NULL, NULL, &dev_kmem_pread, &dev_kmem_pwrite, NULL, NULL, &dev_null_pollconnect, &dev_null_polltest, NULL),
+	INIT_DEVICE("null", MKDEV(1, 3), &dev_null_read, &dev_null_write, &dev_null_pread, &dev_null_pwrite, &dev_zero_mmap, NULL, &dev_null_pollconnect, &dev_null_polltest, NULL),
+	INIT_DEVICE("port", MKDEV(1, 4), NULL, NULL, &dev_port_pread, &dev_port_pwrite, DEV_PORT_MMAP_POINTER, NULL, &dev_null_pollconnect, &dev_null_polltest, &dev_port_open),
+	INIT_DEVICE("zero", MKDEV(1, 5), &dev_zero_read, &dev_null_write, &dev_zero_pread, &dev_null_pwrite, &dev_zero_mmap, NULL, &dev_null_pollconnect, &dev_null_polltest, NULL),
+	INIT_DEVICE("full", MKDEV(1, 7), &dev_zero_read, &dev_full_write, &dev_zero_pread, &dev_full_pwrite, &dev_zero_mmap, NULL, &dev_null_pollconnect, &dev_null_polltest, NULL),
+	INIT_DEVICE("random", MKDEV(1, 8), &dev_random_read, NULL, &dev_random_pread, NULL, DEV_RANDOM_MMAP_POINTER, NULL, &dev_random_pollconnect, &dev_random_polltest, NULL),
+	INIT_DEVICE("urandom", MKDEV(1, 9), &dev_urandom_read, NULL, &dev_urandom_pread, NULL, DEV_URANDOM_MMAP_POINTER, NULL, &urandom_pollconnect, &dev_urandom_polltest, NULL),
+	INIT_DEVICE("kmsg", MKDEV(1, 11), NULL, &dev_kmsg_write, NULL, NULL, NULL, NULL, &dev_kmsg_pollconnect, &dev_kmsg_polltest, NULL),
 };
 
 

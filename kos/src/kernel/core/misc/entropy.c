@@ -20,12 +20,16 @@
 #ifndef GUARD_KERNEL_INCLUDE_KERNEL_ENTROPY_C
 #define GUARD_KERNEL_INCLUDE_KERNEL_ENTROPY_C 1
 #define _KOS_SOURCE 1
+#define _GNU_SOURCE 1
 
 #include <kernel/compiler.h>
 
 #include <debugger/debugger.h>
 #include <kernel/entropy.h>
+#include <kernel/rand.h>
+#include <kernel/syscall.h>
 #include <kernel/types.h>
+#include <kernel/user.h>
 #include <sched/signal.h>
 #include <sched/task.h>
 
@@ -33,8 +37,13 @@
 #include <hybrid/bit.h>
 #include <hybrid/byteorder.h>
 #include <hybrid/overflow.h>
+#include <hybrid/unaligned.h>
 
+#include <kos/except.h>
+#include <kos/except/reason/inval.h>
+#include <kos/io.h>
 #include <sys/param.h>
+#include <sys/random.h>
 
 #include <assert.h>
 #include <ctype.h>
@@ -90,12 +99,12 @@ PUBLIC struct sig entropy_request_sig = SIG_INIT;
 
 
 /* Check if at least `num_bits' of entropy are current available.
- * When this is  the case, return  `true'. Otherwise, connect  to
+ * When this is the case,  return `false'. Otherwise, connect  to
  * `entropy_request_sig' and ATOMIC_CMPXCH `entropy_request_bits'
  * such that its value is not larger than `num_bits'. Afterwards,
  * do another check  if sufficient entropy  is available, and  if
- * that  is  the  case  then,  disconnected  and  return  `true'.
- * Otherwise, return `false', following which the caller may  now
+ * that is  the  case  then,  disconnected  and  return  `false'.
+ * Otherwise, return `true', following  which the caller may  now
  * do a call to `task_waitfor()', after which they may repeat the
  * check for additional entropy. */
 PUBLIC WUNUSED bool FCALL
@@ -103,7 +112,7 @@ entropy_connect(size_t num_bits)
 		THROWS(E_BADALLOC) {
 	size_t oldreq;
 	if (ATOMIC_READ(entropy_bits) >= num_bits)
-		return true; /* Enough bits are available. */
+		return false; /* Enough bits are available. */
 	task_connect_for_poll(&entropy_request_sig);
 	for (;;) {
 		oldreq = ATOMIC_READ(entropy_request_bits);
@@ -117,11 +126,11 @@ entropy_connect(size_t num_bits)
 	/* Do another check for available entropy. */
 	if unlikely(ATOMIC_READ(entropy_bits) >= num_bits) {
 		task_disconnect(&entropy_request_sig);
-		return true; /* Enough bits are available. */
+		return false; /* Enough bits are available. */
 	}
 
 	/* Caller needs to blocking-wait! */
-	return false;
+	return true;
 }
 
 
@@ -250,6 +259,131 @@ NOTHROW(FCALL entropy_give_nopr)(void const *buf, size_t num_bits) {
 }
 
 
+/* Implementation for `read(2)' from `/dev/random', as well
+ * as the  `getrandom(2)' system  call with  `GRND_RANDOM'.
+ *
+ * This function will directly read from the entropy buffer,
+ * returning the number of bytes read. When nothing has  yet
+ * to be read, and nothing can  be read at the moment,  then
+ * either wait for data to become available, throw an  error
+ * `E_WOULDBLOCK', or return `0' (under `IO_NODATAZERO') */
+FUNDEF NOBLOCK WUNUSED NONNULL((1)) size_t FCALL
+entropy_read(USER CHECKED void *buf, size_t num_bytes, iomode_t mode)
+		THROWS(E_WOULDBLOCK, E_SEGFAULT) {
+	size_t result = 0;
+	byte_t temp_buf[64];
+	while (num_bytes) {
+		size_t take_bytes = num_bytes;
+		if (take_bytes > sizeof(temp_buf))
+			take_bytes = sizeof(temp_buf);
+		/* Try to take as much as possible. */
+		if (!entropy_take(temp_buf, take_bytes * NBBY)) {
+			/* Try to take only a single byte (that's as low as we can go) */
+			take_bytes = 1;
+			if (!entropy_take(temp_buf, NBBY)) {
+				/* No more entropy. If we already managed to
+				 * copy ~something~, return without blocking */
+				if (result != 0)
+					break;
+
+				/* Check if we're allowed to block. */
+				if (mode & IO_NONBLOCK) {
+					if (mode & IO_NODATAZERO)
+						break;
+					THROW(E_WOULDBLOCK);
+				}
+
+				/* Wait for data to become available. */
+				if (entropy_connect(NBBY))
+					task_waitfor();
+				continue;
+			}
+		}
+
+		/* Copy data into userspace. */
+		buf = (USER CHECKED byte_t *)mempcpy(buf, temp_buf, take_bytes);
+		num_bytes -= take_bytes;
+		result += take_bytes;
+	}
+	return result;
+}
+
+
+/* Same as `entropy_read()', but always fill the entire buffer,
+ * potentially  waiting until enough entropy has been generated
+ * before returning. */
+PUBLIC NOBLOCK NONNULL((1)) void FCALL
+entropy_readall(USER CHECKED void *buf, size_t num_bytes)
+		THROWS(E_WOULDBLOCK, E_INTERRUPT, E_SEGFAULT) {
+	while (num_bytes) {
+		size_t ok;
+		ok = entropy_read(buf, num_bytes, IO_RDONLY);
+		assert(ok != 0);
+		assert(ok <= num_bytes);
+		buf = (byte_t *)buf + ok;
+		num_bytes -= ok;
+	}
+}
+
+
+/* Similar to `entropy_read()', but implements reads from /dev/urandom.
+ * This function uses a  PRNG which may be  seeded at random points  in
+ * time (but at least once during boot) to generate numbers. */
+PUBLIC NOBLOCK NONNULL((1)) void FCALL
+urandom_read(USER CHECKED void *buf, size_t num_bytes)
+		THROWS(E_SEGFAULT) {
+	while (num_bytes >= 4) {
+		u32 val = krand32();
+		UNALIGNED_SET32((uint32_t *)buf, val);
+		buf = (byte_t *)buf + 4;
+		num_bytes -= 4;
+	}
+	if (num_bytes) {
+		union {
+			u32 r;
+			u8 b[4];
+		} x;
+		x.r = krand32();
+		while (num_bytes--)
+			((u8 *)buf)[num_bytes] = x.b[num_bytes];
+	}
+}
+
+
+
+/* Define the primary entropy-related system call. */
+DEFINE_SYSCALL3(ssize_t, getrandom,
+                USER UNCHECKED void *, buf, size_t, num_bytes,
+                syscall_ulong_t, flags) {
+	ssize_t result;
+
+	/* Validate arguments. */
+	validate_writable(buf, num_bytes);
+	if unlikely(flags & ~(GRND_NONBLOCK | GRND_RANDOM)) {
+		THROW(E_INVALID_ARGUMENT_UNKNOWN_FLAG,
+		      E_INVALID_ARGUMENT_CONTEXT_GETRANDOM_FLAGS,
+		      flags);
+	}
+	if (flags & GRND_RANDOM) {
+#if GRND_NONBLOCK == IO_NONBLOCK
+		iomode_t mode = IO_RDONLY | (flags & GRND_NONBLOCK);
+#else /* GRND_NONBLOCK == IO_NONBLOCK */
+		iomode_t mode = IO_RDONLY;
+		if (flags & GRND_NONBLOCK)
+			mode |= IO_NONBLOCK;
+#endif /* GRND_NONBLOCK != IO_NONBLOCK */
+		result = (ssize_t)entropy_read(buf, num_bytes, mode);
+	} else {
+		urandom_read(buf, num_bytes);
+		result = (ssize_t)num_bytes;
+	}
+	return result;
+}
+
+
+
+
+
 
 #ifdef CONFIG_HAVE_DEBUGGER
 /* Debugger functions to display  entropy information (including a  representation
@@ -324,8 +458,6 @@ DBG_COMMAND(entropy,
 	return 0;
 }
 #endif /* CONFIG_HAVE_DEBUGGER */
-
-
 
 DECL_END
 

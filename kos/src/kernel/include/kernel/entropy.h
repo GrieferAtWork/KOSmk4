@@ -81,12 +81,12 @@ DATDEF struct sig entropy_request_sig;
 
 
 /* Check if at least `num_bits' of entropy are current available.
- * When this is  the case, return  `true'. Otherwise, connect  to
+ * When this is the case,  return `false'. Otherwise, connect  to
  * `entropy_request_sig' and ATOMIC_CMPXCH `entropy_request_bits'
  * such that its value is not larger than `num_bits'. Afterwards,
  * do another check  if sufficient entropy  is available, and  if
- * that  is  the  case  then,  disconnected  and  return  `true'.
- * Otherwise, return `false', following which the caller may  now
+ * that is  the  case  then,  disconnected  and  return  `false'.
+ * Otherwise, return `true', following  which the caller may  now
  * do a call to `task_waitfor()', after which they may repeat the
  * check for additional entropy. */
 FUNDEF WUNUSED __BOOL FCALL
@@ -119,6 +119,34 @@ FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL entropy_give)(void const *buf, size_t num_bits);
 FUNDEF NOBLOCK NOPREEMPT NONNULL((1)) void
 NOTHROW(FCALL entropy_give_nopr)(void const *buf, size_t num_bits);
+
+
+/* Implementation for `read(2)' from `/dev/random', as well
+ * as the  `getrandom(2)' system  call with  `GRND_RANDOM'.
+ *
+ * This function will directly read from the entropy buffer,
+ * returning the number of bytes read. When nothing has  yet
+ * to be read, and nothing can  be read at the moment,  then
+ * either wait for data to become available, throw an  error
+ * `E_WOULDBLOCK', or return `0' (under `IO_NODATAZERO') */
+FUNDEF NOBLOCK WUNUSED NONNULL((1)) size_t FCALL
+entropy_read(USER CHECKED void *buf, size_t num_bytes, iomode_t mode)
+		THROWS(E_WOULDBLOCK, E_SEGFAULT);
+
+/* Same as `entropy_read()', but always fill the entire buffer,
+ * potentially waiting until enough entropy has been generated
+ * before returning. */
+FUNDEF NOBLOCK NONNULL((1)) void FCALL
+entropy_readall(USER CHECKED void *buf, size_t num_bytes)
+		THROWS(E_WOULDBLOCK, E_INTERRUPT, E_SEGFAULT);
+
+
+/* Similar to `entropy_read()', but implements reads from /dev/urandom.
+ * This function uses a  PRNG which may be  seeded at random points  in
+ * time (but at least once during boot) to generate numbers. */
+FUNDEF NOBLOCK NONNULL((1)) void FCALL
+urandom_read(USER CHECKED void *buf, size_t num_bytes)
+		THROWS(E_SEGFAULT);
 
 
 
