@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdbfb9255 */
+/* HASH CRC-32:0xa387e3b4 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -7119,6 +7119,30 @@ __CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,s
  * `str' with  `startswith', returning  the  usual >0,  <0,  ==0. */
 __NAMESPACE_LOCAL_USING_OR_IMPL(strstartcmpz, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) int __NOTHROW_NCX(__LIBCCALL strstartcmpz)(char const *__str, char const *__startswith, size_t __startswith_len) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strstartcmpz))(__str, __startswith, __startswith_len); })
 #endif /* !__CRT_HAVE_strstartcmpz */
+#ifdef __CRT_HAVE_bitcpy
+/* >> bitcpy(3)
+ * Copy exactly `num_bits' from `src_base+(src_bit_offset/NBBY)' to `dst_base+(dst_bit_offset/NBBY)',
+ * doing a byte-wise copy but leaving bits not meant to be copied untouched. Inside of individual
+ * bytes, individual bits are indexed such that the least significant bit is at `0', and the most
+ * significant bit is at `NBBY-1':
+ * >> byte_t src[] = { 0b00001001 };
+ * >> byte_t dst[] = { 0b00000000 };
+ * >> bitcpy(dst, 4, src, 0, 4);
+ * >> assert(dst == 0b10010000); */
+__CDECLARE_VOID(__ATTR_NONNULL((1, 3)),__NOTHROW_NCX,bitcpy,(void *__restrict __dst_base, size_t __dst_bit_offset, void const *__restrict __src_base, size_t __src_bit_offset, size_t __num_bits),(__dst_base,__dst_bit_offset,__src_base,__src_bit_offset,__num_bits))
+#else /* __CRT_HAVE_bitcpy */
+#include <libc/local/string/bitcpy.h>
+/* >> bitcpy(3)
+ * Copy exactly `num_bits' from `src_base+(src_bit_offset/NBBY)' to `dst_base+(dst_bit_offset/NBBY)',
+ * doing a byte-wise copy but leaving bits not meant to be copied untouched. Inside of individual
+ * bytes, individual bits are indexed such that the least significant bit is at `0', and the most
+ * significant bit is at `NBBY-1':
+ * >> byte_t src[] = { 0b00001001 };
+ * >> byte_t dst[] = { 0b00000000 };
+ * >> bitcpy(dst, 4, src, 0, 4);
+ * >> assert(dst == 0b10010000); */
+__NAMESPACE_LOCAL_USING_OR_IMPL(bitcpy, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 3)) void __NOTHROW_NCX(__LIBCCALL bitcpy)(void *__restrict __dst_base, size_t __dst_bit_offset, void const *__restrict __src_base, size_t __src_bit_offset, size_t __num_bits) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(bitcpy))(__dst_base, __dst_bit_offset, __src_base, __src_bit_offset, __num_bits); })
+#endif /* !__CRT_HAVE_bitcpy */
 #endif /* __USE_KOS */
 
 

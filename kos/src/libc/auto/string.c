@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfda98598 */
+/* HASH CRC-32:0xd69ea8f2 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3966,6 +3966,50 @@ NOTHROW_NCX(LIBCCALL libc_strstartcmpz)(char const *str,
 	 * much sense. */
 	return -1;
 }
+#include <hybrid/typecore.h>
+/* >> bitcpy(3)
+ * Copy exactly `num_bits' from `src_base+(src_bit_offset/NBBY)' to `dst_base+(dst_bit_offset/NBBY)',
+ * doing a byte-wise copy but leaving bits not meant to be copied untouched. Inside of individual
+ * bytes, individual bits are indexed such that the least significant bit is at `0', and the most
+ * significant bit is at `NBBY-1':
+ * >> byte_t src[] = { 0b00001001 };
+ * >> byte_t dst[] = { 0b00000000 };
+ * >> bitcpy(dst, 4, src, 0, 4);
+ * >> assert(dst == 0b10010000); */
+INTERN ATTR_SECTION(".text.crt.string.memory") NONNULL((1, 3)) void
+NOTHROW_NCX(LIBCCALL libc_bitcpy)(void *__restrict dst_base,
+                                  size_t dst_bit_offset,
+                                  void const *__restrict src_base,
+                                  size_t src_bit_offset,
+                                  size_t num_bits) {
+	while (num_bits) {
+		byte_t remaining, src_value, remaining_temp;
+		src_base = (byte_t const *)src_base + (src_bit_offset / __CHAR_BIT__);
+		src_bit_offset %= __CHAR_BIT__;
+		remaining = __CHAR_BIT__ - src_bit_offset;
+		if (remaining > num_bits)
+			remaining = num_bits;
+		src_value      = *(byte_t const *)src_base >> src_bit_offset;
+		remaining_temp = remaining;
+		while (remaining_temp) {
+			byte_t avail, dst_value;
+			dst_base = (byte_t *)dst_base + (dst_bit_offset / __CHAR_BIT__);
+			dst_bit_offset %= __CHAR_BIT__;
+			avail = __CHAR_BIT__ - dst_bit_offset;
+			if (avail > remaining_temp)
+				avail = remaining_temp;
+			dst_value = *(byte_t *)dst_base;
+			dst_value &= ~(((1 << avail) - 1) << dst_bit_offset);
+			dst_value |= (src_value & ((1 << avail) - 1)) << dst_bit_offset;
+			*(byte_t *)dst_base = dst_value;
+			dst_bit_offset += avail;
+			remaining_temp -= avail;
+			src_value >>= avail;
+		}
+		src_bit_offset += remaining;
+		num_bits -= remaining;
+	}
+}
 #ifndef __KERNEL__
 INTERN ATTR_SECTION(".text.crt.unicode.static.memory") ATTR_RETNONNULL NONNULL((1)) char *
 NOTHROW_NCX(LIBCCALL libc_strlwr)(char *__restrict str) {
@@ -4480,7 +4524,6 @@ NOTHROW_NCX(LIBCCALL libc_strmode)(mode_t mode,
 	/* NUL-terminate */
 	*p = '\0';
 }
-#include <hybrid/typecore.h>
 /* >> timingsafe_memcmp(3)
  * Compare `s1...+=n_bytes' with `s2...+=n_bytes' in constant, armored `O(n_bytes)'-time
  * @return: <  0: Block `s1' should be considered less than `s2'
@@ -4804,7 +4847,6 @@ DEFINE_PUBLIC_ALIAS(strnicmp, libc_strncasecmp);
 DEFINE_PUBLIC_ALIAS(strncmpi, libc_strncasecmp);
 DEFINE_PUBLIC_ALIAS(strncasecmp, libc_strncasecmp);
 #endif /* !__KERNEL__ */
-#include <hybrid/typecore.h>
 #if !defined(__KERNEL__) && ((__SIZEOF_INT__ == __SIZEOF_LONG__ && !defined(LIBC_ARCH_HAVE_FFSL)) || (__SIZEOF_INT__ == __SIZEOF_LONG_LONG__ && !defined(LIBC_ARCH_HAVE_FFSLL)) || !defined(LIBC_ARCH_HAVE_FFS))
 DEFINE_PUBLIC_ALIAS(__ffs, libc_ffs);
 DEFINE_PUBLIC_ALIAS(ffs, libc_ffs);
@@ -5364,6 +5406,7 @@ DEFINE_PUBLIC_ALIAS(memrevq, libc_memrevq);
 DEFINE_PUBLIC_ALIAS(strcmpz, libc_strcmpz);
 DEFINE_PUBLIC_ALIAS(strstartcmp, libc_strstartcmp);
 DEFINE_PUBLIC_ALIAS(strstartcmpz, libc_strstartcmpz);
+DEFINE_PUBLIC_ALIAS(bitcpy, libc_bitcpy);
 #ifndef __KERNEL__
 #ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_strlwr, libc_strlwr);

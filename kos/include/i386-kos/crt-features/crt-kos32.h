@@ -1454,6 +1454,7 @@
 #define __CRT_HAVE_bindresvport
 #define __CRT_HAVE_bindresvport6
 #define __CRT_HAVE_bindtextdomain
+#define __CRT_HAVE_bitcpy
 #define __CRT_HAVE_brk
 #define __CRT_HAVE_bsd_signal
 #define __CRT_HAVE_bsearch

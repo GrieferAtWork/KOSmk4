@@ -6813,6 +6813,53 @@ int strstartcmpz([[nonnull]] char const *str,
 	 * much sense. */
 	return -1;
 }
+
+
+@@>> bitcpy(3)
+@@Copy exactly `num_bits' from `src_base+(src_bit_offset/NBBY)' to `dst_base+(dst_bit_offset/NBBY)',
+@@doing a byte-wise copy but leaving bits not meant to be copied untouched. Inside of individual
+@@bytes, individual bits are indexed such that the least significant bit is at `0', and the most
+@@significant bit is at `NBBY-1':
+@@>> byte_t src[] = { 0b00001001 };
+@@>> byte_t dst[] = { 0b00000000 };
+@@>> bitcpy(dst, 4, src, 0, 4);
+@@>> assert(dst == 0b10010000);
+[[kernel]]
+[[decl_include("<hybrid/typecore.h>")]]
+[[impl_include("<hybrid/typecore.h>")]]
+void bitcpy([[nonnull]] void *__restrict dst_base, size_t dst_bit_offset,
+            [[nonnull]] void const *__restrict src_base, size_t src_bit_offset,
+            size_t num_bits) {
+	while (num_bits) {
+		byte_t remaining, src_value, remaining_temp;
+		src_base = (byte_t const *)src_base + (src_bit_offset / __CHAR_BIT__);
+		src_bit_offset %= __CHAR_BIT__;
+		remaining = __CHAR_BIT__ - src_bit_offset;
+		if (remaining > num_bits)
+			remaining = num_bits;
+		src_value      = *(byte_t const *)src_base >> src_bit_offset;
+		remaining_temp = remaining;
+		while (remaining_temp) {
+			byte_t avail, dst_value;
+			dst_base = (byte_t *)dst_base + (dst_bit_offset / __CHAR_BIT__);
+			dst_bit_offset %= __CHAR_BIT__;
+			avail = __CHAR_BIT__ - dst_bit_offset;
+			if (avail > remaining_temp)
+				avail = remaining_temp;
+			dst_value = *(byte_t *)dst_base;
+			dst_value &= ~(((1 << avail) - 1) << dst_bit_offset);
+			dst_value |= (src_value & ((1 << avail) - 1)) << dst_bit_offset;
+			*(byte_t *)dst_base = dst_value;
+			dst_bit_offset += avail;
+			remaining_temp -= avail;
+			src_value >>= avail;
+		}
+		src_bit_offset += remaining;
+		num_bits -= remaining;
+	}
+}
+
+
 %#endif /* __USE_KOS */
 
 %

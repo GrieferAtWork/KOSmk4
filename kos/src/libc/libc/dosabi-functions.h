@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1f230d41 */
+/* HASH CRC-32:0x730b2c23 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1820,6 +1820,7 @@ DFUN(".text.crt.dos.string.memory", libd_memrevq, libc_memrevq, TP, 2, TP, TI)
 DFUN(".text.crt.dos.string.memory", libd_strcmpz, libc_strcmpz, TD, 3, TP, TP, TI)
 DFUN(".text.crt.dos.string.memory", libd_strstartcmp, libc_strstartcmp, TD, 2, TP, TP)
 DFUN(".text.crt.dos.string.memory", libd_strstartcmpz, libc_strstartcmpz, TD, 3, TP, TP, TI)
+DFUN(".text.crt.dos.string.memory", libd_bitcpy, libc_bitcpy, TV, 5, TP, TI, TP, TI, TI)
 DFUN(".text.crt.dos.unicode.static.memory", libd_strlwr, libc_strlwr, TP, 1, TP)
 DFUN(".text.crt.dos.unicode.static.memory", libd_strupr, libc_strupr, TP, 1, TP)
 DFUN(".text.crt.dos.string.memory", libd_strset, libc_strset, TP, 2, TP, TD)

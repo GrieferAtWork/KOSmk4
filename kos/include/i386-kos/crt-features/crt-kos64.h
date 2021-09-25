@@ -1295,6 +1295,7 @@
 #define __CRT_HAVE_bindresvport
 #define __CRT_HAVE_bindresvport6
 #define __CRT_HAVE_bindtextdomain
+#define __CRT_HAVE_bitcpy
 #define __CRT_HAVE_brk
 #define __CRT_HAVE_bsd_signal
 #define __CRT_HAVE_bsearch
@@ -5815,6 +5816,7 @@
 #define __CRT_HAVE_KOS$bindresvport
 #define __CRT_HAVE_KOS$bindresvport6
 #define __CRT_HAVE_KOS$bindtextdomain
+#define __CRT_HAVE_KOS$bitcpy
 #define __CRT_HAVE_KOS$brk
 #define __CRT_HAVE_KOS$bsd_signal
 #define __CRT_HAVE_KOS$bsearch
@@ -9217,6 +9219,7 @@
 #define __CRT_HAVE_DOS$bindresvport
 #define __CRT_HAVE_DOS$bindresvport6
 #define __CRT_HAVE_DOS$bindtextdomain
+#define __CRT_HAVE_DOS$bitcpy
 #define __CRT_HAVE_DOS$brk
 #define __CRT_HAVE_DOS$bsd_signal
 #define __CRT_HAVE_DOS$bsearch

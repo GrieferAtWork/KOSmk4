@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfc3c53bb */
+/* HASH CRC-32:0xc2f7ce6c */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2192,6 +2192,28 @@ INTDEF ATTR_PURE WUNUSED NONNULL((1, 2)) int NOTHROW_NCX(LIBDCALL libd_strstartc
  * Compare the first `strnlen(str, startswith_len)' characters of
  * `str' with  `startswith', returning  the  usual >0,  <0,  ==0. */
 INTDEF ATTR_PURE WUNUSED NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc_strstartcmpz)(char const *str, char const *startswith, size_t startswith_len);
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* >> bitcpy(3)
+ * Copy exactly `num_bits' from `src_base+(src_bit_offset/NBBY)' to `dst_base+(dst_bit_offset/NBBY)',
+ * doing a byte-wise copy but leaving bits not meant to be copied untouched. Inside of individual
+ * bytes, individual bits are indexed such that the least significant bit is at `0', and the most
+ * significant bit is at `NBBY-1':
+ * >> byte_t src[] = { 0b00001001 };
+ * >> byte_t dst[] = { 0b00000000 };
+ * >> bitcpy(dst, 4, src, 0, 4);
+ * >> assert(dst == 0b10010000); */
+INTDEF NONNULL((1, 3)) void NOTHROW_NCX(LIBDCALL libd_bitcpy)(void *__restrict dst_base, size_t dst_bit_offset, void const *__restrict src_base, size_t src_bit_offset, size_t num_bits);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+/* >> bitcpy(3)
+ * Copy exactly `num_bits' from `src_base+(src_bit_offset/NBBY)' to `dst_base+(dst_bit_offset/NBBY)',
+ * doing a byte-wise copy but leaving bits not meant to be copied untouched. Inside of individual
+ * bytes, individual bits are indexed such that the least significant bit is at `0', and the most
+ * significant bit is at `NBBY-1':
+ * >> byte_t src[] = { 0b00001001 };
+ * >> byte_t dst[] = { 0b00000000 };
+ * >> bitcpy(dst, 4, src, 0, 4);
+ * >> assert(dst == 0b10010000); */
+INTDEF NONNULL((1, 3)) void NOTHROW_NCX(LIBCCALL libc_bitcpy)(void *__restrict dst_base, size_t dst_bit_offset, void const *__restrict src_base, size_t src_bit_offset, size_t num_bits);
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF ATTR_RETNONNULL NONNULL((1)) char *NOTHROW_NCX(LIBDCALL libd_strlwr)(char *__restrict str);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */

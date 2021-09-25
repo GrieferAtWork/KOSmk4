@@ -271,8 +271,8 @@ STATIC_ASSERT(MPART_ST_NOSC(MPART_ST_SWP_SC) == MPART_ST_SWP);
 
 PRIVATE NOBLOCK NONNULL((1, 3)) void
 NOTHROW(FCALL bitmovedown)(mpart_blkst_word_t *dst_bitset, size_t dst_index,
-                            mpart_blkst_word_t const *src_bitset, size_t src_index,
-                            size_t num_bits) {
+                           mpart_blkst_word_t const *src_bitset, size_t src_index,
+                           size_t num_bits) {
 #define BITSET_INDEX(index) ((index) / BITSOF(mpart_blkst_word_t))
 #define BITSET_SHIFT(index) ((index) % BITSOF(mpart_blkst_word_t))
 #define GETBIT(index)       ((src_bitset[BITSET_INDEX(index)] >> BITSET_SHIFT(index)) & 1)

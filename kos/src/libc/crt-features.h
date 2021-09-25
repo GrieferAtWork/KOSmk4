@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x18c61528 */
+/* HASH CRC-32:0x2007b6f3 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -604,6 +604,7 @@
 #define __CRT_HAVE_DOS$bindresvport
 #define __CRT_HAVE_DOS$bindresvport6
 #define __CRT_HAVE_DOS$bindtextdomain
+#define __CRT_HAVE_DOS$bitcpy
 #define __CRT_HAVE_DOS$brk
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
@@ -3686,6 +3687,9 @@
 #define __CRT_HAVE_bindresvport
 #define __CRT_HAVE_bindresvport6
 #define __CRT_HAVE_bindtextdomain
+#endif /* !__KERNEL__ */
+#define __CRT_HAVE_bitcpy
+#ifndef __KERNEL__
 #define __CRT_HAVE_brk
 #define __CRT_HAVE_bsd_signal
 #define __CRT_HAVE_bsearch

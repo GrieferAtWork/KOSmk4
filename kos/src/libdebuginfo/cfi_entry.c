@@ -660,40 +660,6 @@ NOTHROW_NCX(LIBUNWIND_CC cfi_getreg)(/*struct cfientry **/ void const *arg,
                                      unwind_regno_t dw_regno,
                                      void *__restrict dst);
 
-PRIVATE NONNULL((1, 3)) void CC
-copy_bits(void *__restrict dst_base, unsigned int dst_bit_offset,
-          void const *__restrict src_base, unsigned int src_bit_offset,
-          size_t num_bits) {
-	while (num_bits) {
-		byte_t remaining, src_value, remaining_temp;
-		src_base = (byte_t const *)src_base + (src_bit_offset / NBBY);
-		src_bit_offset %= NBBY;
-		remaining = NBBY - src_bit_offset;
-		if (remaining > num_bits)
-			remaining = num_bits;
-		src_value      = *(byte_t const *)src_base >> src_bit_offset;
-		remaining_temp = remaining;
-		while (remaining_temp) {
-			byte_t avail, dst_value;
-			dst_base = (byte_t *)dst_base + (dst_bit_offset / NBBY);
-			dst_bit_offset %= NBBY;
-			avail = NBBY - dst_bit_offset;
-			if (avail > remaining_temp)
-				avail = remaining_temp;
-			dst_value = *(byte_t const *)dst_base;
-			dst_value &= ~(((1 << avail) - 1) << dst_bit_offset);
-			dst_value |= (src_value & ((1 << avail) - 1)) << dst_bit_offset;
-			*(byte_t *)dst_base = dst_value;
-			dst_bit_offset += avail;
-			remaining_temp -= avail;
-			src_value >>= avail;
-		}
-		src_bit_offset += remaining;
-		num_bits -= remaining;
-	}
-}
-
-
 #ifdef __GNUC__
 /* GCC claims that "expr_length" in  the below function is uninitialized,  when
  * clearly it is very much getting initialized by `debuginfo_location_select()' */
@@ -778,7 +744,7 @@ again_runexpr:
 				missing_bits = (emulator.ue_piecesiz * NBBY) - emulator.ue_piecebits;
 				if (missing_bits > sizeof(addr) * NBBY)
 					missing_bits = sizeof(addr) * NBBY;
-				copy_bits(dst, emulator.ue_piecebits, &addr, 0, missing_bits);
+				bitcpy(dst, emulator.ue_piecebits, &addr, 0, missing_bits);
 			}
 		}
 		return error;
