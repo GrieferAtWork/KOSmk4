@@ -134,7 +134,7 @@ entropy_read(USER CHECKED void *buf, size_t num_bytes, iomode_t mode)
 		THROWS(E_WOULDBLOCK, E_SEGFAULT);
 
 /* Same as `entropy_read()', but always fill the entire buffer,
- * potentially waiting until enough entropy has been generated
+ * potentially  waiting until enough entropy has been generated
  * before returning. */
 FUNDEF NOBLOCK NONNULL((1)) void FCALL
 entropy_readall(USER CHECKED void *buf, size_t num_bytes)
@@ -147,6 +147,46 @@ entropy_readall(USER CHECKED void *buf, size_t num_bytes)
 FUNDEF NOBLOCK NONNULL((1)) void FCALL
 urandom_read(USER CHECKED void *buf, size_t num_bytes)
 		THROWS(E_SEGFAULT);
+
+
+
+/* TODO: `entropy_give' needs to be expanded with a wrapper  API
+ *       for automatic de-biasing  of input data.  While I  have
+ *       no idea how to do this properly, one idea I have is to:
+ * - Enforce fixed-bit-count input chunks and have counters
+ *   for each bit to track how often that was 1, as well as
+ *   an overall counter to track how often data was fed.
+ * - When the overall counter would overflow, divide it by
+ *   2, alongside all other counters.
+ * - With this, we generate a mean of randomness over time.
+ * - Entropy bits are passed to the overall pool one bit at
+ *   a time, using the following code:
+ *   >> size_t num_chunks;     // Total # of chunks
+ *   >>
+ *   >> size_t perbit_num1;    // # of times this bit was 1
+ *   >> bool   perbit_saved;   // Accumulated entropy of this bit
+ *   >> double perbit_worth;   // Accumulated worth of `perbit_saved'
+ *   >>
+ *   >> void handle_bit(bool b) {
+ *   >>     perbit_saved ^= b; // Combine entropy
+ *   >>     if (b != false)
+ *   >>         ++perbit_num1; // Can't possibly overflow
+ *   >>     ++num_chunks;      // Overflow handling is to divide this and perbit_num1 by 2
+ *   >>     double mean  = (double)perbit_num1 / num_chunks; // Average tendency over time
+ *   >>     double error = 2.0 * fabs(0.5 - mean);           // How close is the mean to the perfect mean of 0.5
+ *   >>     double worth = 1.0 - error;                      // How much worth to assign to the given `b'
+ *   >>     // The value appears to be truely random <worth*100>% of the time
+ *   >>     perbit_worth += worth;                           // Accumulate worth over time
+ *   >>     if (perbit_worth >= 1.0) {                       // With enough worth to approximate
+ *   >>                                                      // the mean, post combined bit entropy
+ *   >>         ADD_TO_GLOBAL_POOL(perbit_saved);
+ *   >>         perbit_worth -= 1.0;
+ *   >>     }
+ *   >> }
+ *   >>
+ *
+ */
+
 
 
 

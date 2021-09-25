@@ -26,7 +26,10 @@
 
 #include <kernel/compiler.h>
 
+#include <kernel/entropy.h>
 #include <kernel/isr.h>
+#include <sched/cpu.h>
+#include <sched/tsc.h>
 
 #include <hybrid/atomic.h>
 
@@ -34,6 +37,11 @@
 #include <stddef.h>
 
 DECL_BEGIN
+
+PRIVATE NOBLOCK NOPREEMPT void
+NOTHROW(FCALL seed_entropy)(void) {
+	entropy_giveint_nopr(tsc_get(THIS_CPU), 1);
+}
 
 /* Handle an unexpected ATA interrupt. */
 PRIVATE NOBLOCK NOPREEMPT bool
@@ -53,6 +61,7 @@ NOTHROW(FCALL AtaBus_HW_DmaInterruptHandler)(AtaBus *__restrict self) {
 	dma_status = inb(self->ab_dmaio + DMA_PRIMARY_STATUS);
 	if (!(dma_status & DMA_STATUS_FINTERRUPTED))
 		return false; /* This bus didn't assert an interrupt */
+	seed_entropy();
 	outb(self->ab_dmaio + DMA_PRIMARY_STATUS,
 	     DMA_STATUS_FDMARUNNING |
 	     DMA_STATUS_FINTERRUPTED);
@@ -109,6 +118,7 @@ NOTHROW(FCALL AtaBus_HW_DmaInterruptHandler)(AtaBus *__restrict self) {
 INTERN NOBLOCK NOPREEMPT bool
 NOTHROW(FCALL AtaBus_HW_InterruptHandler)(AtaBus *__restrict self) {
 	u8 status;
+	seed_entropy();
 	/* BUS without DMA support */
 	status = inb(self->ab_busio + ATA_STATUS);
 	ATA_VERBOSE("[ata] IDE interrupt on "

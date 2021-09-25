@@ -62,7 +62,7 @@ NOTHROW(FCALL ps2_keyboard_postkey)(struct ps2_keyboard *__restrict self, u16 ke
 	 * ness when it comes to how fast they type. */
 	bits = 3;
 	if (KEY_ISUP(key))
-		bits = 9;
+		bits = 12;
 	entropy_giveint_nopr(tsc_get(THIS_CPU), bits);
 
 #if 1
