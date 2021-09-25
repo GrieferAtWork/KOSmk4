@@ -28,6 +28,7 @@
 #include <dev/keyboard.h>
 #include <kernel/driver-param.h>
 #include <kernel/driver.h>
+#include <kernel/entropy.h>
 #include <kernel/isr.h>
 #include <kernel/printk.h>
 #include <kernel/types.h>
@@ -47,9 +48,11 @@ DECL_BEGIN
 
 PRIVATE REF struct ps2_keyboard *ps2_keyboards[PS2_PORTCOUNT];
 
-PRIVATE NOBLOCK void
+PRIVATE NOBLOCK NOPREEMPT void
 NOTHROW(FCALL ps2_keyboard_postkey)(struct ps2_keyboard *__restrict self, u16 key) {
 	assert(key != KEY_NONE); /* Use KEY_UNKNOWN instead! */
+	entropy_giveint_nopr(tsc_get(THIS_CPU), 3); /* Feed a little bit of entropy */
+
 #if 1
 	printk(KERN_DEBUG "[ps2:%q] Post key %#.4I16x [state=%u]\n",
 	       self->cd_name, key, (unsigned int)self->pk_state);
@@ -61,7 +64,7 @@ NOTHROW(FCALL ps2_keyboard_postkey)(struct ps2_keyboard *__restrict self, u16 ke
 	}
 }
 
-PRIVATE NOBLOCK void
+PRIVATE NOBLOCK NOPREEMPT void
 NOTHROW(FCALL ps2_keyboard_do_handle_isr)(struct ps2_keyboard *__restrict self) {
 	u8 data = inb(PS2_DATA);
 	if (data == 0xfa)
@@ -333,7 +336,7 @@ done:
 }
 
 
-PRIVATE NOBLOCK bool
+PRIVATE NOBLOCK NOPREEMPT bool
 NOTHROW(FCALL ps2_keyboard_isr_handler)(void *arg) {
 	u8 status = inb(PS2_STATUS);
 	struct ps2_keyboard *me;

@@ -24,6 +24,7 @@
 #include <kernel/compiler.h>
 
 #include <debugger/rt.h> /* dbg_active */
+#include <kernel/entropy.h>
 #include <kernel/panic.h>
 #include <kernel/printk.h>
 #include <sched/atomic64.h>
@@ -152,7 +153,9 @@ NOTHROW(FCALL tsc_resync_interrupt)(ktime_t curr_ktime) {
 			break;
 		now.ts_kt = temp;
 	}
+	entropy_giveint_nopr(now.ts_tsc, 3); /* Feed a little bit of entropy */
 	COMPILER_BARRIER();
+
 	/*
 	 * Create a projection:
 	 *

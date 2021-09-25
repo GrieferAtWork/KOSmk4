@@ -23,6 +23,7 @@
 
 #include <kernel/compiler.h>
 
+#include <kernel/entropy.h>
 #include <kernel/printk.h>
 #include <sched/cpu.h>
 #include <sched/scheduler.h>
@@ -1141,6 +1142,7 @@ NOTHROW(FCALL tsc_deadline_passed)(struct cpu *__restrict me,
 	/* Calculate the current scheduler time. */
 again_with_tsc_now:
 	now = tsc_now_to_ktime(me, tsc_now);
+	entropy_giveint_nopr(now, 3); /* Feed a little bit of entropy */
 again:
 	/* Select the thread with the lowest stop-time as successor. */
 	next          = sched_s_running_first;
