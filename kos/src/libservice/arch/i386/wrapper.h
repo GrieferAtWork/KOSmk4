@@ -716,9 +716,9 @@ STATIC_ASSERT(IS_ALIGNED(offsetof(struct service_com, sc_generic.g_data), 4));
  * >>     movP   0(%Pdx), %Pcx
  * >> #else // __x86_64__
  * >>     pushl_cfi 0(%Pdx)
- * >> //  .cfi_escape DW_CFA_GNU_args_size, 4  # Not needed because `libservice_shmbuf_freeat_nopr()' is NOTHROW
+ * >> //  .cfi_escape DW_CFA_GNU_args_size, 4  # Not needed because `libservice_shmbuf_freeat_fast_nopr()' is NOTHROW
  * >>     pushl_cfi %Pdx
- * >> //  .cfi_escape DW_CFA_GNU_args_size, 8  # Not needed because `libservice_shmbuf_freeat_nopr()' is NOTHROW
+ * >> //  .cfi_escape DW_CFA_GNU_args_size, 8  # Not needed because `libservice_shmbuf_freeat_fast_nopr()' is NOTHROW
  * >> #endif // !__x86_64__
  * >>     movP   LOC_bufpar_shm(%Psp), %R_fcall1P
  * >>     movP   LOC_upm(%Psp), %Pax
@@ -730,10 +730,10 @@ STATIC_ASSERT(IS_ALIGNED(offsetof(struct service_com, sc_generic.g_data), 4));
  * >>     movP   $<cg_service>, %R_fcall0P
  * >>     movP   $full_sigset,  userprocmask::pm_sigmask(%Pax) # re-disable preemption
  * >> #endif // !__x86_64__ || $full_sigset <= 0xffffffff
- * >>     call   libservice_shmbuf_freeat_nopr
+ * >>     call   libservice_shmbuf_freeat_fast_nopr
  * >> #ifndef __x86_64__
  * >>     .cfi_adjust_cfa_offset -8
- * >> //  .cfi_escape DW_CFA_GNU_args_size, 0  # Not needed because `libservice_shmbuf_freeat_nopr()' is NOTHROW
+ * >> //  .cfi_escape DW_CFA_GNU_args_size, 0  # Not needed because `libservice_shmbuf_freeat_fast_nopr()' is NOTHROW
  * >> #endif // !__x86_64__
  * >> 1:
  * >> #endif // cg_buf_paramc != 0
@@ -748,9 +748,9 @@ STATIC_ASSERT(IS_ALIGNED(offsetof(struct service_com, sc_generic.g_data), 4));
  * >>     movq   %R_service_com,    %rdx
  * >> #else // __x86_64__
  * >>     pushl_cfi 0(%R_service_com)
- * >> //  .cfi_escape DW_CFA_GNU_args_size, 4  # Not needed because `libservice_shmbuf_freeat_nopr()' is NOTHROW
+ * >> //  .cfi_escape DW_CFA_GNU_args_size, 4  # Not needed because `libservice_shmbuf_freeat_fast_nopr()' is NOTHROW
  * >>     pushl_cfi %R_service_com
- * >> //  .cfi_escape DW_CFA_GNU_args_size, 8  # Not needed because `libservice_shmbuf_freeat_nopr()' is NOTHROW
+ * >> //  .cfi_escape DW_CFA_GNU_args_size, 8  # Not needed because `libservice_shmbuf_freeat_fast_nopr()' is NOTHROW
  * >> #endif // !__x86_64__
  * >>     movP   LOC_shm(%Psp), %R_fcall1P
  * >> #ifdef __x86_64__
@@ -774,10 +774,10 @@ STATIC_ASSERT(IS_ALIGNED(offsetof(struct service_com, sc_generic.g_data), 4));
  * >> #else // cg_buf_paramc == 0
  * >>     movP   $<cg_service>, %R_fcall0P
  * >> #endif // cg_buf_paramc != 0
- * >>     call   libservice_shmbuf_freeat_nopr
+ * >>     call   libservice_shmbuf_freeat_fast_nopr
  * >> #ifndef __x86_64__
  * >>     .cfi_adjust_cfa_offset -8
- * >> //  .cfi_escape DW_CFA_GNU_args_size, 0  # Not needed because `libservice_shmbuf_freeat_nopr()' is NOTHROW
+ * >> //  .cfi_escape DW_CFA_GNU_args_size, 0  # Not needed because `libservice_shmbuf_freeat_fast_nopr()' is NOTHROW
  * >> #endif // !__x86_64__
  * >>
  * >>
@@ -957,7 +957,7 @@ STATIC_ASSERT(IS_ALIGNED(offsetof(struct service_com, sc_generic.g_data), 4));
  * >>     movP   $<cg_service>, %R_fcall0P
  * >>     movP   $full_sigset,  userprocmask::pm_sigmask(%Pax) # re-disable preemption
  * >> #endif // !__x86_64__ || $full_sigset <= 0xffffffff
- * >>     call   libservice_shmbuf_freeat_nopr
+ * >>     call   libservice_shmbuf_freeat_fast_nopr
  * >> #ifndef __x86_64__
  * >>     .cfi_adjust_cfa_offset -8
  * >> #endif // !__x86_64__
@@ -986,7 +986,7 @@ STATIC_ASSERT(IS_ALIGNED(offsetof(struct service_com, sc_generic.g_data), 4));
  * >>     movP   $<cg_service>, %R_fcall0P
  * >>     movP   $full_sigset,  userprocmask::pm_sigmask(%Pax) # re-disable preemption
  * >> #endif // !__x86_64__ || $full_sigset <= 0xffffffff
- * >>     call   libservice_shmbuf_freeat_nopr
+ * >>     call   libservice_shmbuf_freeat_fast_nopr
  * >> #ifndef __x86_64__
  * >>     .cfi_adjust_cfa_offset -8
  * >> #endif // !__x86_64__

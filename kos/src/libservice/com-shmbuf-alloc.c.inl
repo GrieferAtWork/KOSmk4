@@ -45,10 +45,66 @@ libservice_shmbuf_alloc_nopr(struct service *__restrict self,
 		THROWS(E_BADALLOC)
 #endif /* !DEFINE_libservice_shmbuf_alloc_nopr_nx */
 {
-	/* TODO */
-	(void)self;
-	(void)num_bytes_with_extra;
-	abort();
+	unsigned int bucket_index;
+	struct service_shm_free *range;
+	void *result_ptr;
+	size_t result_siz;
+	REF struct service_shm_handle *result_shm;
+	bucket_index = SERVICE_FREE_LIST_INDEX(num_bytes_with_extra);
+	libservice_shmlock_acquire_nopr(self);
+again:
+	do {
+		range = LIST_FIRST(&self->s_shm_freelist[bucket_index]);
+		if (range) {
+			/* Allocate from `range' */
+			size_t unused;
+			result_siz = service_shm_free_getsize(range);
+			assert(result_siz >= num_bytes_with_extra);
+			unused = result_siz - num_bytes_with_extra;
+			if (unused >= SERVICE_SHM_ALLOC_MINSIZE) {
+				result_ptr = range;
+				result_siz = num_bytes_with_extra;
+				/* Re-insert unused memory into the heap buffer. */
+				service_insert_freearea(self, (byte_t *)result_ptr + result_siz, unused);
+			} else {
+				/* Allocate the entire range. */
+				result_ptr = range;
+			}
+			goto done;
+		}
+	} while (++bucket_index < SERVICE_FREE_LIST_COUNT);
+
+	/* Must increase the SHM file's size. */
+	{
+		size_t pagesize = getpagesize();
+		size_t newsize;
+		newsize = self->s_fd_shm_size + num_bytes_with_extra;
+		newsize = CEIL_ALIGN(newsize, pagesize);
+#ifdef DEFINE_libservice_shmbuf_alloc_nopr_nx
+		if (!service_shmbuf_increase_file_size_locked_nopr(self, newsize, true)) {
+			libservice_shmlock_release_nopr(self);
+			return service_buf_make(NULL, NULL);
+		}
+#else /* DEFINE_libservice_shmbuf_alloc_nopr_nx */
+		TRY {
+			service_shmbuf_increase_file_size_locked_nopr(self, newsize, false);
+		} EXCEPT {
+			libservice_shmlock_release_nopr(self);
+			RETHROW();
+		}
+#endif /* !DEFINE_libservice_shmbuf_alloc_nopr_nx */
+	}
+
+	/* Search for the newly added free range. */
+	bucket_index = SERVICE_FREE_LIST_INDEX(num_bytes_with_extra);
+	goto again;
+
+done:
+	result_shm = incref(self->s_shm);
+	libservice_shmlock_release_nopr(self);
+	*(size_t *)result_ptr = result_siz;
+	result_ptr = (byte_t *)result_ptr + sizeof(size_t);
+	return service_buf_make(result_ptr, result_shm);
 }
 
 DECL_END

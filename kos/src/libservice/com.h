@@ -326,8 +326,11 @@ struct service_shm {
 struct service;
 struct service_shm_handle {
 	WEAK refcnt_t              ssh_refcnt;   /* Reference counter. */
-	struct service_shm        *ssh_shm;      /* [1..(ssh_endp-.)][owned][const] Shared memory region base address.
-	                                          * This pointer  is the  result of  `mmap(fd: ssh_service->s_fd_shm)' */
+	union {
+		struct service_shm    *ssh_shm;      /* [1..(ssh_endp-.)][owned][const] Shared memory region base address.
+		                                      * This pointer  is the  result of  `mmap(fd: ssh_service->s_fd_shm)' */
+		byte_t                *ssh_base;     /* [1..(ssh_endp-.)][const] Base address */
+	};
 	byte_t                    *ssh_endp;     /* [lock(READ(ATOMIC), WRITE(ATOMIC && INCREASE_ONLY &&
 	                                          *                           ssh_service->s_shm_lock)]
 	                                          * Shared memory region end pointer may not be reduced */
@@ -352,6 +355,7 @@ __DEFINE_REFCOUNT_FUNCTIONS(struct service_shm_handle, ssh_refcnt, service_shm_h
 /* Helpers for operating with SHM handle tree functions. */
 #define service_shm_handle_getminaddr(self) ((byte_t *)(self)->ssh_shm)
 #define service_shm_handle_getmaxaddr(self) ((self)->ssh_endp - 1)
+#define service_shm_handle_getsize(self)    ((size_t)((self)->ssh_endp - (byte_t *)(self)->ssh_shm))
 
 
 /* Allocate a new SHM handle. Note that these functions are non-blocking
@@ -370,10 +374,12 @@ NOTHROW(FCALL service_shm_handle_free_nopr)(struct service_shm_handle *__restric
 struct service_shm_free;
 LIST_HEAD(service_shm_free_list, service_shm_free);
 struct service_shm_free {
-	RBTREE_NODE(service_shm_free) ssf_node;   /* [lock(:s_shm_lock)] Node tree. */
-	LIST_ENTRY(service_shm_free)  ssf_bysize; /* [lock(:s_shm_lock)] Link entry for free ranges by size. */
-	size_t                        ssf_size;   /* [lock(:s_shm_lock)] Node size. */
+	LLRBTREE_NODE(service_shm_free) ssf_node;   /* [lock(:s_shm_lock)] Node tree. */
+	LIST_ENTRY(service_shm_free)    ssf_bysize; /* [lock(:s_shm_lock)] Link entry for free ranges by size. */
+	size_t                          ssf_size;   /* [lock(:s_shm_lock)] Node size. (NOTE: least significant bit is `SERVICE_SHM_FREE_REDBIT') */
 };
+#define SERVICE_SHM_FREE_REDBIT 1 /* For `service_shm_free::ssf_size': this is a red node */
+
 
 /* The minimum size of a free block of SHM memory, and thus also the minimum
  * size for an allocation. We subtract */
@@ -384,7 +390,8 @@ struct service_shm_free {
 
 /* Helpers for operating with free range tree functions. */
 #define service_shm_free_getminaddr(self) ((byte_t *)(self))
-#define service_shm_free_getmaxaddr(self) ((byte_t *)(self) + (self)->ssf_size - 1)
+#define service_shm_free_getmaxaddr(self) ((byte_t *)(self) + ((self)->ssf_size & ~SERVICE_SHM_FREE_REDBIT) - 1)
+#define service_shm_free_getsize(self)    ((self)->ssf_size & ~SERVICE_SHM_FREE_REDBIT)
 
 
 #define SERVICE_FREE_LIST_COUNT  7 /* Number of free list buckets. */
@@ -408,9 +415,11 @@ struct service {
 	                                                   * Current SHM  mapping. (may  be altered  when size  needs to  be
 	                                                   * increased, yet doing so isn't possible due to size constraints) */
 	LLRBTREE_ROOT(service_shm_handle) s_shm_tree;     /* [1..n][owned][lock(s_shm_lock)] Tree of all (non-free'd) SHM handles. */
-	RBTREE_ROOT(service_shm_free)     s_shm_freetree; /* [lock(s_shm_lock)] Tree of free nodes. (Pointers within all of these are relative to `s_shm') */
+	LLRBTREE_ROOT(service_shm_free)   s_shm_freetree; /* [lock(s_shm_lock)] Tree of free nodes. (Pointers within all of these are relative to `s_shm') */
 	struct service_shm_free_list      s_shm_freelist[SERVICE_FREE_LIST_COUNT];
 	                                                  /* [lock(s_shm_lock)] Free list by size. (Pointers within all of these are relative to `s_shm') */
+	size_t                            s_fd_shm_size;  /* [lock(s_shm_lock)][== service_shm_handle_getsize(s_shm)]
+	                                                   * Page-aligned, allocated file-size of `s_fd_shm' (s.a. `ftruncate(2)') */
 	fd_t                              s_fd_srv;       /* [const][owned] File descriptor for the unix domain socket connected to the server. */
 	fd_t                              s_fd_shm;       /* [const][owned] File descriptor for the shared memory region. */
 	/* TODO: Allocation helpers for mapping PROT_EXEC memory (for use by arch-specific wrapper function generators) */
@@ -561,7 +570,7 @@ libservice_shmbuf_alloc_nopr(struct service *__restrict self,
  * previously-allocated buffer!
  *
  * This function is simply used to implement `service_buffer_realloc'. */
-INTDEF NOBLOCK NOPREEMPT WUNUSED NONNULL((1, 3)) size_t
+INTDEF NOBLOCK NOPREEMPT WUNUSED NONNULL((1, 2, 3)) size_t
 NOTHROW(FCALL libservice_shmbuf_allocat_nopr)(struct service *__restrict self,
                                               struct service_shm_handle *__restrict shm,
                                               void *ptr, size_t num_bytes);
@@ -570,14 +579,23 @@ NOTHROW(FCALL libservice_shmbuf_allocat_nopr)(struct service *__restrict self,
  * @assume(num_bytes >= SERVICE_SHM_ALLOC_MINSIZE);
  * @assume(IS_ALIGNED(ptr, SERVICE_SHM_ALLOC_ALIGN));
  * @assume(shm == libservice_shm_handle_ataddr_nopr(self, ptr)); */
-INTDEF NOBLOCK NOPREEMPT NONNULL((1, 3)) void
+INTDEF NOBLOCK NOPREEMPT NONNULL((1, 2, 3)) void
 NOTHROW(FCALL libservice_shmbuf_freeat_nopr)(struct service *__restrict self,
                                              REF struct service_shm_handle *__restrict shm,
                                              void *ptr, size_t num_bytes);
+/* Same as `libservice_shmbuf_freeat_nopr()', but don't try to truncate the SHM file. */
+INTDEF NOBLOCK NOPREEMPT NONNULL((1, 2, 3)) void
+NOTHROW(FCALL libservice_shmbuf_freeat_fast_nopr)(struct service *__restrict self,
+                                                  REF struct service_shm_handle *__restrict shm,
+                                                  void *ptr, size_t num_bytes);
 #define libservice_shmbuf_free_nopr(self, shm, ptr)                     \
 	libservice_shmbuf_freeat_nopr(self, shm,                            \
 	                              libservice_shmbuf_get_base_addr(ptr), \
 	                              libservice_shmbuf_get_total_size(ptr))
+#define libservice_shmbuf_free_fast_nopr(self, shm, ptr)                     \
+	libservice_shmbuf_freeat_fast_nopr(self, shm,                            \
+	                                   libservice_shmbuf_get_base_addr(ptr), \
+	                                   libservice_shmbuf_get_total_size(ptr))
 
 
 

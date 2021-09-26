@@ -2681,7 +2681,7 @@ NOTHROW(FCALL comgen_deserialize_buffer_arguments)(struct com_generator *__restr
  * >>     movP   $<cg_service>, %R_fcall0P
  * >>     movP   $full_sigset,  userprocmask::pm_sigmask(%Pax) # re-disable preemption
  * >> #endif // !__x86_64__ || $full_sigset <= 0xffffffff
- * >>     call   libservice_shmbuf_freeat_nopr
+ * >>     call   libservice_shmbuf_freeat_fast_nopr
  * >> #ifndef __x86_64__
  * >>     .cfi_adjust_cfa_offset -8
  * >> #endif // !__x86_64__ */
@@ -2722,8 +2722,8 @@ NOTHROW(FCALL comgen_disable_preemption_and_call_libservice_shmbuf_freeat_nopr)(
 		                                     GEN86_R_PAX));
 	}
 
-	/* >> call   libservice_shmbuf_freeat_nopr */
-	comgen_instr(self, gen86_call(&self->cg_txptr, &libservice_shmbuf_freeat_nopr));
+	/* >> call   libservice_shmbuf_freeat_fast_nopr */
+	comgen_instr(self, gen86_call(&self->cg_txptr, &libservice_shmbuf_freeat_fast_nopr));
 
 #ifndef __x86_64__
 	/* >> .cfi_adjust_cfa_offset -8 */
@@ -2836,7 +2836,7 @@ NOTHROW(FCALL comgen_free_xbuf)(struct com_generator *__restrict self) {
  * >> #else // cg_buf_paramc == 0
  * >>     movP   $<cg_service>, %R_fcall0P
  * >> #endif // cg_buf_paramc != 0
- * >>     call   libservice_shmbuf_freeat_nopr
+ * >>     call   libservice_shmbuf_freeat_fast_nopr
  * >> #ifndef __x86_64__
  * >>     .cfi_adjust_cfa_offset -8
  * >> #endif // !__x86_64__ */
@@ -2926,8 +2926,8 @@ NOTHROW(FCALL comgen_free_combuf)(struct com_generator *__restrict self) {
 		comgen_instr(self, gen86_movP_imm_r(&self->cg_txptr, self->cg_service, GEN86_R_FCALL0P));
 	}
 
-	/* >> call   libservice_shmbuf_freeat_nopr */
-	comgen_instr(self, gen86_call(&self->cg_txptr, &libservice_shmbuf_freeat_nopr));
+	/* >> call   libservice_shmbuf_freeat_fast_nopr */
+	comgen_instr(self, gen86_call(&self->cg_txptr, &libservice_shmbuf_freeat_fast_nopr));
 
 #ifndef __x86_64__
 	/* >> .cfi_adjust_cfa_offset -8 */
