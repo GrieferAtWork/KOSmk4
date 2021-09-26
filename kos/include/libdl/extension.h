@@ -148,6 +148,13 @@ struct dlmodule_format {
 	byte_t df_magic[((DL_MODULE_MAXMAGIC + (__SIZEOF_POINTER__ - 1)) & ~(__SIZEOF_POINTER__ - 1)) + (__SIZEOF_POINTER__ - 1)];
 	byte_t df_magsz; /* Length of this format's magic header. <= DL_MODULE_MAXMAGIC */
 
+	struct dlcore_ops       *df_core; /* [1..1] Initialized by the libdl core: A jump-table of callbacks defined by the core. */
+#ifdef __BUILDING_LIBDL
+	struct dlmodule_format  *df_next; /* [1..1] Next dl module extension format. */
+#else /* __BUILDING_LIBDL */
+	struct dlmodule_format *_df_next; /* [1..1] Next dl module extension format. */
+#endif /* !__BUILDING_LIBDL */
+
 	/* [1..1] Open  a  DL  module,  given   a  header,  filename  and  file   descriptor.
 	 * NOTE: This function is only called when `memcmp(header, df_magic, df_magsz) == 0'! */
 	NONNULL((1, 2)) __REF DlModule *(LIBDL_CC *df_open)(byte_t const header[DL_MODULE_MAXMAGIC],
@@ -212,13 +219,6 @@ struct dlmodule_format {
 	                       __dl_iterator_callback callback, void *arg);
 
 	/* Add more functions here. */
-
-	struct dlcore_ops      *df_core; /* [1..1] Initialized by the libdl core: A jump-table of callbacks defined by the core. */
-#ifdef __BUILDING_LIBDL
-	struct dlmodule_format *df_next; /* [1..1] Next dl module extension format. */
-#else /* __BUILDING_LIBDL */
-	struct dlmodule_format *_df_next; /* [1..1] Next dl module extension format. */
-#endif /* !__BUILDING_LIBDL */
 };
 
 

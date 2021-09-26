@@ -46,7 +46,267 @@
 #include <syslog.h>
 #include <unistd.h>
 
+/************************************************************************/
+/* Config option: enable support for libservice modules                 */
+/************************************************************************/
+#undef CONFIG_DLOPEN_LIBSERVICE_SUPPORT
+#if 1
+#define CONFIG_DLOPEN_LIBSERVICE_SUPPORT 1
+#endif
+
+
+#ifdef CONFIG_DLOPEN_LIBSERVICE_SUPPORT
+#include <libservice/client.h>
+#endif /* CONFIG_DLOPEN_LIBSERVICE_SUPPORT */
+
 DECL_BEGIN
+
+
+#ifdef CONFIG_DLOPEN_LIBSERVICE_SUPPORT
+struct dl_service_module {
+	byte_t          dsm_module[offsetof(DlModule, dm_elf)]; /* Standard module fields. */
+	struct service *dsm_service; /* [1..1] The associated service controller (defined in libservice). */
+};
+
+/*  */
+PRIVATE size_t libservice_inuse = 0;
+
+/* [1..1][valid_if(libservice_inuse > 0)] Libservice library handle. */
+PRIVATE REF DlModule *libservice          = NULL;
+PRIVATE PSERVICE_OPEN pdyn_service_open   = NULL;
+PRIVATE PSERVICE_DLSYM pdyn_service_dlsym = NULL;
+PRIVATE PSERVICE_CLOSE pdyn_service_close = NULL;
+#define service_open  (*pdyn_service_open)
+#define service_dlsym (*pdyn_service_dlsym)
+#define service_close (*pdyn_service_close)
+
+/* Try to open libservice and increment `libservice_inuse' */
+PRIVATE WUNUSED bool CC libservice_open(void) {
+	REF DlModule *_libservice;
+	size_t count;
+again:
+	count = ATOMIC_READ(libservice_inuse);
+	if (count >= 1) {
+		if (!ATOMIC_CMPXCH_WEAK(libservice_inuse, count, count + 1))
+			goto again;
+		/* Library had already been loaded. */
+		return true;
+	}
+	/* Quick check: did a previous attempt at loading libservice fail? */
+	if (ATOMIC_READ(libservice) == (REF DlModule *)-1)
+		return false;
+	_libservice = libdl_dlopen(LIBSERVICE_LIBRARY_NAME, RTLD_LOCAL);
+	if unlikely(!_libservice)
+		goto failed;
+
+	/* Load symbols. */
+	*(void **)&pdyn_service_open  = libdl_dlsym(_libservice, "service_open");
+	*(void **)&pdyn_service_dlsym = libdl_dlsym(_libservice, "service_dlsym");
+	*(void **)&pdyn_service_close = libdl_dlsym(_libservice, "service_close");
+	COMPILER_BARRIER();
+	if unlikely(!pdyn_service_open || !pdyn_service_dlsym || !pdyn_service_close) {
+		libdl_dlclose(_libservice);
+		goto failed;
+	}
+
+	/* Write-back the libservice handle. */
+	ATOMIC_WRITE(libservice, _libservice);
+
+	/* The  only reason why  this cmpxch can fail  is when another thread
+	 * has  also loaded the library at the same time we just did. In this
+	 * case all of the function pointers were loaded twice (since we know
+	 * that we used the same library handle as that other thread did,  as
+	 * `libdl_dlopen()'  will  simply  re-return references  to  the same
+	 * library when that library was already loaded).
+	 * As such, the fact that we succeeded to load everything also  lets
+	 * us  assume that said other thread managed to accomplish the same,
+	 * in which case all that's  still left to do is  to get rid of  the
+	 * second reference to libservice (since we also got one above), and
+	 * to increment the global in-use counter from 1 to 2 (which is done
+	 * by the normal code-path above) */
+	if (!ATOMIC_CMPXCH(libservice_inuse, 0, 1)) {
+		decref_unlikely(_libservice);
+		goto again;
+	}
+	return true;
+failed:
+	ATOMIC_WRITE(libservice, (REF DlModule *)-1);
+	return false;
+}
+
+/* Decrement `libservice_inuse' and close libservice once that drops to 0 */
+PRIVATE void CC libservice_close(void) {
+	REF DlModule *_libservice;
+	/* The read order here is important, as `libservice' becomes
+	 * invalid  the second that `libservice_inuse' drops to `0'! */
+	COMPILER_BARRIER();
+	_libservice = libservice;
+	COMPILER_BARRIER();
+	if (ATOMIC_DECFETCH(libservice_inuse) == 0)
+		decref(_libservice);
+}
+
+PRIVATE ATTR_MALLOC WUNUSED char *
+NOTHROW_RPC(CC realpath_s_malloc)(USER char const *filename) {
+	char *resolved, *buffer;
+	ssize_t result;
+	size_t bufsize;
+	/* Automatically allocate + determine buffer size. */
+	bufsize = PATH_MAX;
+	buffer  = (char *)malloc(bufsize);
+	if unlikely(!buffer)
+		bufsize = 0;
+	for (;;) {
+		result = sys_frealpathat(AT_FDCWD, filename,
+		                         buffer, bufsize,
+		                         AT_READLINK_REQSIZE);
+		if unlikely(E_ISERR(result))
+			goto err_buffer;
+		if likely((size_t)result <= bufsize)
+			break;
+		/* Allocate the required amount of memory. */
+		resolved = (char *)realloc(buffer, (size_t)result);
+		if unlikely(!resolved)
+			goto err_buffer;
+		bufsize = (size_t)result;
+		buffer  = resolved;
+	}
+	if ((size_t)result != bufsize) {
+		resolved = (char *)realloc(buffer, (size_t)result);
+		if likely(resolved)
+			buffer = resolved;
+	}
+	return buffer;
+err_buffer:
+	free(buffer);
+/*err:*/
+	return NULL;
+}
+
+
+
+/* @return: * : One of `DLMODULE_FORMAT_DLSYM_*' */
+PRIVATE NONNULL((1, 2, 3)) int LIBDL_CC
+service_module_dlsym(DlModule *__restrict self,
+                     char const *__restrict symbol_name,
+                     void **__restrict psymbol_addr,
+                     size_t *psymbol_size) {
+	void *addr;
+	struct dl_service_module *me;
+	me = (struct dl_service_module *)self;
+
+	/* Lookup the symbol address. */
+	addr = service_dlsym(me->dsm_service, symbol_name);
+	if (!addr)
+		return DLMODULE_FORMAT_DLSYM_ERROR;
+
+	/* Write-back results. */
+	*psymbol_addr = addr;
+	if (psymbol_size)
+		*psymbol_size = 0;
+	return DLMODULE_FORMAT_DLSYM_OK;
+}
+
+
+PRIVATE NONNULL((1)) void LIBDL_CC
+service_module_fini(DlModule *__restrict self) {
+	struct dl_service_module *me;
+	me = (struct dl_service_module *)self;
+
+	/* Close the service. */
+	service_close(me->dsm_service);
+
+	/* (maybe) close libservice. */
+	libservice_close();
+}
+
+PRIVATE struct dlmodule_format service_module_format = {};
+PRIVATE ATTR_RETNONNULL WUNUSED struct dlmodule_format *
+NOTHROW(CC get_service_module_format)(void) {
+	if (!service_module_format.df_fini) {
+		service_module_format.df_dlsym = &service_module_dlsym;
+		COMPILER_WRITE_BARRIER();
+		service_module_format.df_fini = &service_module_fini;
+		COMPILER_WRITE_BARRIER();
+	}
+	return &service_module_format;
+}
+
+
+
+PRIVATE WUNUSED NONNULL((1)) REF_IF(!(return->dm_flags & RTLD_NODELETE)) DlModule *CC
+DlModule_OpenService(USER char const *filename, unsigned int mode) THROWS(E_SEGFAULT, ...) {
+	struct dl_service_module *result;
+	DlModule *mod;
+	result = (struct dl_service_module *)malloc(sizeof(struct dl_service_module));
+	if unlikely(!result)
+		goto err_nomem;
+	if (!libservice_open()) {
+		/* This will have already modified `dlerror()'! */
+		free(result);
+		return NULL;
+	}
+	/* Try to open the service. */
+	result->dsm_service = service_open(filename);
+	if unlikely(!result->dsm_service) {
+		free(result);
+		libservice_close();
+		dl_seterrorf("Failed to open service %q", filename);
+		return NULL;
+	}
+
+	mod              = (DlModule *)result->dsm_module;
+	mod->dm_loadaddr = 0;
+	mod->dm_filename = realpath_s_malloc(filename);
+	if unlikely(!mod->dm_filename) {
+		service_close(result->dsm_service);
+		libservice_close();
+		goto err_nomem;
+	}
+	mod->dm_dynhdr     = NULL;
+	mod->dm_tlsoff     = 0;
+	mod->dm_tlsinit    = NULL;
+	mod->dm_tlsfsize   = 0;
+	mod->dm_tlsmsize   = 0;
+	mod->dm_tlsalign   = 0;
+	mod->dm_tlsstoff   = 0;
+	mod->dm_tls_init   = NULL;
+	mod->dm_tls_fini   = NULL;
+	mod->dm_tls_arg    = NULL;
+	mod->dm_refcnt     = 1;
+	mod->dm_weakrefcnt = 1;
+	mod->dm_file       = -1;
+	mod->dm_flags      = mode;
+	mod->dm_loadstart  = 0;
+	mod->dm_loadend    = 0;
+	mod->dm_finalize   = NULL;
+	mod->dm_depcnt     = 0;
+	mod->dm_depvec     = NULL;
+	atomic_rwlock_init(&mod->dm_sections_lock);
+	mod->dm_sections          = NULL;
+	mod->dm_sections_dangling = NULL;
+	mod->dm_shnum             = 0;
+
+	/* Set the operator table for this module. */
+	mod->dm_ops = get_service_module_format();
+
+	/* Make the module visible. */
+	if (mode & RTLD_GLOBAL) {
+		atomic_rwlock_write(&DlModule_GlobalLock);
+		DlModule_AddToGlobals(mod);
+		atomic_rwlock_endwrite(&DlModule_GlobalLock);
+	}
+	atomic_rwlock_write(&DlModule_AllLock);
+	DlModule_AddToAll(mod);
+	atomic_rwlock_endwrite(&DlModule_AllLock);
+	return mod;
+err_nomem:
+	dl_seterror_nomem();
+	return NULL;
+}
+
+#endif /* CONFIG_DLOPEN_LIBSERVICE_SUPPORT */
+
 
 
 /* [1..1] Global chain of loaded modules.
@@ -191,8 +451,13 @@ DlModule_OpenFilename(USER char const *filename,
 	if (result)
 		goto done_existing;
 	fd = sys_open(filename, O_RDONLY | O_CLOEXEC, 0);
-	if unlikely(E_ISERR(fd))
+	if unlikely(E_ISERR(fd)) {
+#ifdef CONFIG_DLOPEN_LIBSERVICE_SUPPORT
+		if (fd == -ENXIO) /* Produced as the result of `E_ILLEGAL_OPERATION_OPEN_S_IFSOCK' */
+			return DlModule_OpenService(filename, mode);
+#endif /* CONFIG_DLOPEN_LIBSERVICE_SUPPORT */
 		goto err; /* No error on file-access-failure! */
+	}
 	/* Make sure to only use big file descriptor indices, so-as
 	 * to  prevent use of reserved file numbers, as used by the
 	 * standard I/O handles (aka. `STD(IN|OUT|ERR)_FILENO') */

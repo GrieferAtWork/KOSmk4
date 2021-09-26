@@ -128,8 +128,12 @@ struct service;
  * @return: NULL: [errno=ENOENT] No function exists with the given name.
  * @return: NULL: [errno=EINTR]  The calling thread was interrupted.
  * @return: NULL: [errno=ENOMEM] Insufficient memory. */
+typedef __ATTR_WUNUSED __ATTR_NONNULL((1)) struct service *
+/*__NOTHROW_RPC*/ (LIBSERVICE_CC *PSERVICE_OPEN)(char const *filename);
+#ifdef LIBSERVICE_WANT_PROTOTYPES
 LIBSERVICE_DECL __ATTR_WUNUSED __ATTR_NONNULL((1)) struct service *
 __NOTHROW_RPC(LIBSERVICE_CC service_open)(char const *filename);
+#endif /* LIBSERVICE_WANT_PROTOTYPES */
 
 /* Close/detach a given service. WARNING: After this function was called,
  * all function pointers  returned by `service_dlsym()'  will point  into
@@ -138,8 +142,12 @@ __NOTHROW_RPC(LIBSERVICE_CC service_open)(char const *filename);
  * time of it being closed.
  * Services not closed when the calling process exits, or makes a call
  * to one  of the  `exec()' functions  will be  closed  automatically. */
+typedef __NOBLOCK __ATTR_NONNULL((1)) void
+/*__NOTHROW*/ (LIBSERVICE_CC *PSERVICE_CLOSE)(struct service *__restrict self);
+#ifdef LIBSERVICE_WANT_PROTOTYPES
 LIBSERVICE_DECL __NOBLOCK __ATTR_NONNULL((1)) void
 __NOTHROW(LIBSERVICE_CC service_close)(struct service *__restrict self);
+#endif /* LIBSERVICE_WANT_PROTOTYPES */
 
 
 /* The heart-piece of all of libservice:  lookup a symbol exported by  the
@@ -163,9 +171,14 @@ __NOTHROW(LIBSERVICE_CC service_close)(struct service *__restrict self);
  * @return: NULL: [errno=ENOENT] No function exists with the given name.
  * @return: NULL: [errno=EINTR]  The calling thread was interrupted.
  * @return: NULL: [errno=ENOMEM] Insufficient memory. */
+typedef __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) void *
+/*__NOTHROW_RPC*/ (LIBSERVICE_CC *PSERVICE_DLSYM)(struct service *__restrict self,
+                                                  char const *__restrict symname);
+#ifdef LIBSERVICE_WANT_PROTOTYPES
 LIBSERVICE_DECL __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) void *
 __NOTHROW_RPC(LIBSERVICE_CC service_dlsym)(struct service *__restrict self,
                                            char const *__restrict symname);
+#endif /* LIBSERVICE_WANT_PROTOTYPES */
 
 
 
@@ -183,6 +196,19 @@ __NOTHROW_RPC(LIBSERVICE_CC service_dlsym)(struct service *__restrict self,
  *       by the regular `malloc'!
  * @return: * :   Base address of the buffer.
  * @return: NULL: [errno=ENOMEM] Insufficient memory. */
+typedef __ATTR_WUNUSED __ATTR_NONNULL((1)) void *
+/*__NOTHROW*/ (LIBSERVICE_CC *PSERVICE_BUFFER_MALLOC)(struct service *__restrict self,
+                                                      __size_t num_bytes);
+typedef __ATTR_WUNUSED __ATTR_NONNULL((1)) void *
+/*__NOTHROW*/ (LIBSERVICE_CC *PSERVICE_BUFFER_CALLOC)(struct service *__restrict self,
+                                                      __size_t num_bytes);
+typedef __ATTR_WUNUSED __ATTR_NONNULL((1)) void *
+/*__NOTHROW*/ (LIBSERVICE_CC *PSERVICE_BUFFER_REALLOC)(struct service *__restrict self,
+                                                       void *ptr, __size_t num_bytes);
+typedef __NOBLOCK __ATTR_NONNULL((1)) void
+/*__NOTHROW*/ (LIBSERVICE_CC *PSERVICE_BUFFER_FREE)(struct service *__restrict self,
+                                                    void *ptr);
+#ifdef LIBSERVICE_WANT_PROTOTYPES
 LIBSERVICE_DECL __ATTR_WUNUSED __ATTR_NONNULL((1)) void *
 __NOTHROW(LIBSERVICE_CC service_buffer_malloc)(struct service *__restrict self,
                                                __size_t num_bytes);
@@ -195,14 +221,38 @@ __NOTHROW(LIBSERVICE_CC service_buffer_realloc)(struct service *__restrict self,
 LIBSERVICE_DECL __NOBLOCK __ATTR_NONNULL((1)) void
 __NOTHROW(LIBSERVICE_CC service_buffer_free)(struct service *__restrict self,
                                              void *ptr);
+#endif /* LIBSERVICE_WANT_PROTOTYPES */
+
 /* Returns the usable size of the given `ptr'. */
+typedef __NOBLOCK __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __size_t
+/*__NOTHROW*/ (LIBSERVICE_CC *PSERVICE_BUFFER_MALLOC_USABLE_SIZE)(struct service *__restrict self,
+                                                                  void *ptr);
+#ifdef LIBSERVICE_WANT_PROTOTYPES
 LIBSERVICE_DECL __NOBLOCK __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __size_t
 __NOTHROW(LIBSERVICE_CC service_buffer_malloc_usable_size)(struct service *__restrict self,
                                                            void *ptr);
+#endif /* LIBSERVICE_WANT_PROTOTYPES */
 
 
 
 /* Exception-enabled versions of the above. */
+typedef __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)) struct service *
+(LIBSERVICE_CC *PSERVICEOPEN)(char const *filename)
+		__THROWS(E_FSERROR, E_BADALLOC, E_INTERRUPT);
+typedef __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) void *
+(LIBSERVICE_CC *PSERVICEDLSYM)(struct service *__restrict self,
+                             char const *__restrict symname)
+		__THROWS(E_NO_SUCH_OBJECT, E_BADALLOC, E_INTERRUPT);
+typedef __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)) void *
+(LIBSERVICE_CC *PSERVICEBUFFERMALLOC)(struct service *__restrict self, __size_t num_bytes)
+		__THROWS(E_BADALLOC);
+typedef __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)) void *
+(LIBSERVICE_CC *PSERVICEBUFFERCALLOC)(struct service *__restrict self, __size_t num_bytes)
+		__THROWS(E_BADALLOC);
+typedef __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)) void *
+(LIBSERVICE_CC *PSERVICEBUFFERREALLOC)(struct service *__restrict self, void *ptr, __size_t num_bytes)
+		__THROWS(E_BADALLOC);
+#ifdef LIBSERVICE_WANT_PROTOTYPES
 LIBSERVICE_DECL __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)) struct service *
 (LIBSERVICE_CC ServiceOpen)(char const *filename)
 		__THROWS(E_FSERROR, E_BADALLOC, E_INTERRUPT);
@@ -229,6 +279,7 @@ __COMPILER_REDIRECT(LIBSERVICE_DECL, __NOBLOCK __ATTR_PURE __ATTR_WUNUSED __ATTR
                     __size_t, __NOTHROW, LIBSERVICE_CC,
                     ServiceBufferMallocUsableSize, (struct service * __restrict self, void *ptr),
                     service_buffer_malloc_usable_size, (self, ptr))
+#endif /* LIBSERVICE_WANT_PROTOTYPES */
 
 
 __DECL_END

@@ -17,8 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _LIBSERVICE_CLIENT_H
-#define _LIBSERVICE_CLIENT_H 1
+#ifndef _LIBSERVICE_SERVER_H
+#define _LIBSERVICE_SERVER_H 1
 
 #include "api.h"
 
@@ -119,11 +119,18 @@ struct service_specs {
  * NOTE: The given  set of  functions _must_  be sorted  lexicographically
  *       ascending by name, as binary search is used to locate appropriate
  *       entries during client lookup requests! */
+typedef __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) struct service_api *
+/*__NOTHROW_NCX*/ (LIBSERVICE_CC *PSERVICE_API_CREATE)(char const *__restrict filename,
+                                                       struct service_specs const *__restrict specs);
+typedef __ATTR_NONNULL((1)) void
+/*__NOTHROW*/ (LIBSERVICE_CC *PSERVICE_API_DESTROY)(struct service_api *__restrict self);
+#ifdef LIBSERVICE_WANT_PROTOTYPES
 LIBSERVICE_DECL __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) struct service_api *
 __NOTHROW_NCX(LIBSERVICE_CC service_api_create)(char const *__restrict filename,
                                                 struct service_specs const *__restrict specs);
 LIBSERVICE_DECL __ATTR_NONNULL((1)) void
 __NOTHROW(LIBSERVICE_CC service_api_destroy)(struct service_api *__restrict self);
+#endif /* LIBSERVICE_WANT_PROTOTYPES */
 
 
 /* To-be called  from within  service functions  (service_function::sf_func).
@@ -137,21 +144,35 @@ __NOTHROW(LIBSERVICE_CC service_api_destroy)(struct service_api *__restrict self
  * WARNING: Don't call this function from somewhere other than contexts where
  *          the call originates from within the service API. This requirement
  *          is asserted internally! */
+typedef __ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED void *
+/*__NOTHROW*/ (LIBSERVICE_CC *PSERVICE_API_CONTEXT)(void);
+#ifdef LIBSERVICE_WANT_PROTOTYPES
 LIBSERVICE_DECL __ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED void *
 __NOTHROW(LIBSERVICE_CC service_api_context)(void);
+#endif /* LIBSERVICE_WANT_PROTOTYPES */
 
-/* To-be called from within service functions (service_function::sf_func).
- * This function returns the PID  of the process that originally  attached
- * to create the current context, as returned by  `service_api_context()'.
+struct ucred;
+
+/* To-be called from  within service functions  (service_function::sf_func).
+ * This function returns credentials of the process that originally attached
+ * to create the current context, as returned by `service_api_context()'.
  * WARNING: Don't call this function from somewhere other than contexts where
  *          the call originates from within the service API. This requirement
  *          is asserted internally! */
-LIBSERVICE_DECL __ATTR_CONST __ATTR_WUNUSED __pid_t
-__NOTHROW(LIBSERVICE_CC service_api_getpid)(void);
+typedef __ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED struct ucred const *
+/*__NOTHROW*/ (LIBSERVICE_CC *PSERVICE_API_CRED)(void);
+#ifdef LIBSERVICE_WANT_PROTOTYPES
+LIBSERVICE_DECL __ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED struct ucred const *
+__NOTHROW(LIBSERVICE_CC service_api_cred)(void);
+#endif /* LIBSERVICE_WANT_PROTOTYPES */
 
 
 
 /* Exception-enabled variants of the above functions. */
+typedef __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) struct service_api *
+(LIBSERVICE_CC *PSERVICEAPICREATE)(char const *__restrict filename,
+                                    struct service_specs const *__restrict specs);
+#ifdef LIBSERVICE_WANT_PROTOTYPES
 LIBSERVICE_DECL __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) struct service_api *
 (LIBSERVICE_CC ServiceApiCreate)(char const *__restrict filename,
                                  struct service_specs const *__restrict specs);
@@ -159,11 +180,12 @@ __COMPILER_REDIRECT_VOID(LIBSERVICE_DECL, __ATTR_NONNULL((1)), __NOTHROW, LIBSER
                          ServiceApiDestroy, (struct service_api * __restrict self), service_api_destroy, (self))
 __COMPILER_REDIRECT(LIBSERVICE_DECL, __ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED, void *, __NOTHROW, LIBSERVICE_CC,
                     ServiceApiContext, (void), service_api_context, ())
-__COMPILER_REDIRECT(LIBSERVICE_DECL, __ATTR_CONST __ATTR_WUNUSED, __pid_t, __NOTHROW, LIBSERVICE_CC,
-                    ServiceApiGetpid, (void), service_api_getpid, ())
+__COMPILER_REDIRECT(LIBSERVICE_DECL, __ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED, struct ucred const *, __NOTHROW, LIBSERVICE_CC,
+                    ServiceApiCred, (void), service_api_getpid, ())
+#endif /* LIBSERVICE_WANT_PROTOTYPES */
 
 
 __DECL_END
 #endif /* __CC__ */
 
-#endif /* !_LIBSERVICE_CLIENT_H */
+#endif /* !_LIBSERVICE_SERVER_H */
