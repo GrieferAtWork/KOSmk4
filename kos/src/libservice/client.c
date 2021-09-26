@@ -165,7 +165,7 @@ libservice_open(char const *filename) THROWS(E_FSERROR, E_BADALLOC, E_INTERRUPT)
  * @return: NULL: [errno=ENOMEM] Insufficient memory. */
 INTERN WUNUSED NONNULL((1)) struct service *
 NOTHROW_RPC(CC libservice_open_nx)(char const *filename) {
-	NESTED_TRY {
+	TRY {
 		return libservice_open(filename);
 	} EXCEPT {
 		error_class_t cls = error_class();

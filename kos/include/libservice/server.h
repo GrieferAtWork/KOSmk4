@@ -118,7 +118,13 @@ struct service_specs {
 /* Create a service that is reachable under `filename' and exposes the given set of functions.
  * NOTE: The given  set of  functions _must_  be sorted  lexicographically
  *       ascending by name, as binary search is used to locate appropriate
- *       entries during client lookup requests! */
+ *       entries during client lookup requests!
+ * @throws: E_FSERROR_FILE_ALREADY_EXISTS: The specified `filename' already exists. Note that
+ *                                         this function uses unix domain sockets internally,
+ *                                         which create files during bind that are not removed
+ *                                         when the socket is closed. As such, you really need
+ *                                         to handle this case by unlink(2)-ing the file prior
+ *                                         to calling this function. */
 typedef __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) struct service_api *
 /*__NOTHROW_NCX*/ (LIBSERVICE_CC *PSERVICE_API_CREATE)(char const *__restrict filename,
                                                        struct service_specs const *__restrict specs);

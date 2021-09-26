@@ -23,6 +23,7 @@
 #include "api.h"
 
 #include <kos/types.h>
+
 #include <libservice/client.h>
 
 DECL_BEGIN
