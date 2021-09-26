@@ -822,12 +822,16 @@ NOTHROW(FCALL comgen_allocate_com_buffer)(struct com_generator *__restrict self)
 	/* >> movP   $<cg_service>, %R_fcall0P   # Input constant (hard-coded) */
 	gen86_movP_imm_r(&self->cg_txptr, self->cg_service, GEN86_R_FCALL0P);
 
-	/* >> movP   $<ALLOC_SIZE>, %R_fcall1P   # Input constant (hard-coded) */
+	/* Calculate the allocation size for the  */
 	alloc_size = self->cg_sizeof_service_com;
+	if (alloc_size < offsetafter(struct service_com, sc_except))
+		alloc_size = offsetafter(struct service_com, sc_except); /* Needed for `SERVICE_COM_ST_EXCEPT' */
 	alloc_size = CEIL_ALIGN(alloc_size, SERVICE_SHM_ALLOC_ALIGN);
 	alloc_size += SERVICE_SHM_ALLOC_EXTRA;
 	if (alloc_size < SERVICE_SHM_ALLOC_MINSIZE)
 		alloc_size = SERVICE_SHM_ALLOC_MINSIZE;
+
+	/* >> movP   $<ALLOC_SIZE>, %R_fcall1P   # Input constant (hard-coded) */
 	gen86_movP_imm_r(&self->cg_txptr, alloc_size, GEN86_R_FCALL1P);
 
 	if (!(self->cg_features & COM_GENERATOR_FEATURE_FEXCEPT)) {

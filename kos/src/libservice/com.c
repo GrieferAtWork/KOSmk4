@@ -1019,9 +1019,8 @@ libservice_dlsym_lookup_or_create(struct service *__restrict self,
 		THROWS(E_NO_SUCH_OBJECT, E_BADALLOC, E_INTERRUPT) {
 	struct com_generator cg;
 	struct service_function_entry *entry;
+	struct service_text_range *tx_range, *eh_range;
 	size_t tx_bufsize, eh_bufsize;
-	struct service_text_range *tx_range;
-	struct service_text_range *eh_range;
 	byte_t *tx_base, *eh_base;
 
 	assert(kind == SERVICE_FUNCTION_ENTRY_KIND_NORMAL ||
@@ -1160,10 +1159,19 @@ libservice_dlsym_getinfo(struct service *__restrict self, char const *__restrict
 	struct service_shm_handle *shm;
 	namsize = (strlen(name) + 1) * sizeof(char);
 	comsize = offsetof(struct service_com, sc_dlsym.dl_name) + namsize;
+
+	/* Make sure that there's enough space for us to receive a
+	 * success response, as well as an exception response. */
+#define DLSYM_COM_MINSIZE                                    \
+	MAX_C(offsetafter(struct service_com, sc_dlsym_success), \
+	      offsetafter(struct service_com, sc_except))
+	if (comsize < DLSYM_COM_MINSIZE)
+		comsize = DLSYM_COM_MINSIZE;
+#undef DLSYM_COM_MINSIZE
+
+	/* Adjust `comsize' such that it is accepted by `libservice_shmbuf_alloc_nopr()' */
 	comsize = CEIL_ALIGN(comsize, SERVICE_SHM_ALLOC_ALIGN);
 	comsize += SERVICE_SHM_ALLOC_EXTRA;
-	if (comsize < offsetafter(struct service_com, sc_dlsym_success))
-		comsize = offsetafter(struct service_com, sc_dlsym_success);
 	if (comsize < SERVICE_SHM_ALLOC_MINSIZE)
 		comsize = SERVICE_SHM_ALLOC_MINSIZE;
 
