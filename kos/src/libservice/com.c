@@ -41,6 +41,7 @@
 #include <kos/malloc.h>
 #include <kos/refcnt.h>
 #include <kos/sys/mman.h>
+#include <kos/syscalls.h>
 #include <kos/types.h>
 #include <kos/unistd.h>
 #include <sys/mman.h>
@@ -1130,11 +1131,80 @@ INTERN NONNULL((1, 2, 3)) void CC
 libservice_dlsym_getinfo(struct service *__restrict self, char const *__restrict name,
                          /*out*/ struct service_com_funinfo *__restrict info)
 		THROWS(E_NO_SUCH_OBJECT, E_BADALLOC, E_INTERRUPT) {
-	/* TODO */
-	(void)self;
-	(void)name;
-	(void)info;
-	abort();
+	size_t namsize;
+	size_t comsize;
+	service_buf_t buf;
+	struct service_com *com;
+	struct service_shm_handle *shm;
+	namsize = (strlen(name) + 1) * sizeof(char);
+	comsize = offsetof(struct service_com, sc_dlsym.dl_name) + namsize;
+	comsize = CEIL_ALIGN(comsize, SERVICE_SHM_ALLOC_ALIGN);
+	comsize += SERVICE_SHM_ALLOC_EXTRA;
+	if (comsize < SERVICE_SHM_ALLOC_MINSIZE)
+		comsize = SERVICE_SHM_ALLOC_MINSIZE;
+
+	/* Allocate a com object to-be used for the request. */
+	buf = libservice_shmbuf_alloc_nopr(self, comsize);
+	com = (struct service_com *)service_buf_getptr(buf);
+	shm = service_buf_getshm(buf);
+	TRY {
+		uintptr_t com_reladdr;
+		uintptr_t com_nxtaddr;
+		struct service_shm *shm_ctl;
+
+		/* Fill in the com descriptor. */
+		com->sc_code = SERVICE_COM_DLSYM;
+		memcpy(com->sc_dlsym.dl_name, name, namsize);
+
+		/* Post the request to the server */
+		shm_ctl     = shm->ssh_shm;
+		com_reladdr = (uintptr_t)((byte_t *)com - (byte_t *)shm_ctl);
+		do {
+			com_nxtaddr  = shm_ctl->s_commands;
+			com->sc_link = com_nxtaddr;
+			COMPILER_WRITE_BARRIER();
+		} while (!ATOMIC_CMPXCH_WEAK(shm_ctl->s_commands,
+		                             com_nxtaddr, com_reladdr));
+
+		/* Wake up the server. */
+		sys_lfutex(&shm_ctl->s_commands, LFUTEX_WAKE, 1, NULL, 0);
+
+		/* Wake for the server to respond. */
+		TRY {
+			sys_Xlfutex(&com->sc_code, LFUTEX_WAIT_WHILE,
+			            SERVICE_COM_DLSYM, NULL, 0);
+		} EXCEPT {
+			error_class_t cls = error_class();
+			/* Abort the command. */
+			if (libservice_aux_com_abort(self, com, SERVICE_COM_DLSYM))
+				RETHROW();
+			if (ERRORCLASS_ISRTLPRIORITY(cls))
+				RETHROW();
+		}
+
+		/* Check return status. */
+		if (com->sc_code != SERVICE_COM_ST_SUCCESS) {
+			struct exception_data *e = error_data();
+			assert(e->e_code == ERROR_CODEOF(E_OK));
+			if (com->sc_code == SERVICE_COM_ST_EXCEPT) {
+				e->e_code = com->sc_except.e_code;
+				memcpy(&e->e_args, &com->sc_except.e_args,
+				       sizeof(union exception_data_pointers));
+			} else {
+				e->e_code = ERROR_CODEOF(E_NO_SUCH_OBJECT);
+				memset(&e->e_args, 0, sizeof(e->e_args));
+			}
+			error_throw_current();
+		}
+
+		/* On success, copy back function information */
+		memcpy(info, &com->sc_dlsym_success,
+		       sizeof(struct service_com_funinfo));
+	} EXCEPT {
+		libservice_shmbuf_free_fast_nopr(self, shm, com);
+		RETHROW();
+	}
+	libservice_shmbuf_free_fast_nopr(self, shm, com);
 }
 
 
