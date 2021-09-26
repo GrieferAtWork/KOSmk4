@@ -471,23 +471,19 @@
 /* E_ILLEGAL_OPERATION                                                  */
 /************************************************************************/
 #ifndef E_ILLEGAL_OPERATION
-#define E_ILLEGAL_OPERATION                       (0x000a)                      /* [msg("Illegal operation")] */
+#define E_ILLEGAL_OPERATION                       (0x000a)                      /* [errno($reason == E_ILLEGAL_OPERATION_OPEN_S_IFSOCK ? ENXIO : EPERM)]
+                                                                                 * [msg("Illegal operation")]
+                                                                                 * [fld(reason: syscall_ulong_t, "One of `E_ILLEGAL_OPERATION_*'")] */
 #endif /* !E_ILLEGAL_OPERATION */
 #ifndef E_ILLEGAL_PROCESS_OPERATION
 #define E_ILLEGAL_PROCESS_OPERATION               (E_ILLEGAL_OPERATION, 0x0001) /* [msg("Illegal process operation")]
-                                                                                 * [fld(pid:    pid_t,           "The Pid of the process in question")]
-                                                                                 * [fld(action: syscall_ulong_t, "The illegal action that was attempted (One of `E_ILLEGAL_PROCESS_OPERATION_*')")]
-                                                                                 * [fld(pid2:   pid_t,           "A second pid, or 0 if unused")] */
+                                                                                 * [fld(pid:  pid_t, "The Pid of the process in question")]
+                                                                                 * [fld(pid2: pid_t, "A second pid, or 0 if unused")] */
 #endif /* !E_ILLEGAL_PROCESS_OPERATION */
 #ifndef E_ILLEGAL_REFERENCE_LOOP
-#define E_ILLEGAL_REFERENCE_LOOP                  (E_ILLEGAL_OPERATION, 0x0002) /* [errno(ELOOP), msg("Reference loop detected")] */
+#define E_ILLEGAL_REFERENCE_LOOP                  (E_ILLEGAL_OPERATION, 0x0002) /* [errno($reason == E_ILLEGAL_OPERATION_EPOLL_MONITOR_SELF_LOOP ? EINVAL : ELOOP)]
+                                                                                 * [msg("Reference loop detected")] */
 #endif /* !E_ILLEGAL_REFERENCE_LOOP */
-/*[[[end]]]*/
-#ifndef E_ILLEGAL_PROCESS_OPERATION_SETPGID_LEADER
-#define E_ILLEGAL_PROCESS_OPERATION_SETPGID_LEADER 0x0001 /* Attempted to move the leader of a process group into a different
-                                                           * process  group (`pid2' is  the PID of  the target process group) */
-#endif /* !E_ILLEGAL_PROCESS_OPERATION_SETPGID_LEADER */
-/*[[[begin]]]*/
 
 
 

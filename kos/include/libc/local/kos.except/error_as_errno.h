@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x57785fc6 */
+/* HASH CRC-32:0x2de48cf0 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,6 +27,7 @@ struct exception_data;
 #include <hybrid/host.h>
 #include <kos/bits/exception_data.h>
 #include <kos/except/reason/fs.h>
+#include <kos/except/reason/illop.h>
 #include <kos/except/reason/inval.h>
 #include <kos/except/reason/io.h>
 #include <kos/except/reason/net.h>
@@ -343,12 +344,15 @@ for (local name: classes.keys.sorted()) {
 #endif /* __EPERM && (__i386__ || __x86_64__) */
 
 	case E_ILLEGAL_OPERATION:
+#if defined(__ENXIO) && defined(__EPERM)
+		__result = __self->e_args.e_illegal_operation.io_reason == E_ILLEGAL_OPERATION_OPEN_S_IFSOCK ? __ENXIO : __EPERM;
+#endif /* __ENXIO && __EPERM */
 		switch(__self->e_subclass) {
-#ifdef __ELOOP
+#if defined(__EINVAL) && defined(__ELOOP)
 		case ERROR_SUBCLASS(ERROR_CODEOF(E_ILLEGAL_REFERENCE_LOOP)):
-			__result = __ELOOP;
+			__result = __self->e_args.e_illegal_operation.io_reason == E_ILLEGAL_OPERATION_EPOLL_MONITOR_SELF_LOOP ? __EINVAL : __ELOOP;
 			break;
-#endif /* __ELOOP */
+#endif /* __EINVAL && __ELOOP */
 		default: break;
 		}
 		break;

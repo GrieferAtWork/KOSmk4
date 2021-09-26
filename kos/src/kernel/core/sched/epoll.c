@@ -38,6 +38,7 @@
 
 #include <hybrid/atomic.h>
 
+#include <kos/except/reason/illop.h>
 #include <kos/except/reason/inval.h>
 #include <kos/io.h>
 #include <sys/epoll.h>
@@ -496,10 +497,11 @@ again:
 			if (error == EPOLL_LOOP) {
 epoll_loop:
 				mutex_release(&self->ec_lock);
-				/* TODO: Linux returns -EINVAL when `hand_epoll == self',
-				 *       and -ELOOP in all  other cases. This right  here
-				 *       causes -ELOOP for all cases! */
-				THROW(E_ILLEGAL_REFERENCE_LOOP);
+				/* NOTE: Linux returns -EINVAL when `hand_epoll == self', and -ELOOP in all other cases.
+				 *       We use 2 different exception parameters which affect errno in the same  manner. */
+				THROW(E_ILLEGAL_REFERENCE_LOOP,
+				      hand_epoll == self ? E_ILLEGAL_OPERATION_EPOLL_MONITOR_SELF_LOOP
+				                         : E_ILLEGAL_OPERATION_EPOLL_MONITOR_LOOP);
 			}
 			mutex_release(&self->ec_lock);
 			/* Wait for `error' to become available. */

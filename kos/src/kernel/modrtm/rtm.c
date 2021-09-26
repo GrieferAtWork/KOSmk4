@@ -25,8 +25,10 @@
 #include <kernel/compiler.h>
 
 #include <kernel/driver.h>
-#include <kernel/except.h>
 #include <kernel/mman/rtm.h>
+
+#include <kos/except.h>
+#include <kos/except/reason/illop.h>
 
 #include <stddef.h>
 
@@ -37,7 +39,7 @@ PRIVATE DRIVER_INIT void KCALL rtm_init(void) {
 	/* Install our RTM hooks.
 	 * If RTM hooks had already been installed, throw an exception */
 	if (!awref_cmpxch(&mrtm_hooks, NULL, &rtm_hooks))
-		THROW(E_ILLEGAL_OPERATION);
+		THROW(E_ILLEGAL_OPERATION, E_ILLEGAL_OPERATION_RTM_ALREADY_LOADED);
 }
 
 PRIVATE DRIVER_FINI void KCALL rtm_fini(void) {

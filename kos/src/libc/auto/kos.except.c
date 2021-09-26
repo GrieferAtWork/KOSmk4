@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf96f39a9 */
+/* HASH CRC-32:0x26c422bc */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -35,6 +35,7 @@ DECL_BEGIN
 #include <hybrid/host.h>
 #include <kos/bits/exception_data.h>
 #include <kos/except/reason/fs.h>
+#include <kos/except/reason/illop.h>
 #include <kos/except/reason/inval.h>
 #include <kos/except/reason/io.h>
 #include <kos/except/reason/net.h>
@@ -351,12 +352,15 @@ for (local name: classes.keys.sorted()) {
 #endif /* EPERM && (__i386__ || __x86_64__) */
 
 	case E_ILLEGAL_OPERATION:
+#if defined(ENXIO) && defined(EPERM)
+		result = self->e_args.e_illegal_operation.io_reason == E_ILLEGAL_OPERATION_OPEN_S_IFSOCK ? ENXIO : EPERM;
+#endif /* ENXIO && EPERM */
 		switch(self->e_subclass) {
-#ifdef ELOOP
+#if defined(EINVAL) && defined(ELOOP)
 		case ERROR_SUBCLASS(ERROR_CODEOF(E_ILLEGAL_REFERENCE_LOOP)):
-			result = ELOOP;
+			result = self->e_args.e_illegal_operation.io_reason == E_ILLEGAL_OPERATION_EPOLL_MONITOR_SELF_LOOP ? EINVAL : ELOOP;
 			break;
-#endif /* ELOOP */
+#endif /* EINVAL && ELOOP */
 		default: break;
 		}
 		break;

@@ -23,6 +23,8 @@
 //#define DEFINE_IO_WRITE 1
 #endif /* __INTELLISENSE__ */
 
+#include <kos/except/reason/illop.h>
+
 #if (defined(DEFINE_IO_READ) + defined(DEFINE_IO_WRITE)) != 1
 #error "Must #define exactly one of `DEFINE_IO_READ' or `DEFINE_IO_WRITE' before #including this file"
 #endif
@@ -160,9 +162,8 @@ userkern_segment_writeq(struct vioargs *__restrict args,
 				THROW(E_PROCESS_EXITED, (upid_t)value);
 			if (error == TASK_SETPROCESSGROUPLEADER_LEADER) {
 				THROW(E_ILLEGAL_PROCESS_OPERATION,
-				      (upid_t)0,
-				      E_ILLEGAL_PROCESS_OPERATION_SETPGID_LEADER,
-				      (upid_t)value);
+				      E_ILLEGAL_OPERATION_SETPGID_LEADER,
+				      (upid_t)0, (upid_t)value);
 			}
 		}
 #endif /* !DEFINE_IO_READ */

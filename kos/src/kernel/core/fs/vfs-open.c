@@ -38,8 +38,11 @@
 
 #include <hybrid/atomic.h>
 
+#include <kos/except/reason/illop.h>
 #include <kos/except/reason/inval.h>
 #include <kos/kernel/handle.h>
+#include <network/socket.h>
+#include <network/unix-socket.h>
 
 #include <assert.h>
 #include <fcntl.h>
@@ -527,12 +530,17 @@ check_result_inode_for_symlink:
 					decref_nokill(result_inode); /* Nokill, because one ref exists in `user->fu_fifo' */
 				}	break;
 
-				//TODO:Unix domain sockets:case S_IFSOCK:
-				//TODO:Unix domain sockets:    Read up on what kind of object this should return.
-				//TODO:Unix domain sockets:    Possibly add a `HANDLE_TYPE_*' specifically for this.
+				case S_IFSOCK:
+					/* The specs say that we should return ENXIO in this case. On KOS, we
+					 * have a dedicated exception parameter  for trying to open a  socket
+					 * file which is translated to that errno. */
+					THROW(E_ILLEGAL_OPERATION,
+					      E_ILLEGAL_OPERATION_OPEN_S_IFSOCK);
+					break;
+
 
 				case S_IFLNK:
-					/* Symbolic  */
+					/* Symbolic link */
 open_result_inode:
 					result.h_data = result_inode;
 					result.h_type = HANDLE_TYPE_MFILE;

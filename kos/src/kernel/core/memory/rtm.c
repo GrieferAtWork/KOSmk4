@@ -25,11 +25,12 @@
 #include <kernel/mman/rtm.h>
 
 #ifdef ARCH_HAVE_RTM
-#include <kernel/except.h>
 #include <kernel/mman/driver.h>
 #include <kernel/syscall.h>
 #include <sched/rpc.h>
 
+#include <kos/except.h>
+#include <kos/except/reason/illop.h>
 #include <kos/rtm.h>
 
 #include <errno.h>
@@ -130,7 +131,7 @@ DEFINE_SYSCALL0(rtm_status_t, rtm_begin) {
 #ifdef __ARCH_WANT_SYSCALL_RTM_END
 DEFINE_SYSCALL0(errno_t, rtm_end) {
 	/* This system call is an illegal operation outside of RTM mode. */
-	THROW(E_ILLEGAL_OPERATION);
+	THROW(E_ILLEGAL_OPERATION, E_ILLEGAL_OPERATION_NOT_RTM);
 }
 #endif /* __ARCH_WANT_SYSCALL_RTM_END */
 

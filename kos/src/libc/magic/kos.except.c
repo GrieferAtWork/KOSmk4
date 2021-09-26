@@ -238,6 +238,7 @@ error_register_state_t *error_register_state(void) {
 [[impl_include("<hybrid/host.h>")]]
 [[impl_include("<kos/bits/exception_data.h>")]]
 [[impl_include("<kos/except/reason/fs.h>")]]
+[[impl_include("<kos/except/reason/illop.h>")]]
 [[impl_include("<kos/except/reason/inval.h>")]]
 [[impl_include("<kos/except/reason/io.h>")]]
 [[impl_include("<kos/except/reason/net.h>")]]
@@ -564,10 +565,13 @@ for (local name: classes.keys.sorted()) {
 @@pp_endif@@
 
 	case @E_ILLEGAL_OPERATION@:
+@@pp_if defined(ENXIO) && defined(EPERM)@@
+		result = self->@e_args@.@e_illegal_operation@.@io_reason@ == @E_ILLEGAL_OPERATION_OPEN_S_IFSOCK@ ? ENXIO : EPERM;
+@@pp_endif@@
 		switch(self->@e_subclass@) {
-@@pp_if defined(ELOOP)@@
+@@pp_if defined(EINVAL) && defined(ELOOP)@@
 		case @ERROR_SUBCLASS@(@ERROR_CODEOF@(@E_ILLEGAL_REFERENCE_LOOP@)):
-			result = ELOOP;
+			result = self->@e_args@.@e_illegal_operation@.@io_reason@ == @E_ILLEGAL_OPERATION_EPOLL_MONITOR_SELF_LOOP@ ? EINVAL : ELOOP;
 			break;
 @@pp_endif@@
 		default: break;

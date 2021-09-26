@@ -47,6 +47,8 @@
 #include <bits/os/rusage.h>
 #include <bits/os/timespec.h>
 #include <compat/config.h>
+#include <kos/except.h>
+#include <kos/except/reason/illop.h>
 #include <kos/except/reason/inval.h>
 #include <sys/poll.h>
 #include <sys/resource.h>
@@ -1694,9 +1696,8 @@ handle_error:
 				THROW(E_PROCESS_EXITED, (upid_t)pgid);
 			if (error == TASK_SETPROCESSGROUPLEADER_LEADER) {
 				THROW(E_ILLEGAL_PROCESS_OPERATION,
-				      (upid_t)pid,
-				      E_ILLEGAL_PROCESS_OPERATION_SETPGID_LEADER,
-				      (upid_t)pgid);
+				      E_ILLEGAL_OPERATION_SETPGID_LEADER,
+				      (upid_t)pid, (upid_t)pgid);
 			}
 		}
 	} else {
