@@ -4035,6 +4035,11 @@ NOTHROW(FCALL comgen_compile)(struct com_generator *__restrict self) {
 	 * The rest of the .text section is (ab-)used as .gcc_except_table. */
 	comgen_eh_frame_endproc(self);
 
+	/* Need at least 4 more bytes at the end of .eh_frame (for the sentinel chunk) */
+	if (!comgen_ehav(self, 4))
+		goto fail;
+	UNALIGNED_SET32((u32 *)self->cg_ehptr, 0);
+
 	/* Generate  LSDA (like it would appear in .gcc_except_table)
 	 * This data we simply put into .text (even though it doesn't
 	 * need to be executable, doing so is the easiest way for  us

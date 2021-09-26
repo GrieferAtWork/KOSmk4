@@ -423,7 +423,7 @@ SLIST_HEAD(service_text_range_slist, service_text_range);
 struct service_text_range {
 	SLIST_ENTRY(service_text_range) str_link;  /* [0..1][owned][const] Link to more .text/.eh_frame ranges. */
 	size_t                          str_size;  /* [lock(:s_textlock)] Page-aligned range size (allocated size). */
-	size_t                          str_used;  /* [lock(:s_textlock)] Used range size (in bytes). */
+	size_t                          str_free;  /* [lock(:s_textlock)] Free range size (# of unused trailing bytes). */
 	COMPILER_FLEXIBLE_ARRAY(byte_t, str_data); /* Range contents (up to `str_size - offsetof(str_data)' bytes) */
 };
 

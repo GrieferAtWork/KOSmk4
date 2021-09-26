@@ -106,6 +106,16 @@ NOTHROW(CC unmap_text_range_list)(struct service_text_range_slist *__restrict se
 	}
 }
 
+__LIBC void __LIBCCALL __deregister_frame(void *begin);
+
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(CC unregister_text_range_list)(struct service_text_range_slist *__restrict self) {
+	struct service_text_range *iter;
+	SLIST_FOREACH (iter, self, str_link) {
+		__deregister_frame(iter->str_data);
+	}
+}
+
 /* Close/detach a given service. WARNING: After this function was called,
  * all function pointers  returned by `service_dlsym()'  will point  into
  * the void /  into unmapped memory.  As such, it  is up to  the user  to
@@ -128,6 +138,9 @@ NOTHROW(CC libservice_close)(struct service *__restrict self) {
 	for (i = 0; i < self->s_funcc; ++i)
 		free(self->s_funcv[i]);
 	free(self->s_funcv);
+
+	/* Unregister unwind information */
+	unregister_text_range_list(&self->s_ehranges);
 
 	/* Free .text/.eh_frame buffers */
 	unmap_text_range_list(&self->s_txranges);

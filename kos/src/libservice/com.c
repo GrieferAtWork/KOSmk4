@@ -29,6 +29,7 @@
 #include <hybrid/align.h>
 #include <hybrid/atomic.h>
 #include <hybrid/host.h>
+#include <hybrid/overflow.h>
 #include <hybrid/sequence/list.h>
 #include <hybrid/sequence/rbtree.h>
 #include <hybrid/sync/atomic-lock.h>
@@ -37,6 +38,7 @@
 #include <kos/except.h>
 #include <kos/futex.h>
 #include <kos/kernel/types.h>
+#include <kos/malloc.h>
 #include <kos/refcnt.h>
 #include <kos/sys/mman.h>
 #include <kos/types.h>
@@ -59,6 +61,12 @@
 #include <libservice/types.h>
 
 #include "com.h"
+
+#if defined(__i386__) || defined(__x86_64__)
+#include "arch/i386/wrapper.h"
+#else /* ... */
+#error "Unsupported architecture"
+#endif /* !... */
 
 
 /* R/B-tree ABI for `struct service_shm_handle' */
@@ -456,7 +464,7 @@ again:
 	return range;
 }
 
-/* Insert a free area into `self'. The caller must ensure that conformance to
+/* Insert a free area  into `self'. The caller  must ensure that conformance  to
  * `SERVICE_SHM_ALLOC_*'. Returns the range which contains `base...+=num_bytes'. */
 PRIVATE NOBLOCK NOPREEMPT ATTR_RETNONNULL NONNULL((1, 2)) struct service_shm_free *
 NOTHROW(FCALL service_insert_freearea)(struct service *__restrict self,
@@ -504,7 +512,7 @@ NOTHROW(FCALL reloc_free_list)(struct service_shm_free_list *__restrict self,
 
 
 /* Assign the used SHM handle, inheriting the given reference and
- * dropping a reference from the old handle, as well as relocate
+ * dropping  a reference from the old handle, as well as relocate
  * all pointers into SHM memory to make use of the area described
  * by the given `handle'.
  * This function will initialize:
@@ -832,41 +840,150 @@ NOTHROW(FCALL libservice_shmbuf_freeat_fast_nopr)(struct service *__restrict sel
 
 /* Search for a function entry that may be referring to `name'
  * If not found, return `NULL'. */
-INTERN WUNUSED NONNULL((1, 2)) struct service_function_entry *
-NOTHROW_NCX(CC libservice_dlsym_lookup)(struct service *__restrict self,
-                                        char const *__restrict name)
+PRIVATE WUNUSED NONNULL((1, 2)) struct service_function_entry *
+NOTHROW_NCX(CC service_dlsym_lookup)(struct service *__restrict self,
+                                     char const *__restrict name)
 		THROWS(E_SEGFAULT) {
 	struct service_function_entry *result;
 	size_t lo, hi;
-	atomic_rwlock_read(&self->s_textlock);
-	TRY {
-		lo = 0;
-		hi = self->s_funcc;
-		while (lo < hi) {
-			int cmp;
-			size_t index;
-			index  = (lo + hi) / 2;
-			result = self->s_funcv[index];
-			assert(result);
-			cmp = strcmp(name, result->sfe_name);
-			if (cmp < 0) {
-				hi = index;
-			} else if (cmp > 0) {
-				lo = index + 1;
-			} else {
-				goto foundit;
-			}
+	lo = 0;
+	hi = self->s_funcc;
+	while (lo < hi) {
+		int cmp;
+		size_t index;
+		index  = (lo + hi) / 2;
+		result = self->s_funcv[index];
+		assert(result);
+		cmp = strcmp(name, result->sfe_name);
+		if (cmp < 0) {
+			hi = index;
+		} else if (cmp > 0) {
+			lo = index + 1;
+		} else {
+			goto foundit;
 		}
-	} EXCEPT {
-		atomic_rwlock_endread(&self->s_textlock);
-		RETHROW();
 	}
 	result = NULL;
 foundit:
-	atomic_rwlock_endread(&self->s_textlock);
 	return result;
 }
 
+/* Insert the given `entry' into the function vector. The caller must ensure that
+ * the vector has been resized to allow for an additional entry to be fitted. */
+PRIVATE NONNULL((1, 2)) void
+NOTHROW_NCX(CC service_dlsym_insert)(struct service *__restrict self,
+                                     struct service_function_entry *__restrict entry) {
+	size_t lo, hi, index;
+	lo = 0;
+	hi = self->s_funcc;
+	for (;;) {
+		struct service_function_entry *other;
+		int cmp;
+		index = (lo + hi) / 2;
+		if (lo >= hi)
+			break;
+		other = self->s_funcv[index];
+		assert(other);
+		cmp = strcmp(entry->sfe_name, other->sfe_name);
+		if (cmp < 0) {
+			hi = index;
+		} else if (cmp > 0) {
+			lo = index + 1;
+		} else {
+			break;
+		}
+	}
+	/* Insert at `index' */
+	memmoveup(&self->s_funcv[index + 1],
+	          &self->s_funcv[index],
+	          self->s_funcc - index,
+	          sizeof(struct service_function_entry *));
+	self->s_funcv[index] = entry;
+	++self->s_funcc;
+}
+
+
+/* Try to realloc a text range  buffer. When `range' is equal  to
+ * the first element of `self->s_txranges' or `self->s_ehranges',
+ * then don't munmap `range' if an inplace-realloc failed. */
+PRIVATE WUNUSED NONNULL((1)) struct service_text_range *CC
+service_realloc_textrange(struct service *__restrict self,
+                          struct service_text_range *range,
+                          size_t freesize, unsigned int prot)
+		THROWS(E_BADALLOC) {
+	size_t pagesize = getpagesize();
+	size_t newsize, moresize;
+	struct service_text_range *result;
+	if (!range)
+		goto alloc_new_range;
+	assert(freesize > range->str_free);
+
+	/* Try to inplace increase the size of the mapping. */
+	newsize  = (range->str_size - range->str_free) + freesize;
+	newsize  = CEIL_ALIGN(newsize, pagesize);
+	moresize = newsize - range->str_size;
+	if (mmap((byte_t *)range + range->str_size, moresize, prot,
+	         MAP_FILE | MAP_FIXED_NOREPLACE | MAP_PRIVATE | MAP_ANON, -1, 0) != MAP_FAILED) {
+		range->str_size += moresize;
+		range->str_free += moresize;
+		return range;
+	}
+
+	/* Must allocate a new range. */
+alloc_new_range:
+	freesize         = CEIL_ALIGN(freesize, pagesize);
+	result           = (struct service_text_range *)MMap(NULL, freesize, prot, MAP_PRIVATE | MAP_ANON, -1, 0);
+	result->str_size = freesize;
+	result->str_free = freesize;
+
+	if (range != NULL &&
+	    range != SLIST_FIRST(&self->s_txranges) &&
+	    range != SLIST_FIRST(&self->s_ehranges))
+		munmap(range, range->str_size); /* Free the old range. */
+
+	return result;
+}
+
+
+/* The # of bytes that  must not be freed  past the end of  the
+ * .eh_frame section These act as a sentinel marker for unwind. */
+#define EH_FRAME_SENTINAL_SIZE 4
+
+
+/* Free a text range buffer. When `range' is equal to the first
+ * element  of `self->s_txranges' or `self->s_ehranges', try to
+ * truncate the range to its  used size. Otherwise unmap it  in
+ * its entirety. */
+PRIVATE NONNULL((1)) void
+NOTHROW(CC service_free_textrange)(struct service *__restrict self,
+                                   struct service_text_range *range) {
+	if unlikely(range == NULL)
+		return;
+	if (range == SLIST_FIRST(&self->s_txranges) ||
+	    range == SLIST_FIRST(&self->s_ehranges)) {
+		size_t pagesize = getpagesize();
+		size_t unmap_size;
+		unmap_size = range->str_free;
+		if (range == SLIST_FIRST(&self->s_ehranges)) {
+			/* Special case: the  .eh_frame section's trailing 4 bytes must always
+			 *               be kept as they represent sentinel storage which must
+			 *               not be freed. */
+			if (OVERFLOW_USUB(unmap_size, EH_FRAME_SENTINAL_SIZE, &unmap_size))
+				unmap_size = 0;
+		}
+		unmap_size = FLOOR_ALIGN(unmap_size, pagesize);
+		if (unmap_size != 0) {
+			byte_t *unmap_base;
+			unmap_base = (byte_t *)range + range->str_size - unmap_size;
+			munmap(unmap_base, unmap_size);
+		}
+	} else {
+		munmap(range, range->str_size);
+	}
+}
+
+
+__LIBC void __LIBCCALL __register_frame(void *begin);
 
 /* Lookup a function exported by the service, and if not already loaded, ask the
  * server for information about the function  before creating a wrapper for  it,
@@ -877,19 +994,136 @@ libservice_dlsym_lookup_or_create(struct service *__restrict self,
                                   char const *__restrict name,
                                   unsigned int kind)
 		THROWS(E_NO_SUCH_OBJECT, E_BADALLOC, E_INTERRUPT) {
+	struct com_generator cg;
 	struct service_function_entry *entry;
+	size_t tx_bufsize, eh_bufsize;
+	struct service_text_range *tx_range;
+	struct service_text_range *eh_range;
+	byte_t *tx_base, *eh_base;
+
+	assert(kind == SERVICE_FUNCTION_ENTRY_KIND_NORMAL ||
+	       kind == SERVICE_FUNCTION_ENTRY_KIND_EXCEPT);
 
 	/* Check if the requested function had already been queried in the past. */
-	entry = libservice_dlsym_lookup(self, name);
+	atomic_rwlock_read(&self->s_textlock);
+	TRY {
+		entry = service_dlsym_lookup(self, name);
+	} EXCEPT {
+		atomic_rwlock_endread(&self->s_textlock);
+		RETHROW();
+	}
+	atomic_rwlock_endread(&self->s_textlock);
 	if (entry && entry->sfe_entries[kind] != NULL)
-		return entry->sfe_entries[kind];
+		goto done;
 
-	/* TODO */
-	(void)self;
-	(void)name;
-	(void)kind;
-	abort();
+	/* Ask the server about information regarding this symbol. */
+	libservice_dlsym_getinfo(self, name, &cg.cg_info);
+
+	/* Initialize the com generator. */
+	comgen_init(&cg, self, kind == SERVICE_FUNCTION_ENTRY_KIND_EXCEPT);
+
+	/* Compile the wrapper function. */
+	tx_bufsize = COM_GENERATOR_INITIAL_TX_BUFSIZ;
+	eh_bufsize = COM_GENERATOR_INITIAL_EH_BUFSIZ;
+	atomic_rwlock_write(&self->s_textlock);
+	TRY {
+		tx_range = SLIST_FIRST(&self->s_txranges);
+		eh_range = SLIST_FIRST(&self->s_ehranges);
+
+		/* Check once again if the function is available.
+		 * It may be if another thread created it while the server was telling us about it. */
+		entry = service_dlsym_lookup(self, name);
+		if unlikely(entry && entry->sfe_entries[kind] != NULL) {
+			atomic_rwlock_endwrite(&self->s_textlock);
+			goto done;
+		}
+
+		for (;;) {
+			/* Resize .text and .eh_frame buffers */
+			if (!tx_range || (tx_bufsize + offsetof(struct service_text_range, str_data)) > tx_range->str_free)
+				tx_range = service_realloc_textrange(self, tx_range, tx_bufsize + offsetof(struct service_text_range, str_data), PROT_READ | PROT_WRITE | PROT_EXEC);
+			if (!eh_range || (eh_bufsize + offsetof(struct service_text_range, str_data)) > eh_range->str_free)
+				eh_range = service_realloc_textrange(self, eh_range, eh_bufsize + offsetof(struct service_text_range, str_data), PROT_READ | PROT_WRITE);
+			assert((tx_bufsize + offsetof(struct service_text_range, str_data)) <= tx_range->str_free);
+			assert((eh_bufsize + offsetof(struct service_text_range, str_data)) <= eh_range->str_free);
+			tx_bufsize = tx_range->str_free - offsetof(struct service_text_range, str_data);
+			eh_bufsize = eh_range->str_free - offsetof(struct service_text_range, str_data);
+			tx_base = (byte_t *)tx_range->str_data + tx_range->str_size - tx_bufsize;
+			eh_base = (byte_t *)eh_range->str_data + eh_range->str_size - eh_bufsize;
+			comgen_reset(&cg,
+			             tx_base, tx_base + tx_bufsize,
+			             eh_base, eh_base + eh_bufsize);
+			if (comgen_compile(&cg))
+				break;
+			assert(comgen_compile_st_moretx(&cg) ||
+			       comgen_compile_st_moreeh(&cg));
+			if (comgen_compile_st_moretx(&cg))
+				tx_bufsize *= 2;
+			if (comgen_compile_st_moreeh(&cg))
+				eh_bufsize *= 2;
+		}
+
+		/* Calculate actually used buffer sizes. */
+		tx_bufsize = comgen_compile_txused(&cg);
+		eh_bufsize = comgen_compile_ehused(&cg);
+		assert((tx_bufsize + offsetof(struct service_text_range, str_data)) <= tx_range->str_free);
+		assert((eh_bufsize + offsetof(struct service_text_range, str_data)) <= eh_range->str_free);
+
+		if (!entry) {
+			/* Create a new function entry. */
+			size_t usable_vector_size;
+			size_t namelen = strlen(name);
+			entry = (struct service_function_entry *)Malloc(offsetof(struct service_function_entry, sfe_name) +
+			                                                (namelen + 1) * sizeof(char));
+			usable_vector_size = malloc_usable_size(self->s_funcv) / sizeof(struct service_function_entry *);
+			assert(self->s_funcc <= usable_vector_size);
+			if (self->s_funcc >= usable_vector_size) {
+				size_t new_alloc;
+				new_alloc     = (self->s_funcc + 1) * sizeof(struct service_function_entry *);
+				TRY {
+					self->s_funcv = (struct service_function_entry **)Realloc(self->s_funcv, new_alloc);
+				} EXCEPT {
+					free(entry);
+					RETHROW();
+				}
+			}
+
+			/* Initialize the new entry. */
+			memcpy(entry->sfe_name, name, namelen + 1, sizeof(char));
+			memset(entry->sfe_entries, 0, sizeof(entry->sfe_entries));
+
+			/* Insert at the proper location. */
+			service_dlsym_insert(self, entry);
+		}
+
+		/* Safe the wrapper function base address. */
+		assert(entry->sfe_entries[kind] == NULL);
+		entry->sfe_entries[kind] = tx_base;
+	} EXCEPT {
+		service_free_textrange(self, tx_range);
+		service_free_textrange(self, eh_range);
+		atomic_rwlock_endwrite(&self->s_textlock);
+		RETHROW();
+	}
+
+	/* Insert new .text/.eh_frame buffers into the list of ranges. */
+	assert(tx_range != SLIST_FIRST(&self->s_ehranges));
+	assert(eh_range != SLIST_FIRST(&self->s_txranges));
+	if (tx_range != SLIST_FIRST(&self->s_txranges))
+		SLIST_INSERT(&self->s_txranges, tx_range, str_link);
+	if (eh_range != SLIST_FIRST(&self->s_ehranges)) {
+		SLIST_INSERT(&self->s_ehranges, eh_range, str_link);
+		atomic_rwlock_endwrite(&self->s_textlock);
+		/* First-time use of this .eh_frame range: register for use by libunwind! */
+		__register_frame(eh_range->str_data);
+	} else {
+		atomic_rwlock_endwrite(&self->s_textlock);
+	}
+done:
+	return entry->sfe_entries[kind];
 }
+
+
 
 /* Ask the server for information about the function `name', and store it in `*info' */
 INTERN NONNULL((1, 2, 3)) void CC

@@ -1242,6 +1242,9 @@ INTDEF NOBLOCK WUNUSED NONNULL((1)) bool
 NOTHROW(FCALL comgen_compile)(struct com_generator *__restrict self);
 #define comgen_compile_st_moretx(self) (!comgen_txok1(self))
 #define comgen_compile_st_moreeh(self) (!comgen_ehok1(self))
+/* Number of .text/.eh_frame bytes used on success */
+#define comgen_compile_txused(self) ((size_t)((self)->cg_txptr - (self)->cg_txbas))
+#define comgen_compile_ehused(self) ((size_t)((self)->cg_ehptr - (self)->cg_ehbas))
 
 /* Helper to check if compilation should continue */
 #define comgen_compile_isok(self)       \
