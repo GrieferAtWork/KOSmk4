@@ -333,7 +333,7 @@ struct service_shm_handle {
 	                                          * Shared memory region end pointer may not be reduced */
 	struct service_shm_handle *ssh_tree_lhs; /* [lock(ssh_service->s_shm_lock)][0..1] LHS branch. */
 	struct service_shm_handle *ssh_tree_rhs; /* [lock(ssh_service->s_shm_lock)][0..1] RHS branch. */
-	uintptr_t                  ssh_tree_red; /* [lock(ssh_service->s_shm_lock)] Non-zero  if  this is  a  red node
+	uintptr_t                  ssh_tree_red; /* [lock(ssh_service->s_shm_lock)] Non-zero if  this is  a red  node
 	                                          * within the tree of all SHM handles (using the SHM mapping address
 	                                          * ranges) */
 	union {
@@ -352,6 +352,18 @@ __DEFINE_REFCOUNT_FUNCTIONS(struct service_shm_handle, ssh_refcnt, service_shm_h
 /* Helpers for operating with SHM handle tree functions. */
 #define service_shm_handle_getminaddr(self) ((byte_t *)(self)->ssh_shm)
 #define service_shm_handle_getmaxaddr(self) ((self)->ssh_endp - 1)
+
+
+/* Allocate a new SHM handle. Note that these functions are non-blocking
+ * because  they make use of a custom slab-style allocator. They're also
+ * reentrance-safe because they must be called with preemption disabled. */
+INTDEF NOBLOCK NOPREEMPT ATTR_RETNONNULL WUNUSED struct service_shm_handle *FCALL
+service_shm_handle_alloc_nopr(void) THROWS(E_BADALLOC);
+INTDEF NOBLOCK NOPREEMPT WUNUSED struct service_shm_handle *
+NOTHROW(FCALL service_shm_handle_alloc_nopr_nx)(void);
+INTDEF NOBLOCK NOPREEMPT NONNULL((1)) void
+NOTHROW(FCALL service_shm_handle_free_nopr)(struct service_shm_handle *__restrict self);
+
 
 
 
@@ -415,7 +427,7 @@ struct service {
 /* Acquire or release a lock to `self->s_shm_lops'
  * Note that these functions must only be called when preemption is disabled,
  * and  that as far  as multi-threading semantics go,  these functions may be
- * considered NOBLOCK, and `s_shm_lock' be  considered an SMP-lock! Also  note
+ * considered NOBLOCK, and `s_shm_lock' be considered an SMP-lock! Also  note
  * the  *_nopr suffix, meaning  that all signals must  be masked before these
  * functions  may be called, and that they  must remain masked for the entire
  * duration of the lock being acquired! */

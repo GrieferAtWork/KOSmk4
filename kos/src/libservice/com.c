@@ -33,16 +33,24 @@
 #include <hybrid/sequence/rbtree.h>
 #include <hybrid/sync/atomic-lock.h>
 
+#include <asm/pagesize.h>
 #include <kos/except.h>
 #include <kos/futex.h>
 #include <kos/kernel/types.h>
 #include <kos/refcnt.h>
+#include <kos/sys/mman.h>
 #include <kos/types.h>
+#include <sys/mman.h>
+#include <sys/param.h>
 
 #include <assert.h>
+#include <inttypes.h>
 #include <signal.h>
+#include <stdbool.h>
 #include <stddef.h>
 #include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
 
 #include <libc/signal.h>
 #include <libservice/bits/com.h>
@@ -77,25 +85,276 @@
 
 DECL_BEGIN
 
-PRIVATE NOBLOCK NONNULL((1)) void
-NOTHROW(FCALL service_shm_handle_free)(struct service_shm_handle *__restrict self) {
-	/* FIXME: Need a custom allocator for SHM handles that provides a re-entrant-safe
-	 *        malloc() function for data-blocks with sizeof(service_shm_handle), as
-	 *        SHM handles may need to be allocated from com wrappers. A dedicated
-	 *        slab-allocator would be perfect for this case! */
-	free(self);
+#if !defined(PAGESIZE) && defined(__ARCH_PAGESIZE)
+#define PAGESIZE __ARCH_PAGESIZE
+#endif /* !PAGESIZE && __ARCH_PAGESIZE */
+
+/* SHM-HANDLE slabs look as follows:
+ * >> struct sh_slab {
+ * >>     struct sh_slab *ss_next;
+ * >> };
+ */
+
+struct sh_slab {
+	SLIST_ENTRY(sh_slab)               ss_link;  /* [lock(!PREEMPTION && sh_slab_lock)] Link in list of non-fully-allocated slabs. */
+	COMPILER_FLEXIBLE_ARRAY(uintptr_t, ss_used); /* [lock(!PREEMPTION && sh_slab_lock)][sh_slab_used_count] Bitset of used entries. */
+/*	struct service_shm_handle          ss_hand[]; * [sh_slab_hand_count] Array of handles. */
+	/* Right here, the struct is just shy of PAGESIZE */
+};
+
+/* Helper macros to calculate values relating to the above structure, based on page size */
+#define _sh_slab_hand_count_upper(pagesize) (((pagesize)-offsetof(struct sh_slab, ss_used)) / sizeof(struct service_shm_handle))
+#define _sh_slab_used_count(pagesize)       CEILDIV(_sh_slab_hand_count_upper(pagesize), sizeof(uintptr_t) * NBBY)
+#define _sh_slab_offsetof_hand(pagesize)    (offsetof(struct sh_slab, ss_used) + _sh_slab_used_count(pagesize) * sizeof(uintptr_t))
+#define _sh_slab_sizeof_hand(pagesize)      ((pagesize)-_sh_slab_offsetof_hand(pagesize))
+#define _sh_slab_hand_count(pagesize)       (_sh_slab_sizeof_hand(pagesize) / sizeof(struct service_shm_handle))
+
+/* Value for the last word of `ss_used' when all entries are in-use. */
+#define _sh_slab_used_allones_lastword(pagesize) (((uintptr_t)1 << (_sh_slab_hand_count(pagesize) % (sizeof(uintptr_t) * NBBY))) - 1)
+
+/* Determine slab values. */
+#ifdef PAGESIZE
+enum {
+	v_sh_slab_pagesize      = PAGESIZE,
+	v_sh_slab_used_count    = _sh_slab_used_count(PAGESIZE),
+	v_sh_slab_offsetof_hand = _sh_slab_offsetof_hand(PAGESIZE),
+	v_sh_slab_hand_count    = _sh_slab_hand_count(PAGESIZE),
+};
+#define sh_slab_pagesize              ((size_t)v_sh_slab_pagesize)
+#define sh_slab_used_count            ((size_t)v_sh_slab_used_count)
+#define sh_slab_offsetof_hand         ((size_t)v_sh_slab_offsetof_hand)
+#define sh_slab_hand_count            ((size_t)v_sh_slab_hand_count)
+#define sh_slab_used_allones_lastword _sh_slab_used_allones_lastword(PAGESIZE)
+#define sh_slab_init()                (void)0
+#else /* PAGESIZE */
+PRIVATE size_t sh_slab_pagesize                 = 0;
+PRIVATE size_t sh_slab_used_count               = 0;
+PRIVATE size_t sh_slab_offsetof_hand            = 0;
+PRIVATE size_t sh_slab_hand_count               = 0;
+PRIVATE uintptr_t sh_slab_used_allones_lastword = 0;
+#define sh_slab_init() (void)(sh_slab_used_allones_lastword || (_sh_slab_init(), 0))
+PRIVATE NOBLOCK void NOTHROW(FCALL _sh_slab_init)(void) {
+	size_t pagesize       = getpagesize();
+	sh_slab_pagesize      = pagesize;
+	sh_slab_used_count    = _sh_slab_hand_count(pagesize);
+	sh_slab_offsetof_hand = _sh_slab_sizeof_hand(pagesize);
+	sh_slab_hand_count    = _sh_slab_used_count(pagesize);
+	assertf(sh_slab_hand_count >= 1, "Page size (%" PRIuSIZ ") is _this_ small?", pagesize);
+	COMPILER_WRITE_BARRIER();
+	sh_slab_used_allones_lastword = _sh_slab_used_allones_lastword(pagesize);
+	COMPILER_WRITE_BARRIER();
+}
+#endif /* !PAGESIZE */
+
+/* Return the slab associated with a given pointer */
+#define sh_slab_of(ptr) ((struct sh_slab *)((uintptr_t)(ptr) & ~(sh_slab_pagesize - 1)))
+
+/* Return a pointer to `self->ss_hand' */
+#define sh_slab_hand(self) ((struct service_shm_handle *)((byte_t *)(self) + sh_slab_offsetof_hand))
+
+
+/* Check if the given slab is fully allocated. */
+PRIVATE NOBLOCK NOPREEMPT ATTR_PURE WUNUSED NONNULL((1)) bool
+NOTHROW(FCALL sh_slab_isfull)(struct sh_slab const *__restrict self) {
+	unsigned int index;
+	uintptr_t word;
+	for (index = 0; index < sh_slab_used_count - 1; ++index) {
+		word = self->ss_used[index];
+		if (word != (uintptr_t)-1)
+			return false;
+	}
+	/* Check the last word. */
+	word = self->ss_used[index];
+	return word >= sh_slab_used_allones_lastword;
+}
+
+/* Check if the given slab is empty. */
+PRIVATE NOBLOCK NOPREEMPT ATTR_PURE WUNUSED NONNULL((1)) bool
+NOTHROW(FCALL sh_slab_isempty)(struct sh_slab const *__restrict self) {
+	unsigned int index;
+	uintptr_t word;
+	for (index = 0; index < sh_slab_used_count - 1; ++index) {
+		word = self->ss_used[index];
+		if (word != 0)
+			return false;
+	}
+	/* Check the last word. */
+	word = self->ss_used[index];
+	if (word & sh_slab_used_allones_lastword)
+		return false;
+	return true;
+}
+
+SLIST_HEAD(sh_slab_slist, sh_slab);
+
+/* [0..n][lock(sh_slab_lock)] List of non-fully-allocated slabs. */
+PRIVATE struct sh_slab_slist sh_slab_list = SLIST_HEAD_INITIALIZER(sh_slab_list);
+
+/* Lock for accessing the slab sub-system. */
+PRIVATE struct atomic_lock sh_slab_lock = ATOMIC_LOCK_INIT;
+
+PRIVATE NOBLOCK NOPREEMPT ATTR_RETNONNULL WUNUSED NONNULL((1)) struct service_shm_handle *
+NOTHROW(FCALL sh_slab_allocate_from_non_full)(struct sh_slab *__restrict self) {
+	unsigned int index, addend;
+	uintptr_t word, mask;
+	for (index = 0; index < sh_slab_used_count - 1; ++index) {
+		word = self->ss_used[index];
+		if (word != (uintptr_t)-1)
+			goto allocate_from_word;
+	}
+	/* Check the last word. */
+	word = self->ss_used[index];
+	assertf(word < sh_slab_used_allones_lastword,
+	        "But this one is fully allocated?");
+allocate_from_word:
+	addend = 0;
+	mask   = 1;
+	while (word & mask) {
+		++addend;
+		mask <<= 1;
+	}
+	self->ss_used[index] = word | mask;
+	index *= sizeof(uintptr_t) * NBBY;
+	index += addend;
+	return &sh_slab_hand(self)[index];
+}
+
+/* Allocate a handle from the global slab
+ * cache, or return `NULL' if doing so failed. */
+PRIVATE NOBLOCK NOPREEMPT WUNUSED struct service_shm_handle *
+NOTHROW(FCALL sh_slab_g_alloc_nopr)(void) {
+	struct sh_slab *slab;
+	struct service_shm_handle *result = NULL;
+	atomic_lock_acquire_nopr(&sh_slab_lock);
+	slab = SLIST_FIRST(&sh_slab_list);
+	if (slab != NULL) {
+		result = sh_slab_allocate_from_non_full(slab);
+		/* Check for special case: when the slab got fully allocated,
+		 * then we must remove it from the non-fullly-allocated list. */
+		if unlikely(sh_slab_isfull(slab))
+			SLIST_REMOVE_HEAD(&sh_slab_list, ss_link);
+	}
+	atomic_lock_release(&sh_slab_lock);
+	return result;
+}
+
+PRIVATE NOBLOCK NOPREEMPT ATTR_RETNONNULL WUNUSED NONNULL((1)) struct service_shm_handle *
+NOTHROW(FCALL sh_slab_g_alloc_with_new_page_nopr)(void *page) {
+	struct sh_slab *slab;
+	struct service_shm_handle *result = NULL;
+	atomic_lock_acquire_nopr(&sh_slab_lock);
+	slab = SLIST_FIRST(&sh_slab_list);
+	if likely(slab == NULL) {
+		/* Initialize the new caller-given page. */
+		slab = (struct sh_slab *)page;
+
+		/* Mark all items as free. */
+		memsetc(slab->ss_used, 0, sh_slab_used_count, sizeof(uintptr_t));
+		assert(sh_slab_isempty(slab));
+
+		/* Allocate the first item. */
+		slab->ss_used[0] |= 1;
+		result = &sh_slab_hand(slab)[0];
+		assert(!sh_slab_isempty(slab));
+
+		/* Insert into the list of non-full slabs. */
+		if unlikely(sh_slab_hand_count == 1) {
+			assert(sh_slab_isfull(slab));
+		} else {
+			assert(!sh_slab_isfull(slab));
+			SLIST_INSERT(&sh_slab_list, slab, ss_link);
+		}
+		atomic_lock_release(&sh_slab_lock);
+	} else {
+		/* Someone else allocated more in the mean time. */
+		result = sh_slab_allocate_from_non_full(slab);
+		if unlikely(sh_slab_isfull(slab))
+			SLIST_REMOVE_HEAD(&sh_slab_list, ss_link);
+		atomic_lock_release(&sh_slab_lock);
+		/* Don't need the new caller-given page. */
+		munmap(page, sh_slab_pagesize);
+	}
+	return result;
 }
 
 
-PRIVATE NOBLOCK NONNULL((1, 2)) void
+
+
+
+
+
+/* Allocate a new SHM handle. Note that these functions are non-blocking
+ * because  they make use of a custom slab-style allocator. They're also
+ * reentrance-safe because they must be called with preemption disabled. */
+INTERN NOBLOCK NOPREEMPT ATTR_RETNONNULL WUNUSED struct service_shm_handle *FCALL
+service_shm_handle_alloc_nopr(void) THROWS(E_BADALLOC) {
+	struct service_shm_handle *result;
+	result = sh_slab_g_alloc_nopr();
+	if (result == NULL) {
+		void *page;
+		sh_slab_init();
+		page   = MMap(NULL, sh_slab_pagesize, PROT_READ | PROT_WRITE, MAP_ANON, -1, 0);
+		result = sh_slab_g_alloc_with_new_page_nopr(page);
+	}
+	return result;
+}
+
+INTERN NOBLOCK NOPREEMPT WUNUSED struct service_shm_handle *
+NOTHROW(FCALL service_shm_handle_alloc_nopr_nx)(void) {
+	struct service_shm_handle *result;
+	result = sh_slab_g_alloc_nopr();
+	if (result == NULL) {
+		void *page;
+		sh_slab_init();
+		page = mmap(NULL, sh_slab_pagesize, PROT_READ | PROT_WRITE, MAP_ANON, -1, 0);
+		if (page != MAP_FAILED)
+			result = sh_slab_g_alloc_with_new_page_nopr(page);
+	}
+	return result;
+}
+
+
+INTERN NOBLOCK NOPREEMPT NONNULL((1)) void
+NOTHROW(FCALL service_shm_handle_free_nopr)(struct service_shm_handle *__restrict self) {
+	struct sh_slab *slab;
+	unsigned int index, i, shift;
+	slab  = sh_slab_of(self);
+	index = (unsigned int)(self - sh_slab_hand(slab));
+	assertf(&sh_slab_hand(slab)[index] == self,
+	        "Unaligned pointer %p", self);
+	i     = index / (sizeof(uintptr_t) * NBBY);
+	shift = index % (sizeof(uintptr_t) * NBBY);
+	assertf(slab->ss_used[i] & ((uintptr_t)1 << shift),
+	        "Pointer at %p already marked as free", self);
+	atomic_lock_acquire_nopr(&sh_slab_lock);
+	/* Special case: if the slab was full, then we must add it to the non-full list. */
+	if (sh_slab_isfull(slab)) {
+		slab->ss_used[i] &= ~((uintptr_t)1 << shift);
+		SLIST_INSERT(&sh_slab_list, slab, ss_link);
+	} else {
+		slab->ss_used[i] &= ~((uintptr_t)1 << shift);
+	}
+	if (sh_slab_isempty(slab)) {
+		/* Special case: the slab became empty.
+		 * Remove from the non-full list and munmap() it. */
+		SLIST_REMOVE(&sh_slab_list, slab, ss_link);
+		atomic_lock_release(&sh_slab_lock);
+		munmap(slab, sh_slab_pagesize);
+		return;
+	}
+	atomic_lock_release(&sh_slab_lock);
+}
+
+
+PRIVATE NOBLOCK NOPREEMPT NONNULL((1, 2)) void
 NOTHROW(LOCKOP_CC service_shm_handle_destroy_postlop)(Tobpostlockop(service) *__restrict self,
                                                       struct service *__restrict UNUSED(obj)) {
 	struct service_shm_handle *me;
 	me = container_of(self, struct service_shm_handle, ssh_plop);
-	service_shm_handle_free(me);
+	service_shm_handle_free_nopr(me);
 }
 
-PRIVATE NOBLOCK NONNULL((1, 2)) Tobpostlockop(service) *
+PRIVATE NOBLOCK NOPREEMPT NONNULL((1, 2)) Tobpostlockop(service) *
 NOTHROW(LOCKOP_CC service_shm_handle_destroy_lop)(Toblockop(service) *__restrict self,
                                                   struct service *__restrict obj) {
 	struct service_shm_handle *me;
@@ -116,8 +375,8 @@ NOTHROW(FCALL service_shm_handle_destroy)(struct service_shm_handle *__restrict 
 	if (libservice_shmlock_tryacquire_nopr(svc)) {
 		sshtree_removenode(&svc->s_shm_tree, self);
 		libservice_shmlock_release_nopr(svc);
+		service_shm_handle_free_nopr(self);
 		PREEMPTION_POP(was);
-		service_shm_handle_free(self);
 		return;
 	}
 	/* Enqueue a lockop to remove `self' from `svc->s_shm_tree' */
@@ -129,7 +388,7 @@ NOTHROW(FCALL service_shm_handle_destroy)(struct service_shm_handle *__restrict 
 
 
 /* Lookup a function exported by the service, and if not already loaded, ask the
- * server for information about the function before creating a wrapper for it,
+ * server for information about the function  before creating a wrapper for  it,
  * which is then cached before also being returned. */
 INTERN WUNUSED NONNULL((1, 2)) void *CC
 libservice_dlsym_lookup_or_create(struct service *__restrict self,
@@ -156,10 +415,10 @@ libservice_dlsym_getinfo(struct service *__restrict self, char const *__restrict
 }
 
 
-/* Abort the given command by trying to CMPXCH the command code of `com'
+/* Abort the given command by trying to CMPXCH the command code of  `com'
  * from `orig_code' to `SERVICE_COM_NOOP', before sending an interrupt to
- * the server and forcing the thread currently serving this command to
- * restart (at which point the NOOP will be able to complete without any
+ * the  server and forcing  the thread currently  serving this command to
+ * restart (at which point the NOOP will be able to complete without  any
  * further blocking)
  * This function then waits until the operation stops blocking doing that,
  * and only returns once it is safe to deallocate `com'
