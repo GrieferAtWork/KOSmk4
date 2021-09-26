@@ -29,14 +29,16 @@
 #include <kos/except.h>
 #include <kos/malloc.h>
 #include <kos/sys/mman.h>
+#include <kos/sys/socket.h>
 #include <kos/types.h>
 #include <kos/unistd.h>
-#include <sys/mman.h>
-#include <sys/socket.h>
+#include <sys/un.h>
 
+#include <alloca.h>
 #include <assert.h>
 #include <errno.h>
 #include <malloc.h>
+#include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
@@ -73,10 +75,22 @@ libservice_open(char const *filename) THROWS(E_FSERROR, E_BADALLOC, E_INTERRUPT)
 			result->s_funcv = NULL;
 
 			/* Create the socket which we're going to use to communicate with the server. */
-			result->s_fd_srv = socket(AF_UNIX, SOCK_STREAM, PF_UNIX); // TODO: "Socket()"
+			result->s_fd_srv = Socket(AF_UNIX, SOCK_STREAM, PF_UNIX);
 			TRY {
+				struct sockaddr_un *sa;
+				socklen_t sa_len;
+				size_t filename_size;
+
+				/* Connect to a unix domain socket bound to the given file. */
+				filename_size  = (strlen(filename) + 1) * sizeof(char);
+				sa_len         = offsetof(struct sockaddr_un, sun_path) + filename_size;
+				sa             = (struct sockaddr_un *)alloca(sa_len);
+				sa->sun_family = AF_UNIX;
+				memcpy(sa->sun_path, filename, filename_size);
+				Connect(result->s_fd_srv, (struct sockaddr *)sa, sa_len);
 
 				/* TODO: Server handshake + acquire SHM handle. */
+
 				(void)filename;
 				abort();
 
@@ -88,7 +102,7 @@ libservice_open(char const *filename) THROWS(E_FSERROR, E_BADALLOC, E_INTERRUPT)
 					unsigned int bucket;
 
 					/* This really shouldn't happen, but we mustn't assume anything about `getpagesize()'!
-					 * Note that in all likelyhood, the compiler will just optimize this away, especially
+					 * Note that in all likelihood, the compiler will just optimize this away, especially
 					 * when `getpagesize()' expands to a constant integer. */
 					if unlikely(shm_size < SERVICE_SHM_ALLOC_MINSIZE)
 						shm_size = CEIL_ALIGN(SERVICE_SHM_ALLOC_MINSIZE, pagesize);
