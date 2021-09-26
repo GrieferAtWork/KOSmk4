@@ -26,10 +26,13 @@
 
 #include <kos/except.h>
 #include <kos/types.h>
+#include <sys/mman.h>
 
 #include <assert.h>
 #include <errno.h>
+#include <malloc.h>
 #include <string.h>
+#include <unistd.h>
 
 #include <libservice/client.h>
 
@@ -62,6 +65,47 @@ NOTHROW_RPC(CC libservice_open_nx)(char const *filename) {
 	return NULL;
 }
 
+/* Exception-enabled versions of the above. */
+INTERN ATTR_RETNONNULL WUNUSED NONNULL((1)) struct service *CC
+libservice_open(char const *filename) THROWS(E_FSERROR, E_BADALLOC, E_INTERRUPT) {
+	/* TODO */
+	(void)filename;
+	THROW(E_NOT_IMPLEMENTED_TODO);
+}
+
+
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(CC destroy_shm_handle)(struct service_shm_handle *__restrict self) {
+	struct service_shm_handle *lhs, *rhs;
+again:
+	lhs = self->ssh_tree_lhs;
+	rhs = self->ssh_tree_rhs;
+
+	/* Unmap this SHM mapping. */
+	munmap(self->ssh_base, service_shm_handle_getsize(self));
+
+	/* Free the handle descriptor itself. */
+	service_shm_handle_free_nopr(self);
+	if (lhs) {
+		if (rhs)
+			destroy_shm_handle(rhs);
+		self = lhs;
+		goto again;
+	}
+	if (rhs) {
+		self = rhs;
+		goto again;
+	}
+}
+
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(CC unmap_text_range_list)(struct service_text_range_slist *__restrict self) {
+	struct service_text_range *iter;
+	SLIST_FOREACH_SAFE (iter, self, str_link) {
+		munmap(iter, iter->str_size);
+	}
+}
+
 /* Close/detach a given service. WARNING: After this function was called,
  * all function pointers  returned by `service_dlsym()'  will point  into
  * the void /  into unmapped memory.  As such, it  is up to  the user  to
@@ -71,9 +115,26 @@ NOTHROW_RPC(CC libservice_open_nx)(char const *filename) {
  * to one  of the  `exec()' functions  will be  closed  automatically. */
 INTERN NOBLOCK NONNULL((1)) void
 NOTHROW(CC libservice_close)(struct service *__restrict self) {
-	/* TODO */
-	(void)self;
-	COMPILER_IMPURE();
+	size_t i;
+
+	/* Destroy all SHM handles. */
+	destroy_shm_handle(self->s_shm);
+
+	/* Close internal file descriptors. */
+	close(self->s_fd_srv);
+	close(self->s_fd_shm);
+
+	/* Free Function descriptor */
+	for (i = 0; i < self->s_funcc; ++i)
+		free(self->s_funcv[i]);
+	free(self->s_funcv);
+
+	/* Free .text/.eh_frame buffers */
+	unmap_text_range_list(&self->s_txranges);
+	unmap_text_range_list(&self->s_ehranges);
+
+	/* Free the main control structure. */
+	free(self);
 }
 
 
@@ -101,28 +162,25 @@ NOTHROW(CC libservice_close)(struct service *__restrict self) {
 INTERN WUNUSED NONNULL((1, 2)) void *
 NOTHROW_RPC(CC libservice_dlsym_nx)(struct service *__restrict self,
                                     char const *__restrict symname) {
-	/* TODO */
-	(void)self;
-	(void)symname;
-	errno = ENOSYS;
-	return NULL;
+	void *result;
+	TRY {
+		result = libservice_dlsym_lookup_or_create(self, symname, SERVICE_FUNCTION_ENTRY_KIND_NORMAL);
+	} EXCEPT {
+		error_class_t cls = error_class();
+		if (ERRORCLASS_ISRTLPRIORITY(cls))
+			RETHROW();
+		errno  = error_as_errno(error_data());
+		result = NULL;
+	}
+	return result;
 }
 
 INTERN ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) void *CC
 libservice_dlsym(struct service *__restrict self, char const *__restrict symname)
 		THROWS(E_NO_SUCH_OBJECT, E_BADALLOC, E_INTERRUPT) {
-	/* TODO */
-	(void)self;
-	(void)symname;
-	THROW(E_NOT_IMPLEMENTED_TODO);
-}
-
-
-/* Exception-enabled versions of the above. */
-INTERN ATTR_RETNONNULL WUNUSED NONNULL((1)) struct service *CC
-libservice_open(char const *filename) THROWS(E_FSERROR, E_BADALLOC, E_INTERRUPT) {
-	(void)filename;
-	THROW(E_NOT_IMPLEMENTED_TODO);
+	void *result;
+	result = libservice_dlsym_lookup_or_create(self, symname, SERVICE_FUNCTION_ENTRY_KIND_EXCEPT);
+	return result;
 }
 
 

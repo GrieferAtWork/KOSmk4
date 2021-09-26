@@ -830,19 +830,64 @@ NOTHROW(FCALL libservice_shmbuf_freeat_fast_nopr)(struct service *__restrict sel
 
 
 
+/* Search for a function entry that may be referring to `name'
+ * If not found, return `NULL'. */
+INTERN WUNUSED NONNULL((1, 2)) struct service_function_entry *
+NOTHROW_NCX(CC libservice_dlsym_lookup)(struct service *__restrict self,
+                                        char const *__restrict name)
+		THROWS(E_SEGFAULT) {
+	struct service_function_entry *result;
+	size_t lo, hi;
+	atomic_rwlock_read(&self->s_textlock);
+	TRY {
+		lo = 0;
+		hi = self->s_funcc;
+		while (lo < hi) {
+			int cmp;
+			size_t index;
+			index  = (lo + hi) / 2;
+			result = self->s_funcv[index];
+			assert(result);
+			cmp = strcmp(name, result->sfe_name);
+			if (cmp < 0) {
+				hi = index;
+			} else if (cmp > 0) {
+				lo = index + 1;
+			} else {
+				goto foundit;
+			}
+		}
+	} EXCEPT {
+		atomic_rwlock_endread(&self->s_textlock);
+		RETHROW();
+	}
+	result = NULL;
+foundit:
+	atomic_rwlock_endread(&self->s_textlock);
+	return result;
+}
+
 
 /* Lookup a function exported by the service, and if not already loaded, ask the
  * server for information about the function  before creating a wrapper for  it,
- * which is then cached before also being returned. */
+ * which is then cached before also being returned.
+ * @param: kind: One of `SERVICE_FUNCTION_ENTRY_KIND_*' */
 INTERN WUNUSED NONNULL((1, 2)) void *CC
 libservice_dlsym_lookup_or_create(struct service *__restrict self,
                                   char const *__restrict name,
-                                  bool uses_exceptions)
+                                  unsigned int kind)
 		THROWS(E_NO_SUCH_OBJECT, E_BADALLOC, E_INTERRUPT) {
+	struct service_function_entry *entry;
+
+	/* Check if the requested function had already been queried in the past. */
+	entry = libservice_dlsym_lookup(self, name);
+	if (entry && entry->sfe_entries[kind] != NULL)
+		return entry->sfe_entries[kind];
+
 	/* TODO */
 	(void)self;
 	(void)name;
-	(void)uses_exceptions;
+	(void)kind;
 	abort();
 }
 

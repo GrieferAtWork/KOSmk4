@@ -34,6 +34,7 @@
 #include <hybrid/sequence/list.h>
 #include <hybrid/sequence/rbtree.h>
 #include <hybrid/sync/atomic-lock.h>
+#include <hybrid/sync/atomic-rwlock.h>
 
 #include <kos/except.h>
 #include <kos/futex.h>
@@ -403,6 +404,30 @@ struct service_shm_free {
 	 ? SERVICE_FREE_LIST_COUNT                                       \
 	 : (size) >> _SERVICE_FREE_LIST_SHIFT)
 
+
+struct service_function_entry {
+	union {
+		struct {
+			void                 *sfe_entry; /* [0..1][lock(read(ATOMIC), write(ONCE && :s_textlock))] Non-exception-enable function entry. */
+			void                 *sfe_Entry; /* [0..1][lock(read(ATOMIC), write(ONCE && :s_textlock))] Exception-enable function entry. */
+		};
+#define SERVICE_FUNCTION_ENTRY_KIND_NORMAL 0 /* Normal function */
+#define SERVICE_FUNCTION_ENTRY_KIND_EXCEPT 1 /* Exception-enabled function */
+		void *sfe_entries[2]; /* Function entries. (see above) */
+	};
+	COMPILER_FLEXIBLE_ARRAY(char, sfe_name); /* [const] Function name (NUL-terminated C-string) */
+};
+
+struct service_text_range;
+SLIST_HEAD(service_text_range_slist, service_text_range);
+struct service_text_range {
+	SLIST_ENTRY(service_text_range) str_link;  /* [0..1][owned][const] Link to more .text/.eh_frame ranges. */
+	size_t                          str_size;  /* [lock(:s_textlock)] Page-aligned range size (allocated size). */
+	size_t                          str_used;  /* [lock(:s_textlock)] Used range size (in bytes). */
+	COMPILER_FLEXIBLE_ARRAY(byte_t, str_data); /* Range contents (up to `str_size - offsetof(str_data)' bytes) */
+};
+
+
 struct service {
 	struct atomic_lock                s_shm_lock;     /* Lock for `s_shm' and related members.
 	                                                   * NOTE: This lock may only be acquired/released while the calling
@@ -422,16 +447,22 @@ struct service {
 	                                                   * Page-aligned, allocated file-size of `s_fd_shm' (s.a. `ftruncate(2)') */
 	fd_t                              s_fd_srv;       /* [const][owned] File descriptor for the unix domain socket connected to the server. */
 	fd_t                              s_fd_shm;       /* [const][owned] File descriptor for the shared memory region. */
-	/* TODO: Allocation helpers for mapping PROT_EXEC memory (for use by arch-specific wrapper function generators) */
-	/* TODO: Allocation helpers for creating `.eh_frame' data (registered via `__register_frame()') (for use by arch-specific wrapper function generators) */
-	/* TODO: Cache of already-loaded service functions (such that `service_dlsym()'  can
-	 *       re-return identical pointers for symbols after they've already been loaded) */
+
+	/* Helpers for keeping track of .text/.eh_frame allocations, as well as function name->address mappings. */
+	struct atomic_rwlock              s_textlock;     /* Lock for .text/.eh_frame buffers, as well as the table of known functions. */
+	struct service_text_range_slist   s_txranges;     /* [0..n][owned][lock(s_textlock)] Memory ranges allocated for .text memory */
+	struct service_text_range_slist   s_ehranges;     /* [0..n][owned][lock(s_textlock)] Memory ranges allocated for .eh_frame memory
+	                                                   * NOTE: Each element of this list was registered via `__register_frame(3)' */
+	size_t                            s_funcc;        /* [lock(s_textlock)] # of entries in `s_funcv' */
+	struct service_function_entry   **s_funcv;        /* [1..1][owned][lock(s_textlock)][0..s_funcc][owned][lock(s_textlock)]
+	                                                   * Array of known functions descriptors. (Sorted lexicographically by name) */
 };
 
 
 /* Reap lock operations of `self->s_shm_lops' */
-#define libservice_shmlock_mustreap(self) lockop_mustreap(&(self)->s_shm_lops)
-#define libservice_shmlock_reap_nopr(self)     oblockop_reap_atomic_lock(&(self)->s_shm_lops, &(self)->s_shm_lock, self)
+#define libservice_shmlock_mustreap(self)   lockop_mustreap(&(self)->s_shm_lops)
+#define libservice_shmlock_reap_nopr(self)  oblockop_reap_atomic_lock(&(self)->s_shm_lops, &(self)->s_shm_lock, self)
+#define _libservice_shmlock_reap_nopr(self) _oblockop_reap_atomic_lock(&(self)->s_shm_lops, &(self)->s_shm_lock, self)
 
 /* Acquire or release a lock to `self->s_shm_lops'
  * Note that these functions must only be called when preemption is disabled,
@@ -457,28 +488,16 @@ struct service {
 		PREEMPTION_POP(_was);                  \
 	} __WHILE0
 
-struct service_wrapper_buffer {
-	byte_t *swb_txbuf; /* [1..swb_txsiz] .text buffer */
-	size_t  swb_txsiz; /* .text buffer size */
-	byte_t *swb_ehbuf; /* [1..swb_ehsiz] .eh_frame buffer */
-	size_t  swb_ehsiz; /* .eh_frame buffer size */
-	byte_t *swb_entry; /* [out][1..1] Function entry point */
-};
-
-/* Bits for `libservice_dlsym_create_wrapper::flags' */
-#define SERVICE_WRAPPER_FLAG_NORMAL 0x0000 /* Normal flags. */
-#define SERVICE_WRAPPER_FLAG_EXCEPT 0x0001 /* The function makes use of exception, rather than
-                                            * using `errno'. For differences, see the mock for
-                                            * `CLIENT' above. */
 
 
 /* Lookup a function exported by the service, and if not already loaded, ask the
  * server for information about the function  before creating a wrapper for  it,
- * which is then cached before also being returned. */
+ * which is then cached before also being returned.
+ * @param: kind: One of `SERVICE_FUNCTION_ENTRY_KIND_*' */
 INTDEF WUNUSED NONNULL((1, 2)) void *CC
 libservice_dlsym_lookup_or_create(struct service *__restrict self,
                                   char const *__restrict name,
-                                  bool uses_exceptions)
+                                  unsigned int kind)
 		THROWS(E_NO_SUCH_OBJECT, E_BADALLOC, E_INTERRUPT);
 
 /* Ask the server for information about the function `name', and store it in `*info' */

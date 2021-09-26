@@ -100,6 +100,12 @@ again:
 	goto again;
 
 done:
+	/* Every allocation comes with an implicit reference to its associated
+	 * SHM.  Technically we there's no point in us actually returning this
+	 * pointer, as it can be determined by the buffer pointer alone  (s.a.
+	 * `libservice_shm_handle_ataddr_nopr()'), but that operation runs  in
+	 * O(log2(n)) time, so passing this  reference along can speed  things
+	 * up a little bit. */
 	result_shm = incref(self->s_shm);
 	libservice_shmlock_release_nopr(self);
 	*(size_t *)result_ptr = result_siz;
