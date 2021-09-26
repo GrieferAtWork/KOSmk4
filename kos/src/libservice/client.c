@@ -24,13 +24,20 @@
 #include "api.h"
 /**/
 
+#include <hybrid/align.h>
+
 #include <kos/except.h>
+#include <kos/malloc.h>
+#include <kos/sys/mman.h>
 #include <kos/types.h>
+#include <kos/unistd.h>
 #include <sys/mman.h>
+#include <sys/socket.h>
 
 #include <assert.h>
 #include <errno.h>
 #include <malloc.h>
+#include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
 
@@ -40,6 +47,96 @@
 #include "com.h"
 
 DECL_BEGIN
+
+/* Exception-enabled version of `libservice_open_nx()'. */
+INTERN ATTR_RETNONNULL WUNUSED NONNULL((1)) struct service *CC
+libservice_open(char const *filename) THROWS(E_FSERROR, E_BADALLOC, E_INTERRUPT) {
+	struct service *result;
+	REF struct service_shm_handle *shm;
+	result = (struct service *)Malloc(sizeof(struct service));
+	TRY {
+		atomic_lock_init(&result->s_shm_lock);
+		SLIST_INIT(&result->s_shm_lops);
+		shm = service_shm_handle_alloc();
+		TRY {
+			shm->ssh_refcnt    = 1;
+			shm->ssh_tree_lhs  = NULL;
+			shm->ssh_tree_rhs  = NULL;
+			shm->ssh_tree_red  = 1; /* Singular leaf is always red */
+			shm->ssh_service   = result;
+			result->s_shm      = shm;
+			result->s_shm_tree = shm;
+			atomic_rwlock_init(&result->s_textlock);
+			SLIST_INIT(&result->s_txranges);
+			SLIST_INIT(&result->s_ehranges);
+			result->s_funcc = 0;
+			result->s_funcv = NULL;
+
+			/* Create the socket which we're going to use to communicate with the server. */
+			result->s_fd_srv = socket(AF_UNIX, SOCK_STREAM, PF_UNIX); // TODO: "Socket()"
+			TRY {
+
+				/* TODO: Server handshake + acquire SHM handle. */
+				(void)filename;
+				abort();
+
+				TRY {
+					struct service_shm_free *allfree;
+					size_t pagesize = getpagesize();
+					size_t shm_size = pagesize * 4;
+					byte_t *shm_base;
+					unsigned int bucket;
+
+					/* This really shouldn't happen, but we mustn't assume anything about `getpagesize()'!
+					 * Note that in all likelyhood, the compiler will just optimize this away, especially
+					 * when `getpagesize()' expands to a constant integer. */
+					if unlikely(shm_size < SERVICE_SHM_ALLOC_MINSIZE)
+						shm_size = CEIL_ALIGN(SERVICE_SHM_ALLOC_MINSIZE, pagesize);
+
+					/* Allocate the initial SHM buffer. */
+					FTruncate(result->s_fd_shm, shm_size);
+					result->s_fd_shm_size = shm_size;
+
+					/* Create the initial SHM mapping. */
+					shm_base = (byte_t *)MMap(NULL, shm_size, PROT_READ | PROT_WRITE,
+					                          MAP_SHARED | MAP_FILE, result->s_fd_shm,
+					                          0);
+
+					/* Fill in the mapping location for the initial SHM region. */
+					shm->ssh_base = shm_base;
+					shm->ssh_endp = shm_base + shm_size;
+
+					/* Register everything about the SHM control header as free memory. */
+					allfree           = (struct service_shm_free *)shm->ssh_shm->s_data;
+					allfree->ssf_size = (shm_size - offsetof(struct service_shm, s_data)) |
+					                    SERVICE_SHM_FREE_REDBIT; /* Singular leaf is always red */
+					allfree->ssf_node.rb_lhs = NULL;
+					allfree->ssf_node.rb_rhs = NULL;
+					result->s_shm_freetree = allfree;
+
+					bucket = SERVICE_FREE_LIST_INDEX(shm_size);
+					allfree->ssf_bysize.le_prev = &result->s_shm_freelist[bucket].lh_first;
+					allfree->ssf_bysize.le_next = NULL;
+					result->s_shm_freelist[bucket].lh_first = allfree;
+				} EXCEPT {
+					close(result->s_fd_shm);
+					RETHROW();
+				}
+			} EXCEPT {
+				close(result->s_fd_srv);
+				RETHROW();
+			}
+		} EXCEPT {
+			service_shm_handle_free(shm);
+			RETHROW();
+		}
+	} EXCEPT {
+		free(result);
+		RETHROW();
+	}
+	return result;
+}
+
 
 /* Client API interface for service. Note that opening the same
  * service more than once will return unique handles each time,
@@ -64,15 +161,6 @@ NOTHROW_RPC(CC libservice_open_nx)(char const *filename) {
 	}
 	return NULL;
 }
-
-/* Exception-enabled versions of the above. */
-INTERN ATTR_RETNONNULL WUNUSED NONNULL((1)) struct service *CC
-libservice_open(char const *filename) THROWS(E_FSERROR, E_BADALLOC, E_INTERRUPT) {
-	/* TODO */
-	(void)filename;
-	THROW(E_NOT_IMPLEMENTED_TODO);
-}
-
 
 PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(CC destroy_shm_handle)(struct service_shm_handle *__restrict self) {

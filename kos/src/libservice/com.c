@@ -375,6 +375,28 @@ NOTHROW(FCALL service_shm_handle_free_nopr)(struct service_shm_handle *__restric
 	atomic_lock_release(&sh_slab_lock);
 }
 
+INTERN NOBLOCK ATTR_RETNONNULL WUNUSED struct service_shm_handle *FCALL
+service_shm_handle_alloc(void) THROWS(E_BADALLOC) {
+	pflag_t was = PREEMPTION_PUSHOFF();
+	struct service_shm_handle *result;
+	TRY {
+		result = service_shm_handle_alloc_nopr();
+	} EXCEPT {
+		PREEMPTION_POP(was);
+		RETHROW();
+	}
+	PREEMPTION_POP(was);
+	return result;
+}
+
+INTDEF NOBLOCK NOPREEMPT NONNULL((1)) void
+NOTHROW(FCALL service_shm_handle_free)(struct service_shm_handle *__restrict self) {
+	pflag_t was = PREEMPTION_PUSHOFF();
+	service_shm_handle_free_nopr(self);
+	PREEMPTION_POP(was);
+}
+
+
 
 PRIVATE NOBLOCK NOPREEMPT NONNULL((1, 2)) void
 NOTHROW(LOCKOP_CC service_shm_handle_destroy_postlop)(Tobpostlockop(service) *__restrict self,

@@ -372,6 +372,11 @@ NOTHROW(FCALL service_shm_handle_alloc_nopr_nx)(void);
 INTDEF NOBLOCK NOPREEMPT NONNULL((1)) void
 NOTHROW(FCALL service_shm_handle_free_nopr)(struct service_shm_handle *__restrict self);
 
+INTDEF NOBLOCK ATTR_RETNONNULL WUNUSED struct service_shm_handle *FCALL
+service_shm_handle_alloc(void) THROWS(E_BADALLOC);
+INTDEF NOBLOCK NOPREEMPT NONNULL((1)) void
+NOTHROW(FCALL service_shm_handle_free)(struct service_shm_handle *__restrict self);
+
 
 
 
