@@ -1162,6 +1162,8 @@ libservice_dlsym_getinfo(struct service *__restrict self, char const *__restrict
 	comsize = offsetof(struct service_com, sc_dlsym.dl_name) + namsize;
 	comsize = CEIL_ALIGN(comsize, SERVICE_SHM_ALLOC_ALIGN);
 	comsize += SERVICE_SHM_ALLOC_EXTRA;
+	if (comsize < offsetafter(struct service_com, sc_dlsym_success))
+		comsize = offsetafter(struct service_com, sc_dlsym_success);
 	if (comsize < SERVICE_SHM_ALLOC_MINSIZE)
 		comsize = SERVICE_SHM_ALLOC_MINSIZE;
 
