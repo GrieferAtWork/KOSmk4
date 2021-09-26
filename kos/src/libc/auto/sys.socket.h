@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xba2b3f1e */
+/* HASH CRC-32:0x3f92c36f */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -257,7 +257,7 @@ INTDEF fd_t NOTHROW_RPC(LIBDCALL libd_accept4)(fd_t sockfd, __SOCKADDR_ARG addr,
  *                            MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB'
  * @return: * : The # of datagrams successfully sent.
  * @return: -1: ... Same as `sendmsg(2)' */
-INTDEF NONNULL((2)) int NOTHROW_RPC(LIBDCALL libd_sendmmsg)(fd_t sockfd, struct mmsghdr *vmessages, __STDC_UINT_AS_SIZE_T vlen, __STDC_INT_AS_UINT_T msg_flags);
+INTDEF NONNULL((2)) __STDC_INT_AS_SSIZE_T NOTHROW_RPC(LIBDCALL libd_sendmmsg)(fd_t sockfd, struct mmsghdr *vmessages, __STDC_UINT_AS_SIZE_T vlen, __STDC_INT_AS_UINT_T msg_flags);
 /* >> recvmmsg(2)
  * Same as `recvmsg(2)', but may be used to receive many
  * messages  (datagrams)  with  a  single  system  call.
@@ -267,7 +267,7 @@ INTDEF NONNULL((2)) int NOTHROW_RPC(LIBDCALL libd_sendmmsg)(fd_t sockfd, struct 
  *                            MSG_WAITFORONE'
  * @return: * : The # of datagrams successfully received.
  * @return: -1: Error (s.a. `recvmsg(2)') */
-INTDEF NONNULL((2)) int NOTHROW_RPC(LIBDCALL libd_recvmmsg)(fd_t sockfd, struct mmsghdr *vmessages, __STDC_UINT_AS_SIZE_T vlen, __STDC_INT_AS_UINT_T msg_flags, struct timespec *tmo);
+INTDEF NONNULL((2)) __STDC_INT_AS_SSIZE_T NOTHROW_RPC(LIBDCALL libd_recvmmsg)(fd_t sockfd, struct mmsghdr *vmessages, __STDC_UINT_AS_SIZE_T vlen, __STDC_INT_AS_UINT_T msg_flags, struct timespec *tmo);
 /* >> recvmmsg(2)
  * Same as `recvmsg(2)', but may be used to receive many
  * messages  (datagrams)  with  a  single  system  call.
@@ -277,7 +277,7 @@ INTDEF NONNULL((2)) int NOTHROW_RPC(LIBDCALL libd_recvmmsg)(fd_t sockfd, struct 
  *                            MSG_WAITFORONE'
  * @return: * : The # of datagrams successfully received.
  * @return: -1: Error (s.a. `recvmsg(2)') */
-INTDEF NONNULL((2)) int NOTHROW_RPC(LIBDCALL libd_recvmmsg64)(fd_t sockfd, struct mmsghdr *vmessages, __STDC_UINT_AS_SIZE_T vlen, __STDC_INT_AS_UINT_T msg_flags, struct timespec64 *tmo);
+INTDEF NONNULL((2)) __STDC_INT_AS_SSIZE_T NOTHROW_RPC(LIBDCALL libd_recvmmsg64)(fd_t sockfd, struct mmsghdr *vmessages, __STDC_UINT_AS_SIZE_T vlen, __STDC_INT_AS_UINT_T msg_flags, struct timespec64 *tmo);
 /* >> sockatmark(3)
  * Check if `sockfd' is at a out-of-band mark
  * @return: > 0 : The read-pointer is pointing at out-of-band data

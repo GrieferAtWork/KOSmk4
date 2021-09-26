@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2007b6f3 */
+/* HASH CRC-32:0xe1517ac */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,11 +20,15 @@
  */
 
 #ifndef __KERNEL__
+#define __CRT_HAVE_Accept
+#define __CRT_HAVE_Accept4
+#define __CRT_HAVE_Bind
 #define __CRT_HAVE_Calloc
 #define __CRT_HAVE_ChRoot
 #define __CRT_HAVE_Chdir
 #define __CRT_HAVE_Chmod
 #define __CRT_HAVE_Chown
+#define __CRT_HAVE_Connect
 #define __CRT_HAVE_Creat
 #define __CRT_HAVE_Creat64
 #endif /* !__KERNEL__ */
@@ -2964,9 +2968,12 @@
 #define __CRT_HAVE_GetDomainName
 #define __CRT_HAVE_GetHostName
 #define __CRT_HAVE_GetPGid
+#define __CRT_HAVE_GetPeerName
 #define __CRT_HAVE_GetResGid
 #define __CRT_HAVE_GetResUid
 #define __CRT_HAVE_GetSid
+#define __CRT_HAVE_GetSockName
+#define __CRT_HAVE_GetSockOpt
 #define __CRT_HAVE_Hop
 #define __CRT_HAVE_Hopf
 #define __CRT_HAVE_Ioctl
@@ -2976,6 +2983,7 @@
 #define __CRT_HAVE_LSeek64
 #define __CRT_HAVE_Link
 #define __CRT_HAVE_LinkAt
+#define __CRT_HAVE_Listen
 #define __CRT_HAVE_MAdvise
 #define __CRT_HAVE_MInCore
 #define __CRT_HAVE_MLock
@@ -3029,8 +3037,17 @@
 #define __CRT_HAVE_Readlink
 #define __CRT_HAVE_ReadlinkAt
 #define __CRT_HAVE_Realloc
+#define __CRT_HAVE_Recv
+#define __CRT_HAVE_RecvFrom
+#define __CRT_HAVE_RecvMMsg
+#define __CRT_HAVE_RecvMMsg64
+#define __CRT_HAVE_RecvMsg
 #define __CRT_HAVE_RemapFilePages
 #define __CRT_HAVE_Rmdir
+#define __CRT_HAVE_Send
+#define __CRT_HAVE_SendMMsg
+#define __CRT_HAVE_SendMsg
+#define __CRT_HAVE_SendTo
 #define __CRT_HAVE_SetDomainName
 #define __CRT_HAVE_SetEGid
 #define __CRT_HAVE_SetEUid
@@ -3043,9 +3060,13 @@
 #define __CRT_HAVE_SetResGid
 #define __CRT_HAVE_SetResUid
 #define __CRT_HAVE_SetSid
+#define __CRT_HAVE_SetSockOpt
 #define __CRT_HAVE_SetUid
 #define __CRT_HAVE_ShmOpen
 #define __CRT_HAVE_ShmUnlink
+#define __CRT_HAVE_Shutdown
+#define __CRT_HAVE_Socket
+#define __CRT_HAVE_SocketPair
 #define __CRT_HAVE_Symlink
 #define __CRT_HAVE_SymlinkAt
 #define __CRT_HAVE_SyncFs

@@ -122,6 +122,49 @@ DEFINE_XSYSCALL_EXPORT(PKeyFree, sys_Xpkey_free)
 DEFINE_XSYSCALL_EXPORT(PKeyMProtect, sys_Xpkey_mprotect)
 #endif /* __ARCH_HAVE_PKEY */
 
+DEFINE_XSYSCALL_EXPORT(Socket, sys_Xsocket)
+DEFINE_XSYSCALL_EXPORT(SocketPair, sys_Xsocketpair)
+DEFINE_XSYSCALL_EXPORT(Bind, sys_Xbind)
+DEFINE_XSYSCALL_EXPORT(GetSockName, sys_Xgetsockname)
+DEFINE_XSYSCALL_EXPORT(Connect, sys_Xconnect)
+DEFINE_XSYSCALL_EXPORT(GetPeerName, sys_Xgetpeername)
+DEFINE_XSYSCALL_EXPORT(GetSockOpt, sys_Xgetsockopt)
+DEFINE_XSYSCALL_EXPORT(SetSockOpt, sys_Xsetsockopt)
+DEFINE_XSYSCALL_EXPORT(Listen, sys_Xlisten)
+DEFINE_XSYSCALL_EXPORT(Shutdown, sys_Xshutdown)
+#ifdef SYS_accept
+DEFINE_XSYSCALL_EXPORT(Accept, sys_Xaccept)
+#endif /* SYS_accept */
+DEFINE_XSYSCALL_EXPORT(Accept4, sys_Xaccept4)
+#ifdef SYS_recvmmsg_time64
+DEFINE_XSYSCALL_EXPORT(RecvMMsg64, sys_Xrecvmmsg_time64)
+#elif __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+DEFINE_XSYSCALL_EXPORT(RecvMMsg64, sys_Xrecvmmsg)
+#else /* ... */
+#error "Invalid configuration"
+#endif /* !... */
+#ifdef SYS_send
+DEFINE_XSYSCALL_EXPORT(Send, sys_Xsend)
+#endif /* SYS_send */
+#ifdef SYS_sendto
+DEFINE_XSYSCALL_EXPORT(SendTo, sys_Xsendto)
+#endif /* SYS_sendto */
+#ifdef SYS_sendmsg
+DEFINE_XSYSCALL_EXPORT(SendMsg, sys_Xsendmsg)
+#endif /* SYS_sendmsg */
+DEFINE_XSYSCALL_EXPORT(SendMMsg, sys_Xsendmmsg)
+#ifdef SYS_recv
+DEFINE_XSYSCALL_EXPORT(Recv, sys_Xrecv)
+#endif /* SYS_recv */
+#ifdef SYS_recvmsg
+DEFINE_XSYSCALL_EXPORT(RecvMsg, sys_Xrecvmsg)
+#endif /* SYS_recvmsg */
+DEFINE_XSYSCALL_EXPORT(RecvMMsg, sys_Xrecvmmsg)
+#ifdef SYS_recvfrom
+DEFINE_XSYSCALL_EXPORT(RecvFrom, sys_Xrecvfrom)
+#endif /* SYS_recvfrom */
+
+
 
 #ifdef SYS_getresuid32
 DEFINE_XSYSCALL_EXPORT(GetResUid, sys_Xgetresuid32)
@@ -187,9 +230,7 @@ DEFINE_XSYSCALL_EXPORT(LSeek64, sys_Xlseek)
 #error "Invalid configuration"
 #endif /* !... */
 
-#ifdef SYS_utimensat64
-DEFINE_XSYSCALL_EXPORT(UTimensAt64, sys_Xutimensat64)
-#elif defined(SYS_utimensat_time64)
+#ifdef SYS_utimensat_time64
 DEFINE_XSYSCALL_EXPORT(UTimensAt64, sys_Xutimensat_time64)
 #elif __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_XSYSCALL_EXPORT(UTimensAt64, sys_Xutimensat)

@@ -392,6 +392,7 @@
 	CB(PREFIX.crt.except.fs.basic_property PREFIX.crt.except.fs.property) \
 	CB(PREFIX.crt.except.fs.modify) \
 	CB(PREFIX.crt.except.fs.utility) \
+	CB(PREFIX.crt.except.net.socket) \
 	CB(PREFIX.crt.except.fs.modify_time) \
 	CB(PREFIX.crt.except.system.mman PREFIX.crt.except.system.utility) \
 	CB(PREFIX.crt.except.system.configuration) \

@@ -244,9 +244,9 @@ NOTHROW_RPC(LIBCCALL libc_recv)(fd_t sockfd,
 	msg.msg_hdr.msg_controllen = 0;
 	result = sys_recvmmsg(sockfd, &msg, 1, msg_flags);
 	if (result >= 1)
-		result = msg.msg_hdr.msg_len;
+		result = msg.msg_len;
 #else /* ... */
-#error "No suitable system call to implement `recv()'"
+#error "No suitable system call to implement `recv(2)'"
 #endif /* !... */
 	return libc_seterrno_syserr(result);
 }
@@ -311,10 +311,10 @@ NOTHROW_RPC(LIBCCALL libc_recvfrom)(fd_t sockfd,
 	if (result >= 1) {
 		if (addr_len)
 			*addr_len = msg.msg_hdr.msg_namelen;
-		result = msg.msg_hdr.msg_len;
+		result = msg.msg_len;
 	}
 #else /* ... */
-#error "No suitable system call to implement `recv()'"
+#error "No suitable system call to implement `recvfrom(2)'"
 #endif /* !... */
 	return libc_seterrno_syserr(result);
 }
@@ -336,14 +336,29 @@ NOTHROW_RPC(LIBCCALL libc_recvmsg)(fd_t sockfd,
 /*[[[body:libc_recvmsg]]]*/
 {
 	ssize_t result;
+#ifdef SYS_recvmsg
 	result = sys_recvmsg(sockfd,
 	                     message,
 	                     (syscall_ulong_t)msg_flags);
+#elif defined(SYS_recvmmsg)
+	struct mmsghdr msg;
+	msg.msg_hdr                = *message;
+	msg.msg_hdr.msg_control    = NULL;
+	msg.msg_hdr.msg_controllen = 0;
+	result = sys_recvmmsg(sockfd, &msg, 1, msg_flags, NULL);
+	message->msg_namelen    = msg.msg_hdr.msg_namelen;
+	message->msg_controllen = msg.msg_hdr.msg_controllen;
+	message->msg_flags      = msg.msg_hdr.msg_flags;
+	if (result >= 1)
+		result = msg.msg_len;
+#else /* ... */
+#error "No suitable system call to implement `recvmsg(2)'"
+#endif /* !... */
 	return libc_seterrno_syserr(result);
 }
 /*[[[end:libc_recvmsg]]]*/
 
-/*[[[head:libc_recvmmsg,hash:CRC-32=0xe117cf4f]]]*/
+/*[[[head:libc_recvmmsg,hash:CRC-32=0xf48faa28]]]*/
 /* >> recvmmsg(2)
  * Same as `recvmsg(2)', but may be used to receive many
  * messages  (datagrams)  with  a  single  system  call.
@@ -353,7 +368,7 @@ NOTHROW_RPC(LIBCCALL libc_recvmsg)(fd_t sockfd,
  *                            MSG_WAITFORONE'
  * @return: * : The # of datagrams successfully received.
  * @return: -1: Error (s.a. `recvmsg(2)') */
-INTERN ATTR_SECTION(".text.crt.net.socket") NONNULL((2)) int
+INTERN ATTR_SECTION(".text.crt.net.socket") NONNULL((2)) __STDC_INT_AS_SSIZE_T
 NOTHROW_RPC(LIBCCALL libc_recvmmsg)(fd_t sockfd,
                                     struct mmsghdr *vmessages,
                                     __STDC_UINT_AS_SIZE_T vlen,
@@ -371,7 +386,7 @@ NOTHROW_RPC(LIBCCALL libc_recvmmsg)(fd_t sockfd,
 }
 /*[[[end:libc_recvmmsg]]]*/
 
-/*[[[head:libc_recvmmsg64,hash:CRC-32=0x38962cb1]]]*/
+/*[[[head:libc_recvmmsg64,hash:CRC-32=0xe8b0c5b0]]]*/
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_recvmmsg64, libc_recvmmsg);
 #else /* MAGIC:alias */
@@ -384,7 +399,7 @@ DEFINE_INTERN_ALIAS(libc_recvmmsg64, libc_recvmmsg);
  *                            MSG_WAITFORONE'
  * @return: * : The # of datagrams successfully received.
  * @return: -1: Error (s.a. `recvmsg(2)') */
-INTERN ATTR_SECTION(".text.crt.net.socket") NONNULL((2)) int
+INTERN ATTR_SECTION(".text.crt.net.socket") NONNULL((2)) __STDC_INT_AS_SSIZE_T
 NOTHROW_RPC(LIBCCALL libc_recvmmsg64)(fd_t sockfd,
                                       struct mmsghdr *vmessages,
                                       __STDC_UINT_AS_SIZE_T vlen,
@@ -393,20 +408,14 @@ NOTHROW_RPC(LIBCCALL libc_recvmmsg64)(fd_t sockfd,
 /*[[[body:libc_recvmmsg64]]]*/
 {
 	ssize_t error;
-#ifdef SYS_recvmmsg64
-	error = sys_recvmmsg64(sockfd,
-	                       vmessages,
-	                       (size_t)vlen,
-	                       (syscall_ulong_t)msg_flags,
-	                       tmo);
-#elif defined(SYS_recvmmsg_time64)
+#ifdef SYS_recvmmsg_time64
 	error = sys_recvmmsg_time64(sockfd,
 	                            vmessages,
 	                            (size_t)vlen,
 	                            (syscall_ulong_t)msg_flags,
 	                            tmo);
 #else /* ... */
-#error "No way to implement `recvmmsg64()'"
+#error "No way to implement `recvmmsg64(2)'"
 #endif /* !... */
 	return (int)libc_seterrno_syserr(error);
 }
@@ -460,9 +469,9 @@ NOTHROW_RPC(LIBCCALL libc_send)(fd_t sockfd,
 	msg.msg_hdr.msg_controllen = 0;
 	result = sys_sendmmsg(sockfd, &msg, 1, msg_flags);
 	if (result >= 1)
-		result = msg.msg_hdr.msg_len;
+		result = msg.msg_len;
 #else /* ... */
-#error "No suitable system call to implement `send()'"
+#error "No suitable system call to implement `send(2)'"
 #endif /* !... */
 	return libc_seterrno_syserr(result);
 }
@@ -523,9 +532,9 @@ NOTHROW_RPC(LIBCCALL libc_sendto)(fd_t sockfd,
 	msg.msg_hdr.msg_controllen = 0;
 	result = sys_sendmmsg(sockfd, &msg, 1, msg_flags);
 	if (result >= 1)
-		result = msg.msg_hdr.msg_len;
+		result = msg.msg_len;
 #else /* ... */
-#error "No suitable system call to implement `sendto()'"
+#error "No suitable system call to implement `sendto(2)'"
 #endif /* !... */
 	return libc_seterrno_syserr(result);
 }
@@ -546,14 +555,29 @@ NOTHROW_RPC(LIBCCALL libc_sendmsg)(fd_t sockfd,
 /*[[[body:libc_sendmsg]]]*/
 {
 	ssize_t result;
+#ifdef SYS_sendmsg
 	result = sys_sendmsg(sockfd,
 	                     message,
 	                     (syscall_ulong_t)msg_flags);
+#elif defined(SYS_sendmmsg)
+	struct mmsghdr msg;
+	msg.msg_hdr                = *message;
+	msg.msg_hdr.msg_control    = NULL;
+	msg.msg_hdr.msg_controllen = 0;
+	result = sys_sendmmsg(sockfd, &msg, 1, msg_flags);
+	message->msg_namelen    = msg.msg_hdr.msg_namelen;
+	message->msg_controllen = msg.msg_hdr.msg_controllen;
+	message->msg_flags      = msg.msg_hdr.msg_flags;
+	if (result >= 1)
+		result = msg.msg_len;
+#else /* ... */
+#error "No suitable system call to implement `sendmsg(2)'"
+#endif /* !... */
 	return libc_seterrno_syserr(result);
 }
 /*[[[end:libc_sendmsg]]]*/
 
-/*[[[head:libc_sendmmsg,hash:CRC-32=0x85bdb5a1]]]*/
+/*[[[head:libc_sendmmsg,hash:CRC-32=0x66c04436]]]*/
 /* >> sendmmsg(2)
  * Same as `sendmsg(2)', but may be used to send many
  * messages (datagrams)  with a  single system  call.
@@ -561,7 +585,7 @@ NOTHROW_RPC(LIBCCALL libc_sendmsg)(fd_t sockfd,
  *                            MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB'
  * @return: * : The # of datagrams successfully sent.
  * @return: -1: ... Same as `sendmsg(2)' */
-INTERN ATTR_SECTION(".text.crt.net.socket") NONNULL((2)) int
+INTERN ATTR_SECTION(".text.crt.net.socket") NONNULL((2)) __STDC_INT_AS_SSIZE_T
 NOTHROW_RPC(LIBCCALL libc_sendmmsg)(fd_t sockfd,
                                     struct mmsghdr *vmessages,
                                     __STDC_UINT_AS_SIZE_T vlen,
@@ -679,10 +703,13 @@ NOTHROW_RPC(LIBCCALL libc_accept)(fd_t sockfd,
 /*[[[body:libc_accept]]]*/
 {
 	fd_t result;
-	result = sys_accept4(sockfd,
-	                     (struct sockaddr *)addr,
-	                     addr_len,
-	                     0);
+#ifdef SYS_accept
+	result = sys_accept(sockfd, (struct sockaddr *)addr, addr_len);
+#elif defined(SYS_accept4)
+	result = sys_accept4(sockfd, (struct sockaddr *)addr, addr_len, 0);
+#else /* ... */
+#error "No suitable system call to implement `accept(2)'"
+#endif /* !... */
 	return libc_seterrno_syserr(result);
 }
 /*[[[end:libc_accept]]]*/
