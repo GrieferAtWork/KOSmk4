@@ -89,6 +89,28 @@ INTERN bool NOTHROW(FCALL libservice_aux_com_discard_nonrt_exception)(void) {
 	return true;
 }
 
+STATIC_ASSERT(offsetof(struct service_com_exceptinfo, e_code) == offsetof(struct exception_data, e_code));
+STATIC_ASSERT(offsetof(struct service_com_exceptinfo, e_class) == offsetof(struct exception_data, e_class));
+STATIC_ASSERT(offsetof(struct service_com_exceptinfo, e_subclass) == offsetof(struct exception_data, e_subclass));
+STATIC_ASSERT(offsetof(struct service_com_exceptinfo, e_args) == offsetof(struct exception_data, e_args));
+
+/* Set `errno' to the error code associated with `info' */
+INTERN NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL libservice_aux_load_except_as_errno)(struct service_com_exceptinfo *__restrict info) {
+	errno =	error_as_errno((struct exception_data const *)info);
+}
+
+/* Populate `error_data()' with the given information. */
+INTERN NOBLOCK NONNULL((1, 2)) void
+NOTHROW(FCALL libservice_aux_load_except_as_error)(struct service_com_exceptinfo *__restrict info,
+                                                   void const *faultpc) {
+	struct exception_data *d = error_data();
+	memcpy(d, info, sizeof(*info));
+	d->e_faultaddr = faultpc;
+}
+
+
+
 PRIVATE ATTR_PURE WUNUSED NONNULL((1, 2)) int
 compar_com_inline_buffer_param(void const *_a, void const *_b) {
 #define _MASK (COM_INLINE_BUFFER_PARAM_FIN | COM_INLINE_BUFFER_PARAM_FOUT)
@@ -2149,6 +2171,23 @@ __LIBC void __i386_syscall(void);
 
 /* Generate assembly to perform a system call:
  * >> #ifdef __x86_64__
+ * >>     syscall
+ * >> #else // __x86_64__
+ * >>     call   __i386_syscall
+ * >> #endif // !__x86_64__ */
+PRIVATE NONNULL((1)) void
+NOTHROW(FCALL comgen_do_syscall_nx)(struct com_generator *__restrict self) {
+#ifdef __x86_64__
+	/* >> syscall */
+	comgen_instr(self, gen86_syscall(&self->cg_txptr));
+#else /* __x86_64__ */
+	comgen_instr(self, gen86_call(&self->cg_txptr, &__i386_syscall));
+#endif /* !__x86_64__ */
+}
+
+
+/* Generate assembly to perform a system call:
+ * >> #ifdef __x86_64__
  * >> #if COM_GENERATOR_FEATURE_FEXCEPT
  * >>     std
  * >>     .cfi_escape 56,22,49,7,146,49,0,11,255,251,26  # Disable EFLAGS.DF during unwind & landing
@@ -2167,8 +2206,8 @@ __LIBC void __i386_syscall(void);
  * >> #endif // !__x86_64__ */
 PRIVATE NONNULL((1)) void
 NOTHROW(FCALL comgen_do_syscall)(struct com_generator *__restrict self) {
-#ifdef __x86_64__
 	if (self->cg_features & COM_GENERATOR_FEATURE_FEXCEPT) {
+#ifdef __x86_64__
 		/* >> std */
 		comgen_instr(self, gen86_std(&self->cg_txptr));
 
@@ -2191,17 +2230,12 @@ NOTHROW(FCALL comgen_do_syscall)(struct com_generator *__restrict self) {
 		/* >> .cfi_escape 57 */
 		comgen_eh_movehere(self);
 		comgen_eh_putb(self, DW_CFA_KOS_endcapsule);
-	} else {
-		/* >> syscall */
-		comgen_instr(self, gen86_syscall(&self->cg_txptr));
-	}
 #else /* __x86_64__ */
-	if (self->cg_features & COM_GENERATOR_FEATURE_FEXCEPT) {
 		comgen_instr(self, gen86_call(&self->cg_txptr, &__i386_Xsyscall));
-	} else {
-		comgen_instr(self, gen86_call(&self->cg_txptr, &__i386_syscall));
-	}
 #endif /* !__x86_64__ */
+	} else {
+		comgen_do_syscall_nx(self);
+	}
 }
 
 
@@ -2219,7 +2253,7 @@ NOTHROW(FCALL comgen_do_syscall)(struct com_generator *__restrict self) {
  * >>     movl   $LFUTEX_WAKE, %ecx
  * >>     movl   $1,           %edx
  * >> #endif // !__x86_64__
- * >>     <comgen_do_syscall> */
+ * >>     <comgen_do_syscall_nx> */
 #ifdef __x86_64__
 PRIVATE NONNULL((1)) void
 NOTHROW(FCALL comgen_wake_server)(struct com_generator *__restrict self,
@@ -2272,7 +2306,7 @@ NOTHROW(FCALL comgen_wake_server)(struct com_generator *__restrict self)
 #endif /* !__x86_64__ */
 
 	/* Invoke the system call. */
-	comgen_do_syscall(self);
+	comgen_do_syscall_nx(self);
 }
 
 
@@ -2295,7 +2329,8 @@ NOTHROW(FCALL comgen_wake_server)(struct com_generator *__restrict self)
  * >>     ja     .Lerr_com_abort_errno
  * >> #endif // !COM_GENERATOR_FEATURE_FEXCEPT
  * >>     # Check if the operation has completed
- * >>     cmpP   $<cg_info.dl_comid>, service_com::sc_code(%R_service_com)
+ * >>     movP   service_com::sc_code(%R_service_com), %Pax
+ * >>     cmpP   $<cg_info.dl_comid>, %Pax
  * >>     je     .Lwaitfor_completion
  * >> .Leh_com_waitfor_end: */
 PRIVATE NONNULL((1)) void
@@ -2346,11 +2381,15 @@ NOTHROW(FCALL comgen_waitfor_command)(struct com_generator *__restrict self) {
 	}
 
 	/* Check if the operation has completed */
-	/* >> cmpP   $<cg_info.dl_comid>, service_com::sc_code(%R_service_com) */
-	comgen_instr(self, gen86_cmpP_imm_mod(&self->cg_txptr, gen86_modrm_db,
-	                                      self->cg_info.dl_comid,
-	                                      offsetof(struct service_com, sc_code),
-	                                      GEN86_R_service_com));
+	/* >> movP   service_com::sc_code(%R_service_com), %Pax */
+	comgen_instr(self, gen86_movP_db_r(&self->cg_txptr,
+	                                   offsetof(struct service_com, sc_code),
+	                                   GEN86_R_service_com, GEN86_R_PAX));
+
+	/* >> cmpP   $<cg_info.dl_comid>, %Pax */
+	comgen_instr(self, gen86_cmpP_imm_r(&self->cg_txptr,
+	                                    self->cg_info.dl_comid,
+	                                    GEN86_R_PAX));
 
 	/* >> je     .Lwaitfor_completion */
 	comgen_instr(self, gen86_je(&self->cg_txptr, loc_Lwaitfor_completion));
@@ -3407,6 +3446,107 @@ NOTHROW(FCALL comgen_handle_errno_problems)(struct com_generator *__restrict sel
 
 
 
+/* Generate   instructions:
+ * >> .Lcom_special_return:
+ * >>     cmpP   $SERVICE_COM_ST_EXCEPT, %Pax
+ * >>     je     1f
+ * >>     # Normal return with non-zero errno
+ * >>     negP   %Pax
+ * >>     movP   %Pax, %R_fcall0P
+ * >>     call   __set_errno_f
+ * >>     jmp    .Lcom_special_return_resume
+ * >> 1:  leaP   service_com::sc_except(%R_service_com), %R_fcall0P
+ * >> #if !COM_GENERATOR_FEATURE_FEXCEPT
+ * >>     call   libservice_aux_load_except_as_errno
+ * >> #if cg_buf_paramc != 0
+ * >>     jmp    .Leh_free_xbuf_end
+ * >> #else // cg_buf_paramc != 0
+ * >>     jmp    .Leh_free_service_com_end
+ * >> #endif // cg_buf_paramc == 0
+ * >> #else // !COM_GENERATOR_FEATURE_FEXCEPT
+ * >>     movP   <cg_cfa_offset-P>(%Psp), %R_fcall1P
+ * >>     call   libservice_aux_load_except_as_error
+ * >> #if cg_buf_paramc != 0
+ * >>     jmp    .Leh_free_xbuf_entry
+ * >> #else // cg_buf_paramc != 0
+ * >>     jmp    .Leh_free_service_com_entry
+ * >> #endif // cg_buf_paramc == 0
+ * >> #endif // COM_GENERATOR_FEATURE_FEXCEPT */
+PRIVATE NONNULL((1)) void
+NOTHROW(FCALL comgen_custom_status_return)(struct com_generator *__restrict self) {
+	int8_t *pdisp_1;
+
+	/* >> .Lcom_special_return: */
+	comgen_defsym(self, COM_SYM_Lcom_special_return);
+
+	/* >> cmpP   $SERVICE_COM_ST_EXCEPT, %Pax */
+	comgen_instr(self, gen86_cmpP_imm_r(&self->cg_txptr,
+	                                    SERVICE_COM_ST_EXCEPT,
+	                                    GEN86_R_PAX));
+
+	/* >> je     1f */
+	comgen_instr(self, gen86_jcc8_offset(&self->cg_txptr, GEN86_CC_E, -1));
+	pdisp_1 = (int8_t *)(self->cg_txptr - 1);
+
+	/* Normal return with non-zero errno */
+	/* >> negP   %Pax */
+	comgen_instr(self, gen86_negP_r(&self->cg_txptr, GEN86_R_PAX));
+
+	/* >> movP   %Pax, %R_fcall0P */
+	comgen_instr(self, gen86_movP_r_r(&self->cg_txptr, GEN86_R_PAX, GEN86_R_FCALL0P));
+
+	/* >> call   __set_errno_f */
+	comgen_instr(self, gen86_call(&self->cg_txptr, &USED_SET_ERRNO));
+
+	/* >> jmp    .Lcom_special_return_resume */
+	comgen_gen86_jmp_symbol(self, COM_SYM_Lcom_special_return_resume);
+
+	/* >> 1: */
+	*pdisp_1 += (int8_t)(uint8_t)(uintptr_t)
+	            (self->cg_txptr - (byte_t *)pdisp_1);
+
+	/* >> leaP   service_com::sc_except(%R_service_com), %R_fcall0P */
+	comgen_instr(self, gen86_leaP_db_r(&self->cg_txptr, offsetof(struct service_com, sc_except),
+	                                   GEN86_R_service_com, GEN86_R_FCALL0P));
+
+	if (!(self->cg_features & COM_GENERATOR_FEATURE_FEXCEPT)) {
+		unsigned int return_symbol;
+		/* >> call   libservice_aux_load_except_as_errno */
+		comgen_instr(self, gen86_call(&self->cg_txptr, &libservice_aux_load_except_as_errno));
+
+		if (self->cg_buf_paramc != 0) {
+			/* >> jmp    .Leh_free_xbuf_end */
+			return_symbol = COM_SYM_Leh_free_xbuf_end;
+		} else {
+			/* >> jmp    .Leh_free_service_com_end */
+			return_symbol = COM_SYM_Leh_free_service_com_end;
+		}
+		comgen_gen86_jmp_symbol(self, return_symbol);
+	} else {
+		unsigned int return_symbol;
+
+		/* >> movP   <cg_cfa_offset-P>(%Psp), %R_fcall1P */
+		comgen_instr(self, gen86_movP_db_r(&self->cg_txptr,
+		                                   self->cg_cfa_offset - SIZEOF_POINTER,
+		                                   GEN86_R_PSP, GEN86_R_FCALL1P));
+
+		/* >> call   libservice_aux_load_except_as_errno */
+		comgen_instr(self, gen86_call(&self->cg_txptr, &libservice_aux_load_except_as_error));
+
+		if (self->cg_buf_paramc != 0) {
+			/* >> jmp    .Leh_free_xbuf_entry */
+			return_symbol = COM_SYM_Leh_free_xbuf_entry;
+		} else {
+			/* >> jmp    .Leh_free_service_com_entry */
+			return_symbol = COM_SYM_Leh_free_service_com_entry;
+		}
+		comgen_instr(self, gen86_jcc8_offset(&self->cg_txptr, GEN86_CC_NZ, -1));
+		comgen_reloc(self, self->cg_txptr - 1, COM_R_PCREL8, return_symbol);
+	}
+}
+
+
+
 /* Generate     instructions:
  * >> .Leh_com_waitfor_entry:
  * >>     movP   $<cg_service>,  %R_fcall0P
@@ -3957,6 +4097,27 @@ NOTHROW(FCALL comgen_compile)(struct com_generator *__restrict self) {
 	if unlikely(!comgen_ehok1(self))
 		goto fail;
 
+	/* Check if the command completed with a special status code */
+	if (SERVICE_COM_ST_SUCCESS == 0) {
+		/* >> testP  %Pax, %Pax */
+		gen86_testP_r_r(&self->cg_txptr, GEN86_R_PAX, GEN86_R_PAX);
+
+		/* >> jnz    .Lcom_special_return */
+		gen86_jccl_offset(&self->cg_txptr, GEN86_CC_NZ, -4);
+	} else {
+		/* >> cmpP   $SERVICE_COM_ST_SUCCESS, %Pax */
+		gen86_cmpP_imm_r(&self->cg_txptr, SERVICE_COM_ST_SUCCESS, GEN86_R_PAX);
+
+		/* >> jne    .Lcom_special_return */
+		gen86_jccl_offset(&self->cg_txptr, GEN86_CC_NE, -4);
+	}
+	comgen_reloc(self, self->cg_txptr - 4, COM_R_PCREL32, COM_SYM_Lcom_special_return);
+
+	/* >> .Lcom_special_return_resume: */
+	comgen_defsym(self, COM_SYM_Lcom_special_return_resume);
+	if unlikely(!comgen_txok1(self))
+		goto fail;
+
 	/* Deserialize fixed-length inline buffers */
 	comgen_deserialize_inline_buffers(self);
 
@@ -4022,6 +4183,11 @@ NOTHROW(FCALL comgen_compile)(struct com_generator *__restrict self) {
 		if unlikely(!comgen_ehok1(self))
 			goto fail;
 	}
+
+	/* Handling for custom completion status codes */
+	comgen_custom_status_return(self);
+	if (!comgen_compile_isok(self))
+		goto fail;
 
 	/* Define exception handlers. */
 	comgen_eh_com_waitfor_entry(self);

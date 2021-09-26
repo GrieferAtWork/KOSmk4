@@ -265,6 +265,9 @@ struct service_com_funinfo {
 };
 
 struct service_com_exceptinfo {
+	/* NOTE: This structure is binary-compatible with `struct exception_data',
+	 *       with the exception that this one is lacking the `e_faultaddr'
+	 *       field at the end. */
 	union {
 		error_code_t              e_code;     /* Exception code. */
 		struct {

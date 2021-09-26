@@ -577,26 +577,14 @@ STATIC_ASSERT(IS_ALIGNED(offsetof(struct service_com, sc_generic.g_data), 4));
  * >>     leaq   service_shm::s_commands(%R_shmbase), %rdi # NOTE: %R_shmbase was already initialized above!
  * >>     movq   $LFUTEX_WAKE,                        %rsi
  * >>     movq   $1,                                  %rdx
- * >> #if COM_GENERATOR_FEATURE_FEXCEPT
- * >>     std
- * >>     .cfi_escape 56,22,49,7,146,49,0,11,255,251,26  # Disable EFLAGS.DF during unwind & landing
  * >>     syscall
- * >>     cld
- * >>     .cfi_escape 57
- * >> #else // COM_GENERATOR_FEATURE_FEXCEPT
- * >>     syscall
- * >> #endif // !COM_GENERATOR_FEATURE_FEXCEPT
  * >> #else // __x86_64__
  * >> #if offsetof(service_shm, s_commands) != 0  # HINT: `%R_shmbase' is `%ebx' on i386!
  * >>     addl   $<service_shm::s_commands>, %ebx # NOTE: %R_shmbase was already initialized above!
  * >> #endif // offsetof(service_shm, s_commands) != 0
  * >>     movl   $LFUTEX_WAKE, %ecx
  * >>     movl   $1,           %edx
- * >> #if COM_GENERATOR_FEATURE_FEXCEPT
- * >>     call   __i386_Xsyscall
- * >> #else // COM_GENERATOR_FEATURE_FEXCEPT
  * >>     call   __i386_syscall
- * >> #endif // !COM_GENERATOR_FEATURE_FEXCEPT
  * >> #endif // !__x86_64__
  * >>     # No need to check for errors here: There
  * >>     # should be no reason for the above to fail!
@@ -636,10 +624,17 @@ STATIC_ASSERT(IS_ALIGNED(offsetof(struct service_com, sc_generic.g_data), 4));
  * >>     ja     .Lerr_com_abort_errno
  * >> #endif // !COM_GENERATOR_FEATURE_FEXCEPT
  * >>     # Check if the operation has completed
- * >>     cmpP   $<cg_info.dl_comid>, service_com::sc_code(%R_service_com)
+ * >>     movP   service_com::sc_code(%R_service_com), %Pax
+ * >>     cmpP   $<cg_info.dl_comid>, %Pax
  * >>     je     .Lwaitfor_completion
  * >> .Leh_com_waitfor_end:
  * >>
+ * >>
+ * >>
+ * >> // Check if the command completed with a special status code
+ * >>     cmpP   $SERVICE_COM_ST_SUCCESS, %Pax
+ * >>     jne    .Lcom_special_return
+ * >> .Lcom_special_return_resume:
  * >>
  * >>
  * >> // Deserialize fixed-length inline buffers
@@ -912,6 +907,36 @@ STATIC_ASSERT(IS_ALIGNED(offsetof(struct service_com, sc_generic.g_data), 4));
  * >>
  * >>
  * >>
+ * >> // Handling for custom completion status codes
+ * >> .Lcom_special_return:
+ * >>     cmpP   $SERVICE_COM_ST_EXCEPT, %Pax
+ * >>     je     1f
+ * >>     # Normal return with non-zero errno
+ * >>     negP   %Pax
+ * >>     movP   %Pax, %R_fcall0P
+ * >>     call   __set_errno_f
+ * >>     jmp    .Lcom_special_return_resume
+ * >> 1:  leaP   service_com::sc_except(%R_service_com), %R_fcall0P
+ * >> #if !COM_GENERATOR_FEATURE_FEXCEPT
+ * >>     call   libservice_aux_load_except_as_errno
+ * >> #if cg_buf_paramc != 0
+ * >>     jmp    .Leh_free_xbuf_end
+ * >> #else // cg_buf_paramc != 0
+ * >>     jmp    .Leh_free_service_com_end
+ * >> #endif // cg_buf_paramc == 0
+ * >> #else // !COM_GENERATOR_FEATURE_FEXCEPT
+ * >>     movP   <cg_cfa_offset-P>(%Psp), %R_fcall1P
+ * >>     call   libservice_aux_load_except_as_error
+ * >> #if cg_buf_paramc != 0
+ * >>     jmp    .Leh_free_xbuf_entry
+ * >> #else // cg_buf_paramc != 0
+ * >>     jmp    .Leh_free_service_com_entry
+ * >> #endif // cg_buf_paramc == 0
+ * >> #endif // COM_GENERATOR_FEATURE_FEXCEPT
+ * >>
+ * >>
+ * >>
+ * >>
  * >> // Remove command from wait queue on interrupt
  * >> .Leh_com_waitfor_entry:
  * >>     movP   $<cg_service>,  %R_fcall0P
@@ -1033,6 +1058,8 @@ enum {
 	COM_SYM_Lall_buffers_are_in_band_preemption_reenabled,       /* `.Lall_buffers_are_in_band_preemption_reenabled'                [valid_if(cg_buf_paramc >= 2)] */
 	COM_SYM_Leh_com_waitfor_begin,                               /* `.Leh_com_waitfor_begin' */
 	COM_SYM_Leh_com_waitfor_end,                                 /* `.Leh_com_waitfor_end' */
+	COM_SYM_Lcom_special_return,                                 /* `.Lcom_special_return' */
+	COM_SYM_Lcom_special_return_resume,                          /* `.Lcom_special_return_resume' */
 	COM_SYM_Leh_free_xbuf_end,                                   /* `.Leh_free_xbuf_end'                                            [valid_if(cg_buf_paramc != 0)] */
 	COM_SYM_Leh_free_service_com_end,                            /* `.Leh_free_service_com_end' */
 	COM_SYM_Leh_preemption_pop_end,                              /* `.Leh_preemption_pop_end' */
@@ -1074,7 +1101,7 @@ struct com_reloc {
 /* Max number of relocations in com wrapper functions */
 /*[[[deemon print("#define COM_RELOC_MAXCOUNT ", (File from deemon)
 	.open("./wrapper.c", "r").read().decode("utf-8").count("comgen_reloc"));]]]*/
-#define COM_RELOC_MAXCOUNT 7
+#define COM_RELOC_MAXCOUNT 9
 /*[[[end]]]*/
 
 
@@ -1497,6 +1524,14 @@ NOTHROW(FCALL comgen_eh_DW_CFA_def_cfa_offset)(struct com_generator *__restrict 
 INTDEF bool NOTHROW(FCALL libservice_aux_com_discard_nonrt_exception)(void);
 
 
+/* Set `errno' to the error code associated with `info' */
+INTDEF NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL libservice_aux_load_except_as_errno)(struct service_com_exceptinfo *__restrict info);
+
+/* Populate `error_data()' with the given information. */
+INTDEF NOBLOCK NONNULL((1, 2)) void
+NOTHROW(FCALL libservice_aux_load_except_as_error)(struct service_com_exceptinfo *__restrict info,
+                                                   void const *faultpc);
 
 
 DECL_END
