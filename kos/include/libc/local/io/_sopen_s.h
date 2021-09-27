@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8318f516 */
+/* HASH CRC-32:0x73216ef */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local__sopen_s_defined
-#define __local__sopen_s_defined 1
+#define __local__sopen_s_defined
 #include <__crt.h>
 #include <features.h>
 #include <asm/os/oflags.h>
@@ -28,7 +28,7 @@
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_sopen_defined
-#define __local___localdep_sopen_defined 1
+#define __local___localdep_sopen_defined
 #ifdef __CRT_HAVE_sopen
 __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,__localdep_sopen,(char const *__filename, __oflag_t __oflags, int __sflags),sopen,(__filename,__oflags,__sflags),__sflags,1,(__mode_t))
 #elif defined(__CRT_HAVE__sopen)
@@ -68,7 +68,7 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(_sopen_s))(__fd_t *__fd, char const *
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep__sopen_s_defined
-#define __local___localdep__sopen_s_defined 1
+#define __local___localdep__sopen_s_defined
 #define __localdep__sopen_s __LIBC_LOCAL_NAME(_sopen_s)
 #endif /* !__local___localdep__sopen_s_defined */
 #else /* __CRT_HAVE_sopen || __CRT_HAVE__sopen || __CRT_HAVE_open64 || __CRT_HAVE___open64 || __CRT_HAVE_open || __CRT_HAVE__open || __CRT_HAVE___open || (__AT_FDCWD && (__CRT_HAVE_openat64 || __CRT_HAVE_openat)) */

@@ -32,13 +32,13 @@ __DECL_BEGIN
 /* Deduced set of definitions, as would also be declared by <stdint.h> */
 
 #ifndef __intmax_t_defined
-#define __intmax_t_defined 1
+#define __intmax_t_defined
 typedef __INTMAX_TYPE__  intmax_t;
 typedef __UINTMAX_TYPE__ uintmax_t;
 #endif /* !__intmax_t_defined */
 
 #ifndef __int8_t_defined
-#define __int8_t_defined 1
+#define __int8_t_defined
 #ifdef __INT8_TYPE__
 typedef __INT8_TYPE__ int8_t;
 #endif /* __INT8_TYPE__ */
@@ -54,7 +54,7 @@ typedef __INT64_TYPE__ int64_t;
 #endif /* !__int8_t_defined */
 
 #ifndef __uint8_t_defined
-#define __uint8_t_defined 1
+#define __uint8_t_defined
 #ifdef __UINT8_TYPE__
 typedef __UINT8_TYPE__ uint8_t;
 #endif /* __UINT8_TYPE__ */
@@ -70,7 +70,7 @@ typedef __UINT64_TYPE__ uint64_t;
 #endif /* !__uint8_t_defined */
 
 #ifndef __int_least8_t_defined
-#define __int_least8_t_defined 1
+#define __int_least8_t_defined
 typedef __INT_LEAST8_TYPE__   int_least8_t;
 typedef __INT_LEAST16_TYPE__  int_least16_t;
 typedef __INT_LEAST32_TYPE__  int_least32_t;
@@ -84,7 +84,7 @@ typedef __UINT_LEAST64_TYPE__ uint_least64_t;
 #endif /* !__int_least8_t_defined */
 
 #ifndef __int_fast8_t_defined
-#define __int_fast8_t_defined 1
+#define __int_fast8_t_defined
 typedef __INT_FAST8_TYPE__   int_fast8_t;
 typedef __INT_FAST16_TYPE__  int_fast16_t;
 typedef __UINT_FAST8_TYPE__  uint_fast8_t;
@@ -98,12 +98,12 @@ typedef __UINT_FAST64_TYPE__ uint_fast64_t;
 #endif /* !__int_fast8_t_defined */
 
 #ifndef __intptr_t_defined
-#define __intptr_t_defined 1
+#define __intptr_t_defined
 typedef __INTPTR_TYPE__  intptr_t;
 #endif /* !__intptr_t_defined */
 
 #ifndef __uintptr_t_defined
-#define __uintptr_t_defined 1
+#define __uintptr_t_defined
 typedef __UINTPTR_TYPE__ uintptr_t;
 #endif /* !__uintptr_t_defined */
 

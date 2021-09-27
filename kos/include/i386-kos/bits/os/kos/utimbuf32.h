@@ -122,7 +122,7 @@
 #define __SIZEOF_UTIMBUF64         __SIZEOF_UTIMBUFX32_64
 #define __ALIGNOF_UTIMBUF64        __ALIGNOF_UTIMBUFX32_64
 
-#define __utimbuf_defined 1
+#define __utimbuf_defined
 #endif /* __i386__ && !__x86_64__*/
 /*[[[end]]]*/
 

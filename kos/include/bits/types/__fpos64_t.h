@@ -21,7 +21,7 @@
 #include <__stdinc.h>
 #include <bits/types.h>
 #ifndef ____fpos64_t_defined
-#define ____fpos64_t_defined 1
+#define ____fpos64_t_defined
 #ifdef __CC__
 __DECL_BEGIN
 typedef __pos64_t __fpos64_t;

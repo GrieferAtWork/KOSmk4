@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4ee05d64 */
+/* HASH CRC-32:0x1f4e3d89 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,13 +19,13 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local__strerror_defined
-#define __local__strerror_defined 1
+#define __local__strerror_defined
 #include <__crt.h>
 #include <libc/errno.h>
 #if defined(__CRT_HAVE__strerror_s) || defined(__libc_geterrno)
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep__strerror_s_defined
-#define __local___localdep__strerror_s_defined 1
+#define __local___localdep__strerror_s_defined
 #ifdef __CRT_HAVE__strerror_s
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
@@ -51,7 +51,7 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(_strerror))(char const *__message) {
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep__strerror_defined
-#define __local___localdep__strerror_defined 1
+#define __local___localdep__strerror_defined
 #define __localdep__strerror __LIBC_LOCAL_NAME(_strerror)
 #endif /* !__local___localdep__strerror_defined */
 #else /* __CRT_HAVE__strerror_s || __libc_geterrno */

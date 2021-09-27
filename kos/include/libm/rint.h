@@ -43,7 +43,7 @@ __DECL_BEGIN
 /* <<<No copyright notice found in the original file, but was part of fdlibm>>> */
 
 #ifndef __libm_hugef_defined
-#define __libm_hugef_defined 1
+#define __libm_hugef_defined
 __LIBM_LOCAL_DECLARE_BEGIN
 __LIBM_LOCAL_DECLARE(__IEEE754_FLOAT_TYPE__, hugef, __IEEE754_FLOAT_C(1.0e30))
 __LIBM_LOCAL_DECLARE_END
@@ -125,7 +125,7 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE754_FLOAT_TYPE__
  */
 
 #ifndef __libm_huge_defined
-#define __libm_huge_defined 1
+#define __libm_huge_defined
 __LIBM_LOCAL_DECLARE_BEGIN
 __LIBM_LOCAL_DECLARE(__IEEE754_DOUBLE_TYPE__, huge, __IEEE754_DOUBLE_C(1.0e300))
 __LIBM_LOCAL_DECLARE_END
@@ -213,7 +213,7 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE754_DOUBLE_TYPE__
 /* <<<No copyright notice found in the original file, but was part of fdlibm>>> */
 
 #ifndef __libm_hugeval4930l_defined
-#define __libm_hugeval4930l_defined 1
+#define __libm_hugeval4930l_defined
 __LIBM_LOCAL_DECLARE_BEGIN
 __LIBM_LOCAL_DECLARE(__IEEE854_LONG_DOUBLE_TYPE__, hugeval4930l, __IEEE854_LONG_DOUBLE_C(1.0e4930))
 __LIBM_LOCAL_DECLARE_END

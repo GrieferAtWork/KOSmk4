@@ -377,55 +377,55 @@ enum {
 __DECL_BEGIN
 
 #ifndef __pthread_t_defined
-#define __pthread_t_defined 1
+#define __pthread_t_defined
 typedef __pthread_t pthread_t;
 #endif /* !__pthread_t_defined */
 #ifndef __pthread_attr_t_defined
-#define __pthread_attr_t_defined 1
+#define __pthread_attr_t_defined
 typedef __pthread_attr_t pthread_attr_t;
 #endif /* !__pthread_attr_t_defined */
 #ifndef __pthread_mutex_t_defined
-#define __pthread_mutex_t_defined 1
+#define __pthread_mutex_t_defined
 typedef __pthread_mutex_t pthread_mutex_t;
 #endif /* !__pthread_mutex_t_defined */
 #ifndef __pthread_mutexattr_t_defined
-#define __pthread_mutexattr_t_defined 1
+#define __pthread_mutexattr_t_defined
 typedef __pthread_mutexattr_t pthread_mutexattr_t;
 #endif /* !__pthread_mutexattr_t_defined */
 #ifndef __pthread_cond_t_defined
-#define __pthread_cond_t_defined 1
+#define __pthread_cond_t_defined
 typedef __pthread_cond_t pthread_cond_t;
 #endif /* !__pthread_cond_t_defined */
 #ifndef __pthread_condattr_t_defined
-#define __pthread_condattr_t_defined 1
+#define __pthread_condattr_t_defined
 typedef __pthread_condattr_t pthread_condattr_t;
 #endif /* !__pthread_condattr_t_defined */
 #ifndef __pthread_key_t_defined
-#define __pthread_key_t_defined 1
+#define __pthread_key_t_defined
 typedef __pthread_key_t pthread_key_t;
 #endif /* !__pthread_key_t_defined */
 #ifndef __pthread_once_t_defined
-#define __pthread_once_t_defined 1
+#define __pthread_once_t_defined
 typedef __pthread_once_t pthread_once_t;
 #endif /* !__pthread_once_t_defined */
 #ifndef __pthread_barrier_t_defined
-#define __pthread_barrier_t_defined 1
+#define __pthread_barrier_t_defined
 typedef __pthread_barrier_t pthread_barrier_t;
 #endif /* !__pthread_barrier_t_defined */
 #ifndef __pthread_barrierattr_t_defined
-#define __pthread_barrierattr_t_defined 1
+#define __pthread_barrierattr_t_defined
 typedef __pthread_barrierattr_t pthread_barrierattr_t;
 #endif /* !__pthread_barrierattr_t_defined */
 #ifndef __pthread_spinlock_t_defined
-#define __pthread_spinlock_t_defined 1
+#define __pthread_spinlock_t_defined
 typedef __pthread_spinlock_t pthread_spinlock_t;
 #endif /* !__pthread_spinlock_t_defined */
 #ifndef __pthread_rwlock_t_defined
-#define __pthread_rwlock_t_defined 1
+#define __pthread_rwlock_t_defined
 typedef __pthread_rwlock_t pthread_rwlock_t;
 #endif /* !__pthread_rwlock_t_defined */
 #ifndef __pthread_rwlockattr_t_defined
-#define __pthread_rwlockattr_t_defined 1
+#define __pthread_rwlockattr_t_defined
 typedef __pthread_rwlockattr_t pthread_rwlockattr_t;
 #endif /* !__pthread_rwlockattr_t_defined */
 

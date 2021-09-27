@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x77a36769 */
+/* HASH CRC-32:0x8f160894 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -60,7 +60,7 @@
 __SYSDECL_BEGIN
 
 #ifndef __login_tty_defined
-#define __login_tty_defined 1
+#define __login_tty_defined
 #ifdef __CRT_HAVE_login_tty
 /* >> login_tty(3)
  * Set the given `fd' as the controlling terminal, stdin,
@@ -84,17 +84,17 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(login_tty, __FORCELOCAL __ATTR_ARTIFICIAL int __
 #endif /* !__CRT_HAVE_login_tty */
 #endif /* !__login_tty_defined */
 #if !defined(__login_defined) && defined(__CRT_HAVE_login)
-#define __login_defined 1
+#define __login_defined
 /* >> login(3) */
 __CDECLARE_VOID(__ATTR_NONNULL((1)),__NOTHROW_RPC_KOS,login,(struct utmp const *__entry),(__entry))
 #endif /* !__login_defined && __CRT_HAVE_login */
 #if !defined(__logout_defined) && defined(__CRT_HAVE_logout)
-#define __logout_defined 1
+#define __logout_defined
 /* >> logout(3) */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC_KOS,logout,(char const *__ut_line),(__ut_line))
 #endif /* !__logout_defined && __CRT_HAVE_logout */
 #if !defined(__logwtmp_defined) && defined(__CRT_HAVE_logwtmp)
-#define __logwtmp_defined 1
+#define __logwtmp_defined
 /* >> logwtmp(3) */
 __CDECLARE_VOID(__ATTR_NONNULL((1, 2, 3)),__NOTHROW_RPC_KOS,logwtmp,(char const *__ut_line, char const *__ut_name, char const *__ut_host),(__ut_line,__ut_name,__ut_host))
 #endif /* !__logwtmp_defined && __CRT_HAVE_logwtmp */

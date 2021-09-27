@@ -54,7 +54,7 @@ DECL_BEGIN
 #endif /* !__BRANCH_PREDITION_RIGHT_WRONG_TYPE */
 
 #ifndef __branch_prediction_defined
-#define __branch_prediction_defined 1
+#define __branch_prediction_defined
 struct branch_prediction {
 	__BRANCH_PREDITION_ADDRESS_TYPE  bp_addr;   /* [const][1..1] Source location */
 	__BRANCH_PREDITION_EXPECTED_TYPE bp_expect; /* [const] The expected value */

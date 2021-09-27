@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x21320db4 */
+/* HASH CRC-32:0x6ec384e */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,11 +19,11 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local__wsplitpath_defined
-#define __local__wsplitpath_defined 1
+#define __local__wsplitpath_defined
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep__wsplitpath_s_defined
-#define __local___localdep__wsplitpath_s_defined 1
+#define __local___localdep__wsplitpath_s_defined
 #ifdef __CRT_HAVE__wsplitpath_s
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
@@ -46,7 +46,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_wsplitpath))(__WCHAR_TYPE__ const *_
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep__wsplitpath_defined
-#define __local___localdep__wsplitpath_defined 1
+#define __local___localdep__wsplitpath_defined
 #define __localdep__wsplitpath __LIBC_LOCAL_NAME(_wsplitpath)
 #endif /* !__local___localdep__wsplitpath_defined */
 #endif /* !__local__wsplitpath_defined */

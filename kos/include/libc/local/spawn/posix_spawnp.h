@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcb86e561 */
+/* HASH CRC-32:0xbd82df1a */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_posix_spawnp_defined
-#define __local_posix_spawnp_defined 1
+#define __local_posix_spawnp_defined
 #include <__crt.h>
 #include <hybrid/__alloca.h>
 #include <libc/template/environ.h>
@@ -42,7 +42,7 @@
 #endif /* !__TARGV */
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_getenv_defined
-#define __local___localdep_getenv_defined 1
+#define __local___localdep_getenv_defined
 #ifdef __CRT_HAVE_getenv
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_getenv,(char const *__varname),getenv,(__varname))
 #elif defined(__LOCAL_environ)
@@ -55,7 +55,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_getenv_defined */
 #ifndef __local___localdep_posix_spawn_defined
-#define __local___localdep_posix_spawn_defined 1
+#define __local___localdep_posix_spawn_defined
 #ifdef __CRT_HAVE_posix_spawn
 __CREDIRECT(__ATTR_NONNULL((1, 2, 5, 6)),__errno_t,__NOTHROW_RPC,__localdep_posix_spawn,(__pid_t *__restrict __pid, char const *__restrict __path, struct __posix_spawn_file_actions const *__file_actions, struct __posix_spawnattr const *__attrp, __TARGV, __TENVP),posix_spawn,(__pid,__path,__file_actions,__attrp,___argv,___envp))
 #elif (defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))) && (defined(__CRT_HAVE_posix_fspawn_np) || (defined(__POSIX_SPAWN_USE_KOS) && ((defined(__ARCH_HAVE_SHARED_VM_VFORK) && (defined(__CRT_HAVE_vfork) || defined(__CRT_HAVE___vfork))) || ((defined(__CRT_HAVE_fork) || defined(__CRT_HAVE___fork)) && (defined(__CRT_HAVE_pipe2) || defined(__CRT_HAVE_pipe) || defined(__CRT_HAVE___pipe) || defined(__CRT_HAVE__pipe)) && defined(__O_CLOEXEC) && (defined(__CRT_HAVE_read) || defined(__CRT_HAVE__read) || defined(__CRT_HAVE___read)) && (defined(__CRT_HAVE_write) || defined(__CRT_HAVE__write) || defined(__CRT_HAVE___write)) && (defined(__CRT_HAVE_close) || defined(__CRT_HAVE__close) || defined(__CRT_HAVE___close)))) && defined(__CRT_HAVE_fexecve) && (defined(__CRT_HAVE_waitpid) || defined(__CRT_HAVE___waitpid))))
@@ -68,7 +68,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_posix_spawn_defined */
 #ifndef __local___localdep_strchr_defined
-#define __local___localdep_strchr_defined 1
+#define __local___localdep_strchr_defined
 #if __has_builtin(__builtin_strchr) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_strchr)
 __CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_strchr,(char const *__restrict __haystack, int __needle),strchr,{ return __builtin_strchr(__haystack, __needle); })
 #elif __has_builtin(__builtin_index) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_index)
@@ -85,7 +85,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_strchr_defined */
 #ifndef __local___localdep_strchrnul_defined
-#define __local___localdep_strchrnul_defined 1
+#define __local___localdep_strchrnul_defined
 #ifdef __CRT_HAVE_strchrnul
 __CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_strchrnul,(char const *__restrict __haystack, int __needle),strchrnul,(__haystack,__needle))
 #else /* __CRT_HAVE_strchrnul */
@@ -96,7 +96,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__CRT_HAVE_strchrnul */
 #endif /* !__local___localdep_strchrnul_defined */
 #ifndef __local___localdep_strlen_defined
-#define __local___localdep_strlen_defined 1
+#define __local___localdep_strlen_defined
 #ifdef __CRT_HAVE_strlen
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
@@ -186,7 +186,7 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(posix_spawnp))(__pid_t *__restrict __
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_posix_spawnp_defined
-#define __local___localdep_posix_spawnp_defined 1
+#define __local___localdep_posix_spawnp_defined
 #define __localdep_posix_spawnp __LIBC_LOCAL_NAME(posix_spawnp)
 #endif /* !__local___localdep_posix_spawnp_defined */
 #else /* (__CRT_HAVE_getenv || __LOCAL_environ) && (__CRT_HAVE_posix_spawn || ((__CRT_HAVE_open64 || __CRT_HAVE___open64 || __CRT_HAVE_open || __CRT_HAVE__open || __CRT_HAVE___open || (__AT_FDCWD && (__CRT_HAVE_openat64 || __CRT_HAVE_openat))) && (__CRT_HAVE_posix_fspawn_np || (__POSIX_SPAWN_USE_KOS && ((__ARCH_HAVE_SHARED_VM_VFORK && (__CRT_HAVE_vfork || __CRT_HAVE___vfork)) || ((__CRT_HAVE_fork || __CRT_HAVE___fork) && (__CRT_HAVE_pipe2 || __CRT_HAVE_pipe || __CRT_HAVE___pipe || __CRT_HAVE__pipe) && __O_CLOEXEC && (__CRT_HAVE_read || __CRT_HAVE__read || __CRT_HAVE___read) && (__CRT_HAVE_write || __CRT_HAVE__write || __CRT_HAVE___write) && (__CRT_HAVE_close || __CRT_HAVE__close || __CRT_HAVE___close))) && __CRT_HAVE_fexecve && (__CRT_HAVE_waitpid || __CRT_HAVE___waitpid))))) && __hybrid_alloca */

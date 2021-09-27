@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc39454ef */
+/* HASH CRC-32:0x8627494a */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_setprogname_defined
-#define __local_setprogname_defined 1
+#define __local_setprogname_defined
 #include <__crt.h>
 #include <libc/template/program_invocation_name.h>
 #ifdef __LOCAL_program_invocation_short_name_p
@@ -30,7 +30,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(setprogname))(char const *__name) {
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_setprogname_defined
-#define __local___localdep_setprogname_defined 1
+#define __local___localdep_setprogname_defined
 #define __localdep_setprogname __LIBC_LOCAL_NAME(setprogname)
 #endif /* !__local___localdep_setprogname_defined */
 #else /* __LOCAL_program_invocation_short_name_p */

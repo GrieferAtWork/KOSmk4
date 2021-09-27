@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2426a32a */
+/* HASH CRC-32:0xce6da299 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,13 +19,13 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_cuserid_defined
-#define __local_cuserid_defined 1
+#define __local_cuserid_defined
 #include <__crt.h>
 #include <libc/template/environ.h>
 #if defined(__CRT_HAVE_getlogin_r) || defined(__CRT_HAVE_getenv) || defined(__LOCAL_environ) || (defined(__CRT_HAVE_getpwuid_r) && defined(__CRT_HAVE_geteuid))
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_getlogin_r_defined
-#define __local___localdep_getlogin_r_defined 1
+#define __local___localdep_getlogin_r_defined
 #ifdef __CRT_HAVE_getlogin_r
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
@@ -59,7 +59,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(cuserid))(char *__s) {
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_cuserid_defined
-#define __local___localdep_cuserid_defined 1
+#define __local___localdep_cuserid_defined
 #define __localdep_cuserid __LIBC_LOCAL_NAME(cuserid)
 #endif /* !__local___localdep_cuserid_defined */
 #else /* __CRT_HAVE_getlogin_r || __CRT_HAVE_getenv || __LOCAL_environ || (__CRT_HAVE_getpwuid_r && __CRT_HAVE_geteuid) */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd124fc8a */
+/* HASH CRC-32:0x834e3935 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,13 +19,13 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_wrmdir_defined
-#define __local_wrmdir_defined 1
+#define __local_wrmdir_defined
 #include <__crt.h>
 #include <asm/os/fcntl.h>
 #if defined(__AT_FDCWD) && defined(__CRT_HAVE_wunlinkat)
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_wunlinkat_defined
-#define __local___localdep_wunlinkat_defined 1
+#define __local___localdep_wunlinkat_defined
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -37,7 +37,7 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(wrmdir))(__WCHAR_TYPE__ const *__path
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_wrmdir_defined
-#define __local___localdep_wrmdir_defined 1
+#define __local___localdep_wrmdir_defined
 #define __localdep_wrmdir __LIBC_LOCAL_NAME(wrmdir)
 #endif /* !__local___localdep_wrmdir_defined */
 #else /* __AT_FDCWD && __CRT_HAVE_wunlinkat */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x307c0b92 */
+/* HASH CRC-32:0xc042459d */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_creat_defined
-#define __local_creat_defined 1
+#define __local_creat_defined
 #include <__crt.h>
 #include <asm/os/oflags.h>
 #include <features.h>
@@ -28,7 +28,7 @@
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_open_defined
-#define __local___localdep_open_defined 1
+#define __local___localdep_open_defined
 #if defined(__CRT_HAVE_open) && (!defined(__USE_FILE_OFFSET64) || !defined(__O_LARGEFILE) || !__O_LARGEFILE)
 __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,__localdep_open,(char const *__filename, __oflag_t __oflags),open,(__filename,__oflags),__oflags,1,(__mode_t))
 #elif defined(__CRT_HAVE__open) && (!defined(__USE_FILE_OFFSET64) || !defined(__O_LARGEFILE) || !__O_LARGEFILE)
@@ -54,7 +54,7 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(creat))(char const *__filename, __mod
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_creat_defined
-#define __local___localdep_creat_defined 1
+#define __local___localdep_creat_defined
 #define __localdep_creat __LIBC_LOCAL_NAME(creat)
 #endif /* !__local___localdep_creat_defined */
 #else /* ((__CRT_HAVE_creat && (!__O_LARGEFILE || !__O_LARGEFILE)) || (__CRT_HAVE__creat && (!__O_LARGEFILE || !__O_LARGEFILE)) || __CRT_HAVE_creat64 || __CRT_HAVE_open64 || __CRT_HAVE___open64 || __CRT_HAVE_open || __CRT_HAVE__open || __CRT_HAVE___open) && (__CRT_HAVE_open64 || __CRT_HAVE___open64 || __CRT_HAVE_open || __CRT_HAVE__open || __CRT_HAVE___open || (__AT_FDCWD && (__CRT_HAVE_openat64 || __CRT_HAVE_openat))) */

@@ -30,8 +30,6 @@
 #ifdef __CC__
 __DECL_BEGIN
 
-#ifndef __flock_defined
-#define __flock_defined 1
 struct flock /*[PREFIX(l_)]*/ {
 	__INT16_TYPE__ l_type;
 	__INT16_TYPE__ l_whence;
@@ -44,21 +42,17 @@ struct flock /*[PREFIX(l_)]*/ {
 #endif /* !__USE_KOS_ALTERATIONS */
 	__pid_t        l_pid;
 };
-#endif /* !__flock_defined */
 
 #if __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
 #define _FLOCK_MATCHES_FLOCK64 1
 #endif /* __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__ */
 
 #ifdef __USE_LARGEFILE64
-#ifndef __flock64_defined
-#define __flock64_defined 1
 #if (defined(__USE_FILE_OFFSET64) || defined(_FLOCK_MATCHES_FLOCK64)) && defined(__USE_STRUCT64_MACRO)
 #define flock64 flock
 #else /* (__USE_FILE_OFFSET64 || _FLOCK_MATCHES_FLOCK64) && __USE_STRUCT64_MACRO */
 #define __flock64 flock64
 #endif /* (!__USE_FILE_OFFSET64 && !_FLOCK_MATCHES_FLOCK64) || !__USE_STRUCT64_MACRO */
-#endif /* !__flock64_defined */
 #endif /* __USE_LARGEFILE64 */
 
 #if (defined(__USE_FILE_OFFSET64) || defined(_FLOCK_MATCHES_FLOCK64)) && defined(__USE_STRUCT64_MACRO)
@@ -79,14 +73,11 @@ struct __flock64 /*[NAME(flock64)][PREFIX(l_)]*/ {
 #endif /* (!__USE_FILE_OFFSET64 && !_FLOCK_MATCHES_FLOCK64) || !__USE_STRUCT64_MACRO */
 
 #ifdef __USE_KOS
-#ifndef __flock32_defined
-#define __flock32_defined 1
 #if !defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
 #define flock32 flock
 #else /* !__USE_FILE_OFFSET64 || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__ */
 #define __flock32 flock32
 #endif /* __USE_FILE_OFFSET64 && __SIZEOF_OFF32_T__ != __SIZEOF_OFF64_T__ */
-#endif /* !__flock32_defined */
 #endif /* __USE_KOS */
 
 #if !defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__

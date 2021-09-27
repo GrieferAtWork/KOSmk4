@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa73cbe51 */
+/* HASH CRC-32:0xa8bc8765 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,14 +19,14 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_format_vscanf_defined
-#define __local_format_vscanf_defined 1
+#define __local_format_vscanf_defined
 #include <__crt.h>
 #include <kos/anno.h>
 #include <bits/crt/format-printer.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_scanf_defined
-#define __local___localdep_scanf_defined 1
+#define __local___localdep_scanf_defined
 #if __has_builtin(__builtin_scanf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_scanf) && __has_builtin(__builtin_va_arg_pack)
 __NAMESPACE_LOCAL_END
 #include <features.h>
@@ -77,7 +77,7 @@ __LOCAL_LIBC(format_vscanf) __ATTR_LIBC_SCANF(4, 0) __ATTR_NONNULL((1, 2, 4)) __
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_format_vscanf_defined
-#define __local___localdep_format_vscanf_defined 1
+#define __local___localdep_format_vscanf_defined
 #define __localdep_format_vscanf __LIBC_LOCAL_NAME(format_vscanf)
 #endif /* !__local___localdep_format_vscanf_defined */
 #endif /* !__local_format_vscanf_defined */

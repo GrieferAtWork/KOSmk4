@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x68422ccb */
+/* HASH CRC-32:0x7cacba48 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,13 +19,13 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_adjtime64_defined
-#define __local_adjtime64_defined 1
+#define __local_adjtime64_defined
 #include <__crt.h>
 #ifdef __CRT_HAVE_adjtime
 #include <bits/os/timeval.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_adjtime32_defined
-#define __local___localdep_adjtime32_defined 1
+#define __local___localdep_adjtime32_defined
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_adjtime32,(struct __timeval32 const *__delta, struct __timeval32 *__olddelta),adjtime,(__delta,__olddelta))
 #endif /* !__local___localdep_adjtime32_defined */
 __LOCAL_LIBC(adjtime64) int
@@ -45,7 +45,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(adjtime64))(struct __timeval64 const 
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_adjtime64_defined
-#define __local___localdep_adjtime64_defined 1
+#define __local___localdep_adjtime64_defined
 #define __localdep_adjtime64 __LIBC_LOCAL_NAME(adjtime64)
 #endif /* !__local___localdep_adjtime64_defined */
 #else /* __CRT_HAVE_adjtime */

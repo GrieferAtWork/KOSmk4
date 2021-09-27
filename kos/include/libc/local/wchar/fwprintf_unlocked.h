@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x689f016e */
+/* HASH CRC-32:0xe545f379 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_fwprintf_unlocked_defined
-#define __local_fwprintf_unlocked_defined 1
+#define __local_fwprintf_unlocked_defined
 #include <__crt.h>
 #if defined(__CRT_HAVE_vfwprintf_unlocked) || defined(__CRT_HAVE_file_wprinter_unlocked) || defined(__CRT_HAVE_file_wprinter) || defined(__CRT_HAVE_fputwc_unlocked) || defined(__CRT_HAVE__fputwc_nolock)
 #include <kos/anno.h>
@@ -27,7 +27,7 @@
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_vfwprintf_unlocked_defined
-#define __local___localdep_vfwprintf_unlocked_defined 1
+#define __local___localdep_vfwprintf_unlocked_defined
 #ifdef __CRT_HAVE_vfwprintf_unlocked
 __CREDIRECT(__ATTR_LIBC_WPRINTF(2, 0) __ATTR_NONNULL((1, 2)),__STDC_INT_AS_SIZE_T,__THROWING,__localdep_vfwprintf_unlocked,(__FILE *__restrict __stream, __WCHAR_TYPE__ const *__restrict __format, __builtin_va_list __args),vfwprintf_unlocked,(__stream,__format,__args))
 #elif defined(__CRT_HAVE_file_wprinter_unlocked) || defined(__CRT_HAVE_file_wprinter) || defined(__CRT_HAVE_fputwc_unlocked) || defined(__CRT_HAVE__fputwc_nolock)
@@ -50,7 +50,7 @@ __LOCAL_LIBC(fwprintf_unlocked) __ATTR_LIBC_WPRINTF(2, 3) __ATTR_NONNULL((1, 2))
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_fwprintf_unlocked_defined
-#define __local___localdep_fwprintf_unlocked_defined 1
+#define __local___localdep_fwprintf_unlocked_defined
 #define __localdep_fwprintf_unlocked __LIBC_LOCAL_NAME(fwprintf_unlocked)
 #endif /* !__local___localdep_fwprintf_unlocked_defined */
 #else /* __CRT_HAVE_vfwprintf_unlocked || __CRT_HAVE_file_wprinter_unlocked || __CRT_HAVE_file_wprinter || __CRT_HAVE_fputwc_unlocked || __CRT_HAVE__fputwc_nolock */

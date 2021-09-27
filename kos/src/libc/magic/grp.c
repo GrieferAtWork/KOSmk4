@@ -57,19 +57,19 @@
 __SYSDECL_BEGIN
 
 #ifndef __size_t_defined
-#define __size_t_defined 1
+#define __size_t_defined
 typedef __size_t size_t;
 #endif /* !__size_t_defined */
 
 #if defined(__USE_XOPEN) || defined(__USE_XOPEN2K)
 #ifndef __gid_t_defined
-#define __gid_t_defined 1
+#define __gid_t_defined
 typedef __gid_t gid_t;
 #endif /* !__gid_t_defined */
 #endif /* __USE_XOPEN || __USE_XOPEN2K */
 
 #ifndef __std_FILE_defined
-#define __std_FILE_defined 1
+#define __std_FILE_defined
 __NAMESPACE_STD_BEGIN
 typedef __FILE FILE;
 __NAMESPACE_STD_END
@@ -77,7 +77,7 @@ __NAMESPACE_STD_END
 
 #ifndef __CXX_SYSTEM_HEADER
 #ifndef __FILE_defined
-#define __FILE_defined 1
+#define __FILE_defined
 __NAMESPACE_STD_USING(FILE)
 #endif /* !__FILE_defined */
 #endif /* !__CXX_SYSTEM_HEADER */

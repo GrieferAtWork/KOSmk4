@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf54332a9 */
+/* HASH CRC-32:0x44a880d4 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,12 +19,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_c32sxfrm_l_defined
-#define __local_c32sxfrm_l_defined 1
+#define __local_c32sxfrm_l_defined
 #include <__crt.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_c32sxfrm_defined
-#define __local___localdep_c32sxfrm_defined 1
+#define __local___localdep_c32sxfrm_defined
 #if defined(__CRT_HAVE_wcsxfrm) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
 __CREDIRECT(__ATTR_NONNULL((2)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_c32sxfrm,(__CHAR32_TYPE__ *__dst, __CHAR32_TYPE__ const *__restrict __src, __SIZE_TYPE__ __maxlen),wcsxfrm,(__dst,__src,__maxlen))
 #elif defined(__CRT_HAVE_KOS$wcsxfrm)
@@ -48,7 +48,7 @@ __NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(c32sxfrm_l))(__CHAR32_TYPE__ *__dst, 
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_c32sxfrm_l_defined
-#define __local___localdep_c32sxfrm_l_defined 1
+#define __local___localdep_c32sxfrm_l_defined
 #define __localdep_c32sxfrm_l __LIBC_LOCAL_NAME(c32sxfrm_l)
 #endif /* !__local___localdep_c32sxfrm_l_defined */
 #endif /* !__local_c32sxfrm_l_defined */

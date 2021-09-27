@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9c7a4f43 */
+/* HASH CRC-32:0x8249e05 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local__vscwprintf_p_defined
-#define __local__vscwprintf_p_defined 1
+#define __local__vscwprintf_p_defined
 #include <__crt.h>
 #include <features.h>
 #include <hybrid/typecore.h>
@@ -34,7 +34,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_vscwprintf_p))(__WCHAR_TYPE__ const 
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep__vscwprintf_p_defined
-#define __local___localdep__vscwprintf_p_defined 1
+#define __local___localdep__vscwprintf_p_defined
 #define __localdep__vscwprintf_p __LIBC_LOCAL_NAME(_vscwprintf_p)
 #endif /* !__local___localdep__vscwprintf_p_defined */
 #endif /* !__local__vscwprintf_p_defined */

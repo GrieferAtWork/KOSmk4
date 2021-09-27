@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2253af6 */
+/* HASH CRC-32:0xb9698be8 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -36,7 +36,7 @@ __SYSDECL_BEGIN
 
 #ifndef __NO_FPU
 #if !defined(__getloadavg_defined) && defined(__CRT_HAVE_getloadavg)
-#define __getloadavg_defined 1
+#define __getloadavg_defined
 __CDECLARE(,int,__NOTHROW_RPC,getloadavg,(double __loadavg[], __STDC_INT_AS_SIZE_T __nelem),(__loadavg,__nelem))
 #endif /* !__getloadavg_defined && __CRT_HAVE_getloadavg */
 #endif /* !__NO_FPU */

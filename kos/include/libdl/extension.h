@@ -93,13 +93,13 @@ DECL_BEGIN
 #ifdef __CC__
 
 #ifndef __DlSection_defined
-#define __DlSection_defined 1
+#define __DlSection_defined
 struct dlsection;
 typedef struct dlsection DlSection;
 #endif /* !__DlSection_defined */
 
 #ifndef __DlModule_defined
-#define __DlModule_defined 1
+#define __DlModule_defined
 struct dlmodule;
 typedef struct dlmodule DlModule;
 #endif /* !__DlModule_defined */
@@ -133,7 +133,7 @@ struct dl_sect_info {
 };
 
 #ifndef ____dl_iterator_callback_defined
-#define ____dl_iterator_callback_defined 1
+#define ____dl_iterator_callback_defined
 struct dl_phdr_info;
 /* Callback prototype for `dl_iterate_phdr()' */
 typedef int (__DLFCN_CC *__dl_iterator_callback)(struct dl_phdr_info *__info,

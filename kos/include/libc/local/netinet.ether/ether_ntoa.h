@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1e779024 */
+/* HASH CRC-32:0x96ca6f75 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,12 +19,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_ether_ntoa_defined
-#define __local_ether_ntoa_defined 1
+#define __local_ether_ntoa_defined
 #include <__crt.h>
 struct ether_addr;
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_ether_ntoa_r_defined
-#define __local___localdep_ether_ntoa_r_defined 1
+#define __local___localdep_ether_ntoa_r_defined
 #ifdef __CRT_HAVE_ether_ntoa_r
 __CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),char *,__NOTHROW_NCX,__localdep_ether_ntoa_r,(struct ether_addr const *__restrict __addr, char *__restrict __buf),ether_ntoa_r,(__addr,__buf))
 #else /* __CRT_HAVE_ether_ntoa_r */
@@ -44,7 +44,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(ether_ntoa))(struct ether_addr const 
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_ether_ntoa_defined
-#define __local___localdep_ether_ntoa_defined 1
+#define __local___localdep_ether_ntoa_defined
 #define __localdep_ether_ntoa __LIBC_LOCAL_NAME(ether_ntoa)
 #endif /* !__local___localdep_ether_ntoa_defined */
 #endif /* !__local_ether_ntoa_defined */

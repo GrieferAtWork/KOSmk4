@@ -21,7 +21,7 @@
 #define GUARD_APPS_GFX_MAIN_C 1
 #define _GNU_SOURCE 1
 #define _KOS_SOURCE 1
-#define LIBVIDEO_GFX_WANT_PROTOTYPES 1
+#define LIBVIDEO_GFX_WANT_PROTOTYPES
 
 #include <hybrid/compiler.h>
 

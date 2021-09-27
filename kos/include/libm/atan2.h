@@ -50,11 +50,11 @@ __DECL_BEGIN
 
 __LIBM_LOCAL_DECLARE_BEGIN
 #ifndef __libm_tinyf_defined
-#define __libm_tinyf_defined 1
+#define __libm_tinyf_defined
 __LIBM_LOCAL_DECLARE(__IEEE754_FLOAT_TYPE__, tinyf, __IEEE754_FLOAT_C(1.0e-30))
 #endif /* !__libm_tinyf_defined */
 #ifndef __libm_zerof_defined
-#define __libm_zerof_defined 1
+#define __libm_zerof_defined
 __LIBM_LOCAL_DECLARE(__IEEE754_FLOAT_TYPE__, zerof, __IEEE754_FLOAT_C(0.0))
 #endif /* !__libm_zerof_defined */
 __LIBM_LOCAL_DECLARE(__IEEE754_FLOAT_TYPE__, pi_o_4f, __IEEE754_FLOAT_C(7.8539818525e-01)) /* 0x3f490fdb */
@@ -163,11 +163,11 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE754_FLOAT_TYPE__
 
 __LIBM_LOCAL_DECLARE_BEGIN
 #ifndef __libm_tiny_defined
-#define __libm_tiny_defined 1
+#define __libm_tiny_defined
 __LIBM_LOCAL_DECLARE(__IEEE754_DOUBLE_TYPE__, tiny, __IEEE754_DOUBLE_C(1.0e-300))
 #endif /* !__libm_tiny_defined */
 #ifndef __libm_zero_defined
-#define __libm_zero_defined 1
+#define __libm_zero_defined
 __LIBM_LOCAL_DECLARE(__IEEE754_DOUBLE_TYPE__, zero, __IEEE754_DOUBLE_C(0.0))
 #endif /* !__libm_zero_defined */
 __LIBM_LOCAL_DECLARE(__IEEE754_DOUBLE_TYPE__, pi_o_4, __IEEE754_DOUBLE_C(7.8539816339744827900E-01)) /* 0x3FE921FB, 0x54442D18 */
@@ -277,11 +277,11 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE754_DOUBLE_TYPE__
 
 __LIBM_LOCAL_DECLARE_BEGIN
 #ifndef __libm_tinyl_defined
-#define __libm_tinyl_defined 1
+#define __libm_tinyl_defined
 __LIBM_LOCAL_DECLARE(__IEEE854_LONG_DOUBLE_TYPE__, tinyl, __IEEE854_LONG_DOUBLE_C(1.0e-4900))
 #endif /* !__libm_tinyl_defined */
 #ifndef __libm_zerol_defined
-#define __libm_zerol_defined 1
+#define __libm_zerol_defined
 __LIBM_LOCAL_DECLARE(__IEEE854_LONG_DOUBLE_TYPE__, zerol, __IEEE854_LONG_DOUBLE_C(0.0))
 #endif /* !__libm_zerol_defined */
 __LIBM_LOCAL_DECLARE(__IEEE854_LONG_DOUBLE_TYPE__, pi_o_4l, __IEEE854_LONG_DOUBLE_C(7.85398163397448309628202E-01)) /* 0x3FFE, 0xC90FDAA2, 0x2168C235 */

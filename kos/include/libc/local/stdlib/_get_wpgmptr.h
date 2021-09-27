@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xef969115 */
+/* HASH CRC-32:0xd64ea01f */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,13 +19,13 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local__get_wpgmptr_defined
-#define __local__get_wpgmptr_defined 1
+#define __local__get_wpgmptr_defined
 #include <__crt.h>
 #ifdef __CRT_HAVE___p__wpgmptr
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep___p__wpgmptr_defined
-#define __local___localdep___p__wpgmptr_defined 1
+#define __local___localdep___p__wpgmptr_defined
 __CREDIRECT(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,__WCHAR_TYPE__ **,__NOTHROW_NCX,__localdep___p__wpgmptr,(void),__p__wpgmptr,())
 #endif /* !__local___localdep___p__wpgmptr_defined */
 __LOCAL_LIBC(_get_wpgmptr) __errno_t
@@ -35,7 +35,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_get_wpgmptr))(__WCHAR_TYPE__ **__pva
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep__get_wpgmptr_defined
-#define __local___localdep__get_wpgmptr_defined 1
+#define __local___localdep__get_wpgmptr_defined
 #define __localdep__get_wpgmptr __LIBC_LOCAL_NAME(_get_wpgmptr)
 #endif /* !__local___localdep__get_wpgmptr_defined */
 #else /* __CRT_HAVE___p__wpgmptr */

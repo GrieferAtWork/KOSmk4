@@ -59,7 +59,7 @@ __DECL_BEGIN
 
 __LIBM_LOCAL_DECLARE_BEGIN
 #ifndef __libm_onef_defined
-#define __libm_onef_defined 1
+#define __libm_onef_defined
 __LIBM_LOCAL_DECLARE(__IEEE754_FLOAT_TYPE__, onef, __IEEE754_FLOAT_C(1.0))
 #endif /* !__libm_onef_defined */
 __LIBM_LOCAL_DECLARE_ARRAY(__IEEE754_FLOAT_TYPE__, zero2f, 2) {
@@ -186,7 +186,7 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE754_FLOAT_TYPE__
 
 __LIBM_LOCAL_DECLARE_BEGIN
 #ifndef __libm_one_defined
-#define __libm_one_defined 1
+#define __libm_one_defined
 __LIBM_LOCAL_DECLARE(__IEEE754_DOUBLE_TYPE__, one, __IEEE754_DOUBLE_C(1.0))
 #endif /* !__libm_one_defined */
 __LIBM_LOCAL_DECLARE_ARRAY(__IEEE754_DOUBLE_TYPE__, zero2, 2) {

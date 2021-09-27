@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4bfe960 */
+/* HASH CRC-32:0xe456fa18 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -50,23 +50,23 @@
  * This   function   will   write   at   most   `UNICODE_UTF16_CURLEN'   words   to  `dst' */
 #define __libc_unicode_writeutf16 __libc_core_unicode_writeutf16
 #if !defined(____libc___unicode_descriptor_defined) && defined(____libc_core___unicode_descriptor_defined)
-#define ____libc___unicode_descriptor_defined 1
+#define ____libc___unicode_descriptor_defined
 #define __libc___unicode_descriptor __libc_core___unicode_descriptor
 #endif /* !____libc___unicode_descriptor_defined && ____libc_core___unicode_descriptor_defined */
 #if !defined(____libc___unicode_descriptor_digit_defined) && defined(____libc_core___unicode_descriptor_digit_defined)
-#define ____libc___unicode_descriptor_digit_defined 1
+#define ____libc___unicode_descriptor_digit_defined
 #define __libc___unicode_descriptor_digit __libc_core___unicode_descriptor_digit
 #endif /* !____libc___unicode_descriptor_digit_defined && ____libc_core___unicode_descriptor_digit_defined */
 #if !defined(____libc___unicode_descriptor_digit64_defined) && defined(____libc_core___unicode_descriptor_digit64_defined)
-#define ____libc___unicode_descriptor_digit64_defined 1
+#define ____libc___unicode_descriptor_digit64_defined
 #define __libc___unicode_descriptor_digit64 __libc_core___unicode_descriptor_digit64
 #endif /* !____libc___unicode_descriptor_digit64_defined && ____libc_core___unicode_descriptor_digit64_defined */
 #if !defined(____libc___unicode_descriptor_digitd_defined) && defined(____libc_core___unicode_descriptor_digitd_defined)
-#define ____libc___unicode_descriptor_digitd_defined 1
+#define ____libc___unicode_descriptor_digitd_defined
 #define __libc___unicode_descriptor_digitd __libc_core___unicode_descriptor_digitd
 #endif /* !____libc___unicode_descriptor_digitd_defined && ____libc_core___unicode_descriptor_digitd_defined */
 #if !defined(____libc___unicode_descriptor_digitld_defined) && defined(____libc_core___unicode_descriptor_digitld_defined)
-#define ____libc___unicode_descriptor_digitld_defined 1
+#define ____libc___unicode_descriptor_digitld_defined
 #define __libc___unicode_descriptor_digitld __libc_core___unicode_descriptor_digitld
 #endif /* !____libc___unicode_descriptor_digitld_defined && ____libc_core___unicode_descriptor_digitld_defined */
 /* >> unicode_fold(3)

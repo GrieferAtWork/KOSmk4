@@ -32,7 +32,7 @@
 
 #if (!defined(LIBUNWIND_WANT_PROTOTYPES) && \
      defined(__KOS__) && defined(__KERNEL__))
-#define LIBUNWIND_WANT_PROTOTYPES 1
+#define LIBUNWIND_WANT_PROTOTYPES
 #endif /* ... */
 
 #if (defined(__KOS__) && defined(__KERNEL__) && \

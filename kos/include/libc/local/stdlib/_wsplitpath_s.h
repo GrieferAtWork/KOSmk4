@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x31b9a205 */
+/* HASH CRC-32:0x4bd32fb3 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,12 +19,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local__wsplitpath_s_defined
-#define __local__wsplitpath_s_defined 1
+#define __local__wsplitpath_s_defined
 #include <__crt.h>
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_memcpyc_defined
-#define __local___localdep_memcpyc_defined 1
+#define __local___localdep_memcpyc_defined
 #ifdef __CRT_HAVE_memcpyc
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
@@ -127,7 +127,7 @@ __err_range:
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep__wsplitpath_s_defined
-#define __local___localdep__wsplitpath_s_defined 1
+#define __local___localdep__wsplitpath_s_defined
 #define __localdep__wsplitpath_s __LIBC_LOCAL_NAME(_wsplitpath_s)
 #endif /* !__local___localdep__wsplitpath_s_defined */
 #endif /* !__local__wsplitpath_s_defined */

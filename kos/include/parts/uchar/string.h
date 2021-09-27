@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf215905e */
+/* HASH CRC-32:0x2ff31c16 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2442,7 +2442,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(c32spbrk, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_
 #endif /* !__cplusplus || !__CORRECT_ISO_CPP_WCHAR_H_PROTO */
 #endif /* !... */
 #ifndef __c16stok_defined
-#define __c16stok_defined 1
+#define __c16stok_defined
 #if defined(__CRT_HAVE_wcstok) && !defined(__CRT_DOS_PRIMARY) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
 /* >> wcstok(3) */
 __CREDIRECT(__ATTR_NONNULL((2, 3)),char16_t *,__NOTHROW_NCX,c16stok,(char16_t *__str, char16_t const *__restrict __delim, char16_t **__restrict __save_ptr),wcstok,(__str,__delim,__save_ptr))
@@ -2466,7 +2466,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(c16stok, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_N
 #endif /* !... */
 #endif /* !__c16stok_defined */
 #ifndef __c32stok_defined
-#define __c32stok_defined 1
+#define __c32stok_defined
 #if defined(__CRT_HAVE_wcstok) && !defined(__CRT_DOS_PRIMARY) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
 /* >> wcstok(3) */
 __CREDIRECT(__ATTR_NONNULL((2, 3)),char32_t *,__NOTHROW_NCX,c32stok,(char32_t *__str, char32_t const *__restrict __delim, char32_t **__restrict __save_ptr),wcstok,(__str,__delim,__save_ptr))

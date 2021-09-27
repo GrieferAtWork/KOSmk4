@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd5cdf73f */
+/* HASH CRC-32:0x4547a2e6 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_format_length_defined
-#define __local_format_length_defined 1
+#define __local_format_length_defined
 #include <__crt.h>
 #include <bits/crt/format-printer.h>
 #include <hybrid/typecore.h>
@@ -32,7 +32,7 @@ __NOTHROW_NCX(__FORMATPRINTER_CC __LIBC_LOCAL_NAME(format_length))(void *__arg, 
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_format_length_defined
-#define __local___localdep_format_length_defined 1
+#define __local___localdep_format_length_defined
 #define __localdep_format_length __LIBC_LOCAL_NAME(format_length)
 #endif /* !__local___localdep_format_length_defined */
 #endif /* !__local_format_length_defined */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd0a92758 */
+/* HASH CRC-32:0xa4b26583 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,11 +19,11 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local__wctomb_l_defined
-#define __local__wctomb_l_defined 1
+#define __local__wctomb_l_defined
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_wctomb_defined
-#define __local___localdep_wctomb_defined 1
+#define __local___localdep_wctomb_defined
 #ifdef __CRT_HAVE_wctomb
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_wctomb,(char *__str, __WCHAR_TYPE__ __wc),wctomb,(__str,__wc))
 #else /* __CRT_HAVE_wctomb */
@@ -40,7 +40,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_wctomb_l))(char *__buf, __WCHAR_TYPE
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep__wctomb_l_defined
-#define __local___localdep__wctomb_l_defined 1
+#define __local___localdep__wctomb_l_defined
 #define __localdep__wctomb_l __LIBC_LOCAL_NAME(_wctomb_l)
 #endif /* !__local___localdep__wctomb_l_defined */
 #endif /* !__local__wctomb_l_defined */

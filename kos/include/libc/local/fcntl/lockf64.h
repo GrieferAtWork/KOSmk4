@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb00e87f0 */
+/* HASH CRC-32:0x7a767400 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_lockf64_defined
-#define __local_lockf64_defined 1
+#define __local_lockf64_defined
 #include <__crt.h>
 #if defined(__CRT_HAVE_lockf) || defined(__CRT_HAVE_locking) || defined(__CRT_HAVE__locking)
 #include <features.h>
@@ -35,7 +35,7 @@
 #endif /* !__PIO_OFFSET */
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_crt_locking_defined
-#define __local___localdep_crt_locking_defined 1
+#define __local___localdep_crt_locking_defined
 #ifdef __CRT_HAVE_locking
 __CREDIRECT(,int,__NOTHROW_RPC,__localdep_crt_locking,(__fd_t __fd, __STDC_INT_AS_UINT_T __cmd, __pos32_t __length),locking,(__fd,__cmd,__length))
 #elif defined(__CRT_HAVE__locking)
@@ -45,7 +45,7 @@ __CREDIRECT(,int,__NOTHROW_RPC,__localdep_crt_locking,(__fd_t __fd, __STDC_INT_A
 #endif /* !... */
 #endif /* !__local___localdep_crt_locking_defined */
 #if !defined(__local___localdep_lockf32_defined) && defined(__CRT_HAVE_lockf)
-#define __local___localdep_lockf32_defined 1
+#define __local___localdep_lockf32_defined
 __CREDIRECT(,int,__NOTHROW_RPC,__localdep_lockf32,(__fd_t __fd, __STDC_INT_AS_UINT_T __cmd, __pos32_t __length),lockf,(__fd,__cmd,__length))
 #endif /* !__local___localdep_lockf32_defined && __CRT_HAVE_lockf */
 __LOCAL_LIBC(lockf64) int
@@ -58,7 +58,7 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(lockf64))(__fd_t __fd, __STDC_INT_AS_
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_lockf64_defined
-#define __local___localdep_lockf64_defined 1
+#define __local___localdep_lockf64_defined
 #define __localdep_lockf64 __LIBC_LOCAL_NAME(lockf64)
 #endif /* !__local___localdep_lockf64_defined */
 #else /* __CRT_HAVE_lockf || __CRT_HAVE_locking || __CRT_HAVE__locking */

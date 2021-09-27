@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc9b9c5e2 */
+/* HASH CRC-32:0x9de9eb4c */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_Readlink_defined
-#define __local_Readlink_defined 1
+#define __local_Readlink_defined
 #include <__crt.h>
 #include <asm/os/fcntl.h>
 #if defined(__AT_FDCWD) && defined(__CRT_HAVE_ReadlinkAt)
@@ -27,7 +27,7 @@
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_ReadlinkAt_defined
-#define __local___localdep_ReadlinkAt_defined 1
+#define __local___localdep_ReadlinkAt_defined
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -39,7 +39,7 @@ __LOCAL_LIBC(Readlink) __ATTR_NONNULL((1, 2)) __SIZE_TYPE__
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_Readlink_defined
-#define __local___localdep_Readlink_defined 1
+#define __local___localdep_Readlink_defined
 #define __localdep_Readlink __LIBC_LOCAL_NAME(Readlink)
 #endif /* !__local___localdep_Readlink_defined */
 #else /* __AT_FDCWD && __CRT_HAVE_ReadlinkAt */

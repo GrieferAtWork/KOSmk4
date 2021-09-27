@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc4d34b5 */
+/* HASH CRC-32:0xab6c17ff */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_feraiseexcept_defined
-#define __local_feraiseexcept_defined 1
+#define __local_feraiseexcept_defined
 #include <__crt.h>
 #include <kos/anno.h>
 #include <bits/crt/fenv-inline.h>
@@ -31,7 +31,7 @@ __LOCAL_LIBC(feraiseexcept) int
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_feraiseexcept_defined
-#define __local___localdep_feraiseexcept_defined 1
+#define __local___localdep_feraiseexcept_defined
 #define __localdep_feraiseexcept __LIBC_LOCAL_NAME(feraiseexcept)
 #endif /* !__local___localdep_feraiseexcept_defined */
 #endif /* !__local_feraiseexcept_defined */

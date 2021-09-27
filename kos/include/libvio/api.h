@@ -52,22 +52,22 @@
 
 #if defined(__i386__) && !defined(__x86_64__)
 #define LIBVIO_CC __ATTR_STDCALL
-#else
+#else /* ... */
 #define LIBVIO_CC /* nothing */
-#endif
+#endif /* !... */
 
 #if (!defined(LIBVIO_WANT_PROTOTYPES) && \
      defined(__KERNEL__) && defined(LIBVIO_CONFIG_ENABLED))
-#define LIBVIO_WANT_PROTOTYPES 1
+#define LIBVIO_WANT_PROTOTYPES
 #endif /* __KERNEL__ && LIBVIO_CONFIG_ENABLED */
 
 #ifdef LIBVIO_WANT_PROTOTYPES
 #define LIBVIO_DECL __PUBDEF
 #elif defined(__LIBVIO_STATIC)
 #define LIBVIO_DECL __INTDEF
-#else
+#else /* ... */
 #define LIBVIO_DECL __IMPDEF
-#endif
+#endif /* !... */
 
 /* Library name for use with `dlopen()' */
 #define LIBVIO_LIBRARY_NAME "libvio.so"

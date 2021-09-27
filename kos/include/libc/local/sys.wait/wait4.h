@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcc31cc87 */
+/* HASH CRC-32:0x51bd1299 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_wait4_defined
-#define __local_wait4_defined 1
+#define __local_wait4_defined
 #include <__crt.h>
 #include <bits/types.h>
 #if defined(__CRT_HAVE_wait4_64) || defined(__CRT_HAVE_wait4)
@@ -29,11 +29,11 @@ struct rusage;
 #include <parts/waitmacros.h>
 __NAMESPACE_LOCAL_BEGIN
 #if !defined(__local___localdep_wait4_32_defined) && defined(__CRT_HAVE_wait4)
-#define __local___localdep_wait4_32_defined 1
+#define __local___localdep_wait4_32_defined
 __CREDIRECT(,__pid_t,__NOTHROW_RPC,__localdep_wait4_32,(__pid_t __pid, __WAIT_STATUS __stat_loc, __STDC_INT_AS_UINT_T __options, struct __rusage32 *__usage),wait4,(__pid,__stat_loc,__options,__usage))
 #endif /* !__local___localdep_wait4_32_defined && __CRT_HAVE_wait4 */
 #ifndef __local___localdep_wait4_64_defined
-#define __local___localdep_wait4_64_defined 1
+#define __local___localdep_wait4_64_defined
 #if defined(__CRT_HAVE_wait4) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 __NAMESPACE_LOCAL_END
 struct __rusage64;
@@ -74,7 +74,7 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(wait4))(__pid_t __pid, __WAIT_STATUS 
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_wait4_defined
-#define __local___localdep_wait4_defined 1
+#define __local___localdep_wait4_defined
 #define __localdep_wait4 __LIBC_LOCAL_NAME(wait4)
 #endif /* !__local___localdep_wait4_defined */
 #else /* __CRT_HAVE_wait4_64 || __CRT_HAVE_wait4 */

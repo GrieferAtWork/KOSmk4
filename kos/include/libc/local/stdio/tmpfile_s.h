@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfcbe4640 */
+/* HASH CRC-32:0xe63a4a42 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,14 +19,14 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_tmpfile_s_defined
-#define __local_tmpfile_s_defined 1
+#define __local_tmpfile_s_defined
 #include <__crt.h>
 #include <asm/os/oflags.h>
 #if (defined(__CRT_HAVE_tmpfile) && (!defined(__O_LARGEFILE) || !__O_LARGEFILE)) || defined(__CRT_HAVE_tmpfile64)
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_tmpfile64_defined
-#define __local___localdep_tmpfile64_defined 1
+#define __local___localdep_tmpfile64_defined
 #if defined(__CRT_HAVE_tmpfile) && (!defined(__O_LARGEFILE) || !__O_LARGEFILE)
 __CREDIRECT(__ATTR_WUNUSED,__FILE *,__NOTHROW_RPC,__localdep_tmpfile64,(void),tmpfile,())
 #elif defined(__CRT_HAVE_tmpfile64)
@@ -59,7 +59,7 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(tmpfile_s))(__FILE **__pstream) {
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_tmpfile_s_defined
-#define __local___localdep_tmpfile_s_defined 1
+#define __local___localdep_tmpfile_s_defined
 #define __localdep_tmpfile_s __LIBC_LOCAL_NAME(tmpfile_s)
 #endif /* !__local___localdep_tmpfile_s_defined */
 #else /* (__CRT_HAVE_tmpfile && (!__O_LARGEFILE || !__O_LARGEFILE)) || __CRT_HAVE_tmpfile64 */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x794f53d9 */
+/* HASH CRC-32:0xf467b192 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,12 +19,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_acosl_defined
-#define __local_acosl_defined 1
+#define __local_acosl_defined
 #include <__crt.h>
 #if defined(__CRT_HAVE_acos) || defined(__CRT_HAVE___acos)
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_acos_defined
-#define __local___localdep_acos_defined 1
+#define __local___localdep_acos_defined
 #if __has_builtin(__builtin_acos) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_acos)
 __CEIREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_acos,(double __x),acos,{ return __builtin_acos(__x); })
 #elif defined(__CRT_HAVE_acos)
@@ -41,7 +41,7 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(acosl))(__LONGDOUBLE __x) {
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_acosl_defined
-#define __local___localdep_acosl_defined 1
+#define __local___localdep_acosl_defined
 #define __localdep_acosl __LIBC_LOCAL_NAME(acosl)
 #endif /* !__local___localdep_acosl_defined */
 #else /* __CRT_HAVE_acos || __CRT_HAVE___acos */

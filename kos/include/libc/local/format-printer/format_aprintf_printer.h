@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa388cc0e */
+/* HASH CRC-32:0xc82a0670 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,14 +19,14 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_format_aprintf_printer_defined
-#define __local_format_aprintf_printer_defined 1
+#define __local_format_aprintf_printer_defined
 #include <__crt.h>
 #if defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc)
 #include <bits/crt/format-printer.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_format_aprintf_alloc_defined
-#define __local___localdep_format_aprintf_alloc_defined 1
+#define __local___localdep_format_aprintf_alloc_defined
 #ifdef __CRT_HAVE_format_aprintf_alloc
 __NAMESPACE_LOCAL_END
 struct format_aprintf_data;
@@ -42,7 +42,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_format_aprintf_alloc_defined */
 #ifndef __local___localdep_memcpyc_defined
-#define __local___localdep_memcpyc_defined 1
+#define __local___localdep_memcpyc_defined
 #ifdef __CRT_HAVE_memcpyc
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_memcpyc,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),memcpyc,(__dst,__src,__elem_count,__elem_size))
 #else /* __CRT_HAVE_memcpyc */
@@ -66,7 +66,7 @@ __err:
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_format_aprintf_printer_defined
-#define __local___localdep_format_aprintf_printer_defined 1
+#define __local___localdep_format_aprintf_printer_defined
 #define __localdep_format_aprintf_printer __LIBC_LOCAL_NAME(format_aprintf_printer)
 #endif /* !__local___localdep_format_aprintf_printer_defined */
 #else /* __CRT_HAVE_format_aprintf_alloc || __CRT_HAVE_realloc */

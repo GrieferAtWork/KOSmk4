@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3332ef82 */
+/* HASH CRC-32:0x3833eccf */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,11 +19,11 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_l64a_defined
-#define __local_l64a_defined 1
+#define __local_l64a_defined
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_l64a_r_defined
-#define __local___localdep_l64a_r_defined 1
+#define __local___localdep_l64a_r_defined
 #ifdef __CRT_HAVE_l64a_r
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_l64a_r,(long __n, char *__buf, __STDC_INT_AS_SIZE_T __bufsize),l64a_r,(__n,__buf,__bufsize))
 #else /* __CRT_HAVE_l64a_r */
@@ -47,7 +47,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(l64a))(long __n) {
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_l64a_defined
-#define __local___localdep_l64a_defined 1
+#define __local___localdep_l64a_defined
 #define __localdep_l64a __LIBC_LOCAL_NAME(l64a)
 #endif /* !__local___localdep_l64a_defined */
 #endif /* !__local_l64a_defined */

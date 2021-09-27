@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3c768f12 */
+/* HASH CRC-32:0x78bcafe5 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_pthread_cond_timedwait64_defined
-#define __local_pthread_cond_timedwait64_defined 1
+#define __local_pthread_cond_timedwait64_defined
 #include <__crt.h>
 #ifdef __CRT_HAVE_pthread_cond_timedwait
 #include <bits/types.h>
@@ -27,7 +27,7 @@
 #include <bits/os/timespec.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_pthread_cond_timedwait32_defined
-#define __local___localdep_pthread_cond_timedwait32_defined 1
+#define __local___localdep_pthread_cond_timedwait32_defined
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2, 3)),__errno_t,__NOTHROW_RPC,__localdep_pthread_cond_timedwait32,(__pthread_cond_t *__restrict __cond, __pthread_mutex_t *__restrict __mutex, struct __timespec32 const *__restrict __abstime),pthread_cond_timedwait,(__cond,__mutex,__abstime))
 #endif /* !__local___localdep_pthread_cond_timedwait32_defined */
 __LOCAL_LIBC(pthread_cond_timedwait64) __ATTR_WUNUSED __ATTR_NONNULL((1, 2, 3)) __errno_t
@@ -41,7 +41,7 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(pthread_cond_timedwait64))(__pthread_
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_pthread_cond_timedwait64_defined
-#define __local___localdep_pthread_cond_timedwait64_defined 1
+#define __local___localdep_pthread_cond_timedwait64_defined
 #define __localdep_pthread_cond_timedwait64 __LIBC_LOCAL_NAME(pthread_cond_timedwait64)
 #endif /* !__local___localdep_pthread_cond_timedwait64_defined */
 #else /* __CRT_HAVE_pthread_cond_timedwait */

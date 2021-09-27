@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x84a2717e */
+/* HASH CRC-32:0x1e17f525 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,13 +19,13 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_putchar_unlocked_defined
-#define __local_putchar_unlocked_defined 1
+#define __local_putchar_unlocked_defined
 #include <__crt.h>
 #if !defined(__NO_STDSTREAMS) && (defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE_putc_unlocked) || (defined(__CRT_HAVE_fputc) && (!defined(__CRT_DOS) || !defined(__CRT_HAVE__flsbuf))) || (defined(__CRT_HAVE_putc) && (!defined(__CRT_DOS) || !defined(__CRT_HAVE__flsbuf))) || (defined(__CRT_HAVE__IO_putc) && (!defined(__CRT_DOS) || !defined(__CRT_HAVE__flsbuf))) || (defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE__IO_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock))
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_fputc_unlocked_defined
-#define __local___localdep_fputc_unlocked_defined 1
+#define __local___localdep_fputc_unlocked_defined
 #if __has_builtin(__builtin_fputc_unlocked) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_fputc_unlocked)
 __CEIREDIRECT(__ATTR_NONNULL((2)),int,__THROWING,__localdep_fputc_unlocked,(int __ch, __FILE *__restrict __stream),fputc_unlocked,{ return __builtin_fputc_unlocked(__ch, __stream); })
 #elif defined(__CRT_HAVE_fputc_unlocked)
@@ -56,7 +56,7 @@ __LOCAL_LIBC(putchar_unlocked) int
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_putchar_unlocked_defined
-#define __local___localdep_putchar_unlocked_defined 1
+#define __local___localdep_putchar_unlocked_defined
 #define __localdep_putchar_unlocked __LIBC_LOCAL_NAME(putchar_unlocked)
 #endif /* !__local___localdep_putchar_unlocked_defined */
 #else /* !__NO_STDSTREAMS && (__CRT_HAVE_fputc_unlocked || __CRT_HAVE_putc_unlocked || (__CRT_HAVE_fputc && (!__CRT_DOS || !__CRT_HAVE__flsbuf)) || (__CRT_HAVE_putc && (!__CRT_DOS || !__CRT_HAVE__flsbuf)) || (__CRT_HAVE__IO_putc && (!__CRT_DOS || !__CRT_HAVE__flsbuf)) || (__CRT_DOS && __CRT_HAVE__flsbuf) || __CRT_HAVE_fwrite || __CRT_HAVE__IO_fwrite || __CRT_HAVE_fwrite_s || __CRT_HAVE_fwrite_unlocked || __CRT_HAVE__fwrite_nolock) */

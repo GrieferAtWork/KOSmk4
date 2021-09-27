@@ -35,7 +35,7 @@
 __CXXDECL_BEGIN
 
 #ifndef __char16_t_defined
-#define __char16_t_defined 1
+#define __char16_t_defined
 typedef __CHAR16_TYPE__ char16_t;
 typedef __CHAR32_TYPE__ char32_t;
 #endif /* !__char16_t_defined */
@@ -43,7 +43,7 @@ typedef __CHAR32_TYPE__ char32_t;
 __NAMESPACE_STD_BEGIN
 
 #ifndef __std_memory_order_defined
-#define __std_memory_order_defined 1
+#define __std_memory_order_defined
 typedef enum {
 	memory_order_relaxed = __ATOMIC_RELAXED,
 	memory_order_consume = __ATOMIC_CONSUME,

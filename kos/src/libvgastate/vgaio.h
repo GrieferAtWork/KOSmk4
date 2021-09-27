@@ -31,7 +31,7 @@
 DECL_BEGIN
 
 #ifndef __port_t_defined
-#define __port_t_defined 1
+#define __port_t_defined
 typedef __port_t port_t;
 #endif /* !__port_t_defined */
 

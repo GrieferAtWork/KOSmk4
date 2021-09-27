@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x65d1ae25 */
+/* HASH CRC-32:0x6a24d592 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -361,7 +361,7 @@ __SYSDECL_END
 #endif /* __CC__ */
 
 #ifdef __CXX_SYSTEM_HEADER
-#define _CXX_STDONLY_CCOMPLEX 1
+#define _CXX_STDONLY_CCOMPLEX
 #undef _COMPLEX_H
 #endif /* __CXX_SYSTEM_HEADER */
 #endif /* !_CXX_STDONLY_CCOMPLEX */

@@ -219,12 +219,12 @@
 __SYSDECL_BEGIN
 
 #ifndef __ssize_t_defined
-#define __ssize_t_defined 1
+#define __ssize_t_defined
 typedef __ssize_t ssize_t;
 #endif /* !__ssize_t_defined */
 
 #ifndef __size_t_defined
-#define __size_t_defined 1
+#define __size_t_defined
 typedef __SIZE_TYPE__ size_t;
 #endif /* !__size_t_defined */
 
@@ -234,11 +234,11 @@ typedef __SIZE_TYPE__ size_t;
 
 #if defined(__USE_XOPEN) || defined(__USE_XOPEN2K)
 #ifndef __gid_t_defined
-#define __gid_t_defined 1
+#define __gid_t_defined
 typedef __gid_t gid_t;
 #endif /* !__gid_t_defined */
 #ifndef __uid_t_defined
-#define __uid_t_defined 1
+#define __uid_t_defined
 typedef __uid_t uid_t;
 #endif /* !__uid_t_defined */
 #ifndef __off_t_defined
@@ -246,16 +246,16 @@ typedef __uid_t uid_t;
 typedef __FS_TYPE(off) off_t;
 #endif /* !__off_t_defined */
 #ifndef __useconds_t_defined
-#define __useconds_t_defined 1
+#define __useconds_t_defined
 typedef __useconds_t useconds_t;
 #endif /* !__useconds_t_defined */
 #ifndef __pid_t_defined
-#define __pid_t_defined 1
+#define __pid_t_defined
 typedef __pid_t pid_t;
 #endif /* !__pid_t_defined */
 #ifdef __USE_LARGEFILE64
 #ifndef __off64_t_defined
-#define __off64_t_defined 1
+#define __off64_t_defined
 typedef __off64_t off64_t;
 #endif /* !__off64_t_defined */
 #endif /* __USE_LARGEFILE64 */
@@ -263,14 +263,14 @@ typedef __off64_t off64_t;
 
 #if defined(__USE_XOPEN_EXTENDED) || defined(__USE_XOPEN2K)
 #ifndef __intptr_t_defined
-#define __intptr_t_defined 1
+#define __intptr_t_defined
 typedef __intptr_t intptr_t;
 #endif /* !__intptr_t_defined */
 #endif /* __USE_XOPEN_EXTENDED || __USE_XOPEN2K */
 
 #if defined(__USE_MISC) || defined(__USE_XOPEN)
 #ifndef __socklen_t_defined
-#define __socklen_t_defined 1
+#define __socklen_t_defined
 typedef __socklen_t socklen_t;
 #endif /* !__socklen_t_defined */
 #endif /* __USE_MISC || __USE_XOPEN */
@@ -286,7 +286,7 @@ typedef __socklen_t socklen_t;
 #endif /* !__TARGV */
 
 #ifndef ____environ_defined
-#define ____environ_defined 1
+#define ____environ_defined
 #undef __environ
 #if defined(__CRT_HAVE_environ) && !defined(__NO_ASMNAME)
 __LIBC char **__environ __ASMNAME("environ");
@@ -297,14 +297,14 @@ __LIBC char **__environ __ASMNAME("_environ");
 #elif defined(__CRT_HAVE_environ)
 #undef environ
 #ifndef __environ_defined
-#define __environ_defined 1
+#define __environ_defined
 __LIBC char **environ;
 #endif /* !__environ_defined */
 #define __environ environ
 #elif defined(__CRT_HAVE__environ)
 #undef _environ
 #ifndef ___environ_defined
-#define ___environ_defined 1
+#define ___environ_defined
 __LIBC char **_environ;
 #endif /* !___environ_defined */
 #define __environ _environ
@@ -313,7 +313,7 @@ __LIBC char **__environ;
 #define __environ __environ
 #elif defined(__CRT_HAVE___p__environ)
 #ifndef ____p__environ_defined
-#define ____p__environ_defined 1
+#define ____p__environ_defined
 __CDECLARE(__ATTR_WUNUSED __ATTR_CONST __ATTR_RETNONNULL,char ***,__NOTHROW,__p__environ,(void),())
 #endif /* !____p__environ_defined */
 #define __environ (*__p__environ())
@@ -1360,7 +1360,7 @@ int pipe2([[nonnull]] $fd_t pipedes[2], $oflag_t flags) {
 
 %{
 #ifndef __environ_defined
-#define __environ_defined 1
+#define __environ_defined
 #undef environ
 #if defined(__CRT_HAVE_environ)
 __LIBC char **environ;
@@ -1370,7 +1370,7 @@ __LIBC char **environ __ASMNAME("_environ");
 #define environ environ
 #elif defined(__CRT_HAVE__environ)
 #ifndef ___environ_defined
-#define ___environ_defined 1
+#define ___environ_defined
 #undef _environ
 __LIBC char **_environ;
 #endif /* !___environ_defined */
@@ -1380,14 +1380,14 @@ __LIBC char **environ __ASMNAME("__environ");
 #define environ environ
 #elif defined(__CRT_HAVE___environ)
 #ifndef ____environ_defined
-#define ____environ_defined 1
+#define ____environ_defined
 #undef __environ
 __LIBC char **__environ;
 #endif /* !____environ_defined */
 #define environ __environ
 #elif defined(__CRT_HAVE___p__environ)
 #ifndef ____p__environ_defined
-#define ____p__environ_defined 1
+#define ____p__environ_defined
 __CDECLARE(__ATTR_WUNUSED __ATTR_CONST __ATTR_RETNONNULL,char ***,__NOTHROW,__p__environ,(void),())
 #endif /* !____p__environ_defined */
 #define environ (*__p__environ())
@@ -2153,7 +2153,7 @@ __LIBC char const *const _sys_siglist[_NSIG];
 #endif /* !sys_siglist */
 
 #ifndef __sa_family_t_defined
-#define __sa_family_t_defined 1
+#define __sa_family_t_defined
 typedef __sa_family_t sa_family_t; /* One of `AF_*' */
 #endif /* !__sa_family_t_defined */
 }

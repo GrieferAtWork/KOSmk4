@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4ce2c9c9 */
+/* HASH CRC-32:0xfaab91ff */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,13 +19,13 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_nextafterf_defined
-#define __local_nextafterf_defined 1
+#define __local_nextafterf_defined
 #include <__crt.h>
 #include <ieee754.h>
 #if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_nextafter) || defined(__CRT_HAVE_nexttoward) || defined(__CRT_HAVE___nextafter) || defined(__CRT_HAVE__nextafter) || defined(__CRT_HAVE___nexttoward) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_nextafter_defined
-#define __local___localdep_nextafter_defined 1
+#define __local___localdep_nextafter_defined
 #if __has_builtin(__builtin_nextafter) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_nextafter)
 __CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__localdep_nextafter,(double __x, double __y),nextafter,{ return __builtin_nextafter(__x, __y); })
 #elif __has_builtin(__builtin_nexttoward) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_nexttoward)
@@ -64,7 +64,7 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(nextafterf))(float __x, float __y) {
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_nextafterf_defined
-#define __local___localdep_nextafterf_defined 1
+#define __local___localdep_nextafterf_defined
 #define __localdep_nextafterf __LIBC_LOCAL_NAME(nextafterf)
 #endif /* !__local___localdep_nextafterf_defined */
 #else /* __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ || __CRT_HAVE_nextafter || __CRT_HAVE_nexttoward || __CRT_HAVE___nextafter || __CRT_HAVE__nextafter || __CRT_HAVE___nexttoward || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */

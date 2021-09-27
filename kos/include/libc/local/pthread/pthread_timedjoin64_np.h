@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1fb7e59d */
+/* HASH CRC-32:0x9eb55d50 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_pthread_timedjoin64_np_defined
-#define __local_pthread_timedjoin64_np_defined 1
+#define __local_pthread_timedjoin64_np_defined
 #include <__crt.h>
 #ifdef __CRT_HAVE_pthread_timedjoin_np
 #include <bits/types.h>
@@ -27,7 +27,7 @@
 #include <bits/os/timespec.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_pthread_timedjoin32_np_defined
-#define __local___localdep_pthread_timedjoin32_np_defined 1
+#define __local___localdep_pthread_timedjoin32_np_defined
 __CREDIRECT(,__errno_t,__NOTHROW_RPC,__localdep_pthread_timedjoin32_np,(__pthread_t __pthread, void **__thread_return, struct __timespec32 const *__abstime),pthread_timedjoin_np,(__pthread,__thread_return,__abstime))
 #endif /* !__local___localdep_pthread_timedjoin32_np_defined */
 __LOCAL_LIBC(pthread_timedjoin64_np) __errno_t
@@ -41,7 +41,7 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(pthread_timedjoin64_np))(__pthread_t 
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_pthread_timedjoin64_np_defined
-#define __local___localdep_pthread_timedjoin64_np_defined 1
+#define __local___localdep_pthread_timedjoin64_np_defined
 #define __localdep_pthread_timedjoin64_np __LIBC_LOCAL_NAME(pthread_timedjoin64_np)
 #endif /* !__local___localdep_pthread_timedjoin64_np_defined */
 #else /* __CRT_HAVE_pthread_timedjoin_np */

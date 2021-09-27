@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb2797625 */
+/* HASH CRC-32:0x7a821e6d */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_posix_spawnattr_setsigdefault_defined
-#define __local_posix_spawnattr_setsigdefault_defined 1
+#define __local_posix_spawnattr_setsigdefault_defined
 #include <__crt.h>
 #include <asm/crt/posix_spawn.h>
 #ifdef __POSIX_SPAWN_USE_KOS
@@ -27,7 +27,7 @@
 #include <bits/os/sigset.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_memcpy_defined
-#define __local___localdep_memcpy_defined 1
+#define __local___localdep_memcpy_defined
 #ifdef __CRT_HAVE_memcpy
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
@@ -47,7 +47,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(posix_spawnattr_setsigdefault))(struc
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_posix_spawnattr_setsigdefault_defined
-#define __local___localdep_posix_spawnattr_setsigdefault_defined 1
+#define __local___localdep_posix_spawnattr_setsigdefault_defined
 #define __localdep_posix_spawnattr_setsigdefault __LIBC_LOCAL_NAME(posix_spawnattr_setsigdefault)
 #endif /* !__local___localdep_posix_spawnattr_setsigdefault_defined */
 #else /* __POSIX_SPAWN_USE_KOS */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xab45f5a7 */
+/* HASH CRC-32:0xd3a30a59 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,14 +19,14 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_tcflush_defined
-#define __local_tcflush_defined 1
+#define __local_tcflush_defined
 #include <__crt.h>
 #include <asm/os/tty.h>
 #if defined(__CRT_HAVE_ioctl) && defined(__TCFLSH)
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_ioctl_defined
-#define __local___localdep_ioctl_defined 1
+#define __local___localdep_ioctl_defined
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -38,7 +38,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(tcflush))(__fd_t __fd, __STDC_INT_AS_
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_tcflush_defined
-#define __local___localdep_tcflush_defined 1
+#define __local___localdep_tcflush_defined
 #define __localdep_tcflush __LIBC_LOCAL_NAME(tcflush)
 #endif /* !__local___localdep_tcflush_defined */
 #else /* __CRT_HAVE_ioctl && __TCFLSH */

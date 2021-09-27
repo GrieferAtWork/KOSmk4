@@ -39,7 +39,7 @@ DECL_BEGIN
 struct driver;
 
 #ifndef __drv_self_defined
-#define __drv_self_defined 1
+#define __drv_self_defined
 DATDEF struct driver drv_self
 #ifdef CONFIG_BUILDING_KERNEL_CORE
 	ASMNAME("kernel_driver")

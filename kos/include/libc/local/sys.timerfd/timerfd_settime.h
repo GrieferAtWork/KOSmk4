@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5f4b0039 */
+/* HASH CRC-32:0x10933870 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_timerfd_settime_defined
-#define __local_timerfd_settime_defined 1
+#define __local_timerfd_settime_defined
 #include <__crt.h>
 #include <bits/types.h>
 #if defined(__CRT_HAVE_timerfd_settime64) || defined(__CRT_HAVE_timerfd_settime)
@@ -27,11 +27,11 @@
 #include <bits/os/itimerspec.h>
 __NAMESPACE_LOCAL_BEGIN
 #if !defined(__local___localdep_timerfd_settime32_defined) && defined(__CRT_HAVE_timerfd_settime)
-#define __local___localdep_timerfd_settime32_defined 1
+#define __local___localdep_timerfd_settime32_defined
 __CREDIRECT(__ATTR_NONNULL((3)),int,__NOTHROW_NCX,__localdep_timerfd_settime32,(__fd_t __ufd, __STDC_INT_AS_UINT_T __flags, struct __itimerspec32 const *__utmr, struct __itimerspec32 *__otmr),timerfd_settime,(__ufd,__flags,__utmr,__otmr))
 #endif /* !__local___localdep_timerfd_settime32_defined && __CRT_HAVE_timerfd_settime */
 #ifndef __local___localdep_timerfd_settime64_defined
-#define __local___localdep_timerfd_settime64_defined 1
+#define __local___localdep_timerfd_settime64_defined
 #if defined(__CRT_HAVE_timerfd_settime) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 __CREDIRECT(__ATTR_NONNULL((3)),int,__NOTHROW_NCX,__localdep_timerfd_settime64,(__fd_t __ufd, __STDC_INT_AS_UINT_T __flags, struct __itimerspec64 const *__utmr, struct __itimerspec64 *__otmr),timerfd_settime,(__ufd,__flags,__utmr,__otmr))
 #elif defined(__CRT_HAVE_timerfd_settime64)
@@ -81,7 +81,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(timerfd_settime))(__fd_t __ufd, __STD
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_timerfd_settime_defined
-#define __local___localdep_timerfd_settime_defined 1
+#define __local___localdep_timerfd_settime_defined
 #define __localdep_timerfd_settime __LIBC_LOCAL_NAME(timerfd_settime)
 #endif /* !__local___localdep_timerfd_settime_defined */
 #else /* __CRT_HAVE_timerfd_settime64 || __CRT_HAVE_timerfd_settime */

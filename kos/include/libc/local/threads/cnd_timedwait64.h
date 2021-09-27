@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xea5bfb67 */
+/* HASH CRC-32:0xf12738f */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_cnd_timedwait64_defined
-#define __local_cnd_timedwait64_defined 1
+#define __local_cnd_timedwait64_defined
 #include <__crt.h>
 #include <bits/types.h>
 #if defined(__CRT_HAVE_pthread_cond_timedwait64) || defined(__CRT_HAVE_pthread_cond_timedwait)
@@ -27,7 +27,7 @@
 #include <bits/os/timespec.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_pthread_cond_timedwait64_defined
-#define __local___localdep_pthread_cond_timedwait64_defined 1
+#define __local___localdep_pthread_cond_timedwait64_defined
 #if defined(__CRT_HAVE_pthread_cond_timedwait) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 __NAMESPACE_LOCAL_END
 #include <bits/crt/pthreadtypes.h>
@@ -68,7 +68,7 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(cnd_timedwait64))(__cnd_t *__restrict
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_cnd_timedwait64_defined
-#define __local___localdep_cnd_timedwait64_defined 1
+#define __local___localdep_cnd_timedwait64_defined
 #define __localdep_cnd_timedwait64 __LIBC_LOCAL_NAME(cnd_timedwait64)
 #endif /* !__local___localdep_cnd_timedwait64_defined */
 #else /* __CRT_HAVE_pthread_cond_timedwait64 || __CRT_HAVE_pthread_cond_timedwait */

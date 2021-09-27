@@ -50,27 +50,21 @@ __DECL_BEGIN
 #undef actime
 #undef modtime
 
-#ifndef __utimbuf_defined
-#define __utimbuf_defined 1
 struct utimbuf /*[PREFIX()]*/ {
 	__TM_TYPE(time) actime;  /* Access time. */
 	__TM_TYPE(time) modtime; /* Modification time. */
 };
-#endif /* !__utimbuf_defined */
 
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 #define _UTIMBUF_MATCHES_UTIMBUF64 1
 #endif /* __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ */
 
 #ifdef __USE_TIME64
-#ifndef __utimbuf64_defined
-#define __utimbuf64_defined 1
 #if (defined(__USE_TIME_BITS64) || defined(_UTIMBUF_MATCHES_UTIMBUF64)) && defined(__USE_STRUCT64_MACRO)
 #define utimbuf64 utimbuf
 #else /* (__USE_TIME_BITS64 || _UTIMBUF_MATCHES_UTIMBUF64) && __USE_STRUCT64_MACRO */
 #define __utimbuf64 utimbuf64
 #endif /* (!__USE_TIME_BITS64 && !_UTIMBUF_MATCHES_UTIMBUF64) || !__USE_STRUCT64_MACRO */
-#endif /* !__utimbuf64_defined */
 #endif /* __USE_TIME64 */
 
 #if (defined(__USE_TIME_BITS64) || defined(_UTIMBUF_MATCHES_UTIMBUF64)) && defined(__USE_STRUCT64_MACRO)
@@ -83,14 +77,11 @@ struct __utimbuf64 /*[NAME(utimbuf64)][PREFIX()]*/ {
 #endif /* (!__USE_TIME_BITS64 && !_UTIMBUF_MATCHES_UTIMBUF64) || !__USE_STRUCT64_MACRO */
 
 #ifdef __USE_KOS
-#ifndef __utimbuf32_defined
-#define __utimbuf32_defined 1
 #if !defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 #define utimbuf32 utimbuf
 #else /* !__USE_TIME_BITS64 || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ */
 #define __utimbuf32 utimbuf32
 #endif /* __USE_TIME_BITS64 && __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
-#endif /* !__utimbuf32_defined */
 #endif /* __USE_KOS */
 
 #if !defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__

@@ -20,6 +20,6 @@
 #ifndef __iovec_defined
 #include <bits/os/iovec.h>
 #ifndef __iovec_defined
-#define __iovec_defined 1
+#define __iovec_defined
 #endif /* !__iovec_defined */
 #endif /* !__iovec_defined */

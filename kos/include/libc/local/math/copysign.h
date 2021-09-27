@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xee5c2561 */
+/* HASH CRC-32:0x45effb16 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_copysign_defined
-#define __local_copysign_defined 1
+#define __local_copysign_defined
 #include <__crt.h>
 #include <libm/copysign.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -35,7 +35,7 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(copysign))(double __num, double __sign) {
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_copysign_defined
-#define __local___localdep_copysign_defined 1
+#define __local___localdep_copysign_defined
 #define __localdep_copysign __LIBC_LOCAL_NAME(copysign)
 #endif /* !__local___localdep_copysign_defined */
 #endif /* !__local_copysign_defined */

@@ -278,7 +278,7 @@ typedef int __epoll_ctl_t;
 typedef union epoll_data epoll_data_t;
 
 #ifndef __sigset_t_defined
-#define __sigset_t_defined 1
+#define __sigset_t_defined
 typedef struct __sigset_struct sigset_t;
 #endif /* !__sigset_t_defined */
 

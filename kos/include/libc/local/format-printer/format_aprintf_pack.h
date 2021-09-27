@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x547e3b5b */
+/* HASH CRC-32:0xadbe6149 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,12 +19,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_format_aprintf_pack_defined
-#define __local_format_aprintf_pack_defined 1
+#define __local_format_aprintf_pack_defined
 #include <__crt.h>
 struct format_aprintf_data;
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_malloc_defined
-#define __local___localdep_malloc_defined 1
+#define __local___localdep_malloc_defined
 #if __has_builtin(__builtin_malloc) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_malloc)
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
@@ -45,7 +45,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_malloc_defined */
 #ifndef __local___localdep_realloc_defined
-#define __local___localdep_realloc_defined 1
+#define __local___localdep_realloc_defined
 #if __has_builtin(__builtin_realloc) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_realloc)
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
@@ -63,7 +63,7 @@ __CREDIRECT(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)),vo
 __NAMESPACE_LOCAL_END
 #include <hybrid/__assert.h>
 #ifndef __format_aprintf_data_defined
-#define __format_aprintf_data_defined 1
+#define __format_aprintf_data_defined
 struct format_aprintf_data {
 	char         *ap_base;  /* [0..ap_used|ALLOC(ap_used+ap_avail)][owned] Buffer */
 	__SIZE_TYPE__ ap_avail; /* Unused buffer size */
@@ -121,7 +121,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(format_aprintf_pack))(struct format_a
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_format_aprintf_pack_defined
-#define __local___localdep_format_aprintf_pack_defined 1
+#define __local___localdep_format_aprintf_pack_defined
 #define __localdep_format_aprintf_pack __LIBC_LOCAL_NAME(format_aprintf_pack)
 #endif /* !__local___localdep_format_aprintf_pack_defined */
 #endif /* !__local_format_aprintf_pack_defined */

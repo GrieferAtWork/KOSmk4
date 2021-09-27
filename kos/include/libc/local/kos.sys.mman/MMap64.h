@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4aa53cb6 */
+/* HASH CRC-32:0x60e70c27 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_MMap64_defined
-#define __local_MMap64_defined 1
+#define __local_MMap64_defined
 #include <__crt.h>
 #ifdef __CRT_HAVE_MMap
 #include <kos/anno.h>
@@ -27,7 +27,7 @@
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_MMap32_defined
-#define __local___localdep_MMap32_defined 1
+#define __local___localdep_MMap32_defined
 __CREDIRECT(,void *,__THROWING,__localdep_MMap32,(void *__addr, __SIZE_TYPE__ __len, __STDC_INT_AS_UINT_T __prot, __STDC_INT_AS_UINT_T __flags, __fd_t __fd, __pos32_t __offset),MMap,(__addr,__len,__prot,__flags,__fd,__offset))
 #endif /* !__local___localdep_MMap32_defined */
 __LOCAL_LIBC(MMap64) __ATTR_WUNUSED void *
@@ -36,7 +36,7 @@ __LOCAL_LIBC(MMap64) __ATTR_WUNUSED void *
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_MMap64_defined
-#define __local___localdep_MMap64_defined 1
+#define __local___localdep_MMap64_defined
 #define __localdep_MMap64 __LIBC_LOCAL_NAME(MMap64)
 #endif /* !__local___localdep_MMap64_defined */
 #else /* __CRT_HAVE_MMap */

@@ -445,10 +445,10 @@ extern void (__cdecl _ReadWriteBarrier)(void);
 #endif /* RELEASE || _RELEASE */
 
 #ifdef _NATIVE_WCHAR_T_DEFINED
-#define __native_wchar_t_defined 1
+#define __native_wchar_t_defined
 #endif /* _NATIVE_WCHAR_T_DEFINED */
 #ifdef _WCHAR_T_DEFINED
-#define __wchar_t_defined 1
+#define __wchar_t_defined
 #endif /* _WCHAR_T_DEFINED */
 
 

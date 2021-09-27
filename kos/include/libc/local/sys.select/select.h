@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1ba84e05 */
+/* HASH CRC-32:0x5f1b61eb */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_select_defined
-#define __local_select_defined 1
+#define __local_select_defined
 #include <__crt.h>
 #include <bits/types.h>
 #if defined(__CRT_HAVE_select64) || defined(__CRT_HAVE_select) || defined(__CRT_HAVE___select)
@@ -28,7 +28,7 @@
 #include <bits/os/fd_set.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_select32_defined
-#define __local___localdep_select32_defined 1
+#define __local___localdep_select32_defined
 #ifdef __CRT_HAVE_select
 __CREDIRECT(,__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,__localdep_select32,(__STDC_INT_AS_SIZE_T __nfds, struct __fd_set_struct *__restrict __readfds, struct __fd_set_struct *__restrict __writefds, struct __fd_set_struct *__restrict __exceptfds, struct __timeval32 *__restrict __timeout),select,(__nfds,__readfds,__writefds,__exceptfds,__timeout))
 #elif defined(__CRT_HAVE___select)
@@ -38,7 +38,7 @@ __CREDIRECT(,__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,__localdep_select32,(__STDC_INT
 #endif /* !... */
 #endif /* !__local___localdep_select32_defined */
 #ifndef __local___localdep_select64_defined
-#define __local___localdep_select64_defined 1
+#define __local___localdep_select64_defined
 #if defined(__CRT_HAVE_select) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 __CREDIRECT(,__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,__localdep_select64,(__STDC_INT_AS_SIZE_T __nfds, struct __fd_set_struct *__restrict __readfds, struct __fd_set_struct *__restrict __writefds, struct __fd_set_struct *__restrict __exceptfds, struct __timeval64 *__restrict __timeout),select,(__nfds,__readfds,__writefds,__exceptfds,__timeout))
 #elif defined(__CRT_HAVE_select64)
@@ -72,7 +72,7 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(select))(__STDC_INT_AS_SIZE_T __nfds,
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_select_defined
-#define __local___localdep_select_defined 1
+#define __local___localdep_select_defined
 #define __localdep_select __LIBC_LOCAL_NAME(select)
 #endif /* !__local___localdep_select_defined */
 #else /* __CRT_HAVE_select64 || __CRT_HAVE_select || __CRT_HAVE___select */

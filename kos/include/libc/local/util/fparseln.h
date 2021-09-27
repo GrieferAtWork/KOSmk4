@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbf7ffee3 */
+/* HASH CRC-32:0x11870ba0 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,14 +19,14 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_fparseln_defined
-#define __local_fparseln_defined 1
+#define __local_fparseln_defined
 #include <__crt.h>
 #include <features.h>
 #if (defined(__CRT_HAVE_fgetc) || defined(__CRT_HAVE_getc) || defined(__CRT_HAVE__IO_getc) || defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked) || (defined(__CRT_DOS) && defined(__CRT_HAVE__filbuf)) || defined(__CRT_HAVE_fread) || defined(__CRT_HAVE__IO_fread) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock)) && (defined(__CRT_HAVE_ungetc) || defined(__CRT_HAVE__IO_ungetc) || defined(__CRT_HAVE_ungetc_unlocked) || defined(__CRT_HAVE__ungetc_nolock)) && defined(__CRT_HAVE_realloc)
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_fgetc_defined
-#define __local___localdep_fgetc_defined 1
+#define __local___localdep_fgetc_defined
 #if defined(__CRT_HAVE_fgetc_unlocked) && defined(__USE_STDIO_UNLOCKED)
 __NAMESPACE_LOCAL_END
 #include <kos/anno.h>
@@ -72,7 +72,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_fgetc_defined */
 #ifndef __local___localdep_free_defined
-#define __local___localdep_free_defined 1
+#define __local___localdep_free_defined
 #if __has_builtin(__builtin_free) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_free)
 __CEIREDIRECT(,void,__NOTHROW_NCX,__localdep_free,(void *__mallptr),free,{ __builtin_free(__mallptr); })
 #elif defined(__CRT_HAVE_free)
@@ -84,7 +84,7 @@ __CREDIRECT_VOID(,__NOTHROW_NCX,__localdep_free,(void *__mallptr),cfree,(__mallp
 #endif /* !... */
 #endif /* !__local___localdep_free_defined */
 #ifndef __local___localdep_getline_defined
-#define __local___localdep_getline_defined 1
+#define __local___localdep_getline_defined
 #if defined(__CRT_HAVE_getline_unlocked) && defined(__USE_STDIO_UNLOCKED)
 __NAMESPACE_LOCAL_END
 #include <kos/anno.h>
@@ -108,7 +108,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_getline_defined */
 #ifndef __local___localdep_malloc_defined
-#define __local___localdep_malloc_defined 1
+#define __local___localdep_malloc_defined
 #if __has_builtin(__builtin_malloc) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_malloc)
 __CEIREDIRECT(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1)),void *,__NOTHROW_NCX,__localdep_malloc,(__SIZE_TYPE__ __num_bytes),malloc,{ return __builtin_malloc(__num_bytes); })
 #elif defined(__CRT_HAVE_malloc)
@@ -121,7 +121,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_malloc_defined */
 #ifndef __local___localdep_memcpyc_defined
-#define __local___localdep_memcpyc_defined 1
+#define __local___localdep_memcpyc_defined
 #ifdef __CRT_HAVE_memcpyc
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_memcpyc,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),memcpyc,(__dst,__src,__elem_count,__elem_size))
 #else /* __CRT_HAVE_memcpyc */
@@ -132,7 +132,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__CRT_HAVE_memcpyc */
 #endif /* !__local___localdep_memcpyc_defined */
 #ifndef __local___localdep_memmovedownc_defined
-#define __local___localdep_memmovedownc_defined 1
+#define __local___localdep_memmovedownc_defined
 #ifdef __CRT_HAVE_memmovedownc
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_memmovedownc,(void *__dst, void const *__src, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),memmovedownc,(__dst,__src,__elem_count,__elem_size))
 #else /* __CRT_HAVE_memmovedownc */
@@ -143,7 +143,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__CRT_HAVE_memmovedownc */
 #endif /* !__local___localdep_memmovedownc_defined */
 #ifndef __local___localdep_realloc_defined
-#define __local___localdep_realloc_defined 1
+#define __local___localdep_realloc_defined
 #if __has_builtin(__builtin_realloc) && defined(__LIBC_BIND_CRTBUILTINS)
 __CEIREDIRECT(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)),void *,__NOTHROW_NCX,__localdep_realloc,(void *__mallptr, __SIZE_TYPE__ __num_bytes),realloc,{ return __builtin_realloc(__mallptr, __num_bytes); })
 #else /* __has_builtin(__builtin_realloc) && __LIBC_BIND_CRTBUILTINS */
@@ -151,7 +151,7 @@ __CREDIRECT(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)),vo
 #endif /* !__has_builtin(__builtin_realloc) || !__LIBC_BIND_CRTBUILTINS */
 #endif /* !__local___localdep_realloc_defined */
 #ifndef __local___localdep_ungetc_defined
-#define __local___localdep_ungetc_defined 1
+#define __local___localdep_ungetc_defined
 #if defined(__CRT_HAVE_ungetc_unlocked) && defined(__USE_STDIO_UNLOCKED)
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_ungetc,(int __ch, __FILE *__restrict __stream),ungetc_unlocked,(__ch,__stream))
 #elif defined(__CRT_HAVE__ungetc_nolock) && defined(__USE_STDIO_UNLOCKED)
@@ -411,7 +411,7 @@ __err:
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_fparseln_defined
-#define __local___localdep_fparseln_defined 1
+#define __local___localdep_fparseln_defined
 #define __localdep_fparseln __LIBC_LOCAL_NAME(fparseln)
 #endif /* !__local___localdep_fparseln_defined */
 #else /* (__CRT_HAVE_fgetc || __CRT_HAVE_getc || __CRT_HAVE__IO_getc || __CRT_HAVE_fgetc_unlocked || __CRT_HAVE_getc_unlocked || (__CRT_DOS && __CRT_HAVE__filbuf) || __CRT_HAVE_fread || __CRT_HAVE__IO_fread || __CRT_HAVE_fread_unlocked || __CRT_HAVE__fread_nolock) && (__CRT_HAVE_ungetc || __CRT_HAVE__IO_ungetc || __CRT_HAVE_ungetc_unlocked || __CRT_HAVE__ungetc_nolock) && __CRT_HAVE_realloc */

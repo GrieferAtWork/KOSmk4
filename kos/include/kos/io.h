@@ -39,22 +39,22 @@ __DECL_BEGIN
 
 #ifdef __CC__
 #ifndef __iomode_t_defined
-#define __iomode_t_defined 1
+#define __iomode_t_defined
 typedef __iomode_t iomode_t; /* Set of `IO_*' */
 #endif /* !__iomode_t_defined */
 
 #ifndef __readdir_mode_t_defined
-#define __readdir_mode_t_defined 1
+#define __readdir_mode_t_defined
 typedef unsigned int readdir_mode_t; /* Set of `READDIR_*' */
 #endif /* !__readdir_mode_t_defined */
 
 #ifndef __fallocate_mode_t_defined
-#define __fallocate_mode_t_defined 1
+#define __fallocate_mode_t_defined
 typedef unsigned int fallocate_mode_t; /* TODO */
 #endif /* !__fallocate_mode_t_defined */
 
 #ifndef __poll_mode_t_defined
-#define __poll_mode_t_defined 1
+#define __poll_mode_t_defined
 typedef unsigned int poll_mode_t; /* Set of `POLL*' */
 #endif /* !poll_mode_t_defined */
 #endif /* __CC__ */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x81d305dc */
+/* HASH CRC-32:0x7f33b9a9 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,14 +19,14 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_fuzzy_c32scmp_defined
-#define __local_fuzzy_c32scmp_defined 1
+#define __local_fuzzy_c32scmp_defined
 #include <__crt.h>
 #include <hybrid/typecore.h>
 #include <parts/malloca.h>
 #if defined(__CRT_HAVE_fuzzy_memcmpl) || (defined(__CRT_HAVE_fuzzy_wmemcmp) && __SIZEOF_WCHAR_T__ == 4) || (defined(__CRT_HAVE_KOS$fuzzy_wmemcmp) && defined(__LIBCCALL_IS_LIBKCALL)) || !defined(__NO_MALLOCA)
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_c32slen_defined
-#define __local___localdep_c32slen_defined 1
+#define __local___localdep_c32slen_defined
 #if defined(__CRT_HAVE_wcslen) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_c32slen,(__CHAR32_TYPE__ const *__restrict __str),wcslen,(__str))
 #elif defined(__CRT_HAVE_KOS$wcslen)
@@ -44,7 +44,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_c32slen_defined */
 #ifndef __local___localdep_fuzzy_memcmpl_defined
-#define __local___localdep_fuzzy_memcmpl_defined 1
+#define __local___localdep_fuzzy_memcmpl_defined
 #ifdef __CRT_HAVE_fuzzy_memcmpl
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 3)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_fuzzy_memcmpl,(void const *__s1, __SIZE_TYPE__ __s1_dwords, void const *__s2, __SIZE_TYPE__ __s2_dwords),fuzzy_memcmpl,(__s1,__s1_dwords,__s2,__s2_dwords))
 #elif defined(__CRT_HAVE_fuzzy_wmemcmp) && __SIZEOF_WCHAR_T__ == 4
@@ -66,7 +66,7 @@ __NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(fuzzy_c32scmp))(__CHAR32_TYPE__ const
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_fuzzy_c32scmp_defined
-#define __local___localdep_fuzzy_c32scmp_defined 1
+#define __local___localdep_fuzzy_c32scmp_defined
 #define __localdep_fuzzy_c32scmp __LIBC_LOCAL_NAME(fuzzy_c32scmp)
 #endif /* !__local___localdep_fuzzy_c32scmp_defined */
 #else /* __CRT_HAVE_fuzzy_memcmpl || (__CRT_HAVE_fuzzy_wmemcmp && __SIZEOF_WCHAR_T__ == 4) || (__CRT_HAVE_KOS$fuzzy_wmemcmp && __LIBCCALL_IS_LIBKCALL) || !__NO_MALLOCA */

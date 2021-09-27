@@ -83,7 +83,7 @@ DATDEF struct desctab const x86_idt_ptr;
 
 #ifdef CONFIG_HAVE_DEBUGGER
 #ifndef __x86_dbgidt_defined
-#define __x86_dbgidt_defined 1
+#define __x86_dbgidt_defined
 DATDEF struct idt_segment x86_dbgidt[256];
 DATDEF struct desctab const x86_dbgidt_ptr;
 #ifndef CONFIG_NO_SMP

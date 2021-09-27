@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa211848e */
+/* HASH CRC-32:0xa159a48b */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,12 +19,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_log1pf_defined
-#define __local_log1pf_defined 1
+#define __local_log1pf_defined
 #include <__crt.h>
 #if defined(__CRT_HAVE_log1p) || defined(__CRT_HAVE___log1p)
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_log1p_defined
-#define __local___localdep_log1p_defined 1
+#define __local___localdep_log1p_defined
 #if __has_builtin(__builtin_log1p) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_log1p)
 __CEIREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_log1p,(double __x),log1p,{ return __builtin_log1p(__x); })
 #elif defined(__CRT_HAVE_log1p)
@@ -41,7 +41,7 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(log1pf))(float __x) {
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_log1pf_defined
-#define __local___localdep_log1pf_defined 1
+#define __local___localdep_log1pf_defined
 #define __localdep_log1pf __LIBC_LOCAL_NAME(log1pf)
 #endif /* !__local___localdep_log1pf_defined */
 #else /* __CRT_HAVE_log1p || __CRT_HAVE___log1p */

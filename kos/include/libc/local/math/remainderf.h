@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2437434 */
+/* HASH CRC-32:0xa56501f5 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,13 +19,13 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_remainderf_defined
-#define __local_remainderf_defined 1
+#define __local_remainderf_defined
 #include <__crt.h>
 #include <ieee754.h>
 #if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_remainder) || defined(__CRT_HAVE_drem) || defined(__CRT_HAVE___remainder) || defined(__CRT_HAVE___drem) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_remainder_defined
-#define __local___localdep_remainder_defined 1
+#define __local___localdep_remainder_defined
 #if __has_builtin(__builtin_remainder) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_remainder)
 __CEIREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_remainder,(double __x, double __p),remainder,{ return __builtin_remainder(__x, __p); })
 #elif __has_builtin(__builtin_drem) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_drem)
@@ -69,7 +69,7 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(remainderf))(float __x, float __p) {
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_remainderf_defined
-#define __local___localdep_remainderf_defined 1
+#define __local___localdep_remainderf_defined
 #define __localdep_remainderf __LIBC_LOCAL_NAME(remainderf)
 #endif /* !__local___localdep_remainderf_defined */
 #else /* __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ || __CRT_HAVE_remainder || __CRT_HAVE_drem || __CRT_HAVE___remainder || __CRT_HAVE___drem || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */

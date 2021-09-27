@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x28f7689 */
+/* HASH CRC-32:0xc0f6fe1 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,12 +19,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_remquol_defined
-#define __local_remquol_defined 1
+#define __local_remquol_defined
 #include <__crt.h>
 #if defined(__CRT_HAVE_remquo) || defined(__CRT_HAVE___remquo)
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_remquo_defined
-#define __local___localdep_remquo_defined 1
+#define __local___localdep_remquo_defined
 #if __has_builtin(__builtin_remquo) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_remquo)
 __CEIREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((3)),double,__NOTHROW,__localdep_remquo,(double __x, double __y, int *__pquo),remquo,{ return __builtin_remquo(__x, __y, __pquo); })
 #elif defined(__CRT_HAVE_remquo)
@@ -41,7 +41,7 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(remquol))(__LONGDOUBLE __x, __LONGDOUBLE 
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_remquol_defined
-#define __local___localdep_remquol_defined 1
+#define __local___localdep_remquol_defined
 #define __localdep_remquol __LIBC_LOCAL_NAME(remquol)
 #endif /* !__local___localdep_remquol_defined */
 #else /* __CRT_HAVE_remquo || __CRT_HAVE___remquo */

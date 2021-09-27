@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x554c11e3 */
+/* HASH CRC-32:0x5f041138 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,18 +19,18 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_pthread_attr_setstack_defined
-#define __local_pthread_attr_setstack_defined 1
+#define __local_pthread_attr_setstack_defined
 #include <__crt.h>
 #if defined(__CRT_HAVE_pthread_attr_setstackaddr) && defined(__CRT_HAVE_pthread_attr_setstacksize)
 #include <bits/types.h>
 #include <bits/crt/pthreadtypes.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_crt_pthread_attr_setstackaddr_defined
-#define __local___localdep_crt_pthread_attr_setstackaddr_defined 1
+#define __local___localdep_crt_pthread_attr_setstackaddr_defined
 __CREDIRECT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,__localdep_crt_pthread_attr_setstackaddr,(__pthread_attr_t *__attr, void *__stackaddr),pthread_attr_setstackaddr,(__attr,__stackaddr))
 #endif /* !__local___localdep_crt_pthread_attr_setstackaddr_defined */
 #ifndef __local___localdep_crt_pthread_attr_setstacksize_defined
-#define __local___localdep_crt_pthread_attr_setstacksize_defined 1
+#define __local___localdep_crt_pthread_attr_setstacksize_defined
 __CREDIRECT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,__localdep_crt_pthread_attr_setstacksize,(__pthread_attr_t *__attr, __SIZE_TYPE__ __stacksize),pthread_attr_setstacksize,(__attr,__stacksize))
 #endif /* !__local___localdep_crt_pthread_attr_setstacksize_defined */
 __LOCAL_LIBC(pthread_attr_setstack) __ATTR_NONNULL((1)) __errno_t
@@ -43,7 +43,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(pthread_attr_setstack))(__pthread_att
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_pthread_attr_setstack_defined
-#define __local___localdep_pthread_attr_setstack_defined 1
+#define __local___localdep_pthread_attr_setstack_defined
 #define __localdep_pthread_attr_setstack __LIBC_LOCAL_NAME(pthread_attr_setstack)
 #endif /* !__local___localdep_pthread_attr_setstack_defined */
 #else /* __CRT_HAVE_pthread_attr_setstackaddr && __CRT_HAVE_pthread_attr_setstacksize */

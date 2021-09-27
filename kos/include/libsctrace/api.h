@@ -38,22 +38,22 @@
 
 #if defined(__i386__) && !defined(__x86_64__)
 #define LIBSCTRACE_CC __ATTR_STDCALL
-#else
+#else /* ... */
 #define LIBSCTRACE_CC /* nothing */
-#endif
+#endif /* !... */
 
-#if !defined(LIBSCTRACE_WANT_PROTOTYPES) && \
-     defined(__KOS__) && defined(__KERNEL__)
-#define LIBSCTRACE_WANT_PROTOTYPES 1
-#endif
+#if (!defined(LIBSCTRACE_WANT_PROTOTYPES) && \
+     defined(__KOS__) && defined(__KERNEL__))
+#define LIBSCTRACE_WANT_PROTOTYPES
+#endif /* ... */
 
 #if defined(__KOS__) && defined(__KERNEL__)
 #define LIBSCTRACE_DECL __PUBDEF
 #elif defined(__LIBSCTRACE_STATIC)
 #define LIBSCTRACE_DECL __INTDEF
-#else
+#else /* ... */
 #define LIBSCTRACE_DECL __IMPDEF
-#endif
+#endif /* !... */
 
 /* Library name for use with `dlopen()' */
 #define LIBSCTRACE_LIBRARY_NAME "libsctrace.so"

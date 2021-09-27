@@ -114,7 +114,7 @@ __SYSDECL_BEGIN
 
 
 #ifndef __error_register_state_t_defined
-#define __error_register_state_t_defined 1
+#define __error_register_state_t_defined
 typedef __ERROR_REGISTER_STATE_TYPE error_register_state_t;
 #endif /* !__error_register_state_t_defined */
 

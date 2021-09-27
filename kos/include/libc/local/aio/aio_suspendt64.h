@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3273b1bc */
+/* HASH CRC-32:0xef2dec8d */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_aio_suspendt64_defined
-#define __local_aio_suspendt64_defined 1
+#define __local_aio_suspendt64_defined
 #include <__crt.h>
 #include <features.h>
 #include <bits/types.h>
@@ -28,7 +28,7 @@
 #include <bits/os/timespec.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_aio_suspendt32_defined
-#define __local___localdep_aio_suspendt32_defined 1
+#define __local___localdep_aio_suspendt32_defined
 #if defined(__CRT_HAVE_aio_suspend) && (!defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_aio_suspendt32,(struct aiocb const *const __list[], __STDC_INT_AS_SIZE_T __nent, struct __timespec32 const *__restrict __timeout),aio_suspend,(__list,__nent,__timeout))
 #elif defined(__CRT_HAVE_aio_suspend64) && (defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
@@ -48,7 +48,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(aio_suspendt64))(struct aiocb const *
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_aio_suspendt64_defined
-#define __local___localdep_aio_suspendt64_defined 1
+#define __local___localdep_aio_suspendt64_defined
 #define __localdep_aio_suspendt64 __LIBC_LOCAL_NAME(aio_suspendt64)
 #endif /* !__local___localdep_aio_suspendt64_defined */
 #else /* (__CRT_HAVE_aio_suspend && (!__USE_FILE_OFFSET64 || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)) || (__CRT_HAVE_aio_suspend64 && (__USE_FILE_OFFSET64 || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)) */

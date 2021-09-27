@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8aab86e8 */
+/* HASH CRC-32:0x66c1d67e */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local__vfwprintf_p_defined
-#define __local__vfwprintf_p_defined 1
+#define __local__vfwprintf_p_defined
 #include <__crt.h>
 #include <kos/anno.h>
 #include <features.h>
@@ -36,7 +36,7 @@ __LOCAL_LIBC(_vfwprintf_p) __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep__vfwprintf_p_defined
-#define __local___localdep__vfwprintf_p_defined 1
+#define __local___localdep__vfwprintf_p_defined
 #define __localdep__vfwprintf_p __LIBC_LOCAL_NAME(_vfwprintf_p)
 #endif /* !__local___localdep__vfwprintf_p_defined */
 #endif /* !__local__vfwprintf_p_defined */

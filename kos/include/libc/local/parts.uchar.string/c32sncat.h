@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb827b190 */
+/* HASH CRC-32:0x69f59049 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,12 +19,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_c32sncat_defined
-#define __local_c32sncat_defined 1
+#define __local_c32sncat_defined
 #include <__crt.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_c32send_defined
-#define __local___localdep_c32send_defined 1
+#define __local___localdep_c32send_defined
 #if defined(__CRT_HAVE_wcsend) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
 __CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),__CHAR32_TYPE__ *,__NOTHROW_NCX,__localdep_c32send,(__CHAR32_TYPE__ const *__restrict __str),wcsend,(__str))
 #elif defined(__CRT_HAVE_KOS$wcsend)
@@ -42,7 +42,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_c32send_defined */
 #ifndef __local___localdep_c32snlen_defined
-#define __local___localdep_c32snlen_defined 1
+#define __local___localdep_c32snlen_defined
 #if defined(__CRT_HAVE_wcsnlen) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_c32snlen,(__CHAR32_TYPE__ const *__restrict __str, __SIZE_TYPE__ __maxlen),wcsnlen,(__str,__maxlen))
 #elif defined(__CRT_HAVE_KOS$wcsnlen)
@@ -60,7 +60,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_c32snlen_defined */
 #ifndef __local___localdep_memcpyl_defined
-#define __local___localdep_memcpyl_defined 1
+#define __local___localdep_memcpyl_defined
 #ifdef __CRT_HAVE_memcpyl
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT32_TYPE__ *,__NOTHROW_NCX,__localdep_memcpyl,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_dwords),memcpyl,(__dst,__src,__n_dwords))
 #elif defined(__CRT_HAVE_wmemcpy) && __SIZEOF_WCHAR_T__ == 4
@@ -84,7 +84,7 @@ __NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(c32sncat))(__CHAR32_TYPE__ *__restric
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_c32sncat_defined
-#define __local___localdep_c32sncat_defined 1
+#define __local___localdep_c32sncat_defined
 #define __localdep_c32sncat __LIBC_LOCAL_NAME(c32sncat)
 #endif /* !__local___localdep_c32sncat_defined */
 #endif /* !__local_c32sncat_defined */

@@ -66,7 +66,7 @@ struct dbg_entry_info {
 	}
 
 #ifndef __dbg_active_defined
-#define __dbg_active_defined 1
+#define __dbg_active_defined
 /* Set to true while the debugger is currently active.
  * NOTE: This variable may be used to test if the system is being debugged. */
 DATDEF bool dbg_active;
@@ -202,7 +202,7 @@ DATDEF uintptr_t volatile kernel_debug_on;
 DECL_END
 #else /* CONFIG_HAVE_DEBUGGER */
 #ifndef __dbg_active_defined
-#define __dbg_active_defined 1
+#define __dbg_active_defined
 #define dbg_active 0
 #endif /* !__dbg_active_defined */
 #endif /* !CONFIG_HAVE_DEBUGGER */

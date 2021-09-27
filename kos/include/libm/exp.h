@@ -419,7 +419,7 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE754_FLOAT_TYPE__
 
 __LIBM_LOCAL_DECLARE_BEGIN
 #ifndef __libm_one_defined
-#define __libm_one_defined 1
+#define __libm_one_defined
 __LIBM_LOCAL_DECLARE(__IEEE754_DOUBLE_TYPE__, one, __IEEE754_DOUBLE_C(1.0))
 #endif /* !__libm_one_defined */
 __LIBM_LOCAL_DECLARE_ARRAY(__IEEE754_DOUBLE_TYPE__, halF, 2) {
@@ -427,12 +427,12 @@ __LIBM_LOCAL_DECLARE_ARRAY(__IEEE754_DOUBLE_TYPE__, halF, 2) {
 	__IEEE754_DOUBLE_C(-0.5)
 };
 #ifndef __libm_huge_defined
-#define __libm_huge_defined 1
+#define __libm_huge_defined
 __LIBM_LOCAL_DECLARE(__IEEE754_DOUBLE_TYPE__, huge, __IEEE754_DOUBLE_C(1.0e300))
 #endif /* !__libm_huge_defined */
 __LIBM_LOCAL_DECLARE(__IEEE754_DOUBLE_TYPE__, twom1000, __IEEE754_DOUBLE_C(9.33263618503218878990e-302))    /* 2 ** -1000=0x01700000,0 */
 #ifndef __libm_o_threshold_defined
-#define __libm_o_threshold_defined 1
+#define __libm_o_threshold_defined
 __LIBM_LOCAL_DECLARE(__IEEE754_DOUBLE_TYPE__, o_threshold, __IEEE754_DOUBLE_C(7.09782712893383973096e+02)) /* 0x40862E42, 0xFEFA39EF */
 #endif /* !__libm_o_threshold_defined */
 __LIBM_LOCAL_DECLARE(__IEEE754_DOUBLE_TYPE__, u_threshold, __IEEE754_DOUBLE_C(-7.45133219101941108420e+02)) /* 0xc0874910, 0xD52D3051 */
@@ -445,11 +445,11 @@ __LIBM_LOCAL_DECLARE_ARRAY(__IEEE754_DOUBLE_TYPE__, ln2LO, 2) {
 	__IEEE754_DOUBLE_C(-1.90821492927058770002e-10) /* 0xbdea39ef, 0x35793c76 */
 };
 #ifndef __libm_invln2_defined
-#define __libm_invln2_defined 1
+#define __libm_invln2_defined
 __LIBM_LOCAL_DECLARE(__IEEE754_DOUBLE_TYPE__, invln2, __IEEE754_DOUBLE_C(1.44269504088896338700e+00)) /* 0x3ff71547, 0x652b82fe */
 #endif /* !__libm_invln2_defined */
 #ifndef __libm_P12345_defined
-#define __libm_P12345_defined 1
+#define __libm_P12345_defined
 __LIBM_LOCAL_DECLARE(__IEEE754_DOUBLE_TYPE__, P1, __IEEE754_DOUBLE_C(1.66666666666666019037e-01))  /* 0x3FC55555, 0x5555553E */
 __LIBM_LOCAL_DECLARE(__IEEE754_DOUBLE_TYPE__, P2, __IEEE754_DOUBLE_C(-2.77777777770155933842e-03)) /* 0xBF66C16C, 0x16BEBD93 */
 __LIBM_LOCAL_DECLARE(__IEEE754_DOUBLE_TYPE__, P3, __IEEE754_DOUBLE_C(6.61375632143793436117e-05))  /* 0x3F11566A, 0xAF25DE2C */

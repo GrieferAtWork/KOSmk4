@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xce5abc32 */
+/* HASH CRC-32:0x95b2b521 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,13 +19,13 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_wctype_l_defined
-#define __local_wctype_l_defined 1
+#define __local_wctype_l_defined
 #include <__crt.h>
 #if defined(__CRT_HAVE_wctype) || (defined(__CRT_KOS) && defined(__CRT_HAVE___unicode_descriptor))
 #include <bits/crt/wctype.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_wctype_defined
-#define __local___localdep_wctype_defined 1
+#define __local___localdep_wctype_defined
 #ifdef __CRT_HAVE_wctype
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__wctype_t,__NOTHROW_NCX,__localdep_wctype,(char const *__prop),wctype,(__prop))
 #elif defined(__CRT_KOS) && defined(__CRT_HAVE___unicode_descriptor)
@@ -45,7 +45,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wctype_l))(char const *__prop, __loca
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_wctype_l_defined
-#define __local___localdep_wctype_l_defined 1
+#define __local___localdep_wctype_l_defined
 #define __localdep_wctype_l __LIBC_LOCAL_NAME(wctype_l)
 #endif /* !__local___localdep_wctype_l_defined */
 #else /* __CRT_HAVE_wctype || (__CRT_KOS && __CRT_HAVE___unicode_descriptor) */

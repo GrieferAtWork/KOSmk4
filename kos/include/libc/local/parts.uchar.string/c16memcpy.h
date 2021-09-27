@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc6d19311 */
+/* HASH CRC-32:0x27170a39 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,12 +19,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_c16memcpy_defined
-#define __local_c16memcpy_defined 1
+#define __local_c16memcpy_defined
 #include <__crt.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_memcpyc_defined
-#define __local___localdep_memcpyc_defined 1
+#define __local___localdep_memcpyc_defined
 #ifdef __CRT_HAVE_memcpyc
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_memcpyc,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),memcpyc,(__dst,__src,__elem_count,__elem_size))
 #else /* __CRT_HAVE_memcpyc */
@@ -35,7 +35,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__CRT_HAVE_memcpyc */
 #endif /* !__local___localdep_memcpyc_defined */
 #ifndef __local___localdep_memcpyl_defined
-#define __local___localdep_memcpyl_defined 1
+#define __local___localdep_memcpyl_defined
 #ifdef __CRT_HAVE_memcpyl
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT32_TYPE__ *,__NOTHROW_NCX,__localdep_memcpyl,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_dwords),memcpyl,(__dst,__src,__n_dwords))
 #elif defined(__CRT_HAVE_wmemcpy) && __SIZEOF_WCHAR_T__ == 4
@@ -50,7 +50,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_memcpyl_defined */
 #ifndef __local___localdep_memcpyw_defined
-#define __local___localdep_memcpyw_defined 1
+#define __local___localdep_memcpyw_defined
 #ifdef __CRT_HAVE_memcpyw
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT16_TYPE__ *,__NOTHROW_NCX,__localdep_memcpyw,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_words),memcpyw,(__dst,__src,__n_words))
 #elif defined(__CRT_HAVE_wmemcpy) && __SIZEOF_WCHAR_T__ == 2
@@ -76,7 +76,7 @@ __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(c16memcpy))(__CHAR16_TYPE__ *__restri
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_c16memcpy_defined
-#define __local___localdep_c16memcpy_defined 1
+#define __local___localdep_c16memcpy_defined
 #define __localdep_c16memcpy __LIBC_LOCAL_NAME(c16memcpy)
 #endif /* !__local___localdep_c16memcpy_defined */
 #endif /* !__local_c16memcpy_defined */

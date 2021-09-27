@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1ddbf7c */
+/* HASH CRC-32:0x58b04b12 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,14 +19,14 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_isinff_defined
-#define __local_isinff_defined 1
+#define __local_isinff_defined
 #include <__crt.h>
 #include <ieee754.h>
 #include <bits/math-constants.h>
 #if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__INFINITYF) || defined(__HUGE_VALF) || defined(__CRT_HAVE_isinf) || defined(__CRT_HAVE___isinf) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__INFINITY) || defined(__HUGE_VAL)
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_isinf_defined
-#define __local___localdep_isinf_defined 1
+#define __local___localdep_isinf_defined
 #if __has_builtin(__builtin_isinf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_isinf)
 __CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isinf,(double __x),isinf,{ return __builtin_isinf(__x); })
 #elif defined(__CRT_HAVE_isinf)
@@ -65,7 +65,7 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(isinff))(float __x) {
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_isinff_defined
-#define __local___localdep_isinff_defined 1
+#define __local___localdep_isinff_defined
 #define __localdep_isinff __LIBC_LOCAL_NAME(isinff)
 #endif /* !__local___localdep_isinff_defined */
 #else /* __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ || __INFINITYF || __HUGE_VALF || __CRT_HAVE_isinf || __CRT_HAVE___isinf || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ || __INFINITY || __HUGE_VAL */

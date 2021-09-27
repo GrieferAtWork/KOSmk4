@@ -79,8 +79,6 @@ __DECL_BEGIN
 
 __TIMEVAL_CXX_DECL_BEGIN
 
-#ifndef __timeval_defined
-#define __timeval_defined 1
 #define _STRUCT_TIMEVAL 1
 struct timeval /*[PREFIX(tv_)]*/ {
 	__TM_TYPE(time)   tv_sec;   /* Seconds */
@@ -98,21 +96,17 @@ struct timeval /*[PREFIX(tv_)]*/ {
 	__TIMEVAL_CXX_SUPPORT(struct timeval, __TM_TYPE(time), __CRT_PRIVATE_ULNG(__SIZEOF_SUSECONDS_T__))
 };
 __TIMEVAL_CXX_SUPPORT2(struct timeval, __TM_TYPE(time), __CRT_PRIVATE_ULNG(__SIZEOF_SUSECONDS_T__))
-#endif /* !__timeval_defined */
 
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 #define _TIMEVAL_MATCHES_TIMEVAL64 1
 #endif /* __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ */
 
 #ifdef __USE_TIME64
-#ifndef __timeval64_defined
-#define __timeval64_defined 1
 #if (defined(__USE_TIME_BITS64) || defined(_TIMEVAL_MATCHES_TIMEVAL64)) && defined(__USE_STRUCT64_MACRO)
 #define timeval64 timeval
 #else /* (__USE_TIME_BITS64 || _TIMEVAL_MATCHES_TIMEVAL64) && __USE_STRUCT64_MACRO */
 #define __timeval64 timeval64
 #endif /* (!__USE_TIME_BITS64 && !_TIMEVAL_MATCHES_TIMEVAL64) || !__USE_STRUCT64_MACRO */
-#endif /* !__timeval64_defined */
 #endif /* __USE_TIME64 */
 
 #if (defined(__USE_TIME_BITS64) || defined(_TIMEVAL_MATCHES_TIMEVAL64)) && defined(__USE_STRUCT64_MACRO)
@@ -137,14 +131,11 @@ __TIMEVAL_CXX_SUPPORT2(struct __timeval64, __time64_t, __CRT_PRIVATE_ULNG(__SIZE
 #endif /* (!__USE_TIME_BITS64 && !_TIMEVAL_MATCHES_TIMEVAL64) || !__USE_STRUCT64_MACRO */
 
 #ifdef __USE_KOS
-#ifndef __timeval32_defined
-#define __timeval32_defined 1
 #if !defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 #define timeval32 timeval
 #else /* !__USE_TIME_BITS64 || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ */
 #define __timeval32 timeval32
 #endif /* __USE_TIME_BITS64 && __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
-#endif /* !__timeval32_defined */
 #endif /* __USE_KOS */
 
 #if !defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__

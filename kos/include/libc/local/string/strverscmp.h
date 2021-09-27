@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8dbd0c80 */
+/* HASH CRC-32:0x9d8e9205 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_strverscmp_defined
-#define __local_strverscmp_defined 1
+#define __local_strverscmp_defined
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(strverscmp) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) int
@@ -69,7 +69,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strverscmp))(char const *__s1, char c
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_strverscmp_defined
-#define __local___localdep_strverscmp_defined 1
+#define __local___localdep_strverscmp_defined
 #define __localdep_strverscmp __LIBC_LOCAL_NAME(strverscmp)
 #endif /* !__local___localdep_strverscmp_defined */
 #endif /* !__local_strverscmp_defined */

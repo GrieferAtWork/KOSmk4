@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9af26c7c */
+/* HASH CRC-32:0x3981fce1 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -46,29 +46,29 @@
 #else /* __CXX_SYSTEM_HEADER */
 /* Import all symbols into the global namespace when re-including "stdlib.h" after "cstdlib" */
 #ifndef __size_t_defined
-#define __size_t_defined 1
+#define __size_t_defined
 __NAMESPACE_STD_USING(size_t)
 #endif /* !__size_t_defined */
 #ifndef __div_t_defined
-#define __div_t_defined 1
+#define __div_t_defined
 __NAMESPACE_STD_USING(div_t)
 #endif /* !__div_t_defined */
 #ifndef __ldiv_t_defined
-#define __ldiv_t_defined 1
+#define __ldiv_t_defined
 __NAMESPACE_STD_USING(ldiv_t)
 #endif /* !__ldiv_t_defined */
 #ifdef __USE_ISOC99
 #ifndef __lldiv_t_defined
-#define __lldiv_t_defined 1
+#define __lldiv_t_defined
 __NAMESPACE_STD_USING(lldiv_t)
 #endif /* !__lldiv_t_defined */
 #endif /* __USE_ISOC99 */
 #if !defined(__qsort_defined) && defined(__std_qsort_defined)
-#define __qsort_defined 1
+#define __qsort_defined
 __NAMESPACE_STD_USING(qsort)
 #endif /* !__qsort_defined && __std_qsort_defined */
 #if !defined(__bsearch_defined) && defined(__std_bsearch_defined)
-#define __bsearch_defined 1
+#define __bsearch_defined
 __NAMESPACE_STD_USING(bsearch)
 #endif /* !__bsearch_defined && __std_bsearch_defined */
 __NAMESPACE_STD_USING(labs)
@@ -91,15 +91,15 @@ __NAMESPACE_STD_USING(wctomb)
 __NAMESPACE_STD_USING(mbstowcs)
 __NAMESPACE_STD_USING(wcstombs)
 #if !defined(__system_defined) && defined(__std_system_defined)
-#define __system_defined 1
+#define __system_defined
 __NAMESPACE_STD_USING(system)
 #endif /* !__system_defined && __std_system_defined */
 #if !defined(__abort_defined) && defined(__std_abort_defined)
-#define __abort_defined 1
+#define __abort_defined
 __NAMESPACE_STD_USING(abort)
 #endif /* !__abort_defined && __std_abort_defined */
 #if !defined(__exit_defined) && defined(__std_exit_defined)
-#define __exit_defined 1
+#define __exit_defined
 __NAMESPACE_STD_USING(exit)
 #endif /* !__exit_defined && __std_exit_defined */
 #if defined(__CRT_HAVE_atexit) || defined(__CRT_HAVE_at_quick_exit)
@@ -119,19 +119,19 @@ __NAMESPACE_STD_USING(_Exit)
 #endif /* __CRT_HAVE__Exit || __CRT_HAVE__exit || __CRT_HAVE_quick_exit || __CRT_HAVE_exit */
 #endif /* __USE_ISOC99 */
 #if !defined(__malloc_defined) && defined(__std_malloc_defined)
-#define __malloc_defined 1
+#define __malloc_defined
 __NAMESPACE_STD_USING(malloc)
 #endif /* !__malloc_defined && __std_malloc_defined */
 #if !defined(__calloc_defined) && defined(__std_calloc_defined)
-#define __calloc_defined 1
+#define __calloc_defined
 __NAMESPACE_STD_USING(calloc)
 #endif /* !__calloc_defined && __std_calloc_defined */
 #if !defined(__realloc_defined) && defined(__std_realloc_defined)
-#define __realloc_defined 1
+#define __realloc_defined
 __NAMESPACE_STD_USING(realloc)
 #endif /* !__realloc_defined && __std_realloc_defined */
 #if !defined(__free_defined) && defined(__std_free_defined)
-#define __free_defined 1
+#define __free_defined
 __NAMESPACE_STD_USING(free)
 #endif /* !__free_defined && __std_free_defined */
 __NAMESPACE_STD_USING(srand)
@@ -142,27 +142,27 @@ __NAMESPACE_STD_USING(atoll)
 __NAMESPACE_STD_USING(strtoul)
 __NAMESPACE_STD_USING(strtol)
 #if !defined(__strtoull_defined) && defined(__std_strtoull_defined)
-#define __strtoull_defined 1
+#define __strtoull_defined
 __NAMESPACE_STD_USING(strtoull)
 #endif /* !__strtoull_defined && __std_strtoull_defined */
 #if !defined(__strtoll_defined) && defined(__std_strtoll_defined)
-#define __strtoll_defined 1
+#define __strtoll_defined
 __NAMESPACE_STD_USING(strtoll)
 #endif /* !__strtoll_defined && __std_strtoll_defined */
 #ifndef __NO_FPU
 __NAMESPACE_STD_USING(atof)
 __NAMESPACE_STD_USING(strtod)
 #if !defined(__strtof_defined) && defined(__std_strtof_defined)
-#define __strtof_defined 1
+#define __strtof_defined
 __NAMESPACE_STD_USING(strtof)
 #endif /* !__strtof_defined && __std_strtof_defined */
 #if !defined(__strtold_defined) && defined(__std_strtold_defined)
-#define __strtold_defined 1
+#define __strtold_defined
 __NAMESPACE_STD_USING(strtold)
 #endif /* !__strtold_defined && __std_strtold_defined */
 #endif /* !__NO_FPU */
 #if !defined(__aligned_alloc_defined) && defined(__std_aligned_alloc_defined)
-#define __aligned_alloc_defined 1
+#define __aligned_alloc_defined
 __NAMESPACE_STD_USING(aligned_alloc)
 #endif /* !__aligned_alloc_defined && __std_aligned_alloc_defined */
 #undef _CXX_STDONLY_CSTDLIB
@@ -237,7 +237,7 @@ __SYSDECL_BEGIN
 #ifdef __CC__
 
 #ifndef __std_size_t_defined
-#define __std_size_t_defined 1
+#define __std_size_t_defined
 __NAMESPACE_STD_BEGIN
 typedef __SIZE_TYPE__ size_t;
 __NAMESPACE_STD_END
@@ -245,13 +245,13 @@ __NAMESPACE_STD_END
 
 #ifndef __CXX_SYSTEM_HEADER
 #ifndef __size_t_defined
-#define __size_t_defined 1
+#define __size_t_defined
 __NAMESPACE_STD_USING(size_t)
 #endif /* !__size_t_defined */
 #endif /* !__CXX_SYSTEM_HEADER */
 
 #ifndef __wchar_t_defined
-#define __wchar_t_defined 1
+#define __wchar_t_defined
 typedef __WCHAR_TYPE__ wchar_t;
 #endif /* !__wchar_t_defined */
 
@@ -286,16 +286,16 @@ struct __lldiv_struct {
 
 __NAMESPACE_STD_BEGIN
 #ifndef __std_div_t_defined
-#define __std_div_t_defined 1
+#define __std_div_t_defined
 typedef struct __div_struct div_t;
 #endif /* !__std_div_t_defined */
 #ifndef __std_ldiv_t_defined
-#define __std_ldiv_t_defined 1
+#define __std_ldiv_t_defined
 typedef struct __ldiv_struct ldiv_t;
 #endif /* !__std_ldiv_t_defined */
 #ifdef __USE_ISOC99
 #ifndef __std_lldiv_t_defined
-#define __std_lldiv_t_defined 1
+#define __std_lldiv_t_defined
 typedef struct __lldiv_struct lldiv_t;
 #endif /* !__std_lldiv_t_defined */
 #endif /* __USE_ISOC99 */
@@ -303,16 +303,16 @@ __NAMESPACE_STD_END
 
 #ifndef __CXX_SYSTEM_HEADER
 #ifndef __div_t_defined
-#define __div_t_defined 1
+#define __div_t_defined
 __NAMESPACE_STD_USING(div_t)
 #endif /* !__div_t_defined */
 #ifndef __ldiv_t_defined
-#define __ldiv_t_defined 1
+#define __ldiv_t_defined
 __NAMESPACE_STD_USING(ldiv_t)
 #endif /* !__ldiv_t_defined */
 #ifdef __USE_ISOC99
 #ifndef __lldiv_t_defined
-#define __lldiv_t_defined 1
+#define __lldiv_t_defined
 __NAMESPACE_STD_USING(lldiv_t)
 #endif /* !__lldiv_t_defined */
 #endif /* __USE_ISOC99 */
@@ -321,7 +321,7 @@ __NAMESPACE_STD_USING(lldiv_t)
 #ifndef __COMPAR_FN_T
 #define __COMPAR_FN_T 1
 #ifndef ____compar_fn_t_defined
-#define ____compar_fn_t_defined 1
+#define ____compar_fn_t_defined
 typedef int (__LIBCCALL *__compar_fn_t)(void const *__a, void const *__b);
 #endif /* !____compar_fn_t_defined */
 #ifdef __USE_GNU
@@ -332,7 +332,7 @@ typedef __compar_fn_t comparison_fn_t;
 
 #ifdef __USE_KOS
 #ifndef __compar_d_fn_t_defined
-#define __compar_d_fn_t_defined 1
+#define __compar_d_fn_t_defined
 typedef int (__LIBCCALL *__compar_d_fn_t)(void const *__a, void const *__b, void *__arg);
 #endif /* !__compar_d_fn_t_defined */
 #ifdef __CRT_HAVE_bsearch_r
@@ -359,7 +359,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(bsearch_r, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR
 
 __NAMESPACE_STD_BEGIN
 #ifndef __std_qsort_defined
-#define __std_qsort_defined 1
+#define __std_qsort_defined
 #ifdef __qsort_defined
 __NAMESPACE_GLB_USING_OR_IMPL(qsort, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 4)) void (__LIBCCALL qsort)(void *__pbase, size_t __item_count, size_t __item_size, int (__LIBCCALL *__compar)(void const *__a, void const *__b)) __THROWS(...) { :: qsort(__pbase, __item_count, __item_size, __compar); })
 #elif defined(__CRT_HAVE_qsort)
@@ -372,7 +372,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(qsort, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NON
 #endif /* !... */
 #endif /* !__std_qsort_defined */
 #ifndef __std_bsearch_defined
-#define __std_bsearch_defined 1
+#define __std_bsearch_defined
 #ifdef __bsearch_defined
 #if !defined(__COMPILER_HAVE_BUG_BLOATY_CXX_USING) || defined(__NO_NAMESPACE_STD)
 __NAMESPACE_GLB_USING(bsearch)
@@ -727,7 +727,7 @@ __NAMESPACE_STD_BEGIN
 __NAMESPACE_LOCAL_USING_OR_IMPL(wcstombs, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) size_t __NOTHROW_NCX(__LIBCCALL wcstombs)(char *__restrict __dst, wchar_t const *__restrict __src, size_t __dstlen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcstombs))(__dst, __src, __dstlen); })
 #endif /* !__CRT_HAVE_wcstombs */
 #ifndef __std_system_defined
-#define __std_system_defined 1
+#define __std_system_defined
 #ifdef __system_defined
 /* >> system(3)
  * Execute a given `command' on the system interpreter (as in `sh -c $command')
@@ -762,7 +762,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(system, __FORCELOCAL __ATTR_ARTIFICIAL int __NOT
 #endif /* !... */
 #endif /* !__std_system_defined */
 #ifndef __std_abort_defined
-#define __std_abort_defined 1
+#define __std_abort_defined
 #ifdef __abort_defined
 __NAMESPACE_GLB_USING_OR_IMPL(abort, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NORETURN void (__LIBCCALL abort)(void) __THROWS(...) { :: abort(); })
 #elif __has_builtin(__builtin_abort) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_abort)
@@ -783,7 +783,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(abort, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NOR
 #endif /* !... */
 #endif /* !__std_abort_defined */
 #ifndef __std_exit_defined
-#define __std_exit_defined 1
+#define __std_exit_defined
 #ifdef __exit_defined
 __NAMESPACE_GLB_USING_OR_IMPL(exit, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NORETURN void (__LIBCCALL exit)(int __status) __THROWS(...) { :: exit(__status); })
 #elif __has_builtin(__builtin_exit) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_exit)
@@ -837,7 +837,7 @@ __CREDIRECT_VOID_GCCNCX(__ATTR_NORETURN,__THROWING,_Exit,(int __status),exit,(__
 #endif /* ... */
 #endif /* __USE_ISOC99 */
 #ifndef __std_malloc_defined
-#define __std_malloc_defined 1
+#define __std_malloc_defined
 #ifdef __malloc_defined
 __NAMESPACE_GLB_USING_OR_IMPL(malloc, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1)) void *__NOTHROW_NCX(__LIBCCALL malloc)(size_t __num_bytes) { return :: malloc(__num_bytes); })
 #elif __has_builtin(__builtin_malloc) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_malloc)
@@ -854,7 +854,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(malloc, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_MA
 #endif /* !... */
 #endif /* !__std_malloc_defined */
 #ifndef __std_calloc_defined
-#define __std_calloc_defined 1
+#define __std_calloc_defined
 #ifdef __calloc_defined
 __NAMESPACE_GLB_USING_OR_IMPL(calloc, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1, 2)) void *__NOTHROW_NCX(__LIBCCALL calloc)(size_t __count, size_t __num_bytes) { return :: calloc(__count, __num_bytes); })
 #elif __has_builtin(__builtin_calloc) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_calloc)
@@ -871,7 +871,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(calloc, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_MA
 #endif /* !... */
 #endif /* !__std_calloc_defined */
 #ifndef __std_realloc_defined
-#define __std_realloc_defined 1
+#define __std_realloc_defined
 #ifdef __realloc_defined
 __NAMESPACE_GLB_USING_OR_IMPL(realloc, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)) void *__NOTHROW_NCX(__LIBCCALL realloc)(void *__mallptr, size_t __num_bytes) { return :: realloc(__mallptr, __num_bytes); })
 #elif __has_builtin(__builtin_realloc) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_realloc)
@@ -883,7 +883,7 @@ __CDECLARE_GCCNCX(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((
 #endif /* !... */
 #endif /* !__std_realloc_defined */
 #ifndef __std_free_defined
-#define __std_free_defined 1
+#define __std_free_defined
 #ifdef __free_defined
 __NAMESPACE_GLB_USING_OR_IMPL(free, __FORCELOCAL __ATTR_ARTIFICIAL void __NOTHROW_NCX(__LIBCCALL free)(void *__mallptr) { :: free(__mallptr); })
 #elif __has_builtin(__builtin_free) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_free)
@@ -1005,7 +1005,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(strtol, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LE
 #ifdef __LONGLONG
 #ifdef __USE_ISOC99
 #ifndef __std_strtoull_defined
-#define __std_strtoull_defined 1
+#define __std_strtoull_defined
 #ifdef __strtoull_defined
 __NAMESPACE_GLB_USING_OR_IMPL(strtoull, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_NONNULL((1)) __ULONGLONG __NOTHROW_NCX(__LIBCCALL strtoull)(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base) { return :: strtoull(__nptr, __endptr, __base); })
 #elif defined(__CRT_HAVE_strtoull)
@@ -1040,7 +1040,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(strtoull, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_
 #endif /* !... */
 #endif /* !__std_strtoull_defined */
 #ifndef __std_strtoll_defined
-#define __std_strtoll_defined 1
+#define __std_strtoll_defined
 #ifdef __strtoll_defined
 __NAMESPACE_GLB_USING_OR_IMPL(strtoll, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_NONNULL((1)) __LONGLONG __NOTHROW_NCX(__LIBCCALL strtoll)(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base) { return :: strtoll(__nptr, __endptr, __base); })
 #elif defined(__CRT_HAVE_strtoll)
@@ -1097,7 +1097,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(strtod, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LE
 #endif /* !... */
 #ifdef __USE_ISOC99
 #ifndef __std_strtof_defined
-#define __std_strtof_defined 1
+#define __std_strtof_defined
 #ifdef __strtof_defined
 __NAMESPACE_GLB_USING_OR_IMPL(strtof, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_NONNULL((1)) float __NOTHROW_NCX(__LIBCCALL strtof)(char const *__restrict __nptr, char **__endptr) { return :: strtof(__nptr, __endptr); })
 #elif defined(__CRT_HAVE_strtof)
@@ -1111,7 +1111,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(strtof, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LE
 #endif /* !__std_strtof_defined */
 #ifdef __COMPILER_HAVE_LONGDOUBLE
 #ifndef __std_strtold_defined
-#define __std_strtold_defined 1
+#define __std_strtold_defined
 #ifdef __strtold_defined
 __NAMESPACE_GLB_USING_OR_IMPL(strtold, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_NONNULL((1)) __LONGDOUBLE __NOTHROW_NCX(__LIBCCALL strtold)(char const *__restrict __nptr, char **__endptr) { return :: strtold(__nptr, __endptr); })
 #elif defined(__CRT_HAVE_strtold)
@@ -1130,7 +1130,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(strtold, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_L
 #endif /* !__NO_FPU */
 #ifdef __USE_ISOCXX17
 #ifndef __std_aligned_alloc_defined
-#define __std_aligned_alloc_defined 1
+#define __std_aligned_alloc_defined
 #ifdef __aligned_alloc_defined
 __NAMESPACE_GLB_USING_OR_IMPL(aligned_alloc, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_MALLOC __ATTR_WUNUSED __ATTR_ALLOC_ALIGN(1) __ATTR_ALLOC_SIZE((2)) void *__NOTHROW_NCX(__LIBCCALL aligned_alloc)(size_t __alignment, size_t __n_bytes) { return (void *):: aligned_alloc(); })
 #elif __has_builtin(__builtin_aligned_alloc) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_aligned_alloc)
@@ -1153,11 +1153,11 @@ __NAMESPACE_STD_END
 
 #ifndef __CXX_SYSTEM_HEADER
 #if !defined(__qsort_defined) && defined(__std_qsort_defined)
-#define __qsort_defined 1
+#define __qsort_defined
 __NAMESPACE_STD_USING(qsort)
 #endif /* !__qsort_defined && __std_qsort_defined */
 #if !defined(__bsearch_defined) && defined(__std_bsearch_defined)
-#define __bsearch_defined 1
+#define __bsearch_defined
 __NAMESPACE_STD_USING(bsearch)
 #endif /* !__bsearch_defined && __std_bsearch_defined */
 __NAMESPACE_STD_USING(labs)
@@ -1188,15 +1188,15 @@ __NAMESPACE_STD_USING(wctomb)
 __NAMESPACE_STD_USING(mbstowcs)
 __NAMESPACE_STD_USING(wcstombs)
 #if !defined(__system_defined) && defined(__std_system_defined)
-#define __system_defined 1
+#define __system_defined
 __NAMESPACE_STD_USING(system)
 #endif /* !__system_defined && __std_system_defined */
 #if !defined(__abort_defined) && defined(__std_abort_defined)
-#define __abort_defined 1
+#define __abort_defined
 __NAMESPACE_STD_USING(abort)
 #endif /* !__abort_defined && __std_abort_defined */
 #if !defined(__exit_defined) && defined(__std_exit_defined)
-#define __exit_defined 1
+#define __exit_defined
 __NAMESPACE_STD_USING(exit)
 #endif /* !__exit_defined && __std_exit_defined */
 #if defined(__CRT_HAVE_atexit) || defined(__CRT_HAVE_at_quick_exit)
@@ -1222,19 +1222,19 @@ __NAMESPACE_STD_USING(_Exit)
 #endif /* __USE_ISOC99 */
 #ifndef __CXX_SYSTEM_HEADER
 #if !defined(__malloc_defined) && defined(__std_malloc_defined)
-#define __malloc_defined 1
+#define __malloc_defined
 __NAMESPACE_STD_USING(malloc)
 #endif /* !__malloc_defined && __std_malloc_defined */
 #if !defined(__calloc_defined) && defined(__std_calloc_defined)
-#define __calloc_defined 1
+#define __calloc_defined
 __NAMESPACE_STD_USING(calloc)
 #endif /* !__calloc_defined && __std_calloc_defined */
 #if !defined(__realloc_defined) && defined(__std_realloc_defined)
-#define __realloc_defined 1
+#define __realloc_defined
 __NAMESPACE_STD_USING(realloc)
 #endif /* !__realloc_defined && __std_realloc_defined */
 #if !defined(__free_defined) && defined(__std_free_defined)
-#define __free_defined 1
+#define __free_defined
 __NAMESPACE_STD_USING(free)
 #endif /* !__free_defined && __std_free_defined */
 __NAMESPACE_STD_USING(srand)
@@ -1251,11 +1251,11 @@ __NAMESPACE_STD_USING(atoll)
 __NAMESPACE_STD_USING(strtoul)
 __NAMESPACE_STD_USING(strtol)
 #if !defined(__strtoull_defined) && defined(__std_strtoull_defined)
-#define __strtoull_defined 1
+#define __strtoull_defined
 __NAMESPACE_STD_USING(strtoull)
 #endif /* !__strtoull_defined && __std_strtoull_defined */
 #if !defined(__strtoll_defined) && defined(__std_strtoll_defined)
-#define __strtoll_defined 1
+#define __strtoll_defined
 __NAMESPACE_STD_USING(strtoll)
 #endif /* !__strtoll_defined && __std_strtoll_defined */
 #endif /* !__CXX_SYSTEM_HEADER */
@@ -1264,11 +1264,11 @@ __NAMESPACE_STD_USING(strtoll)
 __NAMESPACE_STD_USING(atof)
 __NAMESPACE_STD_USING(strtod)
 #if !defined(__strtof_defined) && defined(__std_strtof_defined)
-#define __strtof_defined 1
+#define __strtof_defined
 __NAMESPACE_STD_USING(strtof)
 #endif /* !__strtof_defined && __std_strtof_defined */
 #if !defined(__strtold_defined) && defined(__std_strtold_defined)
-#define __strtold_defined 1
+#define __strtold_defined
 __NAMESPACE_STD_USING(strtold)
 #endif /* !__strtold_defined && __std_strtold_defined */
 #endif /* !__CXX_SYSTEM_HEADER */
@@ -2245,7 +2245,7 @@ __CDECLARE_OPT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,setstate_r,(char *__rest
 __CDECLARE_OPT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,on_exit,(void (__LIBCCALL *__func)(int __status, void *__arg), void *__arg),(__func,__arg))
 __CDECLARE_OPT(,int,__NOTHROW_NCX,clearenv,(void),())
 #ifndef __mkstemps_defined
-#define __mkstemps_defined 1
+#define __mkstemps_defined
 #include <asm/os/oflags.h>
 #if defined(__CRT_HAVE_mkstemps) && (!defined(__USE_FILE_OFFSET64) || !defined(__O_LARGEFILE) || !__O_LARGEFILE)
 /* >> mkstemps(3), mkstemps64(3)
@@ -2295,7 +2295,7 @@ __CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,rpma
 __NAMESPACE_LOCAL_USING_OR_IMPL(rpmatch, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL rpmatch)(char const *__response) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(rpmatch))(__response); })
 #endif /* !__CRT_HAVE_rpmatch */
 #ifndef __cfree_defined
-#define __cfree_defined 1
+#define __cfree_defined
 #if __has_builtin(__builtin_free) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_free)
 __CEIREDIRECT(,void,__NOTHROW_NCX,cfree,(void *__mallptr),free,{ __builtin_free(__mallptr); })
 #elif defined(__CRT_HAVE_free)
@@ -2308,7 +2308,7 @@ __CDECLARE_VOID(,__NOTHROW_NCX,cfree,(void *__mallptr),(__mallptr))
 #endif /* !__cfree_defined */
 #ifndef __NO_FPU
 #if !defined(__getloadavg_defined) && defined(__CRT_HAVE_getloadavg)
-#define __getloadavg_defined 1
+#define __getloadavg_defined
 __CDECLARE(,int,__NOTHROW_RPC,getloadavg,(double __loadavg[], __STDC_INT_AS_SIZE_T __nelem),(__loadavg,__nelem))
 #endif /* !__getloadavg_defined && __CRT_HAVE_getloadavg */
 #endif /* !__NO_FPU */
@@ -2357,7 +2357,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(mkstemps64, __FORCELOCAL __ATTR_ARTIFICIAL __ATT
 
 #if defined(__USE_MISC) || (defined(__USE_XOPEN_EXTENDED) && !defined(__USE_XOPEN2K))
 #ifndef __valloc_defined
-#define __valloc_defined 1
+#define __valloc_defined
 #ifdef __CRT_HAVE_valloc
 __CDECLARE(__ATTR_MALL_PAGEALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1)),void *,__NOTHROW_NCX,valloc,(__SIZE_TYPE__ __n_bytes),(__n_bytes))
 #elif defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign)
@@ -2371,7 +2371,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(valloc, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_MA
 
 #ifdef __USE_XOPEN2K
 #ifndef __posix_memalign_defined
-#define __posix_memalign_defined 1
+#define __posix_memalign_defined
 #if __has_builtin(__builtin_posix_memalign) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_posix_memalign)
 __CEIDECLARE_GCCNCX(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,posix_memalign,(void **__restrict __pp, __SIZE_TYPE__ __alignment, __SIZE_TYPE__ __n_bytes),{ return __builtin_posix_memalign(__pp, __alignment, __n_bytes); })
 #elif defined(__CRT_HAVE_posix_memalign)
@@ -2400,7 +2400,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(unsetenv, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_
 #ifdef __USE_ISOCXX17
 #ifndef __CXX_SYSTEM_HEADER
 #if !defined(__aligned_alloc_defined) && defined(__std_aligned_alloc_defined)
-#define __aligned_alloc_defined 1
+#define __aligned_alloc_defined
 __NAMESPACE_STD_USING(aligned_alloc)
 #endif /* !__aligned_alloc_defined && __std_aligned_alloc_defined */
 #endif /* !__CXX_SYSTEM_HEADER */
@@ -2409,7 +2409,7 @@ __NAMESPACE_STD_USING(aligned_alloc)
 /* aligned_alloc() is defined by both c11 and c++17 */
 #ifdef __USE_ISOC11
 #ifndef __aligned_alloc_defined
-#define __aligned_alloc_defined 1
+#define __aligned_alloc_defined
 #ifdef __std_aligned_alloc_defined
 __NAMESPACE_STD_USING(aligned_alloc)
 #elif __has_builtin(__builtin_aligned_alloc) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_aligned_alloc)
@@ -2553,7 +2553,7 @@ __CDECLARE_OPT(__ATTR_WUNUSED __ATTR_NONNULL((2)),char *,__NOTHROW_RPC,frealpath
 #if (defined(__USE_MISC) || \
      (defined(__USE_XOPEN_EXTENDED) && !defined(__USE_XOPEN2K8)))
 #ifndef __mktemp_defined
-#define __mktemp_defined 1
+#define __mktemp_defined
 #ifdef __CRT_HAVE_mktemp
 /* >> mktemp(3)
  * Badly designed version of  `mkstemp' that won't actually  create
@@ -2633,7 +2633,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(fcvt, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNU
 #endif /* __USE_MISC || __USE_DOS || (__USE_XOPEN_EXTENDED && !__USE_XOPEN2K8) */
 #if defined(__USE_XOPEN_EXTENDED) || defined(__USE_XOPEN2K8)
 #ifndef __getsubopt_defined
-#define __getsubopt_defined 1
+#define __getsubopt_defined
 #ifdef __CRT_HAVE_getsubopt
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_NCX,getsubopt,(char **__restrict __optionp, char *const *__restrict __tokens, char **__restrict __valuep),(__optionp,__tokens,__valuep))
 #else /* __CRT_HAVE_getsubopt */
@@ -2728,7 +2728,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(mkdtemp, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_W
 
 #ifdef __USE_XOPEN
 #if !defined(__setkey_defined) && defined(__CRT_HAVE_setkey)
-#define __setkey_defined 1
+#define __setkey_defined
 /* >> setkey(3), setkey_r(3) */
 __CDECLARE_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,setkey,(char const *__key),(__key))
 #endif /* !__setkey_defined && __CRT_HAVE_setkey */
@@ -2961,7 +2961,7 @@ __CDECLARE_OPT(__ATTR_MALLOC __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW
 
 #if defined(__USE_KOS) || defined(__USE_MISC) || defined(__USE_BSD)
 #ifndef __reallocarray_defined
-#define __reallocarray_defined 1
+#define __reallocarray_defined
 #ifdef __CRT_HAVE_reallocarray
 __CDECLARE(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)) __ATTR_ALLOC_SIZE((2, 3)),void *,__NOTHROW_NCX,reallocarray,(void *__ptr, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),(__ptr,__elem_count,__elem_size))
 #elif defined(__CRT_HAVE_reallocarr)
@@ -2977,7 +2977,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(reallocarray, __FORCELOCAL __ATTR_ARTIFICIAL __A
 
 #ifdef __USE_KOS
 #ifndef __recalloc_defined
-#define __recalloc_defined 1
+#define __recalloc_defined
 #ifdef __CRT_HAVE_recalloc
 __CDECLARE(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)),void *,__NOTHROW_NCX,recalloc,(void *__mallptr, __SIZE_TYPE__ __num_bytes),(__mallptr,__num_bytes))
 #elif defined(__CRT_HAVE_realloc) && (defined(__CRT_HAVE_malloc_usable_size) || defined(__CRT_HAVE__msize))
@@ -2988,7 +2988,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(recalloc, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_
 #endif /* !... */
 #endif /* !__recalloc_defined */
 #ifndef __reallocv_defined
-#define __reallocv_defined 1
+#define __reallocv_defined
 #ifdef __CRT_HAVE_reallocarray
 __CREDIRECT(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)) __ATTR_ALLOC_SIZE((2, 3)),void *,__NOTHROW_NCX,reallocv,(void *__ptr, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),reallocarray,(__ptr,__elem_count,__elem_size))
 #elif defined(__CRT_HAVE_reallocarr)
@@ -3001,7 +3001,7 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR
 #endif /* !... */
 #endif /* !__reallocv_defined */
 #ifndef __recallocv_defined
-#define __recallocv_defined 1
+#define __recallocv_defined
 #ifdef __CRT_HAVE_recallocv
 __CDECLARE(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2, 3)),void *,__NOTHROW_NCX,recallocv,(void *__mallptr, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),(__mallptr,__elem_count,__elem_size))
 #elif defined(__CRT_HAVE__recalloc)
@@ -3107,7 +3107,7 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR
 #endif /* !__MALLOC_OVERLOADS_DEFINED */
 #endif /* __USE_STRING_OVERLOADS */
 #ifndef __shexec_defined
-#define __shexec_defined 1
+#define __shexec_defined
 #ifdef __CRT_HAVE_shexec
 /* >> shexec(3)
  * Execute command with the system interpreter (such as: `/bin/sh -c $command')
@@ -3141,11 +3141,11 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(shexec, __FORCELOCAL __ATTR_ARTIFICIAL int __NOT
 
 #ifdef __USE_SOLARIS
 #ifndef __uid_t_defined
-#define __uid_t_defined 1
+#define __uid_t_defined
 typedef __uid_t uid_t; /* User ID */
 #endif /* !__uid_t_defined */
 #ifndef __closefrom_defined
-#define __closefrom_defined 1
+#define __closefrom_defined
 #ifdef __CRT_HAVE_closefrom
 /* >> closefrom(2)
  * Close all file descriptors with indices `>= lowfd' (s.a. `fcntl(F_CLOSEM)') */
@@ -3163,7 +3163,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(closefrom, __FORCELOCAL __ATTR_ARTIFICIAL void _
 #endif /* !__CRT_HAVE_closefrom */
 #endif /* !__closefrom_defined */
 #ifndef __dup2_defined
-#define __dup2_defined 1
+#define __dup2_defined
 #ifdef __CRT_HAVE_dup2
 /* >> dup2(2)
  * @return: newfd: Returns the new handle upon success.
@@ -3184,7 +3184,7 @@ __CREDIRECT(,__fd_t,__NOTHROW_NCX,dup2,(__fd_t __oldfd, __fd_t __newfd),__dup2,(
 #endif /* !... */
 #endif /* !__dup2_defined */
 #ifndef __getcwd_defined
-#define __getcwd_defined 1
+#define __getcwd_defined
 #ifdef __CRT_HAVE_getcwd
 /* >> getcwd(2)
  * Return the path of the current working directory, relative to the filesystem root set by `chdir(2)' */
@@ -3198,7 +3198,7 @@ __CREDIRECT(,char *,__NOTHROW_RPC,getcwd,(char *__buf, size_t __bufsize),_getcwd
 #endif /* !... */
 #endif /* !__getcwd_defined */
 #ifndef __getlogin_defined
-#define __getlogin_defined 1
+#define __getlogin_defined
 #ifdef __CRT_HAVE_getlogin
 /* >> getlogin(3)
  * Return the login name for the current user, or `NULL' on error.
@@ -3215,7 +3215,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(getlogin, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_
 #endif /* !... */
 #endif /* !__getlogin_defined */
 #ifndef __getpass_defined
-#define __getpass_defined 1
+#define __getpass_defined
 #ifdef __CRT_HAVE_getpass
 /* >> getpass(3), getpassphrase(3) */
 __CDECLARE(__ATTR_WUNUSED,char *,__NOTHROW_RPC,getpass,(char const *__restrict __prompt),(__prompt))
@@ -3234,7 +3234,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(getpass, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_W
 #endif /* !... */
 #endif /* !__getpass_defined */
 #ifndef __getpw_defined
-#define __getpw_defined 1
+#define __getpw_defined
 #ifdef __CRT_HAVE_getpw
 /* Re-construct the password-file line for the given uid in the
  * given  buffer. This  knows the  format that  the caller will
@@ -3251,7 +3251,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(getpw, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTH
 #endif /* !... */
 #endif /* !__getpw_defined */
 #ifndef __isatty_defined
-#define __isatty_defined 1
+#define __isatty_defined
 #ifdef __CRT_HAVE_isatty
 /* >> isatty(2)
  * Check if the given file handle `fd' refers to a TTY
@@ -3279,7 +3279,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(isatty, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WU
 #endif /* !... */
 #endif /* !__isatty_defined */
 #ifndef __memalign_defined
-#define __memalign_defined 1
+#define __memalign_defined
 #if __has_builtin(__builtin_aligned_alloc) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_aligned_alloc)
 __CEIREDIRECT(__ATTR_MALLOC __ATTR_WUNUSED __ATTR_ALLOC_ALIGN(1) __ATTR_ALLOC_SIZE((2)),void *,__NOTHROW_NCX,memalign,(size_t __alignment, size_t __n_bytes),aligned_alloc,{ return __builtin_aligned_alloc(__alignment, __n_bytes); })
 #elif defined(__CRT_HAVE_memalign)
@@ -3294,7 +3294,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(memalign, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_
 #endif /* !... */
 #endif /* !__memalign_defined */
 #if !defined(__ttyname_defined) && defined(__CRT_HAVE_ttyname)
-#define __ttyname_defined 1
+#define __ttyname_defined
 /* >> ttyname(3)
  * Return the name of a TTY given its file descriptor */
 __CDECLARE(__ATTR_WUNUSED,char *,__NOTHROW_RPC,ttyname,(__fd_t __fd),(__fd))
@@ -3359,7 +3359,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(ulltostr, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_
 
 #ifdef __USE_BSD
 #ifndef __reallocf_defined
-#define __reallocf_defined 1
+#define __reallocf_defined
 #ifdef __CRT_HAVE_reallocf
 __CDECLARE(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)),void *,__NOTHROW_NCX,reallocf,(void *__mallptr, __SIZE_TYPE__ __num_bytes),(__mallptr,__num_bytes))
 #elif defined(__CRT_HAVE_realloc)
@@ -3370,7 +3370,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(reallocf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_
 #endif /* !... */
 #endif /* !__reallocf_defined */
 #ifndef __recallocarray_defined
-#define __recallocarray_defined 1
+#define __recallocarray_defined
 #ifdef __CRT_HAVE_recallocarray
 /* >> recallocarray(3)
  * Same   as    `recallocv(mallptr, new_elem_count, elem_size)',   but    also   ensure    that
@@ -3389,7 +3389,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(recallocarray, __FORCELOCAL __ATTR_ARTIFICIAL __
 #endif /* !... */
 #endif /* !__recallocarray_defined */
 #ifndef __freezero_defined
-#define __freezero_defined 1
+#define __freezero_defined
 #ifdef __CRT_HAVE_freezero
 /* >> freezero(3)
  * Same as  `free(mallptr)', but  also ensure  that the  memory  region
@@ -3410,11 +3410,11 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(freezero, __FORCELOCAL __ATTR_ARTIFICIAL void __
 #endif /* !... */
 #endif /* !__freezero_defined */
 #if !defined(__getbsize_defined) && defined(__CRT_HAVE_getbsize)
-#define __getbsize_defined 1
+#define __getbsize_defined
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),char *,__NOTHROW_NCX,getbsize,(int *__headerlenp, __LONGPTR_TYPE__ *__blocksizep),(__headerlenp,__blocksizep))
 #endif /* !__getbsize_defined && __CRT_HAVE_getbsize */
 #if !defined(__daemon_defined) && defined(__CRT_HAVE_daemon)
-#define __daemon_defined 1
+#define __daemon_defined
 /* >> daemon(3) */
 __CDECLARE(,int,__NOTHROW_RPC,daemon,(__STDC_INT_AS_UINT_T __nochdir, __STDC_INT_AS_UINT_T __noclose),(__nochdir,__noclose))
 #endif /* !__daemon_defined && __CRT_HAVE_daemon */
@@ -3437,7 +3437,7 @@ __CDECLARE(,int,__NOTHROW_NCX,l64a_r,(long __n, char *__buf, __STDC_INT_AS_SIZE_
 __NAMESPACE_LOCAL_USING_OR_IMPL(l64a_r, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_NCX(__LIBCCALL l64a_r)(long __n, char *__buf, __STDC_INT_AS_SIZE_T __bufsize) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(l64a_r))(__n, __buf, __bufsize); })
 #endif /* !__CRT_HAVE_l64a_r */
 #ifndef __getprogname_defined
-#define __getprogname_defined 1
+#define __getprogname_defined
 #ifdef __CRT_HAVE_getprogname
 /* >> getprogname(3), setprogname(3) */
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,char const *,__NOTHROW_NCX,getprogname,(void),())
@@ -3453,7 +3453,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(getprogname, __FORCELOCAL __ATTR_ARTIFICIAL __AT
 #endif /* !__CRT_HAVE_getprogname */
 #endif /* !__getprogname_defined */
 #ifndef __setprogname_defined
-#define __setprogname_defined 1
+#define __setprogname_defined
 #ifdef __CRT_HAVE_setprogname
 /* >> getprogname(3), setprogname(3) */
 __CDECLARE_VOID(,__NOTHROW_NCX,setprogname,(char const *__name),(__name))
@@ -3469,7 +3469,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(setprogname, __FORCELOCAL __ATTR_ARTIFICIAL void
 #endif /* !__CRT_HAVE_setprogname */
 #endif /* !__setprogname_defined */
 #ifndef __heapsort_defined
-#define __heapsort_defined 1
+#define __heapsort_defined
 #ifdef __CRT_HAVE_heapsort
 __CDECLARE(__ATTR_NONNULL((1, 4)),int,__THROWING,heapsort,(void *__pbase, __SIZE_TYPE__ __item_count, __SIZE_TYPE__ __item_size, int (__LIBCCALL *__compar)(void const *__a, void const *__b)),(__pbase,__item_count,__item_size,__compar))
 #else /* __CRT_HAVE_heapsort */
@@ -3478,7 +3478,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(heapsort, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_
 #endif /* !__CRT_HAVE_heapsort */
 #endif /* !__heapsort_defined */
 #ifndef __mergesort_defined
-#define __mergesort_defined 1
+#define __mergesort_defined
 #ifdef __CRT_HAVE_mergesort
 __CDECLARE(__ATTR_NONNULL((1, 4)),int,__THROWING,mergesort,(void *__pbase, __SIZE_TYPE__ __item_count, __SIZE_TYPE__ __item_size, int (__LIBCCALL *__compar)(void const *__a, void const *__b)),(__pbase,__item_count,__item_size,__compar))
 #else /* __CRT_HAVE_mergesort */
@@ -3487,17 +3487,17 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(mergesort, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR
 #endif /* !__CRT_HAVE_mergesort */
 #endif /* !__mergesort_defined */
 #if !defined(__radixsort_defined) && defined(__CRT_HAVE_radixsort)
-#define __radixsort_defined 1
+#define __radixsort_defined
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,radixsort,(unsigned char const **__base, int __item_count, unsigned char const *__table, unsigned __endbyte),(__base,__item_count,__table,__endbyte))
 #endif /* !__radixsort_defined && __CRT_HAVE_radixsort */
 #if !defined(__sradixsort_defined) && defined(__CRT_HAVE_sradixsort)
-#define __sradixsort_defined 1
+#define __sradixsort_defined
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,sradixsort,(unsigned char const **__base, int __item_count, unsigned char const *__table, unsigned __endbyte),(__base,__item_count,__table,__endbyte))
 #endif /* !__sradixsort_defined && __CRT_HAVE_sradixsort */
 
 #ifdef __LONGLONG
 #ifndef __strtonum_defined
-#define __strtonum_defined 1
+#define __strtonum_defined
 #ifdef __CRT_HAVE_strtonum
 /* >> strtonum(3)
  * Similar to `strtoi()'  with `base=10',  but return  human-
@@ -3532,7 +3532,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(strtonum, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_
 
 #if defined(__USE_GNU) || defined(__USE_BSD)
 #ifndef __compar_d_fn_t_defined
-#define __compar_d_fn_t_defined 1
+#define __compar_d_fn_t_defined
 typedef int (__LIBCCALL *__compar_d_fn_t)(void const *__a, void const *__b, void *__arg);
 #endif /* !__compar_d_fn_t_defined */
 #ifdef __CRT_HAVE_qsort_r
@@ -3645,11 +3645,11 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(mkostemps64, __FORCELOCAL __ATTR_ARTIFICIAL __AT
 
 #ifdef __USE_NETBSD
 #ifndef __dev_t_defined
-#define __dev_t_defined 1
+#define __dev_t_defined
 typedef __dev_t dev_t;
 #endif /* !__dev_t_defined */
 #ifndef __mode_t_defined
-#define __mode_t_defined 1
+#define __mode_t_defined
 typedef __mode_t mode_t;
 #endif /* !__mode_t_defined */
 #ifdef __CRT_HAVE_devname
@@ -3692,21 +3692,21 @@ __CDECLARE_OPT(__ATTR_NONNULL((3)),int,__NOTHROW_NCX,devname_r,(dev_t __dev, mod
 #endif /* !HN_AUTOSCALE && __HN_AUTOSCALE */
 
 #if !defined(__humanize_number_defined) && defined(__CRT_HAVE_humanize_number)
-#define __humanize_number_defined 1
+#define __humanize_number_defined
 /* >> humanize_number(3), dehumanize_number(3)
  * @param: scale: Set of `HN_GETSCALE | HN_AUTOSCALE'
  * @param: flags: Set of `HN_DECIMAL | HN_NOSPACE | HN_B | HN_DIVISOR_1000 | HN_IEC_PREFIXES' */
 __CDECLARE(,int,__NOTHROW_NCX,humanize_number,(char *__buf, __SIZE_TYPE__ __len, __INT64_TYPE__ __bytes, char const *__suffix, int __scale, int __flags),(__buf,__len,__bytes,__suffix,__scale,__flags))
 #endif /* !__humanize_number_defined && __CRT_HAVE_humanize_number */
 #if !defined(__dehumanize_number_defined) && defined(__CRT_HAVE_dehumanize_number)
-#define __dehumanize_number_defined 1
+#define __dehumanize_number_defined
 /* >> humanize_number(3), dehumanize_number(3)
  * @param: scale: Set of `HN_GETSCALE | HN_AUTOSCALE'
  * @param: flags: Set of `HN_DECIMAL | HN_NOSPACE | HN_B | HN_DIVISOR_1000 | HN_IEC_PREFIXES' */
 __CDECLARE(,int,__NOTHROW_NCX,dehumanize_number,(char const *__str, __INT64_TYPE__ *__size),(__str,__size))
 #endif /* !__dehumanize_number_defined && __CRT_HAVE_dehumanize_number */
 #if !defined(__setproctitle_defined) && defined(__CRT_HAVE_setproctitle)
-#define __setproctitle_defined 1
+#define __setproctitle_defined
 /* >> setproctitle(3) */
 __LIBC __ATTR_LIBC_PRINTF(1, 2) void __NOTHROW_NCX(__VLIBCCALL setproctitle)(char const *__format, ...) __CASMNAME_SAME("setproctitle");
 #endif /* !__setproctitle_defined && __CRT_HAVE_setproctitle */
@@ -3890,7 +3890,7 @@ __SYSDECL_BEGIN
 #ifdef __CC__
 
 #ifndef __errno_t_defined
-#define __errno_t_defined 1
+#define __errno_t_defined
 typedef int errno_t;
 #endif /* !__errno_t_defined */
 
@@ -3906,7 +3906,7 @@ typedef int (__LIBDCALL *_onexit_t)(void);
 #define _CRT_ERRNO_DEFINED 1
 #ifndef errno
 #ifndef ____errno_location_defined
-#define ____errno_location_defined 1
+#define ____errno_location_defined
 #ifdef __CRT_HAVE___errno_location
 /* >> __errno_location(3) */
 __CDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,__errno_t *,__NOTHROW_NCX,__errno_location,(void),())
@@ -3928,7 +3928,7 @@ __CDECLARE_OPT(,errno_t,__NOTHROW_NCX,_get_errno,(errno_t *__perr),(__perr))
 __CDECLARE_OPT(,errno_t,__NOTHROW_NCX,_set_errno,(errno_t __err),(__err))
 #endif /* !_CRT_ERRNO_DEFINED */
 #if !defined(____doserrno_defined) && defined(__CRT_HAVE___doserrno)
-#define ____doserrno_defined 1
+#define ____doserrno_defined
 __CDECLARE(__ATTR_CONST,__UINT32_TYPE__ *,__NOTHROW_NCX,__doserrno,(void),())
 #endif /* !____doserrno_defined && __CRT_HAVE___doserrno */
 __CDECLARE_OPT(,errno_t,__NOTHROW_NCX,_get_doserrno,(__UINT32_TYPE__ *__perr),(__perr))
@@ -3938,14 +3938,14 @@ __CDECLARE_OPT(,errno_t,__NOTHROW_NCX,_set_doserrno,(__UINT32_TYPE__ __err),(__e
 #endif /* ____doserrno_defined */
 
 #ifndef ___environ_defined
-#define ___environ_defined 1
+#define ___environ_defined
 #undef _environ
 #if defined(__CRT_HAVE_environ) && !defined(__NO_ASMNAME)
 __LIBC char **_environ __ASMNAME("environ");
 #define _environ _environ
 #elif defined(__CRT_HAVE_environ)
 #ifndef __environ_defined
-#define __environ_defined 1
+#define __environ_defined
 #undef environ
 __LIBC char **environ;
 #endif /* !__environ_defined */
@@ -3958,14 +3958,14 @@ __LIBC char **_environ __ASMNAME("__environ");
 #define _environ _environ
 #elif defined(__CRT_HAVE___environ)
 #ifndef ____environ_defined
-#define ____environ_defined 1
+#define ____environ_defined
 #undef __environ
 __LIBC char **__environ;
 #endif /* !____environ_defined */
 #define _environ __environ
 #elif defined(__CRT_HAVE___p__environ)
 #ifndef ____p__environ_defined
-#define ____p__environ_defined 1
+#define ____p__environ_defined
 __CDECLARE(__ATTR_WUNUSED __ATTR_CONST __ATTR_RETNONNULL,char ***,__NOTHROW,__p__environ,(void),())
 #endif /* !____p__environ_defined */
 #define _environ (*__p__environ())
@@ -3980,7 +3980,7 @@ __LIBC int __argc;
 #define __argc __argc
 #else /* __CRT_HAVE___argc */
 #if !defined(____p___argc_defined) && defined(__CRT_HAVE___p___argc)
-#define ____p___argc_defined 1
+#define ____p___argc_defined
 __CDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,int *,__NOTHROW_NCX,__p___argc,(void),())
 #endif /* !____p___argc_defined && __CRT_HAVE___p___argc */
 #ifdef ____p___argc_defined
@@ -3994,7 +3994,7 @@ __CDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,int *,__NOTHROW_NCX,__p
 __LIBC char **__argv;
 #else /* __CRT_HAVE___argv */
 #if !defined(____p___argv_defined) && defined(__CRT_HAVE___p___argv)
-#define ____p___argv_defined 1
+#define ____p___argv_defined
 __CDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,char ***,__NOTHROW_NCX,__p___argv,(void),())
 #endif /* !____p___argv_defined && __CRT_HAVE___p___argv */
 #ifdef ____p___argv_defined
@@ -4009,7 +4009,7 @@ __LIBC wchar_t **__wargv;
 #define __wargv __wargv
 #else /* __CRT_HAVE___wargv */
 #if !defined(____p___wargv_defined) && defined(__CRT_HAVE___p___wargv)
-#define ____p___wargv_defined 1
+#define ____p___wargv_defined
 __CDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,wchar_t ***,__NOTHROW_NCX,__p___wargv,(void),())
 #endif /* !____p___wargv_defined && __CRT_HAVE___p___wargv */
 #ifdef ____p___wargv_defined
@@ -4024,7 +4024,7 @@ __LIBC wchar_t **_wenviron;
 #define _wenviron _wenviron
 #else /* __CRT_HAVE__wenviron */
 #if !defined(____p__wenviron_defined) && defined(__CRT_HAVE___p__wenviron)
-#define ____p__wenviron_defined 1
+#define ____p__wenviron_defined
 __CDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,wchar_t ***,__NOTHROW_NCX,__p__wenviron,(void),())
 #endif /* !____p__wenviron_defined && __CRT_HAVE___p__wenviron */
 #ifdef ____p__wenviron_defined
@@ -4039,7 +4039,7 @@ __LIBC wchar_t *_wpgmptr;
 #define _wpgmptr _wpgmptr
 #else /* __CRT_HAVE__wpgmptr */
 #if !defined(____p__wpgmptr_defined) && defined(__CRT_HAVE___p__wpgmptr)
-#define ____p__wpgmptr_defined 1
+#define ____p__wpgmptr_defined
 __CDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,wchar_t **,__NOTHROW_NCX,__p__wpgmptr,(void),())
 #endif /* !____p__wpgmptr_defined && __CRT_HAVE___p__wpgmptr */
 #ifdef ____p__wpgmptr_defined
@@ -4078,7 +4078,7 @@ __LIBC char *__progname_full;
 #endif /* __NO_ASMNAME */
 #else /* ... */
 #ifndef ____p__pgmptr_defined
-#define ____p__pgmptr_defined 1
+#define ____p__pgmptr_defined
 #ifdef __CRT_HAVE___p__pgmptr
 /* Alias for argv[0], as passed to main() */
 __CDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,char **,__NOTHROW_NCX,__p__pgmptr,(void),())
@@ -4108,7 +4108,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(__p__pgmptr, __FORCELOCAL __ATTR_ARTIFICIAL __AT
 __LIBC char **__initenv;
 #else /* __CRT_HAVE___initenv */
 #if !defined(____p___initenv_defined) && defined(__CRT_HAVE___p___initenv)
-#define ____p___initenv_defined 1
+#define ____p___initenv_defined
 /* Access to the initial environment block */
 __CDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,char ***,__NOTHROW_NCX,__p___initenv,(void),())
 #endif /* !____p___initenv_defined && __CRT_HAVE___p___initenv */
@@ -4122,7 +4122,7 @@ __CDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,char ***,__NOTHROW_NCX,
 __LIBC wchar_t **__winitenv;
 #else /* __CRT_HAVE___winitenv */
 #if !defined(____p___winitenv_defined) && defined(__CRT_HAVE___p___winitenv)
-#define ____p___winitenv_defined 1
+#define ____p___winitenv_defined
 /* Access to the initial environment block */
 __CDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,wchar_t ***,__NOTHROW_NCX,__p___winitenv,(void),())
 #endif /* !____p___winitenv_defined && __CRT_HAVE___p___winitenv */
@@ -4138,14 +4138,14 @@ __CDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,wchar_t ***,__NOTHROW_N
 #endif /* !_countof */
 
 #ifndef ___purecall_handler_defined
-#define ___purecall_handler_defined 1
+#define ___purecall_handler_defined
 typedef void (__LIBDCALL *_purecall_handler)(void);
 #endif /* !___purecall_handler_defined */
 __CDECLARE_OPT(,_purecall_handler,__NOTHROW_NCX,_set_purecall_handler,(_purecall_handler __handler),(__handler))
 __CDECLARE_OPT(,_purecall_handler,__NOTHROW_NCX,_get_purecall_handler,(void),())
 
 #ifndef ___invalid_parameter_handler_defined
-#define ___invalid_parameter_handler_defined 1
+#define ___invalid_parameter_handler_defined
 typedef void (__LIBDCALL *_invalid_parameter_handler)(wchar_t const *, wchar_t const *, wchar_t const *, unsigned int, __UINTPTR_TYPE__);
 #endif /* !___invalid_parameter_handler_defined */
 __CDECLARE_OPT(,_invalid_parameter_handler,__NOTHROW_NCX,_set_invalid_parameter_handler,(_invalid_parameter_handler __handler),(__handler))
@@ -4169,7 +4169,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_get_wpgmptr, __FORCELOCAL __ATTR_ARTIFICIAL err
 __LIBC int _fmode;
 #else /* ... */
 #if !defined(____p__fmode_defined) && defined(__CRT_HAVE___p__fmode)
-#define ____p__fmode_defined 1
+#define ____p__fmode_defined
 __CDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,int *,__NOTHROW_NCX,__p__fmode,(void),())
 #endif /* !____p__fmode_defined && __CRT_HAVE___p__fmode */
 #ifdef ____p__fmode_defined
@@ -4289,14 +4289,14 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_byteswap_uint64, __FORCELOCAL __ATTR_ARTIFICIAL
 #endif /* !_MSC_VER */
 #ifdef __USE_DOS_SLIB
 #ifndef __rsize_t_defined
-#define __rsize_t_defined 1
+#define __rsize_t_defined
 typedef __SIZE_TYPE__ rsize_t;
 #endif /* !__rsize_t_defined */
 
 #ifndef _CRT_ALGO_DEFINED
 #define _CRT_ALGO_DEFINED 1
 #ifndef __bsearch_s_defined
-#define __bsearch_s_defined 1
+#define __bsearch_s_defined
 #ifdef __CRT_HAVE_bsearch_s
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 2, 5)),void *,__THROWING,bsearch_s,(void const *__key, void const *__base, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size, int (__LIBCCALL *__compar)(void *__arg, void const *__a, void const *__b), void *__arg),(__key,__base,__elem_count,__elem_size,__compar,__arg))
 #else /* __CRT_HAVE_bsearch_s */
@@ -4305,7 +4305,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(bsearch_s, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR
 #endif /* !__CRT_HAVE_bsearch_s */
 #endif /* !__bsearch_s_defined */
 #ifndef __qsort_s_defined
-#define __qsort_s_defined 1
+#define __qsort_s_defined
 #ifdef __CRT_HAVE_qsort_s
 __CDECLARE_VOID(__ATTR_NONNULL((1, 4)),__THROWING,qsort_s,(void *__base, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size, int (__LIBCCALL *__compar)(void *__arg, void const *__a, void const *__b), void *__arg),(__base,__elem_count,__elem_size,__compar,__arg))
 #else /* __CRT_HAVE_qsort_s */
@@ -5256,7 +5256,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_lrotr, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CO
 #ifndef _CRT_PERROR_DEFINED
 #define _CRT_PERROR_DEFINED 1
 #ifndef __perror_defined
-#define __perror_defined 1
+#define __perror_defined
 #ifdef __std_perror_defined
 /* >> perror(3)
  * Print a given `message' alongside `strerror(errno)' to stderr:
@@ -5372,7 +5372,7 @@ __FORCELOCAL __ATTR_ARTIFICIAL void __NOTHROW_RPC(__LIBCCALL _sleep)(__UINT32_TY
 #endif /* ... */
 
 #ifndef __environ_defined
-#define __environ_defined 1
+#define __environ_defined
 #undef environ
 #if defined(__CRT_HAVE_environ)
 __LIBC char **environ;
@@ -5382,7 +5382,7 @@ __LIBC char **environ __ASMNAME("_environ");
 #define environ environ
 #elif defined(__CRT_HAVE__environ)
 #ifndef ___environ_defined
-#define ___environ_defined 1
+#define ___environ_defined
 #undef _environ
 __LIBC char **_environ;
 #endif /* !___environ_defined */
@@ -5392,14 +5392,14 @@ __LIBC char **environ __ASMNAME("__environ");
 #define environ environ
 #elif defined(__CRT_HAVE___environ)
 #ifndef ____environ_defined
-#define ____environ_defined 1
+#define ____environ_defined
 #undef __environ
 __LIBC char **__environ;
 #endif /* !____environ_defined */
 #define environ __environ
 #elif defined(__CRT_HAVE___p__environ)
 #ifndef ____p__environ_defined
-#define ____p__environ_defined 1
+#define ____p__environ_defined
 __CDECLARE(__ATTR_WUNUSED __ATTR_CONST __ATTR_RETNONNULL,char ***,__NOTHROW,__p__environ,(void),())
 #endif /* !____p__environ_defined */
 #define environ (*__p__environ())
@@ -5409,7 +5409,7 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_CONST __ATTR_RETNONNULL,char ***,__NOTHROW,__p_
 #endif /* !__environ_defined */
 
 #ifndef __swab_defined
-#define __swab_defined 1
+#define __swab_defined
 #ifdef __CRT_HAVE_swab
 /* >> swab(3)
  * Copy `n_bytes & ~1' (FLOOR_ALIGN(n_bytes, 2)) from `from' to `to',
@@ -5485,19 +5485,19 @@ __CREDIRECT(,onexit_t,__NOTHROW_NCX,onexit,(onexit_t __func),_onexit,(__func))
 #ifndef _WSTDLIB_DEFINED
 #define _WSTDLIB_DEFINED
 #if !defined(___wgetenv_defined) && defined(__CRT_HAVE__wgetenv)
-#define ___wgetenv_defined 1
+#define ___wgetenv_defined
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),wchar_t *,__NOTHROW_NCX,_wgetenv,(wchar_t const *__varname),(__varname))
 #endif /* !___wgetenv_defined && __CRT_HAVE__wgetenv */
 #if !defined(___wgetenv_s_defined) && defined(__CRT_HAVE__wgetenv_s)
-#define ___wgetenv_s_defined 1
+#define ___wgetenv_s_defined
 __CDECLARE(__ATTR_NONNULL((1, 4)),errno_t,__NOTHROW_NCX,_wgetenv_s,(__SIZE_TYPE__ *__return_size, wchar_t *__buf, __SIZE_TYPE__ __buflen, wchar_t const *__varname),(__return_size,__buf,__buflen,__varname))
 #endif /* !___wgetenv_s_defined && __CRT_HAVE__wgetenv_s */
 #if !defined(___wdupenv_s_defined) && defined(__CRT_HAVE__wdupenv_s)
-#define ___wdupenv_s_defined 1
+#define ___wdupenv_s_defined
 __CDECLARE(__ATTR_NONNULL((1, 2, 3)),errno_t,__NOTHROW_NCX,_wdupenv_s,(wchar_t **__pbuf, __SIZE_TYPE__ *__pbuflen, wchar_t const *__varname),(__pbuf,__pbuflen,__varname))
 #endif /* !___wdupenv_s_defined && __CRT_HAVE__wdupenv_s */
 #ifndef _CRT_WSYSTEM_DEFINED
-#define _CRT_WSYSTEM_DEFINED 1
+#define _CRT_WSYSTEM_DEFINED
 #ifdef __CRT_HAVE_wsystem
 __CREDIRECT(,int,__NOTHROW_RPC,_wsystem,(wchar_t const *__cmd),wsystem,(__cmd))
 #elif defined(__CRT_HAVE__wsystem)
@@ -5507,7 +5507,7 @@ __CDECLARE(,int,__NOTHROW_RPC,_wsystem,(wchar_t const *__cmd),(__cmd))
 #endif /* !... */
 #endif /* !_CRT_WSYSTEM_DEFINED */
 #ifndef __wcstol_defined
-#define __wcstol_defined 1
+#define __wcstol_defined
 #ifdef __std_wcstol_defined
 /* >> wcstol(3) */
 __NAMESPACE_STD_USING(wcstol)
@@ -5539,7 +5539,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(wcstol, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LE
 #endif /* !... */
 #endif /* !__wcstol_defined */
 #ifndef __wcstoll_defined
-#define __wcstoll_defined 1
+#define __wcstoll_defined
 #ifdef __std_wcstoll_defined
 /* >> wcstoll(3) */
 __NAMESPACE_STD_USING(wcstoll)
@@ -5571,7 +5571,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(wcstoll, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_L
 #endif /* !... */
 #endif /* !__wcstoll_defined */
 #ifndef __wcstoul_defined
-#define __wcstoul_defined 1
+#define __wcstoul_defined
 #ifdef __std_wcstoul_defined
 /* >> wcstoul(3) */
 __NAMESPACE_STD_USING(wcstoul)
@@ -5603,7 +5603,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(wcstoul, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_L
 #endif /* !... */
 #endif /* !__wcstoul_defined */
 #ifndef __wcstoull_defined
-#define __wcstoull_defined 1
+#define __wcstoull_defined
 #ifdef __std_wcstoull_defined
 /* >> wcstoull(3) */
 __NAMESPACE_STD_USING(wcstoull)
@@ -5635,7 +5635,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(wcstoull, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_
 #endif /* !... */
 #endif /* !__wcstoull_defined */
 #ifndef ___wcstol_l_defined
-#define ___wcstol_l_defined 1
+#define ___wcstol_l_defined
 #ifdef __CRT_HAVE_wcstol_l
 /* >> wcstol_l(3) */
 __CREDIRECT(__ATTR_NONNULL((1)),long,__NOTHROW_NCX,_wcstol_l,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale),wcstol_l,(__nptr,__endptr,__base,__locale))
@@ -5652,7 +5652,7 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) long __NOTHROW_NCX(__LIBCCALL
 #endif /* !... */
 #endif /* !___wcstol_l_defined */
 #ifndef ___wcstoul_l_defined
-#define ___wcstoul_l_defined 1
+#define ___wcstoul_l_defined
 #ifdef __CRT_HAVE_wcstoul_l
 /* >> wcstoul_l(3) */
 __CREDIRECT(__ATTR_NONNULL((1)),unsigned long,__NOTHROW_NCX,_wcstoul_l,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale),wcstoul_l,(__nptr,__endptr,__base,__locale))
@@ -5670,7 +5670,7 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) unsigned long __NOTHROW_NCX(_
 #endif /* !___wcstoul_l_defined */
 #ifndef __NO_FPU
 #ifndef __wcstof_defined
-#define __wcstof_defined 1
+#define __wcstof_defined
 #ifdef __std_wcstof_defined
 /* >> wcstof(3) */
 __NAMESPACE_STD_USING(wcstof)
@@ -5684,7 +5684,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(wcstof, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LE
 #endif /* !... */
 #endif /* !__wcstof_defined */
 #ifndef __wcstod_defined
-#define __wcstod_defined 1
+#define __wcstod_defined
 #ifdef __std_wcstod_defined
 /* >> wcstod(3) */
 __NAMESPACE_STD_USING(wcstod)
@@ -5698,7 +5698,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(wcstod, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LE
 #endif /* !... */
 #endif /* !__wcstod_defined */
 #ifndef ___wcstof_l_defined
-#define ___wcstof_l_defined 1
+#define ___wcstof_l_defined
 #ifdef __CRT_HAVE_wcstof_l
 /* >> wcstof_l(3) */
 __CREDIRECT(__ATTR_NONNULL((1)),float,__NOTHROW_NCX,_wcstof_l,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __locale_t __locale),wcstof_l,(__nptr,__endptr,__locale))
@@ -5715,7 +5715,7 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) float __NOTHROW_NCX(__LIBCCAL
 #endif /* !... */
 #endif /* !___wcstof_l_defined */
 #ifndef ___wcstod_l_defined
-#define ___wcstod_l_defined 1
+#define ___wcstod_l_defined
 #ifdef __CRT_HAVE_wcstod_l
 /* >> wcstod_l(3) */
 __CREDIRECT(__ATTR_NONNULL((1)),double,__NOTHROW_NCX,_wcstod_l,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __locale_t __locale),wcstod_l,(__nptr,__endptr,__locale))
@@ -5733,7 +5733,7 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) double __NOTHROW_NCX(__LIBCCA
 #endif /* !___wcstod_l_defined */
 #ifdef __COMPILER_HAVE_LONGDOUBLE
 #ifndef __wcstold_defined
-#define __wcstold_defined 1
+#define __wcstold_defined
 #ifdef __std_wcstold_defined
 /* >> wcstold(3) */
 __NAMESPACE_STD_USING(wcstold)
@@ -5747,7 +5747,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(wcstold, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_L
 #endif /* !... */
 #endif /* !__wcstold_defined */
 #ifndef ___wcstold_l_defined
-#define ___wcstold_l_defined 1
+#define ___wcstold_l_defined
 #ifdef __CRT_HAVE_wcstold_l
 /* >> wcstold_l(3) */
 __CREDIRECT(__ATTR_NONNULL((1)),__LONGDOUBLE,__NOTHROW_NCX,_wcstold_l,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __locale_t __locale),wcstold_l,(__nptr,__endptr,__locale))
@@ -5765,7 +5765,7 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __LONGDOUBLE __NOTHROW_NCX(__
 #endif /* !___wcstold_l_defined */
 #endif /* __COMPILER_HAVE_LONGDOUBLE */
 #ifndef ___wtof_defined
-#define ___wtof_defined 1
+#define ___wtof_defined
 #ifdef __CRT_HAVE__wtof
 __CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),double,__NOTHROW_NCX,_wtof,(wchar_t const *__nptr),(__nptr))
 #else /* __CRT_HAVE__wtof */
@@ -5774,7 +5774,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_wtof, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PUR
 #endif /* !__CRT_HAVE__wtof */
 #endif /* !___wtof_defined */
 #ifndef ___wtof_l_defined
-#define ___wtof_l_defined 1
+#define ___wtof_l_defined
 #ifdef __CRT_HAVE__wtof_l
 __CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),double,__NOTHROW_NCX,_wtof_l,(wchar_t const *__nptr, __locale_t __locale),(__nptr,__locale))
 #else /* __CRT_HAVE__wtof_l */
@@ -5784,7 +5784,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_wtof_l, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_P
 #endif /* !___wtof_l_defined */
 #endif /* !__NO_FPU */
 #ifndef ___itow_defined
-#define ___itow_defined 1
+#define ___itow_defined
 #ifdef __CRT_HAVE__itow
 __CDECLARE(__ATTR_NONNULL((2)),wchar_t *,__NOTHROW_NCX,_itow,(int __val, wchar_t *__buf, int __radix),(__val,__buf,__radix))
 #else /* __CRT_HAVE__itow */
@@ -5793,7 +5793,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_itow, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NON
 #endif /* !__CRT_HAVE__itow */
 #endif /* !___itow_defined */
 #ifndef ___ltow_defined
-#define ___ltow_defined 1
+#define ___ltow_defined
 #ifdef __CRT_HAVE__ltow
 __CDECLARE(__ATTR_NONNULL((2)),wchar_t *,__NOTHROW_NCX,_ltow,(long __val, wchar_t *__buf, int __radix),(__val,__buf,__radix))
 #else /* __CRT_HAVE__ltow */
@@ -5802,7 +5802,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_ltow, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NON
 #endif /* !__CRT_HAVE__ltow */
 #endif /* !___ltow_defined */
 #ifndef ___ultow_defined
-#define ___ultow_defined 1
+#define ___ultow_defined
 #ifdef __CRT_HAVE__ultow
 __CDECLARE(__ATTR_NONNULL((2)),wchar_t *,__NOTHROW_NCX,_ultow,(unsigned long __val, wchar_t *__buf, int __radix),(__val,__buf,__radix))
 #else /* __CRT_HAVE__ultow */
@@ -5811,7 +5811,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_ultow, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NO
 #endif /* !__CRT_HAVE__ultow */
 #endif /* !___ultow_defined */
 #ifndef ___i64tow_defined
-#define ___i64tow_defined 1
+#define ___i64tow_defined
 #ifdef __CRT_HAVE__i64tow
 __CDECLARE(__ATTR_NONNULL((2)),wchar_t *,__NOTHROW_NCX,_i64tow,(__INT64_TYPE__ __val, wchar_t *__buf, int __radix),(__val,__buf,__radix))
 #else /* __CRT_HAVE__i64tow */
@@ -5820,7 +5820,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_i64tow, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_N
 #endif /* !__CRT_HAVE__i64tow */
 #endif /* !___i64tow_defined */
 #ifndef ___ui64tow_defined
-#define ___ui64tow_defined 1
+#define ___ui64tow_defined
 #ifdef __CRT_HAVE__ui64tow
 __CDECLARE(__ATTR_NONNULL((2)),wchar_t *,__NOTHROW_NCX,_ui64tow,(__UINT64_TYPE__ __val, wchar_t *__buf, int __radix),(__val,__buf,__radix))
 #else /* __CRT_HAVE__ui64tow */
@@ -5829,7 +5829,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_ui64tow, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_
 #endif /* !__CRT_HAVE__ui64tow */
 #endif /* !___ui64tow_defined */
 #ifndef ___itow_s_defined
-#define ___itow_s_defined 1
+#define ___itow_s_defined
 #ifdef __CRT_HAVE__itow_s
 __CDECLARE(__ATTR_NONNULL((2)),errno_t,__NOTHROW_NCX,_itow_s,(int __val, wchar_t *__buf, __SIZE_TYPE__ __buflen, int __radix),(__val,__buf,__buflen,__radix))
 #else /* __CRT_HAVE__itow_s */
@@ -5838,7 +5838,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_itow_s, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_N
 #endif /* !__CRT_HAVE__itow_s */
 #endif /* !___itow_s_defined */
 #ifndef ___ltow_s_defined
-#define ___ltow_s_defined 1
+#define ___ltow_s_defined
 #ifdef __CRT_HAVE__ltow_s
 __CDECLARE(__ATTR_NONNULL((2)),errno_t,__NOTHROW_NCX,_ltow_s,(long __val, wchar_t *__buf, __SIZE_TYPE__ __buflen, int __radix),(__val,__buf,__buflen,__radix))
 #else /* __CRT_HAVE__ltow_s */
@@ -5847,7 +5847,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_ltow_s, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_N
 #endif /* !__CRT_HAVE__ltow_s */
 #endif /* !___ltow_s_defined */
 #ifndef ___ultow_s_defined
-#define ___ultow_s_defined 1
+#define ___ultow_s_defined
 #ifdef __CRT_HAVE__ultow_s
 __CDECLARE(__ATTR_NONNULL((2)),errno_t,__NOTHROW_NCX,_ultow_s,(unsigned long __val, wchar_t *__buf, __SIZE_TYPE__ __buflen, int __radix),(__val,__buf,__buflen,__radix))
 #else /* __CRT_HAVE__ultow_s */
@@ -5856,7 +5856,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_ultow_s, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_
 #endif /* !__CRT_HAVE__ultow_s */
 #endif /* !___ultow_s_defined */
 #ifndef ___i64tow_s_defined
-#define ___i64tow_s_defined 1
+#define ___i64tow_s_defined
 #ifdef __CRT_HAVE__i64tow_s
 __CDECLARE(__ATTR_NONNULL((2)),errno_t,__NOTHROW_NCX,_i64tow_s,(__INT64_TYPE__ __val, wchar_t *__buf, __SIZE_TYPE__ __buflen, int __radix),(__val,__buf,__buflen,__radix))
 #else /* __CRT_HAVE__i64tow_s */
@@ -5865,7 +5865,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_i64tow_s, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR
 #endif /* !__CRT_HAVE__i64tow_s */
 #endif /* !___i64tow_s_defined */
 #ifndef ___ui64tow_s_defined
-#define ___ui64tow_s_defined 1
+#define ___ui64tow_s_defined
 #ifdef __CRT_HAVE__ui64tow_s
 __CDECLARE(__ATTR_NONNULL((2)),errno_t,__NOTHROW_NCX,_ui64tow_s,(__UINT64_TYPE__ __val, wchar_t *__buf, __SIZE_TYPE__ __buflen, int __radix),(__val,__buf,__buflen,__radix))
 #else /* __CRT_HAVE__ui64tow_s */
@@ -5874,7 +5874,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_ui64tow_s, __FORCELOCAL __ATTR_ARTIFICIAL __ATT
 #endif /* !__CRT_HAVE__ui64tow_s */
 #endif /* !___ui64tow_s_defined */
 #ifndef ___wtoi_defined
-#define ___wtoi_defined 1
+#define ___wtoi_defined
 #ifdef __CRT_HAVE_wtoi
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,_wtoi,(wchar_t const *__nptr),wtoi,(__nptr))
 #elif defined(__CRT_HAVE__wtoi)
@@ -5895,7 +5895,7 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) in
 #endif /* !... */
 #endif /* !___wtoi_defined */
 #ifndef ___wtol_defined
-#define ___wtol_defined 1
+#define ___wtol_defined
 #ifdef __CRT_HAVE_wtol
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),long,__NOTHROW_NCX,_wtol,(wchar_t const *__nptr),wtol,(__nptr))
 #elif defined(__CRT_HAVE__wtol)
@@ -5916,7 +5916,7 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) lo
 #endif /* !... */
 #endif /* !___wtol_defined */
 #ifndef ___wtoi64_defined
-#define ___wtoi64_defined 1
+#define ___wtoi64_defined
 #ifdef __CRT_HAVE__wtoi64
 __CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__INT64_TYPE__,__NOTHROW_NCX,_wtoi64,(wchar_t const *__restrict __nptr),(__nptr))
 #elif defined(__CRT_HAVE__wtoi) && __SIZEOF_INT__ == 8
@@ -5931,7 +5931,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_wtoi64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_P
 #endif /* !... */
 #endif /* !___wtoi64_defined */
 #ifndef ___wcstoi64_defined
-#define ___wcstoi64_defined 1
+#define ___wcstoi64_defined
 #ifdef __CRT_HAVE_wcsto64
 /* >> wcsto64(3) */
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__INT64_TYPE__,__NOTHROW_NCX,_wcstoi64,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base),wcsto64,(__nptr,__endptr,__base))
@@ -5957,7 +5957,7 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_NONNULL((1)) __INT64_TYPE__ __
 #endif /* !... */
 #endif /* !___wcstoi64_defined */
 #ifndef ___wcstoui64_defined
-#define ___wcstoui64_defined 1
+#define ___wcstoui64_defined
 #ifdef __CRT_HAVE_wcstou64
 /* >> wcstou64(3) */
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__UINT64_TYPE__,__NOTHROW_NCX,_wcstoui64,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base),wcstou64,(__nptr,__endptr,__base))
@@ -5983,7 +5983,7 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_NONNULL((1)) __UINT64_TYPE__ _
 #endif /* !... */
 #endif /* !___wcstoui64_defined */
 #ifndef ___wtoi_l_defined
-#define ___wtoi_l_defined 1
+#define ___wtoi_l_defined
 #ifdef __CRT_HAVE__wtoi_l
 __CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,_wtoi_l,(wchar_t const *__restrict __nptr, __locale_t __locale),(__nptr,__locale))
 #elif defined(__CRT_HAVE__wtol_l) && __SIZEOF_INT__ == __SIZEOF_LONG__
@@ -5998,7 +5998,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_wtoi_l, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_P
 #endif /* !... */
 #endif /* !___wtoi_l_defined */
 #ifndef ___wtol_l_defined
-#define ___wtol_l_defined 1
+#define ___wtol_l_defined
 #ifdef __CRT_HAVE__wtol_l
 __CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),long int,__NOTHROW_NCX,_wtol_l,(wchar_t const *__restrict __nptr, __locale_t __locale),(__nptr,__locale))
 #elif defined(__CRT_HAVE__wtoi_l) && __SIZEOF_LONG__ == __SIZEOF_INT__
@@ -6013,7 +6013,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_wtol_l, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_P
 #endif /* !... */
 #endif /* !___wtol_l_defined */
 #ifndef ___wtoi64_l_defined
-#define ___wtoi64_l_defined 1
+#define ___wtoi64_l_defined
 #ifdef __CRT_HAVE__wtoi64_l
 __CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__INT64_TYPE__,__NOTHROW_NCX,_wtoi64_l,(wchar_t const *__restrict __nptr, __locale_t __locale),(__nptr,__locale))
 #elif defined(__CRT_HAVE__wtoi_l) && __SIZEOF_INT__ == 8
@@ -6028,7 +6028,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_wtoi64_l, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR
 #endif /* !... */
 #endif /* !___wtoi64_l_defined */
 #ifndef ___wcstoi64_l_defined
-#define ___wcstoi64_l_defined 1
+#define ___wcstoi64_l_defined
 #ifdef __CRT_HAVE_wcsto64_l
 /* >> wcsto64_l(3) */
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__INT64_TYPE__,__NOTHROW_NCX,_wcstoi64_l,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale),wcsto64_l,(__nptr,__endptr,__base,__locale))
@@ -6069,7 +6069,7 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_NONNULL((1)) __INT64_TYPE__ __
 #endif /* !... */
 #endif /* !___wcstoi64_l_defined */
 #ifndef ___wcstoui64_l_defined
-#define ___wcstoui64_l_defined 1
+#define ___wcstoui64_l_defined
 #ifdef __CRT_HAVE_wcstou64_l
 /* >> wcstou64_l(3) */
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__UINT64_TYPE__,__NOTHROW_NCX,_wcstoui64_l,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale),wcstou64_l,(__nptr,__endptr,__base,__locale))
@@ -6111,7 +6111,7 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_NONNULL((1)) __UINT64_TYPE__ _
 #endif /* !___wcstoui64_l_defined */
 #ifdef __LONGLONG
 #ifndef ___wcstoll_l_defined
-#define ___wcstoll_l_defined 1
+#define ___wcstoll_l_defined
 #ifdef __CRT_HAVE_wcstoll_l
 /* >> wcstoll_l(3) */
 __CREDIRECT(__ATTR_NONNULL((1)),__LONGLONG,__NOTHROW_NCX,_wcstoll_l,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale),wcstoll_l,(__nptr,__endptr,__base,__locale))
@@ -6152,7 +6152,7 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __LONGLONG __NOTHROW_NCX(__LI
 #endif /* !... */
 #endif /* !___wcstoll_l_defined */
 #ifndef ___wcstoull_l_defined
-#define ___wcstoull_l_defined 1
+#define ___wcstoull_l_defined
 #ifdef __CRT_HAVE_wcstoull_l
 /* >> wcstoull_l(3) */
 __CREDIRECT(__ATTR_NONNULL((1)),__ULONGLONG,__NOTHROW_NCX,_wcstoull_l,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale),wcstoull_l,(__nptr,__endptr,__base,__locale))
@@ -6193,7 +6193,7 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __ULONGLONG __NOTHROW_NCX(__L
 #endif /* !... */
 #endif /* !___wcstoull_l_defined */
 #ifndef ___wtoll_defined
-#define ___wtoll_defined 1
+#define ___wtoll_defined
 #ifdef __CRT_HAVE_wtoll
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__LONGLONG,__NOTHROW_NCX,_wtoll,(wchar_t const *__nptr),wtoll,(__nptr))
 #elif defined(__CRT_HAVE__wtoll)
@@ -6214,7 +6214,7 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __
 #endif /* !... */
 #endif /* !___wtoll_defined */
 #ifndef ___wtoll_l_defined
-#define ___wtoll_l_defined 1
+#define ___wtoll_l_defined
 #ifdef __CRT_HAVE__wtoll_l
 __CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__LONGLONG,__NOTHROW_NCX,_wtoll_l,(wchar_t const *__restrict __nptr, __locale_t __locale),(__nptr,__locale))
 #elif defined(__CRT_HAVE__wtoi_l) && __SIZEOF_LONG_LONG__ == __SIZEOF_INT__
@@ -6233,11 +6233,11 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_wtoll_l, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_
 #ifndef _WSTDLIBP_DEFINED
 #define _WSTDLIBP_DEFINED 1
 #if !defined(___wfullpath_defined) && defined(__CRT_HAVE__wfullpath)
-#define ___wfullpath_defined 1
+#define ___wfullpath_defined
 __CDECLARE(,wchar_t *,__NOTHROW_NCX,_wfullpath,(wchar_t *__buf, wchar_t const *__path, __SIZE_TYPE__ __buflen),(__buf,__path,__buflen))
 #endif /* !___wfullpath_defined && __CRT_HAVE__wfullpath */
 #ifndef ___wmakepath_s_defined
-#define ___wmakepath_s_defined 1
+#define ___wmakepath_s_defined
 #ifdef __CRT_HAVE__wmakepath_s
 __CDECLARE(__ATTR_NONNULL((1)),errno_t,__NOTHROW_NCX,_wmakepath_s,(wchar_t *__buf, __SIZE_TYPE__ __buflen, wchar_t const *__drive, wchar_t const *__dir, wchar_t const *__file, wchar_t const *__ext),(__buf,__buflen,__drive,__dir,__file,__ext))
 #else /* __CRT_HAVE__wmakepath_s */
@@ -6246,7 +6246,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_wmakepath_s, __FORCELOCAL __ATTR_ARTIFICIAL __A
 #endif /* !__CRT_HAVE__wmakepath_s */
 #endif /* !___wmakepath_s_defined */
 #ifndef ___wmakepath_defined
-#define ___wmakepath_defined 1
+#define ___wmakepath_defined
 #ifdef __CRT_HAVE__wmakepath
 __CDECLARE_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,_wmakepath,(wchar_t *__restrict __buf, wchar_t const *__drive, wchar_t const *__dir, wchar_t const *__file, wchar_t const *__ext),(__buf,__drive,__dir,__file,__ext))
 #else /* __CRT_HAVE__wmakepath */
@@ -6255,7 +6255,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_wmakepath, __FORCELOCAL __ATTR_ARTIFICIAL __ATT
 #endif /* !__CRT_HAVE__wmakepath */
 #endif /* !___wmakepath_defined */
 #ifndef _CRT_WPERROR_DEFINED
-#define _CRT_WPERROR_DEFINED 1
+#define _CRT_WPERROR_DEFINED
 #ifdef __CRT_HAVE__wperror
 __CDECLARE_VOID(__ATTR_COLD,__THROWING,_wperror,(__WCHAR_TYPE__ const *__restrict __message),(__message))
 #else /* __CRT_HAVE__wperror */
@@ -6270,19 +6270,19 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_wperror, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_
 #endif /* !__CRT_HAVE__wperror */
 #endif /* !_CRT_WPERROR_DEFINED */
 #if !defined(___wputenv_defined) && defined(__CRT_HAVE__wputenv)
-#define ___wputenv_defined 1
+#define ___wputenv_defined
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,_wputenv,(wchar_t *__string),(__string))
 #endif /* !___wputenv_defined && __CRT_HAVE__wputenv */
 #if !defined(___wputenv_s_defined) && defined(__CRT_HAVE__wputenv_s)
-#define ___wputenv_s_defined 1
+#define ___wputenv_s_defined
 __CDECLARE(,errno_t,__NOTHROW_NCX,_wputenv_s,(wchar_t const *__varname, wchar_t const *__val),(__varname,__val))
 #endif /* !___wputenv_s_defined && __CRT_HAVE__wputenv_s */
 #if !defined(___wsearchenv_s_defined) && defined(__CRT_HAVE__wsearchenv_s)
-#define ___wsearchenv_s_defined 1
+#define ___wsearchenv_s_defined
 __CDECLARE(__ATTR_NONNULL((1, 2, 3)),errno_t,__NOTHROW_RPC,_wsearchenv_s,(wchar_t const *__file, wchar_t const *__envvar, wchar_t *__restrict __resultpath, __SIZE_TYPE__ __buflen),(__file,__envvar,__resultpath,__buflen))
 #endif /* !___wsearchenv_s_defined && __CRT_HAVE__wsearchenv_s */
 #ifndef ___wsearchenv_defined
-#define ___wsearchenv_defined 1
+#define ___wsearchenv_defined
 #ifdef __CRT_HAVE__wsearchenv
 __CDECLARE_VOID(__ATTR_NONNULL((1, 2, 3)),__NOTHROW_RPC,_wsearchenv,(wchar_t const *__file, wchar_t const *__envvar, wchar_t *__restrict __resultpath),(__file,__envvar,__resultpath))
 #elif defined(__CRT_HAVE__wsearchenv_s)
@@ -6293,7 +6293,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_wsearchenv, __FORCELOCAL __ATTR_ARTIFICIAL __AT
 #endif /* !... */
 #endif /* !___wsearchenv_defined */
 #ifndef ___wsplitpath_defined
-#define ___wsplitpath_defined 1
+#define ___wsplitpath_defined
 #ifdef __CRT_HAVE__wsplitpath
 __CDECLARE_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,_wsplitpath,(wchar_t const *__restrict __abspath, wchar_t *__drive, wchar_t *__dir, wchar_t *__file, wchar_t *__ext),(__abspath,__drive,__dir,__file,__ext))
 #else /* __CRT_HAVE__wsplitpath */
@@ -6302,7 +6302,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_wsplitpath, __FORCELOCAL __ATTR_ARTIFICIAL __AT
 #endif /* !__CRT_HAVE__wsplitpath */
 #endif /* !___wsplitpath_defined */
 #ifndef ___wsplitpath_s_defined
-#define ___wsplitpath_s_defined 1
+#define ___wsplitpath_s_defined
 #ifdef __CRT_HAVE__wsplitpath_s
 __CDECLARE(__ATTR_NONNULL((1)),errno_t,__NOTHROW_NCX,_wsplitpath_s,(wchar_t const *__restrict __abspath, wchar_t *__drive, __SIZE_TYPE__ __drivelen, wchar_t *__dir, __SIZE_TYPE__ __dirlen, wchar_t *__file, __SIZE_TYPE__ __filelen, wchar_t *__ext, __SIZE_TYPE__ __extlen),(__abspath,__drive,__drivelen,__dir,__dirlen,__file,__filelen,__ext,__extlen))
 #else /* __CRT_HAVE__wsplitpath_s */
@@ -6332,7 +6332,7 @@ __SYSDECL_END
 #endif /* __USE_KOS */
 
 #ifdef __CXX_SYSTEM_HEADER
-#define _CXX_STDONLY_CSTDLIB 1
+#define _CXX_STDONLY_CSTDLIB
 #undef _STDLIB_H
 #endif /* __CXX_SYSTEM_HEADER */
 #endif /* !_CXX_STDONLY_CSTDLIB */

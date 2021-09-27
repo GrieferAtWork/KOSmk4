@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x309de5b8 */
+/* HASH CRC-32:0x28045e9e */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_fabsl_defined
-#define __local_fabsl_defined 1
+#define __local_fabsl_defined
 #include <__crt.h>
 #include <libm/fabs.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -33,7 +33,7 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(fabsl))(__LONGDOUBLE __x) {
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_fabsl_defined
-#define __local___localdep_fabsl_defined 1
+#define __local___localdep_fabsl_defined
 #define __localdep_fabsl __LIBC_LOCAL_NAME(fabsl)
 #endif /* !__local___localdep_fabsl_defined */
 #endif /* !__local_fabsl_defined */

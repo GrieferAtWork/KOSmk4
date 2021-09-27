@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2535c73b */
+/* HASH CRC-32:0xa61dce1b */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,13 +19,13 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_pthread_spin_lock_defined
-#define __local_pthread_spin_lock_defined 1
+#define __local_pthread_spin_lock_defined
 #include <__crt.h>
 #include <bits/types.h>
 #include <bits/crt/pthreadtypes.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_pthread_spin_trylock_defined
-#define __local___localdep_pthread_spin_trylock_defined 1
+#define __local___localdep_pthread_spin_trylock_defined
 #ifdef __CRT_HAVE_pthread_spin_trylock
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,__localdep_pthread_spin_trylock,(__pthread_spinlock_t *__lock),pthread_spin_trylock,(__lock))
 #else /* __CRT_HAVE_pthread_spin_trylock */
@@ -47,7 +47,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(pthread_spin_lock))(__pthread_spinloc
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_pthread_spin_lock_defined
-#define __local___localdep_pthread_spin_lock_defined 1
+#define __local___localdep_pthread_spin_lock_defined
 #define __localdep_pthread_spin_lock __LIBC_LOCAL_NAME(pthread_spin_lock)
 #endif /* !__local___localdep_pthread_spin_lock_defined */
 #endif /* !__local_pthread_spin_lock_defined */

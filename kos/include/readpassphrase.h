@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x75d16562 */
+/* HASH CRC-32:0x1766da25 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -65,7 +65,7 @@
 __SYSDECL_BEGIN
 
 #ifndef __size_t_defined
-#define __size_t_defined 1
+#define __size_t_defined
 typedef __SIZE_TYPE__ size_t;
 #endif /* !__size_t_defined */
 

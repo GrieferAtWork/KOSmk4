@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdbe71108 */
+/* HASH CRC-32:0x817d4b6 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,7 +30,7 @@
 __SYSDECL_BEGIN
 
 #ifndef ____libc_core_realloc_in_place_defined
-#define ____libc_core_realloc_in_place_defined 1
+#define ____libc_core_realloc_in_place_defined
 #ifdef __CRT_HAVE_realloc_in_place
 #include <hybrid/typecore.h>
 /* @EXCEPT: `realloc_in_place()' will return `NULL' if the reallocation isn't
@@ -52,7 +52,7 @@ __CREDIRECT(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_ALLOC_SIZE((2)),void *,__NOTHROW_
 #endif /* !... */
 #endif /* !____libc_core_realloc_in_place_defined */
 #ifndef ____libc_core_malloc_usable_size_defined
-#define ____libc_core_malloc_usable_size_defined 1
+#define ____libc_core_malloc_usable_size_defined
 #ifdef __CRT_HAVE_malloc_usable_size
 #include <hybrid/typecore.h>
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,__SIZE_TYPE__,__NOTHROW_NCX,__libc_core_malloc_usable_size,(void *__restrict __mallptr),malloc_usable_size,(__mallptr))

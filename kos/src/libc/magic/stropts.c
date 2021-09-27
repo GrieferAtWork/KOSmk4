@@ -257,12 +257,12 @@
 __SYSDECL_BEGIN
 
 #ifndef __gid_t_defined
-#define __gid_t_defined 1
+#define __gid_t_defined
 typedef __gid_t gid_t;
 #endif /* !__gid_t_defined */
 
 #ifndef __uid_t_defined
-#define __uid_t_defined 1
+#define __uid_t_defined
 typedef __uid_t uid_t;
 #endif /* !__uid_t_defined */
 

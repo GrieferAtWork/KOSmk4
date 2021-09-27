@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc6352f8f */
+/* HASH CRC-32:0x37008fb2 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,14 +19,14 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_c32readlink_defined
-#define __local_c32readlink_defined 1
+#define __local_c32readlink_defined
 #include <__crt.h>
 #include <asm/os/fcntl.h>
 #if defined(__AT_FDCWD) && ((defined(__CRT_HAVE_wreadlinkat) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)) || defined(__CRT_HAVE_KOS$wreadlinkat))
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_c32readlinkat_defined
-#define __local___localdep_c32readlinkat_defined 1
+#define __local___localdep_c32readlinkat_defined
 #if defined(__CRT_HAVE_wreadlinkat) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
@@ -47,7 +47,7 @@ __NOTHROW_RPC(__LIBKCALL __LIBC_LOCAL_NAME(c32readlink))(__CHAR32_TYPE__ const *
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_c32readlink_defined
-#define __local___localdep_c32readlink_defined 1
+#define __local___localdep_c32readlink_defined
 #define __localdep_c32readlink __LIBC_LOCAL_NAME(c32readlink)
 #endif /* !__local___localdep_c32readlink_defined */
 #else /* __AT_FDCWD && ((__CRT_HAVE_wreadlinkat && __SIZEOF_WCHAR_T__ == 4 && __LIBCCALL_IS_LIBKCALL) || __CRT_HAVE_KOS$wreadlinkat) */

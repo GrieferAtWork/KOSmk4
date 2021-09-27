@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x996b8f6e */
+/* HASH CRC-32:0xad791b13 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,12 +19,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_sigemptyset_defined
-#define __local_sigemptyset_defined 1
+#define __local_sigemptyset_defined
 #include <__crt.h>
 #include <bits/os/sigset.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_bzeroc_defined
-#define __local___localdep_bzeroc_defined 1
+#define __local___localdep_bzeroc_defined
 #ifdef __CRT_HAVE_bzeroc
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
@@ -44,7 +44,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(sigemptyset))(struct __sigset_struct 
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_sigemptyset_defined
-#define __local___localdep_sigemptyset_defined 1
+#define __local___localdep_sigemptyset_defined
 #define __localdep_sigemptyset __LIBC_LOCAL_NAME(sigemptyset)
 #endif /* !__local___localdep_sigemptyset_defined */
 #endif /* !__local_sigemptyset_defined */

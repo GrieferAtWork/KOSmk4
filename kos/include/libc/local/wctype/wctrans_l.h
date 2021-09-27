@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x979e7cff */
+/* HASH CRC-32:0x8f304b9f */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,13 +19,13 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_wctrans_l_defined
-#define __local_wctrans_l_defined 1
+#define __local_wctrans_l_defined
 #include <__crt.h>
 #if defined(__CRT_HAVE_wctrans) || defined(__CRT_KOS)
 #include <bits/crt/wctype.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_wctrans_defined
-#define __local___localdep_wctrans_defined 1
+#define __local___localdep_wctrans_defined
 #ifdef __CRT_HAVE_wctrans
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__wctrans_t,__NOTHROW_NCX,__localdep_wctrans,(char const *__prop),wctrans,(__prop))
 #elif defined(__CRT_KOS)
@@ -45,7 +45,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wctrans_l))(char const *__prop, __loc
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_wctrans_l_defined
-#define __local___localdep_wctrans_l_defined 1
+#define __local___localdep_wctrans_l_defined
 #define __localdep_wctrans_l __LIBC_LOCAL_NAME(wctrans_l)
 #endif /* !__local___localdep_wctrans_l_defined */
 #else /* __CRT_HAVE_wctrans || __CRT_KOS */

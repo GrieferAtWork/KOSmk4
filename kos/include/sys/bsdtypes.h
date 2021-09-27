@@ -28,7 +28,7 @@
 __DECL_BEGIN
 
 #ifndef __u_char_defined
-#define __u_char_defined 1
+#define __u_char_defined
 typedef __u_char  u_char;
 typedef __u_short u_short;
 typedef __u_int   u_int;

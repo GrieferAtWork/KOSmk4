@@ -40,22 +40,22 @@ typedef __off64_t __off_t;
 typedef __u_net32_t __in_addr_t;
 typedef __u_net16_t __in_port_t;
 #ifndef __machine_fsblkcnt_t_defined
-#define __machine_fsblkcnt_t_defined 1
+#define __machine_fsblkcnt_t_defined
 #define __fsblkcnt_t __FS_TYPE(fsblkcnt)
 #endif /* !__machine_fsblkcnt_t_defined */
 #ifndef __machine_fsfilcnt_t_defined
-#define __machine_fsfilcnt_t_defined 1
+#define __machine_fsfilcnt_t_defined
 #define __fsfilcnt_t __FS_TYPE(fsfilcnt)
 #endif /* !__machine_fsfilcnt_t_defined */
 #ifndef ____mbstate_t_defined
-#define ____mbstate_t_defined 1
+#define ____mbstate_t_defined
 typedef struct __mbstate __mbstate_t;
 #endif /* !____mbstate_t_defined */
 #define _BSD_WCTRANS_T_ __wctrans_t
 #define _BSD_WCTYPE_T_  __wctype_t
 #define _BSD_MBSTATE_T_ __mbstate_t
 #ifndef ____va_list_defined
-#define ____va_list_defined 1
+#define ____va_list_defined
 typedef __builtin_va_list __va_list;
 #endif /* !____va_list_defined */
 

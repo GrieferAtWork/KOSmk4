@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xff62adb8 */
+/* HASH CRC-32:0x1866b1d0 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,13 +19,13 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_fmodf_defined
-#define __local_fmodf_defined 1
+#define __local_fmodf_defined
 #include <__crt.h>
 #include <ieee754.h>
 #if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_fmod) || defined(__CRT_HAVE___fmod) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_fmod_defined
-#define __local___localdep_fmod_defined 1
+#define __local___localdep_fmod_defined
 #if __has_builtin(__builtin_fmod) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_fmod)
 __CEIREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_fmod,(double __x, double __y),fmod,{ return __builtin_fmod(__x, __y); })
 #elif defined(__CRT_HAVE_fmod)
@@ -63,7 +63,7 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(fmodf))(float __x, float __y) {
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_fmodf_defined
-#define __local___localdep_fmodf_defined 1
+#define __local___localdep_fmodf_defined
 #define __localdep_fmodf __LIBC_LOCAL_NAME(fmodf)
 #endif /* !__local___localdep_fmodf_defined */
 #else /* __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ || __CRT_HAVE_fmod || __CRT_HAVE___fmod || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd734d42a */
+/* HASH CRC-32:0x94fbe607 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,12 +19,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_wcscasestr_defined
-#define __local_wcscasestr_defined 1
+#define __local_wcscasestr_defined
 #include <__crt.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_wcscasecmp_defined
-#define __local___localdep_wcscasecmp_defined 1
+#define __local___localdep_wcscasecmp_defined
 #ifdef __CRT_HAVE_wcscasecmp
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_wcscasecmp,(__WCHAR_TYPE__ const *__s1, __WCHAR_TYPE__ const *__s2),wcscasecmp,(__s1,__s2))
 #elif defined(__CRT_HAVE__wcsicmp)
@@ -46,7 +46,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcscasestr))(__WCHAR_TYPE__ const *__
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_wcscasestr_defined
-#define __local___localdep_wcscasestr_defined 1
+#define __local___localdep_wcscasestr_defined
 #define __localdep_wcscasestr __LIBC_LOCAL_NAME(wcscasestr)
 #endif /* !__local___localdep_wcscasestr_defined */
 #endif /* !__local_wcscasestr_defined */

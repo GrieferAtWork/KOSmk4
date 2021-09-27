@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4157eb6 */
+/* HASH CRC-32:0x2ee4c81 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_rawmemchrl_defined
-#define __local_rawmemchrl_defined 1
+#define __local_rawmemchrl_defined
 #include <__crt.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -34,7 +34,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(rawmemchrl))(void const *__restrict _
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_rawmemchrl_defined
-#define __local___localdep_rawmemchrl_defined 1
+#define __local___localdep_rawmemchrl_defined
 #define __localdep_rawmemchrl __LIBC_LOCAL_NAME(rawmemchrl)
 #endif /* !__local___localdep_rawmemchrl_defined */
 #endif /* !__local_rawmemchrl_defined */

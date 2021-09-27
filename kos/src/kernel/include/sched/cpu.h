@@ -89,7 +89,7 @@ struct cpu {
 
 
 #ifndef __realtime_defined
-#define __realtime_defined 1
+#define __realtime_defined
 /* Returns the current real time derived from the current CPU time.
  * WARNING: KOS only gives a best-effort guaranty for this function
  *          in terms of  consistency when it  comes to the  calling

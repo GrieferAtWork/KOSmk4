@@ -1671,7 +1671,7 @@ class LocalFunction {
 			local usedPrototype = functionPrototype;
 			local localGuardName = namespace.keyDefaultGuard(name);
 			fp.ppIfndef(localGuardName);
-			fp.ppDefine(localGuardName, "1");
+			fp.ppDefine(localGuardName, "");
 			fp.ppInclude("<__crt.h>");
 			/* Include the preprocessor-condition prefix texts. */
 			for (local x: ppCondPrefix)
@@ -1694,7 +1694,7 @@ class LocalFunction {
 			fp.forceStartOfLine();
 			/* Also bind ourself as a local dependency function */
 			fp << "#ifndef " << myLocalDepGuard << "\n"
-				"#define " << myLocalDepGuard << " 1\n"
+				"#define " << myLocalDepGuard << "\n"
 				"#define " << myLocalDepName << " " << namespace.keyCSymbolName(name) << "\n"
 				"#endif /* !" << myLocalDepGuard << " */\n";
 			fp.ppElse();
@@ -2794,7 +2794,7 @@ no_usable_bindings:
 					/* Try to optimize special case: Only 1 binding
 					 * Instead  of  writing  something  like  this:
 					 * >> #ifndef __wcslen_defined
-					 * >> #define __wcslen_defined 1
+					 * >> #define __wcslen_defined
 					 * >> #if $has_function(wcslen) || defined(__std_wcslen_defined)
 					 * >> __NAMESPACE_STD_USING(wcslen)
 					 * >> #else // <$has_function(wcslen)> || __std_wcslen_defined
@@ -2804,7 +2804,7 @@ no_usable_bindings:
 					 *
 					 * Write the following instead:
 					 * >> #if !defined(__wcslen_defined) && (defined(__std_wcslen_defined) || $has_function(wcslen))
-					 * >> #define __wcslen_defined 1
+					 * >> #define __wcslen_defined
 					 * >> __NAMESPACE_STD_USING(wcslen)
 					 * >> #endif // !__wcslen_defined && (__std_wcslen_defined || $has_function(wcslen)) */
 					local bind = usedBindings.first;
@@ -2831,7 +2831,7 @@ again_check_extendedPrefixes:
 						guardName,
 						escapeText(bind.ppCond, escapeMode)
 					}));
-					fp.ppDefine(guardName, "1");
+					fp.ppDefine(guardName, "");
 					bind.cprintBindFunction(
 						fp, escapeMode, decl, exposedName, guardName,
 						doc, preferBindingMacros,
@@ -2842,7 +2842,7 @@ again_check_extendedPrefixes:
 				}
 normal_guardName_binding:
 				fp.ppIfndef(guardName);
-				fp.ppDefine(guardName, "1");
+				fp.ppDefine(guardName, "");
 			} else /* if (guardName is none) */ {
 				/* Check if we can use `__CDECLARE_OPT()' */
 				if (#usedBindings == 1) {
@@ -3414,7 +3414,7 @@ class SystemHeader {
 		local guardName = "_LIBC_{}_H"
 			.format({ name.replace("-", "_").replace(".", "_").upper() });
 		fp << "#ifndef " << guardName << "\n"
-			"#define " << guardName << " 1\n"
+			"#define " << guardName << " 1\n" /* This "1" must stay for compat */
 			"\n"
 			"#include <__stdinc.h>\n"
 			"\n"
@@ -3450,18 +3450,18 @@ class SystemHeader {
 				if (partFast) {
 					fp << "#ifndef " << myGuardName << "\n"
 						"#ifdef __fast_" << partName << "_defined\n"
-						"#define " << myGuardName << " 1\n"
+						"#define " << myGuardName << "\n"
 						"#define __libc_" << partName << " ("
 							<< nsFast.prefix << " "
 							<< nsFast.keyCSymbolName(partName) << ")\n"
 						"#elif defined(" << coreGuardName << ")\n"
-						"#define " << myGuardName << " 1\n"
+						"#define " << myGuardName << "\n"
 						"#define __libc_" << partName << " __libc_core_" << partName << "\n"
 						"#endif /* ... */\n"
 						"#endif /* !" << myGuardName << " */\n";
 				} else {
 					fp << "#if !defined(" << myGuardName << ") && defined(" << coreGuardName << ")\n"
-						"#define " << myGuardName << " 1\n"
+						"#define " << myGuardName << "\n"
 						"#define __libc_" << partName << " __libc_core_" << partName << "\n"
 						"#endif /* !" << myGuardName << " && " << coreGuardName << " */\n";
 				}
@@ -3497,7 +3497,7 @@ class SystemHeader {
 		local guardName = "_LIBC_CORE_{}_H"
 			.format({ name.replace("-", "_").replace(".", "_").upper() });
 		fp << "#ifndef " << guardName << "\n"
-			"#define " << guardName << " 1\n"
+			"#define " << guardName << " 1\n" /* This "1" must stay for compat */
 			"\n"
 			"#include <__stdinc.h>\n"
 			"\n"
@@ -3541,7 +3541,7 @@ class SystemHeader {
 			name.replace("-", "_").replace(".", "_").upper()
 		});
 		fp << "#ifndef " << guardName << "\n"
-			"#define " << guardName << " 1\n"
+			"#define " << guardName << " 1\n" /* This "1" must stay for compat */
 			"\n"
 			"#include \"../api.h\"\n";
 		if (!isAuto && order_libcAutoHeader)
@@ -3577,7 +3577,7 @@ class SystemHeader {
 			name.replace("-", "_").replace(".", "_").upper(),
 		});
 		fp << "#ifndef " << guardName << "\n"
-			"#define " << guardName << " 1\n"
+			"#define " << guardName << " 1\n" /* This "1" must stay for compat */
 			"\n"
 			"#include \"../api.h\"\n"
 			"#include <hybrid/typecore.h>\n"

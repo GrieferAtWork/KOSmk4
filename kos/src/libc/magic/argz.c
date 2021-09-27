@@ -51,12 +51,12 @@
 __SYSDECL_BEGIN
 
 #ifndef __size_t_defined
-#define __size_t_defined 1
+#define __size_t_defined
 typedef __size_t size_t;
 #endif /* !__size_t_defined */
 
 #ifndef __error_t_defined
-#define __error_t_defined 1
+#define __error_t_defined
 typedef __errno_t error_t;
 #endif /* !__error_t_defined */
 

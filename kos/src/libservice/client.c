@@ -102,7 +102,7 @@ libservice_open(char const *filename) THROWS(E_FSERROR, E_BADALLOC, E_INTERRUPT)
 					unsigned int bucket;
 
 					/* This really shouldn't happen, but we mustn't assume anything about `getpagesize()'!
-					 * Note that in all likelihood, the compiler will just optimize this away, especially
+					 * Note that in all likelihood, the compiler will just optimize this away,  especially
 					 * when `getpagesize()' expands to a constant integer. */
 					if unlikely(shm_size < SERVICE_SHM_ALLOC_MINSIZE)
 						shm_size = CEIL_ALIGN(SERVICE_SHM_ALLOC_MINSIZE, pagesize);

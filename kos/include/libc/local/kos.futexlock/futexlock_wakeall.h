@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x21cbf3c6 */
+/* HASH CRC-32:0x138d4e7e */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,13 +19,13 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_futexlock_wakeall_defined
-#define __local_futexlock_wakeall_defined 1
+#define __local_futexlock_wakeall_defined
 #include <__crt.h>
 #include <bits/types.h>
 #if defined(__CRT_HAVE_futex_wakeall) || defined(__CRT_HAVE_futex_wake) || defined(__CRT_HAVE_lfutex64) || defined(__CRT_HAVE_lfutex)
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_futex_wakeall_defined
-#define __local___localdep_futex_wakeall_defined 1
+#define __local___localdep_futex_wakeall_defined
 #ifdef __CRT_HAVE_futex_wakeall
 __CREDIRECT(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__NOTHROW_NCX,__localdep_futex_wakeall,(__uintptr_t *__uaddr),futex_wakeall,(__uaddr))
 #elif defined(__CRT_HAVE_futex_wake) || defined(__CRT_HAVE_lfutex64) || defined(__CRT_HAVE_lfutex)
@@ -53,7 +53,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(futexlock_wakeall))(__uintptr_t *__ul
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_futexlock_wakeall_defined
-#define __local___localdep_futexlock_wakeall_defined 1
+#define __local___localdep_futexlock_wakeall_defined
 #define __localdep_futexlock_wakeall __LIBC_LOCAL_NAME(futexlock_wakeall)
 #endif /* !__local___localdep_futexlock_wakeall_defined */
 #else /* __CRT_HAVE_futex_wakeall || __CRT_HAVE_futex_wake || __CRT_HAVE_lfutex64 || __CRT_HAVE_lfutex */

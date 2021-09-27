@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x277fdd3e */
+/* HASH CRC-32:0x1cbab28 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,14 +19,14 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_clock_getres_defined
-#define __local_clock_getres_defined 1
+#define __local_clock_getres_defined
 #include <__crt.h>
 #include <bits/types.h>
 #if defined(__CRT_HAVE_clock_getres64) || defined(__CRT_HAVE_clock_getres) || defined(__CRT_HAVE___clock_getres)
 #include <bits/os/timespec.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_clock_getres32_defined
-#define __local___localdep_clock_getres32_defined 1
+#define __local___localdep_clock_getres32_defined
 #ifdef __CRT_HAVE_clock_getres
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_clock_getres32,(__clockid_t __clock_id, struct __timespec32 *__res),clock_getres,(__clock_id,__res))
 #elif defined(__CRT_HAVE___clock_getres)
@@ -36,7 +36,7 @@ __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_clock_getres32,(__c
 #endif /* !... */
 #endif /* !__local___localdep_clock_getres32_defined */
 #ifndef __local___localdep_clock_getres64_defined
-#define __local___localdep_clock_getres64_defined 1
+#define __local___localdep_clock_getres64_defined
 #if defined(__CRT_HAVE_clock_getres) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_clock_getres64,(__clockid_t __clock_id, struct __timespec64 *__res),clock_getres,(__clock_id,__res))
 #elif defined(__CRT_HAVE_clock_getres64)
@@ -74,7 +74,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(clock_getres))(__clockid_t __clock_id
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_clock_getres_defined
-#define __local___localdep_clock_getres_defined 1
+#define __local___localdep_clock_getres_defined
 #define __localdep_clock_getres __LIBC_LOCAL_NAME(clock_getres)
 #endif /* !__local___localdep_clock_getres_defined */
 #else /* __CRT_HAVE_clock_getres64 || __CRT_HAVE_clock_getres || __CRT_HAVE___clock_getres */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x363975e6 */
+/* HASH CRC-32:0xbf67ad3 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_unicode_writeutf16_chk_defined
-#define __local_unicode_writeutf16_chk_defined 1
+#define __local_unicode_writeutf16_chk_defined
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(unicode_writeutf16_chk) __ATTR_WUNUSED __ATTR_NONNULL((1)) __CHAR16_TYPE__ *
@@ -37,7 +37,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(unicode_writeutf16_chk))(__CHAR16_TYP
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_unicode_writeutf16_chk_defined
-#define __local___localdep_unicode_writeutf16_chk_defined 1
+#define __local___localdep_unicode_writeutf16_chk_defined
 #define __localdep_unicode_writeutf16_chk __LIBC_LOCAL_NAME(unicode_writeutf16_chk)
 #endif /* !__local___localdep_unicode_writeutf16_chk_defined */
 #endif /* !__local_unicode_writeutf16_chk_defined */

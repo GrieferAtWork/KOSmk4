@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8c8a6575 */
+/* HASH CRC-32:0xbf325364 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,13 +19,13 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_tcdrain_defined
-#define __local_tcdrain_defined 1
+#define __local_tcdrain_defined
 #include <__crt.h>
 #include <asm/os/tty.h>
 #if defined(__CRT_HAVE_ioctl) && defined(__TCSBRK)
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_ioctl_defined
-#define __local___localdep_ioctl_defined 1
+#define __local___localdep_ioctl_defined
 __NAMESPACE_LOCAL_END
 #include <features.h>
 #include <bits/types.h>
@@ -38,7 +38,7 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(tcdrain))(__fd_t __fd) {
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_tcdrain_defined
-#define __local___localdep_tcdrain_defined 1
+#define __local___localdep_tcdrain_defined
 #define __localdep_tcdrain __LIBC_LOCAL_NAME(tcdrain)
 #endif /* !__local___localdep_tcdrain_defined */
 #else /* __CRT_HAVE_ioctl && __TCSBRK */

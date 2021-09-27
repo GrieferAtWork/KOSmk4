@@ -25,19 +25,19 @@
 
 #if defined(__i386__) && !defined(__x86_64__)
 #define LIBREGEX_CC __ATTR_FASTCALL
-#else
+#else /* ... */
 #define LIBREGEX_CC /* nothing */
-#endif
+#endif /* !... */
 
 #if 0
-#define LIBREGEX_WANT_PROTOTYPES 1
+#define LIBREGEX_WANT_PROTOTYPES
 #endif
 
 #ifdef __LIBREGEX_STATIC
 #define LIBREGEX_DECL __INTDEF
-#else
+#else /* ... */
 #define LIBREGEX_DECL __IMPDEF
-#endif
+#endif /* !... */
 
 /* Library name for use with `dlopen()' */
 #define LIBREGEX_LIBRARY_NAME "libregex.so"

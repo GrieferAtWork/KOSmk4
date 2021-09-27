@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd07f98a4 */
+/* HASH CRC-32:0x4e13e4a */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -42,7 +42,7 @@
 __SYSDECL_BEGIN
 
 #ifndef __wremove_defined
-#define __wremove_defined 1
+#define __wremove_defined
 #ifdef __CRT_HAVE_wremove
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,wremove,(wchar_t const *__filename),(__filename))
 #elif defined(__CRT_HAVE__wremove)
@@ -62,7 +62,7 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__FILE *,__NOTHROW_NCX,wfreopen
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__FILE *,__NOTHROW_NCX,wfreopen,(wchar_t const *__filename, wchar_t const *__mode, __FILE *__stream),_wfreopen,(__filename,__mode,__stream))
 #endif /* ... */
 #ifndef __wpopen_defined
-#define __wpopen_defined 1
+#define __wpopen_defined
 #ifdef __CRT_HAVE_wpopen
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__FILE *,__NOTHROW_NCX,wpopen,(wchar_t const *__command, wchar_t const *__mode),(__command,__mode))
 #elif defined(__CRT_HAVE__wpopen)

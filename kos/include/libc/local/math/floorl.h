@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x60952cab */
+/* HASH CRC-32:0xca07c922 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_floorl_defined
-#define __local_floorl_defined 1
+#define __local_floorl_defined
 #include <__crt.h>
 #include <hybrid/typecore.h>
 #include <libm/floor.h>
@@ -38,7 +38,7 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(floorl))(__LONGDOUBLE __x) {
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_floorl_defined
-#define __local___localdep_floorl_defined 1
+#define __local___localdep_floorl_defined
 #define __localdep_floorl __LIBC_LOCAL_NAME(floorl)
 #endif /* !__local___localdep_floorl_defined */
 #endif /* !__local_floorl_defined */

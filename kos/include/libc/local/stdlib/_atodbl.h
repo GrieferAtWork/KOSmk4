@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd638fcd6 */
+/* HASH CRC-32:0x87bfecd2 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,12 +19,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local__atodbl_defined
-#define __local__atodbl_defined 1
+#define __local__atodbl_defined
 #include <__crt.h>
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_strtod_defined
-#define __local___localdep_strtod_defined 1
+#define __local___localdep_strtod_defined
 #ifdef __CRT_HAVE_strtod
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),double,__NOTHROW_NCX,__localdep_strtod,(char const *__restrict __nptr, char **__endptr),strtod,(__nptr,__endptr))
 #elif defined(__CRT_HAVE_strtold) && __SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__
@@ -43,7 +43,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_atodbl))(double *__restrict __result
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep__atodbl_defined
-#define __local___localdep__atodbl_defined 1
+#define __local___localdep__atodbl_defined
 #define __localdep__atodbl __LIBC_LOCAL_NAME(_atodbl)
 #endif /* !__local___localdep__atodbl_defined */
 #endif /* !__local__atodbl_defined */

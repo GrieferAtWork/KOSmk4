@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x33f47bac */
+/* HASH CRC-32:0x8f698d8c */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local__ui64toa_s_defined
-#define __local__ui64toa_s_defined 1
+#define __local__ui64toa_s_defined
 #include <__crt.h>
 #include <bits/types.h>
 #include <libc/errno.h>
@@ -53,7 +53,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_ui64toa_s))(__UINT64_TYPE__ __val, c
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep__ui64toa_s_defined
-#define __local___localdep__ui64toa_s_defined 1
+#define __local___localdep__ui64toa_s_defined
 #define __localdep__ui64toa_s __LIBC_LOCAL_NAME(_ui64toa_s)
 #endif /* !__local___localdep__ui64toa_s_defined */
 #endif /* !__local__ui64toa_s_defined */

@@ -66,7 +66,7 @@ DECL_BEGIN
 
 /* Globals defined by libdl.so */
 #undef ____peb_defined
-#define ____peb_defined 1
+#define ____peb_defined
 #undef __peb
 #undef __argc
 #undef __argv
@@ -111,13 +111,13 @@ DECLARE_NOREL_GLOBAL_META(char **, environ);   /* aka. `_environ', `__environ' *
 
 /* <stdio.h> */
 #ifndef __std_FILE_defined
-#define __std_FILE_defined 1
+#define __std_FILE_defined
 __NAMESPACE_STD_BEGIN
 typedef __FILE FILE;
 __NAMESPACE_STD_END
 #endif /* !__std_FILE_defined */
 #ifndef __FILE_defined
-#define __FILE_defined 1
+#define __FILE_defined
 __NAMESPACE_STD_USING(FILE)
 #endif /* !__FILE_defined */
 #undef __local_stdstream_defined
@@ -131,14 +131,14 @@ __NAMESPACE_STD_USING(FILE)
 DECLARE_NOREL_GLOBAL_META(FILE *, stdin);
 DECLARE_NOREL_GLOBAL_META(FILE *, stdout);
 DECLARE_NOREL_GLOBAL_META(FILE *, stderr);
-#define __local_stdstream_defined 1
+#define __local_stdstream_defined
 #define __LOCAL_stdin  GET_NOREL_GLOBAL(stdin)
 #define __LOCAL_stdout GET_NOREL_GLOBAL(stdout)
 #define __LOCAL_stderr GET_NOREL_GLOBAL(stderr)
-#define __stdstreams_defined 1
-#define stdin          GET_NOREL_GLOBAL(stdin)
-#define stdout         GET_NOREL_GLOBAL(stdout)
-#define stderr         GET_NOREL_GLOBAL(stderr)
+#define __stdstreams_defined
+#define stdin  GET_NOREL_GLOBAL(stdin)
+#define stdout GET_NOREL_GLOBAL(stdout)
+#define stderr GET_NOREL_GLOBAL(stderr)
 
 
 /* <error.h> */
@@ -163,7 +163,7 @@ DECLARE_NOREL_GLOBAL_META(int, error_one_per_line);
 /* <regex.h> */
 #undef re_syntax_options
 #ifndef __reg_syntax_t_defined
-#define __reg_syntax_t_defined 1
+#define __reg_syntax_t_defined
 typedef __ULONGPTR_TYPE__ reg_syntax_t; /* Set of `RE_*' */
 #endif /* !__reg_syntax_t_defined */
 DECLARE_NOREL_GLOBAL_META(reg_syntax_t, re_syntax_options);

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x86fbaa3f */
+/* HASH CRC-32:0x205b2a35 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,11 +19,11 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_mbtoc32_defined
-#define __local_mbtoc32_defined 1
+#define __local_mbtoc32_defined
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_uchar_mbrtoc32_defined
-#define __local___localdep_uchar_mbrtoc32_defined 1
+#define __local___localdep_uchar_mbrtoc32_defined
 #if defined(__CRT_HAVE_mbrtowc) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
 __NAMESPACE_LOCAL_END
 #include <bits/crt/mbstate.h>
@@ -78,7 +78,7 @@ __NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(mbtoc32))(__CHAR32_TYPE__ *__restrict
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_mbtoc32_defined
-#define __local___localdep_mbtoc32_defined 1
+#define __local___localdep_mbtoc32_defined
 #define __localdep_mbtoc32 __LIBC_LOCAL_NAME(mbtoc32)
 #endif /* !__local___localdep_mbtoc32_defined */
 #endif /* !__local_mbtoc32_defined */

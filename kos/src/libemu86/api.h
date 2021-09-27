@@ -22,7 +22,7 @@
 
 #include <hybrid/host.h>
 
-#define LIBEMU86_WANT_PROTOTYPES 1
+#define LIBEMU86_WANT_PROTOTYPES
 #define CONFIG_LIBEMU86_WANT_32BIT 1
 #ifdef __x86_64__
 /* Disable 16-bit support on 64-bit x86_64 targets by default. */

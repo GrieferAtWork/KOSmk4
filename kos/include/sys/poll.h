@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x106242f6 */
+/* HASH CRC-32:0x84005b81 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -129,7 +129,7 @@
 __SYSDECL_BEGIN
 
 #ifndef __nfds_t_defined
-#define __nfds_t_defined 1
+#define __nfds_t_defined
 typedef __UINTPTR_TYPE__ nfds_t;
 #endif /* !__nfds_t_defined */
 

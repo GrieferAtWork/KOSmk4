@@ -38,15 +38,15 @@
 #else /* __CXX_SYSTEM_HEADER */
 /* Import all symbols into the global namespace when re-including "ctype.h" after "cctype" */
 #ifndef __ptrdiff_t_defined
-#define __ptrdiff_t_defined 1
+#define __ptrdiff_t_defined
 __NAMESPACE_STD_USING(ptrdiff_t)
 #endif /* !__ptrdiff_t_defined */
 #ifndef __size_t_defined
-#define __size_t_defined 1
+#define __size_t_defined
 __NAMESPACE_STD_USING(size_t)
 #endif /* !__size_t_defined */
 #ifndef __max_align_t_defined
-#define __max_align_t_defined 1
+#define __max_align_t_defined
 __NAMESPACE_STD_USING(max_align_t)
 #endif /* !__max_align_t_defined */
 #undef _CXX_STDONLY_CSTDDEF
@@ -70,24 +70,24 @@ __SYSDECL_BEGIN
 __NAMESPACE_STD_BEGIN
 
 #ifndef __std_ptrdiff_t_defined
-#define __std_ptrdiff_t_defined 1
+#define __std_ptrdiff_t_defined
 typedef __PTRDIFF_TYPE__ ptrdiff_t;
 #endif /* !__std_ptrdiff_t_defined */
 
 #ifndef __std_size_t_defined
-#define __std_size_t_defined 1
+#define __std_size_t_defined
 typedef __SIZE_TYPE__ size_t;
 #endif /* !__std_size_t_defined */
 
 #ifndef __std_max_align_t_defined
-#define __std_max_align_t_defined 1
+#define __std_max_align_t_defined
 typedef __MAX_ALIGN_TYPE__ max_align_t;
 #endif /* !__std_max_align_t_defined */
 
 #ifdef __cplusplus
 #ifdef __USE_ISOCXX11
 #ifndef __std_nullptr_t_defined
-#define __std_nullptr_t_defined 1
+#define __std_nullptr_t_defined
 #if defined(__COMPILER_HAVE_CXX_DECLTYPE) && defined(__COMPILER_HAVE_CXX_NULLPTR)
 typedef decltype(nullptr) nullptr_t;
 #else /* __COMPILER_HAVE_CXX_DECLTYPE && __COMPILER_HAVE_CXX_NULLPTR */
@@ -101,21 +101,21 @@ __NAMESPACE_STD_END
 
 #ifndef __CXX_SYSTEM_HEADER
 #ifndef __ptrdiff_t_defined
-#define __ptrdiff_t_defined 1
+#define __ptrdiff_t_defined
 __NAMESPACE_STD_USING(ptrdiff_t)
 #endif /* !__ptrdiff_t_defined */
 #ifndef __size_t_defined
-#define __size_t_defined 1
+#define __size_t_defined
 __NAMESPACE_STD_USING(size_t)
 #endif /* !__size_t_defined */
 #ifndef __max_align_t_defined
-#define __max_align_t_defined 1
+#define __max_align_t_defined
 __NAMESPACE_STD_USING(max_align_t)
 #endif /* !__max_align_t_defined */
 #endif /* !__CXX_SYSTEM_HEADER */
 
 #ifndef __wchar_t_defined
-#define __wchar_t_defined 1
+#define __wchar_t_defined
 typedef __WCHAR_TYPE__ wchar_t;
 #endif /* !__wchar_t_defined */
 
@@ -137,7 +137,7 @@ typedef __WCHAR_TYPE__ wchar_t;
 __SYSDECL_END
 
 #ifdef __CXX_SYSTEM_HEADER
-#define _CXX_STDONLY_CSTDDEF 1
+#define _CXX_STDONLY_CSTDDEF
 #undef _STDDEF_H
 #endif /* __CXX_SYSTEM_HEADER */
 #endif /* !_CXX_STDONLY_CSTDDEF */

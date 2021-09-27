@@ -74,8 +74,6 @@ __SYSDECL_BEGIN
 #undef esterror
 #undef tai
 
-#ifndef __ntptimeval_defined
-#define __ntptimeval_defined 1
 struct ntptimeval /*[PREFIX()]*/ {
 	struct timeval       time;            /* ??? */
 	__LONGPTR_TYPE__     maxerror;        /* ??? */
@@ -86,21 +84,17 @@ struct ntptimeval /*[PREFIX()]*/ {
 	__LONGPTR_TYPE__   __glibc_reserved3; /* ... */
 	__LONGPTR_TYPE__   __glibc_reserved4; /* ... */
 };
-#endif /* !__ntptimeval_defined */
 
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 #define _NTPTIMEVAL_MATCHES_NTPTIMEVAL64 1
 #endif /* __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ */
 
 #ifdef __USE_TIME64
-#ifndef __ntptimeval64_defined
-#define __ntptimeval64_defined 1
 #if (defined(__USE_TIME_BITS64) || defined(_NTPTIMEVAL_MATCHES_NTPTIMEVAL64)) && defined(__USE_STRUCT64_MACRO)
 #define ntptimeval64 ntptimeval
 #else /* (__USE_TIME_BITS64 || _NTPTIMEVAL_MATCHES_NTPTIMEVAL64) && __USE_STRUCT64_MACRO */
 #define __ntptimeval64 ntptimeval64
 #endif /* (!__USE_TIME_BITS64 && !_NTPTIMEVAL_MATCHES_NTPTIMEVAL64) || !__USE_STRUCT64_MACRO */
-#endif /* !__ntptimeval64_defined */
 #endif /* __USE_TIME64 */
 
 #if (defined(__USE_TIME_BITS64) || defined(_NTPTIMEVAL_MATCHES_NTPTIMEVAL64)) && defined(__USE_STRUCT64_MACRO)
@@ -119,14 +113,11 @@ struct __ntptimeval64 /*[NAME(ntptimeval64)][PREFIX()]*/ {
 #endif /* (!__USE_TIME_BITS64 && !_NTPTIMEVAL_MATCHES_NTPTIMEVAL64) || !__USE_STRUCT64_MACRO */
 
 #ifdef __USE_KOS
-#ifndef __ntptimeval32_defined
-#define __ntptimeval32_defined 1
 #if !defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 #define ntptimeval32 ntptimeval
 #else /* !__USE_TIME_BITS64 || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ */
 #define __ntptimeval32 ntptimeval32
 #endif /* __USE_TIME_BITS64 && __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
-#endif /* !__ntptimeval32_defined */
 #endif /* __USE_KOS */
 
 #if !defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfe4ed576 */
+/* HASH CRC-32:0x4eb89e86 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,11 +19,11 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local__wtof_l_defined
-#define __local__wtof_l_defined 1
+#define __local__wtof_l_defined
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_wcstod_l_defined
-#define __local___localdep_wcstod_l_defined 1
+#define __local___localdep_wcstod_l_defined
 #ifdef __CRT_HAVE_wcstod_l
 __CREDIRECT(__ATTR_NONNULL((1)),double,__NOTHROW_NCX,__localdep_wcstod_l,(__WCHAR_TYPE__ const *__restrict __nptr, __WCHAR_TYPE__ **__endptr, __locale_t __locale),wcstod_l,(__nptr,__endptr,__locale))
 #elif defined(__CRT_HAVE__wcstod_l)
@@ -43,7 +43,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_wtof_l))(__WCHAR_TYPE__ const *__npt
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep__wtof_l_defined
-#define __local___localdep__wtof_l_defined 1
+#define __local___localdep__wtof_l_defined
 #define __localdep__wtof_l __LIBC_LOCAL_NAME(_wtof_l)
 #endif /* !__local___localdep__wtof_l_defined */
 #endif /* !__local__wtof_l_defined */

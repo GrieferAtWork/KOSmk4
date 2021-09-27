@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x55581ef2 */
+/* HASH CRC-32:0x8dc505b7 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_srand_defined
-#define __local_srand_defined 1
+#define __local_srand_defined
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(srand) void
@@ -30,7 +30,7 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(srand))(long __seed) {
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_srand_defined
-#define __local___localdep_srand_defined 1
+#define __local___localdep_srand_defined
 #define __localdep_srand __LIBC_LOCAL_NAME(srand)
 #endif /* !__local___localdep_srand_defined */
 #endif /* !__local_srand_defined */

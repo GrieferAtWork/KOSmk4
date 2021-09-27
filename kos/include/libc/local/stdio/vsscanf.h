@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xce5b30d */
+/* HASH CRC-32:0x2aebdd1b */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,12 +19,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_vsscanf_defined
-#define __local_vsscanf_defined 1
+#define __local_vsscanf_defined
 #include <__crt.h>
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_format_vscanf_defined
-#define __local___localdep_format_vscanf_defined 1
+#define __local___localdep_format_vscanf_defined
 #ifdef __CRT_HAVE_format_vscanf
 __NAMESPACE_LOCAL_END
 #include <kos/anno.h>
@@ -40,7 +40,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__CRT_HAVE_format_vscanf */
 #endif /* !__local___localdep_format_vscanf_defined */
 #ifndef __local___localdep_unicode_readutf8_defined
-#define __local___localdep_unicode_readutf8_defined 1
+#define __local___localdep_unicode_readutf8_defined
 #ifdef __CRT_HAVE_unicode_readutf8
 __CREDIRECT(__ATTR_NONNULL((1)),__CHAR32_TYPE__,__NOTHROW_NCX,__localdep_unicode_readutf8,(char const **__restrict __ptext),unicode_readutf8,(__ptext))
 #else /* __CRT_HAVE_unicode_readutf8 */
@@ -51,7 +51,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__CRT_HAVE_unicode_readutf8 */
 #endif /* !__local___localdep_unicode_readutf8_defined */
 #ifndef __local___localdep_unicode_readutf8_rev_defined
-#define __local___localdep_unicode_readutf8_rev_defined 1
+#define __local___localdep_unicode_readutf8_rev_defined
 #ifdef __CRT_HAVE_unicode_readutf8_rev
 __CREDIRECT(__ATTR_NONNULL((1)),__CHAR32_TYPE__,__NOTHROW_NCX,__localdep_unicode_readutf8_rev,(char const **__restrict __ptext),unicode_readutf8_rev,(__ptext))
 #else /* __CRT_HAVE_unicode_readutf8_rev */
@@ -66,7 +66,7 @@ __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 #include <bits/crt/format-printer.h>
 #ifndef ____vsscanf_getc_defined
-#define ____vsscanf_getc_defined 1
+#define ____vsscanf_getc_defined
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(vsscanf_getc) __SSIZE_TYPE__
 (__FORMATPRINTER_CC __vsscanf_getc)(void *__arg) {
@@ -104,7 +104,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(vsscanf))(char const *__restrict __in
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_vsscanf_defined
-#define __local___localdep_vsscanf_defined 1
+#define __local___localdep_vsscanf_defined
 #define __localdep_vsscanf __LIBC_LOCAL_NAME(vsscanf)
 #endif /* !__local___localdep_vsscanf_defined */
 #endif /* !__local_vsscanf_defined */

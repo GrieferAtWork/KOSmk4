@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1382461e */
+/* HASH CRC-32:0xb88c3a89 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,11 +19,11 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_itoa_defined
-#define __local_itoa_defined 1
+#define __local_itoa_defined
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep__itoa_s_defined
-#define __local___localdep__itoa_s_defined 1
+#define __local___localdep__itoa_s_defined
 #ifdef __CRT_HAVE__itoa_s
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
@@ -58,7 +58,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(itoa))(int __val, char *__buf, int __
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_itoa_defined
-#define __local___localdep_itoa_defined 1
+#define __local___localdep_itoa_defined
 #define __localdep_itoa __LIBC_LOCAL_NAME(itoa)
 #endif /* !__local___localdep_itoa_defined */
 #endif /* !__local_itoa_defined */

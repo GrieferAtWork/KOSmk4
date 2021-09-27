@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5616106b */
+/* HASH CRC-32:0x4c2669b7 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,14 +19,14 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_toctrans32_l_defined
-#define __local_toctrans32_l_defined 1
+#define __local_toctrans32_l_defined
 #include <__crt.h>
 #if (defined(__CRT_HAVE_towctrans) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)) || defined(__CRT_HAVE_KOS$towctrans) || (defined(__CRT_HAVE___towctrans) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)) || defined(__CRT_HAVE_KOS$__towctrans) || (defined(__CRT_KOS) && defined(__CRT_HAVE___unicode_descriptor))
 #include <hybrid/typecore.h>
 #include <bits/crt/wctype.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_toctrans32_defined
-#define __local___localdep_toctrans32_defined 1
+#define __local___localdep_toctrans32_defined
 #if defined(__CRT_HAVE_towctrans) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__WINT32_TYPE__,__NOTHROW_NCX,__localdep_toctrans32,(__WINT32_TYPE__ __wc, __wctrans_t __desc),towctrans,(__wc,__desc))
 #elif defined(__CRT_HAVE_KOS$towctrans)
@@ -57,7 +57,7 @@ __NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(toctrans32_l))(__WINT32_TYPE__ __wc, 
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_toctrans32_l_defined
-#define __local___localdep_toctrans32_l_defined 1
+#define __local___localdep_toctrans32_l_defined
 #define __localdep_toctrans32_l __LIBC_LOCAL_NAME(toctrans32_l)
 #endif /* !__local___localdep_toctrans32_l_defined */
 #else /* (__CRT_HAVE_towctrans && __SIZEOF_WCHAR_T__ == 4 && __LIBCCALL_IS_LIBKCALL) || __CRT_HAVE_KOS$towctrans || (__CRT_HAVE___towctrans && __SIZEOF_WCHAR_T__ == 4 && __LIBCCALL_IS_LIBKCALL) || __CRT_HAVE_KOS$__towctrans || (__CRT_KOS && __CRT_HAVE___unicode_descriptor) */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x65725f11 */
+/* HASH CRC-32:0xf7baabf8 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,11 +19,11 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_wctomb_defined
-#define __local_wctomb_defined 1
+#define __local_wctomb_defined
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_wcrtomb_defined
-#define __local___localdep_wcrtomb_defined 1
+#define __local___localdep_wcrtomb_defined
 #ifdef __CRT_HAVE_wcrtomb
 __NAMESPACE_LOCAL_END
 #include <bits/crt/mbstate.h>
@@ -55,7 +55,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wctomb))(char *__str, __WCHAR_TYPE__ 
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_wctomb_defined
-#define __local___localdep_wctomb_defined 1
+#define __local___localdep_wctomb_defined
 #define __localdep_wctomb __LIBC_LOCAL_NAME(wctomb)
 #endif /* !__local___localdep_wctomb_defined */
 #endif /* !__local_wctomb_defined */

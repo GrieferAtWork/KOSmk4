@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x73ac64de */
+/* HASH CRC-32:0xa466c41c */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,14 +19,14 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_settimeofday64_defined
-#define __local_settimeofday64_defined 1
+#define __local_settimeofday64_defined
 #include <__crt.h>
 #ifdef __CRT_HAVE_settimeofday
 #include <bits/os/timeval.h>
 struct timezone;
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_settimeofday32_defined
-#define __local___localdep_settimeofday32_defined 1
+#define __local___localdep_settimeofday32_defined
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_settimeofday32,(struct __timeval32 const *__tv, struct timezone const *__tz),settimeofday,(__tv,__tz))
 #endif /* !__local___localdep_settimeofday32_defined */
 __LOCAL_LIBC(settimeofday64) int
@@ -40,7 +40,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(settimeofday64))(struct __timeval64 c
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_settimeofday64_defined
-#define __local___localdep_settimeofday64_defined 1
+#define __local___localdep_settimeofday64_defined
 #define __localdep_settimeofday64 __LIBC_LOCAL_NAME(settimeofday64)
 #endif /* !__local___localdep_settimeofday64_defined */
 #else /* __CRT_HAVE_settimeofday */

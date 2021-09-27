@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe9fd45c7 */
+/* HASH CRC-32:0x39d5a9d9 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,13 +19,13 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_gettimeofday64_defined
-#define __local_gettimeofday64_defined 1
+#define __local_gettimeofday64_defined
 #include <__crt.h>
 #if defined(__CRT_HAVE_gettimeofday) || defined(__CRT_HAVE___gettimeofday)
 #include <bits/os/timeval.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_gettimeofday32_defined
-#define __local___localdep_gettimeofday32_defined 1
+#define __local___localdep_gettimeofday32_defined
 #ifdef __CRT_HAVE_gettimeofday
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_gettimeofday32,(struct __timeval32 *__restrict __tv, void * __tz),gettimeofday,(__tv,__tz))
 #elif defined(__CRT_HAVE___gettimeofday)
@@ -49,7 +49,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(gettimeofday64))(struct __timeval64 *
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_gettimeofday64_defined
-#define __local___localdep_gettimeofday64_defined 1
+#define __local___localdep_gettimeofday64_defined
 #define __localdep_gettimeofday64 __LIBC_LOCAL_NAME(gettimeofday64)
 #endif /* !__local___localdep_gettimeofday64_defined */
 #else /* __CRT_HAVE_gettimeofday || __CRT_HAVE___gettimeofday */

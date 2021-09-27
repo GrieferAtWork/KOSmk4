@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6d9141c8 */
+/* HASH CRC-32:0x5effda59 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_qsort_r_defined
-#define __local_qsort_r_defined 1
+#define __local_qsort_r_defined
 #include <__crt.h>
 #include <hybrid/typecore.h>
 #include <kos/anno.h>
@@ -79,7 +79,7 @@ __LOCAL_LIBC(qsort_r) __ATTR_NONNULL((1, 4)) void
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_qsort_r_defined
-#define __local___localdep_qsort_r_defined 1
+#define __local___localdep_qsort_r_defined
 #define __localdep_qsort_r __LIBC_LOCAL_NAME(qsort_r)
 #endif /* !__local___localdep_qsort_r_defined */
 #endif /* !__local_qsort_r_defined */

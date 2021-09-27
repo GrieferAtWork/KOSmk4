@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4bd2628e */
+/* HASH CRC-32:0xb65df36c */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -570,7 +570,7 @@
  * an  approximation of its contents (adjusted for KOS). */
 #undef __DYNAMIC_REENT__
 #undef __LINUX_ERRNO_EXTENSIONS__
-#define __DYNAMIC_REENT__ 1
+#define __DYNAMIC_REENT__          1
 #define __LINUX_ERRNO_EXTENSIONS__ 1
 
 #undef _READ_WRITE_RETURN_TYPE
@@ -585,7 +585,7 @@
 
 #ifdef __CC__
 #ifndef __size_t_defined
-#define __size_t_defined 1
+#define __size_t_defined
 __DECL_BEGIN
 typedef __SIZE_TYPE__ size_t;
 __DECL_END

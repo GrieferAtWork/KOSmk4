@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x227f05b8 */
+/* HASH CRC-32:0xd9c373ab */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,13 +19,13 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_gmtime_r_defined
-#define __local_gmtime_r_defined 1
+#define __local_gmtime_r_defined
 #include <__crt.h>
 #include <bits/types.h>
 #include <bits/crt/tm.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_dos_gmtime_s_defined
-#define __local___localdep_dos_gmtime_s_defined 1
+#define __local___localdep_dos_gmtime_s_defined
 __NAMESPACE_LOCAL_END
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -43,7 +43,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_dos_gmtime_s_defined */
 #ifndef __local___localdep_gmtime64_r_defined
-#define __local___localdep_gmtime64_r_defined 1
+#define __local___localdep_gmtime64_r_defined
 #if defined(__CRT_HAVE_gmtime_r) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 __CREDIRECT(__ATTR_NONNULL((1, 2)),struct __NAMESPACE_STD_SYM tm *,__NOTHROW_NCX,__localdep_gmtime64_r,(__time64_t const *__restrict __timer, struct __NAMESPACE_STD_SYM tm *__restrict __tp),gmtime_r,(__timer,__tp))
 #elif defined(__CRT_HAVE_gmtime64_r)
@@ -133,7 +133,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(gmtime_r))(__TM_TYPE(time) const *__r
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_gmtime_r_defined
-#define __local___localdep_gmtime_r_defined 1
+#define __local___localdep_gmtime_r_defined
 #define __localdep_gmtime_r __LIBC_LOCAL_NAME(gmtime_r)
 #endif /* !__local___localdep_gmtime_r_defined */
 #endif /* !__local_gmtime_r_defined */

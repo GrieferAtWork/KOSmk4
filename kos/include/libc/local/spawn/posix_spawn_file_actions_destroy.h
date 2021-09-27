@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x93a1d4d4 */
+/* HASH CRC-32:0x3db60940 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,14 +19,14 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_posix_spawn_file_actions_destroy_defined
-#define __local_posix_spawn_file_actions_destroy_defined 1
+#define __local_posix_spawn_file_actions_destroy_defined
 #include <__crt.h>
 #include <asm/crt/posix_spawn.h>
 #ifdef __POSIX_SPAWN_USE_KOS
 #include <bits/crt/posix_spawn.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_free_defined
-#define __local___localdep_free_defined 1
+#define __local___localdep_free_defined
 #if __has_builtin(__builtin_free) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_free)
 __CEIREDIRECT(,void,__NOTHROW_NCX,__localdep_free,(void *__mallptr),free,{ __builtin_free(__mallptr); })
 #elif defined(__CRT_HAVE_free)
@@ -38,7 +38,7 @@ __CREDIRECT_VOID(,__NOTHROW_NCX,__localdep_free,(void *__mallptr),cfree,(__mallp
 #endif /* !... */
 #endif /* !__local___localdep_free_defined */
 #ifndef __local___localdep_memset_defined
-#define __local___localdep_memset_defined 1
+#define __local___localdep_memset_defined
 #ifdef __CRT_HAVE_memset
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
@@ -87,7 +87,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(posix_spawn_file_actions_destroy))(st
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_posix_spawn_file_actions_destroy_defined
-#define __local___localdep_posix_spawn_file_actions_destroy_defined 1
+#define __local___localdep_posix_spawn_file_actions_destroy_defined
 #define __localdep_posix_spawn_file_actions_destroy __LIBC_LOCAL_NAME(posix_spawn_file_actions_destroy)
 #endif /* !__local___localdep_posix_spawn_file_actions_destroy_defined */
 #else /* __POSIX_SPAWN_USE_KOS */

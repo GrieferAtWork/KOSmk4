@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6454ffa0 */
+/* HASH CRC-32:0x69a55421 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,14 +19,14 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_fopen_s_defined
-#define __local_fopen_s_defined 1
+#define __local_fopen_s_defined
 #include <__crt.h>
 #include <asm/os/oflags.h>
 #if (defined(__CRT_HAVE_fopen) && (!defined(__O_LARGEFILE) || !__O_LARGEFILE)) || defined(__CRT_HAVE_fopen64)
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_fopen64_defined
-#define __local___localdep_fopen64_defined 1
+#define __local___localdep_fopen64_defined
 #if defined(__CRT_HAVE_fopen) && (!defined(__O_LARGEFILE) || !__O_LARGEFILE)
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__FILE *,__NOTHROW_RPC,__localdep_fopen64,(char const *__restrict __filename, char const *__restrict __modes),fopen,(__filename,__modes))
 #elif defined(__CRT_HAVE_fopen64)
@@ -61,7 +61,7 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(fopen_s))(__FILE **__pstream, char co
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_fopen_s_defined
-#define __local___localdep_fopen_s_defined 1
+#define __local___localdep_fopen_s_defined
 #define __localdep_fopen_s __LIBC_LOCAL_NAME(fopen_s)
 #endif /* !__local___localdep_fopen_s_defined */
 #else /* (__CRT_HAVE_fopen && (!__O_LARGEFILE || !__O_LARGEFILE)) || __CRT_HAVE_fopen64 */

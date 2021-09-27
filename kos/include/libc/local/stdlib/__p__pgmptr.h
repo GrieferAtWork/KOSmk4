@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6005fff4 */
+/* HASH CRC-32:0x1021658b */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local___p__pgmptr_defined
-#define __local___p__pgmptr_defined 1
+#define __local___p__pgmptr_defined
 #include <__crt.h>
 #include <libc/template/program_invocation_name.h>
 #ifdef __LOCAL_program_invocation_name_p
@@ -30,7 +30,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(__p__pgmptr))(void) {
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep___p__pgmptr_defined
-#define __local___localdep___p__pgmptr_defined 1
+#define __local___localdep___p__pgmptr_defined
 #define __localdep___p__pgmptr __LIBC_LOCAL_NAME(__p__pgmptr)
 #endif /* !__local___localdep___p__pgmptr_defined */
 #else /* __LOCAL_program_invocation_name_p */

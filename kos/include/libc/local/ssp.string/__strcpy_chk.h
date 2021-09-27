@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc9833292 */
+/* HASH CRC-32:0x1e22e600 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,12 +19,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local___strcpy_chk_defined
-#define __local___strcpy_chk_defined 1
+#define __local___strcpy_chk_defined
 #include <__crt.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_strcpy_defined
-#define __local___localdep_strcpy_defined 1
+#define __local___localdep_strcpy_defined
 #if __has_builtin(__builtin_strcpy) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_strcpy)
 __CEIREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),char *,__NOTHROW_NCX,__localdep_strcpy,(char *__restrict __dst, char const *__restrict __src),strcpy,{ return __builtin_strcpy(__dst, __src); })
 #elif defined(__CRT_HAVE_strcpy)
@@ -46,7 +46,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(__strcpy_chk))(char *__restrict __dst
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep___strcpy_chk_defined
-#define __local___localdep___strcpy_chk_defined 1
+#define __local___localdep___strcpy_chk_defined
 #define __localdep___strcpy_chk __LIBC_LOCAL_NAME(__strcpy_chk)
 #endif /* !__local___localdep___strcpy_chk_defined */
 #endif /* !__local___strcpy_chk_defined */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xae235818 */
+/* HASH CRC-32:0x891ca296 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,13 +19,13 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local__msize_dbg_defined
-#define __local__msize_dbg_defined 1
+#define __local__msize_dbg_defined
 #include <__crt.h>
 #if defined(__CRT_HAVE_malloc_usable_size) || defined(__CRT_HAVE__msize)
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_malloc_usable_size_defined
-#define __local___localdep_malloc_usable_size_defined 1
+#define __local___localdep_malloc_usable_size_defined
 #ifdef __CRT_HAVE_malloc_usable_size
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,__SIZE_TYPE__,__NOTHROW_NCX,__localdep_malloc_usable_size,(void *__restrict __mallptr),malloc_usable_size,(__mallptr))
 #elif defined(__CRT_HAVE__msize)
@@ -41,7 +41,7 @@ __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(_msize_dbg))(void *__ptr, int __block
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep__msize_dbg_defined
-#define __local___localdep__msize_dbg_defined 1
+#define __local___localdep__msize_dbg_defined
 #define __localdep__msize_dbg __LIBC_LOCAL_NAME(_msize_dbg)
 #endif /* !__local___localdep__msize_dbg_defined */
 #else /* __CRT_HAVE_malloc_usable_size || __CRT_HAVE__msize */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3deb864 */
+/* HASH CRC-32:0x6116823e */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,12 +19,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local__wsearchenv_defined
-#define __local__wsearchenv_defined 1
+#define __local__wsearchenv_defined
 #include <__crt.h>
 #ifdef __CRT_HAVE__wsearchenv_s
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep__wsearchenv_s_defined
-#define __local___localdep__wsearchenv_s_defined 1
+#define __local___localdep__wsearchenv_s_defined
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -36,7 +36,7 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(_wsearchenv))(__WCHAR_TYPE__ const *_
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep__wsearchenv_defined
-#define __local___localdep__wsearchenv_defined 1
+#define __local___localdep__wsearchenv_defined
 #define __localdep__wsearchenv __LIBC_LOCAL_NAME(_wsearchenv)
 #endif /* !__local___localdep__wsearchenv_defined */
 #else /* __CRT_HAVE__wsearchenv_s */

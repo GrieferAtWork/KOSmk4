@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x78b0ca62 */
+/* HASH CRC-32:0x2d457532 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -39,7 +39,7 @@ __SYSDECL_BEGIN
 #define _sys_errlist sys_errlist
 #else /* sys_errlist */
 #if !defined(____sys_errlist_defined) && defined(__CRT_HAVE___sys_errlist)
-#define ____sys_errlist_defined 1
+#define ____sys_errlist_defined
 __CDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,char const *const *,__NOTHROW,__sys_errlist,(void),())
 #endif /* !____sys_errlist_defined && __CRT_HAVE___sys_errlist */
 #ifdef ____sys_errlist_defined
@@ -68,7 +68,7 @@ __LIBC char const *const sys_errlist[];
 #define _sys_nerr sys_nerr
 #else /* sys_nerr */
 #if !defined(____sys_nerr_defined) && defined(__CRT_HAVE___sys_nerr)
-#define ____sys_nerr_defined 1
+#define ____sys_nerr_defined
 __CDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,int *,__NOTHROW,__sys_nerr,(void),())
 #endif /* !____sys_nerr_defined && __CRT_HAVE___sys_nerr */
 #ifdef ____sys_nerr_defined
@@ -99,7 +99,7 @@ __LIBC int sys_nerr;
 #define sys_errlist _sys_errlist
 #else /* _sys_errlist */
 #if !defined(____sys_errlist_defined) && defined(__CRT_HAVE___sys_errlist)
-#define ____sys_errlist_defined 1
+#define ____sys_errlist_defined
 __CDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,char const *const *,__NOTHROW,__sys_errlist,(void),())
 #endif /* !____sys_errlist_defined && __CRT_HAVE___sys_errlist */
 #ifdef ____sys_errlist_defined
@@ -128,7 +128,7 @@ __LIBC char const *const sys_errlist[];
 #define sys_nerr _sys_nerr
 #else /* _sys_nerr */
 #if !defined(____sys_nerr_defined) && defined(__CRT_HAVE___sys_nerr)
-#define ____sys_nerr_defined 1
+#define ____sys_nerr_defined
 __CDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,int *,__NOTHROW,__sys_nerr,(void),())
 #endif /* !____sys_nerr_defined && __CRT_HAVE___sys_nerr */
 #ifdef ____sys_nerr_defined

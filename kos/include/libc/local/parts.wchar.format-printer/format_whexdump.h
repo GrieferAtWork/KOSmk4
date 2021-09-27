@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc20c9558 */
+/* HASH CRC-32:0x3f1193ba */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,14 +19,14 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_format_whexdump_defined
-#define __local_format_whexdump_defined 1
+#define __local_format_whexdump_defined
 #include <__crt.h>
 #include <kos/anno.h>
 #include <bits/crt/wformat-printer.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_format_wrepeat_defined
-#define __local___localdep_format_wrepeat_defined 1
+#define __local___localdep_format_wrepeat_defined
 #ifdef __CRT_HAVE_format_wrepeat
 __CREDIRECT(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,__localdep_format_wrepeat,(__pwformatprinter __printer, void *__arg, __WCHAR_TYPE__ __ch, __SIZE_TYPE__ __num_repetitions),format_wrepeat,(__printer,__arg,__ch,__num_repetitions))
 #else /* __CRT_HAVE_format_wrepeat */
@@ -37,7 +37,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__CRT_HAVE_format_wrepeat */
 #endif /* !__local___localdep_format_wrepeat_defined */
 #ifndef __local___localdep_iswprint_defined
-#define __local___localdep_iswprint_defined 1
+#define __local___localdep_iswprint_defined
 __NAMESPACE_LOCAL_END
 #include <bits/crt/wctype.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -253,7 +253,7 @@ __err:
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_format_whexdump_defined
-#define __local___localdep_format_whexdump_defined 1
+#define __local___localdep_format_whexdump_defined
 #define __localdep_format_whexdump __LIBC_LOCAL_NAME(format_whexdump)
 #endif /* !__local___localdep_format_whexdump_defined */
 #endif /* !__local_format_whexdump_defined */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf2258592 */
+/* HASH CRC-32:0x10ca321e */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -75,7 +75,7 @@ __SYSDECL_BEGIN
 
 
 #ifndef __error_register_state_t_defined
-#define __error_register_state_t_defined 1
+#define __error_register_state_t_defined
 typedef __ERROR_REGISTER_STATE_TYPE error_register_state_t;
 #endif /* !__error_register_state_t_defined */
 
@@ -198,7 +198,7 @@ __LIBC __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)) error_register_state
 __LIBC __ATTR_COLD __ATTR_NORETURN void (__LIBKCALL error_throw_current)(void) __THROWS(...) __CASMNAME_SAME("error_throw_current");
 #endif /* __CRT_HAVE_error_throw_current */
 #if !defined(__error_rethrow_defined) && defined(__CRT_HAVE_error_rethrow)
-#define __error_rethrow_defined 1
+#define __error_rethrow_defined
 /* Rethrow the current exception (same as a c++ `throw;' expression) */
 __LIBC __ATTR_COLD __ATTR_NORETURN void (__LIBKCALL error_rethrow)(void) __THROWS(...) __CASMNAME_SAME("error_rethrow");
 #endif /* !__error_rethrow_defined && __CRT_HAVE_error_rethrow */
@@ -234,12 +234,12 @@ __ATTR_WUNUSED __BOOL __NOTHROW(was_thrown)(error_code_t __code);
 
 #ifndef THROW
 #if !defined(__error_throw_defined) && defined(__CRT_HAVE_error_throw)
-#define __error_throw_defined 1
+#define __error_throw_defined
 /* Throw an exception and fill exception pointers with all zeroes */
 __LIBC __ATTR_COLD __ATTR_NORETURN void (__ERROR_THROW_CC error_throw)(error_code_t __code) __THROWS(...) __CASMNAME_SAME("error_throw");
 #endif /* !__error_throw_defined && __CRT_HAVE_error_throw */
 #if !defined(__error_thrown_defined) && defined(__CRT_HAVE_error_thrown)
-#define __error_thrown_defined 1
+#define __error_thrown_defined
 /* Throw an exception and load `argc' pointers from varargs */
 __LIBC __ATTR_COLD __ATTR_NORETURN void (__ERROR_THROWN_CC error_thrown)(error_code_t __code, unsigned int ___argc, ...) __THROWS(...) __CASMNAME_SAME("error_thrown");
 #endif /* !__error_thrown_defined && __CRT_HAVE_error_thrown */
@@ -307,12 +307,12 @@ __LIBC __ATTR_COLD __ATTR_NORETURN void (__ERROR_THROWN_CC error_thrown)(error_c
 #endif /* !was_thrown */
 #endif /* !__INTELLISENSE__ */
 #if !defined(__error_nesting_begin_defined) && defined(__CRT_HAVE_error_nesting_begin)
-#define __error_nesting_begin_defined 1
+#define __error_nesting_begin_defined
 /* Begin a nested TRY-block. (i.e. inside of another EXCEPT block) */
 __LIBC __ATTR_NONNULL((1)) void __NOTHROW(__ERROR_NESTING_BEGIN_CC error_nesting_begin)(struct _exception_nesting_data *__restrict __saved) __CASMNAME_SAME("error_nesting_begin");
 #endif /* !__error_nesting_begin_defined && __CRT_HAVE_error_nesting_begin */
 #if !defined(__error_nesting_end_defined) && defined(__CRT_HAVE_error_nesting_end)
-#define __error_nesting_end_defined 1
+#define __error_nesting_end_defined
 /* End a nested TRY-block. (i.e. inside of another EXCEPT block) */
 __LIBC __ATTR_NONNULL((1)) void __NOTHROW(__ERROR_NESTING_END_CC error_nesting_end)(struct _exception_nesting_data *__restrict __saved) __CASMNAME_SAME("error_nesting_end");
 #endif /* !__error_nesting_end_defined && __CRT_HAVE_error_nesting_end */

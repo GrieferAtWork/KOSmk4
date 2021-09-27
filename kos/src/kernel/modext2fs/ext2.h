@@ -143,12 +143,12 @@ typedef struct ATTR_PACKED {
 	                              * counting the actual inode structure nor directory entries linking
 	                              * to the inode. */
 #define EXT2_INODE_FSECURE_DELETE 0x00000001 /* Rewrite data and INode headers of the file a couple
-                                              * of times to prevent file recovery upon deletion. */
+                                              * of times to  prevent file  recovery upon  deletion. */
 #define EXT2_INODE_FKEEP_DATA     0x00000002 /* (IGNORED) Try to preserve file data for as long as
-                                              * possible after deletion to allow for undelete. */
+                                              * possible  after  deletion to  allow  for undelete. */
 #define EXT2_INODE_FSYNC          0x00000008 /* Changes are written to disk immediately. (same as `IO_DSYNC') */
 #define EXT2_INODE_FIMMUTABLE     0x00000010 /* File contents cannot be modified. */
-#define EXT2_INODE_FAPPEND        0x00000020 /* Opening the file forces `O_APPEND' to be used.
+#define EXT2_INODE_FAPPEND        0x00000020 /* Opening  the file forces  `O_APPEND' to be used.
                                               * However, mapping the file to memory still allows
                                               * non-trailing data to be overwritten. */
 #define EXT2_INODE_FDONT_DUMP     0x00000040 /* Don't include the file in filesystem dumps. */

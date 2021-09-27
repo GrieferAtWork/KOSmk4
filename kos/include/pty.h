@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbeab7c95 */
+/* HASH CRC-32:0x55e327d7 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -48,7 +48,7 @@ struct termios;
 struct winsize;
 
 #if !defined(__openpty_defined) && defined(__CRT_HAVE_openpty)
-#define __openpty_defined 1
+#define __openpty_defined
 /* >> openpty(2)
  * Create  a  new  ptty (psuedo  tty),  storing the  handles  for the
  * master/slave adapters in  `*amaster' and `*aslave'.  Additionally,
@@ -68,7 +68,7 @@ struct winsize;
 __CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,openpty,(__fd_t *__amaster, __fd_t *__aslave, char *__name, struct termios const *__termp, struct winsize const *__winp),(__amaster,__aslave,__name,__termp,__winp))
 #endif /* !__openpty_defined && __CRT_HAVE_openpty */
 #ifndef __forkpty_defined
-#define __forkpty_defined 1
+#define __forkpty_defined
 #ifdef __CRT_HAVE_forkpty
 /* >> forkpty(3)
  * A helper for combining `openpty(2)' with `fork(2)' and `login_tty(3)',

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9fe653a5 */
+/* HASH CRC-32:0x2fa058d3 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,7 +30,7 @@
 __SYSDECL_BEGIN
 
 #ifndef ____libc_core_getpagesize_defined
-#define ____libc_core_getpagesize_defined 1
+#define ____libc_core_getpagesize_defined
 #include <asm/pagesize.h>
 #if defined(__CRT_HAVE_getpagesize) && defined(__ARCH_PAGESIZE)
 #include <features.h>
@@ -57,13 +57,13 @@ __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED __STDC_INT_AS_SIZE_T __NOTHROW(__LIBCCA
 #endif /* !... */
 #endif /* !____libc_core_getpagesize_defined */
 #if !defined(____libc_core_syscall_defined) && defined(__CRT_HAVE_syscall)
-#define ____libc_core_syscall_defined 1
+#define ____libc_core_syscall_defined
 #include <bits/types.h>
 /* >> syscall(2), syscall64(2) */
 __CVREDIRECT(,__LONGPTR_TYPE__,__NOTHROW_RPC,__libc_core_syscall,(__LONGPTR_TYPE__ __sysno),syscall,(__sysno),__sysno,6,(__syscall_ulong_t,__syscall_ulong_t,__syscall_ulong_t,__syscall_ulong_t,__syscall_ulong_t,__syscall_ulong_t))
 #endif /* !____libc_core_syscall_defined && __CRT_HAVE_syscall */
 #ifndef ____libc_core_syscall64_defined
-#define ____libc_core_syscall64_defined 1
+#define ____libc_core_syscall64_defined
 #ifdef __CRT_HAVE_syscall
 #include <bits/types.h>
 /* >> syscall(2), syscall64(2) */

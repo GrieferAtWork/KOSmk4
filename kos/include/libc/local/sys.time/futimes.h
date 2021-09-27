@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3b622afe */
+/* HASH CRC-32:0x4892babe */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,18 +19,18 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_futimes_defined
-#define __local_futimes_defined 1
+#define __local_futimes_defined
 #include <__crt.h>
 #include <bits/types.h>
 #if (defined(__CRT_HAVE_lutimes) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__) || defined(__CRT_HAVE_futimes64) || defined(__CRT_HAVE_futimes)
 #include <bits/os/timeval.h>
 __NAMESPACE_LOCAL_BEGIN
 #if !defined(__local___localdep_futimes32_defined) && defined(__CRT_HAVE_futimes)
-#define __local___localdep_futimes32_defined 1
+#define __local___localdep_futimes32_defined
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_futimes32,(__fd_t __fd, struct __timeval32 const __tvp[2]),futimes,(__fd,__tvp))
 #endif /* !__local___localdep_futimes32_defined && __CRT_HAVE_futimes */
 #ifndef __local___localdep_futimes64_defined
-#define __local___localdep_futimes64_defined 1
+#define __local___localdep_futimes64_defined
 #if defined(__CRT_HAVE_lutimes) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_futimes64,(__fd_t __fd, struct __timeval64 const __tvp[2]),lutimes,(__fd,__tvp))
 #elif defined(__CRT_HAVE_futimes64)
@@ -68,7 +68,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(futimes))(__fd_t __fd, struct timeval
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_futimes_defined
-#define __local___localdep_futimes_defined 1
+#define __local___localdep_futimes_defined
 #define __localdep_futimes __LIBC_LOCAL_NAME(futimes)
 #endif /* !__local___localdep_futimes_defined */
 #else /* (__CRT_HAVE_lutimes && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__) || __CRT_HAVE_futimes64 || __CRT_HAVE_futimes */

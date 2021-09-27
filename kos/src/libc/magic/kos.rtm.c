@@ -73,7 +73,7 @@
 __SYSDECL_BEGIN
 
 #ifndef __rtm_status_t_defined
-#define __rtm_status_t_defined 1
+#define __rtm_status_t_defined
 /* RTM status code:
  *   - One of `RTM_NOSYS' or `RTM_STARTED'
  *   - Or a set of `RTM_ABORT_*', possibly or'd with `RTM_ABORT_CODE()' */

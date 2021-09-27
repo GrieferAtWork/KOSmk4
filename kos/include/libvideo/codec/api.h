@@ -25,23 +25,23 @@
 
 #if defined(__i386__) && !defined(__x86_64__)
 #define LIBVIDEO_CODEC_CC __ATTR_FASTCALL
-#else
+#else /* ... */
 #define LIBVIDEO_CODEC_CC /* nothing */
-#endif
+#endif /* !... */
 
-#if !defined(LIBVIDEO_CODEC_WANT_PROTOTYPES) && \
-     defined(__KOS__) && defined(__KERNEL__)
-#define LIBVIDEO_CODEC_WANT_PROTOTYPES 1
-#endif
+#if (!defined(LIBVIDEO_CODEC_WANT_PROTOTYPES) && \
+     defined(__KOS__) && defined(__KERNEL__))
+#define LIBVIDEO_CODEC_WANT_PROTOTYPES
+#endif /* ... */
 
-#if defined(__KOS__) && defined(__KERNEL__) && \
-    defined(CONFIG_BUILDING_KERNEL_CORE)
+#if (defined(__KOS__) && defined(__KERNEL__) && \
+     defined(CONFIG_BUILDING_KERNEL_CORE))
 #define LIBVIDEO_CODEC_DECL __PUBDEF
 #elif defined(__LIBVIDEO_CODEC_STATIC)
 #define LIBVIDEO_CODEC_DECL __INTDEF
-#else
+#else /* ... */
 #define LIBVIDEO_CODEC_DECL __IMPDEF
-#endif
+#endif /* !... */
 
 /* Library name for use with `dlopen()' */
 #define LIBVIDEO_CODEC_LIBRARY_NAME "libvideo-codec.so"

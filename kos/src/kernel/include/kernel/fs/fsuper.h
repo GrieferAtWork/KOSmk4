@@ -129,7 +129,7 @@ struct fsuper_ops {
 
 
 #ifndef __fnode_slist_defined
-#define __fnode_slist_defined 1
+#define __fnode_slist_defined
 SLIST_HEAD(fnode_slist, fnode);
 #endif /* !__fnode_slist_defined */
 

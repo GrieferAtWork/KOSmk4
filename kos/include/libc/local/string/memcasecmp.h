@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe4ac6ea9 */
+/* HASH CRC-32:0x4644aefc */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,12 +19,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_memcasecmp_defined
-#define __local_memcasecmp_defined 1
+#define __local_memcasecmp_defined
 #include <__crt.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_tolower_defined
-#define __local___localdep_tolower_defined 1
+#define __local___localdep_tolower_defined
 __NAMESPACE_LOCAL_END
 #include <bits/crt/ctype.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -58,7 +58,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memcasecmp))(void const *__s1, void c
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_memcasecmp_defined
-#define __local___localdep_memcasecmp_defined 1
+#define __local___localdep_memcasecmp_defined
 #define __localdep_memcasecmp __LIBC_LOCAL_NAME(memcasecmp)
 #endif /* !__local___localdep_memcasecmp_defined */
 #endif /* !__local_memcasecmp_defined */

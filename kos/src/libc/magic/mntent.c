@@ -65,7 +65,7 @@
 __SYSDECL_BEGIN
 
 #ifndef __FILE_defined
-#define __FILE_defined 1
+#define __FILE_defined
 typedef __FILE FILE;
 #endif /* !__FILE_defined */
 

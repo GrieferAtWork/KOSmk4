@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd3923ee7 */
+/* HASH CRC-32:0xe6a7ddbb */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_error_info_defined
-#define __local_error_info_defined 1
+#define __local_error_info_defined
 #include <__crt.h>
 #include <kos/bits/fastexcept.h>
 #ifdef __arch_error_info
@@ -31,7 +31,7 @@ __NOTHROW(__LIBKCALL __LIBC_LOCAL_NAME(error_info))(void) {
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_error_info_defined
-#define __local___localdep_error_info_defined 1
+#define __local___localdep_error_info_defined
 #define __localdep_error_info __LIBC_LOCAL_NAME(error_info)
 #endif /* !__local___localdep_error_info_defined */
 #else /* __arch_error_info */

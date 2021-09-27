@@ -21,7 +21,7 @@
 #include <__stdinc.h>
 #include <hybrid/typecore.h>
 #ifndef __sig_atomic_t_defined
-#define __sig_atomic_t_defined 1
+#define __sig_atomic_t_defined
 #ifdef __CC__
 __DECL_BEGIN
 typedef __SIG_ATOMIC_TYPE__ sig_atomic_t;

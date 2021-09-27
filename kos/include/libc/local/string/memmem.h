@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xce86049b */
+/* HASH CRC-32:0xcf6b5124 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,12 +19,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_memmem_defined
-#define __local_memmem_defined 1
+#define __local_memmem_defined
 #include <__crt.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_memchr_defined
-#define __local___localdep_memchr_defined 1
+#define __local___localdep_memchr_defined
 #ifdef __CRT_HAVE_memchr
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),void *,__NOTHROW_NCX,__localdep_memchr,(void const *__restrict __haystack, int __needle, __SIZE_TYPE__ __n_bytes),memchr,(__haystack,__needle,__n_bytes))
 #else /* __CRT_HAVE_memchr */
@@ -35,7 +35,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__CRT_HAVE_memchr */
 #endif /* !__local___localdep_memchr_defined */
 #ifndef __local___localdep_memcmp_defined
-#define __local___localdep_memcmp_defined 1
+#define __local___localdep_memcmp_defined
 #ifdef __CRT_HAVE_memcmp
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_memcmp,(void const *__s1, void const *__s2, __SIZE_TYPE__ __n_bytes),memcmp,(__s1,__s2,__n_bytes))
 #elif defined(__CRT_HAVE_bcmp)
@@ -75,7 +75,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memmem))(void const *__haystack, __SI
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_memmem_defined
-#define __local___localdep_memmem_defined 1
+#define __local___localdep_memmem_defined
 #define __localdep_memmem __LIBC_LOCAL_NAME(memmem)
 #endif /* !__local___localdep_memmem_defined */
 #endif /* !__local_memmem_defined */

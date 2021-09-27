@@ -42,7 +42,7 @@
 __SYSDECL_BEGIN
 
 #ifndef __lfutex_t_defined
-#define __lfutex_t_defined 1
+#define __lfutex_t_defined
 typedef __uintptr_t lfutex_t;
 #endif /* !__lfutex_t_defined */
 

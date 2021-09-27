@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x24263676 */
+/* HASH CRC-32:0xe670073c */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_popcountl_defined
-#define __local_popcountl_defined 1
+#define __local_popcountl_defined
 #include <__crt.h>
 #include <hybrid/__bit.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -29,7 +29,7 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(popcountl))(unsigned long __i) {
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_popcountl_defined
-#define __local___localdep_popcountl_defined 1
+#define __local___localdep_popcountl_defined
 #define __localdep_popcountl __LIBC_LOCAL_NAME(popcountl)
 #endif /* !__local___localdep_popcountl_defined */
 #endif /* !__local_popcountl_defined */

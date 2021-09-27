@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5f15f736 */
+/* HASH CRC-32:0xbaa62e87 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,11 +19,11 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_wcsfry_defined
-#define __local_wcsfry_defined 1
+#define __local_wcsfry_defined
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_rand_defined
-#define __local___localdep_rand_defined 1
+#define __local___localdep_rand_defined
 #ifdef __CRT_HAVE_rand
 __CREDIRECT(,int,__NOTHROW,__localdep_rand,(void),rand,())
 #else /* __CRT_HAVE_rand */
@@ -41,7 +41,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__CRT_HAVE_rand */
 #endif /* !__local___localdep_rand_defined */
 #ifndef __local___localdep_wcslen_defined
-#define __local___localdep_wcslen_defined 1
+#define __local___localdep_wcslen_defined
 #ifdef __CRT_HAVE_wcslen
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
@@ -73,7 +73,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcsfry))(__WCHAR_TYPE__ *__restrict _
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_wcsfry_defined
-#define __local___localdep_wcsfry_defined 1
+#define __local___localdep_wcsfry_defined
 #define __localdep_wcsfry __LIBC_LOCAL_NAME(wcsfry)
 #endif /* !__local___localdep_wcsfry_defined */
 #endif /* !__local_wcsfry_defined */

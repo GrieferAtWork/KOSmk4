@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf08c202f */
+/* HASH CRC-32:0x655b782a */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,12 +19,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_reallocf_defined
-#define __local_reallocf_defined 1
+#define __local_reallocf_defined
 #include <__crt.h>
 #ifdef __CRT_HAVE_realloc
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_free_defined
-#define __local___localdep_free_defined 1
+#define __local___localdep_free_defined
 #if __has_builtin(__builtin_free) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_free)
 __CEIREDIRECT(,void,__NOTHROW_NCX,__localdep_free,(void *__mallptr),free,{ __builtin_free(__mallptr); })
 #elif defined(__CRT_HAVE_free)
@@ -36,7 +36,7 @@ __CREDIRECT_VOID(,__NOTHROW_NCX,__localdep_free,(void *__mallptr),cfree,(__mallp
 #endif /* !... */
 #endif /* !__local___localdep_free_defined */
 #ifndef __local___localdep_realloc_defined
-#define __local___localdep_realloc_defined 1
+#define __local___localdep_realloc_defined
 #if __has_builtin(__builtin_realloc) && defined(__LIBC_BIND_CRTBUILTINS)
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
@@ -79,7 +79,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(reallocf))(void *__mallptr, __SIZE_TY
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_reallocf_defined
-#define __local___localdep_reallocf_defined 1
+#define __local___localdep_reallocf_defined
 #define __localdep_reallocf __LIBC_LOCAL_NAME(reallocf)
 #endif /* !__local___localdep_reallocf_defined */
 #else /* __CRT_HAVE_realloc */

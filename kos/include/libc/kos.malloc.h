@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9764e883 */
+/* HASH CRC-32:0x1bf38796 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,15 +28,15 @@
 #include "core/kos.malloc.h"
 
 #if !defined(____libc_Malloc_defined) && defined(____libc_core_Malloc_defined)
-#define ____libc_Malloc_defined 1
+#define ____libc_Malloc_defined
 #define __libc_Malloc __libc_core_Malloc
 #endif /* !____libc_Malloc_defined && ____libc_core_Malloc_defined */
 #if !defined(____libc_Calloc_defined) && defined(____libc_core_Calloc_defined)
-#define ____libc_Calloc_defined 1
+#define ____libc_Calloc_defined
 #define __libc_Calloc __libc_core_Calloc
 #endif /* !____libc_Calloc_defined && ____libc_core_Calloc_defined */
 #if !defined(____libc_Realloc_defined) && defined(____libc_core_Realloc_defined)
-#define ____libc_Realloc_defined 1
+#define ____libc_Realloc_defined
 #define __libc_Realloc __libc_core_Realloc
 #endif /* !____libc_Realloc_defined && ____libc_core_Realloc_defined */
 

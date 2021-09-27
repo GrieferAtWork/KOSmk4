@@ -123,7 +123,7 @@
 #define __SIZEOF_ITIMERSPEC64          __SIZEOF_ITIMERSPECX32_64
 #define __ALIGNOF_ITIMERSPEC64         __ALIGNOF_ITIMERSPECX32_64
 
-#define __itimerspec_defined 1
+#define __itimerspec_defined
 #endif /* __i386__ && !__x86_64__*/
 /*[[[end]]]*/
 

@@ -24,14 +24,18 @@
 
 #include <hybrid/typecore.h>
 
+#define __OFFSET_SIGSTACK_SP      0
+#define __OFFSET_SIGSTACK_ONSTACK __SIZEOF_POINTER__
+#define __SIZEOF_SIGSTACK         (__SIZEOF_POINTER__ * 2)
+
+#define __OFFSET_SIGALTSTACK_SP    0
+#define __OFFSET_SIGALTSTACK_FLAGS __SIZEOF_POINTER__
+#define __OFFSET_SIGALTSTACK_SIZE  (__SIZEOF_POINTER__ * 2)
+#define __SIZEOF_SIGALTSTACK       (__SIZEOF_POINTER__ * 3)
+
+#ifdef __CC__
 __DECL_BEGIN
 
-#ifndef __sigstack_defined
-#define __sigstack_defined 1
-#define __OFFSET_SIGSTACK_SP       0
-#define __OFFSET_SIGSTACK_ONSTACK  __SIZEOF_POINTER__
-#define __SIZEOF_SIGSTACK         (__SIZEOF_POINTER__*2)
-#ifdef __CC__
 /* Structure describing a signal stack (obsolete). */
 struct sigstack /*[PREFIX(ss_)]*/ {
 	void           *ss_sp;      /* Signal stack pointer. */
@@ -40,16 +44,7 @@ struct sigstack /*[PREFIX(ss_)]*/ {
 	__BYTE_TYPE__ __ss_pad[__SIZEOF_POINTER__ - __SIZEOF_INT__];
 #endif /* __SIZEOF_POINTER__ > __SIZEOF_INT__ */
 };
-#endif /* __CC__ */
-#endif /* !__sigstack_defined */
 
-#ifndef __sigaltstack_defined
-#define __sigaltstack_defined 1
-#define __OFFSET_SIGALTSTACK_SP    0
-#define __OFFSET_SIGALTSTACK_FLAGS 4
-#define __OFFSET_SIGALTSTACK_SIZE  8
-#define __SIZEOF_SIGALTSTACK       12
-#ifdef __CC__
 /* Alternate, preferred interface. */
 struct sigaltstack /*[PREFIX(ss_)]*/ {
 	void            *ss_sp;
@@ -59,9 +54,8 @@ struct sigaltstack /*[PREFIX(ss_)]*/ {
 #endif /* __SIZEOF_POINTER__ > __SIZEOF_INT__ */
 	__ULONG32_TYPE__ ss_size;
 };
-#endif /* __CC__ */
-#endif /* !__sigaltstack_defined */
 
 __DECL_END
+#endif /* __CC__ */
 
 #endif /* !_BITS_OS_KOS_SIGSTACK_H */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x702515b2 */
+/* HASH CRC-32:0xc60a1352 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,12 +19,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_c16get_current_dir_name_defined
-#define __local_c16get_current_dir_name_defined 1
+#define __local_c16get_current_dir_name_defined
 #include <__crt.h>
 #if (defined(__CRT_HAVE_wgetcwd) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)) || defined(__CRT_HAVE_DOS$wgetcwd) || (defined(__CRT_HAVE__wgetcwd) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)) || defined(__CRT_HAVE_DOS$_wgetcwd)
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_c16getcwd_defined
-#define __local___localdep_c16getcwd_defined 1
+#define __local___localdep_c16getcwd_defined
 #if defined(__CRT_HAVE_wgetcwd) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
@@ -50,7 +50,7 @@ __CREDIRECT_DOS(,__CHAR16_TYPE__ *,__NOTHROW_RPC,__localdep_c16getcwd,(__CHAR16_
 #endif /* !... */
 #endif /* !__local___localdep_c16getcwd_defined */
 #ifndef __local___localdep_c16sdup_defined
-#define __local___localdep_c16sdup_defined 1
+#define __local___localdep_c16sdup_defined
 #if defined(__CRT_HAVE_wcsdup) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
 __CREDIRECT(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_NONNULL((1)),__CHAR16_TYPE__ *,__NOTHROW_NCX,__localdep_c16sdup,(__CHAR16_TYPE__ const *__restrict __string),wcsdup,(__string))
 #elif defined(__CRT_HAVE_DOS$wcsdup)
@@ -74,7 +74,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_c16sdup_defined */
 #ifndef __local___localdep_getenv_defined
-#define __local___localdep_getenv_defined 1
+#define __local___localdep_getenv_defined
 #ifdef __CRT_HAVE_getenv
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_getenv,(char const *__varname),getenv,(__varname))
 #else /* __CRT_HAVE_getenv */
@@ -92,7 +92,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__CRT_HAVE_getenv */
 #endif /* !__local___localdep_getenv_defined */
 #ifndef __local___localdep_stat_defined
-#define __local___localdep_stat_defined 1
+#define __local___localdep_stat_defined
 #if defined(__CRT_HAVE_kstat) && defined(__CRT_KOS_PRIMARY)
 __NAMESPACE_LOCAL_END
 #include <bits/os/stat.h>
@@ -176,7 +176,7 @@ __NOTHROW_RPC(__LIBDCALL __LIBC_LOCAL_NAME(c16get_current_dir_name))(void) {
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_c16get_current_dir_name_defined
-#define __local___localdep_c16get_current_dir_name_defined 1
+#define __local___localdep_c16get_current_dir_name_defined
 #define __localdep_c16get_current_dir_name __LIBC_LOCAL_NAME(c16get_current_dir_name)
 #endif /* !__local___localdep_c16get_current_dir_name_defined */
 #else /* (__CRT_HAVE_wgetcwd && __SIZEOF_WCHAR_T__ == 2 && __LIBCCALL_IS_LIBDCALL) || __CRT_HAVE_DOS$wgetcwd || (__CRT_HAVE__wgetcwd && __SIZEOF_WCHAR_T__ == 2 && __LIBCCALL_IS_LIBDCALL) || __CRT_HAVE_DOS$_wgetcwd */

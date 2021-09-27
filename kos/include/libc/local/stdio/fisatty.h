@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe18bd66d */
+/* HASH CRC-32:0xa6f755a1 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,14 +19,14 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_fisatty_defined
-#define __local_fisatty_defined 1
+#define __local_fisatty_defined
 #include <__crt.h>
 #include <asm/os/tty.h>
 #include <features.h>
 #if (defined(__CRT_HAVE_isatty) || defined(__CRT_HAVE__isatty) || defined(__CRT_HAVE_tcgetattr) || (defined(__CRT_HAVE_ioctl) && defined(__TCGETA))) && (defined(__CRT_HAVE_fileno) || defined(__CRT_HAVE__fileno) || defined(__CRT_HAVE_fileno_unlocked))
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_fileno_defined
-#define __local___localdep_fileno_defined 1
+#define __local___localdep_fileno_defined
 #if defined(__CRT_HAVE_fileno_unlocked) && defined(__USE_STDIO_UNLOCKED)
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_NCX,__localdep_fileno,(__FILE *__restrict __stream),fileno_unlocked,(__stream))
 #elif defined(__CRT_HAVE_fileno)
@@ -40,7 +40,7 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_NCX,__localdep_f
 #endif /* !... */
 #endif /* !__local___localdep_fileno_defined */
 #ifndef __local___localdep_isatty_defined
-#define __local___localdep_isatty_defined 1
+#define __local___localdep_isatty_defined
 #ifdef __CRT_HAVE_isatty
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
@@ -66,7 +66,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(fisatty))(__FILE *__restrict __stream
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_fisatty_defined
-#define __local___localdep_fisatty_defined 1
+#define __local___localdep_fisatty_defined
 #define __localdep_fisatty __LIBC_LOCAL_NAME(fisatty)
 #endif /* !__local___localdep_fisatty_defined */
 #else /* (__CRT_HAVE_isatty || __CRT_HAVE__isatty || __CRT_HAVE_tcgetattr || (__CRT_HAVE_ioctl && __TCGETA)) && (__CRT_HAVE_fileno || __CRT_HAVE__fileno || __CRT_HAVE_fileno_unlocked) */

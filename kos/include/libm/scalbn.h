@@ -48,16 +48,16 @@ __DECL_BEGIN
 
 __LIBM_LOCAL_DECLARE_BEGIN
 #ifndef __libm_two25f_defined
-#define __libm_two25f_defined 1
+#define __libm_two25f_defined
 __LIBM_LOCAL_DECLARE(__IEEE754_FLOAT_TYPE__, two25f, __IEEE754_FLOAT_C(3.355443200e+07))   /* 0x4c000000 */
 #endif /* !__libm_two25f_defined */
 __LIBM_LOCAL_DECLARE(__IEEE754_FLOAT_TYPE__, twom25f, __IEEE754_FLOAT_C(2.9802322388e-08)) /* 0x33000000 */
 #ifndef __libm_hugef_defined
-#define __libm_hugef_defined 1
+#define __libm_hugef_defined
 __LIBM_LOCAL_DECLARE(__IEEE754_FLOAT_TYPE__, hugef, __IEEE754_FLOAT_C(1.0e+30))
 #endif /* !__libm_hugef_defined */
 #ifndef __libm_tinyf_defined
-#define __libm_tinyf_defined 1
+#define __libm_tinyf_defined
 __LIBM_LOCAL_DECLARE(__IEEE754_FLOAT_TYPE__, tinyf, __IEEE754_FLOAT_C(1.0e-30))
 #endif /* !__libm_tinyf_defined */
 __LIBM_LOCAL_DECLARE_END
@@ -159,16 +159,16 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE754_FLOAT_TYPE__
 
 __LIBM_LOCAL_DECLARE_BEGIN
 #ifndef __libm_two54_defined
-#define __libm_two54_defined 1
+#define __libm_two54_defined
 __LIBM_LOCAL_DECLARE(__IEEE754_DOUBLE_TYPE__, two54, __IEEE754_DOUBLE_C(1.80143985094819840000e+16)) /* 0x43500000, 0x00000000 */
 #endif /* !__libm_two54_defined */
 __LIBM_LOCAL_DECLARE(__IEEE754_DOUBLE_TYPE__, twom54, __IEEE754_DOUBLE_C(5.55111512312578270212e-17)) /* 0x3C900000, 0x00000000 */
 #ifndef __libm_huge_defined
-#define __libm_huge_defined 1
+#define __libm_huge_defined
 __LIBM_LOCAL_DECLARE(__IEEE754_DOUBLE_TYPE__, huge, __IEEE754_DOUBLE_C(1.0e+300))
 #endif /* !__libm_huge_defined */
 #ifndef __libm_tiny_defined
-#define __libm_tiny_defined 1
+#define __libm_tiny_defined
 __LIBM_LOCAL_DECLARE(__IEEE754_DOUBLE_TYPE__, tiny, __IEEE754_DOUBLE_C(1.0e-300))
 #endif /* !__libm_tiny_defined */
 __LIBM_LOCAL_DECLARE_END
@@ -258,7 +258,7 @@ __LIBM_LOCAL_DECLARE(__IEEE854_LONG_DOUBLE_TYPE__, two64l, __IEEE854_LONG_DOUBLE
 __LIBM_LOCAL_DECLARE(__IEEE854_LONG_DOUBLE_TYPE__, twom64l, __IEEE854_LONG_DOUBLE_C(5.421010862427522170037e-20))
 __LIBM_LOCAL_DECLARE(__IEEE854_LONG_DOUBLE_TYPE__, hugeval4900l, __IEEE854_LONG_DOUBLE_C(1.0e+4900))
 #ifndef __libm_tinyl_defined
-#define __libm_tinyl_defined 1
+#define __libm_tinyl_defined
 __LIBM_LOCAL_DECLARE(__IEEE854_LONG_DOUBLE_TYPE__, tinyl, __IEEE854_LONG_DOUBLE_C(1.0e-4900))
 #endif /* !__libm_tinyl_defined */
 __LIBM_LOCAL_DECLARE_END

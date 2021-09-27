@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2d983fd4 */
+/* HASH CRC-32:0x22391e0f */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_inet_netof_defined
-#define __local_inet_netof_defined 1
+#define __local_inet_netof_defined
 #include <__crt.h>
 #include <hybrid/typecore.h>
 #include <netinet/bits/in.h>
@@ -39,7 +39,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(inet_netof))(struct in_addr __inaddr)
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_inet_netof_defined
-#define __local___localdep_inet_netof_defined 1
+#define __local___localdep_inet_netof_defined
 #define __localdep_inet_netof __LIBC_LOCAL_NAME(inet_netof)
 #endif /* !__local___localdep_inet_netof_defined */
 #endif /* !__local_inet_netof_defined */

@@ -171,7 +171,7 @@ struct ifmap {
 #define IFNAMSIZ        IF_NAMESIZE
 #endif /* !IFNAMSIZ */
 #ifndef __ifreq_defined
-#define __ifreq_defined 1
+#define __ifreq_defined
 #ifdef __CC__
 /* TODO: This structure should go into <bits/ifreq-struct.h> */
 struct ifreq {
@@ -299,7 +299,7 @@ struct ifreq {
  * for programs which must know all networks accessible). */
 #ifdef __CC__
 #ifndef __ifconf_defined
-#define __ifconf_defined 1
+#define __ifconf_defined
 /* TODO: This structure should go into <bits/ifconf-struct.h> */
 struct ifconf {
 	__INT32_TYPE__    ifc_len; /* size of buffer */

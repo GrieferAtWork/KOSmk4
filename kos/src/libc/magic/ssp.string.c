@@ -504,7 +504,7 @@ __mempmovedownq_chk([[nonnull]] /*aligned(8)*/ void *__restrict dst,
 #if defined(__cplusplus) || !defined(__USE_STRING_OVERLOADS)
 #ifdef __cplusplus
 #ifndef __std___forward_voidp_defined
-#define __std___forward_voidp_defined 1
+#define __std___forward_voidp_defined
 __NAMESPACE_STD_BEGIN
 #ifdef __forward_voidp_defined
 __NAMESPACE_GLB_USING_OR_IMPL(__forward_voidp, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST void *__NOTHROW(__forward_voidp)(void *__x) { return __x; })
@@ -513,7 +513,7 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST void *__NOTHROW(__forward_voidp)(voi
 #endif /* !__forward_voidp_defined */
 __NAMESPACE_STD_END
 #ifndef __forward_voidp_defined
-#define __forward_voidp_defined 1
+#define __forward_voidp_defined
 __NAMESPACE_STD_USING(__forward_voidp)
 #endif /* !__forward_voidp_defined */
 #endif /* !__std___forward_voidp_defined */

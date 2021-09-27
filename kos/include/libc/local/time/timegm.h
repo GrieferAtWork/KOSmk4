@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4add8e7 */
+/* HASH CRC-32:0xe77f6d82 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,13 +19,13 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_timegm_defined
-#define __local_timegm_defined 1
+#define __local_timegm_defined
 #include <__crt.h>
 #include <bits/types.h>
 #include <bits/crt/tm.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_mktime_defined
-#define __local___localdep_mktime_defined 1
+#define __local___localdep_mktime_defined
 __NAMESPACE_LOCAL_END
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -49,7 +49,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_mktime_defined */
 #ifndef __local___localdep_timegm64_defined
-#define __local___localdep_timegm64_defined 1
+#define __local___localdep_timegm64_defined
 #if defined(__CRT_HAVE_timegm) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__time64_t,__NOTHROW_NCX,__localdep_timegm64,(struct __NAMESPACE_STD_SYM tm *__tp),timegm,(__tp))
 #elif defined(__CRT_HAVE_timegm64)
@@ -72,7 +72,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(timegm))(struct __NAMESPACE_STD_SYM t
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_timegm_defined
-#define __local___localdep_timegm_defined 1
+#define __local___localdep_timegm_defined
 #define __localdep_timegm __LIBC_LOCAL_NAME(timegm)
 #endif /* !__local___localdep_timegm_defined */
 #endif /* !__local_timegm_defined */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcb020dc7 */
+/* HASH CRC-32:0x8c2a18cc */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,13 +19,13 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local__swscanf_l_defined
-#define __local__swscanf_l_defined 1
+#define __local__swscanf_l_defined
 #include <__crt.h>
 #include <features.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep__vswscanf_l_defined
-#define __local___localdep__vswscanf_l_defined 1
+#define __local___localdep__vswscanf_l_defined
 #ifdef __CRT_HAVE__vswscanf_l
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,__localdep__vswscanf_l,(__WCHAR_TYPE__ const *__src, __WCHAR_TYPE__ const *__format, __locale_t __locale, __builtin_va_list __args),_vswscanf_l,(__src,__format,__locale,__args))
 #else /* __CRT_HAVE__vswscanf_l */
@@ -46,7 +46,7 @@ __NOTHROW_NCX(__VLIBCCALL __LIBC_LOCAL_NAME(_swscanf_l))(__WCHAR_TYPE__ const *_
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep__swscanf_l_defined
-#define __local___localdep__swscanf_l_defined 1
+#define __local___localdep__swscanf_l_defined
 #define __localdep__swscanf_l __LIBC_LOCAL_NAME(_swscanf_l)
 #endif /* !__local___localdep__swscanf_l_defined */
 #endif /* !__local__swscanf_l_defined */

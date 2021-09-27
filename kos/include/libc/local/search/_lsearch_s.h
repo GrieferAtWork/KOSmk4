@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbc8fb6e8 */
+/* HASH CRC-32:0x85cafe51 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,13 +19,13 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local__lsearch_s_defined
-#define __local__lsearch_s_defined 1
+#define __local__lsearch_s_defined
 #include <__crt.h>
 #include <kos/anno.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep__lfind_s_defined
-#define __local___localdep__lfind_s_defined 1
+#define __local___localdep__lfind_s_defined
 #ifdef __CRT_HAVE__lfind_s
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2, 3, 5)),void *,__THROWING,__localdep__lfind_s,(void const *__key, void const *__pbase, __SIZE_TYPE__ __KOS_FIXED_CONST *__pitem_count, __SIZE_TYPE__ __item_size, int (__LIBCCALL *__compar)(void *__arg, void const *__a, void const *__b), void *__arg),_lfind_s,(__key,__pbase,__pitem_count,__item_size,__compar,__arg))
 #else /* __CRT_HAVE__lfind_s */
@@ -36,7 +36,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__CRT_HAVE__lfind_s */
 #endif /* !__local___localdep__lfind_s_defined */
 #ifndef __local___localdep_memcpy_defined
-#define __local___localdep_memcpy_defined 1
+#define __local___localdep_memcpy_defined
 #ifdef __CRT_HAVE_memcpy
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_memcpy,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_bytes),memcpy,(__dst,__src,__n_bytes))
 #else /* __CRT_HAVE_memcpy */
@@ -58,7 +58,7 @@ __LOCAL_LIBC(_lsearch_s) __ATTR_WUNUSED __ATTR_NONNULL((2, 3, 5)) void *
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep__lsearch_s_defined
-#define __local___localdep__lsearch_s_defined 1
+#define __local___localdep__lsearch_s_defined
 #define __localdep__lsearch_s __LIBC_LOCAL_NAME(_lsearch_s)
 #endif /* !__local___localdep__lsearch_s_defined */
 #endif /* !__local__lsearch_s_defined */

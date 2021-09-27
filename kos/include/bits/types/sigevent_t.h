@@ -20,7 +20,7 @@
 #ifndef __sigevent_t_defined
 #include <bits/os/sigevent.h>
 #ifndef __sigevent_t_defined
-#define __sigevent_t_defined 1
+#define __sigevent_t_defined
 #ifdef __CC__
 __DECL_BEGIN
 typedef struct sigevent sigevent_t;

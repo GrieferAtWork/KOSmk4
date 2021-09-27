@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd41b2fa */
+/* HASH CRC-32:0xdb580d4e */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_pread64_defined
-#define __local_pread64_defined 1
+#define __local_pread64_defined
 #include <__crt.h>
 #include <asm/os/stdio.h>
 #include <features.h>
@@ -36,7 +36,7 @@
 #endif /* !__PIO_OFFSET */
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_lseek32_defined
-#define __local___localdep_lseek32_defined 1
+#define __local___localdep_lseek32_defined
 #ifdef __CRT_HAVE_lseek
 __CREDIRECT(,__off32_t,__NOTHROW_NCX,__localdep_lseek32,(__fd_t __fd, __off32_t __offset, __STDC_INT_AS_UINT_T __whence),lseek,(__fd,__offset,__whence))
 #elif defined(__CRT_HAVE__lseek)
@@ -48,7 +48,7 @@ __CREDIRECT(,__off32_t,__NOTHROW_NCX,__localdep_lseek32,(__fd_t __fd, __off32_t 
 #endif /* !... */
 #endif /* !__local___localdep_lseek32_defined */
 #ifndef __local___localdep_lseek64_defined
-#define __local___localdep_lseek64_defined 1
+#define __local___localdep_lseek64_defined
 #if defined(__CRT_HAVE_lseek) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
 __CREDIRECT(,__off64_t,__NOTHROW_NCX,__localdep_lseek64,(__fd_t __fd, __off64_t __offset, __STDC_INT_AS_UINT_T __whence),lseek,(__fd,__offset,__whence))
 #elif defined(__CRT_HAVE_lseek64)
@@ -65,11 +65,11 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_lseek64_defined */
 #if !defined(__local___localdep_pread32_defined) && defined(__CRT_HAVE_pread)
-#define __local___localdep_pread32_defined 1
+#define __local___localdep_pread32_defined
 __CREDIRECT(__ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_pread32,(__fd_t __fd, void *__buf, __SIZE_TYPE__ __bufsize, __pos32_t __offset),pread,(__fd,__buf,__bufsize,__offset))
 #endif /* !__local___localdep_pread32_defined && __CRT_HAVE_pread */
 #ifndef __local___localdep_read_defined
-#define __local___localdep_read_defined 1
+#define __local___localdep_read_defined
 #ifdef __CRT_HAVE_read
 __CREDIRECT(__ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_read,(__fd_t __fd, void *__buf, __SIZE_TYPE__ __bufsize),read,(__fd,__buf,__bufsize))
 #elif defined(__CRT_HAVE__read)
@@ -112,7 +112,7 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(pread64))(__fd_t __fd, void *__buf, _
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_pread64_defined
-#define __local___localdep_pread64_defined 1
+#define __local___localdep_pread64_defined
 #define __localdep_pread64 __LIBC_LOCAL_NAME(pread64)
 #endif /* !__local___localdep_pread64_defined */
 #else /* __CRT_HAVE_pread || ((__CRT_HAVE_lseek64 || __CRT_HAVE__lseeki64 || __CRT_HAVE_lseek || __CRT_HAVE__lseek || __CRT_HAVE___lseek) && (__CRT_HAVE_read || __CRT_HAVE__read || __CRT_HAVE___read) && __SEEK_CUR && __SEEK_SET) */

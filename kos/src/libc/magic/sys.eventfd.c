@@ -100,7 +100,7 @@ enum {
 
 /* Type for event counter. */
 #ifndef __eventfd_t_defined
-#define __eventfd_t_defined 1
+#define __eventfd_t_defined
 typedef __uint64_t eventfd_t;
 #endif /* !__eventfd_t_defined */
 

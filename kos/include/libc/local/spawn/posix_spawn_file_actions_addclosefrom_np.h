@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x79de9057 */
+/* HASH CRC-32:0x67e32338 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_posix_spawn_file_actions_addclosefrom_np_defined
-#define __local_posix_spawn_file_actions_addclosefrom_np_defined 1
+#define __local_posix_spawn_file_actions_addclosefrom_np_defined
 #include <__crt.h>
 #include <asm/crt/posix_spawn.h>
 #include <bits/crt/posix_spawn.h>
@@ -27,7 +27,7 @@
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_posix_spawn_file_actions_alloc_defined
-#define __local___localdep_posix_spawn_file_actions_alloc_defined 1
+#define __local___localdep_posix_spawn_file_actions_alloc_defined
 __NAMESPACE_LOCAL_END
 #include <libc/local/spawn/posix_spawn_file_actions_alloc.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -52,7 +52,7 @@ __err:
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_posix_spawn_file_actions_addclosefrom_np_defined
-#define __local___localdep_posix_spawn_file_actions_addclosefrom_np_defined 1
+#define __local___localdep_posix_spawn_file_actions_addclosefrom_np_defined
 #define __localdep_posix_spawn_file_actions_addclosefrom_np __LIBC_LOCAL_NAME(posix_spawn_file_actions_addclosefrom_np)
 #endif /* !__local___localdep_posix_spawn_file_actions_addclosefrom_np_defined */
 #else /* __POSIX_SPAWN_ACTION_CLOSEFROM && __POSIX_SPAWN_USE_KOS && __CRT_HAVE_realloc */

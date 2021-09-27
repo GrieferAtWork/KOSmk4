@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4b2a4af3 */
+/* HASH CRC-32:0xe875520b */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_dprintf_defined
-#define __local_dprintf_defined 1
+#define __local_dprintf_defined
 #include <__crt.h>
 #include <hybrid/typecore.h>
 #include <bits/crt/format-printer.h>
@@ -27,7 +27,7 @@
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_vdprintf_defined
-#define __local___localdep_vdprintf_defined 1
+#define __local___localdep_vdprintf_defined
 #ifdef __CRT_HAVE_vdprintf
 __CREDIRECT(__ATTR_LIBC_PRINTF(2, 0) __ATTR_NONNULL((2)),__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,__localdep_vdprintf,(__fd_t __fd, char const *__restrict __format, __builtin_va_list __args),vdprintf,(__fd,__format,__args))
 #elif defined(__CRT_HAVE_write_printer) || defined(__CRT_HAVE_writeall) || defined(__CRT_HAVE_write) || defined(__CRT_HAVE__write) || defined(__CRT_HAVE___write)
@@ -50,7 +50,7 @@ __NOTHROW_RPC(__VLIBCCALL __LIBC_LOCAL_NAME(dprintf))(__fd_t __fd, char const *_
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_dprintf_defined
-#define __local___localdep_dprintf_defined 1
+#define __local___localdep_dprintf_defined
 #define __localdep_dprintf __LIBC_LOCAL_NAME(dprintf)
 #endif /* !__local___localdep_dprintf_defined */
 #else /* __CRT_HAVE_vdprintf || __CRT_HAVE_write_printer || __CRT_HAVE_writeall || __CRT_HAVE_write || __CRT_HAVE__write || __CRT_HAVE___write */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2ed66cfa */
+/* HASH CRC-32:0x6cac67f */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_RecvMMsg_defined
-#define __local_RecvMMsg_defined 1
+#define __local_RecvMMsg_defined
 #include <__crt.h>
 #include <bits/types.h>
 #if (defined(__CRT_HAVE_RecvMMsg) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__) || defined(__CRT_HAVE_RecvMMsg64) || defined(__CRT_HAVE_recvmmsg)
@@ -29,11 +29,11 @@
 #include <bits/os/timespec.h>
 __NAMESPACE_LOCAL_BEGIN
 #if !defined(__local___localdep_RecvMMsg32_defined) && defined(__CRT_HAVE_recvmmsg)
-#define __local___localdep_RecvMMsg32_defined 1
+#define __local___localdep_RecvMMsg32_defined
 __CREDIRECT(__ATTR_NONNULL((2)),__SIZE_TYPE__,__THROWING,__localdep_RecvMMsg32,(__fd_t __sockfd, struct mmsghdr *__vmessages, __STDC_UINT_AS_SIZE_T __vlen, __STDC_INT_AS_UINT_T __msg_flags, struct __timespec32 *__tmo),recvmmsg,(__sockfd,__vmessages,__vlen,__msg_flags,__tmo))
 #endif /* !__local___localdep_RecvMMsg32_defined && __CRT_HAVE_recvmmsg */
 #ifndef __local___localdep_RecvMMsg64_defined
-#define __local___localdep_RecvMMsg64_defined 1
+#define __local___localdep_RecvMMsg64_defined
 #if defined(__CRT_HAVE_RecvMMsg) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 __CREDIRECT(__ATTR_NONNULL((2)),__SIZE_TYPE__,__THROWING,__localdep_RecvMMsg64,(__fd_t __sockfd, struct mmsghdr *__vmessages, __STDC_UINT_AS_SIZE_T __vlen, __STDC_INT_AS_UINT_T __msg_flags, struct __timespec64 *__tmo),RecvMMsg,(__sockfd,__vmessages,__vlen,__msg_flags,__tmo))
 #elif defined(__CRT_HAVE_RecvMMsg64)
@@ -67,7 +67,7 @@ __LOCAL_LIBC(RecvMMsg) __ATTR_NONNULL((2)) __SIZE_TYPE__
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_RecvMMsg_defined
-#define __local___localdep_RecvMMsg_defined 1
+#define __local___localdep_RecvMMsg_defined
 #define __localdep_RecvMMsg __LIBC_LOCAL_NAME(RecvMMsg)
 #endif /* !__local___localdep_RecvMMsg_defined */
 #else /* (__CRT_HAVE_RecvMMsg && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__) || __CRT_HAVE_RecvMMsg64 || __CRT_HAVE_recvmmsg */

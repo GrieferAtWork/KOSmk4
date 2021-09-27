@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf8093f2 */
+/* HASH CRC-32:0x4fe78b09 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,13 +19,13 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_execl_defined
-#define __local_execl_defined 1
+#define __local_execl_defined
 #include <__crt.h>
 #include <libc/template/environ.h>
 #if defined(__CRT_HAVE_execv) || defined(__CRT_HAVE__execv) || ((defined(__CRT_HAVE_execve) || defined(__CRT_HAVE__execve)) && defined(__LOCAL_environ))
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_execv_defined
-#define __local___localdep_execv_defined 1
+#define __local___localdep_execv_defined
 #if __has_builtin(__builtin_execv) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_execv)
 __NAMESPACE_LOCAL_END
 #include <features.h>
@@ -86,7 +86,7 @@ __NOTHROW_RPC(__VLIBCCALL __LIBC_LOCAL_NAME(execl))(char const *__restrict __pat
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_execl_defined
-#define __local___localdep_execl_defined 1
+#define __local___localdep_execl_defined
 #define __localdep_execl __LIBC_LOCAL_NAME(execl)
 #endif /* !__local___localdep_execl_defined */
 #else /* __CRT_HAVE_execv || __CRT_HAVE__execv || ((__CRT_HAVE_execve || __CRT_HAVE__execve) && __LOCAL_environ) */

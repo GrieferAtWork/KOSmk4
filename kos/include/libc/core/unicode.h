@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf57357ba */
+/* HASH CRC-32:0x9504f733 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -98,7 +98,7 @@ __CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1)),__CHAR16_TYPE__ *,__NOTHROW_NC
 #define __libc_core_unicode_writeutf16 __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(unicode_writeutf16)
 #endif /* !__CRT_HAVE_unicode_writeutf16 */
 #if !defined(____libc_core___unicode_descriptor_defined) && defined(__CRT_HAVE___unicode_descriptor)
-#define ____libc_core___unicode_descriptor_defined 1
+#define ____libc_core___unicode_descriptor_defined
 #include <bits/crt/unicode.h>
 /* >> __unicode_descriptor(3)
  * Return the internal descriptor for the given `ch'
@@ -110,7 +110,7 @@ __CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1)),__CHAR16_TYPE__ *,__NOTHROW_NC
 __CREDIRECT(__ATTR_CONST __ATTR_RETNONNULL,struct __unitraits const *,__NOTHROW,__libc_core___unicode_descriptor,(__CHAR32_TYPE__ __ch),__unicode_descriptor,(__ch))
 #endif /* !____libc_core___unicode_descriptor_defined && __CRT_HAVE___unicode_descriptor */
 #if !defined(____libc_core___unicode_descriptor_digit_defined) && defined(__CRT_HAVE___unicode_descriptor_digit)
-#define ____libc_core___unicode_descriptor_digit_defined 1
+#define ____libc_core___unicode_descriptor_digit_defined
 /* >> __unicode_descriptor_digit(3), __unicode_descriptor_digit64(3)
  * Return the integer constant associated  with a given digit  index
  * Returns `0' if the given index is invalid
@@ -118,7 +118,7 @@ __CREDIRECT(__ATTR_CONST __ATTR_RETNONNULL,struct __unitraits const *,__NOTHROW,
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__UINT8_TYPE__,__NOTHROW,__libc_core___unicode_descriptor_digit,(__UINT8_TYPE__ __digit_idx),__unicode_descriptor_digit,(__digit_idx))
 #endif /* !____libc_core___unicode_descriptor_digit_defined && __CRT_HAVE___unicode_descriptor_digit */
 #if !defined(____libc_core___unicode_descriptor_digit64_defined) && defined(__CRT_HAVE___unicode_descriptor_digit64)
-#define ____libc_core___unicode_descriptor_digit64_defined 1
+#define ____libc_core___unicode_descriptor_digit64_defined
 /* >> __unicode_descriptor_digit(3), __unicode_descriptor_digit64(3)
  * Return the integer constant associated  with a given digit  index
  * Returns `0' if the given index is invalid
@@ -126,7 +126,7 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__UINT8_TYPE__,__NOTHROW,__libc_core___u
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__UINT64_TYPE__,__NOTHROW,__libc_core___unicode_descriptor_digit64,(__UINT8_TYPE__ __digit_idx),__unicode_descriptor_digit64,(__digit_idx))
 #endif /* !____libc_core___unicode_descriptor_digit64_defined && __CRT_HAVE___unicode_descriptor_digit64 */
 #if !defined(____libc_core___unicode_descriptor_digitd_defined) && defined(__CRT_HAVE___unicode_descriptor_digitd)
-#define ____libc_core___unicode_descriptor_digitd_defined 1
+#define ____libc_core___unicode_descriptor_digitd_defined
 /* >> __unicode_descriptor_digitd(3), __unicode_descriptor_digitld(3)
  * Return the floating-point constant associated with a given digit index
  * Returns `0.0' if the given index is invalid
@@ -134,7 +134,7 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__UINT64_TYPE__,__NOTHROW,__libc_core___
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__libc_core___unicode_descriptor_digitd,(__UINT8_TYPE__ __digit_idx),__unicode_descriptor_digitd,(__digit_idx))
 #endif /* !____libc_core___unicode_descriptor_digitd_defined && __CRT_HAVE___unicode_descriptor_digitd */
 #if !defined(____libc_core___unicode_descriptor_digitld_defined) && defined(__CRT_HAVE___unicode_descriptor_digitld)
-#define ____libc_core___unicode_descriptor_digitld_defined 1
+#define ____libc_core___unicode_descriptor_digitld_defined
 /* >> __unicode_descriptor_digitd(3), __unicode_descriptor_digitld(3)
  * Return the floating-point constant associated with a given digit index
  * Returns `0.0' if the given index is invalid

@@ -47,22 +47,22 @@
 
 #if defined(__i386__) && !defined(__x86_64__)
 #define LIBPHYS_CC __ATTR_FASTCALL
-#else
+#else /* ... */
 #define LIBPHYS_CC /* nothing */
-#endif
+#endif /* !... */
 
 /* NOTE: In kernel-space, libpciaccess doesn't exist per-se, but (most) functions
  *       exist with identical names, and are also declared when  <libphys/phys.h>
  *       is #included, so act as though prototypes were provided. */
 #if defined(__KOS__) && defined(__KERNEL__)
-#define LIBPHYS_WANT_PROTOTYPES 1
+#define LIBPHYS_WANT_PROTOTYPES
 #endif /* __KOS__ && __KERNEL__ */
 
 #ifdef __LIBPHYS_STATIC
 #define LIBPHYS_DECL __INTDEF
-#else
+#else /* ... */
 #define LIBPHYS_DECL __IMPDEF
-#endif
+#endif /* !... */
 
 /* Library name for use with `dlopen()' */
 #define LIBPHYS_LIBRARY_NAME "libphys.so"

@@ -40,17 +40,17 @@
 __DECL_BEGIN
 
 #ifndef __compat_greg_t_defined
-#define __compat_greg_t_defined 1
+#define __compat_greg_t_defined
 typedef __ARCH_COMPAT_REGISTER_T compat_greg_t;
 #endif /* !__compat_greg_t_defined */
 
 #ifndef __compat_ucontext_t_defined
-#define __compat_ucontext_t_defined 1
+#define __compat_ucontext_t_defined
 typedef struct compat_ucontext compat_ucontext_t;
 #endif /* !__compat_ucontext_t_defined */
 
 #ifndef __compat_mcontext_t_defined
-#define __compat_mcontext_t_defined 1
+#define __compat_mcontext_t_defined
 typedef struct compat_mcontext compat_mcontext_t;
 #endif /* !__compat_mcontext_t_defined */
 

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7c8c58dc */
+/* HASH CRC-32:0x2e6c0213 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_fgetc16s_unlocked_defined
-#define __local_fgetc16s_unlocked_defined 1
+#define __local_fgetc16s_unlocked_defined
 #include <__crt.h>
 #include <features.h>
 #if ((defined(__CRT_HAVE_fgetwc_unlocked) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)) || defined(__CRT_HAVE_DOS$fgetwc_unlocked) || (defined(__CRT_HAVE__fgetwc_nolock) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)) || defined(__CRT_HAVE_DOS$_fgetwc_nolock)) && ((defined(__CRT_HAVE_ungetwc_unlocked) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)) || defined(__CRT_HAVE_DOS$ungetwc_unlocked) || (defined(__CRT_HAVE__ungetwc_nolock) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)) || defined(__CRT_HAVE_DOS$_ungetwc_nolock) || (defined(__CRT_HAVE_ungetwc) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)) || defined(__CRT_HAVE_DOS$ungetwc)) && (defined(__CRT_HAVE_ferror) || defined(__CRT_HAVE__IO_ferror) || defined(__CRT_HAVE_ferror_unlocked))
@@ -27,7 +27,7 @@
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_ferror_unlocked_defined
-#define __local___localdep_ferror_unlocked_defined 1
+#define __local___localdep_ferror_unlocked_defined
 #if defined(__CRT_HAVE_ferror_unlocked) && defined(__USE_STDIO_UNLOCKED)
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_ferror_unlocked,(__FILE __KOS_FIXED_CONST *__restrict __stream),ferror_unlocked,(__stream))
 #elif defined(__CRT_HAVE_ferror)
@@ -41,7 +41,7 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,__l
 #endif /* !... */
 #endif /* !__local___localdep_ferror_unlocked_defined */
 #ifndef __local___localdep_fgetc16_unlocked_defined
-#define __local___localdep_fgetc16_unlocked_defined 1
+#define __local___localdep_fgetc16_unlocked_defined
 #if defined(__CRT_HAVE_fgetwc_unlocked) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
 __CREDIRECT(__ATTR_NONNULL((1)),__WINT16_TYPE__,__THROWING,__localdep_fgetc16_unlocked,(__FILE *__restrict __stream),fgetwc_unlocked,(__stream))
 #elif defined(__CRT_HAVE_DOS$fgetwc_unlocked)
@@ -55,7 +55,7 @@ __CREDIRECT_DOS(__ATTR_NONNULL((1)),__WINT16_TYPE__,__THROWING,__localdep_fgetc1
 #endif /* !... */
 #endif /* !__local___localdep_fgetc16_unlocked_defined */
 #ifndef __local___localdep_ungetc16_unlocked_defined
-#define __local___localdep_ungetc16_unlocked_defined 1
+#define __local___localdep_ungetc16_unlocked_defined
 #if defined(__CRT_HAVE_ungetwc_unlocked) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
 __CREDIRECT(__ATTR_NONNULL((2)),__WINT16_TYPE__,__NOTHROW_NCX,__localdep_ungetc16_unlocked,(__WINT16_TYPE__ __ch, __FILE *__restrict __stream),ungetwc_unlocked,(__ch,__stream))
 #elif defined(__CRT_HAVE_DOS$ungetwc_unlocked)
@@ -116,7 +116,7 @@ __LOCAL_LIBC(fgetc16s_unlocked) __ATTR_NONNULL((1, 3)) __CHAR16_TYPE__ *
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_fgetc16s_unlocked_defined
-#define __local___localdep_fgetc16s_unlocked_defined 1
+#define __local___localdep_fgetc16s_unlocked_defined
 #define __localdep_fgetc16s_unlocked __LIBC_LOCAL_NAME(fgetc16s_unlocked)
 #endif /* !__local___localdep_fgetc16s_unlocked_defined */
 #else /* ((__CRT_HAVE_fgetwc_unlocked && __SIZEOF_WCHAR_T__ == 2 && __LIBCCALL_IS_LIBDCALL) || __CRT_HAVE_DOS$fgetwc_unlocked || (__CRT_HAVE__fgetwc_nolock && __SIZEOF_WCHAR_T__ == 2 && __LIBCCALL_IS_LIBDCALL) || __CRT_HAVE_DOS$_fgetwc_nolock) && ((__CRT_HAVE_ungetwc_unlocked && __SIZEOF_WCHAR_T__ == 2 && __LIBCCALL_IS_LIBDCALL) || __CRT_HAVE_DOS$ungetwc_unlocked || (__CRT_HAVE__ungetwc_nolock && __SIZEOF_WCHAR_T__ == 2 && __LIBCCALL_IS_LIBDCALL) || __CRT_HAVE_DOS$_ungetwc_nolock || (__CRT_HAVE_ungetwc && __SIZEOF_WCHAR_T__ == 2 && __LIBCCALL_IS_LIBDCALL) || __CRT_HAVE_DOS$ungetwc) && (__CRT_HAVE_ferror || __CRT_HAVE__IO_ferror || __CRT_HAVE_ferror_unlocked) */

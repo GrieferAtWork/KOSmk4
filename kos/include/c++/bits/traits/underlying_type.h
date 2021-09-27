@@ -25,7 +25,7 @@
 __CXXDECL_BEGIN
 __NAMESPACE_STD_BEGIN
 #ifndef __std_underlying_type_defined
-#define __std_underlying_type_defined 1
+#define __std_underlying_type_defined
 template<class __T> struct underlying_type {
 	typedef __underlying_type(__T) type;
 };

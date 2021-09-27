@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1783a6f1 */
+/* HASH CRC-32:0xbd0802f0 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,11 +19,11 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_strerrordesc_np_defined
-#define __local_strerrordesc_np_defined 1
+#define __local_strerrordesc_np_defined
 #include <__crt.h>
 #include <bits/types.h>
 #ifndef ___local_sys_errlist_defined
-#define ___local_sys_errlist_defined 1
+#define ___local_sys_errlist_defined
 #if defined(__CRT_HAVE__sys_errlist) && defined(__CRT_HAVE__sys_nerr)
 #ifndef _sys_errlist
 __LIBC char const *const _sys_errlist[];
@@ -485,7 +485,7 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(strerrordesc_np))(__errno_t __errnum) {
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_strerrordesc_np_defined
-#define __local___localdep_strerrordesc_np_defined 1
+#define __local___localdep_strerrordesc_np_defined
 #define __localdep_strerrordesc_np __LIBC_LOCAL_NAME(strerrordesc_np)
 #endif /* !__local___localdep_strerrordesc_np_defined */
 #endif /* !__local_strerrordesc_np_defined */

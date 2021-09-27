@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbb9bf3b7 */
+/* HASH CRC-32:0x7523f5d9 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,12 +19,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_envz_entry_defined
-#define __local_envz_entry_defined 1
+#define __local_envz_entry_defined
 #include <__crt.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_memcmp_defined
-#define __local___localdep_memcmp_defined 1
+#define __local___localdep_memcmp_defined
 #ifdef __CRT_HAVE_memcmp
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_memcmp,(void const *__s1, void const *__s2, __SIZE_TYPE__ __n_bytes),memcmp,(__s1,__s2,__n_bytes))
 #elif defined(__CRT_HAVE_bcmp)
@@ -37,7 +37,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_memcmp_defined */
 #ifndef __local___localdep_strend_defined
-#define __local___localdep_strend_defined 1
+#define __local___localdep_strend_defined
 #ifdef __CRT_HAVE_strend
 __CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_strend,(char const *__restrict __str),strend,(__str))
 #else /* __CRT_HAVE_strend */
@@ -48,7 +48,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__CRT_HAVE_strend */
 #endif /* !__local___localdep_strend_defined */
 #ifndef __local___localdep_stroff_defined
-#define __local___localdep_stroff_defined 1
+#define __local___localdep_stroff_defined
 #ifdef __CRT_HAVE_stroff
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_stroff,(char const *__restrict __haystack, int __needle),stroff,(__haystack,__needle))
 #else /* __CRT_HAVE_stroff */
@@ -73,7 +73,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(envz_entry))(char const *__restrict _
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_envz_entry_defined
-#define __local___localdep_envz_entry_defined 1
+#define __local___localdep_envz_entry_defined
 #define __localdep_envz_entry __LIBC_LOCAL_NAME(envz_entry)
 #endif /* !__local___localdep_envz_entry_defined */
 #endif /* !__local_envz_entry_defined */

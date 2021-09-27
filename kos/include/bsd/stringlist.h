@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdea46e74 */
+/* HASH CRC-32:0xc618b3f0 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -35,7 +35,7 @@
 __SYSDECL_BEGIN
 
 #ifndef __sl_delete_defined
-#define __sl_delete_defined 1
+#define __sl_delete_defined
 #ifdef __CRT_HAVE_sl_delete
 /* >> sl_delete(3)
  * Remove an entry `name' from `sl'

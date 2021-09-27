@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3173992c */
+/* HASH CRC-32:0x51ae6ce5 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,11 +19,11 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_strcasestr_l_defined
-#define __local_strcasestr_l_defined 1
+#define __local_strcasestr_l_defined
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_strcasecmp_l_defined
-#define __local___localdep_strcasecmp_l_defined 1
+#define __local___localdep_strcasecmp_l_defined
 #ifdef __CRT_HAVE_strcasecmp_l
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_strcasecmp_l,(char const *__s1, char const *__s2, __locale_t __locale),strcasecmp_l,(__s1,__s2,__locale))
 #elif defined(__CRT_HAVE__stricmp_l)
@@ -47,7 +47,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strcasestr_l))(char const *__haystack
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_strcasestr_l_defined
-#define __local___localdep_strcasestr_l_defined 1
+#define __local___localdep_strcasestr_l_defined
 #define __localdep_strcasestr_l __LIBC_LOCAL_NAME(strcasestr_l)
 #endif /* !__local___localdep_strcasestr_l_defined */
 #endif /* !__local_strcasestr_l_defined */

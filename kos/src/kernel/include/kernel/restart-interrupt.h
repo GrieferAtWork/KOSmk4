@@ -34,7 +34,7 @@ DECL_BEGIN
 
 /* Callback prototype for `kernel_restart_interrupt()' */
 #ifndef __kernel_interrupt_callback_t_defined
-#define __kernel_interrupt_callback_t_defined 1
+#define __kernel_interrupt_callback_t_defined
 typedef struct icpustate *
 (KERNEL_INTERRUPT_CALLBACK_CC *kernel_interrupt_callback_t)(struct icpustate *__restrict state);
 #endif /* !__kernel_interrupt_callback_t_defined */
@@ -47,7 +47,7 @@ typedef struct icpustate *
  *          Rather,  it behaves similar to `longjmp()', in that `cb()' is made to return to
  *          the origin of `state' after being injected ontop of that location. */
 #ifndef __kernel_restart_interrupt_defined
-#define __kernel_restart_interrupt_defined 1
+#define __kernel_restart_interrupt_defined
 FUNDEF ATTR_NORETURN void KERNEL_INTERRUPT_CALLBACK_CC
 kernel_restart_interrupt(struct icpustate *__restrict state,
                          kernel_interrupt_callback_t cb);

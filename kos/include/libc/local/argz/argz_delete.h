@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa69ce085 */
+/* HASH CRC-32:0x6fdb2881 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,12 +19,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_argz_delete_defined
-#define __local_argz_delete_defined 1
+#define __local_argz_delete_defined
 #include <__crt.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_free_defined
-#define __local___localdep_free_defined 1
+#define __local___localdep_free_defined
 #if __has_builtin(__builtin_free) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_free)
 __CEIREDIRECT(,void,__NOTHROW_NCX,__localdep_free,(void *__mallptr),free,{ __builtin_free(__mallptr); })
 #elif defined(__CRT_HAVE_free)
@@ -36,7 +36,7 @@ __CREDIRECT_VOID(,__NOTHROW_NCX,__localdep_free,(void *__mallptr),cfree,(__mallp
 #endif /* !... */
 #endif /* !__local___localdep_free_defined */
 #ifndef __local___localdep_memmovedownc_defined
-#define __local___localdep_memmovedownc_defined 1
+#define __local___localdep_memmovedownc_defined
 #ifdef __CRT_HAVE_memmovedownc
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_memmovedownc,(void *__dst, void const *__src, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),memmovedownc,(__dst,__src,__elem_count,__elem_size))
 #else /* __CRT_HAVE_memmovedownc */
@@ -47,7 +47,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__CRT_HAVE_memmovedownc */
 #endif /* !__local___localdep_memmovedownc_defined */
 #ifndef __local___localdep_strlen_defined
-#define __local___localdep_strlen_defined 1
+#define __local___localdep_strlen_defined
 #ifdef __CRT_HAVE_strlen
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_strlen,(char const *__restrict __str),strlen,(__str))
 #else /* __CRT_HAVE_strlen */
@@ -78,7 +78,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(argz_delete))(char **__restrict __par
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_argz_delete_defined
-#define __local___localdep_argz_delete_defined 1
+#define __local___localdep_argz_delete_defined
 #define __localdep_argz_delete __LIBC_LOCAL_NAME(argz_delete)
 #endif /* !__local___localdep_argz_delete_defined */
 #endif /* !__local_argz_delete_defined */

@@ -76,7 +76,7 @@
 #else /* __USE_TIME64 */
 #define __utimbuf64 utimbuf
 #endif /* !__USE_TIME64 */
-#define __utimbuf_defined 1
+#define __utimbuf_defined
 #endif /* __x86_64__ */
 /*[[[end]]]*/
 

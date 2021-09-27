@@ -20,7 +20,7 @@
 #ifndef __siginfo_t_defined
 #include <bits/os/siginfo.h>
 #ifndef __siginfo_t_defined
-#define __siginfo_t_defined 1
+#define __siginfo_t_defined
 #ifdef __CC__
 __DECL_BEGIN
 typedef struct __siginfo_struct siginfo_t;

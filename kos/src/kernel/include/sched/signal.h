@@ -755,7 +755,7 @@ NOTHROW(KCALL pertask_init_task_connections)(struct task *__restrict self);
 #ifdef __CC__
 #ifdef CONFIG_YIELD_BEFORE_CONNECT
 #ifndef __task_tryyield_defined
-#define __task_tryyield_defined 1
+#define __task_tryyield_defined
 FUNDEF NOBLOCK_IF(!PREEMPTION_ENABLED())
 unsigned int NOTHROW(KCALL task_tryyield)(void);
 #endif /* !__task_tryyield_defined */

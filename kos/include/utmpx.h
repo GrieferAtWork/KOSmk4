@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd7a4440f */
+/* HASH CRC-32:0xe8e8d17b */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -62,7 +62,7 @@ struct utmp;
 #endif /* __USE_GNU */
 
 #ifndef __pid_t_defined
-#define __pid_t_defined 1
+#define __pid_t_defined
 typedef __pid_t pid_t;
 #endif /* !__pid_t_defined */
 

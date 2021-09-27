@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe6386017 */
+/* HASH CRC-32:0xf60d9803 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local__lfind_s_defined
-#define __local__lfind_s_defined 1
+#define __local__lfind_s_defined
 #include <__crt.h>
 #include <kos/anno.h>
 #include <hybrid/typecore.h>
@@ -37,7 +37,7 @@ __LOCAL_LIBC(_lfind_s) __ATTR_WUNUSED __ATTR_NONNULL((2, 3, 5)) void *
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep__lfind_s_defined
-#define __local___localdep__lfind_s_defined 1
+#define __local___localdep__lfind_s_defined
 #define __localdep__lfind_s __LIBC_LOCAL_NAME(_lfind_s)
 #endif /* !__local___localdep__lfind_s_defined */
 #endif /* !__local__lfind_s_defined */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x308e4ae */
+/* HASH CRC-32:0x3293ed85 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,14 +19,14 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local__wutime32_defined
-#define __local__wutime32_defined 1
+#define __local__wutime32_defined
 #include <__crt.h>
 #if defined(__CRT_HAVE_wutime64) || defined(__CRT_HAVE__wutime64)
 #include <features.h>
 #include <bits/os/utimbuf.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_crt_wutime64_defined
-#define __local___localdep_crt_wutime64_defined 1
+#define __local___localdep_crt_wutime64_defined
 #ifdef __CRT_HAVE_wutime64
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_crt_wutime64,(__WCHAR_TYPE__ const *__filename, struct __utimbuf64 const *__file_times),wutime64,(__filename,__file_times))
 #elif defined(__CRT_HAVE__wutime64)
@@ -56,7 +56,7 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(_wutime32))(__WCHAR_TYPE__ const *__f
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep__wutime32_defined
-#define __local___localdep__wutime32_defined 1
+#define __local___localdep__wutime32_defined
 #define __localdep__wutime32 __LIBC_LOCAL_NAME(_wutime32)
 #endif /* !__local___localdep__wutime32_defined */
 #else /* __CRT_HAVE_wutime64 || __CRT_HAVE__wutime64 */

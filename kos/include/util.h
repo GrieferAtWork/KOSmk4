@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x448ac693 */
+/* HASH CRC-32:0xc101aaa3 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -75,28 +75,28 @@ struct winsize;
 struct iovec;
 
 #ifndef __FILE_defined
-#define __FILE_defined 1
+#define __FILE_defined
 typedef __FILE FILE;
 #endif /* !__FILE_defined */
 
 #ifndef __pid_t_defined
-#define __pid_t_defined 1
+#define __pid_t_defined
 typedef __pid_t pid_t;
 #endif /* !__pid_t_defined */
 
 #ifndef __size_t_defined
-#define __size_t_defined 1
+#define __size_t_defined
 typedef __SIZE_TYPE__ size_t;
 #endif /* !__size_t_defined */
 
 
 #if !defined(__login_defined) && defined(__CRT_HAVE_login)
-#define __login_defined 1
+#define __login_defined
 /* >> login(3) */
 __CDECLARE_VOID(__ATTR_NONNULL((1)),__NOTHROW_RPC_KOS,login,(struct utmp const *__entry),(__entry))
 #endif /* !__login_defined && __CRT_HAVE_login */
 #ifndef __login_tty_defined
-#define __login_tty_defined 1
+#define __login_tty_defined
 #ifdef __CRT_HAVE_login_tty
 /* >> login_tty(3)
  * Set the given `fd' as the controlling terminal, stdin,
@@ -120,12 +120,12 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(login_tty, __FORCELOCAL __ATTR_ARTIFICIAL int __
 #endif /* !__CRT_HAVE_login_tty */
 #endif /* !__login_tty_defined */
 #if !defined(__logout_defined) && defined(__CRT_HAVE_logout)
-#define __logout_defined 1
+#define __logout_defined
 /* >> logout(3) */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC_KOS,logout,(char const *__ut_line),(__ut_line))
 #endif /* !__logout_defined && __CRT_HAVE_logout */
 #if !defined(__logwtmp_defined) && defined(__CRT_HAVE_logwtmp)
-#define __logwtmp_defined 1
+#define __logwtmp_defined
 /* >> logwtmp(3) */
 __CDECLARE_VOID(__ATTR_NONNULL((1, 2, 3)),__NOTHROW_RPC_KOS,logwtmp,(char const *__ut_line, char const *__ut_name, char const *__ut_host),(__ut_line,__ut_name,__ut_host))
 #endif /* !__logwtmp_defined && __CRT_HAVE_logwtmp */
@@ -133,7 +133,7 @@ __CDECLARE_VOID(__ATTR_NONNULL((1, 2, 3)),__NOTHROW_RPC_KOS,logwtmp,(char const 
  * @param: dflags: Set of `0 | OPENDEV_PART | OPENDEV_BLCK' */
 __CDECLARE_OPT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,opendev,(char const *__path, __oflag_t __oflags, __STDC_INT_AS_UINT_T __dflags, char **__realpath),(__path,__oflags,__dflags,__realpath))
 #if !defined(__openpty_defined) && defined(__CRT_HAVE_openpty)
-#define __openpty_defined 1
+#define __openpty_defined
 /* >> openpty(2)
  * Create  a  new  ptty (psuedo  tty),  storing the  handles  for the
  * master/slave adapters in  `*amaster' and `*aslave'.  Additionally,
@@ -153,7 +153,7 @@ __CDECLARE_OPT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,opendev,(
 __CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,openpty,(__fd_t *__amaster, __fd_t *__aslave, char *__name, struct termios const *__termp, struct winsize const *__winp),(__amaster,__aslave,__name,__termp,__winp))
 #endif /* !__openpty_defined && __CRT_HAVE_openpty */
 #ifndef __forkpty_defined
-#define __forkpty_defined 1
+#define __forkpty_defined
 #ifdef __CRT_HAVE_forkpty
 /* >> forkpty(3)
  * A helper for combining `openpty(2)' with `fork(2)' and `login_tty(3)',
@@ -183,7 +183,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(forkpty, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_N
 #endif /* !__CRT_HAVE_forkpty */
 #endif /* !__forkpty_defined */
 #ifndef __fparseln_defined
-#define __fparseln_defined 1
+#define __fparseln_defined
 #ifdef __CRT_HAVE_fparseln
 /* >> fparseln(3)
  * Parse one line of text from `stream', whilst accounting for

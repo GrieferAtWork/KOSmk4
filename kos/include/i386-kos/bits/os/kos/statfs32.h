@@ -164,7 +164,7 @@
 #define __SIZEOF_STATFS64         __SIZEOF_STATFSX32_64
 #define __ALIGNOF_STATFS64        __ALIGNOF_STATFSX32_64
 
-#define __statfs_defined 1
+#define __statfs_defined
 #endif /* __i386__ && !__x86_64__*/
 /*[[[end]]]*/
 

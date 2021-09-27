@@ -26,15 +26,15 @@
 
 #if defined(__i386__) && !defined(__x86_64__)
 #define LIBEMU86_CC __ATTR_FASTCALL
-#else
+#else /* ... */
 #define LIBEMU86_CC /* nothing */
-#endif
+#endif /* !... */
 
 #if (!defined(LIBEMU86_WANT_PROTOTYPES) && \
      (defined(__LIBEMU86_STATIC) ||        \
       (defined(__KOS__) && defined(__KERNEL__))))
-#define LIBEMU86_WANT_PROTOTYPES 1
-#endif
+#define LIBEMU86_WANT_PROTOTYPES
+#endif /* ... */
 
 /* Library name for use with `dlopen()' */
 #define LIBEMU86_LIBRARY_NAME "libemu86.so"
@@ -92,7 +92,7 @@
      (CONFIG_LIBEMU86_WANT_32BIT != 1) ||                    \
      (CONFIG_LIBEMU86_WANT_64BIT != (defined(__x86_64__) || !defined(__i386__))))
 #error "Invalid configuration for non-static linkage (must enable `__LIBEMU86_STATIC')"
-#endif
+#endif /* ... */
 
 #endif /* !__LIBEMU86_STATIC */
 

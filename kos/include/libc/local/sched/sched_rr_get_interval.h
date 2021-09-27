@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa6db18f2 */
+/* HASH CRC-32:0x25059a8b */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,18 +19,18 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_sched_rr_get_interval_defined
-#define __local_sched_rr_get_interval_defined 1
+#define __local_sched_rr_get_interval_defined
 #include <__crt.h>
 #include <bits/types.h>
 #if defined(__CRT_HAVE_sched_rr_get_interval64) || defined(__CRT_HAVE_sched_rr_get_interval)
 #include <bits/os/timespec.h>
 __NAMESPACE_LOCAL_BEGIN
 #if !defined(__local___localdep_sched_rr_get_interval32_defined) && defined(__CRT_HAVE_sched_rr_get_interval)
-#define __local___localdep_sched_rr_get_interval32_defined 1
+#define __local___localdep_sched_rr_get_interval32_defined
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_sched_rr_get_interval32,(__pid_t __pid, struct __timespec32 *__tms),sched_rr_get_interval,(__pid,__tms))
 #endif /* !__local___localdep_sched_rr_get_interval32_defined && __CRT_HAVE_sched_rr_get_interval */
 #ifndef __local___localdep_sched_rr_get_interval64_defined
-#define __local___localdep_sched_rr_get_interval64_defined 1
+#define __local___localdep_sched_rr_get_interval64_defined
 #if defined(__CRT_HAVE_sched_rr_get_interval) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_sched_rr_get_interval64,(__pid_t __pid, struct __timespec64 *__tms),sched_rr_get_interval,(__pid,__tms))
 #elif defined(__CRT_HAVE_sched_rr_get_interval64)
@@ -64,7 +64,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(sched_rr_get_interval))(__pid_t __pid
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_sched_rr_get_interval_defined
-#define __local___localdep_sched_rr_get_interval_defined 1
+#define __local___localdep_sched_rr_get_interval_defined
 #define __localdep_sched_rr_get_interval __LIBC_LOCAL_NAME(sched_rr_get_interval)
 #endif /* !__local___localdep_sched_rr_get_interval_defined */
 #else /* __CRT_HAVE_sched_rr_get_interval64 || __CRT_HAVE_sched_rr_get_interval */

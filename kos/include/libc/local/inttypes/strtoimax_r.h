@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x40551636 */
+/* HASH CRC-32:0x7f2bdba7 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,13 +19,13 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_strtoimax_r_defined
-#define __local_strtoimax_r_defined 1
+#define __local_strtoimax_r_defined
 #include <__crt.h>
 #include <features.h>
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_strto32_r_defined
-#define __local___localdep_strto32_r_defined 1
+#define __local___localdep_strto32_r_defined
 #ifdef __CRT_HAVE_strto32_r
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__INT32_TYPE__,__NOTHROW_NCX,__localdep_strto32_r,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base, __errno_t *__error),strto32_r,(__nptr,__endptr,__base,__error))
 #else /* __CRT_HAVE_strto32_r */
@@ -36,7 +36,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__CRT_HAVE_strto32_r */
 #endif /* !__local___localdep_strto32_r_defined */
 #ifndef __local___localdep_strto64_r_defined
-#define __local___localdep_strto64_r_defined 1
+#define __local___localdep_strto64_r_defined
 #ifdef __CRT_HAVE_strto64_r
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__INT64_TYPE__,__NOTHROW_NCX,__localdep_strto64_r,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base, __errno_t *__error),strto64_r,(__nptr,__endptr,__base,__error))
 #else /* __CRT_HAVE_strto64_r */
@@ -83,7 +83,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strtoimax_r))(char const *__restrict 
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_strtoimax_r_defined
-#define __local___localdep_strtoimax_r_defined 1
+#define __local___localdep_strtoimax_r_defined
 #define __localdep_strtoimax_r __LIBC_LOCAL_NAME(strtoimax_r)
 #endif /* !__local___localdep_strtoimax_r_defined */
 #endif /* !__local_strtoimax_r_defined */

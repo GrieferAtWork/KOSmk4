@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe43dff37 */
+/* HASH CRC-32:0x67a5d4ca */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_wcsftime_defined
-#define __local_wcsftime_defined 1
+#define __local_wcsftime_defined
 #include <__crt.h>
 #include <hybrid/typecore.h>
 #include <bits/crt/tm.h>
@@ -35,7 +35,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcsftime))(__WCHAR_TYPE__ *__restrict
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_wcsftime_defined
-#define __local___localdep_wcsftime_defined 1
+#define __local___localdep_wcsftime_defined
 #define __localdep_wcsftime __LIBC_LOCAL_NAME(wcsftime)
 #endif /* !__local___localdep_wcsftime_defined */
 #endif /* !__local_wcsftime_defined */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc2330caa */
+/* HASH CRC-32:0x4fd2d359 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,12 +19,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_recallocarray_defined
-#define __local_recallocarray_defined 1
+#define __local_recallocarray_defined
 #include <__crt.h>
 #if (defined(__CRT_HAVE_recallocv) || defined(__CRT_HAVE__recalloc) || defined(__CRT_HAVE_realloc)) && (defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign)) && (defined(__CRT_HAVE_malloc_usable_size) || defined(__CRT_HAVE__msize))
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_calloc_defined
-#define __local___localdep_calloc_defined 1
+#define __local___localdep_calloc_defined
 #if __has_builtin(__builtin_calloc) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_calloc)
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
@@ -45,7 +45,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_calloc_defined */
 #ifndef __local___localdep_explicit_bzero_defined
-#define __local___localdep_explicit_bzero_defined 1
+#define __local___localdep_explicit_bzero_defined
 #ifdef __CRT_HAVE_bzero
 __CREDIRECT_VOID(,__NOTHROW_NCX,__localdep_explicit_bzero,(void *__dst, __SIZE_TYPE__ __n_bytes),bzero,(__dst,__n_bytes))
 #elif defined(__CRT_HAVE_explicit_bzero)
@@ -60,7 +60,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_explicit_bzero_defined */
 #ifndef __local___localdep_freezero_defined
-#define __local___localdep_freezero_defined 1
+#define __local___localdep_freezero_defined
 #ifdef __CRT_HAVE_freezero
 __CREDIRECT_VOID(,__NOTHROW_NCX,__localdep_freezero,(void *__mallptr, __SIZE_TYPE__ __num_bytes),freezero,(__mallptr,__num_bytes))
 #elif defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree)
@@ -73,7 +73,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_freezero_defined */
 #ifndef __local___localdep_malloc_usable_size_defined
-#define __local___localdep_malloc_usable_size_defined 1
+#define __local___localdep_malloc_usable_size_defined
 #ifdef __CRT_HAVE_malloc_usable_size
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
@@ -89,7 +89,7 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,__SIZE_TYPE__,__NOTHROW_NCX,__localdep_ma
 #endif /* !... */
 #endif /* !__local___localdep_malloc_usable_size_defined */
 #ifndef __local___localdep_memcpy_defined
-#define __local___localdep_memcpy_defined 1
+#define __local___localdep_memcpy_defined
 #ifdef __CRT_HAVE_memcpy
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
@@ -103,7 +103,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__CRT_HAVE_memcpy */
 #endif /* !__local___localdep_memcpy_defined */
 #ifndef __local___localdep_recallocv_defined
-#define __local___localdep_recallocv_defined 1
+#define __local___localdep_recallocv_defined
 #ifdef __CRT_HAVE_recallocv
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
@@ -153,7 +153,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(recallocarray))(void *__mallptr, __SI
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_recallocarray_defined
-#define __local___localdep_recallocarray_defined 1
+#define __local___localdep_recallocarray_defined
 #define __localdep_recallocarray __LIBC_LOCAL_NAME(recallocarray)
 #endif /* !__local___localdep_recallocarray_defined */
 #else /* (__CRT_HAVE_recallocv || __CRT_HAVE__recalloc || __CRT_HAVE_realloc) && (__CRT_HAVE_malloc || __CRT_HAVE_calloc || __CRT_HAVE_realloc || __CRT_HAVE_memalign || __CRT_HAVE_aligned_alloc || __CRT_HAVE_posix_memalign) && (__CRT_HAVE_malloc_usable_size || __CRT_HAVE__msize) */

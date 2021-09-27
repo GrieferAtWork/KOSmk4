@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf10f4a67 */
+/* HASH CRC-32:0xe98e1463 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,13 +19,13 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_mtx_trylock_defined
-#define __local_mtx_trylock_defined 1
+#define __local_mtx_trylock_defined
 #include <__crt.h>
 #ifdef __CRT_HAVE_pthread_mutex_trylock
 #include <bits/crt/threads.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_pthread_mutex_trylock_defined
-#define __local___localdep_pthread_mutex_trylock_defined 1
+#define __local___localdep_pthread_mutex_trylock_defined
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 #include <bits/crt/pthreadtypes.h>
@@ -51,7 +51,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(mtx_trylock))(__mtx_t *__restrict __m
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_mtx_trylock_defined
-#define __local___localdep_mtx_trylock_defined 1
+#define __local___localdep_mtx_trylock_defined
 #define __localdep_mtx_trylock __LIBC_LOCAL_NAME(mtx_trylock)
 #endif /* !__local___localdep_mtx_trylock_defined */
 #else /* __CRT_HAVE_pthread_mutex_trylock */

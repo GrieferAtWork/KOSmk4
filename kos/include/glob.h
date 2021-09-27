@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb23ef05 */
+/* HASH CRC-32:0xf53a5ff */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -206,7 +206,7 @@
 __SYSDECL_BEGIN
 
 #ifndef __size_t_defined
-#define __size_t_defined 1
+#define __size_t_defined
 typedef __size_t size_t;
 #endif /* !__size_t_defined */
 
@@ -216,7 +216,7 @@ typedef struct __glob64_struct glob64_t;
 #endif /* __USE_LARGEFILE64 */
 
 #ifndef ____glob_errfunc_t_defined
-#define ____glob_errfunc_t_defined 1
+#define ____glob_errfunc_t_defined
 #endif /* !____glob_errfunc_t_defined */
 
 #if defined(__CRT_HAVE_glob) && (!defined(__USE_FILE_OFFSET64) || defined(__GLOB32_MATCHES_GLOB64))

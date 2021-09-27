@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2f0ff11 */
+/* HASH CRC-32:0x4732bc10 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -66,7 +66,7 @@
 __SYSDECL_BEGIN
 
 #ifndef __FILE_defined
-#define __FILE_defined 1
+#define __FILE_defined
 typedef __FILE FILE;
 #endif /* !__FILE_defined */
 

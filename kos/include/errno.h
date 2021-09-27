@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6f13f82c */
+/* HASH CRC-32:0xf2e2d83b */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -564,7 +564,7 @@ __SYSDECL_BEGIN
 
 #if defined(__USE_KOS) || defined(__USE_KOS_KERNEL)
 #ifndef __errno_t_defined
-#define __errno_t_defined 1
+#define __errno_t_defined
 typedef __errno_t errno_t;
 #endif /* !__errno_t_defined */
 #endif /* __USE_KOS || __USE_KOS_KERNEL */
@@ -576,7 +576,7 @@ typedef __errno_t errno_t;
 #define errno __libc_errno
 #else /* __libc_errno */
 #ifndef ____errno_location_defined
-#define ____errno_location_defined 1
+#define ____errno_location_defined
 #ifdef __CRT_HAVE___errno_location
 /* >> __errno_location(3) */
 __CDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,__errno_t *,__NOTHROW_NCX,__errno_location,(void),())
@@ -633,7 +633,7 @@ __LIBC char *__progname_full;
 #endif /* __NO_ASMNAME */
 #else /* ... */
 #ifndef ____p__pgmptr_defined
-#define ____p__pgmptr_defined 1
+#define ____p__pgmptr_defined
 #ifdef __CRT_HAVE___p__pgmptr
 /* Alias for argv[0], as passed to main() */
 __CDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,char **,__NOTHROW_NCX,__p__pgmptr,(void),())
@@ -675,7 +675,7 @@ __LIBC char *__progname;
 #endif /* __NO_ASMNAME */
 #else /* ... */
 #ifndef ____p_program_invocation_short_name_defined
-#define ____p_program_invocation_short_name_defined 1
+#define ____p_program_invocation_short_name_defined
 #ifdef __CRT_HAVE___p_program_invocation_short_name
 /* >> __p_program_invocation_short_name(3)
  * Alias for `strchr(argv[0], '/') ? strchr(argv[0], '/') + 1 : argv[0]', as passed to main() */
@@ -699,7 +699,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(__p_program_invocation_short_name, __FORCELOCAL 
 #endif /* !program_invocation_short_name */
 
 #ifndef __error_t_defined
-#define __error_t_defined 1
+#define __error_t_defined
 typedef __errno_t error_t;
 #endif /* !__error_t_defined */
 

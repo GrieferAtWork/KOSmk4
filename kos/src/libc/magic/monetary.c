@@ -45,12 +45,12 @@
 __SYSDECL_BEGIN
 
 #ifndef __size_t_defined
-#define __size_t_defined 1
+#define __size_t_defined
 typedef __size_t size_t;
 #endif /* !__size_t_defined */
 
 #ifndef __ssize_t_defined
-#define __ssize_t_defined 1
+#define __ssize_t_defined
 typedef __ssize_t ssize_t;
 #endif /* !__ssize_t_defined */
 

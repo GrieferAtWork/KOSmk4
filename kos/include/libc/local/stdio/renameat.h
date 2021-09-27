@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5c1018a9 */
+/* HASH CRC-32:0x8d2cbd84 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,12 +19,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_renameat_defined
-#define __local_renameat_defined 1
+#define __local_renameat_defined
 #include <__crt.h>
 #ifdef __CRT_HAVE_frenameat
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_frenameat_defined
-#define __local___localdep_frenameat_defined 1
+#define __local___localdep_frenameat_defined
 __CREDIRECT(__ATTR_NONNULL((2, 4)),int,__NOTHROW_RPC,__localdep_frenameat,(__fd_t __oldfd, char const *__oldname, __fd_t __newfd, char const *__newname_or_path, __atflag_t __flags),frenameat,(__oldfd,__oldname,__newfd,__newname_or_path,__flags))
 #endif /* !__local___localdep_frenameat_defined */
 __LOCAL_LIBC(renameat) __ATTR_NONNULL((2, 4)) int
@@ -33,7 +33,7 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(renameat))(__fd_t __oldfd, char const
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_renameat_defined
-#define __local___localdep_renameat_defined 1
+#define __local___localdep_renameat_defined
 #define __localdep_renameat __LIBC_LOCAL_NAME(renameat)
 #endif /* !__local___localdep_renameat_defined */
 #else /* __CRT_HAVE_frenameat */

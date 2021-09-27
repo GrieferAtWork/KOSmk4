@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x374dc4a5 */
+/* HASH CRC-32:0x348b0f2d */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,13 +19,13 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_modff_defined
-#define __local_modff_defined 1
+#define __local_modff_defined
 #include <__crt.h>
 #include <ieee754.h>
 #if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_modf) || defined(__CRT_HAVE___modf) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_modf_defined
-#define __local___localdep_modf_defined 1
+#define __local___localdep_modf_defined
 #if __has_builtin(__builtin_modf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_modf)
 __CEIREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2)),double,__NOTHROW_NCX,__localdep_modf,(double __x, double *__iptr),modf,{ return __builtin_modf(__x, __iptr); })
 #elif defined(__CRT_HAVE_modf)
@@ -63,7 +63,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(modff))(float __x, float *__iptr) {
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_modff_defined
-#define __local___localdep_modff_defined 1
+#define __local___localdep_modff_defined
 #define __localdep_modff __LIBC_LOCAL_NAME(modff)
 #endif /* !__local___localdep_modff_defined */
 #else /* __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ || __CRT_HAVE_modf || __CRT_HAVE___modf || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */

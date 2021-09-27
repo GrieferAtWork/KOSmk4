@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcdff416a */
+/* HASH CRC-32:0x11e08791 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,14 +19,14 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local__setmode_defined
-#define __local__setmode_defined 1
+#define __local__setmode_defined
 #include <__crt.h>
 #include <asm/os/fcntl.h>
 #if (defined(__CRT_HAVE_fcntl) || defined(__CRT_HAVE___fcntl)) && (defined(__F_SETFL_XCH) || (defined(__F_GETFL) && defined(__F_SETFL)))
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_fcntl_defined
-#define __local___localdep_fcntl_defined 1
+#define __local___localdep_fcntl_defined
 #ifdef __CRT_HAVE_fcntl
 __NAMESPACE_LOCAL_END
 #include <features.h>
@@ -55,7 +55,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_setmode))(__fd_t __fd, __oflag_t __m
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep__setmode_defined
-#define __local___localdep__setmode_defined 1
+#define __local___localdep__setmode_defined
 #define __localdep__setmode __LIBC_LOCAL_NAME(_setmode)
 #endif /* !__local___localdep__setmode_defined */
 #else /* (__CRT_HAVE_fcntl || __CRT_HAVE___fcntl) && (__F_SETFL_XCH || (__F_GETFL && __F_SETFL)) */

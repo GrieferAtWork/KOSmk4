@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x42827437 */
+/* HASH CRC-32:0x2d61a9d5 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_Open64_defined
-#define __local_Open64_defined 1
+#define __local_Open64_defined
 #include <__crt.h>
 #include <asm/os/fcntl.h>
 #include <asm/os/oflags.h>
@@ -28,11 +28,11 @@
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 #if !defined(__local___localdep_Open32_defined) && defined(__CRT_HAVE_Open)
-#define __local___localdep_Open32_defined 1
+#define __local___localdep_Open32_defined
 __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__THROWING,__localdep_Open32,(char const *__filename, __oflag_t __oflags),Open,(__filename,__oflags),__oflags,1,(__mode_t))
 #endif /* !__local___localdep_Open32_defined && __CRT_HAVE_Open */
 #ifndef __local___localdep_OpenAt64_defined
-#define __local___localdep_OpenAt64_defined 1
+#define __local___localdep_OpenAt64_defined
 #if defined(__CRT_HAVE_OpenAt) && (!defined(__O_LARGEFILE) || !__O_LARGEFILE)
 __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2)),__fd_t,__THROWING,__localdep_OpenAt64,(__fd_t __dirfd, char const *__filename, __oflag_t __oflags),OpenAt,(__dirfd,__filename,__oflags),__oflags,1,(__mode_t))
 #elif defined(__CRT_HAVE_OpenAt64)
@@ -65,7 +65,7 @@ __LOCAL_LIBC(Open64) __ATTR_WUNUSED __ATTR_NONNULL((1)) __fd_t
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_Open64_defined
-#define __local___localdep_Open64_defined 1
+#define __local___localdep_Open64_defined
 #define __localdep_Open64 __LIBC_LOCAL_NAME(Open64)
 #endif /* !__local___localdep_Open64_defined */
 #else /* (__AT_FDCWD && (__CRT_HAVE_OpenAt64 || __CRT_HAVE_OpenAt)) || __CRT_HAVE_Open */

@@ -68,7 +68,7 @@ template<class __T> __T const &(FORMMAN)(struct mman const *__restrict self, __T
 
 #ifndef THIS_TASK
 #ifndef __this_task_defined
-#define __this_task_defined 1
+#define __this_task_defined
 DATDEF ATTR_PERTASK struct task this_task; /* The current task (for use with `PERTASK') */
 #endif /* !__this_task_defined */
 #define THIS_TASK PERTASK(this_task)

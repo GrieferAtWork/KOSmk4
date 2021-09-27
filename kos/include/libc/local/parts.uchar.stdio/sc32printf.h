@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x57b19446 */
+/* HASH CRC-32:0x82b17029 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,13 +19,13 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_sc32printf_defined
-#define __local_sc32printf_defined 1
+#define __local_sc32printf_defined
 #include <__crt.h>
 #include <features.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_vsc32printf_defined
-#define __local___localdep_vsc32printf_defined 1
+#define __local___localdep_vsc32printf_defined
 #if defined(__CRT_HAVE_vswprintf) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
 __CREDIRECT(__ATTR_LIBC_WPRINTF(3, 0) __ATTR_NONNULL((3)),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,__localdep_vsc32printf,(__CHAR32_TYPE__ *__restrict __buf, __SIZE_TYPE__ __buflen, __CHAR32_TYPE__ const *__restrict __format, __builtin_va_list __args),vswprintf,(__buf,__buflen,__format,__args))
 #elif defined(__CRT_HAVE_KOS$vswprintf)
@@ -53,7 +53,7 @@ __NOTHROW_NCX(__VLIBKCALL __LIBC_LOCAL_NAME(sc32printf))(__CHAR32_TYPE__ *__rest
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_sc32printf_defined
-#define __local___localdep_sc32printf_defined 1
+#define __local___localdep_sc32printf_defined
 #define __localdep_sc32printf __LIBC_LOCAL_NAME(sc32printf)
 #endif /* !__local___localdep_sc32printf_defined */
 #endif /* !__local_sc32printf_defined */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe58d0ebd */
+/* HASH CRC-32:0xaf231aa8 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_format_width_defined
-#define __local_format_width_defined 1
+#define __local_format_width_defined
 #include <__crt.h>
 #include <bits/crt/format-printer.h>
 #include <hybrid/typecore.h>
@@ -43,7 +43,7 @@ __NOTHROW_NCX(__FORMATPRINTER_CC __LIBC_LOCAL_NAME(format_width))(void *__arg, c
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_format_width_defined
-#define __local___localdep_format_width_defined 1
+#define __local___localdep_format_width_defined
 #define __localdep_format_width __LIBC_LOCAL_NAME(format_width)
 #endif /* !__local___localdep_format_width_defined */
 #endif /* !__local_format_width_defined */

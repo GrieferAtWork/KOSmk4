@@ -26,23 +26,23 @@
 
 #if defined(__i386__) && !defined(__x86_64__)
 #define LIBJSON_CC __ATTR_STDCALL
-#else
+#else /* ... */
 #define LIBJSON_CC /* nothing */
-#endif
+#endif /* !... */
 
-#if !defined(LIBJSON_WANT_PROTOTYPES) && \
-     defined(__KOS__) && defined(__KERNEL__)
-#define LIBJSON_WANT_PROTOTYPES 1
-#endif
+#if (!defined(LIBJSON_WANT_PROTOTYPES) && \
+     defined(__KOS__) && defined(__KERNEL__))
+#define LIBJSON_WANT_PROTOTYPES
+#endif /* ... */
 
-#if defined(__KOS__) && defined(__KERNEL__) && \
-    defined(CONFIG_BUILDING_KERNEL_CORE)
+#if (defined(__KOS__) && defined(__KERNEL__) && \
+     defined(CONFIG_BUILDING_KERNEL_CORE))
 #define LIBJSON_DECL __PUBDEF
 #elif defined(__LIBJSON_STATIC)
 #define LIBJSON_DECL __INTDEF
-#else
+#else /* ... */
 #define LIBJSON_DECL __IMPDEF
-#endif
+#endif /* !... */
 
 /* Library name for use with `dlopen()' */
 #define LIBJSON_LIBRARY_NAME "libjson.so"

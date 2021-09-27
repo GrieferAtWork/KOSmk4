@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6c1d9737 */
+/* HASH CRC-32:0xbd0605ea */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,11 +19,11 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_srandom_defined
-#define __local_srandom_defined 1
+#define __local_srandom_defined
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_srand_defined
-#define __local___localdep_srand_defined 1
+#define __local___localdep_srand_defined
 #ifdef __CRT_HAVE_srand
 __CREDIRECT_VOID(,__NOTHROW,__localdep_srand,(long __seed),srand,(__seed))
 #else /* __CRT_HAVE_srand */
@@ -46,7 +46,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(srandom))(unsigned int __seed) {
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_srandom_defined
-#define __local___localdep_srandom_defined 1
+#define __local___localdep_srandom_defined
 #define __localdep_srandom __LIBC_LOCAL_NAME(srandom)
 #endif /* !__local___localdep_srandom_defined */
 #endif /* !__local_srandom_defined */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x59551435 */
+/* HASH CRC-32:0x70e04604 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,12 +19,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_mempmoveupl_defined
-#define __local_mempmoveupl_defined 1
+#define __local_mempmoveupl_defined
 #include <__crt.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_memmoveupl_defined
-#define __local___localdep_memmoveupl_defined 1
+#define __local___localdep_memmoveupl_defined
 #ifdef __CRT_HAVE_memmoveupl
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT32_TYPE__ *,__NOTHROW_NCX,__localdep_memmoveupl,(void *__dst, void const *__src, __SIZE_TYPE__ __n_dwords),memmoveupl,(__dst,__src,__n_dwords))
 #elif defined(__CRT_HAVE_memmovel)
@@ -46,7 +46,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(mempmoveupl))(void *__dst, void const
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_mempmoveupl_defined
-#define __local___localdep_mempmoveupl_defined 1
+#define __local___localdep_mempmoveupl_defined
 #define __localdep_mempmoveupl __LIBC_LOCAL_NAME(mempmoveupl)
 #endif /* !__local___localdep_mempmoveupl_defined */
 #endif /* !__local_mempmoveupl_defined */

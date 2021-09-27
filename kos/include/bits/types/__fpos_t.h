@@ -22,7 +22,7 @@
 #include <features.h>
 #include <bits/types.h>
 #ifndef ____fpos_t_defined
-#define ____fpos_t_defined 1
+#define ____fpos_t_defined
 #ifdef __CC__
 __SYSDECL_BEGIN
 typedef __FS_TYPE(pos) __fpos_t;

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x33b17d62 */
+/* HASH CRC-32:0x67b3701 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,12 +19,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_mempmove_defined
-#define __local_mempmove_defined 1
+#define __local_mempmove_defined
 #include <__crt.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_memmove_defined
-#define __local___localdep_memmove_defined 1
+#define __local___localdep_memmove_defined
 #ifdef __CRT_HAVE_memmove
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_memmove,(void *__dst, void const *__src, __SIZE_TYPE__ __n_bytes),memmove,(__dst,__src,__n_bytes))
 #else /* __CRT_HAVE_memmove */
@@ -40,7 +40,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(mempmove))(void *__dst, void const *_
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_mempmove_defined
-#define __local___localdep_mempmove_defined 1
+#define __local___localdep_mempmove_defined
 #define __localdep_mempmove __LIBC_LOCAL_NAME(mempmove)
 #endif /* !__local___localdep_mempmove_defined */
 #endif /* !__local_mempmove_defined */

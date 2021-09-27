@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcc025712 */
+/* HASH CRC-32:0xd31d7435 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -626,7 +626,7 @@ __SYSDECL_BEGIN
 
 #if defined(__USE_UNIX98) || defined(__USE_XOPEN2K8)
 #ifndef __pid_t_defined
-#define __pid_t_defined 1
+#define __pid_t_defined
 typedef __pid_t pid_t;
 #endif /* !__pid_t_defined */
 #endif /* __USE_UNIX98 || __USE_XOPEN2K8 */

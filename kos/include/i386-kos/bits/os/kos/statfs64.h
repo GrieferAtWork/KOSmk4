@@ -110,7 +110,7 @@
 #else /* __USE_LARGEFILE64 */
 #define __statfs64 statfs
 #endif /* !__USE_LARGEFILE64 */
-#define __statfs_defined 1
+#define __statfs_defined
 #endif /* __x86_64__ */
 /*[[[end]]]*/
 

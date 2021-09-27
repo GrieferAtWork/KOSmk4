@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x40a45412 */
+/* HASH CRC-32:0xa78116e0 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_memmoveupq_defined
-#define __local_memmoveupq_defined 1
+#define __local_memmoveupq_defined
 #include <__crt.h>
 #include <hybrid/typecore.h>
 #include <hybrid/__assert.h>
@@ -58,7 +58,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memmoveupq))(void *__dst, void const 
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_memmoveupq_defined
-#define __local___localdep_memmoveupq_defined 1
+#define __local___localdep_memmoveupq_defined
 #define __localdep_memmoveupq __LIBC_LOCAL_NAME(memmoveupq)
 #endif /* !__local___localdep_memmoveupq_defined */
 #endif /* !__local_memmoveupq_defined */

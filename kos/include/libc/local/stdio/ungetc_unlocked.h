@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6e122e18 */
+/* HASH CRC-32:0xe1eec21a */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,13 +19,13 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_ungetc_unlocked_defined
-#define __local_ungetc_unlocked_defined 1
+#define __local_ungetc_unlocked_defined
 #include <__crt.h>
 #include <features.h>
 #if defined(__CRT_HAVE_ungetc) || defined(__CRT_HAVE__IO_ungetc) || defined(__CRT_HAVE_ungetc_unlocked) || defined(__CRT_HAVE__ungetc_nolock)
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_ungetc_defined
-#define __local___localdep_ungetc_defined 1
+#define __local___localdep_ungetc_defined
 #if defined(__CRT_HAVE_ungetc_unlocked) && defined(__USE_STDIO_UNLOCKED)
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_ungetc,(int __ch, __FILE *__restrict __stream),ungetc_unlocked,(__ch,__stream))
 #elif defined(__CRT_HAVE__ungetc_nolock) && defined(__USE_STDIO_UNLOCKED)
@@ -48,7 +48,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(ungetc_unlocked))(int __ch, __FILE *_
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_ungetc_unlocked_defined
-#define __local___localdep_ungetc_unlocked_defined 1
+#define __local___localdep_ungetc_unlocked_defined
 #define __localdep_ungetc_unlocked __LIBC_LOCAL_NAME(ungetc_unlocked)
 #endif /* !__local___localdep_ungetc_unlocked_defined */
 #else /* __CRT_HAVE_ungetc || __CRT_HAVE__IO_ungetc || __CRT_HAVE_ungetc_unlocked || __CRT_HAVE__ungetc_nolock */

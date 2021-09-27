@@ -150,7 +150,7 @@ DECL_BEGIN
  *       calling  thread!  (if  this  doesn't  apply,  `syscall_emulate()' should
  *       be used instead) */
 #ifndef __syscall_emulate_defined
-#define __syscall_emulate_defined 1
+#define __syscall_emulate_defined
 FUNDEF WUNUSED NONNULL((1, 2)) struct icpustate *FCALL
 syscall_emulate(struct icpustate *__restrict state,
                 struct rpc_syscall_info const *__restrict sc_info);

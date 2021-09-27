@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5087a611 */
+/* HASH CRC-32:0x194734d */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,12 +19,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_atoll_defined
-#define __local_atoll_defined 1
+#define __local_atoll_defined
 #include <__crt.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_strto32_defined
-#define __local___localdep_strto32_defined 1
+#define __local___localdep_strto32_defined
 #ifdef __CRT_HAVE_strto32
 __NAMESPACE_LOCAL_END
 #include <features.h>
@@ -58,7 +58,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_strto32_defined */
 #ifndef __local___localdep_strto64_defined
-#define __local___localdep_strto64_defined 1
+#define __local___localdep_strto64_defined
 #ifdef __CRT_HAVE_strto64
 __NAMESPACE_LOCAL_END
 #include <features.h>
@@ -106,7 +106,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(atoll))(char const *__restrict __nptr
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_atoll_defined
-#define __local___localdep_atoll_defined 1
+#define __local___localdep_atoll_defined
 #define __localdep_atoll __LIBC_LOCAL_NAME(atoll)
 #endif /* !__local___localdep_atoll_defined */
 #endif /* !__local_atoll_defined */

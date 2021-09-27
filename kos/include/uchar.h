@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7a1402b7 */
+/* HASH CRC-32:0x8a2db72b */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -35,11 +35,11 @@
 #else /* __CXX_SYSTEM_HEADER */
 /* Import all symbols into the global namespace when re-including "uchar.h" after "cuchar" */
 #ifndef __mbstate_t_defined
-#define __mbstate_t_defined 1
+#define __mbstate_t_defined
 __NAMESPACE_STD_USING(mbstate_t)
 #endif /* !__mbstate_t_defined */
 #ifndef __size_t_defined
-#define __size_t_defined 1
+#define __size_t_defined
 __NAMESPACE_STD_USING(size_t)
 #endif /* !__size_t_defined */
 __NAMESPACE_STD_USING(mbrtoc16)
@@ -87,7 +87,7 @@ __NAMESPACE_STD_USING(c32rtomb)
 __SYSDECL_BEGIN
 
 #ifndef __std_mbstate_t_defined
-#define __std_mbstate_t_defined 1
+#define __std_mbstate_t_defined
 __NAMESPACE_STD_BEGIN
 typedef struct __mbstate mbstate_t;
 __NAMESPACE_STD_END
@@ -95,7 +95,7 @@ __NAMESPACE_STD_END
 
 #ifndef __CXX_SYSTEM_HEADER
 #ifndef __mbstate_t_defined
-#define __mbstate_t_defined 1
+#define __mbstate_t_defined
 __NAMESPACE_STD_USING(mbstate_t)
 #endif /* !__mbstate_t_defined */
 #endif /* !__CXX_SYSTEM_HEADER */
@@ -103,20 +103,20 @@ __NAMESPACE_STD_USING(mbstate_t)
 
 /* Define `size_t' */
 #ifndef __std_size_t_defined
-#define __std_size_t_defined 1
+#define __std_size_t_defined
 __NAMESPACE_STD_BEGIN
 typedef __SIZE_TYPE__ size_t;
 __NAMESPACE_STD_END
 #endif /* !__std_size_t_defined */
 #ifndef __CXX_SYSTEM_HEADER
 #ifndef __size_t_defined
-#define __size_t_defined 1
+#define __size_t_defined
 __NAMESPACE_STD_USING(size_t)
 #endif /* !__size_t_defined */
 #endif /* !__CXX_SYSTEM_HEADER */
 
 #ifndef __char16_t_defined
-#define __char16_t_defined 1
+#define __char16_t_defined
 typedef __CHAR16_TYPE__ char16_t;
 typedef __CHAR32_TYPE__ char32_t;
 #endif /* !__char16_t_defined */
@@ -307,7 +307,7 @@ __SYSDECL_END
 #endif /* __USE_UTF */
 
 #ifdef __CXX_SYSTEM_HEADER
-#define _CXX_STDONLY_CUCHAR 1
+#define _CXX_STDONLY_CUCHAR
 #undef _UCHAR_H
 #endif /* __CXX_SYSTEM_HEADER */
 #endif /* !_CXX_STDONLY_CUCHAR */

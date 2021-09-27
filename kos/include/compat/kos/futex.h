@@ -31,7 +31,7 @@
 __DECL_BEGIN
 
 #ifndef __compat_lfutex_t_defined
-#define __compat_lfutex_t_defined 1
+#define __compat_lfutex_t_defined
 typedef __compat_uintptr_t compat_lfutex_t;
 #endif /* !__compat_lfutex_t_defined */
 

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1c2d39fa */
+/* HASH CRC-32:0x2cf139f3 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,13 +19,13 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_atanf_defined
-#define __local_atanf_defined 1
+#define __local_atanf_defined
 #include <__crt.h>
 #include <ieee754.h>
 #if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_atan) || defined(__CRT_HAVE___atan) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_atan_defined
-#define __local___localdep_atan_defined 1
+#define __local___localdep_atan_defined
 #if __has_builtin(__builtin_atan) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_atan)
 __CEIREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_atan,(double __x),atan,{ return __builtin_atan(__x); })
 #elif defined(__CRT_HAVE_atan)
@@ -67,7 +67,7 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(atanf))(float __x) {
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_atanf_defined
-#define __local___localdep_atanf_defined 1
+#define __local___localdep_atanf_defined
 #define __localdep_atanf __LIBC_LOCAL_NAME(atanf)
 #endif /* !__local___localdep_atanf_defined */
 #else /* __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ || __CRT_HAVE_atan || __CRT_HAVE___atan || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */

@@ -47,7 +47,7 @@ __SYSDECL_BEGIN
 
 #ifndef __USE_ISOC_PURE
 #ifndef __wint_t_defined
-#define __wint_t_defined 1
+#define __wint_t_defined
 typedef __WINT_TYPE__ wint_t;
 #endif /* !__wint_t_defined */
 #endif /* !__USE_ISOC_PURE */
@@ -111,7 +111,7 @@ typedef __io_write_fn cookie_write_function_t;
 typedef __io_seek_fn cookie_seek_function_t;
 typedef __io_close_fn cookie_close_function_t;
 #ifndef __cookie_io_functions_t_defined
-#define __cookie_io_functions_t_defined 1
+#define __cookie_io_functions_t_defined
 typedef _IO_cookie_io_functions_t cookie_io_functions_t;
 #endif /* !__cookie_io_functions_t_defined */
 #endif /* __USE_GNU */

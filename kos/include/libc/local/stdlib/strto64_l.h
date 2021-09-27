@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc2b56f4f */
+/* HASH CRC-32:0xf139497d */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,13 +19,13 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_strto64_l_defined
-#define __local_strto64_l_defined 1
+#define __local_strto64_l_defined
 #include <__crt.h>
 #include <features.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_strto64_defined
-#define __local___localdep_strto64_defined 1
+#define __local___localdep_strto64_defined
 #ifdef __CRT_HAVE_strto64
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__INT64_TYPE__,__NOTHROW_NCX,__localdep_strto64,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base),strto64,(__nptr,__endptr,__base))
 #elif defined(__CRT_HAVE__strtoi64)
@@ -52,7 +52,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strto64_l))(char const *__restrict __
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_strto64_l_defined
-#define __local___localdep_strto64_l_defined 1
+#define __local___localdep_strto64_l_defined
 #define __localdep_strto64_l __LIBC_LOCAL_NAME(strto64_l)
 #endif /* !__local___localdep_strto64_l_defined */
 #endif /* !__local_strto64_l_defined */

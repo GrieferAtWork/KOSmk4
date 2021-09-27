@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd8f9f45 */
+/* HASH CRC-32:0xe3abb7ea */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,12 +19,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_mempatl_defined
-#define __local_mempatl_defined 1
+#define __local_mempatl_defined
 #include <__crt.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_mempsetl_defined
-#define __local___localdep_mempsetl_defined 1
+#define __local___localdep_mempsetl_defined
 #ifdef __CRT_HAVE_mempsetl
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),__UINT32_TYPE__ *,__NOTHROW_NCX,__localdep_mempsetl,(void *__restrict __dst, __UINT32_TYPE__ __dword, __SIZE_TYPE__ __n_dwords),mempsetl,(__dst,__dword,__n_dwords))
 #elif defined(__CRT_HAVE_wmempset) && __SIZEOF_WCHAR_T__ == 4
@@ -53,7 +53,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(mempatl))(void *__restrict __dst, __U
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_mempatl_defined
-#define __local___localdep_mempatl_defined 1
+#define __local___localdep_mempatl_defined
 #define __localdep_mempatl __LIBC_LOCAL_NAME(mempatl)
 #endif /* !__local___localdep_mempatl_defined */
 #endif /* !__local_mempatl_defined */

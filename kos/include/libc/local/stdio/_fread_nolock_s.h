@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1aff1760 */
+/* HASH CRC-32:0x9aa7b566 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,13 +19,13 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local__fread_nolock_s_defined
-#define __local__fread_nolock_s_defined 1
+#define __local__fread_nolock_s_defined
 #include <__crt.h>
 #if defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked) || (defined(__CRT_HAVE_fgetc) && (!defined(__CRT_DOS) || !defined(__CRT_HAVE__filbuf))) || (defined(__CRT_HAVE_getc) && (!defined(__CRT_DOS) || !defined(__CRT_HAVE__filbuf))) || (defined(__CRT_HAVE__IO_getc) && (!defined(__CRT_DOS) || !defined(__CRT_HAVE__filbuf))) || (defined(__CRT_DOS) && defined(__CRT_HAVE__filbuf)) || defined(__CRT_HAVE_fread) || defined(__CRT_HAVE__IO_fread) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock)
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_fread_unlocked_defined
-#define __local___localdep_fread_unlocked_defined 1
+#define __local___localdep_fread_unlocked_defined
 #ifdef __CRT_HAVE_fread_unlocked
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
@@ -66,7 +66,7 @@ __LOCAL_LIBC(_fread_nolock_s) __ATTR_WUNUSED __ATTR_NONNULL((1, 5)) __SIZE_TYPE_
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep__fread_nolock_s_defined
-#define __local___localdep__fread_nolock_s_defined 1
+#define __local___localdep__fread_nolock_s_defined
 #define __localdep__fread_nolock_s __LIBC_LOCAL_NAME(_fread_nolock_s)
 #endif /* !__local___localdep__fread_nolock_s_defined */
 #else /* __CRT_HAVE_fgetc_unlocked || __CRT_HAVE_getc_unlocked || (__CRT_HAVE_fgetc && (!__CRT_DOS || !__CRT_HAVE__filbuf)) || (__CRT_HAVE_getc && (!__CRT_DOS || !__CRT_HAVE__filbuf)) || (__CRT_HAVE__IO_getc && (!__CRT_DOS || !__CRT_HAVE__filbuf)) || (__CRT_DOS && __CRT_HAVE__filbuf) || __CRT_HAVE_fread || __CRT_HAVE__IO_fread || __CRT_HAVE_fread_unlocked || __CRT_HAVE__fread_nolock */

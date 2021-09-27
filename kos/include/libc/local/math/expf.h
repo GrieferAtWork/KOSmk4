@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb8f45aa3 */
+/* HASH CRC-32:0x1d37f747 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,14 +19,14 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_expf_defined
-#define __local_expf_defined 1
+#define __local_expf_defined
 #include <__crt.h>
 #include <ieee754.h>
 #if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_exp) || defined(__CRT_HAVE___exp) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <bits/crt/math-vector.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_exp_defined
-#define __local___localdep_exp_defined 1
+#define __local___localdep_exp_defined
 #if __has_builtin(__builtin_exp) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_exp)
 __CEIREDIRECT(__ATTR_WUNUSED __DECL_SIMD_exp,double,__NOTHROW,__localdep_exp,(double __x),exp,{ return __builtin_exp(__x); })
 #elif defined(__CRT_HAVE_exp)
@@ -70,7 +70,7 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(expf))(float __x) {
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_expf_defined
-#define __local___localdep_expf_defined 1
+#define __local___localdep_expf_defined
 #define __localdep_expf __LIBC_LOCAL_NAME(expf)
 #endif /* !__local___localdep_expf_defined */
 #else /* __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ || __CRT_HAVE_exp || __CRT_HAVE___exp || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */

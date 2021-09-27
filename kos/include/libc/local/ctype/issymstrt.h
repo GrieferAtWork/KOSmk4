@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3544c9d9 */
+/* HASH CRC-32:0xed4e92db */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,12 +19,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_issymstrt_defined
-#define __local_issymstrt_defined 1
+#define __local_issymstrt_defined
 #include <__crt.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_isalpha_defined
-#define __local___localdep_isalpha_defined 1
+#define __local___localdep_isalpha_defined
 __NAMESPACE_LOCAL_END
 #include <bits/crt/ctype.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -49,7 +49,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(issymstrt))(int __ch) {
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_issymstrt_defined
-#define __local___localdep_issymstrt_defined 1
+#define __local___localdep_issymstrt_defined
 #define __localdep_issymstrt __LIBC_LOCAL_NAME(issymstrt)
 #endif /* !__local___localdep_issymstrt_defined */
 #endif /* !__local_issymstrt_defined */

@@ -618,7 +618,7 @@ DEFINE_REFCOUNT_FUNCTIONS(struct socket_connect_aio, sca_refcnt, socket_connect_
 	 MSG_OOB | MSG_PEEK | MSG_TRUNC | MSG_WAITALL)
 
 #ifndef __socket_connect_aio_axref_defined
-#define __socket_connect_aio_axref_defined 1
+#define __socket_connect_aio_axref_defined
 AXREF(socket_connect_aio_axref, socket_connect_aio);
 #endif /* !__socket_connect_aio_axref_defined */
 

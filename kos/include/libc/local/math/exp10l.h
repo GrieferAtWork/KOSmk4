@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc14a99bf */
+/* HASH CRC-32:0x811d2914 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,12 +19,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_exp10l_defined
-#define __local_exp10l_defined 1
+#define __local_exp10l_defined
 #include <__crt.h>
 #if defined(__CRT_HAVE_exp10) || defined(__CRT_HAVE___exp10)
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_exp10_defined
-#define __local___localdep_exp10_defined 1
+#define __local___localdep_exp10_defined
 #if __has_builtin(__builtin_exp10) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_exp10)
 __CEIREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_exp10,(double __x),exp10,{ return __builtin_exp10(__x); })
 #elif defined(__CRT_HAVE_exp10)
@@ -41,7 +41,7 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(exp10l))(__LONGDOUBLE __x) {
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_exp10l_defined
-#define __local___localdep_exp10l_defined 1
+#define __local___localdep_exp10l_defined
 #define __localdep_exp10l __LIBC_LOCAL_NAME(exp10l)
 #endif /* !__local___localdep_exp10l_defined */
 #else /* __CRT_HAVE_exp10 || __CRT_HAVE___exp10 */

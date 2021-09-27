@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x53d976bb */
+/* HASH CRC-32:0x97a46888 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_unicode_readutf8_n_defined
-#define __local_unicode_readutf8_n_defined 1
+#define __local_unicode_readutf8_n_defined
 #include <__crt.h>
 #include <libc/template/unicode_utf8seqlen.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -111,7 +111,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(unicode_readutf8_n))(char const **__r
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_unicode_readutf8_n_defined
-#define __local___localdep_unicode_readutf8_n_defined 1
+#define __local___localdep_unicode_readutf8_n_defined
 #define __localdep_unicode_readutf8_n __LIBC_LOCAL_NAME(unicode_readutf8_n)
 #endif /* !__local___localdep_unicode_readutf8_n_defined */
 #endif /* !__local_unicode_readutf8_n_defined */

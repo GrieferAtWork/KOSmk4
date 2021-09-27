@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x62fd5f49 */
+/* HASH CRC-32:0x23fbcd06 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,14 +19,14 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_getpass_r_defined
-#define __local_getpass_r_defined 1
+#define __local_getpass_r_defined
 #include <__crt.h>
 #include <asm/os/stdio.h>
 #if defined(__CRT_HAVE_getpassfd) || defined(__CRT_HAVE_read) || defined(__CRT_HAVE__read) || defined(__CRT_HAVE___read) || defined(__CRT_HAVE_readpassphrase)
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_getpassfd_defined
-#define __local___localdep_getpassfd_defined 1
+#define __local___localdep_getpassfd_defined
 #ifdef __CRT_HAVE_getpassfd
 __NAMESPACE_LOCAL_END
 #include <features.h>
@@ -43,7 +43,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_getpassfd_defined */
 #ifndef __local___localdep_readpassphrase_defined
-#define __local___localdep_readpassphrase_defined 1
+#define __local___localdep_readpassphrase_defined
 #ifdef __CRT_HAVE_readpassphrase
 __NAMESPACE_LOCAL_END
 #include <features.h>
@@ -83,7 +83,7 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(getpass_r))(char const *__prompt, cha
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_getpass_r_defined
-#define __local___localdep_getpass_r_defined 1
+#define __local___localdep_getpass_r_defined
 #define __localdep_getpass_r __LIBC_LOCAL_NAME(getpass_r)
 #endif /* !__local___localdep_getpass_r_defined */
 #else /* __CRT_HAVE_getpassfd || __CRT_HAVE_read || __CRT_HAVE__read || __CRT_HAVE___read || __CRT_HAVE_readpassphrase */

@@ -57,14 +57,14 @@ __DECL_BEGIN
 
 #ifdef __USE_KOS
 #ifndef __byte_t_defined
-#define __byte_t_defined 1
+#define __byte_t_defined
 typedef __byte_t byte_t;
 #endif /* !__byte_t_defined */
 #endif /* __USE_KOS */
 
 #ifdef __USE_MISC
 #ifndef __u_char_defined
-#define __u_char_defined 1
+#define __u_char_defined
 typedef __u_char   u_char;
 typedef __u_short  u_short;
 typedef __u_int    u_int;
@@ -72,24 +72,24 @@ typedef __u_long   u_long;
 #endif /* !__u_char_defined */
 
 #ifndef __quad_t_defined
-#define __quad_t_defined 1
+#define __quad_t_defined
 typedef __quad_t   quad_t;
 typedef __u_quad_t u_quad_t;
 #endif /* !__quad_t_defined */
 
 #ifndef __fsid_t_defined
-#define __fsid_t_defined 1
+#define __fsid_t_defined
 typedef __fsid_t   fsid_t;
 #endif /* !__fsid_t_defined */
 
 #ifndef __daddr_t_defined
-#define __daddr_t_defined 1
+#define __daddr_t_defined
 typedef __daddr_t daddr_t;
 typedef __caddr_t caddr_t;
 #endif /* !__daddr_t_defined */
 
 #ifndef __ulong_defined
-#define __ulong_defined 1
+#define __ulong_defined
 typedef unsigned long int  ulong;
 typedef unsigned short int ushort;
 typedef unsigned int       uint;
@@ -98,122 +98,122 @@ typedef unsigned int       uint;
 #endif /* __USE_MISC */
 
 #ifndef __loff_t_defined
-#define __loff_t_defined 1
+#define __loff_t_defined
 typedef __loff_t loff_t; /* Large file/device offset */
 #endif /* !__loff_t_defined */
 
 #ifndef __ino_t_defined
-#define __ino_t_defined 1
+#define __ino_t_defined
 typedef __FS_TYPE(ino) ino_t;  /* INode number */
 #endif /* !__ino_t_defined */
 
 #ifdef __USE_LARGEFILE64
 #ifndef __ino64_t_defined
-#define __ino64_t_defined 1
+#define __ino64_t_defined
 typedef __ino64_t ino64_t;
 #endif /* !__ino64_t_defined */
 
 #ifndef __off64_t_defined
-#define __off64_t_defined 1
+#define __off64_t_defined
 typedef __off64_t off64_t;
 #endif /* !__off64_t_defined */
 #endif /* __USE_LARGEFILE64 */
 
 #ifndef __dev_t_defined
-#define __dev_t_defined 1
+#define __dev_t_defined
 typedef __dev_t dev_t;
 #endif /* !__dev_t_defined */
 
 #ifndef __gid_t_defined
-#define __gid_t_defined 1
+#define __gid_t_defined
 typedef __gid_t gid_t;
 #endif /* !__gid_t_defined */
 
 #ifndef __mode_t_defined
-#define __mode_t_defined 1
+#define __mode_t_defined
 typedef __mode_t mode_t; /* INode type (Set of `S_*' from `<fcntl.h>' or `<sys/stat.h>') */
 #endif /* !__mode_t_defined */
 
 #ifndef __nlink_t_defined
-#define __nlink_t_defined 1
+#define __nlink_t_defined
 typedef __nlink_t nlink_t;
 #endif /* !__nlink_t_defined */
 
 #ifndef __uid_t_defined
-#define __uid_t_defined 1
+#define __uid_t_defined
 typedef __uid_t uid_t;
 #endif /* !__uid_t_defined */
 
 #ifndef __off_t_defined
-#define __off_t_defined 1
+#define __off_t_defined
 typedef __FS_TYPE(off) off_t;
 #endif /* !__off_t_defined */
 
 #ifndef __pid_t_defined
-#define __pid_t_defined 1
+#define __pid_t_defined
 typedef __pid_t pid_t;
 #endif /* !__pid_t_defined */
 
 #if defined(__USE_XOPEN) || defined(__USE_XOPEN2K8)
 #ifndef __id_t_defined
-#define __id_t_defined 1
+#define __id_t_defined
 typedef __id_t id_t;
 #endif /* !__id_t_defined */
 
 #ifndef __clock_t_defined
-#define __clock_t_defined 1
+#define __clock_t_defined
 typedef __clock_t clock_t;
 #endif /* !__clock_t_defined */
 #endif /* __USE_XOPEN || __USE_XOPEN2K8 */
 
 #ifndef __ssize_t_defined
-#define __ssize_t_defined 1
+#define __ssize_t_defined
 typedef __ssize_t ssize_t;
 #endif /* !__ssize_t_defined */
 
 #if defined (__USE_MISC) || defined(__USE_XOPEN)
 #ifndef __key_t_defined
-#define __key_t_defined 1
+#define __key_t_defined
 typedef __key_t key_t;
 #endif /* !__key_t_defined */
 #endif /* __USE_MISC || __USE_XOPEN */
 
 #ifndef __time_t_defined
-#define __time_t_defined  1
+#define __time_t_defined
 typedef __TM_TYPE(time) time_t;
 #endif /* !__time_t_defined */
 
 #ifndef __clockid_t_defined
-#define __clockid_t_defined 1
+#define __clockid_t_defined
 typedef __clockid_t clockid_t;
 #endif /* !__clockid_t_defined */
 
 #ifndef __timer_t_defined
-#define __timer_t_defined 1
+#define __timer_t_defined
 typedef __timer_t timer_t;
 #endif /* !__timer_t_defined */
 
 #ifdef __USE_XOPEN
 #ifndef __useconds_t_defined
-#define __useconds_t_defined 1
+#define __useconds_t_defined
 typedef __useconds_t useconds_t;
 #endif /* !__useconds_t_defined */
 
 #ifndef __suseconds_t_defined
-#define __suseconds_t_defined 1
+#define __suseconds_t_defined
 typedef __suseconds_t suseconds_t;
 #endif /* !__suseconds_t_defined */
 #endif /* !__USE_XOPEN */
 
 #ifndef __size_t_defined
-#define __size_t_defined 1
+#define __size_t_defined
 typedef __SIZE_TYPE__ size_t;
 #endif /* !__size_t_defined */
 
 #ifndef __BIT_TYPES_DEFINED__
 #define __BIT_TYPES_DEFINED__ 1 /* Keep this macro! Some programs test for it. */
 #ifndef __int8_t_defined
-#define __int8_t_defined 1
+#define __int8_t_defined
 #ifdef __INT8_TYPE__
 typedef __INT8_TYPE__ int8_t;
 #endif /* __INT8_TYPE__ */
@@ -229,7 +229,7 @@ typedef __INT64_TYPE__ int64_t;
 #endif /* __int8_t_defined */
 
 #ifndef __uint8_t_defined
-#define __uint8_t_defined 1
+#define __uint8_t_defined
 #ifdef __UINT8_TYPE__
 typedef __UINT8_TYPE__ uint8_t;
 #endif /* __UINT8_TYPE__ */
@@ -245,7 +245,7 @@ typedef __UINT64_TYPE__ uint64_t;
 #endif /* !__uint8_t_defined */
 
 #ifndef __u_int8_t_defined
-#define __u_int8_t_defined 1
+#define __u_int8_t_defined
 #ifdef __UINT8_TYPE__
 typedef __UINT8_TYPE__ u_int8_t;
 #endif /* __UINT8_TYPE__ */
@@ -261,46 +261,46 @@ typedef __UINT64_TYPE__ u_int64_t;
 #endif /* !__u_int8_t_defined */
 
 #ifndef __register_t_defined
-#define __register_t_defined 1
+#define __register_t_defined
 typedef __sregister_t register_t; /* This one's signed in GLIBc, so we make it such, too. */
 #endif /* !__register_t_defined */
 #endif /* !__BIT_TYPES_DEFINED__ */
 
 #if defined(__USE_UNIX98) || defined(__USE_XOPEN2K8)
 #ifndef __blksize_t_defined
-#define __blksize_t_defined 1
+#define __blksize_t_defined
 typedef __blksize_t blksize_t;
 #endif /* !__blksize_t_defined */
 #endif /* __USE_UNIX98 || __USE_XOPEN2K8 */
 
 #ifndef __blkcnt_t_defined
-#define __blkcnt_t_defined 1
+#define __blkcnt_t_defined
 typedef __FS_TYPE(blkcnt) blkcnt_t;
 #endif /* !__blkcnt_t_defined */
 
 #ifndef __fsblkcnt_t_defined
-#define __fsblkcnt_t_defined 1
+#define __fsblkcnt_t_defined
 typedef __FS_TYPE(fsblkcnt) fsblkcnt_t;
 #endif /* !__fsblkcnt_t_defined */
 
 #ifndef __fsfilcnt_t_defined
-#define __fsfilcnt_t_defined 1
+#define __fsfilcnt_t_defined
 typedef __FS_TYPE(fsfilcnt) fsfilcnt_t;
 #endif /* !__fsfilcnt_t_defined */
 
 #ifdef __USE_LARGEFILE64
 #ifndef __blkcnt64_t_defined
-#define __blkcnt64_t_defined 1
+#define __blkcnt64_t_defined
 typedef __blkcnt64_t blkcnt64_t;
 #endif /* !__blkcnt64_t_defined */
 
 #ifndef __fsblkcnt64_t_defined
-#define __fsblkcnt64_t_defined 1
+#define __fsblkcnt64_t_defined
 typedef __fsblkcnt64_t fsblkcnt64_t;
 #endif /* !__fsblkcnt64_t_defined */
 
 #ifndef __fsfilcnt64_t_defined
-#define __fsfilcnt64_t_defined 1
+#define __fsfilcnt64_t_defined
 typedef __fsfilcnt64_t fsfilcnt64_t;
 #endif /* !__fsfilcnt64_t_defined */
 #endif /* !__USE_LARGEFILE64 */

@@ -104,15 +104,15 @@ __SYSDECL_BEGIN
 %{
 
 #ifndef __intptr_t_defined
-#define __intptr_t_defined 1
+#define __intptr_t_defined
 typedef __intptr_t intptr_t;
 #endif /* !__intptr_t_defined */
 #ifndef __uintptr_t_defined
-#define __uintptr_t_defined 1
+#define __uintptr_t_defined
 typedef __uintptr_t uintptr_t;
 #endif /* !__uintptr_t_defined */
 #ifndef __wchar_t_defined
-#define __wchar_t_defined 1
+#define __wchar_t_defined
 typedef __WCHAR_TYPE__ wchar_t;
 #endif /* !__wchar_t_defined */
 
@@ -122,7 +122,7 @@ typedef __WCHAR_TYPE__ wchar_t;
 %[default:section(".text.crt.dos.sched.thread")]
 %{
 #ifndef ____dos_beginthreadex_entry_t_defined
-#define ____dos_beginthreadex_entry_t_defined 1
+#define ____dos_beginthreadex_entry_t_defined
 #ifdef __NO_ATTR_STDCALL
 typedef __UINT32_TYPE__ (__LIBDCALL *__dos_beginthreadex_entry_t)(void *__arg);
 #else /* __NO_ATTR_STDCALL */
@@ -134,7 +134,7 @@ typedef __UINT32_TYPE__ (__ATTR_STDCALL *__dos_beginthreadex_entry_t)(void *__ar
 
 %[define(DEFINE_DOS_BEGINTHREADEX_ENTRY_T =
 @@pp_ifndef ____dos_beginthreadex_entry_t_defined@@
-#define ____dos_beginthreadex_entry_t_defined 1
+#define ____dos_beginthreadex_entry_t_defined
 #ifdef __NO_ATTR_STDCALL
 typedef __UINT32_TYPE__ (__LIBDCALL *__dos_beginthreadex_entry_t)(void *__arg);
 #else /* __NO_ATTR_STDCALL */
@@ -286,7 +286,7 @@ int _unloaddll(intptr_t hnd) {
 %
 %{
 #ifndef ____procfun_defined
-#define ____procfun_defined 1
+#define ____procfun_defined
 typedef int (*__procfun)(void);
 #endif /* !____procfun_defined */
 }
@@ -294,7 +294,7 @@ typedef int (*__procfun)(void);
 %[define_type_class(__procfun = "TP")]
 %[define(DEFINE_PROCFUN =
 #ifndef ____procfun_defined
-#define ____procfun_defined 1
+#define ____procfun_defined
 typedef int (*__procfun)(void);
 #endif /* !____procfun_defined */
 )]
@@ -315,12 +315,12 @@ __procfun _getdllprocaddr(intptr_t hnd,
 %{
 
 #ifndef __wchar_t_defined
-#define __wchar_t_defined 1
+#define __wchar_t_defined
 typedef __WCHAR_TYPE__ wchar_t;
 #endif /* !__wchar_t_defined */
 
 #ifndef __intptr_t_defined
-#define __intptr_t_defined 1
+#define __intptr_t_defined
 typedef __intptr_t intptr_t;
 #endif /* !__intptr_t_defined */
 

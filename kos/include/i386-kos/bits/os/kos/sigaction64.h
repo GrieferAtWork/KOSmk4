@@ -51,7 +51,7 @@
 #define __ALIGNOF_SIGACTION          __ALIGNOF_SIGACTIONX64
 #define __sigactionx64 sigaction
 #ifndef ____sighandler_t_defined
-#define ____sighandler_t_defined 1
+#define ____sighandler_t_defined
 #define __sighandlerx64_t __sighandler_t
 #endif /* !____sighandler_t_defined */
 #endif /* __x86_64__ */

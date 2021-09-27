@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x639b8db5 */
+/* HASH CRC-32:0x7f21f66c */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,14 +19,14 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_nanosleep_defined
-#define __local_nanosleep_defined 1
+#define __local_nanosleep_defined
 #include <__crt.h>
 #include <bits/types.h>
 #if defined(__CRT_HAVE_nanosleep64) || defined(__CRT_HAVE_nanosleep) || defined(__CRT_HAVE___nanosleep)
 #include <bits/os/timespec.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_nanosleep32_defined
-#define __local___localdep_nanosleep32_defined 1
+#define __local___localdep_nanosleep32_defined
 #ifdef __CRT_HAVE_nanosleep
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_nanosleep32,(struct timespec const *__requested_time, struct __timespec32 *__remaining),nanosleep,(__requested_time,__remaining))
 #elif defined(__CRT_HAVE___nanosleep)
@@ -36,7 +36,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_nanosleep32,(struct
 #endif /* !... */
 #endif /* !__local___localdep_nanosleep32_defined */
 #ifndef __local___localdep_nanosleep64_defined
-#define __local___localdep_nanosleep64_defined 1
+#define __local___localdep_nanosleep64_defined
 #if defined(__CRT_HAVE_nanosleep) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_nanosleep64,(struct __timespec64 const *__restrict __requested_time, struct __timespec64 *__remaining),nanosleep,(__requested_time,__remaining))
 #elif defined(__CRT_HAVE_nanosleep64)
@@ -78,7 +78,7 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(nanosleep))(struct timespec const *__
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_nanosleep_defined
-#define __local___localdep_nanosleep_defined 1
+#define __local___localdep_nanosleep_defined
 #define __localdep_nanosleep __LIBC_LOCAL_NAME(nanosleep)
 #endif /* !__local___localdep_nanosleep_defined */
 #else /* __CRT_HAVE_nanosleep64 || __CRT_HAVE_nanosleep || __CRT_HAVE___nanosleep */

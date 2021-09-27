@@ -38,65 +38,65 @@
 __DECL_BEGIN
 
 #ifndef __wint_t_defined
-#define __wint_t_defined 1
+#define __wint_t_defined
 typedef __WINT_TYPE__ wint_t;
 #endif /* !__wint_t_defined */
 
 #ifndef __size_t_defined
-#define __size_t_defined 1
+#define __size_t_defined
 typedef __SIZE_TYPE__ wint_t;
 #endif /* !__size_t_defined */
 
 #ifndef __machine_blkcnt_t_defined
-#define __machine_blkcnt_t_defined 1
+#define __machine_blkcnt_t_defined
 typedef __FS_TYPE(blkcnt) __blkcnt_t;
 #endif /* !__machine_blkcnt_t_defined */
 
 #ifndef __machine_blksize_t_defined
-#define __machine_blksize_t_defined 1
+#define __machine_blksize_t_defined
 #endif /* !__machine_blksize_t_defined */
 
 #ifndef __machine_fsblkcnt_t_defined
-#define __machine_fsblkcnt_t_defined 1
+#define __machine_fsblkcnt_t_defined
 typedef __FS_TYPE(fsblkcnt) __fsblkcnt_t;
 #endif /* !__machine_fsblkcnt_t_defined */
 
 #ifndef __machine_fsfilcnt_t_defined
-#define __machine_fsfilcnt_t_defined 1
+#define __machine_fsfilcnt_t_defined
 typedef __FS_TYPE(fsfilcnt) __fsfilcnt_t;
 #endif /* !__machine_fsfilcnt_t_defined */
 
 #ifndef __machine_off_t_defined
-#define __machine_off_t_defined 1
+#define __machine_off_t_defined
 typedef __FS_TYPE(off) _off_t;
 #endif /* !__machine_off_t_defined */
 
 #ifndef __machine_dev_t_defined
-#define __machine_dev_t_defined 1
+#define __machine_dev_t_defined
 #endif /* !__machine_dev_t_defined */
 
 #ifndef __machine_uid_t_defined
-#define __machine_uid_t_defined 1
+#define __machine_uid_t_defined
 #endif /* !__machine_uid_t_defined */
 
 #ifndef __machine_gid_t_defined
-#define __machine_gid_t_defined 1
+#define __machine_gid_t_defined
 #endif /* !__machine_gid_t_defined */
 
 #ifndef __machine_id_t_defined
-#define __machine_id_t_defined 1
+#define __machine_id_t_defined
 #endif /* !__machine_id_t_defined */
 
 #ifndef __machine_ino_t_defined
-#define __machine_ino_t_defined 1
+#define __machine_ino_t_defined
 #endif /* !__machine_ino_t_defined */
 
 #ifndef __machine_mode_t_defined
-#define __machine_mode_t_defined 1
+#define __machine_mode_t_defined
 #endif /* !__machine_mode_t_defined */
 
 #ifndef __machine_off64_t_defined
-#define __machine_off64_t_defined 1
+#define __machine_off64_t_defined
 typedef __off64_t _off64_t;
 #endif /* !__machine_off64_t_defined */
 
@@ -106,43 +106,43 @@ typedef _off64_t __off_t;
 #endif /* !__off_t */
 
 #ifndef __machine_key_t_defined
-#define __machine_key_t_defined 1
+#define __machine_key_t_defined
 #endif /* !__machine_key_t_defined */
 
 #ifndef __machine_fpos_t_defined
-#define __machine_fpos_t_defined 1
+#define __machine_fpos_t_defined
 typedef __pos32_t _fpos_t;
 #endif /* !__machine_fpos_t_defined */
 
 #ifdef __USE_LARGEFILE64
 #ifndef __machine_fpos64_t_defined
-#define __machine_fpos64_t_defined 1
+#define __machine_fpos64_t_defined
 typedef __pos64_t _fpos64_t;
 #endif /* !__machine_fpos64_t_defined */
 #endif /* __USE_LARGEFILE64 */
 
 #ifndef __machine_size_t_defined
-#define __machine_size_t_defined 1
+#define __machine_size_t_defined
 #endif /* !__machine_size_t_defined */
 
 #ifndef __machine_ssize_t_defined
-#define __machine_ssize_t_defined 1
+#define __machine_ssize_t_defined
 typedef __ssize_t _ssize_t;
 #endif /* !__machine_ssize_t_defined */
 
 #ifndef __machine_mbstate_t_defined
-#define __machine_mbstate_t_defined 1
+#define __machine_mbstate_t_defined
 #include <bits/crt/mbstate.h>
 typedef struct __mbstate _mbstate_t;
 #endif /* !__machine_mbstate_t_defined */
 
 #ifndef __machine_iconv_t_defined
-#define __machine_iconv_t_defined 1
+#define __machine_iconv_t_defined
 typedef void *_iconv_t;
 #endif /* !__machine_iconv_t_defined */
 
 #ifndef __machine_clock_t_defined
-#define __machine_clock_t_defined 1
+#define __machine_clock_t_defined
 #define _CLOCK_T_ __clock_t
 #endif /* !__machine_clock_t_defined */
 
@@ -150,29 +150,29 @@ typedef void *_iconv_t;
 typedef __TM_TYPE(time) __time_t;
 
 #ifndef __machine_clockid_t_defined
-#define __machine_clockid_t_defined 1
+#define __machine_clockid_t_defined
 #define _CLOCKID_T_ __clockid_t
 #endif /* !__machine_clockid_t_defined */
 
 #define _TIMER_T_ __timer_t
 #ifndef __machine_sa_family_t_defined
-#define __machine_sa_family_t_defined 1
+#define __machine_sa_family_t_defined
 #endif /* !__machine_sa_family_t_defined */
 
 #ifndef __machine_socklen_t_defined
-#define __machine_socklen_t_defined 1
+#define __machine_socklen_t_defined
 #endif /* !__machine_socklen_t_defined */
 
 typedef int __nl_item;
 #ifndef ____va_list_defined
-#define ____va_list_defined 1
+#define ____va_list_defined
 typedef __builtin_va_list __va_list;
 #endif /* !____va_list_defined */
 
 /* Some more types from BSD */
 typedef __uint32_t __fflags_t;
 #ifndef __machine_ino_t_defined
-#define __machine_ino_t_defined 1
+#define __machine_ino_t_defined
 typedef __FS_TYPE(ino) __ino_t;
 #endif /* !__machine_ino_t_defined */
 typedef __pid_t __lwpid_t;
@@ -190,12 +190,12 @@ typedef __WINT_TYPE__ __wint_t;
 typedef __MAX_ALIGN_TYPE__ __max_align_t;
 typedef __uint32_t __fixpt_t;
 #ifndef ____mbstate_t_defined
-#define ____mbstate_t_defined 1
+#define ____mbstate_t_defined
 typedef struct __mbstate __mbstate_t;
 #endif /* !____mbstate_t_defined */
 typedef __uintmax_t __rman_res_t;
 #ifndef ____gnuc_va_list_defined
-#define ____gnuc_va_list_defined 1
+#define ____gnuc_va_list_defined
 typedef __builtin_va_list __gnuc_va_list;
 #endif /* !____gnuc_va_list_defined */
 

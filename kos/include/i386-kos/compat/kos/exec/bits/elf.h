@@ -24,7 +24,7 @@
 
 #ifdef __x86_64__
 #include <kos/exec/bits/elf32.h>
-#define __compat_elfexec_info_defined 1
+#define __compat_elfexec_info_defined
 #define compat_elfexec_info             elfexec_info32
 #define compat_elfexec_info_getfilename elfexec_info32_getfilename
 #define compat_elfexec_info_getentry    elfexec_info32_getentry

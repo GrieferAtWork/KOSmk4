@@ -276,13 +276,13 @@
 #define __INTMAX_C(c)  c##i64
 #define __UINTMAX_C(c) c##ui64
 
-#define __CHAR16_TYPE__     ::__intern::____INTELLISENSE_char16_t
-#define __CHAR32_TYPE__     ::__intern::____INTELLISENSE_char32_t
-#define __WCHAR_TYPE__      wchar_t
-#define __WINT_TYPE__       unsigned int
-#define __SIZEOF_WCHAR_T__  2 /* Psht... */
-#define __native_wchar_t_defined 1 /* Psht... */
-#define __wchar_t_defined   1 /* Psht... */
+#define __CHAR16_TYPE__          ::__intern::____INTELLISENSE_char16_t
+#define __CHAR32_TYPE__          ::__intern::____INTELLISENSE_char32_t
+#define __WCHAR_TYPE__           wchar_t
+#define __WINT_TYPE__            unsigned int
+#define __SIZEOF_WCHAR_T__       2 /* Psht... */
+#define __native_wchar_t_defined   /* Psht... */
+#define __wchar_t_defined          /* Psht... */
 
 #define __DBL_DECIMAL_DIG__        17
 #define __DBL_DENORM_MIN__       ((double)4.94065645841246544177e-324L)

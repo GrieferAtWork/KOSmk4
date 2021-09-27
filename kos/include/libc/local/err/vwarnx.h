@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcc9b20f1 */
+/* HASH CRC-32:0x10eec8c7 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_vwarnx_defined
-#define __local_vwarnx_defined 1
+#define __local_vwarnx_defined
 #include <__crt.h>
 #include <libc/template/program_invocation_name.h>
 #include <features.h>
@@ -27,7 +27,7 @@
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_flockfile_defined
-#define __local___localdep_flockfile_defined 1
+#define __local___localdep_flockfile_defined
 #ifdef __CRT_HAVE_flockfile
 __CREDIRECT_VOID(__ATTR_NONNULL((1)),__NOTHROW_RPC,__localdep_flockfile,(__FILE *__restrict __stream),flockfile,(__stream))
 #elif defined(__CRT_HAVE__lock_file)
@@ -39,7 +39,7 @@ __CREDIRECT_VOID(__ATTR_NONNULL((1)),__NOTHROW_RPC,__localdep_flockfile,(__FILE 
 #endif /* !... */
 #endif /* !__local___localdep_flockfile_defined */
 #ifndef __local___localdep_fprintf_defined
-#define __local___localdep_fprintf_defined 1
+#define __local___localdep_fprintf_defined
 #if __has_builtin(__builtin_fprintf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_fprintf) && __has_builtin(__builtin_va_arg_pack)
 __CEIREDIRECT(__ATTR_LIBC_PRINTF(2, 3) __ATTR_NONNULL((1, 2)),__STDC_INT_AS_SSIZE_T,__THROWING,__localdep_fprintf,(__FILE *__restrict __stream, char const *__restrict __format, ...),fprintf,{ return __builtin_fprintf(__stream, __format, __builtin_va_arg_pack()); })
 #elif defined(__CRT_HAVE_fprintf_unlocked) && defined(__USE_STDIO_UNLOCKED)
@@ -60,7 +60,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_fprintf_defined */
 #ifndef __local___localdep_fputc_defined
-#define __local___localdep_fputc_defined 1
+#define __local___localdep_fputc_defined
 #if __has_builtin(__builtin_fputc) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_fputc)
 __CEIREDIRECT(__ATTR_NONNULL((2)),int,__THROWING,__localdep_fputc,(int __ch, __FILE *__restrict __stream),fputc,{ return __builtin_fputc(__ch, __stream); })
 #elif defined(__CRT_HAVE_fputc_unlocked) && defined(__USE_STDIO_UNLOCKED)
@@ -87,7 +87,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_fputc_defined */
 #ifndef __local___localdep_funlockfile_defined
-#define __local___localdep_funlockfile_defined 1
+#define __local___localdep_funlockfile_defined
 #ifdef __CRT_HAVE_funlockfile
 __CREDIRECT_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,__localdep_funlockfile,(__FILE *__restrict __stream),funlockfile,(__stream))
 #elif defined(__CRT_HAVE__unlock_file)
@@ -99,7 +99,7 @@ __CREDIRECT_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,__localdep_funlockfile,(__FIL
 #endif /* !... */
 #endif /* !__local___localdep_funlockfile_defined */
 #ifndef __local___localdep_vfprintf_defined
-#define __local___localdep_vfprintf_defined 1
+#define __local___localdep_vfprintf_defined
 #if __has_builtin(__builtin_vfprintf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_vfprintf)
 __CEIREDIRECT(__ATTR_LIBC_PRINTF(2, 0) __ATTR_NONNULL((1, 2)),__STDC_INT_AS_SSIZE_T,__THROWING,__localdep_vfprintf,(__FILE *__restrict __stream, char const *__restrict __format, __builtin_va_list __args),vfprintf,{ return __builtin_vfprintf(__stream, __format, __args); })
 #elif defined(__CRT_HAVE_vfprintf_unlocked) && defined(__USE_STDIO_UNLOCKED)
@@ -137,7 +137,7 @@ __LOCAL_LIBC(vwarnx) __ATTR_LIBC_PRINTF(1, 0) void
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_vwarnx_defined
-#define __local___localdep_vwarnx_defined 1
+#define __local___localdep_vwarnx_defined
 #define __localdep_vwarnx __LIBC_LOCAL_NAME(vwarnx)
 #endif /* !__local___localdep_vwarnx_defined */
 #else /* !__NO_STDSTREAMS && __LOCAL_program_invocation_short_name && (__CRT_HAVE_fputc || __CRT_HAVE_putc || __CRT_HAVE__IO_putc || __CRT_HAVE_fputc_unlocked || __CRT_HAVE_putc_unlocked || (__CRT_DOS && __CRT_HAVE__flsbuf) || __CRT_HAVE_fwrite || __CRT_HAVE__IO_fwrite || __CRT_HAVE_fwrite_s || __CRT_HAVE_fwrite_unlocked || __CRT_HAVE__fwrite_nolock) */

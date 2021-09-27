@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc8e7c9ac */
+/* HASH CRC-32:0x593563ae */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,12 +19,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_c16mempmove_defined
-#define __local_c16mempmove_defined 1
+#define __local_c16mempmove_defined
 #include <__crt.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_mempmove_defined
-#define __local___localdep_mempmove_defined 1
+#define __local___localdep_mempmove_defined
 #ifdef __CRT_HAVE_mempmove
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_mempmove,(void *__dst, void const *__src, __SIZE_TYPE__ __n_bytes),mempmove,(__dst,__src,__n_bytes))
 #else /* __CRT_HAVE_mempmove */
@@ -35,7 +35,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__CRT_HAVE_mempmove */
 #endif /* !__local___localdep_mempmove_defined */
 #ifndef __local___localdep_mempmovel_defined
-#define __local___localdep_mempmovel_defined 1
+#define __local___localdep_mempmovel_defined
 #ifdef __CRT_HAVE_mempmovel
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT32_TYPE__ *,__NOTHROW_NCX,__localdep_mempmovel,(void *__dst, void const *__src, __SIZE_TYPE__ __n_dwords),mempmovel,(__dst,__src,__n_dwords))
 #elif defined(__CRT_HAVE_wmempmove) && __SIZEOF_WCHAR_T__ == 4
@@ -50,7 +50,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_mempmovel_defined */
 #ifndef __local___localdep_mempmovew_defined
-#define __local___localdep_mempmovew_defined 1
+#define __local___localdep_mempmovew_defined
 #ifdef __CRT_HAVE_mempmovew
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT16_TYPE__ *,__NOTHROW_NCX,__localdep_mempmovew,(void *__dst, void const *__src, __SIZE_TYPE__ __n_words),mempmovew,(__dst,__src,__n_words))
 #elif defined(__CRT_HAVE_wmempmove) && __SIZEOF_WCHAR_T__ == 2
@@ -76,7 +76,7 @@ __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(c16mempmove))(__CHAR16_TYPE__ *__dst,
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_c16mempmove_defined
-#define __local___localdep_c16mempmove_defined 1
+#define __local___localdep_c16mempmove_defined
 #define __localdep_c16mempmove __LIBC_LOCAL_NAME(c16mempmove)
 #endif /* !__local___localdep_c16mempmove_defined */
 #endif /* !__local_c16mempmove_defined */

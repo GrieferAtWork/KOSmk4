@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5b37a336 */
+/* HASH CRC-32:0x15cf6ada */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,12 +19,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_wcsrev_defined
-#define __local_wcsrev_defined 1
+#define __local_wcsrev_defined
 #include <__crt.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_memrev_defined
-#define __local___localdep_memrev_defined 1
+#define __local___localdep_memrev_defined
 #ifdef __CRT_HAVE_memrev
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),void *,__NOTHROW_NCX,__localdep_memrev,(void *__restrict __base, __SIZE_TYPE__ __n_bytes),memrev,(__base,__n_bytes))
 #else /* __CRT_HAVE_memrev */
@@ -35,7 +35,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__CRT_HAVE_memrev */
 #endif /* !__local___localdep_memrev_defined */
 #ifndef __local___localdep_memrevl_defined
-#define __local___localdep_memrevl_defined 1
+#define __local___localdep_memrevl_defined
 #ifdef __CRT_HAVE_memrevl
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),__UINT32_TYPE__ *,__NOTHROW_NCX,__localdep_memrevl,(void *__restrict __base, __SIZE_TYPE__ __n_dwords),memrevl,(__base,__n_dwords))
 #else /* __CRT_HAVE_memrevl */
@@ -46,7 +46,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__CRT_HAVE_memrevl */
 #endif /* !__local___localdep_memrevl_defined */
 #ifndef __local___localdep_memrevw_defined
-#define __local___localdep_memrevw_defined 1
+#define __local___localdep_memrevw_defined
 #ifdef __CRT_HAVE_memrevw
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),__UINT16_TYPE__ *,__NOTHROW_NCX,__localdep_memrevw,(void *__restrict __base, __SIZE_TYPE__ __n_words),memrevw,(__base,__n_words))
 #else /* __CRT_HAVE_memrevw */
@@ -57,7 +57,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__CRT_HAVE_memrevw */
 #endif /* !__local___localdep_memrevw_defined */
 #ifndef __local___localdep_wcslen_defined
-#define __local___localdep_wcslen_defined 1
+#define __local___localdep_wcslen_defined
 #ifdef __CRT_HAVE_wcslen
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_wcslen,(__WCHAR_TYPE__ const *__restrict __str),wcslen,(__str))
 #else /* __CRT_HAVE_wcslen */
@@ -79,7 +79,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcsrev))(__WCHAR_TYPE__ *__restrict _
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_wcsrev_defined
-#define __local___localdep_wcsrev_defined 1
+#define __local___localdep_wcsrev_defined
 #define __localdep_wcsrev __LIBC_LOCAL_NAME(wcsrev)
 #endif /* !__local___localdep_wcsrev_defined */
 #endif /* !__local_wcsrev_defined */

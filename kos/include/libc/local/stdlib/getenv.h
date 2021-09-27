@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xacd65355 */
+/* HASH CRC-32:0xe6999a72 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,13 +19,13 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_getenv_defined
-#define __local_getenv_defined 1
+#define __local_getenv_defined
 #include <__crt.h>
 #include <libc/template/environ.h>
 #ifdef __LOCAL_environ
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_memcmp_defined
-#define __local___localdep_memcmp_defined 1
+#define __local___localdep_memcmp_defined
 #ifdef __CRT_HAVE_memcmp
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
@@ -44,7 +44,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_memcmp_defined */
 #ifndef __local___localdep_strlen_defined
-#define __local___localdep_strlen_defined 1
+#define __local___localdep_strlen_defined
 #ifdef __CRT_HAVE_strlen
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
@@ -137,7 +137,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(getenv))(char const *__varname) {
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_getenv_defined
-#define __local___localdep_getenv_defined 1
+#define __local___localdep_getenv_defined
 #define __localdep_getenv __LIBC_LOCAL_NAME(getenv)
 #endif /* !__local___localdep_getenv_defined */
 #else /* __LOCAL_environ */

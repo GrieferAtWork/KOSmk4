@@ -30,8 +30,6 @@
 
 #ifdef __CRT_CYG_PRIMARY
 
-#ifndef __stat_defined
-#define __stat_defined 1
 #define __cyg_stat   stat
 
 #ifdef __USE_TIME_BITS64
@@ -47,13 +45,9 @@
 #define _STATBUF_ST_BLKSIZE  1
 #define _STATBUF_ST_RDEV     1
 #define _STATBUF_ST_BLOCKS   1
-#endif /* !__stat_defined */
 
 #ifdef __USE_LARGEFILE64
-#ifndef __stat64_defined
-#define __stat64_defined 1
 #define __cyg_stat_alias64 stat64
-#endif /* !__stat64_defined */
 #endif /* __USE_LARGEFILE64 */
 
 #endif /* __CRT_CYG_PRIMARY */

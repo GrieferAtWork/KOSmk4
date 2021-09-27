@@ -121,7 +121,7 @@
 #else /* __USE_TIME64 */
 #define __rusage64 rusage
 #endif /* !__USE_TIME64 */
-#define __rusage_defined 1
+#define __rusage_defined
 #endif /* __x86_64__ */
 /*[[[end]]]*/
 

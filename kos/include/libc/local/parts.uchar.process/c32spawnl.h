@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4a88098a */
+/* HASH CRC-32:0x211cde28 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,12 +19,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_c32spawnl_defined
-#define __local_c32spawnl_defined 1
+#define __local_c32spawnl_defined
 #include <__crt.h>
 #if (defined(__CRT_HAVE_wspawnv) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)) || defined(__CRT_HAVE_KOS$wspawnv) || (defined(__CRT_HAVE__wspawnv) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)) || defined(__CRT_HAVE_KOS$_wspawnv)
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_c32spawnv_defined
-#define __local___localdep_c32spawnv_defined 1
+#define __local___localdep_c32spawnv_defined
 #if defined(__CRT_HAVE_wspawnv) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
 __NAMESPACE_LOCAL_END
 #include <features.h>
@@ -94,7 +94,7 @@ __NOTHROW_RPC(__VLIBKCALL __LIBC_LOCAL_NAME(c32spawnl))(__STDC_INT_AS_UINT_T __m
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_c32spawnl_defined
-#define __local___localdep_c32spawnl_defined 1
+#define __local___localdep_c32spawnl_defined
 #define __localdep_c32spawnl __LIBC_LOCAL_NAME(c32spawnl)
 #endif /* !__local___localdep_c32spawnl_defined */
 #else /* (__CRT_HAVE_wspawnv && __SIZEOF_WCHAR_T__ == 4 && __LIBCCALL_IS_LIBKCALL) || __CRT_HAVE_KOS$wspawnv || (__CRT_HAVE__wspawnv && __SIZEOF_WCHAR_T__ == 4 && __LIBCCALL_IS_LIBKCALL) || __CRT_HAVE_KOS$_wspawnv */

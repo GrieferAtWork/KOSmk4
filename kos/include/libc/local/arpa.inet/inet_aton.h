@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6bb47219 */
+/* HASH CRC-32:0x5b547026 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,12 +19,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_inet_aton_defined
-#define __local_inet_aton_defined 1
+#define __local_inet_aton_defined
 #include <__crt.h>
 #include <netinet/bits/in.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_inet_paton_defined
-#define __local___localdep_inet_paton_defined 1
+#define __local___localdep_inet_paton_defined
 #ifdef __CRT_HAVE_inet_paton
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_inet_paton,(char const **__restrict __pcp, struct in_addr *__restrict __inp, int __network_addr),inet_paton,(__pcp,__inp,__network_addr))
 #else /* __CRT_HAVE_inet_paton */
@@ -40,7 +40,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(inet_aton))(char const *__restrict __
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_inet_aton_defined
-#define __local___localdep_inet_aton_defined 1
+#define __local___localdep_inet_aton_defined
 #define __localdep_inet_aton __LIBC_LOCAL_NAME(inet_aton)
 #endif /* !__local___localdep_inet_aton_defined */
 #endif /* !__local_inet_aton_defined */

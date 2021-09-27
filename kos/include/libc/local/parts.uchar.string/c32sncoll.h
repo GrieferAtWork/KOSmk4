@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2373308a */
+/* HASH CRC-32:0x668399e */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,12 +19,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_c32sncoll_defined
-#define __local_c32sncoll_defined 1
+#define __local_c32sncoll_defined
 #include <__crt.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_c32sncmp_defined
-#define __local___localdep_c32sncmp_defined 1
+#define __local___localdep_c32sncmp_defined
 #if defined(__CRT_HAVE_wcsncmp) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_c32sncmp,(__CHAR32_TYPE__ const *__s1, __CHAR32_TYPE__ const *__s2, __SIZE_TYPE__ __maxlen),wcsncmp,(__s1,__s2,__maxlen))
 #elif defined(__CRT_HAVE_KOS$wcsncmp)
@@ -47,7 +47,7 @@ __NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(c32sncoll))(__CHAR32_TYPE__ const *__
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_c32sncoll_defined
-#define __local___localdep_c32sncoll_defined 1
+#define __local___localdep_c32sncoll_defined
 #define __localdep_c32sncoll __LIBC_LOCAL_NAME(c32sncoll)
 #endif /* !__local___localdep_c32sncoll_defined */
 #endif /* !__local_c32sncoll_defined */

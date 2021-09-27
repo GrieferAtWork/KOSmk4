@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc2271cbc */
+/* HASH CRC-32:0xab8fe9f2 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -261,12 +261,12 @@
 __SYSDECL_BEGIN
 
 #ifndef __gid_t_defined
-#define __gid_t_defined 1
+#define __gid_t_defined
 typedef __gid_t gid_t;
 #endif /* !__gid_t_defined */
 
 #ifndef __uid_t_defined
-#define __uid_t_defined 1
+#define __uid_t_defined
 typedef __uid_t uid_t;
 #endif /* !__uid_t_defined */
 
@@ -287,15 +287,15 @@ __CDECLARE_OPT(,int,__NOTHROW_RPC,putmsg,(__fd_t __fd, struct strbuf const *__ct
 /* @param: flags: Set of `MSG_HIPRI | MSG_ANY | MSG_BAND' */
 __CDECLARE_OPT(,int,__NOTHROW_RPC,putpmsg,(__fd_t __fd, struct strbuf const *__ctlptr, struct strbuf const *__dataptr, __STDC_INT_AS_UINT_T __band, __STDC_INT_AS_UINT_T __flags),(__fd,__ctlptr,__dataptr,__band,__flags))
 #if !defined(__fattach_defined) && defined(__CRT_HAVE_fattach)
-#define __fattach_defined 1
+#define __fattach_defined
 __CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_RPC_KOS,fattach,(__fd_t __fd, char const *__restrict __path),(__fd,__path))
 #endif /* !__fattach_defined && __CRT_HAVE_fattach */
 #if !defined(__fdetach_defined) && defined(__CRT_HAVE_fdetach)
-#define __fdetach_defined 1
+#define __fdetach_defined
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC_KOS,fdetach,(char const *__restrict __path),(__path))
 #endif /* !__fdetach_defined && __CRT_HAVE_fdetach */
 #if !defined(__ioctl_defined) && defined(__CRT_HAVE_ioctl)
-#define __ioctl_defined 1
+#define __ioctl_defined
 /* >> ioctl(2)
  * Perform the  I/O control  operation specified  by `request'  on  `fd'.
  * Many I/O  control operations  except  an additional  argument,  though

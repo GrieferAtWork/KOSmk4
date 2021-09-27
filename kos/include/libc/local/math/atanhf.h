@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe4107273 */
+/* HASH CRC-32:0x325317b0 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,12 +19,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_atanhf_defined
-#define __local_atanhf_defined 1
+#define __local_atanhf_defined
 #include <__crt.h>
 #if defined(__CRT_HAVE_atanh) || defined(__CRT_HAVE___atanh)
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_atanh_defined
-#define __local___localdep_atanh_defined 1
+#define __local___localdep_atanh_defined
 #if __has_builtin(__builtin_atanh) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_atanh)
 __CEIREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_atanh,(double __x),atanh,{ return __builtin_atanh(__x); })
 #elif defined(__CRT_HAVE_atanh)
@@ -41,7 +41,7 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(atanhf))(float __x) {
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_atanhf_defined
-#define __local___localdep_atanhf_defined 1
+#define __local___localdep_atanhf_defined
 #define __localdep_atanhf __LIBC_LOCAL_NAME(atanhf)
 #endif /* !__local___localdep_atanhf_defined */
 #else /* __CRT_HAVE_atanh || __CRT_HAVE___atanh */

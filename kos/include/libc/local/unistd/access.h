@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x405d7d0c */
+/* HASH CRC-32:0x5ab232d8 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,14 +19,14 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_access_defined
-#define __local_access_defined 1
+#define __local_access_defined
 #include <__crt.h>
 #include <asm/os/fcntl.h>
 #if defined(__AT_FDCWD) && defined(__CRT_HAVE_faccessat)
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_faccessat_defined
-#define __local___localdep_faccessat_defined 1
+#define __local___localdep_faccessat_defined
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,__localdep_faccessat,(__fd_t __dfd, char const *__file, __STDC_INT_AS_UINT_T __type, __atflag_t __flags),faccessat,(__dfd,__file,__type,__flags))
 #endif /* !__local___localdep_faccessat_defined */
 __LOCAL_LIBC(access) __ATTR_WUNUSED __ATTR_NONNULL((1)) int
@@ -35,7 +35,7 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(access))(char const *__file, __STDC_I
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_access_defined
-#define __local___localdep_access_defined 1
+#define __local___localdep_access_defined
 #define __localdep_access __LIBC_LOCAL_NAME(access)
 #endif /* !__local___localdep_access_defined */
 #else /* __AT_FDCWD && __CRT_HAVE_faccessat */

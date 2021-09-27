@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x65ad78c8 */
+/* HASH CRC-32:0xd453fe8 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_signandset_defined
-#define __local_signandset_defined 1
+#define __local_signandset_defined
 #include <__crt.h>
 #include <bits/os/sigset.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -32,7 +32,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(signandset))(struct __sigset_struct *
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_signandset_defined
-#define __local___localdep_signandset_defined 1
+#define __local___localdep_signandset_defined
 #define __localdep_signandset __LIBC_LOCAL_NAME(signandset)
 #endif /* !__local___localdep_signandset_defined */
 #endif /* !__local_signandset_defined */

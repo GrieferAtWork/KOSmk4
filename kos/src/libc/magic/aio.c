@@ -87,7 +87,7 @@
 __SYSDECL_BEGIN
 
 #ifndef __sigevent_t_defined
-#define __sigevent_t_defined 1
+#define __sigevent_t_defined
 typedef struct sigevent sigevent_t;
 #endif /* !__sigevent_t_defined */
 

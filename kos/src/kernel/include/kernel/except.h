@@ -61,7 +61,7 @@ FUNDEF void NOTHROW(KCALL error_vprintf)(char const *__restrict reason, __builti
 FUNDEF ssize_t NOTHROW(KCALL error_print_into)(__pformatprinter printer, void *arg);
 
 #ifndef __errno_t_defined
-#define __errno_t_defined 1
+#define __errno_t_defined
 typedef __errno_t errno_t;
 #endif /* !errno_t_defined */
 

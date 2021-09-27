@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5cc360af */
+/* HASH CRC-32:0xe18f33f3 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_strmode_defined
-#define __local_strmode_defined 1
+#define __local_strmode_defined
 #include <__crt.h>
 #include <bits/types.h>
 #include <asm/os/stat.h>
@@ -152,7 +152,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strmode))(__mode_t __mode, char __p[1
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_strmode_defined
-#define __local___localdep_strmode_defined 1
+#define __local___localdep_strmode_defined
 #define __localdep_strmode __LIBC_LOCAL_NAME(strmode)
 #endif /* !__local___localdep_strmode_defined */
 #endif /* !__local_strmode_defined */

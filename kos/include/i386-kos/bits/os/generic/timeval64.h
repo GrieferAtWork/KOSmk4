@@ -81,7 +81,7 @@
 #else /* __USE_TIME64 */
 #define __timeval64 timeval
 #endif /* !__USE_TIME64 */
-#define __timeval_defined 1
+#define __timeval_defined
 #endif /* __x86_64__ */
 /*[[[end]]]*/
 

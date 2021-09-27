@@ -319,18 +319,14 @@ struct ksysctl_driver_set_library_path /*[PREFIX(slp_)]*/ {
 
 /* Perform a handle operation specified by `cmd'
  * @param: cmd: One of `KSYSCTL_*' (see above) */
-#ifndef __ksysctl_defined
-#ifdef __CRT_HAVE_ksysctl
-#define __ksysctl_defined 1
+#if !defined(__ksysctl_defined) && defined(__CRT_HAVE_ksysctl)
+#define __ksysctl_defined
 __LIBC __syscall_slong_t __NOTHROW_NCX(__VLIBCCALL ksysctl)(__syscall_ulong_t __cmd, ... /*, void *arg*/) __CASMNAME_SAME("ksysctl");
-#endif /* __CRT_HAVE_ksysctl */
-#endif /* !__ksysctl_defined */
-#ifndef __KSysctl_defined
-#ifdef __CRT_HAVE_KSysctl
-#define __KSysctl_defined 1
+#endif /* !__ksysctl_defined && __CRT_HAVE_ksysctl */
+#if !defined(__KSysctl_defined) && defined(__CRT_HAVE_KSysctl)
+#define __KSysctl_defined
 __LIBC __syscall_slong_t (__VLIBCCALL KSysctl)(__syscall_ulong_t __cmd, ... /*, void *arg*/) __CASMNAME_SAME("KSysctl");
-#endif /* __CRT_HAVE_KSysctl */
-#endif /* !__KSysctl_defined */
+#endif /* !__KSysctl_defined && __CRT_HAVE_KSysctl */
 
 #ifndef NO_KSYSCTL_HELPER_FUNCTIONS
 #ifdef __ksysctl_defined

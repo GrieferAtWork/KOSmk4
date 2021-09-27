@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1c3bd37b */
+/* HASH CRC-32:0x8ad5ce2f */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,11 +19,11 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_stresep_defined
-#define __local_stresep_defined 1
+#define __local_stresep_defined
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_strchr_defined
-#define __local___localdep_strchr_defined 1
+#define __local___localdep_strchr_defined
 #if __has_builtin(__builtin_strchr) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_strchr)
 __CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_strchr,(char const *__restrict __haystack, int __needle),strchr,{ return __builtin_strchr(__haystack, __needle); })
 #elif __has_builtin(__builtin_index) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_index)
@@ -64,7 +64,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(stresep))(char **__restrict __stringp
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_stresep_defined
-#define __local___localdep_stresep_defined 1
+#define __local___localdep_stresep_defined
 #define __localdep_stresep __LIBC_LOCAL_NAME(stresep)
 #endif /* !__local___localdep_stresep_defined */
 #endif /* !__local_stresep_defined */

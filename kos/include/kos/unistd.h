@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x324981e8 */
+/* HASH CRC-32:0x3f5e2525 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -38,13 +38,13 @@
 __SYSDECL_BEGIN
 
 #ifndef __pos_t_defined
-#define __pos_t_defined 1
+#define __pos_t_defined
 typedef __FS_TYPE(pos) pos_t; /* File/device position */
 #endif /* !__pos_t_defined */
 
 #ifdef __USE_LARGEFILE64
 #ifndef __pos64_t_defined
-#define __pos64_t_defined 1
+#define __pos64_t_defined
 typedef __pos64_t pos64_t; /* File/device position */
 #endif /* !__pos64_t_defined */
 #endif /* __USE_LARGEFILE64 */
@@ -582,7 +582,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(Truncate64, __FORCELOCAL __ATTR_ARTIFICIAL __ATT
 
 #ifdef __USE_XOPEN2K8
 #if !defined(__FExecve_defined) && defined(__CRT_HAVE_FExecve)
-#define __FExecve_defined 1
+#define __FExecve_defined
 /* >> fexecve(2)
  * Replace the  calling  process  with the  application  image  referred to  by  `fd'  and
  * execute it's `main()' method, passing the given `argv', and setting `environ' to `envp' */

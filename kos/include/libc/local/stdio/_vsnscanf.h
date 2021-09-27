@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcd11e1d0 */
+/* HASH CRC-32:0x2ba0f46a */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,13 +19,13 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local__vsnscanf_defined
-#define __local__vsnscanf_defined 1
+#define __local__vsnscanf_defined
 #include <__crt.h>
 #include <features.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_format_vscanf_defined
-#define __local___localdep_format_vscanf_defined 1
+#define __local___localdep_format_vscanf_defined
 #ifdef __CRT_HAVE_format_vscanf
 __NAMESPACE_LOCAL_END
 #include <kos/anno.h>
@@ -40,7 +40,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__CRT_HAVE_format_vscanf */
 #endif /* !__local___localdep_format_vscanf_defined */
 #ifndef __local___localdep_unicode_readutf8_n_defined
-#define __local___localdep_unicode_readutf8_n_defined 1
+#define __local___localdep_unicode_readutf8_n_defined
 #ifdef __CRT_HAVE_unicode_readutf8_n
 __CREDIRECT(__ATTR_NONNULL((1, 2)),__CHAR32_TYPE__,__NOTHROW_NCX,__localdep_unicode_readutf8_n,(char const **__restrict __ptext, char const *__text_end),unicode_readutf8_n,(__ptext,__text_end))
 #else /* __CRT_HAVE_unicode_readutf8_n */
@@ -51,7 +51,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__CRT_HAVE_unicode_readutf8_n */
 #endif /* !__local___localdep_unicode_readutf8_n_defined */
 #ifndef __local___localdep_unicode_readutf8_rev_defined
-#define __local___localdep_unicode_readutf8_rev_defined 1
+#define __local___localdep_unicode_readutf8_rev_defined
 #ifdef __CRT_HAVE_unicode_readutf8_rev
 __CREDIRECT(__ATTR_NONNULL((1)),__CHAR32_TYPE__,__NOTHROW_NCX,__localdep_unicode_readutf8_rev,(char const **__restrict __ptext),unicode_readutf8_rev,(__ptext))
 #else /* __CRT_HAVE_unicode_readutf8_rev */
@@ -93,7 +93,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_vsnscanf))(char const *__restrict __
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep__vsnscanf_defined
-#define __local___localdep__vsnscanf_defined 1
+#define __local___localdep__vsnscanf_defined
 #define __localdep__vsnscanf __LIBC_LOCAL_NAME(_vsnscanf)
 #endif /* !__local___localdep__vsnscanf_defined */
 #endif /* !__local__vsnscanf_defined */

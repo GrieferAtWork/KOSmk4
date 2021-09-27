@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3b337167 */
+/* HASH CRC-32:0x85ac41b3 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -50,7 +50,7 @@ __SYSDECL_BEGIN
 #ifdef __CRT_HAVE_dcgettext
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_dcngettext_defined
-#define __local___localdep_dcngettext_defined 1
+#define __local___localdep_dcngettext_defined
 #ifdef __CRT_HAVE_dcngettext
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_FORMAT_ARG(2) __ATTR_FORMAT_ARG(3),char *,__NOTHROW_NCX,__localdep_dcngettext,(char const *__domainname, char const *__msgid_singular, char const *__msgid_plural, __ULONGPTR_TYPE__ __n, int __category),dcngettext,(__domainname,__msgid_singular,__msgid_plural,__n,__category))
 #else /* __CRT_HAVE_dcngettext */
@@ -65,7 +65,7 @@ __CEIDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_FORMAT_ARG(2),char *,__NOTHROW_NC
 #elif defined(__CRT_HAVE___dcgettext)
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_dcngettext_defined
-#define __local___localdep_dcngettext_defined 1
+#define __local___localdep_dcngettext_defined
 #ifdef __CRT_HAVE_dcngettext
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_FORMAT_ARG(2) __ATTR_FORMAT_ARG(3),char *,__NOTHROW_NCX,__localdep_dcngettext,(char const *__domainname, char const *__msgid_singular, char const *__msgid_plural, __ULONGPTR_TYPE__ __n, int __category),dcngettext,(__domainname,__msgid_singular,__msgid_plural,__n,__category))
 #else /* __CRT_HAVE_dcngettext */
@@ -80,7 +80,7 @@ __CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_FORMAT_ARG(2),char *,__NOTHROW_N
 #else /* ... */
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_dcngettext_defined
-#define __local___localdep_dcngettext_defined 1
+#define __local___localdep_dcngettext_defined
 #ifdef __CRT_HAVE_dcngettext
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_FORMAT_ARG(2) __ATTR_FORMAT_ARG(3),char *,__NOTHROW_NCX,__localdep_dcngettext,(char const *__domainname, char const *__msgid_singular, char const *__msgid_plural, __ULONGPTR_TYPE__ __n, int __category),dcngettext,(__domainname,__msgid_singular,__msgid_plural,__n,__category))
 #else /* __CRT_HAVE_dcngettext */
@@ -96,7 +96,7 @@ __LOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_FORMAT_ARG(2) char *__NOTHROW_NCX(__LI
 #ifdef __CRT_HAVE_dgettext
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_dcngettext_defined
-#define __local___localdep_dcngettext_defined 1
+#define __local___localdep_dcngettext_defined
 #ifdef __CRT_HAVE_dcngettext
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_FORMAT_ARG(2) __ATTR_FORMAT_ARG(3),char *,__NOTHROW_NCX,__localdep_dcngettext,(char const *__domainname, char const *__msgid_singular, char const *__msgid_plural, __ULONGPTR_TYPE__ __n, int __category),dcngettext,(__domainname,__msgid_singular,__msgid_plural,__n,__category))
 #else /* __CRT_HAVE_dcngettext */
@@ -111,7 +111,7 @@ __CEIDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_FORMAT_ARG(2),char *,__NOTHROW_NC
 #elif defined(__CRT_HAVE___dgettext)
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_dcngettext_defined
-#define __local___localdep_dcngettext_defined 1
+#define __local___localdep_dcngettext_defined
 #ifdef __CRT_HAVE_dcngettext
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_FORMAT_ARG(2) __ATTR_FORMAT_ARG(3),char *,__NOTHROW_NCX,__localdep_dcngettext,(char const *__domainname, char const *__msgid_singular, char const *__msgid_plural, __ULONGPTR_TYPE__ __n, int __category),dcngettext,(__domainname,__msgid_singular,__msgid_plural,__n,__category))
 #else /* __CRT_HAVE_dcngettext */
@@ -126,7 +126,7 @@ __CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_FORMAT_ARG(2),char *,__NOTHROW_N
 #else /* ... */
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_dcngettext_defined
-#define __local___localdep_dcngettext_defined 1
+#define __local___localdep_dcngettext_defined
 #ifdef __CRT_HAVE_dcngettext
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_FORMAT_ARG(2) __ATTR_FORMAT_ARG(3),char *,__NOTHROW_NCX,__localdep_dcngettext,(char const *__domainname, char const *__msgid_singular, char const *__msgid_plural, __ULONGPTR_TYPE__ __n, int __category),dcngettext,(__domainname,__msgid_singular,__msgid_plural,__n,__category))
 #else /* __CRT_HAVE_dcngettext */
@@ -142,7 +142,7 @@ __LOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_FORMAT_ARG(2) char *__NOTHROW_NCX(__LI
 #ifdef __CRT_HAVE_gettext
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_dcngettext_defined
-#define __local___localdep_dcngettext_defined 1
+#define __local___localdep_dcngettext_defined
 #ifdef __CRT_HAVE_dcngettext
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_FORMAT_ARG(2) __ATTR_FORMAT_ARG(3),char *,__NOTHROW_NCX,__localdep_dcngettext,(char const *__domainname, char const *__msgid_singular, char const *__msgid_plural, __ULONGPTR_TYPE__ __n, int __category),dcngettext,(__domainname,__msgid_singular,__msgid_plural,__n,__category))
 #else /* __CRT_HAVE_dcngettext */
@@ -157,7 +157,7 @@ __CEIDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_FORMAT_ARG(1),char *,__NOTHROW_NC
 #else /* __CRT_HAVE_gettext */
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_dcngettext_defined
-#define __local___localdep_dcngettext_defined 1
+#define __local___localdep_dcngettext_defined
 #ifdef __CRT_HAVE_dcngettext
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_FORMAT_ARG(2) __ATTR_FORMAT_ARG(3),char *,__NOTHROW_NCX,__localdep_dcngettext,(char const *__domainname, char const *__msgid_singular, char const *__msgid_plural, __ULONGPTR_TYPE__ __n, int __category),dcngettext,(__domainname,__msgid_singular,__msgid_plural,__n,__category))
 #else /* __CRT_HAVE_dcngettext */
@@ -173,7 +173,7 @@ __LOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_FORMAT_ARG(1) char *__NOTHROW_NCX(__LI
 #ifdef __CRT_HAVE_ngettext
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_dcngettext_defined
-#define __local___localdep_dcngettext_defined 1
+#define __local___localdep_dcngettext_defined
 #ifdef __CRT_HAVE_dcngettext
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_FORMAT_ARG(2) __ATTR_FORMAT_ARG(3),char *,__NOTHROW_NCX,__localdep_dcngettext,(char const *__domainname, char const *__msgid_singular, char const *__msgid_plural, __ULONGPTR_TYPE__ __n, int __category),dcngettext,(__domainname,__msgid_singular,__msgid_plural,__n,__category))
 #else /* __CRT_HAVE_dcngettext */
@@ -188,7 +188,7 @@ __CEIDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_FORMAT_ARG(1) __ATTR_FORMAT_ARG(2
 #else /* __CRT_HAVE_ngettext */
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_dcngettext_defined
-#define __local___localdep_dcngettext_defined 1
+#define __local___localdep_dcngettext_defined
 #ifdef __CRT_HAVE_dcngettext
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_FORMAT_ARG(2) __ATTR_FORMAT_ARG(3),char *,__NOTHROW_NCX,__localdep_dcngettext,(char const *__domainname, char const *__msgid_singular, char const *__msgid_plural, __ULONGPTR_TYPE__ __n, int __category),dcngettext,(__domainname,__msgid_singular,__msgid_plural,__n,__category))
 #else /* __CRT_HAVE_dcngettext */
@@ -204,7 +204,7 @@ __LOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_FORMAT_ARG(1) __ATTR_FORMAT_ARG(2) cha
 #ifdef __CRT_HAVE_dngettext
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_dcngettext_defined
-#define __local___localdep_dcngettext_defined 1
+#define __local___localdep_dcngettext_defined
 #ifdef __CRT_HAVE_dcngettext
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_FORMAT_ARG(2) __ATTR_FORMAT_ARG(3),char *,__NOTHROW_NCX,__localdep_dcngettext,(char const *__domainname, char const *__msgid_singular, char const *__msgid_plural, __ULONGPTR_TYPE__ __n, int __category),dcngettext,(__domainname,__msgid_singular,__msgid_plural,__n,__category))
 #else /* __CRT_HAVE_dcngettext */
@@ -219,7 +219,7 @@ __CEIDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_FORMAT_ARG(2) __ATTR_FORMAT_ARG(3
 #else /* __CRT_HAVE_dngettext */
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_dcngettext_defined
-#define __local___localdep_dcngettext_defined 1
+#define __local___localdep_dcngettext_defined
 #ifdef __CRT_HAVE_dcngettext
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_FORMAT_ARG(2) __ATTR_FORMAT_ARG(3),char *,__NOTHROW_NCX,__localdep_dcngettext,(char const *__domainname, char const *__msgid_singular, char const *__msgid_plural, __ULONGPTR_TYPE__ __n, int __category),dcngettext,(__domainname,__msgid_singular,__msgid_plural,__n,__category))
 #else /* __CRT_HAVE_dcngettext */
@@ -244,7 +244,7 @@ __CDECLARE_OPT(,char *,__NOTHROW_NCX,bind_textdomain_codeset,(char const *__doma
 #ifdef __CRT_HAVE_dgettext
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_dcngettext_defined
-#define __local___localdep_dcngettext_defined 1
+#define __local___localdep_dcngettext_defined
 #ifdef __CRT_HAVE_dcngettext
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_FORMAT_ARG(2) __ATTR_FORMAT_ARG(3),char *,__NOTHROW_NCX,__localdep_dcngettext,(char const *__domainname, char const *__msgid_singular, char const *__msgid_plural, __ULONGPTR_TYPE__ __n, int __category),dcngettext,(__domainname,__msgid_singular,__msgid_plural,__n,__category))
 #else /* __CRT_HAVE_dcngettext */
@@ -259,7 +259,7 @@ __CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_FORMAT_ARG(2),char *,__NOTHROW_N
 #elif defined(__CRT_HAVE___dgettext)
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_dcngettext_defined
-#define __local___localdep_dcngettext_defined 1
+#define __local___localdep_dcngettext_defined
 #ifdef __CRT_HAVE_dcngettext
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_FORMAT_ARG(2) __ATTR_FORMAT_ARG(3),char *,__NOTHROW_NCX,__localdep_dcngettext,(char const *__domainname, char const *__msgid_singular, char const *__msgid_plural, __ULONGPTR_TYPE__ __n, int __category),dcngettext,(__domainname,__msgid_singular,__msgid_plural,__n,__category))
 #else /* __CRT_HAVE_dcngettext */
@@ -274,7 +274,7 @@ __CEIDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_FORMAT_ARG(2),char *,__NOTHROW_NC
 #else /* ... */
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_dcngettext_defined
-#define __local___localdep_dcngettext_defined 1
+#define __local___localdep_dcngettext_defined
 #ifdef __CRT_HAVE_dcngettext
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_FORMAT_ARG(2) __ATTR_FORMAT_ARG(3),char *,__NOTHROW_NCX,__localdep_dcngettext,(char const *__domainname, char const *__msgid_singular, char const *__msgid_plural, __ULONGPTR_TYPE__ __n, int __category),dcngettext,(__domainname,__msgid_singular,__msgid_plural,__n,__category))
 #else /* __CRT_HAVE_dcngettext */
@@ -290,7 +290,7 @@ __LOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_FORMAT_ARG(2) char *__NOTHROW_NCX(__LI
 #ifdef __CRT_HAVE_dcgettext
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_dcngettext_defined
-#define __local___localdep_dcngettext_defined 1
+#define __local___localdep_dcngettext_defined
 #ifdef __CRT_HAVE_dcngettext
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_FORMAT_ARG(2) __ATTR_FORMAT_ARG(3),char *,__NOTHROW_NCX,__localdep_dcngettext,(char const *__domainname, char const *__msgid_singular, char const *__msgid_plural, __ULONGPTR_TYPE__ __n, int __category),dcngettext,(__domainname,__msgid_singular,__msgid_plural,__n,__category))
 #else /* __CRT_HAVE_dcngettext */
@@ -305,7 +305,7 @@ __CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_FORMAT_ARG(2),char *,__NOTHROW_N
 #elif defined(__CRT_HAVE___dcgettext)
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_dcngettext_defined
-#define __local___localdep_dcngettext_defined 1
+#define __local___localdep_dcngettext_defined
 #ifdef __CRT_HAVE_dcngettext
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_FORMAT_ARG(2) __ATTR_FORMAT_ARG(3),char *,__NOTHROW_NCX,__localdep_dcngettext,(char const *__domainname, char const *__msgid_singular, char const *__msgid_plural, __ULONGPTR_TYPE__ __n, int __category),dcngettext,(__domainname,__msgid_singular,__msgid_plural,__n,__category))
 #else /* __CRT_HAVE_dcngettext */
@@ -320,7 +320,7 @@ __CEIDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_FORMAT_ARG(2),char *,__NOTHROW_NC
 #else /* ... */
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_dcngettext_defined
-#define __local___localdep_dcngettext_defined 1
+#define __local___localdep_dcngettext_defined
 #ifdef __CRT_HAVE_dcngettext
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_FORMAT_ARG(2) __ATTR_FORMAT_ARG(3),char *,__NOTHROW_NCX,__localdep_dcngettext,(char const *__domainname, char const *__msgid_singular, char const *__msgid_plural, __ULONGPTR_TYPE__ __n, int __category),dcngettext,(__domainname,__msgid_singular,__msgid_plural,__n,__category))
 #else /* __CRT_HAVE_dcngettext */

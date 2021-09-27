@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8df7256 */
+/* HASH CRC-32:0x80319d99 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,11 +19,11 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_atof_defined
-#define __local_atof_defined 1
+#define __local_atof_defined
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_strtod_defined
-#define __local___localdep_strtod_defined 1
+#define __local___localdep_strtod_defined
 #ifdef __CRT_HAVE_strtod
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),double,__NOTHROW_NCX,__localdep_strtod,(char const *__restrict __nptr, char **__endptr),strtod,(__nptr,__endptr))
 #elif defined(__CRT_HAVE_strtold) && __SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__
@@ -41,7 +41,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(atof))(char const *__restrict __nptr)
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_atof_defined
-#define __local___localdep_atof_defined 1
+#define __local___localdep_atof_defined
 #define __localdep_atof __LIBC_LOCAL_NAME(atof)
 #endif /* !__local___localdep_atof_defined */
 #endif /* !__local_atof_defined */

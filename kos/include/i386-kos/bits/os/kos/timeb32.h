@@ -130,7 +130,7 @@
 #define __SIZEOF_TIMEB64          __SIZEOF_TIMEBX32_64
 #define __ALIGNOF_TIMEB64         __ALIGNOF_TIMEBX32_64
 
-#define __timeb_defined 1
+#define __timeb_defined
 #endif /* __i386__ && !__x86_64__*/
 /*[[[end]]]*/
 

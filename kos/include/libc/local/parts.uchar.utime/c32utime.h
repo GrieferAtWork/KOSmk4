@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd8795558 */
+/* HASH CRC-32:0xc14c9768 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,12 +19,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_c32utime_defined
-#define __local_c32utime_defined 1
+#define __local_c32utime_defined
 #include <__crt.h>
 #if (defined(__CRT_HAVE_wutime) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)) || defined(__CRT_HAVE_KOS$wutime) || (defined(__CRT_HAVE__wutime32) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)) || defined(__CRT_HAVE_KOS$_wutime32) || (defined(__CRT_HAVE_wutime64) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)) || defined(__CRT_HAVE_KOS$wutime64) || (defined(__CRT_HAVE__wutime64) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)) || defined(__CRT_HAVE_KOS$_wutime64)
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_c32utime64_defined
-#define __local___localdep_c32utime64_defined 1
+#define __local___localdep_c32utime64_defined
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -55,7 +55,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_c32utime64_defined */
 #ifndef __local___localdep_crt_c32utime32_defined
-#define __local___localdep_crt_c32utime32_defined 1
+#define __local___localdep_crt_c32utime32_defined
 #if defined(__CRT_HAVE_wutime) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_crt_c32utime32,(__CHAR32_TYPE__ const *__filename, struct __utimbuf32 const *__file_times),wutime,(__filename,__file_times))
 #elif defined(__CRT_HAVE_KOS$wutime)
@@ -98,7 +98,7 @@ __NOTHROW_RPC(__LIBKCALL __LIBC_LOCAL_NAME(c32utime))(__CHAR32_TYPE__ const *__f
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_c32utime_defined
-#define __local___localdep_c32utime_defined 1
+#define __local___localdep_c32utime_defined
 #define __localdep_c32utime __LIBC_LOCAL_NAME(c32utime)
 #endif /* !__local___localdep_c32utime_defined */
 #else /* (__CRT_HAVE_wutime && __SIZEOF_WCHAR_T__ == 4 && __LIBCCALL_IS_LIBKCALL) || __CRT_HAVE_KOS$wutime || (__CRT_HAVE__wutime32 && __SIZEOF_WCHAR_T__ == 4 && __LIBCCALL_IS_LIBKCALL) || __CRT_HAVE_KOS$_wutime32 || (__CRT_HAVE_wutime64 && __SIZEOF_WCHAR_T__ == 4 && __LIBCCALL_IS_LIBKCALL) || __CRT_HAVE_KOS$wutime64 || (__CRT_HAVE__wutime64 && __SIZEOF_WCHAR_T__ == 4 && __LIBCCALL_IS_LIBKCALL) || __CRT_HAVE_KOS$_wutime64 */

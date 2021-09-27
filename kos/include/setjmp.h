@@ -43,15 +43,15 @@
 #else /* __CXX_SYSTEM_HEADER */
 /* Import all symbols into the global namespace when re-including "ctype.h" after "cctype" */
 #ifndef __jmp_buf_defined
-#define __jmp_buf_defined 1
+#define __jmp_buf_defined
 __NAMESPACE_STD_USING(jmp_buf)
 #endif /* !__jmp_buf_defined */
 #if defined(__std_setjmp_defined) && !defined(__setjmp_defined)
-#define __setjmp_defined 1
+#define __setjmp_defined
 __NAMESPACE_STD_USING(setjmp)
 #endif /* __std_setjmp_defined && !__setjmp_defined */
 #if defined(__std_longjmp_defined) && !defined(__longjmp_defined)
-#define __longjmp_defined 1
+#define __longjmp_defined
 __NAMESPACE_STD_USING(longjmp)
 #endif /* __std_longjmp_defined && !__longjmp_defined */
 #undef _CXX_STDONLY_CSETJMP
@@ -74,12 +74,12 @@ __SYSDECL_BEGIN
 __NAMESPACE_STD_BEGIN
 
 #ifndef __std_jmp_buf_defined
-#define __std_jmp_buf_defined 1
+#define __std_jmp_buf_defined
 typedef struct __jmp_buf jmp_buf[1];
 #endif /* !__std_jmp_buf_defined */
 
 #ifndef __std_setjmp_defined
-#define __std_setjmp_defined 1
+#define __std_setjmp_defined
 #if defined(__setjmp_defined) && !defined(__COMPILER_HAVE_BUG_BLOATY_CXX_USING)
 __NAMESPACE_GLB_USING(setjmp)
 #elif defined(__CRT_HAVE_setjmp)
@@ -92,7 +92,7 @@ __CREDIRECT(__ATTR_RETURNS_TWICE,int,__NOTHROW_NCX,setjmp,(jmp_buf __buf),_setjm
 #endif /* !__std_setjmp_defined */
 
 #ifndef __std_longjmp_defined
-#define __std_longjmp_defined 1
+#define __std_longjmp_defined
 #if defined(__longjmp_defined) && !defined(__COMPILER_HAVE_BUG_BLOATY_CXX_USING)
 __NAMESPACE_GLB_USING(longjmp)
 #elif defined(__CRT_HAVE_longjmp)
@@ -122,15 +122,15 @@ __NAMESPACE_STD_END
 
 #ifndef __CXX_SYSTEM_HEADER
 #ifndef __jmp_buf_defined
-#define __jmp_buf_defined 1
+#define __jmp_buf_defined
 __NAMESPACE_STD_USING(jmp_buf)
 #endif /* !__jmp_buf_defined */
 #if defined(__std_setjmp_defined) && !defined(__setjmp_defined)
-#define __setjmp_defined 1
+#define __setjmp_defined
 __NAMESPACE_STD_USING(setjmp)
 #endif /* __std_setjmp_defined && !__setjmp_defined */
 #if defined(__std_longjmp_defined) && !defined(__longjmp_defined)
-#define __longjmp_defined 1
+#define __longjmp_defined
 __NAMESPACE_STD_USING(longjmp)
 #endif /* __std_longjmp_defined && !__longjmp_defined */
 #endif /* !__CXX_SYSTEM_HEADER */
@@ -210,7 +210,7 @@ __CREDIRECT(__ATTR_RETURNS_TWICE,int,__NOTHROW_NCX,_setjmp,(__NAMESPACE_STD_SYM 
 __SYSDECL_END
 
 #ifdef __CXX_SYSTEM_HEADER
-#define _CXX_STDONLY_CSETJMP 1
+#define _CXX_STDONLY_CSETJMP
 #undef _SETJMP_H
 #endif /* __CXX_SYSTEM_HEADER */
 #endif /* !_CXX_STDONLY_CSETJMP */

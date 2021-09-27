@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4b484036 */
+/* HASH CRC-32:0x7efd3ffb */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_fsetpos_defined
-#define __local_fsetpos_defined 1
+#define __local_fsetpos_defined
 #include <__crt.h>
 #include <features.h>
 #include <bits/types.h>
@@ -28,7 +28,7 @@
 #include <bits/crt/stdio.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_crt_fseek_defined
-#define __local___localdep_crt_fseek_defined 1
+#define __local___localdep_crt_fseek_defined
 #if defined(__CRT_HAVE_fseek_unlocked) && defined(__USE_STDIO_UNLOCKED)
 __CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,__localdep_crt_fseek,(__FILE *__restrict __stream, long int __off, int __whence),fseek_unlocked,(__stream,__off,__whence))
 #elif defined(__CRT_HAVE__fseek_nolock) && defined(__USE_STDIO_UNLOCKED)
@@ -68,7 +68,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,__localdep_crt_fseek,(__FILE *__r
 #endif /* !... */
 #endif /* !__local___localdep_crt_fseek_defined */
 #ifndef __local___localdep_crt_fseeko_defined
-#define __local___localdep_crt_fseeko_defined 1
+#define __local___localdep_crt_fseeko_defined
 #if defined(__CRT_HAVE_fseek_unlocked) && defined(__USE_STDIO_UNLOCKED) && __SIZEOF_OFF32_T__ == __SIZEOF_LONG__
 __CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,__localdep_crt_fseeko,(__FILE *__restrict __stream, __off32_t __off, int __whence),fseek_unlocked,(__stream,__off,__whence))
 #elif defined(__CRT_HAVE__fseek_nolock) && defined(__USE_STDIO_UNLOCKED) && __SIZEOF_OFF32_T__ == __SIZEOF_LONG__
@@ -108,7 +108,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,__localdep_crt_fseeko,(__FILE *__
 #endif /* !... */
 #endif /* !__local___localdep_crt_fseeko_defined */
 #ifndef __local___localdep_crt_fseeko64_defined
-#define __local___localdep_crt_fseeko64_defined 1
+#define __local___localdep_crt_fseeko64_defined
 #if defined(__CRT_HAVE_fseek_unlocked) && defined(__USE_STDIO_UNLOCKED) && __SIZEOF_OFF64_T__ == __SIZEOF_LONG__
 __CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,__localdep_crt_fseeko64,(__FILE *__restrict __stream, __off32_t __off, int __whence),fseek_unlocked,(__stream,__off,__whence))
 #elif defined(__CRT_HAVE__fseek_nolock) && defined(__USE_STDIO_UNLOCKED) && __SIZEOF_OFF64_T__ == __SIZEOF_LONG__
@@ -148,7 +148,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,__localdep_crt_fseeko64,(__FILE *
 #endif /* !... */
 #endif /* !__local___localdep_crt_fseeko64_defined */
 #ifndef __local___localdep_crt_fsetpos_defined
-#define __local___localdep_crt_fsetpos_defined 1
+#define __local___localdep_crt_fsetpos_defined
 #if defined(__CRT_HAVE_fsetpos_unlocked) && defined(__USE_STDIO_UNLOCKED)
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__THROWING,__localdep_crt_fsetpos,(__FILE *__restrict __stream, __pos32_t const *__restrict __pos),fsetpos_unlocked,(__stream,__pos))
 #elif defined(__CRT_HAVE_fsetpos64_unlocked) && defined(__USE_STDIO_UNLOCKED) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
@@ -170,7 +170,7 @@ __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__THROWING,__localdep_crt_fsetpos,(__FILE
 #endif /* !... */
 #endif /* !__local___localdep_crt_fsetpos_defined */
 #ifndef __local___localdep_crt_fsetpos64_defined
-#define __local___localdep_crt_fsetpos64_defined 1
+#define __local___localdep_crt_fsetpos64_defined
 #if defined(__CRT_HAVE_fsetpos_unlocked) && defined(__USE_STDIO_UNLOCKED) && __SIZEOF_OFF64_T__ == __SIZEOF_OFF32_T__
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__THROWING,__localdep_crt_fsetpos64,(__FILE *__restrict __stream, __pos64_t const *__restrict __pos),fsetpos_unlocked,(__stream,__pos))
 #elif defined(__CRT_HAVE_fsetpos64_unlocked) && defined(__USE_STDIO_UNLOCKED)
@@ -211,7 +211,7 @@ __LOCAL_LIBC(fsetpos) __ATTR_NONNULL((1, 2)) int
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_fsetpos_defined
-#define __local___localdep_fsetpos_defined 1
+#define __local___localdep_fsetpos_defined
 #define __localdep_fsetpos __LIBC_LOCAL_NAME(fsetpos)
 #endif /* !__local___localdep_fsetpos_defined */
 #else /* __CRT_HAVE_fseeko64 || __CRT_HAVE_fseek64 || __CRT_HAVE__fseeki64 || __CRT_HAVE_fseeko64_unlocked || __CRT_HAVE_fseek64_unlocked || __CRT_HAVE__fseeki64_nolock || __CRT_HAVE_fsetpos || __CRT_HAVE__IO_fsetpos || __CRT_HAVE_fsetpos_unlocked || __CRT_HAVE_fsetpos64 || __CRT_HAVE__IO_fsetpos64 || __CRT_HAVE_fsetpos64_unlocked || __CRT_HAVE_fseeko || __CRT_HAVE_fseeko_unlocked || __CRT_HAVE_fseek || __CRT_HAVE_fseek_unlocked || __CRT_HAVE__fseek_nolock */

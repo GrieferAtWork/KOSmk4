@@ -48,12 +48,12 @@
 __DECL_BEGIN
 
 #ifndef __sa_family_t_defined
-#define __sa_family_t_defined 1
+#define __sa_family_t_defined
 typedef __sa_family_t sa_family_t; /* One of `AF_*' */
 #endif /* !__sa_family_t_defined */
 
 #ifndef __sockaddr_un_defined
-#define __sockaddr_un_defined 1
+#define __sockaddr_un_defined
 struct sockaddr_un {
 	__SOCKADDR_COMMON(sun_);
 	char sun_path[108]; /* Path name. */

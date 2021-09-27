@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xaea07968 */
+/* HASH CRC-32:0x846d0251 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,13 +19,13 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_localtime_r_defined
-#define __local_localtime_r_defined 1
+#define __local_localtime_r_defined
 #include <__crt.h>
 #include <bits/types.h>
 #include <bits/crt/tm.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_dos_localtime_s_defined
-#define __local___localdep_dos_localtime_s_defined 1
+#define __local___localdep_dos_localtime_s_defined
 __NAMESPACE_LOCAL_END
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -43,7 +43,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_dos_localtime_s_defined */
 #ifndef __local___localdep_gmtime_r_defined
-#define __local___localdep_gmtime_r_defined 1
+#define __local___localdep_gmtime_r_defined
 #ifdef __CRT_HAVE_gmtime_r
 __CREDIRECT(__ATTR_NONNULL((1, 2)),struct __NAMESPACE_STD_SYM tm *,__NOTHROW_NCX,__localdep_gmtime_r,(__TM_TYPE(time) const *__restrict __timer, struct __NAMESPACE_STD_SYM tm *__restrict __tp),gmtime_r,(__timer,__tp))
 #elif defined(__CRT_HAVE___gmtime_r)
@@ -56,7 +56,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_gmtime_r_defined */
 #ifndef __local___localdep_localtime64_r_defined
-#define __local___localdep_localtime64_r_defined 1
+#define __local___localdep_localtime64_r_defined
 #if defined(__CRT_HAVE_localtime_r) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 __CREDIRECT(__ATTR_NONNULL((1, 2)),struct __NAMESPACE_STD_SYM tm *,__NOTHROW_NCX,__localdep_localtime64_r,(__time64_t const *__restrict __timer, struct __NAMESPACE_STD_SYM tm *__restrict __tp),localtime_r,(__timer,__tp))
 #elif defined(__CRT_HAVE_localtime64_r)
@@ -84,7 +84,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(localtime_r))(__TM_TYPE(time) const *
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_localtime_r_defined
-#define __local___localdep_localtime_r_defined 1
+#define __local___localdep_localtime_r_defined
 #define __localdep_localtime_r __LIBC_LOCAL_NAME(localtime_r)
 #endif /* !__local___localdep_localtime_r_defined */
 #endif /* !__local_localtime_r_defined */

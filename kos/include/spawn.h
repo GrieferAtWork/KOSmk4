@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5ca91bff */
+/* HASH CRC-32:0x3e31e117 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -88,12 +88,12 @@ __SYSDECL_BEGIN
 #ifdef __CC__
 
 #ifndef __sigset_t_defined
-#define __sigset_t_defined 1
+#define __sigset_t_defined
 typedef struct __sigset_struct sigset_t;
 #endif /* !__sigset_t_defined */
 
 #ifndef __pid_t_defined
-#define __pid_t_defined 1
+#define __pid_t_defined
 typedef __pid_t pid_t;
 #endif /* !pid_t_defined */
 

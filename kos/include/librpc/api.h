@@ -27,20 +27,20 @@
 #if defined(__i386__) && !defined(__x86_64__)
 #define LIBRPC_CC  __ATTR_STDCALL
 #define LIBRPC_VCC __ATTR_CDECL
-#else
+#else /* ... */
 #define LIBRPC_CC  /* nothing */
 #define LIBRPC_VCC /* nothing */
-#endif
+#endif /* !... */
 
 #if 0
-#define LIBRPC_WANT_PROTOTYPES 1
+#define LIBRPC_WANT_PROTOTYPES
 #endif
 
 #if defined(__LIBRPC_STATIC)
 #define LIBRPC_DECL __INTDEF
-#else
+#else /* ... */
 #define LIBRPC_DECL __IMPDEF
-#endif
+#endif /* !... */
 
 /* Library name for use with `dlopen()' */
 #define LIBRPC_LIBRARY_NAME "librpc.so"

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd2ed0261 */
+/* HASH CRC-32:0x85705865 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,13 +19,13 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_vsnprintf_defined
-#define __local_vsnprintf_defined 1
+#define __local_vsnprintf_defined
 #include <__crt.h>
 #include <features.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_format_snprintf_printer_defined
-#define __local___localdep_format_snprintf_printer_defined 1
+#define __local___localdep_format_snprintf_printer_defined
 #ifdef __CRT_HAVE_format_snprintf_printer
 __NAMESPACE_LOCAL_END
 #include <bits/crt/format-printer.h>
@@ -39,7 +39,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__CRT_HAVE_format_snprintf_printer */
 #endif /* !__local___localdep_format_snprintf_printer_defined */
 #ifndef __local___localdep_format_vprintf_defined
-#define __local___localdep_format_vprintf_defined 1
+#define __local___localdep_format_vprintf_defined
 #ifdef __CRT_HAVE_format_vprintf
 __NAMESPACE_LOCAL_END
 #include <kos/anno.h>
@@ -55,7 +55,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__local___localdep_format_vprintf_defined */
 __NAMESPACE_LOCAL_END
 #ifndef ____format_snprintf_data_defined
-#define ____format_snprintf_data_defined 1
+#define ____format_snprintf_data_defined
 struct __format_snprintf_data {
 	char         *__sd_buffer; /* [0..sd_bufsiz] Pointer to the next memory location to which to write. */
 	__SIZE_TYPE__ __sd_bufsiz; /* Remaining buffer size. */
@@ -113,7 +113,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(vsnprintf))(char *__restrict __buf, _
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_vsnprintf_defined
-#define __local___localdep_vsnprintf_defined 1
+#define __local___localdep_vsnprintf_defined
 #define __localdep_vsnprintf __LIBC_LOCAL_NAME(vsnprintf)
 #endif /* !__local___localdep_vsnprintf_defined */
 #endif /* !__local_vsnprintf_defined */

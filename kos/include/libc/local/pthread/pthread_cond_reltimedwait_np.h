@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd5b41f52 */
+/* HASH CRC-32:0xe8ceeae9 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_pthread_cond_reltimedwait_np_defined
-#define __local_pthread_cond_reltimedwait_np_defined 1
+#define __local_pthread_cond_reltimedwait_np_defined
 #include <__crt.h>
 #include <bits/types.h>
 #if defined(__CRT_HAVE_pthread_cond_reltimedwait64_np) || defined(__CRT_HAVE_pthread_cond_reltimedwait_np)
@@ -27,11 +27,11 @@
 #include <bits/os/timespec.h>
 __NAMESPACE_LOCAL_BEGIN
 #if !defined(__local___localdep_pthread_cond_reltimedwait32_np_defined) && defined(__CRT_HAVE_pthread_cond_reltimedwait_np)
-#define __local___localdep_pthread_cond_reltimedwait32_np_defined 1
+#define __local___localdep_pthread_cond_reltimedwait32_np_defined
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2, 3)),__errno_t,__NOTHROW_RPC,__localdep_pthread_cond_reltimedwait32_np,(__pthread_cond_t *__restrict __cond, __pthread_mutex_t *__restrict __mutex, struct __timespec32 const *__restrict __reltime),pthread_cond_reltimedwait_np,(__cond,__mutex,__reltime))
 #endif /* !__local___localdep_pthread_cond_reltimedwait32_np_defined && __CRT_HAVE_pthread_cond_reltimedwait_np */
 #ifndef __local___localdep_pthread_cond_reltimedwait64_np_defined
-#define __local___localdep_pthread_cond_reltimedwait64_np_defined 1
+#define __local___localdep_pthread_cond_reltimedwait64_np_defined
 #if defined(__CRT_HAVE_pthread_cond_reltimedwait_np) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2, 3)),__errno_t,__NOTHROW_RPC,__localdep_pthread_cond_reltimedwait64_np,(__pthread_cond_t *__restrict __cond, __pthread_mutex_t *__restrict __mutex, struct __timespec64 const *__restrict __reltime),pthread_cond_reltimedwait_np,(__cond,__mutex,__reltime))
 #elif defined(__CRT_HAVE_pthread_cond_reltimedwait64_np)
@@ -65,7 +65,7 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(pthread_cond_reltimedwait_np))(__pthr
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_pthread_cond_reltimedwait_np_defined
-#define __local___localdep_pthread_cond_reltimedwait_np_defined 1
+#define __local___localdep_pthread_cond_reltimedwait_np_defined
 #define __localdep_pthread_cond_reltimedwait_np __LIBC_LOCAL_NAME(pthread_cond_reltimedwait_np)
 #endif /* !__local___localdep_pthread_cond_reltimedwait_np_defined */
 #else /* __CRT_HAVE_pthread_cond_reltimedwait64_np || __CRT_HAVE_pthread_cond_reltimedwait_np */

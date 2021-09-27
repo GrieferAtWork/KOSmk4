@@ -131,7 +131,7 @@
 #define __OFFSET_FLOCK64_PID    __OFFSET_FLOCKX32_64_PID
 #define __SIZEOF_FLOCK64        __SIZEOF_FLOCKX32_64
 
-#define __flock_defined 1
+#define __flock_defined
 #endif /* __i386__ && !__x86_64__*/
 /*[[[end]]]*/
 

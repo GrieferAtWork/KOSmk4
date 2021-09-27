@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa3c0b3cb */
+/* HASH CRC-32:0xf7976351 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -93,20 +93,20 @@ __SYSDECL_BEGIN
 #ifdef __CC__
 
 #ifndef __intptr_t_defined
-#define __intptr_t_defined 1
+#define __intptr_t_defined
 typedef __intptr_t intptr_t;
 #endif /* !__intptr_t_defined */
 #ifndef __uintptr_t_defined
-#define __uintptr_t_defined 1
+#define __uintptr_t_defined
 typedef __uintptr_t uintptr_t;
 #endif /* !__uintptr_t_defined */
 #ifndef __wchar_t_defined
-#define __wchar_t_defined 1
+#define __wchar_t_defined
 typedef __WCHAR_TYPE__ wchar_t;
 #endif /* !__wchar_t_defined */
 
 #ifndef ____dos_beginthreadex_entry_t_defined
-#define ____dos_beginthreadex_entry_t_defined 1
+#define ____dos_beginthreadex_entry_t_defined
 #ifdef __NO_ATTR_STDCALL
 typedef __UINT32_TYPE__ (__LIBDCALL *__dos_beginthreadex_entry_t)(void *__arg);
 #else /* __NO_ATTR_STDCALL */
@@ -127,7 +127,7 @@ __CDECLARE_VOID_OPT(,__NOTHROW_NCX,_endthreadex,(__UINT32_TYPE__ __exitcode),(__
 #ifndef _CRT_TERMINATE_DEFINED
 #define _CRT_TERMINATE_DEFINED 1
 #ifndef __exit_defined
-#define __exit_defined 1
+#define __exit_defined
 #ifdef __std_exit_defined
 __NAMESPACE_STD_USING(exit)
 #elif __has_builtin(__builtin_exit) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_exit)
@@ -145,7 +145,7 @@ __CREDIRECT_VOID_GCCNCX(__ATTR_NORETURN,__THROWING,exit,(int __status),_Exit,(__
 #endif /* !... */
 #endif /* !__exit_defined */
 #ifndef __abort_defined
-#define __abort_defined 1
+#define __abort_defined
 #ifdef __std_abort_defined
 __NAMESPACE_STD_USING(abort)
 #elif __has_builtin(__builtin_abort) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_abort)
@@ -164,7 +164,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(abort, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NOR
 #endif /* !... */
 #endif /* !__abort_defined */
 #ifndef ___exit_defined
-#define ___exit_defined 1
+#define ___exit_defined
 #if __has_builtin(__builtin__Exit) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE__Exit)
 __CEIREDIRECT_GCCNCX(__ATTR_NORETURN,void,__THROWING,_exit,(int __status),_Exit,{ __builtin__Exit(__status); })
 #elif __has_builtin(__builtin__exit) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE__exit)
@@ -517,7 +517,7 @@ __LIBC __ATTR_SENTINEL_O(1) __ATTR_NONNULL((2)) intptr_t __NOTHROW_NCX(__VLIBCCA
 #endif /* __CRT_HAVE_spawnvpe || __CRT_HAVE__spawnvpe || ((__CRT_HAVE_getenv || __LOCAL_environ) && (__CRT_HAVE_spawnve || __CRT_HAVE__spawnve || ((__CRT_HAVE_open64 || __CRT_HAVE___open64 || __CRT_HAVE_open || __CRT_HAVE__open || __CRT_HAVE___open || (__AT_FDCWD && (__CRT_HAVE_openat64 || __CRT_HAVE_openat))) && (__CRT_HAVE_fspawnve || ((__CRT_HAVE__Exit || __CRT_HAVE__exit || __CRT_HAVE_quick_exit || __CRT_HAVE_exit) && ((__ARCH_HAVE_SHARED_VM_VFORK && (__CRT_HAVE_vfork || __CRT_HAVE___vfork)) || ((__CRT_HAVE_fork || __CRT_HAVE___fork) && (__CRT_HAVE_pipe2 || __CRT_HAVE_pipe || __CRT_HAVE___pipe || __CRT_HAVE__pipe) && __O_CLOEXEC && (__CRT_HAVE_read || __CRT_HAVE__read || __CRT_HAVE___read) && (__CRT_HAVE_write || __CRT_HAVE__write || __CRT_HAVE___write) && (__CRT_HAVE_close || __CRT_HAVE__close || __CRT_HAVE___close))) && __CRT_HAVE_fexecve && (__CRT_HAVE_waitpid || __CRT_HAVE___waitpid))))) && __hybrid_alloca) */
 #endif /* !... */
 #ifndef __system_defined
-#define __system_defined 1
+#define __system_defined
 #ifdef __std_system_defined
 /* >> system(3)
  * Execute a given `command' on the system interpreter (as in `sh -c $command')
@@ -567,7 +567,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_unloaddll, __FORCELOCAL __ATTR_ARTIFICIAL int (
 #endif /* !__CRT_HAVE__unloaddll */
 
 #ifndef ____procfun_defined
-#define ____procfun_defined 1
+#define ____procfun_defined
 typedef int (*__procfun)(void);
 #endif /* !____procfun_defined */
 #ifdef __CRT_HAVE__getdllprocaddr
@@ -581,12 +581,12 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_getdllprocaddr, __FORCELOCAL __ATTR_ARTIFICIAL 
 #endif /* !__CRT_HAVE__getdllprocaddr */
 
 #ifndef __wchar_t_defined
-#define __wchar_t_defined 1
+#define __wchar_t_defined
 typedef __WCHAR_TYPE__ wchar_t;
 #endif /* !__wchar_t_defined */
 
 #ifndef __intptr_t_defined
-#define __intptr_t_defined 1
+#define __intptr_t_defined
 typedef __intptr_t intptr_t;
 #endif /* !__intptr_t_defined */
 
@@ -710,7 +710,7 @@ __LIBC __ATTR_SENTINEL_O(1) __ATTR_NONNULL((2)) intptr_t __NOTHROW_NCX(__VLIBCCA
 #endif /* !_WPROCESS_DEFINED */
 
 #ifndef _CRT_WSYSTEM_DEFINED
-#define _CRT_WSYSTEM_DEFINED 1
+#define _CRT_WSYSTEM_DEFINED
 #ifdef __CRT_HAVE_wsystem
 __CREDIRECT(,int,__NOTHROW_RPC,_wsystem,(wchar_t const *__cmd),wsystem,(__cmd))
 #elif defined(__CRT_HAVE__wsystem)
@@ -726,7 +726,7 @@ __CDECLARE(,int,__NOTHROW_RPC,_wsystem,(wchar_t const *__cmd),(__cmd))
 
 #if defined(__USE_DOS) || defined(__USE_KOS)
 #ifndef __getpid_defined
-#define __getpid_defined 1
+#define __getpid_defined
 #ifdef __CRT_HAVE_getpid
 /* >> getpid(2)
  * Return the PID of the calling process (that is the TID of the calling thread group's leader)
@@ -747,7 +747,7 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__pid_t,__NOTHROW,getpid,(void),__getpid
 #endif /* !... */
 #endif /* !__getpid_defined */
 #ifndef __execv_defined
-#define __execv_defined 1
+#define __execv_defined
 #if __has_builtin(__builtin_execv) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_execv)
 /* >> execv(3)
  * Replace the calling  process with  the application  image referred  to by  `path' /  `file'
@@ -777,7 +777,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(execv, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NON
 #endif /* !... */
 #endif /* !__execv_defined */
 #ifndef __execvp_defined
-#define __execvp_defined 1
+#define __execvp_defined
 #if __has_builtin(__builtin_execvp) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_execvp)
 /* >> execvp(3)
  * Replace the calling  process with  the application  image referred  to by  `path' /  `file'
@@ -808,7 +808,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(execvp, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NO
 #endif /* !... */
 #endif /* !__execvp_defined */
 #ifndef __execve_defined
-#define __execve_defined 1
+#define __execve_defined
 #if __has_builtin(__builtin_execve) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_execve)
 /* >> execve(2)
  * Replace the calling  process with  the application  image referred  to by  `path' /  `file'
@@ -829,7 +829,7 @@ __CREDIRECT_GCCNCX(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,execve,(char cons
 #endif /* !... */
 #endif /* !__execve_defined */
 #ifndef __execvpe_defined
-#define __execvpe_defined 1
+#define __execvpe_defined
 #ifdef __CRT_HAVE_execvpe
 /* >> execvpe(3)
  * Replace the  calling process  with the  application  image referred  to by  `file'  and
@@ -855,7 +855,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(execvpe, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_N
 #endif /* !... */
 #endif /* !__execvpe_defined */
 #ifndef __execl_defined
-#define __execl_defined 1
+#define __execl_defined
 #if __has_builtin(__builtin_execl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_execl) && __has_builtin(__builtin_va_arg_pack)
 /* >> execl(3)
  * Replace the calling process with the application image referred to by `path' / `file'
@@ -901,7 +901,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(execl, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_SEN
 #endif /* !... */
 #endif /* !__execl_defined */
 #ifndef __execlp_defined
-#define __execlp_defined 1
+#define __execlp_defined
 #if __has_builtin(__builtin_execlp) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_execlp) && __has_builtin(__builtin_va_arg_pack)
 /* >> execlp(3)
  * Replace the calling process with the application image referred to by `path' / `file'
@@ -948,7 +948,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(execlp, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_SE
 #endif /* !... */
 #endif /* !__execlp_defined */
 #ifndef __execle_defined
-#define __execle_defined 1
+#define __execle_defined
 #if __has_builtin(__builtin_execle) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_execle) && __has_builtin(__builtin_va_arg_pack)
 /* >> execle(3)
  * Replace the calling process with the application image referred to by `path' / `file'
@@ -995,7 +995,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(execle, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_SE
 #endif /* !... */
 #endif /* !__execle_defined */
 #ifndef __execlpe_defined
-#define __execlpe_defined 1
+#define __execlpe_defined
 #ifdef __CRT_HAVE_execlpe
 /* >> execlpe(3)
  * Replace the calling process with the application image referred to by `path' / `file'
@@ -1036,7 +1036,7 @@ __CREDIRECT(,__pid_t,__NOTHROW_RPC,cwait,(int *__tstat, __pid_t __pid, __STDC_IN
 __NAMESPACE_LOCAL_USING_OR_IMPL(cwait, __FORCELOCAL __ATTR_ARTIFICIAL __pid_t __NOTHROW_RPC(__LIBCCALL cwait)(int *__tstat, __pid_t __pid, __STDC_INT_AS_UINT_T __action) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(cwait))(__tstat, __pid, __action); })
 #endif /* ... */
 #ifndef __spawnv_defined
-#define __spawnv_defined 1
+#define __spawnv_defined
 #ifdef __CRT_HAVE_spawnv
 __CDECLARE(__ATTR_NONNULL((2, 3)),__pid_t,__NOTHROW_RPC,spawnv,(__STDC_INT_AS_UINT_T __mode, char const *__restrict __path, __TARGV),(__mode,__path,___argv))
 #elif defined(__CRT_HAVE__spawnv)
@@ -1055,7 +1055,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(spawnv, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NO
 #endif /* !... */
 #endif /* !__spawnv_defined */
 #ifndef __spawnvp_defined
-#define __spawnvp_defined 1
+#define __spawnvp_defined
 #ifdef __CRT_HAVE_spawnvp
 __CDECLARE(__ATTR_NONNULL((2, 3)),__pid_t,__NOTHROW_RPC,spawnvp,(__STDC_INT_AS_UINT_T __mode, char const *__restrict __file, __TARGV),(__mode,__file,___argv))
 #elif defined(__CRT_HAVE__spawnvp)
@@ -1075,7 +1075,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(spawnvp, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_N
 #endif /* !... */
 #endif /* !__spawnvp_defined */
 #ifndef __spawnve_defined
-#define __spawnve_defined 1
+#define __spawnve_defined
 #ifdef __CRT_HAVE_spawnve
 __CDECLARE(__ATTR_NONNULL((2, 3, 4)),__pid_t,__NOTHROW_RPC,spawnve,(__STDC_INT_AS_UINT_T __mode, char const *__restrict __path, __TARGV, __TENVP),(__mode,__path,___argv,___envp))
 #elif defined(__CRT_HAVE__spawnve)
@@ -1093,7 +1093,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(spawnve, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_N
 #endif /* !... */
 #endif /* !__spawnve_defined */
 #ifndef __spawnvpe_defined
-#define __spawnvpe_defined 1
+#define __spawnvpe_defined
 #ifdef __CRT_HAVE_spawnvpe
 __CDECLARE(__ATTR_NONNULL((2, 3, 4)),__pid_t,__NOTHROW_RPC,spawnvpe,(__STDC_INT_AS_UINT_T __mode, char const *__restrict __file, __TARGV, __TENVP),(__mode,__file,___argv,___envp))
 #elif defined(__CRT_HAVE__spawnvpe)
@@ -1113,7 +1113,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(spawnvpe, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_
 #endif /* !... */
 #endif /* !__spawnvpe_defined */
 #ifndef __spawnl_defined
-#define __spawnl_defined 1
+#define __spawnl_defined
 #ifdef __CRT_HAVE_spawnl
 __LIBC __ATTR_SENTINEL __ATTR_NONNULL((2)) __pid_t __NOTHROW_RPC(__VLIBCCALL spawnl)(__STDC_INT_AS_UINT_T __mode, char const *__restrict __path, char const *__args, ...) __CASMNAME_SAME("spawnl");
 #elif defined(__CRT_HAVE__spawnl)
@@ -1136,7 +1136,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(spawnl, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_SE
 #endif /* !... */
 #endif /* !__spawnl_defined */
 #ifndef __spawnlp_defined
-#define __spawnlp_defined 1
+#define __spawnlp_defined
 #ifdef __CRT_HAVE_spawnlp
 __LIBC __ATTR_SENTINEL __ATTR_NONNULL((2)) __pid_t __NOTHROW_RPC(__VLIBCCALL spawnlp)(__STDC_INT_AS_UINT_T __mode, char const *__restrict __file, char const *__args, ...) __CASMNAME_SAME("spawnlp");
 #elif defined(__CRT_HAVE__spawnlp)
@@ -1160,7 +1160,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(spawnlp, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_S
 #endif /* !... */
 #endif /* !__spawnlp_defined */
 #ifndef __spawnle_defined
-#define __spawnle_defined 1
+#define __spawnle_defined
 #ifdef __CRT_HAVE_spawnle
 __LIBC __ATTR_SENTINEL_O(1) __ATTR_NONNULL((2)) __pid_t __NOTHROW_RPC(__VLIBCCALL spawnle)(__STDC_INT_AS_UINT_T __mode, char const *__restrict __path, char const *__args, ...) __CASMNAME_SAME("spawnle");
 #elif defined(__CRT_HAVE__spawnle)
@@ -1182,7 +1182,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(spawnle, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_S
 #endif /* !... */
 #endif /* !__spawnle_defined */
 #ifndef __spawnlpe_defined
-#define __spawnlpe_defined 1
+#define __spawnlpe_defined
 #ifdef __CRT_HAVE_spawnlpe
 __LIBC __ATTR_SENTINEL_O(1) __ATTR_NONNULL((2)) __pid_t __NOTHROW_RPC(__VLIBCCALL spawnlpe)(__STDC_INT_AS_UINT_T __mode, char const *__restrict __file, char const *__args, ...) __CASMNAME_SAME("spawnlpe");
 #elif defined(__CRT_HAVE__spawnlpe)
@@ -1207,7 +1207,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(spawnlpe, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_
 #endif /* !__spawnlpe_defined */
 #ifdef __USE_KOS
 #ifndef __fspawnve_defined
-#define __fspawnve_defined 1
+#define __fspawnve_defined
 #ifdef __CRT_HAVE_fspawnve
 __CDECLARE(__ATTR_NONNULL((3, 4)),__pid_t,__NOTHROW_RPC,fspawnve,(__STDC_INT_AS_UINT_T __mode, __fd_t __execfd, __TARGV, __TENVP),(__mode,__path,___argv,___envp))
 #elif defined(__CRT_HAVE__spawnve)

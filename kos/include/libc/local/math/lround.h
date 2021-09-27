@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8c437e8d */
+/* HASH CRC-32:0xa5b63e00 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,11 +19,11 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_lround_defined
-#define __local_lround_defined 1
+#define __local_lround_defined
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_round_defined
-#define __local___localdep_round_defined 1
+#define __local___localdep_round_defined
 #if __has_builtin(__builtin_round) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_round)
 __CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__localdep_round,(double __x),round,{ return __builtin_round(__x); })
 #elif defined(__CRT_HAVE_round)
@@ -51,7 +51,7 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(lround))(double __x) {
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_lround_defined
-#define __local___localdep_lround_defined 1
+#define __local___localdep_lround_defined
 #define __localdep_lround __LIBC_LOCAL_NAME(lround)
 #endif /* !__local___localdep_lround_defined */
 #endif /* !__local_lround_defined */

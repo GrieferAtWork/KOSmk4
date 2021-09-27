@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8978c4e6 */
+/* HASH CRC-32:0x5d7b1a5a */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,18 +19,18 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_UTimensAt_defined
-#define __local_UTimensAt_defined 1
+#define __local_UTimensAt_defined
 #include <__crt.h>
 #include <bits/types.h>
 #if defined(__CRT_HAVE_UTimensAt64) || defined(__CRT_HAVE_UTimensAt)
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
 #if !defined(__local___localdep_UTimensAt32_defined) && defined(__CRT_HAVE_UTimensAt)
-#define __local___localdep_UTimensAt32_defined 1
+#define __local___localdep_UTimensAt32_defined
 __CREDIRECT_VOID(__ATTR_NONNULL((2)),__THROWING,__localdep_UTimensAt32,(__fd_t __dirfd, char const *__filename, struct timespec const __times[2 /*or:3*/], __atflag_t __flags),UTimensAt,(__dirfd,__filename,__times,__flags))
 #endif /* !__local___localdep_UTimensAt32_defined && __CRT_HAVE_UTimensAt */
 #ifndef __local___localdep_UTimensAt64_defined
-#define __local___localdep_UTimensAt64_defined 1
+#define __local___localdep_UTimensAt64_defined
 #if defined(__CRT_HAVE_UTimensAt) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 __CREDIRECT_VOID(__ATTR_NONNULL((2)),__THROWING,__localdep_UTimensAt64,(__fd_t __dirfd, char const *__filename, struct __timespec64 const __times[2 /*or:3*/], __atflag_t __flags),UTimensAt,(__dirfd,__filename,__times,__flags))
 #elif defined(__CRT_HAVE_UTimensAt64)
@@ -109,7 +109,7 @@ __LOCAL_LIBC(UTimensAt) __ATTR_NONNULL((2)) void
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_UTimensAt_defined
-#define __local___localdep_UTimensAt_defined 1
+#define __local___localdep_UTimensAt_defined
 #define __localdep_UTimensAt __LIBC_LOCAL_NAME(UTimensAt)
 #endif /* !__local___localdep_UTimensAt_defined */
 #else /* __CRT_HAVE_UTimensAt64 || __CRT_HAVE_UTimensAt */

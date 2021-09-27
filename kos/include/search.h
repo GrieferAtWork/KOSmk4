@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x702a4397 */
+/* HASH CRC-32:0xc4f59cc3 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -126,7 +126,7 @@ typedef enum {
 #ifdef __CC__
 
 #ifndef __size_t_defined
-#define __size_t_defined 1
+#define __size_t_defined
 typedef __SIZE_TYPE__ size_t;
 #endif /* !__size_t_defined */
 
@@ -166,7 +166,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(remque, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NO
 #ifndef __COMPAR_FN_T
 #define __COMPAR_FN_T 1
 #ifndef ____compar_fn_t_defined
-#define ____compar_fn_t_defined 1
+#define ____compar_fn_t_defined
 typedef int (__LIBCCALL *__compar_fn_t)(void const *__a, void const *__b);
 #endif /* !____compar_fn_t_defined */
 #ifdef __USE_GNU
@@ -175,7 +175,7 @@ typedef __compar_fn_t comparison_fn_t;
 #endif /* __COMPAR_FN_T */
 
 #ifndef __ENTRY_defined
-#define __ENTRY_defined 1
+#define __ENTRY_defined
 typedef struct entry {
 	char *key;
 	void *data;
@@ -226,7 +226,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(hdestroy, __FORCELOCAL __ATTR_ARTIFICIAL void __
 #ifdef __USE_GNU
 /* Data type for reentrant functions.  */
 #ifndef __hsearch_data_defined
-#define __hsearch_data_defined 1
+#define __hsearch_data_defined
 struct hsearch_data {
 	struct _ENTRY *table;
 	unsigned int   size;
@@ -390,7 +390,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(twalk, __FORCELOCAL __ATTR_ARTIFICIAL void (__LI
 /* Callback type for function to free a tree node.
  * If the keys are atomic data this function should do nothing. */
 #ifndef ____free_fn_t_defined
-#define ____free_fn_t_defined 1
+#define ____free_fn_t_defined
 typedef void (__LIBCCALL *__free_fn_t)(void *__nodep);
 #endif /* !____free_fn_t_defined */
 #ifdef __CRT_HAVE_tdestroy
@@ -537,7 +537,7 @@ __CDECLARE(__ATTR_NONNULL((2, 3, 5)),void *,__THROWING,_lsearch,(void const *__k
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2, 3, 5)) void *(__LIBCCALL _lsearch)(void const *__key, void *__pbase, size_t *__pitem_count, size_t __item_size, int (__LIBCCALL *__compar)(void const *__a, void const *__b)) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lsearch))(__key, __pbase, __pitem_count, __item_size, __compar); }
 #endif /* !... */
 #ifndef __qsort_defined
-#define __qsort_defined 1
+#define __qsort_defined
 #ifdef __std_qsort_defined
 __NAMESPACE_STD_USING(qsort)
 #elif defined(__CRT_HAVE_qsort)
@@ -548,7 +548,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(qsort, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NON
 #endif /* !... */
 #endif /* !__qsort_defined */
 #ifndef __bsearch_defined
-#define __bsearch_defined 1
+#define __bsearch_defined
 #ifdef __std_bsearch_defined
 __NAMESPACE_STD_USING(bsearch)
 #elif defined(__CRT_HAVE_bsearch)
@@ -600,7 +600,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_lsearch_s, __FORCELOCAL __ATTR_ARTIFICIAL __ATT
 #endif /* !__CRT_HAVE__lsearch_s */
 #ifdef __USE_DOS_SLIB
 #ifndef __qsort_s_defined
-#define __qsort_s_defined 1
+#define __qsort_s_defined
 #ifdef __CRT_HAVE_qsort_s
 __CDECLARE_VOID(__ATTR_NONNULL((1, 4)),__THROWING,qsort_s,(void *__base, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size, int (__LIBCCALL *__compar)(void *__arg, void const *__a, void const *__b), void *__arg),(__base,__elem_count,__elem_size,__compar,__arg))
 #else /* __CRT_HAVE_qsort_s */
@@ -609,7 +609,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(qsort_s, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_N
 #endif /* !__CRT_HAVE_qsort_s */
 #endif /* !__qsort_s_defined */
 #ifndef __bsearch_s_defined
-#define __bsearch_s_defined 1
+#define __bsearch_s_defined
 #ifdef __CRT_HAVE_bsearch_s
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 2, 5)),void *,__THROWING,bsearch_s,(void const *__key, void const *__base, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size, int (__LIBCCALL *__compar)(void *__arg, void const *__a, void const *__b), void *__arg),(__key,__base,__elem_count,__elem_size,__compar,__arg))
 #else /* __CRT_HAVE_bsearch_s */

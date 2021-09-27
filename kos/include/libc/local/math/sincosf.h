@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9873559f */
+/* HASH CRC-32:0x8eb1e59 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,13 +19,13 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_sincosf_defined
-#define __local_sincosf_defined 1
+#define __local_sincosf_defined
 #include <__crt.h>
 #if defined(__CRT_HAVE_sincos) || defined(__CRT_HAVE___sincos)
 #include <bits/crt/math-vector.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_sincos_defined
-#define __local___localdep_sincos_defined 1
+#define __local___localdep_sincos_defined
 #if __has_builtin(__builtin_sincos) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_sincos)
 __CEIREDIRECT(__DECL_SIMD_sincos __ATTR_NONNULL((2, 3)),void,__NOTHROW,__localdep_sincos,(double __x, double *__psinx, double *__pcosx),sincos,{ __builtin_sincos(__x, __psinx, __pcosx); })
 #elif defined(__CRT_HAVE_sincos)
@@ -45,7 +45,7 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(sincosf))(float __x, float *__psinx, floa
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_sincosf_defined
-#define __local___localdep_sincosf_defined 1
+#define __local___localdep_sincosf_defined
 #define __localdep_sincosf __LIBC_LOCAL_NAME(sincosf)
 #endif /* !__local___localdep_sincosf_defined */
 #else /* __CRT_HAVE_sincos || __CRT_HAVE___sincos */

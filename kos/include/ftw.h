@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf8cb6a38 */
+/* HASH CRC-32:0xa2cbf3b5 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -123,20 +123,20 @@
 __SYSDECL_BEGIN
 
 #ifndef ____ftw_func_t_defined
-#define ____ftw_func_t_defined 1
+#define ____ftw_func_t_defined
 struct stat;
 typedef int (__LIBKCALL *__ftw_func_t)(char const *__fpath, struct stat const *__sb, int __typeflag);
 #endif /* !____ftw_func_t_defined */
 #ifdef __USE_LARGEFILE64
 #ifndef ____ftw64_func_t_defined
-#define ____ftw64_func_t_defined 1
+#define ____ftw64_func_t_defined
 struct stat64;
 typedef int (__LIBKCALL *__ftw64_func_t)(char const *__fpath, struct stat64 const *__sb, int __typeflag);
 #endif /* !____ftw64_func_t_defined */
 #endif /* __USE_LARGEFILE64 */
 #ifdef __USE_XOPEN_EXTENDED
 #ifndef ____nftw_func_t_defined
-#define ____nftw_func_t_defined 1
+#define ____nftw_func_t_defined
 struct stat;
 #ifdef __USE_XOPEN_EXTENDED
 struct FTW;
@@ -148,7 +148,7 @@ typedef int (__LIBKCALL *__nftw_func_t)(char const *__fpath, struct stat const *
 #endif /* !____nftw_func_t_defined */
 #ifdef __USE_LARGEFILE64
 #ifndef ____nftw64_func_t_defined
-#define ____nftw64_func_t_defined 1
+#define ____nftw64_func_t_defined
 struct stat64;
 #ifdef __USE_XOPEN_EXTENDED
 struct FTW;

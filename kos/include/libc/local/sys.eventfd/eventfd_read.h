@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x922c0949 */
+/* HASH CRC-32:0x9e8e3164 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,13 +19,13 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_eventfd_read_defined
-#define __local_eventfd_read_defined 1
+#define __local_eventfd_read_defined
 #include <__crt.h>
 #if defined(__CRT_HAVE_read) || defined(__CRT_HAVE__read) || defined(__CRT_HAVE___read)
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_read_defined
-#define __local___localdep_read_defined 1
+#define __local___localdep_read_defined
 #ifdef __CRT_HAVE_read
 __CREDIRECT(__ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_read,(__fd_t __fd, void *__buf, __SIZE_TYPE__ __bufsize),read,(__fd,__buf,__bufsize))
 #elif defined(__CRT_HAVE__read)
@@ -53,7 +53,7 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(eventfd_read))(__fd_t __fd, __UINT64_
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_eventfd_read_defined
-#define __local___localdep_eventfd_read_defined 1
+#define __local___localdep_eventfd_read_defined
 #define __localdep_eventfd_read __LIBC_LOCAL_NAME(eventfd_read)
 #endif /* !__local___localdep_eventfd_read_defined */
 #else /* __CRT_HAVE_read || __CRT_HAVE__read || __CRT_HAVE___read */

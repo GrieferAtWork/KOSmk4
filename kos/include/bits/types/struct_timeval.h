@@ -20,6 +20,6 @@
 #ifndef __timeval_defined
 #include <bits/os/timeval.h>
 #ifndef __timeval_defined
-#define __timeval_defined 1
+#define __timeval_defined
 #endif /* !__timeval_defined */
 #endif /* !__timeval_defined */

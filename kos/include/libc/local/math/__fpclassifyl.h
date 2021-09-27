@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x97dd9149 */
+/* HASH CRC-32:0xda71cfe7 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,13 +19,13 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local___fpclassifyl_defined
-#define __local___fpclassifyl_defined 1
+#define __local___fpclassifyl_defined
 #include <__crt.h>
 #include <ieee754.h>
 #if defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE___fpclassify) || defined(__CRT_HAVE_fpclassify) || defined(__CRT_HAVE__dclass) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep___fpclassify_defined
-#define __local___localdep___fpclassify_defined 1
+#define __local___localdep___fpclassify_defined
 #ifdef __CRT_HAVE___fpclassify
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep___fpclassify,(double __x),__fpclassify,(__x))
 #elif defined(__CRT_HAVE_fpclassify)
@@ -63,7 +63,7 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(__fpclassifyl))(__LONGDOUBLE __x) {
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep___fpclassifyl_defined
-#define __local___localdep___fpclassifyl_defined 1
+#define __local___localdep___fpclassifyl_defined
 #define __localdep___fpclassifyl __LIBC_LOCAL_NAME(__fpclassifyl)
 #endif /* !__local___localdep___fpclassifyl_defined */
 #else /* __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __CRT_HAVE___fpclassify || __CRT_HAVE_fpclassify || __CRT_HAVE__dclass || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */

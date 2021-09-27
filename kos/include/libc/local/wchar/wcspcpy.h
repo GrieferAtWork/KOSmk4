@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9ff3795f */
+/* HASH CRC-32:0xac09e7ce */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,12 +19,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_wcspcpy_defined
-#define __local_wcspcpy_defined 1
+#define __local_wcspcpy_defined
 #include <__crt.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_wcslen_defined
-#define __local___localdep_wcslen_defined 1
+#define __local___localdep_wcslen_defined
 #ifdef __CRT_HAVE_wcslen
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_wcslen,(__WCHAR_TYPE__ const *__restrict __str),wcslen,(__str))
 #else /* __CRT_HAVE_wcslen */
@@ -35,7 +35,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__CRT_HAVE_wcslen */
 #endif /* !__local___localdep_wcslen_defined */
 #ifndef __local___localdep_wmempcpy_defined
-#define __local___localdep_wmempcpy_defined 1
+#define __local___localdep_wmempcpy_defined
 #ifdef __CRT_HAVE_wmempcpy
 __CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__WCHAR_TYPE__ *,__NOTHROW_NCX,__localdep_wmempcpy,(__WCHAR_TYPE__ *__restrict __dst, __WCHAR_TYPE__ const *__restrict __src, __SIZE_TYPE__ __num_chars),wmempcpy,(__dst,__src,__num_chars))
 #elif defined(__CRT_HAVE_mempcpyw) && __SIZEOF_WCHAR_T__ == 2
@@ -65,7 +65,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcspcpy))(__WCHAR_TYPE__ *__restrict 
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_wcspcpy_defined
-#define __local___localdep_wcspcpy_defined 1
+#define __local___localdep_wcspcpy_defined
 #define __localdep_wcspcpy __LIBC_LOCAL_NAME(wcspcpy)
 #endif /* !__local___localdep_wcspcpy_defined */
 #endif /* !__local_wcspcpy_defined */

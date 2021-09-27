@@ -20,7 +20,7 @@
 #ifndef GUARD_LIBTERM_API_H
 #define GUARD_LIBTERM_API_H 1
 
-#define LIBBUFFER_WANT_PROTOTYPES 1
+#define LIBBUFFER_WANT_PROTOTYPES
 
 #include <libterm/api.h>
 /**/

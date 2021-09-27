@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe2935f7c */
+/* HASH CRC-32:0xc4bfe545 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_dcngettext_defined
-#define __local_dcngettext_defined 1
+#define __local_dcngettext_defined
 #include <__crt.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -34,7 +34,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(dcngettext))(char const *__domainname
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_dcngettext_defined
-#define __local___localdep_dcngettext_defined 1
+#define __local___localdep_dcngettext_defined
 #define __localdep_dcngettext __LIBC_LOCAL_NAME(dcngettext)
 #endif /* !__local___localdep_dcngettext_defined */
 #endif /* !__local_dcngettext_defined */

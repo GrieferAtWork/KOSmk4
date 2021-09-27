@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2e628ac6 */
+/* HASH CRC-32:0x2beb6eef */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,14 +19,14 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_sigstack_defined
-#define __local_sigstack_defined 1
+#define __local_sigstack_defined
 #include <__crt.h>
 #include <asm/os/signal.h>
 #if defined(__SS_ONSTACK) && defined(__SS_DISABLE) && defined(__CRT_HAVE_sigaltstack)
 #include <bits/os/sigstack.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_sigaltstack_defined
-#define __local___localdep_sigaltstack_defined 1
+#define __local___localdep_sigaltstack_defined
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_sigaltstack,(struct sigaltstack const *__ss, struct sigaltstack *__oss),sigaltstack,(__ss,__oss))
 #endif /* !__local___localdep_sigaltstack_defined */
 __LOCAL_LIBC(sigstack) int
@@ -50,7 +50,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(sigstack))(struct sigstack *__ss, str
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_sigstack_defined
-#define __local___localdep_sigstack_defined 1
+#define __local___localdep_sigstack_defined
 #define __localdep_sigstack __LIBC_LOCAL_NAME(sigstack)
 #endif /* !__local___localdep_sigstack_defined */
 #else /* __SS_ONSTACK && __SS_DISABLE && __CRT_HAVE_sigaltstack */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcff454ce */
+/* HASH CRC-32:0xcd01bbd1 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,12 +19,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_c16stoull_r_defined
-#define __local_c16stoull_r_defined 1
+#define __local_c16stoull_r_defined
 #include <__crt.h>
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_c16stou32_r_defined
-#define __local___localdep_c16stou32_r_defined 1
+#define __local___localdep_c16stou32_r_defined
 #if defined(__CRT_HAVE_wcstou32_r) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
@@ -48,7 +48,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_c16stou32_r_defined */
 #ifndef __local___localdep_c16stou64_r_defined
-#define __local___localdep_c16stou64_r_defined 1
+#define __local___localdep_c16stou64_r_defined
 #if defined(__CRT_HAVE_wcstou64_r) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
@@ -99,7 +99,7 @@ __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(c16stoull_r))(__CHAR16_TYPE__ const *
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_c16stoull_r_defined
-#define __local___localdep_c16stoull_r_defined 1
+#define __local___localdep_c16stoull_r_defined
 #define __localdep_c16stoull_r __LIBC_LOCAL_NAME(c16stoull_r)
 #endif /* !__local___localdep_c16stoull_r_defined */
 #endif /* !__local_c16stoull_r_defined */

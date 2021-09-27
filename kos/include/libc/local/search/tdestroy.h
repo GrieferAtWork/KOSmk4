@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa6c14c61 */
+/* HASH CRC-32:0x49e96f2d */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,12 +19,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_tdestroy_defined
-#define __local_tdestroy_defined 1
+#define __local_tdestroy_defined
 #include <__crt.h>
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_tdestroy_r_defined
-#define __local___localdep_tdestroy_r_defined 1
+#define __local___localdep_tdestroy_r_defined
 #ifdef __CRT_HAVE_tdestroy_r
 __CREDIRECT_VOID(__ATTR_NONNULL((2)),__THROWING,__localdep_tdestroy_r,(void *__root, void (__LIBCCALL *__freefct)(void *__nodep, void *__arg), void *__arg),tdestroy_r,(__root,__freefct,__arg))
 #else /* __CRT_HAVE_tdestroy_r */
@@ -38,7 +38,7 @@ __NAMESPACE_LOCAL_END
 #ifndef __LIBCCALL_CALLER_CLEANUP
 #ifndef ____invoke_free_fn_helper_defined
 __NAMESPACE_LOCAL_BEGIN
-#define ____invoke_free_fn_helper_defined 1
+#define ____invoke_free_fn_helper_defined
 __LOCAL_LIBC(__invoke_free_fn_helper) void
 (__LIBCCALL __invoke_free_fn_helper)(void *__nodep, void *__arg) {
 	(*(void (__LIBCCALL *)(void *))__arg)(__nodep);
@@ -57,7 +57,7 @@ __LOCAL_LIBC(tdestroy) __ATTR_NONNULL((2)) void
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_tdestroy_defined
-#define __local___localdep_tdestroy_defined 1
+#define __local___localdep_tdestroy_defined
 #define __localdep_tdestroy __LIBC_LOCAL_NAME(tdestroy)
 #endif /* !__local___localdep_tdestroy_defined */
 #endif /* !__local_tdestroy_defined */

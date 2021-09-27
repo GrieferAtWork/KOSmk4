@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5b3edf6b */
+/* HASH CRC-32:0x60dd801d */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,18 +19,18 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_FTruncate_defined
-#define __local_FTruncate_defined 1
+#define __local_FTruncate_defined
 #include <__crt.h>
 #include <bits/types.h>
 #if defined(__CRT_HAVE_FTruncate64) || defined(__CRT_HAVE_FTruncate)
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
 #if !defined(__local___localdep_FTruncate32_defined) && defined(__CRT_HAVE_FTruncate)
-#define __local___localdep_FTruncate32_defined 1
+#define __local___localdep_FTruncate32_defined
 __CREDIRECT(,int,__THROWING,__localdep_FTruncate32,(__fd_t __fd, __pos32_t __length),FTruncate,(__fd,__length))
 #endif /* !__local___localdep_FTruncate32_defined && __CRT_HAVE_FTruncate */
 #ifndef __local___localdep_FTruncate64_defined
-#define __local___localdep_FTruncate64_defined 1
+#define __local___localdep_FTruncate64_defined
 #if defined(__CRT_HAVE_FTruncate) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
 __CREDIRECT_VOID(,__THROWING,__localdep_FTruncate64,(__fd_t __fd, __pos64_t __length),FTruncate,(__fd,__length))
 #elif defined(__CRT_HAVE_FTruncate64)
@@ -54,7 +54,7 @@ __LOCAL_LIBC(FTruncate) void
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_FTruncate_defined
-#define __local___localdep_FTruncate_defined 1
+#define __local___localdep_FTruncate_defined
 #define __localdep_FTruncate __LIBC_LOCAL_NAME(FTruncate)
 #endif /* !__local___localdep_FTruncate_defined */
 #else /* __CRT_HAVE_FTruncate64 || __CRT_HAVE_FTruncate */

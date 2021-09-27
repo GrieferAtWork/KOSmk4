@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7ef0e5f4 */
+/* HASH CRC-32:0x86eb6b1e */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -44,7 +44,7 @@
 __SYSDECL_BEGIN
 
 #ifndef __size_t_defined
-#define __size_t_defined 1
+#define __size_t_defined
 typedef __SIZE_TYPE__ size_t;
 #endif /* !__size_t_defined */
 
@@ -90,11 +90,11 @@ __CDECLARE_OPT(,int,__NOTHROW_RPC,_getdrive,(void),())
 __CDECLARE_OPT(,__ULONG32_TYPE__,__NOTHROW_RPC,_getdrives,(void),())
 
 #if !defined(_GETDISKFREE_DEFINED) && defined(__CRT_HAVE__getdiskfree)
-#define _GETDISKFREE_DEFINED 1
+#define _GETDISKFREE_DEFINED
 __CDECLARE(,unsigned int,__NOTHROW_RPC,_getdiskfree,(unsigned int __drive, struct _diskfree_t *__diskfree),(__drive,__diskfree))
 #endif /* !_GETDISKFREE_DEFINED && __CRT_HAVE__getdiskfree */
 #ifndef __getcwd_defined
-#define __getcwd_defined 1
+#define __getcwd_defined
 #ifdef __CRT_HAVE_getcwd
 /* >> getcwd(2)
  * Return the path of the current working directory, relative to the filesystem root set by `chdir(2)' */
@@ -108,7 +108,7 @@ __CREDIRECT(,char *,__NOTHROW_RPC,getcwd,(char *__buf, size_t __bufsize),_getcwd
 #endif /* !... */
 #endif /* !__getcwd_defined */
 #ifndef __rmdir_defined
-#define __rmdir_defined 1
+#define __rmdir_defined
 #ifdef __CRT_HAVE_rmdir
 /* >> rmdir(2)
  * Remove a directory referred to by `path' */
@@ -140,7 +140,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_mkdir, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NO
  * form, with the addition of a preprocessor overload to also allow
  * use of the 1-argument variant. */
 #ifndef __mkdir_defined
-#define __mkdir_defined 1
+#define __mkdir_defined
 #ifdef __CRT_HAVE_mkdir
 /* >> mkdir(2) */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,mkdir,(char const *__pathname, __mode_t __mode),(__pathname,__mode))

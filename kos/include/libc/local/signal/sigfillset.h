@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x98501428 */
+/* HASH CRC-32:0x151936d7 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,12 +19,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_sigfillset_defined
-#define __local_sigfillset_defined 1
+#define __local_sigfillset_defined
 #include <__crt.h>
 #include <bits/os/sigset.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_memset_defined
-#define __local___localdep_memset_defined 1
+#define __local___localdep_memset_defined
 #ifdef __CRT_HAVE_memset
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
@@ -38,7 +38,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__CRT_HAVE_memset */
 #endif /* !__local___localdep_memset_defined */
 #ifndef __local___localdep_memsetl_defined
-#define __local___localdep_memsetl_defined 1
+#define __local___localdep_memsetl_defined
 #ifdef __CRT_HAVE_memsetl
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
@@ -62,7 +62,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_memsetl_defined */
 #ifndef __local___localdep_memsetq_defined
-#define __local___localdep_memsetq_defined 1
+#define __local___localdep_memsetq_defined
 #ifdef __CRT_HAVE_memsetq
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
@@ -76,7 +76,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__CRT_HAVE_memsetq */
 #endif /* !__local___localdep_memsetq_defined */
 #ifndef __local___localdep_memsetw_defined
-#define __local___localdep_memsetw_defined 1
+#define __local___localdep_memsetw_defined
 #ifdef __CRT_HAVE_memsetw
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
@@ -114,7 +114,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(sigfillset))(struct __sigset_struct *
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_sigfillset_defined
-#define __local___localdep_sigfillset_defined 1
+#define __local___localdep_sigfillset_defined
 #define __localdep_sigfillset __LIBC_LOCAL_NAME(sigfillset)
 #endif /* !__local___localdep_sigfillset_defined */
 #endif /* !__local_sigfillset_defined */

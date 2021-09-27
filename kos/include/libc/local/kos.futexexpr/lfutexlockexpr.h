@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc8da52fe */
+/* HASH CRC-32:0x51106cf */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_lfutexlockexpr_defined
-#define __local_lfutexlockexpr_defined 1
+#define __local_lfutexlockexpr_defined
 #include <__crt.h>
 #include <bits/types.h>
 #if defined(__CRT_HAVE_lfutexlockexpr64) || defined(__CRT_HAVE_lfutexlockexpr)
@@ -27,11 +27,11 @@
 #include <kos/bits/futex-expr.h>
 __NAMESPACE_LOCAL_BEGIN
 #if !defined(__local___localdep_lfutexlockexpr32_defined) && defined(__CRT_HAVE_lfutexlockexpr)
-#define __local___localdep_lfutexlockexpr32_defined 1
+#define __local___localdep_lfutexlockexpr32_defined
 __CREDIRECT(__ATTR_NONNULL((1, 4)),int,__NOTHROW_RPC,__localdep_lfutexlockexpr32,(__uintptr_t *__ulockaddr, void *__base, __SIZE_TYPE__ __exprc, struct lfutexexpr const *__exprv, struct __timespec64 const *__timeout, unsigned int __timeout_flags),lfutexlockexpr,(__ulockaddr,__base,__exprc,__exprv,__timeout,__timeout_flags))
 #endif /* !__local___localdep_lfutexlockexpr32_defined && __CRT_HAVE_lfutexlockexpr */
 #ifndef __local___localdep_lfutexlockexpr64_defined
-#define __local___localdep_lfutexlockexpr64_defined 1
+#define __local___localdep_lfutexlockexpr64_defined
 #if defined(__CRT_HAVE_lfutexlockexpr) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 __CREDIRECT(__ATTR_NONNULL((1, 4)),int,__NOTHROW_RPC,__localdep_lfutexlockexpr64,(__uintptr_t *__ulockaddr, void *__base, __SIZE_TYPE__ __exprc, struct lfutexexpr const *__exprv, struct __timespec64 const *__timeout, unsigned int __timeout_flags),lfutexlockexpr,(__ulockaddr,__base,__exprc,__exprv,__timeout,__timeout_flags))
 #elif defined(__CRT_HAVE_lfutexlockexpr64)
@@ -65,7 +65,7 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(lfutexlockexpr))(__uintptr_t *__ulock
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_lfutexlockexpr_defined
-#define __local___localdep_lfutexlockexpr_defined 1
+#define __local___localdep_lfutexlockexpr_defined
 #define __localdep_lfutexlockexpr __LIBC_LOCAL_NAME(lfutexlockexpr)
 #endif /* !__local___localdep_lfutexlockexpr_defined */
 #else /* __CRT_HAVE_lfutexlockexpr64 || __CRT_HAVE_lfutexlockexpr */

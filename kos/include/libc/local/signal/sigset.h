@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd98b6bfb */
+/* HASH CRC-32:0x1a4cb405 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,14 +19,14 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_sigset_defined
-#define __local_sigset_defined 1
+#define __local_sigset_defined
 #include <__crt.h>
 #include <asm/os/signal.h>
 #if defined(__SIG_ERR) && defined(__SIG_HOLD) && defined(__SIG_BLOCK) && (defined(__CRT_HAVE_sigprocmask) || defined(__CRT_HAVE_pthread_sigmask)) && (defined(__CRT_HAVE_sigaction) || defined(__CRT_HAVE___sigaction))
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_sigaction_defined
-#define __local___localdep_sigaction_defined 1
+#define __local___localdep_sigaction_defined
 #ifdef __CRT_HAVE_sigaction
 __NAMESPACE_LOCAL_END
 struct sigaction;
@@ -42,7 +42,7 @@ __CREDIRECT(,int,__NOTHROW_NCX,__localdep_sigaction,(__signo_t __signo, struct s
 #endif /* !... */
 #endif /* !__local___localdep_sigaction_defined */
 #ifndef __local___localdep_sigaddset_defined
-#define __local___localdep_sigaddset_defined 1
+#define __local___localdep_sigaddset_defined
 #ifdef __CRT_HAVE_sigaddset
 __NAMESPACE_LOCAL_END
 #include <bits/os/sigset.h>
@@ -154,7 +154,7 @@ __LOCAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL __localdep_sigaddset)(s
 #endif /* !... */
 #endif /* !__local___localdep_sigaddset_defined */
 #ifndef __local___localdep_sigemptyset_defined
-#define __local___localdep_sigemptyset_defined 1
+#define __local___localdep_sigemptyset_defined
 #ifdef __CRT_HAVE_sigemptyset
 __NAMESPACE_LOCAL_END
 #include <bits/os/sigset.h>
@@ -168,7 +168,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__CRT_HAVE_sigemptyset */
 #endif /* !__local___localdep_sigemptyset_defined */
 #ifndef __local___localdep_sigismember_defined
-#define __local___localdep_sigismember_defined 1
+#define __local___localdep_sigismember_defined
 #ifdef __CRT_HAVE_sigismember
 __NAMESPACE_LOCAL_END
 #include <bits/os/sigset.h>
@@ -277,7 +277,7 @@ __LOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCC
 #endif /* !... */
 #endif /* !__local___localdep_sigismember_defined */
 #ifndef __local___localdep_sigprocmask_defined
-#define __local___localdep_sigprocmask_defined 1
+#define __local___localdep_sigprocmask_defined
 #ifdef __CRT_HAVE_sigprocmask
 __NAMESPACE_LOCAL_END
 #include <features.h>
@@ -336,7 +336,7 @@ __err:
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_sigset_defined
-#define __local___localdep_sigset_defined 1
+#define __local___localdep_sigset_defined
 #define __localdep_sigset __LIBC_LOCAL_NAME(sigset)
 #endif /* !__local___localdep_sigset_defined */
 #else /* __SIG_ERR && __SIG_HOLD && __SIG_BLOCK && (__CRT_HAVE_sigprocmask || __CRT_HAVE_pthread_sigmask) && (__CRT_HAVE_sigaction || __CRT_HAVE___sigaction) */

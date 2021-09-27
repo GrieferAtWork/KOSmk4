@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x89d7f286 */
+/* HASH CRC-32:0x681cc51e */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -656,7 +656,7 @@
 __SYSDECL_BEGIN
 
 #if !defined(__ioctl_defined) && defined(__CRT_HAVE_ioctl)
-#define __ioctl_defined 1
+#define __ioctl_defined
 /* >> ioctl(2)
  * Perform the  I/O control  operation specified  by `request'  on  `fd'.
  * Many I/O  control operations  except  an additional  argument,  though

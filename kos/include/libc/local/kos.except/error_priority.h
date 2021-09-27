@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcd8344f6 */
+/* HASH CRC-32:0x6683e89b */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_error_priority_defined
-#define __local_error_priority_defined 1
+#define __local_error_priority_defined
 #include <__crt.h>
 #include <kos/bits/exception_data.h>
 #include <kos/except/codes.h>
@@ -39,7 +39,7 @@ __NOTHROW(__LIBKCALL __LIBC_LOCAL_NAME(error_priority))(__error_code_t __code) {
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_error_priority_defined
-#define __local___localdep_error_priority_defined 1
+#define __local___localdep_error_priority_defined
 #define __localdep_error_priority __LIBC_LOCAL_NAME(error_priority)
 #endif /* !__local___localdep_error_priority_defined */
 #endif /* !__local_error_priority_defined */

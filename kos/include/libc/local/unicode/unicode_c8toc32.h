@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x52ffc995 */
+/* HASH CRC-32:0x2289bc9d */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_unicode_c8toc32_defined
-#define __local_unicode_c8toc32_defined 1
+#define __local_unicode_c8toc32_defined
 #include <__crt.h>
 #include <bits/crt/mbstate.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -135,7 +135,7 @@ __done:
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_unicode_c8toc32_defined
-#define __local___localdep_unicode_c8toc32_defined 1
+#define __local___localdep_unicode_c8toc32_defined
 #define __localdep_unicode_c8toc32 __LIBC_LOCAL_NAME(unicode_c8toc32)
 #endif /* !__local___localdep_unicode_c8toc32_defined */
 #endif /* !__local_unicode_c8toc32_defined */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa436555a */
+/* HASH CRC-32:0xabe1b406 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_wait3_defined
-#define __local_wait3_defined 1
+#define __local_wait3_defined
 #include <__crt.h>
 #include <bits/types.h>
 #if defined(__CRT_HAVE_wait3_64) || defined(__CRT_HAVE_wait3)
@@ -28,11 +28,11 @@
 #include <parts/waitmacros.h>
 __NAMESPACE_LOCAL_BEGIN
 #if !defined(__local___localdep_wait3_32_defined) && defined(__CRT_HAVE_wait3)
-#define __local___localdep_wait3_32_defined 1
+#define __local___localdep_wait3_32_defined
 __CREDIRECT(,__pid_t,__NOTHROW_RPC,__localdep_wait3_32,(__WAIT_STATUS __stat_loc, __STDC_INT_AS_UINT_T __options, struct __rusage32 *__usage),wait3,(__stat_loc,__options,__usage))
 #endif /* !__local___localdep_wait3_32_defined && __CRT_HAVE_wait3 */
 #ifndef __local___localdep_wait3_64_defined
-#define __local___localdep_wait3_64_defined 1
+#define __local___localdep_wait3_64_defined
 #if defined(__CRT_HAVE_wait3) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 __CREDIRECT(,__pid_t,__NOTHROW_NCX,__localdep_wait3_64,(__WAIT_STATUS __stat_loc, __STDC_INT_AS_UINT_T __options, struct __rusage64 *__usage),wait3,(__stat_loc,__options,__usage))
 #elif defined(__CRT_HAVE_wait3_64)
@@ -67,7 +67,7 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(wait3))(__WAIT_STATUS __stat_loc, __S
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_wait3_defined
-#define __local___localdep_wait3_defined 1
+#define __local___localdep_wait3_defined
 #define __localdep_wait3 __LIBC_LOCAL_NAME(wait3)
 #endif /* !__local___localdep_wait3_defined */
 #else /* __CRT_HAVE_wait3_64 || __CRT_HAVE_wait3 */

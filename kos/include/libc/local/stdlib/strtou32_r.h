@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb59ed4d4 */
+/* HASH CRC-32:0xfcd787d9 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,13 +19,13 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_strtou32_r_defined
-#define __local_strtou32_r_defined 1
+#define __local_strtou32_r_defined
 #include <__crt.h>
 #include <features.h>
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_isspace_defined
-#define __local___localdep_isspace_defined 1
+#define __local___localdep_isspace_defined
 __NAMESPACE_LOCAL_END
 #include <bits/crt/ctype.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -160,7 +160,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strtou32_r))(char const *__restrict _
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_strtou32_r_defined
-#define __local___localdep_strtou32_r_defined 1
+#define __local___localdep_strtou32_r_defined
 #define __localdep_strtou32_r __LIBC_LOCAL_NAME(strtou32_r)
 #endif /* !__local___localdep_strtou32_r_defined */
 #endif /* !__local_strtou32_r_defined */

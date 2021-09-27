@@ -892,7 +892,7 @@ foundit:
 }
 
 /* Insert the given `entry' into the function vector. The caller must ensure that
- * the vector has been resized to allow for an additional entry to be fitted. */
+ * the vector has been  resized to allow  for an additional  entry to be  fitted. */
 PRIVATE NONNULL((1, 2)) void
 NOTHROW_NCX(CC service_dlsym_insert)(struct service *__restrict self,
                                      struct service_function_entry *__restrict entry) {
@@ -1161,7 +1161,7 @@ libservice_dlsym_getinfo(struct service *__restrict self, char const *__restrict
 	comsize = offsetof(struct service_com, sc_dlsym.dl_name) + namsize;
 
 	/* Make sure that there's enough space for us to receive a
-	 * success response, as well as an exception response. */
+	 * success  response,  as well  as an  exception response. */
 #define DLSYM_COM_MINSIZE                                    \
 	MAX_C(offsetafter(struct service_com, sc_dlsym_success), \
 	      offsetafter(struct service_com, sc_except))

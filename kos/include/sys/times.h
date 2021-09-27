@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x20930351 */
+/* HASH CRC-32:0x6dca86f6 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -48,7 +48,7 @@
 __SYSDECL_BEGIN
 
 #ifndef __clock_t_defined
-#define __clock_t_defined 1
+#define __clock_t_defined
 typedef __clock_t clock_t;
 #endif /* !__clock_t_defined */
 

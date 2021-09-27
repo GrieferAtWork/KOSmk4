@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc9f52ded */
+/* HASH CRC-32:0x2bc3cfd4 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,13 +19,13 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_c16toumax_defined
-#define __local_c16toumax_defined 1
+#define __local_c16toumax_defined
 #include <__crt.h>
 #include <features.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_c16stou32_defined
-#define __local___localdep_c16stou32_defined 1
+#define __local___localdep_c16stou32_defined
 #if defined(__CRT_HAVE_wcstou32) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__UINT32_TYPE__,__NOTHROW_NCX,__localdep_c16stou32,(__CHAR16_TYPE__ const *__restrict __nptr, __CHAR16_TYPE__ **__endptr, __STDC_INT_AS_UINT_T __base),wcstou32,(__nptr,__endptr,__base))
 #elif defined(__CRT_HAVE_DOS$wcstou32)
@@ -59,7 +59,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_c16stou32_defined */
 #ifndef __local___localdep_c16stou64_defined
-#define __local___localdep_c16stou64_defined 1
+#define __local___localdep_c16stou64_defined
 #if defined(__CRT_HAVE_wcstou64) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__UINT64_TYPE__,__NOTHROW_NCX,__localdep_c16stou64,(__CHAR16_TYPE__ const *__restrict __nptr, __CHAR16_TYPE__ **__endptr, __STDC_INT_AS_UINT_T __base),wcstou64,(__nptr,__endptr,__base))
 #elif defined(__CRT_HAVE_DOS$wcstou64)
@@ -106,7 +106,7 @@ __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(c16toumax))(__CHAR16_TYPE__ const *__
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_c16toumax_defined
-#define __local___localdep_c16toumax_defined 1
+#define __local___localdep_c16toumax_defined
 #define __localdep_c16toumax __LIBC_LOCAL_NAME(c16toumax)
 #endif /* !__local___localdep_c16toumax_defined */
 #endif /* !__local_c16toumax_defined */

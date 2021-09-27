@@ -1386,7 +1386,7 @@ typedef struct elf64_phdr /*[PREFIX(p_)]*/ {
 #define PT_LOOS         0x60000000      /* Start of OS-specific */
 #define PT_GNU_EH_FRAME 0x6474e550      /* GCC .eh_frame_hdr segment */
 #define PT_SUNW_EH_FRAME PT_GNU_EH_FRAME /* Solaris uses the same value */
-#define PT_GNU_STACK    0x6474e551      /* Indicates stack executability */
+#define PT_GNU_STACK    0x6474e551      /* Indicates mmap flags for stacks (use `PHDR.p_flags' for allocations) */
 #define PT_GNU_RELRO    0x6474e552      /* Read-only after relocation */
 #define PT_GNU_PROPERTY	0x6474e553      /* GNU property */
 #define PT_SUNW_UNWIND  0x6464e550

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7a4b058b */
+/* HASH CRC-32:0x97897b39 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,14 +19,14 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_clearerr_s_defined
-#define __local_clearerr_s_defined 1
+#define __local_clearerr_s_defined
 #include <__crt.h>
 #include <features.h>
 #if defined(__CRT_HAVE_clearerr) || defined(__CRT_HAVE_clearerr_unlocked)
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_clearerr_defined
-#define __local___localdep_clearerr_defined 1
+#define __local___localdep_clearerr_defined
 #if defined(__CRT_HAVE_clearerr_unlocked) && defined(__USE_STDIO_UNLOCKED)
 __CREDIRECT_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,__localdep_clearerr,(__FILE *__restrict __stream),clearerr_unlocked,(__stream))
 #elif defined(__CRT_HAVE_clearerr)
@@ -54,7 +54,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(clearerr_s))(__FILE *__restrict __str
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_clearerr_s_defined
-#define __local___localdep_clearerr_s_defined 1
+#define __local___localdep_clearerr_s_defined
 #define __localdep_clearerr_s __LIBC_LOCAL_NAME(clearerr_s)
 #endif /* !__local___localdep_clearerr_s_defined */
 #else /* __CRT_HAVE_clearerr || __CRT_HAVE_clearerr_unlocked */

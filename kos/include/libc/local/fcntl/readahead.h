@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3af80e8b */
+/* HASH CRC-32:0x4414e84 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_readahead_defined
-#define __local_readahead_defined 1
+#define __local_readahead_defined
 #include <__crt.h>
 #include <bits/types.h>
 #include <features.h>
@@ -41,7 +41,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(readahead))(__fd_t __fd, __PIO_OFFSET
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_readahead_defined
-#define __local___localdep_readahead_defined 1
+#define __local___localdep_readahead_defined
 #define __localdep_readahead __LIBC_LOCAL_NAME(readahead)
 #endif /* !__local___localdep_readahead_defined */
 #endif /* !__local_readahead_defined */

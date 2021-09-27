@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7a70284 */
+/* HASH CRC-32:0x2e28bf36 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,18 +19,18 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_pthread_key_create_once_np_defined
-#define __local_pthread_key_create_once_np_defined 1
+#define __local_pthread_key_create_once_np_defined
 #include <__crt.h>
 #ifdef __CRT_HAVE_pthread_key_create
 #include <bits/types.h>
 #include <bits/crt/pthreadtypes.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_pthread_key_create_defined
-#define __local___localdep_pthread_key_create_defined 1
+#define __local___localdep_pthread_key_create_defined
 __CREDIRECT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,__localdep_pthread_key_create,(__pthread_key_t *__key, void (__LIBKCALL *__destr_function)(void *__value)),pthread_key_create,(__key,__destr_function))
 #endif /* !__local___localdep_pthread_key_create_defined */
 #ifndef __local___localdep_pthread_key_delete_defined
-#define __local___localdep_pthread_key_delete_defined 1
+#define __local___localdep_pthread_key_delete_defined
 #ifdef __CRT_HAVE_pthread_key_delete
 __CREDIRECT(,__errno_t,__NOTHROW_NCX,__localdep_pthread_key_delete,(__pthread_key_t __key),pthread_key_delete,(__key))
 #elif defined(__CRT_HAVE_tss_delete)
@@ -83,7 +83,7 @@ __again:
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_pthread_key_create_once_np_defined
-#define __local___localdep_pthread_key_create_once_np_defined 1
+#define __local___localdep_pthread_key_create_once_np_defined
 #define __localdep_pthread_key_create_once_np __LIBC_LOCAL_NAME(pthread_key_create_once_np)
 #endif /* !__local___localdep_pthread_key_create_once_np_defined */
 #else /* __CRT_HAVE_pthread_key_create */

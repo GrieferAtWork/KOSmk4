@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe3ac9be3 */
+/* HASH CRC-32:0x1f5e799 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,14 +19,14 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_mtx_init_defined
-#define __local_mtx_init_defined 1
+#define __local_mtx_init_defined
 #include <__crt.h>
 #ifdef __CRT_HAVE_pthread_mutex_init
 #include <features.h>
 #include <bits/crt/threads.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_pthread_mutex_init_defined
-#define __local___localdep_pthread_mutex_init_defined 1
+#define __local___localdep_pthread_mutex_init_defined
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 #include <bits/crt/pthreadtypes.h>
@@ -34,7 +34,7 @@ __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,__localdep_pthread_mutex_init,(__pthread_mutex_t *__mutex, __pthread_mutexattr_t const *__mutexattr),pthread_mutex_init,(__mutex,__mutexattr))
 #endif /* !__local___localdep_pthread_mutex_init_defined */
 #if !defined(__local___localdep_pthread_mutexattr_destroy_defined) && defined(__CRT_HAVE_pthread_mutexattr_destroy)
-#define __local___localdep_pthread_mutexattr_destroy_defined 1
+#define __local___localdep_pthread_mutexattr_destroy_defined
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 #include <bits/crt/pthreadtypes.h>
@@ -42,7 +42,7 @@ __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,__localdep_pthread_mutexattr_destroy,(__pthread_mutexattr_t *__attr),pthread_mutexattr_destroy,(__attr))
 #endif /* !__local___localdep_pthread_mutexattr_destroy_defined && __CRT_HAVE_pthread_mutexattr_destroy */
 #if !defined(__local___localdep_pthread_mutexattr_init_defined) && defined(__CRT_HAVE_pthread_mutexattr_init)
-#define __local___localdep_pthread_mutexattr_init_defined 1
+#define __local___localdep_pthread_mutexattr_init_defined
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 #include <bits/crt/pthreadtypes.h>
@@ -50,7 +50,7 @@ __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,__localdep_pthread_mutexattr_init,(__pthread_mutexattr_t *__attr),pthread_mutexattr_init,(__attr))
 #endif /* !__local___localdep_pthread_mutexattr_init_defined && __CRT_HAVE_pthread_mutexattr_init */
 #ifndef __local___localdep_pthread_mutexattr_settype_defined
-#define __local___localdep_pthread_mutexattr_settype_defined 1
+#define __local___localdep_pthread_mutexattr_settype_defined
 #ifdef __CRT_HAVE_pthread_mutexattr_settype
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
@@ -96,7 +96,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(mtx_init))(__mtx_t *__restrict __mute
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_mtx_init_defined
-#define __local___localdep_mtx_init_defined 1
+#define __local___localdep_mtx_init_defined
 #define __localdep_mtx_init __LIBC_LOCAL_NAME(mtx_init)
 #endif /* !__local___localdep_mtx_init_defined */
 #else /* __CRT_HAVE_pthread_mutex_init */

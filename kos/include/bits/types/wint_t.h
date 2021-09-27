@@ -21,7 +21,7 @@
 #include <__stdinc.h>
 #include <hybrid/typecore.h>
 #ifndef __wint_t_defined
-#define __wint_t_defined 1
+#define __wint_t_defined
 #ifdef __CC__
 __DECL_BEGIN
 typedef __WINT_TYPE__ wint_t;

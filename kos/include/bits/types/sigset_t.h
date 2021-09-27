@@ -22,7 +22,7 @@
 
 #include <bits/os/sigset.h>
 #ifndef __sigset_t_defined
-#define __sigset_t_defined 1
+#define __sigset_t_defined
 #ifdef __CC__
 __SYSDECL_BEGIN
 typedef struct __sigset_struct sigset_t;

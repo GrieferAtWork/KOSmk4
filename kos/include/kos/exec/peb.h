@@ -39,7 +39,7 @@ __DECL_BEGIN
 #ifdef __CC__
 #if defined(__KOS__) && !defined(__KERNEL__)
 #ifndef ____peb_defined
-#define ____peb_defined 1
+#define ____peb_defined
 /* The PEB of the current process. */
 __LIBC struct process_peb __peb;
 #endif /* !____peb_defined */

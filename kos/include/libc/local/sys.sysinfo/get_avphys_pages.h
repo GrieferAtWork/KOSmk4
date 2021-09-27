@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x838fd581 */
+/* HASH CRC-32:0x66571949 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,14 +19,14 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_get_avphys_pages_defined
-#define __local_get_avphys_pages_defined 1
+#define __local_get_avphys_pages_defined
 #include <__crt.h>
 #include <asm/pagesize.h>
 #if defined(__CRT_HAVE_sysinfo) && !defined(__solaris__) && (defined(__CRT_HAVE_getpagesize) || defined(__CRT_HAVE___getpagesize) || defined(__ARCH_PAGESIZE))
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_getpagesize_defined
-#define __local___localdep_getpagesize_defined 1
+#define __local___localdep_getpagesize_defined
 #if defined(__CRT_HAVE_getpagesize) && defined(__ARCH_PAGESIZE)
 __NAMESPACE_LOCAL_END
 #include <features.h>
@@ -52,7 +52,7 @@ __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED __STDC_INT_AS_SIZE_T __NOTHROW(__LIBCCA
 #endif /* !... */
 #endif /* !__local___localdep_getpagesize_defined */
 #ifndef __local___localdep_sysinfo_defined
-#define __local___localdep_sysinfo_defined 1
+#define __local___localdep_sysinfo_defined
 __NAMESPACE_LOCAL_END
 #include <linux/sysinfo.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -82,7 +82,7 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(get_avphys_pages))(void) {
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_get_avphys_pages_defined
-#define __local___localdep_get_avphys_pages_defined 1
+#define __local___localdep_get_avphys_pages_defined
 #define __localdep_get_avphys_pages __LIBC_LOCAL_NAME(get_avphys_pages)
 #endif /* !__local___localdep_get_avphys_pages_defined */
 #else /* __CRT_HAVE_sysinfo && !__solaris__ && (__CRT_HAVE_getpagesize || __CRT_HAVE___getpagesize || __ARCH_PAGESIZE) */

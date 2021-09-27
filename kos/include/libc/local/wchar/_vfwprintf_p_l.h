@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7a324df2 */
+/* HASH CRC-32:0x1763724 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,14 +19,14 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local__vfwprintf_p_l_defined
-#define __local__vfwprintf_p_l_defined 1
+#define __local__vfwprintf_p_l_defined
 #include <__crt.h>
 #include <kos/anno.h>
 #include <features.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep__vfwprintf_p_defined
-#define __local___localdep__vfwprintf_p_defined 1
+#define __local___localdep__vfwprintf_p_defined
 #ifdef __CRT_HAVE__vfwprintf_p
 __CREDIRECT(__ATTR_NONNULL((1, 2)),__STDC_INT_AS_SSIZE_T,__THROWING,__localdep__vfwprintf_p,(__FILE *__stream, __WCHAR_TYPE__ const *__format, __builtin_va_list __args),_vfwprintf_p,(__stream,__format,__args))
 #else /* __CRT_HAVE__vfwprintf_p */
@@ -43,7 +43,7 @@ __LOCAL_LIBC(_vfwprintf_p_l) __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep__vfwprintf_p_l_defined
-#define __local___localdep__vfwprintf_p_l_defined 1
+#define __local___localdep__vfwprintf_p_l_defined
 #define __localdep__vfwprintf_p_l __LIBC_LOCAL_NAME(_vfwprintf_p_l)
 #endif /* !__local___localdep__vfwprintf_p_l_defined */
 #endif /* !__local__vfwprintf_p_l_defined */

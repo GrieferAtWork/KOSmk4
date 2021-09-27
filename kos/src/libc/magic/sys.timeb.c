@@ -55,7 +55,7 @@
 __SYSDECL_BEGIN
 
 #ifndef __time_t_defined
-#define __time_t_defined 1
+#define __time_t_defined
 typedef __TM_TYPE(time) time_t;
 #endif /* !__time_t_defined */
 
@@ -72,7 +72,7 @@ int crt_ftime64([[nonnull]] struct $timeb64 *timebuf);
 %#ifdef __USE_DOS
 %{
 #ifndef __errno_t_defined
-#define __errno_t_defined 1
+#define __errno_t_defined
 typedef __errno_t errno_t;
 #endif /* !__errno_t_defined */
 }

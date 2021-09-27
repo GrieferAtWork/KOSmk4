@@ -20,6 +20,6 @@
 #ifndef __sigval_t_defined
 #include <bits/os/sigval.h>
 #ifndef __sigval_t_defined
-#define __sigval_t_defined 1
+#define __sigval_t_defined
 #endif /* !__sigval_t_defined */
 #endif /* !__sigval_t_defined */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x97decd80 */
+/* HASH CRC-32:0xdd7c8b08 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,13 +19,13 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_setsigmaskfullptr_defined
-#define __local_setsigmaskfullptr_defined 1
+#define __local_setsigmaskfullptr_defined
 #include <__crt.h>
 #ifdef __CRT_HAVE_setsigmaskptr
 #include <bits/os/sigset.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_setsigmaskptr_defined
-#define __local___localdep_setsigmaskptr_defined 1
+#define __local___localdep_setsigmaskptr_defined
 __CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1)),struct __sigset_struct *,__NOTHROW_NCX,__localdep_setsigmaskptr,(struct __sigset_struct *__sigmaskptr),setsigmaskptr,(__sigmaskptr))
 #endif /* !__local___localdep_setsigmaskptr_defined */
 __LOCAL_LIBC(setsigmaskfullptr) __ATTR_RETNONNULL struct __sigset_struct *
@@ -35,7 +35,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(setsigmaskfullptr))(void) {
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_setsigmaskfullptr_defined
-#define __local___localdep_setsigmaskfullptr_defined 1
+#define __local___localdep_setsigmaskfullptr_defined
 #define __localdep_setsigmaskfullptr __LIBC_LOCAL_NAME(setsigmaskfullptr)
 #endif /* !__local___localdep_setsigmaskfullptr_defined */
 #else /* __CRT_HAVE_setsigmaskptr */

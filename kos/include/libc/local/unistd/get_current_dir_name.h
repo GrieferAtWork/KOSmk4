@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4c830109 */
+/* HASH CRC-32:0xf737504 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,12 +19,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_get_current_dir_name_defined
-#define __local_get_current_dir_name_defined 1
+#define __local_get_current_dir_name_defined
 #include <__crt.h>
 #if defined(__CRT_HAVE_getcwd) || defined(__CRT_HAVE__getcwd)
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_getcwd_defined
-#define __local___localdep_getcwd_defined 1
+#define __local___localdep_getcwd_defined
 #ifdef __CRT_HAVE_getcwd
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
@@ -40,7 +40,7 @@ __CREDIRECT(,char *,__NOTHROW_RPC,__localdep_getcwd,(char *__buf, __SIZE_TYPE__ 
 #endif /* !... */
 #endif /* !__local___localdep_getcwd_defined */
 #ifndef __local___localdep_getenv_defined
-#define __local___localdep_getenv_defined 1
+#define __local___localdep_getenv_defined
 #ifdef __CRT_HAVE_getenv
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_getenv,(char const *__varname),getenv,(__varname))
 #else /* __CRT_HAVE_getenv */
@@ -58,7 +58,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__CRT_HAVE_getenv */
 #endif /* !__local___localdep_getenv_defined */
 #ifndef __local___localdep_stat_defined
-#define __local___localdep_stat_defined 1
+#define __local___localdep_stat_defined
 #if defined(__CRT_HAVE_kstat) && defined(__CRT_KOS_PRIMARY)
 __NAMESPACE_LOCAL_END
 #include <bits/os/stat.h>
@@ -119,7 +119,7 @@ __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_stat,(char const
 #endif /* !... */
 #endif /* !__local___localdep_stat_defined */
 #ifndef __local___localdep_strdup_defined
-#define __local___localdep_strdup_defined 1
+#define __local___localdep_strdup_defined
 #if __has_builtin(__builtin_strdup) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_strdup)
 __CEIREDIRECT(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_strdup,(char const *__restrict __string),strdup,{ return __builtin_strdup(__string); })
 #elif defined(__CRT_HAVE_strdup)
@@ -161,7 +161,7 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(get_current_dir_name))(void) {
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_get_current_dir_name_defined
-#define __local___localdep_get_current_dir_name_defined 1
+#define __local___localdep_get_current_dir_name_defined
 #define __localdep_get_current_dir_name __LIBC_LOCAL_NAME(get_current_dir_name)
 #endif /* !__local___localdep_get_current_dir_name_defined */
 #else /* __CRT_HAVE_getcwd || __CRT_HAVE__getcwd */

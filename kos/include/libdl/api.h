@@ -32,14 +32,14 @@
 #endif /* !__i386__ || __x86_64__ */
 
 #if 0
-#define LIBDL_WANT_PROTOTYPES 1
+#define LIBDL_WANT_PROTOTYPES
 #endif
 
 #ifdef __LIBDL_STATIC
 #define LIBDL_DECL __INTDEF
-#else
+#else /* ... */
 #define LIBDL_DECL __IMPDEF
-#endif
+#endif /* !... */
 
 /* Library name for use with `dlopen()' */
 #define LIBDL_LIBRARY_NAME "libdl.so"

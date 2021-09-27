@@ -34,37 +34,37 @@ __DECL_BEGIN
 #ifdef __CC__
 
 #ifndef __timespec_t_defined
-#define __timespec_t_defined 1
+#define __timespec_t_defined
 typedef struct timespec timespec_t;
 #endif /* !__timespec_t_defined */
 
 #ifndef __timestruc_t_defined
-#define __timestruc_t_defined 1
+#define __timestruc_t_defined
 typedef struct timespec timestruc_t;
 #endif /* !__timestruc_t_defined */
 
 #ifndef __loff_t_defined
-#define __loff_t_defined 1
+#define __loff_t_defined
 typedef __loff_t loff_t;
 #endif /* !__loff_t_defined */
 
 #ifndef __vm_offset_t_defined
-#define __vm_offset_t_defined 1
+#define __vm_offset_t_defined
 typedef __ULONGPTR_TYPE__ vm_offset_t;
 #endif /* !__vm_offset_t_defined */
 
 #ifndef __vm_size_t_defined
-#define __vm_size_t_defined 1
+#define __vm_size_t_defined
 typedef __ULONGPTR_TYPE__ vm_size_t;
 #endif /* !__vm_size_t_defined */
 
 #ifndef __vm_object_t_defined
-#define __vm_object_t_defined 1
+#define __vm_object_t_defined
 typedef void *vm_object_t;
 #endif /* !__vm_object_t_defined */
 
 #ifndef __addr_t_defined
-#define __addr_t_defined 1
+#define __addr_t_defined
 typedef char *addr_t;
 #endif /* !__addr_t_defined */
 

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x21f61c52 */
+/* HASH CRC-32:0xd5727779 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,12 +19,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_c32stol_l_defined
-#define __local_c32stol_l_defined 1
+#define __local_c32stol_l_defined
 #include <__crt.h>
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_c32stol_defined
-#define __local___localdep_c32stol_defined 1
+#define __local___localdep_c32stol_defined
 #if defined(__CRT_HAVE_wcstol) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
@@ -114,7 +114,7 @@ __NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(c32stol_l))(__CHAR32_TYPE__ const *__
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_c32stol_l_defined
-#define __local___localdep_c32stol_l_defined 1
+#define __local___localdep_c32stol_l_defined
 #define __localdep_c32stol_l __LIBC_LOCAL_NAME(c32stol_l)
 #endif /* !__local___localdep_c32stol_l_defined */
 #endif /* !__local_c32stol_l_defined */

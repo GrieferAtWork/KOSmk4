@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd105f1f1 */
+/* HASH CRC-32:0x9083b2d2 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,13 +19,13 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_setlinebuf_defined
-#define __local_setlinebuf_defined 1
+#define __local_setlinebuf_defined
 #include <__crt.h>
 #include <features.h>
 #if defined(__CRT_HAVE_setvbuf) || defined(__CRT_HAVE__IO_setvbuf) || defined(__CRT_HAVE_setvbuf_unlocked)
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_setvbuf_defined
-#define __local___localdep_setvbuf_defined 1
+#define __local___localdep_setvbuf_defined
 #if defined(__CRT_HAVE_setvbuf_unlocked) && defined(__USE_STDIO_UNLOCKED)
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
@@ -56,7 +56,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(setlinebuf))(__FILE *__restrict __str
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_setlinebuf_defined
-#define __local___localdep_setlinebuf_defined 1
+#define __local___localdep_setlinebuf_defined
 #define __localdep_setlinebuf __LIBC_LOCAL_NAME(setlinebuf)
 #endif /* !__local___localdep_setlinebuf_defined */
 #else /* __CRT_HAVE_setvbuf || __CRT_HAVE__IO_setvbuf || __CRT_HAVE_setvbuf_unlocked */

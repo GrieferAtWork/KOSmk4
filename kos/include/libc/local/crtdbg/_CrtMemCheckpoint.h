@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x64a4f465 */
+/* HASH CRC-32:0x54b5eda1 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,11 +19,11 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local__CrtMemCheckpoint_defined
-#define __local__CrtMemCheckpoint_defined 1
+#define __local__CrtMemCheckpoint_defined
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_memset_defined
-#define __local___localdep_memset_defined 1
+#define __local___localdep_memset_defined
 #ifdef __CRT_HAVE_memset
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
@@ -42,7 +42,7 @@ __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(_CrtMemCheckpoint))(_CrtMemState *__s
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep__CrtMemCheckpoint_defined
-#define __local___localdep__CrtMemCheckpoint_defined 1
+#define __local___localdep__CrtMemCheckpoint_defined
 #define __localdep__CrtMemCheckpoint __LIBC_LOCAL_NAME(_CrtMemCheckpoint)
 #endif /* !__local___localdep__CrtMemCheckpoint_defined */
 #endif /* !__local__CrtMemCheckpoint_defined */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8bc16724 */
+/* HASH CRC-32:0x4c630c84 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -72,11 +72,11 @@ __NAMESPACE_STD_USING(towlower)
 __NAMESPACE_STD_USING(towupper)
 __NAMESPACE_STD_USING(iswblank)
 #if !defined(__wctrans_defined) && defined(__std_wctrans_defined)
-#define __wctrans_defined 1
+#define __wctrans_defined
 __NAMESPACE_STD_USING(wctrans)
 #endif /* !__wctrans_defined && __std_wctrans_defined */
 #if !defined(__towctrans_defined) && defined(__std_towctrans_defined)
-#define __towctrans_defined 1
+#define __towctrans_defined
 __NAMESPACE_STD_USING(towctrans)
 #endif /* !__towctrans_defined && __std_towctrans_defined */
 #if defined(__CRT_HAVE_wctype) || (defined(__CRT_KOS) && defined(__CRT_HAVE___unicode_descriptor))
@@ -433,7 +433,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(iswblank, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_
 #endif /* __USE_ISOC99 */
 #ifdef __USE_ISOC99
 #ifndef __std_wctrans_defined
-#define __std_wctrans_defined 1
+#define __std_wctrans_defined
 #ifdef __wctrans_defined
 __NAMESPACE_GLB_USING_OR_IMPL(wctrans, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) wctrans_t __NOTHROW_NCX(__LIBCCALL wctrans)(char const *__prop) { return :: wctrans(__prop); })
 #elif defined(__CRT_HAVE_wctrans)
@@ -448,7 +448,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(wctrans, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_P
 #endif /* !... */
 #endif /* !__std_wctrans_defined */
 #ifndef __std_towctrans_defined
-#define __std_towctrans_defined 1
+#define __std_towctrans_defined
 #ifdef __towctrans_defined
 __NAMESPACE_GLB_USING_OR_IMPL(towctrans, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED wint_t __NOTHROW_NCX(__LIBCCALL towctrans)(wint_t __wc, wctrans_t __desc) { return :: towctrans(__wc, __desc); })
 #elif defined(__CRT_HAVE_towctrans)
@@ -509,11 +509,11 @@ __NAMESPACE_STD_USING(iswblank)
 #ifdef __USE_ISOC99
 #ifndef __CXX_SYSTEM_HEADER
 #if !defined(__wctrans_defined) && defined(__std_wctrans_defined)
-#define __wctrans_defined 1
+#define __wctrans_defined
 __NAMESPACE_STD_USING(wctrans)
 #endif /* !__wctrans_defined && __std_wctrans_defined */
 #if !defined(__towctrans_defined) && defined(__std_towctrans_defined)
-#define __towctrans_defined 1
+#define __towctrans_defined
 __NAMESPACE_STD_USING(towctrans)
 #endif /* !__towctrans_defined && __std_towctrans_defined */
 #endif /* !__CXX_SYSTEM_HEADER */
@@ -1522,7 +1522,7 @@ __SYSDECL_END
 #endif /* __USE_UTF */
 
 #ifdef __CXX_SYSTEM_HEADER
-#define _CXX_STDONLY_CWCTYPE 1
+#define _CXX_STDONLY_CWCTYPE
 #undef _WCTYPE_H
 #endif /* __CXX_SYSTEM_HEADER */
 #endif /* !_CXX_STDONLY_CWCTYPE */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9e9f8770 */
+/* HASH CRC-32:0x1b5d56f6 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -45,19 +45,19 @@
 #else /* __CXX_SYSTEM_HEADER */
 /* Import all symbols into the global namespace when re-including "time.h" after "ctime" */
 #ifndef __size_t_defined
-#define __size_t_defined 1
+#define __size_t_defined
 __NAMESPACE_STD_USING(size_t)
 #endif /* !__size_t_defined */
 #ifndef __clock_t_defined
-#define __clock_t_defined 1
+#define __clock_t_defined
 __NAMESPACE_STD_USING(clock_t)
 #endif /* !__clock_t_defined */
 #ifndef __time_t_defined
-#define __time_t_defined 1
+#define __time_t_defined
 __NAMESPACE_STD_USING(time_t)
 #endif /* !__time_t_defined */
 #ifndef __tm_defined
-#define __tm_defined 1
+#define __tm_defined
 __NAMESPACE_STD_USING(tm)
 #endif /* !__tm_defined */
 #ifdef __CRT_HAVE_clock
@@ -69,7 +69,7 @@ __NAMESPACE_STD_USING(clock)
 __NAMESPACE_STD_USING(time)
 #endif /* __CRT_HAVE_time64 || __CRT_HAVE__time64 || __CRT_HAVE_time || __CRT_HAVE__time32 */
 #if !defined(__difftime_defined) && defined(__std_difftime_defined)
-#define __difftime_defined 1
+#define __difftime_defined
 __NAMESPACE_STD_USING(difftime)
 #endif /* !__difftime_defined && __std_difftime_defined */
 __NAMESPACE_STD_USING(mktime)
@@ -79,11 +79,11 @@ __NAMESPACE_STD_USING(localtime)
 __NAMESPACE_STD_USING(strftime)
 __NAMESPACE_STD_USING(asctime)
 #if !defined(__asctime_s_defined) && defined(__std_asctime_s_defined)
-#define __asctime_s_defined 1
+#define __asctime_s_defined
 __NAMESPACE_STD_USING(asctime_s)
 #endif /* !__asctime_s_defined && __std_asctime_s_defined */
 #if !defined(__timespec_get_defined) && defined(__std_timespec_get_defined)
-#define __timespec_get_defined 1
+#define __timespec_get_defined
 __NAMESPACE_STD_USING(timespec_get)
 #endif /* !__timespec_get_defined && __std_timespec_get_defined */
 #undef _CXX_STDONLY_CTIME
@@ -293,7 +293,7 @@ __SYSDECL_END
 __SYSDECL_BEGIN
 #ifdef _SC_CLK_TCK
 #ifndef ____os_sysconf_defined
-#define ____os_sysconf_defined 1
+#define ____os_sysconf_defined
 #ifdef __CRT_HAVE_sysconf
 /* >> sysconf(2)
  * @param: name: One of `_SC_*' from <asm/crt/confname.h>
@@ -378,55 +378,55 @@ __SYSDECL_BEGIN
 
 __NAMESPACE_STD_BEGIN
 #ifndef __std_size_t_defined
-#define __std_size_t_defined 1
+#define __std_size_t_defined
 typedef __SIZE_TYPE__ size_t;
 #endif /* !__std_size_t_defined */
 #ifndef __std_clock_t_defined
-#define __std_clock_t_defined 1
+#define __std_clock_t_defined
 typedef __clock_t clock_t;
 #endif /* !__std_clock_t_defined */
 #ifndef __std_time_t_defined
-#define __std_time_t_defined 1
+#define __std_time_t_defined
 typedef __TM_TYPE(time) time_t;
 #endif /* !__std_time_t_defined */
 __NAMESPACE_STD_END
 
 #ifndef __CXX_SYSTEM_HEADER
 #ifndef __size_t_defined
-#define __size_t_defined 1
+#define __size_t_defined
 __NAMESPACE_STD_USING(size_t)
 #endif /* !__size_t_defined */
 #ifndef __clock_t_defined
-#define __clock_t_defined 1
+#define __clock_t_defined
 __NAMESPACE_STD_USING(clock_t)
 #endif /* !__clock_t_defined */
 #ifndef __time_t_defined
-#define __time_t_defined 1
+#define __time_t_defined
 __NAMESPACE_STD_USING(time_t)
 #endif /* !__time_t_defined */
 #endif /* !__CXX_SYSTEM_HEADER */
 
 #ifdef __USE_XOPEN2K
 #ifndef __pid_t_defined
-#define __pid_t_defined 1
+#define __pid_t_defined
 typedef __pid_t pid_t;
 #endif /* !__pid_t_defined */
 #endif /* __USE_XOPEN2K */
 
 #ifdef __USE_TIME64
 #ifndef __time64_t_defined
-#define __time64_t_defined 1
+#define __time64_t_defined
 typedef __time64_t time64_t;
 #endif /* !__time64_t_defined */
 #endif /* __USE_TIME64 */
 
 #ifdef __USE_POSIX199309
 #ifndef __clockid_t_defined
-#define __clockid_t_defined 1
+#define __clockid_t_defined
 typedef __clockid_t clockid_t;
 #endif /* !__clockid_t_defined */
 #ifndef __timer_t_defined
-#define __timer_t_defined 1
+#define __timer_t_defined
 typedef __timer_t timer_t;
 #endif /* !__timer_t_defined */
 #endif /* __USE_POSIX199309 */
@@ -434,7 +434,7 @@ typedef __timer_t timer_t;
 
 #ifndef __CXX_SYSTEM_HEADER
 #ifndef __tm_defined
-#define __tm_defined 1
+#define __tm_defined
 __NAMESPACE_STD_USING(tm)
 #endif /* !__tm_defined */
 #endif /* !__CXX_SYSTEM_HEADER */
@@ -476,7 +476,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(time, __FORCELOCAL __ATTR_ARTIFICIAL time_t __NO
 #endif /* ... */
 #ifndef __NO_FPU
 #ifndef __std_difftime_defined
-#define __std_difftime_defined 1
+#define __std_difftime_defined
 #ifdef __difftime_defined
 /* >> difftime(3), difftime64(3)
  * Return the difference between `time1' and `time0' */
@@ -660,7 +660,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(asctime, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_R
 #endif /* !__CRT_HAVE_asctime */
 #ifdef __USE_ISOC11
 #ifndef __std_asctime_s_defined
-#define __std_asctime_s_defined 1
+#define __std_asctime_s_defined
 #ifdef __asctime_s_defined
 /* >> asctime_s(3) */
 __NAMESPACE_GLB_USING_OR_IMPL(asctime_s, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 3)) __errno_t __NOTHROW_NCX(__LIBCCALL asctime_s)(char *__restrict __buf, size_t __buflen, struct tm const *__restrict __tp) { return :: asctime_s(__buf, __buflen, __tp); })
@@ -678,7 +678,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(asctime_s, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR
 #endif /* __USE_ISOC11 */
 #ifdef __USE_ISOCXX17
 #ifndef __std_timespec_get_defined
-#define __std_timespec_get_defined 1
+#define __std_timespec_get_defined
 #ifdef __timespec_get_defined
 /* >> timespec_get(3), timespec_get64(3)
  * Set `ts' to calendar time based in time base `base' */
@@ -712,7 +712,7 @@ __NAMESPACE_STD_USING(clock)
 __NAMESPACE_STD_USING(time)
 #endif /* __CRT_HAVE_time64 || __CRT_HAVE__time64 || __CRT_HAVE_time || __CRT_HAVE__time32 */
 #if !defined(__difftime_defined) && defined(__std_difftime_defined)
-#define __difftime_defined 1
+#define __difftime_defined
 __NAMESPACE_STD_USING(difftime)
 #endif /* !__difftime_defined && __std_difftime_defined */
 __NAMESPACE_STD_USING(mktime)
@@ -722,7 +722,7 @@ __NAMESPACE_STD_USING(localtime)
 __NAMESPACE_STD_USING(strftime)
 __NAMESPACE_STD_USING(asctime)
 #if !defined(__asctime_s_defined) && defined(__std_asctime_s_defined)
-#define __asctime_s_defined 1
+#define __asctime_s_defined
 __NAMESPACE_STD_USING(asctime_s)
 #endif /* !__asctime_s_defined && __std_asctime_s_defined */
 #endif /* !__CXX_SYSTEM_HEADER */
@@ -747,7 +747,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(time64, __FORCELOCAL __ATTR_ARTIFICIAL __time64_
 #endif /* ... */
 #ifndef __NO_FPU
 #ifndef __difftime64_defined
-#define __difftime64_defined 1
+#define __difftime64_defined
 #if defined(__CRT_HAVE_difftime) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 /* >> difftime(3), difftime64(3)
  * Return the difference between `time1' and `time0' */
@@ -866,7 +866,7 @@ __LIBC char *__tzname[2];
 #elif defined(__CRT_HAVE_tzname)
 #define __tzname tzname
 #ifndef __tzname_defined
-#define __tzname_defined 1
+#define __tzname_defined
 __LIBC char *tzname[2];
 #endif /* !__tzname_defined */
 #elif defined(__CRT_HAVE_DOS$__tzname)
@@ -885,7 +885,7 @@ __LIBC int __daylight;
 #elif defined(__CRT_HAVE_daylight)
 #define __daylight daylight
 #ifndef __daylight_defined
-#define __daylight_defined 1
+#define __daylight_defined
 __LIBC int daylight;
 #endif /* !__daylight_defined */
 #elif defined(__CRT_HAVE_DOS$__daylight)
@@ -904,7 +904,7 @@ __LIBC __LONGPTR_TYPE__ __timezone;
 #elif defined(__CRT_HAVE_timezone)
 #define __timezone timezone
 #ifndef __timezone_defined
-#define __timezone_defined 1
+#define __timezone_defined
 __LIBC __LONGPTR_TYPE__ timezone;
 #endif /* !__timezone_defined */
 #elif defined(__CRT_HAVE_DOS$__timezone)
@@ -915,7 +915,7 @@ __CREDIRECT_DOS(__ATTR_WUNUSED __ATTR_RETNONNULL __ATTR_CONST,long *,__NOTHROW_N
 
 #ifdef __USE_POSIX
 #ifndef __tzname_defined
-#define __tzname_defined 1
+#define __tzname_defined
 #ifndef tzname
 #ifdef __CRT_HAVE_tzname
 __LIBC char *tzname[2];
@@ -940,7 +940,7 @@ __CDECLARE_VOID_OPT(,__NOTHROW_NCX,tzset,(void),())
 
 #if defined(__USE_MISC) || defined(__USE_XOPEN)
 #ifndef __daylight_defined
-#define __daylight_defined 1
+#define __daylight_defined
 #ifndef daylight
 #ifdef __CRT_HAVE_daylight
 __LIBC int daylight;
@@ -959,7 +959,7 @@ __LIBC int daylight __ASMNAME("__daylight");
 #endif /* !__daylight_defined */
 
 #ifndef __timezone_defined
-#define __timezone_defined 1
+#define __timezone_defined
 #ifndef timezone
 #ifdef __CRT_HAVE_timezone
 __LIBC __LONGPTR_TYPE__ timezone;
@@ -990,7 +990,7 @@ __LIBC __LONGPTR_TYPE__ timezone __ASMNAME("__timezone");
 
 #ifdef __USE_MISC
 #ifndef __stime_defined
-#define __stime_defined 1
+#define __stime_defined
 #if defined(__CRT_HAVE_stime) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* >> stime(2), stime64(2)
  * Set the system time to `*when'. This call is restricted to the superuser */
@@ -1366,7 +1366,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(clock_nanosleep64, __FORCELOCAL __ATTR_ARTIFICIA
 #ifdef __USE_ISOCXX17
 #ifndef __CXX_SYSTEM_HEADER
 #if !defined(__timespec_get_defined) && defined(__std_timespec_get_defined)
-#define __timespec_get_defined 1
+#define __timespec_get_defined
 __NAMESPACE_STD_USING(timespec_get)
 #endif /* !__timespec_get_defined && __std_timespec_get_defined */
 #endif /* !__CXX_SYSTEM_HEADER */
@@ -1391,7 +1391,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(timespec_get64, __FORCELOCAL __ATTR_ARTIFICIAL _
 /* timespec_get() is defined by both c11 and c++17 */
 #ifdef __USE_ISOC11
 #ifndef __timespec_get_defined
-#define __timespec_get_defined 1
+#define __timespec_get_defined
 #ifdef __std_timespec_get_defined
 /* >> timespec_get(3), timespec_get64(3)
  * Set `ts' to calendar time based in time base `base' */
@@ -1440,7 +1440,7 @@ __CDECLARE_OPT(__ATTR_NONNULL((1)),struct __NAMESPACE_STD_SYM tm *,__NOTHROW_NCX
 
 #ifdef __USE_GNU
 #ifndef __getdate_r_defined
-#define __getdate_r_defined 1
+#define __getdate_r_defined
 #ifdef __CRT_HAVE_getdate_r
 /* >> getdate_r(3)
  * Since  `getdate' is not  reentrant because of  the use of `getdate_err'
@@ -1516,7 +1516,7 @@ __CDECLARE(__ATTR_NONNULL((1, 2, 3)),char *,__NOTHROW_NCX,strptime_l,(char const
 __NAMESPACE_LOCAL_USING_OR_IMPL(strptime_l, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2, 3)) char *__NOTHROW_NCX(__LIBCCALL strptime_l)(char const *__restrict __s, char const *__restrict __format, struct __NAMESPACE_STD_SYM tm *__restrict __tp, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strptime_l))(__s, __format, __tp, __locale); })
 #endif /* !__CRT_HAVE_strptime_l */
 #ifndef __getdate_r_defined
-#define __getdate_r_defined 1
+#define __getdate_r_defined
 #ifdef __CRT_HAVE_getdate_r
 /* >> getdate_r(3)
  * Since  `getdate' is not  reentrant because of  the use of `getdate_err'
@@ -1537,7 +1537,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(getdate_r, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR
 #endif /* !__CRT_HAVE_getdate_r */
 #endif /* !__getdate_r_defined */
 #ifndef __clock_adjtime_defined
-#define __clock_adjtime_defined 1
+#define __clock_adjtime_defined
 #if defined(__CRT_HAVE_clock_adjtime) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* >> clock_adjtime(2), clock_adjtime64(2) */
 __CDECLARE(,int,__NOTHROW_NCX,clock_adjtime,(__clockid_t __clock_id, struct timex *__utx),(__clock_id,__utx))
@@ -1551,7 +1551,7 @@ __CREDIRECT(,int,__NOTHROW_NCX,clock_adjtime,(__clockid_t __clock_id, struct tim
 
 #ifdef __USE_TIME64
 #ifndef __clock_adjtime64_defined
-#define __clock_adjtime64_defined 1
+#define __clock_adjtime64_defined
 #if defined(__CRT_HAVE_clock_adjtime) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 /* >> clock_adjtime(2), clock_adjtime64(2) */
 __CREDIRECT(,int,__NOTHROW_NCX,clock_adjtime64,(__clockid_t __clock_id, struct timex64 *__utx),clock_adjtime,(__clock_id,__utx))
@@ -1669,7 +1669,7 @@ __SYSDECL_END
 #endif /* __USE_UTF */
 
 #ifdef __CXX_SYSTEM_HEADER
-#define _CXX_STDONLY_CTIME 1
+#define _CXX_STDONLY_CTIME
 #undef _TIME_H
 #endif /* __CXX_SYSTEM_HEADER */
 #endif /* !_CXX_STDONLY_CTIME */

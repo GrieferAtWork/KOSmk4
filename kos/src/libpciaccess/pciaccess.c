@@ -24,7 +24,7 @@ gcc_opt.append("-O3"); // Force-enable optimizations (mainly for faster pci.ids 
  */
 #ifndef GUARD_LIBPCIACCESS_PCIACCESS_C
 #define GUARD_LIBPCIACCESS_PCIACCESS_C 1
-#define LIBPHYS_WANT_PROTOTYPES 1
+#define LIBPHYS_WANT_PROTOTYPES
 
 #include "api.h"
 
@@ -199,7 +199,7 @@ DECL_END
 DECL_BEGIN
 
 #ifndef __pci_device_slist_defined
-#define __pci_device_slist_defined 1
+#define __pci_device_slist_defined
 SLIST_HEAD(pci_device_slist, pci_device);
 #endif /* !__pci_device_slist_defined */
 

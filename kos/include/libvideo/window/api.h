@@ -25,23 +25,23 @@
 
 #if defined(__i386__) && !defined(__x86_64__)
 #define LIBVIDEO_WINDOW_CC __ATTR_STDCALL
-#else
+#else /* ... */
 #define LIBVIDEO_WINDOW_CC /* nothing */
-#endif
+#endif /* !... */
 
-#if !defined(LIBVIDEO_WINDOW_WANT_PROTOTYPES) && \
-     defined(__KOS__) && defined(__KERNEL__)
-#define LIBVIDEO_WINDOW_WANT_PROTOTYPES 1
-#endif
+#if (!defined(LIBVIDEO_WINDOW_WANT_PROTOTYPES) && \
+     defined(__KOS__) && defined(__KERNEL__))
+#define LIBVIDEO_WINDOW_WANT_PROTOTYPES
+#endif /* ... */
 
-#if defined(__KOS__) && defined(__KERNEL__) && \
-    defined(CONFIG_BUILDING_KERNEL_CORE)
+#if (defined(__KOS__) && defined(__KERNEL__) && \
+     defined(CONFIG_BUILDING_KERNEL_CORE))
 #define LIBVIDEO_WINDOW_DECL __PUBDEF
 #elif defined(__LIBVIDEO_WINDOW_STATIC)
 #define LIBVIDEO_WINDOW_DECL __INTDEF
-#else
+#else /* ... */
 #define LIBVIDEO_WINDOW_DECL __IMPDEF
-#endif
+#endif /* !... */
 
 /* Library name for use with `dlopen()' */
 #define LIBVIDEO_WINDOW_LIBRARY_NAME "libvideo-window.so"

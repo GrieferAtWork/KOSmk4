@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3fd14fdc */
+/* HASH CRC-32:0xdf33a8c8 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,13 +19,13 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_eof_defined
-#define __local_eof_defined 1
+#define __local_eof_defined
 #include <__crt.h>
 #include <bits/types.h>
 #if defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseeki64) || defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek)
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_lseek64_defined
-#define __local___localdep_lseek64_defined 1
+#define __local___localdep_lseek64_defined
 #if defined(__CRT_HAVE_lseek) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
 __CREDIRECT(,__off64_t,__NOTHROW_NCX,__localdep_lseek64,(__fd_t __fd, __off64_t __offset, __STDC_INT_AS_UINT_T __whence),lseek,(__fd,__offset,__whence))
 #elif defined(__CRT_HAVE_lseek64)
@@ -60,7 +60,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(eof))(__fd_t __fd) {
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_eof_defined
-#define __local___localdep_eof_defined 1
+#define __local___localdep_eof_defined
 #define __localdep_eof __LIBC_LOCAL_NAME(eof)
 #endif /* !__local___localdep_eof_defined */
 #else /* __CRT_HAVE_lseek64 || __CRT_HAVE__lseeki64 || __CRT_HAVE_lseek || __CRT_HAVE__lseek || __CRT_HAVE___lseek */

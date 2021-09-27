@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe6cffd5b */
+/* HASH CRC-32:0x324f7c5a */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,13 +19,13 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_argz_create_defined
-#define __local_argz_create_defined 1
+#define __local_argz_create_defined
 #include <__crt.h>
 #if defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign)
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_malloc_defined
-#define __local___localdep_malloc_defined 1
+#define __local___localdep_malloc_defined
 #if __has_builtin(__builtin_malloc) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_malloc)
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
@@ -46,7 +46,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_malloc_defined */
 #ifndef __local___localdep_stpcpy_defined
-#define __local___localdep_stpcpy_defined 1
+#define __local___localdep_stpcpy_defined
 #if __has_builtin(__builtin_stpcpy) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_stpcpy)
 __CEIREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),char *,__NOTHROW_NCX,__localdep_stpcpy,(char *__restrict __buf, char const *__restrict __src),stpcpy,{ return __builtin_stpcpy(__buf, __src); })
 #elif defined(__CRT_HAVE_stpcpy)
@@ -61,7 +61,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_stpcpy_defined */
 #ifndef __local___localdep_strlen_defined
-#define __local___localdep_strlen_defined 1
+#define __local___localdep_strlen_defined
 #ifdef __CRT_HAVE_strlen
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
@@ -108,7 +108,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(argz_create))(char *const ___argv[], 
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_argz_create_defined
-#define __local___localdep_argz_create_defined 1
+#define __local___localdep_argz_create_defined
 #define __localdep_argz_create __LIBC_LOCAL_NAME(argz_create)
 #endif /* !__local___localdep_argz_create_defined */
 #else /* __CRT_HAVE_malloc || __CRT_HAVE_calloc || __CRT_HAVE_realloc || __CRT_HAVE_memalign || __CRT_HAVE_aligned_alloc || __CRT_HAVE_posix_memalign */

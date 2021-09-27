@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x461dff44 */
+/* HASH CRC-32:0x90e3bee2 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_posix_fadvise64_defined
-#define __local_posix_fadvise64_defined 1
+#define __local_posix_fadvise64_defined
 #include <__crt.h>
 #include <features.h>
 #include <bits/types.h>
@@ -34,7 +34,7 @@
 #endif /* !__PIO_OFFSET */
 __NAMESPACE_LOCAL_BEGIN
 #if !defined(__local___localdep_posix_fadvise32_defined) && defined(__CRT_HAVE_posix_fadvise)
-#define __local___localdep_posix_fadvise32_defined 1
+#define __local___localdep_posix_fadvise32_defined
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_posix_fadvise32,(__fd_t __fd, __off32_t __offset, __off32_t __length, __STDC_INT_AS_UINT_T __advise),posix_fadvise,(__fd,__offset,__length,__advise))
 #endif /* !__local___localdep_posix_fadvise32_defined && __CRT_HAVE_posix_fadvise */
 __LOCAL_LIBC(posix_fadvise64) int
@@ -51,7 +51,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(posix_fadvise64))(__fd_t __fd, __PIO_
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_posix_fadvise64_defined
-#define __local___localdep_posix_fadvise64_defined 1
+#define __local___localdep_posix_fadvise64_defined
 #define __localdep_posix_fadvise64 __LIBC_LOCAL_NAME(posix_fadvise64)
 #endif /* !__local___localdep_posix_fadvise64_defined */
 #endif /* !__local_posix_fadvise64_defined */

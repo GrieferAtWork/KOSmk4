@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd2de6a04 */
+/* HASH CRC-32:0x147bb66 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,12 +19,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_bsearch_s_defined
-#define __local_bsearch_s_defined 1
+#define __local_bsearch_s_defined
 #include <__crt.h>
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_bsearch_r_defined
-#define __local___localdep_bsearch_r_defined 1
+#define __local___localdep_bsearch_r_defined
 #ifdef __CRT_HAVE_bsearch_r
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
@@ -39,7 +39,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__local___localdep_bsearch_r_defined */
 __NAMESPACE_LOCAL_END
 #ifndef ____invoke_compare_helper_s_defined
-#define ____invoke_compare_helper_s_defined 1
+#define ____invoke_compare_helper_s_defined
 __NAMESPACE_LOCAL_BEGIN
 struct __invoke_compare_helper_s_data {
 	int (__LIBCCALL *__fun)(void *__arg, void const *__a, void const *__b);
@@ -64,7 +64,7 @@ __LOCAL_LIBC(bsearch_s) __ATTR_WUNUSED __ATTR_NONNULL((1, 2, 5)) void *
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_bsearch_s_defined
-#define __local___localdep_bsearch_s_defined 1
+#define __local___localdep_bsearch_s_defined
 #define __localdep_bsearch_s __LIBC_LOCAL_NAME(bsearch_s)
 #endif /* !__local___localdep_bsearch_s_defined */
 #endif /* !__local_bsearch_s_defined */

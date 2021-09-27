@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1d777c79 */
+/* HASH CRC-32:0x8cbfbaec */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,12 +19,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_wspawnlpe_defined
-#define __local_wspawnlpe_defined 1
+#define __local_wspawnlpe_defined
 #include <__crt.h>
 #if defined(__CRT_HAVE_wspawnvpe) || defined(__CRT_HAVE__wspawnvpe)
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_wspawnvpe_defined
-#define __local___localdep_wspawnvpe_defined 1
+#define __local___localdep_wspawnvpe_defined
 #ifdef __CRT_HAVE_wspawnvpe
 __NAMESPACE_LOCAL_END
 #include <features.h>
@@ -66,7 +66,7 @@ __NOTHROW_RPC(__VLIBCCALL __LIBC_LOCAL_NAME(wspawnlpe))(__STDC_INT_AS_UINT_T __m
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_wspawnlpe_defined
-#define __local___localdep_wspawnlpe_defined 1
+#define __local___localdep_wspawnlpe_defined
 #define __localdep_wspawnlpe __LIBC_LOCAL_NAME(wspawnlpe)
 #endif /* !__local___localdep_wspawnlpe_defined */
 #else /* __CRT_HAVE_wspawnvpe || __CRT_HAVE__wspawnvpe */

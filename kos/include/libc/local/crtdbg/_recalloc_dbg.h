@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4777a749 */
+/* HASH CRC-32:0x6f50375e */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,13 +19,13 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local__recalloc_dbg_defined
-#define __local__recalloc_dbg_defined 1
+#define __local__recalloc_dbg_defined
 #include <__crt.h>
 #if defined(__CRT_HAVE_recallocv) || defined(__CRT_HAVE__recalloc) || (defined(__CRT_HAVE_realloc) && (defined(__CRT_HAVE_malloc_usable_size) || defined(__CRT_HAVE__msize)))
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_recallocv_defined
-#define __local___localdep_recallocv_defined 1
+#define __local___localdep_recallocv_defined
 #ifdef __CRT_HAVE_recallocv
 __CREDIRECT(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2, 3)),void *,__NOTHROW_NCX,__localdep_recallocv,(void *__mallptr, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),recallocv,(__mallptr,__elem_count,__elem_size))
 #elif defined(__CRT_HAVE__recalloc)
@@ -48,7 +48,7 @@ __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(_recalloc_dbg))(void *__ptr, __SIZE_T
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep__recalloc_dbg_defined
-#define __local___localdep__recalloc_dbg_defined 1
+#define __local___localdep__recalloc_dbg_defined
 #define __localdep__recalloc_dbg __LIBC_LOCAL_NAME(_recalloc_dbg)
 #endif /* !__local___localdep__recalloc_dbg_defined */
 #else /* __CRT_HAVE_recallocv || __CRT_HAVE__recalloc || (__CRT_HAVE_realloc && (__CRT_HAVE_malloc_usable_size || __CRT_HAVE__msize)) */

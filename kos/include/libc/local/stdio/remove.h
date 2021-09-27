@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdda55d5f */
+/* HASH CRC-32:0x11dc0bf6 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,13 +19,13 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_remove_defined
-#define __local_remove_defined 1
+#define __local_remove_defined
 #include <__crt.h>
 #include <asm/os/fcntl.h>
 #if defined(__AT_FDCWD) && defined(__CRT_HAVE_removeat)
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_removeat_defined
-#define __local___localdep_removeat_defined 1
+#define __local___localdep_removeat_defined
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,__localdep_removeat,(__fd_t __dirfd, char const *__filename),removeat,(__dirfd,__filename))
 #endif /* !__local___localdep_removeat_defined */
 __LOCAL_LIBC(remove) __ATTR_NONNULL((1)) int
@@ -34,7 +34,7 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(remove))(char const *__filename) {
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_remove_defined
-#define __local___localdep_remove_defined 1
+#define __local___localdep_remove_defined
 #define __localdep_remove __LIBC_LOCAL_NAME(remove)
 #endif /* !__local___localdep_remove_defined */
 #else /* __AT_FDCWD && __CRT_HAVE_removeat */

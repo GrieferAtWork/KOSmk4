@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfc0af361 */
+/* HASH CRC-32:0x8a269477 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_execvpe_defined
-#define __local_execvpe_defined 1
+#define __local_execvpe_defined
 #include <__crt.h>
 #include <hybrid/__alloca.h>
 #include <libc/template/environ.h>
@@ -36,7 +36,7 @@
 #endif /* !__TARGV */
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_execve_defined
-#define __local___localdep_execve_defined 1
+#define __local___localdep_execve_defined
 #if __has_builtin(__builtin_execve) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_execve)
 __CEIREDIRECT(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,__localdep_execve,(char const *__restrict __path, __TARGV, __TENVP),execve,{ return __builtin_execve(__path, (char *const *)___argv, (char *const *)___envp); })
 #elif defined(__CRT_HAVE_execve)
@@ -48,7 +48,7 @@ __CREDIRECT(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,__localdep_execve,(char 
 #endif /* !... */
 #endif /* !__local___localdep_execve_defined */
 #ifndef __local___localdep_getenv_defined
-#define __local___localdep_getenv_defined 1
+#define __local___localdep_getenv_defined
 #ifdef __CRT_HAVE_getenv
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_getenv,(char const *__varname),getenv,(__varname))
 #elif defined(__LOCAL_environ)
@@ -61,7 +61,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_getenv_defined */
 #ifndef __local___localdep_mempcpyc_defined
-#define __local___localdep_mempcpyc_defined 1
+#define __local___localdep_mempcpyc_defined
 #ifdef __CRT_HAVE_mempcpyc
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
@@ -75,7 +75,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__CRT_HAVE_mempcpyc */
 #endif /* !__local___localdep_mempcpyc_defined */
 #ifndef __local___localdep_strchr_defined
-#define __local___localdep_strchr_defined 1
+#define __local___localdep_strchr_defined
 #if __has_builtin(__builtin_strchr) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_strchr)
 __CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_strchr,(char const *__restrict __haystack, int __needle),strchr,{ return __builtin_strchr(__haystack, __needle); })
 #elif __has_builtin(__builtin_index) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_index)
@@ -92,7 +92,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_strchr_defined */
 #ifndef __local___localdep_strchrnul_defined
-#define __local___localdep_strchrnul_defined 1
+#define __local___localdep_strchrnul_defined
 #ifdef __CRT_HAVE_strchrnul
 __CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_strchrnul,(char const *__restrict __haystack, int __needle),strchrnul,(__haystack,__needle))
 #else /* __CRT_HAVE_strchrnul */
@@ -103,7 +103,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__CRT_HAVE_strchrnul */
 #endif /* !__local___localdep_strchrnul_defined */
 #ifndef __local___localdep_strlen_defined
-#define __local___localdep_strlen_defined 1
+#define __local___localdep_strlen_defined
 #ifdef __CRT_HAVE_strlen
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
@@ -184,7 +184,7 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(execvpe))(char const *__restrict __fi
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_execvpe_defined
-#define __local___localdep_execvpe_defined 1
+#define __local___localdep_execvpe_defined
 #define __localdep_execvpe __LIBC_LOCAL_NAME(execvpe)
 #endif /* !__local___localdep_execvpe_defined */
 #else /* (__CRT_HAVE_getenv || __LOCAL_environ) && (__CRT_HAVE_execve || __CRT_HAVE__execve) && __hybrid_alloca */

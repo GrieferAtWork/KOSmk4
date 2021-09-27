@@ -730,7 +730,7 @@ done:
 		generator.addForceNl();
 		local p = generator.addPrinter
 			<< "#define " << macroName;
-		if (!macroValue.startswith("("))
+		if (!macroValue.startswith("(") && macroValue)
 			p << " ";
 		p << macroValue << "\n";
 done:

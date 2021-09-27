@@ -25,23 +25,23 @@
 
 #if defined(__i386__) && !defined(__x86_64__)
 #define LIBREGDUMP_CC __ATTR_FASTCALL
-#else
+#else /* ... */
 #define LIBREGDUMP_CC /* nothing */
-#endif
+#endif /* !... */
 
-#if !defined(LIBREGDUMP_WANT_PROTOTYPES) && \
-     defined(__KOS__) && defined(__KERNEL__)
-#define LIBREGDUMP_WANT_PROTOTYPES 1
-#endif
+#if (!defined(LIBREGDUMP_WANT_PROTOTYPES) && \
+     defined(__KOS__) && defined(__KERNEL__))
+#define LIBREGDUMP_WANT_PROTOTYPES
+#endif /* ... */
 
-#if defined(__KOS__) && defined(__KERNEL__) && \
-    defined(CONFIG_BUILDING_KERNEL_CORE)
+#if (defined(__KOS__) && defined(__KERNEL__) && \
+     defined(CONFIG_BUILDING_KERNEL_CORE))
 #define LIBREGDUMP_DECL __PUBDEF
 #elif defined(__LIBREGDUMP_STATIC)
 #define LIBREGDUMP_DECL __INTDEF
-#else
+#else /* ... */
 #define LIBREGDUMP_DECL __IMPDEF
-#endif
+#endif /* !... */
 
 /* Library name for use with `dlopen()' */
 #define LIBREGDUMP_LIBRARY_NAME "libregdump.so"

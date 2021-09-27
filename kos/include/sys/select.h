@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x90ff4acb */
+/* HASH CRC-32:0xa8285a5b */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -61,17 +61,17 @@
 __SYSDECL_BEGIN
 
 #ifndef __time_t_defined
-#define __time_t_defined  1
+#define __time_t_defined
 typedef __TM_TYPE(time) time_t;
 #endif /* !__time_t_defined */
 
 #ifndef __sigset_t_defined
-#define __sigset_t_defined 1
+#define __sigset_t_defined
 typedef struct __sigset_struct sigset_t;
 #endif /* !__sigset_t_defined */
 
 #ifndef __suseconds_t_defined
-#define __suseconds_t_defined 1
+#define __suseconds_t_defined
 typedef __suseconds_t suseconds_t;
 #endif /* !__suseconds_t_defined */
 

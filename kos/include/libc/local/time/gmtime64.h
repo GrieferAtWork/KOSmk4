@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9a1d1c87 */
+/* HASH CRC-32:0x52830ca */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,13 +19,13 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_gmtime64_defined
-#define __local_gmtime64_defined 1
+#define __local_gmtime64_defined
 #include <__crt.h>
 #include <bits/types.h>
 #include <bits/crt/tm.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_gmtime32_defined
-#define __local___localdep_gmtime32_defined 1
+#define __local___localdep_gmtime32_defined
 #ifdef __CRT_HAVE_gmtime
 __CREDIRECT(__ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),struct __NAMESPACE_STD_SYM tm *,__NOTHROW_NCX,__localdep_gmtime32,(__time32_t const *__timer),gmtime,(__timer))
 #elif defined(__CRT_HAVE__gmtime32)
@@ -35,7 +35,7 @@ __CREDIRECT(__ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),struct __NAMESP
 #endif /* !... */
 #endif /* !__local___localdep_gmtime32_defined */
 #ifndef __local___localdep_gmtime64_r_defined
-#define __local___localdep_gmtime64_r_defined 1
+#define __local___localdep_gmtime64_r_defined
 #if defined(__CRT_HAVE_gmtime_r) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 __CREDIRECT(__ATTR_NONNULL((1, 2)),struct __NAMESPACE_STD_SYM tm *,__NOTHROW_NCX,__localdep_gmtime64_r,(__time64_t const *__restrict __timer, struct __NAMESPACE_STD_SYM tm *__restrict __tp),gmtime_r,(__timer,__tp))
 #elif defined(__CRT_HAVE_gmtime64_r)
@@ -68,7 +68,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(gmtime64))(__time64_t const *__timer)
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_gmtime64_defined
-#define __local___localdep_gmtime64_defined 1
+#define __local___localdep_gmtime64_defined
 #define __localdep_gmtime64 __LIBC_LOCAL_NAME(gmtime64)
 #endif /* !__local___localdep_gmtime64_defined */
 #endif /* !__local_gmtime64_defined */

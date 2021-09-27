@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7ad3ebf7 */
+/* HASH CRC-32:0x68b761c8 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_wprintf_unlocked_defined
-#define __local_wprintf_unlocked_defined 1
+#define __local_wprintf_unlocked_defined
 #include <__crt.h>
 #if defined(__CRT_HAVE_vwprintf_unlocked) || ((defined(__CRT_HAVE_vfwprintf_unlocked) || defined(__CRT_HAVE_file_wprinter_unlocked) || defined(__CRT_HAVE_file_wprinter) || defined(__CRT_HAVE_fputwc_unlocked) || defined(__CRT_HAVE__fputwc_nolock)) && !defined(__NO_STDSTREAMS))
 #include <kos/anno.h>
@@ -27,7 +27,7 @@
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_vwprintf_unlocked_defined
-#define __local___localdep_vwprintf_unlocked_defined 1
+#define __local___localdep_vwprintf_unlocked_defined
 #ifdef __CRT_HAVE_vwprintf_unlocked
 __CREDIRECT(__ATTR_LIBC_WPRINTF(1, 0) __ATTR_NONNULL((1)),__STDC_INT_AS_SIZE_T,__THROWING,__localdep_vwprintf_unlocked,(__WCHAR_TYPE__ const *__restrict __format, __builtin_va_list __args),vwprintf_unlocked,(__format,__args))
 #elif (defined(__CRT_HAVE_vfwprintf_unlocked) || defined(__CRT_HAVE_file_wprinter_unlocked) || defined(__CRT_HAVE_file_wprinter) || defined(__CRT_HAVE_fputwc_unlocked) || defined(__CRT_HAVE__fputwc_nolock)) && !defined(__NO_STDSTREAMS)
@@ -50,7 +50,7 @@ __LOCAL_LIBC(wprintf_unlocked) __ATTR_LIBC_WPRINTF(1, 2) __ATTR_NONNULL((1)) __S
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_wprintf_unlocked_defined
-#define __local___localdep_wprintf_unlocked_defined 1
+#define __local___localdep_wprintf_unlocked_defined
 #define __localdep_wprintf_unlocked __LIBC_LOCAL_NAME(wprintf_unlocked)
 #endif /* !__local___localdep_wprintf_unlocked_defined */
 #else /* __CRT_HAVE_vwprintf_unlocked || ((__CRT_HAVE_vfwprintf_unlocked || __CRT_HAVE_file_wprinter_unlocked || __CRT_HAVE_file_wprinter || __CRT_HAVE_fputwc_unlocked || __CRT_HAVE__fputwc_nolock) && !__NO_STDSTREAMS) */

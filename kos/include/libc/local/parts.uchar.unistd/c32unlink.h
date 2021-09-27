@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xead5136a */
+/* HASH CRC-32:0xe78794a2 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,13 +19,13 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_c32unlink_defined
-#define __local_c32unlink_defined 1
+#define __local_c32unlink_defined
 #include <__crt.h>
 #include <asm/os/fcntl.h>
 #if defined(__AT_FDCWD) && ((defined(__CRT_HAVE_wunlinkat) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)) || defined(__CRT_HAVE_KOS$wunlinkat))
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_c32unlinkat_defined
-#define __local___localdep_c32unlinkat_defined 1
+#define __local___localdep_c32unlinkat_defined
 #if defined(__CRT_HAVE_wunlinkat) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
@@ -46,7 +46,7 @@ __NOTHROW_RPC(__LIBKCALL __LIBC_LOCAL_NAME(c32unlink))(__CHAR32_TYPE__ const *__
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_c32unlink_defined
-#define __local___localdep_c32unlink_defined 1
+#define __local___localdep_c32unlink_defined
 #define __localdep_c32unlink __LIBC_LOCAL_NAME(c32unlink)
 #endif /* !__local___localdep_c32unlink_defined */
 #else /* __AT_FDCWD && ((__CRT_HAVE_wunlinkat && __SIZEOF_WCHAR_T__ == 4 && __LIBCCALL_IS_LIBKCALL) || __CRT_HAVE_KOS$wunlinkat) */

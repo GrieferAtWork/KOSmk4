@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x71f9531 */
+/* HASH CRC-32:0x311e03fe */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,12 +19,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_thr_min_stack_defined
-#define __local_thr_min_stack_defined 1
+#define __local_thr_min_stack_defined
 #include <__crt.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_sysconf_defined
-#define __local___localdep_sysconf_defined 1
+#define __local___localdep_sysconf_defined
 #ifdef __CRT_HAVE_sysconf
 __NAMESPACE_LOCAL_END
 #include <features.h>
@@ -59,7 +59,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(thr_min_stack))(void) {
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_thr_min_stack_defined
-#define __local___localdep_thr_min_stack_defined 1
+#define __local___localdep_thr_min_stack_defined
 #define __localdep_thr_min_stack __LIBC_LOCAL_NAME(thr_min_stack)
 #endif /* !__local___localdep_thr_min_stack_defined */
 #endif /* !__local_thr_min_stack_defined */

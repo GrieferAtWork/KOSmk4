@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe42f1970 */
+/* HASH CRC-32:0xe24e7da */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,14 +19,14 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_file_wprinter_unlocked_defined
-#define __local_file_wprinter_unlocked_defined 1
+#define __local_file_wprinter_unlocked_defined
 #include <__crt.h>
 #if defined(__CRT_HAVE_fputwc_unlocked) || defined(__CRT_HAVE__fputwc_nolock)
 #include <hybrid/typecore.h>
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_fputwc_unlocked_defined
-#define __local___localdep_fputwc_unlocked_defined 1
+#define __local___localdep_fputwc_unlocked_defined
 #ifdef __CRT_HAVE_fputwc_unlocked
 __CREDIRECT(__ATTR_NONNULL((2)),__WINT_TYPE__,__THROWING,__localdep_fputwc_unlocked,(__WCHAR_TYPE__ __wc, __FILE *__restrict __stream),fputwc_unlocked,(__wc,__stream))
 #elif defined(__CRT_HAVE__fputwc_nolock)
@@ -49,7 +49,7 @@ __LOCAL_LIBC(file_wprinter_unlocked) __ATTR_NONNULL((1, 2)) __SSIZE_TYPE__
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_file_wprinter_unlocked_defined
-#define __local___localdep_file_wprinter_unlocked_defined 1
+#define __local___localdep_file_wprinter_unlocked_defined
 #define __localdep_file_wprinter_unlocked __LIBC_LOCAL_NAME(file_wprinter_unlocked)
 #endif /* !__local___localdep_file_wprinter_unlocked_defined */
 #else /* __CRT_HAVE_fputwc_unlocked || __CRT_HAVE__fputwc_nolock */

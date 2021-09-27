@@ -58,12 +58,12 @@
 __SYSDECL_BEGIN
 
 #ifndef __size_t_defined
-#define __size_t_defined 1
+#define __size_t_defined
 typedef __SIZE_TYPE__ size_t;
 #endif /* !__size_t_defined */
 
 #ifndef __ssize_t_defined
-#define __ssize_t_defined 1
+#define __ssize_t_defined
 typedef __SSIZE_TYPE__ ssize_t;
 #endif /* !__ssize_t_defined */
 

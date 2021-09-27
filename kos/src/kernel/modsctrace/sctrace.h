@@ -19,7 +19,7 @@
  */
 #ifndef GUARD_MODSCTRACE_SCTRACE_H
 #define GUARD_MODSCTRACE_SCTRACE_H 1
-#define LIBSCTRACE_WANT_PROTOTYPES 1
+#define LIBSCTRACE_WANT_PROTOTYPES
 
 #include <kernel/compiler.h>
 #include <libsctrace/api.h>

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa9681877 */
+/* HASH CRC-32:0x5acffb53 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,12 +19,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_freezero_defined
-#define __local_freezero_defined 1
+#define __local_freezero_defined
 #include <__crt.h>
 #if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree)
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_explicit_bzero_defined
-#define __local___localdep_explicit_bzero_defined 1
+#define __local___localdep_explicit_bzero_defined
 #ifdef __CRT_HAVE_bzero
 __CREDIRECT_VOID(,__NOTHROW_NCX,__localdep_explicit_bzero,(void *__dst, __SIZE_TYPE__ __n_bytes),bzero,(__dst,__n_bytes))
 #elif defined(__CRT_HAVE_explicit_bzero)
@@ -39,7 +39,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_explicit_bzero_defined */
 #ifndef __local___localdep_free_defined
-#define __local___localdep_free_defined 1
+#define __local___localdep_free_defined
 #if __has_builtin(__builtin_free) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_free)
 __CEIREDIRECT(,void,__NOTHROW_NCX,__localdep_free,(void *__mallptr),free,{ __builtin_free(__mallptr); })
 #elif defined(__CRT_HAVE_free)
@@ -59,7 +59,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(freezero))(void *__mallptr, __SIZE_TY
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_freezero_defined
-#define __local___localdep_freezero_defined 1
+#define __local___localdep_freezero_defined
 #define __localdep_freezero __LIBC_LOCAL_NAME(freezero)
 #endif /* !__local___localdep_freezero_defined */
 #else /* __CRT_HAVE_free || __CRT_HAVE_cfree */

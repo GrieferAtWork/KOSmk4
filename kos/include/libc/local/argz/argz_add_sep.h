@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x88be6c3a */
+/* HASH CRC-32:0xce638cef */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,13 +19,13 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_argz_add_sep_defined
-#define __local_argz_add_sep_defined 1
+#define __local_argz_add_sep_defined
 #include <__crt.h>
 #ifdef __CRT_HAVE_realloc
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_free_defined
-#define __local___localdep_free_defined 1
+#define __local___localdep_free_defined
 #if __has_builtin(__builtin_free) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_free)
 __CEIREDIRECT(,void,__NOTHROW_NCX,__localdep_free,(void *__mallptr),free,{ __builtin_free(__mallptr); })
 #elif defined(__CRT_HAVE_free)
@@ -37,7 +37,7 @@ __CREDIRECT_VOID(,__NOTHROW_NCX,__localdep_free,(void *__mallptr),cfree,(__mallp
 #endif /* !... */
 #endif /* !__local___localdep_free_defined */
 #ifndef __local___localdep_realloc_defined
-#define __local___localdep_realloc_defined 1
+#define __local___localdep_realloc_defined
 #if __has_builtin(__builtin_realloc) && defined(__LIBC_BIND_CRTBUILTINS)
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
@@ -51,7 +51,7 @@ __CREDIRECT(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)),vo
 #endif /* !__has_builtin(__builtin_realloc) || !__LIBC_BIND_CRTBUILTINS */
 #endif /* !__local___localdep_realloc_defined */
 #ifndef __local___localdep_strlen_defined
-#define __local___localdep_strlen_defined 1
+#define __local___localdep_strlen_defined
 #ifdef __CRT_HAVE_strlen
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
@@ -134,7 +134,7 @@ __again_check_ch:
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_argz_add_sep_defined
-#define __local___localdep_argz_add_sep_defined 1
+#define __local___localdep_argz_add_sep_defined
 #define __localdep_argz_add_sep __LIBC_LOCAL_NAME(argz_add_sep)
 #endif /* !__local___localdep_argz_add_sep_defined */
 #else /* __CRT_HAVE_realloc */

@@ -20,7 +20,7 @@
 #ifndef __cookie_io_functions_t_defined
 #include <libio.h>
 #ifndef __cookie_io_functions_t_defined
-#define __cookie_io_functions_t_defined 1
+#define __cookie_io_functions_t_defined
 #ifdef __CC__
 __DECL_BEGIN
 typedef _IO_cookie_io_functions_t cookie_io_functions_t;

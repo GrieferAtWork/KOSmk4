@@ -59,40 +59,40 @@ __DECL_BEGIN
 
 #if (defined(__USE_POSIX199309) || defined(__USE_XOPEN_EXTENDED) || defined(__USE_KOS))
 #ifndef __compat_sigevent_t_defined
-#define __compat_sigevent_t_defined 1
+#define __compat_sigevent_t_defined
 typedef struct compat_sigevent compat_sigevent_t;
 #endif /* !__compat_sigevent_t_defined */
 #ifndef __compat_siginfo_t_defined
-#define __compat_siginfo_t_defined 1
+#define __compat_siginfo_t_defined
 typedef struct __compat_siginfo_struct compat_siginfo_t;
 #endif /* !__compat_siginfo_t_defined */
 #ifndef __compat_sigval_t_defined
-#define __compat_sigval_t_defined 1
+#define __compat_sigval_t_defined
 typedef union compat_sigval compat_sigval_t;
 #endif /* !__compat_sigval_t_defined */
 #endif /* __USE_POSIX199309 || __USE_XOPEN_EXTENDED || __USE_KOS */
 
 #ifdef __USE_POSIX
 #ifndef __compat_sigset_t_defined
-#define __compat_sigset_t_defined 1
+#define __compat_sigset_t_defined
 typedef struct __compat_sigset_struct compat_sigset_t;
 #endif /* !__compat_sigset_t_defined */
 #endif /* __USE_POSIX */
 
 #if defined(__USE_XOPEN) || defined(__USE_XOPEN2K)
 #ifndef __compat_pid_t_defined
-#define __compat_pid_t_defined 1
+#define __compat_pid_t_defined
 typedef __compat_pid_t compat_pid_t;
 #endif /* !__compat_pid_t_defined */
 #ifndef __compat_uid_t_defined
-#define __compat_uid_t_defined 1
+#define __compat_uid_t_defined
 typedef __compat_uid_t compat_uid_t;
 #endif /* !__compat_uid_t_defined */
 #endif /* __USE_XOPEN || __USE_XOPEN2K */
 
 #ifdef __USE_GNU
 #ifndef __compat_sighandler_t_defined
-#define __compat_sighandler_t_defined 1
+#define __compat_sighandler_t_defined
 typedef __compat_sighandler_t compat_sighandler_t;
 #endif /* !__compat_sighandler_t_defined */
 #endif /* __USE_GNU */
@@ -102,7 +102,7 @@ typedef __compat_sighandler_t compat_sig_t;
 #endif /* __USE_MISC */
 
 #ifndef __compat_size_t_defined
-#define __compat_size_t_defined 1
+#define __compat_size_t_defined
 typedef __compat_size_t compat_size_t;
 #endif /* !__compat_size_t_defined */
 

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf1cb601c */
+/* HASH CRC-32:0x4fa56dbc */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,13 +19,13 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_ntp_gettime64_defined
-#define __local_ntp_gettime64_defined 1
+#define __local_ntp_gettime64_defined
 #include <__crt.h>
 #ifdef __CRT_HAVE_ntp_gettimex
 #include <bits/crt/ntptimeval.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_ntp_gettime32_defined
-#define __local___localdep_ntp_gettime32_defined 1
+#define __local___localdep_ntp_gettime32_defined
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_ntp_gettime32,(struct __ntptimeval32 *__restrict __ntv),ntp_gettimex,(__ntv))
 #endif /* !__local___localdep_ntp_gettime32_defined */
 __LOCAL_LIBC(ntp_gettime64) __ATTR_NONNULL((1)) int
@@ -47,7 +47,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(ntp_gettime64))(struct __ntptimeval64
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_ntp_gettime64_defined
-#define __local___localdep_ntp_gettime64_defined 1
+#define __local___localdep_ntp_gettime64_defined
 #define __localdep_ntp_gettime64 __LIBC_LOCAL_NAME(ntp_gettime64)
 #endif /* !__local___localdep_ntp_gettime64_defined */
 #else /* __CRT_HAVE_ntp_gettimex */

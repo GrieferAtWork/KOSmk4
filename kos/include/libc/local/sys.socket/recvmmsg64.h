@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd1c9ab49 */
+/* HASH CRC-32:0xf0fc0eb2 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_recvmmsg64_defined
-#define __local_recvmmsg64_defined 1
+#define __local_recvmmsg64_defined
 #include <__crt.h>
 #ifdef __CRT_HAVE_recvmmsg
 #include <features.h>
@@ -28,7 +28,7 @@
 #include <bits/os/timespec.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_recvmmsg32_defined
-#define __local___localdep_recvmmsg32_defined 1
+#define __local___localdep_recvmmsg32_defined
 __CREDIRECT(__ATTR_NONNULL((2)),__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,__localdep_recvmmsg32,(__fd_t __sockfd, struct mmsghdr *__vmessages, __STDC_UINT_AS_SIZE_T __vlen, __STDC_INT_AS_UINT_T __msg_flags, struct __timespec32 *__tmo),recvmmsg,(__sockfd,__vmessages,__vlen,__msg_flags,__tmo))
 #endif /* !__local___localdep_recvmmsg32_defined */
 __LOCAL_LIBC(recvmmsg64) __ATTR_NONNULL((2)) __STDC_INT_AS_SSIZE_T
@@ -42,7 +42,7 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(recvmmsg64))(__fd_t __sockfd, struct 
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_recvmmsg64_defined
-#define __local___localdep_recvmmsg64_defined 1
+#define __local___localdep_recvmmsg64_defined
 #define __localdep_recvmmsg64 __LIBC_LOCAL_NAME(recvmmsg64)
 #endif /* !__local___localdep_recvmmsg64_defined */
 #else /* __CRT_HAVE_recvmmsg */

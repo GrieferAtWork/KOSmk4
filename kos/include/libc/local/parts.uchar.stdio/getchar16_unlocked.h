@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x66eb0a0c */
+/* HASH CRC-32:0x90f2a442 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,14 +19,14 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_getchar16_unlocked_defined
-#define __local_getchar16_unlocked_defined 1
+#define __local_getchar16_unlocked_defined
 #include <__crt.h>
 #if ((defined(__CRT_HAVE_fgetwc_unlocked) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)) || defined(__CRT_HAVE_DOS$fgetwc_unlocked) || (defined(__CRT_HAVE__fgetwc_nolock) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)) || defined(__CRT_HAVE_DOS$_fgetwc_nolock)) && !defined(__NO_STDSTREAMS)
 #include <hybrid/typecore.h>
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_fgetc16_unlocked_defined
-#define __local___localdep_fgetc16_unlocked_defined 1
+#define __local___localdep_fgetc16_unlocked_defined
 #if defined(__CRT_HAVE_fgetwc_unlocked) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
 __CREDIRECT(__ATTR_NONNULL((1)),__WINT16_TYPE__,__THROWING,__localdep_fgetc16_unlocked,(__FILE *__restrict __stream),fgetwc_unlocked,(__stream))
 #elif defined(__CRT_HAVE_DOS$fgetwc_unlocked)
@@ -48,7 +48,7 @@ __LOCAL_LIBC(getchar16_unlocked) __WINT16_TYPE__
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_getchar16_unlocked_defined
-#define __local___localdep_getchar16_unlocked_defined 1
+#define __local___localdep_getchar16_unlocked_defined
 #define __localdep_getchar16_unlocked __LIBC_LOCAL_NAME(getchar16_unlocked)
 #endif /* !__local___localdep_getchar16_unlocked_defined */
 #else /* ((__CRT_HAVE_fgetwc_unlocked && __SIZEOF_WCHAR_T__ == 2 && __LIBCCALL_IS_LIBDCALL) || __CRT_HAVE_DOS$fgetwc_unlocked || (__CRT_HAVE__fgetwc_nolock && __SIZEOF_WCHAR_T__ == 2 && __LIBCCALL_IS_LIBDCALL) || __CRT_HAVE_DOS$_fgetwc_nolock) && !__NO_STDSTREAMS */

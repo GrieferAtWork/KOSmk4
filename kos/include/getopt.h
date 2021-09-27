@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8d3edad7 */
+/* HASH CRC-32:0x9bfec418 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -186,7 +186,7 @@ struct option {
 #endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
 
 #if !defined(__getopt_defined) && defined(__CRT_HAVE_getopt)
-#define __getopt_defined 1
+#define __getopt_defined
 /* Return the option  character from  OPTS just read.  Return -1  when
  * there  are no  more options.  For unrecognized  options, or options
  * missing arguments, `optopt' is set to the option letter, and '?' is

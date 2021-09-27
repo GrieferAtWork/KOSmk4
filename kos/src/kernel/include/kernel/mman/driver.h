@@ -147,7 +147,7 @@ DEFINE_REFCOUNT_FUNCTIONS_P(struct driver_section, __driver_section_refcnt, __dr
 
 
 #ifndef __elfw_hashtable_defined
-#define __elfw_hashtable_defined 1
+#define __elfw_hashtable_defined
 typedef struct elfW(hashtable) {
 	ElfW(Word) ht_nbuckts;      /* # of buckets. */
 	ElfW(Word) ht_nchains;      /* # of symbols. */
@@ -157,7 +157,7 @@ typedef struct elfW(hashtable) {
 #endif /* !__elfw_hashtable_defined */
 
 #ifndef __elfw_gnu_hashtable_defined
-#define __elfw_gnu_hashtable_defined 1
+#define __elfw_gnu_hashtable_defined
 typedef struct elfW(gnu_hashtable) {
 	ElfW(Word) gh_nbuckets;      /* # of buckets. */
 	ElfW(Word) gh_symoffset;     /* Offset of symbol indices. */

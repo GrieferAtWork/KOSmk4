@@ -30,21 +30,15 @@
 
 #ifdef __CRT_GENERIC
 
-#ifndef __stat_defined
-#define __stat_defined 1
-#define __gen_stat   stat
 
 #define _STATBUF_ST_TIME     1 /* Always defined. */
 #define _STATBUF_ST_BLKSIZE  1
 #define _STATBUF_ST_RDEV     1
 #define _STATBUF_ST_BLOCKS   1
-#endif /* !__stat_defined */
 
+#define __gen_stat stat
 #ifdef __USE_LARGEFILE64
-#ifndef __stat64_defined
-#define __stat64_defined 1
 #define __gen_stat64 stat64
-#endif /* !__stat64_defined */
 #endif /* __USE_LARGEFILE64 */
 
 #endif /* __CRT_GENERIC */

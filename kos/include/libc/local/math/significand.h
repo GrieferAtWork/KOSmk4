@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xffa38061 */
+/* HASH CRC-32:0xfcd5c92d */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_significand_defined
-#define __local_significand_defined 1
+#define __local_significand_defined
 #include <__crt.h>
 #include <ieee754.h>
 #if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
@@ -31,7 +31,7 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(significand))(double __x) {
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_significand_defined
-#define __local___localdep_significand_defined 1
+#define __local___localdep_significand_defined
 #define __localdep_significand __LIBC_LOCAL_NAME(significand)
 #endif /* !__local___localdep_significand_defined */
 #else /* __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */

@@ -3344,13 +3344,13 @@ NOTHROW(FCALL comgen_set_error_return_value)(struct com_generator *__restrict se
 #ifndef __x86_64__
 #define USED_SET_ERRNO __set_errno_f
 #ifndef ____set_errno_f_defined
-#define ____set_errno_f_defined 1
+#define ____set_errno_f_defined
 __LIBC syscall_slong_t FCALL __set_errno_f(errno_t value);
 #endif /* !____set_errno_f_defined */
 #else /* !__x86_64__ */
 #define USED_SET_ERRNO __set_errno
 #ifndef ____set_errno_defined
-#define ____set_errno_defined 1
+#define ____set_errno_defined
 __LIBC syscall_slong_t __set_errno(errno_t value);
 #endif /* !____set_errno_defined */
 #endif /* __x86_64__ */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x27ce7827 */
+/* HASH CRC-32:0x8d70a31c */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,20 +19,20 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_getpw_defined
-#define __local_getpw_defined 1
+#define __local_getpw_defined
 #include <__crt.h>
 #ifdef __CRT_HAVE_getpwuid
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_getpwuid_defined
-#define __local___localdep_getpwuid_defined 1
+#define __local___localdep_getpwuid_defined
 __NAMESPACE_LOCAL_END
 #include <bits/crt/db/passwd.h>
 __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(,struct passwd *,__NOTHROW_RPC,__localdep_getpwuid,(__uid_t __uid),getpwuid,(__uid))
 #endif /* !__local___localdep_getpwuid_defined */
 #ifndef __local___localdep_sprintf_defined
-#define __local___localdep_sprintf_defined 1
+#define __local___localdep_sprintf_defined
 #if __has_builtin(__builtin_sprintf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_sprintf) && __has_builtin(__builtin_va_arg_pack)
 __NAMESPACE_LOCAL_END
 #include <features.h>
@@ -82,7 +82,7 @@ __err:
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_getpw_defined
-#define __local___localdep_getpw_defined 1
+#define __local___localdep_getpw_defined
 #define __localdep_getpw __LIBC_LOCAL_NAME(getpw)
 #endif /* !__local___localdep_getpw_defined */
 #else /* __CRT_HAVE_getpwuid */

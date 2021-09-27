@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x62697c9e */
+/* HASH CRC-32:0x9f96a2ea */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,12 +19,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_asinf_defined
-#define __local_asinf_defined 1
+#define __local_asinf_defined
 #include <__crt.h>
 #if defined(__CRT_HAVE_asin) || defined(__CRT_HAVE___asin)
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_asin_defined
-#define __local___localdep_asin_defined 1
+#define __local___localdep_asin_defined
 #if __has_builtin(__builtin_asin) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_asin)
 __CEIREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_asin,(double __x),asin,{ return __builtin_asin(__x); })
 #elif defined(__CRT_HAVE_asin)
@@ -41,7 +41,7 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(asinf))(float __x) {
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_asinf_defined
-#define __local___localdep_asinf_defined 1
+#define __local___localdep_asinf_defined
 #define __localdep_asinf __LIBC_LOCAL_NAME(asinf)
 #endif /* !__local___localdep_asinf_defined */
 #else /* __CRT_HAVE_asin || __CRT_HAVE___asin */

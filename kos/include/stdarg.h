@@ -36,7 +36,7 @@
 #else /* __CXX_SYSTEM_HEADER */
 /* Import all symbols into the global namespace when re-including "ctype.h" after "cctype" */
 #ifndef __va_list_defined
-#define __va_list_defined 1
+#define __va_list_defined
 __NAMESPACE_STD_USING(va_list)
 #endif /* !__va_list_defined */
 #undef _CXX_STDONLY_CSTDARG
@@ -50,14 +50,14 @@ __SYSDECL_BEGIN
 
 #ifdef __CC__
 #ifndef __std_va_list_defined
-#define __std_va_list_defined 1
+#define __std_va_list_defined
 __NAMESPACE_STD_BEGIN
 typedef __builtin_va_list va_list;
 __NAMESPACE_STD_END
 #endif /* !__std_va_list_defined */
 #ifndef __CXX_SYSTEM_HEADER
 #ifndef __va_list_defined
-#define __va_list_defined 1
+#define __va_list_defined
 __NAMESPACE_STD_USING(va_list)
 #endif /* !__va_list_defined */
 #endif /* !__CXX_SYSTEM_HEADER */
@@ -85,7 +85,7 @@ __NAMESPACE_STD_USING(va_list)
 __SYSDECL_END
 
 #ifdef __CXX_SYSTEM_HEADER
-#define _CXX_STDONLY_CSTDARG 1
+#define _CXX_STDONLY_CSTDARG
 #undef _STDARG_H
 #endif /* __CXX_SYSTEM_HEADER */
 #endif /* !_CXX_STDONLY_CSTDARG */

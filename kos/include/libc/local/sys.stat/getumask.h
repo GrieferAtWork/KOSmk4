@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf0cfe514 */
+/* HASH CRC-32:0xfd5b34c4 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,13 +19,13 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_getumask_defined
-#define __local_getumask_defined 1
+#define __local_getumask_defined
 #include <__crt.h>
 #if defined(__CRT_HAVE_umask) || defined(__CRT_HAVE__umask)
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_umask_defined
-#define __local___localdep_umask_defined 1
+#define __local___localdep_umask_defined
 #ifdef __CRT_HAVE_umask
 __CREDIRECT(,__mode_t,__NOTHROW_NCX,__localdep_umask,(__mode_t __mode),umask,(__mode))
 #elif defined(__CRT_HAVE__umask)
@@ -43,7 +43,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(getumask))(void) {
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_getumask_defined
-#define __local___localdep_getumask_defined 1
+#define __local___localdep_getumask_defined
 #define __localdep_getumask __LIBC_LOCAL_NAME(getumask)
 #endif /* !__local___localdep_getumask_defined */
 #else /* __CRT_HAVE_umask || __CRT_HAVE__umask */

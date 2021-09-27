@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf400ff2a */
+/* HASH CRC-32:0xa8b51995 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,14 +19,14 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_getpassfd_defined
-#define __local_getpassfd_defined 1
+#define __local_getpassfd_defined
 #include <__crt.h>
 #if defined(__CRT_HAVE_read) || defined(__CRT_HAVE__read) || defined(__CRT_HAVE___read)
 #include <features.h>
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_close_defined
-#define __local___localdep_close_defined 1
+#define __local___localdep_close_defined
 #ifdef __CRT_HAVE_close
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_close,(__fd_t __fd),close,(__fd))
 #elif defined(__CRT_HAVE__close)
@@ -38,7 +38,7 @@ __CREDIRECT(,int,__NOTHROW_NCX,__localdep_close,(__fd_t __fd),__close,(__fd))
 #endif /* !... */
 #endif /* !__local___localdep_close_defined */
 #ifndef __local___localdep_free_defined
-#define __local___localdep_free_defined 1
+#define __local___localdep_free_defined
 #if __has_builtin(__builtin_free) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_free)
 __CEIREDIRECT(,void,__NOTHROW_NCX,__localdep_free,(void *__mallptr),free,{ __builtin_free(__mallptr); })
 #elif defined(__CRT_HAVE_free)
@@ -50,7 +50,7 @@ __CREDIRECT_VOID(,__NOTHROW_NCX,__localdep_free,(void *__mallptr),cfree,(__mallp
 #endif /* !... */
 #endif /* !__local___localdep_free_defined */
 #ifndef __local___localdep_isatty_defined
-#define __local___localdep_isatty_defined 1
+#define __local___localdep_isatty_defined
 #ifdef __CRT_HAVE_isatty
 __CREDIRECT(__ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep_isatty,(__fd_t __fd),isatty,(__fd))
 #elif defined(__CRT_HAVE__isatty)
@@ -70,7 +70,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_isatty_defined */
 #ifndef __local___localdep_isprint_defined
-#define __local___localdep_isprint_defined 1
+#define __local___localdep_isprint_defined
 __NAMESPACE_LOCAL_END
 #include <bits/crt/ctype.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -90,7 +90,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_isprint_defined */
 #ifndef __local___localdep_malloc_defined
-#define __local___localdep_malloc_defined 1
+#define __local___localdep_malloc_defined
 #if __has_builtin(__builtin_malloc) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_malloc)
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
@@ -111,7 +111,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_malloc_defined */
 #ifndef __local___localdep_memcmp_defined
-#define __local___localdep_memcmp_defined 1
+#define __local___localdep_memcmp_defined
 #ifdef __CRT_HAVE_memcmp
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
@@ -130,7 +130,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_memcmp_defined */
 #ifndef __local___localdep_memcpy_defined
-#define __local___localdep_memcpy_defined 1
+#define __local___localdep_memcpy_defined
 #ifdef __CRT_HAVE_memcpy
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
@@ -144,7 +144,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__CRT_HAVE_memcpy */
 #endif /* !__local___localdep_memcpy_defined */
 #ifndef __local___localdep_memcpyc_defined
-#define __local___localdep_memcpyc_defined 1
+#define __local___localdep_memcpyc_defined
 #ifdef __CRT_HAVE_memcpyc
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
@@ -158,7 +158,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__CRT_HAVE_memcpyc */
 #endif /* !__local___localdep_memcpyc_defined */
 #ifndef __local___localdep_memset_defined
-#define __local___localdep_memset_defined 1
+#define __local___localdep_memset_defined
 #ifdef __CRT_HAVE_memset
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
@@ -172,7 +172,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__CRT_HAVE_memset */
 #endif /* !__local___localdep_memset_defined */
 #ifndef __local___localdep_open_defined
-#define __local___localdep_open_defined 1
+#define __local___localdep_open_defined
 __NAMESPACE_LOCAL_END
 #include <asm/os/oflags.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -201,7 +201,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_open_defined */
 #ifndef __local___localdep_poll_defined
-#define __local___localdep_poll_defined 1
+#define __local___localdep_poll_defined
 #ifdef __CRT_HAVE_poll
 __NAMESPACE_LOCAL_END
 #include <bits/os/pollfd.h>
@@ -217,7 +217,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_poll,(struct pollfd
 #endif /* !... */
 #endif /* !__local___localdep_poll_defined */
 #ifndef __local___localdep_raise_defined
-#define __local___localdep_raise_defined 1
+#define __local___localdep_raise_defined
 #ifdef __CRT_HAVE_raise
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_raise,(__signo_t __signo),raise,(__signo))
 #elif (defined(__CRT_HAVE_pthread_kill) && (defined(__CRT_HAVE_pthread_self) || defined(__CRT_HAVE_thrd_current))) || (defined(__CRT_HAVE_kill) && (defined(__CRT_HAVE_getpid) || defined(__CRT_HAVE__getpid) || defined(__CRT_HAVE___getpid)))
@@ -230,7 +230,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_raise_defined */
 #ifndef __local___localdep_read_defined
-#define __local___localdep_read_defined 1
+#define __local___localdep_read_defined
 #ifdef __CRT_HAVE_read
 __CREDIRECT(__ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_read,(__fd_t __fd, void *__buf, __SIZE_TYPE__ __bufsize),read,(__fd,__buf,__bufsize))
 #elif defined(__CRT_HAVE__read)
@@ -242,7 +242,7 @@ __CREDIRECT(__ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_read,(__
 #endif /* !... */
 #endif /* !__local___localdep_read_defined */
 #ifndef __local___localdep_strlen_defined
-#define __local___localdep_strlen_defined 1
+#define __local___localdep_strlen_defined
 #ifdef __CRT_HAVE_strlen
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
@@ -256,7 +256,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__CRT_HAVE_strlen */
 #endif /* !__local___localdep_strlen_defined */
 #ifndef __local___localdep_tcgetattr_defined
-#define __local___localdep_tcgetattr_defined 1
+#define __local___localdep_tcgetattr_defined
 #ifdef __CRT_HAVE_tcgetattr
 __NAMESPACE_LOCAL_END
 #include <bits/os/termios.h>
@@ -277,7 +277,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__CRT_HAVE_tcgetattr */
 #endif /* !__local___localdep_tcgetattr_defined */
 #ifndef __local___localdep_tcsetattr_defined
-#define __local___localdep_tcsetattr_defined 1
+#define __local___localdep_tcsetattr_defined
 #ifdef __CRT_HAVE_tcsetattr
 __NAMESPACE_LOCAL_END
 #include <bits/os/termios.h>
@@ -293,7 +293,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_tcsetattr_defined */
 #ifndef __local___localdep_tolower_defined
-#define __local___localdep_tolower_defined 1
+#define __local___localdep_tolower_defined
 __NAMESPACE_LOCAL_END
 #include <bits/crt/ctype.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -313,7 +313,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_tolower_defined */
 #ifndef __local___localdep_toupper_defined
-#define __local___localdep_toupper_defined 1
+#define __local___localdep_toupper_defined
 __NAMESPACE_LOCAL_END
 #include <bits/crt/ctype.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -333,7 +333,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_toupper_defined */
 #ifndef __local___localdep_write_defined
-#define __local___localdep_write_defined 1
+#define __local___localdep_write_defined
 #ifdef __CRT_HAVE_write
 __CREDIRECT(__ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_write,(__fd_t __fd, void const *__buf, __SIZE_TYPE__ __bufsize),write,(__fd,__buf,__bufsize))
 #elif defined(__CRT_HAVE__write)
@@ -895,7 +895,7 @@ __out:
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_getpassfd_defined
-#define __local___localdep_getpassfd_defined 1
+#define __local___localdep_getpassfd_defined
 #define __localdep_getpassfd __LIBC_LOCAL_NAME(getpassfd)
 #endif /* !__local___localdep_getpassfd_defined */
 #else /* __CRT_HAVE_read || __CRT_HAVE__read || __CRT_HAVE___read */

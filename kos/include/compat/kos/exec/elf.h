@@ -75,7 +75,7 @@
 __DECL_BEGIN
 
 #ifndef __compat_elfexec_info_defined
-#define __compat_elfexec_info_defined 1
+#define __compat_elfexec_info_defined
 struct compat_elfexec_info /*[PREFIX(pr_)]*/ {
 	COMPAT_ElfW(Addr)  ei_rtldaddr;    /* Load address of the RTLD itself. */
 	COMPAT_ElfW(Half)  ei_pnum;        /* Amount of ELF program headers. */

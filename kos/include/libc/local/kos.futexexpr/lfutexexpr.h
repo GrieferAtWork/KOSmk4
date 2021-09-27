@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x44094039 */
+/* HASH CRC-32:0xcb67338 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_lfutexexpr_defined
-#define __local_lfutexexpr_defined 1
+#define __local_lfutexexpr_defined
 #include <__crt.h>
 #include <bits/types.h>
 #if defined(__CRT_HAVE_lfutexexpr64) || defined(__CRT_HAVE_lfutexexpr)
@@ -27,11 +27,11 @@
 #include <kos/bits/futex-expr.h>
 __NAMESPACE_LOCAL_BEGIN
 #if !defined(__local___localdep_lfutexexpr32_defined) && defined(__CRT_HAVE_lfutexexpr)
-#define __local___localdep_lfutexexpr32_defined 1
+#define __local___localdep_lfutexexpr32_defined
 __CREDIRECT(__ATTR_NONNULL((3)),int,__NOTHROW_RPC,__localdep_lfutexexpr32,(void *__base, __SIZE_TYPE__ __exprc, struct lfutexexpr const *__exprv, struct __timespec64 const *__timeout, unsigned int __timeout_flags),lfutexexpr,(__base,__exprc,__exprv,__timeout,__timeout_flags))
 #endif /* !__local___localdep_lfutexexpr32_defined && __CRT_HAVE_lfutexexpr */
 #ifndef __local___localdep_lfutexexpr64_defined
-#define __local___localdep_lfutexexpr64_defined 1
+#define __local___localdep_lfutexexpr64_defined
 #if defined(__CRT_HAVE_lfutexexpr) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 __CREDIRECT(__ATTR_NONNULL((3)),int,__NOTHROW_RPC,__localdep_lfutexexpr64,(void *__base, __SIZE_TYPE__ __exprc, struct lfutexexpr const *__exprv, struct __timespec64 const *__timeout, unsigned int __timeout_flags),lfutexexpr,(__base,__exprc,__exprv,__timeout,__timeout_flags))
 #elif defined(__CRT_HAVE_lfutexexpr64)
@@ -65,7 +65,7 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(lfutexexpr))(void *__base, __SIZE_TYP
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_lfutexexpr_defined
-#define __local___localdep_lfutexexpr_defined 1
+#define __local___localdep_lfutexexpr_defined
 #define __localdep_lfutexexpr __LIBC_LOCAL_NAME(lfutexexpr)
 #endif /* !__local___localdep_lfutexexpr_defined */
 #else /* __CRT_HAVE_lfutexexpr64 || __CRT_HAVE_lfutexexpr */

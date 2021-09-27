@@ -60,12 +60,12 @@ struct mnode; /* Memory range descriptor. */
 struct mman;  /* Memory manager. */
 
 #ifndef __mnode_list_defined
-#define __mnode_list_defined 1
+#define __mnode_list_defined
 LIST_HEAD(mnode_list, mnode);
 #endif /* !__mnode_list_defined */
 
 #ifndef __task_list_defined
-#define __task_list_defined 1
+#define __task_list_defined
 LIST_HEAD(task_list, WEAK task);
 #endif /* !__task_list_defined */
 

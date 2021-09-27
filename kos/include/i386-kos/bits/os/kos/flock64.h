@@ -83,7 +83,7 @@
 #else /* __USE_LARGEFILE64 */
 #define __flock64 flock
 #endif /* !__USE_LARGEFILE64 */
-#define __flock_defined 1
+#define __flock_defined
 #endif /* __x86_64__ */
 /*[[[end]]]*/
 

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x91f9b949 */
+/* HASH CRC-32:0x83f3aed */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -226,7 +226,7 @@
 __SYSDECL_BEGIN
 
 #ifndef __except_handler_t_defined
-#define __except_handler_t_defined 1
+#define __except_handler_t_defined
 /* Prototype   for   a   low-level   user-space   exception   handler.
  * Note that the exact prototype may differ between architectures,  as
  * well as the calling convention  not always being the same,  either.

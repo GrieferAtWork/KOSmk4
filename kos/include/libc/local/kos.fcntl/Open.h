@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x22dd7c97 */
+/* HASH CRC-32:0x6517ab82 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_Open_defined
-#define __local_Open_defined 1
+#define __local_Open_defined
 #include <__crt.h>
 #include <asm/os/fcntl.h>
 #include <asm/os/oflags.h>
@@ -29,7 +29,7 @@
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_Open64_defined
-#define __local___localdep_Open64_defined 1
+#define __local___localdep_Open64_defined
 #if defined(__CRT_HAVE_Open) && (!defined(__O_LARGEFILE) || !__O_LARGEFILE)
 __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__THROWING,__localdep_Open64,(char const *__filename, __oflag_t __oflags),Open,(__filename,__oflags),__oflags,1,(__mode_t))
 #elif defined(__CRT_HAVE_Open64)
@@ -44,7 +44,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_Open64_defined */
 #ifndef __local___localdep_OpenAt_defined
-#define __local___localdep_OpenAt_defined 1
+#define __local___localdep_OpenAt_defined
 #if defined(__CRT_HAVE_OpenAt) && (!defined(__USE_FILE_OFFSET64) || !defined(__O_LARGEFILE) || !__O_LARGEFILE)
 __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2)),__fd_t,__THROWING,__localdep_OpenAt,(__fd_t __dirfd, char const *__filename, __oflag_t __oflags),OpenAt,(__dirfd,__filename,__oflags),__oflags,1,(__mode_t))
 #elif defined(__CRT_HAVE_OpenAt64) && (defined(__USE_FILE_OFFSET64) || !defined(__O_LARGEFILE) || !__O_LARGEFILE)
@@ -73,7 +73,7 @@ __LOCAL_LIBC(Open) __ATTR_WUNUSED __ATTR_NONNULL((1)) __fd_t
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_Open_defined
-#define __local___localdep_Open_defined 1
+#define __local___localdep_Open_defined
 #define __localdep_Open __LIBC_LOCAL_NAME(Open)
 #endif /* !__local___localdep_Open_defined */
 #else /* __CRT_HAVE_Open64 || (__AT_FDCWD && (__CRT_HAVE_OpenAt64 || __CRT_HAVE_OpenAt)) || __CRT_HAVE_Open */

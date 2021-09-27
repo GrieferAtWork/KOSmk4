@@ -46,8 +46,6 @@
 #ifdef __CC__
 __DECL_BEGIN
 
-#ifndef __guid_t_defined
-#define __guid_t_defined 1
 #ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
 #pragma push_macro("g_guid")
 #pragma push_macro("g_a")
@@ -87,7 +85,6 @@ typedef union __ATTR_PACKED {
 #pragma pop_macro("g_a")
 #pragma pop_macro("g_guid")
 #endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
-#endif /* !__guid_t_defined */
 
 
 #define GUID_A(x) __hybrid_betoh32((x).g_data.g_a)

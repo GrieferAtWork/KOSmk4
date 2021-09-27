@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x373bba95 */
+/* HASH CRC-32:0x25549914 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -48,7 +48,7 @@ __SYSDECL_BEGIN
 #endif /* !FORMATPRINTER_CC */
 
 #ifndef __pformatprinter_defined
-#define __pformatprinter_defined 1
+#define __pformatprinter_defined
 /* Callback functions prototypes provided to format functions.
  * NOTE: 'pformatprinter' usually returns the number of characters printed, but isn't required to.
  * @param: arg:     The user-defined closure parameter passed alongside this function pointer.
@@ -698,7 +698,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(format_sprintf_printer, __FORCELOCAL __ATTR_ARTI
 
 
 #ifndef __format_snprintf_data_defined
-#define __format_snprintf_data_defined 1
+#define __format_snprintf_data_defined
 /* Data structure for implementing snprintf() */
 struct format_snprintf_data {
 	char         *sd_buffer; /* [0..sd_bufsiz] Pointer to the next memory location to which to write. */
@@ -757,7 +757,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(format_length, __FORCELOCAL __ATTR_ARTIFICIAL __
 #endif /* !... */
 
 #ifndef __format_aprintf_data_defined
-#define __format_aprintf_data_defined 1
+#define __format_aprintf_data_defined
 struct format_aprintf_data {
 	char         *ap_base;  /* [0..ap_used|ALLOC(ap_used+ap_avail)][owned] Buffer */
 	__SIZE_TYPE__ ap_avail; /* Unused buffer size */

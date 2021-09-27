@@ -25,23 +25,23 @@
 
 #if defined(__i386__) && !defined(__x86_64__)
 #define LIBVIDEO_GFX_CC __ATTR_STDCALL
-#else
+#else /* ... */
 #define LIBVIDEO_GFX_CC /* nothing */
-#endif
+#endif /* !... */
 
-#if !defined(LIBVIDEO_GFX_WANT_PROTOTYPES) && \
-     defined(__KOS__) && defined(__KERNEL__)
-#define LIBVIDEO_GFX_WANT_PROTOTYPES 1
-#endif
+#if (!defined(LIBVIDEO_GFX_WANT_PROTOTYPES) && \
+     defined(__KOS__) && defined(__KERNEL__))
+#define LIBVIDEO_GFX_WANT_PROTOTYPES
+#endif /* ... */
 
-#if defined(__KOS__) && defined(__KERNEL__) && \
-    defined(CONFIG_BUILDING_KERNEL_CORE)
+#if (defined(__KOS__) && defined(__KERNEL__) && \
+     defined(CONFIG_BUILDING_KERNEL_CORE))
 #define LIBVIDEO_GFX_DECL __PUBDEF
 #elif defined(__LIBVIDEO_GFX_STATIC)
 #define LIBVIDEO_GFX_DECL __INTDEF
-#else
+#else /* ... */
 #define LIBVIDEO_GFX_DECL __IMPDEF
-#endif
+#endif /* !... */
 
 /* Library name for use with `dlopen()' */
 #define LIBVIDEO_GFX_LIBRARY_NAME "libvideo-gfx.so"

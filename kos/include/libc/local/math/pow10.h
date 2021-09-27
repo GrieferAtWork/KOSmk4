@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x23ceee60 */
+/* HASH CRC-32:0xc201081e */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,13 +19,13 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_pow10_defined
-#define __local_pow10_defined 1
+#define __local_pow10_defined
 #include <__crt.h>
 #include <ieee754.h>
 #if defined(__CRT_HAVE_pow) || defined(__CRT_HAVE___pow) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_pow_defined
-#define __local___localdep_pow_defined 1
+#define __local___localdep_pow_defined
 #if __has_builtin(__builtin_pow) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_pow)
 __NAMESPACE_LOCAL_END
 #include <bits/crt/math-vector.h>
@@ -56,7 +56,7 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(pow10))(double __x) {
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_pow10_defined
-#define __local___localdep_pow10_defined 1
+#define __local___localdep_pow10_defined
 #define __localdep_pow10 __LIBC_LOCAL_NAME(pow10)
 #endif /* !__local___localdep_pow10_defined */
 #else /* __CRT_HAVE_pow || __CRT_HAVE___pow || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */

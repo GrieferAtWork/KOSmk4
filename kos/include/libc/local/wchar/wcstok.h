@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9e0b28e3 */
+/* HASH CRC-32:0x62231d19 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,12 +19,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_wcstok_defined
-#define __local_wcstok_defined 1
+#define __local_wcstok_defined
 #include <__crt.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_wcscspn_defined
-#define __local___localdep_wcscspn_defined 1
+#define __local___localdep_wcscspn_defined
 #ifdef __CRT_HAVE_wcscspn
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_wcscspn,(__WCHAR_TYPE__ const *__haystack, __WCHAR_TYPE__ const *__reject),wcscspn,(__haystack,__reject))
 #else /* __CRT_HAVE_wcscspn */
@@ -35,7 +35,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__CRT_HAVE_wcscspn */
 #endif /* !__local___localdep_wcscspn_defined */
 #ifndef __local___localdep_wcsspn_defined
-#define __local___localdep_wcsspn_defined 1
+#define __local___localdep_wcsspn_defined
 #ifdef __CRT_HAVE_wcsspn
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_wcsspn,(__WCHAR_TYPE__ const *__haystack, __WCHAR_TYPE__ const *__accept),wcsspn,(__haystack,__accept))
 #else /* __CRT_HAVE_wcsspn */
@@ -70,7 +70,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcstok))(__WCHAR_TYPE__ *__str, __WCH
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_wcstok_defined
-#define __local___localdep_wcstok_defined 1
+#define __local___localdep_wcstok_defined
 #define __localdep_wcstok __LIBC_LOCAL_NAME(wcstok)
 #endif /* !__local___localdep_wcstok_defined */
 #endif /* !__local_wcstok_defined */

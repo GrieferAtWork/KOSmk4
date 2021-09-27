@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc0da0952 */
+/* HASH CRC-32:0x8a72296c */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,11 +19,11 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_sl_delete_defined
-#define __local_sl_delete_defined 1
+#define __local_sl_delete_defined
 #include <__crt.h>
 #include <hybrid/typecore.h>
 #ifndef ___stringlist_defined
-#define ___stringlist_defined 1
+#define ___stringlist_defined
 typedef struct _stringlist {
 	char   **sl_str;
 	__SIZE_TYPE__   sl_max;
@@ -32,7 +32,7 @@ typedef struct _stringlist {
 #endif /* !___stringlist_defined */
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_free_defined
-#define __local___localdep_free_defined 1
+#define __local___localdep_free_defined
 #if __has_builtin(__builtin_free) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_free)
 __CEIREDIRECT(,void,__NOTHROW_NCX,__localdep_free,(void *__mallptr),free,{ __builtin_free(__mallptr); })
 #elif defined(__CRT_HAVE_free)
@@ -44,7 +44,7 @@ __CREDIRECT_VOID(,__NOTHROW_NCX,__localdep_free,(void *__mallptr),cfree,(__mallp
 #endif /* !... */
 #endif /* !__local___localdep_free_defined */
 #ifndef __local___localdep_memmovedownc_defined
-#define __local___localdep_memmovedownc_defined 1
+#define __local___localdep_memmovedownc_defined
 #ifdef __CRT_HAVE_memmovedownc
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_memmovedownc,(void *__dst, void const *__src, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),memmovedownc,(__dst,__src,__elem_count,__elem_size))
 #else /* __CRT_HAVE_memmovedownc */
@@ -55,7 +55,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__CRT_HAVE_memmovedownc */
 #endif /* !__local___localdep_memmovedownc_defined */
 #ifndef __local___localdep_strcmp_defined
-#define __local___localdep_strcmp_defined 1
+#define __local___localdep_strcmp_defined
 #if __has_builtin(__builtin_strcmp) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_strcmp)
 __CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_strcmp,(char const *__s1, char const *__s2),strcmp,{ return __builtin_strcmp(__s1, __s2); })
 #elif defined(__CRT_HAVE_strcmp)
@@ -91,7 +91,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(sl_delete))(struct _stringlist *__sl,
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_sl_delete_defined
-#define __local___localdep_sl_delete_defined 1
+#define __local___localdep_sl_delete_defined
 #define __localdep_sl_delete __LIBC_LOCAL_NAME(sl_delete)
 #endif /* !__local___localdep_sl_delete_defined */
 #endif /* !__local_sl_delete_defined */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6452614a */
+/* HASH CRC-32:0x2cf63ddf */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_vfwprintf_defined
-#define __local_vfwprintf_defined 1
+#define __local_vfwprintf_defined
 #include <__crt.h>
 #include <features.h>
 #if defined(__CRT_HAVE_file_wprinter) || defined(__CRT_HAVE_file_wprinter_unlocked) || defined(__CRT_HAVE_fputwc) || defined(__CRT_HAVE_putwc)
@@ -27,7 +27,7 @@
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_file_wprinter_defined
-#define __local___localdep_file_wprinter_defined 1
+#define __local___localdep_file_wprinter_defined
 #if defined(__CRT_HAVE_file_wprinter_unlocked) && defined(__USE_STDIO_UNLOCKED)
 __CREDIRECT(__ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,__THROWING,__localdep_file_wprinter,(void *__arg, __WCHAR_TYPE__ const *__restrict __data, __SIZE_TYPE__ __datalen),file_wprinter_unlocked,(__arg,__data,__datalen))
 #elif defined(__CRT_HAVE_file_wprinter)
@@ -44,7 +44,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_file_wprinter_defined */
 #ifndef __local___localdep_format_vwprintf_defined
-#define __local___localdep_format_vwprintf_defined 1
+#define __local___localdep_format_vwprintf_defined
 #ifdef __CRT_HAVE_format_vwprintf
 __NAMESPACE_LOCAL_END
 #include <bits/crt/wformat-printer.h>
@@ -63,7 +63,7 @@ __LOCAL_LIBC(vfwprintf) __ATTR_LIBC_WPRINTF(2, 0) __ATTR_NONNULL((1, 2)) __STDC_
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_vfwprintf_defined
-#define __local___localdep_vfwprintf_defined 1
+#define __local___localdep_vfwprintf_defined
 #define __localdep_vfwprintf __LIBC_LOCAL_NAME(vfwprintf)
 #endif /* !__local___localdep_vfwprintf_defined */
 #else /* __CRT_HAVE_file_wprinter || __CRT_HAVE_file_wprinter_unlocked || __CRT_HAVE_fputwc || __CRT_HAVE_putwc */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x770a2d87 */
+/* HASH CRC-32:0x13ac6022 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_inet_paton_defined
-#define __local_inet_paton_defined 1
+#define __local_inet_paton_defined
 #include <__crt.h>
 #include <netinet/bits/in.h>
 #include <hybrid/__byteswap.h>
@@ -168,7 +168,7 @@ __err:
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_inet_paton_defined
-#define __local___localdep_inet_paton_defined 1
+#define __local___localdep_inet_paton_defined
 #define __localdep_inet_paton __LIBC_LOCAL_NAME(inet_paton)
 #endif /* !__local___localdep_inet_paton_defined */
 #endif /* !__local_inet_paton_defined */

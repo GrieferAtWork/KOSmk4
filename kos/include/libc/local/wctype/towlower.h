@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb2c5f3a6 */
+/* HASH CRC-32:0xa815b095 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,12 +19,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_towlower_defined
-#define __local_towlower_defined 1
+#define __local_towlower_defined
 #include <__crt.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_btowc_defined
-#define __local___localdep_btowc_defined 1
+#define __local___localdep_btowc_defined
 #ifdef __CRT_HAVE_btowc
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__WINT_TYPE__,__NOTHROW_NCX,__localdep_btowc,(int __ch),btowc,(__ch))
 #else /* __CRT_HAVE_btowc */
@@ -35,7 +35,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__CRT_HAVE_btowc */
 #endif /* !__local___localdep_btowc_defined */
 #ifndef __local___localdep_tolower_defined
-#define __local___localdep_tolower_defined 1
+#define __local___localdep_tolower_defined
 __NAMESPACE_LOCAL_END
 #include <bits/crt/ctype.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -55,7 +55,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_tolower_defined */
 #ifndef __local___localdep_wctob_defined
-#define __local___localdep_wctob_defined 1
+#define __local___localdep_wctob_defined
 #ifdef __CRT_HAVE_wctob
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep_wctob,(__WINT_TYPE__ __ch),wctob,(__ch))
 #else /* __CRT_HAVE_wctob */
@@ -78,7 +78,7 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(towlower))(__WINT_TYPE__ __wc) {
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_towlower_defined
-#define __local___localdep_towlower_defined 1
+#define __local___localdep_towlower_defined
 #define __localdep_towlower __LIBC_LOCAL_NAME(towlower)
 #endif /* !__local___localdep_towlower_defined */
 #endif /* !__local_towlower_defined */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1f90580b */
+/* HASH CRC-32:0x86cba4d2 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,12 +19,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_lgammaf_defined
-#define __local_lgammaf_defined 1
+#define __local_lgammaf_defined
 #include <__crt.h>
 #if defined(__CRT_HAVE_lgamma) || defined(__CRT_HAVE_gamma) || defined(__CRT_HAVE___lgamma) || defined(__CRT_HAVE___gamma)
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_lgamma_defined
-#define __local___localdep_lgamma_defined 1
+#define __local___localdep_lgamma_defined
 #if __has_builtin(__builtin_lgamma) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_lgamma)
 __CEIREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_lgamma,(double __x),lgamma,{ return __builtin_lgamma(__x); })
 #elif __has_builtin(__builtin_gamma) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_gamma)
@@ -47,7 +47,7 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(lgammaf))(float __x) {
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_lgammaf_defined
-#define __local___localdep_lgammaf_defined 1
+#define __local___localdep_lgammaf_defined
 #define __localdep_lgammaf __LIBC_LOCAL_NAME(lgammaf)
 #endif /* !__local___localdep_lgammaf_defined */
 #else /* __CRT_HAVE_lgamma || __CRT_HAVE_gamma || __CRT_HAVE___lgamma || __CRT_HAVE___gamma */

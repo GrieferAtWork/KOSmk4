@@ -191,7 +191,7 @@ DECL_BEGIN
 #define __SIZEOF_GFP_T__ __SIZEOF_INT__
 #ifdef __CC__
 #ifndef __gfp_t_defined
-#define __gfp_t_defined 1
+#define __gfp_t_defined
 typedef unsigned int gfp_t;
 #endif /* !__gfp_t_defined */
 #endif /* __CC__ */

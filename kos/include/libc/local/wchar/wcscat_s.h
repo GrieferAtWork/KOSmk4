@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc3ea56dc */
+/* HASH CRC-32:0x29cb4a13 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_wcscat_s_defined
-#define __local_wcscat_s_defined 1
+#define __local_wcscat_s_defined
 #include <__crt.h>
 #include <bits/types.h>
 #include <libc/errno.h>
@@ -42,7 +42,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcscat_s))(__WCHAR_TYPE__ *__dst, __S
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_wcscat_s_defined
-#define __local___localdep_wcscat_s_defined 1
+#define __local___localdep_wcscat_s_defined
 #define __localdep_wcscat_s __LIBC_LOCAL_NAME(wcscat_s)
 #endif /* !__local___localdep_wcscat_s_defined */
 #endif /* !__local_wcscat_s_defined */

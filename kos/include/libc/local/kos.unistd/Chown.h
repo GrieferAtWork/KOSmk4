@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa2bc51df */
+/* HASH CRC-32:0xcea6e56 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_Chown_defined
-#define __local_Chown_defined 1
+#define __local_Chown_defined
 #include <__crt.h>
 #include <asm/os/fcntl.h>
 #if defined(__AT_FDCWD) && defined(__CRT_HAVE_FChownAt)
@@ -27,7 +27,7 @@
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_FChownAt_defined
-#define __local___localdep_FChownAt_defined 1
+#define __local___localdep_FChownAt_defined
 __CREDIRECT_VOID(__ATTR_NONNULL((2)),__THROWING,__localdep_FChownAt,(__fd_t __dfd, char const *__file, __uid_t __owner, __gid_t __group, __atflag_t __flags),FChownAt,(__dfd,__file,__owner,__group,__flags))
 #endif /* !__local___localdep_FChownAt_defined */
 __LOCAL_LIBC(Chown) __ATTR_NONNULL((1)) void
@@ -36,7 +36,7 @@ __LOCAL_LIBC(Chown) __ATTR_NONNULL((1)) void
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_Chown_defined
-#define __local___localdep_Chown_defined 1
+#define __local___localdep_Chown_defined
 #define __localdep_Chown __LIBC_LOCAL_NAME(Chown)
 #endif /* !__local___localdep_Chown_defined */
 #else /* __AT_FDCWD && __CRT_HAVE_FChownAt */

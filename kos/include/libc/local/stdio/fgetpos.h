@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3e7c4b07 */
+/* HASH CRC-32:0x6d9262a6 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_fgetpos_defined
-#define __local_fgetpos_defined 1
+#define __local_fgetpos_defined
 #include <__crt.h>
 #include <features.h>
 #include <bits/types.h>
@@ -28,7 +28,7 @@
 #include <bits/crt/stdio.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_crt_fgetpos_defined
-#define __local___localdep_crt_fgetpos_defined 1
+#define __local___localdep_crt_fgetpos_defined
 #if defined(__CRT_HAVE_fgetpos_unlocked) && defined(__USE_STDIO_UNLOCKED)
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__THROWING,__localdep_crt_fgetpos,(__FILE *__restrict __stream, __pos32_t *__restrict __pos),fgetpos_unlocked,(__stream,__pos))
 #elif defined(__CRT_HAVE_fgetpos64_unlocked) && defined(__USE_STDIO_UNLOCKED) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
@@ -50,7 +50,7 @@ __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__THROWING,__localdep_crt_fgetpos,(__FILE
 #endif /* !... */
 #endif /* !__local___localdep_crt_fgetpos_defined */
 #ifndef __local___localdep_crt_fgetpos64_defined
-#define __local___localdep_crt_fgetpos64_defined 1
+#define __local___localdep_crt_fgetpos64_defined
 #if defined(__CRT_HAVE_fgetpos_unlocked) && defined(__USE_STDIO_UNLOCKED) && __SIZEOF_OFF64_T__ == __SIZEOF_OFF32_T__
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__THROWING,__localdep_crt_fgetpos64,(__FILE *__restrict __stream, __pos64_t *__restrict __pos),fgetpos_unlocked,(__stream,__pos))
 #elif defined(__CRT_HAVE_fgetpos64_unlocked) && defined(__USE_STDIO_UNLOCKED)
@@ -72,7 +72,7 @@ __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__THROWING,__localdep_crt_fgetpos64,(__FI
 #endif /* !... */
 #endif /* !__local___localdep_crt_fgetpos64_defined */
 #ifndef __local___localdep_crt_ftell_defined
-#define __local___localdep_crt_ftell_defined 1
+#define __local___localdep_crt_ftell_defined
 #if defined(__CRT_HAVE_ftell_unlocked) && defined(__USE_STDIO_UNLOCKED)
 __CREDIRECT(__ATTR_NONNULL((1)),long int,__THROWING,__localdep_crt_ftell,(__FILE *__restrict __stream),ftell_unlocked,(__stream))
 #elif defined(__CRT_HAVE__ftell_nolock) && defined(__USE_STDIO_UNLOCKED)
@@ -114,7 +114,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),long int,__THROWING,__localdep_crt_ftell,(__FILE
 #endif /* !... */
 #endif /* !__local___localdep_crt_ftell_defined */
 #ifndef __local___localdep_crt_ftello_defined
-#define __local___localdep_crt_ftello_defined 1
+#define __local___localdep_crt_ftello_defined
 #if defined(__CRT_HAVE_ftell_unlocked) && defined(__USE_STDIO_UNLOCKED) && __SIZEOF_OFF32_T__ == __SIZEOF_LONG__
 __CREDIRECT(__ATTR_NONNULL((1)),__off32_t,__THROWING,__localdep_crt_ftello,(__FILE *__restrict __stream),ftell_unlocked,(__stream))
 #elif defined(__CRT_HAVE__ftell_nolock) && defined(__USE_STDIO_UNLOCKED) && __SIZEOF_OFF32_T__ == __SIZEOF_LONG__
@@ -156,7 +156,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),__off32_t,__THROWING,__localdep_crt_ftello,(__FI
 #endif /* !... */
 #endif /* !__local___localdep_crt_ftello_defined */
 #ifndef __local___localdep_crt_ftello64_defined
-#define __local___localdep_crt_ftello64_defined 1
+#define __local___localdep_crt_ftello64_defined
 #if defined(__CRT_HAVE_ftell_unlocked) && defined(__USE_STDIO_UNLOCKED) && __SIZEOF_OFF64_T__ == __SIZEOF_LONG__
 __CREDIRECT(__ATTR_NONNULL((1)),__off64_t,__THROWING,__localdep_crt_ftello64,(__FILE *__restrict __stream),ftell_unlocked,(__stream))
 #elif defined(__CRT_HAVE__ftell_nolock) && defined(__USE_STDIO_UNLOCKED) && __SIZEOF_OFF64_T__ == __SIZEOF_LONG__
@@ -223,7 +223,7 @@ __LOCAL_LIBC(fgetpos) __ATTR_NONNULL((1, 2)) int
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_fgetpos_defined
-#define __local___localdep_fgetpos_defined 1
+#define __local___localdep_fgetpos_defined
 #define __localdep_fgetpos __LIBC_LOCAL_NAME(fgetpos)
 #endif /* !__local___localdep_fgetpos_defined */
 #else /* __CRT_HAVE_fgetpos || __CRT_HAVE__IO_fgetpos || __CRT_HAVE_fgetpos_unlocked || __CRT_HAVE_fgetpos64 || __CRT_HAVE__IO_fgetpos64 || __CRT_HAVE_fgetpos64_unlocked || __CRT_HAVE_ftello64 || __CRT_HAVE_ftell64 || __CRT_HAVE__ftelli64 || __CRT_HAVE_ftello64_unlocked || __CRT_HAVE_ftell64_unlocked || __CRT_HAVE__ftelli64_nolock || __CRT_HAVE_ftello || __CRT_HAVE_ftello_unlocked || __CRT_HAVE_ftell || __CRT_HAVE__IO_ftell || __CRT_HAVE_ftell_unlocked || __CRT_HAVE__ftell_nolock */

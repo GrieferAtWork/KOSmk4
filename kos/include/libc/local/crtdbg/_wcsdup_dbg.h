@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa9981c3d */
+/* HASH CRC-32:0x7525361a */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,13 +19,13 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local__wcsdup_dbg_defined
-#define __local__wcsdup_dbg_defined 1
+#define __local__wcsdup_dbg_defined
 #include <__crt.h>
 #if (defined(__CRT_HAVE_wcsdup) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)) || defined(__CRT_HAVE_DOS$wcsdup) || (defined(__CRT_HAVE__wcsdup) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)) || defined(__CRT_HAVE_DOS$_wcsdup) || defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign)
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_c16sdup_defined
-#define __local___localdep_c16sdup_defined 1
+#define __local___localdep_c16sdup_defined
 #if defined(__CRT_HAVE_wcsdup) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
 __CREDIRECT(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_NONNULL((1)),__CHAR16_TYPE__ *,__NOTHROW_NCX,__localdep_c16sdup,(__CHAR16_TYPE__ const *__restrict __string),wcsdup,(__string))
 #elif defined(__CRT_HAVE_DOS$wcsdup)
@@ -57,7 +57,7 @@ __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(_wcsdup_dbg))(__WCHAR16_TYPE__ const 
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep__wcsdup_dbg_defined
-#define __local___localdep__wcsdup_dbg_defined 1
+#define __local___localdep__wcsdup_dbg_defined
 #define __localdep__wcsdup_dbg __LIBC_LOCAL_NAME(_wcsdup_dbg)
 #endif /* !__local___localdep__wcsdup_dbg_defined */
 #else /* (__CRT_HAVE_wcsdup && __SIZEOF_WCHAR_T__ == 2 && __LIBCCALL_IS_LIBDCALL) || __CRT_HAVE_DOS$wcsdup || (__CRT_HAVE__wcsdup && __SIZEOF_WCHAR_T__ == 2 && __LIBCCALL_IS_LIBDCALL) || __CRT_HAVE_DOS$_wcsdup || __CRT_HAVE_malloc || __CRT_HAVE_calloc || __CRT_HAVE_realloc || __CRT_HAVE_memalign || __CRT_HAVE_aligned_alloc || __CRT_HAVE_posix_memalign */

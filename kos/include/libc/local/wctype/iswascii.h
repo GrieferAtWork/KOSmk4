@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x71224090 */
+/* HASH CRC-32:0xe2487b2c */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_iswascii_defined
-#define __local_iswascii_defined 1
+#define __local_iswascii_defined
 #include <__crt.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -29,7 +29,7 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(iswascii))(__WINT_TYPE__ __wc) {
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_iswascii_defined
-#define __local___localdep_iswascii_defined 1
+#define __local___localdep_iswascii_defined
 #define __localdep_iswascii __LIBC_LOCAL_NAME(iswascii)
 #endif /* !__local___localdep_iswascii_defined */
 #endif /* !__local_iswascii_defined */

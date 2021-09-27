@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9bc49a2e */
+/* HASH CRC-32:0xf36e856c */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -41,14 +41,14 @@
 __SYSDECL_BEGIN
 
 #if !defined(__dehumanize_number_defined) && defined(__CRT_HAVE_dehumanize_number)
-#define __dehumanize_number_defined 1
+#define __dehumanize_number_defined
 /* >> humanize_number(3), dehumanize_number(3)
  * @param: scale: Set of `HN_GETSCALE | HN_AUTOSCALE'
  * @param: flags: Set of `HN_DECIMAL | HN_NOSPACE | HN_B | HN_DIVISOR_1000 | HN_IEC_PREFIXES' */
 __CDECLARE(,int,__NOTHROW_NCX,dehumanize_number,(char const *__str, __INT64_TYPE__ *__size),(__str,__size))
 #endif /* !__dehumanize_number_defined && __CRT_HAVE_dehumanize_number */
 #ifndef __getprogname_defined
-#define __getprogname_defined 1
+#define __getprogname_defined
 #ifdef __CRT_HAVE_getprogname
 /* >> getprogname(3), setprogname(3) */
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,char const *,__NOTHROW_NCX,getprogname,(void),())
@@ -64,7 +64,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(getprogname, __FORCELOCAL __ATTR_ARTIFICIAL __AT
 #endif /* !__CRT_HAVE_getprogname */
 #endif /* !__getprogname_defined */
 #ifndef __setprogname_defined
-#define __setprogname_defined 1
+#define __setprogname_defined
 #ifdef __CRT_HAVE_setprogname
 /* >> getprogname(3), setprogname(3) */
 __CDECLARE_VOID(,__NOTHROW_NCX,setprogname,(char const *__name),(__name))
@@ -80,7 +80,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(setprogname, __FORCELOCAL __ATTR_ARTIFICIAL void
 #endif /* !__CRT_HAVE_setprogname */
 #endif /* !__setprogname_defined */
 #ifndef __heapsort_defined
-#define __heapsort_defined 1
+#define __heapsort_defined
 #ifdef __CRT_HAVE_heapsort
 __CDECLARE(__ATTR_NONNULL((1, 4)),int,__THROWING,heapsort,(void *__pbase, __SIZE_TYPE__ __item_count, __SIZE_TYPE__ __item_size, int (__LIBCCALL *__compar)(void const *__a, void const *__b)),(__pbase,__item_count,__item_size,__compar))
 #else /* __CRT_HAVE_heapsort */
@@ -89,7 +89,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(heapsort, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_
 #endif /* !__CRT_HAVE_heapsort */
 #endif /* !__heapsort_defined */
 #ifndef __mergesort_defined
-#define __mergesort_defined 1
+#define __mergesort_defined
 #ifdef __CRT_HAVE_mergesort
 __CDECLARE(__ATTR_NONNULL((1, 4)),int,__THROWING,mergesort,(void *__pbase, __SIZE_TYPE__ __item_count, __SIZE_TYPE__ __item_size, int (__LIBCCALL *__compar)(void const *__a, void const *__b)),(__pbase,__item_count,__item_size,__compar))
 #else /* __CRT_HAVE_mergesort */
@@ -98,15 +98,15 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(mergesort, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR
 #endif /* !__CRT_HAVE_mergesort */
 #endif /* !__mergesort_defined */
 #if !defined(__radixsort_defined) && defined(__CRT_HAVE_radixsort)
-#define __radixsort_defined 1
+#define __radixsort_defined
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,radixsort,(unsigned char const **__base, int __item_count, unsigned char const *__table, unsigned __endbyte),(__base,__item_count,__table,__endbyte))
 #endif /* !__radixsort_defined && __CRT_HAVE_radixsort */
 #if !defined(__sradixsort_defined) && defined(__CRT_HAVE_sradixsort)
-#define __sradixsort_defined 1
+#define __sradixsort_defined
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,sradixsort,(unsigned char const **__base, int __item_count, unsigned char const *__table, unsigned __endbyte),(__base,__item_count,__table,__endbyte))
 #endif /* !__sradixsort_defined && __CRT_HAVE_sradixsort */
 #ifndef __reallocf_defined
-#define __reallocf_defined 1
+#define __reallocf_defined
 #ifdef __CRT_HAVE_reallocf
 __CDECLARE(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)),void *,__NOTHROW_NCX,reallocf,(void *__mallptr, __SIZE_TYPE__ __num_bytes),(__mallptr,__num_bytes))
 #elif defined(__CRT_HAVE_realloc)
@@ -117,7 +117,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(reallocf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_
 #endif /* !... */
 #endif /* !__reallocf_defined */
 #ifndef __reallocarray_defined
-#define __reallocarray_defined 1
+#define __reallocarray_defined
 #ifdef __CRT_HAVE_reallocarray
 __CDECLARE(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)) __ATTR_ALLOC_SIZE((2, 3)),void *,__NOTHROW_NCX,reallocarray,(void *__ptr, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),(__ptr,__elem_count,__elem_size))
 #elif defined(__CRT_HAVE_reallocarr)
@@ -130,7 +130,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(reallocarray, __FORCELOCAL __ATTR_ARTIFICIAL __A
 #endif /* !... */
 #endif /* !__reallocarray_defined */
 #ifndef __recallocarray_defined
-#define __recallocarray_defined 1
+#define __recallocarray_defined
 #ifdef __CRT_HAVE_recallocarray
 /* >> recallocarray(3)
  * Same   as    `recallocv(mallptr, new_elem_count, elem_size)',   but    also   ensure    that
@@ -149,7 +149,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(recallocarray, __FORCELOCAL __ATTR_ARTIFICIAL __
 #endif /* !... */
 #endif /* !__recallocarray_defined */
 #ifndef __freezero_defined
-#define __freezero_defined 1
+#define __freezero_defined
 #ifdef __CRT_HAVE_freezero
 /* >> freezero(3)
  * Same as  `free(mallptr)', but  also ensure  that the  memory  region
@@ -170,7 +170,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(freezero, __FORCELOCAL __ATTR_ARTIFICIAL void __
 #endif /* !... */
 #endif /* !__freezero_defined */
 #ifndef __strtonum_defined
-#define __strtonum_defined 1
+#define __strtonum_defined
 #ifdef __CRT_HAVE_strtonum
 /* >> strtonum(3)
  * Similar to `strtoi()'  with `base=10',  but return  human-
@@ -201,7 +201,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(strtonum, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_
 #endif /* !__CRT_HAVE_strtonum */
 #endif /* !__strtonum_defined */
 #if !defined(__getbsize_defined) && defined(__CRT_HAVE_getbsize)
-#define __getbsize_defined 1
+#define __getbsize_defined
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),char *,__NOTHROW_NCX,getbsize,(int *__headerlenp, __LONGPTR_TYPE__ *__blocksizep),(__headerlenp,__blocksizep))
 #endif /* !__getbsize_defined && __CRT_HAVE_getbsize */
 

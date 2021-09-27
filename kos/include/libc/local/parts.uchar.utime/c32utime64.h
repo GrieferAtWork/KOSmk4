@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x524c52ca */
+/* HASH CRC-32:0x94a01635 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,12 +19,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_c32utime64_defined
-#define __local_c32utime64_defined 1
+#define __local_c32utime64_defined
 #include <__crt.h>
 #if (defined(__CRT_HAVE_wutime) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)) || defined(__CRT_HAVE_KOS$wutime) || (defined(__CRT_HAVE__wutime32) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)) || defined(__CRT_HAVE_KOS$_wutime32)
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_crt_c32utime32_defined
-#define __local___localdep_crt_c32utime32_defined 1
+#define __local___localdep_crt_c32utime32_defined
 #if defined(__CRT_HAVE_wutime) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_crt_c32utime32,(__CHAR32_TYPE__ const *__filename, struct __utimbuf32 const *__file_times),wutime,(__filename,__file_times))
 #elif defined(__CRT_HAVE_KOS$wutime)
@@ -58,7 +58,7 @@ __NOTHROW_RPC(__LIBKCALL __LIBC_LOCAL_NAME(c32utime64))(__CHAR32_TYPE__ const *_
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_c32utime64_defined
-#define __local___localdep_c32utime64_defined 1
+#define __local___localdep_c32utime64_defined
 #define __localdep_c32utime64 __LIBC_LOCAL_NAME(c32utime64)
 #endif /* !__local___localdep_c32utime64_defined */
 #else /* (__CRT_HAVE_wutime && __SIZEOF_WCHAR_T__ == 4 && __LIBCCALL_IS_LIBKCALL) || __CRT_HAVE_KOS$wutime || (__CRT_HAVE__wutime32 && __SIZEOF_WCHAR_T__ == 4 && __LIBCCALL_IS_LIBKCALL) || __CRT_HAVE_KOS$_wutime32 */

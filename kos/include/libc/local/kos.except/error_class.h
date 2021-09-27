@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x53972db4 */
+/* HASH CRC-32:0xc25d3ca9 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,14 +19,14 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_error_class_defined
-#define __local_error_class_defined 1
+#define __local_error_class_defined
 #include <__crt.h>
 #include <kos/bits/fastexcept.h>
 #if defined(__arch_error_class) || defined(__CRT_HAVE_error_code) || defined(__arch_error_code) || defined(__CRT_HAVE_error_data) || defined(__arch_error_data)
 #include <kos/bits/exception_data.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_error_code_defined
-#define __local___localdep_error_code_defined 1
+#define __local___localdep_error_code_defined
 #ifdef __CRT_HAVE_error_code
 __COMPILER_REDIRECT(__LIBC,__ATTR_PURE __ATTR_WUNUSED,__error_code_t,__NOTHROW,__LIBKCALL,__localdep_error_code,(void),error_code,())
 #elif defined(__arch_error_code) || defined(__CRT_HAVE_error_data) || defined(__arch_error_data)
@@ -51,7 +51,7 @@ __NOTHROW(__LIBKCALL __LIBC_LOCAL_NAME(error_class))(void) {
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_error_class_defined
-#define __local___localdep_error_class_defined 1
+#define __local___localdep_error_class_defined
 #define __localdep_error_class __LIBC_LOCAL_NAME(error_class)
 #endif /* !__local___localdep_error_class_defined */
 #else /* __arch_error_class || __CRT_HAVE_error_code || __arch_error_code || __CRT_HAVE_error_data || __arch_error_data */

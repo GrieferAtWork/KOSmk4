@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x81c9a09a */
+/* HASH CRC-32:0x58268aad */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,12 +19,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_fnmatch_defined
-#define __local_fnmatch_defined 1
+#define __local_fnmatch_defined
 #include <__crt.h>
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_tolower_defined
-#define __local___localdep_tolower_defined 1
+#define __local___localdep_tolower_defined
 __NAMESPACE_LOCAL_END
 #include <bits/crt/ctype.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -109,7 +109,7 @@ __nomatch:
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_fnmatch_defined
-#define __local___localdep_fnmatch_defined 1
+#define __local___localdep_fnmatch_defined
 #define __localdep_fnmatch __LIBC_LOCAL_NAME(fnmatch)
 #endif /* !__local___localdep_fnmatch_defined */
 #endif /* !__local_fnmatch_defined */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd8652796 */
+/* HASH CRC-32:0xb5642ada */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,13 +19,13 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_strtoi_defined
-#define __local_strtoi_defined 1
+#define __local_strtoi_defined
 #include <__crt.h>
 #include <features.h>
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_strtoimax_r_defined
-#define __local___localdep_strtoimax_r_defined 1
+#define __local___localdep_strtoimax_r_defined
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -97,7 +97,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strtoi))(char const *__restrict __npt
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_strtoi_defined
-#define __local___localdep_strtoi_defined 1
+#define __local___localdep_strtoi_defined
 #define __localdep_strtoi __LIBC_LOCAL_NAME(strtoi)
 #endif /* !__local___localdep_strtoi_defined */
 #endif /* !__local_strtoi_defined */

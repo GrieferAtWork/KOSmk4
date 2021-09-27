@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6c5aeb79 */
+/* HASH CRC-32:0xd82afeaf */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,11 +19,11 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_wtoi_defined
-#define __local_wtoi_defined 1
+#define __local_wtoi_defined
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_wcsto32_defined
-#define __local___localdep_wcsto32_defined 1
+#define __local___localdep_wcsto32_defined
 #ifdef __CRT_HAVE_wcsto32
 __NAMESPACE_LOCAL_END
 #include <features.h>
@@ -62,7 +62,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_wcsto32_defined */
 #ifndef __local___localdep_wcsto64_defined
-#define __local___localdep_wcsto64_defined 1
+#define __local___localdep_wcsto64_defined
 #ifdef __CRT_HAVE_wcsto64
 __NAMESPACE_LOCAL_END
 #include <features.h>
@@ -116,7 +116,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wtoi))(__WCHAR_TYPE__ const *__nptr) 
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_wtoi_defined
-#define __local___localdep_wtoi_defined 1
+#define __local___localdep_wtoi_defined
 #define __localdep_wtoi __LIBC_LOCAL_NAME(wtoi)
 #endif /* !__local___localdep_wtoi_defined */
 #endif /* !__local_wtoi_defined */

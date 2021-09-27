@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2d8f35d1 */
+/* HASH CRC-32:0x9c4cb3cd */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_mmap_defined
-#define __local_mmap_defined 1
+#define __local_mmap_defined
 #include <__crt.h>
 #include <bits/types.h>
 #if defined(__CRT_HAVE_mmap64) || defined(__CRT_HAVE_mmap)
@@ -35,11 +35,11 @@
 #endif /* !__PIO_OFFSET */
 __NAMESPACE_LOCAL_BEGIN
 #if !defined(__local___localdep_mmap32_defined) && defined(__CRT_HAVE_mmap)
-#define __local___localdep_mmap32_defined 1
+#define __local___localdep_mmap32_defined
 __CREDIRECT(,void *,__NOTHROW_NCX,__localdep_mmap32,(void *__addr, __SIZE_TYPE__ __len, __STDC_INT_AS_UINT_T __prot, __STDC_INT_AS_UINT_T __flags, __fd_t __fd, __off32_t __offset),mmap,(__addr,__len,__prot,__flags,__fd,__offset))
 #endif /* !__local___localdep_mmap32_defined && __CRT_HAVE_mmap */
 #ifndef __local___localdep_mmap64_defined
-#define __local___localdep_mmap64_defined 1
+#define __local___localdep_mmap64_defined
 #if defined(__CRT_HAVE_mmap) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
 __CREDIRECT(__ATTR_WUNUSED,void *,__NOTHROW_NCX,__localdep_mmap64,(void *__addr, __SIZE_TYPE__ __len, __STDC_INT_AS_UINT_T __prot, __STDC_INT_AS_UINT_T __flags, __fd_t __fd, __PIO_OFFSET64 __offset),mmap,(__addr,__len,__prot,__flags,__fd,__offset))
 #elif defined(__CRT_HAVE_mmap64)
@@ -63,7 +63,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(mmap))(void *__addr, __SIZE_TYPE__ __
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_mmap_defined
-#define __local___localdep_mmap_defined 1
+#define __local___localdep_mmap_defined
 #define __localdep_mmap __LIBC_LOCAL_NAME(mmap)
 #endif /* !__local___localdep_mmap_defined */
 #else /* __CRT_HAVE_mmap64 || __CRT_HAVE_mmap */

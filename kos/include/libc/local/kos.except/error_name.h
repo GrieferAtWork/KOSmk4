@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc9b352bd */
+/* HASH CRC-32:0x5d8a032b */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,12 +19,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_error_name_defined
-#define __local_error_name_defined 1
+#define __local_error_name_defined
 #include <__crt.h>
 #include <kos/bits/exception_data.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_rawmemchr_defined
-#define __local___localdep_rawmemchr_defined 1
+#define __local___localdep_rawmemchr_defined
 #ifdef __CRT_HAVE_rawmemchr
 __CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),void *,__NOTHROW_NCX,__localdep_rawmemchr,(void const *__restrict __haystack, int __needle),rawmemchr,(__haystack,__needle))
 #elif defined(__CRT_HAVE___rawmemchr)
@@ -37,7 +37,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_rawmemchr_defined */
 #ifndef __local___localdep_strend_defined
-#define __local___localdep_strend_defined 1
+#define __local___localdep_strend_defined
 #ifdef __CRT_HAVE_strend
 __CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_strend,(char const *__restrict __str),strend,(__str))
 #else /* __CRT_HAVE_strend */
@@ -330,7 +330,7 @@ __non_linear_prefix:
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_error_name_defined
-#define __local___localdep_error_name_defined 1
+#define __local___localdep_error_name_defined
 #define __localdep_error_name __LIBC_LOCAL_NAME(error_name)
 #endif /* !__local___localdep_error_name_defined */
 #endif /* !__local_error_name_defined */

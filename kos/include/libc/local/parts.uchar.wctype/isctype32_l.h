@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4141b82b */
+/* HASH CRC-32:0x5e74904d */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,14 +19,14 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_isctype32_l_defined
-#define __local_isctype32_l_defined 1
+#define __local_isctype32_l_defined
 #include <__crt.h>
 #if (defined(__CRT_HAVE_iswctype) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)) || defined(__CRT_HAVE_KOS$iswctype) || (defined(__CRT_HAVE_is_wctype) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)) || defined(__CRT_HAVE_KOS$is_wctype) || (defined(__CRT_HAVE___iswctype) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)) || defined(__CRT_HAVE_KOS$__iswctype) || (defined(__CRT_KOS) && defined(__CRT_HAVE___unicode_descriptor))
 #include <hybrid/typecore.h>
 #include <bits/crt/wctype.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_isctype32_defined
-#define __local___localdep_isctype32_defined 1
+#define __local___localdep_isctype32_defined
 #if defined(__CRT_HAVE_iswctype) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep_isctype32,(__WINT32_TYPE__ __wc, __wctype_t __desc),iswctype,(__wc,__desc))
 #elif defined(__CRT_HAVE_KOS$iswctype)
@@ -61,7 +61,7 @@ __NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(isctype32_l))(__WINT32_TYPE__ __wc, _
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_isctype32_l_defined
-#define __local___localdep_isctype32_l_defined 1
+#define __local___localdep_isctype32_l_defined
 #define __localdep_isctype32_l __LIBC_LOCAL_NAME(isctype32_l)
 #endif /* !__local___localdep_isctype32_l_defined */
 #else /* (__CRT_HAVE_iswctype && __SIZEOF_WCHAR_T__ == 4 && __LIBCCALL_IS_LIBKCALL) || __CRT_HAVE_KOS$iswctype || (__CRT_HAVE_is_wctype && __SIZEOF_WCHAR_T__ == 4 && __LIBCCALL_IS_LIBKCALL) || __CRT_HAVE_KOS$is_wctype || (__CRT_HAVE___iswctype && __SIZEOF_WCHAR_T__ == 4 && __LIBCCALL_IS_LIBKCALL) || __CRT_HAVE_KOS$__iswctype || (__CRT_KOS && __CRT_HAVE___unicode_descriptor) */

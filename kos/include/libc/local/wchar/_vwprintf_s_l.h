@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3fd8636f */
+/* HASH CRC-32:0xca7fe0db */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local__vwprintf_s_l_defined
-#define __local__vwprintf_s_l_defined 1
+#define __local__vwprintf_s_l_defined
 #include <__crt.h>
 #include <features.h>
 #if defined(__CRT_HAVE_vwprintf) || ((defined(__CRT_HAVE_vfwprintf) || defined(__CRT_HAVE_file_wprinter) || defined(__CRT_HAVE_file_wprinter_unlocked) || defined(__CRT_HAVE_fputwc) || defined(__CRT_HAVE_putwc)) && !defined(__NO_STDSTREAMS))
@@ -27,7 +27,7 @@
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_vwprintf_defined
-#define __local___localdep_vwprintf_defined 1
+#define __local___localdep_vwprintf_defined
 #ifdef __CRT_HAVE_vwprintf
 __CREDIRECT(__ATTR_LIBC_WPRINTF(1, 0) __ATTR_NONNULL((1)),__STDC_INT_AS_SIZE_T,__THROWING,__localdep_vwprintf,(__WCHAR_TYPE__ const *__restrict __format, __builtin_va_list __args),vwprintf,(__format,__args))
 #elif (defined(__CRT_HAVE_vfwprintf) || defined(__CRT_HAVE_file_wprinter) || defined(__CRT_HAVE_file_wprinter_unlocked) || defined(__CRT_HAVE_fputwc) || defined(__CRT_HAVE_putwc)) && !defined(__NO_STDSTREAMS)
@@ -46,7 +46,7 @@ __LOCAL_LIBC(_vwprintf_s_l) __ATTR_NONNULL((1)) __STDC_INT_AS_SSIZE_T
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep__vwprintf_s_l_defined
-#define __local___localdep__vwprintf_s_l_defined 1
+#define __local___localdep__vwprintf_s_l_defined
 #define __localdep__vwprintf_s_l __LIBC_LOCAL_NAME(_vwprintf_s_l)
 #endif /* !__local___localdep__vwprintf_s_l_defined */
 #else /* __CRT_HAVE_vwprintf || ((__CRT_HAVE_vfwprintf || __CRT_HAVE_file_wprinter || __CRT_HAVE_file_wprinter_unlocked || __CRT_HAVE_fputwc || __CRT_HAVE_putwc) && !__NO_STDSTREAMS) */

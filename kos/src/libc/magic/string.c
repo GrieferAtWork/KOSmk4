@@ -403,18 +403,18 @@ __SYSDECL_BEGIN
 #ifdef __CC__
 __NAMESPACE_STD_BEGIN
 #ifndef __std_size_t_defined
-#define __std_size_t_defined 1
+#define __std_size_t_defined
 typedef __size_t size_t;
 #endif /* !__std_size_t_defined */
 __NAMESPACE_STD_END
 #ifndef __CXX_SYSTEM_HEADER
 }%(c, ccompat){
 #ifndef __size_t_defined
-#define __size_t_defined 1
+#define __size_t_defined
 __NAMESPACE_STD_USING(size_t)
 #endif /* !__size_t_defined */
 #if defined(__std___forward_size_defined) && !defined(____forward_size_defined)
-#define ____forward_size_defined 1
+#define ____forward_size_defined
 __NAMESPACE_STD_USING(__forward_size)
 #endif /* __std___forward_size_defined && !____forward_size_defined */
 }%{
@@ -510,11 +510,11 @@ __NAMESPACE_STD_USING(__forward_size)
 
 %(auto_header){
 #ifndef __errno_t_defined
-#define __errno_t_defined 1
+#define __errno_t_defined
 typedef __errno_t errno_t;
 #endif /* !__errno_t_defined */
 #ifndef __rsize_t_defined
-#define __rsize_t_defined 1
+#define __rsize_t_defined
 typedef __size_t rsize_t;
 #endif /* !__rsize_t_defined */
 
@@ -1362,7 +1362,7 @@ int strncasecmp_l([[nonnull]] char const *s1,
 [[const, wunused, nothrow, crt_dos_variant]]
 [[userimpl, decl_include("<bits/types.h>"), impl_prefix(
 #ifndef ___local_sys_errlist_defined
-#define ___local_sys_errlist_defined 1
+#define ___local_sys_errlist_defined
 #if defined(__CRT_HAVE__sys_errlist) && defined(__CRT_HAVE__sys_nerr)
 #ifndef @_sys_errlist@
 __LIBC char const *const @_sys_errlist@[];
@@ -2270,10 +2270,10 @@ char const *strerrorname_np($errno_t errnum) {
 [[const, wunused, nothrow, section(".text.crt{|.dos}.errno")]]
 [[userimpl, crt_dos_variant, impl_include("<asm/os/signal.h>"), impl_prefix(
 #ifndef ___local_sys_siglist_defined
-#define ___local_sys_siglist_defined 1
+#define ___local_sys_siglist_defined
 #if defined(__CRT_HAVE___p_sys_siglist)
 #ifndef ____p_sys_siglist_defined
-#define ____p_sys_siglist_defined 1
+#define ____p_sys_siglist_defined
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED __ATTR_RETNONNULL,char const *const *,__NOTHROW_NCX,@__p_sys_siglist@,(void),())
 #endif /* !____p_sys_siglist_defined */
 #ifndef @_sys_siglist@
@@ -2901,7 +2901,7 @@ void bcopy([[nonnull]] void const *src,
 
 
 %#ifndef __bzero_defined
-%#define __bzero_defined 1
+%#define __bzero_defined
 /* Disable [[crtbuiltin]] because gcc translates `__builtin_bzero()' into a call to `memset()'
  * s.a.: https://gcc.gnu.org/legacy-ml/gcc-bugs/2002-01/msg00511.html
  * While I do understand what  is causing GCC to  do this, I still cannot  let it do this  under
@@ -6817,8 +6817,8 @@ int strstartcmpz([[nonnull]] char const *str,
 
 @@>> bitcpy(3)
 @@Copy exactly `num_bits' from `src_base+(src_bit_offset/NBBY)' to `dst_base+(dst_bit_offset/NBBY)',
-@@doing a byte-wise copy but leaving bits not meant to be copied untouched. Inside of individual
-@@bytes, individual bits are indexed such that the least significant bit is at `0', and the most
+@@doing a byte-wise copy  but leaving bits not  meant to be copied  untouched. Inside of  individual
+@@bytes, individual bits are  indexed such that the  least significant bit is  at `0', and the  most
 @@significant bit is at `NBBY-1':
 @@>> byte_t src[] = { 0b00001001 };
 @@>> byte_t dst[] = { 0b00000000 };
@@ -7329,7 +7329,7 @@ char *_strerror(char const *message) {
 #if __has_builtin(__builtin_strlen)
 #ifdef __cplusplus
 #ifndef __std___forward_size_defined
-#define __std___forward_size_defined 1
+#define __std___forward_size_defined
 __NAMESPACE_STD_BEGIN
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_CONST size_t __NOTHROW(__forward_size)(size_t __x) { return __x; }
 __NAMESPACE_STD_END

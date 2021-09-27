@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x847695cc */
+/* HASH CRC-32:0x813ad451 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,13 +19,13 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_futex_waituntil_cmpxch_defined
-#define __local_futex_waituntil_cmpxch_defined 1
+#define __local_futex_waituntil_cmpxch_defined
 #include <__crt.h>
 #include <bits/types.h>
 #if defined(__CRT_HAVE_lfutex64) || defined(__CRT_HAVE_lfutex)
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_lfutex64_defined
-#define __local___localdep_lfutex64_defined 1
+#define __local___localdep_lfutex64_defined
 #if defined(__CRT_HAVE_lfutex) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 __CVREDIRECT(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_lfutex64,(__uintptr_t *__uaddr, __syscall_ulong_t __futex_op, __uintptr_t __val),lfutex,(__uaddr,__futex_op,__val),__val,2,(void *,__UINTPTR_TYPE__))
 #elif defined(__CRT_HAVE_lfutex64)
@@ -49,7 +49,7 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(futex_waituntil_cmpxch))(__uintptr_t 
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_futex_waituntil_cmpxch_defined
-#define __local___localdep_futex_waituntil_cmpxch_defined 1
+#define __local___localdep_futex_waituntil_cmpxch_defined
 #define __localdep_futex_waituntil_cmpxch __LIBC_LOCAL_NAME(futex_waituntil_cmpxch)
 #endif /* !__local___localdep_futex_waituntil_cmpxch_defined */
 #else /* __CRT_HAVE_lfutex64 || __CRT_HAVE_lfutex */

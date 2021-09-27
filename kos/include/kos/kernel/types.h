@@ -41,7 +41,7 @@
 __DECL_BEGIN
 
 #ifndef __s8_defined
-#define __s8_defined 1
+#define __s8_defined
 typedef __s8 s8;
 typedef __u8 u8;
 typedef __s16 s16;
@@ -57,7 +57,7 @@ typedef __u64 u64;
 #endif /* !__s8_defined */
 
 #ifndef __le8_defined
-#define __le8_defined 1
+#define __le8_defined
 typedef __le8 le8;
 typedef __be8 be8;
 typedef __be16 be16;
@@ -71,7 +71,7 @@ typedef __le64 le64;
 #endif /* !__le8_defined */
 
 #ifndef __refcnt_t_defined
-#define __refcnt_t_defined 1
+#define __refcnt_t_defined
 typedef __uintptr_t refcnt_t;
 #endif /* !__refcnt_t_defined */
 

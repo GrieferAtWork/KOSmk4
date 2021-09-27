@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x36282870 */
+/* HASH CRC-32:0x82c88f10 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,11 +19,11 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_format_32to8_defined
-#define __local_format_32to8_defined 1
+#define __local_format_32to8_defined
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_unicode_writeutf8_defined
-#define __local___localdep_unicode_writeutf8_defined 1
+#define __local___localdep_unicode_writeutf8_defined
 #ifdef __CRT_HAVE_unicode_writeutf8
 __CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_unicode_writeutf8,(char *__restrict __dst, __CHAR32_TYPE__ __ch),unicode_writeutf8,(__dst,__ch))
 #else /* __CRT_HAVE_unicode_writeutf8 */
@@ -115,7 +115,7 @@ __err:
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_format_32to8_defined
-#define __local___localdep_format_32to8_defined 1
+#define __local___localdep_format_32to8_defined
 #define __localdep_format_32to8 __LIBC_LOCAL_NAME(format_32to8)
 #endif /* !__local___localdep_format_32to8_defined */
 #endif /* !__local_format_32to8_defined */

@@ -36,7 +36,7 @@ __SYSDECL_BEGIN
 
 /* 128-bit integer types. */
 #ifndef __int128_t_defined
-#define __int128_t_defined 1
+#define __int128_t_defined
 typedef __hybrid_int128_t int128_t;
 typedef __hybrid_uint128_t uint128_t;
 #endif /* !__int128_t_defined */

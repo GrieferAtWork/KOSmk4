@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfb71ad28 */
+/* HASH CRC-32:0x88765ccb */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,13 +19,13 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_cbrtf_defined
-#define __local_cbrtf_defined 1
+#define __local_cbrtf_defined
 #include <__crt.h>
 #include <ieee754.h>
 #if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_cbrt) || defined(__CRT_HAVE___cbrt) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_cbrt_defined
-#define __local___localdep_cbrt_defined 1
+#define __local___localdep_cbrt_defined
 #if __has_builtin(__builtin_cbrt) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_cbrt)
 __CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__localdep_cbrt,(double __x),cbrt,{ return __builtin_cbrt(__x); })
 #elif defined(__CRT_HAVE_cbrt)
@@ -56,7 +56,7 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(cbrtf))(float __x) {
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_cbrtf_defined
-#define __local___localdep_cbrtf_defined 1
+#define __local___localdep_cbrtf_defined
 #define __localdep_cbrtf __LIBC_LOCAL_NAME(cbrtf)
 #endif /* !__local___localdep_cbrtf_defined */
 #else /* __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ || __CRT_HAVE_cbrt || __CRT_HAVE___cbrt || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */

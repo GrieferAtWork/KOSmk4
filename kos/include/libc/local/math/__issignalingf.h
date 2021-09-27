@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x55b1e5 */
+/* HASH CRC-32:0xecf80b6f */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,13 +19,13 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local___issignalingf_defined
-#define __local___issignalingf_defined 1
+#define __local___issignalingf_defined
 #include <__crt.h>
 #include <ieee754.h>
 #if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_issignaling) || defined(__CRT_HAVE___issignaling) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep___issignaling_defined
-#define __local___localdep___issignaling_defined 1
+#define __local___localdep___issignaling_defined
 #ifdef __CRT_HAVE_issignaling
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep___issignaling,(double __x),issignaling,(__x))
 #elif defined(__CRT_HAVE___issignaling)
@@ -61,7 +61,7 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(__issignalingf))(float __x) {
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep___issignalingf_defined
-#define __local___localdep___issignalingf_defined 1
+#define __local___localdep___issignalingf_defined
 #define __localdep___issignalingf __LIBC_LOCAL_NAME(__issignalingf)
 #endif /* !__local___localdep___issignalingf_defined */
 #else /* __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ || __CRT_HAVE_issignaling || __CRT_HAVE___issignaling || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */

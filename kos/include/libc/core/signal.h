@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2188912 */
+/* HASH CRC-32:0xea67cac2 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,7 +30,7 @@
 __SYSDECL_BEGIN
 
 #ifndef ____libc_core_raise_defined
-#define ____libc_core_raise_defined 1
+#define ____libc_core_raise_defined
 #ifdef __CRT_HAVE_raise
 #include <bits/types.h>
 /* >> raise(3)
@@ -71,7 +71,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__libc_core_sigfillset,(struct
 #define __libc_core_sigfillset __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sigfillset)
 #endif /* !__CRT_HAVE_sigfillset */
 #ifndef ____libc_core_sigprocmask_defined
-#define ____libc_core_sigprocmask_defined 1
+#define ____libc_core_sigprocmask_defined
 #ifdef __CRT_HAVE_sigprocmask
 #include <features.h>
 struct __sigset_struct;
@@ -109,7 +109,7 @@ __CREDIRECT(,int,__NOTHROW_NCX,__libc_core_sigprocmask,(__STDC_INT_AS_UINT_T __h
 #endif /* !... */
 #endif /* !____libc_core_sigprocmask_defined */
 #if !defined(____libc_core_getsigmaskptr_defined) && defined(__CRT_HAVE_getsigmaskptr)
-#define ____libc_core_getsigmaskptr_defined 1
+#define ____libc_core_getsigmaskptr_defined
 #include <bits/os/sigset.h>
 /* >> getsigmaskptr(3)
  * Return   the   current  signal   mask  pointer.
@@ -119,7 +119,7 @@ __CREDIRECT(,int,__NOTHROW_NCX,__libc_core_sigprocmask,(__STDC_INT_AS_UINT_T __h
 __CREDIRECT(__ATTR_RETNONNULL __ATTR_WUNUSED,struct __sigset_struct *,__NOTHROW_NCX,__libc_core_getsigmaskptr,(void),getsigmaskptr,())
 #endif /* !____libc_core_getsigmaskptr_defined && __CRT_HAVE_getsigmaskptr */
 #if !defined(____libc_core_setsigmaskptr_defined) && defined(__CRT_HAVE_setsigmaskptr)
-#define ____libc_core_setsigmaskptr_defined 1
+#define ____libc_core_setsigmaskptr_defined
 #include <bits/os/sigset.h>
 /* >> setsigmaskptr(3)
  * Set  the  current  signal  mask  pointer  to `sigmaskptr'
@@ -146,7 +146,7 @@ __CREDIRECT(__ATTR_RETNONNULL __ATTR_WUNUSED,struct __sigset_struct *,__NOTHROW_
 __CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1)),struct __sigset_struct *,__NOTHROW_NCX,__libc_core_setsigmaskptr,(struct __sigset_struct *__sigmaskptr),setsigmaskptr,(__sigmaskptr))
 #endif /* !____libc_core_setsigmaskptr_defined && __CRT_HAVE_setsigmaskptr */
 #ifndef ____libc_core_setsigmaskfullptr_defined
-#define ____libc_core_setsigmaskfullptr_defined 1
+#define ____libc_core_setsigmaskfullptr_defined
 #ifdef __CRT_HAVE_setsigmaskfullptr
 #include <bits/os/sigset.h>
 /* >> setsigmaskfullptr(3)

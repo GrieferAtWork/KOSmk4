@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x23cdb698 */
+/* HASH CRC-32:0xdc90886c */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,12 +19,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local___xpg_strerror_r_defined
-#define __local___xpg_strerror_r_defined 1
+#define __local___xpg_strerror_r_defined
 #include <__crt.h>
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_memcpyc_defined
-#define __local___localdep_memcpyc_defined 1
+#define __local___localdep_memcpyc_defined
 #ifdef __CRT_HAVE_memcpyc
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
@@ -38,7 +38,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__CRT_HAVE_memcpyc */
 #endif /* !__local___localdep_memcpyc_defined */
 #ifndef __local___localdep_strerrordesc_np_defined
-#define __local___localdep_strerrordesc_np_defined 1
+#define __local___localdep_strerrordesc_np_defined
 #ifdef __CRT_HAVE_strerrordesc_np
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,char const *,__NOTHROW,__localdep_strerrordesc_np,(__errno_t __errnum),strerrordesc_np,(__errnum))
 #else /* __CRT_HAVE_strerrordesc_np */
@@ -49,7 +49,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__CRT_HAVE_strerrordesc_np */
 #endif /* !__local___localdep_strerrordesc_np_defined */
 #ifndef __local___localdep_strlen_defined
-#define __local___localdep_strlen_defined 1
+#define __local___localdep_strlen_defined
 #ifdef __CRT_HAVE_strlen
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
@@ -93,7 +93,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(__xpg_strerror_r))(__errno_t __errnum
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep___xpg_strerror_r_defined
-#define __local___localdep___xpg_strerror_r_defined 1
+#define __local___localdep___xpg_strerror_r_defined
 #define __localdep___xpg_strerror_r __LIBC_LOCAL_NAME(__xpg_strerror_r)
 #endif /* !__local___localdep___xpg_strerror_r_defined */
 #endif /* !__local___xpg_strerror_r_defined */

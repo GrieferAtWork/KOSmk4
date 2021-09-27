@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x626f0310 */
+/* HASH CRC-32:0x4150d259 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,14 +19,14 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_lfutexexpr64_defined
-#define __local_lfutexexpr64_defined 1
+#define __local_lfutexexpr64_defined
 #include <__crt.h>
 #ifdef __CRT_HAVE_lfutexexpr
 #include <bits/os/timespec.h>
 #include <kos/bits/futex-expr.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_lfutexexpr32_defined
-#define __local___localdep_lfutexexpr32_defined 1
+#define __local___localdep_lfutexexpr32_defined
 __CREDIRECT(__ATTR_NONNULL((3)),int,__NOTHROW_RPC,__localdep_lfutexexpr32,(void *__base, __SIZE_TYPE__ __exprc, struct lfutexexpr const *__exprv, struct __timespec64 const *__timeout, unsigned int __timeout_flags),lfutexexpr,(__base,__exprc,__exprv,__timeout,__timeout_flags))
 #endif /* !__local___localdep_lfutexexpr32_defined */
 __LOCAL_LIBC(lfutexexpr64) __ATTR_NONNULL((3)) int
@@ -40,7 +40,7 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(lfutexexpr64))(void *__base, __SIZE_T
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_lfutexexpr64_defined
-#define __local___localdep_lfutexexpr64_defined 1
+#define __local___localdep_lfutexexpr64_defined
 #define __localdep_lfutexexpr64 __LIBC_LOCAL_NAME(lfutexexpr64)
 #endif /* !__local___localdep_lfutexexpr64_defined */
 #else /* __CRT_HAVE_lfutexexpr */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2c035f33 */
+/* HASH CRC-32:0x94c1e7fe */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,13 +19,13 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_c32ftime_l_defined
-#define __local_c32ftime_l_defined 1
+#define __local_c32ftime_l_defined
 #include <__crt.h>
 #include <bits/crt/tm.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_c32ftime_defined
-#define __local___localdep_c32ftime_defined 1
+#define __local___localdep_c32ftime_defined
 #if defined(__CRT_HAVE_wcsftime) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
 __CREDIRECT(__ATTR_NONNULL((1, 3, 4)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_c32ftime,(__CHAR32_TYPE__ *__restrict __buf, __SIZE_TYPE__ __buflen, __CHAR32_TYPE__ const *__restrict __format, struct __NAMESPACE_STD_SYM tm const *__restrict __tp),wcsftime,(__buf,__buflen,__format,__tp))
 #elif defined(__CRT_HAVE_KOS$wcsftime)
@@ -49,7 +49,7 @@ __NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(c32ftime_l))(__CHAR32_TYPE__ *__restr
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_c32ftime_l_defined
-#define __local___localdep_c32ftime_l_defined 1
+#define __local___localdep_c32ftime_l_defined
 #define __localdep_c32ftime_l __LIBC_LOCAL_NAME(c32ftime_l)
 #endif /* !__local___localdep_c32ftime_l_defined */
 #endif /* !__local_c32ftime_l_defined */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x238985c3 */
+/* HASH CRC-32:0x8370763d */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,14 +19,14 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_fuzzy_c16memcasecmp_defined
-#define __local_fuzzy_c16memcasecmp_defined 1
+#define __local_fuzzy_c16memcasecmp_defined
 #include <__crt.h>
 #include <parts/malloca.h>
 #ifndef __NO_MALLOCA
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_memcpyc_defined
-#define __local___localdep_memcpyc_defined 1
+#define __local___localdep_memcpyc_defined
 #ifdef __CRT_HAVE_memcpyc
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_memcpyc,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),memcpyc,(__dst,__src,__elem_count,__elem_size))
 #else /* __CRT_HAVE_memcpyc */
@@ -37,7 +37,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__CRT_HAVE_memcpyc */
 #endif /* !__local___localdep_memcpyc_defined */
 #ifndef __local___localdep_tolower16_defined
-#define __local___localdep_tolower16_defined 1
+#define __local___localdep_tolower16_defined
 __NAMESPACE_LOCAL_END
 #include <bits/crt/wctype.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -123,7 +123,7 @@ __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(fuzzy_c16memcasecmp))(__CHAR16_TYPE__
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_fuzzy_c16memcasecmp_defined
-#define __local___localdep_fuzzy_c16memcasecmp_defined 1
+#define __local___localdep_fuzzy_c16memcasecmp_defined
 #define __localdep_fuzzy_c16memcasecmp __LIBC_LOCAL_NAME(fuzzy_c16memcasecmp)
 #endif /* !__local___localdep_fuzzy_c16memcasecmp_defined */
 #else /* !__NO_MALLOCA */

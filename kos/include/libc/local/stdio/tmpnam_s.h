@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc4e80b43 */
+/* HASH CRC-32:0xa0f570c1 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,13 +19,13 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_tmpnam_s_defined
-#define __local_tmpnam_s_defined 1
+#define __local_tmpnam_s_defined
 #include <__crt.h>
 #ifdef __CRT_HAVE_tmpnam
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_tmpnam_defined
-#define __local___localdep_tmpnam_defined 1
+#define __local___localdep_tmpnam_defined
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_tmpnam,(char *__buf),tmpnam,(__buf))
 #endif /* !__local___localdep_tmpnam_defined */
 __NAMESPACE_LOCAL_END
@@ -58,7 +58,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(tmpnam_s))(char *__restrict __buf, __
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_tmpnam_s_defined
-#define __local___localdep_tmpnam_s_defined 1
+#define __local___localdep_tmpnam_s_defined
 #define __localdep_tmpnam_s __LIBC_LOCAL_NAME(tmpnam_s)
 #endif /* !__local___localdep_tmpnam_s_defined */
 #else /* __CRT_HAVE_tmpnam */

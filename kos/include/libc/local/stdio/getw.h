@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x30d99f8b */
+/* HASH CRC-32:0x2e8be88a */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,14 +19,14 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_getw_defined
-#define __local_getw_defined 1
+#define __local_getw_defined
 #include <__crt.h>
 #include <features.h>
 #if defined(__CRT_HAVE_fgetc) || defined(__CRT_HAVE_getc) || defined(__CRT_HAVE__IO_getc) || defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked) || (defined(__CRT_DOS) && defined(__CRT_HAVE__filbuf)) || defined(__CRT_HAVE_fread) || defined(__CRT_HAVE__IO_fread) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock)
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_fread_defined
-#define __local___localdep_fread_defined 1
+#define __local___localdep_fread_defined
 #if defined(__CRT_HAVE_fread_unlocked) && defined(__USE_STDIO_UNLOCKED)
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
@@ -78,7 +78,7 @@ __LOCAL_LIBC(getw) __ATTR_NONNULL((1)) int
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_getw_defined
-#define __local___localdep_getw_defined 1
+#define __local___localdep_getw_defined
 #define __localdep_getw __LIBC_LOCAL_NAME(getw)
 #endif /* !__local___localdep_getw_defined */
 #else /* __CRT_HAVE_fgetc || __CRT_HAVE_getc || __CRT_HAVE__IO_getc || __CRT_HAVE_fgetc_unlocked || __CRT_HAVE_getc_unlocked || (__CRT_DOS && __CRT_HAVE__filbuf) || __CRT_HAVE_fread || __CRT_HAVE__IO_fread || __CRT_HAVE_fread_unlocked || __CRT_HAVE__fread_nolock */

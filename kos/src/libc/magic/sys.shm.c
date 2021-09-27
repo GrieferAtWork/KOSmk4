@@ -131,23 +131,23 @@ __SYSDECL_BEGIN
 
 #ifdef __USE_XOPEN
 #ifndef __pid_t_defined
-#define __pid_t_defined 1
+#define __pid_t_defined
 typedef __pid_t pid_t;
 #endif /* __pid_t_defined */
 #endif /* __USE_XOPEN */
 
 #ifndef __size_t_defined
-#define __size_t_defined 1
+#define __size_t_defined
 typedef __SIZE_TYPE__ size_t;
 #endif /* !__size_t_defined */
 
 #ifndef __key_t_defined
-#define __key_t_defined 1
+#define __key_t_defined
 typedef __key_t key_t;
 #endif /* !__key_t_defined */
 
 #ifndef __time_t_defined
-#define __time_t_defined 1
+#define __time_t_defined
 typedef __TM_TYPE(time) time_t;
 #endif /* !__time_t_defined */
 

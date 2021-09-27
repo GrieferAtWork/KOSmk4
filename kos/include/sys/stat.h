@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf53c421f */
+/* HASH CRC-32:0x6f4c08aa */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -85,49 +85,49 @@ __SYSDECL_BEGIN
 
 #if defined(__USE_XOPEN) || defined(__USE_XOPEN2K)
 #ifndef __dev_t_defined
-#define __dev_t_defined 1
+#define __dev_t_defined
 typedef __dev_t dev_t;
 #endif /* __dev_t_defined */
 
 #ifndef __gid_t_defined
-#define __gid_t_defined 1
+#define __gid_t_defined
 typedef __gid_t gid_t;
 #endif /* __gid_t_defined */
 
 #ifndef __ino_t_defined
-#define __ino_t_defined 1
+#define __ino_t_defined
 typedef __FS_TYPE(ino) ino_t;  /* INode number */
 #endif /* __ino_t_defined */
 
 #ifndef __mode_t_defined
-#define __mode_t_defined 1
+#define __mode_t_defined
 typedef __mode_t mode_t; /* INode type (Set of `S_*' from `<fcntl.h>' or `<sys/stat.h>') */
 #endif /* __mode_t_defined */
 
 #ifndef __nlink_t_defined
-#define __nlink_t_defined 1
+#define __nlink_t_defined
 typedef __nlink_t nlink_t;
 #endif /* __nlink_t_defined */
 
 #ifndef __off_t_defined
-#define __off_t_defined 1
+#define __off_t_defined
 typedef __FS_TYPE(off) off_t;
 #endif /* __off_t_defined */
 
 #ifndef __uid_t_defined
-#define __uid_t_defined 1
+#define __uid_t_defined
 typedef __uid_t uid_t;
 #endif /* __uid_t_defined */
 #endif /* __USE_XOPEN || __USE_XOPEN2K */
 
 #ifdef __USE_UNIX98
 #ifndef __blkcnt_t_defined
-#define __blkcnt_t_defined 1
+#define __blkcnt_t_defined
 typedef __FS_TYPE(blkcnt)   blkcnt_t;
 #endif /* __blkcnt_t_defined */
 
 #ifndef __blksize_t_defined
-#define __blksize_t_defined 1
+#define __blksize_t_defined
 typedef __blksize_t blksize_t;
 #endif /* __blksize_t_defined */
 #endif /* __USE_UNIX98 */
@@ -566,7 +566,7 @@ __CDECLARE(__ATTR_NONNULL((2, 3)),int,__NOTHROW_NCX,fstatat64,(__fd_t __dirfd, c
 #endif /* __USE_LARGEFILE64 */
 #endif /* __USE_ATFILE */
 #ifndef __mkdir_defined
-#define __mkdir_defined 1
+#define __mkdir_defined
 #ifdef __CRT_HAVE_mkdir
 /* >> mkdir(2) */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,mkdir,(char const *__pathname, __mode_t __mode),(__pathname,__mode))
@@ -579,7 +579,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(mkdir, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NON
 #endif /* !... */
 #endif /* !__mkdir_defined */
 #ifndef __chmod_defined
-#define __chmod_defined 1
+#define __chmod_defined
 #ifdef __CRT_HAVE_chmod
 /* >> chmod(2) */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,chmod,(char const *__filename, __mode_t __mode),(__filename,__mode))
@@ -593,7 +593,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,chmod,(char const *__filename,
 
 #ifdef __USE_MISC
 #ifndef __lchmod_defined
-#define __lchmod_defined 1
+#define __lchmod_defined
 #ifdef __CRT_HAVE_lchmod
 /* >> lchmod(2) */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,lchmod,(char const *__filename, __mode_t __mode),(__filename,__mode))
@@ -609,7 +609,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,lchmod,(char const *__filename
 #endif /* !__lchmod_defined */
 #endif /* __USE_MISC */
 #ifndef __umask_defined
-#define __umask_defined 1
+#define __umask_defined
 #ifdef __CRT_HAVE_umask
 /* >> umask(2) */
 __CDECLARE(,__mode_t,__NOTHROW_NCX,umask,(__mode_t __mode),(__mode))

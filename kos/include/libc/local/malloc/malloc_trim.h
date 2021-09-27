@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x93d7813d */
+/* HASH CRC-32:0xcde1b56f */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,12 +19,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_malloc_trim_defined
-#define __local_malloc_trim_defined 1
+#define __local_malloc_trim_defined
 #include <__crt.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #if !defined(__local___localdep__heapmin_defined) && defined(__CRT_HAVE__heapmin)
-#define __local___localdep__heapmin_defined 1
+#define __local___localdep__heapmin_defined
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep__heapmin,(void),_heapmin,())
 #endif /* !__local___localdep__heapmin_defined && __CRT_HAVE__heapmin */
 __LOCAL_LIBC(malloc_trim) int
@@ -46,7 +46,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(malloc_trim))(__SIZE_TYPE__ __pad) {
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_malloc_trim_defined
-#define __local___localdep_malloc_trim_defined 1
+#define __local___localdep_malloc_trim_defined
 #define __localdep_malloc_trim __LIBC_LOCAL_NAME(malloc_trim)
 #endif /* !__local___localdep_malloc_trim_defined */
 #endif /* !__local_malloc_trim_defined */

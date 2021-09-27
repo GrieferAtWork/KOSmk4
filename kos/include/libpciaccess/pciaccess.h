@@ -603,7 +603,7 @@ struct pci_device {
  */
 #ifdef __KERNEL__
 #ifndef __pci_device_slist_defined
-#define __pci_device_slist_defined 1
+#define __pci_device_slist_defined
 /* SLIST_HEAD(pci_device_slist, pci_device); */
 struct pci_device_slist {
 #ifdef GUARD_LIBPCIACCESS_PCIACCESS_C

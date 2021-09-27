@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcd26050c */
+/* HASH CRC-32:0x766cec0b */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,14 +19,14 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_mktime64_defined
-#define __local_mktime64_defined 1
+#define __local_mktime64_defined
 #include <__crt.h>
 #include <bits/types.h>
 #include <features.h>
 #include <bits/crt/tm.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_mktime32_defined
-#define __local___localdep_mktime32_defined 1
+#define __local___localdep_mktime32_defined
 #ifdef __CRT_HAVE_mktime
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__time32_t,__NOTHROW_NCX,__localdep_mktime32,(struct __NAMESPACE_STD_SYM tm __KOS_FIXED_CONST *__tp),mktime,(__tp))
 #elif defined(__CRT_HAVE__mktime32)
@@ -59,7 +59,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(mktime64))(struct __NAMESPACE_STD_SYM
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_mktime64_defined
-#define __local___localdep_mktime64_defined 1
+#define __local___localdep_mktime64_defined
 #define __localdep_mktime64 __LIBC_LOCAL_NAME(mktime64)
 #endif /* !__local___localdep_mktime64_defined */
 #endif /* !__local_mktime64_defined */

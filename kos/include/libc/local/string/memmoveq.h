@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd56eefc4 */
+/* HASH CRC-32:0x1cefa7c5 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_memmoveq_defined
-#define __local_memmoveq_defined 1
+#define __local_memmoveq_defined
 #include <__crt.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -62,7 +62,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memmoveq))(void *__dst, void const *_
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_memmoveq_defined
-#define __local___localdep_memmoveq_defined 1
+#define __local___localdep_memmoveq_defined
 #define __localdep_memmoveq __LIBC_LOCAL_NAME(memmoveq)
 #endif /* !__local___localdep_memmoveq_defined */
 #endif /* !__local_memmoveq_defined */

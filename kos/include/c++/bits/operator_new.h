@@ -39,7 +39,7 @@ __CXXDECL_BEGIN
 __NAMESPACE_STD_BEGIN
 
 #ifndef __std_nothrow_t_defined
-#define __std_nothrow_t_defined 1
+#define __std_nothrow_t_defined
 struct nothrow_t {};
 #endif /* !__std_nothrow_t_defined */
 
@@ -113,7 +113,7 @@ extern __ATTR_EXTERNALLY_VISIBLE void __LIBCCALL operator delete[](void *__heap_
 #endif /* __cpp_sized_deallocation */
 #if defined(__cpp_aligned_new) && (__cpp_aligned_new+0)
 #ifndef __std_align_val_t_defined
-#define __std_align_val_t_defined 1
+#define __std_align_val_t_defined
 __NAMESPACE_STD_BEGIN
 #ifdef __COMPILER_HAVE_CXX_ENUM_CLASSES
 enum class align_val_t: __size_t {};

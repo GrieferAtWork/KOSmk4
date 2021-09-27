@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4fed233c */
+/* HASH CRC-32:0x965c5bee */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,14 +19,14 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_setbuf_defined
-#define __local_setbuf_defined 1
+#define __local_setbuf_defined
 #include <__crt.h>
 #include <asm/crt/stdio.h>
 #include <features.h>
 #if defined(___IOFBF) && defined(___IONBF) && defined(__BUFSIZ) && (defined(__CRT_HAVE_setvbuf) || defined(__CRT_HAVE__IO_setvbuf) || defined(__CRT_HAVE_setvbuf_unlocked))
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_setvbuf_defined
-#define __local___localdep_setvbuf_defined 1
+#define __local___localdep_setvbuf_defined
 #if defined(__CRT_HAVE_setvbuf_unlocked) && defined(__USE_STDIO_UNLOCKED)
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
@@ -59,7 +59,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(setbuf))(__FILE *__restrict __stream,
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_setbuf_defined
-#define __local___localdep_setbuf_defined 1
+#define __local___localdep_setbuf_defined
 #define __localdep_setbuf __LIBC_LOCAL_NAME(setbuf)
 #endif /* !__local___localdep_setbuf_defined */
 #else /* ___IOFBF && ___IONBF && __BUFSIZ && (__CRT_HAVE_setvbuf || __CRT_HAVE__IO_setvbuf || __CRT_HAVE_setvbuf_unlocked) */

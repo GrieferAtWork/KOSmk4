@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf3155ece */
+/* HASH CRC-32:0x6be9c279 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -41,7 +41,7 @@
 __SYSDECL_BEGIN
 
 #ifndef __lfutex_t_defined
-#define __lfutex_t_defined 1
+#define __lfutex_t_defined
 typedef __uintptr_t lfutex_t;
 #endif /* !__lfutex_t_defined */
 
@@ -1274,7 +1274,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(futex_timedwaitwhile_allbits64, __FORCELOCAL __A
 #endif /* ... */
 #endif /* __USE_TIME64 */
 #if !defined(____os_gettid_defined) && defined(__CRT_HAVE_gettid)
-#define ____os_gettid_defined 1
+#define ____os_gettid_defined
 /* >> gettid(2)
  * Return the TID of the calling thread
  * THIS_THREAD->PID */

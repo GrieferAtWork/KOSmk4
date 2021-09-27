@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdfdae25f */
+/* HASH CRC-32:0x90e72460 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,12 +19,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_c16stok_defined
-#define __local_c16stok_defined 1
+#define __local_c16stok_defined
 #include <__crt.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_c16scspn_defined
-#define __local___localdep_c16scspn_defined 1
+#define __local___localdep_c16scspn_defined
 #if defined(__CRT_HAVE_wcscspn) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_c16scspn,(__CHAR16_TYPE__ const *__haystack, __CHAR16_TYPE__ const *__reject),wcscspn,(__haystack,__reject))
 #elif defined(__CRT_HAVE_DOS$wcscspn)
@@ -42,7 +42,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_c16scspn_defined */
 #ifndef __local___localdep_c16sspn_defined
-#define __local___localdep_c16sspn_defined 1
+#define __local___localdep_c16sspn_defined
 #if defined(__CRT_HAVE_wcsspn) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_c16sspn,(__CHAR16_TYPE__ const *__haystack, __CHAR16_TYPE__ const *__accept),wcsspn,(__haystack,__accept))
 #elif defined(__CRT_HAVE_DOS$wcsspn)
@@ -84,7 +84,7 @@ __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(c16stok))(__CHAR16_TYPE__ *__str, __C
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_c16stok_defined
-#define __local___localdep_c16stok_defined 1
+#define __local___localdep_c16stok_defined
 #define __localdep_c16stok __LIBC_LOCAL_NAME(c16stok)
 #endif /* !__local___localdep_c16stok_defined */
 #endif /* !__local_c16stok_defined */

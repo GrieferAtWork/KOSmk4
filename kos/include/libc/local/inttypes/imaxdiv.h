@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xac435095 */
+/* HASH CRC-32:0x30c6de11 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,11 +19,11 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_imaxdiv_defined
-#define __local_imaxdiv_defined 1
+#define __local_imaxdiv_defined
 #include <__crt.h>
 #include <hybrid/typecore.h>
 #ifndef ____imaxdiv_struct_defined
-#define ____imaxdiv_struct_defined 1
+#define ____imaxdiv_struct_defined
 #ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
 #pragma push_macro("quot")
 #pragma push_macro("rem")
@@ -49,7 +49,7 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(imaxdiv))(__INTMAX_TYPE__ __numer, __INTM
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_imaxdiv_defined
-#define __local___localdep_imaxdiv_defined 1
+#define __local___localdep_imaxdiv_defined
 #define __localdep_imaxdiv __LIBC_LOCAL_NAME(imaxdiv)
 #endif /* !__local___localdep_imaxdiv_defined */
 #endif /* !__local_imaxdiv_defined */

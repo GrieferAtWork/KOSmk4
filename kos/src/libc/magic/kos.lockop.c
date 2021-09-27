@@ -290,7 +290,7 @@ struct atomic_rwlock;
  * >> void oblockop_enqueue(struct oblockop_slist *__restrict self, struct oblockop *__restrict lop);
  * >> void oblockop_enqueue(struct Toblockop_slist(T) *__restrict self, struct Toblockop(T) *__restrict lop);
  * NOTE: To add lock ops to a pending list, use `lockop_enqueue(self, lop)',
- *       which is equivalent to `SLIST_ATOMIC_INSERT(self, lop, lo_link)' */
+ *       which is  equivalent  to  `SLIST_ATOMIC_INSERT(self, lop, lo_link)' */
 #define lockop_enqueue(self, lop)   __lockop_enqueue(self, lop, (lop)->lo_link)
 #define oblockop_enqueue(self, lop) __lockop_enqueue(self, lop, (lop)->olo_link)
 #define __lockop_enqueue(self, lop, lop_link)                                          \
@@ -306,7 +306,7 @@ struct atomic_rwlock;
 /* >> ATTR_PURE WUNUSED bool lockop_mustreap(struct lockop_slist const *__restrict self);
  * >> ATTR_PURE WUNUSED bool lockop_mustreap(struct oblockop_slist const *__restrict self);
  * >> ATTR_PURE WUNUSED bool lockop_mustreap(struct Toblockop_slist(T) const *__restrict self);
- * Check if the given lockop-list `self' must be reaped (that is: contains pending callbacks) */
+ * Check if the given lockop-list `self' must  be reaped (that is: contains pending  callbacks) */
 #define lockop_mustreap(self) \
 	(__hybrid_atomic_load((self)->slh_first, __ATOMIC_ACQUIRE) != __NULLPTR)
 #define oblockop_mustreap(self) lockop_mustreap(self)

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xad87b8df */
+/* HASH CRC-32:0xdee362e7 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_format_repeat_defined
-#define __local_format_repeat_defined 1
+#define __local_format_repeat_defined
 #include <__crt.h>
 #include <kos/anno.h>
 #include <bits/crt/format-printer.h>
@@ -72,7 +72,7 @@ __err:
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_format_repeat_defined
-#define __local___localdep_format_repeat_defined 1
+#define __local___localdep_format_repeat_defined
 #define __localdep_format_repeat __LIBC_LOCAL_NAME(format_repeat)
 #endif /* !__local___localdep_format_repeat_defined */
 #endif /* !__local_format_repeat_defined */

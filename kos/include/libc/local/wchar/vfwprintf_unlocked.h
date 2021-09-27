@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf2ce6430 */
+/* HASH CRC-32:0x7220574b */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_vfwprintf_unlocked_defined
-#define __local_vfwprintf_unlocked_defined 1
+#define __local_vfwprintf_unlocked_defined
 #include <__crt.h>
 #if defined(__CRT_HAVE_file_wprinter_unlocked) || defined(__CRT_HAVE_file_wprinter) || defined(__CRT_HAVE_fputwc_unlocked) || defined(__CRT_HAVE__fputwc_nolock)
 #include <features.h>
@@ -27,7 +27,7 @@
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_file_wprinter_unlocked_defined
-#define __local___localdep_file_wprinter_unlocked_defined 1
+#define __local___localdep_file_wprinter_unlocked_defined
 #ifdef __CRT_HAVE_file_wprinter_unlocked
 __CREDIRECT(__ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,__THROWING,__localdep_file_wprinter_unlocked,(void *__arg, __WCHAR_TYPE__ const *__restrict __data, __SIZE_TYPE__ __datalen),file_wprinter_unlocked,(__arg,__data,__datalen))
 #elif defined(__CRT_HAVE_file_wprinter)
@@ -42,7 +42,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_file_wprinter_unlocked_defined */
 #ifndef __local___localdep_format_vwprintf_defined
-#define __local___localdep_format_vwprintf_defined 1
+#define __local___localdep_format_vwprintf_defined
 #ifdef __CRT_HAVE_format_vwprintf
 __NAMESPACE_LOCAL_END
 #include <bits/crt/wformat-printer.h>
@@ -62,7 +62,7 @@ __LOCAL_LIBC(vfwprintf_unlocked) __ATTR_LIBC_WPRINTF(2, 0) __ATTR_NONNULL((1, 2)
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_vfwprintf_unlocked_defined
-#define __local___localdep_vfwprintf_unlocked_defined 1
+#define __local___localdep_vfwprintf_unlocked_defined
 #define __localdep_vfwprintf_unlocked __LIBC_LOCAL_NAME(vfwprintf_unlocked)
 #endif /* !__local___localdep_vfwprintf_unlocked_defined */
 #else /* __CRT_HAVE_file_wprinter_unlocked || __CRT_HAVE_file_wprinter || __CRT_HAVE_fputwc_unlocked || __CRT_HAVE__fputwc_nolock */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3345f4ea */
+/* HASH CRC-32:0xef799282 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_sigdescr_np_defined
-#define __local_sigdescr_np_defined 1
+#define __local_sigdescr_np_defined
 #include <__crt.h>
 #include <bits/types.h>
 #include <asm/os/signal.h>
@@ -263,7 +263,7 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(sigdescr_np))(__signo_t __signum) {
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_sigdescr_np_defined
-#define __local___localdep_sigdescr_np_defined 1
+#define __local___localdep_sigdescr_np_defined
 #define __localdep_sigdescr_np __LIBC_LOCAL_NAME(sigdescr_np)
 #endif /* !__local___localdep_sigdescr_np_defined */
 #endif /* !__local_sigdescr_np_defined */

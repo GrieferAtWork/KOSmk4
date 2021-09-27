@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x21ac025d */
+/* HASH CRC-32:0x44842690 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,12 +19,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local__aligned_msize_dbg_defined
-#define __local__aligned_msize_dbg_defined 1
+#define __local__aligned_msize_dbg_defined
 #include <__crt.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep__aligned_msize_defined
-#define __local___localdep__aligned_msize_defined 1
+#define __local___localdep__aligned_msize_defined
 #ifdef __CRT_HAVE__aligned_msize
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,__SIZE_TYPE__,__NOTHROW_NCX,__localdep__aligned_msize,(void *__aligned_mallptr, __SIZE_TYPE__ __min_alignment, __SIZE_TYPE__ __offset),_aligned_msize,(__aligned_mallptr,__min_alignment,__offset))
 #else /* __CRT_HAVE__aligned_msize */
@@ -40,7 +40,7 @@ __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(_aligned_msize_dbg))(void *__ptr, __S
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep__aligned_msize_dbg_defined
-#define __local___localdep__aligned_msize_dbg_defined 1
+#define __local___localdep__aligned_msize_dbg_defined
 #define __localdep__aligned_msize_dbg __LIBC_LOCAL_NAME(_aligned_msize_dbg)
 #endif /* !__local___localdep__aligned_msize_dbg_defined */
 #endif /* !__local__aligned_msize_dbg_defined */

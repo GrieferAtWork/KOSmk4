@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x14f48388 */
+/* HASH CRC-32:0x7f930d88 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,12 +19,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_ynf_defined
-#define __local_ynf_defined 1
+#define __local_ynf_defined
 #include <__crt.h>
 #if defined(__CRT_HAVE_yn) || defined(__CRT_HAVE___yn)
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_yn_defined
-#define __local___localdep_yn_defined 1
+#define __local___localdep_yn_defined
 #if __has_builtin(__builtin_yn) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_yn)
 __CEIREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_yn,(int __n, double __x),yn,{ return __builtin_yn(__n, __x); })
 #elif defined(__CRT_HAVE_yn)
@@ -41,7 +41,7 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(ynf))(int __n, float __x) {
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_ynf_defined
-#define __local___localdep_ynf_defined 1
+#define __local___localdep_ynf_defined
 #define __localdep_ynf __LIBC_LOCAL_NAME(ynf)
 #endif /* !__local___localdep_ynf_defined */
 #else /* __CRT_HAVE_yn || __CRT_HAVE___yn */

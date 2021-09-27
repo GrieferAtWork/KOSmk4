@@ -36,7 +36,7 @@ __DECL_BEGIN
 
 #ifdef __KERNEL__
 #ifndef __gfp_t_defined
-#define __gfp_t_defined 1
+#define __gfp_t_defined
 typedef unsigned int gfp_t;
 #endif /* !__gfp_t_defined */
 #endif /* __KERNEL__ */

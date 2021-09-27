@@ -155,49 +155,49 @@ __SYSDECL_BEGIN
 
 #if defined(__USE_XOPEN) || defined(__USE_XOPEN2K)
 #ifndef __dev_t_defined
-#define __dev_t_defined 1
+#define __dev_t_defined
 typedef __dev_t dev_t;
 #endif /* __dev_t_defined */
 
 #ifndef __gid_t_defined
-#define __gid_t_defined 1
+#define __gid_t_defined
 typedef __gid_t gid_t;
 #endif /* __gid_t_defined */
 
 #ifndef __ino_t_defined
-#define __ino_t_defined 1
+#define __ino_t_defined
 typedef __FS_TYPE(ino) ino_t;  /* INode number */
 #endif /* __ino_t_defined */
 
 #ifndef __mode_t_defined
-#define __mode_t_defined 1
+#define __mode_t_defined
 typedef __mode_t mode_t; /* INode type (Set of `S_*' from `<fcntl.h>' or `<sys/stat.h>') */
 #endif /* __mode_t_defined */
 
 #ifndef __nlink_t_defined
-#define __nlink_t_defined 1
+#define __nlink_t_defined
 typedef __nlink_t nlink_t;
 #endif /* __nlink_t_defined */
 
 #ifndef __off_t_defined
-#define __off_t_defined 1
+#define __off_t_defined
 typedef __FS_TYPE(off) off_t;
 #endif /* __off_t_defined */
 
 #ifndef __uid_t_defined
-#define __uid_t_defined 1
+#define __uid_t_defined
 typedef __uid_t uid_t;
 #endif /* __uid_t_defined */
 #endif /* __USE_XOPEN || __USE_XOPEN2K */
 
 #ifdef __USE_UNIX98
 #ifndef __blkcnt_t_defined
-#define __blkcnt_t_defined 1
+#define __blkcnt_t_defined
 typedef __FS_TYPE(blkcnt)   blkcnt_t;
 #endif /* __blkcnt_t_defined */
 
 #ifndef __blksize_t_defined
-#define __blksize_t_defined 1
+#define __blksize_t_defined
 typedef __blksize_t blksize_t;
 #endif /* __blksize_t_defined */
 #endif /* __USE_UNIX98 */

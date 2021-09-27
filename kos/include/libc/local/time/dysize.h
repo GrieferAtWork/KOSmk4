@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7aed30bd */
+/* HASH CRC-32:0x11f06773 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_dysize_defined
-#define __local_dysize_defined 1
+#define __local_dysize_defined
 #include <__crt.h>
 #include <features.h>
 #ifndef __isleap
@@ -32,7 +32,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(dysize))(__STDC_INT_AS_UINT_T __year)
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_dysize_defined
-#define __local___localdep_dysize_defined 1
+#define __local___localdep_dysize_defined
 #define __localdep_dysize __LIBC_LOCAL_NAME(dysize)
 #endif /* !__local___localdep_dysize_defined */
 #endif /* !__local_dysize_defined */

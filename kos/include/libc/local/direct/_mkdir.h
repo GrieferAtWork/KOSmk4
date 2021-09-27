@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4c7232d7 */
+/* HASH CRC-32:0xa444b348 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,12 +19,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local__mkdir_defined
-#define __local__mkdir_defined 1
+#define __local__mkdir_defined
 #include <__crt.h>
 #if defined(__CRT_HAVE_mkdir) || (defined(__CRT_DOS_PRIMARY) && defined(__CRT_HAVE__mkdir))
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_mkdir_defined
-#define __local___localdep_mkdir_defined 1
+#define __local___localdep_mkdir_defined
 #ifdef __CRT_HAVE_mkdir
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
@@ -45,7 +45,7 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(_mkdir))(char const *__path) {
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep__mkdir_defined
-#define __local___localdep__mkdir_defined 1
+#define __local___localdep__mkdir_defined
 #define __localdep__mkdir __LIBC_LOCAL_NAME(_mkdir)
 #endif /* !__local___localdep__mkdir_defined */
 #else /* __CRT_HAVE_mkdir || (__CRT_DOS_PRIMARY && __CRT_HAVE__mkdir) */

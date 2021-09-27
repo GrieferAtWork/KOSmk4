@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x641ac349 */
+/* HASH CRC-32:0x72fad730 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,13 +19,13 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_scalbf_defined
-#define __local_scalbf_defined 1
+#define __local_scalbf_defined
 #include <__crt.h>
 #include <ieee754.h>
 #if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_scalb) || defined(__CRT_HAVE__scalb) || defined(__CRT_HAVE___scalb) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_scalb_defined
-#define __local___localdep_scalb_defined 1
+#define __local___localdep_scalb_defined
 #if __has_builtin(__builtin_scalb) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_scalb)
 __CEIREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_scalb,(double __x, double __fn),scalb,{ return __builtin_scalb(__x, __fn); })
 #elif defined(__CRT_HAVE_scalb)
@@ -102,7 +102,7 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(scalbf))(float __x, float __fn) {
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_scalbf_defined
-#define __local___localdep_scalbf_defined 1
+#define __local___localdep_scalbf_defined
 #define __localdep_scalbf __LIBC_LOCAL_NAME(scalbf)
 #endif /* !__local___localdep_scalbf_defined */
 #else /* __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ || __CRT_HAVE_scalb || __CRT_HAVE__scalb || __CRT_HAVE___scalb || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */

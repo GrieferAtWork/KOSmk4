@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x14a5af22 */
+/* HASH CRC-32:0x75f058e4 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -57,12 +57,12 @@
 __SYSDECL_BEGIN
 
 #ifndef __size_t_defined
-#define __size_t_defined 1
+#define __size_t_defined
 typedef __SIZE_TYPE__ size_t;
 #endif /* !__size_t_defined */
 
 #ifndef __ssize_t_defined
-#define __ssize_t_defined 1
+#define __ssize_t_defined
 typedef __SSIZE_TYPE__ ssize_t;
 #endif /* !__ssize_t_defined */
 
@@ -79,7 +79,7 @@ typedef __SSIZE_TYPE__ ssize_t;
  *                the kernel's random data sink. */
 __CDECLARE_OPT(__ATTR_WUNUSED __ATTR_NONNULL((1)),ssize_t,__NOTHROW_NCX,getrandom,(void *__buf, size_t __num_bytes, unsigned int __flags),(__buf,__num_bytes,__flags))
 #ifndef __getentropy_defined
-#define __getentropy_defined 1
+#define __getentropy_defined
 #ifdef __CRT_HAVE_getentropy
 /* >> getentropy(3)
  * Similar   to   `getrandom(buf, num_bytes, GRND_RANDOM)',  however

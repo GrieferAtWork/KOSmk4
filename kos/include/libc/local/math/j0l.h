@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x84d38c72 */
+/* HASH CRC-32:0x7537729f */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,12 +19,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_j0l_defined
-#define __local_j0l_defined 1
+#define __local_j0l_defined
 #include <__crt.h>
 #if defined(__CRT_HAVE_j0) || defined(__CRT_HAVE___j0)
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_j0_defined
-#define __local___localdep_j0_defined 1
+#define __local___localdep_j0_defined
 #if __has_builtin(__builtin_j0) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_j0)
 __CEIREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_j0,(double __x),j0,{ return __builtin_j0(__x); })
 #elif defined(__CRT_HAVE_j0)
@@ -41,7 +41,7 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(j0l))(__LONGDOUBLE __x) {
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_j0l_defined
-#define __local___localdep_j0l_defined 1
+#define __local___localdep_j0l_defined
 #define __localdep_j0l __LIBC_LOCAL_NAME(j0l)
 #endif /* !__local___localdep_j0l_defined */
 #else /* __CRT_HAVE_j0 || __CRT_HAVE___j0 */

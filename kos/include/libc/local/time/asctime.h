@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8b9e080d */
+/* HASH CRC-32:0xfe97f819 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,11 +19,11 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_asctime_defined
-#define __local_asctime_defined 1
+#define __local_asctime_defined
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_asctime_r_defined
-#define __local___localdep_asctime_r_defined 1
+#define __local___localdep_asctime_r_defined
 #ifdef __CRT_HAVE_asctime_r
 __NAMESPACE_LOCAL_END
 #include <bits/crt/tm.h>
@@ -50,7 +50,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(asctime))(struct __NAMESPACE_STD_SYM 
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_asctime_defined
-#define __local___localdep_asctime_defined 1
+#define __local___localdep_asctime_defined
 #define __localdep_asctime __LIBC_LOCAL_NAME(asctime)
 #endif /* !__local___localdep_asctime_defined */
 #endif /* !__local_asctime_defined */

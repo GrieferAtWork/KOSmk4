@@ -30,7 +30,7 @@ __DECL_BEGIN
 #ifdef __CC__
 
 #ifndef __mkdtemp_defined
-#define __mkdtemp_defined 1
+#define __mkdtemp_defined
 #if defined(__CRT_HAVE_mkdtemp)
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,mkdtemp,(char *__template_),(__template_))
 #elif defined(__CRT_HAVE__mktemp)

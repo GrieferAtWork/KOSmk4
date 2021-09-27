@@ -34,7 +34,7 @@
 #endif /* !... */
 
 #if 0
-#define LIBSERVICE_WANT_PROTOTYPES 1
+#define LIBSERVICE_WANT_PROTOTYPES
 #endif
 
 #ifdef __LIBSERVICE_STATIC

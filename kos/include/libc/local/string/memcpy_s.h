@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x317f5e2e */
+/* HASH CRC-32:0xe47c2c9a */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_memcpy_s_defined
-#define __local_memcpy_s_defined 1
+#define __local_memcpy_s_defined
 #include <__crt.h>
 #include <bits/types.h>
 #include <libc/errno.h>
@@ -44,7 +44,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memcpy_s))(void *__dst, __SIZE_TYPE__
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_memcpy_s_defined
-#define __local___localdep_memcpy_s_defined 1
+#define __local___localdep_memcpy_s_defined
 #define __localdep_memcpy_s __LIBC_LOCAL_NAME(memcpy_s)
 #endif /* !__local___localdep_memcpy_s_defined */
 #endif /* !__local_memcpy_s_defined */

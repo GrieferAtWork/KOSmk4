@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x16e07704 */
+/* HASH CRC-32:0xf90239ec */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_fdatasync_defined
-#define __local_fdatasync_defined 1
+#define __local_fdatasync_defined
 #include <__crt.h>
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -31,7 +31,7 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(fdatasync))(__fd_t __fd) {
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_fdatasync_defined
-#define __local___localdep_fdatasync_defined 1
+#define __local___localdep_fdatasync_defined
 #define __localdep_fdatasync __LIBC_LOCAL_NAME(fdatasync)
 #endif /* !__local___localdep_fdatasync_defined */
 #endif /* !__local_fdatasync_defined */

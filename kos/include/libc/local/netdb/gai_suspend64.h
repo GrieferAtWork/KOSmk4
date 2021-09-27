@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3e3a5d75 */
+/* HASH CRC-32:0x3f922f9b */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,12 +19,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_gai_suspend64_defined
-#define __local_gai_suspend64_defined 1
+#define __local_gai_suspend64_defined
 #include <__crt.h>
 #ifdef __CRT_HAVE_gai_suspend
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_gai_suspend32_defined
-#define __local___localdep_gai_suspend32_defined 1
+#define __local___localdep_gai_suspend32_defined
 __CREDIRECT(,int,__NOTHROW_RPC,__localdep_gai_suspend32,(struct gaicb const *const __list[], int __ent, struct __timespec32 const *__timeout),gai_suspend,(__list,__ent,__timeout))
 #endif /* !__local___localdep_gai_suspend32_defined */
 __LOCAL_LIBC(gai_suspend64) int
@@ -38,7 +38,7 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(gai_suspend64))(struct gaicb const *c
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_gai_suspend64_defined
-#define __local___localdep_gai_suspend64_defined 1
+#define __local___localdep_gai_suspend64_defined
 #define __localdep_gai_suspend64 __LIBC_LOCAL_NAME(gai_suspend64)
 #endif /* !__local___localdep_gai_suspend64_defined */
 #else /* __CRT_HAVE_gai_suspend */

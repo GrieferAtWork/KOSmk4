@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8465ac80 */
+/* HASH CRC-32:0x564df71d */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,14 +19,14 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_fuzzy_wcsncasecmp_defined
-#define __local_fuzzy_wcsncasecmp_defined 1
+#define __local_fuzzy_wcsncasecmp_defined
 #include <__crt.h>
 #include <parts/malloca.h>
 #if defined(__CRT_HAVE_fuzzy_wmemcasecmp) || !defined(__NO_MALLOCA)
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_fuzzy_wmemcasecmp_defined
-#define __local___localdep_fuzzy_wmemcasecmp_defined 1
+#define __local___localdep_fuzzy_wmemcasecmp_defined
 #ifdef __CRT_HAVE_fuzzy_wmemcasecmp
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 3)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_fuzzy_wmemcasecmp,(__WCHAR_TYPE__ const *__s1, __SIZE_TYPE__ __s1_bytes, __WCHAR_TYPE__ const *__s2, __SIZE_TYPE__ __s2_bytes),fuzzy_wmemcasecmp,(__s1,__s1_bytes,__s2,__s2_bytes))
 #elif !defined(__NO_MALLOCA)
@@ -39,7 +39,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_fuzzy_wmemcasecmp_defined */
 #ifndef __local___localdep_wcsnlen_defined
-#define __local___localdep_wcsnlen_defined 1
+#define __local___localdep_wcsnlen_defined
 #ifdef __CRT_HAVE_wcsnlen
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_wcsnlen,(__WCHAR_TYPE__ const *__restrict __str, __SIZE_TYPE__ __maxlen),wcsnlen,(__str,__maxlen))
 #else /* __CRT_HAVE_wcsnlen */
@@ -55,7 +55,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(fuzzy_wcsncasecmp))(__WCHAR_TYPE__ co
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_fuzzy_wcsncasecmp_defined
-#define __local___localdep_fuzzy_wcsncasecmp_defined 1
+#define __local___localdep_fuzzy_wcsncasecmp_defined
 #define __localdep_fuzzy_wcsncasecmp __LIBC_LOCAL_NAME(fuzzy_wcsncasecmp)
 #endif /* !__local___localdep_fuzzy_wcsncasecmp_defined */
 #else /* __CRT_HAVE_fuzzy_wmemcasecmp || !__NO_MALLOCA */

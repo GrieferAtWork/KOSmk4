@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x47d01e2b */
+/* HASH CRC-32:0xa71ae304 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local___libc_current_sigrtmax_defined
-#define __local___libc_current_sigrtmax_defined 1
+#define __local___libc_current_sigrtmax_defined
 #include <__crt.h>
 #include <asm/os/signal.h>
 #ifdef __SIGRTMAX
@@ -31,7 +31,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(__libc_current_sigrtmax))(void) {
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep___libc_current_sigrtmax_defined
-#define __local___localdep___libc_current_sigrtmax_defined 1
+#define __local___localdep___libc_current_sigrtmax_defined
 #define __localdep___libc_current_sigrtmax __LIBC_LOCAL_NAME(__libc_current_sigrtmax)
 #endif /* !__local___localdep___libc_current_sigrtmax_defined */
 #else /* __SIGRTMAX */

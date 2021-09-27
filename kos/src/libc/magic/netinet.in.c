@@ -112,12 +112,12 @@
 __SYSDECL_BEGIN
 
 #ifndef __sa_family_t_defined
-#define __sa_family_t_defined 1
+#define __sa_family_t_defined
 typedef __sa_family_t sa_family_t; /* One of `AF_*' */
 #endif /* !__sa_family_t_defined */
 
 #ifndef __socklen_t_defined
-#define __socklen_t_defined 1
+#define __socklen_t_defined
 typedef __socklen_t socklen_t;
 #endif /* !__socklen_t_defined */
 

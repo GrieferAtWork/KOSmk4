@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4e9f749b */
+/* HASH CRC-32:0x96bbb9a4 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_fesetround_defined
-#define __local_fesetround_defined 1
+#define __local_fesetround_defined
 #include <__crt.h>
 #include <bits/crt/fenv-inline.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -29,7 +29,7 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(fesetround))(int __rounding_direction) {
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_fesetround_defined
-#define __local___localdep_fesetround_defined 1
+#define __local___localdep_fesetround_defined
 #define __localdep_fesetround __LIBC_LOCAL_NAME(fesetround)
 #endif /* !__local___localdep_fesetround_defined */
 #endif /* !__local_fesetround_defined */

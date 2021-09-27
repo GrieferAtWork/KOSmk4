@@ -36,7 +36,7 @@ __DECL_BEGIN
 #define	_TIME_T_DECLARED
 
 #ifndef __time_t_defined
-#define __time_t_defined 1
+#define __time_t_defined
 typedef __TM_TYPE(time) time_t;
 #endif /* !__time_t_defined */
 

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xad0bee8e */
+/* HASH CRC-32:0xd720dd01 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,12 +19,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_strxfrm_l_defined
-#define __local_strxfrm_l_defined 1
+#define __local_strxfrm_l_defined
 #include <__crt.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_strxfrm_defined
-#define __local___localdep_strxfrm_defined 1
+#define __local___localdep_strxfrm_defined
 #ifdef __CRT_HAVE_strxfrm
 __CREDIRECT(__ATTR_NONNULL((2)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_strxfrm,(char *__dst, char const *__restrict __src, __SIZE_TYPE__ __maxlen),strxfrm,(__dst,__src,__maxlen))
 #else /* __CRT_HAVE_strxfrm */
@@ -41,7 +41,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strxfrm_l))(char *__dst, char const *
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_strxfrm_l_defined
-#define __local___localdep_strxfrm_l_defined 1
+#define __local___localdep_strxfrm_l_defined
 #define __localdep_strxfrm_l __LIBC_LOCAL_NAME(strxfrm_l)
 #endif /* !__local___localdep_strxfrm_l_defined */
 #endif /* !__local_strxfrm_l_defined */

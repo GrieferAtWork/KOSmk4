@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x25789622 */
+/* HASH CRC-32:0x11ea72f5 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_twalk_defined
-#define __local_twalk_defined 1
+#define __local_twalk_defined
 #include <__crt.h>
 #ifndef __VISIT_defined
 #define __VISIT_defined
@@ -33,7 +33,7 @@ typedef enum {
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_twalk_r_defined
-#define __local___localdep_twalk_r_defined 1
+#define __local___localdep_twalk_r_defined
 #ifdef __CRT_HAVE_twalk_r
 __CREDIRECT_VOID(,__THROWING,__localdep_twalk_r,(void const *__root, void (__LIBCCALL *__action)(void const *__nodep, VISIT __value, int __level, void *__arg), void *__arg),twalk_r,(__root,__action,__arg))
 #else /* __CRT_HAVE_twalk_r */
@@ -47,7 +47,7 @@ __NAMESPACE_LOCAL_END
 #ifndef __LIBCCALL_CALLER_CLEANUP
 #ifndef ____invoke_twalk_action_helper_defined
 __NAMESPACE_LOCAL_BEGIN
-#define ____invoke_twalk_action_helper_defined 1
+#define ____invoke_twalk_action_helper_defined
 __LOCAL_LIBC(__invoke_twalk_action_helper) void
 (__LIBCCALL __invoke_twalk_action_helper)(void const *__nodep, VISIT __value, int __level, void *__arg) {
 	(*(void (__LIBCCALL *)(void const *, VISIT, int))__arg)(__nodep, __value, __level);
@@ -66,7 +66,7 @@ __LOCAL_LIBC(twalk) void
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_twalk_defined
-#define __local___localdep_twalk_defined 1
+#define __local___localdep_twalk_defined
 #define __localdep_twalk __LIBC_LOCAL_NAME(twalk)
 #endif /* !__local___localdep_twalk_defined */
 #endif /* !__local_twalk_defined */

@@ -35,9 +35,6 @@
 
 #ifdef __CC__
 __DECL_BEGIN
-
-#ifndef __std_tm_defined
-#define __std_tm_defined 1
 __NAMESPACE_STD_BEGIN
 struct tm {
 	int              tm_sec;      /* seconds [0, 61]. */
@@ -60,9 +57,6 @@ struct tm {
 #endif /* __CRT_KOS || __CRT_GLC */
 };
 __NAMESPACE_STD_END
-#endif /* !__std_tm_defined */
-
-
 __DECL_END
 #endif /* __CC__ */
 

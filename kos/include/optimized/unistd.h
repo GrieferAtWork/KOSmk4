@@ -28,7 +28,7 @@
 #include <__crt.h>
 #include <features.h>
 
-#define __fast_getpagesize_defined 1
+#define __fast_getpagesize_defined
 __DECL_BEGIN __NAMESPACE_FAST_BEGIN
 
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED

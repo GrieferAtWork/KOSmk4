@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x73f4ebea */
+/* HASH CRC-32:0xc39b97e1 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,12 +19,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_cfmakesane_defined
-#define __local_cfmakesane_defined 1
+#define __local_cfmakesane_defined
 #include <__crt.h>
 #include <bits/os/termios.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_memset_defined
-#define __local___localdep_memset_defined 1
+#define __local___localdep_memset_defined
 #ifdef __CRT_HAVE_memset
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
@@ -237,7 +237,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(cfmakesane))(struct termios *__restri
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_cfmakesane_defined
-#define __local___localdep_cfmakesane_defined 1
+#define __local___localdep_cfmakesane_defined
 #define __localdep_cfmakesane __LIBC_LOCAL_NAME(cfmakesane)
 #endif /* !__local___localdep_cfmakesane_defined */
 #endif /* !__local_cfmakesane_defined */

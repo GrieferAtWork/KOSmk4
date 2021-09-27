@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7e33d01f */
+/* HASH CRC-32:0xe4dbe7ff */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_c32ftime_defined
-#define __local_c32ftime_defined 1
+#define __local_c32ftime_defined
 #include <__crt.h>
 #include <hybrid/typecore.h>
 #include <bits/crt/tm.h>
@@ -35,7 +35,7 @@ __NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(c32ftime))(__CHAR32_TYPE__ *__restric
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_c32ftime_defined
-#define __local___localdep_c32ftime_defined 1
+#define __local___localdep_c32ftime_defined
 #define __localdep_c32ftime __LIBC_LOCAL_NAME(c32ftime)
 #endif /* !__local___localdep_c32ftime_defined */
 #endif /* !__local_c32ftime_defined */

@@ -79,7 +79,7 @@
 #else /* __USE_TIME64 */
 #define __itimerspec64 itimerspec
 #endif /* !__USE_TIME64 */
-#define __itimerspec_defined 1
+#define __itimerspec_defined
 #endif /* __x86_64__ */
 /*[[[end]]]*/
 

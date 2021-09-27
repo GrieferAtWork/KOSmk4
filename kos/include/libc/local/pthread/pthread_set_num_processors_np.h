@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4667076f */
+/* HASH CRC-32:0xce2ef159 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,13 +19,13 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_pthread_set_num_processors_np_defined
-#define __local_pthread_set_num_processors_np_defined 1
+#define __local_pthread_set_num_processors_np_defined
 #include <__crt.h>
 #ifdef __CRT_HAVE_sched_setaffinity
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_sched_setaffinity_defined
-#define __local___localdep_sched_setaffinity_defined 1
+#define __local___localdep_sched_setaffinity_defined
 __NAMESPACE_LOCAL_END
 #include <bits/os/cpu_set.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -58,7 +58,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(pthread_set_num_processors_np))(int _
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_pthread_set_num_processors_np_defined
-#define __local___localdep_pthread_set_num_processors_np_defined 1
+#define __local___localdep_pthread_set_num_processors_np_defined
 #define __localdep_pthread_set_num_processors_np __LIBC_LOCAL_NAME(pthread_set_num_processors_np)
 #endif /* !__local___localdep_pthread_set_num_processors_np_defined */
 #else /* __CRT_HAVE_sched_setaffinity */

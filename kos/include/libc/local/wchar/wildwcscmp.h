@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x18025cf2 */
+/* HASH CRC-32:0x2c5bba88 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_wildwcscmp_defined
-#define __local_wildwcscmp_defined 1
+#define __local_wildwcscmp_defined
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(wildwcscmp) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) int
@@ -66,7 +66,7 @@ __next:
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_wildwcscmp_defined
-#define __local___localdep_wildwcscmp_defined 1
+#define __local___localdep_wildwcscmp_defined
 #define __localdep_wildwcscmp __LIBC_LOCAL_NAME(wildwcscmp)
 #endif /* !__local___localdep_wildwcscmp_defined */
 #endif /* !__local_wildwcscmp_defined */

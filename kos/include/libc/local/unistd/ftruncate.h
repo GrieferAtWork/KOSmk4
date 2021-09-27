@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd6e10135 */
+/* HASH CRC-32:0x82ed4646 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_ftruncate_defined
-#define __local_ftruncate_defined 1
+#define __local_ftruncate_defined
 #include <__crt.h>
 #include <bits/types.h>
 #if defined(__CRT_HAVE_ftruncate64) || defined(__CRT_HAVE__chsize_s) || defined(__CRT_HAVE_ftruncate)
@@ -35,11 +35,11 @@
 #endif /* !__PIO_OFFSET */
 __NAMESPACE_LOCAL_BEGIN
 #if !defined(__local___localdep_ftruncate32_defined) && defined(__CRT_HAVE_ftruncate)
-#define __local___localdep_ftruncate32_defined 1
+#define __local___localdep_ftruncate32_defined
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_ftruncate32,(__fd_t __fd, __pos32_t __length),ftruncate,(__fd,__length))
 #endif /* !__local___localdep_ftruncate32_defined && __CRT_HAVE_ftruncate */
 #ifndef __local___localdep_ftruncate64_defined
-#define __local___localdep_ftruncate64_defined 1
+#define __local___localdep_ftruncate64_defined
 #if defined(__CRT_HAVE_ftruncate) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_ftruncate64,(__fd_t __fd, __PIO_OFFSET64 __length),ftruncate,(__fd,__length))
 #elif defined(__CRT_HAVE_ftruncate64)
@@ -65,7 +65,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(ftruncate))(__fd_t __fd, __PIO_OFFSET
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_ftruncate_defined
-#define __local___localdep_ftruncate_defined 1
+#define __local___localdep_ftruncate_defined
 #define __localdep_ftruncate __LIBC_LOCAL_NAME(ftruncate)
 #endif /* !__local___localdep_ftruncate_defined */
 #else /* __CRT_HAVE_ftruncate64 || __CRT_HAVE__chsize_s || __CRT_HAVE_ftruncate */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x146df3a7 */
+/* HASH CRC-32:0xef1eb575 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,12 +19,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local__fdpcomp_defined
-#define __local__fdpcomp_defined 1
+#define __local__fdpcomp_defined
 #include <__crt.h>
 #ifdef __CRT_HAVE__dpcomp
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep__dpcomp_defined
-#define __local___localdep__dpcomp_defined 1
+#define __local___localdep__dpcomp_defined
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep__dpcomp,(double __x, double __y),_dpcomp,(__x,__y))
 #endif /* !__local___localdep__dpcomp_defined */
 __LOCAL_LIBC(_fdpcomp) __ATTR_CONST __ATTR_WUNUSED int
@@ -33,7 +33,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_fdpcomp))(float __x, float __y) {
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep__fdpcomp_defined
-#define __local___localdep__fdpcomp_defined 1
+#define __local___localdep__fdpcomp_defined
 #define __localdep__fdpcomp __LIBC_LOCAL_NAME(_fdpcomp)
 #endif /* !__local___localdep__fdpcomp_defined */
 #else /* __CRT_HAVE__dpcomp */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x743f46c */
+/* HASH CRC-32:0x669b607d */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,7 +30,7 @@
 __SYSDECL_BEGIN
 
 #ifndef ____libc_core___errno_location_defined
-#define ____libc_core___errno_location_defined 1
+#define ____libc_core___errno_location_defined
 #ifdef __CRT_HAVE___errno_location
 #include <bits/types.h>
 /* >> __errno_location(3) */

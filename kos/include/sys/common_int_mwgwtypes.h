@@ -29,7 +29,7 @@
 __DECL_BEGIN
 
 #ifndef __int_least8_t_defined
-#define __int_least8_t_defined 1
+#define __int_least8_t_defined
 typedef __INT_LEAST8_TYPE__   int_least8_t;
 typedef __INT_LEAST16_TYPE__  int_least16_t;
 typedef __INT_LEAST32_TYPE__  int_least32_t;
@@ -43,7 +43,7 @@ typedef __UINT_LEAST64_TYPE__ uint_least64_t;
 #endif /* !__int_least8_t_defined */
 
 #ifndef __int_fast8_t_defined
-#define __int_fast8_t_defined 1
+#define __int_fast8_t_defined
 typedef __INT_FAST8_TYPE__   int_fast8_t;
 typedef __INT_FAST16_TYPE__  int_fast16_t;
 typedef __UINT_FAST8_TYPE__  uint_fast8_t;
@@ -57,7 +57,7 @@ typedef __UINT_FAST64_TYPE__ uint_fast64_t;
 #endif /* !__int_fast8_t_defined */
 
 #ifndef __intmax_t_defined
-#define __intmax_t_defined 1
+#define __intmax_t_defined
 typedef __INTMAX_TYPE__  intmax_t;
 typedef __UINTMAX_TYPE__ uintmax_t;
 #endif /* !__intmax_t_defined */

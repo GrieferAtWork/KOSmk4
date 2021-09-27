@@ -61,11 +61,11 @@ __SYSDECL_BEGIN
 
 __NAMESPACE_STD_BEGIN
 #ifndef __std_fenv_t_defined
-#define __std_fenv_t_defined 1
+#define __std_fenv_t_defined
 typedef struct __fenv_struct fenv_t;
 #endif /* !__std_fenv_t_defined */
 #ifndef __std_fexcept_t_defined
-#define __std_fexcept_t_defined 1
+#define __std_fexcept_t_defined
 typedef __fexcept_t fexcept_t;
 #endif /* !__std_fexcept_t_defined */
 __NAMESPACE_STD_END
@@ -73,11 +73,11 @@ __NAMESPACE_STD_END
 #ifndef __CXX_SYSTEM_HEADER
 }%(c, ccompat){
 #ifndef ___fenv_t_defined
-#define ___fenv_t_defined 1
+#define ___fenv_t_defined
 __NAMESPACE_STD_USING(fenv_t)
 #endif /* !___fenv_t_defined */
 #ifndef __fexcept_t_defined
-#define __fexcept_t_defined 1
+#define __fexcept_t_defined
 __NAMESPACE_STD_USING(fexcept_t)
 #endif /* !__fexcept_t_defined */
 }%{

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x47bd32cc */
+/* HASH CRC-32:0xf841f408 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -66,7 +66,7 @@
 __SYSDECL_BEGIN
 
 #if !defined(__humanize_number_defined) && defined(__CRT_HAVE_humanize_number)
-#define __humanize_number_defined 1
+#define __humanize_number_defined
 /* >> humanize_number(3), dehumanize_number(3)
  * @param: scale: Set of `HN_GETSCALE | HN_AUTOSCALE'
  * @param: flags: Set of `HN_DECIMAL | HN_NOSPACE | HN_B | HN_DIVISOR_1000 | HN_IEC_PREFIXES' */

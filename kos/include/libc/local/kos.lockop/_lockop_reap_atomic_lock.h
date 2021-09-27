@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfbb0e752 */
+/* HASH CRC-32:0xbf55c92e */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local__lockop_reap_atomic_lock_defined
-#define __local__lockop_reap_atomic_lock_defined 1
+#define __local__lockop_reap_atomic_lock_defined
 #include <__crt.h>
 #include <kos/anno.h>
 #ifndef __LOCKOP_CC
@@ -45,7 +45,7 @@ __NOTHROW(__LOCKOP_CC __LIBC_LOCAL_NAME(_lockop_reap_atomic_lock))(struct lockop
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep__lockop_reap_atomic_lock_defined
-#define __local___localdep__lockop_reap_atomic_lock_defined 1
+#define __local___localdep__lockop_reap_atomic_lock_defined
 #define __localdep__lockop_reap_atomic_lock __LIBC_LOCAL_NAME(_lockop_reap_atomic_lock)
 #endif /* !__local___localdep__lockop_reap_atomic_lock_defined */
 #endif /* !__local__lockop_reap_atomic_lock_defined */

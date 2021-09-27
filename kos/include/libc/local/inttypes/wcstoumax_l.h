@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3a0a1989 */
+/* HASH CRC-32:0x83b7d887 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,13 +19,13 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_wcstoumax_l_defined
-#define __local_wcstoumax_l_defined 1
+#define __local_wcstoumax_l_defined
 #include <__crt.h>
 #include <features.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_wcstoumax_defined
-#define __local___localdep_wcstoumax_defined 1
+#define __local___localdep_wcstoumax_defined
 #ifdef __CRT_HAVE_wcstoumax
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__UINTMAX_TYPE__,__NOTHROW_NCX,__localdep_wcstoumax,(__WCHAR_TYPE__ const *__restrict __nptr, __WCHAR_TYPE__ **__endptr, __STDC_INT_AS_UINT_T __base),wcstoumax,(__nptr,__endptr,__base))
 #elif defined(__CRT_HAVE_wcstoul) && __SIZEOF_INTMAX_T__ == __SIZEOF_LONG__
@@ -64,7 +64,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcstoumax_l))(__WCHAR_TYPE__ const *_
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_wcstoumax_l_defined
-#define __local___localdep_wcstoumax_l_defined 1
+#define __local___localdep_wcstoumax_l_defined
 #define __localdep_wcstoumax_l __LIBC_LOCAL_NAME(wcstoumax_l)
 #endif /* !__local___localdep_wcstoumax_l_defined */
 #endif /* !__local_wcstoumax_l_defined */

@@ -38,12 +38,12 @@ __DECL_BEGIN
 #define _TIMEVAL_DEFINED
 
 #ifndef __time_t_defined
-#define __time_t_defined 1
+#define __time_t_defined
 typedef __TM_TYPE(time) time_t;
 #endif /* !__time_t_defined */
 
 #ifndef __suseconds_t_defined
-#define __suseconds_t_defined 1
+#define __suseconds_t_defined
 typedef __suseconds_t suseconds_t;
 #endif /* !__suseconds_t_defined */
 

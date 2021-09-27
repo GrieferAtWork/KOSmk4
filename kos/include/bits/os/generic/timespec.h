@@ -79,8 +79,6 @@ __DECL_BEGIN
 
 __TIMESPEC_CXX_DECL_BEGIN
 
-#ifndef __timespec_defined
-#define __timespec_defined 1
 struct timespec /*[PREFIX(tv_)]*/ {
 	__TM_TYPE(time)   tv_sec;   /* Seconds */
 #if __TM_SIZEOF(TIME) <= 4 && __SIZEOF_SYSCALL_LONG_T__ > 4
@@ -99,21 +97,17 @@ struct timespec /*[PREFIX(tv_)]*/ {
 	__TIMESPEC_CXX_SUPPORT(struct timespec, __TM_TYPE(time), __syscall_ulong_t)
 };
 __TIMESPEC_CXX_SUPPORT2(struct timespec, __TM_TYPE(time), __syscall_ulong_t)
-#endif /* !__timespec_defined */
 
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 #define _TIMESPEC_MATCHES_TIMESPEC64 1
 #endif /* __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ */
 
 #ifdef __USE_TIME64
-#ifndef __timespec64_defined
-#define __timespec64_defined 1
 #if (defined(__USE_TIME_BITS64) || defined(_TIMESPEC_MATCHES_TIMESPEC64)) && defined(__USE_STRUCT64_MACRO)
 #define timespec64 timespec
 #else /* (__USE_TIME_BITS64 || _TIMESPEC_MATCHES_TIMESPEC64) && __USE_STRUCT64_MACRO */
 #define __timespec64 timespec64
 #endif /* (!__USE_TIME_BITS64 && !_TIMESPEC_MATCHES_TIMESPEC64) || !__USE_STRUCT64_MACRO */
-#endif /* !__timespec64_defined */
 #endif /* __USE_TIME64 */
 
 #if (defined(__USE_TIME_BITS64) || defined(_TIMESPEC_MATCHES_TIMESPEC64)) && defined(__USE_STRUCT64_MACRO)
@@ -140,14 +134,11 @@ __TIMESPEC_CXX_SUPPORT2(struct __timespec64, __time64_t, __syscall_ulong_t)
 #endif /* (!__USE_TIME_BITS64 && !_TIMESPEC_MATCHES_TIMESPEC64) || !__USE_STRUCT64_MACRO */
 
 #ifdef __USE_KOS
-#ifndef __timespec32_defined
-#define __timespec32_defined 1
 #if !defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 #define timespec32 timespec
 #else /* !__USE_TIME_BITS64 || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ */
 #define __timespec32 timespec32
 #endif /* __USE_TIME_BITS64 && __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
-#endif /* !__timespec32_defined */
 #endif /* __USE_KOS */
 
 #if !defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__

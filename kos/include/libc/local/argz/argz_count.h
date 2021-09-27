@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3b143c2f */
+/* HASH CRC-32:0xb18cecda */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,12 +19,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_argz_count_defined
-#define __local_argz_count_defined 1
+#define __local_argz_count_defined
 #include <__crt.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_strlen_defined
-#define __local___localdep_strlen_defined 1
+#define __local___localdep_strlen_defined
 #ifdef __CRT_HAVE_strlen
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_strlen,(char const *__restrict __str),strlen,(__str))
 #else /* __CRT_HAVE_strlen */
@@ -52,7 +52,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(argz_count))(char const *__argz, __SI
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_argz_count_defined
-#define __local___localdep_argz_count_defined 1
+#define __local___localdep_argz_count_defined
 #define __localdep_argz_count __LIBC_LOCAL_NAME(argz_count)
 #endif /* !__local___localdep_argz_count_defined */
 #endif /* !__local_argz_count_defined */

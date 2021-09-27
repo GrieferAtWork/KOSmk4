@@ -70,7 +70,7 @@ struct stat;
 struct vfs;
 
 #ifndef __fsmode_t_defined
-#define __fsmode_t_defined 1
+#define __fsmode_t_defined
 typedef uintptr_t fsmode_t; /* Set of `FS_MODE_F*' */
 #endif /* !__fsmode_t_defined */
 
@@ -912,7 +912,7 @@ DATDEF struct mfile_ops inode_datablock_type;
 
 
 #ifndef ____devfs_datablock_defined
-#define ____devfs_datablock_defined 1
+#define ____devfs_datablock_defined
 DATDEF struct mfile __devfs_datablock ASMNAME("devfs");
 
 /* Devfs locking functions */

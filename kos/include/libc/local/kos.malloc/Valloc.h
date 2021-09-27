@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2cd0f97a */
+/* HASH CRC-32:0x41148966 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,18 +19,18 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_Valloc_defined
-#define __local_Valloc_defined 1
+#define __local_Valloc_defined
 #include <__crt.h>
 #ifdef __CRT_HAVE_Memalign
 #include <kos/anno.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_Memalign_defined
-#define __local___localdep_Memalign_defined 1
+#define __local___localdep_Memalign_defined
 __CREDIRECT(__ATTR_MALLOC __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_ALLOC_ALIGN(1) __ATTR_ALLOC_SIZE((2)),void *,__THROWING,__localdep_Memalign,(__SIZE_TYPE__ __alignment, __SIZE_TYPE__ __num_bytes),Memalign,(__alignment,__num_bytes))
 #endif /* !__local___localdep_Memalign_defined */
 #ifndef __local___localdep_getpagesize_defined
-#define __local___localdep_getpagesize_defined 1
+#define __local___localdep_getpagesize_defined
 __NAMESPACE_LOCAL_END
 #include <asm/pagesize.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -64,7 +64,7 @@ __LOCAL_LIBC(Valloc) __ATTR_MALLOC __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_MALL_
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_Valloc_defined
-#define __local___localdep_Valloc_defined 1
+#define __local___localdep_Valloc_defined
 #define __localdep_Valloc __LIBC_LOCAL_NAME(Valloc)
 #endif /* !__local___localdep_Valloc_defined */
 #else /* __CRT_HAVE_Memalign */

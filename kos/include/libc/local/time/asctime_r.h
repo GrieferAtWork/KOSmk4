@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7f5b2c89 */
+/* HASH CRC-32:0x1e83e095 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,16 +19,16 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_asctime_r_defined
-#define __local_asctime_r_defined 1
+#define __local_asctime_r_defined
 #include <__crt.h>
 #include <bits/crt/tm.h>
 __NAMESPACE_LOCAL_BEGIN
 #if !defined(__local___localdep_crt_asctime_s_defined) && defined(__CRT_HAVE_asctime_s)
-#define __local___localdep_crt_asctime_s_defined 1
+#define __local___localdep_crt_asctime_s_defined
 __CREDIRECT(__ATTR_NONNULL((1, 3)),__errno_t,__NOTHROW_NCX,__localdep_crt_asctime_s,(char *__restrict __buf, __SIZE_TYPE__ __buflen, struct __NAMESPACE_STD_SYM tm const *__restrict __tp),asctime_s,(__buf,__buflen,__tp))
 #endif /* !__local___localdep_crt_asctime_s_defined && __CRT_HAVE_asctime_s */
 #ifndef __local___localdep_sprintf_defined
-#define __local___localdep_sprintf_defined 1
+#define __local___localdep_sprintf_defined
 #if __has_builtin(__builtin_sprintf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_sprintf) && __has_builtin(__builtin_va_arg_pack)
 __NAMESPACE_LOCAL_END
 #include <features.h>
@@ -90,7 +90,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(asctime_r))(struct __NAMESPACE_STD_SY
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_asctime_r_defined
-#define __local___localdep_asctime_r_defined 1
+#define __local___localdep_asctime_r_defined
 #define __localdep_asctime_r __LIBC_LOCAL_NAME(asctime_r)
 #endif /* !__local___localdep_asctime_r_defined */
 #endif /* !__local_asctime_r_defined */

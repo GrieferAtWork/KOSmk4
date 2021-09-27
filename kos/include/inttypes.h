@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x11b2b494 */
+/* HASH CRC-32:0xe2416cbb */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -45,7 +45,7 @@
 #else /* __CXX_SYSTEM_HEADER */
 /* Import all symbols into the global namespace when re-including "inttypes.h" after "cinttypes" */
 #ifndef __imaxdiv_t_defined
-#define __imaxdiv_t_defined 1
+#define __imaxdiv_t_defined
 __NAMESPACE_STD_USING(imaxdiv_t)
 #endif /* !__imaxdiv_t_defined */
 __NAMESPACE_STD_USING(imaxabs)
@@ -475,7 +475,7 @@ __NAMESPACE_STD_USING(wcstoumax)
 __SYSDECL_BEGIN
 
 #ifndef ____imaxdiv_struct_defined
-#define ____imaxdiv_struct_defined 1
+#define ____imaxdiv_struct_defined
 #ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
 #pragma push_macro("quot")
 #pragma push_macro("rem")
@@ -493,7 +493,7 @@ struct __imaxdiv_struct {
 #endif /* !____imaxdiv_struct_defined */
 
 #ifndef __std_imaxdiv_t_defined
-#define __std_imaxdiv_t_defined 1
+#define __std_imaxdiv_t_defined
 __NAMESPACE_STD_BEGIN
 typedef struct __imaxdiv_struct imaxdiv_t;
 __NAMESPACE_STD_END
@@ -501,7 +501,7 @@ __NAMESPACE_STD_END
 
 #ifndef __CXX_SYSTEM_HEADER
 #ifndef __imaxdiv_t_defined
-#define __imaxdiv_t_defined 1
+#define __imaxdiv_t_defined
 __NAMESPACE_STD_USING(imaxdiv_t)
 #endif /* !__imaxdiv_t_defined */
 #endif /* !__CXX_SYSTEM_HEADER */
@@ -881,7 +881,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(wcstoumax_l, __FORCELOCAL __ATTR_ARTIFICIAL __AT
 
 #ifdef __USE_NETBSD
 #ifndef __strtoi_defined
-#define __strtoi_defined 1
+#define __strtoi_defined
 #ifdef __CRT_HAVE_strtoi
 /* >> strtoi(3), strtou(3), strtoi_l(3), strtou_l(3)
  * Safely convert `nptr'  to an integer  which is then  returned.
@@ -912,7 +912,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(strtoi, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LE
 #endif /* !__CRT_HAVE_strtoi */
 #endif /* !__strtoi_defined */
 #ifndef __strtou_defined
-#define __strtou_defined 1
+#define __strtou_defined
 #ifdef __CRT_HAVE_strtou
 /* >> strtoi(3), strtou(3), strtoi_l(3), strtou_l(3)
  * Safely convert `nptr'  to an integer  which is then  returned.
@@ -1135,7 +1135,7 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_NONNULL((1)) __UINTMAX_TYPE__ 
 
 #ifndef __INTELLISENSE__
 #ifndef ____gwchar_t_defined
-#define ____gwchar_t_defined 1
+#define ____gwchar_t_defined
 #define __gwchar_t __WCHAR_TYPE__
 #endif /* !____gwchar_t_defined */
 #endif /* !__INTELLISENSE__ */
@@ -1150,7 +1150,7 @@ __SYSDECL_END
 #endif /* __USE_UTF */
 
 #ifdef __CXX_SYSTEM_HEADER
-#define _CXX_STDONLY_CINTTYPES 1
+#define _CXX_STDONLY_CINTTYPES
 #undef _INTTYPES_H
 #endif /* __CXX_SYSTEM_HEADER */
 #endif /* !_CXX_STDONLY_CINTTYPES */

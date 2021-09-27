@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2de48cf0 */
+/* HASH CRC-32:0xcab26405 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_error_as_errno_defined
-#define __local_error_as_errno_defined 1
+#define __local_error_as_errno_defined
 #include <__crt.h>
 #include <bits/types.h>
 struct exception_data;
@@ -591,7 +591,7 @@ for (local name: classes.keys.sorted()) {
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_error_as_errno_defined
-#define __local___localdep_error_as_errno_defined 1
+#define __local___localdep_error_as_errno_defined
 #define __localdep_error_as_errno __LIBC_LOCAL_NAME(error_as_errno)
 #endif /* !__local___localdep_error_as_errno_defined */
 #endif /* !__local_error_as_errno_defined */

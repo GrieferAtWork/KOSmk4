@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2ffb2377 */
+/* HASH CRC-32:0x4b2d4a29 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_wctob_defined
-#define __local_wctob_defined 1
+#define __local_wctob_defined
 #include <__crt.h>
 #include <hybrid/typecore.h>
 #include <asm/crt/stdio.h>
@@ -32,7 +32,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wctob))(__WINT_TYPE__ __ch) {
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_wctob_defined
-#define __local___localdep_wctob_defined 1
+#define __local___localdep_wctob_defined
 #define __localdep_wctob __LIBC_LOCAL_NAME(wctob)
 #endif /* !__local___localdep_wctob_defined */
 #endif /* !__local_wctob_defined */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x71101fc4 */
+/* HASH CRC-32:0x16133457 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_vc32scanf_defined
-#define __local_vc32scanf_defined 1
+#define __local_vc32scanf_defined
 #include <__crt.h>
 #if ((defined(__CRT_HAVE_vfwscanf) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)) || defined(__CRT_HAVE_KOS$vfwscanf)) && !defined(__NO_STDSTREAMS)
 #include <features.h>
@@ -27,7 +27,7 @@
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_vfc32scanf_defined
-#define __local___localdep_vfc32scanf_defined 1
+#define __local___localdep_vfc32scanf_defined
 #if defined(__CRT_HAVE_vfwscanf) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
 __CREDIRECT(__ATTR_WUNUSED __ATTR_LIBC_WSCANF(2, 0) __ATTR_NONNULL((1, 2)),__STDC_INT_AS_SIZE_T,__THROWING,__localdep_vfc32scanf,(__FILE *__restrict __stream, __CHAR32_TYPE__ const *__restrict __format, __builtin_va_list __args),vfwscanf,(__stream,__format,__args))
 #elif defined(__CRT_HAVE_KOS$vfwscanf)
@@ -45,7 +45,7 @@ __LOCAL_LIBC(vc32scanf) __ATTR_WUNUSED __ATTR_LIBC_WSCANF(1, 0) __ATTR_NONNULL((
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_vc32scanf_defined
-#define __local___localdep_vc32scanf_defined 1
+#define __local___localdep_vc32scanf_defined
 #define __localdep_vc32scanf __LIBC_LOCAL_NAME(vc32scanf)
 #endif /* !__local___localdep_vc32scanf_defined */
 #else /* ((__CRT_HAVE_vfwscanf && __SIZEOF_WCHAR_T__ == 4 && __LIBCCALL_IS_LIBKCALL) || __CRT_HAVE_KOS$vfwscanf) && !__NO_STDSTREAMS */

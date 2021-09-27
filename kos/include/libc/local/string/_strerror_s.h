@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x75b6d90a */
+/* HASH CRC-32:0xac5fc9d7 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,14 +19,14 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local__strerror_s_defined
-#define __local__strerror_s_defined 1
+#define __local__strerror_s_defined
 #include <__crt.h>
 #include <libc/errno.h>
 #ifdef __libc_geterrno
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_snprintf_defined
-#define __local___localdep_snprintf_defined 1
+#define __local___localdep_snprintf_defined
 #if __has_builtin(__builtin_snprintf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_snprintf) && __has_builtin(__builtin_va_arg_pack)
 __NAMESPACE_LOCAL_END
 #include <features.h>
@@ -47,7 +47,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_snprintf_defined */
 #ifndef __local___localdep_strerrordesc_np_defined
-#define __local___localdep_strerrordesc_np_defined 1
+#define __local___localdep_strerrordesc_np_defined
 #ifdef __CRT_HAVE_strerrordesc_np
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,char const *,__NOTHROW,__localdep_strerrordesc_np,(__errno_t __errnum),strerrordesc_np,(__errnum))
 #else /* __CRT_HAVE_strerrordesc_np */
@@ -80,7 +80,7 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(_strerror_s))(char *__restrict __buf,
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep__strerror_s_defined
-#define __local___localdep__strerror_s_defined 1
+#define __local___localdep__strerror_s_defined
 #define __localdep__strerror_s __LIBC_LOCAL_NAME(_strerror_s)
 #endif /* !__local___localdep__strerror_s_defined */
 #else /* __libc_geterrno */

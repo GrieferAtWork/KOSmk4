@@ -27,7 +27,7 @@
 #ifndef __ptrdiff_t_defined
 #include <hybrid/typecore.h>
 #ifndef __ptrdiff_t_defined
-#define __ptrdiff_t_defined 1
+#define __ptrdiff_t_defined
 #ifdef __CC__
 __DECL_BEGIN
 typedef __PTRDIFF_TYPE__ ptrdiff_t;

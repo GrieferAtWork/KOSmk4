@@ -66,13 +66,13 @@ struct iov_buffer;
 struct iov_physbuffer;
 
 #ifndef __mpart_slist_defined
-#define __mpart_slist_defined 1
+#define __mpart_slist_defined
 SLIST_HEAD(mpart_slist, mpart);
 #endif /* !__mpart_slist_defined */
 
 /* Block-index within some given mem-file. */
 #ifndef __mfile_block_t_defined
-#define __mfile_block_t_defined 1
+#define __mfile_block_t_defined
 typedef pos_t mfile_block_t;
 #endif /* !__mfile_block_t_defined */
 
@@ -87,7 +87,7 @@ typedef pos_t mfile_block_t;
 
 
 #ifndef __poll_mode_t_defined
-#define __poll_mode_t_defined 1
+#define __poll_mode_t_defined
 typedef unsigned int poll_mode_t; /* Set of `POLL*' */
 #endif /* !poll_mode_t_defined */
 

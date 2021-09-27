@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4656e7e0 */
+/* HASH CRC-32:0x87184353 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_preadall64_defined
-#define __local_preadall64_defined 1
+#define __local_preadall64_defined
 #include <__crt.h>
 #include <bits/types.h>
 #include <asm/os/stdio.h>
@@ -27,7 +27,7 @@
 #if defined(__CRT_HAVE_pread64) || defined(__CRT_HAVE___pread64) || defined(__CRT_HAVE_pread) || ((defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseeki64) || defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek)) && (defined(__CRT_HAVE_read) || defined(__CRT_HAVE__read) || defined(__CRT_HAVE___read)) && defined(__SEEK_CUR) && defined(__SEEK_SET))
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_pread64_defined
-#define __local___localdep_pread64_defined 1
+#define __local___localdep_pread64_defined
 #if defined(__CRT_HAVE_pread) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
 __NAMESPACE_LOCAL_END
 #ifndef __PIO_OFFSET
@@ -100,7 +100,7 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(preadall64))(__fd_t __fd, void *__buf
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_preadall64_defined
-#define __local___localdep_preadall64_defined 1
+#define __local___localdep_preadall64_defined
 #define __localdep_preadall64 __LIBC_LOCAL_NAME(preadall64)
 #endif /* !__local___localdep_preadall64_defined */
 #else /* __CRT_HAVE_pread64 || __CRT_HAVE___pread64 || __CRT_HAVE_pread || ((__CRT_HAVE_lseek64 || __CRT_HAVE__lseeki64 || __CRT_HAVE_lseek || __CRT_HAVE__lseek || __CRT_HAVE___lseek) && (__CRT_HAVE_read || __CRT_HAVE__read || __CRT_HAVE___read) && __SEEK_CUR && __SEEK_SET) */

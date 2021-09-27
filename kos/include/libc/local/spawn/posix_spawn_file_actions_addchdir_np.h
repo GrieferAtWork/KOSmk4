@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4f028855 */
+/* HASH CRC-32:0xaa54521 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_posix_spawn_file_actions_addchdir_np_defined
-#define __local_posix_spawn_file_actions_addchdir_np_defined 1
+#define __local_posix_spawn_file_actions_addchdir_np_defined
 #include <__crt.h>
 #include <asm/crt/posix_spawn.h>
 #if defined(__POSIX_SPAWN_USE_KOS) && defined(__CRT_HAVE_realloc)
@@ -27,7 +27,7 @@
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_free_defined
-#define __local___localdep_free_defined 1
+#define __local___localdep_free_defined
 #if __has_builtin(__builtin_free) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_free)
 __CEIREDIRECT(,void,__NOTHROW_NCX,__localdep_free,(void *__mallptr),free,{ __builtin_free(__mallptr); })
 #elif defined(__CRT_HAVE_free)
@@ -39,14 +39,14 @@ __CREDIRECT_VOID(,__NOTHROW_NCX,__localdep_free,(void *__mallptr),cfree,(__mallp
 #endif /* !... */
 #endif /* !__local___localdep_free_defined */
 #ifndef __local___localdep_posix_spawn_file_actions_alloc_defined
-#define __local___localdep_posix_spawn_file_actions_alloc_defined 1
+#define __local___localdep_posix_spawn_file_actions_alloc_defined
 __NAMESPACE_LOCAL_END
 #include <libc/local/spawn/posix_spawn_file_actions_alloc.h>
 __NAMESPACE_LOCAL_BEGIN
 #define __localdep_posix_spawn_file_actions_alloc __LIBC_LOCAL_NAME(posix_spawn_file_actions_alloc)
 #endif /* !__local___localdep_posix_spawn_file_actions_alloc_defined */
 #ifndef __local___localdep_strdup_defined
-#define __local___localdep_strdup_defined 1
+#define __local___localdep_strdup_defined
 #if __has_builtin(__builtin_strdup) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_strdup)
 __CEIREDIRECT(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_strdup,(char const *__restrict __string),strdup,{ return __builtin_strdup(__string); })
 #elif defined(__CRT_HAVE_strdup)
@@ -87,7 +87,7 @@ __err:
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_posix_spawn_file_actions_addchdir_np_defined
-#define __local___localdep_posix_spawn_file_actions_addchdir_np_defined 1
+#define __local___localdep_posix_spawn_file_actions_addchdir_np_defined
 #define __localdep_posix_spawn_file_actions_addchdir_np __LIBC_LOCAL_NAME(posix_spawn_file_actions_addchdir_np)
 #endif /* !__local___localdep_posix_spawn_file_actions_addchdir_np_defined */
 #else /* __POSIX_SPAWN_USE_KOS && __CRT_HAVE_realloc */

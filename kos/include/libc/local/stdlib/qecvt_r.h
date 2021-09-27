@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfb36ce2a */
+/* HASH CRC-32:0xbb242664 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,11 +19,11 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_qecvt_r_defined
-#define __local_qecvt_r_defined 1
+#define __local_qecvt_r_defined
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
 #if !defined(__local___localdep_dos_ecvt_s_defined) && defined(__CRT_HAVE__ecvt_s)
-#define __local___localdep_dos_ecvt_s_defined 1
+#define __local___localdep_dos_ecvt_s_defined
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -47,7 +47,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(qecvt_r))(__LONGDOUBLE __val, int __n
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_qecvt_r_defined
-#define __local___localdep_qecvt_r_defined 1
+#define __local___localdep_qecvt_r_defined
 #define __localdep_qecvt_r __LIBC_LOCAL_NAME(qecvt_r)
 #endif /* !__local___localdep_qecvt_r_defined */
 #endif /* !__local_qecvt_r_defined */

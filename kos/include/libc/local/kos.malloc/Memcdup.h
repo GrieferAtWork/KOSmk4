@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x691123c3 */
+/* HASH CRC-32:0x6fdc90f0 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,14 +19,14 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_Memcdup_defined
-#define __local_Memcdup_defined 1
+#define __local_Memcdup_defined
 #include <__crt.h>
 #if defined(__CRT_HAVE_Memdup) || defined(__CRT_HAVE_Malloc)
 #include <kos/anno.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_Memdup_defined
-#define __local___localdep_Memdup_defined 1
+#define __local___localdep_Memdup_defined
 #ifdef __CRT_HAVE_Memdup
 __CREDIRECT(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)) __ATTR_NONNULL((1)),void *,__THROWING,__localdep_Memdup,(void const *__restrict __ptr, __SIZE_TYPE__ __num_bytes),Memdup,(__ptr,__num_bytes))
 #elif defined(__CRT_HAVE_Malloc)
@@ -39,7 +39,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_Memdup_defined */
 #ifndef __local___localdep_memchr_defined
-#define __local___localdep_memchr_defined 1
+#define __local___localdep_memchr_defined
 #ifdef __CRT_HAVE_memchr
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),void *,__NOTHROW_NCX,__localdep_memchr,(void const *__restrict __haystack, int __needle, __SIZE_TYPE__ __n_bytes),memchr,(__haystack,__needle,__n_bytes))
 #else /* __CRT_HAVE_memchr */
@@ -61,7 +61,7 @@ __LOCAL_LIBC(Memcdup) __ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_RETNONNUL
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_Memcdup_defined
-#define __local___localdep_Memcdup_defined 1
+#define __local___localdep_Memcdup_defined
 #define __localdep_Memcdup __LIBC_LOCAL_NAME(Memcdup)
 #endif /* !__local___localdep_Memcdup_defined */
 #else /* __CRT_HAVE_Memdup || __CRT_HAVE_Malloc */

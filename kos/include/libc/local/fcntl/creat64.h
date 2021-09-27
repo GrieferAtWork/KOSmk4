@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5353496e */
+/* HASH CRC-32:0x389187a3 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,14 +19,14 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_creat64_defined
-#define __local_creat64_defined 1
+#define __local_creat64_defined
 #include <__crt.h>
 #include <asm/os/oflags.h>
 #if defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open)
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_open64_defined
-#define __local___localdep_open64_defined 1
+#define __local___localdep_open64_defined
 #if defined(__CRT_HAVE_open) && (!defined(__O_LARGEFILE) || !__O_LARGEFILE)
 __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,__localdep_open64,(char const *__filename, __oflag_t __oflags),open,(__filename,__oflags),__oflags,1,(__mode_t))
 #elif defined(__CRT_HAVE__open) && (!defined(__O_LARGEFILE) || !__O_LARGEFILE)
@@ -53,7 +53,7 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(creat64))(char const *__filename, __m
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_creat64_defined
-#define __local___localdep_creat64_defined 1
+#define __local___localdep_creat64_defined
 #define __localdep_creat64 __LIBC_LOCAL_NAME(creat64)
 #endif /* !__local___localdep_creat64_defined */
 #else /* __CRT_HAVE_open64 || __CRT_HAVE___open64 || __CRT_HAVE_open || __CRT_HAVE__open || __CRT_HAVE___open */

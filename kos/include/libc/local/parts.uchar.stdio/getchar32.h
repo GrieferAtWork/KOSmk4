@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf2ee9ea */
+/* HASH CRC-32:0x6aaf2d39 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,14 +19,14 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_getchar32_defined
-#define __local_getchar32_defined 1
+#define __local_getchar32_defined
 #include <__crt.h>
 #if !defined(__NO_STDSTREAMS) && ((defined(__CRT_HAVE_fgetwc) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)) || defined(__CRT_HAVE_KOS$fgetwc) || (defined(__CRT_HAVE_getwc) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)) || defined(__CRT_HAVE_KOS$getwc))
 #include <kos/anno.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_fgetc32_defined
-#define __local___localdep_fgetc32_defined 1
+#define __local___localdep_fgetc32_defined
 #if defined(__CRT_HAVE_fgetwc) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
 __CREDIRECT(__ATTR_NONNULL((1)),__WINT32_TYPE__,__THROWING,__localdep_fgetc32,(__FILE *__restrict __stream),fgetwc,(__stream))
 #elif defined(__CRT_HAVE_KOS$fgetwc)
@@ -48,7 +48,7 @@ __LOCAL_LIBC(getchar32) __WINT32_TYPE__
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_getchar32_defined
-#define __local___localdep_getchar32_defined 1
+#define __local___localdep_getchar32_defined
 #define __localdep_getchar32 __LIBC_LOCAL_NAME(getchar32)
 #endif /* !__local___localdep_getchar32_defined */
 #else /* !__NO_STDSTREAMS && ((__CRT_HAVE_fgetwc && __SIZEOF_WCHAR_T__ == 4 && __LIBCCALL_IS_LIBKCALL) || __CRT_HAVE_KOS$fgetwc || (__CRT_HAVE_getwc && __SIZEOF_WCHAR_T__ == 4 && __LIBCCALL_IS_LIBKCALL) || __CRT_HAVE_KOS$getwc) */

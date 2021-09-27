@@ -67,21 +67,21 @@ __LIBM_LOCAL_DECLARE_ARRAY(__IEEE754_FLOAT_TYPE__, bpf, 2) { __IEEE754_FLOAT_C(1
 __LIBM_LOCAL_DECLARE_ARRAY(__IEEE754_FLOAT_TYPE__, dp_hf, 2) { __IEEE754_FLOAT_C(0.0), __IEEE754_FLOAT_C(5.84960938e-01) }; /* 0x3f15c000 */
 __LIBM_LOCAL_DECLARE_ARRAY(__IEEE754_FLOAT_TYPE__, dp_lf, 2) { __IEEE754_FLOAT_C(0.0), __IEEE754_FLOAT_C(1.56322085e-06) }; /* 0x35d1cfdc */
 #ifndef __libm_zerof_defined
-#define __libm_zerof_defined 1
+#define __libm_zerof_defined
 __LIBM_LOCAL_DECLARE(__IEEE754_FLOAT_TYPE__, zerof, __IEEE754_FLOAT_C(0.0))
 #endif /* !__libm_zerof_defined */
 #ifndef __libm_onef_defined
-#define __libm_onef_defined 1
+#define __libm_onef_defined
 __LIBM_LOCAL_DECLARE(__IEEE754_FLOAT_TYPE__, onef, __IEEE754_FLOAT_C(1.0))
 #endif /* !__libm_onef_defined */
 __LIBM_LOCAL_DECLARE(__IEEE754_FLOAT_TYPE__, twof, __IEEE754_FLOAT_C(2.0))
 __LIBM_LOCAL_DECLARE(__IEEE754_FLOAT_TYPE__, two24f, __IEEE754_FLOAT_C(16777216.0)) /* 0x4b800000 */
 #ifndef __libm_hugef_defined
-#define __libm_hugef_defined 1
+#define __libm_hugef_defined
 __LIBM_LOCAL_DECLARE(__IEEE754_FLOAT_TYPE__, hugef, __IEEE754_FLOAT_C(1.0e30))
 #endif /* !__libm_hugef_defined */
 #ifndef __libm_tinyf_defined
-#define __libm_tinyf_defined 1
+#define __libm_tinyf_defined
 __LIBM_LOCAL_DECLARE(__IEEE754_FLOAT_TYPE__, tinyf, __IEEE754_FLOAT_C(1.0e-30))
 #endif /* !__libm_tinyf_defined */
 /* poly coefs for (3/2)*(log(x)-2s-2/3*s**3 */
@@ -377,21 +377,21 @@ __LIBM_LOCAL_DECLARE_ARRAY(__IEEE754_DOUBLE_TYPE__, bp, 2) { __IEEE754_DOUBLE_C(
 __LIBM_LOCAL_DECLARE_ARRAY(__IEEE754_DOUBLE_TYPE__, dp_h, 2) { __IEEE754_DOUBLE_C(0.0), __IEEE754_DOUBLE_C(5.84962487220764160156e-01) }; /* 0x3FE2B803, 0x40000000 */
 __LIBM_LOCAL_DECLARE_ARRAY(__IEEE754_DOUBLE_TYPE__, dp_l, 2) { __IEEE754_DOUBLE_C(0.0), __IEEE754_DOUBLE_C(1.35003920212974897128e-08) }; /* 0x3E4CFDEB, 0x43CFD006 */
 #ifndef __libm_zero_defined
-#define __libm_zero_defined 1
+#define __libm_zero_defined
 __LIBM_LOCAL_DECLARE(__IEEE754_DOUBLE_TYPE__, zero, __IEEE754_DOUBLE_C(0.0))
 #endif /* !__libm_zero_defined */
 #ifndef __libm_one_defined
-#define __libm_one_defined 1
+#define __libm_one_defined
 __LIBM_LOCAL_DECLARE(__IEEE754_DOUBLE_TYPE__, one, __IEEE754_DOUBLE_C(1.0))
 #endif /* !__libm_one_defined */
 __LIBM_LOCAL_DECLARE(__IEEE754_DOUBLE_TYPE__, two, __IEEE754_DOUBLE_C(2.0))
 __LIBM_LOCAL_DECLARE(__IEEE754_DOUBLE_TYPE__, two53, __IEEE754_DOUBLE_C(9007199254740992.0)) /* 0x43400000, 0x00000000 */
 #ifndef __libm_huge_defined
-#define __libm_huge_defined 1
+#define __libm_huge_defined
 __LIBM_LOCAL_DECLARE(__IEEE754_DOUBLE_TYPE__, huge, __IEEE754_DOUBLE_C(1.0e300))
 #endif /* !__libm_huge_defined */
 #ifndef __libm_tiny_defined
-#define __libm_tiny_defined 1
+#define __libm_tiny_defined
 __LIBM_LOCAL_DECLARE(__IEEE754_DOUBLE_TYPE__, tiny, __IEEE754_DOUBLE_C(1.0e-300))
 #endif /* !__libm_tiny_defined */
 /* poly coefs for (3/2)*(log(x)-2s-2/3*s**3 */
@@ -402,7 +402,7 @@ __LIBM_LOCAL_DECLARE(__IEEE754_DOUBLE_TYPE__, L4, __IEEE754_DOUBLE_C(2.727281238
 __LIBM_LOCAL_DECLARE(__IEEE754_DOUBLE_TYPE__, L5, __IEEE754_DOUBLE_C(2.30660745775561754067e-01)) /* 0x3FCD864A, 0x93C9DB65 */
 __LIBM_LOCAL_DECLARE(__IEEE754_DOUBLE_TYPE__, L6, __IEEE754_DOUBLE_C(2.06975017800338417784e-01)) /* 0x3FCA7E28, 0x4A454EEF */
 #ifndef __libm_P12345_defined
-#define __libm_P12345_defined 1
+#define __libm_P12345_defined
 __LIBM_LOCAL_DECLARE(__IEEE754_DOUBLE_TYPE__, P1, __IEEE754_DOUBLE_C(1.66666666666666019037e-01))  /* 0x3FC55555, 0x5555553E */
 __LIBM_LOCAL_DECLARE(__IEEE754_DOUBLE_TYPE__, P2, __IEEE754_DOUBLE_C(-2.77777777770155933842e-03)) /* 0xBF66C16C, 0x16BEBD93 */
 __LIBM_LOCAL_DECLARE(__IEEE754_DOUBLE_TYPE__, P3, __IEEE754_DOUBLE_C(6.61375632143793436117e-05))  /* 0x3F11566A, 0xAF25DE2C */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xae90a4e6 */
+/* HASH CRC-32:0x7c285f36 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,17 +19,17 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_dos_ctime_s_defined
-#define __local_dos_ctime_s_defined 1
+#define __local_dos_ctime_s_defined
 #include <__crt.h>
 #if defined(__CRT_HAVE__ctime64_s) || defined(__CRT_HAVE__ctime32_s)
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 #if !defined(__local___localdep_dos_ctime32_s_defined) && defined(__CRT_HAVE__ctime32_s)
-#define __local___localdep_dos_ctime32_s_defined 1
+#define __local___localdep_dos_ctime32_s_defined
 __CREDIRECT(__ATTR_NONNULL((1, 3)),__errno_t,__NOTHROW_NCX,__localdep_dos_ctime32_s,(char __buf[26], __SIZE_TYPE__ __bufsize, __time32_t const *__restrict __timer),_ctime32_s,(__buf,__bufsize,__timer))
 #endif /* !__local___localdep_dos_ctime32_s_defined && __CRT_HAVE__ctime32_s */
 #ifndef __local___localdep_dos_ctime64_s_defined
-#define __local___localdep_dos_ctime64_s_defined 1
+#define __local___localdep_dos_ctime64_s_defined
 #ifdef __CRT_HAVE__ctime64_s
 __CREDIRECT(__ATTR_NONNULL((1, 3)),__errno_t,__NOTHROW_NCX,__localdep_dos_ctime64_s,(char __buf[26], __SIZE_TYPE__ __bufsize, __time64_t const *__restrict __timer),_ctime64_s,(__buf,__bufsize,__timer))
 #elif defined(__CRT_HAVE__ctime32_s)
@@ -53,7 +53,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(dos_ctime_s))(char __buf[26], __SIZE_
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_dos_ctime_s_defined
-#define __local___localdep_dos_ctime_s_defined 1
+#define __local___localdep_dos_ctime_s_defined
 #define __localdep_dos_ctime_s __LIBC_LOCAL_NAME(dos_ctime_s)
 #endif /* !__local___localdep_dos_ctime_s_defined */
 #else /* __CRT_HAVE__ctime64_s || __CRT_HAVE__ctime32_s */

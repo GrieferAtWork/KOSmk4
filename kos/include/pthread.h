@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x372b8d39 */
+/* HASH CRC-32:0x3cabab18 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -561,58 +561,58 @@ struct _pthread_cleanup_buffer {
 };
 
 #ifndef __pthread_t_defined
-#define __pthread_t_defined 1
+#define __pthread_t_defined
 typedef __pthread_t pthread_t;
 #endif /* !__pthread_t_defined */
 #ifndef __pthread_attr_t_defined
-#define __pthread_attr_t_defined 1
+#define __pthread_attr_t_defined
 typedef __pthread_attr_t pthread_attr_t;
 #endif /* !__pthread_attr_t_defined */
 #ifndef __pthread_mutex_t_defined
-#define __pthread_mutex_t_defined 1
+#define __pthread_mutex_t_defined
 typedef __pthread_mutex_t pthread_mutex_t;
 #endif /* !__pthread_mutex_t_defined */
 #ifndef __pthread_mutexattr_t_defined
-#define __pthread_mutexattr_t_defined 1
+#define __pthread_mutexattr_t_defined
 typedef __pthread_mutexattr_t pthread_mutexattr_t;
 #endif /* !__pthread_mutexattr_t_defined */
 #ifndef __pthread_cond_t_defined
-#define __pthread_cond_t_defined 1
+#define __pthread_cond_t_defined
 typedef __pthread_cond_t pthread_cond_t;
 #endif /* !__pthread_cond_t_defined */
 #ifndef __pthread_condattr_t_defined
-#define __pthread_condattr_t_defined 1
+#define __pthread_condattr_t_defined
 typedef __pthread_condattr_t pthread_condattr_t;
 #endif /* !__pthread_condattr_t_defined */
 #ifndef __pthread_key_t_defined
-#define __pthread_key_t_defined 1
+#define __pthread_key_t_defined
 typedef __pthread_key_t pthread_key_t;
 #endif /* !__pthread_key_t_defined */
 #ifndef __pthread_once_t_defined
-#define __pthread_once_t_defined 1
+#define __pthread_once_t_defined
 typedef __pthread_once_t pthread_once_t;
 #endif /* !__pthread_once_t_defined */
 #if defined(__USE_UNIX98) || defined(__USE_XOPEN2K)
 #ifndef __pthread_rwlock_t_defined
-#define __pthread_rwlock_t_defined 1
+#define __pthread_rwlock_t_defined
 typedef __pthread_rwlock_t pthread_rwlock_t;
 #endif /* !__pthread_rwlock_t_defined */
 #ifndef __pthread_rwlockattr_t_defined
-#define __pthread_rwlockattr_t_defined 1
+#define __pthread_rwlockattr_t_defined
 typedef __pthread_rwlockattr_t pthread_rwlockattr_t;
 #endif /* !__pthread_rwlockattr_t_defined */
 #endif /* __USE_UNIX98 || __USE_XOPEN2K */
 #ifdef __USE_XOPEN2K
 #ifndef __pthread_spinlock_t_defined
-#define __pthread_spinlock_t_defined 1
+#define __pthread_spinlock_t_defined
 typedef __pthread_spinlock_t pthread_spinlock_t;
 #endif /* !__pthread_spinlock_t_defined */
 #ifndef __pthread_barrier_t_defined
-#define __pthread_barrier_t_defined 1
+#define __pthread_barrier_t_defined
 typedef __pthread_barrier_t pthread_barrier_t;
 #endif /* !__pthread_barrier_t_defined */
 #ifndef __pthread_barrierattr_t_defined
-#define __pthread_barrierattr_t_defined 1
+#define __pthread_barrierattr_t_defined
 typedef __pthread_barrierattr_t pthread_barrierattr_t;
 #endif /* !__pthread_barrierattr_t_defined */
 #endif /* __USE_XOPEN2K */
@@ -988,7 +988,7 @@ __CREDIRECT(__ATTR_NONNULL((2)),__errno_t,__NOTHROW_NCX,pthread_setname_np,(pthr
 #endif /* __USE_GNU */
 #ifdef __USE_KOS
 #if !defined(__pthread_gettid_np_defined) && defined(__CRT_HAVE_pthread_gettid_np)
-#define __pthread_gettid_np_defined 1
+#define __pthread_gettid_np_defined
 /* >> pthread_gettid_np(3)
  * Return the TID of the given `target_thread'.
  * If the given `target_thread' has already terminated, 0 is returned
@@ -1102,7 +1102,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(pthread_once, __FORCELOCAL __ATTR_ARTIFICIAL __A
  * @return: EINVAL: Invalid/unsupported `state' */
 __CDECLARE_OPT(,__errno_t,__NOTHROW_NCX,pthread_setcancelstate,(int __state, int *__oldstate),(__state,__oldstate))
 #if !defined(__pthread_setcanceltype_defined) && defined(__CRT_HAVE_pthread_setcanceltype)
-#define __pthread_setcanceltype_defined 1
+#define __pthread_setcanceltype_defined
 /* >> pthread_setcanceltype(3)
  * Set cancellation state of current thread to `type',
  * returning the old type in `*oldtype' if `oldtype' is not `NULL'.
@@ -2299,7 +2299,7 @@ __CDECLARE_OPT(,__errno_t,__NOTHROW_NCX,pthread_setspecific,(pthread_key_t __key
 __CDECLARE_OPT(__ATTR_NONNULL((2)),__errno_t,__NOTHROW_NCX,pthread_getcpuclockid,(pthread_t __pthread, __clockid_t *__clock_id),(__pthread,__clock_id))
 #endif /* __USE_XOPEN2K */
 #if !defined(__pthread_atfork_defined) && defined(__CRT_HAVE_pthread_atfork)
-#define __pthread_atfork_defined 1
+#define __pthread_atfork_defined
 /* >> pthread_atfork(3)
  * Install handlers to be called when a new process is created with  `fork(2)'.
  * The `prepare' handler is called in the parent process just before performing
@@ -2346,7 +2346,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(pthread_set_num_processors_np, __FORCELOCAL __AT
 #endif /* ... */
 #ifdef __USE_BSD
 #ifndef __pthread_main_np_defined
-#define __pthread_main_np_defined 1
+#define __pthread_main_np_defined
 #ifdef __CRT_HAVE_pthread_main_np
 /* >> pthread_main_np(3)
  * Returns  1 if the  calling thread is the  main() thread (i.e. the

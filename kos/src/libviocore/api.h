@@ -21,7 +21,7 @@
 #define GUARD_LIBVIOCORE_API_H 1
 
 #define LIBVIO_WANT_PROTOTYPES      1
-#define LIBINSTRLEN_WANT_PROTOTYPES 1
+#define LIBINSTRLEN_WANT_PROTOTYPES
 
 #include <libviocore/api.h>
 /**/

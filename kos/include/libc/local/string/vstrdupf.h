@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe19b5d81 */
+/* HASH CRC-32:0x88f9fe7f */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,12 +19,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_vstrdupf_defined
-#define __local_vstrdupf_defined 1
+#define __local_vstrdupf_defined
 #include <__crt.h>
 #if defined(__CRT_HAVE_vasprintf) || ((defined(__CRT_HAVE_format_aprintf_printer) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc)) && (defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree)))
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_vasprintf_defined
-#define __local___localdep_vasprintf_defined 1
+#define __local___localdep_vasprintf_defined
 #ifdef __CRT_HAVE_vasprintf
 __NAMESPACE_LOCAL_END
 #include <features.h>
@@ -46,7 +46,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(vstrdupf))(char const *__restrict __f
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_vstrdupf_defined
-#define __local___localdep_vstrdupf_defined 1
+#define __local___localdep_vstrdupf_defined
 #define __localdep_vstrdupf __LIBC_LOCAL_NAME(vstrdupf)
 #endif /* !__local___localdep_vstrdupf_defined */
 #else /* __CRT_HAVE_vasprintf || ((__CRT_HAVE_format_aprintf_printer || __CRT_HAVE_format_aprintf_alloc || __CRT_HAVE_realloc) && (__CRT_HAVE_free || __CRT_HAVE_cfree)) */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x60947ba8 */
+/* HASH CRC-32:0xf0d0b889 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,12 +19,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_toupper32_defined
-#define __local_toupper32_defined 1
+#define __local_toupper32_defined
 #include <__crt.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_btoc32_defined
-#define __local___localdep_btoc32_defined 1
+#define __local___localdep_btoc32_defined
 #if defined(__CRT_HAVE_btowc) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__WINT32_TYPE__,__NOTHROW_NCX,__localdep_btoc32,(int __ch),btowc,(__ch))
 #elif defined(__CRT_HAVE_KOS$btowc)
@@ -42,7 +42,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_btoc32_defined */
 #ifndef __local___localdep_c32tob_defined
-#define __local___localdep_c32tob_defined 1
+#define __local___localdep_c32tob_defined
 #if defined(__CRT_HAVE_wctob) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep_c32tob,(__WINT32_TYPE__ __ch),wctob,(__ch))
 #elif defined(__CRT_HAVE_KOS$wctob)
@@ -60,7 +60,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_c32tob_defined */
 #ifndef __local___localdep_toupper_defined
-#define __local___localdep_toupper_defined 1
+#define __local___localdep_toupper_defined
 __NAMESPACE_LOCAL_END
 #include <bits/crt/ctype.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -92,7 +92,7 @@ __NOTHROW(__LIBKCALL __LIBC_LOCAL_NAME(toupper32))(__WINT32_TYPE__ __wc) {
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_toupper32_defined
-#define __local___localdep_toupper32_defined 1
+#define __local___localdep_toupper32_defined
 #define __localdep_toupper32 __LIBC_LOCAL_NAME(toupper32)
 #endif /* !__local___localdep_toupper32_defined */
 #endif /* !__local_toupper32_defined */

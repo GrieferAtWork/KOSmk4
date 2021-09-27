@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7d8aed60 */
+/* HASH CRC-32:0xaaa36957 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local__vfwscanf_l_defined
-#define __local__vfwscanf_l_defined 1
+#define __local__vfwscanf_l_defined
 #include <__crt.h>
 #ifdef __CRT_HAVE_vfwscanf
 #include <features.h>
@@ -27,7 +27,7 @@
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_vfwscanf_defined
-#define __local___localdep_vfwscanf_defined 1
+#define __local___localdep_vfwscanf_defined
 __CREDIRECT(__ATTR_WUNUSED __ATTR_LIBC_WSCANF(2, 0) __ATTR_NONNULL((1, 2)),__STDC_INT_AS_SIZE_T,__THROWING,__localdep_vfwscanf,(__FILE *__restrict __stream, __WCHAR_TYPE__ const *__restrict __format, __builtin_va_list __args),vfwscanf,(__stream,__format,__args))
 #endif /* !__local___localdep_vfwscanf_defined */
 __LOCAL_LIBC(_vfwscanf_l) __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T
@@ -37,7 +37,7 @@ __LOCAL_LIBC(_vfwscanf_l) __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SS
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep__vfwscanf_l_defined
-#define __local___localdep__vfwscanf_l_defined 1
+#define __local___localdep__vfwscanf_l_defined
 #define __localdep__vfwscanf_l __LIBC_LOCAL_NAME(_vfwscanf_l)
 #endif /* !__local___localdep__vfwscanf_l_defined */
 #else /* __CRT_HAVE_vfwscanf */

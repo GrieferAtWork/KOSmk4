@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x67c2f673 */
+/* HASH CRC-32:0xd5ebb81b */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_mkostemps_defined
-#define __local_mkostemps_defined 1
+#define __local_mkostemps_defined
 #include <__crt.h>
 #include <features.h>
 #include <asm/os/oflags.h>
@@ -28,7 +28,7 @@
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_system_mktemp_defined
-#define __local___localdep_system_mktemp_defined 1
+#define __local___localdep_system_mktemp_defined
 __NAMESPACE_LOCAL_END
 #include <libc/local/stdlib/system_mktemp.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -40,7 +40,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(mkostemps))(char *__template_, __STDC
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_mkostemps_defined
-#define __local___localdep_mkostemps_defined 1
+#define __local___localdep_mkostemps_defined
 #define __localdep_mkostemps __LIBC_LOCAL_NAME(mkostemps)
 #endif /* !__local___localdep_mkostemps_defined */
 #else /* __CRT_HAVE_open64 || __CRT_HAVE___open64 || __CRT_HAVE_open || __CRT_HAVE__open || __CRT_HAVE___open || (__AT_FDCWD && (__CRT_HAVE_openat64 || __CRT_HAVE_openat)) */

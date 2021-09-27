@@ -52,7 +52,7 @@ struct mnode;
 
 
 #ifndef __pagedir_pushval_t_defined
-#define __pagedir_pushval_t_defined 1
+#define __pagedir_pushval_t_defined
 #define PAGEDIR_PUSHVAL_INVALID (__CCAST(pagedir_pushval_t)-1)
 #define SIZEOF_PAGEDIR_PUSHVAL  __SIZEOF_POINTER__
 #ifdef __CC__

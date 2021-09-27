@@ -172,8 +172,6 @@ __DECL_BEGIN
 #undef stbcnt
 #undef tai
 
-#ifndef __timex_defined
-#define __timex_defined 1
 struct timex /*[PREFIX()]*/ {
 	__UINT32_TYPE__      modes;     /* ??? */
 	__TM_TYPE(time)      offset;    /* ??? */
@@ -197,21 +195,17 @@ struct timex /*[PREFIX()]*/ {
 	__TM_TYPE(time)      tai;       /* ??? */
 	__UINT32_TYPE__    __pad[11];   /* ... */
 };
-#endif /* !__timex_defined */
 
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 #define _TIMEX_MATCHES_TIMEX64 1
 #endif /* __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ */
 
 #ifdef __USE_TIME64
-#ifndef __timex64_defined
-#define __timex64_defined 1
 #if (defined(__USE_TIME_BITS64) || defined(_TIMEX_MATCHES_TIMEX64)) && defined(__USE_STRUCT64_MACRO)
 #define timex64 timex
 #else /* (__USE_TIME_BITS64 || _TIMEX_MATCHES_TIMEX64) && __USE_STRUCT64_MACRO */
 #define __timex64 timex64
 #endif /* (!__USE_TIME_BITS64 && !_TIMEX_MATCHES_TIMEX64) || !__USE_STRUCT64_MACRO */
-#endif /* !__timex64_defined */
 #endif /* __USE_TIME64 */
 
 #if (defined(__USE_TIME_BITS64) || defined(_TIMEX_MATCHES_TIMEX64)) && defined(__USE_STRUCT64_MACRO)
@@ -243,14 +237,11 @@ struct __timex64 /*[NAME(timex64)][PREFIX()]*/ {
 #endif /* (!__USE_TIME_BITS64 && !_TIMEX_MATCHES_TIMEX64) || !__USE_STRUCT64_MACRO */
 
 #ifdef __USE_KOS
-#ifndef __timex32_defined
-#define __timex32_defined 1
 #if !defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 #define timex32 timex
 #else /* !__USE_TIME_BITS64 || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ */
 #define __timex32 timex32
 #endif /* __USE_TIME_BITS64 && __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
-#endif /* !__timex32_defined */
 #endif /* __USE_KOS */
 
 #if !defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__

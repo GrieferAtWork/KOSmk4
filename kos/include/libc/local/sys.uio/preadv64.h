@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9381c2eb */
+/* HASH CRC-32:0xb22966df */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_preadv64_defined
-#define __local_preadv64_defined 1
+#define __local_preadv64_defined
 #include <__crt.h>
 #ifdef __CRT_HAVE_preadv
 #include <features.h>
@@ -27,7 +27,7 @@
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_preadv32_defined
-#define __local___localdep_preadv32_defined 1
+#define __local___localdep_preadv32_defined
 __CREDIRECT(__ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_preadv32,(__fd_t __fd, struct iovec const *__iov, __STDC_INT_AS_SIZE_T __count, __off32_t __offset),preadv,(__fd,__iov,__count,__offset))
 #endif /* !__local___localdep_preadv32_defined */
 __LOCAL_LIBC(preadv64) __ATTR_WUNUSED __ATTR_NONNULL((2)) __SSIZE_TYPE__
@@ -36,7 +36,7 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(preadv64))(__fd_t __fd, struct iovec 
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_preadv64_defined
-#define __local___localdep_preadv64_defined 1
+#define __local___localdep_preadv64_defined
 #define __localdep_preadv64 __LIBC_LOCAL_NAME(preadv64)
 #endif /* !__local___localdep_preadv64_defined */
 #else /* __CRT_HAVE_preadv */

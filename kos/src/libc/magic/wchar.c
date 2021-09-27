@@ -64,11 +64,11 @@
 
 %(auto_header){
 #ifndef __errno_t_defined
-#define __errno_t_defined 1
+#define __errno_t_defined
 typedef __errno_t errno_t;
 #endif /* !__errno_t_defined */
 #ifndef __rsize_t_defined
-#define __rsize_t_defined 1
+#define __rsize_t_defined
 typedef size_t rsize_t;
 #endif /* !__rsize_t_defined */
 
@@ -123,7 +123,7 @@ typedef size_t rsize_t;
 __SYSDECL_BEGIN
 
 #ifndef __std_mbstate_t_defined
-#define __std_mbstate_t_defined 1
+#define __std_mbstate_t_defined
 __NAMESPACE_STD_BEGIN
 typedef struct __mbstate mbstate_t;
 __NAMESPACE_STD_END
@@ -132,7 +132,7 @@ __NAMESPACE_STD_END
 #ifndef __CXX_SYSTEM_HEADER
 }%(c, ccompat){
 #ifndef __mbstate_t_defined
-#define __mbstate_t_defined 1
+#define __mbstate_t_defined
 __NAMESPACE_STD_USING(mbstate_t)
 #endif /* !__mbstate_t_defined */
 }%{
@@ -143,7 +143,7 @@ __NAMESPACE_STD_USING(mbstate_t)
 #if defined(__USE_UNIX98) || defined(__USE_XOPEN2K) || defined(__USE_DOS)
 }%{
 #ifndef __std_FILE_defined
-#define __std_FILE_defined 1
+#define __std_FILE_defined
 __NAMESPACE_STD_BEGIN
 typedef __FILE FILE;
 __NAMESPACE_STD_END
@@ -151,7 +151,7 @@ __NAMESPACE_STD_END
 #ifndef __CXX_SYSTEM_HEADER
 }%(c, ccompat){
 #ifndef __FILE_defined
-#define __FILE_defined 1
+#define __FILE_defined
 __NAMESPACE_STD_USING(FILE)
 #endif /* !__FILE_defined */
 }%{
@@ -162,17 +162,17 @@ __NAMESPACE_STD_USING(FILE)
 
 /* Define 'wchar_t' */
 #ifndef __wchar_t_defined
-#define __wchar_t_defined 1
+#define __wchar_t_defined
 typedef __WCHAR_TYPE__ wchar_t;
 #endif /* !__wchar_t_defined */
 
 __NAMESPACE_STD_BEGIN
 #ifndef __std_size_t_defined
-#define __std_size_t_defined 1
+#define __std_size_t_defined
 typedef __SIZE_TYPE__ size_t;
 #endif /* !__std_size_t_defined */
 #ifndef __std_wint_t_defined
-#define __std_wint_t_defined 1
+#define __std_wint_t_defined
 typedef __WINT_TYPE__ wint_t;
 #endif /* !__std_wint_t_defined */
 __NAMESPACE_STD_END
@@ -180,15 +180,15 @@ __NAMESPACE_STD_END
 #ifndef __CXX_SYSTEM_HEADER
 }%(c, ccompat){
 #ifndef __tm_defined
-#define __tm_defined 1
+#define __tm_defined
 __NAMESPACE_STD_USING(tm)
 #endif /* !__tm_defined */
 #ifndef __size_t_defined
-#define __size_t_defined 1
+#define __size_t_defined
 __NAMESPACE_STD_USING(size_t)
 #endif /* !__size_t_defined */
 #ifndef __wint_t_defined
-#define __wint_t_defined 1
+#define __wint_t_defined
 __NAMESPACE_STD_USING(wint_t)
 #endif /* !__wint_t_defined */
 }%{

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x46b25d4 */
+/* HASH CRC-32:0xdc5057a8 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,18 +19,18 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_setitimer_defined
-#define __local_setitimer_defined 1
+#define __local_setitimer_defined
 #include <__crt.h>
 #include <bits/types.h>
 #if defined(__CRT_HAVE_setitimer64) || defined(__CRT_HAVE_setitimer)
 #include <bits/os/itimerval.h>
 __NAMESPACE_LOCAL_BEGIN
 #if !defined(__local___localdep_setitimer32_defined) && defined(__CRT_HAVE_setitimer)
-#define __local___localdep_setitimer32_defined 1
+#define __local___localdep_setitimer32_defined
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_setitimer32,(int __which, struct __itimerval32 const *__restrict __newval, struct __itimerval32 *__restrict __oldval),setitimer,(__which,__newval,__oldval))
 #endif /* !__local___localdep_setitimer32_defined && __CRT_HAVE_setitimer */
 #ifndef __local___localdep_setitimer64_defined
-#define __local___localdep_setitimer64_defined 1
+#define __local___localdep_setitimer64_defined
 #if defined(__CRT_HAVE_setitimer) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_setitimer64,(int __which, struct __itimerval64 const *__newval, struct __itimerval64 *__oldval),setitimer,(__which,__newval,__oldval))
 #elif defined(__CRT_HAVE_setitimer64)
@@ -80,7 +80,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(setitimer))(int __which, struct itime
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_setitimer_defined
-#define __local___localdep_setitimer_defined 1
+#define __local___localdep_setitimer_defined
 #define __localdep_setitimer __LIBC_LOCAL_NAME(setitimer)
 #endif /* !__local___localdep_setitimer_defined */
 #else /* __CRT_HAVE_setitimer64 || __CRT_HAVE_setitimer */

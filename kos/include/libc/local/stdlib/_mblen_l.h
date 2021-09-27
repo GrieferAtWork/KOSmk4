@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf69fcf1d */
+/* HASH CRC-32:0x15afbb9 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,11 +19,11 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local__mblen_l_defined
-#define __local__mblen_l_defined 1
+#define __local__mblen_l_defined
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_mblen_defined
-#define __local___localdep_mblen_defined 1
+#define __local___localdep_mblen_defined
 #ifdef __CRT_HAVE_mblen
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
@@ -43,7 +43,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_mblen_l))(char const *__str, __SIZE_
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep__mblen_l_defined
-#define __local___localdep__mblen_l_defined 1
+#define __local___localdep__mblen_l_defined
 #define __localdep__mblen_l __LIBC_LOCAL_NAME(_mblen_l)
 #endif /* !__local___localdep__mblen_l_defined */
 #endif /* !__local__mblen_l_defined */

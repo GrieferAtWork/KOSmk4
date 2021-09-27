@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc2d4e4d */
+/* HASH CRC-32:0x704ab696 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,13 +19,13 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_getlogin_defined
-#define __local_getlogin_defined 1
+#define __local_getlogin_defined
 #include <__crt.h>
 #include <libc/template/environ.h>
 #if defined(__CRT_HAVE_cuserid) || defined(__CRT_HAVE_getlogin_r) || defined(__CRT_HAVE_getenv) || defined(__LOCAL_environ) || (defined(__CRT_HAVE_getpwuid_r) && defined(__CRT_HAVE_geteuid))
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_cuserid_defined
-#define __local___localdep_cuserid_defined 1
+#define __local___localdep_cuserid_defined
 #ifdef __CRT_HAVE_cuserid
 __CREDIRECT(,char *,__NOTHROW_NCX,__localdep_cuserid,(char *__s),cuserid,(__s))
 #elif defined(__CRT_HAVE_getlogin_r) || defined(__CRT_HAVE_getenv) || defined(__LOCAL_environ) || (defined(__CRT_HAVE_getpwuid_r) && defined(__CRT_HAVE_geteuid))
@@ -38,7 +38,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_cuserid_defined */
 #ifndef __local___localdep_getenv_defined
-#define __local___localdep_getenv_defined 1
+#define __local___localdep_getenv_defined
 #ifdef __CRT_HAVE_getenv
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_getenv,(char const *__varname),getenv,(__varname))
 #elif defined(__LOCAL_environ)
@@ -65,7 +65,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(getlogin))(void) {
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_getlogin_defined
-#define __local___localdep_getlogin_defined 1
+#define __local___localdep_getlogin_defined
 #define __localdep_getlogin __LIBC_LOCAL_NAME(getlogin)
 #endif /* !__local___localdep_getlogin_defined */
 #else /* __CRT_HAVE_cuserid || __CRT_HAVE_getlogin_r || __CRT_HAVE_getenv || __LOCAL_environ || (__CRT_HAVE_getpwuid_r && __CRT_HAVE_geteuid) */

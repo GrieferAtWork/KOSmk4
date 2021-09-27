@@ -52,7 +52,7 @@ extern __ATTR_ERROR("memcpy(): The `dst' and `src' buffers overlap - Use `memmov
 
 #ifdef __UINT64_TYPE__
 #ifndef __fast_memcpyq_defined
-#define __fast_memcpyq_defined 1
+#define __fast_memcpyq_defined
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) /*aligned(8)*/ __UINT64_TYPE__ *
 __NOTHROW_NCX(__LIBC_FAST_NAME(memcpyq))(/*aligned(8)*/ void *__restrict __dst,
                                          /*aligned(8)*/ void const *__restrict __src,
@@ -111,7 +111,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(memcpyq))(/*aligned(8)*/ void *__restrict __dst,
 #endif /* __UINT64_TYPE__ */
 
 #ifndef __fast_memcpyl_defined
-#define __fast_memcpyl_defined 1
+#define __fast_memcpyl_defined
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) /*aligned(4)*/ __UINT32_TYPE__ *
 __NOTHROW_NCX(__LIBC_FAST_NAME(memcpyl))(/*aligned(4)*/ void *__restrict __dst,
                                          /*aligned(4)*/ void const *__restrict __src,
@@ -227,7 +227,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(memcpyl))(/*aligned(4)*/ void *__restrict __dst,
 #endif /* !__fast_memcpyl_defined */
 
 #ifndef __fast_memcpyw_defined
-#define __fast_memcpyw_defined 1
+#define __fast_memcpyw_defined
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) /*aligned(2)*/ __UINT16_TYPE__ *
 __NOTHROW_NCX(__LIBC_FAST_NAME(memcpyw))(/*aligned(2)*/ void *__restrict __dst,
                                          /*aligned(2)*/ void const *__restrict __src,
@@ -407,7 +407,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(memcpyw))(/*aligned(2)*/ void *__restrict __dst,
 
 
 #ifndef __fast_memcpy_defined
-#define __fast_memcpy_defined 1
+#define __fast_memcpy_defined
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) /*aligned(1)*/ void *
 __NOTHROW_NCX(__LIBC_FAST_NAME(memcpy))(/*aligned(1)*/ void *__restrict __dst,
                                         /*aligned(1)*/ void const *__restrict __src,
@@ -689,7 +689,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(memcpy))(/*aligned(1)*/ void *__restrict __dst,
 
 #ifdef __UINT64_TYPE__
 #ifndef __fast_mempcpyq_defined
-#define __fast_mempcpyq_defined 1
+#define __fast_mempcpyq_defined
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) /*aligned(8)*/ __UINT64_TYPE__ *
 __NOTHROW_NCX(__LIBC_FAST_NAME(mempcpyq))(/*aligned(8)*/ void *__restrict __dst,
                                           /*aligned(8)*/ void const *__restrict __src,
@@ -749,7 +749,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(mempcpyq))(/*aligned(8)*/ void *__restrict __dst,
 
 
 #ifndef __fast_mempcpyl_defined
-#define __fast_mempcpyl_defined 1
+#define __fast_mempcpyl_defined
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) /*aligned(4)*/ __UINT32_TYPE__ *
 __NOTHROW_NCX(__LIBC_FAST_NAME(mempcpyl))(/*aligned(4)*/ void *__restrict __dst,
                                           /*aligned(4)*/ void const *__restrict __src,
@@ -865,7 +865,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(mempcpyl))(/*aligned(4)*/ void *__restrict __dst,
 
 
 #ifndef __fast_mempcpyw_defined
-#define __fast_mempcpyw_defined 1
+#define __fast_mempcpyw_defined
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) /*aligned(2)*/ __UINT16_TYPE__ *
 __NOTHROW_NCX(__LIBC_FAST_NAME(mempcpyw))(/*aligned(2)*/ void *__restrict __dst,
                                           /*aligned(2)*/ void const *__restrict __src,
@@ -1045,7 +1045,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(mempcpyw))(/*aligned(2)*/ void *__restrict __dst,
 
 
 #ifndef __fast_mempcpy_defined
-#define __fast_mempcpy_defined 1
+#define __fast_mempcpy_defined
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) /*aligned(1)*/ void *
 __NOTHROW_NCX(__LIBC_FAST_NAME(mempcpy))(/*aligned(1)*/ void *__restrict __dst,
                                          /*aligned(1)*/ void const *__restrict __src,
@@ -1832,7 +1832,7 @@ __NOTHROW_NCX(__private_bzero_constant)(void *__restrict __dst,
 
 #ifdef __UINT64_TYPE__
 #ifndef __fast_bzeroq_defined
-#define __fast_bzeroq_defined 1
+#define __fast_bzeroq_defined
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) void
 __NOTHROW_NCX(__LIBC_FAST_NAME(bzeroq))(/*aligned(8)*/ void *__restrict __dst,
                                         __SIZE_TYPE__ __n_qwords) {
@@ -1847,7 +1847,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(bzeroq))(/*aligned(8)*/ void *__restrict __dst,
 
 
 #ifndef __fast_bzerol_defined
-#define __fast_bzerol_defined 1
+#define __fast_bzerol_defined
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) void
 __NOTHROW_NCX(__LIBC_FAST_NAME(bzerol))(/*aligned(4)*/ void *__restrict __dst,
                                         __SIZE_TYPE__ __n_dwords) {
@@ -1861,7 +1861,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(bzerol))(/*aligned(4)*/ void *__restrict __dst,
 
 
 #ifndef __fast_bzerow_defined
-#define __fast_bzerow_defined 1
+#define __fast_bzerow_defined
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) void
 __NOTHROW_NCX(__LIBC_FAST_NAME(bzerow))(/*aligned(2)*/ void *__restrict __dst,
                                         __SIZE_TYPE__ __n_words) {
@@ -1874,7 +1874,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(bzerow))(/*aligned(2)*/ void *__restrict __dst,
 #endif /* !__fast_bzerow_defined */
 
 #ifndef __fast_bzero_defined
-#define __fast_bzero_defined 1
+#define __fast_bzero_defined
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) void
 __NOTHROW_NCX(__LIBC_FAST_NAME(bzero))(/*aligned(1)*/ void *__restrict __dst,
                                        __SIZE_TYPE__ __n_bytes) {
@@ -1889,7 +1889,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(bzero))(/*aligned(1)*/ void *__restrict __dst,
 
 #ifdef __UINT64_TYPE__
 #ifndef __fast_memsetq_defined
-#define __fast_memsetq_defined 1
+#define __fast_memsetq_defined
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_RETNONNULL __ATTR_NONNULL((1)) /*aligned(8)*/ __UINT64_TYPE__ *
 __NOTHROW_NCX(__LIBC_FAST_NAME(memsetq))(/*aligned(8)*/ void *__restrict __dst,
                                          __UINT64_TYPE__ __qword,
@@ -1978,7 +1978,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(memsetq))(/*aligned(8)*/ void *__restrict __dst,
 
 
 #ifndef __fast_memsetl_defined
-#define __fast_memsetl_defined 1
+#define __fast_memsetl_defined
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_RETNONNULL __ATTR_NONNULL((1)) /*aligned(4)*/ __UINT32_TYPE__ *
 __NOTHROW_NCX(__LIBC_FAST_NAME(memsetl))(/*aligned(4)*/ void *__restrict __dst,
                                          __UINT32_TYPE__ __dword,
@@ -2112,7 +2112,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(memsetl))(/*aligned(4)*/ void *__restrict __dst,
 
 
 #ifndef __fast_memsetw_defined
-#define __fast_memsetw_defined 1
+#define __fast_memsetw_defined
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_RETNONNULL __ATTR_NONNULL((1)) /*aligned(2)*/ __UINT16_TYPE__ *
 __NOTHROW_NCX(__LIBC_FAST_NAME(memsetw))(/*aligned(2)*/ void *__restrict __dst,
                                          __UINT16_TYPE__ __word,
@@ -2300,7 +2300,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(memsetw))(/*aligned(2)*/ void *__restrict __dst,
 
 
 #ifndef __fast_memset_defined
-#define __fast_memset_defined 1
+#define __fast_memset_defined
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_RETNONNULL __ATTR_NONNULL((1)) /*aligned(1)*/ void *
 __NOTHROW_NCX(__LIBC_FAST_NAME(memset))(/*aligned(1)*/ void *__restrict __dst,
                                         int __byte,
@@ -2592,7 +2592,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(memset))(/*aligned(1)*/ void *__restrict __dst,
 
 #ifdef __UINT64_TYPE__
 #ifndef __fast_mempsetq_defined
-#define __fast_mempsetq_defined 1
+#define __fast_mempsetq_defined
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_RETNONNULL __ATTR_NONNULL((1)) /*aligned(8)*/ __UINT64_TYPE__ *
 __NOTHROW_NCX(__LIBC_FAST_NAME(mempsetq))(/*aligned(8)*/ void *__restrict __dst,
                                           __UINT64_TYPE__ __qword,
@@ -2683,7 +2683,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(mempsetq))(/*aligned(8)*/ void *__restrict __dst,
 
 
 #ifndef __fast_mempsetl_defined
-#define __fast_mempsetl_defined 1
+#define __fast_mempsetl_defined
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_RETNONNULL __ATTR_NONNULL((1)) /*aligned(4)*/ __UINT32_TYPE__ *
 __NOTHROW_NCX(__LIBC_FAST_NAME(mempsetl))(/*aligned(4)*/ void *__restrict __dst,
                                           __UINT32_TYPE__ __dword,
@@ -2825,7 +2825,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(mempsetl))(/*aligned(4)*/ void *__restrict __dst,
 
 
 #ifndef __fast_mempsetw_defined
-#define __fast_mempsetw_defined 1
+#define __fast_mempsetw_defined
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_RETNONNULL __ATTR_NONNULL((1)) /*aligned(2)*/ __UINT16_TYPE__ *
 __NOTHROW_NCX(__LIBC_FAST_NAME(mempsetw))(/*aligned(2)*/ void *__restrict __dst,
                                           __UINT16_TYPE__ __word,
@@ -3020,7 +3020,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(mempsetw))(/*aligned(2)*/ void *__restrict __dst,
 
 
 #ifndef __fast_mempset_defined
-#define __fast_mempset_defined 1
+#define __fast_mempset_defined
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_RETNONNULL __ATTR_NONNULL((1)) /*aligned(1)*/ void *
 __NOTHROW_NCX(__LIBC_FAST_NAME(mempset))(/*aligned(1)*/ void *__restrict __dst,
                                          int __byte,
@@ -3308,7 +3308,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(mempset))(/*aligned(1)*/ void *__restrict __dst,
 #endif /* !__fast_mempset_defined */
 
 #ifndef __fast_memchr_defined
-#define __fast_memchr_defined 1
+#define __fast_memchr_defined
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) /*aligned(1)*/ void *
 __NOTHROW_NCX(__LIBC_FAST_NAME(memchr))(/*aligned(1)*/ void const *__restrict __haystack,
                                         int __needle, __SIZE_TYPE__ __n_bytes) {
@@ -3352,7 +3352,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(memchr))(/*aligned(1)*/ void const *__restrict __
 #endif /* !__fast_memchr_defined */
 
 #ifndef __fast_memchrw_defined
-#define __fast_memchrw_defined 1
+#define __fast_memchrw_defined
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) /*aligned(2)*/ __UINT16_TYPE__ *
 __NOTHROW_NCX(__LIBC_FAST_NAME(memchrw))(/*aligned(2)*/ void const *__restrict __haystack,
                                          __UINT16_TYPE__ __word, __SIZE_TYPE__ __n_words) {
@@ -3396,7 +3396,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(memchrw))(/*aligned(2)*/ void const *__restrict _
 #endif /* !__fast_memchrw_defined */
 
 #ifndef __fast_memchrl_defined
-#define __fast_memchrl_defined 1
+#define __fast_memchrl_defined
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) /*aligned(4)*/ __UINT32_TYPE__ *
 __NOTHROW_NCX(__LIBC_FAST_NAME(memchrl))(/*aligned(4)*/ void const *__restrict __haystack,
                                          __UINT32_TYPE__ __dword, __SIZE_TYPE__ __n_dwords) {
@@ -3440,7 +3440,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(memchrl))(/*aligned(4)*/ void const *__restrict _
 #endif /* !__fast_memchrl_defined */
 
 #ifndef __fast_memchrq_defined
-#define __fast_memchrq_defined 1
+#define __fast_memchrq_defined
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) /*aligned(8)*/ __UINT64_TYPE__ *
 __NOTHROW_NCX(__LIBC_FAST_NAME(memchrq))(/*aligned(8)*/ void const *__restrict __haystack,
                                          __UINT64_TYPE__ __qword, __SIZE_TYPE__ __n_qwords) {
@@ -3486,7 +3486,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(memchrq))(/*aligned(8)*/ void const *__restrict _
 #endif /* !__fast_memchrq_defined */
 
 #ifndef __fast_memrchr_defined
-#define __fast_memrchr_defined 1
+#define __fast_memrchr_defined
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) /*aligned(1)*/ void *
 __NOTHROW_NCX(__LIBC_FAST_NAME(memrchr))(/*aligned(1)*/ void const *__restrict __haystack,
                                          int __needle, __SIZE_TYPE__ __n_bytes) {
@@ -3518,7 +3518,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(memrchr))(/*aligned(1)*/ void const *__restrict _
 #endif /* !__fast_memrchr_defined */
 
 #ifndef __fast_memrchrw_defined
-#define __fast_memrchrw_defined 1
+#define __fast_memrchrw_defined
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) /*aligned(2)*/ __UINT16_TYPE__ *
 __NOTHROW_NCX(__LIBC_FAST_NAME(memrchrw))(/*aligned(2)*/ void const *__restrict __haystack,
                                           __UINT16_TYPE__ __word, __SIZE_TYPE__ __n_words) {
@@ -3550,7 +3550,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(memrchrw))(/*aligned(2)*/ void const *__restrict 
 #endif /* !__fast_memrchrw_defined */
 
 #ifndef __fast_memrchrl_defined
-#define __fast_memrchrl_defined 1
+#define __fast_memrchrl_defined
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) /*aligned(4)*/ __UINT32_TYPE__ *
 __NOTHROW_NCX(__LIBC_FAST_NAME(memrchrl))(/*aligned(4)*/ void const *__restrict __haystack,
                                           __UINT32_TYPE__ __dword, __SIZE_TYPE__ __n_dwords) {
@@ -3582,7 +3582,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(memrchrl))(/*aligned(4)*/ void const *__restrict 
 #endif /* !__fast_memrchrl_defined */
 
 #ifndef __fast_memrchrq_defined
-#define __fast_memrchrq_defined 1
+#define __fast_memrchrq_defined
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) /*aligned(8)*/ __UINT64_TYPE__ *
 __NOTHROW_NCX(__LIBC_FAST_NAME(memrchrq))(/*aligned(8)*/ void const *__restrict __haystack,
                                           __UINT64_TYPE__ __qword, __SIZE_TYPE__ __n_qwords) {
@@ -3616,7 +3616,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(memrchrq))(/*aligned(8)*/ void const *__restrict 
 #endif /* !__fast_memrchrq_defined */
 
 #ifndef __fast_memcmp_defined
-#define __fast_memcmp_defined 1
+#define __fast_memcmp_defined
 #include <hybrid/byteorder.h>
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) int
 __NOTHROW_NCX(__LIBC_FAST_NAME(memcmp))(/*aligned(1)*/ void const *__restrict __s1,
@@ -3967,7 +3967,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(memcmp))(/*aligned(1)*/ void const *__restrict __
 #endif /* !__fast_memcmp_defined */
 
 #ifndef __fast_memcmpw_defined
-#define __fast_memcmpw_defined 1
+#define __fast_memcmpw_defined
 #include <hybrid/byteorder.h>
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __INT16_TYPE__
 __NOTHROW_NCX(__LIBC_FAST_NAME(memcmpw))(/*aligned(2)*/ void const *__restrict __s1,
@@ -4182,7 +4182,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(memcmpw))(/*aligned(2)*/ void const *__restrict _
 #endif /* !__fast_memcmpw_defined */
 
 #ifndef __fast_memcmpl_defined
-#define __fast_memcmpl_defined 1
+#define __fast_memcmpl_defined
 #include <hybrid/byteorder.h>
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __INT32_TYPE__
 __NOTHROW_NCX(__LIBC_FAST_NAME(memcmpl))(/*aligned(4)*/ void const *__restrict __s1,
@@ -4331,7 +4331,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(memcmpl))(/*aligned(4)*/ void const *__restrict _
 
 #ifdef __UINT64_TYPE__
 #ifndef __fast_memcmpq_defined
-#define __fast_memcmpq_defined 1
+#define __fast_memcmpq_defined
 #include <hybrid/byteorder.h>
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __INT64_TYPE__
 __NOTHROW_NCX(__LIBC_FAST_NAME(memcmpq))(/*aligned(8)*/ void const *__restrict __s1,
@@ -4469,7 +4469,7 @@ extern __ATTR_ERROR("memmoveup(): The passed dst pointer is lower than src (dst 
 
 #ifdef __UINT64_TYPE__
 #ifndef __fast_memmovedownq_defined
-#define __fast_memmovedownq_defined 1
+#define __fast_memmovedownq_defined
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) /*aligned(8)*/ __UINT64_TYPE__ *
 __NOTHROW_NCX(__LIBC_FAST_NAME(memmovedownq))(/*aligned(8)*/ void *__dst,
                                               /*aligned(8)*/ void const *__src,
@@ -4532,7 +4532,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(memmovedownq))(/*aligned(8)*/ void *__dst,
 #endif /* __UINT64_TYPE__ */
 
 #ifndef __fast_memmovedownl_defined
-#define __fast_memmovedownl_defined 1
+#define __fast_memmovedownl_defined
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) /*aligned(4)*/ __UINT32_TYPE__ *
 __NOTHROW_NCX(__LIBC_FAST_NAME(memmovedownl))(/*aligned(4)*/ void *__dst,
                                               /*aligned(4)*/ void const *__src,
@@ -4660,7 +4660,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(memmovedownl))(/*aligned(4)*/ void *__dst,
 #endif /* !__fast_memmovedownl_defined */
 
 #ifndef __fast_memmovedownw_defined
-#define __fast_memmovedownw_defined 1
+#define __fast_memmovedownw_defined
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) /*aligned(2)*/ __UINT16_TYPE__ *
 __NOTHROW_NCX(__LIBC_FAST_NAME(memmovedownw))(/*aligned(2)*/ void *__dst,
                                               /*aligned(2)*/ void const *__src,
@@ -4861,7 +4861,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(memmovedownw))(/*aligned(2)*/ void *__dst,
 
 
 #ifndef __fast_memmovedown_defined
-#define __fast_memmovedown_defined 1
+#define __fast_memmovedown_defined
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) /*aligned(1)*/ void *
 __NOTHROW_NCX(__LIBC_FAST_NAME(memmovedown))(/*aligned(1)*/ void *__dst,
                                              /*aligned(1)*/ void const *__src,
@@ -5179,7 +5179,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(memmovedown))(/*aligned(1)*/ void *__dst,
 
 #ifdef __UINT64_TYPE__
 #ifndef __fast_mempmovedownq_defined
-#define __fast_mempmovedownq_defined 1
+#define __fast_mempmovedownq_defined
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) /*aligned(8)*/ __UINT64_TYPE__ *
 __NOTHROW_NCX(__LIBC_FAST_NAME(mempmovedownq))(/*aligned(8)*/ void *__dst,
                                                /*aligned(8)*/ void const *__src,
@@ -5243,7 +5243,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(mempmovedownq))(/*aligned(8)*/ void *__dst,
 
 
 #ifndef __fast_mempmovedownl_defined
-#define __fast_mempmovedownl_defined 1
+#define __fast_mempmovedownl_defined
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) /*aligned(4)*/ __UINT32_TYPE__ *
 __NOTHROW_NCX(__LIBC_FAST_NAME(mempmovedownl))(/*aligned(4)*/ void *__dst,
                                                /*aligned(4)*/ void const *__src,
@@ -5371,7 +5371,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(mempmovedownl))(/*aligned(4)*/ void *__dst,
 
 
 #ifndef __fast_mempmovedownw_defined
-#define __fast_mempmovedownw_defined 1
+#define __fast_mempmovedownw_defined
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) /*aligned(2)*/ __UINT16_TYPE__ *
 __NOTHROW_NCX(__LIBC_FAST_NAME(mempmovedownw))(/*aligned(2)*/ void *__dst,
                                                /*aligned(2)*/ void const *__src,
@@ -5572,7 +5572,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(mempmovedownw))(/*aligned(2)*/ void *__dst,
 
 
 #ifndef __fast_mempmovedown_defined
-#define __fast_mempmovedown_defined 1
+#define __fast_mempmovedown_defined
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) /*aligned(1)*/ void *
 __NOTHROW_NCX(__LIBC_FAST_NAME(mempmovedown))(/*aligned(1)*/ void *__dst,
                                               /*aligned(1)*/ void const *__src,
@@ -5896,7 +5896,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(mempmovedown))(/*aligned(1)*/ void *__dst,
 
 #ifdef __UINT64_TYPE__
 #ifndef __fast_memmoveupq_defined
-#define __fast_memmoveupq_defined 1
+#define __fast_memmoveupq_defined
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) /*aligned(8)*/ __UINT64_TYPE__ *
 __NOTHROW_NCX(__LIBC_FAST_NAME(memmoveupq))(/*aligned(8)*/ void *__dst,
                                             /*aligned(8)*/ void const *__src,
@@ -5959,7 +5959,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(memmoveupq))(/*aligned(8)*/ void *__dst,
 #endif /* __UINT64_TYPE__ */
 
 #ifndef __fast_memmoveupl_defined
-#define __fast_memmoveupl_defined 1
+#define __fast_memmoveupl_defined
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) /*aligned(4)*/ __UINT32_TYPE__ *
 __NOTHROW_NCX(__LIBC_FAST_NAME(memmoveupl))(/*aligned(4)*/ void *__dst,
                                             /*aligned(4)*/ void const *__src,
@@ -6087,7 +6087,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(memmoveupl))(/*aligned(4)*/ void *__dst,
 #endif /* !__fast_memmoveupl_defined */
 
 #ifndef __fast_memmoveupw_defined
-#define __fast_memmoveupw_defined 1
+#define __fast_memmoveupw_defined
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) /*aligned(2)*/ __UINT16_TYPE__ *
 __NOTHROW_NCX(__LIBC_FAST_NAME(memmoveupw))(/*aligned(2)*/ void *__dst,
                                             /*aligned(2)*/ void const *__src,
@@ -6288,7 +6288,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(memmoveupw))(/*aligned(2)*/ void *__dst,
 
 
 #ifndef __fast_memmoveup_defined
-#define __fast_memmoveup_defined 1
+#define __fast_memmoveup_defined
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) /*aligned(1)*/ void *
 __NOTHROW_NCX(__LIBC_FAST_NAME(memmoveup))(/*aligned(1)*/ void *__dst,
                                            /*aligned(1)*/ void const *__src,
@@ -6606,7 +6606,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(memmoveup))(/*aligned(1)*/ void *__dst,
 
 #ifdef __UINT64_TYPE__
 #ifndef __fast_mempmoveupq_defined
-#define __fast_mempmoveupq_defined 1
+#define __fast_mempmoveupq_defined
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) /*aligned(8)*/ __UINT64_TYPE__ *
 __NOTHROW_NCX(__LIBC_FAST_NAME(mempmoveupq))(/*aligned(8)*/ void *__dst,
                                              /*aligned(8)*/ void const *__src,
@@ -6670,7 +6670,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(mempmoveupq))(/*aligned(8)*/ void *__dst,
 
 
 #ifndef __fast_mempmoveupl_defined
-#define __fast_mempmoveupl_defined 1
+#define __fast_mempmoveupl_defined
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) /*aligned(4)*/ __UINT32_TYPE__ *
 __NOTHROW_NCX(__LIBC_FAST_NAME(mempmoveupl))(/*aligned(4)*/ void *__dst,
                                              /*aligned(4)*/ void const *__src,
@@ -6798,7 +6798,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(mempmoveupl))(/*aligned(4)*/ void *__dst,
 
 
 #ifndef __fast_mempmoveupw_defined
-#define __fast_mempmoveupw_defined 1
+#define __fast_mempmoveupw_defined
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) /*aligned(2)*/ __UINT16_TYPE__ *
 __NOTHROW_NCX(__LIBC_FAST_NAME(mempmoveupw))(/*aligned(2)*/ void *__dst,
                                              /*aligned(2)*/ void const *__src,
@@ -6999,7 +6999,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(mempmoveupw))(/*aligned(2)*/ void *__dst,
 
 
 #ifndef __fast_mempmoveup_defined
-#define __fast_mempmoveup_defined 1
+#define __fast_mempmoveup_defined
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) /*aligned(1)*/ void *
 __NOTHROW_NCX(__LIBC_FAST_NAME(mempmoveup))(/*aligned(1)*/ void *__dst,
                                             /*aligned(1)*/ void const *__src,
@@ -7320,7 +7320,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(mempmoveup))(/*aligned(1)*/ void *__dst,
 
 #ifdef __UINT64_TYPE__
 #ifndef __fast_memmoveq_defined
-#define __fast_memmoveq_defined 1
+#define __fast_memmoveq_defined
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) /*aligned(8)*/ __UINT64_TYPE__ *
 __NOTHROW_NCX(__LIBC_FAST_NAME(memmoveq))(/*aligned(8)*/ void *__dst,
                                           /*aligned(8)*/ void const *__src,
@@ -7414,7 +7414,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(memmoveq))(/*aligned(8)*/ void *__dst,
 #endif /* __UINT64_TYPE__ */
 
 #ifndef __fast_memmovel_defined
-#define __fast_memmovel_defined 1
+#define __fast_memmovel_defined
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) /*aligned(4)*/ __UINT32_TYPE__ *
 __NOTHROW_NCX(__LIBC_FAST_NAME(memmovel))(/*aligned(4)*/ void *__dst,
                                           /*aligned(4)*/ void const *__src,
@@ -7605,7 +7605,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(memmovel))(/*aligned(4)*/ void *__dst,
 #endif /* !__fast_memmovel_defined */
 
 #ifndef __fast_memmovew_defined
-#define __fast_memmovew_defined 1
+#define __fast_memmovew_defined
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) /*aligned(2)*/ __UINT16_TYPE__ *
 __NOTHROW_NCX(__LIBC_FAST_NAME(memmovew))(/*aligned(2)*/ void *__dst,
                                           /*aligned(2)*/ void const *__src,
@@ -7906,7 +7906,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(memmovew))(/*aligned(2)*/ void *__dst,
 #endif /* !__fast_memmovew_defined */
 
 #ifndef __fast_memmove_defined
-#define __fast_memmove_defined 1
+#define __fast_memmove_defined
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) /*aligned(1)*/ void *
 __NOTHROW_NCX(__LIBC_FAST_NAME(memmove))(/*aligned(1)*/ void *__dst,
                                          /*aligned(1)*/ void const *__src,
@@ -8423,7 +8423,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(memmove))(/*aligned(1)*/ void *__dst,
 
 #ifdef __UINT64_TYPE__
 #ifndef __fast_mempmoveq_defined
-#define __fast_mempmoveq_defined 1
+#define __fast_mempmoveq_defined
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __UINT64_TYPE__ *
 __NOTHROW_NCX(__LIBC_FAST_NAME(mempmoveq))(/*aligned(8)*/ void *__dst,
                                            /*aligned(8)*/ void const *__src,
@@ -8518,7 +8518,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(mempmoveq))(/*aligned(8)*/ void *__dst,
 #endif /* __UINT64_TYPE__ */
 
 #ifndef __fast_mempmovel_defined
-#define __fast_mempmovel_defined 1
+#define __fast_mempmovel_defined
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) /*aligned(4)*/ __UINT32_TYPE__ *
 __NOTHROW_NCX(__LIBC_FAST_NAME(mempmovel))(/*aligned(4)*/ void *__dst,
                                            /*aligned(4)*/ void const *__src,
@@ -8710,7 +8710,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(mempmovel))(/*aligned(4)*/ void *__dst,
 #endif /* !__fast_mempmovel_defined */
 
 #ifndef __fast_mempmovew_defined
-#define __fast_mempmovew_defined 1
+#define __fast_mempmovew_defined
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) /*aligned(2)*/ __UINT16_TYPE__ *
 __NOTHROW_NCX(__LIBC_FAST_NAME(mempmovew))(/*aligned(2)*/ void *__dst,
                                            /*aligned(2)*/ void const *__src,
@@ -9010,7 +9010,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(mempmovew))(/*aligned(2)*/ void *__dst,
 #endif /* !__fast_mempmovew_defined */
 
 #ifndef __fast_mempmove_defined
-#define __fast_mempmove_defined 1
+#define __fast_mempmove_defined
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) /*aligned(1)*/ void *
 __NOTHROW_NCX(__LIBC_FAST_NAME(mempmove))(/*aligned(1)*/ void *__dst,
                                           /*aligned(1)*/ void const *__src,
@@ -9521,7 +9521,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(mempmove))(/*aligned(1)*/ void *__dst,
 #endif /* !__fast_mempmove_defined */
 
 #ifndef __fast_mempatw_defined
-#define __fast_mempatw_defined 1
+#define __fast_mempatw_defined
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_RETNONNULL __ATTR_NONNULL((1)) void *
 __NOTHROW_NCX(__LIBC_FAST_NAME(mempatw))(void *__restrict __dst,
                                          __UINT16_TYPE__ __pattern,
@@ -9540,7 +9540,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(mempatw))(void *__restrict __dst,
 #endif /* !__fast_mempatw_defined */
 
 #ifndef __fast_mempatl_defined
-#define __fast_mempatl_defined 1
+#define __fast_mempatl_defined
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_RETNONNULL __ATTR_NONNULL((1)) void *
 __NOTHROW_NCX(__LIBC_FAST_NAME(mempatl))(void *__restrict __dst,
                                          __UINT32_TYPE__ __pattern,
@@ -9562,7 +9562,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(mempatl))(void *__restrict __dst,
 
 #ifdef __UINT64_TYPE__
 #ifndef __fast_mempatq_defined
-#define __fast_mempatq_defined 1
+#define __fast_mempatq_defined
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_RETNONNULL __ATTR_NONNULL((1)) void *
 __NOTHROW_NCX(__LIBC_FAST_NAME(mempatq))(void *__restrict __dst,
                                          __UINT64_TYPE__ __pattern,
@@ -9698,7 +9698,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(mempatq))(void *__restrict __dst,
 #endif /* !__ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
 
 #ifndef __fast_memcpyc_defined
-#define __fast_memcpyc_defined 1
+#define __fast_memcpyc_defined
 __DEFINE_FAST_MEMCPYC_FUNCTION(memcpyc,
                                __NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memcpy),
                                __NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memcpyw),
@@ -9708,7 +9708,7 @@ __DEFINE_FAST_MEMCPYC_FUNCTION(memcpyc,
 #endif /* !__fast_memcpyc_defined */
 
 #ifndef __fast_mempcpyc_defined
-#define __fast_mempcpyc_defined 1
+#define __fast_mempcpyc_defined
 __DEFINE_FAST_MEMCPYC_FUNCTION(mempcpyc,
                                __NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempcpy),
                                __NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempcpyw),
@@ -9718,7 +9718,7 @@ __DEFINE_FAST_MEMCPYC_FUNCTION(mempcpyc,
 #endif /* !__fast_mempcpyc_defined */
 
 #ifndef __fast_memmovec_defined
-#define __fast_memmovec_defined 1
+#define __fast_memmovec_defined
 __DEFINE_FAST_MEMCPYC_FUNCTION(memmovec,
                                __NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memmove),
                                __NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memmovew),
@@ -9728,7 +9728,7 @@ __DEFINE_FAST_MEMCPYC_FUNCTION(memmovec,
 #endif /* !__fast_memmovec_defined */
 
 #ifndef __fast_mempmovec_defined
-#define __fast_mempmovec_defined 1
+#define __fast_mempmovec_defined
 __DEFINE_FAST_MEMCPYC_FUNCTION(mempmovec,
                                __NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempmove),
                                __NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempmovew),
@@ -9738,7 +9738,7 @@ __DEFINE_FAST_MEMCPYC_FUNCTION(mempmovec,
 #endif /* !__fast_mempmovec_defined */
 
 #ifndef __fast_memmoveupc_defined
-#define __fast_memmoveupc_defined 1
+#define __fast_memmoveupc_defined
 __DEFINE_FAST_MEMCPYC_FUNCTION(memmoveupc,
                                __NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memmoveup),
                                __NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memmoveupw),
@@ -9748,7 +9748,7 @@ __DEFINE_FAST_MEMCPYC_FUNCTION(memmoveupc,
 #endif /* !__fast_memmoveupc_defined */
 
 #ifndef __fast_mempmoveupc_defined
-#define __fast_mempmoveupc_defined 1
+#define __fast_mempmoveupc_defined
 __DEFINE_FAST_MEMCPYC_FUNCTION(mempmoveupc,
                                __NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempmoveup),
                                __NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempmoveupw),
@@ -9758,7 +9758,7 @@ __DEFINE_FAST_MEMCPYC_FUNCTION(mempmoveupc,
 #endif /* !__fast_mempmoveupc_defined */
 
 #ifndef __fast_memmovedownc_defined
-#define __fast_memmovedownc_defined 1
+#define __fast_memmovedownc_defined
 __DEFINE_FAST_MEMCPYC_FUNCTION(memmovedownc,
                                __NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memmovedown),
                                __NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memmovedownw),
@@ -9768,7 +9768,7 @@ __DEFINE_FAST_MEMCPYC_FUNCTION(memmovedownc,
 #endif /* !__fast_memmovedownc_defined */
 
 #ifndef __fast_mempmovedownc_defined
-#define __fast_mempmovedownc_defined 1
+#define __fast_mempmovedownc_defined
 __DEFINE_FAST_MEMCPYC_FUNCTION(mempmovedownc,
                                __NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempmovedown),
                                __NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempmovedownw),

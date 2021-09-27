@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x27886c84 */
+/* HASH CRC-32:0xd398ef16 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,12 +19,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local__aligned_malloc_defined
-#define __local__aligned_malloc_defined 1
+#define __local__aligned_malloc_defined
 #include <__crt.h>
 #if defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign)
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_malloc_defined
-#define __local___localdep_malloc_defined 1
+#define __local___localdep_malloc_defined
 #if __has_builtin(__builtin_malloc) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_malloc)
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
@@ -57,7 +57,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_aligned_malloc))(__SIZE_TYPE__ __num
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep__aligned_malloc_defined
-#define __local___localdep__aligned_malloc_defined 1
+#define __local___localdep__aligned_malloc_defined
 #define __localdep__aligned_malloc __LIBC_LOCAL_NAME(_aligned_malloc)
 #endif /* !__local___localdep__aligned_malloc_defined */
 #else /* __CRT_HAVE_malloc || __CRT_HAVE_calloc || __CRT_HAVE_realloc || __CRT_HAVE_memalign || __CRT_HAVE_aligned_alloc || __CRT_HAVE_posix_memalign */

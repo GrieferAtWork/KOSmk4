@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x15650c8f */
+/* HASH CRC-32:0x3bcb50eb */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,11 +19,11 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_consttime_memequal_defined
-#define __local_consttime_memequal_defined 1
+#define __local_consttime_memequal_defined
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_timingsafe_memcmp_defined
-#define __local___localdep_timingsafe_memcmp_defined 1
+#define __local___localdep_timingsafe_memcmp_defined
 #ifdef __CRT_HAVE_timingsafe_memcmp
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_timingsafe_memcmp,(void const *__s1, void const *__s2, __SIZE_TYPE__ __n_bytes),timingsafe_memcmp,(__s1,__s2,__n_bytes))
 #else /* __CRT_HAVE_timingsafe_memcmp */
@@ -39,7 +39,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(consttime_memequal))(void const *__s1
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_consttime_memequal_defined
-#define __local___localdep_consttime_memequal_defined 1
+#define __local___localdep_consttime_memequal_defined
 #define __localdep_consttime_memequal __LIBC_LOCAL_NAME(consttime_memequal)
 #endif /* !__local___localdep_consttime_memequal_defined */
 #endif /* !__local_consttime_memequal_defined */

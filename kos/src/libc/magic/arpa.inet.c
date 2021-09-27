@@ -52,7 +52,7 @@
 __SYSDECL_BEGIN
 
 #ifndef __socklen_t_defined
-#define __socklen_t_defined 1
+#define __socklen_t_defined
 typedef __socklen_t socklen_t;
 #endif /* !__socklen_t_defined */
 

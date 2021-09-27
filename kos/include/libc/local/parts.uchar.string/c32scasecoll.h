@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x38373e09 */
+/* HASH CRC-32:0x392108b1 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,11 +19,11 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_c32scasecoll_defined
-#define __local_c32scasecoll_defined 1
+#define __local_c32scasecoll_defined
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_c32scasecmp_defined
-#define __local___localdep_c32scasecmp_defined 1
+#define __local___localdep_c32scasecmp_defined
 #if defined(__CRT_HAVE_wcscasecmp) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_c32scasecmp,(__CHAR32_TYPE__ const *__s1, __CHAR32_TYPE__ const *__s2),wcscasecmp,(__s1,__s2))
 #elif defined(__CRT_HAVE_KOS$wcscasecmp)
@@ -50,7 +50,7 @@ __NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(c32scasecoll))(__CHAR32_TYPE__ const 
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_c32scasecoll_defined
-#define __local___localdep_c32scasecoll_defined 1
+#define __local___localdep_c32scasecoll_defined
 #define __localdep_c32scasecoll __LIBC_LOCAL_NAME(c32scasecoll)
 #endif /* !__local___localdep_c32scasecoll_defined */
 #endif /* !__local_c32scasecoll_defined */

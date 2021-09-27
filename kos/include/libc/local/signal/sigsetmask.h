@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x495d5ad */
+/* HASH CRC-32:0x6e28d735 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,13 +19,13 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_sigsetmask_defined
-#define __local_sigsetmask_defined 1
+#define __local_sigsetmask_defined
 #include <__crt.h>
 #include <asm/os/signal.h>
 #if defined(__SIG_SETMASK) && (defined(__CRT_HAVE_sigprocmask) || defined(__CRT_HAVE_pthread_sigmask))
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_sigemptyset_defined
-#define __local___localdep_sigemptyset_defined 1
+#define __local___localdep_sigemptyset_defined
 #ifdef __CRT_HAVE_sigemptyset
 __NAMESPACE_LOCAL_END
 #include <bits/os/sigset.h>
@@ -39,7 +39,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__CRT_HAVE_sigemptyset */
 #endif /* !__local___localdep_sigemptyset_defined */
 #ifndef __local___localdep_sigprocmask_defined
-#define __local___localdep_sigprocmask_defined 1
+#define __local___localdep_sigprocmask_defined
 #ifdef __CRT_HAVE_sigprocmask
 __NAMESPACE_LOCAL_END
 #include <features.h>
@@ -68,7 +68,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(sigsetmask))(int __mask) {
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_sigsetmask_defined
-#define __local___localdep_sigsetmask_defined 1
+#define __local___localdep_sigsetmask_defined
 #define __localdep_sigsetmask __LIBC_LOCAL_NAME(sigsetmask)
 #endif /* !__local___localdep_sigsetmask_defined */
 #else /* __SIG_SETMASK && (__CRT_HAVE_sigprocmask || __CRT_HAVE_pthread_sigmask) */

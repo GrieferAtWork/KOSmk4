@@ -25,23 +25,23 @@
 
 #if defined(__i386__) && !defined(__x86_64__)
 #define LIBVM86_CC __ATTR_STDCALL
-#else
+#else /* ... */
 #define LIBVM86_CC /* nothing */
-#endif
+#endif /* !... */
 
-#if !defined(LIBVM86_WANT_PROTOTYPES) && \
-     defined(__KOS__) && defined(__KERNEL__)
-#define LIBVM86_WANT_PROTOTYPES 1
-#endif
+#if (!defined(LIBVM86_WANT_PROTOTYPES) && \
+     defined(__KOS__) && defined(__KERNEL__))
+#define LIBVM86_WANT_PROTOTYPES
+#endif /* ... */
 
-#if defined(__KOS__) && defined(__KERNEL__) && \
-    defined(CONFIG_BUILDING_KERNEL_CORE)
+#if (defined(__KOS__) && defined(__KERNEL__) && \
+     defined(CONFIG_BUILDING_KERNEL_CORE))
 #define LIBVM86_DECL __PUBDEF
 #elif defined(__LIBVM86_STATIC)
 #define LIBVM86_DECL __INTDEF
-#else
+#else /* ... */
 #define LIBVM86_DECL __IMPDEF
-#endif
+#endif /* !... */
 
 /* Library name for use with `dlopen()' */
 #define LIBVM86_LIBRARY_NAME "libvm86.so"

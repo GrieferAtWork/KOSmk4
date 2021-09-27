@@ -736,6 +736,16 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *       string contains byte-sequences  not allowed  for utf-8,  including
 	 *       incorrect multi-character sequences, as well as overly long chars) */
 
+	/* TODO: Support for `PT_GNU_STACK'
+	 *   - Add handling in modelfexec
+	 *   - Keep  track of requirements  in libdl during  the initial load phase
+	 *     If requirements change while the initial set of libraries is loaded,
+	 *     then mprotect() the main thread's stack to alter protection.
+	 *   - Expose a dlauxctrl() code to query needed stack protection (with
+	 *     a default of PROT_READ|PROT_WRITE)
+	 *   - pthread_create must use that control code to figure out to map
+	 *     new thread stacks. */
+
 	return state;
 }
 

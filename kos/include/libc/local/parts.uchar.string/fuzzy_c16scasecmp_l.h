@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x88b97ad8 */
+/* HASH CRC-32:0xcdcffe1 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,14 +19,14 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_fuzzy_c16scasecmp_l_defined
-#define __local_fuzzy_c16scasecmp_l_defined 1
+#define __local_fuzzy_c16scasecmp_l_defined
 #include <__crt.h>
 #include <parts/malloca.h>
 #if (defined(__CRT_HAVE_fuzzy_wmemcasecmp_l) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)) || defined(__CRT_HAVE_DOS$fuzzy_wmemcasecmp_l) || !defined(__NO_MALLOCA)
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_c16slen_defined
-#define __local___localdep_c16slen_defined 1
+#define __local___localdep_c16slen_defined
 #if defined(__CRT_HAVE_wcslen) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_c16slen,(__CHAR16_TYPE__ const *__restrict __str),wcslen,(__str))
 #elif defined(__CRT_HAVE_DOS$wcslen)
@@ -44,7 +44,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_c16slen_defined */
 #ifndef __local___localdep_fuzzy_c16memcasecmp_l_defined
-#define __local___localdep_fuzzy_c16memcasecmp_l_defined 1
+#define __local___localdep_fuzzy_c16memcasecmp_l_defined
 #if defined(__CRT_HAVE_fuzzy_wmemcasecmp_l) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 3)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_fuzzy_c16memcasecmp_l,(__CHAR16_TYPE__ const *__s1, __SIZE_TYPE__ __s1_bytes, __CHAR16_TYPE__ const *__s2, __SIZE_TYPE__ __s2_bytes, __locale_t __locale),fuzzy_wmemcasecmp_l,(__s1,__s1_bytes,__s2,__s2_bytes,__locale))
 #elif defined(__CRT_HAVE_DOS$fuzzy_wmemcasecmp_l)
@@ -69,7 +69,7 @@ __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(fuzzy_c16scasecmp_l))(__CHAR16_TYPE__
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_fuzzy_c16scasecmp_l_defined
-#define __local___localdep_fuzzy_c16scasecmp_l_defined 1
+#define __local___localdep_fuzzy_c16scasecmp_l_defined
 #define __localdep_fuzzy_c16scasecmp_l __LIBC_LOCAL_NAME(fuzzy_c16scasecmp_l)
 #endif /* !__local___localdep_fuzzy_c16scasecmp_l_defined */
 #else /* (__CRT_HAVE_fuzzy_wmemcasecmp_l && __SIZEOF_WCHAR_T__ == 2 && __LIBCCALL_IS_LIBDCALL) || __CRT_HAVE_DOS$fuzzy_wmemcasecmp_l || !__NO_MALLOCA */

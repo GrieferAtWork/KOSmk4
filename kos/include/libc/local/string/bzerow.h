@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x20a8134 */
+/* HASH CRC-32:0xfe52911b */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,12 +19,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_bzerow_defined
-#define __local_bzerow_defined 1
+#define __local_bzerow_defined
 #include <__crt.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_memsetw_defined
-#define __local___localdep_memsetw_defined 1
+#define __local___localdep_memsetw_defined
 #ifdef __CRT_HAVE_memsetw
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),__UINT16_TYPE__ *,__NOTHROW_NCX,__localdep_memsetw,(void *__restrict __dst, __UINT16_TYPE__ __word, __SIZE_TYPE__ __n_words),memsetw,(__dst,__word,__n_words))
 #elif defined(__CRT_HAVE_wmemset) && __SIZEOF_WCHAR_T__ == 2
@@ -44,7 +44,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(bzerow))(void *__restrict __dst, __SI
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_bzerow_defined
-#define __local___localdep_bzerow_defined 1
+#define __local___localdep_bzerow_defined
 #define __localdep_bzerow __LIBC_LOCAL_NAME(bzerow)
 #endif /* !__local___localdep_bzerow_defined */
 #endif /* !__local_bzerow_defined */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb3e2afda */
+/* HASH CRC-32:0xfd870d7f */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_clock_nanosleep_defined
-#define __local_clock_nanosleep_defined 1
+#define __local_clock_nanosleep_defined
 #include <__crt.h>
 #include <bits/types.h>
 #if defined(__CRT_HAVE_clock_nanosleep64) || defined(__CRT_HAVE_clock_nanosleep) || defined(__CRT_HAVE___clock_nanosleep)
@@ -27,7 +27,7 @@
 #include <bits/os/timespec.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_clock_nanosleep32_defined
-#define __local___localdep_clock_nanosleep32_defined 1
+#define __local___localdep_clock_nanosleep32_defined
 #ifdef __CRT_HAVE_clock_nanosleep
 __CREDIRECT(__ATTR_NONNULL((3)),int,__NOTHROW_RPC,__localdep_clock_nanosleep32,(__clockid_t __clock_id, __STDC_INT_AS_UINT_T __flags, struct __timespec32 const *__restrict __requested_time, struct __timespec32 *__remaining),clock_nanosleep,(__clock_id,__flags,__requested_time,__remaining))
 #elif defined(__CRT_HAVE___clock_nanosleep)
@@ -37,7 +37,7 @@ __CREDIRECT(__ATTR_NONNULL((3)),int,__NOTHROW_RPC,__localdep_clock_nanosleep32,(
 #endif /* !... */
 #endif /* !__local___localdep_clock_nanosleep32_defined */
 #ifndef __local___localdep_clock_nanosleep64_defined
-#define __local___localdep_clock_nanosleep64_defined 1
+#define __local___localdep_clock_nanosleep64_defined
 #if defined(__CRT_HAVE_clock_nanosleep) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 __CREDIRECT(__ATTR_NONNULL((3)),int,__NOTHROW_RPC,__localdep_clock_nanosleep64,(__clockid_t __clock_id, __STDC_INT_AS_UINT_T __flags, struct __timespec64 const *__requested_time, struct __timespec64 *__remaining),clock_nanosleep,(__clock_id,__flags,__requested_time,__remaining))
 #elif defined(__CRT_HAVE_clock_nanosleep64)
@@ -79,7 +79,7 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(clock_nanosleep))(__clockid_t __clock
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_clock_nanosleep_defined
-#define __local___localdep_clock_nanosleep_defined 1
+#define __local___localdep_clock_nanosleep_defined
 #define __localdep_clock_nanosleep __LIBC_LOCAL_NAME(clock_nanosleep)
 #endif /* !__local___localdep_clock_nanosleep_defined */
 #else /* __CRT_HAVE_clock_nanosleep64 || __CRT_HAVE_clock_nanosleep || __CRT_HAVE___clock_nanosleep */

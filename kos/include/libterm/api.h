@@ -25,23 +25,23 @@
 
 #if defined(__i386__) && !defined(__x86_64__)
 #define LIBTERM_CC __ATTR_STDCALL
-#else
+#else /* ... */
 #define LIBTERM_CC /* nothing */
-#endif
+#endif /* !... */
 
-#if !defined(LIBTERM_WANT_PROTOTYPES) && \
-     defined(__KOS__) && defined(__KERNEL__)
-#define LIBTERM_WANT_PROTOTYPES 1
-#endif
+#if (!defined(LIBTERM_WANT_PROTOTYPES) && \
+     defined(__KOS__) && defined(__KERNEL__))
+#define LIBTERM_WANT_PROTOTYPES
+#endif /* ... */
 
-#if defined(__KOS__) && defined(__KERNEL__) && \
-    defined(CONFIG_BUILDING_KERNEL_CORE)
+#if (defined(__KOS__) && defined(__KERNEL__) && \
+     defined(CONFIG_BUILDING_KERNEL_CORE))
 #define LIBTERM_DECL __PUBDEF
 #elif defined(__LIBTERM_STATIC)
 #define LIBTERM_DECL __INTDEF
-#else
+#else /* ... */
 #define LIBTERM_DECL __IMPDEF
-#endif
+#endif /* !... */
 
 /* Library name for use with `dlopen()' */
 #define LIBTERM_LIBRARY_NAME "libterm.so"

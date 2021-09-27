@@ -82,7 +82,7 @@
 #else /* __USE_TIME64 */
 #define __timeb64 timeb
 #endif /* !__USE_TIME64 */
-#define __timeb_defined 1
+#define __timeb_defined
 #endif /* __x86_64__ */
 /*[[[end]]]*/
 

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcf281b66 */
+/* HASH CRC-32:0x53887b0b */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,14 +19,14 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_PReadAll64_defined
-#define __local_PReadAll64_defined 1
+#define __local_PReadAll64_defined
 #include <__crt.h>
 #include <bits/types.h>
 #if defined(__CRT_HAVE_PRead64) || defined(__CRT_HAVE_PRead)
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_PRead64_defined
-#define __local___localdep_PRead64_defined 1
+#define __local___localdep_PRead64_defined
 #if defined(__CRT_HAVE_PRead) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
 __CREDIRECT(__ATTR_NONNULL((2)),__SIZE_TYPE__,__THROWING,__localdep_PRead64,(__fd_t __fd, void *__buf, __SIZE_TYPE__ __bufsize, __pos64_t __offset),PRead,(__fd,__buf,__bufsize,__offset))
 #elif defined(__CRT_HAVE_PRead64)
@@ -64,7 +64,7 @@ __LOCAL_LIBC(PReadAll64) __ATTR_NONNULL((2)) __SIZE_TYPE__
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_PReadAll64_defined
-#define __local___localdep_PReadAll64_defined 1
+#define __local___localdep_PReadAll64_defined
 #define __localdep_PReadAll64 __LIBC_LOCAL_NAME(PReadAll64)
 #endif /* !__local___localdep_PReadAll64_defined */
 #else /* __CRT_HAVE_PRead64 || __CRT_HAVE_PRead */

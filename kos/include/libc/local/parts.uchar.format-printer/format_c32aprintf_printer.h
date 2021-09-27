@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6a9b742e */
+/* HASH CRC-32:0x6ebe5eec */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,16 +19,16 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_format_c32aprintf_printer_defined
-#define __local_format_c32aprintf_printer_defined 1
+#define __local_format_c32aprintf_printer_defined
 #include <__crt.h>
 #if (defined(__CRT_HAVE_format_waprintf_alloc) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)) || defined(__CRT_HAVE_KOS$format_waprintf_alloc) || defined(__CRT_HAVE_realloc)
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_format_c32aprintf_alloc_defined
-#define __local___localdep_format_c32aprintf_alloc_defined 1
+#define __local___localdep_format_c32aprintf_alloc_defined
 #if defined(__CRT_HAVE_format_waprintf_alloc) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
 __NAMESPACE_LOCAL_END
 #ifndef __format_waprintf_data_defined
-#define __format_waprintf_data_defined 1
+#define __format_waprintf_data_defined
 struct format_waprintf_data {
 	__WCHAR_TYPE__      *ap_base;  /* [0..ap_used|ALLOC(ap_used+ap_avail)][owned] Buffer */
 	__SIZE_TYPE__ ap_avail; /* Unused buffer size */
@@ -40,7 +40,7 @@ __CREDIRECT(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_NONN
 #elif defined(__CRT_HAVE_KOS$format_waprintf_alloc)
 __NAMESPACE_LOCAL_END
 #ifndef __format_waprintf_data_defined
-#define __format_waprintf_data_defined 1
+#define __format_waprintf_data_defined
 struct format_waprintf_data {
 	__WCHAR_TYPE__      *ap_base;  /* [0..ap_used|ALLOC(ap_used+ap_avail)][owned] Buffer */
 	__SIZE_TYPE__ ap_avail; /* Unused buffer size */
@@ -64,7 +64,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_format_c32aprintf_alloc_defined */
 #ifndef __local___localdep_memcpyl_defined
-#define __local___localdep_memcpyl_defined 1
+#define __local___localdep_memcpyl_defined
 #ifdef __CRT_HAVE_memcpyl
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
@@ -100,7 +100,7 @@ __err:
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_format_c32aprintf_printer_defined
-#define __local___localdep_format_c32aprintf_printer_defined 1
+#define __local___localdep_format_c32aprintf_printer_defined
 #define __localdep_format_c32aprintf_printer __LIBC_LOCAL_NAME(format_c32aprintf_printer)
 #endif /* !__local___localdep_format_c32aprintf_printer_defined */
 #else /* (__CRT_HAVE_format_waprintf_alloc && __SIZEOF_WCHAR_T__ == 4 && __LIBCCALL_IS_LIBKCALL) || __CRT_HAVE_KOS$format_waprintf_alloc || __CRT_HAVE_realloc */

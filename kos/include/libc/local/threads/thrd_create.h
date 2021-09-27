@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe0335b5e */
+/* HASH CRC-32:0xa51f0400 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,13 +19,13 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_thrd_create_defined
-#define __local_thrd_create_defined 1
+#define __local_thrd_create_defined
 #include <__crt.h>
 #ifdef __CRT_HAVE_pthread_create
 #include <bits/crt/threads.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_pthread_create_defined
-#define __local___localdep_pthread_create_defined 1
+#define __local___localdep_pthread_create_defined
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 #include <bits/crt/pthreadtypes.h>
@@ -53,7 +53,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(thrd_create))(__thrd_t *__thr, int (_
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_thrd_create_defined
-#define __local___localdep_thrd_create_defined 1
+#define __local___localdep_thrd_create_defined
 #define __localdep_thrd_create __LIBC_LOCAL_NAME(thrd_create)
 #endif /* !__local___localdep_thrd_create_defined */
 #else /* __CRT_HAVE_pthread_create */

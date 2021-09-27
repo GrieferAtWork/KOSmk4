@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1f3c80ce */
+/* HASH CRC-32:0xcbe1a0bf */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,13 +19,13 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_lfutexlock64_defined
-#define __local_lfutexlock64_defined 1
+#define __local_lfutexlock64_defined
 #include <__crt.h>
 #ifdef __CRT_HAVE_lfutexlock
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_lfutexlock32_defined
-#define __local___localdep_lfutexlock32_defined 1
+#define __local___localdep_lfutexlock32_defined
 __CVREDIRECT(__ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_lfutexlock32,(__uintptr_t *__ulockaddr, __uintptr_t *__uaddr, __syscall_ulong_t __futex_op, __uintptr_t __val),lfutexlock,(__ulockaddr,__uaddr,__futex_op,__val),__val,2,(__UINTPTR_TYPE__,__UINTPTR_TYPE__))
 #endif /* !__local___localdep_lfutexlock32_defined */
 __NAMESPACE_LOCAL_END
@@ -49,7 +49,7 @@ __NOTHROW_RPC(__VLIBCCALL __LIBC_LOCAL_NAME(lfutexlock64))(__uintptr_t *__ulocka
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_lfutexlock64_defined
-#define __local___localdep_lfutexlock64_defined 1
+#define __local___localdep_lfutexlock64_defined
 #define __localdep_lfutexlock64 __LIBC_LOCAL_NAME(lfutexlock64)
 #endif /* !__local___localdep_lfutexlock64_defined */
 #else /* __CRT_HAVE_lfutexlock */

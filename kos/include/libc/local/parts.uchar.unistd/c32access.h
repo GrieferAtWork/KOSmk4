@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5658904a */
+/* HASH CRC-32:0x3d5ceaf0 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,14 +19,14 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_c32access_defined
-#define __local_c32access_defined 1
+#define __local_c32access_defined
 #include <__crt.h>
 #include <asm/os/fcntl.h>
 #if defined(__AT_FDCWD) && ((defined(__CRT_HAVE_wfaccessat) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)) || defined(__CRT_HAVE_KOS$wfaccessat))
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_c32faccessat_defined
-#define __local___localdep_c32faccessat_defined 1
+#define __local___localdep_c32faccessat_defined
 #if defined(__CRT_HAVE_wfaccessat) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,__localdep_c32faccessat,(__fd_t __dfd, __CHAR32_TYPE__ const *__file, __STDC_INT_AS_UINT_T __type, __atflag_t __flags),wfaccessat,(__dfd,__file,__type,__flags))
 #elif defined(__CRT_HAVE_KOS$wfaccessat)
@@ -41,7 +41,7 @@ __NOTHROW_RPC(__LIBKCALL __LIBC_LOCAL_NAME(c32access))(__CHAR32_TYPE__ const *__
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_c32access_defined
-#define __local___localdep_c32access_defined 1
+#define __local___localdep_c32access_defined
 #define __localdep_c32access __LIBC_LOCAL_NAME(c32access)
 #endif /* !__local___localdep_c32access_defined */
 #else /* __AT_FDCWD && ((__CRT_HAVE_wfaccessat && __SIZEOF_WCHAR_T__ == 4 && __LIBCCALL_IS_LIBKCALL) || __CRT_HAVE_KOS$wfaccessat) */

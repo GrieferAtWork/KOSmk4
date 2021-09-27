@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x914f5488 */
+/* HASH CRC-32:0x40731609 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,14 +19,14 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_futimes64_defined
-#define __local_futimes64_defined 1
+#define __local_futimes64_defined
 #include <__crt.h>
 #ifdef __CRT_HAVE_futimes
 #include <bits/os/timeval.h>
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_futimes32_defined
-#define __local___localdep_futimes32_defined 1
+#define __local___localdep_futimes32_defined
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_futimes32,(__fd_t __fd, struct __timeval32 const __tvp[2]),futimes,(__fd,__tvp))
 #endif /* !__local___localdep_futimes32_defined */
 __LOCAL_LIBC(futimes64) int
@@ -42,7 +42,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(futimes64))(__fd_t __fd, struct __tim
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_futimes64_defined
-#define __local___localdep_futimes64_defined 1
+#define __local___localdep_futimes64_defined
 #define __localdep_futimes64 __LIBC_LOCAL_NAME(futimes64)
 #endif /* !__local___localdep_futimes64_defined */
 #else /* __CRT_HAVE_futimes */

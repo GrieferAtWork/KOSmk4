@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x11f56c1a */
+/* HASH CRC-32:0x8314117b */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,18 +19,18 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_utimensat_defined
-#define __local_utimensat_defined 1
+#define __local_utimensat_defined
 #include <__crt.h>
 #include <bits/types.h>
 #if defined(__CRT_HAVE_utimensat64) || defined(__CRT_HAVE_utimensat)
 #include <bits/os/timespec.h>
 __NAMESPACE_LOCAL_BEGIN
 #if !defined(__local___localdep_utimensat32_defined) && defined(__CRT_HAVE_utimensat)
-#define __local___localdep_utimensat32_defined 1
+#define __local___localdep_utimensat32_defined
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,__localdep_utimensat32,(__fd_t __dirfd, char const *__filename, struct timespec const __times[2 /*or:3*/], __atflag_t __flags),utimensat,(__dirfd,__filename,__times,__flags))
 #endif /* !__local___localdep_utimensat32_defined && __CRT_HAVE_utimensat */
 #ifndef __local___localdep_utimensat64_defined
-#define __local___localdep_utimensat64_defined 1
+#define __local___localdep_utimensat64_defined
 #if defined(__CRT_HAVE_utimensat) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,__localdep_utimensat64,(__fd_t __dirfd, char const *__filename, struct __timespec64 const __times[2 /*or:3*/], __atflag_t __flags),utimensat,(__dirfd,__filename,__times,__flags))
 #elif defined(__CRT_HAVE_utimensat64)
@@ -101,7 +101,7 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(utimensat))(__fd_t __dirfd, char cons
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_utimensat_defined
-#define __local___localdep_utimensat_defined 1
+#define __local___localdep_utimensat_defined
 #define __localdep_utimensat __LIBC_LOCAL_NAME(utimensat)
 #endif /* !__local___localdep_utimensat_defined */
 #else /* __CRT_HAVE_utimensat64 || __CRT_HAVE_utimensat */

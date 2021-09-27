@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xee475f41 */
+/* HASH CRC-32:0x410ae975 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,13 +19,13 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_mtx_unlock_defined
-#define __local_mtx_unlock_defined 1
+#define __local_mtx_unlock_defined
 #include <__crt.h>
 #ifdef __CRT_HAVE_pthread_mutex_unlock
 #include <bits/crt/threads.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_pthread_mutex_unlock_defined
-#define __local___localdep_pthread_mutex_unlock_defined 1
+#define __local___localdep_pthread_mutex_unlock_defined
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 #include <bits/crt/pthreadtypes.h>
@@ -46,7 +46,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(mtx_unlock))(__mtx_t *__restrict __mu
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_mtx_unlock_defined
-#define __local___localdep_mtx_unlock_defined 1
+#define __local___localdep_mtx_unlock_defined
 #define __localdep_mtx_unlock __LIBC_LOCAL_NAME(mtx_unlock)
 #endif /* !__local___localdep_mtx_unlock_defined */
 #else /* __CRT_HAVE_pthread_mutex_unlock */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x25452fe2 */
+/* HASH CRC-32:0x4c2de664 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,12 +19,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_execle_defined
-#define __local_execle_defined 1
+#define __local_execle_defined
 #include <__crt.h>
 #if defined(__CRT_HAVE_execve) || defined(__CRT_HAVE__execve)
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_execve_defined
-#define __local___localdep_execve_defined 1
+#define __local___localdep_execve_defined
 #if __has_builtin(__builtin_execve) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_execve)
 __NAMESPACE_LOCAL_END
 #include <features.h>
@@ -80,7 +80,7 @@ __NOTHROW_RPC(__VLIBCCALL __LIBC_LOCAL_NAME(execle))(char const *__restrict __pa
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_execle_defined
-#define __local___localdep_execle_defined 1
+#define __local___localdep_execle_defined
 #define __localdep_execle __LIBC_LOCAL_NAME(execle)
 #endif /* !__local___localdep_execle_defined */
 #else /* __CRT_HAVE_execve || __CRT_HAVE__execve */

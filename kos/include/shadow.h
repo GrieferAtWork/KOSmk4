@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9538fc0c */
+/* HASH CRC-32:0xcd3695b2 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -48,7 +48,7 @@
 __SYSDECL_BEGIN
 
 #ifndef __std_FILE_defined
-#define __std_FILE_defined 1
+#define __std_FILE_defined
 __NAMESPACE_STD_BEGIN
 typedef __FILE FILE;
 __NAMESPACE_STD_END
@@ -56,13 +56,13 @@ __NAMESPACE_STD_END
 
 #ifndef __CXX_SYSTEM_HEADER
 #ifndef __FILE_defined
-#define __FILE_defined 1
+#define __FILE_defined
 __NAMESPACE_STD_USING(FILE)
 #endif /* !__FILE_defined */
 #endif /* !__CXX_SYSTEM_HEADER */
 
 #ifndef __size_t_defined
-#define __size_t_defined 1
+#define __size_t_defined
 typedef __SIZE_TYPE__ size_t;
 #endif /* !__size_t_defined */
 

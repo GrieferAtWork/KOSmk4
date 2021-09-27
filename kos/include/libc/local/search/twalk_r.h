@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x364a74ef */
+/* HASH CRC-32:0x3deacdd1 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_twalk_r_defined
-#define __local_twalk_r_defined 1
+#define __local_twalk_r_defined
 #include <__crt.h>
 #include <kos/anno.h>
 #ifndef __VISIT_defined
@@ -63,7 +63,7 @@ __LOCAL_LIBC(twalk_r) void
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_twalk_r_defined
-#define __local___localdep_twalk_r_defined 1
+#define __local___localdep_twalk_r_defined
 #define __localdep_twalk_r __LIBC_LOCAL_NAME(twalk_r)
 #endif /* !__local___localdep_twalk_r_defined */
 #endif /* !__local_twalk_r_defined */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3ee3a458 */
+/* HASH CRC-32:0xea59f45d */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,14 +19,14 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_putchar32_defined
-#define __local_putchar32_defined 1
+#define __local_putchar32_defined
 #include <__crt.h>
 #if !defined(__NO_STDSTREAMS) && ((defined(__CRT_HAVE_fputwc) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)) || defined(__CRT_HAVE_KOS$fputwc) || (defined(__CRT_HAVE_putwc) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)) || defined(__CRT_HAVE_KOS$putwc))
 #include <kos/anno.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_fputc32_defined
-#define __local___localdep_fputc32_defined 1
+#define __local___localdep_fputc32_defined
 #if defined(__CRT_HAVE_fputwc) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
 __CREDIRECT(__ATTR_NONNULL((2)),__WINT32_TYPE__,__THROWING,__localdep_fputc32,(__CHAR32_TYPE__ __wc, __FILE *__stream),fputwc,(__wc,__stream))
 #elif defined(__CRT_HAVE_KOS$fputwc)
@@ -48,7 +48,7 @@ __LOCAL_LIBC(putchar32) __WINT32_TYPE__
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_putchar32_defined
-#define __local___localdep_putchar32_defined 1
+#define __local___localdep_putchar32_defined
 #define __localdep_putchar32 __LIBC_LOCAL_NAME(putchar32)
 #endif /* !__local___localdep_putchar32_defined */
 #else /* !__NO_STDSTREAMS && ((__CRT_HAVE_fputwc && __SIZEOF_WCHAR_T__ == 4 && __LIBCCALL_IS_LIBKCALL) || __CRT_HAVE_KOS$fputwc || (__CRT_HAVE_putwc && __SIZEOF_WCHAR_T__ == 4 && __LIBCCALL_IS_LIBKCALL) || __CRT_HAVE_KOS$putwc) */

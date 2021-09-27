@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7340ffc8 */
+/* HASH CRC-32:0xebc4a824 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,14 +19,14 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_mq_timedreceive64_defined
-#define __local_mq_timedreceive64_defined 1
+#define __local_mq_timedreceive64_defined
 #include <__crt.h>
 #ifdef __CRT_HAVE_mq_timedreceive
 #include <bits/os/timespec.h>
 #include <bits/os/mqueue.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_mq_timedreceive32_defined
-#define __local___localdep_mq_timedreceive32_defined 1
+#define __local___localdep_mq_timedreceive32_defined
 __CREDIRECT(__ATTR_NONNULL((2, 5)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_mq_timedreceive32,(__mqd_t __mqdes, char *__restrict __msg_ptr, __SIZE_TYPE__ __msg_len, unsigned int *__pmsg_prio, struct __timespec32 const *__restrict __abs_timeout),mq_timedreceive,(__mqdes,__msg_ptr,__msg_len,__pmsg_prio,__abs_timeout))
 #endif /* !__local___localdep_mq_timedreceive32_defined */
 __LOCAL_LIBC(mq_timedreceive64) __ATTR_NONNULL((2, 5)) __SSIZE_TYPE__
@@ -38,7 +38,7 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(mq_timedreceive64))(__mqd_t __mqdes, 
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_mq_timedreceive64_defined
-#define __local___localdep_mq_timedreceive64_defined 1
+#define __local___localdep_mq_timedreceive64_defined
 #define __localdep_mq_timedreceive64 __LIBC_LOCAL_NAME(mq_timedreceive64)
 #endif /* !__local___localdep_mq_timedreceive64_defined */
 #else /* __CRT_HAVE_mq_timedreceive */

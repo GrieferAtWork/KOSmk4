@@ -27,19 +27,19 @@
 
 #if defined(__i386__) && !defined(__x86_64__)
 #define LIBPCIACCESS_CC __ATTR_FASTCALL
-#else
+#else /* ... */
 #define LIBPCIACCESS_CC /* nothing */
-#endif
+#endif /* !... */
 
 #if defined(__KOS__) && defined(__KERNEL__)
-#define LIBPCIACCESS_WANT_PROTOTYPES 1
+#define LIBPCIACCESS_WANT_PROTOTYPES
 #endif /* __KOS__ && __KERNEL__ */
 
 #ifdef __LIBPCI_STATIC
 #define LIBPCIACCESS_DECL __INTDEF
-#else
+#else /* ... */
 #define LIBPCIACCESS_DECL __IMPDEF
-#endif
+#endif /* !... */
 
 /* Library name for use with `dlopen()' */
 #define LIBPCIACCESS_LIBRARY_NAME "libpciaccess.so"

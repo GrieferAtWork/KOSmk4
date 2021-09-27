@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x16d8cea6 */
+/* HASH CRC-32:0xb01e9bb7 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_wcsnset_defined
-#define __local_wcsnset_defined 1
+#define __local_wcsnset_defined
 #include <__crt.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -32,7 +32,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcsnset))(__WCHAR_TYPE__ *__restrict 
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_wcsnset_defined
-#define __local___localdep_wcsnset_defined 1
+#define __local___localdep_wcsnset_defined
 #define __localdep_wcsnset __LIBC_LOCAL_NAME(wcsnset)
 #endif /* !__local___localdep_wcsnset_defined */
 #endif /* !__local_wcsnset_defined */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd6ed5a2b */
+/* HASH CRC-32:0x740fe7e */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,11 +19,11 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local__makepath_defined
-#define __local__makepath_defined 1
+#define __local__makepath_defined
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep__makepath_s_defined
-#define __local___localdep__makepath_s_defined 1
+#define __local___localdep__makepath_s_defined
 #ifdef __CRT_HAVE__makepath_s
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
@@ -42,7 +42,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_makepath))(char *__restrict __buf, c
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep__makepath_defined
-#define __local___localdep__makepath_defined 1
+#define __local___localdep__makepath_defined
 #define __localdep__makepath __LIBC_LOCAL_NAME(_makepath)
 #endif /* !__local___localdep__makepath_defined */
 #endif /* !__local__makepath_defined */

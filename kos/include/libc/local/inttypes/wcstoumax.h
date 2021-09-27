@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6bf8ec16 */
+/* HASH CRC-32:0x3e8c5cd0 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,13 +19,13 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_wcstoumax_defined
-#define __local_wcstoumax_defined 1
+#define __local_wcstoumax_defined
 #include <__crt.h>
 #include <features.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_wcstou32_defined
-#define __local___localdep_wcstou32_defined 1
+#define __local___localdep_wcstou32_defined
 #ifdef __CRT_HAVE_wcstou32
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__UINT32_TYPE__,__NOTHROW_NCX,__localdep_wcstou32,(__WCHAR_TYPE__ const *__restrict __nptr, __WCHAR_TYPE__ **__endptr, __STDC_INT_AS_UINT_T __base),wcstou32,(__nptr,__endptr,__base))
 #elif defined(__CRT_HAVE_wcstoul) && __SIZEOF_LONG__ == 4
@@ -44,7 +44,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_wcstou32_defined */
 #ifndef __local___localdep_wcstou64_defined
-#define __local___localdep_wcstou64_defined 1
+#define __local___localdep_wcstou64_defined
 #ifdef __CRT_HAVE_wcstou64
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__UINT64_TYPE__,__NOTHROW_NCX,__localdep_wcstou64,(__WCHAR_TYPE__ const *__restrict __nptr, __WCHAR_TYPE__ **__endptr, __STDC_INT_AS_UINT_T __base),wcstou64,(__nptr,__endptr,__base))
 #elif defined(__CRT_HAVE__wcstoui64)
@@ -74,7 +74,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcstoumax))(__WCHAR_TYPE__ const *__r
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_wcstoumax_defined
-#define __local___localdep_wcstoumax_defined 1
+#define __local___localdep_wcstoumax_defined
 #define __localdep_wcstoumax __LIBC_LOCAL_NAME(wcstoumax)
 #endif /* !__local___localdep_wcstoumax_defined */
 #endif /* !__local_wcstoumax_defined */

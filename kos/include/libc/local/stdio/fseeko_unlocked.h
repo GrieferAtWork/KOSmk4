@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd1f1be72 */
+/* HASH CRC-32:0x9678ecbd */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_fseeko_unlocked_defined
-#define __local_fseeko_unlocked_defined 1
+#define __local_fseeko_unlocked_defined
 #include <__crt.h>
 #include <features.h>
 #include <bits/types.h>
@@ -27,7 +27,7 @@
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_fseeko_defined
-#define __local___localdep_fseeko_defined 1
+#define __local___localdep_fseeko_defined
 #if defined(__CRT_HAVE_fseek_unlocked) && defined(__USE_STDIO_UNLOCKED) && __FS_SIZEOF(OFF) == __SIZEOF_LONG__
 __CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,__localdep_fseeko,(__FILE *__restrict __stream, __FS_TYPE(off) __off, int __whence),fseek_unlocked,(__stream,__off,__whence))
 #elif defined(__CRT_HAVE__fseek_nolock) && defined(__USE_STDIO_UNLOCKED) && __FS_SIZEOF(OFF) == __SIZEOF_LONG__
@@ -75,7 +75,7 @@ __LOCAL_LIBC(fseeko_unlocked) __ATTR_NONNULL((1)) int
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_fseeko_unlocked_defined
-#define __local___localdep_fseeko_unlocked_defined 1
+#define __local___localdep_fseeko_unlocked_defined
 #define __localdep_fseeko_unlocked __LIBC_LOCAL_NAME(fseeko_unlocked)
 #endif /* !__local___localdep_fseeko_unlocked_defined */
 #else /* __CRT_HAVE_fseeko64 || __CRT_HAVE_fseek64 || __CRT_HAVE__fseeki64 || __CRT_HAVE_fseeko64_unlocked || __CRT_HAVE_fseek64_unlocked || __CRT_HAVE__fseeki64_nolock || __CRT_HAVE_fseeko || __CRT_HAVE_fseeko_unlocked || __CRT_HAVE_fseek || __CRT_HAVE_fseek_unlocked || __CRT_HAVE__fseek_nolock */

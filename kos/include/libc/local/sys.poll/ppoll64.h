@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x213dcb64 */
+/* HASH CRC-32:0xe33c957a */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_ppoll64_defined
-#define __local_ppoll64_defined 1
+#define __local_ppoll64_defined
 #include <__crt.h>
 #ifdef __CRT_HAVE_ppoll
 #include <bits/os/pollfd.h>
@@ -27,7 +27,7 @@
 #include <bits/os/sigset.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_ppoll32_defined
-#define __local___localdep_ppoll32_defined 1
+#define __local___localdep_ppoll32_defined
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_ppoll32,(struct pollfd *__fds, __UINTPTR_TYPE__ __nfds, struct __timespec32 const *__timeout, struct __sigset_struct const *__ss),ppoll,(__fds,__nfds,__timeout,__ss))
 #endif /* !__local___localdep_ppoll32_defined */
 __LOCAL_LIBC(ppoll64) __ATTR_NONNULL((1)) int
@@ -41,7 +41,7 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(ppoll64))(struct pollfd *__fds, __UIN
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_ppoll64_defined
-#define __local___localdep_ppoll64_defined 1
+#define __local___localdep_ppoll64_defined
 #define __localdep_ppoll64 __LIBC_LOCAL_NAME(ppoll64)
 #endif /* !__local___localdep_ppoll64_defined */
 #else /* __CRT_HAVE_ppoll */

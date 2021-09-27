@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3269c3f5 */
+/* HASH CRC-32:0x53b6903b */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,17 +19,17 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_sendfile_defined
-#define __local_sendfile_defined 1
+#define __local_sendfile_defined
 #include <__crt.h>
 #include <bits/types.h>
 #if defined(__CRT_HAVE_sendfile64) || defined(__CRT_HAVE_sendfile)
 __NAMESPACE_LOCAL_BEGIN
 #if !defined(__local___localdep_sendfile32_defined) && defined(__CRT_HAVE_sendfile)
-#define __local___localdep_sendfile32_defined 1
+#define __local___localdep_sendfile32_defined
 __CREDIRECT(,__SSIZE_TYPE__,__NOTHROW_NCX,__localdep_sendfile32,(__fd_t __out_fd, __fd_t __in_fd, __off32_t *__offset, __SIZE_TYPE__ __count),sendfile,(__out_fd,__in_fd,__offset,__count))
 #endif /* !__local___localdep_sendfile32_defined && __CRT_HAVE_sendfile */
 #ifndef __local___localdep_sendfile64_defined
-#define __local___localdep_sendfile64_defined 1
+#define __local___localdep_sendfile64_defined
 #if defined(__CRT_HAVE_sendfile) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
 __CREDIRECT(,__SSIZE_TYPE__,__NOTHROW_NCX,__localdep_sendfile64,(__fd_t __out_fd, __fd_t __in_fd, __off64_t *__offset, __SIZE_TYPE__ __count),sendfile,(__out_fd,__in_fd,__offset,__count))
 #elif defined(__CRT_HAVE_sendfile64)
@@ -69,7 +69,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(sendfile))(__fd_t __out_fd, __fd_t __
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_sendfile_defined
-#define __local___localdep_sendfile_defined 1
+#define __local___localdep_sendfile_defined
 #define __localdep_sendfile __LIBC_LOCAL_NAME(sendfile)
 #endif /* !__local___localdep_sendfile_defined */
 #else /* __CRT_HAVE_sendfile64 || __CRT_HAVE_sendfile */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xda9931bd */
+/* HASH CRC-32:0x650b962e */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,20 +19,20 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_tcsetsid_defined
-#define __local_tcsetsid_defined 1
+#define __local_tcsetsid_defined
 #include <__crt.h>
 #include <asm/os/tty.h>
 #if defined(__CRT_HAVE_ioctl) && defined(__TIOCSCTTY)
 __NAMESPACE_LOCAL_BEGIN
 #if !defined(__local___localdep_getsid_defined) && defined(__CRT_HAVE_getsid)
-#define __local___localdep_getsid_defined 1
+#define __local___localdep_getsid_defined
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_WUNUSED,__pid_t,__NOTHROW_NCX,__localdep_getsid,(__pid_t __pid),getsid,(__pid))
 #endif /* !__local___localdep_getsid_defined && __CRT_HAVE_getsid */
 #ifndef __local___localdep_ioctl_defined
-#define __local___localdep_ioctl_defined 1
+#define __local___localdep_ioctl_defined
 __NAMESPACE_LOCAL_END
 #include <features.h>
 #include <bits/types.h>
@@ -58,7 +58,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(tcsetsid))(__fd_t __fd, __pid_t __pid
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_tcsetsid_defined
-#define __local___localdep_tcsetsid_defined 1
+#define __local___localdep_tcsetsid_defined
 #define __localdep_tcsetsid __LIBC_LOCAL_NAME(tcsetsid)
 #endif /* !__local___localdep_tcsetsid_defined */
 #else /* __CRT_HAVE_ioctl && __TIOCSCTTY */

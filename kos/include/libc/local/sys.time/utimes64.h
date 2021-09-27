@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x257b4fe1 */
+/* HASH CRC-32:0x3a143f58 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,13 +19,13 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_utimes64_defined
-#define __local_utimes64_defined 1
+#define __local_utimes64_defined
 #include <__crt.h>
 #ifdef __CRT_HAVE_utimes
 #include <bits/os/timeval.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_utimes32_defined
-#define __local___localdep_utimes32_defined 1
+#define __local___localdep_utimes32_defined
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_utimes32,(char const *__file, struct __timeval32 const __tvp[2]),utimes,(__file,__tvp))
 #endif /* !__local___localdep_utimes32_defined */
 __LOCAL_LIBC(utimes64) __ATTR_NONNULL((1)) int
@@ -41,7 +41,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(utimes64))(char const *__file, struct
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_utimes64_defined
-#define __local___localdep_utimes64_defined 1
+#define __local___localdep_utimes64_defined
 #define __localdep_utimes64 __LIBC_LOCAL_NAME(utimes64)
 #endif /* !__local___localdep_utimes64_defined */
 #else /* __CRT_HAVE_utimes */

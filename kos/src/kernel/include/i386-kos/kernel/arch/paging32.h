@@ -250,7 +250,7 @@ NOTHROW(KCALL pagedir_set)(PHYS pagedir_t *__restrict value) {
 
 
 #ifndef __pagedir_pushval_t_defined
-#define __pagedir_pushval_t_defined 1
+#define __pagedir_pushval_t_defined
 #ifdef CONFIG_NO_PAGING_PAE
 #define PAGEDIR_PUSHVAL_INVALID PAE_PAGEDIR_PUSHVAL_INVALID
 #define SIZEOF_PAGEDIR_PUSHVAL  SIZEOF_PAE_PAGEDIR_PUSHVAL

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa4777721 */
+/* HASH CRC-32:0x6adc030f */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,12 +19,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local___mempsetq_chk_defined
-#define __local___mempsetq_chk_defined 1
+#define __local___mempsetq_chk_defined
 #include <__crt.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_mempsetq_defined
-#define __local___localdep_mempsetq_defined 1
+#define __local___localdep_mempsetq_defined
 #ifdef __CRT_HAVE_mempsetq
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),__UINT64_TYPE__ *,__NOTHROW_NCX,__localdep_mempsetq,(void *__restrict __dst, __UINT64_TYPE__ __qword, __SIZE_TYPE__ __n_qwords),mempsetq,(__dst,__qword,__n_qwords))
 #else /* __CRT_HAVE_mempsetq */
@@ -44,7 +44,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(__mempsetq_chk))(void *__restrict __d
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep___mempsetq_chk_defined
-#define __local___localdep___mempsetq_chk_defined 1
+#define __local___localdep___mempsetq_chk_defined
 #define __localdep___mempsetq_chk __LIBC_LOCAL_NAME(__mempsetq_chk)
 #endif /* !__local___localdep___mempsetq_chk_defined */
 #endif /* !__local___mempsetq_chk_defined */

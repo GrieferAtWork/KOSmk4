@@ -37,7 +37,7 @@
 __DECL_BEGIN
 
 #ifndef __physaddr_t_defined
-#define __physaddr_t_defined 1
+#define __physaddr_t_defined
 #ifdef __KERNEL__
 #include <hybrid/__altint.h>
 __HYBRID_ALTINT_TYPEDEF(__physaddr_t, physaddr_t, false); /* Physical memory address (== physpage_t * PAGESIZE) */
@@ -47,7 +47,7 @@ typedef __physaddr_t physaddr_t; /* Physical memory address (== physpage_t * PAG
 #endif /* !__physaddr_t_defined */
 
 #ifndef __size_t_defined
-#define __size_t_defined 1
+#define __size_t_defined
 typedef __size_t size_t;
 #endif /* !__size_t_defined */
 

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1d56853a */
+/* HASH CRC-32:0xfd18a7bc */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,12 +19,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_bzeroc_defined
-#define __local_bzeroc_defined 1
+#define __local_bzeroc_defined
 #include <__crt.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_bzero_defined
-#define __local___localdep_bzero_defined 1
+#define __local___localdep_bzero_defined
 #ifdef __CRT_HAVE_bzero
 __CREDIRECT_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,__localdep_bzero,(void *__restrict __dst, __SIZE_TYPE__ __num_bytes),bzero,(__dst,__num_bytes))
 #elif defined(__CRT_HAVE___bzero)
@@ -39,7 +39,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_bzero_defined */
 #ifndef __local___localdep_bzerol_defined
-#define __local___localdep_bzerol_defined 1
+#define __local___localdep_bzerol_defined
 #ifdef __CRT_HAVE_bzerol
 __CREDIRECT_VOID(__ATTR_LEAF __ATTR_NONNULL((1)),__NOTHROW_NCX,__localdep_bzerol,(void *__restrict __dst, __SIZE_TYPE__ __num_dwords),bzerol,(__dst,__num_dwords))
 #else /* __CRT_HAVE_bzerol */
@@ -50,7 +50,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__CRT_HAVE_bzerol */
 #endif /* !__local___localdep_bzerol_defined */
 #ifndef __local___localdep_bzeroq_defined
-#define __local___localdep_bzeroq_defined 1
+#define __local___localdep_bzeroq_defined
 #ifdef __CRT_HAVE_bzeroq
 __CREDIRECT_VOID(__ATTR_LEAF __ATTR_NONNULL((1)),__NOTHROW_NCX,__localdep_bzeroq,(void *__restrict __dst, __SIZE_TYPE__ __num_qwords),bzeroq,(__dst,__num_qwords))
 #else /* __CRT_HAVE_bzeroq */
@@ -61,7 +61,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__CRT_HAVE_bzeroq */
 #endif /* !__local___localdep_bzeroq_defined */
 #ifndef __local___localdep_bzerow_defined
-#define __local___localdep_bzerow_defined 1
+#define __local___localdep_bzerow_defined
 #ifdef __CRT_HAVE_bzerow
 __CREDIRECT_VOID(__ATTR_LEAF __ATTR_NONNULL((1)),__NOTHROW_NCX,__localdep_bzerow,(void *__restrict __dst, __SIZE_TYPE__ __num_words),bzerow,(__dst,__num_words))
 #else /* __CRT_HAVE_bzerow */
@@ -107,7 +107,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(bzeroc))(void *__restrict __dst, __SI
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_bzeroc_defined
-#define __local___localdep_bzeroc_defined 1
+#define __local___localdep_bzeroc_defined
 #define __localdep_bzeroc __LIBC_LOCAL_NAME(bzeroc)
 #endif /* !__local___localdep_bzeroc_defined */
 #endif /* !__local_bzeroc_defined */

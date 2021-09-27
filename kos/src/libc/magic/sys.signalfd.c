@@ -94,7 +94,7 @@ enum {
 __SYSDECL_BEGIN
 
 #ifndef __sigset_t_defined
-#define __sigset_t_defined 1
+#define __sigset_t_defined
 typedef struct __sigset_struct sigset_t;
 #endif /* !__sigset_t_defined */
 

@@ -103,7 +103,7 @@ __LIBC int sys_nerr;
 
 
 /* NOTE: libc4/5 exports `sys_errlist' under `__USE_BSD', which
- *       implies `__USE_MISC', so we also export it under that
+ *       implies `__USE_MISC', so we also export it under  that
  *       same SOURCE control macro! */
 
 %

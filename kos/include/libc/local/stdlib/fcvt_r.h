@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf2f8d93f */
+/* HASH CRC-32:0x6a894ee8 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,11 +19,11 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_fcvt_r_defined
-#define __local_fcvt_r_defined 1
+#define __local_fcvt_r_defined
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
 #if !defined(__local___localdep_dos_fcvt_s_defined) && defined(__CRT_HAVE__fcvt_s)
-#define __local___localdep_dos_fcvt_s_defined 1
+#define __local___localdep_dos_fcvt_s_defined
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -47,7 +47,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(fcvt_r))(double __val, int __ndigit, 
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_fcvt_r_defined
-#define __local___localdep_fcvt_r_defined 1
+#define __local___localdep_fcvt_r_defined
 #define __localdep_fcvt_r __LIBC_LOCAL_NAME(fcvt_r)
 #endif /* !__local___localdep_fcvt_r_defined */
 #endif /* !__local_fcvt_r_defined */

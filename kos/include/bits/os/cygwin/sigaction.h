@@ -46,8 +46,11 @@
 #define __OFFSET_SIGACTION_FLAGS     __OFFSET_SIGACTION_CYGWIN_FLAGS
 #define __SIZEOF_SIGACTION           __SIZEOF_SIGACTION_CYGWIN
 #define __ALIGNOF_SIGACTION          __ALIGNOF_SIGACTION_CYGWIN
-#define __sighandler_cygwin_t        __sighandler_t
 #define __sigaction_cygwin           sigaction
+#ifndef ____sighandler_t_defined
+#define ____sighandler_t_defined
+#define __sighandler_cygwin_t __sighandler_t
+#endif /* !____sighandler_t_defined */
 #endif /* __CRT_CYG_PRIMARY */
 
 __SYSDECL_BEGIN

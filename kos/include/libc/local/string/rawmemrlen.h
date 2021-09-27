@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6c31b7d9 */
+/* HASH CRC-32:0xf0b8cba8 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,12 +19,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_rawmemrlen_defined
-#define __local_rawmemrlen_defined 1
+#define __local_rawmemrlen_defined
 #include <__crt.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_rawmemrchr_defined
-#define __local___localdep_rawmemrchr_defined 1
+#define __local___localdep_rawmemrchr_defined
 #ifdef __CRT_HAVE_rawmemrchr
 __CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),void *,__NOTHROW_NCX,__localdep_rawmemrchr,(void const *__restrict __haystack, int __needle),rawmemrchr,(__haystack,__needle))
 #else /* __CRT_HAVE_rawmemrchr */
@@ -40,7 +40,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(rawmemrlen))(void const *__restrict _
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_rawmemrlen_defined
-#define __local___localdep_rawmemrlen_defined 1
+#define __local___localdep_rawmemrlen_defined
 #define __localdep_rawmemrlen __LIBC_LOCAL_NAME(rawmemrlen)
 #endif /* !__local___localdep_rawmemrlen_defined */
 #endif /* !__local_rawmemrlen_defined */

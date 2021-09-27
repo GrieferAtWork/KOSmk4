@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcf6d5f90 */
+/* HASH CRC-32:0xa6e7cdd0 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,13 +19,13 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_cosf_defined
-#define __local_cosf_defined 1
+#define __local_cosf_defined
 #include <__crt.h>
 #if defined(__CRT_HAVE_cos) || defined(__CRT_HAVE___cos)
 #include <bits/crt/math-vector.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_cos_defined
-#define __local___localdep_cos_defined 1
+#define __local___localdep_cos_defined
 #if __has_builtin(__builtin_cos) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_cos)
 __CEIREDIRECT(__ATTR_WUNUSED __DECL_SIMD_cos,double,__NOTHROW,__localdep_cos,(double __x),cos,{ return __builtin_cos(__x); })
 #elif defined(__CRT_HAVE_cos)
@@ -42,7 +42,7 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(cosf))(float __x) {
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_cosf_defined
-#define __local___localdep_cosf_defined 1
+#define __local___localdep_cosf_defined
 #define __localdep_cosf __LIBC_LOCAL_NAME(cosf)
 #endif /* !__local___localdep_cosf_defined */
 #else /* __CRT_HAVE_cos || __CRT_HAVE___cos */

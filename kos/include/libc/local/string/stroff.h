@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x835b2f71 */
+/* HASH CRC-32:0x127c21c4 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,12 +19,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_stroff_defined
-#define __local_stroff_defined 1
+#define __local_stroff_defined
 #include <__crt.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_strchrnul_defined
-#define __local___localdep_strchrnul_defined 1
+#define __local___localdep_strchrnul_defined
 #ifdef __CRT_HAVE_strchrnul
 __CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_strchrnul,(char const *__restrict __haystack, int __needle),strchrnul,(__haystack,__needle))
 #else /* __CRT_HAVE_strchrnul */
@@ -40,7 +40,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(stroff))(char const *__restrict __hay
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_stroff_defined
-#define __local___localdep_stroff_defined 1
+#define __local___localdep_stroff_defined
 #define __localdep_stroff __LIBC_LOCAL_NAME(stroff)
 #endif /* !__local___localdep_stroff_defined */
 #endif /* !__local_stroff_defined */

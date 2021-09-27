@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa7004a46 */
+/* HASH CRC-32:0x990b93f6 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -51,7 +51,7 @@ __SYSDECL_BEGIN
 #endif /* !WFORMATPRINTER_CC */
 
 #ifndef __pwformatprinter_defined
-#define __pwformatprinter_defined 1
+#define __pwformatprinter_defined
 /* Callback functions prototypes provided to format functions.
  * NOTE: 'pwformatprinter' usually returns the number of characters printed, but isn't required to.
  * @param: arg:     The user-defined closure parameter passed alongside this function pointer.
@@ -537,7 +537,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(format_wsprintf_printer, __FORCELOCAL __ATTR_ART
 
 
 #ifndef __format_wsnprintf_data_defined
-#define __format_wsnprintf_data_defined 1
+#define __format_wsnprintf_data_defined
 /* Data structure for implementing waprintf() */
 struct format_wsnprintf_data {
 	wchar_t      *sd_buffer; /* [0..sd_bufsiz] Pointer to the next memory location to which to write. */
@@ -603,7 +603,7 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __SSIZE_TYPE__ __NOTHROW_NCX(__WFORM
 #endif /* !... */
 
 #ifndef __format_waprintf_data_defined
-#define __format_waprintf_data_defined 1
+#define __format_waprintf_data_defined
 struct format_waprintf_data {
 	wchar_t      *ap_base;  /* [0..ap_used|ALLOC(ap_used+ap_avail)][owned] Buffer */
 	__SIZE_TYPE__ ap_avail; /* Unused buffer size */

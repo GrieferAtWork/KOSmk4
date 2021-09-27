@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x97f6d324 */
+/* HASH CRC-32:0xc2c117c */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,12 +19,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_strspn_defined
-#define __local_strspn_defined 1
+#define __local_strspn_defined
 #include <__crt.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_strchr_defined
-#define __local___localdep_strchr_defined 1
+#define __local___localdep_strchr_defined
 #if __has_builtin(__builtin_strchr) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_strchr)
 __CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_strchr,(char const *__restrict __haystack, int __needle),strchr,{ return __builtin_strchr(__haystack, __needle); })
 #elif __has_builtin(__builtin_index) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_index)
@@ -49,7 +49,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strspn))(char const *__haystack, char
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_strspn_defined
-#define __local___localdep_strspn_defined 1
+#define __local___localdep_strspn_defined
 #define __localdep_strspn __LIBC_LOCAL_NAME(strspn)
 #endif /* !__local___localdep_strspn_defined */
 #endif /* !__local_strspn_defined */

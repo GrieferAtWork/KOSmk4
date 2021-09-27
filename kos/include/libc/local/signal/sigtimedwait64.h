@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe202b8b */
+/* HASH CRC-32:0xaf3b7a3b */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,14 +19,14 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_sigtimedwait64_defined
-#define __local_sigtimedwait64_defined 1
+#define __local_sigtimedwait64_defined
 #include <__crt.h>
 #ifdef __CRT_HAVE_sigtimedwait
 #include <bits/os/siginfo.h>
 #include <bits/os/timespec.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_sigtimedwait32_defined
-#define __local___localdep_sigtimedwait32_defined 1
+#define __local___localdep_sigtimedwait32_defined
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_sigtimedwait32,(struct __sigset_struct const *__restrict __set, struct __siginfo_struct *__restrict __info, struct __timespec32 const *__rel_timeout),sigtimedwait,(__set,__info,__rel_timeout))
 #endif /* !__local___localdep_sigtimedwait32_defined */
 __LOCAL_LIBC(sigtimedwait64) __ATTR_NONNULL((1)) int
@@ -40,7 +40,7 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(sigtimedwait64))(struct __sigset_stru
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_sigtimedwait64_defined
-#define __local___localdep_sigtimedwait64_defined 1
+#define __local___localdep_sigtimedwait64_defined
 #define __localdep_sigtimedwait64 __LIBC_LOCAL_NAME(sigtimedwait64)
 #endif /* !__local___localdep_sigtimedwait64_defined */
 #else /* __CRT_HAVE_sigtimedwait */

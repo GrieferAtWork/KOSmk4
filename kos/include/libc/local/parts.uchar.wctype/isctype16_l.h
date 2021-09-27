@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2b1cf367 */
+/* HASH CRC-32:0xaa19afdc */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,14 +19,14 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_isctype16_l_defined
-#define __local_isctype16_l_defined 1
+#define __local_isctype16_l_defined
 #include <__crt.h>
 #if (defined(__CRT_HAVE_iswctype) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)) || defined(__CRT_HAVE_DOS$iswctype) || (defined(__CRT_HAVE_is_wctype) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)) || defined(__CRT_HAVE_DOS$is_wctype) || (defined(__CRT_HAVE___iswctype) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)) || defined(__CRT_HAVE_DOS$__iswctype) || (defined(__CRT_KOS) && defined(__CRT_HAVE___unicode_descriptor))
 #include <hybrid/typecore.h>
 #include <bits/crt/wctype.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_isctype16_defined
-#define __local___localdep_isctype16_defined 1
+#define __local___localdep_isctype16_defined
 #if defined(__CRT_HAVE_iswctype) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep_isctype16,(__WINT16_TYPE__ __wc, __wctype_t __desc),iswctype,(__wc,__desc))
 #elif defined(__CRT_HAVE_DOS$iswctype)
@@ -61,7 +61,7 @@ __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(isctype16_l))(__WINT16_TYPE__ __wc, _
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_isctype16_l_defined
-#define __local___localdep_isctype16_l_defined 1
+#define __local___localdep_isctype16_l_defined
 #define __localdep_isctype16_l __LIBC_LOCAL_NAME(isctype16_l)
 #endif /* !__local___localdep_isctype16_l_defined */
 #else /* (__CRT_HAVE_iswctype && __SIZEOF_WCHAR_T__ == 2 && __LIBCCALL_IS_LIBDCALL) || __CRT_HAVE_DOS$iswctype || (__CRT_HAVE_is_wctype && __SIZEOF_WCHAR_T__ == 2 && __LIBCCALL_IS_LIBDCALL) || __CRT_HAVE_DOS$is_wctype || (__CRT_HAVE___iswctype && __SIZEOF_WCHAR_T__ == 2 && __LIBCCALL_IS_LIBDCALL) || __CRT_HAVE_DOS$__iswctype || (__CRT_KOS && __CRT_HAVE___unicode_descriptor) */

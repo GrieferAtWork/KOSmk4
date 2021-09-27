@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe545d132 */
+/* HASH CRC-32:0x488cc8ba */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,13 +19,13 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_wcsto32_l_defined
-#define __local_wcsto32_l_defined 1
+#define __local_wcsto32_l_defined
 #include <__crt.h>
 #include <features.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_wcsto32_defined
-#define __local___localdep_wcsto32_defined 1
+#define __local___localdep_wcsto32_defined
 #ifdef __CRT_HAVE_wcsto32
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__INT32_TYPE__,__NOTHROW_NCX,__localdep_wcsto32,(__WCHAR_TYPE__ const *__restrict __nptr, __WCHAR_TYPE__ **__endptr, __STDC_INT_AS_UINT_T __base),wcsto32,(__nptr,__endptr,__base))
 #elif defined(__CRT_HAVE_wcstol) && __SIZEOF_LONG__ == 4
@@ -50,7 +50,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcsto32_l))(__WCHAR_TYPE__ const *__r
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_wcsto32_l_defined
-#define __local___localdep_wcsto32_l_defined 1
+#define __local___localdep_wcsto32_l_defined
 #define __localdep_wcsto32_l __LIBC_LOCAL_NAME(wcsto32_l)
 #endif /* !__local___localdep_wcsto32_l_defined */
 #endif /* !__local_wcsto32_l_defined */

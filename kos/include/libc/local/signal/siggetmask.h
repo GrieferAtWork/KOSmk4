@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9a56776 */
+/* HASH CRC-32:0xd58884f5 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,12 +19,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_siggetmask_defined
-#define __local_siggetmask_defined 1
+#define __local_siggetmask_defined
 #include <__crt.h>
 #if defined(__CRT_HAVE_sigprocmask) || defined(__CRT_HAVE_pthread_sigmask)
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_sigprocmask_defined
-#define __local___localdep_sigprocmask_defined 1
+#define __local___localdep_sigprocmask_defined
 #ifdef __CRT_HAVE_sigprocmask
 __NAMESPACE_LOCAL_END
 #include <features.h>
@@ -60,7 +60,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(siggetmask))(void) {
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_siggetmask_defined
-#define __local___localdep_siggetmask_defined 1
+#define __local___localdep_siggetmask_defined
 #define __localdep_siggetmask __LIBC_LOCAL_NAME(siggetmask)
 #endif /* !__local___localdep_siggetmask_defined */
 #else /* __CRT_HAVE_sigprocmask || __CRT_HAVE_pthread_sigmask */

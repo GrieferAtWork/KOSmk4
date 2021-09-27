@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xef46091b */
+/* HASH CRC-32:0x9dccf1f2 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,11 +19,11 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_strrev_defined
-#define __local_strrev_defined 1
+#define __local_strrev_defined
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_memrev_defined
-#define __local___localdep_memrev_defined 1
+#define __local___localdep_memrev_defined
 #ifdef __CRT_HAVE_memrev
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
@@ -37,7 +37,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__CRT_HAVE_memrev */
 #endif /* !__local___localdep_memrev_defined */
 #ifndef __local___localdep_strlen_defined
-#define __local___localdep_strlen_defined 1
+#define __local___localdep_strlen_defined
 #ifdef __CRT_HAVE_strlen
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
@@ -56,7 +56,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strrev))(char *__restrict __str) {
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_strrev_defined
-#define __local___localdep_strrev_defined 1
+#define __local___localdep_strrev_defined
 #define __localdep_strrev __LIBC_LOCAL_NAME(strrev)
 #endif /* !__local___localdep_strrev_defined */
 #endif /* !__local_strrev_defined */

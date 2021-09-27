@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdce1c2d7 */
+/* HASH CRC-32:0xc72d85d7 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,13 +19,13 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_wcswidth_defined
-#define __local_wcswidth_defined 1
+#define __local_wcswidth_defined
 #include <__crt.h>
 #include <hybrid/typecore.h>
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_wcwidth_defined
-#define __local___localdep_wcwidth_defined 1
+#define __local___localdep_wcwidth_defined
 #ifdef __CRT_HAVE_wcwidth
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep_wcwidth,(__WCHAR_TYPE__ __ch),wcwidth,(__ch))
 #else /* __CRT_HAVE_wcwidth */
@@ -52,7 +52,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcswidth))(__WCHAR_TYPE__ const *__re
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_wcswidth_defined
-#define __local___localdep_wcswidth_defined 1
+#define __local___localdep_wcswidth_defined
 #define __localdep_wcswidth __LIBC_LOCAL_NAME(wcswidth)
 #endif /* !__local___localdep_wcswidth_defined */
 #endif /* !__local_wcswidth_defined */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb3380edc */
+/* HASH CRC-32:0xc8253a79 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_wcsncmp_defined
-#define __local_wcsncmp_defined 1
+#define __local_wcsncmp_defined
 #include <__crt.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -36,7 +36,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcsncmp))(__WCHAR_TYPE__ const *__s1,
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_wcsncmp_defined
-#define __local___localdep_wcsncmp_defined 1
+#define __local___localdep_wcsncmp_defined
 #define __localdep_wcsncmp __LIBC_LOCAL_NAME(wcsncmp)
 #endif /* !__local___localdep_wcsncmp_defined */
 #endif /* !__local_wcsncmp_defined */

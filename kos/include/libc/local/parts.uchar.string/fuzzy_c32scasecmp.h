@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xad701fee */
+/* HASH CRC-32:0xeba25466 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,14 +19,14 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_fuzzy_c32scasecmp_defined
-#define __local_fuzzy_c32scasecmp_defined 1
+#define __local_fuzzy_c32scasecmp_defined
 #include <__crt.h>
 #include <parts/malloca.h>
 #if (defined(__CRT_HAVE_fuzzy_wmemcasecmp) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)) || defined(__CRT_HAVE_KOS$fuzzy_wmemcasecmp) || !defined(__NO_MALLOCA)
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_c32slen_defined
-#define __local___localdep_c32slen_defined 1
+#define __local___localdep_c32slen_defined
 #if defined(__CRT_HAVE_wcslen) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_c32slen,(__CHAR32_TYPE__ const *__restrict __str),wcslen,(__str))
 #elif defined(__CRT_HAVE_KOS$wcslen)
@@ -44,7 +44,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_c32slen_defined */
 #ifndef __local___localdep_fuzzy_c32memcasecmp_defined
-#define __local___localdep_fuzzy_c32memcasecmp_defined 1
+#define __local___localdep_fuzzy_c32memcasecmp_defined
 #if defined(__CRT_HAVE_fuzzy_wmemcasecmp) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 3)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_fuzzy_c32memcasecmp,(__CHAR32_TYPE__ const *__s1, __SIZE_TYPE__ __s1_bytes, __CHAR32_TYPE__ const *__s2, __SIZE_TYPE__ __s2_bytes),fuzzy_wmemcasecmp,(__s1,__s1_bytes,__s2,__s2_bytes))
 #elif defined(__CRT_HAVE_KOS$fuzzy_wmemcasecmp)
@@ -69,7 +69,7 @@ __NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(fuzzy_c32scasecmp))(__CHAR32_TYPE__ c
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_fuzzy_c32scasecmp_defined
-#define __local___localdep_fuzzy_c32scasecmp_defined 1
+#define __local___localdep_fuzzy_c32scasecmp_defined
 #define __localdep_fuzzy_c32scasecmp __LIBC_LOCAL_NAME(fuzzy_c32scasecmp)
 #endif /* !__local___localdep_fuzzy_c32scasecmp_defined */
 #else /* (__CRT_HAVE_fuzzy_wmemcasecmp && __SIZEOF_WCHAR_T__ == 4 && __LIBCCALL_IS_LIBKCALL) || __CRT_HAVE_KOS$fuzzy_wmemcasecmp || !__NO_MALLOCA */

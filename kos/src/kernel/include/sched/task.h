@@ -186,7 +186,7 @@ NOTHROW(FCALL task_start)(struct task *__restrict thread) {
 
 
 #ifndef __this_task_defined
-#define __this_task_defined 1
+#define __this_task_defined
 DATDEF ATTR_PERTASK struct task this_task; /* The current task (for use with `PERTASK') */
 #endif /* !__this_task_defined */
 
@@ -368,7 +368,7 @@ FORCELOCAL NOBLOCK ATTR_ARTIFICIAL void NOTHROW(KCALL task_pause)(void) { }
  * `task_tryyield_or_pause()' is exactly the same as `task_tryyield()', however
  * it may execute `task_pause()' when preemption is disabled, before returning. */
 #ifndef __task_tryyield_defined
-#define __task_tryyield_defined 1
+#define __task_tryyield_defined
 FUNDEF NOBLOCK_IF(!PREEMPTION_ENABLED()) unsigned int NOTHROW(KCALL task_tryyield)(void);
 #endif /* !__task_tryyield_defined */
 FUNDEF NOBLOCK_IF(!PREEMPTION_ENABLED()) unsigned int NOTHROW(KCALL task_tryyield_or_pause)(void);
@@ -388,7 +388,7 @@ FUNDEF NOBLOCK_IF(!PREEMPTION_ENABLED()) unsigned int NOTHROW(KCALL task_tryyiel
  * to  allow  another  thread  to  start  running prematurely.
  * @throw: E_WOULDBLOCK_PREEMPTED: Preemption has been disabled. */
 #ifndef __task_yield_defined
-#define __task_yield_defined 1
+#define __task_yield_defined
 FUNDEF void (KCALL task_yield)(void) THROWS(E_WOULDBLOCK_PREEMPTED);
 FUNDEF WUNUSED __BOOL NOTHROW(KCALL task_yield_nx)(void);
 #endif /* !__task_yield_defined */

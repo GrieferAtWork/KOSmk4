@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4c764d4 */
+/* HASH CRC-32:0x8048b91c */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,13 +19,13 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_argz_append_defined
-#define __local_argz_append_defined 1
+#define __local_argz_append_defined
 #include <__crt.h>
 #ifdef __CRT_HAVE_realloc
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_memcpyc_defined
-#define __local___localdep_memcpyc_defined 1
+#define __local___localdep_memcpyc_defined
 #ifdef __CRT_HAVE_memcpyc
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
@@ -39,7 +39,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__CRT_HAVE_memcpyc */
 #endif /* !__local___localdep_memcpyc_defined */
 #ifndef __local___localdep_realloc_defined
-#define __local___localdep_realloc_defined 1
+#define __local___localdep_realloc_defined
 #if __has_builtin(__builtin_realloc) && defined(__LIBC_BIND_CRTBUILTINS)
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
@@ -74,7 +74,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(argz_append))(char **__restrict __par
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_argz_append_defined
-#define __local___localdep_argz_append_defined 1
+#define __local___localdep_argz_append_defined
 #define __localdep_argz_append __LIBC_LOCAL_NAME(argz_append)
 #endif /* !__local___localdep_argz_append_defined */
 #else /* __CRT_HAVE_realloc */

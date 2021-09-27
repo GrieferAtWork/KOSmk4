@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2bf8b16a */
+/* HASH CRC-32:0xe2602b2e */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,12 +19,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_hdestroy_r_defined
-#define __local_hdestroy_r_defined 1
+#define __local_hdestroy_r_defined
 #include <__crt.h>
 struct hsearch_data;
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_free_defined
-#define __local___localdep_free_defined 1
+#define __local___localdep_free_defined
 #if __has_builtin(__builtin_free) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_free)
 __CEIREDIRECT(,void,__NOTHROW_NCX,__localdep_free,(void *__mallptr),free,{ __builtin_free(__mallptr); })
 #elif defined(__CRT_HAVE_free)
@@ -37,7 +37,7 @@ __CREDIRECT_VOID(,__NOTHROW_NCX,__localdep_free,(void *__mallptr),cfree,(__mallp
 #endif /* !__local___localdep_free_defined */
 __NAMESPACE_LOCAL_END
 #ifndef __hsearch_data_defined
-#define __hsearch_data_defined 1
+#define __hsearch_data_defined
 struct _ENTRY;
 struct hsearch_data {
 	struct _ENTRY  *table;
@@ -62,7 +62,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(hdestroy_r))(struct hsearch_data *__h
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_hdestroy_r_defined
-#define __local___localdep_hdestroy_r_defined 1
+#define __local___localdep_hdestroy_r_defined
 #define __localdep_hdestroy_r __LIBC_LOCAL_NAME(hdestroy_r)
 #endif /* !__local___localdep_hdestroy_r_defined */
 #endif /* !__local_hdestroy_r_defined */

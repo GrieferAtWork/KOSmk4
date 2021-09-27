@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x512c3e7a */
+/* HASH CRC-32:0x8528cfb3 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_getdtablesize_defined
-#define __local_getdtablesize_defined 1
+#define __local_getdtablesize_defined
 #include <__crt.h>
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -35,7 +35,7 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(getdtablesize))(void) {
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_getdtablesize_defined
-#define __local___localdep_getdtablesize_defined 1
+#define __local___localdep_getdtablesize_defined
 #define __localdep_getdtablesize __LIBC_LOCAL_NAME(getdtablesize)
 #endif /* !__local___localdep_getdtablesize_defined */
 #endif /* !__local_getdtablesize_defined */

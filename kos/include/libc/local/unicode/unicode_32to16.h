@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe7a1a30 */
+/* HASH CRC-32:0x18f16f48 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,11 +19,11 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_unicode_32to16_defined
-#define __local_unicode_32to16_defined 1
+#define __local_unicode_32to16_defined
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_unicode_writeutf16_defined
-#define __local___localdep_unicode_writeutf16_defined 1
+#define __local___localdep_unicode_writeutf16_defined
 #ifdef __CRT_HAVE_unicode_writeutf16
 __CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1)),__CHAR16_TYPE__ *,__NOTHROW_NCX,__localdep_unicode_writeutf16,(__CHAR16_TYPE__ *__restrict __dst, __CHAR32_TYPE__ __ch),unicode_writeutf16,(__dst,__ch))
 #else /* __CRT_HAVE_unicode_writeutf16 */
@@ -41,7 +41,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(unicode_32to16))(__CHAR16_TYPE__ *__r
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_unicode_32to16_defined
-#define __local___localdep_unicode_32to16_defined 1
+#define __local___localdep_unicode_32to16_defined
 #define __localdep_unicode_32to16 __LIBC_LOCAL_NAME(unicode_32to16)
 #endif /* !__local___localdep_unicode_32to16_defined */
 #endif /* !__local_unicode_32to16_defined */

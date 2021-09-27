@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x77bde30c */
+/* HASH CRC-32:0x19eb6c58 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,12 +19,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_wcsnroff_defined
-#define __local_wcsnroff_defined 1
+#define __local_wcsnroff_defined
 #include <__crt.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_wcsnrchrnul_defined
-#define __local___localdep_wcsnrchrnul_defined 1
+#define __local___localdep_wcsnrchrnul_defined
 #ifdef __CRT_HAVE_wcsnrchrnul
 __CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),__WCHAR_TYPE__ *,__NOTHROW_NCX,__localdep_wcsnrchrnul,(__WCHAR_TYPE__ const *__restrict __haystack, __WCHAR_TYPE__ __needle, __SIZE_TYPE__ __maxlen),wcsnrchrnul,(__haystack,__needle,__maxlen))
 #else /* __CRT_HAVE_wcsnrchrnul */
@@ -40,7 +40,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcsnroff))(__WCHAR_TYPE__ const *__re
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_wcsnroff_defined
-#define __local___localdep_wcsnroff_defined 1
+#define __local___localdep_wcsnroff_defined
 #define __localdep_wcsnroff __LIBC_LOCAL_NAME(wcsnroff)
 #endif /* !__local___localdep_wcsnroff_defined */
 #endif /* !__local_wcsnroff_defined */

@@ -110,14 +110,14 @@ enum __idtype_enum {
 /*[[[end]]]*/
 #ifdef __CC__
 #ifndef __idtype_t_defined
-#define __idtype_t_defined 1
+#define __idtype_t_defined
 typedef enum __idtype_enum idtype_t;
 #endif /* !__idtype_t_defined */
 #endif /* __CC__ */
 #else /* __P_ALL || __P_PID || __P_PGID */
 #ifdef __CC__
 #ifndef __idtype_t_defined
-#define __idtype_t_defined 1
+#define __idtype_t_defined
 typedef int idtype_t;
 #endif /* !__idtype_t_defined */
 #endif /* __CC__ */

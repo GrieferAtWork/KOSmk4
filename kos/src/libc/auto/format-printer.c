@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x24f9401b */
+/* HASH CRC-32:0x6fab1f21 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1119,7 +1119,7 @@ NOTHROW_NCX(__FORMATPRINTER_CC libc_format_length)(void *arg,
 }
 #ifndef __KERNEL__
 #ifndef __format_aprintf_data_defined
-#define __format_aprintf_data_defined 1
+#define __format_aprintf_data_defined
 struct format_aprintf_data {
 	char         *ap_base;  /* [0..ap_used|ALLOC(ap_used+ap_avail)][owned] Buffer */
 	__SIZE_TYPE__ ap_avail; /* Unused buffer size */
@@ -1199,7 +1199,7 @@ NOTHROW_NCX(LIBCCALL libc_format_aprintf_pack)(struct format_aprintf_data *__res
 	return result;
 }
 #ifndef __format_aprintf_data_defined
-#define __format_aprintf_data_defined 1
+#define __format_aprintf_data_defined
 struct format_aprintf_data {
 	char         *ap_base;  /* [0..ap_used|ALLOC(ap_used+ap_avail)][owned] Buffer */
 	__SIZE_TYPE__ ap_avail; /* Unused buffer size */

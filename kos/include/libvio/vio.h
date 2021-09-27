@@ -52,7 +52,7 @@ struct vio_operators;
 
 #ifdef __KERNEL__
 #ifndef __pos_t_defined
-#define __pos_t_defined 1
+#define __pos_t_defined
 __HYBRID_ALTINT_TYPEDEF(__pos64_t, pos_t, false); /* File/device position */
 #endif /* !__pos_t_defined */
 typedef pos_t vio_addr_t;

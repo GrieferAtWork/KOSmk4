@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4383d3a7 */
+/* HASH CRC-32:0x2759d8cc */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -362,13 +362,13 @@ enum __rusage_who {
 #ifdef __CC__
 
 #ifndef __rlim_t_defined
-#define __rlim_t_defined 1
+#define __rlim_t_defined
 typedef __FS_TYPE(rlim) rlim_t; /* Resource limit quantity */
 #endif /* !__rlim_t_defined */
 
 #ifdef __USE_LARGEFILE64
 #ifndef __rlim64_t_defined
-#define __rlim64_t_defined 1
+#define __rlim64_t_defined
 typedef __rlim64_t rlim64_t; /* Resource limit quantity (64-bit) */
 #endif /* !__rlim64_t_defined */
 #endif /* __USE_LARGEFILE64 */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9a83d0d6 */
+/* HASH CRC-32:0x7b7c49e0 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,13 +19,13 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_c32link_defined
-#define __local_c32link_defined 1
+#define __local_c32link_defined
 #include <__crt.h>
 #include <asm/os/fcntl.h>
 #if defined(__AT_FDCWD) && ((defined(__CRT_HAVE_wlinkat) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)) || defined(__CRT_HAVE_KOS$wlinkat))
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_c32linkat_defined
-#define __local___localdep_c32linkat_defined 1
+#define __local___localdep_c32linkat_defined
 #if defined(__CRT_HAVE_wlinkat) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
@@ -47,7 +47,7 @@ __NOTHROW_RPC(__LIBKCALL __LIBC_LOCAL_NAME(c32link))(__CHAR32_TYPE__ const *__fr
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_c32link_defined
-#define __local___localdep_c32link_defined 1
+#define __local___localdep_c32link_defined
 #define __localdep_c32link __LIBC_LOCAL_NAME(c32link)
 #endif /* !__local___localdep_c32link_defined */
 #else /* __AT_FDCWD && ((__CRT_HAVE_wlinkat && __SIZEOF_WCHAR_T__ == 4 && __LIBCCALL_IS_LIBKCALL) || __CRT_HAVE_KOS$wlinkat) */

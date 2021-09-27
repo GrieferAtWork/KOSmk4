@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfe041e1e */
+/* HASH CRC-32:0x1a4d2324 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,13 +19,13 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_strndup_defined
-#define __local_strndup_defined 1
+#define __local_strndup_defined
 #include <__crt.h>
 #if defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign)
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_malloc_defined
-#define __local___localdep_malloc_defined 1
+#define __local___localdep_malloc_defined
 #if __has_builtin(__builtin_malloc) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_malloc)
 __CEIREDIRECT(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1)),void *,__NOTHROW_NCX,__localdep_malloc,(__SIZE_TYPE__ __num_bytes),malloc,{ return __builtin_malloc(__num_bytes); })
 #elif defined(__CRT_HAVE_malloc)
@@ -40,7 +40,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_malloc_defined */
 #ifndef __local___localdep_mempcpy_defined
-#define __local___localdep_mempcpy_defined 1
+#define __local___localdep_mempcpy_defined
 #ifdef __CRT_HAVE_mempcpy
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_mempcpy,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_bytes),mempcpy,(__dst,__src,__n_bytes))
 #elif defined(__CRT_HAVE___mempcpy)
@@ -53,7 +53,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_mempcpy_defined */
 #ifndef __local___localdep_strnlen_defined
-#define __local___localdep_strnlen_defined 1
+#define __local___localdep_strnlen_defined
 #if __has_builtin(__builtin_strnlen) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_strnlen)
 __CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_strnlen,(char const *__restrict __str, __SIZE_TYPE__ __maxlen),strnlen,{ return __builtin_strnlen(__str, __maxlen); })
 #elif defined(__CRT_HAVE_strnlen)
@@ -76,7 +76,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strndup))(char const *__restrict __st
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_strndup_defined
-#define __local___localdep_strndup_defined 1
+#define __local___localdep_strndup_defined
 #define __localdep_strndup __LIBC_LOCAL_NAME(strndup)
 #endif /* !__local___localdep_strndup_defined */
 #else /* __CRT_HAVE_malloc || __CRT_HAVE_calloc || __CRT_HAVE_realloc || __CRT_HAVE_memalign || __CRT_HAVE_aligned_alloc || __CRT_HAVE_posix_memalign */

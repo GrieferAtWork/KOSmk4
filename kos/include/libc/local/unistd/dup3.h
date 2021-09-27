@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9f63f724 */
+/* HASH CRC-32:0xb02783df */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,13 +19,13 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_dup3_defined
-#define __local_dup3_defined 1
+#define __local_dup3_defined
 #include <__crt.h>
 #if defined(__CRT_HAVE_dup2) || defined(__CRT_HAVE__dup2) || defined(__CRT_HAVE___dup2)
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_dup2_defined
-#define __local___localdep_dup2_defined 1
+#define __local___localdep_dup2_defined
 #ifdef __CRT_HAVE_dup2
 __CREDIRECT(,__fd_t,__NOTHROW_NCX,__localdep_dup2,(__fd_t __oldfd, __fd_t __newfd),dup2,(__oldfd,__newfd))
 #elif defined(__CRT_HAVE__dup2)
@@ -45,7 +45,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(dup3))(__fd_t __oldfd, __fd_t __newfd
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_dup3_defined
-#define __local___localdep_dup3_defined 1
+#define __local___localdep_dup3_defined
 #define __localdep_dup3 __LIBC_LOCAL_NAME(dup3)
 #endif /* !__local___localdep_dup3_defined */
 #else /* __CRT_HAVE_dup2 || __CRT_HAVE__dup2 || __CRT_HAVE___dup2 */

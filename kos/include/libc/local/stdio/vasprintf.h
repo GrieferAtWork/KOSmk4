@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xec7980b8 */
+/* HASH CRC-32:0xe6a2b252 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,13 +19,13 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_vasprintf_defined
-#define __local_vasprintf_defined 1
+#define __local_vasprintf_defined
 #include <__crt.h>
 #if (defined(__CRT_HAVE_format_aprintf_printer) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc)) && (defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree))
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_format_aprintf_pack_defined
-#define __local___localdep_format_aprintf_pack_defined 1
+#define __local___localdep_format_aprintf_pack_defined
 #ifdef __CRT_HAVE_format_aprintf_pack
 __NAMESPACE_LOCAL_END
 struct format_aprintf_data;
@@ -39,7 +39,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__CRT_HAVE_format_aprintf_pack */
 #endif /* !__local___localdep_format_aprintf_pack_defined */
 #ifndef __local___localdep_format_aprintf_printer_defined
-#define __local___localdep_format_aprintf_printer_defined 1
+#define __local___localdep_format_aprintf_printer_defined
 #ifdef __CRT_HAVE_format_aprintf_printer
 __NAMESPACE_LOCAL_END
 #include <bits/crt/format-printer.h>
@@ -56,7 +56,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_format_aprintf_printer_defined */
 #ifndef __local___localdep_format_vprintf_defined
-#define __local___localdep_format_vprintf_defined 1
+#define __local___localdep_format_vprintf_defined
 #ifdef __CRT_HAVE_format_vprintf
 __NAMESPACE_LOCAL_END
 #include <kos/anno.h>
@@ -72,7 +72,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__CRT_HAVE_format_vprintf */
 #endif /* !__local___localdep_format_vprintf_defined */
 #ifndef __local___localdep_free_defined
-#define __local___localdep_free_defined 1
+#define __local___localdep_free_defined
 #if __has_builtin(__builtin_free) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_free)
 __CEIREDIRECT(,void,__NOTHROW_NCX,__localdep_free,(void *__mallptr),free,{ __builtin_free(__mallptr); })
 #elif defined(__CRT_HAVE_free)
@@ -87,7 +87,7 @@ __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 #include <hybrid/__assert.h>
 #ifndef __format_aprintf_data_defined
-#define __format_aprintf_data_defined 1
+#define __format_aprintf_data_defined
 struct format_aprintf_data {
 	char         *ap_base;  /* [0..ap_used|ALLOC(ap_used+ap_avail)][owend] Buffer */
 	__SIZE_TYPE__ ap_avail; /* Unused buffer size */
@@ -118,7 +118,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(vasprintf))(char **__restrict __pstr,
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_vasprintf_defined
-#define __local___localdep_vasprintf_defined 1
+#define __local___localdep_vasprintf_defined
 #define __localdep_vasprintf __LIBC_LOCAL_NAME(vasprintf)
 #endif /* !__local___localdep_vasprintf_defined */
 #else /* (__CRT_HAVE_format_aprintf_printer || __CRT_HAVE_format_aprintf_alloc || __CRT_HAVE_realloc) && (__CRT_HAVE_free || __CRT_HAVE_cfree) */

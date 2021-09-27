@@ -100,7 +100,11 @@ function defineMacros(macros: {(string, string)...}) {
 	macros = List(macros);
 	local longestNameLength = macros.each[0].length > ...;
 	for (local name, value: macros) {
-		print "#define", name.ljust(longestNameLength), value;
+		if (value) {
+			print "#define", name.ljust(longestNameLength), value;
+		} else {
+			print "#define", name;
+		}
 	}
 }
 
@@ -223,7 +227,7 @@ function do_wrap3264_x32_and_x32_64(
 		macroName,
 	)));
 	fp << "\n";
-	fp << "#define __" << name << "_defined 1\n";
+	fp << "#define __" << name << "_defined\n";
 	fp << "#endif /* " << optimizePreprocessorExpressionAndRemoveDefined(linkIf) << "*/\n";
 }
 
@@ -286,7 +290,7 @@ function do_wrap3264_x64(
 	fp << "#else /* " << optimizePreprocessorExpressionAndRemoveDefined(name64If) << " */\n";
 	defineMacros({ ("__{}64".format({ name }), name), });
 	fp << "#endif /* " << optimizePreprocessorExpressionAndRemoveDefined("!({})".format({ name64If })) << " */\n";
-	defineMacros({ ("__{}_defined".format({ name }), "1"), });
+	defineMacros({ ("__{}_defined".format({ name }), ""), });
 	fp << "#endif /* " << optimizePreprocessorExpressionAndRemoveDefined(linkIf) << " */\n";
 }
 

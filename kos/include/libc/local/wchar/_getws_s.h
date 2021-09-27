@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x311f6008 */
+/* HASH CRC-32:0x5c514e75 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,14 +19,14 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local__getws_s_defined
-#define __local__getws_s_defined 1
+#define __local__getws_s_defined
 #include <__crt.h>
 #include <features.h>
 #if (defined(__CRT_HAVE_fgetws) || defined(__CRT_HAVE_fgetws_unlocked) || defined(__CRT_HAVE__fgetws_nolock) || ((defined(__CRT_HAVE_fgetwc) || defined(__CRT_HAVE_getwc)) && (defined(__CRT_HAVE_ungetwc) || defined(__CRT_HAVE_ungetwc_unlocked)) && (defined(__CRT_HAVE_ferror) || defined(__CRT_HAVE__IO_ferror) || defined(__CRT_HAVE_ferror_unlocked)))) && !defined(__NO_STDSTREAMS)
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_fgetws_defined
-#define __local___localdep_fgetws_defined 1
+#define __local___localdep_fgetws_defined
 #if defined(__CRT_HAVE_fgetws_unlocked) && defined(__USE_STDIO_UNLOCKED)
 __NAMESPACE_LOCAL_END
 #include <kos/anno.h>
@@ -70,7 +70,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_getws_s))(__WCHAR_TYPE__ *__buf, __S
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep__getws_s_defined
-#define __local___localdep__getws_s_defined 1
+#define __local___localdep__getws_s_defined
 #define __localdep__getws_s __LIBC_LOCAL_NAME(_getws_s)
 #endif /* !__local___localdep__getws_s_defined */
 #else /* (__CRT_HAVE_fgetws || __CRT_HAVE_fgetws_unlocked || __CRT_HAVE__fgetws_nolock || ((__CRT_HAVE_fgetwc || __CRT_HAVE_getwc) && (__CRT_HAVE_ungetwc || __CRT_HAVE_ungetwc_unlocked) && (__CRT_HAVE_ferror || __CRT_HAVE__IO_ferror || __CRT_HAVE_ferror_unlocked))) && !__NO_STDSTREAMS */

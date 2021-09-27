@@ -68,7 +68,7 @@ DEFINE_REFCOUNT_FUNCTIONS(struct async_thread_controller, atc_refcnt, async_thre
 
 
 #ifndef __async_thread_controller_arref_defined
-#define __async_thread_controller_arref_defined 1
+#define __async_thread_controller_arref_defined
 ARREF(async_thread_controller_arref, async_thread_controller);
 #endif /* !__async_thread_controller_arref_defined */
 

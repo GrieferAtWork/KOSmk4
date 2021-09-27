@@ -110,14 +110,11 @@ struct rusage /*[PREFIX(ru_)]*/ {
 #endif /* __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ */
 
 #ifdef __USE_TIME64
-#ifndef __rusage64_defined
-#define __rusage64_defined 1
 #if (defined(__USE_TIME_BITS64) || defined(_RUSAGE_MATCHES_RUSAGE64)) && defined(__USE_STRUCT64_MACRO)
 #define rusage64 rusage
 #else /* (__USE_TIME_BITS64 || _RUSAGE_MATCHES_RUSAGE64) && __USE_STRUCT64_MACRO */
 #define __rusage64 rusage64
 #endif /* (!__USE_TIME_BITS64 && !_RUSAGE_MATCHES_RUSAGE64) || !__USE_STRUCT64_MACRO */
-#endif /* !__rusage64_defined */
 #endif /* __USE_TIME64 */
 
 #if (defined(__USE_TIME_BITS64) || defined(_RUSAGE_MATCHES_RUSAGE64)) && defined(__USE_STRUCT64_MACRO)
@@ -146,14 +143,11 @@ struct __rusage64 /*[NAME(rusage64)][PREFIX(ru_)]*/ {
 #endif /* (!__USE_TIME_BITS64 && !_RUSAGE_MATCHES_RUSAGE64) || !__USE_STRUCT64_MACRO */
 
 #ifdef __USE_KOS
-#ifndef __rusage32_defined
-#define __rusage32_defined 1
 #if !defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 #define rusage32 rusage
 #else /* !__USE_TIME_BITS64 || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ */
 #define __rusage32 rusage32
 #endif /* __USE_TIME_BITS64 && __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
-#endif /* !__rusage32_defined */
 #endif /* __USE_KOS */
 
 #if !defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdec22aeb */
+/* HASH CRC-32:0xd266639c */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1157,7 +1157,7 @@ __FORCELOCAL __ATTR_ARTIFICIAL __SSIZE_TYPE__ __NOTHROW_NCX(__LIBKCALL format_32
 __NAMESPACE_LOCAL_USING_OR_IMPL(format_32to16, __FORCELOCAL __ATTR_ARTIFICIAL __SSIZE_TYPE__ __NOTHROW_NCX(__LIBKCALL format_32to16)(void *__arg, char32_t const *__data, __SIZE_TYPE__ __datalen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_32to16))(__arg, __data, __datalen); })
 #endif /* !... */
 #if !defined(____unicode_descriptor_defined) && defined(__CRT_HAVE___unicode_descriptor)
-#define ____unicode_descriptor_defined 1
+#define ____unicode_descriptor_defined
 /* >> __unicode_descriptor(3)
  * Return the internal descriptor for the given `ch'
  * This is the main accessor function for the unicode database, but
@@ -1168,7 +1168,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(format_32to16, __FORCELOCAL __ATTR_ARTIFICIAL __
 __CDECLARE(__ATTR_CONST __ATTR_RETNONNULL,struct __unitraits const *,__NOTHROW,__unicode_descriptor,(char32_t __ch),(__ch))
 #endif /* !____unicode_descriptor_defined && __CRT_HAVE___unicode_descriptor */
 #if !defined(____unicode_descriptor_digit_defined) && defined(__CRT_HAVE___unicode_descriptor_digit)
-#define ____unicode_descriptor_digit_defined 1
+#define ____unicode_descriptor_digit_defined
 /* >> __unicode_descriptor_digit(3), __unicode_descriptor_digit64(3)
  * Return the integer constant associated  with a given digit  index
  * Returns `0' if the given index is invalid
@@ -1177,7 +1177,7 @@ __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__UINT8_TYPE__,__NOTHROW,__unicode_descri
 #endif /* !____unicode_descriptor_digit_defined && __CRT_HAVE___unicode_descriptor_digit */
 #ifdef __UINT64_TYPE__
 #if !defined(____unicode_descriptor_digit64_defined) && defined(__CRT_HAVE___unicode_descriptor_digit64)
-#define ____unicode_descriptor_digit64_defined 1
+#define ____unicode_descriptor_digit64_defined
 /* >> __unicode_descriptor_digit(3), __unicode_descriptor_digit64(3)
  * Return the integer constant associated  with a given digit  index
  * Returns `0' if the given index is invalid
@@ -1187,7 +1187,7 @@ __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__UINT64_TYPE__,__NOTHROW,__unicode_descr
 #endif /* __UINT64_TYPE__ */
 #ifndef __NO_FPU
 #if !defined(____unicode_descriptor_digitd_defined) && defined(__CRT_HAVE___unicode_descriptor_digitd)
-#define ____unicode_descriptor_digitd_defined 1
+#define ____unicode_descriptor_digitd_defined
 /* >> __unicode_descriptor_digitd(3), __unicode_descriptor_digitld(3)
  * Return the floating-point constant associated with a given digit index
  * Returns `0.0' if the given index is invalid
@@ -1196,7 +1196,7 @@ __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__unicode_descriptor_dig
 #endif /* !____unicode_descriptor_digitd_defined && __CRT_HAVE___unicode_descriptor_digitd */
 #ifdef __COMPILER_HAVE_LONGDOUBLE
 #if !defined(____unicode_descriptor_digitld_defined) && defined(__CRT_HAVE___unicode_descriptor_digitld)
-#define ____unicode_descriptor_digitld_defined 1
+#define ____unicode_descriptor_digitld_defined
 /* >> __unicode_descriptor_digitd(3), __unicode_descriptor_digitld(3)
  * Return the floating-point constant associated with a given digit index
  * Returns `0.0' if the given index is invalid

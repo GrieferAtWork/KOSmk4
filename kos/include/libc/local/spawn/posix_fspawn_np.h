@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x96b6c93a */
+/* HASH CRC-32:0x7fe7149e */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_posix_fspawn_np_defined
-#define __local_posix_fspawn_np_defined 1
+#define __local_posix_fspawn_np_defined
 #include <__crt.h>
 #include <asm/crt/posix_spawn.h>
 #include <asm/os/vfork.h>
@@ -38,7 +38,7 @@
 #endif /* !__TARGV */
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep__Exit_defined
-#define __local___localdep__Exit_defined 1
+#define __local___localdep__Exit_defined
 #if __has_builtin(__builtin__Exit) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE__Exit)
 __NAMESPACE_LOCAL_END
 #include <kos/anno.h>
@@ -74,7 +74,7 @@ __CREDIRECT_VOID(__ATTR_NORETURN,__THROWING,__localdep__Exit,(int __status),exit
 #endif /* !... */
 #endif /* !__local___localdep__Exit_defined */
 #ifndef __local___localdep_chdir_defined
-#define __local___localdep_chdir_defined 1
+#define __local___localdep_chdir_defined
 #ifdef __CRT_HAVE_chdir
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_chdir,(char const *__path),chdir,(__path))
 #elif defined(__CRT_HAVE__chdir)
@@ -84,7 +84,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_chdir,(char const *
 #endif /* !... */
 #endif /* !__local___localdep_chdir_defined */
 #ifndef __local___localdep_close_defined
-#define __local___localdep_close_defined 1
+#define __local___localdep_close_defined
 #ifdef __CRT_HAVE_close
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_close,(__fd_t __fd),close,(__fd))
 #elif defined(__CRT_HAVE__close)
@@ -96,7 +96,7 @@ __CREDIRECT(,int,__NOTHROW_NCX,__localdep_close,(__fd_t __fd),__close,(__fd))
 #endif /* !... */
 #endif /* !__local___localdep_close_defined */
 #ifndef __local___localdep_closefrom_defined
-#define __local___localdep_closefrom_defined 1
+#define __local___localdep_closefrom_defined
 #ifdef __CRT_HAVE_closefrom
 __CREDIRECT_VOID(,__NOTHROW_NCX,__localdep_closefrom,(__fd_t __lowfd),closefrom,(__lowfd))
 #else /* __CRT_HAVE_closefrom */
@@ -114,11 +114,11 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__CRT_HAVE_closefrom */
 #endif /* !__local___localdep_closefrom_defined */
 #if !defined(__local___localdep_crt_posix_spawn_defined) && defined(__CRT_HAVE_posix_spawn)
-#define __local___localdep_crt_posix_spawn_defined 1
+#define __local___localdep_crt_posix_spawn_defined
 __CREDIRECT(__ATTR_NONNULL((1, 2, 5, 6)),__errno_t,__NOTHROW_RPC,__localdep_crt_posix_spawn,(__pid_t *__restrict __pid, char const *__restrict __path, struct __posix_spawn_file_actions const *__file_actions, struct __posix_spawnattr const *__attrp, __TARGV, __TENVP),posix_spawn,(__pid,__path,__file_actions,__attrp,___argv,___envp))
 #endif /* !__local___localdep_crt_posix_spawn_defined && __CRT_HAVE_posix_spawn */
 #ifndef __local___localdep_dup2_defined
-#define __local___localdep_dup2_defined 1
+#define __local___localdep_dup2_defined
 #ifdef __CRT_HAVE_dup2
 __CREDIRECT(,__fd_t,__NOTHROW_NCX,__localdep_dup2,(__fd_t __oldfd, __fd_t __newfd),dup2,(__oldfd,__newfd))
 #elif defined(__CRT_HAVE__dup2)
@@ -130,15 +130,15 @@ __CREDIRECT(,__fd_t,__NOTHROW_NCX,__localdep_dup2,(__fd_t __oldfd, __fd_t __newf
 #endif /* !... */
 #endif /* !__local___localdep_dup2_defined */
 #if !defined(__local___localdep_fchdir_defined) && defined(__CRT_HAVE_fchdir)
-#define __local___localdep_fchdir_defined 1
+#define __local___localdep_fchdir_defined
 __CREDIRECT(,int,__NOTHROW_RPC,__localdep_fchdir,(__fd_t __fd),fchdir,(__fd))
 #endif /* !__local___localdep_fchdir_defined && __CRT_HAVE_fchdir */
 #if !defined(__local___localdep_fexecve_defined) && defined(__CRT_HAVE_fexecve)
-#define __local___localdep_fexecve_defined 1
+#define __local___localdep_fexecve_defined
 __CREDIRECT(__ATTR_NONNULL((2, 3)),int,__NOTHROW_RPC,__localdep_fexecve,(__fd_t __fd, __TARGV, __TENVP),fexecve,(__fd,___argv,___envp))
 #endif /* !__local___localdep_fexecve_defined && __CRT_HAVE_fexecve */
 #ifndef __local___localdep_fork_defined
-#define __local___localdep_fork_defined 1
+#define __local___localdep_fork_defined
 #if __has_builtin(__builtin_fork) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_fork)
 __CEIREDIRECT(__ATTR_WUNUSED,__pid_t,__NOTHROW_NCX,__localdep_fork,(void),fork,{ return __builtin_fork(); })
 #elif defined(__CRT_HAVE_fork)
@@ -150,15 +150,15 @@ __CREDIRECT(__ATTR_WUNUSED,__pid_t,__NOTHROW_NCX,__localdep_fork,(void),__fork,(
 #endif /* !... */
 #endif /* !__local___localdep_fork_defined */
 #if !defined(__local___localdep_getgid_defined) && defined(__CRT_HAVE_getgid)
-#define __local___localdep_getgid_defined 1
+#define __local___localdep_getgid_defined
 __CREDIRECT(__ATTR_WUNUSED,__gid_t,__NOTHROW_NCX,__localdep_getgid,(void),getgid,())
 #endif /* !__local___localdep_getgid_defined && __CRT_HAVE_getgid */
 #if !defined(__local___localdep_getuid_defined) && defined(__CRT_HAVE_getuid)
-#define __local___localdep_getuid_defined 1
+#define __local___localdep_getuid_defined
 __CREDIRECT(__ATTR_WUNUSED,__uid_t,__NOTHROW_NCX,__localdep_getuid,(void),getuid,())
 #endif /* !__local___localdep_getuid_defined && __CRT_HAVE_getuid */
 #ifndef __local___localdep_open_defined
-#define __local___localdep_open_defined 1
+#define __local___localdep_open_defined
 __NAMESPACE_LOCAL_END
 #include <asm/os/oflags.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -187,7 +187,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_open_defined */
 #ifndef __local___localdep_pipe2_defined
-#define __local___localdep_pipe2_defined 1
+#define __local___localdep_pipe2_defined
 #ifdef __CRT_HAVE_pipe2
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_pipe2,(__fd_t __pipedes[2], __oflag_t __flags),pipe2,(__pipedes,__flags))
 #elif defined(__CRT_HAVE_pipe) || defined(__CRT_HAVE___pipe) || defined(__CRT_HAVE__pipe)
@@ -200,7 +200,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_pipe2_defined */
 #ifndef __local___localdep_read_defined
-#define __local___localdep_read_defined 1
+#define __local___localdep_read_defined
 #ifdef __CRT_HAVE_read
 __CREDIRECT(__ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_read,(__fd_t __fd, void *__buf, __SIZE_TYPE__ __bufsize),read,(__fd,__buf,__bufsize))
 #elif defined(__CRT_HAVE__read)
@@ -212,7 +212,7 @@ __CREDIRECT(__ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_read,(__
 #endif /* !... */
 #endif /* !__local___localdep_read_defined */
 #ifndef __local___localdep_sched_getparam_defined
-#define __local___localdep_sched_getparam_defined 1
+#define __local___localdep_sched_getparam_defined
 #ifdef __CRT_HAVE_sched_getparam
 __NAMESPACE_LOCAL_END
 #include <bits/os/sched.h>
@@ -228,14 +228,14 @@ __CREDIRECT(,int,__NOTHROW_NCX,__localdep_sched_getparam,(__pid_t __pid, struct 
 #endif /* !... */
 #endif /* !__local___localdep_sched_getparam_defined */
 #if !defined(__local___localdep_sched_setparam_defined) && defined(__CRT_HAVE_sched_setparam)
-#define __local___localdep_sched_setparam_defined 1
+#define __local___localdep_sched_setparam_defined
 __NAMESPACE_LOCAL_END
 #include <bits/os/sched.h>
 __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_sched_setparam,(__pid_t __pid, struct sched_param const *__param),sched_setparam,(__pid,__param))
 #endif /* !__local___localdep_sched_setparam_defined && __CRT_HAVE_sched_setparam */
 #ifndef __local___localdep_sched_setscheduler_defined
-#define __local___localdep_sched_setscheduler_defined 1
+#define __local___localdep_sched_setscheduler_defined
 #ifdef __CRT_HAVE_sched_setscheduler
 __NAMESPACE_LOCAL_END
 #include <bits/os/sched.h>
@@ -251,15 +251,15 @@ __CREDIRECT(,int,__NOTHROW_NCX,__localdep_sched_setscheduler,(__pid_t __pid, int
 #endif /* !... */
 #endif /* !__local___localdep_sched_setscheduler_defined */
 #if !defined(__local___localdep_setegid_defined) && defined(__CRT_HAVE_setegid)
-#define __local___localdep_setegid_defined 1
+#define __local___localdep_setegid_defined
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_setegid,(__gid_t __egid),setegid,(__egid))
 #endif /* !__local___localdep_setegid_defined && __CRT_HAVE_setegid */
 #if !defined(__local___localdep_seteuid_defined) && defined(__CRT_HAVE_seteuid)
-#define __local___localdep_seteuid_defined 1
+#define __local___localdep_seteuid_defined
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_seteuid,(__uid_t __euid),seteuid,(__euid))
 #endif /* !__local___localdep_seteuid_defined && __CRT_HAVE_seteuid */
 #ifndef __local___localdep_setpgid_defined
-#define __local___localdep_setpgid_defined 1
+#define __local___localdep_setpgid_defined
 #ifdef __CRT_HAVE_setpgid
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_setpgid,(__pid_t __pid, __pid_t __pgid),setpgid,(__pid,__pgid))
 #elif defined(__CRT_HAVE___setpgid)
@@ -269,7 +269,7 @@ __CREDIRECT(,int,__NOTHROW_NCX,__localdep_setpgid,(__pid_t __pid, __pid_t __pgid
 #endif /* !... */
 #endif /* !__local___localdep_setpgid_defined */
 #ifndef __local___localdep_sigaction_defined
-#define __local___localdep_sigaction_defined 1
+#define __local___localdep_sigaction_defined
 #ifdef __CRT_HAVE_sigaction
 __NAMESPACE_LOCAL_END
 struct sigaction;
@@ -285,7 +285,7 @@ __CREDIRECT(,int,__NOTHROW_NCX,__localdep_sigaction,(__signo_t __signo, struct s
 #endif /* !... */
 #endif /* !__local___localdep_sigaction_defined */
 #ifndef __local___localdep_sigemptyset_defined
-#define __local___localdep_sigemptyset_defined 1
+#define __local___localdep_sigemptyset_defined
 #ifdef __CRT_HAVE_sigemptyset
 __NAMESPACE_LOCAL_END
 #include <bits/os/sigset.h>
@@ -299,7 +299,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__CRT_HAVE_sigemptyset */
 #endif /* !__local___localdep_sigemptyset_defined */
 #ifndef __local___localdep_sigismember_defined
-#define __local___localdep_sigismember_defined 1
+#define __local___localdep_sigismember_defined
 #ifdef __CRT_HAVE_sigismember
 __NAMESPACE_LOCAL_END
 #include <bits/os/sigset.h>
@@ -408,7 +408,7 @@ __LOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCC
 #endif /* !... */
 #endif /* !__local___localdep_sigismember_defined */
 #ifndef __local___localdep_sigprocmask_defined
-#define __local___localdep_sigprocmask_defined 1
+#define __local___localdep_sigprocmask_defined
 #ifdef __CRT_HAVE_sigprocmask
 __NAMESPACE_LOCAL_END
 struct __sigset_struct;
@@ -424,7 +424,7 @@ __CREDIRECT(,int,__NOTHROW_NCX,__localdep_sigprocmask,(__STDC_INT_AS_UINT_T __ho
 #endif /* !... */
 #endif /* !__local___localdep_sigprocmask_defined */
 #ifndef __local___localdep_sprintf_defined
-#define __local___localdep_sprintf_defined 1
+#define __local___localdep_sprintf_defined
 #if __has_builtin(__builtin_sprintf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_sprintf) && __has_builtin(__builtin_va_arg_pack)
 __CEIREDIRECT(__ATTR_LIBC_PRINTF(2, 3) __ATTR_NONNULL((1, 2)),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,__localdep_sprintf,(char *__restrict __buf, char const *__restrict __format, ...),sprintf,{ return __builtin_sprintf(__buf, __format, __builtin_va_arg_pack()); })
 #elif defined(__CRT_HAVE_sprintf)
@@ -439,11 +439,11 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_sprintf_defined */
 #if !defined(__local___localdep_tcsetpgrp_defined) && defined(__CRT_HAVE_tcsetpgrp)
-#define __local___localdep_tcsetpgrp_defined 1
+#define __local___localdep_tcsetpgrp_defined
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_tcsetpgrp,(__fd_t __fd, __pid_t __pgrp_id),tcsetpgrp,(__fd,__pgrp_id))
 #endif /* !__local___localdep_tcsetpgrp_defined && __CRT_HAVE_tcsetpgrp */
 #ifndef __local___localdep_vfork_defined
-#define __local___localdep_vfork_defined 1
+#define __local___localdep_vfork_defined
 #ifdef __CRT_HAVE_vfork
 __CREDIRECT(__ATTR_RETURNS_TWICE __ATTR_WUNUSED,__pid_t,__NOTHROW_NCX,__localdep_vfork,(void),vfork,())
 #elif defined(__CRT_HAVE___vfork)
@@ -453,7 +453,7 @@ __CREDIRECT(__ATTR_RETURNS_TWICE __ATTR_WUNUSED,__pid_t,__NOTHROW_NCX,__localdep
 #endif /* !... */
 #endif /* !__local___localdep_vfork_defined */
 #ifndef __local___localdep_waitpid_defined
-#define __local___localdep_waitpid_defined 1
+#define __local___localdep_waitpid_defined
 #ifdef __CRT_HAVE_waitpid
 __NAMESPACE_LOCAL_END
 #include <parts/waitmacros.h>
@@ -469,7 +469,7 @@ __CREDIRECT(,__pid_t,__NOTHROW_RPC,__localdep_waitpid,(__pid_t __pid, __WAIT_STA
 #endif /* !... */
 #endif /* !__local___localdep_waitpid_defined */
 #ifndef __local___localdep_write_defined
-#define __local___localdep_write_defined 1
+#define __local___localdep_write_defined
 #ifdef __CRT_HAVE_write
 __CREDIRECT(__ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_write,(__fd_t __fd, void const *__buf, __SIZE_TYPE__ __bufsize),write,(__fd,__buf,__bufsize))
 #elif defined(__CRT_HAVE__write)
@@ -841,7 +841,7 @@ __child_error:
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_posix_fspawn_np_defined
-#define __local___localdep_posix_fspawn_np_defined 1
+#define __local___localdep_posix_fspawn_np_defined
 #define __localdep_posix_fspawn_np __LIBC_LOCAL_NAME(posix_fspawn_np)
 #endif /* !__local___localdep_posix_fspawn_np_defined */
 #else /* (__POSIX_SPAWN_USE_KOS && ((__ARCH_HAVE_SHARED_VM_VFORK && (__CRT_HAVE_vfork || __CRT_HAVE___vfork)) || ((__CRT_HAVE_fork || __CRT_HAVE___fork) && (__CRT_HAVE_pipe2 || __CRT_HAVE_pipe || __CRT_HAVE___pipe || __CRT_HAVE__pipe) && __O_CLOEXEC && (__CRT_HAVE_read || __CRT_HAVE__read || __CRT_HAVE___read) && (__CRT_HAVE_write || __CRT_HAVE__write || __CRT_HAVE___write) && (__CRT_HAVE_close || __CRT_HAVE__close || __CRT_HAVE___close))) && __CRT_HAVE_fexecve && (__CRT_HAVE_waitpid || __CRT_HAVE___waitpid)) || __CRT_HAVE_posix_spawn */

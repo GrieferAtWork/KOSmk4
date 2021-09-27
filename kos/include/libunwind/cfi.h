@@ -650,7 +650,7 @@ typedef struct unwind_emulator_sections_struct {
 } unwind_emulator_sections_t;
 
 #ifndef __di_debuginfo_location_t_defined
-#define __di_debuginfo_location_t_defined 1
+#define __di_debuginfo_location_t_defined
 typedef struct di_debuginfo_location_struct {
 	__byte_t const *l_expr;  /* [0..1] Pointer to a CFI expression (for use with `unwind_emulator_exec') for the pointed-to expression. */
 	__byte_t const *l_llist; /* [0..1] Pointer to a CFI location list (points into the `.debug_loc' section). */

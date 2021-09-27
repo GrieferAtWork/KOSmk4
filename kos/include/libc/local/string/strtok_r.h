@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa22d301c */
+/* HASH CRC-32:0x22872925 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,11 +19,11 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_strtok_r_defined
-#define __local_strtok_r_defined 1
+#define __local_strtok_r_defined
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_strcspn_defined
-#define __local___localdep_strcspn_defined 1
+#define __local___localdep_strcspn_defined
 #if __has_builtin(__builtin_strcspn) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_strcspn)
 __CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_strcspn,(char const *__haystack, char const *__reject),strcspn,{ return __builtin_strcspn(__haystack, __reject); })
 #elif defined(__CRT_HAVE_strcspn)
@@ -36,7 +36,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_strcspn_defined */
 #ifndef __local___localdep_strspn_defined
-#define __local___localdep_strspn_defined 1
+#define __local___localdep_strspn_defined
 #if __has_builtin(__builtin_strspn) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_strspn)
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
@@ -79,7 +79,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strtok_r))(char *__str, char const *_
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_strtok_r_defined
-#define __local___localdep_strtok_r_defined 1
+#define __local___localdep_strtok_r_defined
 #define __localdep_strtok_r __LIBC_LOCAL_NAME(strtok_r)
 #endif /* !__local___localdep_strtok_r_defined */
 #endif /* !__local_strtok_r_defined */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x93589d92 */
+/* HASH CRC-32:0x67f309e0 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,14 +19,14 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_getentropy_defined
-#define __local_getentropy_defined 1
+#define __local_getentropy_defined
 #include <__crt.h>
 #include <asm/os/random.h>
 #if defined(__GRND_RANDOM) && defined(__CRT_HAVE_getrandom)
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_getrandom_defined
-#define __local___localdep_getrandom_defined 1
+#define __local___localdep_getrandom_defined
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__SSIZE_TYPE__,__NOTHROW_NCX,__localdep_getrandom,(void *__buf, __SIZE_TYPE__ __num_bytes, unsigned int __flags),getrandom,(__buf,__num_bytes,__flags))
 #endif /* !__local___localdep_getrandom_defined */
 __NAMESPACE_LOCAL_END
@@ -55,7 +55,7 @@ __err:
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_getentropy_defined
-#define __local___localdep_getentropy_defined 1
+#define __local___localdep_getentropy_defined
 #define __localdep_getentropy __LIBC_LOCAL_NAME(getentropy)
 #endif /* !__local___localdep_getentropy_defined */
 #else /* __GRND_RANDOM && __CRT_HAVE_getrandom */

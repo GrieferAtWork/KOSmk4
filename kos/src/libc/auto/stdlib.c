@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x628a2a4b */
+/* HASH CRC-32:0x2043b8e8 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -45,7 +45,7 @@ DECL_BEGIN
 #include "../libc/globals.h"
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #ifndef __dwrap_sTPTP_TDTPTPTP_c0A0A1c1_defined
-#define __dwrap_sTPTP_TDTPTPTP_c0A0A1c1_defined 1
+#define __dwrap_sTPTP_TDTPTPTP_c0A0A1c1_defined
 struct _dwrap_cookie_struct_sTPTP_TDTPTPTP_c0A0A1c1 {
 	int (LIBDCALL *compar)(void const *a, void const *b, void *arg);
 	void *arg;
@@ -116,7 +116,7 @@ INTERN ATTR_SECTION(".text.crt.utility.stdlib") WUNUSED NONNULL((1, 2, 5)) void 
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #ifndef __dwrap_cTP_TDTPTPTP_CA0A1_defined
-#define __dwrap_cTP_TDTPTPTP_CA0A1_defined 1
+#define __dwrap_cTP_TDTPTPTP_CA0A1_defined
 PRIVATE ATTR_SECTION(".text.crt.dos.utility.stdlib") int
 (LIBCCALL _dwrap_cTP_TDTPTPTP_CA0A1)(void const *a,
                                      void const *b,
@@ -135,7 +135,7 @@ INTERN ATTR_SECTION(".text.crt.dos.utility.stdlib") NONNULL((1, 4)) void
 #ifndef __LIBCCALL_CALLER_CLEANUP
 #ifndef ____invoke_compare_helper_defined
 __NAMESPACE_LOCAL_BEGIN
-#define ____invoke_compare_helper_defined 1
+#define ____invoke_compare_helper_defined
 __LOCAL_LIBC(__invoke_compare_helper) int
 (__LIBCCALL __invoke_compare_helper)(void const *__a, void const *__b, void *__arg) {
 	return (*(int (__LIBCCALL *)(void const *, void const *))__arg)(__a, __b);
@@ -160,7 +160,7 @@ INTERN ATTR_SECTION(".text.crt.utility.stdlib") NONNULL((1, 4)) void
 }
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #ifndef __dwrap_cTP_TDTPTPTP_CA0A1_defined
-#define __dwrap_cTP_TDTPTPTP_CA0A1_defined 1
+#define __dwrap_cTP_TDTPTPTP_CA0A1_defined
 PRIVATE ATTR_SECTION(".text.crt.dos.utility.stdlib") int
 (LIBCCALL _dwrap_cTP_TDTPTPTP_CA0A1)(void const *a,
                                      void const *b,
@@ -461,7 +461,7 @@ DEFINE_INTERN_ALIAS(libc_strtod, libc_strtod);
 #include <asm/crt/stdio.h>
 #if __SIZEOF_CHAR__ == 1
 #ifndef ____vsscanf_getc_defined
-#define ____vsscanf_getc_defined 1
+#define ____vsscanf_getc_defined
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(vsscanf_getc) ssize_t
 (FORMATPRINTER_CC vsscanf_getc)(void *arg) {
@@ -482,7 +482,7 @@ __NAMESPACE_LOCAL_END
 
 #elif __SIZEOF_CHAR__ == 2
 #ifndef ____vsc16scanf_getc_defined
-#define ____vsc16scanf_getc_defined 1
+#define ____vsc16scanf_getc_defined
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(vsc16scanf_getc) ssize_t
 (FORMATPRINTER_CC vsc16scanf_getc)(void *arg) {
@@ -503,7 +503,7 @@ __NAMESPACE_LOCAL_END
 
 #else /* ... */
 #ifndef ____vsc32scanf_getc_defined
-#define ____vsc32scanf_getc_defined 1
+#define ____vsc32scanf_getc_defined
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(vsc32scanf_getc) ssize_t
 (FORMATPRINTER_CC vsc32scanf_getc)(void *arg) {
@@ -552,7 +552,7 @@ NOTHROW_NCX(LIBCCALL libc_strtod)(char const *__restrict nptr,
 #include <asm/crt/stdio.h>
 #if __SIZEOF_CHAR__ == 1
 #ifndef ____vsscanf_getc_defined
-#define ____vsscanf_getc_defined 1
+#define ____vsscanf_getc_defined
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(vsscanf_getc) ssize_t
 (FORMATPRINTER_CC vsscanf_getc)(void *arg) {
@@ -573,7 +573,7 @@ __NAMESPACE_LOCAL_END
 
 #elif __SIZEOF_CHAR__ == 2
 #ifndef ____vsc16scanf_getc_defined
-#define ____vsc16scanf_getc_defined 1
+#define ____vsc16scanf_getc_defined
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(vsc16scanf_getc) ssize_t
 (FORMATPRINTER_CC vsc16scanf_getc)(void *arg) {
@@ -594,7 +594,7 @@ __NAMESPACE_LOCAL_END
 
 #else /* ... */
 #ifndef ____vsc32scanf_getc_defined
-#define ____vsc32scanf_getc_defined 1
+#define ____vsc32scanf_getc_defined
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(vsc32scanf_getc) ssize_t
 (FORMATPRINTER_CC vsc32scanf_getc)(void *arg) {
@@ -645,7 +645,7 @@ DEFINE_INTERN_ALIAS(libc_strtold, libc_strtod);
 #include <asm/crt/stdio.h>
 #if __SIZEOF_CHAR__ == 1
 #ifndef ____vsscanf_getc_defined
-#define ____vsscanf_getc_defined 1
+#define ____vsscanf_getc_defined
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(vsscanf_getc) ssize_t
 (FORMATPRINTER_CC vsscanf_getc)(void *arg) {
@@ -666,7 +666,7 @@ __NAMESPACE_LOCAL_END
 
 #elif __SIZEOF_CHAR__ == 2
 #ifndef ____vsc16scanf_getc_defined
-#define ____vsc16scanf_getc_defined 1
+#define ____vsc16scanf_getc_defined
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(vsc16scanf_getc) ssize_t
 (FORMATPRINTER_CC vsc16scanf_getc)(void *arg) {
@@ -687,7 +687,7 @@ __NAMESPACE_LOCAL_END
 
 #else /* ... */
 #ifndef ____vsc32scanf_getc_defined
-#define ____vsc32scanf_getc_defined 1
+#define ____vsc32scanf_getc_defined
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(vsc32scanf_getc) ssize_t
 (FORMATPRINTER_CC vsc32scanf_getc)(void *arg) {
@@ -2136,7 +2136,7 @@ NOTHROW_NCX(LIBCCALL libc_getexecname)(void) {
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #ifndef __dwrap_sTPTP_TDTPTIn__SIZEOF_FD_T___c0c1A1_defined
-#define __dwrap_sTPTP_TDTPTIn__SIZEOF_FD_T___c0c1A1_defined 1
+#define __dwrap_sTPTP_TDTPTIn__SIZEOF_FD_T___c0c1A1_defined
 struct _dwrap_cookie_struct_sTPTP_TDTPTIn__SIZEOF_FD_T___c0c1A1 {
 	int (LIBDCALL *walk)(void *arg, fd_t fd);
 	void *arg;
@@ -2347,7 +2347,7 @@ NOTHROW_NCX(LIBCCALL libc_strtonum)(char const *nptr,
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #ifndef __dwrap_sTPTP_TDTPTPTP_c0A0A1c1_defined
-#define __dwrap_sTPTP_TDTPTPTP_c0A0A1c1_defined 1
+#define __dwrap_sTPTP_TDTPTPTP_c0A0A1c1_defined
 struct _dwrap_cookie_struct_sTPTP_TDTPTPTP_c0A0A1c1 {
 	int (LIBDCALL *compar)(void const *a, void const *b, void *arg);
 	void *arg;
@@ -2611,7 +2611,7 @@ NOTHROW_NCX(LIBCCALL libc__byteswap_uint64)(u64 val) {
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #ifndef __dwrap_sTPTP_TDTPTPTP_c0c1A0A1_defined
-#define __dwrap_sTPTP_TDTPTPTP_c0c1A0A1_defined 1
+#define __dwrap_sTPTP_TDTPTPTP_c0c1A0A1_defined
 struct _dwrap_cookie_struct_sTPTP_TDTPTPTP_c0c1A0A1 {
 	int (LIBDCALL *compar)(void *arg, void const *a, void const *b);
 	void *arg;
@@ -2638,7 +2638,7 @@ INTERN ATTR_SECTION(".text.crt.dos.utility") WUNUSED NONNULL((1, 2, 5)) void *
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 #ifndef ____invoke_compare_helper_s_defined
-#define ____invoke_compare_helper_s_defined 1
+#define ____invoke_compare_helper_s_defined
 __NAMESPACE_LOCAL_BEGIN
 struct __invoke_compare_helper_s_data {
 	int (__LIBCCALL *__fun)(void *__arg, void const *__a, void const *__b);
@@ -2668,7 +2668,7 @@ INTERN ATTR_SECTION(".text.crt.dos.utility") WUNUSED NONNULL((1, 2, 5)) void *
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #ifndef __dwrap_sTPTP_TDTPTPTP_c0c1A0A1_defined
-#define __dwrap_sTPTP_TDTPTPTP_c0c1A0A1_defined 1
+#define __dwrap_sTPTP_TDTPTPTP_c0c1A0A1_defined
 struct _dwrap_cookie_struct_sTPTP_TDTPTPTP_c0c1A0A1 {
 	int (LIBDCALL *compar)(void *arg, void const *a, void const *b);
 	void *arg;
@@ -2694,7 +2694,7 @@ INTERN ATTR_SECTION(".text.crt.dos.utility") NONNULL((1, 4)) void
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 #ifndef ____invoke_compare_helper_s_defined
-#define ____invoke_compare_helper_s_defined 1
+#define ____invoke_compare_helper_s_defined
 __NAMESPACE_LOCAL_BEGIN
 struct __invoke_compare_helper_s_data {
 	int (__LIBCCALL *__fun)(void *__arg, void const *__a, void const *__b);

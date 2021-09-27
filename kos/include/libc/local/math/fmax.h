@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfbf0dd6 */
+/* HASH CRC-32:0x419a8ff9 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_fmax_defined
-#define __local_fmax_defined 1
+#define __local_fmax_defined
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(fmax) __ATTR_CONST __ATTR_WUNUSED double
@@ -29,7 +29,7 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(fmax))(double __x, double __y) {
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_fmax_defined
-#define __local___localdep_fmax_defined 1
+#define __local___localdep_fmax_defined
 #define __localdep_fmax __LIBC_LOCAL_NAME(fmax)
 #endif /* !__local___localdep_fmax_defined */
 #endif /* !__local_fmax_defined */

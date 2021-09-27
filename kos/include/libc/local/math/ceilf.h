@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x472c04ed */
+/* HASH CRC-32:0xeaf4bcb9 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_ceilf_defined
-#define __local_ceilf_defined 1
+#define __local_ceilf_defined
 #include <__crt.h>
 #include <hybrid/typecore.h>
 #include <libm/ceil.h>
@@ -38,7 +38,7 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(ceilf))(float __x) {
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_ceilf_defined
-#define __local___localdep_ceilf_defined 1
+#define __local___localdep_ceilf_defined
 #define __localdep_ceilf __LIBC_LOCAL_NAME(ceilf)
 #endif /* !__local___localdep_ceilf_defined */
 #endif /* !__local_ceilf_defined */

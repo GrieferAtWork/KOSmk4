@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdf76519f */
+/* HASH CRC-32:0x5c5aa1de */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_pwrite_defined
-#define __local_pwrite_defined 1
+#define __local_pwrite_defined
 #include <__crt.h>
 #include <asm/os/stdio.h>
 #include <bits/types.h>
@@ -36,7 +36,7 @@
 #endif /* !__PIO_OFFSET */
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_lseek_defined
-#define __local___localdep_lseek_defined 1
+#define __local___localdep_lseek_defined
 #if defined(__CRT_HAVE_lseek) && (!defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
 __CREDIRECT(,__FS_TYPE(off),__NOTHROW_NCX,__localdep_lseek,(__fd_t __fd, __FS_TYPE(off) __offset, __STDC_INT_AS_UINT_T __whence),lseek,(__fd,__offset,__whence))
 #elif defined(__CRT_HAVE__lseek) && (!defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
@@ -57,7 +57,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_lseek_defined */
 #ifndef __local___localdep_pwrite64_defined
-#define __local___localdep_pwrite64_defined 1
+#define __local___localdep_pwrite64_defined
 #if defined(__CRT_HAVE_pwrite) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
 __CREDIRECT(__ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_pwrite64,(__fd_t __fd, void const *__buf, __SIZE_TYPE__ __bufsize, __PIO_OFFSET64 __offset),pwrite,(__fd,__buf,__bufsize,__offset))
 #elif defined(__CRT_HAVE_pwrite64)
@@ -74,7 +74,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_pwrite64_defined */
 #ifndef __local___localdep_write_defined
-#define __local___localdep_write_defined 1
+#define __local___localdep_write_defined
 #ifdef __CRT_HAVE_write
 __CREDIRECT(__ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_write,(__fd_t __fd, void const *__buf, __SIZE_TYPE__ __bufsize),write,(__fd,__buf,__bufsize))
 #elif defined(__CRT_HAVE__write)
@@ -105,7 +105,7 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(pwrite))(__fd_t __fd, void const *__b
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_pwrite_defined
-#define __local___localdep_pwrite_defined 1
+#define __local___localdep_pwrite_defined
 #define __localdep_pwrite __LIBC_LOCAL_NAME(pwrite)
 #endif /* !__local___localdep_pwrite_defined */
 #else /* __CRT_HAVE_pwrite64 || __CRT_HAVE___pwrite64 || __CRT_HAVE_pwrite || ((__CRT_HAVE_lseek64 || __CRT_HAVE__lseeki64 || __CRT_HAVE_lseek || __CRT_HAVE__lseek || __CRT_HAVE___lseek) && (__CRT_HAVE_write || __CRT_HAVE__write || __CRT_HAVE___write) && __SEEK_CUR && __SEEK_SET) */

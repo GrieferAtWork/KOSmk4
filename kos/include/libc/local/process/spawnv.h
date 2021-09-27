@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5ea05780 */
+/* HASH CRC-32:0x7ad82896 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_spawnv_defined
-#define __local_spawnv_defined 1
+#define __local_spawnv_defined
 #include <__crt.h>
 #include <libc/template/environ.h>
 #include <features.h>
@@ -39,7 +39,7 @@
 #endif /* !__TARGV */
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_spawnve_defined
-#define __local___localdep_spawnve_defined 1
+#define __local___localdep_spawnve_defined
 #ifdef __CRT_HAVE_spawnve
 __CREDIRECT(__ATTR_NONNULL((2, 3, 4)),__pid_t,__NOTHROW_RPC,__localdep_spawnve,(__STDC_INT_AS_UINT_T __mode, char const *__restrict __path, __TARGV, __TENVP),spawnve,(__mode,__path,___argv,___envp))
 #elif defined(__CRT_HAVE__spawnve)
@@ -59,7 +59,7 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(spawnv))(__STDC_INT_AS_UINT_T __mode,
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_spawnv_defined
-#define __local___localdep_spawnv_defined 1
+#define __local___localdep_spawnv_defined
 #define __localdep_spawnv __LIBC_LOCAL_NAME(spawnv)
 #endif /* !__local___localdep_spawnv_defined */
 #else /* (__CRT_HAVE_spawnve || __CRT_HAVE__spawnve || ((__CRT_HAVE_open64 || __CRT_HAVE___open64 || __CRT_HAVE_open || __CRT_HAVE__open || __CRT_HAVE___open || (__AT_FDCWD && (__CRT_HAVE_openat64 || __CRT_HAVE_openat))) && (__CRT_HAVE_fspawnve || ((__CRT_HAVE__Exit || __CRT_HAVE__exit || __CRT_HAVE_quick_exit || __CRT_HAVE_exit) && ((__ARCH_HAVE_SHARED_VM_VFORK && (__CRT_HAVE_vfork || __CRT_HAVE___vfork)) || ((__CRT_HAVE_fork || __CRT_HAVE___fork) && (__CRT_HAVE_pipe2 || __CRT_HAVE_pipe || __CRT_HAVE___pipe || __CRT_HAVE__pipe) && __O_CLOEXEC && (__CRT_HAVE_read || __CRT_HAVE__read || __CRT_HAVE___read) && (__CRT_HAVE_write || __CRT_HAVE__write || __CRT_HAVE___write) && (__CRT_HAVE_close || __CRT_HAVE__close || __CRT_HAVE___close))) && __CRT_HAVE_fexecve && (__CRT_HAVE_waitpid || __CRT_HAVE___waitpid))))) && __LOCAL_environ */

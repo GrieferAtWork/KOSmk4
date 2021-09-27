@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcc54657c */
+/* HASH CRC-32:0x7d9fc602 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,7 +28,7 @@
 #include "core/signal.h"
 
 #if !defined(____libc_raise_defined) && defined(____libc_core_raise_defined)
-#define ____libc_raise_defined 1
+#define ____libc_raise_defined
 #define __libc_raise __libc_core_raise
 #endif /* !____libc_raise_defined && ____libc_core_raise_defined */
 /* >> sigfillset(3)
@@ -37,19 +37,19 @@
  * @return: 0: Always returns `0' */
 #define __libc_sigfillset __libc_core_sigfillset
 #if !defined(____libc_sigprocmask_defined) && defined(____libc_core_sigprocmask_defined)
-#define ____libc_sigprocmask_defined 1
+#define ____libc_sigprocmask_defined
 #define __libc_sigprocmask __libc_core_sigprocmask
 #endif /* !____libc_sigprocmask_defined && ____libc_core_sigprocmask_defined */
 #if !defined(____libc_getsigmaskptr_defined) && defined(____libc_core_getsigmaskptr_defined)
-#define ____libc_getsigmaskptr_defined 1
+#define ____libc_getsigmaskptr_defined
 #define __libc_getsigmaskptr __libc_core_getsigmaskptr
 #endif /* !____libc_getsigmaskptr_defined && ____libc_core_getsigmaskptr_defined */
 #if !defined(____libc_setsigmaskptr_defined) && defined(____libc_core_setsigmaskptr_defined)
-#define ____libc_setsigmaskptr_defined 1
+#define ____libc_setsigmaskptr_defined
 #define __libc_setsigmaskptr __libc_core_setsigmaskptr
 #endif /* !____libc_setsigmaskptr_defined && ____libc_core_setsigmaskptr_defined */
 #if !defined(____libc_setsigmaskfullptr_defined) && defined(____libc_core_setsigmaskfullptr_defined)
-#define ____libc_setsigmaskfullptr_defined 1
+#define ____libc_setsigmaskfullptr_defined
 #define __libc_setsigmaskfullptr __libc_core_setsigmaskfullptr
 #endif /* !____libc_setsigmaskfullptr_defined && ____libc_core_setsigmaskfullptr_defined */
 

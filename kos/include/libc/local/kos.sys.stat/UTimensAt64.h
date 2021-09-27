@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcbe37cc7 */
+/* HASH CRC-32:0x54f314af */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,13 +19,13 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_UTimensAt64_defined
-#define __local_UTimensAt64_defined 1
+#define __local_UTimensAt64_defined
 #include <__crt.h>
 #ifdef __CRT_HAVE_UTimensAt
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_UTimensAt32_defined
-#define __local___localdep_UTimensAt32_defined 1
+#define __local___localdep_UTimensAt32_defined
 __CREDIRECT_VOID(__ATTR_NONNULL((2)),__THROWING,__localdep_UTimensAt32,(__fd_t __dirfd, char const *__filename, struct timespec const __times[2 /*or:3*/], __atflag_t __flags),UTimensAt,(__dirfd,__filename,__times,__flags))
 #endif /* !__local___localdep_UTimensAt32_defined */
 __NAMESPACE_LOCAL_END
@@ -63,7 +63,7 @@ __LOCAL_LIBC(UTimensAt64) __ATTR_NONNULL((2)) void
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_UTimensAt64_defined
-#define __local___localdep_UTimensAt64_defined 1
+#define __local___localdep_UTimensAt64_defined
 #define __localdep_UTimensAt64 __LIBC_LOCAL_NAME(UTimensAt64)
 #endif /* !__local___localdep_UTimensAt64_defined */
 #else /* __CRT_HAVE_UTimensAt */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf8b3dcf8 */
+/* HASH CRC-32:0xa5174a2f */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_gnu_dev_major_defined
-#define __local_gnu_dev_major_defined 1
+#define __local_gnu_dev_major_defined
 #include <__crt.h>
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -29,7 +29,7 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(gnu_dev_major))(__dev_t __dev) {
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_gnu_dev_major_defined
-#define __local___localdep_gnu_dev_major_defined 1
+#define __local___localdep_gnu_dev_major_defined
 #define __localdep_gnu_dev_major __LIBC_LOCAL_NAME(gnu_dev_major)
 #endif /* !__local___localdep_gnu_dev_major_defined */
 #endif /* !__local_gnu_dev_major_defined */

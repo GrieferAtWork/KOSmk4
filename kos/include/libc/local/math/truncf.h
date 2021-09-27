@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x66c36fed */
+/* HASH CRC-32:0x233e904f */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_truncf_defined
-#define __local_truncf_defined 1
+#define __local_truncf_defined
 #include <__crt.h>
 #include <hybrid/typecore.h>
 #include <libm/trunc.h>
@@ -34,7 +34,7 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(truncf))(float __x) {
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_truncf_defined
-#define __local___localdep_truncf_defined 1
+#define __local___localdep_truncf_defined
 #define __localdep_truncf __LIBC_LOCAL_NAME(truncf)
 #endif /* !__local___localdep_truncf_defined */
 #endif /* !__local_truncf_defined */

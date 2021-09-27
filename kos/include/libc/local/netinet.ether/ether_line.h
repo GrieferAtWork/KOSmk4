@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6619cc90 */
+/* HASH CRC-32:0xdc3f9502 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,12 +19,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_ether_line_defined
-#define __local_ether_line_defined 1
+#define __local_ether_line_defined
 #include <__crt.h>
 struct ether_addr;
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_ether_paton_r_defined
-#define __local___localdep_ether_paton_r_defined 1
+#define __local___localdep_ether_paton_r_defined
 #ifdef __CRT_HAVE_ether_paton_r
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),struct ether_addr *,__NOTHROW_NCX,__localdep_ether_paton_r,(char const **__restrict __pasc, struct ether_addr *__restrict __addr),ether_paton_r,(__pasc,__addr))
 #else /* __CRT_HAVE_ether_paton_r */
@@ -35,7 +35,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__CRT_HAVE_ether_paton_r */
 #endif /* !__local___localdep_ether_paton_r_defined */
 #ifndef __local___localdep_isspace_defined
-#define __local___localdep_isspace_defined 1
+#define __local___localdep_isspace_defined
 __NAMESPACE_LOCAL_END
 #include <bits/crt/ctype.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -55,7 +55,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_isspace_defined */
 #ifndef __local___localdep_mempcpy_defined
-#define __local___localdep_mempcpy_defined 1
+#define __local___localdep_mempcpy_defined
 #ifdef __CRT_HAVE_mempcpy
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
@@ -102,7 +102,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(ether_line))(char const *__line, stru
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_ether_line_defined
-#define __local___localdep_ether_line_defined 1
+#define __local___localdep_ether_line_defined
 #define __localdep_ether_line __LIBC_LOCAL_NAME(ether_line)
 #endif /* !__local___localdep_ether_line_defined */
 #endif /* !__local_ether_line_defined */

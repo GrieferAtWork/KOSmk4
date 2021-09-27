@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7eccfd65 */
+/* HASH CRC-32:0x5a5a054d */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,12 +19,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_memrlenl_defined
-#define __local_memrlenl_defined 1
+#define __local_memrlenl_defined
 #include <__crt.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_memrendl_defined
-#define __local___localdep_memrendl_defined 1
+#define __local___localdep_memrendl_defined
 #ifdef __CRT_HAVE_memrendl
 __CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),__UINT32_TYPE__ *,__NOTHROW_NCX,__localdep_memrendl,(void const *__restrict __haystack, __UINT32_TYPE__ __needle, __SIZE_TYPE__ __n_dwords),memrendl,(__haystack,__needle,__n_dwords))
 #else /* __CRT_HAVE_memrendl */
@@ -40,7 +40,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memrlenl))(void const *__restrict __h
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_memrlenl_defined
-#define __local___localdep_memrlenl_defined 1
+#define __local___localdep_memrlenl_defined
 #define __localdep_memrlenl __LIBC_LOCAL_NAME(memrlenl)
 #endif /* !__local___localdep_memrlenl_defined */
 #endif /* !__local_memrlenl_defined */

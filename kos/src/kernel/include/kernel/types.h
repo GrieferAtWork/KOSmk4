@@ -32,7 +32,7 @@
 DECL_BEGIN
 
 #ifndef __port_t_defined
-#define __port_t_defined 1
+#define __port_t_defined
 __HYBRID_ALTINT_TYPEDEF(__port_t, port_t, false);
 #endif /* !__port_t_defined */
 #undef __port_t
@@ -42,7 +42,7 @@ __HYBRID_ALTINT_TYPEDEF(__port_t, port_t, false);
 #endif /* !__IOPORT */
 
 #ifndef __intptr_half_t_defined
-#define __intptr_half_t_defined 1
+#define __intptr_half_t_defined
 #if __SIZEOF_POINTER__ == 4
 typedef s16 intptr_half_t;
 typedef u16 uintptr_half_t;
@@ -61,7 +61,7 @@ typedef u64 uintptr_half_t;
 #endif /* !__intptr_half_t_defined */
 
 #ifndef __intptr_quarter_t_defined
-#define __intptr_quarter_t_defined 1
+#define __intptr_quarter_t_defined
 #if __SIZEOF_POINTER__ == 4
 typedef s8 intptr_quarter_t;
 typedef u8 uintptr_quarter_t;

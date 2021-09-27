@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf8acc0f */
+/* HASH CRC-32:0x89195095 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,11 +19,11 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_fdim_defined
-#define __local_fdim_defined 1
+#define __local_fdim_defined
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_fabs_defined
-#define __local___localdep_fabs_defined 1
+#define __local___localdep_fabs_defined
 #if __has_builtin(__builtin_fabs) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_fabs)
 __CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__localdep_fabs,(double __x),fabs,{ return __builtin_fabs(__x); })
 #elif defined(__CRT_HAVE_fabs)
@@ -44,7 +44,7 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(fdim))(double __x, double __y) {
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_fdim_defined
-#define __local___localdep_fdim_defined 1
+#define __local___localdep_fdim_defined
 #define __localdep_fdim __LIBC_LOCAL_NAME(fdim)
 #endif /* !__local___localdep_fdim_defined */
 #endif /* !__local_fdim_defined */

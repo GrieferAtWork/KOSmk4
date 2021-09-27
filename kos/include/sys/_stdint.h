@@ -64,7 +64,7 @@ __DECL_BEGIN
 #define _UINTPTR_T_DECLARED
 
 #ifndef ___int8_t_defined
-#define ___int8_t_defined 1
+#define ___int8_t_defined
 #ifdef __INT8_TYPE__
 typedef __INT8_TYPE__ _int8_t;
 #endif /* __INT8_TYPE__ */
@@ -80,7 +80,7 @@ typedef __INT64_TYPE__ _int64_t;
 #endif /* ___int8_t_defined */
 
 #ifndef ___uint8_t_defined
-#define ___uint8_t_defined 1
+#define ___uint8_t_defined
 #ifdef __UINT8_TYPE__
 typedef __UINT8_TYPE__ _uint8_t;
 #endif /* __UINT8_TYPE__ */
@@ -96,7 +96,7 @@ typedef __UINT64_TYPE__ _uint64_t;
 #endif /* !___uint8_t_defined */
 
 #ifndef __int8_t_defined
-#define __int8_t_defined 1
+#define __int8_t_defined
 #ifdef __INT8_TYPE__
 typedef __INT8_TYPE__ int8_t;
 #endif /* __INT8_TYPE__ */
@@ -112,7 +112,7 @@ typedef __INT64_TYPE__ int64_t;
 #endif /* __int8_t_defined */
 
 #ifndef __uint8_t_defined
-#define __uint8_t_defined 1
+#define __uint8_t_defined
 #ifdef __UINT8_TYPE__
 typedef __UINT8_TYPE__ uint8_t;
 #endif /* __UINT8_TYPE__ */
@@ -128,18 +128,18 @@ typedef __UINT64_TYPE__ uint64_t;
 #endif /* !__uint8_t_defined */
 
 #ifndef __intmax_t_defined
-#define __intmax_t_defined 1
+#define __intmax_t_defined
 typedef __INTMAX_TYPE__ intmax_t;
 typedef __UINTMAX_TYPE__ uintmax_t;
 #endif /* !__intmax_t_defined */
 
 #ifndef __intptr_t_defined
-#define __intptr_t_defined 1
+#define __intptr_t_defined
 typedef __intptr_t intptr_t;
 #endif /* !__intptr_t_defined */
 
 #ifndef __uintptr_t_defined
-#define __uintptr_t_defined 1
+#define __uintptr_t_defined
 typedef __uintptr_t uintptr_t;
 #endif /* !__uintptr_t_defined */
 

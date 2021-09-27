@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x82c8f43c */
+/* HASH CRC-32:0xa1b4c2a3 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,11 +19,11 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_getsubopt_defined
-#define __local_getsubopt_defined 1
+#define __local_getsubopt_defined
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_memcmp_defined
-#define __local___localdep_memcmp_defined 1
+#define __local___localdep_memcmp_defined
 #ifdef __CRT_HAVE_memcmp
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
@@ -42,7 +42,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_memcmp_defined */
 #ifndef __local___localdep_strchr_defined
-#define __local___localdep_strchr_defined 1
+#define __local___localdep_strchr_defined
 #if __has_builtin(__builtin_strchr) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_strchr)
 __CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_strchr,(char const *__restrict __haystack, int __needle),strchr,{ return __builtin_strchr(__haystack, __needle); })
 #elif __has_builtin(__builtin_index) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_index)
@@ -59,7 +59,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_strchr_defined */
 #ifndef __local___localdep_strlen_defined
-#define __local___localdep_strlen_defined 1
+#define __local___localdep_strlen_defined
 #ifdef __CRT_HAVE_strlen
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
@@ -110,7 +110,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(getsubopt))(char **__restrict __optio
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_getsubopt_defined
-#define __local___localdep_getsubopt_defined 1
+#define __local___localdep_getsubopt_defined
 #define __localdep_getsubopt __LIBC_LOCAL_NAME(getsubopt)
 #endif /* !__local___localdep_getsubopt_defined */
 #endif /* !__local_getsubopt_defined */

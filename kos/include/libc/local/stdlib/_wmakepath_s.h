@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x74653f99 */
+/* HASH CRC-32:0x1e5bca2f */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,12 +19,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local__wmakepath_s_defined
-#define __local__wmakepath_s_defined 1
+#define __local__wmakepath_s_defined
 #include <__crt.h>
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_mempcpyc_defined
-#define __local___localdep_mempcpyc_defined 1
+#define __local___localdep_mempcpyc_defined
 #ifdef __CRT_HAVE_mempcpyc
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
@@ -38,7 +38,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__CRT_HAVE_mempcpyc */
 #endif /* !__local___localdep_mempcpyc_defined */
 #ifndef __local___localdep_wcslen_defined
-#define __local___localdep_wcslen_defined 1
+#define __local___localdep_wcslen_defined
 #ifdef __CRT_HAVE_wcslen
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
@@ -101,7 +101,7 @@ __err_buflen:
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep__wmakepath_s_defined
-#define __local___localdep__wmakepath_s_defined 1
+#define __local___localdep__wmakepath_s_defined
 #define __localdep__wmakepath_s __LIBC_LOCAL_NAME(_wmakepath_s)
 #endif /* !__local___localdep__wmakepath_s_defined */
 #endif /* !__local__wmakepath_s_defined */

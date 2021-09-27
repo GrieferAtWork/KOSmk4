@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9e293922 */
+/* HASH CRC-32:0xbf2c55ed */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_pthread_rwlock_timedrdlock64_defined
-#define __local_pthread_rwlock_timedrdlock64_defined 1
+#define __local_pthread_rwlock_timedrdlock64_defined
 #include <__crt.h>
 #ifdef __CRT_HAVE_pthread_rwlock_timedrdlock
 #include <bits/types.h>
@@ -27,7 +27,7 @@
 #include <bits/os/timespec.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_pthread_rwlock_timedrdlock32_defined
-#define __local___localdep_pthread_rwlock_timedrdlock32_defined 1
+#define __local___localdep_pthread_rwlock_timedrdlock32_defined
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_RPC,__localdep_pthread_rwlock_timedrdlock32,(__pthread_rwlock_t *__restrict __rwlock, struct __timespec32 const *__restrict __abstime),pthread_rwlock_timedrdlock,(__rwlock,__abstime))
 #endif /* !__local___localdep_pthread_rwlock_timedrdlock32_defined */
 __LOCAL_LIBC(pthread_rwlock_timedrdlock64) __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __errno_t
@@ -41,7 +41,7 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(pthread_rwlock_timedrdlock64))(__pthr
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_pthread_rwlock_timedrdlock64_defined
-#define __local___localdep_pthread_rwlock_timedrdlock64_defined 1
+#define __local___localdep_pthread_rwlock_timedrdlock64_defined
 #define __localdep_pthread_rwlock_timedrdlock64 __LIBC_LOCAL_NAME(pthread_rwlock_timedrdlock64)
 #endif /* !__local___localdep_pthread_rwlock_timedrdlock64_defined */
 #else /* __CRT_HAVE_pthread_rwlock_timedrdlock */

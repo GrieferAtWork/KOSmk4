@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6b35c118 */
+/* HASH CRC-32:0x85a9aaed */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,12 +19,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_set_single_signal_action_defined
-#define __local_set_single_signal_action_defined 1
+#define __local_set_single_signal_action_defined
 #include <__crt.h>
 #if defined(__CRT_HAVE_sigprocmask) || defined(__CRT_HAVE_pthread_sigmask)
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_sigaddset_defined
-#define __local___localdep_sigaddset_defined 1
+#define __local___localdep_sigaddset_defined
 #ifdef __CRT_HAVE_sigaddset
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
@@ -142,7 +142,7 @@ __LOCAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL __localdep_sigaddset)(s
 #endif /* !... */
 #endif /* !__local___localdep_sigaddset_defined */
 #ifndef __local___localdep_sigemptyset_defined
-#define __local___localdep_sigemptyset_defined 1
+#define __local___localdep_sigemptyset_defined
 #ifdef __CRT_HAVE_sigemptyset
 __NAMESPACE_LOCAL_END
 #include <bits/os/sigset.h>
@@ -156,7 +156,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__CRT_HAVE_sigemptyset */
 #endif /* !__local___localdep_sigemptyset_defined */
 #ifndef __local___localdep_sigprocmask_defined
-#define __local___localdep_sigprocmask_defined 1
+#define __local___localdep_sigprocmask_defined
 #ifdef __CRT_HAVE_sigprocmask
 __NAMESPACE_LOCAL_END
 #include <features.h>
@@ -182,7 +182,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(set_single_signal_action))(int __sig,
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_set_single_signal_action_defined
-#define __local___localdep_set_single_signal_action_defined 1
+#define __local___localdep_set_single_signal_action_defined
 #define __localdep_set_single_signal_action __LIBC_LOCAL_NAME(set_single_signal_action)
 #endif /* !__local___localdep_set_single_signal_action_defined */
 #else /* __CRT_HAVE_sigprocmask || __CRT_HAVE_pthread_sigmask */

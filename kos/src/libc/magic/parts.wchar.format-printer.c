@@ -96,7 +96,7 @@ __SYSDECL_BEGIN
 #endif /* !WFORMATPRINTER_CC */
 
 #ifndef __pwformatprinter_defined
-#define __pwformatprinter_defined 1
+#define __pwformatprinter_defined
 /* Callback functions prototypes provided to format functions.
  * NOTE: 'pwformatprinter' usually returns the number of characters printed, but isn't required to.
  * @param: arg:     The user-defined closure parameter passed alongside this function pointer.
@@ -205,7 +205,7 @@ $ssize_t format_wsprintf_printer([[nonnull]] /*wchar_t ***/ void *arg,
 
 
 #ifndef __format_wsnprintf_data_defined
-#define __format_wsnprintf_data_defined 1
+#define __format_wsnprintf_data_defined
 /* Data structure for implementing waprintf() */
 struct format_wsnprintf_data {
 	wchar_t      *sd_buffer; /* [0..sd_bufsiz] Pointer to the next memory location to which to write. */
@@ -258,7 +258,7 @@ $ssize_t format_wwidth(void *arg, [[nonnull]] wchar_t const *__restrict data, $s
 	(void)data;
 	/* XXX: Not necessarily correct, as the 32-bit variant is actually ATTR_CONST.
 	 *
-	 * However, magic  headers  don't support  conditional  attributes,  so we  can't  just  do
+	 * However,  magic headers don't  support conditional attributes, so  we can't just do
 	 * [if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 2), pure]
 	 * [if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ != 2), const] */
 	COMPILER_IMPURE();
@@ -276,7 +276,7 @@ $ssize_t format_wlength(void *arg, wchar_t const *__restrict data,
 %{
 
 #ifndef __format_waprintf_data_defined
-#define __format_waprintf_data_defined 1
+#define __format_waprintf_data_defined
 struct format_waprintf_data {
 	wchar_t      *ap_base;  /* [0..ap_used|ALLOC(ap_used+ap_avail)][owned] Buffer */
 	__SIZE_TYPE__ ap_avail; /* Unused buffer size */
@@ -318,7 +318,7 @@ struct format_waprintf_data {
 
 %[define(DEFINE_FORMAT_WAPRINTF_DATA =
 #ifndef __format_waprintf_data_defined
-#define __format_waprintf_data_defined 1
+#define __format_waprintf_data_defined
 struct format_waprintf_data {
 	wchar_t      *@ap_base@;  /* [0..ap_used|ALLOC(ap_used+ap_avail)][owned] Buffer */
 	__SIZE_TYPE__ @ap_avail@; /* Unused buffer size */

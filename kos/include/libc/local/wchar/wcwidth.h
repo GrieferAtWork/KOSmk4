@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1a53d14d */
+/* HASH CRC-32:0x917bc8b */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_wcwidth_defined
-#define __local_wcwidth_defined 1
+#define __local_wcwidth_defined
 #include <__crt.h>
 #include <hybrid/typecore.h>
 #include <libc/unicode.h>
@@ -34,7 +34,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcwidth))(__WCHAR_TYPE__ __ch) {
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_wcwidth_defined
-#define __local___localdep_wcwidth_defined 1
+#define __local___localdep_wcwidth_defined
 #define __localdep_wcwidth __LIBC_LOCAL_NAME(wcwidth)
 #endif /* !__local___localdep_wcwidth_defined */
 #endif /* !__local_wcwidth_defined */

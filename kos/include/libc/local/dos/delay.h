@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x137221d */
+/* HASH CRC-32:0xbb03496b */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,12 +19,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_delay_defined
-#define __local_delay_defined 1
+#define __local_delay_defined
 #include <__crt.h>
 #if defined(__CRT_HAVE_usleep) || defined(__CRT_HAVE___crtSleep) || defined(__CRT_HAVE_delay)
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_usleep_defined
-#define __local___localdep_usleep_defined 1
+#define __local___localdep_usleep_defined
 #ifdef __CRT_HAVE_usleep
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
@@ -48,7 +48,7 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(delay))(unsigned int __mill) {
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_delay_defined
-#define __local___localdep_delay_defined 1
+#define __local___localdep_delay_defined
 #define __localdep_delay __LIBC_LOCAL_NAME(delay)
 #endif /* !__local___localdep_delay_defined */
 #else /* __CRT_HAVE_usleep || __CRT_HAVE___crtSleep || __CRT_HAVE_delay */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x92217b2 */
+/* HASH CRC-32:0xf57522b0 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1534,7 +1534,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(fallocate64, __FORCELOCAL __ATTR_ARTIFICIAL int 
 #endif /* __USE_LARGEFILE64 */
 #endif /* __USE_GNU */
 #ifndef __fcntl_defined
-#define __fcntl_defined 1
+#define __fcntl_defined
 #ifdef __CRT_HAVE_fcntl
 __LIBC __STDC_INT_AS_SSIZE_T __NOTHROW_NCX(__VLIBCCALL fcntl)(__fd_t __fd, __STDC_INT_AS_UINT_T __cmd, ...) __CASMNAME_SAME("fcntl");
 #elif defined(__CRT_HAVE___fcntl)
@@ -1544,7 +1544,7 @@ __CVREDIRECT(,__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,fcntl,(__fd_t __fd, __STDC_INT
 #endif /* !... */
 #endif /* !__fcntl_defined */
 #ifndef __open_defined
-#define __open_defined 1
+#define __open_defined
 #if defined(__CRT_HAVE_open) && (!defined(__USE_FILE_OFFSET64) || !defined(__O_LARGEFILE) || !__O_LARGEFILE)
 /* >> open(2), open64(2), openat(2), openat64(2)
  * Open  a  new  file  handle  to  the  file  specified  by `filename'
@@ -1651,7 +1651,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(open, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNU
 #endif /* !... */
 #endif /* !__open_defined */
 #ifndef __creat_defined
-#define __creat_defined 1
+#define __creat_defined
 #if defined(__CRT_HAVE_creat) && (!defined(__USE_FILE_OFFSET64) || !defined(__O_LARGEFILE) || !__O_LARGEFILE)
 /* >> creat(2), creat64(2)
  * Alias for `open(filename, O_CREAT | O_WRONLY | O_TRUNC, mode)' */
@@ -1762,7 +1762,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(open64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WU
 #endif /* !__cplusplus */
 #endif /* ... */
 #ifndef __creat64_defined
-#define __creat64_defined 1
+#define __creat64_defined
 #if defined(__CRT_HAVE_creat) && (!defined(__O_LARGEFILE) || !__O_LARGEFILE)
 /* >> creat(2), creat64(2)
  * Alias for `open(filename, O_CREAT | O_WRONLY | O_TRUNC, mode)' */
@@ -1788,7 +1788,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(creat64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_W
 
 #ifdef __USE_ATFILE
 #ifndef __openat_defined
-#define __openat_defined 1
+#define __openat_defined
 #if defined(__CRT_HAVE_openat) && (!defined(__USE_FILE_OFFSET64) || !defined(__O_LARGEFILE) || !__O_LARGEFILE)
 /* >> open(2), open64(2), openat(2), openat64(2)
  * Open  a  new  file  handle  to  the  file  specified  by `filename'
@@ -1848,7 +1848,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(openat, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WU
 #endif /* !__openat_defined */
 #ifdef __USE_LARGEFILE64
 #ifndef __openat64_defined
-#define __openat64_defined 1
+#define __openat64_defined
 #if defined(__CRT_HAVE_openat) && (!defined(__O_LARGEFILE) || !__O_LARGEFILE)
 /* >> open(2), open64(2), openat(2), openat64(2)
  * Open  a  new  file  handle  to  the  file  specified  by `filename'
@@ -1969,7 +1969,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(posix_fallocate64, __FORCELOCAL __ATTR_ARTIFICIA
 #define F_TEST  __F_TEST  /* Test a region for other processes locks. */
 #endif /* !F_TEST && __F_TEST */
 #ifndef __lockf_defined
-#define __lockf_defined 1
+#define __lockf_defined
 #if defined(__CRT_HAVE_lockf) && (!defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
 __CDECLARE(,int,__NOTHROW_RPC,lockf,(__fd_t __fd, __STDC_INT_AS_UINT_T __cmd, __PIO_OFFSET __length),(__fd,__cmd,__length))
 #elif defined(__CRT_HAVE__locking) && (!defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
@@ -1985,7 +1985,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(lockf, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTH
 #endif /* !__lockf_defined */
 #ifdef __USE_LARGEFILE64
 #ifndef __lockf64_defined
-#define __lockf64_defined 1
+#define __lockf64_defined
 #if defined(__CRT_HAVE_lockf) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
 __CREDIRECT(,int,__NOTHROW_RPC,lockf64,(__fd_t __fd, __STDC_INT_AS_UINT_T __cmd, __PIO_OFFSET64 __length),lockf,(__fd,__cmd,__length))
 #elif defined(__CRT_HAVE_lockf64)

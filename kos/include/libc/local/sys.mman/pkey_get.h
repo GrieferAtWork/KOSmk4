@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xff669dd9 */
+/* HASH CRC-32:0xb1e27507 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_pkey_get_defined
-#define __local_pkey_get_defined 1
+#define __local_pkey_get_defined
 #include <__crt.h>
 #include <asm/pkey.h>
 #ifdef __ARCH_HAVE_PKEY
@@ -39,7 +39,7 @@ __badkey:
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_pkey_get_defined
-#define __local___localdep_pkey_get_defined 1
+#define __local___localdep_pkey_get_defined
 #define __localdep_pkey_get __LIBC_LOCAL_NAME(pkey_get)
 #endif /* !__local___localdep_pkey_get_defined */
 #else /* __ARCH_HAVE_PKEY */

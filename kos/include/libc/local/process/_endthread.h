@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcaeab328 */
+/* HASH CRC-32:0x82692810 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,12 +19,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local__endthread_defined
-#define __local__endthread_defined 1
+#define __local__endthread_defined
 #include <__crt.h>
 #ifdef __CRT_HAVE__endthreadex
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep__endthreadex_defined
-#define __local___localdep__endthreadex_defined 1
+#define __local___localdep__endthreadex_defined
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -36,7 +36,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_endthread))(void) {
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep__endthread_defined
-#define __local___localdep__endthread_defined 1
+#define __local___localdep__endthread_defined
 #define __localdep__endthread __LIBC_LOCAL_NAME(_endthread)
 #endif /* !__local___localdep__endthread_defined */
 #else /* __CRT_HAVE__endthreadex */

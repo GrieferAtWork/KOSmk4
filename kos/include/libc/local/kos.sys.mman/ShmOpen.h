@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc945c41d */
+/* HASH CRC-32:0x2c940c82 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_ShmOpen_defined
-#define __local_ShmOpen_defined 1
+#define __local_ShmOpen_defined
 #include <__crt.h>
 #include <features.h>
 #include <asm/os/oflags.h>
@@ -29,11 +29,11 @@
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 #if !defined(__local___localdep_Mkdir_defined) && defined(__CRT_HAVE_Mkdir)
-#define __local___localdep_Mkdir_defined 1
+#define __local___localdep_Mkdir_defined
 __CREDIRECT_VOID(__ATTR_NONNULL((1)),__THROWING,__localdep_Mkdir,(char const *__pathname, __mode_t __mode),Mkdir,(__pathname,__mode))
 #endif /* !__local___localdep_Mkdir_defined && __CRT_HAVE_Mkdir */
 #ifndef __local___localdep_Open_defined
-#define __local___localdep_Open_defined 1
+#define __local___localdep_Open_defined
 #if defined(__CRT_HAVE_Open) && (!defined(__USE_FILE_OFFSET64) || !defined(__O_LARGEFILE) || !__O_LARGEFILE)
 __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__THROWING,__localdep_Open,(char const *__filename, __oflag_t __oflags),Open,(__filename,__oflags),__oflags,1,(__mode_t))
 #elif defined(__CRT_HAVE_Open64) && (defined(__USE_FILE_OFFSET64) || !defined(__O_LARGEFILE) || !__O_LARGEFILE)
@@ -46,7 +46,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_Open_defined */
 #ifndef __local___localdep_memcpy_defined
-#define __local___localdep_memcpy_defined 1
+#define __local___localdep_memcpy_defined
 #ifdef __CRT_HAVE_memcpy
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
@@ -60,7 +60,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__CRT_HAVE_memcpy */
 #endif /* !__local___localdep_memcpy_defined */
 #ifndef __local___localdep_mempcpy_defined
-#define __local___localdep_mempcpy_defined 1
+#define __local___localdep_mempcpy_defined
 #ifdef __CRT_HAVE_mempcpy
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
@@ -79,7 +79,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_mempcpy_defined */
 #ifndef __local___localdep_strlen_defined
-#define __local___localdep_strlen_defined 1
+#define __local___localdep_strlen_defined
 #ifdef __CRT_HAVE_strlen
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
@@ -141,7 +141,7 @@ __LOCAL_LIBC(ShmOpen) __ATTR_NONNULL((1)) __fd_t
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_ShmOpen_defined
-#define __local___localdep_ShmOpen_defined 1
+#define __local___localdep_ShmOpen_defined
 #define __localdep_ShmOpen __LIBC_LOCAL_NAME(ShmOpen)
 #endif /* !__local___localdep_ShmOpen_defined */
 #else /* __CRT_HAVE_Open64 || (__AT_FDCWD && (__CRT_HAVE_OpenAt64 || __CRT_HAVE_OpenAt)) || __CRT_HAVE_Open */

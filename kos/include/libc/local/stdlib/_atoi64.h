@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5e8c493e */
+/* HASH CRC-32:0x75495dc4 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,11 +19,11 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local__atoi64_defined
-#define __local__atoi64_defined 1
+#define __local__atoi64_defined
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_strto64_defined
-#define __local___localdep_strto64_defined 1
+#define __local___localdep_strto64_defined
 #ifdef __CRT_HAVE_strto64
 __NAMESPACE_LOCAL_END
 #include <features.h>
@@ -73,7 +73,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_atoi64))(char const *__restrict __np
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep__atoi64_defined
-#define __local___localdep__atoi64_defined 1
+#define __local___localdep__atoi64_defined
 #define __localdep__atoi64 __LIBC_LOCAL_NAME(_atoi64)
 #endif /* !__local___localdep__atoi64_defined */
 #endif /* !__local__atoi64_defined */

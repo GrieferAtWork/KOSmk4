@@ -63,7 +63,7 @@ __SYSDECL_BEGIN
 
 #if (defined(__USE_XOPEN) || defined(__USE_XOPEN2K) || defined(__USE_DOS))
 #ifndef __time_t_defined
-#define __time_t_defined 1
+#define __time_t_defined
 typedef __TM_TYPE(time) time_t;
 #endif /* !__time_t_defined */
 #endif /* __USE_XOPEN || __USE_XOPEN2K || __USE_DOS */
@@ -233,7 +233,7 @@ int futime64($fd_t fd, [[nullable]] struct utimbuf64 const *file_times) {
 %#ifdef __USE_DOS
 %{
 #ifndef __wchar_t_defined
-#define __wchar_t_defined 1
+#define __wchar_t_defined
 typedef __WCHAR_TYPE__ wchar_t;
 #endif /* !__wchar_t_defined */
 }

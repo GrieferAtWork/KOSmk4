@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd8b7149d */
+/* HASH CRC-32:0x46e935c1 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,14 +19,14 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_scalblnf_defined
-#define __local_scalblnf_defined 1
+#define __local_scalblnf_defined
 #include <__crt.h>
 #include <ieee754.h>
 #include <hybrid/typecore.h>
 #if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_scalbln) || defined(__CRT_HAVE___scalbln) || (defined(__CRT_HAVE_scalbn) && __SIZEOF_INT__ == __SIZEOF_LONG__) || (defined(__CRT_HAVE___scalbn) && __SIZEOF_INT__ == __SIZEOF_LONG__) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_scalbln_defined
-#define __local___localdep_scalbln_defined 1
+#define __local___localdep_scalbln_defined
 #if __has_builtin(__builtin_scalbln) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_scalbln)
 __CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__localdep_scalbln,(double __x, long int __n),scalbln,{ return __builtin_scalbln(__x, __n); })
 #elif defined(__CRT_HAVE_scalbln)
@@ -68,7 +68,7 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(scalblnf))(float __x, long int __n) {
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_scalblnf_defined
-#define __local___localdep_scalblnf_defined 1
+#define __local___localdep_scalblnf_defined
 #define __localdep_scalblnf __LIBC_LOCAL_NAME(scalblnf)
 #endif /* !__local___localdep_scalblnf_defined */
 #else /* __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ || __CRT_HAVE_scalbln || __CRT_HAVE___scalbln || (__CRT_HAVE_scalbn && __SIZEOF_INT__ == __SIZEOF_LONG__) || (__CRT_HAVE___scalbn && __SIZEOF_INT__ == __SIZEOF_LONG__) || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */

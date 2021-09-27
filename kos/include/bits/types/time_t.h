@@ -21,7 +21,7 @@
 #include <__stdinc.h>
 #include <bits/types.h>
 #ifndef __time_t_defined
-#define __time_t_defined 1
+#define __time_t_defined
 #ifdef __CC__
 __DECL_BEGIN
 typedef __TM_TYPE(time) time_t;

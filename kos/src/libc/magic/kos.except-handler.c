@@ -225,7 +225,7 @@
 __SYSDECL_BEGIN
 
 #ifndef __except_handler_t_defined
-#define __except_handler_t_defined 1
+#define __except_handler_t_defined
 /* Prototype   for   a   low-level   user-space   exception   handler.
  * Note that the exact prototype may differ between architectures,  as
  * well as the calling convention  not always being the same,  either.

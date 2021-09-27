@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc393b30 */
+/* HASH CRC-32:0xa6e6bf15 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -56,19 +56,19 @@
 __SYSDECL_BEGIN
 
 #ifndef __size_t_defined
-#define __size_t_defined 1
+#define __size_t_defined
 typedef __size_t size_t;
 #endif /* !__size_t_defined */
 
 #if defined(__USE_XOPEN) || defined(__USE_XOPEN2K)
 #ifndef __gid_t_defined
-#define __gid_t_defined 1
+#define __gid_t_defined
 typedef __gid_t gid_t;
 #endif /* !__gid_t_defined */
 #endif /* __USE_XOPEN || __USE_XOPEN2K */
 
 #ifndef __std_FILE_defined
-#define __std_FILE_defined 1
+#define __std_FILE_defined
 __NAMESPACE_STD_BEGIN
 typedef __FILE FILE;
 __NAMESPACE_STD_END
@@ -76,7 +76,7 @@ __NAMESPACE_STD_END
 
 #ifndef __CXX_SYSTEM_HEADER
 #ifndef __FILE_defined
-#define __FILE_defined 1
+#define __FILE_defined
 __NAMESPACE_STD_USING(FILE)
 #endif /* !__FILE_defined */
 #endif /* !__CXX_SYSTEM_HEADER */
@@ -121,17 +121,17 @@ __CDECLARE_OPT(__ATTR_NONNULL((1, 2, 3, 5)),int,__NOTHROW_RPC,fgetgrent_r,(__FIL
 /* >> fgetgrent(3), fgetgrent_r(3) */
 __CDECLARE_OPT(__ATTR_NONNULL((1)),struct group *,__NOTHROW_RPC,fgetgrent,(__FILE *__restrict __stream),(__stream))
 #if !defined(__setgroups_defined) && defined(__CRT_HAVE_setgroups)
-#define __setgroups_defined 1
+#define __setgroups_defined
 /* >> setgroups(2) */
 __CDECLARE(,int,__NOTHROW_RPC,setgroups,(size_t __count, __gid_t const *__groups),(__count,__groups))
 #endif /* !__setgroups_defined && __CRT_HAVE_setgroups */
 #if !defined(__getgrouplist_defined) && defined(__CRT_HAVE_getgrouplist)
-#define __getgrouplist_defined 1
+#define __getgrouplist_defined
 /* >> getgrouplist(3) */
 __CDECLARE(__ATTR_NONNULL((1, 3, 4)),int,__NOTHROW_RPC,getgrouplist,(char const *__user, __gid_t __group, __gid_t *__groups, int *__ngroups),(__user,__group,__groups,__ngroups))
 #endif /* !__getgrouplist_defined && __CRT_HAVE_getgrouplist */
 #if !defined(__initgroups_defined) && defined(__CRT_HAVE_initgroups)
-#define __initgroups_defined 1
+#define __initgroups_defined
 /* >> initgroups(3) */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,initgroups,(char const *__user, __gid_t __group),(__user,__group))
 #endif /* !__initgroups_defined && __CRT_HAVE_initgroups */

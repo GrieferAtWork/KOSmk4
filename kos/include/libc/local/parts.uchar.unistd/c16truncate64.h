@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6ee9f478 */
+/* HASH CRC-32:0x1b6c2590 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,14 +19,14 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_c16truncate64_defined
-#define __local_c16truncate64_defined 1
+#define __local_c16truncate64_defined
 #include <__crt.h>
 #include <asm/os/oflags.h>
 #include <bits/types.h>
 #if (defined(__CRT_HAVE_wtruncate) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)) || defined(__CRT_HAVE_DOS$wtruncate) || ((defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open)) && (defined(__CRT_HAVE_ftruncate64) || defined(__CRT_HAVE__chsize_s) || defined(__CRT_HAVE_ftruncate)))
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_c16truncate32_defined
-#define __local___localdep_c16truncate32_defined 1
+#define __local___localdep_c16truncate32_defined
 #if defined(__CRT_HAVE_wtruncate) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_c16truncate32,(__CHAR16_TYPE__ const *__file, __pos32_t __length),wtruncate,(__file,__length))
 #elif defined(__CRT_HAVE_DOS$wtruncate)
@@ -36,7 +36,7 @@ __CREDIRECT_DOS(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_c16truncate32,(
 #endif /* !... */
 #endif /* !__local___localdep_c16truncate32_defined */
 #ifndef __local___localdep_close_defined
-#define __local___localdep_close_defined 1
+#define __local___localdep_close_defined
 #ifdef __CRT_HAVE_close
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_close,(__fd_t __fd),close,(__fd))
 #elif defined(__CRT_HAVE__close)
@@ -48,7 +48,7 @@ __CREDIRECT(,int,__NOTHROW_NCX,__localdep_close,(__fd_t __fd),__close,(__fd))
 #endif /* !... */
 #endif /* !__local___localdep_close_defined */
 #ifndef __local___localdep_ftruncate64_defined
-#define __local___localdep_ftruncate64_defined 1
+#define __local___localdep_ftruncate64_defined
 #if defined(__CRT_HAVE_ftruncate) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
 __NAMESPACE_LOCAL_END
 #include <features.h>
@@ -101,7 +101,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_ftruncate64_defined */
 #ifndef __local___localdep_open64_defined
-#define __local___localdep_open64_defined 1
+#define __local___localdep_open64_defined
 #if defined(__CRT_HAVE_open) && (!defined(__O_LARGEFILE) || !__O_LARGEFILE)
 __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,__localdep_open64,(char const *__filename, __oflag_t __oflags),open,(__filename,__oflags),__oflags,1,(__mode_t))
 #elif defined(__CRT_HAVE__open) && (!defined(__O_LARGEFILE) || !__O_LARGEFILE)
@@ -150,7 +150,7 @@ __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(c16truncate64))(__CHAR16_TYPE__ const
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_c16truncate64_defined
-#define __local___localdep_c16truncate64_defined 1
+#define __local___localdep_c16truncate64_defined
 #define __localdep_c16truncate64 __LIBC_LOCAL_NAME(c16truncate64)
 #endif /* !__local___localdep_c16truncate64_defined */
 #else /* (__CRT_HAVE_wtruncate && __SIZEOF_WCHAR_T__ == 2 && __LIBCCALL_IS_LIBDCALL) || __CRT_HAVE_DOS$wtruncate || ((__CRT_HAVE_open64 || __CRT_HAVE___open64 || __CRT_HAVE_open || __CRT_HAVE__open || __CRT_HAVE___open) && (__CRT_HAVE_ftruncate64 || __CRT_HAVE__chsize_s || __CRT_HAVE_ftruncate)) */

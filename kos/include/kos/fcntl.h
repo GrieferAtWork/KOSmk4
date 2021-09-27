@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xccdbeb89 */
+/* HASH CRC-32:0xbaee4e19 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -36,11 +36,11 @@
 __SYSDECL_BEGIN
 
 #if !defined(__Fcntl_defined) && defined(__CRT_HAVE_Fcntl)
-#define __Fcntl_defined 1
+#define __Fcntl_defined
 __LIBC __STDC_INT_AS_SSIZE_T (__VLIBCCALL Fcntl)(__fd_t __fd, int __cmd, ...) __THROWS(...) __CASMNAME_SAME("Fcntl");
 #endif /* !__Fcntl_defined && __CRT_HAVE_Fcntl */
 #ifndef __Open_defined
-#define __Open_defined 1
+#define __Open_defined
 #include <asm/os/oflags.h>
 #if defined(__CRT_HAVE_Open) && (!defined(__USE_FILE_OFFSET64) || !defined(__O_LARGEFILE) || !__O_LARGEFILE)
 __LIBC __ATTR_WUNUSED __ATTR_NONNULL((1)) __fd_t (__VLIBCCALL Open)(char const *__filename, __oflag_t __oflags, ...) __THROWS(...) __CASMNAME_SAME("Open");
@@ -61,7 +61,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(Open, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNU
 #endif /* !... */
 #endif /* !__Open_defined */
 #ifndef __Creat_defined
-#define __Creat_defined 1
+#define __Creat_defined
 #include <asm/os/oflags.h>
 #if defined(__CRT_HAVE_Creat) && (!defined(__USE_FILE_OFFSET64) || !defined(__O_LARGEFILE) || !__O_LARGEFILE)
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__THROWING,Creat,(char const *__filename, __mode_t __mode),(__filename,__mode))
@@ -96,7 +96,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(Open64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WU
 #endif /* (__AT_FDCWD && (__CRT_HAVE_OpenAt64 || __CRT_HAVE_OpenAt)) || __CRT_HAVE_Open */
 #endif /* !... */
 #ifndef __Creat64_defined
-#define __Creat64_defined 1
+#define __Creat64_defined
 #if defined(__CRT_HAVE_Creat) && (!defined(__O_LARGEFILE) || !__O_LARGEFILE)
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__THROWING,Creat64,(char const *__filename, __mode_t __mode),Creat,(__filename,__mode))
 #elif defined(__CRT_HAVE_Creat64)
@@ -115,7 +115,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(Creat64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_W
 
 #ifdef __USE_ATFILE
 #ifndef __OpenAt_defined
-#define __OpenAt_defined 1
+#define __OpenAt_defined
 #if defined(__CRT_HAVE_OpenAt) && (!defined(__USE_FILE_OFFSET64) || !defined(__O_LARGEFILE) || !__O_LARGEFILE)
 __LIBC __ATTR_WUNUSED __ATTR_NONNULL((2)) __fd_t (__VLIBCCALL OpenAt)(__fd_t __dirfd, char const *__filename, __oflag_t __oflags, ...) __THROWS(...) __CASMNAME_SAME("OpenAt");
 #elif defined(__CRT_HAVE_OpenAt64) && (defined(__USE_FILE_OFFSET64) || !defined(__O_LARGEFILE) || !__O_LARGEFILE)
@@ -133,7 +133,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(OpenAt, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WU
 #endif /* !__OpenAt_defined */
 #ifdef __USE_LARGEFILE64
 #ifndef __OpenAt64_defined
-#define __OpenAt64_defined 1
+#define __OpenAt64_defined
 #if defined(__CRT_HAVE_OpenAt) && (!defined(__O_LARGEFILE) || !__O_LARGEFILE)
 __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2)),__fd_t,__THROWING,OpenAt64,(__fd_t __dirfd, char const *__filename, __oflag_t __oflags),OpenAt,(__dirfd,__filename,__oflags),__oflags,1,(__mode_t))
 #elif defined(__CRT_HAVE_OpenAt64)

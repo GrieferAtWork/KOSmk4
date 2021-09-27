@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x95cce37f */
+/* HASH CRC-32:0x8e11d02f */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_posix_fallocate_defined
-#define __local_posix_fallocate_defined 1
+#define __local_posix_fallocate_defined
 #include <__crt.h>
 #include <features.h>
 #include <bits/types.h>
@@ -34,11 +34,11 @@
 #endif /* !__PIO_OFFSET */
 __NAMESPACE_LOCAL_BEGIN
 #if !defined(__local___localdep_posix_fallocate32_defined) && defined(__CRT_HAVE_posix_fallocate)
-#define __local___localdep_posix_fallocate32_defined 1
+#define __local___localdep_posix_fallocate32_defined
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_posix_fallocate32,(__fd_t __fd, __pos32_t __offset, __pos32_t __length),posix_fallocate,(__fd,__offset,__length))
 #endif /* !__local___localdep_posix_fallocate32_defined && __CRT_HAVE_posix_fallocate */
 #ifndef __local___localdep_posix_fallocate64_defined
-#define __local___localdep_posix_fallocate64_defined 1
+#define __local___localdep_posix_fallocate64_defined
 #if defined(__CRT_HAVE_posix_fallocate) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_posix_fallocate64,(__fd_t __fd, __PIO_OFFSET64 __offset, __PIO_OFFSET64 __length),posix_fallocate,(__fd,__offset,__length))
 #elif defined(__CRT_HAVE_posix_fallocate64)
@@ -65,7 +65,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(posix_fallocate))(__fd_t __fd, __PIO_
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_posix_fallocate_defined
-#define __local___localdep_posix_fallocate_defined 1
+#define __local___localdep_posix_fallocate_defined
 #define __localdep_posix_fallocate __LIBC_LOCAL_NAME(posix_fallocate)
 #endif /* !__local___localdep_posix_fallocate_defined */
 #endif /* !__local_posix_fallocate_defined */

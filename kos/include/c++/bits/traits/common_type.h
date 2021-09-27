@@ -30,12 +30,12 @@
 defined(__COMPILER_HAVE_CXX_VARIABLE_TEMPLATES)
 __CXXDECL_BEGIN
 __NAMESPACE_STD_BEGIN
-#define __std_common_type_defined 1
+#define __std_common_type_defined
 template<class... __T> struct common_type;
 __NAMESPACE_STD_END
 __NAMESPACE_INT_BEGIN
 #ifndef __int_success_failure_type_defined
-#define __int_success_failure_type_defined 1
+#define __int_success_failure_type_defined
 template<class __T> struct __success_type { typedef __T type; };
 struct __failure_type {};
 #endif /* !__int_success_failure_type_defined */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x62042547 */
+/* HASH CRC-32:0xf153f5ec */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -50,7 +50,7 @@ __NAMESPACE_STD_USING(sig_atomic_t)
 #endif /* !__sig_atomic_t_defined */
 #if defined(__USE_XOPEN_EXTENDED) || defined(__USE_XOPEN2K8)
 #ifndef __size_t_defined
-#define __size_t_defined 1
+#define __size_t_defined
 __NAMESPACE_STD_USING(size_t)
 #endif /* !__size_t_defined */
 #endif /* __USE_XOPEN_EXTENDED || __USE_XOPEN2K8 */
@@ -1227,7 +1227,7 @@ typedef __sighandler_t sig_t;
 #endif /* !__PRIVATE_SIGSET_VALIDATE_SIGNO */
 #if defined(__USE_XOPEN_EXTENDED) || defined(__USE_XOPEN2K8)
 #ifndef __std_size_t_defined
-#define __std_size_t_defined 1
+#define __std_size_t_defined
 __NAMESPACE_STD_BEGIN
 typedef __SIZE_TYPE__ size_t;
 __NAMESPACE_STD_END
@@ -1235,7 +1235,7 @@ __NAMESPACE_STD_END
 
 #ifndef __CXX_SYSTEM_HEADER
 #ifndef __size_t_defined
-#define __size_t_defined 1
+#define __size_t_defined
 __NAMESPACE_STD_USING(size_t)
 #endif /* !__size_t_defined */
 #endif /* !__CXX_SYSTEM_HEADER */
@@ -1480,7 +1480,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(siggetmask, __FORCELOCAL __ATTR_ARTIFICIAL __ATT
 #define sys_siglist _sys_siglist
 #else /* _sys_siglist */
 #if !defined(____p_sys_siglist_defined) && defined(__CRT_HAVE___p_sys_siglist)
-#define ____p_sys_siglist_defined 1
+#define ____p_sys_siglist_defined
 __CDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,char const *const *,__NOTHROW,__p_sys_siglist,(void),())
 #endif /* !____p_sys_siglist_defined && __CRT_HAVE___p_sys_siglist */
 #ifdef ____p_sys_siglist_defined
@@ -1751,14 +1751,14 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(setsigmaskfullptr, __FORCELOCAL __ATTR_ARTIFICIA
 #endif /* ... */
 struct userprocmask;
 #if !defined(__getuserprocmask_defined) && defined(__CRT_HAVE_getuserprocmask)
-#define __getuserprocmask_defined 1
+#define __getuserprocmask_defined
 /* >> getuserprocmask(3)
  * Return a pointer to the calling thread's userprocmask
  * This function is only  declared if supported by  libc */
 __CDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,struct userprocmask *,__NOTHROW,getuserprocmask,(void),())
 #endif /* !__getuserprocmask_defined && __CRT_HAVE_getuserprocmask */
 #if !defined(__chkuserprocmask_defined) && defined(__CRT_HAVE_chkuserprocmask)
-#define __chkuserprocmask_defined 1
+#define __chkuserprocmask_defined
 /* >> chkuserprocmask(3)
  * Following the calling thread's userprocmask becoming less
  * restrictive, check for pending signals and handle them if
@@ -2016,7 +2016,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(killpg, __FORCELOCAL __ATTR_ARTIFICIAL int __NOT
 
 #ifdef __USE_XOPEN2K8
 #ifndef __psignal_defined
-#define __psignal_defined 1
+#define __psignal_defined
 #ifdef __CRT_HAVE_psignal
 /* >> psignal(3)
  * Same as `fprintf(stderr, "%s: %s\n", s, sigabbrev_np(signo) ? "SIG"+. : strdupf("Unknown signal %d", signo))'
@@ -2179,7 +2179,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(__libc_current_sigrtmax, __FORCELOCAL __ATTR_ART
 
 #if defined(__USE_POSIX199506) || defined(__USE_UNIX98)
 #ifndef __pthread_sigmask_defined
-#define __pthread_sigmask_defined 1
+#define __pthread_sigmask_defined
 #ifdef __CRT_HAVE_pthread_sigmask
 /* >> pthread_sigmask(3)
  * Thread-safe version of `sigprocmask(2)'. Note though, that on
@@ -2203,7 +2203,7 @@ __CREDIRECT(,__errno_t,__NOTHROW_NCX,pthread_sigmask,(__STDC_INT_AS_UINT_T __how
 #endif /* !... */
 #endif /* !__pthread_sigmask_defined */
 #if !defined(__pthread_kill_defined) && defined(__CRT_HAVE_pthread_kill)
-#define __pthread_kill_defined 1
+#define __pthread_kill_defined
 /* >> pthread_kill(3)
  * Portable function for sending a signal to a specific `pthread' within one's own process.
  * @return: EOK:    Success
@@ -2212,7 +2212,7 @@ __CDECLARE(,__errno_t,__NOTHROW_NCX,pthread_kill,(__pthread_t __pthread, __signo
 #endif /* !__pthread_kill_defined && __CRT_HAVE_pthread_kill */
 #ifdef __USE_GNU
 #if !defined(__pthread_sigqueue_defined) && defined(__CRT_HAVE_pthread_sigqueue)
-#define __pthread_sigqueue_defined 1
+#define __pthread_sigqueue_defined
 /* >> pthread_sigqueue(3)
  * This function is for `pthread_kill(3)', what `sigqueue(2)' is for  `kill(2)',
  * in that it sends a signal to `pthread', alongside a custom signal value `val'
@@ -2449,7 +2449,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(signalnext, __FORCELOCAL __ATTR_ARTIFICIAL __ATT
 __SYSDECL_END
 
 #ifdef __CXX_SYSTEM_HEADER
-#define _CXX_STDONLY_CSIGNAL 1
+#define _CXX_STDONLY_CSIGNAL
 #undef _SIGNAL_H
 #endif /* __CXX_SYSTEM_HEADER */
 #endif /* !_CXX_STDONLY_CSIGNAL */

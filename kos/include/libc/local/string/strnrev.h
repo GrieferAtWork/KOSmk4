@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc3af0e3f */
+/* HASH CRC-32:0x743d4054 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,12 +19,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_strnrev_defined
-#define __local_strnrev_defined 1
+#define __local_strnrev_defined
 #include <__crt.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_memrev_defined
-#define __local___localdep_memrev_defined 1
+#define __local___localdep_memrev_defined
 #ifdef __CRT_HAVE_memrev
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),void *,__NOTHROW_NCX,__localdep_memrev,(void *__restrict __base, __SIZE_TYPE__ __n_bytes),memrev,(__base,__n_bytes))
 #else /* __CRT_HAVE_memrev */
@@ -35,7 +35,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__CRT_HAVE_memrev */
 #endif /* !__local___localdep_memrev_defined */
 #ifndef __local___localdep_strnlen_defined
-#define __local___localdep_strnlen_defined 1
+#define __local___localdep_strnlen_defined
 #if __has_builtin(__builtin_strnlen) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_strnlen)
 __CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_strnlen,(char const *__restrict __str, __SIZE_TYPE__ __maxlen),strnlen,{ return __builtin_strnlen(__str, __maxlen); })
 #elif defined(__CRT_HAVE_strnlen)
@@ -53,7 +53,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strnrev))(char *__restrict __str, __S
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_strnrev_defined
-#define __local___localdep_strnrev_defined 1
+#define __local___localdep_strnrev_defined
 #define __localdep_strnrev __LIBC_LOCAL_NAME(strnrev)
 #endif /* !__local___localdep_strnrev_defined */
 #endif /* !__local_strnrev_defined */

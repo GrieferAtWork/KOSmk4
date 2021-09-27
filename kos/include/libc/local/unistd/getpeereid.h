@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe5a8801d */
+/* HASH CRC-32:0xeac5ca0d */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,13 +19,13 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_getpeereid_defined
-#define __local_getpeereid_defined 1
+#define __local_getpeereid_defined
 #include <__crt.h>
 #include <asm/os/socket.h>
 #if defined(__CRT_HAVE_getsockopt) && defined(__SOL_SOCKET) && defined(__SO_PEERCRED)
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_getsockopt_defined
-#define __local___localdep_getsockopt_defined 1
+#define __local___localdep_getsockopt_defined
 __NAMESPACE_LOCAL_END
 #include <features.h>
 #include <bits/types.h>
@@ -62,7 +62,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(getpeereid))(__fd_t __sockfd, __uid_t
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_getpeereid_defined
-#define __local___localdep_getpeereid_defined 1
+#define __local___localdep_getpeereid_defined
 #define __localdep_getpeereid __LIBC_LOCAL_NAME(getpeereid)
 #endif /* !__local___localdep_getpeereid_defined */
 #else /* __CRT_HAVE_getsockopt && __SOL_SOCKET && __SO_PEERCRED */

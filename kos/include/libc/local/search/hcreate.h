@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfd51b57b */
+/* HASH CRC-32:0x6aacb642 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,13 +19,13 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_hcreate_defined
-#define __local_hcreate_defined 1
+#define __local_hcreate_defined
 #include <__crt.h>
 #if defined(__CRT_HAVE_hcreate_r) || defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign)
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_hcreate_r_defined
-#define __local___localdep_hcreate_r_defined 1
+#define __local___localdep_hcreate_r_defined
 #ifdef __CRT_HAVE_hcreate_r
 __NAMESPACE_LOCAL_END
 struct hsearch_data;
@@ -42,7 +42,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__local___localdep_hcreate_r_defined */
 __NAMESPACE_LOCAL_END
 #ifndef __hsearch_data_defined
-#define __hsearch_data_defined 1
+#define __hsearch_data_defined
 struct _ENTRY;
 struct hsearch_data {
 	struct _ENTRY  *table;
@@ -51,7 +51,7 @@ struct hsearch_data {
 };
 #endif /* !__hsearch_data_defined */
 #ifndef __local_htab_defined
-#define __local_htab_defined 1
+#define __local_htab_defined
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC_DATA(__htab) struct hsearch_data __htab = { __NULLPTR, 0, 0 };
 __NAMESPACE_LOCAL_END
@@ -63,7 +63,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(hcreate))(__SIZE_TYPE__ __nel) {
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_hcreate_defined
-#define __local___localdep_hcreate_defined 1
+#define __local___localdep_hcreate_defined
 #define __localdep_hcreate __LIBC_LOCAL_NAME(hcreate)
 #endif /* !__local___localdep_hcreate_defined */
 #else /* __CRT_HAVE_hcreate_r || __CRT_HAVE_malloc || __CRT_HAVE_calloc || __CRT_HAVE_realloc || __CRT_HAVE_memalign || __CRT_HAVE_aligned_alloc || __CRT_HAVE_posix_memalign */

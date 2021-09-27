@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x11c5cc8d */
+/* HASH CRC-32:0x3ab5b76d */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,14 +19,14 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_format_vprintf_defined
-#define __local_format_vprintf_defined 1
+#define __local_format_vprintf_defined
 #include <__crt.h>
 #include <kos/anno.h>
 #include <bits/crt/format-printer.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_format_16to8_defined
-#define __local___localdep_format_16to8_defined 1
+#define __local___localdep_format_16to8_defined
 #if defined(__CRT_HAVE_format_wto8) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
 __CREDIRECT(,__SSIZE_TYPE__,__NOTHROW_NCX,__localdep_format_16to8,(void *__arg, __CHAR16_TYPE__ const *__data, __SIZE_TYPE__ __datalen),format_wto8,(__arg,__data,__datalen))
 #elif defined(__CRT_HAVE_DOS$format_wto8)
@@ -44,7 +44,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_format_16to8_defined */
 #ifndef __local___localdep_format_32to8_defined
-#define __local___localdep_format_32to8_defined 1
+#define __local___localdep_format_32to8_defined
 #if defined(__CRT_HAVE_format_wto8) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
 __CREDIRECT(,__SSIZE_TYPE__,__NOTHROW_NCX,__localdep_format_32to8,(void *__arg, __CHAR32_TYPE__ const *__data, __SIZE_TYPE__ __datalen),format_wto8,(__arg,__data,__datalen))
 #elif defined(__CRT_HAVE_KOS$format_wto8)
@@ -62,7 +62,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_format_32to8_defined */
 #ifndef __local___localdep_format_c16escape_defined
-#define __local___localdep_format_c16escape_defined 1
+#define __local___localdep_format_c16escape_defined
 #if defined(__CRT_HAVE_format_wescape) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
 __NAMESPACE_LOCAL_END
 #include <bits/crt/uformat-printer.h>
@@ -87,7 +87,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_format_c16escape_defined */
 #ifndef __local___localdep_format_c16width_defined
-#define __local___localdep_format_c16width_defined 1
+#define __local___localdep_format_c16width_defined
 #if defined(__CRT_HAVE_format_wwidth) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
 __CREDIRECT(__ATTR_PURE __ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_NCX,__localdep_format_c16width,(void *__arg, __CHAR16_TYPE__ const *__restrict __data, __SIZE_TYPE__ __datalen),format_wwidth,(__arg,__data,__datalen))
 #elif defined(__CRT_HAVE_DOS$format_wwidth)
@@ -105,7 +105,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_format_c16width_defined */
 #ifndef __local___localdep_format_c32escape_defined
-#define __local___localdep_format_c32escape_defined 1
+#define __local___localdep_format_c32escape_defined
 #if defined(__CRT_HAVE_format_wescape) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
 __NAMESPACE_LOCAL_END
 #include <bits/crt/uformat-printer.h>
@@ -130,7 +130,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_format_c32escape_defined */
 #ifndef __local___localdep_format_c32width_defined
-#define __local___localdep_format_c32width_defined 1
+#define __local___localdep_format_c32width_defined
 #if defined(__CRT_HAVE_format_length) && defined(__LIBCCALL_IS_LIBKCALL)
 __CREDIRECT(__ATTR_PURE __ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_NCX,__localdep_format_c32width,(void *__arg, __CHAR32_TYPE__ const *__restrict __data, __SIZE_TYPE__ __datalen),format_length,(__arg,__data,__datalen))
 #elif defined(__CRT_HAVE_KOS$format_length)
@@ -152,7 +152,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_format_c32width_defined */
 #ifndef __local___localdep_format_escape_defined
-#define __local___localdep_format_escape_defined 1
+#define __local___localdep_format_escape_defined
 #ifdef __CRT_HAVE_format_escape
 __CREDIRECT(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,__localdep_format_escape,(__pformatprinter __printer, void *__arg, char const *__restrict __text, __SIZE_TYPE__ __textlen, unsigned int __flags),format_escape,(__printer,__arg,__text,__textlen,__flags))
 #elif defined(__CRT_HAVE_format_quote)
@@ -165,7 +165,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_format_escape_defined */
 #ifndef __local___localdep_format_hexdump_defined
-#define __local___localdep_format_hexdump_defined 1
+#define __local___localdep_format_hexdump_defined
 #ifdef __CRT_HAVE_format_hexdump
 __CREDIRECT(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,__localdep_format_hexdump,(__pformatprinter __printer, void *__arg, void const *__restrict __data, __SIZE_TYPE__ __size, __SIZE_TYPE__ __linesize, unsigned int __flags),format_hexdump,(__printer,__arg,__data,__size,__linesize,__flags))
 #else /* __CRT_HAVE_format_hexdump */
@@ -176,7 +176,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__CRT_HAVE_format_hexdump */
 #endif /* !__local___localdep_format_hexdump_defined */
 #ifndef __local___localdep_format_repeat_defined
-#define __local___localdep_format_repeat_defined 1
+#define __local___localdep_format_repeat_defined
 #ifdef __CRT_HAVE_format_repeat
 __CREDIRECT(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,__localdep_format_repeat,(__pformatprinter __printer, void *__arg, char __ch, __SIZE_TYPE__ __num_repetitions),format_repeat,(__printer,__arg,__ch,__num_repetitions))
 #else /* __CRT_HAVE_format_repeat */
@@ -187,7 +187,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__CRT_HAVE_format_repeat */
 #endif /* !__local___localdep_format_repeat_defined */
 #ifndef __local___localdep_format_width_defined
-#define __local___localdep_format_width_defined 1
+#define __local___localdep_format_width_defined
 #ifdef __CRT_HAVE_format_width
 __COMPILER_REDIRECT(__LIBC,__ATTR_PURE __ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_NCX,__FORMATPRINTER_CC,__localdep_format_width,(void *__arg, char const *__restrict __data, __SIZE_TYPE__ __datalen),format_width,(__arg,__data,__datalen))
 #else /* __CRT_HAVE_format_width */
@@ -198,7 +198,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__CRT_HAVE_format_width */
 #endif /* !__local___localdep_format_width_defined */
 #ifndef __local___localdep_printf_defined
-#define __local___localdep_printf_defined 1
+#define __local___localdep_printf_defined
 #if __has_builtin(__builtin_printf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_printf) && __has_builtin(__builtin_va_arg_pack)
 __NAMESPACE_LOCAL_END
 #include <features.h>
@@ -239,7 +239,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_printf_defined */
 #ifndef __local___localdep_strerror_defined
-#define __local___localdep_strerror_defined 1
+#define __local___localdep_strerror_defined
 #ifdef __CRT_HAVE_strerror
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
@@ -253,7 +253,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__CRT_HAVE_strerror */
 #endif /* !__local___localdep_strerror_defined */
 #ifndef __local___localdep_unicode_writeutf8_defined
-#define __local___localdep_unicode_writeutf8_defined 1
+#define __local___localdep_unicode_writeutf8_defined
 #ifdef __CRT_HAVE_unicode_writeutf8
 __CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_unicode_writeutf8,(char *__restrict __dst, __CHAR32_TYPE__ __ch),unicode_writeutf8,(__dst,__ch))
 #else /* __CRT_HAVE_unicode_writeutf8 */
@@ -310,7 +310,7 @@ __LOCAL_LIBC(format_vprintf) __ATTR_LIBC_PRINTF(3, 0) __ATTR_NONNULL((1, 3)) __S
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_format_vprintf_defined
-#define __local___localdep_format_vprintf_defined 1
+#define __local___localdep_format_vprintf_defined
 #define __localdep_format_vprintf __LIBC_LOCAL_NAME(format_vprintf)
 #endif /* !__local___localdep_format_vprintf_defined */
 #endif /* !__local_format_vprintf_defined */

@@ -72,7 +72,7 @@ struct aligned_storage {
 };
 #ifndef __std_aligned_union_defined
 #ifdef __COMPILER_HAVE_CXX_VARIABLE_TEMPLATES
-#define __std_aligned_union_defined 1
+#define __std_aligned_union_defined
 template<__SIZE_TYPE__ __StorageSize, class... __Types> struct aligned_union {
 private:
 	static_assert(sizeof...(__Types) != 0, "At least one type is required");

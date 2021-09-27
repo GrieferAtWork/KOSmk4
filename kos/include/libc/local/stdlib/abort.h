@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc63e68ad */
+/* HASH CRC-32:0x28250478 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,13 +19,13 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_abort_defined
-#define __local_abort_defined 1
+#define __local_abort_defined
 #include <__crt.h>
 #if defined(__CRT_HAVE__Exit) || defined(__CRT_HAVE__exit) || defined(__CRT_HAVE_quick_exit) || defined(__CRT_HAVE_exit)
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep__Exit_defined
-#define __local___localdep__Exit_defined 1
+#define __local___localdep__Exit_defined
 #if __has_builtin(__builtin__Exit) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE__Exit)
 __CEIREDIRECT(__ATTR_NORETURN,void,__THROWING,__localdep__Exit,(int __status),_Exit,{ __builtin__Exit(__status); })
 #elif __has_builtin(__builtin__exit) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE__exit)
@@ -51,7 +51,7 @@ __LOCAL_LIBC(abort) __ATTR_NORETURN void
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_abort_defined
-#define __local___localdep_abort_defined 1
+#define __local___localdep_abort_defined
 #define __localdep_abort __LIBC_LOCAL_NAME(abort)
 #endif /* !__local___localdep_abort_defined */
 #else /* __CRT_HAVE__Exit || __CRT_HAVE__exit || __CRT_HAVE_quick_exit || __CRT_HAVE_exit */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x48fc0b6c */
+/* HASH CRC-32:0x56adc484 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,12 +19,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_umount_defined
-#define __local_umount_defined 1
+#define __local_umount_defined
 #include <__crt.h>
 #ifdef __CRT_HAVE_umount2
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_umount2_defined
-#define __local___localdep_umount2_defined 1
+#define __local___localdep_umount2_defined
 __NAMESPACE_LOCAL_END
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -36,7 +36,7 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(umount))(char const *__special_file) 
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_umount_defined
-#define __local___localdep_umount_defined 1
+#define __local___localdep_umount_defined
 #define __localdep_umount __LIBC_LOCAL_NAME(umount)
 #endif /* !__local___localdep_umount_defined */
 #else /* __CRT_HAVE_umount2 */

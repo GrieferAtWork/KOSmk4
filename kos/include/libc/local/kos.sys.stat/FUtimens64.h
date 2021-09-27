@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7f82d87e */
+/* HASH CRC-32:0xaf659670 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,13 +19,13 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_FUtimens64_defined
-#define __local_FUtimens64_defined 1
+#define __local_FUtimens64_defined
 #include <__crt.h>
 #ifdef __CRT_HAVE_FUtimens
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_FUtimens32_defined
-#define __local___localdep_FUtimens32_defined 1
+#define __local___localdep_FUtimens32_defined
 __CREDIRECT_VOID(,__THROWING,__localdep_FUtimens32,(__fd_t __fd, struct timespec const __times[2 /*or:3*/]),FUtimens,(__fd,__times))
 #endif /* !__local___localdep_FUtimens32_defined */
 __LOCAL_LIBC(FUtimens64) void
@@ -43,7 +43,7 @@ __LOCAL_LIBC(FUtimens64) void
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_FUtimens64_defined
-#define __local___localdep_FUtimens64_defined 1
+#define __local___localdep_FUtimens64_defined
 #define __localdep_FUtimens64 __LIBC_LOCAL_NAME(FUtimens64)
 #endif /* !__local___localdep_FUtimens64_defined */
 #else /* __CRT_HAVE_FUtimens */

@@ -56,7 +56,7 @@ __SYSDECL_BEGIN
 
 #ifdef __CC__
 #ifndef __size_t_defined
-#define __size_t_defined 1
+#define __size_t_defined
 typedef __SIZE_TYPE__ size_t;
 #endif /* !__size_t_defined */
 
@@ -76,7 +76,7 @@ typedef __SIZE_TYPE__ size_t;
 
 %
 %#ifndef __bzero_defined
-%#define __bzero_defined 1
+%#define __bzero_defined
 %[insert:function(bzero)]
 %#if defined(__cplusplus) && defined(__USE_STRING_OVERLOADS)
 %[insert:function(bzero = bzeroc, externLinkageOverride: "C++")]

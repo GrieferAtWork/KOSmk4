@@ -46,7 +46,7 @@
 __SYSDECL_BEGIN
 
 #ifndef __clock_t_defined
-#define __clock_t_defined 1
+#define __clock_t_defined
 typedef __clock_t clock_t;
 #endif /* !__clock_t_defined */
 

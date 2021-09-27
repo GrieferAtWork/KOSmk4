@@ -32,7 +32,7 @@
 #define _SS_SIZE __SIZEOF_SOCKADDR_STORAGE
 
 #ifndef __sa_family_t_defined
-#define __sa_family_t_defined 1
+#define __sa_family_t_defined
 #include <bits/types.h>
 #ifdef __CC__
 __DECL_BEGIN

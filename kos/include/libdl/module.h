@@ -53,13 +53,13 @@ DECL_BEGIN
 #endif /* !__DLFCN_CC */
 
 #ifndef __DlSection_defined
-#define __DlSection_defined 1
+#define __DlSection_defined
 struct dlsection;
 typedef struct dlsection DlSection;
 #endif /* !__DlSection_defined */
 
 #ifndef __DlModule_defined
-#define __DlModule_defined 1
+#define __DlModule_defined
 struct dlmodule;
 typedef struct dlmodule DlModule;
 #endif /* !__DlModule_defined */
@@ -131,7 +131,7 @@ struct dlmodule_finalizers {
 };
 
 #ifndef __elfw_hashtable_defined
-#define __elfw_hashtable_defined 1
+#define __elfw_hashtable_defined
 typedef struct elfW(hashtable) {
 	ElfW(Word) ht_nbuckts;      /* # of buckets. */
 	ElfW(Word) ht_nchains;      /* # of symbols. */
@@ -141,7 +141,7 @@ typedef struct elfW(hashtable) {
 #endif /* !__elfw_hashtable_defined */
 
 #ifndef __elfw_gnu_hashtable_defined
-#define __elfw_gnu_hashtable_defined 1
+#define __elfw_gnu_hashtable_defined
 typedef struct elfW(gnu_hashtable) {
 	ElfW(Word) gh_nbuckets;      /* # of buckets. */
 	ElfW(Word) gh_symoffset;     /* Offset of symbol indices. */

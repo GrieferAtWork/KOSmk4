@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5dc7fae3 */
+/* HASH CRC-32:0xca3438b6 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,13 +19,13 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local__getcwd_dbg_defined
-#define __local__getcwd_dbg_defined 1
+#define __local__getcwd_dbg_defined
 #include <__crt.h>
 #if defined(__CRT_HAVE_getcwd) || defined(__CRT_HAVE__getcwd)
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_getcwd_defined
-#define __local___localdep_getcwd_defined 1
+#define __local___localdep_getcwd_defined
 #ifdef __CRT_HAVE_getcwd
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
@@ -49,7 +49,7 @@ __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(_getcwd_dbg))(char *__buf, __STDC_INT
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep__getcwd_dbg_defined
-#define __local___localdep__getcwd_dbg_defined 1
+#define __local___localdep__getcwd_dbg_defined
 #define __localdep__getcwd_dbg __LIBC_LOCAL_NAME(_getcwd_dbg)
 #endif /* !__local___localdep__getcwd_dbg_defined */
 #else /* __CRT_HAVE_getcwd || __CRT_HAVE__getcwd */

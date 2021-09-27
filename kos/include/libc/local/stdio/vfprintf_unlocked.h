@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x94861eeb */
+/* HASH CRC-32:0xb24c4a2e */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,14 +19,14 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_vfprintf_unlocked_defined
-#define __local_vfprintf_unlocked_defined 1
+#define __local_vfprintf_unlocked_defined
 #include <__crt.h>
 #if defined(__CRT_HAVE_file_printer_unlocked) || defined(__CRT_HAVE_file_printer) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE__IO_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked) || (defined(__CRT_HAVE_fgetc) && (!defined(__CRT_DOS) || !defined(__CRT_HAVE__filbuf))) || (defined(__CRT_HAVE_getc) && (!defined(__CRT_DOS) || !defined(__CRT_HAVE__filbuf))) || (defined(__CRT_HAVE__IO_getc) && (!defined(__CRT_DOS) || !defined(__CRT_HAVE__filbuf))) || (defined(__CRT_DOS) && defined(__CRT_HAVE__filbuf)) || defined(__CRT_HAVE_fread) || defined(__CRT_HAVE__IO_fread) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock)
 #include <features.h>
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_file_printer_unlocked_defined
-#define __local___localdep_file_printer_unlocked_defined 1
+#define __local___localdep_file_printer_unlocked_defined
 #ifdef __CRT_HAVE_file_printer_unlocked
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
@@ -49,7 +49,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_file_printer_unlocked_defined */
 #ifndef __local___localdep_format_vprintf_defined
-#define __local___localdep_format_vprintf_defined 1
+#define __local___localdep_format_vprintf_defined
 #ifdef __CRT_HAVE_format_vprintf
 __NAMESPACE_LOCAL_END
 #include <bits/crt/format-printer.h>
@@ -69,7 +69,7 @@ __LOCAL_LIBC(vfprintf_unlocked) __ATTR_LIBC_PRINTF(2, 0) __ATTR_NONNULL((1, 2)) 
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_vfprintf_unlocked_defined
-#define __local___localdep_vfprintf_unlocked_defined 1
+#define __local___localdep_vfprintf_unlocked_defined
 #define __localdep_vfprintf_unlocked __LIBC_LOCAL_NAME(vfprintf_unlocked)
 #endif /* !__local___localdep_vfprintf_unlocked_defined */
 #else /* __CRT_HAVE_file_printer_unlocked || __CRT_HAVE_file_printer || __CRT_HAVE_fwrite_unlocked || __CRT_HAVE__fwrite_nolock || __CRT_HAVE_fwrite || __CRT_HAVE__IO_fwrite || __CRT_HAVE_fwrite_s || __CRT_HAVE_fgetc_unlocked || __CRT_HAVE_getc_unlocked || (__CRT_HAVE_fgetc && (!__CRT_DOS || !__CRT_HAVE__filbuf)) || (__CRT_HAVE_getc && (!__CRT_DOS || !__CRT_HAVE__filbuf)) || (__CRT_HAVE__IO_getc && (!__CRT_DOS || !__CRT_HAVE__filbuf)) || (__CRT_DOS && __CRT_HAVE__filbuf) || __CRT_HAVE_fread || __CRT_HAVE__IO_fread || __CRT_HAVE_fread_unlocked || __CRT_HAVE__fread_nolock */

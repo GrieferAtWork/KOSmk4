@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xea8412bc */
+/* HASH CRC-32:0xadb86c18 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_fgetpwfiltered_r_defined
-#define __local_fgetpwfiltered_r_defined 1
+#define __local_fgetpwfiltered_r_defined
 #include <__crt.h>
 #include <features.h>
 #include <bits/crt/stdio.h>
@@ -28,7 +28,7 @@
 #include <bits/crt/db/passwd.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_fgetpos64_defined
-#define __local___localdep_fgetpos64_defined 1
+#define __local___localdep_fgetpos64_defined
 #if defined(__CRT_HAVE_fgetpos_unlocked) && defined(__USE_STDIO_UNLOCKED) && __SIZEOF_FPOS64_T__ == __SIZEOF_FPOS32_T__
 __NAMESPACE_LOCAL_END
 #include <kos/anno.h>
@@ -79,7 +79,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_fgetpos64_defined */
 #ifndef __local___localdep_fparseln_defined
-#define __local___localdep_fparseln_defined 1
+#define __local___localdep_fparseln_defined
 #ifdef __CRT_HAVE_fparseln
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
@@ -95,7 +95,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_fparseln_defined */
 #ifndef __local___localdep_free_defined
-#define __local___localdep_free_defined 1
+#define __local___localdep_free_defined
 #if __has_builtin(__builtin_free) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_free)
 __CEIREDIRECT(,void,__NOTHROW_NCX,__localdep_free,(void *__mallptr),free,{ __builtin_free(__mallptr); })
 #elif defined(__CRT_HAVE_free)
@@ -107,7 +107,7 @@ __CREDIRECT_VOID(,__NOTHROW_NCX,__localdep_free,(void *__mallptr),cfree,(__mallp
 #endif /* !... */
 #endif /* !__local___localdep_free_defined */
 #ifndef __local___localdep_fsetpos64_defined
-#define __local___localdep_fsetpos64_defined 1
+#define __local___localdep_fsetpos64_defined
 #if defined(__CRT_HAVE_fsetpos_unlocked) && defined(__USE_STDIO_UNLOCKED) && __SIZEOF_FPOS64_T__ == __SIZEOF_FPOS32_T__
 __NAMESPACE_LOCAL_END
 #include <kos/anno.h>
@@ -158,7 +158,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_fsetpos64_defined */
 #ifndef __local___localdep_mempcpy_defined
-#define __local___localdep_mempcpy_defined 1
+#define __local___localdep_mempcpy_defined
 #ifdef __CRT_HAVE_mempcpy
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
@@ -177,7 +177,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_mempcpy_defined */
 #ifndef __local___localdep_rewind_defined
-#define __local___localdep_rewind_defined 1
+#define __local___localdep_rewind_defined
 #if defined(__CRT_HAVE_rewind_unlocked) && defined(__USE_STDIO_UNLOCKED)
 __NAMESPACE_LOCAL_END
 #include <kos/anno.h>
@@ -203,7 +203,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_rewind_defined */
 #ifndef __local___localdep_strchrnul_defined
-#define __local___localdep_strchrnul_defined 1
+#define __local___localdep_strchrnul_defined
 #ifdef __CRT_HAVE_strchrnul
 __CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_strchrnul,(char const *__restrict __haystack, int __needle),strchrnul,(__haystack,__needle))
 #else /* __CRT_HAVE_strchrnul */
@@ -214,7 +214,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__CRT_HAVE_strchrnul */
 #endif /* !__local___localdep_strchrnul_defined */
 #ifndef __local___localdep_strcmp_defined
-#define __local___localdep_strcmp_defined 1
+#define __local___localdep_strcmp_defined
 #if __has_builtin(__builtin_strcmp) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_strcmp)
 __CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_strcmp,(char const *__s1, char const *__s2),strcmp,{ return __builtin_strcmp(__s1, __s2); })
 #elif defined(__CRT_HAVE_strcmp)
@@ -227,7 +227,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_strcmp_defined */
 #ifndef __local___localdep_strlen_defined
-#define __local___localdep_strlen_defined 1
+#define __local___localdep_strlen_defined
 #ifdef __CRT_HAVE_strlen
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
@@ -241,7 +241,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__CRT_HAVE_strlen */
 #endif /* !__local___localdep_strlen_defined */
 #ifndef __local___localdep_strtoul_defined
-#define __local___localdep_strtoul_defined 1
+#define __local___localdep_strtoul_defined
 #ifdef __CRT_HAVE_strtoul
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
@@ -285,7 +285,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_strtoul_defined */
 #ifndef __local___localdep_syslog_defined
-#define __local___localdep_syslog_defined 1
+#define __local___localdep_syslog_defined
 #ifdef __CRT_HAVE_syslog
 __LIBC __ATTR_LIBC_PRINTF(2, 3) __ATTR_NONNULL((2)) void __NOTHROW_RPC(__VLIBCCALL __localdep_syslog)(__STDC_INT_AS_UINT_T __level, char const *__format, ...) __CASMNAME("syslog");
 #elif defined(__CRT_HAVE_vsyslog) || defined(__CRT_HAVE_syslog_printer)
@@ -475,7 +475,7 @@ __nextline:
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_fgetpwfiltered_r_defined
-#define __local___localdep_fgetpwfiltered_r_defined 1
+#define __local___localdep_fgetpwfiltered_r_defined
 #define __localdep_fgetpwfiltered_r __LIBC_LOCAL_NAME(fgetpwfiltered_r)
 #endif /* !__local___localdep_fgetpwfiltered_r_defined */
 #else /* (__CRT_HAVE_fgetpos64 || __CRT_HAVE__IO_fgetpos64 || __CRT_HAVE_fgetpos64_unlocked || __CRT_HAVE_ftello64 || __CRT_HAVE_ftell64 || __CRT_HAVE__ftelli64 || __CRT_HAVE_ftello64_unlocked || __CRT_HAVE_ftell64_unlocked || __CRT_HAVE__ftelli64_nolock || __CRT_HAVE_fgetpos || __CRT_HAVE__IO_fgetpos || __CRT_HAVE_fgetpos_unlocked || __CRT_HAVE_ftello || __CRT_HAVE_ftello_unlocked || __CRT_HAVE_ftell || __CRT_HAVE__IO_ftell || __CRT_HAVE_ftell_unlocked || __CRT_HAVE__ftell_nolock) && (__CRT_HAVE_fsetpos64 || __CRT_HAVE__IO_fsetpos64 || __CRT_HAVE_fsetpos64_unlocked || __CRT_HAVE_fsetpos || __CRT_HAVE__IO_fsetpos || __CRT_HAVE_fsetpos_unlocked || (__SEEK_SET && (__CRT_HAVE_fseeko64 || __CRT_HAVE_fseek64 || __CRT_HAVE__fseeki64 || __CRT_HAVE_fseeko64_unlocked || __CRT_HAVE_fseek64_unlocked || __CRT_HAVE__fseeki64_nolock || __CRT_HAVE_fseeko || __CRT_HAVE_fseeko_unlocked || __CRT_HAVE_fseek || __CRT_HAVE_fseek_unlocked || __CRT_HAVE__fseek_nolock))) && (__CRT_HAVE_fparseln || ((__CRT_HAVE_fgetc || __CRT_HAVE_getc || __CRT_HAVE__IO_getc || __CRT_HAVE_fgetc_unlocked || __CRT_HAVE_getc_unlocked || (__CRT_DOS && __CRT_HAVE__filbuf) || __CRT_HAVE_fread || __CRT_HAVE__IO_fread || __CRT_HAVE_fread_unlocked || __CRT_HAVE__fread_nolock) && (__CRT_HAVE_ungetc || __CRT_HAVE__IO_ungetc || __CRT_HAVE_ungetc_unlocked || __CRT_HAVE__ungetc_nolock) && __CRT_HAVE_realloc)) */

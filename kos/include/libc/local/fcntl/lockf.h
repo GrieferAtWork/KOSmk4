@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb1853f4b */
+/* HASH CRC-32:0xfa81a01c */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_lockf_defined
-#define __local_lockf_defined 1
+#define __local_lockf_defined
 #include <__crt.h>
 #include <bits/types.h>
 #if defined(__CRT_HAVE_lockf64) || defined(__CRT_HAVE_lockf) || defined(__CRT_HAVE_locking) || defined(__CRT_HAVE__locking)
@@ -35,7 +35,7 @@
 #endif /* !__PIO_OFFSET */
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_crt_locking_defined
-#define __local___localdep_crt_locking_defined 1
+#define __local___localdep_crt_locking_defined
 #ifdef __CRT_HAVE_locking
 __CREDIRECT(,int,__NOTHROW_RPC,__localdep_crt_locking,(__fd_t __fd, __STDC_INT_AS_UINT_T __cmd, __pos32_t __length),locking,(__fd,__cmd,__length))
 #elif defined(__CRT_HAVE__locking)
@@ -45,11 +45,11 @@ __CREDIRECT(,int,__NOTHROW_RPC,__localdep_crt_locking,(__fd_t __fd, __STDC_INT_A
 #endif /* !... */
 #endif /* !__local___localdep_crt_locking_defined */
 #if !defined(__local___localdep_lockf32_defined) && defined(__CRT_HAVE_lockf)
-#define __local___localdep_lockf32_defined 1
+#define __local___localdep_lockf32_defined
 __CREDIRECT(,int,__NOTHROW_RPC,__localdep_lockf32,(__fd_t __fd, __STDC_INT_AS_UINT_T __cmd, __pos32_t __length),lockf,(__fd,__cmd,__length))
 #endif /* !__local___localdep_lockf32_defined && __CRT_HAVE_lockf */
 #ifndef __local___localdep_lockf64_defined
-#define __local___localdep_lockf64_defined 1
+#define __local___localdep_lockf64_defined
 #if defined(__CRT_HAVE_lockf) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
 __CREDIRECT(,int,__NOTHROW_RPC,__localdep_lockf64,(__fd_t __fd, __STDC_INT_AS_UINT_T __cmd, __PIO_OFFSET64 __length),lockf,(__fd,__cmd,__length))
 #elif defined(__CRT_HAVE_lockf64)
@@ -75,7 +75,7 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(lockf))(__fd_t __fd, __STDC_INT_AS_UI
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_lockf_defined
-#define __local___localdep_lockf_defined 1
+#define __local___localdep_lockf_defined
 #define __localdep_lockf __LIBC_LOCAL_NAME(lockf)
 #endif /* !__local___localdep_lockf_defined */
 #else /* __CRT_HAVE_lockf64 || __CRT_HAVE_lockf || __CRT_HAVE_locking || __CRT_HAVE__locking */

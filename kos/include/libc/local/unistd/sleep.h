@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2c81dcdd */
+/* HASH CRC-32:0x594427fc */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,12 +19,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_sleep_defined
-#define __local_sleep_defined 1
+#define __local_sleep_defined
 #include <__crt.h>
 #if defined(__CRT_HAVE__sleep) || defined(__CRT_HAVE_sleep)
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_dos_sleep_defined
-#define __local___localdep_dos_sleep_defined 1
+#define __local___localdep_dos_sleep_defined
 #ifdef __CRT_HAVE__sleep
 __CREDIRECT_VOID(,__NOTHROW_RPC,__localdep_dos_sleep,(unsigned int __duration),_sleep,(__duration))
 #elif defined(__CRT_HAVE_sleep)
@@ -40,7 +40,7 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(sleep))(unsigned int __seconds) {
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_sleep_defined
-#define __local___localdep_sleep_defined 1
+#define __local___localdep_sleep_defined
 #define __localdep_sleep __LIBC_LOCAL_NAME(sleep)
 #endif /* !__local___localdep_sleep_defined */
 #else /* __CRT_HAVE__sleep || __CRT_HAVE_sleep */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcc85b852 */
+/* HASH CRC-32:0xf02f617f */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,11 +19,11 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_lrintf_defined
-#define __local_lrintf_defined 1
+#define __local_lrintf_defined
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_rintf_defined
-#define __local___localdep_rintf_defined 1
+#define __local___localdep_rintf_defined
 #if __has_builtin(__builtin_rintf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_rintf)
 __CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,__localdep_rintf,(float __x),rintf,{ return __builtin_rintf(__x); })
 #elif __has_builtin(__builtin_nearbyintf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_nearbyintf)
@@ -64,7 +64,7 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(lrintf))(float __x) {
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_lrintf_defined
-#define __local___localdep_lrintf_defined 1
+#define __local___localdep_lrintf_defined
 #define __localdep_lrintf __LIBC_LOCAL_NAME(lrintf)
 #endif /* !__local___localdep_lrintf_defined */
 #endif /* !__local_lrintf_defined */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbd1bb6c4 */
+/* HASH CRC-32:0xc76059be */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,12 +19,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_mempcpyw_defined
-#define __local_mempcpyw_defined 1
+#define __local_mempcpyw_defined
 #include <__crt.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_memcpyw_defined
-#define __local___localdep_memcpyw_defined 1
+#define __local___localdep_memcpyw_defined
 #ifdef __CRT_HAVE_memcpyw
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT16_TYPE__ *,__NOTHROW_NCX,__localdep_memcpyw,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_words),memcpyw,(__dst,__src,__n_words))
 #elif defined(__CRT_HAVE_wmemcpy) && __SIZEOF_WCHAR_T__ == 2
@@ -44,7 +44,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(mempcpyw))(void *__restrict __dst, vo
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_mempcpyw_defined
-#define __local___localdep_mempcpyw_defined 1
+#define __local___localdep_mempcpyw_defined
 #define __localdep_mempcpyw __LIBC_LOCAL_NAME(mempcpyw)
 #endif /* !__local___localdep_mempcpyw_defined */
 #endif /* !__local_mempcpyw_defined */

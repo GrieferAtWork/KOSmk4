@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x245af595 */
+/* HASH CRC-32:0x1a507032 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,13 +19,13 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_strtoll_defined
-#define __local_strtoll_defined 1
+#define __local_strtoll_defined
 #include <__crt.h>
 #include <features.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_strto32_defined
-#define __local___localdep_strto32_defined 1
+#define __local___localdep_strto32_defined
 #ifdef __CRT_HAVE_strto32
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__INT32_TYPE__,__NOTHROW_NCX,__localdep_strto32,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base),strto32,(__nptr,__endptr,__base))
 #elif defined(__CRT_HAVE_strtol) && __SIZEOF_LONG__ == 4
@@ -44,7 +44,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_strto32_defined */
 #ifndef __local___localdep_strto64_defined
-#define __local___localdep_strto64_defined 1
+#define __local___localdep_strto64_defined
 #ifdef __CRT_HAVE_strto64
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__INT64_TYPE__,__NOTHROW_NCX,__localdep_strto64,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base),strto64,(__nptr,__endptr,__base))
 #elif defined(__CRT_HAVE__strtoi64)
@@ -74,7 +74,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strtoll))(char const *__restrict __np
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_strtoll_defined
-#define __local___localdep_strtoll_defined 1
+#define __local___localdep_strtoll_defined
 #define __localdep_strtoll __LIBC_LOCAL_NAME(strtoll)
 #endif /* !__local___localdep_strtoll_defined */
 #endif /* !__local_strtoll_defined */

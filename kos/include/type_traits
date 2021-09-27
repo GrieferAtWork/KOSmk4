@@ -188,7 +188,7 @@ template<class __T, __SIZE_TYPE__ __Size> struct rank<__T[__Size]>: public integ
 template<class __T> struct rank<__T[]>: public integral_constant<__SIZE_TYPE__, 1 + rank<__T>::value> {};
 
 #ifndef __std_reference_wrapper_defined
-#define __std_reference_wrapper_defined 1
+#define __std_reference_wrapper_defined
 template<class __T> class reference_wrapper;
 #endif /* !__std_reference_wrapper_defined */
 

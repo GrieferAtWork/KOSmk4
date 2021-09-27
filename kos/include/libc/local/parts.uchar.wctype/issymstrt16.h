@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x19302061 */
+/* HASH CRC-32:0xb639caa6 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,19 +19,19 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_issymstrt16_defined
-#define __local_issymstrt16_defined 1
+#define __local_issymstrt16_defined
 #include <__crt.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #if !defined(__local___localdep___unicode_descriptor_defined) && defined(__CRT_HAVE___unicode_descriptor)
-#define __local___localdep___unicode_descriptor_defined 1
+#define __local___localdep___unicode_descriptor_defined
 __NAMESPACE_LOCAL_END
 #include <bits/crt/unicode.h>
 __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_CONST __ATTR_RETNONNULL,struct __unitraits const *,__NOTHROW,__localdep___unicode_descriptor,(__CHAR32_TYPE__ __ch),__unicode_descriptor,(__ch))
 #endif /* !__local___localdep___unicode_descriptor_defined && __CRT_HAVE___unicode_descriptor */
 #ifndef __local___localdep_isalpha16_defined
-#define __local___localdep_isalpha16_defined 1
+#define __local___localdep_isalpha16_defined
 __NAMESPACE_LOCAL_END
 #include <bits/crt/wctype.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -71,7 +71,7 @@ __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(issymstrt16))(__WINT16_TYPE__ __wc) {
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_issymstrt16_defined
-#define __local___localdep_issymstrt16_defined 1
+#define __local___localdep_issymstrt16_defined
 #define __localdep_issymstrt16 __LIBC_LOCAL_NAME(issymstrt16)
 #endif /* !__local___localdep_issymstrt16_defined */
 #endif /* !__local_issymstrt16_defined */

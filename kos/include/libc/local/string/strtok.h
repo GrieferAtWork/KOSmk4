@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb5ca1e95 */
+/* HASH CRC-32:0x9ace50fa */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,11 +19,11 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_strtok_defined
-#define __local_strtok_defined 1
+#define __local_strtok_defined
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_strtok_r_defined
-#define __local___localdep_strtok_r_defined 1
+#define __local___localdep_strtok_r_defined
 #ifdef __CRT_HAVE_strtok_r
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((2, 3)),char *,__NOTHROW_NCX,__localdep_strtok_r,(char *__str, char const *__delim, char **__restrict __save_ptr),strtok_r,(__str,__delim,__save_ptr))
 #elif defined(__CRT_HAVE_strtok_s)
@@ -44,7 +44,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strtok))(char *__str, char const *__d
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_strtok_defined
-#define __local___localdep_strtok_defined 1
+#define __local___localdep_strtok_defined
 #define __localdep_strtok __LIBC_LOCAL_NAME(strtok)
 #endif /* !__local___localdep_strtok_defined */
 #endif /* !__local_strtok_defined */

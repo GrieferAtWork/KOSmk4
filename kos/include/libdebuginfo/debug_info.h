@@ -202,7 +202,7 @@ typedef struct di_debuginfo_cu_parser_struct {
 } di_debuginfo_cu_parser_t;
 
 #ifndef __di_debuginfo_location_t_defined
-#define __di_debuginfo_location_t_defined 1
+#define __di_debuginfo_location_t_defined
 /* NOTE: The user-interface API for this type is exported
  *       by  `libunwind',  rather  than   `libdebuginfo'! */
 typedef struct di_debuginfo_location_struct {

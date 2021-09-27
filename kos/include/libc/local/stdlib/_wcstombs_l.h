@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5ef2bcc2 */
+/* HASH CRC-32:0xc22e1b73 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,12 +19,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local__wcstombs_l_defined
-#define __local__wcstombs_l_defined 1
+#define __local__wcstombs_l_defined
 #include <__crt.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_wcstombs_defined
-#define __local___localdep_wcstombs_defined 1
+#define __local___localdep_wcstombs_defined
 #ifdef __CRT_HAVE_wcstombs
 __CREDIRECT(__ATTR_NONNULL((1, 2)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_wcstombs,(char *__restrict __dst, __WCHAR_TYPE__ const *__restrict __src, __SIZE_TYPE__ __dstlen),wcstombs,(__dst,__src,__dstlen))
 #else /* __CRT_HAVE_wcstombs */
@@ -41,7 +41,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_wcstombs_l))(char *__dst, __WCHAR_TY
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep__wcstombs_l_defined
-#define __local___localdep__wcstombs_l_defined 1
+#define __local___localdep__wcstombs_l_defined
 #define __localdep__wcstombs_l __LIBC_LOCAL_NAME(_wcstombs_l)
 #endif /* !__local___localdep__wcstombs_l_defined */
 #endif /* !__local__wcstombs_l_defined */

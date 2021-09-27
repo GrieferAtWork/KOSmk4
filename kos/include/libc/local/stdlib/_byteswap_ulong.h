@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x665a9cf7 */
+/* HASH CRC-32:0xbba33f78 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local__byteswap_ulong_defined
-#define __local__byteswap_ulong_defined 1
+#define __local__byteswap_ulong_defined
 #include <__crt.h>
 #include <hybrid/__byteswap.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -29,7 +29,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_byteswap_ulong))(__UINT32_TYPE__ __v
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep__byteswap_ulong_defined
-#define __local___localdep__byteswap_ulong_defined 1
+#define __local___localdep__byteswap_ulong_defined
 #define __localdep__byteswap_ulong __LIBC_LOCAL_NAME(_byteswap_ulong)
 #endif /* !__local___localdep__byteswap_ulong_defined */
 #endif /* !__local__byteswap_ulong_defined */

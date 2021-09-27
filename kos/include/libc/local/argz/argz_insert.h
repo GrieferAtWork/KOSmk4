@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9b96ad4a */
+/* HASH CRC-32:0xf51935e7 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,13 +19,13 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_argz_insert_defined
-#define __local_argz_insert_defined 1
+#define __local_argz_insert_defined
 #include <__crt.h>
 #ifdef __CRT_HAVE_realloc
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_argz_add_defined
-#define __local___localdep_argz_add_defined 1
+#define __local___localdep_argz_add_defined
 #ifdef __CRT_HAVE_argz_add
 __CREDIRECT(__ATTR_NONNULL((1, 2, 3)),__errno_t,__NOTHROW_NCX,__localdep_argz_add,(char **__restrict __pargz, __SIZE_TYPE__ *__restrict __pargz_len, char const *__restrict __str),argz_add,(__pargz,__pargz_len,__str))
 #elif defined(__CRT_HAVE___argz_add)
@@ -38,7 +38,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_argz_add_defined */
 #ifndef __local___localdep_memcpyc_defined
-#define __local___localdep_memcpyc_defined 1
+#define __local___localdep_memcpyc_defined
 #ifdef __CRT_HAVE_memcpyc
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
@@ -52,7 +52,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__CRT_HAVE_memcpyc */
 #endif /* !__local___localdep_memcpyc_defined */
 #ifndef __local___localdep_memmoveupc_defined
-#define __local___localdep_memmoveupc_defined 1
+#define __local___localdep_memmoveupc_defined
 #ifdef __CRT_HAVE_memmoveupc
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
@@ -66,7 +66,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__CRT_HAVE_memmoveupc */
 #endif /* !__local___localdep_memmoveupc_defined */
 #ifndef __local___localdep_realloc_defined
-#define __local___localdep_realloc_defined 1
+#define __local___localdep_realloc_defined
 #if __has_builtin(__builtin_realloc) && defined(__LIBC_BIND_CRTBUILTINS)
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
@@ -80,7 +80,7 @@ __CREDIRECT(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)),vo
 #endif /* !__has_builtin(__builtin_realloc) || !__LIBC_BIND_CRTBUILTINS */
 #endif /* !__local___localdep_realloc_defined */
 #ifndef __local___localdep_strlen_defined
-#define __local___localdep_strlen_defined 1
+#define __local___localdep_strlen_defined
 #ifdef __CRT_HAVE_strlen
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
@@ -154,7 +154,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(argz_insert))(char **__restrict __par
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_argz_insert_defined
-#define __local___localdep_argz_insert_defined 1
+#define __local___localdep_argz_insert_defined
 #define __localdep_argz_insert __LIBC_LOCAL_NAME(argz_insert)
 #endif /* !__local___localdep_argz_insert_defined */
 #else /* __CRT_HAVE_realloc */

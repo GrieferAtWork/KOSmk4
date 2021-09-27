@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa71369c1 */
+/* HASH CRC-32:0x92ffed0f */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -67,7 +67,7 @@
 __SYSDECL_BEGIN
 
 #ifndef __sysinfo_defined
-#define __sysinfo_defined 1
+#define __sysinfo_defined
 #if defined(__CRT_HAVE_sysinfo) && defined(__solaris__)
 __CDECLARE(,int,__NOTHROW_NCX,sysinfo,(__STDC_INT_AS_UINT_T __command, char *__buf, __STDC_LONG_AS_SIZE_T __buflen),(__command,__buf,__buflen))
 #elif defined(__CRT_HAVE___solaris_sysinfo)

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9d3753bf */
+/* HASH CRC-32:0x2949ae9b */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_posix_spawnattr_setflags_defined
-#define __local_posix_spawnattr_setflags_defined 1
+#define __local_posix_spawnattr_setflags_defined
 #include <__crt.h>
 #include <asm/crt/posix_spawn.h>
 #ifdef __POSIX_SPAWN_USE_KOS
@@ -32,7 +32,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(posix_spawnattr_setflags))(struct __p
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_posix_spawnattr_setflags_defined
-#define __local___localdep_posix_spawnattr_setflags_defined 1
+#define __local___localdep_posix_spawnattr_setflags_defined
 #define __localdep_posix_spawnattr_setflags __LIBC_LOCAL_NAME(posix_spawnattr_setflags)
 #endif /* !__local___localdep_posix_spawnattr_setflags_defined */
 #else /* __POSIX_SPAWN_USE_KOS */

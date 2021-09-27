@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x25d51329 */
+/* HASH CRC-32:0x30c7cdea */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local__CrtIsMemoryBlock_defined
-#define __local__CrtIsMemoryBlock_defined 1
+#define __local__CrtIsMemoryBlock_defined
 #include <__crt.h>
 #include <features.h>
 #include <hybrid/typecore.h>
@@ -38,7 +38,7 @@ __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(_CrtIsMemoryBlock))(void const *__ptr
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep__CrtIsMemoryBlock_defined
-#define __local___localdep__CrtIsMemoryBlock_defined 1
+#define __local___localdep__CrtIsMemoryBlock_defined
 #define __localdep__CrtIsMemoryBlock __LIBC_LOCAL_NAME(_CrtIsMemoryBlock)
 #endif /* !__local___localdep__CrtIsMemoryBlock_defined */
 #endif /* !__local__CrtIsMemoryBlock_defined */

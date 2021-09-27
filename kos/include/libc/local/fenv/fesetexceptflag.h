@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8602ea23 */
+/* HASH CRC-32:0xb0cbbcdb */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_fesetexceptflag_defined
-#define __local_fesetexceptflag_defined 1
+#define __local_fesetexceptflag_defined
 #include <__crt.h>
 #include <bits/crt/fenv-inline.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -36,7 +36,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(fesetexceptflag))(__fexcept_t const *
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_fesetexceptflag_defined
-#define __local___localdep_fesetexceptflag_defined 1
+#define __local___localdep_fesetexceptflag_defined
 #define __localdep_fesetexceptflag __LIBC_LOCAL_NAME(fesetexceptflag)
 #endif /* !__local___localdep_fesetexceptflag_defined */
 #endif /* !__local_fesetexceptflag_defined */

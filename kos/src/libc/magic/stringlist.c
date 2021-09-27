@@ -34,7 +34,7 @@
 __SYSDECL_BEGIN
 
 #ifndef ___stringlist_defined
-#define ___stringlist_defined 1
+#define ___stringlist_defined
 typedef struct _stringlist {
 	char   **sl_str; /* [1..1][owned(maybe)][0..sl_cur|ALLOC(sl_max)][owned] Vector of strings */
 	size_t   sl_max; /* Allocated vector size */
@@ -46,7 +46,7 @@ typedef struct _stringlist {
 
 %[define(DEFINE_STRINGLIST =
 #ifndef ___stringlist_defined
-#define ___stringlist_defined 1
+#define ___stringlist_defined
 typedef struct @_stringlist@ {
 	char   **@sl_str@;
 	size_t   @sl_max@;

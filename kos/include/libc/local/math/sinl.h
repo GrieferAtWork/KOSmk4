@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x810356d3 */
+/* HASH CRC-32:0x5d56fa35 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,13 +19,13 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_sinl_defined
-#define __local_sinl_defined 1
+#define __local_sinl_defined
 #include <__crt.h>
 #if defined(__CRT_HAVE_sin) || defined(__CRT_HAVE___sin)
 #include <bits/crt/math-vector.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_sin_defined
-#define __local___localdep_sin_defined 1
+#define __local___localdep_sin_defined
 #if __has_builtin(__builtin_sin) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_sin)
 __CEIREDIRECT(__ATTR_WUNUSED __DECL_SIMD_sin,double,__NOTHROW,__localdep_sin,(double __x),sin,{ return __builtin_sin(__x); })
 #elif defined(__CRT_HAVE_sin)
@@ -42,7 +42,7 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(sinl))(__LONGDOUBLE __x) {
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_sinl_defined
-#define __local___localdep_sinl_defined 1
+#define __local___localdep_sinl_defined
 #define __localdep_sinl __LIBC_LOCAL_NAME(sinl)
 #endif /* !__local___localdep_sinl_defined */
 #else /* __CRT_HAVE_sin || __CRT_HAVE___sin */

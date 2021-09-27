@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe1805e38 */
+/* HASH CRC-32:0xe5a5a0e3 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,12 +19,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_iswlower_defined
-#define __local_iswlower_defined 1
+#define __local_iswlower_defined
 #include <__crt.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_islower_defined
-#define __local___localdep_islower_defined 1
+#define __local___localdep_islower_defined
 __NAMESPACE_LOCAL_END
 #include <bits/crt/ctype.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -44,7 +44,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_islower_defined */
 #ifndef __local___localdep_wctob_defined
-#define __local___localdep_wctob_defined 1
+#define __local___localdep_wctob_defined
 #ifdef __CRT_HAVE_wctob
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep_wctob,(__WINT_TYPE__ __ch),wctob,(__ch))
 #else /* __CRT_HAVE_wctob */
@@ -67,7 +67,7 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(iswlower))(__WINT_TYPE__ __wc) {
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_iswlower_defined
-#define __local___localdep_iswlower_defined 1
+#define __local___localdep_iswlower_defined
 #define __localdep_iswlower __LIBC_LOCAL_NAME(iswlower)
 #endif /* !__local___localdep_iswlower_defined */
 #endif /* !__local_iswlower_defined */

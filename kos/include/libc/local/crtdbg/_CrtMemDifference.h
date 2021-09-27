@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xefd9ef5c */
+/* HASH CRC-32:0x1a0c27b8 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,11 +19,11 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local__CrtMemDifference_defined
-#define __local__CrtMemDifference_defined 1
+#define __local__CrtMemDifference_defined
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_memset_defined
-#define __local___localdep_memset_defined 1
+#define __local___localdep_memset_defined
 #ifdef __CRT_HAVE_memset
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
@@ -45,7 +45,7 @@ __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(_CrtMemDifference))(_CrtMemState *__s
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep__CrtMemDifference_defined
-#define __local___localdep__CrtMemDifference_defined 1
+#define __local___localdep__CrtMemDifference_defined
 #define __localdep__CrtMemDifference __LIBC_LOCAL_NAME(_CrtMemDifference)
 #endif /* !__local___localdep__CrtMemDifference_defined */
 #endif /* !__local__CrtMemDifference_defined */

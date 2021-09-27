@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x37a75756 */
+/* HASH CRC-32:0x5eb2317c */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,11 +19,11 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_isdigit_l_defined
-#define __local_isdigit_l_defined 1
+#define __local_isdigit_l_defined
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_isdigit_defined
-#define __local___localdep_isdigit_defined 1
+#define __local___localdep_isdigit_defined
 __NAMESPACE_LOCAL_END
 #include <bits/crt/ctype.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -50,7 +50,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(isdigit_l))(int __ch, __locale_t __lo
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_isdigit_l_defined
-#define __local___localdep_isdigit_l_defined 1
+#define __local___localdep_isdigit_l_defined
 #define __localdep_isdigit_l __LIBC_LOCAL_NAME(isdigit_l)
 #endif /* !__local___localdep_isdigit_l_defined */
 #endif /* !__local_isdigit_l_defined */

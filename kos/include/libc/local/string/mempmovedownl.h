@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x25c796d2 */
+/* HASH CRC-32:0x1ef14239 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,12 +19,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_mempmovedownl_defined
-#define __local_mempmovedownl_defined 1
+#define __local_mempmovedownl_defined
 #include <__crt.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_memmovedownl_defined
-#define __local___localdep_memmovedownl_defined 1
+#define __local___localdep_memmovedownl_defined
 #ifdef __CRT_HAVE_memmovedownl
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT32_TYPE__ *,__NOTHROW_NCX,__localdep_memmovedownl,(void *__dst, void const *__src, __SIZE_TYPE__ __n_dwords),memmovedownl,(__dst,__src,__n_dwords))
 #elif defined(__CRT_HAVE_memmovel)
@@ -46,7 +46,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(mempmovedownl))(void *__dst, void con
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_mempmovedownl_defined
-#define __local___localdep_mempmovedownl_defined 1
+#define __local___localdep_mempmovedownl_defined
 #define __localdep_mempmovedownl __LIBC_LOCAL_NAME(mempmovedownl)
 #endif /* !__local___localdep_mempmovedownl_defined */
 #endif /* !__local_mempmovedownl_defined */

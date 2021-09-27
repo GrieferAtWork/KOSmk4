@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc2f7ce6c */
+/* HASH CRC-32:0x79fdae10 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -350,11 +350,11 @@ for (local f: funcs) {
 #endif /* __KERNEL__ */
 
 #ifndef __errno_t_defined
-#define __errno_t_defined 1
+#define __errno_t_defined
 typedef __errno_t errno_t;
 #endif /* !__errno_t_defined */
 #ifndef __rsize_t_defined
-#define __rsize_t_defined 1
+#define __rsize_t_defined
 typedef __size_t rsize_t;
 #endif /* !__rsize_t_defined */
 
@@ -2195,8 +2195,8 @@ INTDEF ATTR_PURE WUNUSED NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc_strstartc
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> bitcpy(3)
  * Copy exactly `num_bits' from `src_base+(src_bit_offset/NBBY)' to `dst_base+(dst_bit_offset/NBBY)',
- * doing a byte-wise copy but leaving bits not meant to be copied untouched. Inside of individual
- * bytes, individual bits are indexed such that the least significant bit is at `0', and the most
+ * doing a byte-wise copy  but leaving bits not  meant to be copied  untouched. Inside of  individual
+ * bytes, individual bits are  indexed such that the  least significant bit is  at `0', and the  most
  * significant bit is at `NBBY-1':
  * >> byte_t src[] = { 0b00001001 };
  * >> byte_t dst[] = { 0b00000000 };
@@ -2206,8 +2206,8 @@ INTDEF NONNULL((1, 3)) void NOTHROW_NCX(LIBDCALL libd_bitcpy)(void *__restrict d
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 /* >> bitcpy(3)
  * Copy exactly `num_bits' from `src_base+(src_bit_offset/NBBY)' to `dst_base+(dst_bit_offset/NBBY)',
- * doing a byte-wise copy but leaving bits not meant to be copied untouched. Inside of individual
- * bytes, individual bits are indexed such that the least significant bit is at `0', and the most
+ * doing a byte-wise copy  but leaving bits not  meant to be copied  untouched. Inside of  individual
+ * bytes, individual bits are  indexed such that the  least significant bit is  at `0', and the  most
  * significant bit is at `NBBY-1':
  * >> byte_t src[] = { 0b00001001 };
  * >> byte_t dst[] = { 0b00000000 };

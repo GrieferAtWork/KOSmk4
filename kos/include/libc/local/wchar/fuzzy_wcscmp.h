@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xec06b0bf */
+/* HASH CRC-32:0x5ca117af */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,12 +19,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_fuzzy_wcscmp_defined
-#define __local_fuzzy_wcscmp_defined 1
+#define __local_fuzzy_wcscmp_defined
 #include <__crt.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_fuzzy_wmemcmp_defined
-#define __local___localdep_fuzzy_wmemcmp_defined 1
+#define __local___localdep_fuzzy_wmemcmp_defined
 #ifdef __CRT_HAVE_fuzzy_wmemcmp
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 3)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_fuzzy_wmemcmp,(__WCHAR_TYPE__ const *__s1, __SIZE_TYPE__ __s1_chars, __WCHAR_TYPE__ const *__s2, __SIZE_TYPE__ __s2_chars),fuzzy_wmemcmp,(__s1,__s1_chars,__s2,__s2_chars))
 #elif defined(__CRT_HAVE_fuzzy_memcmpw) && __SIZEOF_WCHAR_T__ == 2
@@ -49,7 +49,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_fuzzy_wmemcmp_defined */
 #ifndef __local___localdep_wcslen_defined
-#define __local___localdep_wcslen_defined 1
+#define __local___localdep_wcslen_defined
 #ifdef __CRT_HAVE_wcslen
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_wcslen,(__WCHAR_TYPE__ const *__restrict __str),wcslen,(__str))
 #else /* __CRT_HAVE_wcslen */
@@ -65,7 +65,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(fuzzy_wcscmp))(__WCHAR_TYPE__ const *
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_fuzzy_wcscmp_defined
-#define __local___localdep_fuzzy_wcscmp_defined 1
+#define __local___localdep_fuzzy_wcscmp_defined
 #define __localdep_fuzzy_wcscmp __LIBC_LOCAL_NAME(fuzzy_wcscmp)
 #endif /* !__local___localdep_fuzzy_wcscmp_defined */
 #endif /* !__local_fuzzy_wcscmp_defined */

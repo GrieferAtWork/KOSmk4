@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe1bd560a */
+/* HASH CRC-32:0xbfc5091c */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_cfsetospeed_defined
-#define __local_cfsetospeed_defined 1
+#define __local_cfsetospeed_defined
 #include <__crt.h>
 #include <bits/os/termios.h>
 #include <bits/types.h>
@@ -31,7 +31,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(cfsetospeed))(struct termios *__restr
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_cfsetospeed_defined
-#define __local___localdep_cfsetospeed_defined 1
+#define __local___localdep_cfsetospeed_defined
 #define __localdep_cfsetospeed __LIBC_LOCAL_NAME(cfsetospeed)
 #endif /* !__local___localdep_cfsetospeed_defined */
 #endif /* !__local_cfsetospeed_defined */

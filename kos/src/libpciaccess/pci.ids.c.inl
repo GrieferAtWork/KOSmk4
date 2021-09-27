@@ -226,7 +226,7 @@ PRIVATE NOBLOCK void NOTHROW(CC fini_name_cache)(void) {
 
 
 #ifndef __pci_device_slist_defined
-#define __pci_device_slist_defined 1
+#define __pci_device_slist_defined
 SLIST_HEAD(pci_device_slist, pci_device);
 #endif /* !__pci_device_slist_defined */
 

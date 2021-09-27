@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2c9e66ff */
+/* HASH CRC-32:0x932dab42 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,14 +19,14 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_futimens64_defined
-#define __local_futimens64_defined 1
+#define __local_futimens64_defined
 #include <__crt.h>
 #ifdef __CRT_HAVE_futimens
 #include <bits/os/timespec.h>
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_futimens32_defined
-#define __local___localdep_futimens32_defined 1
+#define __local___localdep_futimens32_defined
 __CREDIRECT(,int,__NOTHROW_RPC,__localdep_futimens32,(__fd_t __fd, struct timespec const __times[2 /*or:3*/]),futimens,(__fd,__times))
 #endif /* !__local___localdep_futimens32_defined */
 __LOCAL_LIBC(futimens64) int
@@ -42,7 +42,7 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(futimens64))(__fd_t __fd, struct __ti
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_futimens64_defined
-#define __local___localdep_futimens64_defined 1
+#define __local___localdep_futimens64_defined
 #define __localdep_futimens64 __LIBC_LOCAL_NAME(futimens64)
 #endif /* !__local___localdep_futimens64_defined */
 #else /* __CRT_HAVE_futimens */

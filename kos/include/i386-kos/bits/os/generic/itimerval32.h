@@ -123,7 +123,7 @@
 #define __SIZEOF_ITIMERVAL64          __SIZEOF_ITIMERVALX32_64
 #define __ALIGNOF_ITIMERVAL64         __ALIGNOF_ITIMERVALX32_64
 
-#define __itimerval_defined 1
+#define __itimerval_defined
 #endif /* __i386__ && !__x86_64__*/
 /*[[[end]]]*/
 

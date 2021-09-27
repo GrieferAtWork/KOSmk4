@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbbbaa2ba */
+/* HASH CRC-32:0xa1ffcfc */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_pwriteall_defined
-#define __local_pwriteall_defined 1
+#define __local_pwriteall_defined
 #include <__crt.h>
 #include <bits/types.h>
 #include <asm/os/stdio.h>
@@ -36,7 +36,7 @@
 #endif /* !__PIO_OFFSET */
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_pwriteall64_defined
-#define __local___localdep_pwriteall64_defined 1
+#define __local___localdep_pwriteall64_defined
 #if defined(__CRT_HAVE_pwriteall) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
 __CREDIRECT(__ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_pwriteall64,(__fd_t __fd, void *__buf, __SIZE_TYPE__ __bufsize, __PIO_OFFSET64 __offset),pwriteall,(__fd,__buf,__bufsize,__offset))
 #elif defined(__CRT_HAVE_pwriteall64)
@@ -59,7 +59,7 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(pwriteall))(__fd_t __fd, void const *
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_pwriteall_defined
-#define __local___localdep_pwriteall_defined 1
+#define __local___localdep_pwriteall_defined
 #define __localdep_pwriteall __LIBC_LOCAL_NAME(pwriteall)
 #endif /* !__local___localdep_pwriteall_defined */
 #else /* (__CRT_HAVE_pwriteall && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__) || __CRT_HAVE_pwriteall64 || __CRT_HAVE_pwrite64 || __CRT_HAVE___pwrite64 || __CRT_HAVE_pwrite || ((__CRT_HAVE_lseek64 || __CRT_HAVE__lseeki64 || __CRT_HAVE_lseek || __CRT_HAVE__lseek || __CRT_HAVE___lseek) && (__CRT_HAVE_write || __CRT_HAVE__write || __CRT_HAVE___write) && __SEEK_CUR && __SEEK_SET) */

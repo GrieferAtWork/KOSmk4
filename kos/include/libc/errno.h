@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4c52ba0 */
+/* HASH CRC-32:0xa0614b7c */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -34,7 +34,7 @@
 #define __libc_errno errno
 #else /* errno */
 #if !defined(____libc___errno_location_defined) && defined(____libc_core___errno_location_defined)
-#define ____libc___errno_location_defined 1
+#define ____libc___errno_location_defined
 #define __libc___errno_location __libc_core___errno_location
 #endif /* !____libc___errno_location_defined && ____libc_core___errno_location_defined */
 #ifdef ____libc___errno_location_defined

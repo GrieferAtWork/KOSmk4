@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe6ae06c8 */
+/* HASH CRC-32:0xb3c2b097 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,14 +19,14 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local__putws_defined
-#define __local__putws_defined 1
+#define __local__putws_defined
 #include <__crt.h>
 #include <features.h>
 #if (defined(__CRT_HAVE_fputws) || defined(__CRT_HAVE_fputws_unlocked) || defined(__CRT_HAVE__fputws_nolock) || defined(__CRT_HAVE_file_wprinter) || defined(__CRT_HAVE_file_wprinter_unlocked) || defined(__CRT_HAVE_fputwc) || defined(__CRT_HAVE_putwc)) && !defined(__NO_STDSTREAMS)
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_fputws_defined
-#define __local___localdep_fputws_defined 1
+#define __local___localdep_fputws_defined
 #if defined(__CRT_HAVE_fputws_unlocked) && defined(__USE_STDIO_UNLOCKED)
 __NAMESPACE_LOCAL_END
 #include <kos/anno.h>
@@ -70,7 +70,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_putws))(__WCHAR_TYPE__ const *__str)
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep__putws_defined
-#define __local___localdep__putws_defined 1
+#define __local___localdep__putws_defined
 #define __localdep__putws __LIBC_LOCAL_NAME(_putws)
 #endif /* !__local___localdep__putws_defined */
 #else /* (__CRT_HAVE_fputws || __CRT_HAVE_fputws_unlocked || __CRT_HAVE__fputws_nolock || __CRT_HAVE_file_wprinter || __CRT_HAVE_file_wprinter_unlocked || __CRT_HAVE_fputwc || __CRT_HAVE_putwc) && !__NO_STDSTREAMS */

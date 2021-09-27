@@ -56,7 +56,7 @@ __SYSDECL_BEGIN
 #endif /* !C32FORMATPRINTER_CC */
 
 #ifndef __pc16formatprinter_defined
-#define __pc16formatprinter_defined 1
+#define __pc16formatprinter_defined
 /* Callback functions prototypes provided to format functions.
  * NOTE: 'pc(16|32)formatprinter' usually returns the number of characters printed, but isn't required to.
  * @param: arg:     The user-defined closure parameter passed alongside this function pointer.
@@ -105,7 +105,7 @@ $ssize_t format_c32sprintf_printer(/*char32_t ***/ void *arg, char32_t const *__
 
 
 #ifndef __format_c16snprintf_data_defined
-#define __format_c16snprintf_data_defined 1
+#define __format_c16snprintf_data_defined
 /* Data structure for implementing c16snprintf() */
 struct format_c16snprintf_data {
 	char16_t     *sd_buffer; /* [0..sd_bufsiz] Pointer to the next memory location to which to write. */
@@ -152,7 +152,7 @@ $ssize_t format_c32length(void *arg, char32_t const *__restrict data, $size_t da
 %{
 
 #ifndef __format_c16aprintf_data_defined
-#define __format_c16aprintf_data_defined 1
+#define __format_c16aprintf_data_defined
 struct format_c16aprintf_data {
 	char16_t     *ap_base;  /* [0..ap_used|ALLOC(ap_used+ap_avail)][owned] Buffer */
 	__SIZE_TYPE__ ap_avail; /* Unused buffer size */
@@ -161,7 +161,7 @@ struct format_c16aprintf_data {
 #endif /* !__format_c32aprintf_data_defined */
 
 #ifndef __format_c32aprintf_data_defined
-#define __format_c32aprintf_data_defined 1
+#define __format_c32aprintf_data_defined
 struct format_c32aprintf_data {
 	char32_t     *ap_base;  /* [0..ap_used|ALLOC(ap_used+ap_avail)][owned] Buffer */
 	__SIZE_TYPE__ ap_avail; /* Unused buffer size */

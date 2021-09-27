@@ -25,23 +25,23 @@
 
 #if defined(__i386__) && !defined(__x86_64__)
 #define LIBCPUSTATE_CC __ATTR_FASTCALL
-#else
+#else /* ... */
 #define LIBCPUSTATE_CC /* nothing */
-#endif
+#endif /* !... */
 
-#if !defined(LIBCPUSTATE_WANT_PROTOTYPES) && \
-     defined(__KOS__) && defined(__KERNEL__)
-#define LIBCPUSTATE_WANT_PROTOTYPES 1
-#endif
+#if (!defined(LIBCPUSTATE_WANT_PROTOTYPES) && \
+     defined(__KOS__) && defined(__KERNEL__))
+#define LIBCPUSTATE_WANT_PROTOTYPES
+#endif /* ... */
 
 #if defined(__KOS__) && defined(__KERNEL__) && \
     defined(CONFIG_BUILDING_KERNEL_CORE)
 #define LIBCPUSTATE_DECL __PUBDEF
 #elif defined(__LIBCPUSTATE_STATIC)
 #define LIBCPUSTATE_DECL __INTDEF
-#else
+#else /* ... */
 #define LIBCPUSTATE_DECL __IMPDEF
-#endif
+#endif /* !... */
 
 /* Library name for use with `dlopen()' */
 #define LIBCPUSTATE_LIBRARY_NAME "libcpustate.so"

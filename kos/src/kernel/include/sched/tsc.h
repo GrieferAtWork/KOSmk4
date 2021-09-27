@@ -558,7 +558,7 @@ FUNDEF NOBLOCK WUNUSED ktime_t FCALL relktime_from_user_rel(USER CHECKED struct 
 
 
 #ifndef __realtime_defined
-#define __realtime_defined 1
+#define __realtime_defined
 /* Returns the current real time derived from the current CPU time.
  * WARNING: KOS only gives a best-effort guaranty for this function
  *          in terms of  consistency when it  comes to the  calling

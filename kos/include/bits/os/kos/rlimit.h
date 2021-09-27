@@ -28,22 +28,16 @@
 #ifdef __CC__
 __DECL_BEGIN
 
-#ifndef __rlimit_defined
-#define __rlimit_defined 1
 struct rlimit {
 	__FS_TYPE(rlim) rlim_cur; /* The current (soft) limit. */
 	__FS_TYPE(rlim) rlim_max; /* The hard limit. */
 };
-#endif /* !__rlimit_defined */
 
 #ifdef __USE_LARGEFILE64
-#ifndef __rlimit64_defined
-#define __rlimit64_defined 1
 struct rlimit64 {
 	__rlim64_t rlim_cur; /* The current (soft) limit. */
 	__rlim64_t rlim_max; /* The hard limit. */
 };
-#endif /* !__rlimit64_defined */
 #endif /* __USE_LARGEFILE64 */
 
 __DECL_END

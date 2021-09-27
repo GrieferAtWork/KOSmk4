@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x67ca0e60 */
+/* HASH CRC-32:0xd39da859 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,13 +19,13 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_tcgetsid_defined
-#define __local_tcgetsid_defined 1
+#define __local_tcgetsid_defined
 #include <__crt.h>
 #include <asm/os/tty.h>
 #if defined(__CRT_HAVE_ioctl) && defined(__TIOCGSID)
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_ioctl_defined
-#define __local___localdep_ioctl_defined 1
+#define __local___localdep_ioctl_defined
 __NAMESPACE_LOCAL_END
 #include <features.h>
 #include <bits/types.h>
@@ -41,7 +41,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(tcgetsid))(__fd_t __fd) {
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_tcgetsid_defined
-#define __local___localdep_tcgetsid_defined 1
+#define __local___localdep_tcgetsid_defined
 #define __localdep_tcgetsid __LIBC_LOCAL_NAME(tcgetsid)
 #endif /* !__local___localdep_tcgetsid_defined */
 #else /* __CRT_HAVE_ioctl && __TIOCGSID */

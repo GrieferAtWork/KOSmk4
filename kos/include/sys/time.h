@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x353b62c5 */
+/* HASH CRC-32:0xcdf30353 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -95,7 +95,7 @@ typedef enum __itimer_which {
 #ifdef __CC__
 
 #ifndef __time_t_defined
-#define __time_t_defined  1
+#define __time_t_defined
 typedef __TM_TYPE(time) time_t;
 #endif /* !__time_t_defined */
 
@@ -117,7 +117,7 @@ typedef __suseconds_t suseconds_t;
 
 #ifdef __USE_MISC
 #ifndef __struct_timezone_defined
-#define __struct_timezone_defined 1
+#define __struct_timezone_defined
 struct timezone {
 	__INT32_TYPE__ tz_minuteswest; /* Minutes west of GMT. */
 	__INT32_TYPE__ tz_dsttime;     /* Nonzero if daylight-savings-time can ever be effect. */
@@ -126,7 +126,7 @@ struct timezone {
 #endif /* __USE_MISC */
 
 #ifndef ____timezone_ptr_t_defined
-#define ____timezone_ptr_t_defined 1
+#define ____timezone_ptr_t_defined
 #ifdef __USE_MISC
 typedef struct timezone *__restrict __timezone_ptr_t;
 #else /* __USE_MISC */

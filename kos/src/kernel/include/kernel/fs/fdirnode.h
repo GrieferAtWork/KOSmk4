@@ -38,7 +38,7 @@ struct fdirent;
 struct fdirnode;
 
 #ifndef __fsmode_t_defined
-#define __fsmode_t_defined 1
+#define __fsmode_t_defined
 typedef uintptr_t fsmode_t; /* Set of `FS_MODE_F*' */
 #endif /* !__fsmode_t_defined */
 

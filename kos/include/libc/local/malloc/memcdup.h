@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6b30d66a */
+/* HASH CRC-32:0xc805f67d */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,13 +19,13 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_memcdup_defined
-#define __local_memcdup_defined 1
+#define __local_memcdup_defined
 #include <__crt.h>
 #if defined(__CRT_HAVE_memdup) || defined(__CRT_HAVE___memdup) || defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign)
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_memchr_defined
-#define __local___localdep_memchr_defined 1
+#define __local___localdep_memchr_defined
 #ifdef __CRT_HAVE_memchr
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),void *,__NOTHROW_NCX,__localdep_memchr,(void const *__restrict __haystack, int __needle, __SIZE_TYPE__ __n_bytes),memchr,(__haystack,__needle,__n_bytes))
 #else /* __CRT_HAVE_memchr */
@@ -36,7 +36,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__CRT_HAVE_memchr */
 #endif /* !__local___localdep_memchr_defined */
 #ifndef __local___localdep_memdup_defined
-#define __local___localdep_memdup_defined 1
+#define __local___localdep_memdup_defined
 #ifdef __CRT_HAVE_memdup
 __CREDIRECT(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)) __ATTR_NONNULL((1)),void *,__NOTHROW_NCX,__localdep_memdup,(void const *__restrict __ptr, __SIZE_TYPE__ __n_bytes),memdup,(__ptr,__n_bytes))
 #elif defined(__CRT_HAVE___memdup)
@@ -62,7 +62,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memcdup))(void const *__restrict __pt
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_memcdup_defined
-#define __local___localdep_memcdup_defined 1
+#define __local___localdep_memcdup_defined
 #define __localdep_memcdup __LIBC_LOCAL_NAME(memcdup)
 #endif /* !__local___localdep_memcdup_defined */
 #else /* __CRT_HAVE_memdup || __CRT_HAVE___memdup || __CRT_HAVE_malloc || __CRT_HAVE_calloc || __CRT_HAVE_realloc || __CRT_HAVE_memalign || __CRT_HAVE_aligned_alloc || __CRT_HAVE_posix_memalign */

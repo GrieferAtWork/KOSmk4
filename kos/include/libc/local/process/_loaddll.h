@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe05dbe54 */
+/* HASH CRC-32:0x72ac026 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local__loaddll_defined
-#define __local__loaddll_defined 1
+#define __local__loaddll_defined
 #include <__crt.h>
 #include <libdl/asm/dlfcn.h>
 #ifdef __CRT_HAVE_dlopen
@@ -40,7 +40,7 @@ __LOCAL_LIBC(_loaddll) __INTPTR_TYPE__
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep__loaddll_defined
-#define __local___localdep__loaddll_defined 1
+#define __local___localdep__loaddll_defined
 #define __localdep__loaddll __LIBC_LOCAL_NAME(_loaddll)
 #endif /* !__local___localdep__loaddll_defined */
 #else /* __CRT_HAVE_dlopen */

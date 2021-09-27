@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8271b1a6 */
+/* HASH CRC-32:0x5c675e80 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -263,7 +263,7 @@ struct gaicb {
 
 #if defined(__USE_MISC) || !defined(__USE_XOPEN2K8)
 #if !defined(____h_errno_location_defined) && defined(__CRT_HAVE___h_errno_location)
-#define ____h_errno_location_defined 1
+#define ____h_errno_location_defined
 /* Function to get address of global `h_errno' variable */
 __CDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,int *,__NOTHROW_NCX,__h_errno_location,(void),())
 #endif /* !____h_errno_location_defined && __CRT_HAVE___h_errno_location */
@@ -444,7 +444,7 @@ __CDECLARE_OPT(,int,__NOTHROW_RPC,getnetgrent_r,(char **__restrict __hostp, char
 
 #ifdef __USE_MISC
 #if !defined(__rcmd_defined) && defined(__CRT_HAVE_rcmd)
-#define __rcmd_defined 1
+#define __rcmd_defined
 /* Call `rshd' at port `rport' on remote machine `*ahost' to execute `cmd'.
  * The  local  user is  `locuser',  on the  remote  machine the  command is
  * executed as `remuser'. In `*fd2p' the  descriptor to the socket for  the
@@ -456,7 +456,7 @@ __CDECLARE_OPT(,int,__NOTHROW_RPC,getnetgrent_r,(char **__restrict __hostp, char
 __CDECLARE(,int,__NOTHROW_RPC,rcmd,(char **__restrict __ahost, __UINT16_TYPE__ __rport, char const *__restrict __locuser, char const *__restrict __remuser, char const *__restrict __cmd, int *__restrict __fd2p),(__ahost,__rport,__locuser,__remuser,__cmd,__fd2p))
 #endif /* !__rcmd_defined && __CRT_HAVE_rcmd */
 #if !defined(__rcmd_af_defined) && defined(__CRT_HAVE_rcmd_af)
-#define __rcmd_af_defined 1
+#define __rcmd_af_defined
 /* This is the equivalent function where the protocol can be selected
  * and which therefore can be used for IPv6.
  * This function is not part of POSIX and therefore no official
@@ -472,7 +472,7 @@ __CDECLARE(,int,__NOTHROW_RPC,rcmd_af,(char **__restrict __ahost, __UINT16_TYPE_
  * cancellation point */
 __CDECLARE_OPT(,int,__NOTHROW_RPC,rexec,(char **__restrict __ahost, int __rport, char const *__restrict __name, char const *__restrict __pass, char const *__restrict __cmd, int *__restrict __fd2p),(__ahost,__rport,__name,__pass,__cmd,__fd2p))
 #if !defined(__rexec_af_defined) && defined(__CRT_HAVE_rexec_af)
-#define __rexec_af_defined 1
+#define __rexec_af_defined
 /* This is the equivalent function where the protocol can be selected
  * and which therefore can be used for IPv6.
  * This function is not part of POSIX and therefore no official
@@ -480,7 +480,7 @@ __CDECLARE_OPT(,int,__NOTHROW_RPC,rexec,(char **__restrict __ahost, int __rport,
 __CDECLARE(,int,__NOTHROW_RPC,rexec_af,(char **__restrict __ahost, int __rport, char const *__restrict __name, char const *__restrict __pass, char const *__restrict __cmd, int *__restrict __fd2p, __UINT16_TYPE__ __af),(__ahost,__rport,__name,__pass,__cmd,__fd2p,__af))
 #endif /* !__rexec_af_defined && __CRT_HAVE_rexec_af */
 #if !defined(__ruserok_defined) && defined(__CRT_HAVE_ruserok)
-#define __ruserok_defined 1
+#define __ruserok_defined
 /* Check whether user `remuser' on system `rhost' is allowed to login
  * as `locuser'. If  `suser' is  not zero  the user  tries to  become
  * superuser. Return 0 if it is possible.
@@ -507,7 +507,7 @@ __CDECLARE_OPT(,int,__NOTHROW_RPC,iruserok,(uint32_t __raddr, int __suser, char 
  * cancellation point */
 __CDECLARE_OPT(,int,__NOTHROW_RPC,iruserok_af,(void const *__raddr, int __suser, char const *__remuser, char const *__locuser, sa_family_t __af),(__raddr,__suser,__remuser,__locuser,__af))
 #if !defined(__rresvport_defined) && defined(__CRT_HAVE_rresvport)
-#define __rresvport_defined 1
+#define __rresvport_defined
 /* Try to allocate reserved port, returning a descriptor for a socket opened
  * at this port  or -1  if unsuccessful. The  search for  an available  port
  * will   start   at   `alport'   and   continues   with   lower    numbers.
@@ -516,7 +516,7 @@ __CDECLARE_OPT(,int,__NOTHROW_RPC,iruserok_af,(void const *__raddr, int __suser,
 __CDECLARE(,int,__NOTHROW_RPC,rresvport,(int *__alport),(__alport))
 #endif /* !__rresvport_defined && __CRT_HAVE_rresvport */
 #if !defined(__rresvport_af_defined) && defined(__CRT_HAVE_rresvport_af)
-#define __rresvport_af_defined 1
+#define __rresvport_af_defined
 /* This is the equivalent function where the protocol can be selected
  * and which therefore can be used for IPv6.
  * This function is not part of POSIX and therefore no official
@@ -539,7 +539,7 @@ __CDECLARE_OPT(,int,__NOTHROW_RPC,getnameinfo,(struct sockaddr const *__restrict
 
 #ifdef __USE_GNU
 #ifndef __sigevent_t_defined
-#define __sigevent_t_defined 1
+#define __sigevent_t_defined
 typedef struct sigevent sigevent_t;
 #endif /* !__sigevent_t_defined */
 /* Enqueue `ent' requests from the `list'. If `mode' is GAI_WAIT wait until all

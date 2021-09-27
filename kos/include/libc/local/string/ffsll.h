@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb5115f9d */
+/* HASH CRC-32:0xed5ad21a */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_ffsll_defined
-#define __local_ffsll_defined 1
+#define __local_ffsll_defined
 #include <__crt.h>
 #include <features.h>
 #include <hybrid/__bit.h>
@@ -30,7 +30,7 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(ffsll))(__LONGLONG __i) {
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_ffsll_defined
-#define __local___localdep_ffsll_defined 1
+#define __local___localdep_ffsll_defined
 #define __localdep_ffsll __LIBC_LOCAL_NAME(ffsll)
 #endif /* !__local___localdep_ffsll_defined */
 #endif /* !__local_ffsll_defined */

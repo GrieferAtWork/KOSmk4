@@ -43,7 +43,7 @@
 __DECL_BEGIN
 
 #ifndef __greg_t_defined
-#define __greg_t_defined 1
+#define __greg_t_defined
 #if defined(__KOS__) && __KOS_VERSION__ >= 300
 typedef __REGISTER_TYPE__ greg_t;
 #else /* __KOS__ && __KOS_VERSION__ >= 300 */
@@ -52,12 +52,12 @@ typedef __SREGISTER_TYPE__ greg_t;
 #endif /* !__greg_t_defined */
 
 #ifndef __ucontext_t_defined
-#define __ucontext_t_defined 1
+#define __ucontext_t_defined
 typedef struct ucontext ucontext_t;
 #endif /* !__ucontext_t_defined */
 
 #ifndef __mcontext_t_defined
-#define __mcontext_t_defined 1
+#define __mcontext_t_defined
 typedef struct mcontext mcontext_t;
 #endif /* !__mcontext_t_defined */
 

@@ -28,7 +28,7 @@
 #ifndef ____sigset_t_defined
 #include <bits/os/sigset.h>
 #ifndef ____sigset_t_defined
-#define ____sigset_t_defined 1
+#define ____sigset_t_defined
 #ifdef __CC__
 __DECL_BEGIN
 typedef struct __sigset_struct __sigset_t;

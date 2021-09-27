@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x89682069 */
+/* HASH CRC-32:0xd34a33 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_rtm_test_defined
-#define __local_rtm_test_defined 1
+#define __local_rtm_test_defined
 #include <__crt.h>
 #include <kos/bits/rtm.h>
 #ifdef __arch_rtm_test
@@ -30,7 +30,7 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(rtm_test))(void) {
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_rtm_test_defined
-#define __local___localdep_rtm_test_defined 1
+#define __local___localdep_rtm_test_defined
 #define __localdep_rtm_test __LIBC_LOCAL_NAME(rtm_test)
 #endif /* !__local___localdep_rtm_test_defined */
 #else /* __arch_rtm_test */

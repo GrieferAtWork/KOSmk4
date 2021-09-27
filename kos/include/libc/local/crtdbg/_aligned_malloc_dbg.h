@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x91d2d232 */
+/* HASH CRC-32:0x3ce58afa */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,13 +19,13 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local__aligned_malloc_dbg_defined
-#define __local__aligned_malloc_dbg_defined 1
+#define __local__aligned_malloc_dbg_defined
 #include <__crt.h>
 #if defined(__CRT_HAVE__aligned_malloc) || defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign)
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep__aligned_malloc_defined
-#define __local___localdep__aligned_malloc_defined 1
+#define __local___localdep__aligned_malloc_defined
 #ifdef __CRT_HAVE__aligned_malloc
 __CREDIRECT(__ATTR_MALLOC __ATTR_WUNUSED __ATTR_ALLOC_ALIGN(2) __ATTR_ALLOC_SIZE((1)),void *,__NOTHROW_NCX,__localdep__aligned_malloc,(__SIZE_TYPE__ __num_bytes, __SIZE_TYPE__ __min_alignment),_aligned_malloc,(__num_bytes,__min_alignment))
 #elif defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign)
@@ -45,7 +45,7 @@ __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(_aligned_malloc_dbg))(__SIZE_TYPE__ _
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep__aligned_malloc_dbg_defined
-#define __local___localdep__aligned_malloc_dbg_defined 1
+#define __local___localdep__aligned_malloc_dbg_defined
 #define __localdep__aligned_malloc_dbg __LIBC_LOCAL_NAME(_aligned_malloc_dbg)
 #endif /* !__local___localdep__aligned_malloc_dbg_defined */
 #else /* __CRT_HAVE__aligned_malloc || __CRT_HAVE_malloc || __CRT_HAVE_calloc || __CRT_HAVE_realloc || __CRT_HAVE_memalign || __CRT_HAVE_aligned_alloc || __CRT_HAVE_posix_memalign */

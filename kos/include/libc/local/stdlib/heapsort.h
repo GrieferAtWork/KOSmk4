@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x91effd88 */
+/* HASH CRC-32:0x4c0488b8 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,13 +19,13 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_heapsort_defined
-#define __local_heapsort_defined 1
+#define __local_heapsort_defined
 #include <__crt.h>
 #include <kos/anno.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_qsort_defined
-#define __local___localdep_qsort_defined 1
+#define __local___localdep_qsort_defined
 #ifdef __CRT_HAVE_qsort
 __CREDIRECT_VOID(__ATTR_NONNULL((1, 4)),__THROWING,__localdep_qsort,(void *__pbase, __SIZE_TYPE__ __item_count, __SIZE_TYPE__ __item_size, int (__LIBCCALL *__compar)(void const *__a, void const *__b)),qsort,(__pbase,__item_count,__item_size,__compar))
 #else /* __CRT_HAVE_qsort */
@@ -43,7 +43,7 @@ __LOCAL_LIBC(heapsort) __ATTR_NONNULL((1, 4)) int
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_heapsort_defined
-#define __local___localdep_heapsort_defined 1
+#define __local___localdep_heapsort_defined
 #define __localdep_heapsort __LIBC_LOCAL_NAME(heapsort)
 #endif /* !__local___localdep_heapsort_defined */
 #endif /* !__local_heapsort_defined */

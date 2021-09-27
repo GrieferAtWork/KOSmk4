@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x53021049 */
+/* HASH CRC-32:0xedba6af3 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,12 +19,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_strdupf_defined
-#define __local_strdupf_defined 1
+#define __local_strdupf_defined
 #include <__crt.h>
 #if defined(__CRT_HAVE_vstrdupf) || defined(__CRT_HAVE_vasprintf) || ((defined(__CRT_HAVE_format_aprintf_printer) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc)) && (defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree)))
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_vstrdupf_defined
-#define __local___localdep_vstrdupf_defined 1
+#define __local___localdep_vstrdupf_defined
 #ifdef __CRT_HAVE_vstrdupf
 __CREDIRECT(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_LIBC_PRINTF(1, 0),char *,__NOTHROW_NCX,__localdep_vstrdupf,(char const *__restrict __format, __builtin_va_list __args),vstrdupf,(__format,__args))
 #elif defined(__CRT_HAVE_vasprintf) || ((defined(__CRT_HAVE_format_aprintf_printer) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc)) && (defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree)))
@@ -47,7 +47,7 @@ __NOTHROW_NCX(__VLIBCCALL __LIBC_LOCAL_NAME(strdupf))(char const *__restrict __f
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_strdupf_defined
-#define __local___localdep_strdupf_defined 1
+#define __local___localdep_strdupf_defined
 #define __localdep_strdupf __LIBC_LOCAL_NAME(strdupf)
 #endif /* !__local___localdep_strdupf_defined */
 #else /* __CRT_HAVE_vstrdupf || __CRT_HAVE_vasprintf || ((__CRT_HAVE_format_aprintf_printer || __CRT_HAVE_format_aprintf_alloc || __CRT_HAVE_realloc) && (__CRT_HAVE_free || __CRT_HAVE_cfree)) */

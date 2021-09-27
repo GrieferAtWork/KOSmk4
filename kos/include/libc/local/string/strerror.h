@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd5df120b */
+/* HASH CRC-32:0xd70a458d */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,12 +19,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_strerror_defined
-#define __local_strerror_defined 1
+#define __local_strerror_defined
 #include <__crt.h>
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_memcpy_defined
-#define __local___localdep_memcpy_defined 1
+#define __local___localdep_memcpy_defined
 #ifdef __CRT_HAVE_memcpy
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
@@ -38,7 +38,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__CRT_HAVE_memcpy */
 #endif /* !__local___localdep_memcpy_defined */
 #ifndef __local___localdep_sprintf_defined
-#define __local___localdep_sprintf_defined 1
+#define __local___localdep_sprintf_defined
 #if __has_builtin(__builtin_sprintf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_sprintf) && __has_builtin(__builtin_va_arg_pack)
 __NAMESPACE_LOCAL_END
 #include <features.h>
@@ -62,7 +62,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_sprintf_defined */
 #ifndef __local___localdep_strerrordesc_np_defined
-#define __local___localdep_strerrordesc_np_defined 1
+#define __local___localdep_strerrordesc_np_defined
 #ifdef __CRT_HAVE_strerrordesc_np
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,char const *,__NOTHROW,__localdep_strerrordesc_np,(__errno_t __errnum),strerrordesc_np,(__errnum))
 #else /* __CRT_HAVE_strerrordesc_np */
@@ -73,7 +73,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__CRT_HAVE_strerrordesc_np */
 #endif /* !__local___localdep_strerrordesc_np_defined */
 #ifndef __local___localdep_strncpy_defined
-#define __local___localdep_strncpy_defined 1
+#define __local___localdep_strncpy_defined
 #if __has_builtin(__builtin_strncpy) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_strncpy)
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
@@ -127,7 +127,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strerror))(__errno_t __errnum) {
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_strerror_defined
-#define __local___localdep_strerror_defined 1
+#define __local___localdep_strerror_defined
 #define __localdep_strerror __LIBC_LOCAL_NAME(strerror)
 #endif /* !__local___localdep_strerror_defined */
 #endif /* !__local_strerror_defined */

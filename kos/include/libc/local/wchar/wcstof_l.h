@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa9ea4d6 */
+/* HASH CRC-32:0x13179cc4 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,11 +19,11 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_wcstof_l_defined
-#define __local_wcstof_l_defined 1
+#define __local_wcstof_l_defined
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_wcstof_defined
-#define __local___localdep_wcstof_defined 1
+#define __local___localdep_wcstof_defined
 #ifdef __CRT_HAVE_wcstof
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),float,__NOTHROW_NCX,__localdep_wcstof,(__WCHAR_TYPE__ const *__restrict __nptr, __WCHAR_TYPE__ **__endptr),wcstof,(__nptr,__endptr))
 #else /* __CRT_HAVE_wcstof */
@@ -40,7 +40,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcstof_l))(__WCHAR_TYPE__ const *__re
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_wcstof_l_defined
-#define __local___localdep_wcstof_l_defined 1
+#define __local___localdep_wcstof_l_defined
 #define __localdep_wcstof_l __LIBC_LOCAL_NAME(wcstof_l)
 #endif /* !__local___localdep_wcstof_l_defined */
 #endif /* !__local_wcstof_l_defined */

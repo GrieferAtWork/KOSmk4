@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc0fc98dc */
+/* HASH CRC-32:0xa572c506 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,13 +19,13 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_thrd_exit_defined
-#define __local_thrd_exit_defined 1
+#define __local_thrd_exit_defined
 #include <__crt.h>
 #ifdef __CRT_HAVE_pthread_exit
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_pthread_exit_defined
-#define __local___localdep_pthread_exit_defined 1
+#define __local___localdep_pthread_exit_defined
 __CREDIRECT_VOID(__ATTR_NORETURN,__THROWING,__localdep_pthread_exit,(void *__retval),pthread_exit,(__retval))
 #endif /* !__local___localdep_pthread_exit_defined */
 __LOCAL_LIBC(thrd_exit) __ATTR_NORETURN void
@@ -34,7 +34,7 @@ __LOCAL_LIBC(thrd_exit) __ATTR_NORETURN void
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_thrd_exit_defined
-#define __local___localdep_thrd_exit_defined 1
+#define __local___localdep_thrd_exit_defined
 #define __localdep_thrd_exit __LIBC_LOCAL_NAME(thrd_exit)
 #endif /* !__local___localdep_thrd_exit_defined */
 #else /* __CRT_HAVE_pthread_exit */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xacdbd797 */
+/* HASH CRC-32:0x659411eb */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_fspawnve_defined
-#define __local_fspawnve_defined 1
+#define __local_fspawnve_defined
 #include <__crt.h>
 #include <asm/os/oflags.h>
 #include <asm/os/vfork.h>
@@ -37,7 +37,7 @@
 #endif /* !__TARGV */
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep__Exit_defined
-#define __local___localdep__Exit_defined 1
+#define __local___localdep__Exit_defined
 #if __has_builtin(__builtin__Exit) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE__Exit)
 __NAMESPACE_LOCAL_END
 #include <kos/anno.h>
@@ -73,7 +73,7 @@ __CREDIRECT_VOID(__ATTR_NORETURN,__THROWING,__localdep__Exit,(int __status),exit
 #endif /* !... */
 #endif /* !__local___localdep__Exit_defined */
 #ifndef __local___localdep_close_defined
-#define __local___localdep_close_defined 1
+#define __local___localdep_close_defined
 #ifdef __CRT_HAVE_close
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_close,(__fd_t __fd),close,(__fd))
 #elif defined(__CRT_HAVE__close)
@@ -85,15 +85,15 @@ __CREDIRECT(,int,__NOTHROW_NCX,__localdep_close,(__fd_t __fd),__close,(__fd))
 #endif /* !... */
 #endif /* !__local___localdep_close_defined */
 #if !defined(__local___localdep_detach_defined) && defined(__CRT_HAVE_detach)
-#define __local___localdep_detach_defined 1
+#define __local___localdep_detach_defined
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_detach,(__pid_t __pid),detach,(__pid))
 #endif /* !__local___localdep_detach_defined && __CRT_HAVE_detach */
 #ifndef __local___localdep_fexecve_defined
-#define __local___localdep_fexecve_defined 1
+#define __local___localdep_fexecve_defined
 __CREDIRECT(__ATTR_NONNULL((2, 3)),int,__NOTHROW_RPC,__localdep_fexecve,(__fd_t __fd, __TARGV, __TENVP),fexecve,(__fd,___argv,___envp))
 #endif /* !__local___localdep_fexecve_defined */
 #ifndef __local___localdep_fork_defined
-#define __local___localdep_fork_defined 1
+#define __local___localdep_fork_defined
 #if __has_builtin(__builtin_fork) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_fork)
 __CEIREDIRECT(__ATTR_WUNUSED,__pid_t,__NOTHROW_NCX,__localdep_fork,(void),fork,{ return __builtin_fork(); })
 #elif defined(__CRT_HAVE_fork)
@@ -105,7 +105,7 @@ __CREDIRECT(__ATTR_WUNUSED,__pid_t,__NOTHROW_NCX,__localdep_fork,(void),__fork,(
 #endif /* !... */
 #endif /* !__local___localdep_fork_defined */
 #ifndef __local___localdep_pipe2_defined
-#define __local___localdep_pipe2_defined 1
+#define __local___localdep_pipe2_defined
 #ifdef __CRT_HAVE_pipe2
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_pipe2,(__fd_t __pipedes[2], __oflag_t __flags),pipe2,(__pipedes,__flags))
 #elif defined(__CRT_HAVE_pipe) || defined(__CRT_HAVE___pipe) || defined(__CRT_HAVE__pipe)
@@ -118,7 +118,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_pipe2_defined */
 #ifndef __local___localdep_read_defined
-#define __local___localdep_read_defined 1
+#define __local___localdep_read_defined
 #ifdef __CRT_HAVE_read
 __CREDIRECT(__ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_read,(__fd_t __fd, void *__buf, __SIZE_TYPE__ __bufsize),read,(__fd,__buf,__bufsize))
 #elif defined(__CRT_HAVE__read)
@@ -130,7 +130,7 @@ __CREDIRECT(__ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_read,(__
 #endif /* !... */
 #endif /* !__local___localdep_read_defined */
 #ifndef __local___localdep_vfork_defined
-#define __local___localdep_vfork_defined 1
+#define __local___localdep_vfork_defined
 #ifdef __CRT_HAVE_vfork
 __CREDIRECT(__ATTR_RETURNS_TWICE __ATTR_WUNUSED,__pid_t,__NOTHROW_NCX,__localdep_vfork,(void),vfork,())
 #elif defined(__CRT_HAVE___vfork)
@@ -140,7 +140,7 @@ __CREDIRECT(__ATTR_RETURNS_TWICE __ATTR_WUNUSED,__pid_t,__NOTHROW_NCX,__localdep
 #endif /* !... */
 #endif /* !__local___localdep_vfork_defined */
 #ifndef __local___localdep_waitpid_defined
-#define __local___localdep_waitpid_defined 1
+#define __local___localdep_waitpid_defined
 #ifdef __CRT_HAVE_waitpid
 __NAMESPACE_LOCAL_END
 #include <parts/waitmacros.h>
@@ -156,7 +156,7 @@ __CREDIRECT(,__pid_t,__NOTHROW_RPC,__localdep_waitpid,(__pid_t __pid, __WAIT_STA
 #endif /* !... */
 #endif /* !__local___localdep_waitpid_defined */
 #ifndef __local___localdep_write_defined
-#define __local___localdep_write_defined 1
+#define __local___localdep_write_defined
 #ifdef __CRT_HAVE_write
 __CREDIRECT(__ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_write,(__fd_t __fd, void const *__buf, __SIZE_TYPE__ __bufsize),write,(__fd,__buf,__bufsize))
 #elif defined(__CRT_HAVE__write)
@@ -333,7 +333,7 @@ __do_exec:
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_fspawnve_defined
-#define __local___localdep_fspawnve_defined 1
+#define __local___localdep_fspawnve_defined
 #define __localdep_fspawnve __LIBC_LOCAL_NAME(fspawnve)
 #endif /* !__local___localdep_fspawnve_defined */
 #else /* (__CRT_HAVE__Exit || __CRT_HAVE__exit || __CRT_HAVE_quick_exit || __CRT_HAVE_exit) && ((__ARCH_HAVE_SHARED_VM_VFORK && (__CRT_HAVE_vfork || __CRT_HAVE___vfork)) || ((__CRT_HAVE_fork || __CRT_HAVE___fork) && (__CRT_HAVE_pipe2 || __CRT_HAVE_pipe || __CRT_HAVE___pipe || __CRT_HAVE__pipe) && __O_CLOEXEC && (__CRT_HAVE_read || __CRT_HAVE__read || __CRT_HAVE___read) && (__CRT_HAVE_write || __CRT_HAVE__write || __CRT_HAVE___write) && (__CRT_HAVE_close || __CRT_HAVE__close || __CRT_HAVE___close))) && __CRT_HAVE_fexecve && (__CRT_HAVE_waitpid || __CRT_HAVE___waitpid) */

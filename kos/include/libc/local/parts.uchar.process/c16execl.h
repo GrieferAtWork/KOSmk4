@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1a90db88 */
+/* HASH CRC-32:0x7e7aeda3 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,12 +19,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_c16execl_defined
-#define __local_c16execl_defined 1
+#define __local_c16execl_defined
 #include <__crt.h>
 #if (defined(__CRT_HAVE_wexecv) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)) || defined(__CRT_HAVE_DOS$wexecv) || (defined(__CRT_HAVE__wexecv) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)) || defined(__CRT_HAVE_DOS$_wexecv)
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_c16execv_defined
-#define __local___localdep_c16execv_defined 1
+#define __local___localdep_c16execv_defined
 #if defined(__CRT_HAVE_wexecv) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
 __NAMESPACE_LOCAL_END
 #include <features.h>
@@ -94,7 +94,7 @@ __NOTHROW_RPC(__VLIBDCALL __LIBC_LOCAL_NAME(c16execl))(__CHAR16_TYPE__ const *__
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_c16execl_defined
-#define __local___localdep_c16execl_defined 1
+#define __local___localdep_c16execl_defined
 #define __localdep_c16execl __LIBC_LOCAL_NAME(c16execl)
 #endif /* !__local___localdep_c16execl_defined */
 #else /* (__CRT_HAVE_wexecv && __SIZEOF_WCHAR_T__ == 2 && __LIBCCALL_IS_LIBDCALL) || __CRT_HAVE_DOS$wexecv || (__CRT_HAVE__wexecv && __SIZEOF_WCHAR_T__ == 2 && __LIBCCALL_IS_LIBDCALL) || __CRT_HAVE_DOS$_wexecv */

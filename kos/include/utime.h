@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd058f41 */
+/* HASH CRC-32:0x55e71751 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -54,7 +54,7 @@ __SYSDECL_BEGIN
 
 #if (defined(__USE_XOPEN) || defined(__USE_XOPEN2K) || defined(__USE_DOS))
 #ifndef __time_t_defined
-#define __time_t_defined 1
+#define __time_t_defined
 typedef __TM_TYPE(time) time_t;
 #endif /* !__time_t_defined */
 #endif /* __USE_XOPEN || __USE_XOPEN2K || __USE_DOS */
@@ -151,7 +151,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(futime64, __FORCELOCAL __ATTR_ARTIFICIAL int __N
 
 #ifdef __USE_DOS
 #ifndef __wchar_t_defined
-#define __wchar_t_defined 1
+#define __wchar_t_defined
 typedef __WCHAR_TYPE__ wchar_t;
 #endif /* !__wchar_t_defined */
 #if defined(__CRT_HAVE_utime) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)

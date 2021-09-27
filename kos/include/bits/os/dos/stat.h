@@ -29,19 +29,12 @@
 
 #ifdef __CRT_DOS_PRIMARY
 
-#ifndef __stat_defined
-#define __stat_defined 1
-#define __dos_bstat stat
-
+#define __dos_bstat      stat
 #define _STATBUF_ST_TIME 1 /* Always defined. */
 #define _STATBUF_ST_RDEV 1
-#endif /* !__stat_defined */
 
 #ifdef __USE_LARGEFILE64
-#ifndef __stat64_defined
-#define __stat64_defined 1
 #define __dos_bstat64 stat64
-#endif /* !__stat64_defined */
 #endif /* __USE_LARGEFILE64 */
 
 #endif /* __CRT_DOS_PRIMARY */

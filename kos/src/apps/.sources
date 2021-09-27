@@ -67,7 +67,7 @@ BEGIN GROUP("apps.system-test") { COMPILE, LINK, MCOPY };
 	STATIC_USELIB("libssp")
 	OBJECT({ TARGET_BINPATH + DISK_LIBPATH + "crt0.o" });
 
-	/* When building the compatibility-mode system libraries for x86_64, also
+	/* When building  the compatibility-mode  system libraries  for x86_64,  also
 	 * include a regular 32-bit application /bin/system-test32 that is the 32-bit
 	 * variant of /bin/system-test, but will have to be executed in compatibility
 	 * mode, thus also testing the system's ability to run such applications!

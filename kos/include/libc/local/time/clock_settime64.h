@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb3f637e0 */
+/* HASH CRC-32:0x78786691 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,14 +19,14 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_clock_settime64_defined
-#define __local_clock_settime64_defined 1
+#define __local_clock_settime64_defined
 #include <__crt.h>
 #if defined(__CRT_HAVE_clock_settime) || defined(__CRT_HAVE___clock_settime)
 #include <bits/types.h>
 #include <bits/os/timespec.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_clock_settime32_defined
-#define __local___localdep_clock_settime32_defined 1
+#define __local___localdep_clock_settime32_defined
 #ifdef __CRT_HAVE_clock_settime
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_clock_settime32,(__clockid_t __clock_id, struct __timespec32 const *__tp),clock_settime,(__clock_id,__tp))
 #elif defined(__CRT_HAVE___clock_settime)
@@ -44,7 +44,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(clock_settime64))(__clockid_t __clock
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_clock_settime64_defined
-#define __local___localdep_clock_settime64_defined 1
+#define __local___localdep_clock_settime64_defined
 #define __localdep_clock_settime64 __LIBC_LOCAL_NAME(clock_settime64)
 #endif /* !__local___localdep_clock_settime64_defined */
 #else /* __CRT_HAVE_clock_settime || __CRT_HAVE___clock_settime */

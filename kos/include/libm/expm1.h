@@ -50,11 +50,11 @@ __DECL_BEGIN
 
 __LIBM_LOCAL_DECLARE_BEGIN
 #ifndef __libm_hugef_defined
-#define __libm_hugef_defined 1
+#define __libm_hugef_defined
 __LIBM_LOCAL_DECLARE(__IEEE754_FLOAT_TYPE__, hugef, __IEEE754_FLOAT_C(1.0e30))
 #endif /* !__libm_hugef_defined */
 #ifndef __libm_onef_defined
-#define __libm_onef_defined 1
+#define __libm_onef_defined
 __LIBM_LOCAL_DECLARE(__IEEE754_FLOAT_TYPE__, onef, __IEEE754_FLOAT_C(1.0))
 #endif /* !__libm_onef_defined */
 __LIBM_LOCAL_DECLARE(__IEEE754_FLOAT_TYPE__, o_thresholdf, __IEEE754_FLOAT_C(8.8721679688e+01)) /* 0x42b17180 */
@@ -198,17 +198,17 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE754_FLOAT_TYPE__
 
 __LIBM_LOCAL_DECLARE_BEGIN
 #ifndef __libm_huge_defined
-#define __libm_huge_defined 1
+#define __libm_huge_defined
 __LIBM_LOCAL_DECLARE(__IEEE754_DOUBLE_TYPE__, huge, __IEEE754_DOUBLE_C(1.0e300))
 #endif /* !__libm_huge_defined */
 #ifndef __libm_o_threshold_defined
-#define __libm_o_threshold_defined 1
+#define __libm_o_threshold_defined
 __LIBM_LOCAL_DECLARE(__IEEE754_DOUBLE_TYPE__, o_threshold, __IEEE754_DOUBLE_C(7.09782712893383973096e+02)) /* 0x40862E42, 0xFEFA39EF */
 #endif /* !__libm_o_threshold_defined */
 __LIBM_LOCAL_DECLARE(__IEEE754_DOUBLE_TYPE__, ln2_hi, __IEEE754_DOUBLE_C(6.93147180369123816490e-01)) /* 0x3fe62e42, 0xfee00000 */
 __LIBM_LOCAL_DECLARE(__IEEE754_DOUBLE_TYPE__, ln2_lo, __IEEE754_DOUBLE_C(1.90821492927058770002e-10)) /* 0x3dea39ef, 0x35793c76 */
 #ifndef __libm_invln2_defined
-#define __libm_invln2_defined 1
+#define __libm_invln2_defined
 __LIBM_LOCAL_DECLARE(__IEEE754_DOUBLE_TYPE__, invln2, __IEEE754_DOUBLE_C(1.44269504088896338700e+00)) /* 0x3ff71547, 0x652b82fe */
 #endif /* !__libm_invln2_defined */
 /* scaled coefficients related to expm1 */

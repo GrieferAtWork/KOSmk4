@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x398ddb5b */
+/* HASH CRC-32:0xfdabd10 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -38,7 +38,7 @@
 __SYSDECL_BEGIN
 
 #ifndef __vfork_defined
-#define __vfork_defined 1
+#define __vfork_defined
 #ifdef __CRT_HAVE_vfork
 /* >> vfork(2)
  * Same as `fork(2)', but the child process may be executed within in the same VM

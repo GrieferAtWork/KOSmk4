@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9dffb8a3 */
+/* HASH CRC-32:0x2d4774c9 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,13 +19,13 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local__aligned_realloc_dbg_defined
-#define __local__aligned_realloc_dbg_defined 1
+#define __local__aligned_realloc_dbg_defined
 #include <__crt.h>
 #if defined(__CRT_HAVE__aligned_realloc) || ((defined(__CRT_HAVE__aligned_malloc) || defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign)) && (defined(__CRT_HAVE__aligned_free) || defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree)))
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep__aligned_realloc_defined
-#define __local___localdep__aligned_realloc_defined 1
+#define __local___localdep__aligned_realloc_defined
 #ifdef __CRT_HAVE__aligned_realloc
 __CREDIRECT(__ATTR_WUNUSED __ATTR_ALLOC_ALIGN(3) __ATTR_ALLOC_SIZE((2)),void *,__NOTHROW_NCX,__localdep__aligned_realloc,(void *__aligned_mallptr, __SIZE_TYPE__ __newsize, __SIZE_TYPE__ __min_alignment),_aligned_realloc,(__aligned_mallptr,__newsize,__min_alignment))
 #elif (defined(__CRT_HAVE__aligned_malloc) || defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign)) && (defined(__CRT_HAVE__aligned_free) || defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree))
@@ -45,7 +45,7 @@ __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(_aligned_realloc_dbg))(void *__ptr, _
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep__aligned_realloc_dbg_defined
-#define __local___localdep__aligned_realloc_dbg_defined 1
+#define __local___localdep__aligned_realloc_dbg_defined
 #define __localdep__aligned_realloc_dbg __LIBC_LOCAL_NAME(_aligned_realloc_dbg)
 #endif /* !__local___localdep__aligned_realloc_dbg_defined */
 #else /* __CRT_HAVE__aligned_realloc || ((__CRT_HAVE__aligned_malloc || __CRT_HAVE_malloc || __CRT_HAVE_calloc || __CRT_HAVE_realloc || __CRT_HAVE_memalign || __CRT_HAVE_aligned_alloc || __CRT_HAVE_posix_memalign) && (__CRT_HAVE__aligned_free || __CRT_HAVE_free || __CRT_HAVE_cfree)) */

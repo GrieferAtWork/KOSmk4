@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc578bd39 */
+/* HASH CRC-32:0x781412b5 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,14 +19,14 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_sem_timedwait64_defined
-#define __local_sem_timedwait64_defined 1
+#define __local_sem_timedwait64_defined
 #include <__crt.h>
 #ifdef __CRT_HAVE_sem_timedwait
 #include <bits/crt/semaphore.h>
 #include <bits/os/timespec.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_sem_timedwait32_defined
-#define __local___localdep_sem_timedwait32_defined 1
+#define __local___localdep_sem_timedwait32_defined
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,__localdep_sem_timedwait32,(__sem_t *__restrict __sem, struct __timespec32 const *__restrict __abstime),sem_timedwait,(__sem,__abstime))
 #endif /* !__local___localdep_sem_timedwait32_defined */
 __LOCAL_LIBC(sem_timedwait64) __ATTR_NONNULL((1, 2)) int
@@ -38,7 +38,7 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(sem_timedwait64))(__sem_t *__restrict
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_sem_timedwait64_defined
-#define __local___localdep_sem_timedwait64_defined 1
+#define __local___localdep_sem_timedwait64_defined
 #define __localdep_sem_timedwait64 __LIBC_LOCAL_NAME(sem_timedwait64)
 #endif /* !__local___localdep_sem_timedwait64_defined */
 #else /* __CRT_HAVE_sem_timedwait */

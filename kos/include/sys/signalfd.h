@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7b325ec1 */
+/* HASH CRC-32:0x11863b82 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -92,7 +92,7 @@ enum {
 __SYSDECL_BEGIN
 
 #ifndef __sigset_t_defined
-#define __sigset_t_defined 1
+#define __sigset_t_defined
 typedef struct __sigset_struct sigset_t;
 #endif /* !__sigset_t_defined */
 

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xde5c7238 */
+/* HASH CRC-32:0xb032677d */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,14 +19,14 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_PKeySet_defined
-#define __local_PKeySet_defined 1
+#define __local_PKeySet_defined
 #include <__crt.h>
 #include <asm/pkey.h>
 #if defined(__ARCH_HAVE_PKEY) && defined(__CRT_HAVE_error_thrown)
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_error_thrown_defined
-#define __local___localdep_error_thrown_defined 1
+#define __local___localdep_error_thrown_defined
 __NAMESPACE_LOCAL_END
 #include <kos/bits/exception_data.h>
 #ifndef __ERROR_THROWN_CC
@@ -49,7 +49,7 @@ __LOCAL_LIBC(PKeySet) void
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_PKeySet_defined
-#define __local___localdep_PKeySet_defined 1
+#define __local___localdep_PKeySet_defined
 #define __localdep_PKeySet __LIBC_LOCAL_NAME(PKeySet)
 #endif /* !__local___localdep_PKeySet_defined */
 #else /* __ARCH_HAVE_PKEY && __CRT_HAVE_error_thrown */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf548fbe7 */
+/* HASH CRC-32:0xaa0c0c48 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_file_printer_defined
-#define __local_file_printer_defined 1
+#define __local_file_printer_defined
 #include <__crt.h>
 #include <features.h>
 #if defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE_putc) || defined(__CRT_HAVE__IO_putc) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE_putc_unlocked) || (defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE__IO_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock)
@@ -28,7 +28,7 @@
 #include <bits/crt/format-printer.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_fwrite_defined
-#define __local___localdep_fwrite_defined 1
+#define __local___localdep_fwrite_defined
 #if __has_builtin(__builtin_fwrite) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_fwrite)
 __CEIREDIRECT(__ATTR_NONNULL((1, 4)),__SIZE_TYPE__,__THROWING,__localdep_fwrite,(void const *__restrict __buf, __SIZE_TYPE__ __elemsize, __SIZE_TYPE__ __elemcount, __FILE *__restrict __stream),fwrite,{ return __builtin_fwrite(__buf, __elemsize, __elemcount, __stream); })
 #elif defined(__CRT_HAVE_fwrite_unlocked) && defined(__USE_STDIO_UNLOCKED)
@@ -60,7 +60,7 @@ __LOCAL_LIBC(file_printer) __ATTR_NONNULL((1, 2)) __SSIZE_TYPE__
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_file_printer_defined
-#define __local___localdep_file_printer_defined 1
+#define __local___localdep_file_printer_defined
 #define __localdep_file_printer __LIBC_LOCAL_NAME(file_printer)
 #endif /* !__local___localdep_file_printer_defined */
 #else /* __CRT_HAVE_fputc || __CRT_HAVE_putc || __CRT_HAVE__IO_putc || __CRT_HAVE_fputc_unlocked || __CRT_HAVE_putc_unlocked || (__CRT_DOS && __CRT_HAVE__flsbuf) || __CRT_HAVE_fwrite || __CRT_HAVE__IO_fwrite || __CRT_HAVE_fwrite_s || __CRT_HAVE_fwrite_unlocked || __CRT_HAVE__fwrite_nolock */

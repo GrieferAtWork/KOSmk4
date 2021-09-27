@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfe898913 */
+/* HASH CRC-32:0xf261951e */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_hsearch_r_defined
-#define __local_hsearch_r_defined 1
+#define __local_hsearch_r_defined
 #include <__crt.h>
 struct entry;
 struct hsearch_data;
@@ -32,7 +32,7 @@ typedef enum {
 #endif /* !__ACTION_defined */
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_strcmp_defined
-#define __local___localdep_strcmp_defined 1
+#define __local___localdep_strcmp_defined
 #if __has_builtin(__builtin_strcmp) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_strcmp)
 __CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_strcmp,(char const *__s1, char const *__s2),strcmp,{ return __builtin_strcmp(__s1, __s2); })
 #elif defined(__CRT_HAVE_strcmp)
@@ -45,7 +45,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_strcmp_defined */
 #ifndef __local___localdep_strlen_defined
-#define __local___localdep_strlen_defined 1
+#define __local___localdep_strlen_defined
 #ifdef __CRT_HAVE_strlen
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
@@ -60,7 +60,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__local___localdep_strlen_defined */
 __NAMESPACE_LOCAL_END
 #ifndef __hsearch_data_defined
-#define __hsearch_data_defined 1
+#define __hsearch_data_defined
 struct _ENTRY;
 struct hsearch_data {
 	struct _ENTRY  *table;
@@ -69,7 +69,7 @@ struct hsearch_data {
 };
 #endif /* !__hsearch_data_defined */
 #ifndef __ENTRY_defined
-#define __ENTRY_defined 1
+#define __ENTRY_defined
 typedef struct entry {
 	char *key;
 	void *data;
@@ -138,7 +138,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(hsearch_r))(struct entry __item, ACTI
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_hsearch_r_defined
-#define __local___localdep_hsearch_r_defined 1
+#define __local___localdep_hsearch_r_defined
 #define __localdep_hsearch_r __LIBC_LOCAL_NAME(hsearch_r)
 #endif /* !__local___localdep_hsearch_r_defined */
 #endif /* !__local_hsearch_r_defined */

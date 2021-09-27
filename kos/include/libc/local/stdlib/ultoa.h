@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc2d21d85 */
+/* HASH CRC-32:0x5c7f4f65 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,11 +19,11 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_ultoa_defined
-#define __local_ultoa_defined 1
+#define __local_ultoa_defined
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep__ultoa_s_defined
-#define __local___localdep__ultoa_s_defined 1
+#define __local___localdep__ultoa_s_defined
 #ifdef __CRT_HAVE__ultoa_s
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
@@ -53,7 +53,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(ultoa))(unsigned long __val, char *__
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_ultoa_defined
-#define __local___localdep_ultoa_defined 1
+#define __local___localdep_ultoa_defined
 #define __localdep_ultoa __LIBC_LOCAL_NAME(ultoa)
 #endif /* !__local___localdep_ultoa_defined */
 #endif /* !__local_ultoa_defined */

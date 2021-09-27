@@ -28,7 +28,7 @@
 #ifndef __size_t_defined
 #include <hybrid/typecore.h>
 #ifndef __size_t_defined
-#define __size_t_defined 1
+#define __size_t_defined
 #ifdef __CC__
 __DECL_BEGIN
 typedef __SIZE_TYPE__ size_t;

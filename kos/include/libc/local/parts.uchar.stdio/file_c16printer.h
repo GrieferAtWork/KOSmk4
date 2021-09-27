@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x560be186 */
+/* HASH CRC-32:0xfb5ac1b7 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,14 +19,14 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_file_c16printer_defined
-#define __local_file_c16printer_defined 1
+#define __local_file_c16printer_defined
 #include <__crt.h>
 #if (defined(__CRT_HAVE_fputwc) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)) || defined(__CRT_HAVE_DOS$fputwc) || (defined(__CRT_HAVE_putwc) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)) || defined(__CRT_HAVE_DOS$putwc)
 #include <hybrid/typecore.h>
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_fputc16_defined
-#define __local___localdep_fputc16_defined 1
+#define __local___localdep_fputc16_defined
 #if defined(__CRT_HAVE_fputwc) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
 __CREDIRECT(__ATTR_NONNULL((2)),__WINT16_TYPE__,__THROWING,__localdep_fputc16,(__CHAR16_TYPE__ __wc, __FILE *__stream),fputwc,(__wc,__stream))
 #elif defined(__CRT_HAVE_DOS$fputwc)
@@ -53,7 +53,7 @@ __LOCAL_LIBC(file_c16printer) __ATTR_NONNULL((1, 2)) __SSIZE_TYPE__
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_file_c16printer_defined
-#define __local___localdep_file_c16printer_defined 1
+#define __local___localdep_file_c16printer_defined
 #define __localdep_file_c16printer __LIBC_LOCAL_NAME(file_c16printer)
 #endif /* !__local___localdep_file_c16printer_defined */
 #else /* (__CRT_HAVE_fputwc && __SIZEOF_WCHAR_T__ == 2 && __LIBCCALL_IS_LIBDCALL) || __CRT_HAVE_DOS$fputwc || (__CRT_HAVE_putwc && __SIZEOF_WCHAR_T__ == 2 && __LIBCCALL_IS_LIBDCALL) || __CRT_HAVE_DOS$putwc */

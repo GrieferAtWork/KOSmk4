@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7ba2b93 */
+/* HASH CRC-32:0x61fb2395 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,13 +19,13 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_closefrom_defined
-#define __local_closefrom_defined 1
+#define __local_closefrom_defined
 #include <__crt.h>
 #include <asm/os/fcntl.h>
 #if (defined(__CRT_HAVE_fcntl) || defined(__CRT_HAVE___fcntl)) && defined(__F_CLOSEM)
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_fcntl_defined
-#define __local___localdep_fcntl_defined 1
+#define __local___localdep_fcntl_defined
 #ifdef __CRT_HAVE_fcntl
 __NAMESPACE_LOCAL_END
 #include <features.h>
@@ -48,7 +48,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(closefrom))(__fd_t __lowfd) {
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_closefrom_defined
-#define __local___localdep_closefrom_defined 1
+#define __local___localdep_closefrom_defined
 #define __localdep_closefrom __LIBC_LOCAL_NAME(closefrom)
 #endif /* !__local___localdep_closefrom_defined */
 #else /* (__CRT_HAVE_fcntl || __CRT_HAVE___fcntl) && __F_CLOSEM */

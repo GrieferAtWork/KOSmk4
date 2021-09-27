@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x530b54e2 */
+/* HASH CRC-32:0x3d32a121 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,17 +19,17 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_fgetc_unlocked_defined
-#define __local_fgetc_unlocked_defined 1
+#define __local_fgetc_unlocked_defined
 #include <__crt.h>
 #if (defined(__CRT_DOS) && defined(__CRT_HAVE__filbuf)) || defined(__CRT_HAVE_fread) || defined(__CRT_HAVE__IO_fread) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock)
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
 #if !defined(__local___localdep__filbuf_defined) && defined(__CRT_HAVE__filbuf)
-#define __local___localdep__filbuf_defined 1
+#define __local___localdep__filbuf_defined
 __CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,__localdep__filbuf,(__FILE *__restrict __stream),_filbuf,(__stream))
 #endif /* !__local___localdep__filbuf_defined && __CRT_HAVE__filbuf */
 #ifndef __local___localdep_crt_fread_unlocked_defined
-#define __local___localdep_crt_fread_unlocked_defined 1
+#define __local___localdep_crt_fread_unlocked_defined
 #ifdef __CRT_HAVE_fread
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
@@ -70,7 +70,7 @@ __LOCAL_LIBC(fgetc_unlocked) __ATTR_NONNULL((1)) int
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_fgetc_unlocked_defined
-#define __local___localdep_fgetc_unlocked_defined 1
+#define __local___localdep_fgetc_unlocked_defined
 #define __localdep_fgetc_unlocked __LIBC_LOCAL_NAME(fgetc_unlocked)
 #endif /* !__local___localdep_fgetc_unlocked_defined */
 #else /* (__CRT_DOS && __CRT_HAVE__filbuf) || __CRT_HAVE_fread || __CRT_HAVE__IO_fread || __CRT_HAVE_fread_unlocked || __CRT_HAVE__fread_nolock */

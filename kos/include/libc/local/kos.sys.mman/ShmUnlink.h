@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x800e56fd */
+/* HASH CRC-32:0xcbdd008b */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,14 +19,14 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_ShmUnlink_defined
-#define __local_ShmUnlink_defined 1
+#define __local_ShmUnlink_defined
 #include <__crt.h>
 #include <asm/os/fcntl.h>
 #if defined(__CRT_HAVE_Unlink) || (defined(__AT_FDCWD) && defined(__CRT_HAVE_UnlinkAt))
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_Unlink_defined
-#define __local___localdep_Unlink_defined 1
+#define __local___localdep_Unlink_defined
 #ifdef __CRT_HAVE_Unlink
 __CREDIRECT_VOID(__ATTR_NONNULL((1)),__THROWING,__localdep_Unlink,(char const *__file),Unlink,(__file))
 #elif defined(__AT_FDCWD) && defined(__CRT_HAVE_UnlinkAt)
@@ -39,7 +39,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_Unlink_defined */
 #ifndef __local___localdep_memcpy_defined
-#define __local___localdep_memcpy_defined 1
+#define __local___localdep_memcpy_defined
 #ifdef __CRT_HAVE_memcpy
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
@@ -53,7 +53,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__CRT_HAVE_memcpy */
 #endif /* !__local___localdep_memcpy_defined */
 #ifndef __local___localdep_mempcpy_defined
-#define __local___localdep_mempcpy_defined 1
+#define __local___localdep_mempcpy_defined
 #ifdef __CRT_HAVE_mempcpy
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
@@ -72,7 +72,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_mempcpy_defined */
 #ifndef __local___localdep_strlen_defined
-#define __local___localdep_strlen_defined 1
+#define __local___localdep_strlen_defined
 #ifdef __CRT_HAVE_strlen
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
@@ -116,7 +116,7 @@ __LOCAL_LIBC(ShmUnlink) __ATTR_NONNULL((1)) void
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_ShmUnlink_defined
-#define __local___localdep_ShmUnlink_defined 1
+#define __local___localdep_ShmUnlink_defined
 #define __localdep_ShmUnlink __LIBC_LOCAL_NAME(ShmUnlink)
 #endif /* !__local___localdep_ShmUnlink_defined */
 #else /* __CRT_HAVE_Unlink || (__AT_FDCWD && __CRT_HAVE_UnlinkAt) */

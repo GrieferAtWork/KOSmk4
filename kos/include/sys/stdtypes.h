@@ -34,47 +34,47 @@
 __DECL_BEGIN
 
 #ifndef __sigset_t_defined
-#define __sigset_t_defined 1
+#define __sigset_t_defined
 typedef struct __sigset_struct sigset_t;
 #endif /* !__sigset_t_defined */
 
 #ifndef __pid_t_defined
-#define __pid_t_defined 1
+#define __pid_t_defined
 typedef __pid_t pid_t;
 #endif /* !__pid_t_defined */
 
 #ifndef __mode_t_defined
-#define __mode_t_defined 1
+#define __mode_t_defined
 typedef __mode_t mode_t;
 #endif /* !__mode_t_defined */
 
 #ifndef __nlink_t_defined
-#define __nlink_t_defined 1
+#define __nlink_t_defined
 typedef __nlink_t nlink_t;
 #endif /* !__nlink_t_defined */
 
 #ifndef __clock_t_defined
-#define __clock_t_defined 1
+#define __clock_t_defined
 typedef __clock_t clock_t;
 #endif /* !__clock_t_defined */
 
 #ifndef __time_t_defined
-#define __time_t_defined 1
+#define __time_t_defined
 typedef __TM_TYPE(time) time_t; /* UNIX time in seconds since 01.01.1970 */
 #endif /* !__time_t_defined */
 
 #ifndef __size_t_defined
-#define __size_t_defined 1
+#define __size_t_defined
 typedef __SIZE_TYPE__ size_t;
 #endif /* !__size_t_defined */
 
 #ifndef __ptrdiff_t_defined
-#define __ptrdiff_t_defined 1
+#define __ptrdiff_t_defined
 typedef __PTRDIFF_TYPE__ ptrdiff_t;
 #endif /* !__ptrdiff_t_defined */
 
 #ifndef __wchar_t_defined
-#define __wchar_t_defined 1
+#define __wchar_t_defined
 typedef __WCHAR_TYPE__ wchar_t;
 #endif /* !__wchar_t_defined */
 

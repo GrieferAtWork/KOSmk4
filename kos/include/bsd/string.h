@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6ad9eea5 */
+/* HASH CRC-32:0x3d54259f */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -37,7 +37,7 @@
 __SYSDECL_BEGIN
 
 #ifndef __strlcpy_defined
-#define __strlcpy_defined 1
+#define __strlcpy_defined
 #ifdef __CRT_HAVE_strlcpy
 __CDECLARE(__ATTR_LEAF __ATTR_NONNULL((1, 2)),__SIZE_TYPE__,__NOTHROW_NCX,strlcpy,(char *__restrict __dst, char const *__restrict __src, __SIZE_TYPE__ __bufsize),(__dst,__src,__bufsize))
 #else /* __CRT_HAVE_strlcpy */
@@ -46,7 +46,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(strlcpy, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_L
 #endif /* !__CRT_HAVE_strlcpy */
 #endif /* !__strlcpy_defined */
 #ifndef __strlcat_defined
-#define __strlcat_defined 1
+#define __strlcat_defined
 #ifdef __CRT_HAVE_strlcat
 __CDECLARE(__ATTR_LEAF __ATTR_NONNULL((1, 2)),__SIZE_TYPE__,__NOTHROW_NCX,strlcat,(char *__restrict __dst, char const *__restrict __src, __SIZE_TYPE__ __bufsize),(__dst,__src,__bufsize))
 #else /* __CRT_HAVE_strlcat */
@@ -55,7 +55,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(strlcat, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_L
 #endif /* !__CRT_HAVE_strlcat */
 #endif /* !__strlcat_defined */
 #ifndef __strnstr_defined
-#define __strnstr_defined 1
+#define __strnstr_defined
 #ifdef __CRT_HAVE_strnstr
 #if defined(__cplusplus) && defined(__CORRECT_ISO_CPP_STRING_H_PROTO)
 extern "C++" {
@@ -102,7 +102,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(strnstr, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_P
 #endif /* !__CRT_HAVE_strnstr */
 #endif /* !__strnstr_defined */
 #ifndef __strmode_defined
-#define __strmode_defined 1
+#define __strmode_defined
 #ifdef __CRT_HAVE_strmode
 /* Generate  a file mode representation similar to what's printed by `ls -l'
  * The representation is written to `p', and `mode' is the value as returned
@@ -155,7 +155,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(strmode, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_N
 #endif /* !__CRT_HAVE_strmode */
 #endif /* !__strmode_defined */
 #ifndef __explicit_bzero_defined
-#define __explicit_bzero_defined 1
+#define __explicit_bzero_defined
 #ifdef __CRT_HAVE_bzero
 /* >> explicit_bzero(3)
  * Same as `bzero(dst, n_bytes)',  however compilers  will not  optimize

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x78670337 */
+/* HASH CRC-32:0x86001813 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_verr_defined
-#define __local_verr_defined 1
+#define __local_verr_defined
 #include <__crt.h>
 #include <libc/template/program_invocation_name.h>
 #include <features.h>
@@ -27,7 +27,7 @@
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_verrc_defined
-#define __local___localdep_verrc_defined 1
+#define __local___localdep_verrc_defined
 #ifdef __CRT_HAVE_verrc
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
@@ -51,7 +51,7 @@ __LOCAL_LIBC(verr) __ATTR_NORETURN __ATTR_LIBC_PRINTF(2, 0) void
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_verr_defined
-#define __local___localdep_verr_defined 1
+#define __local___localdep_verr_defined
 #define __localdep_verr __LIBC_LOCAL_NAME(verr)
 #endif /* !__local___localdep_verr_defined */
 #else /* __CRT_HAVE_verrc || ((__CRT_HAVE_vwarnc || (!__NO_STDSTREAMS && __LOCAL_program_invocation_short_name && (__CRT_HAVE_vfprintf || __CRT_HAVE_vfprintf_s || __CRT_HAVE__IO_vfprintf || __CRT_HAVE_vfprintf_unlocked || __CRT_HAVE_file_printer || __CRT_HAVE_file_printer_unlocked || __CRT_HAVE_fputc || __CRT_HAVE_putc || __CRT_HAVE__IO_putc || __CRT_HAVE_fputc_unlocked || __CRT_HAVE_putc_unlocked || (__CRT_DOS && __CRT_HAVE__flsbuf) || __CRT_HAVE_fwrite || __CRT_HAVE__IO_fwrite || __CRT_HAVE_fwrite_s || __CRT_HAVE_fwrite_unlocked || __CRT_HAVE__fwrite_nolock))) && (__CRT_HAVE_exit || __CRT_HAVE_quick_exit || __CRT_HAVE__exit || __CRT_HAVE__Exit)) */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x480ac5b7 */
+/* HASH CRC-32:0xe4a8d961 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -46,12 +46,12 @@ __SYSDECL_BEGIN
 /* >> setkey(3), setkey_r(3) */
 __CDECLARE_VOID_OPT(__ATTR_NONNULL((1)),__NOTHROW_NCX,setkey,(char const *__key),(__key))
 #if !defined(__crypt_defined) && defined(__CRT_HAVE_crypt)
-#define __crypt_defined 1
+#define __crypt_defined
 /* >> crypt(3), crypt_r(3) */
 __CDECLARE(__ATTR_NONNULL((1, 2)),char *,__NOTHROW_NCX,crypt,(char const *__key, char const *__salt),(__key,__salt))
 #endif /* !__crypt_defined && __CRT_HAVE_crypt */
 #if !defined(__encrypt_defined) && defined(__CRT_HAVE_encrypt)
-#define __encrypt_defined 1
+#define __encrypt_defined
 /* >> encrypt(3), encrypt_r(3) */
 __CDECLARE_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,encrypt,(char *__glibc_block, __STDC_INT_AS_UINT_T __edflag),(__glibc_block,__edflag))
 #endif /* !__encrypt_defined && __CRT_HAVE_encrypt */

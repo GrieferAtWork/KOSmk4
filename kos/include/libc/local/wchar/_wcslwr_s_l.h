@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf89dd47c */
+/* HASH CRC-32:0x224dbc75 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,12 +19,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local__wcslwr_s_l_defined
-#define __local__wcslwr_s_l_defined 1
+#define __local__wcslwr_s_l_defined
 #include <__crt.h>
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_towlower_l_defined
-#define __local___localdep_towlower_l_defined 1
+#define __local___localdep_towlower_l_defined
 __NAMESPACE_LOCAL_END
 #include <bits/crt/wctype.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -76,7 +76,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_towlower_l_defined */
 #ifndef __local___localdep_wcsnlen_defined
-#define __local___localdep_wcsnlen_defined 1
+#define __local___localdep_wcsnlen_defined
 #ifdef __CRT_HAVE_wcsnlen
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
@@ -102,7 +102,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_wcslwr_s_l))(__WCHAR_TYPE__ *__buf, 
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep__wcslwr_s_l_defined
-#define __local___localdep__wcslwr_s_l_defined 1
+#define __local___localdep__wcslwr_s_l_defined
 #define __localdep__wcslwr_s_l __LIBC_LOCAL_NAME(_wcslwr_s_l)
 #endif /* !__local___localdep__wcslwr_s_l_defined */
 #endif /* !__local__wcslwr_s_l_defined */

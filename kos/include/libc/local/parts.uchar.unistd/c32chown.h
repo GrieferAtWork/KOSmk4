@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x41b150db */
+/* HASH CRC-32:0x9cf729aa */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,14 +19,14 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_c32chown_defined
-#define __local_c32chown_defined 1
+#define __local_c32chown_defined
 #include <__crt.h>
 #include <asm/os/fcntl.h>
 #if defined(__AT_FDCWD) && ((defined(__CRT_HAVE_wfchownat) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)) || defined(__CRT_HAVE_KOS$wfchownat))
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_c32fchownat_defined
-#define __local___localdep_c32fchownat_defined 1
+#define __local___localdep_c32fchownat_defined
 #if defined(__CRT_HAVE_wfchownat) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,__localdep_c32fchownat,(__fd_t __dfd, __CHAR32_TYPE__ const *__file, __uid_t __owner, __gid_t __group, __atflag_t __flags),wfchownat,(__dfd,__file,__owner,__group,__flags))
 #elif defined(__CRT_HAVE_KOS$wfchownat)
@@ -41,7 +41,7 @@ __NOTHROW_RPC(__LIBKCALL __LIBC_LOCAL_NAME(c32chown))(__CHAR32_TYPE__ const *__f
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_c32chown_defined
-#define __local___localdep_c32chown_defined 1
+#define __local___localdep_c32chown_defined
 #define __localdep_c32chown __LIBC_LOCAL_NAME(c32chown)
 #endif /* !__local___localdep_c32chown_defined */
 #else /* __AT_FDCWD && ((__CRT_HAVE_wfchownat && __SIZEOF_WCHAR_T__ == 4 && __LIBCCALL_IS_LIBKCALL) || __CRT_HAVE_KOS$wfchownat) */

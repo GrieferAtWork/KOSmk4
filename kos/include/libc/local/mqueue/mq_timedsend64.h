@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6528ded */
+/* HASH CRC-32:0x89e495e0 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,14 +19,14 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_mq_timedsend64_defined
-#define __local_mq_timedsend64_defined 1
+#define __local_mq_timedsend64_defined
 #include <__crt.h>
 #ifdef __CRT_HAVE_mq_timedsend
 #include <bits/os/timespec.h>
 #include <bits/os/mqueue.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_mq_timedsend32_defined
-#define __local___localdep_mq_timedsend32_defined 1
+#define __local___localdep_mq_timedsend32_defined
 __CREDIRECT(__ATTR_NONNULL((2, 5)),int,__NOTHROW_RPC,__localdep_mq_timedsend32,(__mqd_t __mqdes, char const *__msg_ptr, __SIZE_TYPE__ __msg_len, unsigned int __msg_prio, struct __timespec32 const *__abs_timeout),mq_timedsend,(__mqdes,__msg_ptr,__msg_len,__msg_prio,__abs_timeout))
 #endif /* !__local___localdep_mq_timedsend32_defined */
 __LOCAL_LIBC(mq_timedsend64) __ATTR_NONNULL((2, 5)) int
@@ -38,7 +38,7 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(mq_timedsend64))(__mqd_t __mqdes, cha
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_mq_timedsend64_defined
-#define __local___localdep_mq_timedsend64_defined 1
+#define __local___localdep_mq_timedsend64_defined
 #define __localdep_mq_timedsend64 __LIBC_LOCAL_NAME(mq_timedsend64)
 #endif /* !__local___localdep_mq_timedsend64_defined */
 #else /* __CRT_HAVE_mq_timedsend */

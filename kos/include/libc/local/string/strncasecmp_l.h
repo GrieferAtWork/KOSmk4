@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4a40ec6f */
+/* HASH CRC-32:0x6e22c42e */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,12 +19,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_strncasecmp_l_defined
-#define __local_strncasecmp_l_defined 1
+#define __local_strncasecmp_l_defined
 #include <__crt.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_strncasecmp_defined
-#define __local___localdep_strncasecmp_defined 1
+#define __local___localdep_strncasecmp_defined
 #if __has_builtin(__builtin_strncasecmp) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_strncasecmp)
 __CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_strncasecmp,(char const *__s1, char const *__s2, __SIZE_TYPE__ __maxlen),strncasecmp,{ return __builtin_strncasecmp(__s1, __s2, __maxlen); })
 #elif defined(__CRT_HAVE_strncasecmp)
@@ -51,7 +51,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strncasecmp_l))(char const *__s1, cha
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_strncasecmp_l_defined
-#define __local___localdep_strncasecmp_l_defined 1
+#define __local___localdep_strncasecmp_l_defined
 #define __localdep_strncasecmp_l __LIBC_LOCAL_NAME(strncasecmp_l)
 #endif /* !__local___localdep_strncasecmp_l_defined */
 #endif /* !__local_strncasecmp_l_defined */

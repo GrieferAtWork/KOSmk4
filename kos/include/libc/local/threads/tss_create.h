@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x75bf9ac8 */
+/* HASH CRC-32:0x3fbfeb6a */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,13 +19,13 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_tss_create_defined
-#define __local_tss_create_defined 1
+#define __local_tss_create_defined
 #include <__crt.h>
 #ifdef __CRT_HAVE_pthread_key_create
 #include <bits/crt/threads.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_pthread_key_create_defined
-#define __local___localdep_pthread_key_create_defined 1
+#define __local___localdep_pthread_key_create_defined
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 #include <bits/crt/pthreadtypes.h>
@@ -46,7 +46,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(tss_create))(__tss_t *__tss_id, void 
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_tss_create_defined
-#define __local___localdep_tss_create_defined 1
+#define __local___localdep_tss_create_defined
 #define __localdep_tss_create __LIBC_LOCAL_NAME(tss_create)
 #endif /* !__local___localdep_tss_create_defined */
 #else /* __CRT_HAVE_pthread_key_create */

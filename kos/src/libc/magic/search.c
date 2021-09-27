@@ -126,7 +126,7 @@ typedef enum {
 #ifdef __CC__
 
 #ifndef __size_t_defined
-#define __size_t_defined 1
+#define __size_t_defined
 typedef __SIZE_TYPE__ size_t;
 #endif /* !__size_t_defined */
 
@@ -186,7 +186,7 @@ void remque([[nonnull]] void *__restrict elem) {
 #ifndef __COMPAR_FN_T
 #define __COMPAR_FN_T 1
 #ifndef ____compar_fn_t_defined
-#define ____compar_fn_t_defined 1
+#define ____compar_fn_t_defined
 typedef int (__LIBCCALL *__compar_fn_t)(void const *__a, void const *__b);
 #endif /* !____compar_fn_t_defined */
 #ifdef __USE_GNU
@@ -195,7 +195,7 @@ typedef __compar_fn_t comparison_fn_t;
 #endif /* __COMPAR_FN_T */
 
 #ifndef __ENTRY_defined
-#define __ENTRY_defined 1
+#define __ENTRY_defined
 typedef struct entry {
 	char *key;
 	void *data;
@@ -218,7 +218,7 @@ struct _ENTRY;
 
 %[define(DEFINE_HSEARCH_DATA =
 @@pp_ifndef __hsearch_data_defined@@
-#define __hsearch_data_defined 1
+#define __hsearch_data_defined
 struct _ENTRY;
 struct hsearch_data {
 	struct _ENTRY  *@table@;
@@ -230,7 +230,7 @@ struct hsearch_data {
 
 %[define(DEFINE_HSEARCH_HTAB =
 @@pp_ifndef __local_htab_defined@@
-#define __local_htab_defined 1
+#define __local_htab_defined
 @@push_namespace(local)@@
 __LOCAL_LIBC_DATA(htab) struct hsearch_data htab = { NULL, 0, 0 };
 @@pop_namespace@@
@@ -239,7 +239,7 @@ __LOCAL_LIBC_DATA(htab) struct hsearch_data htab = { NULL, 0, 0 };
 
 %[define(DEFINE_SEARCH_ENTRY =
 @@pp_ifndef __ENTRY_defined@@
-#define __ENTRY_defined 1
+#define __ENTRY_defined
 typedef struct entry {
 	char *@key@;
 	void *@data@;
@@ -280,7 +280,7 @@ void hdestroy() {
 #ifdef __USE_GNU
 /* Data type for reentrant functions.  */
 #ifndef __hsearch_data_defined
-#define __hsearch_data_defined 1
+#define __hsearch_data_defined
 struct hsearch_data {
 	struct _ENTRY *table;
 	unsigned int   size;
@@ -927,7 +927,7 @@ typedef void (__LIBCCALL *__action_fn_t)(void const *nodep, VISIT value, int lev
 @@pp_ifndef              __LIBCCALL_CALLER_CLEANUP@@
 @@pp_ifndef ____invoke_twalk_action_helper_defined@@
 @@push_namespace(local)@@
-#define ____invoke_twalk_action_helper_defined 1
+#define ____invoke_twalk_action_helper_defined
 __LOCAL_LIBC(__invoke_twalk_action_helper) void
 (__LIBCCALL __invoke_twalk_action_helper)(void const *nodep, VISIT value, int level, void *arg) {
 	(*(void (LIBCCALL *)(void const *, VISIT, int))arg)(nodep, value, level);
@@ -961,7 +961,7 @@ void twalk([[nullable]] void const *root,
 /* Callback type for function to free a tree node.
  * If the keys are atomic data this function should do nothing. */
 #ifndef ____free_fn_t_defined
-#define ____free_fn_t_defined 1
+#define ____free_fn_t_defined
 typedef void (__LIBCCALL *__free_fn_t)(void *__nodep);
 #endif /* !____free_fn_t_defined */
 }
@@ -970,7 +970,7 @@ typedef void (__LIBCCALL *__free_fn_t)(void *__nodep);
 @@pp_ifndef         __LIBCCALL_CALLER_CLEANUP@@
 @@pp_ifndef ____invoke_free_fn_helper_defined@@
 @@push_namespace(local)@@
-#define ____invoke_free_fn_helper_defined 1
+#define ____invoke_free_fn_helper_defined
 __LOCAL_LIBC(__invoke_free_fn_helper) void
 (__LIBCCALL __invoke_free_fn_helper)(void *nodep, void *arg) {
 	(*(void (LIBCCALL *)(void *))arg)(nodep);

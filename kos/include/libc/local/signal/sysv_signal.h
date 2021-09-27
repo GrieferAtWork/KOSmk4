@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x36ec2094 */
+/* HASH CRC-32:0x48025f3a */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_sysv_signal_defined
-#define __local_sysv_signal_defined 1
+#define __local_sysv_signal_defined
 #include <__crt.h>
 #include <asm/os/signal.h>
 #if defined(__SA_RESETHAND) && defined(__SA_NODEFER) && defined(__SIG_ERR) && (defined(__CRT_HAVE_sigaction) || defined(__CRT_HAVE___sigaction))
@@ -27,7 +27,7 @@
 #include <bits/os/sigaction.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_sigaction_defined
-#define __local___localdep_sigaction_defined 1
+#define __local___localdep_sigaction_defined
 #ifdef __CRT_HAVE_sigaction
 __NAMESPACE_LOCAL_END
 struct sigaction;
@@ -43,7 +43,7 @@ __CREDIRECT(,int,__NOTHROW_NCX,__localdep_sigaction,(__signo_t __signo, struct s
 #endif /* !... */
 #endif /* !__local___localdep_sigaction_defined */
 #ifndef __local___localdep_sigemptyset_defined
-#define __local___localdep_sigemptyset_defined 1
+#define __local___localdep_sigemptyset_defined
 #ifdef __CRT_HAVE_sigemptyset
 __NAMESPACE_LOCAL_END
 #include <bits/os/sigset.h>
@@ -68,7 +68,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(sysv_signal))(__signo_t __signo, __si
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_sysv_signal_defined
-#define __local___localdep_sysv_signal_defined 1
+#define __local___localdep_sysv_signal_defined
 #define __localdep_sysv_signal __LIBC_LOCAL_NAME(sysv_signal)
 #endif /* !__local___localdep_sysv_signal_defined */
 #else /* __SA_RESETHAND && __SA_NODEFER && __SIG_ERR && (__CRT_HAVE_sigaction || __CRT_HAVE___sigaction) */

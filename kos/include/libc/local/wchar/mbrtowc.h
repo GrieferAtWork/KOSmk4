@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd70b0425 */
+/* HASH CRC-32:0xe0809eee */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,13 +19,13 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_mbrtowc_defined
-#define __local_mbrtowc_defined 1
+#define __local_mbrtowc_defined
 #include <__crt.h>
 #include <bits/crt/mbstate.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_unicode_c8toc16_defined
-#define __local___localdep_unicode_c8toc16_defined 1
+#define __local___localdep_unicode_c8toc16_defined
 #ifdef __CRT_HAVE_unicode_c8toc16
 __CREDIRECT(__ATTR_NONNULL((1, 2, 4)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_unicode_c8toc16,(__CHAR16_TYPE__ *__restrict __pc16, char const *__restrict __s, __SIZE_TYPE__ __n, struct __mbstate *__restrict __mbs),unicode_c8toc16,(__pc16,__s,__n,__mbs))
 #else /* __CRT_HAVE_unicode_c8toc16 */
@@ -36,7 +36,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__CRT_HAVE_unicode_c8toc16 */
 #endif /* !__local___localdep_unicode_c8toc16_defined */
 #ifndef __local___localdep_unicode_c8toc32_defined
-#define __local___localdep_unicode_c8toc32_defined 1
+#define __local___localdep_unicode_c8toc32_defined
 #ifdef __CRT_HAVE_unicode_c8toc32
 __CREDIRECT(__ATTR_NONNULL((1, 2, 4)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_unicode_c8toc32,(__CHAR32_TYPE__ *__restrict __pc32, char const *__restrict __s, __SIZE_TYPE__ __n, struct __mbstate *__restrict __mbs),unicode_c8toc32,(__pc32,__s,__n,__mbs))
 #else /* __CRT_HAVE_unicode_c8toc32 */
@@ -75,7 +75,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(mbrtowc))(__WCHAR_TYPE__ *__pwc, char
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_mbrtowc_defined
-#define __local___localdep_mbrtowc_defined 1
+#define __local___localdep_mbrtowc_defined
 #define __localdep_mbrtowc __LIBC_LOCAL_NAME(mbrtowc)
 #endif /* !__local___localdep_mbrtowc_defined */
 #endif /* !__local_mbrtowc_defined */

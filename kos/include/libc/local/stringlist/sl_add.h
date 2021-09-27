@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9ba1d427 */
+/* HASH CRC-32:0xcfd5394b */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,12 +19,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_sl_add_defined
-#define __local_sl_add_defined 1
+#define __local_sl_add_defined
 #include <__crt.h>
 #ifdef __CRT_HAVE_realloc
 #include <hybrid/typecore.h>
 #ifndef ___stringlist_defined
-#define ___stringlist_defined 1
+#define ___stringlist_defined
 typedef struct _stringlist {
 	char   **sl_str;
 	__SIZE_TYPE__   sl_max;
@@ -33,7 +33,7 @@ typedef struct _stringlist {
 #endif /* !___stringlist_defined */
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_realloc_defined
-#define __local___localdep_realloc_defined 1
+#define __local___localdep_realloc_defined
 #if __has_builtin(__builtin_realloc) && defined(__LIBC_BIND_CRTBUILTINS)
 __CEIREDIRECT(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)),void *,__NOTHROW_NCX,__localdep_realloc,(void *__mallptr, __SIZE_TYPE__ __num_bytes),realloc,{ return __builtin_realloc(__mallptr, __num_bytes); })
 #else /* __has_builtin(__builtin_realloc) && __LIBC_BIND_CRTBUILTINS */
@@ -58,7 +58,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(sl_add))(struct _stringlist *__sl, ch
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_sl_add_defined
-#define __local___localdep_sl_add_defined 1
+#define __local___localdep_sl_add_defined
 #define __localdep_sl_add __LIBC_LOCAL_NAME(sl_add)
 #endif /* !__local___localdep_sl_add_defined */
 #else /* __CRT_HAVE_realloc */

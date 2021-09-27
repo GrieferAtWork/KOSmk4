@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x320bc008 */
+/* HASH CRC-32:0x631a60b3 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,12 +19,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_unsetenv_defined
-#define __local_unsetenv_defined 1
+#define __local_unsetenv_defined
 #include <__crt.h>
 #if defined(__CRT_HAVE_putenv) || defined(__CRT_HAVE__putenv)
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_memcpyc_defined
-#define __local___localdep_memcpyc_defined 1
+#define __local___localdep_memcpyc_defined
 #ifdef __CRT_HAVE_memcpyc
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
@@ -38,7 +38,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__CRT_HAVE_memcpyc */
 #endif /* !__local___localdep_memcpyc_defined */
 #ifndef __local___localdep_putenv_defined
-#define __local___localdep_putenv_defined 1
+#define __local___localdep_putenv_defined
 #ifdef __CRT_HAVE_putenv
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_putenv,(char *__string),putenv,(__string))
 #elif defined(__CRT_HAVE__putenv)
@@ -48,7 +48,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_putenv,(char *__str
 #endif /* !... */
 #endif /* !__local___localdep_putenv_defined */
 #ifndef __local___localdep_strlen_defined
-#define __local___localdep_strlen_defined 1
+#define __local___localdep_strlen_defined
 #ifdef __CRT_HAVE_strlen
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
@@ -84,7 +84,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(unsetenv))(char const *__varname) {
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_unsetenv_defined
-#define __local___localdep_unsetenv_defined 1
+#define __local___localdep_unsetenv_defined
 #define __localdep_unsetenv __LIBC_LOCAL_NAME(unsetenv)
 #endif /* !__local___localdep_unsetenv_defined */
 #else /* __CRT_HAVE_putenv || __CRT_HAVE__putenv */

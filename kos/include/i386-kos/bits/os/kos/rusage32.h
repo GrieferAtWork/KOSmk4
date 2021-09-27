@@ -181,7 +181,7 @@
 #define __SIZEOF_RUSAGE64          __SIZEOF_RUSAGEX32_64
 #define __ALIGNOF_RUSAGE64         __ALIGNOF_RUSAGEX32_64
 
-#define __rusage_defined 1
+#define __rusage_defined
 #endif /* __i386__ && !__x86_64__*/
 /*[[[end]]]*/
 

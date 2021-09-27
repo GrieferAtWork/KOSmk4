@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x456a2f23 */
+/* HASH CRC-32:0x4217a38a */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,12 +19,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_ether_aton_defined
-#define __local_ether_aton_defined 1
+#define __local_ether_aton_defined
 #include <__crt.h>
 struct ether_addr;
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_ether_aton_r_defined
-#define __local___localdep_ether_aton_r_defined 1
+#define __local___localdep_ether_aton_r_defined
 #ifdef __CRT_HAVE_ether_aton_r
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),struct ether_addr *,__NOTHROW_NCX,__localdep_ether_aton_r,(char const *__restrict __asc, struct ether_addr *__restrict __addr),ether_aton_r,(__asc,__addr))
 #else /* __CRT_HAVE_ether_aton_r */
@@ -44,7 +44,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(ether_aton))(char const *__restrict _
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_ether_aton_defined
-#define __local___localdep_ether_aton_defined 1
+#define __local___localdep_ether_aton_defined
 #define __localdep_ether_aton __LIBC_LOCAL_NAME(ether_aton)
 #endif /* !__local___localdep_ether_aton_defined */
 #endif /* !__local_ether_aton_defined */

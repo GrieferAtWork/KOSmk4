@@ -464,7 +464,7 @@
 __SYSDECL_BEGIN
 
 #ifndef ____imaxdiv_struct_defined
-#define ____imaxdiv_struct_defined 1
+#define ____imaxdiv_struct_defined
 }%[push_macro @undef { quot rem }]%{
 struct __imaxdiv_struct {
 	__INTMAX_TYPE__ quot; /* Quotient. */
@@ -478,7 +478,7 @@ struct __imaxdiv_struct {
 
 %[define(DEFINE_IMAXDIV_STRUCT =
 #ifndef ____imaxdiv_struct_defined
-#define ____imaxdiv_struct_defined 1
+#define ____imaxdiv_struct_defined
 #ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
 #pragma @push_macro@("quot")
 #pragma @push_macro@("rem")
@@ -499,7 +499,7 @@ struct __imaxdiv_struct {
 %{
 
 #ifndef __std_imaxdiv_t_defined
-#define __std_imaxdiv_t_defined 1
+#define __std_imaxdiv_t_defined
 __NAMESPACE_STD_BEGIN
 typedef struct __imaxdiv_struct imaxdiv_t;
 __NAMESPACE_STD_END
@@ -508,7 +508,7 @@ __NAMESPACE_STD_END
 #ifndef __CXX_SYSTEM_HEADER
 }%(c, ccompat){
 #ifndef __imaxdiv_t_defined
-#define __imaxdiv_t_defined 1
+#define __imaxdiv_t_defined
 __NAMESPACE_STD_USING(imaxdiv_t)
 #endif /* !__imaxdiv_t_defined */
 }%{
@@ -924,7 +924,7 @@ $uintmax_t strtou_l([[nonnull]] char const *__restrict nptr,
 
 #ifndef __INTELLISENSE__
 #ifndef ____gwchar_t_defined
-#define ____gwchar_t_defined 1
+#define ____gwchar_t_defined
 #define __gwchar_t __WCHAR_TYPE__
 #endif /* !____gwchar_t_defined */
 #endif /* !__INTELLISENSE__ */

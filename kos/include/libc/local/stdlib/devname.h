@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4fc4ca05 */
+/* HASH CRC-32:0x143148aa */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,12 +19,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_devname_defined
-#define __local_devname_defined 1
+#define __local_devname_defined
 #include <__crt.h>
 #ifdef __CRT_HAVE_devname_r
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_devname_r_defined
-#define __local___localdep_devname_r_defined 1
+#define __local___localdep_devname_r_defined
 __CREDIRECT(__ATTR_NONNULL((3)),int,__NOTHROW_NCX,__localdep_devname_r,(__dev_t __dev, __mode_t __type, char *__buf, __SIZE_TYPE__ __len),devname_r,(__dev,__type,__buf,__len))
 #endif /* !__local___localdep_devname_r_defined */
 __LOCAL_LIBC(devname) __ATTR_CONST char *
@@ -34,7 +34,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(devname))(__dev_t __dev, __mode_t __t
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_devname_defined
-#define __local___localdep_devname_defined 1
+#define __local___localdep_devname_defined
 #define __localdep_devname __LIBC_LOCAL_NAME(devname)
 #endif /* !__local___localdep_devname_defined */
 #else /* __CRT_HAVE_devname_r */

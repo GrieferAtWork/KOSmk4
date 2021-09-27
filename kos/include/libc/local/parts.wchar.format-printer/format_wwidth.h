@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa5550432 */
+/* HASH CRC-32:0x9f2097c4 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_format_wwidth_defined
-#define __local_format_wwidth_defined 1
+#define __local_format_wwidth_defined
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(format_wwidth) __ATTR_PURE __ATTR_NONNULL((2)) __SSIZE_TYPE__
@@ -45,7 +45,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(format_wwidth))(void *__arg, __WCHAR_
 	(void)__data;
 	/* XXX: Not necessarily correct, as the 32-bit variant is actually ATTR_CONST.
 	 *
-	 * However, magic  headers  don't support  conditional  attributes,  so we  can't  just  do
+	 * However,  magic headers don't  support conditional attributes, so  we can't just do
 	 * [if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 2), pure]
 	 * [if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ != 2), const] */
 	__COMPILER_IMPURE();
@@ -54,7 +54,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(format_wwidth))(void *__arg, __WCHAR_
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_format_wwidth_defined
-#define __local___localdep_format_wwidth_defined 1
+#define __local___localdep_format_wwidth_defined
 #define __localdep_format_wwidth __LIBC_LOCAL_NAME(format_wwidth)
 #endif /* !__local___localdep_format_wwidth_defined */
 #endif /* !__local_format_wwidth_defined */

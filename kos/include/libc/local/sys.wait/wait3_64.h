@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x13a4f03b */
+/* HASH CRC-32:0xd45b022b */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_wait3_64_defined
-#define __local_wait3_64_defined 1
+#define __local_wait3_64_defined
 #include <__crt.h>
 #ifdef __CRT_HAVE_wait3
 #include <features.h>
@@ -28,7 +28,7 @@
 #include <parts/waitmacros.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_wait3_32_defined
-#define __local___localdep_wait3_32_defined 1
+#define __local___localdep_wait3_32_defined
 __CREDIRECT(,__pid_t,__NOTHROW_RPC,__localdep_wait3_32,(__WAIT_STATUS __stat_loc, __STDC_INT_AS_UINT_T __options, struct __rusage32 *__usage),wait3,(__stat_loc,__options,__usage))
 #endif /* !__local___localdep_wait3_32_defined */
 __NAMESPACE_LOCAL_END
@@ -45,7 +45,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wait3_64))(__WAIT_STATUS __stat_loc, 
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_wait3_64_defined
-#define __local___localdep_wait3_64_defined 1
+#define __local___localdep_wait3_64_defined
 #define __localdep_wait3_64 __LIBC_LOCAL_NAME(wait3_64)
 #endif /* !__local___localdep_wait3_64_defined */
 #else /* __CRT_HAVE_wait3 */

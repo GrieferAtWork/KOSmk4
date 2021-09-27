@@ -325,15 +325,15 @@ __SYSDECL_BEGIN
 
 __NAMESPACE_STD_BEGIN
 #ifndef __std_size_t_defined
-#define __std_size_t_defined 1
+#define __std_size_t_defined
 typedef __SIZE_TYPE__ size_t;
 #endif /* !__std_size_t_defined */
 #ifndef __std_clock_t_defined
-#define __std_clock_t_defined 1
+#define __std_clock_t_defined
 typedef __clock_t clock_t;
 #endif /* !__std_clock_t_defined */
 #ifndef __std_time_t_defined
-#define __std_time_t_defined 1
+#define __std_time_t_defined
 typedef __TM_TYPE(time) time_t;
 #endif /* !__std_time_t_defined */
 __NAMESPACE_STD_END
@@ -341,15 +341,15 @@ __NAMESPACE_STD_END
 #ifndef __CXX_SYSTEM_HEADER
 }%(c, ccompat){
 #ifndef __size_t_defined
-#define __size_t_defined 1
+#define __size_t_defined
 __NAMESPACE_STD_USING(size_t)
 #endif /* !__size_t_defined */
 #ifndef __clock_t_defined
-#define __clock_t_defined 1
+#define __clock_t_defined
 __NAMESPACE_STD_USING(clock_t)
 #endif /* !__clock_t_defined */
 #ifndef __time_t_defined
-#define __time_t_defined 1
+#define __time_t_defined
 __NAMESPACE_STD_USING(time_t)
 #endif /* !__time_t_defined */
 }%{
@@ -357,25 +357,25 @@ __NAMESPACE_STD_USING(time_t)
 
 #ifdef __USE_XOPEN2K
 #ifndef __pid_t_defined
-#define __pid_t_defined 1
+#define __pid_t_defined
 typedef __pid_t pid_t;
 #endif /* !__pid_t_defined */
 #endif /* __USE_XOPEN2K */
 
 #ifdef __USE_TIME64
 #ifndef __time64_t_defined
-#define __time64_t_defined 1
+#define __time64_t_defined
 typedef __time64_t time64_t;
 #endif /* !__time64_t_defined */
 #endif /* __USE_TIME64 */
 
 #ifdef __USE_POSIX199309
 #ifndef __clockid_t_defined
-#define __clockid_t_defined 1
+#define __clockid_t_defined
 typedef __clockid_t clockid_t;
 #endif /* !__clockid_t_defined */
 #ifndef __timer_t_defined
-#define __timer_t_defined 1
+#define __timer_t_defined
 typedef __timer_t timer_t;
 #endif /* !__timer_t_defined */
 #endif /* __USE_POSIX199309 */
@@ -384,7 +384,7 @@ typedef __timer_t timer_t;
 #ifndef __CXX_SYSTEM_HEADER
 }%(c, ccompat){
 #ifndef __tm_defined
-#define __tm_defined 1
+#define __tm_defined
 __NAMESPACE_STD_USING(tm)
 #endif /* !__tm_defined */
 }%{
@@ -863,7 +863,7 @@ __LIBC char *__tzname[2];
 #elif defined(__CRT_HAVE_tzname)
 #define __tzname tzname
 #ifndef __tzname_defined
-#define __tzname_defined 1
+#define __tzname_defined
 __LIBC char *tzname[2];
 #endif /* !__tzname_defined */
 #elif defined(__CRT_HAVE_DOS$__tzname)
@@ -882,7 +882,7 @@ __LIBC int __daylight;
 #elif defined(__CRT_HAVE_daylight)
 #define __daylight daylight
 #ifndef __daylight_defined
-#define __daylight_defined 1
+#define __daylight_defined
 __LIBC int daylight;
 #endif /* !__daylight_defined */
 #elif defined(__CRT_HAVE_DOS$__daylight)
@@ -901,7 +901,7 @@ __LIBC __LONGPTR_TYPE__ __timezone;
 #elif defined(__CRT_HAVE_timezone)
 #define __timezone timezone
 #ifndef __timezone_defined
-#define __timezone_defined 1
+#define __timezone_defined
 __LIBC __LONGPTR_TYPE__ timezone;
 #endif /* !__timezone_defined */
 #elif defined(__CRT_HAVE_DOS$__timezone)
@@ -916,7 +916,7 @@ __CREDIRECT_DOS(__ATTR_WUNUSED __ATTR_RETNONNULL __ATTR_CONST,long *,__NOTHROW_N
 %{
 #ifdef __USE_POSIX
 #ifndef __tzname_defined
-#define __tzname_defined 1
+#define __tzname_defined
 #ifndef tzname
 #ifdef __CRT_HAVE_tzname
 __LIBC char *tzname[2];
@@ -945,7 +945,7 @@ void tzset();
 %{
 #if defined(__USE_MISC) || defined(__USE_XOPEN)
 #ifndef __daylight_defined
-#define __daylight_defined 1
+#define __daylight_defined
 #ifndef daylight
 #ifdef __CRT_HAVE_daylight
 __LIBC int daylight;
@@ -964,7 +964,7 @@ __LIBC int daylight __ASMNAME("__daylight");
 #endif /* !__daylight_defined */
 
 #ifndef __timezone_defined
-#define __timezone_defined 1
+#define __timezone_defined
 #ifndef timezone
 #ifdef __CRT_HAVE_timezone
 __LIBC __LONGPTR_TYPE__ timezone;

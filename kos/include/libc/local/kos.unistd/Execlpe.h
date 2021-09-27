@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xda66c67b */
+/* HASH CRC-32:0x946166b0 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,13 +19,13 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_Execlpe_defined
-#define __local_Execlpe_defined 1
+#define __local_Execlpe_defined
 #include <__crt.h>
 #ifdef __CRT_HAVE_Execvpe
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_Execvpe_defined
-#define __local___localdep_Execvpe_defined 1
+#define __local___localdep_Execvpe_defined
 __NAMESPACE_LOCAL_END
 #include <features.h>
 #ifndef __TARGV
@@ -49,7 +49,7 @@ __LOCAL_LIBC(Execlpe) __ATTR_NORETURN __ATTR_SENTINEL_O(1) __ATTR_NONNULL((1)) v
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_Execlpe_defined
-#define __local___localdep_Execlpe_defined 1
+#define __local___localdep_Execlpe_defined
 #define __localdep_Execlpe __LIBC_LOCAL_NAME(Execlpe)
 #endif /* !__local___localdep_Execlpe_defined */
 #else /* __CRT_HAVE_Execvpe */

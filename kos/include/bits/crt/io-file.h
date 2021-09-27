@@ -297,14 +297,14 @@ struct __IO_FILE; /* Opaque */
 #endif /* !__CRT_... */
 
 #ifndef __std_FILE_defined
-#define __std_FILE_defined 1
+#define __std_FILE_defined
 typedef __FILE FILE;
 #endif /* !__std_FILE_defined */
 __NAMESPACE_STD_END
 
 #ifndef __CXX_SYSTEM_HEADER
 #ifndef __FILE_defined
-#define __FILE_defined 1
+#define __FILE_defined
 __NAMESPACE_STD_USING(FILE)
 #endif /* !__FILE_defined */
 #endif /* !__CXX_SYSTEM_HEADER */

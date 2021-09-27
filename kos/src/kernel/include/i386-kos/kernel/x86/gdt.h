@@ -56,7 +56,7 @@ FUNDEF uintptr_t NOTHROW(KCALL x86_get_random_userkern_address)(void);
 #endif /* !CONFIG_NO_USERKERN_SEGMENT */
 
 #ifndef ___this_x86_kernel_psp0_defined
-#define ___this_x86_kernel_psp0_defined 1
+#define ___this_x86_kernel_psp0_defined
 /* [== mnode_getendaddr(THIS_KERNEL_STACK)]
  * The per-task value written to `t_psp0' during scheduler preemption. */
 DATDEF ATTR_PERTASK uintptr_t const this_x86_kernel_psp0;

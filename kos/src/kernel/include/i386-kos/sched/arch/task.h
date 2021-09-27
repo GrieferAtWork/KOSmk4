@@ -348,7 +348,7 @@ FUNDEF void ASMCALL x86_rpc_user_redirection(void);
 DATDEF ATTR_PERTASK struct irregs this_x86_rpc_redirection_iret;
 
 #ifndef ___this_x86_kernel_psp0_defined
-#define ___this_x86_kernel_psp0_defined 1
+#define ___this_x86_kernel_psp0_defined
 /* [== mnode_getendaddr(THIS_KERNEL_STACK)]
  * The per-task value written to `t_psp0' during scheduler preemption. */
 DATDEF ATTR_PERTASK uintptr_t const this_x86_kernel_psp0;

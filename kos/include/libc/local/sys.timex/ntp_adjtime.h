@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa4eb9174 */
+/* HASH CRC-32:0xf05a4397 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,18 +19,18 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_ntp_adjtime_defined
-#define __local_ntp_adjtime_defined 1
+#define __local_ntp_adjtime_defined
 #include <__crt.h>
 #include <bits/types.h>
 #if defined(__CRT_HAVE_ntp_adjtime64) || defined(__CRT_HAVE_ntp_adjtime)
 #include <bits/os/timex.h>
 __NAMESPACE_LOCAL_BEGIN
 #if !defined(__local___localdep_ntp_adjtime32_defined) && defined(__CRT_HAVE_ntp_adjtime)
-#define __local___localdep_ntp_adjtime32_defined 1
+#define __local___localdep_ntp_adjtime32_defined
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_ntp_adjtime32,(struct __timex32 *__restrict __tntx),ntp_adjtime,(__tntx))
 #endif /* !__local___localdep_ntp_adjtime32_defined && __CRT_HAVE_ntp_adjtime */
 #ifndef __local___localdep_ntp_adjtime64_defined
-#define __local___localdep_ntp_adjtime64_defined 1
+#define __local___localdep_ntp_adjtime64_defined
 #if defined(__CRT_HAVE_ntp_adjtime) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_ntp_adjtime64,(struct __timex64 *__restrict __tntx),ntp_adjtime,(__tntx))
 #elif defined(__CRT_HAVE_ntp_adjtime64)
@@ -146,7 +146,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(ntp_adjtime))(struct timex *__restric
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_ntp_adjtime_defined
-#define __local___localdep_ntp_adjtime_defined 1
+#define __local___localdep_ntp_adjtime_defined
 #define __localdep_ntp_adjtime __LIBC_LOCAL_NAME(ntp_adjtime)
 #endif /* !__local___localdep_ntp_adjtime_defined */
 #else /* __CRT_HAVE_ntp_adjtime64 || __CRT_HAVE_ntp_adjtime */

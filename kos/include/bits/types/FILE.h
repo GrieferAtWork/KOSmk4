@@ -21,7 +21,7 @@
 #include <__stdinc.h>
 #include <__crt.h>
 #ifndef __FILE_defined
-#define __FILE_defined 1
+#define __FILE_defined
 #ifdef __CC__
 __DECL_BEGIN
 typedef __FILE FILE;

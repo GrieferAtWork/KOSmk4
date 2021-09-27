@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xaaec4d7b */
+/* HASH CRC-32:0x4cff5a96 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,13 +19,13 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_ldexpf_defined
-#define __local_ldexpf_defined 1
+#define __local_ldexpf_defined
 #include <__crt.h>
 #include <ieee754.h>
 #if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_ldexp) || defined(__CRT_HAVE___ldexp) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_ldexp_defined
-#define __local___localdep_ldexp_defined 1
+#define __local___localdep_ldexp_defined
 #if __has_builtin(__builtin_ldexp) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_ldexp)
 __CEIREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_ldexp,(double __x, int __exponent),ldexp,{ return __builtin_ldexp(__x, __exponent); })
 #elif defined(__CRT_HAVE_ldexp)
@@ -70,7 +70,7 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(ldexpf))(float __x, int __exponent) {
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_ldexpf_defined
-#define __local___localdep_ldexpf_defined 1
+#define __local___localdep_ldexpf_defined
 #define __localdep_ldexpf __LIBC_LOCAL_NAME(ldexpf)
 #endif /* !__local___localdep_ldexpf_defined */
 #else /* __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ || __CRT_HAVE_ldexp || __CRT_HAVE___ldexp || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1f8bc9ba */
+/* HASH CRC-32:0xbf0b3267 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,13 +19,13 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_c16stou32_l_defined
-#define __local_c16stou32_l_defined 1
+#define __local_c16stou32_l_defined
 #include <__crt.h>
 #include <features.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_c16stou32_defined
-#define __local___localdep_c16stou32_defined 1
+#define __local___localdep_c16stou32_defined
 #if defined(__CRT_HAVE_wcstou32) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__UINT32_TYPE__,__NOTHROW_NCX,__localdep_c16stou32,(__CHAR16_TYPE__ const *__restrict __nptr, __CHAR16_TYPE__ **__endptr, __STDC_INT_AS_UINT_T __base),wcstou32,(__nptr,__endptr,__base))
 #elif defined(__CRT_HAVE_DOS$wcstou32)
@@ -65,7 +65,7 @@ __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(c16stou32_l))(__CHAR16_TYPE__ const *
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_c16stou32_l_defined
-#define __local___localdep_c16stou32_l_defined 1
+#define __local___localdep_c16stou32_l_defined
 #define __localdep_c16stou32_l __LIBC_LOCAL_NAME(c16stou32_l)
 #endif /* !__local___localdep_c16stou32_l_defined */
 #endif /* !__local_c16stou32_l_defined */

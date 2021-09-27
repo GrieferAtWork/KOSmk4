@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4886e1c6 */
+/* HASH CRC-32:0x45e99d14 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,13 +19,13 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_c32rlen_defined
-#define __local_c32rlen_defined 1
+#define __local_c32rlen_defined
 #include <__crt.h>
 #include <bits/crt/mbstate.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_uchar_mbrtoc32_defined
-#define __local___localdep_uchar_mbrtoc32_defined 1
+#define __local___localdep_uchar_mbrtoc32_defined
 #if defined(__CRT_HAVE_mbrtowc) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
 __CREDIRECT(,__SIZE_TYPE__,__NOTHROW_NCX,__localdep_uchar_mbrtoc32,(__CHAR32_TYPE__ *__pwc, char const *__restrict __str, __SIZE_TYPE__ __maxlen, struct __mbstate *__mbs),mbrtowc,(__pwc,__str,__maxlen,__mbs))
 #elif defined(__CRT_HAVE_KOS$mbrtowc)
@@ -57,7 +57,7 @@ __NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(c32rlen))(char const *__restrict __st
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_c32rlen_defined
-#define __local___localdep_c32rlen_defined 1
+#define __local___localdep_c32rlen_defined
 #define __localdep_c32rlen __LIBC_LOCAL_NAME(c32rlen)
 #endif /* !__local___localdep_c32rlen_defined */
 #endif /* !__local_c32rlen_defined */

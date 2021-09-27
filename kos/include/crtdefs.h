@@ -283,7 +283,7 @@ __SYSDECL_BEGIN
 #define _SIZE_T_DEFINED 1
 #endif /* !_SIZE_T_DEFINED */
 #ifndef __size_t_defined
-#define __size_t_defined 1
+#define __size_t_defined
 typedef __SIZE_TYPE__ size_t;
 #endif /* !__size_t_defined */
 
@@ -292,7 +292,7 @@ typedef __SIZE_TYPE__ size_t;
 #define _RSIZE_T_DEFINED 1
 #endif /* !_RSIZE_T_DEFINED */
 #ifndef __rsize_t_defined
-#define __rsize_t_defined 1
+#define __rsize_t_defined
 typedef __SIZE_TYPE__ rsize_t;
 #endif /* !__rsize_t_defined */
 #endif /* __STDC_WANT_SECURE_LIB__ */
@@ -301,21 +301,21 @@ typedef __SIZE_TYPE__ rsize_t;
 #define _INTPTR_T_DEFINED 1
 #endif /* !_INTPTR_T_DEFINED */
 #ifndef __intptr_t_defined
-#define __intptr_t_defined 1
+#define __intptr_t_defined
 typedef __INTPTR_TYPE__ intptr_t;
 #endif /* !__intptr_t_defined */
 #ifndef _UINTPTR_T_DEFINED
 #define _UINTPTR_T_DEFINED 1
 #endif /* !_UINTPTR_T_DEFINED */
 #ifndef __uintptr_t_defined
-#define __uintptr_t_defined 1
+#define __uintptr_t_defined
 typedef __UINTPTR_TYPE__ uintptr_t;
 #endif /* !__uintptr_t_defined */
 #ifndef _PTRDIFF_T_DEFINED
 #define _PTRDIFF_T_DEFINED 1
 #endif /* !_PTRDIFF_T_DEFINED */
 #ifndef __ptrdiff_t_defined
-#define __ptrdiff_t_defined 1
+#define __ptrdiff_t_defined
 typedef __PTRDIFF_TYPE__ ptrdiff_t;
 #endif /* !__ptrdiff_t_defined */
 
@@ -323,32 +323,32 @@ typedef __PTRDIFF_TYPE__ ptrdiff_t;
 #define _WCHAR_T_DEFINED 1
 #endif  /* _WCHAR_T_DEFINED */
 #ifndef __wchar_t_defined
-#define __wchar_t_defined 1
+#define __wchar_t_defined
 typedef __WCHAR_TYPE__ wchar_t;
 #endif  /* __wchar_t_defined */
 #ifndef _WCTYPE_T_DEFINED
 #define _WCTYPE_T_DEFINED 1
 #endif /* !_WCTYPE_T_DEFINED */
 #ifndef __wint_t_defined
-#define __wint_t_defined 1
+#define __wint_t_defined
 typedef __WINT_TYPE__ wint_t;
 #endif /* !__wint_t_defined */
 #ifndef __wctype_t_defined
-#define __wctype_t_defined 1
+#define __wctype_t_defined
 typedef __wctype_t wctype_t;
 #endif /* !__wctype_t_defined */
 #ifndef _VA_LIST_DEFINED
 #define _VA_LIST_DEFINED 1
 #endif /* !_VA_LIST_DEFINED */
 #ifndef __va_list_defined
-#define __va_list_defined 1
+#define __va_list_defined
 typedef __builtin_va_list va_list;
 #endif /* !__va_list_defined */
 
 #ifndef _ERRNO_T_DEFINED
 #define _ERRNO_T_DEFINED 1
 #ifndef __errno_t_defined
-#define __errno_t_defined 1
+#define __errno_t_defined
 typedef int errno_t;
 #endif /* !__errno_t_defined */
 #endif /* !_ERRNO_T_DEFINED */
@@ -374,7 +374,7 @@ typedef int errno_t;
 #ifndef _TIME_T_DEFINED
 #define _TIME_T_DEFINED 1
 #ifndef __time_t_defined
-#define __time_t_defined 1
+#define __time_t_defined
 #ifdef _USE_32BIT_TIME_T
 typedef __time32_t time_t;
 #else /* _USE_32BIT_TIME_T */

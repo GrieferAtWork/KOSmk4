@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x26d8119c */
+/* HASH CRC-32:0xe23d42bb */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -92,7 +92,7 @@
 __SYSDECL_BEGIN
 
 #ifndef __htons_defined
-#define __htons_defined 1
+#define __htons_defined
 #ifdef __CRT_HAVE_htons
 __CEIDECLARE(__ATTR_CONST,__UINT16_TYPE__,__NOTHROW_NCX,htons,(__UINT16_TYPE__ __hostword),{ return (__UINT16_TYPE__)__hybrid_htobe32(__hostword); })
 #elif defined(__CRT_HAVE_ntohs) && defined(__HYBRID_HTOBE_IS_BETOH)
@@ -102,7 +102,7 @@ __LOCAL __ATTR_CONST __UINT16_TYPE__ __NOTHROW_NCX(__LIBCCALL htons)(__UINT16_TY
 #endif /* !... */
 #endif /* !__htons_defined */
 #ifndef __ntohs_defined
-#define __ntohs_defined 1
+#define __ntohs_defined
 #ifdef __CRT_HAVE_ntohs
 __CEIDECLARE(__ATTR_CONST,__UINT16_TYPE__,__NOTHROW_NCX,ntohs,(__UINT16_TYPE__ __netshort),{ return (__UINT16_TYPE__)__hybrid_betoh16(__netshort); })
 #elif defined(__CRT_HAVE_htons) && defined(__HYBRID_HTOBE_IS_BETOH)
@@ -112,7 +112,7 @@ __LOCAL __ATTR_CONST __UINT16_TYPE__ __NOTHROW_NCX(__LIBCCALL ntohs)(__UINT16_TY
 #endif /* !... */
 #endif /* !__ntohs_defined */
 #ifndef __htonl_defined
-#define __htonl_defined 1
+#define __htonl_defined
 #ifdef __CRT_HAVE_htonl
 __CEIDECLARE(__ATTR_CONST,__UINT32_TYPE__,__NOTHROW_NCX,htonl,(__UINT32_TYPE__ __hostlong),{ return (__UINT32_TYPE__)__hybrid_htobe32(__hostlong); })
 #elif defined(__CRT_HAVE_ntohl) && defined(__HYBRID_HTOBE_IS_BETOH)
@@ -122,7 +122,7 @@ __LOCAL __ATTR_CONST __UINT32_TYPE__ __NOTHROW_NCX(__LIBCCALL htonl)(__UINT32_TY
 #endif /* !... */
 #endif /* !__htonl_defined */
 #ifndef __ntohl_defined
-#define __ntohl_defined 1
+#define __ntohl_defined
 #ifdef __CRT_HAVE_ntohl
 __CEIDECLARE(__ATTR_CONST,__UINT32_TYPE__,__NOTHROW_NCX,ntohl,(__UINT32_TYPE__ __netlong),{ return (__UINT32_TYPE__)__hybrid_betoh32(__netlong); })
 #elif defined(__CRT_HAVE_htonl) && defined(__HYBRID_HTOBE_IS_BETOH)

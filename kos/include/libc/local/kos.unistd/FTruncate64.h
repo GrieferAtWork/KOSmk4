@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7bd68669 */
+/* HASH CRC-32:0x785259d6 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,14 +19,14 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_FTruncate64_defined
-#define __local_FTruncate64_defined 1
+#define __local_FTruncate64_defined
 #include <__crt.h>
 #ifdef __CRT_HAVE_FTruncate
 #include <kos/anno.h>
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_FTruncate32_defined
-#define __local___localdep_FTruncate32_defined 1
+#define __local___localdep_FTruncate32_defined
 __CREDIRECT(,int,__THROWING,__localdep_FTruncate32,(__fd_t __fd, __pos32_t __length),FTruncate,(__fd,__length))
 #endif /* !__local___localdep_FTruncate32_defined */
 __LOCAL_LIBC(FTruncate64) void
@@ -35,7 +35,7 @@ __LOCAL_LIBC(FTruncate64) void
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_FTruncate64_defined
-#define __local___localdep_FTruncate64_defined 1
+#define __local___localdep_FTruncate64_defined
 #define __localdep_FTruncate64 __LIBC_LOCAL_NAME(FTruncate64)
 #endif /* !__local___localdep_FTruncate64_defined */
 #else /* __CRT_HAVE_FTruncate */

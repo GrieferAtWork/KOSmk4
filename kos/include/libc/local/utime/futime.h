@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe33d5be3 */
+/* HASH CRC-32:0x197b0887 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,13 +19,13 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_futime_defined
-#define __local_futime_defined 1
+#define __local_futime_defined
 #include <__crt.h>
 #if defined(__CRT_HAVE_futime) || defined(__CRT_HAVE__futime32) || defined(__CRT_HAVE_futime64) || defined(__CRT_HAVE__futime64)
 #include <bits/os/utimbuf.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_crt_futime32_defined
-#define __local___localdep_crt_futime32_defined 1
+#define __local___localdep_crt_futime32_defined
 #ifdef __CRT_HAVE_futime
 __CREDIRECT(,int,__NOTHROW_RPC,__localdep_crt_futime32,(__fd_t __fd, struct __utimbuf32 const *__file_times),futime,(__fd,__file_times))
 #elif defined(__CRT_HAVE__futime32)
@@ -35,7 +35,7 @@ __CREDIRECT(,int,__NOTHROW_RPC,__localdep_crt_futime32,(__fd_t __fd, struct __ut
 #endif /* !... */
 #endif /* !__local___localdep_crt_futime32_defined */
 #ifndef __local___localdep_crt_futime64_defined
-#define __local___localdep_crt_futime64_defined 1
+#define __local___localdep_crt_futime64_defined
 #ifdef __CRT_HAVE_futime64
 __CREDIRECT(,int,__NOTHROW_RPC,__localdep_crt_futime64,(__fd_t __fd, struct __utimbuf64 const *__file_times),futime64,(__fd,__file_times))
 #elif defined(__CRT_HAVE__futime64)
@@ -74,7 +74,7 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(futime))(__fd_t __fd, struct utimbuf 
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_futime_defined
-#define __local___localdep_futime_defined 1
+#define __local___localdep_futime_defined
 #define __localdep_futime __LIBC_LOCAL_NAME(futime)
 #endif /* !__local___localdep_futime_defined */
 #else /* __CRT_HAVE_futime || __CRT_HAVE__futime32 || __CRT_HAVE_futime64 || __CRT_HAVE__futime64 */

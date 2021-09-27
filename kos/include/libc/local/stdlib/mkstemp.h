@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x37d5e9f */
+/* HASH CRC-32:0xf2489e9e */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_mkstemp_defined
-#define __local_mkstemp_defined 1
+#define __local_mkstemp_defined
 #include <__crt.h>
 #include <features.h>
 #include <asm/os/oflags.h>
@@ -28,7 +28,7 @@
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_mkstemps_defined
-#define __local___localdep_mkstemps_defined 1
+#define __local___localdep_mkstemps_defined
 #if defined(__CRT_HAVE_mkstemps) && (!defined(__USE_FILE_OFFSET64) || !defined(__O_LARGEFILE) || !__O_LARGEFILE)
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,__localdep_mkstemps,(char *__template_, __STDC_INT_AS_SIZE_T __suffixlen),mkstemps,(__template_,__suffixlen))
 #elif defined(__CRT_HAVE_mkstemps64)
@@ -48,7 +48,7 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(mkstemp))(char *__template_) {
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_mkstemp_defined
-#define __local___localdep_mkstemp_defined 1
+#define __local___localdep_mkstemp_defined
 #define __localdep_mkstemp __LIBC_LOCAL_NAME(mkstemp)
 #endif /* !__local___localdep_mkstemp_defined */
 #else /* (__CRT_HAVE_mkstemps && (!__USE_FILE_OFFSET64 || !__O_LARGEFILE || !__O_LARGEFILE)) || __CRT_HAVE_mkstemps64 || (__CRT_HAVE_mkostemps && (!__USE_FILE_OFFSET64 || !__O_LARGEFILE || !__O_LARGEFILE)) || __CRT_HAVE_mkostemps64 || __CRT_HAVE_open64 || __CRT_HAVE___open64 || __CRT_HAVE_open || __CRT_HAVE__open || __CRT_HAVE___open || (__AT_FDCWD && (__CRT_HAVE_openat64 || __CRT_HAVE_openat)) */

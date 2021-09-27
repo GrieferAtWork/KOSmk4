@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4d9a6352 */
+/* HASH CRC-32:0xf23e26ea */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,14 +19,14 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_Truncate64_defined
-#define __local_Truncate64_defined 1
+#define __local_Truncate64_defined
 #include <__crt.h>
 #ifdef __CRT_HAVE_Truncate
 #include <kos/anno.h>
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_Truncate32_defined
-#define __local___localdep_Truncate32_defined 1
+#define __local___localdep_Truncate32_defined
 __CREDIRECT(__ATTR_NONNULL((1)),__vodi,__THROWING,__localdep_Truncate32,(char const *__file, __pos32_t __length),Truncate,(__file,__length))
 #endif /* !__local___localdep_Truncate32_defined */
 __LOCAL_LIBC(Truncate64) __ATTR_NONNULL((1)) void
@@ -35,7 +35,7 @@ __LOCAL_LIBC(Truncate64) __ATTR_NONNULL((1)) void
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_Truncate64_defined
-#define __local___localdep_Truncate64_defined 1
+#define __local___localdep_Truncate64_defined
 #define __localdep_Truncate64 __LIBC_LOCAL_NAME(Truncate64)
 #endif /* !__local___localdep_Truncate64_defined */
 #else /* __CRT_HAVE_Truncate */

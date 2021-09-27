@@ -78,12 +78,12 @@ DECL_BEGIN
 #ifdef __CC__
 
 #ifndef __sigset_t_defined
-#define __sigset_t_defined 1
+#define __sigset_t_defined
 typedef struct __sigset_struct sigset_t;
 #endif /* !__sigset_t_defined */
 
 #ifndef __siginfo_t_defined
-#define __siginfo_t_defined 1
+#define __siginfo_t_defined
 typedef struct __siginfo_struct siginfo_t;
 #endif /* !__siginfo_t_defined */
 

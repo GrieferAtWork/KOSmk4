@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2c0fbc91 */
+/* HASH CRC-32:0xab5c63bb */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,11 +19,11 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_strtof_l_defined
-#define __local_strtof_l_defined 1
+#define __local_strtof_l_defined
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_strtof_defined
-#define __local___localdep_strtof_defined 1
+#define __local___localdep_strtof_defined
 #ifdef __CRT_HAVE_strtof
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),float,__NOTHROW_NCX,__localdep_strtof,(char const *__restrict __nptr, char **__endptr),strtof,(__nptr,__endptr))
 #else /* __CRT_HAVE_strtof */
@@ -40,7 +40,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strtof_l))(char const *__restrict __n
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_strtof_l_defined
-#define __local___localdep_strtof_l_defined 1
+#define __local___localdep_strtof_l_defined
 #define __localdep_strtof_l __LIBC_LOCAL_NAME(strtof_l)
 #endif /* !__local___localdep_strtof_l_defined */
 #endif /* !__local_strtof_l_defined */

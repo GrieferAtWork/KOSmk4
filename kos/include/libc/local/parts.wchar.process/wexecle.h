@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x83f83b0d */
+/* HASH CRC-32:0x7a2d58d5 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,12 +19,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_wexecle_defined
-#define __local_wexecle_defined 1
+#define __local_wexecle_defined
 #include <__crt.h>
 #if defined(__CRT_HAVE_wexecve) || defined(__CRT_HAVE__wexecve)
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_wexecve_defined
-#define __local___localdep_wexecve_defined 1
+#define __local___localdep_wexecve_defined
 #ifdef __CRT_HAVE_wexecve
 __NAMESPACE_LOCAL_END
 #include <features.h>
@@ -66,7 +66,7 @@ __NOTHROW_RPC(__VLIBCCALL __LIBC_LOCAL_NAME(wexecle))(__WCHAR_TYPE__ const *__re
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_wexecle_defined
-#define __local___localdep_wexecle_defined 1
+#define __local___localdep_wexecle_defined
 #define __localdep_wexecle __LIBC_LOCAL_NAME(wexecle)
 #endif /* !__local___localdep_wexecle_defined */
 #else /* __CRT_HAVE_wexecve || __CRT_HAVE__wexecve */

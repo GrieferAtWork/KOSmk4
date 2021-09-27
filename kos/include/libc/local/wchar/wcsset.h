@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf73c73a2 */
+/* HASH CRC-32:0xa5240f95 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_wcsset_defined
-#define __local_wcsset_defined 1
+#define __local_wcsset_defined
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(wcsset) __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)) __WCHAR_TYPE__ *
@@ -31,7 +31,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcsset))(__WCHAR_TYPE__ *__restrict _
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_wcsset_defined
-#define __local___localdep_wcsset_defined 1
+#define __local___localdep_wcsset_defined
 #define __localdep_wcsset __LIBC_LOCAL_NAME(wcsset)
 #endif /* !__local___localdep_wcsset_defined */
 #endif /* !__local_wcsset_defined */

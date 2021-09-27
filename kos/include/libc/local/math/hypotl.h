@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf9619f60 */
+/* HASH CRC-32:0xfb3f90e4 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,12 +19,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_hypotl_defined
-#define __local_hypotl_defined 1
+#define __local_hypotl_defined
 #include <__crt.h>
 #if defined(__CRT_HAVE_hypot) || defined(__CRT_HAVE___hypot)
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_hypot_defined
-#define __local___localdep_hypot_defined 1
+#define __local___localdep_hypot_defined
 #if __has_builtin(__builtin_hypot) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_hypot)
 __CEIREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_hypot,(double __x, double __y),hypot,{ return __builtin_hypot(__x, __y); })
 #elif defined(__CRT_HAVE_hypot)
@@ -41,7 +41,7 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(hypotl))(__LONGDOUBLE __x, __LONGDOUBLE _
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_hypotl_defined
-#define __local___localdep_hypotl_defined 1
+#define __local___localdep_hypotl_defined
 #define __localdep_hypotl __LIBC_LOCAL_NAME(hypotl)
 #endif /* !__local___localdep_hypotl_defined */
 #else /* __CRT_HAVE_hypot || __CRT_HAVE___hypot */

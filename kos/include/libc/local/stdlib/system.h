@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8555448c */
+/* HASH CRC-32:0x4efc5441 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,13 +19,13 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_system_defined
-#define __local_system_defined 1
+#define __local_system_defined
 #include <__crt.h>
 #include <libc/template/environ.h>
 #if (defined(__CRT_HAVE_shexec) || defined(__CRT_HAVE_execl) || defined(__CRT_HAVE__execl) || defined(__CRT_HAVE_execv) || defined(__CRT_HAVE__execv) || ((defined(__CRT_HAVE_execve) || defined(__CRT_HAVE__execve)) && defined(__LOCAL_environ))) && (defined(__CRT_HAVE__Exit) || defined(__CRT_HAVE__exit) || defined(__CRT_HAVE_quick_exit) || defined(__CRT_HAVE_exit)) && (defined(__CRT_HAVE_waitpid) || defined(__CRT_HAVE___waitpid)) && (defined(__CRT_HAVE_vfork) || defined(__CRT_HAVE___vfork) || defined(__CRT_HAVE_fork) || defined(__CRT_HAVE___fork))
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep__Exit_defined
-#define __local___localdep__Exit_defined 1
+#define __local___localdep__Exit_defined
 #if __has_builtin(__builtin__Exit) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE__Exit)
 __NAMESPACE_LOCAL_END
 #include <kos/anno.h>
@@ -61,7 +61,7 @@ __CREDIRECT_VOID(__ATTR_NORETURN,__THROWING,__localdep__Exit,(int __status),exit
 #endif /* !... */
 #endif /* !__local___localdep__Exit_defined */
 #ifndef __local___localdep_fork_defined
-#define __local___localdep_fork_defined 1
+#define __local___localdep_fork_defined
 #if __has_builtin(__builtin_fork) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_fork)
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
@@ -82,7 +82,7 @@ __CREDIRECT(__ATTR_WUNUSED,__pid_t,__NOTHROW_NCX,__localdep_fork,(void),__fork,(
 #endif /* !... */
 #endif /* !__local___localdep_fork_defined */
 #ifndef __local___localdep_shexec_defined
-#define __local___localdep_shexec_defined 1
+#define __local___localdep_shexec_defined
 #ifdef __CRT_HAVE_shexec
 __CREDIRECT(,int,__NOTHROW_RPC,__localdep_shexec,(char const *__command),shexec,(__command))
 #elif defined(__CRT_HAVE_execl) || defined(__CRT_HAVE__execl) || defined(__CRT_HAVE_execv) || defined(__CRT_HAVE__execv) || ((defined(__CRT_HAVE_execve) || defined(__CRT_HAVE__execve)) && defined(__LOCAL_environ))
@@ -95,7 +95,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_shexec_defined */
 #ifndef __local___localdep_vfork_defined
-#define __local___localdep_vfork_defined 1
+#define __local___localdep_vfork_defined
 #ifdef __CRT_HAVE_vfork
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
@@ -111,7 +111,7 @@ __CREDIRECT(__ATTR_RETURNS_TWICE __ATTR_WUNUSED,__pid_t,__NOTHROW_NCX,__localdep
 #endif /* !... */
 #endif /* !__local___localdep_vfork_defined */
 #ifndef __local___localdep_waitpid_defined
-#define __local___localdep_waitpid_defined 1
+#define __local___localdep_waitpid_defined
 #ifdef __CRT_HAVE_waitpid
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
@@ -174,7 +174,7 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(system))(char const *__command) {
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_system_defined
-#define __local___localdep_system_defined 1
+#define __local___localdep_system_defined
 #define __localdep_system __LIBC_LOCAL_NAME(system)
 #endif /* !__local___localdep_system_defined */
 #else /* (__CRT_HAVE_shexec || __CRT_HAVE_execl || __CRT_HAVE__execl || __CRT_HAVE_execv || __CRT_HAVE__execv || ((__CRT_HAVE_execve || __CRT_HAVE__execve) && __LOCAL_environ)) && (__CRT_HAVE__Exit || __CRT_HAVE__exit || __CRT_HAVE_quick_exit || __CRT_HAVE_exit) && (__CRT_HAVE_waitpid || __CRT_HAVE___waitpid) && (__CRT_HAVE_vfork || __CRT_HAVE___vfork || __CRT_HAVE_fork || __CRT_HAVE___fork) */

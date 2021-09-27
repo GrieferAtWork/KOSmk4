@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x89d9080 */
+/* HASH CRC-32:0x9fedcfbf */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,13 +19,13 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_nanl_defined
-#define __local_nanl_defined 1
+#define __local_nanl_defined
 #include <__crt.h>
 #include <ieee754.h>
 #if defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_nan) || defined(__CRT_HAVE___nan) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_nan_defined
-#define __local___localdep_nan_defined 1
+#define __local___localdep_nan_defined
 #if __has_builtin(__builtin_nan) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_nan)
 __CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__localdep_nan,(char const *__tagb),nan,{ return __builtin_nan(__tagb); })
 #elif defined(__CRT_HAVE_nan)
@@ -56,7 +56,7 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(nanl))(char const *__tagb) {
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_nanl_defined
-#define __local___localdep_nanl_defined 1
+#define __local___localdep_nanl_defined
 #define __localdep_nanl __LIBC_LOCAL_NAME(nanl)
 #endif /* !__local___localdep_nanl_defined */
 #else /* __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __CRT_HAVE_nan || __CRT_HAVE___nan || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */

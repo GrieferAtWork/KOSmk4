@@ -432,7 +432,7 @@ Note on bindings:
   ```c
   #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
   #ifndef __dwrap_sTPTP_TDTPTPTP_c0c1A1A2_defined
-  #define __dwrap_sTPTP_TDTPTPTP_c0c1A1A2_defined 1
+  #define __dwrap_sTPTP_TDTPTPTP_c0c1A1A2_defined
   struct _dwrap_cookie_struct_sTPTP_TDTPTPTP_c0c1A1A2 {
       int (LIBDCALL *compar)(void *arg, void const *a, void const *b);
       void *arg;

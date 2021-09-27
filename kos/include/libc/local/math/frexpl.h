@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3f754c4c */
+/* HASH CRC-32:0x3acb1a10 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,13 +19,13 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_frexpl_defined
-#define __local_frexpl_defined 1
+#define __local_frexpl_defined
 #include <__crt.h>
 #include <ieee754.h>
 #if defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_frexp) || defined(__CRT_HAVE___frexp) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_frexp_defined
-#define __local___localdep_frexp_defined 1
+#define __local___localdep_frexp_defined
 #if __has_builtin(__builtin_frexp) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_frexp)
 __CEIREDIRECT(__ATTR_NONNULL((2)),double,__NOTHROW_NCX,__localdep_frexp,(double __x, int *__pexponent),frexp,{ return __builtin_frexp(__x, __pexponent); })
 #elif defined(__CRT_HAVE_frexp)
@@ -63,7 +63,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(frexpl))(__LONGDOUBLE __x, int *__pex
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_frexpl_defined
-#define __local___localdep_frexpl_defined 1
+#define __local___localdep_frexpl_defined
 #define __localdep_frexpl __LIBC_LOCAL_NAME(frexpl)
 #endif /* !__local___localdep_frexpl_defined */
 #else /* __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __CRT_HAVE_frexp || __CRT_HAVE___frexp || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x19c4e836 */
+/* HASH CRC-32:0x4501edeb */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,13 +19,13 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_sqrtf_defined
-#define __local_sqrtf_defined 1
+#define __local_sqrtf_defined
 #include <__crt.h>
 #include <ieee754.h>
 #if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_sqrt) || defined(__CRT_HAVE___sqrt) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_sqrt_defined
-#define __local___localdep_sqrt_defined 1
+#define __local___localdep_sqrt_defined
 #if __has_builtin(__builtin_sqrt) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_sqrt)
 __CEIREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_sqrt,(double __x),sqrt,{ return __builtin_sqrt(__x); })
 #elif defined(__CRT_HAVE_sqrt)
@@ -61,7 +61,7 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(sqrtf))(float __x) {
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_sqrtf_defined
-#define __local___localdep_sqrtf_defined 1
+#define __local___localdep_sqrtf_defined
 #define __localdep_sqrtf __LIBC_LOCAL_NAME(sqrtf)
 #endif /* !__local___localdep_sqrtf_defined */
 #else /* __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ || __CRT_HAVE_sqrt || __CRT_HAVE___sqrt || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */

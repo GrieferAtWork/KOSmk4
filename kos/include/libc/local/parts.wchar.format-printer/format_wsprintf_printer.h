@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5782024d */
+/* HASH CRC-32:0x2d3044d6 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,11 +19,11 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_format_wsprintf_printer_defined
-#define __local_format_wsprintf_printer_defined 1
+#define __local_format_wsprintf_printer_defined
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_mempcpyc_defined
-#define __local___localdep_mempcpyc_defined 1
+#define __local___localdep_mempcpyc_defined
 #ifdef __CRT_HAVE_mempcpyc
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
@@ -43,7 +43,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(format_wsprintf_printer))(void *__arg
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_format_wsprintf_printer_defined
-#define __local___localdep_format_wsprintf_printer_defined 1
+#define __local___localdep_format_wsprintf_printer_defined
 #define __localdep_format_wsprintf_printer __LIBC_LOCAL_NAME(format_wsprintf_printer)
 #endif /* !__local___localdep_format_wsprintf_printer_defined */
 #endif /* !__local_format_wsprintf_printer_defined */

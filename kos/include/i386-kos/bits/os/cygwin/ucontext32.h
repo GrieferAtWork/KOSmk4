@@ -63,7 +63,7 @@
 __DECL_BEGIN
 
 #ifndef ____sigsetx32_t_defined
-#define ____sigsetx32_t_defined 1
+#define ____sigsetx32_t_defined
 #ifdef __x86_64__
 struct __sigset_structx32 {
 	__UINT32_TYPE__ __val[__SIZEOF_SIGSET_T__ / 4];

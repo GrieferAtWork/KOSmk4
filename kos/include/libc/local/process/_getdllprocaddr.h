@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x76685cb8 */
+/* HASH CRC-32:0xfdc71535 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local__getdllprocaddr_defined
-#define __local__getdllprocaddr_defined 1
+#define __local__getdllprocaddr_defined
 #include <__crt.h>
 #include <libdl/asm/dlfcn.h>
 #ifdef __CRT_HAVE_dlsym
@@ -27,7 +27,7 @@
 #include <features.h>
 #include <bits/types.h>
 #ifndef ____procfun_defined
-#define ____procfun_defined 1
+#define ____procfun_defined
 typedef int (*__procfun)(void);
 #endif /* !____procfun_defined */
 #include <dlfcn.h>
@@ -39,7 +39,7 @@ __LOCAL_LIBC(_getdllprocaddr) __procfun
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep__getdllprocaddr_defined
-#define __local___localdep__getdllprocaddr_defined 1
+#define __local___localdep__getdllprocaddr_defined
 #define __localdep__getdllprocaddr __LIBC_LOCAL_NAME(_getdllprocaddr)
 #endif /* !__local___localdep__getdllprocaddr_defined */
 #else /* __CRT_HAVE_dlsym */

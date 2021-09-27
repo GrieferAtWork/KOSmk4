@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xaf813e51 */
+/* HASH CRC-32:0xd49a1107 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,12 +19,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_memxlenw_defined
-#define __local_memxlenw_defined 1
+#define __local_memxlenw_defined
 #include <__crt.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_memxendw_defined
-#define __local___localdep_memxendw_defined 1
+#define __local___localdep_memxendw_defined
 #ifdef __CRT_HAVE_memxendw
 __CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),__UINT16_TYPE__ *,__NOTHROW_NCX,__localdep_memxendw,(void const *__restrict __haystack, __UINT16_TYPE__ __needle, __SIZE_TYPE__ __n_bytes),memxendw,(__haystack,__needle,__n_bytes))
 #else /* __CRT_HAVE_memxendw */
@@ -40,7 +40,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memxlenw))(void const *__restrict __h
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_memxlenw_defined
-#define __local___localdep_memxlenw_defined 1
+#define __local___localdep_memxlenw_defined
 #define __localdep_memxlenw __LIBC_LOCAL_NAME(memxlenw)
 #endif /* !__local___localdep_memxlenw_defined */
 #endif /* !__local_memxlenw_defined */

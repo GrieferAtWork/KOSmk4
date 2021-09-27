@@ -26,15 +26,15 @@
 
 #if defined(__i386__) && !defined(__x86_64__)
 #define LIBVIOCORE_CC __ATTR_FASTCALL
-#else
+#else /* ... */
 #define LIBVIOCORE_CC /* nothing */
-#endif
+#endif /* !... */
 
 #if (!defined(LIBVIOCORE_WANT_PROTOTYPES) &&    \
      defined(__KOS__) && defined(__KERNEL__) && \
      defined(LIBVIO_CONFIG_ENABLED))
-#define LIBVIOCORE_WANT_PROTOTYPES 1
-#endif
+#define LIBVIOCORE_WANT_PROTOTYPES
+#endif /* ... */
 
 #ifdef __LIBVIOCORE_STATIC
 #define LIBVIOCORE_DECL __INTDEF

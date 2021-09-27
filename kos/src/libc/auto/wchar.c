@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfdf46526 */
+/* HASH CRC-32:0x5715b57 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1252,7 +1252,7 @@ __NAMESPACE_LOCAL_END
 
 
 #ifndef ____vsc16scanf_getc_defined
-#define ____vsc16scanf_getc_defined 1
+#define ____vsc16scanf_getc_defined
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(vsc16scanf_getc) ssize_t
 (FORMATPRINTER_CC vsc16scanf_getc)(void *arg) {
@@ -1356,7 +1356,7 @@ __NAMESPACE_LOCAL_END
 
 
 #ifndef ____vsc32scanf_getc_defined
-#define ____vsc32scanf_getc_defined 1
+#define ____vsc32scanf_getc_defined
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(vsc32scanf_getc) ssize_t
 (FORMATPRINTER_CC vsc32scanf_getc)(void *arg) {
@@ -1420,7 +1420,7 @@ __NAMESPACE_LOCAL_END
 
 
 #ifndef ____vsc16scanf_getc_defined
-#define ____vsc16scanf_getc_defined 1
+#define ____vsc16scanf_getc_defined
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(vsc16scanf_getc) ssize_t
 (FORMATPRINTER_CC vsc16scanf_getc)(void *arg) {
@@ -1524,7 +1524,7 @@ __NAMESPACE_LOCAL_END
 
 
 #ifndef ____vsc32scanf_getc_defined
-#define ____vsc32scanf_getc_defined 1
+#define ____vsc32scanf_getc_defined
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(vsc32scanf_getc) ssize_t
 (FORMATPRINTER_CC vsc32scanf_getc)(void *arg) {
@@ -1588,7 +1588,7 @@ __NAMESPACE_LOCAL_END
 
 
 #ifndef ____vsc16scanf_getc_defined
-#define ____vsc16scanf_getc_defined 1
+#define ____vsc16scanf_getc_defined
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(vsc16scanf_getc) ssize_t
 (FORMATPRINTER_CC vsc16scanf_getc)(void *arg) {
@@ -1692,7 +1692,7 @@ __NAMESPACE_LOCAL_END
 
 
 #ifndef ____vsc32scanf_getc_defined
-#define ____vsc32scanf_getc_defined 1
+#define ____vsc32scanf_getc_defined
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(vsc32scanf_getc) ssize_t
 (FORMATPRINTER_CC vsc32scanf_getc)(void *arg) {

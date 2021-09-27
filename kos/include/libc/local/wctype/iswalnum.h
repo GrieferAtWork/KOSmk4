@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcb352a9d */
+/* HASH CRC-32:0x65e62227 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,12 +19,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_iswalnum_defined
-#define __local_iswalnum_defined 1
+#define __local_iswalnum_defined
 #include <__crt.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_isalnum_defined
-#define __local___localdep_isalnum_defined 1
+#define __local___localdep_isalnum_defined
 __NAMESPACE_LOCAL_END
 #include <bits/crt/ctype.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -44,7 +44,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_isalnum_defined */
 #ifndef __local___localdep_wctob_defined
-#define __local___localdep_wctob_defined 1
+#define __local___localdep_wctob_defined
 #ifdef __CRT_HAVE_wctob
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep_wctob,(__WINT_TYPE__ __ch),wctob,(__ch))
 #else /* __CRT_HAVE_wctob */
@@ -67,7 +67,7 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(iswalnum))(__WINT_TYPE__ __wc) {
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_iswalnum_defined
-#define __local___localdep_iswalnum_defined 1
+#define __local___localdep_iswalnum_defined
 #define __localdep_iswalnum __LIBC_LOCAL_NAME(iswalnum)
 #endif /* !__local___localdep_iswalnum_defined */
 #endif /* !__local_iswalnum_defined */

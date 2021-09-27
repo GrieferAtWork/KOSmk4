@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x729bff67 */
+/* HASH CRC-32:0x17d9e454 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,19 +32,19 @@
 
 #ifndef ____libc_error_defined
 #ifdef __fast_error_defined
-#define ____libc_error_defined 1
+#define ____libc_error_defined
 #define __libc_error (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(error))
 #elif defined(____libc_core_error_defined)
-#define ____libc_error_defined 1
+#define ____libc_error_defined
 #define __libc_error __libc_core_error
 #endif /* ... */
 #endif /* !____libc_error_defined */
 #ifndef ____libc_error_at_line_defined
 #ifdef __fast_error_at_line_defined
-#define ____libc_error_at_line_defined 1
+#define ____libc_error_at_line_defined
 #define __libc_error_at_line (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(error_at_line))
 #elif defined(____libc_core_error_at_line_defined)
-#define ____libc_error_at_line_defined 1
+#define ____libc_error_at_line_defined
 #define __libc_error_at_line __libc_core_error_at_line
 #endif /* ... */
 #endif /* !____libc_error_at_line_defined */

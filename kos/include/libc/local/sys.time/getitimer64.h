@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbb221a82 */
+/* HASH CRC-32:0x616b04a9 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,13 +19,13 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_getitimer64_defined
-#define __local_getitimer64_defined 1
+#define __local_getitimer64_defined
 #include <__crt.h>
 #ifdef __CRT_HAVE_getitimer
 #include <bits/os/itimerval.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_getitimer32_defined
-#define __local___localdep_getitimer32_defined 1
+#define __local___localdep_getitimer32_defined
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_getitimer32,(int __which, struct __itimerval32 *__curr_value),getitimer,(__which,__curr_value))
 #endif /* !__local___localdep_getitimer32_defined */
 __LOCAL_LIBC(getitimer64) __ATTR_NONNULL((2)) int
@@ -43,7 +43,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(getitimer64))(int __which, struct __i
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_getitimer64_defined
-#define __local___localdep_getitimer64_defined 1
+#define __local___localdep_getitimer64_defined
 #define __localdep_getitimer64 __LIBC_LOCAL_NAME(getitimer64)
 #endif /* !__local___localdep_getitimer64_defined */
 #else /* __CRT_HAVE_getitimer */

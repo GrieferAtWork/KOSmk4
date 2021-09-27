@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3f5ae58d */
+/* HASH CRC-32:0xd6bace92 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,12 +19,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_c16sncoll_l_defined
-#define __local_c16sncoll_l_defined 1
+#define __local_c16sncoll_l_defined
 #include <__crt.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_c16sncoll_defined
-#define __local___localdep_c16sncoll_defined 1
+#define __local___localdep_c16sncoll_defined
 #if defined(__CRT_HAVE_wcsncoll) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_c16sncoll,(__CHAR16_TYPE__ const *__s1, __CHAR16_TYPE__ const *__s2, __SIZE_TYPE__ __maxlen),wcsncoll,(__s1,__s2,__maxlen))
 #elif defined(__CRT_HAVE_DOS$wcsncoll)
@@ -52,7 +52,7 @@ __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(c16sncoll_l))(__CHAR16_TYPE__ const *
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_c16sncoll_l_defined
-#define __local___localdep_c16sncoll_l_defined 1
+#define __local___localdep_c16sncoll_l_defined
 #define __localdep_c16sncoll_l __LIBC_LOCAL_NAME(c16sncoll_l)
 #endif /* !__local___localdep_c16sncoll_l_defined */
 #endif /* !__local_c16sncoll_l_defined */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa1f66b60 */
+/* HASH CRC-32:0x316a887d */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,12 +19,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_bzeroq_defined
-#define __local_bzeroq_defined 1
+#define __local_bzeroq_defined
 #include <__crt.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_bzerol_defined
-#define __local___localdep_bzerol_defined 1
+#define __local___localdep_bzerol_defined
 #ifdef __CRT_HAVE_bzerol
 __CREDIRECT_VOID(__ATTR_LEAF __ATTR_NONNULL((1)),__NOTHROW_NCX,__localdep_bzerol,(void *__restrict __dst, __SIZE_TYPE__ __num_dwords),bzerol,(__dst,__num_dwords))
 #else /* __CRT_HAVE_bzerol */
@@ -35,7 +35,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__CRT_HAVE_bzerol */
 #endif /* !__local___localdep_bzerol_defined */
 #ifndef __local___localdep_memsetq_defined
-#define __local___localdep_memsetq_defined 1
+#define __local___localdep_memsetq_defined
 #ifdef __CRT_HAVE_memsetq
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),__UINT64_TYPE__ *,__NOTHROW_NCX,__localdep_memsetq,(void *__restrict __dst, __UINT64_TYPE__ __qword, __SIZE_TYPE__ __n_qwords),memsetq,(__dst,__qword,__n_qwords))
 #else /* __CRT_HAVE_memsetq */
@@ -55,7 +55,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(bzeroq))(void *__restrict __dst, __SI
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_bzeroq_defined
-#define __local___localdep_bzeroq_defined 1
+#define __local___localdep_bzeroq_defined
 #define __localdep_bzeroq __LIBC_LOCAL_NAME(bzeroq)
 #endif /* !__local___localdep_bzeroq_defined */
 #endif /* !__local_bzeroq_defined */

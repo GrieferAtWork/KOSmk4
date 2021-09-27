@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb0b6da0 */
+/* HASH CRC-32:0x5d14e882 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,13 +19,13 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_format_aprintf_alloc_defined
-#define __local_format_aprintf_alloc_defined 1
+#define __local_format_aprintf_alloc_defined
 #include <__crt.h>
 #ifdef __CRT_HAVE_realloc
 struct format_aprintf_data;
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_realloc_defined
-#define __local___localdep_realloc_defined 1
+#define __local___localdep_realloc_defined
 #if __has_builtin(__builtin_realloc) && defined(__LIBC_BIND_CRTBUILTINS)
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
@@ -41,7 +41,7 @@ __CREDIRECT(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)),vo
 __NAMESPACE_LOCAL_END
 #include <hybrid/__assert.h>
 #ifndef __format_aprintf_data_defined
-#define __format_aprintf_data_defined 1
+#define __format_aprintf_data_defined
 struct format_aprintf_data {
 	char         *ap_base;  /* [0..ap_used|ALLOC(ap_used+ap_avail)][owned] Buffer */
 	__SIZE_TYPE__ ap_avail; /* Unused buffer size */
@@ -80,7 +80,7 @@ __err:
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_format_aprintf_alloc_defined
-#define __local___localdep_format_aprintf_alloc_defined 1
+#define __local___localdep_format_aprintf_alloc_defined
 #define __localdep_format_aprintf_alloc __LIBC_LOCAL_NAME(format_aprintf_alloc)
 #endif /* !__local___localdep_format_aprintf_alloc_defined */
 #else /* __CRT_HAVE_realloc */

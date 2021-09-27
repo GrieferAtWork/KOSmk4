@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf79fcbd1 */
+/* HASH CRC-32:0x7a4da5d6 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_pthread_mutex_timedlock_defined
-#define __local_pthread_mutex_timedlock_defined 1
+#define __local_pthread_mutex_timedlock_defined
 #include <__crt.h>
 #include <bits/types.h>
 #if defined(__CRT_HAVE_pthread_mutex_timedlock64) || defined(__CRT_HAVE_pthread_mutex_timedlock)
@@ -27,11 +27,11 @@
 #include <bits/os/timespec.h>
 __NAMESPACE_LOCAL_BEGIN
 #if !defined(__local___localdep_pthread_mutex_timedlock32_defined) && defined(__CRT_HAVE_pthread_mutex_timedlock)
-#define __local___localdep_pthread_mutex_timedlock32_defined 1
+#define __local___localdep_pthread_mutex_timedlock32_defined
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_RPC,__localdep_pthread_mutex_timedlock32,(__pthread_mutex_t *__restrict __mutex, struct timespec const *__restrict __abstime),pthread_mutex_timedlock,(__mutex,__abstime))
 #endif /* !__local___localdep_pthread_mutex_timedlock32_defined && __CRT_HAVE_pthread_mutex_timedlock */
 #ifndef __local___localdep_pthread_mutex_timedlock64_defined
-#define __local___localdep_pthread_mutex_timedlock64_defined 1
+#define __local___localdep_pthread_mutex_timedlock64_defined
 #if defined(__CRT_HAVE_pthread_mutex_timedlock) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_RPC,__localdep_pthread_mutex_timedlock64,(__pthread_mutex_t *__restrict __mutex, struct __timespec64 const *__restrict __abstime),pthread_mutex_timedlock,(__mutex,__abstime))
 #elif defined(__CRT_HAVE_pthread_mutex_timedlock64)
@@ -65,7 +65,7 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(pthread_mutex_timedlock))(__pthread_m
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_pthread_mutex_timedlock_defined
-#define __local___localdep_pthread_mutex_timedlock_defined 1
+#define __local___localdep_pthread_mutex_timedlock_defined
 #define __localdep_pthread_mutex_timedlock __LIBC_LOCAL_NAME(pthread_mutex_timedlock)
 #endif /* !__local___localdep_pthread_mutex_timedlock_defined */
 #else /* __CRT_HAVE_pthread_mutex_timedlock64 || __CRT_HAVE_pthread_mutex_timedlock */

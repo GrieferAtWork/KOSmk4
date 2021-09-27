@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc4a9be91 */
+/* HASH CRC-32:0x435bb78a */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,14 +19,14 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_hcreate_r_defined
-#define __local_hcreate_r_defined 1
+#define __local_hcreate_r_defined
 #include <__crt.h>
 #if defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign)
 struct hsearch_data;
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_calloc_defined
-#define __local___localdep_calloc_defined 1
+#define __local___localdep_calloc_defined
 #if __has_builtin(__builtin_calloc) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_calloc)
 __CEIREDIRECT(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1, 2)),void *,__NOTHROW_NCX,__localdep_calloc,(__SIZE_TYPE__ __count, __SIZE_TYPE__ __num_bytes),calloc,{ return __builtin_calloc(__count, __num_bytes); })
 #elif defined(__CRT_HAVE_calloc)
@@ -42,7 +42,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__local___localdep_calloc_defined */
 __NAMESPACE_LOCAL_END
 #ifndef __hsearch_data_defined
-#define __hsearch_data_defined 1
+#define __hsearch_data_defined
 struct _ENTRY;
 struct hsearch_data {
 	struct _ENTRY  *table;
@@ -51,7 +51,7 @@ struct hsearch_data {
 };
 #endif /* !__hsearch_data_defined */
 #ifndef __ENTRY_defined
-#define __ENTRY_defined 1
+#define __ENTRY_defined
 typedef struct entry {
 	char *key;
 	void *data;
@@ -111,7 +111,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(hcreate_r))(__SIZE_TYPE__ __nel, stru
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_hcreate_r_defined
-#define __local___localdep_hcreate_r_defined 1
+#define __local___localdep_hcreate_r_defined
 #define __localdep_hcreate_r __LIBC_LOCAL_NAME(hcreate_r)
 #endif /* !__local___localdep_hcreate_r_defined */
 #else /* __CRT_HAVE_malloc || __CRT_HAVE_calloc || __CRT_HAVE_realloc || __CRT_HAVE_memalign || __CRT_HAVE_aligned_alloc || __CRT_HAVE_posix_memalign */

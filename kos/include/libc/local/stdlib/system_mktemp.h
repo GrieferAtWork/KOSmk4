@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa3e96c10 */
+/* HASH CRC-32:0x3c3c2ffe */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,11 +19,11 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_system_mktemp_defined
-#define __local_system_mktemp_defined 1
+#define __local_system_mktemp_defined
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_close_defined
-#define __local___localdep_close_defined 1
+#define __local___localdep_close_defined
 #ifdef __CRT_HAVE_close
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
@@ -44,7 +44,7 @@ __CREDIRECT(,int,__NOTHROW_NCX,__localdep_close,(__fd_t __fd),__close,(__fd))
 #endif /* !... */
 #endif /* !__local___localdep_close_defined */
 #ifndef __local___localdep_getpid_defined
-#define __local___localdep_getpid_defined 1
+#define __local___localdep_getpid_defined
 #ifdef __CRT_HAVE_getpid
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__pid_t,__NOTHROW,__localdep_getpid,(void),getpid,())
 #elif defined(__CRT_HAVE__getpid)
@@ -56,11 +56,11 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__pid_t,__NOTHROW,__localdep_getpid,(voi
 #endif /* !... */
 #endif /* !__local___localdep_getpid_defined */
 #if !defined(__local___localdep_gettid_defined) && defined(__CRT_HAVE_gettid)
-#define __local___localdep_gettid_defined 1
+#define __local___localdep_gettid_defined
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__pid_t,__NOTHROW,__localdep_gettid,(void),gettid,())
 #endif /* !__local___localdep_gettid_defined && __CRT_HAVE_gettid */
 #ifndef __local___localdep_gettimeofday_defined
-#define __local___localdep_gettimeofday_defined 1
+#define __local___localdep_gettimeofday_defined
 __NAMESPACE_LOCAL_END
 #include <features.h>
 #include <bits/types.h>
@@ -90,7 +90,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_gettimeofday_defined */
 #ifndef __local___localdep_gettimeofday64_defined
-#define __local___localdep_gettimeofday64_defined 1
+#define __local___localdep_gettimeofday64_defined
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -114,7 +114,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_gettimeofday64_defined */
 #ifndef __local___localdep_memcmp_defined
-#define __local___localdep_memcmp_defined 1
+#define __local___localdep_memcmp_defined
 #ifdef __CRT_HAVE_memcmp
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
@@ -133,7 +133,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_memcmp_defined */
 #ifndef __local___localdep_mkdir_defined
-#define __local___localdep_mkdir_defined 1
+#define __local___localdep_mkdir_defined
 #ifdef __CRT_HAVE_mkdir
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
@@ -149,7 +149,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_mkdir_defined */
 #ifndef __local___localdep_open_defined
-#define __local___localdep_open_defined 1
+#define __local___localdep_open_defined
 __NAMESPACE_LOCAL_END
 #include <features.h>
 #include <asm/os/oflags.h>
@@ -194,7 +194,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_open_defined */
 #ifndef __local___localdep_rand_defined
-#define __local___localdep_rand_defined 1
+#define __local___localdep_rand_defined
 #ifdef __CRT_HAVE_rand
 __CREDIRECT(,int,__NOTHROW,__localdep_rand,(void),rand,())
 #else /* __CRT_HAVE_rand */
@@ -212,7 +212,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__CRT_HAVE_rand */
 #endif /* !__local___localdep_rand_defined */
 #ifndef __local___localdep_stat_defined
-#define __local___localdep_stat_defined 1
+#define __local___localdep_stat_defined
 #if defined(__CRT_HAVE_kstat) && defined(__CRT_KOS_PRIMARY)
 __NAMESPACE_LOCAL_END
 #include <bits/os/stat.h>
@@ -273,7 +273,7 @@ __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_stat,(char const
 #endif /* !... */
 #endif /* !__local___localdep_stat_defined */
 #ifndef __local___localdep_strend_defined
-#define __local___localdep_strend_defined 1
+#define __local___localdep_strend_defined
 #ifdef __CRT_HAVE_strend
 __CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_strend,(char const *__restrict __str),strend,(__str))
 #else /* __CRT_HAVE_strend */
@@ -481,7 +481,7 @@ __do_try_again:
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_system_mktemp_defined
-#define __local___localdep_system_mktemp_defined 1
+#define __local___localdep_system_mktemp_defined
 #define __localdep_system_mktemp __LIBC_LOCAL_NAME(system_mktemp)
 #endif /* !__local___localdep_system_mktemp_defined */
 #endif /* !__local_system_mktemp_defined */

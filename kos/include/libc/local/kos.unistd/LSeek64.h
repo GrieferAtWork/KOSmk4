@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x62bcdfa8 */
+/* HASH CRC-32:0xac90c172 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,14 +19,14 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_LSeek64_defined
-#define __local_LSeek64_defined 1
+#define __local_LSeek64_defined
 #include <__crt.h>
 #ifdef __CRT_HAVE_LSeek
 #include <kos/anno.h>
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_LSeek32_defined
-#define __local___localdep_LSeek32_defined 1
+#define __local___localdep_LSeek32_defined
 __CREDIRECT(,__pos32_t,__THROWING,__localdep_LSeek32,(__fd_t __fd, __off32_t __offset, int __whence),LSeek,(__fd,__offset,__whence))
 #endif /* !__local___localdep_LSeek32_defined */
 __LOCAL_LIBC(LSeek64) __pos64_t
@@ -35,7 +35,7 @@ __LOCAL_LIBC(LSeek64) __pos64_t
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_LSeek64_defined
-#define __local___localdep_LSeek64_defined 1
+#define __local___localdep_LSeek64_defined
 #define __localdep_LSeek64 __LIBC_LOCAL_NAME(LSeek64)
 #endif /* !__local___localdep_LSeek64_defined */
 #else /* __CRT_HAVE_LSeek */

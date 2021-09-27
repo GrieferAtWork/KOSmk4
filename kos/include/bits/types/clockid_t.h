@@ -21,7 +21,7 @@
 #include <__stdinc.h>
 #include <bits/types.h>
 #ifndef __clockid_t_defined
-#define __clockid_t_defined 1
+#define __clockid_t_defined
 #ifdef __CC__
 __DECL_BEGIN
 typedef __clockid_t clockid_t;

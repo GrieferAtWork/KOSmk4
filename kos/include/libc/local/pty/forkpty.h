@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x324791f5 */
+/* HASH CRC-32:0x6056f84c */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_forkpty_defined
-#define __local_forkpty_defined 1
+#define __local_forkpty_defined
 #include <__crt.h>
 #include <asm/os/tty.h>
 #if defined(__CRT_HAVE_openpty) && (defined(__CRT_HAVE_fork) || defined(__CRT_HAVE___fork)) && (defined(__CRT_HAVE_close) || defined(__CRT_HAVE__close) || defined(__CRT_HAVE___close)) && (defined(__CRT_HAVE_login_tty) || (defined(__TIOCSCTTY) && defined(__CRT_HAVE_ioctl) && defined(__CRT_HAVE_setsid) && (defined(__CRT_HAVE_dup2) || defined(__CRT_HAVE__dup2) || defined(__CRT_HAVE___dup2)))) && (defined(__CRT_HAVE__Exit) || defined(__CRT_HAVE__exit) || defined(__CRT_HAVE_quick_exit) || defined(__CRT_HAVE_exit))
@@ -28,7 +28,7 @@ struct winsize;
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep__Exit_defined
-#define __local___localdep__Exit_defined 1
+#define __local___localdep__Exit_defined
 #if __has_builtin(__builtin__Exit) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE__Exit)
 __NAMESPACE_LOCAL_END
 #include <kos/anno.h>
@@ -64,7 +64,7 @@ __CREDIRECT_VOID(__ATTR_NORETURN,__THROWING,__localdep__Exit,(int __status),exit
 #endif /* !... */
 #endif /* !__local___localdep__Exit_defined */
 #ifndef __local___localdep_close_defined
-#define __local___localdep_close_defined 1
+#define __local___localdep_close_defined
 #ifdef __CRT_HAVE_close
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_close,(__fd_t __fd),close,(__fd))
 #elif defined(__CRT_HAVE__close)
@@ -76,7 +76,7 @@ __CREDIRECT(,int,__NOTHROW_NCX,__localdep_close,(__fd_t __fd),__close,(__fd))
 #endif /* !... */
 #endif /* !__local___localdep_close_defined */
 #ifndef __local___localdep_fork_defined
-#define __local___localdep_fork_defined 1
+#define __local___localdep_fork_defined
 #if __has_builtin(__builtin_fork) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_fork)
 __CEIREDIRECT(__ATTR_WUNUSED,__pid_t,__NOTHROW_NCX,__localdep_fork,(void),fork,{ return __builtin_fork(); })
 #elif defined(__CRT_HAVE_fork)
@@ -88,7 +88,7 @@ __CREDIRECT(__ATTR_WUNUSED,__pid_t,__NOTHROW_NCX,__localdep_fork,(void),__fork,(
 #endif /* !... */
 #endif /* !__local___localdep_fork_defined */
 #ifndef __local___localdep_login_tty_defined
-#define __local___localdep_login_tty_defined 1
+#define __local___localdep_login_tty_defined
 #ifdef __CRT_HAVE_login_tty
 __CREDIRECT(,int,__NOTHROW_RPC_KOS,__localdep_login_tty,(__fd_t __fd),login_tty,(__fd))
 #elif defined(__TIOCSCTTY) && defined(__CRT_HAVE_ioctl) && defined(__CRT_HAVE_setsid) && (defined(__CRT_HAVE_dup2) || defined(__CRT_HAVE__dup2) || defined(__CRT_HAVE___dup2))
@@ -101,7 +101,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_login_tty_defined */
 #ifndef __local___localdep_openpty_defined
-#define __local___localdep_openpty_defined 1
+#define __local___localdep_openpty_defined
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_openpty,(__fd_t *__amaster, __fd_t *__aslave, char *__name, struct termios const *__termp, struct winsize const *__winp),openpty,(__amaster,__aslave,__name,__termp,__winp))
 #endif /* !__local___localdep_openpty_defined */
 __LOCAL_LIBC(forkpty) __ATTR_NONNULL((1)) __pid_t
@@ -132,7 +132,7 @@ __done_slave:
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_forkpty_defined
-#define __local___localdep_forkpty_defined 1
+#define __local___localdep_forkpty_defined
 #define __localdep_forkpty __LIBC_LOCAL_NAME(forkpty)
 #endif /* !__local___localdep_forkpty_defined */
 #else /* __CRT_HAVE_openpty && (__CRT_HAVE_fork || __CRT_HAVE___fork) && (__CRT_HAVE_close || __CRT_HAVE__close || __CRT_HAVE___close) && (__CRT_HAVE_login_tty || (__TIOCSCTTY && __CRT_HAVE_ioctl && __CRT_HAVE_setsid && (__CRT_HAVE_dup2 || __CRT_HAVE__dup2 || __CRT_HAVE___dup2))) && (__CRT_HAVE__Exit || __CRT_HAVE__exit || __CRT_HAVE_quick_exit || __CRT_HAVE_exit) */

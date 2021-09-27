@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9d273074 */
+/* HASH CRC-32:0xde3874d */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local__CrtCheckMemory_defined
-#define __local__CrtCheckMemory_defined 1
+#define __local__CrtCheckMemory_defined
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(_CrtCheckMemory) int
@@ -29,7 +29,7 @@ __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(_CrtCheckMemory))(void) {
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep__CrtCheckMemory_defined
-#define __local___localdep__CrtCheckMemory_defined 1
+#define __local___localdep__CrtCheckMemory_defined
 #define __localdep__CrtCheckMemory __LIBC_LOCAL_NAME(_CrtCheckMemory)
 #endif /* !__local___localdep__CrtCheckMemory_defined */
 #endif /* !__local__CrtCheckMemory_defined */

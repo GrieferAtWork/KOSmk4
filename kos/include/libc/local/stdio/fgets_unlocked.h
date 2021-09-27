@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x910df4ec */
+/* HASH CRC-32:0x6884de01 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,14 +19,14 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_fgets_unlocked_defined
-#define __local_fgets_unlocked_defined 1
+#define __local_fgets_unlocked_defined
 #include <__crt.h>
 #include <features.h>
 #if (defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked) || (defined(__CRT_HAVE_fgetc) && (!defined(__CRT_DOS) || !defined(__CRT_HAVE__filbuf))) || (defined(__CRT_HAVE_getc) && (!defined(__CRT_DOS) || !defined(__CRT_HAVE__filbuf))) || (defined(__CRT_HAVE__IO_getc) && (!defined(__CRT_DOS) || !defined(__CRT_HAVE__filbuf))) || (defined(__CRT_DOS) && defined(__CRT_HAVE__filbuf)) || defined(__CRT_HAVE_fread) || defined(__CRT_HAVE__IO_fread) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock)) && (defined(__CRT_HAVE_ungetc) || defined(__CRT_HAVE__IO_ungetc) || defined(__CRT_HAVE_ungetc_unlocked) || defined(__CRT_HAVE__ungetc_nolock)) && (defined(__CRT_HAVE_ferror) || defined(__CRT_HAVE__IO_ferror) || defined(__CRT_HAVE_ferror_unlocked))
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_ferror_unlocked_defined
-#define __local___localdep_ferror_unlocked_defined 1
+#define __local___localdep_ferror_unlocked_defined
 #if defined(__CRT_HAVE_ferror_unlocked) && defined(__USE_STDIO_UNLOCKED)
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_ferror_unlocked,(__FILE __KOS_FIXED_CONST *__restrict __stream),ferror_unlocked,(__stream))
 #elif defined(__CRT_HAVE_ferror)
@@ -40,7 +40,7 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,__l
 #endif /* !... */
 #endif /* !__local___localdep_ferror_unlocked_defined */
 #ifndef __local___localdep_fgetc_unlocked_defined
-#define __local___localdep_fgetc_unlocked_defined 1
+#define __local___localdep_fgetc_unlocked_defined
 #ifdef __CRT_HAVE_fgetc_unlocked
 __CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,__localdep_fgetc_unlocked,(__FILE *__restrict __stream),fgetc_unlocked,(__stream))
 #elif defined(__CRT_HAVE_getc_unlocked)
@@ -61,7 +61,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_fgetc_unlocked_defined */
 #ifndef __local___localdep_ungetc_unlocked_defined
-#define __local___localdep_ungetc_unlocked_defined 1
+#define __local___localdep_ungetc_unlocked_defined
 #ifdef __CRT_HAVE_ungetc_unlocked
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_ungetc_unlocked,(int __ch, __FILE *__restrict __stream),ungetc_unlocked,(__ch,__stream))
 #elif defined(__CRT_HAVE__ungetc_nolock)
@@ -119,7 +119,7 @@ __LOCAL_LIBC(fgets_unlocked) __ATTR_WUNUSED __ATTR_NONNULL((1, 3)) char *
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_fgets_unlocked_defined
-#define __local___localdep_fgets_unlocked_defined 1
+#define __local___localdep_fgets_unlocked_defined
 #define __localdep_fgets_unlocked __LIBC_LOCAL_NAME(fgets_unlocked)
 #endif /* !__local___localdep_fgets_unlocked_defined */
 #else /* (__CRT_HAVE_fgetc_unlocked || __CRT_HAVE_getc_unlocked || (__CRT_HAVE_fgetc && (!__CRT_DOS || !__CRT_HAVE__filbuf)) || (__CRT_HAVE_getc && (!__CRT_DOS || !__CRT_HAVE__filbuf)) || (__CRT_HAVE__IO_getc && (!__CRT_DOS || !__CRT_HAVE__filbuf)) || (__CRT_DOS && __CRT_HAVE__filbuf) || __CRT_HAVE_fread || __CRT_HAVE__IO_fread || __CRT_HAVE_fread_unlocked || __CRT_HAVE__fread_nolock) && (__CRT_HAVE_ungetc || __CRT_HAVE__IO_ungetc || __CRT_HAVE_ungetc_unlocked || __CRT_HAVE__ungetc_nolock) && (__CRT_HAVE_ferror || __CRT_HAVE__IO_ferror || __CRT_HAVE_ferror_unlocked) */

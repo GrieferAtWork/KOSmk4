@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x78d1c9d4 */
+/* HASH CRC-32:0x6bba54a1 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,12 +19,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_wcsncoll_defined
-#define __local_wcsncoll_defined 1
+#define __local_wcsncoll_defined
 #include <__crt.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_wcsncmp_defined
-#define __local___localdep_wcsncmp_defined 1
+#define __local___localdep_wcsncmp_defined
 #ifdef __CRT_HAVE_wcsncmp
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_wcsncmp,(__WCHAR_TYPE__ const *__s1, __WCHAR_TYPE__ const *__s2, __SIZE_TYPE__ __maxlen),wcsncmp,(__s1,__s2,__maxlen))
 #else /* __CRT_HAVE_wcsncmp */
@@ -40,7 +40,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcsncoll))(__WCHAR_TYPE__ const *__s1
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_wcsncoll_defined
-#define __local___localdep_wcsncoll_defined 1
+#define __local___localdep_wcsncoll_defined
 #define __localdep_wcsncoll __LIBC_LOCAL_NAME(wcsncoll)
 #endif /* !__local___localdep_wcsncoll_defined */
 #endif /* !__local_wcsncoll_defined */

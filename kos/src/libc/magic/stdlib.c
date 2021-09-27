@@ -139,7 +139,7 @@ __SYSDECL_BEGIN
 #ifdef __CC__
 
 #ifndef __std_size_t_defined
-#define __std_size_t_defined 1
+#define __std_size_t_defined
 __NAMESPACE_STD_BEGIN
 typedef __SIZE_TYPE__ size_t;
 __NAMESPACE_STD_END
@@ -148,14 +148,14 @@ __NAMESPACE_STD_END
 #ifndef __CXX_SYSTEM_HEADER
 }%(c, ccompat){
 #ifndef __size_t_defined
-#define __size_t_defined 1
+#define __size_t_defined
 __NAMESPACE_STD_USING(size_t)
 #endif /* !__size_t_defined */
 }%{
 #endif /* !__CXX_SYSTEM_HEADER */
 
 #ifndef __wchar_t_defined
-#define __wchar_t_defined 1
+#define __wchar_t_defined
 typedef __WCHAR_TYPE__ wchar_t;
 #endif /* !__wchar_t_defined */
 
@@ -189,16 +189,16 @@ struct __lldiv_struct {
 
 __NAMESPACE_STD_BEGIN
 #ifndef __std_div_t_defined
-#define __std_div_t_defined 1
+#define __std_div_t_defined
 typedef struct __div_struct div_t;
 #endif /* !__std_div_t_defined */
 #ifndef __std_ldiv_t_defined
-#define __std_ldiv_t_defined 1
+#define __std_ldiv_t_defined
 typedef struct __ldiv_struct ldiv_t;
 #endif /* !__std_ldiv_t_defined */
 #ifdef __USE_ISOC99
 #ifndef __std_lldiv_t_defined
-#define __std_lldiv_t_defined 1
+#define __std_lldiv_t_defined
 typedef struct __lldiv_struct lldiv_t;
 #endif /* !__std_lldiv_t_defined */
 #endif /* __USE_ISOC99 */
@@ -207,16 +207,16 @@ __NAMESPACE_STD_END
 #ifndef __CXX_SYSTEM_HEADER
 }%(c, ccompat){
 #ifndef __div_t_defined
-#define __div_t_defined 1
+#define __div_t_defined
 __NAMESPACE_STD_USING(div_t)
 #endif /* !__div_t_defined */
 #ifndef __ldiv_t_defined
-#define __ldiv_t_defined 1
+#define __ldiv_t_defined
 __NAMESPACE_STD_USING(ldiv_t)
 #endif /* !__ldiv_t_defined */
 #ifdef __USE_ISOC99
 #ifndef __lldiv_t_defined
-#define __lldiv_t_defined 1
+#define __lldiv_t_defined
 __NAMESPACE_STD_USING(lldiv_t)
 #endif /* !__lldiv_t_defined */
 #endif /* __USE_ISOC99 */
@@ -226,7 +226,7 @@ __NAMESPACE_STD_USING(lldiv_t)
 #ifndef __COMPAR_FN_T
 #define __COMPAR_FN_T 1
 #ifndef ____compar_fn_t_defined
-#define ____compar_fn_t_defined 1
+#define ____compar_fn_t_defined
 typedef int (__LIBCCALL *__compar_fn_t)(void const *__a, void const *__b);
 #endif /* !____compar_fn_t_defined */
 #ifdef __USE_GNU
@@ -258,7 +258,7 @@ typedef __compar_fn_t comparison_fn_t;
 
 %{
 #ifndef __compar_d_fn_t_defined
-#define __compar_d_fn_t_defined 1
+#define __compar_d_fn_t_defined
 typedef int (__LIBCCALL *__compar_d_fn_t)(void const *__a, void const *__b, void *__arg);
 #endif /* !__compar_d_fn_t_defined */
 }
@@ -323,7 +323,7 @@ void *bsearch_r([[nonnull]] void const *pkey, [[nonnull]] void const *pbase, $si
 @@pp_ifndef         __LIBCCALL_CALLER_CLEANUP@@
 @@pp_ifndef ____invoke_compare_helper_defined@@
 @@push_namespace(local)@@
-#define ____invoke_compare_helper_defined 1
+#define ____invoke_compare_helper_defined
 __LOCAL_LIBC(__invoke_compare_helper) int
 (__LIBCCALL __invoke_compare_helper)(void const *__a, void const *__b, void *__arg) {
 	return (*(int (__LIBCCALL *)(void const *, void const *))__arg)(__a, __b);
@@ -3070,7 +3070,7 @@ int shexec([[nullable]] char const *command) {
 %[default:section(".text.crt{|.dos}.solaris")]
 
 %#ifndef __uid_t_defined
-%#define __uid_t_defined 1
+%#define __uid_t_defined
 %typedef __uid_t uid_t; /* User ID */
 %#endif /* !__uid_t_defined */
 
@@ -3411,7 +3411,7 @@ __LONGLONG strtonum([[nonnull]] char const *nptr,
 %#if defined(__USE_GNU) || defined(__USE_BSD)
 %{
 #ifndef __compar_d_fn_t_defined
-#define __compar_d_fn_t_defined 1
+#define __compar_d_fn_t_defined
 typedef int (__LIBCCALL *__compar_d_fn_t)(void const *__a, void const *__b, void *__arg);
 #endif /* !__compar_d_fn_t_defined */
 }
@@ -3538,11 +3538,11 @@ $fd_t mkostemps64([[nonnull]] char *template_,
 %#ifdef __USE_NETBSD
 %{
 #ifndef __dev_t_defined
-#define __dev_t_defined 1
+#define __dev_t_defined
 typedef __dev_t dev_t;
 #endif /* !__dev_t_defined */
 #ifndef __mode_t_defined
-#define __mode_t_defined 1
+#define __mode_t_defined
 typedef __mode_t mode_t;
 #endif /* !__mode_t_defined */
 }
@@ -3719,7 +3719,7 @@ __SYSDECL_BEGIN
 %{
 
 #ifndef __errno_t_defined
-#define __errno_t_defined 1
+#define __errno_t_defined
 typedef int errno_t;
 #endif /* !__errno_t_defined */
 
@@ -3775,14 +3775,14 @@ errno_t _set_doserrno($u32 err);
 %
 %{
 #ifndef ___environ_defined
-#define ___environ_defined 1
+#define ___environ_defined
 #undef _environ
 #if defined(__CRT_HAVE_environ) && !defined(__NO_ASMNAME)
 __LIBC char **_environ __ASMNAME("environ");
 #define _environ _environ
 #elif defined(__CRT_HAVE_environ)
 #ifndef __environ_defined
-#define __environ_defined 1
+#define __environ_defined
 #undef environ
 __LIBC char **environ;
 #endif /* !__environ_defined */
@@ -3795,14 +3795,14 @@ __LIBC char **_environ __ASMNAME("__environ");
 #define _environ _environ
 #elif defined(__CRT_HAVE___environ)
 #ifndef ____environ_defined
-#define ____environ_defined 1
+#define ____environ_defined
 #undef __environ
 __LIBC char **__environ;
 #endif /* !____environ_defined */
 #define _environ __environ
 #elif defined(__CRT_HAVE___p__environ)
 #ifndef ____p__environ_defined
-#define ____p__environ_defined 1
+#define ____p__environ_defined
 __CDECLARE(__ATTR_WUNUSED __ATTR_CONST __ATTR_RETNONNULL,char ***,__NOTHROW,__p__environ,(void),())
 #endif /* !____p__environ_defined */
 #define _environ (*__p__environ())
@@ -3989,14 +3989,14 @@ __p___winitenv() -> [[nonnull]] wchar_t ***;
 %
 %{
 #ifndef ___purecall_handler_defined
-#define ___purecall_handler_defined 1
+#define ___purecall_handler_defined
 typedef void (__LIBDCALL *_purecall_handler)(void);
 #endif /* !___purecall_handler_defined */
 }
 
 %[define(DEFINE_PURECALL_HANDLER =
 #ifndef ___purecall_handler_defined
-#define ___purecall_handler_defined 1
+#define ___purecall_handler_defined
 typedef void (__LIBDCALL *_purecall_handler)(void);
 #endif /* !___purecall_handler_defined */
 )]
@@ -4015,14 +4015,14 @@ _purecall_handler _get_purecall_handler();
 %
 %{
 #ifndef ___invalid_parameter_handler_defined
-#define ___invalid_parameter_handler_defined 1
+#define ___invalid_parameter_handler_defined
 typedef void (__LIBDCALL *_invalid_parameter_handler)(wchar_t const *, wchar_t const *, wchar_t const *, unsigned int, __UINTPTR_TYPE__);
 #endif /* !___invalid_parameter_handler_defined */
 }
 
 %[define(DEFINE_INVALID_PARAMETER_HANDLER =
 #ifndef ___invalid_parameter_handler_defined
-#define ___invalid_parameter_handler_defined 1
+#define ___invalid_parameter_handler_defined
 typedef void (__LIBDCALL *_invalid_parameter_handler)(wchar_t const *, wchar_t const *, wchar_t const *, unsigned int, __UINTPTR_TYPE__);
 #endif /* !___invalid_parameter_handler_defined */
 )]
@@ -4176,7 +4176,7 @@ $u64 _byteswap_uint64($u64 val) {
 %#ifdef __USE_DOS_SLIB
 %{
 #ifndef __rsize_t_defined
-#define __rsize_t_defined 1
+#define __rsize_t_defined
 typedef __SIZE_TYPE__ rsize_t;
 #endif /* !__rsize_t_defined */
 }
@@ -4187,7 +4187,7 @@ typedef __SIZE_TYPE__ rsize_t;
 
 %[define(DEFINE_INVOKE_COMPARE_HELPER_S =
 @@pp_ifndef ____invoke_compare_helper_s_defined@@
-#define ____invoke_compare_helper_s_defined 1
+#define ____invoke_compare_helper_s_defined
 @@push_namespace(local)@@
 struct __invoke_compare_helper_s_data {
 	int (__LIBCCALL *__fun)(void *__arg, void const *__a, void const *__b);
@@ -5219,7 +5219,7 @@ void _beep(unsigned int freq, unsigned int duration);
 %
 %{
 #ifndef __environ_defined
-#define __environ_defined 1
+#define __environ_defined
 #undef environ
 #if defined(__CRT_HAVE_environ)
 __LIBC char **environ;
@@ -5229,7 +5229,7 @@ __LIBC char **environ __ASMNAME("_environ");
 #define environ environ
 #elif defined(__CRT_HAVE__environ)
 #ifndef ___environ_defined
-#define ___environ_defined 1
+#define ___environ_defined
 #undef _environ
 __LIBC char **_environ;
 #endif /* !___environ_defined */
@@ -5239,14 +5239,14 @@ __LIBC char **environ __ASMNAME("__environ");
 #define environ environ
 #elif defined(__CRT_HAVE___environ)
 #ifndef ____environ_defined
-#define ____environ_defined 1
+#define ____environ_defined
 #undef __environ
 __LIBC char **__environ;
 #endif /* !____environ_defined */
 #define environ __environ
 #elif defined(__CRT_HAVE___p__environ)
 #ifndef ____p__environ_defined
-#define ____p__environ_defined 1
+#define ____p__environ_defined
 __CDECLARE(__ATTR_WUNUSED __ATTR_CONST __ATTR_RETNONNULL,char ***,__NOTHROW,__p__environ,(void),())
 #endif /* !____p__environ_defined */
 #define environ (*__p__environ())

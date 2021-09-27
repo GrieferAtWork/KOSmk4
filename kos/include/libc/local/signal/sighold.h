@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x650f7b47 */
+/* HASH CRC-32:0x14a5e1be */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,14 +19,14 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_sighold_defined
-#define __local_sighold_defined 1
+#define __local_sighold_defined
 #include <__crt.h>
 #include <asm/os/signal.h>
 #if defined(__SIG_BLOCK) && (defined(__CRT_HAVE_sigprocmask) || defined(__CRT_HAVE_pthread_sigmask))
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_set_single_signal_action_defined
-#define __local___localdep_set_single_signal_action_defined 1
+#define __local___localdep_set_single_signal_action_defined
 __NAMESPACE_LOCAL_END
 #include <libc/local/signal/set_single_signal_action.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -38,7 +38,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(sighold))(__signo_t __signo) {
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_sighold_defined
-#define __local___localdep_sighold_defined 1
+#define __local___localdep_sighold_defined
 #define __localdep_sighold __LIBC_LOCAL_NAME(sighold)
 #endif /* !__local___localdep_sighold_defined */
 #else /* __SIG_BLOCK && (__CRT_HAVE_sigprocmask || __CRT_HAVE_pthread_sigmask) */

@@ -20,6 +20,6 @@
 #ifndef __timespec_defined
 #include <bits/os/timespec.h>
 #ifndef __timespec_defined
-#define __timespec_defined 1
+#define __timespec_defined
 #endif /* !__timespec_defined */
 #endif /* !__timespec_defined */

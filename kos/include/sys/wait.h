@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x76b1e358 */
+/* HASH CRC-32:0x5bfb776d */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -80,7 +80,7 @@ __SYSDECL_BEGIN
 
 #if defined(__USE_XOPEN) || defined(__USE_XOPEN2K8)
 #ifndef __siginfo_t_defined
-#define __siginfo_t_defined 1
+#define __siginfo_t_defined
 typedef struct __siginfo_struct siginfo_t;
 #endif /* !__siginfo_t_defined */
 #endif /* __USE_XOPEN || __USE_XOPEN2K8 */
@@ -116,7 +116,7 @@ __CREDIRECT(,__pid_t,__NOTHROW_RPC,waitpid,(__pid_t __pid, __WAIT_STATUS __stat_
 
 #if defined(__USE_XOPEN) || defined(__USE_XOPEN2K8)
 #ifndef __id_t_defined
-#define __id_t_defined 1
+#define __id_t_defined
 typedef __id_t id_t;
 #endif /* !__id_t_defined */
 /* >> waitid(2)

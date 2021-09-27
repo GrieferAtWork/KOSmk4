@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd69ea8f2 */
+/* HASH CRC-32:0xe3e9e41d */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3969,8 +3969,8 @@ NOTHROW_NCX(LIBCCALL libc_strstartcmpz)(char const *str,
 #include <hybrid/typecore.h>
 /* >> bitcpy(3)
  * Copy exactly `num_bits' from `src_base+(src_bit_offset/NBBY)' to `dst_base+(dst_bit_offset/NBBY)',
- * doing a byte-wise copy but leaving bits not meant to be copied untouched. Inside of individual
- * bytes, individual bits are indexed such that the least significant bit is at `0', and the most
+ * doing a byte-wise copy  but leaving bits not  meant to be copied  untouched. Inside of  individual
+ * bytes, individual bits are  indexed such that the  least significant bit is  at `0', and the  most
  * significant bit is at `NBBY-1':
  * >> byte_t src[] = { 0b00001001 };
  * >> byte_t dst[] = { 0b00000000 };

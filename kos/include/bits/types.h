@@ -226,7 +226,7 @@ typedef struct { __UINT32_TYPE__ __lo,__hi; } __uint64_t;
 #define __CRT_PRIVATE_ULNG(sizeof)  __CRT_PRIVATE_ULNG2(sizeof)
 
 #ifndef ____s8_defined
-#define ____s8_defined 1
+#define ____s8_defined
 /* These need to be typedefs, since 3rd party headers like
  * <drm.h>  will try to re-define these through additional
  * typedefs that would cause compiler errors if we defined
@@ -260,7 +260,7 @@ typedef __UINT64_TYPE__ __u64;
 #endif /* !____s8_defined */
 
 #ifndef ____le8_defined
-#define ____le8_defined 1
+#define ____le8_defined
 #ifdef __INTELLISENSE__
 typedef __intern::____intellisense_endianint<1234, __UINT8_TYPE__> __le8;
 typedef __intern::____intellisense_endianint<4321, __UINT8_TYPE__> __be8;

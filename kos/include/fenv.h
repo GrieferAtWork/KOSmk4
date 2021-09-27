@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x865bac73 */
+/* HASH CRC-32:0x45c39814 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -42,11 +42,11 @@
 /* Import all symbols into the global namespace when re-including "fenv.h" after "cfenv" */
 #ifndef __NO_FPU
 #ifndef ___fenv_t_defined
-#define ___fenv_t_defined 1
+#define ___fenv_t_defined
 __NAMESPACE_STD_USING(fenv_t)
 #endif /* !___fenv_t_defined */
 #ifndef __fexcept_t_defined
-#define __fexcept_t_defined 1
+#define __fexcept_t_defined
 __NAMESPACE_STD_USING(fexcept_t)
 #endif /* !__fexcept_t_defined */
 __NAMESPACE_STD_USING(feclearexcept)
@@ -85,22 +85,22 @@ __SYSDECL_BEGIN
 
 __NAMESPACE_STD_BEGIN
 #ifndef __std_fenv_t_defined
-#define __std_fenv_t_defined 1
+#define __std_fenv_t_defined
 typedef struct __fenv_struct fenv_t;
 #endif /* !__std_fenv_t_defined */
 #ifndef __std_fexcept_t_defined
-#define __std_fexcept_t_defined 1
+#define __std_fexcept_t_defined
 typedef __fexcept_t fexcept_t;
 #endif /* !__std_fexcept_t_defined */
 __NAMESPACE_STD_END
 
 #ifndef __CXX_SYSTEM_HEADER
 #ifndef ___fenv_t_defined
-#define ___fenv_t_defined 1
+#define ___fenv_t_defined
 __NAMESPACE_STD_USING(fenv_t)
 #endif /* !___fenv_t_defined */
 #ifndef __fexcept_t_defined
-#define __fexcept_t_defined 1
+#define __fexcept_t_defined
 __NAMESPACE_STD_USING(fexcept_t)
 #endif /* !__fexcept_t_defined */
 #endif /* !__CXX_SYSTEM_HEADER */
@@ -403,7 +403,7 @@ __SYSDECL_END
 
 #endif /* !__NO_FPU */
 #ifdef __CXX_SYSTEM_HEADER
-#define _CXX_STDONLY_CFENV 1
+#define _CXX_STDONLY_CFENV
 #undef _FENV_H
 #endif /* __CXX_SYSTEM_HEADER */
 #endif /* !_CXX_STDONLY_CFENV */

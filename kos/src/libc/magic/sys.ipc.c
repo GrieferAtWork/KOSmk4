@@ -86,22 +86,22 @@
 __SYSDECL_BEGIN
 
 #ifndef __uid_t_defined
-#define __uid_t_defined 1
+#define __uid_t_defined
 typedef __uid_t uid_t;
 #endif /* !__uid_t_defined */
 
 #ifndef __gid_t_defined
-#define __gid_t_defined 1
+#define __gid_t_defined
 typedef __gid_t gid_t;
 #endif /* !__gid_t_defined */
 
 #ifndef __mode_t_defined
-#define __mode_t_defined 1
+#define __mode_t_defined
 typedef __mode_t mode_t; /* INode type (Set of `S_*' from `<fcntl.h>' or `<sys/stat.h>') */
 #endif /* !__mode_t_defined */
 
 #ifndef __key_t_defined
-#define __key_t_defined 1
+#define __key_t_defined
 typedef __key_t key_t;
 #endif /* !__key_t_defined */
 

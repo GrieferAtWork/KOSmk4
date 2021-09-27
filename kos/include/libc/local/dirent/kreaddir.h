@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x91bfa933 */
+/* HASH CRC-32:0x858f1a17 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_kreaddir_defined
-#define __local_kreaddir_defined 1
+#define __local_kreaddir_defined
 #include <__crt.h>
 #include <features.h>
 #include <bits/os/dirent.h>
@@ -27,7 +27,7 @@
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_kreaddirf_defined
-#define __local___localdep_kreaddirf_defined 1
+#define __local___localdep_kreaddirf_defined
 #if defined(__CRT_HAVE_kreaddirf) && (!defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64))
 __CREDIRECT(__ATTR_WUNUSED,__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_kreaddirf,(__fd_t __fd, struct dirent *__buf, __SIZE_TYPE__ __bufsize, unsigned int __mode, __oflag_t __flags),kreaddirf,(__fd,__buf,__bufsize,__mode,__flags))
 #elif defined(__CRT_HAVE_kreaddirf64) && (defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64))
@@ -42,7 +42,7 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(kreaddir))(__fd_t __fd, struct dirent
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_kreaddir_defined
-#define __local___localdep_kreaddir_defined 1
+#define __local___localdep_kreaddir_defined
 #define __localdep_kreaddir __LIBC_LOCAL_NAME(kreaddir)
 #endif /* !__local___localdep_kreaddir_defined */
 #else /* (__CRT_HAVE_kreaddirf && (!__USE_FILE_OFFSET64 || _DIRENT_MATCHES_DIRENT64)) || (__CRT_HAVE_kreaddirf64 && (__USE_FILE_OFFSET64 || _DIRENT_MATCHES_DIRENT64)) */

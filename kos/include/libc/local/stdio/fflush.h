@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xef62451 */
+/* HASH CRC-32:0x2a8b2773 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,12 +19,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_fflush_defined
-#define __local_fflush_defined 1
+#define __local_fflush_defined
 #include <__crt.h>
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_crt_flushall_defined
-#define __local___localdep_crt_flushall_defined 1
+#define __local___localdep_crt_flushall_defined
 #ifdef __CRT_HAVE__flushall
 __CREDIRECT(,int,__THROWING,__localdep_crt_flushall,(void),_flushall,())
 #elif defined(__CRT_HAVE__IO_flush_all)
@@ -46,7 +46,7 @@ __LOCAL_LIBC(fflush) int
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_fflush_defined
-#define __local___localdep_fflush_defined 1
+#define __local___localdep_fflush_defined
 #define __localdep_fflush __LIBC_LOCAL_NAME(fflush)
 #endif /* !__local___localdep_fflush_defined */
 #endif /* !__local_fflush_defined */

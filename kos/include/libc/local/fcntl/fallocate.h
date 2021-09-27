@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8ae653dc */
+/* HASH CRC-32:0x352622c2 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_fallocate_defined
-#define __local_fallocate_defined 1
+#define __local_fallocate_defined
 #include <__crt.h>
 #include <features.h>
 #include <bits/types.h>
@@ -34,11 +34,11 @@
 #endif /* !__PIO_OFFSET */
 __NAMESPACE_LOCAL_BEGIN
 #if !defined(__local___localdep_fallocate32_defined) && defined(__CRT_HAVE_fallocate)
-#define __local___localdep_fallocate32_defined 1
+#define __local___localdep_fallocate32_defined
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_fallocate32,(__fd_t __fd, __STDC_INT_AS_UINT_T __mode, __pos32_t __offset, __pos32_t __length),fallocate,(__fd,__mode,__offset,__length))
 #endif /* !__local___localdep_fallocate32_defined && __CRT_HAVE_fallocate */
 #ifndef __local___localdep_fallocate64_defined
-#define __local___localdep_fallocate64_defined 1
+#define __local___localdep_fallocate64_defined
 #if defined(__CRT_HAVE_fallocate) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_fallocate64,(__fd_t __fd, __STDC_INT_AS_UINT_T __mode, __PIO_OFFSET64 __offset, __PIO_OFFSET64 __length),fallocate,(__fd,__mode,__offset,__length))
 #elif defined(__CRT_HAVE_fallocate64)
@@ -66,7 +66,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(fallocate))(__fd_t __fd, __STDC_INT_A
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_fallocate_defined
-#define __local___localdep_fallocate_defined 1
+#define __local___localdep_fallocate_defined
 #define __localdep_fallocate __LIBC_LOCAL_NAME(fallocate)
 #endif /* !__local___localdep_fallocate_defined */
 #endif /* !__local_fallocate_defined */

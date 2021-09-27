@@ -52,7 +52,7 @@ public:
 	                                                      is_function<__noref_type>::value>::__type type;
 };
 #ifndef __std_reference_wrapper_defined
-#define __std_reference_wrapper_defined 1
+#define __std_reference_wrapper_defined
 template<class __T> class reference_wrapper;
 #endif /* !__std_reference_wrapper_defined */
 __NAMESPACE_STD_END

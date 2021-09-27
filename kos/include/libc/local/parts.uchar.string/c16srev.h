@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2be60d37 */
+/* HASH CRC-32:0x2ebb184e */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,12 +19,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_c16srev_defined
-#define __local_c16srev_defined 1
+#define __local_c16srev_defined
 #include <__crt.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_c16slen_defined
-#define __local___localdep_c16slen_defined 1
+#define __local___localdep_c16slen_defined
 #if defined(__CRT_HAVE_wcslen) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_c16slen,(__CHAR16_TYPE__ const *__restrict __str),wcslen,(__str))
 #elif defined(__CRT_HAVE_DOS$wcslen)
@@ -42,7 +42,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_c16slen_defined */
 #ifndef __local___localdep_memrev_defined
-#define __local___localdep_memrev_defined 1
+#define __local___localdep_memrev_defined
 #ifdef __CRT_HAVE_memrev
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),void *,__NOTHROW_NCX,__localdep_memrev,(void *__restrict __base, __SIZE_TYPE__ __n_bytes),memrev,(__base,__n_bytes))
 #else /* __CRT_HAVE_memrev */
@@ -53,7 +53,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__CRT_HAVE_memrev */
 #endif /* !__local___localdep_memrev_defined */
 #ifndef __local___localdep_memrevl_defined
-#define __local___localdep_memrevl_defined 1
+#define __local___localdep_memrevl_defined
 #ifdef __CRT_HAVE_memrevl
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),__UINT32_TYPE__ *,__NOTHROW_NCX,__localdep_memrevl,(void *__restrict __base, __SIZE_TYPE__ __n_dwords),memrevl,(__base,__n_dwords))
 #else /* __CRT_HAVE_memrevl */
@@ -64,7 +64,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__CRT_HAVE_memrevl */
 #endif /* !__local___localdep_memrevl_defined */
 #ifndef __local___localdep_memrevw_defined
-#define __local___localdep_memrevw_defined 1
+#define __local___localdep_memrevw_defined
 #ifdef __CRT_HAVE_memrevw
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),__UINT16_TYPE__ *,__NOTHROW_NCX,__localdep_memrevw,(void *__restrict __base, __SIZE_TYPE__ __n_words),memrevw,(__base,__n_words))
 #else /* __CRT_HAVE_memrevw */
@@ -86,7 +86,7 @@ __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(c16srev))(__CHAR16_TYPE__ *__restrict
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_c16srev_defined
-#define __local___localdep_c16srev_defined 1
+#define __local___localdep_c16srev_defined
 #define __localdep_c16srev __LIBC_LOCAL_NAME(c16srev)
 #endif /* !__local___localdep_c16srev_defined */
 #endif /* !__local_c16srev_defined */

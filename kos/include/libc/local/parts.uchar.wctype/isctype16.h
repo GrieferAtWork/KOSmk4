@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9fdc5f55 */
+/* HASH CRC-32:0xb43fb84 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,14 +19,14 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_isctype16_defined
-#define __local_isctype16_defined 1
+#define __local_isctype16_defined
 #include <__crt.h>
 #if defined(__CRT_KOS) && defined(__CRT_HAVE___unicode_descriptor)
 #include <hybrid/typecore.h>
 #include <bits/crt/wctype.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep___unicode_descriptor_defined
-#define __local___localdep___unicode_descriptor_defined 1
+#define __local___localdep___unicode_descriptor_defined
 __NAMESPACE_LOCAL_END
 #include <bits/crt/unicode.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -42,7 +42,7 @@ __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(isctype16))(__WINT16_TYPE__ __wc, __w
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_isctype16_defined
-#define __local___localdep_isctype16_defined 1
+#define __local___localdep_isctype16_defined
 #define __localdep_isctype16 __LIBC_LOCAL_NAME(isctype16)
 #endif /* !__local___localdep_isctype16_defined */
 #else /* __CRT_KOS && __CRT_HAVE___unicode_descriptor */

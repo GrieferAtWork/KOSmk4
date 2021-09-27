@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x341daaf */
+/* HASH CRC-32:0xc0314116 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_fgetpos64_unlocked_defined
-#define __local_fgetpos64_unlocked_defined 1
+#define __local_fgetpos64_unlocked_defined
 #include <__crt.h>
 #include <features.h>
 #include <bits/crt/stdio.h>
@@ -28,7 +28,7 @@
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_fgetpos64_defined
-#define __local___localdep_fgetpos64_defined 1
+#define __local___localdep_fgetpos64_defined
 #if defined(__CRT_HAVE_fgetpos_unlocked) && defined(__USE_STDIO_UNLOCKED) && __SIZEOF_FPOS64_T__ == __SIZEOF_FPOS32_T__
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__THROWING,__localdep_fgetpos64,(__FILE *__restrict __stream, __fpos64_t *__restrict __pos),fgetpos_unlocked,(__stream,__pos))
 #elif defined(__CRT_HAVE_fgetpos64_unlocked) && defined(__USE_STDIO_UNLOCKED)
@@ -60,7 +60,7 @@ __LOCAL_LIBC(fgetpos64_unlocked) __ATTR_NONNULL((1, 2)) int
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_fgetpos64_unlocked_defined
-#define __local___localdep_fgetpos64_unlocked_defined 1
+#define __local___localdep_fgetpos64_unlocked_defined
 #define __localdep_fgetpos64_unlocked __LIBC_LOCAL_NAME(fgetpos64_unlocked)
 #endif /* !__local___localdep_fgetpos64_unlocked_defined */
 #else /* __CRT_HAVE_fgetpos64 || __CRT_HAVE__IO_fgetpos64 || __CRT_HAVE_fgetpos64_unlocked || __CRT_HAVE_ftello64 || __CRT_HAVE_ftell64 || __CRT_HAVE__ftelli64 || __CRT_HAVE_ftello64_unlocked || __CRT_HAVE_ftell64_unlocked || __CRT_HAVE__ftelli64_nolock || __CRT_HAVE_fgetpos || __CRT_HAVE__IO_fgetpos || __CRT_HAVE_fgetpos_unlocked || __CRT_HAVE_ftello || __CRT_HAVE_ftello_unlocked || __CRT_HAVE_ftell || __CRT_HAVE__IO_ftell || __CRT_HAVE_ftell_unlocked || __CRT_HAVE__ftell_nolock */

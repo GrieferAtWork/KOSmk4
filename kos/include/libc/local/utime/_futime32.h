@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3de530c7 */
+/* HASH CRC-32:0xa6374251 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,14 +19,14 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local__futime32_defined
-#define __local__futime32_defined 1
+#define __local__futime32_defined
 #include <__crt.h>
 #if defined(__CRT_HAVE_futime64) || defined(__CRT_HAVE__futime64)
 #include <features.h>
 #include <bits/os/utimbuf.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_crt_futime64_defined
-#define __local___localdep_crt_futime64_defined 1
+#define __local___localdep_crt_futime64_defined
 #ifdef __CRT_HAVE_futime64
 __CREDIRECT(,int,__NOTHROW_RPC,__localdep_crt_futime64,(__fd_t __fd, struct __utimbuf64 const *__file_times),futime64,(__fd,__file_times))
 #elif defined(__CRT_HAVE__futime64)
@@ -56,7 +56,7 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(_futime32))(__fd_t __fd, struct __uti
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep__futime32_defined
-#define __local___localdep__futime32_defined 1
+#define __local___localdep__futime32_defined
 #define __localdep__futime32 __LIBC_LOCAL_NAME(_futime32)
 #endif /* !__local___localdep__futime32_defined */
 #else /* __CRT_HAVE_futime64 || __CRT_HAVE__futime64 */

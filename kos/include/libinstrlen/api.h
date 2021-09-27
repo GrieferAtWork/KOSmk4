@@ -25,23 +25,23 @@
 
 #if defined(__i386__) && !defined(__x86_64__)
 #define LIBINSTRLEN_CC __ATTR_FASTCALL
-#else
+#else /* ... */
 #define LIBINSTRLEN_CC /* nothing */
-#endif
+#endif /* !... */
 
-#if !defined(LIBINSTRLEN_WANT_PROTOTYPES) && \
-     defined(__KOS__) && defined(__KERNEL__)
-#define LIBINSTRLEN_WANT_PROTOTYPES 1
-#endif
+#if (!defined(LIBINSTRLEN_WANT_PROTOTYPES) && \
+     defined(__KOS__) && defined(__KERNEL__))
+#define LIBINSTRLEN_WANT_PROTOTYPES
+#endif /* ... */
 
-#if defined(__KOS__) && defined(__KERNEL__) && \
-    defined(CONFIG_BUILDING_KERNEL_CORE)
+#if (defined(__KOS__) && defined(__KERNEL__) && \
+     defined(CONFIG_BUILDING_KERNEL_CORE))
 #define LIBINSTRLEN_DECL __PUBDEF
 #elif defined(__LIBINSTRLEN_STATIC)
 #define LIBINSTRLEN_DECL __INTDEF
-#else
+#else /* ... */
 #define LIBINSTRLEN_DECL __IMPDEF
-#endif
+#endif /* !... */
 
 /* Library name for use with `dlopen()' */
 #define LIBINSTRLEN_LIBRARY_NAME "libinstrlen.so"

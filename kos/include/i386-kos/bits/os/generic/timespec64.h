@@ -80,7 +80,7 @@
 #else /* __USE_TIME64 */
 #define __timespec64 timespec
 #endif /* !__USE_TIME64 */
-#define __timespec_defined 1
+#define __timespec_defined
 #endif /* __x86_64__ */
 /*[[[end]]]*/
 

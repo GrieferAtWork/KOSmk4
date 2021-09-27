@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe8098290 */
+/* HASH CRC-32:0xf6832d75 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_isprint_defined
-#define __local_isprint_defined 1
+#define __local_isprint_defined
 #include <__crt.h>
 #include <bits/crt/ctype.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -33,7 +33,7 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(isprint))(int __ch) {
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_isprint_defined
-#define __local___localdep_isprint_defined 1
+#define __local___localdep_isprint_defined
 #define __localdep_isprint __LIBC_LOCAL_NAME(isprint)
 #endif /* !__local___localdep_isprint_defined */
 #endif /* !__local_isprint_defined */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x606de826 */
+/* HASH CRC-32:0xea596e68 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,13 +19,13 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_format_sprintf_printer_defined
-#define __local_format_sprintf_printer_defined 1
+#define __local_format_sprintf_printer_defined
 #include <__crt.h>
 #include <bits/crt/format-printer.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_mempcpyc_defined
-#define __local___localdep_mempcpyc_defined 1
+#define __local___localdep_mempcpyc_defined
 #ifdef __CRT_HAVE_mempcpyc
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_mempcpyc,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),mempcpyc,(__dst,__src,__elem_count,__elem_size))
 #else /* __CRT_HAVE_mempcpyc */
@@ -42,7 +42,7 @@ __NOTHROW_NCX(__FORMATPRINTER_CC __LIBC_LOCAL_NAME(format_sprintf_printer))(void
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_format_sprintf_printer_defined
-#define __local___localdep_format_sprintf_printer_defined 1
+#define __local___localdep_format_sprintf_printer_defined
 #define __localdep_format_sprintf_printer __LIBC_LOCAL_NAME(format_sprintf_printer)
 #endif /* !__local___localdep_format_sprintf_printer_defined */
 #endif /* !__local_format_sprintf_printer_defined */

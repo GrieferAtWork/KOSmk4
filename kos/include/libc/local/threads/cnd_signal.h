@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x62a958b2 */
+/* HASH CRC-32:0xf5e6a0e9 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,13 +19,13 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_cnd_signal_defined
-#define __local_cnd_signal_defined 1
+#define __local_cnd_signal_defined
 #include <__crt.h>
 #ifdef __CRT_HAVE_pthread_cond_signal
 #include <bits/crt/threads.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_pthread_cond_signal_defined
-#define __local___localdep_pthread_cond_signal_defined 1
+#define __local___localdep_pthread_cond_signal_defined
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 #include <bits/crt/pthreadtypes.h>
@@ -46,7 +46,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(cnd_signal))(__cnd_t *__restrict __co
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_cnd_signal_defined
-#define __local___localdep_cnd_signal_defined 1
+#define __local___localdep_cnd_signal_defined
 #define __localdep_cnd_signal __LIBC_LOCAL_NAME(cnd_signal)
 #endif /* !__local___localdep_cnd_signal_defined */
 #else /* __CRT_HAVE_pthread_cond_signal */

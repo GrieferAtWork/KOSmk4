@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa484a28f */
+/* HASH CRC-32:0x86254d89 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,13 +19,13 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_strtoimax_l_defined
-#define __local_strtoimax_l_defined 1
+#define __local_strtoimax_l_defined
 #include <__crt.h>
 #include <features.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_strtoimax_defined
-#define __local___localdep_strtoimax_defined 1
+#define __local___localdep_strtoimax_defined
 #ifdef __CRT_HAVE_strtoimax
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__INTMAX_TYPE__,__NOTHROW_NCX,__localdep_strtoimax,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base),strtoimax,(__nptr,__endptr,__base))
 #elif defined(__CRT_HAVE_strtol) && __SIZEOF_INTMAX_T__ == __SIZEOF_LONG__
@@ -64,7 +64,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strtoimax_l))(char const *__restrict 
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_strtoimax_l_defined
-#define __local___localdep_strtoimax_l_defined 1
+#define __local___localdep_strtoimax_l_defined
 #define __localdep_strtoimax_l __LIBC_LOCAL_NAME(strtoimax_l)
 #endif /* !__local___localdep_strtoimax_l_defined */
 #endif /* !__local_strtoimax_l_defined */

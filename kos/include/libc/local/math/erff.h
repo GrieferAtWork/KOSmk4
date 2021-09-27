@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x359a2e82 */
+/* HASH CRC-32:0xff7e5615 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,12 +19,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_erff_defined
-#define __local_erff_defined 1
+#define __local_erff_defined
 #include <__crt.h>
 #if defined(__CRT_HAVE_erf) || defined(__CRT_HAVE___erf)
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_erf_defined
-#define __local___localdep_erf_defined 1
+#define __local___localdep_erf_defined
 #if __has_builtin(__builtin_erf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_erf)
 __CEIREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_erf,(double __x),erf,{ return __builtin_erf(__x); })
 #elif defined(__CRT_HAVE_erf)
@@ -41,7 +41,7 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(erff))(float __x) {
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_erff_defined
-#define __local___localdep_erff_defined 1
+#define __local___localdep_erff_defined
 #define __localdep_erff __LIBC_LOCAL_NAME(erff)
 #endif /* !__local___localdep_erff_defined */
 #else /* __CRT_HAVE_erf || __CRT_HAVE___erf */

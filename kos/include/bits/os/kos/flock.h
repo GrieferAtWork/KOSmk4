@@ -76,8 +76,6 @@
 #ifdef __CC__
 __DECL_BEGIN
 
-#ifndef __flock_defined
-#define __flock_defined 1
 struct flock /*[PREFIX(l_)]*/ {
 	__INT16_TYPE__ l_type;   /* Type of lock: F_RDLCK, F_WRLCK, or F_UNLCK. */
 	__INT16_TYPE__ l_whence; /* Where `l_start' is relative to (like `lseek'). */
@@ -96,21 +94,17 @@ struct flock /*[PREFIX(l_)]*/ {
 	__UINT32_TYPE__ __l_pad2; /* ... */
 #endif /* __ALIGNOF_INTN(__FS_SIZEOF(OFF)) >= 8 && __SIZEOF_PID_T__ < 8 */
 };
-#endif /* !__flock_defined */
 
 #if __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
 #define _FLOCK_MATCHES_FLOCK64 1
 #endif /* __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__ */
 
 #ifdef __USE_LARGEFILE64
-#ifndef __flock64_defined
-#define __flock64_defined 1
 #if (defined(__USE_FILE_OFFSET64) || defined(_FLOCK_MATCHES_FLOCK64)) && defined(__USE_STRUCT64_MACRO)
 #define flock64 flock
 #else /* (__USE_FILE_OFFSET64 || _FLOCK_MATCHES_FLOCK64) && __USE_STRUCT64_MACRO */
 #define __flock64 flock64
 #endif /* (!__USE_FILE_OFFSET64 && !_FLOCK_MATCHES_FLOCK64) || !__USE_STRUCT64_MACRO */
-#endif /* !__flock64_defined */
 #endif /* __USE_LARGEFILE64 */
 
 #if (defined(__USE_FILE_OFFSET64) || defined(_FLOCK_MATCHES_FLOCK64)) && defined(__USE_STRUCT64_MACRO)
@@ -137,14 +131,11 @@ struct __flock64 /*[NAME(flock64)][PREFIX(l_)]*/ {
 #endif /* (!__USE_FILE_OFFSET64 && !_FLOCK_MATCHES_FLOCK64) || !__USE_STRUCT64_MACRO */
 
 #ifdef __USE_KOS
-#ifndef __flock32_defined
-#define __flock32_defined 1
 #if !defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
 #define flock32 flock
 #else /* !__USE_FILE_OFFSET64 || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__ */
 #define __flock32 flock32
 #endif /* __USE_FILE_OFFSET64 && __SIZEOF_OFF32_T__ != __SIZEOF_OFF64_T__ */
-#endif /* !__flock32_defined */
 #endif /* __USE_KOS */
 
 #if !defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__

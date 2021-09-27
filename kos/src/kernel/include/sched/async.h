@@ -301,7 +301,7 @@ NOTHROW(FCALL async_cancel)(struct async *__restrict self);
 
 
 #ifndef __async_list_defined
-#define __async_list_defined 1
+#define __async_list_defined
 LIST_HEAD(async_list, async);
 #endif /* !__async_list_defined */
 

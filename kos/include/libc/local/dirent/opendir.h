@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x10f2ccd1 */
+/* HASH CRC-32:0xfd3ca1f0 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_opendir_defined
-#define __local_opendir_defined 1
+#define __local_opendir_defined
 #include <__crt.h>
 #include <asm/os/fcntl.h>
 #include <features.h>
@@ -28,7 +28,7 @@
 struct __dirstream;
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_opendirat_defined
-#define __local___localdep_opendirat_defined 1
+#define __local___localdep_opendirat_defined
 #ifdef __CRT_HAVE_opendirat
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2)),struct __dirstream *,__NOTHROW_RPC,__localdep_opendirat,(__fd_t __dirfd, char const *__name),opendirat,(__dirfd,__name))
 #elif defined(__CRT_HAVE_fopendirat) || (defined(__CRT_HAVE_fdopendir) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))
@@ -48,7 +48,7 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(opendir))(char const *__name) {
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_opendir_defined
-#define __local___localdep_opendir_defined 1
+#define __local___localdep_opendir_defined
 #define __localdep_opendir __LIBC_LOCAL_NAME(opendir)
 #endif /* !__local___localdep_opendir_defined */
 #else /* __AT_FDCWD && (__CRT_HAVE_opendirat || __CRT_HAVE_fopendirat || (__CRT_HAVE_fdopendir && (__CRT_HAVE_openat64 || __CRT_HAVE_openat))) */

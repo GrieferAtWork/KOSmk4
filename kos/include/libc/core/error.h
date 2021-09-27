@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5abceea0 */
+/* HASH CRC-32:0x15acf344 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,7 +30,7 @@
 __SYSDECL_BEGIN
 
 #ifndef ____libc_core_error_defined
-#define ____libc_core_error_defined 1
+#define ____libc_core_error_defined
 #ifdef __CRT_HAVE_error
 #include <kos/anno.h>
 #include <bits/types.h>
@@ -58,7 +58,7 @@ __LIBC __ATTR_LIBC_PRINTF(3, 4) void (__VLIBCCALL __libc_core_error)(int __statu
 #endif /* !__CRT_HAVE_error */
 #endif /* !____libc_core_error_defined */
 #ifndef ____libc_core_error_at_line_defined
-#define ____libc_core_error_at_line_defined 1
+#define ____libc_core_error_at_line_defined
 #ifdef __CRT_HAVE_error_at_line
 #include <kos/anno.h>
 #include <bits/types.h>

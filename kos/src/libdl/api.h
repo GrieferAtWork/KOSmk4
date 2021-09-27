@@ -55,7 +55,7 @@
 
 /* Prevent the global variable  `__peb' from being defined  prematurely
  * (and breaking the visibility of us exporting that variable for real) */
-#define ____peb_defined 1
+#define ____peb_defined
 
 /* Commit our custom configuration by using it to setup CRT definitions. */
 #include <__crt.h>

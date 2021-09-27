@@ -131,7 +131,7 @@ __SYSDECL_BEGIN
 
 %[define(DEFINE_FTW_FUNC_T =
 @@pp_ifndef ____ftw_func_t_defined@@
-#define ____ftw_func_t_defined 1
+#define ____ftw_func_t_defined
 struct stat;
 typedef int (__LIBKCALL *__ftw_func_t)(char const *__fpath, struct stat const *__sb, int __typeflag);
 @@pp_endif@@
@@ -139,7 +139,7 @@ typedef int (__LIBKCALL *__ftw_func_t)(char const *__fpath, struct stat const *_
 
 %[define(DEFINE_FTW64_FUNC_T =
 @@pp_ifndef ____ftw64_func_t_defined@@
-#define ____ftw64_func_t_defined 1
+#define ____ftw64_func_t_defined
 struct stat64;
 typedef int (__LIBKCALL *__ftw64_func_t)(char const *__fpath, struct stat64 const *__sb, int __typeflag);
 @@pp_endif@@
@@ -147,7 +147,7 @@ typedef int (__LIBKCALL *__ftw64_func_t)(char const *__fpath, struct stat64 cons
 
 %[define(DEFINE_NFTW_FUNC_T =
 @@pp_ifndef ____nftw_func_t_defined@@
-#define ____nftw_func_t_defined 1
+#define ____nftw_func_t_defined
 struct stat;
 @@pp_ifdef __USE_XOPEN_EXTENDED@@
 struct FTW;
@@ -161,7 +161,7 @@ typedef int (__LIBKCALL *__nftw_func_t)(char const *__fpath, struct stat const *
 
 %[define(DEFINE_NFTW64_FUNC_T =
 @@pp_ifndef ____nftw64_func_t_defined@@
-#define ____nftw64_func_t_defined 1
+#define ____nftw64_func_t_defined
 struct stat64;
 @@pp_ifdef __USE_XOPEN_EXTENDED@@
 struct FTW;

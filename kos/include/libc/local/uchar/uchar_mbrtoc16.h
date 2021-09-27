@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xebf1e1af */
+/* HASH CRC-32:0x4a5287ad */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,13 +19,13 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_uchar_mbrtoc16_defined
-#define __local_uchar_mbrtoc16_defined 1
+#define __local_uchar_mbrtoc16_defined
 #include <__crt.h>
 #include <bits/crt/mbstate.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_unicode_c8toc16_defined
-#define __local___localdep_unicode_c8toc16_defined 1
+#define __local___localdep_unicode_c8toc16_defined
 #ifdef __CRT_HAVE_unicode_c8toc16
 __CREDIRECT(__ATTR_NONNULL((1, 2, 4)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_unicode_c8toc16,(__CHAR16_TYPE__ *__restrict __pc16, char const *__restrict __s, __SIZE_TYPE__ __n, struct __mbstate *__restrict __mbs),unicode_c8toc16,(__pc16,__s,__n,__mbs))
 #else /* __CRT_HAVE_unicode_c8toc16 */
@@ -36,7 +36,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__CRT_HAVE_unicode_c8toc16 */
 #endif /* !__local___localdep_unicode_c8toc16_defined */
 #ifndef __local___localdep_unicode_c8toc32_defined
-#define __local___localdep_unicode_c8toc32_defined 1
+#define __local___localdep_unicode_c8toc32_defined
 #ifdef __CRT_HAVE_unicode_c8toc32
 __CREDIRECT(__ATTR_NONNULL((1, 2, 4)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_unicode_c8toc32,(__CHAR32_TYPE__ *__restrict __pc32, char const *__restrict __s, __SIZE_TYPE__ __n, struct __mbstate *__restrict __mbs),unicode_c8toc32,(__pc32,__s,__n,__mbs))
 #else /* __CRT_HAVE_unicode_c8toc32 */
@@ -75,7 +75,7 @@ __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(uchar_mbrtoc16))(__CHAR16_TYPE__ *__p
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_uchar_mbrtoc16_defined
-#define __local___localdep_uchar_mbrtoc16_defined 1
+#define __local___localdep_uchar_mbrtoc16_defined
 #define __localdep_uchar_mbrtoc16 __LIBC_LOCAL_NAME(uchar_mbrtoc16)
 #endif /* !__local___localdep_uchar_mbrtoc16_defined */
 #endif /* !__local_uchar_mbrtoc16_defined */

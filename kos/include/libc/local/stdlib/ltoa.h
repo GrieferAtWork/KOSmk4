@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2546ee8e */
+/* HASH CRC-32:0x1f6a16e3 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,11 +19,11 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_ltoa_defined
-#define __local_ltoa_defined 1
+#define __local_ltoa_defined
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep__ltoa_s_defined
-#define __local___localdep__ltoa_s_defined 1
+#define __local___localdep__ltoa_s_defined
 #ifdef __CRT_HAVE__ltoa_s
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
@@ -58,7 +58,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(ltoa))(long __val, char *__buf, int _
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_ltoa_defined
-#define __local___localdep_ltoa_defined 1
+#define __local___localdep_ltoa_defined
 #define __localdep_ltoa __LIBC_LOCAL_NAME(ltoa)
 #endif /* !__local___localdep_ltoa_defined */
 #endif /* !__local_ltoa_defined */

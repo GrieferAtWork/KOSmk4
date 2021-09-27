@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x22d448a8 */
+/* HASH CRC-32:0x7ba747c9 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,12 +19,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_bzerol_defined
-#define __local_bzerol_defined 1
+#define __local_bzerol_defined
 #include <__crt.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_memsetl_defined
-#define __local___localdep_memsetl_defined 1
+#define __local___localdep_memsetl_defined
 #ifdef __CRT_HAVE_memsetl
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),__UINT32_TYPE__ *,__NOTHROW_NCX,__localdep_memsetl,(void *__restrict __dst, __UINT32_TYPE__ __dword, __SIZE_TYPE__ __n_dwords),memsetl,(__dst,__dword,__n_dwords))
 #elif defined(__CRT_HAVE_wmemset) && __SIZEOF_WCHAR_T__ == 4
@@ -44,7 +44,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(bzerol))(void *__restrict __dst, __SI
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_bzerol_defined
-#define __local___localdep_bzerol_defined 1
+#define __local___localdep_bzerol_defined
 #define __localdep_bzerol __LIBC_LOCAL_NAME(bzerol)
 #endif /* !__local___localdep_bzerol_defined */
 #endif /* !__local_bzerol_defined */

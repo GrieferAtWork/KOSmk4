@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa5a26d1d */
+/* HASH CRC-32:0x496a2011 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,13 +19,13 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local__dupenv_s_dbg_defined
-#define __local__dupenv_s_dbg_defined 1
+#define __local__dupenv_s_dbg_defined
 #include <__crt.h>
 #ifdef __CRT_HAVE__dupenv_s
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep__dupenv_s_defined
-#define __local___localdep__dupenv_s_defined 1
+#define __local___localdep__dupenv_s_defined
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -40,7 +40,7 @@ __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(_dupenv_s_dbg))(char **__pbuf, __SIZE
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep__dupenv_s_dbg_defined
-#define __local___localdep__dupenv_s_dbg_defined 1
+#define __local___localdep__dupenv_s_dbg_defined
 #define __localdep__dupenv_s_dbg __LIBC_LOCAL_NAME(_dupenv_s_dbg)
 #endif /* !__local___localdep__dupenv_s_dbg_defined */
 #else /* __CRT_HAVE__dupenv_s */

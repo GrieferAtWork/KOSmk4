@@ -25,23 +25,23 @@
 
 #if defined(__i386__) && !defined(__x86_64__)
 #define LIBZLIB_CC __ATTR_FASTCALL
-#else
+#else /* ... */
 #define LIBZLIB_CC /* nothing */
-#endif
+#endif /* !... */
 
-#if !defined(LIBZLIB_WANT_PROTOTYPES) && \
-     defined(__KOS__) && defined(__KERNEL__)
-#define LIBZLIB_WANT_PROTOTYPES 1
-#endif
+#if (!defined(LIBZLIB_WANT_PROTOTYPES) && \
+     defined(__KOS__) && defined(__KERNEL__))
+#define LIBZLIB_WANT_PROTOTYPES
+#endif /* ... */
 
-#if defined(__KOS__) && defined(__KERNEL__) && \
-    defined(CONFIG_BUILDING_KERNEL_CORE)
+#if (defined(__KOS__) && defined(__KERNEL__) && \
+     defined(CONFIG_BUILDING_KERNEL_CORE))
 #define LIBZLIB_DECL __PUBDEF
 #elif defined(__LIBZLIB_STATIC)
 #define LIBZLIB_DECL __INTDEF
-#else
+#else /* ... */
 #define LIBZLIB_DECL __IMPDEF
-#endif
+#endif /* !... */
 
 /* Library name for use with `dlopen()' */
 #define LIBZLIB_LIBRARY_NAME "libzlbi.so"

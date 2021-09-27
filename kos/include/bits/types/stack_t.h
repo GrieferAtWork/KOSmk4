@@ -22,7 +22,7 @@
 #include <bits/os/sigstack.h>
 #endif /* !__sigstack_defined */
 #ifndef __stack_t_defined
-#define __stack_t_defined 1
+#define __stack_t_defined
 #ifdef __CC__
 typedef struct sigaltstack stack_t;
 #endif /* __CC__ */

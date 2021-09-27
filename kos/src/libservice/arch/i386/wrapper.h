@@ -1332,7 +1332,7 @@ NOTHROW(FCALL comgen_compile)(struct com_generator *__restrict self);
 /* Define the symbol `id' at the current text location. */
 #define comgen_defsym(self, id) (void)((self)->cg_symbols[id] = comgen_funcrel_offset(self))
 
-/* Return the absolute address of the given symbol `id'.
+/* Return the  absolute address  of  the given  symbol  `id'.
  * The caller must ensure that `id' has already been defined. */
 #define comgen_symaddr(self, id) ((self)->cg_txbas + (self)->cg_symbols[id])
 #define comgen_symreladdr(self, id) (self)->cg_symbols[id]

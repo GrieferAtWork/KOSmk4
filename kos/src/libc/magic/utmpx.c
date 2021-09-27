@@ -62,7 +62,7 @@ struct utmp;
 #endif /* __USE_GNU */
 
 #ifndef __pid_t_defined
-#define __pid_t_defined 1
+#define __pid_t_defined
 typedef __pid_t pid_t;
 #endif /* !__pid_t_defined */
 

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6d32a09c */
+/* HASH CRC-32:0x466494fb */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,14 +19,14 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_putchar32_unlocked_defined
-#define __local_putchar32_unlocked_defined 1
+#define __local_putchar32_unlocked_defined
 #include <__crt.h>
 #if ((defined(__CRT_HAVE_fputwc_unlocked) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)) || defined(__CRT_HAVE_KOS$fputwc_unlocked) || (defined(__CRT_HAVE__fputwc_nolock) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)) || defined(__CRT_HAVE_KOS$_fputwc_nolock)) && !defined(__NO_STDSTREAMS)
 #include <hybrid/typecore.h>
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_fputc32_unlocked_defined
-#define __local___localdep_fputc32_unlocked_defined 1
+#define __local___localdep_fputc32_unlocked_defined
 #if defined(__CRT_HAVE_fputwc_unlocked) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
 __CREDIRECT(__ATTR_NONNULL((2)),__WINT32_TYPE__,__THROWING,__localdep_fputc32_unlocked,(__CHAR32_TYPE__ __wc, __FILE *__restrict __stream),fputwc_unlocked,(__wc,__stream))
 #elif defined(__CRT_HAVE_KOS$fputwc_unlocked)
@@ -48,7 +48,7 @@ __LOCAL_LIBC(putchar32_unlocked) __WINT32_TYPE__
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_putchar32_unlocked_defined
-#define __local___localdep_putchar32_unlocked_defined 1
+#define __local___localdep_putchar32_unlocked_defined
 #define __localdep_putchar32_unlocked __LIBC_LOCAL_NAME(putchar32_unlocked)
 #endif /* !__local___localdep_putchar32_unlocked_defined */
 #else /* ((__CRT_HAVE_fputwc_unlocked && __SIZEOF_WCHAR_T__ == 4 && __LIBCCALL_IS_LIBKCALL) || __CRT_HAVE_KOS$fputwc_unlocked || (__CRT_HAVE__fputwc_nolock && __SIZEOF_WCHAR_T__ == 4 && __LIBCCALL_IS_LIBKCALL) || __CRT_HAVE_KOS$_fputwc_nolock) && !__NO_STDSTREAMS */

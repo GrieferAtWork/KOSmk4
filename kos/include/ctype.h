@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x411e2efd */
+/* HASH CRC-32:0xb9a8b75e */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -993,7 +993,7 @@ __LOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL _toupper)(int __ch)
 
 #ifdef __USE_DOS
 #ifndef ___isctype_defined
-#define ___isctype_defined 1
+#define ___isctype_defined
 #ifdef __CRT_HAVE__isctype
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,_isctype,(int __ch, int __mask),(__ch,__mask))
 #else /* __CRT_HAVE__isctype */
@@ -1002,7 +1002,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_isctype, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_
 #endif /* !__CRT_HAVE__isctype */
 #endif /* !___isctype_defined */
 #ifndef ___isctype_l_defined
-#define ___isctype_l_defined 1
+#define ___isctype_l_defined
 #ifdef __CRT_HAVE__isctype_l
 __CDECLARE(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,_isctype_l,(int __ch, int __mask, __locale_t __locale),(__ch,__mask,__locale))
 #else /* __CRT_HAVE__isctype_l */
@@ -1420,7 +1420,7 @@ __SYSDECL_END
 #endif /* __CC__ */
 
 #ifdef __CXX_SYSTEM_HEADER
-#define _CXX_STDONLY_CCTYPE 1
+#define _CXX_STDONLY_CCTYPE
 #undef _CTYPE_H
 #endif /* __CXX_SYSTEM_HEADER */
 #endif /* !_CXX_STDONLY_CCTYPE */

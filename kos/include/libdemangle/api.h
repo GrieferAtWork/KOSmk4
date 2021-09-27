@@ -26,20 +26,20 @@
 #if defined(__i386__) && !defined(__x86_64__)
 #define LIBDEMANGLE_CC  __ATTR_STDCALL
 #define LIBDEMANGLE_VCC __ATTR_CDECL
-#else
+#else /* ... */
 #define LIBDEMANGLE_CC  /* nothing */
 #define LIBDEMANGLE_VCC /* nothing */
-#endif
+#endif /* !... */
 
 #if 0
-#define LIBDEMANGLE_WANT_PROTOTYPES 1
+#define LIBDEMANGLE_WANT_PROTOTYPES
 #endif
 
 #if defined(__LIBDEMANGLE_STATIC)
 #define LIBDEMANGLE_DECL __INTDEF
-#else
+#else /* ... */
 #define LIBDEMANGLE_DECL __IMPDEF
-#endif
+#endif /* !... */
 
 /* Library name for use with `dlopen()' */
 #define LIBDEMANGLE_LIBRARY_NAME "libdemangle.so"

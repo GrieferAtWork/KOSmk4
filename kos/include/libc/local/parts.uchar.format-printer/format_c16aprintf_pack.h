@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb4734f67 */
+/* HASH CRC-32:0x5a44453b */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,11 +19,11 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_format_c16aprintf_pack_defined
-#define __local_format_c16aprintf_pack_defined 1
+#define __local_format_c16aprintf_pack_defined
 #include <__crt.h>
 #ifdef __CRT_HAVE_realloc
 #ifndef __format_waprintf_data_defined
-#define __format_waprintf_data_defined 1
+#define __format_waprintf_data_defined
 struct format_waprintf_data {
 	__WCHAR_TYPE__      *ap_base;  /* [0..ap_used|ALLOC(ap_used+ap_avail)][owned] Buffer */
 	__SIZE_TYPE__ ap_avail; /* Unused buffer size */
@@ -32,7 +32,7 @@ struct format_waprintf_data {
 #endif /* !__format_waprintf_data_defined */
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_malloc_defined
-#define __local___localdep_malloc_defined 1
+#define __local___localdep_malloc_defined
 #if __has_builtin(__builtin_malloc) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_malloc)
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
@@ -51,7 +51,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_malloc_defined */
 #ifndef __local___localdep_realloc_defined
-#define __local___localdep_realloc_defined 1
+#define __local___localdep_realloc_defined
 #if __has_builtin(__builtin_realloc) && defined(__LIBC_BIND_CRTBUILTINS)
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
@@ -110,7 +110,7 @@ __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(format_c16aprintf_pack))(struct forma
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_format_c16aprintf_pack_defined
-#define __local___localdep_format_c16aprintf_pack_defined 1
+#define __local___localdep_format_c16aprintf_pack_defined
 #define __localdep_format_c16aprintf_pack __LIBC_LOCAL_NAME(format_c16aprintf_pack)
 #endif /* !__local___localdep_format_c16aprintf_pack_defined */
 #else /* __CRT_HAVE_realloc */

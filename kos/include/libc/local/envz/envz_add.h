@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6e9e63b1 */
+/* HASH CRC-32:0x5f98d762 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,13 +19,13 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_envz_add_defined
-#define __local_envz_add_defined 1
+#define __local_envz_add_defined
 #include <__crt.h>
 #ifdef __CRT_HAVE_realloc
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_argz_add_defined
-#define __local___localdep_argz_add_defined 1
+#define __local___localdep_argz_add_defined
 #ifdef __CRT_HAVE_argz_add
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
@@ -44,7 +44,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_argz_add_defined */
 #ifndef __local___localdep_envz_remove_defined
-#define __local___localdep_envz_remove_defined 1
+#define __local___localdep_envz_remove_defined
 #ifdef __CRT_HAVE_envz_remove
 __CREDIRECT_VOID(__ATTR_NONNULL((1, 2, 3)),__NOTHROW_NCX,__localdep_envz_remove,(char **__restrict __penvz, __SIZE_TYPE__ *__restrict __penvz_len, char const *__restrict __name),envz_remove,(__penvz,__penvz_len,__name))
 #else /* __CRT_HAVE_envz_remove */
@@ -55,7 +55,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__CRT_HAVE_envz_remove */
 #endif /* !__local___localdep_envz_remove_defined */
 #ifndef __local___localdep_mempcpyc_defined
-#define __local___localdep_mempcpyc_defined 1
+#define __local___localdep_mempcpyc_defined
 #ifdef __CRT_HAVE_mempcpyc
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_mempcpyc,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),mempcpyc,(__dst,__src,__elem_count,__elem_size))
 #else /* __CRT_HAVE_mempcpyc */
@@ -66,7 +66,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__CRT_HAVE_mempcpyc */
 #endif /* !__local___localdep_mempcpyc_defined */
 #ifndef __local___localdep_realloc_defined
-#define __local___localdep_realloc_defined 1
+#define __local___localdep_realloc_defined
 #if __has_builtin(__builtin_realloc) && defined(__LIBC_BIND_CRTBUILTINS)
 __CEIREDIRECT(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)),void *,__NOTHROW_NCX,__localdep_realloc,(void *__mallptr, __SIZE_TYPE__ __num_bytes),realloc,{ return __builtin_realloc(__mallptr, __num_bytes); })
 #else /* __has_builtin(__builtin_realloc) && __LIBC_BIND_CRTBUILTINS */
@@ -74,7 +74,7 @@ __CREDIRECT(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)),vo
 #endif /* !__has_builtin(__builtin_realloc) || !__LIBC_BIND_CRTBUILTINS */
 #endif /* !__local___localdep_realloc_defined */
 #ifndef __local___localdep_strlen_defined
-#define __local___localdep_strlen_defined 1
+#define __local___localdep_strlen_defined
 #ifdef __CRT_HAVE_strlen
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_strlen,(char const *__restrict __str),strlen,(__str))
 #else /* __CRT_HAVE_strlen */
@@ -117,7 +117,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(envz_add))(char **__restrict __penvz,
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_envz_add_defined
-#define __local___localdep_envz_add_defined 1
+#define __local___localdep_envz_add_defined
 #define __localdep_envz_add __LIBC_LOCAL_NAME(envz_add)
 #endif /* !__local___localdep_envz_add_defined */
 #else /* __CRT_HAVE_realloc */

@@ -100,7 +100,7 @@ __SYSDECL_BEGIN
 #endif /* !FORMATPRINTER_CC */
 
 #ifndef __pformatprinter_defined
-#define __pformatprinter_defined 1
+#define __pformatprinter_defined
 /* Callback functions prototypes provided to format functions.
  * NOTE: 'pformatprinter' usually returns the number of characters printed, but isn't required to.
  * @param: arg:     The user-defined closure parameter passed alongside this function pointer.
@@ -966,7 +966,7 @@ $ssize_t format_sprintf_printer([[nonnull]] /*char ***/ void *arg,
 
 
 #ifndef __format_snprintf_data_defined
-#define __format_snprintf_data_defined 1
+#define __format_snprintf_data_defined
 /* Data structure for implementing snprintf() */
 struct format_snprintf_data {
 	char         *sd_buffer; /* [0..sd_bufsiz] Pointer to the next memory location to which to write. */
@@ -1047,7 +1047,7 @@ $ssize_t format_length(void *arg,
 %{
 
 #ifndef __format_aprintf_data_defined
-#define __format_aprintf_data_defined 1
+#define __format_aprintf_data_defined
 struct format_aprintf_data {
 	char         *ap_base;  /* [0..ap_used|ALLOC(ap_used+ap_avail)][owned] Buffer */
 	__SIZE_TYPE__ ap_avail; /* Unused buffer size */
@@ -1085,7 +1085,7 @@ struct format_aprintf_data {
 
 %[define(DEFINE_FORMAT_APRINTF_DATA =
 @@pp_ifndef __format_aprintf_data_defined@@
-#define __format_aprintf_data_defined 1
+#define __format_aprintf_data_defined
 struct format_aprintf_data {
 	char         *@ap_base@;  /* [0..ap_used|ALLOC(ap_used+ap_avail)][owned] Buffer */
 	__SIZE_TYPE__ @ap_avail@; /* Unused buffer size */

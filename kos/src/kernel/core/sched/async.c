@@ -58,7 +58,7 @@ PUBLIC struct lockop_slist /*  */ async_all_lops = SLIST_HEAD_INITIALIZER(async_
 
 
 #ifndef __async_slist_defined
-#define __async_slist_defined 1
+#define __async_slist_defined
 SLIST_HEAD(async_slist, async);
 #endif /* !__async_slist_defined */
 

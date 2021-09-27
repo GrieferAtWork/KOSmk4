@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc305b10f */
+/* HASH CRC-32:0x7279fce8 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,13 +19,13 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local__expand_dbg_defined
-#define __local__expand_dbg_defined 1
+#define __local__expand_dbg_defined
 #include <__crt.h>
 #if defined(__CRT_HAVE_realloc_in_place) || defined(__CRT_HAVE__expand)
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_realloc_in_place_defined
-#define __local___localdep_realloc_in_place_defined 1
+#define __local___localdep_realloc_in_place_defined
 #ifdef __CRT_HAVE_realloc_in_place
 __CREDIRECT(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_ALLOC_SIZE((2)),void *,__NOTHROW_NCX,__localdep_realloc_in_place,(void *__restrict __mallptr, __SIZE_TYPE__ __n_bytes),realloc_in_place,(__mallptr,__n_bytes))
 #elif defined(__CRT_HAVE__expand)
@@ -43,7 +43,7 @@ __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(_expand_dbg))(void *__ptr, __SIZE_TYP
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep__expand_dbg_defined
-#define __local___localdep__expand_dbg_defined 1
+#define __local___localdep__expand_dbg_defined
 #define __localdep__expand_dbg __LIBC_LOCAL_NAME(_expand_dbg)
 #endif /* !__local___localdep__expand_dbg_defined */
 #else /* __CRT_HAVE_realloc_in_place || __CRT_HAVE__expand */

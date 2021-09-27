@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xddb7233b */
+/* HASH CRC-32:0x7815aeca */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,14 +19,14 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_pthread_once_defined
-#define __local_pthread_once_defined 1
+#define __local_pthread_once_defined
 #include <__crt.h>
 #include <kos/anno.h>
 #include <bits/types.h>
 #include <bits/crt/pthreadtypes.h>
 __NAMESPACE_LOCAL_BEGIN
 #if !defined(__local___localdep_error_rethrow_defined) && defined(__CRT_HAVE_error_rethrow)
-#define __local___localdep_error_rethrow_defined 1
+#define __local___localdep_error_rethrow_defined
 __COMPILER_REDIRECT_VOID(__LIBC,__ATTR_COLD __ATTR_NORETURN,__THROWING,__LIBKCALL,__localdep_error_rethrow,(void),error_rethrow,())
 #endif /* !__local___localdep_error_rethrow_defined && __CRT_HAVE_error_rethrow */
 __NAMESPACE_LOCAL_END
@@ -100,7 +100,7 @@ __again:
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_pthread_once_defined
-#define __local___localdep_pthread_once_defined 1
+#define __local___localdep_pthread_once_defined
 #define __localdep_pthread_once __LIBC_LOCAL_NAME(pthread_once)
 #endif /* !__local___localdep_pthread_once_defined */
 #endif /* !__local_pthread_once_defined */

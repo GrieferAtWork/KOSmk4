@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1a79dec1 */
+/* HASH CRC-32:0x8ce77d47 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -37,7 +37,7 @@
 __SYSDECL_BEGIN
 
 #if !defined(__fmtcheck_defined) && defined(__CRT_HAVE_fmtcheck)
-#define __fmtcheck_defined 1
+#define __fmtcheck_defined
 /* >> fmtcheck(3)
  * Check if `user_format' may be used as a drop-in replacement for `good_format'
  * in the context of a call to `printf(3)' (or `format_printf()'), such that all
@@ -51,12 +51,12 @@ __SYSDECL_BEGIN
 __CDECLARE(__ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((2)) __ATTR_FORMAT_ARG(2),char const *,__NOTHROW_NCX,fmtcheck,(char const *__user_format, char const *__good_format),(__user_format,__good_format))
 #endif /* !__fmtcheck_defined && __CRT_HAVE_fmtcheck */
 #if !defined(__fgetln_defined) && defined(__CRT_HAVE_fgetln)
-#define __fgetln_defined 1
+#define __fgetln_defined
 /* >> fgetln(3) */
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),char *,__NOTHROW_NCX,fgetln,(__FILE *__restrict __fp, __SIZE_TYPE__ *__restrict __lenp),(__fp,__lenp))
 #endif /* !__fgetln_defined && __CRT_HAVE_fgetln */
 #ifndef __fpurge_defined
-#define __fpurge_defined 1
+#define __fpurge_defined
 #ifdef __CRT_HAVE___fpurge
 /* >> __fpurge(3)
  * Discard all pending buffered I/O on `stream' */
@@ -70,7 +70,7 @@ __CDECLARE_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,fpurge,(__FILE *__stream),(__s
 #endif /* !... */
 #endif /* !__fpurge_defined */
 #ifndef __funopen_defined
-#define __funopen_defined 1
+#define __funopen_defined
 #if defined(__CRT_HAVE_funopen) && __FS_SIZEOF(OFF) == __SIZEOF_OFF32_T__
 /* >> funopen(3), funopen64(3) */
 __CDECLARE(__ATTR_WUNUSED,__FILE *,__NOTHROW_NCX,funopen,(void const *__cookie, int (__LIBKCALL *__readfn)(void *__cookie, char *__buf, int __num_bytes), int (__LIBKCALL *__writefn)(void *__cookie, char const *__buf, int __num_bytes), off_t (__LIBKCALL *__seekfn)(void *__cookie, off_t __off, int __whence), int (__LIBKCALL *__closefn)(void *__cookie)),(__cookie,__readfn,__writefn,__seekfn,__closefn))

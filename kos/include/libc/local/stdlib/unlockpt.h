@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfe972e90 */
+/* HASH CRC-32:0xd40fab89 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,14 +19,14 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_unlockpt_defined
-#define __local_unlockpt_defined 1
+#define __local_unlockpt_defined
 #include <__crt.h>
 #include <asm/os/tty.h>
 #if defined(__CRT_HAVE_ioctl) && defined(__TIOCSPTLCK)
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_ioctl_defined
-#define __local___localdep_ioctl_defined 1
+#define __local___localdep_ioctl_defined
 __NAMESPACE_LOCAL_END
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -41,7 +41,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(unlockpt))(__fd_t __fd) {
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_unlockpt_defined
-#define __local___localdep_unlockpt_defined 1
+#define __local___localdep_unlockpt_defined
 #define __localdep_unlockpt __LIBC_LOCAL_NAME(unlockpt)
 #endif /* !__local___localdep_unlockpt_defined */
 #else /* __CRT_HAVE_ioctl && __TIOCSPTLCK */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5c19507b */
+/* HASH CRC-32:0xe0eeb2e2 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,13 +19,13 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_error_active_defined
-#define __local_error_active_defined 1
+#define __local_error_active_defined
 #include <__crt.h>
 #include <kos/bits/fastexcept.h>
 #if defined(__CRT_HAVE_error_code) || defined(__arch_error_code) || defined(__CRT_HAVE_error_data) || defined(__arch_error_data)
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_error_code_defined
-#define __local___localdep_error_code_defined 1
+#define __local___localdep_error_code_defined
 #ifdef __CRT_HAVE_error_code
 __NAMESPACE_LOCAL_END
 #include <kos/bits/exception_data.h>
@@ -53,7 +53,7 @@ __NOTHROW(__LIBKCALL __LIBC_LOCAL_NAME(error_active))(void) {
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_error_active_defined
-#define __local___localdep_error_active_defined 1
+#define __local___localdep_error_active_defined
 #define __localdep_error_active __LIBC_LOCAL_NAME(error_active)
 #endif /* !__local___localdep_error_active_defined */
 #else /* __CRT_HAVE_error_code || __arch_error_code || __CRT_HAVE_error_data || __arch_error_data */

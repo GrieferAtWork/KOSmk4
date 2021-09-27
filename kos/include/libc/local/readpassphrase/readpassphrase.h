@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xda166452 */
+/* HASH CRC-32:0x8d4ccfe1 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,14 +19,14 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_readpassphrase_defined
-#define __local_readpassphrase_defined 1
+#define __local_readpassphrase_defined
 #include <__crt.h>
 #include <asm/os/stdio.h>
 #if defined(__STDIN_FILENO) && (defined(__CRT_HAVE_read) || defined(__CRT_HAVE__read) || defined(__CRT_HAVE___read))
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_close_defined
-#define __local___localdep_close_defined 1
+#define __local___localdep_close_defined
 #ifdef __CRT_HAVE_close
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
@@ -47,7 +47,7 @@ __CREDIRECT(,int,__NOTHROW_NCX,__localdep_close,(__fd_t __fd),__close,(__fd))
 #endif /* !... */
 #endif /* !__local___localdep_close_defined */
 #ifndef __local___localdep_getpid_defined
-#define __local___localdep_getpid_defined 1
+#define __local___localdep_getpid_defined
 #ifdef __CRT_HAVE_getpid
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__pid_t,__NOTHROW,__localdep_getpid,(void),getpid,())
 #elif defined(__CRT_HAVE__getpid)
@@ -59,14 +59,14 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__pid_t,__NOTHROW,__localdep_getpid,(voi
 #endif /* !... */
 #endif /* !__local___localdep_getpid_defined */
 #if !defined(__local___localdep_kill_defined) && defined(__CRT_HAVE_kill)
-#define __local___localdep_kill_defined 1
+#define __local___localdep_kill_defined
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_kill,(__pid_t __pid, __signo_t __signo),kill,(__pid,__signo))
 #endif /* !__local___localdep_kill_defined && __CRT_HAVE_kill */
 #ifndef __local___localdep_memcmp_defined
-#define __local___localdep_memcmp_defined 1
+#define __local___localdep_memcmp_defined
 #ifdef __CRT_HAVE_memcmp
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
@@ -85,7 +85,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_memcmp_defined */
 #ifndef __local___localdep_memcpy_defined
-#define __local___localdep_memcpy_defined 1
+#define __local___localdep_memcpy_defined
 #ifdef __CRT_HAVE_memcpy
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
@@ -99,7 +99,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__CRT_HAVE_memcpy */
 #endif /* !__local___localdep_memcpy_defined */
 #ifndef __local___localdep_memset_defined
-#define __local___localdep_memset_defined 1
+#define __local___localdep_memset_defined
 #ifdef __CRT_HAVE_memset
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
@@ -113,7 +113,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__CRT_HAVE_memset */
 #endif /* !__local___localdep_memset_defined */
 #ifndef __local___localdep_open_defined
-#define __local___localdep_open_defined 1
+#define __local___localdep_open_defined
 __NAMESPACE_LOCAL_END
 #include <asm/os/oflags.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -157,7 +157,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_open_defined */
 #ifndef __local___localdep_raise_defined
-#define __local___localdep_raise_defined 1
+#define __local___localdep_raise_defined
 #ifdef __CRT_HAVE_raise
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
@@ -173,7 +173,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_raise_defined */
 #ifndef __local___localdep_read_defined
-#define __local___localdep_read_defined 1
+#define __local___localdep_read_defined
 #ifdef __CRT_HAVE_read
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
@@ -194,7 +194,7 @@ __CREDIRECT(__ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_read,(__
 #endif /* !... */
 #endif /* !__local___localdep_read_defined */
 #ifndef __local___localdep_sigaction_defined
-#define __local___localdep_sigaction_defined 1
+#define __local___localdep_sigaction_defined
 #ifdef __CRT_HAVE_sigaction
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
@@ -212,7 +212,7 @@ __CREDIRECT(,int,__NOTHROW_NCX,__localdep_sigaction,(__signo_t __signo, struct s
 #endif /* !... */
 #endif /* !__local___localdep_sigaction_defined */
 #ifndef __local___localdep_strlen_defined
-#define __local___localdep_strlen_defined 1
+#define __local___localdep_strlen_defined
 #ifdef __CRT_HAVE_strlen
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
@@ -226,7 +226,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__CRT_HAVE_strlen */
 #endif /* !__local___localdep_strlen_defined */
 #ifndef __local___localdep_tcgetattr_defined
-#define __local___localdep_tcgetattr_defined 1
+#define __local___localdep_tcgetattr_defined
 #ifdef __CRT_HAVE_tcgetattr
 __NAMESPACE_LOCAL_END
 #include <bits/os/termios.h>
@@ -247,7 +247,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__CRT_HAVE_tcgetattr */
 #endif /* !__local___localdep_tcgetattr_defined */
 #ifndef __local___localdep_tcsetattr_defined
-#define __local___localdep_tcsetattr_defined 1
+#define __local___localdep_tcsetattr_defined
 #ifdef __CRT_HAVE_tcsetattr
 __NAMESPACE_LOCAL_END
 #include <bits/os/termios.h>
@@ -263,7 +263,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_tcsetattr_defined */
 #ifndef __local___localdep_tolower_defined
-#define __local___localdep_tolower_defined 1
+#define __local___localdep_tolower_defined
 __NAMESPACE_LOCAL_END
 #include <bits/crt/ctype.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -283,7 +283,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_tolower_defined */
 #ifndef __local___localdep_toupper_defined
-#define __local___localdep_toupper_defined 1
+#define __local___localdep_toupper_defined
 __NAMESPACE_LOCAL_END
 #include <bits/crt/ctype.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -303,7 +303,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_toupper_defined */
 #ifndef __local___localdep_write_defined
-#define __local___localdep_write_defined 1
+#define __local___localdep_write_defined
 #ifdef __CRT_HAVE_write
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
@@ -685,7 +685,7 @@ __err:
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_readpassphrase_defined
-#define __local___localdep_readpassphrase_defined 1
+#define __local___localdep_readpassphrase_defined
 #define __localdep_readpassphrase __LIBC_LOCAL_NAME(readpassphrase)
 #endif /* !__local___localdep_readpassphrase_defined */
 #else /* __STDIN_FILENO && (__CRT_HAVE_read || __CRT_HAVE__read || __CRT_HAVE___read) */

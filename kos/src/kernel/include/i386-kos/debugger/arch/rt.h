@@ -204,7 +204,7 @@ DATDEF struct segment x86_dbggdt[SEGMENT_COUNT];
 DATDEF struct desctab const x86_dbggdt_ptr;
 
 #ifndef __x86_dbgidt_defined
-#define __x86_dbgidt_defined 1
+#define __x86_dbgidt_defined
 DATDEF struct idt_segment x86_dbgidt[256];
 DATDEF struct desctab const x86_dbgidt_ptr;
 #ifndef CONFIG_NO_SMP
@@ -214,7 +214,7 @@ DATDEF struct desctab const x86_dbgaltcoreidt_ptr;
 #endif /* !__x86_dbgidt_defined */
 
 #ifndef __dbg_stack_defined
-#define __dbg_stack_defined 1
+#define __dbg_stack_defined
 DATDEF byte_t dbg_stack[KERNEL_DEBUG_STACKSIZE];
 #endif /* !__dbg_stack_defined */
 

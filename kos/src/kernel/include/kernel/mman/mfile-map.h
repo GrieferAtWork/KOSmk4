@@ -35,7 +35,7 @@ DECL_BEGIN
 struct mnode;
 
 #ifndef __mnode_slist_defined
-#define __mnode_slist_defined 1
+#define __mnode_slist_defined
 SLIST_HEAD(mnode_slist, mnode);
 #endif /* !__mnode_slist_defined */
 

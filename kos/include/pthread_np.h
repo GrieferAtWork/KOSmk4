@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc7281454 */
+/* HASH CRC-32:0xf1e2be88 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -38,12 +38,12 @@
 __SYSDECL_BEGIN
 
 #ifndef __pthread_switch_routine_t_defined
-#define __pthread_switch_routine_t_defined 1
+#define __pthread_switch_routine_t_defined
 typedef void (__LIBKCALL *pthread_switch_routine_t)(pthread_t, pthread_t);
 #endif /* !__pthread_switch_routine_t_defined */
 
 #ifndef __stack_t_defined
-#define __stack_t_defined 1
+#define __stack_t_defined
 typedef struct sigaltstack stack_t;
 #endif /* !__stack_t_defined */
 
@@ -100,7 +100,7 @@ __CREDIRECT(__ATTR_NONNULL((2)),__errno_t,__NOTHROW_NCX,pthread_set_name_np,(pth
 __CDECLARE(__ATTR_NONNULL((2)),__errno_t,__NOTHROW_NCX,pthread_set_name_np,(pthread_t __target_thread, const char *__name),(__target_thread,__name))
 #endif /* ... */
 #ifndef __pthread_main_np_defined
-#define __pthread_main_np_defined 1
+#define __pthread_main_np_defined
 #ifdef __CRT_HAVE_pthread_main_np
 /* >> pthread_main_np(3)
  * Returns  1 if the  calling thread is the  main() thread (i.e. the

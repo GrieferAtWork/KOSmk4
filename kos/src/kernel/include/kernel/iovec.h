@@ -73,7 +73,7 @@
 DECL_BEGIN
 
 #ifndef __iov_entry_defined
-#define __iov_entry_defined 1
+#define __iov_entry_defined
 struct iov_entry {
 	USER CHECKED byte_t *ive_base; /* [?..ive_size] Virtual base address of the buffer. */
 	size_t               ive_size; /* Buffer size of `ive_base' (in bytes) */

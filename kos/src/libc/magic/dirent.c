@@ -203,24 +203,24 @@ __SYSDECL_BEGIN
 
 #ifdef __USE_XOPEN
 #ifndef __ino_t_defined
-#define __ino_t_defined 1
+#define __ino_t_defined
 typedef __FS_TYPE(ino) ino_t; /* INode number */
 #endif /* !__ino_t_defined */
 #ifdef __USE_LARGEFILE64
 #ifndef __ino64_t_defined
-#define __ino64_t_defined 1
+#define __ino64_t_defined
 typedef __ino64_t ino64_t; /* INode number */
 #endif /* !__ino64_t_defined */
 #endif /* __USE_LARGEFILE64 */
 #endif /* __USE_XOPEN */
 
 #ifndef __size_t_defined
-#define __size_t_defined 1
+#define __size_t_defined
 typedef __SIZE_TYPE__ size_t;
 #endif /* !__size_t_defined */
 
 #ifndef __DIR_defined
-#define __DIR_defined 1
+#define __DIR_defined
 typedef struct __dirstream DIR;
 #endif /* !__DIR_defined */
 

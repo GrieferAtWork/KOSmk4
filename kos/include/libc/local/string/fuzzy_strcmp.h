@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xff036bd3 */
+/* HASH CRC-32:0xaf197784 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,14 +19,14 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_fuzzy_strcmp_defined
-#define __local_fuzzy_strcmp_defined 1
+#define __local_fuzzy_strcmp_defined
 #include <__crt.h>
 #include <parts/malloca.h>
 #if defined(__CRT_HAVE_fuzzy_memcmp) || !defined(__NO_MALLOCA)
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_fuzzy_memcmp_defined
-#define __local___localdep_fuzzy_memcmp_defined 1
+#define __local___localdep_fuzzy_memcmp_defined
 #ifdef __CRT_HAVE_fuzzy_memcmp
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 3)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_fuzzy_memcmp,(void const *__s1, __SIZE_TYPE__ __s1_bytes, void const *__s2, __SIZE_TYPE__ __s2_bytes),fuzzy_memcmp,(__s1,__s1_bytes,__s2,__s2_bytes))
 #elif !defined(__NO_MALLOCA)
@@ -39,7 +39,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_fuzzy_memcmp_defined */
 #ifndef __local___localdep_strlen_defined
-#define __local___localdep_strlen_defined 1
+#define __local___localdep_strlen_defined
 #ifdef __CRT_HAVE_strlen
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_strlen,(char const *__restrict __str),strlen,(__str))
 #else /* __CRT_HAVE_strlen */
@@ -55,7 +55,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(fuzzy_strcmp))(char const *__s1, char
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_fuzzy_strcmp_defined
-#define __local___localdep_fuzzy_strcmp_defined 1
+#define __local___localdep_fuzzy_strcmp_defined
 #define __localdep_fuzzy_strcmp __LIBC_LOCAL_NAME(fuzzy_strcmp)
 #endif /* !__local___localdep_fuzzy_strcmp_defined */
 #else /* __CRT_HAVE_fuzzy_memcmp || !__NO_MALLOCA */

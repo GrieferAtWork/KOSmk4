@@ -725,7 +725,7 @@ int _CrtGetCheckCount() {
 %{
 
 #ifndef ___CrtDbgBreak_defined
-#define ___CrtDbgBreak_defined 1
+#define ___CrtDbgBreak_defined
 __SYSDECL_END
 #include <intrin.h>
 __SYSDECL_BEGIN

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6583f74d */
+/* HASH CRC-32:0x2a9b9b13 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -70,7 +70,7 @@ NOTHROW_NCX(LIBCCALL libc_remque)(void *__restrict elem) {
 		next->l_back = prev;
 }
 #ifndef __hsearch_data_defined
-#define __hsearch_data_defined 1
+#define __hsearch_data_defined
 struct _ENTRY;
 struct hsearch_data {
 	struct _ENTRY  *table;
@@ -79,7 +79,7 @@ struct hsearch_data {
 };
 #endif /* !__hsearch_data_defined */
 #ifndef __local_htab_defined
-#define __local_htab_defined 1
+#define __local_htab_defined
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC_DATA(htab) struct hsearch_data htab = { NULL, 0, 0 };
 __NAMESPACE_LOCAL_END
@@ -96,7 +96,7 @@ NOTHROW_NCX(LIBCCALL libc_hsearch)(ENTRY item,
 	return result;
 }
 #ifndef __hsearch_data_defined
-#define __hsearch_data_defined 1
+#define __hsearch_data_defined
 struct _ENTRY;
 struct hsearch_data {
 	struct _ENTRY  *table;
@@ -105,7 +105,7 @@ struct hsearch_data {
 };
 #endif /* !__hsearch_data_defined */
 #ifndef __local_htab_defined
-#define __local_htab_defined 1
+#define __local_htab_defined
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC_DATA(htab) struct hsearch_data htab = { NULL, 0, 0 };
 __NAMESPACE_LOCAL_END
@@ -117,7 +117,7 @@ NOTHROW_NCX(LIBCCALL libc_hcreate)(size_t nel) {
 	return libc_hcreate_r(nel, &__NAMESPACE_LOCAL_SYM htab);
 }
 #ifndef __hsearch_data_defined
-#define __hsearch_data_defined 1
+#define __hsearch_data_defined
 struct _ENTRY;
 struct hsearch_data {
 	struct _ENTRY  *table;
@@ -126,7 +126,7 @@ struct hsearch_data {
 };
 #endif /* !__hsearch_data_defined */
 #ifndef __local_htab_defined
-#define __local_htab_defined 1
+#define __local_htab_defined
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC_DATA(htab) struct hsearch_data htab = { NULL, 0, 0 };
 __NAMESPACE_LOCAL_END
@@ -138,7 +138,7 @@ NOTHROW_NCX(LIBCCALL libc_hdestroy)(void) {
 	libc_hdestroy_r(&__NAMESPACE_LOCAL_SYM htab);
 }
 #ifndef __hsearch_data_defined
-#define __hsearch_data_defined 1
+#define __hsearch_data_defined
 struct _ENTRY;
 struct hsearch_data {
 	struct _ENTRY  *table;
@@ -147,7 +147,7 @@ struct hsearch_data {
 };
 #endif /* !__hsearch_data_defined */
 #ifndef __ENTRY_defined
-#define __ENTRY_defined 1
+#define __ENTRY_defined
 typedef struct entry {
 	char *key;
 	void *data;
@@ -219,7 +219,7 @@ NOTHROW_NCX(LIBCCALL libc_hsearch_r)(ENTRY item,
 	return 0;
 }
 #ifndef __hsearch_data_defined
-#define __hsearch_data_defined 1
+#define __hsearch_data_defined
 struct _ENTRY;
 struct hsearch_data {
 	struct _ENTRY  *table;
@@ -228,7 +228,7 @@ struct hsearch_data {
 };
 #endif /* !__hsearch_data_defined */
 #ifndef __ENTRY_defined
-#define __ENTRY_defined 1
+#define __ENTRY_defined
 typedef struct entry {
 	char *key;
 	void *data;
@@ -288,7 +288,7 @@ NOTHROW_NCX(LIBCCALL libc_hcreate_r)(size_t nel,
 	return 1;
 }
 #ifndef __hsearch_data_defined
-#define __hsearch_data_defined 1
+#define __hsearch_data_defined
 struct _ENTRY;
 struct hsearch_data {
 	struct _ENTRY  *table;
@@ -314,7 +314,7 @@ NOTHROW_NCX(LIBCCALL libc_hdestroy_r)(struct hsearch_data *htab) {
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #ifndef __dwrap_sTPTP_TDTPTPTP_c0A0A1c1_defined
-#define __dwrap_sTPTP_TDTPTPTP_c0A0A1c1_defined 1
+#define __dwrap_sTPTP_TDTPTPTP_c0A0A1c1_defined
 struct _dwrap_cookie_struct_sTPTP_TDTPTPTP_c0A0A1c1 {
 	int (LIBDCALL *compar)(void const *a, void const *b, void *arg);
 	void *arg;
@@ -468,7 +468,7 @@ INTERN ATTR_SECTION(".text.crt.utility.search") NONNULL((3)) void *
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #ifndef __dwrap_sTPTP_TDTPTPTP_c0A0A1c1_defined
-#define __dwrap_sTPTP_TDTPTPTP_c0A0A1c1_defined 1
+#define __dwrap_sTPTP_TDTPTPTP_c0A0A1c1_defined
 struct _dwrap_cookie_struct_sTPTP_TDTPTPTP_c0A0A1c1 {
 	int (LIBDCALL *compar)(void const *a, void const *b, void *arg);
 	void *arg;
@@ -524,7 +524,7 @@ INTERN ATTR_SECTION(".text.crt.utility.search") NONNULL((3)) void *
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #ifndef __dwrap_sTPTP_TDTPTPTP_c0A0A1c1_defined
-#define __dwrap_sTPTP_TDTPTPTP_c0A0A1c1_defined 1
+#define __dwrap_sTPTP_TDTPTPTP_c0A0A1c1_defined
 struct _dwrap_cookie_struct_sTPTP_TDTPTPTP_c0A0A1c1 {
 	int (LIBDCALL *compar)(void const *a, void const *b, void *arg);
 	void *arg;
@@ -737,7 +737,7 @@ done:
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #ifndef __dwrap_sTPTP_TVTPTDTDTP_c0A0A1A2c1_defined
-#define __dwrap_sTPTP_TVTPTDTDTP_c0A0A1A2c1_defined 1
+#define __dwrap_sTPTP_TVTPTDTDTP_c0A0A1A2c1_defined
 struct _dwrap_cookie_struct_sTPTP_TVTPTDTDTP_c0A0A1A2c1 {
 	void (LIBDCALL *action)(void const *nodep, VISIT value, int level, void *arg);
 	void *arg;
@@ -799,7 +799,7 @@ INTERN ATTR_SECTION(".text.crt.utility.search") void
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #ifndef __dwrap_sTPTP_TVTPTP_c0A0c1_defined
-#define __dwrap_sTPTP_TVTPTP_c0A0c1_defined 1
+#define __dwrap_sTPTP_TVTPTP_c0A0c1_defined
 struct _dwrap_cookie_struct_sTPTP_TVTPTP_c0A0c1 {
 	void (LIBDCALL *freefct)(void *nodep, void *arg);
 	void *arg;
@@ -852,7 +852,7 @@ again:
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #ifndef __dwrap_cTP_TDTPTPTP_CA0A1_defined
-#define __dwrap_cTP_TDTPTPTP_CA0A1_defined 1
+#define __dwrap_cTP_TDTPTPTP_CA0A1_defined
 PRIVATE ATTR_SECTION(".text.crt.dos.utility.search") int
 (LIBCCALL _dwrap_cTP_TDTPTPTP_CA0A1)(void const *a,
                                      void const *b,
@@ -874,7 +874,7 @@ INTERN ATTR_SECTION(".text.crt.dos.utility.search") NONNULL((3)) void *
 #ifndef __LIBCCALL_CALLER_CLEANUP
 #ifndef ____invoke_compare_helper_defined
 __NAMESPACE_LOCAL_BEGIN
-#define ____invoke_compare_helper_defined 1
+#define ____invoke_compare_helper_defined
 __LOCAL_LIBC(__invoke_compare_helper) int
 (__LIBCCALL __invoke_compare_helper)(void const *__a, void const *__b, void *__arg) {
 	return (*(int (__LIBCCALL *)(void const *, void const *))__arg)(__a, __b);
@@ -898,7 +898,7 @@ INTERN ATTR_SECTION(".text.crt.utility.search") NONNULL((3)) void *
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #ifndef __dwrap_cTP_TDTPTPTP_CA0A1_defined
-#define __dwrap_cTP_TDTPTPTP_CA0A1_defined 1
+#define __dwrap_cTP_TDTPTPTP_CA0A1_defined
 PRIVATE ATTR_SECTION(".text.crt.dos.utility.search") int
 (LIBCCALL _dwrap_cTP_TDTPTPTP_CA0A1)(void const *a,
                                      void const *b,
@@ -920,7 +920,7 @@ INTERN ATTR_SECTION(".text.crt.dos.utility.search") NONNULL((3)) void *
 #ifndef __LIBCCALL_CALLER_CLEANUP
 #ifndef ____invoke_compare_helper_defined
 __NAMESPACE_LOCAL_BEGIN
-#define ____invoke_compare_helper_defined 1
+#define ____invoke_compare_helper_defined
 __LOCAL_LIBC(__invoke_compare_helper) int
 (__LIBCCALL __invoke_compare_helper)(void const *__a, void const *__b, void *__arg) {
 	return (*(int (__LIBCCALL *)(void const *, void const *))__arg)(__a, __b);
@@ -944,7 +944,7 @@ INTERN ATTR_SECTION(".text.crt.utility.search") NONNULL((3)) void *
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #ifndef __dwrap_cTP_TDTPTPTP_CA0A1_defined
-#define __dwrap_cTP_TDTPTPTP_CA0A1_defined 1
+#define __dwrap_cTP_TDTPTPTP_CA0A1_defined
 PRIVATE ATTR_SECTION(".text.crt.dos.utility.search") int
 (LIBCCALL _dwrap_cTP_TDTPTPTP_CA0A1)(void const *a,
                                      void const *b,
@@ -965,7 +965,7 @@ INTERN ATTR_SECTION(".text.crt.dos.utility.search") NONNULL((3)) void *
 #ifndef __LIBCCALL_CALLER_CLEANUP
 #ifndef ____invoke_compare_helper_defined
 __NAMESPACE_LOCAL_BEGIN
-#define ____invoke_compare_helper_defined 1
+#define ____invoke_compare_helper_defined
 __LOCAL_LIBC(__invoke_compare_helper) int
 (__LIBCCALL __invoke_compare_helper)(void const *__a, void const *__b, void *__arg) {
 	return (*(int (__LIBCCALL *)(void const *, void const *))__arg)(__a, __b);
@@ -988,7 +988,7 @@ INTERN ATTR_SECTION(".text.crt.utility.search") NONNULL((3)) void *
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #ifndef __dwrap_cTP_TVTPTDTDTP_CA0A1A2_defined
-#define __dwrap_cTP_TVTPTDTDTP_CA0A1A2_defined 1
+#define __dwrap_cTP_TVTPTDTDTP_CA0A1A2_defined
 PRIVATE ATTR_SECTION(".text.crt.dos.utility.search") void
 (LIBCCALL _dwrap_cTP_TVTPTDTDTP_CA0A1A2)(void const *nodep,
                                          VISIT value,
@@ -1009,7 +1009,7 @@ INTERN ATTR_SECTION(".text.crt.dos.utility.search") void
 #ifndef __LIBCCALL_CALLER_CLEANUP
 #ifndef ____invoke_twalk_action_helper_defined
 __NAMESPACE_LOCAL_BEGIN
-#define ____invoke_twalk_action_helper_defined 1
+#define ____invoke_twalk_action_helper_defined
 __LOCAL_LIBC(__invoke_twalk_action_helper) void
 (__LIBCCALL __invoke_twalk_action_helper)(void const *nodep, VISIT value, int level, void *arg) {
 	(*(void (LIBCCALL *)(void const *, VISIT, int))arg)(nodep, value, level);
@@ -1031,7 +1031,7 @@ INTERN ATTR_SECTION(".text.crt.utility.search") void
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #ifndef __dwrap_cTP_TVTPTP_CA0_defined
-#define __dwrap_cTP_TVTPTP_CA0_defined 1
+#define __dwrap_cTP_TVTPTP_CA0_defined
 PRIVATE ATTR_SECTION(".text.crt.dos.utility.search") void
 (LIBCCALL _dwrap_cTP_TVTPTP_CA0)(void *nodep,
                                  void (LIBDCALL *c)(void *nodep)) THROWS(...) {
@@ -1050,7 +1050,7 @@ INTERN ATTR_SECTION(".text.crt.dos.utility.search") NONNULL((2)) void
 #ifndef __LIBCCALL_CALLER_CLEANUP
 #ifndef ____invoke_free_fn_helper_defined
 __NAMESPACE_LOCAL_BEGIN
-#define ____invoke_free_fn_helper_defined 1
+#define ____invoke_free_fn_helper_defined
 __LOCAL_LIBC(__invoke_free_fn_helper) void
 (__LIBCCALL __invoke_free_fn_helper)(void *nodep, void *arg) {
 	(*(void (LIBCCALL *)(void *))arg)(nodep);
@@ -1072,7 +1072,7 @@ INTERN ATTR_SECTION(".text.crt.utility.search") NONNULL((2)) void
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #ifndef __dwrap_cTP_TDTPTPTP_CA1A2_defined
-#define __dwrap_cTP_TDTPTPTP_CA1A2_defined 1
+#define __dwrap_cTP_TDTPTPTP_CA1A2_defined
 PRIVATE ATTR_SECTION(".text.crt.dos.utility.search") int
 (LIBCCALL _dwrap_cTP_TDTPTPTP_CA1A2)(__compar_fn_t c,
                                      void const *a,
@@ -1112,7 +1112,7 @@ INTERN ATTR_SECTION(".text.crt.utility.search") WUNUSED NONNULL((2, 3, 5)) void 
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #ifndef __dwrap_cTP_TDTPTPTP_CA1A2_defined
-#define __dwrap_cTP_TDTPTPTP_CA1A2_defined 1
+#define __dwrap_cTP_TDTPTPTP_CA1A2_defined
 PRIVATE ATTR_SECTION(".text.crt.dos.utility.search") int
 (LIBCCALL _dwrap_cTP_TDTPTPTP_CA1A2)(int (LIBDCALL *c)(void const *a, void const *b),
                                      void const *a,
@@ -1153,7 +1153,7 @@ INTERN ATTR_SECTION(".text.crt.utility.search") NONNULL((2, 3, 5)) void *
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #ifndef __dwrap_sTPTP_TDTPTPTP_c0c1A1A2_defined
-#define __dwrap_sTPTP_TDTPTPTP_c0c1A1A2_defined 1
+#define __dwrap_sTPTP_TDTPTPTP_c0c1A1A2_defined
 struct _dwrap_cookie_struct_sTPTP_TDTPTPTP_c0c1A1A2 {
 	int (LIBDCALL *compar)(void *arg, void const *a, void const *b);
 	void *arg;
@@ -1198,7 +1198,7 @@ INTERN ATTR_SECTION(".text.crt.dos.utility.search") WUNUSED NONNULL((2, 3, 5)) v
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #ifndef __dwrap_sTPTP_TDTPTPTP_c0c1A1A2_defined
-#define __dwrap_sTPTP_TDTPTPTP_c0c1A1A2_defined 1
+#define __dwrap_sTPTP_TDTPTPTP_c0c1A1A2_defined
 struct _dwrap_cookie_struct_sTPTP_TDTPTPTP_c0c1A1A2 {
 	int (LIBDCALL *compar)(void *arg, void const *a, void const *b);
 	void *arg;

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd3585b58 */
+/* HASH CRC-32:0xcfea8d44 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_ReadAll_defined
-#define __local_ReadAll_defined 1
+#define __local_ReadAll_defined
 #include <__crt.h>
 #include <features.h>
 #include <bits/types.h>
@@ -27,11 +27,11 @@
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_Read_defined
-#define __local___localdep_Read_defined 1
+#define __local___localdep_Read_defined
 __CREDIRECT(__ATTR_NONNULL((2)),__SIZE_TYPE__,__THROWING,__localdep_Read,(__fd_t __fd, void *__buf, __SIZE_TYPE__ __bufsize),Read,(__fd,__buf,__bufsize))
 #endif /* !__local___localdep_Read_defined */
 #ifndef __local___localdep_lseek_defined
-#define __local___localdep_lseek_defined 1
+#define __local___localdep_lseek_defined
 #if defined(__CRT_HAVE_lseek) && (!defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
 __CREDIRECT(,__FS_TYPE(off),__NOTHROW_NCX,__localdep_lseek,(__fd_t __fd, __FS_TYPE(off) __offset, __STDC_INT_AS_UINT_T __whence),lseek,(__fd,__offset,__whence))
 #elif defined(__CRT_HAVE__lseek) && (!defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
@@ -88,7 +88,7 @@ __LOCAL_LIBC(ReadAll) __ATTR_NONNULL((2)) __SIZE_TYPE__
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_ReadAll_defined
-#define __local___localdep_ReadAll_defined 1
+#define __local___localdep_ReadAll_defined
 #define __localdep_ReadAll __LIBC_LOCAL_NAME(ReadAll)
 #endif /* !__local___localdep_ReadAll_defined */
 #else /* __CRT_HAVE_Read && (__CRT_HAVE_lseek64 || __CRT_HAVE__lseeki64 || __CRT_HAVE_lseek || __CRT_HAVE__lseek || __CRT_HAVE___lseek) */

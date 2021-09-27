@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x494bd3df */
+/* HASH CRC-32:0x61f6d438 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,11 +19,11 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local__mbtowc_l_defined
-#define __local__mbtowc_l_defined 1
+#define __local__mbtowc_l_defined
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_mbtowc_defined
-#define __local___localdep_mbtowc_defined 1
+#define __local___localdep_mbtowc_defined
 #ifdef __CRT_HAVE_mbtowc
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_mbtowc,(__WCHAR_TYPE__ *__restrict __pwc, char const *__restrict __str, __SIZE_TYPE__ __maxlen),mbtowc,(__pwc,__str,__maxlen))
 #else /* __CRT_HAVE_mbtowc */
@@ -40,7 +40,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_mbtowc_l))(__WCHAR_TYPE__ *__dst, ch
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep__mbtowc_l_defined
-#define __local___localdep__mbtowc_l_defined 1
+#define __local___localdep__mbtowc_l_defined
 #define __localdep__mbtowc_l __LIBC_LOCAL_NAME(_mbtowc_l)
 #endif /* !__local___localdep__mbtowc_l_defined */
 #endif /* !__local__mbtowc_l_defined */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4f8232 */
+/* HASH CRC-32:0xfbc788e5 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,12 +19,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local__vscprintf_defined
-#define __local__vscprintf_defined 1
+#define __local__vscprintf_defined
 #include <__crt.h>
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_vsnprintf_defined
-#define __local___localdep_vsnprintf_defined 1
+#define __local___localdep_vsnprintf_defined
 #if __has_builtin(__builtin_vsnprintf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_vsnprintf)
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
@@ -53,7 +53,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_vscprintf))(char const *__restrict _
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep__vscprintf_defined
-#define __local___localdep__vscprintf_defined 1
+#define __local___localdep__vscprintf_defined
 #define __localdep__vscprintf __LIBC_LOCAL_NAME(_vscprintf)
 #endif /* !__local___localdep__vscprintf_defined */
 #endif /* !__local__vscprintf_defined */

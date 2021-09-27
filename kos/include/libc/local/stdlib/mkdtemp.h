@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf643523 */
+/* HASH CRC-32:0x1f6c281c */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,12 +19,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_mkdtemp_defined
-#define __local_mkdtemp_defined 1
+#define __local_mkdtemp_defined
 #include <__crt.h>
 #if defined(__CRT_HAVE_mkdir) || (defined(__CRT_DOS_PRIMARY) && defined(__CRT_HAVE__mkdir))
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_system_mktemp_defined
-#define __local___localdep_system_mktemp_defined 1
+#define __local___localdep_system_mktemp_defined
 __NAMESPACE_LOCAL_END
 #include <libc/local/stdlib/system_mktemp.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -38,7 +38,7 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(mkdtemp))(char *__template_) {
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_mkdtemp_defined
-#define __local___localdep_mkdtemp_defined 1
+#define __local___localdep_mkdtemp_defined
 #define __localdep_mkdtemp __LIBC_LOCAL_NAME(mkdtemp)
 #endif /* !__local___localdep_mkdtemp_defined */
 #else /* __CRT_HAVE_mkdir || (__CRT_DOS_PRIMARY && __CRT_HAVE__mkdir) */

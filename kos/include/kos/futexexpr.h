@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6623e851 */
+/* HASH CRC-32:0xf599f90f */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -42,7 +42,7 @@
 __SYSDECL_BEGIN
 
 #ifndef __lfutex_t_defined
-#define __lfutex_t_defined 1
+#define __lfutex_t_defined
 typedef __uintptr_t lfutex_t;
 #endif /* !__lfutex_t_defined */
 

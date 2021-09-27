@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf4039b73 */
+/* HASH CRC-32:0xd9e506e1 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,13 +19,13 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_pow10f_defined
-#define __local_pow10f_defined 1
+#define __local_pow10f_defined
 #include <__crt.h>
 #include <ieee754.h>
 #if defined(__CRT_HAVE_powf) || defined(__CRT_HAVE___powf) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_pow10) || defined(__CRT_HAVE___pow10) || defined(__CRT_HAVE_pow) || defined(__CRT_HAVE___pow) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_pow10_defined
-#define __local___localdep_pow10_defined 1
+#define __local___localdep_pow10_defined
 #if __has_builtin(__builtin_pow10) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_pow10)
 __CEIREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_pow10,(double __x),pow10,{ return __builtin_pow10(__x); })
 #elif defined(__CRT_HAVE_pow10)
@@ -42,7 +42,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_pow10_defined */
 #ifndef __local___localdep_powf_defined
-#define __local___localdep_powf_defined 1
+#define __local___localdep_powf_defined
 #if __has_builtin(__builtin_powf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_powf)
 __NAMESPACE_LOCAL_END
 #include <bits/crt/math-vector.h>
@@ -77,7 +77,7 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(pow10f))(float __x) {
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_pow10f_defined
-#define __local___localdep_pow10f_defined 1
+#define __local___localdep_pow10f_defined
 #define __localdep_pow10f __LIBC_LOCAL_NAME(pow10f)
 #endif /* !__local___localdep_pow10f_defined */
 #else /* __CRT_HAVE_powf || __CRT_HAVE___powf || __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ || __CRT_HAVE_pow10 || __CRT_HAVE___pow10 || __CRT_HAVE_pow || __CRT_HAVE___pow || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */

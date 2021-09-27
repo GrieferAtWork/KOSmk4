@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6c0e11a2 */
+/* HASH CRC-32:0x589ae99a */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,12 +19,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_ctime64_defined
-#define __local_ctime64_defined 1
+#define __local_ctime64_defined
 #include <__crt.h>
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_ctime32_defined
-#define __local___localdep_ctime32_defined 1
+#define __local___localdep_ctime32_defined
 #ifdef __CRT_HAVE_ctime
 __CREDIRECT(__ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_ctime32,(__time32_t const *__timer),ctime,(__timer))
 #elif defined(__CRT_HAVE__ctime32)
@@ -34,7 +34,7 @@ __CREDIRECT(__ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHRO
 #endif /* !... */
 #endif /* !__local___localdep_ctime32_defined */
 #ifndef __local___localdep_ctime64_r_defined
-#define __local___localdep_ctime64_r_defined 1
+#define __local___localdep_ctime64_r_defined
 #if defined(__CRT_HAVE_ctime_r) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 __NAMESPACE_LOCAL_END
 #include <bits/crt/tm.h>
@@ -74,7 +74,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(ctime64))(__time64_t const *__timer) 
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_ctime64_defined
-#define __local___localdep_ctime64_defined 1
+#define __local___localdep_ctime64_defined
 #define __localdep_ctime64 __LIBC_LOCAL_NAME(ctime64)
 #endif /* !__local___localdep_ctime64_defined */
 #endif /* !__local_ctime64_defined */

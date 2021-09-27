@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1e36cb4d */
+/* HASH CRC-32:0x18a9056d */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,13 +19,13 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_tsearch_defined
-#define __local_tsearch_defined 1
+#define __local_tsearch_defined
 #include <__crt.h>
 #if defined(__CRT_HAVE_tsearch_r) || defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign)
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_tsearch_r_defined
-#define __local___localdep_tsearch_r_defined 1
+#define __local___localdep_tsearch_r_defined
 #ifdef __CRT_HAVE_tsearch_r
 __CREDIRECT(__ATTR_NONNULL((3)),void *,__THROWING,__localdep_tsearch_r,(void const *__key, void **__vrootp, int (__LIBCCALL *__compar)(void const *__a, void const *__b, void *__arg), void *__arg),tsearch_r,(__key,__vrootp,__compar,__arg))
 #elif defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign)
@@ -41,7 +41,7 @@ __NAMESPACE_LOCAL_END
 #ifndef __LIBCCALL_CALLER_CLEANUP
 #ifndef ____invoke_compare_helper_defined
 __NAMESPACE_LOCAL_BEGIN
-#define ____invoke_compare_helper_defined 1
+#define ____invoke_compare_helper_defined
 __LOCAL_LIBC(__invoke_compare_helper) int
 (__LIBCCALL __invoke_compare_helper)(void const *__a, void const *__b, void *__arg) {
 	return (*(int (__LIBCCALL *)(void const *, void const *))__arg)(__a, __b);
@@ -60,7 +60,7 @@ __LOCAL_LIBC(tsearch) __ATTR_NONNULL((3)) void *
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_tsearch_defined
-#define __local___localdep_tsearch_defined 1
+#define __local___localdep_tsearch_defined
 #define __localdep_tsearch __LIBC_LOCAL_NAME(tsearch)
 #endif /* !__local___localdep_tsearch_defined */
 #else /* __CRT_HAVE_tsearch_r || __CRT_HAVE_malloc || __CRT_HAVE_calloc || __CRT_HAVE_realloc || __CRT_HAVE_memalign || __CRT_HAVE_aligned_alloc || __CRT_HAVE_posix_memalign */

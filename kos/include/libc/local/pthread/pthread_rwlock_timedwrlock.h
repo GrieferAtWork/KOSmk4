@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7dc39e90 */
+/* HASH CRC-32:0x2778faba */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_pthread_rwlock_timedwrlock_defined
-#define __local_pthread_rwlock_timedwrlock_defined 1
+#define __local_pthread_rwlock_timedwrlock_defined
 #include <__crt.h>
 #include <bits/types.h>
 #if defined(__CRT_HAVE_pthread_rwlock_timedwrlock64) || defined(__CRT_HAVE_pthread_rwlock_timedwrlock)
@@ -27,11 +27,11 @@
 #include <bits/os/timespec.h>
 __NAMESPACE_LOCAL_BEGIN
 #if !defined(__local___localdep_pthread_rwlock_timedwrlock32_defined) && defined(__CRT_HAVE_pthread_rwlock_timedwrlock)
-#define __local___localdep_pthread_rwlock_timedwrlock32_defined 1
+#define __local___localdep_pthread_rwlock_timedwrlock32_defined
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_RPC,__localdep_pthread_rwlock_timedwrlock32,(__pthread_rwlock_t *__restrict __rwlock, struct __timespec32 const *__restrict __abstime),pthread_rwlock_timedwrlock,(__rwlock,__abstime))
 #endif /* !__local___localdep_pthread_rwlock_timedwrlock32_defined && __CRT_HAVE_pthread_rwlock_timedwrlock */
 #ifndef __local___localdep_pthread_rwlock_timedwrlock64_defined
-#define __local___localdep_pthread_rwlock_timedwrlock64_defined 1
+#define __local___localdep_pthread_rwlock_timedwrlock64_defined
 #if defined(__CRT_HAVE_pthread_rwlock_timedwrlock) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_RPC,__localdep_pthread_rwlock_timedwrlock64,(__pthread_rwlock_t *__restrict __rwlock, struct __timespec64 const *__restrict __abstime),pthread_rwlock_timedwrlock,(__rwlock,__abstime))
 #elif defined(__CRT_HAVE_pthread_rwlock_timedwrlock64)
@@ -65,7 +65,7 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(pthread_rwlock_timedwrlock))(__pthrea
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_pthread_rwlock_timedwrlock_defined
-#define __local___localdep_pthread_rwlock_timedwrlock_defined 1
+#define __local___localdep_pthread_rwlock_timedwrlock_defined
 #define __localdep_pthread_rwlock_timedwrlock __LIBC_LOCAL_NAME(pthread_rwlock_timedwrlock)
 #endif /* !__local___localdep_pthread_rwlock_timedwrlock_defined */
 #else /* __CRT_HAVE_pthread_rwlock_timedwrlock64 || __CRT_HAVE_pthread_rwlock_timedwrlock */

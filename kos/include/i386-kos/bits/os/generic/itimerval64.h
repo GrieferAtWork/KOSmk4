@@ -79,7 +79,7 @@
 #else /* __USE_TIME64 */
 #define __itimerval64 itimerval
 #endif /* !__USE_TIME64 */
-#define __itimerval_defined 1
+#define __itimerval_defined
 #endif /* __x86_64__ */
 /*[[[end]]]*/
 

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4e562aa2 */
+/* HASH CRC-32:0xbb6c1a68 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_settimeofday_defined
-#define __local_settimeofday_defined 1
+#define __local_settimeofday_defined
 #include <__crt.h>
 #include <bits/types.h>
 #if defined(__CRT_HAVE_settimeofday64) || defined(__CRT_HAVE_settimeofday)
@@ -27,11 +27,11 @@
 struct timezone;
 __NAMESPACE_LOCAL_BEGIN
 #if !defined(__local___localdep_settimeofday32_defined) && defined(__CRT_HAVE_settimeofday)
-#define __local___localdep_settimeofday32_defined 1
+#define __local___localdep_settimeofday32_defined
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_settimeofday32,(struct __timeval32 const *__tv, struct timezone const *__tz),settimeofday,(__tv,__tz))
 #endif /* !__local___localdep_settimeofday32_defined && __CRT_HAVE_settimeofday */
 #ifndef __local___localdep_settimeofday64_defined
-#define __local___localdep_settimeofday64_defined 1
+#define __local___localdep_settimeofday64_defined
 #if defined(__CRT_HAVE_settimeofday) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_settimeofday64,(struct __timeval64 const *__tv, struct timezone const *__tz),settimeofday,(__tv,__tz))
 #elif defined(__CRT_HAVE_settimeofday64)
@@ -65,7 +65,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(settimeofday))(struct timeval const *
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_settimeofday_defined
-#define __local___localdep_settimeofday_defined 1
+#define __local___localdep_settimeofday_defined
 #define __localdep_settimeofday __LIBC_LOCAL_NAME(settimeofday)
 #endif /* !__local___localdep_settimeofday_defined */
 #else /* __CRT_HAVE_settimeofday64 || __CRT_HAVE_settimeofday */

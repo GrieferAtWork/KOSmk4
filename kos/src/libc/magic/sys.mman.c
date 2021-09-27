@@ -562,17 +562,17 @@
 __SYSDECL_BEGIN
 
 #ifndef __off_t_defined
-#define __off_t_defined 1
+#define __off_t_defined
 typedef __FS_TYPE(off) off_t;
 #endif /* !__off_t_defined */
 
 #ifndef __size_t_defined
-#define __size_t_defined 1
+#define __size_t_defined
 typedef __size_t size_t;
 #endif /* !__size_t_defined */
 
 #ifndef __mode_t_defined
-#define __mode_t_defined 1
+#define __mode_t_defined
 typedef __mode_t mode_t; /* INode type (Set of `S_*' from `<fcntl.h>' or `<sys/stat.h>') */
 #endif /* !__mode_t_defined */
 

@@ -24,18 +24,16 @@
 #ifdef __ARCH_HAVE_COMPAT
 #include <compat/kos/bits/except-handler.h>
 
+#ifdef __CC__
 __DECL_BEGIN
 
-#ifdef __CC__
-
 #ifndef __compat_except_handler_t_defined
-#define __compat_except_handler_t_defined 1
+#define __compat_except_handler_t_defined
 typedef __compat_except_handler_t compat_except_handler_t;
 #endif /* !__compat_except_handler_t_defined */
 
-#endif /* __CC__ */
-
 __DECL_END
+#endif /* __CC__ */
 
 #endif /* __ARCH_HAVE_COMPAT */
 

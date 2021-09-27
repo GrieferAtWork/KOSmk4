@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x41603f75 */
+/* HASH CRC-32:0xdb3fc12 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,11 +19,11 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_strtosigno_defined
-#define __local_strtosigno_defined 1
+#define __local_strtosigno_defined
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_sigabbrev_np_defined
-#define __local___localdep_sigabbrev_np_defined 1
+#define __local___localdep_sigabbrev_np_defined
 #ifdef __CRT_HAVE_sigabbrev_np
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
@@ -42,7 +42,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_sigabbrev_np_defined */
 #ifndef __local___localdep_strcmp_defined
-#define __local___localdep_strcmp_defined 1
+#define __local___localdep_strcmp_defined
 #if __has_builtin(__builtin_strcmp) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_strcmp)
 __CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_strcmp,(char const *__s1, char const *__s2),strcmp,{ return __builtin_strcmp(__s1, __s2); })
 #elif defined(__CRT_HAVE_strcmp)
@@ -74,7 +74,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strtosigno))(const char *__name) {
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_strtosigno_defined
-#define __local___localdep_strtosigno_defined 1
+#define __local___localdep_strtosigno_defined
 #define __localdep_strtosigno __LIBC_LOCAL_NAME(strtosigno)
 #endif /* !__local___localdep_strtosigno_defined */
 #endif /* !__local_strtosigno_defined */

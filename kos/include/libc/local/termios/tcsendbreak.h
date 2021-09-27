@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8ee18b1 */
+/* HASH CRC-32:0x8f01ea77 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,13 +19,13 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_tcsendbreak_defined
-#define __local_tcsendbreak_defined 1
+#define __local_tcsendbreak_defined
 #include <__crt.h>
 #include <asm/os/tty.h>
 #if defined(__CRT_HAVE_ioctl) && defined(__TCSBRKP)
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_ioctl_defined
-#define __local___localdep_ioctl_defined 1
+#define __local___localdep_ioctl_defined
 __NAMESPACE_LOCAL_END
 #include <features.h>
 #include <bits/types.h>
@@ -38,7 +38,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(tcsendbreak))(__fd_t __fd, int __dura
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_tcsendbreak_defined
-#define __local___localdep_tcsendbreak_defined 1
+#define __local___localdep_tcsendbreak_defined
 #define __localdep_tcsendbreak __LIBC_LOCAL_NAME(tcsendbreak)
 #endif /* !__local___localdep_tcsendbreak_defined */
 #else /* __CRT_HAVE_ioctl && __TCSBRKP */

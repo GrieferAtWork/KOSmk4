@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xef9be52a */
+/* HASH CRC-32:0x2ab86d88 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -280,7 +280,7 @@ __SYSDECL_END
 #endif /* __CC__ */
 
 #ifdef __CXX_SYSTEM_HEADER
-#define _CXX_STDONLY_CLOCALE 1
+#define _CXX_STDONLY_CLOCALE
 #undef _LOCALE_H
 #endif /* __CXX_SYSTEM_HEADER */
 #endif /* !_CXX_STDONLY_CLOCALE */

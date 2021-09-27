@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x215325b4 */
+/* HASH CRC-32:0xdc311480 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,12 +19,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_mempmoveupc_defined
-#define __local_mempmoveupc_defined 1
+#define __local_mempmoveupc_defined
 #include <__crt.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_mempmoveup_defined
-#define __local___localdep_mempmoveup_defined 1
+#define __local___localdep_mempmoveup_defined
 #ifdef __CRT_HAVE_mempmoveup
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_mempmoveup,(void *__dst, void const *__src, __SIZE_TYPE__ __n_bytes),mempmoveup,(__dst,__src,__n_bytes))
 #elif defined(__CRT_HAVE_mempmove)
@@ -37,7 +37,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_mempmoveup_defined */
 #ifndef __local___localdep_mempmoveupl_defined
-#define __local___localdep_mempmoveupl_defined 1
+#define __local___localdep_mempmoveupl_defined
 #ifdef __CRT_HAVE_mempmoveupl
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT32_TYPE__ *,__NOTHROW_NCX,__localdep_mempmoveupl,(void *__dst, void const *__src, __SIZE_TYPE__ __n_dwords),mempmoveupl,(__dst,__src,__n_dwords))
 #elif defined(__CRT_HAVE_mempmovel)
@@ -54,7 +54,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_mempmoveupl_defined */
 #ifndef __local___localdep_mempmoveupq_defined
-#define __local___localdep_mempmoveupq_defined 1
+#define __local___localdep_mempmoveupq_defined
 #ifdef __CRT_HAVE_mempmoveupq
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT64_TYPE__ *,__NOTHROW_NCX,__localdep_mempmoveupq,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_qwords),mempmoveupq,(__dst,__src,__n_qwords))
 #elif defined(__CRT_HAVE_mempmoveq)
@@ -67,7 +67,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_mempmoveupq_defined */
 #ifndef __local___localdep_mempmoveupw_defined
-#define __local___localdep_mempmoveupw_defined 1
+#define __local___localdep_mempmoveupw_defined
 #ifdef __CRT_HAVE_mempmoveupw
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT16_TYPE__ *,__NOTHROW_NCX,__localdep_mempmoveupw,(void *__dst, void const *__src, __SIZE_TYPE__ __n_words),mempmoveupw,(__dst,__src,__n_words))
 #elif defined(__CRT_HAVE_mempmovew)
@@ -113,7 +113,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(mempmoveupc))(void *__dst, void const
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_mempmoveupc_defined
-#define __local___localdep_mempmoveupc_defined 1
+#define __local___localdep_mempmoveupc_defined
 #define __localdep_mempmoveupc __LIBC_LOCAL_NAME(mempmoveupc)
 #endif /* !__local___localdep_mempmoveupc_defined */
 #endif /* !__local_mempmoveupc_defined */

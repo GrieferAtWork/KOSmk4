@@ -35,7 +35,7 @@ __CXXDECL_BEGIN
 __NAMESPACE_STD_BEGIN
 
 #ifndef __std_nothrow_defined
-#define __std_nothrow_defined 1
+#define __std_nothrow_defined
 #if defined(__KOS__) && defined(__KERNEL__)
 __LOCAL_LIBC_CONST_DATA(nothrow) nothrow_t const nothrow = nothrow_t();
 #else /* __KOS__ && __KERNEL__ */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8ad0fc68 */
+/* HASH CRC-32:0x687b68de */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,13 +19,13 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_mtx_lock_defined
-#define __local_mtx_lock_defined 1
+#define __local_mtx_lock_defined
 #include <__crt.h>
 #ifdef __CRT_HAVE_pthread_mutex_lock
 #include <bits/crt/threads.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_pthread_mutex_lock_defined
-#define __local___localdep_pthread_mutex_lock_defined 1
+#define __local___localdep_pthread_mutex_lock_defined
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 #include <bits/crt/pthreadtypes.h>
@@ -46,7 +46,7 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(mtx_lock))(__mtx_t *__restrict __mute
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_mtx_lock_defined
-#define __local___localdep_mtx_lock_defined 1
+#define __local___localdep_mtx_lock_defined
 #define __localdep_mtx_lock __LIBC_LOCAL_NAME(mtx_lock)
 #endif /* !__local___localdep_mtx_lock_defined */
 #else /* __CRT_HAVE_pthread_mutex_lock */

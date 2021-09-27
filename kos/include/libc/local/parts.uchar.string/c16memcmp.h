@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x601e13c */
+/* HASH CRC-32:0x3917d593 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,12 +19,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_c16memcmp_defined
-#define __local_c16memcmp_defined 1
+#define __local_c16memcmp_defined
 #include <__crt.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_memcmp_defined
-#define __local___localdep_memcmp_defined 1
+#define __local___localdep_memcmp_defined
 #ifdef __CRT_HAVE_memcmp
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_memcmp,(void const *__s1, void const *__s2, __SIZE_TYPE__ __n_bytes),memcmp,(__s1,__s2,__n_bytes))
 #elif defined(__CRT_HAVE_bcmp)
@@ -37,7 +37,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_memcmp_defined */
 #ifndef __local___localdep_memcmpl_defined
-#define __local___localdep_memcmpl_defined 1
+#define __local___localdep_memcmpl_defined
 #ifdef __CRT_HAVE_memcmpl
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__INT32_TYPE__,__NOTHROW_NCX,__localdep_memcmpl,(void const *__s1, void const *__s2, __SIZE_TYPE__ __n_dwords),memcmpl,(__s1,__s2,__n_dwords))
 #elif defined(__CRT_HAVE_wmemcmp) && __SIZEOF_WCHAR_T__ == 4 && __SIZEOF_INT__ >= 4
@@ -52,7 +52,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_memcmpl_defined */
 #ifndef __local___localdep_memcmpw_defined
-#define __local___localdep_memcmpw_defined 1
+#define __local___localdep_memcmpw_defined
 #ifdef __CRT_HAVE_memcmpw
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__INT16_TYPE__,__NOTHROW_NCX,__localdep_memcmpw,(void const *__s1, void const *__s2, __SIZE_TYPE__ __n_words),memcmpw,(__s1,__s2,__n_words))
 #elif defined(__CRT_HAVE_wmemcmp) && __SIZEOF_WCHAR_T__ == 2 && __SIZEOF_INT__ >= 2
@@ -78,7 +78,7 @@ __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(c16memcmp))(__CHAR16_TYPE__ const *__
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_c16memcmp_defined
-#define __local___localdep_c16memcmp_defined 1
+#define __local___localdep_c16memcmp_defined
 #define __localdep_c16memcmp __LIBC_LOCAL_NAME(c16memcmp)
 #endif /* !__local___localdep_c16memcmp_defined */
 #endif /* !__local_c16memcmp_defined */

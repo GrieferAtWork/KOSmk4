@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2b903da3 */
+/* HASH CRC-32:0xc7ab4f85 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,13 +19,13 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_wcsrtombs_defined
-#define __local_wcsrtombs_defined 1
+#define __local_wcsrtombs_defined
 #include <__crt.h>
 #include <bits/crt/mbstate.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_mempcpy_defined
-#define __local___localdep_mempcpy_defined 1
+#define __local___localdep_mempcpy_defined
 #ifdef __CRT_HAVE_mempcpy
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_mempcpy,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_bytes),mempcpy,(__dst,__src,__n_bytes))
 #elif defined(__CRT_HAVE___mempcpy)
@@ -38,7 +38,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_mempcpy_defined */
 #ifndef __local___localdep_wcrtomb_defined
-#define __local___localdep_wcrtomb_defined 1
+#define __local___localdep_wcrtomb_defined
 #ifdef __CRT_HAVE_wcrtomb
 __CREDIRECT(,__SIZE_TYPE__,__NOTHROW_NCX,__localdep_wcrtomb,(char *__restrict __str, __WCHAR_TYPE__ __wc, struct __mbstate *__mbs),wcrtomb,(__str,__wc,__mbs))
 #elif defined(__CRT_HAVE_c16rtomb) && __SIZEOF_WCHAR_T__ == 2
@@ -76,7 +76,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcsrtombs))(char *__dst, __WCHAR_TYPE
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_wcsrtombs_defined
-#define __local___localdep_wcsrtombs_defined 1
+#define __local___localdep_wcsrtombs_defined
 #define __localdep_wcsrtombs __LIBC_LOCAL_NAME(wcsrtombs)
 #endif /* !__local___localdep_wcsrtombs_defined */
 #endif /* !__local_wcsrtombs_defined */

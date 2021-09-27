@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xce95f417 */
+/* HASH CRC-32:0xf7c915ef */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_mq_timedsend_defined
-#define __local_mq_timedsend_defined 1
+#define __local_mq_timedsend_defined
 #include <__crt.h>
 #include <bits/types.h>
 #if defined(__CRT_HAVE_mq_timedsend64) || defined(__CRT_HAVE_mq_timedsend)
@@ -27,11 +27,11 @@
 #include <bits/os/mqueue.h>
 __NAMESPACE_LOCAL_BEGIN
 #if !defined(__local___localdep_mq_timedsend32_defined) && defined(__CRT_HAVE_mq_timedsend)
-#define __local___localdep_mq_timedsend32_defined 1
+#define __local___localdep_mq_timedsend32_defined
 __CREDIRECT(__ATTR_NONNULL((2, 5)),int,__NOTHROW_RPC,__localdep_mq_timedsend32,(__mqd_t __mqdes, char const *__msg_ptr, __SIZE_TYPE__ __msg_len, unsigned int __msg_prio, struct __timespec32 const *__abs_timeout),mq_timedsend,(__mqdes,__msg_ptr,__msg_len,__msg_prio,__abs_timeout))
 #endif /* !__local___localdep_mq_timedsend32_defined && __CRT_HAVE_mq_timedsend */
 #ifndef __local___localdep_mq_timedsend64_defined
-#define __local___localdep_mq_timedsend64_defined 1
+#define __local___localdep_mq_timedsend64_defined
 #if defined(__CRT_HAVE_mq_timedsend) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 __CREDIRECT(__ATTR_NONNULL((2, 5)),int,__NOTHROW_RPC,__localdep_mq_timedsend64,(__mqd_t __mqdes, char const *__msg_ptr, __SIZE_TYPE__ __msg_len, unsigned int __msg_prio, struct __timespec64 const *__abs_timeout),mq_timedsend,(__mqdes,__msg_ptr,__msg_len,__msg_prio,__abs_timeout))
 #elif defined(__CRT_HAVE_mq_timedsend64)
@@ -61,7 +61,7 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(mq_timedsend))(__mqd_t __mqdes, char 
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_mq_timedsend_defined
-#define __local___localdep_mq_timedsend_defined 1
+#define __local___localdep_mq_timedsend_defined
 #define __localdep_mq_timedsend __LIBC_LOCAL_NAME(mq_timedsend)
 #endif /* !__local___localdep_mq_timedsend_defined */
 #else /* __CRT_HAVE_mq_timedsend64 || __CRT_HAVE_mq_timedsend */

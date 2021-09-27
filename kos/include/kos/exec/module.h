@@ -109,7 +109,7 @@ struct dlmodule;
 typedef struct dlmodule module_t;
 #else /* ... */
 #ifndef __dl_section_defined
-#define __dl_section_defined 1
+#define __dl_section_defined
 struct dl_section {
 	void       *const ds_data;    /* [0..ds_size][const] Memory mapping for the section's contents. */
 	__size_t    const ds_size;    /* [const] Size of the section (in bytes) */
@@ -149,7 +149,7 @@ typedef void module_t;
 #define DLGETHANDLE_FINCREF 0x0001 /* Return a new reference, that must be closed by `dlclose(return)' */
 #endif /* !DLGETHANDLE_FNORMAL */
 #if !defined(__dlgethandle_defined) && defined(__CRT_HAVE_dlgethandle)
-#define __dlgethandle_defined 1
+#define __dlgethandle_defined
 __IMPDEF __ATTR_WUNUSED void *
 __NOTHROW(__DLFCN_CC dlgethandle)(void const *__static_pointer,
                                   unsigned int __flags __DFL(DLGETHANDLE_FNORMAL));
@@ -162,7 +162,7 @@ __NOTHROW(__DLFCN_CC dlgethandle)(void const *__static_pointer,
 
 #ifndef module_getloadaddr
 #if !defined(__dlmodulebase_defined) && defined(__CRT_HAVE_dlmodulebase)
-#define __dlmodulebase_defined 1
+#define __dlmodulebase_defined
 __IMPDEF __ATTR_WUNUSED __ATTR_NONNULL((1)) __uintptr_t
 __NOTHROW_NCX(__DLFCN_CC dlmodulebase)(void *__handle);
 #endif /* !__dlmodulebase_defined && __CRT_HAVE_dlmodulebase */
@@ -173,7 +173,7 @@ __NOTHROW_NCX(__DLFCN_CC dlmodulebase)(void *__handle);
 
 
 #if !defined(__dllocksection_defined) && defined(__CRT_HAVE_dllocksection)
-#define __dllocksection_defined 1
+#define __dllocksection_defined
 __IMPDEF __ATTR_WUNUSED __ATTR_NONNULL((1)) /*REF*/ struct dl_section *
 __NOTHROW_NCX(__DLFCN_CC dllocksection)(void *__handle,
                                         char const *__restrict __name,
@@ -186,7 +186,7 @@ __NOTHROW_NCX(__DLFCN_CC dllocksection)(void *__handle,
 
 
 #if !defined(__dlinflatesection_defined) && defined(__CRT_HAVE_dlinflatesection)
-#define __dlinflatesection_defined 1
+#define __dlinflatesection_defined
 __IMPDEF __ATTR_WUNUSED __ATTR_NONNULL((1)) void *
 __NOTHROW_NCX(__DLFCN_CC dlinflatesection)(struct dl_section *__sect,
                                            __size_t *__psize);
@@ -226,7 +226,7 @@ __NOTHROW_NCX(__DLFCN_CC dlinflatesection)(struct dl_section *__sect,
 #endif /* !module_section_xincref && module_section_incref */
 #ifndef module_section_decref
 #if !defined(__dlunlocksection_defined) && defined(__CRT_HAVE_dlunlocksection)
-#define __dlunlocksection_defined 1
+#define __dlunlocksection_defined
 __IMPDEF __ATTR_NONNULL((1)) int
 __NOTHROW_NCX(__DLFCN_CC dlunlocksection)(/*REF*/ struct dl_section *__sect);
 #endif /* !__dlunlocksection_defined && __CRT_HAVE_dlunlocksection */

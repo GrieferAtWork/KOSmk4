@@ -42,7 +42,7 @@
 __CXXDECL_BEGIN
 __NAMESPACE_STD_BEGIN
 #ifndef __std_tuple_fwd_defined
-#define __std_tuple_fwd_defined 1
+#define __std_tuple_fwd_defined
 template<__CXX_VARARGS_TEMPLATE_ARGS_DEF(class, __Types, void)> class tuple;
 #endif /* !__std_tuple_fwd_defined */
 
@@ -52,7 +52,7 @@ static __CXX11_CONSTEXPR piecewise_construct_t piecewise_construct = piecewise_c
 __NAMESPACE_STD_END
 __NAMESPACE_INT_BEGIN
 #ifndef __int___Index_tuple_defined
-#define __int___Index_tuple_defined 1
+#define __int___Index_tuple_defined
 template<__SIZE_TYPE__ ...__Indexes> struct __Index_tuple {};
 #endif /* !__int___Index_tuple_defined */
 template<class __T1, class __T2, class __U1, class __U2>
@@ -434,7 +434,7 @@ __LIBCCALL make_pair(__T1 __first, __T2 __second)
 
 
 #ifndef __std_tuple_size_fwd_defined
-#define __std_tuple_size_fwd_defined 1
+#define __std_tuple_size_fwd_defined
 template<class __T> struct tuple_size;
 #endif /* !__std_tuple_size_fwd_defined */
 

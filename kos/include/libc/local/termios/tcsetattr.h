@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xed2e29ce */
+/* HASH CRC-32:0x7ddb0fcd */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,14 +19,14 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_tcsetattr_defined
-#define __local_tcsetattr_defined 1
+#define __local_tcsetattr_defined
 #include <__crt.h>
 #ifdef __CRT_HAVE_ioctl
 #include <features.h>
 #include <bits/os/termios.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_ioctl_defined
-#define __local___localdep_ioctl_defined 1
+#define __local___localdep_ioctl_defined
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -71,7 +71,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(tcsetattr))(__fd_t __fd, __STDC_INT_A
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_tcsetattr_defined
-#define __local___localdep_tcsetattr_defined 1
+#define __local___localdep_tcsetattr_defined
 #define __localdep_tcsetattr __LIBC_LOCAL_NAME(tcsetattr)
 #endif /* !__local___localdep_tcsetattr_defined */
 #else /* __CRT_HAVE_ioctl */

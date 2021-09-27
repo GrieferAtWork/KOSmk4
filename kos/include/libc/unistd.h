@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1e32b2a9 */
+/* HASH CRC-32:0x28d60b57 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,19 +32,19 @@
 
 #ifndef ____libc_getpagesize_defined
 #ifdef __fast_getpagesize_defined
-#define ____libc_getpagesize_defined 1
+#define ____libc_getpagesize_defined
 #define __libc_getpagesize (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(getpagesize))
 #elif defined(____libc_core_getpagesize_defined)
-#define ____libc_getpagesize_defined 1
+#define ____libc_getpagesize_defined
 #define __libc_getpagesize __libc_core_getpagesize
 #endif /* ... */
 #endif /* !____libc_getpagesize_defined */
 #if !defined(____libc_syscall_defined) && defined(____libc_core_syscall_defined)
-#define ____libc_syscall_defined 1
+#define ____libc_syscall_defined
 #define __libc_syscall __libc_core_syscall
 #endif /* !____libc_syscall_defined && ____libc_core_syscall_defined */
 #if !defined(____libc_syscall64_defined) && defined(____libc_core_syscall64_defined)
-#define ____libc_syscall64_defined 1
+#define ____libc_syscall64_defined
 #define __libc_syscall64 __libc_core_syscall64
 #endif /* !____libc_syscall64_defined && ____libc_core_syscall64_defined */
 

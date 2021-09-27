@@ -26,7 +26,7 @@
 #define CC LIBVIDEO_GFX_CC
 
 /* Our library is linked against libvideo-codec.so */
-#define LIBVIDEO_CODEC_WANT_PROTOTYPES 1
+#define LIBVIDEO_CODEC_WANT_PROTOTYPES
 
 
 #endif /* !GUARD_LIBVIDEO_GFX_API_H */

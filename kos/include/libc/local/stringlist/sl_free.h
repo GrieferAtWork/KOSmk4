@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x66bae6cd */
+/* HASH CRC-32:0x213d0860 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,12 +19,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_sl_free_defined
-#define __local_sl_free_defined 1
+#define __local_sl_free_defined
 #include <__crt.h>
 #if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree)
 #include <hybrid/typecore.h>
 #ifndef ___stringlist_defined
-#define ___stringlist_defined 1
+#define ___stringlist_defined
 typedef struct _stringlist {
 	char   **sl_str;
 	__SIZE_TYPE__   sl_max;
@@ -33,7 +33,7 @@ typedef struct _stringlist {
 #endif /* !___stringlist_defined */
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_free_defined
-#define __local___localdep_free_defined 1
+#define __local___localdep_free_defined
 #if __has_builtin(__builtin_free) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_free)
 __CEIREDIRECT(,void,__NOTHROW_NCX,__localdep_free,(void *__mallptr),free,{ __builtin_free(__mallptr); })
 #elif defined(__CRT_HAVE_free)
@@ -60,7 +60,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(sl_free))(struct _stringlist *__sl, i
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_sl_free_defined
-#define __local___localdep_sl_free_defined 1
+#define __local___localdep_sl_free_defined
 #define __localdep_sl_free __LIBC_LOCAL_NAME(sl_free)
 #endif /* !__local___localdep_sl_free_defined */
 #else /* __CRT_HAVE_free || __CRT_HAVE_cfree */

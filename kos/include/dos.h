@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa63784ca */
+/* HASH CRC-32:0x8cf23a7c */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -63,7 +63,7 @@ __SYSDECL_BEGIN
 #define diskfree_t _diskfree_t
 
 #if !defined(_GETDISKFREE_DEFINED) && defined(__CRT_HAVE__getdiskfree)
-#define _GETDISKFREE_DEFINED 1
+#define _GETDISKFREE_DEFINED
 __CDECLARE(,unsigned int,__NOTHROW_RPC,_getdiskfree,(unsigned int __drive, struct _diskfree_t *__diskfree),(__drive,__diskfree))
 #endif /* !_GETDISKFREE_DEFINED && __CRT_HAVE__getdiskfree */
 
@@ -91,7 +91,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(delay, __FORCELOCAL __ATTR_ARTIFICIAL void __NOT
 __CREDIRECT(,unsigned int,__NOTHROW_RPC,_dos_getdiskfree,(unsigned int __drive, struct _diskfree_t *__diskfree),_getdiskfree,(__drive,__diskfree))
 #endif /* __CRT_HAVE__getdiskfree */
 #ifndef __sleep_defined
-#define __sleep_defined 1
+#define __sleep_defined
 #ifdef __CRT_HAVE__sleep
 /* >> sleep(2)
  * Sleep for up to `duration' seconds */
@@ -105,7 +105,7 @@ __CDECLARE_VOID(,__NOTHROW_RPC,sleep,(unsigned int __duration),(__duration))
 #endif /* !... */
 #endif /* !__sleep_defined */
 #ifndef __unlink_defined
-#define __unlink_defined 1
+#define __unlink_defined
 #ifdef __CRT_HAVE_unlink
 /* >> unlink(2)
  * Remove a file, symbolic link, device or FIFO referred to by `file' */

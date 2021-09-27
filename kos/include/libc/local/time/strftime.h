@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd29f5890 */
+/* HASH CRC-32:0xdfb63c2a */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,12 +19,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_strftime_defined
-#define __local_strftime_defined 1
+#define __local_strftime_defined
 #include <__crt.h>
 #include <bits/crt/tm.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_crt_strftime_l_defined
-#define __local___localdep_crt_strftime_l_defined 1
+#define __local___localdep_crt_strftime_l_defined
 #ifdef __CRT_HAVE_strftime_l
 __CREDIRECT(__ATTR_NONNULL((1, 3, 4)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_crt_strftime_l,(char *__restrict __buf, __SIZE_TYPE__ __bufsize, char const *__restrict __format, struct __NAMESPACE_STD_SYM tm const *__restrict __tp, __locale_t __locale),strftime_l,(__buf,__bufsize,__format,__tp,__locale))
 #elif defined(__CRT_HAVE__strftime_l)
@@ -51,7 +51,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strftime))(char *__restrict __buf, __
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_strftime_defined
-#define __local___localdep_strftime_defined 1
+#define __local___localdep_strftime_defined
 #define __localdep_strftime __LIBC_LOCAL_NAME(strftime)
 #endif /* !__local___localdep_strftime_defined */
 #endif /* !__local_strftime_defined */

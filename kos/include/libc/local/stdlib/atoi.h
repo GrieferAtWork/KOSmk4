@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdff8e1c0 */
+/* HASH CRC-32:0xd49719e7 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,11 +19,11 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_atoi_defined
-#define __local_atoi_defined 1
+#define __local_atoi_defined
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_strto32_defined
-#define __local___localdep_strto32_defined 1
+#define __local___localdep_strto32_defined
 #ifdef __CRT_HAVE_strto32
 __NAMESPACE_LOCAL_END
 #include <features.h>
@@ -62,7 +62,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_strto32_defined */
 #ifndef __local___localdep_strto64_defined
-#define __local___localdep_strto64_defined 1
+#define __local___localdep_strto64_defined
 #ifdef __CRT_HAVE_strto64
 __NAMESPACE_LOCAL_END
 #include <features.h>
@@ -116,7 +116,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(atoi))(char const *__restrict __nptr)
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_atoi_defined
-#define __local___localdep_atoi_defined 1
+#define __local___localdep_atoi_defined
 #define __localdep_atoi __LIBC_LOCAL_NAME(atoi)
 #endif /* !__local___localdep_atoi_defined */
 #endif /* !__local_atoi_defined */

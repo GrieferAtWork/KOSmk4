@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6fafc63c */
+/* HASH CRC-32:0x3f92139f */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,14 +19,14 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_write_printer_defined
-#define __local_write_printer_defined 1
+#define __local_write_printer_defined
 #include <__crt.h>
 #include <hybrid/typecore.h>
 #include <bits/crt/format-printer.h>
 #if defined(__CRT_HAVE_writeall) || (defined(__CRT_HAVE_write_printer) && defined(__LIBCCALL_IS_FORMATPRINTER_CC) && __SIZEOF_INT__ == __SIZEOF_POINTER__) || defined(__CRT_HAVE_write) || defined(__CRT_HAVE__write) || defined(__CRT_HAVE___write)
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_writeall_defined
-#define __local___localdep_writeall_defined 1
+#define __local___localdep_writeall_defined
 #ifdef __CRT_HAVE_writeall
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
@@ -55,7 +55,7 @@ __NOTHROW_RPC(__FORMATPRINTER_CC __LIBC_LOCAL_NAME(write_printer))(void *__fd, c
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_write_printer_defined
-#define __local___localdep_write_printer_defined 1
+#define __local___localdep_write_printer_defined
 #define __localdep_write_printer __LIBC_LOCAL_NAME(write_printer)
 #endif /* !__local___localdep_write_printer_defined */
 #else /* __CRT_HAVE_writeall || (__CRT_HAVE_write_printer && __LIBCCALL_IS_FORMATPRINTER_CC && __SIZEOF_INT__ == __SIZEOF_POINTER__) || __CRT_HAVE_write || __CRT_HAVE__write || __CRT_HAVE___write */

@@ -1252,7 +1252,7 @@ DEFINE___PRIVATE_SIGSET_VALIDATE_SIGNO
 #if defined(__USE_XOPEN_EXTENDED) || defined(__USE_XOPEN2K8)
 }%{
 #ifndef __std_size_t_defined
-#define __std_size_t_defined 1
+#define __std_size_t_defined
 __NAMESPACE_STD_BEGIN
 typedef __SIZE_TYPE__ size_t;
 __NAMESPACE_STD_END
@@ -1261,7 +1261,7 @@ __NAMESPACE_STD_END
 #ifndef __CXX_SYSTEM_HEADER
 }%(c, ccompat){
 #ifndef __size_t_defined
-#define __size_t_defined 1
+#define __size_t_defined
 __NAMESPACE_STD_USING(size_t)
 #endif /* !__size_t_defined */
 }%{

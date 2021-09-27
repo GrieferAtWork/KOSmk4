@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xccbc884f */
+/* HASH CRC-32:0x3b40fd11 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,13 +19,13 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_format_c16printf_defined
-#define __local_format_c16printf_defined 1
+#define __local_format_c16printf_defined
 #include <__crt.h>
 #include <kos/anno.h>
 #include <bits/crt/uformat-printer.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_format_vc16printf_defined
-#define __local___localdep_format_vc16printf_defined 1
+#define __local___localdep_format_vc16printf_defined
 #if defined(__CRT_HAVE_format_vwprintf) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
 __CREDIRECT(__ATTR_LIBC_WPRINTF(3, 0) __ATTR_NONNULL((1, 3)),__SSIZE_TYPE__,__THROWING,__localdep_format_vc16printf,(__pc16formatprinter __printer, void *__arg, __CHAR16_TYPE__ const *__restrict __format, __builtin_va_list __args),format_vwprintf,(__printer,__arg,__format,__args))
 #elif defined(__CRT_HAVE_DOS$format_vwprintf)
@@ -53,7 +53,7 @@ __LOCAL_LIBC(format_c16printf) __ATTR_LIBC_WPRINTF(3, 0) __ATTR_NONNULL((1, 3)) 
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_format_c16printf_defined
-#define __local___localdep_format_c16printf_defined 1
+#define __local___localdep_format_c16printf_defined
 #define __localdep_format_c16printf __LIBC_LOCAL_NAME(format_c16printf)
 #endif /* !__local___localdep_format_c16printf_defined */
 #endif /* !__local_format_c16printf_defined */

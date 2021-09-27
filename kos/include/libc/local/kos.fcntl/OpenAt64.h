@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xad024365 */
+/* HASH CRC-32:0x73e6e2b7 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,14 +19,14 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_OpenAt64_defined
-#define __local_OpenAt64_defined 1
+#define __local_OpenAt64_defined
 #include <__crt.h>
 #ifdef __CRT_HAVE_OpenAt
 #include <kos/anno.h>
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_OpenAt32_defined
-#define __local___localdep_OpenAt32_defined 1
+#define __local___localdep_OpenAt32_defined
 __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2)),__fd_t,__THROWING,__localdep_OpenAt32,(__fd_t __dirfd, char const *__filename, __oflag_t __oflags),OpenAt,(__dirfd,__filename,__oflags),__oflags,1,(__mode_t))
 #endif /* !__local___localdep_OpenAt32_defined */
 __NAMESPACE_LOCAL_END
@@ -47,7 +47,7 @@ __LOCAL_LIBC(OpenAt64) __ATTR_WUNUSED __ATTR_NONNULL((2)) __fd_t
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_OpenAt64_defined
-#define __local___localdep_OpenAt64_defined 1
+#define __local___localdep_OpenAt64_defined
 #define __localdep_OpenAt64 __LIBC_LOCAL_NAME(OpenAt64)
 #endif /* !__local___localdep_OpenAt64_defined */
 #else /* __CRT_HAVE_OpenAt */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4b0936b9 */
+/* HASH CRC-32:0xf0ed5c58 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,14 +19,14 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_sigignore_defined
-#define __local_sigignore_defined 1
+#define __local_sigignore_defined
 #include <__crt.h>
 #include <asm/os/signal.h>
 #if defined(__SIG_IGN) && defined(__SIG_ERR) && defined(__CRT_HAVE_bsd_signal)
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_bsd_signal_defined
-#define __local___localdep_bsd_signal_defined 1
+#define __local___localdep_bsd_signal_defined
 __NAMESPACE_LOCAL_END
 #include <bits/os/sigaction.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -38,7 +38,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(sigignore))(__signo_t __signo) {
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_sigignore_defined
-#define __local___localdep_sigignore_defined 1
+#define __local___localdep_sigignore_defined
 #define __localdep_sigignore __LIBC_LOCAL_NAME(sigignore)
 #endif /* !__local___localdep_sigignore_defined */
 #else /* __SIG_IGN && __SIG_ERR && __CRT_HAVE_bsd_signal */

@@ -41,7 +41,7 @@ typedef __UINT32_TYPE__ __wsum;
 #define __aligned_le64 __ATTR_ALIGNED(8) __le64
 
 #ifndef __size_t_defined
-#define __size_t_defined 1
+#define __size_t_defined
 typedef __SIZE_TYPE__ size_t;
 #endif /* !__size_t_defined */
 #endif /* __CC__ */

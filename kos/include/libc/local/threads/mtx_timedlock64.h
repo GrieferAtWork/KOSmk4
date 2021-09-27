@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8a1ca757 */
+/* HASH CRC-32:0x1b2cfd3d */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,14 +19,14 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_mtx_timedlock64_defined
-#define __local_mtx_timedlock64_defined 1
+#define __local_mtx_timedlock64_defined
 #include <__crt.h>
 #include <bits/types.h>
 #if defined(__CRT_HAVE_pthread_mutex_timedlock64) || defined(__CRT_HAVE_pthread_mutex_timedlock)
 #include <bits/crt/threads.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_pthread_mutex_timedlock64_defined
-#define __local___localdep_pthread_mutex_timedlock64_defined 1
+#define __local___localdep_pthread_mutex_timedlock64_defined
 #if defined(__CRT_HAVE_pthread_mutex_timedlock) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 __NAMESPACE_LOCAL_END
 #include <bits/crt/pthreadtypes.h>
@@ -67,7 +67,7 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(mtx_timedlock64))(__mtx_t *__restrict
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_mtx_timedlock64_defined
-#define __local___localdep_mtx_timedlock64_defined 1
+#define __local___localdep_mtx_timedlock64_defined
 #define __localdep_mtx_timedlock64 __LIBC_LOCAL_NAME(mtx_timedlock64)
 #endif /* !__local___localdep_mtx_timedlock64_defined */
 #else /* __CRT_HAVE_pthread_mutex_timedlock64 || __CRT_HAVE_pthread_mutex_timedlock */

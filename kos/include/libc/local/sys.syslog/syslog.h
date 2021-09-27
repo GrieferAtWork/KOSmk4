@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x597ea5b6 */
+/* HASH CRC-32:0x58fcfa2b */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,13 +19,13 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_syslog_defined
-#define __local_syslog_defined 1
+#define __local_syslog_defined
 #include <__crt.h>
 #if defined(__CRT_HAVE_vsyslog) || defined(__CRT_HAVE_syslog_printer)
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_vsyslog_defined
-#define __local___localdep_vsyslog_defined 1
+#define __local___localdep_vsyslog_defined
 #ifdef __CRT_HAVE_vsyslog
 __CREDIRECT_VOID(__ATTR_LIBC_PRINTF(2, 0) __ATTR_NONNULL((2)),__NOTHROW_RPC,__localdep_vsyslog,(__STDC_INT_AS_UINT_T __level, char const *__format, __builtin_va_list __args),vsyslog,(__level,__format,__args))
 #elif defined(__CRT_HAVE_syslog_printer)
@@ -46,7 +46,7 @@ __NOTHROW_RPC(__VLIBCCALL __LIBC_LOCAL_NAME(syslog))(__STDC_INT_AS_UINT_T __leve
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_syslog_defined
-#define __local___localdep_syslog_defined 1
+#define __local___localdep_syslog_defined
 #define __localdep_syslog __LIBC_LOCAL_NAME(syslog)
 #endif /* !__local___localdep_syslog_defined */
 #else /* __CRT_HAVE_vsyslog || __CRT_HAVE_syslog_printer */

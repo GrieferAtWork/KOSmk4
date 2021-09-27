@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa3667919 */
+/* HASH CRC-32:0xb0506629 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,14 +19,14 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_tcgetattr_defined
-#define __local_tcgetattr_defined 1
+#define __local_tcgetattr_defined
 #include <__crt.h>
 #include <asm/os/tty.h>
 #if defined(__CRT_HAVE_ioctl) && defined(__TCGETA)
 #include <bits/os/termios.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_ioctl_defined
-#define __local___localdep_ioctl_defined 1
+#define __local___localdep_ioctl_defined
 __NAMESPACE_LOCAL_END
 #include <features.h>
 #include <bits/types.h>
@@ -39,7 +39,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(tcgetattr))(__fd_t __fd, struct termi
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_tcgetattr_defined
-#define __local___localdep_tcgetattr_defined 1
+#define __local___localdep_tcgetattr_defined
 #define __localdep_tcgetattr __LIBC_LOCAL_NAME(tcgetattr)
 #endif /* !__local___localdep_tcgetattr_defined */
 #else /* __CRT_HAVE_ioctl && __TCGETA */

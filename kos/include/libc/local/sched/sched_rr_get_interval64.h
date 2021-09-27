@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf2fbdf6e */
+/* HASH CRC-32:0x98cd912d */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,14 +19,14 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_sched_rr_get_interval64_defined
-#define __local_sched_rr_get_interval64_defined 1
+#define __local_sched_rr_get_interval64_defined
 #include <__crt.h>
 #ifdef __CRT_HAVE_sched_rr_get_interval
 #include <bits/types.h>
 #include <bits/os/timespec.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_sched_rr_get_interval32_defined
-#define __local___localdep_sched_rr_get_interval32_defined 1
+#define __local___localdep_sched_rr_get_interval32_defined
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_sched_rr_get_interval32,(__pid_t __pid, struct __timespec32 *__tms),sched_rr_get_interval,(__pid,__tms))
 #endif /* !__local___localdep_sched_rr_get_interval32_defined */
 __LOCAL_LIBC(sched_rr_get_interval64) int
@@ -40,7 +40,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(sched_rr_get_interval64))(__pid_t __p
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_sched_rr_get_interval64_defined
-#define __local___localdep_sched_rr_get_interval64_defined 1
+#define __local___localdep_sched_rr_get_interval64_defined
 #define __localdep_sched_rr_get_interval64 __LIBC_LOCAL_NAME(sched_rr_get_interval64)
 #endif /* !__local___localdep_sched_rr_get_interval64_defined */
 #else /* __CRT_HAVE_sched_rr_get_interval */

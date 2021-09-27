@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc86fa8ea */
+/* HASH CRC-32:0x2b002d15 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,12 +19,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local__aligned_offset_realloc_defined
-#define __local__aligned_offset_realloc_defined 1
+#define __local__aligned_offset_realloc_defined
 #include <__crt.h>
 #if (defined(__CRT_HAVE__aligned_offset_malloc) || defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign)) && (defined(__CRT_HAVE__aligned_free) || defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree))
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep__aligned_free_defined
-#define __local___localdep__aligned_free_defined 1
+#define __local___localdep__aligned_free_defined
 #ifdef __CRT_HAVE__aligned_free
 __CREDIRECT_VOID(,__NOTHROW_NCX,__localdep__aligned_free,(void *__aligned_mallptr),_aligned_free,(__aligned_mallptr))
 #elif defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree)
@@ -37,7 +37,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep__aligned_free_defined */
 #ifndef __local___localdep__aligned_msize_defined
-#define __local___localdep__aligned_msize_defined 1
+#define __local___localdep__aligned_msize_defined
 #ifdef __CRT_HAVE__aligned_msize
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,__SIZE_TYPE__,__NOTHROW_NCX,__localdep__aligned_msize,(void *__aligned_mallptr, __SIZE_TYPE__ __min_alignment, __SIZE_TYPE__ __offset),_aligned_msize,(__aligned_mallptr,__min_alignment,__offset))
 #else /* __CRT_HAVE__aligned_msize */
@@ -48,7 +48,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__CRT_HAVE__aligned_msize */
 #endif /* !__local___localdep__aligned_msize_defined */
 #ifndef __local___localdep__aligned_offset_malloc_defined
-#define __local___localdep__aligned_offset_malloc_defined 1
+#define __local___localdep__aligned_offset_malloc_defined
 #ifdef __CRT_HAVE__aligned_offset_malloc
 __CREDIRECT(__ATTR_MALLOC __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1)),void *,__NOTHROW_NCX,__localdep__aligned_offset_malloc,(__SIZE_TYPE__ __num_bytes, __SIZE_TYPE__ __min_alignment, __SIZE_TYPE__ __offset),_aligned_offset_malloc,(__num_bytes,__min_alignment,__offset))
 #elif defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign)
@@ -61,7 +61,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep__aligned_offset_malloc_defined */
 #ifndef __local___localdep_memcpy_defined
-#define __local___localdep_memcpy_defined 1
+#define __local___localdep_memcpy_defined
 #ifdef __CRT_HAVE_memcpy
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
@@ -89,7 +89,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_aligned_offset_realloc))(void *__ali
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep__aligned_offset_realloc_defined
-#define __local___localdep__aligned_offset_realloc_defined 1
+#define __local___localdep__aligned_offset_realloc_defined
 #define __localdep__aligned_offset_realloc __LIBC_LOCAL_NAME(_aligned_offset_realloc)
 #endif /* !__local___localdep__aligned_offset_realloc_defined */
 #else /* (__CRT_HAVE__aligned_offset_malloc || __CRT_HAVE_malloc || __CRT_HAVE_calloc || __CRT_HAVE_realloc || __CRT_HAVE_memalign || __CRT_HAVE_aligned_alloc || __CRT_HAVE_posix_memalign) && (__CRT_HAVE__aligned_free || __CRT_HAVE_free || __CRT_HAVE_cfree) */

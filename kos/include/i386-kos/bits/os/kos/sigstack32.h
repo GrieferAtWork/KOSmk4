@@ -43,22 +43,16 @@ __SYSDECL_BEGIN
 
 #if !defined(__x86_64__) && defined(__i386__)
 
-#ifndef __sigstack_defined
-#define __sigstack_defined 1
 #define __OFFSET_SIGSTACK_SP       __OFFSET_SIGSTACKX32_SP
 #define __OFFSET_SIGSTACK_ONSTACK  __OFFSET_SIGSTACKX32_ONSTACK
 #define __SIZEOF_SIGSTACK          __SIZEOF_SIGSTACKX32
 #define __sigstackx32              sigstack
-#endif /* !__sigstack_defined */
 
-#ifndef __sigaltstack_defined
-#define __sigaltstack_defined 1
 #define __OFFSET_SIGALTSTACK_SP    __OFFSET_SIGALTSTACKX32_SP
 #define __OFFSET_SIGALTSTACK_FLAGS __OFFSET_SIGALTSTACKX32_FLAGS
 #define __OFFSET_SIGALTSTACK_SIZE  __OFFSET_SIGALTSTACKX32_SIZE
 #define __SIZEOF_SIGALTSTACK       __SIZEOF_SIGALTSTACKX32
 #define __sigaltstackx32           sigaltstack
-#endif /* !__sigaltstack_defined */
 
 #endif /* !__x86_64__ && __i386__ */
 

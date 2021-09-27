@@ -71,7 +71,7 @@
 __SYSDECL_BEGIN
 
 #ifndef __std_mbstate_t_defined
-#define __std_mbstate_t_defined 1
+#define __std_mbstate_t_defined
 __NAMESPACE_STD_BEGIN
 typedef struct __mbstate mbstate_t;
 __NAMESPACE_STD_END
@@ -80,7 +80,7 @@ __NAMESPACE_STD_END
 #ifndef __CXX_SYSTEM_HEADER
 }%(c,ccompat){
 #ifndef __mbstate_t_defined
-#define __mbstate_t_defined 1
+#define __mbstate_t_defined
 __NAMESPACE_STD_USING(mbstate_t)
 #endif /* !__mbstate_t_defined */
 }%{
@@ -89,7 +89,7 @@ __NAMESPACE_STD_USING(mbstate_t)
 
 /* Define `size_t' */
 #ifndef __std_size_t_defined
-#define __std_size_t_defined 1
+#define __std_size_t_defined
 __NAMESPACE_STD_BEGIN
 typedef __SIZE_TYPE__ size_t;
 __NAMESPACE_STD_END
@@ -97,14 +97,14 @@ __NAMESPACE_STD_END
 #ifndef __CXX_SYSTEM_HEADER
 }%(c, ccompat){
 #ifndef __size_t_defined
-#define __size_t_defined 1
+#define __size_t_defined
 __NAMESPACE_STD_USING(size_t)
 #endif /* !__size_t_defined */
 }%{
 #endif /* !__CXX_SYSTEM_HEADER */
 
 #ifndef __char16_t_defined
-#define __char16_t_defined 1
+#define __char16_t_defined
 typedef __CHAR16_TYPE__ char16_t;
 typedef __CHAR32_TYPE__ char32_t;
 #endif /* !__char16_t_defined */

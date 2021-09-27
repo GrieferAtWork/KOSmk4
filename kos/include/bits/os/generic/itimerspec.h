@@ -49,27 +49,21 @@ __SYSDECL_BEGIN
 #undef it_interval
 #undef it_value
 
-#ifndef __itimerspec_defined
-#define __itimerspec_defined 1
 struct itimerspec /*[PREFIX(it_)]*/ {
 	struct timespec it_interval;
 	struct timespec it_value;
 };
-#endif /* !__itimerspec_defined */
 
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 #define _ITIMERSPEC_MATCHES_ITIMERSPEC64 1
 #endif /* __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ */
 
 #ifdef __USE_TIME64
-#ifndef __itimerspec64_defined
-#define __itimerspec64_defined 1
 #if (defined(__USE_TIME_BITS64) || defined(_ITIMERSPEC_MATCHES_ITIMERSPEC64)) && defined(__USE_STRUCT64_MACRO)
 #define itimerspec64 itimerspec
 #else /* (__USE_TIME_BITS64 || _ITIMERSPEC_MATCHES_ITIMERSPEC64) && __USE_STRUCT64_MACRO */
 #define __itimerspec64 itimerspec64
 #endif /* (!__USE_TIME_BITS64 && !_ITIMERSPEC_MATCHES_ITIMERSPEC64) || !__USE_STRUCT64_MACRO */
-#endif /* !__itimerspec64_defined */
 #endif /* __USE_TIME64 */
 
 #if (defined(__USE_TIME_BITS64) || defined(_ITIMERSPEC_MATCHES_ITIMERSPEC64)) && defined(__USE_STRUCT64_MACRO)
@@ -82,14 +76,11 @@ struct __itimerspec64 /*[NAME(itimerspec64)][PREFIX(it_)]*/ {
 #endif /* (!__USE_TIME_BITS64 && !_ITIMERSPEC_MATCHES_ITIMERSPEC64) || !__USE_STRUCT64_MACRO */
 
 #ifdef __USE_KOS
-#ifndef __itimerspec32_defined
-#define __itimerspec32_defined 1
 #if !defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 #define itimerspec32 itimerspec
 #else /* !__USE_TIME_BITS64 || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ */
 #define __itimerspec32 itimerspec32
 #endif /* __USE_TIME_BITS64 && __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
-#endif /* !__itimerspec32_defined */
 #endif /* __USE_KOS */
 
 #if !defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__

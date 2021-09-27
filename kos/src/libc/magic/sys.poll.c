@@ -140,7 +140,7 @@
 __SYSDECL_BEGIN
 
 #ifndef __nfds_t_defined
-#define __nfds_t_defined 1
+#define __nfds_t_defined
 typedef __UINTPTR_TYPE__ nfds_t;
 #endif /* !__nfds_t_defined */
 

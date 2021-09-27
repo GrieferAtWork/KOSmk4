@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x22348e0f */
+/* HASH CRC-32:0x93801c13 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,18 +19,18 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_Memdup_defined
-#define __local_Memdup_defined 1
+#define __local_Memdup_defined
 #include <__crt.h>
 #ifdef __CRT_HAVE_Malloc
 #include <kos/anno.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_Malloc_defined
-#define __local___localdep_Malloc_defined 1
+#define __local___localdep_Malloc_defined
 __CREDIRECT(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1)),void *,__THROWING,__localdep_Malloc,(__SIZE_TYPE__ __num_bytes),Malloc,(__num_bytes))
 #endif /* !__local___localdep_Malloc_defined */
 #ifndef __local___localdep_memcpy_defined
-#define __local___localdep_memcpy_defined 1
+#define __local___localdep_memcpy_defined
 #ifdef __CRT_HAVE_memcpy
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_memcpy,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_bytes),memcpy,(__dst,__src,__n_bytes))
 #else /* __CRT_HAVE_memcpy */
@@ -49,7 +49,7 @@ __LOCAL_LIBC(Memdup) __ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_RETNONNULL
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_Memdup_defined
-#define __local___localdep_Memdup_defined 1
+#define __local___localdep_Memdup_defined
 #define __localdep_Memdup __LIBC_LOCAL_NAME(Memdup)
 #endif /* !__local___localdep_Memdup_defined */
 #else /* __CRT_HAVE_Malloc */

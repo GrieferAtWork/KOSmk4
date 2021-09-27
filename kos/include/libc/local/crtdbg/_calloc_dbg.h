@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1769ca56 */
+/* HASH CRC-32:0x5dfc4df8 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,13 +19,13 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local__calloc_dbg_defined
-#define __local__calloc_dbg_defined 1
+#define __local__calloc_dbg_defined
 #include <__crt.h>
 #if defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign)
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_calloc_defined
-#define __local___localdep_calloc_defined 1
+#define __local___localdep_calloc_defined
 #if __has_builtin(__builtin_calloc) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_calloc)
 __CEIREDIRECT(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1, 2)),void *,__NOTHROW_NCX,__localdep_calloc,(__SIZE_TYPE__ __count, __SIZE_TYPE__ __num_bytes),calloc,{ return __builtin_calloc(__count, __num_bytes); })
 #elif defined(__CRT_HAVE_calloc)
@@ -48,7 +48,7 @@ __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(_calloc_dbg))(__SIZE_TYPE__ __count, 
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep__calloc_dbg_defined
-#define __local___localdep__calloc_dbg_defined 1
+#define __local___localdep__calloc_dbg_defined
 #define __localdep__calloc_dbg __LIBC_LOCAL_NAME(_calloc_dbg)
 #endif /* !__local___localdep__calloc_dbg_defined */
 #else /* __CRT_HAVE_malloc || __CRT_HAVE_calloc || __CRT_HAVE_realloc || __CRT_HAVE_memalign || __CRT_HAVE_aligned_alloc || __CRT_HAVE_posix_memalign */

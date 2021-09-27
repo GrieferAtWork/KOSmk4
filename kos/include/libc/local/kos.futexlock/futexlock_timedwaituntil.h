@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x79424b1c */
+/* HASH CRC-32:0xe4f05631 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_futexlock_timedwaituntil_defined
-#define __local_futexlock_timedwaituntil_defined 1
+#define __local_futexlock_timedwaituntil_defined
 #include <__crt.h>
 #include <features.h>
 #include <bits/types.h>
@@ -27,7 +27,7 @@
 #include <bits/os/timespec.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_lfutexlock_defined
-#define __local___localdep_lfutexlock_defined 1
+#define __local___localdep_lfutexlock_defined
 #if defined(__CRT_HAVE_lfutexlock) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 __CVREDIRECT(__ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_lfutexlock,(__uintptr_t *__ulockaddr, __uintptr_t *__uaddr, __syscall_ulong_t __futex_op, __uintptr_t __val),lfutexlock,(__ulockaddr,__uaddr,__futex_op,__val),__val,2,(void *,__UINTPTR_TYPE__))
 #elif defined(__CRT_HAVE_lfutexlock64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
@@ -48,7 +48,7 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(futexlock_timedwaituntil))(__uintptr_
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_futexlock_timedwaituntil_defined
-#define __local___localdep_futexlock_timedwaituntil_defined 1
+#define __local___localdep_futexlock_timedwaituntil_defined
 #define __localdep_futexlock_timedwaituntil __LIBC_LOCAL_NAME(futexlock_timedwaituntil)
 #endif /* !__local___localdep_futexlock_timedwaituntil_defined */
 #else /* __CRT_HAVE_lfutexlock64 || __CRT_HAVE_lfutexlock */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x155f3337 */
+/* HASH CRC-32:0x6b31dbda */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_fgetws_defined
-#define __local_fgetws_defined 1
+#define __local_fgetws_defined
 #include <__crt.h>
 #include <features.h>
 #if (defined(__CRT_HAVE_fgetwc) || defined(__CRT_HAVE_getwc)) && (defined(__CRT_HAVE_ungetwc) || defined(__CRT_HAVE_ungetwc_unlocked)) && (defined(__CRT_HAVE_ferror) || defined(__CRT_HAVE__IO_ferror) || defined(__CRT_HAVE_ferror_unlocked))
@@ -27,7 +27,7 @@
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_ferror_defined
-#define __local___localdep_ferror_defined 1
+#define __local___localdep_ferror_defined
 #if defined(__CRT_HAVE_ferror_unlocked) && defined(__USE_STDIO_UNLOCKED)
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_ferror,(__FILE __KOS_FIXED_CONST *__restrict __stream),ferror_unlocked,(__stream))
 #elif defined(__CRT_HAVE_ferror)
@@ -41,7 +41,7 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,__l
 #endif /* !... */
 #endif /* !__local___localdep_ferror_defined */
 #ifndef __local___localdep_fgetwc_defined
-#define __local___localdep_fgetwc_defined 1
+#define __local___localdep_fgetwc_defined
 #ifdef __CRT_HAVE_fgetwc
 __CREDIRECT(__ATTR_NONNULL((1)),__WINT_TYPE__,__THROWING,__localdep_fgetwc,(__FILE *__restrict __stream),fgetwc,(__stream))
 #elif defined(__CRT_HAVE_getwc)
@@ -51,7 +51,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),__WINT_TYPE__,__THROWING,__localdep_fgetwc,(__FI
 #endif /* !... */
 #endif /* !__local___localdep_fgetwc_defined */
 #ifndef __local___localdep_ungetwc_defined
-#define __local___localdep_ungetwc_defined 1
+#define __local___localdep_ungetwc_defined
 #if defined(__CRT_HAVE_ungetwc_unlocked) && defined(__USE_STDIO_UNLOCKED)
 __CREDIRECT(__ATTR_NONNULL((2)),__WINT_TYPE__,__NOTHROW_NCX,__localdep_ungetwc,(__WINT_TYPE__ __wc, __FILE *__stream),ungetwc_unlocked,(__wc,__stream))
 #elif defined(__CRT_HAVE_ungetwc)
@@ -106,7 +106,7 @@ __LOCAL_LIBC(fgetws) __ATTR_WUNUSED __ATTR_NONNULL((1, 3)) __WCHAR_TYPE__ *
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_fgetws_defined
-#define __local___localdep_fgetws_defined 1
+#define __local___localdep_fgetws_defined
 #define __localdep_fgetws __LIBC_LOCAL_NAME(fgetws)
 #endif /* !__local___localdep_fgetws_defined */
 #else /* (__CRT_HAVE_fgetwc || __CRT_HAVE_getwc) && (__CRT_HAVE_ungetwc || __CRT_HAVE_ungetwc_unlocked) && (__CRT_HAVE_ferror || __CRT_HAVE__IO_ferror || __CRT_HAVE_ferror_unlocked) */

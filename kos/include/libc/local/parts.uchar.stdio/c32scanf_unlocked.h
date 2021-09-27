@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc0d5b23f */
+/* HASH CRC-32:0x783906c6 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_c32scanf_unlocked_defined
-#define __local_c32scanf_unlocked_defined 1
+#define __local_c32scanf_unlocked_defined
 #include <__crt.h>
 #if (defined(__CRT_HAVE_vwscanf_unlocked) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)) || defined(__CRT_HAVE_KOS$vwscanf_unlocked) || ((defined(__CRT_HAVE_vfwscanf_unlocked) || defined(__CRT_HAVE_vfwscanf)) && !defined(__NO_STDSTREAMS) && __SIZEOF_WCHAR_T__ == 4) || (((defined(__CRT_HAVE_vfwscanf_unlocked) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)) || defined(__CRT_HAVE_KOS$vfwscanf_unlocked) || (defined(__CRT_HAVE_vfwscanf) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)) || defined(__CRT_HAVE_KOS$vfwscanf)) && !defined(__NO_STDSTREAMS))
 #include <kos/anno.h>
@@ -27,7 +27,7 @@
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_vc32scanf_unlocked_defined
-#define __local___localdep_vc32scanf_unlocked_defined 1
+#define __local___localdep_vc32scanf_unlocked_defined
 #if defined(__CRT_HAVE_vwscanf_unlocked) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
 __CREDIRECT(__ATTR_WUNUSED __ATTR_LIBC_SCANF(1, 0) __ATTR_NONNULL((1)),__STDC_INT_AS_SIZE_T,__THROWING,__localdep_vc32scanf_unlocked,(__CHAR32_TYPE__ const *__restrict __format, __builtin_va_list __args),vwscanf_unlocked,(__format,__args))
 #elif defined(__CRT_HAVE_KOS$vwscanf_unlocked)
@@ -57,7 +57,7 @@ __LOCAL_LIBC(c32scanf_unlocked) __ATTR_WUNUSED __ATTR_LIBC_SCANF(1, 2) __ATTR_NO
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_c32scanf_unlocked_defined
-#define __local___localdep_c32scanf_unlocked_defined 1
+#define __local___localdep_c32scanf_unlocked_defined
 #define __localdep_c32scanf_unlocked __LIBC_LOCAL_NAME(c32scanf_unlocked)
 #endif /* !__local___localdep_c32scanf_unlocked_defined */
 #else /* (__CRT_HAVE_vwscanf_unlocked && __SIZEOF_WCHAR_T__ == 4 && __LIBCCALL_IS_LIBKCALL) || __CRT_HAVE_KOS$vwscanf_unlocked || ((__CRT_HAVE_vfwscanf_unlocked || __CRT_HAVE_vfwscanf) && !__NO_STDSTREAMS && __SIZEOF_WCHAR_T__ == 4) || (((__CRT_HAVE_vfwscanf_unlocked && __SIZEOF_WCHAR_T__ == 4 && __LIBCCALL_IS_LIBKCALL) || __CRT_HAVE_KOS$vfwscanf_unlocked || (__CRT_HAVE_vfwscanf && __SIZEOF_WCHAR_T__ == 4 && __LIBCCALL_IS_LIBKCALL) || __CRT_HAVE_KOS$vfwscanf) && !__NO_STDSTREAMS) */

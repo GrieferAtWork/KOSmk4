@@ -1069,7 +1069,7 @@ __SYSDECL_BEGIN
 
 #if defined(__USE_KOS) || defined(__USE_KOS_KERNEL)
 #ifndef __errno_t_defined
-#define __errno_t_defined 1
+#define __errno_t_defined
 typedef __errno_t errno_t;
 #endif /* !__errno_t_defined */
 #endif /* __USE_KOS || __USE_KOS_KERNEL */
@@ -1227,7 +1227,7 @@ char **__p_program_invocation_short_name() {
 #endif /* !program_invocation_short_name */
 
 #ifndef __error_t_defined
-#define __error_t_defined 1
+#define __error_t_defined
 typedef __errno_t error_t;
 #endif /* !__error_t_defined */
 

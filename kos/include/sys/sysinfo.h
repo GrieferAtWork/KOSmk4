@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf43cc049 */
+/* HASH CRC-32:0xe079e812 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -43,7 +43,7 @@
 __SYSDECL_BEGIN
 
 #if !defined(__sysinfo_defined) && defined(__CRT_HAVE_sysinfo) && !defined(__solaris__)
-#define __sysinfo_defined 1
+#define __sysinfo_defined
 /* >> sysinfo(2)
  * Return current system information */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,sysinfo,(struct sysinfo *__info),(__info))

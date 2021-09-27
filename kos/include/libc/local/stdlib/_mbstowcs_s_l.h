@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x68398555 */
+/* HASH CRC-32:0x43e754f3 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,12 +19,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local__mbstowcs_s_l_defined
-#define __local__mbstowcs_s_l_defined 1
+#define __local__mbstowcs_s_l_defined
 #include <__crt.h>
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep__mbstowcs_l_defined
-#define __local___localdep__mbstowcs_l_defined 1
+#define __local___localdep__mbstowcs_l_defined
 #ifdef __CRT_HAVE__mbstowcs_l
 __CREDIRECT(,__SIZE_TYPE__,__NOTHROW_NCX,__localdep__mbstowcs_l,(__WCHAR_TYPE__ *__dst, char const *__src, __SIZE_TYPE__ __dstlen, __locale_t __locale),_mbstowcs_l,(__dst,__src,__dstlen,__locale))
 #else /* __CRT_HAVE__mbstowcs_l */
@@ -53,7 +53,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_mbstowcs_s_l))(__SIZE_TYPE__ *__pres
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep__mbstowcs_s_l_defined
-#define __local___localdep__mbstowcs_s_l_defined 1
+#define __local___localdep__mbstowcs_s_l_defined
 #define __localdep__mbstowcs_s_l __LIBC_LOCAL_NAME(_mbstowcs_s_l)
 #endif /* !__local___localdep__mbstowcs_s_l_defined */
 #endif /* !__local__mbstowcs_s_l_defined */

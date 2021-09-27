@@ -38,12 +38,12 @@
 DECL_BEGIN
 
 #ifndef __physaddr_t_defined
-#define __physaddr_t_defined 1
+#define __physaddr_t_defined
 typedef __physaddr_t physaddr_t; /* Physical memory address (== physpage_t * PAGESIZE) */
 #endif /* !__physaddr_t_defined */
 
 #ifndef __port_t_defined
-#define __port_t_defined 1
+#define __port_t_defined
 typedef __port_t port_t;
 #endif /* !__port_t_defined */
 

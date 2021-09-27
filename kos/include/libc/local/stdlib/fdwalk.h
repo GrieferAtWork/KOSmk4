@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa363c594 */
+/* HASH CRC-32:0x10cb243e */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,14 +19,14 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_fdwalk_defined
-#define __local_fdwalk_defined 1
+#define __local_fdwalk_defined
 #include <__crt.h>
 #include <asm/os/fcntl.h>
 #if (defined(__CRT_HAVE_fcntl) || defined(__CRT_HAVE___fcntl)) && defined(__F_NEXT)
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_fcntl_defined
-#define __local___localdep_fcntl_defined 1
+#define __local___localdep_fcntl_defined
 #ifdef __CRT_HAVE_fcntl
 __NAMESPACE_LOCAL_END
 #include <features.h>
@@ -76,7 +76,7 @@ __LOCAL_LIBC(fdwalk) __ATTR_NONNULL((1)) int
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_fdwalk_defined
-#define __local___localdep_fdwalk_defined 1
+#define __local___localdep_fdwalk_defined
 #define __localdep_fdwalk __LIBC_LOCAL_NAME(fdwalk)
 #endif /* !__local___localdep_fdwalk_defined */
 #else /* (__CRT_HAVE_fcntl || __CRT_HAVE___fcntl) && __F_NEXT */

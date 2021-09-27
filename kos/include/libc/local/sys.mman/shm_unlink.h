@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x979e4b6a */
+/* HASH CRC-32:0xb9772343 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,13 +19,13 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_shm_unlink_defined
-#define __local_shm_unlink_defined 1
+#define __local_shm_unlink_defined
 #include <__crt.h>
 #include <asm/os/fcntl.h>
 #if defined(__CRT_HAVE_unlink) || defined(__CRT_HAVE__unlink) || (defined(__AT_FDCWD) && defined(__CRT_HAVE_unlinkat))
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_memcpy_defined
-#define __local___localdep_memcpy_defined 1
+#define __local___localdep_memcpy_defined
 #ifdef __CRT_HAVE_memcpy
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
@@ -39,7 +39,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__CRT_HAVE_memcpy */
 #endif /* !__local___localdep_memcpy_defined */
 #ifndef __local___localdep_mempcpy_defined
-#define __local___localdep_mempcpy_defined 1
+#define __local___localdep_mempcpy_defined
 #ifdef __CRT_HAVE_mempcpy
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
@@ -58,7 +58,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_mempcpy_defined */
 #ifndef __local___localdep_strlen_defined
-#define __local___localdep_strlen_defined 1
+#define __local___localdep_strlen_defined
 #ifdef __CRT_HAVE_strlen
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
@@ -72,7 +72,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__CRT_HAVE_strlen */
 #endif /* !__local___localdep_strlen_defined */
 #ifndef __local___localdep_unlink_defined
-#define __local___localdep_unlink_defined 1
+#define __local___localdep_unlink_defined
 #ifdef __CRT_HAVE_unlink
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_unlink,(char const *__file),unlink,(__file))
 #elif defined(__CRT_HAVE__unlink)
@@ -121,7 +121,7 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(shm_unlink))(char const *__name) {
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_shm_unlink_defined
-#define __local___localdep_shm_unlink_defined 1
+#define __local___localdep_shm_unlink_defined
 #define __localdep_shm_unlink __LIBC_LOCAL_NAME(shm_unlink)
 #endif /* !__local___localdep_shm_unlink_defined */
 #else /* __CRT_HAVE_unlink || __CRT_HAVE__unlink || (__AT_FDCWD && __CRT_HAVE_unlinkat) */

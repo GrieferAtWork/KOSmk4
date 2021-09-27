@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5089e532 */
+/* HASH CRC-32:0xfe2fa130 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,12 +19,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_getwd_defined
-#define __local_getwd_defined 1
+#define __local_getwd_defined
 #include <__crt.h>
 #if defined(__CRT_HAVE_getcwd) || defined(__CRT_HAVE__getcwd)
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_getcwd_defined
-#define __local___localdep_getcwd_defined 1
+#define __local___localdep_getcwd_defined
 #ifdef __CRT_HAVE_getcwd
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
@@ -48,7 +48,7 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(getwd))(char *__buf) {
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_getwd_defined
-#define __local___localdep_getwd_defined 1
+#define __local___localdep_getwd_defined
 #define __localdep_getwd __LIBC_LOCAL_NAME(getwd)
 #endif /* !__local___localdep_getwd_defined */
 #else /* __CRT_HAVE_getcwd || __CRT_HAVE__getcwd */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa2762a3e */
+/* HASH CRC-32:0x53afa13c */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,14 +19,14 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_setvbuf_unlocked_defined
-#define __local_setvbuf_unlocked_defined 1
+#define __local_setvbuf_unlocked_defined
 #include <__crt.h>
 #include <features.h>
 #if defined(__CRT_HAVE_setvbuf) || defined(__CRT_HAVE__IO_setvbuf) || defined(__CRT_HAVE_setvbuf_unlocked)
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_setvbuf_defined
-#define __local___localdep_setvbuf_defined 1
+#define __local___localdep_setvbuf_defined
 #if defined(__CRT_HAVE_setvbuf_unlocked) && defined(__USE_STDIO_UNLOCKED)
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_setvbuf,(__FILE *__restrict __stream, char *__restrict __buf, __STDC_INT_AS_UINT_T __modes, __SIZE_TYPE__ __bufsize),setvbuf_unlocked,(__stream,__buf,__modes,__bufsize))
 #elif defined(__CRT_HAVE_setvbuf)
@@ -45,7 +45,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(setvbuf_unlocked))(__FILE *__restrict
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_setvbuf_unlocked_defined
-#define __local___localdep_setvbuf_unlocked_defined 1
+#define __local___localdep_setvbuf_unlocked_defined
 #define __localdep_setvbuf_unlocked __LIBC_LOCAL_NAME(setvbuf_unlocked)
 #endif /* !__local___localdep_setvbuf_unlocked_defined */
 #else /* __CRT_HAVE_setvbuf || __CRT_HAVE__IO_setvbuf || __CRT_HAVE_setvbuf_unlocked */

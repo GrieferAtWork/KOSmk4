@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8f469709 */
+/* HASH CRC-32:0x6ee1cd19 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,14 +19,14 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_putwchar_defined
-#define __local_putwchar_defined 1
+#define __local_putwchar_defined
 #include <__crt.h>
 #if !defined(__NO_STDSTREAMS) && (defined(__CRT_HAVE_fputwc) || defined(__CRT_HAVE_putwc))
 #include <kos/anno.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_fputwc_defined
-#define __local___localdep_fputwc_defined 1
+#define __local___localdep_fputwc_defined
 #ifdef __CRT_HAVE_fputwc
 __CREDIRECT(__ATTR_NONNULL((2)),__WINT_TYPE__,__THROWING,__localdep_fputwc,(__WCHAR_TYPE__ __wc, __FILE *__stream),fputwc,(__wc,__stream))
 #elif defined(__CRT_HAVE_putwc)
@@ -44,7 +44,7 @@ __LOCAL_LIBC(putwchar) __WINT_TYPE__
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_putwchar_defined
-#define __local___localdep_putwchar_defined 1
+#define __local___localdep_putwchar_defined
 #define __localdep_putwchar __LIBC_LOCAL_NAME(putwchar)
 #endif /* !__local___localdep_putwchar_defined */
 #else /* !__NO_STDSTREAMS && (__CRT_HAVE_fputwc || __CRT_HAVE_putwc) */

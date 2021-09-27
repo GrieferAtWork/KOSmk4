@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb3694bfb */
+/* HASH CRC-32:0x45a00b37 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,12 +19,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_strnoff_defined
-#define __local_strnoff_defined 1
+#define __local_strnoff_defined
 #include <__crt.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_strnchrnul_defined
-#define __local___localdep_strnchrnul_defined 1
+#define __local___localdep_strnchrnul_defined
 #ifdef __CRT_HAVE_strnchrnul
 __CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_strnchrnul,(char const *__restrict __haystack, int __needle, __SIZE_TYPE__ __maxlen),strnchrnul,(__haystack,__needle,__maxlen))
 #else /* __CRT_HAVE_strnchrnul */
@@ -40,7 +40,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strnoff))(char const *__restrict __ha
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_strnoff_defined
-#define __local___localdep_strnoff_defined 1
+#define __local___localdep_strnoff_defined
 #define __localdep_strnoff __LIBC_LOCAL_NAME(strnoff)
 #endif /* !__local___localdep_strnoff_defined */
 #endif /* !__local_strnoff_defined */

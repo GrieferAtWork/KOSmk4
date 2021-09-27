@@ -51,8 +51,8 @@
 #define __ALIGNOF_SIGACTION          __ALIGNOF_SIGACTIONX32
 #define __sigactionx32 sigaction
 #ifndef ____sighandler_t_defined
-#define ____sighandler_t_defined 1
-#define __sighandlerx32_t  __sighandler_t
+#define ____sighandler_t_defined
+#define __sighandlerx32_t __sighandler_t
 #endif /* !____sighandler_t_defined */
 #endif /* !__x86_64__ && __i386__ */
 
@@ -77,7 +77,7 @@ struct __ucontextx32;
 #endif /* __USE_KOS_ALTERATIONS */
 #endif /* __USE_POSIX199309 */
 #ifndef ____sigsetx32_t_defined
-#define ____sigsetx32_t_defined 1
+#define ____sigsetx32_t_defined
 #ifdef __x86_64__
 struct __sigset_structx32 {
 	__UINT32_TYPE__ __val[__SIZEOF_SIGSET_T__ / 4];

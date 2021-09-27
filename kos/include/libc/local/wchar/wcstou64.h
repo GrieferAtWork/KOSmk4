@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x378d470f */
+/* HASH CRC-32:0xeffa38bc */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,13 +19,13 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_wcstou64_defined
-#define __local_wcstou64_defined 1
+#define __local_wcstou64_defined
 #include <__crt.h>
 #include <features.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_wcstou64_r_defined
-#define __local___localdep_wcstou64_r_defined 1
+#define __local___localdep_wcstou64_r_defined
 #ifdef __CRT_HAVE_wcstou64_r
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
@@ -56,7 +56,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcstou64))(__WCHAR_TYPE__ const *__re
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_wcstou64_defined
-#define __local___localdep_wcstou64_defined 1
+#define __local___localdep_wcstou64_defined
 #define __localdep_wcstou64 __LIBC_LOCAL_NAME(wcstou64)
 #endif /* !__local___localdep_wcstou64_defined */
 #endif /* !__local_wcstou64_defined */

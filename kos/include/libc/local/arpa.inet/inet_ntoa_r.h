@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4d055867 */
+/* HASH CRC-32:0x3e8a75de */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,12 +19,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_inet_ntoa_r_defined
-#define __local_inet_ntoa_r_defined 1
+#define __local_inet_ntoa_r_defined
 #include <__crt.h>
 #include <netinet/bits/in.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_sprintf_defined
-#define __local___localdep_sprintf_defined 1
+#define __local___localdep_sprintf_defined
 #if __has_builtin(__builtin_sprintf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_sprintf) && __has_builtin(__builtin_va_arg_pack)
 __NAMESPACE_LOCAL_END
 #include <features.h>
@@ -63,7 +63,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(inet_ntoa_r))(struct in_addr __inaddr
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_inet_ntoa_r_defined
-#define __local___localdep_inet_ntoa_r_defined 1
+#define __local___localdep_inet_ntoa_r_defined
 #define __localdep_inet_ntoa_r __LIBC_LOCAL_NAME(inet_ntoa_r)
 #endif /* !__local___localdep_inet_ntoa_r_defined */
 #endif /* !__local_inet_ntoa_r_defined */

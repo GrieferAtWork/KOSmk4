@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x33d15d04 */
+/* HASH CRC-32:0xeaeabcfe */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_fgetc32s_defined
-#define __local_fgetc32s_defined 1
+#define __local_fgetc32s_defined
 #include <__crt.h>
 #include <features.h>
 #if ((defined(__CRT_HAVE_fgetwc) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)) || defined(__CRT_HAVE_KOS$fgetwc) || (defined(__CRT_HAVE_getwc) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)) || defined(__CRT_HAVE_KOS$getwc)) && ((defined(__CRT_HAVE_ungetwc) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)) || defined(__CRT_HAVE_KOS$ungetwc) || (defined(__CRT_HAVE_ungetwc_unlocked) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)) || defined(__CRT_HAVE_KOS$ungetwc_unlocked)) && (defined(__CRT_HAVE_ferror) || defined(__CRT_HAVE__IO_ferror) || defined(__CRT_HAVE_ferror_unlocked))
@@ -27,7 +27,7 @@
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_ferror_defined
-#define __local___localdep_ferror_defined 1
+#define __local___localdep_ferror_defined
 #if defined(__CRT_HAVE_ferror_unlocked) && defined(__USE_STDIO_UNLOCKED)
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_ferror,(__FILE __KOS_FIXED_CONST *__restrict __stream),ferror_unlocked,(__stream))
 #elif defined(__CRT_HAVE_ferror)
@@ -41,7 +41,7 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,__l
 #endif /* !... */
 #endif /* !__local___localdep_ferror_defined */
 #ifndef __local___localdep_fgetc32_defined
-#define __local___localdep_fgetc32_defined 1
+#define __local___localdep_fgetc32_defined
 #if defined(__CRT_HAVE_fgetwc) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
 __CREDIRECT(__ATTR_NONNULL((1)),__WINT32_TYPE__,__THROWING,__localdep_fgetc32,(__FILE *__restrict __stream),fgetwc,(__stream))
 #elif defined(__CRT_HAVE_KOS$fgetwc)
@@ -55,7 +55,7 @@ __CREDIRECT_KOS(__ATTR_NONNULL((1)),__WINT32_TYPE__,__THROWING,__localdep_fgetc3
 #endif /* !... */
 #endif /* !__local___localdep_fgetc32_defined */
 #ifndef __local___localdep_ungetc32_defined
-#define __local___localdep_ungetc32_defined 1
+#define __local___localdep_ungetc32_defined
 #if defined(__CRT_HAVE_ungetwc_unlocked) && defined(__USE_STDIO_UNLOCKED) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
 __CREDIRECT(__ATTR_NONNULL((2)),__WINT32_TYPE__,__NOTHROW_NCX,__localdep_ungetc32,(__WINT32_TYPE__ __wc, __FILE *__stream),ungetwc_unlocked,(__wc,__stream))
 #elif defined(__CRT_HAVE_KOS$ungetwc_unlocked) && defined(__USE_STDIO_UNLOCKED)
@@ -116,7 +116,7 @@ __LOCAL_LIBC(fgetc32s) __ATTR_WUNUSED __ATTR_NONNULL((1, 3)) __CHAR32_TYPE__ *
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_fgetc32s_defined
-#define __local___localdep_fgetc32s_defined 1
+#define __local___localdep_fgetc32s_defined
 #define __localdep_fgetc32s __LIBC_LOCAL_NAME(fgetc32s)
 #endif /* !__local___localdep_fgetc32s_defined */
 #else /* ((__CRT_HAVE_fgetwc && __SIZEOF_WCHAR_T__ == 4 && __LIBCCALL_IS_LIBKCALL) || __CRT_HAVE_KOS$fgetwc || (__CRT_HAVE_getwc && __SIZEOF_WCHAR_T__ == 4 && __LIBCCALL_IS_LIBKCALL) || __CRT_HAVE_KOS$getwc) && ((__CRT_HAVE_ungetwc && __SIZEOF_WCHAR_T__ == 4 && __LIBCCALL_IS_LIBKCALL) || __CRT_HAVE_KOS$ungetwc || (__CRT_HAVE_ungetwc_unlocked && __SIZEOF_WCHAR_T__ == 4 && __LIBCCALL_IS_LIBKCALL) || __CRT_HAVE_KOS$ungetwc_unlocked) && (__CRT_HAVE_ferror || __CRT_HAVE__IO_ferror || __CRT_HAVE_ferror_unlocked) */

@@ -62,7 +62,7 @@ __DECL_END
 
 __DECL_BEGIN
 #ifndef __task_yield_defined
-#define __task_yield_defined 1
+#define __task_yield_defined
 __PUBDEF void (__KCALL task_yield)(void);
 #endif /* !__task_yield_defined */
 #define __hybrid_yield task_yield
@@ -75,12 +75,12 @@ __DECL_END
 
 __DECL_BEGIN
 #ifndef __errno_t_defined
-#define __errno_t_defined 1
+#define __errno_t_defined
 typedef int errno_t;
 #endif /* !__errno_t_defined */
 
 #ifndef __task_yield_defined
-#define __task_yield_defined 1
+#define __task_yield_defined
 /* Yield the remainder of the caller's quantum to the next
  * scheduled task (no-op if no task to switch to  exists).
  * HINT: All registers but EAX are preserved across a call to this function.

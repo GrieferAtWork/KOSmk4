@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb3f5f7df */
+/* HASH CRC-32:0x774ea4a8 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_inet_makeaddr_defined
-#define __local_inet_makeaddr_defined 1
+#define __local_inet_makeaddr_defined
 #include <__crt.h>
 #include <hybrid/typecore.h>
 #include <netinet/bits/in.h>
@@ -44,7 +44,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(inet_makeaddr))(__UINT32_TYPE__ __net
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_inet_makeaddr_defined
-#define __local___localdep_inet_makeaddr_defined 1
+#define __local___localdep_inet_makeaddr_defined
 #define __localdep_inet_makeaddr __LIBC_LOCAL_NAME(inet_makeaddr)
 #endif /* !__local___localdep_inet_makeaddr_defined */
 #endif /* !__local_inet_makeaddr_defined */

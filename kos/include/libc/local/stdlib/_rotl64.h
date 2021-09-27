@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x96e530a7 */
+/* HASH CRC-32:0xd341a0d9 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local__rotl64_defined
-#define __local__rotl64_defined 1
+#define __local__rotl64_defined
 #include <__crt.h>
 #include <hybrid/__rotate.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -29,7 +29,7 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(_rotl64))(__UINT64_TYPE__ __val, int __sh
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep__rotl64_defined
-#define __local___localdep__rotl64_defined 1
+#define __local___localdep__rotl64_defined
 #define __localdep__rotl64 __LIBC_LOCAL_NAME(_rotl64)
 #endif /* !__local___localdep__rotl64_defined */
 #endif /* !__local__rotl64_defined */

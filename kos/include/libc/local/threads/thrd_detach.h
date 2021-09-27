@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb7375a29 */
+/* HASH CRC-32:0x3608c3ec */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,13 +19,13 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_thrd_detach_defined
-#define __local_thrd_detach_defined 1
+#define __local_thrd_detach_defined
 #include <__crt.h>
 #ifdef __CRT_HAVE_pthread_detach
 #include <bits/crt/threads.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_pthread_detach_defined
-#define __local___localdep_pthread_detach_defined 1
+#define __local___localdep_pthread_detach_defined
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 #include <bits/crt/pthreadtypes.h>
@@ -45,7 +45,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(thrd_detach))(__thrd_t __thr) {
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_thrd_detach_defined
-#define __local___localdep_thrd_detach_defined 1
+#define __local___localdep_thrd_detach_defined
 #define __localdep_thrd_detach __LIBC_LOCAL_NAME(thrd_detach)
 #endif /* !__local___localdep_thrd_detach_defined */
 #else /* __CRT_HAVE_pthread_detach */

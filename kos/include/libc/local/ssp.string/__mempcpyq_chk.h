@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc323c0c7 */
+/* HASH CRC-32:0x68238976 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,12 +19,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local___mempcpyq_chk_defined
-#define __local___mempcpyq_chk_defined 1
+#define __local___mempcpyq_chk_defined
 #include <__crt.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_mempcpyq_defined
-#define __local___localdep_mempcpyq_defined 1
+#define __local___localdep_mempcpyq_defined
 #ifdef __CRT_HAVE_mempcpyq
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT64_TYPE__ *,__NOTHROW_NCX,__localdep_mempcpyq,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_qwords),mempcpyq,(__dst,__src,__n_qwords))
 #else /* __CRT_HAVE_mempcpyq */
@@ -44,7 +44,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(__mempcpyq_chk))(void *__restrict __d
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep___mempcpyq_chk_defined
-#define __local___localdep___mempcpyq_chk_defined 1
+#define __local___localdep___mempcpyq_chk_defined
 #define __localdep___mempcpyq_chk __LIBC_LOCAL_NAME(__mempcpyq_chk)
 #endif /* !__local___localdep___mempcpyq_chk_defined */
 #endif /* !__local___mempcpyq_chk_defined */

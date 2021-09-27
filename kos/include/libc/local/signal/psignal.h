@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd0fe7783 */
+/* HASH CRC-32:0x2e145be0 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,14 +19,14 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_psignal_defined
-#define __local_psignal_defined 1
+#define __local_psignal_defined
 #include <__crt.h>
 #include <features.h>
 #if !defined(__NO_STDSTREAMS) && (defined(__CRT_HAVE_fprintf) || defined(__CRT_HAVE__IO_fprintf) || defined(__CRT_HAVE_fprintf_s) || defined(__CRT_HAVE_fprintf_unlocked) || defined(__CRT_HAVE_vfprintf) || defined(__CRT_HAVE_vfprintf_s) || defined(__CRT_HAVE__IO_vfprintf) || defined(__CRT_HAVE_vfprintf_unlocked) || defined(__CRT_HAVE_file_printer) || defined(__CRT_HAVE_file_printer_unlocked) || defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE_putc) || defined(__CRT_HAVE__IO_putc) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE_putc_unlocked) || (defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE__IO_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock))
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_fprintf_defined
-#define __local___localdep_fprintf_defined 1
+#define __local___localdep_fprintf_defined
 #if __has_builtin(__builtin_fprintf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_fprintf) && __has_builtin(__builtin_va_arg_pack)
 __NAMESPACE_LOCAL_END
 #include <kos/anno.h>
@@ -67,7 +67,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_fprintf_defined */
 #ifndef __local___localdep_sigabbrev_np_defined
-#define __local___localdep_sigabbrev_np_defined 1
+#define __local___localdep_sigabbrev_np_defined
 #ifdef __CRT_HAVE_sigabbrev_np
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,char const *,__NOTHROW,__localdep_sigabbrev_np,(__signo_t __signum),sigabbrev_np,(__signum))
 #elif defined(__CRT_HAVE_signalname)
@@ -92,7 +92,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(psignal))(__signo_t __signo, char con
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_psignal_defined
-#define __local___localdep_psignal_defined 1
+#define __local___localdep_psignal_defined
 #define __localdep_psignal __LIBC_LOCAL_NAME(psignal)
 #endif /* !__local___localdep_psignal_defined */
 #else /* !__NO_STDSTREAMS && (__CRT_HAVE_fprintf || __CRT_HAVE__IO_fprintf || __CRT_HAVE_fprintf_s || __CRT_HAVE_fprintf_unlocked || __CRT_HAVE_vfprintf || __CRT_HAVE_vfprintf_s || __CRT_HAVE__IO_vfprintf || __CRT_HAVE_vfprintf_unlocked || __CRT_HAVE_file_printer || __CRT_HAVE_file_printer_unlocked || __CRT_HAVE_fputc || __CRT_HAVE_putc || __CRT_HAVE__IO_putc || __CRT_HAVE_fputc_unlocked || __CRT_HAVE_putc_unlocked || (__CRT_DOS && __CRT_HAVE__flsbuf) || __CRT_HAVE_fwrite || __CRT_HAVE__IO_fwrite || __CRT_HAVE_fwrite_s || __CRT_HAVE_fwrite_unlocked || __CRT_HAVE__fwrite_nolock) */

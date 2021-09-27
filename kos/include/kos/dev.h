@@ -43,7 +43,7 @@
 __DECL_BEGIN
 
 #ifndef __dev_t_defined
-#define __dev_t_defined 1
+#define __dev_t_defined
 typedef __dev_t dev_t;
 #endif /* !__dev_t_defined */
 

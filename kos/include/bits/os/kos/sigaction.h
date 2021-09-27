@@ -46,7 +46,7 @@
 __DECL_BEGIN
 
 #ifndef ____sighandler_t_defined
-#define ____sighandler_t_defined 1
+#define ____sighandler_t_defined
 typedef void (__LIBKCALL *__sighandler_t)(int __signo);
 #endif /* !____sighandler_t_defined */
 

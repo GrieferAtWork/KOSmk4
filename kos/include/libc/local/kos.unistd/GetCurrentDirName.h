@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8f8ccf39 */
+/* HASH CRC-32:0x538c6100 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,14 +19,14 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_GetCurrentDirName_defined
-#define __local_GetCurrentDirName_defined 1
+#define __local_GetCurrentDirName_defined
 #include <__crt.h>
 #ifdef __CRT_HAVE_GetCwd
 #include <kos/anno.h>
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_GetCwd_defined
-#define __local___localdep_GetCwd_defined 1
+#define __local___localdep_GetCwd_defined
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -38,7 +38,7 @@ __LOCAL_LIBC(GetCurrentDirName) __ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_GetCurrentDirName_defined
-#define __local___localdep_GetCurrentDirName_defined 1
+#define __local___localdep_GetCurrentDirName_defined
 #define __localdep_GetCurrentDirName __LIBC_LOCAL_NAME(GetCurrentDirName)
 #endif /* !__local___localdep_GetCurrentDirName_defined */
 #else /* __CRT_HAVE_GetCwd */

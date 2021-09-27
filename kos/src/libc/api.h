@@ -205,8 +205,8 @@
 #define __libc_geterrno         libc_geterrno
 #define __libc_geterrno_or(alt) libc_geterrno()
 #define __libc_seterrno         libc_seterrno
-#define ____errno_location_defined 1
-#define __errno_location()         libc_errno_p()
+#define ____errno_location_defined
+#define __errno_location()            libc_errno_p()
 #define libc_seterrno_syserr(e)       (likely(!E_ISERR(e)) ? (e) : libc_seterrno_neg((errno_t)(syscall_slong_t)(syscall_ulong_t)(e)))
 #define libc_seterrno_syserr2(e, ERR) (likely(!E_ISERR(e)) ? (e) : (libc_seterrno_neg((errno_t)(syscall_slong_t)(syscall_ulong_t)(e)), (ERR)))
 #endif /* !__KERNEL__ */
@@ -216,12 +216,12 @@
 DECL_BEGIN
 
 #ifndef __locale_t_defined
-#define __locale_t_defined 1
+#define __locale_t_defined
 typedef __locale_t locale_t;
 #endif /* !__locale_t_defined */
 
 #ifndef __errno_t_defined
-#define __errno_t_defined 1
+#define __errno_t_defined
 typedef __errno_t errno_t;
 #endif /* !errno_t_defined */
 

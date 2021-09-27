@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x379a93cf */
+/* HASH CRC-32:0x18deb93b */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -35,7 +35,7 @@
 __SYSDECL_BEGIN
 
 #ifndef __strtoi_defined
-#define __strtoi_defined 1
+#define __strtoi_defined
 #ifdef __CRT_HAVE_strtoi
 /* >> strtoi(3), strtou(3), strtoi_l(3), strtou_l(3)
  * Safely convert `nptr'  to an integer  which is then  returned.
@@ -66,7 +66,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(strtoi, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LE
 #endif /* !__CRT_HAVE_strtoi */
 #endif /* !__strtoi_defined */
 #ifndef __strtou_defined
-#define __strtou_defined 1
+#define __strtou_defined
 #ifdef __CRT_HAVE_strtou
 /* >> strtoi(3), strtou(3), strtoi_l(3), strtou_l(3)
  * Safely convert `nptr'  to an integer  which is then  returned.

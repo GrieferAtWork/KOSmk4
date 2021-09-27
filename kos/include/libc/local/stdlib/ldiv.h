@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa3352444 */
+/* HASH CRC-32:0x7f320cee */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_ldiv_defined
-#define __local_ldiv_defined 1
+#define __local_ldiv_defined
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(ldiv) __ATTR_CONST __ATTR_WUNUSED struct __ldiv_struct
@@ -31,7 +31,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(ldiv))(long __numer, long __denom) {
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_ldiv_defined
-#define __local___localdep_ldiv_defined 1
+#define __local___localdep_ldiv_defined
 #define __localdep_ldiv __LIBC_LOCAL_NAME(ldiv)
 #endif /* !__local___localdep_ldiv_defined */
 #endif /* !__local_ldiv_defined */

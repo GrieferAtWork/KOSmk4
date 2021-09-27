@@ -25,23 +25,23 @@
 
 #if defined(__i386__) && !defined(__x86_64__)
 #define LIBCMDLINE_CC __ATTR_FASTCALL
-#else
+#else /* ... */
 #define LIBCMDLINE_CC /* nothing */
-#endif
+#endif /* !... */
 
-#if !defined(LIBCMDLINE_WANT_PROTOTYPES) && \
-     defined(__KOS__) && defined(__KERNEL__)
-#define LIBCMDLINE_WANT_PROTOTYPES 1
-#endif
+#if (!defined(LIBCMDLINE_WANT_PROTOTYPES) && \
+     defined(__KOS__) && defined(__KERNEL__))
+#define LIBCMDLINE_WANT_PROTOTYPES
+#endif /* ... */
 
-#if defined(__KOS__) && defined(__KERNEL__) && \
-    defined(CONFIG_BUILDING_KERNEL_CORE)
+#if (defined(__KOS__) && defined(__KERNEL__) && \
+     defined(CONFIG_BUILDING_KERNEL_CORE))
 #define LIBCMDLINE_DECL __PUBDEF
 #elif defined(__LIBCMDLINE_STATIC)
 #define LIBCMDLINE_DECL __INTDEF
-#else
+#else /* ... */
 #define LIBCMDLINE_DECL __IMPDEF
-#endif
+#endif /* !... */
 
 /* Library name for use with `dlopen()' */
 #define LIBCMDLINE_LIBRARY_NAME "libcmdline.so"

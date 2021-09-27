@@ -19,7 +19,7 @@
  */
 #ifndef GUARD_APPS_KEYMAP_MAIN_C
 #define GUARD_APPS_KEYMAP_MAIN_C 1
-#define LIBKEYMAP_WANT_PROTOTYPES 1
+#define LIBKEYMAP_WANT_PROTOTYPES
 
 #include <hybrid/compiler.h>
 

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa272694d */
+/* HASH CRC-32:0x623cdd18 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_fedisableexcept_defined
-#define __local_fedisableexcept_defined 1
+#define __local_fedisableexcept_defined
 #include <__crt.h>
 #include <bits/crt/fenv-inline.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -29,7 +29,7 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(fedisableexcept))(int __excepts) {
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_fedisableexcept_defined
-#define __local___localdep_fedisableexcept_defined 1
+#define __local___localdep_fedisableexcept_defined
 #define __localdep_fedisableexcept __LIBC_LOCAL_NAME(fedisableexcept)
 #endif /* !__local___localdep_fedisableexcept_defined */
 #endif /* !__local_fedisableexcept_defined */

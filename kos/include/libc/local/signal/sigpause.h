@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc130027f */
+/* HASH CRC-32:0xfff71689 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,13 +19,13 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_sigpause_defined
-#define __local_sigpause_defined 1
+#define __local_sigpause_defined
 #include <__crt.h>
 #if defined(__CRT_HAVE_sigsuspend) || defined(__CRT_HAVE___sigsuspend)
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_sigaddset_defined
-#define __local___localdep_sigaddset_defined 1
+#define __local___localdep_sigaddset_defined
 #ifdef __CRT_HAVE_sigaddset
 __NAMESPACE_LOCAL_END
 #include <bits/os/sigset.h>
@@ -140,7 +140,7 @@ __LOCAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL __localdep_sigaddset)(s
 #endif /* !... */
 #endif /* !__local___localdep_sigaddset_defined */
 #ifndef __local___localdep_sigemptyset_defined
-#define __local___localdep_sigemptyset_defined 1
+#define __local___localdep_sigemptyset_defined
 #ifdef __CRT_HAVE_sigemptyset
 __NAMESPACE_LOCAL_END
 #include <bits/os/sigset.h>
@@ -154,7 +154,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__CRT_HAVE_sigemptyset */
 #endif /* !__local___localdep_sigemptyset_defined */
 #ifndef __local___localdep_sigsuspend_defined
-#define __local___localdep_sigsuspend_defined 1
+#define __local___localdep_sigsuspend_defined
 #ifdef __CRT_HAVE_sigsuspend
 __NAMESPACE_LOCAL_END
 #include <bits/os/sigset.h>
@@ -178,7 +178,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(sigpause))(__signo_t __signo) {
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_sigpause_defined
-#define __local___localdep_sigpause_defined 1
+#define __local___localdep_sigpause_defined
 #define __localdep_sigpause __LIBC_LOCAL_NAME(sigpause)
 #endif /* !__local___localdep_sigpause_defined */
 #else /* __CRT_HAVE_sigsuspend || __CRT_HAVE___sigsuspend */

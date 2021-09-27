@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd11750ec */
+/* HASH CRC-32:0xf98d51c1 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -38,7 +38,7 @@
 __SYSDECL_BEGIN
 
 #ifndef __warnc_defined
-#define __warnc_defined 1
+#define __warnc_defined
 #ifdef __CRT_HAVE_warnc
 /* >> warnc(3), vwarnc(3)
  * Print to stderr: `<program_invocation_short_name>: <format...>: strerror(used_errno)\n' */
@@ -62,7 +62,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(warnc, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LIB
 #endif /* !__CRT_HAVE_warnc */
 #endif /* !__warnc_defined */
 #ifndef __vwarnc_defined
-#define __vwarnc_defined 1
+#define __vwarnc_defined
 #ifdef __CRT_HAVE_vwarnc
 /* >> warnc(3), vwarnc(3)
  * Print to stderr: `<program_invocation_short_name>: <format...>: strerror(used_errno)\n' */
@@ -82,7 +82,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(vwarnc, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LI
 #endif /* !__CRT_HAVE_vwarnc */
 #endif /* !__vwarnc_defined */
 #ifndef __errc_defined
-#define __errc_defined 1
+#define __errc_defined
 #ifdef __CRT_HAVE_errc
 /* >> errc(3), verrc(3)
  * Same as `warnc()', but follow up by calling `exit(status)' */
@@ -106,7 +106,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(errc, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NORE
 #endif /* !__CRT_HAVE_errc */
 #endif /* !__errc_defined */
 #ifndef __verrc_defined
-#define __verrc_defined 1
+#define __verrc_defined
 #ifdef __CRT_HAVE_verrc
 /* >> errc(3), verrc(3)
  * Same as `warnc()', but follow up by calling `exit(status)' */

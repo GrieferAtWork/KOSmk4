@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd3ffc31e */
+/* HASH CRC-32:0xb75e39df */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_fgetpwnam_r_defined
-#define __local_fgetpwnam_r_defined 1
+#define __local_fgetpwnam_r_defined
 #include <__crt.h>
 #include <features.h>
 #include <bits/crt/stdio.h>
@@ -28,7 +28,7 @@
 #include <bits/crt/db/passwd.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_fgetpwfiltered_r_defined
-#define __local___localdep_fgetpwfiltered_r_defined 1
+#define __local___localdep_fgetpwfiltered_r_defined
 __NAMESPACE_LOCAL_END
 #include <libc/local/pwd/fgetpwfiltered_r.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -50,7 +50,7 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(fgetpwnam_r))(__FILE *__restrict __st
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_fgetpwnam_r_defined
-#define __local___localdep_fgetpwnam_r_defined 1
+#define __local___localdep_fgetpwnam_r_defined
 #define __localdep_fgetpwnam_r __LIBC_LOCAL_NAME(fgetpwnam_r)
 #endif /* !__local___localdep_fgetpwnam_r_defined */
 #else /* (__CRT_HAVE_fgetpos64 || __CRT_HAVE__IO_fgetpos64 || __CRT_HAVE_fgetpos64_unlocked || __CRT_HAVE_ftello64 || __CRT_HAVE_ftell64 || __CRT_HAVE__ftelli64 || __CRT_HAVE_ftello64_unlocked || __CRT_HAVE_ftell64_unlocked || __CRT_HAVE__ftelli64_nolock || __CRT_HAVE_fgetpos || __CRT_HAVE__IO_fgetpos || __CRT_HAVE_fgetpos_unlocked || __CRT_HAVE_ftello || __CRT_HAVE_ftello_unlocked || __CRT_HAVE_ftell || __CRT_HAVE__IO_ftell || __CRT_HAVE_ftell_unlocked || __CRT_HAVE__ftell_nolock) && (__CRT_HAVE_fsetpos64 || __CRT_HAVE__IO_fsetpos64 || __CRT_HAVE_fsetpos64_unlocked || __CRT_HAVE_fsetpos || __CRT_HAVE__IO_fsetpos || __CRT_HAVE_fsetpos_unlocked || (__SEEK_SET && (__CRT_HAVE_fseeko64 || __CRT_HAVE_fseek64 || __CRT_HAVE__fseeki64 || __CRT_HAVE_fseeko64_unlocked || __CRT_HAVE_fseek64_unlocked || __CRT_HAVE__fseeki64_nolock || __CRT_HAVE_fseeko || __CRT_HAVE_fseeko_unlocked || __CRT_HAVE_fseek || __CRT_HAVE_fseek_unlocked || __CRT_HAVE__fseek_nolock))) && (__CRT_HAVE_fparseln || ((__CRT_HAVE_fgetc || __CRT_HAVE_getc || __CRT_HAVE__IO_getc || __CRT_HAVE_fgetc_unlocked || __CRT_HAVE_getc_unlocked || (__CRT_DOS && __CRT_HAVE__filbuf) || __CRT_HAVE_fread || __CRT_HAVE__IO_fread || __CRT_HAVE_fread_unlocked || __CRT_HAVE__fread_nolock) && (__CRT_HAVE_ungetc || __CRT_HAVE__IO_ungetc || __CRT_HAVE_ungetc_unlocked || __CRT_HAVE__ungetc_nolock) && __CRT_HAVE_realloc)) */

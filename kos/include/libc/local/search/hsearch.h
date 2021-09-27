@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa05d9c5f */
+/* HASH CRC-32:0xe42ec178 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_hsearch_defined
-#define __local_hsearch_defined 1
+#define __local_hsearch_defined
 #include <__crt.h>
 struct entry;
 #ifndef __ACTION_defined
@@ -31,7 +31,7 @@ typedef enum {
 #endif /* !__ACTION_defined */
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_hsearch_r_defined
-#define __local___localdep_hsearch_r_defined 1
+#define __local___localdep_hsearch_r_defined
 #ifdef __CRT_HAVE_hsearch_r
 __NAMESPACE_LOCAL_END
 struct hsearch_data;
@@ -46,7 +46,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__local___localdep_hsearch_r_defined */
 __NAMESPACE_LOCAL_END
 #ifndef __hsearch_data_defined
-#define __hsearch_data_defined 1
+#define __hsearch_data_defined
 struct _ENTRY;
 struct hsearch_data {
 	struct _ENTRY  *table;
@@ -55,7 +55,7 @@ struct hsearch_data {
 };
 #endif /* !__hsearch_data_defined */
 #ifndef __local_htab_defined
-#define __local_htab_defined 1
+#define __local_htab_defined
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC_DATA(__htab) struct hsearch_data __htab = { __NULLPTR, 0, 0 };
 __NAMESPACE_LOCAL_END
@@ -69,7 +69,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(hsearch))(struct entry __item, ACTION
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_hsearch_defined
-#define __local___localdep_hsearch_defined 1
+#define __local___localdep_hsearch_defined
 #define __localdep_hsearch __LIBC_LOCAL_NAME(hsearch)
 #endif /* !__local___localdep_hsearch_defined */
 #endif /* !__local_hsearch_defined */

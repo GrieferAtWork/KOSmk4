@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x97a1c61e */
+/* HASH CRC-32:0xa88fe9f4 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,12 +19,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_y1l_defined
-#define __local_y1l_defined 1
+#define __local_y1l_defined
 #include <__crt.h>
 #if defined(__CRT_HAVE_y1) || defined(__CRT_HAVE___y1)
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_y1_defined
-#define __local___localdep_y1_defined 1
+#define __local___localdep_y1_defined
 #if __has_builtin(__builtin_y1) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_y1)
 __CEIREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_y1,(double __x),y1,{ return __builtin_y1(__x); })
 #elif defined(__CRT_HAVE_y1)
@@ -41,7 +41,7 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(y1l))(__LONGDOUBLE __x) {
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_y1l_defined
-#define __local___localdep_y1l_defined 1
+#define __local___localdep_y1l_defined
 #define __localdep_y1l __LIBC_LOCAL_NAME(y1l)
 #endif /* !__local___localdep_y1l_defined */
 #else /* __CRT_HAVE_y1 || __CRT_HAVE___y1 */

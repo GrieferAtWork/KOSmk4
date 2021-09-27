@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x878c3d42 */
+/* HASH CRC-32:0x9c79051c */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local__unloaddll_defined
-#define __local__unloaddll_defined 1
+#define __local__unloaddll_defined
 #include <__crt.h>
 #include <kos/anno.h>
 #include <bits/types.h>
@@ -36,7 +36,7 @@ __LOCAL_LIBC(_unloaddll) int
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep__unloaddll_defined
-#define __local___localdep__unloaddll_defined 1
+#define __local___localdep__unloaddll_defined
 #define __localdep__unloaddll __LIBC_LOCAL_NAME(_unloaddll)
 #endif /* !__local___localdep__unloaddll_defined */
 #endif /* !__local__unloaddll_defined */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x95bd1752 */
+/* HASH CRC-32:0xb3f8645d */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,22 +19,22 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_pthread_attr_setstacksize_defined
-#define __local_pthread_attr_setstacksize_defined 1
+#define __local_pthread_attr_setstacksize_defined
 #include <__crt.h>
 #if (defined(__CRT_HAVE_pthread_attr_getstack) || (defined(__CRT_HAVE_pthread_attr_getstackaddr) && defined(__CRT_HAVE_pthread_attr_getstacksize))) && defined(__CRT_HAVE_pthread_attr_setstack)
 #include <bits/types.h>
 #include <bits/crt/pthreadtypes.h>
 __NAMESPACE_LOCAL_BEGIN
 #if !defined(__local___localdep_crt_pthread_attr_getstackaddr_defined) && defined(__CRT_HAVE_pthread_attr_getstackaddr)
-#define __local___localdep_crt_pthread_attr_getstackaddr_defined 1
+#define __local___localdep_crt_pthread_attr_getstackaddr_defined
 __CREDIRECT(__ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_NCX,__localdep_crt_pthread_attr_getstackaddr,(__pthread_attr_t const *__restrict __attr, void **__restrict __stackaddr),pthread_attr_getstackaddr,(__attr,__stackaddr))
 #endif /* !__local___localdep_crt_pthread_attr_getstackaddr_defined && __CRT_HAVE_pthread_attr_getstackaddr */
 #ifndef __local___localdep_crt_pthread_attr_setstack_defined
-#define __local___localdep_crt_pthread_attr_setstack_defined 1
+#define __local___localdep_crt_pthread_attr_setstack_defined
 __CREDIRECT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,__localdep_crt_pthread_attr_setstack,(__pthread_attr_t *__attr, void *__stackaddr, __SIZE_TYPE__ __stacksize),pthread_attr_setstack,(__attr,__stackaddr,__stacksize))
 #endif /* !__local___localdep_crt_pthread_attr_setstack_defined */
 #ifndef __local___localdep_pthread_attr_getstack_defined
-#define __local___localdep_pthread_attr_getstack_defined 1
+#define __local___localdep_pthread_attr_getstack_defined
 #ifdef __CRT_HAVE_pthread_attr_getstack
 __CREDIRECT(__ATTR_NONNULL((1, 2, 3)),__errno_t,__NOTHROW_NCX,__localdep_pthread_attr_getstack,(__pthread_attr_t const *__restrict __attr, void **__restrict __stackaddr, __SIZE_TYPE__ *__restrict __stacksize),pthread_attr_getstack,(__attr,__stackaddr,__stacksize))
 #elif defined(__CRT_HAVE_pthread_attr_getstackaddr) && defined(__CRT_HAVE_pthread_attr_getstacksize)
@@ -62,7 +62,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(pthread_attr_setstacksize))(__pthread
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_pthread_attr_setstacksize_defined
-#define __local___localdep_pthread_attr_setstacksize_defined 1
+#define __local___localdep_pthread_attr_setstacksize_defined
 #define __localdep_pthread_attr_setstacksize __LIBC_LOCAL_NAME(pthread_attr_setstacksize)
 #endif /* !__local___localdep_pthread_attr_setstacksize_defined */
 #else /* (__CRT_HAVE_pthread_attr_getstack || (__CRT_HAVE_pthread_attr_getstackaddr && __CRT_HAVE_pthread_attr_getstacksize)) && __CRT_HAVE_pthread_attr_setstack */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9e23e333 */
+/* HASH CRC-32:0x3780fbfd */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,11 +19,11 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local__isctype_l_defined
-#define __local__isctype_l_defined 1
+#define __local__isctype_l_defined
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep__isctype_defined
-#define __local___localdep__isctype_defined 1
+#define __local___localdep__isctype_defined
 #ifdef __CRT_HAVE__isctype
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep__isctype,(int __ch, int __mask),_isctype,(__ch,__mask))
 #else /* __CRT_HAVE__isctype */
@@ -41,7 +41,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_isctype_l))(int __ch, int __mask, __
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep__isctype_l_defined
-#define __local___localdep__isctype_l_defined 1
+#define __local___localdep__isctype_l_defined
 #define __localdep__isctype_l __LIBC_LOCAL_NAME(_isctype_l)
 #endif /* !__local___localdep__isctype_l_defined */
 #endif /* !__local__isctype_l_defined */

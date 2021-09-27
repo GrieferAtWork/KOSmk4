@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x70f79ed8 */
+/* HASH CRC-32:0x7552fe94 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,12 +19,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_c16utime_defined
-#define __local_c16utime_defined 1
+#define __local_c16utime_defined
 #include <__crt.h>
 #if (defined(__CRT_HAVE_wutime) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)) || defined(__CRT_HAVE_DOS$wutime) || (defined(__CRT_HAVE__wutime32) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)) || defined(__CRT_HAVE_DOS$_wutime32) || (defined(__CRT_HAVE_wutime64) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)) || defined(__CRT_HAVE_DOS$wutime64) || (defined(__CRT_HAVE__wutime64) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)) || defined(__CRT_HAVE_DOS$_wutime64)
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_c16utime64_defined
-#define __local___localdep_c16utime64_defined 1
+#define __local___localdep_c16utime64_defined
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -55,7 +55,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_c16utime64_defined */
 #ifndef __local___localdep_crt_c16utime32_defined
-#define __local___localdep_crt_c16utime32_defined 1
+#define __local___localdep_crt_c16utime32_defined
 #if defined(__CRT_HAVE_wutime) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_crt_c16utime32,(__CHAR16_TYPE__ const *__filename, struct __utimbuf32 const *__file_times),wutime,(__filename,__file_times))
 #elif defined(__CRT_HAVE_DOS$wutime)
@@ -98,7 +98,7 @@ __NOTHROW_RPC(__LIBDCALL __LIBC_LOCAL_NAME(c16utime))(__CHAR16_TYPE__ const *__f
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_c16utime_defined
-#define __local___localdep_c16utime_defined 1
+#define __local___localdep_c16utime_defined
 #define __localdep_c16utime __LIBC_LOCAL_NAME(c16utime)
 #endif /* !__local___localdep_c16utime_defined */
 #else /* (__CRT_HAVE_wutime && __SIZEOF_WCHAR_T__ == 2 && __LIBCCALL_IS_LIBDCALL) || __CRT_HAVE_DOS$wutime || (__CRT_HAVE__wutime32 && __SIZEOF_WCHAR_T__ == 2 && __LIBCCALL_IS_LIBDCALL) || __CRT_HAVE_DOS$_wutime32 || (__CRT_HAVE_wutime64 && __SIZEOF_WCHAR_T__ == 2 && __LIBCCALL_IS_LIBDCALL) || __CRT_HAVE_DOS$wutime64 || (__CRT_HAVE__wutime64 && __SIZEOF_WCHAR_T__ == 2 && __LIBCCALL_IS_LIBDCALL) || __CRT_HAVE_DOS$_wutime64 */

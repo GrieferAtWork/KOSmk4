@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3b4b045f */
+/* HASH CRC-32:0x1b39e526 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,11 +19,11 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_strcat_defined
-#define __local_strcat_defined 1
+#define __local_strcat_defined
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_memcpy_defined
-#define __local___localdep_memcpy_defined 1
+#define __local___localdep_memcpy_defined
 #ifdef __CRT_HAVE_memcpy
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
@@ -37,7 +37,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__CRT_HAVE_memcpy */
 #endif /* !__local___localdep_memcpy_defined */
 #ifndef __local___localdep_strend_defined
-#define __local___localdep_strend_defined 1
+#define __local___localdep_strend_defined
 #ifdef __CRT_HAVE_strend
 __CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_strend,(char const *__restrict __str),strend,(__str))
 #else /* __CRT_HAVE_strend */
@@ -48,7 +48,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__CRT_HAVE_strend */
 #endif /* !__local___localdep_strend_defined */
 #ifndef __local___localdep_strlen_defined
-#define __local___localdep_strlen_defined 1
+#define __local___localdep_strlen_defined
 #ifdef __CRT_HAVE_strlen
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
@@ -68,7 +68,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strcat))(char *__restrict __dst, char
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_strcat_defined
-#define __local___localdep_strcat_defined 1
+#define __local___localdep_strcat_defined
 #define __localdep_strcat __LIBC_LOCAL_NAME(strcat)
 #endif /* !__local___localdep_strcat_defined */
 #endif /* !__local_strcat_defined */

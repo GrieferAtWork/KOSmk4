@@ -35,9 +35,7 @@
 #endif /* !__WANT_FULL_STRUCT_STAT */
 
 #ifdef __KOS__
-#ifndef __stat_defined
-#define __stat_defined 1
-#define __kos_stat stat
+#define __kos_stat                  stat
 #define __OFFSET_STAT_DEV           __OFFSET_KOS_STAT_DEV
 #define __OFFSET_STAT_INO           __OFFSET_KOS_STAT_INO
 #define __OFFSET_STAT_MODE          __OFFSET_KOS_STAT_MODE
@@ -76,14 +74,11 @@
 #define __OFFSET_STAT_CTIME         __OFFSET_KOS_STAT_CTIME
 #define __OFFSET_STAT_CTIMENSEC     __OFFSET_KOS_STAT_CTIMENSEC
 #define __SIZEOF_STAT               __SIZEOF_KOS_STAT
-#endif /* !__stat_defined */
 
 /* Even though `struct stat64'  is the same  as `struct stat', we  can't
  * simply `#define stat64 stat' because there function definitions using
  * the same name in <sys/stat.h>... */
 #ifdef __USE_LARGEFILE64
-#ifndef __stat64_defined
-#define __stat64_defined 1
 #undef __kos_stat_alias64
 #define __kos_stat_alias64 stat64
 #define __OFFSET_STAT64_DEV         __OFFSET_KOS_STAT_DEV
@@ -124,7 +119,6 @@
 #define __OFFSET_STAT64_CTIME       __OFFSET_KOS_STAT_CTIME
 #define __OFFSET_STAT64_CTIMENSEC   __OFFSET_KOS_STAT_CTIMENSEC
 #define __SIZEOF_STAT64             __SIZEOF_KOS_STAT
-#endif /* !__stat64_defined */
 #endif /* __USE_LARGEFILE64 */
 
 /* Define macros for available stat features. */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x69629d3d */
+/* HASH CRC-32:0xeb1bfc09 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -89,11 +89,11 @@
 __SYSDECL_BEGIN
 
 #ifndef __fsblkcnt_t_defined
-#define __fsblkcnt_t_defined 1
+#define __fsblkcnt_t_defined
 typedef __FS_TYPE(fsblkcnt) fsblkcnt_t; /* Type to count file system blocks.  */
 #endif /* !__fsblkcnt_t_defined */
 #ifndef __fsfilcnt_t_defined
-#define __fsfilcnt_t_defined 1
+#define __fsfilcnt_t_defined
 typedef __FS_TYPE(fsfilcnt) fsfilcnt_t; /* Type to count file system inodes.  */
 #endif /* !__fsfilcnt_t_defined */
 

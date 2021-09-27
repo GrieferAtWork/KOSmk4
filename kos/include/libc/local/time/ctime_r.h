@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xaf86f2d4 */
+/* HASH CRC-32:0xccb9987 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,13 +19,13 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_ctime_r_defined
-#define __local_ctime_r_defined 1
+#define __local_ctime_r_defined
 #include <__crt.h>
 #include <bits/types.h>
 #include <bits/crt/tm.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_asctime_r_defined
-#define __local___localdep_asctime_r_defined 1
+#define __local___localdep_asctime_r_defined
 #ifdef __CRT_HAVE_asctime_r
 __CREDIRECT(__ATTR_NONNULL((1, 2)),char *,__NOTHROW_NCX,__localdep_asctime_r,(struct __NAMESPACE_STD_SYM tm const *__restrict __tp, char __buf[26]),asctime_r,(__tp,__buf))
 #else /* __CRT_HAVE_asctime_r */
@@ -36,7 +36,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__CRT_HAVE_asctime_r */
 #endif /* !__local___localdep_asctime_r_defined */
 #ifndef __local___localdep_dos_ctime_s_defined
-#define __local___localdep_dos_ctime_s_defined 1
+#define __local___localdep_dos_ctime_s_defined
 __NAMESPACE_LOCAL_END
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -54,7 +54,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_dos_ctime_s_defined */
 #ifndef __local___localdep_localtime_r_defined
-#define __local___localdep_localtime_r_defined 1
+#define __local___localdep_localtime_r_defined
 #ifdef __CRT_HAVE_localtime_r
 __CREDIRECT(__ATTR_NONNULL((1, 2)),struct __NAMESPACE_STD_SYM tm *,__NOTHROW_NCX,__localdep_localtime_r,(__TM_TYPE(time) const *__restrict __timer, struct __NAMESPACE_STD_SYM tm *__restrict __tp),localtime_r,(__timer,__tp))
 #else /* __CRT_HAVE_localtime_r */
@@ -75,7 +75,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(ctime_r))(__TM_TYPE(time) const *__re
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_ctime_r_defined
-#define __local___localdep_ctime_r_defined 1
+#define __local___localdep_ctime_r_defined
 #define __localdep_ctime_r __LIBC_LOCAL_NAME(ctime_r)
 #endif /* !__local___localdep_ctime_r_defined */
 #endif /* !__local_ctime_r_defined */

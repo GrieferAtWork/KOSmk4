@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdac6c01b */
+/* HASH CRC-32:0xe674c752 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,11 +19,11 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_c16sfry_defined
-#define __local_c16sfry_defined 1
+#define __local_c16sfry_defined
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_c16slen_defined
-#define __local___localdep_c16slen_defined 1
+#define __local___localdep_c16slen_defined
 #if defined(__CRT_HAVE_wcslen) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
@@ -47,7 +47,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_c16slen_defined */
 #ifndef __local___localdep_rand_defined
-#define __local___localdep_rand_defined 1
+#define __local___localdep_rand_defined
 #ifdef __CRT_HAVE_rand
 __CREDIRECT(,int,__NOTHROW,__localdep_rand,(void),rand,())
 #else /* __CRT_HAVE_rand */
@@ -83,7 +83,7 @@ __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(c16sfry))(__CHAR16_TYPE__ *__restrict
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_c16sfry_defined
-#define __local___localdep_c16sfry_defined 1
+#define __local___localdep_c16sfry_defined
 #define __localdep_c16sfry __LIBC_LOCAL_NAME(c16sfry)
 #endif /* !__local___localdep_c16sfry_defined */
 #endif /* !__local_c16sfry_defined */

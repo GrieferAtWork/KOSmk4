@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf0979e32 */
+/* HASH CRC-32:0x870d283 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,12 +19,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_inet_addr_defined
-#define __local_inet_addr_defined 1
+#define __local_inet_addr_defined
 #include <__crt.h>
 #include <net/bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_inet_paton_defined
-#define __local___localdep_inet_paton_defined 1
+#define __local___localdep_inet_paton_defined
 #ifdef __CRT_HAVE_inet_paton
 __NAMESPACE_LOCAL_END
 #include <netinet/bits/in.h>
@@ -49,7 +49,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(inet_addr))(char const *__restrict __
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_inet_addr_defined
-#define __local___localdep_inet_addr_defined 1
+#define __local___localdep_inet_addr_defined
 #define __localdep_inet_addr __LIBC_LOCAL_NAME(inet_addr)
 #endif /* !__local___localdep_inet_addr_defined */
 #endif /* !__local_inet_addr_defined */

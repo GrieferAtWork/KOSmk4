@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb89922bb */
+/* HASH CRC-32:0x9b5399bc */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_fminl_defined
-#define __local_fminl_defined 1
+#define __local_fminl_defined
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(fminl) __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE
@@ -29,7 +29,7 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(fminl))(__LONGDOUBLE __x, __LONGDOUBLE __
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_fminl_defined
-#define __local___localdep_fminl_defined 1
+#define __local___localdep_fminl_defined
 #define __localdep_fminl __LIBC_LOCAL_NAME(fminl)
 #endif /* !__local___localdep_fminl_defined */
 #endif /* !__local_fminl_defined */

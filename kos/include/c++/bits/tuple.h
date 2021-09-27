@@ -35,7 +35,7 @@ __CXXDECL_BEGIN
 __NAMESPACE_STD_BEGIN
 
 #ifndef __std_tuple_size_fwd_defined
-#define __std_tuple_size_fwd_defined 1
+#define __std_tuple_size_fwd_defined
 template<class __T> struct tuple_size;
 #endif /* !__std_tuple_size_fwd_defined */
 template<class __T> struct tuple_size<__T const>: public integral_constant<__SIZE_TYPE__, tuple_size<__T>::value> {};
@@ -58,7 +58,7 @@ template<__SIZE_TYPE__ __i, class __T> using tuple_element_t = typename tuple_el
 __NAMESPACE_STD_END
 __NAMESPACE_INT_BEGIN
 #ifndef __int___Index_tuple_defined
-#define __int___Index_tuple_defined 1
+#define __int___Index_tuple_defined
 template<__SIZE_TYPE__... __Indexes> struct __Index_tuple {};
 #endif /* !__int___Index_tuple_defined */
 template<class __ITuple1, class __ITuple2> struct __Itup_cat;

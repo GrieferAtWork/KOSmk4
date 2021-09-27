@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9bb2f15f */
+/* HASH CRC-32:0x338fdbcb */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_scalbln_defined
-#define __local_scalbln_defined 1
+#define __local_scalbln_defined
 #include <__crt.h>
 #include <ieee754.h>
 #if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
@@ -37,7 +37,7 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(scalbln))(double __x, long int __n) {
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_scalbln_defined
-#define __local___localdep_scalbln_defined 1
+#define __local___localdep_scalbln_defined
 #define __localdep_scalbln __LIBC_LOCAL_NAME(scalbln)
 #endif /* !__local___localdep_scalbln_defined */
 #else /* __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */

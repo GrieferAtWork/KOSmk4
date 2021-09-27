@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x90a7d967 */
+/* HASH CRC-32:0x3bab98a0 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local__byteswap_ushort_defined
-#define __local__byteswap_ushort_defined 1
+#define __local__byteswap_ushort_defined
 #include <__crt.h>
 #include <hybrid/__byteswap.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -29,7 +29,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_byteswap_ushort))(__UINT16_TYPE__ __
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep__byteswap_ushort_defined
-#define __local___localdep__byteswap_ushort_defined 1
+#define __local___localdep__byteswap_ushort_defined
 #define __localdep__byteswap_ushort __LIBC_LOCAL_NAME(_byteswap_ushort)
 #endif /* !__local___localdep__byteswap_ushort_defined */
 #endif /* !__local__byteswap_ushort_defined */

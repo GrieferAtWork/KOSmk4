@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb429b9fa */
+/* HASH CRC-32:0x29b4741 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,19 +28,19 @@
 #include "core/stdlib.h"
 
 #if !defined(____libc_malloc_defined) && defined(____libc_core_malloc_defined)
-#define ____libc_malloc_defined 1
+#define ____libc_malloc_defined
 #define __libc_malloc __libc_core_malloc
 #endif /* !____libc_malloc_defined && ____libc_core_malloc_defined */
 #if !defined(____libc_calloc_defined) && defined(____libc_core_calloc_defined)
-#define ____libc_calloc_defined 1
+#define ____libc_calloc_defined
 #define __libc_calloc __libc_core_calloc
 #endif /* !____libc_calloc_defined && ____libc_core_calloc_defined */
 #if !defined(____libc_realloc_defined) && defined(____libc_core_realloc_defined)
-#define ____libc_realloc_defined 1
+#define ____libc_realloc_defined
 #define __libc_realloc __libc_core_realloc
 #endif /* !____libc_realloc_defined && ____libc_core_realloc_defined */
 #if !defined(____libc_free_defined) && defined(____libc_core_free_defined)
-#define ____libc_free_defined 1
+#define ____libc_free_defined
 #define __libc_free __libc_core_free
 #endif /* !____libc_free_defined && ____libc_core_free_defined */
 

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x24f68d6b */
+/* HASH CRC-32:0x9bd24187 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,12 +19,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_memcasemem_l_defined
-#define __local_memcasemem_l_defined 1
+#define __local_memcasemem_l_defined
 #include <__crt.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_memcasecmp_l_defined
-#define __local___localdep_memcasecmp_l_defined 1
+#define __local___localdep_memcasecmp_l_defined
 #ifdef __CRT_HAVE_memcasecmp_l
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_memcasecmp_l,(void const *__s1, void const *__s2, __SIZE_TYPE__ __n_bytes, __locale_t __locale),memcasecmp_l,(__s1,__s2,__n_bytes,__locale))
 #elif defined(__CRT_HAVE__memicmp_l)
@@ -37,7 +37,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_memcasecmp_l_defined */
 #ifndef __local___localdep_tolower_l_defined
-#define __local___localdep_tolower_l_defined 1
+#define __local___localdep_tolower_l_defined
 __NAMESPACE_LOCAL_END
 #include <bits/crt/ctype.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -99,7 +99,7 @@ __got_candidate:
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_memcasemem_l_defined
-#define __local___localdep_memcasemem_l_defined 1
+#define __local___localdep_memcasemem_l_defined
 #define __localdep_memcasemem_l __LIBC_LOCAL_NAME(memcasemem_l)
 #endif /* !__local___localdep_memcasemem_l_defined */
 #endif /* !__local_memcasemem_l_defined */

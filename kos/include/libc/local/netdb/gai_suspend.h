@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd6479338 */
+/* HASH CRC-32:0x5e95a6d5 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,17 +19,17 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_gai_suspend_defined
-#define __local_gai_suspend_defined 1
+#define __local_gai_suspend_defined
 #include <__crt.h>
 #include <bits/types.h>
 #if defined(__CRT_HAVE_gai_suspend64) || defined(__CRT_HAVE_gai_suspend)
 __NAMESPACE_LOCAL_BEGIN
 #if !defined(__local___localdep_gai_suspend32_defined) && defined(__CRT_HAVE_gai_suspend)
-#define __local___localdep_gai_suspend32_defined 1
+#define __local___localdep_gai_suspend32_defined
 __CREDIRECT(,int,__NOTHROW_RPC,__localdep_gai_suspend32,(struct gaicb const *const __list[], int __ent, struct __timespec32 const *__timeout),gai_suspend,(__list,__ent,__timeout))
 #endif /* !__local___localdep_gai_suspend32_defined && __CRT_HAVE_gai_suspend */
 #ifndef __local___localdep_gai_suspend64_defined
-#define __local___localdep_gai_suspend64_defined 1
+#define __local___localdep_gai_suspend64_defined
 #if defined(__CRT_HAVE_gai_suspend) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 __CREDIRECT(,int,__NOTHROW_RPC,__localdep_gai_suspend64,(struct gaicb const *const __list[], int __ent, struct __timespec64 const *__timeout),gai_suspend,(__list,__ent,__timeout))
 #elif defined(__CRT_HAVE_gai_suspend64)
@@ -63,7 +63,7 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(gai_suspend))(struct gaicb const *con
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_gai_suspend_defined
-#define __local___localdep_gai_suspend_defined 1
+#define __local___localdep_gai_suspend_defined
 #define __localdep_gai_suspend __LIBC_LOCAL_NAME(gai_suspend)
 #endif /* !__local___localdep_gai_suspend_defined */
 #else /* __CRT_HAVE_gai_suspend64 || __CRT_HAVE_gai_suspend */

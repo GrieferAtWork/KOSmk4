@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4cbcd528 */
+/* HASH CRC-32:0x177051fa */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,12 +19,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_strsignal_defined
-#define __local_strsignal_defined 1
+#define __local_strsignal_defined
 #include <__crt.h>
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_sigdescr_np_defined
-#define __local___localdep_sigdescr_np_defined 1
+#define __local___localdep_sigdescr_np_defined
 #ifdef __CRT_HAVE_sigdescr_np
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,char const *,__NOTHROW,__localdep_sigdescr_np,(__signo_t __signum),sigdescr_np,(__signum))
 #else /* __CRT_HAVE_sigdescr_np */
@@ -35,7 +35,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__CRT_HAVE_sigdescr_np */
 #endif /* !__local___localdep_sigdescr_np_defined */
 #ifndef __local___localdep_sprintf_defined
-#define __local___localdep_sprintf_defined 1
+#define __local___localdep_sprintf_defined
 #if __has_builtin(__builtin_sprintf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_sprintf) && __has_builtin(__builtin_va_arg_pack)
 __NAMESPACE_LOCAL_END
 #include <features.h>
@@ -59,7 +59,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_sprintf_defined */
 #ifndef __local___localdep_strncpy_defined
-#define __local___localdep_strncpy_defined 1
+#define __local___localdep_strncpy_defined
 #if __has_builtin(__builtin_strncpy) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_strncpy)
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
@@ -94,7 +94,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strsignal))(__signo_t __signo) {
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_strsignal_defined
-#define __local___localdep_strsignal_defined 1
+#define __local___localdep_strsignal_defined
 #define __localdep_strsignal __LIBC_LOCAL_NAME(strsignal)
 #endif /* !__local___localdep_strsignal_defined */
 #endif /* !__local_strsignal_defined */

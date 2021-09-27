@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9a071b66 */
+/* HASH CRC-32:0x5e7618b6 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_fftruncate_defined
-#define __local_fftruncate_defined 1
+#define __local_fftruncate_defined
 #include <__crt.h>
 #include <features.h>
 #include <bits/types.h>
@@ -36,7 +36,7 @@
 #endif /* !__PIO_OFFSET */
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_fileno_defined
-#define __local___localdep_fileno_defined 1
+#define __local___localdep_fileno_defined
 #if defined(__CRT_HAVE_fileno_unlocked) && defined(__USE_STDIO_UNLOCKED)
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_NCX,__localdep_fileno,(__FILE *__restrict __stream),fileno_unlocked,(__stream))
 #elif defined(__CRT_HAVE_fileno)
@@ -50,7 +50,7 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_NCX,__localdep_f
 #endif /* !... */
 #endif /* !__local___localdep_fileno_defined */
 #ifndef __local___localdep_ftruncate_defined
-#define __local___localdep_ftruncate_defined 1
+#define __local___localdep_ftruncate_defined
 #if defined(__CRT_HAVE_ftruncate) && (!defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_ftruncate,(__fd_t __fd, __PIO_OFFSET __length),ftruncate,(__fd,__length))
 #elif defined(__CRT_HAVE__chsize) && (!defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
@@ -80,7 +80,7 @@ __LOCAL_LIBC(fftruncate) __ATTR_NONNULL((1)) int
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_fftruncate_defined
-#define __local___localdep_fftruncate_defined 1
+#define __local___localdep_fftruncate_defined
 #define __localdep_fftruncate __LIBC_LOCAL_NAME(fftruncate)
 #endif /* !__local___localdep_fftruncate_defined */
 #else /* ((__CRT_HAVE__chsize && (!__USE_FILE_OFFSET64 || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)) || (__CRT_HAVE_chsize && (!__USE_FILE_OFFSET64 || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)) || __CRT_HAVE_ftruncate64 || __CRT_HAVE__chsize_s || __CRT_HAVE_ftruncate) && (__CRT_HAVE_fileno || __CRT_HAVE__fileno || __CRT_HAVE_fileno_unlocked) */

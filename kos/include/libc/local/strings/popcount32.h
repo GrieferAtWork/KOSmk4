@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x50479eae */
+/* HASH CRC-32:0x679209c2 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_popcount32_defined
-#define __local_popcount32_defined 1
+#define __local_popcount32_defined
 #include <__crt.h>
 #include <hybrid/__bit.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -29,7 +29,7 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(popcount32))(__UINT32_TYPE__ __i) {
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_popcount32_defined
-#define __local___localdep_popcount32_defined 1
+#define __local___localdep_popcount32_defined
 #define __localdep_popcount32 __LIBC_LOCAL_NAME(popcount32)
 #endif /* !__local___localdep_popcount32_defined */
 #endif /* !__local_popcount32_defined */

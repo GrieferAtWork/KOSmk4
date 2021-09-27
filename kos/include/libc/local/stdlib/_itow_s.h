@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x151ccc32 */
+/* HASH CRC-32:0x7f16d6f7 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local__itow_s_defined
-#define __local__itow_s_defined 1
+#define __local__itow_s_defined
 #include <__crt.h>
 #include <bits/types.h>
 #include <libc/errno.h>
@@ -64,7 +64,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_itow_s))(int __val, __WCHAR_TYPE__ *
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep__itow_s_defined
-#define __local___localdep__itow_s_defined 1
+#define __local___localdep__itow_s_defined
 #define __localdep__itow_s __LIBC_LOCAL_NAME(_itow_s)
 #endif /* !__local___localdep__itow_s_defined */
 #endif /* !__local__itow_s_defined */

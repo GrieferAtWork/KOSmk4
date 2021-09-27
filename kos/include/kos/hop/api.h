@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xffcb4119 */
+/* HASH CRC-32:0x324213c3 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -62,13 +62,13 @@
 __SYSDECL_BEGIN
 
 #if !defined(__hop_defined) && defined(__CRT_HAVE_hop)
-#define __hop_defined 1
+#define __hop_defined
 /* Perform a handle operation specified by `cmd'
  * @param: cmd: One of `HOP_<type>_<command>' */
 __LIBC __syscall_slong_t __NOTHROW_NCX(__VLIBCCALL hop)(__fd_t __fd, __syscall_ulong_t __cmd, ...) __CASMNAME_SAME("hop");
 #endif /* !__hop_defined && __CRT_HAVE_hop */
 #if !defined(__hopf_defined) && defined(__CRT_HAVE_hopf)
-#define __hopf_defined 1
+#define __hopf_defined
 /* Perform a handle operation specified by `cmd'
  * @param: cmd: One of `HOP_<type>_<command>' */
 __LIBC __syscall_slong_t __NOTHROW_NCX(__VLIBCCALL hopf)(__fd_t __fd, __syscall_ulong_t __cmd, __iomode_t __mode, ...) __CASMNAME_SAME("hopf");
@@ -79,13 +79,13 @@ __LIBC __syscall_slong_t __NOTHROW_NCX(__VLIBCCALL hopf)(__fd_t __fd, __syscall_
 /* Exception-enabled variants */
 
 #if !defined(__Hop_defined) && defined(__CRT_HAVE_Hop)
-#define __Hop_defined 1
+#define __Hop_defined
 /* Perform a handle operation specified by `cmd'
  * @param: cmd: One of `HOP_<type>_<command>' */
 __LIBC __syscall_slong_t (__VLIBCCALL Hop)(__fd_t __fd, __syscall_ulong_t __cmd, ...) __THROWS(...) __CASMNAME_SAME("Hop");
 #endif /* !__Hop_defined && __CRT_HAVE_Hop */
 #if !defined(__Hopf_defined) && defined(__CRT_HAVE_Hopf)
-#define __Hopf_defined 1
+#define __Hopf_defined
 /* Perform a handle operation specified by `cmd'
  * @param: cmd: One of `HOP_<type>_<command>' */
 __LIBC __syscall_slong_t (__VLIBCCALL Hopf)(__fd_t __fd, __syscall_ulong_t __cmd, __iomode_t __mode, ...) __THROWS(...) __CASMNAME_SAME("Hopf");

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1ba42b32 */
+/* HASH CRC-32:0x3cff50c */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,12 +19,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_lgammaf_r_defined
-#define __local_lgammaf_r_defined 1
+#define __local_lgammaf_r_defined
 #include <__crt.h>
 #if defined(__CRT_HAVE_lgamma_r) || defined(__CRT_HAVE___lgamma_r)
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_lgamma_r_defined
-#define __local___localdep_lgamma_r_defined 1
+#define __local___localdep_lgamma_r_defined
 #if __has_builtin(__builtin_lgamma_r) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_lgamma_r)
 __CEIREDIRECT(__ATTR_WUNUSED,double,__NOTHROW_NCX,__localdep_lgamma_r,(double __x, int *__signgamp),lgamma_r,{ return __builtin_lgamma_r(__x, __signgamp); })
 #elif defined(__CRT_HAVE_lgamma_r)
@@ -41,7 +41,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(lgammaf_r))(float __x, int *__signgam
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_lgammaf_r_defined
-#define __local___localdep_lgammaf_r_defined 1
+#define __local___localdep_lgammaf_r_defined
 #define __localdep_lgammaf_r __LIBC_LOCAL_NAME(lgammaf_r)
 #endif /* !__local___localdep_lgammaf_r_defined */
 #else /* __CRT_HAVE_lgamma_r || __CRT_HAVE___lgamma_r */

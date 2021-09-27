@@ -126,7 +126,7 @@ __DECL_END
 /* The following stuff comes from BSD                                   */
 #ifdef __CC__
 #ifndef __uint8_t_defined
-#define __uint8_t_defined 1
+#define __uint8_t_defined
 __DECL_BEGIN
 #ifdef __UINT8_TYPE__
 typedef __UINT8_TYPE__ uint8_t;

@@ -20,7 +20,7 @@
 #ifndef __locale_t_defined
 #include <__crt.h>
 #ifndef __locale_t_defined
-#define __locale_t_defined 1
+#define __locale_t_defined
 #ifdef __CC__
 __DECL_BEGIN
 typedef __locale_t locale_t;

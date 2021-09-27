@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x320841f0 */
+/* HASH CRC-32:0x2d61d8f4 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,12 +19,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_flushall_unlocked_defined
-#define __local_flushall_unlocked_defined 1
+#define __local_flushall_unlocked_defined
 #include <__crt.h>
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_fflush_unlocked_defined
-#define __local___localdep_fflush_unlocked_defined 1
+#define __local___localdep_fflush_unlocked_defined
 #ifdef __CRT_HAVE_fflush_unlocked
 __CREDIRECT(,int,__THROWING,__localdep_fflush_unlocked,(__FILE *__stream),fflush_unlocked,(__stream))
 #elif defined(__CRT_HAVE__fflush_nolock)
@@ -46,7 +46,7 @@ __LOCAL_LIBC(flushall_unlocked) int
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_flushall_unlocked_defined
-#define __local___localdep_flushall_unlocked_defined 1
+#define __local___localdep_flushall_unlocked_defined
 #define __localdep_flushall_unlocked __LIBC_LOCAL_NAME(flushall_unlocked)
 #endif /* !__local___localdep_flushall_unlocked_defined */
 #endif /* !__local_flushall_unlocked_defined */

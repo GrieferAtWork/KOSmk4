@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x86560f6f */
+/* HASH CRC-32:0x1c049aa0 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,14 +19,14 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_timer_gettime64_defined
-#define __local_timer_gettime64_defined 1
+#define __local_timer_gettime64_defined
 #include <__crt.h>
 #ifdef __CRT_HAVE_timer_gettime
 #include <bits/os/itimerspec.h>
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_timer_gettime32_defined
-#define __local___localdep_timer_gettime32_defined 1
+#define __local___localdep_timer_gettime32_defined
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_timer_gettime32,(__timer_t __timerid, struct itimerspec *__value),timer_gettime,(__timerid,__value))
 #endif /* !__local___localdep_timer_gettime32_defined */
 __LOCAL_LIBC(timer_gettime64) __ATTR_NONNULL((2)) int
@@ -44,7 +44,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(timer_gettime64))(__timer_t __timerid
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_timer_gettime64_defined
-#define __local___localdep_timer_gettime64_defined 1
+#define __local___localdep_timer_gettime64_defined
 #define __localdep_timer_gettime64 __LIBC_LOCAL_NAME(timer_gettime64)
 #endif /* !__local___localdep_timer_gettime64_defined */
 #else /* __CRT_HAVE_timer_gettime */

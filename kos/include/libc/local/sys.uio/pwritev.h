@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa4fdab45 */
+/* HASH CRC-32:0x2a2f115a */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_pwritev_defined
-#define __local_pwritev_defined 1
+#define __local_pwritev_defined
 #include <__crt.h>
 #include <bits/types.h>
 #if defined(__CRT_HAVE_pwritev64) || defined(__CRT_HAVE_pwritev)
@@ -27,11 +27,11 @@
 #include <bits/os/iovec.h>
 __NAMESPACE_LOCAL_BEGIN
 #if !defined(__local___localdep_pwritev32_defined) && defined(__CRT_HAVE_pwritev)
-#define __local___localdep_pwritev32_defined 1
+#define __local___localdep_pwritev32_defined
 __CREDIRECT(__ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_pwritev32,(__fd_t __fd, struct iovec const *__iov, __STDC_INT_AS_SIZE_T __count, __off32_t __offset),pwritev,(__fd,__iov,__count,__offset))
 #endif /* !__local___localdep_pwritev32_defined && __CRT_HAVE_pwritev */
 #ifndef __local___localdep_pwritev64_defined
-#define __local___localdep_pwritev64_defined 1
+#define __local___localdep_pwritev64_defined
 #if defined(__CRT_HAVE_pwritev) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
 __CREDIRECT(__ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_pwritev64,(__fd_t __fd, struct iovec const *__iov, __STDC_INT_AS_SIZE_T __count, __off64_t __offset),pwritev,(__fd,__iov,__count,__offset))
 #elif defined(__CRT_HAVE_pwritev64)
@@ -55,7 +55,7 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(pwritev))(__fd_t __fd, struct iovec c
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_pwritev_defined
-#define __local___localdep_pwritev_defined 1
+#define __local___localdep_pwritev_defined
 #define __localdep_pwritev __LIBC_LOCAL_NAME(pwritev)
 #endif /* !__local___localdep_pwritev_defined */
 #else /* __CRT_HAVE_pwritev64 || __CRT_HAVE_pwritev */

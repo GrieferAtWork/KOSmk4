@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6ff2250c */
+/* HASH CRC-32:0xfc75192c */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,11 +19,11 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_c16scoll_defined
-#define __local_c16scoll_defined 1
+#define __local_c16scoll_defined
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_c16scmp_defined
-#define __local___localdep_c16scmp_defined 1
+#define __local___localdep_c16scmp_defined
 #if defined(__CRT_HAVE_wcscmp) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_c16scmp,(__CHAR16_TYPE__ const *__s1, __CHAR16_TYPE__ const *__s2),wcscmp,(__s1,__s2))
 #elif defined(__CRT_HAVE_DOS$wcscmp)
@@ -46,7 +46,7 @@ __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(c16scoll))(__CHAR16_TYPE__ const *__s
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_c16scoll_defined
-#define __local___localdep_c16scoll_defined 1
+#define __local___localdep_c16scoll_defined
 #define __localdep_c16scoll __LIBC_LOCAL_NAME(c16scoll)
 #endif /* !__local___localdep_c16scoll_defined */
 #endif /* !__local_c16scoll_defined */

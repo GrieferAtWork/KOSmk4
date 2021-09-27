@@ -40,14 +40,14 @@ defined(__COMPILER_HAVE_CXX_VARIABLE_TEMPLATES)
 
 __CXXDECL_BEGIN
 #ifndef __std_reference_wrapper_defined
-#define __std_reference_wrapper_defined 1
+#define __std_reference_wrapper_defined
 __NAMESPACE_STD_BEGIN
 template<class __T> class reference_wrapper;
 __NAMESPACE_STD_END
 #endif /* !__std_reference_wrapper_defined */
 __NAMESPACE_INT_BEGIN
 #ifndef __int_success_failure_type_defined
-#define __int_success_failure_type_defined 1
+#define __int_success_failure_type_defined
 template<class __T> struct __success_type { typedef __T type; };
 struct __failure_type {};
 #endif /* !__int_success_failure_type_defined */
@@ -190,7 +190,7 @@ struct __result_of_impl<false, false, __Function, __ArgumentTypes...>
 };
 __NAMESPACE_INT_END
 __NAMESPACE_STD_BEGIN
-#define __std_result_of_defined 1
+#define __std_result_of_defined
 template<class __Signature> struct result_of;
 template<class __Function, class... __ArgumentTypes>
 struct result_of<__Function(__ArgumentTypes...)>

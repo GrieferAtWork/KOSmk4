@@ -20,7 +20,7 @@
 #ifndef ____mbstate_t_defined
 #include <bits/crt/mbstate.h>
 #ifndef ____mbstate_t_defined
-#define ____mbstate_t_defined 1
+#define ____mbstate_t_defined
 #ifdef __CC__
 __DECL_BEGIN
 typedef struct __mbstate __mbstate_t;

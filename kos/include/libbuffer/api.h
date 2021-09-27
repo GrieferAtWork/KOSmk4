@@ -25,23 +25,23 @@
 
 #if defined(__i386__) && !defined(__x86_64__)
 #define LIBBUFFER_CC __ATTR_FASTCALL
-#else
+#else /* ... */
 #define LIBBUFFER_CC /* nothing */
-#endif
+#endif /* !... */
 
-#if !defined(LIBBUFFER_WANT_PROTOTYPES) && \
-     defined(__KOS__) && defined(__KERNEL__)
-#define LIBBUFFER_WANT_PROTOTYPES 1
-#endif
+#if (!defined(LIBBUFFER_WANT_PROTOTYPES) && \
+     defined(__KOS__) && defined(__KERNEL__))
+#define LIBBUFFER_WANT_PROTOTYPES
+#endif /* ... */
 
 #if defined(__KOS__) && defined(__KERNEL__) && \
     defined(CONFIG_BUILDING_KERNEL_CORE)
 #define LIBBUFFER_DECL __PUBDEF
 #elif defined(__LIBBUFFER_STATIC)
 #define LIBBUFFER_DECL __INTDEF
-#else
+#else /* ... */
 #define LIBBUFFER_DECL __IMPDEF
-#endif
+#endif /* !... */
 
 /* Library name for use with `dlopen()' */
 #define LIBBUFFER_LIBRARY_NAME "libbuffer.so"

@@ -29,13 +29,12 @@
 #ifndef __cplusplus /* XXX: Also define if not provided by the c++ compiler! */
 
 #ifndef __alignas_is_defined
-#define __alignas_is_defined 1
+#define __alignas_is_defined
 #define alignas __ATTR_ALIGNED
 #endif /* !__alignas_is_defined */
 
 #ifndef __alignof_is_defined
-#define __alignof_is_defined 1
-#define __alignof_is_defined 1
+#define __alignof_is_defined
 #define alignof __COMPILER_ALIGNOF
 #endif /* !__alignof_is_defined */
 

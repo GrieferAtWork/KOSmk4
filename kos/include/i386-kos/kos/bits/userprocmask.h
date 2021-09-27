@@ -39,7 +39,7 @@
 __DECL_BEGIN
 
 #define USERPROCMASK_FLAG_NORMAL     0x0000 /* Normal flags. */
-#define USERPROCMASK_FLAG_HASPENDING 0x0001 /* FLAG: `pm_pending' may contain non-zero entries.
+#define USERPROCMASK_FLAG_HASPENDING 0x0001 /* FLAG: `pm_pending'   may    contain   non-zero    entries.
                                              * Set by the kernel and expected to be cleared by userspace. */
 
 

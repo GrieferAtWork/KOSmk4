@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7ce810fc */
+/* HASH CRC-32:0xb54f2fb8 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -38,7 +38,7 @@
 __SYSDECL_BEGIN
 
 #ifndef ___stringlist_defined
-#define ___stringlist_defined 1
+#define ___stringlist_defined
 typedef struct _stringlist {
 	char   **sl_str; /* [1..1][owned(maybe)][0..sl_cur|ALLOC(sl_max)][owned] Vector of strings */
 	size_t   sl_max; /* Allocated vector size */
@@ -100,7 +100,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(sl_find, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_P
 #endif /* !__CRT_HAVE_sl_find */
 #ifdef __USE_BSD
 #ifndef __sl_delete_defined
-#define __sl_delete_defined 1
+#define __sl_delete_defined
 #ifdef __CRT_HAVE_sl_delete
 /* >> sl_delete(3)
  * Remove an entry `name' from `sl'

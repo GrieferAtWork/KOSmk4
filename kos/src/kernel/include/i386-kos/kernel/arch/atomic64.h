@@ -42,7 +42,7 @@ DECL_BEGIN
 #error "atomic64_t already defined"
 #endif /* __atomic64_t_defined */
 
-#define __atomic64_t_defined 1
+#define __atomic64_t_defined
 #ifdef __INTELLISENSE__
 typedef struct {
 	u64 _a_val;

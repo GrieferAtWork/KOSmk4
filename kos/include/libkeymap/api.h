@@ -26,20 +26,20 @@
 
 #if defined(__i386__) && !defined(__x86_64__)
 #define LIBKEYMAP_CC __ATTR_FASTCALL
-#else
+#else /* ... */
 #define LIBKEYMAP_CC /* nothing */
-#endif
+#endif /* !... */
 
-#if !defined(LIBKEYMAP_WANT_PROTOTYPES) && \
-     defined(__KOS__) && defined(__KERNEL__)
-#define LIBKEYMAP_WANT_PROTOTYPES 1
-#endif
+#if (!defined(LIBKEYMAP_WANT_PROTOTYPES) && \
+     defined(__KOS__) && defined(__KERNEL__))
+#define LIBKEYMAP_WANT_PROTOTYPES
+#endif /* ... */
 
 #if defined(__LIBKEYMAP_STATIC)
 #define LIBKEYMAP_DECL __INTDEF
-#else
+#else /* ... */
 #define LIBKEYMAP_DECL __IMPDEF
-#endif
+#endif /* !... */
 
 /* Library name for use with `dlopen()' */
 #define LIBKEYMAP_LIBRARY_NAME "libkeymap.so"

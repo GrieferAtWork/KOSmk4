@@ -2941,7 +2941,7 @@ class CrtDosVariantCallbackMetadata: CrtDosVariantMetadata {
 			if (serial !is none) {
 				serialKey = "__dwrap_{}_defined".format({ serial });
 				dosPrefix.ppIfndef(serialKey);
-				dosPrefix.ppDefine(serialKey, "1");
+				dosPrefix.ppDefine(serialKey, "");
 				wrapperFunctionName = "_dwrap_" + serial;
 			}
 			if (cookie is WrapperCookieStruct) {
@@ -6349,7 +6349,7 @@ done_function:
 		result.order_header.insertall(1, context.result_order_headerCCompat);
 		result.order_header.append(
 			"#ifdef __CXX_SYSTEM_HEADER\n"
-			"#define {1} 1\n"
+			"#define {1}\n"
 			"#undef {0}\n"
 			"#endif /* __CXX_SYSTEM_HEADER */\n"
 			"#endif /* !{1} */\n"

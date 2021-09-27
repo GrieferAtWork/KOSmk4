@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x54d23ccf */
+/* HASH CRC-32:0x64fed8e9 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,11 +19,11 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local__mbstrnlen_defined
-#define __local__mbstrnlen_defined 1
+#define __local__mbstrnlen_defined
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_unicode_readutf8_n_defined
-#define __local___localdep_unicode_readutf8_n_defined 1
+#define __local___localdep_unicode_readutf8_n_defined
 #ifdef __CRT_HAVE_unicode_readutf8_n
 __CREDIRECT(__ATTR_NONNULL((1, 2)),__CHAR32_TYPE__,__NOTHROW_NCX,__localdep_unicode_readutf8_n,(char const **__restrict __ptext, char const *__text_end),unicode_readutf8_n,(__ptext,__text_end))
 #else /* __CRT_HAVE_unicode_readutf8_n */
@@ -43,7 +43,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_mbstrnlen))(char const *__str, __SIZ
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep__mbstrnlen_defined
-#define __local___localdep__mbstrnlen_defined 1
+#define __local___localdep__mbstrnlen_defined
 #define __localdep__mbstrnlen __LIBC_LOCAL_NAME(_mbstrnlen)
 #endif /* !__local___localdep__mbstrnlen_defined */
 #endif /* !__local__mbstrnlen_defined */

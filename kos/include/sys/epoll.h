@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb9ade41a */
+/* HASH CRC-32:0x4605c820 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -276,7 +276,7 @@ typedef int __epoll_ctl_t;
 typedef union epoll_data epoll_data_t;
 
 #ifndef __sigset_t_defined
-#define __sigset_t_defined 1
+#define __sigset_t_defined
 typedef struct __sigset_struct sigset_t;
 #endif /* !__sigset_t_defined */
 

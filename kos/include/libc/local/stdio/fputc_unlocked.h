@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xddb1c6af */
+/* HASH CRC-32:0xd2218985 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,17 +19,17 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_fputc_unlocked_defined
-#define __local_fputc_unlocked_defined 1
+#define __local_fputc_unlocked_defined
 #include <__crt.h>
 #if (defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE__IO_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock)
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
 #if !defined(__local___localdep__flsbuf_defined) && defined(__CRT_HAVE__flsbuf)
-#define __local___localdep__flsbuf_defined 1
+#define __local___localdep__flsbuf_defined
 __CREDIRECT(__ATTR_NONNULL((2)),int,__THROWING,__localdep__flsbuf,(int __ch, __FILE *__restrict __stream),_flsbuf,(__ch,__stream))
 #endif /* !__local___localdep__flsbuf_defined && __CRT_HAVE__flsbuf */
 #ifndef __local___localdep_crt_fwrite_unlocked_defined
-#define __local___localdep_crt_fwrite_unlocked_defined 1
+#define __local___localdep_crt_fwrite_unlocked_defined
 #ifdef __CRT_HAVE_fwrite
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
@@ -72,7 +72,7 @@ __LOCAL_LIBC(fputc_unlocked) __ATTR_NONNULL((2)) int
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_fputc_unlocked_defined
-#define __local___localdep_fputc_unlocked_defined 1
+#define __local___localdep_fputc_unlocked_defined
 #define __localdep_fputc_unlocked __LIBC_LOCAL_NAME(fputc_unlocked)
 #endif /* !__local___localdep_fputc_unlocked_defined */
 #else /* (__CRT_DOS && __CRT_HAVE__flsbuf) || __CRT_HAVE_fwrite || __CRT_HAVE__IO_fwrite || __CRT_HAVE_fwrite_s || __CRT_HAVE_fwrite_unlocked || __CRT_HAVE__fwrite_nolock */

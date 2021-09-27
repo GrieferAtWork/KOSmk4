@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc9805d8b */
+/* HASH CRC-32:0x9bf3f4 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_cfmakeraw_defined
-#define __local_cfmakeraw_defined 1
+#define __local_cfmakeraw_defined
 #include <__crt.h>
 #include <bits/os/termios.h>
 #include <asm/os/termios.h>
@@ -164,7 +164,7 @@ for (local field, add, flags: ops) {
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_cfmakeraw_defined
-#define __local___localdep_cfmakeraw_defined 1
+#define __local___localdep_cfmakeraw_defined
 #define __localdep_cfmakeraw __LIBC_LOCAL_NAME(cfmakeraw)
 #endif /* !__local___localdep_cfmakeraw_defined */
 #endif /* !__local_cfmakeraw_defined */

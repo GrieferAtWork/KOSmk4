@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfa331c3d */
+/* HASH CRC-32:0x36847ce4 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,13 +19,13 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local__sprintf_p_defined
-#define __local__sprintf_p_defined 1
+#define __local__sprintf_p_defined
 #include <__crt.h>
 #include <features.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep__vsprintf_p_defined
-#define __local___localdep__vsprintf_p_defined 1
+#define __local___localdep__vsprintf_p_defined
 #ifdef __CRT_HAVE__vsprintf_p
 __CREDIRECT(__ATTR_LIBC_PRINTF_P(3, 0) __ATTR_NONNULL((3)),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,__localdep__vsprintf_p,(char *__restrict __buf, __SIZE_TYPE__ __bufsize, char const *__restrict __format, __builtin_va_list __args),_vsprintf_p,(__buf,__bufsize,__format,__args))
 #else /* __CRT_HAVE__vsprintf_p */
@@ -46,7 +46,7 @@ __NOTHROW_NCX(__VLIBCCALL __LIBC_LOCAL_NAME(_sprintf_p))(char *__restrict __buf,
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep__sprintf_p_defined
-#define __local___localdep__sprintf_p_defined 1
+#define __local___localdep__sprintf_p_defined
 #define __localdep__sprintf_p __LIBC_LOCAL_NAME(_sprintf_p)
 #endif /* !__local___localdep__sprintf_p_defined */
 #endif /* !__local__sprintf_p_defined */

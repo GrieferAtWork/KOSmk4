@@ -203,7 +203,7 @@
 __SYSDECL_BEGIN
 
 #ifndef __size_t_defined
-#define __size_t_defined 1
+#define __size_t_defined
 typedef __SIZE_TYPE__ size_t;
 #endif /* !__size_t_defined */
 
@@ -401,7 +401,7 @@ __NOTHROW_NCX(__DLFCN_CC dlexceptaware)(void *__handle);
  * @param: flags: Set of `DLGETHANDLE_F*' */
 #ifdef __CRT_HAVE_dlgethandle
 #ifndef __dlgethandle_defined
-#define __dlgethandle_defined 1
+#define __dlgethandle_defined
 __IMPDEF __ATTR_WUNUSED void *
 __NOTHROW(__DLFCN_CC dlgethandle)(void const *__static_pointer,
                                   unsigned int __flags __DFL(DLGETHANDLE_FNORMAL));
@@ -465,7 +465,7 @@ __NOTHROW_NCX(__DLFCN_CC dlmodulename)(void *__handle);
  * @return: 0 : Error (s.a. `dlerror()'), or load-address of ZERO */
 #ifdef __CRT_HAVE_dlmodulebase
 #ifndef __dlmodulebase_defined
-#define __dlmodulebase_defined 1
+#define __dlmodulebase_defined
 __IMPDEF __ATTR_WUNUSED __ATTR_NONNULL((1)) __uintptr_t
 __NOTHROW_NCX(__DLFCN_CC dlmodulebase)(void *__handle);
 #endif /* !__dlmodulebase_defined */
@@ -477,7 +477,7 @@ __NOTHROW_NCX(__DLFCN_CC dlmodulebase)(void *__handle);
      defined(__CRT_HAVE_dlsectionname) || defined(__CRT_HAVE_dlsectionindex) ||  \
      defined(__CRT_HAVE_dlsectionmodule) || defined(__CRT_HAVE_dlinflatesection))
 #ifndef __dl_section_defined
-#define __dl_section_defined 1
+#define __dl_section_defined
 struct dl_section {
 	void       *const ds_data;    /* [0..ds_size][const] Memory mapping for the section's contents. (`(void *)-1' instead of `NULL') */
 	__size_t    const ds_size;    /* [const] Size of the section (in bytes) */
@@ -506,7 +506,7 @@ struct dl_section {
  *                 very least `MAP_PRIVATE', meaning that writes aren't written back to the library file!
  * @return: NULL:  Error (s.a. `dlerror()'; usually: unknown section) */
 #ifndef __dllocksection_defined
-#define __dllocksection_defined 1
+#define __dllocksection_defined
 __IMPDEF __ATTR_WUNUSED __ATTR_NONNULL((1)) /*REF*/ struct dl_section *
 __NOTHROW_NCX(__DLFCN_CC dllocksection)(void *__handle,
                                         char const *__restrict __name,
@@ -521,7 +521,7 @@ __NOTHROW_NCX(__DLFCN_CC dllocksection)(void *__handle,
  * @return: * : Error (s.a. `dlerror()') */
 #ifdef __CRT_HAVE_dlunlocksection
 #ifndef __dlunlocksection_defined
-#define __dlunlocksection_defined 1
+#define __dlunlocksection_defined
 __IMPDEF __ATTR_NONNULL((1)) int
 __NOTHROW_NCX(__DLFCN_CC dlunlocksection)(/*REF*/ struct dl_section *__sect);
 #endif /* !__dlunlocksection_defined */
@@ -587,7 +587,7 @@ __NOTHROW_NCX(__DLFCN_CC dlsectionmodule)(struct dl_section *__sect,
  * @return: NULL: Error (s.a. `dlerror()') */
 #ifdef __CRT_HAVE_dlinflatesection
 #ifndef __dlinflatesection_defined
-#define __dlinflatesection_defined 1
+#define __dlinflatesection_defined
 __IMPDEF __ATTR_WUNUSED __ATTR_NONNULL((1)) void *
 __NOTHROW_NCX(__DLFCN_CC dlinflatesection)(struct dl_section *__sect,
                                            __size_t *__psize);
@@ -799,7 +799,7 @@ __IMPDEF void *(__DLFCN_VCC dlauxctrl)(void *__handle,
 #if defined(__USE_GNU) || defined(__USE_NETBSD)
 #ifdef __CRT_HAVE_dladdr
 #ifndef __Dl_info_defined
-#define __Dl_info_defined 1
+#define __Dl_info_defined
 typedef struct __dl_info_struct Dl_info;
 #endif /* !__Dl_info_defined */
 
@@ -875,7 +875,7 @@ __IMPDEF __ATTR_NONNULL((2, 3)) void *
 #endif /* __RTLD_DL_LINKMAP */
 
 #ifndef __Dl_info_defined
-#define __Dl_info_defined 1
+#define __Dl_info_defined
 typedef struct __dl_info_struct Dl_info;
 #endif /* !__Dl_info_defined */
 

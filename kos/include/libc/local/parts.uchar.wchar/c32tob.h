@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4e5bb0d0 */
+/* HASH CRC-32:0x5cbb2b39 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_c32tob_defined
-#define __local_c32tob_defined 1
+#define __local_c32tob_defined
 #include <__crt.h>
 #include <hybrid/typecore.h>
 #include <asm/crt/stdio.h>
@@ -32,7 +32,7 @@ __NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(c32tob))(__WINT32_TYPE__ __ch) {
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_c32tob_defined
-#define __local___localdep_c32tob_defined 1
+#define __local___localdep_c32tob_defined
 #define __localdep_c32tob __LIBC_LOCAL_NAME(c32tob)
 #endif /* !__local___localdep_c32tob_defined */
 #endif /* !__local_c32tob_defined */

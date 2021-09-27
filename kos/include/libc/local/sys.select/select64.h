@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x946e3c36 */
+/* HASH CRC-32:0xe0e96c65 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_select64_defined
-#define __local_select64_defined 1
+#define __local_select64_defined
 #include <__crt.h>
 #if defined(__CRT_HAVE_select) || defined(__CRT_HAVE___select)
 #include <features.h>
@@ -27,7 +27,7 @@
 #include <bits/os/fd_set.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_select32_defined
-#define __local___localdep_select32_defined 1
+#define __local___localdep_select32_defined
 #ifdef __CRT_HAVE_select
 __CREDIRECT(,__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,__localdep_select32,(__STDC_INT_AS_SIZE_T __nfds, struct __fd_set_struct *__restrict __readfds, struct __fd_set_struct *__restrict __writefds, struct __fd_set_struct *__restrict __exceptfds, struct __timeval32 *__restrict __timeout),select,(__nfds,__readfds,__writefds,__exceptfds,__timeout))
 #elif defined(__CRT_HAVE___select)
@@ -47,7 +47,7 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(select64))(__STDC_INT_AS_SIZE_T __nfd
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_select64_defined
-#define __local___localdep_select64_defined 1
+#define __local___localdep_select64_defined
 #define __localdep_select64 __LIBC_LOCAL_NAME(select64)
 #endif /* !__local___localdep_select64_defined */
 #else /* __CRT_HAVE_select || __CRT_HAVE___select */

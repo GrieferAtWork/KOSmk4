@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe0e20f1 */
+/* HASH CRC-32:0xc3f0ce78 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -46,23 +46,23 @@
 #else /* __CXX_SYSTEM_HEADER */
 /* Import all symbols into the global namespace when re-including "stdio.h" after "cstdio" */
 #ifndef __size_t_defined
-#define __size_t_defined 1
+#define __size_t_defined
 __NAMESPACE_STD_USING(size_t)
 #endif /* !__size_t_defined */
 #ifndef __fpos_t_defined
-#define __fpos_t_defined 1
+#define __fpos_t_defined
 __NAMESPACE_STD_USING(fpos_t)
 #endif /* !__fpos_t_defined */
 #ifndef __FILE_defined
-#define __FILE_defined 1
+#define __FILE_defined
 __NAMESPACE_STD_USING(FILE)
 #endif /* !__FILE_defined */
 #if !defined(__remove_defined) && defined(__std_remove_defined)
-#define __remove_defined 1
+#define __remove_defined
 __NAMESPACE_STD_USING(remove)
 #endif /* !__remove_defined && __std_remove_defined */
 #if !defined(__rename_defined) && defined(__std_rename_defined)
-#define __rename_defined 1
+#define __rename_defined
 __NAMESPACE_STD_USING(rename)
 #endif /* !__rename_defined && __std_rename_defined */
 #ifdef __CRT_HAVE_tmpnam
@@ -134,7 +134,7 @@ __NAMESPACE_STD_USING(feof)
 __NAMESPACE_STD_USING(ferror)
 #endif /* __CRT_HAVE_ferror || __CRT_HAVE__IO_ferror || __CRT_HAVE_ferror_unlocked */
 #if !defined(__perror_defined) && defined(__std_perror_defined)
-#define __perror_defined 1
+#define __perror_defined
 __NAMESPACE_STD_USING(perror)
 #endif /* !__perror_defined && __std_perror_defined */
 #include <asm/os/oflags.h>
@@ -166,11 +166,11 @@ __NAMESPACE_STD_USING(vprintf)
 __NAMESPACE_STD_USING(printf)
 #endif /* __CRT_HAVE_printf || __CRT_HAVE__IO_printf || __CRT_HAVE_printf_s || __CRT_HAVE_printf_unlocked || __CRT_HAVE_vprintf || __CRT_HAVE_vprintf_s || __CRT_HAVE_vprintf_unlocked || (!__NO_STDSTREAMS && (__CRT_HAVE_vfprintf || __CRT_HAVE_vfprintf_s || __CRT_HAVE__IO_vfprintf || __CRT_HAVE_vfprintf_unlocked || __CRT_HAVE_file_printer || __CRT_HAVE_file_printer_unlocked || __CRT_HAVE_fputc || __CRT_HAVE_putc || __CRT_HAVE__IO_putc || __CRT_HAVE_fputc_unlocked || __CRT_HAVE_putc_unlocked || (__CRT_DOS && __CRT_HAVE__flsbuf) || __CRT_HAVE_fwrite || __CRT_HAVE__IO_fwrite || __CRT_HAVE_fwrite_s || __CRT_HAVE_fwrite_unlocked || __CRT_HAVE__fwrite_nolock)) */
 #if !defined(__vfscanf_defined) && defined(__std_vfscanf_defined)
-#define __vfscanf_defined 1
+#define __vfscanf_defined
 __NAMESPACE_STD_USING(vfscanf)
 #endif /* !__vfscanf_defined && __std_vfscanf_defined */
 #if !defined(__vscanf_defined) && defined(__std_vscanf_defined)
-#define __vscanf_defined 1
+#define __vscanf_defined
 __NAMESPACE_STD_USING(vscanf)
 #endif /* !__vscanf_defined && __std_vscanf_defined */
 #if defined(__CRT_HAVE_fscanf) || defined(__CRT_HAVE_fscanf_unlocked) || defined(__CRT_HAVE_vfscanf) || defined(__CRT_HAVE__vfscanf) || defined(__CRT_HAVE__vfscanf_s) || defined(__CRT_HAVE__IO_vfscanf) || defined(__CRT_HAVE_vfscanf_unlocked) || defined(__CRT_HAVE___vfscanf) || ((defined(__CRT_HAVE_fgetc) || defined(__CRT_HAVE_getc) || defined(__CRT_HAVE__IO_getc) || defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked) || (defined(__CRT_DOS) && defined(__CRT_HAVE__filbuf)) || defined(__CRT_HAVE_fread) || defined(__CRT_HAVE__IO_fread) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock)) && (defined(__CRT_HAVE_ungetc) || defined(__CRT_HAVE__IO_ungetc) || defined(__CRT_HAVE_ungetc_unlocked) || defined(__CRT_HAVE__ungetc_nolock)))
@@ -180,22 +180,22 @@ __NAMESPACE_STD_USING(fscanf)
 __NAMESPACE_STD_USING(scanf)
 #endif /* __CRT_HAVE_scanf || __CRT_HAVE_scanf_unlocked || __CRT_HAVE_vscanf || __CRT_HAVE__vscanf || __CRT_HAVE_vscanf_unlocked || (!__NO_STDSTREAMS && (__CRT_HAVE_vfscanf || __CRT_HAVE__vfscanf || __CRT_HAVE__vfscanf_s || __CRT_HAVE__IO_vfscanf || __CRT_HAVE_vfscanf_unlocked || __CRT_HAVE___vfscanf || ((__CRT_HAVE_fgetc || __CRT_HAVE_getc || __CRT_HAVE__IO_getc || __CRT_HAVE_fgetc_unlocked || __CRT_HAVE_getc_unlocked || (__CRT_DOS && __CRT_HAVE__filbuf) || __CRT_HAVE_fread || __CRT_HAVE__IO_fread || __CRT_HAVE_fread_unlocked || __CRT_HAVE__fread_nolock) && (__CRT_HAVE_ungetc || __CRT_HAVE__IO_ungetc || __CRT_HAVE_ungetc_unlocked || __CRT_HAVE__ungetc_nolock)))) */
 #if !defined(__gets_defined) && defined(__std_gets_defined)
-#define __gets_defined 1
+#define __gets_defined
 __NAMESPACE_STD_USING(gets)
 #endif /* !__gets_defined && __std_gets_defined */
 #if !defined(__vsscanf_defined) && defined(__std_vsscanf_defined)
-#define __vsscanf_defined 1
+#define __vsscanf_defined
 __NAMESPACE_STD_USING(vsscanf)
 #endif /* !__vsscanf_defined && __std_vsscanf_defined */
 __NAMESPACE_STD_USING(sscanf)
 __NAMESPACE_STD_USING(vsprintf)
 __NAMESPACE_STD_USING(sprintf)
 #if !defined(__vsnprintf_defined) && defined(__std_vsnprintf_defined)
-#define __vsnprintf_defined 1
+#define __vsnprintf_defined
 __NAMESPACE_STD_USING(vsnprintf)
 #endif /* !__vsnprintf_defined && __std_vsnprintf_defined */
 #if !defined(__snprintf_defined) && defined(__std_snprintf_defined)
-#define __snprintf_defined 1
+#define __snprintf_defined
 __NAMESPACE_STD_USING(snprintf)
 #endif /* !__snprintf_defined && __std_snprintf_defined */
 #undef _CXX_STDONLY_CSTDIO
@@ -340,66 +340,66 @@ __SYSDECL_BEGIN
 
 #ifdef __CC__
 #ifndef __std_size_t_defined
-#define __std_size_t_defined 1
+#define __std_size_t_defined
 __NAMESPACE_STD_BEGIN
 typedef __SIZE_TYPE__ size_t;
 __NAMESPACE_STD_END
 #endif /* !__std_size_t_defined */
 #ifndef __CXX_SYSTEM_HEADER
 #ifndef __size_t_defined
-#define __size_t_defined 1
+#define __size_t_defined
 __NAMESPACE_STD_USING(size_t)
 #endif /* !__size_t_defined */
 #endif /* !__CXX_SYSTEM_HEADER */
 
 #ifdef __USE_XOPEN2K8
 #ifndef __off_t_defined
-#define __off_t_defined 1
+#define __off_t_defined
 typedef __FS_TYPE(off) off_t;
 #endif /* !__off_t_defined */
 
 #ifndef __ssize_t_defined
-#define __ssize_t_defined 1
+#define __ssize_t_defined
 typedef __ssize_t ssize_t;
 #endif /* !__ssize_t_defined */
 
 #ifdef __USE_LARGEFILE64
 #ifndef __off64_t_defined
-#define __off64_t_defined 1
+#define __off64_t_defined
 typedef __off64_t off64_t;
 #endif /* !__off64_t_defined */
 #endif /* __USE_LARGEFILE64 */
 #endif /* __USE_XOPEN2K8 */
 
 #ifndef __std_fpos_t_defined
-#define __std_fpos_t_defined 1
+#define __std_fpos_t_defined
 __NAMESPACE_STD_BEGIN
 typedef __FS_TYPE(fpos) fpos_t;
 __NAMESPACE_STD_END
 #endif /* !__std_fpos_t_defined */
 #ifndef __CXX_SYSTEM_HEADER
 #ifndef __fpos_t_defined
-#define __fpos_t_defined 1
+#define __fpos_t_defined
 __NAMESPACE_STD_USING(fpos_t)
 #endif /* !__fpos_t_defined */
 #endif /* !__CXX_SYSTEM_HEADER */
 
 #ifdef __USE_LARGEFILE64
 #ifndef __fpos64_t_defined
-#define __fpos64_t_defined 1
+#define __fpos64_t_defined
 typedef __fpos64_t fpos64_t;
 #endif /* !__fpos64_t_defined */
 #endif /* __USE_LARGEFILE64 */
 
 #ifndef __std_FILE_defined
-#define __std_FILE_defined 1
+#define __std_FILE_defined
 __NAMESPACE_STD_BEGIN
 typedef __FILE FILE;
 __NAMESPACE_STD_END
 #endif /* !__std_FILE_defined */
 #ifndef __CXX_SYSTEM_HEADER
 #ifndef __FILE_defined
-#define __FILE_defined 1
+#define __FILE_defined
 __NAMESPACE_STD_USING(FILE)
 #endif /* !__FILE_defined */
 #endif /* !__CXX_SYSTEM_HEADER */
@@ -407,7 +407,7 @@ __NAMESPACE_STD_USING(FILE)
 #ifndef __NO_STDSTREAMS
 /* Standard streams. */
 #ifndef __stdstreams_defined
-#define __stdstreams_defined 1
+#define __stdstreams_defined
 #undef stdin
 #undef stdout
 #undef stderr
@@ -418,7 +418,7 @@ __NAMESPACE_STD_USING(FILE)
 #elif defined(__CRT_DOS_PRIMARY)
 #ifdef __USE_DOS_LINKOBJECTS
 #ifndef ___iob_defined
-#define ___iob_defined 1
+#define ___iob_defined
 __LIBC FILE _iob[];
 #endif /* !___iob_defined */
 #   define stdin    (_iob + 0)
@@ -426,7 +426,7 @@ __LIBC FILE _iob[];
 #   define stderr   (_iob + 2)
 #else /* __USE_DOS_LINKOBJECTS */
 #ifndef ____iob_func_defined
-#define ____iob_func_defined 1
+#define ____iob_func_defined
 __LIBC __ATTR_WUNUSED __ATTR_RETNONNULL FILE *__NOTHROW(__LIBCCALL __iob_func)(void);
 #endif /* !____iob_func_defined */
 #   define stdin    (__iob_func() + 0)
@@ -447,7 +447,7 @@ __LIBC __FILE *stderr;
 
 __NAMESPACE_STD_BEGIN
 #ifndef __std_remove_defined
-#define __std_remove_defined 1
+#define __std_remove_defined
 #ifdef __remove_defined
 /* >> remove(3)
  * Remove a file or directory `filename' */
@@ -473,7 +473,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(remove, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NO
 #endif /* !... */
 #endif /* !__std_remove_defined */
 #ifndef __std_rename_defined
-#define __std_rename_defined 1
+#define __std_rename_defined
 #ifdef __rename_defined
 /* >> rename(2)
  * Rename  a given file `oldname' to `newname_or_path', or in the event
@@ -1265,7 +1265,7 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,fer
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,ferror,(__FILE __KOS_FIXED_CONST *__restrict __stream),ferror_unlocked,(__stream))
 #endif /* ... */
 #ifndef __std_perror_defined
-#define __std_perror_defined 1
+#define __std_perror_defined
 #ifdef __perror_defined
 /* >> perror(3)
  * Print a given `message' alongside `strerror(errno)' to stderr:
@@ -1617,7 +1617,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(printf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LI
 
 #if defined(__USE_ISOC99) || defined(__USE_DOS)
 #ifndef __std_vfscanf_defined
-#define __std_vfscanf_defined 1
+#define __std_vfscanf_defined
 #ifdef __vfscanf_defined
 /* >> fscanf(3), vfscanf(3)
  * Scan  data   from   `stream',   following   `format'
@@ -1676,7 +1676,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(vfscanf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_W
 #endif /* !... */
 #endif /* !__std_vfscanf_defined */
 #ifndef __std_vscanf_defined
-#define __std_vscanf_defined 1
+#define __std_vscanf_defined
 #ifdef __vscanf_defined
 /* >> scanf(3), vscanf(3)
  * Scan data from `stdin', following `format'
@@ -1800,7 +1800,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(scanf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUN
 
 #if !defined(__USE_ISOC11) || (defined(__cplusplus) && __cplusplus <= 201103L)
 #ifndef __std_gets_defined
-#define __std_gets_defined 1
+#define __std_gets_defined
 #ifdef __gets_defined
 __NAMESPACE_GLB_USING_OR_IMPL(gets, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_DEPRECATED("No buffer size checks (use `fgets\' instead)") __ATTR_NONNULL((1)) char *(__LIBCCALL gets)(char *__restrict __buf) __THROWS(...) { return :: gets(__buf); })
 #elif defined(__CRT_HAVE_gets)
@@ -1825,7 +1825,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(gets, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNU
 
 #if defined(__USE_ISOC99) || defined(__USE_DOS)
 #ifndef __std_vsscanf_defined
-#define __std_vsscanf_defined 1
+#define __std_vsscanf_defined
 #ifdef __vsscanf_defined
 /* >> sscanf(3), vsscanf(3)
  * Scan data from a given `input' string, following `format'
@@ -1975,7 +1975,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(sprintf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_L
 
 #if defined(__USE_ISOC99) || defined(__USE_UNIX98) || defined(__USE_DOS)
 #ifndef __std_vsnprintf_defined
-#define __std_vsnprintf_defined 1
+#define __std_vsnprintf_defined
 #ifdef __vsnprintf_defined
 /* >> snprintf(3), vsnprintf(3)
  * Print  a formatted string to a given in-member string buffer `buf'
@@ -2012,7 +2012,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(vsnprintf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR
 #endif /* !... */
 #endif /* !__std_vsnprintf_defined */
 #ifndef __std_snprintf_defined
-#define __std_snprintf_defined 1
+#define __std_snprintf_defined
 #ifdef __snprintf_defined
 /* >> snprintf(3), vsnprintf(3)
  * Print  a formatted string to a given in-member string buffer `buf'
@@ -2057,11 +2057,11 @@ __NAMESPACE_STD_END
 
 #ifndef __CXX_SYSTEM_HEADER
 #if !defined(__remove_defined) && defined(__std_remove_defined)
-#define __remove_defined 1
+#define __remove_defined
 __NAMESPACE_STD_USING(remove)
 #endif /* !__remove_defined && __std_remove_defined */
 #if !defined(__rename_defined) && defined(__std_rename_defined)
-#define __rename_defined 1
+#define __rename_defined
 __NAMESPACE_STD_USING(rename)
 #endif /* !__rename_defined && __std_rename_defined */
 #ifdef __CRT_HAVE_tmpnam
@@ -2129,7 +2129,7 @@ __NAMESPACE_STD_USING(feof)
 __NAMESPACE_STD_USING(ferror)
 #endif /* __CRT_HAVE_ferror || __CRT_HAVE__IO_ferror || __CRT_HAVE_ferror_unlocked */
 #if !defined(__perror_defined) && defined(__std_perror_defined)
-#define __perror_defined 1
+#define __perror_defined
 __NAMESPACE_STD_USING(perror)
 #endif /* !__perror_defined && __std_perror_defined */
 #if (defined(__CRT_HAVE_tmpfile) && (!defined(__USE_FILE_OFFSET64) || !defined(__O_LARGEFILE) || !__O_LARGEFILE)) || defined(__CRT_HAVE_tmpfile64)
@@ -2160,11 +2160,11 @@ __NAMESPACE_STD_USING(vprintf)
 __NAMESPACE_STD_USING(printf)
 #endif /* __CRT_HAVE_printf || __CRT_HAVE__IO_printf || __CRT_HAVE_printf_s || __CRT_HAVE_printf_unlocked || __CRT_HAVE_vprintf || __CRT_HAVE_vprintf_s || __CRT_HAVE_vprintf_unlocked || (!__NO_STDSTREAMS && (__CRT_HAVE_vfprintf || __CRT_HAVE_vfprintf_s || __CRT_HAVE__IO_vfprintf || __CRT_HAVE_vfprintf_unlocked || __CRT_HAVE_file_printer || __CRT_HAVE_file_printer_unlocked || __CRT_HAVE_fputc || __CRT_HAVE_putc || __CRT_HAVE__IO_putc || __CRT_HAVE_fputc_unlocked || __CRT_HAVE_putc_unlocked || (__CRT_DOS && __CRT_HAVE__flsbuf) || __CRT_HAVE_fwrite || __CRT_HAVE__IO_fwrite || __CRT_HAVE_fwrite_s || __CRT_HAVE_fwrite_unlocked || __CRT_HAVE__fwrite_nolock)) */
 #if !defined(__vfscanf_defined) && defined(__std_vfscanf_defined)
-#define __vfscanf_defined 1
+#define __vfscanf_defined
 __NAMESPACE_STD_USING(vfscanf)
 #endif /* !__vfscanf_defined && __std_vfscanf_defined */
 #if !defined(__vscanf_defined) && defined(__std_vscanf_defined)
-#define __vscanf_defined 1
+#define __vscanf_defined
 __NAMESPACE_STD_USING(vscanf)
 #endif /* !__vscanf_defined && __std_vscanf_defined */
 #if defined(__CRT_HAVE_fscanf) || defined(__CRT_HAVE_fscanf_unlocked) || defined(__CRT_HAVE_vfscanf) || defined(__CRT_HAVE__vfscanf) || defined(__CRT_HAVE__vfscanf_s) || defined(__CRT_HAVE__IO_vfscanf) || defined(__CRT_HAVE_vfscanf_unlocked) || defined(__CRT_HAVE___vfscanf) || ((defined(__CRT_HAVE_fgetc) || defined(__CRT_HAVE_getc) || defined(__CRT_HAVE__IO_getc) || defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked) || (defined(__CRT_DOS) && defined(__CRT_HAVE__filbuf)) || defined(__CRT_HAVE_fread) || defined(__CRT_HAVE__IO_fread) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock)) && (defined(__CRT_HAVE_ungetc) || defined(__CRT_HAVE__IO_ungetc) || defined(__CRT_HAVE_ungetc_unlocked) || defined(__CRT_HAVE__ungetc_nolock)))
@@ -2174,22 +2174,22 @@ __NAMESPACE_STD_USING(fscanf)
 __NAMESPACE_STD_USING(scanf)
 #endif /* __CRT_HAVE_scanf || __CRT_HAVE_scanf_unlocked || __CRT_HAVE_vscanf || __CRT_HAVE__vscanf || __CRT_HAVE_vscanf_unlocked || (!__NO_STDSTREAMS && (__CRT_HAVE_vfscanf || __CRT_HAVE__vfscanf || __CRT_HAVE__vfscanf_s || __CRT_HAVE__IO_vfscanf || __CRT_HAVE_vfscanf_unlocked || __CRT_HAVE___vfscanf || ((__CRT_HAVE_fgetc || __CRT_HAVE_getc || __CRT_HAVE__IO_getc || __CRT_HAVE_fgetc_unlocked || __CRT_HAVE_getc_unlocked || (__CRT_DOS && __CRT_HAVE__filbuf) || __CRT_HAVE_fread || __CRT_HAVE__IO_fread || __CRT_HAVE_fread_unlocked || __CRT_HAVE__fread_nolock) && (__CRT_HAVE_ungetc || __CRT_HAVE__IO_ungetc || __CRT_HAVE_ungetc_unlocked || __CRT_HAVE__ungetc_nolock)))) */
 #if !defined(__gets_defined) && defined(__std_gets_defined)
-#define __gets_defined 1
+#define __gets_defined
 __NAMESPACE_STD_USING(gets)
 #endif /* !__gets_defined && __std_gets_defined */
 #if !defined(__vsscanf_defined) && defined(__std_vsscanf_defined)
-#define __vsscanf_defined 1
+#define __vsscanf_defined
 __NAMESPACE_STD_USING(vsscanf)
 #endif /* !__vsscanf_defined && __std_vsscanf_defined */
 __NAMESPACE_STD_USING(sscanf)
 __NAMESPACE_STD_USING(vsprintf)
 __NAMESPACE_STD_USING(sprintf)
 #if !defined(__vsnprintf_defined) && defined(__std_vsnprintf_defined)
-#define __vsnprintf_defined 1
+#define __vsnprintf_defined
 __NAMESPACE_STD_USING(vsnprintf)
 #endif /* !__vsnprintf_defined && __std_vsnprintf_defined */
 #if !defined(__snprintf_defined) && defined(__std_snprintf_defined)
-#define __snprintf_defined 1
+#define __snprintf_defined
 __NAMESPACE_STD_USING(snprintf)
 #endif /* !__snprintf_defined && __std_snprintf_defined */
 #endif /* !__CXX_SYSTEM_HEADER */
@@ -2694,7 +2694,7 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,ftrylockfile,(_
 
 #ifdef __USE_POSIX
 #ifndef __ctermid_defined
-#define __ctermid_defined 1
+#define __ctermid_defined
 #ifdef __CRT_HAVE_ctermid
 /* >> ctermid(3)
  * Writes the string "/dev/tty" to `s', or returns a pointer to
@@ -2712,7 +2712,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(ctermid, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_R
 
 #ifdef __USE_REENTRANT
 #ifndef __ctermid_r_defined
-#define __ctermid_r_defined 1
+#define __ctermid_r_defined
 #ifdef __CRT_HAVE_ctermid_r
 /* >> ctermid_r(3)
  * Same as `ctermid', but return `NULL' when `s' is `NULL' */
@@ -2728,7 +2728,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(ctermid_r, __FORCELOCAL __ATTR_ARTIFICIAL char *
 
 #ifdef __USE_XOPEN
 #ifndef __cuserid_defined
-#define __cuserid_defined 1
+#define __cuserid_defined
 #ifdef __CRT_HAVE_cuserid
 /* >> cuserid(3)
  * Return the name of the current user (`$LOGNAME' or `getpwuid(geteuid())'), storing
@@ -4056,7 +4056,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(scanf_unlocked, __FORCELOCAL __ATTR_ARTIFICIAL _
 #ifdef __USE_SOLARIS
 #if !defined(__USE_XOPEN) || defined(_EVERY_SOURCE)
 #ifndef __getsubopt_defined
-#define __getsubopt_defined 1
+#define __getsubopt_defined
 #ifdef __CRT_HAVE_getsubopt
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_NCX,getsubopt,(char **__restrict __optionp, char *const *__restrict __tokens, char **__restrict __valuep),(__optionp,__tokens,__valuep))
 #else /* __CRT_HAVE_getsubopt */
@@ -4224,7 +4224,7 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __off64_t (__L
 
 #ifdef __USE_NETBSD
 #ifndef __fparseln_defined
-#define __fparseln_defined 1
+#define __fparseln_defined
 #ifdef __CRT_HAVE_fparseln
 /* >> fparseln(3)
  * Parse one line of text from `stream', whilst accounting for
@@ -4269,7 +4269,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(fparseln, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_
 #endif /* !... */
 #endif /* !__fparseln_defined */
 #ifndef __fpurge_defined
-#define __fpurge_defined 1
+#define __fpurge_defined
 #ifdef __CRT_HAVE___fpurge
 /* >> __fpurge(3)
  * Discard all pending buffered I/O on `stream' */
@@ -4283,12 +4283,12 @@ __CDECLARE_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,fpurge,(__FILE *__stream),(__s
 #endif /* !... */
 #endif /* !__fpurge_defined */
 #if !defined(__fgetln_defined) && defined(__CRT_HAVE_fgetln)
-#define __fgetln_defined 1
+#define __fgetln_defined
 /* >> fgetln(3) */
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),char *,__NOTHROW_NCX,fgetln,(__FILE *__restrict __fp, __SIZE_TYPE__ *__restrict __lenp),(__fp,__lenp))
 #endif /* !__fgetln_defined && __CRT_HAVE_fgetln */
 #if !defined(__fmtcheck_defined) && defined(__CRT_HAVE_fmtcheck)
-#define __fmtcheck_defined 1
+#define __fmtcheck_defined
 /* >> fmtcheck(3)
  * Check if `user_format' may be used as a drop-in replacement for `good_format'
  * in the context of a call to `printf(3)' (or `format_printf()'), such that all
@@ -4305,11 +4305,11 @@ __CDECLARE(__ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((2)) __ATTR_FORMAT_AR
 
 #if defined(__USE_NETBSD) || defined(__USE_KOS)
 #ifndef __off_t_defined
-#define __off_t_defined 1
+#define __off_t_defined
 typedef __FS_TYPE(off) off_t;
 #endif /* !__off_t_defined */
 #ifndef __funopen_defined
-#define __funopen_defined 1
+#define __funopen_defined
 #if defined(__CRT_HAVE_funopen) && __FS_SIZEOF(OFF) == __SIZEOF_OFF32_T__
 /* >> funopen(3), funopen64(3) */
 __CDECLARE(__ATTR_WUNUSED,__FILE *,__NOTHROW_NCX,funopen,(void const *__cookie, int (__LIBKCALL *__readfn)(void *__cookie, char *__buf, int __num_bytes), int (__LIBKCALL *__writefn)(void *__cookie, char const *__buf, int __num_bytes), off_t (__LIBKCALL *__seekfn)(void *__cookie, off_t __off, int __whence), int (__LIBKCALL *__closefn)(void *__cookie)),(__cookie,__readfn,__writefn,__seekfn,__closefn))
@@ -4328,7 +4328,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(funopen, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_W
 #endif /* !... */
 #endif /* !__funopen_defined */
 #ifndef __funopen2_defined
-#define __funopen2_defined 1
+#define __funopen2_defined
 #if defined(__CRT_HAVE_funopen2) && __FS_SIZEOF(OFF) == __SIZEOF_OFF32_T__
 /* >> funopen2(3), funopen2_64(3) */
 __CDECLARE(__ATTR_WUNUSED,__FILE *,__NOTHROW_NCX,funopen2,(void const *__cookie, ssize_t (__LIBKCALL *__readfn)(void *__cookie, void *__buf, size_t __num_bytes), ssize_t (__LIBKCALL *__writefn)(void *__cookie, void const *__buf, size_t __num_bytes), off_t (__LIBKCALL *__seekfn)(void *__cookie, off_t __off, int __whence), int (__LIBKCALL *__flushfn)(void *__cookie), int (__LIBKCALL *__closefn)(void *__cookie)),(__cookie,__readfn,__writefn,__seekfn,__flushfn,__closefn))
@@ -4345,7 +4345,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(funopen2, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_
 #endif /* !__funopen2_defined */
 #ifdef __USE_LARGEFILE64
 #ifndef __off64_t_defined
-#define __off64_t_defined 1
+#define __off64_t_defined
 typedef __off64_t off_t;
 #endif /* !__off64_t_defined */
 #if defined(__CRT_HAVE_funopen) && __SIZEOF_OFF64_T__ == __SIZEOF_OFF32_T__
@@ -4422,28 +4422,28 @@ __SYSDECL_END
 
 #ifdef __CC__
 #ifndef __errno_t_defined
-#define __errno_t_defined 1
+#define __errno_t_defined
 typedef __errno_t errno_t;
 #endif /* !__errno_t_defined */
 
 #ifndef __rsize_t_defined
-#define __rsize_t_defined 1
+#define __rsize_t_defined
 typedef __SIZE_TYPE__ rsize_t;
 #endif /* !__rsize_t_defined */
 
 #ifndef __size_t_defined
-#define __size_t_defined 1
+#define __size_t_defined
 typedef __SIZE_TYPE__ size_t;
 #endif /* !__size_t_defined */
 
 #ifndef __std_FILE_defined
-#define __std_FILE_defined 1
+#define __std_FILE_defined
 __NAMESPACE_STD_BEGIN
 typedef __FILE FILE;
 __NAMESPACE_STD_END
 #endif /* !__std_FILE_defined */
 #ifndef __FILE_defined
-#define __FILE_defined 1
+#define __FILE_defined
 __NAMESPACE_STD_USING(FILE)
 #endif /* !__FILE_defined */
 
@@ -4451,7 +4451,7 @@ __NAMESPACE_STD_USING(FILE)
 #ifndef _CRT_DIRECTORY_DEFINED
 #define _CRT_DIRECTORY_DEFINED 1
 #ifndef __unlink_defined
-#define __unlink_defined 1
+#define __unlink_defined
 #ifdef __CRT_HAVE_unlink
 /* >> unlink(2)
  * Remove a file, symbolic link, device or FIFO referred to by `file' */
@@ -4473,7 +4473,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(unlink, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NO
 #endif /* !... */
 #endif /* !__unlink_defined */
 #ifndef ___unlink_defined
-#define ___unlink_defined 1
+#define ___unlink_defined
 #ifdef __CRT_HAVE_unlink
 /* >> unlink(2)
  * Remove a file, symbolic link, device or FIFO referred to by `file' */
@@ -5785,7 +5785,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(vsnprintf_s, __FORCELOCAL __ATTR_ARTIFICIAL __AT
 #endif /* __USE_DOS_SLIB */
 
 #ifndef _CRT_WPERROR_DEFINED
-#define _CRT_WPERROR_DEFINED 1
+#define _CRT_WPERROR_DEFINED
 #ifdef __CRT_HAVE__wperror
 __CDECLARE_VOID(__ATTR_COLD,__THROWING,_wperror,(__WCHAR_TYPE__ const *__restrict __message),(__message))
 #else /* __CRT_HAVE__wperror */
@@ -6237,11 +6237,11 @@ __CREDIRECT(,int,__NOTHROW_RPC,rmtmp,(void),_rmtmp,())
 
 /* Define 'wchar_t' */
 #ifndef __wchar_t_defined
-#define __wchar_t_defined 1
+#define __wchar_t_defined
 typedef __WCHAR_TYPE__ wchar_t;
 #endif /* !__wchar_t_defined */
 #ifndef __fgetwc_defined
-#define __fgetwc_defined 1
+#define __fgetwc_defined
 #ifdef __std_fgetwc_defined
 /* >> fgetwc(3) */
 __NAMESPACE_STD_USING(fgetwc)
@@ -6256,7 +6256,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),wint_t,__THROWING,fgetwc,(FILE *__restrict __str
 #endif /* !... */
 #endif /* !__fgetwc_defined */
 #ifndef __fputwc_defined
-#define __fputwc_defined 1
+#define __fputwc_defined
 #ifdef __std_fputwc_defined
 /* >> fputwc(3) */
 __NAMESPACE_STD_USING(fputwc)
@@ -6271,7 +6271,7 @@ __CREDIRECT(__ATTR_NONNULL((2)),wint_t,__THROWING,fputwc,(wchar_t __wc, FILE *__
 #endif /* !... */
 #endif /* !__fputwc_defined */
 #ifndef __getwc_defined
-#define __getwc_defined 1
+#define __getwc_defined
 #ifdef __CRT_HAVE_fgetwc
 /* >> fgetwc(3) */
 __CREDIRECT(__ATTR_NONNULL((1)),wint_t,__THROWING,getwc,(FILE *__restrict __stream),fgetwc,(__stream))
@@ -6283,7 +6283,7 @@ __CDECLARE(__ATTR_NONNULL((1)),wint_t,__THROWING,getwc,(FILE *__restrict __strea
 #endif /* !... */
 #endif /* !__getwc_defined */
 #ifndef __getwchar_defined
-#define __getwchar_defined 1
+#define __getwchar_defined
 #ifdef __std_getwchar_defined
 /* >> getwchar(3) */
 __NAMESPACE_STD_USING(getwchar)
@@ -6302,7 +6302,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(getwchar, __FORCELOCAL __ATTR_ARTIFICIAL wint_t 
 #endif /* !... */
 #endif /* !__getwchar_defined */
 #ifndef __putwc_defined
-#define __putwc_defined 1
+#define __putwc_defined
 #ifdef __CRT_HAVE_fputwc
 /* >> fputwc(3) */
 __CREDIRECT(__ATTR_NONNULL((2)),wint_t,__THROWING,putwc,(wchar_t __wc, FILE *__stream),fputwc,(__wc,__stream))
@@ -6314,7 +6314,7 @@ __CDECLARE(__ATTR_NONNULL((2)),wint_t,__THROWING,putwc,(wchar_t __wc, FILE *__st
 #endif /* !... */
 #endif /* !__putwc_defined */
 #ifndef __putwchar_defined
-#define __putwchar_defined 1
+#define __putwchar_defined
 #ifdef __std_putwchar_defined
 /* >> putwchar(3) */
 __NAMESPACE_STD_USING(putwchar)
@@ -6333,7 +6333,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(putwchar, __FORCELOCAL __ATTR_ARTIFICIAL wint_t 
 #endif /* !... */
 #endif /* !__putwchar_defined */
 #ifndef __ungetwc_defined
-#define __ungetwc_defined 1
+#define __ungetwc_defined
 #ifdef __std_ungetwc_defined
 /* >> ungetwc(3) */
 __NAMESPACE_STD_USING(ungetwc)
@@ -6351,7 +6351,7 @@ __CREDIRECT(__ATTR_NONNULL((2)),wint_t,__NOTHROW_NCX,ungetwc,(wint_t __wc, FILE 
 #endif /* !... */
 #endif /* !__ungetwc_defined */
 #ifndef __fgetws_defined
-#define __fgetws_defined 1
+#define __fgetws_defined
 #ifdef __std_fgetws_defined
 /* >> fgetws(3) */
 __NAMESPACE_STD_USING(fgetws)
@@ -6379,7 +6379,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(fgetws, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WU
 #endif /* !... */
 #endif /* !__fgetws_defined */
 #ifndef __fputws_defined
-#define __fputws_defined 1
+#define __fputws_defined
 #ifdef __std_fputws_defined
 /* >> fputws(3) */
 __NAMESPACE_STD_USING(fputws)
@@ -6407,7 +6407,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(fputws, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NO
 #endif /* !... */
 #endif /* !__fputws_defined */
 #ifndef __vfwprintf_defined
-#define __vfwprintf_defined 1
+#define __vfwprintf_defined
 #ifdef __std_vfwprintf_defined
 /* >> vfwprintf(3) */
 __NAMESPACE_STD_USING(vfwprintf)
@@ -6423,7 +6423,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(vfwprintf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR
 #endif /* !... */
 #endif /* !__vfwprintf_defined */
 #ifndef __fwprintf_defined
-#define __fwprintf_defined 1
+#define __fwprintf_defined
 #ifdef __std_fwprintf_defined
 /* >> fwprintf(3) */
 __NAMESPACE_STD_USING(fwprintf)
@@ -6443,7 +6443,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(fwprintf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_
 #endif /* !... */
 #endif /* !__fwprintf_defined */
 #ifndef __vfwscanf_defined
-#define __vfwscanf_defined 1
+#define __vfwscanf_defined
 #ifdef __std_vfwscanf_defined
 /* >> vfwscanf(3) */
 __NAMESPACE_STD_USING(vfwscanf)
@@ -6455,7 +6455,7 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_LIBC_WSCANF(2, 0) __ATTR_NONNULL((1, 2)),__STDC
 #endif /* !... */
 #endif /* !__vfwscanf_defined */
 #ifndef __fwscanf_defined
-#define __fwscanf_defined 1
+#define __fwscanf_defined
 #ifdef __std_fwscanf_defined
 /* >> fwscanf(3) */
 __NAMESPACE_STD_USING(fwscanf)
@@ -6475,7 +6475,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(fwscanf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_L
 #endif /* !... */
 #endif /* !__fwscanf_defined */
 #ifndef __vwprintf_defined
-#define __vwprintf_defined 1
+#define __vwprintf_defined
 #ifdef __std_vwprintf_defined
 /* >> vwprintf(3) */
 __NAMESPACE_STD_USING(vwprintf)
@@ -6491,7 +6491,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(vwprintf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_
 #endif /* !... */
 #endif /* !__vwprintf_defined */
 #ifndef __wprintf_defined
-#define __wprintf_defined 1
+#define __wprintf_defined
 #ifdef __std_wprintf_defined
 /* >> wprintf(3) */
 __NAMESPACE_STD_USING(wprintf)
@@ -6511,7 +6511,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(wprintf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_L
 #endif /* !... */
 #endif /* !__wprintf_defined */
 #ifndef __vwscanf_defined
-#define __vwscanf_defined 1
+#define __vwscanf_defined
 #ifdef __std_vwscanf_defined
 /* >> vwscanf(3) */
 __NAMESPACE_STD_USING(vwscanf)
@@ -6527,7 +6527,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(vwscanf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_W
 #endif /* !... */
 #endif /* !__vwscanf_defined */
 #ifndef __wscanf_defined
-#define __wscanf_defined 1
+#define __wscanf_defined
 #ifdef __std_wscanf_defined
 /* >> wscanf(3) */
 __NAMESPACE_STD_USING(wscanf)
@@ -6547,7 +6547,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(wscanf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LI
 #endif /* !... */
 #endif /* !__wscanf_defined */
 #ifndef __vswscanf_defined
-#define __vswscanf_defined 1
+#define __vswscanf_defined
 #ifdef __std_vswscanf_defined
 /* >> vswscanf(3) */
 __NAMESPACE_STD_USING(vswscanf)
@@ -6561,7 +6561,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(vswscanf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_
 #endif /* !... */
 #endif /* !__vswscanf_defined */
 #ifndef __swscanf_defined
-#define __swscanf_defined 1
+#define __swscanf_defined
 #ifdef __std_swscanf_defined
 /* >> swscanf(3) */
 __NAMESPACE_STD_USING(swscanf)
@@ -6580,7 +6580,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(swscanf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_L
 #endif /* !__swscanf_defined */
 #ifdef __USE_DOS_SLIB
 #ifndef __vswprintf_s_defined
-#define __vswprintf_s_defined 1
+#define __vswprintf_s_defined
 #ifdef __CRT_HAVE_vswprintf
 /* >> vswprintf(3) */
 __CREDIRECT(__ATTR_LIBC_WPRINTF(3, 0) __ATTR_NONNULL((3)),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,vswprintf_s,(wchar_t *__restrict __buf, size_t __buflen, wchar_t const *__restrict __format, __builtin_va_list __args),vswprintf,(__buf,__buflen,__format,__args))
@@ -6591,7 +6591,7 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LIBC_WPRINTF(3, 0) __ATTR_NONNULL((3)) __S
 #endif /* !__CRT_HAVE_vswprintf */
 #endif /* !__vswprintf_s_defined */
 #ifndef __swprintf_s_defined
-#define __swprintf_s_defined 1
+#define __swprintf_s_defined
 #ifdef __CRT_HAVE_swprintf
 /* >> swprintf(3) */
 __LIBC __ATTR_LIBC_WPRINTF(3, 4) __ATTR_NONNULL((3)) __STDC_INT_AS_SIZE_T __NOTHROW_NCX(__VLIBCCALL swprintf_s)(wchar_t *__restrict __buf, size_t __buflen, wchar_t const *__restrict __format, ...) __CASMNAME("swprintf");
@@ -6605,7 +6605,7 @@ __LIBC __ATTR_LIBC_WPRINTF(3, 4) __ATTR_NONNULL((3)) __STDC_INT_AS_SIZE_T __NOTH
 #endif /* !... */
 #endif /* !__swprintf_s_defined */
 #ifndef __vfwprintf_s_defined
-#define __vfwprintf_s_defined 1
+#define __vfwprintf_s_defined
 #ifdef __CRT_HAVE_vfwprintf
 /* >> vfwprintf(3) */
 __CREDIRECT(__ATTR_LIBC_WPRINTF(2, 0) __ATTR_NONNULL((1, 2)),__STDC_INT_AS_SIZE_T,__THROWING,vfwprintf_s,(FILE *__restrict __stream, wchar_t const *__restrict __format, __builtin_va_list __args),vfwprintf,(__stream,__format,__args))
@@ -6618,7 +6618,7 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LIBC_WPRINTF(2, 0) __ATTR_NONNULL((1, 2)) 
 #endif /* !... */
 #endif /* !__vfwprintf_s_defined */
 #ifndef __fwprintf_s_defined
-#define __fwprintf_s_defined 1
+#define __fwprintf_s_defined
 #ifdef __CRT_HAVE_fwprintf
 /* >> fwprintf(3) */
 __LIBC __ATTR_LIBC_WPRINTF(2, 3) __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SIZE_T (__VLIBCCALL fwprintf_s)(FILE *__restrict __stream, wchar_t const *__restrict __format, ...) __THROWS(...) __CASMNAME("fwprintf");
@@ -6631,7 +6631,7 @@ __LIBC __ATTR_LIBC_WPRINTF(2, 3) __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SIZE_T (__
 #endif /* !... */
 #endif /* !__fwprintf_s_defined */
 #ifndef __vwprintf_s_defined
-#define __vwprintf_s_defined 1
+#define __vwprintf_s_defined
 #ifdef __CRT_HAVE_vwprintf
 /* >> vwprintf(3) */
 __CREDIRECT(__ATTR_LIBC_WPRINTF(1, 0) __ATTR_NONNULL((1)),__STDC_INT_AS_SIZE_T,__THROWING,vwprintf_s,(wchar_t const *__restrict __format, __builtin_va_list __args),vwprintf,(__format,__args))
@@ -6644,7 +6644,7 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LIBC_WPRINTF(1, 0) __ATTR_NONNULL((1)) __S
 #endif /* !... */
 #endif /* !__vwprintf_s_defined */
 #ifndef __wprintf_s_defined
-#define __wprintf_s_defined 1
+#define __wprintf_s_defined
 #ifdef __CRT_HAVE_wprintf
 /* >> wprintf(3) */
 __LIBC __ATTR_LIBC_WPRINTF(1, 2) __ATTR_NONNULL((1)) __STDC_INT_AS_SIZE_T (__VLIBCCALL wprintf_s)(wchar_t const *__restrict __format, ...) __THROWS(...) __CASMNAME("wprintf");
@@ -6657,7 +6657,7 @@ __LIBC __ATTR_LIBC_WPRINTF(1, 2) __ATTR_NONNULL((1)) __STDC_INT_AS_SIZE_T (__VLI
 #endif /* !... */
 #endif /* !__wprintf_s_defined */
 #ifndef __vswscanf_s_defined
-#define __vswscanf_s_defined 1
+#define __vswscanf_s_defined
 #ifdef __CRT_HAVE_vswscanf
 /* >> vswscanf(3) */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_LIBC_WSCANF(2, 0) __ATTR_NONNULL((1, 2)),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,vswscanf_s,(wchar_t const *__restrict __src, wchar_t const *__restrict __format, __builtin_va_list __args),vswscanf,(__src,__format,__args))
@@ -6668,7 +6668,7 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_LIBC_WSCANF(2, 0) __ATTR_NO
 #endif /* !__CRT_HAVE_vswscanf */
 #endif /* !__vswscanf_s_defined */
 #ifndef __swscanf_s_defined
-#define __swscanf_s_defined 1
+#define __swscanf_s_defined
 #ifdef __CRT_HAVE_swscanf
 /* >> swscanf(3) */
 __LIBC __ATTR_LIBC_WSCANF(2, 3) __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SIZE_T __NOTHROW_NCX(__VLIBCCALL swscanf_s)(wchar_t const *__restrict __src, wchar_t const *__restrict __format, ...) __CASMNAME("swscanf");
@@ -6679,12 +6679,12 @@ __LIBC __ATTR_LIBC_WSCANF(2, 3) __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SIZE_T __NO
 #endif /* !__CRT_HAVE_swscanf */
 #endif /* !__swscanf_s_defined */
 #if !defined(__vfwscanf_s_defined) && defined(__CRT_HAVE_vfwscanf)
-#define __vfwscanf_s_defined 1
+#define __vfwscanf_s_defined
 /* >> vfwscanf(3) */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_LIBC_WSCANF(2, 0) __ATTR_NONNULL((1, 2)),__STDC_INT_AS_SIZE_T,__THROWING,vfwscanf_s,(FILE *__restrict __stream, wchar_t const *__restrict __format, __builtin_va_list __args),vfwscanf,(__stream,__format,__args))
 #endif /* !__vfwscanf_s_defined && __CRT_HAVE_vfwscanf */
 #ifndef __fwscanf_s_defined
-#define __fwscanf_s_defined 1
+#define __fwscanf_s_defined
 #ifdef __CRT_HAVE_fwscanf
 /* >> fwscanf(3) */
 __LIBC __ATTR_LIBC_WSCANF(2, 3) __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SIZE_T (__VLIBCCALL fwscanf_s)(FILE *__restrict __stream, wchar_t const *__restrict __format, ...) __THROWS(...) __CASMNAME("fwscanf");
@@ -6697,7 +6697,7 @@ __LIBC __ATTR_LIBC_WSCANF(2, 3) __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SIZE_T (__V
 #endif /* !... */
 #endif /* !__fwscanf_s_defined */
 #ifndef __vwscanf_s_defined
-#define __vwscanf_s_defined 1
+#define __vwscanf_s_defined
 #ifdef __CRT_HAVE_vwscanf
 /* >> vwscanf(3) */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_LIBC_WSCANF(1, 0) __ATTR_NONNULL((1)),__STDC_INT_AS_SIZE_T,__THROWING,vwscanf_s,(wchar_t const *__restrict __format, __builtin_va_list __args),vwscanf,(__format,__args))
@@ -6710,7 +6710,7 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_LIBC_WSCANF(1, 0) __ATTR_NO
 #endif /* !... */
 #endif /* !__vwscanf_s_defined */
 #ifndef __wscanf_s_defined
-#define __wscanf_s_defined 1
+#define __wscanf_s_defined
 #ifdef __CRT_HAVE_wscanf
 /* >> wscanf(3) */
 __LIBC __ATTR_LIBC_WSCANF(1, 2) __ATTR_NONNULL((1)) __STDC_INT_AS_SIZE_T (__VLIBCCALL wscanf_s)(wchar_t const *__restrict __format, ...) __THROWS(...) __CASMNAME("wscanf");
@@ -6724,7 +6724,7 @@ __LIBC __ATTR_LIBC_WSCANF(1, 2) __ATTR_NONNULL((1)) __STDC_INT_AS_SIZE_T (__VLIB
 #endif /* !__wscanf_s_defined */
 #endif /* __USE_DOS_SLIB */
 #ifndef ___vscwprintf_defined
-#define ___vscwprintf_defined 1
+#define ___vscwprintf_defined
 #ifdef __CRT_HAVE__vscwprintf
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,_vscwprintf,(wchar_t const *__format, __builtin_va_list __args),(__format,__args))
 #else /* __CRT_HAVE__vscwprintf */
@@ -6733,7 +6733,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_vscwprintf, __FORCELOCAL __ATTR_ARTIFICIAL __AT
 #endif /* !__CRT_HAVE__vscwprintf */
 #endif /* !___vscwprintf_defined */
 #ifndef ___scwprintf_defined
-#define ___scwprintf_defined 1
+#define ___scwprintf_defined
 #ifdef __CRT_HAVE__scwprintf
 __LIBC __ATTR_WUNUSED __ATTR_NONNULL((1)) __STDC_INT_AS_SSIZE_T __NOTHROW_NCX(__VLIBCCALL _scwprintf)(wchar_t const *__format, ...) __CASMNAME_SAME("_scwprintf");
 #else /* __CRT_HAVE__scwprintf */
@@ -6746,7 +6746,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_scwprintf, __FORCELOCAL __ATTR_ARTIFICIAL __ATT
 #endif /* !__CRT_HAVE__scwprintf */
 #endif /* !___scwprintf_defined */
 #ifndef ___vscwprintf_p_defined
-#define ___vscwprintf_p_defined 1
+#define ___vscwprintf_p_defined
 #ifdef __CRT_HAVE__vscwprintf_p
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,_vscwprintf_p,(wchar_t const *__format, __builtin_va_list __args),(__format,__args))
 #else /* __CRT_HAVE__vscwprintf_p */
@@ -6755,7 +6755,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_vscwprintf_p, __FORCELOCAL __ATTR_ARTIFICIAL __
 #endif /* !__CRT_HAVE__vscwprintf_p */
 #endif /* !___vscwprintf_p_defined */
 #ifndef ___scwprintf_p_defined
-#define ___scwprintf_p_defined 1
+#define ___scwprintf_p_defined
 #ifdef __CRT_HAVE__scwprintf_p
 __LIBC __ATTR_WUNUSED __ATTR_NONNULL((1)) __STDC_INT_AS_SSIZE_T __NOTHROW_NCX(__VLIBCCALL _scwprintf_p)(wchar_t const *__format, ...) __CASMNAME_SAME("_scwprintf_p");
 #else /* __CRT_HAVE__scwprintf_p */
@@ -6768,7 +6768,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_scwprintf_p, __FORCELOCAL __ATTR_ARTIFICIAL __A
 #endif /* !__CRT_HAVE__scwprintf_p */
 #endif /* !___scwprintf_p_defined */
 #ifndef ___vscwprintf_l_defined
-#define ___vscwprintf_l_defined 1
+#define ___vscwprintf_l_defined
 #ifdef __CRT_HAVE__vscwprintf_l
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,_vscwprintf_l,(wchar_t const *__format, __locale_t __locale, __builtin_va_list __args),(__format,__locale,__args))
 #else /* __CRT_HAVE__vscwprintf_l */
@@ -6777,7 +6777,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_vscwprintf_l, __FORCELOCAL __ATTR_ARTIFICIAL __
 #endif /* !__CRT_HAVE__vscwprintf_l */
 #endif /* !___vscwprintf_l_defined */
 #ifndef ___scwprintf_l_defined
-#define ___scwprintf_l_defined 1
+#define ___scwprintf_l_defined
 #ifdef __CRT_HAVE__scwprintf_l
 __LIBC __ATTR_WUNUSED __ATTR_NONNULL((1)) __STDC_INT_AS_SSIZE_T __NOTHROW_NCX(__VLIBCCALL _scwprintf_l)(wchar_t const *__format, __locale_t __locale, ...) __CASMNAME_SAME("_scwprintf_l");
 #else /* __CRT_HAVE__scwprintf_l */
@@ -6790,7 +6790,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_scwprintf_l, __FORCELOCAL __ATTR_ARTIFICIAL __A
 #endif /* !__CRT_HAVE__scwprintf_l */
 #endif /* !___scwprintf_l_defined */
 #ifndef ___vscwprintf_p_l_defined
-#define ___vscwprintf_p_l_defined 1
+#define ___vscwprintf_p_l_defined
 #ifdef __CRT_HAVE__vscwprintf_p_l
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,_vscwprintf_p_l,(wchar_t const *__format, __locale_t __locale, __builtin_va_list __args),(__format,__locale,__args))
 #else /* __CRT_HAVE__vscwprintf_p_l */
@@ -6799,7 +6799,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_vscwprintf_p_l, __FORCELOCAL __ATTR_ARTIFICIAL 
 #endif /* !__CRT_HAVE__vscwprintf_p_l */
 #endif /* !___vscwprintf_p_l_defined */
 #ifndef ___scwprintf_p_l_defined
-#define ___scwprintf_p_l_defined 1
+#define ___scwprintf_p_l_defined
 #ifdef __CRT_HAVE__scwprintf_p_l
 __LIBC __ATTR_WUNUSED __ATTR_NONNULL((1)) __STDC_INT_AS_SSIZE_T __NOTHROW_NCX(__VLIBCCALL _scwprintf_p_l)(wchar_t const *__format, __locale_t __locale, ...) __CASMNAME_SAME("_scwprintf_p_l");
 #else /* __CRT_HAVE__scwprintf_p_l */
@@ -6812,7 +6812,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_scwprintf_p_l, __FORCELOCAL __ATTR_ARTIFICIAL _
 #endif /* !__CRT_HAVE__scwprintf_p_l */
 #endif /* !___scwprintf_p_l_defined */
 #ifndef ___vswprintf_c_defined
-#define ___vswprintf_c_defined 1
+#define ___vswprintf_c_defined
 #ifdef __CRT_HAVE_vswprintf
 /* >> vswprintf(3) */
 __CREDIRECT(__ATTR_LIBC_WPRINTF(3, 0) __ATTR_NONNULL((3)),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,_vswprintf_c,(wchar_t *__restrict __buf, size_t __buflen, wchar_t const *__restrict __format, __builtin_va_list __args),vswprintf,(__buf,__buflen,__format,__args))
@@ -6823,7 +6823,7 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LIBC_WPRINTF(3, 0) __ATTR_NONNULL((3)) __S
 #endif /* !__CRT_HAVE_vswprintf */
 #endif /* !___vswprintf_c_defined */
 #ifndef ___swprintf_c_defined
-#define ___swprintf_c_defined 1
+#define ___swprintf_c_defined
 #ifdef __CRT_HAVE_swprintf
 /* >> swprintf(3) */
 __LIBC __ATTR_LIBC_WPRINTF(3, 4) __ATTR_NONNULL((3)) __STDC_INT_AS_SIZE_T __NOTHROW_NCX(__VLIBCCALL _swprintf_c)(wchar_t *__restrict __buf, size_t __buflen, wchar_t const *__restrict __format, ...) __CASMNAME("swprintf");
@@ -6837,7 +6837,7 @@ __LIBC __ATTR_LIBC_WPRINTF(3, 4) __ATTR_NONNULL((3)) __STDC_INT_AS_SIZE_T __NOTH
 #endif /* !... */
 #endif /* !___swprintf_c_defined */
 #ifndef ___vsnwprintf_s_defined
-#define ___vsnwprintf_s_defined 1
+#define ___vsnwprintf_s_defined
 #ifdef __CRT_HAVE__vsnwprintf_s
 __CDECLARE(__ATTR_NONNULL((4)),__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,_vsnwprintf_s,(wchar_t *__buf, __SIZE_TYPE__ __bufsize, __SIZE_TYPE__ __buflen, wchar_t const *__format, __builtin_va_list __args),(__buf,__bufsize,__buflen,__format,__args))
 #else /* __CRT_HAVE__vsnwprintf_s */
@@ -6846,7 +6846,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_vsnwprintf_s, __FORCELOCAL __ATTR_ARTIFICIAL __
 #endif /* !__CRT_HAVE__vsnwprintf_s */
 #endif /* !___vsnwprintf_s_defined */
 #ifndef ___snwprintf_s_defined
-#define ___snwprintf_s_defined 1
+#define ___snwprintf_s_defined
 #ifdef __CRT_HAVE__snwprintf_s
 __LIBC __ATTR_NONNULL((4)) __STDC_INT_AS_SSIZE_T __NOTHROW_NCX(__VLIBCCALL _snwprintf_s)(wchar_t *__buf, __SIZE_TYPE__ __bufsize, __SIZE_TYPE__ __buflen, wchar_t const *__format, ...) __CASMNAME_SAME("_snwprintf_s");
 #else /* __CRT_HAVE__snwprintf_s */
@@ -6859,7 +6859,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_snwprintf_s, __FORCELOCAL __ATTR_ARTIFICIAL __A
 #endif /* !__CRT_HAVE__snwprintf_s */
 #endif /* !___snwprintf_s_defined */
 #ifndef ___vfwprintf_p_defined
-#define ___vfwprintf_p_defined 1
+#define ___vfwprintf_p_defined
 #ifdef __CRT_HAVE__vfwprintf_p
 __CDECLARE(__ATTR_NONNULL((1, 2)),__STDC_INT_AS_SSIZE_T,__THROWING,_vfwprintf_p,(__FILE *__stream, wchar_t const *__format, __builtin_va_list __args),(__stream,__format,__args))
 #else /* __CRT_HAVE__vfwprintf_p */
@@ -6868,7 +6868,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_vfwprintf_p, __FORCELOCAL __ATTR_ARTIFICIAL __A
 #endif /* !__CRT_HAVE__vfwprintf_p */
 #endif /* !___vfwprintf_p_defined */
 #ifndef ___fwprintf_p_defined
-#define ___fwprintf_p_defined 1
+#define ___fwprintf_p_defined
 #ifdef __CRT_HAVE__fwprintf_p
 __LIBC __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T (__VLIBCCALL _fwprintf_p)(__FILE *__stream, wchar_t const *__format, ...) __THROWS(...) __CASMNAME_SAME("_fwprintf_p");
 #else /* __CRT_HAVE__fwprintf_p */
@@ -6881,7 +6881,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_fwprintf_p, __FORCELOCAL __ATTR_ARTIFICIAL __AT
 #endif /* !__CRT_HAVE__fwprintf_p */
 #endif /* !___fwprintf_p_defined */
 #ifndef ___vwprintf_p_defined
-#define ___vwprintf_p_defined 1
+#define ___vwprintf_p_defined
 #ifdef __CRT_HAVE__vwprintf_p
 __CDECLARE(__ATTR_NONNULL((1)),__STDC_INT_AS_SSIZE_T,__THROWING,_vwprintf_p,(wchar_t const *__format, __builtin_va_list __args),(__format,__args))
 #elif !defined(__NO_STDSTREAMS)
@@ -6892,7 +6892,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_vwprintf_p, __FORCELOCAL __ATTR_ARTIFICIAL __AT
 #endif /* !... */
 #endif /* !___vwprintf_p_defined */
 #ifndef ___wprintf_p_defined
-#define ___wprintf_p_defined 1
+#define ___wprintf_p_defined
 #ifdef __CRT_HAVE__wprintf_p
 __LIBC __ATTR_NONNULL((1)) __STDC_INT_AS_SSIZE_T (__VLIBCCALL _wprintf_p)(wchar_t const *__format, ...) __THROWS(...) __CASMNAME_SAME("_wprintf_p");
 #elif defined(__CRT_HAVE__vwprintf_p) || !defined(__NO_STDSTREAMS)
@@ -6907,7 +6907,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_wprintf_p, __FORCELOCAL __ATTR_ARTIFICIAL __ATT
 #endif /* !... */
 #endif /* !___wprintf_p_defined */
 #ifndef ___vswprintf_p_defined
-#define ___vswprintf_p_defined 1
+#define ___vswprintf_p_defined
 #ifdef __CRT_HAVE__vswprintf_p
 __CDECLARE(__ATTR_NONNULL((1, 3)),__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,_vswprintf_p,(wchar_t *__buf, __SIZE_TYPE__ __bufsize, wchar_t const *__format, __builtin_va_list __args),(__buf,__bufsize,__format,__args))
 #else /* __CRT_HAVE__vswprintf_p */
@@ -6916,7 +6916,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_vswprintf_p, __FORCELOCAL __ATTR_ARTIFICIAL __A
 #endif /* !__CRT_HAVE__vswprintf_p */
 #endif /* !___vswprintf_p_defined */
 #ifndef ___swprintf_p_defined
-#define ___swprintf_p_defined 1
+#define ___swprintf_p_defined
 #ifdef __CRT_HAVE__swprintf_p
 __LIBC __ATTR_NONNULL((1, 3)) __STDC_INT_AS_SSIZE_T __NOTHROW_NCX(__VLIBCCALL _swprintf_p)(wchar_t *__dst, __SIZE_TYPE__ __bufsize, wchar_t const *__format, ...) __CASMNAME_SAME("_swprintf_p");
 #else /* __CRT_HAVE__swprintf_p */
@@ -6929,7 +6929,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_swprintf_p, __FORCELOCAL __ATTR_ARTIFICIAL __AT
 #endif /* !__CRT_HAVE__swprintf_p */
 #endif /* !___swprintf_p_defined */
 #ifndef ___vwprintf_l_defined
-#define ___vwprintf_l_defined 1
+#define ___vwprintf_l_defined
 #ifdef __CRT_HAVE__vwprintf_l
 __CDECLARE(__ATTR_NONNULL((1)),__STDC_INT_AS_SSIZE_T,__THROWING,_vwprintf_l,(wchar_t const *__format, __locale_t __locale, __builtin_va_list __args),(__format,__locale,__args))
 #elif defined(__CRT_HAVE_vwprintf) || ((defined(__CRT_HAVE_vfwprintf) || defined(__CRT_HAVE_file_wprinter) || defined(__CRT_HAVE_file_wprinter_unlocked) || defined(__CRT_HAVE_fputwc) || defined(__CRT_HAVE_putwc)) && !defined(__NO_STDSTREAMS))
@@ -6940,7 +6940,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_vwprintf_l, __FORCELOCAL __ATTR_ARTIFICIAL __AT
 #endif /* !... */
 #endif /* !___vwprintf_l_defined */
 #ifndef ___wprintf_l_defined
-#define ___wprintf_l_defined 1
+#define ___wprintf_l_defined
 #ifdef __CRT_HAVE__wprintf_l
 __LIBC __ATTR_NONNULL((1)) __STDC_INT_AS_SSIZE_T (__VLIBCCALL _wprintf_l)(wchar_t const *__format, __locale_t __locale, ...) __THROWS(...) __CASMNAME_SAME("_wprintf_l");
 #elif defined(__CRT_HAVE__vwprintf_l) || defined(__CRT_HAVE_vwprintf) || ((defined(__CRT_HAVE_vfwprintf) || defined(__CRT_HAVE_file_wprinter) || defined(__CRT_HAVE_file_wprinter_unlocked) || defined(__CRT_HAVE_fputwc) || defined(__CRT_HAVE_putwc)) && !defined(__NO_STDSTREAMS))
@@ -6955,7 +6955,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_wprintf_l, __FORCELOCAL __ATTR_ARTIFICIAL __ATT
 #endif /* !... */
 #endif /* !___wprintf_l_defined */
 #ifndef ___vwprintf_p_l_defined
-#define ___vwprintf_p_l_defined 1
+#define ___vwprintf_p_l_defined
 #ifdef __CRT_HAVE__vwprintf_p_l
 __CDECLARE(__ATTR_NONNULL((1)),__STDC_INT_AS_SSIZE_T,__THROWING,_vwprintf_p_l,(wchar_t const *__format, __locale_t __locale, __builtin_va_list __args),(__format,__locale,__args))
 #elif defined(__CRT_HAVE__vwprintf_p) || !defined(__NO_STDSTREAMS)
@@ -6966,7 +6966,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_vwprintf_p_l, __FORCELOCAL __ATTR_ARTIFICIAL __
 #endif /* !... */
 #endif /* !___vwprintf_p_l_defined */
 #ifndef ___wprintf_p_l_defined
-#define ___wprintf_p_l_defined 1
+#define ___wprintf_p_l_defined
 #ifdef __CRT_HAVE__wprintf_p_l
 __LIBC __ATTR_NONNULL((1)) __STDC_INT_AS_SSIZE_T (__VLIBCCALL _wprintf_p_l)(wchar_t const *__format, __locale_t __locale, ...) __THROWS(...) __CASMNAME_SAME("_wprintf_p_l");
 #elif defined(__CRT_HAVE__vwprintf_p_l) || defined(__CRT_HAVE__vwprintf_p) || !defined(__NO_STDSTREAMS)
@@ -6981,7 +6981,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_wprintf_p_l, __FORCELOCAL __ATTR_ARTIFICIAL __A
 #endif /* !... */
 #endif /* !___wprintf_p_l_defined */
 #ifndef ___vwprintf_s_l_defined
-#define ___vwprintf_s_l_defined 1
+#define ___vwprintf_s_l_defined
 #ifdef __CRT_HAVE__vwprintf_s_l
 __CDECLARE(__ATTR_NONNULL((1)),__STDC_INT_AS_SSIZE_T,__THROWING,_vwprintf_s_l,(wchar_t const *__format, __locale_t __locale, __builtin_va_list __args),(__format,__locale,__args))
 #elif defined(__CRT_HAVE_vwprintf) || ((defined(__CRT_HAVE_vfwprintf) || defined(__CRT_HAVE_file_wprinter) || defined(__CRT_HAVE_file_wprinter_unlocked) || defined(__CRT_HAVE_fputwc) || defined(__CRT_HAVE_putwc)) && !defined(__NO_STDSTREAMS))
@@ -6992,7 +6992,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_vwprintf_s_l, __FORCELOCAL __ATTR_ARTIFICIAL __
 #endif /* !... */
 #endif /* !___vwprintf_s_l_defined */
 #ifndef ___wprintf_s_l_defined
-#define ___wprintf_s_l_defined 1
+#define ___wprintf_s_l_defined
 #ifdef __CRT_HAVE__wprintf_s_l
 __LIBC __ATTR_NONNULL((1)) __STDC_INT_AS_SSIZE_T (__VLIBCCALL _wprintf_s_l)(wchar_t const *__format, __locale_t __locale, ...) __THROWS(...) __CASMNAME_SAME("_wprintf_s_l");
 #elif defined(__CRT_HAVE__vwprintf_s_l) || defined(__CRT_HAVE_vwprintf) || ((defined(__CRT_HAVE_vfwprintf) || defined(__CRT_HAVE_file_wprinter) || defined(__CRT_HAVE_file_wprinter_unlocked) || defined(__CRT_HAVE_fputwc) || defined(__CRT_HAVE_putwc)) && !defined(__NO_STDSTREAMS))
@@ -7007,7 +7007,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_wprintf_s_l, __FORCELOCAL __ATTR_ARTIFICIAL __A
 #endif /* !... */
 #endif /* !___wprintf_s_l_defined */
 #ifndef ___vfwprintf_l_defined
-#define ___vfwprintf_l_defined 1
+#define ___vfwprintf_l_defined
 #ifdef __CRT_HAVE__vfwprintf_l
 __CDECLARE(__ATTR_NONNULL((1, 2)),__STDC_INT_AS_SSIZE_T,__THROWING,_vfwprintf_l,(__FILE *__stream, wchar_t const *__format, __locale_t __locale, __builtin_va_list __args),(__stream,__format,__locale,__args))
 #elif defined(__CRT_HAVE_vfwprintf) || defined(__CRT_HAVE_file_wprinter) || defined(__CRT_HAVE_file_wprinter_unlocked) || defined(__CRT_HAVE_fputwc) || defined(__CRT_HAVE_putwc)
@@ -7018,7 +7018,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_vfwprintf_l, __FORCELOCAL __ATTR_ARTIFICIAL __A
 #endif /* !... */
 #endif /* !___vfwprintf_l_defined */
 #ifndef ___fwprintf_l_defined
-#define ___fwprintf_l_defined 1
+#define ___fwprintf_l_defined
 #ifdef __CRT_HAVE__fwprintf_l
 __LIBC __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T (__VLIBCCALL _fwprintf_l)(__FILE *__stream, wchar_t const *__format, __locale_t __locale, ...) __THROWS(...) __CASMNAME_SAME("_fwprintf_l");
 #elif defined(__CRT_HAVE__vfwprintf_l) || defined(__CRT_HAVE_vfwprintf) || defined(__CRT_HAVE_file_wprinter) || defined(__CRT_HAVE_file_wprinter_unlocked) || defined(__CRT_HAVE_fputwc) || defined(__CRT_HAVE_putwc)
@@ -7033,7 +7033,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_fwprintf_l, __FORCELOCAL __ATTR_ARTIFICIAL __AT
 #endif /* !... */
 #endif /* !___fwprintf_l_defined */
 #ifndef ___vfwprintf_p_l_defined
-#define ___vfwprintf_p_l_defined 1
+#define ___vfwprintf_p_l_defined
 #ifdef __CRT_HAVE__vfwprintf_p_l
 __CDECLARE(__ATTR_NONNULL((1, 2)),__STDC_INT_AS_SSIZE_T,__THROWING,_vfwprintf_p_l,(__FILE *__stream, wchar_t const *__format, __locale_t __locale, __builtin_va_list __args),(__stream,__format,__locale,__args))
 #else /* __CRT_HAVE__vfwprintf_p_l */
@@ -7042,7 +7042,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_vfwprintf_p_l, __FORCELOCAL __ATTR_ARTIFICIAL _
 #endif /* !__CRT_HAVE__vfwprintf_p_l */
 #endif /* !___vfwprintf_p_l_defined */
 #ifndef ___fwprintf_p_l_defined
-#define ___fwprintf_p_l_defined 1
+#define ___fwprintf_p_l_defined
 #ifdef __CRT_HAVE__fwprintf_p_l
 __LIBC __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T (__VLIBCCALL _fwprintf_p_l)(__FILE *__stream, wchar_t const *__format, __locale_t __locale, ...) __THROWS(...) __CASMNAME_SAME("_fwprintf_p_l");
 #else /* __CRT_HAVE__fwprintf_p_l */
@@ -7055,7 +7055,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_fwprintf_p_l, __FORCELOCAL __ATTR_ARTIFICIAL __
 #endif /* !__CRT_HAVE__fwprintf_p_l */
 #endif /* !___fwprintf_p_l_defined */
 #ifndef ___vfwprintf_s_l_defined
-#define ___vfwprintf_s_l_defined 1
+#define ___vfwprintf_s_l_defined
 #ifdef __CRT_HAVE__vfwprintf_s_l
 __CDECLARE(__ATTR_NONNULL((1, 2)),__STDC_INT_AS_SSIZE_T,__THROWING,_vfwprintf_s_l,(__FILE *__stream, wchar_t const *__format, __locale_t __locale, __builtin_va_list __args),(__stream,__format,__locale,__args))
 #elif defined(__CRT_HAVE_vfwprintf) || defined(__CRT_HAVE_file_wprinter) || defined(__CRT_HAVE_file_wprinter_unlocked) || defined(__CRT_HAVE_fputwc) || defined(__CRT_HAVE_putwc)
@@ -7066,7 +7066,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_vfwprintf_s_l, __FORCELOCAL __ATTR_ARTIFICIAL _
 #endif /* !... */
 #endif /* !___vfwprintf_s_l_defined */
 #ifndef ___fwprintf_s_l_defined
-#define ___fwprintf_s_l_defined 1
+#define ___fwprintf_s_l_defined
 #ifdef __CRT_HAVE__fwprintf_s_l
 __LIBC __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T (__VLIBCCALL _fwprintf_s_l)(__FILE *__stream, wchar_t const *__format, __locale_t __locale, ...) __THROWS(...) __CASMNAME_SAME("_fwprintf_s_l");
 #elif defined(__CRT_HAVE__vfwprintf_s_l) || defined(__CRT_HAVE_vfwprintf) || defined(__CRT_HAVE_file_wprinter) || defined(__CRT_HAVE_file_wprinter_unlocked) || defined(__CRT_HAVE_fputwc) || defined(__CRT_HAVE_putwc)
@@ -7081,7 +7081,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_fwprintf_s_l, __FORCELOCAL __ATTR_ARTIFICIAL __
 #endif /* !... */
 #endif /* !___fwprintf_s_l_defined */
 #ifndef ___vswprintf_c_l_defined
-#define ___vswprintf_c_l_defined 1
+#define ___vswprintf_c_l_defined
 #ifdef __CRT_HAVE__vswprintf_c_l
 __CDECLARE(__ATTR_NONNULL((1, 3)),__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,_vswprintf_c_l,(wchar_t *__dst, __SIZE_TYPE__ __bufsize, wchar_t const *__format, __locale_t __locale, __builtin_va_list __args),(__dst,__bufsize,__format,__locale,__args))
 #else /* __CRT_HAVE__vswprintf_c_l */
@@ -7090,7 +7090,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_vswprintf_c_l, __FORCELOCAL __ATTR_ARTIFICIAL _
 #endif /* !__CRT_HAVE__vswprintf_c_l */
 #endif /* !___vswprintf_c_l_defined */
 #ifndef ___swprintf_c_l_defined
-#define ___swprintf_c_l_defined 1
+#define ___swprintf_c_l_defined
 #ifdef __CRT_HAVE__swprintf_c_l
 __LIBC __ATTR_NONNULL((1, 3)) __STDC_INT_AS_SSIZE_T __NOTHROW_NCX(__VLIBCCALL _swprintf_c_l)(wchar_t *__dst, __SIZE_TYPE__ __bufsize, wchar_t const *__format, __locale_t __locale, ...) __CASMNAME_SAME("_swprintf_c_l");
 #else /* __CRT_HAVE__swprintf_c_l */
@@ -7103,7 +7103,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_swprintf_c_l, __FORCELOCAL __ATTR_ARTIFICIAL __
 #endif /* !__CRT_HAVE__swprintf_c_l */
 #endif /* !___swprintf_c_l_defined */
 #ifndef ___vswprintf_p_l_defined
-#define ___vswprintf_p_l_defined 1
+#define ___vswprintf_p_l_defined
 #ifdef __CRT_HAVE__vswprintf_p_l
 __CDECLARE(__ATTR_NONNULL((1, 3)),__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,_vswprintf_p_l,(wchar_t *__dst, __SIZE_TYPE__ __bufsize, wchar_t const *__format, __locale_t __locale, __builtin_va_list __args),(__dst,__bufsize,__format,__locale,__args))
 #else /* __CRT_HAVE__vswprintf_p_l */
@@ -7112,7 +7112,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_vswprintf_p_l, __FORCELOCAL __ATTR_ARTIFICIAL _
 #endif /* !__CRT_HAVE__vswprintf_p_l */
 #endif /* !___vswprintf_p_l_defined */
 #ifndef ___swprintf_p_l_defined
-#define ___swprintf_p_l_defined 1
+#define ___swprintf_p_l_defined
 #ifdef __CRT_HAVE__swprintf_p_l
 __LIBC __ATTR_NONNULL((1, 3)) __STDC_INT_AS_SSIZE_T __NOTHROW_NCX(__VLIBCCALL _swprintf_p_l)(wchar_t *__dst, __SIZE_TYPE__ __bufsize, wchar_t const *__format, __locale_t __locale, ...) __CASMNAME_SAME("_swprintf_p_l");
 #else /* __CRT_HAVE__swprintf_p_l */
@@ -7125,7 +7125,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_swprintf_p_l, __FORCELOCAL __ATTR_ARTIFICIAL __
 #endif /* !__CRT_HAVE__swprintf_p_l */
 #endif /* !___swprintf_p_l_defined */
 #ifndef ___vswprintf_s_l_defined
-#define ___vswprintf_s_l_defined 1
+#define ___vswprintf_s_l_defined
 #ifdef __CRT_HAVE__vswprintf_s_l
 __CDECLARE(__ATTR_NONNULL((1, 3)),__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,_vswprintf_s_l,(wchar_t *__dst, __SIZE_TYPE__ __wchar_count, wchar_t const *__format, __locale_t __locale, __builtin_va_list __args),(__dst,__wchar_count,__format,__locale,__args))
 #else /* __CRT_HAVE__vswprintf_s_l */
@@ -7134,7 +7134,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_vswprintf_s_l, __FORCELOCAL __ATTR_ARTIFICIAL _
 #endif /* !__CRT_HAVE__vswprintf_s_l */
 #endif /* !___vswprintf_s_l_defined */
 #ifndef ___swprintf_s_l_defined
-#define ___swprintf_s_l_defined 1
+#define ___swprintf_s_l_defined
 #ifdef __CRT_HAVE__swprintf_s_l
 __LIBC __ATTR_NONNULL((1, 3)) __STDC_INT_AS_SSIZE_T __NOTHROW_NCX(__VLIBCCALL _swprintf_s_l)(wchar_t *__dst, __SIZE_TYPE__ __wchar_count, wchar_t const *__format, __locale_t __locale, ...) __CASMNAME_SAME("_swprintf_s_l");
 #else /* __CRT_HAVE__swprintf_s_l */
@@ -7147,7 +7147,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_swprintf_s_l, __FORCELOCAL __ATTR_ARTIFICIAL __
 #endif /* !__CRT_HAVE__swprintf_s_l */
 #endif /* !___swprintf_s_l_defined */
 #ifndef ___vsnwprintf_l_defined
-#define ___vsnwprintf_l_defined 1
+#define ___vsnwprintf_l_defined
 #ifdef __CRT_HAVE__vsnwprintf_l
 __CDECLARE(__ATTR_NONNULL((1, 3)),__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,_vsnwprintf_l,(wchar_t *__dst, __SIZE_TYPE__ __bufsize, wchar_t const *__format, __locale_t __locale, __builtin_va_list __args),(__dst,__bufsize,__format,__locale,__args))
 #else /* __CRT_HAVE__vsnwprintf_l */
@@ -7156,7 +7156,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_vsnwprintf_l, __FORCELOCAL __ATTR_ARTIFICIAL __
 #endif /* !__CRT_HAVE__vsnwprintf_l */
 #endif /* !___vsnwprintf_l_defined */
 #ifndef ___snwprintf_l_defined
-#define ___snwprintf_l_defined 1
+#define ___snwprintf_l_defined
 #ifdef __CRT_HAVE__snwprintf_l
 __LIBC __ATTR_NONNULL((1, 3)) __STDC_INT_AS_SSIZE_T __NOTHROW_NCX(__VLIBCCALL _snwprintf_l)(wchar_t *__dst, __SIZE_TYPE__ __bufsize, wchar_t const *__format, __locale_t __locale, ...) __CASMNAME_SAME("_snwprintf_l");
 #else /* __CRT_HAVE__snwprintf_l */
@@ -7169,7 +7169,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_snwprintf_l, __FORCELOCAL __ATTR_ARTIFICIAL __A
 #endif /* !__CRT_HAVE__snwprintf_l */
 #endif /* !___snwprintf_l_defined */
 #ifndef ___vsnwprintf_s_l_defined
-#define ___vsnwprintf_s_l_defined 1
+#define ___vsnwprintf_s_l_defined
 #ifdef __CRT_HAVE__vsnwprintf_s_l
 __CDECLARE(__ATTR_NONNULL((1, 4)),__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,_vsnwprintf_s_l,(wchar_t *__dst, __SIZE_TYPE__ __wchar_count, __SIZE_TYPE__ __bufsize, wchar_t const *__format, __locale_t __locale, __builtin_va_list __args),(__dst,__wchar_count,__bufsize,__format,__locale,__args))
 #else /* __CRT_HAVE__vsnwprintf_s_l */
@@ -7178,7 +7178,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_vsnwprintf_s_l, __FORCELOCAL __ATTR_ARTIFICIAL 
 #endif /* !__CRT_HAVE__vsnwprintf_s_l */
 #endif /* !___vsnwprintf_s_l_defined */
 #ifndef ___snwprintf_s_l_defined
-#define ___snwprintf_s_l_defined 1
+#define ___snwprintf_s_l_defined
 #ifdef __CRT_HAVE__snwprintf_s_l
 __LIBC __ATTR_NONNULL((1, 4)) __STDC_INT_AS_SSIZE_T __NOTHROW_NCX(__VLIBCCALL _snwprintf_s_l)(wchar_t *__dst, __SIZE_TYPE__ __wchar_count, __SIZE_TYPE__ __bufsize, wchar_t const *__format, __locale_t __locale, ...) __CASMNAME_SAME("_snwprintf_s_l");
 #else /* __CRT_HAVE__snwprintf_s_l */
@@ -7191,7 +7191,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_snwprintf_s_l, __FORCELOCAL __ATTR_ARTIFICIAL _
 #endif /* !__CRT_HAVE__snwprintf_s_l */
 #endif /* !___snwprintf_s_l_defined */
 #ifndef ___fwscanf_l_defined
-#define ___fwscanf_l_defined 1
+#define ___fwscanf_l_defined
 #ifdef __CRT_HAVE__fwscanf_l
 __LIBC __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T (__VLIBCCALL _fwscanf_l)(__FILE *__stream, wchar_t const *__format, __locale_t __locale, ...) __THROWS(...) __CASMNAME_SAME("_fwscanf_l");
 #elif defined(__CRT_HAVE__vfwscanf_l) || defined(__CRT_HAVE_vfwscanf)
@@ -7206,7 +7206,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_fwscanf_l, __FORCELOCAL __ATTR_ARTIFICIAL __ATT
 #endif /* !... */
 #endif /* !___fwscanf_l_defined */
 #ifndef ___fwscanf_s_l_defined
-#define ___fwscanf_s_l_defined 1
+#define ___fwscanf_s_l_defined
 #ifdef __CRT_HAVE__fwscanf_l
 __LIBC __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T (__VLIBCCALL _fwscanf_s_l)(__FILE *__stream, wchar_t const *__format, __locale_t __locale, ...) __THROWS(...) __CASMNAME("_fwscanf_l");
 #elif defined(__CRT_HAVE__vfwscanf_l) || defined(__CRT_HAVE_vfwscanf)
@@ -7217,7 +7217,7 @@ __LIBC __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T (__VLIBCCALL 
 #endif /* !... */
 #endif /* !___fwscanf_s_l_defined */
 #ifndef ___swscanf_l_defined
-#define ___swscanf_l_defined 1
+#define ___swscanf_l_defined
 #ifdef __CRT_HAVE__swscanf_l
 __LIBC __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T __NOTHROW_NCX(__VLIBCCALL _swscanf_l)(wchar_t const *__src, wchar_t const *__format, __locale_t __locale, ...) __CASMNAME_SAME("_swscanf_l");
 #else /* __CRT_HAVE__swscanf_l */
@@ -7230,7 +7230,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_swscanf_l, __FORCELOCAL __ATTR_ARTIFICIAL __ATT
 #endif /* !__CRT_HAVE__swscanf_l */
 #endif /* !___swscanf_l_defined */
 #ifndef ___swscanf_s_l_defined
-#define ___swscanf_s_l_defined 1
+#define ___swscanf_s_l_defined
 #ifdef __CRT_HAVE__swscanf_l
 __LIBC __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T __NOTHROW_NCX(__VLIBCCALL _swscanf_s_l)(wchar_t const *__src, wchar_t const *__format, __locale_t __locale, ...) __CASMNAME("_swscanf_l");
 #else /* __CRT_HAVE__swscanf_l */
@@ -7239,7 +7239,7 @@ __LIBC __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T __NOTHROW_NCX
 #endif /* !__CRT_HAVE__swscanf_l */
 #endif /* !___swscanf_s_l_defined */
 #ifndef ___snwscanf_defined
-#define ___snwscanf_defined 1
+#define ___snwscanf_defined
 #ifdef __CRT_HAVE__snwscanf
 __LIBC __ATTR_WUNUSED __ATTR_NONNULL((1, 3)) __STDC_INT_AS_SSIZE_T __NOTHROW_NCX(__VLIBCCALL _snwscanf)(wchar_t const *__src, __SIZE_TYPE__ __bufsize, wchar_t const *__format, ...) __CASMNAME_SAME("_snwscanf");
 #else /* __CRT_HAVE__snwscanf */
@@ -7252,7 +7252,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_snwscanf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR
 #endif /* !__CRT_HAVE__snwscanf */
 #endif /* !___snwscanf_defined */
 #ifndef ___snwscanf_l_defined
-#define ___snwscanf_l_defined 1
+#define ___snwscanf_l_defined
 #ifdef __CRT_HAVE__snwscanf_l
 __LIBC __ATTR_WUNUSED __ATTR_NONNULL((1, 3)) __STDC_INT_AS_SSIZE_T __NOTHROW_NCX(__VLIBCCALL _snwscanf_l)(wchar_t const *__src, __SIZE_TYPE__ __bufsize, wchar_t const *__format, __locale_t __locale, ...) __CASMNAME_SAME("_snwscanf_l");
 #else /* __CRT_HAVE__snwscanf_l */
@@ -7265,7 +7265,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_snwscanf_l, __FORCELOCAL __ATTR_ARTIFICIAL __AT
 #endif /* !__CRT_HAVE__snwscanf_l */
 #endif /* !___snwscanf_l_defined */
 #ifndef ___snwscanf_s_defined
-#define ___snwscanf_s_defined 1
+#define ___snwscanf_s_defined
 #ifdef __CRT_HAVE__snwscanf
 __LIBC __ATTR_WUNUSED __ATTR_NONNULL((1, 3)) __STDC_INT_AS_SSIZE_T __NOTHROW_NCX(__VLIBCCALL _snwscanf_s)(wchar_t const *__src, __SIZE_TYPE__ __bufsize, wchar_t const *__format, ...) __CASMNAME("_snwscanf");
 #else /* __CRT_HAVE__snwscanf */
@@ -7274,7 +7274,7 @@ __LIBC __ATTR_WUNUSED __ATTR_NONNULL((1, 3)) __STDC_INT_AS_SSIZE_T __NOTHROW_NCX
 #endif /* !__CRT_HAVE__snwscanf */
 #endif /* !___snwscanf_s_defined */
 #ifndef ___snwscanf_s_l_defined
-#define ___snwscanf_s_l_defined 1
+#define ___snwscanf_s_l_defined
 #ifdef __CRT_HAVE__snwscanf_s_l
 __LIBC __ATTR_WUNUSED __ATTR_NONNULL((1, 3)) __STDC_INT_AS_SSIZE_T __NOTHROW_NCX(__VLIBCCALL _snwscanf_s_l)(wchar_t const *__src, __SIZE_TYPE__ __bufsize, wchar_t const *__format, __locale_t __locale, ...) __CASMNAME_SAME("_snwscanf_s_l");
 #else /* __CRT_HAVE__snwscanf_s_l */
@@ -7287,7 +7287,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_snwscanf_s_l, __FORCELOCAL __ATTR_ARTIFICIAL __
 #endif /* !__CRT_HAVE__snwscanf_s_l */
 #endif /* !___snwscanf_s_l_defined */
 #ifndef ___wscanf_l_defined
-#define ___wscanf_l_defined 1
+#define ___wscanf_l_defined
 #ifdef __CRT_HAVE__wscanf_l
 __LIBC __ATTR_WUNUSED __ATTR_NONNULL((1)) __STDC_INT_AS_SSIZE_T (__VLIBCCALL _wscanf_l)(wchar_t const *__format, __locale_t __locale, ...) __THROWS(...) __CASMNAME_SAME("_wscanf_l");
 #elif defined(__CRT_HAVE__vwscanf_l) || defined(__CRT_HAVE_vwscanf) || (defined(__CRT_HAVE_vfwscanf) && !defined(__NO_STDSTREAMS))
@@ -7302,7 +7302,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_wscanf_l, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR
 #endif /* !... */
 #endif /* !___wscanf_l_defined */
 #ifndef ___wscanf_s_l_defined
-#define ___wscanf_s_l_defined 1
+#define ___wscanf_s_l_defined
 #ifdef __CRT_HAVE__wscanf_l
 __LIBC __ATTR_WUNUSED __ATTR_NONNULL((1)) __STDC_INT_AS_SSIZE_T (__VLIBCCALL _wscanf_s_l)(wchar_t const *__format, __locale_t __locale, ...) __THROWS(...) __CASMNAME("_wscanf_l");
 #elif defined(__CRT_HAVE__vwscanf_l) || defined(__CRT_HAVE_vwscanf) || (defined(__CRT_HAVE_vfwscanf) && !defined(__NO_STDSTREAMS))
@@ -7313,23 +7313,23 @@ __LIBC __ATTR_WUNUSED __ATTR_NONNULL((1)) __STDC_INT_AS_SSIZE_T (__VLIBCCALL _ws
 #endif /* !... */
 #endif /* !___wscanf_s_l_defined */
 #if !defined(___wfsopen_defined) && defined(__CRT_HAVE__wfsopen)
-#define ___wfsopen_defined 1
+#define ___wfsopen_defined
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__FILE *,__NOTHROW_NCX,_wfsopen,(wchar_t const *__filename, wchar_t const *__mode, __STDC_INT_AS_UINT_T __sh_flag),(__filename,__mode,__sh_flag))
 #endif /* !___wfsopen_defined && __CRT_HAVE__wfsopen */
 #if !defined(___wfdopen_defined) && defined(__CRT_HAVE__wfdopen)
-#define ___wfdopen_defined 1
+#define ___wfdopen_defined
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((2)),__FILE *,__NOTHROW_NCX,_wfdopen,(__fd_t __fd, wchar_t const *__mode),(__fd,__mode))
 #endif /* !___wfdopen_defined && __CRT_HAVE__wfdopen */
 #if !defined(___wfopen_s_defined) && defined(__CRT_HAVE__wfopen_s)
-#define ___wfopen_s_defined 1
+#define ___wfopen_s_defined
 __CDECLARE(__ATTR_NONNULL((1, 2, 3)),__errno_t,__NOTHROW_NCX,_wfopen_s,(__FILE **__pstream, wchar_t const *__filename, wchar_t const *__mode),(__pstream,__filename,__mode))
 #endif /* !___wfopen_s_defined && __CRT_HAVE__wfopen_s */
 #if !defined(___wfreopen_s_defined) && defined(__CRT_HAVE__wfreopen_s)
-#define ___wfreopen_s_defined 1
+#define ___wfreopen_s_defined
 __CDECLARE(__ATTR_NONNULL((1, 2, 3)),__errno_t,__NOTHROW_NCX,_wfreopen_s,(__FILE **__pstream, wchar_t const *__filename, wchar_t const *__mode, __FILE *__stream),(__pstream,__filename,__mode,__stream))
 #endif /* !___wfreopen_s_defined && __CRT_HAVE__wfreopen_s */
 #ifndef ___wfopen_defined
-#define ___wfopen_defined 1
+#define ___wfopen_defined
 #ifdef __CRT_HAVE_wfopen
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__FILE *,__NOTHROW_NCX,_wfopen,(wchar_t const *__filename, wchar_t const *__mode),wfopen,(__filename,__mode))
 #elif defined(__CRT_HAVE__wfopen)
@@ -7339,7 +7339,7 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__FILE *,__NOTHROW_NCX,_wfopen,
 #endif /* !... */
 #endif /* !___wfopen_defined */
 #ifndef ___wfreopen_defined
-#define ___wfreopen_defined 1
+#define ___wfreopen_defined
 #ifdef __CRT_HAVE_wfreopen
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__FILE *,__NOTHROW_NCX,_wfreopen,(wchar_t const *__filename, wchar_t const *__mode, __FILE *__stream),wfreopen,(__filename,__mode,__stream))
 #elif defined(__CRT_HAVE__wfreopen)
@@ -7349,7 +7349,7 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__FILE *,__NOTHROW_NCX,_wfreope
 #endif /* !... */
 #endif /* !___wfreopen_defined */
 #ifndef ___fgetwchar_defined
-#define ___fgetwchar_defined 1
+#define ___fgetwchar_defined
 #ifdef __CRT_HAVE_getwchar
 /* >> getwchar(3) */
 __CREDIRECT(,wint_t,__THROWING,_fgetwchar,(void),getwchar,())
@@ -7365,7 +7365,7 @@ __FORCELOCAL __ATTR_ARTIFICIAL wint_t (__LIBCCALL _fgetwchar)(void) __THROWS(...
 #endif /* !... */
 #endif /* !___fgetwchar_defined */
 #ifndef ___fputwchar_defined
-#define ___fputwchar_defined 1
+#define ___fputwchar_defined
 #ifdef __CRT_HAVE_putwchar
 /* >> putwchar(3) */
 __CREDIRECT(,wint_t,__THROWING,_fputwchar,(wchar_t __wc),putwchar,(__wc))
@@ -7381,7 +7381,7 @@ __FORCELOCAL __ATTR_ARTIFICIAL wint_t (__LIBCCALL _fputwchar)(wchar_t __wc) __TH
 #endif /* !... */
 #endif /* !___fputwchar_defined */
 #ifndef ___getws_s_defined
-#define ___getws_s_defined 1
+#define ___getws_s_defined
 #ifdef __CRT_HAVE__getws_s
 __CDECLARE(,wchar_t *,__NOTHROW_NCX,_getws_s,(wchar_t *__buf, __SIZE_TYPE__ __buflen),(__buf,__buflen))
 #elif (defined(__CRT_HAVE_fgetws) || defined(__CRT_HAVE_fgetws_unlocked) || defined(__CRT_HAVE__fgetws_nolock) || ((defined(__CRT_HAVE_fgetwc) || defined(__CRT_HAVE_getwc)) && (defined(__CRT_HAVE_ungetwc) || defined(__CRT_HAVE_ungetwc_unlocked)) && (defined(__CRT_HAVE_ferror) || defined(__CRT_HAVE__IO_ferror) || defined(__CRT_HAVE_ferror_unlocked)))) && !defined(__NO_STDSTREAMS)
@@ -7392,7 +7392,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_getws_s, __FORCELOCAL __ATTR_ARTIFICIAL wchar_t
 #endif /* !... */
 #endif /* !___getws_s_defined */
 #ifndef ___putws_defined
-#define ___putws_defined 1
+#define ___putws_defined
 #ifdef __CRT_HAVE__putws
 __CDECLARE(__ATTR_NONNULL((1)),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,_putws,(wchar_t const *__str),(__str))
 #elif (defined(__CRT_HAVE_fputws) || defined(__CRT_HAVE_fputws_unlocked) || defined(__CRT_HAVE__fputws_nolock) || defined(__CRT_HAVE_file_wprinter) || defined(__CRT_HAVE_file_wprinter_unlocked) || defined(__CRT_HAVE_fputwc) || defined(__CRT_HAVE_putwc)) && !defined(__NO_STDSTREAMS)
@@ -7403,11 +7403,11 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_putws, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NO
 #endif /* !... */
 #endif /* !___putws_defined */
 #if !defined(___wtempnam_defined) && defined(__CRT_HAVE__wtempnam)
-#define ___wtempnam_defined 1
+#define ___wtempnam_defined
 __CDECLARE(__ATTR_WUNUSED,wchar_t *,__NOTHROW_NCX,_wtempnam,(wchar_t const *__directory, wchar_t const *__file_prefix),(__directory,__file_prefix))
 #endif /* !___wtempnam_defined && __CRT_HAVE__wtempnam */
 #ifndef _CRT_WPERROR_DEFINED
-#define _CRT_WPERROR_DEFINED 1
+#define _CRT_WPERROR_DEFINED
 #ifdef __CRT_HAVE__wperror
 __CDECLARE_VOID(__ATTR_COLD,__THROWING,_wperror,(__WCHAR_TYPE__ const *__restrict __message),(__message))
 #else /* __CRT_HAVE__wperror */
@@ -7419,7 +7419,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_wperror, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_
 #undef _CRT_WPERROR_DEFINED
 #endif /* __NO_STDSTREAMS || !__libc_geterrno || (!__CRT_HAVE_fprintf && !__CRT_HAVE__IO_fprintf && !__CRT_HAVE_fprintf_s && !__CRT_HAVE_fprintf_unlocked && !__CRT_HAVE_vfprintf && !__CRT_HAVE_vfprintf_s && !__CRT_HAVE__IO_vfprintf && !__CRT_HAVE_vfprintf_unlocked && !__CRT_HAVE_file_printer && !__CRT_HAVE_file_printer_unlocked && !__CRT_HAVE_fputc && !__CRT_HAVE_putc && !__CRT_HAVE__IO_putc && !__CRT_HAVE_fputc_unlocked && !__CRT_HAVE_putc_unlocked && (!__CRT_DOS || !__CRT_HAVE__flsbuf) && !__CRT_HAVE_fwrite && !__CRT_HAVE__IO_fwrite && !__CRT_HAVE_fwrite_s && !__CRT_HAVE_fwrite_unlocked && !__CRT_HAVE__fwrite_nolock) */
 #endif /* !__CRT_HAVE__wperror */
-#define _CRT_WPERROR_DEFINED 1
+#define _CRT_WPERROR_DEFINED
 #ifdef __CRT_HAVE__wperror
 __CDECLARE_VOID(__ATTR_COLD,__THROWING,_wperror,(__WCHAR_TYPE__ const *__restrict __message),(__message))
 #else /* __CRT_HAVE__wperror */
@@ -7433,7 +7433,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_wperror, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_
 #endif /* !__CRT_HAVE__wperror */
 #endif /* !_CRT_WPERROR_DEFINED */
 #ifndef ___wpopen_defined
-#define ___wpopen_defined 1
+#define ___wpopen_defined
 #ifdef __CRT_HAVE_wpopen
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__FILE *,__NOTHROW_NCX,_wpopen,(wchar_t const *__command, wchar_t const *__mode),wpopen,(__command,__mode))
 #elif defined(__CRT_HAVE__wpopen)
@@ -7443,7 +7443,7 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__FILE *,__NOTHROW_NCX,_wpopen,
 #endif /* !... */
 #endif /* !___wpopen_defined */
 #ifndef ___wremove_defined
-#define ___wremove_defined 1
+#define ___wremove_defined
 #ifdef __CRT_HAVE_wremove
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,_wremove,(wchar_t const *__filename),wremove,(__filename))
 #elif defined(__CRT_HAVE__wremove)
@@ -7453,11 +7453,11 @@ __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,_wremove,(wchar_t const *__file
 #endif /* !... */
 #endif /* !___wremove_defined */
 #if !defined(___wtmpnam_s_defined) && defined(__CRT_HAVE__wtmpnam_s)
-#define ___wtmpnam_s_defined 1
+#define ___wtmpnam_s_defined
 __CDECLARE(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,_wtmpnam_s,(wchar_t *__dst, __SIZE_TYPE__ __wchar_count),(__dst,__wchar_count))
 #endif /* !___wtmpnam_s_defined && __CRT_HAVE__wtmpnam_s */
 #ifndef ___fgetwc_nolock_defined
-#define ___fgetwc_nolock_defined 1
+#define ___fgetwc_nolock_defined
 #ifdef __CRT_HAVE_fgetwc_unlocked
 /* >> getwc_unlocked(3), fgetwc_unlocked(3) */
 __CREDIRECT(__ATTR_NONNULL((1)),__WINT_TYPE__,__THROWING,_fgetwc_nolock,(__FILE *__restrict __stream),fgetwc_unlocked,(__stream))
@@ -7469,7 +7469,7 @@ __CDECLARE(__ATTR_NONNULL((1)),__WINT_TYPE__,__THROWING,_fgetwc_nolock,(__FILE *
 #endif /* !... */
 #endif /* !___fgetwc_nolock_defined */
 #ifndef ___fputwc_nolock_defined
-#define ___fputwc_nolock_defined 1
+#define ___fputwc_nolock_defined
 #ifdef __CRT_HAVE_fputwc_unlocked
 /* >> putwc_unlocked(3), fputwc_unlocked(3) */
 __CREDIRECT(__ATTR_NONNULL((2)),__WINT_TYPE__,__THROWING,_fputwc_nolock,(wchar_t __wc, __FILE *__restrict __stream),fputwc_unlocked,(__wc,__stream))
@@ -7481,7 +7481,7 @@ __CDECLARE(__ATTR_NONNULL((2)),__WINT_TYPE__,__THROWING,_fputwc_nolock,(wchar_t 
 #endif /* !... */
 #endif /* !___fputwc_nolock_defined */
 #ifndef ___ungetwc_nolock_defined
-#define ___ungetwc_nolock_defined 1
+#define ___ungetwc_nolock_defined
 #ifdef __CRT_HAVE_ungetwc_unlocked
 /* >> ungetwc_unlocked(3) */
 __CREDIRECT(__ATTR_NONNULL((2)),__WINT_TYPE__,__NOTHROW_NCX,_ungetwc_nolock,(__WINT_TYPE__ __ch, __FILE *__restrict __stream),ungetwc_unlocked,(__ch,__stream))
@@ -7496,7 +7496,7 @@ __CREDIRECT(__ATTR_NONNULL((2)),__WINT_TYPE__,__NOTHROW_NCX,_ungetwc_nolock,(__W
 #endif /* !... */
 #endif /* !___ungetwc_nolock_defined */
 #ifndef ___getwc_nolock_defined
-#define ___getwc_nolock_defined 1
+#define ___getwc_nolock_defined
 #ifdef __CRT_HAVE_fgetwc_unlocked
 /* >> getwc_unlocked(3), fgetwc_unlocked(3) */
 __CREDIRECT(__ATTR_NONNULL((1)),__WINT_TYPE__,__THROWING,_getwc_nolock,(__FILE *__restrict __stream),fgetwc_unlocked,(__stream))
@@ -7508,7 +7508,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),__WINT_TYPE__,__THROWING,_getwc_nolock,(__FILE *
 #endif /* !... */
 #endif /* !___getwc_nolock_defined */
 #ifndef ___putwc_nolock_defined
-#define ___putwc_nolock_defined 1
+#define ___putwc_nolock_defined
 #ifdef __CRT_HAVE_fputwc_unlocked
 /* >> putwc_unlocked(3), fputwc_unlocked(3) */
 __CREDIRECT(__ATTR_NONNULL((2)),__WINT_TYPE__,__THROWING,_putwc_nolock,(wchar_t __wc, __FILE *__restrict __stream),fputwc_unlocked,(__wc,__stream))
@@ -7535,7 +7535,7 @@ __CREDIRECT(__ATTR_NONNULL((2)),__WINT_TYPE__,__THROWING,_putwc_nolock,(wchar_t 
 #endif /* __USE_UTF */
 
 #ifdef __CXX_SYSTEM_HEADER
-#define _CXX_STDONLY_CSTDIO 1
+#define _CXX_STDONLY_CSTDIO
 #undef _STDIO_H
 #endif /* __CXX_SYSTEM_HEADER */
 #endif /* !_CXX_STDONLY_CSTDIO */

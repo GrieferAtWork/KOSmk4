@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8838561b */
+/* HASH CRC-32:0x8aa63748 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local___signbitl_defined
-#define __local___signbitl_defined 1
+#define __local___signbitl_defined
 #include <__crt.h>
 #include <libm/signbit.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -37,7 +37,7 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(__signbitl))(__LONGDOUBLE __x) {
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep___signbitl_defined
-#define __local___localdep___signbitl_defined 1
+#define __local___localdep___signbitl_defined
 #define __localdep___signbitl __LIBC_LOCAL_NAME(__signbitl)
 #endif /* !__local___localdep___signbitl_defined */
 #endif /* !__local___signbitl_defined */

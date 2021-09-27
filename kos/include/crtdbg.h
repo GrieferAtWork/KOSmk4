@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd554a1b7 */
+/* HASH CRC-32:0xc94edd2f */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -254,7 +254,7 @@ typedef void (__ATTR_CDECL *_PFNCRTDOFORALLCLIENTOBJECTS)(void *, void *);
 __LIBC __LONG32_TYPE__ _crtAssertBusy;
 #else /* __CRT_HAVE__crtAssertBusy */
 #if !defined(____p__crtAssertBusy_defined) && defined(__CRT_HAVE___p__crtAssertBusy)
-#define ____p__crtAssertBusy_defined 1
+#define ____p__crtAssertBusy_defined
 __LIBC __LONG32_TYPE__ *__NOTHROW_NCX(__LIBDCALL __p__crtAssertBusy)(void) __CASMNAME_SAME("__p__crtAssertBusy");
 #endif /* !____p__crtAssertBusy_defined && __CRT_HAVE___p__crtAssertBusy */
 #ifdef ____p__crtAssertBusy_defined
@@ -265,7 +265,7 @@ __LIBC __LONG32_TYPE__ *__NOTHROW_NCX(__LIBDCALL __p__crtAssertBusy)(void) __CAS
 __LIBC __LONG32_TYPE__ _crtBreakAlloc;
 #else /* __CRT_HAVE__crtBreakAlloc */
 #if !defined(____p__crtBreakAlloc_defined) && defined(__CRT_HAVE___p__crtBreakAlloc)
-#define ____p__crtBreakAlloc_defined 1
+#define ____p__crtBreakAlloc_defined
 __LIBC __LONG32_TYPE__ *__NOTHROW_NCX(__LIBDCALL __p__crtBreakAlloc)(void) __CASMNAME_SAME("__p__crtBreakAlloc");
 #endif /* !____p__crtBreakAlloc_defined && __CRT_HAVE___p__crtBreakAlloc */
 #ifdef ____p__crtBreakAlloc_defined
@@ -276,7 +276,7 @@ __LIBC __LONG32_TYPE__ *__NOTHROW_NCX(__LIBDCALL __p__crtBreakAlloc)(void) __CAS
 __LIBC int _crtDbgFlag;
 #else /* __CRT_HAVE__crtDbgFlag */
 #if !defined(____p__crtDbgFlag_defined) && defined(__CRT_HAVE___p__crtDbgFlag)
-#define ____p__crtDbgFlag_defined 1
+#define ____p__crtDbgFlag_defined
 __LIBC int *__NOTHROW_NCX(__LIBDCALL __p__crtDbgFlag)(void) __CASMNAME_SAME("__p__crtDbgFlag");
 #endif /* !____p__crtDbgFlag_defined && __CRT_HAVE___p__crtDbgFlag */
 #ifdef ____p__crtDbgFlag_defined
@@ -324,11 +324,11 @@ __LIBC _HFILE __NOTHROW_NCX(__LIBDCALL _CrtSetReportFile)(int __report_type, _HF
 __LIBC __SIZE_TYPE__ __NOTHROW_NCX(__LIBDCALL _CrtSetDebugFillThreshold)(__SIZE_TYPE__ __new_debug_fill_threshold) __CASMNAME_SAME("_CrtSetDebugFillThreshold");
 #endif /* __CRT_HAVE__CrtSetDebugFillThreshold */
 #if !defined(___CrtDbgReport_defined) && defined(__CRT_HAVE__CrtDbgReport)
-#define ___CrtDbgReport_defined 1
+#define ___CrtDbgReport_defined
 __LIBC int __NOTHROW_NCX(__VLIBDCALL _CrtDbgReport)(int __report_type, char const *__filename, int __line, char const *__module_name, char const *__format, ...) __CASMNAME_SAME("_CrtDbgReport");
 #endif /* !___CrtDbgReport_defined && __CRT_HAVE__CrtDbgReport */
 #ifndef ___CrtDbgReportW_defined
-#define ___CrtDbgReportW_defined 1
+#define ___CrtDbgReportW_defined
 #ifdef __CRT_HAVE__CrtDbgReportW
 __LIBC int __NOTHROW_NCX(__VLIBDCALL _CrtDbgReportW)(int __report_type, __WCHAR16_TYPE__ const *__filename, int __line, __WCHAR16_TYPE__ const *__module_name, __WCHAR16_TYPE__ const *__format, ...) __CASMNAME_SAME("_CrtDbgReportW");
 #elif defined(__CRT_HAVE_$Q_CrtDbgReportW$A$AYAHHPBGH00ZZ)
@@ -338,14 +338,14 @@ __LIBC int __NOTHROW_NCX(__VLIBDCALL _CrtDbgReportW)(int __report_type, __WCHAR1
 #endif /* !... */
 #endif /* !___CrtDbgReportW_defined */
 #if !defined(___CrtDbgBreak_defined) && defined(__CRT_HAVE__CrtDbgBreak)
-#define ___CrtDbgBreak_defined 1
+#define ___CrtDbgBreak_defined
 __LIBC void __NOTHROW_NCX(__LIBDCALL _CrtDbgBreak)(void) __CASMNAME_SAME("_CrtDbgBreak");
 #endif /* !___CrtDbgBreak_defined && __CRT_HAVE__CrtDbgBreak */
 #ifdef __CRT_HAVE__CrtSetBreakAlloc
 __LIBC __LONG32_TYPE__ __NOTHROW_NCX(__LIBDCALL _CrtSetBreakAlloc)(__LONG32_TYPE__ __break_alloc) __CASMNAME_SAME("_CrtSetBreakAlloc");
 #endif /* __CRT_HAVE__CrtSetBreakAlloc */
 #ifndef ___malloc_dbg_defined
-#define ___malloc_dbg_defined 1
+#define ___malloc_dbg_defined
 #ifdef __CRT_HAVE__malloc_dbg
 __LIBC __ATTR_MALLOC __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1)) void *__NOTHROW_NCX(__LIBDCALL _malloc_dbg)(__SIZE_TYPE__ __num_bytes, int __block_type, char const *__filename, int __line) __CASMNAME_SAME("_malloc_dbg");
 #elif defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign)
@@ -356,7 +356,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_malloc_dbg, __FORCELOCAL __ATTR_ARTIFICIAL __AT
 #endif /* !... */
 #endif /* !___malloc_dbg_defined */
 #ifndef ___calloc_dbg_defined
-#define ___calloc_dbg_defined 1
+#define ___calloc_dbg_defined
 #ifdef __CRT_HAVE__calloc_dbg
 __LIBC __ATTR_MALLOC __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1, 2)) void *__NOTHROW_NCX(__LIBDCALL _calloc_dbg)(__SIZE_TYPE__ __count, __SIZE_TYPE__ __num_bytes, int __block_type, char const *__filename, int __line) __CASMNAME_SAME("_calloc_dbg");
 #elif defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign)
@@ -367,7 +367,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_calloc_dbg, __FORCELOCAL __ATTR_ARTIFICIAL __AT
 #endif /* !... */
 #endif /* !___calloc_dbg_defined */
 #ifndef ___realloc_dbg_defined
-#define ___realloc_dbg_defined 1
+#define ___realloc_dbg_defined
 #ifdef __CRT_HAVE__realloc_dbg
 __LIBC __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)) void *__NOTHROW_NCX(__LIBDCALL _realloc_dbg)(void *__ptr, __SIZE_TYPE__ __num_bytes, int __block_type, char const *__filename, int __line) __CASMNAME_SAME("_realloc_dbg");
 #elif defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign)
@@ -378,7 +378,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_realloc_dbg, __FORCELOCAL __ATTR_ARTIFICIAL __A
 #endif /* !... */
 #endif /* !___realloc_dbg_defined */
 #ifndef ___recalloc_dbg_defined
-#define ___recalloc_dbg_defined 1
+#define ___recalloc_dbg_defined
 #ifdef __CRT_HAVE__recalloc_dbg
 __LIBC __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2, 3)) void *__NOTHROW_NCX(__LIBDCALL _recalloc_dbg)(void *__ptr, __SIZE_TYPE__ __count, __SIZE_TYPE__ __num_bytes, int __block_type, char const *__filename, int __line) __CASMNAME_SAME("_recalloc_dbg");
 #elif defined(__CRT_HAVE_recallocv) || defined(__CRT_HAVE__recalloc) || (defined(__CRT_HAVE_realloc) && (defined(__CRT_HAVE_malloc_usable_size) || defined(__CRT_HAVE__msize)))
@@ -389,7 +389,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_recalloc_dbg, __FORCELOCAL __ATTR_ARTIFICIAL __
 #endif /* !... */
 #endif /* !___recalloc_dbg_defined */
 #ifndef ___expand_dbg_defined
-#define ___expand_dbg_defined 1
+#define ___expand_dbg_defined
 #ifdef __CRT_HAVE__expand_dbg
 __LIBC __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)) __ATTR_NONNULL((1)) void *__NOTHROW_NCX(__LIBDCALL _expand_dbg)(void *__ptr, __SIZE_TYPE__ __num_bytes, int __block_type, char const *__filename, int __line) __CASMNAME_SAME("_expand_dbg");
 #elif defined(__CRT_HAVE_realloc_in_place) || defined(__CRT_HAVE__expand)
@@ -400,7 +400,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_expand_dbg, __FORCELOCAL __ATTR_ARTIFICIAL __AT
 #endif /* !... */
 #endif /* !___expand_dbg_defined */
 #ifndef ___free_dbg_defined
-#define ___free_dbg_defined 1
+#define ___free_dbg_defined
 #ifdef __CRT_HAVE__free_dbg
 __LIBC void __NOTHROW_NCX(__LIBDCALL _free_dbg)(void *__ptr, int __block_type) __CASMNAME_SAME("_free_dbg");
 #elif defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree)
@@ -411,7 +411,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_free_dbg, __FORCELOCAL __ATTR_ARTIFICIAL void _
 #endif /* !... */
 #endif /* !___free_dbg_defined */
 #ifndef ___msize_dbg_defined
-#define ___msize_dbg_defined 1
+#define ___msize_dbg_defined
 #ifdef __CRT_HAVE__msize_dbg
 __LIBC __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __SIZE_TYPE__ __NOTHROW_NCX(__LIBDCALL _msize_dbg)(void *__ptr, int __block_type) __CASMNAME_SAME("_msize_dbg");
 #elif defined(__CRT_HAVE_malloc_usable_size) || defined(__CRT_HAVE__msize)
@@ -422,7 +422,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_msize_dbg, __FORCELOCAL __ATTR_ARTIFICIAL __ATT
 #endif /* !... */
 #endif /* !___msize_dbg_defined */
 #ifndef ___aligned_msize_dbg_defined
-#define ___aligned_msize_dbg_defined 1
+#define ___aligned_msize_dbg_defined
 #ifdef __CRT_HAVE__aligned_msize_dbg
 __LIBC __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __SIZE_TYPE__ __NOTHROW_NCX(__LIBDCALL _aligned_msize_dbg)(void *__ptr, __SIZE_TYPE__ __min_alignment, __SIZE_TYPE__ __offset) __CASMNAME_SAME("_aligned_msize_dbg");
 #else /* __CRT_HAVE__aligned_msize_dbg */
@@ -431,7 +431,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_aligned_msize_dbg, __FORCELOCAL __ATTR_ARTIFICI
 #endif /* !__CRT_HAVE__aligned_msize_dbg */
 #endif /* !___aligned_msize_dbg_defined */
 #ifndef ___aligned_malloc_dbg_defined
-#define ___aligned_malloc_dbg_defined 1
+#define ___aligned_malloc_dbg_defined
 #ifdef __CRT_HAVE__aligned_malloc_dbg
 __LIBC __ATTR_MALLOC __ATTR_WUNUSED __ATTR_ALLOC_ALIGN(2) __ATTR_ALLOC_SIZE((1)) void *__NOTHROW_NCX(__LIBDCALL _aligned_malloc_dbg)(__SIZE_TYPE__ __num_bytes, __SIZE_TYPE__ __min_alignment, char const *__filename, int __line) __CASMNAME_SAME("_aligned_malloc_dbg");
 #elif defined(__CRT_HAVE__aligned_malloc) || defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign)
@@ -442,7 +442,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_aligned_malloc_dbg, __FORCELOCAL __ATTR_ARTIFIC
 #endif /* !... */
 #endif /* !___aligned_malloc_dbg_defined */
 #ifndef ___aligned_realloc_dbg_defined
-#define ___aligned_realloc_dbg_defined 1
+#define ___aligned_realloc_dbg_defined
 #ifdef __CRT_HAVE__aligned_realloc_dbg
 __LIBC __ATTR_WUNUSED __ATTR_ALLOC_ALIGN(3) __ATTR_ALLOC_SIZE((2)) void *__NOTHROW_NCX(__LIBDCALL _aligned_realloc_dbg)(void *__ptr, __SIZE_TYPE__ __num_bytes, __SIZE_TYPE__ __min_alignment, char const *__filename, int __line) __CASMNAME_SAME("_aligned_realloc_dbg");
 #elif defined(__CRT_HAVE__aligned_realloc) || ((defined(__CRT_HAVE__aligned_malloc) || defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign)) && (defined(__CRT_HAVE__aligned_free) || defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree)))
@@ -453,7 +453,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_aligned_realloc_dbg, __FORCELOCAL __ATTR_ARTIFI
 #endif /* !... */
 #endif /* !___aligned_realloc_dbg_defined */
 #ifndef ___aligned_recalloc_dbg_defined
-#define ___aligned_recalloc_dbg_defined 1
+#define ___aligned_recalloc_dbg_defined
 #ifdef __CRT_HAVE__aligned_recalloc_dbg
 __LIBC __ATTR_WUNUSED __ATTR_ALLOC_ALIGN(4) __ATTR_ALLOC_SIZE((2, 3)) void *__NOTHROW_NCX(__LIBDCALL _aligned_recalloc_dbg)(void *__ptr, __SIZE_TYPE__ __count, __SIZE_TYPE__ __num_bytes, __SIZE_TYPE__ __min_alignment, char const *__filename, int __line) __CASMNAME_SAME("_aligned_recalloc_dbg");
 #elif defined(__CRT_HAVE__aligned_recalloc) || ((defined(__CRT_HAVE__aligned_malloc) || defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign)) && (defined(__CRT_HAVE__aligned_free) || defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree)))
@@ -464,7 +464,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_aligned_recalloc_dbg, __FORCELOCAL __ATTR_ARTIF
 #endif /* !... */
 #endif /* !___aligned_recalloc_dbg_defined */
 #ifndef ___aligned_offset_malloc_dbg_defined
-#define ___aligned_offset_malloc_dbg_defined 1
+#define ___aligned_offset_malloc_dbg_defined
 #ifdef __CRT_HAVE__aligned_offset_malloc_dbg
 __LIBC __ATTR_MALLOC __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1)) void *__NOTHROW_NCX(__LIBDCALL _aligned_offset_malloc_dbg)(__SIZE_TYPE__ __num_bytes, __SIZE_TYPE__ __min_alignment, __SIZE_TYPE__ __offset, char const *__filename, int __line) __CASMNAME_SAME("_aligned_offset_malloc_dbg");
 #elif defined(__CRT_HAVE__aligned_offset_malloc) || defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign)
@@ -475,7 +475,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_aligned_offset_malloc_dbg, __FORCELOCAL __ATTR_
 #endif /* !... */
 #endif /* !___aligned_offset_malloc_dbg_defined */
 #ifndef ___aligned_offset_realloc_dbg_defined
-#define ___aligned_offset_realloc_dbg_defined 1
+#define ___aligned_offset_realloc_dbg_defined
 #ifdef __CRT_HAVE__aligned_offset_realloc_dbg
 __LIBC __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)) void *__NOTHROW_NCX(__LIBDCALL _aligned_offset_realloc_dbg)(void *__ptr, __SIZE_TYPE__ __num_bytes, __SIZE_TYPE__ __min_alignment, __SIZE_TYPE__ __offset, char const *__filename, int __line) __CASMNAME_SAME("_aligned_offset_realloc_dbg");
 #elif defined(__CRT_HAVE__aligned_offset_realloc) || ((defined(__CRT_HAVE__aligned_offset_malloc) || defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign)) && (defined(__CRT_HAVE__aligned_free) || defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree)))
@@ -486,7 +486,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_aligned_offset_realloc_dbg, __FORCELOCAL __ATTR
 #endif /* !... */
 #endif /* !___aligned_offset_realloc_dbg_defined */
 #ifndef ___aligned_offset_recalloc_dbg_defined
-#define ___aligned_offset_recalloc_dbg_defined 1
+#define ___aligned_offset_recalloc_dbg_defined
 #ifdef __CRT_HAVE__aligned_offset_recalloc_dbg
 __LIBC __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2, 3)) void *__NOTHROW_NCX(__LIBDCALL _aligned_offset_recalloc_dbg)(void *__ptr, __SIZE_TYPE__ __count, __SIZE_TYPE__ __num_bytes, __SIZE_TYPE__ __min_alignment, __SIZE_TYPE__ __offset, char const *__filename, int __line) __CASMNAME_SAME("_aligned_offset_recalloc_dbg");
 #elif defined(__CRT_HAVE__aligned_offset_recalloc) || ((defined(__CRT_HAVE__aligned_offset_malloc) || defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign)) && (defined(__CRT_HAVE__aligned_free) || defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree)))
@@ -497,7 +497,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_aligned_offset_recalloc_dbg, __FORCELOCAL __ATT
 #endif /* !... */
 #endif /* !___aligned_offset_recalloc_dbg_defined */
 #ifndef ___aligned_free_dbg_defined
-#define ___aligned_free_dbg_defined 1
+#define ___aligned_free_dbg_defined
 #ifdef __CRT_HAVE__aligned_free_dbg
 __LIBC void __NOTHROW_NCX(__LIBDCALL _aligned_free_dbg)(void *__ptr) __CASMNAME_SAME("_aligned_free_dbg");
 #elif defined(__CRT_HAVE__aligned_free) || defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree)
@@ -508,7 +508,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_aligned_free_dbg, __FORCELOCAL __ATTR_ARTIFICIA
 #endif /* !... */
 #endif /* !___aligned_free_dbg_defined */
 #ifndef ___strdup_dbg_defined
-#define ___strdup_dbg_defined 1
+#define ___strdup_dbg_defined
 #ifdef __CRT_HAVE__strdup_dbg
 __LIBC __ATTR_MALLOC __ATTR_WUNUSED char *__NOTHROW_NCX(__LIBDCALL _strdup_dbg)(char const *__string, int __block_type, char const *__filename, int __line) __CASMNAME_SAME("_strdup_dbg");
 #elif defined(__CRT_HAVE_strdup) || defined(__CRT_HAVE__strdup) || defined(__CRT_HAVE___strdup) || defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign)
@@ -519,7 +519,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_strdup_dbg, __FORCELOCAL __ATTR_ARTIFICIAL __AT
 #endif /* !... */
 #endif /* !___strdup_dbg_defined */
 #ifndef ___wcsdup_dbg_defined
-#define ___wcsdup_dbg_defined 1
+#define ___wcsdup_dbg_defined
 #ifdef __CRT_HAVE__wcsdup_dbg
 __LIBC __ATTR_MALLOC __ATTR_WUNUSED __WCHAR16_TYPE__ *__NOTHROW_NCX(__LIBDCALL _wcsdup_dbg)(__WCHAR16_TYPE__ const *__string, int __block_type, char const *__filename, int __line) __CASMNAME_SAME("_wcsdup_dbg");
 #elif (defined(__CRT_HAVE_wcsdup) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)) || defined(__CRT_HAVE_DOS$wcsdup) || (defined(__CRT_HAVE__wcsdup) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)) || defined(__CRT_HAVE_DOS$_wcsdup) || defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign)
@@ -530,7 +530,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_wcsdup_dbg, __FORCELOCAL __ATTR_ARTIFICIAL __AT
 #endif /* !... */
 #endif /* !___wcsdup_dbg_defined */
 #ifndef ___tempnam_dbg_defined
-#define ___tempnam_dbg_defined 1
+#define ___tempnam_dbg_defined
 #ifdef __CRT_HAVE__tempnam_dbg
 __LIBC __ATTR_MALLOC __ATTR_WUNUSED char *__NOTHROW_NCX(__LIBDCALL _tempnam_dbg)(char const *__dir_name, char const *__file_prefix, int __block_type, char const *__filename, int __line) __CASMNAME_SAME("_tempnam_dbg");
 #elif defined(__CRT_HAVE_tempnam) || defined(__CRT_HAVE__tempnam)
@@ -541,7 +541,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_tempnam_dbg, __FORCELOCAL __ATTR_ARTIFICIAL __A
 #endif /* !... */
 #endif /* !___tempnam_dbg_defined */
 #ifndef ___wtempnam_dbg_defined
-#define ___wtempnam_dbg_defined 1
+#define ___wtempnam_dbg_defined
 #ifdef __CRT_HAVE__wtempnam_dbg
 __LIBC __ATTR_WUNUSED __WCHAR16_TYPE__ *__NOTHROW_NCX(__LIBDCALL _wtempnam_dbg)(__WCHAR16_TYPE__ const *__dir_name, __WCHAR16_TYPE__ const *__file_prefix, int __block_type, char const *__filename, int __line) __CASMNAME_SAME("_wtempnam_dbg");
 #else /* __CRT_HAVE__wtempnam_dbg */
@@ -550,7 +550,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_wtempnam_dbg, __FORCELOCAL __ATTR_ARTIFICIAL __
 #endif /* !__CRT_HAVE__wtempnam_dbg */
 #endif /* !___wtempnam_dbg_defined */
 #ifndef ___fullpath_dbg_defined
-#define ___fullpath_dbg_defined 1
+#define ___fullpath_dbg_defined
 #ifdef __CRT_HAVE__fullpath_dbg
 __LIBC __ATTR_WUNUSED __ATTR_NONNULL((2)) char *__NOTHROW_NCX(__LIBDCALL _fullpath_dbg)(char *__full_path, char const *__path, __SIZE_TYPE__ __bufsize, int __block_type, char const *__filename, int __line) __CASMNAME_SAME("_fullpath_dbg");
 #elif defined(__CRT_HAVE__fullpath)
@@ -561,7 +561,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_fullpath_dbg, __FORCELOCAL __ATTR_ARTIFICIAL __
 #endif /* !... */
 #endif /* !___fullpath_dbg_defined */
 #ifndef ___wfullpath_dbg_defined
-#define ___wfullpath_dbg_defined 1
+#define ___wfullpath_dbg_defined
 #ifdef __CRT_HAVE__wfullpath_dbg
 __LIBC __ATTR_WUNUSED __ATTR_NONNULL((2)) __WCHAR16_TYPE__ *__NOTHROW_NCX(__LIBDCALL _wfullpath_dbg)(__WCHAR16_TYPE__ *__full_path, __WCHAR16_TYPE__ const *__path, __SIZE_TYPE__ __buflen, int __block_type, char const *__filename, int __line) __CASMNAME_SAME("_wfullpath_dbg");
 #else /* __CRT_HAVE__wfullpath_dbg */
@@ -570,7 +570,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_wfullpath_dbg, __FORCELOCAL __ATTR_ARTIFICIAL _
 #endif /* !__CRT_HAVE__wfullpath_dbg */
 #endif /* !___wfullpath_dbg_defined */
 #ifndef ___getcwd_dbg_defined
-#define ___getcwd_dbg_defined 1
+#define ___getcwd_dbg_defined
 #ifdef __CRT_HAVE__getcwd_dbg
 __LIBC __ATTR_WUNUSED char *__NOTHROW_NCX(__LIBDCALL _getcwd_dbg)(char *__buf, __STDC_INT_AS_SIZE_T __bufsize, int __block_type, char const *__filename, int __line) __CASMNAME_SAME("_getcwd_dbg");
 #elif defined(__CRT_HAVE_getcwd) || defined(__CRT_HAVE__getcwd)
@@ -581,7 +581,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_getcwd_dbg, __FORCELOCAL __ATTR_ARTIFICIAL __AT
 #endif /* !... */
 #endif /* !___getcwd_dbg_defined */
 #ifndef ___wgetcwd_dbg_defined
-#define ___wgetcwd_dbg_defined 1
+#define ___wgetcwd_dbg_defined
 #ifdef __CRT_HAVE__wgetcwd_dbg
 __LIBC __ATTR_WUNUSED __WCHAR16_TYPE__ *__NOTHROW_NCX(__LIBDCALL _wgetcwd_dbg)(__WCHAR16_TYPE__ *__buf, __STDC_INT_AS_SIZE_T __buflen, int __block_type, char const *__filename, int __line) __CASMNAME_SAME("_wgetcwd_dbg");
 #elif (defined(__CRT_HAVE_wgetcwd) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)) || defined(__CRT_HAVE_DOS$wgetcwd) || (defined(__CRT_HAVE__wgetcwd) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)) || defined(__CRT_HAVE_DOS$_wgetcwd)
@@ -592,7 +592,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_wgetcwd_dbg, __FORCELOCAL __ATTR_ARTIFICIAL __A
 #endif /* !... */
 #endif /* !___wgetcwd_dbg_defined */
 #ifndef ___getdcwd_dbg_defined
-#define ___getdcwd_dbg_defined 1
+#define ___getdcwd_dbg_defined
 #ifdef __CRT_HAVE__getdcwd_dbg
 __LIBC __ATTR_WUNUSED char *__NOTHROW_NCX(__LIBDCALL _getdcwd_dbg)(int __driveno, char *__buf, __STDC_INT_AS_SIZE_T __bufsize, int __block_type, char const *__filename, int __line) __CASMNAME_SAME("_getdcwd_dbg");
 #elif defined(__CRT_HAVE__getdcwd)
@@ -603,7 +603,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_getdcwd_dbg, __FORCELOCAL __ATTR_ARTIFICIAL __A
 #endif /* !... */
 #endif /* !___getdcwd_dbg_defined */
 #ifndef ___wgetdcwd_dbg_defined
-#define ___wgetdcwd_dbg_defined 1
+#define ___wgetdcwd_dbg_defined
 #ifdef __CRT_HAVE__wgetdcwd_dbg
 __LIBC __ATTR_WUNUSED __WCHAR16_TYPE__ *__NOTHROW_NCX(__LIBDCALL _wgetdcwd_dbg)(int __driveno, __WCHAR16_TYPE__ *__buf, __STDC_INT_AS_SIZE_T __buflen, int __block_type, char const *__filename, int __line) __CASMNAME_SAME("_wgetdcwd_dbg");
 #else /* __CRT_HAVE__wgetdcwd_dbg */
@@ -612,7 +612,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_wgetdcwd_dbg, __FORCELOCAL __ATTR_ARTIFICIAL __
 #endif /* !__CRT_HAVE__wgetdcwd_dbg */
 #endif /* !___wgetdcwd_dbg_defined */
 #ifndef ___getdcwd_lk_dbg_defined
-#define ___getdcwd_lk_dbg_defined 1
+#define ___getdcwd_lk_dbg_defined
 #ifdef __CRT_HAVE__getdcwd_dbg
 __COMPILER_REDIRECT(__LIBC,__ATTR_WUNUSED,char *,__NOTHROW_NCX,__LIBDCALL,_getdcwd_lk_dbg,(int __driveno, char *__buf, __STDC_INT_AS_SIZE_T __bufsize, int __block_type, char const *__filename, int __line),_getdcwd_dbg,(__driveno,__buf,__bufsize,__block_type,__filename,__line))
 #elif defined(__CRT_HAVE__getdcwd)
@@ -623,7 +623,7 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED char *__NOTHROW_NCX(__LIBDCALL _ge
 #endif /* !... */
 #endif /* !___getdcwd_lk_dbg_defined */
 #ifndef ___wgetdcwd_lk_dbg_defined
-#define ___wgetdcwd_lk_dbg_defined 1
+#define ___wgetdcwd_lk_dbg_defined
 #ifdef __CRT_HAVE__wgetdcwd_dbg
 __COMPILER_REDIRECT(__LIBC,__ATTR_WUNUSED,__WCHAR16_TYPE__ *,__NOTHROW_NCX,__LIBDCALL,_wgetdcwd_lk_dbg,(int __driveno, __WCHAR16_TYPE__ *__buf, __STDC_INT_AS_SIZE_T __buflen, int __block_type, char const *__filename, int __line),_wgetdcwd_dbg,(__driveno,__buf,__buflen,__block_type,__filename,__line))
 #else /* __CRT_HAVE__wgetdcwd_dbg */
@@ -632,7 +632,7 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __WCHAR16_TYPE__ *__NOTHROW_NCX(__
 #endif /* !__CRT_HAVE__wgetdcwd_dbg */
 #endif /* !___wgetdcwd_lk_dbg_defined */
 #ifndef ___dupenv_s_dbg_defined
-#define ___dupenv_s_dbg_defined 1
+#define ___dupenv_s_dbg_defined
 #ifdef __CRT_HAVE__dupenv_s_dbg
 __LIBC _Check_return_wat_ __ATTR_NONNULL((3)) __errno_t __NOTHROW_NCX(__LIBDCALL _dupenv_s_dbg)(char **__pbuf, __SIZE_TYPE__ *__pbufsize, char const *__varname, int __block_type, char const *__filename, int __line) __CASMNAME_SAME("_dupenv_s_dbg");
 #elif defined(__CRT_HAVE__dupenv_s)
@@ -643,7 +643,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_dupenv_s_dbg, __FORCELOCAL __ATTR_ARTIFICIAL _C
 #endif /* !... */
 #endif /* !___dupenv_s_dbg_defined */
 #ifndef ___wdupenv_s_dbg_defined
-#define ___wdupenv_s_dbg_defined 1
+#define ___wdupenv_s_dbg_defined
 #ifdef __CRT_HAVE__wdupenv_s_dbg
 __LIBC _Check_return_wat_ __ATTR_NONNULL((3)) __errno_t __NOTHROW_NCX(__LIBDCALL _wdupenv_s_dbg)(__WCHAR16_TYPE__ **__pbuf, __SIZE_TYPE__ *__pbuflen, __WCHAR16_TYPE__ const *__varname, int __block_type, char const *__filename, int __line) __CASMNAME_SAME("_wdupenv_s_dbg");
 #else /* __CRT_HAVE__wdupenv_s_dbg */
@@ -731,7 +731,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_CrtGetCheckCount, __FORCELOCAL __ATTR_ARTIFICIA
 #endif /* !__CRT_HAVE__CrtGetCheckCount */
 
 #ifndef ___CrtDbgBreak_defined
-#define ___CrtDbgBreak_defined 1
+#define ___CrtDbgBreak_defined
 __SYSDECL_END
 #include <intrin.h>
 __SYSDECL_BEGIN

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6b31ece3 */
+/* HASH CRC-32:0x71c834e2 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,13 +19,13 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local__fullpath_dbg_defined
-#define __local__fullpath_dbg_defined 1
+#define __local__fullpath_dbg_defined
 #include <__crt.h>
 #ifdef __CRT_HAVE__fullpath
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep__fullpath_defined
-#define __local___localdep__fullpath_defined 1
+#define __local___localdep__fullpath_defined
 __CREDIRECT(,char *,__NOTHROW_RPC,__localdep__fullpath,(char *__buf, char const *__path, __SIZE_TYPE__ __buflen),_fullpath,(__buf,__path,__buflen))
 #endif /* !__local___localdep__fullpath_defined */
 __LOCAL_LIBC(_fullpath_dbg) __ATTR_WUNUSED __ATTR_NONNULL((2)) char *
@@ -37,7 +37,7 @@ __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(_fullpath_dbg))(char *__full_path, ch
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep__fullpath_dbg_defined
-#define __local___localdep__fullpath_dbg_defined 1
+#define __local___localdep__fullpath_dbg_defined
 #define __localdep__fullpath_dbg __LIBC_LOCAL_NAME(_fullpath_dbg)
 #endif /* !__local___localdep__fullpath_dbg_defined */
 #else /* __CRT_HAVE__fullpath */

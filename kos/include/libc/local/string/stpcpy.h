@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8efe3285 */
+/* HASH CRC-32:0x64dc5093 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,11 +19,11 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_stpcpy_defined
-#define __local_stpcpy_defined 1
+#define __local_stpcpy_defined
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_mempcpy_defined
-#define __local___localdep_mempcpy_defined 1
+#define __local___localdep_mempcpy_defined
 #ifdef __CRT_HAVE_mempcpy
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
@@ -42,7 +42,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_mempcpy_defined */
 #ifndef __local___localdep_strlen_defined
-#define __local___localdep_strlen_defined 1
+#define __local___localdep_strlen_defined
 #ifdef __CRT_HAVE_strlen
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
@@ -61,7 +61,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(stpcpy))(char *__restrict __buf, char
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_stpcpy_defined
-#define __local___localdep_stpcpy_defined 1
+#define __local___localdep_stpcpy_defined
 #define __localdep_stpcpy __LIBC_LOCAL_NAME(stpcpy)
 #endif /* !__local___localdep_stpcpy_defined */
 #endif /* !__local_stpcpy_defined */

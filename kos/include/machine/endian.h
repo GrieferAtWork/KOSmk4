@@ -52,7 +52,7 @@
 #define __bswap64(x) __hybrid_bswap64(x)
 
 #ifndef __machine_host_to_from_network_defined
-#define __machine_host_to_from_network_defined 1
+#define __machine_host_to_from_network_defined
 #define __htonl(x) __hybrid_htobe32(x)
 #define __htons(x) __hybrid_htobe16(x)
 #define __ntohl(x) __hybrid_betoh32(x)

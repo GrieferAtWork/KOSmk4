@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9610b529 */
+/* HASH CRC-32:0xf88553f1 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -337,7 +337,7 @@ __CDECLARE_OPT(,int,__NOTHROW_NCX,__control87_2,(__UINT32_TYPE__ __newval, __UIN
 #endif /* X64... */
 /* TODO: This function is most definitely x86-specific! */
 #if !defined(____fpecode_defined) && defined(__CRT_HAVE___fpecode)
-#define ____fpecode_defined 1
+#define ____fpecode_defined
 __CDECLARE(,int *,__NOTHROW_NCX,__fpecode,(void),())
 #endif /* !____fpecode_defined && __CRT_HAVE___fpecode */
 #ifdef ____fpecode_defined
@@ -595,7 +595,7 @@ __SYSDECL_END
 
 #endif /* !__NO_FPU */
 #ifdef __CXX_SYSTEM_HEADER
-#define _CXX_STDONLY_CFLOAT 1
+#define _CXX_STDONLY_CFLOAT
 #undef _FLOAT_H
 #endif /* __CXX_SYSTEM_HEADER */
 #endif /* !_CXX_STDONLY_CFLOAT */

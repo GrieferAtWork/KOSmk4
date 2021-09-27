@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x66e31b56 */
+/* HASH CRC-32:0xb354765f */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,12 +19,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_wutime_defined
-#define __local_wutime_defined 1
+#define __local_wutime_defined
 #include <__crt.h>
 #if defined(__CRT_HAVE_wutime) || defined(__CRT_HAVE__wutime32) || defined(__CRT_HAVE_wutime64) || defined(__CRT_HAVE__wutime64)
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_crt_wutime32_defined
-#define __local___localdep_crt_wutime32_defined 1
+#define __local___localdep_crt_wutime32_defined
 #ifdef __CRT_HAVE_wutime
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_crt_wutime32,(__WCHAR_TYPE__ const *__filename, struct __utimbuf32 const *__file_times),wutime,(__filename,__file_times))
 #elif defined(__CRT_HAVE__wutime32)
@@ -34,7 +34,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_crt_wutime32,(__WCH
 #endif /* !... */
 #endif /* !__local___localdep_crt_wutime32_defined */
 #ifndef __local___localdep_wutime64_defined
-#define __local___localdep_wutime64_defined 1
+#define __local___localdep_wutime64_defined
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -83,7 +83,7 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(wutime))(__WCHAR_TYPE__ const *__file
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_wutime_defined
-#define __local___localdep_wutime_defined 1
+#define __local___localdep_wutime_defined
 #define __localdep_wutime __LIBC_LOCAL_NAME(wutime)
 #endif /* !__local___localdep_wutime_defined */
 #else /* __CRT_HAVE_wutime || __CRT_HAVE__wutime32 || __CRT_HAVE_wutime64 || __CRT_HAVE__wutime64 */

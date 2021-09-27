@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x37e5fb9d */
+/* HASH CRC-32:0xe939e7b */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -54,22 +54,22 @@
 __SYSDECL_BEGIN
 
 #ifndef __errno_t_defined
-#define __errno_t_defined 1
+#define __errno_t_defined
 typedef __errno_t errno_t;
 #endif /* !__errno_t_defined */
 
 #ifndef __size_t_defined
-#define __size_t_defined 1
+#define __size_t_defined
 typedef __size_t size_t;
 #endif /* !__size_t_defined */
 
 #ifndef __ssize_t_defined
-#define __ssize_t_defined 1
+#define __ssize_t_defined
 typedef __ssize_t ssize_t;
 #endif /* !__ssize_t_defined */
 
 #ifndef __intptr_t_defined
-#define __intptr_t_defined 1
+#define __intptr_t_defined
 typedef __intptr_t intptr_t;
 #endif /* !__intptr_t_defined */
 
@@ -94,7 +94,7 @@ struct _finddata64i32_t;
 #endif /* !__PIO_OFFSET */
 
 #ifndef __remove_defined
-#define __remove_defined 1
+#define __remove_defined
 #ifdef __std_remove_defined
 /* >> remove(3)
  * Remove a file or directory `filename' */
@@ -113,7 +113,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(remove, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NO
 #endif /* !... */
 #endif /* !__remove_defined */
 #ifndef __rename_defined
-#define __rename_defined 1
+#define __rename_defined
 #ifdef __std_rename_defined
 /* >> rename(2)
  * Rename  a given file `oldname' to `newname_or_path', or in the event
@@ -135,7 +135,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(rename, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NO
 #endif /* !... */
 #endif /* !__rename_defined */
 #ifndef __unlink_defined
-#define __unlink_defined 1
+#define __unlink_defined
 #ifdef __CRT_HAVE_unlink
 /* >> unlink(2)
  * Remove a file, symbolic link, device or FIFO referred to by `file' */
@@ -154,7 +154,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(unlink, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NO
 #endif /* !... */
 #endif /* !__unlink_defined */
 #ifndef __open_defined
-#define __open_defined 1
+#define __open_defined
 #if defined(__CRT_HAVE_open) && (!defined(__USE_FILE_OFFSET64) || !defined(__O_LARGEFILE) || !__O_LARGEFILE)
 /* >> open(2), open64(2), openat(2), openat64(2)
  * Open  a  new  file  handle  to  the  file  specified  by `filename'
@@ -261,7 +261,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(open, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNU
 #endif /* !... */
 #endif /* !__open_defined */
 #ifndef __creat_defined
-#define __creat_defined 1
+#define __creat_defined
 #if defined(__CRT_HAVE_creat) && (!defined(__USE_FILE_OFFSET64) || !defined(__O_LARGEFILE) || !__O_LARGEFILE)
 /* >> creat(2), creat64(2)
  * Alias for `open(filename, O_CREAT | O_WRONLY | O_TRUNC, mode)' */
@@ -284,7 +284,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(creat, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUN
 #endif /* !... */
 #endif /* !__creat_defined */
 #ifndef __access_defined
-#define __access_defined 1
+#define __access_defined
 #ifdef __CRT_HAVE_access
 /* >> access(2)
  * @param: type: Set of `X_OK | W_OK | R_OK'
@@ -306,7 +306,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(access, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WU
 #endif /* !... */
 #endif /* !__access_defined */
 #ifndef __chmod_defined
-#define __chmod_defined 1
+#define __chmod_defined
 #ifdef __CRT_HAVE_chmod
 /* >> chmod(2) */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,chmod,(char const *__filename, __mode_t __mode),(__filename,__mode))
@@ -318,7 +318,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,chmod,(char const *__filename,
 #endif /* !... */
 #endif /* !__chmod_defined */
 #ifndef __close_defined
-#define __close_defined 1
+#define __close_defined
 #ifdef __CRT_HAVE_close
 /* >> close(2)
  * Close a given file descriptor/handle `fd' */
@@ -336,7 +336,7 @@ __CREDIRECT(,int,__NOTHROW_NCX,close,(__fd_t __fd),__close,(__fd))
 #endif /* !... */
 #endif /* !__close_defined */
 #ifndef __dup_defined
-#define __dup_defined 1
+#define __dup_defined
 #ifdef __CRT_HAVE_dup
 /* >> dup(2)
  * @return: * : Returns the new handle upon success.
@@ -352,7 +352,7 @@ __CREDIRECT(__ATTR_WUNUSED,__fd_t,__NOTHROW_NCX,dup,(__fd_t __fd),_dup,(__fd))
 #endif /* !... */
 #endif /* !__dup_defined */
 #ifndef __dup2_defined
-#define __dup2_defined 1
+#define __dup2_defined
 #ifdef __CRT_HAVE_dup2
 /* >> dup2(2)
  * @return: newfd: Returns the new handle upon success.
@@ -373,7 +373,7 @@ __CREDIRECT(,__fd_t,__NOTHROW_NCX,dup2,(__fd_t __oldfd, __fd_t __newfd),__dup2,(
 #endif /* !... */
 #endif /* !__dup2_defined */
 #ifndef __isatty_defined
-#define __isatty_defined 1
+#define __isatty_defined
 #ifdef __CRT_HAVE_isatty
 /* >> isatty(2)
  * Check if the given file handle `fd' refers to a TTY
@@ -401,7 +401,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(isatty, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WU
 #endif /* !... */
 #endif /* !__isatty_defined */
 #ifndef __lseek_defined
-#define __lseek_defined 1
+#define __lseek_defined
 #if defined(__CRT_HAVE_lseek) && (!defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
 /* >> lseek(2), lseek64(2)
  * Change the position of the file read/write pointer within a file referred to by `fd' */
@@ -432,7 +432,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(lseek, __FORCELOCAL __ATTR_ARTIFICIAL __FS_TYPE(
 #endif /* !... */
 #endif /* !__lseek_defined */
 #ifndef __mktemp_defined
-#define __mktemp_defined 1
+#define __mktemp_defined
 #ifdef __CRT_HAVE_mktemp
 /* >> mktemp(3)
  * Badly designed version of  `mkstemp' that won't actually  create
@@ -486,7 +486,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(mktemp, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_RE
 #endif /* !... */
 #endif /* !__mktemp_defined */
 #ifndef __umask_defined
-#define __umask_defined 1
+#define __umask_defined
 #ifdef __CRT_HAVE_umask
 /* >> umask(2) */
 __CDECLARE(,__mode_t,__NOTHROW_NCX,umask,(__mode_t __mode),(__mode))
@@ -498,7 +498,7 @@ __CREDIRECT(,__mode_t,__NOTHROW_NCX,umask,(__mode_t __mode),_umask,(__mode))
 #endif /* !... */
 #endif /* !__umask_defined */
 #ifndef __read_defined
-#define __read_defined 1
+#define __read_defined
 #ifdef __CRT_HAVE_read
 /* >> read(2)
  * Read up to `bufsize' bytes from `fd' into `buf'
@@ -531,7 +531,7 @@ __CREDIRECT(__ATTR_NONNULL((2)),ssize_t,__NOTHROW_RPC,read,(__fd_t __fd, void *_
 #endif /* !... */
 #endif /* !__read_defined */
 #ifndef __write_defined
-#define __write_defined 1
+#define __write_defined
 #ifdef __CRT_HAVE_write
 /* >> write(2)
  * Write up to `bufsize' bytes from `buf' into `fd'
@@ -727,7 +727,7 @@ __CREDIRECT(,int,__NOTHROW_RPC,_locking,(__fd_t __fd, __STDC_INT_AS_UINT_T __cmd
 __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_RPC(__LIBCCALL _locking)(__fd_t __fd, __STDC_INT_AS_UINT_T __cmd, __PIO_OFFSET __length) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lockf))(__fd, __cmd, __length); }
 #endif /* ... */
 #ifndef ___unlink_defined
-#define ___unlink_defined 1
+#define ___unlink_defined
 #ifdef __CRT_HAVE_unlink
 /* >> unlink(2)
  * Remove a file, symbolic link, device or FIFO referred to by `file' */
@@ -1154,7 +1154,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_open_osfhandle, __FORCELOCAL __ATTR_ARTIFICIAL 
 
 /* WARNING: `setmode(3)' is also a completely different BSD-specific function in <unistd.h>! */
 #ifndef __setmode_defined
-#define __setmode_defined 1
+#define __setmode_defined
 #ifdef __CRT_HAVE__setmode
 __CREDIRECT(,__oflag_t,__NOTHROW_NCX,setmode,(__fd_t __fd, __oflag_t __mode),_setmode,(__fd,__mode))
 #elif (defined(__CRT_HAVE_fcntl) || defined(__CRT_HAVE___fcntl)) && (defined(__F_SETFL_XCH) || (defined(__F_GETFL) && defined(__F_SETFL)))
@@ -1219,7 +1219,7 @@ __CREDIRECT(__ATTR_WUNUSED,__LONG32_TYPE__,__NOTHROW_NCX,filelength,(__fd_t __fd
 __NAMESPACE_LOCAL_USING_OR_IMPL(filelength, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __LONG32_TYPE__ __NOTHROW_NCX(__LIBCCALL filelength)(__fd_t __fd) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(filelength))(__fd); })
 #endif /* ... */
 #ifndef __tell_defined
-#define __tell_defined 1
+#define __tell_defined
 #if defined(__CRT_HAVE_tell) && (!defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
 /* >> tell(3), tell64(3)
  * Return the current file position (alias for `lseek(fd, 0, SEEK_CUR)') */

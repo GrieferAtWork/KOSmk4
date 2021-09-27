@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdf6b1f4f */
+/* HASH CRC-32:0x9b2e7d3b */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_glob_defined
-#define __local_glob_defined 1
+#define __local_glob_defined
 #include <__crt.h>
 #include <features.h>
 #include <bits/crt/glob.h>
@@ -36,7 +36,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(glob))(char const *__restrict __patte
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_glob_defined
-#define __local___localdep_glob_defined 1
+#define __local___localdep_glob_defined
 #define __localdep_glob __LIBC_LOCAL_NAME(glob)
 #endif /* !__local___localdep_glob_defined */
 #endif /* !__local_glob_defined */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x31fd135a */
+/* HASH CRC-32:0x571a727a */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,14 +19,14 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_futimesat64_defined
-#define __local_futimesat64_defined 1
+#define __local_futimesat64_defined
 #include <__crt.h>
 #ifdef __CRT_HAVE_futimesat
 #include <bits/os/timeval.h>
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_futimesat32_defined
-#define __local___localdep_futimesat32_defined 1
+#define __local___localdep_futimesat32_defined
 __CREDIRECT(__ATTR_NONNULL((2, 3)),int,__NOTHROW_NCX,__localdep_futimesat32,(__fd_t __fd, char const *__file, struct __timeval32 const __tvp[2]),futimesat,(__fd,__file,__tvp))
 #endif /* !__local___localdep_futimesat32_defined */
 __LOCAL_LIBC(futimesat64) __ATTR_NONNULL((2)) int
@@ -42,7 +42,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(futimesat64))(__fd_t __fd, char const
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_futimesat64_defined
-#define __local___localdep_futimesat64_defined 1
+#define __local___localdep_futimesat64_defined
 #define __localdep_futimesat64 __LIBC_LOCAL_NAME(futimesat64)
 #endif /* !__local___localdep_futimesat64_defined */
 #else /* __CRT_HAVE_futimesat */

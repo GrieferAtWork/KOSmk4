@@ -34,7 +34,7 @@
 __DECL_BEGIN
 
 #ifndef __va_list_defined
-#define __va_list_defined 1
+#define __va_list_defined
 typedef __builtin_va_list va_list;
 #endif /* !__va_list_defined */
 
