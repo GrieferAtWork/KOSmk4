@@ -17,10 +17,37 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _I386_KOS_LIBRPC_BITS_SYSCALL_INFO_CONVERT_H
-#define _I386_KOS_LIBRPC_BITS_SYSCALL_INFO_CONVERT_H 1
-/* !!! DEPRECATED HEADER !!! */
+#ifndef _I386_KOS_KOS_BITS_SYSCALL_INFO32_H
+#define _I386_KOS_KOS_BITS_SYSCALL_INFO32_H 1
 
-#include <kos/bits/syscall-info-convert.h>
+#include <__stdinc.h>
+#include <hybrid/typecore.h>
+#include <hybrid/host.h>
 
-#endif /* !_I386_KOS_LIBRPC_BITS_SYSCALL_INFO_CONVERT_H */
+#ifndef __x86_64__
+#define OFFSET_RPC_SYSCALL_INFO_FLAGS OFFSET_RPC_SYSCALL_INFO32_FLAGS
+#define OFFSET_RPC_SYSCALL_INFO_SYSNO OFFSET_RPC_SYSCALL_INFO32_SYSNO
+#define OFFSET_RPC_SYSCALL_INFO_REG   OFFSET_RPC_SYSCALL_INFO32_REG
+#define SIZEOF_RPC_SYSCALL_INFO       SIZEOF_RPC_SYSCALL_INFO32
+#define rpc_syscall_info32            rpc_syscall_info
+#endif /* !__x86_64__ */
+
+#define OFFSET_RPC_SYSCALL_INFO32_FLAGS  0
+#define OFFSET_RPC_SYSCALL_INFO32_SYSNO  4
+#define OFFSET_RPC_SYSCALL_INFO32_REG(i) (((i) + 2) * 4)
+#define SIZEOF_RPC_SYSCALL_INFO32        32
+
+#ifdef __CC__
+__DECL_BEGIN
+
+struct rpc_syscall_info32 /*[PREFIX(rsi_)]*/ {
+	__UINT32_TYPE__  rsi_flags;   /* System call invocation flags (Set of `RPC_SYSCALL_INFO_F*') */
+	__UINT32_TYPE__  rsi_sysno;   /* The system call vector that got invoked. */
+	__UINT32_TYPE__  rsi_regs[6]; /* Arguments passed to the system call.
+	                               * NOTE: You may validate any argument by testing for `RPC_SYSCALL_INFO_FREGVALID(i)' */
+};
+
+__DECL_END
+#endif /* __CC__ */
+
+#endif /* !_I386_KOS_KOS_BITS_SYSCALL_INFO32_H */

@@ -190,10 +190,9 @@
 %[struct_escape(statfs32 = __statfs32, statfsx32 = __statfsx32, statfsx32_64 = __statfsx32_64)]
 %[struct_escape(statfs64 = __statfs64, statfsx64 = __statfsx64)]
 
-%[typeorg(<librpc/bits/syscall-info.h>: rpc_syscall_info)]
-%[typeorg(<librpc/bits/syscall-info32.h>: rpc_syscall_info32)]
-%[typeorg(<librpc/bits/syscall-info64.h>: rpc_syscall_info64)]
-
+%[typeorg(<kos/bits/syscall-info.h>: rpc_syscall_info)]
+%[typeorg(<kos/bits/syscall-info32.h>: rpc_syscall_info32)]
+%[typeorg(<kos/bits/syscall-info64.h>: rpc_syscall_info64)]
 %[typeorg(<kos/bits/except-handler.h>: __except_handler_t)]
 %[typeorg(<kos/bits/except-handler32.h>: __except_handler32_t)]
 %[typeorg(<kos/bits/except-handler64.h>: __except_handler64_t)]

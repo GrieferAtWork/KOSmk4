@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfc14e2f9 */
+/* HASH CRC-32:0x5e0e3c30 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -43,12 +43,12 @@
 #include <bits/os/tms.h>
 #include <bits/os/utimbuf.h>
 #include <bits/types.h>
+#include <kos/bits/syscall-info.h>
 #include <kos/compat/linux-dirent.h>
 #include <kos/compat/linux-dirent64.h>
 #include <kos/compat/linux-stat.h>
 #include <kos/kernel/cpu-state.h>
 #include <kos/kernel/fpu-state.h>
-#include <librpc/bits/syscall-info.h>
 
 
 #ifndef __CDECLARE_SC

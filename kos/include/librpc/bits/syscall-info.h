@@ -19,27 +19,8 @@
  */
 #ifndef _LIBRPC_BITS_SYSCALL_INFO_H
 #define _LIBRPC_BITS_SYSCALL_INFO_H 1
+/* !!! DEPRECATED HEADER !!! */
 
-#include <__stdinc.h>
-#include <bits/types.h>
-
-#define OFFSET_RPC_SYSCALL_INFO_FLAGS  0
-#define OFFSET_RPC_SYSCALL_INFO_SYSNO  __SIZEOF_SYSCALL_LONG_T__
-#define OFFSET_RPC_SYSCALL_INFO_REG(i) (((i) + 2) * __SIZEOF_SYSCALL_LONG_T__)
-#define SIZEOF_RPC_SYSCALL_INFO        (8 * __SIZEOF_SYSCALL_LONG_T__)
-
-#ifdef __CC__
-__DECL_BEGIN
-
-struct rpc_syscall_info {
-	/* Structure pushed by `RPC_PROGRAM_OP_psh_sys' */
-	__syscall_ulong_t  rsi_flags;   /* System call invocation flags (Set of `RPC_SYSCALL_INFO_F*') */
-	__syscall_ulong_t  rsi_sysno;   /* The system call vector that got invoked. */
-	__syscall_ulong_t  rsi_regs[6]; /* Arguments passed to the system call.
-	                                 * NOTE: You may validate any argument by testing for `RPC_SYSCALL_INFO_FREGVALID(i)' */
-};
-
-__DECL_END
-#endif /* __CC__ */
+#include <kos/bits/syscall-info.h>
 
 #endif /* !_LIBRPC_BITS_SYSCALL_INFO_H */

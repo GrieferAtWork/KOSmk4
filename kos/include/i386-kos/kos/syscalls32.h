@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x24c8098a */
+/* HASH CRC-32:0x73536358 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -54,6 +54,7 @@
 #include <kos/bits/except-handler.h>
 #include <kos/bits/except-handler32.h>
 #include <kos/bits/futex-expr32.h>
+#include <kos/bits/syscall-info32.h>
 #include <kos/bits/userprocmask.h>
 #include <kos/compat/linux-dirent.h>
 #include <kos/compat/linux-dirent64.h>
@@ -63,7 +64,6 @@
 #include <kos/kernel/cpu-state32.h>
 #include <kos/kernel/fpu-state32.h>
 #include <kos/rtm.h>
-#include <librpc/bits/syscall-info32.h>
 
 
 #ifndef __CDECLARE_SC

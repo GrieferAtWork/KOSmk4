@@ -668,7 +668,6 @@ incdir("");
 #include <kos/sys/mman.h>
 #include <kos/sys/stat.h>
 #include <kos/syscalls.h>
-#include <kos/thread.h>
 #include <kos/types.h>
 #include <kos/ukern.h>
 #include <kos/unistd.h>

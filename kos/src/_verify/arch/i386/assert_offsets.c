@@ -117,6 +117,8 @@ local files = {
 	"../../../../include/i386-kos/kos/bits/exception_data64.h",
 	"../../../../include/i386-kos/kos/bits/ukern-struct32.h",
 	"../../../../include/i386-kos/kos/bits/ukern-struct64.h",
+	"../../../../include/i386-kos/kos/bits/syscall-info32.h",
+	"../../../../include/i386-kos/kos/bits/syscall-info64.h",
 	"../../../../include/i386-kos/kos/exec/asm/elf32.h",
 	"../../../../include/i386-kos/kos/exec/asm/elf64.h",
 	"../../../../include/i386-kos/kos/exec/bits/peb32.h",
@@ -129,10 +131,6 @@ local files = {
 	"../../../../include/i386-kos/kos/kernel/tss16.h",
 	"../../../../include/i386-kos/kos/kernel/tss32.h",
 	"../../../../include/i386-kos/kos/kernel/tss64.h",
-	"../../../../include/i386-kos/librpc/bits/rpc32.h",
-	"../../../../include/i386-kos/librpc/bits/rpc64.h",
-	"../../../../include/i386-kos/librpc/bits/syscall-info32.h",
-	"../../../../include/i386-kos/librpc/bits/syscall-info64.h",
 };
 
 local include_prefixes = {
@@ -1722,6 +1720,28 @@ static_assert(sizeof(struct userkern64) == SIZEOF_USERKERN64);
 
 
 
+#include <kos/bits/syscall-info32.h>
+
+/* struct rpc_syscall_info32 */
+static_assert(offsetof(struct rpc_syscall_info32, rsi_flags) == OFFSET_RPC_SYSCALL_INFO32_FLAGS);
+static_assert(offsetof(struct rpc_syscall_info32, rsi_sysno) == OFFSET_RPC_SYSCALL_INFO32_SYSNO);
+static_assert(sizeof(struct rpc_syscall_info32) == SIZEOF_RPC_SYSCALL_INFO32);
+
+
+
+
+
+#include <kos/bits/syscall-info64.h>
+
+/* struct rpc_syscall_info64 */
+static_assert(offsetof(struct rpc_syscall_info64, rsi_flags) == OFFSET_RPC_SYSCALL_INFO64_FLAGS);
+static_assert(offsetof(struct rpc_syscall_info64, rsi_sysno) == OFFSET_RPC_SYSCALL_INFO64_SYSNO);
+static_assert(sizeof(struct rpc_syscall_info64) == SIZEOF_RPC_SYSCALL_INFO64);
+
+
+
+
+
 #include <kos/exec/asm/elf32.h>
 
 
@@ -2048,6 +2068,22 @@ static_assert(offsetof(struct sfpustate, fs_fip) == OFFSET_SFPUSTATE_FIP);
 static_assert(offsetof(struct sfpustate, fs_fop) == OFFSET_SFPUSTATE_FOP);
 static_assert(offsetof(struct sfpustate, fs_fsw) == OFFSET_SFPUSTATE_FSW);
 static_assert(offsetof(struct sfpustate, fs_ftw) == OFFSET_SFPUSTATE_FTW);
+static_assert(offsetof(struct sfpustate, fs_regs[0]) == OFFSET_SFPUSTATE_MM0);
+static_assert(offsetof(struct sfpustate, fs_regs[1]) == OFFSET_SFPUSTATE_MM1);
+static_assert(offsetof(struct sfpustate, fs_regs[2]) == OFFSET_SFPUSTATE_MM2);
+static_assert(offsetof(struct sfpustate, fs_regs[3]) == OFFSET_SFPUSTATE_MM3);
+static_assert(offsetof(struct sfpustate, fs_regs[4]) == OFFSET_SFPUSTATE_MM4);
+static_assert(offsetof(struct sfpustate, fs_regs[5]) == OFFSET_SFPUSTATE_MM5);
+static_assert(offsetof(struct sfpustate, fs_regs[6]) == OFFSET_SFPUSTATE_MM6);
+static_assert(offsetof(struct sfpustate, fs_regs[7]) == OFFSET_SFPUSTATE_MM7);
+static_assert(offsetof(struct sfpustate, fs_regs[0]) == OFFSET_SFPUSTATE_ST0);
+static_assert(offsetof(struct sfpustate, fs_regs[1]) == OFFSET_SFPUSTATE_ST1);
+static_assert(offsetof(struct sfpustate, fs_regs[2]) == OFFSET_SFPUSTATE_ST2);
+static_assert(offsetof(struct sfpustate, fs_regs[3]) == OFFSET_SFPUSTATE_ST3);
+static_assert(offsetof(struct sfpustate, fs_regs[4]) == OFFSET_SFPUSTATE_ST4);
+static_assert(offsetof(struct sfpustate, fs_regs[5]) == OFFSET_SFPUSTATE_ST5);
+static_assert(offsetof(struct sfpustate, fs_regs[6]) == OFFSET_SFPUSTATE_ST6);
+static_assert(offsetof(struct sfpustate, fs_regs[7]) == OFFSET_SFPUSTATE_ST7);
 static_assert(sizeof(struct sfpustate) == SIZEOF_SFPUSTATE);
 static_assert(alignof(struct sfpustate) == ALIGNOF_SFPUSTATE);
 
@@ -2066,8 +2102,32 @@ static_assert(offsetof(struct xfpustate32, fx_fip) == OFFSET_XFPUSTATE32_FIP);
 static_assert(offsetof(struct xfpustate32, fx_fop) == OFFSET_XFPUSTATE32_FOP);
 static_assert(offsetof(struct xfpustate32, fx_fsw) == OFFSET_XFPUSTATE32_FSW);
 static_assert(offsetof(struct xfpustate32, fx_ftw) == OFFSET_XFPUSTATE32_FTW);
+static_assert(offsetof(struct xfpustate32, fx_regs[0]) == OFFSET_XFPUSTATE32_MM0);
+static_assert(offsetof(struct xfpustate32, fx_regs[1]) == OFFSET_XFPUSTATE32_MM1);
+static_assert(offsetof(struct xfpustate32, fx_regs[2]) == OFFSET_XFPUSTATE32_MM2);
+static_assert(offsetof(struct xfpustate32, fx_regs[3]) == OFFSET_XFPUSTATE32_MM3);
+static_assert(offsetof(struct xfpustate32, fx_regs[4]) == OFFSET_XFPUSTATE32_MM4);
+static_assert(offsetof(struct xfpustate32, fx_regs[5]) == OFFSET_XFPUSTATE32_MM5);
+static_assert(offsetof(struct xfpustate32, fx_regs[6]) == OFFSET_XFPUSTATE32_MM6);
+static_assert(offsetof(struct xfpustate32, fx_regs[7]) == OFFSET_XFPUSTATE32_MM7);
 static_assert(offsetof(struct xfpustate32, fx_mxcsr) == OFFSET_XFPUSTATE32_MXCSR);
 static_assert(offsetof(struct xfpustate32, fx_mxcsr_mask) == OFFSET_XFPUSTATE32_MXCSR_MASK);
+static_assert(offsetof(struct xfpustate32, fx_regs[0]) == OFFSET_XFPUSTATE32_ST0);
+static_assert(offsetof(struct xfpustate32, fx_regs[1]) == OFFSET_XFPUSTATE32_ST1);
+static_assert(offsetof(struct xfpustate32, fx_regs[2]) == OFFSET_XFPUSTATE32_ST2);
+static_assert(offsetof(struct xfpustate32, fx_regs[3]) == OFFSET_XFPUSTATE32_ST3);
+static_assert(offsetof(struct xfpustate32, fx_regs[4]) == OFFSET_XFPUSTATE32_ST4);
+static_assert(offsetof(struct xfpustate32, fx_regs[5]) == OFFSET_XFPUSTATE32_ST5);
+static_assert(offsetof(struct xfpustate32, fx_regs[6]) == OFFSET_XFPUSTATE32_ST6);
+static_assert(offsetof(struct xfpustate32, fx_regs[7]) == OFFSET_XFPUSTATE32_ST7);
+static_assert(offsetof(struct xfpustate32, fx_xmm[0]) == OFFSET_XFPUSTATE32_XMM0);
+static_assert(offsetof(struct xfpustate32, fx_xmm[1]) == OFFSET_XFPUSTATE32_XMM1);
+static_assert(offsetof(struct xfpustate32, fx_xmm[2]) == OFFSET_XFPUSTATE32_XMM2);
+static_assert(offsetof(struct xfpustate32, fx_xmm[3]) == OFFSET_XFPUSTATE32_XMM3);
+static_assert(offsetof(struct xfpustate32, fx_xmm[4]) == OFFSET_XFPUSTATE32_XMM4);
+static_assert(offsetof(struct xfpustate32, fx_xmm[5]) == OFFSET_XFPUSTATE32_XMM5);
+static_assert(offsetof(struct xfpustate32, fx_xmm[6]) == OFFSET_XFPUSTATE32_XMM6);
+static_assert(offsetof(struct xfpustate32, fx_xmm[7]) == OFFSET_XFPUSTATE32_XMM7);
 static_assert(sizeof(struct xfpustate32) == SIZEOF_XFPUSTATE32);
 static_assert(alignof(struct xfpustate32) == ALIGNOF_XFPUSTATE32);
 
@@ -2088,8 +2148,40 @@ static_assert(offsetof(struct xfpustate64, fx_fip) == OFFSET_XFPUSTATE64_FIP);
 static_assert(offsetof(struct xfpustate64, fx_fop) == OFFSET_XFPUSTATE64_FOP);
 static_assert(offsetof(struct xfpustate64, fx_fsw) == OFFSET_XFPUSTATE64_FSW);
 static_assert(offsetof(struct xfpustate64, fx_ftw) == OFFSET_XFPUSTATE64_FTW);
+static_assert(offsetof(struct xfpustate64, fx_regs[0]) == OFFSET_XFPUSTATE64_MM0);
+static_assert(offsetof(struct xfpustate64, fx_regs[1]) == OFFSET_XFPUSTATE64_MM1);
+static_assert(offsetof(struct xfpustate64, fx_regs[2]) == OFFSET_XFPUSTATE64_MM2);
+static_assert(offsetof(struct xfpustate64, fx_regs[3]) == OFFSET_XFPUSTATE64_MM3);
+static_assert(offsetof(struct xfpustate64, fx_regs[4]) == OFFSET_XFPUSTATE64_MM4);
+static_assert(offsetof(struct xfpustate64, fx_regs[5]) == OFFSET_XFPUSTATE64_MM5);
+static_assert(offsetof(struct xfpustate64, fx_regs[6]) == OFFSET_XFPUSTATE64_MM6);
+static_assert(offsetof(struct xfpustate64, fx_regs[7]) == OFFSET_XFPUSTATE64_MM7);
 static_assert(offsetof(struct xfpustate64, fx_mxcsr) == OFFSET_XFPUSTATE64_MXCSR);
 static_assert(offsetof(struct xfpustate64, fx_mxcsr_mask) == OFFSET_XFPUSTATE64_MXCSR_MASK);
+static_assert(offsetof(struct xfpustate64, fx_regs[0]) == OFFSET_XFPUSTATE64_ST0);
+static_assert(offsetof(struct xfpustate64, fx_regs[1]) == OFFSET_XFPUSTATE64_ST1);
+static_assert(offsetof(struct xfpustate64, fx_regs[2]) == OFFSET_XFPUSTATE64_ST2);
+static_assert(offsetof(struct xfpustate64, fx_regs[3]) == OFFSET_XFPUSTATE64_ST3);
+static_assert(offsetof(struct xfpustate64, fx_regs[4]) == OFFSET_XFPUSTATE64_ST4);
+static_assert(offsetof(struct xfpustate64, fx_regs[5]) == OFFSET_XFPUSTATE64_ST5);
+static_assert(offsetof(struct xfpustate64, fx_regs[6]) == OFFSET_XFPUSTATE64_ST6);
+static_assert(offsetof(struct xfpustate64, fx_regs[7]) == OFFSET_XFPUSTATE64_ST7);
+static_assert(offsetof(struct xfpustate64, fx_xmm[0]) == OFFSET_XFPUSTATE64_XMM0);
+static_assert(offsetof(struct xfpustate64, fx_xmm[1]) == OFFSET_XFPUSTATE64_XMM1);
+static_assert(offsetof(struct xfpustate64, fx_xmm[10]) == OFFSET_XFPUSTATE64_XMM10);
+static_assert(offsetof(struct xfpustate64, fx_xmm[11]) == OFFSET_XFPUSTATE64_XMM11);
+static_assert(offsetof(struct xfpustate64, fx_xmm[12]) == OFFSET_XFPUSTATE64_XMM12);
+static_assert(offsetof(struct xfpustate64, fx_xmm[13]) == OFFSET_XFPUSTATE64_XMM13);
+static_assert(offsetof(struct xfpustate64, fx_xmm[14]) == OFFSET_XFPUSTATE64_XMM14);
+static_assert(offsetof(struct xfpustate64, fx_xmm[15]) == OFFSET_XFPUSTATE64_XMM15);
+static_assert(offsetof(struct xfpustate64, fx_xmm[2]) == OFFSET_XFPUSTATE64_XMM2);
+static_assert(offsetof(struct xfpustate64, fx_xmm[3]) == OFFSET_XFPUSTATE64_XMM3);
+static_assert(offsetof(struct xfpustate64, fx_xmm[4]) == OFFSET_XFPUSTATE64_XMM4);
+static_assert(offsetof(struct xfpustate64, fx_xmm[5]) == OFFSET_XFPUSTATE64_XMM5);
+static_assert(offsetof(struct xfpustate64, fx_xmm[6]) == OFFSET_XFPUSTATE64_XMM6);
+static_assert(offsetof(struct xfpustate64, fx_xmm[7]) == OFFSET_XFPUSTATE64_XMM7);
+static_assert(offsetof(struct xfpustate64, fx_xmm[8]) == OFFSET_XFPUSTATE64_XMM8);
+static_assert(offsetof(struct xfpustate64, fx_xmm[9]) == OFFSET_XFPUSTATE64_XMM9);
 static_assert(sizeof(struct xfpustate64) == SIZEOF_XFPUSTATE64);
 static_assert(alignof(struct xfpustate64) == ALIGNOF_XFPUSTATE64);
 
@@ -2186,46 +2278,6 @@ static_assert(offsetof(struct tss64, t_rsp1) == OFFSET_TSS64_RSP1);
 static_assert(offsetof(struct tss64, t_rsp2) == OFFSET_TSS64_RSP2);
 static_assert(sizeof(struct tss64) == SIZEOF_TSS64);
 static_assert(alignof(struct tss64) == ALIGNOF_TSS64);
-
-
-
-
-
-#include <librpc/bits/rpc32.h>
-
-/* struct rpc_register_state32 */
-/* ... */
-
-
-
-
-
-#include <librpc/bits/rpc64.h>
-
-/* struct rpc_register_state64 */
-/* ... */
-
-
-
-
-
-#include <librpc/bits/syscall-info32.h>
-
-/* struct rpc_syscall_info32 */
-static_assert(offsetof(struct rpc_syscall_info32, rsi_flags) == OFFSET_RPC_SYSCALL_INFO32_FLAGS);
-static_assert(offsetof(struct rpc_syscall_info32, rsi_sysno) == OFFSET_RPC_SYSCALL_INFO32_SYSNO);
-static_assert(sizeof(struct rpc_syscall_info32) == SIZEOF_RPC_SYSCALL_INFO32);
-
-
-
-
-
-#include <librpc/bits/syscall-info64.h>
-
-/* struct rpc_syscall_info64 */
-static_assert(offsetof(struct rpc_syscall_info64, rsi_flags) == OFFSET_RPC_SYSCALL_INFO64_FLAGS);
-static_assert(offsetof(struct rpc_syscall_info64, rsi_sysno) == OFFSET_RPC_SYSCALL_INFO64_SYSNO);
-static_assert(sizeof(struct rpc_syscall_info64) == SIZEOF_RPC_SYSCALL_INFO64);
 
 
 

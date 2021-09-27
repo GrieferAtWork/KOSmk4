@@ -17,10 +17,15 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _I386_KOS_LIBRPC_BITS_SYSCALL_INFO_CONVERT_H
-#define _I386_KOS_LIBRPC_BITS_SYSCALL_INFO_CONVERT_H 1
-/* !!! DEPRECATED HEADER !!! */
+#ifndef _I386_KOS_KOS_BITS_SYSCALL_INFO_H
+#define _I386_KOS_KOS_BITS_SYSCALL_INFO_H 1
 
-#include <kos/bits/syscall-info-convert.h>
+#include <hybrid/host.h>
 
-#endif /* !_I386_KOS_LIBRPC_BITS_SYSCALL_INFO_CONVERT_H */
+#ifdef __x86_64__
+#include "syscall-info64.h"
+#else /* __x86_64__ */
+#include "syscall-info32.h"
+#endif /* !__x86_64__ */
+
+#endif /* !_I386_KOS_KOS_BITS_SYSCALL_INFO_H */

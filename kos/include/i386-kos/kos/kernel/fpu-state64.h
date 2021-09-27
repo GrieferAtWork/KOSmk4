@@ -92,40 +92,40 @@ __SYSDECL_BEGIN
 #define OFFSET_XFPUSTATE64_MXCSR      24
 #define OFFSET_XFPUSTATE64_MXCSR_MASK 28
 #define OFFSET_XFPUSTATE64_ST(i)      (32 + (i) * 16)
-#define OFFSET_XFPUSTATE64_ST0        32
-#define OFFSET_XFPUSTATE64_ST1        48
-#define OFFSET_XFPUSTATE64_ST2        64
-#define OFFSET_XFPUSTATE64_ST3        80
-#define OFFSET_XFPUSTATE64_ST4        96
-#define OFFSET_XFPUSTATE64_ST5        112
-#define OFFSET_XFPUSTATE64_ST6        128
-#define OFFSET_XFPUSTATE64_ST7        144
+#define OFFSET_XFPUSTATE64_ST0        32  /* [FIELD(fx_regs[0])] */
+#define OFFSET_XFPUSTATE64_ST1        48  /* [FIELD(fx_regs[1])] */
+#define OFFSET_XFPUSTATE64_ST2        64  /* [FIELD(fx_regs[2])] */
+#define OFFSET_XFPUSTATE64_ST3        80  /* [FIELD(fx_regs[3])] */
+#define OFFSET_XFPUSTATE64_ST4        96  /* [FIELD(fx_regs[4])] */
+#define OFFSET_XFPUSTATE64_ST5        112 /* [FIELD(fx_regs[5])] */
+#define OFFSET_XFPUSTATE64_ST6        128 /* [FIELD(fx_regs[6])] */
+#define OFFSET_XFPUSTATE64_ST7        144 /* [FIELD(fx_regs[7])] */
 #define OFFSET_XFPUSTATE64_MM(i)      (32 + (i) * 16)
-#define OFFSET_XFPUSTATE64_MM0        32
-#define OFFSET_XFPUSTATE64_MM1        48
-#define OFFSET_XFPUSTATE64_MM2        64
-#define OFFSET_XFPUSTATE64_MM3        80
-#define OFFSET_XFPUSTATE64_MM4        96
-#define OFFSET_XFPUSTATE64_MM5        112
-#define OFFSET_XFPUSTATE64_MM6        128
-#define OFFSET_XFPUSTATE64_MM7        144
+#define OFFSET_XFPUSTATE64_MM0        32  /* [FIELD(fx_regs[0])] */
+#define OFFSET_XFPUSTATE64_MM1        48  /* [FIELD(fx_regs[1])] */
+#define OFFSET_XFPUSTATE64_MM2        64  /* [FIELD(fx_regs[2])] */
+#define OFFSET_XFPUSTATE64_MM3        80  /* [FIELD(fx_regs[3])] */
+#define OFFSET_XFPUSTATE64_MM4        96  /* [FIELD(fx_regs[4])] */
+#define OFFSET_XFPUSTATE64_MM5        112 /* [FIELD(fx_regs[5])] */
+#define OFFSET_XFPUSTATE64_MM6        128 /* [FIELD(fx_regs[6])] */
+#define OFFSET_XFPUSTATE64_MM7        144 /* [FIELD(fx_regs[7])] */
 #define OFFSET_XFPUSTATE64_XMM(i)     (160 + (i) * 16)
-#define OFFSET_XFPUSTATE64_XMM0       160
-#define OFFSET_XFPUSTATE64_XMM1       176
-#define OFFSET_XFPUSTATE64_XMM2       192
-#define OFFSET_XFPUSTATE64_XMM3       208
-#define OFFSET_XFPUSTATE64_XMM4       224
-#define OFFSET_XFPUSTATE64_XMM5       240
-#define OFFSET_XFPUSTATE64_XMM6       256
-#define OFFSET_XFPUSTATE64_XMM7       272
-#define OFFSET_XFPUSTATE64_XMM8       288
-#define OFFSET_XFPUSTATE64_XMM9       304
-#define OFFSET_XFPUSTATE64_XMM10      320
-#define OFFSET_XFPUSTATE64_XMM11      336
-#define OFFSET_XFPUSTATE64_XMM12      352
-#define OFFSET_XFPUSTATE64_XMM13      368
-#define OFFSET_XFPUSTATE64_XMM14      384
-#define OFFSET_XFPUSTATE64_XMM15      400
+#define OFFSET_XFPUSTATE64_XMM0       160 /* [FIELD(fx_xmm[0])] */
+#define OFFSET_XFPUSTATE64_XMM1       176 /* [FIELD(fx_xmm[1])] */
+#define OFFSET_XFPUSTATE64_XMM2       192 /* [FIELD(fx_xmm[2])] */
+#define OFFSET_XFPUSTATE64_XMM3       208 /* [FIELD(fx_xmm[3])] */
+#define OFFSET_XFPUSTATE64_XMM4       224 /* [FIELD(fx_xmm[4])] */
+#define OFFSET_XFPUSTATE64_XMM5       240 /* [FIELD(fx_xmm[5])] */
+#define OFFSET_XFPUSTATE64_XMM6       256 /* [FIELD(fx_xmm[6])] */
+#define OFFSET_XFPUSTATE64_XMM7       272 /* [FIELD(fx_xmm[7])] */
+#define OFFSET_XFPUSTATE64_XMM8       288 /* [FIELD(fx_xmm[8])] */
+#define OFFSET_XFPUSTATE64_XMM9       304 /* [FIELD(fx_xmm[9])] */
+#define OFFSET_XFPUSTATE64_XMM10      320 /* [FIELD(fx_xmm[10])] */
+#define OFFSET_XFPUSTATE64_XMM11      336 /* [FIELD(fx_xmm[11])] */
+#define OFFSET_XFPUSTATE64_XMM12      352 /* [FIELD(fx_xmm[12])] */
+#define OFFSET_XFPUSTATE64_XMM13      368 /* [FIELD(fx_xmm[13])] */
+#define OFFSET_XFPUSTATE64_XMM14      384 /* [FIELD(fx_xmm[14])] */
+#define OFFSET_XFPUSTATE64_XMM15      400 /* [FIELD(fx_xmm[15])] */
 #define SIZEOF_XFPUSTATE64            512
 #define ALIGNOF_XFPUSTATE64           16
 #ifdef __CC__

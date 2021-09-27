@@ -17,38 +17,37 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _I386_KOS_LIBRPC_BITS_SYSCALL_INFO32_H
-#define _I386_KOS_LIBRPC_BITS_SYSCALL_INFO32_H 1
+#ifndef _I386_KOS_KOS_BITS_SYSCALL_INFO64_H
+#define _I386_KOS_KOS_BITS_SYSCALL_INFO64_H 1
 
 #include <__stdinc.h>
 #include <hybrid/typecore.h>
 #include <hybrid/host.h>
 
-#ifndef __x86_64__
-#define OFFSET_RPC_SYSCALL_INFO_FLAGS OFFSET_RPC_SYSCALL_INFO32_FLAGS
-#define OFFSET_RPC_SYSCALL_INFO_SYSNO OFFSET_RPC_SYSCALL_INFO32_SYSNO
-#define OFFSET_RPC_SYSCALL_INFO_REG   OFFSET_RPC_SYSCALL_INFO32_REG
-#define SIZEOF_RPC_SYSCALL_INFO       SIZEOF_RPC_SYSCALL_INFO32
-#define rpc_syscall_info32            rpc_syscall_info
-#endif /* !__x86_64__ */
+#ifdef __x86_64__
+#define OFFSET_RPC_SYSCALL_INFO_FLAGS OFFSET_RPC_SYSCALL_INFO64_FLAGS
+#define OFFSET_RPC_SYSCALL_INFO_SYSNO OFFSET_RPC_SYSCALL_INFO64_SYSNO
+#define OFFSET_RPC_SYSCALL_INFO_REG   OFFSET_RPC_SYSCALL_INFO64_REG
+#define SIZEOF_RPC_SYSCALL_INFO       SIZEOF_RPC_SYSCALL_INFO64
+#define rpc_syscall_info64            rpc_syscall_info
+#endif /* __x86_64__ */
 
-#define OFFSET_RPC_SYSCALL_INFO32_FLAGS  0
-#define OFFSET_RPC_SYSCALL_INFO32_SYSNO  4
-#define OFFSET_RPC_SYSCALL_INFO32_REG(i) (((i) + 2) * 4)
-#define SIZEOF_RPC_SYSCALL_INFO32        32
+#define OFFSET_RPC_SYSCALL_INFO64_FLAGS  0
+#define OFFSET_RPC_SYSCALL_INFO64_SYSNO  8
+#define OFFSET_RPC_SYSCALL_INFO64_REG(i) (((i) + 2) * 8)
+#define SIZEOF_RPC_SYSCALL_INFO64        64
 
 #ifdef __CC__
 __DECL_BEGIN
 
-struct rpc_syscall_info32 /*[PREFIX(rsi_)]*/ {
-	/* Structure pushed by `RPC_PROGRAM_OP_psh_sys' */
-	__UINT32_TYPE__  rsi_flags;   /* System call invocation flags (Set of `RPC_SYSCALL_INFO_F*') */
-	__UINT32_TYPE__  rsi_sysno;   /* The system call vector that got invoked. */
-	__UINT32_TYPE__  rsi_regs[6]; /* Arguments passed to the system call.
+struct rpc_syscall_info64 /*[PREFIX(rsi_)]*/ {
+	__UINT64_TYPE__  rsi_flags;   /* System call invocation flags (Set of `RPC_SYSCALL_INFO_F*') */
+	__UINT64_TYPE__  rsi_sysno;   /* The system call vector that got invoked. */
+	__UINT64_TYPE__  rsi_regs[6]; /* Arguments passed to the system call.
 	                               * NOTE: You may validate any argument by testing for `RPC_SYSCALL_INFO_FREGVALID(i)' */
 };
 
 __DECL_END
 #endif /* __CC__ */
 
-#endif /* !_I386_KOS_LIBRPC_BITS_SYSCALL_INFO32_H */
+#endif /* !_I386_KOS_KOS_BITS_SYSCALL_INFO64_H */

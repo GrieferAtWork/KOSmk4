@@ -69,23 +69,23 @@ struct __ATTR_ALIGNED(ALIGNOF_SFPUENV) __ATTR_PACKED sfpuenv /*[PREFIX(fe_)]*/ {
 #define OFFSET_SFPUSTATE_FDP   20
 #define OFFSET_SFPUSTATE_FDS   24
 #define OFFSET_SFPUSTATE_ST(i) (28 + (i) * 10)
-#define OFFSET_SFPUSTATE_ST0   28
-#define OFFSET_SFPUSTATE_ST1   38
-#define OFFSET_SFPUSTATE_ST2   48
-#define OFFSET_SFPUSTATE_ST3   58
-#define OFFSET_SFPUSTATE_ST4   68
-#define OFFSET_SFPUSTATE_ST5   78
-#define OFFSET_SFPUSTATE_ST6   88
-#define OFFSET_SFPUSTATE_ST7   98
+#define OFFSET_SFPUSTATE_ST0   28 /* [FIELD(fs_regs[0])] */
+#define OFFSET_SFPUSTATE_ST1   38 /* [FIELD(fs_regs[1])] */
+#define OFFSET_SFPUSTATE_ST2   48 /* [FIELD(fs_regs[2])] */
+#define OFFSET_SFPUSTATE_ST3   58 /* [FIELD(fs_regs[3])] */
+#define OFFSET_SFPUSTATE_ST4   68 /* [FIELD(fs_regs[4])] */
+#define OFFSET_SFPUSTATE_ST5   78 /* [FIELD(fs_regs[5])] */
+#define OFFSET_SFPUSTATE_ST6   88 /* [FIELD(fs_regs[6])] */
+#define OFFSET_SFPUSTATE_ST7   98 /* [FIELD(fs_regs[7])] */
 #define OFFSET_SFPUSTATE_MM(i) (28 + (i) * 10)
-#define OFFSET_SFPUSTATE_MM0   28
-#define OFFSET_SFPUSTATE_MM1   38
-#define OFFSET_SFPUSTATE_MM2   48
-#define OFFSET_SFPUSTATE_MM3   58
-#define OFFSET_SFPUSTATE_MM4   68
-#define OFFSET_SFPUSTATE_MM5   78
-#define OFFSET_SFPUSTATE_MM6   88
-#define OFFSET_SFPUSTATE_MM7   98
+#define OFFSET_SFPUSTATE_MM0   28 /* [FIELD(fs_regs[0])] */
+#define OFFSET_SFPUSTATE_MM1   38 /* [FIELD(fs_regs[1])] */
+#define OFFSET_SFPUSTATE_MM2   48 /* [FIELD(fs_regs[2])] */
+#define OFFSET_SFPUSTATE_MM3   58 /* [FIELD(fs_regs[3])] */
+#define OFFSET_SFPUSTATE_MM4   68 /* [FIELD(fs_regs[4])] */
+#define OFFSET_SFPUSTATE_MM5   78 /* [FIELD(fs_regs[5])] */
+#define OFFSET_SFPUSTATE_MM6   88 /* [FIELD(fs_regs[6])] */
+#define OFFSET_SFPUSTATE_MM7   98 /* [FIELD(fs_regs[7])] */
 #define SIZEOF_SFPUSTATE       108
 #define ALIGNOF_SFPUSTATE      4
 #ifdef __CC__

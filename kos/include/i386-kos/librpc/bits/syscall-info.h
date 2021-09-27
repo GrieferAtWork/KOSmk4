@@ -19,13 +19,8 @@
  */
 #ifndef _I386_KOS_LIBRPC_BITS_SYSCALL_INFO_H
 #define _I386_KOS_LIBRPC_BITS_SYSCALL_INFO_H 1
+/* !!! DEPRECATED HEADER !!! */
 
-#include <hybrid/host.h>
-
-#ifdef __x86_64__
-#include "syscall-info64.h"
-#else /* __x86_64__ */
-#include "syscall-info32.h"
-#endif /* !__x86_64__ */
+#include <kos/bits/syscall-info.h>
 
 #endif /* !_I386_KOS_LIBRPC_BITS_SYSCALL_INFO_H */
