@@ -43,6 +43,7 @@
 #include <kos/refcnt.h>
 #include <kos/types.h>
 
+#include <pthread.h>
 #include <signal.h>
 #include <stddef.h>
 
@@ -318,11 +319,119 @@ struct service_com {
 	};
 };
 
+struct service_comdesc;
+LIST_HEAD(service_comdesc_list, service_comdesc);
+struct service_comdesc {
+	/* TODO: Com wrappers must allocate this structure and link it in `:s_active_list'
+	 *       for the duration of waiting for the command to complete. A list of active
+	 *       commands needs to be kept track of to deal with unexpected server  exits,
+	 *       in which case POLL_HUP being signaled must be responded to by walking the
+	 *       list of active commands and marking each of them as having finished  with
+	 *       an exception `E_SERVICE_EXITED' */
+
+	/* TODO: The HUP condition must be signaled to to userspace on some way.
+	 *
+	 * Ideas:
+	 *  - New  user-space library `libasync' that will become the
+	 *    replacement for the  kernel header <sched/async.h>,  as
+	 *    well as be  available for  user-space where  ao_connect
+	 *    is implemented in terms of <sys/epoll.h>. Then use this
+	 *    library to poll for POLL_HUP.
+	 *
+	 *  - Alter wrapper functions  such that instead  of doing  a
+	 *    boring, old  `FUTEX_WAIT_WHILE',  they  also  poll  for
+	 *    `s_fd_srv' to indicate POLL_HUP, and if the later  ends
+	 *    up being the case,  all active commands will  terminate
+	 *    with  `E_SERVICE_EXITED'. (For efficiency, this sort of
+	 *    function may even be implemented via a dedicated system
+	 *    call, in which case it  would also include the  initial
+	 *    wakeup signal send to the server)
+	 *    NOTE: Even without the dedicated system call, this entire
+	 *          thing should  still be  implementable with  already
+	 *          existing system calls.
+	 *
+	 *  - Expand the kernel epoll API to allow for custom  actions
+	 *    to be performed when  special conditions arise in  files
+	 *    being monitored, including the raising of posix signals,
+	 *    as well as the scheduling of RPC callbacks. Using  this,
+	 *    we  could then schedule  an RPC to  mark all commands as
+	 *    having exited with `E_SERVICE_EXITED'.
+	 *    NOTE: In  conjunction to this, redesign the entire RPC
+	 *          system from the ground up, such that it built on
+	 *          top of POSIX signals with its own SIGRPC that is
+	 *          dedicated to masking/unmasking synchronous RPCs,
+	 *          such  that synchronous ones can only be received
+	 *          when they're not currently being masked.
+	 *    Also: Get rid of librpc and move the user-space part
+	 *          into libc, exposed by a new header <kos/rpc.h>
+	 *          Additionally, the current API should be scrapped
+	 *          and a new system (including new opcodes) should
+	 *          be developed and implemented.
+	 *    This is probably the best option to pick, since it can
+	 *    be made to work without the need of additional threads
+	 *    running in user-space!
+	 */
+
+	LIST_ENTRY(service_comdesc) scd_link; /* [lock(:s_active_lock)] List of active commands. */
+	struct service_com          scd_com;  /* The underlying command. */
+};
+
+
+/* Special value assigned to `s_commands' after the service is
+ * shut down remotely (as the result of `s_fd_srv'  indicating
+ * POLL_HUP).
+ *
+ * In  turn, this causes  any further attempts  at calling a wrapper
+ * functions to fail with errno=ENOSYS, or throw `E_SERVICE_EXITED'.
+ *
+ * Commands currently active (and blocking), or already pending at
+ * the time that the server called `service_api_destroy()' will be
+ * made to  complete with  `SERVICE_COM_ST_EXCEPT' translating  to
+ * `E_SERVICE_EXITED'. */
+#define SERVICE_SHM_COMMANDS_SHUTDOWN ((lfutex_t)-1)
 
 /* Layout of the shared memory region between client/server */
 struct service_shm {
-	lfutex_t                        s_commands; /* [0..n] List  of pending commands in form of offset
-	                                             * to first pending commands (futex-send after added) */
+	/* The service does the following to consume commands:
+	 * >> struct service_com *consume(struct service_shm *self) {
+	 * >>     struct service_com *result;
+	 * >>     for (;;) {
+	 * >>         lfutex_t com, next;
+	 * >>         com = ATOMIC_READ(self->s_commands);
+	 * >>         if (com == 0)
+	 * >>             return NULL;
+	 * >>         if (com > MAPPED_SIZE_OF(self)) {
+	 * >>             struct stat st;
+	 * >>             fstat(SHM_FD, &st);
+	 * >>             if (com >= st.st_size)
+	 * >>                 TERMINATE_CONNECTION();
+	 * >>             // NOTE: This remap also includes 1 trailing page mapped as RESERVED
+	 * >>             //       that will trigger a SEGFAULT if accessed. That way, command
+	 * >>             //       buffers don't have to be range-checked, as access-past-end
+	 * >>             //       will cause E_SEGFAULT, which will either be propagated back
+	 * >>             //       to the client, or terminate the connection
+	 * >>             self = REMAP_FOR_LARGER_SIZE(self, st.st_size);
+	 * >>         }
+	 * >>         result = (struct service_com *)((byte_t *)self + com);
+	 * >>         next   = result->sc_link; // Even when `next' contains nonsense-data,
+	 * >>                                   // it is re-validated by the CMPXCH checking
+	 * >>                                   // that `s_commands' doesn't differ from `com'
+	 * >>                                   // Only if the CMPXCH fails may this read have
+	 * >>                                   // been bogus.
+	 * >>         if (!ATOMIC_CMPXCH(self->s_commands, com, next))
+	 * >>             continue;
+	 * >>         // Ensure that at least 1 additional thread is also waiting for
+	 * >>         // more commands to arrive (or service commands that are still
+	 * >>         // within the pending queue)
+	 * >>         ENSURE_EXISTANCE_OF_MORE_SERVICE_THREADS();
+	 * >>         break;
+	 * >>     }
+	 * >>     return result;
+	 * >> } */
+	lfutex_t                        s_commands; /* [0..n] List  of  pending  commands in  form  of offset
+	                                             * to  first  pending commands  (futex-send  after added)
+	                                             * Set to `SERVICE_SHM_COMMANDS_SHUTDOWN' once the socket
+	                                             * indicates POLL_HUP. */
 	COMPILER_FLEXIBLE_ARRAY(byte_t, s_data);    /* Buffer area begins here (entirely client-side managed) */
 };
 
@@ -455,6 +564,11 @@ struct service {
 	                                                   * Page-aligned, allocated file-size of `s_fd_shm' (s.a. `ftruncate(2)') */
 	fd_t                              s_fd_srv;       /* [const][owned] File descriptor for the unix domain socket connected to the server. */
 	fd_t                              s_fd_shm;       /* [const][owned] File descriptor for the shared memory region. */
+
+	/* List of active commands (added-to/removed-from by com wrappers) */
+	struct atomic_lock                s_active_lock;     /* Lock for `s_active_list'. */
+	struct service_comdesc_list       s_active_list;     /* [0..n][lock(!PREEMPTION && s_active_lock)] List of active commands. */
+
 
 	/* Helpers for keeping track of .text/.eh_frame allocations, as well as function name->address mappings. */
 	struct atomic_rwlock              s_textlock;     /* Lock for .text/.eh_frame buffers, as well as the table of known functions. */

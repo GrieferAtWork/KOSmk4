@@ -509,12 +509,12 @@ NOTHROW(CC get_device_name)(pci_devnameid_t id) {
 
 struct pci_vennameid_list {
 	size_t                            pvl_size;  /* # of entries */
-	COMPILER_FLEXIBLE_ARRAY(uint16_t, pvl_list); /* Flexible array of entries */
+	COMPILER_FLEXIBLE_ARRAY(uint16_t, pvl_list); /* [pvl_size] Flexible array of entries */
 };
 
 struct pci_devnameid_list {
 	size_t                                   pdl_size;  /* # of entries */
-	COMPILER_FLEXIBLE_ARRAY(pci_devnameid_t, pdl_list); /* Flexible array of entries */
+	COMPILER_FLEXIBLE_ARRAY(pci_devnameid_t, pdl_list); /* [pdl_size] Flexible array of entries */
 };
 
 PRIVATE ATTR_PURE WUNUSED NONNULL((1)) bool

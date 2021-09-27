@@ -302,6 +302,9 @@
 #ifndef E_NOT_IMPLEMENTED_TODO
 #define E_NOT_IMPLEMENTED_TODO                    (E_NOT_IMPLEMENTED, 0x0002) /* [msg("Function not yet implemented")] */
 #endif /* !E_NOT_IMPLEMENTED_TODO */
+#ifndef E_SERVICE_EXITED
+#define E_SERVICE_EXITED                          (E_NOT_IMPLEMENTED, 0x0003) /* [msg("Service was shut down")] */
+#endif /* !E_SERVICE_EXITED */
 
 
 

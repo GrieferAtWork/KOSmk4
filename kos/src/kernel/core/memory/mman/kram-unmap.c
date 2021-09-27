@@ -1541,8 +1541,10 @@ again_service_lops:
 		/* Invoke the lock operation. */
 		later = (*iter->olo_func)(iter, self);
 		/* Enqueue operations for later execution. */
-		if (later != NULL)
+		if (later != NULL) {
+			assert(pagedir_ismapped(later));
 			SLIST_INSERT(&post, later, oplo_link);
+		}
 continue_with_next:
 		iter = next;
 	}
@@ -1559,8 +1561,10 @@ continue_with_next:
 			job = SLIST_FIRST(&krlist);
 			SLIST_REMOVE_HEAD(&krlist, mukj_link);
 			later = lockop_kram_cb(&job->mukj_lop_mm, self);
-			if (later != NULL)
+			if (later != NULL) {
+				assert(pagedir_ismapped(later));
 				SLIST_INSERT(&post, later, oplo_link);
+			}
 		} while (!SLIST_EMPTY(&krlist));
 	}
 

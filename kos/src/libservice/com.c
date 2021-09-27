@@ -524,13 +524,18 @@ again:
 PRIVATE NOBLOCK NOPREEMPT NONNULL((1)) void
 NOTHROW(FCALL reloc_free_list)(struct service_shm_free_list *__restrict self,
                                uintptr_t disp) {
-	struct service_shm_free **piter;
+	struct service_shm_free **piter, *iter;
 	piter = LIST_PFIRST(self);
 	while (*piter) {
 		*(byte_t **)piter += disp;
-		(*piter)->ssf_bysize.le_prev = piter;
-		piter = &(*piter)->ssf_bysize.le_next;
+		iter = *piter;
+		iter->ssf_bysize.le_prev = piter;
+		piter = &iter->ssf_bysize.le_next;
 	}
+	/* Fix the back-link of the first list element. */
+	iter = LIST_FIRST(self);
+	if (iter != NULL)
+		iter->ssf_bysize.le_prev = LIST_PFIRST(self);
 }
 
 

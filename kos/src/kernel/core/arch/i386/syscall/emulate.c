@@ -283,12 +283,13 @@ do_syscall:
 	} EXCEPT {
 		/* Service user-redirection RPCs to try and resolve the problem. */
 		bool must_restart_syscall;
-		error_class_t cls = error_class();
+		error_class_t cls;
 		must_restart_syscall = false;
 		state = rpc_serve_user_redirection_all(state,
 		                                       TASK_RPC_REASON_SYSCALL,
 		                                       sc_info,
 		                                       &must_restart_syscall);
+		cls = error_class();
 		if (cls == ERROR_CLASS(ERROR_CODEOF(E_OK))) {
 			if unlikely(must_restart_syscall)
 				goto again; /* Do the restart */

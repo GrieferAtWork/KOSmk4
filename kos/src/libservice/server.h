@@ -28,6 +28,15 @@
 
 DECL_BEGIN
 
+
+struct service_api {
+	struct service_specs const *sa_specs;  /* [1..1][const] Service specs. */
+	fd_t                        sa_server; /* [owned][const] AF_UNIX-socket bound to the service file. */
+
+};
+
+
+
 /* Create a service that is reachable under `filename' and exposes the given set of functions.
  * NOTE: The given  set of  functions _must_  be sorted  lexicographically
  *       ascending by name, as binary search is used to locate appropriate
