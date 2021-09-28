@@ -740,8 +740,8 @@ NOTHROW(FCALL x86_userexcept_unwind)(struct ucpustate *__restrict ustate,
 	/* Check if user-space got redirected (if so, we need to follow some custom unwinding rules). */
 	if (return_state->ics_irregs.ir_Pip == (uintptr_t)&x86_rpc_user_redirection) {
 		/* A re-direction may have happened whilst we were unwinding. - Adjust for that now!
-		 * HINT: The actual user-space return location is stored in `this_x86_rpc_redirection_iret' */
-		assert(PERTASK_GET(this_x86_rpc_redirection_iret.ir_Pip) != (uintptr_t)&x86_rpc_user_redirection);
+		 * HINT: The actual user-space return location is stored in `this_x86_sysret_iret' */
+		assert(PERTASK_GET(this_x86_sysret_iret.ir_Pip) != (uintptr_t)&x86_rpc_user_redirection);
 		assert(return_state->ics_irregs.ir_Pflags == 0);
 		assert(SEGMENT_IS_VALID_KERNCODE(return_state->ics_irregs.ir_cs));
 		/* Manually unwind additional FLAGS registers.
@@ -764,15 +764,15 @@ NOTHROW(FCALL x86_userexcept_unwind)(struct ucpustate *__restrict ustate,
 #endif /* !__x86_64__ */
 
 #ifdef __x86_64__
-		return_state->ics_irregs.ir_rip    = PERTASK_GET(this_x86_rpc_redirection_iret.ir_rip);
-		return_state->ics_irregs.ir_cs     = PERTASK_GET(this_x86_rpc_redirection_iret.ir_cs16);
-		return_state->ics_irregs.ir_rflags = PERTASK_GET(this_x86_rpc_redirection_iret.ir_rflags);
-		return_state->ics_irregs.ir_rsp    = PERTASK_GET(this_x86_rpc_redirection_iret.ir_rsp);
-		return_state->ics_irregs.ir_ss     = PERTASK_GET(this_x86_rpc_redirection_iret.ir_ss16);
+		return_state->ics_irregs.ir_rip    = PERTASK_GET(this_x86_sysret_iret.ir_rip);
+		return_state->ics_irregs.ir_cs     = PERTASK_GET(this_x86_sysret_iret.ir_cs16);
+		return_state->ics_irregs.ir_rflags = PERTASK_GET(this_x86_sysret_iret.ir_rflags);
+		return_state->ics_irregs.ir_rsp    = PERTASK_GET(this_x86_sysret_iret.ir_rsp);
+		return_state->ics_irregs.ir_ss     = PERTASK_GET(this_x86_sysret_iret.ir_ss16);
 #else /* __x86_64__ */
-		return_state->ics_irregs_u.ir_eip    = PERTASK_GET(this_x86_rpc_redirection_iret.ir_eip);
-		return_state->ics_irregs_u.ir_cs     = PERTASK_GET(this_x86_rpc_redirection_iret.ir_cs16);
-		return_state->ics_irregs_u.ir_eflags = PERTASK_GET(this_x86_rpc_redirection_iret.ir_eflags);
+		return_state->ics_irregs_u.ir_eip    = PERTASK_GET(this_x86_sysret_iret.ir_eip);
+		return_state->ics_irregs_u.ir_cs     = PERTASK_GET(this_x86_sysret_iret.ir_cs16);
+		return_state->ics_irregs_u.ir_eflags = PERTASK_GET(this_x86_sysret_iret.ir_eflags);
 #if 0 /* Still initialized correctly... */
 		return_state->ics_irregs_u.ir_ss     = return_state->ics_irregs_u.ir_ss16;
 		return_state->ics_irregs_u.ir_esp    = return_state->ics_irregs_u.ir_esp;

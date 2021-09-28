@@ -324,7 +324,7 @@ NOTHROW(__x86_preemption_pop)(pflag_t flag) {
  * >>     } else {
  * >>         irr = GET_KERNEL_STACK_BASE() - sizeof(struct irregs_user);
  * >>     }
- * >>     memcpy(&PERTASK(this_x86_rpc_redirection_iret),irr,
+ * >>     memcpy(&PERTASK(this_x86_sysret_iret),irr,
  * >>            sizeof(struct irregs_kernel));
  * >>     irr->ir_eip    = &x86_userexcept_sysret;
  * >>     irr->ir_cs     = SEGMENT_KERNEL_CS;
@@ -348,7 +348,7 @@ FUNDEF void ASMCALL x86_userexcept_sysret(void);
  * >>     } else {
  * >>         irr = GET_KERNEL_STACK_BASE() - sizeof(struct irregs_user);
  * >>     }
- * >>     memcpy(&PERTASK(this_x86_rpc_redirection_iret),irr,
+ * >>     memcpy(&PERTASK(this_x86_sysret_iret),irr,
  * >>            sizeof(struct irregs_kernel));
  * >>     irr->ir_eip    = &x86_rpc_user_redirection;
  * >>     irr->ir_cs     = SEGMENT_KERNEL_CS;
@@ -372,7 +372,7 @@ FUNDEF void ASMCALL x86_rpc_user_redirection(void);
 
 #ifdef __x86_64__
 
-DATDEF ATTR_PERTASK struct irregs this_x86_rpc_redirection_iret;
+DATDEF ATTR_PERTASK struct irregs this_x86_sysret_iret;
 
 #ifndef ___this_x86_kernel_psp0_defined
 #define ___this_x86_kernel_psp0_defined
@@ -390,7 +390,7 @@ DATDEF ATTR_PERTASK uintptr_t const this_x86_kernel_psp0;
 
 #else /* __x86_64__ */
 
-DATDEF ATTR_PERTASK struct irregs_kernel this_x86_rpc_redirection_iret;
+DATDEF ATTR_PERTASK struct irregs_kernel this_x86_sysret_iret;
 
 struct irregs_user;
 

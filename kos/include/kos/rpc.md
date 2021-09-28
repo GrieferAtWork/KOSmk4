@@ -100,7 +100,7 @@ Obviously, most of the actual work is done by `task_serve_with_icpustate()`, whi
 
 ```c
 /* Returns `NULL' if nothing got served. */
-struct icpustate *task_serve_with_icpustate(struct icpustate *__restrict state) THROWS(E_INTERRUPT_USER_RPC) {
+struct icpustate *task_serve_with_icpustate(struct icpustate *__restrict state) THROWS(E_INTERRUPT_USER_RPC, ...) {
 	struct exception_info error;
 	struct pending_rpc_slist pending; /* Pending RPCs */
 	struct pending_rpc_slist runnow;  /* RPCs that should be executed now */

@@ -55,17 +55,17 @@ PUBLIC_FUNCTION(x86_syscall64_syscall)
 	/* Because we can assume that we only get here from user-space with #IF enabled,
 	 * we don't have to swapgs  or sti conditionally, but  can simply always do  so. */
 	swapgs
-	EXTERN(this_x86_rpc_redirection_iret)
-	movq   %rsp, %gs:(this_x86_rpc_redirection_iret + OFFSET_IRREGS_RSP)
+	EXTERN(this_x86_sysret_iret)
+	movq   %rsp, %gs:(this_x86_sysret_iret + OFFSET_IRREGS_RSP)
 /*[[[cfi{arch='x86_64', register='%rsp'}
 	ifnotimpl "KOS", 1f   # GDB doesn't understand `form_tls_address', so hide that fact
-	push   @(this_x86_rpc_redirection_iret + OFFSET_IRREGS_RSP)
+	push   @(this_x86_sysret_iret + OFFSET_IRREGS_RSP)
 	form_tls_address
 	deref
 	ret
 1:	push   %rsp
 ]]]*/
-	.cfi_escape 22,7,18,47,3,0,75,79,83,47,7,0,8,this_x86_rpc_redirection_iret + OFFSET_IRREGS_RSP,155,6
+	.cfi_escape 22,7,18,47,3,0,75,79,83,47,7,0,8,this_x86_sysret_iret + OFFSET_IRREGS_RSP,155,6
 	.cfi_escape 47,2,0,119,0
 /*[[[end]]]*/
 
@@ -73,7 +73,7 @@ PUBLIC_FUNCTION(x86_syscall64_syscall)
 	movq   %gs:this_x86_kernel_psp0, %rsp /* Load our kernel-space stack. */
 	pushq_cfi $(SEGMENT_USER_DATA64_RPL)                              /* ir_ss */
 	.cfi_rel_offset %ss, 0
-	pushq_cfi %gs:(this_x86_rpc_redirection_iret + OFFSET_IRREGS_RSP) /* ir_rsp */
+	pushq_cfi %gs:(this_x86_sysret_iret + OFFSET_IRREGS_RSP) /* ir_rsp */
 	.cfi_rel_offset %rsp, 0
 	pushq_cfi %r11                                                    /* ir_rflags */
 	.cfi_rel_offset %rflags, 0
@@ -126,17 +126,17 @@ PUBLIC_FUNCTION(x86_syscall64_syscall_traced)
 	/* Because we can assume that we only get here from user-space with #IF enabled,
 	 * we don't have to swapgs  or sti conditionally, but  can simply always do  so. */
 	swapgs
-	EXTERN(this_x86_rpc_redirection_iret)
-	movq   %rsp, %gs:(this_x86_rpc_redirection_iret + OFFSET_IRREGS_RSP)
+	EXTERN(this_x86_sysret_iret)
+	movq   %rsp, %gs:(this_x86_sysret_iret + OFFSET_IRREGS_RSP)
 /*[[[cfi{arch='x86_64', register='%rsp'}
 	ifnotimpl "KOS", 1f   # GDB doesn't understand `form_tls_address', so hide that fact
-	push   @(this_x86_rpc_redirection_iret + OFFSET_IRREGS_RSP)
+	push   @(this_x86_sysret_iret + OFFSET_IRREGS_RSP)
 	form_tls_address
 	deref
 	ret
 1:	push   %rsp
 ]]]*/
-	.cfi_escape 22,7,18,47,3,0,75,79,83,47,7,0,8,this_x86_rpc_redirection_iret + OFFSET_IRREGS_RSP,155,6
+	.cfi_escape 22,7,18,47,3,0,75,79,83,47,7,0,8,this_x86_sysret_iret + OFFSET_IRREGS_RSP,155,6
 	.cfi_escape 47,2,0,119,0
 /*[[[end]]]*/
 
@@ -144,7 +144,7 @@ PUBLIC_FUNCTION(x86_syscall64_syscall_traced)
 	movq   %gs:this_x86_kernel_psp0, %rsp /* Load our kernel-space stack. */
 	pushq_cfi $(SEGMENT_USER_DATA64_RPL)                              /* ir_ss */
 	.cfi_rel_offset %ss, 0
-	pushq_cfi %gs:(this_x86_rpc_redirection_iret + OFFSET_IRREGS_RSP) /* ir_rsp */
+	pushq_cfi %gs:(this_x86_sysret_iret + OFFSET_IRREGS_RSP) /* ir_rsp */
 	.cfi_rel_offset %rsp, 0
 	pushq_cfi %r11                                                    /* ir_rflags */
 	.cfi_rel_offset %rflags, 0

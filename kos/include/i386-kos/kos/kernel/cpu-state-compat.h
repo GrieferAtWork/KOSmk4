@@ -34,6 +34,8 @@
 #define gp_Pdx                  gp_rdx
 #define gp_Pcx                  gp_rcx
 #define gp_Pax                  gp_rax
+#define gp_R_fcall0P            gp_rdi
+#define gp_R_fcall1P            gp_rsi
 #define ir_Pip                  ir_rip
 #define ir_Pflags               ir_rflags
 #define ir_Psp                  ir_rsp
@@ -78,6 +80,8 @@
 #define gp_Pdx                  gp_edx
 #define gp_Pcx                  gp_ecx
 #define gp_Pax                  gp_eax
+#define gp_R_fcall0P            gp_ecx
+#define gp_R_fcall1P            gp_edx
 #define ir_Pip                  ir_eip
 #define ir_Pflags               ir_eflags
 #define ir_Psp                  ir_esp

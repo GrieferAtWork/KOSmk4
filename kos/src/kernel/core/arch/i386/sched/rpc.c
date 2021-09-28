@@ -30,14 +30,29 @@
 #include <sched/rpc-internal.h>
 #include <sched/task.h>
 
+#include <asm/cpu-flags.h>
 #include <kos/kernel/cpu-state-compat.h>
 #include <kos/kernel/cpu-state-helpers.h>
 #include <kos/kernel/cpu-state.h>
 
 #include <assert.h>
+#include <stddef.h>
 #include <string.h>
 
 DECL_BEGIN
+
+/* The following offsets are currently being hard-coded in `rpc.S' */
+STATIC_ASSERT(offsetof(struct rpc_context, rc_context) == 0);
+#ifdef __x86_64__
+STATIC_ASSERT(offsetof(struct rpc_context, rc_state) == 8);
+#else /* __x86_64__ */
+STATIC_ASSERT(offsetof(struct rpc_context, rc_state) == 4);
+#endif /* !__x86_64__ */
+
+/* Restore function for functions pushed by `task_asyncrpc_push()'
+ * This  function   is   entered   with  the   stack   set   like:
+ *   0(%Psp): struct rpc_context */
+extern void ASMCALL x86_task_asyncrpc_restore(void);
 
 /* Arch-specific function:
  * Alter the given `state' to inject a call to `func'. The context
@@ -47,52 +62,71 @@ PUBLIC NOBLOCK NOPREEMPT ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) struct scpustat
 NOTHROW(FCALL task_asyncrpc_push)(struct scpustate *__restrict state,
                                   prpc_exec_callback_t func,
                                   void *cookie) {
-#ifdef __x86_64__
+	byte_t *sp;
+	rpc_cpustate_t *rc_state;
+	struct scpustate *result_sstate;
 	struct rpc_context *rc;
-	struct ATTR_PACKED buffer {
-		struct gpregs b_gpregs; /* General purpose registers. */
-		u32 b_gs;               /* G segment register (Usually `SEGMENT_USER_GSBASE_RPL') */
-	};
-	unsigned int reason;
-	struct icpustate *istate;
-	struct scpustate *result;
-	struct buffer regbuf;
-	byte_t *dest;
-	void *argbuffer;
-	reason = scpustate_isuser(state)
-	         ? RPC_REASONCTX_SYSRET
-	         : RPC_REASONCTX_ASYNC_KERN;
-	memcpy(&regbuf, state, sizeof(regbuf));
-	dest = (byte_t *)state + sizeof(regbuf);
+	bool isuser = scpustate_isuser(result_sstate);
 
-	/* DEST: fs, es, ds, eip, cs, eflags, [...] */
-	dest -= sizeof(struct gpregs);
-	memcpy(dest, &regbuf.b_gpregs, sizeof(struct gpregs));
-
-	/* `dest' now points to a valid `struct icpustate' (which will be passed to `func') */
-	istate = (struct icpustate *)dest;
-
-	/* Allocate memory for `struct rpc_context' passed to the function */
-	dest -= sizeof(struct rpc_context);
-	rc = (struct rpc_context *)dest;
-
-	/* Push the return address for `func' */
-
-	/* TODO */
-
-	result->scs_sgregs.sg_gs     = regbuf.b_gs;
-	result->scs_irregs.ir_rip    = (uintptr_t)func;
-	result->scs_irregs.ir_ss     = SEGMENT_KERNEL_DATA0;
-	result->scs_irregs.ir_rsp    = (u64)dest;
-	result->scs_irregs.ir_cs     = SEGMENT_KERNEL_CODE;
-	result->scs_irregs.ir_rflags = istate->ics_irregs.ir_Pflags;
-	return result;
+#ifdef __x86_64__
+	/* Convert `state' into a `struct icpustate'. On x86_64, that can
+	 * easily  be done by  skipping over the  first couple of fields. */
+	STATIC_ASSERT(SIZEOF_SCPUSTATE64 - OFFSET_SCPUSTATE64_GPREGSNSP == SIZEOF_ICPUSTATE64);
+	STATIC_ASSERT(OFFSET_SCPUSTATE64_GPREGSNSP - OFFSET_SCPUSTATE64_GPREGSNSP == OFFSET_ICPUSTATE64_GPREGSNSP);
+	STATIC_ASSERT(OFFSET_SCPUSTATE64_IRREGS - OFFSET_SCPUSTATE64_GPREGSNSP == OFFSET_ICPUSTATE64_IRREGS);
+	sp       = (byte_t *)&state->scs_gpregs; /* Have `sp' point at the `icpustate' portion of `state' */
+	rc_state = (struct icpustate *)sp;
+	sp -= offsetof(struct rpc_context, rc_scinfo); /* Allocate space for the `struct rpc_context' */
+	rc = (struct rpc_context *)sp;
+	sp -= sizeof(void *); /* Allocate space for the return CPU state. */
+	result_sstate = (struct scpustate *)(sp - (OFFSET_SCPUSTATE_IRREGS + SIZEOF_IRREGS_KERNEL));
+	/* Copy everything except the IRET tail into the new CPU state. */
+	memcpy(result_sstate, state, OFFSET_SCPUSTATE64_IRREGS);
 #else /* __x86_64__ */
-	/* TODO */
+	STATIC_ASSERT(OFFSET_SCPUSTATE32_GPREGS == OFFSET_ICPUSTATE32_GPREGS);
+	STATIC_ASSERT(OFFSET_SCPUSTATE32_SGREGS + OFFSET_SGREGS32_FS == OFFSET_ICPUSTATE32_FS + 4);
+	STATIC_ASSERT(OFFSET_SCPUSTATE32_SGREGS + OFFSET_SGREGS32_ES == OFFSET_ICPUSTATE32_ES + 4);
+	STATIC_ASSERT(OFFSET_SCPUSTATE32_SGREGS + OFFSET_SGREGS32_DS == OFFSET_ICPUSTATE32_DS + 4);
+	u32 saved_gs = state->scs_sgregs.sg_gs;
+	/* To inplace-convert a `struct scpustate' into `struct icpustate', we essentially
+	 * just have to pluck out the `scs_sgregs.sg_gs' field by memmoveup-ing everything
+	 * that comes before it by 4 bytes. */
+	rc_state = (rpc_cpustate_t *)memmoveup((byte_t *)state + 4, state, OFFSET_ICPUSTATE32_FS);
+	sp -= offsetof(struct rpc_context, rc_scinfo); /* Allocate space for the `struct rpc_context' */
+	rc = (struct rpc_context *)sp;
+	sp -= sizeof(void *); /* Allocate space for the return CPU state. */
+	result_sstate = (struct scpustate *)(sp - (OFFSET_SCPUSTATE_IRREGS + SIZEOF_IRREGS_KERNEL));
+	/* Fill in most of `result_sstate' */
+	memcpy(&result_sstate->scs_gpregs, &rc_state->ics_gpregs, sizeof(struct gpregs32));
+	memcpy((byte_t *)&result_sstate->scs_sgregs + OFFSET_SGREGS32_FS,
+	       (byte_t *)&rc_state + OFFSET_ICPUSTATE32_FS, 3 * 4);
+	result_sstate->scs_sgregs.sg_gs = saved_gs;
 #endif /* !__x86_64__ */
+
+	/* Setup everything such that execution resumes at `func' */
+	*(uintptr_t *)sp = (uintptr_t)&x86_task_asyncrpc_restore;
+#ifdef __x86_64__
+	result_sstate->scs_irregs.ir_ss        = SEGMENT_KERNEL_DATA0;
+	result_sstate->scs_irregs.ir_Psp       = (uintptr_t)sp;
+#endif /* __x86_64__ */
+
+	result_sstate->scs_irregs.ir_Pip       = (uintptr_t)func;
+	result_sstate->scs_irregs.ir_cs        = SEGMENT_KERNEL_CODE;
+	result_sstate->scs_irregs.ir_Pflags    = rc_state->ics_irregs.ir_Pflags & ~(EFLAGS_DF | EFLAGS_IF);
+	result_sstate->scs_gpregs.gp_R_fcall0P = (uintptr_t)rc;
+	result_sstate->scs_gpregs.gp_R_fcall1P = (uintptr_t)cookie;
+
+	/* Fill in RPC context information. */
+	rc->rc_state   = rc_state;
+	rc->rc_context = isuser ? RPC_REASONCTX_SYSRET
+	                        : RPC_REASONCTX_ASYNC_KERN;
+	return result_sstate;
 }
 
 
+
+/* Saved IRET tail for `x86_userexcept_sysret' */
+PUBLIC ATTR_PERTASK struct irregs_kernel this_x86_sysret_iret = { 0 };
 
 /* Arch-specific function:
  * If not done already, modify  `state' such that rather than  returning
@@ -118,7 +152,7 @@ NOTHROW(FCALL userexcept_sysret_inject_with_state)(struct icpustate *__restrict 
 		return state; /* Already redirected. */
 
 	/* Save the original IRET tail. */
-	thread_save = &FORTASK(me, this_x86_rpc_redirection_iret);
+	thread_save = &FORTASK(me, this_x86_sysret_iret);
 	thread_save->ir_rip    = state->ics_irregs.ir_rip;
 	thread_save->ir_cs     = state->ics_irregs.ir_cs;
 	thread_save->ir_rflags = state->ics_irregs.ir_rflags;
@@ -147,9 +181,9 @@ NOTHROW(FCALL userexcept_sysret_inject_with_state)(struct icpustate *__restrict 
 	assert(&state->ics_irregs_u == x86_get_irregs(me));
 	if (state->ics_irregs_u.ir_eip == (uintptr_t)&x86_userexcept_sysret)
 		return state; /* Already redirected. */
-	FORTASK(me, this_x86_rpc_redirection_iret).ir_eip    = state->ics_irregs_u.ir_eip;
-	FORTASK(me, this_x86_rpc_redirection_iret).ir_cs     = state->ics_irregs_u.ir_cs;
-	FORTASK(me, this_x86_rpc_redirection_iret).ir_eflags = state->ics_irregs_u.ir_eflags;
+	FORTASK(me, this_x86_sysret_iret).ir_eip    = state->ics_irregs_u.ir_eip;
+	FORTASK(me, this_x86_sysret_iret).ir_cs     = state->ics_irregs_u.ir_cs;
+	FORTASK(me, this_x86_sysret_iret).ir_eflags = state->ics_irregs_u.ir_eflags;
 	COMPILER_READ_BARRIER();
 	/* NOTE: The write-order of all  of these is highly  important,
 	 *       so  just  put  a  write-barrier  around  every  write.
@@ -195,7 +229,7 @@ NOTHROW(FCALL userexcept_sysret_inject)(struct task *__restrict thread) {
 	if (thread_iret->ir_rip == (uintptr_t)&x86_userexcept_sysret)
 		return; /* Already redirected. */
 	/* Save the original IRET tail. */
-	thread_save = &FORTASK(thread, this_x86_rpc_redirection_iret);
+	thread_save = &FORTASK(thread, this_x86_sysret_iret);
 	thread_save->ir_rip    = thread_iret->ir_rip;
 	thread_save->ir_cs     = thread_iret->ir_cs;
 	thread_save->ir_rflags = thread_iret->ir_rflags;
@@ -260,9 +294,9 @@ NOTHROW(FCALL userexcept_sysret_inject)(struct task *__restrict thread) {
 	thread_iret = x86_get_irregs(thread);
 	if (thread_iret->ir_eip == (uintptr_t)&x86_userexcept_sysret)
 		return; /* Already redirected. */
-	FORTASK(thread, this_x86_rpc_redirection_iret).ir_eip    = thread_iret->ir_eip;
-	FORTASK(thread, this_x86_rpc_redirection_iret).ir_cs     = thread_iret->ir_cs;
-	FORTASK(thread, this_x86_rpc_redirection_iret).ir_eflags = thread_iret->ir_eflags;
+	FORTASK(thread, this_x86_sysret_iret).ir_eip    = thread_iret->ir_eip;
+	FORTASK(thread, this_x86_sysret_iret).ir_cs     = thread_iret->ir_cs;
+	FORTASK(thread, this_x86_sysret_iret).ir_eflags = thread_iret->ir_eflags;
 	COMPILER_READ_BARRIER();
 	/* NOTE: The write-order of all  of these is highly  important,
 	 *       so  just  put  a  write-barrier  around  every  write.

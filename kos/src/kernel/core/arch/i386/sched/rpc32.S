@@ -41,11 +41,11 @@
 
 
 .section .data.pertask.early
-PUBLIC_OBJECT(this_x86_rpc_redirection_iret)
+PUBLIC_OBJECT(this_x86_sysret_iret)
 	.long  0  /* ir_eip */
 	.long  0  /* ir_cs */
 	.long  0  /* ir_eflags */
-END(this_x86_rpc_redirection_iret)
+END(this_x86_sysret_iret)
 
 .section .text
 	.cfi_startproc simple
@@ -57,7 +57,7 @@ import outputForAssembly from .......misc.libgen.cfi.comp;
 for (local reg: ["eip", "cs", "eflags"]) {
 	outputForAssembly('i386', '%' + reg, r'
 		ifnotimpl "KOS", 1f
-		const1u @(this_x86_rpc_redirection_iret + OFFSET_IRREGS_' + reg.upper() + r')
+		const1u @(this_x86_sysret_iret + OFFSET_IRREGS_' + reg.upper() + r')
 		form_tls_address
 		deref
 		ret
@@ -66,7 +66,7 @@ for (local reg: ["eip", "cs", "eflags"]) {
 for (local reg: { "es", "ds", "fs", "gs" }) {
 	outputForAssembly('i386', '%' + reg, r'
 		ifnotimpl "KOS", 1f
-		const1u @(this_x86_rpc_redirection_iret + OFFSET_IRREGS_EFLAGS)
+		const1u @(this_x86_sysret_iret + OFFSET_IRREGS_EFLAGS)
 		form_tls_address
 		deref
 		and    $EFLAGS_VM
@@ -77,22 +77,22 @@ for (local reg: { "es", "ds", "fs", "gs" }) {
 	1:	push   %' + reg + r'             # Unchanged');
 }
 ]]]*/
-__ASM_L(	.cfi_escape 22,8,18,47,3,0,75,79,83,47,7,0,8,this_x86_rpc_redirection_iret + OFFSET_IRREGS_EIP,155,6)
+__ASM_L(	.cfi_escape 22,8,18,47,3,0,75,79,83,47,7,0,8,this_x86_sysret_iret + OFFSET_IRREGS_EIP,155,6)
 __ASM_L(	.cfi_escape 47,2,0,120,0)
-__ASM_L(	.cfi_escape 22,41,19,47,3,0,75,79,83,47,7,0,8,this_x86_rpc_redirection_iret + OFFSET_IRREGS_CS,155,6)
+__ASM_L(	.cfi_escape 22,41,19,47,3,0,75,79,83,47,7,0,8,this_x86_sysret_iret + OFFSET_IRREGS_CS,155,6)
 __ASM_L(	.cfi_escape 47,3,0,146,41,0)
-__ASM_L(	.cfi_escape 22,9,18,47,3,0,75,79,83,47,7,0,8,this_x86_rpc_redirection_iret + OFFSET_IRREGS_EFLAGS,155,6)
+__ASM_L(	.cfi_escape 22,9,18,47,3,0,75,79,83,47,7,0,8,this_x86_sysret_iret + OFFSET_IRREGS_EFLAGS,155,6)
 __ASM_L(	.cfi_escape 47,2,0,121,0)
-__ASM_L(	.cfi_escape 22,40,31,47,3,0,75,79,83,47,19,0,8,this_x86_rpc_redirection_iret + OFFSET_IRREGS_EFLAGS,155,6)
+__ASM_L(	.cfi_escape 22,40,31,47,3,0,75,79,83,47,19,0,8,this_x86_sysret_iret + OFFSET_IRREGS_EFLAGS,155,6)
 __ASM_L(	.cfi_escape 16,128,128,8,26,32,40,6,0,116,8,6,47,3,0,146)
 __ASM_L(	.cfi_escape 40,0)
-__ASM_L(	.cfi_escape 22,43,31,47,3,0,75,79,83,47,19,0,8,this_x86_rpc_redirection_iret + OFFSET_IRREGS_EFLAGS,155,6)
+__ASM_L(	.cfi_escape 22,43,31,47,3,0,75,79,83,47,19,0,8,this_x86_sysret_iret + OFFSET_IRREGS_EFLAGS,155,6)
 __ASM_L(	.cfi_escape 16,128,128,8,26,32,40,6,0,116,12,6,47,3,0,146)
 __ASM_L(	.cfi_escape 43,0)
-__ASM_L(	.cfi_escape 22,44,31,47,3,0,75,79,83,47,19,0,8,this_x86_rpc_redirection_iret + OFFSET_IRREGS_EFLAGS,155,6)
+__ASM_L(	.cfi_escape 22,44,31,47,3,0,75,79,83,47,19,0,8,this_x86_sysret_iret + OFFSET_IRREGS_EFLAGS,155,6)
 __ASM_L(	.cfi_escape 16,128,128,8,26,32,40,6,0,116,16,6,47,3,0,146)
 __ASM_L(	.cfi_escape 44,0)
-__ASM_L(	.cfi_escape 22,45,31,47,3,0,75,79,83,47,19,0,8,this_x86_rpc_redirection_iret + OFFSET_IRREGS_EFLAGS,155,6)
+__ASM_L(	.cfi_escape 22,45,31,47,3,0,75,79,83,47,19,0,8,this_x86_sysret_iret + OFFSET_IRREGS_EFLAGS,155,6)
 __ASM_L(	.cfi_escape 16,128,128,8,26,32,40,6,0,116,20,6,47,3,0,146)
 __ASM_L(	.cfi_escape 45,0)
 //[[[end]]]
@@ -115,19 +115,19 @@ PUBLIC_FUNCTION(x86_rpc_user_redirection)
 	movw   $(SEGMENT_KERNEL_FSBASE), %ax
 	movw   %ax, %fs
 
-	movl   %fs:this_x86_rpc_redirection_iret + 8, %eax
+	movl   %fs:this_x86_sysret_iret + 8, %eax
 	pushl  %eax     /* ir_eflags */
 	.cfi_reg_offset %esp, 4, %esp
 	.cfi_reg_offset %ss, 4, %esp
 	.cfi_reg_offset %eax, (4 + OFFSET_ICPUSTATE_GPREGS + OFFSET_GPREGS_EAX - (SIZEOF_IRREGS_KERNEL + OFFSET_ICPUSTATE_IRREGS)), %esp
 	.cfi_reg_offset %fs, (4 + OFFSET_ICPUSTATE_FS - (SIZEOF_IRREGS_KERNEL + OFFSET_ICPUSTATE_IRREGS)), %esp
-	movl   %fs:this_x86_rpc_redirection_iret + 4, %eax
+	movl   %fs:this_x86_sysret_iret + 4, %eax
 	pushl  %eax     /* ir_cs */
 	.cfi_reg_offset %esp, 8, %esp
 	.cfi_reg_offset %ss, 4, %esp
 	.cfi_reg_offset %eax, (8 + OFFSET_ICPUSTATE_GPREGS + OFFSET_GPREGS_EAX - (SIZEOF_IRREGS_KERNEL + OFFSET_ICPUSTATE_IRREGS)), %esp
 	.cfi_reg_offset %fs, (8 + OFFSET_ICPUSTATE_FS - (SIZEOF_IRREGS_KERNEL + OFFSET_ICPUSTATE_IRREGS)), %esp
-	movl   %fs:this_x86_rpc_redirection_iret + 0, %eax
+	movl   %fs:this_x86_sysret_iret + 0, %eax
 	pushl  %eax     /* ir_eip */
 	.cfi_reg_offset %esp, 12, %esp
 	.cfi_reg_offset %ss, 8, %esp
@@ -592,7 +592,7 @@ PUBLIC_FUNCTION(task_serve_nx)
 	popal_cfi_r
 	cmpl   $(0), %fs:this_rpc_pending_sync_count
 	je     1f
-	orl    $TASK_SERVE_NX_XPENDING, %eax
+	orl    $TASK_SERVE_NX_EXCEPT, %eax
 1:
 	popl_cfi %fs
 	.cfi_restore_iret_fs

@@ -439,7 +439,6 @@
 #endif /* !__KERNEL__ */
 
 
-
 #ifdef __CC__
 __SYSDECL_BEGIN
 

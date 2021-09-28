@@ -307,8 +307,8 @@ PUBLIC_FUNCTION(x86_syscall_emulate_sysenter_r)
 	EXTERN(x86_rpc_user_redirection)
 	cmpl   $(x86_rpc_user_redirection), (12 + OFFSET_IRREGS_EIP)(%esp)
 	jne    1f
-	EXTERN(this_x86_rpc_redirection_iret)
-	movl   %edi, %fs:(this_x86_rpc_redirection_iret + OFFSET_IRREGS_EIP) /* EIP := EDI */
+	EXTERN(this_x86_sysret_iret)
+	movl   %edi, %fs:(this_x86_sysret_iret + OFFSET_IRREGS_EIP) /* EIP := EDI */
 	jmp    2f
 1:	movl   %edi, 12+OFFSET_IRREGS_EIP(%esp) /* EIP := EDI */
 2:	movl   %ebp, 12+OFFSET_IRREGS_ESP(%esp) /* ESP := EBP */

@@ -203,8 +203,8 @@ INTERN_LABEL(__x86_syscall_emulate_r_protect_start):
 	int3   /* ASSERTION FAILED: Invalid %cs value: <%ax> */
 1:
 #endif /* !NDEBUG */
-	/* Load the actual CS value from `this_x86_rpc_redirection_iret' */
-	movw   %gs:(this_x86_rpc_redirection_iret + OFFSET_IRREGS_CS), %ax
+	/* Load the actual CS value from `this_x86_sysret_iret' */
+	movw   %gs:(this_x86_sysret_iret + OFFSET_IRREGS_CS), %ax
 	cmpw   $(SEGMENT_USER_CODE64_RPL), %ax
 	je     .Lsyscall_emulate64_r
 #ifndef NDEBUG

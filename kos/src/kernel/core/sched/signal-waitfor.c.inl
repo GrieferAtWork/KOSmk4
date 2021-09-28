@@ -108,7 +108,7 @@ got_result:
 			what = task_serve_nx();
 			if (what & TASK_SERVE_NX_DIDRUN)
 				goto again;
-			if (what & TASK_SERVE_NX_XPENDING) {
+			if (what & TASK_SERVE_NX_EXCEPT) {
 				/* Can't go to sleep while there are pending X-RPCs */
 				PREEMPTION_ENABLE();
 				goto do_return_with_disconnect;

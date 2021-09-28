@@ -61,7 +61,7 @@ NOTHROW(FCALL userexcept_handler)(struct icpustate *__restrict state,
  *
  * The   implementation  of  this  function  serves  the  function
  * documented in <kos/rpc.md> under the name `handle_sysret_rpc()' */
-FUNDEF WUNUSED NONNULL((1)) struct icpustate *
+FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) struct icpustate *
 NOTHROW(FCALL userexcept_sysret)(struct icpustate *__restrict state);
 
 

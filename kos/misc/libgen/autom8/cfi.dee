@@ -100,6 +100,8 @@ function main(parser: Autom8Parser, body: string) {
 				arch = "i386";
 			} else if ("64" in baseName && "32" !in baseName) {
 				arch = "x86_64";
+			} else if ("64" !in baseName && "32" !in baseName) {
+				arch = "x86";
 			}
 		}
 		if (arch is none) {
@@ -130,30 +132,42 @@ function main(parser: Autom8Parser, body: string) {
 			mode = "default";
 		}
 	}
-	if (mode == "default") {
-		CFI.outputForAssembly(arch, register, body, outputFile: parser.newText);
-	} else if (mode == "asm") {
-		CFI.outputForAssembly(arch, register, body, outputFile: parser.newText,
-			linePrefix: "", lineSuffix: "", asmArgPrefix: "", asmArgSuffix: "");
-	} else if (mode == "bytes") {
-		local asm = CFI.Assembler(arch, body);
-		local data = List(asm.assemble(register));
-		if (#data != 1 || data.first.first != "1")
-			throw Error("CFI bytes contain conditional code (cannot output)");
-		data = data.first.last;
-		parser.newText << "\t" << ",\n\t".join(
-			for (local line: data.segments(16))
-				",".join(line)) << "\n";
-	} else if (mode.startswith("macro:")) {
-		local macroName = mode[6:];
-		if (!macroName.issymbol())
-			throw Error("Macro name " + repr macroName + " not a valid symbol name");
-		local fp = File.Writer();
-		CFI.outputForAssembly(arch, register, body, outputFile: fp);
-		parser.newText << "#define " << macroName << " \\\n";
-		parser.newText << "\t" << " \\\n\t".join(fp.string.strip().splitlines(false)) << "\n";
+	function doTheThing(arch: string) {
+		if (mode == "default") {
+			CFI.outputForAssembly(arch, register, body, outputFile: parser.newText);
+		} else if (mode == "asm") {
+			CFI.outputForAssembly(arch, register, body, outputFile: parser.newText,
+				linePrefix: "", lineSuffix: "", asmArgPrefix: "", asmArgSuffix: "");
+		} else if (mode == "bytes") {
+			local asm = CFI.Assembler(arch, body);
+			local data = List(asm.assemble(register));
+			if (#data != 1 || data.first.first != "1")
+				throw Error("CFI bytes contain conditional code (cannot output)");
+			data = data.first.last;
+			parser.newText << "\t" << ",\n\t".join(
+				for (local line: data.segments(16))
+					",".join(line)) << "\n";
+		} else if (mode.startswith("macro:")) {
+			local macroName = mode[6:];
+			if (!macroName.issymbol())
+				throw Error("Macro name " + repr macroName + " not a valid symbol name");
+			local fp = File.Writer();
+			CFI.outputForAssembly(arch, register, body, outputFile: fp);
+			parser.newText << "#define " << macroName << " \\\n";
+			parser.newText << "\t" << " \\\n\t".join(fp.string.strip().splitlines(false)) << "\n";
+		} else {
+			throw Error("Unsupported CFI mode: " + repr mode);
+		}
+	}
+	if (arch == "x86") {
+		/* Helper to easily generate portable x86 instrumentation */
+		parser.newText << "#ifdef __x86_64__\n";
+		doTheThing("x86_64");
+		parser.newText << "#else /* __x86_64__ */\n";
+		doTheThing("i386");
+		parser.newText << "#endif /* !__x86_64__ */\n";
 	} else {
-		throw Error("Unsupported CFI mode: " + repr mode);
+		doTheThing(arch);
 	}
 
 	parser.newText << "/*[[[end]]]*/";

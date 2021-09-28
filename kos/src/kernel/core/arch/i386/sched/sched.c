@@ -287,9 +287,9 @@ NOTHROW(FCALL task_push_asynchronous_rpc_v)(struct scpustate *__restrict state,
  * return target  to instead  point back  towards  a kernel-space  function which  is  then
  * able  to  service  RPC  functions  scheduled  using `task_(schedule|exec)_user_[s]rpc()'
  * On x86, this is done by modifying the IRET tail at the top of the target thread's stack:
- *   >> FORTASK(self,this_x86_rpc_redirection_iret).ir_eip    = GET_USERCODE_IRET(self)->ir_eip;
- *   >> FORTASK(self,this_x86_rpc_redirection_iret).ir_cs     = GET_USERCODE_IRET(self)->ir_cs;
- *   >> FORTASK(self,this_x86_rpc_redirection_iret).ir_eflags = GET_USERCODE_IRET(self)->ir_eflags;
+ *   >> FORTASK(self,this_x86_sysret_iret).ir_eip    = GET_USERCODE_IRET(self)->ir_eip;
+ *   >> FORTASK(self,this_x86_sysret_iret).ir_cs     = GET_USERCODE_IRET(self)->ir_cs;
+ *   >> FORTASK(self,this_x86_sysret_iret).ir_eflags = GET_USERCODE_IRET(self)->ir_eflags;
  *   >> GET_USERCODE_IRET(self)->ir_eip                  = &x86_rpc_user_redirection;
  *   >> GET_USERCODE_IRET(self)->ir_cs                   = SEGMENT_KERNEL_CODE;
  *   >> GET_USERCODE_IRET(self)->ir_eflags               = 0;
@@ -311,7 +311,7 @@ NOTHROW(FCALL task_enable_redirect_usercode_rpc)(struct task *__restrict self) {
 	if (thread_iret->ir_rip == (uintptr_t)&x86_rpc_user_redirection)
 		return false; /* Already redirected. */
 	/* Save the original IRET tail. */
-	thread_save = &FORTASK(self, this_x86_rpc_redirection_iret);
+	thread_save = &FORTASK(self, this_x86_sysret_iret);
 	thread_save->ir_rip    = thread_iret->ir_rip;
 	thread_save->ir_cs     = thread_iret->ir_cs;
 	thread_save->ir_rflags = thread_iret->ir_rflags;
@@ -455,9 +455,9 @@ NOTHROW(FCALL task_push_asynchronous_rpc_v)(struct scpustate *__restrict state,
  * return target  to instead  point back  towards  a kernel-space  function which  is  then
  * able  to  service  RPC  functions  scheduled  using `task_(schedule|exec)_user_[s]rpc()'
  * On x86, this is done by modifying the IRET tail at the top of the target thread's stack:
- *   >> FORTASK(self,this_x86_rpc_redirection_iret).ir_eip    = GET_USERCODE_IRET(self)->ir_eip;
- *   >> FORTASK(self,this_x86_rpc_redirection_iret).ir_cs     = GET_USERCODE_IRET(self)->ir_cs;
- *   >> FORTASK(self,this_x86_rpc_redirection_iret).ir_eflags = GET_USERCODE_IRET(self)->ir_eflags;
+ *   >> FORTASK(self,this_x86_sysret_iret).ir_eip    = GET_USERCODE_IRET(self)->ir_eip;
+ *   >> FORTASK(self,this_x86_sysret_iret).ir_cs     = GET_USERCODE_IRET(self)->ir_cs;
+ *   >> FORTASK(self,this_x86_sysret_iret).ir_eflags = GET_USERCODE_IRET(self)->ir_eflags;
  *   >> GET_USERCODE_IRET(self)->ir_eip                  = &x86_rpc_user_redirection;
  *   >> GET_USERCODE_IRET(self)->ir_cs                   = SEGMENT_KERNEL_CODE;
  *   >> GET_USERCODE_IRET(self)->ir_eflags               = 0;
@@ -513,9 +513,9 @@ NOTHROW(FCALL task_enable_redirect_usercode_rpc)(struct task *__restrict self) {
 	thread_iret = x86_get_irregs(self);
 	if (thread_iret->ir_eip == (uintptr_t)&x86_rpc_user_redirection)
 		return false; /* Already redirected. */
-	FORTASK(self, this_x86_rpc_redirection_iret).ir_eip    = thread_iret->ir_eip;
-	FORTASK(self, this_x86_rpc_redirection_iret).ir_cs     = thread_iret->ir_cs;
-	FORTASK(self, this_x86_rpc_redirection_iret).ir_eflags = thread_iret->ir_eflags;
+	FORTASK(self, this_x86_sysret_iret).ir_eip    = thread_iret->ir_eip;
+	FORTASK(self, this_x86_sysret_iret).ir_cs     = thread_iret->ir_cs;
+	FORTASK(self, this_x86_sysret_iret).ir_eflags = thread_iret->ir_eflags;
 	COMPILER_READ_BARRIER();
 	/* NOTE: The write-order of all  of these is highly  important,
 	 *       so  just  put  a  write-barrier  around  every  write.

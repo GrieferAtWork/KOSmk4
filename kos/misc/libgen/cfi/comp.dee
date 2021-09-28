@@ -253,6 +253,9 @@ class Architecture {
 	@@True if this is a big endian architecture
 	public member bigEndian: bool = false;
 
+	@@Set of pre-defined arch macros
+	public member archMacros: {string: int} = none;
+
 	@@True if 64-bit offsets should be supported
 	public property support64: bool = {
 		get(): bool {
@@ -293,10 +296,15 @@ class Architecture {
 			this._loadSysmacroFile(fs.expand(fs.joinpath(
 				fs.headof(__FILE__), "../../../../" + file), "pac"));
 			_sysmacroLoadedFiles.insert(file);
-			local r = _sysmacroValueCache.get(name);
+			r = _sysmacroValueCache.get(name);
 			if (r !is none)
 				return r;
 		}
+		r = archMacros.get(name);
+		if (r !is none)
+			return r;
+		if (name in { "P", "SIZEOF_POINTER", "__SIZEOF_POINTER__" })
+			return addrsize;
 		return none;
 	}
 }
@@ -1026,6 +1034,11 @@ encode_suleb:
 	function assemble_plus16(arg) -> _assemble_plus(arg, 2);
 	function assemble_plus32(arg) -> _assemble_plus(arg, 4);
 	function assemble_plus64(arg) -> _assemble_plus(arg, 8);
+	function assemble_add(arg) -> assemble_plus(arg);
+	function assemble_add8(arg) -> assemble_plus8(arg);
+	function assemble_add16(arg) -> assemble_plus16(arg);
+	function assemble_add32(arg) -> assemble_plus32(arg);
+	function assemble_add64(arg) -> assemble_plus64(arg);
 	function _assemble_plus(arg, maxsize: int) {
 		if (arg is int && arg == 0) {
 			/* No-op */
@@ -1360,6 +1373,19 @@ handle_fixed_operand_size:
 		if (outputRegister !is int) {
 			if (outputRegister.startswith("%"))
 				outputRegister = outputRegister[1:];
+			if (outputRegister == "cfa") {
+				/* Special case to define the %cfa register itself! */
+				yield DW_CFA_def_cfa_expression;
+				if (isDerefAfter) {
+					yield encodeULeb128(#data + 1)...;
+					yield data...;
+					yield DW_OP_deref;
+				} else {
+					yield encodeULeb128(#data)...;
+					yield data...;
+				}
+				return;
+			}
 			outputRegister = this.arch.registers[outputRegister];
 		}
 		yield isDerefAfter ? DW_CFA_expression : DW_CFA_val_expression;

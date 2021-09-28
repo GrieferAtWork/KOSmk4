@@ -95,6 +95,18 @@ DECL_BEGIN
 #define TASK_FKERNTHREAD   __UINT32_C(0x80000000) /* [const] The thread is running exclusively in kernel-space, and can never return to user-space. */
 
 
+/* Offsets into `struct task' */
+#define OFFSET_TASK_SELF            0
+#define OFFSET_TASK_REFCNT          (__SIZEOF_POINTER__)
+#define OFFSET_TASK_FLAGS           (__SIZEOF_POINTER__ * 2)
+#define OFFSET_TASK_CPU             (__SIZEOF_POINTER__ * 3)
+#define OFFSET_TASK_MMAN            (__SIZEOF_POINTER__ * 4)
+#define OFFSET_TASK_MMAN_TASKS_NEXT (__SIZEOF_POINTER__ * 5)
+#define OFFSET_TASK_MMAN_TASKS_PREV (__SIZEOF_POINTER__ * 6)
+#define OFFSET_TASK_HEAPSZ          (__SIZEOF_POINTER__ * 7)
+#define OFFSET_TASK_STATE           (__SIZEOF_POINTER__ * 8)
+#define OFFSET_TASK__NEXT           (__SIZEOF_POINTER__ * 8)
+
 #ifdef __CC__
 
 struct cpu;

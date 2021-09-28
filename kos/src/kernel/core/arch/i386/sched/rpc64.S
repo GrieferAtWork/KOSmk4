@@ -43,13 +43,13 @@
 
 
 .section .data.pertask.early
-PUBLIC_OBJECT(this_x86_rpc_redirection_iret)
+PUBLIC_OBJECT(this_x86_sysret_iret)
 	.quad  0  /* ir_rip */
 	.quad  0  /* ir_cs */
 	.quad  0  /* ir_rflags */
 	.quad  0  /* ir_rsp */
 	.quad  0  /* ir_ss */
-END(this_x86_rpc_redirection_iret)
+END(this_x86_sysret_iret)
 
 .section .text
 	.cfi_startproc simple
@@ -61,22 +61,22 @@ import outputForAssembly from .......misc.libgen.cfi.comp;
 for (local reg: ["rip", "cs", "rflags", "rsp", "ss"]) {
 	outputForAssembly('x86_64', '%' + reg, r'
 		ifnotimpl "KOS", 1f
-		const1u @(this_x86_rpc_redirection_iret + OFFSET_IRREGS64_' + reg.upper() + r')
+		const1u @(this_x86_sysret_iret + OFFSET_IRREGS64_' + reg.upper() + r')
 		form_tls_address
 		deref
 		ret
 	1:	push   %' + reg);
 }
 ]]]*/
-__ASM_L(	.cfi_escape 22,16,18,47,3,0,75,79,83,47,7,0,8,this_x86_rpc_redirection_iret + OFFSET_IRREGS64_RIP,155,6)
+__ASM_L(	.cfi_escape 22,16,18,47,3,0,75,79,83,47,7,0,8,this_x86_sysret_iret + OFFSET_IRREGS64_RIP,155,6)
 __ASM_L(	.cfi_escape 47,2,0,128,0)
-__ASM_L(	.cfi_escape 22,51,19,47,3,0,75,79,83,47,7,0,8,this_x86_rpc_redirection_iret + OFFSET_IRREGS64_CS,155,6)
+__ASM_L(	.cfi_escape 22,51,19,47,3,0,75,79,83,47,7,0,8,this_x86_sysret_iret + OFFSET_IRREGS64_CS,155,6)
 __ASM_L(	.cfi_escape 47,3,0,146,51,0)
-__ASM_L(	.cfi_escape 22,49,19,47,3,0,75,79,83,47,7,0,8,this_x86_rpc_redirection_iret + OFFSET_IRREGS64_RFLAGS,155,6)
+__ASM_L(	.cfi_escape 22,49,19,47,3,0,75,79,83,47,7,0,8,this_x86_sysret_iret + OFFSET_IRREGS64_RFLAGS,155,6)
 __ASM_L(	.cfi_escape 47,3,0,146,49,0)
-__ASM_L(	.cfi_escape 22,7,18,47,3,0,75,79,83,47,7,0,8,this_x86_rpc_redirection_iret + OFFSET_IRREGS64_RSP,155,6)
+__ASM_L(	.cfi_escape 22,7,18,47,3,0,75,79,83,47,7,0,8,this_x86_sysret_iret + OFFSET_IRREGS64_RSP,155,6)
 __ASM_L(	.cfi_escape 47,2,0,119,0)
-__ASM_L(	.cfi_escape 22,52,19,47,3,0,75,79,83,47,7,0,8,this_x86_rpc_redirection_iret + OFFSET_IRREGS64_SS,155,6)
+__ASM_L(	.cfi_escape 22,52,19,47,3,0,75,79,83,47,7,0,8,this_x86_sysret_iret + OFFSET_IRREGS64_SS,155,6)
 __ASM_L(	.cfi_escape 47,3,0,146,52,0)
 //[[[end]]]
 	.cfi_def_cfa %rsp, 0
@@ -87,15 +87,15 @@ PUBLIC_FUNCTION(x86_rpc_user_redirection)
 	/* Entry point for redirected RPC callbacks
 	 * Note that our current %gs.base still points to kernel-space. */
 
-	pushq_cfi  %gs:(this_x86_rpc_redirection_iret + 32) /* ir_ss */
+	pushq_cfi  %gs:(this_x86_sysret_iret + 32) /* ir_ss */
 	.cfi_rel_offset %ss, 0
-	pushq_cfi  %gs:(this_x86_rpc_redirection_iret + 24) /* ir_rsp */
+	pushq_cfi  %gs:(this_x86_sysret_iret + 24) /* ir_rsp */
 	.cfi_rel_offset %rsp, 0
-	pushq_cfi  %gs:(this_x86_rpc_redirection_iret + 16) /* ir_rflags */
+	pushq_cfi  %gs:(this_x86_sysret_iret + 16) /* ir_rflags */
 	.cfi_rel_offset %rflags, 0
-	pushq_cfi  %gs:(this_x86_rpc_redirection_iret + 8)  /* ir_cs */
+	pushq_cfi  %gs:(this_x86_sysret_iret + 8)  /* ir_cs */
 	.cfi_rel_offset %cs, 0
-	pushq_cfi  %gs:(this_x86_rpc_redirection_iret + 0)  /* ir_rip */
+	pushq_cfi  %gs:(this_x86_sysret_iret + 0)  /* ir_rip */
 	.cfi_rel_offset %rip, 0
 
 	/* Re-enable interrupts, now that everything important has been saved. */
@@ -445,7 +445,7 @@ PUBLIC_FUNCTION(task_serve_nx)
 	ASM_POP_ICPUSTATE_BEFORE_IRET_CFI_R
 	cmpq   $(0), %gs:this_rpc_pending_sync_count
 	je     1f
-	orq    $(TASK_SERVE_NX_XPENDING), %rax
+	orq    $(TASK_SERVE_NX_EXCEPT), %rax
 1:	intr_exit
 	.cfi_endproc
 END(task_serve_nx)

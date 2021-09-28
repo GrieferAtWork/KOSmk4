@@ -78,7 +78,40 @@ task_rpc_exec(struct task *__restrict thread, syscall_ulong_t flags,
 
 
 
+/* Arch-specific function:
+ * Serve pending, synchronous (and asynchronous) RPCs.
+ * NOTE: If the caller was previously  disabled preemption, it will  remain
+ *       disabled  if  there  were no  RPC  functions had  to  be executed.
+ *       Otherwise, preemption will become enabled, and `true' is returned,
+ *       or an exception thrown by an RPC function gets propagated.
+ * WARNING: Do not call this function unconditionally!
+ *          Only call it if you're certain to be about to start  blocking
+ *          in a context where a reset of your current context would have
+ *          the potential to resolve the  block. (Reset here meaning  the
+ *          current system call being restarted)
+ * @return: true:  At   least  one  RPC   function  was  executed,  and
+ *                 preemption was re-enabled if it was disabled before.
+ * @return: false: No  RPC needed to be served, and preemption
+ *                 remains disabled if it was disabled before. */
+FUNDEF bool KCALL task_serve(void) THROWS(E_INTERRUPT_USER_RPC, ...);
+
+/* Arch-specific function:
+ * Same as `task_serve()', but only sevice RPCs that were scheduled as no-throw.
+ * @return: * : Set of `TASK_SERVE_*' */
+FUNDEF WUNUSED unsigned int NOTHROW(KCALL task_serve_nx)(void);
+
+/* Automatically updates `state' to include the intended return value for `task_serve()'! */
+FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) struct icpustate *FCALL
+task_serve_with_icpustate(struct icpustate *__restrict state)
+		THROWS(E_INTERRUPT_USER_RPC, ...);
+FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) struct icpustate *
+NOTHROW(FCALL task_serve_with_icpustate_nx)(struct icpustate *__restrict state);
+
 #endif /* __CC__ */
+
+#define TASK_SERVE_NX_NORMAL 0x00 /* Nothing was executed, or needed to be. */
+#define TASK_SERVE_NX_EXCEPT 0x01 /* FLAG: Pending RPC functions that can only be serviced by `task_serve()' still remain. */
+#define TASK_SERVE_NX_DIDRUN 0x02 /* FLAG: NX RPC functions were executed. */
 
 
 #else /* CONFIG_USE_NEW_RPC */
@@ -414,9 +447,9 @@ NOTHROW(FCALL task_push_asynchronous_rpc_v)(struct scpustate *__restrict state,
  * return target  to instead  point back  towards  a kernel-space  function which  is  then
  * able  to  service  RPC  functions  scheduled  using `task_(schedule|exec)_user_[s]rpc()'
  * On x86, this is done by modifying the IRET tail at the top of the target thread's stack:
- *   >> FORTASK(self,this_x86_rpc_redirection_iret).ir_eip    = GET_USERCODE_IRET(self)->ir_eip;
- *   >> FORTASK(self,this_x86_rpc_redirection_iret).ir_cs     = GET_USERCODE_IRET(self)->ir_cs;
- *   >> FORTASK(self,this_x86_rpc_redirection_iret).ir_eflags = GET_USERCODE_IRET(self)->ir_eflags;
+ *   >> FORTASK(self,this_x86_sysret_iret).ir_eip    = GET_USERCODE_IRET(self)->ir_eip;
+ *   >> FORTASK(self,this_x86_sysret_iret).ir_cs     = GET_USERCODE_IRET(self)->ir_cs;
+ *   >> FORTASK(self,this_x86_sysret_iret).ir_eflags = GET_USERCODE_IRET(self)->ir_eflags;
  *   >> GET_USERCODE_IRET(self)->ir_eip                  = &x86_rpc_user_redirection;
  *   >> GET_USERCODE_IRET(self)->ir_cs                   = SEGMENT_KERNEL_CODE;
  *   >> GET_USERCODE_IRET(self)->ir_eflags               = 0;
@@ -445,13 +478,6 @@ NOTHROW(FCALL task_enable_redirect_usercode_rpc)(struct task *__restrict self);
 FUNDEF NOBLOCK NONNULL((1)) bool
 NOTHROW(KCALL task_redirect_usercode_rpc)(struct task *__restrict target, uintptr_t mode);
 
-#endif /* __CC__ */
-#endif /* !CONFIG_USE_NEW_RPC */
-
-
-
-
-#ifdef __CC__
 /* Arch-specific function:
  * Serve pending, synchronous (and asynchronous) RPCs.
  * NOTE: If the caller was previously  disabled preemption, it will  remain
@@ -474,9 +500,10 @@ FUNDEF bool KCALL task_serve(void) THROWS(...);
  * @return: * : Set of `TASK_SERVE_*' */
 FUNDEF WUNUSED unsigned int NOTHROW(KCALL task_serve_nx)(void);
 #endif /* __CC__ */
-#define TASK_SERVE_NX_NOOP     0 /* Nothing was executed, or needed to be. */
-#define TASK_SERVE_NX_XPENDING 1 /* FLAG: Pending RPC functions that can only be serviced by `task_serve()' still remain. */
+#define TASK_SERVE_NX_NORMAL     0 /* Nothing was executed, or needed to be. */
+#define TASK_SERVE_NX_EXCEPT 1 /* FLAG: Pending RPC functions that can only be serviced by `task_serve()' still remain. */
 #define TASK_SERVE_NX_DIDRUN   2 /* FLAG: NX RPC functions were executed. */
+#endif /* !CONFIG_USE_NEW_RPC */
 
 
 

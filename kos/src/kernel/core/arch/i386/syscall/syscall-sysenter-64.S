@@ -275,8 +275,8 @@ PUBLIC_FUNCTION(x86_syscall_emulate_sysenter_r)
 	EXTERN(x86_rpc_user_redirection)
 	cmpq   $(x86_rpc_user_redirection), OFFSET_IRREGS_RIP(%rsp)
 	jne    1f
-	EXTERN(this_x86_rpc_redirection_iret)
-	movq   %rdi, %gs:(this_x86_rpc_redirection_iret + OFFSET_IRREGS_RIP) /* RIP := RDI */
+	EXTERN(this_x86_sysret_iret)
+	movq   %rdi, %gs:(this_x86_sysret_iret + OFFSET_IRREGS_RIP) /* RIP := RDI */
 	jmp    2f
 1:	movq   %rdi, OFFSET_IRREGS_RIP(%rsp) /* RIP := RDI */
 2:	movq   %rbp, OFFSET_IRREGS_RSP(%rsp) /* RSP := RBP */

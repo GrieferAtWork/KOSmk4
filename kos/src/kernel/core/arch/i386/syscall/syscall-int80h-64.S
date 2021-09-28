@@ -248,7 +248,7 @@ PUBLIC_FUNCTION(x86_syscall_emulate_int80h_r)
 	/* Must account for IRET redirection when selecting compatibility mode!
 	 * >> temp = IRET.CS;
 	 * >> if unlikely(temp == SEGMENT_KERNEL_CODE)
-	 * >>     temp = PERTASK_GET(this_x86_rpc_redirection_iret.ir_cs);
+	 * >>     temp = PERTASK_GET(this_x86_sysret_iret.ir_cs);
 	 * >> if (temp == SEGMENT_USER_CODE32_RPL)
 	 * >>     DO_X32();
 	 * >> DO_X64(); */
@@ -273,7 +273,7 @@ INTERN_OBJECT(x86_syscall_emulate_int80h_r_rel_x86_syscall64x32_int80)
 END(x86_syscall_emulate_int80h_r_rel_x86_syscall64x32_int80)
 .Lsyscall_emulate_rpc_redirection_cs:
 	.cfi_restore_state
-	movw   %gs:(this_x86_rpc_redirection_iret + OFFSET_IRREGS64_CS), %ax
+	movw   %gs:(this_x86_sysret_iret + OFFSET_IRREGS64_CS), %ax
 	jmp    1b
 	.cfi_endproc
 END(x86_syscall_emulate_int80h_r)
