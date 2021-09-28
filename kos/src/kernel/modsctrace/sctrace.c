@@ -33,12 +33,12 @@
 #include <sched/pid.h>
 
 #include <compat/config.h>
+#include <kos/asm/rpc-method.h>
+#include <kos/bits/syscall-info.h>
 
 #include <format-printer.h>
 #include <inttypes.h>
 
-#include <librpc/bits/rpc-common.h>
-#include <librpc/bits/syscall-info.h>
 #include <librpc/rpc.h>
 
 #ifndef __NR_syslog

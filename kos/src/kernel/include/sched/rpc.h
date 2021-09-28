@@ -25,8 +25,24 @@
 #include <kernel/malloc-defs.h>
 #include <kernel/types.h>
 
+#ifdef CONFIG_USE_NEW_RPC
+#include <kos/rpc.h>
+#endif /* CONFIG_USE_NEW_RPC */
+
 DECL_BEGIN
 
+
+#ifdef CONFIG_USE_NEW_RPC
+#define task_rpc_t                prpc_exec_callback_t
+#define TASK_RPC_REASON_ASYNC     RPC_REASONCTX_ASYNC_KERN
+#define TASK_RPC_REASON_ASYNCUSER RPC_REASONCTX_ASYNC
+#define TASK_RPC_REASON_SYNC      RPC_REASONCTX_SYNC
+#define TASK_RPC_REASON_SHUTDOWN  RPC_REASONCTX_SHUTDOWN
+
+
+
+
+#else /* CONFIG_USE_NEW_RPC */
 /* RPCs are served under the following, different circumstantial conditions.
  * NOTE: The order in which RPCs are executed (irregardless of their type)
  *       is    never   guarantied   and    can   be   completely   random.
@@ -415,6 +431,12 @@ FUNDEF WUNUSED unsigned int NOTHROW(KCALL task_serve_nx)(void);
 #define TASK_SERVE_NX_NOOP     0 /* Nothing was executed, or needed to be. */
 #define TASK_SERVE_NX_XPENDING 1 /* FLAG: Pending RPC functions that can only be serviced by `task_serve()' still remain. */
 #define TASK_SERVE_NX_DIDRUN   2 /* FLAG: NX RPC functions were executed. */
+#endif /* !CONFIG_USE_NEW_RPC */
+
+
+
+
+
 
 
 #ifdef __CC__

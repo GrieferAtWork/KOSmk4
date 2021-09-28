@@ -40,6 +40,7 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #include <hybrid/unaligned.h>
 
 #include <compat/config.h>
+#include <kos/asm/rpc-method.h>
 #include <sys/mman.h>
 
 #include <fcntl.h>
@@ -47,7 +48,6 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #include <stddef.h>
 #include <string.h>
 
-#include <librpc/bits/rpc-common.h>
 #include <libsctrace/repr-types.h>
 
 #include "sctrace.h"

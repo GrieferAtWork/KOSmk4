@@ -25,14 +25,14 @@
 
 #include <hybrid/compiler.h>
 
+#include <kos/bits/syscall-info.h> /* struct rpc_syscall_info */
 #include <kos/types.h>
 
 #include <format-printer.h>
 #include <stdbool.h>
 
-#include <librpc/bits/syscall-info.h> /* struct rpc_syscall_info */
-#include <libsctrace/sctrace.h>
 #include <libsctrace/repr-types.h>
+#include <libsctrace/sctrace.h>
 
 DECL_BEGIN
 

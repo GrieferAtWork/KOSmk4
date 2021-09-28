@@ -22,6 +22,72 @@
 
 #include <kernel/compiler.h>
 
+#ifdef CONFIG_USE_NEW_RPC
+#include <kernel/types.h>
+#include <sched/pertask.h>
+
+#include <hybrid/sequence/list.h>
+
+#include <kos/rpc.h>
+
+#ifdef __CC__
+DECL_BEGIN
+
+struct pending_user_rpc {
+	void const USER CHECKED                       *pur_prog; /* [1..1][const] Userspace RPC program */
+	void const USER UNCHECKED *const USER CHECKED *pur_args; /* [?..?][0..n][const] RPC program arguments. */
+	REF struct mman                               *pur_mman; /* [1..1][const] The mman within with the program and arguments reside. */
+};
+
+/* Finalize a given `struct pending_user_rpc' */
+#define pending_user_rpc_fini(self) decref((self)->pur_mman)
+
+struct pending_rpc {
+	SLIST_ENTRY(pending_rpc) pr_link;  /* [0..1][lock(ATOMIC)] Link in the list of pending RPCs */
+	uintptr_t                pr_flags; /* [const] RPC flags: RPC_CONTEXT_KERN, ...
+	                                    * NOTE: When `RPC_CONTEXT_INACTIVE' is set, then the RPC is inactive. */
+	union {
+		struct {
+			prpc_exec_callback_t k_func;   /* [1..1][const] Function to invoke. */
+			void                *k_cookie; /* [?..?][const] Cookie argument for `k_func' */
+		}                       pr_kern;   /* [RPC_CONTEXT_KERN] Kernel-mode RPC */
+		struct pending_user_rpc pr_user;   /* [!RPC_CONTEXT_KERN] User-mode RPC */
+	};
+};
+
+/* Alloc/free functions used for `struct pending_rpc' */
+#define pending_rpc_alloc(size, gfp)    kmalloc(size, gfp)
+#define pending_rpc_alloc_nx(size, gfp) kmalloc_nx(size, gfp)
+#define pending_rpc_free(self)          kfree(self)
+
+SLIST_HEAD(pending_rpc_slist, pending_rpc);
+
+/* [0..n][lock(INSERT(ATOMIC), CLEAR(ATOMIC && THIS_TASK))]
+ * Pending RPCs. (Set of `THIS_RPCS_TERMINATED' when RPCs may no longer
+ * be executed, and all that were there prior to this becoming the case
+ * are/were serviced with `RPC_REASONCTX_SHUTDOWN') */
+DATDEF ATTR_PERTASK struct pending_rpc_slist this_rpcs;
+#define THIS_RPCS_TERMINATED ((struct pending_rpc *)-1)
+
+
+/* Schedule the given `rpc' for execution on `thread'.
+ * NOTE: Be mindful of the scenario  where `thread == THIS_TASK', in which  case
+ *       this function will return like normal, and the RPC will only be noticed
+ *       the next time you make a call to `task_serve()'!
+ * @return: true:  Success. (Even if the thread terminates before the RPC can be served
+ *                 normally, it will still  be served as `RPC_REASONCTX_SHUTDOWN'  when
+ *                 true has been returned here)
+ * @return: false: The target thread has already terminated. */
+FUNDEF NOBLOCK WUNUSED NONNULL((1, 2)) __BOOL
+NOTHROW(FCALL task_rpc_schedule)(struct task *__restrict thread,
+                                 /*inherit(on_success)*/ struct pending_rpc *__restrict rpc);
+
+
+
+DECL_END
+#endif /* __CC__ */
+
+#else /* CONFIG_USE_NEW_RPC */
 #include <kernel/types.h>
 
 #include "rpc.h"
@@ -135,7 +201,7 @@ NOTHROW(KCALL task_deliver_rpc)(struct task *__restrict target,
                                                                          * NOTE: This return value still indicates success! */
 #define TASK_DELIVER_RPC_WASOK(x)    TASK_SCHEDULE_USER_RPC_WASOK(x)
 
-
 DECL_END
+#endif /* !CONFIG_USE_NEW_RPC */
 
 #endif /* !GUARD_KERNEL_INCLUDE_SCHED_RPC_INTERNAL_H */

@@ -53,6 +53,11 @@
 #define CONFIG_USE_NEW_ASYNC
 #endif
 
+#undef CONFIG_USE_NEW_RPC
+#if 0
+#define CONFIG_USE_NEW_RPC
+#endif
+
 #ifdef CONFIG_USE_NEW_FS
 /* Backward-compatibility */
 #define inode            fnode

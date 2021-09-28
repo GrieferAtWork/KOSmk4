@@ -746,6 +746,8 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *   - pthread_create must use that control code to figure out to map
 	 *     new thread stacks. */
 
+	/* TODO: Look into enabling `-fsanitize=undefined' for all code. */
+
 	return state;
 }
 

@@ -26,373 +26,9 @@
 
 #include <bits/types.h>
 #include <kos/anno.h>
-#endif /* !__DEEMON__ */
-
-/* RPC (and posix signal) handling contexts:
- *
- *  - Target thread is in user-space at time of delivery:
- *    - RPC_SYNCMODE_SYNC:  Schedule the RPC as pending until the next call to `task_serve()'
- *    - RPC_SYNCMODE_ASYNC: The RPC is executed immediately.
- *
- *  - Target thread is in kernel-space at time of delivery:
- *    - * : Schedule the RPC as pending until the next call to `task_serve()'
- *
- *  - Target thread makes a call to kernel function `task_serve()':
- *    - Redirect the thread's IRET tail to inject a function
- *      to-be  executed  before  returning  to   user-space.
- *    - Within this function, handle all pending RPCs and posix signals:
- *      >> // Resume execution in user-space
- *      >> #define HANDLE_ACTION_RESUME 0
- *      >> // Restart the interrupt and call `handle_user_rpc'
- *      >> // again before returning to user-space, then using
- *      >> // `RPC_REASONCTX_SYSRET' as the reason for handling.
- *      >> #define HANDLE_ACTION_RESTART_INTERRUPT_AND_SYSRET 1
- *      >>
- *      >> // NOTE: Exceptions thrown by this function are propagated normally,
- *      >> //       but note that the E_INTERRUPT_USER_RPC error that brought
- *      >> //       us here will have already been consumed when this function
- *      >> //       is called!
- *      >> struct icpustate *
- *      >> handle_user_rpc(struct icpustate *state,
- *      >>                 unsigned int reason,
- *      >>                 struct rpc_syscall_info const *sc_info,
- *      >>                 unsigned int *return_mode) {
- *      >>     bool rpc_handled;
- *      >>     bool must_reactivate;
- *      >>     bool user_rpc_handled;
- *      >>     assert(reason == RPC_REASONCTX_SYSRET ||
- *      >>            reason == RPC_REASONCTX_INTERRUPT ||
- *      >>            reason == RPC_REASONCTX_ASYNC);
- *      >>     assert(reason == RPC_REASONCTX_INTERRUPT || sc_info == NULL);
- *      >>     assert(error_code() == ERROR_CODEOF(E_OK));
- *      >>
- *      >>     // Kernel-private RPCs executed before
- *      >>     // return-to-user are also handled here.
- *      >>
- *      >>     rpc_handled = false;
- *      >>     FOREACH(RPC: <pending_rpcs>) {
- *      >>         if (RPC.flags & RPC_CONTEXT_KERN) {
- *      >>             auto func = RPC.func;
- *      >>             CONSUME_RPC(RPC);
- *      >>             // TODO: This function must somehow be able to set `user_rpc_handled = true'!
- *      >>             state = (*func)(state, reason, sc_info);
- *      >>             rpc_handled = true;
- *      >>         }
- *      >>     }
- *      >>
- *      >>     must_reactivate  = false;
- *      >>     user_rpc_handled = false;
- *      >>     if (!IS_MASKED(SIGRPC)) {
- *      >>         FOREACH(RPC: <pending_rpcs>) {
- *      >>             unsigned int user_rpc_reason = RPC_REASONCTX_ASYNC;
- *      >>             bool         user_rpc_restart_syscall = false;
- *      >>             if (reason == RPC_REASONCTX_SYSRET) {
- *      >>                 if (RPC.flags & (RPC_SYNCMODE_F_REQUIRE_SC | RPC_SYNCMODE_F_REQUIRE_CP))
- *      >>                     RPC.active = true; // Re-enable for the next call
- *      >>                 if (!(RPC.flags & RPC_SYNCMODE_F_ALLOW_ASYNC))
- *      >>                     continue; // RPC may not be delivered to asynchronous user-space.
- *      >>             } else {
- *      >>                 if ((RPC.flags & RPC_SYNCMODE_F_REQUIRE_SC) && !sc_info) {
- *      >>                     if (reason == RPC_REASONCTX_INTERRUPT) {
- *      >>                         RPC.active = false; // RPC requires a system call
- *      >>                         must_reactivate = true;
- *      >>                     }
- *      >>                     continue;
- *      >>                 }
- *      >>                 if (sc_info) {
- *      >>                     unsigned int syscall_restart_mode;
- *      >>                     assert(reason == RPC_REASONCTX_INTERRUPT);
- *      >>                     if ((RPC.flags & RPC_SYNCMODE_F_REQUIRE_CP) && !kernel_syscall_iscp(sc_info->rsi_sysno)) {
- *      >>                         assert(reason == RPC_REASONCTX_INTERRUPT);
- *      >>                         RPC.active = false; // The RPC requires a cancellation point.
- *      >>                         must_reactivate = true;
- *      >>                         continue;
- *      >>                     }
- *      >>                     user_rpc_reason      = RPC_REASONCTX_SYNC;
- *      >>                     syscall_restart_mode = kernel_syscall_restartmode(sc_info->rsi_sysno);
- *      >>                     if (syscall_restart_mode == SYSCALL_RESTART_MODE_MUST)
- *      >>                         user_rpc_restart_syscall = true;
- *      >>                     else {
- *      >>                         if ((syscall_restart_mode == SYSCALL_RESTART_MODE_AUTO) && (RPC.flags & RPC_SYSRESTART_F_AUTO))
- *      >>                             user_rpc_restart_syscall = true;
- *      >>                         if ((syscall_restart_mode == SYSCALL_RESTART_MODE_DONT) && (RPC.flags & RPC_SYSRESTART_F_DONT))
- *      >>                             user_rpc_restart_syscall = true;
- *      >>                     }
- *      >>                 } else if (reason == RPC_REASONCTX_ASYNC) {
- *      >>                     if (!(RPC.flags & RPC_SYNCMODE_F_ALLOW_ASYNC)) {
- *      >>                         RPC.active = false; // RPC may not be delivered to asynchronous user-space.
- *      >>                         must_reactivate = true;
- *      >>                         continue;
- *      >>                     }
- *      >>                 } else {
- *      >>                     assert(reason == RPC_REASONCTX_INTERRUPT);
- *      >>                     user_rpc_reason = RPC_REASONCTX_SYNC;
- *      >>                 }
- *      >>             }
- *      >>
- *      >>             // Execute the program associated with `RPC'
- *      >>             if (user_rpc_handled) {
- *      >>                 // Only the first RPC program executed is able to potentially
- *      >>                 // restart a system call. If more programs are executed, then
- *      >>                 // those will simply return the context pushed by the first
- *      >>                 // program.
- *      >>                 state = EXECUTE_RPC_PROGRAM(RPC, state, user_rpc_reason, false, NULL);
- *      >>             } else {
- *      >>                 // NOTE: `user_rpc_restart_syscall' is set to `true' if the
- *      >>                 //       system call described by `sc_info' should be restarted
- *      >>                 //       once the sub-routine pushed by the RPC program returns.
- *      >>                 // NOTE: `user_rpc_reason' is one of `RPC_REASONCTX_ASYNC', `RPC_REASONCTX_SYNC'
- *      >>                 state = EXECUTE_RPC_PROGRAM(RPC, state, user_rpc_reason,
- *      >>                                             user_rpc_restart_syscall, sc_info);
- *      >>             }
- *      >>             user_rpc_handled = true;
- *      >>             rpc_handled      = true;
- *      >>             CONSUME_RPC(RPC);
- *      >>             // RPC programs are able to mask signals. Not just because of
- *      >>             // userprocmask and the fact that programs are able to write
- *      >>             // into user-space memory, but also because
- *      >>             if (IS_MASKED(SIGRPC))
- *      >>                 break;
- *      >>         }
- *      >>     }
- *      >>
- *      >>     // POSIX signals are also handled here, and are always handled like:
- *      >>     //  - `RPC_SYNCMODE_ASYNC | RPC_SYSRESTART_NORMAL'  (without `SA_RESTART')
- *      >>     //  - `RPC_SYNCMODE_ASYNC | RPC_SYSRESTART_MOST'    (with `SA_RESTART')
- *      >>     // Also note that when `user_rpc_handled == true', posix signals are
- *      >>     // handled with `reason = RPC_REASONCTX_ASYNC, sc_info = NULL'.
- *      >>
- *      >>     *return_mode = HANDLE_ACTION_RESUME;
- *      >>     if (rpc_handled) {
- *      >>         // If any RPCs were handled, then we must make sure that all RPCs
- *      >>         // which may have gotten disabled are once again re-enabled. Also
- *      >>         // there's no need to restart the current interrupt in this case!
- *      >>         if (must_reactivate) {
- *      >>             FOREACH(RPC: <pending_rpcs>) {
- *      >>                 if (!RPC.active)
- *      >>                     RPC.active = true;
- *      >>             }
- *      >>         }
- *      >>     } else if (must_reactivate) {
- *      >>         // If any of the RPCs got deactivated, then we must restart the
- *      >>         // interrupt with problematic RPCs disabled. then, once the
- *      >>         // interrupt completes, re-enable the RPCs so they're handled
- *      >>         // the next time the current thread calls `task_serve()'
- *      >>         assert(reason == RPC_REASONCTX_INTERRUPT);
- *      >>         *return_mode = HANDLE_ACTION_RESTART_INTERRUPT_AND_SYSRET;
- *      >>     }
- *      >>     return state;
- *      >> }
- *      NOTE: The `RPC.active' field only affects which RPCs cause `task_serve()' to
- *            throw an `E_INTERRUPT_USER_RPC' exception. The field has no effects on
- *            which  RPCs are enumerated by the `FOREACH' above, which always simply
- *            enumerates all of them.
- *
- *  - The implementation of `task_serve()' looks like this:
- *      >> bool task_serve(void) {
- *      >>     bool result = false;
- *      >>     FOREACH(RPC: <pending_rpcs>) {
- *      >>         if (RPC.flags & RPC_CONTEXT_KERN) {
- *      >>             PREEMPTION_ENABLE();
- *      >>             auto func = RPC.func;
- *      >>             CONSUME_RPC(RPC);
- *      >>             struct icpustate *state = CURRENT_STATE();
- *      >>             state = (*func)(state, reason, sc_info);
- *      >>             SET_CURRENT_STATE(state);
- *      >>             result = true;
- *      >>         } else {
- *      >>             if (RPC.active && !IS_MASKED(SIGRPC)) {
- *      >>                 PREEMPTION_ENABLE();
- *      >>                 THROW(E_INTERRUPT_USER_RPC);
- *      >>             }
- *      >>         }
- *      >>     }
- *      >>     return result;
- *      >> }
- *
- */
-
-
-/* RPC service context codes */
-#define RPC_REASONCTX_ASYNC      0x0000 /* Asynchronous execution in user-space. */
-#ifdef __KERNEL__
-#define RPC_REASONCTX_SYNC       0x0001 /* RPC is being handled from within `task_serve()' */
-#define RPC_REASONCTX_SYSRET     0x0002 /* Return from interrupt. Used to reset `RPC_SYNCMODE_F_REQUIRE_SC' and `RPC_SYNCMODE_F_REQUIRE_CP' RPCs. */
-#define RPC_REASONCTX_INTERRUPT  0x0003 /* About  to return to user-space after `task_serve()' found
-                                         * some active RPCs that required  the stack to be  unwound.
-                                         * The interrupt may be something like  #PF, or it may be  a
-                                         * system call. In the case  of a system call, `sc_info'  is
-                                         * non-NULL. In either case, the interrupt can be restarted. */
-#define RPC_REASONCTX_ASYNC_KERN 0x0004 /* Kernel-space was interrupted asynchronously. (in this case,
-                                         * preemption is unconditionally  disabled and  should not  be
-                                         * enabled by the RPC callback) */
-#define RPC_REASONCTX_SHUTDOWN   0x0005 /* RPC is invoked because the thread is exiting. */
-#else /* __KERNEL__ */
-#define RPC_REASONCTX_SYNC       0x0001 /* A  blocking operation was interrupted. The operation
-                                         * may or may not be restarted, depending on additional
-                                         * data which was pushed. */
-#endif /* !__KERNEL__ */
-
-
-
-#ifdef __KERNEL__
-/************************************************************************/
-/* RPC context flags */
-#define RPC_CONTEXT_USER 0x0000 /* User RPC */
-
-/* FLAG: Kernel  RPC. This flag can only be set  by the kernel itself (it is not
- *       accepted by the RPC enqueue system calls, which will indicate that this
- *       flag  is invalid). When set, it changes  the meaning of other RPC flags
- *       and operational method (instead of  needing an RPC program, a  function
- *       pointer is accepted that will be executed instead of the RPC  program):
- *
- *  - RPC_SYNCMODE_F_ALLOW_ASYNC:
- *       The  RPC is delivered  immediately and completely  bypasses the RPC queue.
- *       Instead, the RPC function is pushed onto the target thread's kernel stack,
- *       where  it will be  executed the next time  the thread gets  a share of its
- *       quantum.  If the  target thread  was sleeping  (s.a. `task_sleep()'), then
- *       sleep is interrupted by means of  a sporadic interrupt. The reason  passed
- *       to the RPC function is  always `RPC_REASONCTX_ASYNC_KERN', and are  always
- *       executed  with preemption disabled.  (Note that all  other RPCs are always
- *       executed with preemption enabled)
- *
- *       If this flag is not set, 1 of 2 things can happen:
- *         - If the thread is currently in user-space, inject a piece of code onto
- *           the kernel stack that immediately invokes the given function with the
- *           reason code `RPC_REASONCTX_SYNC'
- *         - Otherwise,  the RPC  is scheduled for  execution the next  time the thread
- *           calls `task_serve()' or as soon as  the thread returns to user-space.  The
- *           later only  happens when  `TASK_FKERNTHREAD' isn't  set. If  in this  case
- *           the target thread also happens  to be sleeping, it  is woken using a  call
- *           to  `task_wake()'. Note that  here it is assumed  that the introduction of
- *           a sporadic interrupt will either cause the thread to return to  user-space
- *           (at which  point  the RPC  will  be  handled), or  to  re-poll  waited-for
- *           conditions and eventually call `task_serve()', followed by `task_sleep()',
- *           in which case the RPC is also handled.
- *       The complete set of reasons when `RPC_SYNCMODE_F_ALLOW_ASYNC' isn't set is:
- *        - RPC_REASONCTX_ASYNC      (Return to user-space location)
- *        - RPC_REASONCTX_SYNC       (Called from `task_serve()')
- *        - RPC_REASONCTX_SYSRET     (Interrupt-to-userspace or system call was unwound)
- *        - RPC_REASONCTX_INTERRUPT  (Interrupt-to-userspace or system call was unwound)
- *        - RPC_REASONCTX_SHUTDOWN   (Thread is exiting)
- *
- *
- *  - RPC_SYNCMODE_F_USER:
- *  - RPC_PRIORITY_F_HIGH:
- *       This flag is accepted and operates as documented below
- *
- *  - RPC_SYNCMODE_F_REQUIRE_SC:
- *       This flag is NOT allowed (but note that `RPC_SYNCMODE_F_USER' is, which
- *       shares its numerical value with this flag)
- *
- *  - RPC_SYNCMODE_F_REQUIRE_CP:
- *  - RPC_SYSRESTART_F_AUTO:
- *  - RPC_SYSRESTART_F_DONT:
- *       This flag is NOT allowed (use of it results in kernel panic)
- */
-#define RPC_CONTEXT_KERN     0x8000
-
-/* Flag for use with `RPC_CONTEXT_KERN': the associated function will never
- * throw an exception and is therefor safe to invoke from `task_serve_nx()' */
-#define RPC_CONTEXT_NOEXCEPT 0x4000
-#endif /* __KERNEL__ */
-
-
-
-/************************************************************************/
-/* RPC synchronization flags */
-#define RPC_SYNCMODE_F_ALLOW_ASYNC 0x0001 /* FLAG: Allow delivery to threads currently in user-space. */
-#define RPC_SYNCMODE_F_REQUIRE_SC  0x0002 /* FLAG: Require that the interrupt is the result of a system call being made. */
-#define RPC_SYNCMODE_F_REQUIRE_CP  0x0004 /* FLAG: When interrupting a system call, only handle if the system call is a cancellation point. */
-#ifdef __KERNEL__
-#define RPC_SYNCMODE_F_USER 0x0002 /* For use with `RPC_CONTEXT_KERN': Have `task_serve()' handle the RPC
-                                    * as though the `RPC_CONTEXT_KERN' wasn't set. As a consequence, RPCs
-                                    * with this flag will only ever be invoked with reasons:
-                                    *   - RPC_REASONCTX_ASYNC      (Return to user-space location)
-                                    *   - RPC_REASONCTX_SYSRET     (Interrupt-to-userspace or system call was unwound)
-                                    *   - RPC_REASONCTX_INTERRUPT  (Interrupt-to-userspace or system call was unwound)
-                                    *   - RPC_REASONCTX_SHUTDOWN   (Thread is exiting) */
-#endif /* __KERNEL__ */
-
-
-/* RPC synchronization options */
-
-/* RPC may only be executed when the target thread is making
- * a system call that is  a cancellation point, after  which
- * that call will be interrupted, the RPC will be  executed,
- * and the system call (may) be restarted. */
-#define RPC_SYNCMODE_SYNC  0x0000
-
-/* RPC  may be executed at any point while the target thread
- * is running in user-space, so-long as SIGRPC isn't masked.
- * While the thread is in kernel-space, behavior is the same
- * as for `RPC_SYNCMODE_SYNC'. As such, this option can also
- * be seen as a flag "ALLOW_DELIVERLY_WHILE_IN_USERSPACE" */
-#define RPC_SYNCMODE_ASYNC RPC_SYNCMODE_F_ALLOW_ASYNC
-
-/* RPC is only handled when  interrupting a system call  that
- * has been marked  as a cancellation  point. Otherwise,  the
- * RPC will be marked as inactive until the end of the system
- * call,  such that  it's next  chance at  being handled only
- * comes about the next time a (different) system call  makes
- * a call to `task_serve()' */
-#define RPC_SYNCMODE_CP (RPC_SYNCMODE_F_REQUIRE_SC | RPC_SYNCMODE_F_REQUIRE_CP)
-/************************************************************************/
-
-
-
-
-/************************************************************************/
-/* RPC system call restart flags */
-#define RPC_SYSRESTART_F_AUTO 0x0010 /* [posix: SA_RESTART] Also restart `SYSCALL_RESTART_MODE_AUTO' */
-#define RPC_SYSRESTART_F_DONT 0x0020 /* [posix:          -] Also restart `SYSCALL_RESTART_MODE_DONT' */
-
-/* RPC system call  restart options.  These only apply  to RPCs  delivered
- * while the target thread is in kernel-space and executing a system  call
- * marked as [cp] and something other than [restart(must)], and the system
- * call made a call to `task_serve()' internally. */
-#define RPC_SYSRESTART_NORMAL 0x0000                                          /* [posix:!SA_RESTART] SYSCALL_RESTART_MODE_MUST */
-#define RPC_SYSRESTART_MOST   RPC_SYSRESTART_F_AUTO                           /* [posix: SA_RESTART] SYSCALL_RESTART_MODE_MUST+SYSCALL_RESTART_MODE_AUTO */
-#define RPC_SYSRESTART_ALL    (RPC_SYSRESTART_F_AUTO | RPC_SYSRESTART_F_DONT) /* [posix:          -] SYSCALL_RESTART_MODE_MUST+SYSCALL_RESTART_MODE_AUTO+SYSCALL_RESTART_MODE_DONT */
-/************************************************************************/
-
-
-
-
-/************************************************************************/
-/* RPC priority flags */
-#define RPC_PRIORITY_F_HIGH 0x0040 /* Try to gift the target thread the remainder
-                                    * of  the  calling thread's  current quantum. */
-
-/* RPC priority options */
-#define RPC_PRIORITY_NORMAL 0x0000              /* Normal priority */
-#define RPC_PRIORITY_HIGH   RPC_PRIORITY_F_HIGH /* High priority (try to  gift the target thread  the
-                                                 * remainder of the calling thread's current quantum) */
-/************************************************************************/
-
-
-
-
-
-
-/************************************************************************/
-/* RPC system call information                                          */
-/************************************************************************/
-
-/* Flags for `struct rpc_syscall_info::rsi_flags' */
-#define RPC_SYSCALL_INFO_FNORMAL         0x0000 /* Normal system call flags. */
-#define RPC_SYSCALL_INFO_FEXCEPT         0x8000 /* Exceptions were enabled for this system call. */
-#define RPC_SYSCALL_INFO_FMETHOD         0x00ff /* Mask for the arch-specific system call invocation method. (One of `RPC_SYSCALL_INFO_METHOD_*') */
-#define RPC_SYSCALL_INFO_FREGVALID(i)    (0x0100 << (i)) /* Mask for checking if some given register `i' is valid */
-#define RPC_SYSCALL_INFO_FREGVALID_SHIFT 8
-#define RPC_SYSCALL_INFO_FREGVALID_MASK  0x7f00
-#ifndef __DEEMON__
 #include <kos/asm/rpc-method.h>    /* `RPC_SYSCALL_INFO_METHOD_*' */
 #include <kos/bits/syscall-info.h> /* `struct rpc_syscall_info' */
 #endif /* !__DEEMON__ */
-
-
-
 
 
 /************************************************************************/
@@ -609,14 +245,14 @@
 /*      RPC_OP_               0x9d  * ... */
 /*      RPC_OP_               0x9e  * ... */
 /*      RPC_OP_               0x9f  * ... */
-#define RPC_OP_push_reason    0xa0 /* [+0] PUSH(user_rpc_reason); // Either `RPC_REASONCTX_ASYNC' or `RPC_REASONCTX_SYNC' */
-#define RPC_OP_push_dorestart 0xa1 /* [+0] PUSH(user_rpc_restart_syscall ? 1 : 0); // If true, implies `sc_info != NULL' */
-#define RPC_OP_push_issyscall 0xa2 /* [+0] PUSH(sc_info != NULL ? 1 : 0); */
-#define RPC_OP_push_sc_info   0xa3 /* [+1] word = *pc++; PUSH(((uintptr_t *)sc_info)[word]); */
-#define RPC_OP_sppush_sc_info 0xa4 /* [+0] Push the entire `sc_info' descriptor onto the user stack. */
-#define RPC_OP_push_param     0xa5 /* [+1] word = *pc++; PUSH(params[i]); // `params' is an argument */
-#define RPC_OP_push_sigmask   0xa6 /* [+1] sigset_t s; sigprocmask(SIG_SETMASK, NULL, &s); PUSH(s.__val[*pc++]); */
-#define RPC_OP_sigblock       0xa7 /* [+1] sigset_t s; sigemptyset(&s); sigaddset(&s, *pc++); sigprocmask(SIG_BLOCK, &s, NULL); */
+#define RPC_OP_push_reason    0xa0 /* [+0] PUSH(user_rpc_reason); */
+#define RPC_OP_push_dorestart 0xa1 /* [+0] PUSH(user_rpc_reason == RPC_REASONCTX_SYSCALL ? 1 : 0); */
+#define RPC_OP_push_sc_info   0xa2 /* [+1] word = *pc++; PUSH(((uintptr_t *)sc_info)[word]);         // Illegal when `user_rpc_reason != RPC_REASONCTX_SYSCALL' */
+#define RPC_OP_sppush_sc_info 0xa3 /* [+0] Push the entire `sc_info' descriptor onto the user stack. // Illegal when `user_rpc_reason != RPC_REASONCTX_SYSCALL' */
+#define RPC_OP_push_param     0xa4 /* [+1] word = *pc++; PUSH(params[i]); // `params' is an argument */
+#define RPC_OP_push_sigmask   0xa5 /* [+1] sigset_t s; sigprocmask(SIG_SETMASK, NULL, &s); PUSH(s.__val[*pc++]); */
+#define RPC_OP_sigblock       0xa6 /* [+1] sigset_t s; sigemptyset(&s); sigaddset(&s, *pc++); sigprocmask(SIG_BLOCK, &s, NULL); */
+/*      RPC_OP_               0xa7  * ... */
 #define RPC_OP_nbra           0xa8 /* [+2] off = *(s16 const *)pc; pc += 2; if (POP() == 0) pc += off; */
 /*      RPC_OP_               ...   * ... */
 /*      RPC_OP_               0xdf  * ... */
@@ -632,8 +268,244 @@
 
 
 
+#ifdef __KERNEL__
+/************************************************************************/
+/* RPC context flags */
+
+/* FLAG: Kernel  RPC. This flag can only be set  by the kernel itself (it is not
+ *       accepted by the RPC enqueue system calls, which will indicate that this
+ *       flag  is invalid). When set, it changes  the meaning of other RPC flags
+ *       and operational method (instead of  needing an RPC program, a  function
+ *       pointer is accepted that will be executed instead of the RPC  program):
+ *
+ *  - RPC_SYNCMODE_F_ALLOW_ASYNC:
+ *       The  RPC is delivered  immediately and completely  bypasses the RPC queue.
+ *       Instead, the RPC function is pushed onto the target thread's kernel stack,
+ *       where  it will be  executed the next time  the thread gets  a share of its
+ *       quantum.  If the  target thread  was sleeping  (s.a. `task_sleep()'), then
+ *       sleep is interrupted by means of  a sporadic interrupt. The reason  passed
+ *       to the RPC function is  always `RPC_REASONCTX_ASYNC_KERN', and are  always
+ *       executed  with preemption disabled.  (Note that all  other RPCs are always
+ *       executed with preemption enabled)
+ *
+ *  - RPC_SYNCMODE_F_USER:
+ *  - RPC_PRIORITY_F_HIGH:
+ *       These flags are accepted and operates as documented below
+ *
+ *  - RPC_SYNCMODE_F_REQUIRE_SC:
+ *       These flags are NOT allowed (but note that `RPC_SYNCMODE_F_USER' is,
+ *       which shares its  numerical value with  `RPC_SYNCMODE_F_REQUIRE_SC')
+ *
+ *  - RPC_SYNCMODE_F_REQUIRE_CP:
+ *  - RPC_SYSRESTART_F_AUTO:
+ *  - RPC_SYSRESTART_F_DONT:
+ *       These flags are NOT allowed (use of it results in kernel panic)
+ */
+#define RPC_CONTEXT_KERN      0x00080000
+
+/* Flag for use with `RPC_CONTEXT_KERN': the associated function will never
+ * throw an exception and is therefor safe to invoke from `task_serve_nx()' */
+#define RPC_CONTEXT_NOEXCEPT  0x00040000
+
+/* Internally used: RPC is currently inactive. */
+#define _RPC_CONTEXT_INACTIVE 0x00020000
+#endif /* __KERNEL__ */
+
+
+
+/************************************************************************/
+/* RPC Signal encoding                                                  */
+#define RPC_SIGNO_MASK   0x00ff  /* Mask for the posix signal number which mustn't be masked for this RPC to be received.
+                                  * When  set  to  `0', the  kernel  will fill  in  `SIGRPC' before  scheduling  the RPC. */
+#define RPC_SIGNO(signo) (signo) /* Use the given `signo' to determine when/if the RPC may be delivered. */
+#define _RPC_GETSIGNO(x) ((x) & RPC_SIGNO_MASK)
+/************************************************************************/
+
+
+
+/************************************************************************/
+/* RPC synchronization flags */
+#define RPC_SYNCMODE_F_ALLOW_ASYNC 0x0100 /* FLAG: Allow delivery to threads currently in user-space. */
+#define RPC_SYNCMODE_F_REQUIRE_SC  0x0200 /* FLAG: Require that the interrupt is the result of a system call being made. */
+#define RPC_SYNCMODE_F_REQUIRE_CP  0x0400 /* FLAG: When interrupting a system call, only handle if the system call is a cancellation point. */
+#ifdef __KERNEL__
+#define RPC_SYNCMODE_F_USER   0x0200 /* For use with `RPC_CONTEXT_KERN': Have `task_serve()' handle the RPC
+                                      * as though the `RPC_CONTEXT_KERN' wasn't set. As a consequence, RPCs
+                                      * with this flag will only ever be invoked with reasons:
+                                      *   - RPC_REASONCTX_ASYNC      (Return to user-space location)
+                                      *   - RPC_REASONCTX_SYSRET     (Interrupt-to-userspace or system call was unwound)
+                                      *   - RPC_REASONCTX_INTERRUPT  (Interrupt-to-userspace or system call was unwound)
+                                      *   - RPC_REASONCTX_SHUTDOWN   (Thread is exiting) */
+#define RPC_SYNCMODE_F_SYSRET 0x0400 /* Combine with `RPC_SYNCMODE_F_USER': Service the RPC in the sysret path. */
+#endif /* __KERNEL__ */
+
+
+/* RPC synchronization options */
+
+/* RPC may only be executed when the target thread is making
+ * a system call that is  a cancellation point, after  which
+ * that call will be interrupted, the RPC will be  executed,
+ * and the system call (may) be restarted. */
+#define RPC_SYNCMODE_SYNC  0x0000
+
+/* RPC  may be executed at any point while the target thread
+ * is running in user-space, so-long as SIGRPC isn't masked.
+ * While the thread is in kernel-space, behavior is the same
+ * as for `RPC_SYNCMODE_SYNC'. As such, this option can also
+ * be seen as a flag "ALLOW_DELIVERLY_WHILE_IN_USERSPACE" */
+#define RPC_SYNCMODE_ASYNC RPC_SYNCMODE_F_ALLOW_ASYNC
+
+/* RPC is only handled when  interrupting a system call  that
+ * has been marked  as a cancellation  point. Otherwise,  the
+ * RPC will be marked as inactive until the end of the system
+ * call,  such that  it's next  chance at  being handled only
+ * comes about the next time a (different) system call  makes
+ * a call to `task_serve()' */
+#define RPC_SYNCMODE_CP (RPC_SYNCMODE_F_REQUIRE_SC | RPC_SYNCMODE_F_REQUIRE_CP)
+/************************************************************************/
+
+
+
+
+/************************************************************************/
+/* RPC system call restart flags */
+#define RPC_SYSRESTART_F_AUTO 0x1000 /* [posix: SA_RESTART] Also restart `SYSCALL_RESTART_MODE_AUTO' */
+#define RPC_SYSRESTART_F_DONT 0x2000 /* [posix:          -] Also restart `SYSCALL_RESTART_MODE_DONT' */
+
+/* RPC system call  restart options.  These only apply  to RPCs  delivered
+ * while the target thread is in kernel-space and executing a system  call
+ * marked as [cp] and something other than [restart(must)], and the system
+ * call made a call to `task_serve()' internally. */
+#define RPC_SYSRESTART_NORMAL 0x0000                                          /* [posix:!SA_RESTART] SYSCALL_RESTART_MODE_MUST */
+#define RPC_SYSRESTART_MOST   RPC_SYSRESTART_F_AUTO                           /* [posix: SA_RESTART] SYSCALL_RESTART_MODE_MUST+SYSCALL_RESTART_MODE_AUTO */
+#define RPC_SYSRESTART_ALL    (RPC_SYSRESTART_F_AUTO | RPC_SYSRESTART_F_DONT) /* [posix:          -] SYSCALL_RESTART_MODE_MUST+SYSCALL_RESTART_MODE_AUTO+SYSCALL_RESTART_MODE_DONT */
+/************************************************************************/
+
+
+
+
+/************************************************************************/
+/* RPC priority flags */
+#define RPC_PRIORITY_F_HIGH 0x4000 /* Try to gift the target thread the remainder
+                                    * of  the  calling thread's  current quantum. */
+
+/* RPC priority options */
+#define RPC_PRIORITY_NORMAL 0x0000              /* Normal priority */
+#define RPC_PRIORITY_HIGH   RPC_PRIORITY_F_HIGH /* High priority (try to  gift the target thread  the
+                                                 * remainder of the calling thread's current quantum) */
+/************************************************************************/
+
+
+
+
+
+
+/************************************************************************/
+/* RPC system call information                                          */
+/************************************************************************/
+
+/* Flags for `struct rpc_syscall_info::rsi_flags' */
+#define RPC_SYSCALL_INFO_FNORMAL         0x0000 /* Normal system call flags. */
+#define RPC_SYSCALL_INFO_FEXCEPT         0x8000 /* Exceptions were enabled for this system call. */
+#define RPC_SYSCALL_INFO_FMETHOD         0x00ff /* Mask for the arch-specific system call invocation method. (One of `RPC_SYSCALL_INFO_METHOD_*') */
+#define RPC_SYSCALL_INFO_FREGVALID(i)    (0x0100 << (i)) /* Mask for checking if some given register `i' is valid */
+#define RPC_SYSCALL_INFO_FREGVALID_SHIFT 8
+#define RPC_SYSCALL_INFO_FREGVALID_MASK  0x7f00
+
+
+
+/************************************************************************/
+/* RPC service context codes                                            */
+/************************************************************************/
+#define RPC_REASONCTX_ASYNC      0x0000 /* Asynchronous execution in user-space. */
+#ifdef __KERNEL__
+#define RPC_REASONCTX_SYNC       0x0001 /* RPC is being handled from within `task_serve()' */
+#define RPC_REASONCTX_SYSCALL    0x0002 /* A syscall called `task_serve()' and an unwind was forced.  The
+                                         * syscall will be restarted unless `RPC_REASONCTX_ASYNC' is set. */
+#define RPC_REASONCTX_INTERRUPT  0x0003 /* A non-syscall interrupt called `task_serve()' and an unwind was forced.
+                                         * The interrupt will  be restarted unless  `RPC_REASONCTX_ASYNC' is  set. */
+#define RPC_REASONCTX_SYSRET     0x0004 /* Return from interrupt. Used to reset `RPC_SYNCMODE_F_REQUIRE_SC' and `RPC_SYNCMODE_F_REQUIRE_CP' RPCs. */
+#define RPC_REASONCTX_ASYNC_KERN 0x0005 /* Kernel-space was interrupted asynchronously. (in this case,
+                                         * preemption is unconditionally  disabled and  should not  be
+                                         * enabled by the RPC callback) */
+#define RPC_REASONCTX_SHUTDOWN   0x0006 /* RPC is invoked because the thread is exiting. */
+#else /* __KERNEL__ */
+#define RPC_REASONCTX_SYNC       0x0001 /* A system call was interrupt, and will not be restarted after the RPC returns. */
+#define RPC_REASONCTX_SYSCALL    0x0002 /* A system call was interrupt, but will be restarted after the RPC returns. */
+#endif /* !__KERNEL__ */
+
+
+
 #ifdef __CC__
 __SYSDECL_BEGIN
+
+#ifdef __KERNEL__
+typedef struct icpustate rpc_cpustate_t;
+#define PRPC_EXEC_CALLBACK_CC __FCALL
+#else /* __KERNEL__ */
+typedef struct ucpustate rpc_cpustate_t;
+#define PRPC_EXEC_CALLBACK_CC __LIBKCALL
+#endif /* !__KERNEL__ */
+
+
+/* The initial value of `rc_context' depends on how the RPC was scheduled:
+ *
+ * #ifdef __KERNEL__
+ *
+ *   - `RPC_CONTEXT_KERN | RPC_SYNCMODE_F_ALLOW_ASYNC':
+ *       - RPC_REASONCTX_ASYNC_KERN: Always
+ *
+ *   - `RPC_CONTEXT_KERN | RPC_SYNCMODE_F_USER | RPC_SYNCMODE_F_SYSRET':
+ *       - RPC_REASONCTX_SYSRET:    Return to userspace
+ *       - RPC_REASONCTX_SHUTDOWN:  Thread is about to terminate
+ *
+ *   - `RPC_CONTEXT_KERN | RPC_SYNCMODE_F_USER':
+ *       - RPC_REASONCTX_SYSCALL:   Syscall aborted   (set `rc_context = RPC_REASONCTX_ASYNC' to prevent restart)
+ *       - RPC_REASONCTX_INTERRUPT: Interrupt aborted (set `rc_context = RPC_REASONCTX_ASYNC' to prevent restart)
+ *       - RPC_REASONCTX_ASYNC:     Async userspace
+ *       - RPC_REASONCTX_SYSRET:    Return to userspace (treat like `RPC_REASONCTX_ASYNC')
+ *       - RPC_REASONCTX_SHUTDOWN:  Thread is about to terminate
+ *
+ *   - `RPC_CONTEXT_KERN':
+ *       - RPC_REASONCTX_SYNC:      Direct execution from within `task_serve()'
+ *       - RPC_REASONCTX_SHUTDOWN:  Thread is about to terminate
+ *       - RPC_REASONCTX_ASYNC:     Async userspace     (treat like `RPC_REASONCTX_SYNC')
+ *       - RPC_REASONCTX_SYSCALL:   Syscall aborted     (treat like `RPC_REASONCTX_SYNC')
+ *       - RPC_REASONCTX_INTERRUPT: Interrupt aborted   (treat like `RPC_REASONCTX_SYNC')
+ *       - RPC_REASONCTX_SYSRET:    Return to userspace (treat like `RPC_REASONCTX_SYNC')
+ *
+ * #else // __KERNEL__
+ *
+ *   - `0':
+ *       - RPC_REASONCTX_SYSCALL:  Syscall aborted (set `rc_context = RPC_REASONCTX_SYNC' to prevent restart)
+ *       - RPC_REASONCTX_SYNC:     Synchronous interrupt call was aborted
+ *
+ *   - `RPC_SYNCMODE_F_ALLOW_ASYNC':
+ *       - RPC_REASONCTX_ASYNC:    Async userspace
+ *       - RPC_REASONCTX_SYSCALL:  Synchronous system call was aborted (but will be restarted)
+ *       - RPC_REASONCTX_SYNC:     Synchronous interrupt call was aborted (treat like `RPC_REASONCTX_SYSCALL')
+ *
+ * #endif // !__KERNEL__
+ *
+ */
+
+struct rpc_context {
+	__uintptr_t             rc_context; /* [in|out] Execution context (also  determines is  a system  call
+	                                     * or  interrupt  should  be restarted)  One  of `RPC_REASONCTX_*'
+	                                     * Possible values (and allowed transitions) are documented above. */
+	rpc_cpustate_t         *rc_state;   /* [1..1][in|out] The  register state  that got  interrupted.
+	                                     * In the case of an interrupted system call that is supposed
+	                                     * to be restarted, this describes  the return state of  that
+	                                     * system call. */
+	struct rpc_syscall_info rc_scinfo;  /* [valid_if(rc_context == RPC_REASONCTX_SYSCALL)] Syscall info. */
+};
+
+/* Callback prototype for RPC functions registered by `rpc_exec()' */
+typedef __ATTR_NONNULL((1)) void
+(PRPC_EXEC_CALLBACK_CC *prpc_exec_callback_t)(struct rpc_context *__restrict __ctx, void *__cookie)
+		__THROWS(...);
+
+
 
 /* >> rpc_schedule(2)
  * Schedule an RPC program to-be executed by some other thread. This  function
@@ -678,37 +550,6 @@ __CDECLARE_OPT(__ATTR_NONNULL((1, 3)),int,__NOTHROW_NCX,rpc_schedule,
  * @return: 1 : At least 1 RPC was served (but note that this may have been an internal,
  *              kernel-level RPC,  rather than  anything relating  to user-space  RPCs). */
 __CDECLARE_OPT(,int,__NOTHROW_RPC,rpc_serve,(void),()) /*__THROWS(...)*/
-
-
-struct ucpustate;
-
-/* Callback prototype for RPC functions registered by `rpc_exec()'
- * @param: state:   The register state that  got interrupted. Note that  this
- *                  isn't necessarily the register state which will be loaded
- *                  once  this function returns,  as (depending on additional
- *                  information not exposed here), a system call as described
- *                  by the given `sc_info' may be repeated prior to returning
- * @param: reason:  Information about the context from which the current
- *                  thread was interrupted in order to service this RPC.
- *                  Either `RPC_REASONCTX_ASYNC' or `RPC_REASONCTX_SYNC'
- * @param: sc_info: Information about a system call that was interrupted in
- *                  order to service this RPC.  Note that this system  call
- *                  may or may not be  restarted once this RPC returns.  If
- *                  this  happens depends on additional information that is
- *                  not exposed to this callback.
- * @param: cookie:  The cookie-argument originally given to `rpc_exec(3)'
- * @return: * :     The new
- * @throw: * :      Exceptions may only be thrown when `reason == RPC_REASONCTX_SYNC',
- *                  as an exception thrown  from an asynchronous instruction  position
- *                  is  unpredictable by nature. However, when `RPC_REASONCTX_SYNC' is
- *                  given, the exception is thrown such that it will appear as  though
- *                  it  was caused by the aborted system  call or interrupt (such as a
- *                  page-fault throwing E_SEGFAULT, an  RPC aborting a page-fault  may
- *                  throw that same, or some completely different exception) */
-typedef struct ucpustate *
-(__LIBKCALL *prpc_exec_callback_t)(struct ucpustate *__restrict __state, unsigned int __reason,
-                                   struct rpc_syscall_info const *__sc_info, void *__cookie)
-		__THROWS(...);
 
 
 /* >> rpc_exec(3)

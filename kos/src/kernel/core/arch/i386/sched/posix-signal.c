@@ -43,9 +43,11 @@
 #include <asm/cpu-flags.h>
 #include <asm/intrin.h>
 #include <asm/registers.h>
-#include <bits/os/kos/siginfo-convert.h> /* siginfo64_to_siginfo32 */
-#include <bits/os/kos/siginfo32.h>       /* siginfo32_t */
-#include <bits/os/kos/ucontext32.h>      /* __ucontextx32 */
+#include <bits/os/kos/siginfo-convert.h>   /* siginfo64_to_siginfo32 */
+#include <bits/os/kos/siginfo32.h>         /* siginfo32_t */
+#include <bits/os/kos/ucontext32.h>        /* __ucontextx32 */
+#include <kos/bits/syscall-info-convert.h> /* rpc_syscall_info_to_rpc_syscall_info32 */
+#include <kos/bits/syscall-info32.h>       /* rpc_syscall_info32 */
 #include <kos/except/reason/inval.h>
 #include <kos/kernel/cpu-state-verify.h> /* cpustate_verify_user...() */
 #include <kos/kernel/cpu-state.h>        /* icpustate */
@@ -60,8 +62,6 @@
 #include <string.h>
 #include <syscall.h>
 
-#include <librpc/bits/syscall-info-convert.h> /* rpc_syscall_info_to_rpc_syscall_info32 */
-#include <librpc/bits/syscall-info32.h>       /* rpc_syscall_info32 */
 #include <librpc/rpc.h>
 
 DECL_BEGIN
