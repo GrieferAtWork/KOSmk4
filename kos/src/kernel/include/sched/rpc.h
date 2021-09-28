@@ -35,11 +35,50 @@ DECL_BEGIN
 #ifdef CONFIG_USE_NEW_RPC
 #define task_rpc_t                prpc_exec_callback_t
 #define TASK_RPC_REASON_ASYNC     RPC_REASONCTX_ASYNC_KERN
-#define TASK_RPC_REASON_ASYNCUSER RPC_REASONCTX_ASYNC
+#define TASK_RPC_REASON_ASYNCUSER RPC_REASONCTX_SYSRET
+#define TASK_RPC_REASON_SYSCALL   RPC_REASONCTX_SYSCALL
 #define TASK_RPC_REASON_SYNC      RPC_REASONCTX_SYNC
 #define TASK_RPC_REASON_SHUTDOWN  RPC_REASONCTX_SHUTDOWN
 
 
+#ifdef __CC__
+
+/* High-level RPC scheduling function.
+ * This is the kernel-equivalent of the userspace `rpc_exec()' from <kos/rpc.h>
+ *
+ * @param: flags: Set of RPC flags (MUST contain `RPC_CONTEXT_KERN'):
+ *   - RPC_CONTEXT_KERN:           Mandatory flag
+ *   - RPC_CONTEXT_NOEXCEPT:       The given `func' never throws and may be served by `task_serve_nx()'
+ *   - RPC_SYNCMODE_F_ALLOW_ASYNC: Schedule  as an asynchronous RPC (be _very_ careful about these, as
+ *                                 the given `func' must act like an interrupt handler and be NOBLOCK)
+ *   - RPC_SYNCMODE_F_USER:        Only  allowed  when  `!(thread->t_flags & TASK_FKERNTHREAD)':   Force
+ *                                 unwind the current system call the next time `thread' makes a call to
+ *                                 `task_serve()'  (if the thread is currently sleeping, it will be send
+ *                                 a sporadic interrupt which should cause it to call that function once
+ *                                 again). Once unwinding all to  way to userspace has finished,  invoke
+ *                                 `func' in the context to which  the syscall returns. Note that  here,
+ *                                 `func'  is allowed  to transition  the `ctx->rc_context'  it is given
+ *                                 from `RPC_REASONCTX_SYSCALL' to `RPC_REASONCTX_SYSRET', in which case
+ *                                 the system call/interrupt will not be restarted.
+ *                                 When `thread == THIS_TASK', this function will not return normally,
+ *                                 but will instead `THROW(E_INTERRUPT_USER_RPC)'.
+ *   - RPC_SYNCMODE_F_SYSRET:      May only be used when  combined with `RPC_SYNCMODE_F_USER', in  which
+ *                                 case the RPC will only be invoked the next time that `thread' returns
+ *                                 to user-space (or immediately if `thread' is currently in user-space)
+ *                                 Note though that an in-progress, blocking system call isn't  aborted.
+ *   - RPC_PRIORITY_F_HIGH:        When  `thread' is hosted by the same CPU as the caller, gift the rest
+ *                                 of the calling thread's current quantum to `thread' and have it start
+ *                                 executing even before this function returns.
+ * @return: true:  Success
+ * @return: false: Failure because `thread' has already terminated. */
+FUNDEF NOBLOCK_IF(rpc_gfp & GFP_ATOMIC) NONNULL((1, 3)) bool KCALL
+task_rpc_exec(struct task *__restrict thread, syscall_ulong_t flags,
+              prpc_exec_callback_t func, void *cookie DFL(__NULLPTR))
+		THROWS(E_WOULDBLOCK, E_BADALLOC, E_INTERRUPT_USER_RPC);
+
+
+
+#endif /* __CC__ */
 
 
 #else /* CONFIG_USE_NEW_RPC */
@@ -406,9 +445,15 @@ NOTHROW(FCALL task_enable_redirect_usercode_rpc)(struct task *__restrict self);
 FUNDEF NOBLOCK NONNULL((1)) bool
 NOTHROW(KCALL task_redirect_usercode_rpc)(struct task *__restrict target, uintptr_t mode);
 
+#endif /* __CC__ */
+#endif /* !CONFIG_USE_NEW_RPC */
 
 
-/* Serve pending, synchronous (and asynchronous) RPCs.
+
+
+#ifdef __CC__
+/* Arch-specific function:
+ * Serve pending, synchronous (and asynchronous) RPCs.
  * NOTE: If the caller was previously  disabled preemption, it will  remain
  *       disabled  if  there  were no  RPC  functions had  to  be executed.
  *       Otherwise, preemption will become enabled, and `true' is returned,
@@ -424,16 +469,14 @@ NOTHROW(KCALL task_redirect_usercode_rpc)(struct task *__restrict target, uintpt
  *                 remains disabled if it was disabled before. */
 FUNDEF bool KCALL task_serve(void) THROWS(...);
 
-/* Same as `task_serve()', but only sevice RPCs that were scheduled as no-throw.
+/* Arch-specific function:
+ * Same as `task_serve()', but only sevice RPCs that were scheduled as no-throw.
  * @return: * : Set of `TASK_SERVE_*' */
 FUNDEF WUNUSED unsigned int NOTHROW(KCALL task_serve_nx)(void);
 #endif /* __CC__ */
 #define TASK_SERVE_NX_NOOP     0 /* Nothing was executed, or needed to be. */
 #define TASK_SERVE_NX_XPENDING 1 /* FLAG: Pending RPC functions that can only be serviced by `task_serve()' still remain. */
 #define TASK_SERVE_NX_DIDRUN   2 /* FLAG: NX RPC functions were executed. */
-#endif /* !CONFIG_USE_NEW_RPC */
-
-
 
 
 

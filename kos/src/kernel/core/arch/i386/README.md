@@ -4,10 +4,10 @@
 
   ```c
   #include <kos/kernel/cpu-state.h>
-  #include <kos/kernel/cpu-state-compat.h> // Defines `gp_pax'
+  #include <kos/kernel/cpu-state-compat.h> // Defines `gp_Pax'
   ...
   struct gpregs gp;
-  gp.gp_pax = 42;
+  gp.gp_Pax = 42;
   // Same as:
   #ifdef __x86_64__
   struct gpregs64 gp;

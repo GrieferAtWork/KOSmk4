@@ -109,9 +109,9 @@ PUBLIC_FUNCTION(cpu_ipi_service_nopr)
 	pushP_cfi_r_ss    /* irregs::ir_ss */
 	pushq_cfi %rcx    /* irregs::ir_rsp */
 #endif /* __x86_64__ */
-	pushfP_cfi_r      /* irregs::ir_pflags */
+	pushfP_cfi_r      /* irregs::ir_Pflags */
 	pushP_cfi_r_cs    /* irregs::ir_cs */
-	pushP_cfi %Pax    /* irregs::ir_pip */
+	pushP_cfi %Pax    /* irregs::ir_Pip */
 /*	.cfi_rel_offset %Pip, 0 */
 	.cfi_endproc
 INTERN_FUNCTION(x86_idt_apic_ipi)
@@ -275,9 +275,9 @@ INTERN_FUNCTION(x86_execute_direct_ipi_nopr)
 	pushq_cfi %rcx    /* irregs::ir_rsp */
 	.cfi_rel_offset %rsp, 0
 #endif /* __x86_64__ */
-	pushfP_cfi_r      /* irregs::ir_pflags */
+	pushfP_cfi_r      /* irregs::ir_Pflags */
 	pushP_cfi_r_cs    /* irregs::ir_cs */
-	pushP_cfi %Pax    /* irregs::ir_pip */
+	pushP_cfi %Pax    /* irregs::ir_Pip */
 	.cfi_rel_offset %Pip, 0
 
 	/* Construct a full `struct icpustate' */
@@ -312,10 +312,10 @@ INTERN_FUNCTION(x86_execute_direct_ipi)
 	pushq_cfi %rcx    /* irregs::ir_rsp */
 	.cfi_rel_offset %rsp, 0
 #endif /* __x86_64__ */
-	pushfP_cfi_r      /* irregs::ir_pflags */
+	pushfP_cfi_r      /* irregs::ir_Pflags */
 	orP    $(EFLAGS_IF), 0(%Psp) /* Make sure that #IF is set in the IRET tail. */
 	pushP_cfi_r_cs    /* irregs::ir_cs */
-	pushP_cfi %Pax    /* irregs::ir_pip */
+	pushP_cfi %Pax    /* irregs::ir_Pip */
 	.cfi_rel_offset %Pip, 0
 
 	/* Construct a full `struct icpustate' */
@@ -1295,10 +1295,10 @@ PUBLIC_FUNCTION(cpu_enter_deepsleep)
 	pushq_cfi %rcx    /* irregs::ir_rsp */
 	.cfi_rel_offset %rsp, 0
 #endif /* __x86_64__ */
-	pushfP_cfi_r      /* irregs::ir_pflags */
+	pushfP_cfi_r      /* irregs::ir_Pflags */
 	orP    $(EFLAGS_IF), 0(%Psp) /* Re-enable interrupts upon return */
 	pushP_cfi_r_cs    /* irregs::ir_cs */
-	pushP_cfi %Pax    /* irregs::ir_pip */
+	pushP_cfi %Pax    /* irregs::ir_Pip */
 	.cfi_rel_offset %Pip, 0
 
 	/* Construct a `struct scpustate' on-stack */

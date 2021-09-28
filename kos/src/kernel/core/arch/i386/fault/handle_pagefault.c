@@ -404,9 +404,9 @@ x86_handle_pagefault(struct icpustate *__restrict state, uintptr_t ecode) {
 	struct task_connections con;
 
 	/* Check for memcpy_nopf() */
-	pc = (void const *)state->ics_irregs.ir_pip;
+	pc = (void const *)state->ics_irregs.ir_Pip;
 	if unlikely_untraced(x86_nopf_check(pc)) {
-		state->ics_irregs.ir_pip = (uintptr_t)x86_nopf_retof(pc);
+		state->ics_irregs.ir_Pip = (uintptr_t)x86_nopf_retof(pc);
 		return state;
 	}
 
@@ -454,7 +454,7 @@ x86_handle_pagefault(struct icpustate *__restrict state, uintptr_t ecode) {
 	}
 
 	/* Re-enable interrupts if they were enabled before. */
-	if (state->ics_irregs.ir_pflags & EFLAGS_IF)
+	if (state->ics_irregs.ir_Pflags & EFLAGS_IF)
 		__sti();
 
 	/* Figure out memory manager in charge of the accessed address. */
@@ -666,7 +666,7 @@ got_node_and_lock:
 			if (mf.mfl_node == &x86_phys2virt64_node) {
 				PREEMPTION_DISABLE();
 				x86_phys2virt64_require(addr);
-				if (state->ics_irregs.ir_pflags & EFLAGS_IF)
+				if (state->ics_irregs.ir_Pflags & EFLAGS_IF)
 					PREEMPTION_ENABLE();
 				goto pop_connections_and_return;
 			}

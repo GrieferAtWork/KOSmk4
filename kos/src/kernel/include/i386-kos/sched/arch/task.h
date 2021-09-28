@@ -312,6 +312,32 @@ NOTHROW(__x86_preemption_pop)(pflag_t flag) {
 #endif /* !__NO_XBLOCK */
 
 
+
+#ifdef CONFIG_USE_NEW_RPC
+/* Entry point for IRET tails that have been re-directed for sysret.
+ * Used to  redirect  how  the kernel  will  return  to  user-space:
+ * >> redirect_iret_for_sysret() {
+ * >>     struct irregs_kernel *irr;
+ * >>     PREEMPTION_DISABLE(); // Redirection is only
+ * >>     if (IS_VM86_TASK) {
+ * >>         irr = GET_KERNEL_STACK_BASE() - sizeof(struct irregs_vm86);
+ * >>     } else {
+ * >>         irr = GET_KERNEL_STACK_BASE() - sizeof(struct irregs_user);
+ * >>     }
+ * >>     memcpy(&PERTASK(this_x86_rpc_redirection_iret),irr,
+ * >>            sizeof(struct irregs_kernel));
+ * >>     irr->ir_eip    = &x86_userexcept_sysret;
+ * >>     irr->ir_cs     = SEGMENT_KERNEL_CS;
+ * >>     irr->ir_eflags = 0; // Most importantly: disable interrupts
+ * >> }
+ * WARNING:
+ *    Because of the redirection, in order to get/set any of the kernel  IRET
+ *    registers when inside of an interrupt/syscall with preemption  enabled,
+ *    you must always use the functions below, so-as to ensure that you don't
+ *    re-override  the sysret redirection, but modify the saved state when it
+ *    comes to the IRET tail. */
+FUNDEF void ASMCALL x86_userexcept_sysret(void);
+#else /* CONFIG_USE_NEW_RPC */
 /* Entry point for IRET tails that have been re-directed for RPC.
  * Used  to redirect  how the  kernel will  return to user-space:
  * >> redirect_iret_to_execute_rpcs() {
@@ -324,7 +350,7 @@ NOTHROW(__x86_preemption_pop)(pflag_t flag) {
  * >>     }
  * >>     memcpy(&PERTASK(this_x86_rpc_redirection_iret),irr,
  * >>            sizeof(struct irregs_kernel));
- * >>     irr->ir_eip    = &x86_rpc_user_redirectionS;
+ * >>     irr->ir_eip    = &x86_rpc_user_redirection;
  * >>     irr->ir_cs     = SEGMENT_KERNEL_CS;
  * >>     irr->ir_eflags = 0; // Most importantly: disable interrupts
  * >> }
@@ -341,6 +367,7 @@ NOTHROW(__x86_preemption_pop)(pflag_t flag) {
  *    re-override the RPC  redirection, but  modify the saved  state when  it
  *    comes to the IRET tail. */
 FUNDEF void ASMCALL x86_rpc_user_redirection(void);
+#endif /* !CONFIG_USE_NEW_RPC */
 
 
 #ifdef __x86_64__
@@ -382,7 +409,7 @@ NOTHROW(FCALL x86_get_irregs)(struct task const *__restrict thread);
 FUNDEF NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) __BOOL
 NOTHROW(FCALL irregs_isuser)(struct irregs_kernel const *__restrict self);
 
-/* get:`self->ir_pip' */
+/* get:`self->ir_Pip' */
 FUNDEF NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) uintptr_t
 NOTHROW(FCALL irregs_rdip)(struct irregs_kernel const *__restrict self);
 
@@ -390,11 +417,11 @@ NOTHROW(FCALL irregs_rdip)(struct irregs_kernel const *__restrict self);
 FUNDEF NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) u16
 NOTHROW(FCALL irregs_rdcs)(struct irregs_kernel const *__restrict self);
 
-/* get:`self->ir_pflags' */
+/* get:`self->ir_Pflags' */
 FUNDEF NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) uintptr_t
 NOTHROW(FCALL irregs_rdflags)(struct irregs_kernel const *__restrict self);
 
-/* set:`self->ir_pip' */
+/* set:`self->ir_Pip' */
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL irregs_wrip)(struct irregs_kernel *__restrict self, uintptr_t value);
 
@@ -402,16 +429,16 @@ NOTHROW(FCALL irregs_wrip)(struct irregs_kernel *__restrict self, uintptr_t valu
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL irregs_wrcs)(struct irregs_kernel *__restrict self, u16 value);
 
-/* set:`self->ir_pflags' */
+/* set:`self->ir_Pflags' */
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL irregs_wrflags)(struct irregs_kernel *__restrict self, uintptr_t value);
 
-/* set:`self->ir_pflags = (self->ir_pflags & mask) | flags' */
+/* set:`self->ir_Pflags = (self->ir_Pflags & mask) | flags' */
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL irregs_mskflags)(struct irregs_kernel *__restrict self,
                                uintptr_t mask, uintptr_t flags);
 
-/* get:`self->ir_psp' (with accounting for kernel-space return-sp on i386) */
+/* get:`self->ir_Psp' (with accounting for kernel-space return-sp on i386) */
 FUNDEF NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) uintptr_t
 NOTHROW(FCALL irregs_rdsp)(struct irregs_kernel const *__restrict self);
 

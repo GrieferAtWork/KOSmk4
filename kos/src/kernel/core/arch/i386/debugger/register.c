@@ -120,8 +120,8 @@ NOTHROW(KCALL set_trapstate_from_fcpustate)(struct fcpustate const *__restrict s
 		fcpustate_to_lcpustate(state, (struct lcpustate *)x86_dbg_trapstate);
 #ifdef __x86_64__
 		/* Restore all registers except for `%r15', `%r14', `%r13', `%r12', ``rebp', `%rsp', `%rbx', `%rip' */
-		x86_dbg_exitstate.de_state.fcs_gpregs.gp_pdi = state->fcs_gpregs.gp_pdi;
-		x86_dbg_exitstate.de_state.fcs_gpregs.gp_psi = state->fcs_gpregs.gp_psi;
+		x86_dbg_exitstate.de_state.fcs_gpregs.gp_Pdi = state->fcs_gpregs.gp_Pdi;
+		x86_dbg_exitstate.de_state.fcs_gpregs.gp_Psi = state->fcs_gpregs.gp_Psi;
 		x86_dbg_exitstate.de_state.fcs_gpregs.gp_r11 = state->fcs_gpregs.gp_r11;
 		x86_dbg_exitstate.de_state.fcs_gpregs.gp_r10 = state->fcs_gpregs.gp_r10;
 		x86_dbg_exitstate.de_state.fcs_gpregs.gp_r9  = state->fcs_gpregs.gp_r9;
@@ -130,18 +130,18 @@ NOTHROW(KCALL set_trapstate_from_fcpustate)(struct fcpustate const *__restrict s
 #else /* __x86_64__ */
 		/* Restore all registers except for `%edi', `%esi', `%ebp', `%esp', `%ebx', `%eip' */
 #endif /* !__x86_64__ */
-		x86_dbg_exitstate.de_state.fcs_gpregs.gp_pax = state->fcs_gpregs.gp_pax;
-		x86_dbg_exitstate.de_state.fcs_gpregs.gp_pbx = state->fcs_gpregs.gp_pbx;
-		x86_dbg_exitstate.de_state.fcs_gpregs.gp_pdx = state->fcs_gpregs.gp_pdx;
-		x86_dbg_exitstate.de_state.fcs_gpregs.gp_pcx = state->fcs_gpregs.gp_pcx;
-		x86_dbg_exitstate.de_state.fcs_gpregs.gp_pax = state->fcs_gpregs.gp_pax;
+		x86_dbg_exitstate.de_state.fcs_gpregs.gp_Pax = state->fcs_gpregs.gp_Pax;
+		x86_dbg_exitstate.de_state.fcs_gpregs.gp_Pbx = state->fcs_gpregs.gp_Pbx;
+		x86_dbg_exitstate.de_state.fcs_gpregs.gp_Pdx = state->fcs_gpregs.gp_Pdx;
+		x86_dbg_exitstate.de_state.fcs_gpregs.gp_Pcx = state->fcs_gpregs.gp_Pcx;
+		x86_dbg_exitstate.de_state.fcs_gpregs.gp_Pax = state->fcs_gpregs.gp_Pax;
 		x86_dbg_exitstate.de_state.fcs_sgregs.sg_es  = state->fcs_sgregs.sg_es;
 		x86_dbg_exitstate.de_state.fcs_sgregs.sg_cs  = state->fcs_sgregs.sg_cs;
 		x86_dbg_exitstate.de_state.fcs_sgregs.sg_ss  = state->fcs_sgregs.sg_ss;
 		x86_dbg_exitstate.de_state.fcs_sgregs.sg_ds  = state->fcs_sgregs.sg_ds;
 		x86_dbg_exitstate.de_state.fcs_sgregs.sg_fs  = state->fcs_sgregs.sg_fs;
 		x86_dbg_exitstate.de_state.fcs_sgregs.sg_gs  = state->fcs_sgregs.sg_gs;
-		x86_dbg_exitstate.de_state.fcs_pflags        = state->fcs_pflags;
+		x86_dbg_exitstate.de_state.fcs_Pflags        = state->fcs_Pflags;
 		break;
 
 	case X86_DBG_STATEKIND_KCPU:
@@ -304,7 +304,7 @@ NOTHROW(KCALL saveorig)(void) {
 		ammend->dca_sgregs.sg_fs = x86_dbg_origstate.fcs_sgregs.sg_fs16;
 		ammend->dca_sgregs.sg_gs = x86_dbg_origstate.fcs_sgregs.sg_gs16;
 #else /* __x86_64__ */
-		if (!(x86_dbg_origstate.fcs_pflags & EFLAGS_VM)) {
+		if (!(x86_dbg_origstate.fcs_Pflags & EFLAGS_VM)) {
 			ammend->dca_gs = x86_dbg_origstate.fcs_sgregs.sg_gs;
 			ammend->dca_ss = x86_dbg_origstate.fcs_sgregs.sg_ss;
 		}
@@ -407,22 +407,22 @@ NOTHROW(KCALL loadview)(void) {
 			x86_dbg_origstate.fcs_drregs       = ammend->dca_drregs;
 			x86_dbg_origstate.fcs_gdt          = ammend->dca_gdt;
 			x86_dbg_origstate.fcs_idt          = ammend->dca_idt;
-			x86_dbg_origstate.fcs_pip          = ist->ics_irregs.ir_pip;
-			x86_dbg_origstate.fcs_pflags       = ist->ics_irregs.ir_pflags;
+			x86_dbg_origstate.fcs_Pip          = ist->ics_irregs.ir_Pip;
+			x86_dbg_origstate.fcs_Pflags       = ist->ics_irregs.ir_Pflags;
 			x86_dbg_origstate.fcs_sgregs.sg_cs = ist->ics_irregs.ir_cs16;
 #ifdef __x86_64__
-			psp                                = ist->ics_irregs.ir_psp;
+			psp                                = ist->ics_irregs.ir_Psp;
 			x86_dbg_origstate.fcs_sgregs.sg_ss = ist->ics_irregs.ir_ss16;
 #endif /* __x86_64__ */
 #if 0 /* Don't bend the truth when it comes to IRET tails. */
-			if (x86_dbg_origstate.fcs_pip == (uintptr_t)&x86_rpc_user_redirection) {
+			if (x86_dbg_origstate.fcs_Pip == (uintptr_t)&x86_rpc_user_redirection) {
 				struct irregs_kernel *iret;
 				iret = &FORTASK(ammend->dca_thread, this_x86_rpc_redirection_iret);
-				x86_dbg_origstate.fcs_pip          = iret->ir_pip;
-				x86_dbg_origstate.fcs_pflags       = iret->ir_pflags;
+				x86_dbg_origstate.fcs_Pip          = iret->ir_Pip;
+				x86_dbg_origstate.fcs_Pflags       = iret->ir_Pflags;
 				x86_dbg_origstate.fcs_sgregs.sg_cs = iret->ir_cs16;
 #ifdef __x86_64__
-				psp                                = iret->ir_psp;
+				psp                                = iret->ir_Psp;
 				x86_dbg_origstate.fcs_sgregs.sg_ss = iret->ir_ss16;
 #endif /* __x86_64__ */
 			}
@@ -434,14 +434,14 @@ NOTHROW(KCALL loadview)(void) {
 			x86_dbg_origstate.fcs_sgregs.sg_fs = ammend->dca_sgregs.sg_fs16;
 			x86_dbg_origstate.fcs_sgregs.sg_gs = ammend->dca_sgregs.sg_gs16;
 #else /* __x86_64__ */
-			if (x86_dbg_origstate.fcs_pflags & EFLAGS_VM) {
+			if (x86_dbg_origstate.fcs_Pflags & EFLAGS_VM) {
 				/* Vm86 IRET tail */
 				x86_dbg_origstate.fcs_sgregs.sg_es = ist->ics_irregs_v.ir_es16;
 				x86_dbg_origstate.fcs_sgregs.sg_ds = ist->ics_irregs_v.ir_ds16;
 				x86_dbg_origstate.fcs_sgregs.sg_fs = ist->ics_irregs_v.ir_fs16;
 				x86_dbg_origstate.fcs_sgregs.sg_gs = ist->ics_irregs_v.ir_gs16;
 				x86_dbg_origstate.fcs_sgregs.sg_ss = ist->ics_irregs_v.ir_ss16;
-				psp                                = ist->ics_irregs_v.ir_psp;
+				psp                                = ist->ics_irregs_v.ir_Psp;
 			} else {
 				x86_dbg_origstate.fcs_sgregs.sg_es = ist->ics_es16;
 				x86_dbg_origstate.fcs_sgregs.sg_ds = ist->ics_ds16;
@@ -450,7 +450,7 @@ NOTHROW(KCALL loadview)(void) {
 				x86_dbg_origstate.fcs_sgregs.sg_ss = ammend->dca_ss;
 				if (x86_dbg_origstate.fcs_sgregs.sg_cs16 & 3) {
 					/* User-space IRET tail */
-					psp = ist->ics_irregs_u.ir_psp;
+					psp = ist->ics_irregs_u.ir_Psp;
 				} else {
 					/* Kernel-space IRET tail */
 					psp = irregs_getkernelpsp(&ist->ics_irregs);
@@ -463,7 +463,7 @@ NOTHROW(KCALL loadview)(void) {
 			gpregsnsp_to_gpregs(&ist->ics_gpregs, &x86_dbg_origstate.fcs_gpregs, psp);
 #else /* __x86_64__ */
 			memcpy(&x86_dbg_origstate.fcs_gpregs, &ist->ics_gpregs, sizeof(struct gpregs));
-			x86_dbg_origstate.fcs_gpregs.gp_psp = psp;
+			x86_dbg_origstate.fcs_gpregs.gp_Psp = psp;
 #endif /* !__x86_64__ */
 #endif /* !CONFIG_NO_SMP */
 		} else {

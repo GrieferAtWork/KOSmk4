@@ -138,7 +138,7 @@ x86_dump_ucpustate_register_state(struct ucpustate *__restrict ustate,
 	regdump_gpregs(&rd_printer, &ustate->ucs_gpregs);
 	regdump_ip(&rd_printer, (uintptr_t)ucpustate_getpc(ustate),
 	           instrlen_isa_from_ucpustate(ustate));
-	regdump_flags(&rd_printer, ustate->ucs_pflags);
+	regdump_flags(&rd_printer, ustate->ucs_Pflags);
 	printk(KERN_EMERG "\n");
 	regdump_sgregs_with_cs_ss_tr_ldt(&rd_printer, &ustate->ucs_sgregs,
 	                                 ustate->ucs_cs, ustate->ucs_ss,
@@ -223,7 +223,7 @@ x86_handle_unhandled_idt(struct icpustate *__restrict state,
 	__cli();
 	icpustate_to_ucpustate(state, &ustate);
 	printk(KERN_EMERG "Unhandled interrupt %#" PRIxPTR " (%" PRIuPTR ") [pc=%p]",
-	       intno, intno, state->ics_irregs.ir_pip);
+	       intno, intno, state->ics_irregs.ir_Pip);
 	{
 		char const *name, *desc;
 		name = get_interrupt_name(intno);

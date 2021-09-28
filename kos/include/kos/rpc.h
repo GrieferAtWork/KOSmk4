@@ -284,9 +284,10 @@
  *       where  it will be  executed the next time  the thread gets  a share of its
  *       quantum.  If the  target thread  was sleeping  (s.a. `task_sleep()'), then
  *       sleep is interrupted by means of  a sporadic interrupt. The reason  passed
- *       to the RPC function is  always `RPC_REASONCTX_ASYNC_KERN', and are  always
- *       executed  with preemption disabled.  (Note that all  other RPCs are always
- *       executed with preemption enabled)
+ *       to the RPC function is always either `RPC_REASONCTX_ASYNC_KERN' for kernel
+ *       return locations, or `RPC_REASONCTX_SYSRET'  for user-space ones, and  are
+ *       always  executed with preemption  disabled. (Note that  all other RPCs are
+ *       always executed with preemption enabled)
  *
  *  - RPC_SYNCMODE_F_USER:
  *  - RPC_PRIORITY_F_HIGH:
@@ -332,9 +333,9 @@
 #define RPC_SYNCMODE_F_USER   0x0200 /* For use with `RPC_CONTEXT_KERN': Have `task_serve()' handle the RPC
                                       * as though the `RPC_CONTEXT_KERN' wasn't set. As a consequence, RPCs
                                       * with this flag will only ever be invoked with reasons:
-                                      *   - RPC_REASONCTX_ASYNC      (Return to user-space location)
-                                      *   - RPC_REASONCTX_SYSRET     (Interrupt-to-userspace or system call was unwound)
-                                      *   - RPC_REASONCTX_INTERRUPT  (Interrupt-to-userspace or system call was unwound)
+                                      *   - RPC_REASONCTX_SYSRET     (Return to user-space location)
+                                      *   - RPC_REASONCTX_SYSCALL    (Interrupt was unwound)
+                                      *   - RPC_REASONCTX_INTERRUPT  (syscall was unwound)
                                       *   - RPC_REASONCTX_SHUTDOWN   (Thread is exiting) */
 #define RPC_SYNCMODE_F_SYSRET 0x0400 /* Combine with `RPC_SYNCMODE_F_USER': Service the RPC in the sysret path. */
 #endif /* __KERNEL__ */
@@ -417,19 +418,22 @@
 /************************************************************************/
 /* RPC service context codes                                            */
 /************************************************************************/
-#define RPC_REASONCTX_ASYNC      0x0000 /* Asynchronous execution in user-space. */
 #ifdef __KERNEL__
+#define RPC_REASONCTX_SYSRET     0x0004 /* Return to arbitrary user-space location. */
 #define RPC_REASONCTX_SYNC       0x0001 /* RPC is being handled from within `task_serve()' */
-#define RPC_REASONCTX_SYSCALL    0x0002 /* A syscall called `task_serve()' and an unwind was forced.  The
-                                         * syscall will be restarted unless `RPC_REASONCTX_ASYNC' is set. */
+#define RPC_REASONCTX_SYSCALL    0x0002 /* A syscall called `task_serve()' and  an unwind was forced.  The
+                                         * syscall will be restarted unless `RPC_REASONCTX_SYSRET' is set. */
 #define RPC_REASONCTX_INTERRUPT  0x0003 /* A non-syscall interrupt called `task_serve()' and an unwind was forced.
-                                         * The interrupt will  be restarted unless  `RPC_REASONCTX_ASYNC' is  set. */
-#define RPC_REASONCTX_SYSRET     0x0004 /* Return from interrupt. Used to reset `RPC_SYNCMODE_F_REQUIRE_SC' and `RPC_SYNCMODE_F_REQUIRE_CP' RPCs. */
+                                         * The interrupt will be  restarted unless `RPC_REASONCTX_SYSRET' is  set. */
 #define RPC_REASONCTX_ASYNC_KERN 0x0005 /* Kernel-space was interrupted asynchronously. (in this case,
                                          * preemption is unconditionally  disabled and  should not  be
                                          * enabled by the RPC callback) */
 #define RPC_REASONCTX_SHUTDOWN   0x0006 /* RPC is invoked because the thread is exiting. */
+#define _RPC_REASONCTX_ASYNC     0x0000 /* User-space context: `RPC_REASONCTX_ASYNC' */
+#define _RPC_REASONCTX_SYNC      0x0001 /* User-space context: `RPC_REASONCTX_SYNC' */
+#define _RPC_REASONCTX_SYSCALL   0x0002 /* User-space context: `RPC_REASONCTX_SYSCALL' */
 #else /* __KERNEL__ */
+#define RPC_REASONCTX_ASYNC      0x0000 /* Asynchronous execution in user-space. */
 #define RPC_REASONCTX_SYNC       0x0001 /* A system call was interrupt, and will not be restarted after the RPC returns. */
 #define RPC_REASONCTX_SYSCALL    0x0002 /* A system call was interrupt, but will be restarted after the RPC returns. */
 #endif /* !__KERNEL__ */
@@ -453,23 +457,22 @@ typedef struct ucpustate rpc_cpustate_t;
  * #ifdef __KERNEL__
  *
  *   - `RPC_CONTEXT_KERN | RPC_SYNCMODE_F_ALLOW_ASYNC':
- *       - RPC_REASONCTX_ASYNC_KERN: Always
+ *       - RPC_REASONCTX_ASYNC_KERN: Thread is currently in kernel-space
+ *       - RPC_REASONCTX_SYSRET:     Thread is currently in user-space
  *
  *   - `RPC_CONTEXT_KERN | RPC_SYNCMODE_F_USER | RPC_SYNCMODE_F_SYSRET':
  *       - RPC_REASONCTX_SYSRET:    Return to userspace
  *       - RPC_REASONCTX_SHUTDOWN:  Thread is about to terminate
  *
  *   - `RPC_CONTEXT_KERN | RPC_SYNCMODE_F_USER':
- *       - RPC_REASONCTX_SYSCALL:   Syscall aborted   (set `rc_context = RPC_REASONCTX_ASYNC' to prevent restart)
- *       - RPC_REASONCTX_INTERRUPT: Interrupt aborted (set `rc_context = RPC_REASONCTX_ASYNC' to prevent restart)
- *       - RPC_REASONCTX_ASYNC:     Async userspace
- *       - RPC_REASONCTX_SYSRET:    Return to userspace (treat like `RPC_REASONCTX_ASYNC')
+ *       - RPC_REASONCTX_SYSCALL:   Syscall aborted   (set `rc_context = RPC_REASONCTX_SYSRET' to prevent restart)
+ *       - RPC_REASONCTX_INTERRUPT: Interrupt aborted (set `rc_context = RPC_REASONCTX_SYSRET' to prevent restart)
+ *       - RPC_REASONCTX_SYSRET:    Return to userspace
  *       - RPC_REASONCTX_SHUTDOWN:  Thread is about to terminate
  *
  *   - `RPC_CONTEXT_KERN':
  *       - RPC_REASONCTX_SYNC:      Direct execution from within `task_serve()'
  *       - RPC_REASONCTX_SHUTDOWN:  Thread is about to terminate
- *       - RPC_REASONCTX_ASYNC:     Async userspace     (treat like `RPC_REASONCTX_SYNC')
  *       - RPC_REASONCTX_SYSCALL:   Syscall aborted     (treat like `RPC_REASONCTX_SYNC')
  *       - RPC_REASONCTX_INTERRUPT: Interrupt aborted   (treat like `RPC_REASONCTX_SYNC')
  *       - RPC_REASONCTX_SYSRET:    Return to userspace (treat like `RPC_REASONCTX_SYNC')

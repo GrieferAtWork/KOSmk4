@@ -23,6 +23,9 @@
 
 #include <kernel/compiler.h>
 
+#ifdef CONFIG_USE_NEW_RPC
+#include "rpc.S"
+#else /* CONFIG_USE_NEW_RPC */
 #include <debugger/config.h>
 #include <kernel/except.h>
 #include <kernel/x86/gdt.h>
@@ -446,7 +449,6 @@ PUBLIC_FUNCTION(task_serve_nx)
 1:	intr_exit
 	.cfi_endproc
 END(task_serve_nx)
-
-
+#endif /* !CONFIG_USE_NEW_RPC */
 
 #endif /* !GUARD_KERNEL_CORE_ARCH_I386_SCHED_RPC64_S */

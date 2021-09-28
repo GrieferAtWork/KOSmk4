@@ -17,19 +17,21 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_SRC_MISC_EXCEPT_C
-#define GUARD_KERNEL_SRC_MISC_EXCEPT_C 1
+#ifndef GUARD_KERNEL_SRC_MISC_EXCEPT_LIBC_C
+#define GUARD_KERNEL_SRC_MISC_EXCEPT_LIBC_C 1
+
+/* Kernel implementation of functions from <kos/except.h> */
 
 #include <kernel/compiler.h>
 
 #include <kernel/except.h>
 #include <kernel/types.h>
 
-DECL_BEGIN
-
 #ifndef LIBCCALL
 #define LIBCCALL __LIBCCALL
 #endif /* !LIBCCALL */
+
+DECL_BEGIN
 
 INTERN WUNUSED ATTR_CONST ATTR_RETNONNULL struct exception_info *
 NOTHROW_NCX(LIBCCALL libc_error_info)(void) {
@@ -73,7 +75,8 @@ DEFINE_PUBLIC_ALIAS(error_code, libc_error_code);
 DEFINE_PUBLIC_ALIAS(error_active, libc_error_active);
 DEFINE_PUBLIC_ALIAS(error_class, libc_error_class);
 DEFINE_PUBLIC_ALIAS(error_subclass, libc_error_subclass);
+/************************************************************************/
 
 DECL_END
 
-#endif /* !GUARD_KERNEL_SRC_MISC_EXCEPT_C */
+#endif /* !GUARD_KERNEL_SRC_MISC_EXCEPT_LIBC_C */

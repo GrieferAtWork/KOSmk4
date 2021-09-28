@@ -17,12 +17,13 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_SRC_SCHED_RPC_C
-#define GUARD_KERNEL_SRC_SCHED_RPC_C 1
+#ifndef GUARD_KERNEL_SRC_SCHED_OLDRPC_C
+#define GUARD_KERNEL_SRC_SCHED_OLDRPC_C 1
 #define _KOS_SOURCE 1
 
 #include <kernel/compiler.h>
 
+#ifndef CONFIG_USE_NEW_RPC
 #include <kernel/cache.h>
 #include <kernel/except.h>
 #include <kernel/malloc.h>
@@ -1083,23 +1084,22 @@ DECL_END
 
 #ifndef __INTELLISENSE__
 #define RPC_SERVE_ALL 1
-#include "rpc-serveuser.c.inl"
+#include "oldrpc-serveuser.c.inl"
 /**/
-#include "rpc-serveuser.c.inl"
+#include "oldrpc-serveuser.c.inl"
 
 /* User RPCs */
 #define RPC_USER      1
-#include "rpc-schedule-impl.c.inl"
+#include "oldrpc-schedule-impl.c.inl"
 #define RPC_NOEXCEPT  1
 #define RPC_USER      1
-#include "rpc-schedule-impl.c.inl"
+#include "oldrpc-schedule-impl.c.inl"
 
 /* Non-user RPCs */
-#include "rpc-schedule-impl.c.inl"
+#include "oldrpc-schedule-impl.c.inl"
 #define RPC_NOEXCEPT  1
-#include "rpc-schedule-impl.c.inl"
+#include "oldrpc-schedule-impl.c.inl"
 #endif
+#endif /* !CONFIG_USE_NEW_RPC */
 
-
-
-#endif /* !GUARD_KERNEL_SRC_SCHED_RPC_C */
+#endif /* !GUARD_KERNEL_SRC_SCHED_OLDRPC_C */

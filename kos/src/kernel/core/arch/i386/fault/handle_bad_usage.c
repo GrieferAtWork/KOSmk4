@@ -1360,60 +1360,60 @@ err_privileged_segment:
 PRIVATE WUNUSED NONNULL((1)) void
 NOTHROW(KCALL cpuid)(struct icpustate *__restrict state) {
 	struct cpuinfo const *info = &CURRENT_X86_CPUID;
-	if ((u32)state->ics_gpregs.gp_pax & UINT32_C(0x80000000)) {
-		switch ((u32)state->ics_gpregs.gp_pax) {
+	if ((u32)state->ics_gpregs.gp_Pax & UINT32_C(0x80000000)) {
+		switch ((u32)state->ics_gpregs.gp_Pax) {
 		case UINT32_C(0x80000000):
-			state->ics_gpregs.gp_pax = info->ci_80000000a;
-			state->ics_gpregs.gp_pbx = info->ci_0b;
-			state->ics_gpregs.gp_pcx = info->ci_0c;
-			state->ics_gpregs.gp_pdx = info->ci_0d;
+			state->ics_gpregs.gp_Pax = info->ci_80000000a;
+			state->ics_gpregs.gp_Pbx = info->ci_0b;
+			state->ics_gpregs.gp_Pcx = info->ci_0c;
+			state->ics_gpregs.gp_Pdx = info->ci_0d;
 			break;
 		case UINT32_C(0x80000001):
-			state->ics_gpregs.gp_pax = 0;
-			state->ics_gpregs.gp_pbx = 0;
-			state->ics_gpregs.gp_pcx = info->ci_80000001c;
-			state->ics_gpregs.gp_pdx = info->ci_80000001d;
+			state->ics_gpregs.gp_Pax = 0;
+			state->ics_gpregs.gp_Pbx = 0;
+			state->ics_gpregs.gp_Pcx = info->ci_80000001c;
+			state->ics_gpregs.gp_Pdx = info->ci_80000001d;
 			break;
 		case UINT32_C(0x80000002):
-			state->ics_gpregs.gp_pax = info->ci_80000002a;
-			state->ics_gpregs.gp_pbx = info->ci_80000002b;
-			state->ics_gpregs.gp_pcx = info->ci_80000002c;
-			state->ics_gpregs.gp_pdx = info->ci_80000002d;
+			state->ics_gpregs.gp_Pax = info->ci_80000002a;
+			state->ics_gpregs.gp_Pbx = info->ci_80000002b;
+			state->ics_gpregs.gp_Pcx = info->ci_80000002c;
+			state->ics_gpregs.gp_Pdx = info->ci_80000002d;
 			break;
 		case UINT32_C(0x80000003):
-			state->ics_gpregs.gp_pax = info->ci_80000003a;
-			state->ics_gpregs.gp_pbx = info->ci_80000003b;
-			state->ics_gpregs.gp_pcx = info->ci_80000003c;
-			state->ics_gpregs.gp_pdx = info->ci_80000003d;
+			state->ics_gpregs.gp_Pax = info->ci_80000003a;
+			state->ics_gpregs.gp_Pbx = info->ci_80000003b;
+			state->ics_gpregs.gp_Pcx = info->ci_80000003c;
+			state->ics_gpregs.gp_Pdx = info->ci_80000003d;
 			break;
 		case UINT32_C(0x80000004):
 		default:
-			state->ics_gpregs.gp_pax = info->ci_80000004a;
-			state->ics_gpregs.gp_pbx = info->ci_80000004b;
-			state->ics_gpregs.gp_pcx = info->ci_80000004c;
-			state->ics_gpregs.gp_pdx = info->ci_80000004d;
+			state->ics_gpregs.gp_Pax = info->ci_80000004a;
+			state->ics_gpregs.gp_Pbx = info->ci_80000004b;
+			state->ics_gpregs.gp_Pcx = info->ci_80000004c;
+			state->ics_gpregs.gp_Pdx = info->ci_80000004d;
 			break;
 		}
 	} else {
-		switch ((u32)state->ics_gpregs.gp_pax) {
+		switch ((u32)state->ics_gpregs.gp_Pax) {
 		case 0:
-			state->ics_gpregs.gp_pax = info->ci_0a;
-			state->ics_gpregs.gp_pbx = info->ci_0b;
-			state->ics_gpregs.gp_pcx = info->ci_0c;
-			state->ics_gpregs.gp_pdx = info->ci_0d;
+			state->ics_gpregs.gp_Pax = info->ci_0a;
+			state->ics_gpregs.gp_Pbx = info->ci_0b;
+			state->ics_gpregs.gp_Pcx = info->ci_0c;
+			state->ics_gpregs.gp_Pdx = info->ci_0d;
 			break;
 		case 1:
-			state->ics_gpregs.gp_pax = info->ci_1a;
-			state->ics_gpregs.gp_pbx = info->ci_1b;
-			state->ics_gpregs.gp_pcx = info->ci_1c;
-			state->ics_gpregs.gp_pdx = info->ci_1d;
+			state->ics_gpregs.gp_Pax = info->ci_1a;
+			state->ics_gpregs.gp_Pbx = info->ci_1b;
+			state->ics_gpregs.gp_Pcx = info->ci_1c;
+			state->ics_gpregs.gp_Pdx = info->ci_1d;
 			break;
 		case 2 ... 7:
 		default:
-			state->ics_gpregs.gp_pax = 0;
-			state->ics_gpregs.gp_pbx = info->ci_7b;
-			state->ics_gpregs.gp_pcx = info->ci_7c;
-			state->ics_gpregs.gp_pdx = info->ci_7d;
+			state->ics_gpregs.gp_Pax = 0;
+			state->ics_gpregs.gp_Pbx = info->ci_7b;
+			state->ics_gpregs.gp_Pcx = info->ci_7c;
+			state->ics_gpregs.gp_Pdx = info->ci_7d;
 			break;
 		}
 	}

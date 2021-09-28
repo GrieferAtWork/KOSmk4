@@ -7,9 +7,9 @@
 	- `_RPC_CONTEXT_INACTIVE`: Used internally to mark RPCs that are set to inactive, which is a mechanism used to prevent `RPC_SYNCMODE_F_REQUIRE_CP` RPCs from continuously aborting a non-cancellation-point system call, even when that system call invokes `task_serve()`.  
 	  This flag must never be set when enqueueing an RPC
 	- `RPC_SYNCMODE_F_USER`: The RPC may only be served in the context of returning to user-space:
-		- `RPC_REASONCTX_ASYNC`      (Return to user-space location)
-		- `RPC_REASONCTX_SYSRET`     (Interrupt-to-userspace or system call was unwound)
-		- `RPC_REASONCTX_INTERRUPT`  (Interrupt-to-userspace or system call was unwound)
+		- `RPC_REASONCTX_SYSRET`     (Return to user-space location)
+		- `RPC_REASONCTX_INTERRUPT`  (Interrupt was unwound)
+		- `RPC_REASONCTX_SYSCALL`    (Syscall was unwound)
 		- `RPC_REASONCTX_SHUTDOWN`   (Thread is exiting)
 	- `RPC_SYNCMODE_F_SYSRET`: The RPC must be served **after** an associated interrupt/syscall has been completed without errors (s.a. ``)
 	
@@ -301,14 +301,14 @@ make_inactive:
 			/* Figure out the reason we want to tell user-space.
 			 * NOTE: Yes: this checks for  the original `sc_info'  (and
 			 *       not for `ctx.rc_context == RPC_REASONCTX_SYSCALL') */
-			user_rpc_reason = RPC_REASONCTX_SYNC;
+			user_rpc_reason = _RPC_REASONCTX_SYNC;
 			if (sc_info != NULL) {
 				if ((rpc->pr_flags & RPC_SYNCMODE_F_REQUIRE_CP) &&
 				    !kernel_syscall_iscp(sc_info->rsi_sysno))
 					goto make_inactive;
 				/* If the system call  */
 				if (ctx.rc_context == RPC_REASONCTX_SYSCALL)
-					user_rpc_reason = RPC_REASONCTX_SYSCALL;
+					user_rpc_reason = _RPC_REASONCTX_SYSCALL;
 			} else {
 				if ((rpc->pr_flags & RPC_SYNCMODE_F_REQUIRE_SC))
 					goto make_inactive;
@@ -327,7 +327,7 @@ make_inactive:
 			}
 			/* User-space RPCs are _always_ required (or at least expected) to
 			 * restart system calls, meaning that */
-			ctx.rc_context = RPC_REASONCTX_ASYNC;
+			ctx.rc_context = RPC_REASONCTX_SYSRET;
 			pending_user_rpc_fini(&user_rpc_info);
 		}
 	}
@@ -386,7 +386,7 @@ make_inactive:
 				if (error_priority(error.ei_code) < error_priority(tls->ei_code))
 					memcpy(&error, tls, sizeof(error));
 			}
-			assert(ctx.rc_context == RPC_REASONCTX_ASYNC ||
+			assert(ctx.rc_context == RPC_REASONCTX_SYSRET ||
 			       ctx.rc_context == (sc_info ? RPC_REASONCTX_SYSCALL
 			                                  : RPC_REASONCTX_INTERRUPT));
 		}
@@ -399,7 +399,7 @@ make_inactive:
 	 * to happen) */
 	if (restore_plast != SLIST_PFIRST(&restore)) {
 		*restore_plast = NULL; /* NULL-terminate list */
-		if (error.ei_code != ERROR_CODEOF(E_OK) || ctx.rc_context == RPC_REASONCTX_ASYNC) {
+		if (error.ei_code != ERROR_CODEOF(E_OK) || ctx.rc_context == RPC_REASONCTX_SYSRET) {
 			/* When  the system call won't be restarted, then we must still
 			 * serve kernel RPCS with the `RPC_SYNCMODE_F_SYSRET' flag set. */
 			struct pending_rpc **piter;
@@ -446,14 +446,15 @@ make_inactive:
 					if (error_priority(error.ei_code) < error_priority(tls->ei_code))
 						memcpy(&error, tls, sizeof(error));
 				}
-				assert(ctx.rc_context == RPC_REASONCTX_ASYNC ||
+				assert(ctx.rc_context == RPC_REASONCTX_SYSRET ||
 				       ctx.rc_context == (sc_info ? RPC_REASONCTX_SYSCALL
 				                                  : RPC_REASONCTX_INTERRUPT));
 			}
-			restore_pending_rpcs(SLIST_FIRST(&restore));
 		}
-		restore_pending_rpcs(SLIST_FIRST(&restore));
-		ATOMIC_OR(PERTASK(this_task.t_flags), TASK_FRPC);
+		if (!SLIST_EMPTY(&restore)) {
+			restore_pending_rpcs(SLIST_FIRST(&restore));
+			ATOMIC_OR(PERTASK(this_task.t_flags), TASK_FRPC);
+		}
 	}
 
 	/* Check if we must throw a new exception. */
@@ -469,7 +470,7 @@ make_inactive:
 	 * then we mustn't try to restart  it ourselves, but rather load  back
 	 * all RPCs that  are still pending  before resuming normal  execution
 	 * in user-space. */
-	if (ctx.rc_context == RPC_REASONCTX_ASYNC)
+	if (ctx.rc_context == RPC_REASONCTX_SYSRET)
 		return ctx.rc_state;
 
 	/* Must restart a previously aborted interrupt/syscall with all of
@@ -488,8 +489,12 @@ make_inactive:
 
 	/* The following call causes `handle_sysret_rpc()' to be
 	 * invoked before we'll eventually return to user-space. */
-	task_enable_redirect_usercode_rpc(THIS_TASK);
 	state = ctx.rc_state;
+	assert(PREEMPTION_ENABLED());
+	PREEMPTION_DISABLE();
+	state = userexcept_sysret_inject_with_state(state);
+	/* userexcept_sysret_inject(THIS_TASK); // Same as `userexcept_sysret_inject_with_state()' */
+	PREEMPTION_ENABLE();
 
 	/* Restart the interrupt/syscall */
 	goto again;
@@ -564,7 +569,7 @@ sysret_make_inactive:
 				/* Execute the program associated with this RPC */
 				TRY {
 					sysret_ctx.rc_state = EXECUTE_RPC_PROGRAM(&user_rpc_info, sysret_ctx.rc_state,
-					                                          RPC_REASONCTX_ASYNC, NULL);
+					                                          _RPC_REASONCTX_ASYNC, NULL);
 				} EXCEPT {
 					/* Prioritize errors. */
 					struct exception_info *tls = error_info();
@@ -678,12 +683,12 @@ bool NOTHROW(task_rpc_schedule)(struct task *__restrict thread,
 	 * such that it executes `handle_sysret_rpc()'  the next time it  returns
 	 * back to user-space.
 	 *
-	 * This is normally done by `task_enable_redirect_usercode_rpc()', however
-	 * that function only works correctly when  the thread is being hosted  by
-	 * the same CPU as the calling thread. But there's also a wrapper for that
-	 * low-level  function `task_redirect_usercode_rpc()', which does the same
-	 * thing, but also works then the thread hosted by another CPU. */
-	task_redirect_usercode_rpc(thread);
+	 * This  is normally done  by `userexcept_sysret_inject()', however that
+	 * function only  works correctly  when the  thread is  being hosted  by
+	 * the same CPU as  the calling thread. But  there's also a wrapper  for
+	 * that low-level function `userexcept_sysret_inject_safe()', which does
+	 * the same thing, but also works then the thread hosted by another CPU. */
+	userexcept_sysret_inject_safe(thread);
 }
 ```
 

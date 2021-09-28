@@ -17,8 +17,10 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_SRC_SCHED_EXCEPT_HANDLER_C
-#define GUARD_KERNEL_SRC_SCHED_EXCEPT_HANDLER_C 1
+#ifndef GUARD_KERNEL_SRC_MISC_EXCEPT_SYSCALL_C
+#define GUARD_KERNEL_SRC_MISC_EXCEPT_SYSCALL_C 1
+
+/* System calls and meta-data tracking for stuff relating to exception handling */
 
 #include <kernel/compiler.h>
 
@@ -603,8 +605,8 @@ DEFINE_SYSCALL1(errno_t, set_userprocmask_address,
 		/* NOTE: ___Don't___  call `sigmask_check()' here!  Assuming that the user
 		 *       calls that function when appropriate, none of the pending signals
 		 *       would  currently be unmasked,  and even if  they were, we mustn't
-		 *       check  for them here, since this system call isn't a cancellation
-		 *       point! */
+		 *       check  for them here, since this system call would otherwise look
+		 *       like it failed! */
 	}
 done:
 	return -EOK;
@@ -613,7 +615,6 @@ done:
 #endif /* CONFIG_HAVE_USERPROCMASK */
 
 
-
 DECL_END
 
-#endif /* !GUARD_KERNEL_SRC_SCHED_EXCEPT_HANDLER_C */
+#endif /* !GUARD_KERNEL_SRC_MISC_EXCEPT_SYSCALL_C */

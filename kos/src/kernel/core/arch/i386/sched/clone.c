@@ -311,7 +311,7 @@ again_lock_mman:
 		/* Reset iopl() for the child thread/process */
 		if ((clone_flags & CLONE_THREAD) ? !x86_iopl_keep_after_clone
 		                                 : !x86_iopl_keep_after_fork)
-			state->scs_irregs.ir_pflags &= ~EFLAGS_IOPLMASK;
+			state->scs_irregs.ir_Pflags &= ~EFLAGS_IOPLMASK;
 
 		/* Have `clone()' or `fork()' return `0' in the child thread/process */
 		gpregs_setpax(&state->scs_gpregs, 0);

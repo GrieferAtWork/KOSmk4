@@ -283,13 +283,13 @@ x86_handle_device_not_available(struct icpustate *__restrict state) {
 		                  "[pc=%p]\n",
 		       old_task, old_task ? task_getroottid_of_s(old_task) : 0,
 		       new_task, task_getroottid_of_s(new_task),
-		       state->ics_irregs.ir_pip);
+		       state->ics_irregs.ir_Pip);
 		mystate = PERTASK_GET(this_fpustate);
 		if (!mystate) {
 			/* Try to have interrupts enabled when allocating memory.
 			 * By doing this, we prevent the allocation failing with `E_WOULDBLOCK'
 			 * if  at  some  point  it  needs  to  do  something  that  may  block. */
-			if (state->ics_irregs.ir_pflags & EFLAGS_IF)
+			if (state->ics_irregs.ir_Pflags & EFLAGS_IF)
 				__sti();
 			/* Lazily allocate a new state upon first access.
 			 * NOTE: If this causes an exception, that exception

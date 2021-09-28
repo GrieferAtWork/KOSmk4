@@ -1107,7 +1107,7 @@ INTERN ATTR_DBGTEXT void KCALL x86_dbg_fini(void) {
 	 * as found in  icpustate or  scpustate, both of  which may  appear
 	 * within the `x86_dbg_trapstate' pointer. */
 	if (x86_dbg_trapstatekind != X86_DBG_STATEKIND_NONE)
-		x86_dbg_exitstate.de_state.fcs_gpregs.gp_pax = (uintptr_t)x86_dbg_trapstate;
+		x86_dbg_exitstate.de_state.fcs_gpregs.gp_Pax = (uintptr_t)x86_dbg_trapstate;
 	initok = 0;
 }
 

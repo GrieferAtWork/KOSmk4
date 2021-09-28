@@ -17,11 +17,12 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_SRC_SCHED_RPC_ASYNC_C
-#define GUARD_KERNEL_SRC_SCHED_RPC_ASYNC_C 1
+#ifndef GUARD_KERNEL_SRC_SCHED_OLDRPC_ASYNC_C
+#define GUARD_KERNEL_SRC_SCHED_OLDRPC_ASYNC_C 1
 
 #include <kernel/compiler.h>
 
+#ifndef CONFIG_USE_NEW_RPC
 #include <kernel/except.h>
 #include <kernel/types.h>
 #include <sched/cpu.h>
@@ -633,5 +634,6 @@ again:
 }
 
 DECL_END
+#endif /* !CONFIG_USE_NEW_RPC */
 
-#endif /* !GUARD_KERNEL_SRC_SCHED_RPC_ASYNC_C */
+#endif /* !GUARD_KERNEL_SRC_SCHED_OLDRPC_ASYNC_C */

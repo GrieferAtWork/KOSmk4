@@ -25,7 +25,7 @@
 
 /**/
 #include <kos/bits/except.h>             /* struct __error_register_state_type_struct */
-#include <kos/kernel/cpu-state-compat.h> /* gp_p..., kcs_pflags, kcs_pip */
+#include <kos/kernel/cpu-state-compat.h> /* gp_p..., kcs_Pflags, kcs_Pip */
 #include <kos/kernel/cpu-state.h>        /* struct kcpustate */
 /**/
 
@@ -48,16 +48,16 @@ ASSERT_SAME_OFFSET(__ers_r10, kcs_gpregs.gp_r10);
 ASSERT_SAME_OFFSET(__ers_r9, kcs_gpregs.gp_r9);
 ASSERT_SAME_OFFSET(__ers_r8, kcs_gpregs.gp_r8);
 #endif /* __x86_64__ */
-ASSERT_SAME_OFFSET(__ers_pdi, kcs_gpregs.gp_pdi);
-ASSERT_SAME_OFFSET(__ers_psi, kcs_gpregs.gp_psi);
-ASSERT_SAME_OFFSET(__ers_pbp, kcs_gpregs.gp_pbp);
-ASSERT_SAME_OFFSET(__ers_psp, kcs_gpregs.gp_psp);
-ASSERT_SAME_OFFSET(__ers_pbx, kcs_gpregs.gp_pbx);
-ASSERT_SAME_OFFSET(__ers_pdx, kcs_gpregs.gp_pdx);
-ASSERT_SAME_OFFSET(__ers_pcx, kcs_gpregs.gp_pcx);
-ASSERT_SAME_OFFSET(__ers_pax, kcs_gpregs.gp_pax);
-ASSERT_SAME_OFFSET(__ers_pflags, kcs_pflags);
-ASSERT_SAME_OFFSET(__ers_pip, kcs_pip);
+ASSERT_SAME_OFFSET(__ers_pdi, kcs_gpregs.gp_Pdi);
+ASSERT_SAME_OFFSET(__ers_psi, kcs_gpregs.gp_Psi);
+ASSERT_SAME_OFFSET(__ers_pbp, kcs_gpregs.gp_Pbp);
+ASSERT_SAME_OFFSET(__ers_psp, kcs_gpregs.gp_Psp);
+ASSERT_SAME_OFFSET(__ers_pbx, kcs_gpregs.gp_Pbx);
+ASSERT_SAME_OFFSET(__ers_pdx, kcs_gpregs.gp_Pdx);
+ASSERT_SAME_OFFSET(__ers_pcx, kcs_gpregs.gp_Pcx);
+ASSERT_SAME_OFFSET(__ers_pax, kcs_gpregs.gp_Pax);
+ASSERT_SAME_OFFSET(__ers_pflags, kcs_Pflags);
+ASSERT_SAME_OFFSET(__ers_pip, kcs_Pip);
 #undef ASSERT_SAME_OFFSET
 
 

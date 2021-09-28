@@ -74,6 +74,9 @@ DATDEF ATTR_PERTASK struct pending_rpc_slist this_rpcs;
  * NOTE: Be mindful of the scenario  where `thread == THIS_TASK', in which  case
  *       this function will return like normal, and the RPC will only be noticed
  *       the next time you make a call to `task_serve()'!
+ * NOTE: The caller must initialize:
+ *       - `rpc->pr_flags'
+ *       - `rpc->pr_kern' or `rpc->pr_user'
  * @return: true:  Success. (Even if the thread terminates before the RPC can be served
  *                 normally, it will still  be served as `RPC_REASONCTX_SHUTDOWN'  when
  *                 true has been returned here)
@@ -81,6 +84,27 @@ DATDEF ATTR_PERTASK struct pending_rpc_slist this_rpcs;
 FUNDEF NOBLOCK WUNUSED NONNULL((1, 2)) __BOOL
 NOTHROW(FCALL task_rpc_schedule)(struct task *__restrict thread,
                                  /*inherit(on_success)*/ struct pending_rpc *__restrict rpc);
+
+
+/************************************************************************/
+/* Internal RPC execution helpers                                       */
+/************************************************************************/
+
+/* Arch-specific function:
+ * Execute the given `func' using the register state at the time of
+ * the call to this function,  whilst passing the given  `context'. */
+FUNDEF NOBLOCK NONNULL((1, 2)) void FCALL
+task_asyncrpc_execnow(struct rpc_context *__restrict context,
+                      prpc_exec_callback_t func, void *cookie DFL(__NULLPTR));
+
+/* Arch-specific function:
+ * Alter the given `state' to inject a call to `func'. The context
+ * argument passed to  `func' will use  `RPC_REASONCTX_ASYNC_KERN'
+ * or `RPC_REASONCTX_SYSRET' as reason. */
+FUNDEF NOBLOCK NOPREEMPT ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) struct scpustate *
+NOTHROW(FCALL task_asyncrpc_push)(struct scpustate *__restrict state,
+                                  prpc_exec_callback_t func,
+                                  void *cookie DFL(__NULLPTR));
 
 
 

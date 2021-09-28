@@ -1557,7 +1557,7 @@ rtm_failure:
 	if (mach.r_nesting > 0)
 		mach.r_pax |= _XABORT_NESTED;
 	/* Copy the RTM status code from the machine register state. */
-	state->ics_gpregs.gp_pax = mach.r_pax;
+	state->ics_gpregs.gp_Pax = mach.r_pax;
 	/* Redirect execution to resume at `fallback_ip' */
 	icpustate_setpc(state, fallback_ip);
 	return state;

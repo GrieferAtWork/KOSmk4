@@ -102,7 +102,7 @@ NOTHROW(FCALL cpl_getiopl_impl)(void *buf, struct task *__restrict thread) {
 	if (thread == THIS_TASK) {
 		*(uintptr_t *)buf = irregs_getpflags(irregs);
 	} else {
-		*(uintptr_t *)buf = irregs->ir_pflags;
+		*(uintptr_t *)buf = irregs->ir_Pflags;
 	}
 }
 
@@ -129,7 +129,7 @@ NOTHROW(FCALL cpl_setiopl_impl)(void *buf, struct task *__restrict thread) {
 	allow_change = args->ia_allow_iopl_change;
 	old_pflags = thread == THIS_TASK
 	             ? irregs_getpflags(irregs)
-	             : irregs->ir_pflags;
+	             : irregs->ir_Pflags;
 	old_iopl   = EFLAGS_GTIOPL(old_pflags);
 	if (old_iopl == args->ia_new_iopl)
 		was_set = true;
@@ -141,7 +141,7 @@ NOTHROW(FCALL cpl_setiopl_impl)(void *buf, struct task *__restrict thread) {
 		if (thread == THIS_TASK) {
 			irregs_setpflags(irregs, new_pflags);
 		} else {
-			irregs->ir_pflags = new_pflags;
+			irregs->ir_Pflags = new_pflags;
 		}
 	}
 	args->ia_old_iopl = old_iopl;

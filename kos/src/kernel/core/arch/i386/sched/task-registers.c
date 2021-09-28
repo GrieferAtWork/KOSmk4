@@ -57,18 +57,18 @@ NOTHROW(FCALL irregs_isuser)(struct irregs_kernel const *__restrict self) {
 #endif /* !__x86_64__ */
 	if (cs != SEGMENT_KERNEL_CODE)
 		return false;
-	pip = ATOMIC_READ(self->ir_pip);
+	pip = ATOMIC_READ(self->ir_Pip);
 	if unlikely(pip == (uintptr_t)&x86_rpc_user_redirection)
 		return true;
 	return false;
 }
 
-/* get:`self->ir_pip' */
+/* get:`self->ir_Pip' */
 PUBLIC NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) uintptr_t
 NOTHROW(FCALL irregs_rdip)(struct irregs_kernel const *__restrict self) {
-	uintptr_t result = ATOMIC_READ(self->ir_pip);
+	uintptr_t result = ATOMIC_READ(self->ir_Pip);
 	if unlikely(result == (uintptr_t)&x86_rpc_user_redirection)
-		result = PERTASK_GET(this_x86_rpc_redirection_iret.ir_pip);
+		result = PERTASK_GET(this_x86_rpc_redirection_iret.ir_Pip);
 	return result;
 }
 
@@ -77,21 +77,21 @@ PUBLIC NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) u16
 NOTHROW(FCALL irregs_rdcs)(struct irregs_kernel const *__restrict self) {
 	u16 result = ATOMIC_READ(self->ir_cs16);
 	if (result == SEGMENT_KERNEL_CODE) {
-		uintptr_t pip = ATOMIC_READ(self->ir_pip);
+		uintptr_t pip = ATOMIC_READ(self->ir_Pip);
 		if unlikely(pip == (uintptr_t)&x86_rpc_user_redirection)
 			result = PERTASK_GET(this_x86_rpc_redirection_iret.ir_cs16);
 	}
 	return result;
 }
 
-/* get:`self->ir_pflags' */
+/* get:`self->ir_Pflags' */
 PUBLIC NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) uintptr_t
 NOTHROW(FCALL irregs_rdflags)(struct irregs_kernel const *__restrict self) {
-	uintptr_t result = ATOMIC_READ(self->ir_pflags);
+	uintptr_t result = ATOMIC_READ(self->ir_Pflags);
 	if unlikely(result == 0) {
-		uintptr_t pip = ATOMIC_READ(self->ir_pip);
+		uintptr_t pip = ATOMIC_READ(self->ir_Pip);
 		if unlikely(pip == (uintptr_t)&x86_rpc_user_redirection)
-			result = PERTASK_GET(this_x86_rpc_redirection_iret.ir_pflags);
+			result = PERTASK_GET(this_x86_rpc_redirection_iret.ir_Pflags);
 	}
 	return result;
 }
@@ -126,17 +126,17 @@ is_user_iret:
 #endif /* !__x86_64__ */
 }
 
-/* set:`self->ir_pip' */
+/* set:`self->ir_Pip' */
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL irregs_wrip)(struct irregs_kernel *__restrict self, uintptr_t value) {
 	uintptr_t oldval;
 	do {
-		oldval = ATOMIC_READ(self->ir_pip);
+		oldval = ATOMIC_READ(self->ir_Pip);
 		if unlikely(oldval == (uintptr_t)&x86_rpc_user_redirection) {
-			PERTASK_SET(this_x86_rpc_redirection_iret.ir_pip, value);
+			PERTASK_SET(this_x86_rpc_redirection_iret.ir_Pip, value);
 			break;
 		}
-	} while unlikely(!ATOMIC_CMPXCH_WEAK(self->ir_pip, oldval, value));
+	} while unlikely(!ATOMIC_CMPXCH_WEAK(self->ir_Pip, oldval, value));
 }
 
 /* set:`self->ir_cs' */
@@ -145,7 +145,7 @@ NOTHROW(FCALL irregs_wrcs)(struct irregs_kernel *__restrict self, u16 value) {
 	pflag_t was;
 	was = PREEMPTION_PUSHOFF();
 	COMPILER_READ_BARRIER();
-	if unlikely(self->ir_pip == (uintptr_t)&x86_rpc_user_redirection) {
+	if unlikely(self->ir_Pip == (uintptr_t)&x86_rpc_user_redirection) {
 		PERTASK_SET(this_x86_rpc_redirection_iret.ir_cs, value);
 	} else {
 		self->ir_cs = value;
@@ -154,35 +154,35 @@ NOTHROW(FCALL irregs_wrcs)(struct irregs_kernel *__restrict self, u16 value) {
 	PREEMPTION_POP(was);
 }
 
-/* set:`self->ir_pflags' */
+/* set:`self->ir_Pflags' */
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL irregs_wrflags)(struct irregs_kernel *__restrict self, uintptr_t value) {
 	pflag_t was;
 	was = PREEMPTION_PUSHOFF();
 	COMPILER_READ_BARRIER();
-	if unlikely(self->ir_pip == (uintptr_t)&x86_rpc_user_redirection) {
-		PERTASK_SET(this_x86_rpc_redirection_iret.ir_pflags, value);
+	if unlikely(self->ir_Pip == (uintptr_t)&x86_rpc_user_redirection) {
+		PERTASK_SET(this_x86_rpc_redirection_iret.ir_Pflags, value);
 	} else {
-		self->ir_pflags = value;
+		self->ir_Pflags = value;
 	}
 	COMPILER_WRITE_BARRIER();
 	PREEMPTION_POP(was);
 }
 
-/* set:`self->ir_pflags = (self->ir_pflags & mask) | flags' */
+/* set:`self->ir_Pflags = (self->ir_Pflags & mask) | flags' */
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL irregs_mskflags)(struct irregs_kernel *__restrict self,
                                uintptr_t mask, uintptr_t flags) {
 	pflag_t was;
 	was = PREEMPTION_PUSHOFF();
 	COMPILER_READ_BARRIER();
-	if unlikely(self->ir_pip == (uintptr_t)&x86_rpc_user_redirection) {
+	if unlikely(self->ir_Pip == (uintptr_t)&x86_rpc_user_redirection) {
 		uintptr_t newval;
-		newval = PERTASK_GET(this_x86_rpc_redirection_iret.ir_pflags);
-		PERTASK_SET(this_x86_rpc_redirection_iret.ir_pflags, (newval & mask) | flags);
+		newval = PERTASK_GET(this_x86_rpc_redirection_iret.ir_Pflags);
+		PERTASK_SET(this_x86_rpc_redirection_iret.ir_Pflags, (newval & mask) | flags);
 	} else {
-		self->ir_pflags &= mask;
-		self->ir_pflags |= flags;
+		self->ir_Pflags &= mask;
+		self->ir_Pflags |= flags;
 	}
 	COMPILER_WRITE_BARRIER();
 	PREEMPTION_POP(was);
