@@ -40,20 +40,67 @@ DECL_BEGIN
 struct icpustate;
 struct task;
 
+/* Arch-specific function:
+ * Try to invoke the user-space exception handler for `error'
+ * WARNING: Because this function writes to the user-space stack,
+ *          it  is  capable of  throwing an  `E_SEGFAULT' itself.
+ * @param: state:   The user-space CPU state (note that `icpustate_isuser(state)' is assumed!)
+ * @param: sc_info: When  non-NULL, information about  the system call  that caused the exception.
+ *                  Otherwise, if this argument is `NULL', the exception was caused by user-space,
+ *                  such as a user-space program causing an `E_SEGFAULT', as opposed to the kernel
+ *                  throwing an `E_FSERROR_FILE_NOT_FOUND'
+ *            HINT: Additional information about how the system call was invoked can be
+ *                  extracted from `sc_info->rsi_flags' (s.a. `<kos/asm/rpc-method.h>')
+ * @return: NULL:   User-space does not define an exception handler.
+ * @return: * :     The updated interrupt CPU state, modified to invoke the
+ *                  user-space exception handler once user-space  execution
+ *                  resumes. */
+FUNDEF WUNUSED NONNULL((1, 3)) struct icpustate *FCALL
+userexcept_callhandler(struct icpustate *__restrict state,
+                       struct rpc_syscall_info const *sc_info,
+                       struct exception_data const *__restrict error)
+		THROWS(E_SEGFAULT);
+
+/* Arch-specific function:
+ * Translate the current exception into an errno and set that errno
+ * as the return value of  the system call described by  `sc_info'. */
+FUNDEF WUNUSED NONNULL((1, 2, 3)) struct icpustate *
+NOTHROW(FCALL userexcept_seterrno)(struct icpustate *__restrict state,
+                                   struct rpc_syscall_info const *__restrict sc_info,
+                                   struct exception_data const *__restrict error);
+
+
+
 /* High-level exception handler that must be called by _all_ interrupts
  * and system call invocation wrappers.  This function is very  special
  * in that it _only_ returns when the associated interrupt/syscall must
  * be restarted immediately (for whatever reason).
  *
- * When anything else needs to be done in order to handle the currently
- * set exception, then this function not return normally, but will load
+ * When  anything else needs to be done  in order to handle the currently
+ * set exception, then this function won't return normally, but will load
  * the (at that point modified) `state' directly (via `cpu_apply(3)')
  *
  * The implementation of this function serves the function  documented
- * in <kos/rpc.md> under the name `generic_interrupt_or_system_call()' */
-FUNDEF WUNUSED NONNULL((1)) struct icpustate *
+ * in <kos/rpc.md> under the name `generic_interrupt_or_system_call()'
+ *
+ * WARNING: When this function returns, it will have cleared the current
+ *          exception, as it is also capable of handling (some)  errors,
+ *          most notably `E_INTERRUPT_USER_RPC'! */
+FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) struct icpustate *
 NOTHROW(FCALL userexcept_handler)(struct icpustate *__restrict state,
                                   struct rpc_syscall_info *sc_info);
+
+/* Arch-specific function:
+ * Wrapper around `userexcept_handler()' for use in implementing `error_unwind()'.
+ * This  function will (safely) construct a complete `struct icpustate' at the far
+ * end of the  calling thread's stack  and populate with  with register info  from
+ * `state'. Afterwards, it  will force-unwind  the kernel  stack such  that it  is
+ * located immediately at the new state. Once that is done, a call to the portable
+ * function `userexcept_handler(<state>, sc_info)'  is made,  and that  function's
+ * return value is passed to `cpu_apply_icpustate()' */
+FUNDEF ATTR_NORETURN NONNULL((1)) void
+NOTHROW(FCALL userexcept_handler_ucpustate)(struct ucpustate *__restrict state,
+                                            struct rpc_syscall_info *sc_info);
 
 
 /* This is the function that is injected by `userexcept_sysret_inject()',

@@ -31,10 +31,16 @@
 #include <hybrid/host.h>
 
 #include <asm/cfi.h>
+#include <asm/cpu-flags.h>
 #include <asm/instr/compat.h>
 #include <kos/kernel/cpu-state-asm.h>
 #include <kos/kernel/cpu-state-compat.h>
 #include <kos/rpc.h>
+
+#ifdef __x86_64__
+#include <asm/instr/fsgsbase.h>
+#include <asm/instr/kgsbase.h>
+#endif /* __x86_64__ */
 
 #ifdef __x86_64__
 #define cpu_apply_icpustate_Psp cpu_apply_icpustate_rsp
@@ -42,6 +48,7 @@
 #define cpu_apply_icpustate_Psp cpu_apply_icpustate_esp
 #endif /* !__x86_64__ */
 
+#define SIZEOF_POINTER              __SIZEOF_POINTER__
 #define rpc_context__rc_state       __SIZEOF_POINTER__
 #define task__t_self                OFFSET_TASK_SELF
 #define task__t_refcnt              OFFSET_TASK_REFCNT
@@ -266,10 +273,17 @@ END(task_serve_nx)
 .section .text
 	.cfi_startproc simple
 	.cfi_signal_frame
-	EXTERN(x86_userexcept_sysret_personality)
-	/* NOTE: `x86_userexcept_sysret_personality'  handles
-	 *       exceptions by calling `userexcept_handler()' */
-	.cfi_personality 0, x86_userexcept_sysret_personality
+	/* NOTE: No personality function is defined  here, because the only  thing
+	 *       it could ever do is  silently try to use `userexcept_handler'  in
+	 *       order to push the  exception into user-space. However,  knowledge
+	 *       of how to  restart the current  syscall/interrupt isn't  present,
+	 *       as that would have had to be implemented somewhere higher on  the
+	 *       call-stack, meaning that  we should  only ever get  here with  an
+	 *       exception set when the current kernel function's not restartable.
+	 *
+	 * As such, we can also just let the regular fallback exception propagation
+	 * take hold, which is already capable of this scenario. */
+
 
 	/* CFI instrumentation to restore registers from the correct locations.
 	 * Note the use of `ifnotimpl "KOS"', since GDB p00ps itself if we  let
@@ -414,7 +428,7 @@ PUBLIC_FUNCTION(x86_userexcept_sysret)
 #endif /* !__x86_64__ */
 
 	/* With the return-to-userspace context fully loaded, we're
-	 * now ready to make the call to `userexcept_sysret()'! */
+	 * now  ready  to make  the call  to `userexcept_sysret()'! */
 	movP   %Psp, %R_fcall0P
 	EXTERN(userexcept_sysret)
 	call   userexcept_sysret
@@ -425,6 +439,308 @@ PUBLIC_FUNCTION(x86_userexcept_sysret)
 	jmp    cpu_apply_icpustate_Psp
 	.cfi_endproc
 END(x86_userexcept_sysret)
+
+
+
+
+/* >> FUNDEF ATTR_NORETURN NONNULL((1)) void
+ * >> NOTHROW(FCALL userexcept_handler_ucpustate)(struct ucpustate *__restrict state,
+ * >>                                             struct rpc_syscall_info *sc_info);
+ * Arch-specific function:
+ * Wrapper around `userexcept_handler()' for use in implementing `error_unwind()'.
+ * This  function will (safely) construct a complete `struct icpustate' at the far
+ * end of the  calling thread's stack  and populate with  with register info  from
+ * `state'. Afterwards, it  will force-unwind  the kernel  stack such  that it  is
+ * located immediately at the new state. Once that is done, a call to the portable
+ * function `userexcept_handler(<state>, sc_info)'  is made,  and that  function's
+ * return value is passed to `cpu_apply_icpustate()' */
+.section .text
+INTERN_FUNCTION(userexcept_handler_ucpustate)
+	.cfi_startproc simple
+	.cfi_signal_frame
+	.cfi_def_cfa %R_fcall0P, 0
+	ASM_CFI_OFFSET_RESTORE_UCPUSTATE(0)
+
+#ifdef __x86_64__
+#define MAX_SIZEOF_ICPUSTATE (SIZEOF_ICPUSTATE64)
+#else /* __x86_64__ */
+#define MAX_SIZEOF_ICPUSTATE (OFFSET_ICPUSTATE_IRREGS + SIZEOF_IRREGS32_VM86)
+#endif /* !__x86_64__ */
+
+#define MAX_USED_BYTES_AT_STACK_TOP \
+	(MAX_SIZEOF_ICPUSTATE + SIZEOF_RPC_SYSCALL_INFO + SIZEOF_UCPUSTATE)
+
+	/* Check if one of the  given arguments fall into  the
+	 * region of the stack which we're about to overwrite:
+	 * >> if ((uintptr_t)state >= this_x86_kernel_psp0 - MAX_USED_BYTES_AT_STACK_TOP)
+	 * >>     goto .Lmust_copy_state; */
+	.cfi_remember_state
+	EXTERN(this_x86_kernel_psp0)
+	movP   %segtls:this_x86_kernel_psp0, %Pbp
+	leaP   -MAX_USED_BYTES_AT_STACK_TOP(%Pbp), %Pax
+	cmpP   %Pax, %R_fcall0P
+	jae    .Lmust_copy_state
+.Ldid_copy_state:
+	/* >> if ((uintptr_t)sc_info >= this_x86_kernel_psp0 - MAX_USED_BYTES_AT_STACK_TOP)
+	 * >>     goto .Lmust_copy_sc_info; */
+	cmpP   %Pax, %R_fcall1P
+	jae    .Lmust_copy_sc_info
+.Ldid_copy_sc_info:
+
+	cli /* Disable interrupts to  prevent async-RPCs from  trying to redirect  the
+	     * iret, especially given how we're about to modify/re-write it ourselves! */
+
+	/* Set `%Psp' such that it points at the correct IRET tail. */
+#ifdef __x86_64__
+	leaP   -SIZEOF_IRREGS64(%Pbp), %Psp
+#else /* __x86_64__ */
+	movP   $(-SIZEOF_IRREGS32_USER), %Pax
+	movP   $(-SIZEOF_IRREGS32_VM86), %Pcx
+	ttest  mask=EFLAGS_VM, loc=OFFSET_UCPUSTATE_PFLAGS(%R_fcall0P)
+	cmovnzP %Pcx, %Pax /* if (ucpustate_isvm86(state)) %Pax = %Pcx */
+	leaP   (%Pbp,%Pax,1), %Psp
+#endif /* !__x86_64__ */
+
+	/* Check if the current IRET location points to `x86_userexcept_sysret' */
+	cmpP   $(x86_userexcept_sysret), OFFSET_IRREGS_PIP(%Psp)
+	jne    .Lfill_iret_from_state
+/*.Lfill_iret_from_sysret:*/
+
+	/* Debug assertions. */
+#ifndef NDEBUG
+#define ASSERT_CC(cc) j##cc 991f; int3; 991:
+	cmpP   $(x86_userexcept_sysret), %segtls:OFFSET_IRREGS_PIP+this_x86_sysret_iret
+	ASSERT_CC(ne) /* assert(PERTASK_GET(this_x86_sysret_iret.ir_Pip) != (uintptr_t)&x86_userexcept_sysret); */
+	cmpP   $(0), OFFSET_IRREGS_PFLAGS(%Psp)
+	ASSERT_CC(e) /* assert(return_state->ics_irregs.ir_Pflags == 0); */
+	cmpP   $(0), OFFSET_UCPUSTATE_PFLAGS(%R_fcall0P)
+	ASSERT_CC(e) /* assert(state->ucs_Pflags == 0); */
+	cmpw   $(SEGMENT_KERNEL_CODE), OFFSET_IRREGS_CS(%Psp)
+	ASSERT_CC(e) /* assert(SEGMENT_IS_VALID_KERNCODE(return_state->ics_irregs.ir_cs16)); */
+	cmpw   $(SEGMENT_KERNEL_CODE), OFFSET_UCPUSTATE_CS(%R_fcall0P)
+	ASSERT_CC(e) /* assert(SEGMENT_IS_VALID_KERNCODE(state->ucs_cs16)); */
+#ifdef __x86_64__
+	/* assert(state->ucs_gpregs.gp_rsp == return_state->ics_irregs.ir_rsp); */
+	movP   OFFSET_IRREGS_PSP(%Psp), %Pax
+#else /* __x86_64__ */
+	/* assert(state->ucs_gpregs.gp_esp == (u32)&return_state->ics_irregs_u.ir_esp); */
+	leaP   OFFSET_IRREGS_PSP(%Psp), %Pax
+#endif /* !__x86_64__ */
+	cmpP   %Pax, OFFSET_UCPUSTATE_GPREGS+OFFSET_GPREGS_PSP(%R_fcall0P)
+	ASSERT_CC(e)
+#undef ASSERT_CC
+#endif /* !NDEBUG */
+
+	/* Copy registers back into our iret tail. */
+	movP   %segtls:this_x86_sysret_iret+OFFSET_IRREGS_PIP, %Pax
+	movP   %Pax, OFFSET_IRREGS_PIP(%Psp)
+	movzwP %segtls:this_x86_sysret_iret+OFFSET_IRREGS_CS, %Pax
+	movP   %Pax, OFFSET_IRREGS_CS(%Psp)
+	movP   %segtls:this_x86_sysret_iret+OFFSET_IRREGS_PFLAGS, %Pax
+	movP   %Pax, OFFSET_IRREGS_PFLAGS(%Psp)
+#ifdef __x86_64__
+	movP   %segtls:this_x86_sysret_iret+OFFSET_IRREGS_PSP, %Pax
+	movP   %Pax, OFFSET_IRREGS_PSP(%Psp)
+	movzwP %segtls:this_x86_sysret_iret+OFFSET_IRREGS_SS, %Pax
+	movP   %Pax, OFFSET_IRREGS_SS(%Psp)
+#else /* __x86_64__ */
+	/* Still initialized correctly:
+	 * >> return_state->ics_irregs_u.ir_ss  = return_state->ics_irregs_u.ir_ss16;
+	 * >> return_state->ics_irregs_u.ir_esp = return_state->ics_irregs_u.ir_esp; */
+#endif /* !__x86_64__ */
+	jmp    .Lfill_iret_done
+.Lfill_iret_from_state:
+	/* Copy from the caller-given `state' */
+	movP   OFFSET_UCPUSTATE_PIP(%R_fcall0P), %Pax
+	movP   %Pax, OFFSET_IRREGS_PIP(%Psp)
+	movzwP OFFSET_UCPUSTATE_CS(%R_fcall0P), %Pax
+	movP   %Pax, OFFSET_IRREGS_CS(%Psp)
+	movP   OFFSET_UCPUSTATE_PFLAGS(%R_fcall0P), %Pax
+	movP   %Pax, OFFSET_IRREGS_PFLAGS(%Psp)
+	movP   OFFSET_UCPUSTATE_GPREGS + OFFSET_GPREGS_PSP(%R_fcall0P), %Pax
+	movP   %Pax, OFFSET_IRREGS_PSP(%Psp)
+	movzwP OFFSET_UCPUSTATE_SS(%R_fcall0P), %Pax
+	movP   %Pax, OFFSET_IRREGS_SS(%Psp)
+.Lfill_iret_done:
+
+	/* And with that, the IRET tail has been initialized correctly!
+	 * Time  to  construct  the  rest  of  the  `struct icpustate'! */
+
+#ifndef __x86_64__
+	ttest  mask=EFLAGS_VM, loc=OFFSET_UCPUSTATE_PFLAGS(%R_fcall0P)
+	jz     .Lpush_icpustate_sgregs_novm86
+	/* Copy vm86 segment registers into the IRET tail where they belong! */
+	movzwP OFFSET_UCPUSTATE_SGREGS + OFFSET_SGREGS_ES(%R_fcall0P), %Pax
+	movP   %Pax, OFFSET_IRREGS_ES(%Psp)
+	movzwP OFFSET_UCPUSTATE_SGREGS + OFFSET_SGREGS_DS(%R_fcall0P), %Pax
+	movP   %Pax, OFFSET_IRREGS_DS(%Psp)
+	movzwP OFFSET_UCPUSTATE_SGREGS + OFFSET_SGREGS_FS(%R_fcall0P), %Pax
+	movP   %Pax, OFFSET_IRREGS_FS(%Psp)
+	movzwP OFFSET_UCPUSTATE_SGREGS + OFFSET_SGREGS_GS(%R_fcall0P), %Pax
+	movP   %Pax, OFFSET_IRREGS_GS(%Psp)
+	pushP  $(SEGMENT_USER_DATA_RPL)   /* ics_ds */
+	pushP  $(SEGMENT_USER_DATA_RPL)   /* ics_es */
+	pushP  $(SEGMENT_USER_FSBASE_RPL) /* ics_fs */
+	jmp    .Lpush_icpustate_sgregs_done
+.Lpush_icpustate_sgregs_novm86:
+	pushP  OFFSET_UCPUSTATE_SGREGS + OFFSET_SGREGS_DS(%R_fcall0P) /* ics_ds */
+	pushP  OFFSET_UCPUSTATE_SGREGS + OFFSET_SGREGS_ES(%R_fcall0P) /* ics_es */
+	pushP  OFFSET_UCPUSTATE_SGREGS + OFFSET_SGREGS_FS(%R_fcall0P) /* ics_fs */
+	movw   OFFSET_UCPUSTATE_SGREGS + OFFSET_SGREGS_GS(%R_fcall0P), %ax
+	movw   %ax, %gs /* Doesn't appear in `struct icpustate', so must set immediatly! */
+.Lpush_icpustate_sgregs_done:
+#endif /* !__x86_64__ */
+
+	/* Fill in `ics_gpregs' */
+	pushP  OFFSET_UCPUSTATE_GPREGS + OFFSET_GPREGS_PAX(%R_fcall0P) /* gp_eax */
+	pushP  OFFSET_UCPUSTATE_GPREGS + OFFSET_GPREGS_PCX(%R_fcall0P) /* gp_ecx */
+	pushP  OFFSET_UCPUSTATE_GPREGS + OFFSET_GPREGS_PDX(%R_fcall0P) /* gp_edx */
+	pushP  OFFSET_UCPUSTATE_GPREGS + OFFSET_GPREGS_PBX(%R_fcall0P) /* gp_ebx */
+#ifndef __x86_64__ /* x86_64 uses `struct gpregsnsp' */
+	pushP  OFFSET_UCPUSTATE_GPREGS + OFFSET_GPREGS_PSP(%R_fcall0P) /* gp_esp */
+#endif /* !__x86_64__ */
+	pushP  OFFSET_UCPUSTATE_GPREGS + OFFSET_GPREGS_PBP(%R_fcall0P) /* gp_ebp */
+	pushP  OFFSET_UCPUSTATE_GPREGS + OFFSET_GPREGS_PSI(%R_fcall0P) /* gp_esi */
+	pushP  OFFSET_UCPUSTATE_GPREGS + OFFSET_GPREGS_PDI(%R_fcall0P) /* gp_edi */
+#ifdef __x86_64__ /* x86_64 has a bunch more registers */
+	pushP  OFFSET_UCPUSTATE_GPREGS + OFFSET_GPREGS_R8(%R_fcall0P)  /* gp_r8 */
+	pushP  OFFSET_UCPUSTATE_GPREGS + OFFSET_GPREGS_R9(%R_fcall0P)  /* gp_r9 */
+	pushP  OFFSET_UCPUSTATE_GPREGS + OFFSET_GPREGS_R10(%R_fcall0P) /* gp_r10 */
+	pushP  OFFSET_UCPUSTATE_GPREGS + OFFSET_GPREGS_R11(%R_fcall0P) /* gp_r11 */
+	pushP  OFFSET_UCPUSTATE_GPREGS + OFFSET_GPREGS_R12(%R_fcall0P) /* gp_r12 */
+	pushP  OFFSET_UCPUSTATE_GPREGS + OFFSET_GPREGS_R13(%R_fcall0P) /* gp_r13 */
+	pushP  OFFSET_UCPUSTATE_GPREGS + OFFSET_GPREGS_R14(%R_fcall0P) /* gp_r14 */
+	pushP  OFFSET_UCPUSTATE_GPREGS + OFFSET_GPREGS_R15(%R_fcall0P) /* gp_r15 */
+#endif /* __x86_64__ */
+
+	/* And   with  that,  the  new  `icpustate'  is  complete.
+	 * However, we can't re-enable interrupts yet, since there
+	 * are still some registers which need to be filled in, as
+	 * well as the caller-given `sc_info', which we also  have
+	 * to copy in case it is present. */
+#ifdef __x86_64__
+	movw   OFFSET_UCPUSTATE_SGREGS + OFFSET_SGREGS_DS(%R_fcall0P), %ax
+	movw   %ax, %ds
+	movw   OFFSET_UCPUSTATE_SGREGS + OFFSET_SGREGS_ES(%R_fcall0P), %ax
+	movw   %ax, %es
+	movw   OFFSET_UCPUSTATE_SGREGS + OFFSET_SGREGS_FS(%R_fcall0P), %ax
+	movw   %ax, %fs
+	EXTERN(this_task)
+	movP   %segtls:this_task, %Pbx
+	movw   OFFSET_UCPUSTATE_SGREGS + OFFSET_SGREGS_GS(%R_fcall0P), %ax
+	movw   %ax, %gs
+	wrgsbaseq %Pbx
+	movP   OFFSET_UCPUSTATE_SGBASE + OFFSET_SGBASE_GSBASE(%R_fcall0P), %Pax
+	wrkgsbaseq %Pax
+	movP   OFFSET_UCPUSTATE_SGBASE + OFFSET_SGBASE_FSBASE(%R_fcall0P), %Pax
+	wrfsbaseq %Pax
+#endif /* __x86_64__ */
+
+	/* With that, everything we could possibly need from `%R_fcall0P'
+	 * has been  loaded, and  the `icpustate'  at %Psp  is  complete! */
+	movP   %Psp, %Pbx
+	ASM_CFI_OFFSET_RESTORE_ICPUSTATE(-OFFSET_ICPUSTATE_IRREGS)
+	.cfi_def_cfa %Pbx, OFFSET_ICPUSTATE_IRREGS
+
+	/* Check if we need to copy `sc_info' */
+	testP  %R_fcall1P, %R_fcall1P
+	jnz    .Lcopy_sc_info
+.Lcopy_sc_info_return:
+
+	/* With everything from high now copied, we can re-enable interrupts */
+	sti
+
+	movP   %Pbx, %R_fcall0P /* For `userexcept_handler()' */
+	EXTERN(userexcept_handler)
+	call   userexcept_handler
+
+	/* Normally when `userexcept_handler()' returns, it means that the
+	 * current system call or interrupt should be restarted.  However,
+	 * the only reason  we ever get  here is because  `error_unwind()'
+	 * tried  to unwind an exception into userspace in a context where
+	 * no prior exception handler  claimed ownership of the  exception
+	 * for the purpose of allowing restarts.
+	 *
+	 * This is actually something that's allowed, as it also forms the
+	 * fallback  for arbitrary exception-to-userspace return paths, as
+	 * well as interrupts that don't need to be restarted in order  to
+	 * maintain proper semantics (such as the #PF interrupt, which  is
+	 * able to call  `task_serve()', but doesn't  need to be  manually
+	 * restarted as it  auto-restarts itself when  another attempt  is
+	 * made to access the faulting memory location) */
+
+	movP   %Pax, %Psp
+	.cfi_def_cfa_register %Psp
+
+	/* Load the newly updated cpustate. */
+	EXTERN(cpu_apply_icpustate_Psp)
+	jmp    cpu_apply_icpustate_Psp
+
+
+/* Auxiliary helper sub-routine: copy sc_info to the correct location. */
+.Lcopy_sc_info:
+	cld
+#ifndef __x86_64__ /* On x86_64, `%R_fcall1P == %Psi' */
+	movP   %R_fcall1P, %Psi
+#endif /* !__x86_64__ */
+	subP   $(SIZEOF_RPC_SYSCALL_INFO),                  %Psp
+	movP   %Psp,                                        %Pdi
+	movP   $(SIZEOF_RPC_SYSCALL_INFO / SIZEOF_POINTER), %Pcx
+	rep    movsP
+	movP   %Psp, %R_fcall1P
+	jmp    .Lcopy_sc_info_return
+
+
+/* Auxiliary helper sub-routines to deal with the unlikely event of stack-overlap */
+	.cfi_restore_state
+.Lmust_copy_state:
+#ifdef __x86_64__
+	movP   %R_fcall1P, %Pbp /* This  would  save %Pdx  on i386,  which isn't
+	                         * clobbered below, so doesn't need to be saved!
+	                         * On x86_64, it's  %Psi, which _is_  clobbered! */
+#endif /* __x86_64__ */
+
+	movP   %R_fcall0P, %Pbx /* Only needed for unwinding... */
+	.cfi_def_cfa_register %Pbx
+
+	/* >> %Psp -= SIZEOF_UCPUSTATE;
+	 * >> %R_fcall0P = memcpy(%Psp, %R_fcall0P, SIZEOF_UCPUSTATE); */
+	cld
+	subP   $(SIZEOF_UCPUSTATE),                  %Psp
+	movP   %R_fcall0P,                           %Psi
+	movP   %Psp,                                 %Pdi
+	movP   $(SIZEOF_UCPUSTATE / SIZEOF_POINTER), %Pcx
+	rep    movsP
+	movP   %Psp, %R_fcall0P /* The new & improved `struct ucpustate *state' */
+
+#ifdef __x86_64__
+	movP   %Pbp, %R_fcall1P
+	movP   %segtls:this_x86_kernel_psp0, %Pbp
+#endif /* __x86_64__ */
+	jmp    .Ldid_copy_state
+
+.Lmust_copy_sc_info:
+	movP   %R_fcall0P, %Pbx
+	.cfi_def_cfa_register %Pbx
+
+	/* >> %Psp -= SIZEOF_RPC_SYSCALL_INFO;
+	 * >> %R_fcall1P = memcpy(%Psp, %R_fcall1P, SIZEOF_RPC_SYSCALL_INFO); */
+	cld
+	subP   $(SIZEOF_RPC_SYSCALL_INFO),                  %Psp
+	movP   %R_fcall1P,                                  %Psi
+	movP   %Psp,                                        %Pdi
+	movP   $(SIZEOF_RPC_SYSCALL_INFO / SIZEOF_POINTER), %Pcx
+	rep    movsP
+	movP   %Psp, %R_fcall1P /* The new & improved `struct rpc_syscall_info *sc_info' */
+	movP   %Pbx, %R_fcall0P
+	jmp    .Ldid_copy_sc_info
+	.cfi_endproc
+END(userexcept_handler_ucpustate)
+
+
+
+
+
 
 #endif /* !CONFIG_USE_NEW_RPC */
 

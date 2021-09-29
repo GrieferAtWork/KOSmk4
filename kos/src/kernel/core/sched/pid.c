@@ -169,6 +169,13 @@ PUBLIC ATTR_PERTASK struct sigqueue this_sigqueue = {
 PUBLIC ATTR_PERTASK struct taskpid *this_taskpid = NULL;
 
 
+#ifdef CONFIG_USE_NEW_RPC
+PRIVATE NONNULL((1)) void PRPC_EXEC_CALLBACK_CC
+rpc_propagate_exit_state_to_worker(struct rpc_context *__restrict ctx, void *cookie) {
+	if (ctx->rc_context != RPC_REASONCTX_SHUTDOWN)
+		THROW(E_EXIT_THREAD, (uintptr_t)cookie);
+}
+#else /* CONFIG_USE_NEW_RPC */
 PRIVATE WUNUSED NONNULL((2)) struct icpustate *FCALL
 rpc_propagate_exit_state_to_worker(void *arg, struct icpustate *__restrict state,
                                    unsigned int reason,
@@ -177,6 +184,7 @@ rpc_propagate_exit_state_to_worker(void *arg, struct icpustate *__restrict state
 		THROW(E_EXIT_THREAD, (uintptr_t)arg);
 	return state;
 }
+#endif /* !CONFIG_USE_NEW_RPC */
 
 
 PRIVATE NOBLOCK void
@@ -186,7 +194,9 @@ NOTHROW(KCALL task_propagate_exit_status_to_worker_thread)(struct task *__restri
                                                            struct taskpid *__restrict origin_pid) {
 	struct taskgroup *worker_group;
 	struct rpc_entry *rpc;
+#ifndef CONFIG_USE_NEW_RPC
 	int rpc_status;
+#endif /* !CONFIG_USE_NEW_RPC */
 	/* Send an RPC callback to `worker' to propagate the exit status
 	 * that caused the  task associated with  `origin_pid' to  exit. */
 	worker_group = &FORTASK(worker, this_taskgroup);
@@ -195,6 +205,16 @@ NOTHROW(KCALL task_propagate_exit_status_to_worker_thread)(struct task *__restri
 	if unlikely(!rpc)
 		return; /* Shouldn't happen, but would indicate that an RPC was already delivered. */
 	/* Save the exit-status from the originating thread, and use that status for the worker. */
+#ifdef CONFIG_USE_NEW_RPC
+	rpc->pr_kern.k_cookie = (void *)(uintptr_t)(unsigned int)origin_pid->tp_status.w_status;
+	if (task_rpc_schedule(worker, rpc))
+		return;
+	/* Failed to deliver the RPC because the worker thread has/is already
+	 * terminated/terminating, and is no longer able to service any RPCs. */
+
+	/* Cleanup the RPC, since it isn't inherited by `task_rpc_schedule()' upon failure. */
+	pending_rpc_free(rpc);
+#else /* CONFIG_USE_NEW_RPC */
 	rpc->re_arg = (void *)(uintptr_t)(unsigned int)origin_pid->tp_status.w_status;
 	/* Try to deliver the RPC */
 	rpc_status = task_deliver_rpc(worker, rpc, TASK_RPC_FNORMAL);
@@ -208,6 +228,7 @@ NOTHROW(KCALL task_propagate_exit_status_to_worker_thread)(struct task *__restri
 	        "rpc_status = %d", rpc_status);
 	/* Cleanup the RPC, since it isn't inherited by `task_deliver_rpc()' upon failure. */
 	task_free_rpc(rpc);
+#endif /* !CONFIG_USE_NEW_RPC */
 }
 
 PRIVATE NOBLOCK void
@@ -510,8 +531,14 @@ task_setthread(struct task *__restrict self,
 	        "`task_setthread()' and `task_setprocess()' may only be called once");
 	assertf(!(self->t_flags & TASK_FKERNTHREAD),
 	        "`task_setthread()' and `task_setprocess()' may not be used with kernel threads");
-	leader   = task_getprocess_of(leader);
+	leader = task_getprocess_of(leader);
+#ifdef CONFIG_USE_NEW_RPC
+	exit_rpc                 = pending_rpc_alloc_kern(GFP_NORMAL);
+	exit_rpc->pr_flags       = RPC_CONTEXT_KERN;
+	exit_rpc->pr_kern.k_func = &rpc_propagate_exit_state_to_worker;
+#else /* CONFIG_USE_NEW_RPC */
 	exit_rpc = task_alloc_synchronous_rpc(&rpc_propagate_exit_state_to_worker);
+#endif /* !CONFIG_USE_NEW_RPC */
 	TRY {
 		sync_write(&FORTASK(leader, this_taskgroup).tg_proc_threads_lock);
 	} EXCEPT {

@@ -92,7 +92,7 @@
 /*      RPC_OP_               0x04  * ... */
 #define RPC_OP_sppush_pop     0x05 /* [+0] PUSH_ONTO_USER_STACK(POP()); */
 #define RPC_OP_deref          0x06 /* [+0] TOP = *(uintptr_t *)TOP; */
-#define RPC_OP_write          0x07 /* [+0] addr = POP(); value = POP(); *(uintptr_t *)addr = value; */
+#define RPC_OP_write          0x07 /* [+0] value = POP(); addr = POP(); *(uintptr_t *)addr = value; */
 #define RPC_OP_const1u        0x08 /* [+1] PUSH(*(u8 const *)pc); */
 #define RPC_OP_const1s        0x09 /* [+1] PUSH(*(s8 const *)pc); */
 #define RPC_OP_const2u        0x0a /* [+2] PUSH(*(u16 const *)pc); */
@@ -233,7 +233,7 @@
 #define RPC_OP_sppushregx     0x92 /* [+*] PUSH_ONTO_USER_STACK(CFI_REGISTER(dwarf_decode_uleb128(&pc))); */
 /*      RPC_OP_               0x93  * ... */
 #define RPC_OP_deref_size     0x94 /* [+1] n = *(u8 const *)pc; pc += 1; p = POP(); PUSH(n == 1 ? *(u8 const *)p : n == 2 ? *(u16 const *)p : n == 4 ? *(u32 const *)p : n == 8 ? *(u64 const *)p : UNDEFINED); */
-#define RPC_OP_write_size     0x95 /* [+1] n = *(u8 const *)pc; pc += 1; p = POP(); v = POP(); if (n == 1) *(u8 *)p = v; else if (n == 2) *(u16 *)p = v; else if (n == 4) *(u32 *)p = v; else if (n == 8) *(u64 *)p = v; else UNDEFINED; */
+#define RPC_OP_write_size     0x95 /* [+1] n = *(u8 const *)pc; pc += 1; v = POP(); p = POP(); if (n == 1) *(u8 *)p = v; else if (n == 2) *(u16 *)p = v; else if (n == 4) *(u32 *)p = v; else if (n == 8) *(u64 *)p = v; else UNDEFINED; */
 #define RPC_OP_nop            0x96 /* [+0] Do nothing */
 /*      RPC_OP_               0x96  * ... */
 /*      RPC_OP_               0x97  * ... */
@@ -254,6 +254,7 @@
 #define RPC_OP_sigblock       0xa6 /* [+1] sigset_t s; sigemptyset(&s); sigaddset(&s, *pc++); sigprocmask(SIG_BLOCK, &s, NULL); */
 /*      RPC_OP_               0xa7  * ... */
 #define RPC_OP_nbra           0xa8 /* [+2] off = *(s16 const *)pc; pc += 2; if (POP() == 0) pc += off; */
+#define RPC_OP_futex_wake     0xa9 /* [+0] count = POP(); addr = POP(); futex_wake(addr, count); */
 /*      RPC_OP_               ...   * ... */
 /*      RPC_OP_               0xdf  * ... */
 #define RPC_OP_lo_arch        0xe0 /* First arch-specific opcode */

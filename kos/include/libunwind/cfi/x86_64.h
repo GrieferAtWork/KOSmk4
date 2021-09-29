@@ -100,7 +100,7 @@
 /*      CFI_X86_64_UNWIND_REGISTER_       56 */
 /*      CFI_X86_64_UNWIND_REGISTER_       57 */
 #define CFI_X86_64_UNWIND_REGISTER_FSBASE 58 /* gas knows this as `%fs.base' */
-#define CFI_X86_64_UNWIND_REGISTER_GSBASE 59 /* gas knows this as `%fs.base' */
+#define CFI_X86_64_UNWIND_REGISTER_GSBASE 59 /* gas knows this as `%gs.base' */
 /*      CFI_X86_64_UNWIND_REGISTER_       60 */
 /*      CFI_X86_64_UNWIND_REGISTER_       61 */
 #define CFI_X86_64_UNWIND_REGISTER_TR     62

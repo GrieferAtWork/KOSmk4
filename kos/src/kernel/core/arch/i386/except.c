@@ -631,6 +631,8 @@ halt_unhandled_exception(unsigned int unwind_error,
 #endif /* !CONFIG_HAVE_DEBUGGER */
 }
 
+#ifndef CONFIG_USE_NEW_RPC
+
 PRIVATE NONNULL((1)) unsigned int
 NOTHROW(FCALL unwind_landingpad)(unwind_fde_t *__restrict fde, /* Only non-const for lazy initialized fields! */
                                  struct kcpustate *__restrict state,
@@ -661,6 +663,7 @@ done:
 	}
 	return unwind_error;
 }
+
 
 DEFINE_PUBLIC_ALIAS(error_unwind, libc_error_unwind);
 INTERN NONNULL((1)) struct kcpustate *
@@ -867,8 +870,6 @@ err:
 
 
 
-
-
 DEFINE_PUBLIC_ALIAS(__gcc_personality_v0, __gxx_personality_v0);
 
 /* This  function  is hooked  by CFI  under `struct unwind_fde_struct::f_persofun'
@@ -934,6 +935,7 @@ NOTHROW(KCALL __gxx_personality_v0)(struct unwind_fde_struct *__restrict fde,
 	/* Default behavior: abort exception handling (this function was marked as NOTHROW) */
 	return DWARF_PERSO_ABORT_SEARCH;
 }
+#endif /* !CONFIG_USE_NEW_RPC */
 
 
 

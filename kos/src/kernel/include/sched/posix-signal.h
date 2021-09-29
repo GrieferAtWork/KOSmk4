@@ -37,8 +37,8 @@
 #include <kos/aref.h>
 #include <sys/wait.h>
 
-#include <signal.h>  /* SIG* */
-#include <stdbool.h> /* SIG* */
+#include <signal.h> /* SIG* */
+#include <stdbool.h>
 
 #include <libc/string.h> /* __libc_memset() */
 
@@ -129,7 +129,7 @@ sigmask_kernel_getwr(void) THROWS(E_BADALLOC);
 #if defined(__INTELLISENSE__) || defined(CONFIG_HAVE_USERPROCMASK)
 
 /* Return a pointer to the signal mask of the calling thread. */
-FUNDEF WUNUSED USER CHECKED sigset_t *KCALL sigmask_getrd(void) THROWS(...);
+FUNDEF WUNUSED USER CHECKED sigset_t const *KCALL sigmask_getrd(void) THROWS(E_SEGFAULT);
 
 /* Make sure that `this_sigmask' is allocated, and isn't being shared.
  * Then, always return `PERTASK_GET(this_sigmask)'
@@ -137,11 +137,50 @@ FUNDEF WUNUSED USER CHECKED sigset_t *KCALL sigmask_getrd(void) THROWS(...);
  *       then this function will return the address of the currently-
  *       assigned  user-space signal mask,  rather than its in-kernel
  *       counterpart! */
-FUNDEF WUNUSED USER CHECKED sigset_t *KCALL sigmask_getwr(void) THROWS(E_BADALLOC, ...);
+FUNDEF WUNUSED USER CHECKED sigset_t *KCALL sigmask_getwr(void) THROWS(E_BADALLOC, E_SEGFAULT, ...);
+
 #else /* __INTELLISENSE__ || CONFIG_HAVE_USERPROCMASK */
 #define sigmask_getrd() (&sigmask_kernel_getrd()->sm_mask)
 #define sigmask_getwr() (&sigmask_kernel_getwr()->sm_mask)
 #endif /* !__INTELLISENSE__ && !CONFIG_HAVE_USERPROCMASK */
+
+
+/* Same as `sigmask_ismasked_nospecial()', but also handle VFORK
+ * and USERPROCMASK scenarios. As such, this function may access
+ * user-space memory, which can include VIO memory!
+ * NOTE: If the thread uses USERPROCMASK, this function will
+ *       also  mark  the  given  `signo'  as  pending within
+ *       `this_userprocmask_address->pm_pending' */
+#ifdef CONFIG_HAVE_USERPROCMASK
+FUNDEF ATTR_PURE WUNUSED bool FCALL sigmask_ismasked(signo_t signo) THROWS(E_SEGFAULT);
+#else /* CONFIG_HAVE_USERPROCMASK */
+FUNDEF NOBLOCK ATTR_PURE WUNUSED bool NOTHROW(FCALL sigmask_ismasked)(signo_t signo);
+#endif /* !CONFIG_HAVE_USERPROCMASK */
+
+#ifdef CONFIG_HAVE_USERPROCMASK
+#define SIGMASK_ISMASKED_NOPF_NO  0 /* The signal isn't masked */
+#define SIGMASK_ISMASKED_NOPF_YES 1 /* The signal is masked */
+/* The signal may be masked, or it may not be, however due  to
+ * the target thread running on a different CPU, or using VIO,
+ * a faulty pointer, or memory  currently not loaded into  the
+ * core for the backing memory of its usersigmask, the calling
+ * thread cannot conclusively determine this. */
+#define SIGMASK_ISMASKED_NOPF_FAULT (-2)
+
+/* Non-faulting version of `sigmask_ismasked()'.
+ * @return: * : One of `SIGMASK_ISMASKED_NOPF_*' */
+FUNDEF NOBLOCK ATTR_PURE WUNUSED int
+NOTHROW(FCALL sigmask_ismasked_nopf)(signo_t signo);
+#else /* CONFIG_HAVE_USERPROCMASK */
+#define SIGMASK_ISMASKED_NOPF_NO     false /* The signal isn't masked */
+#define SIGMASK_ISMASKED_NOPF_YES    true  /* The signal is masked */
+#define sigmask_ismasked_nopf(signo) sigmask_ismasked(signo)
+#endif /* !CONFIG_HAVE_USERPROCMASK */
+
+
+
+
+
 
 /* Check for pending signals that are no longer being masked. */
 FUNDEF void FCALL sigmask_check(void) THROWS(E_INTERRUPT, E_WOULDBLOCK);

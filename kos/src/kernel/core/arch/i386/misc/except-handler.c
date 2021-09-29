@@ -17,8 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_CORE_ARCH_I386_SYSCALL_EXCEPT_HANDLER_C
-#define GUARD_KERNEL_CORE_ARCH_I386_SYSCALL_EXCEPT_HANDLER_C 1
+#ifndef GUARD_KERNEL_CORE_ARCH_I386_MISC_EXCEPT_HANDLER_C
+#define GUARD_KERNEL_CORE_ARCH_I386_MISC_EXCEPT_HANDLER_C 1
 #define _KOS_SOURCE 1
 
 #include <kernel/compiler.h>
@@ -65,27 +65,27 @@ DECL_BEGIN
 LOCAL NOBLOCK NONNULL((1, 2, 3)) void
 NOTHROW(FCALL log_userexcept_errno_propagate)(struct icpustate const *__restrict state,
                                               struct rpc_syscall_info const *__restrict sc_info,
-                                              struct exception_data const *__restrict except_data,
+                                              struct exception_data const *__restrict error,
                                               errno_t negative_errno_value) {
 	unsigned int pointer_count = EXCEPTION_DATA_POINTERS;
 	char const *name;
 	(void)state;
 	(void)sc_info;
 	while (pointer_count != 0 &&
-	       except_data->e_args.e_pointers[pointer_count - 1] == 0)
+	       error->e_args.e_pointers[pointer_count - 1] == 0)
 		--pointer_count;
 	printk(KERN_TRACE "[except] Translate exception "
 	                  "%#" PRIxN(__SIZEOF_ERROR_CLASS_T__) ":"
 	                  "%#" PRIxN(__SIZEOF_ERROR_SUBCLASS_T__),
-	       except_data->e_class, except_data->e_subclass);
-	if ((name = error_name(except_data->e_code)) != NULL)
+	       error->e_class, error->e_subclass);
+	if ((name = error_name(error->e_code)) != NULL)
 		printk(KERN_TRACE ",%s", name);
 	if (pointer_count != 0) {
 		unsigned int i;
 		for (i = 0; i < pointer_count; ++i) {
 			printk(KERN_TRACE "%c%#" PRIxPTR,
 			       i == 0 ? '[' : ',',
-			       except_data->e_args.e_pointers[i]);
+			       error->e_args.e_pointers[i]);
 		}
 		printk(KERN_TRACE "]");
 	}
@@ -96,29 +96,27 @@ NOTHROW(FCALL log_userexcept_errno_propagate)(struct icpustate const *__restrict
 LOCAL NOBLOCK NONNULL((1, 2, 3)) void
 NOTHROW(FCALL log_userexcept_error_propagate)(struct icpustate const *__restrict state,
                                               struct rpc_syscall_info const *__restrict sc_info,
-                                              struct exception_data const *__restrict except_data,
-                                              uintptr_t mode,
-                                              USER void *handler,
-                                              USER void *stack) {
+                                              struct exception_data const *__restrict error,
+                                              uintptr_t mode, USER void *handler, USER void *stack) {
 	unsigned int pointer_count = EXCEPTION_DATA_POINTERS;
 	char const *name;
 	(void)state;
 	(void)sc_info;
 	while (pointer_count != 0 &&
-	       except_data->e_args.e_pointers[pointer_count - 1] == 0)
+	       error->e_args.e_pointers[pointer_count - 1] == 0)
 		--pointer_count;
 	printk(KERN_TRACE "[except] Propagate exception "
 	                  "%#" PRIxN(__SIZEOF_ERROR_CLASS_T__) ":"
 	                  "%#" PRIxN(__SIZEOF_ERROR_SUBCLASS_T__),
-	       except_data->e_class, except_data->e_subclass);
-	if ((name = error_name(except_data->e_code)) != NULL)
+	       error->e_class, error->e_subclass);
+	if ((name = error_name(error->e_code)) != NULL)
 		printk(KERN_TRACE ",%s", name);
 	if (pointer_count != 0) {
 		unsigned int i;
 		for (i = 0; i < pointer_count; ++i) {
 			printk(KERN_TRACE "%c%#" PRIxPTR "",
 			       i == 0 ? '[' : ',',
-			       except_data->e_args.e_pointers[i]);
+			       error->e_args.e_pointers[i]);
 		}
 		printk(KERN_TRACE "]");
 	}
@@ -129,35 +127,37 @@ NOTHROW(FCALL log_userexcept_error_propagate)(struct icpustate const *__restrict
 	       handler, stack,
 	       icpustate_getpc(state),
 	       icpustate_getusersp(state),
-	       except_data->e_faultaddr, mode);
+	       error->e_faultaddr, mode);
 }
 
 
 
-/* Try to invoke the user-space exception handler for  the
- * currently set exception, as described by `error_info()'
+/* Arch-specific function:
+ * Try to invoke the user-space exception handler for `error'
+ * WARNING: Because this function writes to the user-space stack,
+ *          it  is  capable of  throwing an  `E_SEGFAULT' itself.
  * @param: state:   The user-space CPU state (note that `icpustate_isuser(state)' is assumed!)
  * @param: sc_info: When  non-NULL, information about  the system call  that caused the exception.
  *                  Otherwise, if this argument is `NULL', the exception was caused by user-space,
  *                  such as a user-space program causing an `E_SEGFAULT', as opposed to the kernel
  *                  throwing an `E_FSERROR_FILE_NOT_FOUND'
- *            HINT: Additional information about how the system call was invoked can be extracted
- *                  from      `sc_info->rsi_flags'!      (s.a.      `<librpc/bits/rpc-common.h>')
+ *            HINT: Additional information about how the system call was invoked can be
+ *                  extracted from `sc_info->rsi_flags' (s.a. `<kos/asm/rpc-method.h>')
  * @return: NULL:   User-space does not define an exception handler.
  * @return: * :     The updated interrupt CPU state, modified to invoke the
  *                  user-space exception handler once user-space  execution
  *                  resumes. */
 #ifdef __x86_64__
 PUBLIC WUNUSED NONNULL((1, 3)) struct icpustate *FCALL
-x86_userexcept_callhandler(struct icpustate *__restrict state,
-                           struct rpc_syscall_info const *sc_info,
-                           struct exception_data const *__restrict except_data)
+userexcept_callhandler(struct icpustate *__restrict state,
+                       struct rpc_syscall_info const *sc_info,
+                       struct exception_data const *__restrict error)
 		THROWS(E_SEGFAULT) {
 	struct icpustate *result;
 	if (icpustate_is64bit(state)) {
-		result = x86_userexcept_callhandler64(state, sc_info, except_data);
+		result = x86_userexcept_callhandler64(state, sc_info, error);
 	} else {
-		result = x86_userexcept_callhandler32(state, sc_info, except_data);
+		result = x86_userexcept_callhandler32(state, sc_info, error);
 	}
 	return result;
 }
@@ -165,7 +165,7 @@ x86_userexcept_callhandler(struct icpustate *__restrict state,
 PUBLIC WUNUSED NONNULL((1, 3)) struct icpustate *FCALL
 x86_userexcept_callhandler64(struct icpustate *__restrict state,
                              struct rpc_syscall_info const *sc_info,
-                             struct exception_data const *__restrict except_data)
+                             struct exception_data const *__restrict error)
 		THROWS(E_SEGFAULT) {
 	/* Call a 64-bit exception handler. */
 	uintptr_t mode;
@@ -195,15 +195,15 @@ x86_userexcept_callhandler64(struct icpustate *__restrict state,
 	/* Fill in user-space context information */
 	icpustate_user_to_kcpustate64(state, user_state);
 	/* Copy exception data onto the user-space stack. */
-	user_error->e_code = (__error_code64_t)except_data->e_code;
+	user_error->e_code = (__error_code64_t)error->e_code;
 	for (i = 0; i < EXCEPTION_DATA_POINTERS; ++i)
-		user_error->e_args.e_pointers[i] = (u64)except_data->e_args.e_pointers[i];
+		user_error->e_args.e_pointers[i] = (u64)error->e_args.e_pointers[i];
 	/* In case of  a system call,  set the  fault
 	 * address as the system call return address. */
 	user_error->e_faultaddr = sc_info != NULL
 	                          ? (__HYBRID_PTR64(void))(u64)(uintptr_t)icpustate_getusersp(state)
-	                          : (__HYBRID_PTR64(void))(u64)(uintptr_t)except_data->e_faultaddr;
-	log_userexcept_error_propagate(state, sc_info, except_data, mode, (void *)handler, user_error);
+	                          : (__HYBRID_PTR64(void))(u64)(uintptr_t)error->e_faultaddr;
+	log_userexcept_error_propagate(state, sc_info, error, mode, (void *)handler, user_error);
 	/* Redirect the given CPU state to return to the user-space handler. */
 	gpregs_setpdi(&state->ics_gpregs, (uintptr_t)user_state); /* struct kcpustate64 *__restrict state */
 	gpregs_setpsi(&state->ics_gpregs, (uintptr_t)user_error); /* struct __exception_data64 *__restrict error */
@@ -228,13 +228,13 @@ x86_userexcept_callhandler64(struct icpustate *__restrict state,
 PUBLIC WUNUSED NONNULL((1, 3)) struct icpustate *FCALL
 x86_userexcept_callhandler32(struct icpustate *__restrict state,
                              struct rpc_syscall_info const *sc_info,
-                             struct exception_data const *__restrict except_data)
+                             struct exception_data const *__restrict error)
 		THROWS(E_SEGFAULT)
 #else /* __x86_64__ */
 PUBLIC WUNUSED NONNULL((1, 3)) struct icpustate *FCALL
-x86_userexcept_callhandler(struct icpustate *__restrict state,
-                           struct rpc_syscall_info const *sc_info,
-                           struct exception_data const *__restrict except_data)
+userexcept_callhandler(struct icpustate *__restrict state,
+                       struct rpc_syscall_info const *sc_info,
+                       struct exception_data const *__restrict error)
 		THROWS(E_SEGFAULT)
 #endif /* !__x86_64__ */
 {
@@ -267,19 +267,19 @@ x86_userexcept_callhandler(struct icpustate *__restrict state,
 #ifdef __x86_64__
 	/* Propagate class & sub-class individually, since the way in
 	 * which they form e_code is  different in x32 and x64  mode. */
-	user_error->e_class    = (__error_class32_t)except_data->e_class;
-	user_error->e_subclass = (__error_subclass32_t)except_data->e_subclass;
+	user_error->e_class    = (__error_class32_t)error->e_class;
+	user_error->e_subclass = (__error_subclass32_t)error->e_subclass;
 #else /* __x86_64__ */
-	user_error->e_code = (__error_code32_t)except_data->e_code;
+	user_error->e_code = (__error_code32_t)error->e_code;
 #endif /* !__x86_64__ */
 	for (i = 0; i < EXCEPTION_DATA_POINTERS; ++i)
-		user_error->e_args.e_pointers[i] = (u32)except_data->e_args.e_pointers[i];
+		user_error->e_args.e_pointers[i] = (u32)error->e_args.e_pointers[i];
 	/* In case of  a system call,  set the  fault
 	 * address as the system call return address. */
 	user_error->e_faultaddr = sc_info != NULL
 	                          ? (__HYBRID_PTR32(void))(u32)(uintptr_t)icpustate_getusersp(state)
-	                          : (__HYBRID_PTR32(void))(u32)(uintptr_t)except_data->e_faultaddr;
-	log_userexcept_error_propagate(state, sc_info, except_data, mode, (void *)handler, user_error);
+	                          : (__HYBRID_PTR32(void))(u32)(uintptr_t)error->e_faultaddr;
+	log_userexcept_error_propagate(state, sc_info, error, mode, (void *)handler, user_error);
 	/* Redirect the given CPU state to return to the user-space handler. */
 	gpregs_setpcx(&state->ics_gpregs, (uintptr_t)user_state); /* struct kcpustate32 *__restrict state */
 	gpregs_setpdx(&state->ics_gpregs, (uintptr_t)user_error); /* struct __exception_data32 *__restrict error */
@@ -302,6 +302,88 @@ x86_userexcept_callhandler(struct icpustate *__restrict state,
 }
 
 
+
+/* Set the appropriate error flag for the system call method described by `sc_info' (if any)
+ * We (no longer) have a dedicated system error-flag. */
+LOCAL NOBLOCK NONNULL((1, 2, 3)) struct icpustate *
+NOTHROW(FCALL x86_userexcept_set_error_flag)(struct icpustate *__restrict state,
+                                             struct rpc_syscall_info const *__restrict sc_info,
+                                             struct exception_data const *__restrict data) {
+	(void)sc_info;
+	(void)data;
+	/* We (no longer) have a dedicated system error-flag. */
+	return state;
+}
+
+
+/* Arch-specific function:
+ * Translate the current exception into an errno and set that errno
+ * as the return value of  the system call described by  `sc_info'. */
+#ifdef __x86_64__
+PUBLIC NOBLOCK WUNUSED NONNULL((1, 2, 3)) struct icpustate *
+NOTHROW(FCALL userexcept_seterrno)(struct icpustate *__restrict state,
+                                   struct rpc_syscall_info const *__restrict sc_info,
+                                   struct exception_data const *__restrict data) {
+	struct icpustate *result;
+	if (icpustate_is64bit(state)) {
+		result = x86_userexcept_seterrno64(state, sc_info, data);
+	} else {
+		result = x86_userexcept_seterrno32(state, sc_info, data);
+	}
+	return result;
+}
+
+PUBLIC NOBLOCK WUNUSED NONNULL((1, 2, 3)) struct icpustate *
+NOTHROW(FCALL x86_userexcept_seterrno64)(struct icpustate *__restrict state,
+                                         struct rpc_syscall_info const *__restrict sc_info,
+                                         struct exception_data const *__restrict data) {
+	errno_t errval;
+	(void)sc_info;
+	errval = -error_as_errno(data);
+	log_userexcept_errno_propagate(state, sc_info, data, errval);
+	gpregs_setpax(&state->ics_gpregs, (uintptr_t)(intptr_t)errval);
+	/* Check if the system call is double-wide so we
+	 * can  sign-extend the error code if necessary. */
+	if (kernel_syscall64_doublewide(sc_info->rsi_sysno))
+		gpregs_setpdx(&state->ics_gpregs, (uintptr_t)-1); /* sign-extend */
+	/* Set an error flag (if any) */
+	state = x86_userexcept_set_error_flag(state, sc_info, data);
+	return state;
+}
+
+PUBLIC NOBLOCK WUNUSED NONNULL((1, 2, 3)) struct icpustate *
+NOTHROW(FCALL x86_userexcept_seterrno32)(struct icpustate *__restrict state,
+                                         struct rpc_syscall_info const *__restrict sc_info,
+                                         struct exception_data const *__restrict data)
+#else /* __x86_64__ */
+PUBLIC NOBLOCK WUNUSED NONNULL((1, 2, 3)) struct icpustate *
+NOTHROW(FCALL userexcept_seterrno)(struct icpustate *__restrict state,
+                                   struct rpc_syscall_info const *__restrict sc_info,
+                                   struct exception_data const *__restrict data)
+#endif /* !__x86_64__ */
+{
+	errno_t errval;
+	errval = -error_as_errno(data);
+	log_userexcept_errno_propagate(state, sc_info, data, errval);
+
+	/* All system call  methods return error  values through  EAX.
+	 * If  this were ever to change (such that certain methods use
+	 * different registers/locations), that special behavior would
+	 * have to be implemented right here. */
+	gpregs_setpax(&state->ics_gpregs, errval);
+
+	/* Check if the system call is double-wide so we
+	 * can  sign-extend the error code if necessary. */
+	if (kernel_syscall32_doublewide(sc_info->rsi_sysno))
+		gpregs_setpdx(&state->ics_gpregs, (uintptr_t)-1); /* sign-extend */
+
+	/* Set an error flag (if any) */
+	state = x86_userexcept_set_error_flag(state, sc_info, data);
+	return state;
+}
+
+
+#ifndef CONFIG_USE_NEW_RPC
 LOCAL ATTR_NORETURN void
 NOTHROW(FCALL process_exit)(int reason) {
 	if (!task_isprocessleader()) {
@@ -336,11 +418,11 @@ done:
 }
 
 LOCAL ATTR_NORETURN NONNULL((1)) void
-NOTHROW(FCALL process_exit_for_exception_after_coredump)(struct exception_data const *__restrict except_data) {
+NOTHROW(FCALL process_exit_for_exception_after_coredump)(struct exception_data const *__restrict error) {
 	siginfo_t si;
 	/* Try to translate the current exception  into a signal, so that  we
 	 * can use that signal code as reason for why the process has exited. */
-	if (!error_as_signal(except_data, &si))
+	if (!error_as_signal(error, &si))
 		si.si_signo = SIGILL;
 	process_exit(W_EXITCODE(1, si.si_signo) | WCOREFLAG);
 }
@@ -354,13 +436,12 @@ NOTHROW(FCALL process_exit_for_exception_after_coredump)(struct exception_data c
  *                  such as a user-space program causing an `E_SEGFAULT', as opposed to the kernel
  *                  throwing an `E_FSERROR_FILE_NOT_FOUND'
  *            HINT: Additional information about how the system call was invoked can be extracted
- *                  from      `sc_info->rsi_flags'!      (s.a.      `<librpc/bits/rpc-common.h>')
+ *                  from      `sc_info->rsi_flags'!      (s.a.      `<kos/asm/rpc-method.h>')
  * @param: siginfo: The signal that is being raised
  * @param: except_info: When non-NULL, `siginfo' was generated through `error_as_signal(&except_info->ei_data)',
  *                  and  if a coredump ends up being generated  as a result of the signal being
  *                  raised, that coredump will include information about `error_info()', rather
  *                  than the given `siginfo'
- * @return: NULL:   User-space does not define an signal handler.
  * @return: * :     The updated interrupt CPU state, modified to invoke the
  *                  user-space signal  handler  once  user-space  execution
  *                  resumes. */
@@ -403,7 +484,7 @@ again_gethand:
 			goto again_gethand;
 #endif
 		if (sc_info && except_info)
-			state = x86_userexcept_seterrno(state, sc_info, &except_info->ei_data);
+			state = userexcept_seterrno(state, sc_info, &except_info->ei_data);
 		return state;
 
 	case KERNEL_SIG_CORE:
@@ -498,83 +579,6 @@ x86_userexcept_raisesignal_from_exception(struct icpustate *__restrict state,
 }
 
 
-/* Set the appropriate error flag for the system call method described by `sc_info' (if any)
- * We (no longer) have a dedicated system error-flag. */
-LOCAL NOBLOCK NONNULL((1, 2, 3)) struct icpustate *
-NOTHROW(FCALL x86_userexcept_set_error_flag)(struct icpustate *__restrict state,
-                                             struct rpc_syscall_info const *__restrict sc_info,
-                                             struct exception_data const *__restrict data) {
-	(void)sc_info;
-	(void)data;
-	/* We (no longer) have a dedicated system error-flag. */
-	return state;
-}
-
-
-/* Translate the current exception into an errno and set that errno
- * as the return value of  the system call described by  `sc_info'. */
-#ifdef __x86_64__
-PUBLIC WUNUSED NONNULL((1, 2, 3)) struct icpustate *
-NOTHROW(FCALL x86_userexcept_seterrno)(struct icpustate *__restrict state,
-                                       struct rpc_syscall_info const *__restrict sc_info,
-                                       struct exception_data const *__restrict data) {
-	struct icpustate *result;
-	if (icpustate_is64bit(state)) {
-		result = x86_userexcept_seterrno64(state, sc_info, data);
-	} else {
-		result = x86_userexcept_seterrno32(state, sc_info, data);
-	}
-	return result;
-}
-
-PUBLIC WUNUSED NONNULL((1, 2, 3)) struct icpustate *
-NOTHROW(FCALL x86_userexcept_seterrno64)(struct icpustate *__restrict state,
-                                         struct rpc_syscall_info const *__restrict sc_info,
-                                         struct exception_data const *__restrict data) {
-	errno_t errval;
-	(void)sc_info;
-	errval = -error_as_errno(data);
-	log_userexcept_errno_propagate(state, sc_info, data, errval);
-	gpregs_setpax(&state->ics_gpregs, (uintptr_t)(intptr_t)errval);
-	/* Check if the system call is double-wide so we
-	 * can  sign-extend the error code if necessary. */
-	if (kernel_syscall64_doublewide(sc_info->rsi_sysno))
-		gpregs_setpdx(&state->ics_gpregs, (uintptr_t)-1); /* sign-extend */
-	/* Set an error flag (if any) */
-	state = x86_userexcept_set_error_flag(state, sc_info, data);
-	return state;
-}
-
-PUBLIC WUNUSED NONNULL((1, 2, 3)) struct icpustate *
-NOTHROW(FCALL x86_userexcept_seterrno32)(struct icpustate *__restrict state,
-                                         struct rpc_syscall_info const *__restrict sc_info,
-                                         struct exception_data const *__restrict data)
-#else /* __x86_64__ */
-PUBLIC WUNUSED NONNULL((1, 2, 3)) struct icpustate *
-NOTHROW(FCALL x86_userexcept_seterrno)(struct icpustate *__restrict state,
-                                       struct rpc_syscall_info const *__restrict sc_info,
-                                       struct exception_data const *__restrict data)
-#endif /* !__x86_64__ */
-{
-	errno_t errval;
-	errval = -error_as_errno(data);
-	log_userexcept_errno_propagate(state, sc_info, data, errval);
-
-	/* All system call  methods return error  values through  EAX.
-	 * If  this were ever to change (such that certain methods use
-	 * different registers/locations), that special behavior would
-	 * have to be implemented right here. */
-	gpregs_setpax(&state->ics_gpregs, errval);
-
-	/* Check if the system call is double-wide so we
-	 * can  sign-extend the error code if necessary. */
-	if (kernel_syscall32_doublewide(sc_info->rsi_sysno))
-		gpregs_setpdx(&state->ics_gpregs, (uintptr_t)-1); /* sign-extend */
-
-	/* Set an error flag (if any) */
-	state = x86_userexcept_set_error_flag(state, sc_info, data);
-	return state;
-}
 
 
 /* Propagate the currently  thrown exception  into user-space, using  either the  user-space
@@ -646,7 +650,7 @@ again:
 				/* Propagate the exception to user-space if handlers are enabled. */
 				if ((PERTASK_GET(this_user_except_handler.ueh_mode) &
 				     EXCEPT_HANDLER_MODE_MASK) != EXCEPT_HANDLER_MODE_DISABLED) {
-					result = x86_userexcept_callhandler(state, sc_info, &info.ei_data);
+					result = userexcept_callhandler(state, sc_info, &info.ei_data);
 					if likely(result)
 						goto done;
 				}
@@ -658,14 +662,14 @@ again:
 				goto terminate_app;
 			}
 			/* Translate the current exception into an errno. */
-			result = x86_userexcept_seterrno(state, sc_info, &info.ei_data);
+			result = userexcept_seterrno(state, sc_info, &info.ei_data);
 			goto done;
 		}
 
 		/* Check if signal exceptions should be propagated in non-syscall scenarios. */
 		if ((PERTASK_GET(this_user_except_handler.ueh_mode) &
 		     EXCEPT_HANDLER_MODE_MASK) == EXCEPT_HANDLER_MODE_SIGHAND) {
-			result = x86_userexcept_callhandler(state, sc_info, &info.ei_data);
+			result = userexcept_callhandler(state, sc_info, &info.ei_data);
 			if likely(result)
 				goto done;
 		}
@@ -882,10 +886,10 @@ NOTHROW(FCALL x86_userexcept_unwind_i)(struct icpustate *__restrict state,
 	 * at this point no kernel exception remains set! */
 	cpu_apply_icpustate(state);
 }
-
+#endif /* !CONFIG_USE_NEW_RPC */
 
 
 
 DECL_END
 
-#endif /* !GUARD_KERNEL_CORE_ARCH_I386_SYSCALL_EXCEPT_HANDLER_C */
+#endif /* !GUARD_KERNEL_CORE_ARCH_I386_MISC_EXCEPT_HANDLER_C */

@@ -21,30 +21,33 @@
 #define GUARD_KERNEL_INCLUDE_I386_KOS_SCHED_ARCH_EXCEPT_HANDLER_H 1
 
 #include <kernel/compiler.h>
+
+#ifndef CONFIG_USE_NEW_RPC
 #include <kernel/types.h>
 #include <hybrid/host.h>
 
 #ifdef __CC__
 DECL_BEGIN
 
-/* Try to invoke the user-space exception handler for `except_data'
+/* Arch-specific function:
+ * Try to invoke the user-space exception handler for `except_data'
  * WARNING: Because this function writes to the user-space stack,
- *          it  is  capable  of  throwing  an  E_SEGFAULT itself.
+ *          it  is  capable of  throwing an  `E_SEGFAULT' itself.
  * @param: state:   The user-space CPU state (note that `icpustate_isuser(state)' is assumed!)
  * @param: sc_info: When  non-NULL, information about  the system call  that caused the exception.
  *                  Otherwise, if this argument is `NULL', the exception was caused by user-space,
  *                  such as a user-space program causing an `E_SEGFAULT', as opposed to the kernel
  *                  throwing an `E_FSERROR_FILE_NOT_FOUND'
- *            HINT: Additional information about how the system call was invoked can be extracted
- *                  from      `sc_info->rsi_flags'      (s.a.       `<librpc/bits/rpc-common.h>')
+ *            HINT: Additional information about how the system call was invoked can be
+ *                  extracted from `sc_info->rsi_flags' (s.a. `<kos/asm/rpc-method.h>')
  * @return: NULL:   User-space does not define an exception handler.
  * @return: * :     The updated interrupt CPU state, modified to invoke the
  *                  user-space exception handler once user-space  execution
  *                  resumes. */
 FUNDEF WUNUSED NONNULL((1, 3)) struct icpustate *FCALL
-x86_userexcept_callhandler(struct icpustate *__restrict state,
-                           struct rpc_syscall_info const *sc_info,
-                           struct exception_data const *__restrict except_data)
+userexcept_callhandler(struct icpustate *__restrict state,
+                       struct rpc_syscall_info const *sc_info,
+                       struct exception_data const *__restrict except_data)
 		THROWS(E_SEGFAULT);
 
 #ifdef __x86_64__
@@ -61,7 +64,7 @@ x86_userexcept_callhandler64(struct icpustate *__restrict state,
                              struct exception_data const *__restrict except_data)
 		THROWS(E_SEGFAULT);
 #else /* __x86_64__ */
-#define x86_userexcept_callhandler32 x86_userexcept_callhandler
+#define x86_userexcept_callhandler32 userexcept_callhandler
 #endif /* !__x86_64__ */
 
 
@@ -72,13 +75,12 @@ x86_userexcept_callhandler64(struct icpustate *__restrict state,
  *                  such as a user-space program causing an `E_SEGFAULT', as opposed to the kernel
  *                  throwing an `E_FSERROR_FILE_NOT_FOUND'
  *            HINT: Additional information about how the system call was invoked can be extracted
- *                  from      `sc_info->rsi_flags'!      (s.a.      `<librpc/bits/rpc-common.h>')
+ *                  from      `sc_info->rsi_flags'!      (s.a.      `<kos/asm/rpc-method.h>')
  * @param: siginfo: The signal that is being raised
  * @param: except_info: When non-NULL, `siginfo' was generated through `error_as_signal(&except_info->ei_data)',
  *                  and  if a coredump ends up being generated  as a result of the signal being
  *                  raised, that coredump will include information about `error_info()', rather
  *                  than the given `siginfo'
- * @return: NULL:   User-space does not define an signal handler.
  * @return: * :     The updated interrupt CPU state, modified to invoke the
  *                  user-space signal  handler  once  user-space  execution
  *                  resumes. */
@@ -100,26 +102,27 @@ x86_userexcept_raisesignal_from_exception(struct icpustate *__restrict state,
                                           struct rpc_syscall_info const *sc_info,
                                           struct exception_info const *__restrict except_info);
 
-/* Translate the current exception into an errno and set that errno
+/* Arch-specific function:
+ * Translate the current exception into an errno and set that errno
  * as the return value of  the system call described by  `sc_info'. */
-FUNDEF WUNUSED NONNULL((1, 2, 3)) struct icpustate *
-NOTHROW(FCALL x86_userexcept_seterrno)(struct icpustate *__restrict state,
-                                       struct rpc_syscall_info const *__restrict sc_info,
-                                       struct exception_data const *__restrict except_data);
+FUNDEF NOBLOCK WUNUSED NONNULL((1, 2, 3)) struct icpustate *
+NOTHROW(FCALL userexcept_seterrno)(struct icpustate *__restrict state,
+                                   struct rpc_syscall_info const *__restrict sc_info,
+                                   struct exception_data const *__restrict except_data);
 
 #ifdef __x86_64__
 /* Dedicated  functions  which  may  be  used  if  the  caller already
  * knows the result of `icpustate_is32bit(state)' and related helpers. */
-FUNDEF WUNUSED NONNULL((1, 2, 3)) struct icpustate *
+FUNDEF NOBLOCK WUNUSED NONNULL((1, 2, 3)) struct icpustate *
 NOTHROW(FCALL x86_userexcept_seterrno32)(struct icpustate *__restrict state,
                                          struct rpc_syscall_info const *__restrict sc_info,
                                          struct exception_data const *__restrict except_data);
-FUNDEF WUNUSED NONNULL((1, 2, 3)) struct icpustate *
+FUNDEF NOBLOCK WUNUSED NONNULL((1, 2, 3)) struct icpustate *
 NOTHROW(FCALL x86_userexcept_seterrno64)(struct icpustate *__restrict state,
                                          struct rpc_syscall_info const *__restrict sc_info,
                                          struct exception_data const *__restrict except_data);
 #else /* __x86_64__ */
-#define x86_userexcept_seterrno32 x86_userexcept_seterrno
+#define x86_userexcept_seterrno32 userexcept_seterrno
 #endif /* !__x86_64__ */
 
 
@@ -183,5 +186,6 @@ FUNDEF ATTR_NORETURN void NOTHROW(ASMCALL x86_userexcept_unwind_interrupt_kernel
 
 DECL_END
 #endif /* __CC__ */
+#endif /* !CONFIG_USE_NEW_RPC */
 
 #endif /* !GUARD_KERNEL_INCLUDE_I386_KOS_SCHED_ARCH_EXCEPT_HANDLER_H */

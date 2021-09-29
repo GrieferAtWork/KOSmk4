@@ -11,10 +11,10 @@
 		- `RPC_REASONCTX_INTERRUPT`  (Interrupt was unwound)
 		- `RPC_REASONCTX_SYSCALL`    (Syscall was unwound)
 		- `RPC_REASONCTX_SHUTDOWN`   (Thread is exiting)
-	- `RPC_SYNCMODE_F_SYSRET`: The RPC must be served **after** an associated interrupt/syscall has been completed without errors (s.a. ``)
-	
+	- `RPC_SYNCMODE_F_SYSRET`: The RPC must be served **after** an associated interrupt/syscall has been completed without errors (s.a. [`handle_sysret_rpc()`](#handle_sysret_rpc))
+
 - User-RPC-specific flags:
-	- 
+	- TODO
 
 
 
@@ -46,7 +46,7 @@ DATDEF ATTR_PERTASK struct pending_rpc_slist this_rpcs;
 
 Finally, there exists a flag `TASK_FRPC` that is set when `this_rpcs` (may) contains RPCs that require the attention of the thread in question. Note that this flag is cleared by the thread itself, but may be set by anyone on the entire system. Also note that the thread may clear `TASK_FRPC`, but then end up keeping certain RPCs within the `this_rpcs` (for a period of time). This is intentional and the situations when (and why) this is done should become obvious as you continue reading this file.
 
-#### RPC Basics
+### RPC Basics
 
 On the kernel-level, 2 kinds of RPCs exist: synchronous RPCs, and asynchronous RPCs. The later only exists when using the flags `RPC_CONTEXT_KERN | RPC_SYNCMODE_F_ALLOW_ASYNC`, which causes the given RPC function to be called as the first thing to do once the target thread gets another quantum.
 
@@ -134,13 +134,12 @@ handle_pending:
 			restore_plast  = &rpc->pr_link.sle_next;
 			if (!(rpc->pr_flags & _RPC_CONTEXT_INACTIVE)) {
 				if (!(rpc->pr_flags & RPC_CONTEXT_KERN)) {
-					unsigned int status;
 					/* NOTE: `sigmask_ismasked_chk_nopf()' returns one of:
-					 *  - SIGMASK_ISMASKED_CHK_NOPF_YES:   Signal is masked
-					 *  - SIGMASK_ISMASKED_CHK_NOPF_NO:    Signal isn't masked
-					 *  - SIGMASK_ISMASKED_CHK_NOPF_FAULT: Unable to access userprocmask */
-					status = sigmask_ismasked_chk_nopf(_RPC_GETSIGNO(rpc->pr_flags));
-					if (status == SIGMASK_ISMASKED_CHK_NOPF_YES)
+					 *  - SIGMASK_ISMASKED_NOPF_YES:   Signal is masked
+					 *  - SIGMASK_ISMASKED_NOPF_NO:    Signal isn't masked
+					 *  - SIGMASK_ISMASKED_NOPF_FAULT: Unable to access userprocmask */
+					int status = sigmask_ismasked_nopf(_RPC_GETSIGNO(rpc->pr_flags));
+					if (status == SIGMASK_ISMASKED_NOPF_YES)
 						continue; /* Signal is known to be masked! (so skip) */
 				}
 
@@ -226,6 +225,8 @@ again:
 		/* Notice that _everything_ below is _just_ there to handle exceptions! */
 	} EXCEPT {
 		struct exception_info *tls = error_info();
+		if (!icpustate_isuser(state))
+			RETHROW();
 		if (tls->ei_code != ERROR_CODEOF(E_INTERRUPT_USER_RPC)) {
 			memcpy(&error, &tls, sizeof(error));
 			goto handle_rpc;
@@ -243,8 +244,6 @@ handle_rpc:
 	}
 	ATOMIC_AND(PERTASK(this_task.t_flags), ~TASK_FRPC);
 	pending.slh_first = SLIST_ATOMIC_CLEAR(&PERTASK(this_rpcs));
-	if unlikely(!pending.slh_first)
-		goto again;
 	restore_plast = SLIST_PFIRST(&restore);
 	SLIST_INIT(&kernel_rpcs);
 handle_pending:
@@ -480,7 +479,7 @@ make_inactive:
 	 *
 	 * Once the interrupt/syscall completes as normal, all of them will
 	 * be re-enabled once again. */
-	if (!SLIST_FIRST(&restore)) {
+	if (SLIST_EMPTY(&restore)) {
 		/* Nothing to restore. -  Just restart the system  call
 		 * without any post-system-all-completion RPC handling. */
 		state = ctx.rc_state;
@@ -501,6 +500,7 @@ make_inactive:
 }
 ```
 
+<a name="handle_sysret_rpc"></a>
 The referenced `handle_sysret_rpc()` function looks very similar and is implemented as follows:
 
 ```c
@@ -544,7 +544,7 @@ sysret_handle_pending:
 				unsigned int user_rpc_reason;
 				bool is_masked;
 				TRY {
-					is_masked = sigmask_ismasked_chk(_RPC_GETSIGNO(rpc->pr_flags));
+					is_masked = sigmask_ismasked(_RPC_GETSIGNO(rpc->pr_flags));
 				} EXCEPT {
 					/* Prioritize errors. */
 					struct exception_info *tls = error_info();
@@ -634,7 +634,7 @@ sysret_make_inactive:
 	/* Check if we must throw a new exception. */
 	if (sysret_error.ei_code != ERROR_CODEOF(E_OK)) {
 		memcpy(error_info(), &sysret_error, sizeof(sysret_error));
-		/* Most likely, this will unwind into user-space! */
+		/* This will unwind into user-space! */
 		_Unwind_Resume(ctx.rc_state);
 	}
 
@@ -689,6 +689,8 @@ bool NOTHROW(task_rpc_schedule)(struct task *__restrict thread,
 	 * that low-level function `userexcept_sysret_inject_safe()', which does
 	 * the same thing, but also works then the thread hosted by another CPU. */
 	userexcept_sysret_inject_safe(thread);
+
+	return true;
 }
 ```
 
@@ -705,14 +707,22 @@ bool NOTHROW(task_rpc_schedule)(struct task *__restrict thread,
 These functions are referenced by above (near-pseudo) code:
 
 ```c
-void NOTHROW(restore_pending_rpcs)(struct pending_rpc *list) {
-	struct pending_rpc *last;
-	if (!list)
-		return;
-	last = list;
-	while (SLIST_NEXT(last, pr_link))
-		last = SLIST_NEXT(last, pr_link);
-	SLIST_ATOMIC_INSERT_R(&PERTASK(this_rpcs), list, last, pr_link);
+void NOTHROW(restore_pending_rpcs)(struct pending_rpc *restore) {
+	if (restore) {
+		struct pending_rpc_slist *list;
+		struct pending_rpc *last;
+		list = &PERTASK(this_rpcs);
+again:
+		last = ATOMIC_READ(list->slh_first);
+		if (!last) {
+			if (!ATOMIC_CMPXCH_WEAK(list->slh_first, NULL, restore))
+				goto again;
+		} else {
+			while (SLIST_NEXT(last, pr_link))
+				last = SLIST_NEXT(last, pr_link);
+			last->pr_link.sle_next = restore;
+		}
+	}
 }
 ```
 

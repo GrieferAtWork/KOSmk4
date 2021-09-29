@@ -138,7 +138,7 @@ sighand_raise_signal(struct icpustate *__restrict state,
 		must_restore_sigmask = memcmp(&old_sigmask, sigmask,
 		                              sizeof(sigset_t)) != 0;
 	} else {
-		USER CHECKED sigset_t *sigmask;
+		USER CHECKED sigset_t const *sigmask;
 		sigmask = sigmask_getrd();
 		memcpy(&old_sigmask, sigmask, sizeof(sigset_t));
 	}

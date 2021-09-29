@@ -187,7 +187,6 @@ DEFINE_PUBLIC_WEAK_ALIAS(__cxa_rethrow, libc_error_rethrow)
  *       equivalent to `throw except'.
  *       However, since kernel exception handling is rather simplistic, we can
  *       simply handle it the same way we handle rethrow! */
-#if 1
 .section .text
 PUBLIC_FUNCTION(_Unwind_Resume)
 	.cfi_startproc
@@ -196,9 +195,6 @@ PUBLIC_FUNCTION(_Unwind_Resume)
 	goto_Ldo_unwind_rsp
 	.cfi_endproc
 END(_Unwind_Resume)
-#else
-DEFINE_PUBLIC_ALIAS(_Unwind_Resume, error_rethrow)
-#endif
 
 #else /* __KERNEL__ */
 

@@ -30,6 +30,9 @@
 
 #include <kos/rpc.h>
 
+#define rpc_entry     pending_rpc      /* !DEPRECATED! */
+#define task_free_rpc pending_rpc_free /* !DEPRECATED! */
+
 #ifdef __CC__
 DECL_BEGIN
 
@@ -56,8 +59,10 @@ struct pending_rpc {
 };
 
 /* Alloc/free functions used for `struct pending_rpc' */
-#define pending_rpc_alloc(size, gfp)    kmalloc(size, gfp)
-#define pending_rpc_alloc_nx(size, gfp) kmalloc_nx(size, gfp)
+#define pending_rpc_alloc(size, gfp)    ((struct pending_rpc *)kmalloc(size, gfp))
+#define pending_rpc_alloc_nx(size, gfp) ((struct pending_rpc *)kmalloc_nx(size, gfp))
+#define pending_rpc_alloc_kern(gfp)     pending_rpc_alloc(COMPILER_OFFSETAFTER(struct pending_rpc, pr_kern), gfp)
+#define pending_rpc_alloc_kern_nx(gfp)  pending_rpc_alloc_nx(COMPILER_OFFSETAFTER(struct pending_rpc, pr_kern), gfp)
 #define pending_rpc_free(self)          kfree(self)
 
 SLIST_HEAD(pending_rpc_slist, pending_rpc);
@@ -105,6 +110,13 @@ FUNDEF NOBLOCK NOPREEMPT ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) struct scpustat
 NOTHROW(FCALL task_asyncrpc_push)(struct scpustate *__restrict state,
                                   prpc_exec_callback_t func,
                                   void *cookie DFL(__NULLPTR));
+
+/* Execute a user-space RPC program
+ * @param: reason:  One of `_RPC_REASONCTX_ASYNC', `_RPC_REASONCTX_SYNC' or `_RPC_REASONCTX_SYSCALL'
+ * @param: sc_info: [valid_if(reason == _RPC_REASONCTX_SYSCALL)] System call information. */
+FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) rpc_cpustate_t *FCALL
+task_userrpc_runprogram(rpc_cpustate_t *__restrict state, struct pending_user_rpc const *__restrict rpc,
+                        unsigned int reason, struct rpc_syscall_info const *sc_info);
 
 
 

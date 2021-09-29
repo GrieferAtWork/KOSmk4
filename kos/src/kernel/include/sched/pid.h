@@ -186,8 +186,13 @@ struct taskgroup {
 	                                                      *   - Any kernel thread is always its own process. */
 	/* All of the following fields are only valid when `tg_process == THIS_TASK' (Otherwise, they are all `[0..1][const]') */
 	union {
+#ifdef CONFIG_USE_NEW_RPC
+		struct pending_rpc      *tg_thread_exit;         /* [valid_if(tg_process != THIS_TASK)][lock(PRIVATE(tg_process), CLEAR_ONCE)][0..1][owned]
+		                                                  * A pre-allocated RPC used by the process leader to propagate its exit status to this thread. */
+#else /* CONFIG_USE_NEW_RPC */
 		struct rpc_entry        *tg_thread_exit;         /* [valid_if(tg_process != THIS_TASK)][lock(PRIVATE(tg_process), CLEAR_ONCE)][0..1][owned]
 		                                                  * A pre-allocated RPC used by the process leader to propagate its exit status to this thread. */
+#endif /* !CONFIG_USE_NEW_RPC */
 		struct atomic_rwlock     tg_proc_threads_lock;   /* [valid_if(tg_process == THIS_TASK)] Lock for `tg_proc_threads' */
 	};
 	union {
