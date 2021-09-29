@@ -877,12 +877,26 @@
 /************************************************************************/
 /* RTL Thread/Process exit (E_EXIT_THREAD, E_EXIT_PROCESS)              */
 /************************************************************************/
+/*[[[end]]]*/
+
+/* The following are not ~real~ exception codes, but are used by internal kernel logic.
+ * Throwing them in userspace doesn't have any affects (they behave just like  throwing
+ * any  other exception). Throwing them in kernel-space  works as intended, in that the
+ * `_E_STOP_PROCESS' will cause the process to stop execution until receiving SIG_CONT,
+ * and  the `SIG_CORE' exception to trigger a coredump. Handling of this is done at the
+ * same time as the E_EXIT_* exceptions, that is just before returning to user-space.
+ *
+ * Used in: `/kos/src/kernel/core/misc/except-handler-userexcept.c.inl' */
+#define _E_STOP_PROCESS (0xfe7f) /* [fld(procstat: uintptr_t, "Process status")] Marker for: `SIG_STOP' */
+#define _E_CORE_PROCESS (0xfe82) /* [fld(procstat: uintptr_t, si_errno: int, si_code: int)] Marker for: `SIG_CORE' */
+
+/*[[[begin]]]*/
 #ifndef E_EXIT_THREAD
-#define E_EXIT_THREAD                             (0xfe00) /* [fld(exit_code: uintptr_t, "The thread exit status")]
+#define E_EXIT_THREAD                             (0xfe40) /* [fld(exit_code: uintptr_t, "The thread exit status")]
                                                             * The thread is supposed to terminate */
 #endif /* !E_EXIT_THREAD */
 #ifndef E_EXIT_PROCESS
-#define E_EXIT_PROCESS                            (0xfe01) /* [fld(exit_code: uintptr_t, "The process exit status")]
+#define E_EXIT_PROCESS                            (0xfe81) /* [fld(exit_code: uintptr_t, "The process exit status")]
                                                             * The entire process is supposed to terminate */
 #endif /* !E_EXIT_PROCESS */
 

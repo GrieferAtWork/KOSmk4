@@ -79,7 +79,7 @@
 
 DECL_BEGIN
 
-/* An empty signal mask used to initialize `this_sigmask' */
+/* An empty signal mask used to initialize `this_kernel_sigmask' */
 PUBLIC struct kernel_sigmask kernel_sigmask_empty = {
 	/* .sm_refcnt = */ 2,
 	/* .sm_share  = */ 2,
@@ -183,14 +183,18 @@ print("#endif /" "* ... *" "/");
 
 
 /* [0..1][lock(READ(ATOMIC), WRITE(THIS_TASK))]
- * Reference to the signal mask (set of signals being blocked) in the current thread. */
+ * Reference to the signal mask (set of signals being blocked) in the  current
+ * thread. The pointed-to object is meaningless (but must still be valid) when
+ * the associated thread make use of userprocmask.
+ *
+ * NOTE: Only ever NULL for kernel-space threads! */
 PUBLIC ATTR_PERTASK struct kernel_sigmask_arref
-this_sigmask = ARREF_INIT(&kernel_sigmask_empty);
+this_kernel_sigmask = ARREF_INIT(&kernel_sigmask_empty);
 
 
 #ifdef CONFIG_HAVE_USERPROCMASK
 PRIVATE ATTR_PURE WUNUSED bool FCALL
-usersigmask_ismasked_chk(signo_t signo) {
+usersigmask_ismasked_chk(signo_t signo) THROWS(E_SEGFAULT) {
 	ulongptr_t mask, word;
 	USER CHECKED struct userprocmask *umask;
 	USER UNCHECKED sigset_t *usigset;
@@ -398,19 +402,25 @@ done:
 #endif /* CONFIG_HAVE_USERPROCMASK */
 
 
-/* Check if the given `signo' is currently masked by `self'.
+/* Helper  function that can  be used to determine  the masking status for
+ * an arbitrary signal within an  arbitrary thread. Not that  userprocmask
+ * signals  can _ONLY_  be determined (at  all) when `self'  is running on
+ * the same CPU as the calling thread. If this is not the case, and `self'
+ * uses the  userprocmask mechanism,  then SIGMASK_ISMASKED_NOPF_FAULT  is
+ * _always_ returned.
  * @param: allow_blocking_and_exception_when_self_is_THIS_TASK:
  *              Like the argument name says: When self == THIS_TASK,
  *              and this argument is true, then this call is allowed
  *              to block, as well as throw exceptions.
  * @return: * : One of `SIGMASK_ISMASKED_*' (see above) */
 #ifdef CONFIG_HAVE_USERPROCMASK
-PRIVATE NOBLOCK_IF(!allow_blocking_and_exception_when_self_is_THIS_TASK || self != THIS_TASK)
+PUBLIC NOBLOCK_IF(!allow_blocking_and_exception_when_self_is_THIS_TASK || self != THIS_TASK)
 ATTR_PURE WUNUSED NONNULL((1)) int FCALL
 sigmask_ismasked_in(struct task *__restrict self, signo_t signo,
                     bool allow_blocking_and_exception_when_self_is_THIS_TASK)
+		THROWS(E_SEGFAULT)
 #else /* CONFIG_HAVE_USERPROCMASK */
-PRIVATE NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) int
+PUBLIC NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) int
 NOTHROW(FCALL sigmask_ismasked_in)(struct task *__restrict self, signo_t signo)
 #define sigmask_ismasked_in(self, signo, x) sigmask_ismasked_in(self, signo)
 #endif /* !CONFIG_HAVE_USERPROCMASK */
@@ -529,7 +539,7 @@ NOTHROW(FCALL sigmask_ismasked_in)(struct task *__restrict self, signo_t signo)
 		return result;
 #endif /* CONFIG_HAVE_USERPROCMASK */
 	}
-	sm     = arref_get(&FORTASK(self, this_sigmask));
+	sm     = arref_get(&FORTASK(self, this_kernel_sigmask));
 	result = (int)!!sigismember(&sm->sm_mask, signo);
 	decref_unlikely(sm);
 	if (result != SIGMASK_ISMASKED_NOPF_NO &&
@@ -551,12 +561,10 @@ NOTHROW(FCALL sigmask_ismasked_nospecial)(signo_t signo) {
 	return result;
 }
 
-/* Same as `sigmask_ismasked_nospecial()', but also handle VFORK
- * and USERPROCMASK scenarios. As such, this function may access
- * user-space memory, which can include VIO memory!
- * NOTE: If the thread uses USERPROCMASK, this function will
- *       also  mark  the  given  `signo'  as  pending within
- *       `this_userprocmask_address->pm_pending' */
+/* Check if a given `signo' is currently masked. This function
+ * handles all of the special cases, including TASK_VFORK  and
+ * TASK_USERPROCMASK, as well as making sure that SIGSTOP  and
+ * SIGKILL are never considered to be masked. */
 #ifdef CONFIG_HAVE_USERPROCMASK
 PUBLIC ATTR_PURE WUNUSED bool FCALL
 sigmask_ismasked(signo_t signo) THROWS(E_SEGFAULT)
@@ -688,8 +696,8 @@ clone_posix_signals(struct task *__restrict new_thread, uintptr_t flags) {
 inherit_parent_userprocmask:
 			FORTASK(new_thread, this_userprocmask_address) = um;
 			new_thread->t_flags |= TASK_FUSERPROCMASK;
-			/* The static initialization for the kernel-space `this_sigmask' is sufficient in this case! */
-			/*FORTASK(new_thread, this_sigmask) = ARREF_INIT(&kernel_sigmask_empty);*/
+			/* The static initialization for the kernel-space `this_kernel_sigmask' is sufficient in this case! */
+			/*FORTASK(new_thread, this_kernel_sigmask) = ARREF_INIT(&kernel_sigmask_empty);*/
 		} else if (flags & CLONE_VFORK) {
 			/* Special case:
 			 * ```
@@ -711,7 +719,7 @@ inherit_parent_userprocmask:
 			 *  thread, while the child thread will start with TASK_FUSERPROCMASK=0.
 			 * ```
 			 *
-			 * In other words: We must copy `um->pm_sigmask' into `FORTASK(new_thread, this_sigmask)'
+			 * In other words: We must copy `um->pm_sigmask' into `FORTASK(new_thread, this_kernel_sigmask)'
 			 */
 			struct kernel_sigmask *new_thread_mask;
 			new_thread_mask = (struct kernel_sigmask *)kmalloc(sizeof(struct kernel_sigmask),
@@ -731,7 +739,7 @@ inherit_parent_userprocmask:
 			new_thread_mask->sm_share  = 1;
 			/* Initialize the new  thread's signal mask  with
 			 * the copy of the parent's current userprocmask. */
-			arref_init(&FORTASK(new_thread, this_sigmask), new_thread_mask);
+			arref_init(&FORTASK(new_thread, this_kernel_sigmask), new_thread_mask);
 		}
 	} else
 #endif /* CONFIG_HAVE_USERPROCMASK */
@@ -741,12 +749,12 @@ inherit_parent_userprocmask:
 		} else {
 			REF struct kernel_sigmask *mask;
 			struct kernel_sigmask_arref *maskref;
-			maskref = &PERTASK(this_sigmask);
+			maskref = &PERTASK(this_kernel_sigmask);
 			mask    = arref_get(maskref);
 			assert(mask != &kernel_sigmask_empty);
 			ATOMIC_INC(mask->sm_share);
 			COMPILER_WRITE_BARRIER();
-			arref_init(&FORTASK(new_thread, this_sigmask), mask); /* Inherit reference. */
+			arref_init(&FORTASK(new_thread, this_kernel_sigmask), mask); /* Inherit reference. */
 			COMPILER_WRITE_BARRIER();
 		}
 	}
@@ -818,7 +826,7 @@ DEFINE_PERTASK_FINI(fini_posix_signals);
 PRIVATE NOBLOCK ATTR_USED void
 NOTHROW(KCALL fini_posix_signals)(struct task *__restrict thread) {
 	struct kernel_sigmask *mask;
-	mask = arref_ptr(&FORTASK(thread, this_sigmask));
+	mask = arref_ptr(&FORTASK(thread, this_kernel_sigmask));
 	if (mask != &kernel_sigmask_empty)
 		decref(mask);
 	xdecref(FORTASK(thread, this_sighand_ptr));
@@ -840,8 +848,8 @@ sigmask_getrd(void) THROWS(E_SEGFAULT) {
 }
 #endif /* CONFIG_HAVE_USERPROCMASK */
 
-/* Make sure that `this_sigmask' is allocated, and isn't being shared.
- * Then, always return `PERTASK_GET(this_sigmask)' */
+/* Make sure that `this_kernel_sigmask' is allocated, and isn't being
+ * shared.  Then,  always  return  `PERTASK_GET(this_kernel_sigmask)' */
 PUBLIC ATTR_RETNONNULL WUNUSED struct kernel_sigmask *KCALL
 sigmask_kernel_getwr(void) THROWS(E_BADALLOC) {
 	struct kernel_sigmask *mymask;
@@ -856,7 +864,7 @@ sigmask_kernel_getwr(void) THROWS(E_BADALLOC) {
 		copy->sm_refcnt = 1;
 		copy->sm_share  = 1;
 
-		maskref = &PERTASK(this_sigmask);
+		maskref = &PERTASK(this_kernel_sigmask);
 		mymask  = arref_xch_inherit(maskref, copy);
 		if (mymask != &kernel_sigmask_empty) {
 			ATOMIC_DEC(mymask->sm_share);
@@ -869,8 +877,8 @@ sigmask_kernel_getwr(void) THROWS(E_BADALLOC) {
 }
 
 #ifdef CONFIG_HAVE_USERPROCMASK
-/* Make sure that `this_sigmask' is allocated, and isn't being shared.
- * Then, always return `PERTASK_GET(this_sigmask)'
+/* Make sure that `this_kernel_sigmask' is allocated, and isn't being shared.
+ * Then, always return `PERTASK_GET(this_kernel_sigmask)'
  * NOTE: When  calling thread has  the `TASK_FUSERPROCMASK' flag set,
  *       then this function will return the address of the currently-
  *       assigned  user-space signal mask,  rather than its in-kernel
@@ -1140,6 +1148,44 @@ NOTHROW(KCALL sighand_default_action)(signo_t signo) {
 }
 
 
+
+/* Reset  the current handler for `signo' when  `current_action' matches the currently set action.
+ * This function should be called by kernel-space signal delivery implementations to implement the
+ * behavior of `SIGACTION_SA_RESETHAND' when handling a signal.
+ * @return: true:  Successfully reset the handler
+ * @return: false: The given `current_action' didn't match the currently set action. */
+PUBLIC bool KCALL
+sighand_reset_handler(signo_t signo,
+                      struct kernel_sigaction const *__restrict current_action)
+		THROWS(E_WOULDBLOCK, E_BADALLOC) {
+	struct sighand *hand;
+	assert(signo != 0);
+	assert(signo < NSIG);
+	if unlikely(!THIS_SIGHAND_PTR)
+		return false;
+	hand = sighand_ptr_lockwrite();
+	if (memcmp(current_action,
+	           &hand->sh_actions[signo - 1],
+	           sizeof(struct kernel_sigaction)) != 0) {
+		sync_endwrite(hand);
+		return false;
+	}
+	/* Reset the action. */
+	memset(&hand->sh_actions[signo - 1], 0,
+	       sizeof(struct kernel_sigaction));
+	sync_endwrite(hand);
+	/* Drop the reference held by the `sh_actions' vector.
+	 * Note however that since the caller must have copied that action at one point,
+	 * they  must currently  be holding a  reference to its  `sa_mask', meaning that
+	 * decref-ing that field mustn't be able to destroy the mask object! */
+	xdecref_nokill(current_action->sa_mask);
+	return true;
+}
+
+
+
+
+#ifndef CONFIG_USE_NEW_RPC
 /* Suspend execution of the calling thread by setting `TASK_FSUSPENDED',
  * and keep  the  thread  suspended until  `task_sigcont()'  is  called.
  * This is used to implement SIGSTOP/SIGCONT behavior.
@@ -1198,41 +1244,6 @@ NOTHROW(KCALL task_sigcont)(struct task *__restrict thread) {
 
 
 
-/* Reset  the current handler for `signo' when  `current_action' matches the currently set action.
- * This function should be called by kernel-space signal delivery implementations to implement the
- * behavior of `SIGACTION_SA_RESETHAND' when handling a signal.
- * @return: true:  Successfully reset the handler
- * @return: false: The given `current_action' didn't match the currently set action. */
-PUBLIC bool KCALL
-sighand_reset_handler(signo_t signo,
-                      struct kernel_sigaction const *__restrict current_action)
-		THROWS(E_WOULDBLOCK, E_BADALLOC) {
-	struct sighand *hand;
-	assert(signo != 0);
-	assert(signo < NSIG);
-	if unlikely(!THIS_SIGHAND_PTR)
-		return false;
-	hand = sighand_ptr_lockwrite();
-	if (memcmp(current_action,
-	           &hand->sh_actions[signo - 1],
-	           sizeof(struct kernel_sigaction)) != 0) {
-		sync_endwrite(hand);
-		return false;
-	}
-	/* Reset the action. */
-	memset(&hand->sh_actions[signo - 1], 0,
-	       sizeof(struct kernel_sigaction));
-	sync_endwrite(hand);
-	/* Drop the reference held by the `sh_actions' vector.
-	 * Note however that since the caller must have copied that action at one point,
-	 * they  must currently  be holding a  reference to its  `sa_mask', meaning that
-	 * decref-ing that field mustn't be able to destroy the mask object! */
-	xdecref_nokill(current_action->sa_mask);
-	return true;
-}
-
-
-
 PRIVATE struct icpustate *FCALL
 set_syscall_return(struct icpustate *__restrict state, syscall_ulong_t value) {
 #ifdef __x86_64__
@@ -1244,8 +1255,6 @@ set_syscall_return(struct icpustate *__restrict state, syscall_ulong_t value) {
 #endif
 	return state;
 }
-
-
 
 PRIVATE struct icpustate *FCALL
 task_sigmask_check_rpc_handler(void *UNUSED(arg),
@@ -1803,6 +1812,9 @@ no_perthread_pending:
 	sync_endread(&prqueue->psq_lock);
 }
 
+
+
+
 /* Same as `sigmask_check()', but should be called in order to have
  * user-space handle the currently set  exception in case a  signal
  * handler has to be invoked.
@@ -1970,6 +1982,7 @@ again_scan_prqueue:
 	return state;
 }
 
+#endif /* !CONFIG_USE_NEW_RPC */
 
 
 

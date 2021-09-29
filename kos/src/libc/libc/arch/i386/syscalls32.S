@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x64de3cea */
+/* HASH CRC-32:0xa3713831 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1144,7 +1144,7 @@ DEFINE_PUBLIC_ALIAS(sys_fsync, libc_sys_fsync)
 /* Restore the specified register state when returning from a signal handler
  * Note that the order and locations of arguments taken by this system  call
  * are of great importance, as they must match what is encoded by the kernel
- * within `sighand_raise_signal()'
+ * within `userexcept_callsignal()'
  * The order chosen is also important, as it is selected such that arguments
  * are  only  passed   through  registers  that   are  preserved  by   CDECL */
 /* void sigreturn(struct fpustate32 const *restore_fpu, syscall_ulong_t unused1, syscall_ulong_t unused2, struct __sigset_struct const *restore_sigmask, struct rpc_syscall_info32 const *sc_info, struct ucpustate32 const *restore_cpu) */
@@ -1600,7 +1600,7 @@ DEFINE_PUBLIC_ALIAS(sys_prctl, libc_sys_prctl)
 /* Restore the specified register state when returning from a signal handler
  * Note that the order and locations of arguments taken by this system  call
  * are of great importance, as they must match what is encoded by the kernel
- * within `sighand_raise_signal()'
+ * within `userexcept_callsignal()'
  * The order chosen is also important, as it is selected such that arguments
  * are  only  passed   through  registers  that   are  preserved  by   CDECL */
 /* void rt_sigreturn(struct fpustate32 const *restore_fpu, syscall_ulong_t unused1, syscall_ulong_t unused2, struct __sigset_struct const *restore_sigmask, struct rpc_syscall_info32 const *sc_info, struct ucpustate32 const *restore_cpu) */

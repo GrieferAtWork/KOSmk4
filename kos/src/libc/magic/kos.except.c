@@ -1063,8 +1063,10 @@ char const *error_name(error_code_t code) {
 	"XT_CTTY_DIFFERS\0\1\1\1\1\1\1\1\1\1\1\1E_BUFFER_TOO_SMALL\0\1E_UNICODE_ERROR\0\1";
 	static char const e_linear_f000h_f001h[] =
 	"E_INTERRUPT\0E_INTERRUPT_USER_RPC\0\1__E_RETRY_RWLOCK\0\1";
-	static char const e_linear_fe00h_fe01h[] =
-	"E_EXIT_THREAD\0\1E_EXIT_PROCESS\0\1";
+	static char const e_linear_fe40h_fe40h[] =
+	"E_EXIT_THREAD\0\1";
+	static char const e_linear_fe81h_fe81h[] =
+	"E_EXIT_PROCESS\0\1";
 	static char const e_linear_feffh_ff07h[] =
 	"E_UNHANDLED_INTERRUPT\0\1\1E_SEGFAULT\0E_SEGFAULT_UNMAPPED\0E_SEGFAUL"
 	"T_READONLY\0E_SEGFAULT_NOTREADABLE\0E_SEGFAULT_NOTEXECUTABLE\0E_SEG"
@@ -1086,9 +1088,12 @@ char const *error_name(error_code_t code) {
 	} else if (err_class >= 0xf000 && err_class <= 0xf001) {
 		result = e_linear_f000h_f001h;
 		class_offset = err_class - 0xf000;
-	} else if (err_class >= 0xfe00 && err_class <= 0xfe01) {
-		result = e_linear_fe00h_fe01h;
-		class_offset = err_class - 0xfe00;
+	} else if (err_class >= 0xfe40 && err_class <= 0xfe40) {
+		result = e_linear_fe40h_fe40h;
+		class_offset = err_class - 0xfe40;
+	} else if (err_class >= 0xfe81 && err_class <= 0xfe81) {
+		result = e_linear_fe81h_fe81h;
+		class_offset = err_class - 0xfe81;
 	} else if (err_class >= 0xfeff && err_class <= 0xff07) {
 		result = e_linear_feffh_ff07h;
 		class_offset = err_class - 0xfeff;
@@ -1187,8 +1192,10 @@ non_linear_prefix:
 	"XT_CTTY_DIFFERS\0\1\1\1\1\1\1\1\1\1\1\1E_BUFFER_TOO_SMALL\0\1E_UNICODE_ERROR\0\1";
 	static char const e_linear_f000h_f001h[] =
 	"E_INTERRUPT\0E_INTERRUPT_USER_RPC\0\1__E_RETRY_RWLOCK\0\1";
-	static char const e_linear_fe00h_fe01h[] =
-	"E_EXIT_THREAD\0\1E_EXIT_PROCESS\0\1";
+	static char const e_linear_fe40h_fe40h[] =
+	"E_EXIT_THREAD\0\1";
+	static char const e_linear_fe81h_fe81h[] =
+	"E_EXIT_PROCESS\0\1";
 	static char const e_linear_feffh_ff0eh[] =
 	"E_UNHANDLED_INTERRUPT\0\1E_DIVIDE_BY_ZERO\0\1\1\1E_BREAKPOINT\0\1E_OVERF"
 	"LOW\0\1E_INDEX_ERROR\0E_INDEX_ERROR_OUT_OF_BOUNDS\0\1\1\1E_STACK_OVERFL"
@@ -1207,9 +1214,12 @@ non_linear_prefix:
 	} else if (err_class >= 0xf000 && err_class <= 0xf001) {
 		result = e_linear_f000h_f001h;
 		class_offset = err_class - 0xf000;
-	} else if (err_class >= 0xfe00 && err_class <= 0xfe01) {
-		result = e_linear_fe00h_fe01h;
-		class_offset = err_class - 0xfe00;
+	} else if (err_class >= 0xfe40 && err_class <= 0xfe40) {
+		result = e_linear_fe40h_fe40h;
+		class_offset = err_class - 0xfe40;
+	} else if (err_class >= 0xfe81 && err_class <= 0xfe81) {
+		result = e_linear_fe81h_fe81h;
+		class_offset = err_class - 0xfe81;
 	} else if (err_class >= 0xfeff && err_class <= 0xff0e) {
 		result = e_linear_feffh_ff0eh;
 		class_offset = err_class - 0xfeff;

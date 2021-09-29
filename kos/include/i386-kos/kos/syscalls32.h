@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x73536358 */
+/* HASH CRC-32:0x1c4955aa */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1845,7 +1845,7 @@ __CDECLARE_SC(,__errno_t,rt_sigqueueinfo,(__pid_t __pid, __signo_t __usigno, str
 /* Restore the specified register state when returning from a signal handler
  * Note that the order and locations of arguments taken by this system  call
  * are of great importance, as they must match what is encoded by the kernel
- * within `sighand_raise_signal()'
+ * within `userexcept_callsignal()'
  * The order chosen is also important, as it is selected such that arguments
  * are  only  passed   through  registers  that   are  preserved  by   CDECL */
 __CDECLARE_VOID_SC(,rt_sigreturn,(struct fpustate32 const *__restore_fpu, __syscall_ulong_t __unused1, __syscall_ulong_t __unused2, struct __sigset_struct const *__restore_sigmask, struct rpc_syscall_info32 const *__sc_info, struct ucpustate32 const *__restore_cpu),(__restore_fpu,__unused1,__unused2,__restore_sigmask,__sc_info,__restore_cpu))
@@ -2305,7 +2305,7 @@ __CDECLARE_SC(,__errno_t,sigprocmask,(__syscall_ulong_t __how, struct __sigset_s
 /* Restore the specified register state when returning from a signal handler
  * Note that the order and locations of arguments taken by this system  call
  * are of great importance, as they must match what is encoded by the kernel
- * within `sighand_raise_signal()'
+ * within `userexcept_callsignal()'
  * The order chosen is also important, as it is selected such that arguments
  * are  only  passed   through  registers  that   are  preserved  by   CDECL */
 __CDECLARE_VOID_SC(,sigreturn,(struct fpustate32 const *__restore_fpu, __syscall_ulong_t __unused1, __syscall_ulong_t __unused2, struct __sigset_struct const *__restore_sigmask, struct rpc_syscall_info32 const *__sc_info, struct ucpustate32 const *__restore_cpu),(__restore_fpu,__unused1,__unused2,__restore_sigmask,__sc_info,__restore_cpu))

@@ -309,6 +309,9 @@
  * throw an exception and is therefor safe to invoke from `task_serve_nx()' */
 #define RPC_CONTEXT_NOEXCEPT  0x00040000
 
+/* Flag for use WITHOUT `RPC_CONTEXT_KERN': the associated item is a posix signal. */
+#define RPC_CONTEXT_SIGNAL    0x00040000
+
 /* Internally used: RPC is currently inactive. */
 #define _RPC_CONTEXT_INACTIVE 0x00020000
 #endif /* __KERNEL__ */

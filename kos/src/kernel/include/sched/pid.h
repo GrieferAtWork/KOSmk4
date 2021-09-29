@@ -121,6 +121,31 @@ DATDEF ATTR_PERTASK struct taskpid *this_taskpid;
 
 
 /* For `posix-signal' */
+#ifdef CONFIG_USE_NEW_RPC
+struct pending_rpc; /* Define in `rpc-internal.h' */
+#ifndef __pending_rpc_slist_defined
+#define __pending_rpc_slist_defined
+SLIST_HEAD(pending_rpc_slist, pending_rpc);
+#endif /* !__pending_rpc_slist_defined */
+
+struct process_pending_rpcs {
+	struct atomic_rwlock     ppr_lock; /* Lock for `ppr_list'. */
+	struct pending_rpc_slist ppr_list; /* [0..n][lock(ppr_lock)]  List  of pending  RPCs  directed at
+	                                    * the process as a whole. When set to `THIS_RPCS_TERMINATED',
+	                                    * the process is considered  as terminated and no  additional
+	                                    * RPCs can be enqueued.
+	                                    * NOTE: User-RPCs must not have the `RPC_SYNCMODE_F_REQUIRE_SC'
+	                                    *       or `RPC_SYNCMODE_F_REQUIRE_CP'  flag set.  If they  do,
+	                                    *       an internal assertion check will trigger. */
+};
+
+FUNDEF NOBLOCK NONNULL((1)) void
+NOTHROW(KCALL process_pending_rpcs_fini)(struct process_pending_rpcs *__restrict self);
+
+/* Pending RPCs for the calling process. */
+#define THIS_PROCESS_RPCS \
+	FORTASK(task_getprocess(), this_taskgroup.tg_proc_rpcs)
+#else /* CONFIG_USE_NEW_RPC */
 struct sigqueue_entry;
 struct sigqueue {
 	/* Descriptor for pending signals (always per-thread or per-process).
@@ -152,6 +177,7 @@ DATDEF ATTR_PERTASK struct sigqueue this_sigqueue;
  * Pending signals for the calling process. */
 #define THIS_PROCESS_SIGQUEUE \
 	FORTASK(task_getprocess(), this_taskgroup.tg_proc_signals)
+#endif /* !CONFIG_USE_NEW_RPC */
 
 struct ttybase_device;
 struct rpc_entry;
@@ -235,7 +261,11 @@ struct taskgroup {
 	                                                      *           taskpid_gettask(tg_proc_group) != NULL)]
 	                                                      * Chain of sibling processes within the same process group.
 	                                                      * The base of this chain is `taskpid_gettask(tg_proc_group)->tg_pgrp_processes' */
+#ifdef CONFIG_USE_NEW_RPC
+	struct process_pending_rpcs  tg_proc_rpcs;           /* Pending RPCs of this process as a whole. */
+#else /* CONFIG_USE_NEW_RPC */
 	struct process_sigqueue      tg_proc_signals;        /* Pending signals that are being delivered to this process. */
+#endif /* !CONFIG_USE_NEW_RPC */
 	/* All of the following fields are only valid when `tg_proc_group == THIS_TASKPID' (Otherwise, they are all `[0..1][const]') */
 	struct atomic_rwlock         tg_pgrp_processes_lock; /* Lock for `tg_pgrp_processes' */
 	struct task_list             tg_pgrp_processes;      /* [0..1] Chain of processes within this  process group (excluding the calling  process)

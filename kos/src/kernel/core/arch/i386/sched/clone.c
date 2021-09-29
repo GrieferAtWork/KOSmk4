@@ -397,7 +397,7 @@ again_lock_mman:
 		if (clone_flags & CLONE_VFORK) {
 			REF struct kernel_sigmask *old_sigmask;
 			struct kernel_sigmask_arref *maskref;
-			maskref = &PERTASK(this_sigmask);
+			maskref = &PERTASK(this_kernel_sigmask);
 
 #ifdef CONFIG_HAVE_USERPROCMASK
 			/* Special case for when the parent thread was using USERPROCMASK.

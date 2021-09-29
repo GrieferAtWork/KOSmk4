@@ -42,6 +42,14 @@
 
 #include <libc/string.h> /* __libc_memset() */
 
+#ifdef CONFIG_USE_NEW_RPC
+#include <kernel/rt/except-handler.h> /* userexcept_sysret_inject_self() */
+#include <sched/rpc.h>                /* task_serve() */
+
+#define sigmask_check()                             task_serve()                    /* !DEPREACTED! */
+#define sigmask_check_after_syscall(syscall_result) userexcept_sysret_inject_self() /* !DEPREACTED! */
+#endif /* CONFIG_USE_NEW_RPC */
+
 DECL_BEGIN
 
 #ifndef NSIG
@@ -92,6 +100,20 @@ typedef void (*user_sighandler_func_t)(signo_t signo);
 typedef void (*user_sigaction_func_t)(signo_t signo, siginfo_t *info, struct ucontext *ctx);
 typedef void (*user_sigrestore_func_t)(void);
 
+
+
+
+
+
+
+
+
+
+
+
+/************************************************************************/
+/* SIGNAL MASK                                                          */
+/************************************************************************/
 struct kernel_sigmask {
 	WEAK refcnt_t sm_refcnt;  /* Signal mask reference counter. */
 	WEAK refcnt_t sm_share;   /* [<= sm_refcnt] Signal mask share counter.
@@ -101,7 +123,7 @@ struct kernel_sigmask {
 
 DEFINE_REFCOUNT_FUNCTIONS(struct kernel_sigmask, sm_refcnt, kfree)
 
-/* An empty signal mask used to initialize `this_sigmask' */
+/* An empty signal mask used to initialize `this_kernel_sigmask' */
 DATDEF struct kernel_sigmask kernel_sigmask_empty;
 
 /* A full signal mask (i.e. one that blocks all signals (except for SIGKILL and SIGSTOP)) */
@@ -113,49 +135,48 @@ ARREF(kernel_sigmask_arref, kernel_sigmask);
 #endif /* !__kernel_sigmask_arref_defined */
 
 /* [0..1][lock(READ(ATOMIC), WRITE(THIS_TASK))]
- * Reference to the signal mask (set of signals being blocked) in the current thread.
+ * Reference to the signal mask (set of signals being blocked) in the  current
+ * thread. The pointed-to object is meaningless (but must still be valid) when
+ * the associated thread make use of userprocmask.
  * NOTE: Only ever NULL for kernel-space threads! */
-DATDEF ATTR_PERTASK struct kernel_sigmask_arref this_sigmask;
+DATDEF ATTR_PERTASK struct kernel_sigmask_arref this_kernel_sigmask;
 
 /* Return a pointer to the kernel signal mask of the calling thread. */
-#define sigmask_kernel_getrd() PERTASK_GET(this_sigmask.arr_obj)
+#define sigmask_kernel_getrd() PERTASK_GET(this_kernel_sigmask.arr_obj)
 
-/* Make sure that `this_sigmask' is allocated, and isn't being shared.
- * Then, always return `PERTASK_GET(this_sigmask)' */
+/* Make sure that `this_kernel_sigmask' is allocated, and isn't being
+ * shared.  Then,  always  return  `PERTASK_GET(this_kernel_sigmask)' */
 FUNDEF ATTR_RETNONNULL WUNUSED struct kernel_sigmask *KCALL
 sigmask_kernel_getwr(void) THROWS(E_BADALLOC);
 
 
-#if defined(__INTELLISENSE__) || defined(CONFIG_HAVE_USERPROCMASK)
-
+#ifdef CONFIG_HAVE_USERPROCMASK
 /* Return a pointer to the signal mask of the calling thread. */
 FUNDEF WUNUSED USER CHECKED sigset_t const *KCALL sigmask_getrd(void) THROWS(E_SEGFAULT);
 
-/* Make sure that `this_sigmask' is allocated, and isn't being shared.
- * Then, always return `PERTASK_GET(this_sigmask)'
+/* Make sure that `this_kernel_sigmask' is allocated, and isn't being shared.
+ * Then, always return `PERTASK_GET(this_kernel_sigmask)'
  * NOTE: When  calling thread has  the `TASK_FUSERPROCMASK' flag set,
  *       then this function will return the address of the currently-
  *       assigned  user-space signal mask,  rather than its in-kernel
  *       counterpart! */
 FUNDEF WUNUSED USER CHECKED sigset_t *KCALL sigmask_getwr(void) THROWS(E_BADALLOC, E_SEGFAULT, ...);
-
-#else /* __INTELLISENSE__ || CONFIG_HAVE_USERPROCMASK */
+#else /* CONFIG_HAVE_USERPROCMASK */
 #define sigmask_getrd() (&sigmask_kernel_getrd()->sm_mask)
 #define sigmask_getwr() (&sigmask_kernel_getwr()->sm_mask)
-#endif /* !__INTELLISENSE__ && !CONFIG_HAVE_USERPROCMASK */
+#endif /* !CONFIG_HAVE_USERPROCMASK */
 
 
-/* Same as `sigmask_ismasked_nospecial()', but also handle VFORK
- * and USERPROCMASK scenarios. As such, this function may access
- * user-space memory, which can include VIO memory!
- * NOTE: If the thread uses USERPROCMASK, this function will
- *       also  mark  the  given  `signo'  as  pending within
- *       `this_userprocmask_address->pm_pending' */
+/* Check if a given `signo' is currently masked. This function
+ * handles all of the special cases, including TASK_VFORK  and
+ * TASK_USERPROCMASK, as well as making sure that SIGSTOP  and
+ * SIGKILL are never considered to be masked. */
 #ifdef CONFIG_HAVE_USERPROCMASK
 FUNDEF ATTR_PURE WUNUSED bool FCALL sigmask_ismasked(signo_t signo) THROWS(E_SEGFAULT);
 #else /* CONFIG_HAVE_USERPROCMASK */
 FUNDEF NOBLOCK ATTR_PURE WUNUSED bool NOTHROW(FCALL sigmask_ismasked)(signo_t signo);
 #endif /* !CONFIG_HAVE_USERPROCMASK */
+
 
 #ifdef CONFIG_HAVE_USERPROCMASK
 #define SIGMASK_ISMASKED_NOPF_NO  0 /* The signal isn't masked */
@@ -176,75 +197,45 @@ NOTHROW(FCALL sigmask_ismasked_nopf)(signo_t signo);
 #define SIGMASK_ISMASKED_NOPF_YES    true  /* The signal is masked */
 #define sigmask_ismasked_nopf(signo) sigmask_ismasked(signo)
 #endif /* !CONFIG_HAVE_USERPROCMASK */
+/************************************************************************/
+
+/* Helper  function that can  be used to determine  the masking status for
+ * an arbitrary signal within an  arbitrary thread. Not that  userprocmask
+ * signals  can _ONLY_  be determined (at  all) when `self'  is running on
+ * the same CPU as the calling thread. If this is not the case, and `self'
+ * uses the  userprocmask mechanism,  then SIGMASK_ISMASKED_NOPF_FAULT  is
+ * _always_ returned.
+ * @param: allow_blocking_and_exception_when_self_is_THIS_TASK:
+ *              Like the argument name says: When self == THIS_TASK,
+ *              and this argument is true, then this call is allowed
+ *              to block, as well as throw exceptions.
+ * @return: * : One of `SIGMASK_ISMASKED_*' (see above) */
+#ifdef CONFIG_HAVE_USERPROCMASK
+FUNDEF NOBLOCK_IF(!allow_blocking_and_exception_when_self_is_THIS_TASK || self != THIS_TASK)
+ATTR_PURE WUNUSED NONNULL((1)) int FCALL
+sigmask_ismasked_in(struct task *__restrict self, signo_t signo,
+                    bool allow_blocking_and_exception_when_self_is_THIS_TASK __DFL(false))
+		THROWS(E_SEGFAULT); /* Is NOTHROW when `allow_blocking_and_exception_when_self_is_THIS_TASK == false && self == THIS_TASK' */
+#else /* CONFIG_HAVE_USERPROCMASK */
+FUNDEF NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) int
+NOTHROW(FCALL sigmask_ismasked_in)(struct task *__restrict self, signo_t signo);
+#define sigmask_ismasked_in(self, signo, ...) sigmask_ismasked_in(self, signo)
+#endif /* !CONFIG_HAVE_USERPROCMASK */
 
 
 
 
 
 
-/* Check for pending signals that are no longer being masked. */
-FUNDEF void FCALL sigmask_check(void) THROWS(E_INTERRUPT, E_WOULDBLOCK);
-
-/* Same as `sigmask_check()', but if a signal gets triggered, act as though
- * it was being serviced after the current system call has exited with  the
- * given `syscall_result' return value. (preventing system call restarting,
- * or indicating an interrupt exception to user-space)
- * If no signal was triggered, simply return normally.
- * This function is meant to  be used to check  for pending signals after  the
- * original signal mask got restored following the completion of a `pselect()'
- * or `ppoll()' system call. (at which point a previously masked signal should
- * no longer cause the system  call to fail and error  out with -EINTR (to  be
- * restarted), but instead  return its  normal value once  returning from  its
- * associated user-space signal handler (if any))
- * With this in mind, the call order for temporarily overriding the signal mask
- * for the purpose of a single system call looks like this:
- * >> sigset_t oldmask;
- * >> USER CHECKED sigset_t *mymask;
- * >> mymask = sigmask_getwr();
- * >> memcpy(&oldmask, mymask, sizeof(sigset_t));
- * >> TRY {
- * >>     memcpy(mymask, &newmask, sizeof(sigset_t));
- * >> } EXCEPT {
- * >>     memcpy(mymask, &oldmask, sizeof(sigset_t));
- * >>     RETHROW();
- * >> }
- * >> TRY {
- * >>     result = do_my_system_call();
- * >> } EXCEPT {
- * >>     memcpy(mymask, &oldmask, sizeof(sigset_t));
- * >>     sigmask_check_after_except();
- * >>     RETHROW();
- * >> }
- * >> memcpy(mymask, &oldmask, sizeof(sigset_t));
- * >> sigmask_check_after_syscall(result);
- * >> return result;
- */
-FUNDEF void FCALL
-sigmask_check_after_syscall(syscall_ulong_t syscall_result)
-		THROWS(E_INTERRUPT, E_WOULDBLOCK);
-
-/* Same as `sigmask_check()', but should be called in order to have
- * user-space handle the currently set  exception in case a  signal
- * handler has to be invoked.
- * See the documentation of `sigmask_check_after_syscall()' for when
- * this function needs to be called. */
-FUNDEF void FCALL
-sigmask_check_after_except(void)
-		THROWS(E_INTERRUPT, E_WOULDBLOCK);
 
 
-struct rpc_syscall_info;
-
-/* Same as `sigmask_check()', but service signals immediately.
- * @param: sc_info: A system call that may be restarted, or NULL.
- * @return: * :                       The updated cpu-state.
- * @return: TASK_RPC_RESTART_SYSCALL: Nothing was handled. */
-FUNDEF struct icpustate *FCALL
-sigmask_check_s(struct icpustate *__restrict state,
-                struct rpc_syscall_info const *sc_info)
-		THROWS(E_WOULDBLOCK, E_SEGFAULT);
 
 
+
+
+/************************************************************************/
+/* SIGNAL ACTION DEFINITIONS                                            */
+/************************************************************************/
 struct kernel_sigaction {
 	union {
 		USER CHECKED user_sighandler_func_t sa_handler;   /* [1..1][valid_if(!SIGACTION_SA_ONSTACK)] Normal signal handler */
@@ -349,7 +340,84 @@ FUNDEF bool KCALL
 sighand_reset_handler(signo_t signo,
                       struct kernel_sigaction const *__restrict current_action)
 		THROWS(E_WOULDBLOCK, E_BADALLOC);
+/************************************************************************/
 
+
+
+
+
+
+
+
+
+
+
+
+/************************************************************************/
+/* SIGNAL SCHEDULING                                                    */
+/************************************************************************/
+#ifndef CONFIG_USE_NEW_RPC
+/* Check for pending signals that are no longer being masked. */
+FUNDEF void FCALL sigmask_check(void) THROWS(E_INTERRUPT, E_WOULDBLOCK);
+
+/* Same as `sigmask_check()', but if a signal gets triggered, act as though
+ * it was being serviced after the current system call has exited with  the
+ * given `syscall_result' return value. (preventing system call restarting,
+ * or indicating an interrupt exception to user-space)
+ * If no signal was triggered, simply return normally.
+ * This function is meant to  be used to check  for pending signals after  the
+ * original signal mask got restored following the completion of a `pselect()'
+ * or `ppoll()' system call. (at which point a previously masked signal should
+ * no longer cause the system  call to fail and error  out with -EINTR (to  be
+ * restarted), but instead  return its  normal value once  returning from  its
+ * associated user-space signal handler (if any))
+ * With this in mind, the call order for temporarily overriding the signal mask
+ * for the purpose of a single system call looks like this:
+ * >> sigset_t oldmask;
+ * >> USER CHECKED sigset_t *mymask;
+ * >> mymask = sigmask_getwr();
+ * >> memcpy(&oldmask, mymask, sizeof(sigset_t));
+ * >> TRY {
+ * >>     memcpy(mymask, &newmask, sizeof(sigset_t));
+ * >> } EXCEPT {
+ * >>     memcpy(mymask, &oldmask, sizeof(sigset_t));
+ * >>     RETHROW();
+ * >> }
+ * >> TRY {
+ * >>     result = do_my_system_call();
+ * >> } EXCEPT {
+ * >>     memcpy(mymask, &oldmask, sizeof(sigset_t));
+ * >>     sigmask_check_after_except();
+ * >>     RETHROW();
+ * >> }
+ * >> memcpy(mymask, &oldmask, sizeof(sigset_t));
+ * >> sigmask_check_after_syscall(result);
+ * >> return result;
+ */
+FUNDEF void FCALL
+sigmask_check_after_syscall(syscall_ulong_t syscall_result)
+		THROWS(E_INTERRUPT, E_WOULDBLOCK);
+
+
+/* Same as `sigmask_check()', but should be called in order to have
+ * user-space handle the currently set  exception in case a  signal
+ * handler has to be invoked.
+ * See the documentation of `sigmask_check_after_syscall()' for when
+ * this function needs to be called. */
+FUNDEF void FCALL
+sigmask_check_after_except(void)
+		THROWS(E_INTERRUPT, E_WOULDBLOCK);
+
+struct rpc_syscall_info;
+
+/* Same as `sigmask_check()', but service signals immediately.
+ * @param: sc_info: A system call that may be restarted, or NULL.
+ * @return: * :                       The updated cpu-state.
+ * @return: TASK_RPC_RESTART_SYSCALL: Nothing was handled. */
+FUNDEF struct icpustate *FCALL
+sigmask_check_s(struct icpustate *__restrict state,
+                struct rpc_syscall_info const *sc_info)
+		THROWS(E_WOULDBLOCK, E_SEGFAULT);
 
 struct icpustate;
 struct rpc_syscall_info;
@@ -391,14 +459,14 @@ FUNDEF void KCALL task_sigstop(int stop_code) THROWS(E_WOULDBLOCK,E_INTERRUPT);
  * @return: false: Either `thread' hasn't started sleeping, or was already continued. */
 FUNDEF NOBLOCK bool NOTHROW(KCALL task_sigcont)(struct task *__restrict thread);
 
-
-
 struct sigqueue_entry {
 	/* Descriptor for  a signal  that  was send,  but  was
 	 * blocked and thereby scheduled to be received later. */
 	struct sigqueue_entry *sqe_next;  /* [owned][0..1] Next queued signal. */
 	siginfo_t              sqe_info;  /* Signal information. */
 };
+#endif /* !CONFIG_USE_NEW_RPC */
+
 
 /* Raise a posix signal within a given thread `target'
  * @return: true:  Successfully scheduled/enqueued the signal for delivery to `target'

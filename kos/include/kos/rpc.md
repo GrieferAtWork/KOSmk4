@@ -152,20 +152,16 @@ handle_pending:
 
 	/* Execute kernel RPCs. */
 	while (!SLIST_EMPTY(&runnow)) {
-		prpc_exec_callback_t func;
-		void *cookie;
 		struct pending_rpc *rpc = SLIST_FIRST(&runnow);
 		SLIST_REMOVE_HEAD(&runnow, pr_link);
 		assert(rpc->pr_flags & RPC_CONTEXT_KERN);
 		assert(!(rpc->pr_flags & RPC_SYNCMODE_F_USER));
-		func   = rpc->pr_kern.k_func;
-		cookie = rpc->pr_kern.k_cookie;
-		pending_rpc_free(rpc);
 		TRY {
-			(*func)(&ctx, cookie);
+			(*rpc->pr_kern.k_func)(&ctx, rpc->pr_kern.k_cookie);
 		} EXCEPT {
 			struct exception_info *tls = error_info();
 			if (tls->ei_code == ERROR_CODEOF(E_INTERRUPT_USER_RPC)) {
+				pending_rpc_free(rpc);
 				/* Load additional RPCs, but discard this new exception */
 				ATOMIC_AND(PERTASK(this_task.t_flags), ~TASK_FRPC);
 				pending.slh_first = SLIST_ATOMIC_CLEAR(&PERTASK(this_rpcs));
@@ -175,6 +171,7 @@ handle_pending:
 			if (error_priority(error.ei_code) < error_priority(tls->ei_code))
 				memcpy(&error, tls, sizeof(error));
 		}
+		pending_rpc_free(rpc);
 		assert(ctx.rc_context == RPC_REASONCTX_SYNC);
 	}
 
@@ -275,7 +272,6 @@ handle_pending:
 			 *       before, meaning that the last one executed (iow: the first one
 			 *       originally scheduled) will have the last word when it comes to
 			 *       where execution should continue. */
-			struct pending_user_rpc user_rpc_info;
 			unsigned int user_rpc_reason;
 			bool is_masked;
 			TRY {
@@ -312,12 +308,10 @@ make_inactive:
 				if ((rpc->pr_flags & RPC_SYNCMODE_F_REQUIRE_SC))
 					goto make_inactive;
 			}
-			user_rpc_info = rpc->pr_user;
-			pending_rpc_free(rpc);
 			/* Execute the program associated with this RPC */
 			TRY {
-				ctx.rc_state = EXECUTE_RPC_PROGRAM(&user_rpc_info, ctx.rc_state,
-				                                   user_rpc_reason, &ctx.rc_scinfo);
+				ctx.rc_state = task_userrpc_runprogram(ctx.rc_state, &rpc->pr_user,
+				                                       user_rpc_reason, &ctx.rc_scinfo);
 			} EXCEPT {
 				/* Prioritize errors. */
 				struct exception_info *tls = error_info();
@@ -327,7 +321,8 @@ make_inactive:
 			/* User-space RPCs are _always_ required (or at least expected) to
 			 * restart system calls, meaning that */
 			ctx.rc_context = RPC_REASONCTX_SYSRET;
-			pending_user_rpc_fini(&user_rpc_info);
+			pending_user_rpc_fini(&rpc->pr_user);
+			pending_rpc_free(rpc);
 		}
 	}
 
@@ -360,22 +355,17 @@ make_inactive:
 		rpc = SLIST_FIRST(&kernel_rpcs);
 		SLIST_REMOVE_HEAD(&kernel_rpcs, pr_link);
 		assert(rpc->pr_flags & RPC_CONTEXT_KERN);
-		assert(!(rpc->pr_flags & RPC_SYNCMODE_F_SYSRET));
 		if (rpc->pr_flags & RPC_SYNCMODE_F_SYSRET) {
 			*restore_plast = rpc;
 			restore_plast  = &rpc->pr_link.sle_next;
 			rpc->pr_flags |= _RPC_CONTEXT_INACTIVE;
 		} else {
-			prpc_exec_callback_t func;
-			void *cookie;
-			func   = rpc->pr_kern.k_func;
-			cookie = rpc->pr_kern.k_cookie;
-			pending_rpc_free(rpc);
 			TRY {
-				(*func)(&ctx, cookie);
+				(*rpc->pr_kern.k_func)(&ctx, rpc->pr_kern.k_cookie);
 			} EXCEPT {
 				struct exception_info *tls = error_info();
 				if (tls->ei_code == ERROR_CODEOF(E_INTERRUPT_USER_RPC)) {
+					pending_rpc_free(rpc);
 					/* Load additional RPCs, but discard this new exception */
 					ATOMIC_AND(PERTASK(this_task.t_flags), ~TASK_FRPC);
 					pending.slh_first = SLIST_ATOMIC_CLEAR(&PERTASK(this_rpcs));
@@ -385,6 +375,7 @@ make_inactive:
 				if (error_priority(error.ei_code) < error_priority(tls->ei_code))
 					memcpy(&error, tls, sizeof(error));
 			}
+			pending_rpc_free(rpc);
 			assert(ctx.rc_context == RPC_REASONCTX_SYSRET ||
 			       ctx.rc_context == (sc_info ? RPC_REASONCTX_SYSCALL
 			                                  : RPC_REASONCTX_INTERRUPT));
@@ -428,14 +419,12 @@ make_inactive:
 				rpc = SLIST_FIRST(&kernel_rpcs);
 				SLIST_REMOVE_HEAD(&kernel_rpcs, pr_link);
 				assert(rpc->pr_flags & RPC_SYNCMODE_F_SYSRET);
-				func   = rpc->pr_kern.k_func;
-				cookie = rpc->pr_kern.k_cookie;
-				pending_rpc_free(rpc);
 				TRY {
-					(*func)(&ctx, cookie);
+					(*rpc->pr_kern.k_func)(&ctx, rpc->pr_kern.k_cookie);
 				} EXCEPT {
 					struct exception_info *tls = error_info();
 					if (tls->ei_code == ERROR_CODEOF(E_INTERRUPT_USER_RPC)) {
+						pending_rpc_free(rpc);
 						/* Load additional RPCs, but discard this new exception */
 						ATOMIC_AND(PERTASK(this_task.t_flags), ~TASK_FRPC);
 						pending.slh_first = SLIST_ATOMIC_CLEAR(&PERTASK(this_rpcs));
@@ -445,6 +434,7 @@ make_inactive:
 					if (error_priority(error.ei_code) < error_priority(tls->ei_code))
 						memcpy(&error, tls, sizeof(error));
 				}
+				pending_rpc_free(rpc);
 				assert(ctx.rc_context == RPC_REASONCTX_SYSRET ||
 				       ctx.rc_context == (sc_info ? RPC_REASONCTX_SYSCALL
 				                                  : RPC_REASONCTX_INTERRUPT));
@@ -491,8 +481,8 @@ make_inactive:
 	state = ctx.rc_state;
 	assert(PREEMPTION_ENABLED());
 	PREEMPTION_DISABLE();
-	state = userexcept_sysret_inject_with_state(state);
-	/* userexcept_sysret_inject(THIS_TASK); // Same as `userexcept_sysret_inject_with_state()' */
+	state = userexcept_sysret_inject_with_state_nopr(state);
+	/* userexcept_sysret_inject_nopr(THIS_TASK); // Same as `userexcept_sysret_inject_with_state_nopr()' */
 	PREEMPTION_ENABLE();
 
 	/* Restart the interrupt/syscall */
@@ -540,7 +530,6 @@ sysret_handle_pending:
 				sysret_restore_plast  = &rpc->pr_link.sle_next;
 			} else {
 				/* User-space RPC */
-				struct pending_user_rpc user_rpc_info;
 				unsigned int user_rpc_reason;
 				bool is_masked;
 				TRY {
@@ -561,22 +550,18 @@ sysret_make_inactive:
 					sysret_restore_plast  = &rpc->pr_link.sle_next;
 					continue;
 				}
-				/* Figure out the reason we want to tell user-space.
-				 * NOTE: Yes: this checks for  the original `sc_info'  (and
-				 *       not for `ctx.rc_context == RPC_REASONCTX_SYSCALL') */
-				user_rpc_info = rpc->pr_user;
-				pending_rpc_free(rpc);
 				/* Execute the program associated with this RPC */
 				TRY {
-					sysret_ctx.rc_state = EXECUTE_RPC_PROGRAM(&user_rpc_info, sysret_ctx.rc_state,
-					                                          _RPC_REASONCTX_ASYNC, NULL);
+					sysret_ctx.rc_state = task_userrpc_runprogram(sysret_ctx.rc_state, &rpc->pr_user,
+					                                              _RPC_REASONCTX_ASYNC, NULL);
 				} EXCEPT {
 					/* Prioritize errors. */
 					struct exception_info *tls = error_info();
 					if (error_priority(sysret_error.ei_code) < error_priority(tls->ei_code))
 						memcpy(&sysret_error, tls, sizeof(sysret_error));
 				}
-				pending_user_rpc_fini(&user_rpc_info);
+				pending_user_rpc_fini(&rpc->pr_user);
+				pending_rpc_free(rpc);
 			}
 		}
 	}
@@ -603,16 +588,11 @@ sysret_make_inactive:
 		rpc = SLIST_FIRST(&sysret_kernel_rpcs);
 		SLIST_REMOVE_HEAD(&sysret_kernel_rpcs, pr_link);
 		TRY {
-			prpc_exec_callback_t func;
-			void *cookie;
-			func   = rpc->pr_kern.k_func;
-			cookie = rpc->pr_kern.k_cookie;
-			pending_rpc_free(rpc);
-			(*func)(&sysret_ctx, cookie);
-			assert(sysret_ctx.rc_context == RPC_REASONCTX_SYSRET);
+			(*rpc->pr_kern.k_func)(&sysret_ctx, rpc->pr_kern.k_cookie);
 		} EXCEPT {
 			struct exception_info *tls = error_info();
 			if (tls->ei_code == ERROR_CODEOF(E_INTERRUPT_USER_RPC)) {
+				pending_rpc_free(rpc);
 				/* Load additional RPCs, but discard this new exception */
 				ATOMIC_AND(PERTASK(this_task.t_flags), ~TASK_FRPC);
 				sysret_pending.slh_first = SLIST_ATOMIC_CLEAR(&PERTASK(this_rpcs));
@@ -622,6 +602,8 @@ sysret_make_inactive:
 			if (error_priority(sysret_error.ei_code) < error_priority(tls->ei_code))
 				memcpy(&sysret_error, tls, sizeof(sysret_error));
 		}
+		assert(sysret_ctx.rc_context == RPC_REASONCTX_SYSRET);
+		pending_rpc_free(rpc);
 	}
 
 	/* If there are any RPCs that could not be handled, restore them now! */
@@ -675,20 +657,33 @@ bool NOTHROW(task_rpc_schedule)(struct task *__restrict thread,
 		COMPILER_WRITE_BARRIER();
 	} while (!ATOMIC_CMPXCH_WEAK(list->slh_first, head, rpc));
 
-	/* Set the thread's `TASK_FRPC' flag to indicate that it's got work to do */
-	ATOMIC_OR(thread->t_flags, TASK_FRPC);
+	if (rpc_flags & RPC_CONTEXT_KERN) {
+		/* Set the thread's `TASK_FRPC' flag to indicate that it's got work to do */
+		ATOMIC_OR(thread->t_flags, TASK_FRPC);
 
-	/* Deal  with the case where `thread' is currently running in user-space,
-	 * which requires us to temporarily move its execution into kernel-space,
-	 * such that it executes `handle_sysret_rpc()'  the next time it  returns
-	 * back to user-space.
-	 *
-	 * This  is normally done  by `userexcept_sysret_inject()', however that
-	 * function only  works correctly  when the  thread is  being hosted  by
-	 * the same CPU as  the calling thread. But  there's also a wrapper  for
-	 * that low-level function `userexcept_sysret_inject_safe()', which does
-	 * the same thing, but also works then the thread hosted by another CPU. */
-	userexcept_sysret_inject_safe(thread);
+		/* Deal  with the case where `thread' is currently running in user-space,
+		 * which requires us to temporarily move its execution into kernel-space,
+		 * such that it executes `handle_sysret_rpc()'  the next time it  returns
+		 * back to user-space.
+		 *
+		 * This is normally  done by `userexcept_sysret_inject_nopr()',  however
+		 * that function only works correctly when the thread is being hosted by
+		 * the same CPU as  the calling thread. But  there's also a wrapper  for
+		 * that low-level function `userexcept_sysret_inject_safe()', which does
+		 * the same thing, but also works then the thread hosted by another CPU. */
+		userexcept_sysret_inject_safe(thread, rpc_flags);
+	} else {
+		/* Because it's a user-level RPC, we only want to interrupt the thread if
+		 * it isn't masking the  signal vector `_RPC_GETSIGNO(rpc_flags)'. If  it
+		 * is currently masked, then  we also want to  mark it as pending  within
+		 * the thread's userprocmask (if it's  using one). Finally, we only  want
+		 * to wake the thread if the signal isn't masked, all of which is done by
+		 * the following call.
+		 *
+		 * NOTE: The `TASK_FRPC' flag also gets set by this function (though only
+		 *       if necessary) */
+		userexcept_sysret_inject_and_marksignal_safe(thread, rpc_flags);
+	}
 
 	return true;
 }

@@ -34,7 +34,7 @@
 #ifdef __CC__
 DECL_BEGIN
 
-/* TODO: `userexcept_sysret_inject' replaces `task_enable_redirect_usercode_rpc' */
+/* TODO: `userexcept_sysret_inject_nopr' replaces `task_enable_redirect_usercode_rpc' */
 /* TODO: `userexcept_sysret_inject_safe' replaces `task_redirect_usercode_rpc' */
 
 struct icpustate;
@@ -60,6 +60,37 @@ userexcept_callhandler(struct icpustate *__restrict state,
                        struct rpc_syscall_info const *sc_info,
                        struct exception_data const *__restrict error)
 		THROWS(E_SEGFAULT);
+
+#ifndef __siginfo_t_defined
+#define __siginfo_t_defined
+struct __siginfo_struct;
+typedef struct __siginfo_struct siginfo_t;
+#endif /* !__siginfo_t_defined */
+
+/* Update the given  `state' to raise  the specified `siginfo'  as
+ * a user-space signal  within the calling  thread. The caller  is
+ * responsible  to handle special signal handlers (`KERNEL_SIG_*')
+ * before calling this function! This function should only be used
+ * to  enqueue the execution of a signal handler with a user-space
+ * entry point.
+ * @param: state:   The CPU state describing the return to user-space.
+ * @param: action:  The signal action to perform.
+ * @param: siginfo: The signal that is being raised.
+ * @param: sc_info: When non-NULL, `sc_info'  describes a system  call
+ *                  that may be restarted. Note however that ontop  of
+ *                  this, [restart({auto,must,dont})] logic will still
+ *                  be applied, which is done in cooperation with  the
+ *                  system call restart database.
+ * @return: * :     The updated CPU state.
+ * @return: NULL:   The `SIGACTION_SA_RESETHAND' flag was set,
+ *                  but `action' differs from the set handler. */
+FUNDEF WUNUSED NONNULL((1, 2, 3)) struct icpustate *FCALL
+userexcept_callsignal(struct icpustate *__restrict state,
+                      struct kernel_sigaction const *__restrict action,
+                      siginfo_t const *__restrict siginfo,
+                      struct rpc_syscall_info const *sc_info)
+		THROWS(E_SEGFAULT, E_WOULDBLOCK);
+
 
 /* Arch-specific function:
  * Translate the current exception into an errno and set that errno
@@ -103,7 +134,7 @@ NOTHROW(FCALL userexcept_handler_ucpustate)(struct ucpustate *__restrict state,
                                             struct rpc_syscall_info *sc_info);
 
 
-/* This is the function that is injected by `userexcept_sysret_inject()',
+/* This is the function that is injected by `userexcept_sysret_inject_nopr()',
  * as well as related functions.
  *
  * The   implementation  of  this  function  serves  the  function
@@ -118,13 +149,13 @@ NOTHROW(FCALL userexcept_sysret)(struct icpustate *__restrict state);
  * `assert(icpustate_isuser(state))'), it will make a round-trip through
  * arch-specific wrappers which  eventually call  `userexcept_sysret()'.
  * Once that function  returns, execution will  finally resume in  user-
- * space,  unless  this function  (or  `userexcept_sysret_inject()') was
- * called yet again.
+ * space,  unless  this function  (or `userexcept_sysret_inject_nopr()')
+ * was called yet again.
  * NOTE: The  given `state' must point to user-space, and be located at
  *       the very end of the kernel stack. This requirement is asserted
  *       internally by this function! */
-FUNDEF NOPREEMPT ATTR_RETNONNULL WUNUSED NONNULL((1)) struct icpustate *
-NOTHROW(FCALL userexcept_sysret_inject_with_state)(struct icpustate *__restrict state);
+FUNDEF NOBLOCK NOPREEMPT ATTR_RETNONNULL WUNUSED NONNULL((1)) struct icpustate *
+NOTHROW(FCALL userexcept_sysret_inject_with_state_nopr)(struct icpustate *__restrict state);
 
 
 /* Arch-specific function:
@@ -132,8 +163,8 @@ NOTHROW(FCALL userexcept_sysret_inject_with_state)(struct icpustate *__restrict 
  * returns  back to user-space the next time. This function works correctly
  * even when `thread == THIS_TASK', or when the injection has already  been
  * performed (either by a  prior call to  this function, or  by use of  the
- * sibling function `userexcept_sysret_inject_with_state()'), in which case
- * the call is silent no-op.
+ * sibling function `userexcept_sysret_inject_with_state_nopr()'), in which
+ * case the call is silent no-op.
  *
  * However, the caller still has to ensure `thread' won't make any  kernel-
  * user transitions for the duration of this call. The only way this can be
@@ -144,16 +175,28 @@ NOTHROW(FCALL userexcept_sysret_inject_with_state)(struct icpustate *__restrict 
  *
  * Additionally, the caller must also ensure that `thread' is still running
  * and  has  yet   to  terminate  (iow:   `TASK_FTERMINATING'  isn't   set) */
-FUNDEF NOPREEMPT WUNUSED NONNULL((1)) void
-NOTHROW(FCALL userexcept_sysret_inject)(struct task *__restrict thread);
+FUNDEF NOBLOCK NOPREEMPT NONNULL((1)) void
+NOTHROW(FCALL userexcept_sysret_inject_nopr)(struct task *__restrict thread);
 
 
 
-/* High-level wrapper for `userexcept_sysret_inject()' that makes all of
- * the right decisions to only ever call `userexcept_sysret_inject()' in
- * a valid context: using IPIs to make the call from the same CPU as the
- * one  currently hosting `thread', and ensuring that the thread has yet
- * to terminate.
+/* Arch-specific function: Behaves identical to:
+ * >> pflag_t was = PREEMPTION_PUSHOFF();
+ * >> userexcept_sysret_inject_nopr(THIS_TASK);
+ * >> PREEMPTION_POP(was);
+ * This function can be used to force checks for RPCs (including  posix
+ * signals) to be performed _after_ a  system has completed (even in  a
+ * scenario where the system call completes successfully). This kind of
+ * functionality is required for some POSIX-signal-related system calls */
+FUNDEF NOBLOCK void NOTHROW(FCALL userexcept_sysret_inject_self)(void);
+
+
+
+/* High-level wrapper  for `userexcept_sysret_inject_nopr()'  that makes  all
+ * of the right decisions to only ever call `userexcept_sysret_inject_nopr()'
+ * in  a valid context: using IPIs to make  the call from the same CPU as the
+ * one  currently hosting `thread',  and ensuring that the  thread has yet to
+ * terminate.
  * Additionally, this function will make a call to `task_wake()'  once
  * the injection has completed, meaning that `thread' will wake up and
  * either immediatly  start executing  `userexcept_sysret()', or  will
@@ -169,9 +212,28 @@ NOTHROW(FCALL userexcept_sysret_inject)(struct task *__restrict thread);
  * @param: rpc_flags: Set of `0 | RPC_PRIORITY_F_HIGH', or one of
  *                    `RPC_PRIORITY_NORMAL',  `RPC_PRIORITY_HIGH'
  *                    Other flags are silently ignored. */
-FUNDEF WUNUSED NONNULL((1)) void
+FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL userexcept_sysret_inject_safe)(struct task *__restrict thread,
                                              syscall_ulong_t rpc_flags);
+
+/* Check if `_RPC_GETSIGNO(rpc_flags)' is currently masked by `thread' (thereby
+ * also marking the associated bit  as pending within its userprocmask,  should
+ * `thread' be using one). Only if  that signal vector isn't currently  masked,
+ * proceed to do the same as also done by `userexcept_sysret_inject_safe()'.
+ *
+ * The  userprocmask is accessed purely via *_nopf functions (hence the NOBLOCK),
+ * and if doing this  fails, act as  though the signal  vector isn't masked,  and
+ * proceed with calling `userexcept_sysret_inject_nopr()', resulting in the given
+ * `thread' eventually calling `userexcept_sysret()'  which will repeat the  test
+ * masked signals (at which point _it_ is  able to use the non-*_nopf variant  of
+ * the masking test function `sigmask_ismasked()')
+ *
+ * Additionally, this function will also set the `TASK_FRPC' just before making
+ * the call to `userexcept_sysret_inject_nopr()' (though obviously only if such
+ * a call actually ends up being made) */
+FUNDEF NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL userexcept_sysret_inject_and_marksignal_safe)(struct task *__restrict thread,
+                                                            syscall_ulong_t rpc_flags);
 
 
 DECL_END

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf153f5ec */
+/* HASH CRC-32:0x886d7bba */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -512,7 +512,7 @@ enum {
 	SI_TIMER = __SI_TIMER,     /* Sent by timer expiration. */
 #endif /* __SI_TIMER */
 #ifdef __SI_QUEUE
-	SI_QUEUE = __SI_QUEUE,     /* Sent by sigqueue_entry. */
+	SI_QUEUE = __SI_QUEUE,     /* Sent by sigqueue. */
 #endif /* __SI_QUEUE */
 #ifdef __SI_USER
 	SI_USER = __SI_USER,       /* Sent by kill, sigsend. */
@@ -543,7 +543,7 @@ enum {
 #define SI_TIMER   SI_TIMER   /* Sent by timer expiration. */
 #endif /* __SI_TIMER */
 #ifdef __SI_QUEUE
-#define SI_QUEUE   SI_QUEUE   /* Sent by sigqueue_entry. */
+#define SI_QUEUE   SI_QUEUE   /* Sent by sigqueue. */
 #endif /* __SI_QUEUE */
 #ifdef __SI_USER
 #define SI_USER    SI_USER    /* Sent by kill, sigsend. */
@@ -571,7 +571,7 @@ enum {
 #define SI_TIMER   __SI_TIMER   /* Sent by timer expiration. */
 #endif /* __SI_TIMER */
 #ifdef __SI_QUEUE
-#define SI_QUEUE   __SI_QUEUE   /* Sent by sigqueue_entry. */
+#define SI_QUEUE   __SI_QUEUE   /* Sent by sigqueue. */
 #endif /* __SI_QUEUE */
 #ifdef __SI_USER
 #define SI_USER    __SI_USER    /* Sent by kill, sigsend. */

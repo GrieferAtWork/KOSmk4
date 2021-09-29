@@ -83,6 +83,8 @@ DECL_BEGIN
 #endif /* NDEBUG */
 
 
+
+#ifndef CONFIG_USE_NEW_RPC
 LOCAL NOBLOCK void
 NOTHROW(KCALL sigqueue_entry_freechain)(struct sigqueue_entry *head) {
 	struct sigqueue_entry *next;
@@ -121,6 +123,7 @@ NOTHROW(KCALL process_sigqueue_set_term)(struct process_sigqueue *__restrict sel
 	sync_endwrite(&self->psq_lock);
 	sigqueue_entry_freechain(queue);
 }
+#endif /* !CONFIG_USE_NEW_RPC */
 
 
 
@@ -155,6 +158,7 @@ taskpid_gettask_srch(struct taskpid *__restrict self) THROWS(E_PROCESS_EXITED) {
 }
 
 
+#ifndef CONFIG_USE_NEW_RPC
 /* [valid_if(!TASK_FKERNTHREAD)]
  * [lock(LINKED_LIST(APPEND(ATOMIC),CLEAR(THIS_TASK)))]
  * Pending signals for the calling thread. */
@@ -162,6 +166,7 @@ PUBLIC ATTR_PERTASK struct sigqueue this_sigqueue = {
 	/* .sq_newsig = */ SIG_INIT,
 	/* .sq_queue  = */ NULL
 };
+#endif /* !CONFIG_USE_NEW_RPC */
 
 
 /* [1..1][valid_if(!TASK_FKERNTHREAD)][const] The PID associated with the calling thread.
@@ -299,7 +304,9 @@ NOTHROW(KCALL this_taskgroup_cleanup)(void) {
 #else /* __INTELLISENSE__ */
 #define mygroup FORTASK(proc, this_taskgroup)
 #endif /* !__INTELLISENSE__ */
+#ifndef CONFIG_USE_NEW_RPC
 	sigqueue_set_term(&THIS_SIGQUEUE);
+#endif /* !CONFIG_USE_NEW_RPC */
 	proc = task_getprocess();
 	if (!proc) {
 		/* Kernel-space thread */
@@ -360,7 +367,21 @@ NOTHROW(KCALL this_taskgroup_cleanup)(void) {
 				decref(parent);
 			}
 		}
+#ifdef CONFIG_USE_NEW_RPC
+		/* Shutdown any remaining RPCs and mark the per-process RPC list as terminated. */
+		{
+			struct pending_rpc *remain;
+			assert(PREEMPTION_ENABLED());
+			atomic_rwlock_write(&mygroup.tg_proc_rpcs.ppr_lock);
+			remain = mygroup.tg_proc_rpcs.ppr_list.slh_first;
+			mygroup.tg_proc_rpcs.ppr_list.slh_first = THIS_RPCS_TERMINATED;
+			atomic_rwlock_endwrite(&mygroup.tg_proc_rpcs.ppr_lock);
+			assert(remain != THIS_RPCS_TERMINATED);
+			task_asyncrpc_destroy_list_for_shutdown(remain);
+		}
+#else /* CONFIG_USE_NEW_RPC */
 		process_sigqueue_set_term(&mygroup.tg_proc_signals);
+#endif /* !CONFIG_USE_NEW_RPC */
 	} else {
 		uintptr_t thread_detach_state;
 		assert(mypid);
@@ -405,7 +426,9 @@ NOTHROW(KCALL this_taskgroup_fini)(struct task *__restrict self) {
 #endif /* !__INTELLISENSE__ */
 	assert(wasdestroyed(self));
 	assert(!mypid || awref_ptr(&mypid->tp_thread) == self);
+#ifndef CONFIG_USE_NEW_RPC
 	sigqueue_fini(&FORTASK(self, this_sigqueue));
+#endif /* !CONFIG_USE_NEW_RPC */
 	if unlikely(mygroup.tg_process == NULL)
 		; /* Incomplete initialization... */
 	else if (mygroup.tg_process != self) {
@@ -469,15 +492,21 @@ NOTHROW(KCALL this_taskgroup_fini)(struct task *__restrict self) {
 			decref_nokill(mypid); /* Reference stored in `mygroup.tg_proc_group' */
 		}
 		/* Finalize any signals that were never delivered. */
+#ifdef CONFIG_USE_NEW_RPC
+		process_pending_rpcs_fini(&mygroup.tg_proc_rpcs);
+#else /* CONFIG_USE_NEW_RPC */
 		sigqueue_fini(&mygroup.tg_proc_signals.psq_queue);
+#endif /* !CONFIG_USE_NEW_RPC */
 	}
 	if (mypid) {
 		awref_clear(&mypid->tp_thread);
 		decref_likely(mypid);
 	}
+#ifndef CONFIG_USE_NEW_RPC
 	/* Finalizer per-task pending signals */
 	if (!(self->t_flags & TASK_FKERNTHREAD))
 		sigqueue_fini(&FORTASK(self, this_sigqueue));
+#endif /* !CONFIG_USE_NEW_RPC */
 #undef mygroup
 }
 
@@ -495,6 +524,12 @@ PUBLIC ATTR_PERTASK struct taskgroup this_taskgroup = {
 	/* .tg_proc_group_lock     = */ ATOMIC_RWLOCK_INIT,
 	/* .tg_proc_group          = */ NULL,                /* Initialized by `task_setprocess()' */
 	/* .tg_proc_group_siblings = */ LIST_ENTRY_UNBOUND_INITIALIZER,
+#ifdef CONFIG_USE_NEW_RPC
+	/* .tg_proc_rpcs           = */ {
+		/* .ppr_lock  = */ ATOMIC_RWLOCK_INIT,
+		/* .ppr_list  = */ SLIST_HEAD_INITIALIZER(this_taskgroup.tg_proc_rpcs.ppr_list)
+	},
+#else /* CONFIG_USE_NEW_RPC */
 	/* .tg_proc_signals        = */ {
 		/* .psq_lock  = */ ATOMIC_RWLOCK_INIT,
 		/* .psq_queue = */ {
@@ -502,6 +537,7 @@ PUBLIC ATTR_PERTASK struct taskgroup this_taskgroup = {
 			/* .sq_queue  = */ NULL
 		}
 	},
+#endif /* !CONFIG_USE_NEW_RPC */
 	/* .tg_pgrp_processes_lock = */ ATOMIC_RWLOCK_INIT,
 	/* .tg_pgrp_processes      = */ LIST_HEAD_INITIALIZER(this_taskgroup.tg_pgrp_processes),
 	/* .tg_pgrp_session_lock   = */ ATOMIC_RWLOCK_INIT,

@@ -661,13 +661,35 @@ INTERN_FUNCTION(userexcept_handler_ucpustate)
 	 * no prior exception handler  claimed ownership of the  exception
 	 * for the purpose of allowing restarts.
 	 *
-	 * This is actually something that's allowed, as it also forms the
-	 * fallback  for arbitrary exception-to-userspace return paths, as
-	 * well as interrupts that don't need to be restarted in order  to
-	 * maintain proper semantics (such as the #PF interrupt, which  is
-	 * able to call  `task_serve()', but doesn't  need to be  manually
-	 * restarted as it  auto-restarts itself when  another attempt  is
-	 * made to access the faulting memory location) */
+	 * This  sort of thing must be used with  care, as it may lead to a
+	 * soft-lock where some RPCs keep on causing task_serve() to  throw
+	 * an exception, only for `userexcept_handler()' to fail to restart
+	 * the interrupt,  then return  to user-space  where the  interrupt
+	 * happens again immediatly, causing the loop to continue  forever.
+	 *
+	 * The solution to this problem is to assign exception handling
+	 * to the interrupt handler  that essentially looks like  this:
+	 * >> struct icpustate *myinterrupt(struct icpustate *state) {
+	 * >> again:
+	 * >>     TRY {
+	 * >>         ... // The actual intrrupt work
+	 * >>         return state;
+	 * >>     } EXCEPT {
+	 * >>         // When `userexcept_handler()' returns normally, that
+	 * >>         // means that the interrupt should be restarted without
+	 * >>         // returning to user-space!
+	 * >>         state = userexcept_handler(state);
+	 * >>     }
+	 * >>     goto again;
+	 * >> }
+	 *
+	 * Note that this sort of wrapper should be implemented at the  lowest
+	 * possible level (iow: not in actual C code), and also note that this
+	 * only affects interrupt handles  capable of throwing exceptions,  as
+	 * well as performing blocking operations (iow: device interrupts  are
+	 * unaffected by this,  though any access  to lazily initialized  file
+	 * mappings, and as a consequence,  any user-space memory access  must
+	 * be considered as potentially blocking) */
 
 	movP   %Pax, %Psp
 	.cfi_def_cfa_register %Psp

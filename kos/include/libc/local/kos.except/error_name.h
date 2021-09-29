@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf7b7757c */
+/* HASH CRC-32:0xdb78340a */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -96,8 +96,10 @@ __NOTHROW(__LIBKCALL __LIBC_LOCAL_NAME(error_name))(__error_code_t __code) {
 	"XT_CTTY_DIFFERS\0\1\1\1\1\1\1\1\1\1\1\1E_BUFFER_TOO_SMALL\0\1E_UNICODE_ERROR\0\1";
 	static char const __e_linear_f000h_f001h[] =
 	"E_INTERRUPT\0E_INTERRUPT_USER_RPC\0\1__E_RETRY_RWLOCK\0\1";
-	static char const __e_linear_fe00h_fe01h[] =
-	"E_EXIT_THREAD\0\1E_EXIT_PROCESS\0\1";
+	static char const __e_linear_fe40h_fe40h[] =
+	"E_EXIT_THREAD\0\1";
+	static char const __e_linear_fe81h_fe81h[] =
+	"E_EXIT_PROCESS\0\1";
 	static char const __e_linear_feffh_ff07h[] =
 	"E_UNHANDLED_INTERRUPT\0\1\1E_SEGFAULT\0E_SEGFAULT_UNMAPPED\0E_SEGFAUL"
 	"T_READONLY\0E_SEGFAULT_NOTREADABLE\0E_SEGFAULT_NOTEXECUTABLE\0E_SEG"
@@ -119,9 +121,12 @@ __NOTHROW(__LIBKCALL __LIBC_LOCAL_NAME(error_name))(__error_code_t __code) {
 	} else if (__err_class >= 0xf000 && __err_class <= 0xf001) {
 		__result = __e_linear_f000h_f001h;
 		__class_offset = __err_class - 0xf000;
-	} else if (__err_class >= 0xfe00 && __err_class <= 0xfe01) {
-		__result = __e_linear_fe00h_fe01h;
-		__class_offset = __err_class - 0xfe00;
+	} else if (__err_class >= 0xfe40 && __err_class <= 0xfe40) {
+		__result = __e_linear_fe40h_fe40h;
+		__class_offset = __err_class - 0xfe40;
+	} else if (__err_class >= 0xfe81 && __err_class <= 0xfe81) {
+		__result = __e_linear_fe81h_fe81h;
+		__class_offset = __err_class - 0xfe81;
 	} else if (__err_class >= 0xfeff && __err_class <= 0xff07) {
 		__result = __e_linear_feffh_ff07h;
 		__class_offset = __err_class - 0xfeff;
@@ -220,8 +225,10 @@ __non_linear_prefix:
 	"XT_CTTY_DIFFERS\0\1\1\1\1\1\1\1\1\1\1\1E_BUFFER_TOO_SMALL\0\1E_UNICODE_ERROR\0\1";
 	static char const __e_linear_f000h_f001h[] =
 	"E_INTERRUPT\0E_INTERRUPT_USER_RPC\0\1__E_RETRY_RWLOCK\0\1";
-	static char const __e_linear_fe00h_fe01h[] =
-	"E_EXIT_THREAD\0\1E_EXIT_PROCESS\0\1";
+	static char const __e_linear_fe40h_fe40h[] =
+	"E_EXIT_THREAD\0\1";
+	static char const __e_linear_fe81h_fe81h[] =
+	"E_EXIT_PROCESS\0\1";
 	static char const __e_linear_feffh_ff0eh[] =
 	"E_UNHANDLED_INTERRUPT\0\1E_DIVIDE_BY_ZERO\0\1\1\1E_BREAKPOINT\0\1E_OVERF"
 	"LOW\0\1E_INDEX_ERROR\0E_INDEX_ERROR_OUT_OF_BOUNDS\0\1\1\1E_STACK_OVERFL"
@@ -240,9 +247,12 @@ __non_linear_prefix:
 	} else if (__err_class >= 0xf000 && __err_class <= 0xf001) {
 		__result = __e_linear_f000h_f001h;
 		__class_offset = __err_class - 0xf000;
-	} else if (__err_class >= 0xfe00 && __err_class <= 0xfe01) {
-		__result = __e_linear_fe00h_fe01h;
-		__class_offset = __err_class - 0xfe00;
+	} else if (__err_class >= 0xfe40 && __err_class <= 0xfe40) {
+		__result = __e_linear_fe40h_fe40h;
+		__class_offset = __err_class - 0xfe40;
+	} else if (__err_class >= 0xfe81 && __err_class <= 0xfe81) {
+		__result = __e_linear_fe81h_fe81h;
+		__class_offset = __err_class - 0xfe81;
 	} else if (__err_class >= 0xfeff && __err_class <= 0xff0e) {
 		__result = __e_linear_feffh_ff0eh;
 		__class_offset = __err_class - 0xfeff;

@@ -24,6 +24,7 @@
 #include <kernel/compiler.h>
 
 #ifdef CONFIG_USE_NEW_RPC
+#include <kernel/mman.h>
 #include <kernel/rt/except-handler.h>
 #include <kernel/types.h>
 #include <sched/arch/rpc.h> /* _task_serve_with_icpustate_arch_set_return_bool, ... */
@@ -39,7 +40,10 @@
 #include <kos/kernel/cpu-state-helpers.h>
 
 #include <assert.h>
+#include <inttypes.h>
+#include <stdalign.h>
 #include <stdbool.h>
+#include <stddef.h>
 #include <string.h>
 
 #include <libcpustate/apply.h>
@@ -85,29 +89,108 @@ PUBLIC NOBLOCK_IF(rpc_gfp & GFP_ATOMIC) NONNULL((1, 3)) bool KCALL
 task_rpc_exec(struct task *__restrict thread, syscall_ulong_t flags,
               prpc_exec_callback_t func, void *cookie)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, E_INTERRUPT_USER_RPC) {
+	struct pending_rpc_slist *list;
+	struct pending_rpc *rpc, *head;
+	assertf(!(flags & ~(RPC_CONTEXT_KERN | RPC_CONTEXT_NOEXCEPT |
+	                    RPC_SYNCMODE_F_ALLOW_ASYNC | RPC_SYNCMODE_F_USER |
+	                    RPC_SYNCMODE_F_SYSRET | RPC_PRIORITY_F_HIGH)),
+	        "Invalid flags: %#" PRIxPTR " (unsupported flag used)", flags);
+	assertf(flags & (RPC_CONTEXT_KERN),
+	        "Invalid flags: %#" PRIxPTR " (`RPC_CONTEXT_KERN' is mandatory)", flags);
+	assertf((flags & (RPC_SYNCMODE_F_SYSRET | RPC_SYNCMODE_F_USER)) != RPC_SYNCMODE_F_SYSRET,
+	        "Invalid flags: %#" PRIxPTR " (`RPC_SYNCMODE_F_SYSRET' requires `RPC_SYNCMODE_F_USER')", flags);
+	if (flags & RPC_SYNCMODE_F_ALLOW_ASYNC) {
+		/* TODO: Async RPCs are scheduled entirely different from regular ones! */
+		THROW(E_NOT_IMPLEMENTED_TODO);
+	}
 
-	/* TODO */
-	THROW(E_NOT_IMPLEMENTED_TODO);
+	rpc = pending_rpc_alloc_kern_nx(GFP_NORMAL);
+	if unlikely(!rpc) {
+		if (ATOMIC_READ(FORTASK(thread, this_rpcs.slh_first)) == THIS_RPCS_TERMINATED)
+			return false; /* Thread has already terminated */
+		rpc = pending_rpc_alloc_kern(GFP_NORMAL);
+	}
+
+	/* Initialize the new RPC. */
+	rpc->pr_flags         = flags;
+	rpc->pr_kern.k_func   = func;
+	rpc->pr_kern.k_cookie = cookie;
+
+	/* Insert into `thread's pending RPC list. */
+	list = &FORTASK(thread, this_rpcs);
+	do {
+		head = ATOMIC_READ(list->slh_first);
+		if unlikely(head == THIS_RPCS_TERMINATED) {
+			/* Already terminated */
+			pending_rpc_free(rpc);
+			return false;
+		}
+		rpc->pr_link.sle_next = head;
+		COMPILER_WRITE_BARRIER();
+	} while (!ATOMIC_CMPXCH_WEAK(list->slh_first, head, rpc));
+
+	/* Set the thread's `TASK_FRPC' flag to indicate that it's got work to do */
+	ATOMIC_OR(thread->t_flags, TASK_FRPC);
+
+	/* Deal  with the case where `thread' is currently running in user-space,
+	 * which requires us to temporarily move its execution into kernel-space,
+	 * such that it executes `handle_sysret_rpc()'  the next time it  returns
+	 * back to user-space.
+	 *
+	 * This is normally done by `userexcept_sysret_inject_nopr()', however that
+	 * function only  works  correctly  when  the thread  is  being  hosted  by
+	 * the same  CPU as  the calling  thread. But  there's also  a wrapper  for
+	 * that  low-level  function `userexcept_sysret_inject_safe()',  which does
+	 * the same thing, but  also works then the  thread hosted by another  CPU. */
+	if (thread->t_flags & TASK_FKERNTHREAD) {
+		assertf(!(flags & RPC_SYNCMODE_F_USER), "Can't send user-return RPC to kernel-only thread");
+		task_wake(thread);
+	} else {
+		userexcept_sysret_inject_safe(thread, flags);
+
+		/* When sending a user-level RPC to oneself, it is necessary to force a
+		 * syscall/interrupt  unwind by throwing an E_INTERRUPT_USER_RPC error.
+		 * Is same behavior can also be seen in `task_serve()' */
+		if ((flags & RPC_SYNCMODE_F_USER) && thread == THIS_TASK)
+			THROW(E_INTERRUPT_USER_RPC);
+	}
+
+	return true;
 }
 
 
 
-INTDEF NOBLOCK void /* From "misc/except-handler.c" */
-NOTHROW(FCALL restore_pending_rpcs)(struct pending_rpc *restore);
-
-/* Check if there are any unmasked posix signals that are currently pending. */
-PRIVATE bool FCALL are_any_unmasked_posix_signals_pending(void)
-		THROWS(E_SEGFAULT) {
-	/* TODO */
-	return false;
+/* Trigger RPC completion for `self' with context `RPC_REASONCTX_SHUTDOWN' */
+PUBLIC NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL task_asyncrpc_destroy_for_shutdown)(struct pending_rpc *__restrict self) {
+	if (self->pr_flags & RPC_CONTEXT_KERN) {
+		/* Invoke kernel RPC in RPC_REASONCTX_SHUTDOWN-context */
+		alignas(alignof(struct rpc_context))
+		byte_t _ctx[offsetof(struct rpc_context, rc_scinfo)];
+		struct rpc_context *ctx = (struct rpc_context *)_ctx;
+		ctx->rc_context         = RPC_REASONCTX_SHUTDOWN;
+		task_asyncrpc_execnow(ctx, self->pr_kern.k_func,
+		                      self->pr_kern.k_cookie);
+	} else if (!(self->pr_flags & RPC_CONTEXT_SIGNAL)) {
+		/* Finalize userspace RPC program meta-data. */
+		pending_user_rpc_fini(&self->pr_user);
+	}
+	pending_rpc_free(self);
 }
 
-/* Same as `are_any_unmasked_posix_signals_pending()',  but use *_nopf  memory
- * access, and if that fails, assume that pending signals are always unmasked. */
-PRIVATE bool NOTHROW(FCALL are_any_unmasked_posix_signals_maybe_pending_nx)(void) {
-	/* TODO */
-	return false;
+/* Same as `task_asyncrpc_destroy_for_shutdown()', but do an entire list. */
+PUBLIC NOBLOCK void
+NOTHROW(FCALL task_asyncrpc_destroy_list_for_shutdown)(struct pending_rpc *first) {
+	while (first) {
+		struct pending_rpc *next;
+		next = SLIST_NEXT(first, pr_link);
+		task_asyncrpc_destroy_for_shutdown(first);
+		first = next;
+	}
 }
+
+
+
 
 
 PRIVATE ATTR_NORETURN void
@@ -120,7 +203,114 @@ NOTHROW(FCALL unwind_current_exception_at_icpustate)(struct icpustate *__restric
 }
 
 
+INTDEF NOBLOCK void /* From "misc/except-handler.c" */
+NOTHROW(FCALL restore_pending_rpcs)(struct pending_rpc *restore);
 
+#ifdef CONFIG_HAVE_USERPROCMASK
+/* Same  as `are_any_unmasked_process_rpcs_pending()', but keep a pair
+ * of internal signal  sets to track  which signals are  known-masked,
+ * and known-unmasked (this allows us to work around the locking issue
+ * relating to the current thread using the userprocmask mechanism)
+ * @param: signo: The first known "faulty" signo that must be blocking-
+ *                checked for being masked/unmasked. */
+PRIVATE ATTR_NOINLINE WUNUSED NONNULL((1)) bool FCALL
+are_any_unmasked_process_rpcs_pending_with_faulty(struct process_pending_rpcs *__restrict proc_rpcs,
+                                                  signo_t signo)
+		THROWS(E_SEGFAULT) {
+	struct pending_rpc *rpc;
+	sigset_t known_masked, known_unmasked;
+	sigemptyset(&known_masked);
+	sigemptyset(&known_unmasked);
+again_test_signo:
+	sigaddset(sigmask_ismasked(signo) ? &known_masked
+	                                  : &known_unmasked,
+	          signo);
+	if unlikely(ATOMIC_READ(proc_rpcs->ppr_list.slh_first) == NULL)
+		return false;
+	atomic_rwlock_read(&proc_rpcs->ppr_lock);
+	SLIST_FOREACH (rpc, &proc_rpcs->ppr_list, pr_link) {
+		int status;
+		signo = _RPC_GETSIGNO(rpc->pr_flags);
+		if (sigismember(&known_masked, signo))
+			continue; /* Known-masked signal */
+		if (sigismember(&known_unmasked, signo)) {
+			atomic_rwlock_endread(&proc_rpcs->ppr_lock);
+			return true; /* Known-unmasked signal */
+		}
+
+		/* Try to read the userprocmask without causing a #PF */
+		status = sigmask_ismasked_nopf(signo);
+		if (status == SIGMASK_ISMASKED_NOPF_YES) {
+			sigaddset(&known_masked, signo);
+			continue; /* Known-masked */
+		}
+		if (status == SIGMASK_ISMASKED_NOPF_FAULT) {
+			/* Must do a "hard" masking-test */
+			atomic_rwlock_endread(&proc_rpcs->ppr_lock);
+			goto again_test_signo;
+		}
+		atomic_rwlock_endread(&proc_rpcs->ppr_lock);
+		return true;
+	}
+	atomic_rwlock_endread(&proc_rpcs->ppr_lock);
+	return false;
+}
+#endif /* CONFIG_HAVE_USERPROCMASK */
+
+
+/* Check if there are any unmasked process RPCs that are currently pending. */
+PRIVATE WUNUSED bool FCALL are_any_unmasked_process_rpcs_pending(void)
+		THROWS(E_SEGFAULT) {
+	struct pending_rpc *rpc;
+	struct process_pending_rpcs *proc_rpcs = &THIS_PROCESS_RPCS;
+	if (ATOMIC_READ(proc_rpcs->ppr_list.slh_first) == NULL)
+		return false;
+	atomic_rwlock_read(&proc_rpcs->ppr_lock);
+	SLIST_FOREACH (rpc, &proc_rpcs->ppr_list, pr_link) {
+		int status;
+		status = sigmask_ismasked_nopf(_RPC_GETSIGNO(rpc->pr_flags));
+		if (status == SIGMASK_ISMASKED_NOPF_YES)
+			continue;
+#ifdef CONFIG_HAVE_USERPROCMASK
+		if (status == SIGMASK_ISMASKED_NOPF_FAULT) {
+			signo_t signo = _RPC_GETSIGNO(rpc->pr_flags);
+			atomic_rwlock_endread(&proc_rpcs->ppr_lock);
+			return are_any_unmasked_process_rpcs_pending_with_faulty(proc_rpcs, signo);
+		}
+		atomic_rwlock_endread(&proc_rpcs->ppr_lock);
+		return true;
+#else /* CONFIG_HAVE_USERPROCMASK */
+		atomic_rwlock_endread(&proc_rpcs->ppr_lock);
+		return true;
+#endif /* !CONFIG_HAVE_USERPROCMASK */
+	}
+	atomic_rwlock_endread(&proc_rpcs->ppr_lock);
+	return false;
+}
+
+/* Same as `are_any_unmasked_process_rpcs_pending()', but use *_nopf memory
+ * access, and if that fails, assume that pending RPCs are always unmasked. */
+PRIVATE WUNUSED bool NOTHROW(FCALL are_any_unmasked_process_rpcs_maybe_pending_nx)(void) {
+	struct pending_rpc *rpc;
+	struct process_pending_rpcs *proc_rpcs = &THIS_PROCESS_RPCS;
+	if (ATOMIC_READ(proc_rpcs->ppr_list.slh_first) == NULL)
+		return false;
+	if (!atomic_rwlock_tryread(&proc_rpcs->ppr_lock))
+		return true; /* Must assume that at least one of them would be unmasked in our thread. */
+	SLIST_FOREACH (rpc, &proc_rpcs->ppr_list, pr_link) {
+		int status;
+		status = sigmask_ismasked_nopf(_RPC_GETSIGNO(rpc->pr_flags));
+		if (status == SIGMASK_ISMASKED_NOPF_YES)
+			continue;
+		/* Either the signal number isn't masked, or the status can't be determined.
+		 * In any case, we're supposed to act like it isn't masked, since our caller
+		 * asked weather there **may** be unmasked process RPCs. */
+		atomic_rwlock_endread(&proc_rpcs->ppr_lock);
+		return true;
+	}
+	atomic_rwlock_endread(&proc_rpcs->ppr_lock);
+	return false;
+}
 
 
 /* Automatically updates `state' to include the intended return value for `task_serve()'! */
@@ -178,20 +368,16 @@ handle_pending:
 
 	/* Execute kernel RPCs. */
 	while (!SLIST_EMPTY(&runnow)) {
-		prpc_exec_callback_t func;
-		void *cookie;
 		struct pending_rpc *rpc = SLIST_FIRST(&runnow);
 		SLIST_REMOVE_HEAD(&runnow, pr_link);
 		assert(rpc->pr_flags & RPC_CONTEXT_KERN);
 		assert(!(rpc->pr_flags & RPC_SYNCMODE_F_USER));
-		func   = rpc->pr_kern.k_func;
-		cookie = rpc->pr_kern.k_cookie;
-		pending_rpc_free(rpc);
 		TRY {
-			(*func)(&ctx, cookie);
+			(*rpc->pr_kern.k_func)(&ctx, rpc->pr_kern.k_cookie);
 		} EXCEPT {
 			struct exception_info *tls = error_info();
 			if (tls->ei_code == ERROR_CODEOF(E_INTERRUPT_USER_RPC)) {
+				pending_rpc_free(rpc);
 				/* Load additional RPCs, but discard this new exception */
 				ATOMIC_AND(PERTASK(this_task.t_flags), ~TASK_FRPC);
 				pending.slh_first = SLIST_ATOMIC_CLEAR(&PERTASK(this_rpcs));
@@ -201,6 +387,7 @@ handle_pending:
 			if (error_priority(error.ei_code) < error_priority(tls->ei_code))
 				memcpy(&error, tls, sizeof(error));
 		}
+		pending_rpc_free(rpc);
 		assert(ctx.rc_context == RPC_REASONCTX_SYNC);
 	}
 
@@ -216,9 +403,9 @@ handle_pending:
 		unwind_current_exception_at_icpustate(ctx.rc_state);
 	}
 
-	/* Unmasked posix signals also require that we unwind the system call. */
+	/* Unmasked process RPCs also require that we unwind the system call. */
 	if (!must_unwind) {
-		if (are_any_unmasked_posix_signals_pending())
+		if (are_any_unmasked_process_rpcs_pending())
 			must_unwind = true;
 	}
 	if (must_unwind)
@@ -288,22 +475,18 @@ handle_pending:
 
 	/* Execute kernel RPCs. */
 	while (!SLIST_EMPTY(&runnow)) {
-		prpc_exec_callback_t func;
-		void *cookie;
 		struct pending_rpc *rpc = SLIST_FIRST(&runnow);
 		SLIST_REMOVE_HEAD(&runnow, pr_link);
 		assert(rpc->pr_flags & RPC_CONTEXT_KERN);
 		assert(!(rpc->pr_flags & RPC_SYNCMODE_F_USER));
-		func   = rpc->pr_kern.k_func;
-		cookie = rpc->pr_kern.k_cookie;
+		(*rpc->pr_kern.k_func)(&ctx, rpc->pr_kern.k_cookie);
 		pending_rpc_free(rpc);
-		(*func)(&ctx, cookie);
 		assert(ctx.rc_context == RPC_REASONCTX_SYNC);
 	}
 
-	/* Unmasked posix signals also require that we unwind the system call. */
+	/* Unmasked process RPCs also require that we unwind the system call. */
 	if (!(result & TASK_SERVE_NX_EXCEPT)) {
-		if (are_any_unmasked_posix_signals_maybe_pending_nx())
+		if (are_any_unmasked_process_rpcs_maybe_pending_nx())
 			result |= TASK_SERVE_NX_EXCEPT;
 	}
 	_task_serve_with_icpustate_nx_arch_set_return_uint(ctx.rc_state, result);
@@ -328,8 +511,7 @@ NOTHROW(FCALL task_rpc_schedule)(struct task *__restrict thread,
                                  /*inherit(on_success)*/ struct pending_rpc *__restrict rpc) {
 	struct pending_rpc_slist *list;
 	struct pending_rpc *head;
-	uintptr_t rpc_flags;
-	rpc_flags = rpc->pr_flags;
+	uintptr_t rpc_flags = rpc->pr_flags;
 
 	/* Insert into `thread's pending RPC list. */
 	list = &FORTASK(thread, this_rpcs);
@@ -341,20 +523,42 @@ NOTHROW(FCALL task_rpc_schedule)(struct task *__restrict thread,
 		COMPILER_BARRIER();
 	} while (!ATOMIC_CMPXCH_WEAK(list->slh_first, head, rpc));
 
-	/* Set the thread's `TASK_FRPC' flag to indicate that it's got work to do */
-	ATOMIC_OR(thread->t_flags, TASK_FRPC);
+	if (rpc_flags & RPC_CONTEXT_KERN) {
+		assertf(!(thread->t_flags & TASK_FKERNTHREAD) ||
+		        !(rpc_flags & RPC_SYNCMODE_F_USER),
+		        "Cannot schedule a RPC_SYNCMODE_F_USER RPC "
+		        "for execution within a TASK_FKERNTHREAD thread");
 
-	/* Deal  with the case where `thread' is currently running in user-space,
-	 * which requires us to temporarily move its execution into kernel-space,
-	 * such that it executes `handle_sysret_rpc()'  the next time it  returns
-	 * back to user-space.
-	 *
-	 * This  is normally done  by `userexcept_sysret_inject()', however that
-	 * function only  works correctly  when the  thread is  being hosted  by
-	 * the same CPU as  the calling thread. But  there's also a wrapper  for
-	 * that low-level function `userexcept_sysret_inject_safe()', which does
-	 * the same thing, but also works then the thread hosted by another CPU. */
-	userexcept_sysret_inject_safe(thread, rpc_flags);
+		/* Set the thread's `TASK_FRPC' flag to indicate that it's got work to do */
+		ATOMIC_OR(thread->t_flags, TASK_FRPC);
+
+		/* Deal  with the case where `thread' is currently running in user-space,
+		 * which requires us to temporarily move its execution into kernel-space,
+		 * such that it executes `handle_sysret_rpc()'  the next time it  returns
+		 * back to user-space.
+		 *
+		 * This is normally  done by `userexcept_sysret_inject_nopr()',  however
+		 * that function only works correctly when the thread is being hosted by
+		 * the same CPU as  the calling thread. But  there's also a wrapper  for
+		 * that low-level function `userexcept_sysret_inject_safe()', which does
+		 * the same thing, but also works then the thread hosted by another CPU. */
+		userexcept_sysret_inject_safe(thread, rpc_flags);
+	} else {
+		assertf(!(thread->t_flags & TASK_FKERNTHREAD),
+		        "Cannot schedule a non-RPC_CONTEXT_KERN RPC "
+		        "for execution within a TASK_FKERNTHREAD thread");
+
+		/* Because it's a user-level RPC, we only want to interrupt the thread if
+		 * it isn't masking the  signal vector `_RPC_GETSIGNO(rpc_flags)'. If  it
+		 * is currently masked, then  we also want to  mark it as pending  within
+		 * the thread's userprocmask (if it's  using one). Finally, we only  want
+		 * to wake the thread if the signal isn't masked, all of which is done by
+		 * the following call.
+		 *
+		 * NOTE: The `TASK_FRPC' flag also gets set by this function (though only
+		 *       if necessary) */
+		userexcept_sysret_inject_and_marksignal_safe(thread, rpc_flags);
+	}
 	return true;
 }
 

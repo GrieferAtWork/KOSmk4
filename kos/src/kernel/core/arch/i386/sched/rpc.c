@@ -135,13 +135,13 @@ PUBLIC ATTR_PERTASK struct irregs_kernel this_x86_sysret_iret = { 0 };
  * `assert(icpustate_isuser(state))'), it will make a round-trip through
  * arch-specific wrappers which  eventually call  `userexcept_sysret()'.
  * Once that function  returns, execution will  finally resume in  user-
- * space,  unless  this function  (or  `userexcept_sysret_inject()') was
- * called yet again.
+ * space,  unless  this function  (or `userexcept_sysret_inject_nopr()')
+ * was called yet again.
  * NOTE: The  given `state' must point to user-space, and be located at
  *       the very end of the kernel stack. This requirement is asserted
  *       internally by this function! */
-PUBLIC NOPREEMPT ATTR_RETNONNULL WUNUSED NONNULL((1)) struct icpustate *
-NOTHROW(FCALL userexcept_sysret_inject_with_state)(struct icpustate *__restrict state) {
+PUBLIC NOBLOCK NOPREEMPT ATTR_RETNONNULL WUNUSED NONNULL((1)) struct icpustate *
+NOTHROW(FCALL userexcept_sysret_inject_with_state_nopr)(struct icpustate *__restrict state) {
 #ifdef __x86_64__
 	struct task *me = THIS_TASK;
 	struct irregs *thread_save;
@@ -206,8 +206,8 @@ NOTHROW(FCALL userexcept_sysret_inject_with_state)(struct icpustate *__restrict 
  * returns  back to user-space the next time. This function works correctly
  * even when `thread == THIS_TASK', or when the injection has already  been
  * performed (either by a  prior call to  this function, or  by use of  the
- * sibling function `userexcept_sysret_inject_with_state()'), in which case
- * the call is silent no-op.
+ * sibling function `userexcept_sysret_inject_with_state_nopr()'), in which
+ * case the call is silent no-op.
  *
  * However, the caller still has to ensure `thread' won't make any  kernel-
  * user transitions for the duration of this call. The only way this can be
@@ -218,8 +218,8 @@ NOTHROW(FCALL userexcept_sysret_inject_with_state)(struct icpustate *__restrict 
  *
  * Additionally, the caller must also ensure that `thread' is still running
  * and  has  yet   to  terminate  (iow:   `TASK_FTERMINATING'  isn't   set) */
-PUBLIC NOPREEMPT WUNUSED NONNULL((1)) void
-NOTHROW(FCALL userexcept_sysret_inject)(struct task *__restrict thread) {
+PUBLIC NOBLOCK NOPREEMPT NONNULL((1)) void
+NOTHROW(FCALL userexcept_sysret_inject_nopr)(struct task *__restrict thread) {
 #ifdef __x86_64__
 	struct irregs_user *thread_iret;
 	struct irregs_user *thread_save;
@@ -309,6 +309,76 @@ NOTHROW(FCALL userexcept_sysret_inject)(struct task *__restrict thread) {
 	COMPILER_WRITE_BARRIER();
 	thread_iret->ir_eflags = 0;
 	COMPILER_WRITE_BARRIER();
+#endif /* !__x86_64__ */
+}
+
+
+/* Arch-specific function: Behaves identical to:
+ * >> pflag_t was = PREEMPTION_PUSHOFF();
+ * >> userexcept_sysret_inject_nopr(THIS_TASK);
+ * >> PREEMPTION_POP(was);
+ * This function can be used to force checks for RPCs (including  posix
+ * signals) to be performed _after_ a  system has completed (even in  a
+ * scenario where the system call completes successfully). This kind of
+ * functionality is required for some POSIX-signal-related system calls */
+PUBLIC NOBLOCK void NOTHROW(FCALL userexcept_sysret_inject_self)(void) {
+	pflag_t was;
+	struct task *thread = THIS_TASK;
+#ifdef __x86_64__
+	struct irregs_user *thread_iret;
+	struct irregs_user *thread_save;
+	assert(!(thread->t_flags & TASK_FKERNTHREAD));
+	thread_iret = x86_get_irregs(thread);
+	was         = PREEMPTION_PUSHOFF();
+	if (thread_iret->ir_rip != (uintptr_t)&x86_userexcept_sysret) {
+		/* Save the original IRET tail. */
+		thread_save = &FORTASK(thread, this_x86_sysret_iret);
+		thread_save->ir_rip    = thread_iret->ir_rip;
+		thread_save->ir_cs     = thread_iret->ir_cs;
+		thread_save->ir_rflags = thread_iret->ir_rflags;
+		thread_save->ir_ss     = thread_iret->ir_ss;
+		thread_save->ir_rsp    = thread_iret->ir_rsp;
+		COMPILER_READ_BARRIER();
+		/* NOTE: The write-order of all  of these is highly  important,
+		 *       so  just  put  a  write-barrier  around  every  write.
+		 *       For more information, see `irregs_rdip()' and friends. */
+		COMPILER_WRITE_BARRIER();
+		thread_iret->ir_rip = (uintptr_t)&x86_userexcept_sysret;
+		COMPILER_WRITE_BARRIER();
+		thread_iret->ir_cs = SEGMENT_KERNEL_CODE;
+		COMPILER_WRITE_BARRIER();
+		thread_iret->ir_rflags = 0;
+		COMPILER_WRITE_BARRIER();
+		thread_iret->ir_ss  = SEGMENT_KERNEL_DATA0;
+		COMPILER_WRITE_BARRIER();
+		thread_iret->ir_rsp = (u64)(thread_iret + 1);
+		COMPILER_WRITE_BARRIER();
+	}
+	PREEMPTION_POP(was);
+#else /* __x86_64__ */
+	struct irregs_user *thread_iret;
+	assert(!PREEMPTION_ENABLED());
+	assert(thread->t_cpu == THIS_CPU);
+	assert(!(thread->t_flags & TASK_FKERNTHREAD));
+	thread_iret = x86_get_irregs(thread);
+	was         = PREEMPTION_PUSHOFF();
+	if (thread_iret->ir_eip != (uintptr_t)&x86_userexcept_sysret) {
+		FORTASK(thread, this_x86_sysret_iret).ir_eip    = thread_iret->ir_eip;
+		FORTASK(thread, this_x86_sysret_iret).ir_cs     = thread_iret->ir_cs;
+		FORTASK(thread, this_x86_sysret_iret).ir_eflags = thread_iret->ir_eflags;
+		COMPILER_READ_BARRIER();
+		/* NOTE: The write-order of all  of these is highly  important,
+		 *       so  just  put  a  write-barrier  around  every  write.
+		 *       For more information, see `irregs_rdip()' and friends. */
+		COMPILER_WRITE_BARRIER();
+		thread_iret->ir_eip = (uintptr_t)&x86_userexcept_sysret;
+		COMPILER_WRITE_BARRIER();
+		thread_iret->ir_cs = SEGMENT_KERNEL_CODE;
+		COMPILER_WRITE_BARRIER();
+		thread_iret->ir_eflags = 0;
+		COMPILER_WRITE_BARRIER();
+	}
+	PREEMPTION_POP(was);
 #endif /* !__x86_64__ */
 }
 

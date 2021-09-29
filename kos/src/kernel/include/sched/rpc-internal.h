@@ -28,6 +28,7 @@
 
 #include <hybrid/sequence/list.h>
 
+#include <bits/os/siginfo.h>
 #include <kos/rpc.h>
 
 #define rpc_entry     pending_rpc      /* !DEPRECATED! */
@@ -45,6 +46,11 @@ struct pending_user_rpc {
 /* Finalize a given `struct pending_user_rpc' */
 #define pending_user_rpc_fini(self) decref((self)->pur_mman)
 
+#ifndef __siginfo_t_defined
+#define __siginfo_t_defined
+typedef struct __siginfo_struct siginfo_t;
+#endif /* !__siginfo_t_defined */
+
 struct pending_rpc {
 	SLIST_ENTRY(pending_rpc) pr_link;  /* [0..1][lock(ATOMIC)] Link in the list of pending RPCs */
 	uintptr_t                pr_flags; /* [const] RPC flags: RPC_CONTEXT_KERN, ...
@@ -54,7 +60,12 @@ struct pending_rpc {
 			prpc_exec_callback_t k_func;   /* [1..1][const] Function to invoke. */
 			void                *k_cookie; /* [?..?][const] Cookie argument for `k_func' */
 		}                       pr_kern;   /* [RPC_CONTEXT_KERN] Kernel-mode RPC */
-		struct pending_user_rpc pr_user;   /* [!RPC_CONTEXT_KERN] User-mode RPC */
+		struct pending_user_rpc pr_user;   /* [!RPC_CONTEXT_KERN && !RPC_CONTEXT_SIGNAL] User-mode RPC */
+		siginfo_t               pr_psig;   /* [!RPC_CONTEXT_KERN && RPC_CONTEXT_SIGNAL] Posix signal
+		                                    * NOTE: In this case, `pr_flags & RPC_SIGNO_MASK' must encode
+		                                    *       the same signal  number as `pr_psig.si_signo'.  Else,
+		                                    *       the incorrect signal is used during sigmask checks
+		                                    * NOTE: Only thread-specific posix signals appear here! */
 	};
 };
 
@@ -63,9 +74,14 @@ struct pending_rpc {
 #define pending_rpc_alloc_nx(size, gfp) ((struct pending_rpc *)kmalloc_nx(size, gfp))
 #define pending_rpc_alloc_kern(gfp)     pending_rpc_alloc(COMPILER_OFFSETAFTER(struct pending_rpc, pr_kern), gfp)
 #define pending_rpc_alloc_kern_nx(gfp)  pending_rpc_alloc_nx(COMPILER_OFFSETAFTER(struct pending_rpc, pr_kern), gfp)
+#define pending_rpc_alloc_psig(gfp)     pending_rpc_alloc(COMPILER_OFFSETAFTER(struct pending_rpc, pr_psig), gfp)
+#define pending_rpc_alloc_psig_nx(gfp)  pending_rpc_alloc_nx(COMPILER_OFFSETAFTER(struct pending_rpc, pr_psig), gfp)
 #define pending_rpc_free(self)          kfree(self)
 
+#ifndef __pending_rpc_slist_defined
+#define __pending_rpc_slist_defined
 SLIST_HEAD(pending_rpc_slist, pending_rpc);
+#endif /* !__pending_rpc_slist_defined */
 
 /* [0..n][lock(INSERT(ATOMIC), CLEAR(ATOMIC && THIS_TASK))]
  * Pending RPCs. (Set of `THIS_RPCS_TERMINATED' when RPCs may no longer
@@ -81,7 +97,7 @@ DATDEF ATTR_PERTASK struct pending_rpc_slist this_rpcs;
  *       the next time you make a call to `task_serve()'!
  * NOTE: The caller must initialize:
  *       - `rpc->pr_flags'
- *       - `rpc->pr_kern' or `rpc->pr_user'
+ *       - `rpc->pr_kern' or `rpc->pr_user' or `rpc->pr_psig'
  * @return: true:  Success. (Even if the thread terminates before the RPC can be served
  *                 normally, it will still  be served as `RPC_REASONCTX_SHUTDOWN'  when
  *                 true has been returned here)
@@ -94,6 +110,12 @@ NOTHROW(FCALL task_rpc_schedule)(struct task *__restrict thread,
 /************************************************************************/
 /* Internal RPC execution helpers                                       */
 /************************************************************************/
+
+/* Trigger RPC completion for `self' with context `RPC_REASONCTX_SHUTDOWN' */
+FUNDEF NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL task_asyncrpc_destroy_for_shutdown)(struct pending_rpc *__restrict self);
+/* Same as `task_asyncrpc_destroy_for_shutdown()', but do an entire list. */
+FUNDEF NOBLOCK void NOTHROW(FCALL task_asyncrpc_destroy_list_for_shutdown)(struct pending_rpc *first);
 
 /* Arch-specific function:
  * Execute the given `func' using the register state at the time of

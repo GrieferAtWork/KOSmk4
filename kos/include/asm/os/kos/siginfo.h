@@ -36,7 +36,7 @@
 #define __SI_ASYNCIO (-4)  /* Sent by AIO completion. */
 #define __SI_MESGQ   (-3)  /* Sent by real time mesq state change. */
 #define __SI_TIMER   (-2)  /* Sent by timer expiration. */
-#define __SI_QUEUE   (-1)  /* Sent by sigqueue_entry. */
+#define __SI_QUEUE   (-1)  /* Sent by sigqueue. */
 #define __SI_USER    0     /* Sent by kill, sigsend. */
 #define __SI_KERNEL  0x80  /* Send by kernel. */
 

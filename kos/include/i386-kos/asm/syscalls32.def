@@ -50,7 +50,7 @@
 @@Restore the specified register state when returning from a signal handler
 @@Note that the order and locations of arguments taken by this system  call
 @@are of great importance, as they must match what is encoded by the kernel
-@@within `sighand_raise_signal()'
+@@within `userexcept_callsignal()'
 @@The order chosen is also important, as it is selected such that arguments
 @@are  only  passed   through  registers  that   are  preserved  by   CDECL
 [restart(must)][noexcept]

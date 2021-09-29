@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x49255a5f */
+/* HASH CRC-32:0x8178323c */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -463,7 +463,7 @@ print("@@pp_endif@@");
 		case __SI_TIMER: __result = "Sent by timer expiration"; break;
 #endif /* __SI_TIMER */
 #ifdef __SI_QUEUE
-		case __SI_QUEUE: __result = "Sent by sigqueue_entry"; break;
+		case __SI_QUEUE: __result = "Sent by sigqueue"; break;
 #endif /* __SI_QUEUE */
 #ifdef __SI_USER
 		case __SI_USER: __result = "Sent by kill, sigsend"; break;
