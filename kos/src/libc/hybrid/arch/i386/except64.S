@@ -565,6 +565,8 @@ END(libc_error_throw)
 
 
 #ifdef __KERNEL__
+#include <kernel/compiler.h>
+#ifndef CONFIG_USE_NEW_RPC
 
 
 .section .text
@@ -667,6 +669,7 @@ END(x86_userexcept_unwind_interrupt_kernel_rsp)
 END(x86_userexcept_unwind_interrupt_rsp)
 END(x86_userexcept_unwind_interrupt)
 
+#endif /* !CONFIG_USE_NEW_RPC */
 #endif /* __KERNEL__ */
 
 #endif /* !GUARD_LIBC_HYBRID_ARCH_I386_EXCEPT64_S */

@@ -36,7 +36,6 @@ DECL_BEGIN
                                                 *       instruction-fetch fault can also easily be detected
                                                 *       by comparing `%eip' with `%cr2' */
 
-
 #ifdef __CC__
 
 /* Helpers and prototypes for c-level hardware fault handlers. */
@@ -45,27 +44,27 @@ struct icpustate;
 struct df_cpustate;
 
 /* Exception handlers */
-INTDEF struct icpustate *FCALL x86_handle_divide_by_zero(struct icpustate *__restrict state);                       /* #DE  Divide-by-zero */
-INTDEF struct icpustate *FCALL x86_handle_debugtrap(struct icpustate *__restrict state);                            /* #DB  Debug */
-INTDEF struct icpustate *FCALL x86_handle_non_maskable_interrupt(struct icpustate *__restrict state);               /* #NMI Non-maskable Interrupt */
-INTDEF struct icpustate *FCALL x86_handle_breakpoint(struct icpustate *__restrict state);                           /* #BP  Breakpoint */
-INTDEF struct icpustate *FCALL x86_handle_overflow(struct icpustate *__restrict state);                             /* #OF  Overflow */
-INTDEF struct icpustate *FCALL x86_handle_bound_range(struct icpustate *__restrict state);                          /* #BR  Bound Range Exceeded */
-INTDEF struct icpustate *FCALL x86_handle_illegal_instruction(struct icpustate *__restrict state);                  /* #UD  Invalid Opcode */
-INTDEF struct icpustate *FCALL x86_handle_device_not_available(struct icpustate *__restrict state);                 /* #NM  Device Not Available */
-INTDEF struct df_cpustate *FCALL x86_handle_double_fault(struct df_cpustate *__restrict state);                     /* #DF  Double Fault */
-INTDEF struct icpustate *FCALL x86_handle_coprocessor_fault(struct icpustate *__restrict state);                    /* #CSO Coprocessor Segment Overrun (unused on 486+) */
-INTDEF struct icpustate *FCALL x86_handle_invalid_tss(struct icpustate *__restrict state, uintptr_t ecode);         /* #TS  Invalid TSS */
-INTDEF struct icpustate *FCALL x86_handle_segment_not_present(struct icpustate *__restrict state, uintptr_t ecode); /* #NP  Segment Not Present */
-INTDEF struct icpustate *FCALL x86_handle_stackfault(struct icpustate *__restrict state, uintptr_t ecode);          /* #SS  Stack-Segment Fault */
-INTDEF struct icpustate *FCALL x86_handle_gpf(struct icpustate *__restrict state, uintptr_t ecode);                 /* #GP  General Protection Fault */
-INTDEF struct icpustate *FCALL x86_handle_pagefault(struct icpustate *__restrict state, uintptr_t ecode);           /* #PF  Page Fault */
-INTDEF struct icpustate *FCALL x86_handle_0fh(struct icpustate *__restrict state);                                  /* Reserved (exception)... */
-INTDEF struct icpustate *FCALL x86_handle_fpu_x87(struct icpustate *__restrict state);                              /* #MF  x87 Floating-Point Exception */
-INTDEF struct icpustate *FCALL x86_handle_bad_alignment(struct icpustate *__restrict state, uintptr_t ecode);       /* #AC  Alignment Check */
-INTDEF struct icpustate *FCALL x86_handle_machine_check(struct icpustate *__restrict state);                        /* #MC  Machine Check */
-INTDEF struct icpustate *FCALL x86_handle_fpu_simd(struct icpustate *__restrict state);                             /* #XM  SIMD Floating-Point Exception */
-INTDEF struct icpustate *FCALL x86_handle_virtualization_error(struct icpustate *__restrict state);                 /* #VE  Virtualization Exception */
+INTDEF struct icpustate *FCALL x86_handle_divide_by_zero(struct icpustate *__restrict state);                         /* #DE  Divide-by-zero */
+INTDEF struct icpustate *FCALL x86_handle_debugtrap(struct icpustate *__restrict state);                              /* #DB  Debug */
+INTDEF struct icpustate *FCALL x86_handle_non_maskable_interrupt(struct icpustate *__restrict state);                 /* #NMI Non-maskable Interrupt */
+INTDEF struct icpustate *FCALL x86_handle_breakpoint(struct icpustate *__restrict state);                             /* #BP  Breakpoint */
+INTDEF struct icpustate *FCALL x86_handle_overflow(struct icpustate *__restrict state);                               /* #OF  Overflow */
+INTDEF struct icpustate *FCALL x86_handle_bound_range(struct icpustate *__restrict state);                            /* #BR  Bound Range Exceeded */
+INTDEF struct icpustate *FCALL x86_handle_illegal_instruction(struct icpustate *__restrict state);                    /* #UD  Invalid Opcode */
+INTDEF struct icpustate *FCALL x86_handle_device_not_available(struct icpustate *__restrict state);                   /* #NM  Device Not Available */
+INTDEF struct df_cpustate *FCALL x86_handle_double_fault(struct df_cpustate *__restrict state);                       /* #DF  Double Fault */
+INTDEF struct icpustate *FCALL x86_handle_coprocessor_fault(struct icpustate *__restrict state);                      /* #CSO Coprocessor Segment Overrun (unused on 486+) */
+INTDEF struct icpustate *FCALL x86_handle_invalid_tss(struct icpustate *__restrict state, uintptr_t ecode);           /* #TS  Invalid TSS */
+INTDEF struct icpustate *FCALL x86_handle_segment_not_present(struct icpustate *__restrict state, uintptr_t ecode);   /* #NP  Segment Not Present */
+INTDEF struct icpustate *FCALL x86_handle_stackfault(struct icpustate *__restrict state, uintptr_t ecode);            /* #SS  Stack-Segment Fault */
+INTDEF struct icpustate *FCALL x86_handle_gpf(struct icpustate *__restrict state, uintptr_t ecode);                   /* #GP  General Protection Fault */
+INTDEF struct icpustate *FCALL x86_handle_pagefault(struct icpustate *__restrict state, uintptr_t ecode, void *addr); /* #PF  Page Fault */
+INTDEF struct icpustate *FCALL x86_handle_0fh(struct icpustate *__restrict state);                                    /* Reserved (exception)... */
+INTDEF struct icpustate *FCALL x86_handle_fpu_x87(struct icpustate *__restrict state);                                /* #MF  x87 Floating-Point Exception */
+INTDEF struct icpustate *FCALL x86_handle_bad_alignment(struct icpustate *__restrict state, uintptr_t ecode);         /* #AC  Alignment Check */
+INTDEF struct icpustate *FCALL x86_handle_machine_check(struct icpustate *__restrict state);                          /* #MC  Machine Check */
+INTDEF struct icpustate *FCALL x86_handle_fpu_simd(struct icpustate *__restrict state);                               /* #XM  SIMD Floating-Point Exception */
+INTDEF struct icpustate *FCALL x86_handle_virtualization_error(struct icpustate *__restrict state);                   /* #VE  Virtualization Exception */
 INTDEF struct icpustate *FCALL x86_handle_15h(struct icpustate *__restrict state);
 INTDEF struct icpustate *FCALL x86_handle_16h(struct icpustate *__restrict state);
 INTDEF struct icpustate *FCALL x86_handle_17h(struct icpustate *__restrict state);

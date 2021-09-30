@@ -61,7 +61,28 @@ INTERN_LABEL(_x86_idt_breakpoint_after_enter):
 
 	movq   %rsp, %rdi     /* struct icpustate *state */
 
-	EXTERN(PP_CAT2(x86_handle_, IDT_VECTOR_NAME))
+#if IDT_VECTOR_ID == 0x0e
+	movq   %cr2, %rdx /* void *addr */
+	movq   %rdx, %rbp /* void *addr (register alias needed for unwinding) */
+#ifdef CONFIG_USE_NEW_RPC
+	.cfi_personality 0, x86_xintr3_userexcept_personality
+#endif /* CONFIG_USE_NEW_RPC */
+#elif IDT_CONFIG_PUSHESERRORS(IDT_VECTOR_ID)
+	movq   %rsi, %rbx /* uintptr_t ecode (register alias needed for unwinding) */
+#ifdef CONFIG_USE_NEW_RPC
+	.cfi_personality 0, x86_xintr2_userexcept_personality
+#endif /* CONFIG_USE_NEW_RPC */
+#else /* ... */
+#ifdef CONFIG_USE_NEW_RPC
+	.cfi_personality 0, x86_xintr1_userexcept_personality
+#endif /* CONFIG_USE_NEW_RPC */
+#endif /* !... */
+#ifdef CONFIG_USE_NEW_RPC
+	.cfi_lsda        0, 1f
+#endif /* CONFIG_USE_NEW_RPC */
+
+
+1:	EXTERN(PP_CAT2(x86_handle_, IDT_VECTOR_NAME))
 	call   PP_CAT2(x86_handle_, IDT_VECTOR_NAME)
 
 	ASM_POP_ICPUSTATE_BEFORE_IRET_CFI_R

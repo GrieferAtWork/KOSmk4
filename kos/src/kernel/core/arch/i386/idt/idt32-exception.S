@@ -19,7 +19,7 @@
  */
 #ifdef __INTELLISENSE__
 #include "idt32.S"
-#define IDT_VECTOR 08
+#define IDT_VECTOR 0e
 #endif /* __INTELLISENSE__ */
 
 
@@ -134,7 +134,21 @@ IDT_HANDLER_BEGIN
 	jmp    cpu_apply_ucpustate
 #undef OFFSET_DF_CPUSTATE_REGS
 #else /* IDT_VECTOR_ID == 0x08 */
-	.cfi_iret_signal_frame
+	/* UGH!  SERIOUS F- YOU  GDB!!!! Like literally,  it just p00ps itself
+	 * because of the `.cfi_adjust_cfa_offset -4' down below. For WHATEVER
+	 * STUPID  REASON, this `.cfi_signal_frame' affects it somehow... WTF? */
+#if IDT_VECTOR_ID != 0x0e
+	.cfi_signal_frame
+#endif /* IDT_VECTOR_ID != 0x0e */
+	.cfi_restore_iret_eip
+	.cfi_restore_iret_cs
+	.cfi_restore_iret_eflags
+	.cfi_restore_iret_esp
+	.cfi_restore_iret_ss
+	.cfi_restore_iret_es
+	.cfi_restore_iret_ds
+	.cfi_restore_iret_fs
+	.cfi_restore_iret_gs
 #if IDT_CONFIG_PUSHESERRORS(IDT_VECTOR_ID)
 	.cfi_def_cfa %esp, 4 /* Adjust for the error code. */
 	popl_cfi %ss:-(12 + SIZEOF_GPREGS + 4)(%esp) /* ECODE */
@@ -181,8 +195,32 @@ IDT_HANDLER_BEGIN
 	movl   -4(%esp), %edx /* uintptr_t ecode */
 #endif /* IDT_CONFIG_PUSHESERRORS(IDT_VECTOR_ID) */
 
-	EXTERN(PP_CAT2(x86_handle_, IDT_VECTOR_NAME))
+#if IDT_VECTOR_ID == 0x0e
+	movl   %cr2, %ebp
+	pushl_cfi %ebp
+#ifdef CONFIG_USE_NEW_RPC
+	movl   %edx, %ebx     /* uintptr_t ecode (register alias needed for unwinding) */
+	.cfi_personality 0, x86_xintr3_userexcept_personality
+#endif /* CONFIG_USE_NEW_RPC */
+#elif IDT_CONFIG_PUSHESERRORS(IDT_VECTOR_ID)
+#ifdef CONFIG_USE_NEW_RPC
+	movl   %edx, %ebx     /* uintptr_t ecode (register alias needed for unwinding) */
+	.cfi_personality 0, x86_xintr2_userexcept_personality
+#endif /* CONFIG_USE_NEW_RPC */
+#else /* ... */
+#ifdef CONFIG_USE_NEW_RPC
+	.cfi_personality 0, x86_xintr1_userexcept_personality
+#endif /* CONFIG_USE_NEW_RPC */
+#endif /* !... */
+#ifdef CONFIG_USE_NEW_RPC
+	.cfi_lsda        0, 1f
+#endif /* CONFIG_USE_NEW_RPC */
+
+1:	EXTERN(PP_CAT2(x86_handle_, IDT_VECTOR_NAME))
 	call   PP_CAT2(x86_handle_, IDT_VECTOR_NAME)
+#if IDT_VECTOR_ID == 0x0e
+	.cfi_adjust_cfa_offset -4
+#endif /* !... */
 
 	popal_cfi_r
 	popl_cfi %fs
@@ -208,7 +246,11 @@ INTERN_FUNCTION(PP_CAT2(x86_handle_, IDT_VECTOR_NAME))
 	EXTERN(x86_handle_unhandled_idt)
 	call   x86_handle_unhandled_idt
 	.cfi_adjust_cfa_offset -4
+#if IDT_VECTOR_ID == 0x08
+	ret    $4
+#else /* IDT_VECTOR_ID == 0x08 */
 	ret
+#endif /* IDT_VECTOR_ID != 0x08 */
 	.cfi_endproc
 END(PP_CAT2(x86_handle_, IDT_VECTOR_NAME))
 

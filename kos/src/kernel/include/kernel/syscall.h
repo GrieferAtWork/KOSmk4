@@ -140,25 +140,29 @@ DECL_BEGIN
 #endif /* CONFIG_BUILDING_KERNEL_CORE */
 
 /* Emulate the execution of a system call.
- * NOTE: `syscall_emulate_r()'   is  the  same  as  `syscall_emulate()',  however
- *       will  reset the  kernel-space stack  to `state',  and immediately return
- *       to userspace after the system call has returned (or unwind any exception
- *       that  was thrown by  the system call, also  dealing with the possibility
- *       of  RPC  function   handling,  as  well   as  system  call   restarting)
- *       Note  this  variant will  _NOT_ unwind  the  caller's stack,  and should
- *       therefor only be  used when no  cleanup has to  be performed within  the
- *       calling  thread!  (if  this  doesn't  apply,  `syscall_emulate()' should
- *       be used instead) */
-#ifndef __syscall_emulate_defined
-#define __syscall_emulate_defined
+ * NOTE: `syscall_emulate_r()' is the same as `syscall_emulate()', however already
+ *       includes all of the necessary exception handling ~ala userexcept_handler:
+ * >> PUBLIC ATTR_NORETURN NONNULL((1, 2)) void
+ * >> NOTHROW(FCALL syscall_emulate_r)(struct icpustate *__restrict state,
+ * >>                                  struct rpc_syscall_info const *__restrict sc_info) {
+ * >> again:
+ * >>     TRY {
+ * >>         state = syscall_emulate(state, sc_info);
+ * >>         cpu_apply_icpustate(state);
+ * >>     } EXCEPT {
+ * >>         state = userexcept_handler(state, sc_info);
+ * >>         // PERTASK_SET(this_exception_code, 1); // Prevent internal assertion check
+ * >>         goto again;
+ * >>     }
+ * >> } */
 FUNDEF WUNUSED NONNULL((1, 2)) struct icpustate *FCALL
 syscall_emulate(struct icpustate *__restrict state,
-                struct rpc_syscall_info const *__restrict sc_info);
-FUNDEF ATTR_NORETURN NONNULL((1, 2)) void FCALL
-syscall_emulate_r(struct icpustate *__restrict state,
-                  struct rpc_syscall_info const *__restrict sc_info);
-#endif /* !__syscall_emulate_defined */
+                struct rpc_syscall_info const *__restrict sc_info)
+		THROWS(...);
 
+FUNDEF ATTR_NORETURN NONNULL((1, 2)) void
+NOTHROW(FCALL syscall_emulate_r)(struct icpustate *__restrict state,
+                                 struct rpc_syscall_info const *__restrict sc_info);
 #endif /* !__CC__ */
 
 DECL_END

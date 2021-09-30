@@ -38,6 +38,7 @@
 #include <kernel/mman/sync.h>
 #include <kernel/paging.h>
 #include <kernel/printk.h>
+#include <kernel/rt/except-handler.h>
 #include <kernel/x86/fault.h>
 #include <kernel/x86/idt.h> /* IDT_CONFIG_ISTRAP() */
 #include <kernel/x86/phys2virt64.h>
@@ -381,8 +382,10 @@ rethrow_exception_from_pf_handler(struct icpustate *__restrict state, void const
 #endif /* CONFIG_NO_SMP */
 
 
+
 INTERN struct icpustate *FCALL
-x86_handle_pagefault(struct icpustate *__restrict state, uintptr_t ecode) {
+x86_handle_pagefault(struct icpustate *__restrict state,
+                     uintptr_t ecode, void *addr) {
 	STATIC_ASSERT(!IDT_CONFIG_ISTRAP(0x0e)); /* #PF  Page Fault */
 #if 1
 #define FAULT_IS_USER ((ecode & X86_PAGEFAULT_ECODE_USERSPACE) != 0)
@@ -399,7 +402,6 @@ x86_handle_pagefault(struct icpustate *__restrict state, uintptr_t ecode) {
 	 (uintptr_t)(ecode & X86_PAGEFAULT_ECODE_WRITING ? E_SEGFAULT_CONTEXT_WRITING : 0))
 #endif
 	void const *pc;
-	void *addr;
 	struct mfault mf;
 	struct task_connections con;
 
@@ -409,9 +411,6 @@ x86_handle_pagefault(struct icpustate *__restrict state, uintptr_t ecode) {
 		state->ics_irregs.ir_Pip = (uintptr_t)x86_nopf_retof(pc);
 		return state;
 	}
-
-	/* Read our the faulting address */
-	addr = __rdcr2();
 
 	/* Load the address of the faulting page. */
 	mf.mfl_addr = (void *)((uintptr_t)addr & ~PAGEMASK);
@@ -911,10 +910,14 @@ cleanup_vio_and_pop_connections_and_set_exception_pointers2:
 					 * would get overwritten with the VIO function address. */
 					decref_unlikely(args.vea_args.va_file);
 					decref_unlikely(part);
+#ifdef CONFIG_USE_NEW_RPC
+					RETHROW();
+#else /* CONFIG_USE_NEW_RPC */
 					task_popconnections();
 					if (FAULT_IS_USER)
 						PERTASK_SET(this_exception_faultaddr, icpustate_getpc(state));
 					x86_userexcept_unwind_interrupt(state);
+#endif /* !CONFIG_USE_NEW_RPC */
 				}
 				decref_unlikely(args.vea_args.va_file);
 				decref_unlikely(part);
@@ -1185,10 +1188,12 @@ set_exception_pointers2:
 		unsigned int i;
 		for (i = 2; i < EXCEPTION_DATA_POINTERS; ++i)
 			PERTASK_SET(this_exception_args.e_pointers[i], 0);
+#ifndef CONFIG_USE_NEW_RPC
 #if EXCEPT_BACKTRACE_SIZE != 0
 		for (i = 0; i < EXCEPT_BACKTRACE_SIZE; ++i)
 			PERTASK_SET(this_exception_trace[i], (void const *)NULL);
 #endif /* EXCEPT_BACKTRACE_SIZE != 0 */
+#endif /* !CONFIG_USE_NEW_RPC */
 	}
 	/* Always make the state point to the instruction _after_ the one causing the problem. */
 	PERTASK_SET(this_exception_faultaddr, pc);
@@ -1202,7 +1207,11 @@ do_unwind_state:
 	if (kernel_debugtrap_shouldtrap(KERNEL_DEBUGTRAP_ON_SEGFAULT))
 		state = kernel_debugtrap_r(state, SIGSEGV);
 	assert(error_active());
+#ifdef CONFIG_USE_NEW_RPC
+	error_throw_current();
+#else /* CONFIG_USE_NEW_RPC */
 	x86_userexcept_unwind_interrupt(state);
+#endif /* !CONFIG_USE_NEW_RPC */
 #undef FAULT_IS_USER
 #undef FAULT_IS_WRITE
 #undef GET_PF_CONTEXT_UW_BITS

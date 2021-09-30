@@ -510,6 +510,8 @@ END(libc_error_throw)
 
 
 #ifdef __KERNEL__
+#include <kernel/compiler.h>
+#ifndef CONFIG_USE_NEW_RPC
 
 /* ECX: <struct icpustate *> */
 INTERN(x86_serve_user_rpc_and_propagate_exceptions)
@@ -616,6 +618,7 @@ END(x86_userexcept_unwind_interrupt_kernel_esp)
 END(x86_userexcept_unwind_interrupt_esp)
 END(x86_userexcept_unwind_interrupt)
 
+#endif /* !CONFIG_USE_NEW_RPC */
 #endif /* __KERNEL__ */
 
 #endif /* !GUARD_LIBC_HYBRID_ARCH_I386_EXCEPT32_S */

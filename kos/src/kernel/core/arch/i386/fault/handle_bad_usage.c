@@ -81,6 +81,7 @@ opt.append("-Os");
 #include <kernel/mman/unmapped.h>
 #include <kernel/printk.h>
 #include <kernel/restart-interrupt.h>
+#include <kernel/rt/except-handler.h>
 #include <kernel/syscall.h>
 #include <kernel/user.h>
 #include <kernel/x86/cpuid.h>
@@ -421,7 +422,9 @@ loophint(struct icpustate *__restrict state) {
 #undef EMU86_EMULATE_RETURN_AFTER_INTO /* Not needed because we don't emulate the instruction */
 #undef EMU86_EMULATE_THROW_BOUNDERR    /* Not needed because we don't emulate the instruction */
 
-
+#ifdef CONFIG_USE_NEW_RPC
+#define unwind_interrupt(self) error_throw_current()
+#else /* CONFIG_USE_NEW_RPC */
 PRIVATE ATTR_NORETURN NOBLOCK void
 NOTHROW(FCALL unwind_interrupt)(struct icpustate *__restrict self) {
 #if EXCEPT_BACKTRACE_SIZE != 0
@@ -433,6 +436,7 @@ NOTHROW(FCALL unwind_interrupt)(struct icpustate *__restrict self) {
 #endif /* EXCEPT_BACKTRACE_SIZE != 0 */
 	x86_userexcept_unwind_interrupt(self);
 }
+#endif /* !CONFIG_USE_NEW_RPC */
 
 #define EMU86_EMULATE_TRY \
 	TRY

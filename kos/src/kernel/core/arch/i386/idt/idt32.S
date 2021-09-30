@@ -23,14 +23,15 @@
 
 #include <hybrid/compiler.h>
 
+#include <kernel/x86/fault.h>
 #include <kernel/x86/idt-names.h>
 #include <kernel/x86/idt.h>
 #include <kernel/x86/pic.h>
 
 #include <asm/cfi.h>
 #include <asm/cpu-flags.h>
-#include <kos/kernel/cpu-state32.h>
 #include <kos/kernel/cpu-state-asm32.h>
+#include <kos/kernel/cpu-state32.h>
 #include <kos/kernel/gdt.h>
 #include <kos/kernel/tss.h>
 

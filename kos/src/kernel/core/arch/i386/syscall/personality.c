@@ -23,11 +23,7 @@
 
 #include <kernel/compiler.h>
 
-#ifdef CONFIG_USE_NEW_RPC
-
-/* TODO */
-
-#else /* CONFIG_USE_NEW_RPC */
+#ifndef CONFIG_USE_NEW_RPC
 #include <kernel/except.h>
 #include <kernel/paging.h>
 #include <kernel/rt/except-personality.h>

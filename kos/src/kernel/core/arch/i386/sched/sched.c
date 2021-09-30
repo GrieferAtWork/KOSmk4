@@ -634,12 +634,21 @@ NOTHROW(FCALL x86_get_irregs)(struct task const *__restrict self) {
 			result = (struct irregs_user *)((byte_t *)result -
 			                                (SIZEOF_IRREGS_VM86 -
 			                                 SIZEOF_IRREGS_USER));
+#ifdef CONFIG_USE_NEW_RPC
+			assertf(result->ir_eflags == userspace_eflags ||
+			        (!(result->ir_eflags & EFLAGS_VM) &&
+			         result->ir_eip == (uintptr_t)&x86_userexcept_sysret &&
+			         SEGMENT_IS_VALID_KERNCODE(result->ir_cs)),
+			        "Unexpected eflags at %p (found: %#" PRIxPTR ", expected: %#" PRIxPTR ")",
+			        &result->ir_eflags, result->ir_eflags, userspace_eflags);
+#else /* CONFIG_USE_NEW_RPC */
 			assertf(result->ir_eflags == userspace_eflags ||
 			        (!(result->ir_eflags & EFLAGS_VM) &&
 			         result->ir_eip == (uintptr_t)&x86_rpc_user_redirection &&
 			         SEGMENT_IS_VALID_KERNCODE(result->ir_cs)),
 			        "Unexpected eflags at %p (found: %#" PRIxPTR ", expected: %#" PRIxPTR ")",
 			        &result->ir_eflags, result->ir_eflags, userspace_eflags);
+#endif /* !CONFIG_USE_NEW_RPC */
 			printk(KERN_TRACE "[x86] Detected iret.vm86 tail at %p\n", result);
 		}
 	}
@@ -648,8 +657,15 @@ NOTHROW(FCALL x86_get_irregs)(struct task const *__restrict self) {
 	if (result->ir_eflags & EFLAGS_VM) {
 		assertf(result->ir_eflags & EFLAGS_IF,
 		        "User-space IRET without EFLAGS.IF (%p)", result->ir_eflags);
-	} else if (result->ir_eip != (uintptr_t)&x86_rpc_user_redirection ||
-	           !SEGMENT_IS_VALID_KERNCODE(result->ir_cs)) {
+	} else
+#ifdef CONFIG_USE_NEW_RPC
+	if (result->ir_eip != (uintptr_t)&x86_userexcept_sysret ||
+	    !SEGMENT_IS_VALID_KERNCODE(result->ir_cs))
+#else /* CONFIG_USE_NEW_RPC */
+	if (result->ir_eip != (uintptr_t)&x86_rpc_user_redirection ||
+	    !SEGMENT_IS_VALID_KERNCODE(result->ir_cs))
+#endif /* !CONFIG_USE_NEW_RPC */
+	{
 		assertf(SEGMENT_IS_VALID_USERCODE(result->ir_cs),
 		        "User-space IRET with invalid CS (%p)", result->ir_cs);
 		assertf(result->ir_eflags & EFLAGS_IF,

@@ -26,6 +26,7 @@
 
 #include <kernel/except.h>
 #include <kernel/restart-interrupt.h>
+#include <kernel/rt/except-handler.h>
 #include <kernel/syscall-properties.h>
 #include <kernel/syscall-trace.h>
 #include <kernel/syscall.h>
@@ -33,7 +34,9 @@
 #include <kernel/x86/fault.h>
 #include <kernel/x86/idt.h>            /* IDT_CONFIG_ISTRAP() */
 #include <kernel/x86/syscall-tables.h> /* CONFIG_X86_EMULATE_LCALL7 */
-#include <sched/except-handler.h>      /* x86_userexcept_unwind_interrupt() */
+#ifndef CONFIG_USE_NEW_RPC
+#include <sched/except-handler.h> /* x86_userexcept_unwind_interrupt() */
+#endif /* !CONFIG_USE_NEW_RPC */
 
 #include <hybrid/atomic.h>
 #include <hybrid/byteorder.h>
@@ -80,6 +83,9 @@ lcall7_clone32(struct icpustate *__restrict state) {
 	sc_info.rsi_sysno = __NR32_clone; /* Only needed for `syscall_trace()' */
 #endif /* !CONFIG_NO_SYSCALL_TRACING */
 	sc_info.rsi_flags = RPC_SYSCALL_INFO_METHOD_LCALL7_32;
+#ifdef CONFIG_USE_NEW_RPC
+again:
+#endif /* CONFIG_USE_NEW_RPC */
 	TRY {
 		u32 *argv;
 		unsigned i;
@@ -107,10 +113,18 @@ lcall7_clone32(struct icpustate *__restrict state) {
 		                                                         : x86_get_user_gsbase(),
 		                      x86_get_user_fsbase());
 	} EXCEPT {
+#ifdef CONFIG_NO_SYSCALL_TRACING
 		sc_info.rsi_sysno = __NR32_clone;
+#endif /* CONFIG_NO_SYSCALL_TRACING */
 		if (icpustate_getpflags(state) & EFLAGS_DF)
 			sc_info.rsi_flags |= RPC_SYSCALL_INFO_FEXCEPT;
+#ifdef CONFIG_USE_NEW_RPC
+		state = userexcept_handler(state, &sc_info);
+		PERTASK_SET(this_exception_code, 1); /* Prevent internal fault */
+		goto again;
+#else /* CONFIG_USE_NEW_RPC */
 		x86_userexcept_unwind_i(state, &sc_info);
+#endif /* !CONFIG_USE_NEW_RPC */
 	}
 	gpregs_setpax(&state->ics_gpregs, cpid);
 	return state;
@@ -123,6 +137,9 @@ x86_emulate_syscall32_lcall7(struct icpustate *__restrict state, u32 segment_off
 	/* lcall7 emulation in compatibility mode. */
 	struct rpc_syscall_info sc_info;
 	unsigned int argc;
+#ifdef CONFIG_USE_NEW_RPC
+again:
+#endif /* CONFIG_USE_NEW_RPC */
 	sc_info.rsi_sysno = segment_offset ? segment_offset
 	                                   : (u32)gpregs_getpax(&state->ics_gpregs);
 #ifndef __OPTIMIZE_SIZE__
@@ -150,7 +167,13 @@ x86_emulate_syscall32_lcall7(struct icpustate *__restrict state, u32 segment_off
 				sc_info.rsi_flags |= RPC_SYSCALL_INFO_FREGVALID(i);
 			}
 		} EXCEPT {
+#ifdef CONFIG_USE_NEW_RPC
+			state = userexcept_handler(state, &sc_info);
+			PERTASK_SET(this_exception_code, 1); /* Prevent internal fault */
+			goto again;
+#else /* CONFIG_USE_NEW_RPC */
 			x86_userexcept_unwind_i(state, &sc_info);
+#endif /* !CONFIG_USE_NEW_RPC */
 		}
 	}
 	syscall_emulate_r(state, &sc_info);
@@ -162,6 +185,9 @@ x86_emulate_syscall64_lcall7(struct icpustate *__restrict state, u64 segment_off
 	/* lcall7 emulation in 64-bit mode. */
 	struct rpc_syscall_info sc_info;
 	unsigned int argc;
+#ifdef CONFIG_USE_NEW_RPC
+again:
+#endif /* CONFIG_USE_NEW_RPC */
 	sc_info.rsi_sysno = segment_offset ? segment_offset
 	                                   : gpregs_getpax(&state->ics_gpregs);
 	sc_info.rsi_flags = RPC_SYSCALL_INFO_METHOD_LCALL7_64;
@@ -181,7 +207,13 @@ x86_emulate_syscall64_lcall7(struct icpustate *__restrict state, u64 segment_off
 				sc_info.rsi_flags |= RPC_SYSCALL_INFO_FREGVALID(i);
 			}
 		} EXCEPT {
+#ifdef CONFIG_USE_NEW_RPC
+			state = userexcept_handler(state, &sc_info);
+			PERTASK_SET(this_exception_code, 1); /* Prevent internal fault */
+			goto again;
+#else /* CONFIG_USE_NEW_RPC */
 			x86_userexcept_unwind_i(state, &sc_info);
+#endif /* !CONFIG_USE_NEW_RPC */
 		}
 	}
 	syscall_emulate_r(state, &sc_info);
@@ -393,11 +425,17 @@ generic_failure:
 unwind_state:
 	PERTASK_SET(this_exception_faultaddr, orig_pc);
 	icpustate_setpc(state, pc);
+#ifndef CONFIG_USE_NEW_RPC
 #if EXCEPT_BACKTRACE_SIZE != 0
 	for (i = 0; i < EXCEPT_BACKTRACE_SIZE; ++i)
 		PERTASK_SET(this_exception_trace[i], (void const *)NULL);
 #endif /* EXCEPT_BACKTRACE_SIZE != 0 */
+#endif /* !CONFIG_USE_NEW_RPC */
+#ifdef CONFIG_USE_NEW_RPC
+	error_throw_current();
+#else /* CONFIG_USE_NEW_RPC */
 	x86_userexcept_unwind_interrupt(state);
+#endif /* !CONFIG_USE_NEW_RPC */
 }
 
 

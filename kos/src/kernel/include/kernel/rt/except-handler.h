@@ -133,7 +133,6 @@ FUNDEF ATTR_NORETURN NONNULL((1)) void
 NOTHROW(FCALL userexcept_handler_ucpustate)(struct ucpustate *__restrict state,
                                             struct rpc_syscall_info *sc_info);
 
-
 /* This is the function that is injected by `userexcept_sysret_inject_nopr()',
  * as well as related functions.
  *
