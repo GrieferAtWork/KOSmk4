@@ -41,6 +41,7 @@
 #include <sched/except-handler.h>
 #include <sched/pid.h>
 #include <sched/posix-signal.h>
+#include <sched/rpc-internal.h>
 #include <sched/rpc.h>
 #include <sched/task.h>
 #include <sched/tsc.h>
@@ -78,6 +79,12 @@
 #include <misc/pointer-set.h>
 
 DECL_BEGIN
+
+STATIC_ASSERT_MSG(NSIG - 1 <= 0xff,
+                  "This is an ABI requirement imposed by:\n"
+                  " - clone(2)\n"
+                  " - RPC_SIGNO_MASK");
+
 
 /* An empty signal mask used to initialize `this_kernel_sigmask' */
 PUBLIC struct kernel_sigmask kernel_sigmask_empty = {
@@ -244,9 +251,9 @@ STATIC_ASSERT(SIGMASK_ISMASKED_NOPF_YES == (int)true);
 STATIC_ASSERT(SIGMASK_ISMASKED_NOPF_YES == (int)(10 != 0));
 
 #ifdef CONFIG_HAVE_USERPROCMASK
-/* Try  to  switch page  directory to  that of  `self', and  make use
- * of memcpy_nopf()  to  try  to  read  its  user-space  userprocmask
- * to  determine  if the  given  `signo' is  currently  being masked.
+/* Try  to  switch  page  directory  to  that  of  `self',  and  make  use
+ * of  memcpy_nopf()   to  try   to  read   its  user-space   userprocmask
+ * to  determine  if  the  given   `signo'  is  currently  being   masked.
  * If any of these steps fail, simply return `SIGMASK_ISMASKED_NOPF_FAULT'
  * NOTE: The caller is responsible to ensure that `self->t_cpu == THIS_CPU',
  *       as well as that preemption has been disabled. */
@@ -333,7 +340,7 @@ done:
 	return result;
 }
 
-/* Version of `sigmask_ismasked_in_userprocmask_nopf()' that
+/* Version of `sigmask_ismasked_in_userprocmask_nopf()'  that
  * always operates on the userprocmask of the current thread. */
 PRIVATE NOBLOCK NOPREEMPT ATTR_PURE WUNUSED int
 NOTHROW(FCALL sigmask_ismasked_in_my_userprocmask_nopf)(signo_t signo) {
@@ -633,9 +640,13 @@ PUBLIC ATTR_PERTASK REF struct sighand_ptr *this_sighand_ptr = NULL;
 
 /* Lock for accessing any remote thread's this_sighand_ptr field */
 #ifndef CONFIG_NO_SMP
-PRIVATE struct atomic_rwlock sighand_ptr_change_lock = ATOMIC_RWLOCK_INIT;
-DEFINE_DBG_BZERO_OBJECT(sighand_ptr_change_lock);
-#endif /* !CONFIG_NO_SMP */
+PRIVATE struct atomic_lock sighand_ptr_change_lock = ATOMIC_LOCK_INIT;
+#define sighand_ptr_change_lock_acquire_nopr() atomic_lock_acquire_nopr(&sighand_ptr_change_lock)
+#define sighand_ptr_change_lock_release_nopr() atomic_lock_release(&sighand_ptr_change_lock)
+#else /* !CONFIG_NO_SMP */
+#define sighand_ptr_change_lock_acquire_nopr() (void)0
+#define sighand_ptr_change_lock_release_nopr() (void)0
+#endif /* CONFIG_NO_SMP */
 
 /* Return the sighand pointer of the given thread. */
 PUBLIC NOBLOCK WUNUSED NONNULL((1)) REF struct sighand_ptr *
@@ -643,15 +654,10 @@ NOTHROW(FCALL task_getsighand_ptr)(struct task *__restrict thread) {
 	pflag_t was;
 	REF struct sighand_ptr *result;
 	was = PREEMPTION_PUSHOFF();
-#ifndef CONFIG_NO_SMP
-	while unlikely(!sync_tryread(&sighand_ptr_change_lock))
-		task_pause();
-#endif /* !CONFIG_NO_SMP */
+	sighand_ptr_change_lock_acquire_nopr();
 	assert(FORTASK(thread, this_sighand_ptr));
 	result = xincref(FORTASK(thread, this_sighand_ptr));
-#ifndef CONFIG_NO_SMP
-	sync_endread(&sighand_ptr_change_lock);
-#endif /* !CONFIG_NO_SMP */
+	sighand_ptr_change_lock_release_nopr();
 	PREEMPTION_POP(was);
 	return result;
 }
@@ -662,16 +668,11 @@ NOTHROW(FCALL task_setsighand_ptr)(struct sighand_ptr *newsighand_ptr) {
 	pflag_t was;
 	REF struct sighand_ptr *result;
 	was = PREEMPTION_PUSHOFF();
-#ifndef CONFIG_NO_SMP
-	while unlikely(!sync_trywrite(&sighand_ptr_change_lock))
-		task_pause();
-#endif /* !CONFIG_NO_SMP */
+	sighand_ptr_change_lock_acquire_nopr();
 	result = PERTASK_GET(this_sighand_ptr);
 	xincref(newsighand_ptr);
 	PERTASK_SET(this_sighand_ptr, newsighand_ptr);
-#ifndef CONFIG_NO_SMP
-	sync_endwrite(&sighand_ptr_change_lock);
-#endif /* !CONFIG_NO_SMP */
+	sighand_ptr_change_lock_release_nopr();
 	PREEMPTION_POP(was);
 	return result;
 }
@@ -2152,6 +2153,40 @@ task_raisesignalthread(struct task *__restrict target,
                        USER CHECKED siginfo_t const *info)
 		THROWS(E_BADALLOC, E_WOULDBLOCK, E_INVALID_ARGUMENT_BAD_VALUE,
 		       E_INTERRUPT_USER_RPC, E_SEGFAULT) {
+#ifdef CONFIG_USE_NEW_RPC
+	bool result;
+	struct pending_rpc *rpc;
+	rpc = pending_rpc_alloc_psig(GFP_NORMAL);
+
+	/* Fill in RPC signal information. */
+	memcpy(&rpc->pr_psig, info, sizeof(siginfo_t));
+	COMPILER_READ_BARRIER();
+	if unlikely(rpc->pr_psig.si_signo <= 0 ||
+	            rpc->pr_psig.si_signo >= NSIG) {
+		signo_t signo = rpc->pr_psig.si_signo;
+		pending_rpc_free(rpc);
+		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
+		      E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGNO,
+		      signo);
+	}
+
+	/* Set RPC flags: posix signals are _always_ async */
+	rpc->pr_flags = RPC_SYNCMODE_F_ALLOW_ASYNC |
+	                RPC_CONTEXT_SIGNAL |
+	                RPC_SIGNO(rpc->pr_psig.si_signo);
+
+	/* Schedule the RPC */
+	if (task_rpc_schedule(target, rpc)) {
+		/* When targeting the current thread, force stack unwind. */
+		if (target == THIS_TASK)
+			THROW(E_INTERRUPT_USER_RPC);
+		return true;
+	}
+
+	/* Target thread already died :( */
+	pending_rpc_free(rpc);
+	return false;
+#else /* CONFIG_USE_NEW_RPC */
 	bool result;
 	struct sigqueue_entry *entry;
 	bool maybe_masked;
@@ -2226,12 +2261,14 @@ task_raisesignalthread(struct task *__restrict target,
 	if (!result)
 		kfree(entry);
 	return result;
-
+#endif /* !CONFIG_USE_NEW_RPC */
 }
 
 
 
 
+
+#ifndef CONFIG_USE_NEW_RPC
 /* Find a thread within the process lead by `process_leader' that isn't
  * masking `signo'. If  no such thread  exists, return `NULL'  instead. */
 PRIVATE WUNUSED NONNULL((1)) REF struct task *KCALL
@@ -2269,9 +2306,9 @@ find_thread_in_process_with_unmasked_signal(struct task *__restrict process_lead
 
 
 #ifdef SIGMASK_ISMASKED_NOPF_FAULT
-/* Same  as  `find_thread_in_process_with_unmasked_signal()',  but  in  the  event
- * that NULL  ends up  being returned,  initialize `pmaybe_maskers'  as a  pointer
- * set of  references (to-be  finalized  by `taskref_pointer_set_fini()')  of  all
+/* Same  as   `find_thread_in_process_with_unmasked_signal()',   but   in   the   event
+ * that  NULL  ends  up  being  returned,  initialize  `pmaybe_maskers'  as  a  pointer
+ * set  of  references  (to-be   finalized  by  `taskref_pointer_set_fini()')  of   all
  * the threads for which `sigmask_ismasked_in()' returned `SIGMASK_ISMASKED_NOPF_FAULT' */
 PRIVATE WUNUSED NONNULL((1, 3)) REF struct task *KCALL
 find_thread_in_process_with_unmasked_signal_and_gather_maybe_maskers(struct task *__restrict process_leader, signo_t signo,
@@ -2530,6 +2567,7 @@ again_find_late_target:
 	}
 	return true;
 }
+#endif /* CONFIG_USE_NEW_RPC */
 
 
 /* Raise a posix signal within a given process that `target' is apart of
@@ -2544,6 +2582,40 @@ task_raisesignalprocess(struct task *__restrict target,
                         USER CHECKED siginfo_t const *info)
 		THROWS(E_BADALLOC, E_WOULDBLOCK, E_INVALID_ARGUMENT_BAD_VALUE,
 		       E_INTERRUPT_USER_RPC, E_SEGFAULT) {
+#ifdef CONFIG_USE_NEW_RPC
+	bool result;
+	struct pending_rpc *rpc;
+	rpc = pending_rpc_alloc_psig(GFP_NORMAL);
+
+	/* Fill in RPC signal information. */
+	memcpy(&rpc->pr_psig, info, sizeof(siginfo_t));
+	COMPILER_READ_BARRIER();
+	if unlikely(rpc->pr_psig.si_signo <= 0 ||
+	            rpc->pr_psig.si_signo >= NSIG) {
+		signo_t signo = rpc->pr_psig.si_signo;
+		pending_rpc_free(rpc);
+		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
+		      E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGNO,
+		      signo);
+	}
+
+	/* Set RPC flags: posix signals are _always_ async */
+	rpc->pr_flags = RPC_SYNCMODE_F_ALLOW_ASYNC |
+	                RPC_CONTEXT_SIGNAL |
+	                RPC_SIGNO(rpc->pr_psig.si_signo);
+
+	/* Schedule the RPC */
+	if (proc_rpc_schedule(target, rpc)) {
+		/* When targeting the current process, force stack unwind. */
+		if (task_getprocess_of(target) == task_getprocess())
+			THROW(E_INTERRUPT_USER_RPC);
+		return true;
+	}
+
+	/* Target thread already died :( */
+	pending_rpc_free(rpc);
+	return false;
+#else /* CONFIG_USE_NEW_RPC */
 	struct sigqueue_entry *entry;
 	bool result;
 	target = task_getprocess_of(target);
@@ -2566,6 +2638,7 @@ task_raisesignalprocess(struct task *__restrict target,
 	result = deliver_signal_to_some_thread_in_process(target,
 	                                                  entry);
 	return result;
+#endif /* !CONFIG_USE_NEW_RPC */
 }
 
 
@@ -3472,6 +3545,7 @@ DEFINE_COMPAT_SYSCALL4(errno_t, rt_tgsigqueueinfo,
 #endif /* ... */
 
 #ifdef WANT_SIGTIMEDWAIT
+#ifndef CONFIG_USE_NEW_RPC
 /* @return: NULL : No signal was detected
  * @return: *    : The accepted signal entry (must be inherited by the caller) */
 PRIVATE struct sigqueue_entry *KCALL
@@ -3566,27 +3640,92 @@ again_scan_prqueue:
 	sync_endread(&prqueue->psq_lock);
 	return NULL;
 }
+#endif /* !CONFIG_USE_NEW_RPC */
 
 
 /* @return: 0 : The timeout has expired
  * @return: * : The accepted signal number */
-PRIVATE syscall_ulong_t KCALL
+PRIVATE signo_t KCALL
 signal_waitfor(CHECKED USER sigset_t const *uthese,
                CHECKED USER siginfo_t *uinfo,
                ktime_t abs_timeout) {
 	sigset_t these;
-	syscall_ulong_t result;
 	assert(!task_wasconnected());
+	assert(PREEMPTION_ENABLED());
 	memcpy(&these, uthese, sizeof(sigset_t));
 	COMPILER_BARRIER();
 	/* Make sure that we don't steal these signals */
 	sigdelset(&these, SIGKILL);
 	sigdelset(&these, SIGSTOP);
 	COMPILER_WRITE_BARRIER();
+#ifdef CONFIG_USE_NEW_RPC
+
+	/* Since we may (very likely)  be waiting for signals that  are
+	 * currently masked,  we need  to make  certain that  we  still
+	 * receive notification when such a signal arrives, even though
+	 * we're unable to handle it by "normal" means. */
+	ATOMIC_OR(THIS_TASK->t_flags, TASK_FWAKEONMSKRPC);
+	TRY {
+		for (;;) {
+			struct pending_rpc *rpc;
+
+			/* Disable preemption for interlocking with  sporadic
+			 * wakeups send as the result of new RPCs being added
+			 * to our thread's or process's pending lists. */
+			PREEMPTION_DISABLE();
+
+			/* Try to steal RPCs. */
+			rpc = task_rpc_pending_steal_posix_signal(&these);
+			if (rpc == NULL) {
+				rpc = proc_rpc_pending_trysteal_posix_signal(&these);
+				if (rpc == PROC_RPC_PENDING_TRYSTEAL_POSIX_SIGNAL_WOULDBLOCK) {
+					struct process_pending_rpcs *proc_rpcs;
+					PREEMPTION_ENABLE();
+					/* Yield until the lock becomes available. */
+					proc_rpcs = &THIS_PROCESS_RPCS;
+					while (!atomic_rwlock_canwrite(&proc_rpcs->ppr_lock))
+						task_yield();
+					continue;
+				}
+			}
+
+			if (rpc != NULL) {
+				/* Got one! */
+				signo_t result;
+				ATOMIC_AND(THIS_TASK->t_flags, ~TASK_FWAKEONMSKRPC);
+				PREEMPTION_ENABLE();
+				assert(!(rpc->pr_flags & RPC_CONTEXT_KERN));
+				assert(rpc->pr_flags & RPC_CONTEXT_SIGNAL);
+				result = rpc->pr_psig.si_signo;
+				/* Copy signal information to userspace */
+				TRY {
+					memcpy(uinfo, &rpc->pr_psig, sizeof(siginfo_t));
+				} EXCEPT {
+					pending_rpc_free(rpc);
+					RETHROW();
+				}
+				pending_rpc_free(rpc);
+				return result;
+			}
+
+			/* Like always, serve RPCs (and posix signals) before going to sleep. */
+			if (task_serve())
+				continue;
+
+			/* Sleep until the next sporadic interrupt. */
+			if (!task_sleep(abs_timeout))
+				return 0;
+		}
+	} EXCEPT {
+		ATOMIC_AND(THIS_TASK->t_flags, ~TASK_FWAKEONMSKRPC);
+		RETHROW();
+	}
+#else /* CONFIG_USE_NEW_RPC */
 	for (;;) {
 		struct sigqueue_entry *ent;
 		ent = signal_try_steal_pending(&these);
 		if (ent) {
+			syscall_ulong_t result;
 copy_and_free_ent_info:
 			result = ent->sqe_info.si_signo;
 			if (uinfo) {
@@ -3598,7 +3737,7 @@ copy_and_free_ent_info:
 				}
 			}
 			kfree(ent);
-			break;
+			return result;
 		}
 		/* Connect to the signals that get broadcast when new signals arrive. */
 		TRY {
@@ -3616,12 +3755,10 @@ copy_and_free_ent_info:
 			RETHROW();
 		}
 		/* Wait for new signals to be delivered. */
-		if (!task_waitfor(abs_timeout)) {
-			result = 0;
-			break;
-		}
+		if (!task_waitfor(abs_timeout))
+			return 0;
 	}
-	return result;
+#endif /* !CONFIG_USE_NEW_RPC */
 }
 #endif /* WANT_SIGTIMEDWAIT */
 
@@ -3761,6 +3898,8 @@ DEFINE_COMPAT_SYSCALL4(syscall_slong_t, rt_sigtimedwait_time64,
 /* rt_sigsuspend(), sigsuspend()                                        */
 /************************************************************************/
 #ifdef __ARCH_WANT_SYSCALL_RT_SIGSUSPEND
+
+#ifndef CONFIG_USE_NEW_RPC
 /* @return: NULL : No signal was detected
  * @return: *    : The accepted signal entry (must be inherited by the caller) */
 PRIVATE struct sigqueue_entry *KCALL
@@ -3907,7 +4046,6 @@ syscall_rt_sigsuspend_rpc(void *UNUSED(arg),
 	return state;
 }
 
-
 DEFINE_SYSCALL2(errno_t, rt_sigsuspend,
                 USER UNCHECKED sigset_t const *, uthese,
                 size_t, sigsetsize) {
@@ -3926,6 +4064,48 @@ DEFINE_SYSCALL2(errno_t, rt_sigsuspend,
 	                       GFP_NORMAL);
 	__builtin_unreachable();
 }
+#else /* !CONFIG_USE_NEW_RPC */
+
+INTERN ATTR_RETNONNULL WUNUSED NONNULL((1)) struct icpustate *FCALL
+sigsuspend_impl(struct icpustate *__restrict context,
+                USER UNCHECKED sigset_t *uthese) {
+	sigset_t these;
+	validate_readable(uthese, sizeof(sigset_t));
+	memcpy(&these, uthese, sizeof(sigset_t));
+
+	/* TODO: This can be implemented via a custom variant of the functions
+	 *       in "/kos/src/kernel/core/misc/except-handler-userexcept.c.inl" */
+	THROW(E_NOT_IMPLEMENTED_TODO);
+
+	return context;
+}
+
+PRIVATE NONNULL((1)) void PRPC_EXEC_CALLBACK_CC
+sigsuspend_rpc(struct rpc_context *__restrict ctx, void *UNUSED(cookie)) {
+	if (ctx->rc_context != RPC_REASONCTX_SYSCALL)
+		return;
+	/* Indicate that our system call is implemented via this RPC. */
+	ctx->rc_context = RPC_REASONCTX_SYSRET;
+
+	/* Do the actual system call. */
+	ctx->rc_state = sigsuspend_impl(ctx->rc_state, (USER UNCHECKED sigset_t *)ctx->rc_scinfo.rsi_regs[0]);
+}
+
+DEFINE_SYSCALL2(errno_t, rt_sigsuspend,
+                USER UNCHECKED sigset_t const *, uthese,
+                size_t, sigsetsize) {
+	(void)uthese;
+	if unlikely(sigsetsize != sizeof(sigset_t)) {
+		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
+		      E_INVALID_ARGUMENT_CONTEXT_SIGNAL_SIGSET_SIZE,
+		      sigsetsize);
+	}
+
+	/* Send an RPC to ourselves, so we can gain access to the user-space register state. */
+	task_rpc_exec(THIS_TASK, RPC_CONTEXT_KERN | RPC_SYNCMODE_F_USER, &sigsuspend_rpc, NULL);
+	__builtin_unreachable();
+}
+#endif /* CONFIG_USE_NEW_RPC */
 #endif /* __ARCH_WANT_SYSCALL_RT_SIGSUSPEND */
 
 #ifdef __ARCH_WANT_SYSCALL_SIGSUSPEND
@@ -3950,6 +4130,8 @@ DEFINE_COMPAT_SYSCALL1(errno_t, sigsuspend,
 /* rt_sigpending(), sigpending()                                        */
 /************************************************************************/
 #ifdef __ARCH_WANT_SYSCALL_RT_SIGPENDING
+#ifndef CONFIG_USE_NEW_RPC
+
 /* Gather the set of pending signals. */
 LOCAL void KCALL
 signal_gather_pending(sigset_t *__restrict these) {
@@ -4008,19 +4190,28 @@ no_perthread_pending:
 	}
 	sync_endread(&prqueue->psq_lock);
 }
+#endif /* !CONFIG_USE_NEW_RPC */
 
 DEFINE_SYSCALL2(errno_t, rt_sigpending,
                 UNCHECKED USER sigset_t *, uset,
                 size_t, sigsetsize) {
 	sigset_t pending;
 	/* Validate the user-space signal set pointer. */
-	if unlikely(sigsetsize != sizeof(sigset_t))
+	if unlikely(sigsetsize != sizeof(sigset_t)) {
 		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
 		      E_INVALID_ARGUMENT_CONTEXT_SIGNAL_SIGSET_SIZE,
 		      sigsetsize);
+	}
 	validate_writable(uset, sizeof(sigset_t));
-	memset(&pending, 0, sizeof(pending));
+	sigemptyset(&pending);
+
+#ifdef CONFIG_USE_NEW_RPC
+	task_rpc_pending_sigset(&pending);
+	proc_rpc_pending_sigset(&pending);
+#else /* CONFIG_USE_NEW_RPC */
 	signal_gather_pending(&pending);
+#endif /* !CONFIG_USE_NEW_RPC */
+
 	COMPILER_WRITE_BARRIER();
 	memcpy(uset, &pending, sizeof(pending));
 	return -EOK;

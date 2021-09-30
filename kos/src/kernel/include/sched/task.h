@@ -80,7 +80,13 @@ DECL_BEGIN
 #define TASK_FUSERPROCMASK __UINT32_C(0x00020000) /* [lock(READ(ATOMIC), WRITE(THIS_TASK))] Task has a `userprocmask'. (s.a. `this_userprocmask_address') */
 #define TASK_FUSERPROCMASK_AFTER_VFORK \
                            __UINT32_C(0x00040000) /* [lock(PRIVATE(THIS_TASK))] `TASK_FUSERPROCMASK' was set after `TASK_FVFORK'. (s.a. `this_userprocmask_address') */
+#ifdef CONFIG_USE_NEW_RPC
+#define TASK_FWAKEONMSKRPC __UINT32_C(0x00080000) /* [lock(PRIVATE(THIS_TASK))] The  thread wants to receive sporadic interrupts whenever
+                                                   * it, or its process receives a pending user RPC, even when the posix signal number is
+                                                   * masked within the thread's signal mask (used to implement `sigtimedwait(2)'). */
+#else /* CONFIG_USE_NEW_RPC */
 /*      TASK_F             __UINT32_C(0x00080000)  * ... */
+#endif /* !CONFIG_USE_NEW_RPC */
 /*      TASK_F             __UINT32_C(0x00100000)  * ... */
 /*      TASK_F             __UINT32_C(0x00200000)  * ... */
 /*      TASK_F             __UINT32_C(0x00400000)  * ... */

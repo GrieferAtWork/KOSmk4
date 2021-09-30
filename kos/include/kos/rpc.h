@@ -331,7 +331,10 @@
 /************************************************************************/
 /* RPC synchronization flags */
 #define RPC_SYNCMODE_F_ALLOW_ASYNC 0x0100 /* FLAG: Allow delivery to threads currently in user-space. */
-#define RPC_SYNCMODE_F_REQUIRE_SC  0x0200 /* FLAG: Require that the interrupt is the result of a system call being made. */
+#define RPC_SYNCMODE_F_REQUIRE_SC  0x0200 /* FLAG: Require that the interrupt is the result of a system call being made.
+                                           * When not set, non-RPC_SYNCMODE_F_ALLOW_ASYNC RPCs  can still be handled  as
+                                           * the result of a blocking  memory access (e.g. one  that needs to read  from
+                                           * disk) */
 #define RPC_SYNCMODE_F_REQUIRE_CP  0x0400 /* FLAG: When interrupting a system call, only handle if the system call is a cancellation point. */
 #ifdef __KERNEL__
 #define RPC_SYNCMODE_F_USER   0x0200 /* For use with `RPC_CONTEXT_KERN': Have `task_serve()' handle the RPC
@@ -423,16 +426,16 @@
 /* RPC service context codes                                            */
 /************************************************************************/
 #ifdef __KERNEL__
-#define RPC_REASONCTX_SYSRET     0x0004 /* Return to arbitrary user-space location. */
+#define RPC_REASONCTX_SYSRET     0x0000 /* Return to arbitrary user-space location. */
 #define RPC_REASONCTX_SYNC       0x0001 /* RPC is being handled from within `task_serve()' */
 #define RPC_REASONCTX_SYSCALL    0x0002 /* A syscall called `task_serve()' and  an unwind was forced.  The
                                          * syscall will be restarted unless `RPC_REASONCTX_SYSRET' is set. */
 #define RPC_REASONCTX_INTERRUPT  0x0003 /* A non-syscall interrupt called `task_serve()' and an unwind was forced.
                                          * The interrupt will be  restarted unless `RPC_REASONCTX_SYSRET' is  set. */
-#define RPC_REASONCTX_ASYNC_KERN 0x0005 /* Kernel-space was interrupted asynchronously. (in this case,
+#define RPC_REASONCTX_ASYNC_KERN 0x0004 /* Kernel-space was interrupted asynchronously. (in this case,
                                          * preemption is unconditionally  disabled and  should not  be
                                          * enabled by the RPC callback) */
-#define RPC_REASONCTX_SHUTDOWN   0x0006 /* RPC is invoked because the thread is exiting. */
+#define RPC_REASONCTX_SHUTDOWN   0x0005 /* RPC is invoked because the thread is exiting. */
 #define _RPC_REASONCTX_ASYNC     0x0000 /* User-space context: `RPC_REASONCTX_ASYNC' */
 #define _RPC_REASONCTX_SYNC      0x0001 /* User-space context: `RPC_REASONCTX_SYNC' */
 #define _RPC_REASONCTX_SYSCALL   0x0002 /* User-space context: `RPC_REASONCTX_SYSCALL' */

@@ -246,10 +246,10 @@ make_inactive:
 
 	/* Service process-directed RPCs.
 	 * NOTE: Handling of these special process-directed RPCs functions the
-	 *       same like thread-directed ones (the handling of which can be
+	 *       same like thread-directed ones (the handling of which can  be
 	 *       seen above)
 	 * NOTE: Additionally, this part is only done so-long as no exception
-	 *       has been set (iow: `error.ei_code == ERROR_CODEOF(E_OK)'). */
+	 *       has been  set (iow:  `error.ei_code == ERROR_CODEOF(E_OK)'). */
 	if (error.ei_code == ERROR_CODEOF(E_OK)) {
 		struct pending_rpc *rpc;
 		struct process_pending_rpcs *proc_rpcs;
@@ -344,7 +344,15 @@ again_scan_proc_rpcs:
 						has_write_lock = true;
 					}
 					/* Remove `rpc' from the list */
-					*p_rpc = rpc->pr_link.sle_next;
+					if (p_rpc == &proc_rpcs->ppr_list.slh_first) {
+						/* Check for race condition: new RPCs were added in the mean time. */
+						if (!ATOMIC_CMPXCH(*p_rpc, rpc, rpc->pr_link.sle_next))
+							goto again_scan_proc_rpcs;
+					} else {
+						assert(*p_rpc == rpc);
+						*p_rpc = rpc->pr_link.sle_next;
+					}
+
 					COMPILER_BARRIER();
 					atomic_rwlock_endwrite(&proc_rpcs->ppr_lock);
 					/* At this point, we've taken ownership of `rpc', and won't ever give it back! */
@@ -524,10 +532,12 @@ check_next_proc_rpc:
 	if (error.ei_code != ERROR_CODEOF(E_OK)) {
 		/* This will unwind into user-space!
 		 * NOTE: This also handles `_E_STOP_PROCESS' and `_E_CORE_PROCESS'! */
-		ctx.rc_state = userexcept_unwind(ctx.rc_state, &error, sc_info);
 #ifdef DEFINE_userexcept_handler
+		ctx.rc_state = userexcept_unwind(ctx.rc_state, &error, sc_info);
 		cpu_apply_icpustate(ctx.rc_state);
-#endif /* DEFINE_userexcept_handler */
+#else /* DEFINE_userexcept_handler */
+		ctx.rc_state = userexcept_unwind(ctx.rc_state, &error, NULL);
+#endif /* !DEFINE_userexcept_handler */
 	}
 
 #ifdef DEFINE_userexcept_handler

@@ -151,7 +151,7 @@ task_rpc_exec(struct task *__restrict thread, syscall_ulong_t flags,
 		/* When sending a user-level RPC to oneself, it is necessary to force a
 		 * syscall/interrupt  unwind by throwing an E_INTERRUPT_USER_RPC error.
 		 * Is same behavior can also be seen in `task_serve()' */
-		if ((flags & RPC_SYNCMODE_F_USER) && thread == THIS_TASK)
+		if ((flags & (RPC_SYNCMODE_F_SYSRET | RPC_SYNCMODE_F_USER)) == RPC_SYNCMODE_F_USER && thread == THIS_TASK)
 			THROW(E_INTERRUPT_USER_RPC);
 	}
 
@@ -562,6 +562,169 @@ NOTHROW(FCALL task_rpc_schedule)(struct task *__restrict thread,
 	}
 	return true;
 }
+
+
+/* Same as `task_rpc_schedule()', but schedule the RPC for execution by
+ * some arbitrary thread apart of the same process as `thread_in_proc'.
+ * NOTE: Process-directed user-RPCs must not make use of `RPC_SYNCMODE_F_REQUIRE_SC'
+ *       or `RPC_SYNCMODE_F_REQUIRE_CP'. Attempting to do so causes this function to
+ *       trigger an internal assertion check.
+ *       All other RPC functionality works as expected, though obviously  RPCs
+ *       will be served by some arbitrary thread within the specified process.
+ * @return: true:  Success. (Even if the process terminates before the RPC can be served
+ *                 normally, it will  still be served  as `RPC_REASONCTX_SHUTDOWN'  when
+ *                 true has been returned here)
+ * @return: false: The target process was marked as having terminated. */
+PUBLIC NOBLOCK WUNUSED NONNULL((1, 2)) bool
+NOTHROW(FCALL proc_rpc_schedule)(struct task *__restrict thread_in_proc,
+                                 /*inherit(on_success)*/ struct pending_rpc *__restrict rpc) {
+	uintptr_t rpc_flags = rpc->pr_flags;
+	struct pending_rpc_slist *list;
+	struct pending_rpc *head;
+	struct task *proc;
+	proc = task_getprocess_of(thread_in_proc);
+
+	/* Insert into the process's pending RPC list. */
+	list = &FORTASK(proc, this_taskgroup.tg_proc_rpcs.ppr_list);
+	do {
+		head = ATOMIC_READ(list->slh_first);
+		if unlikely(head == THIS_RPCS_TERMINATED)
+			return false; /* Already terminated */
+		rpc->pr_link.sle_next = head;
+		COMPILER_BARRIER();
+	} while (!ATOMIC_CMPXCH_WEAK(list->slh_first, head, rpc));
+
+	if unlikely(rpc_flags & RPC_CONTEXT_KERN) {
+		assertf(!(proc->t_flags & TASK_FKERNTHREAD) ||
+		        !(rpc_flags & RPC_SYNCMODE_F_USER),
+		        "Cannot schedule a RPC_SYNCMODE_F_USER RPC "
+		        "for execution within a TASK_FKERNTHREAD thread");
+		userexcept_sysret_injectproc_safe(proc, rpc_flags);
+	} else {
+		assertf(!(rpc_flags & RPC_SYNCMODE_F_REQUIRE_SC),
+		        "Flag `RPC_SYNCMODE_F_REQUIRE_SC' cannot be used for user-space process RPCs");
+		assertf(!(rpc_flags & RPC_SYNCMODE_F_REQUIRE_CP),
+		        "Flag `RPC_SYNCMODE_F_REQUIRE_CP' cannot be used for user-space process RPCs");
+		assertf(!(proc->t_flags & TASK_FKERNTHREAD),
+		        "Cannot schedule a non-RPC_CONTEXT_KERN RPC "
+		        "for execution within a TASK_FKERNTHREAD thread");
+		userexcept_sysret_injectproc_and_marksignal_safe(proc, rpc_flags);
+	}
+	return true;
+}
+
+
+
+PRIVATE NOBLOCK NONNULL((2)) void
+NOTHROW(FCALL pending_signals_from_rpc_list)(struct pending_rpc *first,
+                                             /*out*/ sigset_t *__restrict result) {
+	for (; first; first = SLIST_NEXT(first, pr_link)) {
+		if (!(first->pr_flags & RPC_CONTEXT_KERN))
+			sigaddset(result, _RPC_GETSIGNO(first->pr_flags));
+	}
+}
+
+
+/* Gather the set of posix signal numbers used by pending RPCs
+ * of calling thread or process.  These functions are used  to
+ * implement the `sigpending(2)' system call. */
+PUBLIC NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL task_rpc_pending_sigset)(/*out*/ sigset_t *__restrict result) {
+	struct pending_rpc *list;
+	list = PERTASK_GET(this_rpcs.slh_first);
+	assert(list != THIS_RPCS_TERMINATED);
+	pending_signals_from_rpc_list(list, result);
+}
+
+PUBLIC NONNULL((1)) void FCALL
+proc_rpc_pending_sigset(/*out*/ sigset_t *__restrict result)
+		THROWS(E_WOULDBLOCK) {
+	struct process_pending_rpcs *proc_rpcs;
+	struct pending_rpc *first;
+	proc_rpcs = &THIS_PROCESS_RPCS;
+	atomic_rwlock_read(&proc_rpcs->ppr_lock);
+	first = SLIST_FIRST(&proc_rpcs->ppr_list);
+	if (first != THIS_RPCS_TERMINATED)
+		pending_signals_from_rpc_list(first, result);
+	atomic_rwlock_endread(&proc_rpcs->ppr_lock);
+}
+
+
+/* Try to steal a posix signal RPC from `list' who's signal bit is `1' in `these'
+ * If no such pending  RPC exists, return `NULL';  else return the stolen  entry. */
+PRIVATE NOBLOCK WUNUSED NONNULL((1, 2)) struct pending_rpc *
+NOTHROW(FCALL steal_posix_signal)(struct pending_rpc_slist *__restrict list,
+                                  sigset_t const *__restrict these) {
+	struct pending_rpc **p_rpc, *rpc;
+again:
+	p_rpc = SLIST_PFIRST(list);
+	while ((rpc = *p_rpc) != NULL) {
+		if ((rpc->pr_flags & (RPC_CONTEXT_KERN | RPC_CONTEXT_SIGNAL)) == RPC_CONTEXT_SIGNAL &&
+		    sigismember(these, _RPC_GETSIGNO(rpc->pr_flags))) {
+			/* Found one! */
+#ifndef __OPTIMIZE_SIZE__
+			if (p_rpc != SLIST_PFIRST(list)) {
+				assert(*p_rpc == rpc);
+				*p_rpc = rpc->pr_link.sle_next;
+			} else
+#endif /* !__OPTIMIZE_SIZE__ */
+			{
+				/* Need atomics for the first list entry. */
+				if (!ATOMIC_CMPXCH(*p_rpc, rpc, rpc->pr_link.sle_next))
+					goto again;
+			}
+			return rpc;
+		}
+		p_rpc = &rpc->pr_link.sle_next;
+	}
+	return NULL;
+}
+
+/* Steal pending RPC (that must be a posix signal) with uses a
+ * signal number that is a member of `these'. When no such RPC
+ * exists, return `NULL' */
+PUBLIC NOBLOCK WUNUSED NONNULL((1)) /*inherit*/ struct pending_rpc *
+NOTHROW(FCALL task_rpc_pending_steal_posix_signal)(sigset_t const *__restrict these) {
+	struct pending_rpc_slist *mylist = &PERTASK(this_rpcs);
+	return steal_posix_signal(mylist, these);
+}
+
+PUBLIC WUNUSED NONNULL((1)) /*inherit*/ struct pending_rpc *FCALL
+proc_rpc_pending_steal_posix_signal(sigset_t const *__restrict these)
+		THROWS(E_WOULDBLOCK) {
+	struct pending_rpc *result;
+	struct process_pending_rpcs *proc_rpcs;
+	proc_rpcs = &THIS_PROCESS_RPCS;
+	result = ATOMIC_READ(proc_rpcs->ppr_list.slh_first);
+	if (result == NULL || result == THIS_RPCS_TERMINATED)
+		return NULL;
+	/* XXX: Implement via read-lock + update */
+	atomic_rwlock_write(&proc_rpcs->ppr_lock);
+	result = steal_posix_signal(&proc_rpcs->ppr_list, these);
+	atomic_rwlock_endwrite(&proc_rpcs->ppr_lock);
+	return result;
+}
+
+/* Same  as `proc_rpc_pending_steal_posix_signal()', but only _try_ to
+ * acquire the  necessary lock  to `THIS_PROCESS_RPCS.ppr_lock'.  When
+ * doing so fails, `PROC_RPC_PENDING_TRYSTEAL_POSIX_SIGNAL_WOULDBLOCK'
+ * is returned. */
+PUBLIC NOBLOCK WUNUSED NONNULL((1)) /*inherit*/ struct pending_rpc *
+NOTHROW(FCALL proc_rpc_pending_trysteal_posix_signal)(sigset_t const *__restrict these) {
+	struct pending_rpc *result;
+	struct process_pending_rpcs *proc_rpcs;
+	proc_rpcs = &THIS_PROCESS_RPCS;
+	result = ATOMIC_READ(proc_rpcs->ppr_list.slh_first);
+	if (result == NULL || result == THIS_RPCS_TERMINATED)
+		return NULL;
+	/* XXX: Implement via read-lock + update */
+	if (!atomic_rwlock_trywrite(&proc_rpcs->ppr_lock))
+		return PROC_RPC_PENDING_TRYSTEAL_POSIX_SIGNAL_WOULDBLOCK;
+	result = steal_posix_signal(&proc_rpcs->ppr_list, these);
+	atomic_rwlock_endwrite(&proc_rpcs->ppr_lock);
+	return result;
+}
+
 
 
 

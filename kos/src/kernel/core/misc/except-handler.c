@@ -39,6 +39,7 @@
 #include <kernel/types.h>
 #include <sched/arch/task.h>
 #include <sched/cpu.h>
+#include <sched/enum.h>
 #include <sched/pid.h>
 #include <sched/posix-signal.h>
 #include <sched/rpc-internal.h>
@@ -699,8 +700,11 @@ NOTHROW(FCALL userexcept_sysret_inject_and_marksignal_nopr)(struct task *__restr
 	int status;
 	assert(thread->t_cpu == THIS_CPU);
 	status = sigmask_ismasked_in(thread, signo);
-	/* If the signal isn't masked, or masking cannot be determined, inject a sysret. */
-	if (status != SIGMASK_ISMASKED_NOPF_YES) {
+	/* If the signal isn't masked, or masking cannot be determined, inject a sysret.
+	 * Also wake up the thread if it is explicitly requesting to be woken for every
+	 * signal it is send, even if that signal is being masked. Such behavior is used
+	 * to implement the `sigtimedwait(2)' system call. */
+	if (status != SIGMASK_ISMASKED_NOPF_YES || (thread->t_flags & TASK_FWAKEONMSKRPC)) {
 		/* Set the thread's `TASK_FRPC' flag to indicate that it's got work to do */
 		ATOMIC_OR(thread->t_flags, TASK_FRPC);
 		userexcept_sysret_inject_nopr(thread);
@@ -813,6 +817,43 @@ NOTHROW(FCALL userexcept_sysret_inject_and_marksignal_safe)(struct task *__restr
 		PREEMPTION_POP(was);
 	}
 }
+
+
+PRIVATE NOBLOCK ssize_t
+NOTHROW(KCALL _enum_inject_sysret)(void *arg,
+                                   struct task *thread,
+                                   struct taskpid *pid) {
+	if (thread != NULL)
+		userexcept_sysret_inject_safe(thread, (syscall_ulong_t)(uintptr_t)arg);
+	return 0;
+}
+
+PRIVATE NOBLOCK ssize_t
+NOTHROW(KCALL _enum_inject_sysret_and_marksignal)(void *arg,
+                                                  struct task *thread,
+                                                  struct taskpid *pid) {
+	if (thread != NULL)
+		userexcept_sysret_inject_and_marksignal_safe(thread, (syscall_ulong_t)(uintptr_t)arg);
+	return 0;
+}
+
+
+/* Invoke `userexcept_sysret_inject_safe()' for every thread apart of
+ * `proc', as well as set the `TASK_FRPC' flag for each of those threads. */
+PUBLIC NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL userexcept_sysret_injectproc_safe)(struct task *__restrict proc,
+                                                 syscall_ulong_t rpc_flags) {
+	task_enum_process_threads_nb(&_enum_inject_sysret, (void *)(uintptr_t)rpc_flags, proc);
+}
+
+/* Invoke `userexcept_sysret_inject_and_marksignal_safe()' for every thread apart of `proc' */
+PUBLIC NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL userexcept_sysret_injectproc_and_marksignal_safe)(struct task *__restrict proc,
+                                                                syscall_ulong_t rpc_flags) {
+	task_enum_process_threads_nb(&_enum_inject_sysret_and_marksignal, (void *)(uintptr_t)rpc_flags, proc);
+}
+
+
 
 
 

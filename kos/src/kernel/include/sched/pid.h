@@ -130,10 +130,10 @@ SLIST_HEAD(pending_rpc_slist, pending_rpc);
 
 struct process_pending_rpcs {
 	struct atomic_rwlock     ppr_lock; /* Lock for `ppr_list'. */
-	struct pending_rpc_slist ppr_list; /* [0..n][lock(ppr_lock)]  List  of pending  RPCs  directed at
-	                                    * the process as a whole. When set to `THIS_RPCS_TERMINATED',
-	                                    * the process is considered  as terminated and no  additional
-	                                    * RPCs can be enqueued.
+	struct pending_rpc_slist ppr_list; /* [0..n][lock(APPEND(ATOMIC), REMOVE(ppr_lock))]
+	                                    * List of pending RPCs directed at the process as a whole. When
+	                                    * set  to `THIS_RPCS_TERMINATED', the  process is considered as
+	                                    * terminated and no additional RPCs can be enqueued.
 	                                    * NOTE: User-RPCs must not have the `RPC_SYNCMODE_F_REQUIRE_SC'
 	                                    *       or `RPC_SYNCMODE_F_REQUIRE_CP'  flag set.  If they  do,
 	                                    *       an internal assertion check will trigger. */

@@ -51,6 +51,13 @@ struct pending_user_rpc {
 typedef struct __siginfo_struct siginfo_t;
 #endif /* !__siginfo_t_defined */
 
+#ifndef __sigset_t_defined
+#define __sigset_t_defined
+struct __sigset_struct;
+typedef struct __sigset_struct sigset_t;
+#endif /* !__sigset_t_defined */
+
+
 struct pending_rpc {
 	SLIST_ENTRY(pending_rpc) pr_link;  /* [0..1][lock(ATOMIC)] Link in the list of pending RPCs */
 	uintptr_t                pr_flags; /* [const] RPC flags: RPC_CONTEXT_KERN, ...
@@ -105,6 +112,48 @@ DATDEF ATTR_PERTASK struct pending_rpc_slist this_rpcs;
 FUNDEF NOBLOCK WUNUSED NONNULL((1, 2)) __BOOL
 NOTHROW(FCALL task_rpc_schedule)(struct task *__restrict thread,
                                  /*inherit(on_success)*/ struct pending_rpc *__restrict rpc);
+
+/* Same as `task_rpc_schedule()', but schedule the RPC for execution by
+ * some arbitrary thread apart of the same process as `thread_in_proc'.
+ * NOTE: Process-directed user-RPCs must not make use of `RPC_SYNCMODE_F_REQUIRE_SC'
+ *       or `RPC_SYNCMODE_F_REQUIRE_CP'. Attempting to do so causes this function to
+ *       trigger an internal assertion check.
+ *       All other RPC functionality works as expected, though obviously  RPCs
+ *       will be served by some arbitrary thread within the specified process.
+ * @return: true:  Success. (Even if the process terminates before the RPC can be served
+ *                 normally, it will  still be served  as `RPC_REASONCTX_SHUTDOWN'  when
+ *                 true has been returned here)
+ * @return: false: The target process was marked as having terminated. */
+FUNDEF NOBLOCK WUNUSED NONNULL((1, 2)) __BOOL
+NOTHROW(FCALL proc_rpc_schedule)(struct task *__restrict thread_in_proc,
+                                 /*inherit(on_success)*/ struct pending_rpc *__restrict rpc);
+
+/* Gather the set of posix signal numbers used by pending RPCs
+ * of calling thread or process.  These functions are used  to
+ * implement the `sigpending(2)' system call. */
+FUNDEF NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL task_rpc_pending_sigset)(/*out*/ sigset_t *__restrict result);
+FUNDEF NONNULL((1)) void FCALL
+proc_rpc_pending_sigset(/*out*/ sigset_t *__restrict result)
+		THROWS(E_WOULDBLOCK);
+
+/* Steal pending RPC (that must be a posix signal) with uses a
+ * signal number that is a member of `these'. When no such RPC
+ * exists, return `NULL' */
+FUNDEF NOBLOCK WUNUSED NONNULL((1)) /*inherit*/ struct pending_rpc *
+NOTHROW(FCALL task_rpc_pending_steal_posix_signal)(sigset_t const *__restrict these);
+FUNDEF WUNUSED NONNULL((1)) /*inherit*/ struct pending_rpc *FCALL
+proc_rpc_pending_steal_posix_signal(sigset_t const *__restrict these)
+		THROWS(E_WOULDBLOCK);
+
+/* Same  as `proc_rpc_pending_steal_posix_signal()', but only _try_ to
+ * acquire the  necessary lock  to `THIS_PROCESS_RPCS.ppr_lock'.  When
+ * doing so fails, `PROC_RPC_PENDING_TRYSTEAL_POSIX_SIGNAL_WOULDBLOCK'
+ * is returned. */
+FUNDEF NOBLOCK WUNUSED NONNULL((1)) /*inherit*/ struct pending_rpc *
+NOTHROW(FCALL proc_rpc_pending_trysteal_posix_signal)(sigset_t const *__restrict these);
+#define PROC_RPC_PENDING_TRYSTEAL_POSIX_SIGNAL_WOULDBLOCK ((struct pending_rpc *)-1)
+
 
 
 /************************************************************************/
