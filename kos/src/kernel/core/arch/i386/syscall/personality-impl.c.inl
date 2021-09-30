@@ -37,14 +37,6 @@
 
 DECL_BEGIN
 
-#ifndef HALT_UNHANDLED_EXCEPTION_DEFINED
-#define HALT_UNHANDLED_EXCEPTION_DEFINED 1
-INTDEF void FCALL /* TODO: Get rid of this */
-halt_unhandled_exception(unsigned int error,
-                         struct kcpustate *__restrict unwind_state);
-#endif /* !HALT_UNHANDLED_EXCEPTION_DEFINED */
-
-
 /* The personality function used  to handle exceptions propagated  through
  * system calls. - Specifically, the special handling that is required for
  * servicing an RPC as `rpc_serve_user_redirection_all' */
@@ -83,8 +75,7 @@ NOTHROW(EXCEPT_PERSONALITY_CC FUNC(x86_syscall_personality_asm32_int80))(struct 
 	rpc_syscall_info_get32_int80h(&info, &ustate);
 	x86_userexcept_unwind(&ustate, &info);
 err:
-	halt_unhandled_exception(error, state);
-	return EXCEPT_PERSONALITY_ABORT_SEARCH;
+	return EXCEPT_PERSONALITY_CONTINUE_UNWIND;
 }
 
 /* The personality function used  to handle exceptions propagated  through
@@ -125,8 +116,7 @@ NOTHROW(EXCEPT_PERSONALITY_CC FUNC(x86_syscall_personality_asm32_sysenter))(stru
 	rpc_syscall_info_get32_sysenter_nx(&info, &ustate);
 	x86_userexcept_unwind(&ustate, &info);
 err:
-	halt_unhandled_exception(error, state);
-	return EXCEPT_PERSONALITY_ABORT_SEARCH;
+	return EXCEPT_PERSONALITY_CONTINUE_UNWIND;
 }
 
 
@@ -171,8 +161,7 @@ NOTHROW(EXCEPT_PERSONALITY_CC FUNC(x86_syscall_personality_asm64_syscall))(struc
 	rpc_syscall_info_get64_int80h(&info, &ustate);
 	x86_userexcept_unwind(&ustate, &info);
 err:
-	halt_unhandled_exception(error, state);
-	return EXCEPT_PERSONALITY_ABORT_SEARCH;
+	return EXCEPT_PERSONALITY_CONTINUE_UNWIND;
 }
 #endif /* __x86_64__ */
 

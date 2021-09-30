@@ -300,82 +300,8 @@ PUBLIC_FUNCTION(x86_syscall_emulate_sysenter_r)
 END(x86_syscall_emulate_sysenter_r)
 
 
-
-
-
-
-
-
-
-
-
-
-
-.section .text.cold
-PRIVATE_FUNCTION(copy_extended_user_arguments)
-	.cfi_startproc
-	EXCEPT_HANDLERS_START
-		EXCEPT_HANDLERS_CATCH(
-			E_SEGFAULT,
-			.Lsysenter_guard_start,
-			.Lsysenter_guard_end,
-			.Lsysenter_guard_entry)
-	EXCEPT_HANDLERS_END
-	movq   $(RPC_SYSCALL_INFO_METHOD_SYSENTER_32 | RPC_SYSCALL_INFO_FEXCEPT |  \
-	         RPC_SYSCALL_INFO_FREGVALID(0) | RPC_SYSCALL_INFO_FREGVALID(1) |   \
-	         RPC_SYSCALL_INFO_FREGVALID(2) | RPC_SYSCALL_INFO_FREGVALID(3)), %rdx
-.Lsysenter_guard_start:
-	movzlq 0(%rbp), %rdi
-	movq   %rdi, 24(%rsp) /* ARG[4] */
-	orq    $(RPC_SYSCALL_INFO_FREGVALID(4)), %rdx
-	movzlq 4(%rbp), %rdi
-.Lsysenter_guard_end:
-	movq   %rdi, 32(%rsp) /* ARG[5] */
-	orq    $(RPC_SYSCALL_INFO_FREGVALID(5)), %rdx
-.Lsysenter_guard_entry:
-	ret
-	.cfi_endproc
-END(copy_extended_user_arguments)
-
-.section .text.cold
-INTERN_FUNCTION(__x86_asm32_sysenter_break)
-	/* For `sysenter' system calls:
-	 *   Called when a system call number hasn't been assigned (%rax:sysno) */
-	.cfi_startproc simple
-	EXTERN(x86_syscall_personality_asm32_sysenter_break)
-	.cfi_personality 0, x86_syscall_personality_asm32_sysenter_break
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %rsp, 0
-	/* Check IRET.EFLAGS.DF if an exception should be thrown */
-	ttest  mask=EFLAGS_DF, loc=OFFSET_IRREGS_RFLAGS(%rsp)
-	jnz    1f
-	movq   $-ENOSYS, %rax
-	/* We can just use `sysret' as a drop-in replacement for `sysexit', since
-	 * `sysret' doesn't clobber any  32-bit registers that `sysexit'  doesn't
-	 * also clobber! */
-	X86_IRET_BUT_PREFER_SYSRET32
-1:
-
-	pushq_cfi $(0)    /* Make space for ARG5 */
-	pushq_cfi $(0)    /* Make space for ARG4 */
-	pushq_cfi_r %rsi  /* ARG[3] */
-	pushq_cfi_r %rdx  /* ARG[2] */
-	movq   %rcx, %r9  /* ARG[1] */
-	.cfi_register %rcx, %r9
-	movq   %rbx, %r8  /* ARG[0] */
-	.cfi_register %rbx, %r8
-	movq   %rax, %rcx /* SYSNO */
-	.cfi_register %rax, %rcx
-
-	call   copy_extended_user_arguments
-
-	/* Throw an `E_UNKNOWN_SYSTEMCALL' exception */
-/* 	movq   %rdx, %rdx * Returned by `copy_extended_user_arguments()' */
-	movq   $(8), %rsi
-	movq   $(ERROR_CODEOF(E_UNKNOWN_SYSTEMCALL)), %rdi
-	EXTERN(error_thrown)
-	call   error_thrown
-	.cfi_endproc
-END(__x86_asm32_sysenter_break)
+#ifndef __INTELLISENSE__
+#include "syscall-sysenter.S"
+#endif /* !__INTELLISENSE__ */
 
 #endif /* !GUARD_KERNEL_CORE_ARCH_I386_SYSCALL_SYSCALL_SYSENTER_64_S */

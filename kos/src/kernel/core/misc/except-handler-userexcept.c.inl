@@ -52,7 +52,7 @@ DECL_BEGIN
  *          most notably `E_INTERRUPT_USER_RPC'! */
 PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1)) struct icpustate *
 NOTHROW(FCALL userexcept_handler)(struct icpustate *__restrict state,
-                                  struct rpc_syscall_info *sc_info)
+                                  struct rpc_syscall_info const *sc_info)
 #else /* DEFINE_userexcept_handler */
 /* This is the function that is injected by `userexcept_sysret_inject_nopr()',
  * as well as related functions.

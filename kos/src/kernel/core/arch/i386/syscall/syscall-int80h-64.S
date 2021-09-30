@@ -26,6 +26,7 @@
 #include <kernel/except.h>
 
 #include <asm/cfi.h>
+#include <asm/instr/compat.h>
 #include <asm/instr/interrupt.h>
 #include <asm/instr/movzxq.h>
 #include <asm/instr/ttest.h>
@@ -326,8 +327,6 @@ INTERN_FUNCTION(__x86_asm64_syscall_break)
 	/* For `int 80h' system calls:
 	 *   Called when a system call number hasn't been assigned (%rax:sysno) */
 	.cfi_startproc simple
-	EXTERN(x86_syscall_personality_asm64_syscall_break)
-	.cfi_personality 0, x86_syscall_personality_asm64_syscall_break
 	.cfi_iret_signal_frame
 	.cfi_def_cfa %rsp, 0
 
@@ -336,7 +335,35 @@ INTERN_FUNCTION(__x86_asm64_syscall_break)
 	jnz    1f
 	movq   $-ENOSYS, %rax
 	intr_exit
-1:	pushq_cfi_r %r9  /* ARG[5] */
+1:
+#ifdef CONFIG_USE_NEW_RPC
+	/* Construct a `struct icpustate' */
+	ASM_PUSH_ICPUSTATE_AFTER_HW_IRET_CFI_R
+
+	/* Construct an on-stack `struct rpc_syscall_info' */
+	pushP_cfi %Pdi
+	pushP_cfi %Psi
+	pushP_cfi %Pdx
+	pushP_cfi %r10
+	pushP_cfi %r8
+	pushP_cfi %r9
+	pushP_cfi %Pax
+	pushP_cfi $(RPC_SYSCALL_INFO_METHOD_INT80H_64 | RPC_SYSCALL_INFO_FEXCEPT |  \
+	            RPC_SYSCALL_INFO_FREGVALID(0) | RPC_SYSCALL_INFO_FREGVALID(1) | \
+	            RPC_SYSCALL_INFO_FREGVALID(2) | RPC_SYSCALL_INFO_FREGVALID(3) | \
+	            RPC_SYSCALL_INFO_FREGVALID(4) | RPC_SYSCALL_INFO_FREGVALID(5))
+
+	/* Throw the `E_UNKNOWN_SYSTEMCALL' exception. */
+	leaP   SIZEOF_RPC_SYSCALL_INFO(%Psp), %R_fcall0P
+	movP   %Psp,                          %R_fcall1P
+	EXTERN(userexcept_handler_nosys)
+	call   userexcept_handler_nosys
+
+#else /* CONFIG_USE_NEW_RPC */
+	EXTERN(x86_syscall_personality_asm64_syscall_break)
+	.cfi_personality 0, x86_syscall_personality_asm64_syscall_break
+
+	pushq_cfi_r %r9  /* ARG[5] */
 	pushq_cfi_r %r8  /* ARG[4] */
 	pushq_cfi_r %r10 /* ARG[3] */
 	pushq_cfi_r %rdx /* ARG[2] */
@@ -356,48 +383,12 @@ INTERN_FUNCTION(__x86_asm64_syscall_break)
 	movq   $(ERROR_CODEOF(E_UNKNOWN_SYSTEMCALL)), %rdi
 	EXTERN(error_thrown)
 	call   error_thrown
+#endif /* !CONFIG_USE_NEW_RPC */
 	.cfi_endproc
 END(__x86_asm64_syscall_break)
 
-
-
-
-.section .text.cold
-INTERN_FUNCTION(__x86_asm32_int80_break)
-	/* For `int 80h' system calls:
-	 *   Called when a system call number hasn't been assigned (%eax:sysno) */
-	.cfi_startproc simple
-	EXTERN(x86_syscall_personality_asm32_int80_break)
-	.cfi_personality 0, x86_syscall_personality_asm32_int80_break
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %rsp, 0
-
-	/* Check IRET.EFLAGS.DF if an exception should be thrown */
-	ttest  mask=EFLAGS_DF, loc=OFFSET_IRREGS_RFLAGS(%rsp)
-	jnz    1f
-	movq   $-ENOSYS, %rax
-	intr_exit
-1:	pushq_cfi_r %rbp /* ARG[5] */
-	pushq_cfi_r %rdi /* ARG[4] */
-	pushq_cfi_r %rsi /* ARG[3] */
-	pushq_cfi_r %rdx /* ARG[2] */
-	movq   %rcx, %r9 /* ARG[1] */
-	.cfi_register %rcx, %r9
-	movq   %rbx, %r8 /* ARG[0] */
-	.cfi_register %rbx, %r8
-	movq   %rax, %rcx /* SYSNO */
-	.cfi_register %rax, %rcx
-
-	/* Throw an `E_UNKNOWN_SYSTEMCALL' exception */
-	movq   $(RPC_SYSCALL_INFO_METHOD_INT80H_32 | RPC_SYSCALL_INFO_FEXCEPT |  \
-	         RPC_SYSCALL_INFO_FREGVALID(0) | RPC_SYSCALL_INFO_FREGVALID(1) | \
-	         RPC_SYSCALL_INFO_FREGVALID(2) | RPC_SYSCALL_INFO_FREGVALID(3) | \
-	         RPC_SYSCALL_INFO_FREGVALID(4) | RPC_SYSCALL_INFO_FREGVALID(5)), %rdx
-	movq   $(8), %rsi
-	movq   $(ERROR_CODEOF(E_UNKNOWN_SYSTEMCALL)), %rdi
-	EXTERN(error_thrown)
-	call   error_thrown
-	.cfi_endproc
-END(__x86_asm32_int80_break)
+#ifndef __INTELLISENSE__
+#include "syscall-int80h.S"
+#endif /* !__INTELLISENSE__ */
 
 #endif /* !GUARD_KERNEL_CORE_ARCH_I386_SYSCALL_SYSCALL_INT80H_64_S */

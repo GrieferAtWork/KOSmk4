@@ -25,6 +25,7 @@
 #ifdef CONFIG_USE_NEW_RPC
 #include <kernel/rt/except-handler.h>
 #include <kernel/rt/except-personality.h>
+#include <kernel/x86/syscall-info.h>
 
 #include <kos/bits/syscall-info.h>
 #include <kos/kernel/cpu-state-compat.h>
@@ -32,12 +33,127 @@
 #include <kos/kernel/cpu-state.h>
 #include <kos/rpc.h>
 
+#include <assert.h>
 #include <stddef.h>
 
 #include <libunwind/eh_frame.h>
+#include <libunwind/unwind.h>
 
 DECL_BEGIN
 
+/************************************************************************/
+/* Personality functions for system calls                               */
+/************************************************************************/
+
+/* The personality function used  to handle exceptions propagated  through
+ * system calls. - Specifically, the special handling that is required for
+ * servicing an RPC as `rpc_serve_user_redirection_all' */
+INTERN WUNUSED NONNULL((1, 2)) unsigned int
+NOTHROW(EXCEPT_PERSONALITY_CC x86_syscall_personality_asm32_int80)(struct unwind_fde_struct *__restrict fde,
+                                                                   struct kcpustate *__restrict state) {
+	struct ucpustate ustate;
+	struct rpc_syscall_info sc_info;
+	unwind_cfa_sigframe_state_t cfa;
+	unsigned int error;
+	void const *pc;
+	kcpustate_to_ucpustate(state, &ustate);
+	pc = ucpustate_getpc(&ustate) - 1;
+	error = unwind_fde_sigframe_exec(fde, &cfa, pc);
+	if unlikely(error != UNWIND_SUCCESS)
+		return EXCEPT_PERSONALITY_CONTINUE_UNWIND;
+	error = unwind_cfa_sigframe_apply(&cfa, fde, pc,
+	                                  &unwind_getreg_kcpustate, state,
+	                                  &unwind_setreg_ucpustate, &ustate);
+	if unlikely(error != UNWIND_SUCCESS)
+		return EXCEPT_PERSONALITY_CONTINUE_UNWIND;
+	assert(ucpustate_iskernel(&ustate) ||
+	       ucpustate_getpc(&ustate) == (void const *)&x86_userexcept_sysret);
+	/* System calls encode their vector number  as the LSDA pointer, so  that
+	 * when  unwinding we can reverse-engineer that number in order to decide
+	 * on special actions to perform based on the called function, as well as
+	 * inform user-space of which function  caused the exception, as well  as
+	 * implement system call restarting. */
+	gpregs_setpax(&ustate.ucs_gpregs, (uintptr_t)fde->f_persofun);
+	rpc_syscall_info_get32_int80h(&sc_info, &ustate);
+	userexcept_handler_ucpustate(&ustate, &sc_info);
+}
+
+/* The personality function used  to handle exceptions propagated  through
+ * system calls. - Specifically, the special handling that is required for
+ * servicing an RPC as `rpc_serve_user_redirection_all' */
+INTERN WUNUSED NONNULL((1, 2)) unsigned int
+NOTHROW(EXCEPT_PERSONALITY_CC x86_syscall_personality_asm32_sysenter)(struct unwind_fde_struct *__restrict fde,
+                                                                      struct kcpustate *__restrict state) {
+	struct ucpustate ustate;
+	unsigned int error;
+	struct rpc_syscall_info sc_info;
+	kcpustate_to_ucpustate(state, &ustate);
+	{
+		unwind_cfa_sigframe_state_t cfa;
+		void const *pc = ucpustate_getpc(&ustate) - 1;
+		error = unwind_fde_sigframe_exec(fde, &cfa, pc);
+		if unlikely(error != UNWIND_SUCCESS)
+			goto err;
+		error = unwind_cfa_sigframe_apply(&cfa, fde, pc,
+		                                  &unwind_getreg_kcpustate, state,
+		                                  &unwind_setreg_ucpustate, &ustate);
+		if unlikely(error != UNWIND_SUCCESS)
+			goto err;
+	}
+	assert(ucpustate_iskernel(&ustate) ||
+	       ucpustate_getpc(&ustate) == (void const *)&x86_userexcept_sysret);
+	/* System calls encode their vector number  as the LSDA pointer, so  that
+	 * when  unwinding we can reverse-engineer that number in order to decide
+	 * on special actions to perform based on the called function, as well as
+	 * inform user-space of which function  caused the exception, as well  as
+	 * implement system call restarting. */
+	gpregs_setpax(&ustate.ucs_gpregs, (uintptr_t)fde->f_lsdaaddr);
+	rpc_syscall_info_get32_sysenter_nx(&sc_info, &ustate);
+	userexcept_handler_ucpustate(&ustate, &sc_info);
+err:
+	return EXCEPT_PERSONALITY_CONTINUE_UNWIND;
+}
+
+
+
+#ifdef __x86_64__
+
+/* The personality function used  to handle exceptions propagated  through
+ * system calls. - Specifically, the special handling that is required for
+ * servicing an RPC as `rpc_serve_user_redirection_all' */
+INTERN WUNUSED NONNULL((1, 2)) unsigned int
+NOTHROW(EXCEPT_PERSONALITY_CC x86_syscall_personality_asm64_syscall)(struct unwind_fde_struct *__restrict fde,
+                                                                     struct kcpustate *__restrict state) {
+	struct ucpustate ustate;
+	unsigned int error;
+	struct rpc_syscall_info sc_info;
+	kcpustate_to_ucpustate(state, &ustate);
+	{
+		unwind_cfa_sigframe_state_t cfa;
+		void const *pc = ucpustate_getpc(&ustate) - 1;
+		error = unwind_fde_sigframe_exec(fde, &cfa, pc);
+		if unlikely(error != UNWIND_SUCCESS)
+			goto err;
+		error = unwind_cfa_sigframe_apply(&cfa, fde, pc,
+		                                  &unwind_getreg_kcpustate, state,
+		                                  &unwind_setreg_ucpustate, &ustate);
+		if unlikely(error != UNWIND_SUCCESS)
+			goto err;
+	}
+	assert(ucpustate_iskernel(&ustate) ||
+	       ucpustate_getpc(&ustate) == (void const *)&x86_userexcept_sysret);
+	/* System calls encode their vector number  as the LSDA pointer, so  that
+	 * when  unwinding we can reverse-engineer that number in order to decide
+	 * on special actions to perform based on the called function, as well as
+	 * inform user-space of which function  caused the exception, as well  as
+	 * implement system call restarting. */
+	gpregs_setpax(&ustate.ucs_gpregs, (uintptr_t)fde->f_persofun);
+	rpc_syscall_info_get64_int80h(&sc_info, &ustate);
+	userexcept_handler_ucpustate(&ustate, &sc_info);
+err:
+	return EXCEPT_PERSONALITY_CONTINUE_UNWIND;
+}
+#endif /* __x86_64__ */
 
 
 
@@ -73,7 +189,7 @@ extern void ASMCALL _x86_xintr_userexcept_unwind(void);
 #ifdef __x86_64__
 #define x86_xintr1_userexcept_unwind(st, lsda)                  \
 	do {                                                        \
-		__register void *r12 __asm__("%r12") = (lsda);          \
+		__register void const *r12 __asm__("%r12") = (lsda);    \
 		__asm__ __volatile__("jmp _x86_xintr_userexcept_unwind" \
 		                     :                                  \
 		                     : "r"                (r12)         \
@@ -82,7 +198,7 @@ extern void ASMCALL _x86_xintr_userexcept_unwind(void);
 	}	__WHILE0
 #define x86_xintr2_userexcept_unwind(st, lsda, ecode)           \
 	do {                                                        \
-		__register void *r12 __asm__("%r12") = (lsda);          \
+		__register void const *r12 __asm__("%r12") = (lsda);    \
 		__asm__ __volatile__("jmp _x86_xintr_userexcept_unwind" \
 		                     :                                  \
 		                     : "r"                (r12)         \
@@ -92,7 +208,7 @@ extern void ASMCALL _x86_xintr_userexcept_unwind(void);
 	}	__WHILE0
 #define x86_xintr3_userexcept_unwind(st, lsda, ecode, addr)     \
 	do {                                                        \
-		__register void *r12 __asm__("%r12") = (lsda);          \
+		__register void const *r12 __asm__("%r12") = (lsda);    \
 		__asm__ __volatile__("movq %%rax, %%rbp\n\t"            \
 		                     "jmp _x86_xintr_userexcept_unwind" \
 		                     :                                  \

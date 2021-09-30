@@ -27,6 +27,8 @@
 
 #include <asm/cfi.h>
 #include <asm/instr/ttest.h>
+#include <kos/kernel/cpu-state-asm.h>
+#include <kos/kernel/cpu-state.h>
 #include <kos/kernel/gdt.h>
 
 #include <errno.h>
@@ -208,54 +210,8 @@ END(x86_syscall_emulate_int80h_r_rel_x86_idt_syscall)
 	.cfi_endproc
 END(x86_syscall_emulate_int80h_r)
 
-
-.section .text.cold
-INTERN_FUNCTION(__x86_asm32_int80_break)
-	/* For `int 80h' system calls:
-	 *   Called when a system call number hasn't been assigned (%eax:sysno) */
-	.cfi_startproc simple
-	EXTERN(x86_syscall_personality_asm32_int80_break)
-	.cfi_personality 0, x86_syscall_personality_asm32_int80_break
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %esp, 0
-
-	/* Check IRET.EFLAGS.DF if an exception should be thrown */
-	ttest  mask=EFLAGS_DF, loc=OFFSET_IRREGS_EFLAGS(%esp), seg=%ss
-	jnz    1f
-	movl   $(-ENOSYS), %eax
-	iret
-1:
-	pushl_cfi %ds
-	.cfi_restore_iret_ds_or_offset -4
-	pushl_cfi %es
-	.cfi_restore_iret_es_or_offset -8
-	pushl_cfi %fs
-	.cfi_restore_iret_fs_or_offset -12
-
-	pushl_cfi_r %ebp /* ARG[5] */
-	pushl_cfi_r %edi /* ARG[4] */
-	pushl_cfi_r %esi /* ARG[3] */
-	pushl_cfi_r %edx /* ARG[2] */
-	pushl_cfi_r %ecx /* ARG[1] */
-	pushl_cfi_r %ebx /* ARG[0] */
-	pushl_cfi_r %eax /* SYSNO */
-
-	movl   $(SEGMENT_USER_DATA_RPL), %eax
-	movl   %eax, %ds
-	movl   %eax, %es
-	movl   $(SEGMENT_KERNEL_FSBASE), %eax
-	movl   %eax, %fs
-
-	/* Throw an `E_UNKNOWN_SYSTEMCALL' exception */
-	pushl_cfi $(RPC_SYSCALL_INFO_METHOD_INT80H_32 | RPC_SYSCALL_INFO_FEXCEPT |  \
-	            RPC_SYSCALL_INFO_FREGVALID(0) | RPC_SYSCALL_INFO_FREGVALID(1) | \
-	            RPC_SYSCALL_INFO_FREGVALID(2) | RPC_SYSCALL_INFO_FREGVALID(3) | \
-	            RPC_SYSCALL_INFO_FREGVALID(4) | RPC_SYSCALL_INFO_FREGVALID(5))
-	pushl_cfi $(8)
-	pushl_cfi $(ERROR_CODEOF(E_UNKNOWN_SYSTEMCALL))
-	EXTERN(error_thrown)
-	call   error_thrown
-	.cfi_endproc
-END(__x86_asm32_int80_break)
+#ifndef __INTELLISENSE__
+#include "syscall-int80h.S"
+#endif /* !__INTELLISENSE__ */
 
 #endif /* !GUARD_KERNEL_CORE_ARCH_I386_SYSCALL_SYSCALL_INT80H_32_S */

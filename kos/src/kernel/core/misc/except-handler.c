@@ -534,6 +534,36 @@ again_switch_action_handler:
 }
 
 
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL set_unknown_syscall_exception)(struct rpc_syscall_info const *__restrict sc_info) {
+	struct exception_info *info;
+	/* Fill in exception information. */
+	info = error_info();
+	info->ei_code = ERROR_CODEOF(E_UNKNOWN_SYSTEMCALL);
+	info->ei_data.e_args.e_unknown_systemcall.us_sysno = sc_info->rsi_sysno;
+	info->ei_data.e_args.e_unknown_systemcall.us_flags = sc_info->rsi_flags;
+	info->ei_data.e_args.e_unknown_systemcall.us_arg0  = sc_info->rsi_regs[0];
+	info->ei_data.e_args.e_unknown_systemcall.us_arg1  = sc_info->rsi_regs[1];
+	info->ei_data.e_args.e_unknown_systemcall.us_arg2  = sc_info->rsi_regs[2];
+	info->ei_data.e_args.e_unknown_systemcall.us_arg3  = sc_info->rsi_regs[3];
+	info->ei_data.e_args.e_unknown_systemcall.us_arg4  = sc_info->rsi_regs[4];
+	info->ei_data.e_args.e_unknown_systemcall.us_arg5  = sc_info->rsi_regs[5];
+#if EXCEPT_BACKTRACE_SIZE != 0
+	memset(info->ei_trace, 0, sizeof(info->ei_trace));
+#endif /* EXCEPT_BACKTRACE_SIZE != 0 */
+	info->ei_flags = EXCEPT_FNORMAL;
+}
+
+/* Helper function to implement ENOSYS handling. */
+PUBLIC ATTR_NORETURN NONNULL((1, 2)) void
+NOTHROW(FCALL userexcept_handler_nosys)(struct icpustate *__restrict state,
+                                        struct rpc_syscall_info const *__restrict sc_info) {
+again:
+	set_unknown_syscall_exception(sc_info);
+	state = userexcept_handler(state, sc_info);
+	goto again;
+}
+
 
 
 
@@ -1055,10 +1085,12 @@ PUBLIC WUNUSED NONNULL((1, 2)) unsigned int
 NOTHROW(EXCEPT_PERSONALITY_CC __gxx_personality_v0)(struct unwind_fde_struct *__restrict fde,
                                                     struct kcpustate *__restrict state) {
 	u8 temp, callsite_encoding;
+	byte_t const *reader;
 	byte_t const *landingpad;
 	byte_t const *callsite_end;
 	size_t callsite_size;
 
+	reader     = (byte_t const *)fde->f_lsdaaddr;
 	landingpad = (byte_t const *)fde->f_pcstart;
 
 	/* NOTE: `reader' points to a `struct gcc_lsda' */

@@ -119,7 +119,13 @@ NOTHROW(FCALL userexcept_seterrno)(struct icpustate *__restrict state,
  *          most notably `E_INTERRUPT_USER_RPC'! */
 FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) struct icpustate *
 NOTHROW(FCALL userexcept_handler)(struct icpustate *__restrict state,
-                                  struct rpc_syscall_info *sc_info);
+                                  struct rpc_syscall_info const *sc_info);
+
+/* Helper function to implement ENOSYS handling. */
+FUNDEF ATTR_NORETURN NONNULL((1, 2)) void
+NOTHROW(FCALL userexcept_handler_nosys)(struct icpustate *__restrict state,
+                                        struct rpc_syscall_info const *__restrict sc_info);
+
 
 /* Arch-specific function:
  * Wrapper around `userexcept_handler()' for use in implementing `error_unwind()'.
@@ -127,11 +133,12 @@ NOTHROW(FCALL userexcept_handler)(struct icpustate *__restrict state,
  * end of the  calling thread's stack  and populate with  with register info  from
  * `state'. Afterwards, it  will force-unwind  the kernel  stack such  that it  is
  * located immediately at the new state. Once that is done, a call to the portable
- * function `userexcept_handler(<state>, sc_info)'  is made,  and that  function's
- * return value is passed to `cpu_apply_icpustate()' */
+ * function  `userexcept_handler(<state>, sc_info)' is made,  and if that function
+ * returns normally,  either  `syscall_emulate_r(..., sc_info)'  if  non-NULL,  or
+ * directly load the associated state by means of `cpu_apply_icpustate()'. */
 FUNDEF ATTR_NORETURN NONNULL((1)) void
 NOTHROW(FCALL userexcept_handler_ucpustate)(struct ucpustate *__restrict state,
-                                            struct rpc_syscall_info *sc_info);
+                                            struct rpc_syscall_info const *sc_info);
 
 /* This is the function that is injected by `userexcept_sysret_inject_nopr()',
  * as well as related functions.

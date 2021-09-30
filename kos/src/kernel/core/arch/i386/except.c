@@ -879,10 +879,10 @@ PUBLIC WUNUSED NONNULL((1, 2)) unsigned int
 NOTHROW(EXCEPT_PERSONALITY_CC __gxx_personality_v0)(struct unwind_fde_struct *__restrict fde,
                                                     struct kcpustate *__restrict state) {
 	u8 temp, callsite_encoding;
+	byte_t const *reader;
 	byte_t const *landingpad;
 	byte_t const *callsite_end;
 	size_t callsite_size;
-	byte_t const *reader;
 
 	reader     = (byte_t const *)fde->f_lsdaaddr;
 	landingpad = (byte_t const *)fde->f_pcstart;

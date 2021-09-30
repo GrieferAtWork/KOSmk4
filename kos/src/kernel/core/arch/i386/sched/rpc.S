@@ -452,8 +452,9 @@ END(x86_userexcept_sysret)
  * end of the  calling thread's stack  and populate with  with register info  from
  * `state'. Afterwards, it  will force-unwind  the kernel  stack such  that it  is
  * located immediately at the new state. Once that is done, a call to the portable
- * function `userexcept_handler(<state>, sc_info)'  is made,  and that  function's
- * return value is passed to `cpu_apply_icpustate()' */
+ * function  `userexcept_handler(<state>, sc_info)' is made,  and if that function
+ * returns normally,  either  `syscall_emulate_r(..., sc_info)'  if  non-NULL,  or
+ * directly load the associated state by means of `cpu_apply_icpustate()'. */
 .section .text
 INTERN_FUNCTION(userexcept_handler_ucpustate)
 	.cfi_startproc simple
@@ -651,8 +652,19 @@ INTERN_FUNCTION(userexcept_handler_ucpustate)
 	sti
 
 	movP   %Pbx, %R_fcall0P /* For `userexcept_handler()' */
+	movP   %R_fcall0P, %Pbp /* Needed once again later. */
 	EXTERN(userexcept_handler)
 	call   userexcept_handler
+
+	/* If system call information was given, restart the system call. */
+	testP  %Pbp, %Pbp
+	.cfi_def_cfa_register %Pax
+	jz     1f
+	movP   %Pax, %R_fcall0P
+	movP   %Pbp, %R_fcall1P
+	EXTERN(syscall_emulate_r)
+	jmp    syscall_emulate_r
+1:
 
 	/* Normally when `userexcept_handler()' returns, it means that the
 	 * current system call or interrupt should be restarted.  However,
