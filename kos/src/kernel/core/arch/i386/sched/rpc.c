@@ -256,42 +256,6 @@ NOTHROW(FCALL userexcept_sysret_inject_nopr)(struct task *__restrict thread) {
 	assert(!PREEMPTION_ENABLED());
 	assert(thread->t_cpu == THIS_CPU);
 	assert(!(thread->t_flags & TASK_FKERNTHREAD));
-#ifndef CONFIG_X86_EMULATE_LCALL7
-	/* Check for special case: `thread' was interrupted in
-	 * `x86_syscall32_lcall7' before it was able to complete its IRET tail.
-	 * NOTE: It is sufficient to only  check for EIP ==  ENTRY_OF(x86_syscall32_lcall7),
-	 *       since the first thing `x86_syscall32_lcall7' does is to disable preemption,
-	 *       meaning  that  interrupts  could  only  ever  happen  for  the  very  first
-	 *       instruction. */
-	if unlikely(thread != THIS_TASK &&
-	            FORTASK(thread, this_sstate)->scs_irregs.ir_eip == (uintptr_t)(void *)&x86_syscall32_lcall7) {
-		byte_t *fixup;
-		u32 eflags;
-		fixup = (byte_t *)FORTASK(thread, this_sstate);
-		assertf((fixup + OFFSET_SCPUSTATE_IRREGS + SIZEOF_IRREGS_KERNEL) ==
-		        (byte_t *)(FORTASK(thread, this_x86_kernel_psp0) - 16),
-		        "Fixup(%p) itn't placed 16 bytes below stack_end(%p) (16 == { IP,CS,SP,SS })",
-		        (fixup + OFFSET_SCPUSTATE_IRREGS + SIZEOF_IRREGS_KERNEL),
-		        (byte_t *)FORTASK(thread, this_x86_kernel_psp0));
-		/* Allocate 4 additional bytes. */
-		fixup = (byte_t *)memmovedown(fixup - 4, fixup,
-		                              OFFSET_SCPUSTATE_IRREGS +
-		                              SIZEOF_IRREGS_KERNEL);
-		FORTASK(thread, this_sstate) = (struct scpustate *)fixup;
-		/* Read the original user-space EFLAGS value. */
-		eflags = ((struct scpustate *)fixup)->scs_irregs.ir_eflags;
-		/* Skip the lcall IRET adjustment  we're doing ourself below  by
-		 * advancing the instruction pointer from `x86_syscall32_lcall7'
-		 * to `x86_syscall32_lcall7_iret' */
-		((struct scpustate *)fixup)->scs_irregs.ir_eip = (uintptr_t)(void *)&x86_syscall32_lcall7_iret;
-		fixup += OFFSET_SCPUSTATE_IRREGS + SIZEOF_IRREGS_KERNEL;
-		/* `fixup' now points at at the u32[5] = { ???, IP, CS, SP, SS }
-		 * We want to change this to:   u32[5] = { IP, CS, EFLAGS, SP, SS } */
-		((u32 *)fixup)[0] = ((u32 *)fixup)[1];
-		((u32 *)fixup)[1] = ((u32 *)fixup)[2];
-		((u32 *)fixup)[2] = eflags;
-	}
-#endif /* !CONFIG_X86_EMULATE_LCALL7 */
 	thread_iret = x86_get_irregs(thread);
 	if (thread_iret->ir_eip == (uintptr_t)&x86_userexcept_sysret)
 		return; /* Already redirected. */

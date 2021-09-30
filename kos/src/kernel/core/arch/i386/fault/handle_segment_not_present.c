@@ -33,7 +33,6 @@
 #include <kernel/user.h>
 #include <kernel/x86/fault.h>
 #include <kernel/x86/idt.h>            /* IDT_CONFIG_ISTRAP() */
-#include <kernel/x86/syscall-tables.h> /* CONFIG_X86_EMULATE_LCALL7 */
 #ifndef CONFIG_USE_NEW_RPC
 #include <sched/except-handler.h> /* x86_userexcept_unwind_interrupt() */
 #endif /* !CONFIG_USE_NEW_RPC */
@@ -63,8 +62,6 @@
 #endif /* !__NR32_clone */
 
 DECL_BEGIN
-
-#ifdef CONFIG_X86_EMULATE_LCALL7
 
 #ifndef __OPTIMIZE_SIZE__
 INTDEF pid_t KCALL
@@ -219,7 +216,6 @@ again:
 	syscall_emulate_r(state, &sc_info);
 }
 #endif /* __x86_64__ */
-#endif /* CONFIG_X86_EMULATE_LCALL7 */
 
 INTERN struct icpustate *FCALL
 x86_handle_segment_not_present(struct icpustate *__restrict state,
@@ -262,7 +258,7 @@ x86_handle_segment_not_present(struct icpustate *__restrict state,
 				}
 				segment = UNALIGNED_GETLE16((u16 const *)pc);
 				pc += 2;
-#ifdef CONFIG_X86_EMULATE_LCALL7
+
 				/* lcall7 emulation */
 				if (segment == 7 && (__sldt() & ~7) == SEGMENT_CPU_LDT) {
 					icpustate_setpc(state, pc);
@@ -273,7 +269,7 @@ x86_handle_segment_not_present(struct icpustate *__restrict state,
 #endif /* __x86_64__ && 0 */
 					x86_emulate_syscall32_lcall7(state, offset);
 				}
-#endif /* CONFIG_X86_EMULATE_LCALL7 */
+
 				/* Invalid use of the lcall instruction. */
 				PERTASK_SET(this_exception_code, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_REGISTER));
 				PERTASK_SET(this_exception_args.e_illegal_instruction.ii_opcode, 0x9a);
@@ -312,7 +308,7 @@ x86_handle_segment_not_present(struct icpustate *__restrict state,
 						segment = UNALIGNED_GETLE16((u16 const *)(addr + 0));
 						offset  = UNALIGNED_GETLE16((u16 const *)(addr + 2));
 					}
-#ifdef CONFIG_X86_EMULATE_LCALL7
+
 					/* lcall7 emulation */
 					if (segment == 7 && (__sldt() & ~7) == SEGMENT_CPU_LDT) {
 						icpustate_setpc(state, pc);
@@ -322,7 +318,7 @@ x86_handle_segment_not_present(struct icpustate *__restrict state,
 #endif /* __x86_64__ */
 						x86_emulate_syscall32_lcall7(state, (u32)offset);
 					}
-#endif /* CONFIG_X86_EMULATE_LCALL7 */
+
 					/* Invalid use of the lcall instruction. */
 					PERTASK_SET(this_exception_code, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_REGISTER));
 					PERTASK_SET(this_exception_args.e_illegal_instruction.ii_opcode,

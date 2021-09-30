@@ -30,22 +30,6 @@
 #include <asm/syscalls32_d.h>
 #endif /* !__NR32FEAT_SYSCALL_TABLE_COUNT */
 
-#ifdef __x86_64__
-/* Must always emulate lcall7 system call on x86_64:
- * When lcall is used by user-space, preemption is _NOT_ disabled, and for the
- * duration of a single instruction we could get interrupted whilst having the
- * incorrect value set for %gs.base! */
-#undef CONFIG_X86_EMULATE_LCALL7
-#undef CONFIG_NO_X86_EMULATE_LCALL7
-#define CONFIG_X86_EMULATE_LCALL7 1
-#elif !defined(CONFIG_NO_X86_EMULATE_LCALL7)
-/* Emulate lcall7 even on i386 by default, since doing so greatly simplifies
- * the      implementation      of     `task_enable_redirect_usercode_rpc()' */
-#undef CONFIG_X86_EMULATE_LCALL7
-#define CONFIG_X86_EMULATE_LCALL7 1
-#endif
-
-
 #ifdef CONFIG_BUILDING_KERNEL_CORE
 /* Mangled   names   for   assembly   wrappers   for   a  given
  * system  call,  when  invoked  via  the  specified mechanism.
@@ -193,30 +177,6 @@ FUNDEF void ASMCALL x86_syscall64x32_int80(void);
 FUNDEF void ASMCALL x86_syscall64x64_int80_traced(void);
 FUNDEF void ASMCALL x86_syscall64x32_int80_traced(void);
 #endif /* __x86_64__ */
-
-/* Entry point for `lcall $7, $SYS_xxx' (32-bit system call invocation)
- * Method:
- *    RPC_SYSCALL_INFO_METHOD_LCALL7_32
- * In:
- *    %eax:       System call number  (`__NR32_*') (If `lcall $7, $0'  was
- *                used. Otherwise `SYS_xxx' is used as system call number)
- *    0(%esp):    Arg #0  (If `kernel_syscall32_regcnt(%eax) >= 1')
- *    4(%esp):    Arg #1  (If `kernel_syscall32_regcnt(%eax) >= 2')
- *    8(%esp):    Arg #2  (If `kernel_syscall32_regcnt(%eax) >= 3')
- *    12(%esp):   Arg #3  (If `kernel_syscall32_regcnt(%eax) >= 4')
- *    16(%esp):   Arg #4  (If `kernel_syscall32_regcnt(%eax) >= 5')
- *    20(%esp):   Arg #5  (If `kernel_syscall32_regcnt(%eax) >= 6')
- *    %eflags.DF: Set to enable exception propagation. (s.a. `sys_set_exception_handler()')
- * Out:
- *    %eax:       low  32-bit of return value
- *    %edx:       high 32-bit of return value (If `kernel_syscall32_doublewide(IN(%eax))')
- *    *:          All other registers are preserved by default, though individual
- *                system calls may cause specific registers to become  clobbered. */
-#ifndef CONFIG_X86_EMULATE_LCALL7
-FUNDEF void ASMCALL x86_syscall32_lcall7(void);
-/* Same as `x86_syscall32_lcall7()', but an IRET tail has already been created. */
-FUNDEF void ASMCALL x86_syscall32_lcall7_iret(void);
-#endif /* !CONFIG_X86_EMULATE_LCALL7 */
 
 
 

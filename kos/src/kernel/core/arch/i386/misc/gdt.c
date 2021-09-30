@@ -30,7 +30,6 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 
 #include <kernel/mman/mnode.h>
 #include <kernel/x86/gdt.h>
-#include <kernel/x86/syscall-tables.h> /* CONFIG_X86_EMULATE_LCALL7 */
 #include <sched/pertask.h>
 #include <sched/task.h>
 
@@ -104,13 +103,7 @@ PUBLIC ATTR_PERCPU struct segment thiscpu_x86_gdt[SEGMENT_COUNT] = {
 #endif /* __x86_64__ */
 };
 
-#ifndef CONFIG_X86_EMULATE_LCALL7
-INTDEF byte_t __x86_ldt_lcall7_main_lo[];
-INTDEF byte_t __x86_ldt_lcall7_main_hi[];
-#endif /* !CONFIG_X86_EMULATE_LCALL7 */
-
 PUBLIC ATTR_PERCPU struct segment thiscpu_x86_ldt[LDT_SEGMENT_COUNT] = {
-#ifdef CONFIG_X86_EMULATE_LCALL7
 	/* Define  the lcall7 segment as something that  will cause a #NP when accessed,
 	 * thus allowing us to emulate its behavior, rather than having to implement  it
 	 * properly. As far as the reasoning for this goes, take a look at the emulation
@@ -125,9 +118,6 @@ PUBLIC ATTR_PERCPU struct segment thiscpu_x86_ldt[LDT_SEGMENT_COUNT] = {
 	                    SEGMENT_CALLGATE_INIT_UL(0, SEGMENT_KERNEL_CODE, SEGMENT_DESCRIPTOR_TYPE_CALLGATE, 0, 3, /*present=*/0),
 	                    SEGMENT_CALLGATE_INIT_UH(0, SEGMENT_KERNEL_CODE, SEGMENT_DESCRIPTOR_TYPE_CALLGATE, 0, 3, /*present=*/0))
 #endif /* !__x86_64__ */
-#else /* CONFIG_X86_EMULATE_LCALL7 */
-	DEFINE_LOHI_SEGMENT(LDT_SEGMENT_SYSCALL, __x86_ldt_lcall7_main_lo, __x86_ldt_lcall7_main_hi),
-#endif /* !CONFIG_X86_EMULATE_LCALL7 */
 };
 
 
