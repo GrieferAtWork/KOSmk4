@@ -30,11 +30,9 @@
 #ifdef DEFINE_NORMAL
 #define FUNC(x)                           x
 #define IFELSE_BREAK(if_normal, if_break) if_normal
-#define UNUSED_IF_BREAK(x)                x
 #else /* DEFINE_NORMAL */
 #define FUNC(x)                           x##_break
 #define IFELSE_BREAK(if_normal, if_break) if_break
-#define UNUSED_IF_BREAK                   UNUSED
 #endif /* !DEFINE_NORMAL */
 
 DECL_BEGIN
@@ -50,10 +48,9 @@ halt_unhandled_exception(unsigned int error,
 /* The personality function used  to handle exceptions propagated  through
  * system calls. - Specifically, the special handling that is required for
  * servicing an RPC as `rpc_serve_user_redirection_all' */
-INTERN unsigned int
-NOTHROW(KCALL FUNC(x86_syscall_personality_asm32_int80))(struct unwind_fde_struct *__restrict fde,
-                                                         struct kcpustate *__restrict state,
-                                                         byte_t *UNUSED_IF_BREAK(lsda)) {
+INTERN WUNUSED NONNULL((1, 2)) unsigned int
+NOTHROW(EXCEPT_PERSONALITY_CC FUNC(x86_syscall_personality_asm32_int80))(struct unwind_fde_struct *__restrict fde,
+                                                                         struct kcpustate *__restrict state) {
 	struct ucpustate ustate;
 	unsigned int error;
 	struct rpc_syscall_info info;
@@ -74,29 +71,28 @@ NOTHROW(KCALL FUNC(x86_syscall_personality_asm32_int80))(struct unwind_fde_struc
 	 * or  alternatively:  indicates  a  user-space  redirection. */
 	if (ucpustate_iskernel(&ustate) &&
 	    ucpustate_getpc(&ustate) != (void const *)&x86_rpc_user_redirection)
-		return DWARF_PERSO_ABORT_SEARCH;
+		return EXCEPT_PERSONALITY_ABORT_SEARCH;
 #ifdef DEFINE_NORMAL
 	/* System calls encode their vector number  as the LSDA pointer, so  that
 	 * when  unwinding we can reverse-engineer that number in order to decide
 	 * on special actions to perform based on the called function, as well as
 	 * inform user-space of which function  caused the exception, as well  as
 	 * implement system call restarting. */
-	gpregs_setpax(&ustate.ucs_gpregs, (uintptr_t)lsda);
+	gpregs_setpax(&ustate.ucs_gpregs, (uintptr_t)fde->f_persofun);
 #endif /* DEFINE_NORMAL */
 	rpc_syscall_info_get32_int80h(&info, &ustate);
 	x86_userexcept_unwind(&ustate, &info);
 err:
 	halt_unhandled_exception(error, state);
-	return DWARF_PERSO_ABORT_SEARCH;
+	return EXCEPT_PERSONALITY_ABORT_SEARCH;
 }
 
 /* The personality function used  to handle exceptions propagated  through
  * system calls. - Specifically, the special handling that is required for
  * servicing an RPC as `rpc_serve_user_redirection_all' */
-INTERN unsigned int
-NOTHROW(KCALL FUNC(x86_syscall_personality_asm32_sysenter))(struct unwind_fde_struct *__restrict fde,
-                                                            struct kcpustate *__restrict state,
-                                                            byte_t *UNUSED_IF_BREAK(lsda)) {
+INTERN WUNUSED NONNULL((1, 2)) unsigned int
+NOTHROW(EXCEPT_PERSONALITY_CC FUNC(x86_syscall_personality_asm32_sysenter))(struct unwind_fde_struct *__restrict fde,
+                                                                            struct kcpustate *__restrict state) {
 	struct ucpustate ustate;
 	unsigned int error;
 	struct rpc_syscall_info info;
@@ -117,20 +113,20 @@ NOTHROW(KCALL FUNC(x86_syscall_personality_asm32_sysenter))(struct unwind_fde_st
 	 * or  alternatively:  indicates  a  user-space  redirection. */
 	if (ucpustate_iskernel(&ustate) &&
 	    ucpustate_getpc(&ustate) != (void const *)&x86_rpc_user_redirection)
-		return DWARF_PERSO_ABORT_SEARCH;
+		return EXCEPT_PERSONALITY_ABORT_SEARCH;
 #ifdef DEFINE_NORMAL
 	/* System calls encode their vector number  as the LSDA pointer, so  that
 	 * when  unwinding we can reverse-engineer that number in order to decide
 	 * on special actions to perform based on the called function, as well as
 	 * inform user-space of which function  caused the exception, as well  as
 	 * implement system call restarting. */
-	gpregs_setpax(&ustate.ucs_gpregs, (uintptr_t)lsda);
+	gpregs_setpax(&ustate.ucs_gpregs, (uintptr_t)fde->f_lsdaaddr);
 #endif /* DEFINE_NORMAL */
 	rpc_syscall_info_get32_sysenter_nx(&info, &ustate);
 	x86_userexcept_unwind(&ustate, &info);
 err:
 	halt_unhandled_exception(error, state);
-	return DWARF_PERSO_ABORT_SEARCH;
+	return EXCEPT_PERSONALITY_ABORT_SEARCH;
 }
 
 
@@ -140,10 +136,9 @@ err:
 /* The personality function used  to handle exceptions propagated  through
  * system calls. - Specifically, the special handling that is required for
  * servicing an RPC as `rpc_serve_user_redirection_all' */
-INTERN unsigned int
-NOTHROW(KCALL FUNC(x86_syscall_personality_asm64_syscall))(struct unwind_fde_struct *__restrict fde,
-                                                           struct kcpustate *__restrict state,
-                                                           byte_t *UNUSED_IF_BREAK(lsda)) {
+INTERN WUNUSED NONNULL((1, 2)) unsigned int
+NOTHROW(EXCEPT_PERSONALITY_CC FUNC(x86_syscall_personality_asm64_syscall))(struct unwind_fde_struct *__restrict fde,
+                                                                           struct kcpustate *__restrict state) {
 	struct ucpustate ustate;
 	unsigned int error;
 	struct rpc_syscall_info info;
@@ -164,29 +159,26 @@ NOTHROW(KCALL FUNC(x86_syscall_personality_asm64_syscall))(struct unwind_fde_str
 	 * or  alternatively:  indicates  a  user-space  redirection. */
 	if (ucpustate_iskernel(&ustate) &&
 	    ucpustate_getpc(&ustate) != (void const *)&x86_rpc_user_redirection)
-		return DWARF_PERSO_ABORT_SEARCH;
+		return EXCEPT_PERSONALITY_ABORT_SEARCH;
 #ifdef DEFINE_NORMAL
 	/* System calls encode their vector number  as the LSDA pointer, so  that
 	 * when  unwinding we can reverse-engineer that number in order to decide
 	 * on special actions to perform based on the called function, as well as
 	 * inform user-space of which function  caused the exception, as well  as
 	 * implement system call restarting. */
-	gpregs_setpax(&ustate.ucs_gpregs, (uintptr_t)lsda);
+	gpregs_setpax(&ustate.ucs_gpregs, (uintptr_t)fde->f_persofun);
 #endif /* DEFINE_NORMAL */
 	rpc_syscall_info_get64_int80h(&info, &ustate);
 	x86_userexcept_unwind(&ustate, &info);
 err:
 	halt_unhandled_exception(error, state);
-	return DWARF_PERSO_ABORT_SEARCH;
+	return EXCEPT_PERSONALITY_ABORT_SEARCH;
 }
 #endif /* __x86_64__ */
-
-
 
 DECL_END
 
 #undef FUNC
 #undef IFELSE_BREAK
-#undef UNUSED_IF_BREAK
 #undef DEFINE_NORMAL
 #undef DEFINE_BREAK

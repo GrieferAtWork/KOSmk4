@@ -34,6 +34,7 @@
 #include <kernel/mman.h>
 #include <kernel/printk.h>
 #include <kernel/rt/except-handler.h>
+#include <kernel/rt/except-personality.h>
 #include <kernel/syscall-properties.h>
 #include <kernel/types.h>
 #include <sched/arch/task.h>
@@ -862,12 +863,12 @@ search_fde:
 	if unlikely(error != UNWIND_SUCCESS)
 		goto err;
 	/* Check if there is a personality function for us to execute. */
-	if (fde.f_persofun) {
+	if (fde.f_persofun != NULL) {
 		unsigned int perso_code;
-		perso_code = (*(dwarf_perso_t)fde.f_persofun)(&fde, state, fde.f_lsdaaddr);
+		perso_code = (*(except_personality_t)fde.f_persofun)(&fde, state);
 		switch (perso_code) {
 
-		case DWARF_PERSO_EXECUTE_HANDLER:
+		case EXCEPT_PERSONALITY_EXECUTE_HANDLER:
 			/* When unwinding a landing pad, we must check if there is an active
 			 * `DW_CFA_GNU_args_size' instruction.
 			 * If there is, we must add its value to ESP before resuming execution!
@@ -876,10 +877,10 @@ search_fde:
 			if unlikely(error != UNWIND_SUCCESS)
 				goto err;
 			ATTR_FALLTHROUGH
-		case DWARF_PERSO_EXECUTE_HANDLER_NOW:
+		case EXCEPT_PERSONALITY_EXECUTE_HANDLER_NOW:
 			return state; /* Execute a new handler. */
 
-		case DWARF_PERSO_ABORT_SEARCH:
+		case EXCEPT_PERSONALITY_ABORT_SEARCH:
 			error = UNWIND_SUCCESS;
 			goto err;
 
@@ -1050,10 +1051,9 @@ err:
 /* This  function  is hooked  by CFI  under `struct unwind_fde_struct::f_persofun'
  * It's exact prototype and behavior are therefor not mandated by how GCC uses it. */
 DEFINE_PUBLIC_ALIAS(__gcc_personality_v0, __gxx_personality_v0);
-PUBLIC NONNULL((1, 2, 3)) unsigned int
-NOTHROW(KCALL __gxx_personality_v0)(struct unwind_fde_struct *__restrict fde,
-                                    struct kcpustate *__restrict state,
-                                    byte_t const *__restrict reader) {
+PUBLIC WUNUSED NONNULL((1, 2)) unsigned int
+NOTHROW(EXCEPT_PERSONALITY_CC __gxx_personality_v0)(struct unwind_fde_struct *__restrict fde,
+                                                    struct kcpustate *__restrict state) {
 	u8 temp, callsite_encoding;
 	byte_t const *landingpad;
 	byte_t const *callsite_end;
@@ -1093,7 +1093,7 @@ NOTHROW(KCALL __gxx_personality_v0)(struct unwind_fde_struct *__restrict fde,
 #endif
 		{
 			if (handler == 0)
-				return DWARF_PERSO_CONTINUE_UNWIND; /* No handler -> exception should be propagated. */
+				return EXCEPT_PERSONALITY_CONTINUE_UNWIND; /* No handler -> exception should be propagated. */
 			/* Just to the associated handler */
 			kcpustate_setpc(state, landingpad + handler);
 			if (action != 0) {
@@ -1105,11 +1105,11 @@ NOTHROW(KCALL __gxx_personality_v0)(struct unwind_fde_struct *__restrict fde,
 				 * that at the very least makes a bit of sense. */
 				kcpustate_set_unwind_exception(state, error_code());
 			}
-			return DWARF_PERSO_EXECUTE_HANDLER;
+			return EXCEPT_PERSONALITY_EXECUTE_HANDLER;
 		}
 	}
 	/* Default behavior: abort exception handling (this function was marked as NOTHROW) */
-	return DWARF_PERSO_ABORT_SEARCH;
+	return EXCEPT_PERSONALITY_ABORT_SEARCH;
 }
 
 

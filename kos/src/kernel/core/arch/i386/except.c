@@ -34,6 +34,7 @@
 #include <kernel/except.h>
 #include <kernel/panic.h>
 #include <kernel/printk.h>
+#include <kernel/rt/except-personality.h>
 #include <kernel/syslog.h>
 #include <sched/except-handler.h>
 #include <sched/rpc.h>
@@ -691,12 +692,12 @@ search_fde:
 	if unlikely(error != UNWIND_SUCCESS)
 		goto err;
 	/* Check if there is a personality function for us to execute. */
-	if (fde.f_persofun) {
+	if (fde.f_persofun != NULL) {
 		unsigned int perso_code;
-		perso_code = (*(dwarf_perso_t)fde.f_persofun)(&fde, state, fde.f_lsdaaddr);
+		perso_code = (*(except_personality_t)fde.f_persofun)(&fde, state);
 		switch (perso_code) {
 
-		case DWARF_PERSO_EXECUTE_HANDLER:
+		case EXCEPT_PERSONALITY_EXECUTE_HANDLER:
 			/* When unwinding a landing pad, we must check if there is an active
 			 * `DW_CFA_GNU_args_size' instruction.
 			 * If there is, we must add its value to ESP before resuming execution!
@@ -705,10 +706,10 @@ search_fde:
 			if unlikely(error != UNWIND_SUCCESS)
 				goto err;
 			ATTR_FALLTHROUGH
-		case DWARF_PERSO_EXECUTE_HANDLER_NOW:
+		case EXCEPT_PERSONALITY_EXECUTE_HANDLER_NOW:
 			return state; /* Execute a new handler. */
 
-		case DWARF_PERSO_ABORT_SEARCH:
+		case EXCEPT_PERSONALITY_ABORT_SEARCH:
 			halt_unhandled_exception(UNWIND_SUCCESS, state);
 			return state;
 
@@ -874,15 +875,16 @@ DEFINE_PUBLIC_ALIAS(__gcc_personality_v0, __gxx_personality_v0);
 
 /* This  function  is hooked  by CFI  under `struct unwind_fde_struct::f_persofun'
  * It's exact prototype and behavior are therefor not mandated by how GCC uses it. */
-PUBLIC NONNULL((1, 2, 3)) unsigned int
-NOTHROW(KCALL __gxx_personality_v0)(struct unwind_fde_struct *__restrict fde,
-                                    struct kcpustate *__restrict state,
-                                    byte_t const *__restrict reader) {
+PUBLIC WUNUSED NONNULL((1, 2)) unsigned int
+NOTHROW(EXCEPT_PERSONALITY_CC __gxx_personality_v0)(struct unwind_fde_struct *__restrict fde,
+                                                    struct kcpustate *__restrict state) {
 	u8 temp, callsite_encoding;
 	byte_t const *landingpad;
 	byte_t const *callsite_end;
 	size_t callsite_size;
+	byte_t const *reader;
 
+	reader     = (byte_t const *)fde->f_lsdaaddr;
 	landingpad = (byte_t const *)fde->f_pcstart;
 
 	/* NOTE: `reader' points to a `struct gcc_lsda' */
@@ -917,7 +919,7 @@ NOTHROW(KCALL __gxx_personality_v0)(struct unwind_fde_struct *__restrict fde,
 #endif
 		{
 			if (handler == 0)
-				return DWARF_PERSO_CONTINUE_UNWIND; /* No handler -> exception should be propagated. */
+				return EXCEPT_PERSONALITY_CONTINUE_UNWIND; /* No handler -> exception should be propagated. */
 			/* Just to the associated handler */
 			kcpustate_setpc(state, landingpad + handler);
 			if (action != 0) {
@@ -929,24 +931,34 @@ NOTHROW(KCALL __gxx_personality_v0)(struct unwind_fde_struct *__restrict fde,
 				 * that at the very least makes a bit of sense. */
 				gpregs_setpax(&state->kcs_gpregs, error_code());
 			}
-			return DWARF_PERSO_EXECUTE_HANDLER;
+			return EXCEPT_PERSONALITY_EXECUTE_HANDLER;
 		}
 	}
 	/* Default behavior: abort exception handling (this function was marked as NOTHROW) */
-	return DWARF_PERSO_ABORT_SEARCH;
+	return EXCEPT_PERSONALITY_ABORT_SEARCH;
 }
 #endif /* !CONFIG_USE_NEW_RPC */
 
 
 
 
-PUBLIC NONNULL((1, 2, 3)) unsigned int
-NOTHROW(KCALL x86_asm_except_personality)(struct unwind_fde_struct *__restrict UNUSED(fde),
-                                          struct kcpustate *__restrict state,
-                                          void const *lsda) {
+/* A helpful, predefined  personality function  that is meant  to be  used for  assembly
+ * function which need to be able to handle exceptions in a fairly user-friendly manner.
+ * NOTE: In order to define handlers, make use of the macros defined above.
+ * NOTE: When   the  handler  is   entered,  callee-clobber  registers   may  have  been  clobbered
+ *       if the exception was thrown  by a called function  that didn't encode CFI  instrumentation
+ *       for preserving those  registers. All other  registers have  the same value  as they  would
+ *       have had after a throwing function had returned normally, or before a throwing instruction
+ *       had been invoked (with the obvious exception of `%Pip')
+ *       Separately, you may include `DW_CFA_GNU_args_size' directives within your function,
+ *       which  are recognized as adjustments for `%esp'  and are applied prior to execution
+ *       or the specified handler. */
+PUBLIC WUNUSED NONNULL((1, 2)) unsigned int
+NOTHROW(EXCEPT_PERSONALITY_CC x86_asm_except_personality)(struct unwind_fde_struct *__restrict fde,
+                                                          struct kcpustate *__restrict state) {
 	struct x86_asm_except_entry const *ent;
 	void const *pc = kcpustate_getpc(state);
-	ent = (struct x86_asm_except_entry const *)lsda;
+	ent = (struct x86_asm_except_entry const *)fde->f_lsdaaddr;
 	if (ent) {
 		for (; ent->ee_entry != 0; ++ent) {
 			/* NOTE: Adjust for the fact that `pc' */
@@ -959,11 +971,11 @@ NOTHROW(KCALL x86_asm_except_personality)(struct unwind_fde_struct *__restrict U
 						continue; /* Different mask. */
 				}
 				kcpustate_setpc(state, ent->ee_entry);
-				return DWARF_PERSO_EXECUTE_HANDLER;
+				return EXCEPT_PERSONALITY_EXECUTE_HANDLER;
 			}
 		}
 	}
-	return DWARF_PERSO_CONTINUE_UNWIND;
+	return EXCEPT_PERSONALITY_CONTINUE_UNWIND;
 }
 
 

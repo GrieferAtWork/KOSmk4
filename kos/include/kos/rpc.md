@@ -670,7 +670,8 @@ bool NOTHROW(task_rpc_schedule)(struct task *__restrict thread,
 		 * that function only works correctly when the thread is being hosted by
 		 * the same CPU as  the calling thread. But  there's also a wrapper  for
 		 * that low-level function `userexcept_sysret_inject_safe()', which does
-		 * the same thing, but also works then the thread hosted by another CPU. */
+		 * the  same thing, but also works then  the thread is hosted by another
+		 * CPU. */
 		userexcept_sysret_inject_safe(thread, rpc_flags);
 	} else {
 		/* Because it's a user-level RPC, we only want to interrupt the thread if

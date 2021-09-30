@@ -192,7 +192,7 @@ NOTHROW(KCALL x86_initialize_fsgsbase)(void) {
 	/* Check if our CPU supports fsgsbase. If it does, the we don't  have
 	 * to do anything, and we can NOP out calls to `x86_fsgsbase_patch()' */
 	if (X86_HAVE_FSGSBASE) {
-		*((byte_t *)&x86_fsgsbase_patch + 0) = 0xc3;
+		*((byte_t *)&x86_fsgsbase_patch + 0) = 0xc3; /* ret */
 		return;
 	}
 	/* Patch all fsgsbase instructions within the kernel core. */

@@ -383,7 +383,35 @@ NOTHROW(FCALL userexcept_seterrno)(struct icpustate *__restrict state,
 }
 
 
-#ifndef CONFIG_USE_NEW_RPC
+#ifdef CONFIG_USE_NEW_RPC
+/* TODO: Define a personality function that can be used like:
+ * >> my_interrupt:
+ * >>     .cfi_startproc
+ * >>     .cfi_personality 0, interrupt_restart_personality
+ * >>     .cfi_lsda        0, my_interrupt
+ * >>     iret
+ * >>     .cfi_endproc
+ *
+ * `interrupt_restart_personality' is implemented as
+ * >> interrupt_restart_personality(void *lsda) {
+ * >>     if (RETURNS_TO_KERNELSPACE)
+ * >>         return NORMAL_UNWIND; // Only care about unwind to user
+ * >>     struct icpustate *state = unwind();
+ * >>     state = userexcept_handler(state, NULL);
+ * >>     // When `userexcept_handler()' returns, then we must restart
+ * >>     // the interrupt. This is done by constructing a new IRET
+ * >>     // tail and loading `lsda' as the new program counter. The
+ * >>     // user of our personality function will have accounted for
+ * >>     // this by storing the entry point for the interrupt as the
+ * >>     // associated lsda.
+ * >>     state = PUSH_IRET(state, pc: lsda, cs: SEGMENT_KERNEL_CS);
+ * >>     cpu_apply_icpustate(state);
+ * >> }
+ *
+ * This way, the restartable-interrupt requirement can _very_ easily
+ * be implemented/supported. */
+
+#else /* CONFIG_USE_NEW_RPC */
 LOCAL ATTR_NORETURN void
 NOTHROW(FCALL process_exit)(int reason) {
 	if (!task_isprocessleader()) {
@@ -436,7 +464,7 @@ NOTHROW(FCALL process_exit_for_exception_after_coredump)(struct exception_data c
  *                  such as a user-space program causing an `E_SEGFAULT', as opposed to the kernel
  *                  throwing an `E_FSERROR_FILE_NOT_FOUND'
  *            HINT: Additional information about how the system call was invoked can be extracted
- *                  from      `sc_info->rsi_flags'!      (s.a.      `<kos/asm/rpc-method.h>')
+ *                  from       `sc_info->rsi_flags'!       (s.a.        `<kos/asm/rpc-method.h>')
  * @param: siginfo: The signal that is being raised
  * @param: except_info: When non-NULL, `siginfo' was generated through `error_as_signal(&except_info->ei_data)',
  *                  and  if a coredump ends up being generated  as a result of the signal being

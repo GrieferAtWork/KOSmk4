@@ -25,6 +25,7 @@
 
 #include <kernel/debugtrap.h>
 #include <kernel/except.h>
+#include <kernel/rt/except-personality.h>
 #include <kernel/syscall.h>
 #include <kernel/types.h>
 #include <kernel/user.h>
@@ -60,10 +61,9 @@
 DECL_BEGIN
 
 /* Exception handler for unhandled exceptions thrown by  */
-INTERN ATTR_USED NONNULL((1, 2)) unsigned int
-NOTHROW(KCALL driver_initializer_personality)(struct unwind_fde_struct *__restrict UNUSED(fde),
-                                              struct kcpustate *__restrict UNUSED(state),
-                                              void *UNUSED(lsda)) {
+INTERN WUNUSED NONNULL((1, 2)) unsigned int
+NOTHROW(EXCEPT_PERSONALITY_CC driver_initializer_personality)(struct unwind_fde_struct *__restrict UNUSED(fde),
+                                                              struct kcpustate *__restrict UNUSED(state)) {
 	if (kernel_debugtrap_shouldtrap(KERNEL_DEBUGTRAP_ON_DRIVER_INIT_FAILURE)) {
 		siginfo_t si;
 		struct kcpustate *st;
@@ -73,7 +73,7 @@ NOTHROW(KCALL driver_initializer_personality)(struct unwind_fde_struct *__restri
 		st = kernel_debugtrap_r(&info->ei_state, si.si_signo);
 		(void)st;
 	}
-	return DWARF_PERSO_CONTINUE_UNWIND;
+	return EXCEPT_PERSONALITY_CONTINUE_UNWIND;
 }
 
 

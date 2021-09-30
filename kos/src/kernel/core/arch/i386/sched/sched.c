@@ -29,6 +29,7 @@
 #include <kernel/paging.h>
 #include <kernel/panic.h>
 #include <kernel/printk.h>
+#include <kernel/rt/except-personality.h>
 #include <kernel/syscall.h>
 #include <kernel/user.h>
 #include <kernel/x86/apic.h>
@@ -533,30 +534,28 @@ NOTHROW(FCALL task_enable_redirect_usercode_rpc)(struct task *__restrict self) {
 #endif /* !__x86_64__ */
 
 /* Personality functions for RPC wrappers. */
-INTERN unsigned int
-NOTHROW(KCALL x86_rpc_user_redirection_personality)(struct unwind_fde_struct *__restrict UNUSED(fde),
-                                                    struct kcpustate *__restrict state,
-                                                    byte_t *__restrict UNUSED(lsda)) {
+INTERN WUNUSED NONNULL((1, 2)) unsigned int
+NOTHROW(EXCEPT_PERSONALITY_CC x86_rpc_user_redirection_personality)(struct unwind_fde_struct *__restrict UNUSED(fde),
+                                                                    struct kcpustate *__restrict state) {
 	COMPILER_IMPURE();
 	/* When unwinding directly into `x86_rpc_user_redirection', still execute that
 	 * frame just as  it is,  with no modifications  made to  the register  state. */
 	if (kcpustate_getpc(state) == (void const *)&x86_rpc_user_redirection)
-		return DWARF_PERSO_EXECUTE_HANDLER_NOW;
-	return DWARF_PERSO_CONTINUE_UNWIND;
+		return EXCEPT_PERSONALITY_EXECUTE_HANDLER_NOW;
+	return EXCEPT_PERSONALITY_CONTINUE_UNWIND;
 }
 
-INTERN unsigned int
-NOTHROW(KCALL x86_rpc_kernel_redirection_personality)(struct unwind_fde_struct *__restrict UNUSED(fde),
-                                                      struct kcpustate *__restrict state,
-                                                      byte_t *__restrict UNUSED(lsda)) {
+INTERN WUNUSED NONNULL((1, 2)) unsigned int
+NOTHROW(EXCEPT_PERSONALITY_CC x86_rpc_kernel_redirection_personality)(struct unwind_fde_struct *__restrict UNUSED(fde),
+                                                                      struct kcpustate *__restrict state) {
 	COMPILER_IMPURE();
 	/* When unwinding directly into `x86_rpc_user_redirection', still execute that
 	 * frame just as  it is,  with no modifications  made to  the register  state. */
 	if (kcpustate_getpc(state) == (void const *)&x86_rpc_kernel_redirection) {
 		kcpustate_setpc(state, (void const *)&x86_rpc_kernel_redirection_handler);
-		return DWARF_PERSO_EXECUTE_HANDLER_NOW;
+		return EXCEPT_PERSONALITY_EXECUTE_HANDLER_NOW;
 	}
-	return DWARF_PERSO_CONTINUE_UNWIND;
+	return EXCEPT_PERSONALITY_CONTINUE_UNWIND;
 }
 #endif /* !CONFIG_USE_NEW_RPC */
 

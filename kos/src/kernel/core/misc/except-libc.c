@@ -75,7 +75,6 @@ DEFINE_PUBLIC_ALIAS(error_code, libc_error_code);
 DEFINE_PUBLIC_ALIAS(error_active, libc_error_active);
 DEFINE_PUBLIC_ALIAS(error_class, libc_error_class);
 DEFINE_PUBLIC_ALIAS(error_subclass, libc_error_subclass);
-/************************************************************************/
 
 DECL_END
 

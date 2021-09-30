@@ -24,34 +24,6 @@
 
 #include <hybrid/typecore.h>
 
-DECL_BEGIN
-
-#ifdef __CC__
-
-struct unwind_fde_struct;
-struct kcpustate;
-/* The prototype by which custom personality function must abide within the KOS kernel.
- * When called, `state' refers to the state _within_ the associated function. - Not the
- * state after that function has been unwound!
- * HINT: `.cfi_personality 0, <some-function-implemented-as-dwarf_perso_t>'
- * HINT: The `lsda' argument is the `lsda-value' in `.cfi_lsda 0, <lsda-value>'
- * NOTE: The PC-register of `state' is set to point _AFTER_ the instruction
- *       that  caused/propagated  an  exception (aka.  the  return address)
- * @param: fde:  The FDE pointing to @this personality function.
- * @param: lsda: A pointer to the LanguageSpecificDAta specified within the FDE.
- * @return: * :  One of `DWARF_PERSO_*' */
-typedef NONNULL((1, 2)) unsigned int
-/*NOTHROW*/ (KCALL *dwarf_perso_t)(struct unwind_fde_struct *__restrict fde,
-                                   struct kcpustate *__restrict state,
-                                   void const *lsda);
-#endif /* __CC__ */
-#define DWARF_PERSO_EXECUTE_HANDLER     0x0000 /* An exception handler was found, and `state' was updated */
-#define DWARF_PERSO_EXECUTE_HANDLER_NOW 0x0001 /* Same as `DWARF_PERSO_EXECUTE_HANDLER', but don't adjust for `DW_CFA_GNU_args_size' */
-#define DWARF_PERSO_CONTINUE_UNWIND     0x0002 /* Continue unwinding to search for an exception handler. */
-#define DWARF_PERSO_ABORT_SEARCH        0x0003 /* Abort the search for exception handlers, and panic(). */
-
-
-
 #ifdef __ASSEMBLER__
 #define EXCEPT_HANDLERS_START                        \
 	.global x86_asm_except_personality;              \
@@ -92,12 +64,23 @@ typedef NONNULL((1, 2)) unsigned int
 
 
 #ifdef __CC__
+#include <kernel/arch/rt/except-personality.h>
+
+#ifndef EXCEPT_PERSONALITY_CC
+#define EXCEPT_PERSONALITY_CC KCALL
+#endif /* !EXCEPT_PERSONALITY_CC */
+
+
+DECL_BEGIN
+
 struct x86_asm_except_entry {
 	void const      *ee_entry; /* Exception handler entry PC (or 0 as sentinel) */
 	void const      *ee_start; /* Exception handler start PC */
 	void const      *ee_end;   /* Exception handler end PC */
 	__UINTPTR_TYPE__ ee_mask;  /* Catch mask, or (uintptr_t)-1 to catch anything */
 };
+struct unwind_fde_struct;
+struct kcpustate;
 
 /* A helpful, predefined  personality function  that is meant  to be  used for  assembly
  * function which need to be able to handle exceptions in a fairly user-friendly manner.
@@ -106,18 +89,15 @@ struct x86_asm_except_entry {
  *       if the exception was thrown  by a called function  that didn't encode CFI  instrumentation
  *       for preserving those  registers. All other  registers have  the same value  as they  would
  *       have had after a throwing function had returned normally, or before a throwing instruction
- *       had been invoked (with the obvious exception of `%eip')
+ *       had been invoked (with the obvious exception of `%Pip')
  *       Separately, you may include `DW_CFA_GNU_args_size' directives within your function,
  *       which  are recognized as adjustments for `%esp'  and are applied prior to execution
  *       or the specified handler. */
-FUNDEF unsigned int
-NOTHROW(KCALL x86_asm_except_personality)(struct unwind_fde_struct *__restrict fde,
-                                          struct kcpustate *__restrict state,
-                                          void const *lsda);
-#endif /* __CC__ */
-
-
+FUNDEF WUNUSED NONNULL((1, 2)) unsigned int
+NOTHROW(EXCEPT_PERSONALITY_CC x86_asm_except_personality)(struct unwind_fde_struct *__restrict fde,
+                                                          struct kcpustate *__restrict state);
 
 DECL_END
+#endif /* __CC__ */
 
 #endif /* !GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_ARCH_EXCEPT_H */

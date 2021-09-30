@@ -23,8 +23,14 @@
 
 #include <kernel/compiler.h>
 
+#ifdef CONFIG_USE_NEW_RPC
+
+/* TODO */
+
+#else /* CONFIG_USE_NEW_RPC */
 #include <kernel/except.h>
 #include <kernel/paging.h>
+#include <kernel/rt/except-personality.h>
 #include <kernel/syscall-properties.h>
 #include <kernel/syscall.h>
 #include <kernel/types.h>
@@ -57,10 +63,9 @@ INTDEF byte_t __x86_syscall_emulate_r_protect_end[];
 /* The personality function used  to handle exceptions propagated  through
  * system calls. - Specifically, the special handling that is required for
  * servicing an RPC as `rpc_serve_user_redirection_all' */
-INTERN NONNULL((1, 2, 3)) unsigned int
-NOTHROW(KCALL syscall_emulate_r_personality)(struct unwind_fde_struct *__restrict UNUSED(fde),
-                                             struct kcpustate *__restrict state,
-                                             byte_t *__restrict UNUSED(lsda)) {
+INTERN WUNUSED NONNULL((1, 2)) unsigned int
+NOTHROW(EXCEPT_PERSONALITY_CC syscall_emulate_r_personality)(struct unwind_fde_struct *__restrict UNUSED(fde),
+                                                             struct kcpustate *__restrict state) {
 	struct icpustate *return_cpustate;
 	struct rpc_syscall_info *sc_info;
 	byte_t const *pc;
@@ -71,7 +76,7 @@ NOTHROW(KCALL syscall_emulate_r_personality)(struct unwind_fde_struct *__restric
 	pc = kcpustate_getpc(state);
 	if (pc <= __x86_syscall_emulate_r_protect_start ||
 	    pc > __x86_syscall_emulate_r_protect_end)
-		return DWARF_PERSO_CONTINUE_UNWIND;
+		return EXCEPT_PERSONALITY_CONTINUE_UNWIND;
 	/* Load cpu state structures from the base of the kernel stack. */
 #ifdef __x86_64__
 	sc_info = (struct rpc_syscall_info *)state->kcs_gpregs.gp_rbx;
@@ -96,10 +101,10 @@ struct x86_syscall32_lcall7_args {
 	struct irregs_user l7_iret;
 };
 
-INTERN unsigned int
-NOTHROW(KCALL x86_syscall_personality_asm32_lcall7)(struct unwind_fde_struct *__restrict fde,
-                                                    struct kcpustate *__restrict state,
-                                                    byte_t *__restrict UNUSED(lsda)) {
+
+INTERN WUNUSED NONNULL((1, 2)) unsigned int
+NOTHROW(EXCEPT_PERSONALITY_CC x86_syscall_personality_asm32_lcall7)(struct unwind_fde_struct *__restrict fde,
+                                                                    struct kcpustate *__restrict state) {
 	struct ucpustate ustate;
 	unsigned int error;
 	struct rpc_syscall_info info;
@@ -120,12 +125,12 @@ NOTHROW(KCALL x86_syscall_personality_asm32_lcall7)(struct unwind_fde_struct *__
 	 * or  alternatively:  indicates  a  user-space  redirection. */
 	if (ucpustate_iskernel(&ustate) &&
 	    ucpustate_getpc(&ustate) != (void const *)&x86_rpc_user_redirection)
-		return DWARF_PERSO_ABORT_SEARCH;
+		return EXCEPT_PERSONALITY_ABORT_SEARCH;
 	rpc_syscall_info_get32_lcall7_nx(&info, &ustate);
 	x86_userexcept_unwind(&ustate, &info);
 err:
 	halt_unhandled_exception(error, state);
-	return DWARF_PERSO_ABORT_SEARCH;
+	return EXCEPT_PERSONALITY_ABORT_SEARCH;
 }
 
 
@@ -249,5 +254,6 @@ DECL_END
 #define DEFINE_BREAK 1
 #include "personality-impl.c.inl"
 #endif /* !__INTELLISENSE__ */
+#endif /* !CONFIG_USE_NEW_RPC */
 
 #endif /* !GUARD_KERNEL_CORE_ARCH_I386_SYSCALL_PERSONALITY_C */
