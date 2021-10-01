@@ -94,7 +94,7 @@ restore_rpc:
 #ifdef RPC_SERVE_ALL
 			if (!(chain->re_kind & RPC_KIND_NONSYSCALL) &&
 			    (reason != TASK_RPC_REASON_SYSCALL ||
-			     !kernel_syscall_iscp(sc_info->rsi_sysno)))
+			     !kernel_syscall_iscp(sc_info)))
 #else /* RPC_SERVE_ALL */
 			if (!(chain->re_kind & RPC_KIND_NONSYSCALL))
 #endif /* !RPC_SERVE_ALL */

@@ -92,7 +92,7 @@ sighand_raise_signal(struct icpustate *__restrict state,
 		int rmode;
 		bool delete_sc_info = false;
 
-		rmode = kernel_syscall_restartmode(sc_info->rsi_sysno);
+		rmode = kernel_syscall_restartmode(sc_info);
 		if (rmode == SYSCALL_RESTART_MODE_MUST)
 			; /* Always restart */
 		else if (rmode == SYSCALL_RESTART_MODE_DONT)

@@ -69,9 +69,9 @@ DECL_BEGIN
 	(__KERNEL_SYSCALL32_ISTABLE0(sysno)                           \
 	 ? callback(0, __VA_ARGS__)                                   \
 	 : error)
-#else
+#else /* __NR32FEAT_SYSCALL_TABLE_COUNT == ... */
 #error "Unsupported number of system call tables"
-#endif
+#endif /* __NR32FEAT_SYSCALL_TABLE_COUNT != ... */
 
 #define DEFINE_KERNEL_SYSCALL_TABLES_METADATA(id)                     \
 	DATDEF __UINT8_TYPE__ const kernel_syscall##id##_restartmode32[]; \
@@ -106,10 +106,33 @@ __NR32FEAT_SYSCALL_TABLE_FOREACH(DEFINE_KERNEL_SYSCALL_TABLES_METADATA)
 #define __kernel_syscall32_doublewide_impl(table, sysno) \
 	__kernel_syscall_doublewide(kernel_syscall##table##_regcnt32, (sysno)-__NR32_syscall##table##_min)
 
-#define kernel_syscall64_iscp        kernel_syscall_iscp
-#define kernel_syscall64_restartmode kernel_syscall_restartmode
-#define kernel_syscall64_regcnt      kernel_syscall_regcnt
-#define kernel_syscall64_doublewide  kernel_syscall_doublewide
+#define kernel_syscall64_iscp        _kernel_syscall_iscp
+#define kernel_syscall64_restartmode _kernel_syscall_restartmode
+#define kernel_syscall64_regcnt      _kernel_syscall_regcnt
+#define kernel_syscall64_doublewide  _kernel_syscall_doublewide
+
+
+/* For compatiblity mode, we need to look at the RPC syscall info method
+ * to  figure out which namespace the encoded system call number belongs
+ * to (either 32-bit, or 64-bit) */
+#define __rpc_syscall_info_iscompat(sc_info) \
+	(((sc_info)->rsi_flags & RPC_SYSCALL_INFO_METHOD_F3264) == RPC_SYSCALL_INFO_METHOD_F32)
+#define kernel_syscall_iscp(sc_info)               \
+	(__rpc_syscall_info_iscompat(sc_info)          \
+	 ? kernel_syscall32_iscp((sc_info)->rsi_sysno) \
+	 : kernel_syscall64_iscp((sc_info)->rsi_sysno))
+#define kernel_syscall_restartmode(sc_info)               \
+	(__rpc_syscall_info_iscompat(sc_info)                 \
+	 ? kernel_syscall32_restartmode((sc_info)->rsi_sysno) \
+	 : kernel_syscall64_restartmode((sc_info)->rsi_sysno))
+#define kernel_syscall_regcnt(sc_info)               \
+	(__rpc_syscall_info_iscompat(sc_info)            \
+	 ? kernel_syscall32_regcnt((sc_info)->rsi_sysno) \
+	 : kernel_syscall64_regcnt((sc_info)->rsi_sysno))
+#define kernel_syscall_doublewide(sc_info)               \
+	(__rpc_syscall_info_iscompat(sc_info)                \
+	 ? kernel_syscall32_doublewide((sc_info)->rsi_sysno) \
+	 : kernel_syscall64_doublewide((sc_info)->rsi_sysno))
 
 DECL_END
 
@@ -123,10 +146,10 @@ DECL_END
 #define kernel_syscall1_restartmode64 kernel_syscall1_restartmode
 #define kernel_syscall1_regcnt64      kernel_syscall1_regcnt
 #else /* __x86_64__ */
-#define kernel_syscall32_iscp         kernel_syscall_iscp
-#define kernel_syscall32_restartmode  kernel_syscall_restartmode
-#define kernel_syscall32_regcnt       kernel_syscall_regcnt
-#define kernel_syscall32_doublewide   kernel_syscall_doublewide
+#define kernel_syscall32_iscp         _kernel_syscall_iscp
+#define kernel_syscall32_restartmode  _kernel_syscall_restartmode
+#define kernel_syscall32_regcnt       _kernel_syscall_regcnt
+#define kernel_syscall32_doublewide   _kernel_syscall_doublewide
 #define kernel_syscall0_iscp32        kernel_syscall0_iscp
 #define kernel_syscall0_restartmode32 kernel_syscall0_restartmode
 #define kernel_syscall0_regcnt32      kernel_syscall0_regcnt

@@ -28,12 +28,15 @@
 #include <kernel/handle.h>
 #include <kernel/malloc.h>
 #include <kernel/personality.h>
+#include <kernel/rt/except-handler.h>
 #include <kernel/syscall.h>
 #include <kernel/types.h>
 #include <kernel/user.h>
 #include <sched/epoll.h>
+#include <sched/rpc.h>
 #include <sched/signal-completion.h>
 #include <sched/signal.h>
+#include <sched/task.h>
 #include <sched/tsc.h>
 
 #include <hybrid/atomic.h>
@@ -41,11 +44,14 @@
 #include <kos/except/reason/illop.h>
 #include <kos/except/reason/inval.h>
 #include <kos/io.h>
+#include <kos/kernel/cpu-state-helpers.h>
+#include <kos/kernel/cpu-state.h>
 #include <sys/epoll.h>
 #include <sys/poll.h>
 
 #include <assert.h>
 #include <errno.h>
+#include <signal.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
@@ -1273,6 +1279,40 @@ again:
 }
 
 
+#ifdef CONFIG_USE_NEW_RPC
+PUBLIC NONNULL((1, 4)) size_t KCALL
+epoll_controller_wait_with_sigmask(struct epoll_controller *__restrict self,
+                                   USER CHECKED struct epoll_event *events,
+                                   size_t maxevents,
+                                   sigset_t const *__restrict sigmask,
+                                   ktime_t abs_timeout)
+		THROWS(E_BADALLOC, E_WOULDBLOCK, E_SEGFAULT, E_INTERRUPT) {
+	size_t result;
+	assert(!task_wasconnected());
+again:
+	result = epoll_controller_trywait(self, events, maxevents);
+	if (result == 0) {
+		task_connect(&self->ec_avail);
+		TRY {
+			result = epoll_controller_trywait(self, events, maxevents);
+			if (result != 0) {
+				task_disconnectall();
+				return result;
+			}
+		} EXCEPT {
+			task_disconnectall();
+			RETHROW();
+		}
+		if (!task_waitfor_with_sigmask(sigmask, abs_timeout))
+			return 0; /* Nothing became available in the mean time... */
+		goto again;
+	}
+	return result;
+}
+#endif /* CONFIG_USE_NEW_RPC */
+
+
+
 
 
 /************************************************************************/
@@ -1385,9 +1425,110 @@ DEFINE_SYSCALL4(ssize_t, epoll_wait,
 }
 #endif /* __ARCH_WANT_SYSCALL_EPOLL_WAIT */
 
+#ifdef __ARCH_WANT_SYSCALL_EPOLL_PWAIT
+#ifdef CONFIG_USE_NEW_RPC
 
+/* This function is also called from arch-specific, optimized syscall routers. */
+INTERN ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) struct icpustate *FCALL
+sys_epoll_pwait_impl(struct icpustate *__restrict state,
+                     struct rpc_syscall_info *__restrict sc_info) {
+	fd_t epfd                                 = (fd_t)sc_info->rsi_regs[0];
+	USER UNCHECKED struct epoll_event *events = (USER UNCHECKED struct epoll_event *)sc_info->rsi_regs[1];
+	size_t maxevents                          = (size_t)sc_info->rsi_regs[2];
+	syscall_slong_t timeout                   = (syscall_slong_t)sc_info->rsi_regs[3];
+	USER UNCHECKED sigset_t const *sigmask    = (USER UNCHECKED sigset_t const *)sc_info->rsi_regs[4];
+	size_t sigsetsize                         = (size_t)sc_info->rsi_regs[5];
+	if (sigmask) {
+		size_t result;
+		sigset_t these;
+		if unlikely(sigsetsize != sizeof(sigset_t)) {
+			THROW(E_INVALID_ARGUMENT_BAD_VALUE,
+			      E_INVALID_ARGUMENT_CONTEXT_SIGNAL_SIGSET_SIZE,
+			      sigsetsize);
+		}
+		validate_readable(sigmask, sizeof(sigset_t));
+		memcpy(&these, sigmask, sizeof(sigset_t));
 
+		/* These signals cannot be masked.  */
+		sigdelset(&these, SIGSTOP);
+		sigdelset(&these, SIGKILL);
 
+		/* Validate other arguments. */
+		validate_writablem(events, maxevents, sizeof(struct epoll_event));
+		if unlikely(maxevents <= 0) {
+			THROW(E_INVALID_ARGUMENT_BAD_VALUE,
+			      E_INVALID_ARGUMENT_CONTEXT_EPOLL_WAIT_ZERO_MAXEVENTS,
+			      maxevents);
+		}
+
+		/* Indicate that we want to receive wake-ups for masked signals. */
+		ATOMIC_OR(THIS_TASK->t_flags, TASK_FWAKEONMSKRPC);
+
+		/* This will clear `TASK_FWAKEONMSKRPC', as well as
+		 * perform a check for signals not in `these' which
+		 * may have also appeared in the mean time prior to
+		 * returning to user-space. */
+		userexcept_sysret_inject_self();
+again:
+		TRY {
+			REF struct epoll_controller *self;
+			/* We can only lookup `self' in here because there are code paths
+			 * where `userexcept_handler_with_sigmask()'  will directly  jump
+			 * back to user-space. */
+			self = handle_get_epoll_controller(epfd);
+			FINALLY_DECREF_UNLIKELY(self);
+
+			if (timeout < 0) {
+				result = epoll_controller_wait_with_sigmask(self, events, maxevents, &these);
+			} else if (timeout == 0) {
+				result = epoll_controller_trywait(self, events, maxevents);
+			} else {
+				ktime_t then = ktime();
+				then += relktime_from_milliseconds((syscall_ulong_t)timeout);
+				result = epoll_controller_wait_with_sigmask(self, events, maxevents, &these, then);
+			}
+		} EXCEPT {
+			/* This function  only returns  normally
+			 * when the syscall should be restarted. */
+			state = userexcept_handler_with_sigmask(state, sc_info, &these);
+			PERTASK_SET(this_exception_code, 1); /* Prevent internal fault */
+			goto again;
+		}
+		/* Write-back the system call return value. */
+		icpustate_setreturn(state, result);
+	} else {
+		icpustate_setreturn(state, sys_epoll_wait(epfd, events, maxevents, timeout));
+	}
+	return state;
+}
+
+PRIVATE NONNULL((1)) void PRPC_EXEC_CALLBACK_CC
+sys_epoll_pwait_rpc(struct rpc_context *__restrict ctx, void *UNUSED(cookie)) {
+	if (ctx->rc_context != RPC_REASONCTX_SYSCALL)
+		return;
+	/* Indicate that our system call is implemented via this RPC. */
+	ctx->rc_context = RPC_REASONCTX_SYSRET;
+
+	/* Do the actual system call. */
+	ctx->rc_state = sys_epoll_pwait_impl(ctx->rc_state, &ctx->rc_scinfo);
+}
+
+DEFINE_SYSCALL6(ssize_t, epoll_pwait,
+                fd_t, epfd, USER UNCHECKED struct epoll_event *, events,
+                size_t, maxevents, syscall_slong_t, timeout,
+                USER UNCHECKED sigset_t const *, sigmask, size_t, sigsetsize) {
+	ssize_t result;
+	if (sigmask) {
+		/* Send an RPC to ourselves, so we can gain access to the user-space register state. */
+		task_rpc_exec(THIS_TASK, RPC_CONTEXT_KERN | RPC_SYNCMODE_F_USER, &sys_epoll_pwait_rpc, NULL);
+		__builtin_unreachable();
+	} else {
+		result = sys_epoll_wait(epfd, events, maxevents, timeout);
+	}
+	return result;
+}
+#endif /* __ARCH_WANT_SYSCALL_EPOLL_PWAIT */
+#endif /* CONFIG_USE_NEW_RPC */
 
 
 DECL_END

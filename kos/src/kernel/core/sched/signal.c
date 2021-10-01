@@ -2200,82 +2200,87 @@ DEFINE_TEST(pushpop_connections) {
 DECL_END
 
 #ifndef __INTELLISENSE__
-#define DEFINE_sig_send 1
+#define DEFINE_sig_send
 #include "signal-send.c.inl"
 
-#define DEFINE_sig_send_nopr 1
+#define DEFINE_sig_send_nopr
 #include "signal-send.c.inl"
 
-#define DEFINE_sig_altsend 1
+#define DEFINE_sig_altsend
 #include "signal-send.c.inl"
 
-#define DEFINE_sig_altsend_nopr 1
+#define DEFINE_sig_altsend_nopr
 #include "signal-send.c.inl"
 
-#define DEFINE_sig_sendto 1
+#define DEFINE_sig_sendto
 #include "signal-send.c.inl"
 
-#define DEFINE_sig_sendto_nopr 1
+#define DEFINE_sig_sendto_nopr
 #include "signal-send.c.inl"
 
-#define DEFINE_sig_altsendto 1
+#define DEFINE_sig_altsendto
 #include "signal-send.c.inl"
 
-#define DEFINE_sig_altsendto_nopr 1
+#define DEFINE_sig_altsendto_nopr
 #include "signal-send.c.inl"
 
-#define DEFINE_sig_broadcast 1
+#define DEFINE_sig_broadcast
 #include "signal-send.c.inl"
 
-#define DEFINE_sig_broadcast_nopr 1
+#define DEFINE_sig_broadcast_nopr
 #include "signal-send.c.inl"
 
-#define DEFINE_sig_altbroadcast 1
+#define DEFINE_sig_altbroadcast
 #include "signal-send.c.inl"
 
-#define DEFINE_sig_altbroadcast_nopr 1
+#define DEFINE_sig_altbroadcast_nopr
 #include "signal-send.c.inl"
 
-#define DEFINE_sig_broadcast_as_nopr 1
+#define DEFINE_sig_broadcast_as_nopr
 #include "signal-send.c.inl"
 
-#define DEFINE_sig_broadcast_cleanup_nopr 1
+#define DEFINE_sig_broadcast_cleanup_nopr
 #include "signal-send.c.inl"
 
-#define DEFINE_sig_broadcast_as_cleanup_nopr 1
+#define DEFINE_sig_broadcast_as_cleanup_nopr
 #include "signal-send.c.inl"
 
-#define DEFINE_sig_broadcast_for_fini 1
+#define DEFINE_sig_broadcast_for_fini
 #include "signal-send.c.inl"
 
-#define DEFINE_sig_broadcast_for_fini_nopr 1
+#define DEFINE_sig_broadcast_for_fini_nopr
 #include "signal-send.c.inl"
 
-#define DEFINE_sig_altbroadcast_for_fini 1
+#define DEFINE_sig_altbroadcast_for_fini
 #include "signal-send.c.inl"
 
-#define DEFINE_sig_altbroadcast_for_fini_nopr 1
+#define DEFINE_sig_altbroadcast_for_fini_nopr
 #include "signal-send.c.inl"
 
-#define DEFINE_sig_broadcast_as_for_fini_nopr 1
+#define DEFINE_sig_broadcast_as_for_fini_nopr
 #include "signal-send.c.inl"
 
-#define DEFINE_sig_broadcast_for_fini_cleanup_nopr 1
+#define DEFINE_sig_broadcast_for_fini_cleanup_nopr
 #include "signal-send.c.inl"
 
-#define DEFINE_sig_broadcast_as_for_fini_cleanup_nopr 1
+#define DEFINE_sig_broadcast_as_for_fini_cleanup_nopr
 #include "signal-send.c.inl"
 
-#define DEFINE_task_waitfor 1
+#define DEFINE_task_waitfor
 #include "signal-waitfor.c.inl"
 
-#define DEFINE_task_waitfor_norpc 1
+#ifdef CONFIG_USE_NEW_RPC
+#define DEFINE_task_waitfor_with_sigmask
+#include "signal-waitfor.c.inl"
+#endif /* CONFIG_USE_NEW_RPC */
+
+#define DEFINE_task_waitfor_norpc
 #include "signal-waitfor.c.inl"
 
-#define DEFINE_task_waitfor_nx 1
+#define DEFINE_task_waitfor_nx
 #include "signal-waitfor.c.inl"
 
-#define DEFINE_task_waitfor_norpc_nx 1
+#define DEFINE_task_waitfor_norpc_nx
 #include "signal-waitfor.c.inl"
 #endif /* !__INTELLISENSE__ */
 

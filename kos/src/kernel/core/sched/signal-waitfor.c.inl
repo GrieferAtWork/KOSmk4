@@ -19,14 +19,18 @@
  */
 #ifdef __INTELLISENSE__
 #include "signal.c"
-#define DEFINE_task_waitfor 1
-//#define  DEFINE_task_waitfor_norpc   1
-//#define    DEFINE_task_waitfor_nx    1
-//#define DEFINE_task_waitfor_norpc_nx 1
+//#define DEFINE_task_waitfor
+#define DEFINE_task_waitfor_with_sigmask
+//#define    DEFINE_task_waitfor_norpc
+//#define       DEFINE_task_waitfor_nx
+//#define DEFINE_task_waitfor_norpc_nx
 #endif /* __INTELLISENSE__ */
 
-#if (defined(DEFINE_task_waitfor) /* */ + defined(DEFINE_task_waitfor_nx) + \
-     defined(DEFINE_task_waitfor_norpc) + defined(DEFINE_task_waitfor_norpc_nx)) != 1
+#if (defined(DEFINE_task_waitfor) +              \
+     defined(DEFINE_task_waitfor_with_sigmask) + \
+     defined(DEFINE_task_waitfor_nx) +           \
+     defined(DEFINE_task_waitfor_norpc) +        \
+     defined(DEFINE_task_waitfor_norpc_nx)) != 1
 #error "Must #define exactly one of these macros!"
 #endif /* ... */
 
@@ -47,27 +51,33 @@ DECL_BEGIN
  * @return: * :   The signal that was delivered. */
 PUBLIC struct sig *FCALL
 task_waitfor(ktime_t abs_timeout)
-		THROWS(E_WOULDBLOCK, ...)
+		THROWS(E_INTERRUPT_USER_RPC, E_WOULDBLOCK, ...)
+#elif defined(DEFINE_task_waitfor_with_sigmask)
+PUBLIC NONNULL((1)) struct sig *FCALL
+task_waitfor_with_sigmask(sigset_t const *__restrict sigmask,
+                          ktime_t abs_timeout)
+		THROWS(E_INTERRUPT_USER_RPC, E_WOULDBLOCK, ...)
+#define LOCAL_HAVE_SIGMASK
 #elif defined(DEFINE_task_waitfor_norpc)
-#define HAVE_NORPC 1
 /* Same as `task_waitfor', but don't serve RPC functions. */
 PUBLIC struct sig *FCALL
 task_waitfor_norpc(ktime_t abs_timeout)
 		THROWS(E_WOULDBLOCK)
+#define LOCAL_NORPC
 #elif defined(DEFINE_task_waitfor_nx)
-#define HAVE_NX 1
 /* Same as `task_waitfor', but only service NX RPCs, and return `NULL'
  * if there are pending RPCs that  are allowed to throw exception,  or
  * if preemption was disabled, and the operation would have blocked. */
 PUBLIC struct sig *
 NOTHROW(FCALL task_waitfor_nx)(ktime_t abs_timeout)
+#define LOCAL_NOEXCEPT
 #elif defined(DEFINE_task_waitfor_norpc_nx)
-#define HAVE_NORPC 1
-#define HAVE_NX    1
 /* Same as  `task_waitfor',  but  don't serve  RPC  functions,  and  return
  * `NULL' if preemption was disabled, and the operation would have blocked. */
 PUBLIC struct sig *
 NOTHROW(FCALL task_waitfor_norpc_nx)(ktime_t abs_timeout)
+#define LOCAL_NORPC
+#define LOCAL_NOEXCEPT
 #endif /* ... */
 {
 	struct sig *result;
@@ -83,16 +93,16 @@ got_result:
 		self->tcs_dlvr = NULL;
 	} else {
 		if unlikely_untraced(!PREEMPTION_ENABLED()) {
-#ifdef HAVE_NX
+#ifdef LOCAL_NOEXCEPT
 			goto do_return_with_disconnect;
 #define NEED_do_return_with_disconnect
-#else /* HAVE_NX */
+#else /* LOCAL_NOEXCEPT */
 			result = task_receiveall();
 			if unlikely_untraced(result)
 				goto done;
 #define NEED_done
 			THROW(E_WOULDBLOCK_PREEMPTED);
-#endif /* !HAVE_NX */
+#endif /* !LOCAL_NOEXCEPT */
 		}
 		PREEMPTION_DISABLE();
 		COMPILER_READ_BARRIER();
@@ -101,11 +111,15 @@ got_result:
 			PREEMPTION_ENABLE();
 			goto got_result;
 		}
-#ifndef HAVE_NORPC
-#ifdef HAVE_NX
+#ifndef LOCAL_NORPC
+#ifdef LOCAL_NOEXCEPT
 		{
 			unsigned int what;
+#ifdef LOCAL_HAVE_SIGMASK
+			what = task_serve_with_sigmask_nx(sigmask);
+#else /* LOCAL_HAVE_SIGMASK */
 			what = task_serve_nx();
+#endif /* !LOCAL_HAVE_SIGMASK */
 			if (what & TASK_SERVE_NX_DIDRUN)
 				goto again;
 			if (what & TASK_SERVE_NX_EXCEPT) {
@@ -115,16 +129,21 @@ got_result:
 #define NEED_do_return_with_disconnect
 			}
 		}
-#else /* HAVE_NX */
+#else /* LOCAL_NOEXCEPT */
 		TRY {
+#ifdef LOCAL_HAVE_SIGMASK
+			if (task_serve_with_sigmask(sigmask))
+				goto again;
+#else /* LOCAL_HAVE_SIGMASK */
 			if (task_serve())
 				goto again;
+#endif /* !LOCAL_HAVE_SIGMASK */
 		} EXCEPT {
 			task_disconnectall();
 			RETHROW();
 		}
-#endif /* !HAVE_NX */
-#endif /* !HAVE_NORPC */
+#endif /* !LOCAL_NOEXCEPT */
+#endif /* !LOCAL_NORPC */
 		if (!task_sleep(abs_timeout)) {
 #ifdef NEED_do_return_with_disconnect
 #undef NEED_do_return_with_disconnect
@@ -144,8 +163,9 @@ done:
 }
 
 
-#undef HAVE_NX
-#undef HAVE_NORPC
+#undef LOCAL_HAVE_SIGMASK
+#undef LOCAL_NOEXCEPT
+#undef LOCAL_NORPC
 
 
 DECL_END
@@ -153,4 +173,5 @@ DECL_END
 #undef DEFINE_task_waitfor_norpc_nx
 #undef DEFINE_task_waitfor_nx
 #undef DEFINE_task_waitfor_norpc
+#undef DEFINE_task_waitfor_with_sigmask
 #undef DEFINE_task_waitfor

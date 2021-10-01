@@ -110,35 +110,41 @@ NOTHROW(KCALL __kernel_syscall_doublewide)(__UINT8_TYPE__ const *__restrict base
 
 
 /* Check if a given `sysno' system call is a cancellation point. */
-#define kernel_syscall_iscp(sysno) \
+#define _kernel_syscall_iscp(sysno) \
 	__kernel_syscall_withtable(sysno, 0, __kernel_syscall_iscp_impl, sysno)
 #define __kernel_syscall_iscp_impl(table, sysno) \
 	__kernel_syscall_iscp(kernel_syscall##table##_iscp, (sysno)-__NR_syscall##table##_min)
-
 
 #define SYSCALL_RESTART_MODE_AUTO 0 /* Automatic restarting */
 #define SYSCALL_RESTART_MODE_DONT 1 /* Don't restart */
 #define SYSCALL_RESTART_MODE_MUST 2 /* Always restart */
 
 /* Return the restart mode used for `sysno' (one of `SYSCALL_RESTART_MODE_*'). */
-#define kernel_syscall_restartmode(sysno) \
+#define _kernel_syscall_restartmode(sysno) \
 	__kernel_syscall_withtable(sysno, 0, __kernel_syscall_restartmode_impl, sysno)
 #define __kernel_syscall_restartmode_impl(table, sysno) \
 	__kernel_syscall_restartmode(kernel_syscall##table##_restartmode, (sysno)-__NR_syscall##table##_min)
 
 /* Return the number of registers table by `sysno' (<= `__NRFEAT_SYSCALL_REGISTER_MAX_COUNT') */
-#define kernel_syscall_regcnt(sysno) \
+#define _kernel_syscall_regcnt(sysno) \
 	__kernel_syscall_withtable(sysno, __NRFEAT_SYSCALL_REGISTER_MAX_COUNT, __kernel_syscall_regcnt_impl, sysno)
 #define __kernel_syscall_regcnt_impl(table, sysno) \
 	__kernel_syscall_regcnt(kernel_syscall##table##_regcnt, (sysno)-__NR_syscall##table##_min)
 
 /* Check if a given system call `sysno' has a double-wide return
  * value (i.e.  the  return  value is  passed  in  2  registers) */
-#define kernel_syscall_doublewide(sysno) \
+#define _kernel_syscall_doublewide(sysno) \
 	__kernel_syscall_withtable(sysno, 0, __kernel_syscall_doublewide_impl, sysno)
 #define __kernel_syscall_doublewide_impl(table, sysno) \
 	__kernel_syscall_doublewide(kernel_syscall##table##_regcnt, (sysno)-__NR_syscall##table##_min)
 
+/* Arch may override these. */
+#ifndef kernel_syscall_iscp
+#define kernel_syscall_iscp(sc_info)        _kernel_syscall_iscp((sc_info)->rsi_sysno)
+#define kernel_syscall_restartmode(sc_info) _kernel_syscall_restartmode((sc_info)->rsi_sysno)
+#define kernel_syscall_regcnt(sc_info)      _kernel_syscall_regcnt((sc_info)->rsi_sysno)
+#define kernel_syscall_doublewide(sc_info)  _kernel_syscall_doublewide((sc_info)->rsi_sysno)
+#endif /* !kernel_syscall_iscp */
 
 #endif /* __CC__ */
 

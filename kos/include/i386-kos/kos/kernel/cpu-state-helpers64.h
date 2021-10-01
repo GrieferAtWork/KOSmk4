@@ -122,6 +122,9 @@ __NOTHROW_NCX(gpregsnsp64_to_gpregs64)(struct gpregsnsp64 const *__restrict __se
 	__libc_memcpy(__COMPILER_REQTYPE(struct gpregs64 *, result),     \
 	              __COMPILER_REQTYPE(struct gpregs64 const *, self), \
 	              sizeof(struct gpregs64))
+/* Get/set return registers. */
+#define gpregs64_getreturn64 gpregs64_getrax
+#define gpregs64_setreturn64 gpregs64_setrax
 __LOCAL __NOBLOCK __ATTR_NONNULL((1, 2)) void
 __NOTHROW_NCX(gpregs64_to_gpregsnsp64)(struct gpregs64 const *__restrict __self,
                                        struct gpregsnsp64 *__restrict __result) {
@@ -1039,6 +1042,15 @@ __NOTHROW_NCX(fcpustate64_to_scpustate64_p)(struct fcpustate64 const *__restrict
 #define gpregs_to_gpregsnsp                 gpregs64_to_gpregsnsp64
 #define gpregs_to_gpregsnsp64               gpregs64_to_gpregsnsp64
 #define gpregs64_to_gpregsnsp               gpregs64_to_gpregsnsp64
+#define gpregs_getreturnbool                gpregs64_getreturn64
+#define gpregs_getreturn                    gpregs64_getreturn64
+#define gpregs_getreturn32                  gpregs64_getreturn64
+#define gpregs_getreturn64                  gpregs64_getreturn64
+#define gpregs_setreturnbool                gpregs64_setreturn64
+#define gpregs_setreturn                    gpregs64_setreturn64
+#define gpregs_setreturn32                  gpregs64_setreturn64
+#define gpregs_setreturn64                  gpregs64_setreturn64
+
 
 #define irregs_isvm86(self)                 0
 #define irregs_isuser(self)                 irregs64_isuser(self)
@@ -1234,6 +1246,14 @@ __NOTHROW_NCX(fcpustate64_to_scpustate64_p)(struct fcpustate64 const *__restrict
 #define icpustate_user_to_icpustate_p       icpustate64_user_to_icpustate64_p
 #define icpustate_user_to_icpustate64_p     icpustate64_user_to_icpustate64_p
 #define icpustate64_user_to_icpustate_p     icpustate64_user_to_icpustate64_p
+#define icpustate_getreturnbool(self)       gpregs_getreturnbool(&(self)->ics_gpregs)
+#define icpustate_getreturn(self)           gpregs_getreturn(&(self)->ics_gpregs)
+#define icpustate_getreturn32(self)         gpregs_getreturn32(&(self)->ics_gpregs)
+#define icpustate_getreturn64(self)         gpregs_getreturn64(&(self)->ics_gpregs)
+#define icpustate_setreturnbool(self, v)    gpregs_setreturnbool(&(self)->ics_gpregs, v)
+#define icpustate_setreturn(self, v)        gpregs_setreturn(&(self)->ics_gpregs, v)
+#define icpustate_setreturn32(self, v)      gpregs_setreturn32(&(self)->ics_gpregs, v)
+#define icpustate_setreturn64(self, v)      gpregs_setreturn64(&(self)->ics_gpregs, v)
 
 #define scpustate_isvm86(self)              0
 #define scpustate_isuser_novm86             scpustate64_isuser

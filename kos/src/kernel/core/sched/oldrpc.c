@@ -491,7 +491,7 @@ user_rpc_callback(void *arg, struct icpustate *__restrict state,
 					rpc_reason = RPC_REASON_SYSCALL; /* Always restart --> Indicate SYSCALL */
 				else if (data->rpc_flags & RPC_SCHEDULE_FLAG_NOSYSRESTART)
 					rpc_reason = RPC_REASON_ASYNC; /* Never restart --> Indicate ASYNC */
-				else if (kernel_syscall_restartmode(sc_info->rsi_sysno) != SYSCALL_RESTART_MODE_DONT)
+				else if (kernel_syscall_restartmode(sc_info) != SYSCALL_RESTART_MODE_DONT)
 					rpc_reason = RPC_REASON_SYSCALL; /* AUTO+MUST --> Indicate system call */
 				else {
 					rpc_reason = RPC_REASON_ASYNC; /* DONT --> Indicate Async */

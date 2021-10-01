@@ -674,7 +674,7 @@ FUNDEF NOBLOCK struct sig *NOTHROW(FCALL task_trywait)(void);
  * @return: * :   The signal that was delivered. */
 FUNDEF struct sig *FCALL
 task_waitfor(ktime_t abs_timeout DFL(KTIME_INFINITE))
-		THROWS(E_WOULDBLOCK, ...);
+		THROWS(E_INTERRUPT_USER_RPC, E_WOULDBLOCK, ...);
 
 /* Same as `task_waitfor', but don't serve RPC functions. */
 FUNDEF struct sig *FCALL
@@ -691,6 +691,21 @@ NOTHROW(FCALL task_waitfor_nx)(ktime_t abs_timeout DFL(KTIME_INFINITE));
  * `NULL' if preemption was disabled, and the operation would have blocked. */
 FUNDEF struct sig *
 NOTHROW(FCALL task_waitfor_norpc_nx)(ktime_t abs_timeout DFL(KTIME_INFINITE));
+
+#ifdef CONFIG_USE_NEW_RPC
+#ifndef __sigset_t_defined
+#define __sigset_t_defined
+struct __sigset_struct;
+typedef struct __sigset_struct sigset_t;
+#endif /* !__sigset_t_defined */
+
+/* Same as `task_waitfor()', but uses `task_serve_with_sigmask()' instead of `task_serve()' */
+FUNDEF NONNULL((1)) struct sig *FCALL
+task_waitfor_with_sigmask(sigset_t const *__restrict sigmask,
+                          ktime_t abs_timeout DFL(KTIME_INFINITE))
+		THROWS(E_INTERRUPT_USER_RPC, E_WOULDBLOCK, ...);
+
+#endif /* CONFIG_USE_NEW_RPC */
 
 #ifdef CONFIG_BUILDING_KERNEL_CORE
 INTDEF NOBLOCK NONNULL((1)) void

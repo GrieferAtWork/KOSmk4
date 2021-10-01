@@ -51,6 +51,8 @@
 #include <kos/except/reason/inval.h>
 #include <kos/hop/handle.h>
 #include <kos/io.h>
+#include <kos/kernel/cpu-state-helpers.h>
+#include <kos/kernel/cpu-state.h>
 #include <linux/fs.h>
 #include <linux/kcmp.h>
 #include <sys/ioctl.h>
@@ -85,6 +87,8 @@
 #if (defined(__ARCH_WANT_COMPAT_SYSCALL_SELECT) && defined(__ARCH_WANT_COMPAT_SYSCALL__NEWSELECT))
 #include <compat/kos/compat/linux-oldselect.h>
 #endif /* __ARCH_WANT_COMPAT_SYSCALL_SELECT && __ARCH_WANT_COMPAT_SYSCALL__NEWSELECT */
+
+#undef sigmask
 
 DECL_BEGIN
 
@@ -1592,54 +1596,45 @@ DEFINE_SYSCALL5(ssize_t, kreaddirf,
 /* select(), select64(), pselect6(), pselect6_time64()                  */
 /************************************************************************/
 #undef WANT_SYS_POLL
-#if (defined(__ARCH_WANT_SYSCALL_POLL) ||           \
-     defined(__ARCH_WANT_SYSCALL_PPOLL) ||          \
-     defined(__ARCH_WANT_SYSCALL_PPOLL64) ||        \
-     defined(__ARCH_WANT_SYSCALL_PPOLL_TIME64) ||   \
-     defined(__ARCH_WANT_COMPAT_SYSCALL_PPOLL) ||   \
-     defined(__ARCH_WANT_COMPAT_SYSCALL_PPOLL64) || \
+#if (defined(__ARCH_WANT_SYSCALL_POLL) ||         \
+     defined(__ARCH_WANT_SYSCALL_PPOLL) ||        \
+     defined(__ARCH_WANT_SYSCALL_PPOLL_TIME64) || \
+     defined(__ARCH_WANT_COMPAT_SYSCALL_PPOLL) || \
      defined(__ARCH_WANT_COMPAT_SYSCALL_PPOLL_TIME64))
 #define WANT_SYS_POLL 1
 #endif /* poll... */
 #undef WANT_SYS_SELECT
-#if (defined(__ARCH_WANT_SYSCALL_SELECT) ||          \
-     defined(__ARCH_WANT_SYSCALL_SELECT64) ||        \
-     defined(__ARCH_WANT_SYSCALL_PSELECT6) ||        \
-     defined(__ARCH_WANT_SYSCALL_PSELECT6_64) ||     \
-     defined(__ARCH_WANT_COMPAT_SYSCALL_SELECT) ||   \
-     defined(__ARCH_WANT_COMPAT_SYSCALL_SELECT64) || \
-     defined(__ARCH_WANT_COMPAT_SYSCALL_PSELECT6) || \
-     defined(__ARCH_WANT_COMPAT_SYSCALL_PSELECT6_64))
+#if (defined(__ARCH_WANT_SYSCALL_SELECT) ||               \
+     defined(__ARCH_WANT_SYSCALL_SELECT64) ||             \
+     defined(__ARCH_WANT_SYSCALL_SELECT_TIME64) ||        \
+     defined(__ARCH_WANT_SYSCALL_PSELECT6) ||             \
+     defined(__ARCH_WANT_COMPAT_SYSCALL_SELECT) ||        \
+     defined(__ARCH_WANT_COMPAT_SYSCALL_SELECT64) ||      \
+     defined(__ARCH_WANT_COMPAT_SYSCALL_SELECT_TIME64) || \
+     defined(__ARCH_WANT_COMPAT_SYSCALL_PSELECT6) ||      \
+     defined(__ARCH_WANT_COMPAT_SYSCALL_PSELECT6_TIME64))
 #define WANT_SYS_SELECT 1
 #endif /* select... */
 #if (defined(__ARCH_WANT_SYSCALL_PPOLL) ||                  \
-     defined(__ARCH_WANT_SYSCALL_PPOLL64) ||                \
      defined(__ARCH_WANT_SYSCALL_PPOLL_TIME64) ||           \
      defined(__ARCH_WANT_SYSCALL_PSELECT6) ||               \
-     defined(__ARCH_WANT_SYSCALL_PSELECT6_64) ||            \
      defined(__ARCH_WANT_SYSCALL_PSELECT6_TIME64) ||        \
      defined(__ARCH_WANT_COMPAT_SYSCALL_PPOLL) ||           \
-     defined(__ARCH_WANT_COMPAT_SYSCALL_PPOLL64) ||         \
      defined(__ARCH_WANT_COMPAT_SYSCALL_PPOLL_TIME64) ||    \
      defined(__ARCH_WANT_COMPAT_SYSCALL_PSELECT6) ||        \
-     defined(__ARCH_WANT_COMPAT_SYSCALL_PSELECT6_64) ||     \
      defined(__ARCH_WANT_COMPAT_SYSCALL_PSELECT6_TIME64) || \
      defined(__ARCH_WANT_SYSCALL_EPOLL_PWAIT))
 #define WANT_SYS_POLLSELECT_SIGSET 1
 #endif /* p(poll|select)... */
-#if (defined(__ARCH_WANT_SYSCALL_PPOLL) ||          \
-     defined(__ARCH_WANT_SYSCALL_PPOLL64) ||        \
-     defined(__ARCH_WANT_SYSCALL_PPOLL_TIME64) ||   \
-     defined(__ARCH_WANT_COMPAT_SYSCALL_PPOLL) ||   \
-     defined(__ARCH_WANT_COMPAT_SYSCALL_PPOLL64) || \
+#if (defined(__ARCH_WANT_SYSCALL_PPOLL) ||        \
+     defined(__ARCH_WANT_SYSCALL_PPOLL_TIME64) || \
+     defined(__ARCH_WANT_COMPAT_SYSCALL_PPOLL) || \
      defined(__ARCH_WANT_COMPAT_SYSCALL_PPOLL_TIME64))
 #define WANT_SYS_POLL_SIGSET 1
 #endif /* ppoll... */
-#if (defined(__ARCH_WANT_SYSCALL_PSELECT6) ||           \
-     defined(__ARCH_WANT_SYSCALL_PSELECT6_64) ||        \
-     defined(__ARCH_WANT_SYSCALL_PSELECT6_TIME64) ||    \
-     defined(__ARCH_WANT_COMPAT_SYSCALL_PSELECT6) ||    \
-     defined(__ARCH_WANT_COMPAT_SYSCALL_PSELECT6_64) || \
+#if (defined(__ARCH_WANT_SYSCALL_PSELECT6) ||        \
+     defined(__ARCH_WANT_SYSCALL_PSELECT6_TIME64) || \
+     defined(__ARCH_WANT_COMPAT_SYSCALL_PSELECT6) || \
      defined(__ARCH_WANT_COMPAT_SYSCALL_PSELECT6_TIME64))
 #define WANT_SYS_SELECT_SIGSET 1
 #endif /* pselect... */
@@ -1678,10 +1673,8 @@ PRIVATE poll_mode_t KCALL do_poll_handle(struct handle &hnd,
 /* Low-level implementations for the user-space poll() and select() system calls. */
 #ifdef WANT_SYS_POLL
 PRIVATE size_t KCALL
-do_poll(USER CHECKED struct pollfd *fds,
-        size_t nfds, ktime_t abs_timeout) {
+do_poll_scan(USER CHECKED struct pollfd *fds, size_t nfds) {
 	size_t i, result = 0;
-again:
 	assert(!task_wasconnected());
 	for (i = 0; i < nfds; ++i) {
 		struct handle hnd;
@@ -1730,31 +1723,68 @@ again:
 /*decref_hnd_and_continue:*/
 		decref(hnd);
 	}
+	return result;
+}
+
+PRIVATE size_t KCALL
+do_poll(USER CHECKED struct pollfd *fds,
+        size_t nfds, ktime_t abs_timeout) {
+	size_t result;
+again:
+	/* Do the poll-scan. */
+	result = do_poll_scan(fds, nfds);
+
 	/* Check if any of the specified operations would block.
 	 * If not, disconnect from any connected signal and indicate success. */
 	if (result) {
 		task_disconnectall();
 		return result;
 	}
+
 	/* Wait for something to happen */
 	if (!task_waitfor(abs_timeout))
 		return 0; /* Timeout */
+
 	/* Check to see what happened. */
 	goto again;
 }
+
+#ifdef CONFIG_USE_NEW_RPC
+PRIVATE size_t KCALL
+do_poll_with_sigmask(USER CHECKED struct pollfd *fds,
+                     size_t nfds, ktime_t abs_timeout,
+                     sigset_t const *__restrict sigmask) {
+	size_t result;
+again:
+	/* Do the poll-scan. */
+	result = do_poll_scan(fds, nfds);
+
+	/* Check if any of the specified operations would block.
+	 * If not, disconnect from any connected signal and indicate success. */
+	if (result) {
+		task_disconnectall();
+		return result;
+	}
+
+	/* Wait for something to happen */
+	if (!task_waitfor_with_sigmask(sigmask, abs_timeout))
+		return 0; /* Timeout */
+
+	/* Check to see what happened. */
+	goto again;
+}
+#endif /* CONFIG_USE_NEW_RPC */
 #endif /* WANT_SYS_POLL */
 
 #ifdef WANT_SYS_SELECT
 PRIVATE size_t KCALL
-do_select(size_t nfds,
-          USER CHECKED fd_set *readfds,
-          USER CHECKED fd_set *writefds,
-          USER CHECKED fd_set *exceptfds,
-          ktime_t abs_timeout) {
+do_select_scan(size_t nfds,
+               USER CHECKED fd_set *readfds,
+               USER CHECKED fd_set *writefds,
+               USER CHECKED fd_set *exceptfds) {
 	typedef u8 fds_word_t;
 	enum { BITS_PER_FDS_WORD = 8 };
 	size_t nfds_words, i, result = 0;
-again:
 	assert(!task_wasconnected());
 	nfds_words = CEILDIV(nfds, BITS_PER_FDS_WORD);
 	for (i = 0; i < nfds_words; ++i) {
@@ -1832,20 +1862,66 @@ again:
 				((fds_word_t *)exceptfds)[i] = new_ebits;
 		}
 	}
+	return result;
+}
+
+PRIVATE size_t KCALL
+do_select(size_t nfds,
+          USER CHECKED fd_set *readfds,
+          USER CHECKED fd_set *writefds,
+          USER CHECKED fd_set *exceptfds,
+          ktime_t abs_timeout) {
+	size_t result;
+again:
+	/* Do the select-scan. */
+	result = do_select_scan(nfds, readfds, writefds, exceptfds);
+
 	/* Check if any of the specified operations would block.
 	 * If not, disconnect from any connected signal and indicate success. */
 	if (result) {
 		task_disconnectall();
 		return result;
 	}
+
 	/* Wait for something to happen */
 	if (!task_waitfor(abs_timeout))
 		return 0; /* Timeout */
+
 	/* Check to see what happened. */
 	goto again;
 }
+
+#ifdef CONFIG_USE_NEW_RPC
+PRIVATE size_t KCALL
+do_select_with_sigmask(size_t nfds,
+                       USER CHECKED fd_set *readfds,
+                       USER CHECKED fd_set *writefds,
+                       USER CHECKED fd_set *exceptfds,
+                       ktime_t abs_timeout,
+                       sigset_t const *__restrict sigmask) {
+	size_t result;
+again:
+	/* Do the select-scan. */
+	result = do_select_scan(nfds, readfds, writefds, exceptfds);
+
+	/* Check if any of the specified operations would block.
+	 * If not, disconnect from any connected signal and indicate success. */
+	if (result) {
+		task_disconnectall();
+		return result;
+	}
+
+	/* Wait for something to happen */
+	if (!task_waitfor_with_sigmask(sigmask, abs_timeout))
+		return 0; /* Timeout */
+
+	/* Check to see what happened. */
+	goto again;
+}
+#endif /* CONFIG_USE_NEW_RPC */
 #endif /* WANT_SYS_SELECT */
 
+#ifndef CONFIG_USE_NEW_RPC
 #ifdef WANT_SYS_POLLSELECT_SIGSET
 /* POLL/SELECT Helper functions */
 PRIVATE void KCALL
@@ -1890,18 +1966,17 @@ atomic_sigmask_return(USER CHECKED sigset_t *mymask,
 #endif /* WANT_SYS_POLLSELECT_SIGSET */
 
 #ifdef __ARCH_WANT_SYSCALL_EPOLL_PWAIT
-#undef sigmask
 DEFINE_SYSCALL6(ssize_t, epoll_pwait,
                 fd_t, epfd, USER UNCHECKED struct epoll_event *, events,
                 size_t, maxevents, syscall_slong_t, timeout,
                 USER UNCHECKED sigset_t const *, sigmask, size_t, sigsetsize) {
 	ssize_t result;
-	if unlikely(sigsetsize != sizeof(sigset_t))
-		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
-		      E_INVALID_ARGUMENT_CONTEXT_SIGNAL_SIGSET_SIZE,
-		      sigsetsize);
 	if (sigmask) {
 		sigset_t oldmask;
+		if unlikely(sigsetsize != sizeof(sigset_t))
+			THROW(E_INVALID_ARGUMENT_BAD_VALUE,
+			      E_INVALID_ARGUMENT_CONTEXT_SIGNAL_SIGSET_SIZE,
+			      sigsetsize);
 		USER CHECKED sigset_t *mymask;
 		mymask = sigmask_getwr();
 		atomic_sigmask_begin(mymask, &oldmask, sigmask);
@@ -1920,7 +1995,6 @@ DEFINE_SYSCALL6(ssize_t, epoll_pwait,
 #endif /* __ARCH_WANT_SYSCALL_EPOLL_PWAIT */
 
 #ifdef WANT_SYS_POLL_SIGSET
-#undef sigmask
 PRIVATE size_t KCALL
 do_ppoll(USER CHECKED struct pollfd *fds,
          size_t nfds, ktime_t abs_timeout,
@@ -1972,6 +2046,7 @@ do_pselect(size_t nfds,
 	return result;
 }
 #endif /* WANT_SYS_SELECT_SIGSET */
+#endif /* !CONFIG_USE_NEW_RPC */
 
 #ifdef __ARCH_WANT_SYSCALL_POLL
 DEFINE_SYSCALL3(ssize_t, poll,
@@ -1992,6 +2067,295 @@ DEFINE_SYSCALL3(ssize_t, poll,
 }
 #endif /* __ARCH_WANT_SYSCALL_POLL */
 
+
+#ifdef CONFIG_USE_NEW_RPC
+#if (defined(__ARCH_WANT_SYSCALL_PPOLL) ||        \
+     defined(__ARCH_WANT_COMPAT_SYSCALL_PPOLL) || \
+     defined(__ARCH_WANT_SYSCALL_PPOLL_TIME64) || \
+     defined(__ARCH_WANT_COMPAT_SYSCALL_PPOLL_TIME64))
+PRIVATE ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) struct icpustate *
+sys_ppoll_generic(struct icpustate *__restrict state,
+                  struct rpc_syscall_info *__restrict sc_info,
+                  USER CHECKED struct pollfd *fds, size_t nfds, ktime_t abs_timeout,
+                  USER UNCHECKED sigset_t const *sigmask, size_t sigsetsize) {
+	size_t result;
+	validate_readwritem(fds, nfds, sizeof(struct pollfd));
+	if (sigmask) {
+		sigset_t these;
+		if unlikely(sigsetsize != sizeof(sigset_t)) {
+			THROW(E_INVALID_ARGUMENT_BAD_VALUE,
+			      E_INVALID_ARGUMENT_CONTEXT_SIGNAL_SIGSET_SIZE,
+			      sigsetsize);
+		}
+		validate_readable(sigmask, sizeof(sigset_t));
+		memcpy(&these, sigmask, sizeof(sigset_t));
+
+		/* These signals cannot be masked.  */
+		sigdelset(&these, SIGSTOP);
+		sigdelset(&these, SIGKILL);
+
+		/* Indicate that we want to receive wake-ups for masked signals. */
+		ATOMIC_OR(THIS_TASK->t_flags, TASK_FWAKEONMSKRPC);
+
+		/* This will clear `TASK_FWAKEONMSKRPC', as well as
+		 * perform a check for signals not in `these' which
+		 * may have also appeared in the mean time prior to
+		 * returning to user-space. */
+		userexcept_sysret_inject_self();
+
+again:
+		TRY {
+			result = do_poll_with_sigmask(fds, nfds, abs_timeout, &these);
+		} EXCEPT {
+			/* This function  only returns  normally
+			 * when the syscall should be restarted. */
+			state = userexcept_handler_with_sigmask(state, sc_info, &these);
+			PERTASK_SET(this_exception_code, 1); /* Prevent internal fault */
+			goto again;
+		}
+	} else {
+		result = do_poll(fds, nfds, abs_timeout);
+	}
+	icpustate_setreturn(state, result);
+	return state;
+}
+#endif /* ppoll... */
+
+#ifdef __ARCH_WANT_SYSCALL_PPOLL
+INTERN ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) struct icpustate *FCALL
+sys_ppoll_impl(struct icpustate *__restrict state,
+               struct rpc_syscall_info *__restrict sc_info) {
+	USER UNCHECKED struct pollfd *fds                  = (USER UNCHECKED struct pollfd *)sc_info->rsi_regs[0];
+	size_t nfds                                        = (size_t)sc_info->rsi_regs[1];
+	USER UNCHECKED struct timespec32 const *timeout_ts = (USER UNCHECKED struct timespec32 const *)sc_info->rsi_regs[2];
+	USER UNCHECKED sigset_t const *sigmask             = (USER UNCHECKED sigset_t const *)sc_info->rsi_regs[3];
+	size_t sigsetsize                                  = (size_t)sc_info->rsi_regs[4];
+	ktime_t abs_timeout;
+	validate_readwritem(fds, nfds, sizeof(struct pollfd));
+	abs_timeout = KTIME_INFINITE;
+	if (timeout_ts) {
+		validate_readable(timeout_ts, sizeof(*timeout_ts));
+		abs_timeout = relktime_from_user_rel(timeout_ts);
+		if (abs_timeout != 0)
+			abs_timeout += ktime();
+	}
+	return sys_ppoll_generic(state, sc_info, fds, nfds, abs_timeout, sigmask, sigsetsize);
+}
+
+PRIVATE NONNULL((1)) void PRPC_EXEC_CALLBACK_CC
+sys_ppoll_rpc(struct rpc_context *__restrict ctx, void *UNUSED(cookie)) {
+	if (ctx->rc_context != RPC_REASONCTX_SYSCALL)
+		return;
+	/* Indicate that our system call is implemented via this RPC. */
+	ctx->rc_context = RPC_REASONCTX_SYSRET;
+
+	/* Do the actual system call. */
+	ctx->rc_state = sys_ppoll_impl(ctx->rc_state, &ctx->rc_scinfo);
+}
+
+DEFINE_SYSCALL5(ssize_t, ppoll,
+                USER UNCHECKED struct pollfd *, fds, size_t, nfds,
+                USER UNCHECKED struct timespec32 const *, timeout_ts,
+                USER UNCHECKED sigset_t const *, sigmask,
+                size_t, sigsetsize) {
+	size_t result;
+	ktime_t abs_timeout;
+	if (sigmask) {
+		/* Send an RPC to ourselves, so we can gain access to the user-space register state. */
+		task_rpc_exec(THIS_TASK, RPC_CONTEXT_KERN | RPC_SYNCMODE_F_USER, &sys_ppoll_rpc, NULL);
+		__builtin_unreachable();
+	}
+	validate_readwritem(fds, nfds, sizeof(struct pollfd));
+	abs_timeout = KTIME_INFINITE;
+	if (timeout_ts) {
+		validate_readable(timeout_ts, sizeof(*timeout_ts));
+		abs_timeout = relktime_from_user_rel(timeout_ts);
+		if (abs_timeout != 0)
+			abs_timeout += ktime();
+	}
+	result = do_poll(fds, nfds, abs_timeout);
+	return (ssize_t)result;
+}
+#endif /* __ARCH_WANT_SYSCALL_PPOLL */
+
+#ifdef __ARCH_WANT_COMPAT_SYSCALL_PPOLL
+INTERN ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) struct icpustate *FCALL
+sys_compat_ppoll_impl(struct icpustate *__restrict state,
+                      struct rpc_syscall_info *__restrict sc_info) {
+	STATIC_ASSERT(sizeof(compat_sigset_t) == sizeof(sigset_t));
+	USER UNCHECKED struct pollfd *fds                         = (USER UNCHECKED struct pollfd *)sc_info->rsi_regs[0];
+	size_t nfds                                               = (size_t)sc_info->rsi_regs[1];
+	USER UNCHECKED struct compat_timespec32 const *timeout_ts = (USER UNCHECKED struct compat_timespec32 const *)sc_info->rsi_regs[2];
+	USER UNCHECKED compat_sigset_t const *sigmask             = (USER UNCHECKED compat_sigset_t const *)sc_info->rsi_regs[3];
+	size_t sigsetsize                                         = (size_t)sc_info->rsi_regs[4];
+	ktime_t abs_timeout;
+	compat_validate_readwritem(fds, nfds, sizeof(struct pollfd));
+	abs_timeout = KTIME_INFINITE;
+	if (timeout_ts) {
+		validate_readable(timeout_ts, sizeof(*timeout_ts));
+		abs_timeout = relktime_from_user_rel(timeout_ts);
+		if (abs_timeout != 0)
+			abs_timeout += ktime();
+	}
+	return sys_ppoll_generic(state, sc_info, fds, nfds, abs_timeout, sigmask, sigsetsize);
+}
+
+PRIVATE NONNULL((1)) void PRPC_EXEC_CALLBACK_CC
+sys_compat_ppoll_rpc(struct rpc_context *__restrict ctx, void *UNUSED(cookie)) {
+	if (ctx->rc_context != RPC_REASONCTX_SYSCALL)
+		return;
+
+	/* Indicate that our system call is implemented via this RPC. */
+	ctx->rc_context = RPC_REASONCTX_SYSRET;
+
+	/* Do the actual system call. */
+	ctx->rc_state = sys_compat_ppoll_impl(ctx->rc_state, &ctx->rc_scinfo);
+}
+
+DEFINE_COMPAT_SYSCALL5(ssize_t, ppoll,
+                       USER UNCHECKED struct pollfd *, fds, size_t, nfds,
+                       USER UNCHECKED struct compat_timespec32 const *, timeout_ts,
+                       USER UNCHECKED compat_sigset_t const *, sigmask,
+                       size_t, sigsetsize) {
+	size_t result;
+	ktime_t abs_timeout;
+	if (sigmask) {
+		/* Send an RPC to ourselves, so we can gain access to the user-space register state. */
+		task_rpc_exec(THIS_TASK, RPC_CONTEXT_KERN | RPC_SYNCMODE_F_USER, &sys_compat_ppoll_rpc, NULL);
+		__builtin_unreachable();
+	}
+	compat_validate_readwritem(fds, nfds, sizeof(struct pollfd));
+	abs_timeout = KTIME_INFINITE;
+	if (timeout_ts) {
+		compat_validate_readable(timeout_ts, sizeof(*timeout_ts));
+		abs_timeout = relktime_from_user_rel(timeout_ts);
+		if (abs_timeout != 0)
+			abs_timeout += ktime();
+	}
+	result = do_poll(fds, nfds, abs_timeout);
+	return (ssize_t)result;
+}
+#endif /* __ARCH_WANT_COMPAT_SYSCALL_PPOLL */
+
+#ifdef __ARCH_WANT_SYSCALL_PPOLL_TIME64
+INTERN ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) struct icpustate *FCALL
+sys_ppoll_time64_impl(struct icpustate *__restrict state,
+                             struct rpc_syscall_info *__restrict sc_info) {
+	STATIC_ASSERT(sizeof(sigset_t) == sizeof(sigset_t));
+	USER UNCHECKED struct pollfd *fds                  = (USER UNCHECKED struct pollfd *)sc_info->rsi_regs[0];
+	size_t nfds                                        = (size_t)sc_info->rsi_regs[1];
+	USER UNCHECKED struct timespec64 const *timeout_ts = (USER UNCHECKED struct timespec64 const *)sc_info->rsi_regs[2];
+	USER UNCHECKED sigset_t const *sigmask             = (USER UNCHECKED sigset_t const *)sc_info->rsi_regs[3];
+	size_t sigsetsize                                  = (size_t)sc_info->rsi_regs[4];
+	ktime_t abs_timeout;
+	validate_readwritem(fds, nfds, sizeof(struct pollfd));
+	abs_timeout = KTIME_INFINITE;
+	if (timeout_ts) {
+		validate_readable(timeout_ts, sizeof(*timeout_ts));
+		abs_timeout = relktime_from_user_rel(timeout_ts);
+		if (abs_timeout != 0)
+			abs_timeout += ktime();
+	}
+	return sys_ppoll_generic(state, sc_info, fds, nfds, abs_timeout, sigmask, sigsetsize);
+}
+
+PRIVATE NONNULL((1)) void PRPC_EXEC_CALLBACK_CC
+sys_ppoll_time64_rpc(struct rpc_context *__restrict ctx, void *UNUSED(cookie)) {
+	if (ctx->rc_context != RPC_REASONCTX_SYSCALL)
+		return;
+
+	/* Indicate that our system call is implemented via this RPC. */
+	ctx->rc_context = RPC_REASONCTX_SYSRET;
+
+	/* Do the actual system call. */
+	ctx->rc_state = sys_ppoll_time64_impl(ctx->rc_state, &ctx->rc_scinfo);
+}
+
+DEFINE_SYSCALL5(ssize_t, ppoll_time64,
+                USER UNCHECKED struct pollfd *, fds, size_t, nfds,
+                USER UNCHECKED struct timespec64 const *, timeout_ts,
+                USER UNCHECKED sigset_t const *, sigmask,
+                size_t, sigsetsize) {
+	size_t result;
+	ktime_t abs_timeout;
+	if (sigmask) {
+		/* Send an RPC to ourselves, so we can gain access to the user-space register state. */
+		task_rpc_exec(THIS_TASK, RPC_CONTEXT_KERN | RPC_SYNCMODE_F_USER, &sys_ppoll_time64_rpc, NULL);
+		__builtin_unreachable();
+	}
+	validate_readwritem(fds, nfds, sizeof(struct pollfd));
+	abs_timeout = KTIME_INFINITE;
+	if (timeout_ts) {
+		validate_readable(timeout_ts, sizeof(*timeout_ts));
+		abs_timeout = relktime_from_user_rel(timeout_ts);
+		if (abs_timeout != 0)
+			abs_timeout += ktime();
+	}
+	result = do_poll(fds, nfds, abs_timeout);
+	return (ssize_t)result;
+}
+#endif /* __ARCH_WANT_SYSCALL_PPOLL_TIME64 */
+
+#ifdef __ARCH_WANT_COMPAT_SYSCALL_PPOLL_TIME64
+INTERN ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) struct icpustate *FCALL
+sys_compat_ppoll_time64_impl(struct icpustate *__restrict state,
+                             struct rpc_syscall_info *__restrict sc_info) {
+	STATIC_ASSERT(sizeof(compat_sigset_t) == sizeof(sigset_t));
+	USER UNCHECKED struct pollfd *fds                         = (USER UNCHECKED struct pollfd *)sc_info->rsi_regs[0];
+	size_t nfds                                               = (size_t)sc_info->rsi_regs[1];
+	USER UNCHECKED struct compat_timespec64 const *timeout_ts = (USER UNCHECKED struct compat_timespec64 const *)sc_info->rsi_regs[2];
+	USER UNCHECKED compat_sigset_t const *sigmask             = (USER UNCHECKED compat_sigset_t const *)sc_info->rsi_regs[3];
+	size_t sigsetsize                                         = (size_t)sc_info->rsi_regs[4];
+	ktime_t abs_timeout;
+	compat_validate_readwritem(fds, nfds, sizeof(struct pollfd));
+	abs_timeout = KTIME_INFINITE;
+	if (timeout_ts) {
+		validate_readable(timeout_ts, sizeof(*timeout_ts));
+		abs_timeout = relktime_from_user_rel(timeout_ts);
+		if (abs_timeout != 0)
+			abs_timeout += ktime();
+	}
+	return sys_ppoll_generic(state, sc_info, fds, nfds, abs_timeout, sigmask, sigsetsize);
+}
+
+PRIVATE NONNULL((1)) void PRPC_EXEC_CALLBACK_CC
+sys_compat_ppoll_time64_rpc(struct rpc_context *__restrict ctx, void *UNUSED(cookie)) {
+	if (ctx->rc_context != RPC_REASONCTX_SYSCALL)
+		return;
+
+	/* Indicate that our system call is implemented via this RPC. */
+	ctx->rc_context = RPC_REASONCTX_SYSRET;
+
+	/* Do the actual system call. */
+	ctx->rc_state = sys_compat_ppoll_time64_impl(ctx->rc_state, &ctx->rc_scinfo);
+}
+
+DEFINE_COMPAT_SYSCALL5(ssize_t, ppoll_time64,
+                       USER UNCHECKED struct pollfd *, fds, size_t, nfds,
+                       USER UNCHECKED struct compat_timespec64 const *, timeout_ts,
+                       USER UNCHECKED compat_sigset_t const *, sigmask,
+                       size_t, sigsetsize) {
+	STATIC_ASSERT(sizeof(compat_sigset_t) == sizeof(sigset_t));
+	size_t result;
+	ktime_t abs_timeout;
+	if (sigmask) {
+		/* Send an RPC to ourselves, so we can gain access to the user-space register state. */
+		task_rpc_exec(THIS_TASK, RPC_CONTEXT_KERN | RPC_SYNCMODE_F_USER, &sys_compat_ppoll_time64_rpc, NULL);
+		__builtin_unreachable();
+	}
+	compat_validate_readwritem(fds, nfds, sizeof(struct pollfd));
+	abs_timeout = KTIME_INFINITE;
+	if (timeout_ts) {
+		compat_validate_readable(timeout_ts, sizeof(*timeout_ts));
+		abs_timeout = relktime_from_user_rel(timeout_ts);
+		if (abs_timeout != 0)
+			abs_timeout += ktime();
+	}
+	result = do_poll(fds, nfds, abs_timeout);
+	return (ssize_t)result;
+}
+#endif /* __ARCH_WANT_COMPAT_SYSCALL_PPOLL_TIME64 */
+#else /* CONFIG_USE_NEW_RPC */
 #ifdef __ARCH_WANT_SYSCALL_PPOLL
 DEFINE_SYSCALL5(ssize_t, ppoll,
                 USER UNCHECKED struct pollfd *, fds, size_t, nfds,
@@ -2023,7 +2387,7 @@ DEFINE_COMPAT_SYSCALL5(ssize_t, ppoll,
                        USER UNCHECKED struct pollfd *, fds, size_t, nfds,
                        USER UNCHECKED struct compat_timespec32 const *, timeout_ts,
                        USER UNCHECKED compat_sigset_t const *, sigmask,
-                size_t, sigsetsize) {
+                       size_t, sigsetsize) {
 	STATIC_ASSERT(sizeof(compat_sigset_t) == sizeof(sigset_t));
 	size_t result;
 	ktime_t abs_timeout;
@@ -2045,22 +2409,12 @@ DEFINE_COMPAT_SYSCALL5(ssize_t, ppoll,
 }
 #endif /* __ARCH_WANT_COMPAT_SYSCALL_PPOLL */
 
-#if (defined(__ARCH_WANT_SYSCALL_PPOLL64) || \
-     defined(__ARCH_WANT_SYSCALL_PPOLL_TIME64))
-#ifdef __ARCH_WANT_SYSCALL_PPOLL64
-DEFINE_SYSCALL5(ssize_t, ppoll64,
-                USER UNCHECKED struct pollfd *, fds, size_t, nfds,
-                USER UNCHECKED struct timespec64 const *, timeout_ts,
-                USER UNCHECKED sigset_t const *, sigmask,
-                size_t, sigsetsize)
-#else /* __ARCH_WANT_SYSCALL_PPOLL64 */
+#ifdef __ARCH_WANT_SYSCALL_PPOLL_TIME64
 DEFINE_SYSCALL5(ssize_t, ppoll_time64,
                 USER UNCHECKED struct pollfd *, fds, size_t, nfds,
                 USER UNCHECKED struct timespec64 const *, timeout_ts,
                 USER UNCHECKED sigset_t const *, sigmask,
-                size_t, sigsetsize)
-#endif /* !__ARCH_WANT_SYSCALL_PPOLL64 */
-{
+                size_t, sigsetsize) {
 	size_t result;
 	ktime_t abs_timeout;
 	if unlikely(sigsetsize != sizeof(sigset_t))
@@ -2079,24 +2433,14 @@ DEFINE_SYSCALL5(ssize_t, ppoll_time64,
 	result = do_ppoll(fds, nfds, abs_timeout, sigmask);
 	return (ssize_t)result;
 }
-#endif /* __ARCH_WANT_SYSCALL_PPOLL64 || __ARCH_WANT_SYSCALL_PPOLL_TIME64 */
+#endif /* __ARCH_WANT_SYSCALL_PPOLL_TIME64 */
 
-#if (defined(__ARCH_WANT_COMPAT_SYSCALL_PPOLL64) || \
-     defined(__ARCH_WANT_COMPAT_SYSCALL_PPOLL_TIME64))
-#ifdef __ARCH_WANT_COMPAT_SYSCALL_PPOLL64
-DEFINE_COMPAT_SYSCALL5(ssize_t, ppoll64,
-                       USER UNCHECKED struct pollfd *, fds, size_t, nfds,
-                       USER UNCHECKED struct compat_timespec64 const *, timeout_ts,
-                       USER UNCHECKED compat_sigset_t const *, sigmask,
-                       size_t, sigsetsize)
-#else /* __ARCH_WANT_COMPAT_SYSCALL_PPOLL64 */
+#ifdef __ARCH_WANT_COMPAT_SYSCALL_PPOLL_TIME64
 DEFINE_COMPAT_SYSCALL5(ssize_t, ppoll_time64,
                        USER UNCHECKED struct pollfd *, fds, size_t, nfds,
                        USER UNCHECKED struct compat_timespec64 const *, timeout_ts,
                        USER UNCHECKED compat_sigset_t const *, sigmask,
-                       size_t, sigsetsize)
-#endif /* !__ARCH_WANT_COMPAT_SYSCALL_PPOLL64 */
-{
+                       size_t, sigsetsize) {
 	STATIC_ASSERT(sizeof(compat_sigset_t) == sizeof(sigset_t));
 	size_t result;
 	ktime_t abs_timeout;
@@ -2116,7 +2460,8 @@ DEFINE_COMPAT_SYSCALL5(ssize_t, ppoll_time64,
 	result = do_ppoll(fds, nfds, abs_timeout, sigmask);
 	return (ssize_t)result;
 }
-#endif /* __ARCH_WANT_COMPAT_SYSCALL_PPOLL64 || __ARCH_WANT_COMPAT_SYSCALL_PPOLL_TIME64 */
+#endif /* __ARCH_WANT_COMPAT_SYSCALL_PPOLL_TIME64 */
+#endif /* !CONFIG_USE_NEW_RPC */
 
 #if (defined(__ARCH_WANT_SYSCALL_SELECT) || \
      defined(__ARCH_WANT_SYSCALL__NEWSELECT))
@@ -2305,6 +2650,393 @@ DEFINE_COMPAT_SYSCALL5(ssize_t, select_time64, size_t, nfds,
 }
 #endif /* __ARCH_WANT_COMPAT_SYSCALL_SELECT64 */
 
+#ifdef CONFIG_USE_NEW_RPC
+
+#if (defined(__ARCH_WANT_SYSCALL_PSELECT6) ||        \
+     defined(__ARCH_WANT_SYSCALL_PSELECT6_TIME64) || \
+     defined(__ARCH_WANT_COMPAT_SYSCALL_PSELECT6) || \
+     defined(__ARCH_WANT_COMPAT_SYSCALL_PSELECT6_TIME64))
+PRIVATE ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) struct icpustate *
+sys_pselect_generic(struct icpustate *__restrict state,
+                    struct rpc_syscall_info *__restrict sc_info, size_t nfds,
+                    USER UNCHECKED fd_set *readfds, USER UNCHECKED fd_set *writefds,
+                    USER UNCHECKED fd_set *exceptfds, ktime_t abs_timeout,
+                    USER UNCHECKED sigset_t const *sigmask, size_t sigsetsize) {
+	size_t result, nfd_size;
+	nfd_size = CEILDIV(nfds, __NFDBITS);
+	validate_readwrite_opt(readfds, nfd_size);
+	validate_readwrite_opt(writefds, nfd_size);
+	validate_readwrite_opt(exceptfds, nfd_size);
+	if (sigmask) {
+		sigset_t these;
+		if unlikely(sigsetsize != sizeof(sigset_t)) {
+			THROW(E_INVALID_ARGUMENT_BAD_VALUE,
+			      E_INVALID_ARGUMENT_CONTEXT_SIGNAL_SIGSET_SIZE,
+			      sigsetsize);
+		}
+		validate_readable(sigmask, sizeof(sigset_t));
+		memcpy(&these, sigmask, sizeof(sigset_t));
+
+		/* These signals cannot be masked.  */
+		sigdelset(&these, SIGSTOP);
+		sigdelset(&these, SIGKILL);
+
+		/* Indicate that we want to receive wake-ups for masked signals. */
+		ATOMIC_OR(THIS_TASK->t_flags, TASK_FWAKEONMSKRPC);
+
+		/* This will clear `TASK_FWAKEONMSKRPC', as well as
+		 * perform a check for signals not in `these' which
+		 * may have also appeared in the mean time prior to
+		 * returning to user-space. */
+		userexcept_sysret_inject_self();
+
+again:
+		TRY {
+			result = do_select_with_sigmask(nfds, readfds, writefds, exceptfds, abs_timeout, &these);
+		} EXCEPT {
+			/* This function  only returns  normally
+			 * when the syscall should be restarted. */
+			state = userexcept_handler_with_sigmask(state, sc_info, &these);
+			PERTASK_SET(this_exception_code, 1); /* Prevent internal fault */
+			goto again;
+		}
+	} else {
+		result = do_select(nfds, readfds, writefds, exceptfds, abs_timeout);
+	}
+	icpustate_setreturn(state, result);
+	return state;
+}
+
+#endif /* pselect... */
+
+#ifdef __ARCH_WANT_SYSCALL_PSELECT6
+INTERN ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) struct icpustate *FCALL
+sys_pselect6_impl(struct icpustate *__restrict state,
+                  struct rpc_syscall_info *__restrict sc_info) {
+	struct sigset_and_len {
+		sigset_t const *ss_ptr;
+		size_t          ss_len;
+	};
+	size_t nfds                                       = (size_t)sc_info->rsi_regs[0];
+	USER UNCHECKED fd_set *readfds                    = (USER UNCHECKED fd_set *)sc_info->rsi_regs[1];
+	USER UNCHECKED fd_set *writefds                   = (USER UNCHECKED fd_set *)sc_info->rsi_regs[2];
+	USER UNCHECKED fd_set *exceptfds                  = (USER UNCHECKED fd_set *)sc_info->rsi_regs[3];
+	USER UNCHECKED struct timespec32 const *timeout   = (USER UNCHECKED struct timespec32 const *)sc_info->rsi_regs[4];
+	USER UNCHECKED void const *sigmask_sigset_and_len = (USER UNCHECKED void const *)sc_info->rsi_regs[5];
+	struct sigset_and_len ss;
+	ktime_t abs_timeout;
+	validate_readable(sigmask_sigset_and_len, sizeof(ss));
+	COMPILER_READ_BARRIER();
+	memcpy(&ss, sigmask_sigset_and_len, sizeof(ss));
+	COMPILER_READ_BARRIER();
+	abs_timeout = KTIME_INFINITE;
+	if (timeout) {
+		validate_readable(timeout, sizeof(*timeout));
+		abs_timeout = relktime_from_user_rel(timeout);
+		if (abs_timeout != 0)
+			abs_timeout += ktime();
+	}
+	return sys_pselect_generic(state, sc_info, nfds, readfds, writefds,
+	                           exceptfds, abs_timeout, ss.ss_ptr, ss.ss_len);
+}
+
+PRIVATE NONNULL((1)) void PRPC_EXEC_CALLBACK_CC
+sys_pselect6_rpc(struct rpc_context *__restrict ctx, void *UNUSED(cookie)) {
+	if (ctx->rc_context != RPC_REASONCTX_SYSCALL)
+		return;
+
+	/* Indicate that our system call is implemented via this RPC. */
+	ctx->rc_context = RPC_REASONCTX_SYSRET;
+
+	/* Do the actual system call. */
+	ctx->rc_state = sys_pselect6_impl(ctx->rc_state, &ctx->rc_scinfo);
+}
+
+DEFINE_SYSCALL6(ssize_t, pselect6, size_t, nfds,
+                USER UNCHECKED fd_set *, readfds,
+                USER UNCHECKED fd_set *, writefds,
+                USER UNCHECKED fd_set *, exceptfds,
+                USER UNCHECKED struct timespec32 const *, timeout,
+                USER UNCHECKED void const *, sigmask_sigset_and_len) {
+	struct sigset_and_len {
+		sigset_t const *ss_ptr;
+		size_t          ss_len;
+	};
+	struct sigset_and_len ss;
+	size_t result, nfd_size;
+	ktime_t abs_timeout;
+	validate_readable(sigmask_sigset_and_len, sizeof(ss));
+	COMPILER_READ_BARRIER();
+	memcpy(&ss, sigmask_sigset_and_len, sizeof(ss));
+	COMPILER_READ_BARRIER();
+	if (ss.ss_ptr) {
+		/* Send an RPC to ourselves, so we can gain access to the user-space register state. */
+		task_rpc_exec(THIS_TASK, RPC_CONTEXT_KERN | RPC_SYNCMODE_F_USER, &sys_pselect6_rpc, NULL);
+		__builtin_unreachable();
+	}
+	nfd_size = CEILDIV(nfds, __NFDBITS);
+	validate_readwrite_opt(readfds, nfd_size);
+	validate_readwrite_opt(writefds, nfd_size);
+	validate_readwrite_opt(exceptfds, nfd_size);
+	abs_timeout = KTIME_INFINITE;
+	if (timeout) {
+		validate_readable(timeout, sizeof(*timeout));
+		abs_timeout = relktime_from_user_rel(timeout);
+		if (abs_timeout != 0)
+			abs_timeout += ktime();
+	}
+	result = do_select(nfds, readfds, writefds, exceptfds, abs_timeout);
+	return (ssize_t)result;
+}
+#endif /* __ARCH_WANT_SYSCALL_PSELECT6 */
+
+#ifdef __ARCH_WANT_SYSCALL_PSELECT6_TIME64)
+INTERN ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) struct icpustate *FCALL
+sys_pselect6_time64_impl(struct icpustate *__restrict state,
+                         struct rpc_syscall_info *__restrict sc_info) {
+	struct sigset_and_len {
+		sigset_t const *ss_ptr;
+		size_t          ss_len;
+	};
+	size_t nfds                                       = (size_t)sc_info->rsi_regs[0];
+	USER UNCHECKED fd_set *readfds                    = (USER UNCHECKED fd_set *)sc_info->rsi_regs[1];
+	USER UNCHECKED fd_set *writefds                   = (USER UNCHECKED fd_set *)sc_info->rsi_regs[2];
+	USER UNCHECKED fd_set *exceptfds                  = (USER UNCHECKED fd_set *)sc_info->rsi_regs[3];
+	USER UNCHECKED struct timespec64 const *timeout   = (USER UNCHECKED struct timespec64 const *)sc_info->rsi_regs[4];
+	USER UNCHECKED void const *sigmask_sigset_and_len = (USER UNCHECKED void const *)sc_info->rsi_regs[5];
+	struct sigset_and_len ss;
+	ktime_t abs_timeout;
+	validate_readable(sigmask_sigset_and_len, sizeof(ss));
+	COMPILER_READ_BARRIER();
+	memcpy(&ss, sigmask_sigset_and_len, sizeof(ss));
+	COMPILER_READ_BARRIER();
+	abs_timeout = KTIME_INFINITE;
+	if (timeout) {
+		validate_readable(timeout, sizeof(*timeout));
+		abs_timeout = relktime_from_user_rel(timeout);
+		if (abs_timeout != 0)
+			abs_timeout += ktime();
+	}
+	return sys_pselect_generic(state, sc_info, nfds, readfds, writefds,
+	                           exceptfds, abs_timeout, ss.ss_ptr, ss.ss_len);
+}
+
+PRIVATE NONNULL((1)) void PRPC_EXEC_CALLBACK_CC
+sys_pselect6_time64_rpc(struct rpc_context *__restrict ctx, void *UNUSED(cookie)) {
+	if (ctx->rc_context != RPC_REASONCTX_SYSCALL)
+		return;
+
+	/* Indicate that our system call is implemented via this RPC. */
+	ctx->rc_context = RPC_REASONCTX_SYSRET;
+
+	/* Do the actual system call. */
+	ctx->rc_state = sys_pselect6_time64_impl(ctx->rc_state, &ctx->rc_scinfo);
+}
+
+DEFINE_SYSCALL6(ssize_t, pselect6_time64, size_t, nfds,
+                USER UNCHECKED fd_set *, readfds,
+                USER UNCHECKED fd_set *, writefds,
+                USER UNCHECKED fd_set *, exceptfds,
+                USER UNCHECKED struct timespec64 const *, timeout,
+                USER UNCHECKED void const *, sigmask_sigset_and_len) {
+	struct sigset_and_len {
+		sigset_t const *ss_ptr;
+		size_t          ss_len;
+	};
+	struct sigset_and_len ss;
+	size_t result, nfd_size;
+	ktime_t abs_timeout;
+	validate_readable(sigmask_sigset_and_len, sizeof(ss));
+	COMPILER_READ_BARRIER();
+	memcpy(&ss, sigmask_sigset_and_len, sizeof(ss));
+	COMPILER_READ_BARRIER();
+	if (ss.ss_ptr) {
+		/* Send an RPC to ourselves, so we can gain access to the user-space register state. */
+		task_rpc_exec(THIS_TASK, RPC_CONTEXT_KERN | RPC_SYNCMODE_F_USER, &sys_pselect6_time64_rpc, NULL);
+		__builtin_unreachable();
+	}
+	nfd_size = CEILDIV(nfds, __NFDBITS);
+	validate_readwrite_opt(readfds, nfd_size);
+	validate_readwrite_opt(writefds, nfd_size);
+	validate_readwrite_opt(exceptfds, nfd_size);
+	abs_timeout = KTIME_INFINITE;
+	if (timeout) {
+		validate_readable(timeout, sizeof(*timeout));
+		abs_timeout = relktime_from_user_rel(timeout);
+		if (abs_timeout != 0)
+			abs_timeout += ktime();
+	}
+	result = do_select(nfds, readfds, writefds, exceptfds, abs_timeout);
+	return (ssize_t)result;
+}
+#endif /* __ARCH_WANT_SYSCALL_PSELECT6_TIME64 */
+
+#ifdef __ARCH_WANT_COMPAT_SYSCALL_PSELECT6
+INTERN ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) struct icpustate *FCALL
+sys_compat_pselect6_impl(struct icpustate *__restrict state,
+                         struct rpc_syscall_info *__restrict sc_info) {
+	struct sigset_and_len {
+		compat_ptr(compat_sigset_t const) ss_ptr;
+		compat_size_t                     ss_len;
+	};
+	STATIC_ASSERT(sizeof(compat_sigset_t) == sizeof(sigset_t));
+	size_t nfds                                            = (size_t)sc_info->rsi_regs[0];
+	USER UNCHECKED fd_set *readfds                         = (USER UNCHECKED fd_set *)sc_info->rsi_regs[1];
+	USER UNCHECKED fd_set *writefds                        = (USER UNCHECKED fd_set *)sc_info->rsi_regs[2];
+	USER UNCHECKED fd_set *exceptfds                       = (USER UNCHECKED fd_set *)sc_info->rsi_regs[3];
+	USER UNCHECKED struct compat_timespec32 const *timeout = (USER UNCHECKED struct compat_timespec32 const *)sc_info->rsi_regs[4];
+	USER UNCHECKED void const *sigmask_sigset_and_len      = (USER UNCHECKED void const *)sc_info->rsi_regs[5];
+	struct sigset_and_len ss;
+	ktime_t abs_timeout;
+	validate_readable(sigmask_sigset_and_len, sizeof(ss));
+	COMPILER_READ_BARRIER();
+	memcpy(&ss, sigmask_sigset_and_len, sizeof(ss));
+	COMPILER_READ_BARRIER();
+	abs_timeout = KTIME_INFINITE;
+	if (timeout) {
+		validate_readable(timeout, sizeof(*timeout));
+		abs_timeout = relktime_from_user_rel(timeout);
+		if (abs_timeout != 0)
+			abs_timeout += ktime();
+	}
+	return sys_pselect_generic(state, sc_info, nfds, readfds, writefds,
+	                           exceptfds, abs_timeout, ss.ss_ptr, ss.ss_len);
+}
+
+PRIVATE NONNULL((1)) void PRPC_EXEC_CALLBACK_CC
+sys_compat_pselect6_rpc(struct rpc_context *__restrict ctx, void *UNUSED(cookie)) {
+	if (ctx->rc_context != RPC_REASONCTX_SYSCALL)
+		return;
+
+	/* Indicate that our system call is implemented via this RPC. */
+	ctx->rc_context = RPC_REASONCTX_SYSRET;
+
+	/* Do the actual system call. */
+	ctx->rc_state = sys_compat_pselect6_impl(ctx->rc_state, &ctx->rc_scinfo);
+}
+
+DEFINE_COMPAT_SYSCALL6(ssize_t, pselect6, size_t, nfds,
+                       USER UNCHECKED fd_set *, readfds,
+                       USER UNCHECKED fd_set *, writefds,
+                       USER UNCHECKED fd_set *, exceptfds,
+                       USER UNCHECKED struct compat_timespec32 const *, timeout,
+                       USER UNCHECKED void const *, sigmask_sigset_and_len) {
+	STATIC_ASSERT(sizeof(compat_sigset_t) == sizeof(sigset_t));
+	struct sigset_and_len {
+		compat_ptr(compat_sigset_t const) ss_ptr;
+		compat_size_t                     ss_len;
+	};
+	struct sigset_and_len ss;
+	size_t result, nfd_size;
+	ktime_t abs_timeout;
+	compat_validate_readable(sigmask_sigset_and_len, sizeof(ss));
+	COMPILER_READ_BARRIER();
+	memcpy(&ss, sigmask_sigset_and_len, sizeof(ss));
+	COMPILER_READ_BARRIER();
+	if (ss.ss_ptr) {
+		/* Send an RPC to ourselves, so we can gain access to the user-space register state. */
+		task_rpc_exec(THIS_TASK, RPC_CONTEXT_KERN | RPC_SYNCMODE_F_USER, &sys_compat_pselect6_rpc, NULL);
+		__builtin_unreachable();
+	}
+	nfd_size = CEILDIV(nfds, __NFDBITS);
+	compat_validate_readwrite_opt(readfds, nfd_size);
+	compat_validate_readwrite_opt(writefds, nfd_size);
+	compat_validate_readwrite_opt(exceptfds, nfd_size);
+	abs_timeout = KTIME_INFINITE;
+	if (timeout) {
+		compat_validate_readable(timeout, sizeof(*timeout));
+		abs_timeout = relktime_from_user_rel(timeout);
+		if (abs_timeout != 0)
+			abs_timeout += ktime();
+	}
+	result = do_select(nfds, readfds, writefds, exceptfds, abs_timeout);
+	return (ssize_t)result;
+}
+#endif /* __ARCH_WANT_COMPAT_SYSCALL_PSELECT6 */
+
+#ifdef __ARCH_WANT_COMPAT_SYSCALL_PSELECT6_TIME64
+INTERN ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) struct icpustate *FCALL
+sys_compat_pselect6_time64_impl(struct icpustate *__restrict state,
+                                struct rpc_syscall_info *__restrict sc_info) {
+	struct sigset_and_len {
+		compat_ptr(compat_sigset_t const) ss_ptr;
+		compat_size_t                     ss_len;
+	};
+	STATIC_ASSERT(sizeof(compat_sigset_t) == sizeof(sigset_t));
+	size_t nfds                                            = (size_t)sc_info->rsi_regs[0];
+	USER UNCHECKED fd_set *readfds                         = (USER UNCHECKED fd_set *)sc_info->rsi_regs[1];
+	USER UNCHECKED fd_set *writefds                        = (USER UNCHECKED fd_set *)sc_info->rsi_regs[2];
+	USER UNCHECKED fd_set *exceptfds                       = (USER UNCHECKED fd_set *)sc_info->rsi_regs[3];
+	USER UNCHECKED struct compat_timespec64 const *timeout = (USER UNCHECKED struct compat_timespec64 const *)sc_info->rsi_regs[4];
+	USER UNCHECKED void const *sigmask_sigset_and_len      = (USER UNCHECKED void const *)sc_info->rsi_regs[5];
+	struct sigset_and_len ss;
+	ktime_t abs_timeout;
+	validate_readable(sigmask_sigset_and_len, sizeof(ss));
+	COMPILER_READ_BARRIER();
+	memcpy(&ss, sigmask_sigset_and_len, sizeof(ss));
+	COMPILER_READ_BARRIER();
+	abs_timeout = KTIME_INFINITE;
+	if (timeout) {
+		validate_readable(timeout, sizeof(*timeout));
+		abs_timeout = relktime_from_user_rel(timeout);
+		if (abs_timeout != 0)
+			abs_timeout += ktime();
+	}
+	return sys_pselect_generic(state, sc_info, nfds, readfds, writefds,
+	                           exceptfds, abs_timeout, ss.ss_ptr, ss.ss_len);
+}
+
+PRIVATE NONNULL((1)) void PRPC_EXEC_CALLBACK_CC
+sys_compat_pselect6_time64_rpc(struct rpc_context *__restrict ctx, void *UNUSED(cookie)) {
+	if (ctx->rc_context != RPC_REASONCTX_SYSCALL)
+		return;
+
+	/* Indicate that our system call is implemented via this RPC. */
+	ctx->rc_context = RPC_REASONCTX_SYSRET;
+
+	/* Do the actual system call. */
+	ctx->rc_state = sys_compat_pselect6_time64_impl(ctx->rc_state, &ctx->rc_scinfo);
+}
+
+DEFINE_COMPAT_SYSCALL6(ssize_t, pselect6_time64, size_t, nfds,
+                       USER UNCHECKED fd_set *, readfds,
+                       USER UNCHECKED fd_set *, writefds,
+                       USER UNCHECKED fd_set *, exceptfds,
+                       USER UNCHECKED struct compat_timespec64 const *, timeout,
+                       USER UNCHECKED void const *, sigmask_sigset_and_len) {
+	STATIC_ASSERT(sizeof(compat_sigset_t) == sizeof(sigset_t));
+	struct sigset_and_len {
+		compat_ptr(compat_sigset_t const) ss_ptr;
+		compat_size_t                     ss_len;
+	};
+	struct sigset_and_len ss;
+	size_t result, nfd_size;
+	ktime_t abs_timeout;
+	compat_validate_readable(sigmask_sigset_and_len, sizeof(ss));
+	COMPILER_READ_BARRIER();
+	memcpy(&ss, sigmask_sigset_and_len, sizeof(ss));
+	COMPILER_READ_BARRIER();
+	if (ss.ss_ptr) {
+		/* Send an RPC to ourselves, so we can gain access to the user-space register state. */
+		task_rpc_exec(THIS_TASK, RPC_CONTEXT_KERN | RPC_SYNCMODE_F_USER, &sys_compat_pselect6_time64_rpc, NULL);
+		__builtin_unreachable();
+	}
+	nfd_size = CEILDIV(nfds, __NFDBITS);
+	compat_validate_readwrite_opt(readfds, nfd_size);
+	compat_validate_readwrite_opt(writefds, nfd_size);
+	compat_validate_readwrite_opt(exceptfds, nfd_size);
+	abs_timeout = KTIME_INFINITE;
+	if (timeout) {
+		compat_validate_readable(timeout, sizeof(*timeout));
+		abs_timeout = relktime_from_user_rel(timeout);
+		if (abs_timeout != 0)
+			abs_timeout += ktime();
+	}
+	result = do_select(nfds, readfds, writefds, exceptfds, abs_timeout);
+	return (ssize_t)result;
+}
+#endif /* __ARCH_WANT_COMPAT_SYSCALL_PSELECT6_TIME64 */
+#else /* CONFIG_USE_NEW_RPC */
 #ifdef __ARCH_WANT_SYSCALL_PSELECT6
 DEFINE_SYSCALL6(ssize_t, pselect6, size_t, nfds,
                 USER UNCHECKED fd_set *, readfds,
@@ -2346,24 +3078,13 @@ DEFINE_SYSCALL6(ssize_t, pselect6, size_t, nfds,
 }
 #endif /* __ARCH_WANT_SYSCALL_PSELECT6 */
 
-#if (defined(__ARCH_WANT_SYSCALL_PSELECT6_64) || \
-     defined(__ARCH_WANT_SYSCALL_PSELECT6_TIME64))
-#ifdef __ARCH_WANT_SYSCALL_PSELECT6_64
-DEFINE_SYSCALL6(ssize_t, pselect6_64, size_t, nfds,
-                USER UNCHECKED fd_set *, readfds,
-                USER UNCHECKED fd_set *, writefds,
-                USER UNCHECKED fd_set *, exceptfds,
-                USER UNCHECKED struct timespec64 const *, timeout,
-                USER UNCHECKED void const *, sigmask_sigset_and_len)
-#else /* __ARCH_WANT_SYSCALL_PSELECT6_64 */
+#ifdef __ARCH_WANT_SYSCALL_PSELECT6_TIME64
 DEFINE_SYSCALL6(ssize_t, pselect6_time64, size_t, nfds,
                 USER UNCHECKED fd_set *, readfds,
                 USER UNCHECKED fd_set *, writefds,
                 USER UNCHECKED fd_set *, exceptfds,
                 USER UNCHECKED struct timespec64 const *, timeout,
-                USER UNCHECKED void const *, sigmask_sigset_and_len)
-#endif /* !__ARCH_WANT_SYSCALL_PSELECT6_64 */
-{
+                USER UNCHECKED void const *, sigmask_sigset_and_len) {
 	struct sigset_and_len {
 		sigset_t const *ss_ptr;
 		size_t          ss_len;
@@ -2396,7 +3117,7 @@ DEFINE_SYSCALL6(ssize_t, pselect6_time64, size_t, nfds,
 	                    ss.ss_ptr);
 	return (ssize_t)result;
 }
-#endif /* __ARCH_WANT_SYSCALL_PSELECT6_64 || __ARCH_WANT_SYSCALL_PSELECT6_TIME64 */
+#endif /* __ARCH_WANT_SYSCALL_PSELECT6_TIME64 */
 
 #ifdef __ARCH_WANT_COMPAT_SYSCALL_PSELECT6
 DEFINE_COMPAT_SYSCALL6(ssize_t, pselect6, size_t, nfds,
@@ -2407,8 +3128,8 @@ DEFINE_COMPAT_SYSCALL6(ssize_t, pselect6, size_t, nfds,
                        USER UNCHECKED void const *, sigmask_sigset_and_len) {
 	STATIC_ASSERT(sizeof(compat_sigset_t) == sizeof(sigset_t));
 	struct sigset_and_len {
-		compat_sigset_t const *ss_ptr;
-		compat_size_t          ss_len;
+		compat_ptr(compat_sigset_t const) ss_ptr;
+		compat_size_t                     ss_len;
 	};
 	struct sigset_and_len ss;
 	size_t result, nfd_size;
@@ -2440,28 +3161,17 @@ DEFINE_COMPAT_SYSCALL6(ssize_t, pselect6, size_t, nfds,
 }
 #endif /* __ARCH_WANT_COMPAT_SYSCALL_PSELECT6 */
 
-#if (defined(__ARCH_WANT_COMPAT_SYSCALL_PSELECT6_64) || \
-     defined(__ARCH_WANT_COMPAT_SYSCALL_PSELECT6_TIME64))
-#ifdef __ARCH_WANT_COMPAT_SYSCALL_PSELECT6_64
-DEFINE_COMPAT_SYSCALL6(ssize_t, pselect6_64, size_t, nfds,
-                       USER UNCHECKED fd_set *, readfds,
-                       USER UNCHECKED fd_set *, writefds,
-                       USER UNCHECKED fd_set *, exceptfds,
-                       USER UNCHECKED struct compat_timespec64 const *, timeout,
-                       USER UNCHECKED void const *, sigmask_sigset_and_len)
-#else /* __ARCH_WANT_COMPAT_SYSCALL_PSELECT6_64 */
+#ifdef __ARCH_WANT_COMPAT_SYSCALL_PSELECT6_TIME64
 DEFINE_COMPAT_SYSCALL6(ssize_t, pselect6_time64, size_t, nfds,
                        USER UNCHECKED fd_set *, readfds,
                        USER UNCHECKED fd_set *, writefds,
                        USER UNCHECKED fd_set *, exceptfds,
                        USER UNCHECKED struct compat_timespec64 const *, timeout,
-                       USER UNCHECKED void const *, sigmask_sigset_and_len)
-#endif /* !__ARCH_WANT_COMPAT_SYSCALL_PSELECT6_64 */
-{
+                       USER UNCHECKED void const *, sigmask_sigset_and_len) {
 	STATIC_ASSERT(sizeof(compat_sigset_t) == sizeof(sigset_t));
 	struct sigset_and_len {
-		compat_sigset_t const *ss_ptr;
-		compat_size_t          ss_len;
+		compat_ptr(compat_sigset_t const) ss_ptr;
+		compat_size_t                     ss_len;
 	};
 	struct sigset_and_len ss;
 	size_t result, nfd_size;
@@ -2491,7 +3201,9 @@ DEFINE_COMPAT_SYSCALL6(ssize_t, pselect6_time64, size_t, nfds,
 	                    ss.ss_ptr);
 	return (ssize_t)result;
 }
-#endif /* __ARCH_WANT_COMPAT_SYSCALL_PSELECT6_64 || __ARCH_WANT_COMPAT_SYSCALL_PSELECT6_TIME64 */
+#endif /* __ARCH_WANT_COMPAT_SYSCALL_PSELECT6_TIME64 */
+#endif /* !CONFIG_USE_NEW_RPC */
+
 
 
 

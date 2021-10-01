@@ -4068,20 +4068,24 @@ DEFINE_SYSCALL2(errno_t, rt_sigsuspend,
 
 /* This function is also called from arch-specific, optimized syscall routers. */
 INTERN ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) struct icpustate *FCALL
-rt_sigsuspend_impl(struct icpustate *__restrict state,
-                   struct rpc_syscall_info *__restrict sc_info) {
+sys_rt_sigsuspend_impl(struct icpustate *__restrict state,
+                       struct rpc_syscall_info *__restrict sc_info) {
 	sigset_t these;
 	size_t sigsetsize;
 	USER UNCHECKED sigset_t *uthese;
 	uthese     = (USER UNCHECKED sigset_t *)sc_info->rsi_regs[0];
 	sigsetsize = (size_t)sc_info->rsi_regs[1];
-	validate_readable(uthese, sizeof(sigset_t));
-	memcpy(&these, uthese, sizeof(sigset_t));
 	if unlikely(sigsetsize != sizeof(sigset_t)) {
 		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
 		      E_INVALID_ARGUMENT_CONTEXT_SIGNAL_SIGSET_SIZE,
 		      sigsetsize);
 	}
+	validate_readable(uthese, sizeof(sigset_t));
+	memcpy(&these, uthese, sizeof(sigset_t));
+
+	/* These signals cannot be masked.  */
+	sigdelset(&these, SIGSTOP);
+	sigdelset(&these, SIGKILL);
 
 	/* Indicate that we want to receive wake-ups for masked signals. */
 	ATOMIC_OR(THIS_TASK->t_flags, TASK_FWAKEONMSKRPC);
@@ -4097,7 +4101,7 @@ again:
 		 * except that `task_serve_with_sigmask' replaces
 		 * calls to `task_serve()'
 		 *
-		 * In case of `sigsuspend(2)`, the "normal" implementation
+		 * In case of  `sigsuspend(2)`, the "normal"  implementation
 		 * is `pause(2)`, which can simply be implemented like this: */
 		for (;;) {
 			PREEMPTION_DISABLE();
@@ -4116,14 +4120,14 @@ again:
 }
 
 PRIVATE NONNULL((1)) void PRPC_EXEC_CALLBACK_CC
-rt_sigsuspend_rpc(struct rpc_context *__restrict ctx, void *UNUSED(cookie)) {
+sys_rt_sigsuspend_rpc(struct rpc_context *__restrict ctx, void *UNUSED(cookie)) {
 	if (ctx->rc_context != RPC_REASONCTX_SYSCALL)
 		return;
 	/* Indicate that our system call is implemented via this RPC. */
 	ctx->rc_context = RPC_REASONCTX_SYSRET;
 
 	/* Do the actual system call. */
-	ctx->rc_state = rt_sigsuspend_impl(ctx->rc_state, &ctx->rc_scinfo);
+	ctx->rc_state = sys_rt_sigsuspend_impl(ctx->rc_state, &ctx->rc_scinfo);
 }
 
 DEFINE_SYSCALL2(errno_t, rt_sigsuspend,
@@ -4133,7 +4137,7 @@ DEFINE_SYSCALL2(errno_t, rt_sigsuspend,
 	(void)sigsetsize;
 
 	/* Send an RPC to ourselves, so we can gain access to the user-space register state. */
-	task_rpc_exec(THIS_TASK, RPC_CONTEXT_KERN | RPC_SYNCMODE_F_USER, &rt_sigsuspend_rpc, NULL);
+	task_rpc_exec(THIS_TASK, RPC_CONTEXT_KERN | RPC_SYNCMODE_F_USER, &sys_rt_sigsuspend_rpc, NULL);
 	__builtin_unreachable();
 }
 #endif /* CONFIG_USE_NEW_RPC */

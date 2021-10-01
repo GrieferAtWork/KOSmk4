@@ -252,7 +252,7 @@ make_inactive:
 				user_rpc_reason = _RPC_REASONCTX_SYNC;
 				if (sc_info != NULL) {
 					if ((rpc->pr_flags & RPC_SYNCMODE_F_REQUIRE_CP) &&
-					    !kernel_syscall_iscp(sc_info->rsi_sysno))
+					    !kernel_syscall_iscp(sc_info))
 						goto make_inactive;
 					/* If the system call  */
 					if (ctx.rc_context == RPC_REASONCTX_SYSCALL)
@@ -417,7 +417,7 @@ again_scan_proc_rpcs:
 						user_rpc_reason = _RPC_REASONCTX_SYNC;
 						if (sc_info != NULL) {
 							if ((rpc->pr_flags & RPC_SYNCMODE_F_REQUIRE_CP) &&
-							    !kernel_syscall_iscp(sc_info->rsi_sysno))
+							    !kernel_syscall_iscp(sc_info))
 								goto make_inactive;
 							/* If the system call  */
 							if (ctx.rc_context == RPC_REASONCTX_SYSCALL)

@@ -19,28 +19,28 @@
  */
 #ifdef __INTELLISENSE__
 #include "signal.c"
-//#define     DEFINE_sig_send     1
-//#define   DEFINE_sig_altsend    1
-//#define  DEFINE_sig_send_nopr   1
-//#define DEFINE_sig_altsend_nopr 1
-#define DEFINE_sig_sendto 1
-//#define             DEFINE_sig_altsendto              1
-//#define            DEFINE_sig_sendto_nopr             1
-//#define           DEFINE_sig_altsendto_nopr           1
-//#define             DEFINE_sig_broadcast              1
-//#define            DEFINE_sig_altbroadcast            1
-//#define           DEFINE_sig_broadcast_nopr           1
-//#define         DEFINE_sig_altbroadcast_nopr          1
-//#define         DEFINE_sig_broadcast_as_nopr          1
-//#define       DEFINE_sig_broadcast_cleanup_nopr       1
-//#define     DEFINE_sig_broadcast_as_cleanup_nopr      1
-//#define         DEFINE_sig_broadcast_for_fini         1
-//#define       DEFINE_sig_altbroadcast_for_fini        1
-//#define      DEFINE_sig_broadcast_for_fini_nopr       1
-//#define     DEFINE_sig_altbroadcast_for_fini_nopr     1
-//#define     DEFINE_sig_broadcast_as_for_fini_nopr     1
-//#define  DEFINE_sig_broadcast_for_fini_cleanup_nopr   1
-//#define DEFINE_sig_broadcast_as_for_fini_cleanup_nopr 1
+//#define         DEFINE_sig_send
+//#define      DEFINE_sig_altsend
+//#define    DEFINE_sig_send_nopr
+//#define DEFINE_sig_altsend_nopr
+#define DEFINE_sig_sendto
+//#define                          DEFINE_sig_altsendto
+//#define                        DEFINE_sig_sendto_nopr
+//#define                     DEFINE_sig_altsendto_nopr
+//#define                          DEFINE_sig_broadcast
+//#define                       DEFINE_sig_altbroadcast
+//#define                     DEFINE_sig_broadcast_nopr
+//#define                  DEFINE_sig_altbroadcast_nopr
+//#define                  DEFINE_sig_broadcast_as_nopr
+//#define             DEFINE_sig_broadcast_cleanup_nopr
+//#define          DEFINE_sig_broadcast_as_cleanup_nopr
+//#define                 DEFINE_sig_broadcast_for_fini
+//#define              DEFINE_sig_altbroadcast_for_fini
+//#define            DEFINE_sig_broadcast_for_fini_nopr
+//#define         DEFINE_sig_altbroadcast_for_fini_nopr
+//#define         DEFINE_sig_broadcast_as_for_fini_nopr
+//#define    DEFINE_sig_broadcast_for_fini_cleanup_nopr
+//#define DEFINE_sig_broadcast_as_for_fini_cleanup_nopr
 #endif /* __INTELLISENSE__ */
 
 #if (defined(DEFINE_sig_send) +                            \
