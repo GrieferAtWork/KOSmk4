@@ -84,7 +84,9 @@ task_serve_with_icpustate_and_sigmask(struct icpustate *__restrict state,
 	 * the pending-RPC flag to prevent a race condition. */
 	pending.slh_first = SLIST_ATOMIC_CLEAR(&PERTASK(this_rpcs));
 
+#ifndef LOCAL_NOEXCEPT
 handle_pending:
+#endif /* !LOCAL_NOEXCEPT */
 	while (!SLIST_EMPTY(&pending)) {
 		struct pending_rpc *rpc = SLIST_FIRST(&pending);
 		SLIST_REMOVE_HEAD(&pending, pr_link);

@@ -2127,9 +2127,9 @@ posix_waitfor(idtype_t which,
 		if (handptr) {
 			struct sighand *hand;
 			hand = sighand_ptr_lockread(handptr);
-			if ((hand->sh_actions[SIGCLD - 1].sa_flags & SIGACTION_SA_NOCLDWAIT) ||
+			if ((hand->sh_actions[SIGCLD - 1].sa_flags & SA_NOCLDWAIT) ||
 			    (hand->sh_actions[SIGCLD - 1].sa_handler == SIG_IGN &&
-			     !(hand->sh_actions[SIGCLD - 1].sa_flags & SIGACTION_SA_SIGINFO))) {
+			     !(hand->sh_actions[SIGCLD - 1].sa_flags & SA_SIGINFO))) {
 				sync_endread(hand);
 				/* Block until  all child  processes have  exited
 				 * and reap all zombies created in the mean time.

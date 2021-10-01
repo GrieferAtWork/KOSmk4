@@ -41,12 +41,12 @@ DECL_BEGIN
 #ifdef CONFIG_USE_NEW_RPC
 /* Update the given  `state' to raise  the specified `siginfo'  as
  * a user-space signal  within the calling  thread. The caller  is
- * responsible  to handle special signal handlers (`KERNEL_SIG_*')
+ * responsible  to handle special signal handlers (`SIG_*')
  * before calling this function! This function should only be used
  * to  enqueue the execution of a signal handler with a user-space
  * entry point.
  *
- * Functionality like `SIGACTION_SA_RESETHAND', or system call
+ * Functionality like `SA_RESETHAND', or system call
  * restart  selection  must  be  implemented  by  the  caller.
  *
  * @param: state:   The CPU state describing the return to user-space.
@@ -76,7 +76,7 @@ userexcept_callsignal(struct icpustate *__restrict state,
 #else /* CONFIG_USE_NEW_RPC */
 /* Update the given  `state' to raise  the specified `siginfo'  as
  * a user-space signal  within the calling  thread. The caller  is
- * responsible  to handle special signal handlers (`KERNEL_SIG_*')
+ * responsible  to handle special signal handlers (`SIG_*')
  * before calling this function! This function should only be used
  * to  enqueue the execution of a signal handler with a user-space
  * entry point.
@@ -89,7 +89,7 @@ userexcept_callsignal(struct icpustate *__restrict state,
  *                  be applied, which is done in cooperation with  the
  *                  system call restart database.
  * @return: * :     The updated CPU state.
- * @return: NULL:   The `SIGACTION_SA_RESETHAND' flag was set,
+ * @return: NULL:   The `SA_RESETHAND' flag was set,
  *                  but `action' differs from the set handler. */
 #ifdef __x86_64__
 PRIVATE WUNUSED NONNULL((1, 2)) struct icpustate *KCALL
@@ -125,7 +125,7 @@ userexcept_callsignal(struct icpustate *__restrict state,
 	if unlikely(signo <= 0 || signo >= NSIG)
 		return NULL;
 	/* Check if the handler should be reset before being invoked. */
-	if (action->sa_flags & SIGACTION_SA_RESETHAND) {
+	if (action->sa_flags & SA_RESETHAND) {
 		if unlikely(!sighand_reset_handler(signo, action))
 			return NULL;
 	}
@@ -140,8 +140,8 @@ userexcept_callsignal(struct icpustate *__restrict state,
 		else if (rmode == SYSCALL_RESTART_MODE_DONT)
 			delete_sc_info = true; /* Never restart */
 		else if (rmode == SYSCALL_RESTART_MODE_AUTO) {
-			/* Only restart when `SIGACTION_SA_RESTART' is set. */
-			if (!(action->sa_flags & SIGACTION_SA_RESTART))
+			/* Only restart when `SA_RESTART' is set. */
+			if (!(action->sa_flags & SA_RESTART))
 				delete_sc_info = true;
 		}
 		/* When not restarting the system call, then we must
@@ -171,7 +171,7 @@ userexcept_callsignal(struct icpustate *__restrict state,
 
 	/* Figure out how, and if we need to mask signals. */
 	must_restore_sigmask = false;
-	if (action->sa_mask || !(action->sa_flags & SIGACTION_SA_NODEFER)) {
+	if (action->sa_mask || !(action->sa_flags & SA_NODEFER)) {
 		USER CHECKED sigset_t *sigmask;
 		sigmask = sigmask_getwr();
 		memcpy(&old_sigmask, sigmask, sizeof(sigset_t));
@@ -180,7 +180,7 @@ userexcept_callsignal(struct icpustate *__restrict state,
 		 *        bits are  set to  `0' (s.a.  `setsigmaskfullptr(3)', which  sets
 		 *        the  userprocmask to an all-1s mask which is stored in read-only
 		 *        memory) */
-		if (!(action->sa_flags & SIGACTION_SA_NODEFER))
+		if (!(action->sa_flags & SA_NODEFER))
 			sigaddset(sigmask, (int)signo);
 		if (action->sa_mask)
 			sigorset(sigmask, sigmask, &action->sa_mask->sm_mask);
@@ -196,7 +196,7 @@ userexcept_callsignal(struct icpustate *__restrict state,
 	orig_usp = (USER CHECKED byte_t *)icpustate_getusersp(state);
 	usp      = orig_usp;
 	/* Check if sigaltstack should be used. */
-	if (action->sa_flags & SIGACTION_SA_ONSTACK) {
+	if (action->sa_flags & SA_ONSTACK) {
 		/* TODO: SS_AUTODISARM */
 		/* TODO: If we raised an E_INTERRUPT above, then we mustn't
 		 *       switch  to the alternate  signal stack again here! */
@@ -218,14 +218,14 @@ userexcept_callsignal(struct icpustate *__restrict state,
 	/* At this point, the following options affect how we need to set up the stack:
 	 *  - sc_info:                                  When non-NULL, we must restart an interrupted system call
 	 *  - must_restore_sigmask:                     When true, we must restore `old_sigmask'
-	 *  - action->sa_flags & SIGACTION_SA_SIGINFO:  When true, we must invoke a 3-argument handler
-	 *  - action->sa_flags & SIGACTION_SA_RESTORER: When true, we must have the handler return to `sa_restore' */
+	 *  - action->sa_flags & SA_SIGINFO:  When true, we must invoke a 3-argument handler
+	 *  - action->sa_flags & SA_RESTORER: When true, we must have the handler return to `sa_restore' */
 
 	user_siginfo  = NULL;
 	user_ucontext = NULL;
 	user_sigset   = NULL;
 	user_fpustate = NULL;
-	if (action->sa_flags & SIGACTION_SA_SIGINFO) {
+	if (action->sa_flags & SA_SIGINFO) {
 		/* In 3-argument mode, we always have to push everything... */
 		STATIC_ASSERT(NAME2(__SIX, _USER_MAX_SIZE) >= NAME2(__SIX, _KERNEL_MAX_SIZE));
 		STATIC_ASSERT(NAME2(__SIX, _KERNEL_MAX_SIZE) == sizeof(struct NAME2(__siginfox, _struct)));
@@ -380,7 +380,7 @@ userexcept_callsignal(struct icpustate *__restrict state,
 	 * >>     RESTART_SYSTEM_CALL(user_sc_info);
 	 */
 
-	if (action->sa_flags & SIGACTION_SA_RESTORER) {
+	if (action->sa_flags & SA_RESTORER) {
 		user_rstor = (NAME(u))(uintptr_t)action->sa_restore;
 	} else {
 		/* Must push assembly onto the user-stack:
@@ -418,12 +418,12 @@ userexcept_callsignal(struct icpustate *__restrict state,
 	validate_writable(usp, 8);
 	((u64 *)usp)[0] = (u64)user_rstor;                   /* Return address */
 	gpregs_setpdi(&state->ics_gpregs, (uintptr_t)signo); /* signo_t signo */
-	if (action->sa_flags & SIGACTION_SA_SIGINFO) {
+	if (action->sa_flags & SA_SIGINFO) {
 		gpregs_setpsi(&state->ics_gpregs, (uintptr_t)user_siginfo);  /* siginfo64_t *info */
 		gpregs_setpdx(&state->ics_gpregs, (uintptr_t)user_ucontext); /* struct ucontext64 *ctx */
 	}
 #else /* DEFINE_RAISE64 */
-	if (action->sa_flags & SIGACTION_SA_SIGINFO) {
+	if (action->sa_flags & SA_SIGINFO) {
 		usp -= 4 * sizeof(u32);
 		validate_writable(usp, 4 * sizeof(u32));
 		((u32 *)usp)[0] = (u32)user_rstor;               /* Return address */

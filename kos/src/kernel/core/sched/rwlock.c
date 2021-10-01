@@ -1000,6 +1000,23 @@ wait_for_unshare:
 }
 
 
+#ifdef CONFIG_USE_NEW_RPC
+PRIVATE NONNULL((1)) void PRPC_EXEC_CALLBACK_CC
+kill_reader_rpc(struct rpc_context *__restrict UNUSED(ctx), void *cookie) {
+	struct rwlock *lock;
+	lock = (struct rwlock *)cookie;
+
+	/* Check if the calling thread has a read-lock on `lock',
+	 * and throw an  `E_RETRY_RWLOCK' exception  if it  does. */
+	if (!rwlock_find_readlock(lock))
+		return;
+
+	/* Apparently   we   are  using   that  lock   in  particular.
+	 * So  as already mentioned, to deal with this we simply throw
+	 * an exception that'll cause the read-lock to be re-acquired. */
+	THROW(__E_RETRY_RWLOCK, lock);
+}
+#else /* CONFIG_USE_NEW_RPC */
 PRIVATE WUNUSED NONNULL((1, 2)) struct icpustate *FCALL
 kill_reader_rpc(void *arg, struct icpustate *__restrict state,
                 unsigned int UNUSED(reason),
@@ -1015,6 +1032,7 @@ kill_reader_rpc(void *arg, struct icpustate *__restrict state,
 	 * an exception that'll cause the read-lock to be re-acquired. */
 	THROW(__E_RETRY_RWLOCK, lock);
 }
+#endif /* !CONFIG_USE_NEW_RPC */
 
 PRIVATE NONNULL((1, 2)) bool KCALL
 kill_rwlock_reader(struct task *__restrict thread,
@@ -1057,10 +1075,16 @@ kill_rwlock_reader(struct task *__restrict thread,
 	} else {
 use_rpc:
 		/* Send an RPC to the thread to check if it's using our lock. */
+#ifdef CONFIG_USE_NEW_RPC
+		task_rpc_exec(thread,
+		              RPC_CONTEXT_KERN | RPC_PRIORITY_F_HIGH,
+		              &kill_reader_rpc, lock);
+#else /* CONFIG_USE_NEW_RPC */
 		task_schedule_synchronous_rpc(thread,
 		                              &kill_reader_rpc,
 		                              lock,
 		                              TASK_RPC_FHIGHPRIO);
+#endif /* !CONFIG_USE_NEW_RPC */
 	}
 done:
 	return true;

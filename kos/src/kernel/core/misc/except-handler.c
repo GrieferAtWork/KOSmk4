@@ -140,6 +140,8 @@ NOTHROW(FCALL process_exit_for_exception_after_coredump)(struct exception_data c
 PRIVATE WUNUSED NONNULL((1)) struct icpustate *FCALL
 process_waitfor_SIG_CONT(struct icpustate *__restrict state, int status) {
 	(void)state;
+	(void)status;
+
 	/* TODO: Allocate a SIG_CONT synchronization controller (a ref-counted
 	 *       structure that will be shared  with all other threads  within
 	 *       the current process)
@@ -165,13 +167,13 @@ process_waitfor_SIG_CONT(struct icpustate *__restrict state, int status) {
 	 *       that  may translate to  SIG_CONT. If one is  found, that RPC will
 	 *       be forwarded to the process's main thread.
 	 * The following special actions are performed for certain signal action:
-	 *   - KERNEL_SIG_TERM: Terminate the entire process
-	 *   - KERNEL_SIG_EXIT: Terminate only the thread the signal was directed to.
-	 *                      When send to the main thread, same as KERNEL_SIG_TERM
-	 *   - KERNEL_SIG_CONT: Forwarded to the main thread to resume normal execution
-	 *   - KERNEL_SIG_CORE: Normal behavior
-	 *   - KERNEL_SIG_STOP: Ignore & discard (we're already stopped)
-	 *   - KERNEL_SIG_IGN:  Ignore & discard
+	 *   - SIG_TERM: Terminate the entire process
+	 *   - SIG_EXIT: Terminate only the thread the signal was directed to.
+	 *                      When send to the main thread, same as SIG_TERM
+	 *   - SIG_CONT: Forwarded to the main thread to resume normal execution
+	 *   - SIG_CORE: Normal behavior
+	 *   - SIG_STOP: Ignore & discard (we're already stopped)
+	 *   - SIG_IGN:  Ignore & discard
 	 */
 
 	/* TODO: The main thread keeps on polling the list of per-process RPCs, as
@@ -189,11 +191,11 @@ process_waitfor_SIG_CONT(struct icpustate *__restrict state, int status) {
 	 * Signals directed to the process as a whole are handled by the main thread
 	 * and compared against a pseudo-super-set of signal actions shared by _all_
 	 * threads, where signal actions outweigh each other as follows:
-	 *    - if _ANY_ thread assigns `KERNEL_SIG_CORE' as action, that action wins; else:
-	 *    - if _ANY_ thread assigns `KERNEL_SIG_TERM' as action, that action wins; else:
-	 *    - if _ANY_ thread assigns `KERNEL_SIG_CONT' as action, that action wins; else:
-	 *    - if _ANY_ thread assigns `KERNEL_SIG_STOP' or `KERNEL_SIG_IGN' as action, `KERNEL_SIG_IGN' wins; else:
-	 *    - if _ANY_ thread assigns `KERNEL_SIG_EXIT' as action, `KERNEL_SIG_TERM' wins
+	 *    - if _ANY_ thread assigns `SIG_CORE' as action, that action wins; else:
+	 *    - if _ANY_ thread assigns `SIG_TERM' as action, that action wins; else:
+	 *    - if _ANY_ thread assigns `SIG_CONT' as action, that action wins; else:
+	 *    - if _ANY_ thread assigns `SIG_STOP' or `SIG_IGN' as action, `SIG_IGN' wins; else:
+	 *    - if _ANY_ thread assigns `SIG_EXIT' as action, `SIG_TERM' wins
 	 * Note that this handles _all_ of the special signal actions there are. */
 
 	/* FIXME: The above model has a race condition where SIG_CONT that are send
@@ -205,9 +207,8 @@ process_waitfor_SIG_CONT(struct icpustate *__restrict state, int status) {
 }
 
 
-PRIVATE ATTR_NOINLINE ATTR_NORETURN NONNULL((1, 2)) void FCALL
-abort_SIGINT_program_without_exception_handler(struct icpustate *__restrict state,
-                                               struct rpc_syscall_info const *__restrict sc_info) {
+PRIVATE ATTR_NOINLINE ATTR_NORETURN NONNULL((1)) void FCALL
+abort_SIGINT_program_without_exception_handler(struct icpustate *__restrict state) {
 	struct exception_info info;
 	memset(&info, 0, sizeof(struct exception_info));
 	info.ei_data.e_code      = ERROR_CODEOF(E_INTERRUPT);
@@ -221,7 +222,7 @@ abort_SIGINT_program_without_exception_handler(struct icpustate *__restrict stat
  * or if the system call  should (seemingly) return with  -EINTR or by entering  the
  * user-space exception handler with an E_INTERRUPT exception.
  *
- * This function also implements handling of `SIGACTION_SA_RESETHAND' */
+ * This function also implements handling of `SA_RESETHAND' */
 PRIVATE WUNUSED NONNULL((1, 2, 3)) struct icpustate *FCALL
 userexcept_callsignal_and_maybe_restart_syscall(struct icpustate *__restrict state,
                                                 struct kernel_sigaction const *__restrict action,
@@ -241,7 +242,7 @@ userexcept_callsignal_and_maybe_restart_syscall(struct icpustate *__restrict sta
 			should_restart = false;
 			break;
 		case SYSCALL_RESTART_MODE_AUTO:
-			should_restart = (action->sa_flags & SIGACTION_SA_RESTART) != 0;
+			should_restart = (action->sa_flags & SA_RESTART) != 0;
 			break;
 		default: __builtin_unreachable();
 		}
@@ -264,7 +265,7 @@ userexcept_callsignal_and_maybe_restart_syscall(struct icpustate *__restrict sta
 					/* If the exception still cannot be handled, terminate the program.
 					 * XXX: Logically speaking, the program should only terminate once
 					 *      the signal handler that would be invoked below returned... */
-					abort_SIGINT_program_without_exception_handler(state, sc_info);
+					abort_SIGINT_program_without_exception_handler(state);
 					/*newstate = state;*/
 				}
 				state = newstate;
@@ -284,8 +285,8 @@ userexcept_callsignal_and_maybe_restart_syscall(struct icpustate *__restrict sta
 		}
 	}
 
-	/* Implement support for `SIGACTION_SA_RESETHAND' */
-	if (action->sa_flags & SIGACTION_SA_RESETHAND) {
+	/* Implement support for `SA_RESETHAND' */
+	if (action->sa_flags & SA_RESETHAND) {
 		if unlikely(!sighand_reset_handler(siginfo->si_signo, action))
 			return NULL;
 	}
@@ -321,7 +322,7 @@ again_gethand:
 	assert(siginfo.si_signo != 0);
 	assert(siginfo.si_signo < NSIG);
 	if (!THIS_SIGHAND_PTR) {
-		action.sa_handler = KERNEL_SIG_DFL;
+		action.sa_handler = SIG_DFL;
 		action.sa_flags   = 0;
 		action.sa_mask    = NULL;
 	} else {
@@ -333,18 +334,18 @@ again_gethand:
 	}
 
 	/* Check for special signal handlers. */
-	if (action.sa_handler == KERNEL_SIG_DFL)
+	if (action.sa_handler == SIG_DFL)
 		action.sa_handler = sighand_default_action(siginfo.si_signo);
 	switch ((uintptr_t)(void *)action.sa_handler) {
 
-	case (uintptr_t)KERNEL_SIG_IGN:
-	case (uintptr_t)KERNEL_SIG_CONT:
+	case __SIG_IGN:
+	case __SIG_CONT:
 		xdecref_unlikely(action.sa_mask);
 		if (sc_info)
 			state = userexcept_seterrno(state, sc_info, &error->ei_data);
 		return state;
 
-	case (uintptr_t)KERNEL_SIG_CORE:
+	case __SIG_CORE:
 		xdecref_unlikely(action.sa_mask);
 		/* If we've gotten here because of a system call, then we can assume that
 		 * the exception does have a kernel-space side, and thus we must  include
@@ -352,15 +353,15 @@ again_gethand:
 		coredump_create_for_exception(state, error, sc_info != NULL);
 		process_exit(W_EXITCODE(1, siginfo.si_signo) | WCOREFLAG);
 
-	case (uintptr_t)KERNEL_SIG_TERM:
+	case __SIG_TERM:
 		xdecref_unlikely(action.sa_mask);
 		process_exit(W_EXITCODE(1, siginfo.si_signo));
 
-	case (uintptr_t)KERNEL_SIG_EXIT:
+	case __SIG_EXIT:
 		xdecref_unlikely(action.sa_mask);
 		task_exit(W_EXITCODE(1, siginfo.si_signo));
 
-	case (uintptr_t)KERNEL_SIG_STOP:
+	case __SIG_STOP:
 		xdecref_unlikely(action.sa_mask);
 		state = process_waitfor_SIG_CONT(state, W_STOPCODE(siginfo.si_signo));
 		return state;
@@ -516,15 +517,15 @@ NOTHROW(FCALL userexcept_exec_user_rpc)(/*in|out*/ struct rpc_context *__restric
 		 * `userexcept_raisesignal_from_exception()', but have to implement
 		 * signal action handling ourselves.
 		 *
-		 * This is required for signal actions such as KERNEL_SIG_CORE, or
-		 * KERNEL_SIG_STOP, which introduce  custom control routing  which
+		 * This is required for signal actions such as SIG_CORE, or
+		 * SIG_STOP, which introduce  custom control routing  which
 		 * could otherwise interfere with normal RPC handling. */
 		struct kernel_sigaction action;
 		assert(rpc->pr_psig.si_signo != 0);
 		assert(rpc->pr_psig.si_signo < NSIG);
 again_load_threadsig_action:
 		if (!THIS_SIGHAND_PTR) {
-			action.sa_handler = KERNEL_SIG_DFL;
+			action.sa_handler = SIG_DFL;
 			action.sa_flags   = 0;
 			action.sa_mask    = NULL;
 		} else {
@@ -540,26 +541,26 @@ again_load_threadsig_action:
 again_switch_action_handler:
 		switch ((uintptr_t)action.sa_handler) {
 
-		case (uintptr_t)KERNEL_SIG_DFL:
+		case __SIG_DFL:
 			action.sa_handler = sighand_default_action(rpc->pr_psig.si_signo);
 			goto again_switch_action_handler;
 
-		case (uintptr_t)KERNEL_SIG_IGN:
+		case __SIG_IGN:
 			/* Ignored */
 			break;
 
-		case (uintptr_t)KERNEL_SIG_CONT:
-			/* Undo the effects of `KERNEL_SIG_STOP' */
+		case __SIG_CONT:
+			/* Undo the effects of `SIG_STOP' */
 			if (error->ei_code == ERROR_CODEOF(_E_STOP_PROCESS))
 				error->ei_code = ERROR_CODEOF(E_OK);
 			break;
 
-		case (uintptr_t)KERNEL_SIG_TERM: {
+		case __SIG_TERM: {
 			error_code_t code;
 			code = ERROR_CODEOF(E_EXIT_PROCESS);
-			__IF0 { case (uintptr_t)KERNEL_SIG_EXIT: code = ERROR_CODEOF(E_EXIT_THREAD); }
-			__IF0 { case (uintptr_t)KERNEL_SIG_STOP: code = ERROR_CODEOF(_E_STOP_PROCESS); }
-			__IF0 { case (uintptr_t)KERNEL_SIG_CORE: code = ERROR_CODEOF(_E_CORE_PROCESS); }
+			__IF0 { case __SIG_EXIT: code = ERROR_CODEOF(E_EXIT_THREAD); }
+			__IF0 { case __SIG_STOP: code = ERROR_CODEOF(_E_STOP_PROCESS); }
+			__IF0 { case __SIG_CORE: code = ERROR_CODEOF(_E_CORE_PROCESS); }
 
 			/* If applicable, override the active return-exception. */
 			if (error_priority(error->ei_code) < error_priority(code)) {
@@ -567,11 +568,11 @@ again_switch_action_handler:
 				reason.w_status = W_EXITCODE(1, rpc->pr_psig.si_signo);
 				memset(error, 0, sizeof(struct exception_info));
 				error->ei_code = code;
-				if (action.sa_handler == KERNEL_SIG_CORE) {
+				if (action.sa_handler == SIG_CORE) {
 					error->ei_data.e_args.e_pointers[1] = rpc->pr_psig.si_errno;
 					error->ei_data.e_args.e_pointers[2] = rpc->pr_psig.si_code;
 					reason.w_status |= WCOREFLAG;
-				} else if (action.sa_handler == KERNEL_SIG_STOP) {
+				} else if (action.sa_handler == SIG_STOP) {
 					reason.w_status = W_STOPCODE(rpc->pr_psig.si_signo);
 				}
 				error->ei_data.e_args.e_pointers[0] = reason.w_status;
@@ -591,7 +592,7 @@ again_switch_action_handler:
 				/* When  `userexcept_callsignal_and_maybe_restart_syscall()'  returns `NULL',
 				 * a race condition is indicated where the user-defined signal action changed
 				 * before the handler function could be invoked.
-				 * This is important to ensure that `SIGACTION_SA_RESETHAND' works atomically. */
+				 * This is important to ensure that `SA_RESETHAND' works atomically. */
 				if (newstate == NULL)
 					goto again_load_threadsig_action;
 			} EXCEPT {

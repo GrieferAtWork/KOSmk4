@@ -19,25 +19,59 @@
  */
 #ifdef __INTELLISENSE__
 #include "coredump.c"
-#define DEFINE_COREDUMP32 1
-//#define DEFINE_COREDUMP64 1
+#define DEFINE_sys32_coredump
+//#define DEFINE_sys64_coredump
 #endif /* __INTELLISENSE__ */
 
-#include <alloca.h>
+#include <kernel/coredump.h>
+#include <kernel/except.h>
+#include <kernel/user.h>
+#include <sched/cred.h>
+#include <sched/rpc.h>
+#include <sched/signal.h>
+
+#include <hybrid/host.h>
+#include <hybrid/pointer.h>
+
+#include <asm/cpu-flags.h>
+#include <asm/registers.h>
+#include <bits/os/kos/siginfo-convert.h>
+#include <kos/bits/coredump.h>
+#include <kos/bits/coredump32.h>
+#include <kos/bits/exception_data-convert.h>
+#include <kos/bits/exception_data.h>
+#include <kos/bits/exception_data32.h>
 #include <kos/coredump.h>
+#include <kos/except/reason/inval.h>
+#include <kos/kernel/cpu-state-helpers.h>
+#include <kos/kernel/cpu-state-verify.h>
+#include <kos/kernel/cpu-state.h>
+#include <kos/kernel/cpu-state32.h>
+#include <sys/wait.h>
 
-#if (defined(DEFINE_COREDUMP32) + defined(DEFINE_COREDUMP64)) != 1
-#error "Must #define exactly one of DEFINE_COREDUMP32 or DEFINE_COREDUMP64"
-#endif
+#include <alloca.h>
+#include <assert.h>
+#include <malloca.h>
+#include <signal.h>
+#include <stddef.h>
+#include <string.h>
+
+#include <librpc/rpc.h>
+#include <libunwind/api.h>
+
+#if (defined(DEFINE_sys32_coredump) + \
+     defined(DEFINE_sys64_coredump)) != 1
+#error "Must #define exactly one of these"
+#endif /* ... */
 
 
-#ifdef DEFINE_COREDUMP32
+#ifdef DEFINE_sys32_coredump
 #define NAME(x)     x##32
 #define NAME2(x, y) x##32##y
-#else /* DEFINE_COREDUMP32 */
+#else /* DEFINE_sys32_coredump */
 #define NAME(x)     x##64
 #define NAME2(x, y) x##64##y
-#endif /* !DEFINE_COREDUMP32 */
+#endif /* !DEFINE_sys32_coredump */
 
 DECL_BEGIN
 
@@ -45,15 +79,15 @@ LOCAL void KCALL
 NAME(user_ucpu_from_ucpu)(struct icpustate const *__restrict return_state,
                           USER CHECKED struct NAME(ucpustate) const *ust,
                           struct ucpustate *__restrict result) {
-#ifdef DEFINE_COREDUMP32
+#ifdef DEFINE_sys32_coredump
 	ucpustate32_to_ucpustate(ust, result);
-#else /* DEFINE_COREDUMP32 */
+#else /* DEFINE_sys32_coredump */
 	ucpustate64_to_ucpustate(ust, result);
-#endif /* !DEFINE_COREDUMP32 */
+#endif /* !DEFINE_sys32_coredump */
 	cpustate_verify_userpflags(icpustate_getpflags(return_state),
 	                           ucpustate_getpflags(result),
 	                           cred_allow_eflags_modify_mask());
-#ifdef DEFINE_COREDUMP32
+#ifdef DEFINE_sys32_coredump
 	if (!icpustate_isvm86(return_state)) {
 		cpustate_verify_usercs(result->ucs_cs16);
 		cpustate_verify_userss(result->ucs_ss16);
@@ -62,7 +96,7 @@ NAME(user_ucpu_from_ucpu)(struct icpustate const *__restrict return_state,
 		cpustate_verify_useres(result->ucs_sgregs.sg_es16);
 		cpustate_verify_userds(result->ucs_sgregs.sg_ds16);
 	}
-#endif /* DEFINE_COREDUMP32 */
+#endif /* DEFINE_sys32_coredump */
 }
 
 INTERN struct icpustate *FCALL
@@ -236,5 +270,5 @@ DECL_END
 
 #undef NAME
 #undef NAME2
-#undef DEFINE_COREDUMP32
-#undef DEFINE_COREDUMP64
+#undef DEFINE_sys32_coredump
+#undef DEFINE_sys64_coredump

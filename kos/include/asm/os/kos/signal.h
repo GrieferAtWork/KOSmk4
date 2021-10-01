@@ -28,8 +28,8 @@
 /************************************************************************/
 
 /* Bits in `sa_flags'. */
-#define __SA_NOCLDSTOP __UINT32_C(0x00000001) /* Don't send SIGCHLD when children stop. */
-#define __SA_NOCLDWAIT __UINT32_C(0x00000002) /* Don't create zombie on child death. */
+#define __SA_NOCLDSTOP __UINT32_C(0x00000001) /* Don't send SIGCHLD when children stop (Ignored for anything other than SIGCLD). */
+#define __SA_NOCLDWAIT __UINT32_C(0x00000002) /* Don't create zombie on child death (Ignored for anything other than SIGCLD). */
 #define __SA_SIGINFO   __UINT32_C(0x00000004) /* Invoke signal-catching function with three arguments instead of one. */
 #define __SA_RESTORER  __UINT32_C(0x04000000) /* A custom signal restore function (`sa_restorer') was given.
                                                * This flag is set by libc, after having filled in the `sa_restorer' field.

@@ -95,12 +95,12 @@ DECL_BEGIN
 
 /* Update the given  `state' to raise  the specified `siginfo'  as
  * a user-space signal  within the calling  thread. The caller  is
- * responsible  to handle special signal handlers (`KERNEL_SIG_*')
+ * responsible  to handle special signal handlers (`SIG_*')
  * before calling this function! This function should only be used
  * to  enqueue the execution of a signal handler with a user-space
  * entry point.
  *
- * Functionality like `SIGACTION_SA_RESETHAND', or system call
+ * Functionality like `SA_RESETHAND', or system call
  * restart  selection  must  be  implemented  by  the  caller.
  *
  * @param: state:   The CPU state describing the return to user-space.
@@ -136,7 +136,7 @@ LOCAL_userexcept_callsignal(struct icpustate *__restrict state,
 
 	/* Figure out how, and if we need to mask signals. */
 	must_restore_sigmask = false;
-	if (action->sa_mask || !(action->sa_flags & SIGACTION_SA_NODEFER)) {
+	if (action->sa_mask || !(action->sa_flags & SA_NODEFER)) {
 #ifdef CONFIG_HAVE_USERPROCMASK
 		if (PERTASK_GET(this_task.t_flags) & TASK_FUSERPROCMASK) {
 			/* NOTE: The below code is _very_ careful not to modify the userprocmask
@@ -149,8 +149,8 @@ LOCAL_userexcept_callsignal(struct icpustate *__restrict state,
 			validate_readwrite(umask, sizeof(sigset_t));
 			memcpy(&old_sigmask, umask, sizeof(sigset_t));
 
-			/* Unless `SIGACTION_SA_NODEFER' is set, mask the signal that is being invoked. */
-			if (!(action->sa_flags & SIGACTION_SA_NODEFER) &&
+			/* Unless `SA_NODEFER' is set, mask the signal that is being invoked. */
+			if (!(action->sa_flags & SA_NODEFER) &&
 			    !sigismember(&old_sigmask, siginfo->si_signo)) {
 				sigaddset(umask, siginfo->si_signo);
 				must_restore_sigmask = true;
@@ -180,8 +180,8 @@ LOCAL_userexcept_callsignal(struct icpustate *__restrict state,
 			memcpy(&old_sigmask, tls_sigmask, sizeof(sigset_t));
 			memcpy(&new_sigmask, tls_sigmask, sizeof(sigset_t));
 
-			/* Unless `SIGACTION_SA_NODEFER' is set, mask the signal that is being invoked. */
-			if (!(action->sa_flags & SIGACTION_SA_NODEFER))
+			/* Unless `SA_NODEFER' is set, mask the signal that is being invoked. */
+			if (!(action->sa_flags & SA_NODEFER))
 				sigaddset(&new_sigmask, siginfo->si_signo);
 
 			/* Signal  actions are allowed  to define a secondary  set of signal numbers
@@ -217,7 +217,7 @@ LOCAL_userexcept_callsignal(struct icpustate *__restrict state,
 	orig_usp = (USER CHECKED byte_t *)icpustate_getusersp(state);
 	usp      = orig_usp;
 	/* Check if sigaltstack should be used. */
-	if (action->sa_flags & SIGACTION_SA_ONSTACK) {
+	if (action->sa_flags & SA_ONSTACK) {
 		/* TODO: SS_AUTODISARM */
 		usp = (USER CHECKED byte_t *)PERTASK_GET(this_user_except_handler.ueh_stack);
 	}
@@ -237,14 +237,14 @@ LOCAL_userexcept_callsignal(struct icpustate *__restrict state,
 	/* At this point, the following options affect how we need to set up the stack:
 	 *  - sc_info:                                  When non-NULL, we must restart an interrupted system call
 	 *  - must_restore_sigmask:                     When true, we must restore `old_sigmask'
-	 *  - action->sa_flags & SIGACTION_SA_SIGINFO:  When true, we must invoke a 3-argument handler
-	 *  - action->sa_flags & SIGACTION_SA_RESTORER: When true, we must have the handler return to `sa_restore' */
+	 *  - action->sa_flags & SA_SIGINFO:  When true, we must invoke a 3-argument handler
+	 *  - action->sa_flags & SA_RESTORER: When true, we must have the handler return to `sa_restore' */
 
 	user_siginfo  = NULL;
 	user_ucontext = NULL;
 	user_sigset   = NULL;
 	user_fpustate = NULL;
-	if (action->sa_flags & SIGACTION_SA_SIGINFO) {
+	if (action->sa_flags & SA_SIGINFO) {
 		/* In 3-argument mode, we always have to push everything... */
 		STATIC_ASSERT(LOCAL_SIX_USER_MAX_SIZE >= LOCAL_SIX_KERNEL_MAX_SIZE);
 		STATIC_ASSERT(LOCAL_SIX_KERNEL_MAX_SIZE == sizeof(LOCAL_siginfo_t));
@@ -387,7 +387,7 @@ LOCAL_userexcept_callsignal(struct icpustate *__restrict state,
 	 * >>     RESTART_SYSTEM_CALL(user_sc_info);
 	 */
 
-	if (action->sa_flags & SIGACTION_SA_RESTORER) {
+	if (action->sa_flags & SA_RESTORER) {
 		user_rstor = (LOCAL_uintptr_t)(uintptr_t)action->sa_restore;
 	} else {
 		/* Must push assembly onto the user-stack:
@@ -424,12 +424,12 @@ LOCAL_userexcept_callsignal(struct icpustate *__restrict state,
 	validate_writable(usp, 8);
 	((u64 *)usp)[0] = (u64)user_rstor;                               /* Return address */
 	gpregs_setpdi(&state->ics_gpregs, (uintptr_t)siginfo->si_signo); /* signo_t signo */
-	if (action->sa_flags & SIGACTION_SA_SIGINFO) {
+	if (action->sa_flags & SA_SIGINFO) {
 		gpregs_setpsi(&state->ics_gpregs, (uintptr_t)user_siginfo);  /* siginfo64_t *info */
 		gpregs_setpdx(&state->ics_gpregs, (uintptr_t)user_ucontext); /* struct ucontext64 *ctx */
 	}
 #else /* DEFINE_x86_userexcept_callsignal64 */
-	if (action->sa_flags & SIGACTION_SA_SIGINFO) {
+	if (action->sa_flags & SA_SIGINFO) {
 		usp -= 4 * sizeof(u32);
 		validate_writable(usp, 4 * sizeof(u32));
 		((u32 *)usp)[0] = (u32)user_rstor;               /* Return address */

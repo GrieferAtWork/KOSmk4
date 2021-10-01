@@ -100,7 +100,13 @@ task_rpc_exec(struct task *__restrict thread, syscall_ulong_t flags,
 	assertf((flags & (RPC_SYNCMODE_F_SYSRET | RPC_SYNCMODE_F_USER)) != RPC_SYNCMODE_F_SYSRET,
 	        "Invalid flags: %#" PRIxPTR " (`RPC_SYNCMODE_F_SYSRET' requires `RPC_SYNCMODE_F_USER')", flags);
 	if (flags & RPC_SYNCMODE_F_ALLOW_ASYNC) {
-		/* TODO: Async RPCs are scheduled entirely different from regular ones! */
+		/* TODO: Async RPCs are scheduled entirely different from regular ones:
+		 *        - Send IPI to correct CPU
+		 *        - Update scpustate of target thread via `task_asyncrpc_push()',
+		 *          unless target is THIS_TASK,  where invocation is either  done
+		 *          with  IPI-icpustate,  or via  `task_asyncrpc_execnow()' (when
+		 *          no  IPI had to  be used because the  target CPU didn't differ
+		 *          from that of the original sender) */
 		THROW(E_NOT_IMPLEMENTED_TODO);
 	}
 
@@ -625,6 +631,11 @@ NOTHROW(FCALL proc_rpc_pending_trysteal_posix_signal)(sigset_t const *__restrict
 PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) rpc_cpustate_t *FCALL
 task_userrpc_runprogram(rpc_cpustate_t *__restrict state, struct pending_user_rpc const *__restrict rpc,
                         unsigned int reason, struct rpc_syscall_info const *sc_info) {
+	(void)state;
+	(void)rpc;
+	(void)reason;
+	(void)sc_info;
+	THROW(E_NOT_IMPLEMENTED_TODO);
 	/* TODO */
 	return state;
 }

@@ -445,7 +445,7 @@ again_gethand:
 	assert(siginfo->si_signo != 0);
 	assert(siginfo->si_signo < NSIG);
 	if (!THIS_SIGHAND_PTR) {
-		action.sa_handler = KERNEL_SIG_DFL;
+		action.sa_handler = SIG_DFL;
 		action.sa_flags   = 0;
 		action.sa_mask    = NULL;
 	} else {
@@ -456,17 +456,14 @@ again_gethand:
 	}
 
 	/* Check for special signal handlers. */
-	if (action.sa_handler == KERNEL_SIG_DFL)
+	if (action.sa_handler == SIG_DFL)
 		action.sa_handler = sighand_default_action(siginfo->si_signo);
 	switch ((uintptr_t)(void *)action.sa_handler) {
 
-#undef __CCAST
-#define __CCAST(T) /* nothing */
-
-	case KERNEL_SIG_IGN:
+	case __SIG_IGN:
 		xdecref_unlikely(action.sa_mask);
 #if 0 /* `SA_RESETHAND' only affects user-space signal handler functions */
-		if ((action.sa_flags & SIGACTION_SA_RESETHAND) &&
+		if ((action.sa_flags & SA_RESETHAND) &&
 		    unlikely(!sighand_reset_handler(siginfo->si_signo, &action)))
 			goto again_gethand;
 #endif
@@ -474,7 +471,7 @@ again_gethand:
 			state = userexcept_seterrno(state, sc_info, &except_info->ei_data);
 		return state;
 
-	case KERNEL_SIG_CORE:
+	case __SIG_CORE:
 		xdecref_unlikely(action.sa_mask);
 		if (except_info) {
 			/* If we've gotten here because of a system call, then we can assume that
@@ -486,18 +483,18 @@ again_gethand:
 		}
 		process_exit(W_EXITCODE(1, siginfo->si_signo) | WCOREFLAG);
 
-	case KERNEL_SIG_TERM:
+	case __SIG_TERM:
 		xdecref_unlikely(action.sa_mask);
 		process_exit(W_EXITCODE(1, siginfo->si_signo));
 
-	case KERNEL_SIG_EXIT:
+	case __SIG_EXIT:
 		xdecref_unlikely(action.sa_mask);
 		task_exit(W_EXITCODE(1, siginfo->si_signo));
 
-	case KERNEL_SIG_CONT:
+	case __SIG_CONT:
 		xdecref_unlikely(action.sa_mask);
 #if 0 /* `SA_RESETHAND' only affects user-space signal handler functions */
-		if ((action.sa_flags & SIGACTION_SA_RESETHAND) &&
+		if ((action.sa_flags & SA_RESETHAND) &&
 		    unlikely(!sighand_reset_handler(siginfo->si_signo, &action)))
 			goto again_gethand;
 #endif
@@ -505,11 +502,11 @@ again_gethand:
 		task_sigcont(THIS_TASK);
 		return state;
 
-	case KERNEL_SIG_STOP:
-		/* TODO: Mask additional signals by looking at `SIGACTION_SA_NODEFER' and `action.sa_mask' */
+	case __SIG_STOP:
+		/* TODO: Mask additional signals by looking at `SA_NODEFER' and `action.sa_mask' */
 		xdecref_unlikely(action.sa_mask);
 #if 0 /* `SA_RESETHAND' only affects user-space signal handler functions */
-		if ((action.sa_flags & SIGACTION_SA_RESETHAND) &&
+		if ((action.sa_flags & SA_RESETHAND) &&
 			unlikely(!sighand_reset_handler(siginfo->si_signo, &action)))
 			goto again_gethand;
 #endif
@@ -517,8 +514,6 @@ again_gethand:
 		task_sigstop(W_STOPCODE(siginfo->si_signo));
 		return state;
 
-#undef __CCAST
-#define __CCAST(T) (T)
 	default: break;
 	}
 

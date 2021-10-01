@@ -30,20 +30,20 @@
 /************************************************************************/
 
 /* Bits in `sa_flags'. */
-#define __SA_NOCLDSTOP 0x00000001 /* Don't send SIGCHLD when children stop. */
-#define __SA_NOCLDWAIT 0x00000002 /* Don't create zombie on child death. */
-#define __SA_SIGINFO   0x00000004 /* Invoke signal-catching function with three arguments instead of one. */
-#define __SA_RESTORER  0x04000000 /* A custom signal restore function (`sa_restorer') was given.
-                                   * This flag is set by libc, after having filled in the `sa_restorer' field.
-                                   * NOTE: On x86, the kernel assumes that this points to a function:
-                                   * >> sa_restorer:
-                                   * >>     movl   $SYS_sigreturn, %eax
-                                   * >>     int    $0x80 */
-#define __SA_ONSTACK   0x20000000 /* Execute the handler on sigaltstack. */
-#define __SA_RESTART   0x10000000 /* Restart restartable syscall on signal return. */
-#define __SA_NODEFER   0x40000000 /* Don't automatically block the signal when its handler is being executed. */
-#define __SA_RESETHAND 0x80000000 /* Reset to SIG_DFL on entry to handler. */
-#define __SA_INTERRUPT 0x20000000 /* Historical no-op. */
+#define __SA_NOCLDSTOP __UINT32_C(0x00000001) /* Don't send SIGCHLD when children stop (Ignored for anything other than SIGCLD). */
+#define __SA_NOCLDWAIT __UINT32_C(0x00000002) /* Don't create zombie on child death (Ignored for anything other than SIGCLD). */
+#define __SA_SIGINFO   __UINT32_C(0x00000004) /* Invoke signal-catching function with three arguments instead of one. */
+#define __SA_RESTORER  __UINT32_C(0x04000000) /* A custom signal restore function (`sa_restorer') was given.
+                                               * This flag is set by libc, after having filled in the `sa_restorer' field.
+                                               * NOTE: On x86, the kernel assumes that this points to a function:
+                                               * >> sa_restorer:
+                                               * >>     movl   $SYS_sigreturn, %eax
+                                               * >>     int    $0x80 */
+#define __SA_ONSTACK   __UINT32_C(0x20000000) /* Execute the handler on sigaltstack. */
+#define __SA_RESTART   __UINT32_C(0x10000000) /* Restart restartable syscall on signal return. */
+#define __SA_NODEFER   __UINT32_C(0x40000000) /* Don't automatically block the signal when its handler is being executed. */
+#define __SA_RESETHAND __UINT32_C(0x80000000) /* Reset to SIG_DFL on entry to handler. */
+#define __SA_INTERRUPT __UINT32_C(0x20000000) /* Historical no-op. */
 
 /* Values for the HOW argument to `sigprocmask'. */
 #define __SIG_BLOCK   0 /* Block signals. */

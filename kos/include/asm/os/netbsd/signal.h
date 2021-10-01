@@ -26,13 +26,13 @@
 /* NetBSD                                                               */
 /************************************************************************/
 
-#define __SA_ONSTACK    0x0001
-#define __SA_RESTART    0x0002
-#define __SA_RESETHAND  0x0004
-#define __SA_NODEFER    0x0010
-#define __SA_NOCLDSTOP  0x0008
-#define __SA_NOCLDWAIT  0x0020
-#define __SA_SIGINFO    0x0040
+#define __SA_ONSTACK    0x0001 /* Execute the handler on sigaltstack. */
+#define __SA_RESTART    0x0002 /* Restart restartable syscall on signal return. */
+#define __SA_RESETHAND  0x0004 /* Reset to SIG_DFL on entry to handler. */
+#define __SA_NOCLDSTOP  0x0008 /* Don't send SIGCHLD when children stop (Ignored for anything other than SIGCLD). */
+#define __SA_NODEFER    0x0010 /* Don't automatically block the signal when its handler is being executed. */
+#define __SA_NOCLDWAIT  0x0020 /* Don't create zombie on child death (Ignored for anything other than SIGCLD). */
+#define __SA_SIGINFO    0x0040 /* Invoke signal-catching function with three arguments instead of one. */
 #define __SA_NOKERNINFO 0x0080
 
 #define __SIG_BLOCK   1

@@ -1080,12 +1080,12 @@ again_lock_ptr_for_copy:
 }
 
 
-/* Return the default action to perform when faced with `signo' configured as `KERNEL_SIG_DFL'
- * @return: * : One of `KERNEL_SIG_*' (excluding `KERNEL_SIG_DFL' and `KERNEL_SIG_GET') */
+/* Return the default action to perform when faced with `signo' configured as `SIG_DFL'
+ * @return: * : One of `SIG_*' (excluding `SIG_DFL' and `SIG_GET') */
 PUBLIC NOBLOCK WUNUSED ATTR_CONST user_sighandler_func_t
 NOTHROW(KCALL sighand_default_action)(signo_t signo) {
 	user_sighandler_func_t result;
-	result = KERNEL_SIG_IGN;
+	result = SIG_IGN;
 	switch (signo) {
 
 	case SIGQUIT:
@@ -1104,7 +1104,7 @@ NOTHROW(KCALL sighand_default_action)(signo_t signo) {
 #if defined(SIGUNUSED) && SIGUNUSED != SIGSYS
 	case SIGUNUSED:
 #endif /* SIGUNUSED != SIGSYS */
-		result = KERNEL_SIG_CORE;
+		result = SIG_CORE;
 		break;
 
 	case SIGHUP:
@@ -1129,18 +1129,18 @@ NOTHROW(KCALL sighand_default_action)(signo_t signo) {
 #ifdef SIGLOST
 	case SIGLOST:
 #endif /* SIGLOST */
-		result = KERNEL_SIG_TERM;
+		result = SIG_TERM;
 		break;
 
 	case SIGCONT:
-		result = KERNEL_SIG_CONT;
+		result = SIG_CONT;
 		break;
 
 	case SIGSTOP:
 	case SIGTSTP:
 	case SIGTTIN:
 	case SIGTTOU:
-		result = KERNEL_SIG_STOP;
+		result = SIG_STOP;
 		break;
 
 	default: break;
@@ -1152,7 +1152,7 @@ NOTHROW(KCALL sighand_default_action)(signo_t signo) {
 
 /* Reset  the current handler for `signo' when  `current_action' matches the currently set action.
  * This function should be called by kernel-space signal delivery implementations to implement the
- * behavior of `SIGACTION_SA_RESETHAND' when handling a signal.
+ * behavior of `SA_RESETHAND' when handling a signal.
  * @return: true:  Successfully reset the handler
  * @return: false: The given `current_action' didn't match the currently set action. */
 PUBLIC bool KCALL
@@ -1330,7 +1330,7 @@ again_gethand:
 		/* Default action. */
 default_action:
 		memset(&action, 0, sizeof(action));
-		assert(action.sa_handler == KERNEL_SIG_DFL);
+		assert(action.sa_handler == SIG_DFL);
 	} else {
 		memcpy(&action,
 		       &myhand->sh_actions[info->sqe_info.si_signo - 1],
@@ -1339,42 +1339,39 @@ default_action:
 		sync_endread(myhand);
 	}
 	/* Check for default signal action. */
-	if (action.sa_handler == KERNEL_SIG_DFL)
+	if (action.sa_handler == SIG_DFL)
 		action.sa_handler = sighand_default_action(info->sqe_info.si_signo);
 
 	/* Actually handle the signal */
 	switch ((uintptr_t)(void *)action.sa_handler) {
 
-#undef __CCAST
-#define __CCAST(T) /* nothing */
-
-	case KERNEL_SIG_IGN:
+	case __SIG_IGN:
 		xdecref_unlikely(action.sa_mask);
 #if 0 /* `SA_RESETHAND' only affects user-space signal handler functions */
-		if ((action.sa_flags & SIGACTION_SA_RESETHAND) &&
+		if ((action.sa_flags & SA_RESETHAND) &&
 		    unlikely(!sighand_reset_handler(info->sqe_info.si_signo, &action)))
 			goto again_gethand;
 #endif
 		goto dont_handle;
 
-	case KERNEL_SIG_CORE:
+	case __SIG_CORE:
 		xdecref_unlikely(action.sa_mask);
 		/* Create a coredump */
 		coredump_create_for_signal(state, &info->sqe_info);
 		THROW(E_EXIT_PROCESS, W_EXITCODE(1, info->sqe_info.si_signo));
 
-	case KERNEL_SIG_TERM:
+	case __SIG_TERM:
 		xdecref_unlikely(action.sa_mask);
 		THROW(E_EXIT_PROCESS, W_EXITCODE(1, info->sqe_info.si_signo));
 
-	case KERNEL_SIG_EXIT:
+	case __SIG_EXIT:
 		xdecref_unlikely(action.sa_mask);
 		THROW(E_EXIT_THREAD, W_EXITCODE(1, info->sqe_info.si_signo));
 
-	case KERNEL_SIG_CONT:
+	case __SIG_CONT:
 		xdecref_unlikely(action.sa_mask);
 #if 0 /* `SA_RESETHAND' only affects user-space signal handler functions */
-		if ((action.sa_flags & SIGACTION_SA_RESETHAND) &&
+		if ((action.sa_flags & SA_RESETHAND) &&
 		    unlikely(!sighand_reset_handler(info->sqe_info.si_signo, &action)))
 			goto again_gethand;
 #endif
@@ -1382,12 +1379,12 @@ default_action:
 		task_sigcont(THIS_TASK);
 		goto dont_handle;
 
-	case KERNEL_SIG_STOP:
+	case __SIG_STOP:
 		/* XXX: Should we  mask additional  signals by  looking
-		 *      at `SIGACTION_SA_NODEFER' and `action.sa_mask'? */
+		 *      at `SA_NODEFER' and `action.sa_mask'? */
 		xdecref_unlikely(action.sa_mask);
 #if 0 /* `SA_RESETHAND' only affects user-space signal handler functions */
-		if ((action.sa_flags & SIGACTION_SA_RESETHAND) &&
+		if ((action.sa_flags & SA_RESETHAND) &&
 		    unlikely(!sighand_reset_handler(info->sqe_info.si_signo, &action)))
 			goto again_gethand;
 #endif
@@ -1395,8 +1392,6 @@ default_action:
 		task_sigstop(W_STOPCODE(info->sqe_info.si_signo));
 		goto dont_handle;
 
-#undef __CCAST
-#define __CCAST(T) (T)
 	default: break;
 	}
 	/* Raise the given signal in user-space. */
@@ -1411,7 +1406,7 @@ default_action:
 	}
 	xdecref_unlikely(action.sa_mask);
 	if unlikely(!state)
-		goto again_gethand; /* SIGACTION_SA_RESETHAND... */
+		goto again_gethand; /* SA_RESETHAND... */
 dont_handle:
 	return state;
 }
@@ -1987,14 +1982,14 @@ again_scan_prqueue:
 
 
 
-STATIC_ASSERT(SIGACTION_SA_NOCLDSTOP == SA_NOCLDSTOP);
-STATIC_ASSERT(SIGACTION_SA_NOCLDWAIT == SA_NOCLDWAIT);
-STATIC_ASSERT(SIGACTION_SA_SIGINFO == SA_SIGINFO);
-STATIC_ASSERT(SIGACTION_SA_RESTORER == SA_RESTORER);
-STATIC_ASSERT(SIGACTION_SA_ONSTACK == SA_ONSTACK);
-STATIC_ASSERT(SIGACTION_SA_RESTART == SA_RESTART);
-STATIC_ASSERT(SIGACTION_SA_NODEFER == SA_NODEFER);
-STATIC_ASSERT(SIGACTION_SA_RESETHAND == SA_RESETHAND);
+STATIC_ASSERT(SA_NOCLDSTOP == SA_NOCLDSTOP);
+STATIC_ASSERT(SA_NOCLDWAIT == SA_NOCLDWAIT);
+STATIC_ASSERT(SA_SIGINFO == SA_SIGINFO);
+STATIC_ASSERT(SA_RESTORER == SA_RESTORER);
+STATIC_ASSERT(SA_ONSTACK == SA_ONSTACK);
+STATIC_ASSERT(SA_RESTART == SA_RESTART);
+STATIC_ASSERT(SA_NODEFER == SA_NODEFER);
+STATIC_ASSERT(SA_RESETHAND == SA_RESETHAND);
 
 /* Check  if  `self' contains  any handlers  set to
  * SIG_IGN that wouldn't be set as such by default. */
@@ -2003,10 +1998,10 @@ NOTHROW(FCALL sighand_has_nondefault_sig_ign)(struct sighand const *__restrict s
 	unsigned int i;
 	for (i = 0; i < NSIG - 1; ++i) {
 		/* Check if the handler's action is SIG_IGN */
-		if (self->sh_actions[i].sa_handler != KERNEL_SIG_IGN)
+		if (self->sh_actions[i].sa_handler != SIG_IGN)
 			continue; /* Something other than SIG_IGN */
 		/* Check if the default action is something other than SIG_IGN */
-		if (sighand_default_action(i + 1) == KERNEL_SIG_IGN)
+		if (sighand_default_action(i + 1) == SIG_IGN)
 			continue; /* Default would also be SIG_IGN */
 		/* Found one! */
 		return true;
@@ -2035,7 +2030,7 @@ INTERN void KCALL onexec_posix_signals_reset_action(void) {
 			goto done_handptr;
 		}
 		/* We have to create a new, custom set of signal handlers... */
-		/* NOTE: Use GFP_CALLOC because `KERNEL_SIG_DFL = 0', and we only
+		/* NOTE: Use GFP_CALLOC because `SIG_DFL = 0', and we only
 		 *       need to inherit handlers  that were marked as  `SIG_IGN' */
 		newhand = (REF struct sighand *)kmalloc_nx(sizeof(struct sighand),
 		                                           GFP_CALLOC | GFP_ATOMIC);
@@ -2066,8 +2061,8 @@ INTERN void KCALL onexec_posix_signals_reset_action(void) {
 		 * Especially of note is that we also don't copy signal masks,
 		 * since  those wouldn't actually matter for SIG_IGN handlers. */
 		for (i = 0; i < NSIG - 1; ++i) {
-			if (hand->sh_actions[i].sa_handler == KERNEL_SIG_IGN)
-				newhand->sh_actions[i].sa_handler = KERNEL_SIG_IGN;
+			if (hand->sh_actions[i].sa_handler == SIG_IGN)
+				newhand->sh_actions[i].sa_handler = SIG_IGN;
 		}
 		atomic_rwlock_cinit(&newhand->sh_lock);
 		newhand->sh_share = 1;
@@ -2154,7 +2149,6 @@ task_raisesignalthread(struct task *__restrict target,
 		THROWS(E_BADALLOC, E_WOULDBLOCK, E_INVALID_ARGUMENT_BAD_VALUE,
 		       E_INTERRUPT_USER_RPC, E_SEGFAULT) {
 #ifdef CONFIG_USE_NEW_RPC
-	bool result;
 	struct pending_rpc *rpc;
 	rpc = pending_rpc_alloc_psig(GFP_NORMAL);
 
@@ -2583,7 +2577,6 @@ task_raisesignalprocess(struct task *__restrict target,
 		THROWS(E_BADALLOC, E_WOULDBLOCK, E_INVALID_ARGUMENT_BAD_VALUE,
 		       E_INTERRUPT_USER_RPC, E_SEGFAULT) {
 #ifdef CONFIG_USE_NEW_RPC
-	bool result;
 	struct pending_rpc *rpc;
 	rpc = pending_rpc_alloc_psig(GFP_NORMAL);
 
@@ -2861,7 +2854,7 @@ no_old_handler:
 		nhandler.sa_flags   = act->sa_flags;
 		COMPILER_READ_BARRIER();
 #ifndef KERNELSPACE_HIGHMEM
-		if ((uintptr_t)nhandler.sa_handler >= (uintptr_t)KERNEL_SIG_GET)
+		if ((uintptr_t)nhandler.sa_handler >= __SIG_GET)
 #endif /* !KERNELSPACE_HIGHMEM */
 		{
 			validate_executable((void const *)nhandler.sa_handler);
@@ -3027,7 +3020,7 @@ DEFINE_SYSCALL2(sighandler_t, signal,
                 signo_t, signo,
                 UNCHECKED USER sighandler_t, handler) {
 	struct sigaction oact, act;
-	if (handler == KERNEL_SIG_GET) {
+	if (handler == SIG_GET) {
 		do_sigaction(signo, NULL, &oact);
 	} else {
 		memset(&act, 0, sizeof(act));
@@ -3043,7 +3036,7 @@ DEFINE_COMPAT_SYSCALL2(sighandler_t, signal,
                        compat_signo_t, signo,
                        UNCHECKED USER sighandler_t, handler) {
 	struct sigaction oact, act;
-	if (handler == KERNEL_SIG_GET) {
+	if (handler == SIG_GET) {
 		do_sigaction(signo, NULL, &oact);
 	} else {
 		memset(&act, 0, sizeof(act));

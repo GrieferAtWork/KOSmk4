@@ -170,6 +170,9 @@ __SYSDECL_BEGIN
 #if !defined(SIG_CORE) && defined(__SIG_CORE)
 #define SIG_CORE (__CCAST(__sighandler_t)__SIG_CORE) /* Create a coredump and terminate. */
 #endif /* !SIG_CORE && __SIG_CORE */
+#if !defined(SIG_GET) && defined(__SIG_GET)
+#define SIG_GET  (__CCAST(__sighandler_t)__SIG_GET)  /* Only get the current handler (accepted by `signal(2)') */
+#endif /* !SIG_GET && __SIG_GET */
 #endif /* __USE_KOS */
 
 
@@ -325,10 +328,10 @@ __SYSDECL_BEGIN
 #ifdef __USE_POSIX
 /* Bits in `sa_flags'. */
 #if !defined(SA_NOCLDSTOP) && defined(__SA_NOCLDSTOP)
-#define SA_NOCLDSTOP __SA_NOCLDSTOP /* Don't send SIGCHLD when children stop. */
+#define SA_NOCLDSTOP __SA_NOCLDSTOP /* Don't send SIGCHLD when children stop (Ignored for anything other than SIGCLD). */
 #endif /* !SA_NOCLDSTOP && __SA_NOCLDSTOP */
 #if !defined(SA_NOCLDWAIT) && defined(__SA_NOCLDWAIT)
-#define SA_NOCLDWAIT __SA_NOCLDWAIT /* Don't create zombie on child death. */
+#define SA_NOCLDWAIT __SA_NOCLDWAIT /* Don't create zombie on child death (Ignored for anything other than SIGCLD). */
 #endif /* !SA_NOCLDWAIT && __SA_NOCLDWAIT */
 #if !defined(SA_SIGINFO) && defined(__SA_SIGINFO)
 #define SA_SIGINFO __SA_SIGINFO /* Invoke signal-catching function with three arguments instead of one. */

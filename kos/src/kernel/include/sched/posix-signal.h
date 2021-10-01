@@ -50,40 +50,16 @@
 #define sigmask_check_after_syscall(syscall_result) userexcept_sysret_inject_self() /* !DEPREACTED! */
 #endif /* CONFIG_USE_NEW_RPC */
 
-DECL_BEGIN
 
 #ifndef NSIG
 #define NSIG __NSIG
 #endif /* !NSIG */
 
-#define SIGACTION_SA_NOCLDSTOP 0x00000001 /* Don't send SIGCHLD when children stop (Ignored for anything other than SIGCLD). */
-#define SIGACTION_SA_NOCLDWAIT 0x00000002 /* Don't create zombie on child death (Ignored for anything other than SIGCLD). */
-#define SIGACTION_SA_SIGINFO   0x00000004 /* Invoke signal-catching function with three arguments instead of one. */
-#define SIGACTION_SA_RESTORER  0x04000000 /* A user-supplied signal restore function was given. */
-#define SIGACTION_SA_ONSTACK   0x08000000 /* Execute the handler on sigaltstack. */
-#define SIGACTION_SA_RESTART   0x10000000 /* Restart restartable syscall on signal return. */
-#define SIGACTION_SA_NODEFER   0x40000000 /* Don't automatically block the signal when its handler is being executed. */
-#define SIGACTION_SA_RESETHAND 0x80000000 /* Delete the handler before it gets invoked. */
-
-/* Special signal action functions. */
-#define KERNEL_SIG_DFL   (__CCAST(user_sighandler_func_t)0)  /* [ACT] Default action. */
-#define KERNEL_SIG_IGN   (__CCAST(user_sighandler_func_t)1)  /* [ACT] Ignore signal. */
-/*      KERNEL_SIG_      (__CCAST(user_sighandler_func_t)2)   * Unused in kernel-space (is `SIG_HOLD' in user-space) */
-#define KERNEL_SIG_TERM  (__CCAST(user_sighandler_func_t)3)  /* [ACT] Terminate the receiving process. */
-#define KERNEL_SIG_EXIT  (__CCAST(user_sighandler_func_t)4)  /* [ACT] Terminate the receiving thread. */
-/*      KERNEL_SIG_      (__CCAST(user_sighandler_func_t)5)   * ... */
-/*      KERNEL_SIG_      (__CCAST(user_sighandler_func_t)6)   * ... */
-/*      KERNEL_SIG_      (__CCAST(user_sighandler_func_t)7)   * ... */
-#define KERNEL_SIG_CONT  (__CCAST(user_sighandler_func_t)8)  /* [ACT] Continue execution. */
-#define KERNEL_SIG_STOP  (__CCAST(user_sighandler_func_t)9)  /* [ACT] Suspend execution. */
-#define KERNEL_SIG_CORE  (__CCAST(user_sighandler_func_t)10) /* [ACT] Create a coredump and terminate. */
-#define KERNEL_SIG_GET   (__CCAST(user_sighandler_func_t)11) /* Only get the current handler (accepted by `signal(2)') */
-
-
 #define SIZEOF_USER_SIGINFO_T    __SI_USER_MAX_SIZE
 #define SIZEOF_KERNEL_SIGINFO_T  __SI_KERNEL_MAX_SIZE
 
 #ifdef __CC__
+DECL_BEGIN
 
 #ifndef __sigset_t_defined
 #define __sigset_t_defined
@@ -238,11 +214,11 @@ NOTHROW(FCALL sigmask_ismasked_in)(struct task *__restrict self, signo_t signo);
 /************************************************************************/
 struct kernel_sigaction {
 	union {
-		USER CHECKED user_sighandler_func_t sa_handler;   /* [1..1][valid_if(!SIGACTION_SA_ONSTACK)] Normal signal handler */
-		USER CHECKED user_sigaction_func_t  sa_sigaction; /* [1..1][valid_if(SIGACTION_SA_ONSTACK)] Extended signal handler */
+		USER CHECKED user_sighandler_func_t sa_handler;   /* [1..1][valid_if(!SA_ONSTACK)] Normal signal handler */
+		USER CHECKED user_sigaction_func_t  sa_sigaction; /* [1..1][valid_if(SA_ONSTACK)] Extended signal handler */
 	};
-	USER CHECKED user_sigrestore_func_t     sa_restore;   /* [1..1][valid_if(SIGACTION_SA_RESTORER)] Signal handler restore function. */
-	uintptr_t                               sa_flags;     /* Signal handler flags (Set of `SIGACTION_SA_*'). */
+	USER CHECKED user_sigrestore_func_t     sa_restore;   /* [1..1][valid_if(SA_RESTORER)] Signal handler restore function. */
+	uintptr_t                               sa_flags;     /* Signal handler flags (Set of `SA_*'). */
 	REF struct kernel_sigmask              *sa_mask;      /* [0..1] Mask of additional signals to block during execution of the handler
 	                                                       * NOTE:  When   NULL,   no   additional  signals   been   to   be   blocked.
 	                                                       * NOTE:  The pointed-to  mask is [const]  if its reference  counter is `> 1' */
@@ -325,15 +301,15 @@ sighand_ptr_lockread(struct sighand_ptr *__restrict ptr)
 FUNDEF ATTR_RETNONNULL struct sighand *KCALL
 sighand_ptr_lockwrite(void) THROWS(E_WOULDBLOCK, E_BADALLOC);
 
-/* Return the default action to perform when faced with `signo' configured as `KERNEL_SIG_DFL'
- * @return: * : One of `KERNEL_SIG_*' (excluding `KERNEL_SIG_DFL' and `KERNEL_SIG_GET') */
+/* Return the default action to perform when faced with `signo' configured as `SIG_DFL'
+ * @return: * : One of `SIG_*' (excluding `SIG_DFL' and `SIG_GET') */
 FUNDEF NOBLOCK WUNUSED ATTR_CONST user_sighandler_func_t
 NOTHROW(KCALL sighand_default_action)(signo_t signo);
 
 
 /* Reset  the current handler for `signo' when  `current_action' matches the currently set action.
  * This function should be called by kernel-space signal delivery implementations to implement the
- * behavior of `SIGACTION_SA_RESETHAND' when handling a signal.
+ * behavior of `SA_RESETHAND' when handling a signal.
  * @return: true:  Successfully reset the handler
  * @return: false: The given `current_action' didn't match the currently set action. */
 FUNDEF bool KCALL
@@ -423,7 +399,7 @@ struct icpustate;
 struct rpc_syscall_info;
 /* Update the given  `state' to raise  the specified `siginfo'  as
  * a user-space signal  within the calling  thread. The caller  is
- * responsible  to handle special signal handlers (`KERNEL_SIG_*')
+ * responsible  to handle special signal handlers (`SIG_*')
  * before calling this function! This function should only be used
  * to  enqueue the execution of a signal handler with a user-space
  * entry point.
@@ -436,7 +412,7 @@ struct rpc_syscall_info;
  *                  be applied, which is done in cooperation with  the
  *                  system call restart database.
  * @return: * :     The updated CPU state.
- * @return: NULL:   The `SIGACTION_SA_RESETHAND' flag was set,
+ * @return: NULL:   The `SA_RESETHAND' flag was set,
  *                  but `action' differs from the set handler. */
 FUNDEF WUNUSED NONNULL((1, 2)) struct icpustate *KCALL
 userexcept_callsignal(struct icpustate *__restrict state,
@@ -540,9 +516,8 @@ task_raisesignalprocessgroup(struct task *__restrict target, signo_t signo)
 }
 #endif /* __cplusplus */
 
-
+DECL_END
 #endif /* __CC__ */
 
-DECL_END
 
 #endif /* !GUARD_KERNEL_INCLUDE_SCHED_POSIX_SIGNAL_H */
