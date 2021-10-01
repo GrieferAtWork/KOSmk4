@@ -24,348 +24,279 @@
 
 #include <kernel/compiler.h>
 
+#ifdef CONFIG_USE_NEW_RPC
+#include <kernel/except.h>
 #include <kernel/fpu.h>
-#include <kernel/panic.h>
-#include <kernel/printk.h>
 #include <kernel/rt/except-handler.h>
 #include <kernel/syscall-properties.h>
 #include <kernel/syscall.h>
-#include <kernel/types.h>
 #include <kernel/user.h>
 #include <sched/cred.h>
-#include <sched/except-handler.h>
 #include <sched/posix-signal.h>
+#include <sched/rpc-internal.h>
 #include <sched/rpc.h>
 #include <sched/task.h>
 
 #include <hybrid/atomic.h>
+#include <hybrid/host.h>
 #include <hybrid/minmax.h>
 
-#include <asm/cpu-flags.h>
-#include <asm/intrin.h>
-#include <asm/registers.h>
-#include <bits/os/kos/siginfo-convert.h>   /* siginfo64_to_siginfo32 */
-#include <bits/os/kos/siginfo32.h>         /* siginfo32_t */
-#include <bits/os/kos/ucontext32.h>        /* __ucontextx32 */
-#include <kos/bits/syscall-info-convert.h> /* rpc_syscall_info_to_rpc_syscall_info32 */
-#include <kos/bits/syscall-info32.h>       /* rpc_syscall_info32 */
-#include <kos/except/reason/inval.h>
-#include <kos/kernel/cpu-state-verify.h> /* cpustate_verify_user...() */
-#include <kos/kernel/cpu-state.h>        /* icpustate */
-#include <kos/kernel/cpu-state32.h>      /* ucpustate32 */
-#include <kos/kernel/fpu-state32.h>      /* fpustate32 */
-#include <sys/ucontext.h>
+#include <asm/syscalls32_d.h>
+#include <asm/syscalls64_d.h>
+#include <bits/os/kos/siginfo-convert.h>
+#include <kos/bits/syscall-info-convert.h>
+#include <kos/bits/syscall-info32.h>
+#include <kos/except.h>
+#include <kos/kernel/cpu-state-compat.h>
+#include <kos/kernel/cpu-state-helpers.h>
+#include <kos/kernel/cpu-state-verify.h>
+#include <kos/kernel/cpu-state32.h>
+#include <kos/kernel/fpu-state32.h>
+#include <kos/rpc.h>
 
 #include <assert.h>
-#include <errno.h>
 #include <signal.h>
 #include <stddef.h>
 #include <string.h>
-#include <syscall.h>
-
-#include <librpc/rpc.h>
-
-DECL_BEGIN
-
-#define WORD64(a, b) (u64)((u64)(u32)(a) | (u64)(u32)(b) << 32)
-PUBLIC atomic64_t x86_user_eflags_mask = ATOMIC64_INIT(WORD64(~(EFLAGS_DF), 0));
-PUBLIC atomic64_t x86_exec_eflags_mask = ATOMIC64_INIT(WORD64(~(EFLAGS_DF | EFLAGS_IOPLMASK), 0));
-#undef WORD64
-
-/* TODO: Kernel commandline options:
- *  - user_eflags_mask=mask,flag
- *  - exec_eflags_mask=mask,flag
- */
-
 
 #ifdef __x86_64__
-#define SYSCALL_VECTOR_SIGRETURN64          __NR_rt_sigreturn
-#define SYSCALL_VECTOR_SIGRETURN32          __NR32_sigreturn
-#define SYSCALL_VECTOR_ISSIGRETURN64(vecno) ((vecno) == __NR_rt_sigreturn)
-#define SYSCALL_VECTOR_ISSIGRETURN32(vecno) ((vecno) == __NR32_sigreturn || (vecno) == __NR32_rt_sigreturn)
-#else /* __x86_64__ */
-#define SYSCALL_VECTOR_SIGRETURN32          __NR_sigreturn
-#define SYSCALL_VECTOR_ISSIGRETURN32(vecno) ((vecno) == __NR_sigreturn || (vecno) == __NR_rt_sigreturn)
-#endif /* !__x86_64__ */
+#include <kos/bits/syscall-info64.h>
+#include <kos/kernel/cpu-state64.h>
+#include <kos/kernel/fpu-state64.h>
+#endif /* __x86_64__ */
 
-#ifdef __x86_64__
-#ifdef CONFIG_USE_NEW_RPC
 #ifndef __INTELLISENSE__
-DECL_END
-
-#define DEFINE_RAISE32 1
-#include "posix-signal-raise.c.inl"
-
-#define DEFINE_RAISE64 1
-#include "posix-signal-raise.c.inl"
+#define DEFINE_x86_userexcept_callsignal32
+#include "posix-signal-call.c.inl"
+#ifdef __x86_64__
+#define DEFINE_x86_userexcept_callsignal64
+#include "posix-signal-call.c.inl"
+#endif /* ... */
+#endif /* !__INTELLISENSE__ */
 
 DECL_BEGIN
-#else  /* !__INTELLISENSE__ */
-PRIVATE ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3)) struct icpustate *FCALL
-userexcept_callsignal32(struct icpustate *__restrict state,
-                        struct kernel_sigaction const *__restrict action,
-                        siginfo_t const *__restrict siginfo,
-                        struct rpc_syscall_info const *sc_info)
-		THROWS(E_SEGFAULT);
-PRIVATE ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3)) struct icpustate *FCALL
-userexcept_callsignal64(struct icpustate *__restrict state,
-                        struct kernel_sigaction const *__restrict action,
-                        siginfo_t const *__restrict siginfo,
-                        struct rpc_syscall_info const *sc_info)
-		THROWS(E_SEGFAULT);
-#endif /* __INTELLISENSE__ */
 
+/************************************************************************/
+/* Compatibility mode wrappers                                          */
+/************************************************************************/
+#ifdef __x86_64__
+PRIVATE ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3)) struct icpustate *FCALL
+x86_userexcept_callsignal32(struct icpustate *__restrict state,
+                            struct kernel_sigaction const *__restrict action,
+                            siginfo_t const *__restrict siginfo,
+                            struct rpc_syscall_info const *sc_info)
+THROWS(E_SEGFAULT);
+PRIVATE ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3)) struct icpustate *FCALL
+x86_userexcept_callsignal64(struct icpustate *__restrict state,
+                            struct kernel_sigaction const *__restrict action,
+                            siginfo_t const *__restrict siginfo,
+                            struct rpc_syscall_info const *sc_info)
+THROWS(E_SEGFAULT);
 PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3)) struct icpustate *FCALL
 userexcept_callsignal(struct icpustate *__restrict state,
                       struct kernel_sigaction const *__restrict action,
                       siginfo_t const *__restrict siginfo,
                       struct rpc_syscall_info const *sc_info)
-		THROWS(E_SEGFAULT) {
-	struct icpustate *result;
-	if (irregs_is32bit(&state->ics_irregs)) {
-		/* Compatibility mode. */
-		result = userexcept_callsignal32(state, action, siginfo, sc_info);
-	} else {
-		result = userexcept_callsignal64(state, action, siginfo, sc_info);
-	}
-	return result;
+THROWS(E_SEGFAULT) {
+	return icpustate_iscompat(state) ? x86_userexcept_callsignal32(state, action, siginfo, sc_info)
+	                                 : x86_userexcept_callsignal64(state, action, siginfo, sc_info);
 }
-#else /* CONFIG_USE_NEW_RPC */
-#ifndef __INTELLISENSE__
-DECL_END
-#define DEFINE_RAISE32 1
-#include "posix-signal-raise.c.inl"
-#define DEFINE_RAISE64 1
-#include "posix-signal-raise.c.inl"
-DECL_BEGIN
-#else  /* !__INTELLISENSE__ */
-PRIVATE WUNUSED struct icpustate *KCALL
-userexcept_callsignal32(struct icpustate *__restrict state,
-                        struct kernel_sigaction const *__restrict action,
-                        USER CHECKED siginfo_t const *siginfo,
-                        struct rpc_syscall_info const *sc_info)
-		THROWS(E_SEGFAULT, E_WOULDBLOCK);
-PRIVATE WUNUSED struct icpustate *KCALL
-userexcept_callsignal64(struct icpustate *__restrict state,
-                        struct kernel_sigaction const *__restrict action,
-                        USER CHECKED siginfo_t const *siginfo,
-                        struct rpc_syscall_info const *sc_info)
-		THROWS(E_SEGFAULT, E_WOULDBLOCK);
-#endif /* __INTELLISENSE__ */
-
-PUBLIC WUNUSED struct icpustate *KCALL
-userexcept_callsignal(struct icpustate *__restrict state,
-                      struct kernel_sigaction const *__restrict action,
-                      USER CHECKED siginfo_t const *siginfo,
-                      struct rpc_syscall_info const *sc_info)
-		THROWS(E_SEGFAULT, E_WOULDBLOCK) {
-	struct icpustate *result;
-	if (irregs_is32bit(&state->ics_irregs)) {
-		/* Compatibility mode. */
-		result = userexcept_callsignal32(state, action, siginfo, sc_info);
-	} else {
-		result = userexcept_callsignal64(state, action, siginfo, sc_info);
-	}
-	return result;
-}
-#endif /* !CONFIG_USE_NEW_RPC */
-#else /* __x86_64__ */
-#ifndef __INTELLISENSE__
-DECL_END
-#define DEFINE_RAISE32 1
-#include "posix-signal-raise.c.inl"
-DECL_BEGIN
-#endif /* !__INTELLISENSE__ */
-#endif /* !__x86_64__ */
+#endif /* __x86_64__ */
 
 
 
-PRIVATE struct icpustate *FCALL
-syscall_fill_icpustate_from_ucpustate32(struct icpustate *__restrict state,
-                                        USER CHECKED struct ucpustate32 const *__restrict ust)
-		THROWS(E_INVALID_ARGUMENT_BAD_VALUE, E_SEGFAULT, ...) {
-	u16 gs, fs, es, ds, ss, cs;
-	u32 eflags;
-	gs     = ust->ucs_sgregs.sg_gs16;
-	fs     = ust->ucs_sgregs.sg_fs16;
-	es     = ust->ucs_sgregs.sg_es16;
-	ds     = ust->ucs_sgregs.sg_ds16;
-	ss     = ust->ucs_ss16;
-	cs     = ust->ucs_cs16;
-	eflags = ucpustate32_geteflags(ust);
-	COMPILER_READ_BARRIER();
-	cpustate_verify_userpflags(icpustate_getpflags(state),
-	                           eflags,
-	                           cred_allow_eflags_modify_mask());
-#ifndef __x86_64__
-	if (eflags & EFLAGS_VM) {
-		state->ics_irregs_v.ir_es = es;
-		state->ics_irregs_v.ir_ds = ds;
-		state->ics_irregs_v.ir_fs = fs;
-		state->ics_irregs_v.ir_gs = gs;
+/* Restore the given `sigmask' as the current thread signal mask.
+ * This function may modify user-space for the purpose of writing
+ * to the calling thread's userprocmask. */
+PRIVATE NONNULL((1)) void FCALL
+sigreturn_restore_sigmask(USER CHECKED sigset_t const *sigmask)
+THROWS(E_SEGFAULT) {
+	bool changed;
+	sigset_t newmask;
+	memcpy(&newmask, sigmask, sizeof(sigset_t));
+	sigdelset(&newmask, SIGKILL);
+	sigdelset(&newmask, SIGSTOP);
+
+#ifdef CONFIG_HAVE_USERPROCMASK
+	if (PERTASK_GET(this_task.t_flags) & TASK_FUSERPROCMASK) {
+		unsigned int i;
+		USER UNCHECKED sigset_t *umask;
+		umask = ATOMIC_READ(PERTASK_GET(this_userprocmask_address)->pm_sigmask);
+		validate_readwrite(umask, sizeof(sigset_t));
+		/* Because the userprocmask may  point to read-only memory,  only
+		 * write memory if contents have actually changed (otherwise, the
+		 * signal mask restore can be considered a no-op)
+		 *
+		 * Keep the old setting for SIGKILL and SIGSTOP (they're state is
+		 * ignored within the userprocmask, but  try not to change  their
+		 * actual state, so-as not to  accidentally write to a  read-only
+		 * mask blob) */
+		if (sigismember(umask, SIGKILL))
+			sigaddset(&newmask, SIGKILL);
+		if (sigismember(umask, SIGSTOP))
+			sigaddset(&newmask, SIGSTOP);
+
+		/* Copy values, but only if they actually changed. */
+		for (i = 0; i < COMPILER_LENOF(newmask.__val); ++i) {
+			if (umask->__val[i] != newmask.__val[i]) {
+				COMPILER_BARRIER(); /* Prevent compiler optimizations! */
+				umask->__val[i] = newmask.__val[i];
+				COMPILER_BARRIER(); /* *ditto* */
+				changed = true;
+			}
+		}
 	} else
-#endif /* !__x86_64__ */
+#endif /* !CONFIG_HAVE_USERPROCMASK */
 	{
-		/* Validate segment register indices before actually restoring them. */
-		cpustate_verify_usercs(cs);
-		cpustate_verify_userss(ss);
-		cpustate_verify_usergs(gs);
-		cpustate_verify_userfs(fs);
-		cpustate_verify_useres(es);
-		cpustate_verify_userds(ds);
-		icpustate_setgs_novm86(state, gs);
-		icpustate_setfs_novm86(state, fs);
-		icpustate_setes_novm86(state, es);
-		icpustate_setds_novm86(state, ds);
+		sigset_t *tls_sigmask;
+		tls_sigmask = &sigmask_kernel_getwr()->sm_mask;
+		changed     = memcmp(tls_sigmask, &newmask, sizeof(sigset_t)) != 0;
+		if (changed)
+			memcpy(tls_sigmask, &newmask, sizeof(sigset_t));
 	}
-	icpustate_setcs(state, cs);
-	icpustate_setuserss(state, ss);
-	gpregs32_to_gpregsnsp(&ust->ucs_gpregs, &state->ics_gpregs);
-	icpustate_setpflags(state, eflags);
-	icpustate_setpip(state, ucpustate32_geteip(ust));
-	icpustate_setuserpsp(state, ucpustate32_getesp(ust));
+
+	/* If the signal mask changed (technically only needed if it became
+	 * less restrictive), then ensure that pending signals are  checked
+	 * prior to the next return to user-space.
+	 * We don't call `task_serve()' immediatly because we still want to
+	 * restart the caller's system call,  but if that system call  ends
+	 * up making a call to `task_serve()', then it is able to interrupt
+	 * itself and service the RPC,  at which point the sc_info  context
+	 * will be present (meaning that in that case it won't be the  call
+	 * to sigreturn(2) that's  attempted to be  restarted, but  instead
+	 * the actual *inner* system call) */
+	if (changed)
+		userexcept_sysret_inject_self();
+}
+
+
+
+
+
+
+
+
+/************************************************************************/
+/* 32-BIT SIGRETURN(2)                                                  */
+/************************************************************************/
+
+/* Sigreturn system call implementation.
+ * WARNING: This function may not necessarily return normally, or by throwing an exception! */
+INTERN ATTR_RETNONNULL WUNUSED NONNULL((1)) struct icpustate *FCALL
+sys_sigreturn32_impl(struct icpustate *__restrict state,
+                     USER UNCHECKED struct ucpustate32 const *restore_cpu,
+                     USER UNCHECKED struct fpustate32 const *restore_fpu,
+                     USER UNCHECKED sigset_t const *restore_sigmask,
+                     USER UNCHECKED struct rpc_syscall_info32 const *restart_sc_info) {
+	/* Validate arguments. */
+	validate_readable(restore_cpu, sizeof(*restore_cpu));
+	validate_readable_opt(restore_fpu,
+	                      MIN_C(sizeof(struct sfpustate),
+	                            sizeof(struct xfpustate32)));
+	validate_readable_opt(restore_sigmask, sizeof(*restore_sigmask));
+	validate_readable_opt(restart_sc_info, sizeof(*restart_sc_info));
+
+	/* Load CPU state information from user-space data structures. */
+	{
+		u16 gs, fs, es, ds, ss, cs;
+		u32 eflags;
+		gs     = restore_cpu->ucs_sgregs.sg_gs16;
+		fs     = restore_cpu->ucs_sgregs.sg_fs16;
+		es     = restore_cpu->ucs_sgregs.sg_es16;
+		ds     = restore_cpu->ucs_sgregs.sg_ds16;
+		ss     = restore_cpu->ucs_ss16;
+		cs     = restore_cpu->ucs_cs16;
+		eflags = ucpustate32_geteflags(restore_cpu);
+		COMPILER_READ_BARRIER();
+		cpustate_verify_userpflags(icpustate_getpflags(state),
+		                           eflags,
+		                           cred_allow_eflags_modify_mask());
+#ifndef __x86_64__
+		if (eflags & EFLAGS_VM) {
+			state->ics_irregs_v.ir_es = es;
+			state->ics_irregs_v.ir_ds = ds;
+			state->ics_irregs_v.ir_fs = fs;
+			state->ics_irregs_v.ir_gs = gs;
+		} else
+#endif /* !__x86_64__ */
+		{
+			/* Validate segment register indices before actually restoring them. */
+			cpustate_verify_usercs(cs);
+			cpustate_verify_userss(ss);
+			cpustate_verify_usergs(gs);
+			cpustate_verify_userfs(fs);
+			cpustate_verify_useres(es);
+			cpustate_verify_userds(ds);
+			icpustate_setgs_novm86(state, gs);
+			icpustate_setfs_novm86(state, fs);
+			icpustate_setes_novm86(state, es);
+			icpustate_setds_novm86(state, ds);
+		}
+		icpustate_setcs(state, cs);
+		icpustate_setuserss(state, ss);
+		gpregs32_to_gpregsnsp(&restore_cpu->ucs_gpregs, &state->ics_gpregs);
+		icpustate_setpflags(state, eflags);
+		icpustate_setpip(state, ucpustate32_geteip(restore_cpu));
+		icpustate_setuserpsp(state, ucpustate32_getesp(restore_cpu));
+	}
+
+	/* Restore the given signal mask. */
+	if (restore_sigmask != NULL)
+		sigreturn_restore_sigmask(restore_sigmask);
+
+	/* Restore the FPU context */
+	if (restore_fpu)
+		fpustate32_loadfrom(restore_fpu);
+
+	if (restart_sc_info) {
+		struct rpc_syscall_info restart_sysinfo;
+		COMPILER_READ_BARRIER();
+		restart_sysinfo.rsi_flags   = restart_sc_info->rsi_flags;
+		restart_sysinfo.rsi_sysno   = restart_sc_info->rsi_sysno;
+		restart_sysinfo.rsi_regs[0] = restart_sc_info->rsi_regs[0];
+		restart_sysinfo.rsi_regs[1] = restart_sc_info->rsi_regs[1];
+		restart_sysinfo.rsi_regs[2] = restart_sc_info->rsi_regs[2];
+		restart_sysinfo.rsi_regs[3] = restart_sc_info->rsi_regs[3];
+		restart_sysinfo.rsi_regs[4] = restart_sc_info->rsi_regs[4];
+		restart_sysinfo.rsi_regs[5] = restart_sc_info->rsi_regs[5];
+		COMPILER_READ_BARRIER();
+
+		/* Only a couple of information bits are actually kept. */
+		restart_sysinfo.rsi_flags &= RPC_SYSCALL_INFO_FEXCEPT;
+		restart_sysinfo.rsi_flags |= RPC_SYSCALL_INFO_METHOD_SIGRETURN_32;
+
+		/* Emulate the requested system call (NOTE: This call does
+		 * not return, neither by exception, nor by normal  means) */
+		syscall_emulate32_r(state, &restart_sysinfo);
+	}
 	return state;
 }
-
 
 /* Argument indices of parameters passed to sigreturn() */
-#define SIGRETURN_386_ARGID_RESTORE_CPU     5 /* SYSCALL_ARGUMENT_REGISTER_INDEX(%ebp) */
-#define SIGRETURN_386_ARGID_RESTORE_FPU     0 /* SYSCALL_ARGUMENT_REGISTER_INDEX(%ebx) */
-#define SIGRETURN_386_ARGID_RESTORE_SIGMASK 3 /* SYSCALL_ARGUMENT_REGISTER_INDEX(%esi) */
-#define SIGRETURN_386_ARGID_SC_INFO         4 /* SYSCALL_ARGUMENT_REGISTER_INDEX(%edi) */
+#define SIGRETURN32_ARGID_RESTORE_CPU     5 /* SYSCALL_ARGUMENT_REGISTER_INDEX(%ebp) */
+#define SIGRETURN32_ARGID_RESTORE_FPU     0 /* SYSCALL_ARGUMENT_REGISTER_INDEX(%ebx) */
+#define SIGRETURN32_ARGID_RESTORE_SIGMASK 3 /* SYSCALL_ARGUMENT_REGISTER_INDEX(%esi) */
+#define SIGRETURN32_ARGID_SC_INFO         4 /* SYSCALL_ARGUMENT_REGISTER_INDEX(%edi) */
 
-/* Sigreturn system call implementation. */
-INTERN struct icpustate *FCALL
-sigreturn32_impl(struct icpustate *__restrict state,
-                 USER UNCHECKED struct ucpustate32 const *restore_cpu,
-                 USER UNCHECKED struct fpustate32 const *restore_fpu,
-                 USER UNCHECKED sigset_t const *restore_sigmask,
-                 USER UNCHECKED struct rpc_syscall_info32 const *sc_info) {
-	bool enable_except;
-	enable_except = (irregs_rdflags(&state->ics_irregs) & EFLAGS_DF) != 0;
-	TRY {
-again:
-		validate_readable(restore_cpu, sizeof(*restore_cpu));
-		validate_readable_opt(restore_fpu,
-		                      MIN_C(sizeof(struct sfpustate),
-		                            sizeof(struct xfpustate32)));
-		validate_readable_opt(restore_sigmask, sizeof(*restore_sigmask));
-		validate_readable_opt(sc_info, sizeof(*sc_info));
-		/* Restore the given signal mask. */
-		if (restore_sigmask) {
-			USER CHECKED sigset_t *mymask;
-			COMPILER_READ_BARRIER();
-			mymask = sigmask_getwr();
-			memcpy(mymask, restore_sigmask, sizeof(sigset_t));
-			COMPILER_WRITE_BARRIER();
-			/* Make sure that mandatory signals always remain unmasked. In  case
-			 * we just escaped an RPC  attempt by another thread sending  either
-			 * one  of these  signals, not to  worry, as code  below will always
-			 * check for `sigmask_check_s()' when `restore_sigmask' is non-NULL. */
-			sigdelset(mymask, SIGKILL);
-			sigdelset(mymask, SIGSTOP);
-		}
-		/* Restore the FPU context */
-		if (restore_fpu)
-			fpustate32_loadfrom(restore_fpu);
-		/* Restore the CPU context */
-		state = syscall_fill_icpustate_from_ucpustate32(state, restore_cpu);
 
-		if (sc_info) {
-			/* Restart a system call. */
-			unsigned int i;
-			struct rpc_syscall_info sc;
-			rpc_syscall_info32_to_rpc_syscall_info(sc_info, &sc);
-			COMPILER_READ_BARRIER();
-			/* Check for restartable system calls.
-			 * NOTE: When performing this check,  use the system call  given
-			 *       by  the  caller as  the  one that  would  be restarted.
-			 *       This, alongside the fact that sys_sigreturn() is marked
-			 *       as being [restart(must)],  will ensure  that we  always
-			 *       eventually come back  around to being  able to  restart
-			 *       the system call. */
-			if (restore_sigmask) {
-				struct icpustate *new_state;
-				new_state = sigmask_check_s(state, &sc);
-				if (new_state != TASK_RPC_RESTART_SYSCALL)
-					state = new_state;
-			}
-			/* Set invalid arguments to 0 */
-			for (i = 0; i < 6; ++i) {
-				if (!(sc.rsi_flags & RPC_SYSCALL_INFO_FREGVALID(i)))
-					sc.rsi_regs[i] = 0;
-			}
-			if unlikely(SYSCALL_VECTOR_ISSIGRETURN32(sc.rsi_sysno)) {
-				/* Special case: Return to sigreturn.
-				 * -> To prevent recursion, restart this system call immediately
-				 *    by  looping   back  to   the   start  of   our   function!
-				 * NOTE: This  special case mainly  prevents user-space from being
-				 *       able to cause a kernel stack overflow by chaining a bunch
-				 *       of sigreturn invocations ontop of each other. */
-				restore_cpu     = (USER UNCHECKED struct ucpustate32 const *)sc.rsi_regs[SIGRETURN_386_ARGID_RESTORE_CPU];
-				restore_fpu     = (USER UNCHECKED struct fpustate32 const *)sc.rsi_regs[SIGRETURN_386_ARGID_RESTORE_FPU];
-				restore_sigmask = (USER UNCHECKED sigset_t const *)sc.rsi_regs[SIGRETURN_386_ARGID_RESTORE_SIGMASK];
-				sc_info         = (USER UNCHECKED struct rpc_syscall_info32 const *)sc.rsi_regs[SIGRETURN_386_ARGID_SC_INFO];
-				/* Disable exception propagation when sigreturn() is invoked without exceptions enabled. */
-				if ((sc.rsi_flags & RPC_SYSCALL_INFO_FEXCEPT) == 0)
-					enable_except = false;
-				goto again;
-			}
-			/* Emulate the system call.
-			 * NOTE: Mirror the exceptions  model specified in  `sc_info',
-			 *       in that we propagate system call exceptions the  same
-			 *       way they would have originally been propagated if the
-			 *       system call hadn't had to be restarted. */
-			sc.rsi_flags &= ~RPC_SYSCALL_INFO_FMETHOD;
-			sc.rsi_flags |= RPC_SYSCALL_INFO_METHOD_SIGRETURN_32;
-			state = syscall_emulate32(state, &sc);
-		} else {
-			if (restore_sigmask) {
-				struct icpustate *new_state;
-				new_state = sigmask_check_s(state, NULL);
-				if (new_state != TASK_RPC_RESTART_SYSCALL)
-					state = new_state;
-			}
-		}
-	} EXCEPT {
-		/* Implement our own custom exception handler to work around the fact
-		 * that EFLAGS.DF is undefined when sigreturn() is called, meaning it
-		 * would also be undefined how exceptions caused by restarted  system
-		 * calls are handled.
-		 * The  intended  behavior here  is  that sigreturn()  only  accounts for
-		 * its own EFLAGS.DF when validating and processing is restore arguments,
-		 * but will mirror the exceptions model of a restarted system call. */
-
-		/* NOTE: Technically, this behavior  right here is  incorrect, as it  doesn't
-		 *       preserve the correct  user-space EFLAGS.DF value.  However, we  have
-		 *       no other way of passing the knowledge about how the exception should
-		 *       be propagated to `x86_userexcept_propagate()' and friends.
-		 *       So with this in mind, this is the best we can do when it comes to this problem.
-		 * However, since sigreturn() should only ever be used when returning from signal
-		 * handlers, this shouldn't actually be a problem...
-		 * XXX: Why not call `x86_userexcept_propagate()' directly here? */
-		icpustate_setpflags(state,
-		                    (icpustate_getpflags(state) & ~EFLAGS_DF) |
-		                    (enable_except ? EFLAGS_DF : 0));
-		RETHROW();
-	}
-	return state;
+PRIVATE NONNULL((1)) void PRPC_EXEC_CALLBACK_CC
+sys_sigreturn32_rpc(struct rpc_context *__restrict ctx,
+                    void *UNUSED(cookie)) {
+	USER UNCHECKED struct ucpustate32 const *restore_cpu;
+	USER UNCHECKED struct fpustate32 const *restore_fpu;
+	USER UNCHECKED sigset_t const *restore_sigmask;
+	USER UNCHECKED struct rpc_syscall_info32 const *restart_sc_info;
+	if unlikely (ctx->rc_context != RPC_REASONCTX_SYSCALL)
+		return;
+	restore_cpu     = (USER UNCHECKED struct ucpustate32 const *)ctx->rc_scinfo.rsi_regs[SIGRETURN32_ARGID_RESTORE_CPU];
+	restore_fpu     = (USER UNCHECKED struct fpustate32 const *)ctx->rc_scinfo.rsi_regs[SIGRETURN32_ARGID_RESTORE_FPU];
+	restore_sigmask = (USER UNCHECKED sigset_t const *)ctx->rc_scinfo.rsi_regs[SIGRETURN32_ARGID_RESTORE_SIGMASK];
+	restart_sc_info = (USER UNCHECKED struct rpc_syscall_info32 const *)ctx->rc_scinfo.rsi_regs[SIGRETURN32_ARGID_SC_INFO];
+	ctx->rc_context = RPC_REASONCTX_SYSRET;
+	ctx->rc_state   = sys_sigreturn32_impl(ctx->rc_state, restore_cpu,
+                                         restore_fpu, restore_sigmask,
+                                         restart_sc_info);
 }
-
-INTERN struct icpustate *FCALL
-sigreturn32_rpc(void *UNUSED(arg),
-                struct icpustate *__restrict state,
-                unsigned int reason,
-                struct rpc_syscall_info const *sc_info) {
-	if unlikely(reason != TASK_RPC_REASON_SYSCALL)
-		return state;
-	return sigreturn32_impl(state,
-	                        (USER UNCHECKED struct ucpustate32 const *)sc_info->rsi_regs[SIGRETURN_386_ARGID_RESTORE_CPU],
-	                        (USER UNCHECKED struct fpustate32 const *)sc_info->rsi_regs[SIGRETURN_386_ARGID_RESTORE_FPU],
-	                        (USER UNCHECKED sigset_t const *)sc_info->rsi_regs[SIGRETURN_386_ARGID_RESTORE_SIGMASK],
-	                        (USER UNCHECKED struct rpc_syscall_info32 const *)sc_info->rsi_regs[SIGRETURN_386_ARGID_SC_INFO]);
-}
-
 
 /* Define `rt_sigreturn()' as an alias for `sigreturn()' */
 #ifdef __x86_64__
@@ -391,301 +322,144 @@ DEFINE_SYSCALL32_6(void, sigreturn,
 	(void)restore_sigmask;
 	(void)sc_info;
 	(void)restore_cpu;
-	task_schedule_user_rpc(THIS_TASK,
-	                       &sigreturn32_rpc,
-	                       NULL,
-	                       TASK_RPC_FHIGHPRIO |
-	                       TASK_USER_RPC_FINTR,
-	                       GFP_NORMAL);
+	/* Send an RPC to ourselves, so we can gain access to the user-space register state. */
+	task_rpc_exec(THIS_TASK, RPC_CONTEXT_KERN | RPC_SYNCMODE_F_USER, &sys_sigreturn32_rpc, NULL);
 	__builtin_unreachable();
 }
 
 
+
+
+
+
+
+
 #ifdef __x86_64__
-PRIVATE struct icpustate *FCALL
-syscall_fill_icpustate_from_ucpustate64(struct icpustate *__restrict state,
-                                        USER CHECKED struct ucpustate64 const *__restrict ust)
-		THROWS(E_INVALID_ARGUMENT_BAD_VALUE, E_SEGFAULT, ...) {
-	u16 gs, fs, es, ds, ss, cs;
-	u64 rflags;
-	gs     = ust->ucs_sgregs.sg_gs16;
-	fs     = ust->ucs_sgregs.sg_fs16;
-	es     = ust->ucs_sgregs.sg_es16;
-	ds     = ust->ucs_sgregs.sg_ds16;
-	ss     = ust->ucs_ss16;
-	cs     = ust->ucs_cs16;
-	rflags = ucpustate64_getrflags(ust);
-	COMPILER_READ_BARRIER();
-	cpustate_verify_userpflags(icpustate_getpflags(state),
-	                           rflags,
-	                           cred_allow_eflags_modify_mask());
-	/* Validate segment register indices before actually restoring them. */
-	cpustate_verify_usercs(cs);
-	cpustate_verify_userss(ss);
-	cpustate_verify_usergs(gs);
-	cpustate_verify_userfs(fs);
-	cpustate_verify_useres(es);
-	cpustate_verify_userds(ds);
-	icpustate_setgs_novm86(state, gs);
-	icpustate_setfs_novm86(state, fs);
-	icpustate_setes_novm86(state, es);
-	icpustate_setds_novm86(state, ds);
-	icpustate_setcs(state, cs);
-	icpustate_setuserss(state, ss);
-	gpregs64_to_gpregsnsp(&ust->ucs_gpregs, &state->ics_gpregs);
-	icpustate_setpflags(state, rflags);
-	icpustate_setpip(state, ucpustate64_getrip(ust));
-	icpustate_setuserpsp(state, ucpustate64_getrsp(ust));
-	x86_set_user_gsbase(ust->ucs_sgbase.sg_gsbase);
-	x86_set_user_fsbase(ust->ucs_sgbase.sg_fsbase);
-	return state;
-}
+/************************************************************************/
+/* 64-BIT SIGRETURN(2)                                                  */
+/************************************************************************/
 
-INTERN struct icpustate *FCALL
-sigreturn64_impl(struct icpustate *__restrict state,
-                 USER UNCHECKED struct ucpustate64 const *restore_cpu,
-                 USER UNCHECKED struct fpustate64 const *restore_fpu,
-                 USER UNCHECKED sigset_t const *restore_sigmask,
-                 USER UNCHECKED struct rpc_syscall_info64 const *sc_info) {
-	bool enable_except;
-	enable_except = (irregs_rdflags(&state->ics_irregs) & EFLAGS_DF) != 0;
-	TRY {
-again:
-		validate_readable(restore_cpu, sizeof(*restore_cpu));
-		validate_readable_opt(restore_fpu,
-		                      MIN_C(sizeof(struct sfpustate),
-		                            sizeof(struct xfpustate64)));
-		validate_readable_opt(restore_sigmask, sizeof(*restore_sigmask));
-		validate_readable_opt(sc_info, sizeof(*sc_info));
-		/* Restore the given signal mask. */
-		if (restore_sigmask) {
-			USER CHECKED sigset_t *sigmask;
-			COMPILER_READ_BARRIER();
-			sigmask = sigmask_getwr();
-			memcpy(sigmask, restore_sigmask, sizeof(sigset_t));
-			COMPILER_WRITE_BARRIER();
-			/* Make   sure   that   mandatory  signals   always   remain  unmasked.
-			 * In  case we  just escaped an  RPC attempt by  another thread sending
-			 * either one of these signals, not to worry, as code below will always
-			 * check for  `sigmask_check_s()' when  `restore_sigmask' is  non-NULL. */
-			sigdelset(sigmask, SIGKILL);
-			sigdelset(sigmask, SIGSTOP);
-		}
-		/* Restore the FPU context */
-		if (restore_fpu)
-			fpustate64_loadfrom(restore_fpu);
-		/* Restore the CPU context */
-		state = syscall_fill_icpustate_from_ucpustate64(state, restore_cpu);
+/* Sigreturn system call implementation.
+ * WARNING: This function may not necessarily return normally, or by throwing an exception! */
+INTERN ATTR_RETNONNULL WUNUSED NONNULL((1)) struct icpustate *FCALL
+sys_sigreturn64_impl(struct icpustate *__restrict state,
+                     USER UNCHECKED struct ucpustate64 const *restore_cpu,
+                     USER UNCHECKED struct fpustate64 const *restore_fpu,
+                     USER UNCHECKED sigset_t const *restore_sigmask,
+                     USER UNCHECKED struct rpc_syscall_info64 const *restart_sc_info) {
+	/* Validate arguments. */
+	validate_readable(restore_cpu, sizeof(*restore_cpu));
+	validate_readable_opt(restore_fpu,
+	                      MIN_C(sizeof(struct sfpustate),
+	                            sizeof(struct xfpustate64)));
+	validate_readable_opt(restore_sigmask, sizeof(*restore_sigmask));
+	validate_readable_opt(restart_sc_info, sizeof(*restart_sc_info));
 
-		if (sc_info) {
-			/* Restart a system call. */
-			unsigned int i;
-			struct rpc_syscall_info sc;
-			rpc_syscall_info64_to_rpc_syscall_info(sc_info, &sc);
-			COMPILER_READ_BARRIER();
-			/* Check for restartable system calls.
-			 * NOTE: When performing this check,  use the system call  given
-			 *       by  the  caller as  the  one that  would  be restarted.
-			 *       This, alongside the fact that sys_sigreturn() is marked
-			 *       as being [restart(must)],  will ensure  that we  always
-			 *       eventually come back  around to being  able to  restart
-			 *       the system call. */
-			if (restore_sigmask) {
-				struct icpustate *new_state;
-				new_state = sigmask_check_s(state, &sc);
-				if (new_state != TASK_RPC_RESTART_SYSCALL)
-					state = new_state;
-			}
-			/* Set invalid arguments to 0 */
-			for (i = 0; i < 6; ++i) {
-				if (!(sc.rsi_flags & RPC_SYSCALL_INFO_FREGVALID(i)))
-					sc.rsi_regs[i] = 0;
-			}
-			if unlikely(SYSCALL_VECTOR_ISSIGRETURN64(sc.rsi_sysno)) {
-				/* Special case: Return to sigreturn.
-				 * -> To prevent recursion, restart this system call immediately
-				 *    by  looping   back  to   the   start  of   our   function!
-				 * NOTE: This  special case mainly  prevents user-space from being
-				 *       able to cause a kernel stack overflow by chaining a bunch
-				 *       of sigreturn invocations ontop of each other. */
-				restore_cpu     = (USER UNCHECKED struct ucpustate64 const *)gpregs_getpbp(&state->ics_gpregs);
-				restore_fpu     = (USER UNCHECKED struct fpustate64 const *)gpregs_getpbx(&state->ics_gpregs);
-				restore_sigmask = (USER UNCHECKED sigset_t const *)gpregs_getp12(&state->ics_gpregs);
-				sc_info         = (USER UNCHECKED struct rpc_syscall_info64 const *)gpregs_getp13(&state->ics_gpregs);
+	/* Load CPU state information from user-space data structures. */
+	{
+		u16 gs, fs, es, ds, ss, cs;
+		u64 rflags;
+		gs     = restore_cpu->ucs_sgregs.sg_gs16;
+		fs     = restore_cpu->ucs_sgregs.sg_fs16;
+		es     = restore_cpu->ucs_sgregs.sg_es16;
+		ds     = restore_cpu->ucs_sgregs.sg_ds16;
+		ss     = restore_cpu->ucs_ss16;
+		cs     = restore_cpu->ucs_cs16;
+		rflags = ucpustate64_getrflags(restore_cpu);
+		COMPILER_READ_BARRIER();
+		cpustate_verify_userpflags(icpustate_getpflags(state),
+		                           rflags,
+		                           cred_allow_eflags_modify_mask());
+		/* Validate segment register indices before actually restoring them. */
+		cpustate_verify_usercs(cs);
+		cpustate_verify_userss(ss);
+		cpustate_verify_usergs(gs);
+		cpustate_verify_userfs(fs);
+		cpustate_verify_useres(es);
+		cpustate_verify_userds(ds);
+		icpustate_setgs_novm86(state, gs);
+		icpustate_setfs_novm86(state, fs);
+		icpustate_setes_novm86(state, es);
+		icpustate_setds_novm86(state, ds);
+		icpustate_setcs(state, cs);
+		icpustate_setuserss(state, ss);
+		gpregs64_to_gpregsnsp(&restore_cpu->ucs_gpregs, &state->ics_gpregs);
+		icpustate_setpflags(state, rflags);
+		icpustate_setpip(state, ucpustate64_getrip(restore_cpu));
+		icpustate_setuserpsp(state, ucpustate64_getrsp(restore_cpu));
+		x86_set_user_gsbase(restore_cpu->ucs_sgbase.sg_gsbase);
+		x86_set_user_fsbase(restore_cpu->ucs_sgbase.sg_fsbase);
+	}
 
-				/* Disable exception propagation when sigreturn() is invoked without exceptions enabled. */
-				if ((sc.rsi_flags & RPC_SYSCALL_INFO_FEXCEPT) == 0)
-					enable_except = false;
-				goto again;
-			}
-			/* Emulate the system call.
-			 * NOTE: Mirror the exceptions  model specified in  `sc_info',
-			 *       in that we propagate system call exceptions the  same
-			 *       way they would have originally been propagated if the
-			 *       system call hadn't had to be restarted. */
-			sc.rsi_flags &= ~RPC_SYSCALL_INFO_FMETHOD;
-			sc.rsi_flags |= RPC_SYSCALL_INFO_METHOD_SIGRETURN_64;
-			state = syscall_emulate64(state, &sc);
-		} else {
-			if (restore_sigmask) {
-				struct icpustate *new_state;
-				new_state = sigmask_check_s(state, NULL);
-				if (new_state != TASK_RPC_RESTART_SYSCALL)
-					state = new_state;
-			}
-		}
-	} EXCEPT {
-		/* Implement our own custom exception handler to work around the fact
-		 * that EFLAGS.DF is undefined when sigreturn() is called, meaning it
-		 * would also be undefined how exceptions caused by restarted  system
-		 * calls are handled.
-		 * The  intended  behavior here  is  that sigreturn()  only  accounts for
-		 * its own EFLAGS.DF when validating and processing is restore arguments,
-		 * but will mirror the exceptions model of a restarted system call. */
+	/* Restore the given signal mask. */
+	if (restore_sigmask != NULL)
+		sigreturn_restore_sigmask(restore_sigmask);
 
-		/* NOTE: Technically, this behavior  right here is  incorrect, as it  doesn't
-		 *       preserve the correct  user-space EFLAGS.DF value.  However, we  have
-		 *       no other way of passing the knowledge about how the exception should
-		 *       be propagated to `x86_userexcept_propagate()' and friends.
-		 *       So with this in mind, this is the best we can do when it comes to this problem.
-		 * However, since sigreturn() should only ever be used when returning from signal
-		 * handlers, this shouldn't actually be a problem...
-		 * XXX: Why not call `x86_userexcept_propagate()' directly here? */
-		icpustate_setpflags(state,
-		                    (icpustate_getpflags(state) & ~EFLAGS_DF) |
-		                    (enable_except ? EFLAGS_DF : 0));
-		RETHROW();
+	/* Restore the FPU context */
+	if (restore_fpu)
+		fpustate64_loadfrom(restore_fpu);
+
+	if (restart_sc_info) {
+		struct rpc_syscall_info restart_sysinfo;
+		COMPILER_READ_BARRIER();
+		restart_sysinfo.rsi_flags   = restart_sc_info->rsi_flags;
+		restart_sysinfo.rsi_sysno   = restart_sc_info->rsi_sysno;
+		restart_sysinfo.rsi_regs[0] = restart_sc_info->rsi_regs[0];
+		restart_sysinfo.rsi_regs[1] = restart_sc_info->rsi_regs[1];
+		restart_sysinfo.rsi_regs[2] = restart_sc_info->rsi_regs[2];
+		restart_sysinfo.rsi_regs[3] = restart_sc_info->rsi_regs[3];
+		restart_sysinfo.rsi_regs[4] = restart_sc_info->rsi_regs[4];
+		restart_sysinfo.rsi_regs[5] = restart_sc_info->rsi_regs[5];
+		COMPILER_READ_BARRIER();
+
+		/* Only a couple of information bits are actually kept. */
+		restart_sysinfo.rsi_flags &= RPC_SYSCALL_INFO_FEXCEPT;
+		restart_sysinfo.rsi_flags |= RPC_SYSCALL_INFO_METHOD_SIGRETURN_64;
+
+		/* Emulate the requested system call (NOTE: This call does
+		 * not return, neither by exception, nor by normal  means) */
+		syscall_emulate32_r(state, &restart_sysinfo);
 	}
 	return state;
 }
 
-INTERN struct icpustate *FCALL
-sigreturn64_rpc(void *UNUSED(arg),
-                struct icpustate *__restrict state,
-                unsigned int reason,
-                struct rpc_syscall_info const *UNUSED(sc_info)) {
-	if unlikely(reason != TASK_RPC_REASON_SYSCALL)
-		return state;
-	return sigreturn64_impl(state,
-	                        (USER UNCHECKED struct ucpustate64 const *)gpregs_getpbp(&state->ics_gpregs),
-	                        (USER UNCHECKED struct fpustate64 const *)gpregs_getpbx(&state->ics_gpregs),
-	                        (USER UNCHECKED sigset_t const *)gpregs_getp12(&state->ics_gpregs),
-	                        (USER UNCHECKED struct rpc_syscall_info64 const *)gpregs_getp13(&state->ics_gpregs));
+PRIVATE NONNULL((1)) void PRPC_EXEC_CALLBACK_CC
+sys_sigreturn64_rpc(struct rpc_context *__restrict ctx,
+                    void *UNUSED(cookie)) {
+	USER UNCHECKED struct ucpustate64 const *restore_cpu;
+	USER UNCHECKED struct fpustate64 const *restore_fpu;
+	USER UNCHECKED sigset_t const *restore_sigmask;
+	USER UNCHECKED struct rpc_syscall_info64 const *restart_sc_info;
+	if unlikely (ctx->rc_context != RPC_REASONCTX_SYSCALL)
+		return;
+	restore_cpu     = (USER UNCHECKED struct ucpustate64 const *)gpregs_getpbp(&ctx->rc_state->ics_gpregs);
+	restore_fpu     = (USER UNCHECKED struct fpustate64 const *)gpregs_getpbx(&ctx->rc_state->ics_gpregs);
+	restore_sigmask = (USER UNCHECKED sigset_t const *)gpregs_getp12(&ctx->rc_state->ics_gpregs);
+	restart_sc_info = (USER UNCHECKED struct rpc_syscall_info64 const *)gpregs_getp13(&ctx->rc_state->ics_gpregs);
+	ctx->rc_context = RPC_REASONCTX_SYSRET;
+	ctx->rc_state   = sys_sigreturn64_impl(ctx->rc_state, restore_cpu,
+                                         restore_fpu, restore_sigmask,
+                                         restart_sc_info);
 }
 
 DEFINE_SYSCALL64_0(void, rt_sigreturn) {
-	task_schedule_user_rpc(THIS_TASK,
-	                       &sigreturn64_rpc,
-	                       NULL,
-	                       TASK_RPC_FHIGHPRIO |
-	                       TASK_USER_RPC_FINTR,
-	                       GFP_NORMAL);
+	/* Send an RPC to ourselves, so we can gain access to the user-space register state. */
+	task_rpc_exec(THIS_TASK, RPC_CONTEXT_KERN | RPC_SYNCMODE_F_USER, &sys_sigreturn64_rpc, NULL);
 	__builtin_unreachable();
 }
 #endif /* __x86_64__ */
 
 
 
-INTERN struct icpustate *FCALL
-raiseat32_impl(struct icpustate *__restrict state,
-               USER UNCHECKED struct ucpustate32 const *ust,
-               USER UNCHECKED struct __siginfox32_struct const *usi) {
-	siginfo_t si;
-	validate_readable(usi, sizeof(*usi));
-	siginfox32_to_siginfo(usi, &si);
-	if (ust) {
-		validate_readable(ust, sizeof(*ust));
-		state = syscall_fill_icpustate_from_ucpustate32(state, ust);
-	}
-	/* Verify that the signal number is inside of its mandatory bounds. */
-	if unlikely(si.si_signo <= 0 || si.si_signo >= NSIG) {
-		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
-		      E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGNO,
-		      si.si_signo);
-	}
-	/* By passing sc_info as NULL, we can guaranty that raiseat() isn't restarted. */
-	state = x86_userexcept_raisesignal(state, NULL, &si, NULL);
-	return state;
-}
-
-INTERN struct icpustate *FCALL
-raiseat32_rpc(void *UNUSED(arg),
-              struct icpustate *__restrict state,
-              unsigned int reason,
-              struct rpc_syscall_info const *sc_info) {
-	if unlikely(reason != TASK_RPC_REASON_SYSCALL)
-		return state;
-	return raiseat32_impl(state,
-	                      (USER UNCHECKED struct ucpustate32 const *)sc_info->rsi_regs[0],
-	                      (USER UNCHECKED struct __siginfox32_struct const *)sc_info->rsi_regs[1]);
-}
-
-DEFINE_SYSCALL32_2(errno_t, raiseat,
-                   USER UNCHECKED struct ucpustate32 const *, state,
-                   USER UNCHECKED struct __siginfox32_struct const *, si) {
-	(void)state;
-	(void)si;
-	task_schedule_user_rpc(THIS_TASK,
-	                       &raiseat32_rpc,
-	                       NULL,
-	                       TASK_RPC_FHIGHPRIO |
-	                       TASK_USER_RPC_FINTR,
-	                       GFP_NORMAL);
-	__builtin_unreachable();
-}
 
 
-#ifdef __x86_64__
+/* TODO: The raiseat(2) system call should be removed. Instead, it can be emulated
+ *       by  chaining `sigreturn(2)' with  `rt_tgsigqueueinfo(2)', where the later
+ *       is made to point at a specific thread. */
 
-INTERN struct icpustate *FCALL
-raiseat64_impl(struct icpustate *__restrict state,
-               USER UNCHECKED struct ucpustate64 const *ust,
-               USER UNCHECKED struct __siginfox64_struct const *usi) {
-	siginfo_t si;
-	validate_readable(usi, sizeof(*usi));
-	siginfox64_to_siginfo(usi, &si);
-	if (ust) {
-		validate_readable(ust, sizeof(*ust));
-		state = syscall_fill_icpustate_from_ucpustate64(state, ust);
-	}
-	/* Verify that the signal number is inside of its mandatory bounds. */
-	if unlikely(si.si_signo <= 0 || si.si_signo >= NSIG) {
-		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
-		      E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGNO,
-		      si.si_signo);
-	}
-	/* By passing sc_info as NULL, we can guaranty that raiseat() isn't restarted. */
-	state = x86_userexcept_raisesignal(state, NULL, &si, NULL);
-	return state;
-}
 
-INTERN struct icpustate *FCALL
-raiseat64_rpc(void *UNUSED(arg),
-              struct icpustate *__restrict state,
-              unsigned int reason,
-              struct rpc_syscall_info const *sc_info) {
-	if unlikely(reason != TASK_RPC_REASON_SYSCALL)
-		return state;
-	return raiseat64_impl(state,
-	                      (USER UNCHECKED struct ucpustate64 const *)sc_info->rsi_regs[0],
-	                      (USER UNCHECKED struct __siginfox64_struct const *)sc_info->rsi_regs[1]);
-}
-
-DEFINE_SYSCALL64_2(errno_t, raiseat,
-                   USER UNCHECKED /*ucpustate32*/ struct ucpustate const *, state,
-                   USER UNCHECKED /*siginfo32_t*/ struct __siginfo_struct const *, si) {
-	(void)state;
-	(void)si;
-	task_schedule_user_rpc(THIS_TASK,
-	                       &raiseat64_rpc,
-	                       NULL,
-	                       TASK_RPC_FHIGHPRIO |
-	                       TASK_USER_RPC_FINTR,
-	                       GFP_NORMAL);
-	__builtin_unreachable();
-}
-#endif /* __x86_64__ */
 
 DECL_END
+#endif /* !CONFIG_USE_NEW_RPC */
 
 #endif /* !GUARD_KERNEL_CORE_ARCH_I386_SCHED_POSIX_SIGNAL_C */

@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifdef __INTELLISENSE__
-#include "posix-signal.c"
+#include "oldposix-signal.c"
 #define DEFINE_RAISE32 1
 //#define DEFINE_RAISE64 1
 #endif /* __INTELLISENSE__ */

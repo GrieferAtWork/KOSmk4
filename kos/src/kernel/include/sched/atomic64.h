@@ -22,8 +22,8 @@
 
 #include <kernel/compiler.h>
 
-#include <kernel/arch/atomic64.h>
 #include <kernel/types.h>
+#include <sched/arch/atomic64.h>
 
 #include <hybrid/__assert.h>
 #include <hybrid/__atomic.h>

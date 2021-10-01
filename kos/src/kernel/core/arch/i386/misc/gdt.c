@@ -30,8 +30,11 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 
 #include <kernel/mman/mnode.h>
 #include <kernel/x86/gdt.h>
+#include <sched/atomic64.h>
 #include <sched/pertask.h>
 #include <sched/task.h>
+
+#include <asm/cpu-flags.h>
 
 DECL_BEGIN
 
@@ -139,6 +142,16 @@ NOTHROW(KCALL init_this_x86_kernel_psp0)(struct task *__restrict self) {
 PUBLIC ATTR_PERTASK uintptr_t this_x86_user_fsbase = 0;
 PUBLIC ATTR_PERTASK uintptr_t this_x86_user_gsbase = 0;
 #endif /* !__x86_64__ */
+
+#define WORD64(a, b) (u64)((u64)(u32)(a) | (u64)(u32)(b) << 32)
+PUBLIC atomic64_t x86_user_eflags_mask = ATOMIC64_INIT(WORD64(~(EFLAGS_DF), 0));
+PUBLIC atomic64_t x86_exec_eflags_mask = ATOMIC64_INIT(WORD64(~(EFLAGS_DF | EFLAGS_IOPLMASK), 0));
+#undef WORD64
+
+/* TODO: Kernel commandline options:
+ *  - user_eflags_mask=mask,flag
+ *  - exec_eflags_mask=mask,flag
+ */
 
 
 DECL_END

@@ -1000,11 +1000,10 @@ wait_for_unshare:
 }
 
 
-PRIVATE WUNUSED NONNULL((1, 2)) struct icpustate *
-(FCALL kill_reader)(void *arg,
-                    struct icpustate *__restrict state,
-                    unsigned int UNUSED(reason),
-                    struct rpc_syscall_info const *UNUSED(sc_info)) {
+PRIVATE WUNUSED NONNULL((1, 2)) struct icpustate *FCALL
+kill_reader_rpc(void *arg, struct icpustate *__restrict state,
+                unsigned int UNUSED(reason),
+                struct rpc_syscall_info const *UNUSED(sc_info)) {
 	struct rwlock *lock;
 	lock = (struct rwlock *)arg;
 	/* Check if the calling thread has a read-lock on `lock',
@@ -1059,7 +1058,7 @@ kill_rwlock_reader(struct task *__restrict thread,
 use_rpc:
 		/* Send an RPC to the thread to check if it's using our lock. */
 		task_schedule_synchronous_rpc(thread,
-		                              &kill_reader,
+		                              &kill_reader_rpc,
 		                              lock,
 		                              TASK_RPC_FHIGHPRIO);
 	}

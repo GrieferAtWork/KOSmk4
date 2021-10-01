@@ -17,8 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_ARCH_ATOMIC64_H
-#define GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_ARCH_ATOMIC64_H 1
+#ifndef GUARD_KERNEL_INCLUDE_I386_KOS_SCHED_ARCH_ATOMIC64_H
+#define GUARD_KERNEL_INCLUDE_I386_KOS_SCHED_ARCH_ATOMIC64_H 1
 
 #include <kernel/compiler.h>
 #include <hybrid/host.h>
@@ -309,4 +309,4 @@ DECL_END
 #endif /* !__x86_64__ */
 
 
-#endif /* !GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_ARCH_ATOMIC64_H */
+#endif /* !GUARD_KERNEL_INCLUDE_I386_KOS_SCHED_ARCH_ATOMIC64_H */
