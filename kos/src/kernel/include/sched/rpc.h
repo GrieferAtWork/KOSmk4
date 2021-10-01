@@ -93,12 +93,12 @@ task_rpc_exec(struct task *__restrict thread, syscall_ulong_t flags,
  *                 preemption was re-enabled if it was disabled before.
  * @return: false: No  RPC needed to be served, and preemption
  *                 remains disabled if it was disabled before. */
-FUNDEF bool KCALL task_serve(void) THROWS(E_INTERRUPT_USER_RPC, ...);
+FUNDEF bool FCALL task_serve(void) THROWS(E_INTERRUPT_USER_RPC, ...);
 
 /* Arch-specific function:
  * Same as `task_serve()', but only sevice RPCs that were scheduled as no-throw.
  * @return: * : Set of `TASK_SERVE_*' */
-FUNDEF WUNUSED unsigned int NOTHROW(KCALL task_serve_nx)(void);
+FUNDEF WUNUSED unsigned int NOTHROW(FCALL task_serve_nx)(void);
 
 /* Automatically updates `state' to include the intended return value for `task_serve()'! */
 FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) struct icpustate *FCALL

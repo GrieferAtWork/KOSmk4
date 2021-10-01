@@ -32,6 +32,8 @@
 #include <kernel/user.h>
 #include <sched/pid.h>
 #include <sched/posix-signal.h>
+#include <sched/rpc-internal.h>
+#include <sched/rpc.h>
 #include <sched/signalfd.h>
 
 #include <hybrid/atomic.h>
@@ -46,15 +48,18 @@
 
 DECL_BEGIN
 
+/* Handle object type integration */
+DEFINE_HANDLE_REFCNT_FUNCTIONS(signalfd, struct signalfd);
+
 PRIVATE ATTR_MALLOC ATTR_RETNONNULL WUNUSED REF struct signalfd *KCALL
 signalfd_create(USER CHECKED sigset_t const *mask) THROWS(E_BADALLOC) {
 	struct signalfd *result;
-	result = (struct signalfd *)kmalloc(sizeof(struct signalfd), GFP_NORMAL);
+	result = signalfd_alloc();
 	result->sf_refcnt = 1;
 	TRY {
 		memcpy(&result->sf_mask, mask, sizeof(sigset_t));
 	} EXCEPT {
-		kfree(result);
+		signalfd_free(result);
 		RETHROW();
 	}
 	/* Make sure that we never include SIGKILL or SIGSTOP in the mask. */
@@ -63,8 +68,23 @@ signalfd_create(USER CHECKED sigset_t const *mask) THROWS(E_BADALLOC) {
 	return result;
 }
 
+#ifdef CONFIG_USE_NEW_RPC
 
-DEFINE_HANDLE_REFCNT_FUNCTIONS(signalfd, struct signalfd);
+/* TODO: Re-implement signalfd() for the new RPC system. */
+
+/* TODO: Connect should be  implemented simply by  setting
+ *       the `TASK_FWAKEONMSKRPC' flag, whilst also making
+ *       a call to `userexcept_sysret_inject_self()'.  The
+ *       `TASK_FWAKEONMSKRPC' flag is  later cleared  when
+ *       `userexcept_sysret()' is called. */
+
+/* TODO: Epoll should check if the given object is a signalfd,
+ *       and throw an exception when  trying to listen to  it.
+ *       After all: epoll  works asynchronously, meaning  that
+ *       TLS context (and thus:  RPCs) are weakly defined  and
+ *       can change at any point. */
+
+#else /* CONFIG_USE_NEW_RPC */
 
 LOCAL NOBLOCK NONNULL((1, 2)) void
 NOTHROW(KCALL restore_perthread_pending_signals)(struct sigqueue *__restrict myqueue,
@@ -251,16 +271,43 @@ handle_signalfd_read(struct signalfd *__restrict self,
 INTERN void KCALL
 handle_signalfd_pollconnect(struct signalfd *__restrict UNUSED(self),
                             poll_mode_t what) {
-	if (what & POLLINMASK)
+	if (what & POLLINMASK) {
+#ifdef CONFIG_USE_NEW_RPC
+		/* Connect is implemented simply by setting the `TASK_FWAKEONMSKRPC'
+		 * flag,  before making a call to `userexcept_sysret_inject_self()'.
+		 * The `TASK_FWAKEONMSKRPC' flag is cleared by `userexcept_sysret()' */
+		ATOMIC_OR(THIS_TASK->t_flags, TASK_FWAKEONMSKRPC);
+		userexcept_sysret_inject_self();
+
+		/* FIXME: In this configuration, our thread _is_ guarantied to  receive
+		 *        a sporadic interrupt  once RPCs arrive.  But that's not  good
+		 *        enough; our caller uses `task_waitfor()', which will continue
+		 *        to block until a proper `struct sig'-signal is received,  but
+		 *        RPCs never do that when they arrive, so this right here  ends
+		 *        up not actually working...
+		 *
+		 * Thinking about it, the only ~real~ way of "fixing" this would be to
+		 * introduce a proper `struct sig' that broadcast when RPCs are added.
+		 */
+
+#else /* CONFIG_USE_NEW_RPC */
 		connect_to_my_signal_queues_for_poll();
+#endif /* !CONFIG_USE_NEW_RPC */
+	}
 }
 
 INTERN poll_mode_t KCALL
 handle_signalfd_polltest(struct signalfd *__restrict self,
                          poll_mode_t what) {
 	if (what & POLLINMASK) {
+#ifdef CONFIG_USE_NEW_RPC
+		if (task_rpc_pending_oneof(&self->sf_mask) ||
+		    proc_rpc_pending_oneof(&self->sf_mask))
+			return POLLINMASK;
+#else /* CONFIG_USE_NEW_RPC */
 		if (signalfd_try_read(self, NULL))
 			return POLLINMASK;
+#endif /* !CONFIG_USE_NEW_RPC */
 	}
 	return 0;
 }
@@ -375,6 +422,7 @@ DEFINE_SYSCALL4(fd_t, signalfd4, fd_t, fd,
 			destroy(sfd);
 			RETHROW();
 		}
+		decref_unlikely(sfd);
 	}
 	return (fd_t)result;
 }
@@ -388,6 +436,7 @@ DEFINE_SYSCALL3(fd_t, signalfd, fd_t, fd,
 }
 #endif /* __ARCH_WANT_SYSCALL_SIGNALFD */
 
+#endif /* !CONFIG_USE_NEW_RPC */
 
 
 

@@ -31,35 +31,45 @@
 #include <kos/rpc.h>
 
 /*
- * ============== Userspace <--> RPC control flow overview ==============
+ * ==================================================================================================
+ * ============================ Userspace <--> RPC control flow overview ============================
+ * ==================================================================================================
  *
- *  userexcept_sysret_inject_nopr() <-+
- *     |                              |
- *     v                              |
- * [userexcept_sysret]                |
- *  ^ [serve RPCS]                    |
- *  |      |                          |
- *  |      |                          |
- *  |      +----------------------> [USERSPACE] <-------+
- *  |                                 ^     |           |
- *  |                                 |     |           |
- *  +-----------+---------------------+     |       `userexcept_callhandler()' or
- *              |                           v       `userexcept_callsignal()' or
- *              |   +------------ SYSCALL_ENTRY     `userexcept_seterrno()'
- *              |   |                 /----\ [*]        ^
- *              |   v                 |    |            |
- *     +-----> SYSCALL -> THROW() ----+    v            |
- *     |          |                   |  [userexcept_handler]
- *     |          v                   |      [serve RPCS]
- *     |    [task_serve()]            |      [- When no RPCs got handled (as can happen with RPCs that ]
- *     |          |                   |      [  can only be served when inside special system calls, as]
- *     |          v                   |    +-[  required by `RPC_SYNCMODE_F_REQUIRE_CP', restart the   ]
- *     |    [THROW(E_INTERRUPT_USER_RPC)]  | [  system call after marking them _RPC_CONTEXT_INACTIVE.  ]
- *     |                                   | [  The flag is later cleared in `userexcept_sysret'       ]
- *     |                                   |
- *     +-----------------------------------+
+ * ```
+ *  userexcept_sysret_inject_nopr() <─┐
+ *     │                              │
+ *     v                              │
+ * [userexcept_sysret]                │
+ *  ^ [serve RPCs]                    │
+ *  │      │                          │
+ *  │      │                       ╔══╧════════╗
+ *  │      └─────────────────────> ║ USERSPACE ║ <──────┐
+ *  │                              ╚════════╤══╝        │
+ *  │                                 ^     │           │
+ *  │                                 │     │           │
+ *  └───────────┬─────────────────────┘     │       `userexcept_callhandler()' or
+ *              │                           v       `userexcept_callsignal()' or
+ *              │   ┌───────────── SyscallEntry     `userexcept_seterrno()'
+ *              │   │                 ┌────┐            ^
+ *              │   v                 │[*] │            │
+ *     ┌─────> Syscall ──> THROW() ───┤    v            │
+ *     │          │                   │  [userexcept_handler]
+ *     │          v                   │      [serve RPCs (and handle `E_INTERRUPT_USER_RPC')]
+ *     │    [task_serve()]            │      [- When no RPCs got handled (as can happen with RPCs that ]
+ *     │          │                   │      [  can only be served when inside special system calls, as]
+ *     │          v                   │    ┌─[  required by `RPC_SYNCMODE_F_REQUIRE_CP'), restart the  ]
+ *     │    [THROW(E_INTERRUPT_USER_RPC)]  │ [  system call after marking them _RPC_CONTEXT_INACTIVE.  ]
+ *     │                                   │ [  The flag is later cleared in `userexcept_sysret'       ]
+ *     │                                   │
+ *     └───────────────────────────────────┘
+ * ```
  *
- * [*] The `E_INTERRUPT_USER_RPC' is caught before transitioning to user-space.
+ * ==================================================================================================
+ * [*] Exception handling figuratively "scrapes" by syscall entry points. The
+ *     same also goes  for exceptions thrown  during non-syscall  interrupts,
+ *     which  must also be restartable in the  above model. In this case, you
+ *     may can read `Syscall' as `Interrupt'.
+ * ==================================================================================================
  */
 
 
@@ -227,7 +237,8 @@ NOTHROW(FCALL userexcept_sysret_inject_nopr)(struct task *__restrict thread);
  * signals) to be performed _after_ a  system has completed (even in  a
  * scenario where the system call completes successfully). This kind of
  * functionality is required for some POSIX-signal-related system calls */
-FUNDEF NOBLOCK void NOTHROW(FCALL userexcept_sysret_inject_self)(void);
+FUNDEF NOBLOCK void
+NOTHROW(FCALL userexcept_sysret_inject_self)(void);
 
 
 
@@ -274,7 +285,7 @@ FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL userexcept_sysret_inject_and_marksignal_safe)(struct task *__restrict thread,
                                                             syscall_ulong_t rpc_flags);
 
-/* Invoke `userexcept_sysret_inject_safe()' for every thread apart of
+/* Invoke  `userexcept_sysret_inject_safe()'  for every  thread  apart of
  * `proc', as well as set the `TASK_FRPC' flag for each of those threads. */
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL userexcept_sysret_injectproc_safe)(struct task *__restrict proc,

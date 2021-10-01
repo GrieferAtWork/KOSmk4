@@ -22,7 +22,6 @@
 
 #include <kernel/compiler.h>
 
-#include <kernel/malloc.h>
 #include <kernel/types.h>
 
 #include <bits/os/sigset.h> /* struct __sigset_struct */
@@ -54,12 +53,19 @@ DECL_BEGIN
 typedef struct __sigset_struct sigset_t;
 #endif /* !__sigset_t_defined */
 
+#ifndef ____os_free_defined
+#define ____os_free_defined
+FUNDEF NOBLOCK void NOTHROW(KCALL __os_free)(VIRT void *ptr) ASMNAME("kfree");
+#endif /* !____os_free_defined */
+
 struct signalfd {
 	WEAK refcnt_t sf_refcnt; /* Reference counter. */
 	sigset_t      sf_mask;   /* Mask of signals polled by this signalfd. */
 };
 
-DEFINE_REFCOUNT_FUNCTIONS(struct signalfd, sf_refcnt, kfree)
+#define signalfd_alloc()    ((struct signalfd *)kmalloc(sizeof(struct signalfd), GFP_NORMAL))
+#define signalfd_free(self) __os_free(self)
+DEFINE_REFCOUNT_FUNCTIONS(struct signalfd, sf_refcnt, signalfd_free)
 
 #endif /* __CC__ */
 

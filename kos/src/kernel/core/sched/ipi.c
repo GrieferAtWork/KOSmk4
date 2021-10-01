@@ -28,6 +28,7 @@
 #include <kernel/printk.h>
 #include <sched/cpu.h>
 #include <sched/pid.h>
+#include <sched/rpc-internal.h>
 #include <sched/rpc.h>
 #include <sched/scheduler.h>
 #include <sched/signal.h>
@@ -207,7 +208,15 @@ NOTHROW(FCALL task_wake_ipi)(struct icpustate *__restrict state,
 STATIC_ASSERT(CPU_IPI_FWAITFOR == TASK_WAKE_FWAITFOR);
 #endif /* !CONFIG_NO_SMP */
 
-
+#ifdef CONFIG_USE_NEW_RPC
+PRIVATE NONNULL((1)) void PRPC_EXEC_CALLBACK_CC
+trigger_clone_trap(struct rpc_context *__restrict ctx, void *cookie) {
+	struct debugtrap_reason r;
+	r.dtr_signo   = SIGTRAP; /* New process. */
+	r.dtr_reason  = DEBUGTRAP_REASON_CLONE;
+	ctx->rc_state = kernel_debugtrap_r(ctx->rc_state, &r);
+}
+#else /* CONFIG_USE_NEW_RPC */
 PRIVATE WUNUSED NONNULL((2)) struct icpustate *
 NOTHROW(FCALL trigger_clone_trap)(void *UNUSED(arg),
                                   struct icpustate *__restrict state,
@@ -220,6 +229,7 @@ NOTHROW(FCALL trigger_clone_trap)(void *UNUSED(arg),
 	kernel_debugtrap(state, &r);
 	/* <unreachable...> */
 }
+#endif /* !CONFIG_USE_NEW_RPC */
 
 /* Default task start flags. */
 PUBLIC unsigned int task_start_default_flags = TASK_START_FNORMAL;
@@ -245,8 +255,7 @@ NOTHROW(FCALL task_start)(struct task *__restrict thread, unsigned int flags) {
 				 * -> In this case, we must trigger a clone()
 				 *    trap once the thread begins  execution. */
 				state = FORTASK(thread, this_sstate);
-				state = task_push_asynchronous_rpc(state,
-				                                   &trigger_clone_trap);
+				state = task_push_asynchronous_rpc(state, &trigger_clone_trap, NULL);
 				FORTASK(thread, this_sstate) = state;
 			} else {
 				struct debugtrap_reason r;

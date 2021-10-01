@@ -31,8 +31,9 @@
 #include <bits/os/siginfo.h>
 #include <kos/rpc.h>
 
-#define rpc_entry     pending_rpc      /* !DEPRECATED! */
-#define task_free_rpc pending_rpc_free /* !DEPRECATED! */
+#define rpc_entry                  pending_rpc        /* !DEPRECATED! */
+#define task_free_rpc              pending_rpc_free   /* !DEPRECATED! */
+#define task_push_asynchronous_rpc task_asyncrpc_push /* !DEPRECATED! */
 
 #ifdef __CC__
 DECL_BEGIN
@@ -136,6 +137,21 @@ NOTHROW(FCALL task_rpc_pending_sigset)(/*out*/ sigset_t *__restrict result);
 FUNDEF NONNULL((1)) void FCALL
 proc_rpc_pending_sigset(/*out*/ sigset_t *__restrict result)
 		THROWS(E_WOULDBLOCK);
+
+/* Check if an RPCs routed via one of `these' signals is pending. */
+FUNDEF NOBLOCK WUNUSED NONNULL((1)) __BOOL
+NOTHROW(FCALL task_rpc_pending_oneof)(sigset_t const *__restrict these);
+FUNDEF WUNUSED NONNULL((1)) __BOOL FCALL
+proc_rpc_pending_oneof(sigset_t const *__restrict these)
+		THROWS(E_WOULDBLOCK);
+/* @return: * : One of `PROC_RPC_TRYPENDING_ONEOF_*' */
+FUNDEF NOBLOCK WUNUSED NONNULL((1)) int
+NOTHROW(FCALL proc_rpc_trypending_oneof)(sigset_t const *__restrict these);
+#define PROC_RPC_TRYPENDING_ONEOF_NO         0    /* None of `these' are pending */
+#define PROC_RPC_TRYPENDING_ONEOF_YES        1    /* (At least) one of `these' is pending */
+#define PROC_RPC_TRYPENDING_ONEOF_WOULDBLOCK (-1) /* Operation would block. */
+
+
 
 /* Steal pending RPC (that must be a posix signal) with uses a
  * signal number that is a member of `these'. When no such RPC

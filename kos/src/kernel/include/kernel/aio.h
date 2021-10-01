@@ -90,15 +90,15 @@ DECL_BEGIN
  *   │                                              │       In other words: DMA operations can be kick-started here, too.
  *   v                                              │       >> sig_broadcast(&device->d_aio_avail);
  * [async_operation(device, aio)]                   │                                   │
- * >> // Always need some COMMAND_DESCRIPTOR        └────────┐                          │
- * >> // The used id doesn't matter, though                  │                          │
- * >> aio->ah_data[0]    = incref(device);  ─────────────────│──────────────────────────│──────────────┐
- * >> aio->ah_data[1]    = incref([COMMAND_DESCRIPTOR]);  ───│──────────────────────────│──────────┐   │
- * >> aio->ah_data[2..n] = ...;                              │                          │          │   │
- * >> aio_handle_init(aio, &device_async_aio_type);          │                          │          │   │
- * >> device->d_aio_pending.APPEND(aio);      │              │                          │          │   │
- *                             │              └──────────────│──────────────────────────│──────────│─┐ │
- *                             └─────────────────────────────┘                          │          │ │ │
+ * >> // Always need some COMMAND_DESCRIPTOR        └───────┐                           │
+ * >> // The used id doesn't matter, though                 │                           │
+ * >> aio->ah_data[0]    = incref(device);  ────────────────│───────────────────────────│──────────────┐
+ * >> aio->ah_data[1]    = incref([COMMAND_DESCRIPTOR]);  ──│───────────────────────────│──────────┐   │
+ * >> aio->ah_data[2..n] = ...;                             │                           │          │   │
+ * >> aio_handle_init(aio, &device_async_aio_type);         │                           │          │   │
+ * >> device->d_aio_pending.APPEND(aio);      │             │                           │          │   │
+ *                             │              └─────────────│───────────────────────────│──────────│─┐ │
+ *                             └────────────────────────────┘                           │          │ │ │
  *   ┌──────────────────────────────────────────────────────────────────────────────────┘          │ │ │
  *   │                                                                                             │ │ │
  *   v                                        ┌────> [async_poll(device)]                          │ │ │

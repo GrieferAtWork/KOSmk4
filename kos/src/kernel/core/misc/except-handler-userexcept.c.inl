@@ -86,9 +86,12 @@ NOTHROW(FCALL userexcept_sysret)(struct icpustate *__restrict state)
 	        "In user exception handler, but return state points to kernel-space");
 
 #ifdef DEFINE_userexcept_handler
+
+	/* Load exception information. */
 	memcpy(&error, error_info(), sizeof(error));
 	assertf(error.ei_code != ERROR_CODEOF(E_OK),
 	        "In user exception handler, but no exception was thrown");
+
 	/* Assert that there are no active task connections. */
 #ifndef NDEBUG
 	{
@@ -118,13 +121,30 @@ NOTHROW(FCALL userexcept_sysret)(struct icpustate *__restrict state)
 	error.ei_code  = ERROR_CODEOF(E_OK);
 #endif /* !DEFINE_userexcept_handler */
 
-	ctx.rc_state  = state;
+	ctx.rc_state = state;
 	restore_plast = SLIST_PFIRST(&restore);
 	SLIST_INIT(&kernel_rpcs);
 
-	/* Load RPC functions */
+#ifdef DEFINE_userexcept_sysret
+	/* Also  clear the `TASK_FWAKEONMSKRPC'  during sysret, thus making
+	 * it possible to implement poll support for receiving signals that
+	 * are  currently masked (polling  is done by  setting the flag, as
+	 * well as calling  `userexcept_sysret_inject_self()' to make  sure
+	 * that sysret is invoked before user-space return).
+	 *
+	 * Because there is no way to  define custom operations to be  done
+	 * during disconnect, this is the best way of making it possible to
+	 * do normal polling for signals  (especially since RPCs don't  use
+	 * the normal  sig_send mechanisms, meaning that it's impossible to
+	 * wait for a thread other than THIS_TASK to receive RPCs) */
+	ATOMIC_AND(PERTASK(this_task.t_flags), ~(TASK_FRPC | TASK_FWAKEONMSKRPC));
+#else /* DEFINE_userexcept_sysret */
+	ATOMIC_AND(PERTASK(this_task.t_flags), ~TASK_FRPC);
+#endif /* !DEFINE_userexcept_sysret */
+
+	/* Load RPC functions. This must happen _AFTER_ we clear
+	 * the pending-RPC flag to prevent a race condition. */
 	pending.slh_first = SLIST_ATOMIC_CLEAR(&PERTASK(this_rpcs));
-	ATOMIC_AND(THIS_TASK->t_flags, ~TASK_FRPC);
 
 handle_pending:
 	for (;;) {
@@ -433,6 +453,74 @@ check_next_proc_rpc:
 		} else
 #endif /* DEFINE_userexcept_handler */
 		{
+#ifdef DEFINE_userexcept_handler
+			if (ctx.rc_context != RPC_REASONCTX_SYSRET) {
+				/* Indicate to the RPC that they're allowed to implement
+				 * the actual work  of an interrupt/syscall.  This is  a
+				 * very special case since in  this context, the RPC  is
+				 * allowed to do  a longjmp (iow:  not return  normally,
+				 * and not return by throwing an exception)
+				 *
+				 * Because of this, we have  to do all possible  cleanup
+				 * beforehand, meaning that we have to restore all other
+				 * RPCs that may still be pending. */
+				prpc_exec_callback_t func;
+				void *cookie;
+				func   = rpc->pr_kern.k_func;
+				cookie = rpc->pr_kern.k_cookie;
+				pending_rpc_free(rpc);
+				*restore_plast = SLIST_FIRST(&kernel_rpcs);
+				if (!SLIST_EMPTY(&restore)) {
+					restore_pending_rpcs(SLIST_FIRST(&restore));
+					ATOMIC_OR(PERTASK(this_task.t_flags), TASK_FRPC);
+					assert(PREEMPTION_ENABLED());
+					PREEMPTION_DISABLE();
+					ctx.rc_state = userexcept_sysret_inject_with_state_nopr(ctx.rc_state);
+					PREEMPTION_ENABLE();
+				}
+				/* The following call is allowed not to return at all (neither
+				 * normally, or by throwing an exception), as it is allowed to
+				 * emulate a system call in whatever way it deems suitable! */
+				TRY {
+					(*func)(&ctx, cookie);
+				} EXCEPT {
+					struct exception_info *tls = error_info();
+					if (tls->ei_code != ERROR_CODEOF(E_INTERRUPT_USER_RPC)) {
+						pending.slh_first = SLIST_ATOMIC_CLEAR(&PERTASK(this_rpcs));
+						goto handle_pending;
+					}
+					/* Prioritize errors. */
+					if (error_priority(error.ei_code) < error_priority(tls->ei_code))
+						memcpy(&error, tls, sizeof(error));
+				}
+				restore_plast = SLIST_PFIRST(&restore);
+				SLIST_INIT(&kernel_rpcs);
+				ATOMIC_AND(PERTASK(this_task.t_flags), ~TASK_FRPC);
+				pending.slh_first = SLIST_ATOMIC_CLEAR(&PERTASK(this_rpcs));
+				goto handle_pending;
+			} else {
+				TRY {
+					(*rpc->pr_kern.k_func)(&ctx, rpc->pr_kern.k_cookie);
+				} EXCEPT {
+					struct exception_info *tls = error_info();
+					if (tls->ei_code == ERROR_CODEOF(E_INTERRUPT_USER_RPC)) {
+						pending_rpc_free(rpc);
+						/* Load additional RPCs, but discard this new exception */
+						ATOMIC_AND(PERTASK(this_task.t_flags), ~TASK_FRPC);
+						pending.slh_first = SLIST_ATOMIC_CLEAR(&PERTASK(this_rpcs));
+						goto handle_pending;
+					}
+					/* Prioritize errors. */
+					if (error_priority(error.ei_code) < error_priority(tls->ei_code))
+						memcpy(&error, tls, sizeof(error));
+				}
+				pending_rpc_free(rpc);
+			}
+			assert(ctx.rc_context == RPC_REASONCTX_SYSRET ||
+			       ctx.rc_context == (sc_info ? RPC_REASONCTX_SYSCALL
+			                                  : RPC_REASONCTX_INTERRUPT));
+		}
+#else /* DEFINE_userexcept_handler */
 			TRY {
 				(*rpc->pr_kern.k_func)(&ctx, rpc->pr_kern.k_cookie);
 			} EXCEPT {
@@ -448,15 +536,10 @@ check_next_proc_rpc:
 				if (error_priority(error.ei_code) < error_priority(tls->ei_code))
 					memcpy(&error, tls, sizeof(error));
 			}
-#ifdef DEFINE_userexcept_handler
-			assert(ctx.rc_context == RPC_REASONCTX_SYSRET ||
-			       ctx.rc_context == (sc_info ? RPC_REASONCTX_SYSCALL
-			                                  : RPC_REASONCTX_INTERRUPT));
-#else /* DEFINE_userexcept_handler */
 			assert(ctx.rc_context == RPC_REASONCTX_SYSRET);
-#endif /* !DEFINE_userexcept_handler */
 			pending_rpc_free(rpc);
 		}
+#endif /* !DEFINE_userexcept_handler */
 	}
 
 	/* Restore interrupts that could not be handled right now.
@@ -471,7 +554,17 @@ check_next_proc_rpc:
 		*restore_plast = NULL; /* NULL-terminate list */
 
 #ifdef DEFINE_userexcept_handler
-		if (error.ei_code != ERROR_CODEOF(E_OK) || ctx.rc_context == RPC_REASONCTX_SYSRET) {
+		/* When there's an unhandled exception, then it's impossible to
+		 * restart the interrupt. Thus, we must indicate SYSRET status,
+		 * or in other words: an  async user-space location to  kernel-
+		 * level RPC functions. */
+		if (error.ei_code != ERROR_CODEOF(E_OK)) {
+			assert(ctx.rc_context == RPC_REASONCTX_SYSRET ||
+			       ctx.rc_context == (sc_info ? RPC_REASONCTX_SYSCALL
+			                                  : RPC_REASONCTX_INTERRUPT));
+			ctx.rc_context = RPC_REASONCTX_SYSRET;
+		}
+		if (ctx.rc_context == RPC_REASONCTX_SYSRET) {
 			/* When  the system call won't be restarted, then we must still
 			 * serve kernel RPCS with the `RPC_SYNCMODE_F_SYSRET' flag set. */
 			struct pending_rpc **piter;
@@ -514,9 +607,7 @@ check_next_proc_rpc:
 					if (error_priority(error.ei_code) < error_priority(tls->ei_code))
 						memcpy(&error, tls, sizeof(error));
 				}
-				assert(ctx.rc_context == RPC_REASONCTX_SYSRET ||
-				       ctx.rc_context == (sc_info ? RPC_REASONCTX_SYSCALL
-				                                  : RPC_REASONCTX_INTERRUPT));
+				assert(ctx.rc_context == RPC_REASONCTX_SYSRET);
 				pending_rpc_free(rpc);
 			}
 		}

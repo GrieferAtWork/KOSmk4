@@ -4066,43 +4066,74 @@ DEFINE_SYSCALL2(errno_t, rt_sigsuspend,
 }
 #else /* !CONFIG_USE_NEW_RPC */
 
-INTERN ATTR_RETNONNULL WUNUSED NONNULL((1)) struct icpustate *FCALL
-sigsuspend_impl(struct icpustate *__restrict context,
-                USER UNCHECKED sigset_t *uthese) {
+/* This function is also called from arch-specific, optimized syscall routers. */
+INTERN ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) struct icpustate *FCALL
+rt_sigsuspend_impl(struct icpustate *__restrict state,
+                   struct rpc_syscall_info *__restrict sc_info) {
 	sigset_t these;
+	size_t sigsetsize;
+	USER UNCHECKED sigset_t *uthese;
+	uthese     = (USER UNCHECKED sigset_t *)sc_info->rsi_regs[0];
+	sigsetsize = (size_t)sc_info->rsi_regs[1];
 	validate_readable(uthese, sizeof(sigset_t));
 	memcpy(&these, uthese, sizeof(sigset_t));
-
-	/* TODO: This can be implemented via a custom variant of the functions
-	 *       in "/kos/src/kernel/core/misc/except-handler-userexcept.c.inl" */
-	THROW(E_NOT_IMPLEMENTED_TODO);
-
-	return context;
-}
-
-PRIVATE NONNULL((1)) void PRPC_EXEC_CALLBACK_CC
-sigsuspend_rpc(struct rpc_context *__restrict ctx, void *UNUSED(cookie)) {
-	if (ctx->rc_context != RPC_REASONCTX_SYSCALL)
-		return;
-	/* Indicate that our system call is implemented via this RPC. */
-	ctx->rc_context = RPC_REASONCTX_SYSRET;
-
-	/* Do the actual system call. */
-	ctx->rc_state = sigsuspend_impl(ctx->rc_state, (USER UNCHECKED sigset_t *)ctx->rc_scinfo.rsi_regs[0]);
-}
-
-DEFINE_SYSCALL2(errno_t, rt_sigsuspend,
-                USER UNCHECKED sigset_t const *, uthese,
-                size_t, sigsetsize) {
-	(void)uthese;
 	if unlikely(sigsetsize != sizeof(sigset_t)) {
 		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
 		      E_INVALID_ARGUMENT_CONTEXT_SIGNAL_SIGSET_SIZE,
 		      sigsetsize);
 	}
 
+	/* Indicate that we want to receive wake-ups for masked signals. */
+	ATOMIC_OR(THIS_TASK->t_flags, TASK_FWAKEONMSKRPC);
+
+	/* This will clear `TASK_FWAKEONMSKRPC', as well as
+	 * perform a check for signals not in `these' which
+	 * may have also appeared in the mean time prior to
+	 * returning to user-space. */
+	userexcept_sysret_inject_self();
+again:
+	TRY {
+		/* The  normal implementation of the system call,
+		 * except that `task_serve_with_sigmask' replaces
+		 * calls to `task_serve()'
+		 *
+		 * In case of `sigsuspend(2)`, the "normal" implementation
+		 * is `pause(2)`, which can simply be implemented like this: */
+		for (;;) {
+			PREEMPTION_DISABLE();
+			if (task_serve_with_sigmask(&these))
+				continue;
+			task_pause();
+		}
+	} EXCEPT {
+		/* This function  only returns  normally
+		 * when the syscall should be restarted. */
+		state = userexcept_handler_with_sigmask(state, sc_info, &these);
+		PERTASK_SET(this_exception_code, 1); /* Prevent internal fault */
+		goto again;
+	}
+	__builtin_unreachable();
+}
+
+PRIVATE NONNULL((1)) void PRPC_EXEC_CALLBACK_CC
+rt_sigsuspend_rpc(struct rpc_context *__restrict ctx, void *UNUSED(cookie)) {
+	if (ctx->rc_context != RPC_REASONCTX_SYSCALL)
+		return;
+	/* Indicate that our system call is implemented via this RPC. */
+	ctx->rc_context = RPC_REASONCTX_SYSRET;
+
+	/* Do the actual system call. */
+	ctx->rc_state = rt_sigsuspend_impl(ctx->rc_state, (USER UNCHECKED sigset_t *)ctx->rc_scinfo.rsi_regs[0]);
+}
+
+DEFINE_SYSCALL2(errno_t, rt_sigsuspend,
+                USER UNCHECKED sigset_t const *, uthese,
+                size_t, sigsetsize) {
+	(void)uthese;
+	(void)sigsetsize;
+
 	/* Send an RPC to ourselves, so we can gain access to the user-space register state. */
-	task_rpc_exec(THIS_TASK, RPC_CONTEXT_KERN | RPC_SYNCMODE_F_USER, &sigsuspend_rpc, NULL);
+	task_rpc_exec(THIS_TASK, RPC_CONTEXT_KERN | RPC_SYNCMODE_F_USER, &rt_sigsuspend_rpc, NULL);
 	__builtin_unreachable();
 }
 #endif /* CONFIG_USE_NEW_RPC */

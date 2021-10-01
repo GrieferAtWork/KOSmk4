@@ -325,15 +325,19 @@ task_serve_with_icpustate(struct icpustate *__restrict state)
 	struct rpc_context ctx;
 	bool did_serve_rpcs;
 	bool must_unwind;
-	ctx.rc_context    = RPC_REASONCTX_SYNC;
-	ctx.rc_state      = state;
-	error.ei_code     = ERROR_CODEOF(E_OK);
-	pending.slh_first = SLIST_ATOMIC_CLEAR(&PERTASK(this_rpcs));
-	restore_plast     = SLIST_PFIRST(&restore);
-	did_serve_rpcs    = false;
-	must_unwind       = false;
-handle_pending:
+	ctx.rc_context = RPC_REASONCTX_SYNC;
+	ctx.rc_state   = state;
+	error.ei_code  = ERROR_CODEOF(E_OK);
+	restore_plast  = SLIST_PFIRST(&restore);
+	did_serve_rpcs = false;
+	must_unwind    = false;
 	ATOMIC_AND(PERTASK(this_task.t_flags), ~TASK_FRPC);
+
+	/* Load RPC functions. This must happen _AFTER_ we clear
+	 * the pending-RPC flag to prevent a race condition. */
+	pending.slh_first = SLIST_ATOMIC_CLEAR(&PERTASK(this_rpcs));
+
+handle_pending:
 	while (!SLIST_EMPTY(&pending)) {
 		struct pending_rpc *rpc = SLIST_FIRST(&pending);
 		SLIST_REMOVE_HEAD(&pending, pr_link);
@@ -423,13 +427,17 @@ NOTHROW(FCALL task_serve_with_icpustate_nx)(struct icpustate *__restrict state) 
 	struct pending_rpc **restore_plast;
 	struct rpc_context ctx;
 	unsigned int result;
-	ctx.rc_context    = RPC_REASONCTX_SYNC;
-	ctx.rc_state      = state;
-	pending.slh_first = SLIST_ATOMIC_CLEAR(&PERTASK(this_rpcs));
-	restore_plast     = SLIST_PFIRST(&restore);
-	result            = TASK_SERVE_NX_NORMAL;
-handle_pending:
+	ctx.rc_context = RPC_REASONCTX_SYNC;
+	ctx.rc_state   = state;
+	restore_plast  = SLIST_PFIRST(&restore);
+	result         = TASK_SERVE_NX_NORMAL;
 	ATOMIC_AND(PERTASK(this_task.t_flags), ~TASK_FRPC);
+
+	/* Load RPC functions. This must happen _AFTER_ we clear
+	 * the pending-RPC flag to prevent a race condition. */
+	pending.slh_first = SLIST_ATOMIC_CLEAR(&PERTASK(this_rpcs));
+
+handle_pending:
 	while (!SLIST_EMPTY(&pending)) {
 		struct pending_rpc *rpc = SLIST_FIRST(&pending);
 		SLIST_REMOVE_HEAD(&pending, pr_link);
@@ -615,9 +623,9 @@ NOTHROW(FCALL proc_rpc_schedule)(struct task *__restrict thread_in_proc,
 
 
 
-PRIVATE NOBLOCK NONNULL((2)) void
-NOTHROW(FCALL pending_signals_from_rpc_list)(struct pending_rpc *first,
-                                             /*out*/ sigset_t *__restrict result) {
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL pending_signals_from_rpc_list)(/*out*/ sigset_t *__restrict result,
+                                             struct pending_rpc *first) {
 	for (; first; first = SLIST_NEXT(first, pr_link)) {
 		if (!(first->pr_flags & RPC_CONTEXT_KERN))
 			sigaddset(result, _RPC_GETSIGNO(first->pr_flags));
@@ -633,7 +641,7 @@ NOTHROW(FCALL task_rpc_pending_sigset)(/*out*/ sigset_t *__restrict result) {
 	struct pending_rpc *list;
 	list = PERTASK_GET(this_rpcs.slh_first);
 	assert(list != THIS_RPCS_TERMINATED);
-	pending_signals_from_rpc_list(list, result);
+	pending_signals_from_rpc_list(result, list);
 }
 
 PUBLIC NONNULL((1)) void FCALL
@@ -645,9 +653,68 @@ proc_rpc_pending_sigset(/*out*/ sigset_t *__restrict result)
 	atomic_rwlock_read(&proc_rpcs->ppr_lock);
 	first = SLIST_FIRST(&proc_rpcs->ppr_list);
 	if (first != THIS_RPCS_TERMINATED)
-		pending_signals_from_rpc_list(first, result);
+		pending_signals_from_rpc_list(result, first);
 	atomic_rwlock_endread(&proc_rpcs->ppr_lock);
 }
+
+
+
+/* Check if one of `these' is pending. */
+PRIVATE NOBLOCK WUNUSED NONNULL((1)) bool
+NOTHROW(FCALL is_one_of_these_pending)(sigset_t const *__restrict these,
+                                       struct pending_rpc *first) {
+	for (; first; first = SLIST_NEXT(first, pr_link)) {
+		if (!(first->pr_flags & RPC_CONTEXT_KERN) &&
+		    sigismember(these, _RPC_GETSIGNO(first->pr_flags)))
+			return true;
+	}
+	return false;
+}
+
+/* Check if an RPCs routed via one of `these' signals is pending. */
+PUBLIC NOBLOCK WUNUSED NONNULL((1)) bool
+NOTHROW(FCALL task_rpc_pending_oneof)(sigset_t const *__restrict these) {
+	struct pending_rpc *list;
+	list = PERTASK_GET(this_rpcs.slh_first);
+	assert(list != THIS_RPCS_TERMINATED);
+	return is_one_of_these_pending(these, list);
+}
+
+PUBLIC WUNUSED NONNULL((1)) bool FCALL
+proc_rpc_pending_oneof(sigset_t const *__restrict these)
+		THROWS(E_WOULDBLOCK) {
+	bool result = false;
+	struct process_pending_rpcs *proc_rpcs;
+	struct pending_rpc *first;
+	proc_rpcs = &THIS_PROCESS_RPCS;
+	atomic_rwlock_read(&proc_rpcs->ppr_lock);
+	first = SLIST_FIRST(&proc_rpcs->ppr_list);
+	if (first != THIS_RPCS_TERMINATED)
+		result = is_one_of_these_pending(these, first);
+	atomic_rwlock_endread(&proc_rpcs->ppr_lock);
+	return result;
+}
+
+/* @return: * : One of `PROC_RPC_TRYPENDING_ONEOF_*' */
+PUBLIC NOBLOCK WUNUSED NONNULL((1)) int
+NOTHROW(FCALL proc_rpc_trypending_oneof)(sigset_t const *__restrict these) {
+	int result = PROC_RPC_TRYPENDING_ONEOF_NO;
+	struct process_pending_rpcs *proc_rpcs;
+	struct pending_rpc *first;
+	proc_rpcs = &THIS_PROCESS_RPCS;
+	if (!atomic_rwlock_tryread(&proc_rpcs->ppr_lock))
+		return PROC_RPC_TRYPENDING_ONEOF_WOULDBLOCK;
+	first = SLIST_FIRST(&proc_rpcs->ppr_list);
+	if (first != THIS_RPCS_TERMINATED) {
+		STATIC_ASSERT(PROC_RPC_TRYPENDING_ONEOF_NO == (int)false);
+		STATIC_ASSERT(PROC_RPC_TRYPENDING_ONEOF_YES == (int)true);
+		result = (int)is_one_of_these_pending(these, first);
+	}
+	atomic_rwlock_endread(&proc_rpcs->ppr_lock);
+	return result;
+}
+
+
 
 
 /* Try to steal a posix signal RPC from `list' who's signal bit is `1' in `these'
