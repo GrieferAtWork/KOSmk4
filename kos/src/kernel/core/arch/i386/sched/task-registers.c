@@ -38,6 +38,10 @@
 
 DECL_BEGIN
 
+#ifdef CONFIG_USE_NEW_RPC
+#define x86_rpc_user_redirection x86_userexcept_sysret
+#endif /* CONFIG_USE_NEW_RPC */
+
 /* Safely get/set the values of saved registers that may be modified by RPC redirection. */
 
 /* Check if `self' returns to user-space. */

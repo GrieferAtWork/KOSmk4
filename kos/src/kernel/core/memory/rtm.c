@@ -78,6 +78,49 @@ throw_illegal_op:
 	return state;
 }
 
+
+#ifdef CONFIG_USE_NEW_RPC
+PRIVATE NONNULL((1)) void PRPC_EXEC_CALLBACK_CC
+syscall_rtm_begin_rpc(struct rpc_context *__restrict ctx,
+                      void *UNUSED(cookie)) {
+	REF struct mrtm_driver_hooks *hooks;
+	if (ctx->rc_context != RPC_REASONCTX_SYSCALL)
+		return;
+	ctx->rc_context = RPC_REASONCTX_SYSRET;
+	/* Lookup RTM hooks. */
+	hooks = awref_get(&mrtm_hooks);
+	if unlikely(!hooks) {
+		REF struct driver *rtm_driver;
+		/* Lazily load the RTM driver. */
+		TRY {
+			rtm_driver = driver_insmod(ARCH_RTM_DRIVER_NAME);
+		} EXCEPT {
+			goto throw_illegal_op;
+		}
+		/* Check if hooks have become available now. */
+		{
+			FINALLY_DECREF_UNLIKELY(rtm_driver);
+			hooks = awref_get(&mrtm_hooks);
+		}
+		if unlikely(!hooks) {
+throw_illegal_op:
+			mrtm_setnosys(ctx->rc_state);
+			return;
+		}
+	}
+	{
+		/* Perform an RTM operation for user-space. */
+		FINALLY_DECREF_UNLIKELY(hooks);
+		ctx->rc_state = mrtm_exec(&hooks->rdh_hooks, ctx->rc_state);
+	}
+}
+
+DEFINE_SYSCALL0(rtm_status_t, rtm_begin) {
+	/* Send an RPC to ourself, so we can gain access to the user-space register state. */
+	task_rpc_exec(THIS_TASK, RPC_CONTEXT_KERN | RPC_SYNCMODE_F_USER, &syscall_rtm_begin_rpc, NULL);
+	__builtin_unreachable();
+}
+#else /* CONFIG_USE_NEW_RPC */
 PRIVATE struct icpustate *FCALL
 syscall_rtm_begin_rpc(void *UNUSED(arg),
                       struct icpustate *__restrict state,
@@ -126,6 +169,7 @@ DEFINE_SYSCALL0(rtm_status_t, rtm_begin) {
 	/* Shouldn't get here... */
 	return RTM_NOSYS;
 }
+#endif /* !CONFIG_USE_NEW_RPC */
 #endif /* __ARCH_WANT_SYSCALL_RTM_BEGIN */
 
 #ifdef __ARCH_WANT_SYSCALL_RTM_END

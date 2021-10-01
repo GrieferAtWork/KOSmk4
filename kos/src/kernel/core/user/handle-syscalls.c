@@ -2161,6 +2161,7 @@ DEFINE_SYSCALL5(ssize_t, ppoll,
 	size_t result;
 	ktime_t abs_timeout;
 	if (sigmask) {
+		(void)sigsetsize;
 		/* Send an RPC to ourselves, so we can gain access to the user-space register state. */
 		task_rpc_exec(THIS_TASK, RPC_CONTEXT_KERN | RPC_SYNCMODE_F_USER, &sys_ppoll_rpc, NULL);
 		__builtin_unreachable();
@@ -2220,6 +2221,7 @@ DEFINE_COMPAT_SYSCALL5(ssize_t, ppoll,
 	size_t result;
 	ktime_t abs_timeout;
 	if (sigmask) {
+		(void)sigsetsize;
 		/* Send an RPC to ourselves, so we can gain access to the user-space register state. */
 		task_rpc_exec(THIS_TASK, RPC_CONTEXT_KERN | RPC_SYNCMODE_F_USER, &sys_compat_ppoll_rpc, NULL);
 		__builtin_unreachable();
@@ -2279,6 +2281,7 @@ DEFINE_SYSCALL5(ssize_t, ppoll_time64,
 	size_t result;
 	ktime_t abs_timeout;
 	if (sigmask) {
+		(void)sigsetsize;
 		/* Send an RPC to ourselves, so we can gain access to the user-space register state. */
 		task_rpc_exec(THIS_TASK, RPC_CONTEXT_KERN | RPC_SYNCMODE_F_USER, &sys_ppoll_time64_rpc, NULL);
 		__builtin_unreachable();
@@ -2339,6 +2342,7 @@ DEFINE_COMPAT_SYSCALL5(ssize_t, ppoll_time64,
 	size_t result;
 	ktime_t abs_timeout;
 	if (sigmask) {
+		(void)sigsetsize;
 		/* Send an RPC to ourselves, so we can gain access to the user-space register state. */
 		task_rpc_exec(THIS_TASK, RPC_CONTEXT_KERN | RPC_SYNCMODE_F_USER, &sys_compat_ppoll_time64_rpc, NULL);
 		__builtin_unreachable();
@@ -2790,7 +2794,7 @@ DEFINE_SYSCALL6(ssize_t, pselect6, size_t, nfds,
 }
 #endif /* __ARCH_WANT_SYSCALL_PSELECT6 */
 
-#ifdef __ARCH_WANT_SYSCALL_PSELECT6_TIME64)
+#ifdef __ARCH_WANT_SYSCALL_PSELECT6_TIME64
 INTERN ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) struct icpustate *FCALL
 sys_pselect6_time64_impl(struct icpustate *__restrict state,
                          struct rpc_syscall_info *__restrict sc_info) {

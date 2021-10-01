@@ -27,7 +27,6 @@
 #include <kernel/mman.h>
 #include <kernel/rt/except-handler.h>
 #include <kernel/types.h>
-#include <sched/arch/rpc.h> /* _task_serve_with_icpustate_arch_set_return_bool, ... */
 #include <sched/pid.h>
 #include <sched/posix-signal.h>
 #include <sched/rpc-internal.h>
@@ -38,6 +37,7 @@
 
 #include <kos/except.h>
 #include <kos/kernel/cpu-state-helpers.h>
+#include <kos/kernel/cpu-state.h>
 
 #include <assert.h>
 #include <inttypes.h>

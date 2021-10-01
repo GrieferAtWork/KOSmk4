@@ -199,6 +199,22 @@ sys_iopl_impl(struct icpustate *__restrict state,
 }
 
 
+#ifdef CONFIG_USE_NEW_RPC
+PRIVATE NONNULL((1)) void PRPC_EXEC_CALLBACK_CC
+sys_iopl_rpc(struct rpc_context *__restrict ctx, void *UNUSED(cookie)) {
+	if (ctx->rc_context != RPC_REASONCTX_SYSCALL)
+		return;
+	ctx->rc_context = RPC_REASONCTX_SYSRET;
+	ctx->rc_state   = sys_iopl_impl(ctx->rc_state, ctx->rc_scinfo.rsi_regs[0]);
+}
+
+DEFINE_SYSCALL1(errno_t, iopl, syscall_ulong_t, level) {
+	(void)level;
+	/* Send an RPC to ourself, so we can gain access to the user-space register state. */
+	task_rpc_exec(THIS_TASK, RPC_CONTEXT_KERN | RPC_SYNCMODE_F_USER, &sys_iopl_rpc, NULL);
+	__builtin_unreachable();
+}
+#else /* CONFIG_USE_NEW_RPC */
 PRIVATE struct icpustate *FCALL
 sys_iopl_rpc(void *UNUSED(arg), struct icpustate *__restrict state,
              unsigned int reason, struct rpc_syscall_info const *sc_info) {
@@ -219,6 +235,7 @@ DEFINE_SYSCALL1(errno_t, iopl, syscall_ulong_t, level) {
 	                       GFP_NORMAL);
 	__builtin_unreachable();
 }
+#endif /* !CONFIG_USE_NEW_RPC */
 
 
 DECL_END

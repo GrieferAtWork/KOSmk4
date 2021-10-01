@@ -62,6 +62,10 @@
 
 DECL_BEGIN
 
+/* TODO: Under CONFIG_USE_NEW_RPC, all of the `x86_userexcept_*'
+ *       function should not  be made  `PUBLIC', but  `PRIVATE'! */
+
+
 LOCAL NOBLOCK NONNULL((1, 2, 3)) void
 NOTHROW(FCALL log_userexcept_errno_propagate)(struct icpustate const *__restrict state,
                                               struct rpc_syscall_info const *__restrict sc_info,
@@ -302,68 +306,24 @@ userexcept_callhandler(struct icpustate *__restrict state,
 }
 
 
-
-/* Set the appropriate error flag for the system call method described by `sc_info' (if any)
- * We (no longer) have a dedicated system error-flag. */
-LOCAL NOBLOCK NONNULL((1, 2, 3)) struct icpustate *
-NOTHROW(FCALL x86_userexcept_set_error_flag)(struct icpustate *__restrict state,
-                                             struct rpc_syscall_info const *__restrict sc_info,
-                                             struct exception_data const *__restrict data) {
-	(void)sc_info;
-	(void)data;
-	/* We (no longer) have a dedicated system error-flag. */
-	return state;
-}
-
-
 /* Arch-specific function:
  * Translate the current exception into an errno and set that errno
  * as the return value of  the system call described by  `sc_info'. */
-#ifdef __x86_64__
-PUBLIC NOBLOCK WUNUSED NONNULL((1, 2, 3)) struct icpustate *
-NOTHROW(FCALL userexcept_seterrno)(struct icpustate *__restrict state,
-                                   struct rpc_syscall_info const *__restrict sc_info,
-                                   struct exception_data const *__restrict data) {
-	struct icpustate *result;
-	if (icpustate_is64bit(state)) {
-		result = x86_userexcept_seterrno64(state, sc_info, data);
-	} else {
-		result = x86_userexcept_seterrno32(state, sc_info, data);
-	}
-	return result;
-}
-
-PUBLIC NOBLOCK WUNUSED NONNULL((1, 2, 3)) struct icpustate *
-NOTHROW(FCALL x86_userexcept_seterrno64)(struct icpustate *__restrict state,
-                                         struct rpc_syscall_info const *__restrict sc_info,
-                                         struct exception_data const *__restrict data) {
-	errno_t errval;
-	(void)sc_info;
-	errval = -error_as_errno(data);
-	log_userexcept_errno_propagate(state, sc_info, data, errval);
-	gpregs_setpax(&state->ics_gpregs, (uintptr_t)(intptr_t)errval);
-	/* Check if the system call is double-wide so we
-	 * can  sign-extend the error code if necessary. */
-	if (kernel_syscall64_doublewide(sc_info->rsi_sysno))
-		gpregs_setpdx(&state->ics_gpregs, (uintptr_t)-1); /* sign-extend */
-	/* Set an error flag (if any) */
-	state = x86_userexcept_set_error_flag(state, sc_info, data);
-	return state;
-}
-
-PUBLIC NOBLOCK WUNUSED NONNULL((1, 2, 3)) struct icpustate *
-NOTHROW(FCALL x86_userexcept_seterrno32)(struct icpustate *__restrict state,
-                                         struct rpc_syscall_info const *__restrict sc_info,
-                                         struct exception_data const *__restrict data)
-#else /* __x86_64__ */
-PUBLIC NOBLOCK WUNUSED NONNULL((1, 2, 3)) struct icpustate *
+#ifdef CONFIG_USE_NEW_RPC
+PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3)) struct icpustate *FCALL
+userexcept_seterrno(struct icpustate *__restrict state,
+                    struct rpc_syscall_info const *__restrict sc_info,
+                    struct exception_data const *__restrict data)
+		/* NOTE: On x86, this implementation is actually NOTHROW... */
+		THROWS(E_SEGFAULT)
+#else /* CONFIG_USE_NEW_RPC */
+PUBLIC NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3)) struct icpustate *
 NOTHROW(FCALL userexcept_seterrno)(struct icpustate *__restrict state,
                                    struct rpc_syscall_info const *__restrict sc_info,
                                    struct exception_data const *__restrict data)
-#endif /* !__x86_64__ */
+#endif /* !CONFIG_USE_NEW_RPC */
 {
-	errno_t errval;
-	errval = -error_as_errno(data);
+	errno_t errval = -error_as_errno(data);
 	log_userexcept_errno_propagate(state, sc_info, data, errval);
 
 	/* All system call  methods return error  values through  EAX.
@@ -374,13 +334,12 @@ NOTHROW(FCALL userexcept_seterrno)(struct icpustate *__restrict state,
 
 	/* Check if the system call is double-wide so we
 	 * can  sign-extend the error code if necessary. */
-	if (kernel_syscall32_doublewide(sc_info->rsi_sysno))
+	if (kernel_syscall_doublewide(sc_info))
 		gpregs_setpdx(&state->ics_gpregs, (uintptr_t)-1); /* sign-extend */
-
-	/* Set an error flag (if any) */
-	state = x86_userexcept_set_error_flag(state, sc_info, data);
 	return state;
 }
+
+
 
 
 #ifdef CONFIG_USE_NEW_RPC
@@ -566,7 +525,7 @@ again_gethand:
 	/* Invoke a regular, old signal handler. */
 	{
 		FINALLY_XDECREF_UNLIKELY(action.sa_mask);
-		result = sighand_raise_signal(state,
+		result = userexcept_callsignal(state,
 		                              &action,
 		                              siginfo,
 		                              sc_info);

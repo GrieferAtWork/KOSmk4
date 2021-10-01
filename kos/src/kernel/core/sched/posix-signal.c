@@ -1401,7 +1401,7 @@ default_action:
 	}
 	/* Raise the given signal in user-space. */
 	TRY {
-		state = sighand_raise_signal(state,
+		state = userexcept_callsignal(state,
 		                             &action,
 		                             &info->sqe_info,
 		                             sc_info);

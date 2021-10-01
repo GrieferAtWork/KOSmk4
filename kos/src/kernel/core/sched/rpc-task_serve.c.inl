@@ -184,7 +184,7 @@ handle_pending:
 		if (are_any_unmasked_process_rpcs_maybe_pending_nx())
 			result |= TASK_SERVE_NX_EXCEPT;
 	}
-	_task_serve_with_icpustate_nx_arch_set_return_uint(ctx.rc_state, result);
+	icpustate_setreturn(ctx.rc_state, result);
 	return ctx.rc_state;
 #else /* LOCAL_NOEXCEPT */
 	/* Check if we must throw a new exception. */
@@ -200,7 +200,7 @@ handle_pending:
 	}
 	if (must_unwind)
 		THROW(E_INTERRUPT_USER_RPC);
-	_task_serve_with_icpustate_arch_set_return_bool(ctx.rc_state, did_serve_rpcs);
+	icpustate_setreturnbool(ctx.rc_state, did_serve_rpcs);
 #endif /* !LOCAL_NOEXCEPT */
 	return ctx.rc_state;
 }

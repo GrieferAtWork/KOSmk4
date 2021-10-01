@@ -341,6 +341,69 @@ DECL_BEGIN
 #endif /* !__INTELLISENSE__ */
 
 
+#ifdef CONFIG_USE_NEW_RPC
+PRIVATE NONNULL((1)) void PRPC_EXEC_CALLBACK_CC
+sys_debugtrap_rpc32(struct rpc_context *__restrict ctx,
+                    void *UNUSED(cookie)) {
+	if (ctx->rc_context != RPC_REASONCTX_SYSCALL)
+		return;
+	ctx->rc_context = RPC_REASONCTX_SYSRET;
+	/* Do the system call. */
+	ctx->rc_state = sys_debugtrap32_impl(ctx->rc_state,
+	                                     (USER UNCHECKED struct ucpustate32 const *)ctx->rc_scinfo.rsi_regs[0],
+	                                     (USER UNCHECKED struct debugtrap_reason32 const *)ctx->rc_scinfo.rsi_regs[1]);
+}
+
+#ifdef __x86_64__
+PRIVATE NONNULL((1)) void PRPC_EXEC_CALLBACK_CC
+sys_debugtrap_rpc64(struct rpc_context *__restrict ctx,
+                    void *UNUSED(cookie)) {
+	if (ctx->rc_context != RPC_REASONCTX_SYSCALL)
+		return;
+	ctx->rc_context = RPC_REASONCTX_SYSRET;
+	/* Do the system call. */
+	ctx->rc_state = sys_debugtrap64_impl(ctx->rc_state,
+	                                     (USER UNCHECKED struct ucpustate64 const *)ctx->rc_scinfo.rsi_regs[0],
+	                                     (USER UNCHECKED struct debugtrap_reason64 const *)ctx->rc_scinfo.rsi_regs[1]);
+}
+#endif /* __x86_64__ */
+
+DEFINE_SYSCALL2(errno_t, debugtrap,
+                USER UNCHECKED struct ucpustate const *, state,
+                USER UNCHECKED struct debugtrap_reason const *, reason) {
+	(void)state;
+	(void)reason;
+	if (kernel_debugtrap_enabled()) {
+		/* Send an RPC to ourself, so we can gain access to the user-space register state. */
+		task_rpc_exec(THIS_TASK, RPC_CONTEXT_KERN | RPC_SYNCMODE_F_USER,
+#ifdef __x86_64__
+		              &sys_debugtrap_rpc64,
+#else  /* __x86_64__ */
+		              &sys_debugtrap_rpc32,
+#endif /* !__x86_64__ */
+		              NULL);
+	}
+	return -ENOENT;
+}
+
+
+#ifdef __x86_64__
+DEFINE_SYSCALL32_2(errno_t, debugtrap,
+                   USER UNCHECKED struct ucpustate32 const *, state,
+                   USER UNCHECKED struct debugtrap_reason32 const *, reason) {
+	(void)state;
+	(void)reason;
+	if (kernel_debugtrap_enabled()) {
+		/* Send an RPC to ourself, so we can gain access to the user-space register state. */
+		task_rpc_exec(THIS_TASK, RPC_CONTEXT_KERN | RPC_SYNCMODE_F_USER,
+		              &sys_debugtrap_rpc32, NULL);
+	}
+	return -ENOENT;
+}
+#endif /* __x86_64__ */
+
+#else /* CONFIG_USE_NEW_RPC */
+
 PRIVATE struct icpustate *FCALL
 sys_debugtrap_rpc32(void *UNUSED(arg), struct icpustate *__restrict state,
                     unsigned int reason, struct rpc_syscall_info const *sc_info) {
@@ -402,6 +465,7 @@ DEFINE_SYSCALL32_2(errno_t, debugtrap,
 	return -ENOENT;
 }
 #endif /* __x86_64__ */
+#endif /* !CONFIG_USE_NEW_RPC */
 
 
 DECL_END

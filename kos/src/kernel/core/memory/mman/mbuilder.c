@@ -157,22 +157,33 @@ NOTHROW(FCALL mbuilder_norpc_fini)(struct mbuilder_norpc *__restrict self) {
 /* Finalize the given mem-builder. */
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL mbuilder_fini)(struct mbuilder *__restrict self) {
-	struct rpc_entry *ent;
 
 	/* Destroy the old mappings tree (as inherited during in `mbuilder_apply()'). */
 	if likely(self->mb_oldmap != NULL)
 		mnode_tree_destroy(self->mb_oldmap);
 
 	/* Free all RPC descriptors that may still be allocated */
-	ent = self->mb_killrpc;
-	if unlikely(ent) {
-		do {
-			struct rpc_entry *next;
-			next = ent->re_next;
-			task_free_rpc(ent);
-			ent = next;
-		} while (ent);
+#ifdef CONFIG_USE_NEW_RPC
+	while unlikely(!SLIST_EMPTY(&self->mb_killrpc)) {
+		struct pending_rpc *rpc;
+		rpc = SLIST_FIRST(&self->mb_killrpc);
+		SLIST_REMOVE_HEAD(&self->mb_killrpc, pr_link);
+		pending_rpc_free(rpc);
 	}
+#else /* CONFIG_USE_NEW_RPC */
+	{
+		struct rpc_entry *ent;
+		ent = self->mb_killrpc;
+		if unlikely(ent) {
+			do {
+				struct rpc_entry *next;
+				next = ent->re_next;
+				task_free_rpc(ent);
+				ent = next;
+			} while (ent);
+		}
+	}
+#endif /* !CONFIG_USE_NEW_RPC */
 	mbuilder_norpc_fini(self);
 }
 

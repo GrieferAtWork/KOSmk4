@@ -110,21 +110,6 @@ NOTHROW(FCALL userexcept_seterrno)(struct icpustate *__restrict state,
                                    struct rpc_syscall_info const *__restrict sc_info,
                                    struct exception_data const *__restrict except_data);
 
-#ifdef __x86_64__
-/* Dedicated  functions  which  may  be  used  if  the  caller already
- * knows the result of `icpustate_is32bit(state)' and related helpers. */
-FUNDEF NOBLOCK WUNUSED NONNULL((1, 2, 3)) struct icpustate *
-NOTHROW(FCALL x86_userexcept_seterrno32)(struct icpustate *__restrict state,
-                                         struct rpc_syscall_info const *__restrict sc_info,
-                                         struct exception_data const *__restrict except_data);
-FUNDEF NOBLOCK WUNUSED NONNULL((1, 2, 3)) struct icpustate *
-NOTHROW(FCALL x86_userexcept_seterrno64)(struct icpustate *__restrict state,
-                                         struct rpc_syscall_info const *__restrict sc_info,
-                                         struct exception_data const *__restrict except_data);
-#else /* __x86_64__ */
-#define x86_userexcept_seterrno32 userexcept_seterrno
-#endif /* !__x86_64__ */
-
 
 /* Propagate the currently  thrown exception  into user-space, using  either the  user-space
  * exception handler, by raising  a POSIX signal,  or by translating  the exception into  an

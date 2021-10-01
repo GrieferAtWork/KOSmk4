@@ -38,48 +38,90 @@ DECL_BEGIN
 #endif /* !DEFINE_RAISE32 */
 
 
-/* Update the given `state' to raise the specified `siginfo'
- * as   a  user-space  signal  within  the  calling  thread.
- * NOTE: The   caller  is  responsible  to  handle  special  signal
- *       handlers  (`KERNEL_SIG_*')  before calling  this function!
- *       This function should only be used to enqueue the execution
- *       of a signal handler with a user-space entry point.
- * @param: state:   The interrupt CPU state describing the return to user-space.
+#ifdef CONFIG_USE_NEW_RPC
+/* Update the given  `state' to raise  the specified `siginfo'  as
+ * a user-space signal  within the calling  thread. The caller  is
+ * responsible  to handle special signal handlers (`KERNEL_SIG_*')
+ * before calling this function! This function should only be used
+ * to  enqueue the execution of a signal handler with a user-space
+ * entry point.
+ *
+ * Functionality like `SIGACTION_SA_RESETHAND', or system call
+ * restart  selection  must  be  implemented  by  the  caller.
+ *
+ * @param: state:   The CPU state describing the return to user-space.
  * @param: action:  The signal action to perform.
  * @param: siginfo: The signal that is being raised.
- * @param: sc_info: When non-NULL, `sc_info' describes a system call that may be restarted.
- *                  Note  however   that   ontop   of   this,   [restart({auto,must,dont})]
- *                  logic  will   still  be   applied,  which   is  done   in   cooperation
- *                  with the system call restart database.
- * @return: * :     The updated CPU state.
- * @return: NULL:   The `SIGACTION_SA_RESETHAND' flag was set, but `action'
- *                  differs from the set handler. */
+ * @param: sc_info: When  non-NULL, `sc_info' describes a system call
+ *                  that will be restarted once the user-space signal
+ *                  handler returns. No additional  should-really-be-
+ *                  re-started  logic is done  by this function (iow:
+ *                  such logic must be implemented by the caller)
+ * @return: * :     The updated CPU state. */
 #ifdef __x86_64__
-PRIVATE WUNUSED struct icpustate *KCALL
-NAME(sighand_raise_signal)(struct icpustate *__restrict state,
-                           struct kernel_sigaction const *__restrict action,
-                           USER CHECKED siginfo_t const *siginfo,
-                           struct rpc_syscall_info const *sc_info)
+PRIVATE ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3)) struct icpustate *FCALL
+NAME(userexcept_callsignal)(struct icpustate *__restrict state,
+                            struct kernel_sigaction const *__restrict action,
+                            siginfo_t const *__restrict siginfo,
+                            struct rpc_syscall_info const *sc_info)
+		THROWS(E_SEGFAULT)
+#else /* __x86_64__ */
+PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3)) struct icpustate *FCALL
+userexcept_callsignal(struct icpustate *__restrict state,
+                      struct kernel_sigaction const *__restrict action,
+                      siginfo_t const *__restrict siginfo,
+                      struct rpc_syscall_info const *sc_info)
+		THROWS(E_SEGFAULT)
+#endif /* !__x86_64__ */
+#else /* CONFIG_USE_NEW_RPC */
+/* Update the given  `state' to raise  the specified `siginfo'  as
+ * a user-space signal  within the calling  thread. The caller  is
+ * responsible  to handle special signal handlers (`KERNEL_SIG_*')
+ * before calling this function! This function should only be used
+ * to  enqueue the execution of a signal handler with a user-space
+ * entry point.
+ * @param: state:   The CPU state describing the return to user-space.
+ * @param: action:  The signal action to perform.
+ * @param: siginfo: The signal that is being raised.
+ * @param: sc_info: When non-NULL, `sc_info'  describes a system  call
+ *                  that may be restarted. Note however that ontop  of
+ *                  this, [restart({auto,must,dont})] logic will still
+ *                  be applied, which is done in cooperation with  the
+ *                  system call restart database.
+ * @return: * :     The updated CPU state.
+ * @return: NULL:   The `SIGACTION_SA_RESETHAND' flag was set,
+ *                  but `action' differs from the set handler. */
+#ifdef __x86_64__
+PRIVATE WUNUSED NONNULL((1, 2)) struct icpustate *KCALL
+NAME(userexcept_callsignal)(struct icpustate *__restrict state,
+                            struct kernel_sigaction const *__restrict action,
+                            USER CHECKED siginfo_t const *siginfo,
+                            struct rpc_syscall_info const *sc_info)
 		THROWS(E_SEGFAULT, E_WOULDBLOCK)
 #else /* __x86_64__ */
-PUBLIC WUNUSED struct icpustate *KCALL
-sighand_raise_signal(struct icpustate *__restrict state,
-                     struct kernel_sigaction const *__restrict action,
-                     USER CHECKED siginfo_t const *siginfo,
-                     struct rpc_syscall_info const *sc_info)
+PUBLIC WUNUSED NONNULL((1, 2)) struct icpustate *KCALL
+userexcept_callsignal(struct icpustate *__restrict state,
+                      struct kernel_sigaction const *__restrict action,
+                      USER CHECKED siginfo_t const *siginfo,
+                      struct rpc_syscall_info const *sc_info)
 		THROWS(E_SEGFAULT, E_WOULDBLOCK)
 #endif /* !__x86_64__ */
+#endif /* !CONFIG_USE_NEW_RPC */
 {
 	USER CHECKED byte_t *usp, *orig_usp;
 	bool must_restore_sigmask;
 	sigset_t old_sigmask;
-	signo_t signo = ATOMIC_READ(siginfo->si_signo);
 	USER CHECKED struct NAME2(__siginfox, _struct) *user_siginfo;
 	USER CHECKED struct NAME(__ucontextx) *user_ucontext;
 	USER CHECKED sigset_t *user_sigset;
 	USER CHECKED struct NAME(fpustate) *user_fpustate;
 	USER CHECKED struct NAME(rpc_syscall_info) *user_sc_info;
 	USER CHECKED NAME(u) user_rstor;
+#ifdef CONFIG_USE_NEW_RPC
+	signo_t signo = siginfo->si_signo;
+	assert(!(signo <= 0 || signo >= NSIG));
+#else /* CONFIG_USE_NEW_RPC */
+	signo_t signo = ATOMIC_READ(siginfo->si_signo);
 	if unlikely(signo <= 0 || signo >= NSIG)
 		return NULL;
 	/* Check if the handler should be reset before being invoked. */
@@ -115,7 +157,7 @@ sighand_raise_signal(struct icpustate *__restrict state,
 				tls_info->ei_data.e_faultaddr = icpustate_getpc(state);
 				/* FIXME: This function has a chance to never return when
 				 *        it causes the calling process to be terminated!
-				 * However, we need it to always return, since `sighand_raise_signal()'
+				 * However, we need it to always return, since `userexcept_callsignal()'
 				 * must always return normally, or via an exception! */
 				state = x86_userexcept_propagate(state, sc_info);
 				assert(tls_info->ei_code == ERROR_CODEOF(E_OK));
@@ -125,12 +167,19 @@ sighand_raise_signal(struct icpustate *__restrict state,
 			sc_info = NULL;
 		}
 	}
+#endif /* !CONFIG_USE_NEW_RPC */
+
 	/* Figure out how, and if we need to mask signals. */
 	must_restore_sigmask = false;
 	if (action->sa_mask || !(action->sa_flags & SIGACTION_SA_NODEFER)) {
 		USER CHECKED sigset_t *sigmask;
 		sigmask = sigmask_getwr();
 		memcpy(&old_sigmask, sigmask, sizeof(sigset_t));
+		/* FIXME: `sigmask' may not actually be  writable if it's a  userprocmask.
+		 *        Because of this, we only try add signals to `sigmask' when their
+		 *        bits are  set to  `0' (s.a.  `setsigmaskfullptr(3)', which  sets
+		 *        the  userprocmask to an all-1s mask which is stored in read-only
+		 *        memory) */
 		if (!(action->sa_flags & SIGACTION_SA_NODEFER))
 			sigaddset(sigmask, (int)signo);
 		if (action->sa_mask)

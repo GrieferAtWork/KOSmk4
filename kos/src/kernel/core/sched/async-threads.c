@@ -98,7 +98,9 @@ NOTHROW(FCALL async_threads_kill)(struct task *__restrict thread) {
 	REF struct async_thread_controller *ctl;
 	ctl = arref_get(&async_threads);
 	BSEARCH (i, ctl->atc_threads, ctl->atc_count, ->atd_thread, thread) {
+#ifndef CONFIG_USE_NEW_RPC
 		int rpc_status;
+#endif /* !CONFIG_USE_NEW_RPC */
 		REF struct async_thread_data *dat;
 		struct rpc_entry *rpc;
 		dat = incref(ctl->atc_threads[i]);
@@ -114,6 +116,13 @@ NOTHROW(FCALL async_threads_kill)(struct task *__restrict thread) {
 		/* Deliver the pending kill-rpc.
 		 * All of the remaining work needed to get rid of `thread'
 		 * will  then  be performed  from within  `thread' itself! */
+#ifdef CONFIG_USE_NEW_RPC
+		if unlikely(!task_rpc_schedule(thread, rpc)) {
+			/* Deal with the possibility that the async-worker thread
+			 * died through other means? */
+			pending_rpc_free(rpc);
+		}
+#else /* CONFIG_USE_NEW_RPC */
 		rpc_status = task_deliver_rpc(thread, rpc);
 		assert(rpc_status != TASK_DELIVER_RPC_KERNTHREAD);
 		assert(rpc_status != TASK_DELIVER_RPC_INTERRUPTED);
@@ -122,6 +131,7 @@ NOTHROW(FCALL async_threads_kill)(struct task *__restrict thread) {
 		 * died through other means? */
 		if unlikely(!TASK_DELIVER_RPC_WASOK(rpc_status))
 			task_free_rpc(rpc);
+#endif /* !CONFIG_USE_NEW_RPC */
 		return true;
 	}
 	decref_unlikely(ctl);

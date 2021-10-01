@@ -185,7 +185,6 @@ struct mbnode_partset {
 	(void)0
 
 
-struct rpc_entry;
 struct mbuilder_norpc {
 #ifdef __INTELLISENSE__
 	struct mbnode           *mb_mappings; /* [0..n][owned] Tree of mem-nodes. */
@@ -199,6 +198,16 @@ struct mbuilder_norpc {
 		struct mnode_slist  _mb_fnodes;   /* [0..n][link(_mbn_alloc)] List of free mem-nodes. */
 	};
 };
+
+#ifdef CONFIG_USE_NEW_RPC
+struct pending_rpc;
+#ifndef __pending_rpc_slist_defined
+#define __pending_rpc_slist_defined
+SLIST_HEAD(pending_rpc_slist, pending_rpc);
+#endif /* !__pending_rpc_slist_defined */
+#else /* CONFIG_USE_NEW_RPC */
+struct rpc_entry;
+#endif /* !CONFIG_USE_NEW_RPC */
 
 struct mbuilder
 #ifdef __cplusplus
@@ -214,13 +223,19 @@ struct mbuilder
 #define __mbuilder_base    /* nothing */
 #endif /* __cplusplus */
 #ifdef __INTELLISENSE__
-	struct mnode       *mb_oldmap;   /* [0..n][owned] Old mem-node tree of the target mman. */
+	struct mnode            *mb_oldmap;   /* [0..n][owned] Old mem-node tree of the target mman. */
 #else /* __INTELLISENSE__ */
-	RBTREE_ROOT(mnode)  mb_oldmap;   /* [0..n][owned] Old mem-node tree of the target mman. */
+	RBTREE_ROOT(mnode)       mb_oldmap;   /* [0..n][owned] Old mem-node tree of the target mman. */
 #endif /* !__INTELLISENSE__ */
-	struct rpc_entry   *mb_killrpc;  /* [0..n][link(re_next)]  List  of  pre-allocated  RPC
-	                                  * descriptors, as used by `mbuilder_apply()' in order
-	                                  * to  terminate threads using  the given target mman. */
+#ifdef CONFIG_USE_NEW_RPC
+	struct pending_rpc_slist mb_killrpc;  /* [0..n] List of pre-allocated RPC descriptors, as
+	                                       * used by `mbuilder_apply()' in order to terminate
+	                                       * threads using the given target mman. */
+#else /* CONFIG_USE_NEW_RPC */
+	struct rpc_entry        *mb_killrpc;  /* [0..n][link(re_next)]  List  of  pre-allocated  RPC
+	                                       * descriptors, as used by `mbuilder_apply()' in order
+	                                       * to  terminate threads using  the given target mman. */
+#endif /* !CONFIG_USE_NEW_RPC */
 };
 
 /* Initialize the given mem-builder. */
@@ -234,6 +249,16 @@ struct mbuilder
 	 mbnode_partset_cinit(&(self)->mb_uparts),          \
 	 __hybrid_assert(SLIST_EMPTY(&(self)->mb_uparts)),  \
 	 __hybrid_assert(SLIST_EMPTY(&(self)->_mb_fnodes)))
+#ifdef CONFIG_USE_NEW_RPC
+#define mbuilder_init(self)                         \
+	(mbuilder_norpc_init(__mbuilder_asnorpc(self)), \
+	 (self)->mb_oldmap = __NULLPTR,                 \
+	 SLIST_INIT(&(self)->mb_killrpc))
+#define mbuilder_cinit(self)                          \
+	(mbuilder_norpc_cinit(__mbuilder_asnorpc(self)),  \
+	 __hybrid_assert((self)->mb_oldmap == __NULLPTR), \
+	 __hybrid_assert(SLIST_EMPTY(&(self)->mb_killrpc)))
+#else /* CONFIG_USE_NEW_RPC */
 #define mbuilder_init(self)                         \
 	(mbuilder_norpc_init(__mbuilder_asnorpc(self)), \
 	 (self)->mb_oldmap  = __NULLPTR,                \
@@ -242,6 +267,7 @@ struct mbuilder
 	(mbuilder_norpc_cinit(__mbuilder_asnorpc(self)),  \
 	 __hybrid_assert((self)->mb_oldmap == __NULLPTR), \
 	 __hybrid_assert((self)->mb_killrpc == __NULLPTR))
+#endif /* !CONFIG_USE_NEW_RPC */
 
 /* Finalize the given mem-builder. */
 FUNDEF NOBLOCK NONNULL((1)) void

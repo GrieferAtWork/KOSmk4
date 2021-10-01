@@ -32,16 +32,26 @@
 
 DECL_BEGIN
 
+#ifdef CONFIG_USE_NEW_RPC
+struct pending_rpc;
+#else /* CONFIG_USE_NEW_RPC */
 struct rpc_entry;
+#endif /* !CONFIG_USE_NEW_RPC */
+
 struct async_thread_data {
 	/* Per-async-worker-thread controller context. */
-	WEAK refcnt_t     atd_refcnt;  /* Reference counter. */
-	REF struct task  *atd_thread;  /* [1..1][const] The async-worker thread in question. */
-	struct async     *atd_sleepon; /* [0..1][lock(PRIVATE(THIS_TASK))] The job that  this
-	                                * thread is currently sleeping upon in order to await
-	                                * its timeout to expire. */
-	struct rpc_entry *atd_killrpc; /* [0..1][owned][lock(CLEAR_ONCE)] RPC which may be used
-	                                * to  kill  the associated  thread  (iow: `atd_thread') */
+	WEAK refcnt_t       atd_refcnt;  /* Reference counter. */
+	REF struct task    *atd_thread;  /* [1..1][const] The async-worker thread in question. */
+	struct async       *atd_sleepon; /* [0..1][lock(PRIVATE(THIS_TASK))] The job that  this
+	                                  * thread is currently sleeping upon in order to await
+	                                  * its timeout to expire. */
+#ifdef CONFIG_USE_NEW_RPC
+	struct pending_rpc *atd_killrpc; /* [0..1][owned][lock(CLEAR_ONCE)] RPC which may be used
+	                                  * to  kill  the associated  thread  (iow: `atd_thread') */
+#else /* CONFIG_USE_NEW_RPC */
+	struct rpc_entry   *atd_killrpc; /* [0..1][owned][lock(CLEAR_ONCE)] RPC which may be used
+	                                  * to  kill  the associated  thread  (iow: `atd_thread') */
+#endif /* !CONFIG_USE_NEW_RPC */
 };
 
 /* Destroy the given async-thread-data. */

@@ -33,6 +33,7 @@
 #include <asm/cfi.h>
 #include <asm/cpu-flags.h>
 #include <asm/instr/compat.h>
+#include <asm/instr/ttest.h>
 #include <kos/kernel/cpu-state-asm.h>
 #include <kos/kernel/cpu-state-compat.h>
 #include <kos/rpc.h>
@@ -228,12 +229,12 @@ function restoreVm86Register(reg) {
 print("#ifdef __x86_64__");
 for (local reg: ["rip", "cs", "rflags", "rsp", "ss"])
 	restoreSimpleRegister('x86_64', reg);
-print("#else /* __x86_64__ *" "/");
+print("#else /" "* __x86_64__ *" "/");
 for (local reg: ["eip", "cs", "eflags"])
 	restoreSimpleRegister('i386', reg);
 for (local reg: { "es", "ds", "fs", "gs" })
 	restoreVm86Register(reg);
-print("#endif /* !__x86_64__ *" "/");
+print("#endif /" "* !__x86_64__ *" "/");
 ]]]*/
 #ifdef __x86_64__
 __ASM_L(	.cfi_escape 22,16,18,47,3,0,75,79,83,47,7,0,8,this_x86_sysret_iret + OFFSET_IRREGS_RIP,155,6)
@@ -267,7 +268,7 @@ __ASM_L(	.cfi_escape 16,128,128,8,26,32,40,6,0,116,20,6,47,3,0,146)
 __ASM_L(	.cfi_escape 45,0)
 #endif /* !__x86_64__ */
 /*[[[end]]]*/
-	.cfi_def_cfa %rsp, 0
+	.cfi_def_cfa %Psp, 0
 #ifndef __x86_64__
 	/* Correctly unwind  */
 	.cfi_restore_iret_esp -SIZEOF_IRREGS_KERNEL

@@ -205,6 +205,95 @@ process_waitfor_SIG_CONT(struct icpustate *__restrict state, int status) {
 }
 
 
+PRIVATE ATTR_NOINLINE ATTR_NORETURN NONNULL((1, 2)) void FCALL
+abort_SIGINT_program_without_exception_handler(struct icpustate *__restrict state,
+                                               struct rpc_syscall_info const *__restrict sc_info) {
+	struct exception_info info;
+	memset(&info, 0, sizeof(struct exception_info));
+	info.ei_data.e_code      = ERROR_CODEOF(E_INTERRUPT);
+	info.ei_data.e_faultaddr = icpustate_getpc(state);
+	coredump_create_for_exception(state, &info, true);
+	THROW(E_EXIT_PROCESS, W_EXITCODE(1, SIGINT) | WCOREFLAG);
+}
+
+/* Helper  wrapper  for `userexcept_callsignal()'  that  includes all  of  the logic
+ * related to figuring out if a system call (if one is present) should be restarted,
+ * or if the system call  should (seemingly) return with  -EINTR or by entering  the
+ * user-space exception handler with an E_INTERRUPT exception.
+ *
+ * This function also implements handling of `SIGACTION_SA_RESETHAND' */
+PRIVATE WUNUSED NONNULL((1, 2, 3)) struct icpustate *FCALL
+userexcept_callsignal_and_maybe_restart_syscall(struct icpustate *__restrict state,
+                                                struct kernel_sigaction const *__restrict action,
+                                                siginfo_t const *__restrict siginfo,
+                                                struct rpc_syscall_info const *sc_info)
+		THROWS(E_SEGFAULT) {
+
+	/* Figure out if the system should be restarted. */
+	if (sc_info != NULL) {
+		bool should_restart;
+		int syscall_restart_mode = kernel_syscall_restartmode(sc_info);
+		switch (syscall_restart_mode) {
+		case SYSCALL_RESTART_MODE_MUST:
+			should_restart = true;
+			break;
+		case SYSCALL_RESTART_MODE_DONT:
+			should_restart = false;
+			break;
+		case SYSCALL_RESTART_MODE_AUTO:
+			should_restart = (action->sa_flags & SIGACTION_SA_RESTART) != 0;
+			break;
+		default: __builtin_unreachable();
+		}
+
+		if (!should_restart) {
+			struct exception_data error;
+			/* Made modifications to `state' that will make it look like the
+			 * interrupted  system call returned  with `-EINTR', or returned
+			 * to  user-space by calling the user-defined exception handler. */
+			memset(&error, 0, sizeof(error));
+			error.e_code      = ERROR_CODEOF(E_INTERRUPT);
+			error.e_faultaddr = icpustate_getpc(state);
+			if (sc_info->rsi_flags & RPC_SYSCALL_INFO_FEXCEPT) {
+				/* Make transformations to invoke the user-space exception handler.
+				 * When no handler is installed, `userexcept_callhandler()' returns
+				 * `NULL'. */
+				struct icpustate *newstate;
+				newstate = userexcept_callhandler(state, sc_info, &error);
+				if unlikely(!newstate) {
+					/* If the exception still cannot be handled, terminate the program.
+					 * XXX: Logically speaking, the program should only terminate once
+					 *      the signal handler that would be invoked below returned... */
+					abort_SIGINT_program_without_exception_handler(state, sc_info);
+					/*newstate = state;*/
+				}
+				state = newstate;
+			} else {
+				/* Simple case: Just have the syscall return `-EINTR' */
+				state = userexcept_seterrno(state, sc_info, &error);
+			}
+
+			/* Set `sc_info' to `NULL' in order to prevent `userexcept_callsignal()'
+			 * from generating transformations needed  to have the returning  signal
+			 * handler repeat the system call. */
+			sc_info = NULL;
+		} else {
+			/* Simply pass along `sc_info' to `userexcept_callsignal()',
+			 * which  will generate the necessary transformations needed
+			 * to restart the interrupted system call. */
+		}
+	}
+
+	/* Implement support for `SIGACTION_SA_RESETHAND' */
+	if (action->sa_flags & SIGACTION_SA_RESETHAND) {
+		if unlikely(!sighand_reset_handler(siginfo->si_signo, action))
+			return NULL;
+	}
+
+	return userexcept_callsignal(state, action, siginfo, sc_info);
+}
+
+
 
 /* Raise a posix signal in user-space for `siginfo' whilst performing
  * all of the  extended "builtin"  signal actions, as  may have  been
@@ -282,7 +371,7 @@ again_gethand:
 	/* Invoke a regular, old signal handler. */
 	{
 		FINALLY_XDECREF_UNLIKELY(action.sa_mask);
-		result = userexcept_callsignal(state, &action, &siginfo, sc_info);
+		result = userexcept_callsignal_and_maybe_restart_syscall(state, &action, &siginfo, sc_info);
 	}
 	if unlikely(!result)
 		goto again_gethand;
@@ -368,10 +457,6 @@ again:
 					if likely(result)
 						goto done;
 				}
-				/* If exceptions don't work, try to propagate a POSIX signal */
-				result = userexcept_raisesignal_from_exception(state, sc_info, error);
-				if likely(result)
-					goto done;
 				/* If the exception still cannot be handled, terminate the program. */
 				goto terminate_app;
 			}
@@ -426,10 +511,10 @@ NOTHROW(FCALL userexcept_exec_user_rpc)(/*in|out*/ struct rpc_context *__restric
                                         unsigned int user_rpc_reason) {
 	/* Execute the program associated with this RPC */
 	if (rpc->pr_flags & RPC_CONTEXT_SIGNAL) {
-		/* Because signals handled here must properly integrate with other
-		 * RPCs, as well as the current `error', we can't just make use of
-		 * `userexcept_raisesignal()', but have to implement signal action
-		 * handling ourselves.
+		/* Because signals handled here must properly integrate with  other
+		 * RPCs, as well as the current `error', we can't just make use  of
+		 * `userexcept_raisesignal_from_exception()', but have to implement
+		 * signal action handling ourselves.
 		 *
 		 * This is required for signal actions such as KERNEL_SIG_CORE, or
 		 * KERNEL_SIG_STOP, which introduce  custom control routing  which
@@ -498,16 +583,15 @@ again_switch_action_handler:
 				struct icpustate *newstate;
 
 				/* "Normal" invoke-userspace-function signal action */
-				newstate = userexcept_callsignal(ctx->rc_state, &action, &rpc->pr_psig,
-				                                 ctx->rc_context == RPC_REASONCTX_SYSCALL
-				                                 ? &ctx->rc_scinfo
-				                                 : NULL);
+				newstate = userexcept_callsignal_and_maybe_restart_syscall(ctx->rc_state, &action, &rpc->pr_psig,
+				                                                           ctx->rc_context == RPC_REASONCTX_SYSCALL
+				                                                           ? &ctx->rc_scinfo
+				                                                           : NULL);
 
-				/* When  `userexcept_callsignal()' returns `NULL', a race condition
-				 * is indicated where the user-defined signal action changed before
-				 * the handler function could be invoked.
-				 * This is important to ensure that `SIGACTION_SA_RESETHAND' works
-				 * atomically. */
+				/* When  `userexcept_callsignal_and_maybe_restart_syscall()'  returns `NULL',
+				 * a race condition is indicated where the user-defined signal action changed
+				 * before the handler function could be invoked.
+				 * This is important to ensure that `SIGACTION_SA_RESETHAND' works atomically. */
 				if (newstate == NULL)
 					goto again_load_threadsig_action;
 			} EXCEPT {
@@ -701,7 +785,7 @@ NOTHROW(FCALL userexcept_sysret_inject_and_marksignal_nopr)(struct task *__restr
 	assert(thread->t_cpu == THIS_CPU);
 	status = sigmask_ismasked_in(thread, signo);
 	/* If the signal isn't masked, or masking cannot be determined, inject a sysret.
-	 * Also wake up the thread if it is explicitly requesting to be woken for every
+	 * Also  wake up the thread if it is explicitly requesting to be woken for every
 	 * signal it is send, even if that signal is being masked. Such behavior is used
 	 * to implement the `sigtimedwait(2)' system call. */
 	if (status != SIGMASK_ISMASKED_NOPF_YES || (thread->t_flags & TASK_FWAKEONMSKRPC)) {
@@ -838,7 +922,7 @@ NOTHROW(KCALL _enum_inject_sysret_and_marksignal)(void *arg,
 }
 
 
-/* Invoke `userexcept_sysret_inject_safe()' for every thread apart of
+/* Invoke  `userexcept_sysret_inject_safe()'  for every  thread  apart of
  * `proc', as well as set the `TASK_FRPC' flag for each of those threads. */
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL userexcept_sysret_injectproc_safe)(struct task *__restrict proc,

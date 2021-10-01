@@ -24,43 +24,10 @@
 
 #include <kernel/compiler.h>
 
-#ifdef CONFIG_USE_NEW_RPC
-#include <kernel/rt/except-handler.h>
-
-DECL_BEGIN
-
-/* Update the given  `state' to raise  the specified `siginfo'  as
- * a user-space signal  within the calling  thread. The caller  is
- * responsible  to handle special signal handlers (`KERNEL_SIG_*')
- * before calling this function! This function should only be used
- * to  enqueue the execution of a signal handler with a user-space
- * entry point.
- * @param: state:   The CPU state describing the return to user-space.
- * @param: action:  The signal action to perform.
- * @param: siginfo: The signal that is being raised.
- * @param: sc_info: When non-NULL, `sc_info'  describes a system  call
- *                  that may be restarted. Note however that ontop  of
- *                  this, [restart({auto,must,dont})] logic will still
- *                  be applied, which is done in cooperation with  the
- *                  system call restart database.
- * @return: * :     The updated CPU state.
- * @return: NULL:   The `SIGACTION_SA_RESETHAND' flag was set,
- *                  but `action' differs from the set handler. */
-PUBLIC WUNUSED NONNULL((1, 2, 3)) struct icpustate *FCALL
-userexcept_callsignal(struct icpustate *__restrict state,
-                      struct kernel_sigaction const *__restrict action,
-                      siginfo_t const *__restrict siginfo,
-                      struct rpc_syscall_info const *sc_info)
-		THROWS(E_SEGFAULT, E_WOULDBLOCK) {
-	/* TODO: Basically, this function need to be the new `sighand_raise_signal()' */
-}
-
-DECL_END
-#else /* CONFIG_USE_NEW_RPC */
-
 #include <kernel/fpu.h>
 #include <kernel/panic.h>
 #include <kernel/printk.h>
+#include <kernel/rt/except-handler.h>
 #include <kernel/syscall-properties.h>
 #include <kernel/syscall.h>
 #include <kernel/types.h>
@@ -122,6 +89,48 @@ PUBLIC atomic64_t x86_exec_eflags_mask = ATOMIC64_INIT(WORD64(~(EFLAGS_DF | EFLA
 #endif /* !__x86_64__ */
 
 #ifdef __x86_64__
+#ifdef CONFIG_USE_NEW_RPC
+#ifndef __INTELLISENSE__
+DECL_END
+
+#define DEFINE_RAISE32 1
+#include "posix-signal-raise.c.inl"
+
+#define DEFINE_RAISE64 1
+#include "posix-signal-raise.c.inl"
+
+DECL_BEGIN
+#else  /* !__INTELLISENSE__ */
+PRIVATE ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3)) struct icpustate *FCALL
+userexcept_callsignal32(struct icpustate *__restrict state,
+                        struct kernel_sigaction const *__restrict action,
+                        siginfo_t const *__restrict siginfo,
+                        struct rpc_syscall_info const *sc_info)
+		THROWS(E_SEGFAULT);
+PRIVATE ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3)) struct icpustate *FCALL
+userexcept_callsignal64(struct icpustate *__restrict state,
+                        struct kernel_sigaction const *__restrict action,
+                        siginfo_t const *__restrict siginfo,
+                        struct rpc_syscall_info const *sc_info)
+		THROWS(E_SEGFAULT);
+#endif /* __INTELLISENSE__ */
+
+PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3)) struct icpustate *FCALL
+userexcept_callsignal(struct icpustate *__restrict state,
+                      struct kernel_sigaction const *__restrict action,
+                      siginfo_t const *__restrict siginfo,
+                      struct rpc_syscall_info const *sc_info)
+		THROWS(E_SEGFAULT) {
+	struct icpustate *result;
+	if (irregs_is32bit(&state->ics_irregs)) {
+		/* Compatibility mode. */
+		result = userexcept_callsignal32(state, action, siginfo, sc_info);
+	} else {
+		result = userexcept_callsignal64(state, action, siginfo, sc_info);
+	}
+	return result;
+}
+#else /* CONFIG_USE_NEW_RPC */
 #ifndef __INTELLISENSE__
 DECL_END
 #define DEFINE_RAISE32 1
@@ -129,36 +138,37 @@ DECL_END
 #define DEFINE_RAISE64 1
 #include "posix-signal-raise.c.inl"
 DECL_BEGIN
-#else /* !__INTELLISENSE__ */
+#else  /* !__INTELLISENSE__ */
 PRIVATE WUNUSED struct icpustate *KCALL
-sighand_raise_signal32(struct icpustate *__restrict state,
-                       struct kernel_sigaction const *__restrict action,
-                       USER CHECKED siginfo_t const *siginfo,
-                       struct rpc_syscall_info const *sc_info)
+userexcept_callsignal32(struct icpustate *__restrict state,
+                        struct kernel_sigaction const *__restrict action,
+                        USER CHECKED siginfo_t const *siginfo,
+                        struct rpc_syscall_info const *sc_info)
 		THROWS(E_SEGFAULT, E_WOULDBLOCK);
 PRIVATE WUNUSED struct icpustate *KCALL
-sighand_raise_signal64(struct icpustate *__restrict state,
-                       struct kernel_sigaction const *__restrict action,
-                       USER CHECKED siginfo_t const *siginfo,
-                       struct rpc_syscall_info const *sc_info)
+userexcept_callsignal64(struct icpustate *__restrict state,
+                        struct kernel_sigaction const *__restrict action,
+                        USER CHECKED siginfo_t const *siginfo,
+                        struct rpc_syscall_info const *sc_info)
 		THROWS(E_SEGFAULT, E_WOULDBLOCK);
 #endif /* __INTELLISENSE__ */
 
 PUBLIC WUNUSED struct icpustate *KCALL
-sighand_raise_signal(struct icpustate *__restrict state,
-                     struct kernel_sigaction const *__restrict action,
-                     USER CHECKED siginfo_t const *siginfo,
-                     struct rpc_syscall_info const *sc_info)
+userexcept_callsignal(struct icpustate *__restrict state,
+                      struct kernel_sigaction const *__restrict action,
+                      USER CHECKED siginfo_t const *siginfo,
+                      struct rpc_syscall_info const *sc_info)
 		THROWS(E_SEGFAULT, E_WOULDBLOCK) {
 	struct icpustate *result;
 	if (irregs_is32bit(&state->ics_irregs)) {
 		/* Compatibility mode. */
-		result = sighand_raise_signal32(state, action, siginfo, sc_info);
+		result = userexcept_callsignal32(state, action, siginfo, sc_info);
 	} else {
-		result = sighand_raise_signal64(state, action, siginfo, sc_info);
+		result = userexcept_callsignal64(state, action, siginfo, sc_info);
 	}
 	return result;
 }
+#endif /* !CONFIG_USE_NEW_RPC */
 #else /* __x86_64__ */
 #ifndef __INTELLISENSE__
 DECL_END
@@ -219,10 +229,10 @@ syscall_fill_icpustate_from_ucpustate32(struct icpustate *__restrict state,
 
 
 /* Argument indices of parameters passed to sigreturn() */
-#define SIGRETURN_386_ARGID_RESTORE_CPU      5 /* SYSCALL_ARGUMENT_REGISTER_INDEX(%ebp) */
-#define SIGRETURN_386_ARGID_RESTORE_FPU      0 /* SYSCALL_ARGUMENT_REGISTER_INDEX(%ebx) */
-#define SIGRETURN_386_ARGID_RESTORE_SIGMASK  3 /* SYSCALL_ARGUMENT_REGISTER_INDEX(%esi) */
-#define SIGRETURN_386_ARGID_SC_INFO          4 /* SYSCALL_ARGUMENT_REGISTER_INDEX(%edi) */
+#define SIGRETURN_386_ARGID_RESTORE_CPU     5 /* SYSCALL_ARGUMENT_REGISTER_INDEX(%ebp) */
+#define SIGRETURN_386_ARGID_RESTORE_FPU     0 /* SYSCALL_ARGUMENT_REGISTER_INDEX(%ebx) */
+#define SIGRETURN_386_ARGID_RESTORE_SIGMASK 3 /* SYSCALL_ARGUMENT_REGISTER_INDEX(%esi) */
+#define SIGRETURN_386_ARGID_SC_INFO         4 /* SYSCALL_ARGUMENT_REGISTER_INDEX(%edi) */
 
 /* Sigreturn system call implementation. */
 INTERN struct icpustate *FCALL
@@ -248,10 +258,10 @@ again:
 			mymask = sigmask_getwr();
 			memcpy(mymask, restore_sigmask, sizeof(sigset_t));
 			COMPILER_WRITE_BARRIER();
-			/* Make   sure   that   mandatory  signals   always   remain  unmasked.
-			 * In  case we  just escaped an  RPC attempt by  another thread sending
-			 * either one of these signals, not to worry, as code below will always
-			 * check for  `sigmask_check_s()' when  `restore_sigmask' is  non-NULL. */
+			/* Make sure that mandatory signals always remain unmasked. In  case
+			 * we just escaped an RPC  attempt by another thread sending  either
+			 * one  of these  signals, not to  worry, as code  below will always
+			 * check for `sigmask_check_s()' when `restore_sigmask' is non-NULL. */
 			sigdelset(mymask, SIGKILL);
 			sigdelset(mymask, SIGSTOP);
 		}
@@ -362,7 +372,7 @@ sigreturn32_rpc(void *UNUSED(arg),
 #ifdef __NR32_rt_sigreturn
 DEFINE_PUBLIC_ALIAS(sys32_rt_sigreturn, sys32_sigreturn);
 #endif /* __NR32_rt_sigreturn */
-#else /* __x86_64__ */
+#else  /* __x86_64__ */
 #ifdef __NR_rt_sigreturn
 DEFINE_PUBLIC_ALIAS(sys_rt_sigreturn, sys_sigreturn);
 #endif /* __NR_rt_sigreturn */
@@ -677,6 +687,5 @@ DEFINE_SYSCALL64_2(errno_t, raiseat,
 #endif /* __x86_64__ */
 
 DECL_END
-#endif /* !CONFIG_USE_NEW_RPC */
 
 #endif /* !GUARD_KERNEL_CORE_ARCH_I386_SCHED_POSIX_SIGNAL_C */

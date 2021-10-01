@@ -421,27 +421,28 @@ sigmask_check_s(struct icpustate *__restrict state,
 
 struct icpustate;
 struct rpc_syscall_info;
-/* Update the given `state' to raise the specified `siginfo'
- * as   a  user-space  signal  within  the  calling  thread.
- * NOTE: The   caller  is  responsible  to  handle  special  signal
- *       handlers  (`KERNEL_SIG_*')  before calling  this function!
- *       This function should only be used to enqueue the execution
- *       of a signal handler with a user-space entry point.
- * @param: state:   The interrupt CPU state describing the return to user-space.
+/* Update the given  `state' to raise  the specified `siginfo'  as
+ * a user-space signal  within the calling  thread. The caller  is
+ * responsible  to handle special signal handlers (`KERNEL_SIG_*')
+ * before calling this function! This function should only be used
+ * to  enqueue the execution of a signal handler with a user-space
+ * entry point.
+ * @param: state:   The CPU state describing the return to user-space.
  * @param: action:  The signal action to perform.
  * @param: siginfo: The signal that is being raised.
- * @param: sc_info: When non-NULL, `sc_info' describes a system call that may be restarted.
- *                  Note  however   that   ontop   of   this,   [restart({auto,must,dont})]
- *                  logic  will   still  be   applied,  which   is  done   in   cooperation
- *                  with the system call restart database.
+ * @param: sc_info: When non-NULL, `sc_info'  describes a system  call
+ *                  that may be restarted. Note however that ontop  of
+ *                  this, [restart({auto,must,dont})] logic will still
+ *                  be applied, which is done in cooperation with  the
+ *                  system call restart database.
  * @return: * :     The updated CPU state.
- * @return: NULL:   The `SIGACTION_SA_RESETHAND' flag was set, but `action'
- *                  differs from the set handler. */
-FUNDEF WUNUSED struct icpustate *KCALL
-sighand_raise_signal(struct icpustate *__restrict state,
-                     struct kernel_sigaction const *__restrict action,
-                     USER CHECKED siginfo_t const *siginfo,
-                     struct rpc_syscall_info const *sc_info)
+ * @return: NULL:   The `SIGACTION_SA_RESETHAND' flag was set,
+ *                  but `action' differs from the set handler. */
+FUNDEF WUNUSED NONNULL((1, 2)) struct icpustate *KCALL
+userexcept_callsignal(struct icpustate *__restrict state,
+                      struct kernel_sigaction const *__restrict action,
+                      USER CHECKED siginfo_t const *siginfo,
+                      struct rpc_syscall_info const *sc_info)
 		THROWS(E_SEGFAULT, E_WOULDBLOCK);
 
 /* Suspend execution of the calling thread by setting `TASK_FSUSPENDED',

@@ -116,32 +116,35 @@ typedef struct __siginfo_struct siginfo_t;
  * before calling this function! This function should only be used
  * to  enqueue the execution of a signal handler with a user-space
  * entry point.
+ *
+ * Functionality like `SIGACTION_SA_RESETHAND', or system call
+ * restart  selection  must  be  implemented  by  the  caller.
+ *
  * @param: state:   The CPU state describing the return to user-space.
  * @param: action:  The signal action to perform.
  * @param: siginfo: The signal that is being raised.
- * @param: sc_info: When non-NULL, `sc_info'  describes a system  call
- *                  that may be restarted. Note however that ontop  of
- *                  this, [restart({auto,must,dont})] logic will still
- *                  be applied, which is done in cooperation with  the
- *                  system call restart database.
- * @return: * :     The updated CPU state.
- * @return: NULL:   The `SIGACTION_SA_RESETHAND' flag was set,
- *                  but `action' differs from the set handler. */
-FUNDEF WUNUSED NONNULL((1, 2, 3)) struct icpustate *FCALL
+ * @param: sc_info: When  non-NULL, `sc_info' describes a system call
+ *                  that will be restarted once the user-space signal
+ *                  handler returns. No additional  should-really-be-
+ *                  re-started  logic is done  by this function (iow:
+ *                  such logic must be implemented by the caller)
+ * @return: * :     The updated CPU state. */
+FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3)) struct icpustate *FCALL
 userexcept_callsignal(struct icpustate *__restrict state,
                       struct kernel_sigaction const *__restrict action,
                       siginfo_t const *__restrict siginfo,
                       struct rpc_syscall_info const *sc_info)
-		THROWS(E_SEGFAULT, E_WOULDBLOCK);
+		THROWS(E_SEGFAULT);
 
 
 /* Arch-specific function:
  * Translate the current exception into an errno and set that errno
  * as the return value of  the system call described by  `sc_info'. */
-FUNDEF WUNUSED NONNULL((1, 2, 3)) struct icpustate *
-NOTHROW(FCALL userexcept_seterrno)(struct icpustate *__restrict state,
-                                   struct rpc_syscall_info const *__restrict sc_info,
-                                   struct exception_data const *__restrict error);
+FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3)) struct icpustate *FCALL
+userexcept_seterrno(struct icpustate *__restrict state,
+                    struct rpc_syscall_info const *__restrict sc_info,
+                    struct exception_data const *__restrict error)
+		THROWS(E_SEGFAULT);
 
 
 
