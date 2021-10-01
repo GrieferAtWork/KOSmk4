@@ -844,7 +844,7 @@ rt_sigsuspend_rpc(struct rpc_context *__restrict ctx, void *UNUSED(cookie)) {
 	ctx->rc_context = RPC_REASONCTX_SYSRET;
 
 	/* Do the actual system call. */
-	ctx->rc_state = rt_sigsuspend_impl(ctx->rc_state, (USER UNCHECKED sigset_t *)ctx->rc_scinfo.rsi_regs[0]);
+	ctx->rc_state = rt_sigsuspend_impl(ctx->rc_state, &ctx->rc_scinfo);
 }
 
 DEFINE_SYSCALL2(errno_t, rt_sigsuspend,

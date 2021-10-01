@@ -19,15 +19,18 @@
  */
 #ifdef __INTELLISENSE__
 #include "except-handler.c"
-#define DEFINE_userexcept_handler
-/*#define DEFINE_userexcept_sysret*/
+//#define DEFINE_userexcept_handler
+#define DEFINE_userexcept_handler_with_sigmask
+//#define DEFINE_userexcept_sysret
 #endif /* __INTELLISENSE__ */
 
 #include <sched/pid.h>
 
 #include <stdalign.h>
 
-#if (defined(DEFINE_userexcept_handler) + defined(DEFINE_userexcept_sysret)) != 1
+#if (defined(DEFINE_userexcept_handler) +              \
+     defined(DEFINE_userexcept_handler_with_sigmask) + \
+     defined(DEFINE_userexcept_sysret)) != 1
 #error "Must #define exactly one of `DEFINE_userexcept_handler' or `DEFINE_userexcept_sysret'"
 #endif /* ... */
 
@@ -53,7 +56,18 @@ DECL_BEGIN
 PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1)) struct icpustate *
 NOTHROW(FCALL userexcept_handler)(struct icpustate *__restrict state,
                                   struct rpc_syscall_info const *sc_info)
-#else /* DEFINE_userexcept_handler */
+#undef LOCAL_IS_SYSRET
+#undef LOCAL_HAVE_SIGMASK
+#elif defined(DEFINE_userexcept_handler_with_sigmask)
+/* Same as `userexcept_handler()', but use the given `sigmask'
+ * instead   of   the  calling   thread's   thread-local  one. */
+PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1, 3)) struct icpustate *
+NOTHROW(FCALL userexcept_handler_with_sigmask)(struct icpustate *__restrict state,
+                                               struct rpc_syscall_info const *sc_info,
+                                               sigset_t const *__restrict sigmask)
+#undef LOCAL_IS_SYSRET
+#define LOCAL_HAVE_SIGMASK
+#else /* ... */
 /* This is the function that is injected by `userexcept_sysret_inject_nopr()',
  * as well as related functions.
  *
@@ -61,20 +75,22 @@ NOTHROW(FCALL userexcept_handler)(struct icpustate *__restrict state,
  * documented in <kos/rpc.md> under the name `handle_sysret_rpc()' */
 PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1)) struct icpustate *
 NOTHROW(FCALL userexcept_sysret)(struct icpustate *__restrict state)
-#endif /* !DEFINE_userexcept_handler */
+#define LOCAL_IS_SYSRET
+#undef LOCAL_HAVE_SIGMASK
+#endif /* !... */
 {
 	struct pending_rpc_slist pending;
 	struct pending_rpc_slist restore;
 	struct pending_rpc **restore_plast;
 	struct pending_rpc_slist kernel_rpcs;
 	struct exception_info error;
-#ifdef DEFINE_userexcept_handler
+#ifndef LOCAL_IS_SYSRET
 	struct rpc_context ctx;
-#else /* DEFINE_userexcept_handler */
+#else /* !LOCAL_IS_SYSRET */
 	alignas(alignof(struct rpc_context))
 	byte_t _ctxbuf[offsetof(struct rpc_context, rc_scinfo)];
 #define ctx (*(struct rpc_context *)_ctxbuf)
-#endif /* !DEFINE_userexcept_handler */
+#endif /* !LOCAL_IS_SYSRET */
 
 	assertf(PERTASK_GET(this_exception_info.ei_flags) == EXCEPT_FNORMAL,
 	        "Unexpected exception flags");
@@ -85,7 +101,7 @@ NOTHROW(FCALL userexcept_sysret)(struct icpustate *__restrict state)
 	assertf(icpustate_isuser(state),
 	        "In user exception handler, but return state points to kernel-space");
 
-#ifdef DEFINE_userexcept_handler
+#ifndef LOCAL_IS_SYSRET
 
 	/* Load exception information. */
 	memcpy(&error, error_info(), sizeof(error));
@@ -115,17 +131,17 @@ NOTHROW(FCALL userexcept_sysret)(struct icpustate *__restrict state)
 	} else {
 		ctx.rc_context = RPC_REASONCTX_INTERRUPT;
 	}
-#else /* DEFINE_userexcept_handler */
+#else /* !LOCAL_IS_SYSRET */
 	/* Re-enable disabled RPCs and serve kernel RPCs with `RPC_REASONCTX_SYSRET' */
 	ctx.rc_context = RPC_REASONCTX_SYSRET;
 	error.ei_code  = ERROR_CODEOF(E_OK);
-#endif /* !DEFINE_userexcept_handler */
+#endif /* !LOCAL_IS_SYSRET */
 
 	ctx.rc_state = state;
 	restore_plast = SLIST_PFIRST(&restore);
 	SLIST_INIT(&kernel_rpcs);
 
-#ifdef DEFINE_userexcept_sysret
+#ifdef LOCAL_IS_SYSRET
 	/* Also  clear the `TASK_FWAKEONMSKRPC'  during sysret, thus making
 	 * it possible to implement poll support for receiving signals that
 	 * are  currently masked (polling  is done by  setting the flag, as
@@ -138,9 +154,9 @@ NOTHROW(FCALL userexcept_sysret)(struct icpustate *__restrict state)
 	 * the normal  sig_send mechanisms, meaning that it's impossible to
 	 * wait for a thread other than THIS_TASK to receive RPCs) */
 	ATOMIC_AND(PERTASK(this_task.t_flags), ~(TASK_FRPC | TASK_FWAKEONMSKRPC));
-#else /* DEFINE_userexcept_sysret */
+#else /* LOCAL_IS_SYSRET */
 	ATOMIC_AND(PERTASK(this_task.t_flags), ~TASK_FRPC);
-#endif /* !DEFINE_userexcept_sysret */
+#endif /* !LOCAL_IS_SYSRET */
 
 	/* Load RPC functions. This must happen _AFTER_ we clear
 	 * the pending-RPC flag to prevent a race condition. */
@@ -155,38 +171,38 @@ handle_pending:
 		SLIST_REMOVE_HEAD(&pending, pr_link);
 		/* Here, kernel RPCs are executed _after_ user RPCs. */
 		if (rpc->pr_flags & RPC_CONTEXT_KERN) {
-#ifdef DEFINE_userexcept_handler
+#ifndef LOCAL_IS_SYSRET
 			/* Check if this system call _must_ be handled during SYSRET. */
 			if (rpc->pr_flags & RPC_SYNCMODE_F_SYSRET) {
 				*restore_plast = rpc;
 				restore_plast  = &rpc->pr_link.sle_next;
 				rpc->pr_flags |= _RPC_CONTEXT_INACTIVE;
 			} else
-#endif /* DEFINE_userexcept_handler */
+#endif /* !LOCAL_IS_SYSRET */
 			{
 				/* NOTE: This also inverts the order back to first-scheduled-first-run */
 				SLIST_INSERT_HEAD(&kernel_rpcs, rpc, pr_link);
 			}
 		} else {
-#ifdef DEFINE_userexcept_sysret
+#ifdef LOCAL_IS_SYSRET
 			rpc->pr_flags &= ~_RPC_CONTEXT_INACTIVE;
-#endif /* DEFINE_userexcept_sysret */
+#endif /* LOCAL_IS_SYSRET */
 
-#ifdef DEFINE_userexcept_handler
+#ifndef LOCAL_IS_SYSRET
 			if (rpc->pr_flags & _RPC_CONTEXT_INACTIVE) {
 				/* RPC was disabled in an earlier pass. */
 				*restore_plast = rpc;
 				restore_plast  = &rpc->pr_link.sle_next;
 			} else
-#endif /* DEFINE_userexcept_handler */
+#endif /* !LOCAL_IS_SYSRET */
 
-#ifdef DEFINE_userexcept_sysret
+#ifdef LOCAL_IS_SYSRET
 			if (!(rpc->pr_flags & RPC_SYNCMODE_F_ALLOW_ASYNC)) {
 				/* RPC isn't allowed in an async context. */
 				*restore_plast = rpc;
 				restore_plast  = &rpc->pr_link.sle_next;
 			} else
-#endif /* DEFINE_userexcept_sysret */
+#endif /* LOCAL_IS_SYSRET */
 			{
 				/* User-space RPC
 				 * NOTE: These are executed in reverse  order, since each one  executed
@@ -194,11 +210,12 @@ handle_pending:
 				 *       before, meaning that the last one executed (iow: the first one
 				 *       originally scheduled) will have the last word when it comes to
 				 *       where execution should continue. */
-#ifdef DEFINE_userexcept_handler
+#ifndef LOCAL_IS_SYSRET
 				unsigned int user_rpc_reason;
-#endif /* !DEFINE_userexcept_handler */
-				bool is_masked;
+#endif /* !LOCAL_IS_SYSRET */
 
+#if !defined(LOCAL_HAVE_SIGMASK) && defined(CONFIG_HAVE_USERPROCMASK)
+				bool is_masked;
 				TRY {
 					is_masked = sigmask_ismasked(_RPC_GETSIGNO(rpc->pr_flags));
 				} EXCEPT {
@@ -211,18 +228,24 @@ handle_pending:
 					pending_rpc_free(rpc);
 					continue;
 				}
-				if (is_masked) {
+				if (is_masked)
+#elif !defined(LOCAL_HAVE_SIGMASK)
+				if (sigmask_ismasked(_RPC_GETSIGNO(rpc->pr_flags)))
+#else /* !... */
+				if (sigismember(sigmask, _RPC_GETSIGNO(rpc->pr_flags)))
+#endif /* ... */
+				{
 					/* User-space RPCs are currently masked. */
 make_inactive:
 					*restore_plast = rpc;
 					restore_plast  = &rpc->pr_link.sle_next;
-#ifdef DEFINE_userexcept_handler
+#ifndef LOCAL_IS_SYSRET
 					rpc->pr_flags |= _RPC_CONTEXT_INACTIVE;
-#endif /* DEFINE_userexcept_handler */
+#endif /* !LOCAL_IS_SYSRET */
 					continue;
 				}
 
-#ifdef DEFINE_userexcept_handler
+#ifndef LOCAL_IS_SYSRET
 				/* Figure out the reason we want to tell user-space.
 				 * NOTE: Yes: this checks for  the original `sc_info'  (and
 				 *       not for `ctx.rc_context == RPC_REASONCTX_SYSCALL') */
@@ -238,16 +261,16 @@ make_inactive:
 					if ((rpc->pr_flags & RPC_SYNCMODE_F_REQUIRE_SC))
 						goto make_inactive;
 				}
-#endif /* DEFINE_userexcept_handler */
+#endif /* !LOCAL_IS_SYSRET */
 
 				/* Do everything necessary to handle the USER-rpc. */
-#ifdef DEFINE_userexcept_handler
+#ifndef LOCAL_IS_SYSRET
 				userexcept_exec_user_rpc(&ctx, &error, rpc, user_rpc_reason);
-#else /* DEFINE_userexcept_handler */
+#else /* !LOCAL_IS_SYSRET */
 				userexcept_exec_user_rpc(&ctx, &error, rpc, _RPC_REASONCTX_ASYNC);
-#endif /* !DEFINE_userexcept_handler */
+#endif /* !LOCAL_IS_SYSRET */
 
-#ifdef DEFINE_userexcept_handler
+#ifndef LOCAL_IS_SYSRET
 				/* User-space RPCs are _always_ required (or at least expected)
 				 * to restart system calls, meaning  that once the first  one's
 				 * been executed, any that come after have to be told that they
@@ -257,9 +280,9 @@ make_inactive:
 				 * NOTE: In actuality, `_RPC_REASONCTX_SYNC' is passed as reason
 				 *       for any additional RPCs */
 				ctx.rc_context = RPC_REASONCTX_SYSRET;
-#else /* DEFINE_userexcept_handler */
+#else /* !LOCAL_IS_SYSRET */
 				assert(ctx.rc_context == RPC_REASONCTX_SYSRET);
-#endif /* !DEFINE_userexcept_handler */
+#endif /* !LOCAL_IS_SYSRET */
 			}
 		}
 	}
@@ -294,22 +317,23 @@ again_scan_proc_rpcs:
 				for (;;) {
 					/* Figure out if we should handle this RPC. */
 					if (rpc->pr_flags & RPC_CONTEXT_KERN) {
-#ifdef DEFINE_userexcept_handler
+#ifndef LOCAL_IS_SYSRET
 						if (rpc->pr_flags & RPC_SYNCMODE_F_SYSRET)
 							goto check_next_proc_rpc;
-#endif /* !DEFINE_userexcept_handler */
+#endif /* !LOCAL_IS_SYSRET */
 					} else {
 						signo_t signo;
 						assertf(!(rpc->pr_flags & _RPC_CONTEXT_INACTIVE), "How did this get set?");
 						assertf(!(rpc->pr_flags & RPC_SYNCMODE_F_REQUIRE_SC), "Flag not allowed for process RPCs");
 						assertf(!(rpc->pr_flags & RPC_SYNCMODE_F_REQUIRE_CP), "Flag not allowed for process RPCs");
-#ifdef DEFINE_userexcept_sysret
+#ifdef LOCAL_IS_SYSRET
 						if (!(rpc->pr_flags & RPC_SYNCMODE_F_ALLOW_ASYNC))
 							goto check_next_proc_rpc; /* Not allowed in ASYNC context */
-#endif /* DEFINE_userexcept_sysret */
+#endif /* LOCAL_IS_SYSRET */
+
 						/* Check if the signal number used by this RPC is currently masked. */
 						signo = _RPC_GETSIGNO(rpc->pr_flags);
-#ifdef CONFIG_HAVE_USERPROCMASK
+#if !defined(LOCAL_HAVE_SIGMASK) && defined(CONFIG_HAVE_USERPROCMASK)
 						if (sigismember(&known_masked_signals, signo))
 							goto check_next_proc_rpc; /* Known-masked signal */
 						if (!sigismember(&known_unmasked_signals, signo)) {
@@ -346,10 +370,13 @@ again_scan_proc_rpcs:
 							/* Unmasked signal */
 							sigaddset(&known_unmasked_signals, signo);
 						}
-#else /* CONFIG_HAVE_USERPROCMASK */
+#elif !defined(LOCAL_HAVE_SIGMASK)
 						if (sigmask_ismasked(signo))
 							goto check_next_proc_rpc; /* Masked signal */
-#endif /* !CONFIG_HAVE_USERPROCMASK */
+#else /* ... */
+						if (sigismember(sigmask, signo))
+							goto check_next_proc_rpc; /* Masked signal */
+#endif /* !... */
 					}
 					/* Yes: we _are_ allowed to handle this RPC! */
 
@@ -381,7 +408,7 @@ again_scan_proc_rpcs:
 						SLIST_INSERT_HEAD(&kernel_rpcs, rpc, pr_link);
 					} else {
 						/* User-space RPC */
-#ifdef DEFINE_userexcept_handler
+#ifndef LOCAL_IS_SYSRET
 						unsigned int user_rpc_reason;
 
 						/* Figure out the reason we want to tell user-space.
@@ -411,11 +438,11 @@ again_scan_proc_rpcs:
 						 * NOTE: In actuality, `_RPC_REASONCTX_SYNC' is passed as reason
 						 *       for any additional RPCs */
 						ctx.rc_context = RPC_REASONCTX_SYSRET;
-#else /* DEFINE_userexcept_handler */
+#else /* !LOCAL_IS_SYSRET */
 						/* Do everything necessary to handle the USER-rpc. */
 						userexcept_exec_user_rpc(&ctx, &error, rpc, _RPC_REASONCTX_ASYNC);
 						assert(ctx.rc_context == RPC_REASONCTX_SYSRET);
-#endif /* !DEFINE_userexcept_handler */
+#endif /* !LOCAL_IS_SYSRET */
 					}
 					goto again_lock_proc_rpcs;
 check_next_proc_rpc:
@@ -445,15 +472,15 @@ check_next_proc_rpc:
 		rpc = SLIST_FIRST(&kernel_rpcs);
 		SLIST_REMOVE_HEAD(&kernel_rpcs, pr_link);
 		assert(rpc->pr_flags & RPC_CONTEXT_KERN);
-#ifdef DEFINE_userexcept_handler
+#ifndef LOCAL_IS_SYSRET
 		if (rpc->pr_flags & RPC_SYNCMODE_F_SYSRET) {
 			*restore_plast = rpc;
 			restore_plast  = &rpc->pr_link.sle_next;
 			rpc->pr_flags |= _RPC_CONTEXT_INACTIVE;
 		} else
-#endif /* DEFINE_userexcept_handler */
+#endif /* !LOCAL_IS_SYSRET */
 		{
-#ifdef DEFINE_userexcept_handler
+#ifndef LOCAL_IS_SYSRET
 			if (ctx.rc_context != RPC_REASONCTX_SYSRET) {
 				/* Indicate to the RPC that they're allowed to implement
 				 * the actual work  of an interrupt/syscall.  This is  a
@@ -520,7 +547,7 @@ check_next_proc_rpc:
 			       ctx.rc_context == (sc_info ? RPC_REASONCTX_SYSCALL
 			                                  : RPC_REASONCTX_INTERRUPT));
 		}
-#else /* DEFINE_userexcept_handler */
+#else /* !LOCAL_IS_SYSRET */
 			TRY {
 				(*rpc->pr_kern.k_func)(&ctx, rpc->pr_kern.k_cookie);
 			} EXCEPT {
@@ -539,12 +566,12 @@ check_next_proc_rpc:
 			assert(ctx.rc_context == RPC_REASONCTX_SYSRET);
 			pending_rpc_free(rpc);
 		}
-#endif /* !DEFINE_userexcept_handler */
+#endif /* !LOCAL_IS_SYSRET */
 	}
 
 	/* Restore interrupts that could not be handled right now.
 	 *
-	 * #ifdef DEFINE_userexcept_handler
+	 * #ifndef LOCAL_IS_SYSRET
 	 * In case we don't restart the interrupt/syscall, we must
 	 * also handle SYSRET RPCs (as those must be invoked  just
 	 * before  returning to user-space,  which is what's about
@@ -553,7 +580,7 @@ check_next_proc_rpc:
 	if (restore_plast != SLIST_PFIRST(&restore)) {
 		*restore_plast = NULL; /* NULL-terminate list */
 
-#ifdef DEFINE_userexcept_handler
+#ifndef LOCAL_IS_SYSRET
 		/* When there's an unhandled exception, then it's impossible to
 		 * restart the interrupt. Thus, we must indicate SYSRET status,
 		 * or in other words: an  async user-space location to  kernel-
@@ -612,7 +639,7 @@ check_next_proc_rpc:
 			}
 		}
 		if (!SLIST_EMPTY(&restore))
-#endif /* DEFINE_userexcept_handler */
+#endif /* !LOCAL_IS_SYSRET */
 		{
 			restore_pending_rpcs(SLIST_FIRST(&restore));
 			ATOMIC_OR(PERTASK(this_task.t_flags), TASK_FRPC);
@@ -623,15 +650,15 @@ check_next_proc_rpc:
 	if (error.ei_code != ERROR_CODEOF(E_OK)) {
 		/* This will unwind into user-space!
 		 * NOTE: This also handles `_E_STOP_PROCESS' and `_E_CORE_PROCESS'! */
-#ifdef DEFINE_userexcept_handler
+#ifndef LOCAL_IS_SYSRET
 		ctx.rc_state = userexcept_unwind(ctx.rc_state, &error, sc_info);
 		cpu_apply_icpustate(ctx.rc_state);
-#else /* DEFINE_userexcept_handler */
+#else /* !LOCAL_IS_SYSRET */
 		ctx.rc_state = userexcept_unwind(ctx.rc_state, &error, NULL);
-#endif /* !DEFINE_userexcept_handler */
+#endif /* LOCAL_IS_SYSRET */
 	}
 
-#ifdef DEFINE_userexcept_handler
+#ifndef LOCAL_IS_SYSRET
 	/* If the return context was  altered such that (logically  speaking),
 	 * it points into async user-space  (iow: the interrupted system  call
 	 * should not be restarted, or will be restored by user-space itself),
@@ -657,13 +684,16 @@ check_next_proc_rpc:
 		/* userexcept_sysret_inject_nopr(THIS_TASK); // Same as `userexcept_sysret_inject_with_state_nopr()' */
 		PREEMPTION_ENABLE();
 	}
-#endif /* DEFINE_userexcept_handler */
+#endif /* !LOCAL_IS_SYSRET */
 
-	/* [DEFINE_userexcept_handler]: Restart the interrupt/syscall.
-	 * [DEFINE_userexcept_sysret]:  Resume normal execution. */
+	/* [!LOCAL_IS_SYSRET]: Restart the interrupt/syscall.
+	 * [LOCAL_IS_SYSRET]:  Resume normal execution. */
 	return ctx.rc_state;
 #undef ctx
 }
+
+#undef LOCAL_IS_SYSRET
+#undef LOCAL_HAVE_SIGMASK
 
 DECL_END
 

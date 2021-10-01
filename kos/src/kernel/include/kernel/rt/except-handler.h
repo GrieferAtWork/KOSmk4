@@ -170,6 +170,20 @@ NOTHROW(FCALL userexcept_handler_nosys)(struct icpustate *__restrict state,
                                         struct rpc_syscall_info const *__restrict sc_info);
 
 
+#ifndef __sigset_t_defined
+#define __sigset_t_defined
+typedef struct __sigset_struct sigset_t;
+#endif /* !__sigset_t_defined */
+
+/* Same as `userexcept_handler()', but use the given `sigmask'
+ * instead of the calling thread's thread-local one. Used  for
+ * the implementation of `sigsuspend(2)' */
+FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1, 3)) struct icpustate *
+NOTHROW(FCALL userexcept_handler_with_sigmask)(struct icpustate *__restrict state,
+                                               struct rpc_syscall_info const *sc_info,
+                                               sigset_t const *__restrict sigmask);
+
+
 /* Arch-specific function:
  * Wrapper around `userexcept_handler()' for use in implementing `error_unwind()'.
  * This  function will (safely) construct a complete `struct icpustate' at the far

@@ -147,103 +147,15 @@ PUBLIC_FUNCTION(task_asyncrpc_execnow)
 END(task_asyncrpc_execnow)
 
 
-/* Arch-specific function:
- * Serve pending, synchronous (and asynchronous) RPCs.
- * NOTE: If the caller was previously  disabled preemption, it will  remain
- *       disabled  if  there  were no  RPC  functions had  to  be executed.
- *       Otherwise, preemption will become enabled, and `true' is returned,
- *       or an exception thrown by an RPC function gets propagated.
- * WARNING: Do not call this function unconditionally!
- *          Only call it if you're certain to be about to start  blocking
- *          in a context where a reset of your current context would have
- *          the potential to resolve the  block. (Reset here meaning  the
- *          current system call being restarted)
- * @return: true:  At   least  one  RPC   function  was  executed,  and
- *                 preemption was re-enabled if it was disabled before.
- * @return: false: No  RPC needed to be served, and preemption
- *                 remains disabled if it was disabled before. */
-/* FUNDEF bool KCALL task_serve(void) THROWS(...); */
-.section .text
-PUBLIC_FUNCTION(task_serve)
-	.cfi_startproc
-	.cfi_signal_frame
-	.cfi_def_cfa %esp, 0
-	/* Quick check: is there anything to do? */
-	ttest  mask=TASK_FRPC, loc=task__t_flags, seg=%segtls
-	jnz    1f
-	xorP   %Pax, %Pax
-	ret
-1:	/* Yes, there are pending RPCs which need to be serviced */
-	popP_cfi %Pax
-	.cfi_register %Pip, %Pax
-#ifdef __x86_64__
-	movq   %rsp, %rcx
-	pushq_cfi $(SEGMENT_KERNEL_DATA0) /* %ss */
-	.cfi_rel_offset %ss, 0
-	pushq_cfi %rcx                    /* %Psp */
-	.cfi_rel_offset %rsp, 0
-#endif /* __x86_64__ */
-	pushfP_cfi_r                      /* %Pflags */
-	pushP_cfi $(SEGMENT_KERNEL_CODE)  /* %cs */
-	.cfi_rel_offset %cs, 0
-	pushP_cfi  %Pax                   /* %Pip */
-	.cfi_rel_offset %Pip, 0
-	ASM_PUSH_ICPUSTATE_AFTER_IRET_CFI_R
-
-	movP   %Psp, %R_fcall0P
-	EXTERN(task_serve_with_icpustate)
-	call   task_serve_with_icpustate
-	movP   %Pax, %Psp
-
-	/* Load the newly updated cpustate. */
-	EXTERN(cpu_apply_icpustate_Psp)
-	jmp    cpu_apply_icpustate_Psp
-	.cfi_endproc
-END(task_serve)
-
-
-
-/* Arch-specific function:
- * Same as `task_serve()', but only sevice RPCs that were scheduled as no-throw.
- * @return: * : Set of `TASK_SERVE_*' */
-/* FUNDEF WUNUSED unsigned int NOTHROW(KCALL task_serve_nx)(void); */
-.section .text
-PUBLIC_FUNCTION(task_serve_nx)
-	.cfi_startproc
-	.cfi_signal_frame
-	.cfi_def_cfa %esp, 0
-	/* Quick check: is there anything to do? */
-	ttest  mask=TASK_FRPC, loc=task__t_flags, seg=%segtls
-	jnz    1f
-	xorP   %Pax, %Pax
-	ret
-1:	/* Yes, there are pending RPCs which need to be serviced */
-	popP_cfi %Pax
-	.cfi_register %Pip, %Pax
-#ifdef __x86_64__
-	movq   %rsp, %rcx
-	pushq_cfi $(SEGMENT_KERNEL_DATA0) /* %ss */
-	.cfi_rel_offset %ss, 0
-	pushq_cfi %rcx                    /* %Psp */
-	.cfi_rel_offset %rsp, 0
-#endif /* __x86_64__ */
-	pushfP_cfi_r                      /* %Pflags */
-	pushP_cfi $(SEGMENT_KERNEL_CODE)  /* %cs */
-	.cfi_rel_offset %cs, 0
-	pushP_cfi  %Pax                   /* %Pip */
-	.cfi_rel_offset %Pip, 0
-	ASM_PUSH_ICPUSTATE_AFTER_IRET_CFI_R
-
-	movP   %Psp, %R_fcall0P
-	EXTERN(task_serve_with_icpustate_nx)
-	call   task_serve_with_icpustate_nx
-	movP   %Pax, %Psp
-
-	/* Load the newly updated cpustate. */
-	EXTERN(cpu_apply_icpustate_Psp)
-	jmp    cpu_apply_icpustate_Psp
-	.cfi_endproc
-END(task_serve_nx)
+/* Define low-level implementations for `task_serve()' */
+#ifndef __INTELLISENSE__
+#define DEFINE_task_serve
+#include "rpc-task_serve.S.inl"
+#define DEFINE_task_serve_nx
+#include "rpc-task_serve.S.inl"
+#define DEFINE_task_serve_with_sigmask
+#include "rpc-task_serve.S.inl"
+#endif /* !__INTELLISENSE__ */
 
 
 

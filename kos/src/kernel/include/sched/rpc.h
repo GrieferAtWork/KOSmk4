@@ -26,6 +26,7 @@
 #include <kernel/types.h>
 
 #ifdef CONFIG_USE_NEW_RPC
+#include <bits/os/sigset.h>
 #include <kos/rpc.h>
 #endif /* CONFIG_USE_NEW_RPC */
 
@@ -42,6 +43,12 @@ DECL_BEGIN
 
 
 #ifdef __CC__
+
+#ifndef __sigset_t_defined
+#define __sigset_t_defined
+typedef struct __sigset_struct sigset_t;
+#endif /* !__sigset_t_defined */
+
 
 /* High-level RPC scheduling function.
  * This is the kernel-equivalent of the userspace `rpc_exec()' from <kos/rpc.h>
@@ -100,15 +107,28 @@ FUNDEF bool FCALL task_serve(void) THROWS(E_INTERRUPT_USER_RPC, ...);
  * @return: * : Set of `TASK_SERVE_*' */
 FUNDEF WUNUSED unsigned int NOTHROW(FCALL task_serve_nx)(void);
 
+/* Same as `task_serve()', but use the given `sigmask'
+ * instead of the  calling thread's thread-local  one.
+ * Used for the implementation of `sigsuspend(2)' */
+FUNDEF NONNULL((1)) bool FCALL
+task_serve_with_sigmask(sigset_t const *__restrict sigmask)
+		THROWS(E_INTERRUPT_USER_RPC, ...);
+
+
 /* Automatically updates `state' to include the intended return value for `task_serve()'! */
 FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) struct icpustate *FCALL
 task_serve_with_icpustate(struct icpustate *__restrict state)
+		THROWS(E_INTERRUPT_USER_RPC, ...);
+FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) struct icpustate *FCALL
+task_serve_with_icpustate_and_sigmask(struct icpustate *__restrict state,
+                                      sigset_t const *__restrict sigmask)
 		THROWS(E_INTERRUPT_USER_RPC, ...);
 FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) struct icpustate *
 NOTHROW(FCALL task_serve_with_icpustate_nx)(struct icpustate *__restrict state);
 
 #endif /* __CC__ */
 
+/* Return values for `task_serve_nx()' */
 #define TASK_SERVE_NX_NORMAL 0x00 /* Nothing was executed, or needed to be. */
 #define TASK_SERVE_NX_EXCEPT 0x01 /* FLAG: Pending RPC functions that can only be serviced by `task_serve()' still remain. */
 #define TASK_SERVE_NX_DIDRUN 0x02 /* FLAG: NX RPC functions were executed. */
