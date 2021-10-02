@@ -31,11 +31,9 @@
 #include <asm/unistd.h>
 #include <kos/kernel/cpu-state-asm32.h>
 #include <kos/kernel/cpu-state.h>
+#include <kos/rpc.h>
 
 #include <errno.h>
-
-#include <librpc/rpc.h>
-
 
 #define TEST_DOUBLE_WIDE(sysno_reg, sysno_reg_b, tempreg_l, tempreg_b, segment_prefix)  \
 	cmpl   $(__NR_syscall0_max), sysno_reg;                                             \

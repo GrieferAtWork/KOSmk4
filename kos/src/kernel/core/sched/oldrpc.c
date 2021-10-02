@@ -53,8 +53,6 @@
 #include <stddef.h>
 #include <string.h>
 
-#include <librpc/rpc.h>
-
 #ifdef __ARCH_HAVE_COMPAT
 #include <compat/pointer.h>
 #endif /* __ARCH_HAVE_COMPAT */

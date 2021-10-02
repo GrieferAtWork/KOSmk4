@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1a37c85 */
+/* HASH CRC-32:0x483707aa */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1118,7 +1118,23 @@
 #define SYS_pwrite64f                    __NR_pwrite64f                    /* ssize_t pwrite64f(fd_t fd, void const *buf, size_t bufsize, uint64_t offset, iomode_t mode) */
 #define SYS_pread64f                     __NR_pread64f                     /* ssize_t pread64f(fd_t fd, void *buf, size_t bufsize, uint64_t offset, iomode_t mode) */
 #define SYS_nanosleep64                  __NR_nanosleep64                  /* errno_t nanosleep64(struct timespecx32_64 const *req, struct timespecx32_64 *rem) */
-#define SYS_rpc_service                  __NR_rpc_service                  /* syscall_slong_t rpc_service(void) */
+/* >> rpc_serve(2)
+ * Check for pending signals and RPCs. This is a wrapper around the
+ * kernel `task_serve()' function, which is always invoked before a
+ * thread begins waiting for a blocking operation. All system calls
+ * marked as cancellation  points probably  call `task_serve()'  at
+ * some point.
+ * Note that unlike (say) `pause(2)', this function doesn't  block,
+ * and may be used to implement `pthread_testcancel(3)' (should KOS
+ * RPCs be used to facility pthread cancellation points, as done by
+ * KOS's builtin libc)
+ * This syscall must also be invoked when the calling thread makes
+ * use of the userprocmask mechanism,  and the signal mask  became
+ * less restrictive while the `USERPROCMASK_FLAG_HASPENDING'  flag
+ * was set.
+ * @return: 0:      Nothing was handled.
+ * @return: -EINTR: RPCs (or posix signals) were handled. */
+#define SYS_rpc_serve                    __NR_rpc_serve                    /* syscall_slong_t rpc_serve(void) */
 #define SYS_ksysctl                      __NR_ksysctl                      /* syscall_slong_t ksysctl(syscall_ulong_t command, void *arg) */
 /* Same as `write(2)', but rather than specifying a single, continuous buffer,
  * write  data from `count'  separate buffers, though  still return the actual
@@ -1202,12 +1218,6 @@
  * @return: RTM_ABORT_* : RTM operation failed (s.a. code from `<kos/rtm.h>') */
 #define SYS_rtm_begin                    __NR_rtm_begin                    /* rtm_status_t rtm_begin(void) */
 #define SYS_ftime64                      __NR_ftime64                      /* errno_t ftime64(struct timebx32_64 *tp) */
-/* Check for pending signals, and keep on handling them until none are left
- * The  [restart(must)] is necessary in order to ensure that _all_ unmasked
- * signals get handled until  none are left, in  case more than one  signal
- * became available.
- * This system call is only needed when `set_userprocmask_address(2)' was used. */
-#define SYS_sigmask_check                __NR_sigmask_check                /* errno_t sigmask_check(void) */
 /* Register the address of  the calling thread's userprocmask  controller.
  * This also  initializes `*ctl->pm_sigmask'  and `ctl->pm_pending',  such
  * that `*ctl->pm_sigmask' is filled with the current kernel-level  signal
@@ -1414,17 +1424,38 @@
 /* Create a new pseudo-terminal driver and store handles to both the
  * master  and slave ends  of the connection  in the given pointers. */
 #define SYS_openpty                      __NR_openpty                      /* errno_t openpty(fd_t *amaster, fd_t *aslave, char *name, struct termios const *termp, struct winsize const *winp) */
-/* Schedule an RPC for execution on the specified `target' thread.
- * @param: target:    The targeted thread.
- * @param: flags:     RPC flags (one of `RPC_SCHEDULE_*', or'd with a set of `RPC_SCHEDULE_FLAG_*')
- * @param: program:   An RPC loader program (vector of `RPC_PROGRAM_OP_*')
- * @param: arguments: Arguments for the RPC loader program.
- * @return: 1:  The specified `target' thread has already terminated.
- * @return: 0:  Success.
- * @return: -1: Error (s.a. `errno')
- * @throws: E_PROCESS_EXITED:  `target' does not reference a valid process
- * @throws: E_INVALID_ARGUMENT: The given `flag' is invalid. */
-#define SYS_rpc_schedule                 __NR_rpc_schedule                 /* syscall_slong_t rpc_schedule(pid_t target, syscall_ulong_t flags, uint8_t const *program, __HYBRID_PTR32(void) *arguments) */
+/* >> rpc_schedule(2)
+ * Schedule an RPC program to-be executed by some other thread. This  function
+ * cannot guaranty that  the RPC  program is  always executed,  as the  target
+ * thread terminate before the  conditions for the RPC  to be served are  ever
+ * met. Note that these  conditions depend on the  given `mode'. Note that  on
+ * multi-arch  platforms (such as  x86), the register numbers,  as well as the
+ * address size used by `program' depend on the execution mode of `target_tid'
+ * 
+ * @param: target_tid: The TID of the targeted thread
+ * @param: mode:       One of  `RPC_SYNCMODE_*', or'd  with
+ *                     one of `RPC_SYSRESTART_*', or'd with
+ *                     one of `RPC_PRIORITY_*'
+ * @param: program:    The RPC program to execute (sequences of `RPC_OP_*')
+ * @param: params:     RPC program parameters (for `RPC_OP_push_param')
+ * 
+ * @return: 0 :                Success
+ * @throws: E_SEGFAULT:        Faulty pointers were given
+ * @throws: E_INVALID_ARGUMENT:E_INVALID_ARGUMENT_CONTEXT_RPC_SCHEDULE_MODE:
+ *                             The given `mode' is invalid.
+ * @throws: E_INVALID_ARGUMENT:E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_INSTRUCTION:
+ *                             The RPC program  contains illegal  instructions.
+ *                             In this case, modifications made by instructions
+ *                             encountered before the illegal one(s) will still
+ *                             have  happened, meaning that the target thread's
+ *                             state may have become inconsistent.
+ * @throws: E_PROCESS_EXITED:  The target thread has already terminated, or
+ *                             doesn't exist. Note  though that unless  the
+ *                             thread  is  part  of your  own  process, are
+ *                             still many reasons  outside of your  control
+ *                             for why it  may terminate immediately  after
+ *                             the RPC program finished. */
+#define SYS_rpc_schedule                 __NR_rpc_schedule                 /* errno_t rpc_schedule(pid_t target_tid, syscall_ulong_t mode, void const *program, __HYBRID_PTR32(void const) const *params) */
 /* Returns  the  absolute   filesystem  path  for   the  specified   file
  * When `AT_SYMLINK_NOFOLLOW' is given, a final symlink is  dereferenced,
  * causing the pointed-to file location to be retrieved. - Otherwise, the

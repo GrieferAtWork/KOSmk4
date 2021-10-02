@@ -64,8 +64,6 @@
 #include <string.h>
 #include <syscall.h>
 
-#include <librpc/rpc.h>
-
 DECL_BEGIN
 
 #ifdef __x86_64__

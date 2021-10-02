@@ -30,6 +30,7 @@
 #include <asm/instr/interrupt.h>
 #include <asm/instr/movzxq.h>
 #include <asm/instr/ttest.h>
+#include <kos/kernel/cpu-state.h>
 
 
 /************************************************************************/
@@ -166,6 +167,7 @@ PUBLIC_FUNCTION(__x86_64_syscall_iret)
 	sti
 	/* Clear the current exception (else the kernel might panic because
 	 * it  would  think  that  we  didn't  nest  exceptions   properly) */
+	EXTERN(this_exception_code)
 	movq   $(ERROR_CODEOF(E_OK)), %gs:this_exception_code
 .Lsysret64_probe_begin2:
 	ttest  mask=0, loc=0(%rcx)
@@ -188,6 +190,7 @@ PUBLIC_FUNCTION(__x86_64_syscall_iret)
 	 * problems and potential kernel panics later down the line, as
 	 * the next system call might think that exceptions were  being
 	 * nested) */
+	EXTERN(this_exception_code)
 	movq   $(ERROR_CODEOF(E_OK)), %gs:this_exception_code
 
 .Ldo_iret:

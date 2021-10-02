@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x791e474e */
+/* HASH CRC-32:0xbead7c72 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -33,6 +33,9 @@
 #define __CRT_HAVE_Creat64
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+#define __CRT_HAVE_DOS$RpcExec
+#define __CRT_HAVE_DOS$RpcInterrupt
+#define __CRT_HAVE_DOS$RpcSchedule
 #define __CRT_HAVE_DOS$_Exit
 #define __CRT_HAVE_DOS$__cmsg_nxthdr
 #define __CRT_HAVE_DOS$__control87_2
@@ -2127,6 +2130,9 @@
 #define __CRT_HAVE_DOS$round
 #define __CRT_HAVE_DOS$roundf
 #define __CRT_HAVE_DOS$roundl
+#define __CRT_HAVE_DOS$rpc_exec
+#define __CRT_HAVE_DOS$rpc_interrupt
+#define __CRT_HAVE_DOS$rpc_schedule
 #define __CRT_HAVE_DOS$rpmatch
 #define __CRT_HAVE_DOS$rresvport
 #define __CRT_HAVE_DOS$rresvport_af
@@ -3044,6 +3050,9 @@
 #define __CRT_HAVE_RecvMsg
 #define __CRT_HAVE_RemapFilePages
 #define __CRT_HAVE_Rmdir
+#define __CRT_HAVE_RpcExec
+#define __CRT_HAVE_RpcInterrupt
+#define __CRT_HAVE_RpcSchedule
 #define __CRT_HAVE_Send
 #define __CRT_HAVE_SendMMsg
 #define __CRT_HAVE_SendMsg
@@ -5425,6 +5434,10 @@
 #define __CRT_HAVE_round
 #define __CRT_HAVE_roundf
 #define __CRT_HAVE_roundl
+#define __CRT_HAVE_rpc_exec
+#define __CRT_HAVE_rpc_interrupt
+#define __CRT_HAVE_rpc_schedule
+#define __CRT_HAVE_rpc_serve
 #define __CRT_HAVE_rpmatch
 #define __CRT_HAVE_rresvport
 #define __CRT_HAVE_rresvport_af

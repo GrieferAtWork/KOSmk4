@@ -437,6 +437,7 @@ incdir("");
 #include <compat/kos/bits/except-handler.h>
 #include <compat/kos/bits/futex-expr.h>
 #include <compat/kos/bits/futex.h>
+#include <compat/kos/bits/syscall-info.h>
 #include <compat/kos/compat/linux-dirent.h>
 #include <compat/kos/compat/linux-olddirent.h>
 #include <compat/kos/compat/linux-oldselect.h>
@@ -590,6 +591,7 @@ incdir("");
 #include <kos/bits/futex.h>
 #include <kos/bits/lockop.h>
 #include <kos/bits/rtm.h>
+#include <kos/bits/syscall-info.h>
 #include <kos/bits/thread.h>
 #include <kos/bits/ukern-struct.h>
 #include <kos/bits/ukern.h>
@@ -606,6 +608,7 @@ incdir("");
 #include <kos/except/asm/codes.h>
 #include <kos/except/codes.h>
 #include <kos/except/reason/fs.h>
+#include <kos/except/reason/illop.h>
 #include <kos/except/reason/inval.h>
 #include <kos/except/reason/io.h>
 #include <kos/except/reason/net.h>
@@ -663,11 +666,14 @@ incdir("");
 #include <kos/refcnt-nonatomic.h>
 #include <kos/refcnt.h>
 #include <kos/refptr.h>
+#include <kos/rpc.h>
 #include <kos/rtm.h>
 #include <kos/sys/ioctl.h>
 #include <kos/sys/mman.h>
+#include <kos/sys/socket.h>
 #include <kos/sys/stat.h>
 #include <kos/syscalls.h>
+#include <kos/thread.h>
 #include <kos/types.h>
 #include <kos/ukern.h>
 #include <kos/unistd.h>
@@ -826,10 +832,6 @@ incdir("");
 #include <libregdump/printer.h>
 #include <libregex/api.h>
 #include <libregex/regex.h>
-#include <librpc/api.h>
-#include <librpc/bits/rpc.h>
-#include <librpc/bits/syscall-info.h>
-#include <librpc/rpc.h>
 #include <libsctrace/api.h>
 #include <libsctrace/repr-types.h>
 #include <libsctrace/sctrace.h>

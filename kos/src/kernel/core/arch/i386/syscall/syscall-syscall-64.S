@@ -26,12 +26,14 @@
 #include <kernel/except.h>
 
 #include <asm/cfi.h>
+#include <asm/cpu-flags.h>
 #include <asm/instr/interrupt.h>
 #include <asm/instr/movzxq.h>
 #include <asm/instr/ttest.h>
 #include <asm/syscalls64_d.h>
 #include <kos/kernel/gdt.h>
-#include <librpc/rpc.h>
+#include <kos/rpc.h>
+
 #include <libunwind/cfi.h>
 
 

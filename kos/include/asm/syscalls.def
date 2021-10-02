@@ -1581,13 +1581,6 @@ rt_sigprocmask:([tostr(SIGPROCMASK_HOW)] syscall_ulong_t how,
 @@function will once again disable userprocmask, same as passing `NULL' would
 set_userprocmask_address:(struct userprocmask *ctl) -> errno_t;
 
-@@Check for pending signals, and keep on handling them until none are left
-@@The  [restart(must)] is necessary in order to ensure that _all_ unmasked
-@@signals get handled until  none are left, in  case more than one  signal
-@@became available.
-@@This system call is only needed when `set_userprocmask_address(2)' was used.
-[restart(must)] sigmask_check:() -> errno_t;
-
 
 %[startgroup]
 [cp][restart(dont)] rt_sigtimedwait:([tostr(STRUCT_SIGSET:sigsetsize)] struct __sigset_struct const *set, [tostr(out:STRUCT_SIGINFO)] struct __siginfo_struct *info, [tostr(STRUCT_TIMESPEC)] struct timespec const *timeout, size_t sigsetsize) -> syscall_slong_t;
@@ -1623,20 +1616,59 @@ rt_tgsigqueueinfo:(pid_t pid, pid_t tid, signo_t usigno, [tostr(STRUCT_SIGINFO)]
 %[endgroup]
 
 %[startgroup]
-@@Schedule an RPC for execution on the specified `target' thread.
-@@@param: target:    The targeted thread.
-@@@param: flags:     RPC flags (one of `RPC_SCHEDULE_*', or'd with a set of `RPC_SCHEDULE_FLAG_*')
-@@@param: program:   An RPC loader program (vector of `RPC_PROGRAM_OP_*')
-@@@param: arguments: Arguments for the RPC loader program.
-@@@return: 1:  The specified `target' thread has already terminated.
-@@@return: 0:  Success.
-@@@return: -1: Error (s.a. `errno')
-@@@throws: E_PROCESS_EXITED:  `target' does not reference a valid process
-@@@throws: E_INVALID_ARGUMENT: The given `flag' is invalid.
-rpc_schedule:(pid_t target, [tostr(RPC_SCHEDULE_FLAGS)] syscall_ulong_t flags, uint8_t const *program, void **arguments) -> syscall_slong_t;
-[doc_alias(rpc_schedule)] rpc_schedulex32:(pid_t target, [tostr(RPC_SCHEDULE_FLAGS)] syscall_ulong_t flags, uint8_t const *program, __HYBRID_PTR32(void) *arguments) -> syscall_slong_t;
-[doc_alias(rpc_schedule)] rpc_schedulex64:(pid_t target, [tostr(RPC_SCHEDULE_FLAGS)] syscall_ulong_t flags, uint8_t const *program, __HYBRID_PTR64(void) *arguments) -> syscall_slong_t;
+@@>> rpc_schedule(2)
+@@Schedule an RPC program to-be executed by some other thread. This  function
+@@cannot guaranty that  the RPC  program is  always executed,  as the  target
+@@thread terminate before the  conditions for the RPC  to be served are  ever
+@@met. Note that these  conditions depend on the  given `mode'. Note that  on
+@@multi-arch  platforms (such as  x86), the register numbers,  as well as the
+@@address size used by `program' depend on the execution mode of `target_tid'
+@@
+@@@param: target_tid: The TID of the targeted thread
+@@@param: mode:       One of  `RPC_SYNCMODE_*', or'd  with
+@@                    one of `RPC_SYSRESTART_*', or'd with
+@@                    one of `RPC_PRIORITY_*'
+@@@param: program:    The RPC program to execute (sequences of `RPC_OP_*')
+@@@param: params:     RPC program parameters (for `RPC_OP_push_param')
+@@
+@@@return: 0 :                Success
+@@@throws: E_SEGFAULT:        Faulty pointers were given
+@@@throws: E_INVALID_ARGUMENT:E_INVALID_ARGUMENT_CONTEXT_RPC_SCHEDULE_MODE:
+@@                            The given `mode' is invalid.
+@@@throws: E_INVALID_ARGUMENT:E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_INSTRUCTION:
+@@                            The RPC program  contains illegal  instructions.
+@@                            In this case, modifications made by instructions
+@@                            encountered before the illegal one(s) will still
+@@                            have  happened, meaning that the target thread's
+@@                            state may have become inconsistent.
+@@@throws: E_PROCESS_EXITED:  The target thread has already terminated, or
+@@                            doesn't exist. Note  though that unless  the
+@@                            thread  is  part  of your  own  process, are
+@@                            still many reasons  outside of your  control
+@@                            for why it  may terminate immediately  after
+@@                            the RPC program finished.
+rpc_schedule:(pid_t target_tid, [tostr(RPC_SCHEDULE_MODE)] syscall_ulong_t mode, void const *program, void const *const *params) -> errno_t;
+[doc_alias(rpc_schedule)] rpc_schedulex32:(pid_t target_tid, [tostr(RPC_SCHEDULE_MODE)] syscall_ulong_t mode, void const *program, __HYBRID_PTR32(void const) const *params) -> errno_t;
+[doc_alias(rpc_schedule)] rpc_schedulex64:(pid_t target_tid, [tostr(RPC_SCHEDULE_MODE)] syscall_ulong_t mode, void const *program, __HYBRID_PTR64(void const) const *params) -> errno_t;
 %[endgroup]
+
+@@>> rpc_serve(2)
+@@Check for pending signals and RPCs. This is a wrapper around the
+@@kernel `task_serve()' function, which is always invoked before a
+@@thread begins waiting for a blocking operation. All system calls
+@@marked as cancellation  points probably  call `task_serve()'  at
+@@some point.
+@@Note that unlike (say) `pause(2)', this function doesn't  block,
+@@and may be used to implement `pthread_testcancel(3)' (should KOS
+@@RPCs be used to facility pthread cancellation points, as done by
+@@KOS's builtin libc)
+@@This syscall must also be invoked when the calling thread makes
+@@use of the userprocmask mechanism,  and the signal mask  became
+@@less restrictive while the `USERPROCMASK_FLAG_HASPENDING'  flag
+@@was set.
+@@@return: 0:      Nothing was handled.
+@@@return: -EINTR: RPCs (or posix signals) were handled.
+[cp][restart(dont)] rpc_serve:() -> syscall_slong_t;
 
 %[startgroup]
 @@Raise a signal within the calling thread alongside the given CPU state
@@ -1846,7 +1878,6 @@ sched_setscheduler:(pid_t pid, [tostr(SCHED_POLICY)] syscall_ulong_t policy,
 sched_getscheduler:(pid_t pid) -> [tostr(SCHED_POLICY)] syscall_slong_t; /* UNIMPLEMENTED! */
 
 [restart(dont)] sched_yield:() -> errno_t;
-[cp][restart(dont)] rpc_service:() -> syscall_slong_t;
 sched_get_priority_max:([tostr(SCHED_POLICY)] syscall_ulong_t algorithm) -> syscall_slong_t; /* UNIMPLEMENTED! */
 sched_get_priority_min:([tostr(SCHED_POLICY)] syscall_ulong_t algorithm) -> syscall_slong_t; /* UNIMPLEMENTED! */
 

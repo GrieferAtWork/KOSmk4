@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9222cc9 */
+/* HASH CRC-32:0x59ecb84f */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -749,7 +749,7 @@ __TSYSCALL1(nanosleep64, 0xac, 0xac)
 __TSYSCALL1_UNUSED(0xffffff5f, 0xad, 0xad)
 __TSYSCALL1_UNUSED(0xffffff60, 0xae, 0xae)
 __TSYSCALL1_UNUSED(0xffffff61, 0xaf, 0xaf)
-__TSYSCALL1(rpc_service, 0xb0, 0xb0)
+__TSYSCALL1(rpc_serve, 0xb0, 0xb0)
 __TSYSCALL1_UNUSED(0xffffff63, 0xb1, 0xb1)
 __TSYSCALL1_UNUSED(0xffffff64, 0xb2, 0xb2)
 __TSYSCALL1_UNUSED(0xffffff65, 0xb3, 0xb3)
@@ -874,7 +874,7 @@ __TSYSCALL1_UNUSED(0xffffffdb, 0x129, 0x129)
 __TSYSCALL1_UNUSED(0xffffffdc, 0x12a, 0x12a)
 __TSYSCALL1(ftime64, 0x12b, 0x12b)
 __TSYSCALL1_UNUSED(0xffffffde, 0x12c, 0x12c)
-__TSYSCALL1(sigmask_check, 0x12d, 0x12d)
+__TSYSCALL1_UNUSED(0xffffffdf, 0x12d, 0x12d)
 __TSYSCALL1(set_userprocmask_address, 0x12e, 0x12e)
 __TSYSCALL1_UNUSED(0xffffffe1, 0x12f, 0x12f)
 __TSYSCALL1(utime64, 0x130, 0x130)

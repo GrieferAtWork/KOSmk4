@@ -73,7 +73,6 @@
 #include <stdint.h>
 #include <string.h>
 
-#include <librpc/rpc.h>
 #include <libunwind/unwind.h>
 
 DECL_BEGIN

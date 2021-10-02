@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5ff2c2e */
+/* HASH CRC-32:0x5389c16b */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -345,7 +345,7 @@
 #define __ARCH_WANT_SYSCALL_RESTART_SYSCALL
 #define __ARCH_WANT_SYSCALL_RMDIR
 #define __ARCH_WANT_SYSCALL_RPC_SCHEDULE
-#define __ARCH_WANT_SYSCALL_RPC_SERVICE
+#define __ARCH_WANT_SYSCALL_RPC_SERVE
 #define __ARCH_WANT_SYSCALL_RSEQ
 #define __ARCH_WANT_SYSCALL_RT_SIGACTION
 #define __ARCH_WANT_SYSCALL_RT_SIGPENDING
@@ -429,7 +429,6 @@
 #define __ARCH_WANT_SYSCALL_SHUTDOWN
 #define __ARCH_WANT_SYSCALL_SIGACTION
 #define __ARCH_WANT_SYSCALL_SIGALTSTACK
-#define __ARCH_WANT_SYSCALL_SIGMASK_CHECK
 #define __ARCH_WANT_SYSCALL_SIGNAL
 #define __ARCH_WANT_SYSCALL_SIGNALFD
 #define __ARCH_WANT_SYSCALL_SIGNALFD4

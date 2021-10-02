@@ -32,12 +32,10 @@
 #include <hybrid/__unaligned.h>
 #include <hybrid/host.h>
 
+#include <asm/cpu-flags.h>
 #include <kos/kernel/cpu-state-helpers.h>
 #include <kos/kernel/cpu-state.h>
-
-#include <string.h>
-
-#include <librpc/rpc.h>
+#include <kos/rpc.h>
 
 #ifdef __CC__
 DECL_BEGIN

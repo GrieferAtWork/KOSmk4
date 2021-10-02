@@ -29,8 +29,7 @@
 
 #include <asm/cfi.h>
 #include <asm/instr/movzxq.h>
-
-#include <librpc/rpc.h>
+#include <kos/rpc.h>
 
 /* Include the 32-bit router for compatibility mode. */
 #include "router32.S"

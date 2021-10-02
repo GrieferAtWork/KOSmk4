@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd476bbc1 */
+/* HASH CRC-32:0x4b5e8e7c */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -926,10 +926,10 @@
 #define __NRAN2_openpty                  name
 #define __NRAN3_openpty                  termp
 #define __NRAN4_openpty                  winp
-#define __NRAN0_rpc_schedule             target
-#define __NRAN1_rpc_schedule             flags
+#define __NRAN0_rpc_schedule             target_tid
+#define __NRAN1_rpc_schedule             mode
 #define __NRAN2_rpc_schedule             program
-#define __NRAN3_rpc_schedule             arguments
+#define __NRAN3_rpc_schedule             params
 #define __NRAN0_frealpathat              dirfd
 #define __NRAN1_frealpathat              filename
 #define __NRAN2_frealpathat              buf
@@ -2264,7 +2264,6 @@
 #define __NRATR2_kreaddir                 SC_REPR_SIZE_T                                                       /* bufsize */ 
 #define __NRATR3_kreaddir                 SC_REPR_KREADDIR_MODE                                                /* mode */ 
 #define __NRRTR_kreaddir                  SC_REPR_SSIZE_T                                                      /* return */
-#define __NRRTR_sigmask_check             SC_REPR_ERRNO_T                                                      /* return */
 #define __NRATR0_set_userprocmask_address SC_REPR_POINTER                                                      /* ctl */ 
 #define __NRRTR_set_userprocmask_address  SC_REPR_ERRNO_T                                                      /* return */
 #define __NRRTR_rtm_test                  SC_REPR_SYSCALL_ULONG_T                                              /* return */
@@ -2312,7 +2311,7 @@
 #define __NRATR3_lfutex                   SC_REPR_STRUCT_TIMESPECX64                                           /* timeout */ 
 #define __NRATR4_lfutex                   SC_REPR_UINT64_T                                                     /* val2 */ 
 #define __NRRTR_lfutex                    SC_REPR_SYSCALL_SLONG_T                                              /* return */
-#define __NRRTR_rpc_service               SC_REPR_SYSCALL_SLONG_T                                              /* return */
+#define __NRRTR_rpc_serve                 SC_REPR_SYSCALL_SLONG_T                                              /* return */
 #define __NRATR0_debugtrap                SC_REPR_STRUCT_UCPUSTATE64                                           /* state */ 
 #define __NRATR1_debugtrap                SC_REPR_STRUCT_DEBUGTRAP_REASON64                                    /* reason */ 
 #define __NRRTR_debugtrap                 SC_REPR_ERRNO_T                                                      /* return */
@@ -2361,11 +2360,11 @@
 #define __NRATR3_openpty                  SC_REPR_STRUCT_TERMIOS                                               /* termp */ 
 #define __NRATR4_openpty                  SC_REPR_STRUCT_WINSIZE                                               /* winp */ 
 #define __NRRTR_openpty                   SC_REPR_ERRNO_T                                                      /* return */
-#define __NRATR0_rpc_schedule             SC_REPR_PID_T                                                        /* target */ 
-#define __NRATR1_rpc_schedule             SC_REPR_RPC_SCHEDULE_FLAGS                                           /* flags */ 
+#define __NRATR0_rpc_schedule             SC_REPR_PID_T                                                        /* target_tid */ 
+#define __NRATR1_rpc_schedule             SC_REPR_RPC_SCHEDULE_MODE                                            /* mode */ 
 #define __NRATR2_rpc_schedule             SC_REPR_POINTER                                                      /* program */ 
-#define __NRATR3_rpc_schedule             SC_REPR_POINTER                                                      /* arguments */ 
-#define __NRRTR_rpc_schedule              SC_REPR_SYSCALL_SLONG_T                                              /* return */
+#define __NRATR3_rpc_schedule             SC_REPR_POINTER                                                      /* params */ 
+#define __NRRTR_rpc_schedule              SC_REPR_ERRNO_T                                                      /* return */
 #define __NRATR0_frealpathat              SC_REPR_FD_T                                                         /* dirfd */ 
 #define __NRATR1_frealpathat              SC_REPR_FILENAME                                                     /* filename */ 
 #define __NRATL1_frealpathat              0                                                                    /* filename -> dirfd */ 

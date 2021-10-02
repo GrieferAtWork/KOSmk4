@@ -61,8 +61,6 @@
 #include <signal.h>
 #include <string.h>
 
-#include <librpc/rpc.h>
-
 #ifdef __ARCH_HAVE_COMPAT
 #include <compat/bits/os/sigaction.h>
 #include <compat/bits/os/siginfo-convert.h>

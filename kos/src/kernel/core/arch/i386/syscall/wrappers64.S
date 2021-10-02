@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4e0052cc */
+/* HASH CRC-32:0x54b8dfd9 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -11678,41 +11678,6 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_kreaddir)
 	.cfi_endproc
 END(__x86_asm64_syscall_kreaddir)
 
-/* Check for pending signals, and keep on handling them until none are left
- * The  [restart(must)] is necessary in order to ensure that _all_ unmasked
- * signals get handled until  none are left, in  case more than one  signal
- * became available.
- * This system call is only needed when `set_userprocmask_address(2)' was used. */
-/* errno_t sigmask_check(void) */
-.section .text.x86.asm64_syscall.sigmask_check
-INTERN_WEAK_FUNCTION(__x86_asm64_syscall_sigmask_check)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm64_syscall
-	.cfi_lsda 0, 0xffffffffffffffdb
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %rsp, 0
-	pushq_cfi_r %rcx
-	pushq_cfi_r %rdx
-	pushq_cfi_r %rsi
-	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
-	EXTERN(sys_sigmask_check)
-	call   sys_sigmask_check
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
-	popq_cfi_r %rdi
-	popq_cfi_r %rsi
-	popq_cfi_r %rdx
-	popq_cfi_r %rcx
-	X86_IRET_BUT_PREFER_SYSRET64
-	.cfi_endproc
-END(__x86_asm64_syscall_sigmask_check)
-
 /* Register the address of  the calling thread's userprocmask  controller.
  * This also  initializes `*ctl->pm_sigmask'  and `ctl->pm_pending',  such
  * that `*ctl->pm_sigmask' is filled with the current kernel-level  signal
@@ -12260,9 +12225,25 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_lfutex)
 	.cfi_endproc
 END(__x86_asm64_syscall_lfutex)
 
-/* syscall_slong_t rpc_service(void) */
-.section .text.x86.asm64_syscall.rpc_service
-INTERN_WEAK_FUNCTION(__x86_asm64_syscall_rpc_service)
+/* >> rpc_serve(2)
+ * Check for pending signals and RPCs. This is a wrapper around the
+ * kernel `task_serve()' function, which is always invoked before a
+ * thread begins waiting for a blocking operation. All system calls
+ * marked as cancellation  points probably  call `task_serve()'  at
+ * some point.
+ * Note that unlike (say) `pause(2)', this function doesn't  block,
+ * and may be used to implement `pthread_testcancel(3)' (should KOS
+ * RPCs be used to facility pthread cancellation points, as done by
+ * KOS's builtin libc)
+ * This syscall must also be invoked when the calling thread makes
+ * use of the userprocmask mechanism,  and the signal mask  became
+ * less restrictive while the `USERPROCMASK_FLAG_HASPENDING'  flag
+ * was set.
+ * @return: 0:      Nothing was handled.
+ * @return: -EINTR: RPCs (or posix signals) were handled. */
+/* syscall_slong_t rpc_serve(void) */
+.section .text.x86.asm64_syscall.rpc_serve
+INTERN_WEAK_FUNCTION(__x86_asm64_syscall_rpc_serve)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm64_syscall
 	.cfi_lsda 0, 0xffffffffffffffe9
@@ -12276,8 +12257,8 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_rpc_service)
 	pushq_cfi_r %r9
 	pushq_cfi_r %r10
 	pushq_cfi_r %r11
-	EXTERN(sys_rpc_service)
-	call   sys_rpc_service
+	EXTERN(sys_rpc_serve)
+	call   sys_rpc_serve
 	popq_cfi_r %r11
 	popq_cfi_r %r10
 	popq_cfi_r %r9
@@ -12288,7 +12269,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_rpc_service)
 	popq_cfi_r %rcx
 	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
-END(__x86_asm64_syscall_rpc_service)
+END(__x86_asm64_syscall_rpc_serve)
 
 /* Trigger a debugger trap `trapno', optionally extended with  `regs'
  * at either the system call return location, or at the given `state'
@@ -12618,17 +12599,38 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_openpty)
 	.cfi_endproc
 END(__x86_asm64_syscall_openpty)
 
-/* Schedule an RPC for execution on the specified `target' thread.
- * @param: target:    The targeted thread.
- * @param: flags:     RPC flags (one of `RPC_SCHEDULE_*', or'd with a set of `RPC_SCHEDULE_FLAG_*')
- * @param: program:   An RPC loader program (vector of `RPC_PROGRAM_OP_*')
- * @param: arguments: Arguments for the RPC loader program.
- * @return: 1:  The specified `target' thread has already terminated.
- * @return: 0:  Success.
- * @return: -1: Error (s.a. `errno')
- * @throws: E_PROCESS_EXITED:  `target' does not reference a valid process
- * @throws: E_INVALID_ARGUMENT: The given `flag' is invalid. */
-/* syscall_slong_t rpc_schedule(pid_t target, syscall_ulong_t flags, uint8_t const *program, __HYBRID_PTR64(void) *arguments) */
+/* >> rpc_schedule(2)
+ * Schedule an RPC program to-be executed by some other thread. This  function
+ * cannot guaranty that  the RPC  program is  always executed,  as the  target
+ * thread terminate before the  conditions for the RPC  to be served are  ever
+ * met. Note that these  conditions depend on the  given `mode'. Note that  on
+ * multi-arch  platforms (such as  x86), the register numbers,  as well as the
+ * address size used by `program' depend on the execution mode of `target_tid'
+ * 
+ * @param: target_tid: The TID of the targeted thread
+ * @param: mode:       One of  `RPC_SYNCMODE_*', or'd  with
+ *                     one of `RPC_SYSRESTART_*', or'd with
+ *                     one of `RPC_PRIORITY_*'
+ * @param: program:    The RPC program to execute (sequences of `RPC_OP_*')
+ * @param: params:     RPC program parameters (for `RPC_OP_push_param')
+ * 
+ * @return: 0 :                Success
+ * @throws: E_SEGFAULT:        Faulty pointers were given
+ * @throws: E_INVALID_ARGUMENT:E_INVALID_ARGUMENT_CONTEXT_RPC_SCHEDULE_MODE:
+ *                             The given `mode' is invalid.
+ * @throws: E_INVALID_ARGUMENT:E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_INSTRUCTION:
+ *                             The RPC program  contains illegal  instructions.
+ *                             In this case, modifications made by instructions
+ *                             encountered before the illegal one(s) will still
+ *                             have  happened, meaning that the target thread's
+ *                             state may have become inconsistent.
+ * @throws: E_PROCESS_EXITED:  The target thread has already terminated, or
+ *                             doesn't exist. Note  though that unless  the
+ *                             thread  is  part  of your  own  process, are
+ *                             still many reasons  outside of your  control
+ *                             for why it  may terminate immediately  after
+ *                             the RPC program finished. */
+/* errno_t rpc_schedule(pid_t target_tid, syscall_ulong_t mode, void const *program, __HYBRID_PTR64(void const) const *params) */
 .section .text.x86.asm64_syscall.rpc_schedule
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_rpc_schedule)
 	.cfi_startproc simple
@@ -28360,9 +28362,25 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_nanosleep64)
 	.cfi_endproc
 END(__x86_asm32_int80_nanosleep64)
 
-/* syscall_slong_t rpc_service(void) */
-.section .text.x86.asm32_syscall_int80.rpc_service
-INTERN_WEAK_FUNCTION(__x86_asm32_int80_rpc_service)
+/* >> rpc_serve(2)
+ * Check for pending signals and RPCs. This is a wrapper around the
+ * kernel `task_serve()' function, which is always invoked before a
+ * thread begins waiting for a blocking operation. All system calls
+ * marked as cancellation  points probably  call `task_serve()'  at
+ * some point.
+ * Note that unlike (say) `pause(2)', this function doesn't  block,
+ * and may be used to implement `pthread_testcancel(3)' (should KOS
+ * RPCs be used to facility pthread cancellation points, as done by
+ * KOS's builtin libc)
+ * This syscall must also be invoked when the calling thread makes
+ * use of the userprocmask mechanism,  and the signal mask  became
+ * less restrictive while the `USERPROCMASK_FLAG_HASPENDING'  flag
+ * was set.
+ * @return: 0:      Nothing was handled.
+ * @return: -EINTR: RPCs (or posix signals) were handled. */
+/* syscall_slong_t rpc_serve(void) */
+.section .text.x86.asm32_syscall_int80.rpc_serve
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_rpc_serve)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0xffffff62
@@ -28376,8 +28394,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_rpc_service)
 	pushq_cfi_r %r9
 	pushq_cfi_r %r10
 	pushq_cfi_r %r11
-	EXTERN(sys32_rpc_service)
-	call   sys32_rpc_service
+	EXTERN(sys32_rpc_serve)
+	call   sys32_rpc_serve
 	popq_cfi_r %r11
 	popq_cfi_r %r10
 	popq_cfi_r %r9
@@ -28388,7 +28406,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_rpc_service)
 	popq_cfi_r %rcx
 	intr_exit
 	.cfi_endproc
-END(__x86_asm32_int80_rpc_service)
+END(__x86_asm32_int80_rpc_serve)
 
 /* syscall_slong_t ksysctl(syscall_ulong_t command, void *arg) */
 .section .text.x86.asm32_syscall_int80.ksysctl
@@ -29081,41 +29099,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_ftime64)
 	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_ftime64)
-
-/* Check for pending signals, and keep on handling them until none are left
- * The  [restart(must)] is necessary in order to ensure that _all_ unmasked
- * signals get handled until  none are left, in  case more than one  signal
- * became available.
- * This system call is only needed when `set_userprocmask_address(2)' was used. */
-/* errno_t sigmask_check(void) */
-.section .text.x86.asm32_syscall_int80.sigmask_check
-INTERN_WEAK_FUNCTION(__x86_asm32_int80_sigmask_check)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm32_int80
-	.cfi_lsda 0, 0xffffffdf
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %rsp, 0
-	pushq_cfi_r %rcx
-	pushq_cfi_r %rdx
-	pushq_cfi_r %rsi
-	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
-	EXTERN(sys32_sigmask_check)
-	call   sys32_sigmask_check
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
-	popq_cfi_r %rdi
-	popq_cfi_r %rsi
-	popq_cfi_r %rdx
-	popq_cfi_r %rcx
-	intr_exit
-	.cfi_endproc
-END(__x86_asm32_int80_sigmask_check)
 
 /* Register the address of  the calling thread's userprocmask  controller.
  * This also  initializes `*ctl->pm_sigmask'  and `ctl->pm_pending',  such
@@ -29884,17 +29867,38 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_openpty)
 	.cfi_endproc
 END(__x86_asm32_int80_openpty)
 
-/* Schedule an RPC for execution on the specified `target' thread.
- * @param: target:    The targeted thread.
- * @param: flags:     RPC flags (one of `RPC_SCHEDULE_*', or'd with a set of `RPC_SCHEDULE_FLAG_*')
- * @param: program:   An RPC loader program (vector of `RPC_PROGRAM_OP_*')
- * @param: arguments: Arguments for the RPC loader program.
- * @return: 1:  The specified `target' thread has already terminated.
- * @return: 0:  Success.
- * @return: -1: Error (s.a. `errno')
- * @throws: E_PROCESS_EXITED:  `target' does not reference a valid process
- * @throws: E_INVALID_ARGUMENT: The given `flag' is invalid. */
-/* syscall_slong_t rpc_schedule(pid_t target, syscall_ulong_t flags, uint8_t const *program, __HYBRID_PTR32(void) *arguments) */
+/* >> rpc_schedule(2)
+ * Schedule an RPC program to-be executed by some other thread. This  function
+ * cannot guaranty that  the RPC  program is  always executed,  as the  target
+ * thread terminate before the  conditions for the RPC  to be served are  ever
+ * met. Note that these  conditions depend on the  given `mode'. Note that  on
+ * multi-arch  platforms (such as  x86), the register numbers,  as well as the
+ * address size used by `program' depend on the execution mode of `target_tid'
+ * 
+ * @param: target_tid: The TID of the targeted thread
+ * @param: mode:       One of  `RPC_SYNCMODE_*', or'd  with
+ *                     one of `RPC_SYSRESTART_*', or'd with
+ *                     one of `RPC_PRIORITY_*'
+ * @param: program:    The RPC program to execute (sequences of `RPC_OP_*')
+ * @param: params:     RPC program parameters (for `RPC_OP_push_param')
+ * 
+ * @return: 0 :                Success
+ * @throws: E_SEGFAULT:        Faulty pointers were given
+ * @throws: E_INVALID_ARGUMENT:E_INVALID_ARGUMENT_CONTEXT_RPC_SCHEDULE_MODE:
+ *                             The given `mode' is invalid.
+ * @throws: E_INVALID_ARGUMENT:E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_INSTRUCTION:
+ *                             The RPC program  contains illegal  instructions.
+ *                             In this case, modifications made by instructions
+ *                             encountered before the illegal one(s) will still
+ *                             have  happened, meaning that the target thread's
+ *                             state may have become inconsistent.
+ * @throws: E_PROCESS_EXITED:  The target thread has already terminated, or
+ *                             doesn't exist. Note  though that unless  the
+ *                             thread  is  part  of your  own  process, are
+ *                             still many reasons  outside of your  control
+ *                             for why it  may terminate immediately  after
+ *                             the RPC program finished. */
+/* errno_t rpc_schedule(pid_t target_tid, syscall_ulong_t mode, void const *program, __HYBRID_PTR32(void const) const *params) */
 .section .text.x86.asm32_syscall_int80.rpc_schedule
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_rpc_schedule)
 	.cfi_startproc simple
@@ -34168,8 +34172,24 @@ END(__x86_asm32_sysenter_pread64f)
 /* errno_t nanosleep64(struct timespecx32_64 const *req, struct timespecx32_64 *rem) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_nanosleep64, __x86_asm32_int80_nanosleep64)
 
-/* syscall_slong_t rpc_service(void) */
-DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_rpc_service, __x86_asm32_int80_rpc_service)
+/* >> rpc_serve(2)
+ * Check for pending signals and RPCs. This is a wrapper around the
+ * kernel `task_serve()' function, which is always invoked before a
+ * thread begins waiting for a blocking operation. All system calls
+ * marked as cancellation  points probably  call `task_serve()'  at
+ * some point.
+ * Note that unlike (say) `pause(2)', this function doesn't  block,
+ * and may be used to implement `pthread_testcancel(3)' (should KOS
+ * RPCs be used to facility pthread cancellation points, as done by
+ * KOS's builtin libc)
+ * This syscall must also be invoked when the calling thread makes
+ * use of the userprocmask mechanism,  and the signal mask  became
+ * less restrictive while the `USERPROCMASK_FLAG_HASPENDING'  flag
+ * was set.
+ * @return: 0:      Nothing was handled.
+ * @return: -EINTR: RPCs (or posix signals) were handled. */
+/* syscall_slong_t rpc_serve(void) */
+DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_rpc_serve, __x86_asm32_int80_rpc_serve)
 
 /* syscall_slong_t ksysctl(syscall_ulong_t command, void *arg) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_ksysctl, __x86_asm32_int80_ksysctl)
@@ -34357,14 +34377,6 @@ DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_rtm_begin, __x86_asm32_int80_rtm_b
 
 /* errno_t ftime64(struct timebx32_64 *tp) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_ftime64, __x86_asm32_int80_ftime64)
-
-/* Check for pending signals, and keep on handling them until none are left
- * The  [restart(must)] is necessary in order to ensure that _all_ unmasked
- * signals get handled until  none are left, in  case more than one  signal
- * became available.
- * This system call is only needed when `set_userprocmask_address(2)' was used. */
-/* errno_t sigmask_check(void) */
-DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_sigmask_check, __x86_asm32_int80_sigmask_check)
 
 /* Register the address of  the calling thread's userprocmask  controller.
  * This also  initializes `*ctl->pm_sigmask'  and `ctl->pm_pending',  such
@@ -34773,17 +34785,38 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_openpty)
 	.cfi_endproc
 END(__x86_asm32_sysenter_openpty)
 
-/* Schedule an RPC for execution on the specified `target' thread.
- * @param: target:    The targeted thread.
- * @param: flags:     RPC flags (one of `RPC_SCHEDULE_*', or'd with a set of `RPC_SCHEDULE_FLAG_*')
- * @param: program:   An RPC loader program (vector of `RPC_PROGRAM_OP_*')
- * @param: arguments: Arguments for the RPC loader program.
- * @return: 1:  The specified `target' thread has already terminated.
- * @return: 0:  Success.
- * @return: -1: Error (s.a. `errno')
- * @throws: E_PROCESS_EXITED:  `target' does not reference a valid process
- * @throws: E_INVALID_ARGUMENT: The given `flag' is invalid. */
-/* syscall_slong_t rpc_schedule(pid_t target, syscall_ulong_t flags, uint8_t const *program, __HYBRID_PTR32(void) *arguments) */
+/* >> rpc_schedule(2)
+ * Schedule an RPC program to-be executed by some other thread. This  function
+ * cannot guaranty that  the RPC  program is  always executed,  as the  target
+ * thread terminate before the  conditions for the RPC  to be served are  ever
+ * met. Note that these  conditions depend on the  given `mode'. Note that  on
+ * multi-arch  platforms (such as  x86), the register numbers,  as well as the
+ * address size used by `program' depend on the execution mode of `target_tid'
+ * 
+ * @param: target_tid: The TID of the targeted thread
+ * @param: mode:       One of  `RPC_SYNCMODE_*', or'd  with
+ *                     one of `RPC_SYSRESTART_*', or'd with
+ *                     one of `RPC_PRIORITY_*'
+ * @param: program:    The RPC program to execute (sequences of `RPC_OP_*')
+ * @param: params:     RPC program parameters (for `RPC_OP_push_param')
+ * 
+ * @return: 0 :                Success
+ * @throws: E_SEGFAULT:        Faulty pointers were given
+ * @throws: E_INVALID_ARGUMENT:E_INVALID_ARGUMENT_CONTEXT_RPC_SCHEDULE_MODE:
+ *                             The given `mode' is invalid.
+ * @throws: E_INVALID_ARGUMENT:E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_INSTRUCTION:
+ *                             The RPC program  contains illegal  instructions.
+ *                             In this case, modifications made by instructions
+ *                             encountered before the illegal one(s) will still
+ *                             have  happened, meaning that the target thread's
+ *                             state may have become inconsistent.
+ * @throws: E_PROCESS_EXITED:  The target thread has already terminated, or
+ *                             doesn't exist. Note  though that unless  the
+ *                             thread  is  part  of your  own  process, are
+ *                             still many reasons  outside of your  control
+ *                             for why it  may terminate immediately  after
+ *                             the RPC program finished. */
+/* errno_t rpc_schedule(pid_t target_tid, syscall_ulong_t mode, void const *program, __HYBRID_PTR32(void const) const *params) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_rpc_schedule, __x86_asm32_int80_rpc_schedule)
 
 /* Returns  the  absolute   filesystem  path  for   the  specified   file
@@ -40475,8 +40508,24 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_nanosleep64)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_nanosleep64)
 
-/* syscall_slong_t rpc_service(void) */
-/* DEFINE_INTERN_ALIAS(__x86_asm32_sysrun32_rpc_service, sys32_rpc_service); */
+/* >> rpc_serve(2)
+ * Check for pending signals and RPCs. This is a wrapper around the
+ * kernel `task_serve()' function, which is always invoked before a
+ * thread begins waiting for a blocking operation. All system calls
+ * marked as cancellation  points probably  call `task_serve()'  at
+ * some point.
+ * Note that unlike (say) `pause(2)', this function doesn't  block,
+ * and may be used to implement `pthread_testcancel(3)' (should KOS
+ * RPCs be used to facility pthread cancellation points, as done by
+ * KOS's builtin libc)
+ * This syscall must also be invoked when the calling thread makes
+ * use of the userprocmask mechanism,  and the signal mask  became
+ * less restrictive while the `USERPROCMASK_FLAG_HASPENDING'  flag
+ * was set.
+ * @return: 0:      Nothing was handled.
+ * @return: -EINTR: RPCs (or posix signals) were handled. */
+/* syscall_slong_t rpc_serve(void) */
+/* DEFINE_INTERN_ALIAS(__x86_asm32_sysrun32_rpc_serve, sys32_rpc_serve); */
 
 /* syscall_slong_t ksysctl(syscall_ulong_t command, void *arg) */
 .section .text.x86.asm32_syscall_sysrun32.ksysctl
@@ -40743,14 +40792,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_ftime64)
 	jmp    sys32_ftime64
 	.cfi_endproc
 END(__x86_asm32_sysrun32_ftime64)
-
-/* Check for pending signals, and keep on handling them until none are left
- * The  [restart(must)] is necessary in order to ensure that _all_ unmasked
- * signals get handled until  none are left, in  case more than one  signal
- * became available.
- * This system call is only needed when `set_userprocmask_address(2)' was used. */
-/* errno_t sigmask_check(void) */
-/* DEFINE_INTERN_ALIAS(__x86_asm32_sysrun32_sigmask_check, sys32_sigmask_check); */
 
 /* Register the address of  the calling thread's userprocmask  controller.
  * This also  initializes `*ctl->pm_sigmask'  and `ctl->pm_pending',  such
@@ -41151,17 +41192,38 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_openpty)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_openpty)
 
-/* Schedule an RPC for execution on the specified `target' thread.
- * @param: target:    The targeted thread.
- * @param: flags:     RPC flags (one of `RPC_SCHEDULE_*', or'd with a set of `RPC_SCHEDULE_FLAG_*')
- * @param: program:   An RPC loader program (vector of `RPC_PROGRAM_OP_*')
- * @param: arguments: Arguments for the RPC loader program.
- * @return: 1:  The specified `target' thread has already terminated.
- * @return: 0:  Success.
- * @return: -1: Error (s.a. `errno')
- * @throws: E_PROCESS_EXITED:  `target' does not reference a valid process
- * @throws: E_INVALID_ARGUMENT: The given `flag' is invalid. */
-/* syscall_slong_t rpc_schedule(pid_t target, syscall_ulong_t flags, uint8_t const *program, __HYBRID_PTR32(void) *arguments) */
+/* >> rpc_schedule(2)
+ * Schedule an RPC program to-be executed by some other thread. This  function
+ * cannot guaranty that  the RPC  program is  always executed,  as the  target
+ * thread terminate before the  conditions for the RPC  to be served are  ever
+ * met. Note that these  conditions depend on the  given `mode'. Note that  on
+ * multi-arch  platforms (such as  x86), the register numbers,  as well as the
+ * address size used by `program' depend on the execution mode of `target_tid'
+ * 
+ * @param: target_tid: The TID of the targeted thread
+ * @param: mode:       One of  `RPC_SYNCMODE_*', or'd  with
+ *                     one of `RPC_SYSRESTART_*', or'd with
+ *                     one of `RPC_PRIORITY_*'
+ * @param: program:    The RPC program to execute (sequences of `RPC_OP_*')
+ * @param: params:     RPC program parameters (for `RPC_OP_push_param')
+ * 
+ * @return: 0 :                Success
+ * @throws: E_SEGFAULT:        Faulty pointers were given
+ * @throws: E_INVALID_ARGUMENT:E_INVALID_ARGUMENT_CONTEXT_RPC_SCHEDULE_MODE:
+ *                             The given `mode' is invalid.
+ * @throws: E_INVALID_ARGUMENT:E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_INSTRUCTION:
+ *                             The RPC program  contains illegal  instructions.
+ *                             In this case, modifications made by instructions
+ *                             encountered before the illegal one(s) will still
+ *                             have  happened, meaning that the target thread's
+ *                             state may have become inconsistent.
+ * @throws: E_PROCESS_EXITED:  The target thread has already terminated, or
+ *                             doesn't exist. Note  though that unless  the
+ *                             thread  is  part  of your  own  process, are
+ *                             still many reasons  outside of your  control
+ *                             for why it  may terminate immediately  after
+ *                             the RPC program finished. */
+/* errno_t rpc_schedule(pid_t target_tid, syscall_ulong_t mode, void const *program, __HYBRID_PTR32(void const) const *params) */
 .section .text.x86.asm32_syscall_sysrun32.rpc_schedule
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_rpc_schedule)
 	.cfi_startproc

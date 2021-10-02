@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x461e0b2d */
+/* HASH CRC-32:0x999db90b */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -997,12 +997,6 @@
 /* @param: mode: One of `READDIR_DEFAULT', `READDIR_CONTINUE', `READDIR_PEEK' or `READDIR_MULTIPLE',
  *               optionally     or'd     with     any     of     `READDIR_SKIPREL | READDIR_WANTEOF' */
 #define __NR64_kreaddir                 __UINT64_C(0xffffffffffffffb2) /* ssize_t kreaddir(fd_t fd, struct dirent *buf, size_t bufsize, syscall_ulong_t mode) */
-/* Check for pending signals, and keep on handling them until none are left
- * The  [restart(must)] is necessary in order to ensure that _all_ unmasked
- * signals get handled until  none are left, in  case more than one  signal
- * became available.
- * This system call is only needed when `set_userprocmask_address(2)' was used. */
-#define __NR64_sigmask_check            __UINT64_C(0xffffffffffffffdb) /* errno_t sigmask_check(void) */
 /* Register the address of  the calling thread's userprocmask  controller.
  * This also  initializes `*ctl->pm_sigmask'  and `ctl->pm_pending',  such
  * that `*ctl->pm_sigmask' is filled with the current kernel-level  signal
@@ -1197,7 +1191,23 @@
  * @throw:  E_INTERRUPT:        A blocking futex-wait operation was interrupted
  * @return: -ETIMEDOUT:         A blocking futex-wait operation has timed out */
 #define __NR64_lfutex                   __UINT64_C(0xffffffffffffffe8) /* syscall_slong_t lfutex(uint64_t *uaddr, syscall_ulong_t futex_op, uint64_t val, struct timespecx64 const *timeout, uint64_t val2) */
-#define __NR64_rpc_service              __UINT64_C(0xffffffffffffffe9) /* syscall_slong_t rpc_service(void) */
+/* >> rpc_serve(2)
+ * Check for pending signals and RPCs. This is a wrapper around the
+ * kernel `task_serve()' function, which is always invoked before a
+ * thread begins waiting for a blocking operation. All system calls
+ * marked as cancellation  points probably  call `task_serve()'  at
+ * some point.
+ * Note that unlike (say) `pause(2)', this function doesn't  block,
+ * and may be used to implement `pthread_testcancel(3)' (should KOS
+ * RPCs be used to facility pthread cancellation points, as done by
+ * KOS's builtin libc)
+ * This syscall must also be invoked when the calling thread makes
+ * use of the userprocmask mechanism,  and the signal mask  became
+ * less restrictive while the `USERPROCMASK_FLAG_HASPENDING'  flag
+ * was set.
+ * @return: 0:      Nothing was handled.
+ * @return: -EINTR: RPCs (or posix signals) were handled. */
+#define __NR64_rpc_serve                __UINT64_C(0xffffffffffffffe9) /* syscall_slong_t rpc_serve(void) */
 /* Trigger a debugger trap `trapno', optionally extended with  `regs'
  * at either the system call return location, or at the given `state'
  * In the later case, this system call will by default return to  the
@@ -1259,17 +1269,38 @@
 /* Create a new pseudo-terminal driver and store handles to both the
  * master  and slave ends  of the connection  in the given pointers. */
 #define __NR64_openpty                  __UINT64_C(0xfffffffffffffff3) /* errno_t openpty(fd_t *amaster, fd_t *aslave, char *name, struct termios const *termp, struct winsize const *winp) */
-/* Schedule an RPC for execution on the specified `target' thread.
- * @param: target:    The targeted thread.
- * @param: flags:     RPC flags (one of `RPC_SCHEDULE_*', or'd with a set of `RPC_SCHEDULE_FLAG_*')
- * @param: program:   An RPC loader program (vector of `RPC_PROGRAM_OP_*')
- * @param: arguments: Arguments for the RPC loader program.
- * @return: 1:  The specified `target' thread has already terminated.
- * @return: 0:  Success.
- * @return: -1: Error (s.a. `errno')
- * @throws: E_PROCESS_EXITED:  `target' does not reference a valid process
- * @throws: E_INVALID_ARGUMENT: The given `flag' is invalid. */
-#define __NR64_rpc_schedule             __UINT64_C(0xfffffffffffffff4) /* syscall_slong_t rpc_schedule(pid_t target, syscall_ulong_t flags, uint8_t const *program, __HYBRID_PTR64(void) *arguments) */
+/* >> rpc_schedule(2)
+ * Schedule an RPC program to-be executed by some other thread. This  function
+ * cannot guaranty that  the RPC  program is  always executed,  as the  target
+ * thread terminate before the  conditions for the RPC  to be served are  ever
+ * met. Note that these  conditions depend on the  given `mode'. Note that  on
+ * multi-arch  platforms (such as  x86), the register numbers,  as well as the
+ * address size used by `program' depend on the execution mode of `target_tid'
+ * 
+ * @param: target_tid: The TID of the targeted thread
+ * @param: mode:       One of  `RPC_SYNCMODE_*', or'd  with
+ *                     one of `RPC_SYSRESTART_*', or'd with
+ *                     one of `RPC_PRIORITY_*'
+ * @param: program:    The RPC program to execute (sequences of `RPC_OP_*')
+ * @param: params:     RPC program parameters (for `RPC_OP_push_param')
+ * 
+ * @return: 0 :                Success
+ * @throws: E_SEGFAULT:        Faulty pointers were given
+ * @throws: E_INVALID_ARGUMENT:E_INVALID_ARGUMENT_CONTEXT_RPC_SCHEDULE_MODE:
+ *                             The given `mode' is invalid.
+ * @throws: E_INVALID_ARGUMENT:E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_INSTRUCTION:
+ *                             The RPC program  contains illegal  instructions.
+ *                             In this case, modifications made by instructions
+ *                             encountered before the illegal one(s) will still
+ *                             have  happened, meaning that the target thread's
+ *                             state may have become inconsistent.
+ * @throws: E_PROCESS_EXITED:  The target thread has already terminated, or
+ *                             doesn't exist. Note  though that unless  the
+ *                             thread  is  part  of your  own  process, are
+ *                             still many reasons  outside of your  control
+ *                             for why it  may terminate immediately  after
+ *                             the RPC program finished. */
+#define __NR64_rpc_schedule             __UINT64_C(0xfffffffffffffff4) /* errno_t rpc_schedule(pid_t target_tid, syscall_ulong_t mode, void const *program, __HYBRID_PTR64(void const) const *params) */
 /* Returns  the  absolute   filesystem  path  for   the  specified   file
  * When `AT_SYMLINK_NOFOLLOW' is given, a final symlink is  dereferenced,
  * causing the pointed-to file location to be retrieved. - Otherwise, the
@@ -1812,7 +1843,6 @@
 #define __NR64RM_fchdirat                 0
 #define __NR64RM_kreaddirf                0
 #define __NR64RM_kreaddir                 0
-#define __NR64RM_sigmask_check            2
 #define __NR64RM_set_userprocmask_address 0
 #define __NR64RM_rtm_test                 0
 #define __NR64RM_rtm_abort                0
@@ -1825,7 +1855,7 @@
 #define __NR64RM_lfutexlockexpr           1
 #define __NR64RM_lfutexexpr               1
 #define __NR64RM_lfutex                   1
-#define __NR64RM_rpc_service              1
+#define __NR64RM_rpc_serve                1
 #define __NR64RM_debugtrap                0
 #define __NR64RM_writevf                  0
 #define __NR64RM_readvf                   0
@@ -1983,7 +2013,7 @@
 #define __NR64CP_lfutexlockexpr
 #define __NR64CP_lfutexexpr
 #define __NR64CP_lfutex
-#define __NR64CP_rpc_service
+#define __NR64CP_rpc_serve
 #define __NR64CP_writevf
 #define __NR64CP_readvf
 #define __NR64CP_pwrite64f
@@ -2375,7 +2405,6 @@
 #define __NR64RC_fchdirat                 3
 #define __NR64RC_kreaddirf                5
 #define __NR64RC_kreaddir                 4
-#define __NR64RC_sigmask_check            0
 #define __NR64RC_set_userprocmask_address 1
 #define __NR64RC_rtm_test                 0
 #define __NR64RC_rtm_abort                1
@@ -2388,7 +2417,7 @@
 #define __NR64RC_lfutexlockexpr           6
 #define __NR64RC_lfutexexpr               5
 #define __NR64RC_lfutex                   5
-#define __NR64RC_rpc_service              0
+#define __NR64RC_rpc_serve                0
 #define __NR64RC_debugtrap                2
 #define __NR64RC_writevf                  4
 #define __NR64RC_readvf                   4

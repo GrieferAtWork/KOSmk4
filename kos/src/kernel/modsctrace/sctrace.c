@@ -35,11 +35,10 @@
 #include <compat/config.h>
 #include <kos/asm/rpc-method.h>
 #include <kos/bits/syscall-info.h>
+#include <kos/rpc.h>
 
 #include <format-printer.h>
 #include <inttypes.h>
-
-#include <librpc/rpc.h>
 
 #ifndef __NR_syslog
 #include <asm/syscalls.h>

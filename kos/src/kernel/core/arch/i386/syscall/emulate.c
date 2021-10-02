@@ -46,8 +46,6 @@
 #include <errno.h>
 #include <string.h>
 
-#include <librpc/rpc.h>
-
 DECL_BEGIN
 
 #ifdef __x86_64__

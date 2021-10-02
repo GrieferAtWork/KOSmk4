@@ -429,8 +429,8 @@ NOTHROW_NCX(LIBCCALL libc_sigprocmask)(__STDC_INT_AS_UINT_T how,
 				 * may have already handled it. */
 				sigemptyset(&me->pt_pmask.lpm_pmask.pm_pending);
 
-				/* Calls the kernel's `sigmask_check()' function */
-				sys_sigmask_check();
+				/* Calls the kernel's `task_serve()' function */
+				sys_rpc_serve();
 				break;
 			}
 		}
@@ -563,8 +563,8 @@ NOTHROW_NCX(LIBCCALL libc_setsigmaskptr)(sigset_t *sigmaskptr)
 				 * may have already handled it. */
 				sigemptyset(&me->pt_pmask.lpm_pmask.pm_pending);
 
-				/* Calls the kernel's `sigmask_check()' function */
-				sys_sigmask_check();
+				/* Calls the kernel's `task_serve()' function */
+				sys_rpc_serve();
 				break;
 			}
 		}
@@ -686,8 +686,8 @@ NOTHROW(LIBCCALL libc_chkuserprocmask)(void)
 				 * may have already handled it. */
 				sigemptyset(&me->pt_pmask.lpm_pmask.pm_pending);
 
-				/* Calls the kernel's `sigmask_check()' function */
-				sys_sigmask_check();
+				/* Calls the kernel's `task_serve()' function */
+				sys_rpc_serve();
 				break;
 			}
 		}

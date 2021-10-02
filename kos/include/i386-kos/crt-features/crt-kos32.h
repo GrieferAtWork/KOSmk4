@@ -146,6 +146,9 @@
 #define __CRT_HAVE_RecvMsg
 #define __CRT_HAVE_RemapFilePages
 #define __CRT_HAVE_Rmdir
+#define __CRT_HAVE_RpcExec
+#define __CRT_HAVE_RpcInterrupt
+#define __CRT_HAVE_RpcSchedule
 #define __CRT_HAVE_Send
 #define __CRT_HAVE_SendMMsg
 #define __CRT_HAVE_SendMsg
@@ -3226,6 +3229,10 @@
 #define __CRT_HAVE_round
 #define __CRT_HAVE_roundf
 #define __CRT_HAVE_roundl
+#define __CRT_HAVE_rpc_exec
+#define __CRT_HAVE_rpc_interrupt
+#define __CRT_HAVE_rpc_schedule
+#define __CRT_HAVE_rpc_serve
 #define __CRT_HAVE_rpmatch
 #define __CRT_HAVE_rresvport
 #define __CRT_HAVE_rresvport_af
@@ -3931,7 +3938,7 @@
 #define __CRT_HAVE_sys_Xrestart_syscall
 #define __CRT_HAVE_sys_Xrmdir
 #define __CRT_HAVE_sys_Xrpc_schedule
-#define __CRT_HAVE_sys_Xrpc_service
+#define __CRT_HAVE_sys_Xrpc_serve
 #define __CRT_HAVE_sys_Xrseq
 #define __CRT_HAVE_sys_Xrt_sigaction
 #define __CRT_HAVE_sys_Xrt_sigpending
@@ -4014,7 +4021,6 @@
 #define __CRT_HAVE_sys_Xshutdown
 #define __CRT_HAVE_sys_Xsigaction
 #define __CRT_HAVE_sys_Xsigaltstack
-#define __CRT_HAVE_sys_Xsigmask_check
 #define __CRT_HAVE_sys_Xsignal
 #define __CRT_HAVE_sys_Xsignalfd
 #define __CRT_HAVE_sys_Xsignalfd4
@@ -4426,7 +4432,7 @@
 #define __CRT_HAVE_sys_restart_syscall
 #define __CRT_HAVE_sys_rmdir
 #define __CRT_HAVE_sys_rpc_schedule
-#define __CRT_HAVE_sys_rpc_service
+#define __CRT_HAVE_sys_rpc_serve
 #define __CRT_HAVE_sys_rseq
 #define __CRT_HAVE_sys_rt_sigaction
 #define __CRT_HAVE_sys_rt_sigpending
@@ -4511,7 +4517,6 @@
 #define __CRT_HAVE_sys_sigaction
 #define __CRT_HAVE_sys_sigaltstack
 #define __CRT_HAVE_sys_siglist
-#define __CRT_HAVE_sys_sigmask_check
 #define __CRT_HAVE_sys_signal
 #define __CRT_HAVE_sys_signalfd
 #define __CRT_HAVE_sys_signalfd4

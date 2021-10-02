@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb8b322cc */
+/* HASH CRC-32:0x6c50c970 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -486,7 +486,7 @@
 #define __NRAC_pwrite64f                    5
 #define __NRAC_pread64f                     5
 #define __NRAC_nanosleep64                  2
-#define __NRAC_rpc_service                  0
+#define __NRAC_rpc_serve                    0
 #define __NRAC_ksysctl                      2
 #define __NRAC_writevf                      4
 #define __NRAC_readvf                       4
@@ -506,7 +506,6 @@
 #define __NRAC_rtm_end                      0
 #define __NRAC_rtm_begin                    0
 #define __NRAC_ftime64                      1
-#define __NRAC_sigmask_check                0
 #define __NRAC_set_userprocmask_address     1
 #define __NRAC_utime64                      2
 #define __NRAC_userviofd                    2
@@ -991,7 +990,7 @@
 #define __NRRT_pwrite64f                    (ssize_t, __ssize_t)
 #define __NRRT_pread64f                     (ssize_t, __ssize_t)
 #define __NRRT_nanosleep64                  (errno_t, __errno_t)
-#define __NRRT_rpc_service                  (syscall_slong_t, __syscall_slong_t)
+#define __NRRT_rpc_serve                    (syscall_slong_t, __syscall_slong_t)
 #define __NRRT_ksysctl                      (syscall_slong_t, __syscall_slong_t)
 #define __NRRT_writevf                      (ssize_t, __ssize_t)
 #define __NRRT_readvf                       (ssize_t, __ssize_t)
@@ -1011,7 +1010,6 @@
 #define __NRRT_rtm_end                      (errno_t, __errno_t)
 #define __NRRT_rtm_begin                    (rtm_status_t, __rtm_status_t)
 #define __NRRT_ftime64                      (errno_t, __errno_t)
-#define __NRRT_sigmask_check                (errno_t, __errno_t)
 #define __NRRT_set_userprocmask_address     (errno_t, __errno_t)
 #define __NRRT_utime64                      (errno_t, __errno_t)
 #define __NRRT_userviofd                    (fd_t, __fd_t)
@@ -1029,7 +1027,7 @@
 #define __NRRT_time64                       (int64_t, __int64_t)
 #define __NRRT_fchdirat                     (errno_t, __errno_t)
 #define __NRRT_openpty                      (errno_t, __errno_t)
-#define __NRRT_rpc_schedule                 (syscall_slong_t, __syscall_slong_t)
+#define __NRRT_rpc_schedule                 (errno_t, __errno_t)
 #define __NRRT_frealpathat                  (ssize_t, __ssize_t)
 #define __NRRT_frealpath4                   (ssize_t, __ssize_t)
 #define __NRRT_getdrives                    (syscall_slong_t, __syscall_slong_t)
@@ -2166,8 +2164,8 @@
 #define __NRAT4_openpty                      (struct winsize const *, struct winsize const *)
 #define __NRAT0_rpc_schedule                 (pid_t, __pid_t)
 #define __NRAT1_rpc_schedule                 (syscall_ulong_t, __syscall_ulong_t)
-#define __NRAT2_rpc_schedule                 (uint8_t const *, __uint8_t const *)
-#define __NRAT3_rpc_schedule                 (__HYBRID_PTR32(void) *, __HYBRID_PTR32(void) *)
+#define __NRAT2_rpc_schedule                 (void const *, void const *)
+#define __NRAT3_rpc_schedule                 (__HYBRID_PTR32(void const) const *, __HYBRID_PTR32(void const) const *)
 #define __NRAT0_frealpathat                  (fd_t, __fd_t)
 #define __NRAT1_frealpathat                  (char const *, char const *)
 #define __NRAT2_frealpathat                  (char *, char *)
@@ -2651,7 +2649,7 @@
 #define __NRAM_pwrite64f(a, b, c, d, e, f)                    (__fd_t)a, (void const *)b, (__size_t)c, (__uint64_t)((__uint64_t)d | (__uint64_t)e << 32), (__iomode_t)f
 #define __NRAM_pread64f(a, b, c, d, e, f)                     (__fd_t)a, (void *)b, (__size_t)c, (__uint64_t)((__uint64_t)d | (__uint64_t)e << 32), (__iomode_t)f
 #define __NRAM_nanosleep64(a, b, c, d, e, f)                  (struct __timespecx32_64 const *)a, (struct __timespecx32_64 *)b
-#define __NRAM_rpc_service(a, b, c, d, e, f)                  /* nothing */
+#define __NRAM_rpc_serve(a, b, c, d, e, f)                    /* nothing */
 #define __NRAM_ksysctl(a, b, c, d, e, f)                      (__syscall_ulong_t)a, (void *)b
 #define __NRAM_writevf(a, b, c, d, e, f)                      (__fd_t)a, (struct __iovecx32 const *)b, (__size_t)c, (__iomode_t)d
 #define __NRAM_readvf(a, b, c, d, e, f)                       (__fd_t)a, (struct __iovecx32 const *)b, (__size_t)c, (__iomode_t)d
@@ -2671,7 +2669,6 @@
 #define __NRAM_rtm_end(a, b, c, d, e, f)                      /* nothing */
 #define __NRAM_rtm_begin(a, b, c, d, e, f)                    /* nothing */
 #define __NRAM_ftime64(a, b, c, d, e, f)                      (struct __timebx32_64 *)a
-#define __NRAM_sigmask_check(a, b, c, d, e, f)                /* nothing */
 #define __NRAM_set_userprocmask_address(a, b, c, d, e, f)     (struct userprocmask *)a
 #define __NRAM_utime64(a, b, c, d, e, f)                      (char const *)a, (struct __utimbufx32_64 const *)b
 #define __NRAM_userviofd(a, b, c, d, e, f)                    (__size_t)a, (__syscall_ulong_t)b
@@ -2689,7 +2686,7 @@
 #define __NRAM_time64(a, b, c, d, e, f)                       (__int64_t *)a
 #define __NRAM_fchdirat(a, b, c, d, e, f)                     (__fd_t)a, (char const *)b, (__atflag_t)c
 #define __NRAM_openpty(a, b, c, d, e, f)                      (__fd_t *)a, (__fd_t *)b, (char *)c, (struct termios const *)d, (struct winsize const *)e
-#define __NRAM_rpc_schedule(a, b, c, d, e, f)                 (__pid_t)a, (__syscall_ulong_t)b, (__uint8_t const *)c, (__HYBRID_PTR32(void) *)d
+#define __NRAM_rpc_schedule(a, b, c, d, e, f)                 (__pid_t)a, (__syscall_ulong_t)b, (void const *)c, (__HYBRID_PTR32(void const) const *)d
 #define __NRAM_frealpathat(a, b, c, d, e, f)                  (__fd_t)a, (char const *)b, (char *)c, (__size_t)d, (__atflag_t)e
 #define __NRAM_frealpath4(a, b, c, d, e, f)                   (__fd_t)a, (char *)b, (__size_t)c, (__atflag_t)d
 #define __NRAM_getdrives(a, b, c, d, e, f)                    /* nothing */
@@ -3156,7 +3153,7 @@
 #define __NRAP_pwrite64f(a, b, c, d, e)                       (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)((__uint64_t)d >> 32), (__syscall_ulong_t)e
 #define __NRAP_pread64f(a, b, c, d, e)                        (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)((__uint64_t)d >> 32), (__syscall_ulong_t)e
 #define __NRAP_nanosleep64(a, b)                              (__syscall_ulong_t)a, (__syscall_ulong_t)b
-#define __NRAP_rpc_service()                                  /* nothing */
+#define __NRAP_rpc_serve()                                    /* nothing */
 #define __NRAP_ksysctl(a, b)                                  (__syscall_ulong_t)a, (__syscall_ulong_t)b
 #define __NRAP_writevf(a, b, c, d)                            (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
 #define __NRAP_readvf(a, b, c, d)                             (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
@@ -3176,7 +3173,6 @@
 #define __NRAP_rtm_end()                                      /* nothing */
 #define __NRAP_rtm_begin()                                    /* nothing */
 #define __NRAP_ftime64(a)                                     (__syscall_ulong_t)a
-#define __NRAP_sigmask_check()                                /* nothing */
 #define __NRAP_set_userprocmask_address(a)                    (__syscall_ulong_t)a
 #define __NRAP_utime64(a, b)                                  (__syscall_ulong_t)a, (__syscall_ulong_t)b
 #define __NRAP_userviofd(a, b)                                (__syscall_ulong_t)a, (__syscall_ulong_t)b

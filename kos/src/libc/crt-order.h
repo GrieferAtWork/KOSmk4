@@ -238,7 +238,7 @@
 	CB(PREFIX.crt.sched.utility) \
 	CB(PREFIX.crt.sched.user) \
 	CB(PREFIX.crt.sched.wait) \
-	CB(PREFIX.crt.sched.eventfd PREFIX.crt.sched.pthread.rpc PREFIX.crt.sched.signalfd PREFIX.crt.sched.threads) \
+	CB(PREFIX.crt.sched.eventfd PREFIX.crt.sched.rpc PREFIX.crt.sched.signalfd PREFIX.crt.sched.threads) \
 	CB(PREFIX.crt.time) \
 	CB(PREFIX.crt.time.timezone) \
 	CB(PREFIX.crt.heap.mman) \
@@ -409,7 +409,7 @@
 	CB(PREFIX.crt.dos.sched.utility) \
 	CB(PREFIX.crt.dos.sched.user) \
 	CB(PREFIX.crt.dos.sched.wait) \
-	CB(PREFIX.crt.dos.sched.eventfd PREFIX.crt.dos.sched.signalfd PREFIX.crt.dos.sched.threads) \
+	CB(PREFIX.crt.dos.sched.eventfd PREFIX.crt.dos.sched.rpc PREFIX.crt.dos.sched.signalfd PREFIX.crt.dos.sched.threads) \
 	CB(PREFIX.crt.dos.time) \
 	CB(PREFIX.crt.dos.time.timezone) \
 	CB(PREFIX.crt.dos.heap.mman) \

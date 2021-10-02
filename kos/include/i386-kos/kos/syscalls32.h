@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1c4955aa */
+/* HASH CRC-32:0x2545df8b */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1804,21 +1804,58 @@ __CDECLARE_SC(,__errno_t,restart_syscall,(void),())
 __CDECLARE_SC(,__errno_t,rmdir,(char const *__path),(__path))
 #endif /* __CRT_HAVE_SC(rmdir) */
 #if __CRT_HAVE_SC(rpc_schedule)
-/* Schedule an RPC for execution on the specified `target' thread.
- * @param: target:    The targeted thread.
- * @param: flags:     RPC flags (one of `RPC_SCHEDULE_*', or'd with a set of `RPC_SCHEDULE_FLAG_*')
- * @param: program:   An RPC loader program (vector of `RPC_PROGRAM_OP_*')
- * @param: arguments: Arguments for the RPC loader program.
- * @return: 1:  The specified `target' thread has already terminated.
- * @return: 0:  Success.
- * @return: -1: Error (s.a. `errno')
- * @throws: E_PROCESS_EXITED:  `target' does not reference a valid process
- * @throws: E_INVALID_ARGUMENT: The given `flag' is invalid. */
-__CDECLARE_SC(,__syscall_slong_t,rpc_schedule,(__pid_t __target, __syscall_ulong_t __flags, __uint8_t const *__program, __HYBRID_PTR32(void) *__arguments),(__target,__flags,__program,__arguments))
+/* >> rpc_schedule(2)
+ * Schedule an RPC program to-be executed by some other thread. This  function
+ * cannot guaranty that  the RPC  program is  always executed,  as the  target
+ * thread terminate before the  conditions for the RPC  to be served are  ever
+ * met. Note that these  conditions depend on the  given `mode'. Note that  on
+ * multi-arch  platforms (such as  x86), the register numbers,  as well as the
+ * address size used by `program' depend on the execution mode of `target_tid'
+ * 
+ * @param: target_tid: The TID of the targeted thread
+ * @param: mode:       One of  `RPC_SYNCMODE_*', or'd  with
+ *                     one of `RPC_SYSRESTART_*', or'd with
+ *                     one of `RPC_PRIORITY_*'
+ * @param: program:    The RPC program to execute (sequences of `RPC_OP_*')
+ * @param: params:     RPC program parameters (for `RPC_OP_push_param')
+ * 
+ * @return: 0 :                Success
+ * @throws: E_SEGFAULT:        Faulty pointers were given
+ * @throws: E_INVALID_ARGUMENT:E_INVALID_ARGUMENT_CONTEXT_RPC_SCHEDULE_MODE:
+ *                             The given `mode' is invalid.
+ * @throws: E_INVALID_ARGUMENT:E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_INSTRUCTION:
+ *                             The RPC program  contains illegal  instructions.
+ *                             In this case, modifications made by instructions
+ *                             encountered before the illegal one(s) will still
+ *                             have  happened, meaning that the target thread's
+ *                             state may have become inconsistent.
+ * @throws: E_PROCESS_EXITED:  The target thread has already terminated, or
+ *                             doesn't exist. Note  though that unless  the
+ *                             thread  is  part  of your  own  process, are
+ *                             still many reasons  outside of your  control
+ *                             for why it  may terminate immediately  after
+ *                             the RPC program finished. */
+__CDECLARE_SC(,__errno_t,rpc_schedule,(__pid_t __target_tid, __syscall_ulong_t __mode, void const *__program, __HYBRID_PTR32(void const) const *__params),(__target_tid,__mode,__program,__params))
 #endif /* __CRT_HAVE_SC(rpc_schedule) */
-#if __CRT_HAVE_SC(rpc_service)
-__CDECLARE_SC(,__syscall_slong_t,rpc_service,(void),())
-#endif /* __CRT_HAVE_SC(rpc_service) */
+#if __CRT_HAVE_SC(rpc_serve)
+/* >> rpc_serve(2)
+ * Check for pending signals and RPCs. This is a wrapper around the
+ * kernel `task_serve()' function, which is always invoked before a
+ * thread begins waiting for a blocking operation. All system calls
+ * marked as cancellation  points probably  call `task_serve()'  at
+ * some point.
+ * Note that unlike (say) `pause(2)', this function doesn't  block,
+ * and may be used to implement `pthread_testcancel(3)' (should KOS
+ * RPCs be used to facility pthread cancellation points, as done by
+ * KOS's builtin libc)
+ * This syscall must also be invoked when the calling thread makes
+ * use of the userprocmask mechanism,  and the signal mask  became
+ * less restrictive while the `USERPROCMASK_FLAG_HASPENDING'  flag
+ * was set.
+ * @return: 0:      Nothing was handled.
+ * @return: -EINTR: RPCs (or posix signals) were handled. */
+__CDECLARE_SC(,__syscall_slong_t,rpc_serve,(void),())
+#endif /* __CRT_HAVE_SC(rpc_serve) */
 #if __CRT_HAVE_SC(rseq)
 __CDECLARE_SC(,__errno_t,rseq,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 #endif /* __CRT_HAVE_SC(rseq) */
@@ -2272,14 +2309,6 @@ __CDECLARE_SC(,__errno_t,sigaction,(__signo_t __signo, struct __sigactionx32 con
 #if __CRT_HAVE_SC(sigaltstack)
 __CDECLARE_SC(,__errno_t,sigaltstack,(struct __sigaltstackx32 const *__ss, struct __sigaltstackx32 *__oss),(__ss,__oss))
 #endif /* __CRT_HAVE_SC(sigaltstack) */
-#if __CRT_HAVE_SC(sigmask_check)
-/* Check for pending signals, and keep on handling them until none are left
- * The  [restart(must)] is necessary in order to ensure that _all_ unmasked
- * signals get handled until  none are left, in  case more than one  signal
- * became available.
- * This system call is only needed when `set_userprocmask_address(2)' was used. */
-__CDECLARE_SC(,__errno_t,sigmask_check,(void),())
-#endif /* __CRT_HAVE_SC(sigmask_check) */
 #if __CRT_HAVE_SC(signal)
 __CDECLARE_SC(,__sighandler_t,signal,(__signo_t __signo, __sighandler_t __handler),(__signo,__handler))
 #endif /* __CRT_HAVE_SC(signal) */
@@ -4312,21 +4341,58 @@ __CDECLARE_XSC(,__errno_t,restart_syscall,(void),())
 __CDECLARE_XSC(,__errno_t,rmdir,(char const *__path),(__path))
 #endif /* __CRT_HAVE_XSC(rmdir) */
 #if __CRT_HAVE_XSC(rpc_schedule)
-/* Schedule an RPC for execution on the specified `target' thread.
- * @param: target:    The targeted thread.
- * @param: flags:     RPC flags (one of `RPC_SCHEDULE_*', or'd with a set of `RPC_SCHEDULE_FLAG_*')
- * @param: program:   An RPC loader program (vector of `RPC_PROGRAM_OP_*')
- * @param: arguments: Arguments for the RPC loader program.
- * @return: 1:  The specified `target' thread has already terminated.
- * @return: 0:  Success.
- * @return: -1: Error (s.a. `errno')
- * @throws: E_PROCESS_EXITED:  `target' does not reference a valid process
- * @throws: E_INVALID_ARGUMENT: The given `flag' is invalid. */
-__CDECLARE_XSC(,__syscall_slong_t,rpc_schedule,(__pid_t __target, __syscall_ulong_t __flags, __uint8_t const *__program, __HYBRID_PTR32(void) *__arguments),(__target,__flags,__program,__arguments))
+/* >> rpc_schedule(2)
+ * Schedule an RPC program to-be executed by some other thread. This  function
+ * cannot guaranty that  the RPC  program is  always executed,  as the  target
+ * thread terminate before the  conditions for the RPC  to be served are  ever
+ * met. Note that these  conditions depend on the  given `mode'. Note that  on
+ * multi-arch  platforms (such as  x86), the register numbers,  as well as the
+ * address size used by `program' depend on the execution mode of `target_tid'
+ * 
+ * @param: target_tid: The TID of the targeted thread
+ * @param: mode:       One of  `RPC_SYNCMODE_*', or'd  with
+ *                     one of `RPC_SYSRESTART_*', or'd with
+ *                     one of `RPC_PRIORITY_*'
+ * @param: program:    The RPC program to execute (sequences of `RPC_OP_*')
+ * @param: params:     RPC program parameters (for `RPC_OP_push_param')
+ * 
+ * @return: 0 :                Success
+ * @throws: E_SEGFAULT:        Faulty pointers were given
+ * @throws: E_INVALID_ARGUMENT:E_INVALID_ARGUMENT_CONTEXT_RPC_SCHEDULE_MODE:
+ *                             The given `mode' is invalid.
+ * @throws: E_INVALID_ARGUMENT:E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_INSTRUCTION:
+ *                             The RPC program  contains illegal  instructions.
+ *                             In this case, modifications made by instructions
+ *                             encountered before the illegal one(s) will still
+ *                             have  happened, meaning that the target thread's
+ *                             state may have become inconsistent.
+ * @throws: E_PROCESS_EXITED:  The target thread has already terminated, or
+ *                             doesn't exist. Note  though that unless  the
+ *                             thread  is  part  of your  own  process, are
+ *                             still many reasons  outside of your  control
+ *                             for why it  may terminate immediately  after
+ *                             the RPC program finished. */
+__CDECLARE_XSC(,__errno_t,rpc_schedule,(__pid_t __target_tid, __syscall_ulong_t __mode, void const *__program, __HYBRID_PTR32(void const) const *__params),(__target_tid,__mode,__program,__params))
 #endif /* __CRT_HAVE_XSC(rpc_schedule) */
-#if __CRT_HAVE_XSC(rpc_service)
-__CDECLARE_XSC(,__syscall_slong_t,rpc_service,(void),())
-#endif /* __CRT_HAVE_XSC(rpc_service) */
+#if __CRT_HAVE_XSC(rpc_serve)
+/* >> rpc_serve(2)
+ * Check for pending signals and RPCs. This is a wrapper around the
+ * kernel `task_serve()' function, which is always invoked before a
+ * thread begins waiting for a blocking operation. All system calls
+ * marked as cancellation  points probably  call `task_serve()'  at
+ * some point.
+ * Note that unlike (say) `pause(2)', this function doesn't  block,
+ * and may be used to implement `pthread_testcancel(3)' (should KOS
+ * RPCs be used to facility pthread cancellation points, as done by
+ * KOS's builtin libc)
+ * This syscall must also be invoked when the calling thread makes
+ * use of the userprocmask mechanism,  and the signal mask  became
+ * less restrictive while the `USERPROCMASK_FLAG_HASPENDING'  flag
+ * was set.
+ * @return: 0:      Nothing was handled.
+ * @return: -EINTR: RPCs (or posix signals) were handled. */
+__CDECLARE_XSC(,__syscall_slong_t,rpc_serve,(void),())
+#endif /* __CRT_HAVE_XSC(rpc_serve) */
 #if __CRT_HAVE_XSC(rseq)
 __CDECLARE_XSC(,__errno_t,rseq,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 #endif /* __CRT_HAVE_XSC(rseq) */
@@ -4771,14 +4837,6 @@ __CDECLARE_XSC(,__errno_t,sigaction,(__signo_t __signo, struct __sigactionx32 co
 #if __CRT_HAVE_XSC(sigaltstack)
 __CDECLARE_XSC(,__errno_t,sigaltstack,(struct __sigaltstackx32 const *__ss, struct __sigaltstackx32 *__oss),(__ss,__oss))
 #endif /* __CRT_HAVE_XSC(sigaltstack) */
-#if __CRT_HAVE_XSC(sigmask_check)
-/* Check for pending signals, and keep on handling them until none are left
- * The  [restart(must)] is necessary in order to ensure that _all_ unmasked
- * signals get handled until  none are left, in  case more than one  signal
- * became available.
- * This system call is only needed when `set_userprocmask_address(2)' was used. */
-__CDECLARE_XSC(,__errno_t,sigmask_check,(void),())
-#endif /* __CRT_HAVE_XSC(sigmask_check) */
 #if __CRT_HAVE_XSC(signal)
 __CDECLARE_XSC(,__sighandler_t,signal,(__signo_t __signo, __sighandler_t __handler),(__signo,__handler))
 #endif /* __CRT_HAVE_XSC(signal) */

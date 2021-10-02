@@ -655,25 +655,6 @@ NOTHROW(FCALL proc_rpc_pending_trysteal_posix_signal)(sigset_t const *__restrict
 	return result;
 }
 
-
-
-
-/* Execute a user-space RPC program
- * @param: reason:  One of `_RPC_REASONCTX_ASYNC', `_RPC_REASONCTX_SYNC' or `_RPC_REASONCTX_SYSCALL'
- * @param: sc_info: [valid_if(reason == _RPC_REASONCTX_SYSCALL)] System call information. */
-PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) rpc_cpustate_t *FCALL
-task_userrpc_runprogram(rpc_cpustate_t *__restrict state, struct pending_user_rpc const *__restrict rpc,
-                        unsigned int reason, struct rpc_syscall_info const *sc_info) {
-	(void)state;
-	(void)rpc;
-	(void)reason;
-	(void)sc_info;
-	THROW(E_NOT_IMPLEMENTED_TODO);
-	/* TODO */
-	return state;
-}
-
-
 DECL_END
 
 #endif /* CONFIG_USE_NEW_RPC */

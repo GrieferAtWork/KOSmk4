@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x782b037f */
+/* HASH CRC-32:0x99ec07ab */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,90 +18,19 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _KOS_RPC_H
-#define _KOS_RPC_H 1
+#ifndef GUARD_LIBC_USER_KOS_RPC_H
+#define GUARD_LIBC_USER_KOS_RPC_H 1
 
-#include <__stdinc.h>
-#include <__crt.h>
+#include "../api.h"
+#include "../auto/kos.rpc.h"
 
-#ifdef __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER
-#pragma GCC system_header
-#endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
+#include <hybrid/typecore.h>
+#include <kos/types.h>
+#include <kos/rpc.h>
 
-#include <bits/types.h>
-#include <kos/anno.h>
-#include <kos/asm/rpc.h>
-#include <kos/asm/rpc-method.h>    /* `RPC_SYSCALL_INFO_METHOD_*' */
-#include <kos/bits/syscall-info.h> /* `struct rpc_syscall_info' */
+DECL_BEGIN
 
-#ifdef __CC__
-__SYSDECL_BEGIN
-
-#ifdef __KERNEL__
-typedef struct icpustate rpc_cpustate_t;
-#define PRPC_EXEC_CALLBACK_CC __FCALL
-#else /* __KERNEL__ */
-typedef struct ucpustate rpc_cpustate_t;
-#define PRPC_EXEC_CALLBACK_CC __LIBKCALL
-#endif /* !__KERNEL__ */
-
-
-/* The initial value of `rc_context' depends on how the RPC was scheduled:
- *
- * #ifdef __KERNEL__
- *
- *   - `RPC_CONTEXT_KERN | RPC_SYNCMODE_F_ALLOW_ASYNC':
- *       - RPC_REASONCTX_ASYNC_KERN: Thread is currently in kernel-space
- *       - RPC_REASONCTX_SYSRET:     Thread is currently in user-space
- *
- *   - `RPC_CONTEXT_KERN | RPC_SYNCMODE_F_USER | RPC_SYNCMODE_F_SYSRET':
- *       - RPC_REASONCTX_SYSRET:    Return to userspace
- *       - RPC_REASONCTX_SHUTDOWN:  Thread is about to terminate
- *
- *   - `RPC_CONTEXT_KERN | RPC_SYNCMODE_F_USER':
- *       - RPC_REASONCTX_SYSCALL:   Syscall aborted   (set `rc_context = RPC_REASONCTX_SYSRET' to prevent restart)
- *       - RPC_REASONCTX_INTERRUPT: Interrupt aborted (set `rc_context = RPC_REASONCTX_SYSRET' to prevent restart)
- *       - RPC_REASONCTX_SYSRET:    Return to userspace
- *       - RPC_REASONCTX_SHUTDOWN:  Thread is about to terminate
- *
- *   - `RPC_CONTEXT_KERN':
- *       - RPC_REASONCTX_SYNC:      Direct execution from within `task_serve()'
- *       - RPC_REASONCTX_SHUTDOWN:  Thread is about to terminate
- *       - RPC_REASONCTX_SYSCALL:   Syscall aborted     (treat like `RPC_REASONCTX_SYNC')
- *       - RPC_REASONCTX_INTERRUPT: Interrupt aborted   (treat like `RPC_REASONCTX_SYNC')
- *       - RPC_REASONCTX_SYSRET:    Return to userspace (treat like `RPC_REASONCTX_SYNC')
- *
- * #else // __KERNEL__
- *
- *   - `0':
- *       - RPC_REASONCTX_SYSCALL:  Syscall aborted (set `rc_context = RPC_REASONCTX_SYNC' to prevent restart)
- *       - RPC_REASONCTX_SYNC:     Synchronous interrupt call was aborted
- *
- *   - `RPC_SYNCMODE_F_ALLOW_ASYNC':
- *       - RPC_REASONCTX_ASYNC:    Async userspace
- *       - RPC_REASONCTX_SYSCALL:  Synchronous system call was aborted (but will be restarted)
- *       - RPC_REASONCTX_SYNC:     Synchronous interrupt call was aborted (treat like `RPC_REASONCTX_SYSCALL')
- *
- * #endif // !__KERNEL__
- *
- */
-
-struct rpc_context {
-	__uintptr_t             rc_context; /* [in|out] Execution context (also  determines is  a system  call
-	                                     * or  interrupt  should  be restarted)  One  of `RPC_REASONCTX_*'
-	                                     * Possible values (and allowed transitions) are documented above. */
-	rpc_cpustate_t         *rc_state;   /* [1..1][in|out] The  register state  that got  interrupted.
-	                                     * In the case of an interrupted system call that is supposed
-	                                     * to be restarted, this describes  the return state of  that
-	                                     * system call. */
-	struct rpc_syscall_info rc_scinfo;  /* [valid_if(rc_context == RPC_REASONCTX_SYSCALL)] Syscall info. */
-};
-
-/* Callback prototype for RPC functions registered by `rpc_exec()' */
-typedef __ATTR_NONNULL((1)) void
-(PRPC_EXEC_CALLBACK_CC *prpc_exec_callback_t)(struct rpc_context *__restrict __ctx, void *__cookie)
-		__THROWS(...);
-
+#ifndef __KERNEL__
 /* >> rpc_schedule(2)
  * Schedule an RPC program to-be executed by some other thread. This  function
  * cannot guaranty that  the RPC  program is  always executed,  as the  target
@@ -133,7 +62,7 @@ typedef __ATTR_NONNULL((1)) void
  *                             still many reasons  outside of your  control
  *                             for why it  may terminate immediately  after
  *                             the RPC program finished. */
-__CDECLARE_OPT(__ATTR_NONNULL((3)),int,__NOTHROW_NCX,rpc_schedule,(__pid_t __target_tid, unsigned int __mode, void const *__program, void const *const *__params),(__target_tid,__mode,__program,__params))
+INTDEF NONNULL((3)) int NOTHROW_NCX(LIBCCALL libc_rpc_schedule)(pid_t target_tid, unsigned int mode, void const *program, void const *const *params);
 /* >> rpc_serve(2)
  * Check for  pending RPCs.  This function  is basically  a cancellation  point in  disguise,
  * in  that it literally _is_ a regular, old cancellation point, with the only addition being
@@ -142,7 +71,7 @@ __CDECLARE_OPT(__ATTR_NONNULL((3)),int,__NOTHROW_NCX,rpc_schedule,(__pid_t __tar
  * that function's return value.
  * @return: 0:  Nothing was handled.
  * @return: -1: [errno=EINTR] RPCs (or posix signals) were handled. */
-__CDECLARE_OPT(,int,__NOTHROW_RPC,rpc_serve,(void),())
+INTDEF int NOTHROW_RPC(LIBCCALL libc_rpc_serve)(void);
 /* >> rpc_exec(3)
  * Send a RPC to `target_tid' (which must be a thread within the current process).
  * The RPC will modify  the target thread's register  state such that `func'  will
@@ -160,7 +89,7 @@ __CDECLARE_OPT(,int,__NOTHROW_RPC,rpc_serve,(void),())
  *                             still many  reasons outside  of your  control
  *                             for why  it may  terminate immediately  after
  *                             the RPC program finished. */
-__CDECLARE_OPT(,int,__NOTHROW_NCX,rpc_exec,(__pid_t __target_tid, unsigned int __mode, prpc_exec_callback_t __func, void *__cookie),(__target_tid,__mode,__func,__cookie))
+INTDEF int NOTHROW_NCX(LIBCCALL libc_rpc_exec)(pid_t target_tid, unsigned int mode, prpc_exec_callback_t func, void *cookie);
 /* >> rpc_interrupt(3)
  * Send  a RPC to `target_tid' (which must be a thread within the current process).
  * The RPC won't do anything except causing an in-progress system call to fail with
@@ -182,7 +111,7 @@ __CDECLARE_OPT(,int,__NOTHROW_NCX,rpc_exec,(__pid_t __target_tid, unsigned int _
  *                            still many  reasons outside  of your  control
  *                            for why  it may  terminate immediately  after
  *                            the RPC program finished. */
-__CDECLARE_OPT(,int,__NOTHROW_NCX,rpc_interrupt,(__pid_t __target_tid, unsigned int __mode),(__target_tid,__mode))
+INTDEF int NOTHROW_NCX(LIBCCALL libc_rpc_interrupt)(pid_t target_tid, unsigned int mode);
 /* >> rpc_schedule(2)
  * Schedule an RPC program to-be executed by some other thread. This  function
  * cannot guaranty that  the RPC  program is  always executed,  as the  target
@@ -214,7 +143,7 @@ __CDECLARE_OPT(,int,__NOTHROW_NCX,rpc_interrupt,(__pid_t __target_tid, unsigned 
  *                             still many reasons  outside of your  control
  *                             for why it  may terminate immediately  after
  *                             the RPC program finished. */
-__CDECLARE_VOID_OPT(__ATTR_NONNULL((3)),__THROWING,RpcSchedule,(__pid_t __target_tid, unsigned int __mode, void const *__program, void const *const *__params),(__target_tid,__mode,__program,__params))
+INTDEF NONNULL((3)) void (LIBCCALL libc_RpcSchedule)(pid_t target_tid, unsigned int mode, void const *program, void const *const *params) THROWS(...);
 /* >> rpc_exec(3)
  * Send a RPC to `target_tid' (which must be a thread within the current process).
  * The RPC will modify  the target thread's register  state such that `func'  will
@@ -232,7 +161,7 @@ __CDECLARE_VOID_OPT(__ATTR_NONNULL((3)),__THROWING,RpcSchedule,(__pid_t __target
  *                             still many  reasons outside  of your  control
  *                             for why  it may  terminate immediately  after
  *                             the RPC program finished. */
-__CDECLARE_VOID_OPT(__ATTR_NONNULL((3)),__THROWING,RpcExec,(__pid_t __target_tid, unsigned int __mode, prpc_exec_callback_t __func, void *__cookie),(__target_tid,__mode,__func,__cookie))
+INTDEF NONNULL((3)) void (LIBCCALL libc_RpcExec)(pid_t target_tid, unsigned int mode, prpc_exec_callback_t func, void *cookie) THROWS(...);
 /* >> rpc_interrupt(3)
  * Send  a RPC to `target_tid' (which must be a thread within the current process).
  * The RPC won't do anything except causing an in-progress system call to fail with
@@ -254,9 +183,9 @@ __CDECLARE_VOID_OPT(__ATTR_NONNULL((3)),__THROWING,RpcExec,(__pid_t __target_tid
  *                            still many  reasons outside  of your  control
  *                            for why  it may  terminate immediately  after
  *                            the RPC program finished. */
-__CDECLARE_VOID_OPT(,__THROWING,RpcInterrupt,(__pid_t __target_tid, unsigned int __mode),(__target_tid,__mode))
+INTDEF void (LIBCCALL libc_RpcInterrupt)(pid_t target_tid, unsigned int mode) THROWS(...);
+#endif /* !__KERNEL__ */
 
-__SYSDECL_END
-#endif /* __CC__ */
+DECL_END
 
-#endif /* !_KOS_RPC_H */
+#endif /* !GUARD_LIBC_USER_KOS_RPC_H */

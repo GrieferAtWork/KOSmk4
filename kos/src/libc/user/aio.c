@@ -29,6 +29,7 @@
 
 #include <kos/anno.h>
 #include <kos/futex.h>
+#include <kos/rpc.h>
 #include <kos/syscalls.h>
 #include <linux/futex.h>
 
@@ -40,8 +41,6 @@
 #include <string.h>
 #include <syscall.h>
 #include <unistd.h>
-
-#include <librpc/rpc.h>
 
 /**/
 #include "aio.h"
@@ -676,16 +675,11 @@ NOTHROW_NCX(LIBCCALL find_aio_for_fd)(fd_t fd) {
 /* Send a sporadic interrupt to the thread hosting `self' */
 PRIVATE ATTR_SECTION(".text.crt.utility.aio") void
 NOTHROW_NCX(LIBCCALL interrupt_aio_thread)(struct aio *__restrict self) {
-	/* The RPC program doesn't need to do anything, but sending it
-	 * to the AIO service thread will cause it to fail with  EINTR
-	 * at the next synchronization point. */
-	static byte_t const program[] = { RPC_PROGRAM_OP_resume };
-
-	/* Use `RPC_SCHEDULE_FLAG_HIGHPRIO', thus trying to  do
-	 * an implicit sched_yield() to the thread in question. */
-	sys_rpc_schedule(self->aio_threadpid,
-	                 RPC_SCHEDULE_SYNC | RPC_SCHEDULE_FLAG_HIGHPRIO,
-	                 program, NULL);
+	/* Use `RPC_PRIORITY_HIGH', thus  trying to  do
+	 * an implicit yield to the thread in question. */
+	errno_t saved = libc_geterrno();
+	rpc_interrupt(self->aio_threadpid, RPC_SYNCMODE_CP | RPC_PRIORITY_HIGH);
+	libc_seterrno(saved);
 }
 
 

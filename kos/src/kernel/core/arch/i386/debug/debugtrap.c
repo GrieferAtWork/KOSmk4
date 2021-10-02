@@ -43,6 +43,7 @@
 #include <kos/bits/debugtrap32.h>
 #include <kos/debugtrap.h>
 #include <kos/except/reason/inval.h>
+#include <kos/kernel/cpu-state-helpers.h>
 #include <kos/kernel/cpu-state-verify.h>
 #include <kos/kernel/cpu-state.h>
 #include <kos/kernel/cpu-state32.h>
@@ -55,8 +56,6 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
-
-#include <librpc/rpc.h>
 
 DECL_BEGIN
 

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7d50fc22 */
+/* HASH CRC-32:0x1958e2af */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1142,10 +1142,10 @@
 #define __NR32AN2_openpty                      name
 #define __NR32AN3_openpty                      termp
 #define __NR32AN4_openpty                      winp
-#define __NR32AN0_rpc_schedule                 target
-#define __NR32AN1_rpc_schedule                 flags
+#define __NR32AN0_rpc_schedule                 target_tid
+#define __NR32AN1_rpc_schedule                 mode
 #define __NR32AN2_rpc_schedule                 program
-#define __NR32AN3_rpc_schedule                 arguments
+#define __NR32AN3_rpc_schedule                 params
 #define __NR32AN0_frealpathat                  dirfd
 #define __NR32AN1_frealpathat                  filename
 #define __NR32AN2_frealpathat                  buf
@@ -2753,7 +2753,7 @@
 #define __NR32ATR0_nanosleep64                  SC_REPR_STRUCT_TIMESPECX32_64                                        /* req */ 
 #define __NR32ATR1_nanosleep64                  SC_REPR_POINTER                                                      /* rem */ 
 #define __NR32RTR_nanosleep64                   SC_REPR_ERRNO_T                                                      /* return */
-#define __NR32RTR_rpc_service                   SC_REPR_SYSCALL_SLONG_T                                              /* return */
+#define __NR32RTR_rpc_serve                     SC_REPR_SYSCALL_SLONG_T                                              /* return */
 #define __NR32ATR0_ksysctl                      SC_REPR_KSYSCTL_COMMAND                                              /* command */ 
 #define __NR32ATR1_ksysctl                      SC_REPR_KSYSCTL_ARG                                                  /* arg */ 
 #define __NR32ATL1_ksysctl                      0                                                                    /* arg -> command */ 
@@ -2827,7 +2827,6 @@
 #define __NR32RTR_rtm_begin                     SC_REPR_SIGNO_T                                                      /* return */
 #define __NR32ATR0_ftime64                      SC_REPR_POINTER                                                      /* tp */ 
 #define __NR32RTR_ftime64                       SC_REPR_ERRNO_T                                                      /* return */
-#define __NR32RTR_sigmask_check                 SC_REPR_ERRNO_T                                                      /* return */
 #define __NR32ATR0_set_userprocmask_address     SC_REPR_POINTER                                                      /* ctl */ 
 #define __NR32RTR_set_userprocmask_address      SC_REPR_ERRNO_T                                                      /* return */
 #define __NR32ATR0_utime64                      SC_REPR_FILENAME                                                     /* filename */ 
@@ -2903,11 +2902,11 @@
 #define __NR32ATR3_openpty                      SC_REPR_STRUCT_TERMIOS                                               /* termp */ 
 #define __NR32ATR4_openpty                      SC_REPR_STRUCT_WINSIZE                                               /* winp */ 
 #define __NR32RTR_openpty                       SC_REPR_ERRNO_T                                                      /* return */
-#define __NR32ATR0_rpc_schedule                 SC_REPR_PID_T                                                        /* target */ 
-#define __NR32ATR1_rpc_schedule                 SC_REPR_RPC_SCHEDULE_FLAGS                                           /* flags */ 
+#define __NR32ATR0_rpc_schedule                 SC_REPR_PID_T                                                        /* target_tid */ 
+#define __NR32ATR1_rpc_schedule                 SC_REPR_RPC_SCHEDULE_MODE                                            /* mode */ 
 #define __NR32ATR2_rpc_schedule                 SC_REPR_POINTER                                                      /* program */ 
-#define __NR32ATR3_rpc_schedule                 SC_REPR_POINTER                                                      /* arguments */ 
-#define __NR32RTR_rpc_schedule                  SC_REPR_SYSCALL_SLONG_T                                              /* return */
+#define __NR32ATR3_rpc_schedule                 SC_REPR_POINTER                                                      /* params */ 
+#define __NR32RTR_rpc_schedule                  SC_REPR_ERRNO_T                                                      /* return */
 #define __NR32ATR0_frealpathat                  SC_REPR_FD_T                                                         /* dirfd */ 
 #define __NR32ATR1_frealpathat                  SC_REPR_FILENAME                                                     /* filename */ 
 #define __NR32ATL1_frealpathat                  0                                                                    /* filename -> dirfd */ 

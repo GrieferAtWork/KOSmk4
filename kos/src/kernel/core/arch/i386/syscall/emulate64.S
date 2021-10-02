@@ -34,10 +34,9 @@
 #include <kos/kernel/cpu-state-asm.h>
 #include <kos/kernel/cpu-state.h>
 #include <kos/kernel/gdt.h>
+#include <kos/rpc.h>
 
 #include <errno.h>
-
-#include <librpc/rpc.h>
 
 #define TEST_DOUBLE_WIDE32(sysno_reg_b, sysno_reg_l, sysno_reg_q,            \
                            tempreg_b, tempreg_l, tempreg_q, segment_prefix)  \

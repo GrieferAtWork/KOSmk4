@@ -50,8 +50,6 @@
 #include <stddef.h>
 #include <string.h>
 
-#include <librpc/rpc.h>
-
 DECL_BEGIN
 
 /* When true, iopl() is kept after fork() (w/o CLONE_THREAD) */

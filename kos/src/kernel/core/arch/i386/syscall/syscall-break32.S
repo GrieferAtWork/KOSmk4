@@ -26,8 +26,7 @@
 #include <kernel/except.h>
 
 #include <asm/cfi.h>
-
-#include <librpc/rpc.h>
+#include <kos/rpc.h>
 
 #ifndef __NR32FEAT_DEFINED_SYSCALL_REGISTER_COUNT
 #undef __WANT_SYSCALL_REGISTER_COUNT

@@ -30,10 +30,10 @@
 #include <kernel/syscall-properties.h>
 #include <kernel/syscall-trace.h>
 #include <kernel/syscall.h>
-#include <kernel/rt/except-handler.h>
 #include <kernel/user.h>
 #include <kernel/x86/fault.h>
-#include <kernel/x86/idt.h>            /* IDT_CONFIG_ISTRAP() */
+#include <kernel/x86/gdt.h>
+#include <kernel/x86/idt.h> /* IDT_CONFIG_ISTRAP() */
 
 #include <hybrid/atomic.h>
 #include <hybrid/byteorder.h>
@@ -51,7 +51,6 @@
 #include <stddef.h>
 
 #include <libinstrlen/instrlen.h>
-#include <librpc/rpc.h>
 
 #include "decode.h"
 

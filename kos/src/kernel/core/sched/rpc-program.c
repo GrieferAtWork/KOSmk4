@@ -17,37 +17,53 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_APPS_RPC_SERVICE_MAIN_C
-#define GUARD_APPS_RPC_SERVICE_MAIN_C 1
+#ifndef GUARD_KERNEL_SRC_SCHED_RPC_PROGRAM_C
+#define GUARD_KERNEL_SRC_SCHED_RPC_PROGRAM_C 1
+#define _KOS_SOURCE 1
 
-#include <hybrid/compiler.h>
+#include <kernel/compiler.h>
 
-#include <kos/syscalls.h>
-#include <kos/ksysctl.h>
+#ifdef CONFIG_USE_NEW_RPC
+#include <sched/rpc-internal.h>
+#include <sched/rpc.h>
 
-#include <signal.h>
+#include <kos/except.h>
+#include <kos/rpc.h>
+#include <assert.h>
+
+#include <libunwind/arch-register.h>
 
 DECL_BEGIN
 
-int main(int argc, char *argv[]) {
-	(void)argc;
-	(void)argv;
-	/* This program was used to test a problem related to exception unwinding
-	 * while  inside of `task_serve()' (s.a. `LOG_SEGMENT_INCONSISTENCY()' in
-	 * `kos/src/kernel/core/arch/i386/except.c')
-	 * -> Start  this program and  press CTRL+C a couple  of times (which will
-	 *    eventually cause an E_INTERRUPT_USER_RPC to be thrown and propagated
-	 *    through `task_serve()', that demonstrateted a design flaw caused  by
-	 *    a  miss-understanding  of how  `pushl %<SEGMENT_REGISTER>'  works on
-	 *    different CPUs)
-	 * (To exit the program, send SIGQUIT using CTRL+\ (or its alias: CTRL+4)) */
-	signal(SIGINT, SIG_IGN);
-	for (;;) {
-		sys_rpc_service();
-	}
-	return 0;
+/* Execute a user-space RPC program
+ * @param: reason:  One of `_RPC_REASONCTX_ASYNC', `_RPC_REASONCTX_SYNC' or `_RPC_REASONCTX_SYSCALL'
+ * @param: sc_info: [valid_if(reason == _RPC_REASONCTX_SYSCALL)] System call information. */
+PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) rpc_cpustate_t *FCALL
+task_userrpc_runprogram(rpc_cpustate_t *__restrict state,
+                        struct pending_user_rpc const *__restrict rpc,
+                        unsigned int reason,
+                        struct rpc_syscall_info const *sc_info) {
+	assert(reason == _RPC_REASONCTX_ASYNC ||
+	       reason == _RPC_REASONCTX_SYNC ||
+	       reason == _RPC_REASONCTX_SYSCALL);
+
+	/* NOTE: When the system call isn't restarted, we're also responsible
+	 *       to write -EINTR to the system call return value, or to have
+	 *       the RPC program return to the user-space exception handler
+	 *       with an E_INTERRUPT already pushed onto the stack! */
+
+	(void)state;
+	(void)rpc;
+	(void)reason;
+	(void)sc_info;
+	THROW(E_NOT_IMPLEMENTED_TODO);
+
+	/* TODO */
+	return state;
 }
 
 DECL_END
 
-#endif /* !GUARD_APPS_RPC_SERVICE_MAIN_C */
+#endif /* CONFIG_USE_NEW_RPC */
+
+#endif /* !GUARD_KERNEL_SRC_SCHED_RPC_PROGRAM_C */

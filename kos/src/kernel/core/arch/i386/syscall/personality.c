@@ -45,7 +45,6 @@
 #include <errno.h>
 #include <string.h>
 
-#include <librpc/rpc.h>
 #include <libunwind/eh_frame.h>
 #include <libunwind/unwind.h>
 

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa482d2fd */
+/* HASH CRC-32:0x5b7cb65 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -430,6 +430,14 @@ DEFINE_PUBLIC_ALIAS(DOS$_sopen, libd_sopen);
 DEFINE_PUBLIC_ALIAS(DOS$sopen, libd_sopen);
 DEFINE_PUBLIC_ALIAS(DOS$_filelength, libd__filelength);
 DEFINE_PUBLIC_ALIAS(DOS$_eof, libd__eof);
+
+/* kos.rpc */
+DEFINE_PUBLIC_ALIAS(DOS$rpc_schedule, libd_rpc_schedule);
+DEFINE_PUBLIC_ALIAS(DOS$rpc_exec, libd_rpc_exec);
+DEFINE_PUBLIC_ALIAS(DOS$rpc_interrupt, libd_rpc_interrupt);
+DEFINE_PUBLIC_ALIAS(DOS$RpcSchedule, libd_RpcSchedule);
+DEFINE_PUBLIC_ALIAS(DOS$RpcExec, libd_RpcExec);
+DEFINE_PUBLIC_ALIAS(DOS$RpcInterrupt, libd_RpcInterrupt);
 
 /* libgen */
 DEFINE_PUBLIC_ALIAS(DOS$dirname, libd_dirname);

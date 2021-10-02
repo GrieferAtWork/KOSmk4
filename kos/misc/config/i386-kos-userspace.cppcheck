@@ -34,7 +34,6 @@
 		<dir name="../../src/libm"/>
 		<dir name="../../src/libregdump"/>
 		<dir name="../../src/libregex"/>
-		<dir name="../../src/librpc"/>
 		<dir name="../../src/libssp"/>
 		<dir name="../../src/libterm"/>
 		<dir name="../../src/libunwind"/>

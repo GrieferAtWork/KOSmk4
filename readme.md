@@ -397,10 +397,6 @@ All ported applications can be installed onto your KOS disk image by using `bash
 	- libregex (user)
 		- Port of the deemon regex implementation with additional functionality added
 		- Used to implement the POSIX `<regex.h>` header in libc.so
-	- librpc (user)
-		- Library for sending remote procedure calls to arbitrary threads/processes
-		- KOS provides a system call `sys_rpc_schedule()` that comes alongside a tiny, non-turing-complete assembly language which can be used to describe arbitrary register-save-and-load transformations before some given RPC callback function gets invoked
-		- The main (intended) purpose of RPC functions in KOS is to allow user-space to implement a kind of `terminate_thread()` function that works by scheduling an RPC that will interrupt a blocking operation in the target thread and get executed at the next valid cancelation point (as defined by posix:libpthread), at which point that RPC can simply throw an `E_EXIT_THREAD` exception to unwind the stack, executing finalizers as needed along the way
 	- libsctrace (user/kernel-driver)
 		- Generate human-readable log entries from system call invocation registers. For example:  
 		  `sys_open(filename: "/lib64/libc.so", oflags: O_RDONLY|O_CLOEXEC)`

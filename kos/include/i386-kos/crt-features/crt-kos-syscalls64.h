@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5ffd1f82 */
+/* HASH CRC-32:0xd8b1e83c */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -292,7 +292,7 @@
 #define __CRT_HAVE_sys_restart_syscall
 #define __CRT_HAVE_sys_rmdir
 #define __CRT_HAVE_sys_rpc_schedule
-#define __CRT_HAVE_sys_rpc_service
+#define __CRT_HAVE_sys_rpc_serve
 #define __CRT_HAVE_sys_rseq
 #define __CRT_HAVE_sys_rt_sigaction
 #define __CRT_HAVE_sys_rt_sigpending
@@ -361,7 +361,6 @@
 #define __CRT_HAVE_sys_shmget
 #define __CRT_HAVE_sys_shutdown
 #define __CRT_HAVE_sys_sigaltstack
-#define __CRT_HAVE_sys_sigmask_check
 #define __CRT_HAVE_sys_signalfd
 #define __CRT_HAVE_sys_signalfd4
 #define __CRT_HAVE_sys_socket
@@ -692,7 +691,7 @@
 #define __CRT_HAVE_sys_Xrestart_syscall
 #define __CRT_HAVE_sys_Xrmdir
 #define __CRT_HAVE_sys_Xrpc_schedule
-#define __CRT_HAVE_sys_Xrpc_service
+#define __CRT_HAVE_sys_Xrpc_serve
 #define __CRT_HAVE_sys_Xrseq
 #define __CRT_HAVE_sys_Xrt_sigaction
 #define __CRT_HAVE_sys_Xrt_sigpending
@@ -760,7 +759,6 @@
 #define __CRT_HAVE_sys_Xshmget
 #define __CRT_HAVE_sys_Xshutdown
 #define __CRT_HAVE_sys_Xsigaltstack
-#define __CRT_HAVE_sys_Xsigmask_check
 #define __CRT_HAVE_sys_Xsignalfd
 #define __CRT_HAVE_sys_Xsignalfd4
 #define __CRT_HAVE_sys_Xsocket

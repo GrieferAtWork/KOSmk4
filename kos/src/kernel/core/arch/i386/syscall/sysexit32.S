@@ -26,7 +26,9 @@
 #include <kernel/syscall.h>
 
 #include <asm/cfi.h>
+#include <asm/cpu-flags.h>
 #include <asm/instr/ttest.h>
+#include <kos/kernel/cpu-state.h>
 
 
 /************************************************************************/

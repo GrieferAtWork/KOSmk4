@@ -31,6 +31,7 @@
 #include <kos/anno.h>
 #include <kos/except.h>
 #include <kos/futex.h>
+#include <kos/rpc.h>
 #include <kos/syscalls.h>
 #include <kos/thread.h>
 #include <kos/types.h>
@@ -51,8 +52,6 @@
 #include <string.h>
 #include <syslog.h>
 #include <unistd.h>
-
-#include <librpc/rpc.h>
 
 #include "../libc/dl.h"
 #include "../libc/tls.h"
@@ -151,48 +150,6 @@ STATIC_ASSERT(offsetof(pthread_barrier_t, b_current_round) == __OFFSET_PTHREAD_B
 STATIC_ASSERT(offsetof(pthread_barrier_t, b_count) == __OFFSET_PTHREAD_BARRIER_COUNT);
 STATIC_ASSERT(offsetof(pthread_barrier_t, b_shared) == __OFFSET_PTHREAD_BARRIER_SHARED);
 STATIC_ASSERT(offsetof(pthread_barrier_t, b_out) == __OFFSET_PTHREAD_BARRIER_OUT);
-
-
-
-
-PRIVATE ATTR_SECTION(".rodata.crt.sched.pthread.rpc") char const librpc_name[] = LIBRPC_LIBRARY_NAME;
-PRIVATE ATTR_SECTION(".bss.crt.sched.pthread.rpc") void *librpc = NULL;
-PRIVATE ATTR_SECTION(".bss.crt.sched.pthread.rpc") PRPC_SCHEDULE pdyn_rpc_schedule = NULL;
-PRIVATE ATTR_SECTION(".bss.crt.sched.pthread.rpc") PRPC_SERVICE pdyn_rpc_service = NULL;
-PRIVATE ATTR_SECTION(".rodata.crt.sched.pthread.rpc") char const name_rpc_schedule[] = "rpc_schedule";
-PRIVATE ATTR_SECTION(".rodata.crt.sched.pthread.rpc") char const name_rpc_service[] = "rpc_service";
-
-PRIVATE WUNUSED ATTR_SECTION(".text.crt.sched.pthread.rpc")
-bool NOTHROW(LIBCCALL librpc_init)(void) {
-	void *lib;
-again:
-	lib = ATOMIC_READ(librpc);
-	if (lib)
-		return lib != (void *)-1;
-	lib = dlopen(librpc_name, RTLD_LOCAL);
-	if (!lib)
-		goto err_nolib;
-	*(void **)&pdyn_rpc_schedule = dlsym(lib, name_rpc_schedule);
-	if unlikely(!pdyn_rpc_schedule)
-		goto err;
-	*(void **)&pdyn_rpc_service = dlsym(lib, name_rpc_service);
-	if unlikely(!pdyn_rpc_service)
-		goto err;
-	if (!ATOMIC_CMPXCH(librpc, NULL, lib)) {
-		dlclose(lib);
-		goto again;
-	}
-	return true;
-err:
-	dlclose(lib);
-err_nolib:
-	if (!ATOMIC_CMPXCH(librpc, NULL, (void *)-1))
-		goto again;
-	return false;
-}
-
-
-
 
 
 /* Destroy a given `pthread' `self' */
@@ -1658,10 +1615,11 @@ NOTHROW_NCX(LIBCCALL libc_pthread_setcanceltype)(int type,
 }
 /*[[[end:libc_pthread_setcanceltype]]]*/
 
-PRIVATE ATTR_SECTION(".text.crt.sched.pthread")
-void LIBCCALL pthread_cancel_self(void) {
+PRIVATE ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1)) void PRPC_EXEC_CALLBACK_CC
+pthread_cancel_self_rpc(struct rpc_context *__restrict UNUSED(ctx), void *UNUSED(cookie)) {
 	THROW(E_EXIT_THREAD);
 }
+
 
 /*[[[head:libc_pthread_cancel,hash:CRC-32=0x94f5477c]]]*/
 /* >> pthread_cancel(3)
@@ -1673,25 +1631,14 @@ NOTHROW_NCX(LIBCCALL libc_pthread_cancel)(pthread_t pthread)
 /*[[[body:libc_pthread_cancel]]]*/
 {
 	pid_t tid;
-	/* Make sure that we can load librpc */
-	if (!librpc_init())
-		return ENOSYS;
 	tid = ATOMIC_READ(pthread->pt_tid);
 	if unlikely(tid == 0)
 		return ESRCH;
-	/* Schedule an RPC in the target thread that will cause the thread to terminate itself. */
-	/* In  this case, we  sadly cannot handle the  race condition of `tid'
-	 * terminating at this point (causing the id to become invalid), since
-	 * we cannot undo the RPC schedule operation in that case...
-	 * NOTE: This  is _NOT_ unsafe,  even when the  target thread has already
-	 *       unmapped its stack within  `libc_pthread_unmap_stack_and_exit()'
-	 *       The reason for this is the `RPC_SCHEDULE_SYNC' which only allows
-	 *       the  RPC to be  executed as the result  of a blocking operation,
-	 *       none  of which  happen anymore once  the stack has  gone away in
-	 *       said function! */
-	if ((*pdyn_rpc_schedule)(tid, RPC_SCHEDULE_SYNC,
-	                         (void (*)())&pthread_cancel_self,
-	                         0) != 0)
+	/* Schedule  an RPC in the target thread that  will cause the thread to terminate itself.
+	 * Note that this RPC is scheduled to only execute the next time a call to a cancellation
+	 * point  system call is  made, and that system  call ends up  blocking (iow: calling the
+	 * kernel function `task_serve()') */
+	if unlikely(rpc_exec(tid, RPC_SYNCMODE_CP, &pthread_cancel_self_rpc, NULL) != 0)
 		return libc_geterrno();
 	return EOK;
 }
@@ -1705,12 +1652,7 @@ INTERN ATTR_SECTION(".text.crt.sched.pthread") void
 NOTHROW_RPC(LIBCCALL libc_pthread_testcancel)(void)
 /*[[[body:libc_pthread_testcancel]]]*/
 {
-	/* Load librpc and use it to service RPCs
-	 * Technically,  we could just  directly invoke `sys_rpc_service()', however
-	 * this method allows librpc to perform additional functions, and also makes
-	 * it more clear that it is actually librpc that implements this behavior! */
-	if (librpc_init())
-		(*pdyn_rpc_service)();
+	sys_rpc_serve();
 }
 /*[[[end:libc_pthread_testcancel]]]*/
 

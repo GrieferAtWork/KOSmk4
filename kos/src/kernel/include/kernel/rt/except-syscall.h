@@ -88,7 +88,7 @@ DATDEF ATTR_PERTASK USER CHECKED pid_t *this_tid_address;
  * this, user-space could block/unblock signals without having to do any
  * system calls in case where no signal arrived in the mean time, and in
  * the case where a signal  did arrive in the  mean time, only 1  system
- * call (`sys_sigmask_check(2)') would be required.
+ * call (`sys_rpc_serve(2)') would be required.
  *
  * Purpose:
  *    - A lot of kernel-space code makes use of `PREEMPTION_PUSHOFF()' / `PREEMPTION_POP()'
@@ -248,7 +248,7 @@ DATDEF ATTR_PERTASK USER CHECKED pid_t *this_tid_address;
  * >> // The [restart(must)] is necessary in order to ensure that _all_ unmasked
  * >> // signals get handled until none are left, in case more than one signal
  * >> // became available.
- * >> [restart(must)] errno_t sys_sigmask_check(void);
+ * >> [restart(must)] errno_t sys_rpc_serve(void);
  * >>
  * >>
  * >> // Per-thread user-space signal mask controller
@@ -302,8 +302,8 @@ DATDEF ATTR_PERTASK USER CHECKED pid_t *this_tid_address;
  * >>             // may have already handled it.
  * >>             sigemptyset(&mymask.pm_pending);
  * >>
- * >>             // Calls the kernel's `sigmask_check()' function
- * >>             sys_sigmask_check();
+ * >>             // Calls the kernel's `task_serve()' function
+ * >>             sys_rpc_serve();
  * >>         }
  * >>     }
  * >>     return 0;
@@ -327,7 +327,8 @@ DATDEF ATTR_PERTASK USER CHECKED pid_t *this_tid_address;
  * >>     for (signo_t i = 1; i < NSIG; ++i) {
  * >>         if (sigismember(&mymask.pm_pending, i) && !sigismember(sigmaskptr, i)) {
  * >>             sigemptyset(&mymask.pm_pending);
- * >>             sys_sigmask_check();
+ * >>             sys_rpc_serve();
+ * >>             break;
  * >>         }
  * >>     }
  * >>     return result;

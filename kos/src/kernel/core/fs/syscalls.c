@@ -75,8 +75,6 @@
 #include <stddef.h>
 #include <string.h>
 
-#include <librpc/rpc.h>
-
 #ifdef __ARCH_HAVE_COMPAT
 #include <compat/bits/os/stat-convert.h>
 #include <compat/bits/os/stat.h>

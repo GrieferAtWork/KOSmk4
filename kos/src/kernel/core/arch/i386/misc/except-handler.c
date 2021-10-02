@@ -58,7 +58,6 @@
 #include <string.h>
 
 #include <libcpustate/apply.h>
-#include <librpc/rpc.h>
 
 DECL_BEGIN
 

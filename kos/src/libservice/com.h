@@ -331,45 +331,13 @@ struct service_comdesc {
 
 	/* TODO: The HUP condition must be signaled to to userspace on some way.
 	 *
-	 * Ideas:
-	 *  - New  user-space library `libasync' that will become the
-	 *    replacement for the  kernel header <sched/async.h>,  as
-	 *    well as be  available for  user-space where  ao_connect
-	 *    is implemented in terms of <sys/epoll.h>. Then use this
-	 *    library to poll for POLL_HUP.
-	 *
-	 *  - Alter wrapper functions  such that instead  of doing  a
-	 *    boring, old  `FUTEX_WAIT_WHILE',  they  also  poll  for
-	 *    `s_fd_srv' to indicate POLL_HUP, and if the later  ends
-	 *    up being the case,  all active commands will  terminate
-	 *    with  `E_SERVICE_EXITED'. (For efficiency, this sort of
-	 *    function may even be implemented via a dedicated system
-	 *    call, in which case it  would also include the  initial
-	 *    wakeup signal send to the server)
-	 *    NOTE: Even without the dedicated system call, this entire
-	 *          thing should  still be  implementable with  already
-	 *          existing system calls.
-	 *
+	 * Idea:
 	 *  - Expand the kernel epoll API to allow for custom  actions
 	 *    to be performed when  special conditions arise in  files
 	 *    being monitored, including the raising of posix signals,
 	 *    as well as the scheduling of RPC callbacks. Using  this,
 	 *    we  could then schedule  an RPC to  mark all commands as
 	 *    having exited with `E_SERVICE_EXITED'.
-	 *    NOTE: In  conjunction to this, redesign the entire RPC
-	 *          system from the ground up, such that it built on
-	 *          top of POSIX signals with its own SIGRPC that is
-	 *          dedicated to masking/unmasking synchronous RPCs,
-	 *          such  that synchronous ones can only be received
-	 *          when they're not currently being masked.
-	 *    Also: Get rid of librpc and move the user-space part
-	 *          into libc, exposed by a new header <kos/rpc.h>
-	 *          Additionally, the current API should be scrapped
-	 *          and a new system (including new opcodes) should
-	 *          be developed and implemented.
-	 *    This is probably the best option to pick, since it can
-	 *    be made to work without the need of additional threads
-	 *    running in user-space!
 	 */
 
 	LIST_ENTRY(service_comdesc) scd_link; /* [lock(:s_active_lock)] List of active commands. */

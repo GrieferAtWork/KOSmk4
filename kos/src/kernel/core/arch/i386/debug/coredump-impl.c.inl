@@ -53,7 +53,6 @@
 #include <stddef.h>
 #include <string.h>
 
-#include <librpc/rpc.h>
 #include <libunwind/api.h>
 
 #if (defined(DEFINE_sys32_coredump) + \

@@ -65,8 +65,6 @@
 #include <stdio.h>
 #include <string.h>
 
-#include <librpc/rpc.h>
-
 #ifndef CONFIG_NO_USERKERN_SEGMENT
 #include <kernel/rand.h>
 #include <sched/userkern.h>

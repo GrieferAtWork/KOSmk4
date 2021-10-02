@@ -647,11 +647,11 @@ x86_emulate_rtm_instruction_syscall(struct rtm_machstate *__restrict self
 			return X86_RTM_STATUS_CONTINUE;
 #endif /* rtm_sys_syslog */
 
-#ifdef rtm_sys_rpc_service
-		case __NR32_rpc_service:
-			sysno = SYS_rpc_service;
+#ifdef rtm_sys_rpc_serve
+		case __NR32_rpc_serve:
+			sysno = SYS_rpc_serve;
 			break;
-#endif /* rtm_sys_rpc_service */
+#endif /* rtm_sys_rpc_serve */
 
 #ifdef rtm_sys_gettid
 		case __NR32_gettid:
@@ -725,11 +725,11 @@ x86_emulate_rtm_instruction_syscall(struct rtm_machstate *__restrict self
 		return X86_RTM_STATUS_CONTINUE;
 #endif /* rtm_sys_syslog */
 
-#ifdef rtm_sys_rpc_service
-	case SYS_rpc_service:
-		self->r_pax = rtm_sys_rpc_service(&self->r_mem);
+#ifdef rtm_sys_rpc_serve
+	case SYS_rpc_serve:
+		self->r_pax = rtm_sys_rpc_serve(&self->r_mem);
 		return X86_RTM_STATUS_CONTINUE;
-#endif /* rtm_sys_rpc_service */
+#endif /* rtm_sys_rpc_serve */
 
 #ifdef rtm_sys_gettid
 	case SYS_gettid:
