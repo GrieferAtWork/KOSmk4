@@ -370,6 +370,11 @@ for (local name: classes.keys.sorted()) {
 		result = ENOMEM;
 @@pp_endif@@
 		switch(self->@e_subclass@) {
+@@pp_if defined(EEXIST)@@
+		case @ERROR_SUBCLASS@(@ERROR_CODEOF@(@E_BADALLOC_ADDRESS_ALREADY_EXISTS@)):
+			result = EEXIST;
+			break;
+@@pp_endif@@
 @@pp_if defined(EMFILE)@@
 		case @ERROR_SUBCLASS@(@ERROR_CODEOF@(@E_BADALLOC_INSUFFICIENT_HANDLE_NUMBERS@)):
 			result = EMFILE;

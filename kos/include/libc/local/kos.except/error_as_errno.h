@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcab26405 */
+/* HASH CRC-32:0x10f0cea2 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -161,6 +161,11 @@ for (local name: classes.keys.sorted()) {
 		__result = __ENOMEM;
 #endif /* __ENOMEM */
 		switch(__self->e_subclass) {
+#ifdef __EEXIST
+		case ERROR_SUBCLASS(ERROR_CODEOF(E_BADALLOC_ADDRESS_ALREADY_EXISTS)):
+			__result = __EEXIST;
+			break;
+#endif /* __EEXIST */
 #ifdef __EMFILE
 		case ERROR_SUBCLASS(ERROR_CODEOF(E_BADALLOC_INSUFFICIENT_HANDLE_NUMBERS)):
 			__result = __EMFILE;

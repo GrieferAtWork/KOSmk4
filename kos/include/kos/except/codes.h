@@ -159,7 +159,7 @@
                                                                         * [fld(num_bytes: size_t, "The number of bytes that could not be mapped")] */
 #endif /* !E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY */
 #ifndef E_BADALLOC_ADDRESS_ALREADY_EXISTS
-#define E_BADALLOC_ADDRESS_ALREADY_EXISTS         (E_BADALLOC, 0x0003) /* [msg("Virtual address already in use")]
+#define E_BADALLOC_ADDRESS_ALREADY_EXISTS         (E_BADALLOC, 0x0003) /* [msg("Virtual address already in use"), errno(EEXIST)]
                                                                         * [fld(minaddr:       void *, "Lowest address that was requested")]
                                                                         * [fld(maxaddr:       void *, "Greatest address that was requested")]
                                                                         * [fld(inuse_minaddr: void *, "Lowest address already in use")]

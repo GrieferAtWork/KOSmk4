@@ -71,6 +71,17 @@ NOTHROW(FCALL task_userrpc_cancelprogram)(struct pending_rpc *__restrict rpc) {
 }
 
 
+
+
+struct rpc_vm {
+	/* TODO: Construct structure for execution of user RPC programs.
+	 *       Must include a memory-access buffer layer (similar to
+	 *       that of modrtm, but without the atomic-ness that has,
+	 *       and instead with support for reading/writing VIO) */
+};
+
+
+
 /* Execute a user-space RPC program
  * @param: reason:  One of `_RPC_REASONCTX_ASYNC', `_RPC_REASONCTX_SYNC' or `_RPC_REASONCTX_SYSCALL'
  * @param: sc_info: [valid_if(reason == _RPC_REASONCTX_SYSCALL)] System call information. */
