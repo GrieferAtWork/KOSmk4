@@ -1,3 +1,8 @@
+/*[[[magic
+options["COMPILE.language"] = "c";
+local gcc_opt = options.setdefault("GCC.options", []);
+gcc_opt.remove("-g"); // Disable debug informations for this file!
+]]]*/
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
