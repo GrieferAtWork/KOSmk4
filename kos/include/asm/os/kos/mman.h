@@ -103,7 +103,7 @@
 #endif /* __KOS__ */
 
 
-#define __MAP_FAILED __CCAST(void *)(-1)
+#define __MAP_FAILED (__CCAST(void *)-1)
 
 #define __MS_ASYNC      0x01 /* Perform the operation asynchronously. */
 #define __MS_INVALIDATE 0x02 /* Invalidate caches. */

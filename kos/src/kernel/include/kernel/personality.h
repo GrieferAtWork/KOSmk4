@@ -38,7 +38,7 @@ DATDEF byte_t kernel_personality[(KP_COUNT + 7) / 8];
 #define has_kernel_personality(name) \
 	((kernel_personality[(name) / 8] & (1 << ((name) % 8))) != 0)
 
-/* Check if the calling process has a given personality enabled.
+/* Check if the calling thread has a given personality enabled.
  * @param: name: One of `KP_*' (from <kos/personality.h>) */
 #define has_personality(name) \
 	has_kernel_personality(name)

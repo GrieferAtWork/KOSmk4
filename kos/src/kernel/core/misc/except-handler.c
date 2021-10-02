@@ -594,6 +594,7 @@ again_switch_action_handler:
 				 * This is important to ensure that `SA_RESETHAND' works atomically. */
 				if (newstate == NULL)
 					goto again_load_threadsig_action;
+				ctx->rc_state = newstate;
 			} EXCEPT {
 				/* Prioritize errors. */
 				struct exception_info *tls = error_info();

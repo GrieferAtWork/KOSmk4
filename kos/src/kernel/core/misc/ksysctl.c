@@ -464,8 +464,8 @@ DEFINE_SYSCALL2(syscall_slong_t, ksysctl,
 			newpath_len = strlen(newpath);
 			COMPILER_READ_BARRIER();
 			newpath_string = (REF struct driver_libpath_struct *)kmalloc(offsetof(struct driver_libpath_struct, dlp_path) +
-			                                                                  (newpath_len + 1) * sizeof(char),
-			                                                                  GFP_LOCKED | GFP_PREFLT);
+			                                                             (newpath_len + 1) * sizeof(char),
+			                                                             GFP_LOCKED | GFP_PREFLT);
 			TRY {
 				memcpy(newpath_string, newpath, newpath_len, sizeof(char));
 				newpath_string->dlp_path[newpath_len] = '\0';

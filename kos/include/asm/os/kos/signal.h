@@ -58,6 +58,9 @@
 #ifdef __KOS__
 #define __SIG_TERM 3  /* Terminate the receiving process. */
 #define __SIG_EXIT 4  /* Terminate the receiving thread. */
+/*      __SIG_     5   */
+/*      __SIG_     6   */
+/*      __SIG_     7   */
 #define __SIG_CONT 8  /* Continue execution. */
 #define __SIG_STOP 9  /* Suspend execution. */
 #define __SIG_CORE 10 /* Create a coredump and terminate. */
@@ -101,6 +104,14 @@
 #define __SIGSYS    31        /* Bad system call. */
 #define __NSIG      65        /* Biggest signal number + 1 (including real-time signals). */
 #ifdef __KOS__
+/* NOTE: I  would have loved to assign a  dedicated signal number for SIGRPC, but
+ *       sadly KOS RPCs are kos-specific (who would'a thunk?), and signal numbers
+ *       must be kept such that binary linux compatibility is maintained, meaning
+ *       I can't add any new ones :(
+ * `SIGURG' was chosen as the aliased signal for the simple reason that this
+ * signal  has a default  disposition of `SIG_IGN'  (not that signal actions
+ * matter for RPC signals, but I  feel like a default `SIG_IGN'  disposition
+ * is the best fit for RPCs) */
 #define __SIGRPC    __SIGURG  /* Default signal number used for <kos/rpc.h> */
 #endif /* __KOS__ */
 

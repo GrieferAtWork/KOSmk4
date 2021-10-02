@@ -47,6 +47,8 @@ __SYSDECL_BEGIN
  *          It may be changed without notice, get removed, or changed in other
  *          ways  that may break  existing code using it.  - Use with caution! */
 #if __SIZEOF_POINTER__ < 8
+/* FIXME: `__KSYSCTL_PAD_POINTER' in its current design only works on little-endian architectures! */
+/* FIXME: `__KSYSCTL_PAD_POINTER' isn't required on platforms that don't have a compatibility mode (iow: anything that isn't i386) */
 #define __KSYSCTL_PAD_POINTER(name) __uint32_t name;
 #else /* __SIZEOF_POINTER__ < 8 */
 #define __KSYSCTL_PAD_POINTER(name) /* nothing */

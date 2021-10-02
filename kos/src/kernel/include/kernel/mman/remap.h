@@ -108,7 +108,7 @@ struct mman;
  *         from the given range map linearly to virtual addresses).
  *     action:
  *       - When `new_size <= old_size', unmap trailing pages. For this purpose,
- *         all  pages touches by `old_address...+=new_size' will remain mapped.
+ *         all  pages touched by `old_address...+=new_size' will remain mapped.
  *         When `MREMAP_FIXED'  is given,  all of  the remaining  mappings  are
  *         moved  over  to `new_address...+=new_size',  and  `new_address' will
  *         be returned. Otherwise, `old_address' will be re-returned.
@@ -127,16 +127,16 @@ struct mman;
  * @param: old_size:    The size of the already-existing mapping (at `old_address')
  *                      Set  to  zero  for  duplication  of  PROT_SHARED  mappings.
  * @param: new_size:    The size of the to-be returned mapping.
- * @param: flags:       Set of `MREMAP_MAYMOVE | MREMAP_FIXED | MREMAP_32BIT | MREMAP_GROWSDOWN |
- *                      MREMAP_GROWSUP  |  MREMAP_STACK  |  MREMAP_POPULATE  |  MREMAP_NONBLOCK |
- *                      MREMAP_FIXED_NOREPLACE | MREMAP_NOASLR'
+ * @param: flags:       Set of `MREMAP_MAYMOVE | MREMAP_FIXED | MREMAP_32BIT | MREMAP_GROWSDOWN  |
+ *                      MREMAP_GROWSUP | MREMAP_STACK | MREMAP_POPULATE | MREMAP_FIXED_NOREPLACE |
+ *                      MREMAP_NOASLR'
  * @param: new_address: When `MREMAP_FIXED' is given: the new address of the mapping.
  * @throws: E_SEGFAULT_UNMAPPED: No mapping (or a kernel-mapping) at `old_address'
- * @throws: *:E_INVALID_ARGUMENT_CONTEXT_MREMAP_NEW_SIZE:            `new_size == 0'
- * @throws: *:E_INVALID_ARGUMENT_CONTEXT_MREMAP_FIXED_NO_MAYMOVE:    `MREMAP_FIXED' w/o `MREMAP_MAYMOVE'
- * @throws: *:E_INVALID_ARGUMENT_CONTEXT_MREMAP_NEW_ADDRESS:         `new_address & PAGEMASK != old_address & PAGEMASK'
- * @throws: *:E_INVALID_ARGUMENT_CONTEXT_MREMAP_OLDSZ0_NO_MAYMOVE:   `old_size == 0 && !MREMAP_MAYMOVE'
- * @throws: *:E_INVALID_ARGUMENT_CONTEXT_MREMAP_OLDSZ0_NOT_SHARABLE: Mapping at `old_address' isn't `PROT_SHARED' */
+ * @throws: *:E_INVALID_ARGUMENT_CONTEXT_MREMAP_NEW_SIZE:             `new_size == 0'
+ * @throws: *:E_INVALID_ARGUMENT_CONTEXT_MREMAP_FIXED_NO_MAYMOVE:     `MREMAP_FIXED' w/o `MREMAP_MAYMOVE'
+ * @throws: *:E_INVALID_ARGUMENT_CONTEXT_MREMAP_NEW_ADDRESS:          `new_address & PAGEMASK != old_address & PAGEMASK'
+ * @throws: *:E_INVALID_ARGUMENT_CONTEXT_MREMAP_OLDSZ0_NO_MAYMOVE:    `old_size == 0 && !MREMAP_MAYMOVE'
+ * @throws: *:E_INVALID_ARGUMENT_CONTEXT_MREMAP_OLDSZ0_NOT_SHAREABLE: Mapping at `old_address' isn't `PROT_SHARED' */
 FUNDEF NONNULL((1)) void *KCALL
 mman_remap(struct mman *__restrict self, UNCHECKED void *old_address,
            size_t old_size, size_t new_size, unsigned int flags,

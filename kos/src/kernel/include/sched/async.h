@@ -204,7 +204,7 @@ struct async {
 	                                       * jobs whenever one of them becomes ready. */
 #endif /* !__WANT_ASYNC__a_lockop */
 	LIST_ENTRY(REF async)      a_all;     /* [0..1][lock(async_all_lock)] Entry in the list of all async jobs. */
-	SLIST_ENTRY(REF async)     a_ready;   /* [lock(ATOMIC)] List of ready jobs. */
+	SLIST_ENTRY(REF async)     a_ready;   /* [0..1][lock(ATOMIC)] List of ready jobs. */
 	WEAK struct aio_handle    *a_aio;     /* [0..1][lock(CLEAR_ONCE)] Attached AIO and job cancellation indicator. */
 	LIST_ENTRY(REF async)      a_tmolnk;  /* [0..1][lock(INTERN)]
 	                                       * [valid_if(_ASYNC_ST_READY_TMO || _ASYNC_ST_DELTMO ||
@@ -212,7 +212,7 @@ struct async {
 	                                       * Link entry in the list of async jobs w/ timeouts. */
 	union {
 		ktime_t                a_tmo;     /* [lock(INTERN)][valid_if(_ASYNC_ST_READY_TMO || _ASYNC_ST_SLEEPING)]
-	                                       * Timeout of this job. */
+		                                   * Timeout of this job. */
 		struct lockop         _a_tmolockop;     /* ... */
 		struct postlockop     _a_tmopostlockop; /* ... */
 	};
