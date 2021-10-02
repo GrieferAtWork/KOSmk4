@@ -1522,7 +1522,7 @@ DEFINE_SYSCALL6(ssize_t, epoll_pwait,
 		(void)sigsetsize;
 
 		/* Send an RPC to ourselves, so we can gain access to the user-space register state. */
-		task_rpc_exec(THIS_TASK, RPC_CONTEXT_KERN | RPC_SYNCMODE_F_USER, &sys_epoll_pwait_rpc, NULL);
+		task_rpc_userunwind(&sys_epoll_pwait_rpc, NULL);
 		__builtin_unreachable();
 	} else {
 		result = sys_epoll_wait(epfd, events, maxevents, timeout);

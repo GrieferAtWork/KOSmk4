@@ -114,12 +114,15 @@ typedef __ATTR_NONNULL((1)) void
 @@multi-arch  platforms (such as  x86), the register numbers,  as well as the
 @@address size used by `program' depend on the execution mode of `target_tid'
 @@
-@@@param: target_tid: The TID of the targeted thread
-@@@param: mode:       One of  `RPC_SYNCMODE_*', or'd  with
-@@                    one of `RPC_SYSRESTART_*', or'd with
-@@                    one of `RPC_PRIORITY_*'
-@@@param: program:    The RPC program to execute (sequences of `RPC_OP_*')
-@@@param: params:     RPC program parameters (for `RPC_OP_push_param')
+@@@param: target_tid:      The TID of the targeted thread
+@@@param: mode:            One of  `RPC_SYNCMODE_*', optionally or'd  with
+@@                         one of `RPC_SYSRESTART_*', optionally or'd with
+@@                         one of  `RPC_PRIORITY_*', optionally or'd  with
+@@                         one of  `RPC_DOMAIN_*',  optionally  or'd  with
+@@                         one of `RPC_JOIN_*'
+@@@param: program:         The RPC program to execute (sequences of `RPC_OP_*')
+@@@param: params:          RPC program parameters (for `RPC_OP_push_param')
+@@@param: max_param_count: The max # of `params' used by `program'
 @@
 @@@return: 0 :                Success
 @@@throws: E_SEGFAULT:        Faulty pointers were given
@@ -139,7 +142,8 @@ typedef __ATTR_NONNULL((1)) void
 @@                            the RPC program finished.
 int rpc_schedule($pid_t target_tid, unsigned int mode,
                  [[nonnull]] void const *program,
-                 void const *const *params);
+                 [[inp_opt(max_param_count)]] void const *const *params,
+                 size_t max_param_count);
 
 
 @@>> rpc_serve(2)
@@ -158,11 +162,17 @@ int rpc_schedule($pid_t target_tid, unsigned int mode,
 @@The RPC will modify  the target thread's register  state such that `func'  will
 @@be executed before  (upon its  return), execution resumes  within that  thread.
 @@How/when exactly the RPC is served depends on the given `mode'.
+@@WARNING: Unless special conditions are met, trying to use this function to send
+@@         an RPC to another process  (read: different mman), will probably  fail
+@@         due  to the address  of `func' mapping to  a different location within
+@@         that other process.
 @@
 @@@param: target_tid: The TID of the targeted thread
-@@@param: mode:       One of  `RPC_SYNCMODE_*', or'd  with
-@@                    one of `RPC_SYSRESTART_*', or'd with
-@@                    one of `RPC_PRIORITY_*'
+@@@param: mode:       One of  `RPC_SYNCMODE_*', optionally or'd  with
+@@                    one of `RPC_SYSRESTART_*', optionally or'd with
+@@                    one of  `RPC_PRIORITY_*', optionally or'd  with
+@@                    one of  `RPC_DOMAIN_*',  optionally  or'd  with
+@@                    one of `RPC_JOIN_*'
 @@@return: 0 :                Success
 @@@return: -1: [errno=ESRCH]  The  target thread has already terminated, or
 @@                            doesn't exist.  Note though  that unless  the
@@ -170,7 +180,8 @@ int rpc_schedule($pid_t target_tid, unsigned int mode,
 @@                            still many  reasons outside  of your  control
 @@                            for why  it may  terminate immediately  after
 @@                            the RPC program finished.
-int rpc_exec($pid_t target_tid, unsigned int mode, prpc_exec_callback_t func, void *cookie);
+int rpc_exec($pid_t target_tid, unsigned int mode,
+             [[nonnull]] prpc_exec_callback_t func, void *cookie);
 
 
 @@>> rpc_interrupt(3)
@@ -184,9 +195,11 @@ int rpc_exec($pid_t target_tid, unsigned int mode, prpc_exec_callback_t func, vo
 @@given `target_tid == gettid()'.
 @@
 @@@param: target_tid: The TID of the targeted thread
-@@@param: mode:       One of  `RPC_SYNCMODE_*', or'd  with
-@@                    one of `RPC_SYSRESTART_*', or'd with
-@@                    one of `RPC_PRIORITY_*'
+@@@param: mode:       One of  `RPC_SYNCMODE_*', optionally or'd  with
+@@                    one of `RPC_SYSRESTART_*', optionally or'd with
+@@                    one of  `RPC_PRIORITY_*', optionally or'd  with
+@@                    one of  `RPC_DOMAIN_*',  optionally  or'd  with
+@@                    one of `RPC_JOIN_*'
 @@@return: 0 :               Success
 @@@return: -1: [errno=ESRCH] The  target thread has already terminated, or
 @@                           doesn't exist.  Note though  that unless  the
@@ -207,7 +220,8 @@ int rpc_interrupt($pid_t target_tid, unsigned int mode);
 [[throws, doc_alias("rpc_schedule")]]
 void RpcSchedule($pid_t target_tid, unsigned int mode,
                  [[nonnull]] void const *program,
-                 void const *const *params);
+                 [[inp_opt(max_param_count)]] void const *const *params,
+                 size_t max_param_count);
 
 [[throws, doc_alias("rpc_exec")]]
 void RpcExec($pid_t target_tid, unsigned int mode,

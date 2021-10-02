@@ -380,13 +380,11 @@ DEFINE_SYSCALL2(errno_t, debugtrap,
 	(void)reason;
 	if (kernel_debugtrap_enabled()) {
 		/* Send an RPC to ourself, so we can gain access to the user-space register state. */
-		task_rpc_exec(THIS_TASK, RPC_CONTEXT_KERN | RPC_SYNCMODE_F_USER,
 #ifdef __x86_64__
-		              &sys_debugtrap_rpc64,
+		task_rpc_userunwind(&sys_debugtrap_rpc64, NULL);
 #else  /* __x86_64__ */
-		              &sys_debugtrap_rpc32,
+		task_rpc_userunwind(&sys_debugtrap_rpc32, NULL);
 #endif /* !__x86_64__ */
-		              NULL);
 	}
 	return -ENOENT;
 }
@@ -400,8 +398,7 @@ DEFINE_SYSCALL32_2(errno_t, debugtrap,
 	(void)reason;
 	if (kernel_debugtrap_enabled()) {
 		/* Send an RPC to ourself, so we can gain access to the user-space register state. */
-		task_rpc_exec(THIS_TASK, RPC_CONTEXT_KERN | RPC_SYNCMODE_F_USER,
-		              &sys_debugtrap_rpc32, NULL);
+		task_rpc_userunwind(&sys_debugtrap_rpc32, NULL);
 	}
 	return -ENOENT;
 }

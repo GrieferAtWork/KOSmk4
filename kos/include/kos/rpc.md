@@ -339,7 +339,7 @@ make_inactive:
 			}
 			/* Execute the program associated with this RPC */
 			TRY {
-				ctx.rc_state = task_userrpc_runprogram(ctx.rc_state, &rpc->pr_user,
+				ctx.rc_state = task_userrpc_runprogram(ctx.rc_state, rpc,
 				                                       user_rpc_reason, &ctx.rc_scinfo);
 			} EXCEPT {
 				/* Prioritize errors. */
@@ -350,8 +350,7 @@ make_inactive:
 			/* User-space RPCs are _always_ required (or at least expected) to
 			 * restart system calls, meaning that */
 			ctx.rc_context = RPC_REASONCTX_SYSRET;
-			pending_user_rpc_fini(&rpc->pr_user);
-			pending_rpc_free(rpc);
+			decref(&rpc->pr_user);
 		}
 	}
 
@@ -858,7 +857,7 @@ DEFINE_SYSCALL2(errno_t, rt_sigsuspend,
 	(void)sigsetsize;
 
 	/* Send an RPC to ourselves, so we can gain access to the user-space register state. */
-	task_rpc_exec(THIS_TASK, RPC_CONTEXT_KERN | RPC_SYNCMODE_F_USER, &sys_rt_sigsuspend_rpc, NULL);
+	task_rpc_userunwind(&sys_rt_sigsuspend_rpc, NULL);
 	__builtin_unreachable();
 }
 ```

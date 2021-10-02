@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfc347ee1 */
+/* HASH CRC-32:0x136c030d */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -930,6 +930,7 @@
 #define __NR64AN1_rpc_schedule             mode
 #define __NR64AN2_rpc_schedule             program
 #define __NR64AN3_rpc_schedule             params
+#define __NR64AN4_rpc_schedule             max_param_count
 #define __NR64AN0_frealpathat              dirfd
 #define __NR64AN1_frealpathat              filename
 #define __NR64AN2_frealpathat              buf
@@ -2264,6 +2265,7 @@
 #define __NR64ATR2_kreaddir                 SC_REPR_SIZE_T                                                       /* bufsize */ 
 #define __NR64ATR3_kreaddir                 SC_REPR_KREADDIR_MODE                                                /* mode */ 
 #define __NR64RTR_kreaddir                  SC_REPR_SSIZE_T                                                      /* return */
+#define __NR64RTR_rpc_serve_sysret          SC_REPR_ERRNO_T                                                      /* return */
 #define __NR64ATR0_set_userprocmask_address SC_REPR_POINTER                                                      /* ctl */ 
 #define __NR64RTR_set_userprocmask_address  SC_REPR_ERRNO_T                                                      /* return */
 #define __NR64RTR_rtm_test                  SC_REPR_SYSCALL_ULONG_T                                              /* return */
@@ -2311,7 +2313,7 @@
 #define __NR64ATR3_lfutex                   SC_REPR_STRUCT_TIMESPECX64                                           /* timeout */ 
 #define __NR64ATR4_lfutex                   SC_REPR_UINT64_T                                                     /* val2 */ 
 #define __NR64RTR_lfutex                    SC_REPR_SYSCALL_SLONG_T                                              /* return */
-#define __NR64RTR_rpc_serve                 SC_REPR_SYSCALL_SLONG_T                                              /* return */
+#define __NR64RTR_rpc_serve                 SC_REPR_ERRNO_T                                                      /* return */
 #define __NR64ATR0_debugtrap                SC_REPR_STRUCT_UCPUSTATE64                                           /* state */ 
 #define __NR64ATR1_debugtrap                SC_REPR_STRUCT_DEBUGTRAP_REASON64                                    /* reason */ 
 #define __NR64RTR_debugtrap                 SC_REPR_ERRNO_T                                                      /* return */
@@ -2363,7 +2365,9 @@
 #define __NR64ATR0_rpc_schedule             SC_REPR_PID_T                                                        /* target_tid */ 
 #define __NR64ATR1_rpc_schedule             SC_REPR_RPC_SCHEDULE_MODE                                            /* mode */ 
 #define __NR64ATR2_rpc_schedule             SC_REPR_POINTER                                                      /* program */ 
-#define __NR64ATR3_rpc_schedule             SC_REPR_POINTER                                                      /* params */ 
+#define __NR64ATR3_rpc_schedule             SC_REPR_VOID_VECTOR64                                                /* params */ 
+#define __NR64ATL3_rpc_schedule             4                                                                    /* params -> max_param_count */ 
+#define __NR64ATR4_rpc_schedule             SC_REPR_SIZE_T                                                       /* max_param_count */ 
 #define __NR64RTR_rpc_schedule              SC_REPR_ERRNO_T                                                      /* return */
 #define __NR64ATR0_frealpathat              SC_REPR_FD_T                                                         /* dirfd */ 
 #define __NR64ATR1_frealpathat              SC_REPR_FILENAME                                                     /* filename */ 

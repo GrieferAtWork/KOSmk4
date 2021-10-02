@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x54b8dfd9 */
+/* HASH CRC-32:0xdb65457b */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -11678,6 +11678,45 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_kreaddir)
 	.cfi_endproc
 END(__x86_asm64_syscall_kreaddir)
 
+/* >> rpc_serve_sysret(2)
+ * Very similar to `rpc_serve(2)', but with the addition that this one
+ * will only serve RPCs that can be handled in `RPC_REASONCTX_SYSRET',
+ * aka. `RPC_REASONCTX_ASYNC' contexts. Additionally, this system call
+ * ignores the state of the  internal `TASK_FRPC' flag, and should  be
+ * invoked  when  the calling  thread  makes use  of  the userprocmask
+ * mechanism, and the  signal mask became  less restrictive while  the
+ * `USERPROCMASK_FLAG_HASPENDING' flag was set.
+ * @return: 0 : Always, unconditionally returned. */
+/* errno_t rpc_serve_sysret(void) */
+.section .text.x86.asm64_syscall.rpc_serve_sysret
+INTERN_WEAK_FUNCTION(__x86_asm64_syscall_rpc_serve_sysret)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm64_syscall
+	.cfi_lsda 0, 0xffffffffffffffdb
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	EXTERN(sys_rpc_serve_sysret)
+	call   sys_rpc_serve_sysret
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	X86_IRET_BUT_PREFER_SYSRET64
+	.cfi_endproc
+END(__x86_asm64_syscall_rpc_serve_sysret)
+
 /* Register the address of  the calling thread's userprocmask  controller.
  * This also  initializes `*ctl->pm_sigmask'  and `ctl->pm_pending',  such
  * that `*ctl->pm_sigmask' is filled with the current kernel-level  signal
@@ -12235,13 +12274,9 @@ END(__x86_asm64_syscall_lfutex)
  * and may be used to implement `pthread_testcancel(3)' (should KOS
  * RPCs be used to facility pthread cancellation points, as done by
  * KOS's builtin libc)
- * This syscall must also be invoked when the calling thread makes
- * use of the userprocmask mechanism,  and the signal mask  became
- * less restrictive while the `USERPROCMASK_FLAG_HASPENDING'  flag
- * was set.
  * @return: 0:      Nothing was handled.
  * @return: -EINTR: RPCs (or posix signals) were handled. */
-/* syscall_slong_t rpc_serve(void) */
+/* errno_t rpc_serve(void) */
 .section .text.x86.asm64_syscall.rpc_serve
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_rpc_serve)
 	.cfi_startproc simple
@@ -12607,12 +12642,15 @@ END(__x86_asm64_syscall_openpty)
  * multi-arch  platforms (such as  x86), the register numbers,  as well as the
  * address size used by `program' depend on the execution mode of `target_tid'
  * 
- * @param: target_tid: The TID of the targeted thread
- * @param: mode:       One of  `RPC_SYNCMODE_*', or'd  with
- *                     one of `RPC_SYSRESTART_*', or'd with
- *                     one of `RPC_PRIORITY_*'
- * @param: program:    The RPC program to execute (sequences of `RPC_OP_*')
- * @param: params:     RPC program parameters (for `RPC_OP_push_param')
+ * @param: target_tid:      The TID of the targeted thread
+ * @param: mode:            One of  `RPC_SYNCMODE_*', optionally or'd  with
+ *                          one of `RPC_SYSRESTART_*', optionally or'd with
+ *                          one of  `RPC_PRIORITY_*', optionally or'd  with
+ *                          one of  `RPC_DOMAIN_*',  optionally  or'd  with
+ *                          one of `RPC_JOIN_*'
+ * @param: program:         The RPC program to execute (sequences of `RPC_OP_*')
+ * @param: params:          RPC program parameters (for `RPC_OP_push_param')
+ * @param: max_param_count: The max # of `params' used by `program'
  * 
  * @return: 0 :                Success
  * @throws: E_SEGFAULT:        Faulty pointers were given
@@ -12630,7 +12668,7 @@ END(__x86_asm64_syscall_openpty)
  *                             still many reasons  outside of your  control
  *                             for why it  may terminate immediately  after
  *                             the RPC program finished. */
-/* errno_t rpc_schedule(pid_t target_tid, syscall_ulong_t mode, void const *program, __HYBRID_PTR64(void const) const *params) */
+/* errno_t rpc_schedule(pid_t target_tid, syscall_ulong_t mode, void const *program, __HYBRID_PTR64(void const) const *params, size_t max_param_count) */
 .section .text.x86.asm64_syscall.rpc_schedule
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_rpc_schedule)
 	.cfi_startproc simple
@@ -28372,13 +28410,9 @@ END(__x86_asm32_int80_nanosleep64)
  * and may be used to implement `pthread_testcancel(3)' (should KOS
  * RPCs be used to facility pthread cancellation points, as done by
  * KOS's builtin libc)
- * This syscall must also be invoked when the calling thread makes
- * use of the userprocmask mechanism,  and the signal mask  became
- * less restrictive while the `USERPROCMASK_FLAG_HASPENDING'  flag
- * was set.
  * @return: 0:      Nothing was handled.
  * @return: -EINTR: RPCs (or posix signals) were handled. */
-/* syscall_slong_t rpc_serve(void) */
+/* errno_t rpc_serve(void) */
 .section .text.x86.asm32_syscall_int80.rpc_serve
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_rpc_serve)
 	.cfi_startproc simple
@@ -29099,6 +29133,45 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_ftime64)
 	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_ftime64)
+
+/* >> rpc_serve_sysret(2)
+ * Very similar to `rpc_serve(2)', but with the addition that this one
+ * will only serve RPCs that can be handled in `RPC_REASONCTX_SYSRET',
+ * aka. `RPC_REASONCTX_ASYNC' contexts. Additionally, this system call
+ * ignores the state of the  internal `TASK_FRPC' flag, and should  be
+ * invoked  when  the calling  thread  makes use  of  the userprocmask
+ * mechanism, and the  signal mask became  less restrictive while  the
+ * `USERPROCMASK_FLAG_HASPENDING' flag was set.
+ * @return: 0 : Always, unconditionally returned. */
+/* errno_t rpc_serve_sysret(void) */
+.section .text.x86.asm32_syscall_int80.rpc_serve_sysret
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_rpc_serve_sysret)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0xffffffdf
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	EXTERN(sys32_rpc_serve_sysret)
+	call   sys32_rpc_serve_sysret
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit
+	.cfi_endproc
+END(__x86_asm32_int80_rpc_serve_sysret)
 
 /* Register the address of  the calling thread's userprocmask  controller.
  * This also  initializes `*ctl->pm_sigmask'  and `ctl->pm_pending',  such
@@ -29875,12 +29948,15 @@ END(__x86_asm32_int80_openpty)
  * multi-arch  platforms (such as  x86), the register numbers,  as well as the
  * address size used by `program' depend on the execution mode of `target_tid'
  * 
- * @param: target_tid: The TID of the targeted thread
- * @param: mode:       One of  `RPC_SYNCMODE_*', or'd  with
- *                     one of `RPC_SYSRESTART_*', or'd with
- *                     one of `RPC_PRIORITY_*'
- * @param: program:    The RPC program to execute (sequences of `RPC_OP_*')
- * @param: params:     RPC program parameters (for `RPC_OP_push_param')
+ * @param: target_tid:      The TID of the targeted thread
+ * @param: mode:            One of  `RPC_SYNCMODE_*', optionally or'd  with
+ *                          one of `RPC_SYSRESTART_*', optionally or'd with
+ *                          one of  `RPC_PRIORITY_*', optionally or'd  with
+ *                          one of  `RPC_DOMAIN_*',  optionally  or'd  with
+ *                          one of `RPC_JOIN_*'
+ * @param: program:         The RPC program to execute (sequences of `RPC_OP_*')
+ * @param: params:          RPC program parameters (for `RPC_OP_push_param')
+ * @param: max_param_count: The max # of `params' used by `program'
  * 
  * @return: 0 :                Success
  * @throws: E_SEGFAULT:        Faulty pointers were given
@@ -29898,7 +29974,7 @@ END(__x86_asm32_int80_openpty)
  *                             still many reasons  outside of your  control
  *                             for why it  may terminate immediately  after
  *                             the RPC program finished. */
-/* errno_t rpc_schedule(pid_t target_tid, syscall_ulong_t mode, void const *program, __HYBRID_PTR32(void const) const *params) */
+/* errno_t rpc_schedule(pid_t target_tid, syscall_ulong_t mode, void const *program, __HYBRID_PTR32(void const) const *params, size_t max_param_count) */
 .section .text.x86.asm32_syscall_int80.rpc_schedule
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_rpc_schedule)
 	.cfi_startproc simple
@@ -29914,11 +29990,12 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_rpc_schedule)
 	pushq_cfi_r %r9
 	pushq_cfi_r %r10
 	pushq_cfi_r %r11
-	movzlq %ebx, %rdi /* ARG0 = REG0 */
+	movzlq %edi, %r8 /* ARG4 = REG4 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	movzlq %esi, %rsi /* ARG1 = REG3 */
 	movzlq %ecx, %rcx /* ARG3 = REG1 */
 	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
+	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_rpc_schedule)
 	call   sys32_rpc_schedule
 	popq_cfi_r %r11
@@ -34182,13 +34259,9 @@ DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_nanosleep64, __x86_asm32_int80_nan
  * and may be used to implement `pthread_testcancel(3)' (should KOS
  * RPCs be used to facility pthread cancellation points, as done by
  * KOS's builtin libc)
- * This syscall must also be invoked when the calling thread makes
- * use of the userprocmask mechanism,  and the signal mask  became
- * less restrictive while the `USERPROCMASK_FLAG_HASPENDING'  flag
- * was set.
  * @return: 0:      Nothing was handled.
  * @return: -EINTR: RPCs (or posix signals) were handled. */
-/* syscall_slong_t rpc_serve(void) */
+/* errno_t rpc_serve(void) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_rpc_serve, __x86_asm32_int80_rpc_serve)
 
 /* syscall_slong_t ksysctl(syscall_ulong_t command, void *arg) */
@@ -34377,6 +34450,18 @@ DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_rtm_begin, __x86_asm32_int80_rtm_b
 
 /* errno_t ftime64(struct timebx32_64 *tp) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_ftime64, __x86_asm32_int80_ftime64)
+
+/* >> rpc_serve_sysret(2)
+ * Very similar to `rpc_serve(2)', but with the addition that this one
+ * will only serve RPCs that can be handled in `RPC_REASONCTX_SYSRET',
+ * aka. `RPC_REASONCTX_ASYNC' contexts. Additionally, this system call
+ * ignores the state of the  internal `TASK_FRPC' flag, and should  be
+ * invoked  when  the calling  thread  makes use  of  the userprocmask
+ * mechanism, and the  signal mask became  less restrictive while  the
+ * `USERPROCMASK_FLAG_HASPENDING' flag was set.
+ * @return: 0 : Always, unconditionally returned. */
+/* errno_t rpc_serve_sysret(void) */
+DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_rpc_serve_sysret, __x86_asm32_int80_rpc_serve_sysret)
 
 /* Register the address of  the calling thread's userprocmask  controller.
  * This also  initializes `*ctl->pm_sigmask'  and `ctl->pm_pending',  such
@@ -34793,12 +34878,15 @@ END(__x86_asm32_sysenter_openpty)
  * multi-arch  platforms (such as  x86), the register numbers,  as well as the
  * address size used by `program' depend on the execution mode of `target_tid'
  * 
- * @param: target_tid: The TID of the targeted thread
- * @param: mode:       One of  `RPC_SYNCMODE_*', or'd  with
- *                     one of `RPC_SYSRESTART_*', or'd with
- *                     one of `RPC_PRIORITY_*'
- * @param: program:    The RPC program to execute (sequences of `RPC_OP_*')
- * @param: params:     RPC program parameters (for `RPC_OP_push_param')
+ * @param: target_tid:      The TID of the targeted thread
+ * @param: mode:            One of  `RPC_SYNCMODE_*', optionally or'd  with
+ *                          one of `RPC_SYSRESTART_*', optionally or'd with
+ *                          one of  `RPC_PRIORITY_*', optionally or'd  with
+ *                          one of  `RPC_DOMAIN_*',  optionally  or'd  with
+ *                          one of `RPC_JOIN_*'
+ * @param: program:         The RPC program to execute (sequences of `RPC_OP_*')
+ * @param: params:          RPC program parameters (for `RPC_OP_push_param')
+ * @param: max_param_count: The max # of `params' used by `program'
  * 
  * @return: 0 :                Success
  * @throws: E_SEGFAULT:        Faulty pointers were given
@@ -34816,8 +34904,41 @@ END(__x86_asm32_sysenter_openpty)
  *                             still many reasons  outside of your  control
  *                             for why it  may terminate immediately  after
  *                             the RPC program finished. */
-/* errno_t rpc_schedule(pid_t target_tid, syscall_ulong_t mode, void const *program, __HYBRID_PTR32(void const) const *params) */
-DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_rpc_schedule, __x86_asm32_int80_rpc_schedule)
+/* errno_t rpc_schedule(pid_t target_tid, syscall_ulong_t mode, void const *program, __HYBRID_PTR32(void const) const *params, size_t max_param_count) */
+.section .text.x86.asm32_syscall_sysenter.rpc_schedule
+INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_rpc_schedule)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
+	.cfi_lsda 0, 0xfffffff7
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movzlq 0(%ebp), %r8 /* ARG4 = 0(%ebp) */
+	movzlq %edx, %rdx /* ARG2 = REG2 */
+	movzlq %esi, %rsi /* ARG1 = REG3 */
+	movzlq %ecx, %rcx /* ARG3 = REG1 */
+	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
+	movzlq %ebx, %rdi /* ARG0 = REG0 */
+	EXTERN(sys32_rpc_schedule)
+	call   sys32_rpc_schedule
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	X86_IRET_BUT_PREFER_SYSRET32
+	.cfi_endproc
+END(__x86_asm32_sysenter_rpc_schedule)
 
 /* Returns  the  absolute   filesystem  path  for   the  specified   file
  * When `AT_SYMLINK_NOFOLLOW' is given, a final symlink is  dereferenced,
@@ -40518,13 +40639,9 @@ END(__x86_asm32_sysrun32_nanosleep64)
  * and may be used to implement `pthread_testcancel(3)' (should KOS
  * RPCs be used to facility pthread cancellation points, as done by
  * KOS's builtin libc)
- * This syscall must also be invoked when the calling thread makes
- * use of the userprocmask mechanism,  and the signal mask  became
- * less restrictive while the `USERPROCMASK_FLAG_HASPENDING'  flag
- * was set.
  * @return: 0:      Nothing was handled.
  * @return: -EINTR: RPCs (or posix signals) were handled. */
-/* syscall_slong_t rpc_serve(void) */
+/* errno_t rpc_serve(void) */
 /* DEFINE_INTERN_ALIAS(__x86_asm32_sysrun32_rpc_serve, sys32_rpc_serve); */
 
 /* syscall_slong_t ksysctl(syscall_ulong_t command, void *arg) */
@@ -40792,6 +40909,18 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_ftime64)
 	jmp    sys32_ftime64
 	.cfi_endproc
 END(__x86_asm32_sysrun32_ftime64)
+
+/* >> rpc_serve_sysret(2)
+ * Very similar to `rpc_serve(2)', but with the addition that this one
+ * will only serve RPCs that can be handled in `RPC_REASONCTX_SYSRET',
+ * aka. `RPC_REASONCTX_ASYNC' contexts. Additionally, this system call
+ * ignores the state of the  internal `TASK_FRPC' flag, and should  be
+ * invoked  when  the calling  thread  makes use  of  the userprocmask
+ * mechanism, and the  signal mask became  less restrictive while  the
+ * `USERPROCMASK_FLAG_HASPENDING' flag was set.
+ * @return: 0 : Always, unconditionally returned. */
+/* errno_t rpc_serve_sysret(void) */
+/* DEFINE_INTERN_ALIAS(__x86_asm32_sysrun32_rpc_serve_sysret, sys32_rpc_serve_sysret); */
 
 /* Register the address of  the calling thread's userprocmask  controller.
  * This also  initializes `*ctl->pm_sigmask'  and `ctl->pm_pending',  such
@@ -41200,12 +41329,15 @@ END(__x86_asm32_sysrun32_openpty)
  * multi-arch  platforms (such as  x86), the register numbers,  as well as the
  * address size used by `program' depend on the execution mode of `target_tid'
  * 
- * @param: target_tid: The TID of the targeted thread
- * @param: mode:       One of  `RPC_SYNCMODE_*', or'd  with
- *                     one of `RPC_SYSRESTART_*', or'd with
- *                     one of `RPC_PRIORITY_*'
- * @param: program:    The RPC program to execute (sequences of `RPC_OP_*')
- * @param: params:     RPC program parameters (for `RPC_OP_push_param')
+ * @param: target_tid:      The TID of the targeted thread
+ * @param: mode:            One of  `RPC_SYNCMODE_*', optionally or'd  with
+ *                          one of `RPC_SYSRESTART_*', optionally or'd with
+ *                          one of  `RPC_PRIORITY_*', optionally or'd  with
+ *                          one of  `RPC_DOMAIN_*',  optionally  or'd  with
+ *                          one of `RPC_JOIN_*'
+ * @param: program:         The RPC program to execute (sequences of `RPC_OP_*')
+ * @param: params:          RPC program parameters (for `RPC_OP_push_param')
+ * @param: max_param_count: The max # of `params' used by `program'
  * 
  * @return: 0 :                Success
  * @throws: E_SEGFAULT:        Faulty pointers were given
@@ -41223,10 +41355,11 @@ END(__x86_asm32_sysrun32_openpty)
  *                             still many reasons  outside of your  control
  *                             for why it  may terminate immediately  after
  *                             the RPC program finished. */
-/* errno_t rpc_schedule(pid_t target_tid, syscall_ulong_t mode, void const *program, __HYBRID_PTR32(void const) const *params) */
+/* errno_t rpc_schedule(pid_t target_tid, syscall_ulong_t mode, void const *program, __HYBRID_PTR32(void const) const *params, size_t max_param_count) */
 .section .text.x86.asm32_syscall_sysrun32.rpc_schedule
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_rpc_schedule)
 	.cfi_startproc
+	movzlq 32(%rdi), %r8
 	movzlq 24(%rdi), %rcx
 	movzlq 16(%rdi), %rdx
 	movzlq 8(%rdi), %rsi

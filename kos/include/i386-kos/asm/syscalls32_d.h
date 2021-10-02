@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3d6e326f */
+/* HASH CRC-32:0x4679811b */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1125,13 +1125,9 @@
  * and may be used to implement `pthread_testcancel(3)' (should KOS
  * RPCs be used to facility pthread cancellation points, as done by
  * KOS's builtin libc)
- * This syscall must also be invoked when the calling thread makes
- * use of the userprocmask mechanism,  and the signal mask  became
- * less restrictive while the `USERPROCMASK_FLAG_HASPENDING'  flag
- * was set.
  * @return: 0:      Nothing was handled.
  * @return: -EINTR: RPCs (or posix signals) were handled. */
-#define __NR32_rpc_serve                    __UINT32_C(0xffffff62) /* syscall_slong_t rpc_serve(void) */
+#define __NR32_rpc_serve                    __UINT32_C(0xffffff62) /* errno_t rpc_serve(void) */
 #define __NR32_ksysctl                      __UINT32_C(0xffffff6b) /* syscall_slong_t ksysctl(syscall_ulong_t command, void *arg) */
 /* Same as `write(2)', but rather than specifying a single, continuous buffer,
  * write  data from `count'  separate buffers, though  still return the actual
@@ -1215,6 +1211,16 @@
  * @return: RTM_ABORT_* : RTM operation failed (s.a. code from `<kos/rtm.h>') */
 #define __NR32_rtm_begin                    __UINT32_C(0xffffffd0) /* rtm_status_t rtm_begin(void) */
 #define __NR32_ftime64                      __UINT32_C(0xffffffdd) /* errno_t ftime64(struct timebx32_64 *tp) */
+/* >> rpc_serve_sysret(2)
+ * Very similar to `rpc_serve(2)', but with the addition that this one
+ * will only serve RPCs that can be handled in `RPC_REASONCTX_SYSRET',
+ * aka. `RPC_REASONCTX_ASYNC' contexts. Additionally, this system call
+ * ignores the state of the  internal `TASK_FRPC' flag, and should  be
+ * invoked  when  the calling  thread  makes use  of  the userprocmask
+ * mechanism, and the  signal mask became  less restrictive while  the
+ * `USERPROCMASK_FLAG_HASPENDING' flag was set.
+ * @return: 0 : Always, unconditionally returned. */
+#define __NR32_rpc_serve_sysret             __UINT32_C(0xffffffdf) /* errno_t rpc_serve_sysret(void) */
 /* Register the address of  the calling thread's userprocmask  controller.
  * This also  initializes `*ctl->pm_sigmask'  and `ctl->pm_pending',  such
  * that `*ctl->pm_sigmask' is filled with the current kernel-level  signal
@@ -1429,12 +1435,15 @@
  * multi-arch  platforms (such as  x86), the register numbers,  as well as the
  * address size used by `program' depend on the execution mode of `target_tid'
  * 
- * @param: target_tid: The TID of the targeted thread
- * @param: mode:       One of  `RPC_SYNCMODE_*', or'd  with
- *                     one of `RPC_SYSRESTART_*', or'd with
- *                     one of `RPC_PRIORITY_*'
- * @param: program:    The RPC program to execute (sequences of `RPC_OP_*')
- * @param: params:     RPC program parameters (for `RPC_OP_push_param')
+ * @param: target_tid:      The TID of the targeted thread
+ * @param: mode:            One of  `RPC_SYNCMODE_*', optionally or'd  with
+ *                          one of `RPC_SYSRESTART_*', optionally or'd with
+ *                          one of  `RPC_PRIORITY_*', optionally or'd  with
+ *                          one of  `RPC_DOMAIN_*',  optionally  or'd  with
+ *                          one of `RPC_JOIN_*'
+ * @param: program:         The RPC program to execute (sequences of `RPC_OP_*')
+ * @param: params:          RPC program parameters (for `RPC_OP_push_param')
+ * @param: max_param_count: The max # of `params' used by `program'
  * 
  * @return: 0 :                Success
  * @throws: E_SEGFAULT:        Faulty pointers were given
@@ -1452,7 +1461,7 @@
  *                             still many reasons  outside of your  control
  *                             for why it  may terminate immediately  after
  *                             the RPC program finished. */
-#define __NR32_rpc_schedule                 __UINT32_C(0xfffffff7) /* errno_t rpc_schedule(pid_t target_tid, syscall_ulong_t mode, void const *program, __HYBRID_PTR32(void const) const *params) */
+#define __NR32_rpc_schedule                 __UINT32_C(0xfffffff7) /* errno_t rpc_schedule(pid_t target_tid, syscall_ulong_t mode, void const *program, __HYBRID_PTR32(void const) const *params, size_t max_param_count) */
 /* Returns  the  absolute   filesystem  path  for   the  specified   file
  * When `AT_SYMLINK_NOFOLLOW' is given, a final symlink is  dereferenced,
  * causing the pointed-to file location to be retrieved. - Otherwise, the
@@ -2095,6 +2104,7 @@
 #define __NR32RM_rtm_end                      0
 #define __NR32RM_rtm_begin                    0
 #define __NR32RM_ftime64                      0
+#define __NR32RM_rpc_serve_sysret             1
 #define __NR32RM_set_userprocmask_address     0
 #define __NR32RM_utime64                      0
 #define __NR32RM_userviofd                    0
@@ -2784,6 +2794,7 @@
 #define __NR32RC_rtm_end                      0
 #define __NR32RC_rtm_begin                    0
 #define __NR32RC_ftime64                      1
+#define __NR32RC_rpc_serve_sysret             0
 #define __NR32RC_set_userprocmask_address     1
 #define __NR32RC_utime64                      2
 #define __NR32RC_userviofd                    2
@@ -2801,7 +2812,7 @@
 #define __NR32RC_time64                       1
 #define __NR32RC_fchdirat                     3
 #define __NR32RC_openpty                      5
-#define __NR32RC_rpc_schedule                 4
+#define __NR32RC_rpc_schedule                 5
 #define __NR32RC_frealpathat                  5
 #define __NR32RC_frealpath4                   4
 #define __NR32RC_getdrives                    0

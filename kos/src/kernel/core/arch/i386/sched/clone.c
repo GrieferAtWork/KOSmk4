@@ -528,7 +528,7 @@ DEFINE_SYSCALL64_5(pid_t, clone,
 	(void)newtls;
 
 	/* Send an RPC to ourselves, so we can gain access to the user-space register state. */
-	task_rpc_exec(THIS_TASK, RPC_CONTEXT_KERN | RPC_SYNCMODE_F_USER, &sys_clone64_rpc, NULL);
+	task_rpc_userunwind(&sys_clone64_rpc, NULL);
 	__builtin_unreachable();
 }
 #else /* CONFIG_USE_NEW_RPC */
@@ -614,7 +614,7 @@ DEFINE_SYSCALL32_5(pid_t, clone,
 	(void)newtls;
 
 	/* Send an RPC to ourselves, so we can gain access to the user-space register state. */
-	task_rpc_exec(THIS_TASK, RPC_CONTEXT_KERN | RPC_SYNCMODE_F_USER, &sys_clone32_rpc, NULL);
+	task_rpc_userunwind(&sys_clone32_rpc, NULL);
 	__builtin_unreachable();
 }
 
@@ -702,7 +702,7 @@ sys_fork_rpc(struct rpc_context *__restrict ctx, void *UNUSED(cookie)) {
 
 DEFINE_SYSCALL0(pid_t, fork) {
 	/* Send an RPC to ourselves, so we can gain access to the user-space register state. */
-	task_rpc_exec(THIS_TASK, RPC_CONTEXT_KERN | RPC_SYNCMODE_F_USER, &sys_fork_rpc, NULL);
+	task_rpc_userunwind(&sys_fork_rpc, NULL);
 	__builtin_unreachable();
 }
 #else /* CONFIG_USE_NEW_RPC */
@@ -766,7 +766,7 @@ sys_vfork_rpc(struct rpc_context *__restrict ctx, void *UNUSED(cookie)) {
 
 DEFINE_SYSCALL0(pid_t, vfork) {
 	/* Send an RPC to ourselves, so we can gain access to the user-space register state. */
-	task_rpc_exec(THIS_TASK, RPC_CONTEXT_KERN | RPC_SYNCMODE_F_USER, &sys_vfork_rpc, NULL);
+	task_rpc_userunwind(&sys_vfork_rpc, NULL);
 	__builtin_unreachable();
 }
 #else /* CONFIG_USE_NEW_RPC */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf08ed0ad */
+/* HASH CRC-32:0x165f6f40 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -506,6 +506,7 @@
 #define __NR32AC_rtm_end                      0
 #define __NR32AC_rtm_begin                    0
 #define __NR32AC_ftime64                      1
+#define __NR32AC_rpc_serve_sysret             0
 #define __NR32AC_set_userprocmask_address     1
 #define __NR32AC_utime64                      2
 #define __NR32AC_userviofd                    2
@@ -523,7 +524,7 @@
 #define __NR32AC_time64                       1
 #define __NR32AC_fchdirat                     3
 #define __NR32AC_openpty                      5
-#define __NR32AC_rpc_schedule                 4
+#define __NR32AC_rpc_schedule                 5
 #define __NR32AC_frealpathat                  5
 #define __NR32AC_frealpath4                   4
 #define __NR32AC_getdrives                    0
@@ -990,7 +991,7 @@
 #define __NR32RT_pwrite64f                    (ssize_t, __ssize_t)
 #define __NR32RT_pread64f                     (ssize_t, __ssize_t)
 #define __NR32RT_nanosleep64                  (errno_t, __errno_t)
-#define __NR32RT_rpc_serve                    (syscall_slong_t, __syscall_slong_t)
+#define __NR32RT_rpc_serve                    (errno_t, __errno_t)
 #define __NR32RT_ksysctl                      (syscall_slong_t, __syscall_slong_t)
 #define __NR32RT_writevf                      (ssize_t, __ssize_t)
 #define __NR32RT_readvf                       (ssize_t, __ssize_t)
@@ -1010,6 +1011,7 @@
 #define __NR32RT_rtm_end                      (errno_t, __errno_t)
 #define __NR32RT_rtm_begin                    (rtm_status_t, __rtm_status_t)
 #define __NR32RT_ftime64                      (errno_t, __errno_t)
+#define __NR32RT_rpc_serve_sysret             (errno_t, __errno_t)
 #define __NR32RT_set_userprocmask_address     (errno_t, __errno_t)
 #define __NR32RT_utime64                      (errno_t, __errno_t)
 #define __NR32RT_userviofd                    (fd_t, __fd_t)
@@ -2166,6 +2168,7 @@
 #define __NR32AT1_rpc_schedule                 (syscall_ulong_t, __syscall_ulong_t)
 #define __NR32AT2_rpc_schedule                 (void const *, void const *)
 #define __NR32AT3_rpc_schedule                 (__HYBRID_PTR32(void const) const *, __HYBRID_PTR32(void const) const *)
+#define __NR32AT4_rpc_schedule                 (size_t, __size_t)
 #define __NR32AT0_frealpathat                  (fd_t, __fd_t)
 #define __NR32AT1_frealpathat                  (char const *, char const *)
 #define __NR32AT2_frealpathat                  (char *, char *)
@@ -2669,6 +2672,7 @@
 #define __NR32AM_rtm_end(a, b, c, d, e, f)                      /* nothing */
 #define __NR32AM_rtm_begin(a, b, c, d, e, f)                    /* nothing */
 #define __NR32AM_ftime64(a, b, c, d, e, f)                      (struct __timebx32_64 *)a
+#define __NR32AM_rpc_serve_sysret(a, b, c, d, e, f)             /* nothing */
 #define __NR32AM_set_userprocmask_address(a, b, c, d, e, f)     (struct userprocmask *)a
 #define __NR32AM_utime64(a, b, c, d, e, f)                      (char const *)a, (struct __utimbufx32_64 const *)b
 #define __NR32AM_userviofd(a, b, c, d, e, f)                    (__size_t)a, (__syscall_ulong_t)b
@@ -2686,7 +2690,7 @@
 #define __NR32AM_time64(a, b, c, d, e, f)                       (__int64_t *)a
 #define __NR32AM_fchdirat(a, b, c, d, e, f)                     (__fd_t)a, (char const *)b, (__atflag_t)c
 #define __NR32AM_openpty(a, b, c, d, e, f)                      (__fd_t *)a, (__fd_t *)b, (char *)c, (struct termios const *)d, (struct winsize const *)e
-#define __NR32AM_rpc_schedule(a, b, c, d, e, f)                 (__pid_t)a, (__syscall_ulong_t)b, (void const *)c, (__HYBRID_PTR32(void const) const *)d
+#define __NR32AM_rpc_schedule(a, b, c, d, e, f)                 (__pid_t)a, (__syscall_ulong_t)b, (void const *)c, (__HYBRID_PTR32(void const) const *)d, (__size_t)e
 #define __NR32AM_frealpathat(a, b, c, d, e, f)                  (__fd_t)a, (char const *)b, (char *)c, (__size_t)d, (__atflag_t)e
 #define __NR32AM_frealpath4(a, b, c, d, e, f)                   (__fd_t)a, (char *)b, (__size_t)c, (__atflag_t)d
 #define __NR32AM_getdrives(a, b, c, d, e, f)                    /* nothing */
@@ -3173,6 +3177,7 @@
 #define __NR32AP_rtm_end()                                      /* nothing */
 #define __NR32AP_rtm_begin()                                    /* nothing */
 #define __NR32AP_ftime64(a)                                     (__syscall_ulong_t)a
+#define __NR32AP_rpc_serve_sysret()                             /* nothing */
 #define __NR32AP_set_userprocmask_address(a)                    (__syscall_ulong_t)a
 #define __NR32AP_utime64(a, b)                                  (__syscall_ulong_t)a, (__syscall_ulong_t)b
 #define __NR32AP_userviofd(a, b)                                (__syscall_ulong_t)a, (__syscall_ulong_t)b
@@ -3190,7 +3195,7 @@
 #define __NR32AP_time64(a)                                      (__syscall_ulong_t)a
 #define __NR32AP_fchdirat(a, b, c)                              (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
 #define __NR32AP_openpty(a, b, c, d, e)                         (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e
-#define __NR32AP_rpc_schedule(a, b, c, d)                       (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
+#define __NR32AP_rpc_schedule(a, b, c, d, e)                    (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e
 #define __NR32AP_frealpathat(a, b, c, d, e)                     (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e
 #define __NR32AP_frealpath4(a, b, c, d)                         (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
 #define __NR32AP_getdrives()                                    /* nothing */

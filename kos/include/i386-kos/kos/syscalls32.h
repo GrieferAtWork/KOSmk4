@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2545df8b */
+/* HASH CRC-32:0x832d474e */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1812,12 +1812,15 @@ __CDECLARE_SC(,__errno_t,rmdir,(char const *__path),(__path))
  * multi-arch  platforms (such as  x86), the register numbers,  as well as the
  * address size used by `program' depend on the execution mode of `target_tid'
  * 
- * @param: target_tid: The TID of the targeted thread
- * @param: mode:       One of  `RPC_SYNCMODE_*', or'd  with
- *                     one of `RPC_SYSRESTART_*', or'd with
- *                     one of `RPC_PRIORITY_*'
- * @param: program:    The RPC program to execute (sequences of `RPC_OP_*')
- * @param: params:     RPC program parameters (for `RPC_OP_push_param')
+ * @param: target_tid:      The TID of the targeted thread
+ * @param: mode:            One of  `RPC_SYNCMODE_*', optionally or'd  with
+ *                          one of `RPC_SYSRESTART_*', optionally or'd with
+ *                          one of  `RPC_PRIORITY_*', optionally or'd  with
+ *                          one of  `RPC_DOMAIN_*',  optionally  or'd  with
+ *                          one of `RPC_JOIN_*'
+ * @param: program:         The RPC program to execute (sequences of `RPC_OP_*')
+ * @param: params:          RPC program parameters (for `RPC_OP_push_param')
+ * @param: max_param_count: The max # of `params' used by `program'
  * 
  * @return: 0 :                Success
  * @throws: E_SEGFAULT:        Faulty pointers were given
@@ -1835,7 +1838,7 @@ __CDECLARE_SC(,__errno_t,rmdir,(char const *__path),(__path))
  *                             still many reasons  outside of your  control
  *                             for why it  may terminate immediately  after
  *                             the RPC program finished. */
-__CDECLARE_SC(,__errno_t,rpc_schedule,(__pid_t __target_tid, __syscall_ulong_t __mode, void const *__program, __HYBRID_PTR32(void const) const *__params),(__target_tid,__mode,__program,__params))
+__CDECLARE_SC(,__errno_t,rpc_schedule,(__pid_t __target_tid, __syscall_ulong_t __mode, void const *__program, __HYBRID_PTR32(void const) const *__params, __size_t __max_param_count),(__target_tid,__mode,__program,__params,__max_param_count))
 #endif /* __CRT_HAVE_SC(rpc_schedule) */
 #if __CRT_HAVE_SC(rpc_serve)
 /* >> rpc_serve(2)
@@ -1848,14 +1851,22 @@ __CDECLARE_SC(,__errno_t,rpc_schedule,(__pid_t __target_tid, __syscall_ulong_t _
  * and may be used to implement `pthread_testcancel(3)' (should KOS
  * RPCs be used to facility pthread cancellation points, as done by
  * KOS's builtin libc)
- * This syscall must also be invoked when the calling thread makes
- * use of the userprocmask mechanism,  and the signal mask  became
- * less restrictive while the `USERPROCMASK_FLAG_HASPENDING'  flag
- * was set.
  * @return: 0:      Nothing was handled.
  * @return: -EINTR: RPCs (or posix signals) were handled. */
-__CDECLARE_SC(,__syscall_slong_t,rpc_serve,(void),())
+__CDECLARE_SC(,__errno_t,rpc_serve,(void),())
 #endif /* __CRT_HAVE_SC(rpc_serve) */
+#if __CRT_HAVE_SC(rpc_serve_sysret)
+/* >> rpc_serve_sysret(2)
+ * Very similar to `rpc_serve(2)', but with the addition that this one
+ * will only serve RPCs that can be handled in `RPC_REASONCTX_SYSRET',
+ * aka. `RPC_REASONCTX_ASYNC' contexts. Additionally, this system call
+ * ignores the state of the  internal `TASK_FRPC' flag, and should  be
+ * invoked  when  the calling  thread  makes use  of  the userprocmask
+ * mechanism, and the  signal mask became  less restrictive while  the
+ * `USERPROCMASK_FLAG_HASPENDING' flag was set.
+ * @return: 0 : Always, unconditionally returned. */
+__CDECLARE_SC(,__errno_t,rpc_serve_sysret,(void),())
+#endif /* __CRT_HAVE_SC(rpc_serve_sysret) */
 #if __CRT_HAVE_SC(rseq)
 __CDECLARE_SC(,__errno_t,rseq,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 #endif /* __CRT_HAVE_SC(rseq) */
@@ -4349,12 +4360,15 @@ __CDECLARE_XSC(,__errno_t,rmdir,(char const *__path),(__path))
  * multi-arch  platforms (such as  x86), the register numbers,  as well as the
  * address size used by `program' depend on the execution mode of `target_tid'
  * 
- * @param: target_tid: The TID of the targeted thread
- * @param: mode:       One of  `RPC_SYNCMODE_*', or'd  with
- *                     one of `RPC_SYSRESTART_*', or'd with
- *                     one of `RPC_PRIORITY_*'
- * @param: program:    The RPC program to execute (sequences of `RPC_OP_*')
- * @param: params:     RPC program parameters (for `RPC_OP_push_param')
+ * @param: target_tid:      The TID of the targeted thread
+ * @param: mode:            One of  `RPC_SYNCMODE_*', optionally or'd  with
+ *                          one of `RPC_SYSRESTART_*', optionally or'd with
+ *                          one of  `RPC_PRIORITY_*', optionally or'd  with
+ *                          one of  `RPC_DOMAIN_*',  optionally  or'd  with
+ *                          one of `RPC_JOIN_*'
+ * @param: program:         The RPC program to execute (sequences of `RPC_OP_*')
+ * @param: params:          RPC program parameters (for `RPC_OP_push_param')
+ * @param: max_param_count: The max # of `params' used by `program'
  * 
  * @return: 0 :                Success
  * @throws: E_SEGFAULT:        Faulty pointers were given
@@ -4372,7 +4386,7 @@ __CDECLARE_XSC(,__errno_t,rmdir,(char const *__path),(__path))
  *                             still many reasons  outside of your  control
  *                             for why it  may terminate immediately  after
  *                             the RPC program finished. */
-__CDECLARE_XSC(,__errno_t,rpc_schedule,(__pid_t __target_tid, __syscall_ulong_t __mode, void const *__program, __HYBRID_PTR32(void const) const *__params),(__target_tid,__mode,__program,__params))
+__CDECLARE_XSC(,__errno_t,rpc_schedule,(__pid_t __target_tid, __syscall_ulong_t __mode, void const *__program, __HYBRID_PTR32(void const) const *__params, __size_t __max_param_count),(__target_tid,__mode,__program,__params,__max_param_count))
 #endif /* __CRT_HAVE_XSC(rpc_schedule) */
 #if __CRT_HAVE_XSC(rpc_serve)
 /* >> rpc_serve(2)
@@ -4385,14 +4399,22 @@ __CDECLARE_XSC(,__errno_t,rpc_schedule,(__pid_t __target_tid, __syscall_ulong_t 
  * and may be used to implement `pthread_testcancel(3)' (should KOS
  * RPCs be used to facility pthread cancellation points, as done by
  * KOS's builtin libc)
- * This syscall must also be invoked when the calling thread makes
- * use of the userprocmask mechanism,  and the signal mask  became
- * less restrictive while the `USERPROCMASK_FLAG_HASPENDING'  flag
- * was set.
  * @return: 0:      Nothing was handled.
  * @return: -EINTR: RPCs (or posix signals) were handled. */
-__CDECLARE_XSC(,__syscall_slong_t,rpc_serve,(void),())
+__CDECLARE_XSC(,__errno_t,rpc_serve,(void),())
 #endif /* __CRT_HAVE_XSC(rpc_serve) */
+#if __CRT_HAVE_XSC(rpc_serve_sysret)
+/* >> rpc_serve_sysret(2)
+ * Very similar to `rpc_serve(2)', but with the addition that this one
+ * will only serve RPCs that can be handled in `RPC_REASONCTX_SYSRET',
+ * aka. `RPC_REASONCTX_ASYNC' contexts. Additionally, this system call
+ * ignores the state of the  internal `TASK_FRPC' flag, and should  be
+ * invoked  when  the calling  thread  makes use  of  the userprocmask
+ * mechanism, and the  signal mask became  less restrictive while  the
+ * `USERPROCMASK_FLAG_HASPENDING' flag was set.
+ * @return: 0 : Always, unconditionally returned. */
+__CDECLARE_XSC(,__errno_t,rpc_serve_sysret,(void),())
+#endif /* __CRT_HAVE_XSC(rpc_serve_sysret) */
 #if __CRT_HAVE_XSC(rseq)
 __CDECLARE_XSC(,__errno_t,rseq,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 #endif /* __CRT_HAVE_XSC(rseq) */

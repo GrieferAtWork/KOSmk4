@@ -331,7 +331,7 @@ DEFINE_SYSCALL32_6(void, sigreturn,
 	(void)sc_info;
 	(void)restore_cpu;
 	/* Send an RPC to ourselves, so we can gain access to the user-space register state. */
-	task_rpc_exec(THIS_TASK, RPC_CONTEXT_KERN | RPC_SYNCMODE_F_USER, &sys_sigreturn32_rpc, NULL);
+	task_rpc_userunwind(&sys_sigreturn32_rpc, NULL);
 	__builtin_unreachable();
 }
 
@@ -455,20 +455,10 @@ sys_sigreturn64_rpc(struct rpc_context *__restrict ctx,
 
 DEFINE_SYSCALL64_0(void, rt_sigreturn) {
 	/* Send an RPC to ourselves, so we can gain access to the user-space register state. */
-	task_rpc_exec(THIS_TASK, RPC_CONTEXT_KERN | RPC_SYNCMODE_F_USER, &sys_sigreturn64_rpc, NULL);
+	task_rpc_userunwind(&sys_sigreturn64_rpc, NULL);
 	__builtin_unreachable();
 }
 #endif /* __x86_64__ */
-
-
-
-
-
-/* TODO: The raiseat(2) system call should be removed. Instead, it can be emulated
- *       by  chaining `sigreturn(2)' with  `rt_tgsigqueueinfo(2)', where the later
- *       is made to point at a specific thread. */
-
-
 
 DECL_END
 #endif /* !CONFIG_USE_NEW_RPC */

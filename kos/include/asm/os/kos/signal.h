@@ -100,6 +100,10 @@
 #define __SIGPWR    30        /* Power failure restart (System V). */
 #define __SIGSYS    31        /* Bad system call. */
 #define __NSIG      65        /* Biggest signal number + 1 (including real-time signals). */
+#ifdef __KOS__
+#define __SIGRPC    __SIGURG  /* Default signal number used for <kos/rpc.h> */
+#endif /* __KOS__ */
+
 
 /* These are the hard limits of the kernel.
  * These values should not be used directly at user level. */

@@ -31,7 +31,6 @@
 #ifdef CONFIG_USE_NEW_RPC
 #include <kernel/coredump.h>
 #include <kernel/except.h>
-#include <kernel/mman.h>
 #include <kernel/printk.h>
 #include <kernel/rt/except-handler.h>
 #include <kernel/rt/except-personality.h>
@@ -604,19 +603,20 @@ again_switch_action_handler:
 			break;
 		}
 		xdecref_unlikely(action.sa_mask);
+		pending_rpc_free(rpc);
 	} else {
 		TRY {
-			ctx->rc_state = task_userrpc_runprogram(ctx->rc_state, &rpc->pr_user,
-			                                        user_rpc_reason, &ctx->rc_scinfo);
+			ctx->rc_state = task_userrpc_runprogram(ctx->rc_state, rpc,
+			                                        user_rpc_reason,
+			                                        &ctx->rc_scinfo);
 		} EXCEPT {
 			/* Prioritize errors. */
 			struct exception_info *tls = error_info();
 			if (error_priority(error->ei_code) < error_priority(tls->ei_code))
 				memcpy(error, tls, sizeof(struct exception_info));
 		}
-		pending_user_rpc_fini(&rpc->pr_user);
+		decref(&rpc->pr_user);
 	}
-	pending_rpc_free(rpc);
 }
 
 

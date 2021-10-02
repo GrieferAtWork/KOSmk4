@@ -25,7 +25,6 @@
 
 #ifdef CONFIG_USE_NEW_RPC
 #include <kernel/except.h>
-#include <kernel/mman.h>
 #include <kernel/rt/except-handler.h>
 #include <kernel/types.h>
 #include <sched/pid.h>
@@ -61,31 +60,17 @@ PUBLIC ATTR_PERTASK struct pending_rpc_slist this_rpcs = SLIST_HEAD_INITIALIZER(
 DEFINE_PERTASK_ONEXIT(shutdown_this_rpcs);
 PRIVATE ATTR_USED void
 NOTHROW(KCALL shutdown_this_rpcs)(void) {
-	struct pending_rpc_slist remain;
-	remain.slh_first = ATOMIC_XCH(PERTASK(this_rpcs.slh_first), THIS_RPCS_TERMINATED);
-	assert(remain.slh_first != THIS_RPCS_TERMINATED);
-	while (!SLIST_EMPTY(&remain)) {
-		struct pending_rpc *rpc;
-		rpc = SLIST_FIRST(&remain);
-		SLIST_REMOVE_HEAD(&remain, pr_link);
-		if (rpc->pr_flags & RPC_CONTEXT_KERN) {
-			byte_t _ctxbuf[offsetof(struct rpc_context, rc_scinfo)];
-			struct rpc_context *ctx = (struct rpc_context *)_ctxbuf;
-			TRY {
-				ctx->rc_context = RPC_REASONCTX_SHUTDOWN;
-				task_asyncrpc_execnow(ctx,
-				                      rpc->pr_kern.k_func,
-				                      rpc->pr_kern.k_cookie);
-			} EXCEPT {
-				/* Dump the exception if it is non-signaling */
-				error_printf("Unhandled exception in RPC function during thread termination");
-			}
-		} else {
-			if (!(rpc->pr_flags & RPC_CONTEXT_SIGNAL))
-				pending_user_rpc_fini(&rpc->pr_user);
-		}
-		pending_rpc_free(rpc);
-	}
+	struct pending_rpc *remain;
+
+	/* Mark the RPC list as terminated and load remaining RPCs. */
+	remain = ATOMIC_XCH(PERTASK(this_rpcs.slh_first),
+	                    THIS_RPCS_TERMINATED);
+	assertf(remain != THIS_RPCS_TERMINATED,
+	        "We're the only ones that ever set this, "
+	        "so what; did we get called twice?");
+
+	/* Destroy all remaining RPCs for the purpose of shutdown. */
+	task_asyncrpc_destroy_list_for_shutdown(remain);
 }
 
 
@@ -186,15 +171,26 @@ task_rpc_exec(struct task *__restrict thread, syscall_ulong_t flags,
 		task_wake(thread);
 	} else {
 		userexcept_sysret_inject_safe(thread, flags);
-
-		/* When sending a user-level RPC to oneself, it is necessary to force a
-		 * syscall/interrupt  unwind by throwing an E_INTERRUPT_USER_RPC error.
-		 * Is same behavior can also be seen in `task_serve()' */
-		if ((flags & (RPC_SYNCMODE_F_SYSRET | RPC_SYNCMODE_F_USER)) == RPC_SYNCMODE_F_USER && thread == THIS_TASK)
-			THROW(E_INTERRUPT_USER_RPC);
 	}
 
 	return true;
+}
+
+
+/* Helper wrapper for executing the given RPC `func' after
+ * unwind the current system call. This is identical to:
+ * >> task_rpc_exec(THIS_TASK, RPC_CONTEXT_KERN | RPC_SYNCMODE_F_USER, func, cookie);
+ * >> THROW(E_INTERRUPT_USER_RPC); */
+PUBLIC ATTR_NORETURN NONNULL((1)) void KCALL
+task_rpc_userunwind(prpc_exec_callback_t func, void *cookie)
+		THROWS(E_WOULDBLOCK, E_BADALLOC, E_INTERRUPT_USER_RPC) {
+#ifdef NDEBUG
+	task_rpc_userunwind(func, cookie);
+#else /* NDEBUG */
+	bool ok = task_rpc_exec(THIS_TASK, RPC_CONTEXT_KERN | RPC_SYNCMODE_F_USER, func, cookie);
+	assertf(ok, "This would mean you're calling from within `task_exit()'; don't do that!");
+#endif /* !NDEBUG */
+	THROW(E_INTERRUPT_USER_RPC);
 }
 
 
@@ -205,16 +201,26 @@ NOTHROW(FCALL task_asyncrpc_destroy_for_shutdown)(struct pending_rpc *__restrict
 	if (self->pr_flags & RPC_CONTEXT_KERN) {
 		/* Invoke kernel RPC in RPC_REASONCTX_SHUTDOWN-context */
 		alignas(alignof(struct rpc_context))
-		byte_t _ctx[offsetof(struct rpc_context, rc_scinfo)];
-		struct rpc_context *ctx = (struct rpc_context *)_ctx;
-		ctx->rc_context         = RPC_REASONCTX_SHUTDOWN;
-		task_asyncrpc_execnow(ctx, self->pr_kern.k_func,
-		                      self->pr_kern.k_cookie);
-	} else if (!(self->pr_flags & RPC_CONTEXT_SIGNAL)) {
-		/* Finalize userspace RPC program meta-data. */
-		pending_user_rpc_fini(&self->pr_user);
+		byte_t _ctxbuf[offsetof(struct rpc_context, rc_scinfo)];
+		struct rpc_context *ctx = (struct rpc_context *)_ctxbuf;
+		TRY {
+			ctx->rc_context = RPC_REASONCTX_SHUTDOWN;
+			task_asyncrpc_execnow(ctx,
+			                      self->pr_kern.k_func,
+			                      self->pr_kern.k_cookie);
+		} EXCEPT {
+			/* Dump the exception if it is non-signaling */
+			error_printf("Unhandled exception in RPC function during thread termination");
+		}
+		goto free_rpc;
+	} else if (self->pr_flags & RPC_CONTEXT_SIGNAL){
+free_rpc:
+		pending_rpc_free(self);
+	} else {
+		/* Mark a user RPC program as canceled. */
+		task_userrpc_cancelprogram(self);
+		decref(&self->pr_user);
 	}
-	pending_rpc_free(self);
 }
 
 /* Same as `task_asyncrpc_destroy_for_shutdown()', but do an entire list. */

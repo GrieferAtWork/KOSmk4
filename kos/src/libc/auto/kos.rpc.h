@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x91e82595 */
+/* HASH CRC-32:0xccde2117 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -38,12 +38,15 @@ DECL_BEGIN
  * multi-arch  platforms (such as  x86), the register numbers,  as well as the
  * address size used by `program' depend on the execution mode of `target_tid'
  *
- * @param: target_tid: The TID of the targeted thread
- * @param: mode:       One of  `RPC_SYNCMODE_*', or'd  with
- *                     one of `RPC_SYSRESTART_*', or'd with
- *                     one of `RPC_PRIORITY_*'
- * @param: program:    The RPC program to execute (sequences of `RPC_OP_*')
- * @param: params:     RPC program parameters (for `RPC_OP_push_param')
+ * @param: target_tid:      The TID of the targeted thread
+ * @param: mode:            One of  `RPC_SYNCMODE_*', optionally or'd  with
+ *                          one of `RPC_SYSRESTART_*', optionally or'd with
+ *                          one of  `RPC_PRIORITY_*', optionally or'd  with
+ *                          one of  `RPC_DOMAIN_*',  optionally  or'd  with
+ *                          one of `RPC_JOIN_*'
+ * @param: program:         The RPC program to execute (sequences of `RPC_OP_*')
+ * @param: params:          RPC program parameters (for `RPC_OP_push_param')
+ * @param: max_param_count: The max # of `params' used by `program'
  *
  * @return: 0 :                Success
  * @throws: E_SEGFAULT:        Faulty pointers were given
@@ -61,17 +64,23 @@ DECL_BEGIN
  *                             still many reasons  outside of your  control
  *                             for why it  may terminate immediately  after
  *                             the RPC program finished. */
-INTDEF NONNULL((3)) int NOTHROW_NCX(LIBDCALL libd_rpc_schedule)(pid_t target_tid, unsigned int mode, void const *program, void const *const *params);
+INTDEF NONNULL((3)) int NOTHROW_NCX(LIBDCALL libd_rpc_schedule)(pid_t target_tid, unsigned int mode, void const *program, void const *const *params, size_t max_param_count);
 /* >> rpc_exec(3)
  * Send a RPC to `target_tid' (which must be a thread within the current process).
  * The RPC will modify  the target thread's register  state such that `func'  will
  * be executed before  (upon its  return), execution resumes  within that  thread.
  * How/when exactly the RPC is served depends on the given `mode'.
+ * WARNING: Unless special conditions are met, trying to use this function to send
+ *          an RPC to another process  (read: different mman), will probably  fail
+ *          due  to the address  of `func' mapping to  a different location within
+ *          that other process.
  *
  * @param: target_tid: The TID of the targeted thread
- * @param: mode:       One of  `RPC_SYNCMODE_*', or'd  with
- *                     one of `RPC_SYSRESTART_*', or'd with
- *                     one of `RPC_PRIORITY_*'
+ * @param: mode:       One of  `RPC_SYNCMODE_*', optionally or'd  with
+ *                     one of `RPC_SYSRESTART_*', optionally or'd with
+ *                     one of  `RPC_PRIORITY_*', optionally or'd  with
+ *                     one of  `RPC_DOMAIN_*',  optionally  or'd  with
+ *                     one of `RPC_JOIN_*'
  * @return: 0 :                Success
  * @return: -1: [errno=ESRCH]  The  target thread has already terminated, or
  *                             doesn't exist.  Note though  that unless  the
@@ -79,7 +88,7 @@ INTDEF NONNULL((3)) int NOTHROW_NCX(LIBDCALL libd_rpc_schedule)(pid_t target_tid
  *                             still many  reasons outside  of your  control
  *                             for why  it may  terminate immediately  after
  *                             the RPC program finished. */
-INTDEF int NOTHROW_NCX(LIBDCALL libd_rpc_exec)(pid_t target_tid, unsigned int mode, prpc_exec_callback_t func, void *cookie);
+INTDEF NONNULL((3)) int NOTHROW_NCX(LIBDCALL libd_rpc_exec)(pid_t target_tid, unsigned int mode, prpc_exec_callback_t func, void *cookie);
 /* >> rpc_interrupt(3)
  * Send  a RPC to `target_tid' (which must be a thread within the current process).
  * The RPC won't do anything except causing an in-progress system call to fail with
@@ -91,9 +100,11 @@ INTDEF int NOTHROW_NCX(LIBDCALL libd_rpc_exec)(pid_t target_tid, unsigned int mo
  * given `target_tid == gettid()'.
  *
  * @param: target_tid: The TID of the targeted thread
- * @param: mode:       One of  `RPC_SYNCMODE_*', or'd  with
- *                     one of `RPC_SYSRESTART_*', or'd with
- *                     one of `RPC_PRIORITY_*'
+ * @param: mode:       One of  `RPC_SYNCMODE_*', optionally or'd  with
+ *                     one of `RPC_SYSRESTART_*', optionally or'd with
+ *                     one of  `RPC_PRIORITY_*', optionally or'd  with
+ *                     one of  `RPC_DOMAIN_*',  optionally  or'd  with
+ *                     one of `RPC_JOIN_*'
  * @return: 0 :               Success
  * @return: -1: [errno=ESRCH] The  target thread has already terminated, or
  *                            doesn't exist.  Note though  that unless  the
@@ -110,12 +121,15 @@ INTDEF int NOTHROW_NCX(LIBDCALL libd_rpc_interrupt)(pid_t target_tid, unsigned i
  * multi-arch  platforms (such as  x86), the register numbers,  as well as the
  * address size used by `program' depend on the execution mode of `target_tid'
  *
- * @param: target_tid: The TID of the targeted thread
- * @param: mode:       One of  `RPC_SYNCMODE_*', or'd  with
- *                     one of `RPC_SYSRESTART_*', or'd with
- *                     one of `RPC_PRIORITY_*'
- * @param: program:    The RPC program to execute (sequences of `RPC_OP_*')
- * @param: params:     RPC program parameters (for `RPC_OP_push_param')
+ * @param: target_tid:      The TID of the targeted thread
+ * @param: mode:            One of  `RPC_SYNCMODE_*', optionally or'd  with
+ *                          one of `RPC_SYSRESTART_*', optionally or'd with
+ *                          one of  `RPC_PRIORITY_*', optionally or'd  with
+ *                          one of  `RPC_DOMAIN_*',  optionally  or'd  with
+ *                          one of `RPC_JOIN_*'
+ * @param: program:         The RPC program to execute (sequences of `RPC_OP_*')
+ * @param: params:          RPC program parameters (for `RPC_OP_push_param')
+ * @param: max_param_count: The max # of `params' used by `program'
  *
  * @return: 0 :                Success
  * @throws: E_SEGFAULT:        Faulty pointers were given
@@ -133,17 +147,23 @@ INTDEF int NOTHROW_NCX(LIBDCALL libd_rpc_interrupt)(pid_t target_tid, unsigned i
  *                             still many reasons  outside of your  control
  *                             for why it  may terminate immediately  after
  *                             the RPC program finished. */
-INTDEF NONNULL((3)) void (LIBDCALL libd_RpcSchedule)(pid_t target_tid, unsigned int mode, void const *program, void const *const *params) THROWS(...);
+INTDEF NONNULL((3)) void (LIBDCALL libd_RpcSchedule)(pid_t target_tid, unsigned int mode, void const *program, void const *const *params, size_t max_param_count) THROWS(...);
 /* >> rpc_exec(3)
  * Send a RPC to `target_tid' (which must be a thread within the current process).
  * The RPC will modify  the target thread's register  state such that `func'  will
  * be executed before  (upon its  return), execution resumes  within that  thread.
  * How/when exactly the RPC is served depends on the given `mode'.
+ * WARNING: Unless special conditions are met, trying to use this function to send
+ *          an RPC to another process  (read: different mman), will probably  fail
+ *          due  to the address  of `func' mapping to  a different location within
+ *          that other process.
  *
  * @param: target_tid: The TID of the targeted thread
- * @param: mode:       One of  `RPC_SYNCMODE_*', or'd  with
- *                     one of `RPC_SYSRESTART_*', or'd with
- *                     one of `RPC_PRIORITY_*'
+ * @param: mode:       One of  `RPC_SYNCMODE_*', optionally or'd  with
+ *                     one of `RPC_SYSRESTART_*', optionally or'd with
+ *                     one of  `RPC_PRIORITY_*', optionally or'd  with
+ *                     one of  `RPC_DOMAIN_*',  optionally  or'd  with
+ *                     one of `RPC_JOIN_*'
  * @return: 0 :                Success
  * @return: -1: [errno=ESRCH]  The  target thread has already terminated, or
  *                             doesn't exist.  Note though  that unless  the
@@ -163,9 +183,11 @@ INTDEF NONNULL((3)) void (LIBDCALL libd_RpcExec)(pid_t target_tid, unsigned int 
  * given `target_tid == gettid()'.
  *
  * @param: target_tid: The TID of the targeted thread
- * @param: mode:       One of  `RPC_SYNCMODE_*', or'd  with
- *                     one of `RPC_SYSRESTART_*', or'd with
- *                     one of `RPC_PRIORITY_*'
+ * @param: mode:       One of  `RPC_SYNCMODE_*', optionally or'd  with
+ *                     one of `RPC_SYSRESTART_*', optionally or'd with
+ *                     one of  `RPC_PRIORITY_*', optionally or'd  with
+ *                     one of  `RPC_DOMAIN_*',  optionally  or'd  with
+ *                     one of `RPC_JOIN_*'
  * @return: 0 :               Success
  * @return: -1: [errno=ESRCH] The  target thread has already terminated, or
  *                            doesn't exist.  Note though  that unless  the

@@ -73,8 +73,6 @@ typedef struct __sigset_struct sigset_t;
  *                                 `func'  is allowed  to transition  the `ctx->rc_context'  it is given
  *                                 from `RPC_REASONCTX_SYSCALL' to `RPC_REASONCTX_SYSRET', in which case
  *                                 the system call/interrupt will not be restarted.
- *                                 When `thread == THIS_TASK', this function will not return normally,
- *                                 but will instead `THROW(E_INTERRUPT_USER_RPC)'.
  *   - RPC_SYNCMODE_F_SYSRET:      May only be used when  combined with `RPC_SYNCMODE_F_USER', in  which
  *                                 case the RPC will only be invoked the next time that `thread' returns
  *                                 to user-space (or immediately if `thread' is currently in user-space)
@@ -87,6 +85,14 @@ typedef struct __sigset_struct sigset_t;
 FUNDEF NOBLOCK_IF(rpc_gfp & GFP_ATOMIC) NONNULL((1, 3)) bool KCALL
 task_rpc_exec(struct task *__restrict thread, syscall_ulong_t flags,
               prpc_exec_callback_t func, void *cookie DFL(__NULLPTR))
+		THROWS(E_WOULDBLOCK, E_BADALLOC);
+
+/* Helper wrapper for executing the given RPC `func' after
+ * unwind the current system call. This is identical to:
+ * >> task_rpc_exec(THIS_TASK, RPC_CONTEXT_KERN | RPC_SYNCMODE_F_USER, func, cookie);
+ * >> THROW(E_INTERRUPT_USER_RPC); */
+FUNDEF ATTR_NORETURN NONNULL((1)) void KCALL
+task_rpc_userunwind(prpc_exec_callback_t func, void *cookie DFL(__NULLPTR))
 		THROWS(E_WOULDBLOCK, E_BADALLOC, E_INTERRUPT_USER_RPC);
 
 

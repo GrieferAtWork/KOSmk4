@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4b5e8e7c */
+/* HASH CRC-32:0x730123d1 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -930,6 +930,7 @@
 #define __NRAN1_rpc_schedule             mode
 #define __NRAN2_rpc_schedule             program
 #define __NRAN3_rpc_schedule             params
+#define __NRAN4_rpc_schedule             max_param_count
 #define __NRAN0_frealpathat              dirfd
 #define __NRAN1_frealpathat              filename
 #define __NRAN2_frealpathat              buf
@@ -2264,6 +2265,7 @@
 #define __NRATR2_kreaddir                 SC_REPR_SIZE_T                                                       /* bufsize */ 
 #define __NRATR3_kreaddir                 SC_REPR_KREADDIR_MODE                                                /* mode */ 
 #define __NRRTR_kreaddir                  SC_REPR_SSIZE_T                                                      /* return */
+#define __NRRTR_rpc_serve_sysret          SC_REPR_ERRNO_T                                                      /* return */
 #define __NRATR0_set_userprocmask_address SC_REPR_POINTER                                                      /* ctl */ 
 #define __NRRTR_set_userprocmask_address  SC_REPR_ERRNO_T                                                      /* return */
 #define __NRRTR_rtm_test                  SC_REPR_SYSCALL_ULONG_T                                              /* return */
@@ -2311,7 +2313,7 @@
 #define __NRATR3_lfutex                   SC_REPR_STRUCT_TIMESPECX64                                           /* timeout */ 
 #define __NRATR4_lfutex                   SC_REPR_UINT64_T                                                     /* val2 */ 
 #define __NRRTR_lfutex                    SC_REPR_SYSCALL_SLONG_T                                              /* return */
-#define __NRRTR_rpc_serve                 SC_REPR_SYSCALL_SLONG_T                                              /* return */
+#define __NRRTR_rpc_serve                 SC_REPR_ERRNO_T                                                      /* return */
 #define __NRATR0_debugtrap                SC_REPR_STRUCT_UCPUSTATE64                                           /* state */ 
 #define __NRATR1_debugtrap                SC_REPR_STRUCT_DEBUGTRAP_REASON64                                    /* reason */ 
 #define __NRRTR_debugtrap                 SC_REPR_ERRNO_T                                                      /* return */
@@ -2363,7 +2365,9 @@
 #define __NRATR0_rpc_schedule             SC_REPR_PID_T                                                        /* target_tid */ 
 #define __NRATR1_rpc_schedule             SC_REPR_RPC_SCHEDULE_MODE                                            /* mode */ 
 #define __NRATR2_rpc_schedule             SC_REPR_POINTER                                                      /* program */ 
-#define __NRATR3_rpc_schedule             SC_REPR_POINTER                                                      /* params */ 
+#define __NRATR3_rpc_schedule             SC_REPR_VOID_VECTOR64                                                /* params */ 
+#define __NRATL3_rpc_schedule             4                                                                    /* params -> max_param_count */ 
+#define __NRATR4_rpc_schedule             SC_REPR_SIZE_T                                                       /* max_param_count */ 
 #define __NRRTR_rpc_schedule              SC_REPR_ERRNO_T                                                      /* return */
 #define __NRATR0_frealpathat              SC_REPR_FD_T                                                         /* dirfd */ 
 #define __NRATR1_frealpathat              SC_REPR_FILENAME                                                     /* filename */ 

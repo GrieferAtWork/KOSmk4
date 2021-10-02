@@ -429,8 +429,10 @@ NOTHROW_NCX(LIBCCALL libc_sigprocmask)(__STDC_INT_AS_UINT_T how,
 				 * may have already handled it. */
 				sigemptyset(&me->pt_pmask.lpm_pmask.pm_pending);
 
-				/* Calls the kernel's `task_serve()' function */
-				sys_rpc_serve();
+				/* With the signal mask having  gotten less restrictive, force  check
+				 * for pending RPCs within the kernel (but only handle those that can
+				 * be asynchronously, since we're not a cancellation point) */
+				sys_rpc_serve_sysret();
 				break;
 			}
 		}
@@ -563,8 +565,10 @@ NOTHROW_NCX(LIBCCALL libc_setsigmaskptr)(sigset_t *sigmaskptr)
 				 * may have already handled it. */
 				sigemptyset(&me->pt_pmask.lpm_pmask.pm_pending);
 
-				/* Calls the kernel's `task_serve()' function */
-				sys_rpc_serve();
+				/* With the signal mask having  gotten less restrictive, force  check
+				 * for pending RPCs within the kernel (but only handle those that can
+				 * be asynchronously, since we're not a cancellation point) */
+				sys_rpc_serve_sysret();
 				break;
 			}
 		}
@@ -686,8 +690,10 @@ NOTHROW(LIBCCALL libc_chkuserprocmask)(void)
 				 * may have already handled it. */
 				sigemptyset(&me->pt_pmask.lpm_pmask.pm_pending);
 
-				/* Calls the kernel's `task_serve()' function */
-				sys_rpc_serve();
+				/* With the signal mask having  gotten less restrictive, force  check
+				 * for pending RPCs within the kernel (but only handle those that can
+				 * be asynchronously, since we're not a cancellation point) */
+				sys_rpc_serve_sysret();
 				break;
 			}
 		}

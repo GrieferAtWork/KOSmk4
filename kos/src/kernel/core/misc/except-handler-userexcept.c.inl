@@ -223,9 +223,11 @@ handle_pending:
 					struct exception_info *tls = error_info();
 					if (error_priority(error.ei_code) < error_priority(tls->ei_code))
 						memcpy(&error, tls, sizeof(error));
-					if (!(rpc->pr_flags & RPC_CONTEXT_SIGNAL))
-						pending_user_rpc_fini(&rpc->pr_user);
-					pending_rpc_free(rpc);
+					if (rpc->pr_flags & RPC_CONTEXT_SIGNAL) {
+						pending_rpc_free(rpc);
+					} else {
+						decref(&rpc->pr_user);
+					}
 					continue;
 				}
 				if (is_masked)

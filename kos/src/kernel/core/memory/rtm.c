@@ -119,7 +119,7 @@ throw_illegal_op:
 
 DEFINE_SYSCALL0(rtm_status_t, rtm_begin) {
 	/* Send an RPC to ourself, so we can gain access to the user-space register state. */
-	task_rpc_exec(THIS_TASK, RPC_CONTEXT_KERN | RPC_SYNCMODE_F_USER, &syscall_rtm_begin_rpc, NULL);
+	task_rpc_userunwind(&syscall_rtm_begin_rpc, NULL);
 	__builtin_unreachable();
 }
 #else /* CONFIG_USE_NEW_RPC */

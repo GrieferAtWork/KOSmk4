@@ -255,10 +255,14 @@
 #define RPC_OP_hi_arch        0xff /* Last arch-specific opcode */
 
 /* Arch-specific opcodes */
-#define RPC_OP_386_pushreg_fsbase 0xe0 /* [+0] Push the value of %fs.base */
-#define RPC_OP_386_pushreg_gsbase 0xe1 /* [+0] Push the value of %gs.base */
-#define RPC_OP_386_popreg_fsbase  0xe2 /* [+0] Pop stack-top into %fs.base */
-#define RPC_OP_386_popreg_gsbase  0xe3 /* [+0] Pop stack-top into %gs.base */
+#define RPC_OP_x86_push_is32bit   0xe0 /* [+0] i386/x86_64: push `1' if target thread is 32-bit; push `0' if 64-bit. */
+/*      RPC_OP_                   0xe1  */
+/*      RPC_OP_                   0xe2  */
+/*      RPC_OP_                   0xe3  */
+#define RPC_OP_386_pushreg_fsbase 0xe4 /* [+0] i386: Push the value of %fs.base */
+#define RPC_OP_386_pushreg_gsbase 0xe5 /* [+0] i386: Push the value of %gs.base */
+#define RPC_OP_386_popreg_fsbase  0xe6 /* [+0] i386: Pop stack-top into %fs.base */
+#define RPC_OP_386_popreg_gsbase  0xe7 /* [+0] i386: Pop stack-top into %gs.base */
 /*========================================*/
 
 
@@ -348,7 +352,7 @@
  * a system call that is  a cancellation point, after  which
  * that call will be interrupted, the RPC will be  executed,
  * and the system call (may) be restarted. */
-#define RPC_SYNCMODE_SYNC  0x0000
+#define RPC_SYNCMODE_SYNC  0x0000 /* default */
 
 /* RPC  may be executed at any point while the target thread
  * is running in user-space, so-long as SIGRPC isn't masked.
@@ -378,7 +382,7 @@
  * while the target thread is in kernel-space and executing a system  call
  * marked as [cp] and something other than [restart(must)], and the system
  * call made a call to `task_serve()' internally. */
-#define RPC_SYSRESTART_NORMAL 0x0000                                          /* [posix:!SA_RESTART] SYSCALL_RESTART_MODE_MUST */
+#define RPC_SYSRESTART_NORMAL 0x0000                                          /* [posix:!SA_RESTART] SYSCALL_RESTART_MODE_MUST (default) */
 #define RPC_SYSRESTART_MOST   RPC_SYSRESTART_F_AUTO                           /* [posix: SA_RESTART] SYSCALL_RESTART_MODE_MUST+SYSCALL_RESTART_MODE_AUTO */
 #define RPC_SYSRESTART_ALL    (RPC_SYSRESTART_F_AUTO | RPC_SYSRESTART_F_DONT) /* [posix:          -] SYSCALL_RESTART_MODE_MUST+SYSCALL_RESTART_MODE_AUTO+SYSCALL_RESTART_MODE_DONT */
 /************************************************************************/
@@ -388,13 +392,70 @@
 
 /************************************************************************/
 /* RPC priority flags */
-#define RPC_PRIORITY_F_HIGH 0x4000 /* Try to gift the target thread the remainder
-                                    * of  the  calling thread's  current quantum. */
+#define RPC_PRIORITY_F_HIGH 0x4000 /* Try to gift  the target  thread the  remainder
+                                    * of  the  calling  thread's  current   quantum.
+                                    * Semantically meaningless if `RPC_JOIN_F_ASYNC'
+                                    * isn't being used as well. */
 
 /* RPC priority options */
-#define RPC_PRIORITY_NORMAL 0x0000              /* Normal priority */
+#define RPC_PRIORITY_NORMAL 0x0000              /* Normal priority (default) */
 #define RPC_PRIORITY_HIGH   RPC_PRIORITY_F_HIGH /* High priority (try to  gift the target thread  the
                                                  * remainder of the calling thread's current quantum) */
+/************************************************************************/
+
+
+
+
+/************************************************************************/
+/* RPC domain flags (these _never_ appear in `struct pending_rpc::pr_flags',
+ * but  are simply used  by the `sys_rpc_schedule(2)'  system call to select
+ * the list into which to insert the RPC descriptor) */
+#define RPC_DOMAIN_F_PROC 0x0800 /* Send the RPC to a process as a whole, rather than a specific thread.
+                                  * In  this case, `target_tid' is the TID  of any thread of the process
+                                  * to which to send the RPC, which  will then be served by some  random
+                                  * thread within that process. */
+
+/* RPC domain options */
+#define RPC_DOMAIN_THREAD  0x0000            /* Send to a specific thread (default) */
+#define RPC_DOMAIN_PROCESS RPC_DOMAIN_F_PROC /* Send to a process (and handle with an arbitrary thread) */
+/************************************************************************/
+
+
+
+
+/************************************************************************/
+/* RPC join flags (these _never_ appear in `struct pending_rpc::pr_flags',
+ * but  are simply used  by the `sys_rpc_schedule(2)'  system call to wait
+ * for the RPC program to finish termination) */
+#define RPC_JOIN_F_ASYNC 0x8000 /* Don't wait for the RPC program to finish. Instead,  the
+                                 * program is allowed to execute asynchronously, though if
+                                 * this option is used, any errors relating to the program
+                                 * possibly failing to execute are silently discarded.
+                                 *
+                                 * Unless  this flag is passed, `sys_rpc_schedule(2)' can
+                                 * return with -EINTR, in which case the RPC was  aborted
+                                 * or was never started. When this flag is given however,
+                                 * the  RPC may never end up being executed due to target
+                                 * terminating without ever serving RPCs ever again. */
+
+/* RPC join options */
+#define RPC_JOIN_WAITFOR 0x0000           /* Wait for the RPC program to finish. (default)
+                                           * NOTE: This  does _NOT_ affect  an RPC function (as
+                                           * passed to  `rpc_exec(3)'), but  only the  internal
+                                           * program used to push that function onto the target
+                                           * thread's stack. */
+#define RPC_JOIN_ASYNC   RPC_JOIN_F_ASYNC /* Let the RPC program run asynchronously. */
+/************************************************************************/
+
+
+
+
+
+
+/************************************************************************/
+/* RPC limits                                                           */
+/************************************************************************/
+#define RPC_PARAMS_MAX 256 /* Max # of parameters which may be passed to `rpc_schedule(2)' */
 /************************************************************************/
 
 

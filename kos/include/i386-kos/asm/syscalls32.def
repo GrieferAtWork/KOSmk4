@@ -694,7 +694,7 @@ select64 = selectx32_64;
 -0x0000001e:utime64
 /*x0000001f:...*/
 -0x00000020:set_userprocmask_address
-/*x00000021:...*/
+-0x00000021:rpc_serve_sysret
 /*x00000022:...*/
 -0x00000023:ftime64
 /*x00000024:...*/

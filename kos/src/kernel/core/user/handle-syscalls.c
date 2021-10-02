@@ -2164,7 +2164,7 @@ DEFINE_SYSCALL5(ssize_t, ppoll,
 	if (sigmask) {
 		(void)sigsetsize;
 		/* Send an RPC to ourselves, so we can gain access to the user-space register state. */
-		task_rpc_exec(THIS_TASK, RPC_CONTEXT_KERN | RPC_SYNCMODE_F_USER, &sys_ppoll_rpc, NULL);
+		task_rpc_userunwind(&sys_ppoll_rpc, NULL);
 		__builtin_unreachable();
 	}
 	validate_readwritem(fds, nfds, sizeof(struct pollfd));
@@ -2224,7 +2224,7 @@ DEFINE_COMPAT_SYSCALL5(ssize_t, ppoll,
 	if (sigmask) {
 		(void)sigsetsize;
 		/* Send an RPC to ourselves, so we can gain access to the user-space register state. */
-		task_rpc_exec(THIS_TASK, RPC_CONTEXT_KERN | RPC_SYNCMODE_F_USER, &sys_compat_ppoll_rpc, NULL);
+		task_rpc_userunwind(&sys_compat_ppoll_rpc, NULL);
 		__builtin_unreachable();
 	}
 	compat_validate_readwritem(fds, nfds, sizeof(struct pollfd));
@@ -2284,7 +2284,7 @@ DEFINE_SYSCALL5(ssize_t, ppoll_time64,
 	if (sigmask) {
 		(void)sigsetsize;
 		/* Send an RPC to ourselves, so we can gain access to the user-space register state. */
-		task_rpc_exec(THIS_TASK, RPC_CONTEXT_KERN | RPC_SYNCMODE_F_USER, &sys_ppoll_time64_rpc, NULL);
+		task_rpc_userunwind(&sys_ppoll_time64_rpc, NULL);
 		__builtin_unreachable();
 	}
 	validate_readwritem(fds, nfds, sizeof(struct pollfd));
@@ -2345,7 +2345,7 @@ DEFINE_COMPAT_SYSCALL5(ssize_t, ppoll_time64,
 	if (sigmask) {
 		(void)sigsetsize;
 		/* Send an RPC to ourselves, so we can gain access to the user-space register state. */
-		task_rpc_exec(THIS_TASK, RPC_CONTEXT_KERN | RPC_SYNCMODE_F_USER, &sys_compat_ppoll_time64_rpc, NULL);
+		task_rpc_userunwind(&sys_compat_ppoll_time64_rpc, NULL);
 		__builtin_unreachable();
 	}
 	compat_validate_readwritem(fds, nfds, sizeof(struct pollfd));
@@ -2776,7 +2776,7 @@ DEFINE_SYSCALL6(ssize_t, pselect6, size_t, nfds,
 	COMPILER_READ_BARRIER();
 	if (ss.ss_ptr) {
 		/* Send an RPC to ourselves, so we can gain access to the user-space register state. */
-		task_rpc_exec(THIS_TASK, RPC_CONTEXT_KERN | RPC_SYNCMODE_F_USER, &sys_pselect6_rpc, NULL);
+		task_rpc_userunwind(&sys_pselect6_rpc, NULL);
 		__builtin_unreachable();
 	}
 	nfd_size = CEILDIV(nfds, __NFDBITS);
@@ -2857,7 +2857,7 @@ DEFINE_SYSCALL6(ssize_t, pselect6_time64, size_t, nfds,
 	COMPILER_READ_BARRIER();
 	if (ss.ss_ptr) {
 		/* Send an RPC to ourselves, so we can gain access to the user-space register state. */
-		task_rpc_exec(THIS_TASK, RPC_CONTEXT_KERN | RPC_SYNCMODE_F_USER, &sys_pselect6_time64_rpc, NULL);
+		task_rpc_userunwind(&sys_pselect6_time64_rpc, NULL);
 		__builtin_unreachable();
 	}
 	nfd_size = CEILDIV(nfds, __NFDBITS);
@@ -2940,7 +2940,7 @@ DEFINE_COMPAT_SYSCALL6(ssize_t, pselect6, size_t, nfds,
 	COMPILER_READ_BARRIER();
 	if (ss.ss_ptr) {
 		/* Send an RPC to ourselves, so we can gain access to the user-space register state. */
-		task_rpc_exec(THIS_TASK, RPC_CONTEXT_KERN | RPC_SYNCMODE_F_USER, &sys_compat_pselect6_rpc, NULL);
+		task_rpc_userunwind(&sys_compat_pselect6_rpc, NULL);
 		__builtin_unreachable();
 	}
 	nfd_size = CEILDIV(nfds, __NFDBITS);
@@ -3023,7 +3023,7 @@ DEFINE_COMPAT_SYSCALL6(ssize_t, pselect6_time64, size_t, nfds,
 	COMPILER_READ_BARRIER();
 	if (ss.ss_ptr) {
 		/* Send an RPC to ourselves, so we can gain access to the user-space register state. */
-		task_rpc_exec(THIS_TASK, RPC_CONTEXT_KERN | RPC_SYNCMODE_F_USER, &sys_compat_pselect6_time64_rpc, NULL);
+		task_rpc_userunwind(&sys_compat_pselect6_time64_rpc, NULL);
 		__builtin_unreachable();
 	}
 	nfd_size = CEILDIV(nfds, __NFDBITS);

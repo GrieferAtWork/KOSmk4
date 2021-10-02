@@ -279,6 +279,9 @@ __SYSDECL_BEGIN
 #if !defined(SIGCLD) && defined(__SIGCHLD)
 #define SIGCLD    __SIGCHLD    /* Same as SIGCHLD (System V). */
 #endif /* !SIGCLD && __SIGCHLD */
+#if defined(__USE_KOS) && !defined(SIGRPC) && defined(__SIGRPC)
+#define SIGRPC    __SIGRPC     /* Default signal number used for <kos/rpc.h> */
+#endif /* __USE_KOS && !SIGRPC && __SIGRPC */
 #ifndef SIGUNUSED
 #ifdef __SIGUNUSED
 #define SIGUNUSED __SIGUNUSED

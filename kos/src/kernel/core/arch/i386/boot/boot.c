@@ -748,6 +748,15 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 
 	/* TODO: Look into enabling `-fsanitize=undefined' for all code. */
 
+	/* TODO: The raiseat(2) system call should be removed. Instead, it can be emulated
+	 *       by  chaining `sigreturn(2)' with  `rt_tgsigqueueinfo(2)', where the later
+	 *       is made to point at a specific thread. */
+
+	/* TODO: All places  that clear  the current  exception by  means of  setting
+	 *       this_exception_code to E_OK should also include a call to DBG_memset
+	 *       for filling the remainder  of exception_info (except for  ei_nesting
+	 *       and ei_flags) with 0xcc bytes. */
+
 	return state;
 }
 

@@ -3540,7 +3540,7 @@ DEFINE_SYSCALL5(errno_t, execveat, fd_t, dirfd,
 	(void)flags;
 
 	/* Send an RPC to ourselves, so we can gain access to the user-space register state. */
-	task_rpc_exec(THIS_TASK, RPC_CONTEXT_KERN | RPC_SYNCMODE_F_USER, &sys_execveat_rpc, NULL);
+	task_rpc_userunwind(&sys_execveat_rpc, NULL);
 	__builtin_unreachable();
 }
 #else /* CONFIG_USE_NEW_RPC */
@@ -3619,7 +3619,7 @@ DEFINE_COMPAT_SYSCALL5(errno_t, execveat, fd_t, dirfd,
 	(void)flags;
 
 	/* Send an RPC to ourselves, so we can gain access to the user-space register state. */
-	task_rpc_exec(THIS_TASK, RPC_CONTEXT_KERN | RPC_SYNCMODE_F_USER, &compat_sys_execveat_rpc, NULL);
+	task_rpc_userunwind(&compat_sys_execveat_rpc, NULL);
 	__builtin_unreachable();
 }
 #else /* CONFIG_USE_NEW_RPC */
@@ -3695,7 +3695,7 @@ DEFINE_SYSCALL3(errno_t, execve,
 	(void)envp;
 
 	/* Send an RPC to ourselves, so we can gain access to the user-space register state. */
-	task_rpc_exec(THIS_TASK, RPC_CONTEXT_KERN | RPC_SYNCMODE_F_USER, &sys_execve_rpc, NULL);
+	task_rpc_userunwind(&sys_execve_rpc, NULL);
 	__builtin_unreachable();
 }
 #else /* CONFIG_USE_NEW_RPC */
@@ -3768,7 +3768,7 @@ DEFINE_COMPAT_SYSCALL3(errno_t, execve,
 	(void)envp;
 
 	/* Send an RPC to ourselves, so we can gain access to the user-space register state. */
-	task_rpc_exec(THIS_TASK, RPC_CONTEXT_KERN | RPC_SYNCMODE_F_USER, &compat_sys_execve_rpc, NULL);
+	task_rpc_userunwind(&compat_sys_execve_rpc, NULL);
 	__builtin_unreachable();
 }
 #else /* CONFIG_USE_NEW_RPC */

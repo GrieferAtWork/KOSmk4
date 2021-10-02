@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x342227fc */
+/* HASH CRC-32:0x3da9693b */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -467,10 +467,10 @@ DFUN(".text.crt.dos.fs.utility", libd__filelength, libc__filelength, TI32, 1, TI
 DFUN(".text.crt.dos.fs.utility", libd__eof, libc__eof, TD, 1, TIn(__SIZEOF_FD_T__))
 
 /* kos.rpc */
-DFUN(".text.crt.dos.sched.rpc", libd_rpc_schedule, libc_rpc_schedule, TD, 4, TIn(__SIZEOF_PID_T__), TD, TP, TP)
+DFUN(".text.crt.dos.sched.rpc", libd_rpc_schedule, libc_rpc_schedule, TD, 5, TIn(__SIZEOF_PID_T__), TD, TP, TP, TI)
 DFUN(".text.crt.dos.sched.rpc", libd_rpc_exec, libc_rpc_exec, TD, 4, TIn(__SIZEOF_PID_T__), TD, TP, TP)
 DFUN(".text.crt.dos.sched.rpc", libd_rpc_interrupt, libc_rpc_interrupt, TD, 2, TIn(__SIZEOF_PID_T__), TD)
-DFUN(".text.crt.dos.sched.rpc", libd_RpcSchedule, libc_RpcSchedule, TV, 4, TIn(__SIZEOF_PID_T__), TD, TP, TP)
+DFUN(".text.crt.dos.sched.rpc", libd_RpcSchedule, libc_RpcSchedule, TV, 5, TIn(__SIZEOF_PID_T__), TD, TP, TP, TI)
 DFUN(".text.crt.dos.sched.rpc", libd_RpcExec, libc_RpcExec, TV, 4, TIn(__SIZEOF_PID_T__), TD, TP, TP)
 DFUN(".text.crt.dos.sched.rpc", libd_RpcInterrupt, libc_RpcInterrupt, TV, 2, TIn(__SIZEOF_PID_T__), TD)
 

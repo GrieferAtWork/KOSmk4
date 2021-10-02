@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x53059b9f */
+/* HASH CRC-32:0xc13c82f0 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -997,6 +997,16 @@
 /* @param: mode: One of `READDIR_DEFAULT', `READDIR_CONTINUE', `READDIR_PEEK' or `READDIR_MULTIPLE',
  *               optionally     or'd     with     any     of     `READDIR_SKIPREL | READDIR_WANTEOF' */
 #define __NR_kreaddir                 __UINT64_C(0xffffffffffffffb2) /* ssize_t kreaddir(fd_t fd, struct dirent *buf, size_t bufsize, syscall_ulong_t mode) */
+/* >> rpc_serve_sysret(2)
+ * Very similar to `rpc_serve(2)', but with the addition that this one
+ * will only serve RPCs that can be handled in `RPC_REASONCTX_SYSRET',
+ * aka. `RPC_REASONCTX_ASYNC' contexts. Additionally, this system call
+ * ignores the state of the  internal `TASK_FRPC' flag, and should  be
+ * invoked  when  the calling  thread  makes use  of  the userprocmask
+ * mechanism, and the  signal mask became  less restrictive while  the
+ * `USERPROCMASK_FLAG_HASPENDING' flag was set.
+ * @return: 0 : Always, unconditionally returned. */
+#define __NR_rpc_serve_sysret         __UINT64_C(0xffffffffffffffdb) /* errno_t rpc_serve_sysret(void) */
 /* Register the address of  the calling thread's userprocmask  controller.
  * This also  initializes `*ctl->pm_sigmask'  and `ctl->pm_pending',  such
  * that `*ctl->pm_sigmask' is filled with the current kernel-level  signal
@@ -1201,13 +1211,9 @@
  * and may be used to implement `pthread_testcancel(3)' (should KOS
  * RPCs be used to facility pthread cancellation points, as done by
  * KOS's builtin libc)
- * This syscall must also be invoked when the calling thread makes
- * use of the userprocmask mechanism,  and the signal mask  became
- * less restrictive while the `USERPROCMASK_FLAG_HASPENDING'  flag
- * was set.
  * @return: 0:      Nothing was handled.
  * @return: -EINTR: RPCs (or posix signals) were handled. */
-#define __NR_rpc_serve                __UINT64_C(0xffffffffffffffe9) /* syscall_slong_t rpc_serve(void) */
+#define __NR_rpc_serve                __UINT64_C(0xffffffffffffffe9) /* errno_t rpc_serve(void) */
 /* Trigger a debugger trap `trapno', optionally extended with  `regs'
  * at either the system call return location, or at the given `state'
  * In the later case, this system call will by default return to  the
@@ -1277,12 +1283,15 @@
  * multi-arch  platforms (such as  x86), the register numbers,  as well as the
  * address size used by `program' depend on the execution mode of `target_tid'
  * 
- * @param: target_tid: The TID of the targeted thread
- * @param: mode:       One of  `RPC_SYNCMODE_*', or'd  with
- *                     one of `RPC_SYSRESTART_*', or'd with
- *                     one of `RPC_PRIORITY_*'
- * @param: program:    The RPC program to execute (sequences of `RPC_OP_*')
- * @param: params:     RPC program parameters (for `RPC_OP_push_param')
+ * @param: target_tid:      The TID of the targeted thread
+ * @param: mode:            One of  `RPC_SYNCMODE_*', optionally or'd  with
+ *                          one of `RPC_SYSRESTART_*', optionally or'd with
+ *                          one of  `RPC_PRIORITY_*', optionally or'd  with
+ *                          one of  `RPC_DOMAIN_*',  optionally  or'd  with
+ *                          one of `RPC_JOIN_*'
+ * @param: program:         The RPC program to execute (sequences of `RPC_OP_*')
+ * @param: params:          RPC program parameters (for `RPC_OP_push_param')
+ * @param: max_param_count: The max # of `params' used by `program'
  * 
  * @return: 0 :                Success
  * @throws: E_SEGFAULT:        Faulty pointers were given
@@ -1300,7 +1309,7 @@
  *                             still many reasons  outside of your  control
  *                             for why it  may terminate immediately  after
  *                             the RPC program finished. */
-#define __NR_rpc_schedule             __UINT64_C(0xfffffffffffffff4) /* errno_t rpc_schedule(pid_t target_tid, syscall_ulong_t mode, void const *program, __HYBRID_PTR64(void const) const *params) */
+#define __NR_rpc_schedule             __UINT64_C(0xfffffffffffffff4) /* errno_t rpc_schedule(pid_t target_tid, syscall_ulong_t mode, void const *program, __HYBRID_PTR64(void const) const *params, size_t max_param_count) */
 /* Returns  the  absolute   filesystem  path  for   the  specified   file
  * When `AT_SYMLINK_NOFOLLOW' is given, a final symlink is  dereferenced,
  * causing the pointed-to file location to be retrieved. - Otherwise, the
@@ -1843,6 +1852,7 @@
 #define __NRRM_fchdirat                 0
 #define __NRRM_kreaddirf                0
 #define __NRRM_kreaddir                 0
+#define __NRRM_rpc_serve_sysret         1
 #define __NRRM_set_userprocmask_address 0
 #define __NRRM_rtm_test                 0
 #define __NRRM_rtm_abort                0
@@ -2405,6 +2415,7 @@
 #define __NRRC_fchdirat                 3
 #define __NRRC_kreaddirf                5
 #define __NRRC_kreaddir                 4
+#define __NRRC_rpc_serve_sysret         0
 #define __NRRC_set_userprocmask_address 1
 #define __NRRC_rtm_test                 0
 #define __NRRC_rtm_abort                1
@@ -2427,7 +2438,7 @@
 #define __NRRC_set_exception_handler    3
 #define __NRRC_get_exception_handler    3
 #define __NRRC_openpty                  5
-#define __NRRC_rpc_schedule             4
+#define __NRRC_rpc_schedule             5
 #define __NRRC_frealpathat              5
 #define __NRRC_frealpath4               4
 #define __NRRC_getdrives                0

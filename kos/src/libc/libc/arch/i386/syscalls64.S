@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2540008c */
+/* HASH CRC-32:0xeb7a4d64 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3637,6 +3637,23 @@ INTERN_FUNCTION(libc_sys_kreaddir)
 END(libc_sys_kreaddir)
 DEFINE_PUBLIC_ALIAS(sys_kreaddir, libc_sys_kreaddir)
 
+/* >> rpc_serve_sysret(2)
+ * Very similar to `rpc_serve(2)', but with the addition that this one
+ * will only serve RPCs that can be handled in `RPC_REASONCTX_SYSRET',
+ * aka. `RPC_REASONCTX_ASYNC' contexts. Additionally, this system call
+ * ignores the state of the  internal `TASK_FRPC' flag, and should  be
+ * invoked  when  the calling  thread  makes use  of  the userprocmask
+ * mechanism, and the  signal mask became  less restrictive while  the
+ * `USERPROCMASK_FLAG_HASPENDING' flag was set.
+ * @return: 0 : Always, unconditionally returned. */
+/* errno_t rpc_serve_sysret(void) */
+INTERN_FUNCTION(libc_sys_rpc_serve_sysret)
+	movq   $(0xffffffffffffffdb), %rax
+	syscall
+	ret
+END(libc_sys_rpc_serve_sysret)
+DEFINE_PUBLIC_ALIAS(sys_rpc_serve_sysret, libc_sys_rpc_serve_sysret)
+
 /* Register the address of  the calling thread's userprocmask  controller.
  * This also  initializes `*ctl->pm_sigmask'  and `ctl->pm_pending',  such
  * that `*ctl->pm_sigmask' is filled with the current kernel-level  signal
@@ -3930,13 +3947,9 @@ DEFINE_PUBLIC_ALIAS(sys_lfutex, libc_sys_lfutex)
  * and may be used to implement `pthread_testcancel(3)' (should KOS
  * RPCs be used to facility pthread cancellation points, as done by
  * KOS's builtin libc)
- * This syscall must also be invoked when the calling thread makes
- * use of the userprocmask mechanism,  and the signal mask  became
- * less restrictive while the `USERPROCMASK_FLAG_HASPENDING'  flag
- * was set.
  * @return: 0:      Nothing was handled.
  * @return: -EINTR: RPCs (or posix signals) were handled. */
-/* syscall_slong_t rpc_serve(void) */
+/* errno_t rpc_serve(void) */
 INTERN_FUNCTION(libc_sys_rpc_serve)
 	movq   $(0xffffffffffffffe9), %rax
 	syscall
@@ -4082,12 +4095,15 @@ DEFINE_PUBLIC_ALIAS(sys_openpty, libc_sys_openpty)
  * multi-arch  platforms (such as  x86), the register numbers,  as well as the
  * address size used by `program' depend on the execution mode of `target_tid'
  * 
- * @param: target_tid: The TID of the targeted thread
- * @param: mode:       One of  `RPC_SYNCMODE_*', or'd  with
- *                     one of `RPC_SYSRESTART_*', or'd with
- *                     one of `RPC_PRIORITY_*'
- * @param: program:    The RPC program to execute (sequences of `RPC_OP_*')
- * @param: params:     RPC program parameters (for `RPC_OP_push_param')
+ * @param: target_tid:      The TID of the targeted thread
+ * @param: mode:            One of  `RPC_SYNCMODE_*', optionally or'd  with
+ *                          one of `RPC_SYSRESTART_*', optionally or'd with
+ *                          one of  `RPC_PRIORITY_*', optionally or'd  with
+ *                          one of  `RPC_DOMAIN_*',  optionally  or'd  with
+ *                          one of `RPC_JOIN_*'
+ * @param: program:         The RPC program to execute (sequences of `RPC_OP_*')
+ * @param: params:          RPC program parameters (for `RPC_OP_push_param')
+ * @param: max_param_count: The max # of `params' used by `program'
  * 
  * @return: 0 :                Success
  * @throws: E_SEGFAULT:        Faulty pointers were given
@@ -4105,7 +4121,7 @@ DEFINE_PUBLIC_ALIAS(sys_openpty, libc_sys_openpty)
  *                             still many reasons  outside of your  control
  *                             for why it  may terminate immediately  after
  *                             the RPC program finished. */
-/* errno_t rpc_schedule(pid_t target_tid, syscall_ulong_t mode, void const *program, __HYBRID_PTR64(void const) const *params) */
+/* errno_t rpc_schedule(pid_t target_tid, syscall_ulong_t mode, void const *program, __HYBRID_PTR64(void const) const *params, size_t max_param_count) */
 INTERN_FUNCTION(libc_sys_rpc_schedule)
 	movq   $(0xfffffffffffffff4), %rax
 	movq   %rcx, %r10
@@ -8634,6 +8650,25 @@ INTERN_FUNCTION(libc_sys_Xkreaddir)
 END(libc_sys_Xkreaddir)
 DEFINE_PUBLIC_ALIAS(sys_Xkreaddir, libc_sys_Xkreaddir)
 
+/* >> rpc_serve_sysret(2)
+ * Very similar to `rpc_serve(2)', but with the addition that this one
+ * will only serve RPCs that can be handled in `RPC_REASONCTX_SYSRET',
+ * aka. `RPC_REASONCTX_ASYNC' contexts. Additionally, this system call
+ * ignores the state of the  internal `TASK_FRPC' flag, and should  be
+ * invoked  when  the calling  thread  makes use  of  the userprocmask
+ * mechanism, and the  signal mask became  less restrictive while  the
+ * `USERPROCMASK_FLAG_HASPENDING' flag was set.
+ * @return: 0 : Always, unconditionally returned. */
+/* errno_t rpc_serve_sysret(void) */
+INTERN_FUNCTION(libc_sys_Xrpc_serve_sysret)
+	movq   $(0xffffffffffffffdb), %rax
+	std /* Enable exceptions */
+	syscall
+	cld /* Disable exceptions */
+	ret
+END(libc_sys_Xrpc_serve_sysret)
+DEFINE_PUBLIC_ALIAS(sys_Xrpc_serve_sysret, libc_sys_Xrpc_serve_sysret)
+
 /* Register the address of  the calling thread's userprocmask  controller.
  * This also  initializes `*ctl->pm_sigmask'  and `ctl->pm_pending',  such
  * that `*ctl->pm_sigmask' is filled with the current kernel-level  signal
@@ -8951,13 +8986,9 @@ DEFINE_PUBLIC_ALIAS(sys_Xlfutex, libc_sys_Xlfutex)
  * and may be used to implement `pthread_testcancel(3)' (should KOS
  * RPCs be used to facility pthread cancellation points, as done by
  * KOS's builtin libc)
- * This syscall must also be invoked when the calling thread makes
- * use of the userprocmask mechanism,  and the signal mask  became
- * less restrictive while the `USERPROCMASK_FLAG_HASPENDING'  flag
- * was set.
  * @return: 0:      Nothing was handled.
  * @return: -EINTR: RPCs (or posix signals) were handled. */
-/* syscall_slong_t rpc_serve(void) */
+/* errno_t rpc_serve(void) */
 INTERN_FUNCTION(libc_sys_Xrpc_serve)
 	movq   $(0xffffffffffffffe9), %rax
 	std /* Enable exceptions */
@@ -9123,12 +9154,15 @@ DEFINE_PUBLIC_ALIAS(sys_Xopenpty, libc_sys_Xopenpty)
  * multi-arch  platforms (such as  x86), the register numbers,  as well as the
  * address size used by `program' depend on the execution mode of `target_tid'
  * 
- * @param: target_tid: The TID of the targeted thread
- * @param: mode:       One of  `RPC_SYNCMODE_*', or'd  with
- *                     one of `RPC_SYSRESTART_*', or'd with
- *                     one of `RPC_PRIORITY_*'
- * @param: program:    The RPC program to execute (sequences of `RPC_OP_*')
- * @param: params:     RPC program parameters (for `RPC_OP_push_param')
+ * @param: target_tid:      The TID of the targeted thread
+ * @param: mode:            One of  `RPC_SYNCMODE_*', optionally or'd  with
+ *                          one of `RPC_SYSRESTART_*', optionally or'd with
+ *                          one of  `RPC_PRIORITY_*', optionally or'd  with
+ *                          one of  `RPC_DOMAIN_*',  optionally  or'd  with
+ *                          one of `RPC_JOIN_*'
+ * @param: program:         The RPC program to execute (sequences of `RPC_OP_*')
+ * @param: params:          RPC program parameters (for `RPC_OP_push_param')
+ * @param: max_param_count: The max # of `params' used by `program'
  * 
  * @return: 0 :                Success
  * @throws: E_SEGFAULT:        Faulty pointers were given
@@ -9146,7 +9180,7 @@ DEFINE_PUBLIC_ALIAS(sys_Xopenpty, libc_sys_Xopenpty)
  *                             still many reasons  outside of your  control
  *                             for why it  may terminate immediately  after
  *                             the RPC program finished. */
-/* errno_t rpc_schedule(pid_t target_tid, syscall_ulong_t mode, void const *program, __HYBRID_PTR64(void const) const *params) */
+/* errno_t rpc_schedule(pid_t target_tid, syscall_ulong_t mode, void const *program, __HYBRID_PTR64(void const) const *params, size_t max_param_count) */
 INTERN_FUNCTION(libc_sys_Xrpc_schedule)
 	movq   $(0xfffffffffffffff4), %rax
 	movq   %rcx, %r10

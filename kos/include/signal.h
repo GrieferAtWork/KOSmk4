@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9469c30b */
+/* HASH CRC-32:0xd280f9b1 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -271,6 +271,9 @@ __SYSDECL_BEGIN
 #if !defined(SIGCLD) && defined(__SIGCHLD)
 #define SIGCLD    __SIGCHLD    /* Same as SIGCHLD (System V). */
 #endif /* !SIGCLD && __SIGCHLD */
+#if defined(__USE_KOS) && !defined(SIGRPC) && defined(__SIGRPC)
+#define SIGRPC    __SIGRPC     /* Default signal number used for <kos/rpc.h> */
+#endif /* __USE_KOS && !SIGRPC && __SIGRPC */
 #ifndef SIGUNUSED
 #ifdef __SIGUNUSED
 #define SIGUNUSED __SIGUNUSED

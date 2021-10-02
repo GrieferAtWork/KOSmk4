@@ -305,7 +305,7 @@ DEFINE_SYSCALL32_6(errno_t, coredump,
 	(void)unwind_error;
 #ifdef CONFIG_USE_NEW_RPC
 	/* Send an RPC to ourselves, so we can gain access to the user-space register state. */
-	task_rpc_exec(THIS_TASK, RPC_CONTEXT_KERN | RPC_SYNCMODE_F_USER, &LOCAL_sys_coredump_rpc, NULL);
+	task_rpc_userunwind(&LOCAL_sys_coredump_rpc, NULL);
 	__builtin_unreachable();
 #else /* CONFIG_USE_NEW_RPC */
 	task_schedule_user_rpc(THIS_TASK,

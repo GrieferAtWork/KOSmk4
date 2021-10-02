@@ -25,6 +25,7 @@
 #ifdef CONFIG_USE_NEW_RPC
 #include <kernel/types.h>
 #include <sched/pertask.h>
+#include <sched/signal.h> /* `struct sig' */
 
 #include <hybrid/sequence/list.h>
 
@@ -38,14 +39,28 @@
 #ifdef __CC__
 DECL_BEGIN
 
-struct pending_user_rpc {
-	void const USER CHECKED                       *pur_prog; /* [1..1][const] Userspace RPC program */
-	void const USER UNCHECKED *const USER CHECKED *pur_args; /* [?..?][0..n][const] RPC program arguments. */
-	REF struct mman                               *pur_mman; /* [1..1][const] The mman within with the program and arguments reside. */
-};
+/* Possible values for `struct pending_user_rpc::pur_status' */
+#define PENDING_USER_RPC_STATUS_PENDING  0 /* RPC program is pending execution, or is currently executing */
+#define PENDING_USER_RPC_STATUS_COMPLETE 1 /* RPC program has completed successfully */
+#define PENDING_USER_RPC_STATUS_CANCELED 2 /* RPC program was canceled.  Can either be ATOMIC_CMPXCH'd  from
+                                            * `PENDING_USER_RPC_STATUS_PENDING' by the sender, in which case
+                                            * the  RPC program will be aborted and modifications it made are
+                                            * silently  discarded, or set by the target thread itself as the
+                                            * result of it terminating prior to being able to serve the RPC,
+                                            * which  can be checked by testing `this_rpcs' of the target for
+                                            * being equal to `THIS_RPCS_TERMINATED'. */
 
-/* Finalize a given `struct pending_user_rpc' */
-#define pending_user_rpc_fini(self) decref((self)->pur_mman)
+struct pending_rpc;
+struct pending_user_rpc {
+	WEAK refcnt_t                                        pur_refcnt; /* Reference counter. */
+	unsigned int                                         pur_status; /* RPC status (one of `PENDING_USER_RPC_STATUS_*') */
+	struct sig                                           pur_stchng; /* Signal broadcast when `pur_status' is changed
+	                                                                  * by someone  other than  the original  sender. */
+	REF struct mman                                     *pur_mman;   /* [1..1][const] The mman within which `pur_prog' resides. */
+	USER CHECKED void const                             *pur_prog;   /* [1..1][const] Userspace RPC program */
+	size_t                                               pur_argc;   /* [const] # of program arguments. */
+	COMPILER_FLEXIBLE_ARRAY(USER UNCHECKED void const *, pur_argv);  /* [?..?][const] Vector of program arguments. */
+};
 
 #ifndef __siginfo_t_defined
 #define __siginfo_t_defined
@@ -57,7 +72,6 @@ typedef struct __siginfo_struct siginfo_t;
 struct __sigset_struct;
 typedef struct __sigset_struct sigset_t;
 #endif /* !__sigset_t_defined */
-
 
 struct pending_rpc {
 	SLIST_ENTRY(pending_rpc) pr_link;  /* [0..1][lock(ATOMIC)] Link in the list of pending RPCs */
@@ -77,6 +91,19 @@ struct pending_rpc {
 	};
 };
 
+
+/* Destroy a "!RPC_CONTEXT_KERN && !RPC_CONTEXT_SIGNAL"-rpc once `self->pr_user.pur_refcnt == 0' */
+FUNDEF NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL _pending_rpc_destroy_user)(struct pending_rpc *__restrict self);
+#define _pending_user_rpc_destroy(self) \
+	_pending_rpc_destroy_user(COMPILER_CONTAINER_OF(self, struct pending_rpc, pr_user))
+DEFINE_REFCOUNT_FUNCTIONS(struct pending_user_rpc, pur_refcnt, _pending_user_rpc_destroy)
+
+#ifndef ____os_free_defined
+#define ____os_free_defined
+FUNDEF NOBLOCK void NOTHROW(KCALL __os_free)(VIRT void *ptr) ASMNAME("kfree");
+#endif /* !____os_free_defined */
+
 /* Alloc/free functions used for `struct pending_rpc' */
 #define pending_rpc_alloc(size, gfp)    ((struct pending_rpc *)kmalloc(size, gfp))
 #define pending_rpc_alloc_nx(size, gfp) ((struct pending_rpc *)kmalloc_nx(size, gfp))
@@ -84,7 +111,8 @@ struct pending_rpc {
 #define pending_rpc_alloc_kern_nx(gfp)  pending_rpc_alloc_nx(COMPILER_OFFSETAFTER(struct pending_rpc, pr_kern), gfp)
 #define pending_rpc_alloc_psig(gfp)     pending_rpc_alloc(COMPILER_OFFSETAFTER(struct pending_rpc, pr_psig), gfp)
 #define pending_rpc_alloc_psig_nx(gfp)  pending_rpc_alloc_nx(COMPILER_OFFSETAFTER(struct pending_rpc, pr_psig), gfp)
-#define pending_rpc_free(self)          kfree(self)
+#define pending_rpc_free(self)          __os_free(self)
+
 
 #ifndef __pending_rpc_slist_defined
 #define __pending_rpc_slist_defined
@@ -202,8 +230,15 @@ NOTHROW(FCALL task_asyncrpc_push)(struct scpustate *__restrict state,
  * @param: reason:  One of `_RPC_REASONCTX_ASYNC', `_RPC_REASONCTX_SYNC' or `_RPC_REASONCTX_SYSCALL'
  * @param: sc_info: [valid_if(reason == _RPC_REASONCTX_SYSCALL)] System call information. */
 FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) rpc_cpustate_t *FCALL
-task_userrpc_runprogram(rpc_cpustate_t *__restrict state, struct pending_user_rpc const *__restrict rpc,
+task_userrpc_runprogram(rpc_cpustate_t *__restrict state, struct pending_rpc *__restrict rpc,
                         unsigned int reason, struct rpc_syscall_info const *sc_info);
+
+/* Mark  the given `rpc' as canceled. This function is guarantied to
+ * not be called at the same time as `task_userrpc_runprogram()', as
+ * it is only used to  implement handling for `!RPC_CONTEXT_KERN  &&
+ * !RPC_CONTEXT_SIGNAL' RPCs left-over during thread/process exit. */
+FUNDEF NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL task_userrpc_cancelprogram)(struct pending_rpc *__restrict rpc);
 
 
 

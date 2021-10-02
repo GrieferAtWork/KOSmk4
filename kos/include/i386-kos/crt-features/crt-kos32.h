@@ -3939,6 +3939,7 @@
 #define __CRT_HAVE_sys_Xrmdir
 #define __CRT_HAVE_sys_Xrpc_schedule
 #define __CRT_HAVE_sys_Xrpc_serve
+#define __CRT_HAVE_sys_Xrpc_serve_sysret
 #define __CRT_HAVE_sys_Xrseq
 #define __CRT_HAVE_sys_Xrt_sigaction
 #define __CRT_HAVE_sys_Xrt_sigpending
@@ -4433,6 +4434,7 @@
 #define __CRT_HAVE_sys_rmdir
 #define __CRT_HAVE_sys_rpc_schedule
 #define __CRT_HAVE_sys_rpc_serve
+#define __CRT_HAVE_sys_rpc_serve_sysret
 #define __CRT_HAVE_sys_rseq
 #define __CRT_HAVE_sys_rt_sigaction
 #define __CRT_HAVE_sys_rt_sigpending

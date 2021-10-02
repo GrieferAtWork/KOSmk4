@@ -4136,7 +4136,7 @@ DEFINE_SYSCALL2(errno_t, rt_sigsuspend,
 	(void)sigsetsize;
 
 	/* Send an RPC to ourselves, so we can gain access to the user-space register state. */
-	task_rpc_exec(THIS_TASK, RPC_CONTEXT_KERN | RPC_SYNCMODE_F_USER, &sys_rt_sigsuspend_rpc, NULL);
+	task_rpc_userunwind(&sys_rt_sigsuspend_rpc, NULL);
 	__builtin_unreachable();
 }
 #endif /* CONFIG_USE_NEW_RPC */
@@ -4266,21 +4266,14 @@ DEFINE_COMPAT_SYSCALL1(errno_t, sigpending,
 }
 #endif /* __ARCH_WANT_COMPAT_SYSCALL_SIGPENDING */
 
+#ifndef CONFIG_USE_NEW_RPC
 #ifdef __ARCH_WANT_SYSCALL_SIGMASK_CHECK
 DEFINE_SYSCALL0(errno_t, sigmask_check) {
-#ifdef CONFIG_USE_NEW_RPC
-	/* XXX: An arch-specific version could be implemented
-	 *      to directly call `userexcept_sysret()' */
-	userexcept_sysret_inject_self();
-#else /* CONFIG_USE_NEW_RPC */
-	/* XXX: An arch-specific version could be implemented to directly
-	 *      call  `sigmask_check_s()', which would be way faster than
-	 *      this function is! */
 	sigmask_check();
-#endif /* !CONFIG_USE_NEW_RPC */
 	return -EOK;
 }
 #endif /* __ARCH_WANT_SYSCALL_SIGMASK_CHECK */
+#endif /* !CONFIG_USE_NEW_RPC */
 
 DECL_END
 

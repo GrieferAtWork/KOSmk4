@@ -23,11 +23,13 @@
 #include "../api.h"
 /**/
 
+#include <kos/syscalls.h>
+
 #include "kos.rpc.h"
 
 DECL_BEGIN
 
-/*[[[head:libc_rpc_schedule,hash:CRC-32=0x73baf434]]]*/
+/*[[[head:libc_rpc_schedule,hash:CRC-32=0xb022268d]]]*/
 /* >> rpc_schedule(2)
  * Schedule an RPC program to-be executed by some other thread. This  function
  * cannot guaranty that  the RPC  program is  always executed,  as the  target
@@ -36,12 +38,15 @@ DECL_BEGIN
  * multi-arch  platforms (such as  x86), the register numbers,  as well as the
  * address size used by `program' depend on the execution mode of `target_tid'
  *
- * @param: target_tid: The TID of the targeted thread
- * @param: mode:       One of  `RPC_SYNCMODE_*', or'd  with
- *                     one of `RPC_SYSRESTART_*', or'd with
- *                     one of `RPC_PRIORITY_*'
- * @param: program:    The RPC program to execute (sequences of `RPC_OP_*')
- * @param: params:     RPC program parameters (for `RPC_OP_push_param')
+ * @param: target_tid:      The TID of the targeted thread
+ * @param: mode:            One of  `RPC_SYNCMODE_*', optionally or'd  with
+ *                          one of `RPC_SYSRESTART_*', optionally or'd with
+ *                          one of  `RPC_PRIORITY_*', optionally or'd  with
+ *                          one of  `RPC_DOMAIN_*',  optionally  or'd  with
+ *                          one of `RPC_JOIN_*'
+ * @param: program:         The RPC program to execute (sequences of `RPC_OP_*')
+ * @param: params:          RPC program parameters (for `RPC_OP_push_param')
+ * @param: max_param_count: The max # of `params' used by `program'
  *
  * @return: 0 :                Success
  * @throws: E_SEGFAULT:        Faulty pointers were given
@@ -63,16 +68,14 @@ INTERN ATTR_SECTION(".text.crt.sched.rpc") NONNULL((3)) int
 NOTHROW_NCX(LIBCCALL libc_rpc_schedule)(pid_t target_tid,
                                         unsigned int mode,
                                         void const *program,
-                                        void const *const *params)
+                                        void const *const *params,
+                                        size_t max_param_count)
 /*[[[body:libc_rpc_schedule]]]*/
-/*AUTO*/{
-	(void)target_tid;
-	(void)mode;
-	(void)program;
-	(void)params;
-	CRT_UNIMPLEMENTEDF("rpc_schedule(%" PRIxN(__SIZEOF_PID_T__) ", %x, %p, %p)", target_tid, mode, program, params); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+{
+	errno_t error;
+	error = sys_rpc_schedule(target_tid, mode, program,
+	                         params, max_param_count);
+	return libc_seterrno_syserr(error);
 }
 /*[[[end:libc_rpc_schedule]]]*/
 
@@ -88,24 +91,29 @@ NOTHROW_NCX(LIBCCALL libc_rpc_schedule)(pid_t target_tid,
 INTERN ATTR_SECTION(".text.crt.sched.rpc") int
 NOTHROW_RPC(LIBCCALL libc_rpc_serve)(void)
 /*[[[body:libc_rpc_serve]]]*/
-/*AUTO*/{
-	CRT_UNIMPLEMENTED("rpc_serve"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+{
+	errno_t error = sys_rpc_serve();
+	return libc_seterrno_syserr(error);
 }
 /*[[[end:libc_rpc_serve]]]*/
 
-/*[[[head:libc_rpc_exec,hash:CRC-32=0x821e21d0]]]*/
+/*[[[head:libc_rpc_exec,hash:CRC-32=0x656f7ab1]]]*/
 /* >> rpc_exec(3)
  * Send a RPC to `target_tid' (which must be a thread within the current process).
  * The RPC will modify  the target thread's register  state such that `func'  will
  * be executed before  (upon its  return), execution resumes  within that  thread.
  * How/when exactly the RPC is served depends on the given `mode'.
+ * WARNING: Unless special conditions are met, trying to use this function to send
+ *          an RPC to another process  (read: different mman), will probably  fail
+ *          due  to the address  of `func' mapping to  a different location within
+ *          that other process.
  *
  * @param: target_tid: The TID of the targeted thread
- * @param: mode:       One of  `RPC_SYNCMODE_*', or'd  with
- *                     one of `RPC_SYSRESTART_*', or'd with
- *                     one of `RPC_PRIORITY_*'
+ * @param: mode:       One of  `RPC_SYNCMODE_*', optionally or'd  with
+ *                     one of `RPC_SYSRESTART_*', optionally or'd with
+ *                     one of  `RPC_PRIORITY_*', optionally or'd  with
+ *                     one of  `RPC_DOMAIN_*',  optionally  or'd  with
+ *                     one of `RPC_JOIN_*'
  * @return: 0 :                Success
  * @return: -1: [errno=ESRCH]  The  target thread has already terminated, or
  *                             doesn't exist.  Note though  that unless  the
@@ -113,7 +121,7 @@ NOTHROW_RPC(LIBCCALL libc_rpc_serve)(void)
  *                             still many  reasons outside  of your  control
  *                             for why  it may  terminate immediately  after
  *                             the RPC program finished. */
-INTERN ATTR_SECTION(".text.crt.sched.rpc") int
+INTERN ATTR_SECTION(".text.crt.sched.rpc") NONNULL((3)) int
 NOTHROW_NCX(LIBCCALL libc_rpc_exec)(pid_t target_tid,
                                     unsigned int mode,
                                     prpc_exec_callback_t func,
@@ -130,7 +138,7 @@ NOTHROW_NCX(LIBCCALL libc_rpc_exec)(pid_t target_tid,
 }
 /*[[[end:libc_rpc_exec]]]*/
 
-/*[[[head:libc_rpc_interrupt,hash:CRC-32=0xf22aac02]]]*/
+/*[[[head:libc_rpc_interrupt,hash:CRC-32=0xd9d729e9]]]*/
 /* >> rpc_interrupt(3)
  * Send  a RPC to `target_tid' (which must be a thread within the current process).
  * The RPC won't do anything except causing an in-progress system call to fail with
@@ -142,9 +150,11 @@ NOTHROW_NCX(LIBCCALL libc_rpc_exec)(pid_t target_tid,
  * given `target_tid == gettid()'.
  *
  * @param: target_tid: The TID of the targeted thread
- * @param: mode:       One of  `RPC_SYNCMODE_*', or'd  with
- *                     one of `RPC_SYSRESTART_*', or'd with
- *                     one of `RPC_PRIORITY_*'
+ * @param: mode:       One of  `RPC_SYNCMODE_*', optionally or'd  with
+ *                     one of `RPC_SYSRESTART_*', optionally or'd with
+ *                     one of  `RPC_PRIORITY_*', optionally or'd  with
+ *                     one of  `RPC_DOMAIN_*',  optionally  or'd  with
+ *                     one of `RPC_JOIN_*'
  * @return: 0 :               Success
  * @return: -1: [errno=ESRCH] The  target thread has already terminated, or
  *                            doesn't exist.  Note though  that unless  the
@@ -165,65 +175,25 @@ NOTHROW_NCX(LIBCCALL libc_rpc_interrupt)(pid_t target_tid,
 }
 /*[[[end:libc_rpc_interrupt]]]*/
 
-/*[[[head:libc_RpcSchedule,hash:CRC-32=0x33322a64]]]*/
-/* >> rpc_schedule(2)
- * Schedule an RPC program to-be executed by some other thread. This  function
- * cannot guaranty that  the RPC  program is  always executed,  as the  target
- * thread terminate before the  conditions for the RPC  to be served are  ever
- * met. Note that these  conditions depend on the  given `mode'. Note that  on
- * multi-arch  platforms (such as  x86), the register numbers,  as well as the
- * address size used by `program' depend on the execution mode of `target_tid'
- *
- * @param: target_tid: The TID of the targeted thread
- * @param: mode:       One of  `RPC_SYNCMODE_*', or'd  with
- *                     one of `RPC_SYSRESTART_*', or'd with
- *                     one of `RPC_PRIORITY_*'
- * @param: program:    The RPC program to execute (sequences of `RPC_OP_*')
- * @param: params:     RPC program parameters (for `RPC_OP_push_param')
- *
- * @return: 0 :                Success
- * @throws: E_SEGFAULT:        Faulty pointers were given
- * @throws: E_INVALID_ARGUMENT:E_INVALID_ARGUMENT_CONTEXT_RPC_SCHEDULE_MODE:
- *                             The given `mode' is invalid.
- * @throws: E_INVALID_ARGUMENT:E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_INSTRUCTION:
- *                             The RPC program  contains illegal  instructions.
- *                             In this case, modifications made by instructions
- *                             encountered before the illegal one(s) will still
- *                             have  happened, meaning that the target thread's
- *                             state may have become inconsistent.
- * @throws: E_PROCESS_EXITED:  The target thread has already terminated, or
- *                             doesn't exist. Note  though that unless  the
- *                             thread  is  part  of your  own  process, are
- *                             still many reasons  outside of your  control
- *                             for why it  may terminate immediately  after
- *                             the RPC program finished. */
-INTERN ATTR_SECTION(".text.crt.sched.rpc") NONNULL((3)) void
-(LIBCCALL libc_RpcSchedule)(pid_t target_tid,
-                            unsigned int mode,
-                            void const *program,
-                            void const *const *params) THROWS(...)
-/*[[[body:libc_RpcSchedule]]]*/
-/*AUTO*/{
-	(void)target_tid;
-	(void)mode;
-	(void)program;
-	(void)params;
-	CRT_UNIMPLEMENTEDF("RpcSchedule(%" PRIxN(__SIZEOF_PID_T__) ", %x, %p, %p)", target_tid, mode, program, params); /* TODO */
-	libc_seterrno(ENOSYS);
-}
-/*[[[end:libc_RpcSchedule]]]*/
+/*[[[skip:libc_RpcSchedule]]]*/
 
-/*[[[head:libc_RpcExec,hash:CRC-32=0xc6248eac]]]*/
+/*[[[head:libc_RpcExec,hash:CRC-32=0xe295db49]]]*/
 /* >> rpc_exec(3)
  * Send a RPC to `target_tid' (which must be a thread within the current process).
  * The RPC will modify  the target thread's register  state such that `func'  will
  * be executed before  (upon its  return), execution resumes  within that  thread.
  * How/when exactly the RPC is served depends on the given `mode'.
+ * WARNING: Unless special conditions are met, trying to use this function to send
+ *          an RPC to another process  (read: different mman), will probably  fail
+ *          due  to the address  of `func' mapping to  a different location within
+ *          that other process.
  *
  * @param: target_tid: The TID of the targeted thread
- * @param: mode:       One of  `RPC_SYNCMODE_*', or'd  with
- *                     one of `RPC_SYSRESTART_*', or'd with
- *                     one of `RPC_PRIORITY_*'
+ * @param: mode:       One of  `RPC_SYNCMODE_*', optionally or'd  with
+ *                     one of `RPC_SYSRESTART_*', optionally or'd with
+ *                     one of  `RPC_PRIORITY_*', optionally or'd  with
+ *                     one of  `RPC_DOMAIN_*',  optionally  or'd  with
+ *                     one of `RPC_JOIN_*'
  * @return: 0 :                Success
  * @return: -1: [errno=ESRCH]  The  target thread has already terminated, or
  *                             doesn't exist.  Note though  that unless  the
@@ -247,7 +217,7 @@ INTERN ATTR_SECTION(".text.crt.sched.rpc") NONNULL((3)) void
 }
 /*[[[end:libc_RpcExec]]]*/
 
-/*[[[head:libc_RpcInterrupt,hash:CRC-32=0x9d9dbc4d]]]*/
+/*[[[head:libc_RpcInterrupt,hash:CRC-32=0x8a55c5c6]]]*/
 /* >> rpc_interrupt(3)
  * Send  a RPC to `target_tid' (which must be a thread within the current process).
  * The RPC won't do anything except causing an in-progress system call to fail with
@@ -259,9 +229,11 @@ INTERN ATTR_SECTION(".text.crt.sched.rpc") NONNULL((3)) void
  * given `target_tid == gettid()'.
  *
  * @param: target_tid: The TID of the targeted thread
- * @param: mode:       One of  `RPC_SYNCMODE_*', or'd  with
- *                     one of `RPC_SYSRESTART_*', or'd with
- *                     one of `RPC_PRIORITY_*'
+ * @param: mode:       One of  `RPC_SYNCMODE_*', optionally or'd  with
+ *                     one of `RPC_SYSRESTART_*', optionally or'd with
+ *                     one of  `RPC_PRIORITY_*', optionally or'd  with
+ *                     one of  `RPC_DOMAIN_*',  optionally  or'd  with
+ *                     one of `RPC_JOIN_*'
  * @return: 0 :               Success
  * @return: -1: [errno=ESRCH] The  target thread has already terminated, or
  *                            doesn't exist.  Note though  that unless  the
@@ -281,12 +253,11 @@ INTERN ATTR_SECTION(".text.crt.sched.rpc") void
 }
 /*[[[end:libc_RpcInterrupt]]]*/
 
-/*[[[start:exports,hash:CRC-32=0xb4d47112]]]*/
+/*[[[start:exports,hash:CRC-32=0x4adde8ce]]]*/
 DEFINE_PUBLIC_ALIAS(rpc_schedule, libc_rpc_schedule);
 DEFINE_PUBLIC_ALIAS(rpc_serve, libc_rpc_serve);
 DEFINE_PUBLIC_ALIAS(rpc_exec, libc_rpc_exec);
 DEFINE_PUBLIC_ALIAS(rpc_interrupt, libc_rpc_interrupt);
-DEFINE_PUBLIC_ALIAS(RpcSchedule, libc_RpcSchedule);
 DEFINE_PUBLIC_ALIAS(RpcExec, libc_RpcExec);
 DEFINE_PUBLIC_ALIAS(RpcInterrupt, libc_RpcInterrupt);
 /*[[[end:exports]]]*/

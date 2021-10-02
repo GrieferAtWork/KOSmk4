@@ -221,6 +221,7 @@ enum {
 	E_INVALID_ARGUMENT_CONTEXT_PKEY_GET_PKEY,                      /* E_INVALID_ARGUMENT_BAD_VALUE: The `pkey' argument passed to `PKeyGet(3)' is invalid. */
 	E_INVALID_ARGUMENT_CONTEXT_GETRANDOM_FLAGS,                    /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The set of flags passed to `getrandom(2)' isn't a set of `GRND_NONBLOCK | GRND_RANDOM' */
 	E_INVALID_ARGUMENT_CONTEXT_RPC_SCHEDULE_MODE,                  /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Invalid flags passed to `rpc_schedule(2)'. */
+	E_INVALID_ARGUMENT_CONTEXT_RPC_SCHEDULE_TOO_MANY_PARAMS,       /* E_INVALID_ARGUMENT_BAD_VALUE: The `max_param_count' passed to `rpc_schedule(2)' is greater than `RPC_PARAMS_MAX'. */
 	E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_INSTRUCTION,            /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: An RPC program contains an unrecognized (or currently illegal) instruction. */
 };
 #endif /* __CC__ */
@@ -417,6 +418,8 @@ enum {
 #define E_INVALID_ARGUMENT_CONTEXT_PKEY_SET_ACCESS_RIGHTS             E_INVALID_ARGUMENT_CONTEXT_PKEY_SET_ACCESS_RIGHTS             /* E_INVALID_ARGUMENT_BAD_VALUE: The `access_rights' argument passed to `PKeySet(3)' is invalid. */
 #define E_INVALID_ARGUMENT_CONTEXT_PKEY_GET_PKEY                      E_INVALID_ARGUMENT_CONTEXT_PKEY_GET_PKEY                      /* E_INVALID_ARGUMENT_BAD_VALUE: The `pkey' argument passed to `PKeyGet(3)' is invalid. */
 #define E_INVALID_ARGUMENT_CONTEXT_GETRANDOM_FLAGS                    E_INVALID_ARGUMENT_CONTEXT_GETRANDOM_FLAGS                    /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The set of flags passed to `getrandom(2)' isn't a set of `GRND_NONBLOCK | GRND_RANDOM' */
+#define E_INVALID_ARGUMENT_CONTEXT_RPC_SCHEDULE_MODE                  E_INVALID_ARGUMENT_CONTEXT_RPC_SCHEDULE_MODE                  /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Invalid flags passed to `rpc_schedule(2)'. */
+#define E_INVALID_ARGUMENT_CONTEXT_RPC_SCHEDULE_TOO_MANY_PARAMS       E_INVALID_ARGUMENT_CONTEXT_RPC_SCHEDULE_TOO_MANY_PARAMS       /* E_INVALID_ARGUMENT_BAD_VALUE: The `max_param_count' passed to `rpc_schedule(2)' is greater than `RPC_PARAMS_MAX'. */
 #define E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_INSTRUCTION            E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_INSTRUCTION            /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: An RPC program contains an unrecognized (or currently illegal) instruction. */
 #else /* __COMPILER_PREFERR_ENUMS */
 #define E_INVALID_ARGUMENT_CONTEXT_GENERIC                            0   /* Generic context */
@@ -610,7 +613,9 @@ enum {
 #define E_INVALID_ARGUMENT_CONTEXT_PKEY_SET_ACCESS_RIGHTS             170 /* E_INVALID_ARGUMENT_BAD_VALUE: The `access_rights' argument passed to `PKeySet(3)' is invalid. */
 #define E_INVALID_ARGUMENT_CONTEXT_PKEY_GET_PKEY                      171 /* E_INVALID_ARGUMENT_BAD_VALUE: The `pkey' argument passed to `PKeyGet(3)' is invalid. */
 #define E_INVALID_ARGUMENT_CONTEXT_GETRANDOM_FLAGS                    172 /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The set of flags passed to `getrandom(2)' isn't a set of `GRND_NONBLOCK | GRND_RANDOM' */
-#define E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_INSTRUCTION            173 /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: An RPC program contains an unrecognized (or currently illegal) instruction. */
+#define E_INVALID_ARGUMENT_CONTEXT_RPC_SCHEDULE_MODE                  173 /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Invalid flags passed to `rpc_schedule(2)'. */
+#define E_INVALID_ARGUMENT_CONTEXT_RPC_SCHEDULE_TOO_MANY_PARAMS       174 /* E_INVALID_ARGUMENT_BAD_VALUE: The `max_param_count' passed to `rpc_schedule(2)' is greater than `RPC_PARAMS_MAX'. */
+#define E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_INSTRUCTION            175 /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: An RPC program contains an unrecognized (or currently illegal) instruction. */
 #endif /* !__COMPILER_PREFERR_ENUMS */
 /*[[[end]]]*/
 

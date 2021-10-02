@@ -36,7 +36,7 @@
 #define __ARCH_COMPAT(x)                              x##32
 
 #define __ARCH_COMPAT_SIZEOF_POINTER 4
-#define __ARCH_COMPAT_PTR(T)         __HYBRID_PTR32(T)
+#define __ARCH_COMPAT_PTR            __HYBRID_PTR32
 #define __ARCH_COMPAT_INTPTR_TYPE    __INT32_TYPE__
 #define __ARCH_COMPAT_LONGPTR_TYPE   __LONG32_TYPE__
 #define __ARCH_COMPAT_UINTPTR_TYPE   __UINT32_TYPE__
