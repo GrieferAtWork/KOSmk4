@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc13c82f0 */
+/* HASH CRC-32:0x6ebe366e */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1005,6 +1005,12 @@
  * invoked  when  the calling  thread  makes use  of  the userprocmask
  * mechanism, and the  signal mask became  less restrictive while  the
  * `USERPROCMASK_FLAG_HASPENDING' flag was set.
+ * 
+ * When userprocmask is disabled, this system call is pretty much just
+ * a no-op (semnatically speaking, it does nothing). But when enabled,
+ * it is really only usable  in conjuction with the userprocmask.  The
+ * exact usage can be seen in `chkuserprocmask(3)'.
+ * 
  * @return: 0 : Always, unconditionally returned. */
 #define __NR_rpc_serve_sysret         __UINT64_C(0xffffffffffffffdb) /* errno_t rpc_serve_sysret(void) */
 /* Register the address of  the calling thread's userprocmask  controller.

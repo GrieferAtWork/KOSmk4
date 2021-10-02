@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xeb7a4d64 */
+/* HASH CRC-32:0xb9a73204 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3645,6 +3645,12 @@ DEFINE_PUBLIC_ALIAS(sys_kreaddir, libc_sys_kreaddir)
  * invoked  when  the calling  thread  makes use  of  the userprocmask
  * mechanism, and the  signal mask became  less restrictive while  the
  * `USERPROCMASK_FLAG_HASPENDING' flag was set.
+ * 
+ * When userprocmask is disabled, this system call is pretty much just
+ * a no-op (semnatically speaking, it does nothing). But when enabled,
+ * it is really only usable  in conjuction with the userprocmask.  The
+ * exact usage can be seen in `chkuserprocmask(3)'.
+ * 
  * @return: 0 : Always, unconditionally returned. */
 /* errno_t rpc_serve_sysret(void) */
 INTERN_FUNCTION(libc_sys_rpc_serve_sysret)
@@ -8658,6 +8664,12 @@ DEFINE_PUBLIC_ALIAS(sys_Xkreaddir, libc_sys_Xkreaddir)
  * invoked  when  the calling  thread  makes use  of  the userprocmask
  * mechanism, and the  signal mask became  less restrictive while  the
  * `USERPROCMASK_FLAG_HASPENDING' flag was set.
+ * 
+ * When userprocmask is disabled, this system call is pretty much just
+ * a no-op (semnatically speaking, it does nothing). But when enabled,
+ * it is really only usable  in conjuction with the userprocmask.  The
+ * exact usage can be seen in `chkuserprocmask(3)'.
+ * 
  * @return: 0 : Always, unconditionally returned. */
 /* errno_t rpc_serve_sysret(void) */
 INTERN_FUNCTION(libc_sys_Xrpc_serve_sysret)

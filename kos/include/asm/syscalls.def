@@ -1677,6 +1677,12 @@ rpc_schedule:(pid_t target_tid, [tostr(RPC_SCHEDULE_MODE)] syscall_ulong_t mode,
 @@invoked  when  the calling  thread  makes use  of  the userprocmask
 @@mechanism, and the  signal mask became  less restrictive while  the
 @@`USERPROCMASK_FLAG_HASPENDING' flag was set.
+@@
+@@When userprocmask is disabled, this system call is pretty much just
+@@a no-op (semnatically speaking, it does nothing). But when enabled,
+@@it is really only usable  in conjuction with the userprocmask.  The
+@@exact usage can be seen in `chkuserprocmask(3)'.
+@@
 @@@return: 0 : Always, unconditionally returned.
 [restart(dont)] rpc_serve_sysret:() -> errno_t;
 

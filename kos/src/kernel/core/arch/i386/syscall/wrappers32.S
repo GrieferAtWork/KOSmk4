@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x939ca4dd */
+/* HASH CRC-32:0xeca4cf90 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18317,6 +18317,12 @@ END(__x86_asm32_int80_ftime64)
  * invoked  when  the calling  thread  makes use  of  the userprocmask
  * mechanism, and the  signal mask became  less restrictive while  the
  * `USERPROCMASK_FLAG_HASPENDING' flag was set.
+ * 
+ * When userprocmask is disabled, this system call is pretty much just
+ * a no-op (semnatically speaking, it does nothing). But when enabled,
+ * it is really only usable  in conjuction with the userprocmask.  The
+ * exact usage can be seen in `chkuserprocmask(3)'.
+ * 
  * @return: 0 : Always, unconditionally returned. */
 /* errno_t rpc_serve_sysret(void) */
 .section .text.x86.asm32_syscall_int80.rpc_serve_sysret
@@ -38088,6 +38094,12 @@ END(__x86_asm32_sysenter_ftime64)
  * invoked  when  the calling  thread  makes use  of  the userprocmask
  * mechanism, and the  signal mask became  less restrictive while  the
  * `USERPROCMASK_FLAG_HASPENDING' flag was set.
+ * 
+ * When userprocmask is disabled, this system call is pretty much just
+ * a no-op (semnatically speaking, it does nothing). But when enabled,
+ * it is really only usable  in conjuction with the userprocmask.  The
+ * exact usage can be seen in `chkuserprocmask(3)'.
+ * 
  * @return: 0 : Always, unconditionally returned. */
 /* errno_t rpc_serve_sysret(void) */
 .section .text.x86.asm32_syscall_sysenter.rpc_serve_sysret
