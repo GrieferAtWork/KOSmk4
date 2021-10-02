@@ -618,12 +618,7 @@ socket_sendv(struct socket *__restrict self,
 
 
 
-#ifdef CONFIG_USE_NEW_ASYNC
-struct connect_and_send_job: async
-#else /* CONFIG_USE_NEW_ASYNC */
-struct connect_and_send_job
-#endif /* !CONFIG_USE_NEW_ASYNC */
-{
+struct connect_and_send_job: async {
 	WEAK REF struct socket   *cas_socket;   /* [0..1][lock(CLEAR_ONCE)] Weak reference to the associated socket. */
 	REF struct mman          *cas_bufmm;    /* [0..1][lock(CLEAR_ONCE)] VM for user-space buffers. */
 	struct ancillary_message *cas_pcontrol; /* [0..1][const] Pointer to ancillary message data. */
@@ -635,14 +630,8 @@ struct connect_and_send_job
 	                                         * if (cas_socket ==  NULL): AIO  handle for  send() */
 };
 
-#ifdef CONFIG_USE_NEW_ASYNC
 PRIVATE NOBLOCK NONNULL((1)) void
-NOTHROW(FCALL connect_and_send_destroy)(struct async *__restrict self)
-#else /* CONFIG_USE_NEW_ASYNC */
-PRIVATE NOBLOCK NONNULL((1)) void
-NOTHROW(FCALL connect_and_send_fini)(async_job_t self)
-#endif /* !CONFIG_USE_NEW_ASYNC */
-{
+NOTHROW(FCALL connect_and_send_destroy)(struct async *__restrict self) {
 	struct connect_and_send_job *me;
 	me = (struct connect_and_send_job *)self;
 	aio_handle_generic_fini(&me->cas_aio);
@@ -650,12 +639,9 @@ NOTHROW(FCALL connect_and_send_fini)(async_job_t self)
 		kfree((void *)me->cas_buffer.iv_entv);
 	xweakdecref_unlikely(me->cas_socket);
 	xdecref_unlikely(me->cas_bufmm);
-#ifdef CONFIG_USE_NEW_ASYNC
 	kfree(me);
-#endif /* CONFIG_USE_NEW_ASYNC */
 }
 
-#ifdef CONFIG_USE_NEW_ASYNC
 PRIVATE NONNULL((1)) ktime_t FCALL
 connect_and_send_connect(struct async *__restrict self) {
 	struct connect_and_send_job *me;
@@ -671,20 +657,9 @@ connect_and_send_test(struct async *__restrict self) {
 	return aio_handle_generic_hascompleted(&me->cas_aio);
 }
 
-#else /* CONFIG_USE_NEW_ASYNC */
-
-PRIVATE NONNULL((1, 2)) unsigned int FCALL
-connect_and_send_poll(async_job_t self, ktime_t *__restrict UNUSED(abs_timeout)) {
-	struct connect_and_send_job *me;
-	me = (struct connect_and_send_job *)self;
-	if (aio_handle_generic_poll(&me->cas_aio))
-		return ASYNC_JOB_POLL_AVAILABLE;
-	return ASYNC_JOB_POLL_WAITFOR_NOTIMEOUT;
-}
-#endif /* !CONFIG_USE_NEW_ASYNC */
 
 PRIVATE NONNULL((1)) unsigned int FCALL
-connect_and_send_work(async_job_t self) {
+connect_and_send_work(struct async *__restrict self) {
 	struct connect_and_send_job *me;
 	me = (struct connect_and_send_job *)self;
 	/* Check for AIO errors. */
@@ -692,7 +667,7 @@ connect_and_send_work(async_job_t self) {
 	aio_handle_generic_checkerror(&me->cas_aio);
 	if (!me->cas_socket) {
 		/* send() has completed. */
-		return ASYNC_JOB_WORK_COMPLETE;
+		return ASYNC_FINISHED;
 	}
 	if (!tryincref(me->cas_socket))
 		THROW(E_NO_SUCH_OBJECT);
@@ -724,11 +699,11 @@ connect_and_send_work(async_job_t self) {
 	}
 	decref_unlikely(me->cas_socket);
 	me->cas_socket = NULL;
-	return ASYNC_JOB_WORK_AGAIN;
+	return ASYNC_RESUME;
 }
 
 PRIVATE NONNULL((1)) void FCALL
-connect_and_send_cancel(async_job_t self) {
+connect_and_send_cancel(struct async *__restrict self) {
 	struct connect_and_send_job *me;
 	me = (struct connect_and_send_job *)self;
 	/* Cancel the current AIO operation. */
@@ -736,7 +711,7 @@ connect_and_send_cancel(async_job_t self) {
 }
 
 PRIVATE NOBLOCK NONNULL((1)) size_t
-NOTHROW(FCALL connect_and_send_retsize)(async_job_t self) {
+NOTHROW(FCALL connect_and_send_retsize)(struct async *__restrict self) {
 	struct connect_and_send_job *me;
 	me = (struct connect_and_send_job *)self;
 	assert(aio_handle_generic_hascompleted(&me->cas_aio));
@@ -747,8 +722,7 @@ NOTHROW(FCALL connect_and_send_retsize)(async_job_t self) {
 }
 
 
-PRIVATE struct async_job_callbacks const connect_and_send_cb = {
-#ifdef CONFIG_USE_NEW_ASYNC
+PRIVATE struct async_ops const connect_and_send_cb = {
 	.ao_driver   = &drv_self,
 	.ao_destroy  = &connect_and_send_destroy,
 	.ao_connect  = &connect_and_send_connect,
@@ -758,18 +732,6 @@ PRIVATE struct async_job_callbacks const connect_and_send_cb = {
 	.ao_cancel   = &connect_and_send_cancel,
 	.ao_progress = NULL, /* Unused */
 	.ao_retsize  = &connect_and_send_retsize,
-#else /* CONFIG_USE_NEW_ASYNC */
-	/* .jc_jobsize  = */ sizeof(struct connect_and_send_job),
-	/* .jc_jobalign = */ alignof(struct connect_and_send_job),
-	/* .jc_driver   = */ &drv_self,
-	/* .jc_fini     = */ &connect_and_send_fini,
-	/* .jc_poll     = */ &connect_and_send_poll,
-	/* .jc_work     = */ &connect_and_send_work,
-	/* .jc_time     = */ NULL, /* Unused */
-	/* .jc_cancel   = */ &connect_and_send_cancel,
-	/* .jc_progress = */ NULL, /* Unused */
-	/* .jc_retsize  = */ &connect_and_send_retsize,
-#endif /* !CONFIG_USE_NEW_ASYNC */
 };
 
 
@@ -782,16 +744,12 @@ socket_asendtov_connect_and_send(struct socket *__restrict self,
                                  /*out*/ struct aio_handle *__restrict aio)
 		THROWS_INDIRECT(E_INVALID_ARGUMENT_UNEXPECTED_COMMAND, E_NET_MESSAGE_TOO_LONG,
 		                E_NET_CONNECTION_RESET, E_NET_SHUTDOWN) {
-	async_job_t aj;
+	struct async *aj;
 	assertf(self->sk_ops->so_sendv,
 	        "At least one of `so_sendv' or `so_sendtov' "
 	        "has to be implemented by every socket type");
 	/* Construct an async-job for doing the connect() + send() */
-#ifdef CONFIG_USE_NEW_ASYNC
 	aj = async_new_aio(struct connect_and_send_job, &connect_and_send_cb, aio);
-#else /* CONFIG_USE_NEW_ASYNC */
-	aj = async_job_alloc(&connect_and_send_cb);
-#endif /* !CONFIG_USE_NEW_ASYNC */
 	TRY {
 		struct connect_and_send_job *job;
 		job = (struct connect_and_send_job *)aj;
@@ -834,14 +792,10 @@ socket_asendtov_connect_and_send(struct socket *__restrict self,
 			RETHROW();
 		}
 	} EXCEPT {
-		async_job_free(aj);
+		async_free(aj);
 		RETHROW();
 	}
-#ifdef CONFIG_USE_NEW_ASYNC
 	decref(async_start(aj));
-#else /* CONFIG_USE_NEW_ASYNC */
-	decref(async_job_start(aj, aio));
-#endif /* !CONFIG_USE_NEW_ASYNC */
 }
 
 /* Send the contents of a given buffer over this socket to the specified address.

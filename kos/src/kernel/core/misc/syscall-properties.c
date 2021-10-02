@@ -2,6 +2,7 @@
 options["COMPILE.language"] = "c";
 local gcc_opt = options.setdefault("GCC.options", []);
 gcc_opt.remove("-g"); // Disable debug informations for this file!
+gcc_opt.remove("-fno-rtti");
 ]]]*/
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *

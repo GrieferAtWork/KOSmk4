@@ -642,12 +642,7 @@ NOTHROW(KCALL nic_device_add_arp_response_timeout)(struct nic_device *__restrict
 }
 
 
-#ifdef CONFIG_USE_NEW_ASYNC
-struct ip_arp_and_datagram_job: async
-#else /* CONFIG_USE_NEW_ASYNC */
-struct ip_arp_and_datagram_job
-#endif /* !CONFIG_USE_NEW_ASYNC */
-{
+struct ip_arp_and_datagram_job: async {
 	REF struct nic_device    *adj_dev;    /* [1..1][const] The associated network device. */
 	REF struct net_peeraddr  *adj_peer;   /* [1..1][const][valid_if(adj_arpc != 0)] The peer who's mac address we're in need of. */
 	REF struct nic_packet    *adj_gram;   /* [1..1][const][valid_if(adj_arpc != 0)] The IP datagram (with sufficient header space for an ethernet header) */
@@ -669,14 +664,8 @@ nic_device_send_arp_request(struct nic_device *__restrict self, be32 ip) {
 }
 
 
-#ifdef CONFIG_USE_NEW_ASYNC
 PRIVATE NOBLOCK NONNULL((1)) void
-NOTHROW(FCALL ip_arp_and_datagram_destroy)(struct async *__restrict self)
-#else /* CONFIG_USE_NEW_ASYNC */
-PRIVATE NOBLOCK NONNULL((1)) void
-NOTHROW(FCALL ip_arp_and_datagram_fini)(async_job_t self)
-#endif /* !CONFIG_USE_NEW_ASYNC */
-{
+NOTHROW(FCALL ip_arp_and_datagram_destroy)(struct async *__restrict self) {
 	struct ip_arp_and_datagram_job *me;
 	me = (struct ip_arp_and_datagram_job *)self;
 	if (me->adj_arpc == 0) {
@@ -687,13 +676,10 @@ NOTHROW(FCALL ip_arp_and_datagram_fini)(async_job_t self)
 		decref_unlikely(me->adj_peer);
 	}
 	decref_unlikely(me->adj_dev);
-#ifdef CONFIG_USE_NEW_ASYNC
 	kfree(me);
-#endif /* CONFIG_USE_NEW_ASYNC */
 }
 
 
-#ifdef CONFIG_USE_NEW_ASYNC
 PRIVATE NONNULL((1)) ktime_t FCALL
 ip_arp_and_datagram_connect(struct async *__restrict self) {
 	struct ip_arp_and_datagram_job *me;
@@ -722,44 +708,14 @@ ip_arp_and_datagram_test(struct async *__restrict self) {
 	return false;
 }
 
-#else /* CONFIG_USE_NEW_ASYNC */
-
-PRIVATE NONNULL((1, 2)) unsigned int FCALL
-ip_arp_and_datagram_poll(async_job_t self, ktime_t *__restrict timeout) {
-	struct ip_arp_and_datagram_job *me;
-	me = (struct ip_arp_and_datagram_job *)self;
-	if (me->adj_arpc == 0) {
-		/* Wait for the send to be completed. */
-		if (aio_handle_generic_poll(&me->adj_done))
-			return ASYNC_JOB_POLL_DELETE;
-		return ASYNC_JOB_POLL_WAITFOR_NOTIMEOUT;
-	}
-	/* Wait for the peer's MAC to become available. */
-	if (me->adj_peer->npa_flags & NET_PEERADDR_HAVE_MAC)
-		return ASYNC_JOB_POLL_AVAILABLE; /* Move on to sending the datagram. */
-	task_connect_for_poll(&me->adj_dev->nd_net.n_addravl);
-	COMPILER_READ_BARRIER();
-	if (me->adj_peer->npa_flags & NET_PEERADDR_HAVE_MAC)
-		return ASYNC_JOB_POLL_AVAILABLE; /* Move on to sending the datagram. */
-	/* Setup a timeout before re-sending the ARP request. */
-	*timeout = me->adj_arptmo;
-	return ASYNC_JOB_POLL_WAITFOR;
-}
-#endif /* !CONFIG_USE_NEW_ASYNC */
-
 PRIVATE NONNULL((1)) unsigned int FCALL
-ip_arp_and_datagram_work(async_job_t self) {
+ip_arp_and_datagram_work(struct async *__restrict self) {
 	struct ip_arp_and_datagram_job *me;
 	me = (struct ip_arp_and_datagram_job *)self;
 	if (me->adj_arpc == 0) {
 		assert(aio_handle_generic_hascompleted(&me->adj_done));
 		aio_handle_generic_checkerror(&me->adj_done);
-#ifdef CONFIG_USE_NEW_ASYNC
 		return ASYNC_FINISHED;
-#else /* CONFIG_USE_NEW_ASYNC */
-		/* The delete-transmit-complete is handled by poll() */
-		return ASYNC_JOB_WORK_AGAIN;
-#endif /* !CONFIG_USE_NEW_ASYNC */
 	}
 	/* Check if the MAC has become available. */
 	if (me->adj_peer->npa_flags & NET_PEERADDR_HAVE_MAC) {
@@ -793,17 +749,17 @@ ip_arp_and_datagram_work(async_job_t self) {
 		me->adj_arpc = 0;
 		COMPILER_BARRIER();
 	}
-	return ASYNC_JOB_WORK_AGAIN;
+	return ASYNC_RESUME;
 }
 
 PRIVATE NONNULL((1)) unsigned int FCALL
-ip_arp_and_datagram_time(async_job_t self) {
+ip_arp_and_datagram_time(struct async *__restrict self) {
 	struct ip_arp_and_datagram_job *me;
 	me = (struct ip_arp_and_datagram_job *)self;
 	assert(me->adj_arpc != 0);
 	/* Check once again if the MAC has become available (unlikely) */
 	if (me->adj_peer->npa_flags & NET_PEERADDR_HAVE_MAC)
-		return ASYNC_JOB_WORK_AGAIN;
+		return ASYNC_RESUME;
 	/* Check if this was the last attempt */
 	if (me->adj_arpc == 1) {
 		THROW(E_NET_HOST_UNREACHABLE); /* XXX: Exception pointers? */
@@ -814,11 +770,11 @@ ip_arp_and_datagram_time(async_job_t self) {
 	                            me->adj_peer->npa_ip);
 	me->adj_arptmo = ktime();
 	nic_device_add_arp_response_timeout(me->adj_dev, &me->adj_arptmo);
-	return ASYNC_JOB_WORK_AGAIN;
+	return ASYNC_RESUME;
 }
 
 PRIVATE NONNULL((1)) void FCALL
-ip_arp_and_datagram_cancel(async_job_t self) {
+ip_arp_and_datagram_cancel(struct async *__restrict self) {
 	struct ip_arp_and_datagram_job *me;
 	me = (struct ip_arp_and_datagram_job *)self;
 	if (me->adj_arpc == 0) {
@@ -829,8 +785,7 @@ ip_arp_and_datagram_cancel(async_job_t self) {
 }
 
 
-PRIVATE struct async_job_callbacks const ip_arp_and_datagram = {
-#ifdef CONFIG_USE_NEW_ASYNC
+PRIVATE struct async_ops const ip_arp_and_datagram = {
 	.ao_driver  = &drv_self,
 	.ao_destroy = &ip_arp_and_datagram_destroy,
 	.ao_connect = &ip_arp_and_datagram_connect,
@@ -838,16 +793,6 @@ PRIVATE struct async_job_callbacks const ip_arp_and_datagram = {
 	.ao_work    = &ip_arp_and_datagram_work,
 	.ao_time    = &ip_arp_and_datagram_time,
 	.ao_cancel  = &ip_arp_and_datagram_cancel,
-#else /* CONFIG_USE_NEW_ASYNC */
-	/* .jc_jobsize  = */ sizeof(struct ip_arp_and_datagram_job),
-	/* .jc_jobalign = */ alignof(struct ip_arp_and_datagram_job),
-	/* .jc_driver   = */ &drv_self,
-	/* .jc_fini     = */ &ip_arp_and_datagram_fini,
-	/* .jc_poll     = */ &ip_arp_and_datagram_poll,
-	/* .jc_work     = */ &ip_arp_and_datagram_work,
-	/* .jc_time     = */ &ip_arp_and_datagram_time,
-	/* .jc_cancel   = */ &ip_arp_and_datagram_cancel,
-#endif /* !CONFIG_USE_NEW_ASYNC */
 };
 
 
@@ -936,17 +881,13 @@ ip_senddatagram(struct nic_device *__restrict dev,
 	}
 	{
 		/* Send out an async job for doing the arp+send asynchronously */
-		async_job_t aj;
+		struct async *aj;
 		struct ip_arp_and_datagram_job *job;
 		/* Send the first ARP request.
 		 * XXX: the async job should be configurable to wait for this... */
 		TRY {
 			nic_device_send_arp_request(dev, hdr->ip_dst.s_addr);
-#ifdef CONFIG_USE_NEW_ASYNC
 			aj = async_new_aio(struct ip_arp_and_datagram_job, &ip_arp_and_datagram, aio);
-#else /* CONFIG_USE_NEW_ASYNC */
-			aj = async_job_alloc(&ip_arp_and_datagram);
-#endif /* !CONFIG_USE_NEW_ASYNC */
 		} EXCEPT {
 			decref_unlikely(peer);
 			RETHROW();
@@ -960,22 +901,13 @@ ip_senddatagram(struct nic_device *__restrict dev,
 		nic_device_add_arp_response_timeout(dev, &job->adj_arptmo);
 		job->adj_arpc = 5; /* Must not be 0, but should be configurable */
 		/* Start the async job and attach it to the given AIO handle. */
-#ifdef CONFIG_USE_NEW_ASYNC
 		decref(async_start(aj));
-#else /* CONFIG_USE_NEW_ASYNC */
-		decref(async_job_start(aj, aio));
-#endif /* !CONFIG_USE_NEW_ASYNC */
 	}
 }
 
 
 
-#ifdef CONFIG_USE_NEW_ASYNC
-struct ip_arp_and_datagrams_job: async
-#else /* CONFIG_USE_NEW_ASYNC */
-struct ip_arp_and_datagrams_job
-#endif /* !CONFIG_USE_NEW_ASYNC */
-{
+struct ip_arp_and_datagrams_job: async {
 	REF struct nic_device         *adj_dev;    /* [1..1][const] The associated network device. */
 	REF struct net_peeraddr       *adj_peer;   /* [1..1][const][valid_if(adj_arpc != 0)] The peer who's mac address we're in need of. */
 	struct nic_packetlist          adj_gram;   /* [1..1][const][valid_if(adj_arpc != 0)] The IP datagram list (with sufficient header space for an ethernet header) */
@@ -988,14 +920,8 @@ struct ip_arp_and_datagrams_job
 	 *      rather than waiting until the ARP request has made it through our NIC... */
 };
 
-#ifdef CONFIG_USE_NEW_ASYNC
 PRIVATE NOBLOCK NONNULL((1)) void
-NOTHROW(FCALL ip_arp_and_datagrams_destroy)(struct async *__restrict self)
-#else /* CONFIG_USE_NEW_ASYNC */
-PRIVATE NOBLOCK NONNULL((1)) void
-NOTHROW(FCALL ip_arp_and_datagrams_fini)(async_job_t self)
-#endif /* !CONFIG_USE_NEW_ASYNC */
-{
+NOTHROW(FCALL ip_arp_and_datagrams_destroy)(struct async *__restrict self) {
 	struct ip_arp_and_datagrams_job *me;
 	me = (struct ip_arp_and_datagrams_job *)self;
 	if (me->adj_arpc == 0) {
@@ -1006,12 +932,9 @@ NOTHROW(FCALL ip_arp_and_datagrams_fini)(async_job_t self)
 		decref_unlikely(me->adj_peer);
 	}
 	decref_unlikely(me->adj_dev);
-#ifdef CONFIG_USE_NEW_ASYNC
 	kfree(me);
-#endif /* CONFIG_USE_NEW_ASYNC */
 }
 
-#ifdef CONFIG_USE_NEW_ASYNC
 PRIVATE NONNULL((1)) ktime_t FCALL
 ip_arp_and_datagrams_connect(struct async *__restrict self) {
 	struct ip_arp_and_datagrams_job *me;
@@ -1040,44 +963,15 @@ ip_arp_and_datagrams_test(struct async *__restrict self) {
 	return false;
 }
 
-#else /* CONFIG_USE_NEW_ASYNC */
-
-PRIVATE NONNULL((1, 2)) unsigned int FCALL
-ip_arp_and_datagrams_poll(async_job_t self, ktime_t *__restrict timeout) {
-	struct ip_arp_and_datagrams_job *me;
-	me = (struct ip_arp_and_datagrams_job *)self;
-	if (me->adj_arpc == 0) {
-		/* Wait for the send to be completed. */
-		if (aio_multihandle_generic_poll(&me->adj_done))
-			return ASYNC_JOB_POLL_DELETE;
-		return ASYNC_JOB_POLL_WAITFOR_NOTIMEOUT;
-	}
-	/* Wait for the peer's MAC to become available. */
-	if (me->adj_peer->npa_flags & NET_PEERADDR_HAVE_MAC)
-		return ASYNC_JOB_POLL_AVAILABLE; /* Move on to sending the datagram. */
-	task_connect_for_poll(&me->adj_dev->nd_net.n_addravl);
-	COMPILER_READ_BARRIER();
-	if (me->adj_peer->npa_flags & NET_PEERADDR_HAVE_MAC)
-		return ASYNC_JOB_POLL_AVAILABLE; /* Move on to sending the datagram. */
-	/* Setup a timeout before re-sending the ARP request. */
-	*timeout = me->adj_arptmo;
-	return ASYNC_JOB_POLL_WAITFOR;
-}
-#endif /* !CONFIG_USE_NEW_ASYNC */
 
 PRIVATE NONNULL((1)) unsigned int FCALL
-ip_arp_and_datagrams_work(async_job_t self) {
+ip_arp_and_datagrams_work(struct async *__restrict self) {
 	struct ip_arp_and_datagrams_job *me;
 	me = (struct ip_arp_and_datagrams_job *)self;
 	if (me->adj_arpc == 0) {
 		assert(aio_multihandle_generic_hascompleted(&me->adj_done));
 		aio_multihandle_generic_checkerror(&me->adj_done);
-#ifdef CONFIG_USE_NEW_ASYNC
 		return ASYNC_FINISHED;
-#else /* CONFIG_USE_NEW_ASYNC */
-		/* The delete-transmit-complete is handled by poll() */
-		return ASYNC_JOB_WORK_AGAIN;
-#endif /* !CONFIG_USE_NEW_ASYNC */
 	}
 	/* Check if the MAC has become available. */
 	if (me->adj_peer->npa_flags & NET_PEERADDR_HAVE_MAC) {
@@ -1124,17 +1018,17 @@ ip_arp_and_datagrams_work(async_job_t self) {
 		me->adj_arpc = 0;
 		COMPILER_BARRIER();
 	}
-	return ASYNC_JOB_WORK_AGAIN;
+	return ASYNC_RESUME;
 }
 
 PRIVATE NONNULL((1)) unsigned int FCALL
-ip_arp_and_datagrams_time(async_job_t self) {
+ip_arp_and_datagrams_time(struct async *__restrict self) {
 	struct ip_arp_and_datagrams_job *me;
 	me = (struct ip_arp_and_datagrams_job *)self;
 	assert(me->adj_arpc != 0);
 	/* Check once again if the MAC has become available (unlikely) */
 	if (me->adj_peer->npa_flags & NET_PEERADDR_HAVE_MAC)
-		return ASYNC_JOB_WORK_AGAIN;
+		return ASYNC_RESUME;
 	/* Check if this was the last attempt */
 	if (me->adj_arpc == 1) {
 		THROW(E_NET_HOST_UNREACHABLE); /* XXX: Exception pointers? */
@@ -1145,11 +1039,11 @@ ip_arp_and_datagrams_time(async_job_t self) {
 	                            me->adj_peer->npa_ip);
 	me->adj_arptmo = ktime();
 	nic_device_add_arp_response_timeout(me->adj_dev, &me->adj_arptmo);
-	return ASYNC_JOB_WORK_AGAIN;
+	return ASYNC_RESUME;
 }
 
 PRIVATE NONNULL((1)) void FCALL
-ip_arp_and_datagrams_cancel(async_job_t self) {
+ip_arp_and_datagrams_cancel(struct async *__restrict self) {
 	struct ip_arp_and_datagrams_job *me;
 	me = (struct ip_arp_and_datagrams_job *)self;
 	if (me->adj_arpc == 0) {
@@ -1160,8 +1054,7 @@ ip_arp_and_datagrams_cancel(async_job_t self) {
 }
 
 
-PRIVATE struct async_job_callbacks const ip_arp_and_datagrams = {
-#ifdef CONFIG_USE_NEW_ASYNC
+PRIVATE struct async_ops const ip_arp_and_datagrams = {
 	.ao_driver  = &drv_self,
 	.ao_destroy = &ip_arp_and_datagrams_destroy,
 	.ao_connect = &ip_arp_and_datagrams_connect,
@@ -1169,16 +1062,6 @@ PRIVATE struct async_job_callbacks const ip_arp_and_datagrams = {
 	.ao_work    = &ip_arp_and_datagrams_work,
 	.ao_time    = &ip_arp_and_datagrams_time,
 	.ao_cancel  = &ip_arp_and_datagrams_cancel,
-#else /* CONFIG_USE_NEW_ASYNC */
-	/* .jc_jobsize  = */ sizeof(struct ip_arp_and_datagrams_job),
-	/* .jc_jobalign = */ alignof(struct ip_arp_and_datagrams_job),
-	/* .jc_driver   = */ &drv_self,
-	/* .jc_fini     = */ &ip_arp_and_datagrams_fini,
-	/* .jc_poll     = */ &ip_arp_and_datagrams_poll,
-	/* .jc_work     = */ &ip_arp_and_datagrams_work,
-	/* .jc_time     = */ &ip_arp_and_datagrams_time,
-	/* .jc_cancel   = */ &ip_arp_and_datagrams_cancel,
-#endif /* !CONFIG_USE_NEW_ASYNC */
 };
 
 
@@ -1209,7 +1092,7 @@ PUBLIC NONNULL((1, 2, 3)) void KCALL
 ip_senddatagram_ex(struct nic_device *__restrict dev,
                    struct nic_packet_desc const *__restrict packet,
                    struct aio_handle *__restrict aio) {
-	async_job_t aj;
+	struct async *aj;
 	struct ip_arp_and_datagrams_job *job;
 	REF struct net_peeraddr *peer;
 	struct iphdr *hdr;
@@ -1226,11 +1109,7 @@ ip_senddatagram_ex(struct nic_device *__restrict dev,
 			 *      already! */
 		}
 #endif /* !__OPTIMIZE_SIZE__ */
-#ifdef CONFIG_USE_NEW_ASYNC
-		aj = async_new_aio(struct ip_arp_and_datagrams_job, &ip_arp_and_datagrams, aio);
-#else /* CONFIG_USE_NEW_ASYNC */
-		aj = async_job_alloc(&ip_arp_and_datagrams);
-#endif /* !CONFIG_USE_NEW_ASYNC */
+		aj  = async_new_aio(struct ip_arp_and_datagrams_job, &ip_arp_and_datagrams, aio);
 		job = (struct ip_arp_and_datagrams_job *)aj;
 		TRY {
 			size_t i;
@@ -1304,7 +1183,7 @@ ip_senddatagram_ex(struct nic_device *__restrict dev,
 				offset += fraglen;
 			}
 		} EXCEPT {
-			async_job_free(aj);
+			async_free(aj);
 			RETHROW();
 		}
 	} EXCEPT {
@@ -1317,11 +1196,7 @@ ip_senddatagram_ex(struct nic_device *__restrict dev,
 	job->adj_grammm = incref(THIS_MMAN);
 	nic_device_add_arp_response_timeout(dev, &job->adj_arptmo);
 	job->adj_arpc = 5; /* Must not be 0, but should be configurable */
-#ifdef CONFIG_USE_NEW_ASYNC
 	decref(async_start(aj));
-#else /* CONFIG_USE_NEW_ASYNC */
-	decref(async_job_start(aj, aio));
-#endif /* !CONFIG_USE_NEW_ASYNC */
 }
 
 

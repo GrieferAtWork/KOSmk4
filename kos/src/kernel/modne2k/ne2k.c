@@ -547,14 +547,8 @@ Ne2k_WaitForRemoteDmaComplete(Ne2kDevice *__restrict self) {
 /************************************************************************/
 /* async-worker                                                         */
 /************************************************************************/
-#ifdef CONFIG_USE_NEW_ASYNC
 PRIVATE NONNULL((1)) unsigned int FCALL
-Ne2k_HandleSendTimeout(void *__restrict arg)
-#else /* CONFIG_USE_NEW_ASYNC */
-PRIVATE NONNULL((1)) void FCALL
-Ne2k_HandleSendTimeout(void *__restrict arg)
-#endif /* !CONFIG_USE_NEW_ASYNC */
-{
+Ne2k_HandleSendTimeout(void *__restrict arg) {
 	Ne2kState state;
 	Ne2kDevice *me;
 	me            = (Ne2kDevice *)arg;
@@ -581,15 +575,10 @@ Ne2k_HandleSendTimeout(void *__restrict arg)
 	 *       interrupt  handler  can't  be  responsible  for  signaling
 	 *       transmit completion. */
 done:
-#ifdef CONFIG_USE_NEW_ASYNC
 	return ASYNC_RESUME;
-#else /* CONFIG_USE_NEW_ASYNC */
-	return;
-#endif /* !CONFIG_USE_NEW_ASYNC */
 }
 
 
-#ifdef CONFIG_USE_NEW_ASYNC
 PRIVATE NONNULL((1)) ktime_t FCALL
 Ne2k_AsyncConnect(void *__restrict arg) {
 	Ne2kDevice *me;
@@ -597,31 +586,6 @@ Ne2k_AsyncConnect(void *__restrict arg) {
 	task_connect_for_poll(&me->nk_stpkld);
 	return KTIME_INFINITE;
 }
-#else /* CONFIG_USE_NEW_ASYNC */
-
-PRIVATE NONNULL((1, 2)) bool FCALL
-Ne2k_AsyncPoll(void *__restrict arg,
-               void *__restrict cookie) {
-	Ne2kState state;
-	Ne2kDevice *me;
-	me            = (Ne2kDevice *)arg;
-	state.ns_word = ATOMIC_READ(me->nk_state.ns_word);
-	if (state.ns_state == NE2K_STATE_TX_UPLOAD ||
-	    state.ns_state == NE2K_STATE_RX_DNLOAD)
-		return true;
-	task_connect_for_poll(&me->nk_stpkld);
-	state.ns_word = ATOMIC_READ(me->nk_state.ns_word);
-	if (state.ns_state == NE2K_STATE_TX_UPLOAD ||
-	    state.ns_state == NE2K_STATE_RX_DNLOAD)
-		return true;
-	if (state.ns_state == NE2K_STATE_TX_PKSEND) {
-		/* Setup a timeout for packet sending. */
-		async_worker_timeout(me->nk_cursendtmo, cookie,
-		                     &Ne2k_HandleSendTimeout);
-	}
-	return false;
-}
-#endif /* !CONFIG_USE_NEW_ASYNC */
 
 /* Switch from TX_UPLOAD to TX_PKSEND */
 PRIVATE NOBLOCK NONNULL((1)) void
@@ -645,14 +609,8 @@ NOTHROW(KCALL Ne2k_SwitchToTxPkSendMode)(Ne2kDevice *__restrict self) {
 	                             new_state.ns_word));
 }
 
-#ifdef CONFIG_USE_NEW_ASYNC
 PRIVATE NONNULL((1)) unsigned int FCALL
-Ne2k_AsyncWork(void *__restrict arg)
-#else /* CONFIG_USE_NEW_ASYNC */
-PRIVATE NONNULL((1)) void FCALL
-Ne2k_AsyncWork(void *__restrict arg)
-#endif /* !CONFIG_USE_NEW_ASYNC */
-{
+Ne2k_AsyncWork(void *__restrict arg) {
 	Ne2kState state;
 	Ne2kDevice *me;
 	me = (Ne2kDevice *)arg;
@@ -951,9 +909,7 @@ tx_switch_to_idle:
 		}
 		goto again;
 	}
-#ifdef CONFIG_USE_NEW_ASYNC
 	return ASYNC_RESUME;
-#endif /* CONFIG_USE_NEW_ASYNC */
 }
 
 PRIVATE NONNULL((1)) bool FCALL
@@ -970,18 +926,12 @@ Ne2k_AsyncTest(void *__restrict arg) {
 }
 
 
-PRIVATE struct async_worker_callbacks const Ne2k_AsyncWorkerCallbacks = {
-#ifdef CONFIG_USE_NEW_ASYNC
+PRIVATE struct async_worker_ops const Ne2k_AsyncWorkerCallbacks = {
 	.awo_async   = ASYNC_WORKER_OPS_INIT_BASE,
 	.awo_connect = &Ne2k_AsyncConnect,
 	.awo_test    = &Ne2k_AsyncTest,
 	.awo_work    = &Ne2k_AsyncWork,
 	.awo_time    = &Ne2k_HandleSendTimeout,
-#else /* CONFIG_USE_NEW_ASYNC */
-	/* .awc_poll = */ &Ne2k_AsyncPoll,
-	/* .awc_work = */ &Ne2k_AsyncWork,
-	/* .awc_test = */ &Ne2k_AsyncTest
-#endif /* !CONFIG_USE_NEW_ASYNC */
 };
 
 PRIVATE NOBLOCK NONNULL((1)) bool

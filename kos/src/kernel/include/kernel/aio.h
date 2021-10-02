@@ -103,7 +103,7 @@ DECL_BEGIN
  *   │                                                                                             │ │ │
  *   v                                        ┌────> [async_poll(device)]                          │ │ │
  * [ASYNC_WORKER(device)]                     │      >> if (async_test(device)) return true;       │ │ │
- * >> struct async_worker_callbacks = {       │      >> task_connect_for_poll(&device->d_aio_avail)│ │ │
+ * >> struct async_worker_ops = {             │      >> task_connect_for_poll(&device->d_aio_avail)│ │ │
  * >>     .awc_poll = &async_poll, ───────────┘      >> return async_test(device);                 │ │ │
  * >>     .awc_work = &async_work, ───────┐                                                        │ │ │
  * >>     .awc_test = &async_test  ───────│────────> [async_test(device)]                          │ │ │

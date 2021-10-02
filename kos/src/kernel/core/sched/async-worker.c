@@ -23,7 +23,6 @@
 
 #include <kernel/compiler.h>
 
-#ifdef CONFIG_USE_NEW_ASYNC
 #include <kernel/handle.h>
 #include <kernel/malloc.h>
 #include <sched/async.h>
@@ -403,8 +402,6 @@ NOTHROW(KCALL unregister_async_worker)(struct async_worker_ops const *__restrict
 	return false;
 }
 
-
 DECL_END
-#endif /* CONFIG_USE_NEW_ASYNC */
 
 #endif /* !GUARD_KERNEL_SRC_SCHED_ASYNC_WORKER_C */

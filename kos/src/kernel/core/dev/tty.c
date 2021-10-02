@@ -130,7 +130,6 @@ tty_device_polltest(struct character_device *__restrict self, poll_mode_t what) 
 	return result;
 }
 
-#ifdef CONFIG_USE_NEW_ASYNC
 PRIVATE NONNULL((1)) ktime_t FCALL
 ttyfwd_connect(void *__restrict arg) {
 	struct tty_device *tty;
@@ -148,31 +147,8 @@ ttyfwd_test(void *__restrict arg) {
 	return what != 0;
 }
 
-#else /* CONFIG_USE_NEW_ASYNC */
-
-PRIVATE NONNULL((1, 2)) bool FCALL
-ttyfwd_poll(void *__restrict arg,
-            void *__restrict UNUSED(cookie)) {
-	struct tty_device *tty;
-	poll_mode_t what;
-	tty  = (struct tty_device *)arg;
-	what = (*tty->t_ihandle_polltest)(tty->t_ihandle_ptr, POLLINMASK) & POLLINMASK;
-	if (what)
-		return true;
-	(*tty->t_ihandle_pollconnect)(tty->t_ihandle_ptr, POLLINMASK);
-	what = (*tty->t_ihandle_polltest)(tty->t_ihandle_ptr, POLLINMASK) & POLLINMASK;
-	return what != 0;
-}
-#endif /* !CONFIG_USE_NEW_ASYNC */
-
-#ifdef CONFIG_USE_NEW_ASYNC
 PRIVATE NONNULL((1)) unsigned int FCALL
-ttyfwd_work(void *__restrict arg)
-#else /* CONFIG_USE_NEW_ASYNC */
-PRIVATE NONNULL((1)) void FCALL
-ttyfwd_work(void *__restrict arg)
-#endif /* !CONFIG_USE_NEW_ASYNC */
-{
+ttyfwd_work(void *__restrict arg) {
 	char buf[256];
 	struct tty_device *tty;
 	tty  = (struct tty_device *)arg;
@@ -203,25 +179,15 @@ ttyfwd_work(void *__restrict arg)
 		}
 	}
 done:
-#ifdef CONFIG_USE_NEW_ASYNC
 	return ASYNC_RESUME;
-#else /* CONFIG_USE_NEW_ASYNC */
-	return;
-#endif /* !CONFIG_USE_NEW_ASYNC */
 }
 
 
-PRIVATE struct async_worker_callbacks const ttyfwd_cb = {
-#ifdef CONFIG_USE_NEW_ASYNC
+PRIVATE struct async_worker_ops const ttyfwd_cb = {
 	.awo_async   = ASYNC_WORKER_OPS_INIT_BASE,
 	.awo_connect = &ttyfwd_connect,
 	.awo_test    = &ttyfwd_test,
 	.awo_work    = &ttyfwd_work,
-#else /* CONFIG_USE_NEW_ASYNC */
-	/* .awc_poll = */ &ttyfwd_poll,
-	/* .awc_work = */ &ttyfwd_work,
-	/* .awc_test = */ NULL
-#endif /* !CONFIG_USE_NEW_ASYNC */
 };
 
 /* Start/Stop forwarding  input  handle  data  on  the  given  TTY

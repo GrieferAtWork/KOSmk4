@@ -22,7 +22,6 @@
 
 #include <kernel/compiler.h>
 
-#ifdef CONFIG_USE_NEW_ASYNC
 #include <kernel/types.h>
 #include <sched/async.h>
 
@@ -107,6 +106,5 @@ FUNDEF size_t FCALL async_threads_setcount(size_t new_count) THROWS(E_BADALLOC);
 
 DECL_END
 #endif /* __CC__ */
-#endif /* CONFIG_USE_NEW_ASYNC */
 
 #endif /* !GUARD_KERNEL_INCLUDE_SCHED_ASYNC_INTERN_H */

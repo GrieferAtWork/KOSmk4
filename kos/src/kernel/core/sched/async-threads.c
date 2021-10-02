@@ -23,7 +23,6 @@
 
 #include <kernel/compiler.h>
 
-#ifdef CONFIG_USE_NEW_ASYNC
 #include <kernel/malloc.h>
 #include <sched/async-intern.h>
 #include <sched/async.h>
@@ -192,9 +191,6 @@ async_threads_setcount(size_t new_count) THROWS(E_BADALLOC) {
 	return old_count;
 }
 
-
-
 DECL_END
-#endif /* CONFIG_USE_NEW_ASYNC */
 
 #endif /* !GUARD_KERNEL_SRC_SCHED_ASYNC_THREADS_C */
