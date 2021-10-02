@@ -101,8 +101,9 @@ INTERN ATTR_SECTION(".text.crt.sched.signal") int
 NOTHROW_NCX(LIBCCALL libc_raise)(signo_t signo)
 /*[[[body:libc_raise]]]*/
 {
-	return kill(getpid(),
-	            (syscall_ulong_t)(syscall_slong_t)signo);
+	errno_t error;
+	error = sys_tkill(gettid(), signo);
+	return libc_seterrno_syserr(error);
 }
 /*[[[end:libc_raise]]]*/
 
