@@ -28,6 +28,7 @@
 
 #include <asm/cfi.h>
 #include <asm/cpu-flags.h>
+#include <asm/instr/compat.h>
 #include <asm/instr/ttest.h>
 #include <kos/kernel/cpu-state.h>
 #include <kos/kernel/gdt.h>
@@ -170,13 +171,12 @@ PUBLIC_FUNCTION(x86_syscall32_sysenter_traced)
 	orw    $(RPC_SYSCALL_INFO_FEXCEPT), 0(%esp)
 1:
 
-
 	/* Load kernel segments. */
-	movl   $(SEGMENT_USER_DATA_RPL), %ecx
-	movl   %ecx, %ds
-	movl   %ecx, %es
-	movl   $(SEGMENT_KERNEL_FSBASE), %ecx
-	movl   %ecx, %fs
+	movw   $(SEGMENT_USER_DATA_RPL), %cx
+	movw   %cx, %ds
+	movw   %cx, %es
+	movw   $(SEGMENT_KERNEL_FSBASE), %cx
+	movw   %cx, %fs
 
 	/* Load ARG[4] / ARG[5] if necessary */
 	cmpl   $(__NR_syscall0_max), %eax
@@ -304,8 +304,13 @@ PUBLIC_FUNCTION(x86_syscall_emulate_sysenter_r)
 	/* Check if our user-space return location got re-directed.
 	 * If it was, we need to apply the register override at the
 	 * saved return location, rather than the active one. */
+#ifdef CONFIG_USE_NEW_RPC
+	EXTERN(x86_userexcept_sysret)
+	cmpl   $(x86_userexcept_sysret), (12 + OFFSET_IRREGS_EIP)(%esp)
+#else /* CONFIG_USE_NEW_RPC */
 	EXTERN(x86_rpc_user_redirection)
 	cmpl   $(x86_rpc_user_redirection), (12 + OFFSET_IRREGS_EIP)(%esp)
+#endif /* !CONFIG_USE_NEW_RPC */
 	jne    1f
 	EXTERN(this_x86_sysret_iret)
 	movl   %edi, %fs:(this_x86_sysret_iret + OFFSET_IRREGS_EIP) /* EIP := EDI */
@@ -376,8 +381,6 @@ INTERN_FUNCTION(__asm32_bad_sysenter_extension)
 	/* Called when the %ebp pointer of a sysenter callback
 	 * is   faulty   (aka:   points   into   kernel-space) */
 	.cfi_startproc simple
-	EXTERN(x86_syscall_personality_asm32_sysenter_break)
-	.cfi_personality 0, x86_syscall_personality_asm32_sysenter_break
 	.cfi_signal_frame
 	.cfi_restore_iret_eip
 	.cfi_restore_iret_cs
@@ -401,8 +404,6 @@ INTERN_FUNCTION(__asm32_bad_sysenter_extension)
 	jz     1f
 	movl   $-1, %edx
 1:	movl   $-EFAULT, %eax
-
-	movl   $-1, %edx
 	.cfi_remember_state
 
 	popl_cfi %fs
@@ -414,16 +415,47 @@ INTERN_FUNCTION(__asm32_bad_sysenter_extension)
 
 	X86_IRET_BUT_PREFER_SYSEXIT
 	.cfi_restore_state
-1:	/* Preserve clobber registers for unwinding */
+1:
+#ifdef CONFIG_USE_NEW_RPC
+	/* We want to handle the error via `userexcept_handler', thereby kind-of
+	 * emulating what is done by `x86_syscall_personality_asm32_sysenter()' */
+	pushal_cfi_r  /* Construct a full `struct icpustate' */
+
+	/* Make sure that kernel segments have been loaded */
+	movw   $(SEGMENT_USER_DATA_RPL), %ax
+	movw   %ax, %ds
+	movw   %ax, %es
+	movw   $(SEGMENT_KERNEL_FSBASE), %ax
+	movw   %ax, %fs
+
+	movP   %Psp, %R_fcall0P
+	EXTERN(__asm32_bad_sysenter_extension_impl)
+	call   __asm32_bad_sysenter_extension_impl
+
+	/* Restart the sysenter system call */
+	movP   %Pax, %Psp
+	popal_cfi_r
+	popl_cfi %fs
+	.cfi_restore_iret_fs
+	popl_cfi %es
+	.cfi_restore_iret_es
+	popl_cfi %ds
+	.cfi_restore_iret_ds
+	jmp    .Ldo_prepared_sysenter
+#else /* CONFIG_USE_NEW_RPC */
+	EXTERN(x86_syscall_personality_asm32_sysenter_break)
+	.cfi_personality 0, x86_syscall_personality_asm32_sysenter_break
+
+	/* Preserve clobber registers for unwinding */
 	pushl_cfi_r %edx
 	pushl_cfi_r %ecx
 	pushl_cfi_r %eax
 	/* Make sure that kernel segments have been loaded */
-	movl   $(SEGMENT_USER_DATA_RPL), %eax
-	movl   %eax, %ds
-	movl   %eax, %es
-	movl   $(SEGMENT_KERNEL_FSBASE), %eax
-	movl   %eax, %fs
+	movw   $(SEGMENT_USER_DATA_RPL), %ax
+	movw   %ax, %ds
+	movw   %ax, %es
+	movw   $(SEGMENT_KERNEL_FSBASE), %ax
+	movw   %ax, %fs
 	/* Throw an E_SEGFAULT exception! */
 	pushl_cfi $(E_SEGFAULT_CONTEXT_FAULT)
 	pushl_cfi %ebp
@@ -431,6 +463,7 @@ INTERN_FUNCTION(__asm32_bad_sysenter_extension)
 	pushl_cfi $ERROR_CODEOF(E_SEGFAULT_UNMAPPED)
 	EXTERN(error_thrown)
 	call   error_thrown
+#endif /* !CONFIG_USE_NEW_RPC */
 	.cfi_endproc
 END(__asm32_bad_sysenter_extension)
 

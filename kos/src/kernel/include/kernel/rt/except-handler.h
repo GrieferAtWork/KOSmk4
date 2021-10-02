@@ -83,6 +83,18 @@ DECL_BEGIN
 struct icpustate;
 struct task;
 
+
+/* Throw the current exception (which must _NOT_ be E_INTERRUPT_USER_RPC)
+ * at the the given `state' and  perform all of the necessary  unwinding.
+ *
+ * This  function should  be used  for throwing  exception from interrupt
+ * handlers (read: CPU exception handler), such as page-faults & similar. */
+FUNDEF ATTR_NORETURN NONNULL((1)) void FCALL
+error_throw_current_at_icpustate(struct icpustate *__restrict state)
+		THROWS(...);
+
+
+
 /* Arch-specific function:
  * Try to invoke the user-space exception handler for `error'
  * WARNING: Because this function writes to the user-space stack,
@@ -112,13 +124,13 @@ typedef struct __siginfo_struct siginfo_t;
 
 /* Update the given  `state' to raise  the specified `siginfo'  as
  * a user-space signal  within the calling  thread. The caller  is
- * responsible  to handle special signal handlers (`SIG_*')
+ * responsible  to  handle   special  signal  handlers   (`SIG_*')
  * before calling this function! This function should only be used
  * to  enqueue the execution of a signal handler with a user-space
  * entry point.
  *
- * Functionality like `SA_RESETHAND', or system call
- * restart  selection  must  be  implemented  by  the  caller.
+ * Functionality  like  `SA_RESETHAND', or  system call
+ * restart selection must be implemented by the caller.
  *
  * @param: state:   The CPU state describing the return to user-space.
  * @param: action:  The signal action to perform.

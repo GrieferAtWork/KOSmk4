@@ -2139,15 +2139,13 @@ NOTHROW(FCALL taskref_pointer_set_fini)(struct pointer_set *__restrict self) {
 
 
 /* Raise a posix signal within a given thread `target'
- * @return: true:   Successfully scheduled/enqueued the signal for delivery to `target'
- * @return: false:  The given thread `target' has already terminated execution.
- * @throw: E_INVALID_ARGUMENT_BAD_VALUE: The signal number in `info' is ZERO(0) or >= `NSIG'
- * @throw: E_INTERRUPT_USER_RPC:        `target' is the calling thread, and the signal isn't being blocked at the moment. */
+ * @return: true:  Successfully scheduled/enqueued the signal for delivery to `target'
+ * @return: false: The given thread `target' has already terminated execution.
+ * @throw: E_INVALID_ARGUMENT_BAD_VALUE: The signal number in `info' is ZERO(0) or > `_NSIG' */
 PUBLIC NONNULL((1)) bool KCALL
 task_raisesignalthread(struct task *__restrict target,
                        USER CHECKED siginfo_t const *info)
-		THROWS(E_BADALLOC, E_WOULDBLOCK, E_INVALID_ARGUMENT_BAD_VALUE,
-		       E_INTERRUPT_USER_RPC, E_SEGFAULT) {
+		THROWS(E_BADALLOC, E_WOULDBLOCK, E_INVALID_ARGUMENT_BAD_VALUE, E_SEGFAULT) {
 #ifdef CONFIG_USE_NEW_RPC
 	struct pending_rpc *rpc;
 	rpc = pending_rpc_alloc_psig(GFP_NORMAL);
@@ -2170,12 +2168,8 @@ task_raisesignalthread(struct task *__restrict target,
 	                RPC_SIGNO(rpc->pr_psig.si_signo);
 
 	/* Schedule the RPC */
-	if (task_rpc_schedule(target, rpc)) {
-		/* When targeting the current thread, force stack unwind. */
-		if (target == THIS_TASK)
-			THROW(E_INTERRUPT_USER_RPC);
+	if (task_rpc_schedule(target, rpc))
 		return true;
-	}
 
 	/* Target thread already died :( */
 	pending_rpc_free(rpc);
@@ -2568,14 +2562,11 @@ again_find_late_target:
  * @return: true:  Successfully scheduled/enqueued the signal for delivery to `target'
  * @return: false: The given process `target' has already terminated execution.
  * @return: false: The given process `target' is a kernel thread.
- * @throw: E_INVALID_ARGUMENT_BAD_VALUE: The signal number in `info' is ZERO(0) or >= `NSIG'
- * @throw: E_INTERRUPT_USER_RPC:         The calling thread is apart of the same  process,
- *                                       and the signal isn't being blocked at the moment. */
+ * @throw: E_INVALID_ARGUMENT_BAD_VALUE: The signal number in `info' is ZERO(0) or >= `NSIG' */
 PUBLIC NONNULL((1)) bool KCALL
 task_raisesignalprocess(struct task *__restrict target,
                         USER CHECKED siginfo_t const *info)
-		THROWS(E_BADALLOC, E_WOULDBLOCK, E_INVALID_ARGUMENT_BAD_VALUE,
-		       E_INTERRUPT_USER_RPC, E_SEGFAULT) {
+		THROWS(E_BADALLOC, E_WOULDBLOCK, E_INVALID_ARGUMENT_BAD_VALUE, E_SEGFAULT) {
 #ifdef CONFIG_USE_NEW_RPC
 	struct pending_rpc *rpc;
 	rpc = pending_rpc_alloc_psig(GFP_NORMAL);
@@ -2598,12 +2589,8 @@ task_raisesignalprocess(struct task *__restrict target,
 	                RPC_SIGNO(rpc->pr_psig.si_signo);
 
 	/* Schedule the RPC */
-	if (proc_rpc_schedule(target, rpc)) {
-		/* When targeting the current process, force stack unwind. */
-		if (task_getprocess_of(target) == task_getprocess())
-			THROW(E_INTERRUPT_USER_RPC);
+	if (proc_rpc_schedule(target, rpc))
 		return true;
-	}
 
 	/* Target thread already died :( */
 	pending_rpc_free(rpc);
@@ -2640,16 +2627,26 @@ task_raisesignalprocess(struct task *__restrict target,
 PUBLIC NONNULL((1)) size_t KCALL
 task_raisesignalprocessgroup(struct task *__restrict target,
                              USER CHECKED siginfo_t const *info)
-		THROWS(E_BADALLOC, E_WOULDBLOCK, E_INVALID_ARGUMENT_BAD_VALUE,
-		       E_INTERRUPT_USER_RPC, E_PROCESS_EXITED) {
+		THROWS(E_BADALLOC, E_WOULDBLOCK, E_INVALID_ARGUMENT_BAD_VALUE, E_PROCESS_EXITED) {
 	size_t result = 0;
+#ifndef CONFIG_USE_NEW_RPC
 	bool was_interrupted = false;
+#endif /* !CONFIG_USE_NEW_RPC */
 	REF struct task *pgroup;
 	struct taskgroup *pgroup_group;
 	struct pointer_set ps; /* Set of processes already visited. */
 	/* Deliver the first signal to the process group leader. */
 	pgroup = task_getprocessgroupleader_srch_of(target);
 	pgroup_group = &FORTASK(pgroup, this_taskgroup);
+#ifdef CONFIG_USE_NEW_RPC
+	TRY {
+		if (task_raisesignalprocess(pgroup, info))
+			++result;
+	} EXCEPT {
+		decref_unlikely(pgroup);
+		RETHROW();
+	}
+#else /* CONFIG_USE_NEW_RPC */
 	TRY {
 		if (task_raisesignalprocess(pgroup, info))
 			++result;
@@ -2661,6 +2658,7 @@ task_raisesignalprocessgroup(struct task *__restrict target,
 			RETHROW();
 		}
 	}
+#endif /* !CONFIG_USE_NEW_RPC */
 	pointer_set_init(&ps);
 	TRY {
 		REF struct task *pending_delivery_procv[8];
@@ -2728,6 +2726,10 @@ load_more_threads:
 				REF struct task *thread;
 				thread = pending_delivery_procv[pending_delivery_procc - 1];
 				/* Deliver to this process. */
+#ifdef CONFIG_USE_NEW_RPC
+				if (task_raisesignalprocess(thread, info))
+					++result;
+#else /* CONFIG_USE_NEW_RPC */
 				TRY {
 					if (task_raisesignalprocess(thread, info))
 						++result;
@@ -2736,6 +2738,7 @@ load_more_threads:
 						RETHROW();
 					was_interrupted = true;
 				}
+#endif /* !CONFIG_USE_NEW_RPC */
 				/* NOTE: We must insert references to threads which already had
 				 *       a signal get delivered. This is _required_ to  prevent
 				 *       the scenario where:
@@ -2779,8 +2782,10 @@ load_more_threads:
 	}
 	taskref_pointer_set_fini(&ps);
 	decref_unlikely(pgroup);
+#ifndef CONFIG_USE_NEW_RPC
 	if (was_interrupted)
 		THROW(E_INTERRUPT_USER_RPC);
+#endif /* !CONFIG_USE_NEW_RPC */
 	return result;
 }
 
@@ -3234,9 +3239,11 @@ DEFINE_SYSCALL2(errno_t, kill, pid_t, pid, signo_t, signo) {
 	siginfo_t info;
 	memset(&info, 0, sizeof(siginfo_t));
 	/* Make sure we've been given a valid signal number. */
-	if unlikely(signo <= 0 || signo >= NSIG)
+	if unlikely(signo <= 0 || signo >= NSIG) {
 		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
-		      E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGNO, signo);
+		      E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGNO,
+		      signo);
+	}
 	info.si_signo = signo;
 	info.si_errno = 0;
 	info.si_code  = SI_USER;
@@ -4263,10 +4270,16 @@ DEFINE_COMPAT_SYSCALL1(errno_t, sigpending,
 
 #ifdef __ARCH_WANT_SYSCALL_SIGMASK_CHECK
 DEFINE_SYSCALL0(errno_t, sigmask_check) {
-	/* XXX:  An arch-specific version could be implemented to directly
-	 *       call  `sigmask_check_s()', which would be way faster than
-	 *       this function is! */
+#ifdef CONFIG_USE_NEW_RPC
+	/* XXX: An arch-specific version could be implemented
+	 *      to directly call `userexcept_sysret()' */
+	userexcept_sysret_inject_self();
+#else /* CONFIG_USE_NEW_RPC */
+	/* XXX: An arch-specific version could be implemented to directly
+	 *      call  `sigmask_check_s()', which would be way faster than
+	 *      this function is! */
 	sigmask_check();
+#endif /* !CONFIG_USE_NEW_RPC */
 	return -EOK;
 }
 #endif /* __ARCH_WANT_SYSCALL_SIGMASK_CHECK */

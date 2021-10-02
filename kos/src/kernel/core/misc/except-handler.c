@@ -998,7 +998,7 @@ halt_unhandled_exception(unsigned int unwind_error,
                          struct kcpustate *__restrict unwind_state);
 
 DEFINE_PUBLIC_ALIAS(error_unwind, libc_error_unwind);
-INTERN NONNULL((1)) struct kcpustate *
+INTERN ATTR_RETNONNULL WUNUSED NONNULL((1)) struct kcpustate *
 NOTHROW(FCALL libc_error_unwind)(struct kcpustate *__restrict state) {
 	unsigned int error;
 	unwind_fde_t fde;
@@ -1021,6 +1021,9 @@ search_fde:
 	/* Check if there is a personality function for us to execute. */
 	if (fde.f_persofun != NULL) {
 		unsigned int perso_code;
+		assertf(ADDR_ISKERN(fde.f_persofun),
+		        "Not a kernel-space address: %p",
+		        fde.f_persofun);
 		perso_code = (*(except_personality_t)fde.f_persofun)(&fde, state);
 		switch (perso_code) {
 
@@ -1117,20 +1120,22 @@ search_fde:
 			            ustate.ucs_sgregs.sg_fs != expected_fs ||
 			            ustate.ucs_sgregs.sg_es != expected_es ||
 			            ustate.ucs_sgregs.sg_ds != expected_ds) {
-#define LOG_SEGMENT_INCONSISTENCY(name, isval, wantval)                                                        \
-				do {                                                                                           \
-					if (isval != wantval) {                                                                    \
-						printk(KERN_CRIT "[except] Inconsistent unwind %%%cs: %#" PRIx16 " != %#" PRIx16 "\n", \
-						       name, isval, wantval);                                                          \
-					}                                                                                          \
-				} __WHILE0
-#define LOG_SEGMENT_INCONSISTENCY_CHK(name, isval, isok)                                       \
-				do {                                                                           \
-					if (!isok(isval)) {                                                        \
-						printk(KERN_CRIT "[except] Inconsistent unwind %%%cs: %#" PRIx16 "\n", \
-						       name, isval);                                                   \
-					}                                                                          \
-				} __WHILE0
+#define LOG_SEGMENT_INCONSISTENCY(name, isval, wantval)                                     \
+				do {                                                                        \
+					if (isval != wantval) {                                                 \
+						printk(KERN_CRIT "[except] Inconsistent unwind %%%cs: "             \
+						                 "%#" PRIx32 " & 0xffff != %#" PRIx16 " [pc:%p]\n", \
+						       name, isval, wantval, pc);                                   \
+					}                                                                       \
+				}	__WHILE0
+#define LOG_SEGMENT_INCONSISTENCY_CHK(name, isval, isok)                        \
+				do {                                                            \
+					if (!isok(isval)) {                                         \
+						printk(KERN_CRIT "[except] Inconsistent unwind %%%cs: " \
+						                 "%#" PRIx32 " & 0xffff [pc:%p]\n",     \
+						       name, isval, pc);                                \
+					}                                                           \
+				}	__WHILE0
 				/* NOTE: Some x86 processors behave kind-of weird:
 				 * [warn  ] [except] Inconsistent unwind %cs: 0x80000008 != 0x8
 				 * [warn  ] [except] Inconsistent unwind %fs: 0xeafe0040 != 0x40
@@ -1199,6 +1204,48 @@ err:
 	halt_unhandled_exception(error, state);
 	return state;
 }
+
+
+/* Throw the current exception (which must _NOT_ be E_INTERRUPT_USER_RPC)
+ * at the the given `state' and  perform all of the necessary  unwinding.
+ *
+ * This  function should  be used  for throwing  exception from interrupt
+ * handlers (read: CPU exception handler), such as page-faults & similar. */
+PUBLIC ATTR_NORETURN NONNULL((1)) void FCALL
+error_throw_current_at_icpustate(struct icpustate *__restrict state) {
+	struct exception_info *info = error_info();
+	assertf(info->ei_code != ERROR_CODEOF(E_OK),
+	        "No exception thrown");
+	assertf(info->ei_code != ERROR_CODEOF(E_INTERRUPT_USER_RPC),
+	        "No, you can't throw this one like that!");
+
+	/* Clear out the exception traceback */
+#if EXCEPT_BACKTRACE_SIZE != 0
+	memset(info->ei_trace, 0, sizeof(info->ei_trace));
+#endif /* EXCEPT_BACKTRACE_SIZE != 0 */
+
+	/* Fill in the exception register state. */
+	icpustate_to_kcpustate(state, &info->ei_state);
+
+	/* Figure out how we want to unwind this exception. */
+	if (icpustate_isuser(state)) {
+
+		/* Directly unwind into user-space. */
+		state = userexcept_handler(state, NULL);
+
+		/* We _really_ shouldn't get here, but just in case: simply load `state' */
+		cpu_apply_icpustate(state);
+	} else {
+		struct kcpustate st, *pst;
+
+		/* Do normal unwinding. */
+		memcpy(&st, &info->ei_state, sizeof(struct kcpustate));
+		pst = libc_error_unwind(&st);
+		cpu_apply_kcpustate(pst);
+	}
+
+}
+
 
 
 

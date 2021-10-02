@@ -24,6 +24,7 @@
 #include <kernel/compiler.h>
 
 #include <kernel/except.h>
+#include <kernel/rt/except-handler.h>
 #include <kernel/types.h>
 #include <kernel/x86/fault.h> /* x86_handle_divide_by_zero() */
 #include <kernel/x86/idt.h>   /* IDT_CONFIG_ISTRAP() */
@@ -63,7 +64,7 @@ x86_handle_divide_by_zero(struct icpustate *__restrict state) {
 	if (next_pc)
 		icpustate_setpc(state, next_pc);
 #ifdef CONFIG_USE_NEW_RPC
-	error_throw_current();
+	error_throw_current_at_icpustate(state);
 #else /* CONFIG_USE_NEW_RPC */
 	x86_userexcept_unwind_interrupt(state);
 #endif /* !CONFIG_USE_NEW_RPC */

@@ -697,6 +697,9 @@ sys_fork_rpc(struct rpc_context *__restrict ctx, void *UNUSED(cookie)) {
 	if (ctx->rc_context != RPC_REASONCTX_SYSCALL)
 		return;
 	ctx->rc_state = sys_fork_impl(ctx->rc_state);
+
+	/* Indicate that the system call has completed; further RPCs should never try to restart it! */
+	ctx->rc_context = RPC_REASONCTX_SYSRET;
 }
 
 DEFINE_SYSCALL0(pid_t, fork) {
@@ -758,6 +761,9 @@ sys_vfork_rpc(struct rpc_context *__restrict ctx, void *UNUSED(cookie)) {
 	if (ctx->rc_context != RPC_REASONCTX_SYSCALL)
 		return;
 	ctx->rc_state = sys_vfork_impl(ctx->rc_state);
+
+	/* Indicate that the system call has completed; further RPCs should never try to restart it! */
+	ctx->rc_context = RPC_REASONCTX_SYSRET;
 }
 
 DEFINE_SYSCALL0(pid_t, vfork) {

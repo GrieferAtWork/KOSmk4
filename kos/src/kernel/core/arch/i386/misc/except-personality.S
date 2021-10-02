@@ -37,7 +37,7 @@
 
 
 /* Personality function for `syscall_emulate_r' */
-.section text
+.section .text
 INTERN_FUNCTION(syscall_emulate_r_personality)
 	.cfi_startproc
 	.cfi_signal_frame
@@ -96,7 +96,7 @@ END(syscall_emulate_r_personality)
 /************************************************************************/
 /* Personality functions for restartable interrupt handlers             */
 /************************************************************************/
-.section text
+.section .text
 
 /* The following registers are passed (unmodified) to LSDA: %Pbx, %Pbp
  * LSDA is passed via register: [i386:'%edi', x86_64:'%r12'] */

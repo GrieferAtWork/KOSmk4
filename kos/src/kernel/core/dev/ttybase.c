@@ -167,6 +167,9 @@ do_throw_ttou:
 				if (my_leader->t_flags & (TASK_FTERMINATING | TASK_FTERMINATED))
 					goto do_throw_ttou;
 				task_raisesignalprocessgroup(my_leader, SIGTTOU);
+#ifdef CONFIG_USE_NEW_RPC
+				task_serve();
+#endif /* CONFIG_USE_NEW_RPC */
 			} else {
 				goto do_throw_ttou;
 			}
@@ -175,6 +178,9 @@ do_throw_ttou:
 			 * in the mean time. - In this case, just re-raise `SIGTTIN' within the
 			 * calling process only. */
 			task_raisesignalprocess(task_getprocess(), SIGTTOU);
+#ifdef CONFIG_USE_NEW_RPC
+			task_serve();
+#endif /* CONFIG_USE_NEW_RPC */
 			/* We might get here if `SIGTTOU' is being ignored by the calling thread.
 			 * -> As described by POSIX, allow the process to write in this scenario. */
 		} else {
@@ -194,6 +200,7 @@ do_throw_ttou:
 				if (my_leader->t_flags & (TASK_FTERMINATING | TASK_FTERMINATED))
 					goto do_throw_ttin;
 				task_raisesignalprocessgroup(my_leader, SIGTTIN);
+				task_serve();
 			} else {
 				goto do_throw_ttin;
 			}
@@ -201,6 +208,9 @@ do_throw_ttou:
 			 * in the mean time. - In this case, just re-raise `SIGTTIN' within the
 			 * calling process only. */
 			task_raisesignalprocess(task_getprocess(), SIGTTIN);
+#ifdef CONFIG_USE_NEW_RPC
+			task_serve();
+#endif /* CONFIG_USE_NEW_RPC */
 			/* We might get here if `SIGTTIN' is being ignored by the calling thread. */
 do_throw_ttin:
 			THROW(E_IOERROR_NODATA,
@@ -235,6 +245,9 @@ kernel_terminal_raise(struct terminal *__restrict self,
 		if likely(fg) {
 			FINALLY_DECREF_UNLIKELY(fg);
 			task_raisesignalprocessgroup(fg, signo);
+#ifdef CONFIG_USE_NEW_RPC
+			task_serve();
+#endif /* CONFIG_USE_NEW_RPC */
 		}
 	}
 	return 0;

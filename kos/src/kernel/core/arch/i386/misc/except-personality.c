@@ -66,7 +66,7 @@ NOTHROW(EXCEPT_PERSONALITY_CC x86_syscall_personality_asm32_int80)(struct unwind
 	                                  &unwind_setreg_ucpustate, &ustate);
 	if unlikely(error != UNWIND_SUCCESS)
 		return EXCEPT_PERSONALITY_CONTINUE_UNWIND;
-	assert(ucpustate_iskernel(&ustate) ||
+	assert(ucpustate_isuser(&ustate) ||
 	       ucpustate_getpc(&ustate) == (void const *)&x86_userexcept_sysret);
 	/* System calls encode their vector number  as the LSDA pointer, so  that
 	 * when  unwinding we can reverse-engineer that number in order to decide
@@ -100,7 +100,7 @@ NOTHROW(EXCEPT_PERSONALITY_CC x86_syscall_personality_asm32_sysenter)(struct unw
 		if unlikely(error != UNWIND_SUCCESS)
 			goto err;
 	}
-	assert(ucpustate_iskernel(&ustate) ||
+	assert(ucpustate_isuser(&ustate) ||
 	       ucpustate_getpc(&ustate) == (void const *)&x86_userexcept_sysret);
 	/* System calls encode their vector number  as the LSDA pointer, so  that
 	 * when  unwinding we can reverse-engineer that number in order to decide
@@ -140,7 +140,7 @@ NOTHROW(EXCEPT_PERSONALITY_CC x86_syscall_personality_asm64_syscall)(struct unwi
 		if unlikely(error != UNWIND_SUCCESS)
 			goto err;
 	}
-	assert(ucpustate_iskernel(&ustate) ||
+	assert(ucpustate_isuser(&ustate) ||
 	       ucpustate_getpc(&ustate) == (void const *)&x86_userexcept_sysret);
 	/* System calls encode their vector number  as the LSDA pointer, so  that
 	 * when  unwinding we can reverse-engineer that number in order to decide

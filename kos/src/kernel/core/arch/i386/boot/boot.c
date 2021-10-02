@@ -748,6 +748,10 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 
 	/* TODO: Look into enabling `-fsanitize=undefined' for all code. */
 
+	/* TODO: Libc's `raise(3)' function can't use kill(2), which always sends
+	 *       at the very least a process-directed signal. Instead, it needs to
+	 *       make use of `tkill(2)', `tgkill(2)' or `rt_tgsigqueueinfo(2)' */
+
 	return state;
 }
 

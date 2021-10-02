@@ -35,6 +35,7 @@ opt.append("-Os");
 #include <kernel/except.h>
 #include <kernel/mman/execinfo.h>
 #include <kernel/panic.h>
+#include <kernel/rt/except-handler.h>
 #include <kernel/x86/fault.h> /* x86_handle_stackfault(), x86_handle_gpf(), x86_handle_illegal_instruction() */
 #include <kernel/x86/idt.h>
 #include <sched/pid.h>
@@ -172,7 +173,7 @@ x86_handle_breakpoint(struct icpustate *__restrict state) {
 #endif /* !CONFIG_USE_NEW_RPC */
 	}
 #ifdef CONFIG_USE_NEW_RPC
-	error_throw_current();
+	error_throw_current_at_icpustate(state);
 #else /* CONFIG_USE_NEW_RPC */
 	x86_userexcept_unwind_interrupt(state);
 #endif /* !CONFIG_USE_NEW_RPC */

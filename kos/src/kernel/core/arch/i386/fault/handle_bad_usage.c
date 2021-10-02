@@ -423,7 +423,7 @@ loophint(struct icpustate *__restrict state) {
 #undef EMU86_EMULATE_THROW_BOUNDERR    /* Not needed because we don't emulate the instruction */
 
 #ifdef CONFIG_USE_NEW_RPC
-#define unwind_interrupt(self) error_throw_current()
+#define unwind_interrupt(self) error_throw_current_at_icpustate(self)
 #else /* CONFIG_USE_NEW_RPC */
 PRIVATE ATTR_NORETURN NOBLOCK void
 NOTHROW(FCALL unwind_interrupt)(struct icpustate *__restrict self) {

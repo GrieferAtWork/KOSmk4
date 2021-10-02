@@ -78,6 +78,45 @@
 
 DECL_BEGIN
 
+/* Error  throwing function for when `sysenter' is  used with a illegal extension address
+ * Can't happen on x86_64, since it defines any 32-bit user-space address as valid, which
+ * is what sysenter extensions vectors are limited to in compatiblity mode. */
+#if !defined(__x86_64__) && defined(CONFIG_USE_NEW_RPC)
+INTERN ATTR_RETNONNULL WUNUSED NONNULL((1)) struct icpustate *FCALL
+__asm32_bad_sysenter_extension_impl(struct icpustate *__restrict state) {
+	struct rpc_syscall_info sc_info;
+	struct exception_info *info = error_info();
+
+	/* Fill in system call information */
+	sc_info.rsi_flags   = (RPC_SYSCALL_INFO_FREGVALID(0) | RPC_SYSCALL_INFO_FREGVALID(1) |
+	                       RPC_SYSCALL_INFO_FREGVALID(2) | RPC_SYSCALL_INFO_FREGVALID(3) |
+	                       RPC_SYSCALL_INFO_METHOD_SYSENTER_32);
+	sc_info.rsi_sysno   = state->ics_gpregs.gp_eax;
+	sc_info.rsi_regs[0] = state->ics_gpregs.gp_ebx;
+	sc_info.rsi_regs[1] = state->ics_gpregs.gp_ecx;
+	sc_info.rsi_regs[2] = state->ics_gpregs.gp_edx;
+	sc_info.rsi_regs[3] = state->ics_gpregs.gp_esi;
+
+	/* Fill in exception information. */
+	memset(info, 0, sizeof(*info));
+#if EXCEPT_BACKTRACE_SIZE != 0
+#endif /* EXCEPT_BACKTRACE_SIZE != 0 */
+	info->ei_code = ERROR_CODEOF(E_SEGFAULT_UNMAPPED);
+	info->ei_data.e_args.e_segfault.s_addr    = state->ics_gpregs.gp_ebp;
+	info->ei_data.e_args.e_segfault.s_context = E_SEGFAULT_CONTEXT_FAULT;
+	icpustate_to_kcpustate(state, &info->ei_state);
+	info->ei_data.e_faultaddr = (void *)info->ei_state.kcs_eip;
+	if (info->ei_state.kcs_eflags & EFLAGS_DF)
+		sc_info.rsi_flags |= RPC_SYSCALL_INFO_FEXCEPT;
+
+	/* Handle the exception. */
+	state = userexcept_handler(state, &sc_info);
+
+	/* Restart? - ok... */
+	return state;
+}
+#endif /* !__x86_64__ && CONFIG_USE_NEW_RPC */
+
 
 #ifndef CONFIG_NO_SYSCALL_TRACING
 INTERN ATTR_COLDBSS bool syscall_tracing_enabled = false;

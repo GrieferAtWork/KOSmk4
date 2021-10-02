@@ -1208,7 +1208,7 @@ do_unwind_state:
 		state = kernel_debugtrap_r(state, SIGSEGV);
 	assert(error_active());
 #ifdef CONFIG_USE_NEW_RPC
-	error_throw_current();
+	error_throw_current_at_icpustate(state);
 #else /* CONFIG_USE_NEW_RPC */
 	x86_userexcept_unwind_interrupt(state);
 #endif /* !CONFIG_USE_NEW_RPC */

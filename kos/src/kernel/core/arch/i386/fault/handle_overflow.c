@@ -24,6 +24,7 @@
 #include <kernel/compiler.h>
 
 #include <kernel/except.h>
+#include <kernel/rt/except-handler.h>
 #include <kernel/types.h>
 #include <kernel/x86/fault.h>
 #include <kernel/x86/idt.h> /* IDT_CONFIG_ISTRAP() */
@@ -53,7 +54,7 @@ x86_handle_overflow(struct icpustate *__restrict state) {
 #endif /* !CONFIG_USE_NEW_RPC */
 	PERTASK_SET(this_exception_faultaddr, icpustate_getpc(state));
 #ifdef CONFIG_USE_NEW_RPC
-	error_throw_current();
+	error_throw_current_at_icpustate(state);
 #else /* CONFIG_USE_NEW_RPC */
 	x86_userexcept_unwind_interrupt(state);
 #endif /* !CONFIG_USE_NEW_RPC */

@@ -180,7 +180,6 @@ NOTHROW(FCALL task_exit)(int w_status) {
 
 	/* Account for timings and scheduler internals, as well as figure out a successor thread. */
 	next = sched_intern_yield_onexit(me, caller); /* NOTE: This causes us to inherit a reference to `caller' */
-	FORCPU(me, thiscpu_sched_current) = next;
 
 	/* Hi-jack the execution stack of the next thread to have it do the decref()
 	 * of our own thread, thus preventing  the undefined behavior that would  be
@@ -239,6 +238,9 @@ NOTHROW(FCALL task_exit)(int w_status) {
 		                             old_flags,
 		                             new_flags));
 	}
+
+	/* Update the current-thread field to indicate who's about to start running. */
+	FORCPU(me, thiscpu_sched_current) = next;
 
 	/* Broadcast  the  status-changed   signal  _after_  setting   `TASK_FTERMINATED'
 	 * That way,  other  thread  can use  `tp_changed'  alongside  `TASK_FTERMINATED'

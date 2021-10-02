@@ -66,7 +66,7 @@ NOTHROW(FCALL task_asyncrpc_push)(struct scpustate *__restrict state,
 	rpc_cpustate_t *rc_state;
 	struct scpustate *result_sstate;
 	struct rpc_context *rc;
-	bool isuser = scpustate_isuser(result_sstate);
+	bool isuser = scpustate_isuser(state);
 
 #ifdef __x86_64__
 	/* Convert `state' into a `struct icpustate'. On x86_64, that can
@@ -92,6 +92,7 @@ NOTHROW(FCALL task_asyncrpc_push)(struct scpustate *__restrict state,
 	 * just have to pluck out the `scs_sgregs.sg_gs' field by memmoveup-ing everything
 	 * that comes before it by 4 bytes. */
 	rc_state = (rpc_cpustate_t *)memmoveup((byte_t *)state + 4, state, OFFSET_ICPUSTATE32_FS);
+	sp       = (byte_t *)rc_state;
 	sp -= offsetof(struct rpc_context, rc_scinfo); /* Allocate space for the `struct rpc_context' */
 	rc = (struct rpc_context *)sp;
 	sp -= sizeof(void *); /* Allocate space for the return CPU state. */
@@ -101,6 +102,9 @@ NOTHROW(FCALL task_asyncrpc_push)(struct scpustate *__restrict state,
 	memcpy((byte_t *)&result_sstate->scs_sgregs + OFFSET_SGREGS32_FS,
 	       (byte_t *)&rc_state + OFFSET_ICPUSTATE32_FS, 3 * 4);
 	result_sstate->scs_sgregs.sg_gs = saved_gs;
+	result_sstate->scs_sgregs.sg_ds = SEGMENT_USER_DATA_RPL;
+	result_sstate->scs_sgregs.sg_es = SEGMENT_USER_DATA_RPL;
+	result_sstate->scs_sgregs.sg_fs = SEGMENT_KERNEL_FSBASE;
 #endif /* !__x86_64__ */
 
 	/* Setup everything such that execution resumes at `func' */
@@ -322,7 +326,6 @@ PUBLIC NOBLOCK void NOTHROW(FCALL userexcept_sysret_inject_self)(void) {
 	PREEMPTION_POP(was);
 #else /* __x86_64__ */
 	struct irregs_user *thread_iret;
-	assert(!PREEMPTION_ENABLED());
 	assert(thread->t_cpu == THIS_CPU);
 	assert(!(thread->t_flags & TASK_FKERNTHREAD));
 	thread_iret = x86_get_irregs(thread);

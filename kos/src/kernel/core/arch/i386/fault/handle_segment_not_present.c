@@ -30,12 +30,10 @@
 #include <kernel/syscall-properties.h>
 #include <kernel/syscall-trace.h>
 #include <kernel/syscall.h>
+#include <kernel/rt/except-handler.h>
 #include <kernel/user.h>
 #include <kernel/x86/fault.h>
 #include <kernel/x86/idt.h>            /* IDT_CONFIG_ISTRAP() */
-#ifndef CONFIG_USE_NEW_RPC
-#include <sched/except-handler.h> /* x86_userexcept_unwind_interrupt() */
-#endif /* !CONFIG_USE_NEW_RPC */
 
 #include <hybrid/atomic.h>
 #include <hybrid/byteorder.h>
@@ -56,6 +54,10 @@
 #include <librpc/rpc.h>
 
 #include "decode.h"
+
+#ifndef CONFIG_USE_NEW_RPC
+#include <sched/except-handler.h> /* x86_userexcept_unwind_interrupt() */
+#endif /* !CONFIG_USE_NEW_RPC */
 
 #ifndef __NR32_clone
 #include <asm/syscalls32_d.h>
@@ -428,7 +430,7 @@ unwind_state:
 #endif /* EXCEPT_BACKTRACE_SIZE != 0 */
 #endif /* !CONFIG_USE_NEW_RPC */
 #ifdef CONFIG_USE_NEW_RPC
-	error_throw_current();
+	error_throw_current_at_icpustate(state);
 #else /* CONFIG_USE_NEW_RPC */
 	x86_userexcept_unwind_interrupt(state);
 #endif /* !CONFIG_USE_NEW_RPC */

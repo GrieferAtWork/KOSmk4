@@ -268,11 +268,11 @@ __ASM_L(	.cfi_escape 16,128,128,8,26,32,40,6,0,116,20,6,47,3,0,146)
 __ASM_L(	.cfi_escape 45,0)
 #endif /* !__x86_64__ */
 /*[[[end]]]*/
-	.cfi_def_cfa %Psp, 0
+	.cfi_def_cfa %Psp, -SIZEOF_IRREGS_KERNEL
 #ifndef __x86_64__
-	/* Correctly unwind  */
-	.cfi_restore_iret_esp -SIZEOF_IRREGS_KERNEL
-	.cfi_restore_iret_ss  -SIZEOF_IRREGS_KERNEL
+	/* Correctly unwind these */
+	.cfi_restore_iret_esp 0
+	.cfi_restore_iret_ss  0
 #endif /* !__x86_64__ */
 
 	nop /* Required to allow for detection during unwinding. */
@@ -288,12 +288,14 @@ PUBLIC_FUNCTION(x86_userexcept_sysret)
 	pushP_cfi  %segtls:(this_x86_sysret_iret + OFFSET_IRREGS_PSP)
 	.cfi_rel_offset %Psp, 0
 #else /* __x86_64__ */
-#define SPOFFSETOF_GPREGS (OFFSET_ICPUSTATE_GPREGS - (OFFSET_ICPUSTATE_IRREGS + SIZEOF_IRREGS_KERNEL))
+#define SPOFFSETOF_ICPUSTATE (-(OFFSET_ICPUSTATE_IRREGS + SIZEOF_IRREGS_KERNEL))
+#define SPOFFSETOF_GPREGS    (SPOFFSETOF_ICPUSTATE + OFFSET_ICPUSTATE_GPREGS)
 	movP   %Pax, %ss:SPOFFSETOF_GPREGS + OFFSET_GPREGS_PAX(%Psp)
 	.cfi_rel_offset %eax, SPOFFSETOF_GPREGS + OFFSET_GPREGS_PAX
 	movP   %fs, %Pax
-	movP   %Pax, %ss:SPOFFSETOF_GPREGS + OFFSET_ICPUSTATE_FS(%Psp)
-	.cfi_rel_offset %fs, SPOFFSETOF_GPREGS + OFFSET_ICPUSTATE_FS
+	movP   %Pax, %ss:SPOFFSETOF_ICPUSTATE + OFFSET_ICPUSTATE_FS(%Psp)
+	.cfi_restore_iret_fs_or_offset (-OFFSET_ICPUSTATE_IRREGS) + OFFSET_ICPUSTATE_FS, 0
+#undef SPOFFSETOF_ICPUSTATE
 #undef SPOFFSETOF_GPREGS
 	/* EAX and FS have now been saved, so we can load the KERNEL_FSBASE segment. */
 	movw   $(SEGMENT_KERNEL_FSBASE), %ax
@@ -307,15 +309,13 @@ PUBLIC_FUNCTION(x86_userexcept_sysret)
 	.cfi_rel_offset %Pip, 0
 
 #ifndef __x86_64__
-#define CFAOFFSETOF_ICPUSTATE (-(OFFSET_ICPUSTATE_IRREGS + SIZEOF_IRREGS_KERNEL))
+#define CFAOFFSETOF_ICPUSTATE (-OFFSET_ICPUSTATE_IRREGS)
 	pushP_cfi  %ds   /* ir_ds */
 	.cfi_restore_iret_ds_or_offset CFAOFFSETOF_ICPUSTATE + OFFSET_ICPUSTATE_DS, CFAOFFSETOF_ICPUSTATE + OFFSET_ICPUSTATE_IRREGS
 	pushP_cfi  %es   /* ir_es */
 	.cfi_restore_iret_es_or_offset CFAOFFSETOF_ICPUSTATE + OFFSET_ICPUSTATE_ES, CFAOFFSETOF_ICPUSTATE + OFFSET_ICPUSTATE_IRREGS
 	subP   $(8), %Psp /* NOTE: `%fs' and `%eax' were already saved earlier! */
 	.cfi_adjust_cfa_offset 8
-	pushP_cfi  %fs   /* ir_fs */
-	.cfi_restore_iret_fs_or_offset CFAOFFSETOF_ICPUSTATE + OFFSET_ICPUSTATE_FS, CFAOFFSETOF_ICPUSTATE + OFFSET_ICPUSTATE_IRREGS
 #undef CFAOFFSETOF_ICPUSTATE
 #endif /* !__x86_64__ */
 
@@ -409,9 +409,9 @@ INTERN_FUNCTION(userexcept_handler_ucpustate)
 	leaP   -SIZEOF_IRREGS64(%Pbp), %Psp
 #else /* __x86_64__ */
 	movP   $(-SIZEOF_IRREGS32_USER), %Pax
-	movP   $(-SIZEOF_IRREGS32_VM86), %Pcx
+	movP   $(-SIZEOF_IRREGS32_VM86), %Pdi
 	ttest  mask=EFLAGS_VM, loc=OFFSET_UCPUSTATE_PFLAGS(%R_fcall0P)
-	cmovnzP %Pcx, %Pax /* if (ucpustate_isvm86(state)) %Pax = %Pcx */
+	cmovnzP %Pdi, %Pax /* if (ucpustate_isvm86(state)) %Pax = %Pdi */
 	leaP   (%Pbp,%Pax,1), %Psp
 #endif /* !__x86_64__ */
 

@@ -482,6 +482,9 @@ PRIVATE void KCALL raise_sigpipe(void) {
 	NESTED_EXCEPTION;
 	/* Actually send the signal. */
 	task_raisesignalprocess(THIS_TASK, SIGPIPE);
+#ifdef CONFIG_USE_NEW_RPC
+	task_serve();
+#endif /* CONFIG_USE_NEW_RPC */
 }
 
 

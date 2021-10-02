@@ -564,8 +564,8 @@ NOTHROW(KCALL get_userspace_eflags)(struct task const *__restrict self) {
 PUBLIC NOBLOCK ATTR_CONST ATTR_RETNONNULL NONNULL((1)) struct irregs_user *
 NOTHROW(FCALL x86_get_irregs)(struct task const *__restrict self) {
 	struct irregs_user *result;
-	assert(!PREEMPTION_ENABLED());
-	assert(self->t_cpu == THIS_CPU);
+	pflag_t was;
+	assert(self == THIS_TASK || (!PREEMPTION_ENABLED() && self->t_cpu == THIS_CPU));
 	assert(!(self->t_flags & TASK_FKERNTHREAD));
 #define stacktop() ((byte_t *)FORTASK(self, this_x86_kernel_psp0))
 	result = (struct irregs_user *)(stacktop() - SIZEOF_IRREGS_USER);
@@ -580,6 +580,7 @@ NOTHROW(FCALL x86_get_irregs)(struct task const *__restrict self) {
 	 *  - result->ir_eflags   = real_result->ir_ds
 	 *  - result->ir_esp      = real_result->ir_fs
 	 *  - result->ir_ss       = real_result->ir_gs */
+	was = PREEMPTION_PUSHOFF();
 	if (!(result->ir_esp & 0xffff0000) &&
 	    !(result->ir_eip & 0xffff0000) &&
 	    !(result->ir_eflags & 0xffff0000) &&
@@ -635,6 +636,7 @@ NOTHROW(FCALL x86_get_irregs)(struct task const *__restrict self) {
 		        "User-space IRET without EFLAGS.IF (%p)", result->ir_eflags);
 	}
 #endif /* !NDEBUG */
+	PREEMPTION_POP(was);
 	return result;
 }
 #endif /* !__x86_64__ */

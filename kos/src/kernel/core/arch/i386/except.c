@@ -388,7 +388,7 @@ print_unhandled_exception(pformatprinter printer, void *arg,
 	unsigned int i;
 	bool is_first_pointer;
 	char const *name;
-	struct exception_info *info = &THIS_EXCEPTION_INFO;
+	struct exception_info *info = error_info();
 	struct regdump_printer rd_printer;
 
 	/* Dump the exception that occurred. */
@@ -572,7 +572,7 @@ halt_unhandled_exception(unsigned int unwind_error,
 	print_unhandled_exception(&syslog_printer, SYSLOG_LEVEL_EMERG,
 	                          &syslog_printer, SYSLOG_LEVEL_RAW,
 	                          NULL, NULL);
-	info = &THIS_EXCEPTION_INFO;
+	info = error_info();
 
 #if EXCEPT_BACKTRACE_SIZE != 0
 	{

@@ -54,7 +54,7 @@
 #endif
 
 #undef CONFIG_USE_NEW_RPC
-#if 0
+#if 1
 #define CONFIG_USE_NEW_RPC
 #endif
 
