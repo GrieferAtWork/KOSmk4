@@ -108,7 +108,7 @@ END(x86_task_asyncrpc_restore)
 PUBLIC_FUNCTION(task_asyncrpc_execnow)
 	.cfi_startproc
 	.cfi_signal_frame
-	.cfi_def_cfa %esp, 0
+	.cfi_def_cfa %Psp, 0
 	popP_cfi %Pax
 	.cfi_register %Pip, %Pax
 #ifdef __x86_64__
@@ -544,8 +544,7 @@ INTERN_FUNCTION(userexcept_handler_ucpustate)
 	movw   OFFSET_UCPUSTATE_SGREGS + OFFSET_SGREGS_GS(%R_fcall0P), %ax
 	movw   %ax, %gs
 	wrgsbaseq %Pbx
-	movP   OFFSET_UCPUSTATE_SGBASE + OFFSET_SGBASE_GSBASE(%R_fcall0P), %Pax
-	wrkgsbaseq %Pax
+	wrkgsbaseq OFFSET_UCPUSTATE_SGBASE + OFFSET_SGBASE_GSBASE(%R_fcall0P)
 	movP   OFFSET_UCPUSTATE_SGBASE + OFFSET_SGBASE_FSBASE(%R_fcall0P), %Pax
 	wrfsbaseq %Pax
 #endif /* __x86_64__ */

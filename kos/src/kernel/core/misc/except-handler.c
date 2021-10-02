@@ -907,7 +907,7 @@ NOTHROW(FCALL userexcept_sysret_inject_and_marksignal_safe)(struct task *__restr
 PRIVATE NOBLOCK ssize_t
 NOTHROW(KCALL _enum_inject_sysret)(void *arg,
                                    struct task *thread,
-                                   struct taskpid *pid) {
+                                   struct taskpid *UNUSED(pid)) {
 	if (thread != NULL)
 		userexcept_sysret_inject_safe(thread, (syscall_ulong_t)(uintptr_t)arg);
 	return 0;
@@ -916,7 +916,7 @@ NOTHROW(KCALL _enum_inject_sysret)(void *arg,
 PRIVATE NOBLOCK ssize_t
 NOTHROW(KCALL _enum_inject_sysret_and_marksignal)(void *arg,
                                                   struct task *thread,
-                                                  struct taskpid *pid) {
+                                                  struct taskpid *UNUSED(pid)) {
 	if (thread != NULL)
 		userexcept_sysret_inject_and_marksignal_safe(thread, (syscall_ulong_t)(uintptr_t)arg);
 	return 0;
@@ -1275,6 +1275,8 @@ DECL_END
 
 #ifndef __INTELLISENSE__
 #define DEFINE_userexcept_handler
+#include "except-handler-userexcept.c.inl"
+#define DEFINE_userexcept_handler_with_sigmask
 #include "except-handler-userexcept.c.inl"
 #define DEFINE_userexcept_sysret
 #include "except-handler-userexcept.c.inl"

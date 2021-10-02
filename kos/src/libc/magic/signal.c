@@ -1732,24 +1732,25 @@ int sigpending([[nonnull]] sigset_t *__restrict set);
 @@>> sigwait(3)
 @@Same as `sigsuspend(2)', but write-back the actual signal that was raised to `*signo'
 @@@return: -1: [errno=EINTR] The signal handler for `signo' was executed.
-[[cp, decl_include("<bits/types.h>")]]
+[[cp, decl_include("<bits/os/sigset.h>", "<bits/types.h>")]]
 int sigwait([[nonnull]] sigset_t const *__restrict set,
             [[nonnull]] $signo_t *__restrict signo);
 
 %#ifdef __USE_GNU
 @@>> sigisemptyset(3)
 @@Check if the given signal set is empty
-@@@return: != 0: The given `set' is non-empty
-@@@return: == 0: The given `set' is empty
+@@@return: != 0: Yes, it is empty
+@@@return: == 0: No, at least 1 signal is contained
 [[kernel, pure, wunused, decl_include("<bits/os/sigset.h>")]]
 int sigisemptyset([[nonnull]] $sigset_t const *__restrict set) {
 	size_t i;
 	for (i = 0; i < sizeof(sigset_t) / sizeof($ulongptr_t); ++i) {
-		if (set->__val[i])
-			return 0;
+		if (set->__val[i] != 0)
+			return 0; /* Not empty! */
 	}
 	return 1;
 }
+
 
 @@>> sigandset(3)
 @@Set-up every signal `S' from `set' as the result of `set[S] = left[S] & right[S]'
@@ -2548,7 +2549,7 @@ int sigaltstack([[nullable]] struct sigaltstack const *ss,
 %#ifdef __USE_XOPEN_EXTENDED
 
 [[static, requires_function(sigprocmask)]]
-int set_single_signal_action(int sig, int how) {
+int set_single_signal_masked(int sig, int how) {
 	sigset_t set;
 	sigemptyset(&set);
 	sigaddset(&set, sig);
@@ -2563,9 +2564,9 @@ int set_single_signal_action(int sig, int how) {
 @@@return: -1: Error (s.a. `errno')
 [[decl_include("<bits/types.h>"), impl_include("<asm/os/signal.h>")]]
 [[requires_include("<asm/os/signal.h>")]]
-[[requires(defined(@__SIG_BLOCK@) && $has_function(set_single_signal_action))]]
+[[requires(defined(@__SIG_BLOCK@) && $has_function(set_single_signal_masked))]]
 int sighold($signo_t signo) {
-	return set_single_signal_action(signo, @__SIG_BLOCK@);
+	return set_single_signal_masked(signo, @__SIG_BLOCK@);
 }
 
 @@>> sighold(3)
@@ -2575,9 +2576,9 @@ int sighold($signo_t signo) {
 @@@return: -1: Error (s.a. `errno')
 [[decl_include("<bits/types.h>"), impl_include("<asm/os/signal.h>")]]
 [[requires_include("<asm/os/signal.h>")]]
-[[requires(defined(@__SIG_UNBLOCK@) && $has_function(set_single_signal_action))]]
+[[requires(defined(@__SIG_UNBLOCK@) && $has_function(set_single_signal_masked))]]
 int sigrelse($signo_t signo) {
-	return set_single_signal_action(signo, @__SIG_UNBLOCK@);
+	return set_single_signal_masked(signo, @__SIG_UNBLOCK@);
 }
 
 @@>> sigignore(3)

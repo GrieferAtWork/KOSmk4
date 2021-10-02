@@ -19,6 +19,7 @@
  */
 #ifndef GUARD_KERNEL_SRC_MISC_EXCEPT_SYSCALL_C
 #define GUARD_KERNEL_SRC_MISC_EXCEPT_SYSCALL_C 1
+#define _GNU_SOURCE 1
 
 /* System calls and meta-data tracking for stuff relating to exception handling */
 
@@ -34,6 +35,8 @@
 #include <sched/except-handler.h>
 #include <sched/pid.h>
 #include <sched/posix-signal.h>
+#include <sched/rpc-internal.h>
+#include <sched/rpc.h>
 #include <sched/task.h>
 
 #include <hybrid/atomic.h>
@@ -464,6 +467,102 @@ DEFINE_SYSCALL1(pid_t, set_tid_address,
 
 #ifdef CONFIG_HAVE_USERPROCMASK
 #ifdef __ARCH_WANT_SYSCALL_SET_USERPROCMASK_ADDRESS
+#ifdef CONFIG_USE_NEW_RPC
+DEFINE_SYSCALL1(errno_t, set_userprocmask_address,
+                USER UNCHECKED struct userprocmask *, ctl) {
+	if unlikely(PERTASK_GET(this_task.t_flags) & TASK_FUSERPROCMASK) {
+		USER CHECKED struct userprocmask *old_ctl;
+		old_ctl = PERTASK_GET(this_userprocmask_address);
+		/* Check for special case: Nothing changed. */
+		if unlikely(old_ctl == ctl)
+			goto done;
+
+		/* Load the final userprocmask into kernelspace */
+		load_userprocmask_into_kernelspace(old_ctl);
+	}
+	if unlikely(!ctl) {
+		/* Disable USERPROCMASK mode. */
+		PERTASK_SET(this_userprocmask_address, (struct userprocmask *)NULL);
+		ATOMIC_AND(THIS_TASK->t_flags,
+		           ~(TASK_FUSERPROCMASK |
+		             TASK_FUSERPROCMASK_AFTER_VFORK));
+	} else {
+		size_t sigsetsize;
+		sigset_t initial_pending;
+		uintptr_t initial_flags;
+		USER UNCHECKED sigset_t *new_sigset;
+		struct kernel_sigmask *kernel_mask;
+
+		/* Enable USERPROCMASK mode. */
+		validate_readwrite_opt(ctl, sizeof(*ctl));
+		COMPILER_BARRIER();
+
+		/* Verify that the controller's idea of the size of a signal set matches our's */
+		sigsetsize = ATOMIC_READ(ctl->pm_sigsize);
+		if (sigsetsize != sizeof(sigset_t)) {
+			THROW(E_INVALID_ARGUMENT_BAD_VALUE,
+			      E_INVALID_ARGUMENT_CONTEXT_SIGNAL_SIGSET_SIZE,
+			      sigsetsize);
+		}
+
+		/* Load the address for the initial signal mask. We'll be copying
+		 * our threads kernel signal mask into this field for the purpose
+		 * of initialization. */
+		new_sigset = ATOMIC_READ(ctl->pm_sigmask);
+		COMPILER_BARRIER();
+		validate_readwrite(new_sigset, sizeof(sigset_t));
+
+		/* Initialize the user's initial signal mask with what was their
+		 * thread's signal mask before. */
+		kernel_mask = sigmask_kernel_getrd();
+		memcpy(new_sigset, &kernel_mask->sm_mask, sizeof(sigset_t));
+
+		/* Fill in the initial set of pending signals for user-space. */
+		sigemptyset(&initial_pending);
+		task_rpc_pending_sigset(&initial_pending);
+		proc_rpc_pending_sigset(&initial_pending);
+
+		/* If any signals are pending, set the HASPENDING flag. */
+		initial_flags = USERPROCMASK_FLAG_NORMAL;
+		if (!sigisemptyset(&initial_pending))
+			initial_flags |= USERPROCMASK_FLAG_HASPENDING;
+
+		COMPILER_BARRIER();
+		memcpy(&ctl->pm_pending, &initial_pending, sizeof(sigset_t));
+		COMPILER_BARRIER();
+		ATOMIC_WRITE(ctl->pm_flags, initial_flags);
+		COMPILER_BARRIER();
+
+		/* Finally, initialize the TID field to that of the calling thread. */
+		ctl->pm_mytid = task_gettid();
+		COMPILER_BARRIER();
+
+		/* Store the controller address for our thread. */
+		PERTASK_SET(this_userprocmask_address, ctl);
+
+		{
+			struct task *me = THIS_TASK;
+			uintptr_t old_flags;
+
+			/* Turn on the USERPROCMASK bit in our thread. */
+			old_flags = ATOMIC_FETCHOR(me->t_flags, TASK_FUSERPROCMASK);
+
+			/* If USERPROCMASK wasn't enabled before, and we're a VFORK thread,
+			 * then we must also set the `TASK_FUSERPROCMASK_AFTER_VFORK' flag,
+			 * such that the process of clearing the `TASK_FVFORK' flag  during
+			 * exec() or exit() will also write NULL to `ctl->pm_sigmask' */
+			if ((old_flags & (TASK_FUSERPROCMASK | TASK_FVFORK)) == TASK_FVFORK)
+				ATOMIC_OR(me->t_flags, TASK_FUSERPROCMASK_AFTER_VFORK);
+		}
+
+		/* No need to call `userexcept_sysret_inject_self()' here since the
+		 * effective signal mask shouldn't  have changed (because we  wrote
+		 * the thread's old mask into the buffer it provided) */
+	}
+done:
+	return -EOK;
+}
+#else /* CONFIG_USE_NEW_RPC */
 PRIVATE NOBLOCK NONNULL((1, 2)) void
 NOTHROW(KCALL restore_perthread_pending_signals)(struct sigqueue *__restrict myqueue,
                                                  struct sigqueue_entry *__restrict pending) {
@@ -611,6 +710,7 @@ DEFINE_SYSCALL1(errno_t, set_userprocmask_address,
 done:
 	return -EOK;
 }
+#endif /* !CONFIG_USE_NEW_RPC */
 #endif /* __ARCH_WANT_SYSCALL_SET_USERPROCMASK_ADDRESS */
 #endif /* CONFIG_HAVE_USERPROCMASK */
 

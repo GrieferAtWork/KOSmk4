@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x74e20ab7 */
+/* HASH CRC-32:0x67bad60e */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,16 +25,16 @@
 #if defined(__SIG_UNBLOCK) && (defined(__CRT_HAVE_sigprocmask) || defined(__CRT_HAVE_pthread_sigmask))
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-#ifndef __local___localdep_set_single_signal_action_defined
-#define __local___localdep_set_single_signal_action_defined
+#ifndef __local___localdep_set_single_signal_masked_defined
+#define __local___localdep_set_single_signal_masked_defined
 __NAMESPACE_LOCAL_END
-#include <libc/local/signal/set_single_signal_action.h>
+#include <libc/local/signal/set_single_signal_masked.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep_set_single_signal_action __LIBC_LOCAL_NAME(set_single_signal_action)
-#endif /* !__local___localdep_set_single_signal_action_defined */
+#define __localdep_set_single_signal_masked __LIBC_LOCAL_NAME(set_single_signal_masked)
+#endif /* !__local___localdep_set_single_signal_masked_defined */
 __LOCAL_LIBC(sigrelse) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(sigrelse))(__signo_t __signo) {
-	return (__NAMESPACE_LOCAL_SYM __localdep_set_single_signal_action)(__signo, __SIG_UNBLOCK);
+	return (__NAMESPACE_LOCAL_SYM __localdep_set_single_signal_masked)(__signo, __SIG_UNBLOCK);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_sigrelse_defined

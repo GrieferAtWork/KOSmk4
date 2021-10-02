@@ -344,82 +344,6 @@ NOTHROW(KCALL task_deliver_rpc)(struct task *__restrict target,
 
 
 
-
-
-/* Chain  of blocking cleanup functions (serviced every
- * time `task_serve()' or `task_serve_nx()' is  called)
- * Additionally, functions from this chain will also be
- * serviced by the IDLE thread, the same way any  other
- * IDLE job would be. */
-PUBLIC ATTR_READMOSTLY WEAK void *blocking_cleanup_chain = NULL;
-
-
-STATIC_ASSERT(BLOCKING_CLEANUP_SERVICE_NONE == TASK_SERVE_NX_NORMAL);
-STATIC_ASSERT(BLOCKING_CLEANUP_SERVICE_XRPC == TASK_SERVE_NX_EXCEPT);
-STATIC_ASSERT(BLOCKING_CLEANUP_SERVICE_DONE == TASK_SERVE_NX_DIDRUN);
-
-/* Service blocking cleanup operations.
- * @return: * : One of `BLOCKING_CLEANUP_SERVICE_*' */
-PUBLIC unsigned int
-NOTHROW(FCALL blocking_cleanup_service)(void) {
-	void *next, *chain;
-	if likely(!ATOMIC_READ(blocking_cleanup_chain))
-		goto did_service_none;
-	chain = ATOMIC_XCH(blocking_cleanup_chain, NULL);
-	if unlikely(!chain)
-		goto did_service_none;
-service_chain:
-	for (;;) {
-		next = (*(blocking_cleanup_t)chain)(chain, BLOCKING_CLEANUP_ACTION_SERVICE);
-		if (!next)
-			break;
-		if (next == BLOCKING_CLEANUP_RETURN_XPENDING) {
-			/* Must re-schedule all remaining operations, and service X-RPCs */
-			if (!ATOMIC_CMPXCH(blocking_cleanup_chain, NULL, chain)) {
-				void **pnext, *chain_end = chain;
-				for (;;) {
-					pnext = (void **)(*(blocking_cleanup_t)chain_end)(chain_end, BLOCKING_CLEANUP_ACTION_GETNEXT);
-					assert(pnext != NULL);
-					if (!*pnext)
-						break;
-					chain_end = *pnext;
-				}
-				do
-					*pnext = next = ATOMIC_READ(blocking_cleanup_chain);
-				while (!ATOMIC_CMPXCH_WEAK(blocking_cleanup_chain, next, chain));
-#if 1 /* Can't hurt to do this none-the-less. */
-				blocking_cleanup_prioritize();
-#endif
-			}
-			return BLOCKING_CLEANUP_SERVICE_XRPC;
-		}
-		chain = next;
-	}
-	/* Check for additional functions to service. */
-	chain = ATOMIC_XCH(blocking_cleanup_chain, NULL);
-	if unlikely(chain)
-		goto service_chain;
-	return BLOCKING_CLEANUP_SERVICE_DONE;
-did_service_none:
-	return BLOCKING_CLEANUP_SERVICE_NONE;
-}
-
-
-/* Try to find some thread that can be used to service blocking cleanup
- * operations, potentially  waking  it  up so  it  will  service  them.
- * If no such that can be found, return without doing anything.
- * -> This function  is merely  used to  prevent blocking  cleanup
- *    operations from blocking  indefinitely, by explicitly  going
- *    out of our way to get some other thread to do the dirty work
- *    for us. */
-PUBLIC NOBLOCK void
-NOTHROW(FCALL blocking_cleanup_prioritize)(void) {
-	/* TODO: Wake up random threads until none are left, one of them woke
-	 *       up,  or  `blocking_cleanup_chain'  has  been  set  to `NULL' */
-}
-
-
-
 #if defined(__ARCH_WANT_SYSCALL_RPC_SCHEDULE) || \
     defined(__ARCH_WANT_COMPAT_SYSCALL_RPC_SCHEDULE)
 
@@ -1101,5 +1025,94 @@ DECL_END
 #include "oldrpc-schedule-impl.c.inl"
 #endif
 #endif /* !CONFIG_USE_NEW_RPC */
+
+
+#if 1 /* Super-deprecated (but still needed for the time being...) */
+#include <sched/rpc.h>
+
+#include <hybrid/atomic.h>
+
+#include <assert.h>
+#include <stddef.h>
+
+
+DECL_BEGIN
+
+/* Chain  of blocking cleanup functions (serviced every
+ * time `task_serve()' or `task_serve_nx()' is  called)
+ * Additionally, functions from this chain will also be
+ * serviced by the IDLE thread, the same way any  other
+ * IDLE job would be. */
+PUBLIC ATTR_READMOSTLY WEAK void *blocking_cleanup_chain = NULL;
+
+
+STATIC_ASSERT(BLOCKING_CLEANUP_SERVICE_NONE == TASK_SERVE_NX_NORMAL);
+STATIC_ASSERT(BLOCKING_CLEANUP_SERVICE_XRPC == TASK_SERVE_NX_EXCEPT);
+STATIC_ASSERT(BLOCKING_CLEANUP_SERVICE_DONE == TASK_SERVE_NX_DIDRUN);
+
+/* Service blocking cleanup operations.
+ * @return: * : One of `BLOCKING_CLEANUP_SERVICE_*' */
+PUBLIC unsigned int
+NOTHROW(FCALL blocking_cleanup_service)(void) {
+	void *next, *chain;
+	if likely(!ATOMIC_READ(blocking_cleanup_chain))
+		goto did_service_none;
+	chain = ATOMIC_XCH(blocking_cleanup_chain, NULL);
+	if unlikely(!chain)
+		goto did_service_none;
+service_chain:
+	for (;;) {
+		next = (*(blocking_cleanup_t)chain)(chain, BLOCKING_CLEANUP_ACTION_SERVICE);
+		if (!next)
+			break;
+		if (next == BLOCKING_CLEANUP_RETURN_XPENDING) {
+			/* Must re-schedule all remaining operations, and service X-RPCs */
+			if (!ATOMIC_CMPXCH(blocking_cleanup_chain, NULL, chain)) {
+				void **pnext, *chain_end = chain;
+				for (;;) {
+					pnext = (void **)(*(blocking_cleanup_t)chain_end)(chain_end, BLOCKING_CLEANUP_ACTION_GETNEXT);
+					assert(pnext != NULL);
+					if (!*pnext)
+						break;
+					chain_end = *pnext;
+				}
+				do
+					*pnext = next = ATOMIC_READ(blocking_cleanup_chain);
+				while (!ATOMIC_CMPXCH_WEAK(blocking_cleanup_chain, next, chain));
+#if 1 /* Can't hurt to do this none-the-less. */
+				blocking_cleanup_prioritize();
+#endif
+			}
+			return BLOCKING_CLEANUP_SERVICE_XRPC;
+		}
+		chain = next;
+	}
+	/* Check for additional functions to service. */
+	chain = ATOMIC_XCH(blocking_cleanup_chain, NULL);
+	if unlikely(chain)
+		goto service_chain;
+	return BLOCKING_CLEANUP_SERVICE_DONE;
+did_service_none:
+	return BLOCKING_CLEANUP_SERVICE_NONE;
+}
+
+
+/* Try to find some thread that can be used to service blocking cleanup
+ * operations, potentially  waking  it  up so  it  will  service  them.
+ * If no such that can be found, return without doing anything.
+ * -> This function  is merely  used to  prevent blocking  cleanup
+ *    operations from blocking  indefinitely, by explicitly  going
+ *    out of our way to get some other thread to do the dirty work
+ *    for us. */
+PUBLIC NOBLOCK void
+NOTHROW(FCALL blocking_cleanup_prioritize)(void) {
+	/* TODO: Wake up random threads until none are left, one of them woke
+	 *       up,  or  `blocking_cleanup_chain'  has  been  set  to `NULL' */
+}
+
+
+DECL_END
+#endif
+
 
 #endif /* !GUARD_KERNEL_SRC_SCHED_OLDRPC_C */

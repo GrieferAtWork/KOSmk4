@@ -24,6 +24,7 @@
 #include <kernel/compiler.h>
 
 #ifdef CONFIG_USE_NEW_RPC
+#include <kernel/except.h>
 #include <kernel/mman.h>
 #include <kernel/rt/except-handler.h>
 #include <kernel/types.h>
@@ -55,6 +56,38 @@ DECL_BEGIN
  * be executed, and all that were there prior to this becoming the case
  * are/were serviced with `RPC_REASONCTX_SHUTDOWN') */
 PUBLIC ATTR_PERTASK struct pending_rpc_slist this_rpcs = SLIST_HEAD_INITIALIZER(this_rpcs);
+
+/* Finalizer for thread RPCs (called during `task_exit()') */
+DEFINE_PERTASK_ONEXIT(shutdown_this_rpcs);
+PRIVATE ATTR_USED void
+NOTHROW(KCALL shutdown_this_rpcs)(void) {
+	struct pending_rpc_slist remain;
+	remain.slh_first = ATOMIC_XCH(PERTASK(this_rpcs.slh_first), THIS_RPCS_TERMINATED);
+	assert(remain.slh_first != THIS_RPCS_TERMINATED);
+	while (!SLIST_EMPTY(&remain)) {
+		struct pending_rpc *rpc;
+		rpc = SLIST_FIRST(&remain);
+		SLIST_REMOVE_HEAD(&remain, pr_link);
+		if (rpc->pr_flags & RPC_CONTEXT_KERN) {
+			byte_t _ctxbuf[offsetof(struct rpc_context, rc_scinfo)];
+			struct rpc_context *ctx = (struct rpc_context *)_ctxbuf;
+			TRY {
+				ctx->rc_context = RPC_REASONCTX_SHUTDOWN;
+				task_asyncrpc_execnow(ctx,
+				                      rpc->pr_kern.k_func,
+				                      rpc->pr_kern.k_cookie);
+			} EXCEPT {
+				/* Dump the exception if it is non-signaling */
+				error_printf("Unhandled exception in RPC function during thread termination");
+			}
+		} else {
+			if (!(rpc->pr_flags & RPC_CONTEXT_SIGNAL))
+				pending_user_rpc_fini(&rpc->pr_user);
+		}
+		pending_rpc_free(rpc);
+	}
+}
+
 
 
 /* High-level RPC scheduling function.

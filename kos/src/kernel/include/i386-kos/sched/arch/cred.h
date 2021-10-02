@@ -22,6 +22,8 @@
 
 #include <kernel/compiler.h>
 
+#include <asm/cpu-flags.h>
+
 DECL_BEGIN
 
 /* Return true if the calling thread is allowed to modify EFLAGS.IOPERM */

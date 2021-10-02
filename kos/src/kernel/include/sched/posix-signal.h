@@ -48,6 +48,7 @@
 
 #define sigmask_check()                             task_serve()                    /* !DEPREACTED! */
 #define sigmask_check_after_syscall(syscall_result) userexcept_sysret_inject_self() /* !DEPREACTED! */
+#define sigmask_check_after_except()                userexcept_sysret_inject_self() /* !DEPREACTED! */
 #endif /* CONFIG_USE_NEW_RPC */
 
 

@@ -34,12 +34,18 @@ DECL_BEGIN
 
 
 #ifdef CONFIG_USE_NEW_RPC
-#define task_rpc_t                prpc_exec_callback_t
-#define TASK_RPC_REASON_ASYNC     RPC_REASONCTX_ASYNC_KERN
-#define TASK_RPC_REASON_ASYNCUSER RPC_REASONCTX_SYSRET
-#define TASK_RPC_REASON_SYSCALL   RPC_REASONCTX_SYSCALL
-#define TASK_RPC_REASON_SYNC      RPC_REASONCTX_SYNC
-#define TASK_RPC_REASON_SHUTDOWN  RPC_REASONCTX_SHUTDOWN
+#define task_rpc_t                prpc_exec_callback_t     /* !DEPRECATED! */
+#define TASK_RPC_REASON_ASYNC     RPC_REASONCTX_ASYNC_KERN /* !DEPRECATED! */
+#define TASK_RPC_REASON_ASYNCUSER RPC_REASONCTX_SYSRET     /* !DEPRECATED! */
+#define TASK_RPC_REASON_SYSCALL   RPC_REASONCTX_SYSCALL    /* !DEPRECATED! */
+#define TASK_RPC_REASON_SYNC      RPC_REASONCTX_SYNC       /* !DEPRECATED! */
+#define TASK_RPC_REASON_SHUTDOWN  RPC_REASONCTX_SHUTDOWN   /* !DEPRECATED! */
+#define TASK_RPC_FHIGHPRIO        RPC_PRIORITY_F_HIGH      /* !DEPRECATED! */
+#define TASK_RPC_FWAITFOR         0                        /* !DEPRECATED! */
+#define task_schedule_asynchronous_rpc(thread, func, arg, flags, ...) \
+	task_rpc_exec(thread, RPC_CONTEXT_KERN | RPC_SYNCMODE_F_ALLOW_ASYNC | (flags), func, arg)
+#define task_schedule_synchronous_rpc(thread, func, arg, flags, ...) \
+	task_rpc_exec(thread, RPC_CONTEXT_KERN | (flags), func, arg)
 
 
 #ifdef __CC__

@@ -266,13 +266,22 @@ NOTHROW(FCALL mbuilder_apply_impl)(struct mbuilder *__restrict self,
 
 
 
+
+#ifdef CONFIG_USE_NEW_RPC
+PRIVATE NONNULL((1)) void PRPC_EXEC_CALLBACK_CC
+killthread_for_exec_rpc(struct rpc_context *__restrict ctx, void *UNUSED(cookie)) {
+	if (ctx->rc_context != RPC_REASONCTX_SHUTDOWN)
+		THROW(E_EXIT_THREAD, W_EXITCODE(0, 0));
+}
+#else /* CONFIG_USE_NEW_RPC */
 PRIVATE WUNUSED NONNULL((2)) struct icpustate *FCALL
-killthread_for_exec(void *UNUSED(arg), struct icpustate *__restrict state,
+killthread_for_exec_rpc(void *UNUSED(arg), struct icpustate *__restrict state,
                     unsigned int reason, struct rpc_syscall_info const *UNUSED(sc_info)) {
 	if (reason != TASK_RPC_REASON_SHUTDOWN)
 		THROW(E_EXIT_THREAD, W_EXITCODE(0, 0));
 	return state;
 }
+#endif /* !CONFIG_USE_NEW_RPC */
 
 /* Terminate all threads bound to `target', other than the calling
  * thread by sending an RPC that throws an E_EXIT_THREAD exception
@@ -300,19 +309,24 @@ mbuilder_termthreads_or_unlock(struct mbuilder *__restrict self,
                                struct mman *__restrict target,
                                struct unlockinfo *unlock)
 		THROWS(E_BADALLOC, E_WOULDBLOCK) {
+	struct task *thread, *caller;
+	struct rpc_entry **p_rpc_desc;
+	pflag_t was;
+
 	/* Make sure that there are enough RPC descriptors
 	 * in order to kill  all threads using this  mman.
 	 *
 	 * If  some are missing, then allocate more _before_
 	 * doing anything, since once we start kill threads,
 	 * we've already reached the point of no return! */
-	bool result = true;
-	struct rpc_entry **p_rpc_desc;
-	struct task *thread, *caller;
-	pflag_t was;
-	caller     = THIS_TASK;
+	caller = THIS_TASK;
+#ifdef CONFIG_USE_NEW_RPC
+	p_rpc_desc = SLIST_PFIRST(&self->mb_killrpc);
+#else /* CONFIG_USE_NEW_RPC */
 	p_rpc_desc = &self->mb_killrpc;
-	was        = PREEMPTION_PUSHOFF();
+#endif /* !CONFIG_USE_NEW_RPC */
+
+	was = PREEMPTION_PUSHOFF();
 	mman_threadslock_acquire_nopr(target);
 
 	/* Allocate missing descriptors */
@@ -323,33 +337,66 @@ mbuilder_termthreads_or_unlock(struct mbuilder *__restrict self,
 		rpc = *p_rpc_desc;
 		if (rpc == NULL) {
 			/* Try to allocate another RPC descriptor w/o blocking. */
-			rpc = task_alloc_user_rpc_nx(&killthread_for_exec, NULL,
+#ifdef CONFIG_USE_NEW_RPC
+			rpc = pending_rpc_alloc_kern_nx(GFP_ATOMIC);
+#else /* CONFIG_USE_NEW_RPC */
+			rpc = task_alloc_user_rpc_nx(&killthread_for_exec_rpc, NULL,
 			                             TASK_RPC_FNORMAL, GFP_ATOMIC);
+#endif /* !CONFIG_USE_NEW_RPC */
 			if unlikely(!rpc) {
-				if (result) {
-					mman_threadslock_release_nopr(target);
-					PREEMPTION_POP(was);
-					mbuilder_partlocks_release(self);
-					mman_lock_release(target);
-					unlockinfo_xunlock(unlock);
-					result = false;
-				}
+				mman_threadslock_release_nopr(target);
+				PREEMPTION_POP(was);
+				mbuilder_partlocks_release(self);
+				mman_lock_release(target);
+				unlockinfo_xunlock(unlock);
+
 				/* Re-try the allocation while blocking, and with exceptions enabled. */
-				rpc = task_alloc_user_rpc(&killthread_for_exec, NULL,
+#ifdef CONFIG_USE_NEW_RPC
+				rpc = pending_rpc_alloc_kern(GFP_NORMAL);
+				rpc->pr_link.sle_next = NULL;
+				rpc->pr_flags         = RPC_CONTEXT_KERN;
+				rpc->pr_kern.k_func   = &killthread_for_exec_rpc;
+#else /* CONFIG_USE_NEW_RPC */
+				rpc = task_alloc_user_rpc(&killthread_for_exec_rpc, NULL,
 				                          TASK_RPC_FNORMAL, GFP_NORMAL);
+				rpc->re_next = NULL;
+#endif /* !CONFIG_USE_NEW_RPC */
+				*p_rpc_desc = rpc;
+				/* We lost the locks, so we can't continue to enumerate threads */
+				return false;
 			}
 			/* Set the next-link to NULL. */
+#ifdef CONFIG_USE_NEW_RPC
+			rpc->pr_link.sle_next = NULL;
+			rpc->pr_flags         = RPC_CONTEXT_KERN;
+			rpc->pr_kern.k_func   = &killthread_for_exec_rpc;
+#else /* CONFIG_USE_NEW_RPC */
 			rpc->re_next = NULL;
-			if (!result)
-				goto done; /* We lost the locks, so we can't continue to enumerate threads */
+#endif /* !CONFIG_USE_NEW_RPC */
+			*p_rpc_desc = rpc;
 		}
+#ifdef CONFIG_USE_NEW_RPC
+		p_rpc_desc = &rpc->pr_link.sle_next;
+#else /* CONFIG_USE_NEW_RPC */
 		p_rpc_desc = &rpc->re_next;
+#endif /* !CONFIG_USE_NEW_RPC */
 	}
-	assert(result);
 
 	/* === Pointer of no return:
 	 * Actually send out all of the RPCs to all of the target threads. */
 	LIST_FOREACH (thread, &target->mm_threads, t_mman_tasks) {
+#ifdef CONFIG_USE_NEW_RPC
+		struct pending_rpc *rpc, *next;
+		if (thread == caller)
+			continue; /* Skip this one! */
+		rpc = SLIST_FIRST(&self->mb_killrpc);
+		assert(rpc);
+		next = SLIST_NEXT(rpc, pr_link);
+		COMPILER_BARRIER();
+		/* Send the RPC to `thread' */
+		if likely(task_rpc_schedule(thread, rpc))
+			self->mb_killrpc.slh_first = next;
+#else /* CONFIG_USE_NEW_RPC */
 		int error;
 		struct rpc_entry *rpc, *next;
 		if (thread == caller)
@@ -379,13 +426,13 @@ mbuilder_termthreads_or_unlock(struct mbuilder *__restrict self,
 		 *       isn't something that should normally happen... */
 		if (TASK_DELIVER_RPC_WASOK(error))
 			self->mb_killrpc = next;
+#endif /* !CONFIG_USE_NEW_RPC */
 	}
 
 	/* And with that, all target threads have been killed. */
 	mman_threadslock_release_nopr(target);
 	PREEMPTION_POP(was);
-done:
-	return result;
+	return true;
 }
 
 

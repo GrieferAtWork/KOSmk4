@@ -50,6 +50,13 @@ DECL_BEGIN
 INTERN REF struct task *GDBServer_FallbackHost = NULL;
 
 
+#ifdef CONFIG_USE_NEW_RPC
+PRIVATE NONNULL((1)) void PRPC_EXEC_CALLBACK_CC
+GDBServer_TerminateFallbackHostRPC(struct rpc_context *__restrict ctx, void *UNUSED(cookie)) {
+	if (ctx->rc_context != RPC_REASONCTX_SHUTDOWN)
+		THROW(E_EXIT_THREAD);
+}
+#else /* CONFIG_USE_NEW_RPC */
 PRIVATE struct icpustate *FCALL
 GDBServer_TerminateFallbackHostRPC(void *UNUSED(arg),
                                    struct icpustate *__restrict UNUSED(state),
@@ -57,6 +64,7 @@ GDBServer_TerminateFallbackHostRPC(void *UNUSED(arg),
                                    struct rpc_syscall_info const *UNUSED(sc_info)) {
 	THROW(E_EXIT_THREAD);
 }
+#endif /* !CONFIG_USE_NEW_RPC */
 
 PRIVATE DRIVER_FINI void KCALL GDBServer_Fini(void) {
 
@@ -77,7 +85,8 @@ PRIVATE DRIVER_FINI void KCALL GDBServer_Fini(void) {
 	/* Terminate the fallback-host thread */
 	if (GDBServer_FallbackHost) {
 		task_schedule_synchronous_rpc(GDBServer_FallbackHost,
-		                              &GDBServer_TerminateFallbackHostRPC);
+		                              &GDBServer_TerminateFallbackHostRPC,
+		                              NULL, 0);
 		decref(GDBServer_FallbackHost);
 		GDBServer_FallbackHost = NULL;
 	}

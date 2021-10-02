@@ -50,23 +50,6 @@ userexcept_callhandler(struct icpustate *__restrict state,
                        struct exception_data const *__restrict except_data)
 		THROWS(E_SEGFAULT);
 
-#ifdef __x86_64__
-/* Dedicated  functions  which  may  be  used  if  the  caller already
- * knows the result of `icpustate_is32bit(state)' and related helpers. */
-FUNDEF WUNUSED NONNULL((1, 3)) struct icpustate *FCALL
-x86_userexcept_callhandler32(struct icpustate *__restrict state,
-                             struct rpc_syscall_info const *sc_info,
-                             struct exception_data const *__restrict except_data)
-		THROWS(E_SEGFAULT);
-FUNDEF WUNUSED NONNULL((1, 3)) struct icpustate *FCALL
-x86_userexcept_callhandler64(struct icpustate *__restrict state,
-                             struct rpc_syscall_info const *sc_info,
-                             struct exception_data const *__restrict except_data)
-		THROWS(E_SEGFAULT);
-#else /* __x86_64__ */
-#define x86_userexcept_callhandler32 userexcept_callhandler
-#endif /* !__x86_64__ */
-
 
 /* Raise a posix signal in user-space for `siginfo'
  * @param: state:   The user-space CPU state (note that `icpustate_isuser(state)' is assumed!)

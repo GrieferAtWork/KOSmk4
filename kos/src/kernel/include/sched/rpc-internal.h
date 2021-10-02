@@ -185,7 +185,7 @@ FUNDEF NOBLOCK void NOTHROW(FCALL task_asyncrpc_destroy_list_for_shutdown)(struc
 /* Arch-specific function:
  * Execute the given `func' using the register state at the time of
  * the call to this function,  whilst passing the given  `context'. */
-FUNDEF NOBLOCK NONNULL((1, 2)) void FCALL
+FUNDEF NONNULL((1, 2)) void FCALL
 task_asyncrpc_execnow(struct rpc_context *__restrict context,
                       prpc_exec_callback_t func, void *cookie DFL(__NULLPTR));
 

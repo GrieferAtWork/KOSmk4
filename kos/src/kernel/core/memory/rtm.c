@@ -86,7 +86,6 @@ syscall_rtm_begin_rpc(struct rpc_context *__restrict ctx,
 	REF struct mrtm_driver_hooks *hooks;
 	if (ctx->rc_context != RPC_REASONCTX_SYSCALL)
 		return;
-	ctx->rc_context = RPC_REASONCTX_SYSRET;
 	/* Lookup RTM hooks. */
 	hooks = awref_get(&mrtm_hooks);
 	if unlikely(!hooks) {
@@ -113,6 +112,9 @@ throw_illegal_op:
 		FINALLY_DECREF_UNLIKELY(hooks);
 		ctx->rc_state = mrtm_exec(&hooks->rdh_hooks, ctx->rc_state);
 	}
+
+	/* Indicate that the system call has completed; further RPCs should never try to restart it! */
+	ctx->rc_context = RPC_REASONCTX_SYSRET;
 }
 
 DEFINE_SYSCALL0(rtm_status_t, rtm_begin) {

@@ -287,6 +287,15 @@ do_normal_stop:
 	return (struct icpustate *)stop_event.e.tse_state;
 }
 
+#ifdef CONFIG_USE_NEW_RPC
+PRIVATE NONNULL((1)) void
+NOTHROW(PRPC_EXEC_CALLBACK_CC GDBThread_StopRPC)(struct rpc_context *__restrict ctx,
+                                                 void *cookie) {
+	pflag_t was   = PREEMPTION_PUSHOFF();
+	ctx->rc_state = GDBThread_StopRPCImpl((uintptr_t)cookie, ctx->rc_state);
+	PREEMPTION_POP(was);
+}
+#else /* CONFIG_USE_NEW_RPC */
 PRIVATE struct icpustate *
 NOTHROW(FCALL GDBThread_StopRPC)(void *arg,
                                  struct icpustate *__restrict state,
@@ -298,6 +307,7 @@ NOTHROW(FCALL GDBThread_StopRPC)(void *arg,
 	PREEMPTION_POP(was);
 	return state;
 }
+#endif /* !CONFIG_USE_NEW_RPC */
 
 PRIVATE NOBLOCK NOPREEMPT NONNULL((1, 2)) struct icpustate *
 NOTHROW(FCALL GDBThread_StopAllCpusIPI)(struct icpustate *__restrict state,
@@ -498,6 +508,22 @@ NOTHROW(FCALL GDBThread_HasTerminated)(struct task const *__restrict thread) {
 }
 
 
+#ifdef CONFIG_USE_NEW_RPC
+/* cookie == (struct task *)old_scheduling_override */
+PRIVATE NONNULL((1)) void
+NOTHROW(PRPC_EXEC_CALLBACK_CC GDBThread_StopWithAsyncNotificationRPC)(struct rpc_context *__restrict ctx,
+                                                                      void *cookie) {
+	/* Restore the old CPU override. */
+	struct cpu *me;
+	pflag_t was;
+	was = PREEMPTION_PUSHOFF();
+	me  = THIS_CPU;
+	/* TODO: Don't directly access `thiscpu_sched_override'! */
+	FORCPU(me, thiscpu_sched_override) = (REF struct task *)cookie;
+	ctx->rc_state = GDBThread_StopRPCImpl(GDBTHREAD_STOPRPCIMPL_F_SETREASON, ctx->rc_state);
+	PREEMPTION_POP(was);
+}
+#else /* CONFIG_USE_NEW_RPC */
 /* arg == (struct task *)old_scheduling_override */
 PRIVATE struct icpustate *
 NOTHROW(FCALL GDBThread_StopWithAsyncNotificationRPC)(void *arg,
@@ -516,6 +542,7 @@ NOTHROW(FCALL GDBThread_StopWithAsyncNotificationRPC)(void *arg,
 	PREEMPTION_POP(was);
 	return state;
 }
+#endif /* !CONFIG_USE_NEW_RPC */
 
 
 PRIVATE struct sig GDBThread_StopWithAsyncNotificationIPI_Done = SIG_INIT;

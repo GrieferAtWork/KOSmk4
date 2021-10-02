@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe1517ac */
+/* HASH CRC-32:0x791e474e */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -5490,7 +5490,7 @@
 #define __CRT_HAVE_sendmsg
 #define __CRT_HAVE_sendto
 #define __CRT_HAVE_set_exception_handler
-#define __CRT_HAVE_set_single_signal_action
+#define __CRT_HAVE_set_single_signal_masked
 #define __CRT_HAVE_setaliasent
 #define __CRT_HAVE_setbuf
 #define __CRT_HAVE_setbuffer

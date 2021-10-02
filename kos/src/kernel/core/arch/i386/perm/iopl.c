@@ -204,8 +204,10 @@ PRIVATE NONNULL((1)) void PRPC_EXEC_CALLBACK_CC
 sys_iopl_rpc(struct rpc_context *__restrict ctx, void *UNUSED(cookie)) {
 	if (ctx->rc_context != RPC_REASONCTX_SYSCALL)
 		return;
+	ctx->rc_state = sys_iopl_impl(ctx->rc_state, ctx->rc_scinfo.rsi_regs[0]);
+
+	/* Indicate that the system call has completed; further RPCs should never try to restart it! */
 	ctx->rc_context = RPC_REASONCTX_SYSRET;
-	ctx->rc_state   = sys_iopl_impl(ctx->rc_state, ctx->rc_scinfo.rsi_regs[0]);
 }
 
 DEFINE_SYSCALL1(errno_t, iopl, syscall_ulong_t, level) {

@@ -41,9 +41,12 @@
 #include <hybrid/host.h>
 #include <hybrid/minmax.h>
 
+#include <asm/cpu-flags.h>
 #include <asm/syscalls32_d.h>
 #include <asm/syscalls64_d.h>
+#include <bits/os/kos/mcontext32.h>
 #include <bits/os/kos/siginfo-convert.h>
+#include <bits/os/kos/ucontext32.h>
 #include <kos/bits/syscall-info-convert.h>
 #include <kos/bits/syscall-info32.h>
 #include <kos/except.h>
@@ -60,6 +63,8 @@
 #include <string.h>
 
 #ifdef __x86_64__
+#include <bits/os/kos/mcontext64.h>
+#include <bits/os/kos/ucontext64.h>
 #include <kos/bits/syscall-info64.h>
 #include <kos/kernel/cpu-state64.h>
 #include <kos/kernel/fpu-state64.h>
@@ -292,10 +297,13 @@ sys_sigreturn32_rpc(struct rpc_context *__restrict ctx,
 	restore_fpu     = (USER UNCHECKED struct fpustate32 const *)ctx->rc_scinfo.rsi_regs[SIGRETURN32_ARGID_RESTORE_FPU];
 	restore_sigmask = (USER UNCHECKED sigset_t const *)ctx->rc_scinfo.rsi_regs[SIGRETURN32_ARGID_RESTORE_SIGMASK];
 	restart_sc_info = (USER UNCHECKED struct rpc_syscall_info32 const *)ctx->rc_scinfo.rsi_regs[SIGRETURN32_ARGID_SC_INFO];
+
+	ctx->rc_state = sys_sigreturn32_impl(ctx->rc_state, restore_cpu,
+	                                     restore_fpu, restore_sigmask,
+	                                     restart_sc_info);
+
+	/* Indicate that the system call has completed; further RPCs should never try to restart it! */
 	ctx->rc_context = RPC_REASONCTX_SYSRET;
-	ctx->rc_state   = sys_sigreturn32_impl(ctx->rc_state, restore_cpu,
-                                         restore_fpu, restore_sigmask,
-                                         restart_sc_info);
 }
 
 /* Define `rt_sigreturn()' as an alias for `sigreturn()' */
@@ -436,10 +444,13 @@ sys_sigreturn64_rpc(struct rpc_context *__restrict ctx,
 	restore_fpu     = (USER UNCHECKED struct fpustate64 const *)gpregs_getpbx(&ctx->rc_state->ics_gpregs);
 	restore_sigmask = (USER UNCHECKED sigset_t const *)gpregs_getp12(&ctx->rc_state->ics_gpregs);
 	restart_sc_info = (USER UNCHECKED struct rpc_syscall_info64 const *)gpregs_getp13(&ctx->rc_state->ics_gpregs);
+
+	ctx->rc_state = sys_sigreturn64_impl(ctx->rc_state, restore_cpu,
+	                                     restore_fpu, restore_sigmask,
+	                                     restart_sc_info);
+
+	/* Indicate that the system call has completed; further RPCs should never try to restart it! */
 	ctx->rc_context = RPC_REASONCTX_SYSRET;
-	ctx->rc_state   = sys_sigreturn64_impl(ctx->rc_state, restore_cpu,
-                                         restore_fpu, restore_sigmask,
-                                         restart_sc_info);
 }
 
 DEFINE_SYSCALL64_0(void, rt_sigreturn) {

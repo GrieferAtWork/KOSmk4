@@ -37,16 +37,13 @@
 #include <asm/registers.h>
 #include <bits/os/kos/siginfo-convert.h>
 #include <kos/bits/coredump.h>
-#include <kos/bits/coredump32.h>
 #include <kos/bits/exception_data-convert.h>
 #include <kos/bits/exception_data.h>
-#include <kos/bits/exception_data32.h>
 #include <kos/coredump.h>
 #include <kos/except/reason/inval.h>
 #include <kos/kernel/cpu-state-helpers.h>
 #include <kos/kernel/cpu-state-verify.h>
 #include <kos/kernel/cpu-state.h>
-#include <kos/kernel/cpu-state32.h>
 #include <sys/wait.h>
 
 #include <alloca.h>
@@ -64,21 +61,45 @@
 #error "Must #define exactly one of these"
 #endif /* ... */
 
-
 #ifdef DEFINE_sys32_coredump
-#define NAME(x)     x##32
-#define NAME2(x, y) x##32##y
+#include <kos/bits/coredump32.h>
+#include <kos/bits/exception_data32.h>
+#include <kos/kernel/cpu-state32.h>
 #else /* DEFINE_sys32_coredump */
-#define NAME(x)     x##64
-#define NAME2(x, y) x##64##y
+#include <kos/bits/coredump64.h>
+#include <kos/bits/exception_data64.h>
+#include <kos/kernel/cpu-state64.h>
 #endif /* !DEFINE_sys32_coredump */
+
+
+#ifdef DEFINE_sys64_coredump
+#define LOCAL_struct_ucpustate      struct ucpustate64
+#define LOCAL_uintptr_t             u32
+#define LOCAL_ucpustate_decode      ucpustate_decode64
+#define LOCAL_sys_coredump_impl     sys_coredump64_impl
+#define LOCAL_sys_coredump_rpc      sys_coredump64_rpc
+#define LOCAL_union_coredump_info   union coredump_info64
+#define LOCAL_pointer               PTR64
+#define LOCAL_siginfox_decode       siginfox64_to_siginfo
+#define LOCAL_exception_data_decode exception_data64_to_exception_data
+#else /* DEFINE_sys64_coredump */
+#define LOCAL_struct_ucpustate      struct ucpustate32
+#define LOCAL_uintptr_t             u64
+#define LOCAL_ucpustate_decode      ucpustate_decode32
+#define LOCAL_sys_coredump_impl     sys_coredump32_impl
+#define LOCAL_sys_coredump_rpc      sys_coredump32_rpc
+#define LOCAL_union_coredump_info   union coredump_info32
+#define LOCAL_pointer               PTR32
+#define LOCAL_siginfox_decode       siginfox32_to_siginfo
+#define LOCAL_exception_data_decode exception_data32_to_exception_data
+#endif /* !DEFINE_sys64_coredump */
 
 DECL_BEGIN
 
-LOCAL void KCALL
-NAME(user_ucpu_from_ucpu)(struct icpustate const *__restrict return_state,
-                          USER CHECKED struct NAME(ucpustate) const *ust,
-                          struct ucpustate *__restrict result) {
+LOCAL NONNULL((1, 3)) void KCALL
+LOCAL_ucpustate_decode(struct icpustate const *__restrict return_state,
+                       USER CHECKED LOCAL_struct_ucpustate const *ust,
+                       struct ucpustate *__restrict result) {
 #ifdef DEFINE_sys32_coredump
 	ucpustate32_to_ucpustate(ust, result);
 #else /* DEFINE_sys32_coredump */
@@ -99,13 +120,13 @@ NAME(user_ucpu_from_ucpu)(struct icpustate const *__restrict return_state,
 #endif /* DEFINE_sys32_coredump */
 }
 
-INTERN struct icpustate *FCALL
-NAME(coredump_impl)(struct icpustate *__restrict return_state,
-                    USER UNCHECKED struct NAME(ucpustate) const *curr_state,
-                    USER UNCHECKED struct NAME(ucpustate) const *orig_state,
-                    USER UNCHECKED NAME(u) const *const *traceback_vector, size_t traceback_length,
-                    USER UNCHECKED union NAME(coredump_info) const *reason,
-                    syscall_ulong_t unwind_error) {
+INTERN ATTR_NORETURN NONNULL((1)) void FCALL
+LOCAL_sys_coredump_impl(struct icpustate *__restrict return_state,
+                        USER UNCHECKED LOCAL_struct_ucpustate const *curr_state,
+                        USER UNCHECKED LOCAL_struct_ucpustate const *orig_state,
+                        USER UNCHECKED LOCAL_uintptr_t const *const *traceback_vector, size_t traceback_length,
+                        USER UNCHECKED LOCAL_union_coredump_info const *reason,
+                        syscall_ulong_t unwind_error) {
 	struct ucpustate curr_ustate, orig_ustate;
 	void **utb_vector;
 	signo_t signo = SIGABRT;
@@ -116,21 +137,21 @@ NAME(coredump_impl)(struct icpustate *__restrict return_state,
 		traceback_length = 0;
 	} else if (!curr_state) {
 		validate_readable(orig_state, sizeof(*orig_state));
-		NAME(user_ucpu_from_ucpu)(return_state, orig_state, &orig_ustate);
+		LOCAL_ucpustate_decode(return_state, orig_state, &orig_ustate);
 		memcpy(&curr_ustate, &orig_ustate, sizeof(struct ucpustate));
 		traceback_vector = NULL;
 		traceback_length = 0;
 	} else if (!orig_state) {
 		validate_readable(curr_state, sizeof(*curr_state));
-		NAME(user_ucpu_from_ucpu)(return_state, curr_state, &curr_ustate);
+		LOCAL_ucpustate_decode(return_state, curr_state, &curr_ustate);
 		memcpy(&orig_ustate, &curr_ustate, sizeof(struct ucpustate));
 		traceback_vector = NULL;
 		traceback_length = 0;
 	} else {
 		validate_readable(curr_state, sizeof(*curr_state));
 		validate_readable(orig_state, sizeof(*orig_state));
-		NAME(user_ucpu_from_ucpu)(return_state, curr_state, &curr_ustate);
-		NAME(user_ucpu_from_ucpu)(return_state, orig_state, &orig_ustate);
+		LOCAL_ucpustate_decode(return_state, curr_state, &curr_ustate);
+		LOCAL_ucpustate_decode(return_state, orig_state, &orig_ustate);
 		if (memcmp(&curr_ustate, &orig_ustate, sizeof(ucpustate)) == 0) {
 			traceback_vector = NULL;
 			traceback_length = 0;
@@ -154,7 +175,7 @@ NAME(coredump_impl)(struct icpustate *__restrict return_state,
 		/* Coredump caused by a signal. */
 		siginfo_t si;
 		validate_readable(&reason->ci_signal, sizeof(reason->ci_signal));
-		(NAME2(siginfox, _to_siginfo)(&reason->ci_signal, &si));
+		LOCAL_siginfox_decode(&reason->ci_signal, &si);
 		COMPILER_READ_BARRIER();
 		signo = si.si_signo;
 		coredump_create(&curr_ustate, utb_vector, traceback_length,
@@ -204,7 +225,7 @@ NAME(coredump_impl)(struct icpustate *__restrict return_state,
 		/* Coredump caused by an exception. */
 		struct exception_data exc;
 		validate_readable(&reason->ci_except, sizeof(reason->ci_except));
-		NAME2(exception_data, _to_exception_data)(&reason->ci_except, &exc);
+		LOCAL_exception_data_decode(&reason->ci_except, &exc);
 		COMPILER_READ_BARRIER();
 		coredump_create(&curr_ustate, utb_vector, traceback_length,
 		                &orig_ustate, NULL, 0, NULL,
@@ -222,53 +243,93 @@ NAME(coredump_impl)(struct icpustate *__restrict return_state,
 	assert(!task_wasconnected());
 	THROW(E_EXIT_PROCESS,
 	      W_EXITCODE(1, signo & 0x7f) | WCOREFLAG);
-	return return_state;
 }
 
-INTERN struct icpustate *FCALL
-NAME(coredump_rpc)(void *UNUSED(arg),
-                   struct icpustate *__restrict state,
-                   unsigned int reason,
-                   struct rpc_syscall_info const *sc_info) {
+#ifdef CONFIG_USE_NEW_RPC
+PRIVATE NONNULL((1, 2)) void PRPC_EXEC_CALLBACK_CC
+LOCAL_sys_coredump_rpc(struct rpc_context *__restrict ctx,
+                       void *UNUSED(cookie)) {
+	if unlikely(ctx->rc_context != RPC_REASONCTX_SYSCALL)
+		return;
+	LOCAL_sys_coredump_impl(ctx->rc_state,
+	                        (USER UNCHECKED LOCAL_struct_ucpustate const *)ctx->rc_scinfo.rsi_regs[0],
+	                        (USER UNCHECKED LOCAL_struct_ucpustate const *)ctx->rc_scinfo.rsi_regs[1],
+	                        (USER UNCHECKED LOCAL_uintptr_t const *const *)ctx->rc_scinfo.rsi_regs[2],
+	                        (size_t)ctx->rc_scinfo.rsi_regs[3],
+	                        (USER UNCHECKED LOCAL_union_coredump_info const *)ctx->rc_scinfo.rsi_regs[4],
+	                        (syscall_ulong_t)ctx->rc_scinfo.rsi_regs[5]);
+}
+#else /* CONFIG_USE_NEW_RPC */
+PRIVATE struct icpustate *FCALL
+LOCAL_sys_coredump_rpc(void *UNUSED(arg),
+                       struct icpustate *__restrict state,
+                       unsigned int reason,
+                       struct rpc_syscall_info const *sc_info) {
 	if unlikely(reason != TASK_RPC_REASON_SYSCALL)
 		return state;
-	return NAME(coredump_impl)(state,
-	                           (USER UNCHECKED struct NAME(ucpustate) const *)sc_info->rsi_regs[0],
-	                           (USER UNCHECKED struct NAME(ucpustate) const *)sc_info->rsi_regs[1],
-	                           (USER UNCHECKED NAME(u) const *const *)sc_info->rsi_regs[2],
-	                           (size_t)sc_info->rsi_regs[3],
-	                           (USER UNCHECKED union NAME(coredump_info) const *)sc_info->rsi_regs[4],
-	                           (syscall_ulong_t)sc_info->rsi_regs[5]);
+	LOCAL_sys_coredump_impl(state,
+	                    (USER UNCHECKED LOCAL_struct_ucpustate const *)sc_info->rsi_regs[0],
+	                    (USER UNCHECKED LOCAL_struct_ucpustate const *)sc_info->rsi_regs[1],
+	                    (USER UNCHECKED LOCAL_uintptr_t const *const *)sc_info->rsi_regs[2],
+	                    (size_t)sc_info->rsi_regs[3],
+	                    (USER UNCHECKED LOCAL_union_coredump_info const *)sc_info->rsi_regs[4],
+	                    (syscall_ulong_t)sc_info->rsi_regs[5]);
 }
+#endif /* !CONFIG_USE_NEW_RPC */
 
 /************************************************************************/
 /* coredump()                                                           */
 /************************************************************************/
-NAME2(DEFINE_SYSCALL, _6)(errno_t, coredump,
-                          USER UNCHECKED struct NAME(ucpustate) const *, curr_state,
-                          USER UNCHECKED struct NAME(ucpustate) const *, orig_state,
-                          USER UNCHECKED NAME(PTR)(void const) const *, traceback_vector, size_t, traceback_length,
-                          USER UNCHECKED union NAME(coredump_info) const *, reason,
-                          syscall_ulong_t, unwind_error) {
+#ifdef DEFINE_sys64_coredump
+DEFINE_SYSCALL64_6(errno_t, coredump,
+                   USER UNCHECKED LOCAL_struct_ucpustate const *, curr_state,
+                   USER UNCHECKED LOCAL_struct_ucpustate const *, orig_state,
+                   USER UNCHECKED LOCAL_pointer(void const) const *, traceback_vector,
+                   size_t, traceback_length,
+                   USER UNCHECKED LOCAL_union_coredump_info const *, reason,
+                   syscall_ulong_t, unwind_error)
+#else /* DEFINE_sys64_coredump */
+DEFINE_SYSCALL32_6(errno_t, coredump,
+                   USER UNCHECKED LOCAL_struct_ucpustate const *, curr_state,
+                   USER UNCHECKED LOCAL_struct_ucpustate const *, orig_state,
+                   USER UNCHECKED LOCAL_pointer(void const) const *, traceback_vector,
+                   size_t, traceback_length,
+                   USER UNCHECKED LOCAL_union_coredump_info const *, reason,
+                   syscall_ulong_t, unwind_error)
+#endif /* !DEFINE_sys64_coredump */
+{
 	(void)curr_state;
 	(void)orig_state;
 	(void)traceback_vector;
 	(void)traceback_length;
 	(void)reason;
 	(void)unwind_error;
+#ifdef CONFIG_USE_NEW_RPC
+	/* Send an RPC to ourselves, so we can gain access to the user-space register state. */
+	task_rpc_exec(THIS_TASK, RPC_CONTEXT_KERN | RPC_SYNCMODE_F_USER, &LOCAL_sys_coredump_rpc, NULL);
+	__builtin_unreachable();
+#else /* CONFIG_USE_NEW_RPC */
 	task_schedule_user_rpc(THIS_TASK,
-	                       &NAME(coredump_rpc),
+	                       &LOCAL_sys_coredump_rpc,
 	                       NULL,
 	                       TASK_RPC_FHIGHPRIO |
 	                       TASK_USER_RPC_FINTR,
 	                       GFP_NORMAL);
 	__builtin_unreachable();
+#endif /* !CONFIG_USE_NEW_RPC */
 }
 
+#undef LOCAL_struct_ucpustate
+#undef LOCAL_uintptr_t
+#undef LOCAL_ucpustate_decode
+#undef LOCAL_sys_coredump_impl
+#undef LOCAL_sys_coredump_rpc
+#undef LOCAL_union_coredump_info
+#undef LOCAL_pointer
+#undef LOCAL_siginfox_decode
+#undef LOCAL_exception_data_decode
 
 DECL_END
 
-#undef NAME
-#undef NAME2
 #undef DEFINE_sys32_coredump
 #undef DEFINE_sys64_coredump

@@ -347,11 +347,14 @@ sys_debugtrap_rpc32(struct rpc_context *__restrict ctx,
                     void *UNUSED(cookie)) {
 	if (ctx->rc_context != RPC_REASONCTX_SYSCALL)
 		return;
-	ctx->rc_context = RPC_REASONCTX_SYSRET;
+
 	/* Do the system call. */
 	ctx->rc_state = sys_debugtrap32_impl(ctx->rc_state,
 	                                     (USER UNCHECKED struct ucpustate32 const *)ctx->rc_scinfo.rsi_regs[0],
 	                                     (USER UNCHECKED struct debugtrap_reason32 const *)ctx->rc_scinfo.rsi_regs[1]);
+
+	/* Indicate that the system call has completed; further RPCs should never try to restart it! */
+	ctx->rc_context = RPC_REASONCTX_SYSRET;
 }
 
 #ifdef __x86_64__
@@ -360,11 +363,14 @@ sys_debugtrap_rpc64(struct rpc_context *__restrict ctx,
                     void *UNUSED(cookie)) {
 	if (ctx->rc_context != RPC_REASONCTX_SYSCALL)
 		return;
-	ctx->rc_context = RPC_REASONCTX_SYSRET;
+
 	/* Do the system call. */
 	ctx->rc_state = sys_debugtrap64_impl(ctx->rc_state,
 	                                     (USER UNCHECKED struct ucpustate64 const *)ctx->rc_scinfo.rsi_regs[0],
 	                                     (USER UNCHECKED struct debugtrap_reason64 const *)ctx->rc_scinfo.rsi_regs[1]);
+
+	/* Indicate that the system call has completed; further RPCs should never try to restart it! */
+	ctx->rc_context = RPC_REASONCTX_SYSRET;
 }
 #endif /* __x86_64__ */
 

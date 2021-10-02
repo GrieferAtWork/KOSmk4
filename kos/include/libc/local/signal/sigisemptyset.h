@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd43aed17 */
+/* HASH CRC-32:0xdc2b43d1 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,8 +27,8 @@ __LOCAL_LIBC(sigisemptyset) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(sigisemptyset))(struct __sigset_struct const *__restrict __set) {
 	__SIZE_TYPE__ __i;
 	for (__i = 0; __i < sizeof(struct __sigset_struct) / sizeof(__ULONGPTR_TYPE__); ++__i) {
-		if (__set->__val[__i])
-			return 0;
+		if (__set->__val[__i] != 0)
+			return 0; /* Not empty! */
 	}
 	return 1;
 }

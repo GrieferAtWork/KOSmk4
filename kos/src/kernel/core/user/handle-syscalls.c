@@ -2146,11 +2146,12 @@ PRIVATE NONNULL((1)) void PRPC_EXEC_CALLBACK_CC
 sys_ppoll_rpc(struct rpc_context *__restrict ctx, void *UNUSED(cookie)) {
 	if (ctx->rc_context != RPC_REASONCTX_SYSCALL)
 		return;
-	/* Indicate that our system call is implemented via this RPC. */
-	ctx->rc_context = RPC_REASONCTX_SYSRET;
 
 	/* Do the actual system call. */
 	ctx->rc_state = sys_ppoll_impl(ctx->rc_state, &ctx->rc_scinfo);
+
+	/* Indicate that the system call has completed; further RPCs should never try to restart it! */
+	ctx->rc_context = RPC_REASONCTX_SYSRET;
 }
 
 DEFINE_SYSCALL5(ssize_t, ppoll,
@@ -2206,11 +2207,11 @@ sys_compat_ppoll_rpc(struct rpc_context *__restrict ctx, void *UNUSED(cookie)) {
 	if (ctx->rc_context != RPC_REASONCTX_SYSCALL)
 		return;
 
-	/* Indicate that our system call is implemented via this RPC. */
-	ctx->rc_context = RPC_REASONCTX_SYSRET;
-
 	/* Do the actual system call. */
 	ctx->rc_state = sys_compat_ppoll_impl(ctx->rc_state, &ctx->rc_scinfo);
+
+	/* Indicate that the system call has completed; further RPCs should never try to restart it! */
+	ctx->rc_context = RPC_REASONCTX_SYSRET;
 }
 
 DEFINE_COMPAT_SYSCALL5(ssize_t, ppoll,
@@ -2266,11 +2267,11 @@ sys_ppoll_time64_rpc(struct rpc_context *__restrict ctx, void *UNUSED(cookie)) {
 	if (ctx->rc_context != RPC_REASONCTX_SYSCALL)
 		return;
 
-	/* Indicate that our system call is implemented via this RPC. */
-	ctx->rc_context = RPC_REASONCTX_SYSRET;
-
 	/* Do the actual system call. */
 	ctx->rc_state = sys_ppoll_time64_impl(ctx->rc_state, &ctx->rc_scinfo);
+
+	/* Indicate that the system call has completed; further RPCs should never try to restart it! */
+	ctx->rc_context = RPC_REASONCTX_SYSRET;
 }
 
 DEFINE_SYSCALL5(ssize_t, ppoll_time64,
@@ -2326,11 +2327,11 @@ sys_compat_ppoll_time64_rpc(struct rpc_context *__restrict ctx, void *UNUSED(coo
 	if (ctx->rc_context != RPC_REASONCTX_SYSCALL)
 		return;
 
-	/* Indicate that our system call is implemented via this RPC. */
-	ctx->rc_context = RPC_REASONCTX_SYSRET;
-
 	/* Do the actual system call. */
 	ctx->rc_state = sys_compat_ppoll_time64_impl(ctx->rc_state, &ctx->rc_scinfo);
+
+	/* Indicate that the system call has completed; further RPCs should never try to restart it! */
+	ctx->rc_context = RPC_REASONCTX_SYSRET;
 }
 
 DEFINE_COMPAT_SYSCALL5(ssize_t, ppoll_time64,
@@ -2749,11 +2750,11 @@ sys_pselect6_rpc(struct rpc_context *__restrict ctx, void *UNUSED(cookie)) {
 	if (ctx->rc_context != RPC_REASONCTX_SYSCALL)
 		return;
 
-	/* Indicate that our system call is implemented via this RPC. */
-	ctx->rc_context = RPC_REASONCTX_SYSRET;
-
 	/* Do the actual system call. */
 	ctx->rc_state = sys_pselect6_impl(ctx->rc_state, &ctx->rc_scinfo);
+
+	/* Indicate that the system call has completed; further RPCs should never try to restart it! */
+	ctx->rc_context = RPC_REASONCTX_SYSRET;
 }
 
 DEFINE_SYSCALL6(ssize_t, pselect6, size_t, nfds,
@@ -2830,11 +2831,11 @@ sys_pselect6_time64_rpc(struct rpc_context *__restrict ctx, void *UNUSED(cookie)
 	if (ctx->rc_context != RPC_REASONCTX_SYSCALL)
 		return;
 
-	/* Indicate that our system call is implemented via this RPC. */
-	ctx->rc_context = RPC_REASONCTX_SYSRET;
-
 	/* Do the actual system call. */
 	ctx->rc_state = sys_pselect6_time64_impl(ctx->rc_state, &ctx->rc_scinfo);
+
+	/* Indicate that the system call has completed; further RPCs should never try to restart it! */
+	ctx->rc_context = RPC_REASONCTX_SYSRET;
 }
 
 DEFINE_SYSCALL6(ssize_t, pselect6_time64, size_t, nfds,
@@ -2912,11 +2913,11 @@ sys_compat_pselect6_rpc(struct rpc_context *__restrict ctx, void *UNUSED(cookie)
 	if (ctx->rc_context != RPC_REASONCTX_SYSCALL)
 		return;
 
-	/* Indicate that our system call is implemented via this RPC. */
-	ctx->rc_context = RPC_REASONCTX_SYSRET;
-
 	/* Do the actual system call. */
 	ctx->rc_state = sys_compat_pselect6_impl(ctx->rc_state, &ctx->rc_scinfo);
+
+	/* Indicate that the system call has completed; further RPCs should never try to restart it! */
+	ctx->rc_context = RPC_REASONCTX_SYSRET;
 }
 
 DEFINE_COMPAT_SYSCALL6(ssize_t, pselect6, size_t, nfds,
@@ -2995,11 +2996,11 @@ sys_compat_pselect6_time64_rpc(struct rpc_context *__restrict ctx, void *UNUSED(
 	if (ctx->rc_context != RPC_REASONCTX_SYSCALL)
 		return;
 
-	/* Indicate that our system call is implemented via this RPC. */
-	ctx->rc_context = RPC_REASONCTX_SYSRET;
-
 	/* Do the actual system call. */
 	ctx->rc_state = sys_compat_pselect6_time64_impl(ctx->rc_state, &ctx->rc_scinfo);
+
+	/* Indicate that the system call has completed; further RPCs should never try to restart it! */
+	ctx->rc_context = RPC_REASONCTX_SYSRET;
 }
 
 DEFINE_COMPAT_SYSCALL6(ssize_t, pselect6_time64, size_t, nfds,

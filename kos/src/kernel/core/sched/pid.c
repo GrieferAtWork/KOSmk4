@@ -492,7 +492,10 @@ NOTHROW(KCALL this_taskgroup_fini)(struct task *__restrict self) {
 		}
 		/* Finalize any signals that were never delivered. */
 #ifdef CONFIG_USE_NEW_RPC
-		process_pending_rpcs_fini(&mygroup.tg_proc_rpcs);
+		assertf(mygroup.tg_proc_rpcs.ppr_list.slh_first == NULL ||
+		        mygroup.tg_proc_rpcs.ppr_list.slh_first == THIS_RPCS_TERMINATED,
+		        "This shouldn't be because process RPCs should have gotten "
+		        "cleaned up during task_exit(). So how did this happen?");
 #else /* CONFIG_USE_NEW_RPC */
 		sigqueue_fini(&mygroup.tg_proc_signals.psq_queue);
 #endif /* !CONFIG_USE_NEW_RPC */

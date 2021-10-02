@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf5fc1347 */
+/* HASH CRC-32:0xc02f03a */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -198,14 +198,14 @@ NOTHROW_NCX(LIBCCALL libc_sigismember)(sigset_t const *set,
 }
 /* >> sigisemptyset(3)
  * Check if the given signal set is empty
- * @return: != 0: The given `set' is non-empty
- * @return: == 0: The given `set' is empty */
+ * @return: != 0: Yes, it is empty
+ * @return: == 0: No, at least 1 signal is contained */
 INTERN ATTR_SECTION(".text.crt.sched.signal") ATTR_PURE WUNUSED NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_sigisemptyset)(sigset_t const *__restrict set) {
 	size_t i;
 	for (i = 0; i < sizeof(sigset_t) / sizeof(ulongptr_t); ++i) {
-		if (set->__val[i])
-			return 0;
+		if (set->__val[i] != 0)
+			return 0; /* Not empty! */
 	}
 	return 1;
 }
@@ -824,7 +824,7 @@ NOTHROW_NCX(LIBCCALL libc_sigstack)(struct sigstack *ss,
 	return result;
 }
 INTERN ATTR_SECTION(".text.crt.sched.signal") int
-NOTHROW_NCX(LIBCCALL libc_set_single_signal_action)(int sig,
+NOTHROW_NCX(LIBCCALL libc_set_single_signal_masked)(int sig,
                                                     int how) {
 	sigset_t set;
 	libc_sigemptyset(&set);
@@ -838,7 +838,7 @@ NOTHROW_NCX(LIBCCALL libc_set_single_signal_action)(int sig,
  * @return: -1: Error (s.a. `errno') */
 INTERN ATTR_SECTION(".text.crt.sched.signal") int
 NOTHROW_NCX(LIBCCALL libc_sighold)(signo_t signo) {
-	return libc_set_single_signal_action(signo, __SIG_BLOCK);
+	return libc_set_single_signal_masked(signo, __SIG_BLOCK);
 }
 /* >> sighold(3)
  * Unmask a single signal  `signo', which is the  same
@@ -847,7 +847,7 @@ NOTHROW_NCX(LIBCCALL libc_sighold)(signo_t signo) {
  * @return: -1: Error (s.a. `errno') */
 INTERN ATTR_SECTION(".text.crt.sched.signal") int
 NOTHROW_NCX(LIBCCALL libc_sigrelse)(signo_t signo) {
-	return libc_set_single_signal_action(signo, __SIG_UNBLOCK);
+	return libc_set_single_signal_masked(signo, __SIG_UNBLOCK);
 }
 /* >> sigignore(3)
  * Change the disposition of `signo' to `SIG_IGN' using `bsd_signal(3)'

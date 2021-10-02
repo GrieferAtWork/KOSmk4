@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe1b17df3 */
+/* HASH CRC-32:0x99690c09 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -237,14 +237,14 @@ INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_sigpending)(sigset_t *__restri
 INTDEF NONNULL((1, 2)) int NOTHROW_RPC(LIBDCALL libd_sigwait)(sigset_t const *__restrict set, signo_t *__restrict signo);
 /* >> sigisemptyset(3)
  * Check if the given signal set is empty
- * @return: != 0: The given `set' is non-empty
- * @return: == 0: The given `set' is empty */
+ * @return: != 0: Yes, it is empty
+ * @return: == 0: No, at least 1 signal is contained */
 INTDEF ATTR_PURE WUNUSED NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_sigisemptyset)(sigset_t const *__restrict set);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 /* >> sigisemptyset(3)
  * Check if the given signal set is empty
- * @return: != 0: The given `set' is non-empty
- * @return: == 0: The given `set' is empty */
+ * @return: != 0: Yes, it is empty
+ * @return: == 0: No, at least 1 signal is contained */
 INTDEF ATTR_PURE WUNUSED NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_sigisemptyset)(sigset_t const *__restrict set);
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> sigandset(3)
@@ -441,7 +441,7 @@ INTDEF int NOTHROW_NCX(LIBCCALL libc_sigstack)(struct sigstack *ss, struct sigst
 INTDEF int NOTHROW_NCX(LIBDCALL libd_sigaltstack)(struct sigaltstack const *ss, struct sigaltstack *oss);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF int NOTHROW_NCX(LIBCCALL libc_set_single_signal_action)(int sig, int how);
+INTDEF int NOTHROW_NCX(LIBCCALL libc_set_single_signal_masked)(int sig, int how);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> sighold(3)

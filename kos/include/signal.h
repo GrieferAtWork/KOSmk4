@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7ee0d3d8 */
+/* HASH CRC-32:0x9469c30b */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1817,15 +1817,15 @@ __CDECLARE_OPT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,sigwait,(sigset_t const 
 #ifdef __CRT_HAVE_sigisemptyset
 /* >> sigisemptyset(3)
  * Check if the given signal set is empty
- * @return: != 0: The given `set' is non-empty
- * @return: == 0: The given `set' is empty */
+ * @return: != 0: Yes, it is empty
+ * @return: == 0: No, at least 1 signal is contained */
 __CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,sigisemptyset,(struct __sigset_struct const *__restrict __set),(__set))
 #else /* __CRT_HAVE_sigisemptyset */
 #include <libc/local/signal/sigisemptyset.h>
 /* >> sigisemptyset(3)
  * Check if the given signal set is empty
- * @return: != 0: The given `set' is non-empty
- * @return: == 0: The given `set' is empty */
+ * @return: != 0: Yes, it is empty
+ * @return: == 0: No, at least 1 signal is contained */
 __NAMESPACE_LOCAL_USING_OR_IMPL(sigisemptyset, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL sigisemptyset)(struct __sigset_struct const *__restrict __set) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sigisemptyset))(__set); })
 #endif /* !__CRT_HAVE_sigisemptyset */
 #ifdef __CRT_HAVE_sigandset
@@ -2278,15 +2278,15 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL 
 #ifdef __CRT_HAVE_sigisemptyset
 /* >> sigisemptyset(3)
  * Check if the given signal set is empty
- * @return: != 0: The given `set' is non-empty
- * @return: == 0: The given `set' is empty */
+ * @return: != 0: Yes, it is empty
+ * @return: == 0: No, at least 1 signal is contained */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,__sigisemptyset,(struct __sigset_struct const *__restrict __set),sigisemptyset,(__set))
 #else /* __CRT_HAVE_sigisemptyset */
 #include <libc/local/signal/sigisemptyset.h>
 /* >> sigisemptyset(3)
  * Check if the given signal set is empty
- * @return: != 0: The given `set' is non-empty
- * @return: == 0: The given `set' is empty */
+ * @return: != 0: Yes, it is empty
+ * @return: == 0: No, at least 1 signal is contained */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL __sigisemptyset)(struct __sigset_struct const *__restrict __set) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sigisemptyset))(__set); }
 #endif /* !__CRT_HAVE_sigisemptyset */
 #ifdef __CRT_HAVE_sigandset

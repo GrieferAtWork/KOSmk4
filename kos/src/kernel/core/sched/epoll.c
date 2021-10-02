@@ -1506,11 +1506,11 @@ PRIVATE NONNULL((1)) void PRPC_EXEC_CALLBACK_CC
 sys_epoll_pwait_rpc(struct rpc_context *__restrict ctx, void *UNUSED(cookie)) {
 	if (ctx->rc_context != RPC_REASONCTX_SYSCALL)
 		return;
-	/* Indicate that our system call is implemented via this RPC. */
-	ctx->rc_context = RPC_REASONCTX_SYSRET;
-
 	/* Do the actual system call. */
 	ctx->rc_state = sys_epoll_pwait_impl(ctx->rc_state, &ctx->rc_scinfo);
+
+	/* Indicate that the system call has completed; further RPCs should never try to restart it! */
+	ctx->rc_context = RPC_REASONCTX_SYSRET;
 }
 
 DEFINE_SYSCALL6(ssize_t, epoll_pwait,
@@ -1519,6 +1519,8 @@ DEFINE_SYSCALL6(ssize_t, epoll_pwait,
                 USER UNCHECKED sigset_t const *, sigmask, size_t, sigsetsize) {
 	ssize_t result;
 	if (sigmask) {
+		(void)sigsetsize;
+
 		/* Send an RPC to ourselves, so we can gain access to the user-space register state. */
 		task_rpc_exec(THIS_TASK, RPC_CONTEXT_KERN | RPC_SYNCMODE_F_USER, &sys_epoll_pwait_rpc, NULL);
 		__builtin_unreachable();

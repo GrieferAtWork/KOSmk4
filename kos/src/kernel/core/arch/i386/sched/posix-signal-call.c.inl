@@ -19,8 +19,8 @@
  */
 #ifdef __INTELLISENSE__
 #include "posix-signal.c"
-//#define DEFINE_x86_userexcept_callsignal32
-#define DEFINE_x86_userexcept_callsignal64
+#define DEFINE_x86_userexcept_callsignal32
+//#define DEFINE_x86_userexcept_callsignal64
 #endif /* __INTELLISENSE__ */
 
 
@@ -48,6 +48,7 @@ DECL_BEGIN
 #define LOCAL_siginfo_t               struct __siginfox64_struct
 #define LOCAL_ucontext_t              struct __ucontextx64
 #define LOCAL_struct_fpustate         struct fpustate64
+#define LOCAL_struct_xfpustate        struct xfpustate64
 #define LOCAL_SIX_USER_MAX_SIZE       __SIX64_USER_MAX_SIZE
 #define LOCAL_SIX_KERNEL_MAX_SIZE     __SIX64_KERNEL_MAX_SIZE
 #define LOCAL_fpustate_saveinto       fpustate64_saveinto
@@ -72,6 +73,7 @@ DECL_BEGIN
 #define LOCAL_siginfo_t               struct __siginfox32_struct
 #define LOCAL_ucontext_t              struct __ucontextx32
 #define LOCAL_struct_fpustate         struct fpustate32
+#define LOCAL_struct_xfpustate        struct xfpustate32
 #define LOCAL_SIX_USER_MAX_SIZE       __SIX32_USER_MAX_SIZE
 #define LOCAL_SIX_KERNEL_MAX_SIZE     __SIX32_KERNEL_MAX_SIZE
 #define LOCAL_fpustate_saveinto       fpustate32_saveinto
@@ -299,11 +301,11 @@ LOCAL_userexcept_callsignal(struct icpustate *__restrict state,
 			/* Only allocate what we need for the used FPU state */
 			usp -= x86_fpustate_variant == FPU_STATE_SSTATE
 			       ? sizeof(struct sfpustate)
-			       : sizeof(struct NAME(xfpustate));
+			       : sizeof(LOCAL_struct_xfpustate);
 			user_fpustate = (LOCAL_struct_fpustate *)usp;
 			validate_writable(user_fpustate,
 			                  MIN_C(sizeof(struct sfpustate),
-			                        sizeof(struct NAME(xfpustate))));
+			                        sizeof(LOCAL_struct_xfpustate)));
 			COMPILER_WRITE_BARRIER();
 			user_fpustate = LOCAL_fpustate_saveinto(user_fpustate);
 		}
@@ -323,7 +325,7 @@ LOCAL_userexcept_callsignal(struct icpustate *__restrict state,
 	user_ucontext->uc_mcontext.mc_context.ucs_gpregs.LOCAL_gp_Pdi = (LOCAL_uintptr_t)gpregs_getpdi(&state->ics_gpregs);
 	user_ucontext->uc_mcontext.mc_context.ucs_gpregs.LOCAL_gp_Psi = (LOCAL_uintptr_t)gpregs_getpsi(&state->ics_gpregs);
 	user_ucontext->uc_mcontext.mc_context.ucs_gpregs.LOCAL_gp_Pbp = (LOCAL_uintptr_t)gpregs_getpbp(&state->ics_gpregs);
-	user_ucontext->uc_mcontext.mc_context.ucs_gpregs.LOCAL_gp_Psp = (LOCAL_uintptr_t)orig_usp;
+	user_ucontext->uc_mcontext.mc_context.ucs_gpregs.LOCAL_gp_Psp = (LOCAL_uintptr_t)(uintptr_t)orig_usp;
 	user_ucontext->uc_mcontext.mc_context.ucs_gpregs.LOCAL_gp_Pbx = (LOCAL_uintptr_t)gpregs_getpbx(&state->ics_gpregs);
 	user_ucontext->uc_mcontext.mc_context.ucs_gpregs.LOCAL_gp_Pdx = (LOCAL_uintptr_t)gpregs_getpdx(&state->ics_gpregs);
 	user_ucontext->uc_mcontext.mc_context.ucs_gpregs.LOCAL_gp_Pcx = (LOCAL_uintptr_t)gpregs_getpcx(&state->ics_gpregs);
@@ -359,7 +361,7 @@ LOCAL_userexcept_callsignal(struct icpustate *__restrict state,
 
 	/* Encode system call restart information. */
 	user_sc_info = NULL;
-	if (sc_info) {
+	if (sc_info != NULL) {
 		unsigned int argc;
 		size_t sizeof_sc_info;
 
@@ -495,6 +497,7 @@ LOCAL_userexcept_callsignal(struct icpustate *__restrict state,
 #undef LOCAL_siginfo_t
 #undef LOCAL_ucontext_t
 #undef LOCAL_struct_fpustate
+#undef LOCAL_struct_xfpustate
 #undef LOCAL_SIX_USER_MAX_SIZE
 #undef LOCAL_SIX_KERNEL_MAX_SIZE
 #undef LOCAL_fpustate_saveinto

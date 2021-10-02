@@ -236,7 +236,9 @@ handle_pending:
 #endif /* ... */
 				{
 					/* User-space RPCs are currently masked. */
+#ifndef LOCAL_IS_SYSRET
 make_inactive:
+#endif /* !LOCAL_IS_SYSRET */
 					*restore_plast = rpc;
 					restore_plast  = &rpc->pr_link.sle_next;
 #ifndef LOCAL_IS_SYSRET
@@ -416,16 +418,11 @@ again_scan_proc_rpcs:
 						 *       not for `ctx.rc_context == RPC_REASONCTX_SYSCALL') */
 						user_rpc_reason = _RPC_REASONCTX_SYNC;
 						if (sc_info != NULL) {
-							if ((rpc->pr_flags & RPC_SYNCMODE_F_REQUIRE_CP) &&
-							    !kernel_syscall_iscp(sc_info))
-								goto make_inactive;
 							/* If the system call  */
 							if (ctx.rc_context == RPC_REASONCTX_SYSCALL)
 								user_rpc_reason = _RPC_REASONCTX_SYSCALL;
-						} else {
-							if ((rpc->pr_flags & RPC_SYNCMODE_F_REQUIRE_SC))
-								goto make_inactive;
 						}
+
 						/* Do everything necessary to handle the USER-rpc. */
 						userexcept_exec_user_rpc(&ctx, &error, rpc, user_rpc_reason);
 
@@ -698,4 +695,5 @@ check_next_proc_rpc:
 DECL_END
 
 #undef DEFINE_userexcept_handler
+#undef DEFINE_userexcept_handler_with_sigmask
 #undef DEFINE_userexcept_sysret
