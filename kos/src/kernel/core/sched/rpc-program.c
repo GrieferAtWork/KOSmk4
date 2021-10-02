@@ -146,6 +146,12 @@ task_userrpc_runprogram(rpc_cpustate_t *__restrict state,
 /************************************************************************/
 #ifdef __ARCH_WANT_SYSCALL_RPC_SERVE
 DEFINE_SYSCALL0(errno_t, rpc_serve) {
+	/* Somewhat similar to `rpc_serve_sysret(2)', however this one does  a
+	 * hard check for pending RPCs, including any that can only be handled
+	 * in  the context of a cancellation-point system call (which this one
+	 * is marked as being)
+	 *
+	 * s.a. `pthread_testcancel(3)' */
 	task_serve();
 	return -EOK;
 }
@@ -153,6 +159,17 @@ DEFINE_SYSCALL0(errno_t, rpc_serve) {
 
 #ifdef __ARCH_WANT_SYSCALL_RPC_SERVE_SYSRET
 DEFINE_SYSCALL0(errno_t, rpc_serve_sysret) {
+	/* This system call is supposed to check for pending async (aka. sysret) RPCs,
+	 * mainly  for the purpose  of updating the  calling thread's userprocmask (if
+	 * that thread is using one).
+	 *
+	 * This sort of behavior is needed for when the userprocmask just became  less
+	 * restrictive while there are pending RPCs (or posix signals) that have  just
+	 * become unmasked. In this situation, the kernel must be told that the caller
+	 * is now ready to service the related RPC programs (or posix signals),  which
+	 * is exactly what this system call does, and is there for.
+	 *
+	 * s.a. `chkuserprocmask(3)' */
 	userexcept_sysret_inject_self();
 	return -EOK;
 }
