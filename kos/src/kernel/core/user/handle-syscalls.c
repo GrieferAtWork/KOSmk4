@@ -1718,6 +1718,9 @@ PRIVATE size_t KCALL
 do_poll(USER CHECKED struct pollfd *fds,
         size_t nfds, ktime_t abs_timeout) {
 	size_t result;
+	/* TODO: Special optimization for when  `abs_timeout == KTIME_NONBLOCK'!
+	 *       In this case, it's  enough if we just  test all of the  handles
+	 *       for their poll conditions, and forgo all of the signal handling */
 again:
 	/* Do the poll-scan. */
 	result = do_poll_scan(fds, nfds);

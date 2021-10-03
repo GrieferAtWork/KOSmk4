@@ -52,7 +52,7 @@ DECL_BEGIN
 DEFINE_HANDLE_REFCNT_FUNCTIONS(signalfd, struct signalfd);
 
 PRIVATE ATTR_MALLOC ATTR_RETNONNULL WUNUSED REF struct signalfd *KCALL
-signalfd_create(USER CHECKED sigset_t const *mask) THROWS(E_BADALLOC) {
+signalfd_create(USER CHECKED sigset_t const *mask) THROWS(E_BADALLOC, E_SEGFAULT) {
 	struct signalfd *result;
 	result = signalfd_alloc();
 	result->sf_refcnt = 1;
@@ -68,24 +68,7 @@ signalfd_create(USER CHECKED sigset_t const *mask) THROWS(E_BADALLOC) {
 	return result;
 }
 
-#ifdef CONFIG_USE_NEW_RPC
-
-/* TODO: Re-implement signalfd() for the new RPC system. */
-
-/* TODO: Connect should be  implemented simply by  setting
- *       the `TASK_FWAKEONMSKRPC' flag, whilst also making
- *       a call to `userexcept_sysret_inject_self()'.  The
- *       `TASK_FWAKEONMSKRPC' flag is  later cleared  when
- *       `userexcept_sysret()' is called. */
-
-/* TODO: Epoll should check if the given object is a signalfd,
- *       and throw an exception when  trying to listen to  it.
- *       After all: epoll  works asynchronously, meaning  that
- *       TLS context (and thus:  RPCs) are weakly defined  and
- *       can change at any point. */
-
-#else /* CONFIG_USE_NEW_RPC */
-
+#ifndef CONFIG_USE_NEW_RPC
 LOCAL NOBLOCK NONNULL((1, 2)) void
 NOTHROW(KCALL restore_perthread_pending_signals)(struct sigqueue *__restrict myqueue,
                                                  struct sigqueue_entry *__restrict pending) {
@@ -186,15 +169,6 @@ LOCAL void KCALL connect_to_my_signal_queues(void) {
 	task_connect(&tqueue->sq_newsig);
 }
 
-/* Connect to the signal queue signals of the calling thread and process. */
-LOCAL void KCALL connect_to_my_signal_queues_for_poll(void) {
-	struct sigqueue *pqueue, *tqueue;
-	pqueue = &FORTASK(task_getprocess(), this_taskgroup).tg_proc_signals.psq_queue;
-	tqueue = &THIS_SIGQUEUE;
-	task_connect_for_poll(&pqueue->sq_newsig);
-	task_connect_for_poll(&tqueue->sq_newsig);
-}
-
 
 
 INTERN size_t KCALL
@@ -267,34 +241,125 @@ handle_signalfd_read(struct signalfd *__restrict self,
 	return result;
 }
 
+#else /* !CONFIG_USE_NEW_RPC */
 
-INTERN void KCALL
+INTERN size_t KCALL
+handle_signalfd_read(struct signalfd *__restrict self,
+                     USER CHECKED void *dst,
+                     size_t num_bytes, iomode_t mode) {
+	size_t result;
+	assert(!task_wasconnected());
+	if unlikely(num_bytes < sizeof(struct signalfd_siginfo)) {
+		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
+		      E_INVALID_ARGUMENT_CONTEXT_SIGNALFD_BUFSIZE,
+		      num_bytes);
+	}
+	result = 0;
+	for (;;) {
+		struct pending_rpc *rpc;
+		USER CHECKED struct signalfd_siginfo *usi;
+		rpc = task_rpc_pending_steal_posix_signal(&self->sf_mask);
+		if (!rpc)
+			rpc = proc_rpc_pending_steal_posix_signal(&self->sf_mask);
+		if (!rpc) {
+			if (mode & IO_NONBLOCK) {
+				if (result)
+					break; /* At least something was already read. */
+				if (mode & IO_NODATAZERO)
+					break;
+				THROW(E_WOULDBLOCK_WAITFORSIGNAL);
+			}
+			assert(!task_wasconnected());
+			task_connect(&PERTASK(this_rpcs_sig));
+			TRY {
+				task_connect(&THIS_PROCESS_RPCS.ppr_more);
+				rpc = task_rpc_pending_steal_posix_signal(&self->sf_mask);
+				if (!rpc)
+					rpc = proc_rpc_pending_steal_posix_signal(&self->sf_mask);
+			} EXCEPT {
+				task_disconnectall();
+				RETHROW();
+			}
+			if likely(!rpc) {
+				/* NOTE: Signals that aren't  masked by the  calling thread will  be
+				 *       handled normally when this right here calls `task_serve()'.
+				 * As such, trying  to signals  not masked in  the calling  thread's
+				 * signal mask from a signalfd is inherently racy and while allowed,
+				 * really shouldn't be done  as there is no  way to predict if  some
+				 * signal is read from the signalfd, or handled the normal way.
+				 *
+				 * As the solution, user-space code should ensure that no signal
+				 * contained in the signalfd's mask is unmasked in the  thread's
+				 * signal mask at the time the read(2) is made! */
+				task_waitfor();
+				continue;
+			}
+			task_disconnectall();
+		}
+		assert(rpc);
+		assert(!(rpc->pr_flags & RPC_CONTEXT_KERN));
+		assert(rpc->pr_flags & RPC_CONTEXT_SIGNAL);
+		usi = (USER CHECKED struct signalfd_siginfo *)dst;
+
+		/* Fill in the user-space signalfd info buffer. */
+		TRY {
+			COMPILER_WRITE_BARRIER();
+			usi->ssi_signo   = rpc->pr_psig.si_signo;
+			usi->ssi_errno   = rpc->pr_psig.si_errno;
+			usi->ssi_code    = rpc->pr_psig.si_code;
+			usi->ssi_pid     = rpc->pr_psig.si_pid;
+			usi->ssi_uid     = rpc->pr_psig.si_uid;
+			usi->ssi_fd      = rpc->pr_psig.si_fd;
+			usi->ssi_tid     = rpc->pr_psig.si_timerid;
+			usi->ssi_band    = rpc->pr_psig.si_band;
+			usi->ssi_overrun = rpc->pr_psig.si_overrun;
+			usi->ssi_trapno  = 0; /* ??? */
+			usi->ssi_status  = rpc->pr_psig.si_status;
+			usi->ssi_int     = rpc->pr_psig.si_int;
+			usi->ssi_ptr     = (u64)(uintptr_t)rpc->pr_psig.si_ptr;
+			usi->ssi_utime   = rpc->pr_psig.si_utime;
+			usi->ssi_stime   = rpc->pr_psig.si_stime;
+			usi->ssi_addr    = (u64)(uintptr_t)rpc->pr_psig.si_addr;
+			memset(usi->__pad, 0, sizeof(usi->__pad));
+			COMPILER_WRITE_BARRIER();
+		} EXCEPT {
+			pending_rpc_free(rpc);
+			RETHROW();
+		}
+		pending_rpc_free(rpc);
+
+		result += sizeof(struct signalfd_siginfo);
+		num_bytes -= sizeof(struct signalfd_siginfo);
+		if (num_bytes < sizeof(struct signalfd_siginfo))
+			break;
+		dst = (byte_t *)dst + sizeof(struct signalfd_siginfo);
+	}
+	return result;
+}
+#endif /* CONFIG_USE_NEW_RPC */
+
+
+
+
+INTERN NONNULL((1)) void KCALL
 handle_signalfd_pollconnect(struct signalfd *__restrict UNUSED(self),
                             poll_mode_t what) {
 	if (what & POLLINMASK) {
 #ifdef CONFIG_USE_NEW_RPC
-		/* Connect is implemented simply by setting the `TASK_FWAKEONMSKRPC'
-		 * flag,  before making a call to `userexcept_sysret_inject_self()'.
-		 * The `TASK_FWAKEONMSKRPC' flag is cleared by `userexcept_sysret()' */
-		ATOMIC_OR(THIS_TASK->t_flags, TASK_FWAKEONMSKRPC);
-		userexcept_sysret_inject_self();
-
-		/* FIXME: In this configuration, our thread _is_ guarantied to  receive
-		 *        a sporadic interrupt  once RPCs arrive.  But that's not  good
-		 *        enough; our caller uses `task_waitfor()', which will continue
-		 *        to block until a proper `struct sig'-signal is received,  but
-		 *        RPCs never do that when they arrive, so this right here  ends
-		 *        up not actually working...
-		 *
-		 * Thinking about it, the only ~real~ way of "fixing" this would be to
-		 * introduce a proper `struct sig' that broadcast when RPCs are added.
-		 */
-
+		task_connect_for_poll(&PERTASK(this_rpcs_sig));
+		task_connect_for_poll(&THIS_PROCESS_RPCS.ppr_more);
 #else /* CONFIG_USE_NEW_RPC */
-		connect_to_my_signal_queues_for_poll();
+		struct sigqueue *pqueue, *tqueue;
+		pqueue = &FORTASK(task_getprocess(), this_taskgroup).tg_proc_signals.psq_queue;
+		tqueue = &THIS_SIGQUEUE;
+		task_connect_for_poll(&pqueue->sq_newsig);
+		task_connect_for_poll(&tqueue->sq_newsig);
 #endif /* !CONFIG_USE_NEW_RPC */
 	}
 }
+
+
+
 
 INTERN poll_mode_t KCALL
 handle_signalfd_polltest(struct signalfd *__restrict self,
@@ -313,16 +378,13 @@ handle_signalfd_polltest(struct signalfd *__restrict self,
 }
 
 
-//XXX:INTERN syscall_slong_t KCALL
-//XXX:handle_signalfd_hop(struct signalfd *__restrict self,
-//XXX:                    syscall_ulong_t cmd,
-//XXX:                    USER UNCHECKED void *arg, iomode_t mode) {
-//XXX:   - Hop to get/set the current mask
-//XXX:}
 
 
 
-#undef sigmask
+/************************************************************************/
+/* signalfd(), signalfd4()                                              */
+/************************************************************************/
+#ifdef __ARCH_WANT_SYSCALL_SIGNALFD4
 
 PRIVATE ATTR_NOINLINE void KCALL
 update_signalfd(unsigned int fd,
@@ -344,6 +406,7 @@ update_signalfd(unsigned int fd,
 		COMPILER_BARRIER();
 		memcpy(&newmask, sigmask, sizeof(sigset_t));
 		COMPILER_BARRIER();
+
 		/* Always remove  SIGKILL and  SIGSTOP from  the new  mask
 		 * before applying it, thus ensuring  that at no point  in
 		 * time a signalfd descriptor exists that would be capable
@@ -352,6 +415,7 @@ update_signalfd(unsigned int fd,
 		sigdelset(&newmask, SIGSTOP);
 		COMPILER_BARRIER();
 		memcpy(&sfd->sf_mask, &newmask, sizeof(sigset_t));
+
 		/* The online documentation does not specify if a  thread
 		 * currently waiting on  a signalfd should  wake up  when
 		 * the mask changes. Especially considering that doing so
@@ -366,6 +430,10 @@ update_signalfd(unsigned int fd,
 		 * was shared between processes,  with one process updating  the
 		 * mask  not  actually causing  the  other to  get  the message.
 		 * Oh well... Just mirror what linux does... */
+#ifdef CONFIG_USE_NEW_RPC
+		sig_broadcast(&PERTASK(this_rpcs_sig));
+		sig_broadcast(&THIS_PROCESS_RPCS.ppr_more);
+#else /* CONFIG_USE_NEW_RPC */
 		{
 			struct sigqueue *pqueue, *tqueue;
 			pqueue = &FORTASK(task_getprocess(), this_taskgroup).tg_proc_signals.psq_queue;
@@ -373,6 +441,7 @@ update_signalfd(unsigned int fd,
 			sig_broadcast(&pqueue->sq_newsig);
 			sig_broadcast(&tqueue->sq_newsig);
 		}
+#endif /* !CONFIG_USE_NEW_RPC */
 	} EXCEPT {
 		decref(hnd);
 		RETHROW();
@@ -380,21 +449,15 @@ update_signalfd(unsigned int fd,
 	decref(hnd);
 }
 
-
-
-
-
-/************************************************************************/
-/* signalfd(), signalfd4()                                              */
-/************************************************************************/
-#ifdef __ARCH_WANT_SYSCALL_SIGNALFD4
 DEFINE_SYSCALL4(fd_t, signalfd4, fd_t, fd,
                 USER UNCHECKED sigset_t const *, sigmask,
                 size_t, sigsetsize, syscall_ulong_t, flags) {
 	unsigned int result;
 	REF struct signalfd *sfd;
+	/* NOTE: Yes, validate `flags' even in the `fd == -1' case
+	 *       when they're not even used. (linux does the same) */
 	VALIDATE_FLAGSET(flags,
-	                 SFD_NONBLOCK | SFD_CLOEXEC,
+	                 SFD_NONBLOCK | SFD_CLOEXEC | SFD_CLOFORK,
 	                 E_INVALID_ARGUMENT_CONTEXT_SIGNALFD_FLAGS);
 	if unlikely(sigsetsize != sizeof(sigset_t)) {
 		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
@@ -417,6 +480,8 @@ DEFINE_SYSCALL4(fd_t, signalfd4, fd_t, fd,
 				hnd.h_mode |= IO_NONBLOCK;
 			if (flags & SFD_CLOEXEC)
 				hnd.h_mode |= IO_CLOEXEC;
+			if (flags & SFD_CLOFORK)
+				hnd.h_mode |= IO_CLOFORK;
 			result = handle_install(THIS_HANDLE_MANAGER, hnd);
 		} EXCEPT {
 			destroy(sfd);
@@ -436,7 +501,6 @@ DEFINE_SYSCALL3(fd_t, signalfd, fd_t, fd,
 }
 #endif /* __ARCH_WANT_SYSCALL_SIGNALFD */
 
-#endif /* !CONFIG_USE_NEW_RPC */
 
 
 

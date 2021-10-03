@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4bdc815b */
+/* HASH CRC-32:0x294bb569 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,9 +31,14 @@ DECL_BEGIN
 
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> signalfd(2)
- * Create a poll(2)-able file descriptor which can be used to wait for the
- * delivery of signals masked by `sigmask' to the waiting  thread/process.
- * @param: flags: Set of `0 | SFD_NONBLOCK | SFD_CLOEXEC | SFD_CLOFORK' */
+ * Create or update a poll(2)-able file descriptor which can be used to
+ * wait for the delivery of signals masked by `sigmask' to the  waiting
+ * thread/process.
+ * @param: fd:    When `-1', create a new signalfd object; Otherwise,
+ *                the FD number of  the signalfd object who's  signal
+ *                mask should be updated to `sigmask'.
+ * @param: flags: Set of `0 | SFD_NONBLOCK | SFD_CLOEXEC | SFD_CLOFORK'
+ *                Meaningless,  but  still  validated  when  `fd != -1' */
 INTDEF WUNUSED NONNULL((2)) fd_t NOTHROW_NCX(LIBDCALL libd_signalfd)(fd_t fd, sigset_t const *sigmask, __STDC_INT_AS_UINT_T flags);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 

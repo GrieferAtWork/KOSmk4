@@ -28,22 +28,22 @@
 __DECL_BEGIN
 
 struct signalfd_siginfo {
-	__uint32_t ssi_signo;
-	__int32_t  ssi_errno;
-	__int32_t  ssi_code;
-	__uint32_t ssi_pid;
-	__uint32_t ssi_uid;
-	__int32_t  ssi_fd;
-	__uint32_t ssi_tid;
-	__uint32_t ssi_band;
-	__uint32_t ssi_overrun;
-	__uint32_t ssi_trapno;
-	__int32_t  ssi_status;
-	__int32_t  ssi_int;
-	__uint64_t ssi_ptr;
-	__uint64_t ssi_utime;
-	__uint64_t ssi_stime;
-	__uint64_t ssi_addr;
+	__uint32_t ssi_signo;   /* s.a. `siginfo_t::si_signo' */
+	__int32_t  ssi_errno;   /* s.a. `siginfo_t::si_errno' */
+	__int32_t  ssi_code;    /* s.a. `siginfo_t::si_code' */
+	__uint32_t ssi_pid;     /* s.a. `siginfo_t::si_pid' */
+	__uint32_t ssi_uid;     /* s.a. `siginfo_t::si_uid' */
+	__int32_t  ssi_fd;      /* s.a. `siginfo_t::si_fd' */
+	__uint32_t ssi_tid;     /* s.a. `siginfo_t::si_timerid' */
+	__uint32_t ssi_band;    /* s.a. `siginfo_t::si_band' */
+	__uint32_t ssi_overrun; /* s.a. `siginfo_t::si_overrun' */
+	__uint32_t ssi_trapno;  /* ??? */
+	__int32_t  ssi_status;  /* s.a. `siginfo_t::si_status' */
+	__int32_t  ssi_int;     /* s.a. `siginfo_t::si_int' */
+	__uint64_t ssi_ptr;     /* s.a. `siginfo_t::si_ptr' */
+	__uint64_t ssi_utime;   /* s.a. `siginfo_t::si_utime' */
+	__uint64_t ssi_stime;   /* s.a. `siginfo_t::si_stime' */
+	__uint64_t ssi_addr;    /* s.a. `siginfo_t::si_addr' */
 	__uint8_t  __pad[48];
 };
 
