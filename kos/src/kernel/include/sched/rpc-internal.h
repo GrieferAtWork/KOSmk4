@@ -126,6 +126,12 @@ SLIST_HEAD(pending_rpc_slist, pending_rpc);
 DATDEF ATTR_PERTASK struct pending_rpc_slist this_rpcs;
 #define THIS_RPCS_TERMINATED ((struct pending_rpc *)-1)
 
+/* A  signal that is broadcast whenever something is added to `this_rpcs'
+ * This signal is _only_ used  to implement `signalfd(2)', as you're  not
+ * normally supposed to "wait" for signals to arrive; you just always get
+ * a sporadic interrupt once they do arrive. */
+DATDEF ATTR_PERTASK struct sig this_rpcs_sig;
+
 
 /* Schedule the given `rpc' for execution on `thread'.
  * NOTE: Be mindful of the scenario  where `thread == THIS_TASK', in which  case
@@ -159,21 +165,26 @@ NOTHROW(FCALL proc_rpc_schedule)(struct task *__restrict thread_in_proc,
 
 /* Gather the set of posix signal numbers used by pending RPCs
  * of calling thread or process.  These functions are used  to
- * implement the `sigpending(2)' system call. */
+ * implement the `sigpending(2)' system call.
+ *
+ * NOTE: These functions don't `sigemptyset(result)' beforehand,
+ *       but  will blindly `sigaddset()'  all pending signals to
+ *       it. */
 FUNDEF NOBLOCK NONNULL((1)) void
-NOTHROW(FCALL task_rpc_pending_sigset)(/*out*/ sigset_t *__restrict result);
+NOTHROW(FCALL task_rpc_pending_sigset)(/*in|out*/ sigset_t *__restrict result);
 FUNDEF NONNULL((1)) void FCALL
-proc_rpc_pending_sigset(/*out*/ sigset_t *__restrict result)
+proc_rpc_pending_sigset(/*in|out*/ sigset_t *__restrict result)
 		THROWS(E_WOULDBLOCK);
 
 /* Check if an RPCs routed via one of `these' signals is pending. */
-FUNDEF NOBLOCK WUNUSED NONNULL((1)) __BOOL
+FUNDEF NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) __BOOL
 NOTHROW(FCALL task_rpc_pending_oneof)(sigset_t const *__restrict these);
-FUNDEF WUNUSED NONNULL((1)) __BOOL FCALL
+FUNDEF ATTR_PURE WUNUSED NONNULL((1)) __BOOL FCALL
 proc_rpc_pending_oneof(sigset_t const *__restrict these)
 		THROWS(E_WOULDBLOCK);
+
 /* @return: * : One of `PROC_RPC_TRYPENDING_ONEOF_*' */
-FUNDEF NOBLOCK WUNUSED NONNULL((1)) int
+FUNDEF NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) int
 NOTHROW(FCALL proc_rpc_trypending_oneof)(sigset_t const *__restrict these);
 #define PROC_RPC_TRYPENDING_ONEOF_NO         0    /* None of `these' are pending */
 #define PROC_RPC_TRYPENDING_ONEOF_YES        1    /* (At least) one of `these' is pending */

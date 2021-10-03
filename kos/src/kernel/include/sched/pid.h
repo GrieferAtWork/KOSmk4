@@ -137,6 +137,10 @@ struct process_pending_rpcs {
 	                                    * NOTE: User-RPCs must not have the `RPC_SYNCMODE_F_REQUIRE_SC'
 	                                    *       or `RPC_SYNCMODE_F_REQUIRE_CP'  flag set.  If they  do,
 	                                    *       an internal assertion check will trigger. */
+	struct sig               ppr_more; /* A signal that is broadcast  whenever something is added to  `ppr_list'
+	                                    * This signal is _only_ used  to implement `signalfd(2)', as you're  not
+	                                    * normally supposed to "wait" for signals to arrive; you just always get
+	                                    * a sporadic interrupt once they do arrive. */
 };
 
 FUNDEF NOBLOCK NONNULL((1)) void

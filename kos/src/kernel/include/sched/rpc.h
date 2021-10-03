@@ -82,7 +82,7 @@ typedef struct __sigset_struct sigset_t;
  *                                 executing even before this function returns.
  * @return: true:  Success
  * @return: false: Failure because `thread' has already terminated. */
-FUNDEF NOBLOCK_IF(rpc_gfp & GFP_ATOMIC) NONNULL((1, 3)) bool KCALL
+FUNDEF NONNULL((1, 3)) bool KCALL
 task_rpc_exec(struct task *__restrict thread, syscall_ulong_t flags,
               prpc_exec_callback_t func, void *cookie DFL(__NULLPTR))
 		THROWS(E_WOULDBLOCK, E_BADALLOC);

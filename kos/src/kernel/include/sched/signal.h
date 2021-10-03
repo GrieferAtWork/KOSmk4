@@ -211,6 +211,7 @@ struct sig {
 #endif /* !CONFIG_NO_SMP */
 #define sig_init(x)  (void)((x)->s_con = __NULLPTR)
 #define sig_cinit(x) __hybrid_assert((x)->s_con == __NULLPTR)
+#define sig_isempty(x) ((x)->s_con == __NULLPTR)
 
 
 

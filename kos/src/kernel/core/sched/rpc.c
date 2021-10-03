@@ -50,24 +50,38 @@
 
 DECL_BEGIN
 
+#ifndef NDEBUG
+#define DBG_memset(dst, byte, num_bytes) memset(dst, byte, num_bytes)
+#else /* !NDEBUG */
+#define DBG_memset(dst, byte, num_bytes) (void)0
+#endif /* NDEBUG */
+
 /* [0..n][lock(INSERT(ATOMIC), CLEAR(ATOMIC && THIS_TASK))]
  * Pending RPCs. (Set of `THIS_RPCS_TERMINATED' when RPCs may no longer
  * be executed, and all that were there prior to this becoming the case
  * are/were serviced with `RPC_REASONCTX_SHUTDOWN') */
 PUBLIC ATTR_PERTASK struct pending_rpc_slist this_rpcs = SLIST_HEAD_INITIALIZER(this_rpcs);
 
+/* A  signal that is broadcast whenever something is added to `this_rpcs'
+ * This signal is _only_ used  to implement `signalfd(2)', as you're  not
+ * normally supposed to "wait" for signals to arrive; you just always get
+ * a sporadic interrupt once they do arrive. */
+PUBLIC ATTR_PERTASK struct sig this_rpcs_sig = SIG_INIT;
+
 /* Finalizer for thread RPCs (called during `task_exit()') */
 DEFINE_PERTASK_ONEXIT(shutdown_this_rpcs);
 PRIVATE ATTR_USED void
 NOTHROW(KCALL shutdown_this_rpcs)(void) {
+	struct task *me = THIS_TASK;
 	struct pending_rpc *remain;
 
 	/* Mark the RPC list as terminated and load remaining RPCs. */
-	remain = ATOMIC_XCH(PERTASK(this_rpcs.slh_first),
+	remain = ATOMIC_XCH(FORTASK(me, this_rpcs.slh_first),
 	                    THIS_RPCS_TERMINATED);
 	assertf(remain != THIS_RPCS_TERMINATED,
 	        "We're the only ones that ever set this, "
 	        "so what; did we get called twice?");
+	sig_broadcast_for_fini(&FORTASK(me, this_rpcs_sig));
 
 	/* Destroy all remaining RPCs for the purpose of shutdown. */
 	task_asyncrpc_destroy_list_for_shutdown(remain);
@@ -103,7 +117,7 @@ NOTHROW(KCALL shutdown_this_rpcs)(void) {
  *                                 executing even before this function returns.
  * @return: true:  Success
  * @return: false: Failure because `thread' has already terminated. */
-PUBLIC NOBLOCK_IF(rpc_gfp & GFP_ATOMIC) NONNULL((1, 3)) bool KCALL
+PUBLIC NONNULL((1, 3)) bool KCALL
 task_rpc_exec(struct task *__restrict thread, syscall_ulong_t flags,
               prpc_exec_callback_t func, void *cookie)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, E_INTERRUPT_USER_RPC) {
@@ -152,6 +166,7 @@ task_rpc_exec(struct task *__restrict thread, syscall_ulong_t flags,
 		rpc->pr_link.sle_next = head;
 		COMPILER_WRITE_BARRIER();
 	} while (!ATOMIC_CMPXCH_WEAK(list->slh_first, head, rpc));
+	sig_broadcast(&FORTASK(thread, this_rpcs_sig));
 
 	/* Set the thread's `TASK_FRPC' flag to indicate that it's got work to do */
 	ATOMIC_OR(thread->t_flags, TASK_FRPC);
@@ -267,6 +282,7 @@ are_any_unmasked_process_rpcs_pending_with_faulty(struct process_pending_rpcs *_
 	sigemptyset(&known_masked);
 	sigemptyset(&known_unmasked);
 again_test_signo:
+	/* NOTE: This `sigmask_ismasked()' is the only thing in here that might throw! */
 	sigaddset(sigmask_ismasked(signo) ? &known_masked
 	                                  : &known_unmasked,
 	          signo);
@@ -304,8 +320,14 @@ again_test_signo:
 
 
 /* Check if there are any unmasked process RPCs that are currently pending. */
+#ifdef CONFIG_HAVE_USERPROCMASK
 PRIVATE WUNUSED bool FCALL are_any_unmasked_process_rpcs_pending(void)
-		THROWS(E_SEGFAULT) {
+		THROWS(E_WOULDBLOCK, E_SEGFAULT)
+#else /* CONFIG_HAVE_USERPROCMASK */
+PRIVATE WUNUSED bool FCALL are_any_unmasked_process_rpcs_pending(void)
+		THROWS(E_WOULDBLOCK)
+#endif /* !CONFIG_HAVE_USERPROCMASK */
+{
 	struct pending_rpc *rpc;
 	struct process_pending_rpcs *proc_rpcs = &THIS_PROCESS_RPCS;
 	if (ATOMIC_READ(proc_rpcs->ppr_list.slh_first) == NULL)
@@ -394,11 +416,14 @@ NOTHROW(FCALL task_rpc_schedule)(struct task *__restrict thread,
 	list = &FORTASK(thread, this_rpcs);
 	do {
 		head = ATOMIC_READ(list->slh_first);
-		if unlikely(head == THIS_RPCS_TERMINATED)
+		if unlikely(head == THIS_RPCS_TERMINATED) {
+			DBG_memset(&rpc->pr_link, 0xcc, sizeof(rpc->pr_link));
 			return false; /* Already terminated */
+		}
 		rpc->pr_link.sle_next = head;
 		COMPILER_BARRIER();
 	} while (!ATOMIC_CMPXCH_WEAK(list->slh_first, head, rpc));
+	sig_broadcast(&FORTASK(thread, this_rpcs_sig));
 
 	if (rpc_flags & RPC_CONTEXT_KERN) {
 		assertf(!(thread->t_flags & TASK_FKERNTHREAD) ||
@@ -465,11 +490,14 @@ NOTHROW(FCALL proc_rpc_schedule)(struct task *__restrict thread_in_proc,
 	list = &FORTASK(proc, this_taskgroup.tg_proc_rpcs.ppr_list);
 	do {
 		head = ATOMIC_READ(list->slh_first);
-		if unlikely(head == THIS_RPCS_TERMINATED)
+		if unlikely(head == THIS_RPCS_TERMINATED) {
+			DBG_memset(&rpc->pr_link, 0xcc, sizeof(rpc->pr_link));
 			return false; /* Already terminated */
+		}
 		rpc->pr_link.sle_next = head;
 		COMPILER_BARRIER();
 	} while (!ATOMIC_CMPXCH_WEAK(list->slh_first, head, rpc));
+	sig_broadcast(&FORTASK(proc, this_taskgroup.tg_proc_rpcs.ppr_more));
 
 	if unlikely(rpc_flags & RPC_CONTEXT_KERN) {
 		assertf(!(proc->t_flags & TASK_FKERNTHREAD) ||
@@ -493,7 +521,7 @@ NOTHROW(FCALL proc_rpc_schedule)(struct task *__restrict thread_in_proc,
 
 
 PRIVATE NOBLOCK NONNULL((1)) void
-NOTHROW(FCALL pending_signals_from_rpc_list)(/*out*/ sigset_t *__restrict result,
+NOTHROW(FCALL pending_signals_from_rpc_list)(/*in|out*/ sigset_t *__restrict result,
                                              struct pending_rpc *first) {
 	for (; first; first = SLIST_NEXT(first, pr_link)) {
 		if (!(first->pr_flags & RPC_CONTEXT_KERN))
@@ -504,9 +532,13 @@ NOTHROW(FCALL pending_signals_from_rpc_list)(/*out*/ sigset_t *__restrict result
 
 /* Gather the set of posix signal numbers used by pending RPCs
  * of calling thread or process.  These functions are used  to
- * implement the `sigpending(2)' system call. */
+ * implement the `sigpending(2)' system call.
+ *
+ * NOTE: These functions don't `sigemptyset(result)' beforehand,
+ *       but  will blindly `sigaddset()'  all pending signals to
+ *       it. */
 PUBLIC NOBLOCK NONNULL((1)) void
-NOTHROW(FCALL task_rpc_pending_sigset)(/*out*/ sigset_t *__restrict result) {
+NOTHROW(FCALL task_rpc_pending_sigset)(/*in|out*/ sigset_t *__restrict result) {
 	struct pending_rpc *list;
 	list = PERTASK_GET(this_rpcs.slh_first);
 	assert(list != THIS_RPCS_TERMINATED);
@@ -514,7 +546,7 @@ NOTHROW(FCALL task_rpc_pending_sigset)(/*out*/ sigset_t *__restrict result) {
 }
 
 PUBLIC NONNULL((1)) void FCALL
-proc_rpc_pending_sigset(/*out*/ sigset_t *__restrict result)
+proc_rpc_pending_sigset(/*in|out*/ sigset_t *__restrict result)
 		THROWS(E_WOULDBLOCK) {
 	struct process_pending_rpcs *proc_rpcs;
 	struct pending_rpc *first;
@@ -529,9 +561,9 @@ proc_rpc_pending_sigset(/*out*/ sigset_t *__restrict result)
 
 
 /* Check if one of `these' is pending. */
-PRIVATE NOBLOCK WUNUSED NONNULL((1)) bool
+PRIVATE NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) bool
 NOTHROW(FCALL is_one_of_these_pending)(sigset_t const *__restrict these,
-                                       struct pending_rpc *first) {
+                                       struct pending_rpc const *first) {
 	for (; first; first = SLIST_NEXT(first, pr_link)) {
 		if (!(first->pr_flags & RPC_CONTEXT_KERN) &&
 		    sigismember(these, _RPC_GETSIGNO(first->pr_flags)))
@@ -541,15 +573,15 @@ NOTHROW(FCALL is_one_of_these_pending)(sigset_t const *__restrict these,
 }
 
 /* Check if an RPCs routed via one of `these' signals is pending. */
-PUBLIC NOBLOCK WUNUSED NONNULL((1)) bool
+PUBLIC NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) bool
 NOTHROW(FCALL task_rpc_pending_oneof)(sigset_t const *__restrict these) {
-	struct pending_rpc *list;
+	struct pending_rpc const *list;
 	list = PERTASK_GET(this_rpcs.slh_first);
 	assert(list != THIS_RPCS_TERMINATED);
 	return is_one_of_these_pending(these, list);
 }
 
-PUBLIC WUNUSED NONNULL((1)) bool FCALL
+PUBLIC ATTR_PURE WUNUSED NONNULL((1)) bool FCALL
 proc_rpc_pending_oneof(sigset_t const *__restrict these)
 		THROWS(E_WOULDBLOCK) {
 	bool result = false;
@@ -565,7 +597,7 @@ proc_rpc_pending_oneof(sigset_t const *__restrict these)
 }
 
 /* @return: * : One of `PROC_RPC_TRYPENDING_ONEOF_*' */
-PUBLIC NOBLOCK WUNUSED NONNULL((1)) int
+PUBLIC NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) int
 NOTHROW(FCALL proc_rpc_trypending_oneof)(sigset_t const *__restrict these) {
 	int result = PROC_RPC_TRYPENDING_ONEOF_NO;
 	struct process_pending_rpcs *proc_rpcs;

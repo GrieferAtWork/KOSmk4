@@ -375,6 +375,7 @@ NOTHROW(KCALL this_taskgroup_cleanup)(void) {
 			atomic_rwlock_write(&mygroup.tg_proc_rpcs.ppr_lock);
 			remain = ATOMIC_XCH(mygroup.tg_proc_rpcs.ppr_list.slh_first, THIS_RPCS_TERMINATED);
 			atomic_rwlock_endwrite(&mygroup.tg_proc_rpcs.ppr_lock);
+			sig_broadcast_for_fini(&mygroup.tg_proc_rpcs.ppr_more);
 			assert(remain != THIS_RPCS_TERMINATED);
 			task_asyncrpc_destroy_list_for_shutdown(remain);
 		}
@@ -492,8 +493,9 @@ NOTHROW(KCALL this_taskgroup_fini)(struct task *__restrict self) {
 		}
 		/* Finalize any signals that were never delivered. */
 #ifdef CONFIG_USE_NEW_RPC
-		assertf(mygroup.tg_proc_rpcs.ppr_list.slh_first == NULL ||
-		        mygroup.tg_proc_rpcs.ppr_list.slh_first == THIS_RPCS_TERMINATED,
+		assertf((mygroup.tg_proc_rpcs.ppr_list.slh_first == NULL ||
+		         mygroup.tg_proc_rpcs.ppr_list.slh_first == THIS_RPCS_TERMINATED) &&
+		        sig_isempty(&mygroup.tg_proc_rpcs.ppr_more),
 		        "This shouldn't be because process RPCs should have gotten "
 		        "cleaned up during task_exit(). So how did this happen?");
 #else /* CONFIG_USE_NEW_RPC */
