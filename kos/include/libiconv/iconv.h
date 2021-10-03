@@ -145,7 +145,7 @@ union iconv_decode_data {
 #define _ICONV_DECODE_URI_PCT   1 /* Encountered % */
 #define _ICONV_DECODE_URI_PCT_1 2 /* Encountered %<?> */
 		__uint8_t ue_mode; /* Current state machine mode (one of `_ICONV_DECODE_URI_*') */
-		__uint8_t ue_chr;  /* In `_ICONV_DECODE_URI_PCT_1': alraedy-parsed hex nibble, shifted left by 4 */
+		__uint8_t ue_chr;  /* In `_ICONV_DECODE_URI_PCT_1': already-parsed hex nibble, shifted left by 4 */
 	} idd_uri; /* uri-escape */
 
 	__uint8_t idd_hex; /* For "hex": 0x00-0xf0 when parsing the second nibble; 0x01 when parsing the first. */

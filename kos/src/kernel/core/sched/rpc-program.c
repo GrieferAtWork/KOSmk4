@@ -1102,7 +1102,7 @@ rpc_vm_instr(struct rpc_vm *__restrict self)
 		if unlikely(self->rv_stacksz < 2)
 			goto err_stack_underflow;
 		switch (opcode) {
-#if 0 /* Not needed; alraedy done by the CPU itself! */
+#if 0 /* Not needed; already done by the CPU itself! */
 		case RPC_OP_div:
 		case RPC_OP_mod:
 			if unlikely(TOP == 0)
