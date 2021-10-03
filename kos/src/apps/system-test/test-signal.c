@@ -26,6 +26,7 @@
 #include <hybrid/compiler.h>
 
 #include <kos/types.h>
+#include <sys/signalfd.h>
 #include <system-test/ctest.h>
 
 #include <assert.h>
@@ -33,6 +34,7 @@
 #include <signal.h>
 #include <stddef.h>
 #include <string.h>
+#include <unistd.h>
 
 DECL_BEGIN
 
@@ -47,46 +49,96 @@ DEFINE_TEST(signal_works_correctly) {
 	sigset_t oldset, newset;
 	struct sigaction old_action;
 	struct sigaction new_action;
-	int error;
 	hand_called = 0;
 
 	/* Install the signal handler. */
 	memset(&new_action, 0, sizeof(new_action));
 	new_action.sa_handler = &myhand;
 	new_action.sa_flags   = 0;
-	error = sigaction(SIGUSR1, &new_action, &old_action);
-	assertf(error == 0, "%d:%m", errno);
+	EQd(sigaction(SIGUSR1, &new_action, &old_action), 0);
 
-	assert(hand_called == 0);
+	EQd(hand_called, 0);
 
 	/* Raise the signal. */
-	raise(SIGUSR1);
+	EQd(raise(SIGUSR1), 0);
 
 	/* Make sure that our handler got called. */
-	assert(hand_called == 1);
+	EQd(hand_called, 1);
 
 	/* Also test raising signals while they are masked. */
 	hand_called = 0;
-	sigemptyset(&newset);
-	sigaddset(&newset, SIGUSR1);
-	error = sigprocmask(SIG_BLOCK, &newset, &oldset);
-	assertf(error == 0, "%d:%m", errno);
+	EQd(sigemptyset(&newset), 0);
+	EQd(sigaddset(&newset, SIGUSR1), 0);
+	EQd(sigprocmask(SIG_BLOCK, &newset, &oldset), 0);
 
 	/* Raise the signal again. */
-	assert(hand_called == 0);
-	raise(SIGUSR1);
-	assert(hand_called == 0);
+	EQd(hand_called, 0);
+	EQd(raise(SIGUSR1), 0);
+	EQd(hand_called, 0);
 
 	/* Unmask the signal */
-	error = sigprocmask(SIG_SETMASK, &oldset, NULL);
-	assertf(error == 0, "%d:%m", errno);
+	EQd(sigprocmask(SIG_SETMASK, &oldset, NULL), 0);
 
 	/* Make sure that the handler was called after the signal was unmasked. */
-	assert(hand_called == 1);
+	EQd(hand_called, 1);
+
+	/* Now do some testing with `signalfd(2)' */
+	{
+		fd_t sfd;
+		struct signalfd_siginfo info;
+		hand_called = 0;
+		EQd(sigemptyset(&newset), 0);
+		sfd = signalfd(-1, &newset, SFD_NONBLOCK | SFD_CLOEXEC | SFD_CLOFORK);
+		GEd(sfd, 0);
+		EQd(hand_called, 0);
+
+		/* Mask the signal */
+		EQd(sigprocmask(SIG_SETMASK, NULL, &newset), 0);
+		EQd(sigaddset(&newset, SIGUSR1), 0);
+		EQd(sigprocmask(SIG_SETMASK, &newset, &oldset), 0);
+
+		/* Raise the signal. */
+		EQd(raise(SIGUSR1), 0);
+
+		/* Handler shouldn't have been called. */
+		EQd(hand_called, 0);
+
+		/* Read from the signalfd. */
+		errno = 0;
+		EQss(read(sfd, &info, sizeof(info)), -1); /* No signals are within the signalfd's set */
+		EQd(errno, EWOULDBLOCK);
+		EQd(sigemptyset(&newset), 0);
+		EQd(sigaddset(&newset, SIGUSR1), 0);
+		EQd(signalfd(sfd, &newset, 0), sfd);
+		EQss(read(sfd, &info, sizeof(info)), sizeof(info));
+
+		/* Restore the old signal mask */
+		EQd(sigprocmask(SIG_SETMASK, &oldset, NULL), 0);
+
+		/* Handler shouldn't have been called because signalfd stole the signal. */
+		EQd(hand_called, 0);
+
+		/* Assert that the correct info was read from the signalfd */
+		EQu32(info.ssi_signo, SIGUSR1);
+		EQd32(info.ssi_errno, 0);
+		EQd32(info.ssi_code, SI_TKILL);
+		EQu32(info.ssi_pid, getpid());
+		EQu32(info.ssi_uid, getuid());
+
+		/* Only 1 signal should be readable. */
+		errno = 0;
+		EQss(read(sfd, &info, sizeof(info)), -1);
+		EQd(errno, EWOULDBLOCK);
+
+		/* Close the signal fd */
+		EQd(close(sfd), 0);
+
+		/* Handler shouldn't have been called because signalfd stole the signal. */
+		EQd(hand_called, 0);
+	}
 
 	/* Restore the previous handler. */
-	error = sigaction(SIGUSR1, &old_action, NULL);
-	assertf(error == 0, "%d:%m", errno);
+	EQd(sigaction(SIGUSR1, &old_action, NULL), 0);
 }
 
 
