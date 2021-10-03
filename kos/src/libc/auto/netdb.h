@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4af09742 */
+/* HASH CRC-32:0x97abfd74 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -209,9 +209,9 @@ INTDEF int NOTHROW_RPC(LIBDCALL libd_ruserok_af)(char const *rhost, int suser, c
  * This function is not part of POSIX and therefore no official
  * cancellation point */
 INTDEF int NOTHROW_RPC(LIBDCALL libd_iruserok)(uint32_t raddr, int suser, char const *remuser, char const *locuser);
-/* This is  the equivalent  function where  the pfamiliy  if the  address
- * pointed to by `raddr' is determined by the value of `af'. It therefore
- * can be used for IPv6
+/* This is the equivalent function where the family is the address
+ * pointed  to by `raddr'  is determined by the  value of `af'. It
+ * therefore can be used for IPv6
  * This function is not part of POSIX and therefore no official
  * cancellation point */
 INTDEF int NOTHROW_RPC(LIBDCALL libd_iruserok_af)(void const *raddr, int suser, char const *remuser, char const *locuser, sa_family_t af);

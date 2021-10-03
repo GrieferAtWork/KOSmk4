@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5c675e80 */
+/* HASH CRC-32:0xfd2059c3 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -500,9 +500,9 @@ __CDECLARE_OPT(,int,__NOTHROW_RPC,ruserok_af,(char const *__rhost, int __suser, 
  * This function is not part of POSIX and therefore no official
  * cancellation point */
 __CDECLARE_OPT(,int,__NOTHROW_RPC,iruserok,(uint32_t __raddr, int __suser, char const *__remuser, char const *__locuser),(__raddr,__suser,__remuser,__locuser))
-/* This is  the equivalent  function where  the pfamiliy  if the  address
- * pointed to by `raddr' is determined by the value of `af'. It therefore
- * can be used for IPv6
+/* This is the equivalent function where the family is the address
+ * pointed  to by `raddr'  is determined by the  value of `af'. It
+ * therefore can be used for IPv6
  * This function is not part of POSIX and therefore no official
  * cancellation point */
 __CDECLARE_OPT(,int,__NOTHROW_RPC,iruserok_af,(void const *__raddr, int __suser, char const *__remuser, char const *__locuser, sa_family_t __af),(__raddr,__suser,__remuser,__locuser,__af))

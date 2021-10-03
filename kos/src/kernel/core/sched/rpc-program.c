@@ -560,7 +560,7 @@ struct rpc_vm {
 #define rpc_vm_addrsize(self) SIZEOF_POINTER
 #endif /* !__ARCH_HAVE_COMPAT */
 
-/* Return a pointer to the get/set-register function */
+/* Return a pointer to the get/set-register function or its cookie-argument */
 #ifdef __ARCH_HAVE_COMPAT
 #define rpc_vm_getreg_cb(self)  (self)->rv_unwind_getreg
 #define rpc_vm_getreg_arg(self) (self)->rv_unwind_getreg_arg
@@ -656,9 +656,9 @@ rpc_vm_setreg_impl(void *arg, unwind_regno_t dw_regno, void const *__restrict sr
 
 
 
-
+/* Return the user-space stack pointer register */
 #ifdef ucpustate_getsp
-#define rpc_vm_getsp(self) ((byte_t *)ucpustate_getsp(&(self)->rv_cpu))
+#define rpc_vm_getsp(self) ((USER UNCHECKED byte_t *)ucpustate_getsp(&(self)->rv_cpu))
 #else /* ucpustate_getsp */
 PRIVATE WUNUSED NONNULL((1)) USER UNCHECKED byte_t *FCALL
 rpc_vm_getsp(struct rpc_vm *__restrict self) {
@@ -674,6 +674,7 @@ rpc_vm_getsp(struct rpc_vm *__restrict self) {
 }
 #endif /* !ucpustate_getsp */
 
+/* Set the user-space stack pointer register */
 #ifdef ucpustate_setsp
 #define rpc_vm_setsp(self, value) ucpustate_setsp(&(self)->rv_cpu, value)
 #else /*ucpustate_setsp */
@@ -689,17 +690,32 @@ rpc_vm_setsp(struct rpc_vm *__restrict self, USER UNCHECKED byte_t *value) {
 }
 #endif /* !ucpustate_setsp */
 
+/* Fill the RPC program text buffer and ensure that at least `minbytes' bytes are available */
 PRIVATE NONNULL((1)) void FCALL
 rpc_vm_pc_filbuf(struct rpc_vm *__restrict self, size_t minbytes) THROWS(E_SEGFAULT) {
 	size_t error, ok;
+	assert(minbytes > self->rv_pcbuf_siz);
+	validate_readable(self->rv_pc, 1);
 	if (self->rv_pcbuf_siz != 0) {
-		/* TODO: Reuse existing buffer */
+		size_t have = self->rv_pcbuf_siz;
+		if likely(self->rv_pcbuf_ptr != 0) {
+			/* Reclaim unused buffer space. */
+			memmovedown(&self->rv_pcbuf[0],
+			            &self->rv_pcbuf[self->rv_pcbuf_ptr],
+			            have);
+			self->rv_pcbuf_ptr = 0;
+		}
+		error = mman_read_nopf(self->rv_rpc->pr_user.pur_mman,
+		                       self->rv_pc + have, self->rv_pcbuf + have,
+		                       sizeof(self->rv_pcbuf) - have);
+		ok = (sizeof(self->rv_pcbuf) - error) + have;
+	} else {
+		self->rv_pcbuf_ptr = 0;
+		error = mman_read_nopf(self->rv_rpc->pr_user.pur_mman,
+		                       self->rv_pc, self->rv_pcbuf,
+		                       sizeof(self->rv_pcbuf));
+		ok = (sizeof(self->rv_pcbuf) - error);
 	}
-	self->rv_pcbuf_ptr = 0;
-	error = mman_read_nopf(self->rv_rpc->pr_user.pur_mman,
-	                       self->rv_pc, self->rv_pcbuf,
-	                       sizeof(self->rv_pcbuf));
-	ok = sizeof(self->rv_pcbuf) - error;
 	self->rv_pcbuf_siz = ok;
 	if unlikely(ok < minbytes) {
 		mman_read(self->rv_rpc->pr_user.pur_mman,
@@ -1102,7 +1118,7 @@ rpc_vm_instr(struct rpc_vm *__restrict self)
 		if unlikely(self->rv_stacksz < 2)
 			goto err_stack_underflow;
 		switch (opcode) {
-#if 0 /* Not needed; already done by the CPU itself! */
+#if 0 /* Not needed; already done by the CPU throwing `E_DIVIDE_BY_ZERO' */
 		case RPC_OP_div:
 		case RPC_OP_mod:
 			if unlikely(TOP == 0)
@@ -1303,6 +1319,79 @@ follow_jmp:
 	case RPC_OP_nop:
 		break;
 
+	case RPC_OP_widenz: {
+		uint8_t siz = rpc_vm_pc_rdb(self);
+		uintptr_t value;
+		if unlikely(!CANPOP(1))
+			goto err_stack_underflow;
+		value = TOP;
+		switch (siz) {
+		case 1:
+			value = (uintptr_t)(uint8_t)value;
+			break;
+		case 2:
+			value = (uintptr_t)(uint16_t)value;
+			break;
+
+#if SIZEOF_POINTER >= 8
+		case 4:
+#ifdef __ARCH_HAVE_COMPAT
+			if (rpc_vm_addrsize(self) >= 8) {
+				value = (uintptr_t)(uint32_t)value;
+				break;
+			}
+			ATTR_FALLTHROUGH
+#else /* __ARCH_HAVE_COMPAT */
+			value = (uintptr_t)(uint32_t)value;
+			break;
+#endif /* !__ARCH_HAVE_COMPAT */
+#endif /* SIZEOF_POINTER >= 8 */
+
+		default:
+			THROW(E_INVALID_ARGUMENT_BAD_VALUE,
+			      E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_BAD_WIDTH,
+			      siz);
+		}
+		TOP = value;
+	}	break;
+
+	case RPC_OP_widens: {
+		uint8_t siz = rpc_vm_pc_rdb(self);
+		uintptr_t value;
+		if unlikely(!CANPOP(1))
+			goto err_stack_underflow;
+		value = TOP;
+		switch (siz) {
+		case 1:
+			value = (uintptr_t)(intptr_t)(int8_t)(uint8_t)value;
+			break;
+		case 2:
+			value = (uintptr_t)(intptr_t)(int16_t)(uint16_t)value;
+			break;
+
+#if SIZEOF_POINTER >= 8
+		case 4:
+#ifdef __ARCH_HAVE_COMPAT
+			if (rpc_vm_addrsize(self) >= 8) {
+				value = (uintptr_t)(intptr_t)(int32_t)(uint32_t)value;
+				break;
+			}
+			ATTR_FALLTHROUGH
+#else /* __ARCH_HAVE_COMPAT */
+			value = (uintptr_t)(intptr_t)(int32_t)(uint32_t)value;
+			break;
+#endif /* !__ARCH_HAVE_COMPAT */
+#endif /* SIZEOF_POINTER >= 8 */
+
+		default:
+			THROW(E_INVALID_ARGUMENT_BAD_VALUE,
+			      E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_BAD_WIDTH,
+			      siz);
+		}
+		TOP = value;
+	}	break;
+
+
 
 
 
@@ -1339,7 +1428,14 @@ follow_jmp:
 			goto err_no_syscall_info;
 		if unlikely(!CANPUSH(1))
 			goto err_stack_overflow;
-		PUSH(((uintptr_t *)self->rv_sc_info)[index]);
+#if defined(__ARCH_HAVE_COMPAT) && __ARCH_COMPAT_SIZEOF_POINTER != __SIZEOF_POINTER__
+		if (ucpustate_iscompat(&self->rv_cpu)) {
+			PUSH((uintptr_t)(intptr_t)(compat_longptr_t)(compat_ulongptr_t)((uintptr_t *)self->rv_sc_info)[index]);
+		} else
+#endif /* __ARCH_HAVE_COMPAT && __ARCH_COMPAT_SIZEOF_POINTER != __SIZEOF_POINTER__ */
+		{
+			PUSH(((uintptr_t *)self->rv_sc_info)[index]);
+		}
 	}	break;
 
 	case RPC_OP_sppush_sc_info: {
@@ -1422,7 +1518,7 @@ follow_jmp:
 				      E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_BAD_SIGSET_WORD,
 				      index);
 			}
-			PUSH(((compat_ulongptr_t const *)mymask)[index]);
+			PUSH((uintptr_t)(intptr_t)((compat_longptr_t const *)mymask)[index]);
 		} else
 #endif /* __ARCH_HAVE_COMPAT */
 		{
@@ -1473,7 +1569,7 @@ follow_jmp:
 #define WANT_err_illegal_instruction
 		if unlikely(!CANPUSH(1))
 			goto err_stack_overflow;
-		PUSH(self->rv_cpu.ucs_sgbase.sg_fsbase);
+		PUSH((u64)(s64)(s32)(u32)self->rv_cpu.ucs_sgbase.sg_fsbase);
 		break;
 
 	case RPC_OP_386_pushreg_gsbase:
@@ -1482,7 +1578,7 @@ follow_jmp:
 #define WANT_err_illegal_instruction
 		if unlikely(!CANPUSH(1))
 			goto err_stack_overflow;
-		PUSH(self->rv_cpu.ucs_sgbase.sg_gsbase);
+		PUSH((u64)(s64)(s32)(u32)self->rv_cpu.ucs_sgbase.sg_gsbase);
 		break;
 
 	case RPC_OP_386_popreg_fsbase:

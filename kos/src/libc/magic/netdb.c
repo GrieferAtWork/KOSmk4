@@ -630,9 +630,9 @@ int iruserok(uint32_t raddr, int suser,
              char const *remuser,
              char const *locuser);
 
-@@This is  the equivalent  function where  the pfamiliy  if the  address
-@@pointed to by `raddr' is determined by the value of `af'. It therefore
-@@can be used for IPv6
+@@This is the equivalent function where the family is the address
+@@pointed  to by `raddr'  is determined by the  value of `af'. It
+@@therefore can be used for IPv6
 @@This function is not part of POSIX and therefore no official
 @@cancellation point
 [[cp]]

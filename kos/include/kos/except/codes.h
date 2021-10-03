@@ -106,11 +106,10 @@
 #endif /* !ERRORCLASS_HARDWARE_MAX */
 
 
-/* Check   if  the   given  error   is  low-   (may  get  overwritten
- * by  !LOW ||  HIGH), or  high- (doesn't  get overwritten) priority.
- * This  mechanism  is used  for  dealing with  exceptions  thrown by
- * RPC function callbacks executed  prior to returning to  user-space
- * when checking how an exception should be propagated to user-space. */
+/* Check if the given error is low- (may get overwritten by !LOW || HIGH ||
+ * RTL), or high- (overwritten by RTL) priority. This mechanism is used for
+ * dealing with multiple exceptions thrown at the same time (aka. exception
+ * nesting; s.a. `NESTED_TRY' and `error_priority(3)'). */
 #ifndef ERRORCLASS_ISLOWPRIORITY
 #define ERRORCLASS_ISLOWPRIORITY(x)  ((x) >= ERRORCLASS_STDSIGNAL_MIN && (x) <= ERRORCLASS_USERSIGNAL_MAX)
 #endif /* !ERRORCLASS_ISLOWPRIORITY */
@@ -339,7 +338,7 @@
                                                                               * [fld(handle_mode: iomode_t, "The access permissions of the handle")] */
 #endif /* !E_INVALID_HANDLE_OPERATION */
 #ifndef E_INVALID_HANDLE_NET_OPERATION
-#define E_INVALID_HANDLE_NET_OPERATION            (E_INVALID_HANDLE, 0x0004) /* [errno(EOPNOTSUPP), msg("Network operation not supported by address familiy, socket type, and protocol")]
+#define E_INVALID_HANDLE_NET_OPERATION            (E_INVALID_HANDLE, 0x0004) /* [errno(EOPNOTSUPP), msg("Network operation not supported by address family, socket type, and protocol")]
                                                                               * [fld(operation_id:   syscall_ulong_t, "The attempted network operation (One of `E_NET_OPERATION_*')")]
                                                                               * [fld(address_family: syscall_ulong_t, "The socket's address family (one of `AF_*')")]
                                                                               * [fld(socket_type:    syscall_ulong_t, "The socket's type (one of `SOCK_*')")]
@@ -657,7 +656,7 @@
                                                                        *        ($operation_id == E_FILESYSTEM_OPERATION_CREAT) ? EROFS :
                                                                        *        EPERM)]
                                                                        * [fld(operation_id: uintptr_t, "The unsupported operation (One of `E_FILESYSTEM_OPERATION_*')")]
-                                                                       * The object doesy not support the operation */
+                                                                       * The object does not support the operation */
 #endif /* !E_FSERROR_UNSUPPORTED_OPERATION */
 /*[[[end]]]*/
 /* Notes on errno translation for `E_FSERROR_UNSUPPORTED_OPERATION':
@@ -678,13 +677,13 @@
  *  - E_FILESYSTEM_OPERATION_MKDIR -> EPERM:
  *    - `man 2 mkdir' documents: EPERM <=> The filesystem containing pathname does not support the creation of directories.
  *  - E_FILESYSTEM_OPERATION_SYMLINK -> EPERM:
- *    - `man 2 symlink' documents: EPERM <=> The filesystem containing linkpath does not support the creation of symbolic links.
+ *    - `man 2 symlink' documents: EPERM <=> The filesystem containing `linkpath' does not support the creation of symbolic links.
  *  - E_FILESYSTEM_OPERATION_MKNOD -> EPERM:
  *    - `man 2 symlink' documents: EPERM <=> [...] the filesystem containing pathname does not support the type of node requested.
  *  - E_FILESYSTEM_OPERATION_LINK -> EPERM:
- *    - `man 2 link' documents: EPERM <=> The filesystem containing oldpath and newpath does not support the creation of hard links.
+ *    - `man 2 link' documents: EPERM <=> The filesystem containing `oldpath' and `newpath' does not support the creation of hard links.
  *  - E_FILESYSTEM_OPERATION_RENAME -> EPERM:
- *    - `man 2 rename' documents: EPERM <=> [...] the filesystem containing oldpath does not support renaming of the type requested.
+ *    - `man 2 rename' documents: EPERM <=> [...] the filesystem containing `oldpath' does not support renaming of the type requested.
  *  - E_FILESYSTEM_OPERATION_UNLINK -> EPERM:
  *    - `man 2 unlink' documents: EPERM <=> The system does not allow unlinking of directories. [...] (Linux only) The filesystem does not allow unlinking of files.
  *  - E_FILESYSTEM_OPERATION_RMDIR -> EPERM:
@@ -882,32 +881,33 @@
 /************************************************************************/
 #ifndef E_INTERRUPT
 #define E_INTERRUPT                               (0xf000)              /* [errno(EINTR), msg("Interrupt")]
-                                                                         * The thread has been interrupted by a RPC function,
-                                                                         * causing  a   premature   return   to   user-space.
+                                                                         * The thread has  been interrupted by  a RPC function  or
+                                                                         * posix signal, causing a premature return to user-space.
                                                                          * NOTE: If the  system communication  facility that  was used  for the  interrupt
-                                                                         *       supports restarting (e.g. loadcore() following a  #PF on X86), or if  the
+                                                                         *       supports restarting (e.g. load memory following a #PF on X86), or if  the
                                                                          *       interrupt happened during a restartable system call (e.g. `sys_close()'),
-                                                                         *       and either  wasn't caused  by a  posix_signal, or  that posix_signal  had
-                                                                         *       the  `SA_RESTART' flag  set, this  exception isn't  propagated into user-
-                                                                         *       space, but rather causes the underlying interrupt to be restarted.
+                                                                         *       and SA_RESTART or RPC_SYSRESTART_RESTART  are used, this exception  isn't
+                                                                         *       propagated into user-space, but rather causes the underlying interrupt or
+                                                                         *       system call to be restarted.
                                                                          * KOS Implements 3 distinct system call interrupt-restart behaviors:
-                                                                         *  #1: The  system call is  always restarted (this behavior  is also used when
-                                                                         *      some other type of interrupt handler is interrupted, such as loadcore()
-                                                                         *      during  an ALOA  operation, or when  loading a file  into memory). This
-                                                                         *      mainly includes system calls where  interrupts are undesired, or  would
-                                                                         *      otherwise be unexpected,  most notably ~cleanup~  system calls such  as
-                                                                         *      `sys_close(2)' or `sys_munmap(2)' (or most importantly: `sys_exit(2)').
+                                                                         *  #1: The system call is always restarted (this behavior is also used when  some
+                                                                         *      other type of interrupt handler is interrupted, such as load memory during
+                                                                         *      a  lazy initialization page-fault  operation, or when  loading a file into
+                                                                         *      memory). This mainly includes system calls where interrupts are undesired,
+                                                                         *      or would otherwise be unexpected, most notably ~cleanup~ system calls such
+                                                                         *      as `sys_close(2)' or `sys_munmap(2)' (or most importantly: `sys_exit(2)').
                                                                          *  #2: The system call  is never  restarted (required for  some system  calls
                                                                          *      that are meant to wait for events internally delivered by an interrupt
                                                                          *      mechanism, such as `sigtimedwait()'; the behavior here mirrors what is
                                                                          *      also done by linux, as described on this page:
                                                                          *      `http://man7.org/linux/man-pages/man7/signal.7.html')
-                                                                         *  #3: Restart the system call if the interrupt wasn't caused by a posix_signal,
-                                                                         *      or if it  was caused by  a posix_signal with  the `SA_RESTART' flag  set. */
+                                                                         *  #3: The default behavior applicable to all remaining system call, that is to
+                                                                         *      restart the system call  based on SA_RESTART or  RPC_SYSRESTART_RESTART. */
 #endif /* !E_INTERRUPT */
 #ifndef E_INTERRUPT_USER_RPC
-#define E_INTERRUPT_USER_RPC                      (E_INTERRUPT, 0x0001) /* [msg("Interrupt from user RPC")] Unwind  in  order  to
-                                                                         * execute an RPC callback before returning to user-space */
+#define E_INTERRUPT_USER_RPC                      (E_INTERRUPT, 0x0001) /* [msg("Interrupt from user RPC")] Unwind in order to execute
+                                                                         * an RPC callback before  returning to user-space. Thrown  by
+                                                                         * `task_serve()' and caught in `userexcpt_handler()' */
 #endif /* !E_INTERRUPT_USER_RPC */
 
 
@@ -940,7 +940,7 @@
  *
  * Used in: `/kos/src/kernel/core/misc/except-handler-userexcept.c.inl' */
 #define _E_STOP_PROCESS (0xfe7f) /* [fld(procstat: uintptr_t, "Process status")] Marker for: `SIG_STOP' */
-#define _E_CORE_PROCESS (0xfe82) /* [fld(procstat: uintptr_t, si_errno: int, si_code: int)] Marker for: `SIG_CORE' */
+#define _E_CORE_PROCESS (0xfe82) /* [fld(procstat: uintptr_t)][fld(si_errno: int)][fld(si_code: int)] Marker for: `SIG_CORE' */
 
 /*[[[begin]]]*/
 #ifndef E_EXIT_THREAD

@@ -967,10 +967,10 @@ NOTHROW_RPC(LIBCCALL libc_iruserok)(uint32_t raddr,
 }
 /*[[[end:libc_iruserok]]]*/
 
-/*[[[head:libc_iruserok_af,hash:CRC-32=0x467e80cc]]]*/
-/* This is  the equivalent  function where  the pfamiliy  if the  address
- * pointed to by `raddr' is determined by the value of `af'. It therefore
- * can be used for IPv6
+/*[[[head:libc_iruserok_af,hash:CRC-32=0x51e62658]]]*/
+/* This is the equivalent function where the family is the address
+ * pointed  to by `raddr'  is determined by the  value of `af'. It
+ * therefore can be used for IPv6
  * This function is not part of POSIX and therefore no official
  * cancellation point */
 INTERN ATTR_SECTION(".text.crt.net.db") int

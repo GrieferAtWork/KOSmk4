@@ -234,6 +234,7 @@ enum {
 	E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_PARAM_INDEX_OOB,        /* E_INVALID_ARGUMENT_BAD_VALUE: The operand of `RPC_OP_push_param' is greater than the `max_param_count' passed to `rpc_schedule(2)'. */
 	E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_BAD_SIGSET_WORD,        /* E_INVALID_ARGUMENT_BAD_VALUE: The index-operand of `RPC_OP_push_sigmask' is too large. */
 	E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_UNSUP_SIGSET_SIZE,      /* E_INVALID_ARGUMENT_BAD_VALUE: The signal mask size specified by `RPC_OP_sppush_sigmask' isn't supported. */
+	E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_BAD_WIDTH,              /* E_INVALID_ARGUMENT_BAD_VALUE: The operand of `RPC_OP_widenz' or `RPC_OP_widens' isn't supported. */
 };
 #endif /* __CC__ */
 /*[[[AUTO]]]*/
@@ -443,6 +444,7 @@ enum {
 #define E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_PARAM_INDEX_OOB        E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_PARAM_INDEX_OOB        /* E_INVALID_ARGUMENT_BAD_VALUE: The operand of `RPC_OP_push_param' is greater than the `max_param_count' passed to `rpc_schedule(2)'. */
 #define E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_BAD_SIGSET_WORD        E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_BAD_SIGSET_WORD        /* E_INVALID_ARGUMENT_BAD_VALUE: The index-operand of `RPC_OP_push_sigmask' is too large. */
 #define E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_UNSUP_SIGSET_SIZE      E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_UNSUP_SIGSET_SIZE      /* E_INVALID_ARGUMENT_BAD_VALUE: The signal mask size specified by `RPC_OP_sppush_sigmask' isn't supported. */
+#define E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_BAD_WIDTH              E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_BAD_WIDTH              /* E_INVALID_ARGUMENT_BAD_VALUE: The operand of `RPC_OP_widenz' or `RPC_OP_widens' isn't supported. */
 #else /* __COMPILER_PREFERR_ENUMS */
 #define E_INVALID_ARGUMENT_CONTEXT_GENERIC                            0   /* Generic context */
 #define E_INVALID_ARGUMENT_CONTEXT_SETFD_FD_FLAG                      1   /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Unknown `FD_*' flag passed to `F_SETFD' */
@@ -649,6 +651,7 @@ enum {
 #define E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_PARAM_INDEX_OOB        184 /* E_INVALID_ARGUMENT_BAD_VALUE: The operand of `RPC_OP_push_param' is greater than the `max_param_count' passed to `rpc_schedule(2)'. */
 #define E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_BAD_SIGSET_WORD        185 /* E_INVALID_ARGUMENT_BAD_VALUE: The index-operand of `RPC_OP_push_sigmask' is too large. */
 #define E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_UNSUP_SIGSET_SIZE      186 /* E_INVALID_ARGUMENT_BAD_VALUE: The signal mask size specified by `RPC_OP_sppush_sigmask' isn't supported. */
+#define E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_BAD_WIDTH              187 /* E_INVALID_ARGUMENT_BAD_VALUE: The operand of `RPC_OP_widenz' or `RPC_OP_widens' isn't supported. */
 #endif /* !__COMPILER_PREFERR_ENUMS */
 /*[[[end]]]*/
 

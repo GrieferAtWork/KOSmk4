@@ -264,6 +264,13 @@
 #define RPC_OP_push_sigmask   0xa9 /* [+1] index = *pc++; sigset_t s; sigprocmask(SIG_SETMASK, NULL, &s); PUSH(s.__val[index]); */
 #define RPC_OP_sppush_sigmask 0xaa /* [+2] sigsetsz = *(*(u16 **)&pc)++; sigset_t s; sigprocmask(SIG_SETMASK, NULL, &s); PUSH_ONTO_USER_STACK(&s, sigsetsz); */
 #define RPC_OP_push_signal    0xab /* [+0] PUSH(_RPC_GETSIGNO(RPC_MODE)); */
+/*      RPC_OP_               0xac  * ... */
+/*      RPC_OP_               0xad  * ... */
+/*      RPC_OP_               0xae  * ... */
+/*      RPC_OP_               0xaf  * ... */
+#define RPC_OP_widenz         0xb0 /* [+1] Zero-extend a [OPERAND]-sized integer to full width */
+#define RPC_OP_widens         0xb1 /* [+1] Sign-extend a [OPERAND]-sized integer to full width */
+/*      RPC_OP_               0xb2  * ... */
 /*      RPC_OP_               ...   * ... */
 /*      RPC_OP_               0xdf  * ... */
 #define RPC_OP_lo_arch        0xe0 /* First arch-specific opcode */

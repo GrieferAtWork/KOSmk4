@@ -650,7 +650,7 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 
 	/* TODO: Don't #define __builtin_unreachable() in <__crt.h> to __crt_unreachable()
 	 *       Instead  look into `-fsanitize=unreachable' (which does something similar
-	 *       on  a compiler-basis  and don't make  the library call  mandatory for all
+	 *       on  a compiler-basis  and won't make  the library call  mandatory for all
 	 *       code compiled with debug enabled) */
 
 	/* TODO: Look into enabling `-fsanitize=signed-integer-overflow' for all code... */
@@ -750,12 +750,18 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 
 	/* TODO: The raiseat(2) system call should be removed. Instead, it can be emulated
 	 *       by  chaining `sigreturn(2)' with  `rt_tgsigqueueinfo(2)', where the later
-	 *       is made to point at a specific thread. */
+	 *       is made to point at the calling thread. */
 
 	/* TODO: All places  that clear  the current  exception by  means of  setting
 	 *       this_exception_code to E_OK should also include a call to DBG_memset
 	 *       for filling the remainder  of exception_info (except for  ei_nesting
 	 *       and ei_flags) with 0xcc bytes. */
+
+	/* TODO: Create an assembler similar to /kos/misc/libgen/cfi/comp.dee for RPC
+	 *       programs. As a matter of fact, the CFI compiler can pretty much just
+	 *       be copied verbatim, and the RPC compiler can then be modified to get
+	 *       rid of the operand-range checks while being given support for all of
+	 *       the instructions not found in CFI. */
 
 	return state;
 }
