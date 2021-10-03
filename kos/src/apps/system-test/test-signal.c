@@ -29,7 +29,6 @@
 #include <sys/signalfd.h>
 #include <system-test/ctest.h>
 
-#include <assert.h>
 #include <errno.h>
 #include <signal.h>
 #include <stddef.h>
@@ -41,7 +40,7 @@ DECL_BEGIN
 PRIVATE sig_atomic_t hand_called = 0;
 
 PRIVATE void myhand(signo_t signo) {
-	assert(signo == SIGUSR1);
+	EQd(signo, SIGUSR1);
 	++hand_called;
 }
 

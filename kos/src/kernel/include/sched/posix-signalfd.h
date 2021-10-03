@@ -17,8 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_INCLUDE_SCHED_SIGNALFD_H
-#define GUARD_KERNEL_INCLUDE_SCHED_SIGNALFD_H 1
+#ifndef GUARD_KERNEL_INCLUDE_SCHED_POSIX_SIGNALFD_H
+#define GUARD_KERNEL_INCLUDE_SCHED_POSIX_SIGNALFD_H 1
 
 #include <kernel/compiler.h>
 
@@ -44,9 +44,8 @@
  *         >> task_connect_for_poll(THREAD->SIGQUEUE->AVAIL);
  */
 
-DECL_BEGIN
-
 #ifdef __CC__
+DECL_BEGIN
 
 #ifndef __sigset_t_defined
 #define __sigset_t_defined
@@ -67,8 +66,7 @@ struct signalfd {
 #define signalfd_free(self) __os_free(self)
 DEFINE_REFCOUNT_FUNCTIONS(struct signalfd, sf_refcnt, signalfd_free)
 
+DECL_END
 #endif /* __CC__ */
 
-DECL_END
-
-#endif /* !GUARD_KERNEL_INCLUDE_SCHED_SIGNALFD_H */
+#endif /* !GUARD_KERNEL_INCLUDE_SCHED_POSIX_SIGNALFD_H */

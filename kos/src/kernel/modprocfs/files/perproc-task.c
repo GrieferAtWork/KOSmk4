@@ -33,7 +33,6 @@
 #include <sched/enum.h>
 #include <sched/eventfd.h>
 #include <sched/pid.h>
-#include <sched/signalfd.h>
 
 #include <hybrid/atomic.h>
 

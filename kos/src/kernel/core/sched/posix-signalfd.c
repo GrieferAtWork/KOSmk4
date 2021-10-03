@@ -17,8 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_SRC_SCHED_SIGNALFD_C
-#define GUARD_KERNEL_SRC_SCHED_SIGNALFD_C 1
+#ifndef GUARD_KERNEL_SRC_SCHED_POSIX_SIGNALFD_C
+#define GUARD_KERNEL_SRC_SCHED_POSIX_SIGNALFD_C 1
 
 #include <kernel/compiler.h>
 
@@ -32,9 +32,9 @@
 #include <kernel/user.h>
 #include <sched/pid.h>
 #include <sched/posix-signal.h>
+#include <sched/posix-signalfd.h>
 #include <sched/rpc-internal.h>
 #include <sched/rpc.h>
-#include <sched/signalfd.h>
 
 #include <hybrid/atomic.h>
 
@@ -501,10 +501,6 @@ DEFINE_SYSCALL3(fd_t, signalfd, fd_t, fd,
 }
 #endif /* __ARCH_WANT_SYSCALL_SIGNALFD */
 
-
-
-
-
 DECL_END
 
-#endif /* !GUARD_KERNEL_SRC_SCHED_SIGNALFD_C */
+#endif /* !GUARD_KERNEL_SRC_SCHED_POSIX_SIGNALFD_C */
