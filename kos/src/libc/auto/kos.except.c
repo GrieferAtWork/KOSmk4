@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x83c32825 */
+/* HASH CRC-32:0x9d4deadf */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -331,15 +331,18 @@ for (local name: classes.keys.sorted()) {
 			result = ENOTDIR;
 			break;
 #endif /* ENOTDIR */
-#if defined(ESPIPE) && defined(EINVAL) && defined(EPERM)
+#if defined(ESPIPE) && defined(EINVAL) && defined(ENOTDIR) && defined(ENODEV) && defined(EROFS) && defined(EPERM)
 		case ERROR_SUBCLASS(ERROR_CODEOF(E_FSERROR_UNSUPPORTED_OPERATION)):
 			result = (self->e_args.e_fserror.f_unsupported_operation.uo_operation_id == E_FILESYSTEM_OPERATION_SEEK || self->e_args.e_fserror.f_unsupported_operation.uo_operation_id == E_FILESYSTEM_OPERATION_PREAD ||
 			         self->e_args.e_fserror.f_unsupported_operation.uo_operation_id == E_FILESYSTEM_OPERATION_PWRITE) ? ESPIPE :
 			        (self->e_args.e_fserror.f_unsupported_operation.uo_operation_id == E_FILESYSTEM_OPERATION_READ || self->e_args.e_fserror.f_unsupported_operation.uo_operation_id == E_FILESYSTEM_OPERATION_WRITE ||
-			         self->e_args.e_fserror.f_unsupported_operation.uo_operation_id == E_FILESYSTEM_OPERATION_TRUNC || self->e_args.e_fserror.f_unsupported_operation.uo_operation_id == E_FILESYSTEM_OPERATION_READDIR)
-			         ? EINVAL : EPERM;
+			         self->e_args.e_fserror.f_unsupported_operation.uo_operation_id == E_FILESYSTEM_OPERATION_SYNC) ? EINVAL :
+			        (self->e_args.e_fserror.f_unsupported_operation.uo_operation_id == E_FILESYSTEM_OPERATION_READDIR) ? ENOTDIR :
+			        (self->e_args.e_fserror.f_unsupported_operation.uo_operation_id == E_FILESYSTEM_OPERATION_MMAP || self->e_args.e_fserror.f_unsupported_operation.uo_operation_id == E_FILESYSTEM_OPERATION_ALLOCATE) ? ENODEV :
+			        (self->e_args.e_fserror.f_unsupported_operation.uo_operation_id == E_FILESYSTEM_OPERATION_CREAT) ? EROFS :
+			        EPERM;
 			break;
-#endif /* ESPIPE && EINVAL && EPERM */
+#endif /* ESPIPE && EINVAL && ENOTDIR && ENODEV && EROFS && EPERM */
 		default: break;
 		}
 		break;

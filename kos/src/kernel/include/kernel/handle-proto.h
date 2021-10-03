@@ -168,12 +168,12 @@ DECL_BEGIN
 		 { ("T *__restrict", "self"),                                                                         \
 		   ("poll_mode_t", "what") },                                                                         \
 		 "THROWS(...)",                                                                                       \
-		 "THROW(E_FSERROR_UNSUPPORTED_OPERATION, E_FILESYSTEM_OPERATION_POLL);"),                             \
+		 ""),                                                                                                 \
 		("polltest", "WUNUSED NONNULL((1))", "poll_mode_t", "", "KCALL",                                      \
 		 { ("T *__restrict", "self"),                                                                         \
 		   ("poll_mode_t", "what") },                                                                         \
 		 "THROWS(...)",                                                                                       \
-		 "THROW(E_FSERROR_UNSUPPORTED_OPERATION, E_FILESYSTEM_OPERATION_POLL);"),                             \
+		 "return 0;"),                                                                                        \
 		("hop", "NONNULL((1))", "syscall_slong_t", "", "KCALL",                                               \
 		 { ("T *__restrict", "self"),                                                                         \
 		   ("syscall_ulong_t", "cmd"),                                                                        \

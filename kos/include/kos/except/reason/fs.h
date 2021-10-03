@@ -123,7 +123,6 @@ enum {
 	E_FILESYSTEM_OPERATION_SYNC,     /* The object does not support the fsync() operator */
 	E_FILESYSTEM_OPERATION_DATASYNC, /* The object does not support the fdatasync() operator */
 	E_FILESYSTEM_OPERATION_STAT,     /* The object does not support the fstat() operator */
-	E_FILESYSTEM_OPERATION_POLL,     /* The object does not support the poll() operator */
 	E_FILESYSTEM_OPERATION_ALLOCATE  /* The object does not support the fallocate() operator */
 };
 #endif /* __CC__ */
@@ -151,7 +150,6 @@ enum {
 #define E_FILESYSTEM_OPERATION_SYNC     E_FILESYSTEM_OPERATION_SYNC     /* The object does not support the fsync() operator */
 #define E_FILESYSTEM_OPERATION_DATASYNC E_FILESYSTEM_OPERATION_DATASYNC /* The object does not support the fdatasync() operator */
 #define E_FILESYSTEM_OPERATION_STAT     E_FILESYSTEM_OPERATION_STAT     /* The object does not support the fstat() operator */
-#define E_FILESYSTEM_OPERATION_POLL     E_FILESYSTEM_OPERATION_POLL     /* The object does not support the poll() operator */
 #define E_FILESYSTEM_OPERATION_ALLOCATE E_FILESYSTEM_OPERATION_ALLOCATE /* The object does not support the fallocate() operator */
 #else /* __COMPILER_PREFERR_ENUMS */
 #define E_FILESYSTEM_OPERATION_GENERIC  0  /* Generic file-system operation */
@@ -176,8 +174,7 @@ enum {
 #define E_FILESYSTEM_OPERATION_SYNC     19 /* The object does not support the fsync() operator */
 #define E_FILESYSTEM_OPERATION_DATASYNC 20 /* The object does not support the fdatasync() operator */
 #define E_FILESYSTEM_OPERATION_STAT     21 /* The object does not support the fstat() operator */
-#define E_FILESYSTEM_OPERATION_POLL     22 /* The object does not support the poll() operator */
-#define E_FILESYSTEM_OPERATION_ALLOCATE 23 /* The object does not support the fallocate() operator */
+#define E_FILESYSTEM_OPERATION_ALLOCATE 22 /* The object does not support the fallocate() operator */
 #endif /* !__COMPILER_PREFERR_ENUMS */
 /*[[[end]]]*/
 

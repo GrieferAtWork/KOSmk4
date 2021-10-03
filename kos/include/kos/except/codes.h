@@ -649,11 +649,61 @@
                                                                        * [errno(($operation_id == E_FILESYSTEM_OPERATION_SEEK || $operation_id == E_FILESYSTEM_OPERATION_PREAD ||
                                                                        *         $operation_id == E_FILESYSTEM_OPERATION_PWRITE) ? ESPIPE :
                                                                        *        ($operation_id == E_FILESYSTEM_OPERATION_READ || $operation_id == E_FILESYSTEM_OPERATION_WRITE ||
-                                                                       *         $operation_id == E_FILESYSTEM_OPERATION_TRUNC || $operation_id == E_FILESYSTEM_OPERATION_READDIR)
-                                                                       *         ? EINVAL : EPERM)]
+                                                                       *         $operation_id == E_FILESYSTEM_OPERATION_SYNC) ? EINVAL :
+                                                                       *        ($operation_id == E_FILESYSTEM_OPERATION_READDIR) ? ENOTDIR :
+                                                                       *        ($operation_id == E_FILESYSTEM_OPERATION_MMAP || $operation_id == E_FILESYSTEM_OPERATION_ALLOCATE) ? ENODEV :
+                                                                       *        ($operation_id == E_FILESYSTEM_OPERATION_CREAT) ? EROFS :
+                                                                       *        EPERM)]
                                                                        * [fld(operation_id: uintptr_t, "The unsupported operation (One of `E_FILESYSTEM_OPERATION_*')")]
-                                                                       * The object does not support the operation */
+                                                                       * The object doesy not support the operation */
 #endif /* !E_FSERROR_UNSUPPORTED_OPERATION */
+/*[[[end]]]*/
+/* Notes on errno translation for `E_FSERROR_UNSUPPORTED_OPERATION':
+ *  - E_FILESYSTEM_OPERATION_SEEK, E_FILESYSTEM_OPERATION_PREAD, E_FILESYSTEM_OPERATION_PWRITE -> ESPIPE:
+ *    - `man 2 lseek' documents: ESPIPE <=> fd is associated with a pipe, socket, or FIFO.
+ *    - `man 2 pread' documents: ESPIPE <=> The file is incapable of seeking. (same for `pwrite(2)')
+ *  - E_FILESYSTEM_OPERATION_READ, E_FILESYSTEM_OPERATION_WRITE -> EINVAL:
+ *    - `man 2 read' documents: EINVAL <=> fd is attached to an object which is unsuitable for reading. (same for `write(2)')
+ *                              FIXME (also documented): EISDIR <=> fd refers to a directory
+ *  - E_FILESYSTEM_OPERATION_TRUNC -> EPERM:
+ *    - `man 2 ftruncate' documents: EPERM <=> The underlying filesystem does not support extending a file beyond its current size.
+ *  - E_FILESYSTEM_OPERATION_READDIR -> ENOTDIR:
+ *    - `man 2 readdir' documents: ENOTDIR <=> File descriptor does not refer to a directory.
+ *  - E_FILESYSTEM_OPERATION_CREAT -> EROFS:
+ *    - `man 2 open' documents: EINVAL     <=> The filesystem does not support the O_DIRECT flag
+ *                              EOPNOTSUPP <=> The filesystem containing pathname does not support O_TMPFILE.
+ *                              EROFS      <=> pathname refers to a file on a read-only filesystem and write access was requested.
+ *  - E_FILESYSTEM_OPERATION_MKDIR -> EPERM:
+ *    - `man 2 mkdir' documents: EPERM <=> The filesystem containing pathname does not support the creation of directories.
+ *  - E_FILESYSTEM_OPERATION_SYMLINK -> EPERM:
+ *    - `man 2 symlink' documents: EPERM <=> The filesystem containing linkpath does not support the creation of symbolic links.
+ *  - E_FILESYSTEM_OPERATION_MKNOD -> EPERM:
+ *    - `man 2 symlink' documents: EPERM <=> [...] the filesystem containing pathname does not support the type of node requested.
+ *  - E_FILESYSTEM_OPERATION_LINK -> EPERM:
+ *    - `man 2 link' documents: EPERM <=> The filesystem containing oldpath and newpath does not support the creation of hard links.
+ *  - E_FILESYSTEM_OPERATION_RENAME -> EPERM:
+ *    - `man 2 rename' documents: EPERM <=> [...] the filesystem containing oldpath does not support renaming of the type requested.
+ *  - E_FILESYSTEM_OPERATION_UNLINK -> EPERM:
+ *    - `man 2 unlink' documents: EPERM <=> The system does not allow unlinking of directories. [...] (Linux only) The filesystem does not allow unlinking of files.
+ *  - E_FILESYSTEM_OPERATION_RMDIR -> EPERM:
+ *    - `man 2 rmdir' documents: EPERM <=> The filesystem containing pathname does not support the removal of directories.
+ *  - E_FILESYSTEM_OPERATION_ATTRIB/E_FILESYSTEM_OPERATION_WRATTR -> EPERM:
+ *    - `man 2 chmod' documents: EPERM <=> The file is marked immutable [...]
+ *    - `man 2 chown' documents: EPERM <=> The file is marked immutable [...]
+ *  - E_FILESYSTEM_OPERATION_MMAP -> ENODEV:
+ *    - `man 2 mmap' documents: ENODEV <=> The underlying filesystem of the specified file does not support memory mapping.
+ *  - E_FILESYSTEM_OPERATION_SYNC, E_FILESYSTEM_OPERATION_DATASYNC -> EINVAL:
+ *    - `man 2 fsync' documents: EINVAL <=> fd is bound to a special file [...] which does not support synchronization. (same for `fdatasync(2)')
+ *  - E_FILESYSTEM_OPERATION_STAT -> EPERM:
+ *    - Non-conforming; on linux, anything can be stat'd
+ *  - E_FILESYSTEM_OPERATION_ALLOCATE -> ENODEV:
+ *    - `man 2 fallocate' documents: ENODEV <=> fd does not refer to a regular file or a directory
+ *                                   FIXME (also documented): ESPIPE <=> fd refers to a pipe or FIFO.
+ *                                   FIXME (also documented): EOPNOTSUPP <=> The filesystem containing the file referred to by fd does
+ *                                                                           not support this operation; or the mode is not supported
+ *                                                                           by the filesystem containing the file referred to by fd.
+ */
+/*[[[begin]]]*/
 
 
 

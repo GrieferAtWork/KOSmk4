@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x10f0cea2 */
+/* HASH CRC-32:0x1bdc3689 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -323,15 +323,18 @@ for (local name: classes.keys.sorted()) {
 			__result = __ENOTDIR;
 			break;
 #endif /* __ENOTDIR */
-#if defined(__ESPIPE) && defined(__EINVAL) && defined(__EPERM)
+#if defined(__ESPIPE) && defined(__EINVAL) && defined(__ENOTDIR) && defined(__ENODEV) && defined(__EROFS) && defined(__EPERM)
 		case ERROR_SUBCLASS(ERROR_CODEOF(E_FSERROR_UNSUPPORTED_OPERATION)):
 			__result = (__self->e_args.e_fserror.f_unsupported_operation.uo_operation_id == E_FILESYSTEM_OPERATION_SEEK || __self->e_args.e_fserror.f_unsupported_operation.uo_operation_id == E_FILESYSTEM_OPERATION_PREAD ||
 			         __self->e_args.e_fserror.f_unsupported_operation.uo_operation_id == E_FILESYSTEM_OPERATION_PWRITE) ? __ESPIPE :
 			        (__self->e_args.e_fserror.f_unsupported_operation.uo_operation_id == E_FILESYSTEM_OPERATION_READ || __self->e_args.e_fserror.f_unsupported_operation.uo_operation_id == E_FILESYSTEM_OPERATION_WRITE ||
-			         __self->e_args.e_fserror.f_unsupported_operation.uo_operation_id == E_FILESYSTEM_OPERATION_TRUNC || __self->e_args.e_fserror.f_unsupported_operation.uo_operation_id == E_FILESYSTEM_OPERATION_READDIR)
-			         ? __EINVAL : __EPERM;
+			         __self->e_args.e_fserror.f_unsupported_operation.uo_operation_id == E_FILESYSTEM_OPERATION_SYNC) ? __EINVAL :
+			        (__self->e_args.e_fserror.f_unsupported_operation.uo_operation_id == E_FILESYSTEM_OPERATION_READDIR) ? __ENOTDIR :
+			        (__self->e_args.e_fserror.f_unsupported_operation.uo_operation_id == E_FILESYSTEM_OPERATION_MMAP || __self->e_args.e_fserror.f_unsupported_operation.uo_operation_id == E_FILESYSTEM_OPERATION_ALLOCATE) ? __ENODEV :
+			        (__self->e_args.e_fserror.f_unsupported_operation.uo_operation_id == E_FILESYSTEM_OPERATION_CREAT) ? __EROFS :
+			        __EPERM;
 			break;
-#endif /* __ESPIPE && __EINVAL && __EPERM */
+#endif /* __ESPIPE && __EINVAL && __ENOTDIR && __ENODEV && __EROFS && __EPERM */
 		default: break;
 		}
 		break;

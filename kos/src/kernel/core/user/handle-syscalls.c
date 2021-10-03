@@ -1655,18 +1655,7 @@ PRIVATE poll_mode_t KCALL do_poll_handle(struct handle &hnd,
 		if unlikely(!IO_CANWRITE(hnd.h_mode))
 			return POLLERR;
 	}
-	TRY {
-		result = handle_poll(hnd, what) & what;
-	} EXCEPT {
-		if (was_thrown(E_FSERROR_UNSUPPORTED_OPERATION) &&
-		    PERTASK_GET(this_exception_args.e_invalid_argument.ia_context) == E_FILESYSTEM_OPERATION_POLL)
-			result = POLLHUP; /* Poll is unsupported. */
-		else {
-			/* XXX: Are there other exceptions that should yield POLLERR? */
-			RETHROW();
-		}
-	}
-	return result;
+	return handle_poll(hnd, what) & what;
 }
 #endif /* WANT_SYS_POLL || WANT_SYS_SELECT */
 
