@@ -47,7 +47,7 @@ struct sc_argument {
 struct sc_desc {
 	char const        *sc_name;    /* [0..1] Name of the system call (or `NULL' if unknown) */
 	__size_t           sc_argc;    /* [<= 6] # of arguments taken by the system call. */
-	struct sc_argument sc_argv[6]; /* [sci_argc] Info about individual syscall arguments. */
+	struct sc_argument sc_argv[6]; /* [sc_argc] Info about individual syscall arguments. */
 };
 
 struct rpc_syscall_info;

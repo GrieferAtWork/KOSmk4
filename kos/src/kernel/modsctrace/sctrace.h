@@ -22,6 +22,7 @@
 #define LIBSCTRACE_WANT_PROTOTYPES
 
 #include <kernel/compiler.h>
+
 #include <libsctrace/api.h>
 
 #ifdef _LIBSCTRACE_SCTRACE_H

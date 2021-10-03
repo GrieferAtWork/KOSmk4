@@ -200,12 +200,12 @@ DECL_BEGIN
  *    char         sc_argInul     = '\0';        // NUL-byte
  *
  * This database is initialized from system call meta-data:
- *     sc_argc     = __NRAC_<name>
- *     sc_regdw    = __NRDW<arg{0-5}>_<name>
- *     sc_name     = <name>
- *     sc_argItype = __NRATR<argI>_<name>
- *     sc_argIlink = __NRATL<argI>_<name>
- *     sc_argIname = __NRAN<argI>_<name>
+ *    sc_argc     = __NRAC_<name>
+ *    sc_regdw    = __NRDW<arg{0-5}>_<name>
+ *    sc_name     = <name>
+ *    sc_argItype = __NRATR<argI>_<name>
+ *    sc_argIlink = __NRATL<argI>_<name>
+ *    sc_argIname = __NRAN<argI>_<name>
  */
 
 #define SYSCALL_DB_DECL_ARG(prefix, name, i)     \
