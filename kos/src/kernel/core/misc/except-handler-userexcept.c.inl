@@ -53,7 +53,7 @@ DECL_BEGIN
  * WARNING: When this function returns, it will have cleared the current
  *          exception, as it is also capable of handling (some)  errors,
  *          most notably `E_INTERRUPT_USER_RPC'! */
-PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1)) struct icpustate *
+PUBLIC ABNORMAL_RETURN ATTR_RETNONNULL WUNUSED NONNULL((1)) struct icpustate *
 NOTHROW(FCALL userexcept_handler)(struct icpustate *__restrict state,
                                   struct rpc_syscall_info const *sc_info)
 #undef LOCAL_IS_SYSRET
@@ -61,7 +61,7 @@ NOTHROW(FCALL userexcept_handler)(struct icpustate *__restrict state,
 #elif defined(DEFINE_userexcept_handler_with_sigmask)
 /* Same as `userexcept_handler()', but use the given `sigmask'
  * instead   of   the  calling   thread's   thread-local  one. */
-PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1, 3)) struct icpustate *
+PUBLIC ABNORMAL_RETURN ATTR_RETNONNULL WUNUSED NONNULL((1, 3)) struct icpustate *
 NOTHROW(FCALL userexcept_handler_with_sigmask)(struct icpustate *__restrict state,
                                                struct rpc_syscall_info const *sc_info,
                                                sigset_t const *__restrict sigmask)
@@ -511,12 +511,9 @@ check_next_proc_rpc:
 					(*func)(&ctx, cookie);
 				} EXCEPT {
 					struct exception_info *tls = error_info();
-					if (tls->ei_code != ERROR_CODEOF(E_INTERRUPT_USER_RPC)) {
-						pending.slh_first = SLIST_ATOMIC_CLEAR(&PERTASK(this_rpcs));
-						goto handle_pending;
-					}
 					/* Prioritize errors. */
-					if (error_priority(error.ei_code) < error_priority(tls->ei_code))
+					if (error_priority(error.ei_code) < error_priority(tls->ei_code) &&
+					    tls->ei_code != ERROR_CODEOF(E_INTERRUPT_USER_RPC))
 						memcpy(&error, tls, sizeof(error));
 				}
 				restore_plast = SLIST_PFIRST(&restore);

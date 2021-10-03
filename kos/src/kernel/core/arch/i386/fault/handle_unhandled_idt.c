@@ -216,7 +216,7 @@ panic_uhi_dbg_main(void *arg) {
 #endif /* CONFIG_HAVE_DEBUGGER */
 
 
-INTERN struct icpustate *FCALL
+INTERN ABNORMAL_RETURN WUNUSED NONNULL((1)) struct icpustate *FCALL
 x86_handle_unhandled_idt(struct icpustate *__restrict state,
                          uintptr_t ecode, uintptr_t intno) {
 	struct ucpustate ustate;
@@ -254,8 +254,7 @@ x86_handle_unhandled_idt(struct icpustate *__restrict state,
 			X86_PIC_EOI(intno);
 		args.ecode = ecode;
 		args.intno = intno;
-		state = dbg_enter_r(&panic_uhi_dbg_main,
-		                    &args, state);
+		dbg_enter(&panic_uhi_dbg_main, &args, state);
 	}
 #else /* CONFIG_HAVE_DEBUGGER */
 	PREEMPTION_HALT();

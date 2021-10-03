@@ -1504,8 +1504,9 @@ err_unbound:
 	return result;
 }
 
-PRIVATE ATTR_NORETURN void FCALL
-throw_unbound_handle(unsigned int fd, struct handle_manager *__restrict self) {
+PRIVATE ATTR_NORETURN NONNULL((2)) void FCALL
+throw_unbound_handle(unsigned int fd, struct handle_manager *__restrict self)
+		THROWS(E_INVALID_HANDLE_FILE) {
 	unsigned int fd_max, fd_limit;
 	sync_read(&self->hm_lock);
 	fd_limit = self->hm_maxlimit;

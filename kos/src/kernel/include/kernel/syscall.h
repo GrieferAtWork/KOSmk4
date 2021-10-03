@@ -31,9 +31,9 @@
 #include <kos/syscalls.h>        /* System call prototypes */
 
 #ifdef CONFIG_BUILDING_KERNEL_CORE
-#if !defined(__NRFEAT_DEFINED_SYSCALL_ARGUMENT_COUNT) || \
-    !defined(__NRFEAT_DEFINED_SYSCALL_ARGUMENT_TYPES) || \
-    !defined(__NRFEAT_DEFINED_SYSCALL_RETURN_TYPES)
+#if (!defined(__NRFEAT_DEFINED_SYSCALL_ARGUMENT_COUNT) || \
+     !defined(__NRFEAT_DEFINED_SYSCALL_ARGUMENT_TYPES) || \
+     !defined(__NRFEAT_DEFINED_SYSCALL_RETURN_TYPES))
 #undef __WANT_SYSCALL_ARGUMENT_COUNT
 #undef __WANT_SYSCALL_ARGUMENT_TYPES
 #undef __WANT_SYSCALL_RETURN_TYPES
@@ -142,7 +142,7 @@ DECL_BEGIN
 /* Emulate the execution of a system call.
  * NOTE: `syscall_emulate_r()' is the same as `syscall_emulate()', however already
  *       includes all of the necessary exception handling ~ala userexcept_handler:
- * >> PUBLIC ATTR_NORETURN NONNULL((1, 2)) void
+ * >> PUBLIC ABNORMAL_RETURN ATTR_NORETURN NONNULL((1, 2)) void
  * >> NOTHROW(FCALL syscall_emulate_r)(struct icpustate *__restrict state,
  * >>                                  struct rpc_syscall_info const *__restrict sc_info) {
  * >> again:
@@ -160,7 +160,7 @@ syscall_emulate(struct icpustate *__restrict state,
                 struct rpc_syscall_info const *__restrict sc_info)
 		THROWS(...);
 
-FUNDEF ATTR_NORETURN NONNULL((1, 2)) void
+FUNDEF ABNORMAL_RETURN ATTR_NORETURN NONNULL((1, 2)) void
 NOTHROW(FCALL syscall_emulate_r)(struct icpustate *__restrict state,
                                  struct rpc_syscall_info const *__restrict sc_info);
 #endif /* !__CC__ */

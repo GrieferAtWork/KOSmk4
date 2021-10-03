@@ -75,7 +75,7 @@ assert_printer(void *UNUSED(ignored), char const *__restrict data, size_t datale
 }
 
 
-PRIVATE ATTR_NORETURN ATTR_COLD ATTR_SECTION(".text.crt.assert") void LIBCCALL
+PRIVATE ATTR_COLD ATTR_NORETURN ATTR_SECTION(".text.crt.assert") NONNULL((1)) void LIBCCALL
 trap_application(struct kcpustate *__restrict state,
                  union coredump_info *info,
                  unsigned int unwind_error) {
@@ -92,8 +92,8 @@ trap_application(struct kcpustate *__restrict state,
 }
 
 
-INTERN ATTR_NORETURN ATTR_COLD ATTR_SECTION(".text.crt.assert") void FCALL
-libc_stack_failure_core(struct kcpustate *__restrict state) {
+INTERN ABNORMAL_RETURN ATTR_COLD ATTR_NORETURN ATTR_SECTION(".text.crt.assert") NONNULL((1)) void
+NOTHROW(FCALL libc_stack_failure_core)(struct kcpustate *__restrict state) {
 	format_printf(&assert_printer, NULL,
 	              "User-space stack check failure [pc=%p]\n",
 	              kcpustate_getpc(state));
@@ -103,7 +103,7 @@ libc_stack_failure_core(struct kcpustate *__restrict state) {
 
 /* If a custom signal handler for SIGABRT has been set,
  * sys_raiseat(2) that  signal  at  the  given  `state' */
-PRIVATE ATTR_NOINLINE ATTR_SECTION(".text.crt.assert") void FCALL
+PRIVATE ATTR_NOINLINE ATTR_SECTION(".text.crt.assert") NONNULL((1)) void FCALL
 maybe_raise_SIGABRT(struct kcpustate *__restrict state) {
 	struct sigaction sa;
 	struct ucpustate uc;
@@ -144,8 +144,8 @@ maybe_raise_SIGABRT(struct kcpustate *__restrict state) {
 	 * much all we can even do at this point. */
 }
 
-INTERN ATTR_NORETURN ATTR_COLD ATTR_SECTION(".text.crt.assert") void FCALL
-libc_abort_failure_core(struct kcpustate *__restrict state) {
+INTERN ABNORMAL_RETURN ATTR_COLD ATTR_NORETURN ATTR_SECTION(".text.crt.assert") NONNULL((1)) void
+NOTHROW(FCALL libc_abort_failure_core)(struct kcpustate *__restrict state) {
 	/* If the user has defined a custom sigaction for `SIGABRT',
 	 * then instead of directly  triggering a coredump, we  must
 	 * sys_raiseat(2) that signal at the given `state'! */
@@ -159,8 +159,8 @@ libc_abort_failure_core(struct kcpustate *__restrict state) {
 }
 
 
-INTERN ATTR_NOINLINE ATTR_NORETURN ATTR_COLD ATTR_SECTION(".text.crt.assert") void LIBCCALL
-libc_assertion_failure_core(struct assert_args *__restrict args) {
+INTERN ABNORMAL_RETURN ATTR_COLD ATTR_NORETURN ATTR_SECTION(".text.crt.assert") NONNULL((1)) void
+NOTHROW(FCALL libc_assertion_failure_core)(struct assert_args *__restrict args) {
 	struct coredump_assert cdinfo;
 	char message_buf[COREDUMP_ASSERT_MESG_MAXLEN];
 	format_printf(&assert_printer, NULL,

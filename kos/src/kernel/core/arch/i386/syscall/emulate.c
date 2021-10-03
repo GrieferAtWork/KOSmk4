@@ -75,7 +75,7 @@ IFELSEX3264(x86_syscall_emulate_int80h,
 }
 
 /* Emulate x32:int80h */
-PUBLIC ATTR_NORETURN ATTR_WEAK
+PUBLIC ABNORMAL_RETURN ATTR_NORETURN ATTR_WEAK
 IFELSEX3264(ATTR_SECTION(".text.x86.x86_syscall_emulate_int80h_r"),
             ATTR_SECTION(".text.x86.x86_syscall_emulate32_int80h_r")) NONNULL((1)) void
 NOTHROW(FCALL IFELSEX3264(x86_syscall_emulate_int80h_r,
@@ -99,7 +99,7 @@ IFELSEX3264(x86_syscall_emulate_sysenter,
 }
 
 /* Emulate x32:sysenter */
-PUBLIC ATTR_NORETURN ATTR_WEAK
+PUBLIC ABNORMAL_RETURN ATTR_NORETURN ATTR_WEAK
 IFELSEX3264(ATTR_SECTION(".text.x86.x86_syscall_emulate_sysenter_r"),
             ATTR_SECTION(".text.x86.x86_syscall_emulate32_sysenter_r")) NONNULL((1)) void
 NOTHROW(FCALL IFELSEX3264(x86_syscall_emulate_sysenter_r,
@@ -124,7 +124,7 @@ IFELSEX3264(x86_syscall_emulate_cdecl,
 }
 
 /* Emulate x32:cdecl */
-PUBLIC ATTR_NORETURN ATTR_WEAK
+PUBLIC ABNORMAL_RETURN ATTR_NORETURN ATTR_WEAK
 IFELSEX3264(ATTR_SECTION(".text.x86.x86_syscall_emulate_cdecl_r"),
             ATTR_SECTION(".text.x86.x86_syscall_emulate32_cdecl_r")) NONNULL((1)) void
 NOTHROW(FCALL IFELSEX3264(x86_syscall_emulate_cdecl_r,
@@ -147,7 +147,7 @@ x86_syscall_emulate_int80h(struct icpustate *__restrict state)
 }
 
 /* Emulate x32:int80h, x64:int80h or x64:syscall */
-PUBLIC ATTR_NORETURN ATTR_WEAK
+PUBLIC ABNORMAL_RETURN ATTR_NORETURN ATTR_WEAK
 ATTR_SECTION(".text.x86.x86_syscall_emulate_int80h_r") NONNULL((1)) void
 NOTHROW(FCALL x86_syscall_emulate_int80h_r)(struct icpustate *__restrict state) {
 	struct rpc_syscall_info sc;
@@ -166,7 +166,7 @@ x86_syscall_emulate64_int80h(struct icpustate *__restrict state)
 }
 
 /* Emulate x64:int80h or x64:syscall */
-PUBLIC ATTR_NORETURN ATTR_WEAK
+PUBLIC ABNORMAL_RETURN ATTR_NORETURN ATTR_WEAK
 ATTR_SECTION(".text.x86.x86_syscall_emulate64_int80h_r") NONNULL((1)) void
 NOTHROW(FCALL x86_syscall_emulate64_int80h_r)(struct icpustate *__restrict state) {
 	struct rpc_syscall_info sc;
@@ -186,7 +186,7 @@ x86_syscall_emulate_sysvabi(struct icpustate *__restrict state,
 }
 
 /* Emulate x64:sysvabi */
-PUBLIC ATTR_NORETURN ATTR_WEAK
+PUBLIC ABNORMAL_RETURN ATTR_NORETURN ATTR_WEAK
 ATTR_SECTION(".text.x86.x86_syscall_emulate_sysvabi_r") NONNULL((1)) void
 NOTHROW(FCALL x86_syscall_emulate_sysvabi_r)(struct icpustate *__restrict state,
                                              syscall_ulong_t sysno, bool enable_except) {
@@ -215,7 +215,7 @@ INTDEF bool syscall_tracing_enabled;
 /* Emulate the execution of a system call.
  * NOTE: `syscall_emulate_r()' is the same as `syscall_emulate()', however already
  *       includes all of the necessary exception handling ~ala userexcept_handler:
- * >> PUBLIC ATTR_NORETURN NONNULL((1, 2)) void
+ * >> PUBLIC ABNORMAL_RETURN ATTR_NORETURN NONNULL((1, 2)) void
  * >> NOTHROW(FCALL syscall_emulate_r)(struct icpustate *__restrict state,
  * >>                                  struct rpc_syscall_info const *__restrict sc_info) {
  * >> again:

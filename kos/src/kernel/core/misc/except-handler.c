@@ -98,7 +98,7 @@ again:
 
 
 
-PRIVATE ATTR_NORETURN void
+PRIVATE ABNORMAL_RETURN ATTR_NORETURN void
 NOTHROW(FCALL process_exit)(int reason) {
 	if (!task_isprocessleader()) {
 		/* We need to terminate the _process_; not just this thread!
@@ -125,7 +125,7 @@ done:
 	task_exit(reason);
 }
 
-PRIVATE ATTR_NORETURN NONNULL((1)) void
+PRIVATE ABNORMAL_RETURN ATTR_NORETURN NONNULL((1)) void
 NOTHROW(FCALL process_exit_for_exception_after_coredump)(struct exception_data const *__restrict error) {
 	siginfo_t si;
 	/* Try to translate the current exception  into a signal, so that  we
@@ -207,7 +207,8 @@ process_waitfor_SIG_CONT(struct icpustate *__restrict state, int status) {
 
 
 PRIVATE ATTR_NOINLINE ATTR_NORETURN NONNULL((1)) void FCALL
-abort_SIGINT_program_without_exception_handler(struct icpustate *__restrict state) {
+abort_SIGINT_program_without_exception_handler(struct icpustate *__restrict state)
+		THROWS(E_EXIT_PROCESS) {
 	struct exception_info info;
 	memset(&info, 0, sizeof(struct exception_info));
 	info.ei_data.e_code      = ERROR_CODEOF(E_INTERRUPT);
@@ -299,7 +300,7 @@ userexcept_callsignal_and_maybe_restart_syscall(struct icpustate *__restrict sta
  * all of the  extended "builtin"  signal actions, as  may have  been
  * requested by the user.
  * Returns `NULL' if `error' could not be translated into a signal. */
-PRIVATE WUNUSED NONNULL((1, 3)) struct icpustate *FCALL
+PRIVATE ABNORMAL_RETURN WUNUSED NONNULL((1, 3)) struct icpustate *FCALL
 userexcept_raisesignal_from_exception(struct icpustate *__restrict state,
                                       struct rpc_syscall_info const *sc_info,
                                       struct exception_info const *__restrict error)
@@ -378,7 +379,7 @@ again_gethand:
 	return result;
 }
 
-PRIVATE ATTR_NOINLINE ATTR_NORETURN NONNULL((1, 2)) void
+PRIVATE ABNORMAL_RETURN ATTR_NOINLINE ATTR_NORETURN NONNULL((1, 2)) void
 NOTHROW(FCALL trigger_coredump_from__E_CORE_PROCESS)(struct icpustate *__restrict state,
                                                      struct exception_info *__restrict error) {
 	siginfo_t si;
@@ -395,7 +396,7 @@ NOTHROW(FCALL trigger_coredump_from__E_CORE_PROCESS)(struct icpustate *__restric
  * a posix signal.
  * This function returns the updated CPU state which should
  * be loaded by the caller. */
-PRIVATE ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) struct icpustate *
+PRIVATE ABNORMAL_RETURN ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) struct icpustate *
 NOTHROW(FCALL userexcept_unwind)(struct icpustate *__restrict state,
                                  struct exception_info *__restrict error,
                                  struct rpc_syscall_info const *sc_info) {
@@ -642,7 +643,7 @@ NOTHROW(FCALL set_unknown_syscall_exception)(struct rpc_syscall_info const *__re
 }
 
 /* Helper function to implement ENOSYS handling. */
-PUBLIC ATTR_NORETURN NONNULL((1, 2)) void
+PUBLIC ABNORMAL_RETURN ATTR_NORETURN NONNULL((1, 2)) void
 NOTHROW(FCALL userexcept_handler_nosys)(struct icpustate *__restrict state,
                                         struct rpc_syscall_info const *__restrict sc_info) {
 again:
@@ -1212,8 +1213,8 @@ err:
  *
  * This  function should  be used  for throwing  exception from interrupt
  * handlers (read: CPU exception handler), such as page-faults & similar. */
-PUBLIC ATTR_NORETURN NONNULL((1)) void FCALL
-error_throw_current_at_icpustate(struct icpustate *__restrict state) {
+PUBLIC ABNORMAL_RETURN ATTR_NORETURN NONNULL((1)) void
+NOTHROW(FCALL error_throw_current_at_icpustate)(struct icpustate *__restrict state) {
 	struct exception_info *info = error_info();
 	assertf(info->ei_code != ERROR_CODEOF(E_OK),
 	        "No exception thrown");
@@ -1244,7 +1245,6 @@ error_throw_current_at_icpustate(struct icpustate *__restrict state) {
 		pst = libc_error_unwind(&st);
 		cpu_apply_kcpustate(pst);
 	}
-
 }
 
 

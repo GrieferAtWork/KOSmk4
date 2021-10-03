@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xece1a5bc */
+/* HASH CRC-32:0x97d091d3 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -97,6 +97,15 @@ struct rpc_context {
 	struct rpc_syscall_info rc_scinfo;  /* [valid_if(rc_context == RPC_REASONCTX_SYSCALL)] Syscall info. */
 };
 
+/* // Additional restrictions/permissions applicable in kernel-space
+#ifdef __KERNEL__
+ABNORMAL_RETURN_IF(__ctx->rc_context == RPC_REASONCTX_SYSCALL ||
+                   __ctx->rc_context == RPC_REASONCTX_INTERRUPT)
+NOBLOCK_IF(__ctx->rc_context == RPC_REASONCTX_ASYNC_KERN ||
+           __ctx->rc_context == RPC_REASONCTX_SHUTDOWN)
+NOTHROW_IF(__ctx->rc_context == RPC_REASONCTX_ASYNC_KERN) // You also ~shouldn't~ throw under `RPC_REASONCTX_SHUTDOWN'
+#endif // __KERNEL__
+*/
 /* Callback prototype for RPC functions registered by `rpc_exec()' */
 typedef __ATTR_NONNULL((1)) void
 (PRPC_EXEC_CALLBACK_CC *prpc_exec_callback_t)(struct rpc_context *__restrict __ctx, void *__cookie)

@@ -40,7 +40,7 @@ DECL_BEGIN
  * In  KOS, we too  generate a debugger  trap, then simply raise
  * an E_EXIT_PROCESS exception to terminate the calling process.
  * It doesn't get much simpler than this... */
-INTERN struct icpustate *FCALL
+INTERN ATTR_RETNONNULL WUNUSED NONNULL((1)) struct icpustate *FCALL
 x86_handle_ms_fastfail(struct icpustate *__restrict state) {
 	STATIC_ASSERT(IDT_CONFIG_ISTRAP(0x29)); /* ms_fastfail */
 	enum { SIGNO = SIGABRT };

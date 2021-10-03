@@ -39,7 +39,7 @@
 
 DECL_BEGIN
 
-INTERN struct icpustate *FCALL
+INTERN ABNORMAL_RETURN ATTR_RETNONNULL WUNUSED NONNULL((1)) struct icpustate *FCALL
 x86_handle_overflow(struct icpustate *__restrict state) {
 	unsigned int i;
 	STATIC_ASSERT(IDT_CONFIG_ISTRAP(0x04)); /* #OF  Overflow */

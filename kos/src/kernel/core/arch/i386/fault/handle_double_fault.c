@@ -164,16 +164,15 @@ NOTHROW(KCALL x86_repair_broken_tls_state_impl)(struct cpu *__restrict me) {
 	return mythread;
 }
 
-INTERN NOBLOCK ATTR_RETNONNULL struct task *
+INTERN NOBLOCK ATTR_RETNONNULL WUNUSED struct task *
 NOTHROW(KCALL x86_repair_broken_tls_state)(void) {
-	struct cpu *me;
-	me = x86_failsafe_getcpu();
+	struct cpu *me = x86_failsafe_getcpu();
 	return x86_repair_broken_tls_state_impl(me);
 }
 
 
 /* Double fault handler. */
-INTERN struct df_cpustate *FCALL
+INTERN ABNORMAL_RETURN ATTR_RETNONNULL WUNUSED NONNULL((1)) struct df_cpustate *FCALL
 x86_handle_double_fault(struct df_cpustate *__restrict state) {
 	void *pc;
 	struct cpu *me;
@@ -222,7 +221,7 @@ x86_handle_double_fault(struct df_cpustate *__restrict state) {
 #else /* !CONFIG_NO_DEBUGGER */
 	PREEMPTION_HALT();
 #endif /* CONFIG_NO_DEBUGGER */
-	return state;
+	__builtin_unreachable();
 }
 
 

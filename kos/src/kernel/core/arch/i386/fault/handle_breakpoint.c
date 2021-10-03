@@ -107,7 +107,7 @@ dbg_handle_breakpoint(void *faultpc, void *resumepc) {
 
 
 
-INTERN struct icpustate *FCALL
+INTERN ABNORMAL_RETURN ATTR_RETNONNULL WUNUSED NONNULL((1)) struct icpustate *FCALL
 x86_handle_breakpoint(struct icpustate *__restrict state) {
 	STATIC_ASSERT(!IDT_CONFIG_ISTRAP(0x03)); /* #BP  Breakpoint */
 	byte_t const *pc, *faultpc;
@@ -153,8 +153,8 @@ x86_handle_breakpoint(struct icpustate *__restrict state) {
 		entry.ei_argv[1] = (void *)pc;
 		entry.ei_entry   = (dbg_entry_t)&dbg_handle_breakpoint;
 		/* Enter the debugger. */
-		state = dbg_enter_r((struct dbg_entry_info *)&entry, state);
-		return state;
+		dbg_enter((struct dbg_entry_info *)&entry, state);
+		__builtin_unreachable();
 	}
 #endif /* CONFIG_HAVE_DEBUGGER */
 

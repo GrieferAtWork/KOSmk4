@@ -65,7 +65,7 @@
 DECL_BEGIN
 
 #ifndef __OPTIMIZE_SIZE__
-INTDEF pid_t KCALL
+INTDEF NONNULL((1)) pid_t KCALL
 x86_clone_impl(struct icpustate const *__restrict init_state,
                uintptr_t clone_flags,
                USER UNCHECKED void *child_stack,
@@ -73,8 +73,8 @@ x86_clone_impl(struct icpustate const *__restrict init_state,
                USER UNCHECKED pid_t *child_tidptr,
                uintptr_t gsbase, uintptr_t fsbase);
 
-PRIVATE struct icpustate *KERNEL_INTERRUPT_CALLBACK_CC
-lcall7_clone32(struct icpustate *__restrict state) {
+PRIVATE ABNORMAL_RETURN WUNUSED NONNULL((1)) struct icpustate *
+NOTHROW(KERNEL_INTERRUPT_CALLBACK_CC lcall7_clone32)(struct icpustate *__restrict state) {
 	pid_t cpid;
 	struct rpc_syscall_info sc_info;
 #ifndef CONFIG_NO_SYSCALL_TRACING
@@ -124,14 +124,14 @@ again:
 		x86_userexcept_unwind_i(state, &sc_info);
 #endif /* !CONFIG_USE_NEW_RPC */
 	}
-	gpregs_setpax(&state->ics_gpregs, cpid);
+	icpustate_setreturn(state, cpid);
 	return state;
 }
 
 #endif /* !__OPTIMIZE_SIZE__ */
 
-PRIVATE ATTR_NORETURN void FCALL
-x86_emulate_syscall32_lcall7(struct icpustate *__restrict state, u32 segment_offset) {
+PRIVATE ABNORMAL_RETURN ATTR_NORETURN NONNULL((1)) void
+NOTHROW(FCALL x86_emulate_syscall32_lcall7)(struct icpustate *__restrict state, u32 segment_offset) {
 	/* lcall7 emulation in compatibility mode. */
 	struct rpc_syscall_info sc_info;
 	unsigned int argc;
@@ -178,8 +178,9 @@ again:
 }
 
 #ifdef __x86_64__
-PRIVATE ATTR_NORETURN void FCALL
-x86_emulate_syscall64_lcall7(struct icpustate *__restrict state, u64 segment_offset) {
+PRIVATE ABNORMAL_RETURN ATTR_NORETURN void
+NOTHROW(FCALL x86_emulate_syscall64_lcall7)(struct icpustate *__restrict state,
+                                            u64 segment_offset) {
 	/* lcall7 emulation in 64-bit mode. */
 	struct rpc_syscall_info sc_info;
 	unsigned int argc;
@@ -218,7 +219,7 @@ again:
 }
 #endif /* __x86_64__ */
 
-INTERN struct icpustate *FCALL
+INTERN ABNORMAL_RETURN ATTR_RETNONNULL WUNUSED NONNULL((1)) struct icpustate *FCALL
 x86_handle_segment_not_present(struct icpustate *__restrict state,
                                uintptr_t ecode) {
 	STATIC_ASSERT(IDT_CONFIG_ISTRAP(0x0b)); /* #NP  Segment not present */

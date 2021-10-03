@@ -39,9 +39,9 @@
  *          function does  not  return  in  any  way that  is  observable  to  the  caller.
  *          Rather,  it behaves similar to `longjmp()', in that `cb()' is made to return to
  *          the origin of `state' after being injected ontop of that location. */
-/* FUNDEF ATTR_NORETURN void FCALL
- * kernel_restart_interrupt(struct icpustate *__restrict state,
- *                          kernel_interrupt_callback_t cb); */
+/* FUNDEF ABNORMAL_RETURN ATTR_NORETURN NONNULL((1, 2)) void
+ * NOTHROW(FCALL kernel_restart_interrupt)(struct icpustate *__restrict state,
+ *                                         kernel_interrupt_callback_t cb); */
 .section .text
 PUBLIC_FUNCTION(kernel_restart_interrupt)
 	.cfi_startproc simple

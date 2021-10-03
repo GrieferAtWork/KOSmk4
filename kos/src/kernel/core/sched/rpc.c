@@ -238,7 +238,7 @@ NOTHROW(FCALL task_asyncrpc_destroy_list_for_shutdown)(struct pending_rpc *first
 
 
 
-PRIVATE ATTR_NORETURN void
+PRIVATE ABNORMAL_RETURN ATTR_NORETURN NONNULL((1)) void
 NOTHROW(FCALL unwind_current_exception_at_icpustate)(struct icpustate *__restrict state) {
 	struct kcpustate kst;
 	struct kcpustate *newstate;

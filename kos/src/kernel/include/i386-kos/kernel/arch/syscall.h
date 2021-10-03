@@ -73,28 +73,28 @@ struct rpc_syscall_info;
 #ifdef __x86_64__
 /* emulation with automatic target detection (either x32 or x64) */
 FUNDEF struct icpustate *FCALL x86_syscall_emulate_int80h(struct icpustate *__restrict state) THROWS(...);
-FUNDEF ATTR_NORETURN void NOTHROW(FCALL x86_syscall_emulate_int80h_r)(struct icpustate *__restrict state);
+FUNDEF ABNORMAL_RETURN ATTR_NORETURN void NOTHROW(FCALL x86_syscall_emulate_int80h_r)(struct icpustate *__restrict state);
 /* x32-specific emulation */
 FUNDEF struct icpustate *FCALL x86_syscall_emulate32_int80h(struct icpustate *__restrict state) THROWS(...);
-FUNDEF ATTR_NORETURN void NOTHROW(FCALL x86_syscall_emulate32_int80h_r)(struct icpustate *__restrict state);
+FUNDEF ABNORMAL_RETURN ATTR_NORETURN void NOTHROW(FCALL x86_syscall_emulate32_int80h_r)(struct icpustate *__restrict state);
 FUNDEF struct icpustate *FCALL x86_syscall_emulate32_sysenter(struct icpustate *__restrict state) THROWS(...);
-FUNDEF ATTR_NORETURN void NOTHROW(FCALL x86_syscall_emulate32_sysenter_r)(struct icpustate *__restrict state);
+FUNDEF ABNORMAL_RETURN ATTR_NORETURN void NOTHROW(FCALL x86_syscall_emulate32_sysenter_r)(struct icpustate *__restrict state);
 FUNDEF struct icpustate *FCALL x86_syscall_emulate32_cdecl(struct icpustate *__restrict state, __syscall_ulong_t sysno, bool enable_except) THROWS(...);
-FUNDEF ATTR_NORETURN void NOTHROW(FCALL x86_syscall_emulate32_cdecl_r)(struct icpustate *__restrict state, __syscall_ulong_t sysno, bool enable_except);
+FUNDEF ABNORMAL_RETURN ATTR_NORETURN void NOTHROW(FCALL x86_syscall_emulate32_cdecl_r)(struct icpustate *__restrict state, __syscall_ulong_t sysno, bool enable_except);
 /* x64-specific emulation */
 FUNDEF struct icpustate *FCALL x86_syscall_emulate_sysvabi(struct icpustate *__restrict state, __syscall_ulong_t sysno, bool enable_except) THROWS(...);
-FUNDEF ATTR_NORETURN void NOTHROW(FCALL x86_syscall_emulate_sysvabi_r)(struct icpustate *__restrict state, __syscall_ulong_t sysno, bool enable_except);
+FUNDEF ABNORMAL_RETURN ATTR_NORETURN void NOTHROW(FCALL x86_syscall_emulate_sysvabi_r)(struct icpustate *__restrict state, __syscall_ulong_t sysno, bool enable_except);
 FUNDEF struct icpustate *FCALL x86_syscall_emulate64_int80h(struct icpustate *__restrict state) THROWS(...);
-FUNDEF ATTR_NORETURN void NOTHROW(FCALL x86_syscall_emulate64_int80h_r)(struct icpustate *__restrict state);
+FUNDEF ABNORMAL_RETURN ATTR_NORETURN void NOTHROW(FCALL x86_syscall_emulate64_int80h_r)(struct icpustate *__restrict state);
 #define x86_syscall_emulate64_sysvabi   x86_syscall_emulate_sysvabi
 #define x86_syscall_emulate64_sysvabi_r x86_syscall_emulate_sysvabi_r
 #else /* __x86_64__ */
 FUNDEF struct icpustate *FCALL x86_syscall_emulate_int80h(struct icpustate *__restrict state) THROWS(...);
-FUNDEF ATTR_NORETURN void NOTHROW(FCALL x86_syscall_emulate_int80h_r)(struct icpustate *__restrict state);
+FUNDEF ABNORMAL_RETURN ATTR_NORETURN void NOTHROW(FCALL x86_syscall_emulate_int80h_r)(struct icpustate *__restrict state);
 FUNDEF struct icpustate *FCALL x86_syscall_emulate_sysenter(struct icpustate *__restrict state) THROWS(...);
-FUNDEF ATTR_NORETURN void NOTHROW(FCALL x86_syscall_emulate_sysenter_r)(struct icpustate *__restrict state);
+FUNDEF ABNORMAL_RETURN ATTR_NORETURN void NOTHROW(FCALL x86_syscall_emulate_sysenter_r)(struct icpustate *__restrict state);
 FUNDEF struct icpustate *FCALL x86_syscall_emulate_cdecl(struct icpustate *__restrict state, __syscall_ulong_t sysno, bool enable_except) THROWS(...);
-FUNDEF ATTR_NORETURN void NOTHROW(FCALL x86_syscall_emulate_cdecl_r)(struct icpustate *__restrict state, __syscall_ulong_t sysno, bool enable_except);
+FUNDEF ABNORMAL_RETURN ATTR_NORETURN void NOTHROW(FCALL x86_syscall_emulate_cdecl_r)(struct icpustate *__restrict state, __syscall_ulong_t sysno, bool enable_except);
 #define x86_syscall_emulate32_int80h     x86_syscall_emulate_int80h
 #define x86_syscall_emulate32_int80h_r   x86_syscall_emulate_int80h_r
 #define x86_syscall_emulate32_sysenter   x86_syscall_emulate_sysenter
@@ -147,14 +147,16 @@ DECL_END
 /* Define compatibility-mode system calls. */
 #ifdef CONFIG_BUILDING_KERNEL_CORE
 #ifdef __x86_64__
-/* When   defining   a  64-bit   system   call,  alias   compatible   32-bit  variant(s)   onto  it,
- * thus    implementing    system    calls    without    dedicated    compatibility-mode    variants
- * by    calling    forward    to    their     64-bit    (regular)    variants    (if     possible).
- * A  listing  of   compatible  system   calls  can  be   found  in:   `<asm/syscall3264-compat.h>',
- * available as `#define __NR3264COMPAT_<NAME> <COMPAT_COUNT>(<FIRST_COMPAT>,<SECOND_COMPAT>,<...>)'
- * Comments  found  further   below  detail   exactly  how  this   meta-data  is   used  to   define
- * system  call  aliases  (don't  even  try  to  read  the  preprocessor  magic  used  to  implement
- * the  logic.  -   It  works   and  is  standard-compliant,   but  it   is  extremely   convoluted) */
+/* When defining a 64-bit system call, alias compatible 32-bit variant(s) onto it,
+ * thus implementing system  calls without  dedicated compatibility-mode  variants
+ * by calling forward to their 64-bit (regular) variants (if possible).
+ *
+ * A  listing of compatible system calls can be found in: `<asm/syscall3264-compat.h>':
+ * `#define __NR3264COMPAT_<NAME> <COMPAT_COUNT>(<FIRST_COMPAT>,<SECOND_COMPAT>,<...>)'
+ *
+ * Comments found further  below detail exactly  how this meta-data  is used to  define
+ * system call aliases (don't even try to read the preprocessor magic used to implement
+ * the logic. - It works and is standard-compliant, but it is extremely convoluted) */
 #undef __ARCH_DEFINE_SYSCALL_COMMON
 #undef __ARCH_DEFINE_SYSCALL32_COMMON
 

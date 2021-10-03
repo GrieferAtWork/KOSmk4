@@ -48,10 +48,10 @@ NOTHROW(FCALL x86_icpustate_get64)(struct icpustate *__restrict state, u8 regno)
 #endif /* !__x86_64__ */
 
 
-INTDEF uintptr_t
-NOTHROW(KCALL x86_decode_modrmgetmem)(struct icpustate *__restrict state,
-                                      struct emu86_modrm *__restrict modrm,
-                                      emu86_opflags_t flags);
+INTDEF uintptr_t KCALL
+x86_decode_modrmgetmem(struct icpustate *__restrict state,
+                       struct emu86_modrm *__restrict modrm,
+                       emu86_opflags_t flags);
 
 /* Access the register or memory location described by a MODRM instruction. */
 INTDEF u16 KCALL

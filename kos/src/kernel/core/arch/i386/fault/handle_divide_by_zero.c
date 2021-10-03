@@ -37,7 +37,7 @@
 
 DECL_BEGIN
 
-INTERN struct icpustate *FCALL
+INTERN ABNORMAL_RETURN ATTR_RETNONNULL WUNUSED NONNULL((1)) struct icpustate *FCALL
 x86_handle_divide_by_zero(struct icpustate *__restrict state) {
 	STATIC_ASSERT(IDT_CONFIG_ISTRAP(0x00)); /* #DE  Divide by zero */
 	byte_t const *curr_pc, *next_pc;

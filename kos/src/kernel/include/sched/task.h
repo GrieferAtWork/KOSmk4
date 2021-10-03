@@ -365,12 +365,12 @@ NOTHROW(FCALL task_wake_as)(struct task *thread, struct task *caller,
  *                   This argument is ignored for kernel-threads.
  * WARNING: Calling this function from an IDLE task, or any other
  *          task that is critical will cause the kernel to PANIC! */
-FUNDEF ATTR_NORETURN void
+FUNDEF ABNORMAL_RETURN ATTR_NORETURN void
 NOTHROW(FCALL task_exit)(int w_status DFL(__W_EXITCODE(0, 0)));
 
 #ifdef __cplusplus
 extern "C++" {
-FORCELOCAL ATTR_ARTIFICIAL ATTR_NORETURN void
+FORCELOCAL ABNORMAL_RETURN ATTR_ARTIFICIAL ATTR_NORETURN void
 NOTHROW(FCALL task_exit)(union wait status) {
 	task_exit(status.w_status);
 }

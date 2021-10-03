@@ -1642,7 +1642,6 @@ DEFINE_SYSCALL5(ssize_t, kreaddirf,
 #if defined(WANT_SYS_POLL) || defined(WANT_SYS_SELECT)
 PRIVATE poll_mode_t KCALL do_poll_handle(struct handle &hnd,
                                          poll_mode_t what) {
-	poll_mode_t result;
 	/* Always allow polling for these conditions. */
 	what |= POLLERR | POLLHUP | POLLNVAL;
 	/* Verify that the caller has access to the

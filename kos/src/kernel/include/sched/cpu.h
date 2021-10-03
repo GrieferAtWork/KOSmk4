@@ -582,7 +582,7 @@ NOTHROW(FCALL cpu_run_current_and_remember_nopr)(struct task *__restrict caller)
  * but  don't   remember   the   caller's   context.
  * This  function is used to implement `task_exit()'
  * NOTE: Preemption must be disabled before this function may be called! */
-FUNDEF NOPREEMPT ATTR_NORETURN void
+FUNDEF ABNORMAL_RETURN NOPREEMPT ATTR_NORETURN void
 NOTHROW(FCALL cpu_run_current_nopr)(void);
 
 /* IDLE job prototype.

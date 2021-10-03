@@ -356,7 +356,7 @@ END(x86_userexcept_sysret)
 
 
 
-/* >> FUNDEF ATTR_NORETURN NONNULL((1)) void
+/* >> FUNDEF ABNORMAL_RETURN ATTR_NORETURN NONNULL((1)) void
  * >> NOTHROW(FCALL userexcept_handler_ucpustate)(struct ucpustate *__restrict state,
  * >>                                             struct rpc_syscall_info *sc_info);
  * Arch-specific function:

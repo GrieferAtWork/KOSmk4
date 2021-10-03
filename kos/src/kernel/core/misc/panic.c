@@ -323,8 +323,8 @@ panic_assert_dbg_main(void *arg) {
 #endif /* CONFIG_HAVE_DEBUGGER */
 
 
-INTERN ATTR_COLD ATTR_COLDTEXT ATTR_NOINLINE ATTR_NORETURN void FCALL
-libc_assertion_failure_core(struct assert_args *__restrict args) {
+INTERN ABNORMAL_RETURN ATTR_COLD ATTR_COLDTEXT ATTR_NOINLINE ATTR_NORETURN void
+NOTHROW(FCALL libc_assertion_failure_core)(struct assert_args *__restrict args) {
 	PREEMPTION_DISABLE();
 	_kernel_poison();
 	printk(KERN_RAW "\n\n\n");
@@ -477,8 +477,8 @@ handle_retry_or_ignore:
 }
 #endif /* CONFIG_HAVE_DEBUGGER */
 
-INTERN ATTR_COLD ATTR_COLDTEXT ATTR_NOINLINE struct kcpustate *FCALL
-libc_assertion_check_core(struct assert_args *__restrict args) {
+INTERN ABNORMAL_RETURN ATTR_COLD ATTR_COLDTEXT ATTR_RETNONNULL WUNUSED NONNULL((1)) struct kcpustate *
+NOTHROW(FCALL libc_assertion_check_core)(struct assert_args *__restrict args) {
 	/* Check if assertion failures at the caller's PC should always be ignored. */
 #ifdef CONFIG_HAVE_DEBUGGER
 	if (is_pc_always_ignored(kcpustate_getpc(&args->aa_state))) {
@@ -525,13 +525,9 @@ libc_assertion_check_core(struct assert_args *__restrict args) {
 		kernel_debugtrap(&args->aa_state, SIGTRAP);
 #ifdef CONFIG_HAVE_DEBUGGER
 	/* Enter the debugger */
-	{
-		struct kcpustate *result;
-		result = dbg_enter_r(&panic_assert_chk_dbg_main,
-		                     args, sizeof(*args),
-		                     &args->aa_state);
-		return result;
-	}
+	dbg_enter(&panic_assert_chk_dbg_main,
+	          args, sizeof(*args),
+	          &args->aa_state);
 #else /* CONFIG_HAVE_DEBUGGER */
 	PREEMPTION_HALT();
 #endif /* !CONFIG_HAVE_DEBUGGER */
@@ -566,8 +562,8 @@ PUBLIC ATTR_READMOSTLY uintptr_t __stack_chk_guard = 0x123baf37;
 PUBLIC ATTR_COLDDATA uintptr_t __stack_chk_guard = 0x123baf37;
 #endif /* NDEBUG */
 
-INTERN ATTR_COLD ATTR_COLDTEXT ATTR_NORETURN void FCALL
-libc_stack_failure_core(struct kcpustate *__restrict state) {
+INTERN ABNORMAL_RETURN ATTR_COLD ATTR_COLDTEXT ATTR_NORETURN void
+NOTHROW(FCALL libc_stack_failure_core)(struct kcpustate *__restrict state) {
 	struct ucpustate ustate;
 	PREEMPTION_DISABLE();
 	_kernel_poison();
@@ -588,8 +584,8 @@ libc_stack_failure_core(struct kcpustate *__restrict state) {
 #endif /* !CONFIG_HAVE_DEBUGGER */
 }
 
-INTERN ATTR_COLD ATTR_COLDTEXT ATTR_NORETURN void FCALL
-libc_abort_failure_core(struct kcpustate *__restrict state) {
+INTERN ABNORMAL_RETURN ATTR_COLD ATTR_COLDTEXT ATTR_NORETURN void
+NOTHROW(FCALL libc_abort_failure_core)(struct kcpustate *__restrict state) {
 	struct ucpustate ustate;
 	PREEMPTION_DISABLE();
 	_kernel_poison();
@@ -647,10 +643,10 @@ panic_kernel_dbg_main(void *arg) {
 }
 #endif /* CONFIG_HAVE_DEBUGGER */
 
-PUBLIC ATTR_NORETURN ATTR_COLD ATTR_COLDTEXT void FCALL
-kernel_vpanic_ucpustate_n(unsigned int n_skip,
-                          struct ucpustate *__restrict state,
-                          char const *format, va_list args) {
+PUBLIC ABNORMAL_RETURN ATTR_COLD ATTR_COLDTEXT ATTR_NORETURN void
+NOTHROW(FCALL kernel_vpanic_ucpustate_n)(unsigned int n_skip,
+                                         struct ucpustate *__restrict state,
+                                         char const *format, va_list args) {
 	(void)n_skip; /* TODO: Support for `n_skip'! */
 	PREEMPTION_DISABLE();
 	_kernel_poison();
@@ -686,188 +682,188 @@ kernel_vpanic_ucpustate_n(unsigned int n_skip,
 #endif /* !CONFIG_HAVE_DEBUGGER */
 }
 
-PUBLIC ATTR_NORETURN ATTR_COLD ATTR_COLDTEXT void FCALL
-kernel_vpanic_ucpustate(struct ucpustate *__restrict state,
-                        char const *format, va_list args) {
+PUBLIC ABNORMAL_RETURN ATTR_COLD ATTR_COLDTEXT ATTR_NORETURN void
+NOTHROW(FCALL kernel_vpanic_ucpustate)(struct ucpustate *__restrict state,
+                                       char const *format, va_list args) {
 	kernel_vpanic_ucpustate_n(0, state, format, args);
 }
 
-PUBLIC ATTR_NORETURN ATTR_COLD ATTR_COLDTEXT void FCALL
-kernel_vpanic_lcpustate_n(unsigned int n_skip,
-                          struct lcpustate *__restrict state,
-                          char const *format, va_list args) {
+PUBLIC ABNORMAL_RETURN ATTR_COLD ATTR_COLDTEXT ATTR_NORETURN NONNULL((2)) void
+NOTHROW(FCALL kernel_vpanic_lcpustate_n)(unsigned int n_skip,
+                                         struct lcpustate *__restrict state,
+                                         char const *format, va_list args) {
 	struct ucpustate ustate;
 	lcpustate_to_ucpustate(state, &ustate);
 	kernel_vpanic_ucpustate_n(n_skip, &ustate, format, args);
 }
 
-PUBLIC ATTR_NORETURN ATTR_COLD ATTR_COLDTEXT void FCALL
-kernel_vpanic_kcpustate_n(unsigned int n_skip,
-                          struct kcpustate *__restrict state,
-                          char const *format, va_list args) {
+PUBLIC ABNORMAL_RETURN ATTR_COLD ATTR_COLDTEXT ATTR_NORETURN NONNULL((2)) void
+NOTHROW(FCALL kernel_vpanic_kcpustate_n)(unsigned int n_skip,
+                                         struct kcpustate *__restrict state,
+                                         char const *format, va_list args) {
 	struct ucpustate ustate;
 	kcpustate_to_ucpustate(state, &ustate);
 	kernel_vpanic_ucpustate_n(n_skip, &ustate, format, args);
 }
 
-PUBLIC ATTR_NORETURN ATTR_COLD ATTR_COLDTEXT void FCALL
-kernel_vpanic_icpustate_n(unsigned int n_skip,
-                          struct icpustate *__restrict state,
-                          char const *format, va_list args) {
+PUBLIC ABNORMAL_RETURN ATTR_COLD ATTR_COLDTEXT ATTR_NORETURN NONNULL((2)) void
+NOTHROW(FCALL kernel_vpanic_icpustate_n)(unsigned int n_skip,
+                                         struct icpustate *__restrict state,
+                                         char const *format, va_list args) {
 	struct ucpustate ustate;
 	icpustate_to_ucpustate(state, &ustate);
 	kernel_vpanic_ucpustate_n(n_skip, &ustate, format, args);
 }
 
-PUBLIC ATTR_NORETURN ATTR_COLD ATTR_COLDTEXT void FCALL
-kernel_vpanic_scpustate_n(unsigned int n_skip,
-                          struct scpustate *__restrict state,
-                          char const *format, va_list args) {
+PUBLIC ABNORMAL_RETURN ATTR_COLD ATTR_COLDTEXT ATTR_NORETURN NONNULL((2)) void
+NOTHROW(FCALL kernel_vpanic_scpustate_n)(unsigned int n_skip,
+                                         struct scpustate *__restrict state,
+                                         char const *format, va_list args) {
 	struct ucpustate ustate;
 	scpustate_to_ucpustate(state, &ustate);
 	kernel_vpanic_ucpustate_n(n_skip, &ustate, format, args);
 }
 
-PUBLIC ATTR_NORETURN ATTR_COLD ATTR_COLDTEXT void FCALL
-kernel_vpanic_fcpustate_n(unsigned int n_skip,
-                          struct fcpustate *__restrict state,
-                          char const *format, va_list args) {
+PUBLIC ABNORMAL_RETURN ATTR_COLD ATTR_COLDTEXT ATTR_NORETURN NONNULL((2)) void
+NOTHROW(FCALL kernel_vpanic_fcpustate_n)(unsigned int n_skip,
+                                         struct fcpustate *__restrict state,
+                                         char const *format, va_list args) {
 	struct ucpustate ustate;
 	/* XXX: Don't convert to ucpustate. - This causes information to be lost... */
 	fcpustate_to_ucpustate(state, &ustate);
 	kernel_vpanic_ucpustate_n(n_skip, &ustate, format, args);
 }
 
-PUBLIC ATTR_NORETURN ATTR_COLD ATTR_COLDTEXT void FCALL
-kernel_vpanic_lcpustate(struct lcpustate *__restrict state,
-                        char const *format, va_list args) {
+PUBLIC ABNORMAL_RETURN ATTR_COLD ATTR_COLDTEXT ATTR_NORETURN NONNULL((1)) void
+NOTHROW(FCALL kernel_vpanic_lcpustate)(struct lcpustate *__restrict state,
+                                       char const *format, va_list args) {
 	kernel_vpanic_lcpustate_n(0, state, format, args);
 }
 
-PUBLIC ATTR_NORETURN ATTR_COLD ATTR_COLDTEXT void FCALL
-kernel_vpanic_kcpustate(struct kcpustate *__restrict state,
-                        char const *format, va_list args) {
+PUBLIC ABNORMAL_RETURN ATTR_COLD ATTR_COLDTEXT ATTR_NORETURN NONNULL((1)) void
+NOTHROW(FCALL kernel_vpanic_kcpustate)(struct kcpustate *__restrict state,
+                                       char const *format, va_list args) {
 	kernel_vpanic_kcpustate_n(0, state, format, args);
 }
 
-PUBLIC ATTR_NORETURN ATTR_COLD ATTR_COLDTEXT void FCALL
-kernel_vpanic_icpustate(struct icpustate *__restrict state,
-                        char const *format, va_list args) {
+PUBLIC ABNORMAL_RETURN ATTR_COLD ATTR_COLDTEXT ATTR_NORETURN NONNULL((1)) void
+NOTHROW(FCALL kernel_vpanic_icpustate)(struct icpustate *__restrict state,
+                                       char const *format, va_list args) {
 	kernel_vpanic_icpustate_n(0, state, format, args);
 }
 
-PUBLIC ATTR_NORETURN ATTR_COLD ATTR_COLDTEXT void FCALL
-kernel_vpanic_scpustate(struct scpustate *__restrict state,
-                        char const *format, va_list args) {
+PUBLIC ABNORMAL_RETURN ATTR_COLD ATTR_COLDTEXT ATTR_NORETURN NONNULL((1)) void
+NOTHROW(FCALL kernel_vpanic_scpustate)(struct scpustate *__restrict state,
+                                       char const *format, va_list args) {
 	kernel_vpanic_scpustate_n(0, state, format, args);
 }
 
-PUBLIC ATTR_NORETURN ATTR_COLD ATTR_COLDTEXT void FCALL
-kernel_vpanic_fcpustate(struct fcpustate *__restrict state,
-                        char const *format, va_list args) {
+PUBLIC ABNORMAL_RETURN ATTR_COLD ATTR_COLDTEXT ATTR_NORETURN NONNULL((1)) void
+NOTHROW(FCALL kernel_vpanic_fcpustate)(struct fcpustate *__restrict state,
+                                       char const *format, va_list args) {
 	kernel_vpanic_fcpustate_n(0, state, format, args);
 }
 
 
 
-PUBLIC ATTR_NORETURN ATTR_COLD ATTR_COLDTEXT void VCALL
-kernel_panic_ucpustate(struct ucpustate *__restrict state,
-                       char const *format, ...) {
+PUBLIC ABNORMAL_RETURN ATTR_COLD ATTR_COLDTEXT ATTR_NORETURN NONNULL((1)) void
+NOTHROW(VCALL kernel_panic_ucpustate)(struct ucpustate *__restrict state,
+                                      char const *format, ...) {
 	va_list args;
 	va_start(args, format);
 	kernel_vpanic_ucpustate_n(0, state, format, args);
 }
 
-PUBLIC ATTR_NORETURN ATTR_COLD ATTR_COLDTEXT void VCALL
-kernel_panic_lcpustate(struct lcpustate *__restrict state,
-                       char const *format, ...) {
+PUBLIC ABNORMAL_RETURN ATTR_COLD ATTR_COLDTEXT ATTR_NORETURN NONNULL((1)) void
+NOTHROW(VCALL kernel_panic_lcpustate)(struct lcpustate *__restrict state,
+                                      char const *format, ...) {
 	va_list args;
 	va_start(args, format);
 	kernel_vpanic_lcpustate_n(0, state, format, args);
 }
 
-PUBLIC ATTR_NORETURN ATTR_COLD ATTR_COLDTEXT void VCALL
-kernel_panic_kcpustate(struct kcpustate *__restrict state,
-                       char const *format, ...) {
+PUBLIC ABNORMAL_RETURN ATTR_COLD ATTR_COLDTEXT ATTR_NORETURN NONNULL((1)) void
+NOTHROW(VCALL kernel_panic_kcpustate)(struct kcpustate *__restrict state,
+                                      char const *format, ...) {
 	va_list args;
 	va_start(args, format);
 	kernel_vpanic_kcpustate_n(0, state, format, args);
 }
 
-PUBLIC ATTR_NORETURN ATTR_COLD ATTR_COLDTEXT void VCALL
-kernel_panic_icpustate(struct icpustate *__restrict state,
-                       char const *format, ...) {
+PUBLIC ABNORMAL_RETURN ATTR_COLD ATTR_COLDTEXT ATTR_NORETURN NONNULL((1)) void
+NOTHROW(VCALL kernel_panic_icpustate)(struct icpustate *__restrict state,
+                                      char const *format, ...) {
 	va_list args;
 	va_start(args, format);
 	kernel_vpanic_icpustate_n(0, state, format, args);
 }
 
-PUBLIC ATTR_NORETURN ATTR_COLD ATTR_COLDTEXT void VCALL
-kernel_panic_scpustate(struct scpustate *__restrict state,
-                       char const *format, ...) {
+PUBLIC ABNORMAL_RETURN ATTR_COLD ATTR_COLDTEXT ATTR_NORETURN NONNULL((1)) void
+NOTHROW(VCALL kernel_panic_scpustate)(struct scpustate *__restrict state,
+                                      char const *format, ...) {
 	va_list args;
 	va_start(args, format);
 	kernel_vpanic_scpustate_n(0, state, format, args);
 }
 
-PUBLIC ATTR_NORETURN ATTR_COLD ATTR_COLDTEXT void VCALL
-kernel_panic_fcpustate(struct fcpustate *__restrict state,
-                       char const *format, ...) {
+PUBLIC ABNORMAL_RETURN ATTR_COLD ATTR_COLDTEXT ATTR_NORETURN NONNULL((1)) void
+NOTHROW(VCALL kernel_panic_fcpustate)(struct fcpustate *__restrict state,
+                                      char const *format, ...) {
 	va_list args;
 	va_start(args, format);
 	kernel_vpanic_fcpustate_n(0, state, format, args);
 }
 
 
-PUBLIC ATTR_NORETURN ATTR_COLD ATTR_COLDTEXT void VCALL
-kernel_panic_ucpustate_n(unsigned int n_skip,
-                         struct ucpustate *__restrict state,
-                         char const *format, ...) {
+PUBLIC ABNORMAL_RETURN ATTR_COLD ATTR_COLDTEXT ATTR_NORETURN NONNULL((2)) void
+NOTHROW(VCALL kernel_panic_ucpustate_n)(unsigned int n_skip,
+                                        struct ucpustate *__restrict state,
+                                        char const *format, ...) {
 	va_list args;
 	va_start(args, format);
 	kernel_vpanic_ucpustate_n(n_skip, state, format, args);
 }
 
-PUBLIC ATTR_NORETURN ATTR_COLD ATTR_COLDTEXT void VCALL
-kernel_panic_lcpustate_n(unsigned int n_skip,
-                         struct lcpustate *__restrict state,
-                         char const *format, ...) {
+PUBLIC ABNORMAL_RETURN ATTR_COLD ATTR_COLDTEXT ATTR_NORETURN NONNULL((2)) void
+NOTHROW(VCALL kernel_panic_lcpustate_n)(unsigned int n_skip,
+                                        struct lcpustate *__restrict state,
+                                        char const *format, ...) {
 	va_list args;
 	va_start(args, format);
 	kernel_vpanic_lcpustate_n(n_skip, state, format, args);
 }
 
-PUBLIC ATTR_NORETURN ATTR_COLD ATTR_COLDTEXT void VCALL
-kernel_panic_kcpustate_n(unsigned int n_skip,
-                         struct kcpustate *__restrict state,
-                         char const *format, ...) {
+PUBLIC ABNORMAL_RETURN ATTR_COLD ATTR_COLDTEXT ATTR_NORETURN NONNULL((2)) void
+NOTHROW(VCALL kernel_panic_kcpustate_n)(unsigned int n_skip,
+                                        struct kcpustate *__restrict state,
+                                        char const *format, ...) {
 	va_list args;
 	va_start(args, format);
 	kernel_vpanic_kcpustate_n(n_skip, state, format, args);
 }
 
-PUBLIC ATTR_NORETURN ATTR_COLD ATTR_COLDTEXT void VCALL
-kernel_panic_icpustate_n(unsigned int n_skip,
-                         struct icpustate *__restrict state,
-                         char const *format, ...) {
+PUBLIC ABNORMAL_RETURN ATTR_COLD ATTR_COLDTEXT ATTR_NORETURN NONNULL((2)) void
+NOTHROW(VCALL kernel_panic_icpustate_n)(unsigned int n_skip,
+                                        struct icpustate *__restrict state,
+                                        char const *format, ...) {
 	va_list args;
 	va_start(args, format);
 	kernel_vpanic_icpustate_n(n_skip, state, format, args);
 }
 
-PUBLIC ATTR_NORETURN ATTR_COLD ATTR_COLDTEXT void VCALL
-kernel_panic_scpustate_n(unsigned int n_skip,
-                         struct scpustate *__restrict state,
-                         char const *format, ...) {
+PUBLIC ABNORMAL_RETURN ATTR_COLD ATTR_COLDTEXT ATTR_NORETURN NONNULL((2)) void
+NOTHROW(VCALL kernel_panic_scpustate_n)(unsigned int n_skip,
+                                        struct scpustate *__restrict state,
+                                        char const *format, ...) {
 	va_list args;
 	va_start(args, format);
 	kernel_vpanic_scpustate_n(n_skip, state, format, args);
 }
 
-PUBLIC ATTR_NORETURN ATTR_COLD ATTR_COLDTEXT void VCALL
-kernel_panic_fcpustate_n(unsigned int n_skip,
-                         struct fcpustate *__restrict state,
-                         char const *format, ...) {
+PUBLIC ABNORMAL_RETURN ATTR_COLD ATTR_COLDTEXT ATTR_NORETURN NONNULL((2)) void
+NOTHROW(VCALL kernel_panic_fcpustate_n)(unsigned int n_skip,
+                                        struct fcpustate *__restrict state,
+                                        char const *format, ...) {
 	va_list args;
 	va_start(args, format);
 	kernel_vpanic_fcpustate_n(n_skip, state, format, args);

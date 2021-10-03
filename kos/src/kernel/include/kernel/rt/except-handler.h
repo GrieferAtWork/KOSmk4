@@ -89,9 +89,8 @@ struct task;
  *
  * This  function should  be used  for throwing  exception from interrupt
  * handlers (read: CPU exception handler), such as page-faults & similar. */
-FUNDEF ATTR_NORETURN NONNULL((1)) void FCALL
-error_throw_current_at_icpustate(struct icpustate *__restrict state)
-		THROWS(...);
+FUNDEF ABNORMAL_RETURN ATTR_NORETURN NONNULL((1)) void
+NOTHROW(FCALL error_throw_current_at_icpustate)(struct icpustate *__restrict state);
 
 
 
@@ -175,12 +174,12 @@ userexcept_seterrno(struct icpustate *__restrict state,
  * WARNING: When this function returns, it will have cleared the current
  *          exception, as it is also capable of handling (some)  errors,
  *          most notably `E_INTERRUPT_USER_RPC'! */
-FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) struct icpustate *
+FUNDEF ABNORMAL_RETURN ATTR_RETNONNULL WUNUSED NONNULL((1)) struct icpustate *
 NOTHROW(FCALL userexcept_handler)(struct icpustate *__restrict state,
                                   struct rpc_syscall_info const *sc_info);
 
 /* Helper function to implement ENOSYS handling. */
-FUNDEF ATTR_NORETURN NONNULL((1, 2)) void
+FUNDEF ABNORMAL_RETURN ATTR_NORETURN NONNULL((1, 2)) void
 NOTHROW(FCALL userexcept_handler_nosys)(struct icpustate *__restrict state,
                                         struct rpc_syscall_info const *__restrict sc_info);
 
@@ -193,7 +192,7 @@ typedef struct __sigset_struct sigset_t;
 /* Same as `userexcept_handler()', but use the given `sigmask'
  * instead of the calling thread's thread-local one. Used  for
  * the implementation of `sigsuspend(2)' */
-FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1, 3)) struct icpustate *
+FUNDEF ABNORMAL_RETURN ATTR_RETNONNULL WUNUSED NONNULL((1, 3)) struct icpustate *
 NOTHROW(FCALL userexcept_handler_with_sigmask)(struct icpustate *__restrict state,
                                                struct rpc_syscall_info const *sc_info,
                                                sigset_t const *__restrict sigmask);
@@ -208,7 +207,7 @@ NOTHROW(FCALL userexcept_handler_with_sigmask)(struct icpustate *__restrict stat
  * function  `userexcept_handler(<state>, sc_info)' is made,  and if that function
  * returns normally,  either  `syscall_emulate_r(..., sc_info)'  if  non-NULL,  or
  * directly load the associated state by means of `cpu_apply_icpustate()'. */
-FUNDEF ATTR_NORETURN NONNULL((1)) void
+FUNDEF ABNORMAL_RETURN ATTR_NORETURN NONNULL((1)) void
 NOTHROW(FCALL userexcept_handler_ucpustate)(struct ucpustate *__restrict state,
                                             struct rpc_syscall_info const *sc_info);
 

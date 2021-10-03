@@ -139,8 +139,7 @@ x86_icpustate_set32(struct icpustate *__restrict state,
 
 
 #ifndef __x86_64__
-PRIVATE uintptr_t
-NOTHROW(FCALL get_segment_base)(u16 segid) {
+PRIVATE uintptr_t FCALL get_segment_base(u16 segid) {
 	struct desctab gdt;
 	uintptr_t result;
 	struct segment *seg;
@@ -177,8 +176,8 @@ fail:
 }
 #endif /* !__x86_64__ */
 
-PRIVATE uintptr_t
-NOTHROW(KCALL x86_decode_segmentbase)(struct icpustate *__restrict state, emu86_opflags_t flags) {
+PRIVATE uintptr_t KCALL
+x86_decode_segmentbase(struct icpustate *__restrict state, emu86_opflags_t flags) {
 	uintptr_t result;
 	switch (flags & EMU86_F_SEGMASK) {
 #if defined(__x86_64__)
@@ -204,10 +203,10 @@ NOTHROW(KCALL x86_decode_segmentbase)(struct icpustate *__restrict state, emu86_
 	return result;
 }
 
-INTERN uintptr_t
-NOTHROW(KCALL x86_decode_modrmgetmem)(struct icpustate *__restrict state,
-                                      struct emu86_modrm *__restrict modrm,
-                                      emu86_opflags_t flags) {
+INTERN uintptr_t KCALL
+x86_decode_modrmgetmem(struct icpustate *__restrict state,
+                       struct emu86_modrm *__restrict modrm,
+                       emu86_opflags_t flags) {
 	uintptr_t result;
 	if (EMU86_MODRM_ISREG(modrm->mi_type))
 		return x86_icpustate_get(state, modrm->mi_rm);

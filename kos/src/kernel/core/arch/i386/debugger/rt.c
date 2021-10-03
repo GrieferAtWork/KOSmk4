@@ -1197,7 +1197,7 @@ dbg_enter_scpustate_cr(dbg_entry_c_t entry, void const *data,
 	return result;
 }
 
-PUBLIC ATTR_NORETURN NONNULL((1, 2, 4)) void FCALL
+PUBLIC ABNORMAL_RETURN ATTR_NORETURN NONNULL((1, 2, 4)) void FCALL
 dbg_enter_fcpustate_c(dbg_entry_c_t entry, void const *data,
                       size_t num_bytes, struct fcpustate *__restrict state) {
 	struct fcpustate *new_state;
@@ -1205,7 +1205,7 @@ dbg_enter_fcpustate_c(dbg_entry_c_t entry, void const *data,
 	cpu_apply_fcpustate(new_state);
 }
 
-PUBLIC ATTR_NORETURN NONNULL((1, 2, 4)) void FCALL
+PUBLIC ABNORMAL_RETURN ATTR_NORETURN NONNULL((1, 2, 4)) void FCALL
 dbg_enter_ucpustate_c(dbg_entry_c_t entry, void const *data,
                       size_t num_bytes, struct ucpustate *__restrict state) {
 	struct ucpustate *new_state;
@@ -1213,7 +1213,7 @@ dbg_enter_ucpustate_c(dbg_entry_c_t entry, void const *data,
 	cpu_apply_ucpustate(new_state);
 }
 
-PUBLIC ATTR_NORETURN NONNULL((1, 2, 4)) void FCALL
+PUBLIC ABNORMAL_RETURN ATTR_NORETURN NONNULL((1, 2, 4)) void FCALL
 dbg_enter_lcpustate_c(dbg_entry_c_t entry, void const *data,
                       size_t num_bytes, struct lcpustate *__restrict state) {
 	struct lcpustate *new_state;
@@ -1221,7 +1221,7 @@ dbg_enter_lcpustate_c(dbg_entry_c_t entry, void const *data,
 	cpu_apply_lcpustate(new_state);
 }
 
-PUBLIC ATTR_NORETURN NONNULL((1, 2, 4)) void FCALL
+PUBLIC ABNORMAL_RETURN ATTR_NORETURN NONNULL((1, 2, 4)) void FCALL
 dbg_enter_kcpustate_c(dbg_entry_c_t entry, void const *data,
                       size_t num_bytes, struct kcpustate *__restrict state) {
 	struct kcpustate *new_state;
@@ -1229,7 +1229,7 @@ dbg_enter_kcpustate_c(dbg_entry_c_t entry, void const *data,
 	cpu_apply_kcpustate(new_state);
 }
 
-PUBLIC ATTR_NORETURN NONNULL((1, 2, 4)) void FCALL
+PUBLIC ABNORMAL_RETURN ATTR_NORETURN NONNULL((1, 2, 4)) void FCALL
 dbg_enter_icpustate_c(dbg_entry_c_t entry, void const *data,
                       size_t num_bytes, struct icpustate *__restrict state) {
 	struct icpustate *new_state;
@@ -1237,7 +1237,7 @@ dbg_enter_icpustate_c(dbg_entry_c_t entry, void const *data,
 	cpu_apply_icpustate(new_state);
 }
 
-PUBLIC ATTR_NORETURN NONNULL((1, 2, 4)) void FCALL
+PUBLIC ABNORMAL_RETURN ATTR_NORETURN NONNULL((1, 2, 4)) void FCALL
 dbg_enter_scpustate_c(dbg_entry_c_t entry, void const *data,
                       size_t num_bytes, struct scpustate *__restrict state) {
 	struct scpustate *new_state;

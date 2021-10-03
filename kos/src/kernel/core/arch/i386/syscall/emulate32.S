@@ -63,9 +63,9 @@
  *       that  was thrown by  the system call, also  dealing with the possibility
  *       of RPC function handling, as well as system call restarting) */
 
-/* >> FUNDEF ATTR_NORETURN void FCALL
- * >> syscall_emulate_r(struct icpustate *__restrict state,
- * >>                   struct rpc_syscall_info *__restrict sc_info); */
+/* >> FUNDEF ABNORMAL_RETURN ATTR_NORETURN NONNULL((1)) void
+ * >> NOTHROW(FCALL syscall_emulate_r)(struct icpustate *__restrict state,
+ * >>                                  struct rpc_syscall_info *__restrict sc_info); */
 .section .text
 	.cfi_startproc simple
 	EXTERN(syscall_emulate_r_personality)

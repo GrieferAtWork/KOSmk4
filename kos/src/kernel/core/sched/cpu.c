@@ -126,7 +126,7 @@ NOTHROW(FCALL panic_critical_thread_exited)(void) {
  *                   This argument is ignored for kernel-threads.
  * WARNING: Calling this function from an IDLE task, or any other
  *          task that is critical will cause the kernel to PANIC! */
-PUBLIC ATTR_NORETURN void
+PUBLIC ABNORMAL_RETURN ATTR_NORETURN void
 NOTHROW(FCALL task_exit)(int w_status) {
 	struct task *caller = THIS_TASK, *next;
 	struct cpu *me;

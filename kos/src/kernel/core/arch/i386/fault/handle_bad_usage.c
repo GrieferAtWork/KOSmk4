@@ -453,8 +453,8 @@ NOTHROW(FCALL unwind_interrupt)(struct icpustate *__restrict self) {
 	}
 
 /* Fill in missing exception pointer. */
-PRIVATE ATTR_NORETURN NOBLOCK void FCALL
-complete_except(struct icpustate *__restrict self) {
+PRIVATE ABNORMAL_RETURN NOBLOCK ATTR_NORETURN NONNULL((1)) void
+NOTHROW(FCALL complete_except)(struct icpustate *__restrict self) {
 	error_class_t cls;
 	cls = PERTASK_GET(this_exception_class);
 	if (cls == E_SEGFAULT) {
@@ -487,9 +487,9 @@ complete_except(struct icpustate *__restrict self) {
 }
 
 /* Fill in missing exception pointer. */
-PRIVATE ATTR_NORETURN NOBLOCK void FCALL
-complete_except_switch(struct icpustate *__restrict self,
-                       uintptr_t opcode, uintptr_t op_flags) {
+PRIVATE ABNORMAL_RETURN NOBLOCK ATTR_NORETURN NONNULL((1)) void
+NOTHROW(FCALL complete_except_switch)(struct icpustate *__restrict self,
+                                      uintptr_t opcode, uintptr_t op_flags) {
 	error_class_t cls = PERTASK_GET(this_exception_class);
 	if (cls == E_ILLEGAL_INSTRUCTION) {
 		if (!PERTASK_GET(this_exception_args.e_illegal_instruction.ii_opcode))
@@ -500,12 +500,12 @@ complete_except_switch(struct icpustate *__restrict self,
 	complete_except(self);
 }
 
-PRIVATE ATTR_NORETURN NONNULL((1)) void FCALL
-throw_illegal_instruction_exception(struct icpustate *__restrict state,
-                                    error_code_t code, uintptr_t opcode,
-                                    uintptr_t op_flags, uintptr_t ptr2,
-                                    uintptr_t ptr3, uintptr_t ptr4,
-                                    uintptr_t ptr5, uintptr_t ptr6) {
+PRIVATE ABNORMAL_RETURN ATTR_NORETURN NONNULL((1)) void
+NOTHROW(FCALL throw_illegal_instruction_exception)(struct icpustate *__restrict state,
+                                                   error_code_t code, uintptr_t opcode,
+                                                   uintptr_t op_flags, uintptr_t ptr2,
+                                                   uintptr_t ptr3, uintptr_t ptr4,
+                                                   uintptr_t ptr5, uintptr_t ptr6) {
 	unsigned int i;
 	void const *pc, *next_pc;
 	pc      = icpustate_getpc(state);
@@ -529,9 +529,10 @@ throw_illegal_instruction_exception(struct icpustate *__restrict state,
 	unwind_interrupt(state);
 }
 
-PRIVATE ATTR_NORETURN NONNULL((1)) void FCALL
-throw_exception(struct icpustate *__restrict state,
-                error_code_t code, uintptr_t ptr0, uintptr_t ptr1) {
+PRIVATE ABNORMAL_RETURN ATTR_NORETURN NONNULL((1)) void
+NOTHROW(FCALL throw_exception)(struct icpustate *__restrict state,
+                               error_code_t code, uintptr_t ptr0,
+                               uintptr_t ptr1) {
 	unsigned int i;
 	void const *pc, *next_pc;
 	pc      = icpustate_getpc(state);
@@ -547,18 +548,18 @@ throw_exception(struct icpustate *__restrict state,
 	unwind_interrupt(state);
 }
 
-PRIVATE ATTR_NORETURN NONNULL((1)) void
-(FCALL throw_generic_unknown_instruction)(struct icpustate *__restrict state,
-                                          bad_usage_reason_t usage, uintptr_t opcode,
-                                          emu86_opflags_t op_flags
+PRIVATE ABNORMAL_RETURN ATTR_NORETURN NONNULL((1)) void
+NOTHROW(FCALL throw_generic_unknown_instruction)(struct icpustate *__restrict state,
+                                                 bad_usage_reason_t usage, uintptr_t opcode,
+                                                 emu86_opflags_t op_flags
 #ifndef __x86_64__
-                                          ,
-                                          u8 rm
+                                                 ,
+                                                 u8 rm
 #else /* !__x86_64__ */
 #define throw_generic_unknown_instruction(state, usage, opcode, op_flags, ...) \
 	throw_generic_unknown_instruction(state, usage, opcode, op_flags)
 #endif /* __x86_64__ */
-                                          ) {
+                                                 ) {
 
 	/* Produce some default exception. */
 	if (BAD_USAGE_REASON(usage) == BAD_USAGE_REASON_UD) {
@@ -660,10 +661,10 @@ PRIVATE ATTR_NORETURN NONNULL((1)) void
 	}
 }
 
-PRIVATE ATTR_NORETURN NONNULL((1)) void FCALL
-throw_unsupported_instruction(struct icpustate *__restrict state,
-                              bad_usage_reason_t usage,
-                              uintptr_t opcode, uintptr_t op_flags) {
+PRIVATE ABNORMAL_RETURN ATTR_NORETURN NONNULL((1)) void
+NOTHROW(FCALL throw_unsupported_instruction)(struct icpustate *__restrict state,
+                                             bad_usage_reason_t usage,
+                                             uintptr_t opcode, uintptr_t op_flags) {
 	if (BAD_USAGE_REASON(usage) == BAD_USAGE_REASON_UD) {
 		/* An unsupported instruction caused a #UD
 		 * -> Throw an UNSUPPORTED_OPCODE exception */
@@ -786,7 +787,7 @@ throw_unsupported_instruction(struct icpustate *__restrict state,
 
 /* Return the OS-specific ID for the current CPU (same as the `IA32_TSC_AUX' MSR) */
 #define EMU86_EMULATE_RDPID() emulate_rdpid()
-PRIVATE ATTR_PURE WUNUSED u32 KCALL emulate_rdpid(void) {
+PRIVATE ATTR_PURE WUNUSED u32 NOTHROW(KCALL emulate_rdpid)(void) {
 	/* TODO: KOS currently doesn't  program the `IA32_TSC_AUX'  MSR during CPU  initialization.
 	 *       We really need to do  this, though (programming should  always be done when  cpuid
 	 *       bit `CPUID_80000001D_RDTSCP' is enabled, in which case `rdtscp' exists, and should
@@ -795,8 +796,8 @@ PRIVATE ATTR_PURE WUNUSED u32 KCALL emulate_rdpid(void) {
 }
 
 #define EMU86_EMULATE_RDTSCP(tsc_aux) emulate_rdtscp(&(tsc_aux))
-LOCAL WUNUSED NONNULL((1)) u64 KCALL
-emulate_rdtscp(u32 *__restrict p_tsc_aux) {
+LOCAL WUNUSED NONNULL((1)) u64
+NOTHROW(KCALL emulate_rdtscp)(u32 *__restrict p_tsc_aux) {
 	u64 tsc;
 	pflag_t was;
 	/* To guaranty that the hosting CPU doesn't change  during
@@ -816,7 +817,7 @@ emulate_rdtscp(u32 *__restrict p_tsc_aux) {
 /* Emulation of the `rdtsc' instruction */
 #if EMU86_EMULATE_CONFIG_WANT_RDTSC
 #define EMU86_EMULATE_RDTSC() emulate_rdtsc()
-PRIVATE u64 KCALL emulate_rdtsc(void) {
+PRIVATE u64 NOTHROW(KCALL emulate_rdtsc)(void) {
 	struct timespec now = realtime();
 	return ((u64)now.tv_sec * __NSEC_PER_SEC) + now.tv_nsec;
 }
@@ -898,7 +899,8 @@ PRIVATE u64 KCALL emulate_rdtsc(void) {
 #define EMU86_SETFSBASE(v) setfsbase(_state, (uintptr_t)(v))
 #define EMU86_SETGSBASE(v) setgsbase((uintptr_t)(v))
 PRIVATE void FCALL
-setfsbase(struct icpustate32 *__restrict state, uintptr_t value) {
+setfsbase(struct icpustate32 *__restrict state, uintptr_t value)
+		THROWS(E_ILLEGAL_INSTRUCTION_REGISTER) {
 	u16 myfs = icpustate_getfs_novm86(state) & ~3;
 	if (myfs == SEGMENT_USER_FSBASE)
 		x86_set_user_fsbase_noreload(value);
@@ -915,7 +917,8 @@ setfsbase(struct icpustate32 *__restrict state, uintptr_t value) {
 }
 
 PRIVATE void FCALL
-setgsbase(uintptr_t value) {
+setgsbase(uintptr_t value)
+		THROWS(E_ILLEGAL_INSTRUCTION_REGISTER) {
 	u16 mygs = __rdgs() & ~3;
 	if (mygs == SEGMENT_USER_GSBASE)
 		x86_set_user_gsbase_noreload(value);
@@ -962,7 +965,7 @@ setgsbase(uintptr_t value) {
  * a kernel-space address (while also overlapping with the UKERN  segment),
  * must be dispatched through VIO, as implemented by libviocore. */
 #ifndef CONFIG_NO_USERKERN_SEGMENT
-PRIVATE struct icpustate *FCALL
+PRIVATE WUNUSED NONNULL((1)) struct icpustate *FCALL
 dispatch_userkern_vio_r(struct icpustate *__restrict state) {
 	struct vio_emulate_args args;
 	struct mman *mymm = THIS_MMAN;
@@ -1061,9 +1064,11 @@ assert_user_address_range(struct icpustate *__restrict state,
 
 #define EMU86_EMULATE_VALIDATE_BEFORE_OPCODE_DECODE(pc) \
 	assert_canonical_pc(_state, (void const *)(pc))
-PRIVATE void KCALL
+PRIVATE ABNORMAL_RETURN void KCALL
 assert_canonical_pc(struct icpustate *__restrict state,
-                    void const *pc) {
+                    void const *pc)
+		THROWS(E_SEGFAULT) {
+
 	/* Make sure that the program counter is canonical! */
 	if unlikely(ADDR_IS_NONCANON(pc)) {
 		/* Special case: Non-canonical program counter
@@ -1127,7 +1132,8 @@ PRIVATE void KCALL
 assert_canonical_address(struct icpustate *__restrict state,
                          void const *instr_start_pc,
                          void *addr, size_t num_bytes,
-                         bool reading, bool writing) {
+                         bool reading, bool writing)
+		THROWS(E_SEGFAULT) {
 	assert(reading || writing);
 	if unlikely(ADDR_IS_NONCANON((byte_t *)addr) ||
 	            ADDR_IS_NONCANON((byte_t *)addr + num_bytes - 1)) {
@@ -1213,9 +1219,10 @@ assert_canonical_address(struct icpustate *__restrict state,
 #define EMU86_GETSSBASE() EMU86_GETSEGBASE(EMU86_R_SS)
 #define EMU86_GETFSBASE() EMU86_GETSEGBASE(EMU86_R_FS)
 #define EMU86_GETGSBASE() EMU86_GETSEGBASE(EMU86_R_GS)
-PRIVATE WUNUSED NONNULL((1)) u32
-NOTHROW(KCALL i386_getsegment_base)(struct icpustate32 *__restrict state,
-                                    u8 segment_regno) {
+PRIVATE WUNUSED NONNULL((1)) u32 KCALL
+i386_getsegment_base(struct icpustate32 *__restrict state,
+                     u8 segment_regno)
+		THROWS(E_ILLEGAL_INSTRUCTION_REGISTER) {
 	u32 result;
 	u16 segment_index;
 	pflag_t was;
@@ -1361,7 +1368,7 @@ err_privileged_segment:
  * For this, fill registers with data from the cpu-local features tables. */
 #if EMU86_EMULATE_CONFIG_WANT_CPUID
 #define EMU86_EMULATE_HANDLE_CPUID() cpuid(_state)
-PRIVATE WUNUSED NONNULL((1)) void
+PRIVATE NOBLOCK WUNUSED NONNULL((1)) void
 NOTHROW(KCALL cpuid)(struct icpustate *__restrict state) {
 	struct cpuinfo const *info = &CURRENT_X86_CPUID;
 	if ((u32)state->ics_gpregs.gp_Pax & UINT32_C(0x80000000)) {
@@ -1429,7 +1436,8 @@ NOTHROW(KCALL cpuid)(struct icpustate *__restrict state) {
 	PRIVATE NONNULL((1)) u##Nbits KCALL                                      \
 	do_atomic_cmpxch##bwlq(struct icpustate **__restrict pstate,             \
 	                       USER CHECKED u##Nbits *addr, u##Nbits oldval,     \
-	                       u##Nbits newval, bool force_atomic) {             \
+	                       u##Nbits newval, bool force_atomic)               \
+			THROWS(E_SEGFAULT) {                                             \
 		u##Nbits result;                                                     \
 		if (force_atomic) {                                                  \
 			result = x86_emulock_cmpxch##bwlq(pstate, addr, oldval, newval); \
@@ -1450,7 +1458,8 @@ NOTHROW(KCALL cpuid)(struct icpustate *__restrict state) {
 	PRIVATE NONNULL((1)) bool KCALL                                                 \
 	do_atomic_cmpxch##bwlq##_or_write(struct icpustate **__restrict pstate,         \
 	                                  USER CHECKED u##Nbits *addr, u##Nbits oldval, \
-	                                  u##Nbits newval, bool force_atomic) {         \
+	                                  u##Nbits newval, bool force_atomic)           \
+			THROWS(E_SEGFAULT) {                                                    \
 		u##Nbits result;                                                            \
 		if (force_atomic) {                                                         \
 			result = x86_emulock_cmpxch##bwlq(pstate, addr, oldval, newval);        \
@@ -1475,7 +1484,8 @@ NOTHROW(KCALL cpuid)(struct icpustate *__restrict state) {
 PRIVATE NONNULL((1)) uint128_t KCALL
 do_atomic_cmpxchx(struct icpustate **__restrict pstate,
                   USER CHECKED uint128_t *addr, uint128_t oldval,
-                  uint128_t newval, bool force_atomic) {
+                  uint128_t newval, bool force_atomic)
+		THROWS(E_SEGFAULT) {
 	uint128_t result;
 	if (force_atomic) {
 		result = x86_emulock_cmpxchx(pstate, addr, oldval, newval);
@@ -1693,7 +1703,8 @@ done:
 
 PRIVATE ATTR_RETNONNULL NONNULL((1)) struct icpustate *FCALL
 x86_emulate_xbegin(struct icpustate *__restrict state,
-                   void const *fallback_ip) {
+                   void const *fallback_ip)
+		THROWS(E_ILLEGAL_INSTRUCTION_UNSUPPORTED_OPCODE, ...) {
 	REF struct mrtm_driver_hooks *hooks;
 	/* Lookup RTM hooks. */
 	hooks = awref_get(&mrtm_hooks);
@@ -1744,7 +1755,8 @@ throw_illegal_op:
 PRIVATE NOPREEMPT ATTR_RETNONNULL WUNUSED NONNULL((1)) struct segment *KCALL
 x86_lookup_segment_nopr(struct icpustate *__restrict state,
                         uint16_t segment_value, pflag_t was,
-                        uintptr_t segment_regno) {
+                        uintptr_t segment_regno)
+		THROWS(E_ILLEGAL_INSTRUCTION_REGISTER) {
 	uintptr_t segment_index;
 	struct segment *seg;
 	struct desctab dt;
@@ -1805,9 +1817,10 @@ x86_lookup_segment_nopr(struct icpustate *__restrict state,
 	return seg;
 }
 
-PRIVATE void KCALL
+PRIVATE NONNULL((1)) void KCALL
 x86_validate_ipcs(struct icpustate *__restrict state,
-                  uintptr_t ip, uint16_t cs) {
+                  uintptr_t ip, uint16_t cs)
+		THROWS(E_ILLEGAL_INSTRUCTION_REGISTER) {
 	pflag_t was;
 	struct segment *seg;
 	was = PREEMPTION_PUSHOFF();
@@ -1844,9 +1857,10 @@ x86_validate_ipcs(struct icpustate *__restrict state,
 	PREEMPTION_POP(was);
 }
 
-PRIVATE void KCALL
+PRIVATE NONNULL((1)) void KCALL
 x86_validate_datseg(struct icpustate *__restrict state,
-                    uint16_t segment_value, uintptr_t segment_regno) {
+                    uint16_t segment_value, uintptr_t segment_regno)
+		THROWS(E_ILLEGAL_INSTRUCTION_REGISTER) {
 	pflag_t was;
 	struct segment *seg;
 #ifdef __x86_64__
@@ -1878,10 +1892,11 @@ x86_validate_datseg(struct icpustate *__restrict state,
 /************************************************************************/
 #define EMU86_VALIDATE_IO(portno, num_ports) \
 	hbu_validate_io(_state, portno, num_ports, usage)
-PRIVATE void KCALL
+PRIVATE NONNULL((1)) void KCALL
 hbu_validate_io(struct icpustate *__restrict state,
                 u16 portno, u8 num_ports,
-                bad_usage_reason_t usage) {
+                bad_usage_reason_t usage)
+		THROWS(E_ILLEGAL_INSTRUCTION_PRIVILEGED_OPCODE) {
 	struct ioperm_bitmap *iob;
 	assert(num_ports <= 4);
 
@@ -1967,20 +1982,20 @@ DECL_END
 DECL_BEGIN
 
 
-INTERN struct icpustate *FCALL
-x86_handle_stackfault(struct icpustate *__restrict state, uintptr_t ecode) {
+INTERN ABNORMAL_RETURN ATTR_RETNONNULL WUNUSED NONNULL((1)) struct icpustate *FCALL
+x86_handle_stackfault(struct icpustate *__restrict state, uintptr_t ecode) THROWS(...) {
 	STATIC_ASSERT(IDT_CONFIG_ISTRAP(0x0c)); /* #SS  Stack segment fault. */
 	return x86_handle_bad_usage(state, BAD_USAGE_REASON_SS | (ecode & 0xffff));
 }
 
-INTERN struct icpustate *FCALL
-x86_handle_gpf(struct icpustate *__restrict state, uintptr_t ecode) {
+INTERN ABNORMAL_RETURN ATTR_RETNONNULL WUNUSED NONNULL((1)) struct icpustate *FCALL
+x86_handle_gpf(struct icpustate *__restrict state, uintptr_t ecode) THROWS(...) {
 	STATIC_ASSERT(IDT_CONFIG_ISTRAP(0x0d)); /* #GP  General Protection Fault. */
 	return x86_handle_bad_usage(state, BAD_USAGE_REASON_GFP | (ecode & 0xffff));
 }
 
-INTERN struct icpustate *FCALL
-x86_handle_illegal_instruction(struct icpustate *__restrict state) {
+INTERN ABNORMAL_RETURN ATTR_RETNONNULL WUNUSED NONNULL((1)) struct icpustate *FCALL
+x86_handle_illegal_instruction(struct icpustate *__restrict state) THROWS(...) {
 	STATIC_ASSERT(IDT_CONFIG_ISTRAP(0x06)); /* #UD  Illegal Instruction */
 	return x86_handle_bad_usage(state, BAD_USAGE_REASON_UD);
 }

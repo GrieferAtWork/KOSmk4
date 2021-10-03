@@ -25,10 +25,15 @@
 #include "../api.h"
 /**/
 
+#include <kos/anno.h>
 #include <kos/kernel/cpu-state.h>
 #include <kos/types.h>
 
 DECL_BEGIN
+
+#ifndef ABNORMAL_RETURN
+#define ABNORMAL_RETURN __ABNORMAL_RETURN
+#endif /* !ABNORMAL_RETURN */
 
 #ifndef FCALL
 #define FCALL __FCALL
@@ -45,11 +50,11 @@ struct assert_args {
 };
 
 /* Core undefined-behavior handlers. (called from assembly) */
-INTDEF ATTR_NOINLINE ATTR_NORETURN void FCALL libc_assertion_failure_core(struct assert_args *__restrict args);
-INTDEF ATTR_NOINLINE ATTR_NORETURN void FCALL libc_stack_failure_core(struct kcpustate *__restrict state);
-INTDEF ATTR_NOINLINE ATTR_NORETURN void FCALL libc_abort_failure_core(struct kcpustate *__restrict state);
+INTDEF ABNORMAL_RETURN ATTR_COLD ATTR_NORETURN NONNULL((1)) void NOTHROW(FCALL libc_assertion_failure_core)(struct assert_args *__restrict args);
+INTDEF ABNORMAL_RETURN ATTR_COLD ATTR_NORETURN NONNULL((1)) void NOTHROW(FCALL libc_stack_failure_core)(struct kcpustate *__restrict state);
+INTDEF ABNORMAL_RETURN ATTR_COLD ATTR_NORETURN NONNULL((1)) void NOTHROW(FCALL libc_abort_failure_core)(struct kcpustate *__restrict state);
 #ifdef __KERNEL__
-INTDEF ATTR_NOINLINE struct kcpustate *FCALL libc_assertion_check_core(struct assert_args *__restrict args);
+INTDEF ABNORMAL_RETURN ATTR_COLD ATTR_RETNONNULL WUNUSED NONNULL((1)) struct kcpustate *NOTHROW(FCALL libc_assertion_check_core)(struct assert_args *__restrict args);
 #endif /* __KERNEL__ */
 
 

@@ -364,7 +364,8 @@ NOTHROW(KCALL x86_repair_broken_tls_state)(void);
 
 
 PRIVATE ATTR_NORETURN void FCALL
-rethrow_exception_from_pf_handler(struct icpustate *__restrict state, void const *pc) {
+rethrow_exception_from_pf_handler(struct icpustate *__restrict state, void const *pc)
+		THROWS(...) {
 	/* Use the regular `instruction_trysucc()' since we're actually inside
 	 * of a CATCH-block right now, meaning that it will already do all  of
 	 * the necessary work of preserving the old exception for us! */
@@ -383,7 +384,7 @@ rethrow_exception_from_pf_handler(struct icpustate *__restrict state, void const
 
 
 
-INTERN struct icpustate *FCALL
+INTERN ABNORMAL_RETURN ATTR_RETNONNULL WUNUSED NONNULL((1)) struct icpustate *FCALL
 x86_handle_pagefault(struct icpustate *__restrict state,
                      uintptr_t ecode, void *addr) {
 	STATIC_ASSERT(!IDT_CONFIG_ISTRAP(0x0e)); /* #PF  Page Fault */
