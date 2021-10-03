@@ -1763,7 +1763,7 @@ handle_error:
 				THROW(E_PROCESS_EXITED, (upid_t)pgid);
 			if (error == TASK_SETPROCESSGROUPLEADER_LEADER) {
 				THROW(E_ILLEGAL_PROCESS_OPERATION,
-				      E_ILLEGAL_OPERATION_SETPGID_LEADER,
+				      E_ILLEGAL_OPERATION_CONTEXT_SETPGID_LEADER,
 				      (upid_t)pid, (upid_t)pgid);
 			}
 		}

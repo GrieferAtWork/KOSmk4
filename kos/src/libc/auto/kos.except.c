@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9d4deadf */
+/* HASH CRC-32:0x692686ef */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -361,12 +361,12 @@ for (local name: classes.keys.sorted()) {
 
 	case E_ILLEGAL_OPERATION:
 #if defined(ENXIO) && defined(EPERM)
-		result = self->e_args.e_illegal_operation.io_reason == E_ILLEGAL_OPERATION_OPEN_S_IFSOCK ? ENXIO : EPERM;
+		result = self->e_args.e_illegal_operation.io_reason == E_ILLEGAL_OPERATION_CONTEXT_OPEN_S_IFSOCK ? ENXIO : EPERM;
 #endif /* ENXIO && EPERM */
 		switch(self->e_subclass) {
 #if defined(EINVAL) && defined(ELOOP)
 		case ERROR_SUBCLASS(ERROR_CODEOF(E_ILLEGAL_REFERENCE_LOOP)):
-			result = self->e_args.e_illegal_operation.io_reason == E_ILLEGAL_OPERATION_EPOLL_MONITOR_SELF_LOOP ? EINVAL : ELOOP;
+			result = self->e_args.e_illegal_operation.io_reason == E_ILLEGAL_OPERATION_CONTEXT_EPOLL_MONITOR_SELF_LOOP ? EINVAL : ELOOP;
 			break;
 #endif /* EINVAL && ELOOP */
 		default: break;
@@ -404,7 +404,7 @@ for (local name: classes.keys.sorted()) {
 			        EINVAL;
 			break;
 #endif /* EAFNOSUPPORT && ESOCKTNOSUPPORT && EPROTONOSUPPORT && EINVAL */
-#if defined(ENOTCONN) && defined(EDESTADDRREQ) && defined(EISCONN) && defined(ENXIO) && defined(EPIPE) && defined(EINVAL)
+#if defined(ENOTCONN) && defined(EDESTADDRREQ) && defined(EISCONN) && defined(ENXIO) && defined(EPIPE) && defined(ENOMEM) && defined(EINVAL)
 		case ERROR_SUBCLASS(ERROR_CODEOF(E_INVALID_ARGUMENT_BAD_STATE)):
 			result = self->e_args.e_invalid_argument.ia_context == E_INVALID_ARGUMENT_CONTEXT_SHUTDOWN_NOT_CONNECTED ||
 			        self->e_args.e_invalid_argument.ia_context == E_INVALID_ARGUMENT_CONTEXT_GETPEERNAME_NOT_CONNECTED ||
@@ -413,9 +413,11 @@ for (local name: classes.keys.sorted()) {
 			        self->e_args.e_invalid_argument.ia_context == E_INVALID_ARGUMENT_CONTEXT_CONNECT_ALREADY_CONNECTED ? EISCONN :
 			        self->e_args.e_invalid_argument.ia_context == E_INVALID_ARGUMENT_CONTEXT_OPEN_FIFO_WRITER_NO_READERS ? ENXIO :
 			        self->e_args.e_invalid_argument.ia_context == E_INVALID_ARGUMENT_CONTEXT_WRITE_FIFO_NO_READERS ? EPIPE :
+			        (self->e_args.e_invalid_argument.ia_context == E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_MEMORY ||
+			         self->e_args.e_invalid_argument.ia_context == E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_FUTEX) ? ENOMEM :
 			        EINVAL;
 			break;
-#endif /* ENOTCONN && EDESTADDRREQ && EISCONN && ENXIO && EPIPE && EINVAL */
+#endif /* ENOTCONN && EDESTADDRREQ && EISCONN && ENXIO && EPIPE && ENOMEM && EINVAL */
 #ifdef ENOPROTOOPT
 		case ERROR_SUBCLASS(ERROR_CODEOF(E_INVALID_ARGUMENT_SOCKET_OPT)):
 			result = ENOPROTOOPT;

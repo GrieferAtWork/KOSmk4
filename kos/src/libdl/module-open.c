@@ -453,7 +453,7 @@ DlModule_OpenFilename(USER char const *filename,
 	fd = sys_open(filename, O_RDONLY | O_CLOEXEC, 0);
 	if unlikely(E_ISERR(fd)) {
 #ifdef CONFIG_DLOPEN_LIBSERVICE_SUPPORT
-		if (fd == -ENXIO) /* Produced as the result of `E_ILLEGAL_OPERATION_OPEN_S_IFSOCK' */
+		if (fd == -ENXIO) /* Produced as the result of `E_ILLEGAL_OPERATION_CONTEXT_OPEN_S_IFSOCK' */
 			return DlModule_OpenService(filename, mode);
 #endif /* CONFIG_DLOPEN_LIBSERVICE_SUPPORT */
 		goto err; /* No error on file-access-failure! */

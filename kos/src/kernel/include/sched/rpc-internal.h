@@ -29,6 +29,7 @@
 
 #include <hybrid/sequence/list.h>
 
+#include <kos/bits/exception_data.h>
 #include <bits/os/siginfo.h>
 #include <kos/rpc.h>
 
@@ -49,17 +50,27 @@ DECL_BEGIN
                                             * result of it terminating prior to being able to serve the RPC,
                                             * which  can be checked by testing `this_rpcs' of the target for
                                             * being equal to `THIS_RPCS_TERMINATED'. */
+#define PENDING_USER_RPC_STATUS_ERROR    3 /* Program execution failed. (s.a. `pur_error') */
 
 struct pending_rpc;
 struct pending_user_rpc {
 	WEAK refcnt_t                                        pur_refcnt; /* Reference counter. */
-	unsigned int                                         pur_status; /* RPC status (one of `PENDING_USER_RPC_STATUS_*') */
+	uintptr_t                                            pur_status; /* RPC status (one of `PENDING_USER_RPC_STATUS_*') */
 	struct sig                                           pur_stchng; /* Signal broadcast when `pur_status' is changed
 	                                                                  * by someone  other than  the original  sender. */
-	REF struct mman                                     *pur_mman;   /* [1..1][const] The mman within which `pur_prog' resides. */
-	USER CHECKED void const                             *pur_prog;   /* [1..1][const] Userspace RPC program */
-	size_t                                               pur_argc;   /* [const] # of program arguments. */
-	COMPILER_FLEXIBLE_ARRAY(USER UNCHECKED void const *, pur_argv);  /* [?..?][const] Vector of program arguments. */
+	union {
+		struct {
+			REF struct mman           *pur_mman;       /* [1..1][const] The mman within which `pur_prog' resides. */
+			USER CHECKED void const   *pur_prog;       /* [1..1][const] Userspace RPC program */
+			size_t                     pur_argc;       /* [const] # of program arguments. */
+			USER UNCHECKED void const *pur_argv[1024]; /* [?..?][pur_argc][const] Vector of program arguments.
+			                                            * Should be flexible, but GCC sucks and doesn't allow that... */
+		};
+		struct {
+			__error_code_t                e_code; /* Exception code. */
+			union exception_data_pointers e_args; /* Exception args. */
+		} pur_error; /* [valid_if(PENDING_USER_RPC_STATUS_ERROR)] */
+	};
 };
 
 #ifndef __siginfo_t_defined

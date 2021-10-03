@@ -39,7 +39,7 @@ PRIVATE DRIVER_INIT void KCALL rtm_init(void) {
 	/* Install our RTM hooks.
 	 * If RTM hooks had already been installed, throw an exception */
 	if (!awref_cmpxch(&mrtm_hooks, NULL, &rtm_hooks))
-		THROW(E_ILLEGAL_OPERATION, E_ILLEGAL_OPERATION_RTM_ALREADY_LOADED);
+		THROW(E_ILLEGAL_OPERATION, E_ILLEGAL_OPERATION_CONTEXT_RTM_ALREADY_LOADED);
 }
 
 PRIVATE DRIVER_FINI void KCALL rtm_fini(void) {

@@ -504,8 +504,10 @@ done:
 }
 
 
-/* Helper function for `userexcept_handler()' and `userexcept_sysret()' */
-PRIVATE NONNULL((1, 2, 3)) void
+/* Helper function for `userexcept_handler()' and `userexcept_sysret()'
+ * @return: true:  RPC was handled.
+ * @return: false: RPC cannot be handled right now; Load other RPCs and try again */
+PRIVATE WUNUSED NONNULL((1, 2, 3)) bool
 NOTHROW(FCALL userexcept_exec_user_rpc)(/*in|out*/ struct rpc_context *__restrict ctx,
                                         /*in|out*/ struct exception_info *__restrict error,
                                         /*inherit(always)*/ struct pending_rpc *__restrict rpc) {
@@ -598,6 +600,10 @@ again_switch_action_handler:
 			} EXCEPT {
 				/* Prioritize errors. */
 				struct exception_info *tls = error_info();
+				if (tls->ei_code == ERROR_CODEOF(E_INTERRUPT_USER_RPC)) {
+					xdecref_unlikely(action.sa_mask);
+					return false; /* Load other RPCs and try again. */
+				}
 				if (error_priority(error->ei_code) < error_priority(tls->ei_code))
 					memcpy(error, tls, sizeof(struct exception_info));
 			}
@@ -673,11 +679,14 @@ again_switch_action_handler:
 		} EXCEPT {
 			/* Prioritize errors. */
 			struct exception_info *tls = error_info();
+			if (tls->ei_code == ERROR_CODEOF(E_INTERRUPT_USER_RPC))
+				return false; /* Load other RPCs and try again. */
 			if (error_priority(error->ei_code) < error_priority(tls->ei_code))
 				memcpy(error, tls, sizeof(struct exception_info));
 		}
 		decref(&rpc->pr_user);
 	}
+	return true;
 }
 
 

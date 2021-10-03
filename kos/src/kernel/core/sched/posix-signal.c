@@ -3069,18 +3069,19 @@ DEFINE_SYSCALL4(errno_t, rt_sigprocmask, syscall_ulong_t, how,
 	validate_writable_opt(oset, sizeof(*oset));
 	if (!set) {
 		if (oset) {
-			sigset_t const *mymask;
+			USER CHECKED sigset_t const *mymask;
 			mymask = sigmask_getrd();
 			memcpy(oset, mymask, sizeof(sigset_t));
 		}
 	} else {
-		sigset_t *mymask;
+		USER CHECKED sigset_t *mymask;
 		mymask = sigmask_getwr();
 		if (oset)
 			memcpy(oset, mymask, sizeof(sigset_t));
 		switch (how) {
 
 		case SIG_BLOCK:
+			/* TODO: Don't try to write to a userprocmask if it already contains the correct bits! */
 			sigorset(mymask, mymask, set);
 			break;
 

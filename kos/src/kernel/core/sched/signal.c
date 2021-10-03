@@ -1845,12 +1845,17 @@ sig_multicompletion_connect_from_task(struct sig_multicompletion *__restrict com
 PUBLIC NOBLOCK NONNULL((1)) size_t
 NOTHROW(FCALL sig_sendmany)(struct sig *__restrict self,
                             size_t maxcount) {
-	size_t result = 0;
-	while (maxcount) {
-		if (!sig_send(self))
-			break;
-		--maxcount;
-		++result;
+	size_t result;
+	if (maxcount == (size_t)-1) {
+		result = sig_broadcast(self);
+	} else {
+		result = 0;
+		while (maxcount) {
+			if (!sig_send(self))
+				break;
+			--maxcount;
+			++result;
+		}
 	}
 	return result;
 }
@@ -1859,12 +1864,17 @@ PUBLIC NOBLOCK NONNULL((1, 2)) size_t
 NOTHROW(FCALL sig_altsendmany)(struct sig *self,
                                struct sig *sender,
                                size_t maxcount) {
-	size_t result = 0;
-	while (maxcount) {
-		if (!sig_altsend(self, sender))
-			break;
-		--maxcount;
-		++result;
+	size_t result;
+	if (maxcount == (size_t)-1) {
+		result = sig_altbroadcast(self, sender);
+	} else {
+		result = 0;
+		while (maxcount) {
+			if (!sig_altsend(self, sender))
+				break;
+			--maxcount;
+			++result;
+		}
 	}
 	return result;
 }
@@ -1872,12 +1882,17 @@ NOTHROW(FCALL sig_altsendmany)(struct sig *self,
 PUBLIC NOBLOCK NOPREEMPT NONNULL((1)) size_t
 NOTHROW(FCALL sig_sendmany_nopr)(struct sig *__restrict self,
                                  size_t maxcount) {
-	size_t result = 0;
-	while (maxcount) {
-		if (!sig_send_nopr(self))
-			break;
-		--maxcount;
-		++result;
+	size_t result;
+	if (maxcount == (size_t)-1) {
+		result = sig_broadcast_nopr(self);
+	} else {
+		result = 0;
+		while (maxcount) {
+			if (!sig_send_nopr(self))
+				break;
+			--maxcount;
+			++result;
+		}
 	}
 	return result;
 }
@@ -1886,12 +1901,17 @@ PUBLIC NOBLOCK NOPREEMPT NONNULL((1, 2)) size_t
 NOTHROW(FCALL sig_altsendmany_nopr)(struct sig *self,
                                     struct sig *sender,
                                     size_t maxcount) {
-	size_t result = 0;
-	while (maxcount) {
-		if (!sig_altsend_nopr(self, sender))
-			break;
-		--maxcount;
-		++result;
+	size_t result;
+	if (maxcount == (size_t)-1) {
+		result = sig_altbroadcast_nopr(self, sender);
+	} else {
+		result = 0;
+		while (maxcount) {
+			if (!sig_altsend_nopr(self, sender))
+				break;
+			--maxcount;
+			++result;
+		}
 	}
 	return result;
 }

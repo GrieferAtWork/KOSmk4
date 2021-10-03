@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x10ca321e */
+/* HASH CRC-32:0xd661148 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -202,6 +202,16 @@ __LIBC __ATTR_COLD __ATTR_NORETURN void (__LIBKCALL error_throw_current)(void) _
 /* Rethrow the current exception (same as a c++ `throw;' expression) */
 __LIBC __ATTR_COLD __ATTR_NORETURN void (__LIBKCALL error_rethrow)(void) __THROWS(...) __CASMNAME_SAME("error_rethrow");
 #endif /* !__error_rethrow_defined && __CRT_HAVE_error_rethrow */
+#if !defined(__error_throw_defined) && defined(__CRT_HAVE_error_throw)
+#define __error_throw_defined
+/* Throw an exception and fill exception pointers with all zeroes */
+__LIBC __ATTR_COLD __ATTR_NORETURN void (__ERROR_THROW_CC error_throw)(error_code_t __code) __THROWS(...) __CASMNAME_SAME("error_throw");
+#endif /* !__error_throw_defined && __CRT_HAVE_error_throw */
+#if !defined(__error_thrown_defined) && defined(__CRT_HAVE_error_thrown)
+#define __error_thrown_defined
+/* Throw an exception and load `argc' pointers from varargs */
+__LIBC __ATTR_COLD __ATTR_NORETURN void (__ERROR_THROWN_CC error_thrown)(error_code_t __code, unsigned int ___argc, ...) __THROWS(...) __CASMNAME_SAME("error_thrown");
+#endif /* !__error_thrown_defined && __CRT_HAVE_error_thrown */
 /* Rethrow the last exception */
 #ifdef __error_rethrow_defined
 #define RETHROW() error_rethrow()
@@ -233,16 +243,6 @@ __ATTR_WUNUSED __BOOL __NOTHROW(was_thrown)(error_code_t __code);
 #else /* __INTELLISENSE__ */
 
 #ifndef THROW
-#if !defined(__error_throw_defined) && defined(__CRT_HAVE_error_throw)
-#define __error_throw_defined
-/* Throw an exception and fill exception pointers with all zeroes */
-__LIBC __ATTR_COLD __ATTR_NORETURN void (__ERROR_THROW_CC error_throw)(error_code_t __code) __THROWS(...) __CASMNAME_SAME("error_throw");
-#endif /* !__error_throw_defined && __CRT_HAVE_error_throw */
-#if !defined(__error_thrown_defined) && defined(__CRT_HAVE_error_thrown)
-#define __error_thrown_defined
-/* Throw an exception and load `argc' pointers from varargs */
-__LIBC __ATTR_COLD __ATTR_NORETURN void (__ERROR_THROWN_CC error_thrown)(error_code_t __code, unsigned int ___argc, ...) __THROWS(...) __CASMNAME_SAME("error_thrown");
-#endif /* !__error_thrown_defined && __CRT_HAVE_error_thrown */
 #ifdef __HYBRID_PP_VA_NARGS
 #define __PRIVATE_THROW_PACKAGE_CODE1(code) code
 #define __PRIVATE_THROW_PACKAGE_CODE2       ERROR_CODE

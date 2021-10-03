@@ -537,15 +537,16 @@ printArrayDefineMacro("DEFINE_cfi_x86_64_unwind_landing_register_uncommon2dw", g
 
 /* Host-specific CFI constants. */
 #ifdef __x86_64__
-#define CFI_REGISTER_MAXSIZE                    CFI_X86_64_REGISTER_MAXSIZE
-#define CFI_REGISTER_SIZE(addrsize, regno)      CFI_X86_64_REGISTER_SIZE(regno)
-#define CFI_REGISTER_MEMSIZE(addrsize, regno)   CFI_X86_64_REGISTER_SIZE(regno)      /* Register size for read/write to/from memory */
-#define CFI_REGISTER_MEMSIZE_IS_SIZE            1                                    /* Hint: `CFI_REGISTER_MEMSIZE() == CFI_REGISTER_SIZE()' */
-#define CFI_UNWIND_REGISTER_PC(addrsize)        CFI_X86_64_UNWIND_REGISTER_PC        /* The register containing the program counter. */
-#define CFI_UNWIND_REGISTER_SP(addrsize)        CFI_X86_64_UNWIND_REGISTER_SP        /* The register for the CFA. */
-#define CFI_UNWIND_REGISTER_EXCEPTION(addrsize) CFI_X86_64_UNWIND_REGISTER_EXCEPTION /* The register used to hold the current exception upon entry to an exception handler. */
-#define CFI_UNWIND_REGISTER_MAXCOUNT            CFI_X86_64_UNWIND_REGISTER_COUNT
-#define CFI_UNWIND_REGISTER_COUNT(addrsize)     CFI_X86_64_UNWIND_REGISTER_COUNT
+#define CFI_REGISTER_MAXSIZE                        CFI_X86_64_REGISTER_MAXSIZE
+#define CFI_REGISTER_SIZE(addrsize, regno)          CFI_X86_64_REGISTER_SIZE(regno)
+#define CFI_REGISTER_MEMSIZE(addrsize, regno)       CFI_X86_64_REGISTER_SIZE(regno)      /* Register size for read/write to/from memory */
+#define CFI_REGISTER_MEMSIZE_IS_SIZE                1                                    /* Hint: `CFI_REGISTER_MEMSIZE() == CFI_REGISTER_SIZE()' */
+#define CFI_UNWIND_REGISTER_PC(addrsize)            CFI_X86_64_UNWIND_REGISTER_PC        /* The register containing the program counter. */
+#define CFI_UNWIND_REGISTER_SP(addrsize)            CFI_X86_64_UNWIND_REGISTER_SP        /* The register for the CFA. */
+#define CFI_UNWIND_REGISTER_EXCEPTION(addrsize)     CFI_X86_64_UNWIND_REGISTER_EXCEPTION /* The register used to hold the current exception upon entry to an exception handler. */
+#define CFI_UNWIND_REGISTER_MAXCOUNT                CFI_X86_64_UNWIND_REGISTER_COUNT
+#define CFI_UNWIND_REGISTER_COUNT(addrsize)         CFI_X86_64_UNWIND_REGISTER_COUNT
+#define CFI_UNWIND_IS_FPU_REGISTER(addrsize, regno) CFI_X86_64_UNWIND_IS_FPU_REGISTER(regno)
 
 /* Normal common/uncommon */
 #define CFI_UNWIND_COMMON_REGISTER_MAXCOUNT                    CFI_X86_64_UNWIND_COMMON_REGISTER_COUNT
@@ -618,6 +619,7 @@ printArrayDefineMacro("DEFINE_cfi_x86_64_unwind_landing_register_uncommon2dw", g
 #undef CFI_UNWIND_REGISTER_SP
 #undef CFI_UNWIND_REGISTER_EXCEPTION
 #undef CFI_UNWIND_REGISTER_COUNT
+#undef CFI_UNWIND_IS_FPU_REGISTER
 #undef CFI_UNWIND_COMMON_REGISTER_COUNT
 #undef CFI_UNWIND_UNCOMMON_REGISTER_SP
 #undef CFI_UNWIND_UNCOMMON_REGISTER_COUNT
@@ -630,6 +632,7 @@ printArrayDefineMacro("DEFINE_cfi_x86_64_unwind_landing_register_uncommon2dw", g
 #define CFI_UNWIND_REGISTER_SP(addrsize)                      (__likely((addrsize) >= 8) ? CFI_X86_64_UNWIND_REGISTER_SP : CFI_386_UNWIND_REGISTER_SP)
 #define CFI_UNWIND_REGISTER_EXCEPTION(addrsize)               (__likely((addrsize) >= 8) ? CFI_X86_64_UNWIND_REGISTER_EXCEPTION : CFI_386_UNWIND_REGISTER_EXCEPTION)
 #define CFI_UNWIND_REGISTER_COUNT(addrsize)                   (__likely((addrsize) >= 8) ? CFI_X86_64_UNWIND_REGISTER_COUNT : CFI_386_UNWIND_REGISTER_COUNT)
+#define CFI_UNWIND_IS_FPU_REGISTER(addrsize, regno)           (__likely((addrsize) >= 8) ? CFI_X86_64_UNWIND_IS_FPU_REGISTER(regno) : CFI_386_UNWIND_IS_FPU_REGISTER(regno))
 #define CFI_UNWIND_COMMON_REGISTER_COUNT(addrsize)            (__likely((addrsize) >= 8) ? CFI_X86_64_UNWIND_COMMON_REGISTER_COUNT : CFI_386_UNWIND_COMMON_REGISTER_COUNT)
 #define CFI_UNWIND_UNCOMMON_REGISTER_SP(addrsize)             (__likely((addrsize) >= 8) ? CFI_X86_64_UNWIND_UNCOMMON_REGISTER_SP : CFI_386_UNWIND_UNCOMMON_REGISTER_SP)
 #define CFI_UNWIND_UNCOMMON_REGISTER_COUNT(addrsize)          (__likely((addrsize) >= 8) ? CFI_X86_64_UNWIND_UNCOMMON_REGISTER_COUNT : CFI_386_UNWIND_UNCOMMON_REGISTER_COUNT)

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1bdc3689 */
+/* HASH CRC-32:0x294e759c */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -353,12 +353,12 @@ for (local name: classes.keys.sorted()) {
 
 	case E_ILLEGAL_OPERATION:
 #if defined(__ENXIO) && defined(__EPERM)
-		__result = __self->e_args.e_illegal_operation.io_reason == E_ILLEGAL_OPERATION_OPEN_S_IFSOCK ? __ENXIO : __EPERM;
+		__result = __self->e_args.e_illegal_operation.io_reason == E_ILLEGAL_OPERATION_CONTEXT_OPEN_S_IFSOCK ? __ENXIO : __EPERM;
 #endif /* __ENXIO && __EPERM */
 		switch(__self->e_subclass) {
 #if defined(__EINVAL) && defined(__ELOOP)
 		case ERROR_SUBCLASS(ERROR_CODEOF(E_ILLEGAL_REFERENCE_LOOP)):
-			__result = __self->e_args.e_illegal_operation.io_reason == E_ILLEGAL_OPERATION_EPOLL_MONITOR_SELF_LOOP ? __EINVAL : __ELOOP;
+			__result = __self->e_args.e_illegal_operation.io_reason == E_ILLEGAL_OPERATION_CONTEXT_EPOLL_MONITOR_SELF_LOOP ? __EINVAL : __ELOOP;
 			break;
 #endif /* __EINVAL && __ELOOP */
 		default: break;
@@ -396,7 +396,7 @@ for (local name: classes.keys.sorted()) {
 			        __EINVAL;
 			break;
 #endif /* __EAFNOSUPPORT && __ESOCKTNOSUPPORT && __EPROTONOSUPPORT && __EINVAL */
-#if defined(__ENOTCONN) && defined(__EDESTADDRREQ) && defined(__EISCONN) && defined(__ENXIO) && defined(__EPIPE) && defined(__EINVAL)
+#if defined(__ENOTCONN) && defined(__EDESTADDRREQ) && defined(__EISCONN) && defined(__ENXIO) && defined(__EPIPE) && defined(__ENOMEM) && defined(__EINVAL)
 		case ERROR_SUBCLASS(ERROR_CODEOF(E_INVALID_ARGUMENT_BAD_STATE)):
 			__result = __self->e_args.e_invalid_argument.ia_context == E_INVALID_ARGUMENT_CONTEXT_SHUTDOWN_NOT_CONNECTED ||
 			        __self->e_args.e_invalid_argument.ia_context == E_INVALID_ARGUMENT_CONTEXT_GETPEERNAME_NOT_CONNECTED ||
@@ -405,9 +405,11 @@ for (local name: classes.keys.sorted()) {
 			        __self->e_args.e_invalid_argument.ia_context == E_INVALID_ARGUMENT_CONTEXT_CONNECT_ALREADY_CONNECTED ? __EISCONN :
 			        __self->e_args.e_invalid_argument.ia_context == E_INVALID_ARGUMENT_CONTEXT_OPEN_FIFO_WRITER_NO_READERS ? __ENXIO :
 			        __self->e_args.e_invalid_argument.ia_context == E_INVALID_ARGUMENT_CONTEXT_WRITE_FIFO_NO_READERS ? __EPIPE :
+			        (__self->e_args.e_invalid_argument.ia_context == E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_MEMORY ||
+			         __self->e_args.e_invalid_argument.ia_context == E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_FUTEX) ? __ENOMEM :
 			        __EINVAL;
 			break;
-#endif /* __ENOTCONN && __EDESTADDRREQ && __EISCONN && __ENXIO && __EPIPE && __EINVAL */
+#endif /* __ENOTCONN && __EDESTADDRREQ && __EISCONN && __ENXIO && __EPIPE && __ENOMEM && __EINVAL */
 #ifdef __ENOPROTOOPT
 		case ERROR_SUBCLASS(ERROR_CODEOF(E_INVALID_ARGUMENT_SOCKET_OPT)):
 			__result = __ENOPROTOOPT;

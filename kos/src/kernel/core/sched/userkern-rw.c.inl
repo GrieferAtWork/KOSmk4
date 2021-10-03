@@ -162,7 +162,7 @@ userkern_segment_writeq(struct vioargs *__restrict args,
 				THROW(E_PROCESS_EXITED, (upid_t)value);
 			if (error == TASK_SETPROCESSGROUPLEADER_LEADER) {
 				THROW(E_ILLEGAL_PROCESS_OPERATION,
-				      E_ILLEGAL_OPERATION_SETPGID_LEADER,
+				      E_ILLEGAL_OPERATION_CONTEXT_SETPGID_LEADER,
 				      (upid_t)0, (upid_t)value);
 			}
 		}

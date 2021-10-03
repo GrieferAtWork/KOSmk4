@@ -177,7 +177,7 @@ DEFINE_SYSCALL0(rtm_status_t, rtm_begin) {
 #ifdef __ARCH_WANT_SYSCALL_RTM_END
 DEFINE_SYSCALL0(errno_t, rtm_end) {
 	/* This system call is an illegal operation outside of RTM mode. */
-	THROW(E_ILLEGAL_OPERATION, E_ILLEGAL_OPERATION_NOT_RTM);
+	THROW(E_ILLEGAL_OPERATION, E_ILLEGAL_OPERATION_CONTEXT_NOT_RTM);
 }
 #endif /* __ARCH_WANT_SYSCALL_RTM_END */
 

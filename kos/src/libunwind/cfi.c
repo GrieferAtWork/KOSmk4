@@ -32,6 +32,7 @@
 #include <hybrid/overflow.h>
 #include <hybrid/unaligned.h>
 
+#include <asm/signed-shift.h>
 #include <kos/bits/thread.h>
 #include <kos/except.h>
 #include <kos/types.h>
@@ -940,14 +941,13 @@ do_make_top_const:
 			break;
 
 		CASE(DW_OP_pick) {
-			uint8_t offset;
-			offset = *(uint8_t const *)pc;
-			if unlikely(offset >= stacksz)
+			uint8_t nth = *(uint8_t const *)pc;
+			if unlikely(nth >= stacksz)
 				ERROR(err_stack_underflow);
 			if unlikely(stacksz >= self->ue_stackmax)
 				ERROR(err_stack_overflow);
 			pc += 1;
-			self->ue_stack[stacksz] = self->ue_stack[(stacksz - 1) - offset];
+			self->ue_stack[stacksz] = self->ue_stack[(stacksz - 1) - nth];
 			++stacksz;
 		}	break;
 
@@ -1127,7 +1127,13 @@ do_make_second_const:
 				SECOND.s_uconst >>= TOP.s_uconst;
 				break;
 			case DW_OP_shra:
+#ifdef __ARCH_SIGNED_SHIFT_IS_SDIV
 				SECOND.s_sconst >>= TOP.s_uconst;
+#else /* __ARCH_SIGNED_SHIFT_IS_SDIV */
+				SECOND.s_sconst = SECOND.s_sconst < 0
+				                  ? (intptr_t)-1 - (((intptr_t)-1 - SECOND.s_sconst) >> TOP.s_uconst)
+				                  : SECOND.s_sconst >> TOP.s_uconst;
+#endif /* !__ARCH_SIGNED_SHIFT_IS_SDIV */
 				break;
 			case DW_OP_xor:
 				SECOND.s_uconst ^= TOP.s_uconst;

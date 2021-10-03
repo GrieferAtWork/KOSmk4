@@ -427,15 +427,16 @@ printArrayDefineMacro("DEFINE_cfi_386_unwind_landing_register_uncommon2dw", gene
 
 /* Host-specific CFI constants. */
 #if defined(__i386__) && !defined(__x86_64__)
-#define CFI_REGISTER_MAXSIZE                    CFI_386_REGISTER_MAXSIZE
-#define CFI_REGISTER_SIZE(addrsize, regno)      CFI_386_REGISTER_SIZE(regno) /* Register size for getreg/setreg callbacks */
-#define CFI_REGISTER_MEMSIZE(addrsize, regno)   CFI_386_REGISTER_SIZE(regno) /* Register size for read/write to/from memory */
-#define CFI_REGISTER_MEMSIZE_IS_SIZE            1                            /* Hint: `CFI_REGISTER_MEMSIZE() == CFI_REGISTER_SIZE()' */
-#define CFI_UNWIND_REGISTER_PC(addrsize)        CFI_386_UNWIND_REGISTER_PC        /* The register containing the program counter. */
-#define CFI_UNWIND_REGISTER_SP(addrsize)        CFI_386_UNWIND_REGISTER_SP        /* The register for the CFA. */
-#define CFI_UNWIND_REGISTER_EXCEPTION(addrsize) CFI_386_UNWIND_REGISTER_EXCEPTION /* The register used to hold the current exception upon entry to an exception handler. */
-#define CFI_UNWIND_REGISTER_MAXCOUNT            CFI_386_UNWIND_REGISTER_COUNT
-#define CFI_UNWIND_REGISTER_COUNT(addrsize)     CFI_386_UNWIND_REGISTER_COUNT
+#define CFI_REGISTER_MAXSIZE                        CFI_386_REGISTER_MAXSIZE
+#define CFI_REGISTER_SIZE(addrsize, regno)          CFI_386_REGISTER_SIZE(regno)      /* Register size for getreg/setreg callbacks */
+#define CFI_REGISTER_MEMSIZE(addrsize, regno)       CFI_386_REGISTER_SIZE(regno)      /* Register size for read/write to/from memory */
+#define CFI_REGISTER_MEMSIZE_IS_SIZE                1                                 /* Hint: `CFI_REGISTER_MEMSIZE() == CFI_REGISTER_SIZE()' */
+#define CFI_UNWIND_REGISTER_PC(addrsize)            CFI_386_UNWIND_REGISTER_PC        /* The register containing the program counter. */
+#define CFI_UNWIND_REGISTER_SP(addrsize)            CFI_386_UNWIND_REGISTER_SP        /* The register for the CFA. */
+#define CFI_UNWIND_REGISTER_EXCEPTION(addrsize)     CFI_386_UNWIND_REGISTER_EXCEPTION /* The register used to hold the current exception upon entry to an exception handler. */
+#define CFI_UNWIND_REGISTER_MAXCOUNT                CFI_386_UNWIND_REGISTER_COUNT
+#define CFI_UNWIND_REGISTER_COUNT(addrsize)         CFI_386_UNWIND_REGISTER_COUNT
+#define CFI_UNWIND_IS_FPU_REGISTER(addrsize, regno) CFI_386_UNWIND_IS_FPU_REGISTER(regno)
 
 /* Normal common/uncommon */
 #define CFI_UNWIND_UNCOMMON_REGISTER_SP(addrsize)              CFI_386_UNWIND_UNCOMMON_REGISTER_SP

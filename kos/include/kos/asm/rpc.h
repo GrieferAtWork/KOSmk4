@@ -22,6 +22,7 @@
 
 #ifndef __DEEMON__
 #include <__stdinc.h>
+#include <hybrid/typecore.h>
 #endif /* !__DEEMON__ */
 
 
@@ -36,6 +37,13 @@
  * even identical functionality.
  *
  * NOTES:
+ *  - The stack used by the  below bytecode consists of pointer-sized  words,
+ *    and  trying to push a register that is larger than a pointer will cause
+ *    as many words to be  pushed/popped as necessary, where push  operations
+ *    function such that the last-pushed value contains the least significant
+ *    part of the whole value (if that whole value was interpreted as a base-
+ *    2 integer of arbitrary precision).
+ *
  *  - Register indices are arch-dependent and the same as those used by CFI:
  *      i386:   One of `CFI_386_UNWIND_REGISTER_*'    (from <libunwind/cfi/i386.h>)
  *      x86_64: One of `CFI_X86_64_UNWIND_REGISTER_*' (from <libunwind/cfi/x86_64.h>)
@@ -79,7 +87,7 @@
  */
 
 /*========================================*/
-/*      RPC_OP_               0x00  * ... */
+#define RPC_OP_ret            0x00 /* [+0] Indicate successful completion of the RPC program. */
 /*      RPC_OP_               0x01  * ... */
 /*      RPC_OP_               0x02  * ... */
 #define RPC_OP_sppush_const   0x03 /* [+*] PUSH_ONTO_USER_STACK(*(uintptr_t const *)pc); */
@@ -93,8 +101,10 @@
 #define RPC_OP_const2s        0x0b /* [+2] PUSH(*(s16 const *)pc); */
 #define RPC_OP_const4u        0x0c /* [+4] PUSH(*(u32 const *)pc); */
 #define RPC_OP_const4s        0x0d /* [+4] PUSH(*(s32 const *)pc); */
+#if __SIZEOF_POINTER__ >= 8
 #define RPC_OP_const8u        0x0e /* [+8] PUSH(*(u64 const *)pc); */
 #define RPC_OP_const8s        0x0f /* [+8] PUSH(*(s64 const *)pc); */
+#endif /* __SIZEOF_POINTER__ >= 8 */
 #define RPC_OP_popregx        0x10 /* [+*] CFI_REGISTER(dwarf_decode_uleb128(&pc)) = POP(); */
 /*      RPC_OP_               0x11  * ... */
 #define RPC_OP_dup            0x12 /* [+0] PUSH(TOP); */
@@ -241,17 +251,19 @@
 /*      RPC_OP_               0x9f  * ... */
 #define RPC_OP_push_reason    0xa0 /* [+0] PUSH(user_rpc_reason); */
 #define RPC_OP_push_dorestart 0xa1 /* [+0] PUSH(user_rpc_reason == RPC_REASONCTX_SYSCALL ? 1 : 0); */
-#define RPC_OP_push_issyscall 0xa2 /* [+0] PUSH(sc_info != NULL); // `user_rpc_reason == RPC_REASONCTX_SYSCALL' implies this is true, but not the reverse
+#define RPC_OP_push_issyscall 0xa2 /* [+0] PUSH(sc_info != NULL); // `user_rpc_reason == RPC_REASONCTX_SYSCALL' implies this is true, but not the  reverse
                                     * In case multiple RPCs are handled after one system call, only the first may need to restart. Also, system calls that
-                                    * shouldn't be restarted still come with meta-data that is available to RPC programs, even when the call shouldn't be
+                                    * shouldn't be restarted still come with meta-data that is available to RPC programs, even when the call shouldn't  be
                                     * restarted. */
-#define RPC_OP_push_sc_info   0xa3 /* [+1] word = *pc++; PUSH(((uintptr_t *)sc_info)[word]);         // Illegal when `user_rpc_reason != RPC_REASONCTX_SYSCALL' */
+#define RPC_OP_push_sc_info   0xa3 /* [+1] index = *pc++; PUSH(((uintptr_t *)sc_info)[index]);         // Illegal when `user_rpc_reason != RPC_REASONCTX_SYSCALL' */
 #define RPC_OP_sppush_sc_info 0xa4 /* [+0] Push the entire `sc_info' descriptor onto the user stack. // Illegal when `user_rpc_reason != RPC_REASONCTX_SYSCALL' */
-#define RPC_OP_push_param     0xa5 /* [+1] word = *pc++; PUSH(params[i]); // `params' is an argument */
-#define RPC_OP_push_sigmask   0xa6 /* [+1] sigset_t s; sigprocmask(SIG_SETMASK, NULL, &s); PUSH(s.__val[*pc++]); */
-#define RPC_OP_sigblock       0xa7 /* [+1] sigset_t s; sigemptyset(&s); sigaddset(&s, *pc++); sigprocmask(SIG_BLOCK, &s, NULL); */
+#define RPC_OP_push_param     0xa5 /* [+1] index = *pc++; PUSH(params[index]); // `params' is an argument */
+#define RPC_OP_sigblock       0xa6 /* [+1] sigset_t s; sigemptyset(&s); sigaddset(&s, *pc++); sigprocmask(SIG_BLOCK, &s, NULL); */
+#define RPC_OP_futex_wake     0xa7 /* [+0] count = POP(); addr = POP(); futex_wake(addr, count); */
 #define RPC_OP_nbra           0xa8 /* [+2] off = *(s16 const *)pc; pc += 2; if (POP() == 0) pc += off; */
-#define RPC_OP_futex_wake     0xa9 /* [+0] count = POP(); addr = POP(); futex_wake(addr, count); */
+#define RPC_OP_push_sigmask   0xa9 /* [+1] index = *pc++; sigset_t s; sigprocmask(SIG_SETMASK, NULL, &s); PUSH(s.__val[index]); */
+#define RPC_OP_sppush_sigmask 0xaa /* [+2] sigsetsz = *(*(u16 **)&pc)++; sigset_t s; sigprocmask(SIG_SETMASK, NULL, &s); PUSH_ONTO_USER_STACK(&s, sigsetsz); */
+#define RPC_OP_push_signal    0xab /* [+0] PUSH(_RPC_GETSIGNO(RPC_MODE)); */
 /*      RPC_OP_               ...   * ... */
 /*      RPC_OP_               0xdf  * ... */
 #define RPC_OP_lo_arch        0xe0 /* First arch-specific opcode */
@@ -454,9 +466,12 @@
 
 
 /************************************************************************/
-/* RPC limits                                                           */
+/* RPC program limits                                                   */
 /************************************************************************/
-#define RPC_PARAMS_MAX 256 /* Max # of parameters which may be passed to `rpc_schedule(2)' */
+#define RPC_PROG_PARAMS_MAX 256    /* Max # of parameters which may be passed to `rpc_schedule(2)' */
+#define RPC_PROG_MEMORY_MAX 0xffff /* Max # unique byte addresses a single RPC program may access */
+#define RPC_PROG_STACK_MAX  256    /* Max # of elements which may exist on an RPC program stack. */
+#define RPC_PROG_FUTEX_MAX  256    /* Max # of futex objects which a single RPC program may access */
 /************************************************************************/
 
 

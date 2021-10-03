@@ -297,7 +297,7 @@ struct exception_illegal_instruction_data {
 
 /* E_ILLEGAL_OPERATION */
 struct exception_illegal_operation_data {
-	__syscall_ulong_t /*syscall_ulong_t*/ io_reason; /* One of `E_ILLEGAL_OPERATION_*' */
+	__syscall_ulong_t /*syscall_ulong_t*/ io_reason; /* One of `E_ILLEGAL_OPERATION_CONTEXT_*' */
 	union {
 #undef io_process_operation
 

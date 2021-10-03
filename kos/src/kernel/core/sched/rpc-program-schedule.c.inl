@@ -58,7 +58,6 @@ DECL_BEGIN
 #error "Must #define exactly one of these"
 #endif /* ... */
 
-
 #ifdef DEFINE_compat_sys_rpc_schedule
 DEFINE_COMPAT_SYSCALL5(errno_t, rpc_schedule,
                        pid_t, target_tid, syscall_ulong_t, mode,
@@ -81,7 +80,7 @@ DEFINE_SYSCALL5(errno_t, rpc_schedule,
 	                 RPC_SYSRESTART_F_AUTO | RPC_PRIORITY_F_HIGH |
 	                 RPC_DOMAIN_F_PROC | RPC_JOIN_F_ASYNC,
 	                 E_INVALID_ARGUMENT_CONTEXT_RPC_SCHEDULE_MODE);
-	if unlikely(max_param_count > RPC_PARAMS_MAX) {
+	if unlikely(max_param_count > RPC_PROG_PARAMS_MAX) {
 		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
 		      E_INVALID_ARGUMENT_CONTEXT_RPC_SCHEDULE_TOO_MANY_PARAMS,
 		      max_param_count);
@@ -90,6 +89,15 @@ DEFINE_SYSCALL5(errno_t, rpc_schedule,
 	/* Set the default signal number `SIGRPC' if none was specified. */
 	if ((mode & RPC_SIGNO_MASK) == 0)
 		mode |= RPC_SIGNO(SIGRPC);
+	else {
+		signo_t signo = _RPC_GETSIGNO(mode);
+		if unlikely(signo <= 0 || signo >= NSIG) {
+			THROW(E_INVALID_ARGUMENT_BAD_VALUE,
+			      E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGNO,
+			      signo);
+		}
+	}
+
 	validate_readable(program, 1);
 	validate_readablem(params, max_param_count, sizeof(USER UNCHECKED void const *));
 
@@ -102,9 +110,13 @@ DEFINE_SYSCALL5(errno_t, rpc_schedule,
 		task_serve();
 
 	/* Allocate the new RPC controller. */
-	rpc = (struct pending_rpc *)pending_rpc_alloc(offsetof(struct pending_rpc, pr_user.pur_argv) +
-	                                              max_param_count * sizeof(USER UNCHECKED void *),
-	                                              GFP_NORMAL);
+	{
+		size_t struct_size = offsetof(struct pending_rpc, pr_user.pur_argv) +
+		                     max_param_count * sizeof(USER UNCHECKED void *);
+		if (struct_size < offsetafter(struct pending_rpc, pr_user.pur_error))
+			struct_size = offsetafter(struct pending_rpc, pr_user.pur_error);
+		rpc = (struct pending_rpc *)pending_rpc_alloc(struct_size, GFP_NORMAL);
+	}
 
 	/* Copy arguments. */
 	TRY {
@@ -156,7 +168,7 @@ DEFINE_SYSCALL5(errno_t, rpc_schedule,
 
 	/* (possibly) wait for completion */
 	if (!(mode & RPC_JOIN_F_ASYNC)) {
-		unsigned int status;
+		uintptr_t status;
 		for (;;) {
 			status = ATOMIC_READ(rpc->pr_user.pur_status);
 			if (status != PENDING_USER_RPC_STATUS_PENDING)
@@ -176,9 +188,6 @@ DEFINE_SYSCALL5(errno_t, rpc_schedule,
 				 * then we must discard the exception (unless it's  an
 				 * RT-level error) */
 				status = ATOMIC_XCH(rpc->pr_user.pur_status, PENDING_USER_RPC_STATUS_CANCELED);
-				assert(status == PENDING_USER_RPC_STATUS_PENDING ||
-				       status == PENDING_USER_RPC_STATUS_COMPLETE ||
-				       status == PENDING_USER_RPC_STATUS_CANCELED);
 				if (status != PENDING_USER_RPC_STATUS_COMPLETE)
 					RETHROW();
 
@@ -210,11 +219,22 @@ DEFINE_SYSCALL5(errno_t, rpc_schedule,
 			}
 		}
 		if (status != PENDING_USER_RPC_STATUS_COMPLETE) {
-			assert(status == PENDING_USER_RPC_STATUS_CANCELED);
+			struct exception_data *tls;
+			assert(status == PENDING_USER_RPC_STATUS_CANCELED ||
+			       status == PENDING_USER_RPC_STATUS_ERROR);
 			/* The RPC was canceled, but it wasn't us. This can only mean that
 			 * the  target thread/process exited and will no longer be able to
 			 * service _any_ rpcs at all! */
-			THROW(E_PROCESS_EXITED, (upid_t)target_tid);
+			if (status == PENDING_USER_RPC_STATUS_CANCELED)
+				THROW(E_PROCESS_EXITED, (upid_t)target_tid);
+
+			/* Rethrow the exception that brought down the RPC VM */
+			tls = error_data();
+			tls->e_code      = rpc->pr_user.pur_error.e_code;
+			tls->e_faultaddr = NULL; /* ??? */
+			memcpy(&tls->e_args, &rpc->pr_user.pur_error.e_args,
+			       sizeof(union exception_data_pointers));
+			error_throw_current();
 		}
 	}
 

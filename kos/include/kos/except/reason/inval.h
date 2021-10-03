@@ -221,8 +221,19 @@ enum {
 	E_INVALID_ARGUMENT_CONTEXT_PKEY_GET_PKEY,                      /* E_INVALID_ARGUMENT_BAD_VALUE: The `pkey' argument passed to `PKeyGet(3)' is invalid. */
 	E_INVALID_ARGUMENT_CONTEXT_GETRANDOM_FLAGS,                    /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The set of flags passed to `getrandom(2)' isn't a set of `GRND_NONBLOCK | GRND_RANDOM' */
 	E_INVALID_ARGUMENT_CONTEXT_RPC_SCHEDULE_MODE,                  /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Invalid flags passed to `rpc_schedule(2)'. */
-	E_INVALID_ARGUMENT_CONTEXT_RPC_SCHEDULE_TOO_MANY_PARAMS,       /* E_INVALID_ARGUMENT_BAD_VALUE: The `max_param_count' passed to `rpc_schedule(2)' is greater than `RPC_PARAMS_MAX'. */
+	E_INVALID_ARGUMENT_CONTEXT_RPC_SCHEDULE_TOO_MANY_PARAMS,       /* E_INVALID_ARGUMENT_BAD_VALUE: The `max_param_count' passed to `rpc_schedule(2)' is greater than `RPC_PROG_PARAMS_MAX'. */
 	E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_INSTRUCTION,            /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: An RPC program contains an unrecognized (or currently illegal) instruction. */
+	E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_MEMORY,                 /* E_INVALID_ARGUMENT_BAD_STATE: RPC program tried to access more than `RPC_PROG_MEMORY_MAX' byte locations. */
+	E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_FUTEX,                  /* E_INVALID_ARGUMENT_BAD_STATE: RPC program tried to access more than `RPC_PROG_FUTEX_MAX' futex objects locations. */
+	E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_STACK_OVERFLOW,         /* E_INVALID_ARGUMENT_BAD_STATE: Attempted to push stack value with full stack */
+	E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_STACK_UNDERFLOW,        /* E_INVALID_ARGUMENT_BAD_STATE: Attempted to pop stack value with empty stack */
+	E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_UNKNOWN_REGISTER,       /* E_INVALID_ARGUMENT_BAD_VALUE: Attempted to access an unknown register */
+	E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_BAD_WORD_SIZE,          /* E_INVALID_ARGUMENT_BAD_VALUE: The size-operand of `RPC_OP_deref_size' or `RPC_OP_write_size' is invalid */
+	E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_BAD_SYSINFO_WORD,       /* E_INVALID_ARGUMENT_BAD_VALUE: The index-operand of `RPC_OP_push_sc_info' is invalid */
+	E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_NO_SYSINFO,             /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: `RPC_OP_push_sc_info' or `RPC_OP_sppush_sc_info' was used, but no syscall info is available. */
+	E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_PARAM_INDEX_OOB,        /* E_INVALID_ARGUMENT_BAD_VALUE: The operand of `RPC_OP_push_param' is greater than the `max_param_count' passed to `rpc_schedule(2)'. */
+	E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_BAD_SIGSET_WORD,        /* E_INVALID_ARGUMENT_BAD_VALUE: The index-operand of `RPC_OP_push_sigmask' is too large. */
+	E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_UNSUP_SIGSET_SIZE,      /* E_INVALID_ARGUMENT_BAD_VALUE: The signal mask size specified by `RPC_OP_sppush_sigmask' isn't supported. */
 };
 #endif /* __CC__ */
 /*[[[AUTO]]]*/
@@ -419,8 +430,19 @@ enum {
 #define E_INVALID_ARGUMENT_CONTEXT_PKEY_GET_PKEY                      E_INVALID_ARGUMENT_CONTEXT_PKEY_GET_PKEY                      /* E_INVALID_ARGUMENT_BAD_VALUE: The `pkey' argument passed to `PKeyGet(3)' is invalid. */
 #define E_INVALID_ARGUMENT_CONTEXT_GETRANDOM_FLAGS                    E_INVALID_ARGUMENT_CONTEXT_GETRANDOM_FLAGS                    /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The set of flags passed to `getrandom(2)' isn't a set of `GRND_NONBLOCK | GRND_RANDOM' */
 #define E_INVALID_ARGUMENT_CONTEXT_RPC_SCHEDULE_MODE                  E_INVALID_ARGUMENT_CONTEXT_RPC_SCHEDULE_MODE                  /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Invalid flags passed to `rpc_schedule(2)'. */
-#define E_INVALID_ARGUMENT_CONTEXT_RPC_SCHEDULE_TOO_MANY_PARAMS       E_INVALID_ARGUMENT_CONTEXT_RPC_SCHEDULE_TOO_MANY_PARAMS       /* E_INVALID_ARGUMENT_BAD_VALUE: The `max_param_count' passed to `rpc_schedule(2)' is greater than `RPC_PARAMS_MAX'. */
+#define E_INVALID_ARGUMENT_CONTEXT_RPC_SCHEDULE_TOO_MANY_PARAMS       E_INVALID_ARGUMENT_CONTEXT_RPC_SCHEDULE_TOO_MANY_PARAMS       /* E_INVALID_ARGUMENT_BAD_VALUE: The `max_param_count' passed to `rpc_schedule(2)' is greater than `RPC_PROG_PARAMS_MAX'. */
 #define E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_INSTRUCTION            E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_INSTRUCTION            /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: An RPC program contains an unrecognized (or currently illegal) instruction. */
+#define E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_MEMORY                 E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_MEMORY                 /* E_INVALID_ARGUMENT_BAD_STATE: RPC program tried to access more than `RPC_PROG_MEMORY_MAX' byte locations. */
+#define E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_FUTEX                  E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_FUTEX                  /* E_INVALID_ARGUMENT_BAD_STATE: RPC program tried to access more than `RPC_PROG_FUTEX_MAX' futex objects locations. */
+#define E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_STACK_OVERFLOW         E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_STACK_OVERFLOW         /* E_INVALID_ARGUMENT_BAD_STATE: Attempted to push stack value with full stack */
+#define E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_STACK_UNDERFLOW        E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_STACK_UNDERFLOW        /* E_INVALID_ARGUMENT_BAD_STATE: Attempted to pop stack value with empty stack */
+#define E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_UNKNOWN_REGISTER       E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_UNKNOWN_REGISTER       /* E_INVALID_ARGUMENT_BAD_VALUE: Attempted to access an unknown register */
+#define E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_BAD_WORD_SIZE          E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_BAD_WORD_SIZE          /* E_INVALID_ARGUMENT_BAD_VALUE: The size-operand of `RPC_OP_deref_size' or `RPC_OP_write_size' is invalid */
+#define E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_BAD_SYSINFO_WORD       E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_BAD_SYSINFO_WORD       /* E_INVALID_ARGUMENT_BAD_VALUE: The index-operand of `RPC_OP_push_sc_info' is invalid */
+#define E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_NO_SYSINFO             E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_NO_SYSINFO             /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: `RPC_OP_push_sc_info' or `RPC_OP_sppush_sc_info' was used, but no syscall info is available. */
+#define E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_PARAM_INDEX_OOB        E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_PARAM_INDEX_OOB        /* E_INVALID_ARGUMENT_BAD_VALUE: The operand of `RPC_OP_push_param' is greater than the `max_param_count' passed to `rpc_schedule(2)'. */
+#define E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_BAD_SIGSET_WORD        E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_BAD_SIGSET_WORD        /* E_INVALID_ARGUMENT_BAD_VALUE: The index-operand of `RPC_OP_push_sigmask' is too large. */
+#define E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_UNSUP_SIGSET_SIZE      E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_UNSUP_SIGSET_SIZE      /* E_INVALID_ARGUMENT_BAD_VALUE: The signal mask size specified by `RPC_OP_sppush_sigmask' isn't supported. */
 #else /* __COMPILER_PREFERR_ENUMS */
 #define E_INVALID_ARGUMENT_CONTEXT_GENERIC                            0   /* Generic context */
 #define E_INVALID_ARGUMENT_CONTEXT_SETFD_FD_FLAG                      1   /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Unknown `FD_*' flag passed to `F_SETFD' */
@@ -614,8 +636,19 @@ enum {
 #define E_INVALID_ARGUMENT_CONTEXT_PKEY_GET_PKEY                      171 /* E_INVALID_ARGUMENT_BAD_VALUE: The `pkey' argument passed to `PKeyGet(3)' is invalid. */
 #define E_INVALID_ARGUMENT_CONTEXT_GETRANDOM_FLAGS                    172 /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The set of flags passed to `getrandom(2)' isn't a set of `GRND_NONBLOCK | GRND_RANDOM' */
 #define E_INVALID_ARGUMENT_CONTEXT_RPC_SCHEDULE_MODE                  173 /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Invalid flags passed to `rpc_schedule(2)'. */
-#define E_INVALID_ARGUMENT_CONTEXT_RPC_SCHEDULE_TOO_MANY_PARAMS       174 /* E_INVALID_ARGUMENT_BAD_VALUE: The `max_param_count' passed to `rpc_schedule(2)' is greater than `RPC_PARAMS_MAX'. */
+#define E_INVALID_ARGUMENT_CONTEXT_RPC_SCHEDULE_TOO_MANY_PARAMS       174 /* E_INVALID_ARGUMENT_BAD_VALUE: The `max_param_count' passed to `rpc_schedule(2)' is greater than `RPC_PROG_PARAMS_MAX'. */
 #define E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_INSTRUCTION            175 /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: An RPC program contains an unrecognized (or currently illegal) instruction. */
+#define E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_MEMORY                 176 /* E_INVALID_ARGUMENT_BAD_STATE: RPC program tried to access more than `RPC_PROG_MEMORY_MAX' byte locations. */
+#define E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_FUTEX                  177 /* E_INVALID_ARGUMENT_BAD_STATE: RPC program tried to access more than `RPC_PROG_FUTEX_MAX' futex objects locations. */
+#define E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_STACK_OVERFLOW         178 /* E_INVALID_ARGUMENT_BAD_STATE: Attempted to push stack value with full stack */
+#define E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_STACK_UNDERFLOW        179 /* E_INVALID_ARGUMENT_BAD_STATE: Attempted to pop stack value with empty stack */
+#define E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_UNKNOWN_REGISTER       180 /* E_INVALID_ARGUMENT_BAD_VALUE: Attempted to access an unknown register */
+#define E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_BAD_WORD_SIZE          181 /* E_INVALID_ARGUMENT_BAD_VALUE: The size-operand of `RPC_OP_deref_size' or `RPC_OP_write_size' is invalid */
+#define E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_BAD_SYSINFO_WORD       182 /* E_INVALID_ARGUMENT_BAD_VALUE: The index-operand of `RPC_OP_push_sc_info' is invalid */
+#define E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_NO_SYSINFO             183 /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: `RPC_OP_push_sc_info' or `RPC_OP_sppush_sc_info' was used, but no syscall info is available. */
+#define E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_PARAM_INDEX_OOB        184 /* E_INVALID_ARGUMENT_BAD_VALUE: The operand of `RPC_OP_push_param' is greater than the `max_param_count' passed to `rpc_schedule(2)'. */
+#define E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_BAD_SIGSET_WORD        185 /* E_INVALID_ARGUMENT_BAD_VALUE: The index-operand of `RPC_OP_push_sigmask' is too large. */
+#define E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_UNSUP_SIGSET_SIZE      186 /* E_INVALID_ARGUMENT_BAD_VALUE: The signal mask size specified by `RPC_OP_sppush_sigmask' isn't supported. */
 #endif /* !__COMPILER_PREFERR_ENUMS */
 /*[[[end]]]*/
 

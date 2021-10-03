@@ -268,6 +268,8 @@
                                                                                 *        $context == E_INVALID_ARGUMENT_CONTEXT_CONNECT_ALREADY_CONNECTED ? EISCONN :
                                                                                 *        $context == E_INVALID_ARGUMENT_CONTEXT_OPEN_FIFO_WRITER_NO_READERS ? ENXIO :
                                                                                 *        $context == E_INVALID_ARGUMENT_CONTEXT_WRITE_FIFO_NO_READERS ? EPIPE :
+                                                                                *        ($context == E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_MEMORY ||
+                                                                                *         $context == E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_FUTEX) ? ENOMEM :
                                                                                 *        EINVAL)]
                                                                                 * [msg("The current object state does not allow this operation")] */
 #endif /* !E_INVALID_ARGUMENT_BAD_STATE */
@@ -474,9 +476,9 @@
 /* E_ILLEGAL_OPERATION                                                  */
 /************************************************************************/
 #ifndef E_ILLEGAL_OPERATION
-#define E_ILLEGAL_OPERATION                       (0x000a)                      /* [errno($reason == E_ILLEGAL_OPERATION_OPEN_S_IFSOCK ? ENXIO : EPERM)]
+#define E_ILLEGAL_OPERATION                       (0x000a)                      /* [errno($reason == E_ILLEGAL_OPERATION_CONTEXT_OPEN_S_IFSOCK ? ENXIO : EPERM)]
                                                                                  * [msg("Illegal operation")]
-                                                                                 * [fld(reason: syscall_ulong_t, "One of `E_ILLEGAL_OPERATION_*'")] */
+                                                                                 * [fld(reason: syscall_ulong_t, "One of `E_ILLEGAL_OPERATION_CONTEXT_*'")] */
 #endif /* !E_ILLEGAL_OPERATION */
 #ifndef E_ILLEGAL_PROCESS_OPERATION
 #define E_ILLEGAL_PROCESS_OPERATION               (E_ILLEGAL_OPERATION, 0x0001) /* [msg("Illegal process operation")]
@@ -484,7 +486,7 @@
                                                                                  * [fld(pid2: pid_t, "A second pid, or 0 if unused")] */
 #endif /* !E_ILLEGAL_PROCESS_OPERATION */
 #ifndef E_ILLEGAL_REFERENCE_LOOP
-#define E_ILLEGAL_REFERENCE_LOOP                  (E_ILLEGAL_OPERATION, 0x0002) /* [errno($reason == E_ILLEGAL_OPERATION_EPOLL_MONITOR_SELF_LOOP ? EINVAL : ELOOP)]
+#define E_ILLEGAL_REFERENCE_LOOP                  (E_ILLEGAL_OPERATION, 0x0002) /* [errno($reason == E_ILLEGAL_OPERATION_CONTEXT_EPOLL_MONITOR_SELF_LOOP ? EINVAL : ELOOP)]
                                                                                  * [msg("Reference loop detected")] */
 #endif /* !E_ILLEGAL_REFERENCE_LOOP */
 
@@ -697,10 +699,10 @@
  *  - E_FILESYSTEM_OPERATION_STAT -> EPERM:
  *    - Non-conforming; on linux, anything can be stat'd
  *  - E_FILESYSTEM_OPERATION_ALLOCATE -> ENODEV:
- *    - `man 2 fallocate' documents: ENODEV <=> fd does not refer to a regular file or a directory
+ *    - `man 2 fallocate' documents: ENODEV <=> fd does  not refer to a  regular file or a  directory
  *                                   FIXME (also documented): ESPIPE <=> fd refers to a pipe or FIFO.
  *                                   FIXME (also documented): EOPNOTSUPP <=> The filesystem containing the file referred to by fd does
- *                                                                           not support this operation; or the mode is not supported
+ *                                                                           not support this operation; or the mode is not  supported
  *                                                                           by the filesystem containing the file referred to by fd.
  */
 /*[[[begin]]]*/

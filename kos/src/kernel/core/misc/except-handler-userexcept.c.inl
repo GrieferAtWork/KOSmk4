@@ -81,6 +81,7 @@ NOTHROW(FCALL userexcept_sysret)(struct icpustate *__restrict state)
 {
 	struct pending_rpc_slist pending;
 	struct pending_rpc_slist restore;
+	struct pending_rpc_slist repeat;
 	struct pending_rpc **restore_plast;
 	struct pending_rpc_slist kernel_rpcs;
 	struct exception_info error;
@@ -140,6 +141,7 @@ NOTHROW(FCALL userexcept_sysret)(struct icpustate *__restrict state)
 	ctx.rc_state = state;
 	restore_plast = SLIST_PFIRST(&restore);
 	SLIST_INIT(&kernel_rpcs);
+	SLIST_INIT(&repeat);
 
 #ifdef LOCAL_IS_SYSRET
 	/* Also  clear the `TASK_FWAKEONMSKRPC'  during sysret, thus making
@@ -257,25 +259,23 @@ make_inactive:
 #endif /* !LOCAL_IS_SYSRET */
 
 				/* Do everything necessary to handle the USER-rpc. */
+				if (!userexcept_exec_user_rpc(&ctx, &error, rpc))
+					SLIST_INSERT(&repeat, rpc, pr_link);
+				else {
 #ifndef LOCAL_IS_SYSRET
-				userexcept_exec_user_rpc(&ctx, &error, rpc);
+					/* User-space RPCs are _always_ required (or at least expected)
+					 * to restart system calls, meaning  that once the first  one's
+					 * been executed, any that come after have to be told that they
+					 * will return to an async user-space location (rather than  to
+					 * another system call)
+					 *
+					 * NOTE: In actuality, `_RPC_REASONCTX_SYNC' is passed as reason
+					 *       for any additional RPCs */
+					ctx.rc_context = RPC_REASONCTX_SYSRET;
 #else /* !LOCAL_IS_SYSRET */
-				userexcept_exec_user_rpc(&ctx, &error, rpc);
+					assert(ctx.rc_context == RPC_REASONCTX_SYSRET);
 #endif /* !LOCAL_IS_SYSRET */
-
-#ifndef LOCAL_IS_SYSRET
-				/* User-space RPCs are _always_ required (or at least expected)
-				 * to restart system calls, meaning  that once the first  one's
-				 * been executed, any that come after have to be told that they
-				 * will return to an async user-space location (rather than  to
-				 * another system call)
-				 *
-				 * NOTE: In actuality, `_RPC_REASONCTX_SYNC' is passed as reason
-				 *       for any additional RPCs */
-				ctx.rc_context = RPC_REASONCTX_SYSRET;
-#else /* !LOCAL_IS_SYSRET */
-				assert(ctx.rc_context == RPC_REASONCTX_SYSRET);
-#endif /* !LOCAL_IS_SYSRET */
+				}
 			}
 		}
 	}
@@ -401,24 +401,23 @@ again_scan_proc_rpcs:
 						SLIST_INSERT_HEAD(&kernel_rpcs, rpc, pr_link);
 					} else {
 						/* User-space RPC */
+						if (!userexcept_exec_user_rpc(&ctx, &error, rpc))
+							SLIST_INSERT(&repeat, rpc, pr_link);
+						else {
 #ifndef LOCAL_IS_SYSRET
-						/* Do everything necessary to handle the USER-rpc. */
-						userexcept_exec_user_rpc(&ctx, &error, rpc);
-
-						/* User-space RPCs are _always_ required (or at least expected)
-						 * to restart system calls, meaning  that once the first  one's
-						 * been executed, any that come after have to be told that they
-						 * will return to an async user-space location (rather than  to
-						 * another system call)
-						 *
-						 * NOTE: In actuality, `_RPC_REASONCTX_SYNC' is passed as reason
-						 *       for any additional RPCs */
-						ctx.rc_context = RPC_REASONCTX_SYSRET;
+							/* User-space RPCs are _always_ required (or at least expected)
+							 * to restart system calls, meaning  that once the first  one's
+							 * been executed, any that come after have to be told that they
+							 * will return to an async user-space location (rather than  to
+							 * another system call)
+							 *
+							 * NOTE: In actuality, `_RPC_REASONCTX_SYNC' is passed as reason
+							 *       for any additional RPCs */
+							ctx.rc_context = RPC_REASONCTX_SYSRET;
 #else /* !LOCAL_IS_SYSRET */
-						/* Do everything necessary to handle the USER-rpc. */
-						userexcept_exec_user_rpc(&ctx, &error, rpc);
-						assert(ctx.rc_context == RPC_REASONCTX_SYSRET);
+							assert(ctx.rc_context == RPC_REASONCTX_SYSRET);
 #endif /* !LOCAL_IS_SYSRET */
+						}
 					}
 					goto again_lock_proc_rpcs;
 check_next_proc_rpc:
@@ -473,6 +472,12 @@ check_next_proc_rpc:
 				cookie = rpc->pr_kern.k_cookie;
 				pending_rpc_free(rpc);
 				*restore_plast = SLIST_FIRST(&kernel_rpcs);
+				while (!SLIST_EMPTY(&repeat)) {
+					struct pending_rpc *repeat_rpc;
+					repeat_rpc = SLIST_FIRST(&repeat);
+					SLIST_REMOVE_HEAD(&repeat, pr_link);
+					SLIST_INSERT_HEAD(&restore, repeat_rpc, pr_link);
+				}
 				if (!SLIST_EMPTY(&restore)) {
 					restore_pending_rpcs(SLIST_FIRST(&restore));
 					ATOMIC_OR(PERTASK(this_task.t_flags), TASK_FRPC);
@@ -540,6 +545,24 @@ check_next_proc_rpc:
 			pending_rpc_free(rpc);
 		}
 #endif /* !LOCAL_IS_SYSRET */
+	}
+
+	/* Check if there are RPCs that need to be repeated. */
+	if unlikely(!SLIST_EMPTY(&repeat)) {
+		struct pending_rpc **plast_pending, *repeat_rpc;
+		ATOMIC_AND(PERTASK(this_task.t_flags), ~TASK_FRPC);
+		pending.slh_first = SLIST_ATOMIC_CLEAR(&PERTASK(this_rpcs));
+		plast_pending = SLIST_PFIRST(&pending);
+		while ((repeat_rpc = *plast_pending) != NULL)
+			plast_pending = SLIST_PNEXT(repeat_rpc, pr_link);
+		do {
+			repeat_rpc = SLIST_FIRST(&repeat);
+			SLIST_REMOVE_HEAD(&repeat, pr_link);
+			*plast_pending = repeat_rpc;
+			plast_pending  = &repeat_rpc->pr_link.sle_next;
+		} while (!SLIST_EMPTY(&repeat));
+		*plast_pending = NULL;
+		goto handle_pending;
 	}
 
 	/* Restore interrupts that could not be handled right now.

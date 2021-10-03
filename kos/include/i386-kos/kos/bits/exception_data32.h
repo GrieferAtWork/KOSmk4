@@ -362,7 +362,7 @@ struct __exception_illegal_instruction_data32 {
 
 /* E_ILLEGAL_OPERATION */
 struct __exception_illegal_operation_data32 {
-	__UINT32_TYPE__ /*syscall_ulong_t*/ io_reason; /* One of `E_ILLEGAL_OPERATION_*' */
+	__UINT32_TYPE__ /*syscall_ulong_t*/ io_reason; /* One of `E_ILLEGAL_OPERATION_CONTEXT_*' */
 	union {
 #undef io_process_operation
 

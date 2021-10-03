@@ -535,7 +535,7 @@ check_result_inode_for_symlink:
 					 * have a dedicated exception parameter  for trying to open a  socket
 					 * file which is translated to that errno. */
 					THROW(E_ILLEGAL_OPERATION,
-					      E_ILLEGAL_OPERATION_OPEN_S_IFSOCK);
+					      E_ILLEGAL_OPERATION_CONTEXT_OPEN_S_IFSOCK);
 					break;
 
 

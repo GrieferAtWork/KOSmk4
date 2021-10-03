@@ -574,12 +574,12 @@ for (local name: classes.keys.sorted()) {
 
 	case @E_ILLEGAL_OPERATION@:
 @@pp_if defined(ENXIO) && defined(EPERM)@@
-		result = self->@e_args@.@e_illegal_operation@.@io_reason@ == @E_ILLEGAL_OPERATION_OPEN_S_IFSOCK@ ? ENXIO : EPERM;
+		result = self->@e_args@.@e_illegal_operation@.@io_reason@ == @E_ILLEGAL_OPERATION_CONTEXT_OPEN_S_IFSOCK@ ? ENXIO : EPERM;
 @@pp_endif@@
 		switch(self->@e_subclass@) {
 @@pp_if defined(EINVAL) && defined(ELOOP)@@
 		case @ERROR_SUBCLASS@(@ERROR_CODEOF@(@E_ILLEGAL_REFERENCE_LOOP@)):
-			result = self->@e_args@.@e_illegal_operation@.@io_reason@ == @E_ILLEGAL_OPERATION_EPOLL_MONITOR_SELF_LOOP@ ? EINVAL : ELOOP;
+			result = self->@e_args@.@e_illegal_operation@.@io_reason@ == @E_ILLEGAL_OPERATION_CONTEXT_EPOLL_MONITOR_SELF_LOOP@ ? EINVAL : ELOOP;
 			break;
 @@pp_endif@@
 		default: break;
@@ -617,7 +617,7 @@ for (local name: classes.keys.sorted()) {
 			        EINVAL;
 			break;
 @@pp_endif@@
-@@pp_if defined(ENOTCONN) && defined(EDESTADDRREQ) && defined(EISCONN) && defined(ENXIO) && defined(EPIPE) && defined(EINVAL)@@
+@@pp_if defined(ENOTCONN) && defined(EDESTADDRREQ) && defined(EISCONN) && defined(ENXIO) && defined(EPIPE) && defined(ENOMEM) && defined(EINVAL)@@
 		case @ERROR_SUBCLASS@(@ERROR_CODEOF@(@E_INVALID_ARGUMENT_BAD_STATE@)):
 			result = self->@e_args@.@e_invalid_argument@.@ia_context@ == @E_INVALID_ARGUMENT_CONTEXT_SHUTDOWN_NOT_CONNECTED@ ||
 			        self->@e_args@.@e_invalid_argument@.@ia_context@ == @E_INVALID_ARGUMENT_CONTEXT_GETPEERNAME_NOT_CONNECTED@ ||
@@ -626,6 +626,8 @@ for (local name: classes.keys.sorted()) {
 			        self->@e_args@.@e_invalid_argument@.@ia_context@ == @E_INVALID_ARGUMENT_CONTEXT_CONNECT_ALREADY_CONNECTED@ ? EISCONN :
 			        self->@e_args@.@e_invalid_argument@.@ia_context@ == @E_INVALID_ARGUMENT_CONTEXT_OPEN_FIFO_WRITER_NO_READERS@ ? ENXIO :
 			        self->@e_args@.@e_invalid_argument@.@ia_context@ == @E_INVALID_ARGUMENT_CONTEXT_WRITE_FIFO_NO_READERS@ ? EPIPE :
+			        (self->@e_args@.@e_invalid_argument@.@ia_context@ == @E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_MEMORY@ ||
+			         self->@e_args@.@e_invalid_argument@.@ia_context@ == @E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_FUTEX@) ? ENOMEM :
 			        EINVAL;
 			break;
 @@pp_endif@@
@@ -1384,6 +1386,31 @@ void error_throw_current(void);
 void error_rethrow(void);
 
 
+@@Throw an exception and fill exception pointers with all zeroes
+[[guard, decl_prefix(
+#include <kos/bits/exception_data.h>
+#ifndef __ERROR_THROW_CC
+#define __ERROR_THROW_CC __LIBKCALL
+#endif /* !__ERROR_THROW_CC */
+)]]
+[[noreturn, cold, throws]]
+[[kernel, cc(__ERROR_THROW_CC)]]
+void error_throw(error_code_t code);
+
+
+@@Throw an exception and load `argc' pointers from varargs
+[[guard, decl_prefix(
+#include <kos/bits/exception_data.h>
+#ifndef __ERROR_THROWN_CC
+#define __ERROR_THROWN_CC __LIBKCALL
+#endif /* !__ERROR_THROWN_CC */
+)]]
+[[noreturn, cold, throws]]
+[[kernel, cc(__ERROR_THROWN_CC)]]
+void error_thrown(error_code_t code, unsigned int _argc, ...);
+
+
+
 %{
 /* Rethrow the last exception */
 #ifdef __error_rethrow_defined
@@ -1423,31 +1450,6 @@ __ATTR_WUNUSED __BOOL __NOTHROW(was_thrown)(error_code_t __code);
 
 #ifndef THROW
 }
-
-
-@@Throw an exception and fill exception pointers with all zeroes
-[[guard, decl_prefix(
-#include <kos/bits/exception_data.h>
-#ifndef __ERROR_THROW_CC
-#define __ERROR_THROW_CC __LIBKCALL
-#endif /* !__ERROR_THROW_CC */
-)]]
-[[noreturn, cold, throws]]
-[[kernel, cc(__ERROR_THROW_CC)]]
-void error_throw(error_code_t code);
-
-@@Throw an exception and load `argc' pointers from varargs
-[[guard, decl_prefix(
-#include <kos/bits/exception_data.h>
-#ifndef __ERROR_THROWN_CC
-#define __ERROR_THROWN_CC __LIBKCALL
-#endif /* !__ERROR_THROWN_CC */
-)]]
-[[noreturn, cold, throws]]
-[[kernel, cc(__ERROR_THROWN_CC)]]
-void error_thrown(error_code_t code, unsigned int _argc, ...);
-
-
 %{
 #ifdef __HYBRID_PP_VA_NARGS
 #define __PRIVATE_THROW_PACKAGE_CODE1(code) code

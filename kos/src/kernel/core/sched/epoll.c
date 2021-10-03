@@ -506,8 +506,8 @@ epoll_loop:
 				/* NOTE: Linux returns -EINVAL when `hand_epoll == self', and -ELOOP in all other cases.
 				 *       We use 2 different exception parameters which affect errno in the same  manner. */
 				THROW(E_ILLEGAL_REFERENCE_LOOP,
-				      hand_epoll == self ? E_ILLEGAL_OPERATION_EPOLL_MONITOR_SELF_LOOP
-				                         : E_ILLEGAL_OPERATION_EPOLL_MONITOR_LOOP);
+				      hand_epoll == self ? E_ILLEGAL_OPERATION_CONTEXT_EPOLL_MONITOR_SELF_LOOP
+				                         : E_ILLEGAL_OPERATION_CONTEXT_EPOLL_MONITOR_LOOP);
 			}
 			mutex_release(&self->ec_lock);
 			/* Wait for `error' to become available. */
