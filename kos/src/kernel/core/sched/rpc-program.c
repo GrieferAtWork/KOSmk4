@@ -938,6 +938,17 @@ rpc_vm_pushreg2user(struct rpc_vm *__restrict self, unwind_regno_t regno) {
 PRIVATE NONNULL((1)) bool FCALL
 rpc_vm_instr(struct rpc_vm *__restrict self)
 		THROWS(...) {
+#if defined(__ARCH_HAVE_COMPAT) && __ARCH_COMPAT_SIZEOF_POINTER < SIZEOF_POINTER
+	/* In compatibility mode, stack values are sign extended */
+#define COMPAT_SIGN_EXTEND(value)                                                  \
+	do {                                                                           \
+		if (ucpustate_iscompat(&self->rv_cpu)) {                                   \
+			value = (uintptr_t)(intptr_t)(compat_intptr_t)(compat_uintptr_t)value; \
+		}                                                                          \
+	}	__WHILE0
+#else /* __ARCH_HAVE_COMPAT && __ARCH_COMPAT_SIZEOF_POINTER < SIZEOF_POINTER */
+#define COMPAT_SIGN_EXTEND(value) /* nothing */
+#endif /* !__ARCH_HAVE_COMPAT || __ARCH_COMPAT_SIZEOF_POINTER >= SIZEOF_POINTER */
 	byte_t opcode = rpc_vm_pc_rdb(self);
 	switch (opcode) {
 
@@ -998,12 +1009,11 @@ rpc_vm_instr(struct rpc_vm *__restrict self)
 		if unlikely(!CANPUSH(1))
 			goto err_stack_overflow;
 		value = rpc_vm_pc_rdl(self);
-#if defined(__ARCH_HAVE_COMPAT) && __ARCH_COMPAT_SIZEOF_POINTER == 4
-		if (ucpustate_iscompat(&self->rv_cpu)) {
-			/* Force sign extension in compatibility mode. */
+		/* Force sign extension in compatibility mode. */
+#if defined(__ARCH_HAVE_COMPAT) && __ARCH_COMPAT_SIZEOF_POINTER < SIZEOF_POINTER
+		if (ucpustate_iscompat(&self->rv_cpu))
 			value = (uintptr_t)(intptr_t)(int32_t)value;
-		}
-#endif /* __ARCH_HAVE_COMPAT && __ARCH_COMPAT_SIZEOF_POINTER == 4 */
+#endif /* !__ARCH_HAVE_COMPAT || __ARCH_COMPAT_SIZEOF_POINTER >= SIZEOF_POINTER */
 		PUSH(value);
 	}	break;
 
@@ -1114,6 +1124,10 @@ rpc_vm_instr(struct rpc_vm *__restrict self)
 	case RPC_OP_le:
 	case RPC_OP_lt:
 	case RPC_OP_ne:
+	case RPC_OP_uge:
+	case RPC_OP_ugt:
+	case RPC_OP_ule:
+	case RPC_OP_ult:
 		/* Binary (2-operand) arithmetic and bit-wise operators. */
 		if unlikely(self->rv_stacksz < 2)
 			goto err_stack_underflow;
@@ -1124,24 +1138,24 @@ rpc_vm_instr(struct rpc_vm *__restrict self)
 			if unlikely(TOP == 0)
 				THROW(E_DIVIDE_BY_ZERO);
 			if (opcode == DW_OP_div) {
-				SECOND /= TOP;
+				SECOND = (uintptr_t)((intptr_t)SECOND / (intptr_t)TOP);
 			} else {
-				SECOND %= TOP;
+				SECOND = (uintptr_t)((intptr_t)SECOND % (intptr_t)TOP);
 			}
 			break;
 #else
 		case RPC_OP_div:
-			SECOND /= TOP;
+			SECOND = (uintptr_t)((intptr_t)SECOND / (intptr_t)TOP);
 			break;
 		case RPC_OP_mod:
-			SECOND %= TOP;
+			SECOND = (uintptr_t)((intptr_t)SECOND % (intptr_t)TOP);
 			break;
 #endif
 		case RPC_OP_and:
 			SECOND &= TOP;
 			break;
 		case RPC_OP_mul:
-			SECOND *= TOP;
+			SECOND = (uintptr_t)((intptr_t)SECOND * (intptr_t)TOP);
 			break;
 		case RPC_OP_or:
 			SECOND |= TOP;
@@ -1168,23 +1182,37 @@ rpc_vm_instr(struct rpc_vm *__restrict self)
 			SECOND = SECOND == TOP ? 1 : 0;
 			break;
 		case RPC_OP_ge:
-			SECOND = SECOND >= TOP ? 1 : 0;
+			SECOND = (intptr_t)SECOND >= (intptr_t)TOP ? 1 : 0;
 			break;
 		case RPC_OP_gt:
-			SECOND = SECOND > TOP ? 1 : 0;
+			SECOND = (intptr_t)SECOND > (intptr_t)TOP ? 1 : 0;
 			break;
 		case RPC_OP_le:
-			SECOND = SECOND <= TOP ? 1 : 0;
+			SECOND = (intptr_t)SECOND <= (intptr_t)TOP ? 1 : 0;
 			break;
 		case RPC_OP_lt:
-			SECOND = SECOND < TOP ? 1 : 0;
+			SECOND = (intptr_t)SECOND < (intptr_t)TOP ? 1 : 0;
 			break;
 		case RPC_OP_ne:
 			SECOND = SECOND != TOP ? 1 : 0;
 			break;
+		case RPC_OP_uge:
+			SECOND = SECOND >= TOP ? 1 : 0;
+			break;
+		case RPC_OP_ugt:
+			SECOND = SECOND > TOP ? 1 : 0;
+			break;
+		case RPC_OP_ule:
+			SECOND = SECOND <= TOP ? 1 : 0;
+			break;
+		case RPC_OP_ult:
+			SECOND = SECOND < TOP ? 1 : 0;
+			break;
 		default:
 			__builtin_unreachable();
 		}
+		/* Force sign-extension in compatibility mode. */
+		COMPAT_SIGN_EXTEND(SECOND);
 		--self->rv_stacksz;
 		break;
 
@@ -1428,14 +1456,9 @@ follow_jmp:
 			goto err_no_syscall_info;
 		if unlikely(!CANPUSH(1))
 			goto err_stack_overflow;
-#if defined(__ARCH_HAVE_COMPAT) && __ARCH_COMPAT_SIZEOF_POINTER != __SIZEOF_POINTER__
-		if (ucpustate_iscompat(&self->rv_cpu)) {
-			PUSH((uintptr_t)(intptr_t)(compat_longptr_t)(compat_ulongptr_t)((uintptr_t *)self->rv_sc_info)[index]);
-		} else
-#endif /* __ARCH_HAVE_COMPAT && __ARCH_COMPAT_SIZEOF_POINTER != __SIZEOF_POINTER__ */
-		{
-			PUSH(((uintptr_t *)self->rv_sc_info)[index]);
-		}
+		PUSH(((uintptr_t *)self->rv_sc_info)[index]);
+		/* Force sign-extension in compatibility mode. */
+		COMPAT_SIGN_EXTEND(TOP);
 	}	break;
 
 	case RPC_OP_sppush_sc_info: {
@@ -1469,6 +1492,8 @@ follow_jmp:
 		if unlikely(!CANPUSH(1))
 			goto err_stack_overflow;
 		PUSH((uintptr_t)self->rv_rpc->pr_user.pur_argv[index]);
+		/* Force sign-extension in compatibility mode. */
+		COMPAT_SIGN_EXTEND(TOP);
 	}	break;
 
 	case RPC_OP_futex_wake: {
@@ -1518,6 +1543,7 @@ follow_jmp:
 				      E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_BAD_SIGSET_WORD,
 				      index);
 			}
+			/* Force sign-extension in compatibility mode. */
 			PUSH((uintptr_t)(intptr_t)((compat_longptr_t const *)mymask)[index]);
 		} else
 #endif /* __ARCH_HAVE_COMPAT */
@@ -1569,6 +1595,7 @@ follow_jmp:
 #define WANT_err_illegal_instruction
 		if unlikely(!CANPUSH(1))
 			goto err_stack_overflow;
+		/* Force sign-extension in compatibility mode. */
 		PUSH((u64)(s64)(s32)(u32)self->rv_cpu.ucs_sgbase.sg_fsbase);
 		break;
 
@@ -1578,6 +1605,7 @@ follow_jmp:
 #define WANT_err_illegal_instruction
 		if unlikely(!CANPUSH(1))
 			goto err_stack_overflow;
+		/* Force sign-extension in compatibility mode. */
 		PUSH((u64)(s64)(s32)(u32)self->rv_cpu.ucs_sgbase.sg_gsbase);
 		break;
 
@@ -1658,6 +1686,7 @@ err_no_syscall_info:
 	THROW(E_INVALID_ARGUMENT_UNKNOWN_COMMAND,
 	      E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_NO_SYSINFO,
 	      opcode);
+#undef COMPAT_SIGN_EXTEND
 }
 
 #undef THIRD

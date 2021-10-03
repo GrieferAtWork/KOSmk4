@@ -1103,19 +1103,19 @@ do_make_second_const:
 			switch (opcode) {
 			case DW_OP_div:
 			case DW_OP_mod:
-				if unlikely(TOP.s_uconst == 0)
+				if unlikely(TOP.s_sconst == 0)
 					ERROR(err_divide_by_zero);
 				if (opcode == DW_OP_div) {
-					SECOND.s_uconst /= TOP.s_uconst;
+					SECOND.s_sconst /= TOP.s_sconst;
 				} else {
-					SECOND.s_uconst %= TOP.s_uconst;
+					SECOND.s_sconst %= TOP.s_sconst;
 				}
 				break;
 			case DW_OP_and:
 				SECOND.s_uconst &= TOP.s_uconst;
 				break;
 			case DW_OP_mul:
-				SECOND.s_uconst *= TOP.s_uconst;
+				SECOND.s_sconst *= TOP.s_sconst;
 				break;
 			case DW_OP_or:
 				SECOND.s_uconst |= TOP.s_uconst;
@@ -1142,16 +1142,16 @@ do_make_second_const:
 				SECOND.s_uconst = SECOND.s_uconst == TOP.s_uconst ? 1 : 0;
 				break;
 			case DW_OP_ge:
-				SECOND.s_uconst = SECOND.s_uconst >= TOP.s_uconst ? 1 : 0;
+				SECOND.s_uconst = SECOND.s_sconst >= TOP.s_sconst ? 1 : 0;
 				break;
 			case DW_OP_gt:
-				SECOND.s_uconst = SECOND.s_uconst > TOP.s_uconst ? 1 : 0;
+				SECOND.s_uconst = SECOND.s_sconst > TOP.s_sconst ? 1 : 0;
 				break;
 			case DW_OP_le:
-				SECOND.s_uconst = SECOND.s_uconst <= TOP.s_uconst ? 1 : 0;
+				SECOND.s_uconst = SECOND.s_sconst <= TOP.s_sconst ? 1 : 0;
 				break;
 			case DW_OP_lt:
-				SECOND.s_uconst = SECOND.s_uconst < TOP.s_uconst ? 1 : 0;
+				SECOND.s_uconst = SECOND.s_sconst < TOP.s_sconst ? 1 : 0;
 				break;
 			case DW_OP_ne:
 				SECOND.s_uconst = SECOND.s_uconst != TOP.s_uconst ? 1 : 0;

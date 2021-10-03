@@ -115,10 +115,10 @@
 #define RPC_OP_rot            0x17 /* [+0] a = TOP; TOP = SECOND; SECOND = THIRD; THIRD = a; */
 #define RPC_OP_abs            0x19 /* [+0] a = POP(); PUSH(a < 0 ? -a : a); */
 #define RPC_OP_and            0x1a /* [+0] PUSH(POP(SECOND) & POP(TOP)); */
-#define RPC_OP_div            0x1b /* [+0] PUSH(POP(SECOND) / POP(TOP)); */
+#define RPC_OP_div            0x1b /* [+0] PUSH((signed)POP(SECOND) / (signed)POP(TOP)); */
 #define RPC_OP_minus          0x1c /* [+0] PUSH(POP(SECOND) - POP(TOP)); */
-#define RPC_OP_mod            0x1d /* [+0] PUSH(POP(SECOND) % POP(TOP)); */
-#define RPC_OP_mul            0x1e /* [+0] PUSH(POP(SECOND) * POP(TOP)); */
+#define RPC_OP_mod            0x1d /* [+0] PUSH((signed)POP(SECOND) % (signed)POP(TOP)); */
+#define RPC_OP_mul            0x1e /* [+0] PUSH((signed)POP(SECOND) * (signed)POP(TOP)); */
 #define RPC_OP_neg            0x1f /* [+0] PUSH(-POP()); */
 #define RPC_OP_not            0x20 /* [+0] PUSH(~POP()); */
 #define RPC_OP_or             0x21 /* [+0] PUSH(POP(SECOND) | POP(TOP)); */
@@ -129,12 +129,12 @@
 #define RPC_OP_shra           0x26 /* [+0] PUSH((signed)POP(SECOND) >> POP(TOP)); */
 #define RPC_OP_xor            0x27 /* [+0] PUSH(POP(SECOND) ^ POP(TOP)); */
 #define RPC_OP_bra            0x28 /* [+2] off = *(s16 const *)pc; pc += 2; if (POP() != 0) pc += off; */
-#define RPC_OP_eq             0x29 /* [+0] PUSH((signed)POP(SECOND) == (signed)POP(TOP)); */
+#define RPC_OP_eq             0x29 /* [+0] PUSH(POP(SECOND) == POP(TOP)); */
 #define RPC_OP_ge             0x2a /* [+0] PUSH((signed)POP(SECOND) >= (signed)POP(TOP)); */
 #define RPC_OP_gt             0x2b /* [+0] PUSH((signed)POP(SECOND) >  (signed)POP(TOP)); */
 #define RPC_OP_le             0x2c /* [+0] PUSH((signed)POP(SECOND) <= (signed)POP(TOP)); */
 #define RPC_OP_lt             0x2d /* [+0] PUSH((signed)POP(SECOND) <  (signed)POP(TOP)); */
-#define RPC_OP_ne             0x2e /* [+0] PUSH((signed)POP(SECOND) != (signed)POP(TOP)); */
+#define RPC_OP_ne             0x2e /* [+0] PUSH(POP(SECOND) != POP(TOP)); */
 #define RPC_OP_skip           0x2f /* [+2] off = *(s16 const *)pc; pc += 2; pc += off; */
 #define RPC_OP_popreg0        0x30 /* [+0] CFI_REGISTER(0) = POP(); */
 #define RPC_OP_popreg1        0x31 /* [+0] CFI_REGISTER(1) = POP(); */
@@ -262,12 +262,12 @@
 #define RPC_OP_futex_wake     0xa7 /* [+0] count = POP(); addr = POP(); futex_wake(addr, count); */
 #define RPC_OP_nbra           0xa8 /* [+2] off = *(s16 const *)pc; pc += 2; if (POP() == 0) pc += off; */
 #define RPC_OP_push_sigmask   0xa9 /* [+1] index = *pc++; sigset_t s; sigprocmask(SIG_SETMASK, NULL, &s); PUSH(s.__val[index]); */
-#define RPC_OP_sppush_sigmask 0xaa /* [+2] sigsetsz = *(*(u16 **)&pc)++; sigset_t s; sigprocmask(SIG_SETMASK, NULL, &s); PUSH_ONTO_USER_STACK(&s, sigsetsz); */
-#define RPC_OP_push_signal    0xab /* [+0] PUSH(_RPC_GETSIGNO(RPC_MODE)); */
-/*      RPC_OP_               0xac  * ... */
-/*      RPC_OP_               0xad  * ... */
-/*      RPC_OP_               0xae  * ... */
-/*      RPC_OP_               0xaf  * ... */
+#define RPC_OP_uge            0xaa /* [+0] PUSH((unsigned)POP(SECOND) >= (unsigned)POP(TOP)); */
+#define RPC_OP_ugt            0xab /* [+0] PUSH((unsigned)POP(SECOND) >  (unsigned)POP(TOP)); */
+#define RPC_OP_ule            0xac /* [+0] PUSH((unsigned)POP(SECOND) <= (unsigned)POP(TOP)); */
+#define RPC_OP_ult            0xad /* [+0] PUSH((unsigned)POP(SECOND) <  (unsigned)POP(TOP)); */
+#define RPC_OP_sppush_sigmask 0xae /* [+2] sigsetsz = *(*(u16 **)&pc)++; sigset_t s; sigprocmask(SIG_SETMASK, NULL, &s); PUSH_ONTO_USER_STACK(&s, sigsetsz); */
+#define RPC_OP_push_signal    0xaf /* [+0] PUSH(_RPC_GETSIGNO(RPC_MODE)); */
 #define RPC_OP_widenz         0xb0 /* [+1] Zero-extend a [OPERAND]-sized integer to full width */
 #define RPC_OP_widens         0xb1 /* [+1] Sign-extend a [OPERAND]-sized integer to full width */
 /*      RPC_OP_               0xb2  * ... */

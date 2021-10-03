@@ -130,10 +130,10 @@
 #define DW_OP_xderef               0x18 /* [+0]   off = POP(); id = POP(); PUSH(*(uintptr_t *)id:off) */
 #define DW_OP_abs                  0x19 /* [+0]   a = POP(); PUSH(a < 0 ? -a : a); */
 #define DW_OP_and                  0x1a /* [+0]   PUSH(POP(SECOND) & POP(TOP)); */
-#define DW_OP_div                  0x1b /* [+0]   PUSH(POP(SECOND) / POP(TOP)); */
+#define DW_OP_div                  0x1b /* [+0]   PUSH((signed)POP(SECOND) / (signed)POP(TOP)); */
 #define DW_OP_minus                0x1c /* [+0]   PUSH(POP(SECOND) - POP(TOP)); */
-#define DW_OP_mod                  0x1d /* [+0]   PUSH(POP(SECOND) % POP(TOP)); */
-#define DW_OP_mul                  0x1e /* [+0]   PUSH(POP(SECOND) * POP(TOP)); */
+#define DW_OP_mod                  0x1d /* [+0]   PUSH((signed)POP(SECOND) % (signed)POP(TOP)); */
+#define DW_OP_mul                  0x1e /* [+0]   PUSH((signed)POP(SECOND) * (signed)POP(TOP)); */
 #define DW_OP_neg                  0x1f /* [+0]   PUSH(-POP()); */
 #define DW_OP_not                  0x20 /* [+0]   PUSH(~POP()); */
 #define DW_OP_or                   0x21 /* [+0]   PUSH(POP(SECOND) | POP(TOP)); */
@@ -144,12 +144,12 @@
 #define DW_OP_shra                 0x26 /* [+0]   PUSH((signed)POP(SECOND) >> POP(TOP)); */
 #define DW_OP_xor                  0x27 /* [+0]   PUSH(POP(SECOND) ^ POP(TOP)); */
 #define DW_OP_bra                  0x28 /* [+2]   off = *(s16 const *)pc; pc += 2; if (POP() != 0) pc += off; */
-#define DW_OP_eq                   0x29 /* [+0]   PUSH((signed)POP(SECOND) == (signed)POP(TOP)); */
+#define DW_OP_eq                   0x29 /* [+0]   PUSH(POP(SECOND) == POP(TOP)); */
 #define DW_OP_ge                   0x2a /* [+0]   PUSH((signed)POP(SECOND) >= (signed)POP(TOP)); */
 #define DW_OP_gt                   0x2b /* [+0]   PUSH((signed)POP(SECOND) >  (signed)POP(TOP)); */
 #define DW_OP_le                   0x2c /* [+0]   PUSH((signed)POP(SECOND) <= (signed)POP(TOP)); */
 #define DW_OP_lt                   0x2d /* [+0]   PUSH((signed)POP(SECOND) <  (signed)POP(TOP)); */
-#define DW_OP_ne                   0x2e /* [+0]   PUSH((signed)POP(SECOND) != (signed)POP(TOP)); */
+#define DW_OP_ne                   0x2e /* [+0]   PUSH(POP(SECOND) != POP(TOP)); */
 #define DW_OP_skip                 0x2f /* [+2]   off = *(s16 const *)pc; pc += 2; pc += off; */
 #define DW_OP_lit0                 0x30 /* [+0]   PUSH(0); */
 #define DW_OP_lit1                 0x31 /* [+0]   PUSH(1); */
