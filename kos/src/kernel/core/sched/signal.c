@@ -243,10 +243,13 @@ NOTHROW(FCALL task_connection_free)(struct task_connections *__restrict self,
 #define sig_smplock_release_nopr(self) \
 	__hybrid_atomic_fetchand((self)->s_ctl, ~SIG_CONTROL_SMPLOCK, __ATOMIC_RELEASE)
 #else /* SIG_CONTROL_SMPLOCK != 0 */
-#define sig_smplock_set(con)      con
-#define sig_smplock_clr(con)      con
-#define sig_smplock_tst(con)      0
-#define sig_smplock_cpy(to, from) to
+#define sig_smplock_set(con)              con
+#define sig_smplock_clr(con)              con
+#define sig_smplock_tst(con)              0
+#define sig_smplock_cpy(to, from)         to
+#define sig_smplock_tryacquire_nopr(self) 1
+#define sig_smplock_acquire_nopr(self)    (void)0
+#define sig_smplock_release_nopr(self)    (void)0
 #endif /* SIG_CONTROL_SMPLOCK == 0 */
 
 #ifdef TASK_CONNECTION_STAT_FLOCK
@@ -1098,9 +1101,9 @@ done:
 
 
 
-/* Re-prime the completion callback to be invoked  once again the next time that  the
- * attached signal is delivered. In this case, the completion function is responsible
- * to ensure that no-one is currently trying to destroy the associated signal. */
+/* Re-prime  the completion callback to be invoked once again the next time that the
+ * attached signal is delivered. This function is a no-op if the caller's completion
+ * function was invoked from `sig_broadcast_for_fini()'. */
 PUBLIC NOBLOCK NOPREEMPT NONNULL((1)) bool
 NOTHROW(KCALL sig_completion_reprime)(struct sig_completion *__restrict self,
                                       bool for_poll) {

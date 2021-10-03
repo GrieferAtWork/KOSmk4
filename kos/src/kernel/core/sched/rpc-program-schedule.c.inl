@@ -78,9 +78,8 @@ DEFINE_SYSCALL5(errno_t, rpc_schedule,
 	VALIDATE_FLAGSET(mode,
 	                 RPC_SIGNO_MASK | RPC_SYNCMODE_F_ALLOW_ASYNC |
 	                 RPC_SYNCMODE_F_REQUIRE_SC | RPC_SYNCMODE_F_REQUIRE_CP |
-	                 RPC_SYSRESTART_F_AUTO | RPC_SYSRESTART_F_DONT |
-	                 RPC_PRIORITY_F_HIGH | RPC_DOMAIN_F_PROC |
-	                 RPC_JOIN_F_ASYNC,
+	                 RPC_SYSRESTART_F_AUTO | RPC_PRIORITY_F_HIGH |
+	                 RPC_DOMAIN_F_PROC | RPC_JOIN_F_ASYNC,
 	                 E_INVALID_ARGUMENT_CONTEXT_RPC_SCHEDULE_MODE);
 	if unlikely(max_param_count > RPC_PARAMS_MAX) {
 		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
@@ -128,7 +127,6 @@ DEFINE_SYSCALL5(errno_t, rpc_schedule,
 	                        RPC_SYNCMODE_F_REQUIRE_SC |
 	                        RPC_SYNCMODE_F_REQUIRE_CP |
 	                        RPC_SYSRESTART_F_AUTO |
-	                        RPC_SYSRESTART_F_DONT |
 	                        RPC_PRIORITY_F_HIGH);
 	rpc->pr_user.pur_refcnt = 1;
 	rpc->pr_user.pur_status = PENDING_USER_RPC_STATUS_PENDING;

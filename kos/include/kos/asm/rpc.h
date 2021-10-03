@@ -241,12 +241,15 @@
 /*      RPC_OP_               0x9f  * ... */
 #define RPC_OP_push_reason    0xa0 /* [+0] PUSH(user_rpc_reason); */
 #define RPC_OP_push_dorestart 0xa1 /* [+0] PUSH(user_rpc_reason == RPC_REASONCTX_SYSCALL ? 1 : 0); */
-#define RPC_OP_push_sc_info   0xa2 /* [+1] word = *pc++; PUSH(((uintptr_t *)sc_info)[word]);         // Illegal when `user_rpc_reason != RPC_REASONCTX_SYSCALL' */
-#define RPC_OP_sppush_sc_info 0xa3 /* [+0] Push the entire `sc_info' descriptor onto the user stack. // Illegal when `user_rpc_reason != RPC_REASONCTX_SYSCALL' */
-#define RPC_OP_push_param     0xa4 /* [+1] word = *pc++; PUSH(params[i]); // `params' is an argument */
-#define RPC_OP_push_sigmask   0xa5 /* [+1] sigset_t s; sigprocmask(SIG_SETMASK, NULL, &s); PUSH(s.__val[*pc++]); */
-#define RPC_OP_sigblock       0xa6 /* [+1] sigset_t s; sigemptyset(&s); sigaddset(&s, *pc++); sigprocmask(SIG_BLOCK, &s, NULL); */
-/*      RPC_OP_               0xa7  * ... */
+#define RPC_OP_push_issyscall 0xa2 /* [+0] PUSH(sc_info != NULL); // `user_rpc_reason == RPC_REASONCTX_SYSCALL' implies this is true, but not the reverse
+                                    * In case multiple RPCs are handled after one system call, only the first may need to restart. Also, system calls that
+                                    * shouldn't be restarted still come with meta-data that is available to RPC programs, even when the call shouldn't be
+                                    * restarted. */
+#define RPC_OP_push_sc_info   0xa3 /* [+1] word = *pc++; PUSH(((uintptr_t *)sc_info)[word]);         // Illegal when `user_rpc_reason != RPC_REASONCTX_SYSCALL' */
+#define RPC_OP_sppush_sc_info 0xa4 /* [+0] Push the entire `sc_info' descriptor onto the user stack. // Illegal when `user_rpc_reason != RPC_REASONCTX_SYSCALL' */
+#define RPC_OP_push_param     0xa5 /* [+1] word = *pc++; PUSH(params[i]); // `params' is an argument */
+#define RPC_OP_push_sigmask   0xa6 /* [+1] sigset_t s; sigprocmask(SIG_SETMASK, NULL, &s); PUSH(s.__val[*pc++]); */
+#define RPC_OP_sigblock       0xa7 /* [+1] sigset_t s; sigemptyset(&s); sigaddset(&s, *pc++); sigprocmask(SIG_BLOCK, &s, NULL); */
 #define RPC_OP_nbra           0xa8 /* [+2] off = *(s16 const *)pc; pc += 2; if (POP() == 0) pc += off; */
 #define RPC_OP_futex_wake     0xa9 /* [+0] count = POP(); addr = POP(); futex_wake(addr, count); */
 /*      RPC_OP_               ...   * ... */
@@ -375,16 +378,14 @@
 
 /************************************************************************/
 /* RPC system call restart flags */
-#define RPC_SYSRESTART_F_AUTO 0x1000 /* [posix: SA_RESTART] Also restart `SYSCALL_RESTART_MODE_AUTO' */
-#define RPC_SYSRESTART_F_DONT 0x2000 /* [posix:          -] Also restart `SYSCALL_RESTART_MODE_DONT' */
+#define RPC_SYSRESTART_F_AUTO 0x1000 /* Same as `SA_RESTART' for signal handlers */
 
 /* RPC system call  restart options.  These only apply  to RPCs  delivered
  * while the target thread is in kernel-space and executing a system  call
  * marked as [cp] and something other than [restart(must)], and the system
  * call made a call to `task_serve()' internally. */
-#define RPC_SYSRESTART_NORMAL 0x0000                                          /* [posix:!SA_RESTART] SYSCALL_RESTART_MODE_MUST (default) */
-#define RPC_SYSRESTART_MOST   RPC_SYSRESTART_F_AUTO                           /* [posix: SA_RESTART] SYSCALL_RESTART_MODE_MUST+SYSCALL_RESTART_MODE_AUTO */
-#define RPC_SYSRESTART_ALL    (RPC_SYSRESTART_F_AUTO | RPC_SYSRESTART_F_DONT) /* [posix:          -] SYSCALL_RESTART_MODE_MUST+SYSCALL_RESTART_MODE_AUTO+SYSCALL_RESTART_MODE_DONT */
+#define RPC_SYSRESTART_NORMAL  0x0000                /* [posix:!SA_RESTART] SYSCALL_RESTART_MODE_MUST (default) */
+#define RPC_SYSRESTART_RESTART RPC_SYSRESTART_F_AUTO /* [posix: SA_RESTART] SYSCALL_RESTART_MODE_MUST+SYSCALL_RESTART_MODE_AUTO */
 /************************************************************************/
 
 

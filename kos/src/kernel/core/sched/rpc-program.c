@@ -75,8 +75,8 @@ NOTHROW(FCALL task_userrpc_cancelprogram)(struct pending_rpc *__restrict rpc) {
 
 struct rpc_vm {
 	/* TODO: Construct structure for execution of user RPC programs.
-	 *       Must include a memory-access buffer layer (similar to
-	 *       that of modrtm, but without the atomic-ness that has,
+	 *       Must  include a memory-access  buffer layer (similar to
+	 *       that of modrtm, but  without the atomic-ness that  has,
 	 *       and instead with support for reading/writing VIO) */
 };
 
@@ -84,7 +84,8 @@ struct rpc_vm {
 
 /* Execute a user-space RPC program
  * @param: reason:  One of `_RPC_REASONCTX_ASYNC', `_RPC_REASONCTX_SYNC' or `_RPC_REASONCTX_SYSCALL'
- * @param: sc_info: [valid_if(reason == _RPC_REASONCTX_SYSCALL)] System call information. */
+ * @param: sc_info: The  system call that was active at the  time of the RPC being handled. Note that
+ *                  this system call only has to be restarted when `reason == _RPC_REASONCTX_SYSCALL' */
 PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) rpc_cpustate_t *FCALL
 task_userrpc_runprogram(rpc_cpustate_t *__restrict state,
                         struct pending_rpc *__restrict rpc,

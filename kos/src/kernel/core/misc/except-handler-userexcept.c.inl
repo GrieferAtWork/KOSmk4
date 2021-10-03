@@ -210,10 +210,6 @@ handle_pending:
 				 *       before, meaning that the last one executed (iow: the first one
 				 *       originally scheduled) will have the last word when it comes to
 				 *       where execution should continue. */
-#ifndef LOCAL_IS_SYSRET
-				unsigned int user_rpc_reason;
-#endif /* !LOCAL_IS_SYSRET */
-
 #if !defined(LOCAL_HAVE_SIGMASK) && defined(CONFIG_HAVE_USERPROCMASK)
 				bool is_masked;
 				TRY {
@@ -250,17 +246,10 @@ make_inactive:
 				}
 
 #ifndef LOCAL_IS_SYSRET
-				/* Figure out the reason we want to tell user-space.
-				 * NOTE: Yes: this checks for  the original `sc_info'  (and
-				 *       not for `ctx.rc_context == RPC_REASONCTX_SYSCALL') */
-				user_rpc_reason = _RPC_REASONCTX_SYNC;
 				if (sc_info != NULL) {
 					if ((rpc->pr_flags & RPC_SYNCMODE_F_REQUIRE_CP) &&
 					    !kernel_syscall_iscp(sc_info))
 						goto make_inactive;
-					/* If the system call  */
-					if (ctx.rc_context == RPC_REASONCTX_SYSCALL)
-						user_rpc_reason = _RPC_REASONCTX_SYSCALL;
 				} else {
 					if ((rpc->pr_flags & RPC_SYNCMODE_F_REQUIRE_SC))
 						goto make_inactive;
@@ -269,9 +258,9 @@ make_inactive:
 
 				/* Do everything necessary to handle the USER-rpc. */
 #ifndef LOCAL_IS_SYSRET
-				userexcept_exec_user_rpc(&ctx, &error, rpc, user_rpc_reason);
+				userexcept_exec_user_rpc(&ctx, &error, rpc);
 #else /* !LOCAL_IS_SYSRET */
-				userexcept_exec_user_rpc(&ctx, &error, rpc, _RPC_REASONCTX_ASYNC);
+				userexcept_exec_user_rpc(&ctx, &error, rpc);
 #endif /* !LOCAL_IS_SYSRET */
 
 #ifndef LOCAL_IS_SYSRET
@@ -413,20 +402,8 @@ again_scan_proc_rpcs:
 					} else {
 						/* User-space RPC */
 #ifndef LOCAL_IS_SYSRET
-						unsigned int user_rpc_reason;
-
-						/* Figure out the reason we want to tell user-space.
-						 * NOTE: Yes: this checks for  the original `sc_info'  (and
-						 *       not for `ctx.rc_context == RPC_REASONCTX_SYSCALL') */
-						user_rpc_reason = _RPC_REASONCTX_SYNC;
-						if (sc_info != NULL) {
-							/* If the system call  */
-							if (ctx.rc_context == RPC_REASONCTX_SYSCALL)
-								user_rpc_reason = _RPC_REASONCTX_SYSCALL;
-						}
-
 						/* Do everything necessary to handle the USER-rpc. */
-						userexcept_exec_user_rpc(&ctx, &error, rpc, user_rpc_reason);
+						userexcept_exec_user_rpc(&ctx, &error, rpc);
 
 						/* User-space RPCs are _always_ required (or at least expected)
 						 * to restart system calls, meaning  that once the first  one's
@@ -439,7 +416,7 @@ again_scan_proc_rpcs:
 						ctx.rc_context = RPC_REASONCTX_SYSRET;
 #else /* !LOCAL_IS_SYSRET */
 						/* Do everything necessary to handle the USER-rpc. */
-						userexcept_exec_user_rpc(&ctx, &error, rpc, _RPC_REASONCTX_ASYNC);
+						userexcept_exec_user_rpc(&ctx, &error, rpc);
 						assert(ctx.rc_context == RPC_REASONCTX_SYSRET);
 #endif /* !LOCAL_IS_SYSRET */
 					}

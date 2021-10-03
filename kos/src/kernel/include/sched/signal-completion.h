@@ -59,10 +59,10 @@ struct sig_completion_context {
 	                                  * to-be performed  at a  later point,  once all  SMP-locks have  been
 	                                  * released.
 	                                  * Note that even NOBLOCK functions may not always be  SMP-lock-safe,
-	                                  * which  includes further calls  to `sig_send()' / `sig_broadcast()'
+	                                  * which  includes further calls to `sig_send()' / `sig_broadcast()'.
 	                                  * When using  this mechanism,  you must  also make  sure to  account
 	                                  * for the  possibility  that  either the  associated  signal  and/or
-	                                  * used  sig_completion  descriptor get  destroyed  before/while this
+	                                  * used  `sig_completion' descriptor gets destroyed before/while this
 	                                  * callback will eventually be executed.  As such, it is  recommended
 	                                  * to use  the normal  signal completion  function as  a  first-stage
 	                                  * callback to construct references to objects which are then written
@@ -97,9 +97,9 @@ typedef NOBLOCK NOPREEMPT NONNULL((1, 2)) size_t
                                       struct sig_completion_context *__restrict context,
                                       void *buf, size_t bufsize);
 
-/* Re-prime the completion callback to be invoked  once again the next time that  the
- * attached signal is delivered. In this case, the completion function is responsible
- * to ensure that no-one is currently trying to destroy the associated signal. */
+/* Re-prime  the completion callback to be invoked once again the next time that the
+ * attached signal is delivered. This function is a no-op if the caller's completion
+ * function was invoked from `sig_broadcast_for_fini()'. */
 FUNDEF NOBLOCK NOPREEMPT NONNULL((1)) __BOOL
 NOTHROW(KCALL sig_completion_reprime)(struct sig_completion *__restrict self,
                                       __BOOL for_poll);
@@ -339,9 +339,9 @@ sig_multicompletion_connect_from_task(struct sig_multicompletion *__restrict com
 
 
 #if 0 /* Signal completion usage example */
-/* `struct rising_edge_detector'  can  be  used  for  implementing  an  asynchronous
- * connection  to a signal (i.e. do the equivalent of `task_connect()' asynchronous,
- * including across return-to-userspace-and-back-via-syscall and similar situations) */
+/* `struct rising_edge_detector'   can  be  used  for  implementing  an  asynchronous
+ * connection to a signal (i.e. do the equivalent of `task_connect()' asynchronously,
+ * including across return-to-userspace-and-back-via-syscall  or similar  situations) */
 struct rising_edge_detector {
 	WEAK refcnt_t         red_refcnt;   /* Reference counter */
 	struct sig_completion red_compl;    /* The used completion callback */

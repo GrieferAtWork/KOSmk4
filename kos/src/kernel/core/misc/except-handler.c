@@ -508,8 +508,7 @@ done:
 PRIVATE NONNULL((1, 2, 3)) void
 NOTHROW(FCALL userexcept_exec_user_rpc)(/*in|out*/ struct rpc_context *__restrict ctx,
                                         /*in|out*/ struct exception_info *__restrict error,
-                                        /*inherit(always)*/ struct pending_rpc *__restrict rpc,
-                                        unsigned int user_rpc_reason) {
+                                        /*inherit(always)*/ struct pending_rpc *__restrict rpc) {
 	/* Execute the program associated with this RPC */
 	if (rpc->pr_flags & RPC_CONTEXT_SIGNAL) {
 		/* Because signals handled here must properly integrate with  other
@@ -607,10 +606,70 @@ again_switch_action_handler:
 		xdecref_unlikely(action.sa_mask);
 		pending_rpc_free(rpc);
 	} else {
+		unsigned int user_rpc_reason;
+		/* Figure out the reason we want to tell user-space. */
+		assert(ctx->rc_context == RPC_REASONCTX_SYSRET ||
+		       ctx->rc_context == RPC_REASONCTX_SYSCALL ||
+		       ctx->rc_context == RPC_REASONCTX_INTERRUPT);
+		switch (ctx->rc_context) {
+		case RPC_REASONCTX_SYSRET:
+			user_rpc_reason = _RPC_REASONCTX_ASYNC;
+			break;
+		case RPC_REASONCTX_INTERRUPT:
+			user_rpc_reason = _RPC_REASONCTX_SYNC;
+			break;
+		case RPC_REASONCTX_SYSCALL: {
+			int restart_mode;
+			/* Figure out if we want the RPC program to restart the system call. */
+			restart_mode    = kernel_syscall_restartmode(&ctx->rc_scinfo);
+			user_rpc_reason = _RPC_REASONCTX_SYSCALL;
+			switch (restart_mode) {
+			case SYSCALL_RESTART_MODE_MUST:
+				break;
+			case SYSCALL_RESTART_MODE_DONT:
+				user_rpc_reason = _RPC_REASONCTX_SYNC;
+				break;
+			case SYSCALL_RESTART_MODE_AUTO:
+				if (!(rpc->pr_flags & RPC_SYSRESTART_F_AUTO))
+					user_rpc_reason = _RPC_REASONCTX_SYNC;
+				break;
+			default: __builtin_unreachable();
+			}
+		}	break;
+		default: __builtin_unreachable();
+		}
+		if (ctx->rc_context == RPC_REASONCTX_SYSCALL &&
+		    user_rpc_reason != _RPC_REASONCTX_SYSCALL) {
+			/* System call isn't being restarted; -> Must have it return with -EINTR,
+			 * or by  calling the  user-defined exception  handler with  E_INTERRUPT. */
+			struct exception_data error;
+			memset(&error, 0, sizeof(error));
+			error.e_code      = ERROR_CODEOF(E_INTERRUPT);
+			error.e_faultaddr = icpustate_getpc(ctx->rc_state);
+			if (ctx->rc_scinfo.rsi_flags & RPC_SYSCALL_INFO_FEXCEPT) {
+				/* Make transformations to invoke the user-space exception handler.
+				 * When no handler is installed, `userexcept_callhandler()' returns
+				 * `NULL'. */
+				struct icpustate *newstate;
+				newstate = userexcept_callhandler(ctx->rc_state, &ctx->rc_scinfo, &error);
+				if unlikely(!newstate) {
+					/* If the exception still cannot be handled, terminate the program.
+					 * XXX: Logically speaking, the program should only terminate
+					 *      once  modifications made by the RPC program return... */
+					abort_SIGINT_program_without_exception_handler(ctx->rc_state);
+					/*newstate = ctx->rc_state;*/
+				}
+				ctx->rc_state = newstate;
+			} else {
+				/* Simple case: Just have the syscall return `-EINTR' */
+				ctx->rc_state = userexcept_seterrno(ctx->rc_state, &ctx->rc_scinfo, &error);
+			}
+		}
 		TRY {
-			ctx->rc_state = task_userrpc_runprogram(ctx->rc_state, rpc,
-			                                        user_rpc_reason,
-			                                        &ctx->rc_scinfo);
+			ctx->rc_state = task_userrpc_runprogram(ctx->rc_state, rpc, user_rpc_reason,
+			                                        ctx->rc_context == RPC_REASONCTX_SYSCALL
+			                                        ? &ctx->rc_scinfo
+			                                        : NULL);
 		} EXCEPT {
 			/* Prioritize errors. */
 			struct exception_info *tls = error_info();
