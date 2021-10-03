@@ -261,21 +261,11 @@ make_inactive:
 				/* Do everything necessary to handle the USER-rpc. */
 				if (!userexcept_exec_user_rpc(&ctx, &error, rpc))
 					SLIST_INSERT(&repeat, rpc, pr_link);
+#ifdef LOCAL_IS_SYSRET
 				else {
-#ifndef LOCAL_IS_SYSRET
-					/* User-space RPCs are _always_ required (or at least expected)
-					 * to restart system calls, meaning  that once the first  one's
-					 * been executed, any that come after have to be told that they
-					 * will return to an async user-space location (rather than  to
-					 * another system call)
-					 *
-					 * NOTE: In actuality, `_RPC_REASONCTX_SYNC' is passed as reason
-					 *       for any additional RPCs */
-					ctx.rc_context = RPC_REASONCTX_SYSRET;
-#else /* !LOCAL_IS_SYSRET */
 					assert(ctx.rc_context == RPC_REASONCTX_SYSRET);
-#endif /* !LOCAL_IS_SYSRET */
 				}
+#endif /* !LOCAL_IS_SYSRET */
 			}
 		}
 	}
@@ -403,21 +393,11 @@ again_scan_proc_rpcs:
 						/* User-space RPC */
 						if (!userexcept_exec_user_rpc(&ctx, &error, rpc))
 							SLIST_INSERT(&repeat, rpc, pr_link);
+#ifdef LOCAL_IS_SYSRET
 						else {
-#ifndef LOCAL_IS_SYSRET
-							/* User-space RPCs are _always_ required (or at least expected)
-							 * to restart system calls, meaning  that once the first  one's
-							 * been executed, any that come after have to be told that they
-							 * will return to an async user-space location (rather than  to
-							 * another system call)
-							 *
-							 * NOTE: In actuality, `_RPC_REASONCTX_SYNC' is passed as reason
-							 *       for any additional RPCs */
-							ctx.rc_context = RPC_REASONCTX_SYSRET;
-#else /* !LOCAL_IS_SYSRET */
 							assert(ctx.rc_context == RPC_REASONCTX_SYSRET);
-#endif /* !LOCAL_IS_SYSRET */
 						}
+#endif /* LOCAL_IS_SYSRET */
 					}
 					goto again_lock_proc_rpcs;
 check_next_proc_rpc:

@@ -147,6 +147,7 @@ DEFINE_SYSCALL5(errno_t, rpc_schedule,
 	rpc->pr_user.pur_prog = program;
 	rpc->pr_user.pur_argc = max_param_count;
 	FINALLY_DECREF(&rpc->pr_user);
+	COMPILER_WRITE_BARRIER();
 
 	/* Lookup the target thread. */
 	target = pidns_lookup_task(THIS_PIDNS, (upid_t)target_tid);
@@ -154,16 +155,11 @@ DEFINE_SYSCALL5(errno_t, rpc_schedule,
 	/* Schedule the RPC */
 	rpc->pr_user.pur_refcnt = 2; /* +1 for the target component's list. */
 	COMPILER_WRITE_BARRIER();
-	if (mode & RPC_DOMAIN_F_PROC) {
-		if (!task_rpc_schedule(target, rpc)) {
-			rpc->pr_user.pur_refcnt = 1;
-			THROW(E_PROCESS_EXITED, (upid_t)target_tid);
-		}
-	} else {
-		if (!proc_rpc_schedule(target, rpc)) {
-			rpc->pr_user.pur_refcnt = 1;
-			THROW(E_PROCESS_EXITED, (upid_t)target_tid);
-		}
+	if (!((mode & RPC_DOMAIN_F_PROC) ? proc_rpc_schedule(target, rpc)
+	                                 : task_rpc_schedule(target, rpc))) {
+		rpc->pr_user.pur_refcnt = 1;
+		COMPILER_WRITE_BARRIER();
+		THROW(E_PROCESS_EXITED, (upid_t)target_tid);
 	}
 
 	/* (possibly) wait for completion */
@@ -191,14 +187,14 @@ DEFINE_SYSCALL5(errno_t, rpc_schedule,
 				if (status != PENDING_USER_RPC_STATUS_COMPLETE)
 					RETHROW();
 
-				/* Ooop... The RPC completed before we could cancel it.
+				/* Ooops... The RPC completed before we could cancel it.
 				 * Well: now we have to get rid of the current exception,
 				 *       as  user-space mustn't be told about ?something?
 				 *       having gone wrong.
 				 * A special case here are  RT exception which are  too
 				 * important to dismiss (as they include stuff like our
 				 * own thread being supposed to terminate) */
-				code = error_class();
+				code = error_code();
 				if (ERRORCLASS_ISRTLPRIORITY(ERROR_CLASS(code)))
 					RETHROW(); /* Sorry. Can't discard this one... */
 
@@ -206,18 +202,20 @@ DEFINE_SYSCALL5(errno_t, rpc_schedule,
 				 * discard it by redirecting our sysret path (so that async
 				 * RPCs/posix signals can  be handled  that way).  However,
 				 * synchronous RPCs can't be handled anymore since we can't
-				 * restart the system call anymore (as it succeeded) */
+				 * restart the system call at this point (as it  succeeded) */
 				if (code == ERROR_CODEOF(E_INTERRUPT_USER_RPC)) {
 					userexcept_sysret_inject_self();
 				} else {
 					/* Everything else is just dumped to the system log.
 					 * But  note that there really shouldn't be anything
 					 * that gets here... */
-					error_printf("Canceling user RPC");
+					error_printf("canceling user RPC");
 				}
 				break;
 			}
 		}
+
+		/* Check if the program managed to complete successfully. */
 		if (status != PENDING_USER_RPC_STATUS_COMPLETE) {
 			struct exception_data *tls;
 			assert(status == PENDING_USER_RPC_STATUS_CANCELED ||

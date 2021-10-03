@@ -251,10 +251,15 @@ NOTHROW(FCALL task_asyncrpc_push)(struct scpustate *__restrict state,
 /* Execute a user-space RPC program
  * @param: reason:  One of `_RPC_REASONCTX_ASYNC', `_RPC_REASONCTX_SYNC' or `_RPC_REASONCTX_SYSCALL'
  * @param: sc_info: The  system call that was active at the  time of the RPC being handled. Note that
- *                  this system call only has to be restarted when `reason == _RPC_REASONCTX_SYSCALL' */
-FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) rpc_cpustate_t *FCALL
+ *                  this system call only has to be restarted when `reason == _RPC_REASONCTX_SYSCALL'
+ * @return: * :   The updated CPU state.
+ * @return: NULL: The RPC was canceled before it could be fully executed.
+ * @throw: E_INTERRUPT_USER_RPC: Must serve other RPCs first, then try to serve this one again.
+ * @throw: * : RPCs serving failed, simply `decref(&rpc->pr_user)'; message passing is already done. */
+FUNDEF WUNUSED NONNULL((1, 2)) rpc_cpustate_t *FCALL
 task_userrpc_runprogram(rpc_cpustate_t *__restrict state, struct pending_rpc *__restrict rpc,
-                        unsigned int reason, struct rpc_syscall_info const *sc_info);
+                        unsigned int reason, struct rpc_syscall_info const *sc_info)
+		THROWS(E_INTERRUPT_USER_RPC, ...);
 
 /* Mark  the given `rpc' as canceled. This function is guarantied to
  * not be called at the same time as `task_userrpc_runprogram()', as

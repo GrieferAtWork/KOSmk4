@@ -81,7 +81,8 @@ DECL_BEGIN
 STATIC_ASSERT_MSG(NSIG - 1 <= 0xff,
                   "This is an ABI requirement imposed by:\n"
                   " - clone(2)\n"
-                  " - RPC_SIGNO_MASK");
+                  " - RPC_SIGNO_MASK\n"
+                  " - RPC_OP_sigblock");
 
 
 /* An empty signal mask used to initialize `this_kernel_sigmask' */

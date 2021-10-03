@@ -1530,7 +1530,7 @@ follow_jmp:
 		sigaddset(&self->rv_sigmask, signo);
 	}	break;
 
-	case RPC_OP_push_sigmask: {
+	case RPC_OP_push_sigmask_word: {
 		uint8_t index = rpc_vm_pc_rdb(self);
 		USER CHECKED sigset_t const *mymask;
 		if unlikely(!CANPUSH(1))
@@ -1700,23 +1700,6 @@ err_no_syscall_info:
 
 
 
-/* Execute the given VM */
-PRIVATE NONNULL((1)) void FCALL
-rpc_vm_exec(struct rpc_vm *__restrict self)
-		THROWS(...) {
-	for (;;) {
-		if (!rpc_vm_instr(self))
-			break; /* `RPC_OP_ret' instruction was reached. */
-
-		/* To  ensure that  RPC programs  with infinite  loops don't cause
-		 * the kernel to hang itself, a call to `task_serve_with_sigmask',
-		 * with a signal mask that is  masking all signals except for  the
-		 * mandatory `SIGKILL' and `SIGSTOP',  is made prior to  executing
-		 * any given instruction. */
-		task_serve_with_sigmask(&kernel_sigmask_full.sm_mask);
-	}
-}
-
 
 
 
@@ -1724,12 +1707,17 @@ rpc_vm_exec(struct rpc_vm *__restrict self)
 /* Execute a user-space RPC program
  * @param: reason:  One of `_RPC_REASONCTX_ASYNC', `_RPC_REASONCTX_SYNC' or `_RPC_REASONCTX_SYSCALL'
  * @param: sc_info: The  system call that was active at the  time of the RPC being handled. Note that
- *                  this system call only has to be restarted when `reason == _RPC_REASONCTX_SYSCALL' */
+ *                  this system call only has to be restarted when `reason == _RPC_REASONCTX_SYSCALL'
+ * @return: * :   The updated CPU state.
+ * @return: NULL: The RPC was canceled before it could be fully executed.
+ * @throw: E_INTERRUPT_USER_RPC: Must serve other RPCs first, then try to serve this one again.
+ * @throw: * : RPCs serving failed, simply `decref(&rpc->pr_user)'; message passing is already done. */
 PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) rpc_cpustate_t *FCALL
 task_userrpc_runprogram(rpc_cpustate_t *__restrict state,
                         struct pending_rpc *__restrict rpc,
                         unsigned int reason,
-                        struct rpc_syscall_info const *sc_info) {
+                        struct rpc_syscall_info const *sc_info)
+		THROWS(E_INTERRUPT_USER_RPC, ...) {
 	struct rpc_vm vm;
 #ifdef __ARCH_HAVE_COMPAT
 	struct unwind_getreg_compat_data compat_getreg;
@@ -1739,6 +1727,14 @@ task_userrpc_runprogram(rpc_cpustate_t *__restrict state,
 	       reason == _RPC_REASONCTX_SYNC ||
 	       reason == _RPC_REASONCTX_SYSCALL);
 	assert(icpustate_isuser(state));
+	assert(rpc->pr_user.pur_status == PENDING_USER_RPC_STATUS_PENDING ||
+	       rpc->pr_user.pur_status == PENDING_USER_RPC_STATUS_CANCELED);
+
+	/* Quick check if the RPC has already been canceled. */
+	if unlikely(rpc->pr_user.pur_status != PENDING_USER_RPC_STATUS_PENDING) {
+		state = NULL;
+		goto done_nofini;
+	}
 
 	/* Initialize the RPC program VM */
 	rpc_mem_init(&vm.rv_mem);
@@ -1776,7 +1772,25 @@ task_userrpc_runprogram(rpc_cpustate_t *__restrict state,
 
 	TRY {
 		/* Execute the RPC program VM */
-		rpc_vm_exec(&vm);
+		for (;;) {
+			/* Check if the RPC should be canceled. */
+			if (ATOMIC_READ(rpc->pr_user.pur_status) != PENDING_USER_RPC_STATUS_PENDING) {
+				assert(rpc->pr_user.pur_status == PENDING_USER_RPC_STATUS_CANCELED);
+				state = NULL;
+				goto done;
+			}
+
+			/* Execute a single instruction. */
+			if (!rpc_vm_instr(&vm))
+				break; /* `RPC_OP_ret' instruction was reached. */
+
+			/* To  ensure that  RPC programs  with infinite  loops don't cause
+			 * the kernel to hang itself, a call to `task_serve_with_sigmask',
+			 * with a signal mask that is  masking all signals except for  the
+			 * mandatory `SIGKILL' and `SIGSTOP',  is made prior to  executing
+			 * any given instruction. */
+			task_serve_with_sigmask(&kernel_sigmask_full.sm_mask);
+		}
 
 		/* Write-back the register state (and verify that all values are allowed) */
 #if defined(__i386__) || defined(__x86_64__)
@@ -1796,6 +1810,23 @@ task_userrpc_runprogram(rpc_cpustate_t *__restrict state,
 			cpustate_verify_userds(ucpustate_getds(&vm.rv_cpu));
 		}
 
+		/* NOTE: Even though some of the stuff  below is still able to  throw
+		 *       exceptions, this _has_ to be the point of no return in terms
+		 *       of cancelability, since from this point forth, we have to do
+		 *       stuff that cannot be undone. */
+
+		/* Indicate that the RPC was successfully executed. */
+		if (!ATOMIC_CMPXCH(rpc->pr_user.pur_status,
+		                   PENDING_USER_RPC_STATUS_PENDING,
+		                   PENDING_USER_RPC_STATUS_COMPLETE)) {
+			assert(rpc->pr_user.pur_status == PENDING_USER_RPC_STATUS_CANCELED);
+			state = NULL;
+			goto done;
+		}
+
+		/* Signal anyone waiting for the RPC to complete to wake up. */
+		sig_broadcast(&rpc->pr_user.pur_stchng);
+
 		/* Write-back memory modifications. */
 		rpc_mem_writeback(&vm.rv_mem);
 
@@ -1810,15 +1841,15 @@ task_userrpc_runprogram(rpc_cpustate_t *__restrict state,
 #endif /* __i386__ && !__x86_64__ */
 		                   0)) {
 
+			/* Mask additional signals */
+			if (vm.rv_flags & RPC_VM_HAVESIGMASK)
+				rpc_vm_mask_signals(&vm.rv_sigmask);
+
 #ifdef CONFIG_FPU
 			/* Write-back FPU register modifications and masked signals. */
 			if (vm.rv_flags & RPC_VM_HAVEFPU_MODIFIED)
 				fpustate_loadfrom(&vm.rv_fpu);
 #endif /* CONFIG_FPU */
-
-			/* Mask additional signals */
-			if (vm.rv_flags & RPC_VM_HAVESIGMASK)
-				rpc_vm_mask_signals(&vm.rv_sigmask);
 
 #if defined(__i386__) && !defined(__x86_64__)
 			/* NOTE: No need to reload the %fs register here, since it'll
@@ -1866,30 +1897,34 @@ task_userrpc_runprogram(rpc_cpustate_t *__restrict state,
 			RETHROW(); /* Handled by the caller (causes the RPC to be re-attempted later) */
 		if (ERRORCLASS_ISRTLPRIORITY(tls->ei_class)) {
 			/* Too important to discard. Instead, cancel the RPC and rethrow */
-			ATOMIC_WRITE(rpc->pr_user.pur_status, PENDING_USER_RPC_STATUS_CANCELED);
-			sig_broadcast(&rpc->pr_user.pur_stchng);
+			if (ATOMIC_CMPXCH(rpc->pr_user.pur_status,
+			                  PENDING_USER_RPC_STATUS_PENDING,
+			                  PENDING_USER_RPC_STATUS_CANCELED)) {
+				sig_broadcast(&rpc->pr_user.pur_stchng);
+			} else {
+				assert(rpc->pr_user.pur_status == PENDING_USER_RPC_STATUS_CANCELED);
+			}
 			RETHROW();
 		}
 
 		/* Propagate the exception back to the sender. */
-		if (isshared(&rpc->pr_user)) {
+		if (isshared(&rpc->pr_user) &&
+		    ATOMIC_CMPXCH(rpc->pr_user.pur_status,
+		                  PENDING_USER_RPC_STATUS_PENDING,
+		                  PENDING_USER_RPC_STATUS_ERROR)) {
 			rpc->pr_user.pur_error.e_code = tls->ei_code;
 			memcpy(&rpc->pr_user.pur_error.e_args, &tls->ei_data.e_args,
 			       sizeof(union exception_data_pointers));
+			sig_broadcast(&rpc->pr_user.pur_stchng);
 		} else {
 			/* If no one's there to receive the error, dump it to the system log */
 			error_printf("executing async user RPC program");
 		}
-		ATOMIC_WRITE(rpc->pr_user.pur_status, PENDING_USER_RPC_STATUS_ERROR);
-		goto broadcast_status_changed;
+		goto done_nofini;
 	}
+done:
 	rpc_vm_fini(&vm);
-
-	/* Indicate that the RPC was successfully executed. */
-	ATOMIC_WRITE(rpc->pr_user.pur_status, PENDING_USER_RPC_STATUS_COMPLETE);
-
-broadcast_status_changed:
-	sig_broadcast(&rpc->pr_user.pur_stchng);
+done_nofini:
 	return state;
 }
 

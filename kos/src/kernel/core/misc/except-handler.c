@@ -612,6 +612,7 @@ again_switch_action_handler:
 		xdecref_unlikely(action.sa_mask);
 		pending_rpc_free(rpc);
 	} else {
+		struct icpustate *new_state;
 		unsigned int user_rpc_reason;
 		/* Figure out the reason we want to tell user-space. */
 		assert(ctx->rc_context == RPC_REASONCTX_SYSRET ||
@@ -672,20 +673,40 @@ again_switch_action_handler:
 			}
 		}
 		TRY {
-			ctx->rc_state = task_userrpc_runprogram(ctx->rc_state, rpc, user_rpc_reason,
-			                                        ctx->rc_context == RPC_REASONCTX_SYSCALL
-			                                        ? &ctx->rc_scinfo
-			                                        : NULL);
+			new_state = task_userrpc_runprogram(ctx->rc_state, rpc, user_rpc_reason,
+			                                    ctx->rc_context == RPC_REASONCTX_SYSCALL
+			                                    ? &ctx->rc_scinfo
+			                                    : NULL);
 		} EXCEPT {
 			/* Prioritize errors. */
 			struct exception_info *tls = error_info();
 			if (tls->ei_code == ERROR_CODEOF(E_INTERRUPT_USER_RPC))
-				return false; /* Load other RPCs and try again. */
+				return false; /* Load other RPCs before trying to serve this one again. */
 			if (error_priority(error->ei_code) < error_priority(tls->ei_code))
 				memcpy(error, tls, sizeof(struct exception_info));
+			new_state = ctx->rc_state;
 		}
 		decref(&rpc->pr_user);
+
+		/* When the RPC got canceled, then mustn't set SYSRET context
+		 * as  no piece of  code got committed  which would have been
+		 * able to restart the system call (meaning that as far as we
+		 * are concerned, the system call  still has to be  restarted
+		 * by means of the kernel's doing) */
+		if (!new_state)
+			return true;
+		ctx->rc_state = new_state;
 	}
+
+	/* User-space RPCs are _always_ required (or at least expected)
+	 * to restart system calls, meaning  that once the first  one's
+	 * been executed, any that come after have to be told that they
+	 * will return to an async user-space location (rather than  to
+	 * another system call)
+	 *
+	 * NOTE: In actuality, `_RPC_REASONCTX_SYNC' is passed as reason
+	 *       for any additional RPCs */
+	ctx->rc_context = RPC_REASONCTX_SYSRET;
 	return true;
 }
 

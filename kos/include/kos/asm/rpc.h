@@ -258,10 +258,10 @@
 #define RPC_OP_push_sc_info   0xa3 /* [+1] index = *pc++; PUSH(((uintptr_t *)sc_info)[index]);         // Illegal when `user_rpc_reason != RPC_REASONCTX_SYSCALL' */
 #define RPC_OP_sppush_sc_info 0xa4 /* [+0] Push the entire `sc_info' descriptor onto the user stack. // Illegal when `user_rpc_reason != RPC_REASONCTX_SYSCALL' */
 #define RPC_OP_push_param     0xa5 /* [+1] index = *pc++; PUSH(params[index]); // `params' is an argument */
-#define RPC_OP_sigblock       0xa6 /* [+1] sigset_t s; sigemptyset(&s); sigaddset(&s, *pc++); sigprocmask(SIG_BLOCK, &s, NULL); */
+#define RPC_OP_sigblock       0xa6 /* [+0] sigset_t s; sigemptyset(&s); sigaddset(&s, POP()); sigprocmask(SIG_BLOCK, &s, NULL); */
 #define RPC_OP_futex_wake     0xa7 /* [+0] count = POP(); addr = POP(); futex_wake(addr, count); */
 #define RPC_OP_nbra           0xa8 /* [+2] off = *(s16 const *)pc; pc += 2; if (POP() == 0) pc += off; */
-#define RPC_OP_push_sigmask   0xa9 /* [+1] index = *pc++; sigset_t s; sigprocmask(SIG_SETMASK, NULL, &s); PUSH(s.__val[index]); */
+#define RPC_OP_push_sigmask_word 0xa9 /* [+1] index = *pc++; sigset_t s; sigprocmask(SIG_SETMASK, NULL, &s); PUSH(s.__val[index]); */
 #define RPC_OP_uge            0xaa /* [+0] PUSH((unsigned)POP(SECOND) >= (unsigned)POP(TOP)); */
 #define RPC_OP_ugt            0xab /* [+0] PUSH((unsigned)POP(SECOND) >  (unsigned)POP(TOP)); */
 #define RPC_OP_ule            0xac /* [+0] PUSH((unsigned)POP(SECOND) <= (unsigned)POP(TOP)); */
@@ -277,7 +277,11 @@
 #define RPC_OP_hi_arch        0xff /* Last arch-specific opcode */
 
 /* Arch-specific opcodes */
-#define RPC_OP_x86_push_is32bit   0xe0 /* [+0] i386/x86_64: push `1' if target thread is 32-bit; push `0' if 64-bit. */
+#define RPC_OP_x86_push_is32bit   0xe0 /* [+0] i386/x86_64: push  `1' if target  thread is 32-bit;  push `0' if 64-bit.
+                                        * Since register numbers (and the  operand of `RPC_OP_sppush_const') is  always
+                                        * dependent on the architecture of the _target_ thread (not the sender thread),
+                                        * this instruction can be used to write  portable RPC programs that can be  run
+                                        * both in the context of a 32-bit and 64-bit target thread. */
 /*      RPC_OP_                   0xe1  */
 /*      RPC_OP_                   0xe2  */
 /*      RPC_OP_                   0xe3  */
@@ -334,6 +338,7 @@
 
 /* Internally used: RPC is currently inactive. */
 #define _RPC_CONTEXT_INACTIVE 0x00020000
+/************************************************************************/
 #endif /* __KERNEL__ */
 
 
@@ -477,7 +482,7 @@
 /************************************************************************/
 #define RPC_PROG_PARAMS_MAX 256    /* Max # of parameters which may be passed to `rpc_schedule(2)' */
 #define RPC_PROG_MEMORY_MAX 0xffff /* Max # unique byte addresses a single RPC program may access */
-#define RPC_PROG_STACK_MAX  256    /* Max # of elements which may exist on an RPC program stack. */
+#define RPC_PROG_STACK_MAX  256    /* Max # of elements which may exist on an RPC program stack */
 #define RPC_PROG_FUTEX_MAX  256    /* Max # of futex objects which a single RPC program may access */
 /************************************************************************/
 
@@ -519,8 +524,8 @@
 #define _RPC_REASONCTX_SYSCALL   0x0002 /* User-space context: `RPC_REASONCTX_SYSCALL' */
 #else /* __KERNEL__ */
 #define RPC_REASONCTX_ASYNC      0x0000 /* Asynchronous execution in user-space. */
-#define RPC_REASONCTX_SYNC       0x0001 /* A system call was interrupt, and will not be restarted after the RPC returns. */
-#define RPC_REASONCTX_SYSCALL    0x0002 /* A system call was interrupt, but will be restarted after the RPC returns. */
+#define RPC_REASONCTX_SYNC       0x0001 /* A syscall or interrupt was halted, but will not be restarted after the RPC returns. */
+#define RPC_REASONCTX_SYSCALL    0x0002 /* A syscall was halted, but will be restarted after the RPC returns. */
 #endif /* !__KERNEL__ */
 
 
