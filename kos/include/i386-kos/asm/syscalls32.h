@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x73e31649 */
+/* HASH CRC-32:0xdb306910 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1613,34 +1613,18 @@
 #define __NRFEAT_DEFINED_SYSCALL_RESTART_MODES
 /* Restart modes:
  * 0 (auto):
- *   - Always restart after an `E_INTERRUPT_USER_RPC'
- *   - Restart from sigreturn() if the signal handler had the `SA_RESTART' flag set
+ *   - Restart only if `SA_RESTART' / `RPC_SYSRESTART_F_AUTO' is set
  * 1 (dont):
- *   - Never restart. - Always propagate `E_INTERRUPT_USER_RPC'
- *   - The only case when the system call should still be restarted,
- *     is when an RPC with `RPC_SCHEDULE_FLAG_SYSRESTART' was used
+ *   - Never restart; always return -EINTR or propagate E_INTERRUPT
  * 2 (must):
- *   - Always restart, even from `sigreturn()' when the
- *     handler didn't have the `SA_RESTART' flag set
- *   - The only case when the system call shouldn't be restarted,
- *     is when an RPC with `RPC_SCHEDULE_FLAG_NOSYSRESTART' was used
- * Interaction with `SA_RESTART':
- *  - auto + ~SA_RESTART:      No
- *  - auto + SA_RESTART:       Yes
- *  - dont + ~SA_RESTART:      No
- *  - dont + SA_RESTART:       No
- *  - must + ~SA_RESTART:      Yes
- *  - must + SA_RESTART:       Yes
- * Interaction with RPC flags:
- *  - auto + <no flags>:                     Yes
- *  - auto + RPC_SCHEDULE_FLAG_SYSRESTART:   Yes
- *  - auto + RPC_SCHEDULE_FLAG_NOSYSRESTART: No
- *  - dont + <no flags>:                     No
- *  - dont + RPC_SCHEDULE_FLAG_SYSRESTART:   Yes
- *  - dont + RPC_SCHEDULE_FLAG_NOSYSRESTART: No
- *  - must + <no flags>:                     Yes
- *  - must + RPC_SCHEDULE_FLAG_SYSRESTART:   Yes
- *  - must + RPC_SCHEDULE_FLAG_NOSYSRESTART: No
+ *   - Always restart, after return from a signal handler
+ * Interaction with `SA_RESTART' / `RPC_SYSRESTART_F_AUTO':
+ *  - auto + ~SA_RESTART: No
+ *  - auto + SA_RESTART:  Yes
+ *  - dont + ~SA_RESTART: No
+ *  - dont + SA_RESTART:  No
+ *  - must + ~SA_RESTART: Yes
+ *  - must + SA_RESTART:  Yes
  */
 #define __NRRM_restart_syscall              0
 #define __NRRM_exit                         2

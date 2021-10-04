@@ -37,19 +37,23 @@
  * even identical functionality.
  *
  * NOTES:
- *  - The stack used by the  below bytecode consists of pointer-sized  words,
- *    and  trying to push a register that is larger than a pointer will cause
- *    as many words to be  pushed/popped as necessary, where push  operations
- *    function such that the last-pushed value contains the least significant
- *    part of the whole value (if that whole value was interpreted as a base-
- *    2 integer of arbitrary precision).
+ *  - The  stack used by  the below bytecode  consists of pointer-sized words,
+ *    and trying to push a register that  is larger than a pointer will  cause
+ *    as  many words to  be pushed/popped as  necessary, where push operations
+ *    function such that the last-pushed value contains the least  significant
+ *    part  of the whole value (if that whole value was interpreted as a base-
+ *    2 integer of arbitrary precision), while pop works compatible with this.
+ *    When an over-long register is pushed on the user-stack, the same happens
+ *    and a variable number of pointer-sized words are pushed.
  *
  *  - Register indices are arch-dependent and the same as those used by CFI:
  *      i386:   One of `CFI_386_UNWIND_REGISTER_*'    (from <libunwind/cfi/i386.h>)
  *      x86_64: One of `CFI_X86_64_UNWIND_REGISTER_*' (from <libunwind/cfi/x86_64.h>)
+ *
  *  - RPC  program execution starts with the first instruction, at which point
  *    the stack was set-up to contain a single element equal to what is pushed
  *    by `RPC_OP_push_dorestart'.
+ *
  *  - Every RPC program _must_ include checks regarding a system call needing  to
  *    be restarted, or never return to the interrupted location at all. For  this
  *    purpose, the stack starts out with containing information about the need to
@@ -59,6 +63,24 @@
  *    counter  to  point to  a custom  landing pad  capable of  saving registers,
  *    repeating the system  call, restoring registers,  and finally returning  to
  *    where the system call would have originally returned to.
+ *
+ *  - Unaligned memory access is allowed on all architectures, though if you
+ *    have to resort it making use of it, you might be doing something wrong
+ *
+ *  - Both register-, memory-, futex- and sigmask modifications will only  become
+ *    visible  once the RPC program returns without errors (via `RPC_OP_ret'), at
+ *    which  point the RPC can no longer be canceled (though can still be aborted
+ *    if writes to VIO memory exist, in which case there is a chance that not all
+ *    modifications are applied).
+ *    During execution a program may  arbitrarily be aborted or canceled,  where
+ *    the former happens when SIGKILL or SIGSTOP signals/RPCs are received while
+ *    the  program is executing,  and the later when  the original sender didn't
+ *    make  use of `RPC_JOIN_F_ASYNC' and themselves received an unmasked RPC or
+ *    posix signal (causing the `sys_rpc_schedule(2)' to return with -EINTR).
+ *    - When an RPC is canceled, it won't be restarted but will just be discarded
+ *      in its entirety.
+ *    - When an RPC is aborted, another attempt to execute it will be made before
+ *      the next time the targeted returns to user-space.
  *
  *  - PUSH_ONTO_USER_STACK(value) works as:
  *    >> int spreg  = CFI_UNWIND_REGISTER_SP(sizeof(void *));
