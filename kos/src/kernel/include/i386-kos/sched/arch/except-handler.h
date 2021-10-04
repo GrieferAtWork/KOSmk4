@@ -58,7 +58,7 @@ userexcept_callhandler(struct icpustate *__restrict state,
  *                  such as a user-space program causing an `E_SEGFAULT', as opposed to the kernel
  *                  throwing an `E_FSERROR_FILE_NOT_FOUND'
  *            HINT: Additional information about how the system call was invoked can be extracted
- *                  from      `sc_info->rsi_flags'!      (s.a.      `<kos/asm/rpc-method.h>')
+ *                  from       `sc_info->rsi_flags'!       (s.a.        `<kos/asm/rpc-method.h>')
  * @param: siginfo: The signal that is being raised
  * @param: except_info: When non-NULL, `siginfo' was generated through `error_as_signal(&except_info->ei_data)',
  *                  and  if a coredump ends up being generated  as a result of the signal being

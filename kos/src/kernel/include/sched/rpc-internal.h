@@ -58,12 +58,12 @@ struct pending_user_rpc {
 	uintptr_t                                            pur_status; /* RPC status (one of `PENDING_USER_RPC_STATUS_*') */
 	struct sig                                           pur_stchng; /* Signal broadcast when `pur_status' is changed
 	                                                                  * by someone  other than  the original  sender. */
+	REF struct mman                                     *pur_mman;   /* [1..1][const] The mman within which `pur_prog' resides. */
 	union {
 		struct {
-			REF struct mman           *pur_mman;       /* [1..1][const] The mman within which `pur_prog' resides. */
 			USER CHECKED void const   *pur_prog;       /* [1..1][const] Userspace RPC program */
 			size_t                     pur_argc;       /* [const] # of program arguments. */
-			USER UNCHECKED void const *pur_argv[1024]; /* [?..?][pur_argc][const] Vector of program arguments.
+			USER UNCHECKED void const *pur_argv[1024]; /* [?..?][pur_argc][const]  Vector   of   program   arguments.
 			                                            * Should be flexible, but GCC sucks and doesn't allow that... */
 		};
 		struct {

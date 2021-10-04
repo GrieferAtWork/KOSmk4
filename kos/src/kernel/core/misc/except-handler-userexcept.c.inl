@@ -161,7 +161,7 @@ NOTHROW(FCALL userexcept_sysret)(struct icpustate *__restrict state)
 #endif /* !LOCAL_IS_SYSRET */
 
 	/* Load RPC functions. This must happen _AFTER_ we clear
-	 * the pending-RPC flag to prevent a race condition. */
+	 * the  pending-RPC  flag to  prevent a  race condition. */
 	pending.slh_first = SLIST_ATOMIC_CLEAR(&PERTASK(this_rpcs));
 
 handle_pending:

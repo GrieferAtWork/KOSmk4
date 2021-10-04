@@ -241,6 +241,9 @@ import fs;
 class Architecture {
 	this = default;
 
+	@@Architecture name
+	public member name: string;
+
 	@@Mapping of name->id for CFI registers
 	public member registers: {string: int};
 
@@ -333,13 +336,13 @@ class Instruction {
 global final PAREN_MATCH: {string: string} = { "(" : ")", "[" : "]", "{" : "}" };
 
 function removeSurroundingParenthesis(s: string): string {
-	while (s && s.first in "([{" && s.last == PAREN_MATCH[s.first] &&
+	while (s && s.first == "(" && s.last == PAREN_MATCH[s.first] &&
 	       s.findmatch(s.first, s.last, 1) == #s - 1)
 		s = s[1:-1].strip();
 	return s;
 }
 
-function parseInstructions(arch: Architecture, text: string): {Symbol | Instruction...} {
+function parseInstructions(arch: Architecture, text: string, optPrefix: string = "DW_OP_"): {Symbol | Instruction...} {
 	text = text.unifylines().replace("\\\n", "");
 	local i = 0, len = #text;
 	local uniqueSymbolId = 0;
@@ -503,8 +506,8 @@ again_skip_leading_space:
 			++i;
 			continue;
 		}
-		if (mnemonic.startswith("DW_OP_"))
-			mnemonic = mnemonic[6:];
+		if (mnemonic.startswith(optPrefix))
+			mnemonic = mnemonic[#optPrefix:];
 		local instr = Instruction(mnemonic: mnemonic, operands: []);
 		local flushStart = i;
 		while (i < instrEnd) {
@@ -1181,10 +1184,10 @@ encode_suleb:
 		}
 	}
 
-	function assemble_derefb() -> arch.addrsize == 1 ? { DW_OP_deref } : assemble_deref_size(1);
-	function assemble_derefw() -> arch.addrsize == 2 ? { DW_OP_deref } : assemble_deref_size(2);
-	function assemble_derefl() -> arch.addrsize == 4 ? { DW_OP_deref } : assemble_deref_size(4);
-	function assemble_derefq() -> arch.addrsize == 8 ? { DW_OP_deref } : assemble_deref_size(8);
+	function assemble_derefb() -> assemble_deref_size(1);
+	function assemble_derefw() -> assemble_deref_size(2);
+	function assemble_derefl() -> assemble_deref_size(4);
+	function assemble_derefq() -> assemble_deref_size(8);
 	function assemble_deref_size(n) {
 		if (n is int && n == arch.addrsize) {
 			yield DW_OP_deref;
@@ -1201,10 +1204,10 @@ encode_suleb:
 		}
 	}
 
-	function assemble_xderefb() -> arch.addrsize == 1 ? { DW_OP_xderef } : assemble_xderef_size(1);
-	function assemble_xderefw() -> arch.addrsize == 2 ? { DW_OP_xderef } : assemble_xderef_size(2);
-	function assemble_xderefl() -> arch.addrsize == 4 ? { DW_OP_xderef } : assemble_xderef_size(4);
-	function assemble_xderefq() -> arch.addrsize == 8 ? { DW_OP_xderef } : assemble_xderef_size(8);
+	function assemble_xderefb() -> assemble_xderef_size(1);
+	function assemble_xderefw() -> assemble_xderef_size(2);
+	function assemble_xderefl() -> assemble_xderef_size(4);
+	function assemble_xderefq() -> assemble_xderef_size(8);
 	function assemble_xderef_size(n) {
 		if (n is int && n == arch.addrsize) {
 			yield DW_OP_xderef;

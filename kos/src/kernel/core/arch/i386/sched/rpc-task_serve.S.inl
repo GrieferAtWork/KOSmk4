@@ -19,7 +19,7 @@
  */
 #ifdef __INTELLISENSE__
 #include "rpc.S"
-//#define DEFINE_task_serve
+//#define    DEFINE_task_serve
 //#define DEFINE_task_serve_nx
 #define DEFINE_task_serve_with_sigmask
 #endif /* __INTELLISENSE__ */

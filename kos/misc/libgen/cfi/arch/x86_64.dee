@@ -21,6 +21,7 @@
 import Architecture from ..comp;
 
 global final ARCH = Architecture(
+	name: "x86_64",
 	registers: {
 		"rax"     : 0,
 		"rdx"     : 1,
@@ -137,6 +138,7 @@ global final ARCH = Architecture(
 		"kos/include/i386-kos/kos/kernel/paging.h",
 		"kos/include/i386-kos/kos/kernel/segment.h",
 		"kos/include/i386-kos/kos/kernel/tss64.h",
+		"kos/include/asm/os/sigset.h",
 	},
 	addrsize: 8,
 	bigEndian: false,

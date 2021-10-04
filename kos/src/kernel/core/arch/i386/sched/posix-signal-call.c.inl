@@ -97,13 +97,13 @@ DECL_BEGIN
 
 /* Update the given  `state' to raise  the specified `siginfo'  as
  * a user-space signal  within the calling  thread. The caller  is
- * responsible  to handle special signal handlers (`SIG_*')
+ * responsible  to  handle   special  signal  handlers   (`SIG_*')
  * before calling this function! This function should only be used
  * to  enqueue the execution of a signal handler with a user-space
  * entry point.
  *
- * Functionality like `SA_RESETHAND', or system call
- * restart  selection  must  be  implemented  by  the  caller.
+ * Functionality  like  `SA_RESETHAND', or  system call
+ * restart selection must be implemented by the caller.
  *
  * @param: state:   The CPU state describing the return to user-space.
  * @param: action:  The signal action to perform.

@@ -88,7 +88,7 @@ task_rpc_exec(struct task *__restrict thread, syscall_ulong_t flags,
 		THROWS(E_WOULDBLOCK, E_BADALLOC);
 
 /* Helper wrapper for executing the given RPC `func' after
- * unwind the current system call. This is identical to:
+ * unwind the current system  call. This is identical  to:
  * >> task_rpc_exec(THIS_TASK, RPC_CONTEXT_KERN | RPC_SYNCMODE_F_USER, func, cookie);
  * >> THROW(E_INTERRUPT_USER_RPC); */
 FUNDEF ATTR_NORETURN NONNULL((1)) void KCALL

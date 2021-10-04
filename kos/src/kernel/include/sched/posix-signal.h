@@ -400,7 +400,7 @@ struct icpustate;
 struct rpc_syscall_info;
 /* Update the given  `state' to raise  the specified `siginfo'  as
  * a user-space signal  within the calling  thread. The caller  is
- * responsible  to handle special signal handlers (`SIG_*')
+ * responsible  to  handle   special  signal  handlers   (`SIG_*')
  * before calling this function! This function should only be used
  * to  enqueue the execution of a signal handler with a user-space
  * entry point.

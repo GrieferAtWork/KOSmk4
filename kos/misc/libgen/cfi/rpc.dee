@@ -1,0 +1,1078 @@
+/* Copyright (c) 2019-2021 Griefer@Work                                       *
+ *                                                                            *
+ * This software is provided 'as-is', without any express or implied          *
+ * warranty. In no event will the authors be held liable for any damages      *
+ * arising from the use of this software.                                     *
+ *                                                                            *
+ * Permission is granted to anyone to use this software for any purpose,      *
+ * including commercial applications, and to alter it and redistribute it     *
+ * freely, subject to the following restrictions:                             *
+ *                                                                            *
+ * 1. The origin of this software must not be misrepresented; you must not    *
+ *    claim that you wrote the original software. If you use this software    *
+ *    in a product, an acknowledgement (see the following) in the product     *
+ *    documentation is required:                                              *
+ *    Portions Copyright (c) 2019-2021 Griefer@Work                           *
+ * 2. Altered source versions must be plainly marked as such, and must not be *
+ *    misrepresented as being the original software.                          *
+ * 3. This notice may not be removed or altered from any source distribution. *
+ */
+
+#define __SIZEOF_POINTER__ 8 /* Needed to get all of the opcodes */
+#include "../../../include/kos/asm/rpc.h" /* For opcode constants */
+#undef __SIZEOF_POINTER__
+
+/* ============= RPC assembly compiler =============
+ *
+ * KOS provides userspace the ability to write RPC programs that get
+ * executed  for the purpose  of performing register transformations
+ * and to call custom, injected functions.
+ *
+ * Such RPC programs are written using a custom bytecode that leans
+ * heavily against CFI bytecode (see "./comp.dee")
+ *
+ * Syntax:
+ *   - '#' Marks the rest of the line as a comment
+ *   - ';' and '\n' act as a separators between instructions
+ *   - Empty instructions are ignored
+ *   - Mnemonics are separated from operands by whitespace
+ *   - Operands are separated from each other by ','
+ *   - GAS-style forward/backward labels are recognized (1: 1b, 1f)
+ *   - Labels are declared as mnemonics followed by ':' (e.g. 'foo:')
+ *
+ * Integer operands:
+ *   - '$1234':      Integer constant
+ *   - '$CONSTANT':  Named constant (appears as #define in arch-specific headers)
+ *   - '\variable':  Assembler  macro  variable  (the  compiler  automatically
+ *                   generates optimized code for every supported value range)
+ *   All of these can be combined within  the same operand by having them  be
+ *   combined  with '+' or '-'. Each such set of operand parts may contain at
+ *   most 1 \variable element, which must not appear after a '-', though  any
+ *   number of $1234 or $CONSTANT addends are allowed. Additionally, $1234 or
+ *   $CONSTANT addends may also be prefixed by '~' which will result in the
+ *   bit-wise inverse to be used instead.  (Very useful when wishing to  mask
+ *   specific bits, e.g.: 'and ~$EFLAGS_DF' to clear the DF flag on x86)
+ *
+ * Special operands:
+ *   - '<symbol>':   Symbol operands are just the raw symbol name
+ *   - '%<regname>': Register-value operand
+ *   - '&<regname>': Register-address operands
+ *   - '@<value>':   Raw carry-though
+ *
+ * Recognized instructions:
+ *
+ * ```
+ *     ret                  RPC_OP_ret
+ *     push   top           alias for `dup'
+ *     push   $<value>      RPC_OP_const1s, RPC_OP_const1u,
+ *                          RPC_OP_const2s, RPC_OP_const2u,
+ *                          RPC_OP_const4s, RPC_OP_const4u,
+ *                          RPC_OP_const8s, RPC_OP_const8u,
+ *     push   @foo          RPC_OP_const1u foo
+ *     push   %reg          RPC_OP_pushreg*, RPC_OP_pushregx
+ *     push   *reason       RPC_OP_push_reason
+ *     push   *dorestart    RPC_OP_push_dorestart
+ *     push   *issyscall    RPC_OP_push_issyscall
+ *     push   *sc_info:$<x>   RPC_OP_push_sc_info, <x>
+ *     push   *param:$<x>     RPC_OP_push_param, <x>
+ *     push   *sigmask_word:$<x>   RPC_OP_push_sigmask_word, <x>
+ *     push   *signal       RPC_OP_push_signal
+ *
+ *     pop    %reg          RPC_OP_popreg*, RPC_OP_popregx
+ *     pop                  RPC_OP_drop
+ *
+ *     sp.push pop          RPC_OP_sppush_pop
+ *     sp.push $<value>     RPC_OP_sppush_const, <value>
+ *     sp.push %reg         RPC_OP_sppushreg*, RPC_OP_sppushregx
+ *     sp.push *sc_info     RPC_OP_sppush_sc_info
+ *     sp.push *sigmask:$<sigsetsize>   RPC_OP_sppush_sigmask, <sigsetsize>
+ *     sp.push *sigmask     Alias for `sp.push *sigmask:$__SIZEOF_SIGSET_T__'
+ *     sp.push <v>          Alias for `push <v>; sp.push pop'
+ *
+ *     deref                RPC_OP_deref
+ *     derefb               RPC_OP_deref_size, 1
+ *     derefw               RPC_OP_deref_size, 2
+ *     derefl               RPC_OP_deref_size, 4
+ *     derefq               RPC_OP_deref_size, 8
+ *     deref_size $<n>      RPC_OP_deref_size, <n>
+ *
+ *     write                RPC_OP_write
+ *     writeb               RPC_OP_write_size, 1
+ *     writew               RPC_OP_write_size, 2
+ *     writel               RPC_OP_write_size, 4
+ *     writeq               RPC_OP_write_size, 8
+ *     write_size $<n>      RPC_OP_write_size, <n>
+ *
+ *     pick   $<n>          RPC_OP_pick, <n>
+ *
+ *     bra    <symbol>      RPC_OP_bra, <symbol>
+ *     nbra   <symbol>      RPC_OP_nbra, <symbol>
+ *     skip   <symbol>      RPC_OP_skip, <symbol>
+ *
+ *     widenzb              RPC_OP_widenz, 1
+ *     widenzw              RPC_OP_widenz, 2
+ *     widenzl              RPC_OP_widenz, 4
+ *     widenz  $<n>         RPC_OP_widenz, <n>
+ *     widensb              RPC_OP_widens, 1
+ *     widensw              RPC_OP_widens, 2
+ *     widensl              RPC_OP_widens, 4
+ *     widens  $<n>         RPC_OP_widens, <n>
+ *
+ *     dup                  RPC_OP_dup
+ *     drop                 RPC_OP_drop
+ *     over                 RPC_OP_over
+ *     swap                 RPC_OP_swap
+ *     rot                  RPC_OP_rot
+ *
+ *     abs                  RPC_OP_abs
+ *     neg                  RPC_OP_neg
+ *     not                  RPC_OP_not
+ *     nop                  RPC_OP_nop
+ *
+ *     and                  RPC_OP_and
+ *     div                  RPC_OP_div
+ *     minus                RPC_OP_minus
+ *     mod                  RPC_OP_mod
+ *     mul                  RPC_OP_mul
+ *     or                   RPC_OP_or
+ *     plus                 RPC_OP_plus
+ *     shl                  RPC_OP_shl
+ *     shr                  RPC_OP_shr
+ *     shra                 RPC_OP_shra
+ *     xor                  RPC_OP_xor
+ *     eq                   RPC_OP_eq
+ *     ge                   RPC_OP_ge
+ *     gt                   RPC_OP_gt
+ *     le                   RPC_OP_le
+ *     lt                   RPC_OP_lt
+ *     uge                  RPC_OP_uge
+ *     ugt                  RPC_OP_ugt
+ *     ule                  RPC_OP_ule
+ *     ult                  RPC_OP_ult
+ *     sigblock             RPC_OP_sigblock
+ *     futex_wake           RPC_OP_futex_wake
+ *
+ *     and       <value>    alias for 'push <value>; and;'
+ *     div       <value>    alias for 'push <value>; div;'
+ *     minus     <value>    alias for 'push <value>; minus;'
+ *     mod       <value>    alias for 'push <value>; mod;'
+ *     mul       <value>    alias for 'push <value>; mul;'
+ *     or        <value>    alias for 'push <value>; or;'
+ *     plus      <value>    alias for 'push <value>; plus;'
+ *     shl       <value>    alias for 'push <value>; shl;'
+ *     shr       <value>    alias for 'push <value>; shr;'
+ *     shra      <value>    alias for 'push <value>; shra;'
+ *     xor       <value>    alias for 'push <value>; xor;'
+ *     eq        <value>    alias for 'push <value>; eq;'
+ *     ge        <value>    alias for 'push <value>; ge;'
+ *     gt        <value>    alias for 'push <value>; gt;'
+ *     le        <value>    alias for 'push <value>; le;'
+ *     lt        <value>    alias for 'push <value>; lt;'
+ *     ne        <value>    alias for 'push <value>; ne;'
+ *     uge       <value>    alias for 'push <value>; uge;'
+ *     ugt       <value>    alias for 'push <value>; ugt;'
+ *     ule       <value>    alias for 'push <value>; ule;'
+ *     ult       <value>    alias for 'push <value>; ult;'
+ *     sigblock  <value>    alias for 'push <value>; sigblock;'
+ *     futex_wake  <addr>, <count>  alias for 'push <addr>; push <count>; futex_wake;'
+ *
+ *     add    [...]         alias for 'plus'
+ *     sub    [...]         alias for 'minus'
+ *     jf     pop, <symbol> Alias for 'nbra <symbol>;'
+ *     jf     <v>, <symbol> Alias for 'push <v>; nbra <symbol>;'
+ *     jt     pop, <symbol> Alias for 'bra <symbol>;'
+ *     jt     <v>, <symbol> Alias for 'push <v>; bra <symbol>;'
+ *     jz     ...           Alias for 'jf ...'
+ *     jnz    ...           Alias for 'jt ...'
+ *     jmp    <symbol>      Alias for 'skip <symbol>;'
+ * ```
+ *
+ * The following instructions overloads  don't ~really~ exist, but  are
+ * here for convenience and only exist to make it easier to write code.
+ *
+ * ```
+ *     pushP   <x>           Alias for 'push <x>;'
+ *     popP    <x>           Alias for 'pop <x>;'
+ *     movP    <a>, <b>      Alias for 'mov <a>, <b>;'
+ *
+ *     push    <x>+<x>       Alias for 'push <x>; push <y>; plus;'
+ *     push    <x>-<x>       Alias for 'push <x>; push <y>; minus;'
+ *     push    [<x>]         Alias for 'push <x>; deref;'
+ *     pushb   [<x>]         Alias for 'push <x>; deref_size $1;'
+ *     pushw   [<x>]         Alias for 'push <x>; deref_size $2;'
+ *     pushl   [<x>]         Alias for 'push <x>; deref_size $4;'
+ *     pushq   [<x>]         Alias for 'push <x>; deref_size $8;'
+ *     pop     [<x>]         Alias for 'push <x>; write;'         [*]
+ *     popb    [<x>]         Alias for 'push <x>; write_size $1;' [*]
+ *     popw    [<x>]         Alias for 'push <x>; write_size $2;' [*]
+ *     popl    [<x>]         Alias for 'push <x>; write_size $4;' [*]
+ *     popq    [<x>]         Alias for 'push <x>; write_size $8;' [*]
+ *     mov     <a>, <b>      Alias for 'push <a>; pop <b>;'
+ *     movb    <a>, <b>      Alias for 'pushb <a>; popb <b>;'
+ *     movw    <a>, <b>      Alias for 'pushw <a>; popw <b>;'
+ *     movl    <a>, <b>      Alias for 'pushl <a>; popl <b>;'
+ *     movq    <a>, <b>      Alias for 'pushq <a>; popq <b>;'
+ *     movzbP  <a>, <b>      Alias for 'pushb <a>; [widenzb]; popP <b>;'     # widenzb only if <a> isn't memory
+ *     movzbw  <a>, <b>      Alias for 'pushb <a>; [widenzb]; popw <b>;'     # widenzb only if <a> isn't memory
+ *     movzbl  <a>, <b>      Alias for 'pushb <a>; [widenzb]; popl <b>;'     # widenzb only if <a> isn't memory
+ *     movzbq  <a>, <b>      Alias for 'pushb <a>; [widenzb]; popq <b>;'     # widenzb only if <a> isn't memory
+ *     movzwP  <a>, <b>      Alias for 'pushw <a>; [widenzw]; popP <b>;'     # widenzw only if <a> isn't memory
+ *     movzwl  <a>, <b>      Alias for 'pushw <a>; [widenzw]; popl <b>;'     # widenzw only if <a> isn't memory
+ *     movzwq  <a>, <b>      Alias for 'pushw <a>; [widenzw]; popq <b>;'     # widenzw only if <a> isn't memory
+ *     movzlP  <a>, <b>      Alias for 'pushl <a>; [widenzl]; popP <b>;'     # widenzl only if <a> isn't memory
+ *     movzlq  <a>, <b>      Alias for 'pushl <a>; [widenzl]; popq <b>;'     # widenzl only if <a> isn't memory
+ *     movsbP  <a>, <b>      Alias for 'pushb <a>; widensb; popP <b>;'
+ *     movsbw  <a>, <b>      Alias for 'pushb <a>; widensb; popw <b>;'
+ *     movsbl  <a>, <b>      Alias for 'pushb <a>; widensb; popl <b>;'
+ *     movsbq  <a>, <b>      Alias for 'pushb <a>; widensb; popq <b>;'
+ *     movswP  <a>, <b>      Alias for 'pushw <a>; widensw; popP <b>;'
+ *     movswl  <a>, <b>      Alias for 'pushw <a>; widensw; popl <b>;'
+ *     movswq  <a>, <b>      Alias for 'pushw <a>; widensw; popq <b>;'
+ *     movslP  <a>, <b>      Alias for 'pushl <a>; widensl; popP <b>;'
+ *     movslq  <a>, <b>      Alias for 'pushl <a>; widensl; popq <b>;'
+ *
+ * [*] If the operand `<x>' of a `pop [<x>]' expression makes use of `top'
+ *     or any other stack-relative addressing (first, second, third, fourth,
+ *     *nth:$<x>), the offset of that operand is increased by `1' such that
+ *     a "top" operand references what will become the top _after_ the pop
+ *     has executed!
+ *     This is needed so that `mov <x>, [<y>]' functions correct when <y>
+ *     contains references to `top'.
+ * ```
+ *
+ *
+ */
+
+import * from deemon;
+import * from errors;
+import enumerateIntegerMacrosFromFile from ..strendN;
+import fs;
+import
+	Architecture, Symbol, Instruction, PAREN_MATCH, removeSurroundingParenthesis,
+	parseInstructions, Relocation, InvalidOperands, encodeULeb128
+from .comp;
+
+/* Relocation IDs */
+#define R_CFI_REL16_A 0
+#define R_CFI_REL16_B 1
+
+
+@@Instructions that may  be written  as `<instr>  <operand>;`,
+@@which is compiled as an alias for `push <operand>; <instr>;`
+global final BINARY_AS_PUSH_INSTR_OPCODES: {int...} = {
+	RPC_OP_and, RPC_OP_div, RPC_OP_minus, RPC_OP_mod, RPC_OP_mul, RPC_OP_plus,
+	RPC_OP_or, RPC_OP_shl, RPC_OP_shr, RPC_OP_shra, RPC_OP_xor,
+	RPC_OP_eq, RPC_OP_ge, RPC_OP_gt, RPC_OP_le, RPC_OP_lt, RPC_OP_ne,
+	RPC_OP_uge, RPC_OP_ugt, RPC_OP_ule, RPC_OP_ult, RPC_OP_sigblock,
+};
+
+global final TOP_EXPRESSION_NAMES = { "top", "first" };
+
+@@Instructions with variants that don't take any arguments
+global final NOARG_INSTRUCTIONS: {string: int} = {
+	"ret"                  : RPC_OP_ret,
+	"deref"                : RPC_OP_deref,
+	"derefP"               : RPC_OP_deref, /* ALIAS! */
+	"write"                : RPC_OP_write,
+	"writeP"               : RPC_OP_write, /* ALIAS! */
+	"dup"                  : RPC_OP_dup,
+	"drop"                 : RPC_OP_drop,
+	"pop"                  : RPC_OP_drop, /* ALIAS! */
+	"over"                 : RPC_OP_over,
+	"swap"                 : RPC_OP_swap,
+	"rot"                  : RPC_OP_rot,
+	"abs"                  : RPC_OP_abs,
+	"and"                  : RPC_OP_and,
+	"div"                  : RPC_OP_div,
+	"minus"                : RPC_OP_minus,
+	"sub"                  : RPC_OP_minus, /* ALIAS! */
+	"mod"                  : RPC_OP_mod,
+	"mul"                  : RPC_OP_mul,
+	"neg"                  : RPC_OP_neg,
+	"not"                  : RPC_OP_not,
+	"or"                   : RPC_OP_or,
+	"plus"                 : RPC_OP_plus,
+	"add"                  : RPC_OP_plus,
+	"shl"                  : RPC_OP_shl,
+	"shr"                  : RPC_OP_shr,
+	"shra"                 : RPC_OP_shra,
+	"xor"                  : RPC_OP_xor,
+	"eq"                   : RPC_OP_eq,
+	"ge"                   : RPC_OP_ge,
+	"gt"                   : RPC_OP_gt,
+	"le"                   : RPC_OP_le,
+	"lt"                   : RPC_OP_lt,
+	"ne"                   : RPC_OP_ne,
+	"nop"                  : RPC_OP_nop,
+	"uge"                  : RPC_OP_uge,
+	"ugt"                  : RPC_OP_ugt,
+	"ule"                  : RPC_OP_ule,
+	"ult"                  : RPC_OP_ult,
+	"sigblock"             : RPC_OP_sigblock,
+	"futex_wake"           : RPC_OP_futex_wake,
+	"push_reason"          : RPC_OP_push_reason,
+	"push_dorestart"       : RPC_OP_push_dorestart,
+	"push_issyscall"       : RPC_OP_push_issyscall,
+	"sppush_sc_info"       : RPC_OP_sppush_sc_info,
+	"push_signal"          : RPC_OP_push_signal,
+	"sppush_pop"           : RPC_OP_sppush_pop,
+};
+
+function parseOperandFromString(arch: Architecture, s: string): {int | string...} {
+	/* Super hacky, but... eh; *shrugs* it does the job. */
+	return parseInstructions(arch, "foo " + s).first.operands.first;
+}
+
+class Assembler {
+	@@Symbols
+	public member symbols: {string: Symbol} = Dict();
+
+	@@Instructions
+	public member instructions: {Symbol | Instruction...};
+
+	@@The used architecture
+	public member arch: Architecture;
+
+	public member asmArgPrefix: string = "__ASM_ARG(";
+	public member asmArgSuffix: string = ")";
+
+	this(arch: string | Architecture, code: string) {
+		this.arch = arch is Architecture ? arch
+			: import(".arch." + arch).ARCH;
+		this.instructions = List(parseInstructions(this.arch, code, optPrefix: "RPC_OP_"));
+
+		/* Load named symbols */
+		for (local part: this.instructions) {
+			if (part is Symbol && !part.name.isnumeric())
+				this.symbols[part.name] = part;
+		}
+
+		/* Resolve named symbol operands */
+		for (local part: this.instructions) {
+			if (part is Instruction) {
+				for (local i: [:#part.operands]) {
+					local op = part.operands[i];
+					if (op is string) {
+						local sym = this.symbols.get(op);
+						if (sym !is none)
+							part.operands[i] = sym;
+					}
+				}
+			}
+		}
+	}
+
+#define testEncodeS1(arg) ((arg) >= -128 && (arg) <= 127)
+#define testEncodeS2(arg) ((arg) >= -32768 && (arg) <= 32767)
+#define testEncodeS4(arg) ((arg) >= -2147483648 && (arg) <= 2147483647)
+#define testEncodeS8(arg) ((arg) >= -9223372036854775808 && (arg) <= 9223372036854775807)
+#define testEncodeU1(arg) ((arg) >= 0 && (arg) <= 0xff)
+#define testEncodeU2(arg) ((arg) >= 0 && (arg) <= 0xffff)
+#define testEncodeU4(arg) ((arg) >= 0 && (arg) <= 0xffffffff)
+#define testEncodeU8(arg) ((arg) >= 0 && (arg) <= 0xffffffffffffffff)
+
+#define encodeX1(arg, signed_) ((arg).tobytes(1, byteorder: arch.byteorder, signed: signed_)[0])
+#define encodeX2(arg, signed_) ((arg).tobytes(2, byteorder: arch.byteorder, signed: signed_))
+#define encodeX4(arg, signed_) ((arg).tobytes(4, byteorder: arch.byteorder, signed: signed_))
+#define encodeX8(arg, signed_) ((arg).tobytes(4, byteorder: arch.byteorder, signed: signed_))
+#define encodeS1(arg) encodeX1(arg, true)
+#define encodeU1(arg) encodeX1(arg, false)
+#define encodeS2(arg) encodeX2(arg, true)
+#define encodeU2(arg) encodeX2(arg, false)
+#define encodeS4(arg) encodeX4(arg, true)
+#define encodeU4(arg) encodeX4(arg, false)
+#define encodeS8(arg) encodeX8(arg, true)
+#define encodeU8(arg) encodeX8(arg, false)
+
+
+/***********************************************************************************************/
+/* Instruction assemblers                                                                      */
+/***********************************************************************************************/
+	@@Returns @(hasTopOperand: bool, modInstructions: {string | int...})
+	function _asm_modtop(arg, spAddend = 0): (bool, {string | int...}) {
+		local baseExpression = none;
+		local skipBaseExpression = false;
+again:
+		local totalIntAddend = 0;
+		local instructions = [];
+		local firstPositiveExpression = none;
+		local needPostRelocations = false;
+		for (local part: arg.replace("-", "+-").lstrip("+").split("+")) {
+			part = parseOperandFromString(arch, part);
+			if (part is int) {
+				totalIntAddend += part;
+			} else if (baseExpression is none) {
+				baseExpression = part;
+			} else if (skipBaseExpression && part == baseExpression) {
+				skipBaseExpression = false;
+			} else if (part in TOP_EXPRESSION_NAMES) {
+				if (baseExpression in TOP_EXPRESSION_NAMES)
+					throw InvalidOperands();
+				if (baseExpression !is none) {
+					baseExpression = "top";
+					skipBaseExpression = true;
+					goto again;
+				}
+				baseExpression = "top";
+			} else {
+				local neg = part.startswith("-");
+				if (neg) {
+					part = parseOperandFromString(arch, part[1:]);
+					if (part is int) {
+						totalIntAddend -= part;
+						continue;
+					}
+				} else if (firstPositiveExpression is none) {
+					firstPositiveExpression = part;
+				}
+				instructions.append((part,));
+				needPostRelocations = true;
+				instructions.append(neg ? RPC_OP_minus : RPC_OP_plus);
+			}
+		}
+		if (totalIntAddend != 0) {
+			if (totalIntAddend < 0) {
+				instructions.extend(assemble_push(-totalIntAddend));
+				instructions.append(RPC_OP_minus);
+			} else {
+				instructions.extend(assemble_push(totalIntAddend));
+				instructions.append(RPC_OP_plus);
+			}
+		}
+		if (baseExpression is none)
+			throw InvalidOperands();
+		if (needPostRelocations) {
+			local postSpAddend = spAddend;
+			if (baseExpression !in TOP_EXPRESSION_NAMES)
+				++postSpAddend;
+			for (local i = 0; i < #instructions;) {
+				local part = instructions[i];
+				if (part is Tuple) {
+					part = assemble_push(part, none, postSpAddend);
+					instructions = instructions[:i] + part + instructions[i+1:];
+					i += #part;
+				} else {
+					++i;
+				}
+			}
+		}
+		if (baseExpression in TOP_EXPRESSION_NAMES)
+			return (true, instructions);
+		if (baseExpression.startswith("-")) {
+			if (firstPositiveExpression !is none) {
+				baseExpression = firstPositiveExpression;
+				skipBaseExpression = true;
+				goto again;
+			}
+			instructions.insert(0, RPC_OP_neg);
+			instructions.insertall(0, assemble_push(parseOperandFromString(arch, baseExpression[1:]), none, spAddend));
+		} else {
+			instructions.insertall(0, assemble_push(parseOperandFromString(arch, baseExpression), none, spAddend));
+		}
+		return (false, instructions);
+	}
+
+	function assemble_pushb(arg) -> assemble_push(arg, 1);
+	function assemble_pushw(arg) -> assemble_push(arg, 2);
+	function assemble_pushl(arg) -> assemble_push(arg, 4);
+	function assemble_pushq(arg) -> assemble_push(arg, 8);
+	function assemble_pushP(arg) -> assemble_push(arg);
+	function assemble_push(arg, derefSize = none, spAddend = 0) {
+		if (arg is string) {
+			/* push @xxx         -- RPC_OP_const1u xxx */
+			/* push top          -- RPC_OP_dup */
+			/* push %reg         -- Push register value    (RPC_OP_pushreg0) */
+			if (arg in TOP_EXPRESSION_NAMES) {
+				if (spAddend == 0) {
+					yield RPC_OP_dup;
+				} else {
+					yield RPC_OP_pick;
+					yield spAddend;
+				}
+			} else if (arg == "second") {
+				yield RPC_OP_pick;
+				yield spAddend + 1;
+			} else if (arg == "third") {
+				yield RPC_OP_pick;
+				yield spAddend + 2;
+			} else if (arg == "fourth") {
+				yield RPC_OP_pick;
+				yield spAddend + 3;
+			} else if (arg.startswith("*nth:")) {
+				arg = parseOperandFromString(arch, arg[5:]);
+				if (arg == 0 && spAddend == 0) {
+					yield RPC_OP_dup;
+				} else {
+					yield RPC_OP_pick;
+					yield encodeU1(spAddend + arg);
+				}
+			} else if (arg.startswith("@")) {
+				yield RPC_OP_const1u;
+				yield removeSurroundingParenthesis(arg[1:]);
+			} else if (arg == "%fs.base" && arch.name == "i386") {
+				yield RPC_OP_386_pushreg_fsbase;
+			} else if (arg == "%gs.base" && arch.name == "i386") {
+				yield RPC_OP_386_pushreg_gsbase;
+			} else if (arg.startswith("[") && arg.endswith("]")) {
+				/* Implicit memory deref */
+				yield assemble_push(parseOperandFromString(arch, arg[1:-1]), none, spAddend)...;
+				yield assemble_deref_size(derefSize !is none ? derefSize : arch.addrsize)...;
+			} else if ("+" in arg || "-" in arg) {
+				local hasTopOperand, modInstructions = _asm_modtop(arg, spAddend)...;
+				if (hasTopOperand)
+					yield RPC_OP_dup;
+				yield modInstructions...;
+			} else if (arg.startswith("%")) {
+				local registerId = arch.registers[arg[1:]];
+				if (registerId <= 31) {
+					yield RPC_OP_pushreg0 + registerId;
+				} else {
+					yield RPC_OP_pushregx;
+					yield encodeULeb128(registerId)...;
+				}
+			} else if (arg.startswith("*nth:")) {
+				arg = parseOperandFromString(arch, arg[5:]);
+				if (arg == 0) {
+					yield RPC_OP_dup;
+				} else {
+					yield RPC_OP_pick;
+					yield encodeU1(arg);
+				}
+			} else if (arg == "*reason") {
+				yield RPC_OP_push_reason;
+			} else if (arg == "*dorestart") {
+				yield RPC_OP_push_dorestart;
+			} else if (arg == "*issyscall") {
+				yield RPC_OP_push_issyscall;
+			} else if (arg == "*signal") {
+				yield RPC_OP_push_signal;
+			} else if (arg.startswith("*sc_info:")) {
+				arg = parseOperandFromString(arch, arg[9:]);
+				yield RPC_OP_push_sc_info;
+				if (arg is string && arg.startswith("@")) {
+					yield removeSurroundingParenthesis(arg[1:]);
+				} else if (arg is int && testEncodeU1(arg)) {
+					yield encodeU1(arg);
+				} else {
+					throw InvalidOperands();
+				}
+			} else if (arg.startswith("*param:")) {
+				arg = parseOperandFromString(arch, arg[7:]);
+				yield RPC_OP_push_param;
+				if (arg is string && arg.startswith("@")) {
+					yield removeSurroundingParenthesis(arg[1:]);
+				} else if (arg is int && testEncodeU1(arg)) {
+					yield encodeU1(arg);
+				} else {
+					throw InvalidOperands();
+				}
+			} else if (arg.startswith("*sigmask_word:")) {
+				arg = parseOperandFromString(arch, arg[14:]);
+				yield RPC_OP_push_sigmask_word;
+				if (arg is string && arg.startswith("@")) {
+					yield removeSurroundingParenthesis(arg[1:]);
+				} else if (arg is int && testEncodeU1(arg)) {
+					yield encodeU1(arg);
+				} else {
+					throw InvalidOperands();
+				}
+			} else {
+				throw InvalidOperands();
+			}
+		} else if (testEncodeS1(arg)) {
+			yield RPC_OP_const1s;
+			yield encodeS1(arg);
+		} else if (testEncodeU1(arg)) {
+			yield RPC_OP_const1u;
+			yield encodeU1(arg);
+		} else if (testEncodeS2(arg) && arch.addrsize >= 2) {
+			yield RPC_OP_const2s;
+			yield encodeS2(arg)...;
+		} else if (testEncodeU2(arg) && arch.addrsize >= 2) {
+			yield RPC_OP_const2u;
+			yield encodeU2(arg)...;
+		} else if (testEncodeS4(arg) && arch.addrsize >= 4) {
+			yield RPC_OP_const4s;
+			yield encodeS4(arg)...;
+		} else if (testEncodeU4(arg) && arch.addrsize >= 4) {
+			yield RPC_OP_const4u;
+			yield encodeU4(arg)...;
+		} else if (arch.support64 && testEncodeS8(arg) && arch.addrsize >= 8) {
+			yield RPC_OP_const8s;
+			yield encodeS8(arg)...;
+		} else if (arch.support64 && testEncodeU8(arg) && arch.addrsize >= 8) {
+			yield RPC_OP_const8u;
+			yield encodeU8(arg)...;
+		} else {
+			throw InvalidOperands();
+		}
+	}
+
+	function assemble_popb(arg) -> _asm_pop1(arg, 1);
+	function assemble_popw(arg) -> _asm_pop1(arg, 2);
+	function assemble_popl(arg) -> _asm_pop1(arg, 4);
+	function assemble_popq(arg) -> _asm_pop1(arg, 8);
+	function assemble_popP(arg) -> _asm_pop1(arg);
+	function _asm_pop1(arg, derefSize = none) {
+		if (arg !is string) {
+			throw InvalidOperands();
+		} else if (arg == "%fs.base" && arch.name == "i386") {
+			yield RPC_OP_386_popreg_fsbase;
+		} else if (arg == "%gs.base" && arch.name == "i386") {
+			yield RPC_OP_386_popreg_gsbase;
+		} else if (arg.startswith("[") && arg.endswith("]")) {
+			/* Implicit memory write
+			 *
+			 * If  `arg' make use of stack-relative offsets, the
+			 * user will expect them to be relative to the stack
+			 * state after the pop has been done (also  required
+			 * for  the  `mov' pseudo-instruction).  However, at
+			 * this point the stack has grown by 1 and we'd need
+			 * to account for that here! */
+			yield assemble_push(parseOperandFromString(arch, arg[1:-1]), none, 1)...;
+			yield assemble_write_size(derefSize !is none ? derefSize : arch.addrsize)...;
+		} else if (arg.startswith("%")) {
+			local registerId = arch.registers[arg[1:]];
+			if (registerId <= 31) {
+				yield RPC_OP_popreg0 + registerId;
+			} else {
+				yield RPC_OP_popregx;
+				yield encodeULeb128(registerId)...;
+			}
+		} else {
+			throw InvalidOperands();
+		}
+	}
+
+	function assemble_pop(args...) {
+		if (#args == 0) {
+			yield RPC_OP_drop;
+		} else if (#args == 1) {
+			yield _asm_pop1(args.first)...;
+		} else {
+			throw InvalidOperands();
+		}
+	}
+
+	function assemble_sp_pushl(arg) { if (arch.addrsize != 4) throw InvalidOperands(); return assemble_sp_push(arg); }
+	function assemble_sp_pushq(arg) { if (arch.addrsize != 8) throw InvalidOperands(); return assemble_sp_push(arg); }
+	function assemble_sp_pushP(arg) -> assemble_sp_push(arg);
+	function assemble_sp_push(arg) {
+		if (arg !is string) {
+			yield RPC_OP_sppush_const;
+			yield arg.tobytes(arch.addrsize, byteorder: arch.byteorder, signed: false)...;
+		} else if (arg.startswith("%")) {
+			local registerId = arch.registers.get(arg[1:]);
+			if (registerId is none)
+				goto fallback;
+			if (registerId <= 31) {
+				yield RPC_OP_sppushreg0 + registerId;
+			} else {
+				yield RPC_OP_sppushregx;
+				yield encodeULeb128(registerId)...;
+			}
+		} else if (arg == "pop") {
+			yield RPC_OP_sppush_pop;
+		} else if (arg == "*sc_info") {
+			yield RPC_OP_sppush_sc_info;
+		} else if (arg == "*sigmask") {
+			local sz = arch.getSysMacro("__SIZEOF_SIGSET_T__");
+			if (sz !is int)
+				throw InvalidOperands();
+			yield RPC_OP_sppush_sigmask;
+			yield encodeU2(sz)...;
+		} else if (arg.startswith("*sigmask:")) {
+			arg = parseOperandFromString(arch, arg[9:]);
+			yield RPC_OP_sppush_sigmask;
+			if (arg is int && testEncodeU2(arg)) {
+				yield encodeU2(arg)...;
+			} else {
+				throw InvalidOperands();
+			}
+		} else {
+fallback:
+			yield assemble_push(arg)...;
+			yield RPC_OP_sppush_pop;
+		}
+	}
+
+	function assemble_const1u(arg) {
+		if (arg is string && arg.startswith("@")) {
+			yield RPC_OP_const1u;
+			yield removeSurroundingParenthesis(arg[1:]);
+		} else {
+			if (!testEncodeU1(arg))
+				throw InvalidOperands();
+			yield RPC_OP_const1u;
+			yield encodeU1(arg);
+		}
+	}
+	function assemble_const1s(arg) {
+		if (arg is string && arg.startswith("@")) {
+			yield RPC_OP_const1s;
+			yield removeSurroundingParenthesis(arg[1:]);
+		} else {
+			if (!testEncodeS1(arg))
+				throw InvalidOperands();
+			yield RPC_OP_const1s;
+			yield encodeS1(arg);
+		}
+	}
+	function assemble_const2u(arg) { if (!testEncodeU2(arg)) throw InvalidOperands(); yield RPC_OP_const2u; yield encodeU2(arg)...; }
+	function assemble_const2s(arg) { if (!testEncodeS2(arg)) throw InvalidOperands(); yield RPC_OP_const2s; yield encodeS2(arg)...; }
+	function assemble_const4u(arg) { if (!testEncodeU4(arg)) throw InvalidOperands(); yield RPC_OP_const4u; yield encodeU4(arg)...; }
+	function assemble_const4s(arg) { if (!testEncodeS4(arg)) throw InvalidOperands(); yield RPC_OP_const4s; yield encodeS4(arg)...; }
+	function assemble_const8u(arg) { if (arch.addrsize < 8 || !testEncodeU8(arg)) throw InvalidOperands(); yield RPC_OP_const8u; yield encodeU8(arg)...; }
+	function assemble_const8s(arg) { if (arch.addrsize < 8 || !testEncodeS8(arg)) throw InvalidOperands(); yield RPC_OP_const8s; yield encodeS8(arg)...; }
+
+	function assemble_pick(arg) {
+		if (arg is int && arg == 0) {
+			yield RPC_OP_dup;
+		} else if (arg is string && arg.startswith("@")) {
+			yield RPC_OP_pick;
+			yield removeSurroundingParenthesis(arg[1:]);
+		} else if (testEncodeU1(arg)) {
+			yield RPC_OP_pick;
+			yield encodeU1(arg);
+		} else {
+			throw InvalidOperands();
+		}
+	}
+
+	function assemble_jnz(x, arg) -> assemble_jt(x, arg); /* Jump-if-true */
+	function assemble_jt(x, arg) {
+		if (x is string && x == "pop") {
+			yield _asm_jmp(RPC_OP_bra, arg)...;
+		} else {
+			yield assemble_push(x)...;
+			yield _asm_jmp(RPC_OP_bra, arg)...;
+		}
+	}
+
+	function assemble_jz(x, arg) -> assemble_jf(x, arg); /* Jump-if-false */
+	function assemble_jf(x, arg) {
+		if (x is string && x == "pop") {
+			yield _asm_jmp(RPC_OP_nbra, arg)...;
+		} else {
+			yield assemble_push(x)...;
+			yield _asm_jmp(RPC_OP_nbra, arg)...;
+		}
+	}
+
+	function assemble_bra(arg)  -> _asm_jmp(RPC_OP_bra, arg);
+	function assemble_nbra(arg) -> _asm_jmp(RPC_OP_nbra, arg);
+	function assemble_skip(arg) -> _asm_jmp(RPC_OP_skip, arg);
+	function assemble_jmp(arg)  -> _asm_jmp(RPC_OP_skip, arg);
+	function _asm_jmp(op, arg) {
+		if (arg !is Symbol)
+			throw InvalidOperands();
+		yield op;
+		if (arch.bigEndian) {
+			yield Relocation(R_CFI_REL16_B, arg);
+			yield Relocation(R_CFI_REL16_A, arg);
+		} else {
+			yield Relocation(R_CFI_REL16_A, arg);
+			yield Relocation(R_CFI_REL16_B, arg);
+		}
+	}
+
+	function assemble_derefb() -> assemble_deref_size(1);
+	function assemble_derefw() -> assemble_deref_size(2);
+	function assemble_derefl() -> assemble_deref_size(4);
+	function assemble_derefq() -> assemble_deref_size(8);
+	function assemble_deref_size(n) {
+		if (n is string && n.startswith("@")) {
+			yield RPC_OP_deref_size;
+			yield removeSurroundingParenthesis(n[1:]);
+		} else if (n == arch.addrsize) {
+			yield RPC_OP_deref;
+		} else if (n > arch.addrsize) {
+			throw InvalidOperands();
+		} else {
+			yield RPC_OP_deref_size;
+			if (testEncodeU1(n)) {
+				yield encodeU1(n);
+			} else {
+				throw InvalidOperands();
+			}
+		}
+	}
+
+	function assemble_writeb() -> assemble_write_size(1);
+	function assemble_writew() -> assemble_write_size(2);
+	function assemble_writel() -> assemble_write_size(4);
+	function assemble_writeq() -> assemble_write_size(8);
+	function assemble_write_size(n) {
+		if (n is string && n.startswith("@")) {
+			yield RPC_OP_write_size;
+			yield removeSurroundingParenthesis(n[1:]);
+		} else if (n == arch.addrsize) {
+			yield RPC_OP_write;
+		} else if (n > arch.addrsize) {
+			throw InvalidOperands();
+		} else {
+			yield RPC_OP_write_size;
+			if (testEncodeU1(n)) {
+				yield encodeU1(n);
+			} else {
+				throw InvalidOperands();
+			}
+		}
+	}
+
+	function assemble_widenzb() -> assemble_widenz(1);
+	function assemble_widenzw() -> assemble_widenz(2);
+	function assemble_widenzl() -> assemble_widenz(4);
+	function assemble_widenz(n) {
+		if (n is string && n.startswith("@")) {
+			yield RPC_OP_widenz;
+			yield removeSurroundingParenthesis(n[1:]);
+		} else if (n == arch.addrsize) {
+			/* no-op */
+		} else if (n <= arch.addrsize / 2) {
+			yield RPC_OP_widenz;
+			if (testEncodeU1(n)) {
+				yield encodeU1(n);
+			} else {
+				throw InvalidOperands();
+			}
+		} else {
+			throw InvalidOperands();
+		}
+	}
+
+	function assemble_widensb() -> assemble_widens(1);
+	function assemble_widensw() -> assemble_widens(2);
+	function assemble_widensl() -> assemble_widens(4);
+	function assemble_widens(n) {
+		if (n is string && n.startswith("@")) {
+			yield RPC_OP_widens;
+			yield removeSurroundingParenthesis(n[1:]);
+		} else if (n == arch.addrsize) {
+			/* no-op */
+		} else if (n <= arch.addrsize / 2) {
+			yield RPC_OP_widens;
+			if (testEncodeU1(n)) {
+				yield encodeU1(n);
+			} else {
+				throw InvalidOperands();
+			}
+		} else {
+			throw InvalidOperands();
+		}
+	}
+
+	function assemble_futex_wake(addr, count) {
+		yield assemble_push(addr)...;
+		yield assemble_push(count)...;
+		yield RPC_OP_futex_wake;
+	}
+
+	function assemble_push_sc_info(arg) {
+		if (arg is string && arg.startswith("@")) {
+			yield RPC_OP_push_sc_info;
+			yield removeSurroundingParenthesis(arg[1:]);
+		} else {
+			if (!testEncodeU1(arg))
+				throw InvalidOperands();
+			yield RPC_OP_push_sc_info;
+			yield encodeU1(arg);
+		}
+	}
+
+	function assemble_push_param(arg) {
+		if (arg is string && arg.startswith("@")) {
+			yield RPC_OP_push_param;
+			yield removeSurroundingParenthesis(arg[1:]);
+		} else {
+			if (!testEncodeU1(arg))
+				throw InvalidOperands();
+			yield RPC_OP_push_param;
+			yield encodeU1(arg);
+		}
+	}
+
+	function assemble_push_sigmask_word(arg) {
+		if (arg is string && arg.startswith("@")) {
+			yield RPC_OP_push_sigmask_word;
+			yield removeSurroundingParenthesis(arg[1:]);
+		} else {
+			if (!testEncodeU1(arg))
+				throw InvalidOperands();
+			yield RPC_OP_push_sigmask_word;
+			yield encodeU1(arg);
+		}
+	}
+
+	function assemble_sppush_sigmask(arg) {
+		if (arg !is string && testEncodeU1(arg)) {
+			yield RPC_OP_sppush_sigmask;
+			yield encodeU2(arg);
+		} else {
+			throw InvalidOperands();
+		}
+	}
+
+	function assemble_sppush_const(arg) {
+		if (arg !is string) {
+			yield RPC_OP_sppush_const;
+			yield arg.tobytes(arch.addrsize, byteorder: arch.byteorder, signed: false)...;
+		} else {
+			throw InvalidOperands();
+		}
+	}
+
+	function assemble__escape(bytes...) {
+		for (local b: bytes) {
+			if (b.startswith("\"") && b.endswith("\"")) {
+				try {
+					b = b[1:-1].decode("c-escape");
+				} catch (...) {
+					throw InvalidOperands();
+				}
+				yield b.encode("utf-8").bytes()...;
+			} else if (testEncodeU1(b)) {
+				yield encodeU1(b);
+			} else {
+				throw InvalidOperands();
+			}
+		}
+	}
+
+	/* A couple of neat-looking instruction aliases */
+	function _asm_movX(a, b, func, derefSize = none, writeSize = none) {
+		if (b in TOP_EXPRESSION_NAMES) {
+			if (a.startswith("[") && a.endswith("]")) {
+				local hasTopOperand, modInstructions = _asm_modtop(a[1:-1].strip())...;
+				if (!hasTopOperand)
+					yield RPC_OP_drop;
+				yield modInstructions...;
+				yield assemble_deref_size(derefSize !is none ? derefSize : arch.addrsize)...;
+				if (func && func.startswith("assemble_widens"))
+					yield this.operator . (func)()...;
+			} else {
+				if ("+" in a || "-" in a) {
+					local hasTopOperand, modInstructions = _asm_modtop(a)...;
+					if (!hasTopOperand)
+						yield RPC_OP_drop;
+					yield modInstructions...;
+				} else if (a in TOP_EXPRESSION_NAMES) {
+				} else {
+					yield RPC_OP_drop;
+					yield assemble_push(a)...;
+				}
+				if (func)
+					yield this.operator . (func)()...;
+			}
+		} else {
+			yield assemble_push(a, derefSize)...;
+			if (func && (func.startswith("assemble_widens") || "[" !in a))
+				yield this.operator . (func)()...;
+			if (b in TOP_EXPRESSION_NAMES) {
+				yield RPC_OP_swap;
+				yield RPC_OP_drop;
+			} else {
+				yield _asm_pop1(b, writeSize)...;
+			}
+		}
+	}
+	function assemble_mov(a, b)    -> _asm_movX(a, b, "");
+	function assemble_movP(a, b)   -> _asm_movX(a, b, "");
+	function assemble_movb(a, b)   -> _asm_movX(a, b, "", 1, 1);
+	function assemble_movw(a, b)   -> _asm_movX(a, b, "", 2, 2);
+	function assemble_movl(a, b)   -> _asm_movX(a, b, "", 4, 4);
+	function assemble_movq(a, b)   -> _asm_movX(a, b, "", 8, 8);
+	function assemble_movzbP(a, b) -> _asm_movX(a, b, "assemble_widenzb", 1);
+	function assemble_movzbw(a, b) -> _asm_movX(a, b, "assemble_widenzb", 1, 2);
+	function assemble_movzbl(a, b) -> _asm_movX(a, b, "assemble_widenzb", 1, 4);
+	function assemble_movzbq(a, b) -> _asm_movX(a, b, "assemble_widenzb", 1, 8);
+	function assemble_movzwP(a, b) -> _asm_movX(a, b, "assemble_widenzw", 2);
+	function assemble_movzwl(a, b) -> _asm_movX(a, b, "assemble_widenzw", 2, 4);
+	function assemble_movzwq(a, b) -> _asm_movX(a, b, "assemble_widenzw", 2, 8);
+	function assemble_movzlP(a, b) -> _asm_movX(a, b, "assemble_widenzl", 4);
+	function assemble_movzlq(a, b) -> _asm_movX(a, b, "assemble_widenzl", 4, 8);
+	function assemble_movsbP(a, b) -> _asm_movX(a, b, "assemble_widensb", 1);
+	function assemble_movsbw(a, b) -> _asm_movX(a, b, "assemble_widensb", 1, 2);
+	function assemble_movsbl(a, b) -> _asm_movX(a, b, "assemble_widensb", 1, 4);
+	function assemble_movsbq(a, b) -> _asm_movX(a, b, "assemble_widensb", 1, 8);
+	function assemble_movswP(a, b) -> _asm_movX(a, b, "assemble_widensw", 2);
+	function assemble_movswl(a, b) -> _asm_movX(a, b, "assemble_widensw", 2, 4);
+	function assemble_movswq(a, b) -> _asm_movX(a, b, "assemble_widensw", 2, 8);
+	function assemble_movslP(a, b) -> _asm_movX(a, b, "assemble_widensl", 4);
+	function assemble_movslq(a, b) -> _asm_movX(a, b, "assemble_widensl", 4, 8);
+
+/***********************************************************************************************/
+
+	function assembleInstruction(i: Instruction): {string | int | Relocation | Symbol...} {
+		local mnemonic = i.mnemonic;
+		local opcode = NOARG_INSTRUCTIONS.get(mnemonic);
+		if (opcode !is none) {
+			if (!i.operands)
+				return { opcode };
+			if (opcode in BINARY_AS_PUSH_INSTR_OPCODES) {
+				if (#i.operands == 1) {
+					/* Compile as `push <i.operands.first>; <opcode>;' */
+					return { assemble_push(i.operands.first)..., opcode };
+				} else if (#i.operands == 2) {
+					/* Compile as `push <i.operands.last>; push <i.operands.first>; <opcode>; pop <i.operands.last>;' */
+					return {
+						assemble_push(i.operands.last)...,
+						assemble_push(i.operands.first)...,
+						opcode,
+						assemble_pop(i.operands.last)...,
+					};
+				} else {
+				}
+			}
+		}
+		local attrName = "assemble_" + mnemonic.replace(".", "_");
+		try {
+			return this.operator . (attrName)(i.operands...);
+		} catch (AttributeError) {
+			if (opcode is none)
+				throw;
+		} catch (InvalidOperands) {
+		}
+		throw Error("Invalid operands for {!r}: {}".format({
+			mnemonic,
+			", ".join(for (local o: i.operands) repr o)
+		}));
+	}
+
+	function assembleWithRelocations(): {string | int | Relocation | Symbol...} {
+		for (local i: this.instructions) {
+			if (i is Instruction)
+				yield this.assembleInstruction(i)...;
+			else {
+				yield i;
+			}
+		}
+	}
+
+	@@Assemble all code variables, including requirements
+	function assemble(): {string | int...} {
+		local result = [];
+		for (local part: assembleWithRelocations()) {
+			if (part is Symbol) {
+				part.addr = #result;
+				continue;
+			}
+			if (part is Relocation)
+				part.addr = #result;
+			result.append(part);
+		}
+		/* Resolve relocations */
+		for (local i: [:#result]) {
+			local part = result[i];
+			if (part is Relocation)
+				result[i] = part.resolve();
+		}
+		return result;
+	}
+}
+
+function assemble(arch: string, code: string): {int | string...} {
+	return Assembler(arch, code).assemble();
+}
+
+Error.AppExit.atexit([]{ Error.AppExit.exit(0); });

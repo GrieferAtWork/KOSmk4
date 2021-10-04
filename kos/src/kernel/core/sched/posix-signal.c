@@ -1379,8 +1379,8 @@ default_action:
 		goto dont_handle;
 
 	case __SIG_STOP:
-		/* XXX: Should we  mask additional  signals by  looking
-		 *      at `SA_NODEFER' and `action.sa_mask'? */
+		/* XXX: Should we mask additional signals by looking
+		 *      at   `SA_NODEFER'   and    `action.sa_mask'? */
 		xdecref_unlikely(action.sa_mask);
 #if 0 /* `SA_RESETHAND' only affects user-space signal handler functions */
 		if ((action.sa_flags & SA_RESETHAND) &&
@@ -2029,8 +2029,8 @@ INTERN void KCALL onexec_posix_signals_reset_action(void) {
 			goto done_handptr;
 		}
 		/* We have to create a new, custom set of signal handlers... */
-		/* NOTE: Use GFP_CALLOC because `SIG_DFL = 0', and we only
-		 *       need to inherit handlers  that were marked as  `SIG_IGN' */
+		/* NOTE: Use GFP_CALLOC  because  `SIG_DFL = 0',  and  we  only
+		 *       need to inherit handlers that were marked as `SIG_IGN' */
 		newhand = (REF struct sighand *)kmalloc_nx(sizeof(struct sighand),
 		                                           GFP_CALLOC | GFP_ATOMIC);
 		if (!newhand) {

@@ -417,7 +417,7 @@ INTERN_FUNCTION(__asm32_bad_sysenter_extension)
 1:
 #ifdef CONFIG_USE_NEW_RPC
 	/* We want to handle the error via `userexcept_handler', thereby kind-of
-	 * emulating what is done by `x86_syscall_personality_asm32_sysenter()' */
+	 * emulating what is done by  `x86_syscall_personality_asm32_sysenter()' */
 	pushal_cfi_r  /* Construct a full `struct icpustate' */
 
 	/* Make sure that kernel segments have been loaded */

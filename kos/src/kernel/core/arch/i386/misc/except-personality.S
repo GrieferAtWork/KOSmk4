@@ -99,7 +99,7 @@ END(syscall_emulate_r_personality)
 .section .text
 
 /* The following registers are passed (unmodified) to LSDA: %Pbx, %Pbp
- * LSDA is passed via register: [i386:'%edi', x86_64:'%r12'] */
+ * LSDA   is   passed   via   register:   [i386:'%edi', x86_64:'%r12'] */
 	.cfi_startproc
 	.cfi_signal_frame
 	.cfi_def_cfa %R_fcall0P, OFFSET_ICPUSTATE_IRREGS

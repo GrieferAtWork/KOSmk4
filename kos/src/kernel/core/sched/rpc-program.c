@@ -1307,8 +1307,8 @@ follow_jmp:
 		uintptr_t addr, val;
 		if unlikely(!CANPOP(2))
 			goto err_stack_underflow;
-		val  = POP();
 		addr = POP();
+		val  = POP();
 		rpc_vm_wrmem(self, addr, &val, siz);
 	}	break;
 
@@ -1339,8 +1339,8 @@ follow_jmp:
 			      E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_BAD_WORD_SIZE,
 			      siz);
 		}
-		val  = POP();
 		addr = POP();
+		val  = POP();
 		rpc_vm_wrmem(self, addr, &val, siz);
 	}	break;
 

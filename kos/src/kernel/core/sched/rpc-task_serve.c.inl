@@ -19,7 +19,7 @@
  */
 #ifdef __INTELLISENSE__
 #include "rpc.c"
-//#define DEFINE_task_serve_with_icpustate
+//#define    DEFINE_task_serve_with_icpustate
 //#define DEFINE_task_serve_with_icpustate_nx
 #define DEFINE_task_serve_with_icpustate_and_sigmask
 #endif /* __INTELLISENSE__ */
@@ -81,7 +81,7 @@ task_serve_with_icpustate_and_sigmask(struct icpustate *__restrict state,
 	ATOMIC_AND(PERTASK(this_task.t_flags), ~TASK_FRPC);
 
 	/* Load RPC functions. This must happen _AFTER_ we clear
-	 * the pending-RPC flag to prevent a race condition. */
+	 * the  pending-RPC  flag to  prevent a  race condition. */
 	pending.slh_first = SLIST_ATOMIC_CLEAR(&PERTASK(this_rpcs));
 	SLIST_INIT(&runnow);
 
@@ -216,4 +216,3 @@ DECL_END
 #undef DEFINE_task_serve_with_icpustate_and_sigmask
 #undef DEFINE_task_serve_with_icpustate_nx
 #undef DEFINE_task_serve_with_icpustate
-
