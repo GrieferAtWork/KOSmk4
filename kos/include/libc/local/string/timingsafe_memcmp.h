@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x784f91d9 */
+/* HASH CRC-32:0x461b9998 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,6 +22,7 @@
 #define __local_timingsafe_memcmp_defined
 #include <__crt.h>
 #include <hybrid/typecore.h>
+#include <asm/signed-shift.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(timingsafe_memcmp) __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(timingsafe_memcmp))(void const *__s1, void const *__s2, __SIZE_TYPE__ __n_bytes) {
@@ -42,14 +43,22 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(timingsafe_memcmp))(void const *__s1,
 		 *   -1  <=> a > b
 		 *
 		 * >> a_le_b = a <= b ? 0 : -1; */
+#ifdef __ARCH_SIGNED_SHIFT_IS_SDIV
 		__a_le_b = (int)((__b - __a) >> (__CHAR_BIT__ - 1));
+#else /* __ARCH_SIGNED_SHIFT_IS_SDIV */
+		__a_le_b = (int)((__b - __a) / (1 << (__CHAR_BIT__ - 1)));
+#endif /* !__ARCH_SIGNED_SHIFT_IS_SDIV */
 
 		/* a_gr_b:
 		 *    0  <=> a >= b
 		 *   -1  <=> a < b
 		 *
 		 * >> a_gr_b = a >= b ? 0 : -1; */
+#ifdef __ARCH_SIGNED_SHIFT_IS_SDIV
 		__a_gr_b = (int)((__a - __b) >> (__CHAR_BIT__ - 1));
+#else /* __ARCH_SIGNED_SHIFT_IS_SDIV */
+		__a_gr_b = (int)((__a - __b) / (1 << (__CHAR_BIT__ - 1)));
+#endif /* !__ARCH_SIGNED_SHIFT_IS_SDIV */
 
 		/* a <  b  <=>  [a_le_b= 0,a_gr_b=-1]   -> diff=-1
 		 * a == b  <=>  [a_le_b= 0,a_gr_b= 0]   -> diff= 0

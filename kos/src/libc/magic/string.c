@@ -7786,6 +7786,7 @@ int timingsafe_bcmp([[nonnull]] void const *s1,
 @@@return: >  0: Block `s1' should be considered greater than `s2'
 [[section(".text.crt{|.dos}.bsd"), wunused/*, pure*/]]
 [[impl_include("<hybrid/typecore.h>"), export_as("timingsafe_bcmp")]]
+[[impl_include("<asm/signed-shift.h>")]]
 int timingsafe_memcmp([[nonnull]] void const *s1,
                       [[nonnull]] void const *s2, size_t n_bytes) {
 	int result = 0, finished = 0;
@@ -7805,14 +7806,22 @@ int timingsafe_memcmp([[nonnull]] void const *s1,
 		 *   -1  <=> a > b
 		 *
 		 * >> a_le_b = a <= b ? 0 : -1; */
+@@pp_ifdef __ARCH_SIGNED_SHIFT_IS_SDIV@@
 		a_le_b = (int)((b - a) >> (__CHAR_BIT__ - 1));
+@@pp_else@@
+		a_le_b = (int)((b - a) / (1 << (__CHAR_BIT__ - 1)));
+@@pp_endif@@
 
 		/* a_gr_b:
 		 *    0  <=> a >= b
 		 *   -1  <=> a < b
 		 *
 		 * >> a_gr_b = a >= b ? 0 : -1; */
+@@pp_ifdef __ARCH_SIGNED_SHIFT_IS_SDIV@@
 		a_gr_b = (int)((a - b) >> (__CHAR_BIT__ - 1));
+@@pp_else@@
+		a_gr_b = (int)((a - b) / (1 << (__CHAR_BIT__ - 1)));
+@@pp_endif@@
 
 		/* a <  b  <=>  [a_le_b= 0,a_gr_b=-1]   -> diff=-1
 		 * a == b  <=>  [a_le_b= 0,a_gr_b= 0]   -> diff= 0

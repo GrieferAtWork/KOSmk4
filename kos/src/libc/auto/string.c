@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe3e9e41d */
+/* HASH CRC-32:0xe39d952f */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -4524,6 +4524,7 @@ NOTHROW_NCX(LIBCCALL libc_strmode)(mode_t mode,
 	/* NUL-terminate */
 	*p = '\0';
 }
+#include <asm/signed-shift.h>
 /* >> timingsafe_memcmp(3)
  * Compare `s1...+=n_bytes' with `s2...+=n_bytes' in constant, armored `O(n_bytes)'-time
  * @return: <  0: Block `s1' should be considered less than `s2'
@@ -4550,14 +4551,22 @@ NOTHROW_NCX(LIBCCALL libc_timingsafe_memcmp)(void const *s1,
 		 *   -1  <=> a > b
 		 *
 		 * >> a_le_b = a <= b ? 0 : -1; */
+#ifdef __ARCH_SIGNED_SHIFT_IS_SDIV
 		a_le_b = (int)((b - a) >> (__CHAR_BIT__ - 1));
+#else /* __ARCH_SIGNED_SHIFT_IS_SDIV */
+		a_le_b = (int)((b - a) / (1 << (__CHAR_BIT__ - 1)));
+#endif /* !__ARCH_SIGNED_SHIFT_IS_SDIV */
 
 		/* a_gr_b:
 		 *    0  <=> a >= b
 		 *   -1  <=> a < b
 		 *
 		 * >> a_gr_b = a >= b ? 0 : -1; */
+#ifdef __ARCH_SIGNED_SHIFT_IS_SDIV
 		a_gr_b = (int)((a - b) >> (__CHAR_BIT__ - 1));
+#else /* __ARCH_SIGNED_SHIFT_IS_SDIV */
+		a_gr_b = (int)((a - b) / (1 << (__CHAR_BIT__ - 1)));
+#endif /* !__ARCH_SIGNED_SHIFT_IS_SDIV */
 
 		/* a <  b  <=>  [a_le_b= 0,a_gr_b=-1]   -> diff=-1
 		 * a == b  <=>  [a_le_b= 0,a_gr_b= 0]   -> diff= 0
