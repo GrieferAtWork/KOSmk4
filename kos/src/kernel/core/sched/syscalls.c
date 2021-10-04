@@ -341,7 +341,7 @@ DEFINE_SYSCALL2(errno_t, nanosleep,
 				break; /* Timeout */
 		}
 	} EXCEPT {
-		if (rem != NULL && was_thrown(E_INTERRUPT)) {
+		if (rem != NULL && was_thrown(E_INTERRUPT_USER_RPC)) {
 			/* Write back the remaining time to user-space.
 			 * NOTE: If `rem'  is  a  faulty pointer,  it  is  undefined  what
 			 *       will  happen  to  that E_SEGFAULT  exception,  however it
@@ -352,6 +352,7 @@ DEFINE_SYSCALL2(errno_t, nanosleep,
 			if (now > timeout)
 				now = timeout;
 			tsrem = relktime_to_reltimespec(timeout - now);
+			NESTED_EXCEPTION;
 			COMPILER_WRITE_BARRIER();
 			rem->tv_sec  = (typeof(rem->tv_sec))tsrem.tv_sec;
 			rem->tv_nsec = (typeof(rem->tv_nsec))tsrem.tv_nsec;
@@ -383,7 +384,7 @@ DEFINE_SYSCALL2(errno_t, nanosleep64,
 				break; /* Timeout */
 		}
 	} EXCEPT {
-		if (rem != NULL && was_thrown(E_INTERRUPT)) {
+		if (rem != NULL && was_thrown(E_INTERRUPT_USER_RPC)) {
 			/* Write back the remaining time to user-space.
 			 * NOTE: If `rem'  is  a  faulty pointer,  it  is  undefined  what
 			 *       will  happen  to  that E_SEGFAULT  exception,  however it
@@ -394,6 +395,7 @@ DEFINE_SYSCALL2(errno_t, nanosleep64,
 			if (now > timeout)
 				now = timeout;
 			tsrem = relktime_to_reltimespec(timeout - now);
+			NESTED_EXCEPTION;
 			COMPILER_WRITE_BARRIER();
 			rem->tv_sec  = (typeof(rem->tv_sec))tsrem.tv_sec;
 			rem->tv_nsec = (typeof(rem->tv_nsec))tsrem.tv_nsec;
@@ -425,7 +427,7 @@ DEFINE_COMPAT_SYSCALL2(errno_t, nanosleep,
 				break; /* Timeout */
 		}
 	} EXCEPT {
-		if (rem != NULL && was_thrown(E_INTERRUPT)) {
+		if (rem != NULL && was_thrown(E_INTERRUPT_USER_RPC)) {
 			/* Write back the remaining time to user-space.
 			 * NOTE: If `rem'  is  a  faulty pointer,  it  is  undefined  what
 			 *       will  happen  to  that E_SEGFAULT  exception,  however it
@@ -436,6 +438,7 @@ DEFINE_COMPAT_SYSCALL2(errno_t, nanosleep,
 			if (now > timeout)
 				now = timeout;
 			tsrem = relktime_to_reltimespec(timeout - now);
+			NESTED_EXCEPTION;
 			COMPILER_WRITE_BARRIER();
 			rem->tv_sec  = (typeof(rem->tv_sec))tsrem.tv_sec;
 			rem->tv_nsec = (typeof(rem->tv_nsec))tsrem.tv_nsec;
@@ -467,7 +470,7 @@ DEFINE_COMPAT_SYSCALL2(errno_t, nanosleep64,
 				break; /* Timeout */
 		}
 	} EXCEPT {
-		if (rem != NULL && was_thrown(E_INTERRUPT)) {
+		if (rem != NULL && was_thrown(E_INTERRUPT_USER_RPC)) {
 			/* Write back the remaining time to user-space.
 			 * NOTE: If `rem'  is  a  faulty pointer,  it  is  undefined  what
 			 *       will  happen  to  that E_SEGFAULT  exception,  however it
@@ -478,6 +481,7 @@ DEFINE_COMPAT_SYSCALL2(errno_t, nanosleep64,
 			if (now > timeout)
 				now = timeout;
 			tsrem = relktime_to_reltimespec(timeout - now);
+			NESTED_EXCEPTION;
 			COMPILER_WRITE_BARRIER();
 			rem->tv_sec  = (typeof(rem->tv_sec))tsrem.tv_sec;
 			rem->tv_nsec = (typeof(rem->tv_nsec))tsrem.tv_nsec;
