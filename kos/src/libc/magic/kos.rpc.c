@@ -123,6 +123,8 @@ typedef __ATTR_NONNULL((1)) void
 @@multi-arch  platforms (such as  x86), the register numbers,  as well as the
 @@address size used by `program' depend on the execution mode of `target_tid'
 @@
+@@NOTE: Only a cancellation point when `RPC_JOIN_WAITFOR' is used!
+@@
 @@@param: target_tid:      The TID of the targeted thread
 @@@param: mode:            One of  `RPC_SYNCMODE_*', optionally or'd  with
 @@                         one of `RPC_SYSRESTART_*', optionally or'd with
@@ -149,10 +151,11 @@ typedef __ATTR_NONNULL((1)) void
 @@                            still many reasons  outside of your  control
 @@                            for why it  may terminate immediately  after
 @@                            the RPC program finished.
+[[cp]]
 int rpc_schedule($pid_t target_tid, unsigned int mode,
                  [[nonnull]] void const *program,
                  [[inp_opt(max_param_count)]] void const *const *params,
-                 size_t max_param_count);
+                 $size_t max_param_count);
 
 
 @@>> rpc_serve(2)
@@ -189,6 +192,7 @@ int rpc_schedule($pid_t target_tid, unsigned int mode,
 @@                            still many  reasons outside  of your  control
 @@                            for why  it may  terminate immediately  after
 @@                            the RPC program finished.
+[[cp]]
 int rpc_exec($pid_t target_tid, unsigned int mode,
              [[nonnull]] prpc_exec_callback_t func, void *cookie);
 
@@ -203,6 +207,8 @@ int rpc_exec($pid_t target_tid, unsigned int mode,
 @@system calls performed by  those threads. This function  is a no-op when  the
 @@given `target_tid == gettid()'.
 @@
+@@NOTE: Only a cancellation point when `RPC_JOIN_WAITFOR' is used!
+@@
 @@@param: target_tid: The TID of the targeted thread
 @@@param: mode:       One of  `RPC_SYNCMODE_*', optionally or'd  with
 @@                    one of `RPC_SYSRESTART_*', optionally or'd with
@@ -216,6 +222,7 @@ int rpc_exec($pid_t target_tid, unsigned int mode,
 @@                           still many  reasons outside  of your  control
 @@                           for why  it may  terminate immediately  after
 @@                           the RPC program finished.
+[[cp]]
 int rpc_interrupt($pid_t target_tid, unsigned int mode);
 
 
@@ -226,17 +233,17 @@ int rpc_interrupt($pid_t target_tid, unsigned int mode);
 /* Exception-enabled version of the above API                           */
 /************************************************************************/
 
-[[throws, doc_alias("rpc_schedule")]]
+[[cp, throws, doc_alias("rpc_schedule")]]
 void RpcSchedule($pid_t target_tid, unsigned int mode,
                  [[nonnull]] void const *program,
                  [[inp_opt(max_param_count)]] void const *const *params,
-                 size_t max_param_count);
+                 $size_t max_param_count);
 
-[[throws, doc_alias("rpc_exec")]]
+[[cp, throws, doc_alias("rpc_exec")]]
 void RpcExec($pid_t target_tid, unsigned int mode,
              [[nonnull]] prpc_exec_callback_t func, void *cookie);
 
-[[throws, doc_alias("rpc_interrupt")]]
+[[cp, throws, doc_alias("rpc_interrupt")]]
 void RpcInterrupt($pid_t target_tid, unsigned int mode);
 
 

@@ -538,7 +538,7 @@ again_skip_leading_space:
 			++flushStart;
 		if (instr.operands || flushStart < instrEnd)
 			instr.operands.append(parseOperand(text[flushStart:instrEnd]));
-		if (instr.mnemonic == "ret" && !instr.operands) {
+		if (instr.mnemonic == "ret" && !instr.operands && optPrefix == "DW_OP_") {
 			/* There is no `ret' instruction, but we can emulate it
 			 * by perform a jump to the end of generated  bytecode. */
 			if (returnSymbol is none)

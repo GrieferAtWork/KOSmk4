@@ -22,6 +22,7 @@ import * from deemon;
 import * from ..autom8;
 import RPC = ..cfi.rpc;
 import fs;
+import processX86AssemblyBody from .cfi;
 
 /* Integration for the RPC compiler into autom8 source tags */
 
@@ -120,7 +121,7 @@ function main(parser: Autom8Parser, body: string) {
 			mode = "default";
 		}
 	}
-	function doTheThing(arch: string) {
+	function doTheThing(arch: string, body: string) {
 		local bytes = RPC.assemble(arch, body);
 		if (mode == "default" || mode == "bytes") {
 			parser.newText << "\t" << ",\n\t".join(
@@ -145,12 +146,12 @@ function main(parser: Autom8Parser, body: string) {
 	if (arch == "x86") {
 		/* Helper to easily generate portable x86 instrumentation */
 		parser.newText << "#ifdef __x86_64__\n";
-		doTheThing("x86_64");
+		doTheThing("x86_64", processX86AssemblyBody(body, false));
 		parser.newText << "#else /* __x86_64__ */\n";
-		doTheThing("i386");
+		doTheThing("i386", processX86AssemblyBody(body, true));
 		parser.newText << "#endif /* !__x86_64__ */\n";
 	} else {
-		doTheThing(arch);
+		doTheThing(arch, body);
 	}
 
 	parser.newText << "/*[[[end]]]*/";

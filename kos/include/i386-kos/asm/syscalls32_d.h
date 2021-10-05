@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xaee2315c */
+/* HASH CRC-32:0xdbb2481c */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1441,6 +1441,8 @@
  * multi-arch  platforms (such as  x86), the register numbers,  as well as the
  * address size used by `program' depend on the execution mode of `target_tid'
  * 
+ * NOTE: Only a cancellation point when `RPC_JOIN_WAITFOR' is used!
+ * 
  * @param: target_tid:      The TID of the targeted thread
  * @param: mode:            One of  `RPC_SYNCMODE_*', optionally or'd  with
  *                          one of `RPC_SYSRESTART_*', optionally or'd with
@@ -2298,6 +2300,7 @@
 #define __NR32CP_lseek64
 #define __NR32CP_lfutex
 #define __NR32CP_fchdirat
+#define __NR32CP_rpc_schedule
 #define __NR32CP_frealpathat
 #define __NR32CP_frealpath4
 #define __NR32CP_writef

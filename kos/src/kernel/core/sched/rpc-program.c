@@ -399,6 +399,7 @@ again:
 						num_insert = max;
 				}
 				num_insert += distance;
+				/* TODO: Do more than needed to speed up later operations! */
 				pred = rpc_membank_insert_back(pred, num_insert);
 				self->rm_bankv[i - 1] = pred;
 				if (succ && pred->rmb_addrhi + 1 + RPC_MEMBANK_JOIN_THRESHOLD >= succ->rmb_addrlo) {
@@ -427,6 +428,7 @@ join_pred_succ:
 			size_t distance;
 			distance = (size_t)(succ->rmb_addrhi - addr);
 			if (distance <= RPC_MEMBANK_JOIN_THRESHOLD) {
+				/* TODO: Do more than needed to speed up later operations! */
 				succ = rpc_membank_insert_front(succ, distance);
 				self->rm_bankv[i] = succ;
 				if (pred && pred->rmb_addrhi + 1 + RPC_MEMBANK_JOIN_THRESHOLD >= succ->rmb_addrlo)

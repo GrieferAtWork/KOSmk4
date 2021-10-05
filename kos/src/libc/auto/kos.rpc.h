@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xccde2117 */
+/* HASH CRC-32:0x8298f174 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -38,6 +38,8 @@ DECL_BEGIN
  * multi-arch  platforms (such as  x86), the register numbers,  as well as the
  * address size used by `program' depend on the execution mode of `target_tid'
  *
+ * NOTE: Only a cancellation point when `RPC_JOIN_WAITFOR' is used!
+ *
  * @param: target_tid:      The TID of the targeted thread
  * @param: mode:            One of  `RPC_SYNCMODE_*', optionally or'd  with
  *                          one of `RPC_SYSRESTART_*', optionally or'd with
@@ -64,7 +66,7 @@ DECL_BEGIN
  *                             still many reasons  outside of your  control
  *                             for why it  may terminate immediately  after
  *                             the RPC program finished. */
-INTDEF NONNULL((3)) int NOTHROW_NCX(LIBDCALL libd_rpc_schedule)(pid_t target_tid, unsigned int mode, void const *program, void const *const *params, size_t max_param_count);
+INTDEF NONNULL((3)) int NOTHROW_RPC(LIBDCALL libd_rpc_schedule)(pid_t target_tid, unsigned int mode, void const *program, void const *const *params, size_t max_param_count);
 /* >> rpc_exec(3)
  * Send a RPC to `target_tid' (which must be a thread within the current process).
  * The RPC will modify  the target thread's register  state such that `func'  will
@@ -88,7 +90,7 @@ INTDEF NONNULL((3)) int NOTHROW_NCX(LIBDCALL libd_rpc_schedule)(pid_t target_tid
  *                             still many  reasons outside  of your  control
  *                             for why  it may  terminate immediately  after
  *                             the RPC program finished. */
-INTDEF NONNULL((3)) int NOTHROW_NCX(LIBDCALL libd_rpc_exec)(pid_t target_tid, unsigned int mode, prpc_exec_callback_t func, void *cookie);
+INTDEF NONNULL((3)) int NOTHROW_RPC(LIBDCALL libd_rpc_exec)(pid_t target_tid, unsigned int mode, prpc_exec_callback_t func, void *cookie);
 /* >> rpc_interrupt(3)
  * Send  a RPC to `target_tid' (which must be a thread within the current process).
  * The RPC won't do anything except causing an in-progress system call to fail with
@@ -98,6 +100,8 @@ INTDEF NONNULL((3)) int NOTHROW_NCX(LIBDCALL libd_rpc_exec)(pid_t target_tid, un
  * the  current process, as well as allow  one to stop in-progress, but blocking
  * system calls performed by  those threads. This function  is a no-op when  the
  * given `target_tid == gettid()'.
+ *
+ * NOTE: Only a cancellation point when `RPC_JOIN_WAITFOR' is used!
  *
  * @param: target_tid: The TID of the targeted thread
  * @param: mode:       One of  `RPC_SYNCMODE_*', optionally or'd  with
@@ -112,7 +116,7 @@ INTDEF NONNULL((3)) int NOTHROW_NCX(LIBDCALL libd_rpc_exec)(pid_t target_tid, un
  *                            still many  reasons outside  of your  control
  *                            for why  it may  terminate immediately  after
  *                            the RPC program finished. */
-INTDEF int NOTHROW_NCX(LIBDCALL libd_rpc_interrupt)(pid_t target_tid, unsigned int mode);
+INTDEF int NOTHROW_RPC(LIBDCALL libd_rpc_interrupt)(pid_t target_tid, unsigned int mode);
 /* >> rpc_schedule(2)
  * Schedule an RPC program to-be executed by some other thread. This  function
  * cannot guaranty that  the RPC  program is  always executed,  as the  target
@@ -120,6 +124,8 @@ INTDEF int NOTHROW_NCX(LIBDCALL libd_rpc_interrupt)(pid_t target_tid, unsigned i
  * met. Note that these  conditions depend on the  given `mode'. Note that  on
  * multi-arch  platforms (such as  x86), the register numbers,  as well as the
  * address size used by `program' depend on the execution mode of `target_tid'
+ *
+ * NOTE: Only a cancellation point when `RPC_JOIN_WAITFOR' is used!
  *
  * @param: target_tid:      The TID of the targeted thread
  * @param: mode:            One of  `RPC_SYNCMODE_*', optionally or'd  with
@@ -181,6 +187,8 @@ INTDEF NONNULL((3)) void (LIBDCALL libd_RpcExec)(pid_t target_tid, unsigned int 
  * the  current process, as well as allow  one to stop in-progress, but blocking
  * system calls performed by  those threads. This function  is a no-op when  the
  * given `target_tid == gettid()'.
+ *
+ * NOTE: Only a cancellation point when `RPC_JOIN_WAITFOR' is used!
  *
  * @param: target_tid: The TID of the targeted thread
  * @param: mode:       One of  `RPC_SYNCMODE_*', optionally or'd  with

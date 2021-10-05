@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xeca4cf90 */
+/* HASH CRC-32:0x1348f500 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19208,6 +19208,8 @@ END(__x86_asm32_int80_openpty)
  * met. Note that these  conditions depend on the  given `mode'. Note that  on
  * multi-arch  platforms (such as  x86), the register numbers,  as well as the
  * address size used by `program' depend on the execution mode of `target_tid'
+ * 
+ * NOTE: Only a cancellation point when `RPC_JOIN_WAITFOR' is used!
  * 
  * @param: target_tid:      The TID of the targeted thread
  * @param: mode:            One of  `RPC_SYNCMODE_*', optionally or'd  with
@@ -38995,6 +38997,8 @@ END(__x86_asm32_sysenter_openpty)
  * met. Note that these  conditions depend on the  given `mode'. Note that  on
  * multi-arch  platforms (such as  x86), the register numbers,  as well as the
  * address size used by `program' depend on the execution mode of `target_tid'
+ * 
+ * NOTE: Only a cancellation point when `RPC_JOIN_WAITFOR' is used!
  * 
  * @param: target_tid:      The TID of the targeted thread
  * @param: mode:            One of  `RPC_SYNCMODE_*', optionally or'd  with

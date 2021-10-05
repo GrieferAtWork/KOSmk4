@@ -29,7 +29,12 @@
 
 DECL_BEGIN
 
-/*[[[head:libc_rpc_schedule,hash:CRC-32=0xb022268d]]]*/
+/* These 2 functions are arch-specific */
+INTDEF ATTR_CONST ATTR_RETNONNULL WUNUSED void const *LIBCCALL libc_get_rpc_exec_program(void);
+INTDEF ATTR_CONST ATTR_RETNONNULL WUNUSED void const *LIBCCALL libc_get_rpc_interrupt_program(void);
+
+
+/*[[[head:libc_rpc_schedule,hash:CRC-32=0x6949bbb7]]]*/
 /* >> rpc_schedule(2)
  * Schedule an RPC program to-be executed by some other thread. This  function
  * cannot guaranty that  the RPC  program is  always executed,  as the  target
@@ -37,6 +42,8 @@ DECL_BEGIN
  * met. Note that these  conditions depend on the  given `mode'. Note that  on
  * multi-arch  platforms (such as  x86), the register numbers,  as well as the
  * address size used by `program' depend on the execution mode of `target_tid'
+ *
+ * NOTE: Only a cancellation point when `RPC_JOIN_WAITFOR' is used!
  *
  * @param: target_tid:      The TID of the targeted thread
  * @param: mode:            One of  `RPC_SYNCMODE_*', optionally or'd  with
@@ -65,7 +72,7 @@ DECL_BEGIN
  *                             for why it  may terminate immediately  after
  *                             the RPC program finished. */
 INTERN ATTR_SECTION(".text.crt.sched.rpc") NONNULL((3)) int
-NOTHROW_NCX(LIBCCALL libc_rpc_schedule)(pid_t target_tid,
+NOTHROW_RPC(LIBCCALL libc_rpc_schedule)(pid_t target_tid,
                                         unsigned int mode,
                                         void const *program,
                                         void const *const *params,
@@ -97,7 +104,7 @@ NOTHROW_RPC(LIBCCALL libc_rpc_serve)(void)
 }
 /*[[[end:libc_rpc_serve]]]*/
 
-/*[[[head:libc_rpc_exec,hash:CRC-32=0x656f7ab1]]]*/
+/*[[[head:libc_rpc_exec,hash:CRC-32=0x7f8f1efa]]]*/
 /* >> rpc_exec(3)
  * Send a RPC to `target_tid' (which must be a thread within the current process).
  * The RPC will modify  the target thread's register  state such that `func'  will
@@ -122,23 +129,20 @@ NOTHROW_RPC(LIBCCALL libc_rpc_serve)(void)
  *                             for why  it may  terminate immediately  after
  *                             the RPC program finished. */
 INTERN ATTR_SECTION(".text.crt.sched.rpc") NONNULL((3)) int
-NOTHROW_NCX(LIBCCALL libc_rpc_exec)(pid_t target_tid,
+NOTHROW_RPC(LIBCCALL libc_rpc_exec)(pid_t target_tid,
                                     unsigned int mode,
                                     prpc_exec_callback_t func,
                                     void *cookie)
 /*[[[body:libc_rpc_exec]]]*/
-/*AUTO*/{
-	(void)target_tid;
-	(void)mode;
-	(void)func;
-	(void)cookie;
-	CRT_UNIMPLEMENTEDF("rpc_exec(%" PRIxN(__SIZEOF_PID_T__) ", %x, %p, %p)", target_tid, mode, func, cookie); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+{
+	void *args[2];
+	args[0] = (void *)func;
+	args[1] = (void *)cookie;
+	return libc_rpc_schedule(target_tid, mode, libc_get_rpc_exec_program(), args, 2);
 }
 /*[[[end:libc_rpc_exec]]]*/
 
-/*[[[head:libc_rpc_interrupt,hash:CRC-32=0xd9d729e9]]]*/
+/*[[[head:libc_rpc_interrupt,hash:CRC-32=0x776bcc9c]]]*/
 /* >> rpc_interrupt(3)
  * Send  a RPC to `target_tid' (which must be a thread within the current process).
  * The RPC won't do anything except causing an in-progress system call to fail with
@@ -148,6 +152,8 @@ NOTHROW_NCX(LIBCCALL libc_rpc_exec)(pid_t target_tid,
  * the  current process, as well as allow  one to stop in-progress, but blocking
  * system calls performed by  those threads. This function  is a no-op when  the
  * given `target_tid == gettid()'.
+ *
+ * NOTE: Only a cancellation point when `RPC_JOIN_WAITFOR' is used!
  *
  * @param: target_tid: The TID of the targeted thread
  * @param: mode:       One of  `RPC_SYNCMODE_*', optionally or'd  with
@@ -163,15 +169,11 @@ NOTHROW_NCX(LIBCCALL libc_rpc_exec)(pid_t target_tid,
  *                            for why  it may  terminate immediately  after
  *                            the RPC program finished. */
 INTERN ATTR_SECTION(".text.crt.sched.rpc") int
-NOTHROW_NCX(LIBCCALL libc_rpc_interrupt)(pid_t target_tid,
+NOTHROW_RPC(LIBCCALL libc_rpc_interrupt)(pid_t target_tid,
                                          unsigned int mode)
 /*[[[body:libc_rpc_interrupt]]]*/
-/*AUTO*/{
-	(void)target_tid;
-	(void)mode;
-	CRT_UNIMPLEMENTEDF("rpc_interrupt(%" PRIxN(__SIZEOF_PID_T__) ", %x)", target_tid, mode); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+{
+	return libc_rpc_schedule(target_tid, mode, libc_get_rpc_interrupt_program(), NULL, 0);
 }
 /*[[[end:libc_rpc_interrupt]]]*/
 
@@ -207,17 +209,15 @@ INTERN ATTR_SECTION(".text.crt.sched.rpc") NONNULL((3)) void
                         prpc_exec_callback_t func,
                         void *cookie) THROWS(...)
 /*[[[body:libc_RpcExec]]]*/
-/*AUTO*/{
-	(void)target_tid;
-	(void)mode;
-	(void)func;
-	(void)cookie;
-	CRT_UNIMPLEMENTEDF("RpcExec(%" PRIxN(__SIZEOF_PID_T__) ", %x, %p, %p)", target_tid, mode, func, cookie); /* TODO */
-	libc_seterrno(ENOSYS);
+{
+	void *args[2];
+	args[0] = (void *)func;
+	args[1] = (void *)cookie;
+	libc_RpcSchedule(target_tid, mode, libc_get_rpc_exec_program(), args, 2);
 }
 /*[[[end:libc_RpcExec]]]*/
 
-/*[[[head:libc_RpcInterrupt,hash:CRC-32=0x8a55c5c6]]]*/
+/*[[[head:libc_RpcInterrupt,hash:CRC-32=0x74e1dedc]]]*/
 /* >> rpc_interrupt(3)
  * Send  a RPC to `target_tid' (which must be a thread within the current process).
  * The RPC won't do anything except causing an in-progress system call to fail with
@@ -227,6 +227,8 @@ INTERN ATTR_SECTION(".text.crt.sched.rpc") NONNULL((3)) void
  * the  current process, as well as allow  one to stop in-progress, but blocking
  * system calls performed by  those threads. This function  is a no-op when  the
  * given `target_tid == gettid()'.
+ *
+ * NOTE: Only a cancellation point when `RPC_JOIN_WAITFOR' is used!
  *
  * @param: target_tid: The TID of the targeted thread
  * @param: mode:       One of  `RPC_SYNCMODE_*', optionally or'd  with
@@ -245,11 +247,8 @@ INTERN ATTR_SECTION(".text.crt.sched.rpc") void
 (LIBCCALL libc_RpcInterrupt)(pid_t target_tid,
                              unsigned int mode) THROWS(...)
 /*[[[body:libc_RpcInterrupt]]]*/
-/*AUTO*/{
-	(void)target_tid;
-	(void)mode;
-	CRT_UNIMPLEMENTEDF("RpcInterrupt(%" PRIxN(__SIZEOF_PID_T__) ", %x)", target_tid, mode); /* TODO */
-	libc_seterrno(ENOSYS);
+{
+	libc_RpcSchedule(target_tid, mode, libc_get_rpc_interrupt_program(), NULL, 0);
 }
 /*[[[end:libc_RpcInterrupt]]]*/
 

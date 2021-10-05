@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xae9357ce */
+/* HASH CRC-32:0x82deb461 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1811,6 +1811,8 @@ __CDECLARE_SC(,__errno_t,rmdir,(char const *__path),(__path))
  * met. Note that these  conditions depend on the  given `mode'. Note that  on
  * multi-arch  platforms (such as  x86), the register numbers,  as well as the
  * address size used by `program' depend on the execution mode of `target_tid'
+ * 
+ * NOTE: Only a cancellation point when `RPC_JOIN_WAITFOR' is used!
  * 
  * @param: target_tid:      The TID of the targeted thread
  * @param: mode:            One of  `RPC_SYNCMODE_*', optionally or'd  with
@@ -4365,6 +4367,8 @@ __CDECLARE_XSC(,__errno_t,rmdir,(char const *__path),(__path))
  * met. Note that these  conditions depend on the  given `mode'. Note that  on
  * multi-arch  platforms (such as  x86), the register numbers,  as well as the
  * address size used by `program' depend on the execution mode of `target_tid'
+ * 
+ * NOTE: Only a cancellation point when `RPC_JOIN_WAITFOR' is used!
  * 
  * @param: target_tid:      The TID of the targeted thread
  * @param: mode:            One of  `RPC_SYNCMODE_*', optionally or'd  with

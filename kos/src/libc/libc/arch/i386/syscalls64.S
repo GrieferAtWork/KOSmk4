@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb9a73204 */
+/* HASH CRC-32:0xcfc35ea5 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -4100,6 +4100,8 @@ DEFINE_PUBLIC_ALIAS(sys_openpty, libc_sys_openpty)
  * met. Note that these  conditions depend on the  given `mode'. Note that  on
  * multi-arch  platforms (such as  x86), the register numbers,  as well as the
  * address size used by `program' depend on the execution mode of `target_tid'
+ * 
+ * NOTE: Only a cancellation point when `RPC_JOIN_WAITFOR' is used!
  * 
  * @param: target_tid:      The TID of the targeted thread
  * @param: mode:            One of  `RPC_SYNCMODE_*', optionally or'd  with
@@ -9165,6 +9167,8 @@ DEFINE_PUBLIC_ALIAS(sys_Xopenpty, libc_sys_Xopenpty)
  * met. Note that these  conditions depend on the  given `mode'. Note that  on
  * multi-arch  platforms (such as  x86), the register numbers,  as well as the
  * address size used by `program' depend on the execution mode of `target_tid'
+ * 
+ * NOTE: Only a cancellation point when `RPC_JOIN_WAITFOR' is used!
  * 
  * @param: target_tid:      The TID of the targeted thread
  * @param: mode:            One of  `RPC_SYNCMODE_*', optionally or'd  with

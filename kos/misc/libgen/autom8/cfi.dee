@@ -25,6 +25,63 @@ import fs;
 
 /* Integration for the CFI compiler into autom8 source tags */
 
+
+
+@@Helper function for @"x86" architecture portable CFI expressions
+function processX86AssemblyBodyLines(body: string, is386: bool): {string...} {
+#define CONTEXT_NORMAL      0
+#define CONTEXT_AFTER_IF0   1
+#define CONTEXT_AFTER_IF1   2
+#define CONTEXT_AFTER_ELSE0 3
+#define CONTEXT_AFTER_ELSE1 4
+	local context = CONTEXT_NORMAL;
+	for (local line: body.splitlines(false)) {
+		local strippedLine = line.strip();
+		if (strippedLine.startswith("#if")) {
+			local isX64 = {
+				"#ifdef __x86_64__" : true,
+				"#ifndef __x86_64__" : false,
+				"#ifdef __i386__" : false,
+				"#ifndef __i386__" : true,
+			}.get(strippedLine);
+			if (context != CONTEXT_NORMAL)
+				throw Error("#if.. directive in invalid context: " + repr strippedLine);
+			if (isX64 is none)
+				throw Error("Unknown directive: " + repr strippedLine);
+			if (isX64 ^ is386) {
+				context = CONTEXT_AFTER_IF1;
+			} else {
+				context = CONTEXT_AFTER_IF0;
+			}
+			continue;
+		}
+		if (strippedLine.startswith("#else")) {
+			if (context == CONTEXT_AFTER_IF1)
+				context = CONTEXT_AFTER_ELSE0;
+			else if (context == CONTEXT_AFTER_IF0)
+				context = CONTEXT_AFTER_ELSE1;
+			else {
+				throw Error("#else directive in invalid context: " + repr strippedLine);
+			}
+			continue;
+		}
+		if (strippedLine.startswith("#endif")) {
+			if (context == CONTEXT_NORMAL)
+				throw Error("#endif directive in invalid context: " + repr strippedLine);
+			context = CONTEXT_NORMAL;
+			continue;
+		}
+		if (context in [CONTEXT_NORMAL, CONTEXT_AFTER_IF1, CONTEXT_AFTER_ELSE1])
+			yield line;
+	}
+}
+
+@@Helper function for @"x86" architecture portable CFI expressions
+function processX86AssemblyBody(body: string, is386: bool): string {
+	return "\n".join(processX86AssemblyBodyLines(body, is386));
+}
+
+
 function main(parser: Autom8Parser, body: string) {
 	body = body.lstrip();
 	if (!body.startswith("{"))
@@ -132,7 +189,7 @@ function main(parser: Autom8Parser, body: string) {
 			mode = "default";
 		}
 	}
-	function doTheThing(arch: string) {
+	function doTheThing(arch: string, body: string) {
 		if (mode == "default") {
 			CFI.outputForAssembly(arch, register, body, outputFile: parser.newText);
 		} else if (mode == "asm") {
@@ -162,9 +219,9 @@ function main(parser: Autom8Parser, body: string) {
 	if (arch == "x86") {
 		/* Helper to easily generate portable x86 instrumentation */
 		parser.newText << "#ifdef __x86_64__\n";
-		doTheThing("x86_64");
+		doTheThing("x86_64", processX86AssemblyBody(body, false));
 		parser.newText << "#else /* __x86_64__ */\n";
-		doTheThing("i386");
+		doTheThing("i386", processX86AssemblyBody(body, true));
 		parser.newText << "#endif /* !__x86_64__ */\n";
 	} else {
 		doTheThing(arch);

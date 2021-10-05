@@ -164,6 +164,9 @@
 #ifndef THROWS
 #define THROWS __THROWS
 #endif /* !THROWS */
+#ifndef ASMCALL
+#define ASMCALL /* nothing */
+#endif /* !ASMCALL */
 
 #define ATTR_LIBC_PRINTF(a, b)    __ATTR_LIBC_PRINTF(a, b)
 #define ATTR_LIBC_PRINTF_P(a, b)  __ATTR_LIBC_PRINTF_P(a, b)

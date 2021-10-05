@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xeac0fc95 */
+/* HASH CRC-32:0x4dcbfe28 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,8 +18,6 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#define __stub_RpcExec
-#define __stub_RpcInterrupt
 #define __stub__CrtDbgReport
 #define __stub_$Q_CrtDbgReportW$A$AYAHHPBGH00ZZ
 #define __stub__CrtDbgReportW
@@ -503,8 +501,6 @@
 #define __stub_revoke
 #define __stub_rexec
 #define __stub_rexec_af
-#define __stub_rpc_exec
-#define __stub_rpc_interrupt
 #define __stub_rresvport
 #define __stub_rresvport_af
 #define __stub_ruserok

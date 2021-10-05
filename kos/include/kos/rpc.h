@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x97d091d3 */
+/* HASH CRC-32:0x5838f7bb */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -119,6 +119,8 @@ typedef __ATTR_NONNULL((1)) void
  * multi-arch  platforms (such as  x86), the register numbers,  as well as the
  * address size used by `program' depend on the execution mode of `target_tid'
  *
+ * NOTE: Only a cancellation point when `RPC_JOIN_WAITFOR' is used!
+ *
  * @param: target_tid:      The TID of the targeted thread
  * @param: mode:            One of  `RPC_SYNCMODE_*', optionally or'd  with
  *                          one of `RPC_SYSRESTART_*', optionally or'd with
@@ -145,7 +147,7 @@ typedef __ATTR_NONNULL((1)) void
  *                             still many reasons  outside of your  control
  *                             for why it  may terminate immediately  after
  *                             the RPC program finished. */
-__CDECLARE_OPT(__ATTR_NONNULL((3)),int,__NOTHROW_NCX,rpc_schedule,(__pid_t __target_tid, unsigned int __mode, void const *__program, void const *const *__params, size_t __max_param_count),(__target_tid,__mode,__program,__params,__max_param_count))
+__CDECLARE_OPT(__ATTR_NONNULL((3)),int,__NOTHROW_RPC,rpc_schedule,(__pid_t __target_tid, unsigned int __mode, void const *__program, void const *const *__params, __SIZE_TYPE__ __max_param_count),(__target_tid,__mode,__program,__params,__max_param_count))
 /* >> rpc_serve(2)
  * Check for  pending RPCs.  This function  is basically  a cancellation  point in  disguise,
  * in  that it literally _is_ a regular, old cancellation point, with the only addition being
@@ -178,7 +180,7 @@ __CDECLARE_OPT(,int,__NOTHROW_RPC,rpc_serve,(void),())
  *                             still many  reasons outside  of your  control
  *                             for why  it may  terminate immediately  after
  *                             the RPC program finished. */
-__CDECLARE_OPT(__ATTR_NONNULL((3)),int,__NOTHROW_NCX,rpc_exec,(__pid_t __target_tid, unsigned int __mode, prpc_exec_callback_t __func, void *__cookie),(__target_tid,__mode,__func,__cookie))
+__CDECLARE_OPT(__ATTR_NONNULL((3)),int,__NOTHROW_RPC,rpc_exec,(__pid_t __target_tid, unsigned int __mode, prpc_exec_callback_t __func, void *__cookie),(__target_tid,__mode,__func,__cookie))
 /* >> rpc_interrupt(3)
  * Send  a RPC to `target_tid' (which must be a thread within the current process).
  * The RPC won't do anything except causing an in-progress system call to fail with
@@ -188,6 +190,8 @@ __CDECLARE_OPT(__ATTR_NONNULL((3)),int,__NOTHROW_NCX,rpc_exec,(__pid_t __target_
  * the  current process, as well as allow  one to stop in-progress, but blocking
  * system calls performed by  those threads. This function  is a no-op when  the
  * given `target_tid == gettid()'.
+ *
+ * NOTE: Only a cancellation point when `RPC_JOIN_WAITFOR' is used!
  *
  * @param: target_tid: The TID of the targeted thread
  * @param: mode:       One of  `RPC_SYNCMODE_*', optionally or'd  with
@@ -202,7 +206,7 @@ __CDECLARE_OPT(__ATTR_NONNULL((3)),int,__NOTHROW_NCX,rpc_exec,(__pid_t __target_
  *                            still many  reasons outside  of your  control
  *                            for why  it may  terminate immediately  after
  *                            the RPC program finished. */
-__CDECLARE_OPT(,int,__NOTHROW_NCX,rpc_interrupt,(__pid_t __target_tid, unsigned int __mode),(__target_tid,__mode))
+__CDECLARE_OPT(,int,__NOTHROW_RPC,rpc_interrupt,(__pid_t __target_tid, unsigned int __mode),(__target_tid,__mode))
 /* >> rpc_schedule(2)
  * Schedule an RPC program to-be executed by some other thread. This  function
  * cannot guaranty that  the RPC  program is  always executed,  as the  target
@@ -210,6 +214,8 @@ __CDECLARE_OPT(,int,__NOTHROW_NCX,rpc_interrupt,(__pid_t __target_tid, unsigned 
  * met. Note that these  conditions depend on the  given `mode'. Note that  on
  * multi-arch  platforms (such as  x86), the register numbers,  as well as the
  * address size used by `program' depend on the execution mode of `target_tid'
+ *
+ * NOTE: Only a cancellation point when `RPC_JOIN_WAITFOR' is used!
  *
  * @param: target_tid:      The TID of the targeted thread
  * @param: mode:            One of  `RPC_SYNCMODE_*', optionally or'd  with
@@ -237,7 +243,7 @@ __CDECLARE_OPT(,int,__NOTHROW_NCX,rpc_interrupt,(__pid_t __target_tid, unsigned 
  *                             still many reasons  outside of your  control
  *                             for why it  may terminate immediately  after
  *                             the RPC program finished. */
-__CDECLARE_VOID_OPT(__ATTR_NONNULL((3)),__THROWING,RpcSchedule,(__pid_t __target_tid, unsigned int __mode, void const *__program, void const *const *__params, size_t __max_param_count),(__target_tid,__mode,__program,__params,__max_param_count))
+__CDECLARE_VOID_OPT(__ATTR_NONNULL((3)),__THROWING,RpcSchedule,(__pid_t __target_tid, unsigned int __mode, void const *__program, void const *const *__params, __SIZE_TYPE__ __max_param_count),(__target_tid,__mode,__program,__params,__max_param_count))
 /* >> rpc_exec(3)
  * Send a RPC to `target_tid' (which must be a thread within the current process).
  * The RPC will modify  the target thread's register  state such that `func'  will
@@ -271,6 +277,8 @@ __CDECLARE_VOID_OPT(__ATTR_NONNULL((3)),__THROWING,RpcExec,(__pid_t __target_tid
  * the  current process, as well as allow  one to stop in-progress, but blocking
  * system calls performed by  those threads. This function  is a no-op when  the
  * given `target_tid == gettid()'.
+ *
+ * NOTE: Only a cancellation point when `RPC_JOIN_WAITFOR' is used!
  *
  * @param: target_tid: The TID of the targeted thread
  * @param: mode:       One of  `RPC_SYNCMODE_*', optionally or'd  with

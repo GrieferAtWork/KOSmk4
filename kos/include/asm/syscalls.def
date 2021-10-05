@@ -1624,6 +1624,8 @@ rt_tgsigqueueinfo:(pid_t pid, pid_t tid, signo_t usigno, [tostr(STRUCT_SIGINFO)]
 @@multi-arch  platforms (such as  x86), the register numbers,  as well as the
 @@address size used by `program' depend on the execution mode of `target_tid'
 @@
+@@NOTE: Only a cancellation point when `RPC_JOIN_WAITFOR' is used!
+@@
 @@@param: target_tid:      The TID of the targeted thread
 @@@param: mode:            One of  `RPC_SYNCMODE_*', optionally or'd  with
 @@                         one of `RPC_SYSRESTART_*', optionally or'd with
@@ -1650,9 +1652,9 @@ rt_tgsigqueueinfo:(pid_t pid, pid_t tid, signo_t usigno, [tostr(STRUCT_SIGINFO)]
 @@                            still many reasons  outside of your  control
 @@                            for why it  may terminate immediately  after
 @@                            the RPC program finished.
-rpc_schedule:(pid_t target_tid, [tostr(RPC_SCHEDULE_MODE)] syscall_ulong_t mode, void const *program, void const *const *params, size_t max_param_count) -> errno_t;
-[doc_alias(rpc_schedule)] rpc_schedulex32:(pid_t target_tid, [tostr(RPC_SCHEDULE_MODE)] syscall_ulong_t mode, void const *program, [tostr(VOID_VECTOR32:max_param_count)] __HYBRID_PTR32(void const) const *params, size_t max_param_count) -> errno_t;
-[doc_alias(rpc_schedule)] rpc_schedulex64:(pid_t target_tid, [tostr(RPC_SCHEDULE_MODE)] syscall_ulong_t mode, void const *program, [tostr(VOID_VECTOR64:max_param_count)] __HYBRID_PTR64(void const) const *params, size_t max_param_count) -> errno_t;
+[cp] rpc_schedule:(pid_t target_tid, [tostr(RPC_SCHEDULE_MODE)] syscall_ulong_t mode, void const *program, void const *const *params, size_t max_param_count) -> errno_t;
+[cp][doc_alias(rpc_schedule)] rpc_schedulex32:(pid_t target_tid, [tostr(RPC_SCHEDULE_MODE)] syscall_ulong_t mode, void const *program, [tostr(VOID_VECTOR32:max_param_count)] __HYBRID_PTR32(void const) const *params, size_t max_param_count) -> errno_t;
+[cp][doc_alias(rpc_schedule)] rpc_schedulex64:(pid_t target_tid, [tostr(RPC_SCHEDULE_MODE)] syscall_ulong_t mode, void const *program, [tostr(VOID_VECTOR64:max_param_count)] __HYBRID_PTR64(void const) const *params, size_t max_param_count) -> errno_t;
 %[endgroup]
 
 @@>> rpc_serve(2)
