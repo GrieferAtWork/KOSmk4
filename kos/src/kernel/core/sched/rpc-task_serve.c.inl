@@ -104,6 +104,7 @@ handle_pending:
 			{
 				/* Enabling interrupts when RPCs get served is part of the ABI! */
 				PREEMPTION_ENABLE();
+				icpustate_setpreemption(ctx.rc_state, 1);
 
 				/* Execute synchronous kernel RPC immediately. */
 				SLIST_INSERT_HEAD(&runnow, rpc, pr_link);
@@ -141,6 +142,7 @@ handle_pending:
 #else /* LOCAL_NOEXCEPT */
 				/* Enabling interrupts when RPCs get served is part of the ABI! */
 				PREEMPTION_ENABLE();
+				icpustate_setpreemption(ctx.rc_state, 1);
 				must_unwind = true;
 #endif /* !LOCAL_NOEXCEPT */
 			}
