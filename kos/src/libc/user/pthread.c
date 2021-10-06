@@ -1692,12 +1692,13 @@ NOTHROW_NCX(LIBCCALL libc_pthread_getcpuclockid)(pthread_t pthread,
 }
 /*[[[end:libc_pthread_getcpuclockid]]]*/
 
-/*[[[head:libc_pthread_rpc_exec,hash:CRC-32=0x2bf29050]]]*/
+/*[[[head:libc_pthread_rpc_exec,hash:CRC-32=0xd42ab8fa]]]*/
 /* >> pthread_rpc_exec(3)
  * Schedule an RPC for `target_thread' to-be executed the next  time
  * it makes a call to a cancellation-point system call (or interrupt
  * an active system call, should one such currently be in progress).
- * RPCs are also executed by `pthread_testcancel(3)'
+ *   - RPCs are also executed by `pthread_testcancel(3)'
+ *   - The `struct rpc_context' structure is defined in `<kos/rpc.h>'
  * @return: 0:      Success
  * @return: ENOMEM: Insufficient system memory
  * @return: ESRCH:  The given `target_thread' has already terminated */

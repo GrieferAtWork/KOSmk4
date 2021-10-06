@@ -70,13 +70,13 @@ struct statfs;
 
 struct fsuperfeat {
 	pos_t   sf_symlink_max;        /* [const] Max length of text contained within symbolic links */
-	nlink_t sf_link_max;           /* [const] Max # links a file may have */
+	nlink_t sf_link_max;           /* [const] Max # of links a file may have */
 	u32     sf_magic;              /* [const] Filesystem ~magic~ (one of the constants from `<linux/magic.h>') */
 	u32     sf_rec_incr_xfer_size; /* [const] Buffer size increments for efficient disk transfer operations */
 	u32     sf_rec_max_xfer_size;  /* [const] Max buffer size for efficient disk transfer operations */
 	u32     sf_rec_min_xfer_size;  /* [const] Min buffer size for efficient disk transfer operations */
 	u32     sf_rec_xfer_align;     /* [const] Required in-memory buffer alignment for efficient disk transfer operations */
-	u16     sf_name_max;           /* [const] Max # chars in a file name */
+	u16     sf_name_max;           /* [const] Max # of chars in a file name */
 	u8      sf_filesizebits;       /* [const] Max # of bits in a file's size field (usually 64 or 32) */
 };
 #define fsuperfeat_hassymlink(self) ((self)->sf_symlink_max != 0)

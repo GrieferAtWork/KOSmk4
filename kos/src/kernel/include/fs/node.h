@@ -2043,13 +2043,13 @@ DEFINE_REFCOUNT_FUNCTIONS_P(struct superblock_type,
 
 struct superblock_features {
 	pos_t   sf_symlink_max;        /* Max length of text contained within symbolic links */
-	nlink_t sf_link_max;           /* Max # links a file may have */
+	nlink_t sf_link_max;           /* Max # of links a file may have */
 	u32     sf_magic;              /* Filesystem ~magic~ (one of the constants from `<linux/magic.h>') */
 	u32     sf_rec_incr_xfer_size; /* Buffer size increments for efficient disk transfer operations */
 	u32     sf_rec_max_xfer_size;  /* Max buffer size for efficient disk transfer operations */
 	u32     sf_rec_min_xfer_size;  /* Min buffer size for efficient disk transfer operations */
 	u32     sf_rec_xfer_align;     /* Required in-memory buffer alignment for efficient disk transfer operations */
-	u16     sf_name_max;           /* Max # chars in a file name */
+	u16     sf_name_max;           /* Max # of chars in a file name */
 	u8      sf_filesizebits;       /* Max # of bits in a file's size field (usually 64 or 32) */
 };
 #define superblock_features_has_symlink(self) ((self)->sf_symlink_max != 0)

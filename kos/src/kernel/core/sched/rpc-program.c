@@ -150,7 +150,7 @@ struct rpc_membank {
 };
 #define RPC_MEMBANK_STATUS_BITS      2 /* # of status bits per byte */
 #define _RPC_MEMBANK_STATUS_MASK     ((1 << RPC_MEMBANK_STATUS_BITS) - 1)
-#define RPC_MEMBANK_STATUS_UNDEF     0 /* D */
+#define RPC_MEMBANK_STATUS_UNDEF     0 /* Default: contents of this byte are undefined */
 #define RPC_MEMBANK_STATUS_F_LOADED  1 /* FLAG: Byte was loaded. */
 #define RPC_MEMBANK_STATUS_F_CHANGED 2 /* FLAG: Byte got changed. */
 
@@ -553,6 +553,7 @@ rw_bank:
 
 
 
+/* Flags for `struct rpc_vm::rv_flags' */
 #define RPC_VM_NORMAL      0x0000 /* Normal flags. */
 #define RPC_VM_HAVESIGMASK 0x0001 /* `rv_sigmask' must be or'd with the calling thread's signal mask. */
 #ifdef CONFIG_FPU
@@ -577,7 +578,7 @@ struct rpc_vm {
 #endif /* CONFIG_FPU */
 	uintptr_t                      rv_flags;                     /* Set of `RPC_VM_*'. */
 	size_t                         rv_stacksz;                   /* # of in-use elements in `rv_stack' */
-	uintptr_t                      rv_stack[RPC_PROG_STACK_MAX]; /* RPC program stack. */
+	uintptr_t                      rv_stack[RPC_PROG_STACK_MAX]; /* [rv_stacksz] RPC program stack. */
 	USER CHECKED byte_t const     *rv_pc;                        /* [?..1] User-space address of next PC byte. */
 	byte_t                         rv_pcbuf_ptr;                 /* Index of next byte to read from `rv_pcbuf' */
 	byte_t                         rv_pcbuf_siz;                 /* # of unread bytes at `&rv_pcbuf[rv_pcbuf_ptr]' */

@@ -26,12 +26,12 @@
 /*[[[enum]]]*/
 #ifdef __CC__
 enum {
-	_PC_LINK_MAX,           /* [perfs] Max # links a file may have */
+	_PC_LINK_MAX,           /* [perfs] Max # of links a file may have */
 	_PC_MAX_CANON,          /* [pertty] size of the canonical input queue (s.a. `struct tty_device::t_term.t_canon.lb_limt') */
 	_PC_MAX_INPUT,          /* [pertty] size of the type-ahead buffer (s.a. `struct tty_device::t_term.t_ibuf.rb_limit') */
-	_PC_NAME_MAX,           /* [perfs] Max # chars in a file name */
-	_PC_PATH_MAX,           /* [const] Max # chars in a path name including nul (Unlimited in KOS) */
-	_PC_PIPE_BUF,           /* [const] Max # bytes in atomic write to a pipe */
+	_PC_NAME_MAX,           /* [perfs] Max # of chars in a file name */
+	_PC_PATH_MAX,           /* [const] Max # of chars in a path name including nul (Unlimited in KOS) */
+	_PC_PIPE_BUF,           /* [const] Max # of bytes in atomic write to a pipe */
 	_PC_CHOWN_RESTRICTED,   /* [const] Is file access restricted by file ownership. */
 	_PC_NO_TRUNC,           /* [const] Filenames are not silently truncated. */
 	_PC_VDISABLE,           /* [const] `c_cc' member of `struct termios' structure can be disabled by using the value _POSIX_VDISABLE. */
@@ -51,12 +51,12 @@ enum {
 #endif /* __CC__ */
 /*[[[AUTO]]]*/
 #ifdef __COMPILER_PREFERR_ENUMS
-#define _PC_LINK_MAX           _PC_LINK_MAX           /* [perfs] Max # links a file may have */
+#define _PC_LINK_MAX           _PC_LINK_MAX           /* [perfs] Max # of links a file may have */
 #define _PC_MAX_CANON          _PC_MAX_CANON          /* [pertty] size of the canonical input queue (s.a. `struct tty_device::t_term.t_canon.lb_limt') */
 #define _PC_MAX_INPUT          _PC_MAX_INPUT          /* [pertty] size of the type-ahead buffer (s.a. `struct tty_device::t_term.t_ibuf.rb_limit') */
-#define _PC_NAME_MAX           _PC_NAME_MAX           /* [perfs] Max # chars in a file name */
-#define _PC_PATH_MAX           _PC_PATH_MAX           /* [const] Max # chars in a path name including nul (Unlimited in KOS) */
-#define _PC_PIPE_BUF           _PC_PIPE_BUF           /* [const] Max # bytes in atomic write to a pipe */
+#define _PC_NAME_MAX           _PC_NAME_MAX           /* [perfs] Max # of chars in a file name */
+#define _PC_PATH_MAX           _PC_PATH_MAX           /* [const] Max # of chars in a path name including nul (Unlimited in KOS) */
+#define _PC_PIPE_BUF           _PC_PIPE_BUF           /* [const] Max # of bytes in atomic write to a pipe */
 #define _PC_CHOWN_RESTRICTED   _PC_CHOWN_RESTRICTED   /* [const] Is file access restricted by file ownership. */
 #define _PC_NO_TRUNC           _PC_NO_TRUNC           /* [const] Filenames are not silently truncated. */
 #define _PC_VDISABLE           _PC_VDISABLE           /* [const] `c_cc' member of `struct termios' structure can be disabled by using the value _POSIX_VDISABLE. */
@@ -73,12 +73,12 @@ enum {
 #define _PC_SYMLINK_MAX        _PC_SYMLINK_MAX        /* [perfs] Max length of text contained within symbolic links */
 #define _PC_2_SYMLINKS         _PC_2_SYMLINKS         /* [perfs] Are symbolic links supported by the filesystem */
 #else /* __COMPILER_PREFERR_ENUMS */
-#define _PC_LINK_MAX           0  /* [perfs] Max # links a file may have */
+#define _PC_LINK_MAX           0  /* [perfs] Max # of links a file may have */
 #define _PC_MAX_CANON          1  /* [pertty] size of the canonical input queue (s.a. `struct tty_device::t_term.t_canon.lb_limt') */
 #define _PC_MAX_INPUT          2  /* [pertty] size of the type-ahead buffer (s.a. `struct tty_device::t_term.t_ibuf.rb_limit') */
-#define _PC_NAME_MAX           3  /* [perfs] Max # chars in a file name */
-#define _PC_PATH_MAX           4  /* [const] Max # chars in a path name including nul (Unlimited in KOS) */
-#define _PC_PIPE_BUF           5  /* [const] Max # bytes in atomic write to a pipe */
+#define _PC_NAME_MAX           3  /* [perfs] Max # of chars in a file name */
+#define _PC_PATH_MAX           4  /* [const] Max # of chars in a path name including nul (Unlimited in KOS) */
+#define _PC_PIPE_BUF           5  /* [const] Max # of bytes in atomic write to a pipe */
 #define _PC_CHOWN_RESTRICTED   6  /* [const] Is file access restricted by file ownership. */
 #define _PC_NO_TRUNC           7  /* [const] Filenames are not silently truncated. */
 #define _PC_VDISABLE           8  /* [const] `c_cc' member of `struct termios' structure can be disabled by using the value _POSIX_VDISABLE. */

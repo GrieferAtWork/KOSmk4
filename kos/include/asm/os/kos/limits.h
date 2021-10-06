@@ -34,14 +34,14 @@
 #define __HOST_NAME_MAX      64         /* Max # of characters in a hostname (s.a. `sethostname(2)'). */
 #define __NGROUPS_MAX        (-1)       /* Max # of supplemental group IDs that may be set (s.a. `setgroups(2)') */
 #define __OPEN_MAX           (-1)       /* Max # of open files handles */
-#define __ARG_MAX            131072     /* Max # bytes of args + environ for exec(); */
-#define __LINK_MAX           (-1)       /* Max # links a file may have (fs-dependent) */
+#define __ARG_MAX            131072     /* Max # of bytes of args + environ for exec(); */
+#define __LINK_MAX           (-1)       /* Max # of links a file may have (fs-dependent) */
 #define __MAX_CANON          (-1)       /* Max size of the canonical input queue */
 #define __MAX_INPUT          (-1)       /* Max size of the type-ahead buffer */
-#define __NAME_MAX           65535      /* Max # chars in a file name */
-#define __PATH_MAX           (-1)       /* Max # chars in a path name including nul */
-#define __PIPE_BUF           4096       /* Max # bytes in atomic write to a pipe (Default value, assuming that backing memory isn't VIO or re-mapped during a write) */
-#define __XATTR_NAME_MAX     255        /* Max # chars in an extended attribute name */
+#define __NAME_MAX           65535      /* Max # of chars in a file name */
+#define __PATH_MAX           (-1)       /* Max # of chars in a path name including nul */
+#define __PIPE_BUF           4096       /* Max # of bytes in atomic write to a pipe (Default value, assuming that backing memory isn't VIO or re-mapped during a write) */
+#define __XATTR_NAME_MAX     255        /* Max # of chars in an extended attribute name */
 #define __XATTR_SIZE_MAX     65536      /* Max size of an extended attribute value (64k) */
 #define __XATTR_LIST_MAX     65536      /* Max size of extended attribute namelist (64k) */
 #define __RTSIG_MAX          32         /* # of realtime signals */
@@ -62,14 +62,14 @@
 #define __HOST_NAME_MAX      64         /* Max # of characters in a hostname (s.a. `sethostname(2)'). */
 #define __NGROUPS_MAX        65536      /* Max # of supplemental group IDs that may be set (s.a. `setgroups(2)') */
 #define __OPEN_MAX           1024       /* Max # of open files handles */
-#define __ARG_MAX            131072     /* Max # bytes of args + environ for exec(); */
-#define __LINK_MAX           127        /* Max # links a file may have */
+#define __ARG_MAX            131072     /* Max # of bytes of args + environ for exec(); */
+#define __LINK_MAX           127        /* Max # of links a file may have */
 #define __MAX_CANON          255        /* Max size of the canonical input queue */
 #define __MAX_INPUT          255        /* Max size of the type-ahead buffer */
-#define __NAME_MAX           255        /* Max # chars in a file name */
-#define __PATH_MAX           4096       /* Max # chars in a path name including nul */
-#define __PIPE_BUF           4096       /* Max # bytes in atomic write to a pipe (Default value) */
-#define __XATTR_NAME_MAX     255        /* Max # chars in an extended attribute name */
+#define __NAME_MAX           255        /* Max # of chars in a file name */
+#define __PATH_MAX           4096       /* Max # of chars in a path name including nul */
+#define __PIPE_BUF           4096       /* Max # of bytes in atomic write to a pipe (Default value) */
+#define __XATTR_NAME_MAX     255        /* Max # of chars in an extended attribute name */
 #define __XATTR_SIZE_MAX     65536      /* Max size of an extended attribute value (64k) */
 #define __XATTR_LIST_MAX     65536      /* Max size of extended attribute namelist (64k) */
 #define __RTSIG_MAX          32         /* # of realtime signals */

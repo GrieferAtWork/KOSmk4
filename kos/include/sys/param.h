@@ -102,12 +102,12 @@
 #define NGROUPS_MAX __NGROUPS_MAX
 #endif /* !NGROUPS_MAX && __NGROUPS_MAX != -1 */
 
-/* Max # bytes of args + environ for exec(); */
+/* Max # of bytes of args + environ for exec(); */
 #if !defined(ARG_MAX) && defined(__ARG_MAX) && (__ARG_MAX + 0) != -1
 #define ARG_MAX __ARG_MAX
 #endif /* !ARG_MAX && __ARG_MAX != -1 */
 
-/* Max # links a file may have (fs-dependent) */
+/* Max # of links a file may have (fs-dependent) */
 #if !defined(LINK_MAX) && defined(__LINK_MAX) && (__LINK_MAX + 0) != -1
 #define LINK_MAX __LINK_MAX
 #endif /* !LINK_MAX && __LINK_MAX != -1 */
@@ -122,18 +122,18 @@
 #define MAX_INPUT __MAX_INPUT
 #endif /* !MAX_INPUT && __MAX_INPUT != -1 */
 
-/* Max # chars in a file name */
+/* Max # of chars in a file name */
 #if !defined(NAME_MAX) && defined(__NAME_MAX) && (__NAME_MAX + 0) != -1
 #define NAME_MAX __NAME_MAX
 #endif /* !NAME_MAX && __NAME_MAX != -1 */
 
-/* Max # chars in a path name including nul */
+/* Max # of chars in a path name including nul */
 #if !defined(PATH_MAX) && defined(__PATH_MAX) && (__PATH_MAX + 0) != -1
 #define PATH_MAX __PATH_MAX
 #endif /* !PATH_MAX && __PATH_MAX != -1 */
 
-/* Max # bytes in atomic write to a pipe (Default value, assuming
- * that  backing memory  isn't VIO  or re-mapped  during a write) */
+/* Max # of bytes in atomic write to a pipe (Default value, assuming
+ * that backing  memory  isn't  VIO or  re-mapped  during  a  write) */
 #if !defined(PIPE_BUF) && defined(__PIPE_BUF) && (__PIPE_BUF + 0) != -1
 #define PIPE_BUF __PIPE_BUF
 #endif /* !PIPE_BUF && __PIPE_BUF != -1 */

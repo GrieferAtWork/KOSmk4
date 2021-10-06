@@ -543,7 +543,7 @@
 /* RPC program limits                                                   */
 /************************************************************************/
 #define RPC_PROG_PARAMS_MAX 255    /* Max # of parameters which may be passed to `rpc_schedule(2)' */
-#define RPC_PROG_MEMORY_MAX 0xffff /* Max # unique byte addresses a single RPC program may access */
+#define RPC_PROG_MEMORY_MAX 0xffff /* Max # of unique byte addresses a single RPC program may access */
 #define RPC_PROG_STACK_MAX  255    /* Max # of elements which may exist on an RPC program stack */
 #define RPC_PROG_FUTEX_MAX  255    /* Max # of futex objects which a single RPC program may access */
 /************************************************************************/

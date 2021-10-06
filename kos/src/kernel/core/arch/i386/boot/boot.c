@@ -764,6 +764,11 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *       thread in this  case) is ready,  which would  get rid of  the risk  of
 	 *       the send operation running into an E_BADALLOC error. */
 
+	/* TODO: `sigprocmask(2)' needs special handling  to not needlessly modify  the
+	 *       userprocmask (if set). Needed since the userprocmask may be read-only,
+	 *       in which case sigprocmask() must only attempt to modify it when a  new
+	 *       word to-be written differs from what was written before. */
+
 	return state;
 }
 

@@ -613,9 +613,9 @@ struct hop_superblock_features /*[PREFIX(sbf_)]*/ {
 	__uint64_t            sbf_sector_size;        /* Sector/Fragment/Cluster/Frame/Page/whatever-you-want-to-call-it  size  of
 	                                               * the filesystem. Calculated from `struct hop_datablock_stat::ds_pageshift'
 	                                               * s.a.: `struct statfs::f_frsize' */
-	__uint64_t            sbf_link_max;           /* Max # links a file may have
+	__uint64_t            sbf_link_max;           /* Max # of links a file may have
 	                                               * s.a.: `pathconf(_PC_LINK_MAX)' */
-	__uint64_t            sbf_name_max;           /* Max # chars in a file name
+	__uint64_t            sbf_name_max;           /* Max # of chars in a file name
 	                                               * s.a.: `struct statfs::f_namelen', `pathconf(_PC_NAME_MAX)' */
 	__uint64_t            sbf_symlink_max;        /* Max length of text contained within symbolic links
 	                                               * s.a.: `pathconf(_PC_SYMLINK_MAX)' */
