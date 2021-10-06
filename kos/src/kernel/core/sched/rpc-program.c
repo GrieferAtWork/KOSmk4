@@ -58,6 +58,7 @@
 
 #include <assert.h>
 #include <errno.h>
+#include <inttypes.h>
 #include <stdalign.h>
 #include <stddef.h>
 #include <string.h>
@@ -965,18 +966,27 @@ rpc_vm_instr(struct rpc_vm *__restrict self)
 	byte_t opcode = rpc_vm_pc_rdb(self);
 	switch (opcode) {
 #ifdef RPC_TRACE_INSTRUCTIONS
+#define TRACE_INSTRUCTION(...) printk(KERN_TRACE "[rpc] " __VA_ARGS__)
 #define CASE(x) __IF0 { case x: printk(KERN_TRACE "[rpc] " #x "\n"); }
 #else /* RPC_TRACE_INSTRUCTIONS */
+#define TRACE_INSTRUCTION(...) /* nothing */
 #define CASE(x) case x:
 #endif /* !RPC_TRACE_INSTRUCTIONS */
 
 	CASE(RPC_OP_ret)
 		return false;
 
-	CASE(RPC_OP_sppush_const) {
+	case RPC_OP_sppush_const: {
 		byte_t buf[SIZEOF_POINTER];
 		size_t siz = rpc_vm_addrsize(self);
 		rpc_vm_pc_rdx(self, buf, siz);
+#ifdef __ARCH_HAVE_COMPAT
+		TRACE_INSTRUCTION("RPC_OP_sppush_const %#" PRIxPTR "\n",
+		                  siz == sizeof(uintptr_t) ? UNALIGNED_GET((uintptr_t *)buf)
+		                                           : (uintptr_t)UNALIGNED_GET((compat_uintptr_t *)buf));
+#else /* __ARCH_HAVE_COMPAT */
+		TRACE_INSTRUCTION("RPC_OP_sppush_const %#" PRIxPTR "\n", UNALIGNED_GET((uintptr_t *)buf));
+#endif /* !__ARCH_HAVE_COMPAT */
 		rpc_vm_push2user(self, buf, siz);
 	}	break;
 
@@ -988,45 +998,69 @@ rpc_vm_instr(struct rpc_vm *__restrict self)
 		--self->rv_stacksz;
 	}	break;
 
-	CASE(RPC_OP_const1u)
+	case RPC_OP_const1u: {
+		uint8_t value;
+		value = rpc_vm_pc_rdb(self);
+		TRACE_INSTRUCTION("RPC_OP_const1u %#" PRIx8 "\n", value);
 		if unlikely(!CANPUSH(1))
 			goto err_stack_overflow;
-		PUSH((uintptr_t)rpc_vm_pc_rdb(self));
-		break;
+		PUSH((uintptr_t)value);
+	}	break;
 
-	CASE(RPC_OP_const1s)
+	case RPC_OP_const1s: {
+		int8_t value;
+		value = (int8_t)rpc_vm_pc_rdb(self);
+		TRACE_INSTRUCTION("RPC_OP_const1s %" PRId8 "\n", value);
 		if unlikely(!CANPUSH(1))
 			goto err_stack_overflow;
-		PUSH((uintptr_t)(intptr_t)(int8_t)rpc_vm_pc_rdb(self));
-		break;
+		PUSH((uintptr_t)(intptr_t)value);
+	}	break;
 
-	CASE(RPC_OP_const2u)
+	case RPC_OP_const2u: {
+		uint16_t value;
+		value = rpc_vm_pc_rdw(self);
+		TRACE_INSTRUCTION("RPC_OP_const2u %#" PRIx16 "\n", value);
 		if unlikely(!CANPUSH(1))
 			goto err_stack_overflow;
-		PUSH((uintptr_t)rpc_vm_pc_rdw(self));
-		break;
+		PUSH((uintptr_t)value);
+	}	break;
 
-	CASE(RPC_OP_const2s)
+	case RPC_OP_const2s: {
+		int16_t value;
+		value = (int16_t)rpc_vm_pc_rdw(self);
+		TRACE_INSTRUCTION("RPC_OP_const2s %" PRId16 "\n", value);
 		if unlikely(!CANPUSH(1))
 			goto err_stack_overflow;
-		PUSH((uintptr_t)(intptr_t)(int16_t)rpc_vm_pc_rdw(self));
-		break;
+		PUSH((uintptr_t)(intptr_t)value);
+	}	break;
 
-	CASE(RPC_OP_const4s)
+	case RPC_OP_const4s:
 #if SIZEOF_POINTER < 8
-	CASE(RPC_OP_const4u)
+	case RPC_OP_const4u:
 #endif /* SIZEOF_POINTER < 8 */
+	{
+		int32_t value;
+		value = (int32_t)rpc_vm_pc_rdl(self);
+#if SIZEOF_POINTER < 8 && defined(RPC_TRACE_INSTRUCTIONS)
+		if (opcode == RPC_OP_const4u) {
+			TRACE_INSTRUCTION("RPC_OP_const4u %#" PRIx32 "\n", value);
+		} else
+#endif /* SIZEOF_POINTER >= 8 || !RPC_TRACE_INSTRUCTIONS */
+		{
+			TRACE_INSTRUCTION("RPC_OP_const4s %" PRId32 "\n", value);
+		}
 		if unlikely(!CANPUSH(1))
 			goto err_stack_overflow;
-		PUSH((uintptr_t)(intptr_t)(int32_t)rpc_vm_pc_rdl(self));
-		break;
+		PUSH((uintptr_t)(intptr_t)value);
+	}	break;
 
 #if SIZEOF_POINTER >= 8
 	CASE(RPC_OP_const4u) {
 		uintptr_t value;
+		value = (uintptr_t)rpc_vm_pc_rdl(self);
+		TRACE_INSTRUCTION("RPC_OP_const4u %#" PRIx32 "\n", (uint32_t)value);
 		if unlikely(!CANPUSH(1))
 			goto err_stack_overflow;
-		value = rpc_vm_pc_rdl(self);
 		/* Force sign extension in compatibility mode. */
 #if defined(__ARCH_HAVE_COMPAT) && __ARCH_COMPAT_SIZEOF_POINTER < SIZEOF_POINTER
 		if (ucpustate_iscompat(&self->rv_cpu))
@@ -1036,7 +1070,8 @@ rpc_vm_instr(struct rpc_vm *__restrict self)
 	}	break;
 
 	CASE(RPC_OP_const8u)
-	CASE(RPC_OP_const8s)
+	CASE(RPC_OP_const8s) {
+		uintptr_t value;
 #if defined(__ARCH_HAVE_COMPAT) && __ARCH_COMPAT_SIZEOF_POINTER < 8
 		if (rpc_vm_addrsize(self) < 8)
 			goto err_illegal_instruction;
@@ -1044,8 +1079,17 @@ rpc_vm_instr(struct rpc_vm *__restrict self)
 #endif /* __ARCH_HAVE_COMPAT && __ARCH_COMPAT_SIZEOF_POINTER < 8 */
 		if unlikely(!CANPUSH(1))
 			goto err_stack_overflow;
-		PUSH((uintptr_t)rpc_vm_pc_rdq(self));
-		break;
+		value = (uintptr_t)rpc_vm_pc_rdq(self);
+#ifdef RPC_TRACE_INSTRUCTIONS
+		if (opcode == RPC_OP_const8u) {
+			TRACE_INSTRUCTION("RPC_OP_const8u %#" PRIx64 "\n", value);
+		} else
+#endif /* RPC_TRACE_INSTRUCTIONS */
+		{
+			TRACE_INSTRUCTION("RPC_OP_const8s %" PRId64 "\n", value);
+		}
+		PUSH(value);
+	}	break;
 #endif /* SIZEOF_POINTER >= 8 */
 
 	CASE(RPC_OP_dup) {
@@ -1074,8 +1118,9 @@ rpc_vm_instr(struct rpc_vm *__restrict self)
 		PUSH(value);
 	}	break;
 
-	CASE(RPC_OP_pick) {
+	case RPC_OP_pick: {
 		uint8_t nth = rpc_vm_pc_rdb(self);
+		TRACE_INSTRUCTION("RPC_OP_pick %" PRIu8 "\n", nth);
 		if unlikely(nth >= self->rv_stacksz)
 			goto err_stack_underflow;
 		if unlikely(!CANPUSH(1))
@@ -1234,6 +1279,36 @@ rpc_vm_instr(struct rpc_vm *__restrict self)
 		--self->rv_stacksz;
 		break;
 
+#ifdef RPC_TRACE_INSTRUCTIONS
+	case RPC_OP_bra: {
+		int16_t delta;
+		delta = (int16_t)rpc_vm_pc_rdw(self);
+		TRACE_INSTRUCTION("RPC_OP_bra %" PRId16 "\n", delta);
+		if unlikely(!CANPOP(1))
+			goto err_stack_underflow;
+		--self->rv_stacksz;
+		if (self->rv_stack[self->rv_stacksz] != 0)
+			goto follow_jmp;
+		break;
+
+	case RPC_OP_nbra:
+		delta = (int16_t)rpc_vm_pc_rdw(self);
+		TRACE_INSTRUCTION("RPC_OP_nbra %" PRId16 "\n", delta);
+		if unlikely(!CANPOP(1))
+			goto err_stack_underflow;
+		--self->rv_stacksz;
+		if (self->rv_stack[self->rv_stacksz] == 0)
+			goto follow_jmp;
+		break;
+
+	case RPC_OP_skip:
+		delta = (int16_t)rpc_vm_pc_rdw(self);
+		TRACE_INSTRUCTION("RPC_OP_skip %" PRId16 "\n", delta);
+follow_jmp:
+		self->rv_pc += delta;   /* Adjust program counter */
+		self->rv_pcbuf_siz = 0; /* Clear program text buffer */
+	}	break;
+#else /* RPC_TRACE_INSTRUCTIONS */
 	CASE(RPC_OP_bra)
 		if unlikely(!CANPOP(1))
 			goto err_stack_underflow;
@@ -1259,39 +1334,40 @@ follow_jmp:
 		self->rv_pc += delta;   /* Adjust program counter */
 		self->rv_pcbuf_siz = 0; /* Clear program text buffer */
 	}	break;
+#endif /* !RPC_TRACE_INSTRUCTIONS */
 
 	case RPC_OP_popreg0 ...  RPC_OP_popreg31:
-#ifdef RPC_TRACE_INSTRUCTIONS
-		printk(KERN_TRACE "[rpc] RPC_OP_popreg%u\n", opcode - RPC_OP_popreg0);
-#endif /* RPC_TRACE_INSTRUCTIONS */
+		TRACE_INSTRUCTION("RPC_OP_popreg%u\n", opcode - RPC_OP_popreg0);
 		rpc_vm_popreg(self, opcode - RPC_OP_popreg0);
 		break;
 
 	case RPC_OP_pushreg0 ...  RPC_OP_pushreg31:
-#ifdef RPC_TRACE_INSTRUCTIONS
-		printk(KERN_TRACE "[rpc] RPC_OP_pushreg%u\n", opcode - RPC_OP_pushreg0);
-#endif /* RPC_TRACE_INSTRUCTIONS */
+		TRACE_INSTRUCTION("RPC_OP_pushreg%u\n", opcode - RPC_OP_pushreg0);
 		rpc_vm_pushreg(self, opcode - RPC_OP_pushreg0);
 		break;
 
 	case RPC_OP_sppushreg0 ...  RPC_OP_sppushreg31:
-#ifdef RPC_TRACE_INSTRUCTIONS
-		printk(KERN_TRACE "[rpc] RPC_OP_sppushreg%u\n", opcode - RPC_OP_sppushreg0);
-#endif /* RPC_TRACE_INSTRUCTIONS */
+		TRACE_INSTRUCTION("RPC_OP_sppushreg%u\n", opcode - RPC_OP_sppushreg0);
 		rpc_vm_pushreg2user(self, opcode - RPC_OP_sppushreg0);
 		break;
 
-	CASE(RPC_OP_popregx)
-		rpc_vm_popreg(self, rpc_vm_pc_rduleb128(self));
-		break;
+	case RPC_OP_popregx: {
+		uintptr_t regno = rpc_vm_pc_rduleb128(self);
+		TRACE_INSTRUCTION("RPC_OP_popregx %" PRIuPTR "\n", regno);
+		rpc_vm_popreg(self, regno);
+	}	break;
 
-	CASE(RPC_OP_pushregx)
-		rpc_vm_pushreg(self, rpc_vm_pc_rduleb128(self));
-		break;
+	case RPC_OP_pushregx: {
+		uintptr_t regno = rpc_vm_pc_rduleb128(self);
+		TRACE_INSTRUCTION("RPC_OP_pushregx %" PRIuPTR "\n", regno);
+		rpc_vm_pushreg(self, regno);
+	}	break;
 
-	CASE(RPC_OP_sppushregx)
-		rpc_vm_pushreg2user(self, rpc_vm_pc_rduleb128(self));
-		break;
+	case RPC_OP_sppushregx: {
+		uintptr_t regno = rpc_vm_pc_rduleb128(self);
+		TRACE_INSTRUCTION("RPC_OP_sppushregx %" PRIuPTR "\n", regno);
+		rpc_vm_pushreg2user(self, regno);
+	}	break;
 
 	CASE(RPC_OP_deref) {
 		size_t siz = rpc_vm_addrsize(self);
@@ -1300,8 +1376,9 @@ follow_jmp:
 		rpc_vm_rdmem(self, TOP, &TOP, siz);
 	}	break;
 
-	CASE(RPC_OP_deref_size) {
+	case RPC_OP_deref_size: {
 		uint8_t siz = rpc_vm_pc_rdb(self);
+		TRACE_INSTRUCTION("RPC_OP_deref_size %" PRIu8 "\n", siz);
 		if unlikely(!CANPOP(1))
 			goto err_stack_underflow;
 		switch (siz) {
@@ -1339,8 +1416,9 @@ follow_jmp:
 		rpc_vm_wrmem(self, addr, &val, siz);
 	}	break;
 
-	CASE(RPC_OP_write_size) {
+	case RPC_OP_write_size: {
 		uint8_t siz = rpc_vm_pc_rdb(self);
+		TRACE_INSTRUCTION("RPC_OP_write_size %" PRIu8 "\n", siz);
 		uintptr_t addr, val;
 		if unlikely(!CANPOP(2))
 			goto err_stack_underflow;
@@ -1374,9 +1452,10 @@ follow_jmp:
 	CASE(RPC_OP_nop)
 		break;
 
-	CASE(RPC_OP_widenz) {
+	case RPC_OP_widenz: {
 		uint8_t siz = rpc_vm_pc_rdb(self);
 		uintptr_t value;
+		TRACE_INSTRUCTION("RPC_OP_widenz %" PRIu8 "\n", siz);
 		if unlikely(!CANPOP(1))
 			goto err_stack_underflow;
 		value = TOP;
@@ -1410,9 +1489,10 @@ follow_jmp:
 		TOP = value;
 	}	break;
 
-	CASE(RPC_OP_widens) {
+	case RPC_OP_widens: {
 		uint8_t siz = rpc_vm_pc_rdb(self);
 		uintptr_t value;
+		TRACE_INSTRUCTION("RPC_OP_widens %" PRIu8 "\n", siz);
 		if unlikely(!CANPOP(1))
 			goto err_stack_underflow;
 		value = TOP;
@@ -1472,8 +1552,9 @@ follow_jmp:
 		PUSH(self->rv_sc_info != NULL ? 1 : 0);
 		break;
 
-	CASE(RPC_OP_push_sc_info) {
+	case RPC_OP_push_sc_info: {
 		uint8_t index = rpc_vm_pc_rdb(self);
+		TRACE_INSTRUCTION("RPC_OP_push_sc_info %" PRIu8 "\n", index);
 		if unlikely(index >= sizeof(struct rpc_syscall_info) / sizeof(void *)) {
 			THROW(E_INVALID_ARGUMENT_BAD_VALUE,
 			      E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_BAD_SYSINFO_WORD,
@@ -1509,8 +1590,9 @@ follow_jmp:
 		}
 	}	break;
 
-	CASE(RPC_OP_push_param) {
+	case RPC_OP_push_param: {
 		uint8_t index = rpc_vm_pc_rdb(self);
+		TRACE_INSTRUCTION("RPC_OP_push_param %" PRIu8 "\n", index);
 		if unlikely(index >= self->rv_rpc->pr_user.pur_argc) {
 			THROW(E_INVALID_ARGUMENT_BAD_VALUE,
 			      E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_PARAM_INDEX_OOB,
@@ -1557,9 +1639,10 @@ follow_jmp:
 		sigaddset(&self->rv_sigmask, signo);
 	}	break;
 
-	CASE(RPC_OP_push_sigmask_word) {
+	case RPC_OP_push_sigmask_word: {
 		uint8_t index = rpc_vm_pc_rdb(self);
 		USER CHECKED sigset_t const *mymask;
+		TRACE_INSTRUCTION("RPC_OP_push_sigmask_word %" PRIu8 "\n", index);
 		if unlikely(!CANPUSH(1))
 			goto err_stack_overflow;
 		mymask = sigmask_getrd();
@@ -1584,8 +1667,9 @@ follow_jmp:
 		}
 	}	break;
 
-	CASE(RPC_OP_sppush_sigmask) {
+	case RPC_OP_sppush_sigmask: {
 		uint16_t sigsetsz = rpc_vm_pc_rdw(self);
+		TRACE_INSTRUCTION("RPC_OP_sppush_sigmask %" PRIu16 "\n", sigsetsz);
 		USER CHECKED sigset_t const *mymask;
 		if unlikely(sigsetsz > sizeof(sigset_t)) {
 			THROW(E_INVALID_ARGUMENT_BAD_VALUE,
@@ -1701,6 +1785,7 @@ err_illegal_instruction:
 		      E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_INSTRUCTION,
 		      opcode);
 		break;
+#undef TRACE_INSTRUCTION
 #undef CASE
 	}
 	return true;
