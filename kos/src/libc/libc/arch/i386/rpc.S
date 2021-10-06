@@ -101,6 +101,10 @@ INTERN_FUNCTION(libc_x86_rpc_restorer)
 	cmpP   $(RPC_REASONCTX_SYSCALL), rc_context(%Psp)  /* Check if we must restart a system call. */
 	cmovneP %R_sigreturn_sigmask, %R_sigreturn_sc_info /* if (rc_context != RPC_REASONCTX_SYSCALL) sc_info = NULL; */
 	movP   $(SYS_sigreturn), %Pax
+	std    /* Enable  exceptions (this syscall shouldn't fail, but
+	        * if it does, it shouldn't return with a normal error,
+	        * but with an exception that  will likely turn into  a
+	        * coredump) */
 	syscall
 	.cfi_endproc
 END(libc_x86_rpc_restorer)

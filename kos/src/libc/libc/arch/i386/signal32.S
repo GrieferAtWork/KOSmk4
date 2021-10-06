@@ -123,6 +123,10 @@ for (local reg, offset: {
 	nop /* For unwinding... */
 INTERN_FUNCTION(libc_sig_restore)
 	movl  $(SYS_sigreturn), %eax
+	std   /* Enable  exceptions (this syscall shouldn't fail, but
+	       * if it does, it shouldn't return with a normal error,
+	       * but with an exception that  will likely turn into  a
+	       * coredump) */
 	int   $(0x80)
 END(libc_sig_restore)
 	.cfi_endproc
