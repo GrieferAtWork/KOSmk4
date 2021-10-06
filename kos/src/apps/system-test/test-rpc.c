@@ -57,7 +57,11 @@ my_rpc_function2(struct rpc_context *__restrict ctx,
                  void *cookie) {
 	EQp(cookie, (void *)123);
 	/* Special case: kernel says that the system call was "interrupted",
-	 *               when  it   actuality  it   wasn't  (returns   -EOK) */
+	 *               when it actuality wasn't (returns is -EOK). This is
+	 *               intended and a consequence of the special case that
+	 *               is  trying to send  an RPC to  one's own thread (or
+	 *               process)  while  that RPC  isn't masked,  and while
+	 *               also passing the `RPC_JOIN_WAITFOR' flag. */
 	EQp(ctx->rc_context, RPC_REASONCTX_SYSINT);
 	EQp(ctx->rc_scinfo.rsi_sysno, SYS_rpc_schedule);
 	assertf(ctx->rc_scinfo.rsi_flags & RPC_SYSCALL_INFO_FEXCEPT,
@@ -80,7 +84,7 @@ DEFINE_TEST(rpc) {
 
 	EQd(rpc_function_called, 0);
 	errno = 0;
-	EQd(rpc_serve(), -1); /* !!! cancellation point !!! */
+	EQd(rpc_serve(), -1); /* !!! cancellation point !!!    (think: `pthread_testcancel(3)') */
 	EQd(errno, EINTR);
 	EQd(rpc_function_called, 1);
 	EQd(rpc_serve(), 0);

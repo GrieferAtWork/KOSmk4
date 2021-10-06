@@ -394,25 +394,54 @@
 
 /* RPC synchronization options */
 
-/* RPC may only be executed when the target thread is making
- * a system call that is  a cancellation point, after  which
- * that call will be interrupted, the RPC will be  executed,
- * and the system call (may) be restarted. */
-#define RPC_SYNCMODE_SYNC  0x0000 /* default */
-
 /* RPC  may be executed at any point while the target thread
  * is running in user-space, so-long as SIGRPC isn't masked.
  * While the thread is in kernel-space, behavior is the same
  * as for `RPC_SYNCMODE_SYNC'. As such, this option can also
- * be seen as a flag "ALLOW_DELIVERLY_WHILE_IN_USERSPACE" */
+ * be seen as a flag "ALLOW_DELIVERLY_WHILE_IN_USERSPACE"
+ *
+ * Handled when (if `RPC_SIGNO(signo=SIGRPC)' isn't masked):
+ *   - As soon as possible,  following the same semantics  as
+ *     a normal POSIX signal (~ala signal(2) + kill(2)) does.
+ *   - This also includes the case where the target thread is
+ *     currently in kernel-space, in which case the RPC  will
+ *     be executed as soon as a return to user-space is made,
+ *     which  is  guarantied  to happen  without  any further
+ *     intervention by means of having an active system  call
+ *     return with -EINTR, or having it be restarted once the
+ *     RPC function returns. */
 #define RPC_SYNCMODE_ASYNC RPC_SYNCMODE_F_ALLOW_ASYNC
+
+/* RPC may only be executed when the target thread is making
+ * a system call that is  a cancellation point, after  which
+ * that call will be interrupted, the RPC will be  executed,
+ * and the system call (may) be restarted.
+ *
+ * Handled when (if `RPC_SIGNO(signo=SIGRPC)' isn't masked):
+ *   - Any system call  or interrupt makes  a call to  `task_serve()'
+ *     This includes things like a page-fault blocking due to needing
+ *     to read more data from disk, which is handled as the interrupt
+ *     being aborted and the RPC being served.
+ *   - _NOT_ handled while  the thread is  in user-space, or  is
+ *     only performing operations  that don't  block. Note  that
+ *     the exact definition of what is/isn't consider a blocking
+ *     operation here (intentionally) isn't well defined.
+ *   - If more well-defined behavior is needed, consider making
+ *     use of `RPC_SYNCMODE_CP' instead. */
+#define RPC_SYNCMODE_SYNC  0x0000 /* default */
 
 /* RPC is only handled when  interrupting a system call  that
  * has been marked  as a cancellation  point. Otherwise,  the
  * RPC will be marked as inactive until the end of the system
  * call,  such that  it's next  chance at  being handled only
  * comes about the next time a (different) system call  makes
- * a call to `task_serve()' */
+ * a call to `task_serve()'
+ *
+ * Handled when (if `RPC_SIGNO(signo=SIGRPC)' isn't masked):
+ *   - A system call marked as [cp] makes a call to `task_serve()'
+ *     IOW: A cancellation point does a blocking operation
+ *   - The `sys_rpc_serve(2)' system call is invoked
+ *     IOW: You make a call to `pthread_testcancel(3)' */
 #define RPC_SYNCMODE_CP (RPC_SYNCMODE_F_REQUIRE_SC | RPC_SYNCMODE_F_REQUIRE_CP)
 /************************************************************************/
 
@@ -489,10 +518,10 @@
                                            * program used to push that function onto the target
                                            * thread's stack.
                                            *
-                                           * NOTE: When sending an RPC to one's own thread (or
-                                           *       process), this option will cause the RPC to
+                                           * NOTE: When sending an RPC to one's own thread  (or
+                                           *       process),  this option will cause the RPC to
                                            *       be invoked with `RPC_REASONCTX_SYSINT', even
-                                           *       though `sys_rpc_schedule(2)' will return to
+                                           *       though `sys_rpc_schedule(2)' will return  to
                                            *       indicate success, rather than INTERRUPT.
                                            */
 #define RPC_JOIN_ASYNC   RPC_JOIN_F_ASYNC /* Let the RPC program run asynchronously. */
