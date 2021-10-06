@@ -32,9 +32,11 @@
 #include <kernel/syscall.h>
 #include <kernel/user.h>
 #include <sched/pid.h>
+#include <sched/posix-signal.h>
 #include <sched/rpc-internal.h>
 #include <sched/rpc.h>
 #include <sched/signal.h>
+#include <sched/task.h>
 
 #include <hybrid/atomic.h>
 
@@ -151,15 +153,41 @@ DEFINE_SYSCALL5(errno_t, rpc_schedule,
 
 	/* Lookup the target thread. */
 	target = pidns_lookup_task(THIS_PIDNS, (upid_t)target_tid);
+	{
+		FINALLY_DECREF_UNLIKELY(target);
 
-	/* Schedule the RPC */
-	rpc->pr_user.pur_refcnt = 2; /* +1 for the target component's list. */
-	COMPILER_WRITE_BARRIER();
-	if (!((mode & RPC_DOMAIN_F_PROC) ? proc_rpc_schedule(target, rpc)
-	                                 : task_rpc_schedule(target, rpc))) {
-		rpc->pr_user.pur_refcnt = 1;
+		/* Schedule the RPC */
+		rpc->pr_user.pur_refcnt = 2; /* +1 for the target component's list. */
 		COMPILER_WRITE_BARRIER();
-		THROW(E_PROCESS_EXITED, (upid_t)target_tid);
+		if (mode & RPC_DOMAIN_F_PROC) {
+			target = task_getprocess_of(target);
+			if (target == task_getprocess() && !(mode & RPC_JOIN_F_ASYNC) &&
+			    !sigmask_ismasked(_RPC_GETSIGNO(mode)))
+				goto handle_self_rpc;
+			if (!proc_rpc_schedule(target, rpc))
+				goto err_schedule_failed;
+		} else {
+			if (target == THIS_TASK && !(mode & RPC_JOIN_F_ASYNC) &&
+			    !sigmask_ismasked(_RPC_GETSIGNO(mode))) {
+handle_self_rpc:
+				/* TODO: Special case: Execute the RPC immediately, with:
+				 *        - sc_info != NULL                 (info describes the `rpc_schedule(2)' system call)
+				 *        - reason == _RPC_REASONCTX_SYNC   (don't let the RPC restart the system call)
+				 * Additionally, any exception thrown during the RPC program's
+				 * execution will be propagated back to user-space as  normal.
+				 *
+				 * Upon entry, the register state passed to the RPC program indicates
+				 * a successful completion of the `rpc_schedule(2)' system call (iow:
+				 * the return register is set to `-EOK') */
+				;
+			}
+			if (!task_rpc_schedule(target, rpc)) {
+err_schedule_failed:
+				rpc->pr_user.pur_refcnt = 1;
+				COMPILER_WRITE_BARRIER();
+				THROW(E_PROCESS_EXITED, (upid_t)target_tid);
+			}
+		}
 	}
 
 	/* (possibly) wait for completion */
@@ -178,7 +206,8 @@ DEFINE_SYSCALL5(errno_t, rpc_schedule,
 			TRY {
 				task_waitfor();
 			} EXCEPT {
-				error_code_t code;
+				error_code_t code = error_code();
+
 				/* Must  cancel the RPC  if we get  here, and, if that
 				 * cancel can't be performed because the RPC finished,
 				 * then we must discard the exception (unless it's  an
@@ -194,7 +223,6 @@ DEFINE_SYSCALL5(errno_t, rpc_schedule,
 				 * A special case here are  RT exception which are  too
 				 * important to dismiss (as they include stuff like our
 				 * own thread being supposed to terminate) */
-				code = error_code();
 				if (ERRORCLASS_ISRTLPRIORITY(ERROR_CLASS(code)))
 					RETHROW(); /* Sorry. Can't discard this one... */
 
@@ -220,6 +248,7 @@ DEFINE_SYSCALL5(errno_t, rpc_schedule,
 			struct exception_data *tls;
 			assert(status == PENDING_USER_RPC_STATUS_CANCELED ||
 			       status == PENDING_USER_RPC_STATUS_ERROR);
+
 			/* The RPC was canceled, but it wasn't us. This can only mean that
 			 * the  target thread/process exited and will no longer be able to
 			 * service _any_ rpcs at all! */
