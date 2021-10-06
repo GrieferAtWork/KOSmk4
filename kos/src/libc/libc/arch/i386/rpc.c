@@ -109,16 +109,24 @@ rpc_exec_program[] = {
 	# Load the actual address of the RPC function to invoke
 	movP   *param:$0, %Pip
 
+	# If the interrupted system call had exceptions enabled,
+	# then %Pflags.DF will still be set at this point. However,
+	# all user-space C code may assume that DF=0 (since it's
+	# not compiled with `-mcld' like kernel-code is).
+	#
+	# As such, manually mask the DF bit here
+	and    ~$EFLAGS_DF, %Pflags
+
 ]]]*/
 #ifdef __x86_64__
 	87,128,146,49,112,114,113,115,5,118,116,117,120,121,122,123,
 	124,125,126,127,146,52,146,51,146,58,146,59,146,53,146,50,
 	146,54,146,55,87,162,168,1,0,164,5,160,5,165,1,52,
-	87,53,165,0,64
+	87,53,165,0,64,144,49,11,255,251,26,16,49
 #else /* __x86_64__ */
 	84,120,121,146,42,146,41,146,43,146,40,146,44,146,45,112,
 	113,114,115,5,117,118,119,84,162,168,1,0,164,5,160,5,
-	84,165,1,5,5,165,0,56
+	84,165,1,5,5,165,0,56,89,11,255,251,26,57
 #endif /* !__x86_64__ */
 /*[[[end]]]*/
 	,
