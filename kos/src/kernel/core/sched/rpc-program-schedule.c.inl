@@ -19,8 +19,8 @@
  */
 #ifdef __INTELLISENSE__
 #define _KOS_SOURCE 1
-//#define DEFINE_sys_rpc_schedule
-#define DEFINE_compat_sys_rpc_schedule
+#define DEFINE_sys_rpc_schedule
+//#define DEFINE_compat_sys_rpc_schedule
 #endif /* __INTELLISENSE__ */
 
 #include <kernel/compiler.h>
