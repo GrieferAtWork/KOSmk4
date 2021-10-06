@@ -1692,6 +1692,38 @@ NOTHROW_NCX(LIBCCALL libc_pthread_getcpuclockid)(pthread_t pthread,
 }
 /*[[[end:libc_pthread_getcpuclockid]]]*/
 
+/*[[[head:libc_pthread_rpc_exec,hash:CRC-32=0xd42ab8fa]]]*/
+/* >> pthread_rpc_exec(3)
+ * Schedule an RPC for `target_thread' to-be executed the next  time
+ * it makes a call to a cancellation-point system call (or interrupt
+ * an active system call, should one such currently be in progress).
+ *   - RPCs are also executed by `pthread_testcancel(3)'
+ *   - The `struct rpc_context' structure is defined in `<kos/rpc.h>'
+ * @return: 0:      Success
+ * @return: ENOMEM: Insufficient system memory
+ * @return: ESRCH:  The given `target_thread' has already terminated */
+INTERN ATTR_SECTION(".text.crt.sched.pthread") WUNUSED errno_t
+NOTHROW_RPC(LIBCCALL libc_pthread_rpc_exec)(pthread_t target_thread,
+                                            void (LIBKCALL *func)(struct rpc_context *__restrict ctx, void *cookie),
+                                            void *cookie)
+/*[[[body:libc_pthread_rpc_exec]]]*/
+{
+	pid_t tid;
+	tid = ATOMIC_READ(target_thread->pt_tid);
+	if unlikely(tid == 0)
+		return ESRCH;
+	/* Schedule  an RPC in the target thread that  will cause the thread to terminate itself.
+	 * Note that this RPC is scheduled to only execute the next time a call to a cancellation
+	 * point  system call is  made, and that system  call ends up  blocking (iow: calling the
+	 * kernel function `task_serve()') */
+	if unlikely(rpc_exec(tid, RPC_SYNCMODE_CP | RPC_DOMAIN_THREAD | RPC_JOIN_WAITFOR, func, cookie) != 0)
+		return libc_geterrno();
+	return EOK;
+}
+/*[[[end:libc_pthread_rpc_exec]]]*/
+
+
+
 
 
 
@@ -3755,7 +3787,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_setspecific)(pthread_key_t key,
 
 
 
-/*[[[start:exports,hash:CRC-32=0x4ff42742]]]*/
+/*[[[start:exports,hash:CRC-32=0x7f9488d0]]]*/
 #ifndef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(DOS$pthread_create, libd_pthread_create);
 #endif /* !__LIBCCALL_IS_LIBDCALL */
@@ -3801,6 +3833,7 @@ DEFINE_PUBLIC_ALIAS(pthread_getname_np, libc_pthread_getname_np);
 DEFINE_PUBLIC_ALIAS(pthread_set_name_np, libc_pthread_setname_np);
 DEFINE_PUBLIC_ALIAS(pthread_setname_np, libc_pthread_setname_np);
 DEFINE_PUBLIC_ALIAS(pthread_gettid_np, libc_pthread_gettid_np);
+DEFINE_PUBLIC_ALIAS(pthread_rpc_exec, libc_pthread_rpc_exec);
 DEFINE_PUBLIC_ALIAS(pthread_getconcurrency, libc_pthread_getconcurrency);
 DEFINE_PUBLIC_ALIAS(pthread_setconcurrency, libc_pthread_setconcurrency);
 DEFINE_PUBLIC_ALIAS(pthread_setaffinity_np, libc_pthread_setaffinity_np);

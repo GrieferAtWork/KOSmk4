@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3cabab18 */
+/* HASH CRC-32:0xd2c9a568 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -996,6 +996,17 @@ __CREDIRECT(__ATTR_NONNULL((2)),__errno_t,__NOTHROW_NCX,pthread_setname_np,(pthr
  * @return: 0 : The given `target_thread' has already terminated */
 __CDECLARE(__ATTR_PURE __ATTR_WUNUSED,__pid_t,__NOTHROW_NCX,pthread_gettid_np,(pthread_t __target_thread),(__target_thread))
 #endif /* !__pthread_gettid_np_defined && __CRT_HAVE_pthread_gettid_np */
+struct rpc_context;
+/* >> pthread_rpc_exec(3)
+ * Schedule an RPC for `target_thread' to-be executed the next  time
+ * it makes a call to a cancellation-point system call (or interrupt
+ * an active system call, should one such currently be in progress).
+ *   - RPCs are also executed by `pthread_testcancel(3)'
+ *   - The `struct rpc_context' structure is defined in `<kos/rpc.h>'
+ * @return: 0:      Success
+ * @return: ENOMEM: Insufficient system memory
+ * @return: ESRCH:  The given `target_thread' has already terminated */
+__CDECLARE_OPT(__ATTR_WUNUSED,__errno_t,__NOTHROW_RPC,pthread_rpc_exec,(pthread_t __target_thread, void (__LIBKCALL *__func)(struct rpc_context *__restrict __ctx, void *__cookie), void *__cookie),(__target_thread,__func,__cookie))
 #endif /* __USE_KOS */
 #ifdef __USE_UNIX98
 /* >> pthread_getconcurrency(3)

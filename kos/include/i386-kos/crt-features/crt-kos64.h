@@ -2875,6 +2875,7 @@
 #define __CRT_HAVE_pthread_mutexattr_settype
 #define __CRT_HAVE_pthread_num_processors_np
 #define __CRT_HAVE_pthread_once
+#define __CRT_HAVE_pthread_rpc_exec
 #define __CRT_HAVE_pthread_rwlock_destroy
 #define __CRT_HAVE_pthread_rwlock_init
 #define __CRT_HAVE_pthread_rwlock_rdlock

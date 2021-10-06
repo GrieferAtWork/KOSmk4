@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x12df186e */
+/* HASH CRC-32:0xfc918f95 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -257,6 +257,16 @@ INTDEF NONNULL((2)) errno_t NOTHROW_NCX(LIBCCALL libc_pthread_setname_np)(pthrea
  * @return: * : The TID of the given thread
  * @return: 0 : The given `target_thread' has already terminated */
 INTDEF ATTR_PURE WUNUSED pid_t NOTHROW_NCX(LIBCCALL libc_pthread_gettid_np)(pthread_t target_thread);
+/* >> pthread_rpc_exec(3)
+ * Schedule an RPC for `target_thread' to-be executed the next  time
+ * it makes a call to a cancellation-point system call (or interrupt
+ * an active system call, should one such currently be in progress).
+ *   - RPCs are also executed by `pthread_testcancel(3)'
+ *   - The `struct rpc_context' structure is defined in `<kos/rpc.h>'
+ * @return: 0:      Success
+ * @return: ENOMEM: Insufficient system memory
+ * @return: ESRCH:  The given `target_thread' has already terminated */
+INTDEF WUNUSED errno_t NOTHROW_RPC(LIBCCALL libc_pthread_rpc_exec)(pthread_t target_thread, void (LIBKCALL *func)(struct rpc_context *__restrict ctx, void *cookie), void *cookie);
 /* >> pthread_getconcurrency(3)
  * Determine level of concurrency
  * @return: * : The current concurrency level */

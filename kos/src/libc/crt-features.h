@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbead7c72 */
+/* HASH CRC-32:0xd46a1eba */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -5247,6 +5247,7 @@
 #define __CRT_HAVE_pthread_mutexattr_settype
 #define __CRT_HAVE_pthread_num_processors_np
 #define __CRT_HAVE_pthread_once
+#define __CRT_HAVE_pthread_rpc_exec
 #define __CRT_HAVE_pthread_rwlock_destroy
 #define __CRT_HAVE_pthread_rwlock_init
 #define __CRT_HAVE_pthread_rwlock_rdlock

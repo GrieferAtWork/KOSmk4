@@ -1102,6 +1102,23 @@ $errno_t pthread_setname_np(pthread_t target_thread,
 [[guard, pure, wunused]]
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
 $pid_t pthread_gettid_np(pthread_t target_thread);
+
+%struct rpc_context;
+
+@@>> pthread_rpc_exec(3)
+@@Schedule an RPC for `target_thread' to-be executed the next  time
+@@it makes a call to a cancellation-point system call (or interrupt
+@@an active system call, should one such currently be in progress).
+@@  - RPCs are also executed by `pthread_testcancel(3)'
+@@  - The `struct rpc_context' structure is defined in `<kos/rpc.h>'
+@@@return: 0:      Success
+@@@return: ENOMEM: Insufficient system memory
+@@@return: ESRCH:  The given `target_thread' has already terminated
+[[cp, nodos, wunused]]
+[[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
+$errno_t pthread_rpc_exec(pthread_t target_thread,
+                          void (LIBKCALL *func)(struct rpc_context *__restrict ctx, void *cookie),
+                          void *cookie);
 %#endif /* __USE_KOS */
 
 
