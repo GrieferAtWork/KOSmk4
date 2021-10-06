@@ -381,6 +381,14 @@ rpc_mem_writeback(struct rpc_mem *__restrict self) {
 	}
 }
 
+/* Verify that `addr' is writable (VIO is allowed), but DON'T invoke VIO (if `addr' points to such a mapping) */
+LOCAL void FCALL verify_writable_byte(USER CHECKED byte_t *addr) {
+	byte_t buf;
+	if (!readb_nopf(addr, &buf) || !writeb_nopf(addr, buf)) {
+		/* Force a fault for the given address */
+		mman_forcefault(THIS_MMAN, addr, 1, MMAN_FAULT_F_WRITE);
+	}
+}
 
 #define rpc_mem_read(self, addr, buf, num_bytes)  rpc_mem_readwrite(self, (byte_t *)(addr), buf, num_bytes, false)
 #define rpc_mem_write(self, addr, buf, num_bytes) rpc_mem_readwrite(self, (byte_t *)(addr), (void *)(buf), num_bytes, true)
@@ -512,10 +520,8 @@ rw_bank:
 							THROW(E_INVALID_ARGUMENT_BAD_STATE,
 							      E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_MEMORY);
 					}
-					/* Ensure that the address is writable, but don't write the final value, yet.
-					 * TODO: This can be done better (VIO shouldn't be invoked, and the check can
-					 *       be done on a per-page basis) */
-					ATOMIC_WRITE(addr[j], ATOMIC_READ(addr[j]));
+					/* Ensure that the address is writable, but don't write the final value, yet. */
+					verify_writable_byte(addr + j);
 					st = RPC_MEMBANK_STATUS_F_LOADED | RPC_MEMBANK_STATUS_F_CHANGED;
 					rpc_membank_setstatus(bank, reladdr, st);
 				}
