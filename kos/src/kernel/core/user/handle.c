@@ -28,9 +28,11 @@
 #include <debugger/hook.h>
 #include <dev/block.h>
 #include <dev/char.h>
+#include <fs/fifo.h>
 #include <fs/file.h>
 #include <fs/node.h>
 #include <fs/pipe.h>
+#include <fs/special-node.h>
 #include <fs/vfs.h>
 #include <kernel/except.h>
 #include <kernel/handle.h>
@@ -2236,14 +2238,21 @@ handle_fcntl(struct handle_manager *__restrict self,
 	case F_SETPIPE_SZ:
 		temp = handle_lookupin(fd, self);
 		TRY {
-			struct pipe *p;
+			struct ringbuffer *rb;
 			size_t newsize;
-			/* TODO: Support for named pipes */
 			if (temp.h_type == HANDLE_TYPE_PIPE_READER ||
 			    temp.h_type == HANDLE_TYPE_PIPE_WRITER) {
-				p = ((struct pipe_reader *)temp.h_data)->pr_pipe;
+				struct pipe_reader *me;
+				me = (struct pipe_reader *)temp.h_data;
+				rb = &me->pr_pipe->p_buffer;
 			} else if (temp.h_type == HANDLE_TYPE_PIPE) {
-				p = (struct pipe *)temp.h_data;
+				struct pipe *me;
+				me = (struct pipe *)temp.h_data;
+				rb = &me->p_buffer;
+			} else if (temp.h_type == HANDLE_TYPE_FIFO_USER) {
+				struct fifo_user *me;
+				me = (struct fifo_user *)temp.h_data;
+				rb = &me->fu_fifo->f_fifo.ff_buffer;
 			} else {
 				THROW(E_INVALID_HANDLE_FILETYPE, fd,
 				      HANDLE_TYPE_PIPE, temp.h_type,
@@ -2257,7 +2266,7 @@ handle_fcntl(struct handle_manager *__restrict self,
 				      E_INVALID_ARGUMENT_CONTEXT_BAD_PIPE_BUFFER_SIZE,
 				      newsize);
 			}
-			ringbuffer_set_pipe_limit(&p->p_buffer, newsize);
+			ringbuffer_set_pipe_limit(rb, newsize);
 		} EXCEPT {
 			decref_unlikely(temp);
 			RETHROW();
@@ -2269,19 +2278,27 @@ handle_fcntl(struct handle_manager *__restrict self,
 	case F_GETPIPE_SZ:
 		temp = handle_lookupin(fd, self);
 		TRY {
-			struct pipe *p;
+			struct ringbuffer *rb;
 			if (temp.h_type == HANDLE_TYPE_PIPE_READER ||
 			    temp.h_type == HANDLE_TYPE_PIPE_WRITER) {
-				p = ((struct pipe_reader *)temp.h_data)->pr_pipe;
+				struct pipe_reader *me;
+				me = (struct pipe_reader *)temp.h_data;
+				rb = &me->pr_pipe->p_buffer;
 			} else if (temp.h_type == HANDLE_TYPE_PIPE) {
-				p = (struct pipe *)temp.h_data;
+				struct pipe *me;
+				me = (struct pipe *)temp.h_data;
+				rb = &me->p_buffer;
+			} else if (temp.h_type == HANDLE_TYPE_FIFO_USER) {
+				struct fifo_user *me;
+				me = (struct fifo_user *)temp.h_data;
+				rb = &me->fu_fifo->f_fifo.ff_buffer;
 			} else {
 				THROW(E_INVALID_HANDLE_FILETYPE, fd,
 				      HANDLE_TYPE_PIDNS, temp.h_type,
 				      HANDLE_TYPEKIND_GENERIC,
 				      handle_typekind(&temp));
 			}
-			result = ATOMIC_READ(p->p_buffer.rb_limit);
+			result = ATOMIC_READ(rb->rb_limit);
 		} EXCEPT {
 			decref_unlikely(temp);
 			RETHROW();
