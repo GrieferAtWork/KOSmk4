@@ -171,6 +171,9 @@ rpc_schedule_in_this_task(struct pending_rpc *__restrict rpc,
 				/* Continue working with the secondary copy. */
 				rpc = copy;
 			} else {
+				/* Nothing else (except our caller; s.a. `FINALLY_DECREF(&rpc->pr_user);'
+				 * within  `sys_rpc_schedule(2)' below) is  using the RPC,  so no need to
+				 * copy it. */
 				incref(&rpc->pr_user);
 			}
 		} else {
