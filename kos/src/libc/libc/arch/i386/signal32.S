@@ -31,7 +31,6 @@
 #include <syscall.h>
 
 .section .text.crt.sched.signal
-INTERN_FUNCTION(libc_sig_restore)
 	.cfi_startproc simple
 	.cfi_signal_frame
 	/* %ebp: [1..1] struct ucpustate const *restore_cpu  CPU context */
@@ -121,9 +120,11 @@ for (local reg, offset: {
 	.cfi_escape 22,39,22,115,0,18,32,40,12,0,18,49,26,40,6,0,35,24,6,47,3,0,146,39,0
 /*[[[end]]]*/
 
+	nop /* For unwinding... */
+INTERN_FUNCTION(libc_sig_restore)
 	movl  $(SYS_sigreturn), %eax
 	int   $(0x80)
-	.cfi_endproc
 END(libc_sig_restore)
+	.cfi_endproc
 
 #endif /* !GUARD_LIBC_LIBC_ARCH_I386_SIGNAL32_S */

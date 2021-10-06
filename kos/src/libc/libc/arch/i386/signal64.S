@@ -31,7 +31,6 @@
 #include <syscall.h>
 
 .section .text.crt.sched.signal
-INTERN_FUNCTION(libc_sig_restore)
 	.cfi_startproc simple
 	.cfi_signal_frame
 	/* %rbp: [1..1] struct ucpustate const *restore_cpu  CPU context */
@@ -40,6 +39,7 @@ INTERN_FUNCTION(libc_sig_restore)
 	/* %r13: [0..1] struct rpc_syscall_info *sc_info     Restartable system call */
 	.cfi_def_cfa %rbp, 0
 	ASM_CFI_REL_OFFSET_RESTORE_UCPUSTATE(0)
+
 /*[[[deemon
 import outputForAssembly from ......misc.libgen.cfi.comp;
 for (local reg, xoffset, soffset: {
@@ -136,10 +136,11 @@ for (local reg, offset: {
 	.cfi_escape 22,64,22,115,0,18,32,40,12,0,18,49,26,40,6,0,35,24,6,47,3,0,146,64,0
 /*[[[end]]]*/
 
-
+	nop /* For unwinding... */
+INTERN_FUNCTION(libc_sig_restore)
 	movq  $(SYS_rt_sigreturn), %rax
 	syscall
-	.cfi_endproc
 END(libc_sig_restore)
+	.cfi_endproc
 
 #endif /* !GUARD_LIBC_LIBC_ARCH_I386_SIGNAL64_S */

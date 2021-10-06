@@ -63,7 +63,6 @@
 .section .text.crt.sched.rpc
 /* Restorer wrapper function for `rpc_exec_program' and `rpc_interrupt_program' */
 /* INTDEF void ASMCALL libc_x86_rpc_restorer(void); */
-INTERN_FUNCTION(libc_x86_rpc_restorer)
 	.cfi_startproc simple
 	.cfi_signal_frame
 	/* Upon entry, `%Psp' points at a `struct rpc_context *ctx', and we must:
@@ -82,6 +81,8 @@ INTERN_FUNCTION(libc_x86_rpc_restorer)
 #endif /* !__x86_64__ */
 /*[[[end]]]*/
 	ASM_CFI_OFFSET_RESTORE_UCPUSTATE(0)
+	nop /* For unwinding... */
+INTERN_FUNCTION(libc_x86_rpc_restorer)
 
 	movP   rc_state(%Psp), %R_sigreturn_cpu
 	.cfi_def_cfa_register %R_sigreturn_cpu
