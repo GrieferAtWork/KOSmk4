@@ -852,7 +852,7 @@ rpc_vm_pushreg(struct rpc_vm *__restrict self, unwind_regno_t regno) {
 	alignas(alignof(uintptr_t))
 	byte_t buf[CFI_REGISTER_MAXSIZE];
 	size_t adrsz = rpc_vm_addrsize(self);
-	size_t regsz = CFI_REGISTER_SIZE(adrsz, regno);
+	size_t regsz = CFI_REGISTER_MEMSIZE(adrsz, regno);
 	size_t words = CEILDIV(regsz, adrsz);
 	assert(words);
 
@@ -890,7 +890,7 @@ rpc_vm_popreg(struct rpc_vm *__restrict self, unwind_regno_t regno) {
 	alignas(alignof(uintptr_t))
 	byte_t buf[CFI_REGISTER_MAXSIZE];
 	size_t adrsz = rpc_vm_addrsize(self);
-	size_t regsz = CFI_REGISTER_SIZE(adrsz, regno);
+	size_t regsz = CFI_REGISTER_MEMSIZE(adrsz, regno);
 	size_t words = CEILDIV(regsz, adrsz);
 	assert(words);
 	if unlikely(!CANPOP(words)) {
@@ -928,7 +928,7 @@ rpc_vm_pushreg2user(struct rpc_vm *__restrict self, unwind_regno_t regno) {
 	alignas(alignof(uintptr_t))
 	byte_t buf[CFI_REGISTER_MAXSIZE];
 	size_t adrsz = rpc_vm_addrsize(self);
-	size_t regsz = CFI_REGISTER_SIZE(adrsz, regno);
+	size_t regsz = CFI_REGISTER_MEMSIZE(adrsz, regno);
 	size_t words = CEILDIV(regsz, adrsz);
 	assert(words);
 
