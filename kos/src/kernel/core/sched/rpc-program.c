@@ -28,7 +28,9 @@
 #include <kernel/except.h>
 #include <kernel/fpu.h>
 #include <kernel/mman.h>
+#include <kernel/mman/fault.h>
 #include <kernel/mman/mpartmeta.h>
+#include <kernel/mman/nopf.h>
 #include <kernel/mman/rw.h>
 #include <kernel/rt/except-handler.h>
 #include <kernel/rt/except-syscall.h>
@@ -133,6 +135,12 @@ NOTHROW(FCALL task_userrpc_cancelprogram)(struct pending_rpc *__restrict rpc) {
 #undef RPC_MEMBANK_JOIN_THRESHOLD
 #define RPC_MEMBANK_JOIN_THRESHOLD PAGESIZE
 #endif /* RPC_MEMBANK_JOIN_THRESHOLD > PAGESIZE */
+
+/* # of bytes by which to over-cache memory bank extensions.
+ * Larger values mean more wasted memory; lower values  mean
+ * that memory banks need to be resized more often. */
+#define RPC_MEMBANK_EXPAND_OVERCACHE 32
+
 
 struct rpc_membank {
 	USER CHECKED byte_t            *rmb_addrlo;  /* [const] Lowest bank address. (1-byte granularity) */
@@ -405,13 +413,14 @@ again:
 			distance = (size_t)(addr - (pred->rmb_addrhi + 1));
 			if (distance <= RPC_MEMBANK_JOIN_THRESHOLD) {
 				num_insert = num_bytes;
+				if (num_insert < RPC_MEMBANK_EXPAND_OVERCACHE)
+					num_insert = RPC_MEMBANK_EXPAND_OVERCACHE;
 				if (succ) {
 					size_t max = (size_t)(succ->rmb_addrlo - addr);
 					if (num_insert > max)
 						num_insert = max;
 				}
 				num_insert += distance;
-				/* TODO: Do more than needed to speed up later operations! */
 				pred = rpc_membank_insert_back(pred, num_insert);
 				self->rm_bankv[i - 1] = pred;
 				if (succ && pred->rmb_addrhi + 1 + RPC_MEMBANK_JOIN_THRESHOLD >= succ->rmb_addrlo) {
@@ -438,10 +447,24 @@ join_pred_succ:
 		if (succ) {
 			/* Try to expand the successor bank */
 			size_t distance;
-			distance = (size_t)(succ->rmb_addrhi - addr);
+			if (OVERFLOW_USUB((uintptr_t)succ->rmb_addrlo,
+			                  (uintptr_t)(addr + num_bytes),
+			                  &distance))
+				distance = 0;
 			if (distance <= RPC_MEMBANK_JOIN_THRESHOLD) {
-				/* TODO: Do more than needed to speed up later operations! */
-				succ = rpc_membank_insert_front(succ, distance);
+				size_t num_insert;
+				num_insert = (size_t)(succ->rmb_addrlo - addr);
+				if (num_insert > num_bytes)
+					num_insert = num_bytes;
+				if (num_insert < RPC_MEMBANK_EXPAND_OVERCACHE)
+					num_insert = RPC_MEMBANK_EXPAND_OVERCACHE;
+				num_insert += distance;
+				if (pred) {
+					size_t max_insert = (size_t)(succ->rmb_addrlo - (pred->rmb_addrhi + 1));
+					if (num_insert > max_insert)
+						num_insert = max_insert;
+				}
+				succ = rpc_membank_insert_front(succ, num_insert);
 				self->rm_bankv[i] = succ;
 				if (pred && pred->rmb_addrhi + 1 + RPC_MEMBANK_JOIN_THRESHOLD >= succ->rmb_addrlo)
 					goto join_pred_succ;
