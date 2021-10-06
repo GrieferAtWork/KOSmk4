@@ -246,7 +246,7 @@ handle_print(struct handle const *__restrict self,
 /* Try to determine the effective data size of the given handle (as returned by `FIOQSIZE')
  * @return: true:  The data size was stored in `*presult'.
  * @return: false: The data size could not be determined. */
-FUNDEF NONNULL((1, 2)) __BOOL KCALL
+FUNDEF WUNUSED NONNULL((1, 2)) __BOOL KCALL
 handle_datasize(struct handle const *__restrict self,
                 pos_t *__restrict presult);
 
@@ -254,7 +254,7 @@ handle_datasize(struct handle const *__restrict self,
 extern "C++" {
 FUNDEF NOBLOCK ATTR_PURE WUNUSED uintptr_half_t NOTHROW(KCALL handle_typekind)(struct handle const &__restrict self) ASMNAME("handle_typekind");
 FUNDEF NONNULL((2)) ssize_t KCALL handle_print(struct handle const &__restrict self, __pformatprinter printer, void *arg) ASMNAME("handle_print");
-FUNDEF NONNULL((2)) __BOOL KCALL handle_datasize(struct handle const &__restrict self, pos_t *__restrict presult) ASMNAME("handle_datasize");
+FUNDEF WUNUSED NONNULL((2)) __BOOL KCALL handle_datasize(struct handle const &__restrict self, pos_t *__restrict presult) ASMNAME("handle_datasize");
 } /* extern "C++" */
 #endif /* __cplusplus */
 
@@ -494,7 +494,7 @@ handle_nextfd(unsigned int startfd,
  * The new I/O flags are calculated as `(old_flags & mask) | flag'
  * @return: * :  The handle's old I/O-flags */
 FUNDEF NONNULL((1)) iomode_t FCALL
-handle_stflags(struct handle_manager *__restrict self,
+handle_chflags(struct handle_manager *__restrict self,
                unsigned int fd, iomode_t mask, iomode_t flag)
 		THROWS(E_WOULDBLOCK, E_INVALID_HANDLE_FILE);
 

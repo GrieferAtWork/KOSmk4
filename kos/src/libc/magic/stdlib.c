@@ -1061,7 +1061,7 @@ __LONGDOUBLE strtold([[nonnull]] char const *__restrict nptr,
 @@              In this case, `*endptr' is still updated correctly,  and
 @@              the  returned integer is the closest representable value
 @@              to the integer given in `nptr' (i.e. `U?INTn_(MIN|MAX)')
-@@              This error supercedes `EINVAL' if both conditions apply.
+@@              This error supersedes `EINVAL' if both conditions apply.
 @@ - EINVAL:    Only when `endptr == NULL': The parsed number is followed
 @@              by   at  least  1  additional  non-whitespace  character.
 @@              The returned integer value is not affected by this error.

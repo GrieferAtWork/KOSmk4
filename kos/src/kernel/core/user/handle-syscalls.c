@@ -208,14 +208,14 @@ ioctl_generic(syscall_ulong_t command,
 		/* Set IO_CLOEXEC */
 		if (hand->h_mode & IO_CLOEXEC)
 			break;
-		handle_stflags(THIS_HANDLE_MANAGER, fd, ~0, IO_CLOEXEC);
+		handle_chflags(THIS_HANDLE_MANAGER, fd, ~0, IO_CLOEXEC);
 		break;
 
 	case FIONCLEX:
 		/* Clear IO_CLOEXEC */
 		if (!(hand->h_mode & IO_CLOEXEC))
 			break;
-		handle_stflags(THIS_HANDLE_MANAGER, fd, ~IO_CLOEXEC, 0);
+		handle_chflags(THIS_HANDLE_MANAGER, fd, ~IO_CLOEXEC, 0);
 		break;
 
 	case FIONBIO:
@@ -225,7 +225,7 @@ ioctl_generic(syscall_ulong_t command,
 		validate_readable(arg, sizeof(int));
 		mode = ATOMIC_READ(*(int *)arg);
 		/* XXX: Verify mode == 0/1 */
-		handle_stflags(THIS_HANDLE_MANAGER,
+		handle_chflags(THIS_HANDLE_MANAGER,
 		               fd,
 		               ~IO_NONBLOCK,
 		               mode ? IO_NONBLOCK : 0);
@@ -240,7 +240,7 @@ ioctl_generic(syscall_ulong_t command,
 		mode = *(USER CHECKED int *)arg;
 		COMPILER_READ_BARRIER();
 		/* XXX: Verify mode == 0/1 */
-		handle_stflags(THIS_HANDLE_MANAGER,
+		handle_chflags(THIS_HANDLE_MANAGER,
 		               fd,
 		               ~IO_ASYNC,
 		               mode ? IO_ASYNC

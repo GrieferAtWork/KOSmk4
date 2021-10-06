@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2043b8e8 */
+/* HASH CRC-32:0xa38675d8 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -748,7 +748,7 @@ NOTHROW_NCX(LIBCCALL libc_strtold)(char const *__restrict nptr,
  *               In this case, `*endptr' is still updated correctly,  and
  *               the  returned integer is the closest representable value
  *               to the integer given in `nptr' (i.e. `U?INTn_(MIN|MAX)')
- *               This error supercedes `EINVAL' if both conditions apply.
+ *               This error supersedes `EINVAL' if both conditions apply.
  *  - EINVAL:    Only when `endptr == NULL': The parsed number is followed
  *               by   at  least  1  additional  non-whitespace  character.
  *               The returned integer value is not affected by this error. */
@@ -878,7 +878,7 @@ NOTHROW_NCX(LIBCCALL libc_strtou32_r)(char const *__restrict nptr,
  *               In this case, `*endptr' is still updated correctly,  and
  *               the  returned integer is the closest representable value
  *               to the integer given in `nptr' (i.e. `U?INTn_(MIN|MAX)')
- *               This error supercedes `EINVAL' if both conditions apply.
+ *               This error supersedes `EINVAL' if both conditions apply.
  *  - EINVAL:    Only when `endptr == NULL': The parsed number is followed
  *               by   at  least  1  additional  non-whitespace  character.
  *               The returned integer value is not affected by this error. */
@@ -1020,7 +1020,7 @@ handle_overflow:
  *               In this case, `*endptr' is still updated correctly,  and
  *               the  returned integer is the closest representable value
  *               to the integer given in `nptr' (i.e. `U?INTn_(MIN|MAX)')
- *               This error supercedes `EINVAL' if both conditions apply.
+ *               This error supersedes `EINVAL' if both conditions apply.
  *  - EINVAL:    Only when `endptr == NULL': The parsed number is followed
  *               by   at  least  1  additional  non-whitespace  character.
  *               The returned integer value is not affected by this error. */
@@ -1149,7 +1149,7 @@ NOTHROW_NCX(LIBCCALL libc_strtou64_r)(char const *__restrict nptr,
  *               In this case, `*endptr' is still updated correctly,  and
  *               the  returned integer is the closest representable value
  *               to the integer given in `nptr' (i.e. `U?INTn_(MIN|MAX)')
- *               This error supercedes `EINVAL' if both conditions apply.
+ *               This error supersedes `EINVAL' if both conditions apply.
  *  - EINVAL:    Only when `endptr == NULL': The parsed number is followed
  *               by   at  least  1  additional  non-whitespace  character.
  *               The returned integer value is not affected by this error. */

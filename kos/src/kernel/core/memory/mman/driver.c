@@ -1008,16 +1008,15 @@ driver_getfile(struct driver *__restrict self)
 
 
 /* Known arg$ entry types:
- *   - DRIVER_ARGCASH_ENTRY_TYPE_STRING:   char   dbg_arg$foo$s$bar[];        // == EXISTS("foo=$value") ? "$value" : "bar"
- *   - DRIVER_ARGCASH_ENTRY_TYPE_HEX:      byte_t dbg_arg$foo$x$00000000[4];  // == EXISTS("foo=$value") ? tohex("$value") : tohex("00000000")
- *   - DRIVER_ARGCASH_ENTRY_TYPE_PRESENT:  bool   dbg_arg$foo;                // == EXISTS("foo=$value") ? true : false
- *   - DRIVER_ARGCASH_ENTRY_TYPE_INT:      int    dbg_arg$foo$d$42;           // == EXISTS("foo=$value") ? atoi("$value") : atoi("42")
- *   - DRIVER_ARGCASH_ENTRY_TYPE_UINT:     u32    dbg_arg$foo$I32u$42;        // == EXISTS("foo=$value") ? atoi("$value") : atoi("42")
+ *   - DRIVER_ARGCASH_ENTRY_TYPE_STRING:   char   drv_arg$foo$s$bar[];        // == EXISTS("foo=$value") ? "$value" : "bar"
+ *   - DRIVER_ARGCASH_ENTRY_TYPE_HEX:      byte_t drv_arg$foo$x$00000000[4];  // == EXISTS("foo=$value") ? tohex("$value") : tohex("00000000")
+ *   - DRIVER_ARGCASH_ENTRY_TYPE_PRESENT:  bool   drv_arg$foo;                // == EXISTS("foo=$value") ? true : false
+ *   - DRIVER_ARGCASH_ENTRY_TYPE_INT:      int    drv_arg$foo$d$42;           // == EXISTS("foo=$value") ? atoi("$value") : atoi("42")
+ *   - DRIVER_ARGCASH_ENTRY_TYPE_UINT:     u32    drv_arg$foo$I32u$42;        // == EXISTS("foo=$value") ? atoi("$value") : atoi("42")
  *
- * *NOTE: The  tohex() function is fairly simple, in that
- *        it will silently skip all non-xdigit characters
- *        during parsing!
- */
+ * NOTE: The  tohex() function is fairly simple, in that
+ *       it will silently skip all non-xdigit characters
+ *       during parsing! */
 #define DRIVER_ARGCASH_ENTRY_TYPE_STRING  0x0000 /* String argument. */
 #define DRIVER_ARGCASH_ENTRY_TYPE_HEX     0x0001 /* Hex blob. */
 #define DRIVER_ARGCASH_ENTRY_TYPE_HASSIZE(x) ((x) >= DRIVER_ARGCASH_ENTRY_TYPE_PRESENT)
@@ -4780,11 +4779,13 @@ create_mnode_for_phdr(ElfW(Phdr) const *__restrict phdr,
 			vsize = CEIL_ALIGN(vsize, PAGESIZE);
 			faddr = phdr->p_offset;
 			fsize = phdr->p_filesz;
+
 			/* Verify that the in-file bounds for the initialization template are OK */
 			if unlikely(faddr + fsize < faddr || faddr + fsize > num_bytes) {
 				THROW_FAULTY_ELF_ERROR(E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_PHDR_OFFSET,
 				                       phdr->p_offset, phdr->p_filesz);
 			}
+
 			/* Verify that the file-size doesn't exceed the mem-size. */
 			if unlikely(voffs + fsize > vsize) {
 				THROW_FAULTY_ELF_ERROR(E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_PHDR_FSIZE,
@@ -4834,16 +4835,19 @@ create_mnode_for_phdr(ElfW(Phdr) const *__restrict phdr,
 			 * buffer! */
 			TRY {
 				mpart_reladdr_t dst = 0;
+
 				/* Zero-initialize a couple of leading bytes. */
 				if (voffs != 0) {
 					mpart_ll_bzeromemcc(part, dst, voffs);
 					dst += voffs;
 				}
+
 				/* Copy file initialization data from the template. */
 				if (fsize != 0) {
 					mpart_ll_writemem(part, dst, base + faddr, fsize);
 					dst += fsize;
 				}
+
 				/* Finally, zero-initialize all of the trailing (.bss-style) memory. */
 				assert(dst <= vsize);
 				if (dst < vsize)
@@ -4894,12 +4898,14 @@ driver_create(USER CHECKED byte_t const *base, size_t num_bytes,
 	phdrv = (ElfW(Phdr) const *)(base + ATOMIC_READ(ehdr->e_phoff));
 	phnum = ATOMIC_READ(ehdr->e_phnum);
 	if unlikely(phnum > KERNEL_DRIVER_MAXPROGRAMHEADERCOUNT)
-		THROW_FAULTY_ELF_ERROR(E_NOT_EXECUTABLE_FAULTY_REASON_ELF_TOOMANYSEGMENTS);
+		THROW_FAULTY_ELF_ERROR(E_NOT_EXECUTABLE_FAULTY_REASON_ELF_TOOMANYSEGMENTS, phnum);
 	if unlikely(!phnum)
 		THROW_FAULTY_ELF_ERROR(E_NOT_EXECUTABLE_FAULTY_REASON_ELF_NOSEGMENTS);
 	if unlikely((byte_t const *)(phdrv) < base ||
-	            (byte_t const *)(phdrv + phnum) > base + num_bytes)
-		THROW_FAULTY_ELF_ERROR(E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_HEADERS);
+	            (byte_t const *)(phdrv + phnum) > base + num_bytes) {
+		THROW_FAULTY_ELF_ERROR(E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_HEADERS,
+		                       (size_t)((byte_t const *)phdrv - base));
+	}
 
 	/* Search for the .dynamic section.
 	 * We  need find this section first, because it contains the DT_SONAME
@@ -4921,8 +4927,10 @@ driver_create(USER CHECKED byte_t const *base, size_t num_bytes,
 	/* Ensure that the .dynamic program header bounds are valid. */
 	if unlikely((byte_t const *)pt_dynamic > (byte_t const *)pt_dynamic_end ||
 	            (byte_t const *)pt_dynamic < base ||
-	            (byte_t const *)pt_dynamic_end > base + num_bytes)
-		THROW_FAULTY_ELF_ERROR(E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_DYNAMIC);
+	            (byte_t const *)pt_dynamic_end > base + num_bytes) {
+		THROW_FAULTY_ELF_ERROR(E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_DYNAMIC,
+		                       (size_t)((byte_t const *)pt_dynamic - base));
+	}
 
 	/* Search for an existing driver, based on this one's DT_SONAME */
 	{
@@ -4954,6 +4962,7 @@ driver_create(USER CHECKED byte_t const *base, size_t num_bytes,
 				break;
 			}
 		}
+
 done_dynhdr_for_soname:
 		/* Make sure that we found both a .dynstr section, as well as a DT_SONAME tag. */
 		if unlikely(dynstr_vla == (uintptr_t)-1 || soname_offset == (uintptr_t)-1)
@@ -4969,27 +4978,33 @@ done_dynhdr_for_soname:
 			ElfW(Addr) p_vaddr;
 			size_t p_filesz;
 			if (phidx >= phnum)
-				THROW_FAULTY_ELF_ERROR(E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_SONAME);
+				THROW_FAULTY_ELF_ERROR(E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_SONAME, dynstr_vla);
 			if (ATOMIC_READ(phdrv[phidx].p_type) != PT_LOAD)
 				continue;
 			p_vaddr = ATOMIC_READ(phdrv[phidx].p_vaddr);
 			if (p_vaddr > dynstr_vla)
 				continue;
 			p_filesz = ATOMIC_READ(phdrv[phidx].p_filesz);
+
 			/* Technically p_memsz, but any pointer above would
 			 * always  be an empty string, which isn't allowed! */
 			if (p_vaddr + p_filesz <= dynstr_vla)
 				continue;
+
 			/* Found the segment. */
 			dynstr_offset = dynstr_vla - p_vaddr; /* Offset of `.dynstr' in segment */
 			dynstr_base   = (char *)(base + ATOMIC_READ(phdrv[phidx].p_offset) + dynstr_offset);
 			dynstr_size   = p_filesz - dynstr_offset;
+
 			/* Make sure that .dynstr is in-bounds of the driver image. */
 			if unlikely((byte_t const *)dynstr_base < base || soname_offset > dynstr_size ||
-			            (byte_t const *)(dynstr_base + dynstr_size) > base + num_bytes)
-				THROW_FAULTY_ELF_ERROR(E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_SONAME);
+			            (byte_t const *)(dynstr_base + dynstr_size) > base + num_bytes) {
+				THROW_FAULTY_ELF_ERROR(E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_SONAME,
+				                       (size_t)((byte_t const *)dynstr_base - base));
+			}
 			so_name_start = dynstr_base + soname_offset;
 			so_name_end   = (char *)memend(so_name_start, '\0', dynstr_size - soname_offset);
+
 			/* All right! we've got the DT_SONAME string!
 			 * -> Search for an existing driver with this name. */
 			result = driver_fromname_with_len(so_name_start, (size_t)(so_name_end - so_name_start));
@@ -5012,6 +5027,7 @@ done_dynhdr_for_soname:
 
 		/* Copy program headers. */
 		memcpy(result->d_phdr, phdrv, phnum, sizeof(ElfW(Phdr)));
+
 		/* Initialize the driver commandline. */
 		if (drv_cmdline) {
 			driver_init_cmdline(result, drv_cmdline);
@@ -5020,6 +5036,7 @@ done_dynhdr_for_soname:
 			result->d_argv = (char **)kmalloc(1 * sizeof(char *),
 			                                  GFP_CALLOC | GFP_LOCKED | GFP_PREFLT);
 		}
+
 		shoff              = (uintptr_t)ATOMIC_READ(ehdr->e_shoff);
 		result->d_shstrndx = ATOMIC_READ(ehdr->e_shstrndx);
 		result->d_shnum    = ATOMIC_READ(ehdr->e_shnum);
@@ -5028,6 +5045,7 @@ done_dynhdr_for_soname:
 			THROW_FAULTY_ELF_ERROR(E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_SHENT, ehdr->e_shentsize);
 		if unlikely(result->d_shnum > ELF_ARCH_MAXSHCOUNT)
 			THROW_FAULTY_ELF_ERROR(E_NOT_EXECUTABLE_FAULTY_REASON_ELF_TOOMANYSECTIONS, result->d_shnum);
+
 		/* Validate offsets for section headers */
 		if unlikely(result->d_shstrndx >= result->d_shnum) {
 			THROW_FAULTY_ELF_ERROR(E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_SHSTRNDX,
@@ -5070,6 +5088,7 @@ done_dynhdr_for_soname:
 			}
 			while (shstrtab_size && !shstrtab_base[shstrtab_size - 1])
 				--shstrtab_size;
+
 			/* Load the .shstrtab section into memory. */
 			result->d_shstrtab = (char *)kmalloc((shstrtab_size + 1) * sizeof(char), GFP_PREFLT);
 			memcpy((char *)result->d_shstrtab, shstrtab_base, shstrtab_size, sizeof(char));
@@ -5147,6 +5166,7 @@ again_get_driver_loadlist:
 					syscache_version_t cache_version = SYSCACHE_VERSION_INIT;
 					size_t i, new_ll_insert_index;
 					uintptr_t loadaddr;
+
 					/* Acquire a lock to the kernel mman, so we can insert the new nodes. */
 again_acquire_mman_lock:
 					mman_lock_acquire(&mman_kernel);
@@ -5184,12 +5204,13 @@ again_acquire_mman_lock:
 						struct mnode *node;
 						node = SLIST_FIRST(&nodes);
 						SLIST_REMOVE_HEAD(&nodes, _mn_dead);
+
 						/* Relocate the node relative to our chosen `loadaddr'.
 						 * NOTE: Because we're using anonymous,  pre-initialized,
 						 *       locked mem-parts to  back these  nodes, we  know
 						 *       that the  associated mem-parts  won't have  been
 						 *       truncated since we've created them above, simply
-						 *       because we're the only ones how even know  about
+						 *       because we're the only ones who even know  about
 						 *       their existence! */
 						node->mn_minaddr += loadaddr;
 						node->mn_maxaddr += loadaddr;
@@ -5260,7 +5281,7 @@ again_acquire_mman_lock:
 					 *       memory mappings (everything was prefaulted at the start,
 					 *       meaning  that  everything should  be mapped  right now).
 					 *       However, still make use of `memcpy_nopf()', since faulty
-					 *       driver files can still cause programs at this point. */
+					 *       driver files can still cause problems at this point. */
 					{
 						unsigned int status;
 						uintptr_t reasons[2] = { 0, 0 };
@@ -5334,6 +5355,7 @@ again_acquire_mman_lock:
 					 * there's a chance that the `result'-driver has since been loaded
 					 * by some other thread...) */
 					if unlikely(!arref_cmpxch_inherit_new(&drivers, old_ll, new_ll)) {
+
 						/* The set of loaded drivers has changed.
 						 * Undo everything we did since we've read out `old_ll' */
 						struct mnode *node;

@@ -2053,7 +2053,7 @@ handle_lookup(unsigned int fd)
  * The new I/O flags are calculated as `(old_flags & mask) | flag'
  * @return: * :  The handle's old I/O-flags */
 PUBLIC NONNULL((1)) iomode_t FCALL
-handle_stflags(struct handle_manager *__restrict self,
+handle_chflags(struct handle_manager *__restrict self,
                unsigned int fd, iomode_t mask, iomode_t flag)
 		THROWS(E_WOULDBLOCK, E_INVALID_HANDLE_FILE) {
 	iomode_t result;

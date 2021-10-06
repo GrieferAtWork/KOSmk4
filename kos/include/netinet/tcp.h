@@ -509,7 +509,7 @@ enum {
 
 /* Flags for both getsockopt and setsockopt */
 #define TCP_COOKIE_IN_ALWAYS  (1 << 0) /* Discard SYN without cookie */
-#define TCP_COOKIE_OUT_NEVER  (1 << 1) /* Prohibit outgoing cookies, supercedes everything. */
+#define TCP_COOKIE_OUT_NEVER  (1 << 1) /* Prohibit outgoing cookies, supersedes everything. */
 
 /* Flags for getsockopt */
 #define TCP_S_DATA_IN         (1 << 2) /* Was data received? */

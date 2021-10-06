@@ -128,7 +128,7 @@ NOTHROW(KCALL handle_typekind)(struct handle const *__restrict self) {
 }
 
 
-LOCAL bool KCALL
+LOCAL WUNUSED NONNULL((1, 2)) bool KCALL
 character_device_datasize(struct character_device *__restrict self,
                           pos_t *__restrict presult) {
 	struct stat st;
@@ -151,7 +151,7 @@ character_device_datasize(struct character_device *__restrict self,
 /* Try to determine the effective data size of the given handle (as returned by `FIOQSIZE')
  * @return: true:  The data size was stored in `*presult'.
  * @return: false: The data size could not be determined. */
-PUBLIC NONNULL((1, 2)) bool KCALL
+PUBLIC WUNUSED NONNULL((1, 2)) bool KCALL
 handle_datasize(struct handle const *__restrict self,
                 pos_t *__restrict presult) {
 	pos_t value;

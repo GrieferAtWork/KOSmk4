@@ -657,6 +657,11 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 
 	/* TODO: Add a KOS-specific libcrypt */
 
+	/* TODO: Investigate into a execution-time profiling system (using some  kind
+	 *       of hardware timer interrupt) that can be used to collect the program
+	 *       counter positions where the system spends most of its time, so  that
+	 *       those sub-routines can get more love & care for optimization. */
+
 	/* FIXME: There is a design flaw in how the builtin debugger behaves when
 	 *        entered while another thread is currently initializing parts of
 	 *        a mem-part.
@@ -748,10 +753,6 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 
 	/* TODO: Look into enabling `-fsanitize=undefined' for all code. */
 
-	/* TODO: The raiseat(2) system call should be removed. Instead, it can be emulated
-	 *       by  chaining `sigreturn(2)' with  `rt_tgsigqueueinfo(2)', where the later
-	 *       is made to point at the calling thread. */
-
 	/* TODO: All places  that clear  the current  exception by  means of  setting
 	 *       this_exception_code to E_OK should also include a call to DBG_memset
 	 *       for filling the remainder  of exception_info (except for  ei_nesting
@@ -764,10 +765,25 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *       thread in this  case) is ready,  which would  get rid of  the risk  of
 	 *       the send operation running into an E_BADALLOC error. */
 
+	/* TODO: The raiseat(2) system call should be removed. Instead, it can be emulated
+	 *       by  chaining `sigreturn(2)' with  `rt_tgsigqueueinfo(2)', where the later
+	 *       is made to point at the calling thread. */
+
 	/* TODO: `sigprocmask(2)' needs special handling  to not needlessly modify  the
 	 *       userprocmask (if set). Needed since the userprocmask may be read-only,
 	 *       in which case sigprocmask() must only attempt to modify it when a  new
 	 *       word to-be written differs from what was written before. */
+
+	/* TODO: Play around with something like:
+	 * >> #define TRY   assert(!error_active()); __TRY
+	 *
+	 * This assertion is allowed since a non-E_OK error code would mean that exception
+	 * nesting would be required in  this scenario, or that  the TRY is redundant  and
+	 * could simply be removed.
+	 *
+	 * XXX: There might be some corner-cases I'm not thinking of, but those should
+	 *      also become noticeable, and such  an assertion could really help  with
+	 *      finding  pieces of code that need (but are missing) exception nesting. */
 
 	return state;
 }
