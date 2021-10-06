@@ -60,6 +60,12 @@
 
 DECL_BEGIN
 
+#ifndef NDEBUG
+#define DBG_memset memset
+#else /* !NDEBUG */
+#define DBG_memset(...) (void)0
+#endif /* NDEBUG */
+
 /* Verify that pthread offset constants are correct */
 #ifdef __LIBC_CONFIG_HAVE_USERPROCMASK
 #define pt_tid pt_pmask.lpm_pmask.pm_mytid
@@ -1867,9 +1873,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_mutexattr_destroy)(pthread_mutexattr_t *attr)
 /*[[[body:libc_pthread_mutexattr_destroy]]]*/
 {
 	(void)attr;
-#ifndef NDEBUG
-	memset(attr, 0xcc, sizeof(*attr));
-#endif /* !NDEBUG */
+	DBG_memset(attr, 0xcc, sizeof(*attr));
 	return EOK;
 }
 /*[[[end:libc_pthread_mutexattr_destroy]]]*/
@@ -2101,9 +2105,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_rwlockattr_destroy)(pthread_rwlockattr_t *attr
 /*[[[body:libc_pthread_rwlockattr_destroy]]]*/
 {
 	(void)attr;
-#ifndef NDEBUG
-	memset(attr, 0xcc, sizeof(*attr));
-#endif /* !NDEBUG */
+	DBG_memset(attr, 0xcc, sizeof(*attr));
 	return EOK;
 }
 /*[[[end:libc_pthread_rwlockattr_destroy]]]*/
@@ -2213,9 +2215,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_condattr_destroy)(pthread_condattr_t *attr)
 /*[[[body:libc_pthread_condattr_destroy]]]*/
 {
 	(void)attr;
-#ifndef NDEBUG
-	memset(attr, 0xcc, sizeof(*attr));
-#endif /* !NDEBUG */
+	DBG_memset(attr, 0xcc, sizeof(*attr));
 	return EOK;
 }
 /*[[[end:libc_pthread_condattr_destroy]]]*/
@@ -2329,9 +2329,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_barrierattr_destroy)(pthread_barrierattr_t *at
 /*[[[body:libc_pthread_barrierattr_destroy]]]*/
 {
 	(void)attr;
-#ifndef NDEBUG
-	memset(attr, 0xcc, sizeof(*attr));
-#endif /* !NDEBUG */
+	DBG_memset(attr, 0xcc, sizeof(*attr));
 	return EOK;
 }
 /*[[[end:libc_pthread_barrierattr_destroy]]]*/
@@ -2419,9 +2417,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_mutex_destroy)(pthread_mutex_t *mutex)
 /*[[[body:libc_pthread_mutex_destroy]]]*/
 {
 	(void)mutex;
-#ifndef NDEBUG
-	memset(mutex, 0xcc, sizeof(*mutex));
-#endif /* !NDEBUG */
+	DBG_memset(mutex, 0xcc, sizeof(*mutex));
 	return EOK;
 }
 /*[[[end:libc_pthread_mutex_destroy]]]*/
@@ -3094,9 +3090,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_cond_destroy)(pthread_cond_t *cond)
 /*[[[body:libc_pthread_cond_destroy]]]*/
 {
 	(void)cond;
-#ifndef NDEBUG
-	memset(cond, 0xcc, sizeof(*cond));
-#endif /* !NDEBUG */
+	DBG_memset(cond, 0xcc, sizeof(*cond));
 	return EOK;
 }
 /*[[[end:libc_pthread_cond_destroy]]]*/

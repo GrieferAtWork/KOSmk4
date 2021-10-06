@@ -49,9 +49,9 @@
 DECL_BEGIN
 
 #ifndef NDEBUG
-#define DBG_memset(dst, byte, num_bytes) memset(dst, byte, num_bytes)
+#define DBG_memset memset
 #else /* !NDEBUG */
-#define DBG_memset(dst, byte, num_bytes) (void)0
+#define DBG_memset(...) (void)0
 #endif /* NDEBUG */
 
 /* Check if 2 given ranges overlap (that is: share at least 1 common address) */

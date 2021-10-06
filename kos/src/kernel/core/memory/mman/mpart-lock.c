@@ -52,9 +52,9 @@
 DECL_BEGIN
 
 #ifndef NDEBUG
-#define DBG_memset(dst, byte, num_bytes) memset(dst, byte, num_bytes)
+#define DBG_memset memset
 #else /* !NDEBUG */
-#define DBG_memset(dst, byte, num_bytes) (void)0
+#define DBG_memset(...) (void)0
 #endif /* NDEBUG */
 
 PRIVATE NOBLOCK NONNULL((1)) void

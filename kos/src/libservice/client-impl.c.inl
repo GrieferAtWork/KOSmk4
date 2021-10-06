@@ -69,9 +69,7 @@ libservice_buffer_malloc(struct service *__restrict self, size_t num_bytes)
 #endif /* !LOCAL_DEFINE_NOEXCEPT */
 	PREEMPTION_POP(was);
 	assert(libservice_shmbuf_get_total_size(service_buf_getptr(buf)) >= num_bytes);
-#ifndef NDEBUG
-	memset(service_buf_getptr(buf), 0xcc, libservice_shmbuf_get_usable_size(service_buf_getptr(buf)));
-#endif /* !NDEBUG */
+	DBG_memset(service_buf_getptr(buf), 0xcc, libservice_shmbuf_get_usable_size(service_buf_getptr(buf)));
 	return service_buf_getptr(buf);
 }
 

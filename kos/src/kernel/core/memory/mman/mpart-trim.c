@@ -104,9 +104,9 @@ DECL_BEGIN
 	(!((self)->mp_flags & MPART_F_NOSPLIT))
 
 #ifndef NDEBUG
-#define DBG_memset(dst, byte, num_bytes) memset(dst, byte, num_bytes)
+#define DBG_memset memset
 #else /* !NDEBUG */
-#define DBG_memset(dst, byte, num_bytes) (void)0
+#define DBG_memset(...) (void)0
 #endif /* NDEBUG */
 
 STATIC_ASSERT_MSG(offsetof(struct mpart, _mp_trmlop_mp.olo_func) == offsetof(struct mpart, _mp_trmlop_mm.olo_func) &&

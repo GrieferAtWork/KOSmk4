@@ -46,6 +46,12 @@
 
 DECL_BEGIN
 
+#ifndef NDEBUG
+#define DBG_memset memset
+#else /* !NDEBUG */
+#define DBG_memset(...) (void)0
+#endif /* NDEBUG */
+
 #if SEM_VALUE_MAX == INT8_MAX
 #define SEM_COUNT_MASK   UINT8_C(0x7f)
 #define SEM_WAITERS_FLAG UINT8_C(0x80)
@@ -95,9 +101,7 @@ NOTHROW_NCX(LIBCCALL libc_sem_init)(sem_t *sem,
 	if unlikely(value > SEM_COUNT_MASK)
 		return libc_seterrno(EINVAL);
 #endif /* UINT_MAX > SEM_COUNT_MASK */
-#ifndef NDEBUG
-	memset(sem, 0xcc, __SIZEOF_SEM_T);
-#endif /* !NDEBUG */
+	DBG_memset(sem, 0xcc, __SIZEOF_SEM_T);
 	sem->s_count = value;
 	return 0;
 }
@@ -114,9 +118,7 @@ NOTHROW_NCX(LIBCCALL libc_sem_destroy)(sem_t *sem)
 	COMPILER_IMPURE();
 	(void)sem;
 	/* Nothing to do here... */
-#ifndef NDEBUG
-	memset(sem, 0xcc, __SIZEOF_SEM_T);
-#endif /* !NDEBUG */
+	DBG_memset(sem, 0xcc, __SIZEOF_SEM_T);
 	return 0;
 }
 /*[[[end:libc_sem_destroy]]]*/

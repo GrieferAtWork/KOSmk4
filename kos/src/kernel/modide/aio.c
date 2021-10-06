@@ -34,6 +34,12 @@
 
 DECL_BEGIN
 
+#ifndef NDEBUG
+#define DBG_memset memset
+#else /* !NDEBUG */
+#define DBG_memset(...) (void)0
+#endif /* NDEBUG */
+
 STATIC_ASSERT(sizeof(AtaAIOHandleData) <=
              (AIO_HANDLE_DRIVER_POINTER_COUNT * sizeof(void *)));
 
@@ -51,9 +57,7 @@ NOTHROW(FCALL AtaDrive_DmaAioHandle_ReleaseDmaLocks)(struct aio_handle *__restri
 			mman_dmalock_release(iter);
 		kfree(data->hd_dmalockvec);
 	}
-#ifndef NDEBUG
-	memset(&data->hd_dmalock, 0xcc, sizeof(data->hd_dmalock));
-#endif /* !NDEBUG */
+	DBG_memset(&data->hd_dmalock, 0xcc, sizeof(data->hd_dmalock));
 }
 
 /* Complete the given, generic AIO handle with an ATA error code. */

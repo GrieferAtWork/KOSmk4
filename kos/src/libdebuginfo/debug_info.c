@@ -66,8 +66,14 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #include <malloc.h>
 #endif /* !__KERNEL__ */
 
-
 DECL_BEGIN
+
+#ifndef NDEBUG
+#define DBG_memset memset
+#else /* !NDEBUG */
+#define DBG_memset(...) (void)0
+#endif /* NDEBUG */
+
 
 /* Initialize an iterator for enumerating ranges stored within a given debug_info range selector.
  * >> uintptr_t start_pc, end_pc;
@@ -88,7 +94,7 @@ NOTHROW_NCX(CC libdi_debuginfo_ranges_iterator_init)(di_debuginfo_ranges_iterato
 	self->ri_ranges   = ranges;
 	self->ri_addrsize = parser->dup_addrsize;
 	self->ri_initbase = ranges->r_startpc != (uintptr_t)-1 ? ranges->r_startpc : cu_base;
-	if (DEBUGINFO_RANGES_ISSINGLERANGE(ranges)) {
+	if (DI_DEBUGINFO_RANGES_ISSINGLERANGE(ranges)) {
 		self->ri_pos = self->ri_end = (byte_t const *)-1;
 	} else if (ranges->r_ranges_offset >= (size_t)(debug_ranges_end - debug_ranges_start)) {
 		self->ri_pos = self->ri_end = NULL;
@@ -172,7 +178,7 @@ NOTHROW_NCX(CC libdi_debuginfo_ranges_contains)(di_debuginfo_ranges_t const *__r
                                                 byte_t const *__restrict debug_ranges_start,
                                                 byte_t const *__restrict debug_ranges_end) {
 	byte_t const *iter;
-	if (DEBUGINFO_RANGES_ISSINGLERANGE(self)) {
+	if (DI_DEBUGINFO_RANGES_ISSINGLERANGE(self)) {
 		return (module_relative_pc >= self->r_startpc &&
 		        module_relative_pc < self->r_endpc)
 		       ? DEBUG_INFO_ERROR_SUCCESS
@@ -248,7 +254,7 @@ NOTHROW_NCX(CC libdi_debuginfo_ranges_contains_ex)(di_debuginfo_ranges_t const *
                                                    uintptr_t *__restrict poverlap_start,
                                                    uintptr_t *__restrict poverlap_end) {
 	byte_t const *iter;
-	if (DEBUGINFO_RANGES_ISSINGLERANGE(self)) {
+	if (DI_DEBUGINFO_RANGES_ISSINGLERANGE(self)) {
 		if (module_relative_pc < self->r_startpc ||
 		    module_relative_pc >= self->r_endpc)
 			return DEBUG_INFO_ERROR_NOFRAME;
@@ -444,9 +450,7 @@ NOTHROW_NCX(CC libdi_debuginfo_cu_abbrev_fini)(di_debuginfo_cu_abbrev_t *__restr
 	    self->dua_cache_list != (di_debuginfo_cu_abbrev_cache_entry_t *)-1) {
 		CACHE_FREE(self->dua_cache_list);
 	}
-#ifndef NDEBUG
-	memset(self, 0xcc, offsetof(di_debuginfo_cu_abbrev_t, dua_stcache));
-#endif /* !NDEBUG */
+	DBG_memset(self, 0xcc, offsetof(di_debuginfo_cu_abbrev_t, dua_stcache));
 }
 
 #if 0

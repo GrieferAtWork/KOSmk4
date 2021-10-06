@@ -785,6 +785,13 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *      also become noticeable, and such  an assertion could really help  with
 	 *      finding  pieces of code that need (but are missing) exception nesting. */
 
+	/* TODO: Get rid of restore ordering from libunwind. The whole idea only stems  from
+	 *       me  misunderstanding how  unwinding's supposed  to work,  and defining some
+	 *       specific unwind order doesn't even make a difference since register get/set
+	 *       passed to `unwind(3)'  really can't  use the  same buffer  for getters  and
+	 *       setters already (if you try, it'll fail to unwind in certain  GCC-generated
+	 *       functions). As such, unwind order is 100% unnecessary bloat. */
+
 	return state;
 }
 

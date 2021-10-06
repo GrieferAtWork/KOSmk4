@@ -53,6 +53,12 @@
 
 DECL_BEGIN
 
+#ifndef NDEBUG
+#define DBG_memset memset
+#else /* !NDEBUG */
+#define DBG_memset(...) (void)0
+#endif /* NDEBUG */
+
 #if 0
 #define IPI_DEBUG(...) (printk(KERN_DEBUG "[cpu:%u] ", THIS_CPU->c_id), printk(KERN_DEBUG __VA_ARGS__))
 #else
@@ -265,6 +271,7 @@ NOTHROW(FCALL x86_serve_ipi)(struct cpu *__restrict me,
 	IPI_DEBUG("x86_serve_ipi(%p,%p)\n",
 	          state, FORCPU(me, thiscpu_sched_current));
 	i = CEILDIV(CPU_IPI_BUFFER_SIZE, BITS_PER_POINTER);
+
 	/* Must iterate in reverse, since assembly only checks the first word
 	 * of the in-use bitset to  determine if unhandled IPIs are  present. */
 	while (i) {
@@ -278,13 +285,14 @@ NOTHROW(FCALL x86_serve_ipi)(struct cpu *__restrict me,
 			struct pending_ipi ipi;
 			if (!(bits & mask))
 				continue;
+
 			/* Figure out the absolute allocation slot for the IPI */
 			slot = i * BITS_PER_POINTER + j;
+
 			/* Deallocate this IPI. */
 			memcpy(&ipi, &FORCPU(me, thiscpu_x86_ipi_pending[slot]), sizeof(ipi));
-#ifndef NDEBUG
-			memset(&FORCPU(me, thiscpu_x86_ipi_pending[slot]), 0xcc, sizeof(ipi));
-#endif /* !NDEBUG */
+			DBG_memset(&FORCPU(me, thiscpu_x86_ipi_pending[slot]), 0xcc, sizeof(ipi));
+
 			/* Free up the IPI slot.
 			 * This must  happen for  every in-use  slot individually,  since  the
 			 * IPI  callback itself may recursively call `cpu_ipi_service_nopr()',
@@ -300,6 +308,7 @@ NOTHROW(FCALL x86_serve_ipi)(struct cpu *__restrict me,
 			 *       a in-use bit of a whole different IPI! */
 			ATOMIC_AND(FORCPU(me, thiscpu_x86_ipi_inuse[i]), ~mask);
 			ATOMIC_AND(FORCPU(me, thiscpu_x86_ipi_alloc[i]), ~mask);
+
 			/* Execute the IPI callback. */
 			IPI_DEBUG("x86_serve_ipi:%p [slot=%u,i=%u,mask=%#" PRIxPTR "]\n",
 			          ipi.pi_func, slot, i, mask);

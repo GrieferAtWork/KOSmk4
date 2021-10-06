@@ -380,7 +380,7 @@ typedef struct {
 	__uintptr_t r_startpc;       /* Starting program counter position (or `r_ranges != (uintptr_t)-1 ? 0 : (uintptr_t)-1' if unknown). */
 	__uintptr_t r_endpc;         /* Ending program counter position (or `0' if unknown). */
 } di_debuginfo_ranges_t;
-#define DEBUGINFO_RANGES_ISSINGLERANGE(x) ((x)->r_ranges_offset == (__uintptr_t)-1)
+#define DI_DEBUGINFO_RANGES_ISSINGLERANGE(x) ((x)->r_ranges_offset == (__uintptr_t)-1)
 
 typedef struct {
 	di_debuginfo_ranges_t const *ri_ranges;   /* [1..1][const] The underlying range object. */

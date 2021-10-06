@@ -33,6 +33,12 @@
 
 DECL_BEGIN
 
+#ifndef NDEBUG
+#define DBG_memset memset
+#else /* !NDEBUG */
+#define DBG_memset(...) (void)0
+#endif /* NDEBUG */
+
 /* Stop DMAing by releasing all of the specified DMA locks.
  * NOTE: The  caller  must ensure  that  `lockcnt == return(mman_startdma*())', and
  *       that the specified `lockvec' is either the exact same `lockvec' originally
@@ -48,9 +54,7 @@ NOTHROW(FCALL mman_stopdma)(struct mdmalock *__restrict lockvec,
 		lockvec[i].mdl_part = mpart_dma_dellock(lockvec[i].mdl_part);
 	for (i = lockcnt; i--;)
 		decref_unlikely(lockvec[i].mdl_part);
-#ifndef NDEBUG
-	memset(lockvec, 0xcc, lockcnt, sizeof(struct mdmalock));
-#endif /* !NDEBUG */
+	DBG_memset(lockvec, 0xcc, lockcnt, sizeof(struct mdmalock));
 }
 
 DECL_END

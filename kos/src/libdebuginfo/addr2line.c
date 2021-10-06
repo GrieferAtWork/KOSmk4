@@ -56,8 +56,13 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #include <kernel/mman/driver.h>
 #endif /* __KERNEL__ */
 
-
 DECL_BEGIN
+
+#ifndef NDEBUG
+#define DBG_memset memset
+#else /* !NDEBUG */
+#define DBG_memset(...) (void)0
+#endif /* NDEBUG */
 
 LOCAL TEXTSECTION NONNULL((1)) void
 NOTHROW_NCX(CC fill_error_state)(di_debug_addr2line_t *__restrict result,
@@ -939,9 +944,7 @@ NOTHROW_NCX(CC libdi_debug_addr2line_sections_unlock)(di_addr2line_dl_sections_t
 	module_section_xdecref(dl_sections->dl_debug_abbrev);
 	module_section_xdecref(dl_sections->dl_debug_info);
 	module_section_xdecref(dl_sections->dl_debug_line);
-#ifndef NDEBUG
-	memset(dl_sections, 0xcc, sizeof(*dl_sections));
-#endif /* !NDEBUG */
+	DBG_memset(dl_sections, 0xcc, sizeof(*dl_sections));
 }
 
 DEFINE_PUBLIC_ALIAS(debug_addr2line, libdi_debug_addr2line);

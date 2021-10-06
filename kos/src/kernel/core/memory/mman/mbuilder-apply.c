@@ -51,9 +51,9 @@
 DECL_BEGIN
 
 #ifndef NDEBUG
-#define DBG_memset(dst, byte, num_bytes) memset(dst, byte, num_bytes)
+#define DBG_memset memset
 #else /* !NDEBUG */
-#define DBG_memset(dst, byte, num_bytes) (void)0
+#define DBG_memset(...) (void)0
 #endif /* NDEBUG */
 
 /* Set the `MNODE_F_UNMAPPED' flag for all nodes starting at `root' */

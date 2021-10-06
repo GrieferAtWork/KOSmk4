@@ -50,6 +50,12 @@
 
 DECL_BEGIN
 
+#ifndef NDEBUG
+#define DBG_memset memset
+#else /* !NDEBUG */
+#define DBG_memset(...) (void)0
+#endif /* NDEBUG */
+
 /* Exception-enabled version of `libservice_open_nx()'. */
 INTERN ATTR_RETNONNULL WUNUSED NONNULL((1)) struct service *CC
 libservice_open(char const *filename) THROWS(E_FSERROR, E_BADALLOC, E_INTERRUPT) {
