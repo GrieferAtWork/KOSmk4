@@ -161,12 +161,12 @@ rpc_interrupt_program[] = {
 /*[[[rpc{arch='x86'}
 	# The system pre-pushed a value `bool should_restart_syscall'
 	# prior to executing the RPC program. Since the whole purpose
-	# of the RPC-interrupt program is to "interrupt" system calls
+	# of this RPC-interrupt program is to "interrupt" system calls
 	# there really shouldn't be a scenario where a system call
 	# would need to be restarted. However, since libc allows for
 	# full control of the `mode' given to `rpc_interrupt(3)', we
-	# have to the handle the case where the system call needs to
-	# be restarted...
+	# have to handle the case where system calls do need to be
+	# restarted...
 	jt     pop, 1f
 	ret
 1:
@@ -218,25 +218,19 @@ rpc_interrupt_program[] = {
 	sp.pushP pop       # `struct rpc_context::rc_state'
 	sp.pushP *reason   # `struct rpc_context::rc_context'
 
-	# Load arguments for the RPC function that will be invoked
-#ifdef __x86_64__
-	movq   *param:$1, %rsi  # prpc_exec_callback_t::cookie
-	movq   %Psp,      %rdi  # prpc_exec_callback_t::ctx
-#else // __x86_64__
-	push   %Psp
-	sp.pushl *param:$1  # prpc_exec_callback_t::cookie
-	sp.pushl pop        # prpc_exec_callback_t::ctx
+	# Since no RPC function gets invoked, no need to load proper arguments.
+#ifndef __x86_64__
+	sub    $8, %Psp    # Still need to adjust %Psp on i386, though!
 #endif // !__x86_64__
 ]]]*/
 #ifdef __x86_64__
 	40,1,0,0,87,128,146,49,112,114,113,115,5,118,116,117,
 	120,121,122,123,124,125,126,127,146,52,146,51,146,58,146,59,
-	146,53,146,50,146,54,146,55,87,164,5,160,5,165,1,52,
-	87,53
+	146,53,146,50,146,54,146,55,87,164,5,160,5
 #else /* __x86_64__ */
 	40,1,0,0,84,120,121,146,42,146,41,146,43,146,40,146,
 	44,146,45,112,113,114,115,5,117,118,119,84,164,5,160,5,
-	84,165,1,5,5
+	84,9,8,28,52
 #endif /* !__x86_64__ */
 /*[[[end]]]*/
 	,
