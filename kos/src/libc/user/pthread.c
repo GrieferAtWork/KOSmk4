@@ -282,7 +282,7 @@ NOTHROW(__FCALL libc_pthread_main)(struct pthread *__restrict me,
 			RETHROW();
 		}
 		exitcode = error_data()->e_args.e_exit_thread.et_exit_code;
-		me->pt_retval = NULL;
+		me->pt_retval = PTHREAD_CANCELED;
 	}
 	/* Perform cleanup & terminate the current thread. */
 	pthread_exit_thread(me, exitcode);

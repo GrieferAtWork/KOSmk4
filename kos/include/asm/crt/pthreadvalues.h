@@ -57,7 +57,7 @@
 #define __PTHREAD_CANCEL_DEFERRED     0
 #define __PTHREAD_CANCEL_ASYNCHRONOUS 1
 
-#define __PTHREAD_CANCELED (__CCAST(void *) - 1)
+#define __PTHREAD_CANCELED (__CCAST(void *)-1)
 
 #define __PTHREAD_ONCE_INIT 0
 
