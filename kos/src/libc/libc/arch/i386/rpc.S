@@ -38,11 +38,16 @@
 #define SIZEOF_POINTER __SIZEOF_POINTER__
 #endif /* !SIZEOF_POINTER */
 
+#ifdef __x86_64__
+#define _STACKPARAM_SIZE 0
+#else /* __x86_64__ */
+#define _STACKPARAM_SIZE 8 /* CDECL: `struct rpc_context *ctx', `void *cookie' */
+#endif /* !__x86_64__ */
 
 /* Offsets within `struct rpc_context' */
-#define rc_context 0
-#define rc_state   SIZEOF_POINTER
-#define rc_scinfo  (2 * SIZEOF_POINTER)
+#define rc_context (_STACKPARAM_SIZE + 0)
+#define rc_state   (_STACKPARAM_SIZE + SIZEOF_POINTER)
+#define rc_scinfo  (_STACKPARAM_SIZE + (2 * SIZEOF_POINTER))
 
 /* Parameter registers for `sys_[rt_]sigreturn()' */
 #define R_sigreturn_cpu     Pbp
@@ -71,13 +76,17 @@
 	 *  - Restore the register state from `ctx->rc_state' */
 /*[[[cfi{arch='x86', register='%cfa'}
 	push   %Psp
-	add    $SIZEOF_POINTER  # rc_state
+#ifdef __x86_64__
+	add    $8               # rc_state
+#else // __x86_64__
+	add    $12              # _STACKPARAM_SIZE + rc_state
+#endif // !__x86_64__
 	deref                   # Read the value of `ctx->rc_state'
 ]]]*/
 #ifdef __x86_64__
 	.cfi_escape 15,5,119,0,35,8,6
 #else /* __x86_64__ */
-	.cfi_escape 15,5,116,0,35,4,6
+	.cfi_escape 15,5,116,0,35,12,6
 #endif /* !__x86_64__ */
 /*[[[end]]]*/
 	ASM_CFI_OFFSET_RESTORE_UCPUSTATE(0)
