@@ -22,6 +22,8 @@
 
 #ifndef __DEEMON__
 #include <__stdinc.h>
+
+#include <hybrid/host.h>
 #include <hybrid/typecore.h>
 #endif /* !__DEEMON__ */
 
@@ -295,7 +297,11 @@
 #define RPC_OP_lo_arch        0xe0 /* First arch-specific opcode */
 #define RPC_OP_hi_arch        0xff /* Last arch-specific opcode */
 
-/* Arch-specific opcodes */
+
+/************************************************************************/
+/* Arch-specific opcodes                                                */
+/************************************************************************/
+#if defined(__x86_64__) || defined(__i386__)
 #define RPC_OP_x86_push_is32bit   0xe0 /* [+0] i386/x86_64: push  `1' if target  thread is 32-bit;  push `0' if 64-bit.
                                         * Since register numbers (and the  operand of `RPC_OP_sppush_const') is  always
                                         * dependent on the architecture of the _target_ thread (not the sender thread),
@@ -308,6 +314,7 @@
 #define RPC_OP_386_pushreg_gsbase 0xe5 /* [+0] i386: Push the value of %gs.base */
 #define RPC_OP_386_popreg_fsbase  0xe6 /* [+0] i386: Pop stack-top into %fs.base */
 #define RPC_OP_386_popreg_gsbase  0xe7 /* [+0] i386: Pop stack-top into %gs.base */
+#endif /* __x86_64__ || __i386__ */
 /*========================================*/
 
 
