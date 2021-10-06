@@ -1634,11 +1634,31 @@ NOTHROW_NCX(LIBCCALL libc_pthread_cancel)(pthread_t pthread)
 	tid = ATOMIC_READ(pthread->pt_tid);
 	if unlikely(tid == 0)
 		return ESRCH;
-	/* Schedule  an RPC in the target thread that  will cause the thread to terminate itself.
-	 * Note that this RPC is scheduled to only execute the next time a call to a cancellation
-	 * point  system call is  made, and that system  call ends up  blocking (iow: calling the
-	 * kernel function `task_serve()') */
-	if unlikely(rpc_exec(tid, RPC_SYNCMODE_CP, &pthread_cancel_self_rpc, NULL) != 0)
+	/* NOTE: Use `RPC_JOIN_ASYNC' for joining since `pthread_cancel(3)' isn't
+	 *       a cancellation point itself,  and `rpc_exec()' becomes one  when
+	 *       `RPC_JOIN_WAITFOR' is used. */
+
+	/* TODO: Support for `PTHREAD_CANCEL_ENABLE' / `PTHREAD_CANCEL_DISABLE':
+	 *  - Could be implemented by using a dedicated signal here, and having
+	 *    the thread be able to mask/unmask it via `pthread_setcancelstate'
+	 *  - As far as I know, picking a dedicated signal is also how glibc
+	 *    goes about implementing this. (only that it uses regular,  old
+	 *    posix signal handlers, rather than fancy RPCs like we do)
+	 *  - Currently, this right here uses SIGRPC for RPC delivery */
+
+	/* TODO: Support for `PTHREAD_CANCEL_DEFERRED' / `PTHREAD_CANCEL_ASYNCHRONOUS':
+	 *  - Could be implemented very easily by:
+	 *     - Using `RPC_SYNCMODE_CP' for `PTHREAD_CANCEL_DEFERRED'
+	 *     - Using `RPC_SYNCMODE_ASYNC' for `PTHREAD_CANCEL_ASYNCHRONOUS'
+	 *       NOTE: When a thread switches to `RPC_SYNCMODE_ASYNC', it must
+	 *             also call `sys_rpc_serve()' in  order to deal with  any
+	 *             CP-based cancel RPC  send before the  change was  made.
+	 *             When transitioning in the other direction, no such call
+	 *             is needed since the async  may literally happen at  any
+	 *             point.
+	 *  - Currently, `RPC_SYNCMODE_CP' is being hard-coded. */
+	if unlikely(rpc_exec(tid, RPC_SYNCMODE_CP | RPC_DOMAIN_THREAD | RPC_JOIN_ASYNC,
+	                     &pthread_cancel_self_rpc, NULL) != 0)
 		return libc_geterrno();
 	return EOK;
 }
