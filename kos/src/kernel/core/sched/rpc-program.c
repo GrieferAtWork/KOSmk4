@@ -82,6 +82,15 @@
 #include <compat/kos/types.h>
 #endif /* __ARCH_HAVE_COMPAT */
 
+#undef RPC_TRACE_INSTRUCTIONS
+#if 0
+#define RPC_TRACE_INSTRUCTIONS
+#endif
+
+#ifdef RPC_TRACE_INSTRUCTIONS
+#include <kernel/printk.h>
+#endif /* RPC_TRACE_INSTRUCTIONS */
+
 DECL_BEGIN
 
 #ifndef SIZEOF_POINTER
@@ -953,18 +962,23 @@ rpc_vm_instr(struct rpc_vm *__restrict self)
 #endif /* !__ARCH_HAVE_COMPAT || __ARCH_COMPAT_SIZEOF_POINTER >= SIZEOF_POINTER */
 	byte_t opcode = rpc_vm_pc_rdb(self);
 	switch (opcode) {
+#ifdef RPC_TRACE_INSTRUCTIONS
+#define CASE(x) __IF0 { case x: printk(KERN_TRACE "[rpc] " #x "\n"); }
+#else /* RPC_TRACE_INSTRUCTIONS */
+#define CASE(x) case x:
+#endif /* !RPC_TRACE_INSTRUCTIONS */
 
-	case RPC_OP_ret:
+	CASE(RPC_OP_ret)
 		return false;
 
-	case RPC_OP_sppush_const: {
+	CASE(RPC_OP_sppush_const) {
 		byte_t buf[SIZEOF_POINTER];
 		size_t siz = rpc_vm_addrsize(self);
 		rpc_vm_pc_rdx(self, buf, siz);
 		rpc_vm_push2user(self, buf, siz);
 	}	break;
 
-	case RPC_OP_sppush_pop: {
+	CASE(RPC_OP_sppush_pop) {
 		size_t siz = rpc_vm_addrsize(self);
 		if unlikely(!CANPOP(1))
 			goto err_stack_underflow;
@@ -972,33 +986,33 @@ rpc_vm_instr(struct rpc_vm *__restrict self)
 		--self->rv_stacksz;
 	}	break;
 
-	case RPC_OP_const1u:
+	CASE(RPC_OP_const1u)
 		if unlikely(!CANPUSH(1))
 			goto err_stack_overflow;
 		PUSH((uintptr_t)rpc_vm_pc_rdb(self));
 		break;
 
-	case RPC_OP_const1s:
+	CASE(RPC_OP_const1s)
 		if unlikely(!CANPUSH(1))
 			goto err_stack_overflow;
 		PUSH((uintptr_t)(intptr_t)(int8_t)rpc_vm_pc_rdb(self));
 		break;
 
-	case RPC_OP_const2u:
+	CASE(RPC_OP_const2u)
 		if unlikely(!CANPUSH(1))
 			goto err_stack_overflow;
 		PUSH((uintptr_t)rpc_vm_pc_rdw(self));
 		break;
 
-	case RPC_OP_const2s:
+	CASE(RPC_OP_const2s)
 		if unlikely(!CANPUSH(1))
 			goto err_stack_overflow;
 		PUSH((uintptr_t)(intptr_t)(int16_t)rpc_vm_pc_rdw(self));
 		break;
 
-	case RPC_OP_const4s:
+	CASE(RPC_OP_const4s)
 #if SIZEOF_POINTER < 8
-	case RPC_OP_const4u:
+	CASE(RPC_OP_const4u)
 #endif /* SIZEOF_POINTER < 8 */
 		if unlikely(!CANPUSH(1))
 			goto err_stack_overflow;
@@ -1006,7 +1020,7 @@ rpc_vm_instr(struct rpc_vm *__restrict self)
 		break;
 
 #if SIZEOF_POINTER >= 8
-	case RPC_OP_const4u: {
+	CASE(RPC_OP_const4u) {
 		uintptr_t value;
 		if unlikely(!CANPUSH(1))
 			goto err_stack_overflow;
@@ -1019,8 +1033,8 @@ rpc_vm_instr(struct rpc_vm *__restrict self)
 		PUSH(value);
 	}	break;
 
-	case RPC_OP_const8u:
-	case RPC_OP_const8s:
+	CASE(RPC_OP_const8u)
+	CASE(RPC_OP_const8s)
 #if defined(__ARCH_HAVE_COMPAT) && __ARCH_COMPAT_SIZEOF_POINTER < 8
 		if (rpc_vm_addrsize(self) < 8)
 			goto err_illegal_instruction;
@@ -1032,7 +1046,7 @@ rpc_vm_instr(struct rpc_vm *__restrict self)
 		break;
 #endif /* SIZEOF_POINTER >= 8 */
 
-	case RPC_OP_dup: {
+	CASE(RPC_OP_dup) {
 		uintptr_t value;
 		if unlikely(!CANPOP(1))
 			goto err_stack_underflow;
@@ -1042,13 +1056,13 @@ rpc_vm_instr(struct rpc_vm *__restrict self)
 		PUSH(value);
 	}	break;
 
-	case RPC_OP_drop:
+	CASE(RPC_OP_drop)
 		if unlikely(!CANPOP(1))
 			goto err_stack_underflow;
 		--self->rv_stacksz;
 		break;
 
-	case RPC_OP_over: {
+	CASE(RPC_OP_over) {
 		uintptr_t value;
 		if unlikely(!CANPOP(2))
 			goto err_stack_underflow;
@@ -1058,7 +1072,7 @@ rpc_vm_instr(struct rpc_vm *__restrict self)
 		PUSH(value);
 	}	break;
 
-	case RPC_OP_pick: {
+	CASE(RPC_OP_pick) {
 		uint8_t nth = rpc_vm_pc_rdb(self);
 		if unlikely(nth >= self->rv_stacksz)
 			goto err_stack_underflow;
@@ -1068,7 +1082,7 @@ rpc_vm_instr(struct rpc_vm *__restrict self)
 		++self->rv_stacksz;
 	}	break;
 
-	case RPC_OP_swap: {
+	CASE(RPC_OP_swap) {
 		uintptr_t temp;
 		if unlikely(self->rv_stacksz < 2)
 			goto err_stack_underflow;
@@ -1077,7 +1091,7 @@ rpc_vm_instr(struct rpc_vm *__restrict self)
 		TOP    = temp;
 	}	break;
 
-	case RPC_OP_rot: {
+	CASE(RPC_OP_rot) {
 		uintptr_t temp;
 		if unlikely(self->rv_stacksz < 3)
 			goto err_stack_underflow;
@@ -1087,9 +1101,9 @@ rpc_vm_instr(struct rpc_vm *__restrict self)
 		THIRD  = temp;
 	}	break;
 
-	case RPC_OP_abs:
-	case RPC_OP_neg:
-	case RPC_OP_not:
+	CASE(RPC_OP_abs)
+	CASE(RPC_OP_neg)
+	CASE(RPC_OP_not)
 		/* Unary (1-operand) arithmetic and bit-wise operators. */
 		if unlikely(self->rv_stacksz < 1)
 			goto err_stack_underflow;
@@ -1109,27 +1123,27 @@ rpc_vm_instr(struct rpc_vm *__restrict self)
 		}
 		break;
 
-	case RPC_OP_and:
-	case RPC_OP_div:
-	case RPC_OP_minus:
-	case RPC_OP_mod:
-	case RPC_OP_mul:
-	case RPC_OP_or:
-	case RPC_OP_plus:
-	case RPC_OP_shl:
-	case RPC_OP_shr:
-	case RPC_OP_shra:
-	case RPC_OP_xor:
-	case RPC_OP_eq:
-	case RPC_OP_ge:
-	case RPC_OP_gt:
-	case RPC_OP_le:
-	case RPC_OP_lt:
-	case RPC_OP_ne:
-	case RPC_OP_uge:
-	case RPC_OP_ugt:
-	case RPC_OP_ule:
-	case RPC_OP_ult:
+	CASE(RPC_OP_and)
+	CASE(RPC_OP_div)
+	CASE(RPC_OP_minus)
+	CASE(RPC_OP_mod)
+	CASE(RPC_OP_mul)
+	CASE(RPC_OP_or)
+	CASE(RPC_OP_plus)
+	CASE(RPC_OP_shl)
+	CASE(RPC_OP_shr)
+	CASE(RPC_OP_shra)
+	CASE(RPC_OP_xor)
+	CASE(RPC_OP_eq)
+	CASE(RPC_OP_ge)
+	CASE(RPC_OP_gt)
+	CASE(RPC_OP_le)
+	CASE(RPC_OP_lt)
+	CASE(RPC_OP_ne)
+	CASE(RPC_OP_uge)
+	CASE(RPC_OP_ugt)
+	CASE(RPC_OP_ule)
+	CASE(RPC_OP_ult)
 		/* Binary (2-operand) arithmetic and bit-wise operators. */
 		if unlikely(self->rv_stacksz < 2)
 			goto err_stack_underflow;
@@ -1218,7 +1232,7 @@ rpc_vm_instr(struct rpc_vm *__restrict self)
 		--self->rv_stacksz;
 		break;
 
-	case RPC_OP_bra:
+	CASE(RPC_OP_bra)
 		if unlikely(!CANPOP(1))
 			goto err_stack_underflow;
 		--self->rv_stacksz;
@@ -1227,7 +1241,7 @@ rpc_vm_instr(struct rpc_vm *__restrict self)
 		rpc_vm_pc_rdw(self);
 		break;
 
-	case RPC_OP_nbra:
+	CASE(RPC_OP_nbra)
 		if unlikely(!CANPOP(1))
 			goto err_stack_underflow;
 		--self->rv_stacksz;
@@ -1236,7 +1250,7 @@ rpc_vm_instr(struct rpc_vm *__restrict self)
 		rpc_vm_pc_rdw(self);
 		break;
 
-	case RPC_OP_skip: {
+	CASE(RPC_OP_skip) {
 		int16_t delta;
 follow_jmp:
 		delta = (int16_t)rpc_vm_pc_rdw(self);
@@ -1245,37 +1259,46 @@ follow_jmp:
 	}	break;
 
 	case RPC_OP_popreg0 ...  RPC_OP_popreg31:
+#ifdef RPC_TRACE_INSTRUCTIONS
+		printk(KERN_TRACE "[rpc] RPC_OP_popreg%u\n", opcode - RPC_OP_popreg0);
+#endif /* RPC_TRACE_INSTRUCTIONS */
 		rpc_vm_popreg(self, opcode - RPC_OP_popreg0);
 		break;
 
-	case RPC_OP_popregx:
-		rpc_vm_popreg(self, rpc_vm_pc_rduleb128(self));
-		break;
-
 	case RPC_OP_pushreg0 ...  RPC_OP_pushreg31:
+#ifdef RPC_TRACE_INSTRUCTIONS
+		printk(KERN_TRACE "[rpc] RPC_OP_pushreg%u\n", opcode - RPC_OP_pushreg0);
+#endif /* RPC_TRACE_INSTRUCTIONS */
 		rpc_vm_pushreg(self, opcode - RPC_OP_pushreg0);
 		break;
 
-	case RPC_OP_pushregx:
-		rpc_vm_pushreg(self, rpc_vm_pc_rduleb128(self));
-		break;
-
 	case RPC_OP_sppushreg0 ...  RPC_OP_sppushreg31:
+#ifdef RPC_TRACE_INSTRUCTIONS
+		printk(KERN_TRACE "[rpc] RPC_OP_sppushreg%u\n", opcode - RPC_OP_sppushreg0);
+#endif /* RPC_TRACE_INSTRUCTIONS */
 		rpc_vm_pushreg2user(self, opcode - RPC_OP_sppushreg0);
 		break;
 
-	case RPC_OP_sppushregx:
+	CASE(RPC_OP_popregx)
+		rpc_vm_popreg(self, rpc_vm_pc_rduleb128(self));
+		break;
+
+	CASE(RPC_OP_pushregx)
+		rpc_vm_pushreg(self, rpc_vm_pc_rduleb128(self));
+		break;
+
+	CASE(RPC_OP_sppushregx)
 		rpc_vm_pushreg2user(self, rpc_vm_pc_rduleb128(self));
 		break;
 
-	case RPC_OP_deref: {
+	CASE(RPC_OP_deref) {
 		size_t siz = rpc_vm_addrsize(self);
 		if unlikely(!CANPOP(1))
 			goto err_stack_underflow;
 		rpc_vm_rdmem(self, TOP, &TOP, siz);
 	}	break;
 
-	case RPC_OP_deref_size: {
+	CASE(RPC_OP_deref_size) {
 		uint8_t siz = rpc_vm_pc_rdb(self);
 		if unlikely(!CANPOP(1))
 			goto err_stack_underflow;
@@ -1304,7 +1327,7 @@ follow_jmp:
 		rpc_vm_rdmem(self, TOP, &TOP, siz);
 	}	break;
 
-	case RPC_OP_write: {
+	CASE(RPC_OP_write) {
 		size_t siz = rpc_vm_addrsize(self);
 		uintptr_t addr, val;
 		if unlikely(!CANPOP(2))
@@ -1314,7 +1337,7 @@ follow_jmp:
 		rpc_vm_wrmem(self, addr, &val, siz);
 	}	break;
 
-	case RPC_OP_write_size: {
+	CASE(RPC_OP_write_size) {
 		uint8_t siz = rpc_vm_pc_rdb(self);
 		uintptr_t addr, val;
 		if unlikely(!CANPOP(2))
@@ -1346,10 +1369,10 @@ follow_jmp:
 		rpc_vm_wrmem(self, addr, &val, siz);
 	}	break;
 
-	case RPC_OP_nop:
+	CASE(RPC_OP_nop)
 		break;
 
-	case RPC_OP_widenz: {
+	CASE(RPC_OP_widenz) {
 		uint8_t siz = rpc_vm_pc_rdb(self);
 		uintptr_t value;
 		if unlikely(!CANPOP(1))
@@ -1385,7 +1408,7 @@ follow_jmp:
 		TOP = value;
 	}	break;
 
-	case RPC_OP_widens: {
+	CASE(RPC_OP_widens) {
 		uint8_t siz = rpc_vm_pc_rdb(self);
 		uintptr_t value;
 		if unlikely(!CANPOP(1))
@@ -1429,25 +1452,25 @@ follow_jmp:
 	/************************************************************************/
 	/* Special-purpose instructions                                         */
 	/************************************************************************/
-	case RPC_OP_push_reason:
+	CASE(RPC_OP_push_reason)
 		if unlikely(!CANPUSH(1))
 			goto err_stack_overflow;
 		PUSH(self->rv_reason);
 		break;
 
-	case RPC_OP_push_dorestart:
+	CASE(RPC_OP_push_dorestart)
 		if unlikely(!CANPUSH(1))
 			goto err_stack_overflow;
 		PUSH(self->rv_reason == RPC_REASONCTX_SYSCALL ? 1 : 0);
 		break;
 
-	case RPC_OP_push_issyscall:
+	CASE(RPC_OP_push_issyscall)
 		if unlikely(!CANPUSH(1))
 			goto err_stack_overflow;
 		PUSH(self->rv_sc_info != NULL ? 1 : 0);
 		break;
 
-	case RPC_OP_push_sc_info: {
+	CASE(RPC_OP_push_sc_info) {
 		uint8_t index = rpc_vm_pc_rdb(self);
 		if unlikely(index >= sizeof(struct rpc_syscall_info) / sizeof(void *)) {
 			THROW(E_INVALID_ARGUMENT_BAD_VALUE,
@@ -1463,7 +1486,7 @@ follow_jmp:
 		COMPAT_SIGN_EXTEND(TOP);
 	}	break;
 
-	case RPC_OP_sppush_sc_info: {
+	CASE(RPC_OP_sppush_sc_info) {
 		struct rpc_syscall_info const *info;
 		info = self->rv_sc_info;
 		if unlikely(info == NULL)
@@ -1484,7 +1507,7 @@ follow_jmp:
 		}
 	}	break;
 
-	case RPC_OP_push_param: {
+	CASE(RPC_OP_push_param) {
 		uint8_t index = rpc_vm_pc_rdb(self);
 		if unlikely(index >= self->rv_rpc->pr_user.pur_argc) {
 			THROW(E_INVALID_ARGUMENT_BAD_VALUE,
@@ -1498,7 +1521,7 @@ follow_jmp:
 		COMPAT_SIGN_EXTEND(TOP);
 	}	break;
 
-	case RPC_OP_futex_wake: {
+	CASE(RPC_OP_futex_wake) {
 		uintptr_t addr, count;
 		struct rpc_futex *ftx;
 		if unlikely(!CANPOP(2))
@@ -1515,7 +1538,7 @@ follow_jmp:
 		}
 	}	break;
 
-	case RPC_OP_sigblock: {
+	CASE(RPC_OP_sigblock) {
 		signo_t signo;
 		if unlikely(!CANPOP(1))
 			goto err_stack_underflow;
@@ -1532,7 +1555,7 @@ follow_jmp:
 		sigaddset(&self->rv_sigmask, signo);
 	}	break;
 
-	case RPC_OP_push_sigmask_word: {
+	CASE(RPC_OP_push_sigmask_word) {
 		uint8_t index = rpc_vm_pc_rdb(self);
 		USER CHECKED sigset_t const *mymask;
 		if unlikely(!CANPUSH(1))
@@ -1559,7 +1582,7 @@ follow_jmp:
 		}
 	}	break;
 
-	case RPC_OP_sppush_sigmask: {
+	CASE(RPC_OP_sppush_sigmask) {
 		uint16_t sigsetsz = rpc_vm_pc_rdw(self);
 		USER CHECKED sigset_t const *mymask;
 		if unlikely(sigsetsz > sizeof(sigset_t)) {
@@ -1571,7 +1594,7 @@ follow_jmp:
 		rpc_vm_push2user(self, mymask, sigsetsz);
 	}	break;
 
-	case RPC_OP_push_signal:
+	CASE(RPC_OP_push_signal)
 		if unlikely(!CANPUSH(1))
 			goto err_stack_overflow;
 		PUSH(_RPC_GETSIGNO(self->rv_rpc->pr_flags));
@@ -1585,13 +1608,13 @@ follow_jmp:
 	/* Arch-specific instructions                                           */
 	/************************************************************************/
 #ifdef __x86_64__
-	case RPC_OP_x86_push_is32bit:
+	CASE(RPC_OP_x86_push_is32bit)
 		if unlikely(!CANPUSH(1))
 			goto err_stack_overflow;
 		PUSH(ucpustate_iscompat(&self->rv_cpu) ? 1 : 0);
 		break;
 
-	case RPC_OP_386_pushreg_fsbase:
+	CASE(RPC_OP_386_pushreg_fsbase)
 		if unlikely(!ucpustate_is32bit(&self->rv_cpu))
 			goto err_illegal_instruction;
 #define WANT_err_illegal_instruction
@@ -1601,7 +1624,7 @@ follow_jmp:
 		PUSH((u64)(s64)(s32)(u32)self->rv_cpu.ucs_sgbase.sg_fsbase);
 		break;
 
-	case RPC_OP_386_pushreg_gsbase:
+	CASE(RPC_OP_386_pushreg_gsbase)
 		if unlikely(!ucpustate_is32bit(&self->rv_cpu))
 			goto err_illegal_instruction;
 #define WANT_err_illegal_instruction
@@ -1611,7 +1634,7 @@ follow_jmp:
 		PUSH((u64)(s64)(s32)(u32)self->rv_cpu.ucs_sgbase.sg_gsbase);
 		break;
 
-	case RPC_OP_386_popreg_fsbase:
+	CASE(RPC_OP_386_popreg_fsbase)
 		if unlikely(!ucpustate_is32bit(&self->rv_cpu))
 			goto err_illegal_instruction;
 #define WANT_err_illegal_instruction
@@ -1620,7 +1643,7 @@ follow_jmp:
 		self->rv_cpu.ucs_sgbase.sg_fsbase = POP();
 		break;
 
-	case RPC_OP_386_popreg_gsbase:
+	CASE(RPC_OP_386_popreg_gsbase)
 		if unlikely(!ucpustate_is32bit(&self->rv_cpu))
 			goto err_illegal_instruction;
 #define WANT_err_illegal_instruction
@@ -1629,34 +1652,34 @@ follow_jmp:
 		self->rv_cpu.ucs_sgbase.sg_gsbase = POP();
 		break;
 #elif defined(__i386__)
-	case RPC_OP_x86_push_is32bit:
+	CASE(RPC_OP_x86_push_is32bit)
 		if unlikely(!CANPUSH(1))
 			goto err_stack_overflow;
 		PUSH(1);
 		break;
 
-	case RPC_OP_386_pushreg_fsbase:
+	CASE(RPC_OP_386_pushreg_fsbase)
 		if unlikely(!CANPUSH(1))
 			goto err_stack_overflow;
 		PUSH(self->rv_flags & RPC_VM_HAVE_FSBASE ? self->rv_386_fsbase
 		                                         : x86_get_user_fsbase());
 		break;
 
-	case RPC_OP_386_pushreg_gsbase:
+	CASE(RPC_OP_386_pushreg_gsbase)
 		if unlikely(!CANPUSH(1))
 			goto err_stack_overflow;
 		PUSH(self->rv_flags & RPC_VM_HAVE_GSBASE ? self->rv_386_gsbase
 		                                         : x86_get_user_gsbase());
 		break;
 
-	case RPC_OP_386_popreg_fsbase:
+	CASE(RPC_OP_386_popreg_fsbase)
 		if unlikely(!CANPOP(1))
 			goto err_stack_underflow;
 		self->rv_flags |= RPC_VM_HAVE_FSBASE;
 		self->rv_386_fsbase = POP();
 		break;
 
-	case RPC_OP_386_popreg_gsbase:
+	CASE(RPC_OP_386_popreg_gsbase)
 		if unlikely(!CANPOP(1))
 			goto err_stack_underflow;
 		self->rv_flags |= RPC_VM_HAVE_GSBASE;
@@ -1676,6 +1699,7 @@ err_illegal_instruction:
 		      E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_INSTRUCTION,
 		      opcode);
 		break;
+#undef CASE
 	}
 	return true;
 err_stack_overflow:
