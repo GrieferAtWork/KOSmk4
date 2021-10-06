@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x53ae6486 */
+/* HASH CRC-32:0xf4dd1864 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1274,7 +1274,6 @@
 #define __NRCP_futex
 #define __NRCP_nanosleep
 #define __NRCP_clock_nanosleep
-#define __NRCP_syslog
 #define __NRCP_rt_sigsuspend
 #define __NRCP_rt_sigtimedwait
 #define __NRCP_sysinfo

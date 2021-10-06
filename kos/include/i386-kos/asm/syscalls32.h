@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1344df96 */
+/* HASH CRC-32:0xc2e02918 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1417,10 +1417,10 @@
 #define __NR_get_exception_handler        __UINT32_C(0xfffffff1) /* errno_t get_exception_handler(__ULONG32_TYPE__ *pmode, __except_handler32_t *phandler, __HYBRID_PTR32(void) *phandler_sp) */
 /* Set the exception handler mode for the calling thread.
  * Examples:
- *   Set mode #3 from you `main()': `set_exception_handler(EXCEPT_HANDLER_MODE_SIGHAND, NULL, NULL)'
- *   Set  mode   #4  (as   done  by   libc):  `set_exception_handler(EXCEPT_HANDLER_MODE_SIGHAND   |
- *                                                         EXCEPT_HANDLER_FLAG_SETHANDLER,
- *                                                         &except_handler4, NULL)'
+ *   - Set mode #3 from you `main()': `set_exception_handler(EXCEPT_HANDLER_MODE_SIGHAND, NULL, NULL)'
+ *   - Set mode #4 (as done by libc): `set_exception_handler(EXCEPT_HANDLER_MODE_SIGHAND |
+ *                                                           EXCEPT_HANDLER_FLAG_SETHANDLER,
+ *                                                           &except_handler4, NULL)'
  * @param: mode:       One of `EXCEPT_HANDLER_MODE_*', optionally or'd with `EXCEPT_HANDLER_FLAG_*'
  * @param: handler:    When `EXCEPT_HANDLER_FLAG_SETHANDLER' is set, the address of the exception handler to use
  * @param: handler_sp: When `EXCEPT_HANDLER_FLAG_SETSTACK' is set, the address of the exception handler stack
@@ -2168,7 +2168,6 @@
 #define __NRCP_readdir
 #define __NRCP_fchmod
 #define __NRCP_fchown
-#define __NRCP_syslog
 #define __NRCP_stat
 #define __NRCP_lstat
 #define __NRCP_fstat

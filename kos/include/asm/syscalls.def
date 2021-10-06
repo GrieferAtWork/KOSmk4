@@ -2804,7 +2804,7 @@ reboot:([tostr(REBOOT_HOW)] syscall_ulong_t how) -> errno_t; /* UNIMPLEMENTED! *
 /************************************************************************/
 /* Misc                                                                 */
 /************************************************************************/
-[cp][restart(must)] /* TODO: Implemented incompatible with linux! */
+[restart(must)] /* TODO: Implemented incompatible with linux! */
 syslog:([tostr(SYSLOG_LEVEL)] syscall_ulong_t level,
         [tostr(STRING:len)] char const *str, size_t len) -> ssize_t;
 
@@ -2814,10 +2814,10 @@ getrandom:(void *buf, size_t num_bytes,
 
 @@Set the exception handler mode for the calling thread.
 @@Examples:
-@@  Set mode #3 from you `main()': `set_exception_handler(EXCEPT_HANDLER_MODE_SIGHAND, NULL, NULL)'
-@@  Set  mode   #4  (as   done  by   libc):  `set_exception_handler(EXCEPT_HANDLER_MODE_SIGHAND   |
-@@                                                        EXCEPT_HANDLER_FLAG_SETHANDLER,
-@@                                                        &except_handler4, NULL)'
+@@  - Set mode #3 from you `main()': `set_exception_handler(EXCEPT_HANDLER_MODE_SIGHAND, NULL, NULL)'
+@@  - Set mode #4 (as done by libc): `set_exception_handler(EXCEPT_HANDLER_MODE_SIGHAND |
+@@                                                          EXCEPT_HANDLER_FLAG_SETHANDLER,
+@@                                                          &except_handler4, NULL)'
 @@@param: mode:       One of `EXCEPT_HANDLER_MODE_*', optionally or'd with `EXCEPT_HANDLER_FLAG_*'
 @@@param: handler:    When `EXCEPT_HANDLER_FLAG_SETHANDLER' is set, the address of the exception handler to use
 @@@param: handler_sp: When `EXCEPT_HANDLER_FLAG_SETSTACK' is set, the address of the exception handler stack
