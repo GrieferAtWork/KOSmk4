@@ -564,7 +564,7 @@ INTERN_FUNCTION(userexcept_handler_ucpustate)
 	sti
 
 	movP   %Pbx, %R_fcall0P /* For `userexcept_handler()' */
-	movP   %R_fcall0P, %Pbp /* Needed once again later. */
+	movP   %R_fcall1P, %Pbp /* Needed once again later. */
 	EXTERN(userexcept_handler)
 	call   userexcept_handler
 
