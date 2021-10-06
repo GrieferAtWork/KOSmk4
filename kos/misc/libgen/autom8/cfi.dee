@@ -224,7 +224,7 @@ function main(parser: Autom8Parser, body: string) {
 		doTheThing("i386", processX86AssemblyBody(body, true));
 		parser.newText << "#endif /* !__x86_64__ */\n";
 	} else {
-		doTheThing(arch);
+		doTheThing(arch, body);
 	}
 
 	parser.newText << "/*[[[end]]]*/";
