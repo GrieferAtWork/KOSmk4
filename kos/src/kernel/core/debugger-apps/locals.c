@@ -40,6 +40,7 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 
 #include <hybrid/overflow.h>
 
+#include <compat/config.h>
 #include <kos/kernel/cpu-state-helpers.h>
 #include <kos/kernel/cpu-state.h>
 
@@ -51,6 +52,10 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #include <libdebuginfo/debug_info.h>
 #include <libunwind/cfi.h>
 #include <libunwind/unwind.h>
+
+#ifdef __ARCH_HAVE_COMPAT
+#include <libunwind/arch-register.h> /* unwind_getreg_compat() */
+#endif /* __ARCH_HAVE_COMPAT */
 
 DECL_BEGIN
 
@@ -121,20 +126,42 @@ do_print_local(void *UNUSED(arg),
 	value_buffer   = alloca(bufsize);
 	debug_sections = di_debug_sections_from_di_enum_locals_sections(sections);
 	/* Read the value of this local variable. */
-	error = debuginfo_location_getvalue(&var->v_location,
-	                                    di_debug_sections_as_unwind_emulator_sections(debug_sections),
-	                                    &dbg_getreg,
-	                                    (void *)(uintptr_t)DBG_REGLEVEL_VIEW,
-	                                    di_debuginfo_compile_unit_as_simple(cu),
-	                                    module_relative_pc,
-	                                    _locals_current_module_loadaddr,
-	                                    value_buffer,
-	                                    bufsize,
-	                                    &num_bits,
-	                                    &sp->sp_frame_base,
-	                                    NULL,
-	                                    parser->dup_addrsize,
-	                                    parser->dup_ptrsize);
+#ifdef __ARCH_HAVE_COMPAT
+	if (dbg_current_iscompat()) {
+		struct unwind_getreg_compat_data compat_data;
+		unwind_getreg_compat_data_init(&compat_data, &dbg_getreg, (void *)(uintptr_t)DBG_REGLEVEL_VIEW);
+		error = debuginfo_location_getvalue(&var->v_location,
+		                                    di_debug_sections_as_unwind_emulator_sections(debug_sections),
+		                                    &unwind_getreg_compat,
+		                                    &compat_data,
+		                                    di_debuginfo_compile_unit_as_simple(cu),
+		                                    module_relative_pc,
+		                                    _locals_current_module_loadaddr,
+		                                    value_buffer,
+		                                    bufsize,
+		                                    &num_bits,
+		                                    &sp->sp_frame_base,
+		                                    NULL,
+		                                    parser->dup_addrsize,
+		                                    parser->dup_ptrsize);
+	} else
+#endif /* __ARCH_HAVE_COMPAT */
+	{
+		error = debuginfo_location_getvalue(&var->v_location,
+		                                    di_debug_sections_as_unwind_emulator_sections(debug_sections),
+		                                    &dbg_getreg,
+		                                    (void *)(uintptr_t)DBG_REGLEVEL_VIEW,
+		                                    di_debuginfo_compile_unit_as_simple(cu),
+		                                    module_relative_pc,
+		                                    _locals_current_module_loadaddr,
+		                                    value_buffer,
+		                                    bufsize,
+		                                    &num_bits,
+		                                    &sp->sp_frame_base,
+		                                    NULL,
+		                                    parser->dup_addrsize,
+		                                    parser->dup_ptrsize);
+	}
 	if unlikely(error == UNWIND_SUCCESS) {
 		/* Print the local variable. */
 		debuginfo_print_value(&dbg_printer,
