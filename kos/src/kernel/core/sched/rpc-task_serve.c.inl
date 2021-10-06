@@ -98,6 +98,7 @@ handle_pending:
 				*restore_plast = rpc;
 				restore_plast  = &rpc->pr_link.sle_next;
 				result |= TASK_SERVE_NX_EXCEPT;
+				ATOMIC_OR(PERTASK(this_task.t_flags), TASK_FRPC);
 			} else
 #endif /* LOCAL_NOEXCEPT */
 			{
