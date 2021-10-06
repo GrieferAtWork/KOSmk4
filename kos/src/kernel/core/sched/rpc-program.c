@@ -198,7 +198,7 @@ rpc_membank_insert_back(struct rpc_membank *__restrict self, size_t more_bytes)
 		result->rmb_datoff = new_data_offset;
 	}
 	result->rmb_addrhi += more_bytes;
-	DBG_memset(result + new_data_offset, 0xcc, more_bytes);
+	DBG_memset((byte_t *)result + new_data_offset, 0xcc, more_bytes);
 	for (i = 0; i < more_bytes; ++i) {
 		size_t reladdr = old_byte_count + i;
 		rpc_membank_setstatus(result, reladdr, RPC_MEMBANK_STATUS_UNDEF);
@@ -221,7 +221,7 @@ rpc_membank_insert_front(struct rpc_membank *__restrict self, size_t more_bytes)
 	memmoveup((byte_t *)result + new_data_offset + more_bytes,
 	          (byte_t *)result + result->rmb_datoff,
 	          old_byte_count);
-	DBG_memset(result + new_data_offset, 0xcc, more_bytes);
+	DBG_memset((byte_t *)result + new_data_offset, 0xcc, more_bytes);
 	result->rmb_addrlo -= more_bytes;
 	result->rmb_datoff = new_data_offset;
 	/* Important: move bits in reverse because we move then upwards. */
@@ -259,7 +259,7 @@ rpc_membank_join(struct rpc_membank *__restrict lo,
 		result->rmb_datoff = new_data_offset;
 	}
 	result->rmb_addrhi = hi->rmb_addrhi;
-	memcpy(result + new_data_offset, rpc_membank_data(hi), more_bytes);
+	memcpy((byte_t *)result + new_data_offset, rpc_membank_data(hi), more_bytes);
 	/* TODO: Use `bitcpy' */
 	for (i = 0; i < more_bytes; ++i) {
 		int st         = rpc_membank_getstatus(hi, i);
