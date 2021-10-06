@@ -54,6 +54,35 @@ DECL_BEGIN
 #define unwind_fde_getsysno(fde) ((uintptr_t)(fde)->f_lsdaaddr)
 
 
+/* Only  `struct icpustate's helper macros include checks for `x86_userexcept_sysret',
+ * such that registers are read from TLS memory instead. This is intended and actually
+ * required since only `struct icpustate' allows for the assumption that the given CPU
+ * state _actually_ belongs to the calling thread.
+ *
+ * However, there is one problem with this that is addressed here:
+ *   - When `x86_userexcept_sysret' was injected (s.a. `userexcept_sysret_inject_nopr()'),
+ *     then  IRET.EFLAGS was set to `0', which  regular unwinding will (correctly so) pick
+ *     up on and apply when unwinding reaches `x86_userexcept_sysret' (as it may very well
+ *     in any of the personality functions below)
+ *   - When this happens, then the EFLAGS value used for loading RPC syscall information
+ *     will  also be equal to `0', but this has as a consequence that we'd never realize
+ *     when the system call was performed  with exceptions enabled (which user-space  is
+ *     able to select using EFLAGS.DF)
+ *   - As  such, we must manually check for this  situation and set the EXCEPT flag based
+ *     on what is stored in `this_x86_sysret_iret', rather than the constant `0' normally
+ *     unwound in this scenario.
+ */
+LOCAL NOBLOCK WUNUSED NONNULL((1, 2)) void
+NOTHROW(FCALL syscall_info_amend_FEXCEPT)(struct rpc_syscall_info *__restrict self,
+                                          struct ucpustate const *__restrict ustate) {
+	if ((void *)ucpustate_getpc(ustate) == (void *)&x86_userexcept_sysret) {
+		assert(!(self->rsi_flags & RPC_SYSCALL_INFO_FEXCEPT));
+		assert(ucpustate_getpflags(ustate) == 0);
+		if (PERTASK_GET(this_x86_sysret_iret.ir_Pflags) & EFLAGS_DF)
+			self->rsi_flags |= RPC_SYSCALL_INFO_FEXCEPT;
+	}
+}
+
 
 /* The personality function used  to handle exceptions propagated  through
  * system calls. - Specifically, the special handling that is required for
@@ -80,6 +109,7 @@ NOTHROW(EXCEPT_PERSONALITY_CC x86_syscall_personality_asm32_int80)(struct unwind
 	       ucpustate_getpc(&ustate) == (void const *)&x86_userexcept_sysret);
 	gpregs_setpax(&ustate.ucs_gpregs, unwind_fde_getsysno(fde));
 	rpc_syscall_info_get32_int80h(&sc_info, &ustate);
+	syscall_info_amend_FEXCEPT(&sc_info, &ustate);
 	userexcept_handler_ucpustate(&ustate, &sc_info);
 }
 
@@ -109,6 +139,7 @@ NOTHROW(EXCEPT_PERSONALITY_CC x86_syscall_personality_asm32_sysenter)(struct unw
 	       ucpustate_getpc(&ustate) == (void const *)&x86_userexcept_sysret);
 	gpregs_setpax(&ustate.ucs_gpregs, unwind_fde_getsysno(fde));
 	rpc_syscall_info_get32_sysenter_nx(&sc_info, &ustate);
+	syscall_info_amend_FEXCEPT(&sc_info, &ustate);
 	userexcept_handler_ucpustate(&ustate, &sc_info);
 err:
 	return EXCEPT_PERSONALITY_CONTINUE_UNWIND;
@@ -144,6 +175,7 @@ NOTHROW(EXCEPT_PERSONALITY_CC x86_syscall_personality_asm64_syscall)(struct unwi
 	       ucpustate_getpc(&ustate) == (void const *)&x86_userexcept_sysret);
 	gpregs_setpax(&ustate.ucs_gpregs, unwind_fde_getsysno(fde));
 	rpc_syscall_info_get64_int80h(&sc_info, &ustate);
+	syscall_info_amend_FEXCEPT(&sc_info, &ustate);
 	userexcept_handler_ucpustate(&ustate, &sc_info);
 err:
 	return EXCEPT_PERSONALITY_CONTINUE_UNWIND;
