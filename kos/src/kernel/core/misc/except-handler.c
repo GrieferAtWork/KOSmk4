@@ -804,7 +804,7 @@ NOTHROW(FCALL ipi_userexcept_sysret_inject_safe)(struct icpustate *__restrict st
  * terminate.
  * Additionally, this function will make a call to `task_wake()'  once
  * the injection has completed, meaning that `thread' will wake up and
- * either immediatly  start executing  `userexcept_sysret()', or  will
+ * either immediately start  executing `userexcept_sysret()', or  will
  * handle a sporadic interrupt via a call to `task_serve()'.
  *
  * Note that the  actual injection may  complete asynchronously when  an

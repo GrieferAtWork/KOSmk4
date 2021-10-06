@@ -196,7 +196,7 @@ rpc_schedule_in_this_task(struct pending_rpc *__restrict rpc,
 	 *
 	 * As such, we can proceed to unwind  back to user-space via a custom  kernel
 	 * RPC which then implements the special handling for self-directed, wait-for
-	 * RPCs getting executed immediatly. */
+	 * RPCs getting executed immediately. */
 	TRY {
 		task_rpc_exec(THIS_TASK, RPC_CONTEXT_KERN | RPC_SYNCMODE_F_USER,
 		              &rpc_schedule_in_this_task_rpc, rpc);

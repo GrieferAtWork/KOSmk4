@@ -163,12 +163,12 @@ THROWS(E_SEGFAULT) {
 	/* If the signal mask changed (technically only needed if it became
 	 * less restrictive), then ensure that pending signals are  checked
 	 * prior to the next return to user-space.
-	 * We don't call `task_serve()' immediatly because we still want to
-	 * restart the caller's system call,  but if that system call  ends
-	 * up making a call to `task_serve()', then it is able to interrupt
-	 * itself and service the RPC,  at which point the sc_info  context
-	 * will be present (meaning that in that case it won't be the  call
-	 * to sigreturn(2) that's  attempted to be  restarted, but  instead
+	 * We don't call `task_serve()' immediately because we still want to
+	 * restart  the caller's system  call, but if  that system call ends
+	 * up making a call to `task_serve()', then it is able to  interrupt
+	 * itself  and service the  RPC, at which  point the sc_info context
+	 * will  be present (meaning that in that  case it won't be the call
+	 * to sigreturn(2)  that's attempted  to be  restarted, but  instead
 	 * the actual *inner* system call) */
 	if (changed)
 		userexcept_sysret_inject_self();

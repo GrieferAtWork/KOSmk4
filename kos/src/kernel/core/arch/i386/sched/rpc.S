@@ -501,7 +501,7 @@ INTERN_FUNCTION(userexcept_handler_ucpustate)
 	pushP  OFFSET_UCPUSTATE_SGREGS + OFFSET_SGREGS_ES(%R_fcall0P) /* ics_es */
 	pushP  OFFSET_UCPUSTATE_SGREGS + OFFSET_SGREGS_FS(%R_fcall0P) /* ics_fs */
 	movw   OFFSET_UCPUSTATE_SGREGS + OFFSET_SGREGS_GS(%R_fcall0P), %ax
-	movw   %ax, %gs /* Doesn't appear in `struct icpustate', so must set immediatly! */
+	movw   %ax, %gs /* Doesn't appear in `struct icpustate', so must set immediately! */
 .Lpush_icpustate_sgregs_done:
 #endif /* !__x86_64__ */
 
@@ -589,7 +589,7 @@ INTERN_FUNCTION(userexcept_handler_ucpustate)
 	 * soft-lock where some RPCs keep on causing task_serve() to  throw
 	 * an exception, only for `userexcept_handler()' to fail to restart
 	 * the interrupt,  then return  to user-space  where the  interrupt
-	 * happens again immediatly, causing the loop to continue  forever.
+	 * happens again immediately, causing the loop to continue forever.
 	 *
 	 * The solution to this problem is to assign exception handling
 	 * to the interrupt handler  that essentially looks like  this:
