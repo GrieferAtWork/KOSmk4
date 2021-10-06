@@ -45,6 +45,16 @@ DECL_BEGIN
 /* Personality functions for system calls                               */
 /************************************************************************/
 
+
+/* System calls encode their vector number  as the LSDA pointer, so  that
+ * when  unwinding we can reverse-engineer that number in order to decide
+ * on special actions to perform based on the called function, as well as
+ * inform user-space of which function  caused the exception, as well  as
+ * implement system call restarting. */
+#define unwind_fde_getsysno(fde) ((uintptr_t)(fde)->f_lsdaaddr)
+
+
+
 /* The personality function used  to handle exceptions propagated  through
  * system calls. - Specifically, the special handling that is required for
  * servicing an RPC as `rpc_serve_user_redirection_all' */
@@ -68,12 +78,7 @@ NOTHROW(EXCEPT_PERSONALITY_CC x86_syscall_personality_asm32_int80)(struct unwind
 		return EXCEPT_PERSONALITY_CONTINUE_UNWIND;
 	assert(ucpustate_isuser(&ustate) ||
 	       ucpustate_getpc(&ustate) == (void const *)&x86_userexcept_sysret);
-	/* System calls encode their vector number  as the LSDA pointer, so  that
-	 * when  unwinding we can reverse-engineer that number in order to decide
-	 * on special actions to perform based on the called function, as well as
-	 * inform user-space of which function  caused the exception, as well  as
-	 * implement system call restarting. */
-	gpregs_setpax(&ustate.ucs_gpregs, (uintptr_t)fde->f_persofun);
+	gpregs_setpax(&ustate.ucs_gpregs, unwind_fde_getsysno(fde));
 	rpc_syscall_info_get32_int80h(&sc_info, &ustate);
 	userexcept_handler_ucpustate(&ustate, &sc_info);
 }
@@ -102,12 +107,7 @@ NOTHROW(EXCEPT_PERSONALITY_CC x86_syscall_personality_asm32_sysenter)(struct unw
 	}
 	assert(ucpustate_isuser(&ustate) ||
 	       ucpustate_getpc(&ustate) == (void const *)&x86_userexcept_sysret);
-	/* System calls encode their vector number  as the LSDA pointer, so  that
-	 * when  unwinding we can reverse-engineer that number in order to decide
-	 * on special actions to perform based on the called function, as well as
-	 * inform user-space of which function  caused the exception, as well  as
-	 * implement system call restarting. */
-	gpregs_setpax(&ustate.ucs_gpregs, (uintptr_t)fde->f_lsdaaddr);
+	gpregs_setpax(&ustate.ucs_gpregs, unwind_fde_getsysno(fde));
 	rpc_syscall_info_get32_sysenter_nx(&sc_info, &ustate);
 	userexcept_handler_ucpustate(&ustate, &sc_info);
 err:
@@ -142,12 +142,7 @@ NOTHROW(EXCEPT_PERSONALITY_CC x86_syscall_personality_asm64_syscall)(struct unwi
 	}
 	assert(ucpustate_isuser(&ustate) ||
 	       ucpustate_getpc(&ustate) == (void const *)&x86_userexcept_sysret);
-	/* System calls encode their vector number  as the LSDA pointer, so  that
-	 * when  unwinding we can reverse-engineer that number in order to decide
-	 * on special actions to perform based on the called function, as well as
-	 * inform user-space of which function  caused the exception, as well  as
-	 * implement system call restarting. */
-	gpregs_setpax(&ustate.ucs_gpregs, (uintptr_t)fde->f_persofun);
+	gpregs_setpax(&ustate.ucs_gpregs, unwind_fde_getsysno(fde));
 	rpc_syscall_info_get64_int80h(&sc_info, &ustate);
 	userexcept_handler_ucpustate(&ustate, &sc_info);
 err:
