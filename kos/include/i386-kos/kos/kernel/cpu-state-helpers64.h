@@ -1051,7 +1051,6 @@ __NOTHROW_NCX(fcpustate64_to_scpustate64_p)(struct fcpustate64 const *__restrict
 #define gpregs_setreturn32                  gpregs64_setreturn64
 #define gpregs_setreturn64                  gpregs64_setreturn64
 
-
 #define irregs_isvm86(self)                 0
 #define irregs_isuser(self)                 irregs64_isuser(self)
 #define irregs_isuser_novm86(self)          irregs64_isuser(self)
@@ -1154,6 +1153,14 @@ __NOTHROW_NCX(fcpustate64_to_scpustate64_p)(struct fcpustate64 const *__restrict
 #define kcpustate_to_icpustate_p            kcpustate64_to_icpustate64_p
 #define kcpustate_to_icpustate64_p          kcpustate64_to_icpustate64_p
 #define kcpustate64_to_icpustate_p          kcpustate64_to_icpustate64_p
+#define kcpustate_getreturnbool(self)       gpregs_getreturnbool(&(self)->kcs_gpregs)
+#define kcpustate_getreturn(self)           gpregs_getreturn(&(self)->kcs_gpregs)
+#define kcpustate_getreturn32(self)         gpregs_getreturn32(&(self)->kcs_gpregs)
+#define kcpustate_getreturn64(self)         gpregs_getreturn64(&(self)->kcs_gpregs)
+#define kcpustate_setreturnbool(self, v)    gpregs_setreturnbool(&(self)->kcs_gpregs, v)
+#define kcpustate_setreturn(self, v)        gpregs_setreturn(&(self)->kcs_gpregs, v)
+#define kcpustate_setreturn32(self, v)      gpregs_setreturn32(&(self)->kcs_gpregs, v)
+#define kcpustate_setreturn64(self, v)      gpregs_setreturn64(&(self)->kcs_gpregs, v)
 
 #define icpustate_isvm86(self)              0
 #define icpustate_isuser_novm86             icpustate64_isuser
@@ -1335,6 +1342,14 @@ __NOTHROW_NCX(fcpustate64_to_scpustate64_p)(struct fcpustate64 const *__restrict
 #define scpustate_user_to_scpustate_p       scpustate64_user_to_scpustate64_p
 #define scpustate_user_to_scpustate64_p     scpustate64_user_to_scpustate64_p
 #define scpustate64_user_to_scpustate_p     scpustate64_user_to_scpustate64_p
+#define scpustate_getreturnbool(self)       gpregs_getreturnbool(&(self)->scs_gpregs)
+#define scpustate_getreturn(self)           gpregs_getreturn(&(self)->scs_gpregs)
+#define scpustate_getreturn32(self)         gpregs_getreturn32(&(self)->scs_gpregs)
+#define scpustate_getreturn64(self)         gpregs_getreturn64(&(self)->scs_gpregs)
+#define scpustate_setreturnbool(self, v)    gpregs_setreturnbool(&(self)->scs_gpregs, v)
+#define scpustate_setreturn(self, v)        gpregs_setreturn(&(self)->scs_gpregs, v)
+#define scpustate_setreturn32(self, v)      gpregs_setreturn32(&(self)->scs_gpregs, v)
+#define scpustate_setreturn64(self, v)      gpregs_setreturn64(&(self)->scs_gpregs, v)
 
 #define ucpustate_isvm86(self)              0
 #define ucpustate_isuser_novm86             ucpustate64_isuser
@@ -1380,6 +1395,14 @@ __NOTHROW_NCX(fcpustate64_to_scpustate64_p)(struct fcpustate64 const *__restrict
 #define ucpustate_to_scpustate_p            ucpustate64_to_scpustate64_p
 #define ucpustate_to_scpustate64_p          ucpustate64_to_scpustate64_p
 #define ucpustate64_to_scpustate_p          ucpustate64_to_scpustate64_p
+#define ucpustate_getreturnbool(self)       gpregs_getreturnbool(&(self)->ucs_gpregs)
+#define ucpustate_getreturn(self)           gpregs_getreturn(&(self)->ucs_gpregs)
+#define ucpustate_getreturn32(self)         gpregs_getreturn32(&(self)->ucs_gpregs)
+#define ucpustate_getreturn64(self)         gpregs_getreturn64(&(self)->ucs_gpregs)
+#define ucpustate_setreturnbool(self, v)    gpregs_setreturnbool(&(self)->ucs_gpregs, v)
+#define ucpustate_setreturn(self, v)        gpregs_setreturn(&(self)->ucs_gpregs, v)
+#define ucpustate_setreturn32(self, v)      gpregs_setreturn32(&(self)->ucs_gpregs, v)
+#define ucpustate_setreturn64(self, v)      gpregs_setreturn64(&(self)->ucs_gpregs, v)
 
 #define fcpustate_isvm86(self)              0
 #define fcpustate_isuser_novm86             fcpustate64_isuser
@@ -1436,6 +1459,14 @@ __NOTHROW_NCX(fcpustate64_to_scpustate64_p)(struct fcpustate64 const *__restrict
 #define fcpustate_to_scpustate_p            fcpustate64_to_scpustate64_p
 #define fcpustate_to_scpustate64_p          fcpustate64_to_scpustate64_p
 #define fcpustate64_to_scpustate_p          fcpustate64_to_scpustate64_p
+#define fcpustate_getreturnbool(self)       gpregs_getreturnbool(&(self)->fcs_gpregs)
+#define fcpustate_getreturn(self)           gpregs_getreturn(&(self)->fcs_gpregs)
+#define fcpustate_getreturn32(self)         gpregs_getreturn32(&(self)->fcs_gpregs)
+#define fcpustate_getreturn64(self)         gpregs_getreturn64(&(self)->fcs_gpregs)
+#define fcpustate_setreturnbool(self, v)    gpregs_setreturnbool(&(self)->fcs_gpregs, v)
+#define fcpustate_setreturn(self, v)        gpregs_setreturn(&(self)->fcs_gpregs, v)
+#define fcpustate_setreturn32(self, v)      gpregs_setreturn32(&(self)->fcs_gpregs, v)
+#define fcpustate_setreturn64(self, v)      gpregs_setreturn64(&(self)->fcs_gpregs, v)
 
 #endif /* __x86_64__ */
 
