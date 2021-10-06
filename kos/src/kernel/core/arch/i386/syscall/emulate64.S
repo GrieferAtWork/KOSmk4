@@ -79,7 +79,7 @@
 	.cfi_signal_frame
 	ASM_CFI_OFFSET_RESTORE_ICPUSTATE(0)
 INTERN_FUNCTION(x86_syscall_emulate_traced_r)
-	.cfi_def_cfa %rsp, (SIZEOF_RPC_SYSCALL_INFO + OFFSET_ICPUSTATE_IRREGS)
+	.cfi_def_cfa %rsp, SIZEOF_RPC_SYSCALL_INFO
 	rep;   movsq
 	movq   %rsp, %rdi
 	EXTERN(syscall_trace)
@@ -88,14 +88,14 @@ INTERN_FUNCTION(x86_syscall_emulate_traced_r)
 END(x86_syscall_emulate_traced_r)
 
 PUBLIC_FUNCTION(syscall_emulate_r)
-	.cfi_def_cfa %rdi, OFFSET_ICPUSTATE_IRREGS
+	.cfi_def_cfa %rdi, 0
 	/* Start by copying `sc_info' (%rsi)  just infront of `state'  (%rdi)
 	 * Note that that sc_info may already be overlapping with said target
 	 * area, meaning that we have to use memmove() semantics copying data
 	 * from the top down to the bottom */
 	leaq   -SIZEOF_RPC_SYSCALL_INFO(%rdi), %rsp /* Load %rsp to point to the start of the copied `sc_info' */
+	.cfi_def_cfa %rsp, SIZEOF_RPC_SYSCALL_INFO
 	movq   %rsp, %rbx
-	.cfi_def_cfa %rsp, (SIZEOF_RPC_SYSCALL_INFO + OFFSET_ICPUSTATE_IRREGS)
 	subq   $(8), %rdi
 	addq   $(SIZEOF_RPC_SYSCALL_INFO - 8), %rsi
 	movq   $(SIZEOF_RPC_SYSCALL_INFO / 8), %rcx /* It's ok that this clobbers %rcx. - We can just load `%edi+4' once we're done */
