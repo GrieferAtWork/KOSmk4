@@ -757,11 +757,12 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *       for filling the remainder  of exception_info (except for  ei_nesting
 	 *       and ei_flags) with 0xcc bytes. */
 
-	/* TODO: Create an assembler similar to /kos/misc/libgen/cfi/comp.dee for RPC
-	 *       programs. As a matter of fact, the CFI compiler can pretty much just
-	 *       be copied verbatim, and the RPC compiler can then be modified to get
-	 *       rid of the operand-range checks while being given support for all of
-	 *       the instructions not found in CFI. */
+	/* TODO: Research how kill(2) should work for signals that are already pending.
+	 *       If it turns out that  a pending signal is  not put in-flight a  second
+	 *       time, then kill(2) can be implemented  via a sigset_t of signals  that
+	 *       should be raised  as soon  as the  target process  (yes: process;  not
+	 *       thread in this  case) is ready,  which would  get rid of  the risk  of
+	 *       the send operation running into an E_BADALLOC error. */
 
 	return state;
 }
