@@ -121,7 +121,7 @@ rpc_schedule_in_this_task_rpc(struct rpc_context *__restrict ctx, void *cookie) 
 
 	/* At  this point, the  system call has  completed. Indicate that fact
 	 * so that the RPC won't try to restart the `rpc_schedule(2)' syscall. */
-	ctx->rc_context = RPC_REASONCTX_SYSCALL;
+	ctx->rc_context = RPC_REASONCTX_SYSRET;
 }
 
 INTDEF NOBLOCK void /* From "misc/except-handler.c" */
