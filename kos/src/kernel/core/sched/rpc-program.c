@@ -540,7 +540,9 @@ struct rpc_vm {
 	struct ucpustate               rv_cpu;                       /* Cpu state. */
 	struct pending_rpc            *rv_rpc;                       /* [1..1][const] The RPC in question. */
 	unsigned int                   rv_reason;                    /* [const] RPC reason (one of `_RPC_REASONCTX_*') */
-	struct rpc_syscall_info const *rv_sc_info;                   /* [0..1][const] System call information */
+	struct rpc_syscall_info const *rv_sc_info;                   /* [1..1][valid_if(rv_reason == _RPC_REASONCTX_SYSCALL ||
+	                                                              *                 rv_reason == _RPC_REASONCTX_SYSINT)]
+	                                                              * [const] System call information */
 #ifdef CONFIG_FPU
 	struct fpustate                rv_fpu;                       /* [valid_if(RPC_VM_HAVEFPU)] FPU context. */
 #endif /* CONFIG_FPU */
@@ -1543,13 +1545,16 @@ follow_jmp:
 	CASE(RPC_OP_push_dorestart)
 		if unlikely(!CANPUSH(1))
 			goto err_stack_overflow;
-		PUSH(self->rv_reason == RPC_REASONCTX_SYSCALL ? 1 : 0);
+		PUSH(self->rv_reason == _RPC_REASONCTX_SYSCALL ? 1 : 0);
 		break;
 
 	CASE(RPC_OP_push_issyscall)
 		if unlikely(!CANPUSH(1))
 			goto err_stack_overflow;
-		PUSH(self->rv_sc_info != NULL ? 1 : 0);
+		PUSH((self->rv_reason == _RPC_REASONCTX_SYSCALL ||
+		      self->rv_reason == _RPC_REASONCTX_SYSINT)
+		     ? 1
+		     : 0);
 		break;
 
 	case RPC_OP_push_sc_info: {
@@ -1560,7 +1565,8 @@ follow_jmp:
 			      E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_BAD_SYSINFO_WORD,
 			      index);
 		}
-		if unlikely(self->rv_sc_info == NULL)
+		if unlikely(self->rv_reason != _RPC_REASONCTX_SYSCALL &&
+		            self->rv_reason != _RPC_REASONCTX_SYSINT)
 			goto err_no_syscall_info;
 		if unlikely(!CANPUSH(1))
 			goto err_stack_overflow;
@@ -1570,9 +1576,9 @@ follow_jmp:
 	}	break;
 
 	CASE(RPC_OP_sppush_sc_info) {
-		struct rpc_syscall_info const *info;
-		info = self->rv_sc_info;
-		if unlikely(info == NULL)
+		struct rpc_syscall_info const *info = self->rv_sc_info;
+		if unlikely(self->rv_reason != _RPC_REASONCTX_SYSCALL &&
+		            self->rv_reason != _RPC_REASONCTX_SYSINT)
 			goto err_no_syscall_info;
 #ifdef __ARCH_HAVE_COMPAT
 		if (ucpustate_iscompat(&self->rv_cpu)) {
@@ -1818,8 +1824,9 @@ err_no_syscall_info:
 
 
 /* Execute a user-space RPC program
- * @param: reason:  One of `_RPC_REASONCTX_ASYNC', `_RPC_REASONCTX_SYNC' or `_RPC_REASONCTX_SYSCALL'
- * @param: sc_info: The  system call that was active at the  time of the RPC being handled. Note that
+ * @param: reason:  One of `_RPC_REASONCTX_ASYNC', `_RPC_REASONCTX_SYNC', `_RPC_REASONCTX_SYSCALL' or `_RPC_REASONCTX_SYSINT'
+ * @param: sc_info: [valid_if(reason == _RPC_REASONCTX_SYSCALL || reason == _RPC_REASONCTX_SYSINT)]
+ *                  The  system call that was active at the  time of the RPC being handled. Note that
  *                  this system call only has to be restarted when `reason == _RPC_REASONCTX_SYSCALL'
  * @return: * :   The updated CPU state.
  * @return: NULL: The RPC was canceled before it could be fully executed.
@@ -1838,7 +1845,8 @@ task_userrpc_runprogram(rpc_cpustate_t *__restrict state,
 #endif /* __ARCH_HAVE_COMPAT */
 	assert(reason == _RPC_REASONCTX_ASYNC ||
 	       reason == _RPC_REASONCTX_SYNC ||
-	       reason == _RPC_REASONCTX_SYSCALL);
+	       reason == _RPC_REASONCTX_SYSCALL ||
+	       reason == _RPC_REASONCTX_SYSINT);
 	assert(icpustate_isuser(state));
 	assert(rpc->pr_user.pur_status == PENDING_USER_RPC_STATUS_PENDING ||
 	       rpc->pr_user.pur_status == PENDING_USER_RPC_STATUS_CANCELED);
@@ -1862,7 +1870,7 @@ task_userrpc_runprogram(rpc_cpustate_t *__restrict state,
 	/* As  per specs, RPC programs start execution with 1 element on-
 	 * stack that is indicative of the need to restart a system call. */
 	vm.rv_stacksz  = 1;
-	vm.rv_stack[0] = reason == RPC_REASONCTX_SYSCALL ? 1 : 0;
+	vm.rv_stack[0] = reason == _RPC_REASONCTX_SYSCALL ? 1 : 0;
 
 #ifdef __ARCH_HAVE_COMPAT
 	/* Initialize register getter/setter based on compatibility mode setting

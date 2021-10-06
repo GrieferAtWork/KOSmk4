@@ -42,9 +42,12 @@
 
 #include <kos/except.h>
 #include <kos/except/reason/inval.h>
+#include <kos/kernel/cpu-state-helpers.h>
+#include <kos/kernel/cpu-state.h>
 #include <kos/rpc.h>
 
 #include <assert.h>
+#include <errno.h>
 #include <signal.h>
 #include <stddef.h>
 #include <string.h>
@@ -59,6 +62,152 @@ DECL_BEGIN
      defined(DEFINE_compat_sys_rpc_schedule)) != 1
 #error "Must #define exactly one of these"
 #endif /* ... */
+
+#ifdef DEFINE_compat_sys_rpc_schedule
+#define LOCAL_validate_readable  compat_validate_readable
+#define LOCAL_validate_readablem compat_validate_readablem
+#else /* DEFINE_compat_sys_rpc_schedule */
+#define LOCAL_validate_readable  validate_readable
+#define LOCAL_validate_readablem validate_readablem
+#endif /* !DEFINE_compat_sys_rpc_schedule */
+
+
+#ifndef SIGMASK_ISMASKED_WITH_NESTING_DEFINED
+#define SIGMASK_ISMASKED_WITH_NESTING_DEFINED
+#ifdef CONFIG_HAVE_USERPROCMASK
+PRIVATE ATTR_NOINLINE ATTR_PURE WUNUSED bool FCALL
+sigmask_ismasked_with_nesting(signo_t signo) THROWS(E_SEGFAULT) {
+	NESTED_EXCEPTION;
+	return sigmask_ismasked(signo);
+}
+#else /* CONFIG_HAVE_USERPROCMASK */
+#define sigmask_ismasked_with_nesting sigmask_ismasked
+#endif /* !CONFIG_HAVE_USERPROCMASK */
+#endif /* !SIGMASK_ISMASKED_WITH_NESTING_DEFINED */
+
+
+#ifndef RPC_SCHEDULE_IN_THIS_TASK_DEFINED
+#define RPC_SCHEDULE_IN_THIS_TASK_DEFINED
+PRIVATE NONNULL((1)) void PRPC_EXEC_CALLBACK_CC
+rpc_schedule_in_this_task_rpc(struct rpc_context *__restrict ctx, void *cookie) THROWS(...) {
+	rpc_cpustate_t *newstate;
+	REF struct pending_rpc *rpc = (REF struct pending_rpc *)cookie;
+	FINALLY_DECREF_LIKELY(&rpc->pr_user); /* Always inherit the reference to the RPC */
+
+	/* Check if we got here as the result of a system call. Anything else
+	 * would mean that some other  RPC/posix-signal got delivered to  our
+	 * thread, or that our thread  somehow got terminated (probably  also
+	 * as a result of a posix-signal, or maybe some VIO memory access). */
+	if (ctx->rc_context != RPC_REASONCTX_SYSCALL)
+		return;
+
+	/* Time to execute the RPC! */
+	rpc->pr_user.pur_status = PENDING_USER_RPC_STATUS_PENDING;
+
+	/* Have the original system call return with `-EOK'.
+	 * This must be done _before_  executing the RPC program, so  that
+	 * the program will see the correct register state during whatever
+	 * it wants to do to transform our registers. */
+	icpustate_setreturn(ctx->rc_state, -EOK);
+
+	/* Errors thrown by this call are propagated as normal syscall errors. */
+	newstate = task_userrpc_runprogram(ctx->rc_state, rpc,
+	                                   _RPC_REASONCTX_SYSINT,
+	                                   &ctx->rc_scinfo);
+	assertf(newstate != NULL, "task_userrpc_runprogram() only returns NULL when the RPC "
+	                          "got canceled. So the question is: who canceled it? Our RPC "
+	                          "should only be visible to our own thread at this point!");
+	ctx->rc_state = newstate;
+
+	/* At  this point, the  system call has  completed. Indicate that fact
+	 * so that the RPC won't try to restart the `rpc_schedule(2)' syscall. */
+	ctx->rc_context = RPC_REASONCTX_SYSCALL;
+}
+
+INTDEF NOBLOCK void /* From "misc/except-handler.c" */
+NOTHROW(FCALL restore_pending_rpcs)(struct pending_rpc *restore);
+
+PRIVATE ATTR_NORETURN NONNULL((1)) void FCALL
+rpc_schedule_in_this_task(struct pending_rpc *__restrict rpc,
+                          syscall_ulong_t mode)
+		THROWS(E_INTERRUPT_USER_RPC) {
+	/* Try to remove the RPC from the thread/process pending  list
+	 * which it was originally added to. Since our caller  already
+	 * marked it as `PENDING_USER_RPC_STATUS_CANCELED', anyone who
+	 * may  come across  it within  the per-process  RPC list will
+	 * simply discard+decref it  (which is the  same we're  trying
+	 * to do, so if we don't find it in the per-proc list,  that's
+	 * also OK) */
+	if (mode & RPC_DOMAIN_F_PROC) {
+		bool did_remove = true;
+		struct process_pending_rpcs *rpcs;
+		rpcs = &THIS_PROCESS_RPCS;
+		atomic_rwlock_write(&rpcs->ppr_lock);
+		SLIST_TRYREMOVE(&rpcs->ppr_list, rpc, pr_link, { did_remove = false; });
+		atomic_rwlock_endwrite(&rpcs->ppr_lock);
+		if unlikely(!did_remove) {
+			/* Failed to remove -> Some other thread already came across it, but because
+			 * we managed to set the RPC state to `PENDING_USER_RPC_STATUS_CANCELED', we
+			 * also know that said other thread didn't manage to complete it! */
+			if (isshared(&rpc->pr_user)) {
+				/* Another thread (may be) executing  the RPC _right_ _now_, meaning  that
+				 * we can't re-use the same RPC descriptor, since this one must have  it's
+				 * status kept as `PENDING_USER_RPC_STATUS_CANCELED'. If we were to change
+				 * that, then the other thread currently executing it might end up missing
+				 * the momo on its cancellation.
+				 *
+				 * As such, our only option is to create a duplicate of the descriptor
+				 * and let the original be lazily cleaned up. */
+				struct pending_rpc *copy;
+				size_t struct_size = offsetof(struct pending_rpc, pr_user.pur_argv) +
+				                     rpc->pr_user.pur_argc * sizeof(USER UNCHECKED void *);
+				if (struct_size < offsetafter(struct pending_rpc, pr_user.pur_error))
+					struct_size = offsetafter(struct pending_rpc, pr_user.pur_error);
+				copy = (struct pending_rpc *)pending_rpc_alloc(struct_size, GFP_NORMAL);
+				memcpy(copy, rpc, struct_size);
+				incref(copy->pr_user.pur_mman);
+				copy->pr_user.pur_refcnt = 1;
+
+				/* Continue working with the secondary copy. */
+				rpc = copy;
+			} else {
+				incref(&rpc->pr_user);
+			}
+		} else {
+			/* Reference was inherited from `&rpcs->ppr_list' */
+		}
+	} else {
+		/* The per-task RPC list is thread-private, so no-one should
+		 * have been able to remove `rpc' from our's. */
+		struct pending_rpc_slist *list = &PERTASK(this_rpcs);
+		struct pending_rpc_slist pending;
+		pending.slh_first = SLIST_ATOMIC_CLEAR(list);
+		assert(!SLIST_EMPTY(&pending) &&
+		       SLIST_FIRST(&pending) != THIS_RPCS_TERMINATED);
+		SLIST_REMOVE(&pending, rpc, pr_link); /* Remove the RPC (and inherit reference) */
+		restore_pending_rpcs(SLIST_FIRST(&pending));
+		/*incref(&rpc->pr_user);*/ /* Already inherited from `&pending' */
+	}
+
+	/* At this point, the RPC can no longer be found in any of the pending lists,
+	 * as well as that by  removing the RPC from pending  lists, it is no  longer
+	 * visible to any other thread  (which it was for a  short period of time  in
+	 * the case of `RPC_DOMAIN_F_PROC')
+	 *
+	 * As such, we can proceed to unwind  back to user-space via a custom  kernel
+	 * RPC which then implements the special handling for self-directed, wait-for
+	 * RPCs getting executed immediatly. */
+	TRY {
+		task_rpc_exec(THIS_TASK, RPC_CONTEXT_KERN | RPC_SYNCMODE_F_USER,
+		              &rpc_schedule_in_this_task_rpc, rpc);
+	} EXCEPT {
+		decref(&rpc->pr_user);
+		RETHROW();
+	}
+	THROW(E_INTERRUPT_USER_RPC);
+}
+#endif /* !RPC_SCHEDULE_IN_THIS_TASK_DEFINED */
+
 
 #ifdef DEFINE_compat_sys_rpc_schedule
 DEFINE_COMPAT_SYSCALL5(errno_t, rpc_schedule,
@@ -100,8 +249,8 @@ DEFINE_SYSCALL5(errno_t, rpc_schedule,
 		}
 	}
 
-	validate_readable(program, 1);
-	validate_readablem(params, max_param_count, sizeof(USER UNCHECKED void const *));
+	LOCAL_validate_readable(program, 1);
+	LOCAL_validate_readablem(params, max_param_count, sizeof(USER UNCHECKED void const *));
 
 	/* If  we intend to wait for the RPC program to complete, then we also
 	 * check  for RPCs pending  within our own thread  before we'll end up
@@ -159,34 +308,11 @@ DEFINE_SYSCALL5(errno_t, rpc_schedule,
 		/* Schedule the RPC */
 		rpc->pr_user.pur_refcnt = 2; /* +1 for the target component's list. */
 		COMPILER_WRITE_BARRIER();
-		if (mode & RPC_DOMAIN_F_PROC) {
-			target = task_getprocess_of(target);
-			if (target == task_getprocess() && !(mode & RPC_JOIN_F_ASYNC) &&
-			    !sigmask_ismasked(_RPC_GETSIGNO(mode)))
-				goto handle_self_rpc;
-			if (!proc_rpc_schedule(target, rpc))
-				goto err_schedule_failed;
-		} else {
-			if (target == THIS_TASK && !(mode & RPC_JOIN_F_ASYNC) &&
-			    !sigmask_ismasked(_RPC_GETSIGNO(mode))) {
-handle_self_rpc:
-				/* TODO: Special case: Execute the RPC immediately, with:
-				 *        - sc_info != NULL                 (info describes the `rpc_schedule(2)' system call)
-				 *        - reason == _RPC_REASONCTX_SYNC   (don't let the RPC restart the system call)
-				 * Additionally, any exception thrown during the RPC program's
-				 * execution will be propagated back to user-space as  normal.
-				 *
-				 * Upon entry, the register state passed to the RPC program indicates
-				 * a successful completion of the `rpc_schedule(2)' system call (iow:
-				 * the return register is set to `-EOK') */
-				;
-			}
-			if (!task_rpc_schedule(target, rpc)) {
-err_schedule_failed:
-				rpc->pr_user.pur_refcnt = 1;
-				COMPILER_WRITE_BARRIER();
-				THROW(E_PROCESS_EXITED, (upid_t)target_tid);
-			}
+		if unlikely(!(mode & RPC_DOMAIN_F_PROC ? proc_rpc_schedule(target, rpc)
+		                                       : task_rpc_schedule(target, rpc))) {
+			rpc->pr_user.pur_refcnt = 1;
+			COMPILER_WRITE_BARRIER();
+			THROW(E_PROCESS_EXITED, (upid_t)target_tid);
 		}
 	}
 
@@ -213,8 +339,33 @@ err_schedule_failed:
 				 * then we must discard the exception (unless it's  an
 				 * RT-level error) */
 				status = ATOMIC_XCH(rpc->pr_user.pur_status, PENDING_USER_RPC_STATUS_CANCELED);
-				if (status != PENDING_USER_RPC_STATUS_COMPLETE)
+				if (status != PENDING_USER_RPC_STATUS_COMPLETE) {
+					if (status == PENDING_USER_RPC_STATUS_PENDING &&
+					    code == ERROR_CODEOF(E_INTERRUPT_USER_RPC)) {
+						/* Check for special case: The interrupt is the result of us trying
+						 * to  send an RPC to ourselves (either  our own thread, or our own
+						 * process; in the later case, we already know that no other thread
+						 * within the process  will/is executing the  RPC, because we  were
+						 * able to set its status to CANCELED) */
+						if ((target == THIS_TASK || ((mode & RPC_DOMAIN_F_PROC) &&
+						                             task_getprocess_of(target) == task_getprocess())) &&
+						    !sigmask_ismasked_with_nesting(_RPC_GETSIGNO(mode))) {
+							/* On most definitely! While the actual cause may have also been
+							 * some other RPC, the one we just tried to schedule is just  as
+							 * good of a reason, too!
+							 *
+							 * As such, the special handling for synchronous serving of RPCs
+							 * kicks  in, which has us invoke the RPC program directly under
+							 * a context of:
+							 *   - rpc_syscall_info: Information about the rpc_schedule(2) syscall
+							 *   - reason:           `_RPC_REASONCTX_SYSINT' (even though the
+							 *                       syscall won't/doesn't fail with  -EINTR)
+							 *   - return == 0:      rpc_schedule(2) returns with `0' */
+							goto exec_rpc_in_THIS_TASK;
+						}
+					}
 					RETHROW();
+				}
 
 				/* Ooops... The RPC completed before we could cancel it.
 				 * Well: now we have to get rid of the current exception,
@@ -265,8 +416,13 @@ err_schedule_failed:
 		}
 	}
 
-	return 0;
+	return -EOK;
+exec_rpc_in_THIS_TASK:
+	rpc_schedule_in_this_task(rpc, mode);
 }
+
+#undef LOCAL_validate_readablem
+#undef LOCAL_validate_readable
 
 DECL_END
 

@@ -71,7 +71,8 @@ typedef struct ucpustate rpc_cpustate_t;
  * #else // __KERNEL__
  *
  *   - `0':
- *       - RPC_REASONCTX_SYSCALL:  Syscall aborted (set `rc_context = RPC_REASONCTX_SYNC' to prevent restart)
+ *       - RPC_REASONCTX_SYSCALL:  Syscall aborted (set `rc_context = RPC_REASONCTX_SYSINT' to prevent restart)
+ *       - RPC_REASONCTX_SYSINT:   Syscall returns with -EINTR / E_INTERRUPT and will not be restarted.
  *       - RPC_REASONCTX_SYNC:     Synchronous interrupt call was aborted
  *
  *   - `RPC_SYNCMODE_F_ALLOW_ASYNC':
@@ -91,7 +92,13 @@ struct rpc_context {
 	                                     * In the case of an interrupted system call that is supposed
 	                                     * to be restarted, this describes  the return state of  that
 	                                     * system call. */
-	struct rpc_syscall_info rc_scinfo;  /* [valid_if(rc_context == RPC_REASONCTX_SYSCALL)] Syscall info. */
+	struct rpc_syscall_info rc_scinfo;  /* #ifdef __KERNEL__
+	                                     * [valid_if(rc_context == RPC_REASONCTX_SYSCALL)]
+	                                     * #else // __KERNEL__
+	                                     * [valid_if(rc_context == RPC_REASONCTX_SYSCALL ||
+	                                     *           rc_context == RPC_REASONCTX_SYSINT)]
+	                                     * #endif // !__KERNEL__
+	                                     * Syscall info. */
 };
 
 /* // Additional restrictions/permissions applicable in kernel-space

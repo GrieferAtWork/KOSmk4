@@ -249,8 +249,9 @@ NOTHROW(FCALL task_asyncrpc_push)(struct scpustate *__restrict state,
                                   void *cookie DFL(__NULLPTR));
 
 /* Execute a user-space RPC program
- * @param: reason:  One of `_RPC_REASONCTX_ASYNC', `_RPC_REASONCTX_SYNC' or `_RPC_REASONCTX_SYSCALL'
- * @param: sc_info: The  system call that was active at the  time of the RPC being handled. Note that
+ * @param: reason:  One of `_RPC_REASONCTX_ASYNC', `_RPC_REASONCTX_SYNC', `_RPC_REASONCTX_SYSCALL' or `_RPC_REASONCTX_SYSINT'
+ * @param: sc_info: [valid_if(reason == _RPC_REASONCTX_SYSCALL || reason == _RPC_REASONCTX_SYSINT)]
+ *                  The  system call that was active at the  time of the RPC being handled. Note that
  *                  this system call only has to be restarted when `reason == _RPC_REASONCTX_SYSCALL'
  * @return: * :   The updated CPU state.
  * @return: NULL: The RPC was canceled before it could be fully executed.

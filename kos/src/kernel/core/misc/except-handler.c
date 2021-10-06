@@ -634,11 +634,11 @@ again_switch_action_handler:
 			case SYSCALL_RESTART_MODE_MUST:
 				break;
 			case SYSCALL_RESTART_MODE_DONT:
-				user_rpc_reason = _RPC_REASONCTX_SYNC;
+				user_rpc_reason = _RPC_REASONCTX_SYSINT;
 				break;
 			case SYSCALL_RESTART_MODE_AUTO:
 				if (!(rpc->pr_flags & RPC_SYSRESTART_F_AUTO))
-					user_rpc_reason = _RPC_REASONCTX_SYNC;
+					user_rpc_reason = _RPC_REASONCTX_SYSINT;
 				break;
 			default: __builtin_unreachable();
 			}
@@ -673,10 +673,9 @@ again_switch_action_handler:
 			}
 		}
 		TRY {
-			new_state = task_userrpc_runprogram(ctx->rc_state, rpc, user_rpc_reason,
-			                                    ctx->rc_context == RPC_REASONCTX_SYSCALL
-			                                    ? &ctx->rc_scinfo
-			                                    : NULL);
+			new_state = task_userrpc_runprogram(ctx->rc_state, rpc,
+			                                    user_rpc_reason,
+			                                    &ctx->rc_scinfo);
 		} EXCEPT {
 			/* Prioritize errors. */
 			struct exception_info *tls = error_info();

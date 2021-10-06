@@ -273,12 +273,9 @@
 /*      RPC_OP_               0x9f  * ... */
 #define RPC_OP_push_reason    0xa0 /* [+0] PUSH(user_rpc_reason); */
 #define RPC_OP_push_dorestart 0xa1 /* [+0] PUSH(user_rpc_reason == RPC_REASONCTX_SYSCALL ? 1 : 0); */
-#define RPC_OP_push_issyscall 0xa2 /* [+0] PUSH(sc_info != NULL); // `user_rpc_reason == RPC_REASONCTX_SYSCALL' implies this is true, but not the  reverse
-                                    * In case multiple RPCs are handled after one system call, only the first may need to restart. Also, system calls that
-                                    * shouldn't be restarted still come with meta-data that is available to RPC programs, even when the call shouldn't  be
-                                    * restarted. */
-#define RPC_OP_push_sc_info   0xa3 /* [+1] index = *pc++; PUSH(((uintptr_t *)sc_info)[index]);         // Illegal when `user_rpc_reason != RPC_REASONCTX_SYSCALL' */
-#define RPC_OP_sppush_sc_info 0xa4 /* [+0] Push the entire `sc_info' descriptor onto the user stack. // Illegal when `user_rpc_reason != RPC_REASONCTX_SYSCALL' */
+#define RPC_OP_push_issyscall 0xa2 /* [+0] PUSH(user_rpc_reason in [RPC_REASONCTX_SYSCALL,RPC_REASONCTX_SYSINT] ? 1 : 0); */
+#define RPC_OP_push_sc_info   0xa3 /* [+1] index = *pc++; PUSH(((uintptr_t *)sc_info)[index]);       // Illegal when `user_rpc_reason !in [RPC_REASONCTX_SYSCALL,RPC_REASONCTX_SYSINT]' */
+#define RPC_OP_sppush_sc_info 0xa4 /* [+0] Push the entire `sc_info' descriptor onto the user stack. // Illegal when `user_rpc_reason !in [RPC_REASONCTX_SYSCALL,RPC_REASONCTX_SYSINT]' */
 #define RPC_OP_push_param     0xa5 /* [+1] index = *pc++; PUSH(params[index]); // `params' is an argument */
 #define RPC_OP_sigblock       0xa6 /* [+0] sigset_t s; sigemptyset(&s); sigaddset(&s, POP()); sigprocmask(SIG_BLOCK, &s, NULL); */
 #define RPC_OP_futex_wake     0xa7 /* [+0] count = POP(); addr = POP(); futex_wake(addr, count); */
@@ -490,7 +487,14 @@
                                            * NOTE: This  does _NOT_ affect  an RPC function (as
                                            * passed to  `rpc_exec(3)'), but  only the  internal
                                            * program used to push that function onto the target
-                                           * thread's stack. */
+                                           * thread's stack.
+                                           *
+                                           * NOTE: When sending an RPC to one's own thread (or
+                                           *       process), this option will cause the RPC to
+                                           *       be invoked with `RPC_REASONCTX_SYSINT', even
+                                           *       though `sys_rpc_schedule(2)' will return to
+                                           *       indicate success, rather than INTERRUPT.
+                                           */
 #define RPC_JOIN_ASYNC   RPC_JOIN_F_ASYNC /* Let the RPC program run asynchronously. */
 /************************************************************************/
 
@@ -544,10 +548,14 @@
 #define _RPC_REASONCTX_ASYNC     0x0000 /* User-space context: `RPC_REASONCTX_ASYNC' */
 #define _RPC_REASONCTX_SYNC      0x0001 /* User-space context: `RPC_REASONCTX_SYNC' */
 #define _RPC_REASONCTX_SYSCALL   0x0002 /* User-space context: `RPC_REASONCTX_SYSCALL' */
+#define _RPC_REASONCTX_SYSINT    0x0003 /* User-space context: `RPC_REASONCTX_SYSINT' */
 #else /* __KERNEL__ */
 #define RPC_REASONCTX_ASYNC      0x0000 /* Asynchronous execution in user-space. */
-#define RPC_REASONCTX_SYNC       0x0001 /* A syscall or interrupt was halted, but will not be restarted after the RPC returns. */
-#define RPC_REASONCTX_SYSCALL    0x0002 /* A syscall was halted, but will be restarted after the RPC returns. */
+#define RPC_REASONCTX_SYNC       0x0001 /* An interrupt was halted, or RPC is handled as a non-primary callback with
+                                         * the primary (which your RPC will eventually return to) being called  with
+                                         * either `RPC_REASONCTX_SYSCALL' or `RPC_REASONCTX_SYSINT' */
+#define RPC_REASONCTX_SYSCALL    0x0002 /* A syscall was halted, and will be restarted after the RPC returns. */
+#define RPC_REASONCTX_SYSINT     0x0003 /* A syscall was halted, and will not be restarted after the RPC returns. */
 #endif /* !__KERNEL__ */
 
 
