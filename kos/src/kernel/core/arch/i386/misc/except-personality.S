@@ -98,6 +98,12 @@ END(syscall_emulate_r_personality)
 /************************************************************************/
 .section .text
 
+#ifdef __x86_64__
+#define R_lsdaP r12
+#else /* __x86_64__ */
+#define R_lsdaP Pdi
+#endif /* !__x86_64__ */
+
 /* The following registers are passed (unmodified) to LSDA: %Pbx, %Pbp
  * LSDA   is   passed   via   register:   [i386:'%edi', x86_64:'%r12'] */
 	.cfi_startproc
@@ -111,7 +117,7 @@ INTERN_FUNCTION(_x86_xintr_userexcept_unwind)
 	EXTERN(userexcept_handler)
 	call   userexcept_handler
 	movP   %Pax, %Psp
-	jmpP   *%Pbx
+	jmpP   *%R_lsdaP
 END(_x86_xintr_userexcept_unwind)
 #ifndef __x86_64__
 INTERN_FUNCTION(_x86_xintr3_userexcept_unwind)
@@ -123,7 +129,7 @@ INTERN_FUNCTION(_x86_xintr3_userexcept_unwind)
 	call   userexcept_handler
 	movP   %Pax, %Psp
 	pushP_cfi %Pbp
-	jmpP   *%Pbx
+	jmpP   *%R_lsdaP
 END(_x86_xintr3_userexcept_unwind)
 #endif /* !__x86_64__ */
 	.cfi_endproc

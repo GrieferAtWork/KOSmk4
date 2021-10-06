@@ -291,7 +291,7 @@ NOTHROW(EXCEPT_PERSONALITY_CC x86_xintr3_userexcept_personality)(struct unwind_f
 		return EXCEPT_PERSONALITY_CONTINUE_UNWIND;
 	/* Unwind into user-space. */
 	PREEMPTION_ENABLE();
-	addr  = (void *)state->kcs_gpregs.gp_Pbx;
+	addr  = (void *)state->kcs_gpregs.gp_Pbp;
 	ecode = state->kcs_gpregs.gp_Pbx;
 	x86_xintr3_userexcept_unwind(st, fde->f_lsdaaddr, ecode, addr);
 }

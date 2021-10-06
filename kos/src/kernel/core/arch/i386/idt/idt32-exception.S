@@ -190,31 +190,43 @@ IDT_HANDLER_BEGIN
 	movw   $(SEGMENT_KERNEL_FSBASE), %ax
 	movw   %ax, %fs
 
+#ifdef CONFIG_USE_NEW_RPC
+#if IDT_CONFIG_PUSHESERRORS(IDT_VECTOR_ID)
+	movl   -4(%esp), %ebx /* uintptr_t ecode (register alias needed for unwinding) */
+#endif /* IDT_CONFIG_PUSHESERRORS(IDT_VECTOR_ID) */
+
+#if IDT_VECTOR_ID == 0x0e
+	movl   %cr2, %ebp /* void *addr (register alias needed for unwinding) */
+#endif /* IDT_VECTOR_ID == 0x0e */
+
+#if IDT_VECTOR_ID == 0x0e
+	.cfi_personality 0, x86_xintr3_userexcept_personality /* preserves: %esp+=4, %ebx, %ebp */
+#elif IDT_CONFIG_PUSHESERRORS(IDT_VECTOR_ID)
+	.cfi_personality 0, x86_xintr2_userexcept_personality /* preserves: %esp, %ebx */
+#else /* ... */
+	.cfi_personality 0, x86_xintr1_userexcept_personality /* preserves: %esp */
+#endif /* !... */
+	.cfi_lsda        0, 1f
+
+1:	movl   %esp, %ecx     /* struct icpustate *state */
+#if IDT_VECTOR_ID == 0x0e
+	pushl_cfi %ebp        /* void *addr */
+#endif /* !... */
+#if IDT_CONFIG_PUSHESERRORS(IDT_VECTOR_ID)
+	movl   %ebx, %edx     /* uintptr_t ecode */
+#endif /* IDT_CONFIG_PUSHESERRORS(IDT_VECTOR_ID) */
+
+#else /* CONFIG_USE_NEW_RPC */
 	movl   %esp, %ecx     /* struct icpustate *state */
 #if IDT_CONFIG_PUSHESERRORS(IDT_VECTOR_ID)
 	movl   -4(%esp), %edx /* uintptr_t ecode */
 #endif /* IDT_CONFIG_PUSHESERRORS(IDT_VECTOR_ID) */
-
 #if IDT_VECTOR_ID == 0x0e
 	movl   %cr2, %ebp
 	pushl_cfi %ebp
-#ifdef CONFIG_USE_NEW_RPC
-	movl   %edx, %ebx     /* uintptr_t ecode (register alias needed for unwinding) */
-	.cfi_personality 0, x86_xintr3_userexcept_personality
-#endif /* CONFIG_USE_NEW_RPC */
-#elif IDT_CONFIG_PUSHESERRORS(IDT_VECTOR_ID)
-#ifdef CONFIG_USE_NEW_RPC
-	movl   %edx, %ebx     /* uintptr_t ecode (register alias needed for unwinding) */
-	.cfi_personality 0, x86_xintr2_userexcept_personality
-#endif /* CONFIG_USE_NEW_RPC */
-#else /* ... */
-#ifdef CONFIG_USE_NEW_RPC
-	.cfi_personality 0, x86_xintr1_userexcept_personality
-#endif /* CONFIG_USE_NEW_RPC */
-#endif /* !... */
-#ifdef CONFIG_USE_NEW_RPC
-	.cfi_lsda        0, 1f
-#endif /* CONFIG_USE_NEW_RPC */
+#endif /* IDT_VECTOR_ID == 0x0e */
+#endif /* !CONFIG_USE_NEW_RPC */
+
 
 1:	EXTERN(PP_CAT2(x86_handle_, IDT_VECTOR_NAME))
 	call   PP_CAT2(x86_handle_, IDT_VECTOR_NAME)
