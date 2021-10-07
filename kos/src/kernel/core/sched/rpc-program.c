@@ -2105,8 +2105,9 @@ DEFINE_SYSCALL0(errno_t, rpc_serve) {
 #ifdef __ARCH_WANT_SYSCALL_RPC_SERVE_SYSRET
 DEFINE_SYSCALL0(errno_t, rpc_serve_sysret) {
 	/* This system call is supposed to check for pending async (aka. sysret) RPCs,
-	 * mainly  for the purpose  of updating the  calling thread's userprocmask (if
-	 * that thread is using one).
+	 * mainly  for the purpose  of updating the  calling thread userprocmask's (if
+	 * that thread is using one) set of  pending signals, as well as handling  any
+	 * that have become unmasked.
 	 *
 	 * This sort of behavior is needed for when the userprocmask just became  less
 	 * restrictive while there are pending RPCs (or posix signals) that have  just
