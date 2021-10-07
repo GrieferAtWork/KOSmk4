@@ -3075,36 +3075,122 @@ DEFINE_SYSCALL4(errno_t, rt_sigprocmask, syscall_ulong_t, how,
 			memcpy(oset, mymask, sizeof(sigset_t));
 		}
 	} else {
+		sigset_t newmask;
 		USER CHECKED sigset_t *mymask;
 		mymask = sigmask_getwr();
 		if (oset)
 			memcpy(oset, mymask, sizeof(sigset_t));
+		memcpy(&newmask, set, sizeof(sigset_t));
 		switch (how) {
 
-		case SIG_BLOCK:
-			/* TODO: Don't try to write to a userprocmask if it already contains the correct bits! */
-			sigorset(mymask, mymask, set);
-			break;
+		case SIG_BLOCK: {
+			size_t i;
 
-		case SIG_UNBLOCK:
+			/* Don't block these signals. Technically, this safety measure is
+			 * only necessary when USERPROCMASK  is disabled, but it  doesn't
+			 * hurt to do it unconditionally. */
+			sigdelset(&newmask, SIGKILL);
+			sigdelset(&newmask, SIGSTOP);
+
+			/* Don't try to write to a userprocmask if it already contains the correct bits!
+			 * This is required since a userprocmask may be read-only if the user knows that
+			 * certain signals will never be marked as masked. */
+#ifdef CONFIG_HAVE_USERPROCMASK
+			for (i = 0; i < COMPILER_LENOF(mymask->__val); ++i) {
+				ulongptr_t oldword, newword;
+				oldword = mymask->__val[i];
+				newword = oldword | newmask.__val[i];
+				if (oldword != newword)
+					mymask->__val[i] = newword;
+			}
+#else /* CONFIG_HAVE_USERPROCMASK */
+			sigorset(mymask, mymask, &newmask);
+#endif /* !CONFIG_HAVE_USERPROCMASK */
+		}	break;
+
+		case SIG_UNBLOCK: {
+			size_t i;
+			bool did_unmask = false;
+
+			/* Don't  modify the state of these signals. Technically, this is only
+			 * necessary  when USERPROCMASK is  enabled, in which  case we have to
+			 * do our best to make as few modifications to their mask as possible,
+			 * thus  improving the chances that no writes  are done at all in case
+			 * the mask is read-only. */
+#ifdef CONFIG_HAVE_USERPROCMASK
+			sigdelset(&newmask, SIGKILL);
+			sigdelset(&newmask, SIGSTOP);
+#endif /* CONFIG_HAVE_USERPROCMASK */
+
 			/* No need to check for  mandatory masks being clear,  since
 			 * this command is only able to clear masks from the get-go. */
-			signandset(mymask, mymask, set);
-			/* Since signals (may) have just gotten unmasked, check if we're
-			 * now  able   to   handle   any   of   the   pending   signals. */
-			sigmask_check_after_syscall(-EOK);
-			break;
+			for (i = 0; i < COMPILER_LENOF(mymask->__val); ++i) {
+				ulongptr_t oldword, newword;
+				oldword = mymask->__val[i];
+				newword = oldword & ~newmask.__val[i];
+				if (oldword != newword) {
+					mymask->__val[i] = newword;
+					did_unmask       = true;
+				}
+			}
+			if (did_unmask) {
+#ifdef CONFIG_USE_NEW_RPC
+				/* Check for pending  signals now that  the
+				 * mask (may have) gotten less restrictive. */
+				userexcept_sysret_inject_self();
+#else /* CONFIG_USE_NEW_RPC */
+				sigmask_check_after_syscall(-EOK);
+#endif /* !CONFIG_USE_NEW_RPC */
+			}
+		}	break;
 
-		case SIG_SETMASK:
-			memcpy(mymask, set, sizeof(sigset_t));
-			/* Make sure that mandatory signals are in check */
-			sigdelset(mymask, SIGKILL);
-			sigdelset(mymask, SIGSTOP);
-			COMPILER_BARRIER();
-			/* Always check for pending signals, since
-			 * anything may have happened to our mask. */
-			sigmask_check_after_syscall(-EOK);
-			break;
+		case SIG_SETMASK: {
+			size_t i;
+			bool did_unmask = false;
+
+			/* Don't allow masking of these signals! */
+			sigdelset(&newmask, SIGKILL);
+			sigdelset(&newmask, SIGSTOP);
+
+			/* When the userprocmask is enabled,  retain
+			 * the old state of mandatory signals. Their
+			 * state  doesn't actually matter, but if we
+			 * retain  it, we may improve the chances of
+			 * not having to do any modifications. */
+#ifdef CONFIG_HAVE_USERPROCMASK
+			if (PERTASK_GET(this_task.t_flags) & TASK_FUSERPROCMASK) {
+				if (sigismember(mymask, SIGKILL))
+					sigaddset(&newmask, SIGKILL);
+				if (sigismember(mymask, SIGSTOP))
+					sigaddset(&newmask, SIGSTOP);
+			}
+#endif /* CONFIG_HAVE_USERPROCMASK */
+
+			/* Modify the signal mask, but only write to fields
+			 * that actually changed (needed to be done for the
+			 * sake of userprocmask support) */
+			for (i = 0; i < COMPILER_LENOF(mymask->__val); ++i) {
+				ulongptr_t oldword, newword;
+				oldword = mymask->__val[i];
+				newword = newmask.__val[i];
+				if (oldword != newword) {
+					mymask->__val[i] = newword;
+					if ((oldword & ~newword) != 0)
+						did_unmask = true; /* some signal just became unmasked! */
+				}
+			}
+
+			/* If some signal became unmasked, check for pending signals. */
+			if (did_unmask) {
+#ifdef CONFIG_USE_NEW_RPC
+				/* Check for pending  signals now that  the
+				 * mask (may have) gotten less restrictive. */
+				userexcept_sysret_inject_self();
+#else  /* CONFIG_USE_NEW_RPC */
+				sigmask_check_after_syscall(-EOK);
+#endif /* !CONFIG_USE_NEW_RPC */
+			}
+		}	break;
 
 		default:
 			THROW(E_INVALID_ARGUMENT_UNKNOWN_COMMAND,
