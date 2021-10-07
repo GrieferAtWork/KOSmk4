@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x41cd7d69 */
+/* HASH CRC-32:0xc9200335 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -13138,16 +13138,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_restart_syscall)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	EXTERN(sys32_restart_syscall)
 	call   sys32_restart_syscall
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -13170,17 +13162,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_exit)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_exit)
 	call   sys32_exit
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -13210,16 +13194,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fork)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	EXTERN(sys32_fork)
 	call   sys32_fork
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -13246,19 +13222,11 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_read)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	EXTERN(sys32_read)
 	call   sys32_read
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -13285,19 +13253,11 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_write)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	EXTERN(sys32_write)
 	call   sys32_write
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -13331,19 +13291,11 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_open)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	movslq %ecx, %rsi /* ARG1 = REG1 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	EXTERN(sys32_open)
 	call   sys32_open
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -13365,17 +13317,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_close)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_close)
 	call   sys32_close
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -13402,19 +13346,11 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_waitpid)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	EXTERN(sys32_waitpid)
 	call   sys32_waitpid
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -13435,18 +13371,10 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_creat)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	EXTERN(sys32_creat)
 	call   sys32_creat
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -13467,18 +13395,10 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_link)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	EXTERN(sys32_link)
 	call   sys32_link
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -13499,17 +13419,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_unlink)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_unlink)
 	call   sys32_unlink
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -13532,19 +13444,11 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_execve)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	EXTERN(sys32_execve)
 	call   sys32_execve
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -13565,17 +13469,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_chdir)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_chdir)
 	call   sys32_chdir
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -13596,17 +13492,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_time)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_time)
 	call   sys32_time
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -13627,19 +13515,11 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_mknod)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	EXTERN(sys32_mknod)
 	call   sys32_mknod
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -13660,18 +13540,10 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_chmod)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	EXTERN(sys32_chmod)
 	call   sys32_chmod
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -13692,19 +13564,11 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_lchown)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	movzwq %cx, %rsi /* ARG1 = REG1 (16-bit) */
 	movzwq %dx, %rdx /* ARG2 = REG2 (16-bit) */
 	EXTERN(sys32_lchown)
 	call   sys32_lchown
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -13725,16 +13589,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_break)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	EXTERN(sys32_break)
 	call   sys32_break
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -13755,18 +13611,10 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_oldstat)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	EXTERN(sys32_oldstat)
 	call   sys32_oldstat
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -13787,19 +13635,11 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_lseek)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	movslq %ecx, %rsi /* ARG1 = REG1 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	EXTERN(sys32_lseek)
 	call   sys32_lseek
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -13820,16 +13660,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getpid)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	EXTERN(sys32_getpid)
 	call   sys32_getpid
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -13850,10 +13682,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_mount)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %edi, %r8 /* ARG4 = REG4 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	movzlq %esi, %rsi /* ARG1 = REG3 */
@@ -13862,10 +13690,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_mount)
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_mount)
 	call   sys32_mount
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -13886,17 +13710,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_umount)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_umount)
 	call   sys32_umount
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -13921,17 +13737,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_setuid)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzwq %bx, %rdi /* ARG0 = REG0 (16-bit) */
 	EXTERN(sys32_setuid)
 	call   sys32_setuid
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -13954,16 +13762,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getuid)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	EXTERN(sys32_getuid)
 	call   sys32_getuid
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -13984,17 +13784,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_stime)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_stime)
 	call   sys32_stime
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -14015,10 +13807,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_ptrace)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	movzlq %esi, %rsi /* ARG1 = REG3 */
@@ -14026,10 +13814,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_ptrace)
 	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
 	EXTERN(sys32_ptrace)
 	call   sys32_ptrace
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -14050,17 +13834,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_alarm)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_alarm)
 	call   sys32_alarm
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -14081,18 +13857,10 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_oldfstat)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	EXTERN(sys32_oldfstat)
 	call   sys32_oldfstat
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -14114,16 +13882,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_pause)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	EXTERN(sys32_pause)
 	call   sys32_pause
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -14145,18 +13905,10 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_utime)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	EXTERN(sys32_utime)
 	call   sys32_utime
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -14177,16 +13929,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_stty)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	EXTERN(sys32_stty)
 	call   sys32_stty
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -14207,16 +13951,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_gtty)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	EXTERN(sys32_gtty)
 	call   sys32_gtty
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -14238,18 +13974,10 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_access)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	EXTERN(sys32_access)
 	call   sys32_access
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -14270,17 +13998,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_nice)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_nice)
 	call   sys32_nice
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -14301,17 +14021,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_ftime)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_ftime)
 	call   sys32_ftime
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -14332,16 +14044,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_sync)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	EXTERN(sys32_sync)
 	call   sys32_sync
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -14362,18 +14066,10 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_kill)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	movslq %ecx, %rsi /* ARG1 = REG1 */
 	EXTERN(sys32_kill)
 	call   sys32_kill
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -14394,18 +14090,10 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_rename)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	EXTERN(sys32_rename)
 	call   sys32_rename
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -14426,18 +14114,10 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_mkdir)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	EXTERN(sys32_mkdir)
 	call   sys32_mkdir
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -14458,17 +14138,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_rmdir)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_rmdir)
 	call   sys32_rmdir
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -14489,17 +14161,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_dup)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_dup)
 	call   sys32_dup
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -14520,17 +14184,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_pipe)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_pipe)
 	call   sys32_pipe
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -14551,17 +14207,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_times)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_times)
 	call   sys32_times
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -14582,16 +14230,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_prof)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	EXTERN(sys32_prof)
 	call   sys32_prof
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -14612,17 +14252,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_brk)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_brk)
 	call   sys32_brk
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -14647,17 +14279,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_setgid)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzwq %bx, %rdi /* ARG0 = REG0 (16-bit) */
 	EXTERN(sys32_setgid)
 	call   sys32_setgid
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -14680,16 +14304,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getgid)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	EXTERN(sys32_getgid)
 	call   sys32_getgid
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -14710,18 +14326,10 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_signal)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	EXTERN(sys32_signal)
 	call   sys32_signal
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -14745,16 +14353,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_geteuid)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	EXTERN(sys32_geteuid)
 	call   sys32_geteuid
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -14778,16 +14378,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getegid)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	EXTERN(sys32_getegid)
 	call   sys32_getegid
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -14808,17 +14400,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_acct)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_acct)
 	call   sys32_acct
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -14839,18 +14423,10 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_umount2)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	EXTERN(sys32_umount2)
 	call   sys32_umount2
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -14871,16 +14447,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_lock)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	EXTERN(sys32_lock)
 	call   sys32_lock
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -14901,19 +14469,11 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_ioctl)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	EXTERN(sys32_ioctl)
 	call   sys32_ioctl
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -14934,19 +14494,11 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fcntl)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	EXTERN(sys32_fcntl)
 	call   sys32_fcntl
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -14967,16 +14519,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_mpx)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	EXTERN(sys32_mpx)
 	call   sys32_mpx
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -14997,18 +14541,10 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_setpgid)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	EXTERN(sys32_setpgid)
 	call   sys32_setpgid
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -15029,16 +14565,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_ulimit)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	EXTERN(sys32_ulimit)
 	call   sys32_ulimit
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -15059,17 +14587,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_oldolduname)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_oldolduname)
 	call   sys32_oldolduname
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -15090,17 +14610,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_umask)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_umask)
 	call   sys32_umask
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -15121,17 +14633,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_chroot)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_chroot)
 	call   sys32_chroot
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -15152,18 +14656,10 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_ustat)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	EXTERN(sys32_ustat)
 	call   sys32_ustat
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -15184,18 +14680,10 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_dup2)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	movslq %ecx, %rsi /* ARG1 = REG1 */
 	EXTERN(sys32_dup2)
 	call   sys32_dup2
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -15216,16 +14704,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getppid)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	EXTERN(sys32_getppid)
 	call   sys32_getppid
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -15246,16 +14726,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getpgrp)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	EXTERN(sys32_getpgrp)
 	call   sys32_getpgrp
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -15276,16 +14748,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_setsid)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	EXTERN(sys32_setsid)
 	call   sys32_setsid
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -15306,19 +14770,11 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_sigaction)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	EXTERN(sys32_sigaction)
 	call   sys32_sigaction
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -15339,16 +14795,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_sgetmask)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	EXTERN(sys32_sgetmask)
 	call   sys32_sgetmask
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -15369,17 +14817,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_ssetmask)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_ssetmask)
 	call   sys32_ssetmask
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -15404,18 +14844,10 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_setreuid)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzwq %bx, %rdi /* ARG0 = REG0 (16-bit) */
 	movzwq %cx, %rsi /* ARG1 = REG1 (16-bit) */
 	EXTERN(sys32_setreuid)
 	call   sys32_setreuid
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -15440,18 +14872,10 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_setregid)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzwq %bx, %rdi /* ARG0 = REG0 (16-bit) */
 	movzwq %cx, %rsi /* ARG1 = REG1 (16-bit) */
 	EXTERN(sys32_setregid)
 	call   sys32_setregid
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -15472,17 +14896,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_sigsuspend)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_sigsuspend)
 	call   sys32_sigsuspend
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -15503,17 +14919,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_sigpending)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_sigpending)
 	call   sys32_sigpending
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -15534,18 +14942,10 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_sethostname)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	EXTERN(sys32_sethostname)
 	call   sys32_sethostname
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -15567,18 +14967,10 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_setrlimit)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	EXTERN(sys32_setrlimit)
 	call   sys32_setrlimit
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -15600,18 +14992,10 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getrlimit)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	EXTERN(sys32_getrlimit)
 	call   sys32_getrlimit
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -15633,18 +15017,10 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getrusage)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	EXTERN(sys32_getrusage)
 	call   sys32_getrusage
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -15665,18 +15041,10 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_gettimeofday)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	EXTERN(sys32_gettimeofday)
 	call   sys32_gettimeofday
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -15697,18 +15065,10 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_settimeofday)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	EXTERN(sys32_settimeofday)
 	call   sys32_settimeofday
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -15732,18 +15092,10 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getgroups)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	EXTERN(sys32_getgroups)
 	call   sys32_getgroups
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -15764,18 +15116,10 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_setgroups)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	EXTERN(sys32_setgroups)
 	call   sys32_setgroups
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -15796,17 +15140,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_select)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_select)
 	call   sys32_select
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -15827,18 +15163,10 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_symlink)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	EXTERN(sys32_symlink)
 	call   sys32_symlink
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -15859,18 +15187,10 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_oldlstat)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	EXTERN(sys32_oldlstat)
 	call   sys32_oldlstat
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -15891,19 +15211,11 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_readlink)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	EXTERN(sys32_readlink)
 	call   sys32_readlink
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -15924,17 +15236,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_uselib)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_uselib)
 	call   sys32_uselib
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -15956,18 +15260,10 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_swapon)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	EXTERN(sys32_swapon)
 	call   sys32_swapon
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -15989,17 +15285,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_reboot)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_reboot)
 	call   sys32_reboot
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -16026,18 +15314,10 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_readdir)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	EXTERN(sys32_readdir)
 	call   sys32_readdir
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -16063,10 +15343,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_mmap)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %edi, %r8 /* ARG4 = REG4 */
 	movzlq %ebp, %r9 /* ARG5 = REG5 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
@@ -16076,10 +15352,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_mmap)
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_mmap)
 	call   sys32_mmap
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -16100,18 +15372,10 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_munmap)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	EXTERN(sys32_munmap)
 	call   sys32_munmap
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -16132,18 +15396,10 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_truncate)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	EXTERN(sys32_truncate)
 	call   sys32_truncate
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -16164,18 +15420,10 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_ftruncate)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	EXTERN(sys32_ftruncate)
 	call   sys32_ftruncate
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -16196,18 +15444,10 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fchmod)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	EXTERN(sys32_fchmod)
 	call   sys32_fchmod
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -16228,19 +15468,11 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fchown)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	movzwq %cx, %rsi /* ARG1 = REG1 (16-bit) */
 	movzwq %dx, %rdx /* ARG2 = REG2 (16-bit) */
 	EXTERN(sys32_fchown)
 	call   sys32_fchown
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -16262,18 +15494,10 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getpriority)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	EXTERN(sys32_getpriority)
 	call   sys32_getpriority
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -16295,19 +15519,11 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_setpriority)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	EXTERN(sys32_setpriority)
 	call   sys32_setpriority
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -16328,16 +15544,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_profil)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	EXTERN(sys32_profil)
 	call   sys32_profil
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -16358,18 +15566,10 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_statfs)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	EXTERN(sys32_statfs)
 	call   sys32_statfs
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -16390,18 +15590,10 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fstatfs)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	EXTERN(sys32_fstatfs)
 	call   sys32_fstatfs
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -16422,19 +15614,11 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_ioperm)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	EXTERN(sys32_ioperm)
 	call   sys32_ioperm
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -16455,18 +15639,10 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_socketcall)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	EXTERN(sys32_socketcall)
 	call   sys32_socketcall
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -16487,19 +15663,11 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_syslog)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	EXTERN(sys32_syslog)
 	call   sys32_syslog
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -16521,19 +15689,11 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_setitimer)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	EXTERN(sys32_setitimer)
 	call   sys32_setitimer
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -16555,18 +15715,10 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getitimer)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	EXTERN(sys32_getitimer)
 	call   sys32_getitimer
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -16587,18 +15739,10 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_stat)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	EXTERN(sys32_stat)
 	call   sys32_stat
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -16619,18 +15763,10 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_lstat)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	EXTERN(sys32_lstat)
 	call   sys32_lstat
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -16651,18 +15787,10 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fstat)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	EXTERN(sys32_fstat)
 	call   sys32_fstat
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -16683,17 +15811,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_olduname)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_olduname)
 	call   sys32_olduname
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -16714,17 +15834,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_iopl)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_iopl)
 	call   sys32_iopl
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -16745,16 +15857,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_vhangup)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	EXTERN(sys32_vhangup)
 	call   sys32_vhangup
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -16775,16 +15879,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_idle)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	EXTERN(sys32_idle)
 	call   sys32_idle
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -16805,17 +15901,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_vm86old)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_vm86old)
 	call   sys32_vm86old
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -16838,10 +15926,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_wait4)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	movzlq %esi, %rsi /* ARG1 = REG3 */
@@ -16849,10 +15933,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_wait4)
 	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
 	EXTERN(sys32_wait4)
 	call   sys32_wait4
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -16873,17 +15953,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_swapoff)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_swapoff)
 	call   sys32_swapoff
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -16904,17 +15976,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_sysinfo)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_sysinfo)
 	call   sys32_sysinfo
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -16935,17 +15999,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_ipc)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_ipc)
 	call   sys32_ipc
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -16968,17 +16024,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fsync)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_fsync)
 	call   sys32_fsync
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -17005,10 +16053,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_sigreturn)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %edi, %r8 /* ARG4 = REG4 */
 	movzlq %ebp, %r9 /* ARG5 = REG5 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
@@ -17018,10 +16062,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_sigreturn)
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_sigreturn)
 	call   sys32_sigreturn
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -17042,10 +16082,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_clone)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %edi, %r8 /* ARG4 = REG4 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	movzlq %esi, %rsi /* ARG1 = REG3 */
@@ -17054,10 +16090,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_clone)
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_clone)
 	call   sys32_clone
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -17078,18 +16110,10 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_setdomainname)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	EXTERN(sys32_setdomainname)
 	call   sys32_setdomainname
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -17110,17 +16134,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_uname)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_uname)
 	call   sys32_uname
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -17141,19 +16157,11 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_modify_ldt)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	EXTERN(sys32_modify_ldt)
 	call   sys32_modify_ldt
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -17174,17 +16182,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_adjtimex)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_adjtimex)
 	call   sys32_adjtimex
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -17206,19 +16206,11 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_mprotect)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	EXTERN(sys32_mprotect)
 	call   sys32_mprotect
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -17240,19 +16232,11 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_sigprocmask)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	EXTERN(sys32_sigprocmask)
 	call   sys32_sigprocmask
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -17273,16 +16257,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_create_module)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	EXTERN(sys32_create_module)
 	call   sys32_create_module
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -17312,19 +16288,11 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_init_module)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	EXTERN(sys32_init_module)
 	call   sys32_init_module
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -17358,18 +16326,10 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_delete_module)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	movslq %ecx, %rsi /* ARG1 = REG1 */
 	EXTERN(sys32_delete_module)
 	call   sys32_delete_module
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -17390,16 +16350,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_get_kernel_syms)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	EXTERN(sys32_get_kernel_syms)
 	call   sys32_get_kernel_syms
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -17420,17 +16372,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_quotactl)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_quotactl)
 	call   sys32_quotactl
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -17451,17 +16395,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getpgid)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_getpgid)
 	call   sys32_getpgid
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -17482,17 +16418,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fchdir)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_fchdir)
 	call   sys32_fchdir
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -17513,17 +16441,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_bdflush)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_bdflush)
 	call   sys32_bdflush
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -17544,17 +16464,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_sysfs)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_sysfs)
 	call   sys32_sysfs
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -17575,17 +16487,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_personality)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_personality)
 	call   sys32_personality
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -17606,16 +16510,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_afs_syscall)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	EXTERN(sys32_afs_syscall)
 	call   sys32_afs_syscall
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -17641,17 +16537,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_setfsuid)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzwq %bx, %rdi /* ARG0 = REG0 (16-bit) */
 	EXTERN(sys32_setfsuid)
 	call   sys32_setfsuid
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -17677,17 +16565,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_setfsgid)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzwq %bx, %rdi /* ARG0 = REG0 (16-bit) */
 	EXTERN(sys32_setfsgid)
 	call   sys32_setfsgid
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -17708,10 +16588,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80__llseek)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %edx, %rax          /* %rax = REG1:REG2 */
 	movzlq %ecx, %r8           /* ... */
 	shlq   $(32), %rax            /* ... */
@@ -17722,10 +16598,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80__llseek)
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32__llseek)
 	call   sys32__llseek
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -17748,19 +16620,11 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getdents)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	EXTERN(sys32_getdents)
 	call   sys32_getdents
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -17781,10 +16645,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80__newselect)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %edi, %r8 /* ARG4 = REG4 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	movzlq %esi, %rsi /* ARG1 = REG3 */
@@ -17793,10 +16653,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80__newselect)
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32__newselect)
 	call   sys32__newselect
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -17817,18 +16673,10 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_flock)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	EXTERN(sys32_flock)
 	call   sys32_flock
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -17849,19 +16697,11 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_msync)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	EXTERN(sys32_msync)
 	call   sys32_msync
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -17890,19 +16730,11 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_readv)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	EXTERN(sys32_readv)
 	call   sys32_readv
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -17931,19 +16763,11 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_writev)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	EXTERN(sys32_writev)
 	call   sys32_writev
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -17964,17 +16788,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getsid)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_getsid)
 	call   sys32_getsid
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -17997,17 +16813,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fdatasync)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_fdatasync)
 	call   sys32_fdatasync
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -18028,17 +16836,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80__sysctl)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32__sysctl)
 	call   sys32__sysctl
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -18059,18 +16859,10 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_mlock)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	EXTERN(sys32_mlock)
 	call   sys32_mlock
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -18091,18 +16883,10 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_munlock)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	EXTERN(sys32_munlock)
 	call   sys32_munlock
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -18124,17 +16908,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_mlockall)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_mlockall)
 	call   sys32_mlockall
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -18155,16 +16931,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_munlockall)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	EXTERN(sys32_munlockall)
 	call   sys32_munlockall
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -18185,18 +16953,10 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_sched_setparam)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	EXTERN(sys32_sched_setparam)
 	call   sys32_sched_setparam
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -18217,18 +16977,10 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_sched_getparam)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	EXTERN(sys32_sched_getparam)
 	call   sys32_sched_getparam
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -18251,19 +17003,11 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_sched_setscheduler)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	EXTERN(sys32_sched_setscheduler)
 	call   sys32_sched_setscheduler
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -18284,17 +17028,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_sched_getscheduler)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_sched_getscheduler)
 	call   sys32_sched_getscheduler
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -18315,16 +17051,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_sched_yield)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	EXTERN(sys32_sched_yield)
 	call   sys32_sched_yield
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -18345,17 +17073,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_sched_get_priority_max)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_sched_get_priority_max)
 	call   sys32_sched_get_priority_max
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -18376,17 +17096,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_sched_get_priority_min)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_sched_get_priority_min)
 	call   sys32_sched_get_priority_min
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -18407,18 +17119,10 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_sched_rr_get_interval)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	EXTERN(sys32_sched_rr_get_interval)
 	call   sys32_sched_rr_get_interval
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -18439,18 +17143,10 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_nanosleep)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	EXTERN(sys32_nanosleep)
 	call   sys32_nanosleep
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -18472,10 +17168,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_mremap)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %edi, %r8 /* ARG4 = REG4 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	movzlq %esi, %rsi /* ARG1 = REG3 */
@@ -18484,10 +17176,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_mremap)
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_mremap)
 	call   sys32_mremap
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -18512,19 +17200,11 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_setresuid)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzwq %bx, %rdi /* ARG0 = REG0 (16-bit) */
 	movzwq %cx, %rsi /* ARG1 = REG1 (16-bit) */
 	movzwq %dx, %rdx /* ARG2 = REG2 (16-bit) */
 	EXTERN(sys32_setresuid)
 	call   sys32_setresuid
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -18548,19 +17228,11 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getresuid)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	EXTERN(sys32_getresuid)
 	call   sys32_getresuid
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -18581,17 +17253,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_vm86)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_vm86)
 	call   sys32_vm86
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -18612,16 +17276,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_query_module)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	EXTERN(sys32_query_module)
 	call   sys32_query_module
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -18642,19 +17298,11 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_poll)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	movslq %edx, %rdx /* ARG2 = REG2 */
 	EXTERN(sys32_poll)
 	call   sys32_poll
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -18675,17 +17323,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_nfsservctl)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_nfsservctl)
 	call   sys32_nfsservctl
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -18710,19 +17350,11 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_setresgid)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzwq %bx, %rdi /* ARG0 = REG0 (16-bit) */
 	movzwq %cx, %rsi /* ARG1 = REG1 (16-bit) */
 	movzwq %dx, %rdx /* ARG2 = REG2 (16-bit) */
 	EXTERN(sys32_setresgid)
 	call   sys32_setresgid
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -18746,19 +17378,11 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getresgid)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	EXTERN(sys32_getresgid)
 	call   sys32_getresgid
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -18779,17 +17403,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_prctl)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_prctl)
 	call   sys32_prctl
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -18816,10 +17432,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_rt_sigreturn)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %edi, %r8 /* ARG4 = REG4 */
 	movzlq %ebp, %r9 /* ARG5 = REG5 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
@@ -18829,10 +17441,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_rt_sigreturn)
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_rt_sigreturn)
 	call   sys32_rt_sigreturn
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -18853,10 +17461,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_rt_sigaction)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	movzlq %esi, %rsi /* ARG1 = REG3 */
@@ -18864,10 +17468,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_rt_sigaction)
 	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
 	EXTERN(sys32_rt_sigaction)
 	call   sys32_rt_sigaction
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -18889,10 +17489,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_rt_sigprocmask)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	movzlq %esi, %rsi /* ARG1 = REG3 */
@@ -18900,10 +17496,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_rt_sigprocmask)
 	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
 	EXTERN(sys32_rt_sigprocmask)
 	call   sys32_rt_sigprocmask
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -18924,18 +17516,10 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_rt_sigpending)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	EXTERN(sys32_rt_sigpending)
 	call   sys32_rt_sigpending
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -18956,10 +17540,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_rt_sigtimedwait)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	movzlq %esi, %rsi /* ARG1 = REG3 */
@@ -18967,10 +17547,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_rt_sigtimedwait)
 	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
 	EXTERN(sys32_rt_sigtimedwait)
 	call   sys32_rt_sigtimedwait
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -18997,19 +17573,11 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_rt_sigqueueinfo)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	movslq %ecx, %rsi /* ARG1 = REG1 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	EXTERN(sys32_rt_sigqueueinfo)
 	call   sys32_rt_sigqueueinfo
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -19030,18 +17598,10 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_rt_sigsuspend)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	EXTERN(sys32_rt_sigsuspend)
 	call   sys32_rt_sigsuspend
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -19062,10 +17622,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_pread64)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %edi, %rax          /* %rax = REG3:REG4 */
 	movzlq %esi, %r8           /* ... */
 	shlq   $(32), %rax            /* ... */
@@ -19076,10 +17632,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_pread64)
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_pread64)
 	call   sys32_pread64
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -19100,10 +17652,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_pwrite64)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %edi, %rax          /* %rax = REG3:REG4 */
 	movzlq %esi, %r8           /* ... */
 	shlq   $(32), %rax            /* ... */
@@ -19114,10 +17662,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_pwrite64)
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_pwrite64)
 	call   sys32_pwrite64
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -19138,19 +17682,11 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_chown)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	movzwq %cx, %rsi /* ARG1 = REG1 (16-bit) */
 	movzwq %dx, %rdx /* ARG2 = REG2 (16-bit) */
 	EXTERN(sys32_chown)
 	call   sys32_chown
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -19171,18 +17707,10 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getcwd)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	EXTERN(sys32_getcwd)
 	call   sys32_getcwd
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -19203,17 +17731,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_capget)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_capget)
 	call   sys32_capget
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -19234,17 +17754,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_capset)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_capset)
 	call   sys32_capset
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -19265,18 +17777,10 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_sigaltstack)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	EXTERN(sys32_sigaltstack)
 	call   sys32_sigaltstack
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -19297,10 +17801,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_sendfile)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	movzlq %esi, %rsi /* ARG1 = REG3 */
@@ -19308,10 +17808,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_sendfile)
 	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
 	EXTERN(sys32_sendfile)
 	call   sys32_sendfile
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -19332,16 +17828,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getpmsg)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	EXTERN(sys32_getpmsg)
 	call   sys32_getpmsg
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -19362,16 +17850,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_putpmsg)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	EXTERN(sys32_putpmsg)
 	call   sys32_putpmsg
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -19415,16 +17895,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_vfork)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	EXTERN(sys32_vfork)
 	call   sys32_vfork
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -19445,17 +17917,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_ugetrlimit)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_ugetrlimit)
 	call   sys32_ugetrlimit
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -19476,10 +17940,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_mmap2)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %edi, %r8 /* ARG4 = REG4 */
 	movzlq %ebp, %r9 /* ARG5 = REG5 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
@@ -19489,10 +17949,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_mmap2)
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_mmap2)
 	call   sys32_mmap2
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -19513,10 +17969,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_truncate64)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %edx, %rsi          /* ARG1 = REG1:REG2 */
 	movzlq %ecx, %rax          /* ... */
@@ -19524,10 +17976,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_truncate64)
 	orq    %rax, %rsi          /* ... */
 	EXTERN(sys32_truncate64)
 	call   sys32_truncate64
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -19548,10 +17996,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_ftruncate64)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %edx, %rsi          /* ARG1 = REG1:REG2 */
 	movzlq %ecx, %rax          /* ... */
@@ -19559,10 +18003,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_ftruncate64)
 	orq    %rax, %rsi          /* ... */
 	EXTERN(sys32_ftruncate64)
 	call   sys32_ftruncate64
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -19583,18 +18023,10 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_stat64)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	EXTERN(sys32_stat64)
 	call   sys32_stat64
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -19615,18 +18047,10 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_lstat64)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	EXTERN(sys32_lstat64)
 	call   sys32_lstat64
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -19647,18 +18071,10 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fstat64)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	EXTERN(sys32_fstat64)
 	call   sys32_fstat64
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -19679,19 +18095,11 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_lchown32)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	EXTERN(sys32_lchown32)
 	call   sys32_lchown32
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -19714,16 +18122,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getuid32)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	EXTERN(sys32_getuid32)
 	call   sys32_getuid32
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -19746,16 +18146,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getgid32)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	EXTERN(sys32_getgid32)
 	call   sys32_getgid32
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -19779,16 +18171,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_geteuid32)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	EXTERN(sys32_geteuid32)
 	call   sys32_geteuid32
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -19812,16 +18196,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getegid32)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	EXTERN(sys32_getegid32)
 	call   sys32_getegid32
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -19846,18 +18222,10 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_setreuid32)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	EXTERN(sys32_setreuid32)
 	call   sys32_setreuid32
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -19882,18 +18250,10 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_setregid32)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	EXTERN(sys32_setregid32)
 	call   sys32_setregid32
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -19917,18 +18277,10 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getgroups32)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	EXTERN(sys32_getgroups32)
 	call   sys32_getgroups32
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -19949,18 +18301,10 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_setgroups32)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	EXTERN(sys32_setgroups32)
 	call   sys32_setgroups32
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -19981,19 +18325,11 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fchown32)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	EXTERN(sys32_fchown32)
 	call   sys32_fchown32
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -20018,19 +18354,11 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_setresuid32)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	EXTERN(sys32_setresuid32)
 	call   sys32_setresuid32
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -20054,19 +18382,11 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getresuid32)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	EXTERN(sys32_getresuid32)
 	call   sys32_getresuid32
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -20091,19 +18411,11 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_setresgid32)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	EXTERN(sys32_setresgid32)
 	call   sys32_setresgid32
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -20127,19 +18439,11 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getresgid32)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	EXTERN(sys32_getresgid32)
 	call   sys32_getresgid32
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -20160,19 +18464,11 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_chown32)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	EXTERN(sys32_chown32)
 	call   sys32_chown32
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -20197,17 +18493,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_setuid32)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_setuid32)
 	call   sys32_setuid32
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -20232,17 +18520,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_setgid32)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_setgid32)
 	call   sys32_setgid32
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -20268,17 +18548,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_setfsuid32)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_setfsuid32)
 	call   sys32_setfsuid32
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -20304,17 +18576,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_setfsgid32)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_setfsgid32)
 	call   sys32_setfsgid32
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -20335,17 +18599,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_pivot_root)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_pivot_root)
 	call   sys32_pivot_root
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -20366,19 +18622,11 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_mincore)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	EXTERN(sys32_mincore)
 	call   sys32_mincore
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -20399,19 +18647,11 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_madvise)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	EXTERN(sys32_madvise)
 	call   sys32_madvise
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -20434,19 +18674,11 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getdents64)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	EXTERN(sys32_getdents64)
 	call   sys32_getdents64
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -20467,19 +18699,11 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fcntl64)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	EXTERN(sys32_fcntl64)
 	call   sys32_fcntl64
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -20500,16 +18724,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_gettid)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	EXTERN(sys32_gettid)
 	call   sys32_gettid
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -20530,10 +18746,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_readahead)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %edx, %rax          /* %rax = REG1:REG2 */
 	movzlq %ecx, %r8           /* ... */
@@ -20543,10 +18755,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_readahead)
 	movq   %rax, %rsi /* ARG1 = %rax */
 	EXTERN(sys32_readahead)
 	call   sys32_readahead
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -20568,10 +18776,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_setxattr)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %edi, %r8 /* ARG4 = REG4 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	movzlq %esi, %rsi /* ARG1 = REG3 */
@@ -20580,10 +18784,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_setxattr)
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_setxattr)
 	call   sys32_setxattr
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -20605,10 +18805,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_lsetxattr)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %edi, %r8 /* ARG4 = REG4 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	movzlq %esi, %rsi /* ARG1 = REG3 */
@@ -20617,10 +18813,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_lsetxattr)
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_lsetxattr)
 	call   sys32_lsetxattr
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -20642,10 +18834,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fsetxattr)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %edi, %r8 /* ARG4 = REG4 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	movzlq %esi, %rsi /* ARG1 = REG3 */
@@ -20654,10 +18842,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fsetxattr)
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_fsetxattr)
 	call   sys32_fsetxattr
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -20678,10 +18862,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getxattr)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	movzlq %esi, %rsi /* ARG1 = REG3 */
@@ -20689,10 +18869,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getxattr)
 	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
 	EXTERN(sys32_getxattr)
 	call   sys32_getxattr
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -20713,10 +18889,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_lgetxattr)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	movzlq %esi, %rsi /* ARG1 = REG3 */
@@ -20724,10 +18896,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_lgetxattr)
 	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
 	EXTERN(sys32_lgetxattr)
 	call   sys32_lgetxattr
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -20748,10 +18916,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fgetxattr)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	movzlq %esi, %rsi /* ARG1 = REG3 */
@@ -20759,10 +18923,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fgetxattr)
 	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
 	EXTERN(sys32_fgetxattr)
 	call   sys32_fgetxattr
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -20783,19 +18943,11 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_listxattr)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	EXTERN(sys32_listxattr)
 	call   sys32_listxattr
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -20816,19 +18968,11 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_llistxattr)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	EXTERN(sys32_llistxattr)
 	call   sys32_llistxattr
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -20849,19 +18993,11 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_flistxattr)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	EXTERN(sys32_flistxattr)
 	call   sys32_flistxattr
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -20882,18 +19018,10 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_removexattr)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	EXTERN(sys32_removexattr)
 	call   sys32_removexattr
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -20914,18 +19042,10 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_lremovexattr)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	EXTERN(sys32_lremovexattr)
 	call   sys32_lremovexattr
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -20946,18 +19066,10 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fremovexattr)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	EXTERN(sys32_fremovexattr)
 	call   sys32_fremovexattr
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -20978,18 +19090,10 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_tkill)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	movslq %ecx, %rsi /* ARG1 = REG1 */
 	EXTERN(sys32_tkill)
 	call   sys32_tkill
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -21010,10 +19114,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_sendfile64)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	movzlq %esi, %rsi /* ARG1 = REG3 */
@@ -21021,10 +19121,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_sendfile64)
 	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
 	EXTERN(sys32_sendfile64)
 	call   sys32_sendfile64
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -21046,10 +19142,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_futex)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %edi, %r8 /* ARG4 = REG4 */
 	movzlq %ebp, %r9 /* ARG5 = REG5 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
@@ -21059,10 +19151,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_futex)
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_futex)
 	call   sys32_futex
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -21083,19 +19171,11 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_sched_setaffinity)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	EXTERN(sys32_sched_setaffinity)
 	call   sys32_sched_setaffinity
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -21116,19 +19196,11 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_sched_getaffinity)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	EXTERN(sys32_sched_getaffinity)
 	call   sys32_sched_getaffinity
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -21149,17 +19221,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_set_thread_area)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_set_thread_area)
 	call   sys32_set_thread_area
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -21180,17 +19244,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_get_thread_area)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_get_thread_area)
 	call   sys32_get_thread_area
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -21211,17 +19267,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_io_setup)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_io_setup)
 	call   sys32_io_setup
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -21242,17 +19290,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_io_destroy)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_io_destroy)
 	call   sys32_io_destroy
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -21273,17 +19313,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_io_getevents)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_io_getevents)
 	call   sys32_io_getevents
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -21304,17 +19336,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_io_submit)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_io_submit)
 	call   sys32_io_submit
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -21335,17 +19359,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_io_cancel)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_io_cancel)
 	call   sys32_io_cancel
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -21366,17 +19382,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fadvise64)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_fadvise64)
 	call   sys32_fadvise64
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -21399,17 +19407,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_exit_group)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_exit_group)
 	call   sys32_exit_group
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -21430,17 +19430,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_lookup_dcookie)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_lookup_dcookie)
 	call   sys32_lookup_dcookie
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -21465,17 +19457,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_epoll_create)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_epoll_create)
 	call   sys32_epoll_create
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -21509,10 +19493,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_epoll_ctl)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	movslq %edx, %rdx /* ARG2 = REG2 */
 	movzlq %esi, %rsi /* ARG1 = REG3 */
@@ -21520,10 +19500,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_epoll_ctl)
 	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
 	EXTERN(sys32_epoll_ctl)
 	call   sys32_epoll_ctl
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -21557,10 +19533,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_epoll_wait)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	movslq %esi, %rsi /* ARG1 = REG3 */
@@ -21568,10 +19540,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_epoll_wait)
 	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
 	EXTERN(sys32_epoll_wait)
 	call   sys32_epoll_wait
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -21592,10 +19560,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_remap_file_pages)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %edi, %r8 /* ARG4 = REG4 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	movzlq %esi, %rsi /* ARG1 = REG3 */
@@ -21604,10 +19568,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_remap_file_pages)
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_remap_file_pages)
 	call   sys32_remap_file_pages
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -21628,17 +19588,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_set_tid_address)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_set_tid_address)
 	call   sys32_set_tid_address
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -21659,19 +19611,11 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_timer_create)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	EXTERN(sys32_timer_create)
 	call   sys32_timer_create
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -21693,10 +19637,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_timer_settime)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	movzlq %esi, %rsi /* ARG1 = REG3 */
@@ -21704,10 +19644,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_timer_settime)
 	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
 	EXTERN(sys32_timer_settime)
 	call   sys32_timer_settime
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -21728,18 +19664,10 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_timer_gettime)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	EXTERN(sys32_timer_gettime)
 	call   sys32_timer_gettime
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -21760,17 +19688,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_timer_getoverrun)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_timer_getoverrun)
 	call   sys32_timer_getoverrun
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -21791,17 +19711,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_timer_delete)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_timer_delete)
 	call   sys32_timer_delete
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -21822,18 +19734,10 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_clock_settime)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	EXTERN(sys32_clock_settime)
 	call   sys32_clock_settime
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -21854,18 +19758,10 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_clock_gettime)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	EXTERN(sys32_clock_gettime)
 	call   sys32_clock_gettime
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -21886,18 +19782,10 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_clock_getres)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	EXTERN(sys32_clock_getres)
 	call   sys32_clock_getres
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -21918,10 +19806,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_clock_nanosleep)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	movzlq %esi, %rsi /* ARG1 = REG3 */
@@ -21929,10 +19813,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_clock_nanosleep)
 	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
 	EXTERN(sys32_clock_nanosleep)
 	call   sys32_clock_nanosleep
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -21953,18 +19833,10 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_statfs64)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	EXTERN(sys32_statfs64)
 	call   sys32_statfs64
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -21985,18 +19857,10 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fstatfs64)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	EXTERN(sys32_fstatfs64)
 	call   sys32_fstatfs64
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -22017,19 +19881,11 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_tgkill)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	movslq %edx, %rdx /* ARG2 = REG2 */
 	EXTERN(sys32_tgkill)
 	call   sys32_tgkill
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -22053,18 +19909,10 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_utimes)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	EXTERN(sys32_utimes)
 	call   sys32_utimes
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -22085,17 +19933,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fadvise64_64)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_fadvise64_64)
 	call   sys32_fadvise64_64
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -22116,16 +19956,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_vserver)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	EXTERN(sys32_vserver)
 	call   sys32_vserver
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -22146,17 +19978,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_mbind)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_mbind)
 	call   sys32_mbind
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -22177,17 +20001,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_get_mempolicy)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_get_mempolicy)
 	call   sys32_get_mempolicy
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -22208,17 +20024,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_set_mempolicy)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_set_mempolicy)
 	call   sys32_set_mempolicy
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -22239,19 +20047,11 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_mq_open)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	movslq %ecx, %rsi /* ARG1 = REG1 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	EXTERN(sys32_mq_open)
 	call   sys32_mq_open
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -22272,17 +20072,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_mq_unlink)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_mq_unlink)
 	call   sys32_mq_unlink
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -22303,10 +20095,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_mq_timedsend)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %edi, %r8 /* ARG4 = REG4 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	movzlq %esi, %rsi /* ARG1 = REG3 */
@@ -22315,10 +20103,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_mq_timedsend)
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_mq_timedsend)
 	call   sys32_mq_timedsend
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -22339,10 +20123,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_mq_timedreceive)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %edi, %r8 /* ARG4 = REG4 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	movzlq %esi, %rsi /* ARG1 = REG3 */
@@ -22351,10 +20131,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_mq_timedreceive)
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_mq_timedreceive)
 	call   sys32_mq_timedreceive
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -22375,18 +20151,10 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_mq_notify)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	EXTERN(sys32_mq_notify)
 	call   sys32_mq_notify
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -22407,19 +20175,11 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_mq_getsetattr)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	EXTERN(sys32_mq_getsetattr)
 	call   sys32_mq_getsetattr
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -22440,17 +20200,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_kexec_load)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_kexec_load)
 	call   sys32_kexec_load
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -22474,10 +20226,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_waitid)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %edi, %r8 /* ARG4 = REG4 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	movzlq %esi, %rsi /* ARG1 = REG3 */
@@ -22486,10 +20234,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_waitid)
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_waitid)
 	call   sys32_waitid
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -22510,17 +20254,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_add_key)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_add_key)
 	call   sys32_add_key
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -22541,17 +20277,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_request_key)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_request_key)
 	call   sys32_request_key
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -22572,17 +20300,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_keyctl)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_keyctl)
 	call   sys32_keyctl
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -22605,19 +20325,11 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_ioprio_set)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	EXTERN(sys32_ioprio_set)
 	call   sys32_ioprio_set
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -22640,18 +20352,10 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_ioprio_get)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	EXTERN(sys32_ioprio_get)
 	call   sys32_ioprio_get
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -22672,17 +20376,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_inotify_init)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_inotify_init)
 	call   sys32_inotify_init
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -22703,17 +20399,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_inotify_add_watch)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_inotify_add_watch)
 	call   sys32_inotify_add_watch
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -22734,17 +20422,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_inotify_rm_watch)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_inotify_rm_watch)
 	call   sys32_inotify_rm_watch
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -22765,17 +20445,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_migrate_pages)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_migrate_pages)
 	call   sys32_migrate_pages
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -22809,10 +20481,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_openat)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	movslq %edx, %rdx /* ARG2 = REG2 */
 	movzlq %esi, %rsi /* ARG1 = REG3 */
@@ -22820,10 +20488,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_openat)
 	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
 	EXTERN(sys32_openat)
 	call   sys32_openat
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -22844,19 +20508,11 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_mkdirat)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	EXTERN(sys32_mkdirat)
 	call   sys32_mkdirat
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -22877,10 +20533,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_mknodat)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	movzlq %esi, %rsi /* ARG1 = REG3 */
@@ -22888,10 +20540,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_mknodat)
 	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
 	EXTERN(sys32_mknodat)
 	call   sys32_mknodat
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -22913,10 +20561,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fchownat)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %edi, %r8 /* ARG4 = REG4 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	movzlq %esi, %rsi /* ARG1 = REG3 */
@@ -22925,10 +20569,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fchownat)
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_fchownat)
 	call   sys32_fchownat
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -22949,19 +20589,11 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_futimesat)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	EXTERN(sys32_futimesat)
 	call   sys32_futimesat
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -22983,10 +20615,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fstatat64)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	movzlq %esi, %rsi /* ARG1 = REG3 */
@@ -22994,10 +20622,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fstatat64)
 	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
 	EXTERN(sys32_fstatat64)
 	call   sys32_fstatat64
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -23019,19 +20643,11 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_unlinkat)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	EXTERN(sys32_unlinkat)
 	call   sys32_unlinkat
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -23052,10 +20668,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_renameat)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	movslq %edx, %rdx /* ARG2 = REG2 */
 	movzlq %esi, %rsi /* ARG1 = REG3 */
@@ -23063,10 +20675,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_renameat)
 	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
 	EXTERN(sys32_renameat)
 	call   sys32_renameat
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -23088,10 +20696,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_linkat)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %edi, %r8 /* ARG4 = REG4 */
 	movslq %edx, %rdx /* ARG2 = REG2 */
 	movzlq %esi, %rsi /* ARG1 = REG3 */
@@ -23100,10 +20704,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_linkat)
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_linkat)
 	call   sys32_linkat
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -23124,19 +20724,11 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_symlinkat)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	movslq %ecx, %rsi /* ARG1 = REG1 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	EXTERN(sys32_symlinkat)
 	call   sys32_symlinkat
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -23157,10 +20749,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_readlinkat)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	movzlq %esi, %rsi /* ARG1 = REG3 */
@@ -23168,10 +20756,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_readlinkat)
 	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
 	EXTERN(sys32_readlinkat)
 	call   sys32_readlinkat
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -23193,10 +20777,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fchmodat)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	movzlq %esi, %rsi /* ARG1 = REG3 */
@@ -23204,10 +20784,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fchmodat)
 	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
 	EXTERN(sys32_fchmodat)
 	call   sys32_fchmodat
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -23230,10 +20806,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_faccessat)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	movzlq %esi, %rsi /* ARG1 = REG3 */
@@ -23241,10 +20813,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_faccessat)
 	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
 	EXTERN(sys32_faccessat)
 	call   sys32_faccessat
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -23265,10 +20833,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_pselect6)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %edi, %r8 /* ARG4 = REG4 */
 	movzlq %ebp, %r9 /* ARG5 = REG5 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
@@ -23278,10 +20842,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_pselect6)
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_pselect6)
 	call   sys32_pselect6
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -23302,10 +20862,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_ppoll)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %edi, %r8 /* ARG4 = REG4 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	movzlq %esi, %rsi /* ARG1 = REG3 */
@@ -23314,10 +20870,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_ppoll)
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_ppoll)
 	call   sys32_ppoll
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -23339,17 +20891,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_unshare)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_unshare)
 	call   sys32_unshare
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -23370,17 +20914,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_set_robust_list)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_set_robust_list)
 	call   sys32_set_robust_list
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -23401,17 +20937,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_get_robust_list)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_get_robust_list)
 	call   sys32_get_robust_list
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -23433,10 +20961,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_splice)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %edi, %r8 /* ARG4 = REG4 */
 	movzlq %ebp, %r9 /* ARG5 = REG5 */
 	movslq %edx, %rdx /* ARG2 = REG2 */
@@ -23446,10 +20970,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_splice)
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_splice)
 	call   sys32_splice
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -23471,10 +20991,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_sync_file_range)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %edx, %rax          /* %rax = REG1:REG2 */
 	movzlq %ecx, %r8           /* ... */
 	shlq   $(32), %rax            /* ... */
@@ -23488,10 +21004,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_sync_file_range)
 	movzlq %ebp, %rcx /* ARG3 = REG5 */
 	EXTERN(sys32_sync_file_range)
 	call   sys32_sync_file_range
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -23513,10 +21025,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_tee)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	movzlq %esi, %rsi /* ARG1 = REG3 */
@@ -23524,10 +21032,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_tee)
 	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
 	EXTERN(sys32_tee)
 	call   sys32_tee
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -23549,10 +21053,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_vmsplice)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	movzlq %esi, %rsi /* ARG1 = REG3 */
@@ -23560,10 +21060,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_vmsplice)
 	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
 	EXTERN(sys32_vmsplice)
 	call   sys32_vmsplice
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -23584,17 +21080,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_move_pages)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_move_pages)
 	call   sys32_move_pages
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -23615,19 +21103,11 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getcpu)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	EXTERN(sys32_getcpu)
 	call   sys32_getcpu
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -23663,10 +21143,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_epoll_pwait)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %edi, %r8 /* ARG4 = REG4 */
 	movzlq %ebp, %r9 /* ARG5 = REG5 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
@@ -23676,10 +21152,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_epoll_pwait)
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_epoll_pwait)
 	call   sys32_epoll_pwait
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -23701,10 +21173,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_utimensat)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	movzlq %esi, %rsi /* ARG1 = REG3 */
@@ -23712,10 +21180,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_utimensat)
 	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
 	EXTERN(sys32_utimensat)
 	call   sys32_utimensat
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -23738,19 +21202,11 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_signalfd)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	EXTERN(sys32_signalfd)
 	call   sys32_signalfd
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -23773,18 +21229,10 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_timerfd_create)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	EXTERN(sys32_timerfd_create)
 	call   sys32_timerfd_create
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -23805,17 +21253,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_eventfd)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_eventfd)
 	call   sys32_eventfd
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -23837,10 +21277,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fallocate)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	movzlq %esi, %rsi /* ARG1 = REG3 */
@@ -23848,10 +21284,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fallocate)
 	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
 	EXTERN(sys32_fallocate)
 	call   sys32_fallocate
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -23876,10 +21308,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_timerfd_settime)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	movzlq %esi, %rsi /* ARG1 = REG3 */
@@ -23887,10 +21315,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_timerfd_settime)
 	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
 	EXTERN(sys32_timerfd_settime)
 	call   sys32_timerfd_settime
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -23912,18 +21336,10 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_timerfd_gettime)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	EXTERN(sys32_timerfd_gettime)
 	call   sys32_timerfd_gettime
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -23947,10 +21363,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_signalfd4)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	movzlq %esi, %rsi /* ARG1 = REG3 */
@@ -23958,10 +21370,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_signalfd4)
 	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
 	EXTERN(sys32_signalfd4)
 	call   sys32_signalfd4
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -23983,18 +21391,10 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_eventfd2)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	EXTERN(sys32_eventfd2)
 	call   sys32_eventfd2
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -24021,17 +21421,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_epoll_create1)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_epoll_create1)
 	call   sys32_epoll_create1
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -24053,19 +21445,11 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_dup3)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	movslq %ecx, %rsi /* ARG1 = REG1 */
 	movslq %edx, %rdx /* ARG2 = REG2 */
 	EXTERN(sys32_dup3)
 	call   sys32_dup3
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -24086,18 +21470,10 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_pipe2)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	movslq %ecx, %rsi /* ARG1 = REG1 */
 	EXTERN(sys32_pipe2)
 	call   sys32_pipe2
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -24118,17 +21494,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_inotify_init1)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_inotify_init1)
 	call   sys32_inotify_init1
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -24152,10 +21520,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_preadv)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %edi, %rax          /* %rax = REG3:REG4 */
 	movzlq %esi, %r8           /* ... */
 	shlq   $(32), %rax            /* ... */
@@ -24166,10 +21530,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_preadv)
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_preadv)
 	call   sys32_preadv
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -24193,10 +21553,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_pwritev)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %edi, %rax          /* %rax = REG3:REG4 */
 	movzlq %esi, %r8           /* ... */
 	shlq   $(32), %rax            /* ... */
@@ -24207,10 +21563,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_pwritev)
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_pwritev)
 	call   sys32_pwritev
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -24237,10 +21589,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_rt_tgsigqueueinfo)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	movslq %edx, %rdx /* ARG2 = REG2 */
 	movzlq %esi, %rsi /* ARG1 = REG3 */
@@ -24248,10 +21596,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_rt_tgsigqueueinfo)
 	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
 	EXTERN(sys32_rt_tgsigqueueinfo)
 	call   sys32_rt_tgsigqueueinfo
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -24272,17 +21616,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_perf_event_open)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_perf_event_open)
 	call   sys32_perf_event_open
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -24311,10 +21647,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_recvmmsg)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %edi, %r8 /* ARG4 = REG4 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	movzlq %esi, %rsi /* ARG1 = REG3 */
@@ -24323,10 +21655,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_recvmmsg)
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_recvmmsg)
 	call   sys32_recvmmsg
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -24347,17 +21675,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fanotify_init)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_fanotify_init)
 	call   sys32_fanotify_init
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -24378,17 +21698,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fanotify_mark)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_fanotify_mark)
 	call   sys32_fanotify_mark
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -24410,10 +21722,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_prlimit64)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	movzlq %esi, %rsi /* ARG1 = REG3 */
@@ -24421,10 +21729,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_prlimit64)
 	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
 	EXTERN(sys32_prlimit64)
 	call   sys32_prlimit64
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -24446,10 +21750,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_name_to_handle_at)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %edi, %r8 /* ARG4 = REG4 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	movzlq %esi, %rsi /* ARG1 = REG3 */
@@ -24458,10 +21758,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_name_to_handle_at)
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_name_to_handle_at)
 	call   sys32_name_to_handle_at
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -24482,19 +21778,11 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_open_by_handle_at)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	movslq %edx, %rdx /* ARG2 = REG2 */
 	EXTERN(sys32_open_by_handle_at)
 	call   sys32_open_by_handle_at
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -24515,17 +21803,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_clock_adjtime)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_clock_adjtime)
 	call   sys32_clock_adjtime
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -24546,17 +21826,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_syncfs)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_syncfs)
 	call   sys32_syncfs
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -24583,10 +21855,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_sendmmsg)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	movzlq %esi, %rsi /* ARG1 = REG3 */
@@ -24594,10 +21862,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_sendmmsg)
 	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
 	EXTERN(sys32_sendmmsg)
 	call   sys32_sendmmsg
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -24618,18 +21882,10 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_setns)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	EXTERN(sys32_setns)
 	call   sys32_setns
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -24653,10 +21909,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_process_vm_readv)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %edi, %r8 /* ARG4 = REG4 */
 	movzlq %ebp, %r9 /* ARG5 = REG5 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
@@ -24666,10 +21918,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_process_vm_readv)
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_process_vm_readv)
 	call   sys32_process_vm_readv
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -24693,10 +21941,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_process_vm_writev)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %edi, %r8 /* ARG4 = REG4 */
 	movzlq %ebp, %r9 /* ARG5 = REG5 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
@@ -24706,10 +21950,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_process_vm_writev)
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_process_vm_writev)
 	call   sys32_process_vm_writev
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -24732,10 +21972,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_kcmp)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %edi, %r8 /* ARG4 = REG4 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	movzlq %esi, %rsi /* ARG1 = REG3 */
@@ -24744,10 +21980,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_kcmp)
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_kcmp)
 	call   sys32_kcmp
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -24777,19 +22009,11 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_finit_module)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	EXTERN(sys32_finit_module)
 	call   sys32_finit_module
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -24810,17 +22034,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_sched_setattr)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_sched_setattr)
 	call   sys32_sched_setattr
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -24841,17 +22057,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_sched_getattr)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_sched_getattr)
 	call   sys32_sched_getattr
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -24873,10 +22081,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_renameat2)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %edi, %r8 /* ARG4 = REG4 */
 	movslq %edx, %rdx /* ARG2 = REG2 */
 	movzlq %esi, %rsi /* ARG1 = REG3 */
@@ -24885,10 +22089,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_renameat2)
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_renameat2)
 	call   sys32_renameat2
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -24909,17 +22109,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_seccomp)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_seccomp)
 	call   sys32_seccomp
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -24941,19 +22133,11 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getrandom)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	EXTERN(sys32_getrandom)
 	call   sys32_getrandom
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -24975,18 +22159,10 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_memfd_create)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	EXTERN(sys32_memfd_create)
 	call   sys32_memfd_create
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -25007,17 +22183,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_bpf)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_bpf)
 	call   sys32_bpf
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -25041,10 +22209,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_execveat)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %edi, %r8 /* ARG4 = REG4 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	movzlq %esi, %rsi /* ARG1 = REG3 */
@@ -25053,10 +22217,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_execveat)
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_execveat)
 	call   sys32_execveat
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -25087,19 +22247,11 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_socket)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	EXTERN(sys32_socket)
 	call   sys32_socket
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -25130,10 +22282,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_socketpair)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	movzlq %esi, %rsi /* ARG1 = REG3 */
@@ -25141,10 +22289,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_socketpair)
 	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
 	EXTERN(sys32_socketpair)
 	call   sys32_socketpair
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -25172,19 +22316,11 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_bind)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	EXTERN(sys32_bind)
 	call   sys32_bind
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -25215,19 +22351,11 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_connect)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	EXTERN(sys32_connect)
 	call   sys32_connect
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -25256,18 +22384,10 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_listen)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	EXTERN(sys32_listen)
 	call   sys32_listen
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -25302,10 +22422,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_accept4)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	movzlq %esi, %rsi /* ARG1 = REG3 */
@@ -25313,10 +22429,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_accept4)
 	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
 	EXTERN(sys32_accept4)
 	call   sys32_accept4
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -25347,10 +22459,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getsockopt)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %edi, %r8 /* ARG4 = REG4 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	movzlq %esi, %rsi /* ARG1 = REG3 */
@@ -25359,10 +22467,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getsockopt)
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_getsockopt)
 	call   sys32_getsockopt
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -25391,10 +22495,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_setsockopt)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %edi, %r8 /* ARG4 = REG4 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	movzlq %esi, %rsi /* ARG1 = REG3 */
@@ -25403,10 +22503,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_setsockopt)
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_setsockopt)
 	call   sys32_setsockopt
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -25438,19 +22534,11 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getsockname)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	EXTERN(sys32_getsockname)
 	call   sys32_getsockname
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -25479,19 +22567,11 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getpeername)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	EXTERN(sys32_getpeername)
 	call   sys32_getpeername
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -25527,10 +22607,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_sendto)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %edi, %r8 /* ARG4 = REG4 */
 	movzlq %ebp, %r9 /* ARG5 = REG5 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
@@ -25540,10 +22616,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_sendto)
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_sendto)
 	call   sys32_sendto
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -25570,19 +22642,11 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_sendmsg)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	EXTERN(sys32_sendmsg)
 	call   sys32_sendmsg
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -25618,10 +22682,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_recvfrom)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %edi, %r8 /* ARG4 = REG4 */
 	movzlq %ebp, %r9 /* ARG5 = REG5 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
@@ -25631,10 +22691,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_recvfrom)
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_recvfrom)
 	call   sys32_recvfrom
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -25662,19 +22718,11 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_recvmsg)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	EXTERN(sys32_recvmsg)
 	call   sys32_recvmsg
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -25701,18 +22749,10 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_shutdown)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	EXTERN(sys32_shutdown)
 	call   sys32_shutdown
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -25733,17 +22773,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_userfaultfd)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_userfaultfd)
 	call   sys32_userfaultfd
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -25764,17 +22796,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_membarrier)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_membarrier)
 	call   sys32_membarrier
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -25795,19 +22819,11 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_mlock2)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	EXTERN(sys32_mlock2)
 	call   sys32_mlock2
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -25828,17 +22844,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_copy_file_range)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_copy_file_range)
 	call   sys32_copy_file_range
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -25859,17 +22867,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_preadv2)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_preadv2)
 	call   sys32_preadv2
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -25890,17 +22890,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_pwritev2)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_pwritev2)
 	call   sys32_pwritev2
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -25921,10 +22913,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_pkey_mprotect)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	movzlq %esi, %rsi /* ARG1 = REG3 */
@@ -25932,10 +22920,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_pkey_mprotect)
 	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
 	EXTERN(sys32_pkey_mprotect)
 	call   sys32_pkey_mprotect
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -25956,18 +22940,10 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_pkey_alloc)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	EXTERN(sys32_pkey_alloc)
 	call   sys32_pkey_alloc
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -25988,17 +22964,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_pkey_free)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_pkey_free)
 	call   sys32_pkey_free
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -26019,17 +22987,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_statx)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_statx)
 	call   sys32_statx
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -26050,17 +23010,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_arch_prctl)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_arch_prctl)
 	call   sys32_arch_prctl
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -26081,17 +23033,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_io_pgetevents)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_io_pgetevents)
 	call   sys32_io_pgetevents
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -26112,17 +23056,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_rseq)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_rseq)
 	call   sys32_rseq
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -26143,17 +23079,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_semget)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_semget)
 	call   sys32_semget
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -26174,17 +23102,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_semctl)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_semctl)
 	call   sys32_semctl
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -26205,19 +23125,11 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_shmget)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	EXTERN(sys32_shmget)
 	call   sys32_shmget
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -26238,19 +23150,11 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_shmctl)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	EXTERN(sys32_shmctl)
 	call   sys32_shmctl
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -26271,19 +23175,11 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_shmat)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	EXTERN(sys32_shmat)
 	call   sys32_shmat
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -26304,17 +23200,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_shmdt)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_shmdt)
 	call   sys32_shmdt
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -26335,17 +23223,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_msgget)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_msgget)
 	call   sys32_msgget
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -26366,17 +23246,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_msgsnd)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_msgsnd)
 	call   sys32_msgsnd
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -26397,17 +23269,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_msgrcv)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_msgrcv)
 	call   sys32_msgrcv
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -26428,17 +23292,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_msgctl)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_msgctl)
 	call   sys32_msgctl
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -26459,18 +23315,10 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_clock_gettime64)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	EXTERN(sys32_clock_gettime64)
 	call   sys32_clock_gettime64
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -26491,18 +23339,10 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_clock_settime64)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	EXTERN(sys32_clock_settime64)
 	call   sys32_clock_settime64
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -26523,17 +23363,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_clock_adjtime64)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_clock_adjtime64)
 	call   sys32_clock_adjtime64
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -26554,18 +23386,10 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_clock_getres_time64)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	EXTERN(sys32_clock_getres_time64)
 	call   sys32_clock_getres_time64
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -26586,10 +23410,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_clock_nanosleep_time64)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	movzlq %esi, %rsi /* ARG1 = REG3 */
@@ -26597,10 +23417,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_clock_nanosleep_time64)
 	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
 	EXTERN(sys32_clock_nanosleep_time64)
 	call   sys32_clock_nanosleep_time64
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -26621,18 +23437,10 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_timer_gettime64)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	EXTERN(sys32_timer_gettime64)
 	call   sys32_timer_gettime64
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -26654,10 +23462,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_timer_settime64)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	movzlq %esi, %rsi /* ARG1 = REG3 */
@@ -26665,10 +23469,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_timer_settime64)
 	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
 	EXTERN(sys32_timer_settime64)
 	call   sys32_timer_settime64
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -26690,18 +23490,10 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_timerfd_gettime64)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	EXTERN(sys32_timerfd_gettime64)
 	call   sys32_timerfd_gettime64
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -26726,10 +23518,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_timerfd_settime64)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	movzlq %esi, %rsi /* ARG1 = REG3 */
@@ -26737,10 +23525,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_timerfd_settime64)
 	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
 	EXTERN(sys32_timerfd_settime64)
 	call   sys32_timerfd_settime64
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -26762,10 +23546,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_utimensat_time64)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	movzlq %esi, %rsi /* ARG1 = REG3 */
@@ -26773,10 +23553,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_utimensat_time64)
 	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
 	EXTERN(sys32_utimensat_time64)
 	call   sys32_utimensat_time64
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -26797,10 +23573,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_pselect6_time64)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %edi, %r8 /* ARG4 = REG4 */
 	movzlq %ebp, %r9 /* ARG5 = REG5 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
@@ -26810,10 +23582,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_pselect6_time64)
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_pselect6_time64)
 	call   sys32_pselect6_time64
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -26834,10 +23602,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_ppoll_time64)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %edi, %r8 /* ARG4 = REG4 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	movzlq %esi, %rsi /* ARG1 = REG3 */
@@ -26846,10 +23610,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_ppoll_time64)
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_ppoll_time64)
 	call   sys32_ppoll_time64
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -26870,17 +23630,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_io_pgetevents_time64)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_io_pgetevents_time64)
 	call   sys32_io_pgetevents_time64
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -26909,10 +23661,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_recvmmsg_time64)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %edi, %r8 /* ARG4 = REG4 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	movzlq %esi, %rsi /* ARG1 = REG3 */
@@ -26921,10 +23669,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_recvmmsg_time64)
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_recvmmsg_time64)
 	call   sys32_recvmmsg_time64
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -26945,10 +23689,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_mq_timedsend_time64)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %edi, %r8 /* ARG4 = REG4 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	movzlq %esi, %rsi /* ARG1 = REG3 */
@@ -26957,10 +23697,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_mq_timedsend_time64)
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_mq_timedsend_time64)
 	call   sys32_mq_timedsend_time64
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -26981,10 +23717,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_mq_timedreceive_time64)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %edi, %r8 /* ARG4 = REG4 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	movzlq %esi, %rsi /* ARG1 = REG3 */
@@ -26993,10 +23725,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_mq_timedreceive_time64)
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_mq_timedreceive_time64)
 	call   sys32_mq_timedreceive_time64
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -27017,17 +23745,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_semtimedop_time64)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_semtimedop_time64)
 	call   sys32_semtimedop_time64
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -27048,10 +23768,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_rt_sigtimedwait_time64)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	movzlq %esi, %rsi /* ARG1 = REG3 */
@@ -27059,10 +23775,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_rt_sigtimedwait_time64)
 	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
 	EXTERN(sys32_rt_sigtimedwait_time64)
 	call   sys32_rt_sigtimedwait_time64
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -27084,10 +23796,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_futex_time64)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %edi, %r8 /* ARG4 = REG4 */
 	movzlq %ebp, %r9 /* ARG5 = REG5 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
@@ -27097,10 +23805,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_futex_time64)
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_futex_time64)
 	call   sys32_futex_time64
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -27121,18 +23825,10 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_sched_rr_get_interval_time64)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	EXTERN(sys32_sched_rr_get_interval_time64)
 	call   sys32_sched_rr_get_interval_time64
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -27165,10 +23861,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_pidfd_send_signal)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	movzlq %esi, %rsi /* ARG1 = REG3 */
@@ -27176,10 +23868,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_pidfd_send_signal)
 	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
 	EXTERN(sys32_pidfd_send_signal)
 	call   sys32_pidfd_send_signal
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -27200,17 +23888,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_io_uring_setup)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_io_uring_setup)
 	call   sys32_io_uring_setup
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -27231,17 +23911,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_io_uring_enter)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_io_uring_enter)
 	call   sys32_io_uring_enter
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -27262,17 +23934,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_io_uring_register)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_io_uring_register)
 	call   sys32_io_uring_register
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -27293,17 +23957,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_open_tree)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_open_tree)
 	call   sys32_open_tree
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -27324,17 +23980,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_move_mount)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_move_mount)
 	call   sys32_move_mount
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -27355,17 +24003,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fsopen)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_fsopen)
 	call   sys32_fsopen
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -27386,17 +24026,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fsconfig)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_fsconfig)
 	call   sys32_fsconfig
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -27417,17 +24049,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fsmount)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_fsmount)
 	call   sys32_fsmount
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -27448,17 +24072,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fspick)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_fspick)
 	call   sys32_fspick
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -27488,18 +24104,10 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_pidfd_open)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	EXTERN(sys32_pidfd_open)
 	call   sys32_pidfd_open
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -27520,17 +24128,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_clone3)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_clone3)
 	call   sys32_clone3
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -27551,17 +24151,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_close_range)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_close_range)
 	call   sys32_close_range
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -27582,17 +24174,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_openat2)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_openat2)
 	call   sys32_openat2
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -27625,19 +24209,11 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_pidfd_getfd)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	movslq %ecx, %rsi /* ARG1 = REG1 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	EXTERN(sys32_pidfd_getfd)
 	call   sys32_pidfd_getfd
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -27658,17 +24234,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_faccessat2)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_faccessat2)
 	call   sys32_faccessat2
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -27692,10 +24260,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_pwritevf)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %edi, %rax          /* %rax = REG3:REG4 */
 	movzlq %esi, %r8           /* ... */
 	shlq   $(32), %rax            /* ... */
@@ -27707,10 +24271,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_pwritevf)
 	movzlq %ebp, %r8 /* ARG4 = REG5 */
 	EXTERN(sys32_pwritevf)
 	call   sys32_pwritevf
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -27734,10 +24294,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_preadvf)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %edi, %rax          /* %rax = REG3:REG4 */
 	movzlq %esi, %r8           /* ... */
 	shlq   $(32), %rax            /* ... */
@@ -27749,10 +24305,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_preadvf)
 	movzlq %ebp, %r8 /* ARG4 = REG5 */
 	EXTERN(sys32_preadvf)
 	call   sys32_preadvf
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -27773,10 +24325,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fallocate64)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %esi, %rdx          /* ARG2 = REG2:REG3 */
 	movzlq %edx, %rax          /* ... */
 	shlq   $(32), %rdx            /* ... */
@@ -27790,10 +24338,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fallocate64)
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_fallocate64)
 	call   sys32_fallocate64
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -27815,10 +24359,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_freadlinkat)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %edi, %r8 /* ARG4 = REG4 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	movzlq %esi, %rsi /* ARG1 = REG3 */
@@ -27827,10 +24367,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_freadlinkat)
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_freadlinkat)
 	call   sys32_freadlinkat
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -27852,10 +24388,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fsymlinkat)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	movzlq %esi, %rsi /* ARG1 = REG3 */
@@ -27863,10 +24395,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fsymlinkat)
 	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
 	EXTERN(sys32_fsymlinkat)
 	call   sys32_fsymlinkat
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -27888,10 +24416,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_frenameat)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %edi, %r8 /* ARG4 = REG4 */
 	movslq %edx, %rdx /* ARG2 = REG2 */
 	movzlq %esi, %rsi /* ARG1 = REG3 */
@@ -27900,10 +24424,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_frenameat)
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_frenameat)
 	call   sys32_frenameat
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -27925,10 +24445,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_kfstatat)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	movzlq %esi, %rsi /* ARG1 = REG3 */
@@ -27936,10 +24452,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_kfstatat)
 	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
 	EXTERN(sys32_kfstatat)
 	call   sys32_kfstatat
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -27960,19 +24472,11 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_futimesat64)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	EXTERN(sys32_futimesat64)
 	call   sys32_futimesat64
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -27994,10 +24498,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fmknodat)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %edi, %r8 /* ARG4 = REG4 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	movzlq %esi, %rsi /* ARG1 = REG3 */
@@ -28006,10 +24506,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fmknodat)
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_fmknodat)
 	call   sys32_fmknodat
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -28031,10 +24527,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fmkdirat)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	movzlq %esi, %rsi /* ARG1 = REG3 */
@@ -28042,10 +24534,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fmkdirat)
 	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
 	EXTERN(sys32_fmkdirat)
 	call   sys32_fmkdirat
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -28069,10 +24557,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_waitid64)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %edi, %r8 /* ARG4 = REG4 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	movzlq %esi, %rsi /* ARG1 = REG3 */
@@ -28081,10 +24565,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_waitid64)
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_waitid64)
 	call   sys32_waitid64
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -28108,18 +24588,10 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_utimes64)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	EXTERN(sys32_utimes64)
 	call   sys32_utimes64
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -28142,10 +24614,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_kreaddirf)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %edi, %r8 /* ARG4 = REG4 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	movzlq %esi, %rsi /* ARG1 = REG3 */
@@ -28154,10 +24622,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_kreaddirf)
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_kreaddirf)
 	call   sys32_kreaddirf
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -28178,18 +24642,10 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_kfstat)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	EXTERN(sys32_kfstat)
 	call   sys32_kfstat
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -28210,18 +24666,10 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_klstat)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	EXTERN(sys32_klstat)
 	call   sys32_klstat
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -28242,18 +24690,10 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_kstat)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	EXTERN(sys32_kstat)
 	call   sys32_kstat
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -28274,10 +24714,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_pwrite64f)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %edi, %rax          /* %rax = REG3:REG4 */
 	movzlq %esi, %r8           /* ... */
 	shlq   $(32), %rax            /* ... */
@@ -28289,10 +24725,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_pwrite64f)
 	movzlq %ebp, %r8 /* ARG4 = REG5 */
 	EXTERN(sys32_pwrite64f)
 	call   sys32_pwrite64f
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -28313,10 +24745,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_pread64f)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %edi, %rax          /* %rax = REG3:REG4 */
 	movzlq %esi, %r8           /* ... */
 	shlq   $(32), %rax            /* ... */
@@ -28328,10 +24756,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_pread64f)
 	movzlq %ebp, %r8 /* ARG4 = REG5 */
 	EXTERN(sys32_pread64f)
 	call   sys32_pread64f
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -28352,18 +24776,10 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_nanosleep64)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	EXTERN(sys32_nanosleep64)
 	call   sys32_nanosleep64
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -28396,16 +24812,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_rpc_serve)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	EXTERN(sys32_rpc_serve)
 	call   sys32_rpc_serve
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -28426,18 +24834,10 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_ksysctl)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	EXTERN(sys32_ksysctl)
 	call   sys32_ksysctl
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -28466,10 +24866,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_writevf)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	movzlq %esi, %rsi /* ARG1 = REG3 */
@@ -28477,10 +24873,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_writevf)
 	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
 	EXTERN(sys32_writevf)
 	call   sys32_writevf
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -28509,10 +24901,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_readvf)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	movzlq %esi, %rsi /* ARG1 = REG3 */
@@ -28520,10 +24908,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_readvf)
 	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
 	EXTERN(sys32_readvf)
 	call   sys32_readvf
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -28546,10 +24930,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_kreaddir)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	movzlq %esi, %rsi /* ARG1 = REG3 */
@@ -28557,10 +24937,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_kreaddir)
 	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
 	EXTERN(sys32_kreaddir)
 	call   sys32_kreaddir
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -28583,10 +24959,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_wait4_64)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	movzlq %esi, %rsi /* ARG1 = REG3 */
@@ -28594,10 +24966,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_wait4_64)
 	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
 	EXTERN(sys32_wait4_64)
 	call   sys32_wait4_64
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -28619,18 +24987,10 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getitimer64)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	EXTERN(sys32_getitimer64)
 	call   sys32_getitimer64
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -28652,19 +25012,11 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_setitimer64)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	EXTERN(sys32_setitimer64)
 	call   sys32_setitimer64
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -28695,10 +25047,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_maplibrary)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %edi, %r8 /* ARG4 = REG4 */
 	movslq %edx, %rdx /* ARG2 = REG2 */
 	movzlq %esi, %rsi /* ARG1 = REG3 */
@@ -28707,10 +25055,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_maplibrary)
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_maplibrary)
 	call   sys32_maplibrary
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -28731,10 +25075,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_select64)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %edi, %r8 /* ARG4 = REG4 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	movzlq %esi, %rsi /* ARG1 = REG3 */
@@ -28743,10 +25083,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_select64)
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_select64)
 	call   sys32_select64
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -28767,18 +25103,10 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_settimeofday64)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	EXTERN(sys32_settimeofday64)
 	call   sys32_settimeofday64
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -28799,18 +25127,10 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_gettimeofday64)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	EXTERN(sys32_gettimeofday64)
 	call   sys32_gettimeofday64
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -28832,18 +25152,10 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getrusage64)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	EXTERN(sys32_getrusage64)
 	call   sys32_getrusage64
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -28864,20 +25176,12 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fsmode)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ecx, %rdi          /* ARG0 = REG0:REG1 */
 	movzlq %ebx, %rax          /* ... */
 	shlq   $(32), %rdi            /* ... */
 	orq    %rax, %rdi          /* ... */
 	EXTERN(sys32_fsmode)
 	call   sys32_fsmode
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi %rcx
@@ -28900,10 +25204,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_ioctlf)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	movzlq %esi, %rsi /* ARG1 = REG3 */
@@ -28911,10 +25211,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_ioctlf)
 	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
 	EXTERN(sys32_ioctlf)
 	call   sys32_ioctlf
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -28938,16 +25234,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_rtm_test)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	EXTERN(sys32_rtm_test)
 	call   sys32_rtm_test
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -28973,17 +25261,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_rtm_abort)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_rtm_abort)
 	call   sys32_rtm_abort
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -29008,16 +25288,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_rtm_end)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	EXTERN(sys32_rtm_end)
 	call   sys32_rtm_end
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -29057,16 +25329,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_rtm_begin)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	EXTERN(sys32_rtm_begin)
 	call   sys32_rtm_begin
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -29087,17 +25351,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_ftime64)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_ftime64)
 	call   sys32_ftime64
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -29133,16 +25389,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_rpc_serve_sysret)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	EXTERN(sys32_rpc_serve_sysret)
 	call   sys32_rpc_serve_sysret
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -29190,17 +25438,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_set_userprocmask_address)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_set_userprocmask_address)
 	call   sys32_set_userprocmask_address
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -29222,18 +25462,10 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_utime64)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	EXTERN(sys32_utime64)
 	call   sys32_utime64
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -29267,18 +25499,10 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_userviofd)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	EXTERN(sys32_userviofd)
 	call   sys32_userviofd
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -29299,17 +25523,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_stime64)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_stime64)
 	call   sys32_stime64
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -29355,10 +25571,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_coredump)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %edi, %r8 /* ARG4 = REG4 */
 	movzlq %ebp, %r9 /* ARG5 = REG5 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
@@ -29368,10 +25580,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_coredump)
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_coredump)
 	call   sys32_coredump
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -29396,10 +25604,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_mktty)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	movslq %edx, %rdx /* ARG2 = REG2 */
 	movzlq %esi, %rsi /* ARG1 = REG3 */
@@ -29407,10 +25611,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_mktty)
 	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
 	EXTERN(sys32_mktty)
 	call   sys32_mktty
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -29458,10 +25658,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_lfutexlockexpr)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %edi, %r8 /* ARG4 = REG4 */
 	movzlq %ebp, %r9 /* ARG5 = REG5 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
@@ -29471,10 +25667,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_lfutexlockexpr)
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_lfutexlockexpr)
 	call   sys32_lfutexlockexpr
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -29522,10 +25714,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_lfutexexpr)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %edi, %r8 /* ARG4 = REG4 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	movzlq %esi, %rsi /* ARG1 = REG3 */
@@ -29534,10 +25722,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_lfutexexpr)
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_lfutexexpr)
 	call   sys32_lfutexexpr
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -29558,10 +25742,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_lseek64)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %edx, %rax          /* %rax = REG1:REG2 */
 	movzlq %ecx, %r8           /* ... */
@@ -29571,10 +25751,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_lseek64)
 	movq   %rax, %rsi /* ARG1 = %rax */
 	EXTERN(sys32_lseek64)
 	call   sys32_lseek64
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi %rcx
@@ -29619,10 +25795,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_lfutex)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %edi, %r8 /* ARG4 = REG4 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	movzlq %esi, %rsi /* ARG1 = REG3 */
@@ -29631,10 +25803,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_lfutex)
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_lfutex)
 	call   sys32_lfutex
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -29665,18 +25833,10 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_debugtrap)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	EXTERN(sys32_debugtrap)
 	call   sys32_debugtrap
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -29710,19 +25870,11 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_get_exception_handler)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	EXTERN(sys32_get_exception_handler)
 	call   sys32_get_exception_handler
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -29754,19 +25906,11 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_set_exception_handler)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	EXTERN(sys32_set_exception_handler)
 	call   sys32_set_exception_handler
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -29787,17 +25931,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_time64)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_time64)
 	call   sys32_time64
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi %rcx
@@ -29821,19 +25957,11 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fchdirat)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	EXTERN(sys32_fchdirat)
 	call   sys32_fchdirat
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -29856,10 +25984,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_openpty)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %edi, %r8 /* ARG4 = REG4 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	movzlq %esi, %rsi /* ARG1 = REG3 */
@@ -29868,10 +25992,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_openpty)
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_openpty)
 	call   sys32_openpty
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -29928,10 +26048,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_rpc_schedule)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %edi, %r8 /* ARG4 = REG4 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	movzlq %esi, %rsi /* ARG1 = REG3 */
@@ -29940,10 +26056,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_rpc_schedule)
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_rpc_schedule)
 	call   sys32_rpc_schedule
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -29971,10 +26083,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_frealpathat)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %edi, %r8 /* ARG4 = REG4 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	movzlq %esi, %rsi /* ARG1 = REG3 */
@@ -29983,10 +26091,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_frealpathat)
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_frealpathat)
 	call   sys32_frealpathat
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -30010,10 +26114,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_frealpath4)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	movzlq %esi, %rsi /* ARG1 = REG3 */
@@ -30021,10 +26121,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_frealpath4)
 	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
 	EXTERN(sys32_frealpath4)
 	call   sys32_frealpath4
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -30046,16 +26142,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getdrives)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	EXTERN(sys32_getdrives)
 	call   sys32_getdrives
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -30164,17 +26252,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_detach)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_detach)
 	call   sys32_detach
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -30201,10 +26281,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_writef)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	movzlq %esi, %rsi /* ARG1 = REG3 */
@@ -30212,10 +26288,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_writef)
 	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
 	EXTERN(sys32_writef)
 	call   sys32_writef
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -30242,10 +26314,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_readf)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	movzlq %esi, %rsi /* ARG1 = REG3 */
@@ -30253,10 +26321,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_readf)
 	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
 	EXTERN(sys32_readf)
 	call   sys32_readf
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -30277,10 +26341,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_hopf)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	movzlq %esi, %rsi /* ARG1 = REG3 */
@@ -30288,10 +26348,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_hopf)
 	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
 	EXTERN(sys32_hopf)
 	call   sys32_hopf
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
@@ -30312,19 +26368,11 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_hop)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	EXTERN(sys32_hop)
 	call   sys32_hop
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx

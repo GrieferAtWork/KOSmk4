@@ -186,7 +186,7 @@ dumpTables("bin/x86_64-kos-OD/os/kernel.bin", {
 	"x86_sysroute0_c",
 	"x86_sysroute1_c",
 
-	/* 32-bit,  high-level  SYSVABI-compatible  tables,  each  on  taking
+	/* 32-bit, high-level  SYSVABI-compatible  tables,  each  one  taking
 	 * a single  argument  `u64 *regv = %rdi'  that points  to  a  vector
 	 * of up  to 6  registers to-be  used during  invocation. This  table
 	 * is used when system calls are emulated (s.a. `syscall_emulate()'),

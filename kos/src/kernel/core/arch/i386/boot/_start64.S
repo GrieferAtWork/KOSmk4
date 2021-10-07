@@ -677,7 +677,7 @@ INTERN_FUNCTION(_start)
 	/* Setup the page directory identity mapping
 	 * >> pagedir_kernel.p_e4[257] = &pagedir_kernel.p_e4[0] + FLAGS_VECTOR; */
 	movl   $(pagedir_kernel_p_e4(0) + FLAGS_VECTOR), pagedir_kernel_p_e4(257)
-	/* HINT: Right now our VM looks like this:
+	/* HINT: Right now our pagedir looks like this:
 	 *  - [0] 0000000000000000..000000007fffffff --> 0000000000000000..000000007fffffff
 	 *  - [1] ffff800000000000..ffff80007fffffff --> 0000000000000000..000000007fffffff (Redundant, unavoidable, and never used)
 	 *  - [2] ffff808000000000..ffff80ffffffffff --> <recursive page-directory self-mapping>
@@ -820,7 +820,7 @@ INTERN_FUNCTION(_start64)
 	movq   $(0), (__x86_pagedir_kernel_share + 8)
 	movq   $(0), (pagedir_kernel + 0)
 
-	/* HINT: Right now our VM looks like this:
+	/* HINT: Right now our pagedir looks like this:
 	 * [0] ffff808000000000..ffff80ffffffffff --> <recursive page-directory self-mapping>
 	 * [1] ffffffff80000000..ffffffffffffffff --> 0000000000000000..000000007fffffff
 	 * In  this  picture, we're  currently running  from  [1] (mapped  at -2GiB...0) */

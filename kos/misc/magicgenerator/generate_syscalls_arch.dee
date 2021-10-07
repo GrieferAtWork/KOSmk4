@@ -1060,17 +1060,28 @@ function x86_64_printKernelSyscallWrapper_asm32_int80(fp: File, f: Function, sys
 	fp << "	pushq_cfi_r %rdx\n";
 	fp << "	pushq_cfi_r %rsi\n";
 	fp << "	pushq_cfi_r %rdi\n";
+#if 0
 	fp << "	pushq_cfi_r %r8\n";
 	fp << "	pushq_cfi_r %r9\n";
 	fp << "	pushq_cfi_r %r10\n";
 	fp << "	pushq_cfi_r %r11\n";
+#endif
 	x86_64_printKernelSyscallWrapper_transformArguments(fp, f, sysenter: false);
 	fp << "	EXTERN(sys32_" << f.name << ")\n";
 	fp << "	call   sys32_" << f.name << "\n";
+#if 0
 	fp << "	popq_cfi_r %r11\n";
 	fp << "	popq_cfi_r %r10\n";
 	fp << "	popq_cfi_r %r9\n";
 	fp << "	popq_cfi_r %r8\n";
+#elif 0 /* I don't *think* this right here is necessary.
+         * After all: 32-bit  user-space shouldn't  have
+         * any way of accessing this from the get-go! */
+	fp << "	xorq %r11, %r11\n";
+	fp << "	xorq %r10, %r10\n";
+	fp << "	xorq %r9, %r9\n";
+	fp << "	xorq %r8, %r8\n";
+#endif
 	fp << "	popq_cfi_r %rdi\n";
 	fp << "	popq_cfi_r %rsi\n";
 	if (f.returnType.isReg64) {
