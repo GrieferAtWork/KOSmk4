@@ -361,7 +361,7 @@ handle_signalfd_pollconnect(struct signalfd *__restrict UNUSED(self),
 
 
 
-INTERN poll_mode_t KCALL
+INTERN ATTR_PURE WUNUSED NONNULL((1)) poll_mode_t KCALL
 handle_signalfd_polltest(struct signalfd *__restrict self,
                          poll_mode_t what) {
 	if (what & POLLINMASK) {
