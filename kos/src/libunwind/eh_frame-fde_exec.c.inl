@@ -93,19 +93,16 @@ NOTHROW_NCX(CC SYM(unwind_cfa_backup_state_freechain))(SYM(unwind_cfa_backup_sta
      defined(EH_FRAME_FDE_EXEC_CFA_SIGFRAME_STATE) || \
      defined(EH_FRAME_FDE_EXEC_CFA_LANDING_STATE))
 #ifdef EH_FRAME_FDE_EXEC_CFA_SIGFRAME_STATE
-#define CFI_UNWIND_LOCAL_CFA_STATE_T                unwind_cfa_sigframe_state_t
 #define CFI_UNWIND_LOCAL_COMMON_REGISTER_MAXCOUNT   CFI_UNWIND_SIGFRAME_COMMON_REGISTER_MAXCOUNT
 #define CFI_UNWIND_LOCAL_UNCOMMON_REGISTER_MAXCOUNT CFI_UNWIND_SIGFRAME_UNCOMMON_REGISTER_MAXCOUNT
 #define cfi_unwind_local_register_dw2common         cfi_unwind_sigframe_register_dw2common
 #define cfi_unwind_local_register_dw2uncommon       cfi_unwind_sigframe_register_dw2uncommon
 #elif defined(EH_FRAME_FDE_EXEC_CFA_LANDING_STATE)
-#define CFI_UNWIND_LOCAL_CFA_STATE_T                _unwind_cfa_landing_state_t
 #define CFI_UNWIND_LOCAL_COMMON_REGISTER_MAXCOUNT   CFI_UNWIND_LANDING_COMMON_REGISTER_MAXCOUNT
 #define CFI_UNWIND_LOCAL_UNCOMMON_REGISTER_MAXCOUNT CFI_UNWIND_LANDING_UNCOMMON_REGISTER_MAXCOUNT
 #define cfi_unwind_local_register_dw2common         cfi_unwind_landing_register_dw2common
 #define cfi_unwind_local_register_dw2uncommon       cfi_unwind_landing_register_dw2uncommon
 #else /* ... */
-#define CFI_UNWIND_LOCAL_CFA_STATE_T                unwind_cfa_state_t
 #define CFI_UNWIND_LOCAL_COMMON_REGISTER_MAXCOUNT   CFI_UNWIND_COMMON_REGISTER_MAXCOUNT
 #define CFI_UNWIND_LOCAL_UNCOMMON_REGISTER_MAXCOUNT CFI_UNWIND_UNCOMMON_REGISTER_MAXCOUNT
 #define cfi_unwind_local_register_dw2common         cfi_unwind_register_dw2common
@@ -122,51 +119,6 @@ NOTHROW_NCX(CC SYM(unwind_cfa_backup_state_freechain))(SYM(unwind_cfa_backup_sta
 #error "Neither common, nor uncommon registers defined for NORMAL"
 #endif /* !... */
 #endif /* ... */
-
-
-#if CFI_UNWIND_LOCAL_COMMON_REGISTER_MAXCOUNT != 0
-PRIVATE NONNULL((1)) void
-NOTHROW_NCX(CC SYM(set_common_order_ffh))(CFI_UNWIND_LOCAL_CFA_STATE_T *__restrict self,
-                                          unwind_regno_t com_regno) {
-	unwind_order_index_t base;
-	unwind_regno_t i;
-	base = self->cs_regs[com_regno].cr_order;
-	for (i = 0; i < CFI_UNWIND_LOCAL_COMMON_REGISTER_MAXCOUNT; ++i) {
-		if (self->cs_regs[i].cr_order > base)
-			--self->cs_regs[i].cr_order;
-	}
-#if CFI_UNWIND_LOCAL_UNCOMMON_REGISTER_MAXCOUNT != 0
-	for (i = 0; i < CFI_UNWIND_LOCAL_UNCOMMON_REGISTER_MAXCOUNT; ++i) {
-		if (self->cs_uncorder[i] > base)
-			--self->cs_uncorder[i];
-	}
-#endif /* CFI_UNWIND_LOCAL_UNCOMMON_REGISTER_MAXCOUNT != 0 */
-	self->cs_regs[com_regno].cr_order = (unwind_order_index_t)-1;
-}
-#endif /* CFI_UNWIND_LOCAL_COMMON_REGISTER_MAXCOUNT != 0 */
-
-#if CFI_UNWIND_LOCAL_UNCOMMON_REGISTER_MAXCOUNT != 0
-PRIVATE NONNULL((1)) void
-NOTHROW_NCX(CC SYM(set_uncommon_order_ffh))(CFI_UNWIND_LOCAL_CFA_STATE_T *__restrict self,
-                                            unwind_regno_t uncom_regno) {
-	unwind_order_index_t base;
-	unwind_regno_t i;
-	base = self->cs_uncorder[uncom_regno];
-	for (i = 0; i < CFI_UNWIND_LOCAL_UNCOMMON_REGISTER_MAXCOUNT; ++i) {
-		if (self->cs_uncorder[i] > base)
-			--self->cs_uncorder[i];
-	}
-#if CFI_UNWIND_LOCAL_COMMON_REGISTER_MAXCOUNT != 0
-	for (i = 0; i < CFI_UNWIND_LOCAL_COMMON_REGISTER_MAXCOUNT; ++i) {
-		if (self->cs_regs[i].cr_order > base)
-			--self->cs_regs[i].cr_order;
-	}
-#endif /* CFI_UNWIND_LOCAL_COMMON_REGISTER_MAXCOUNT != 0 */
-	self->cs_uncorder[uncom_regno] = (unwind_order_index_t)-1;
-}
-#endif /* CFI_UNWIND_LOCAL_UNCOMMON_REGISTER_MAXCOUNT != 0 */
-
-#undef CFI_UNWIND_LOCAL_CFA_STATE_T
 #endif /* EH_FRAME_FDE_EXEC_CFA_STATE || EH_FRAME_FDE_EXEC_CFA_SIGFRAME_STATE || EH_FRAME_FDE_EXEC_CFA_LANDING_STATE */
 
 
@@ -188,21 +140,16 @@ NOTHROW_NCX(CC SYM(set_uncommon_order_ffh))(CFI_UNWIND_LOCAL_CFA_STATE_T *__rest
  * @return: UNWIND_BADALLOC:                ... */
 PRIVATE
 #if CFI_UNWIND_SIGFRAME_COMMON_REGISTER_MAXCOUNT != 0 && CFI_UNWIND_SIGFRAME_UNCOMMON_REGISTER_MAXCOUNT != 0
-	NONNULL((1, 4, 5, 6, 7))
+	NONNULL((1, 4, 5, 6))
 #elif CFI_UNWIND_SIGFRAME_COMMON_REGISTER_MAXCOUNT != 0 || CFI_UNWIND_SIGFRAME_UNCOMMON_REGISTER_MAXCOUNT != 0
-	NONNULL((1, 3, 4, 5, 6))
+	NONNULL((1, 3, 4, 5))
 #else /* ... */
-	NONNULL((1, 2, 3, 4, 5))
+	NONNULL((1, 2, 3, 4))
 #endif /* !... */
 	unsigned int
 NOTHROW_NCX(CC libuw_unwind_fde_exec_until)(unwind_fde_t *__restrict self, /* Only non-const for lazy initialized fields! */
-#if CFI_UNWIND_COMMON_REGISTER_MAXCOUNT != 0
-                                            unwind_cfa_register_t *common_init_regs,
-#endif /* CFI_UNWIND_COMMON_REGISTER_MAXCOUNT != 0 */
-#if CFI_UNWIND_UNCOMMON_REGISTER_MAXCOUNT != 0
-                                            unwind_regno_t *uncommon_init_regs,
-#endif /* CFI_UNWIND_UNCOMMON_REGISTER_MAXCOUNT != 0 */
-                                            unwind_order_index_t *__restrict porder,
+                                            IF_CFI_UNWIND_COMMON_REGISTER_MAXCOUNT(unwind_cfa_register_t *common_init_regs,)
+                                            IF_CFI_UNWIND_UNCOMMON_REGISTER_MAXCOUNT(byte_t *uncommon_init_regs,)
                                             byte_t const *reader,
                                             byte_t const *end,
                                             unwind_cfa_state_t *__restrict result,
@@ -223,21 +170,16 @@ NOTHROW_NCX(CC libuw_unwind_fde_exec_until)(unwind_fde_t *__restrict self, /* On
  * @return: UNWIND_BADALLOC:                ... */
 PRIVATE
 #if CFI_UNWIND_SIGFRAME_COMMON_REGISTER_MAXCOUNT != 0 && CFI_UNWIND_SIGFRAME_UNCOMMON_REGISTER_MAXCOUNT != 0
-	NONNULL((1, 4, 5, 6, 7))
+	NONNULL((1, 4, 5, 6))
 #elif CFI_UNWIND_SIGFRAME_COMMON_REGISTER_MAXCOUNT != 0 || CFI_UNWIND_SIGFRAME_UNCOMMON_REGISTER_MAXCOUNT != 0
-	NONNULL((1, 3, 4, 5, 6))
+	NONNULL((1, 3, 4, 5))
 #else /* ... */
-	NONNULL((1, 2, 3, 4, 5))
+	NONNULL((1, 2, 3, 4))
 #endif /* !... */
 	unsigned int
 NOTHROW_NCX(CC libuw_unwind_sigframe_fde_exec_until)(unwind_fde_t *__restrict self, /* Only non-const for lazy initialized fields! */
-#if CFI_UNWIND_SIGFRAME_COMMON_REGISTER_MAXCOUNT != 0
-                                                     unwind_cfa_register_t *common_init_regs,
-#endif /* CFI_UNWIND_SIGFRAME_COMMON_REGISTER_MAXCOUNT != 0 */
-#if CFI_UNWIND_SIGFRAME_UNCOMMON_REGISTER_MAXCOUNT != 0
-                                                     unwind_regno_t *uncommon_init_regs,
-#endif /* CFI_UNWIND_SIGFRAME_UNCOMMON_REGISTER_MAXCOUNT != 0 */
-                                                     unwind_order_index_t *__restrict porder,
+                                                     IF_CFI_UNWIND_SIGFRAME_COMMON_REGISTER_MAXCOUNT(unwind_cfa_register_t *common_init_regs,)
+                                                     IF_CFI_UNWIND_SIGFRAME_UNCOMMON_REGISTER_MAXCOUNT(byte_t *uncommon_init_regs,)
                                                      byte_t const *reader,
                                                      byte_t const *end,
                                                      unwind_cfa_sigframe_state_t *__restrict result,
@@ -246,21 +188,16 @@ NOTHROW_NCX(CC libuw_unwind_sigframe_fde_exec_until)(unwind_fde_t *__restrict se
 /* Internal helper for calculating landing-pad rules. */
 PRIVATE
 #if CFI_UNWIND_LANDING_COMMON_REGISTER_MAXCOUNT != 0 && CFI_UNWIND_LANDING_UNCOMMON_REGISTER_MAXCOUNT != 0
-	NONNULL((1, 4, 5, 6, 7))
+	NONNULL((1, 4, 5, 6))
 #elif CFI_UNWIND_LANDING_COMMON_REGISTER_MAXCOUNT != 0 || CFI_UNWIND_LANDING_UNCOMMON_REGISTER_MAXCOUNT != 0
-	NONNULL((1, 3, 4, 5, 6))
+	NONNULL((1, 3, 4, 5))
 #else /* ... */
-	NONNULL((1, 2, 3, 4, 5))
+	NONNULL((1, 2, 3, 4))
 #endif /* !... */
 	unsigned int
 NOTHROW_NCX(CC libuw_unwind_landing_fde_exec_until)(unwind_fde_t *__restrict self, /* Only non-const for lazy initialized fields! */
-#if CFI_UNWIND_LANDING_COMMON_REGISTER_MAXCOUNT != 0
-                                                    unwind_cfa_register_t *common_init_regs,
-#endif /* CFI_UNWIND_LANDING_COMMON_REGISTER_MAXCOUNT != 0 */
-#if CFI_UNWIND_LANDING_UNCOMMON_REGISTER_MAXCOUNT != 0
-                                                    unwind_regno_t *uncommon_init_regs,
-#endif /* CFI_UNWIND_LANDING_UNCOMMON_REGISTER_MAXCOUNT != 0 */
-                                                    unwind_order_index_t *__restrict porder,
+                                                    IF_CFI_UNWIND_LANDING_COMMON_REGISTER_MAXCOUNT(unwind_cfa_register_t *common_init_regs,)
+                                                    IF_CFI_UNWIND_LANDING_UNCOMMON_REGISTER_MAXCOUNT(byte_t *uncommon_init_regs,)
                                                     byte_t const *reader,
                                                     byte_t const *landing_start_reader,
                                                     byte_t const *end,
@@ -324,32 +261,23 @@ NOTHROW_NCX(CC libuw_unwind_fde_exec_rule_until)(unwind_fde_t *__restrict self, 
      defined(EH_FRAME_FDE_EXEC_CFA_LANDING_STATE))
 #if CFI_UNWIND_LOCAL_COMMON_REGISTER_MAXCOUNT != 0
 #if CFI_UNWIND_LOCAL_UNCOMMON_REGISTER_MAXCOUNT != 0
-#define SET_REGISTER(dw_regid, ...)                                                   \
-	LOCAL_IF_SHOULD_APPLY_RULE {                                                      \
-		unwind_regno_t temp;                                                          \
-		temp = cfi_unwind_local_register_dw2common(self->f_addrsize, dw_regid);       \
-		if likely(temp < CFI_UNWIND_LOCAL_COMMON_REGISTER_MAXCOUNT) {                 \
-			/* Common register */                                                     \
-			unwind_cfa_register_t *rule;                                              \
-			rule = &result->cs_regs[temp];                                            \
-			if unlikely(*porder == (unwind_order_index_t)-1) {                        \
-				SYM(set_common_order_ffh)(result, temp);                              \
-			} else {                                                                  \
-				rule->cr_order = ++*porder;                                           \
-			}                                                                         \
-			__VA_ARGS__;                                                              \
-		} else {                                                                      \
-			temp = cfi_unwind_local_register_dw2uncommon(self->f_addrsize, dw_regid); \
-			if unlikely(temp >= CFI_UNWIND_LOCAL_UNCOMMON_REGISTER_MAXCOUNT)          \
-				ERRORF(err_invalid_register, "regno=%u\n",                            \
-				       (unsigned int)(dw_regid));                                     \
-			/* Uncommon register */                                                   \
-			if unlikely(*porder == (unwind_order_index_t)-1) {                        \
-				SYM(set_uncommon_order_ffh)(result, temp);                            \
-			} else {                                                                  \
-				result->cs_uncorder[temp] = ++*porder;                                \
-			}                                                                         \
-		}                                                                             \
+#define SET_REGISTER(dw_regid, ...)                                                          \
+	LOCAL_IF_SHOULD_APPLY_RULE {                                                             \
+		unwind_regno_t temp;                                                                 \
+		temp = cfi_unwind_local_register_dw2common(self->f_addrsize, dw_regid);              \
+		if likely(temp < CFI_UNWIND_LOCAL_COMMON_REGISTER_MAXCOUNT) {                        \
+			/* Common register */                                                            \
+			unwind_cfa_register_t *rule = &result->cs_regs[temp];                            \
+			__VA_ARGS__;                                                                     \
+		} else {                                                                             \
+			temp = cfi_unwind_local_register_dw2uncommon(self->f_addrsize, dw_regid);        \
+			if unlikely(temp >= CFI_UNWIND_LOCAL_UNCOMMON_REGISTER_MAXCOUNT)                 \
+				ERRORF(err_invalid_register, "regno=%u\n",                                   \
+				       (unsigned int)(dw_regid));                                            \
+			/* Uncommon register */                                                          \
+			bitset_insert(result->cs_uncommon, temp);                                        \
+			bitset_insert(result->cs_uncommon, CFI_UNWIND_LOCAL_UNCOMMON_REGISTER_MAXCOUNT); \
+		}                                                                                    \
 	}
 #else /* CFI_UNWIND_LOCAL_UNCOMMON_REGISTER_MAXCOUNT != 0 */
 #define SET_REGISTER(dw_regid, ...)                                             \
@@ -358,13 +286,7 @@ NOTHROW_NCX(CC libuw_unwind_fde_exec_rule_until)(unwind_fde_t *__restrict self, 
 		temp = cfi_unwind_local_register_dw2common(self->f_addrsize, dw_regid); \
 		if likely(temp < CFI_UNWIND_LOCAL_COMMON_REGISTER_MAXCOUNT) {           \
 			/* Common register */                                               \
-			unwind_cfa_register_t *rule;                                        \
-			rule           = &result->cs_regs[temp];                            \
-			if unlikely(*porder == (unwind_order_index_t)-1) {                  \
-				SYM(set_common_order_ffh)(result, temp);                        \
-			} else {                                                            \
-				rule->cr_order = ++*porder;                                     \
-			}                                                                   \
+			unwind_cfa_register_t *rule = &result->cs_regs[temp];               \
 			__VA_ARGS__;                                                        \
 		} else {                                                                \
 			ERRORF(err_invalid_register, "regno=%u\n",                          \
@@ -374,19 +296,16 @@ NOTHROW_NCX(CC libuw_unwind_fde_exec_rule_until)(unwind_fde_t *__restrict self, 
 #endif /* CFI_UNWIND_LOCAL_UNCOMMON_REGISTER_MAXCOUNT == 0 */
 #else /* CFI_UNWIND_LOCAL_COMMON_REGISTER_MAXCOUNT != 0 */
 #if CFI_UNWIND_LOCAL_UNCOMMON_REGISTER_MAXCOUNT != 0
-#define SET_REGISTER(dw_regid, ...)                                               \
-	LOCAL_IF_SHOULD_APPLY_RULE {                                                  \
-		unwind_regno_t temp;                                                      \
-		temp = cfi_unwind_local_register_dw2uncommon(self->f_addrsize, dw_regid); \
-		if unlikely(temp >= CFI_UNWIND_LOCAL_UNCOMMON_REGISTER_MAXCOUNT)          \
-			ERRORF(err_invalid_register, "regno=%u\n",                            \
-			       (unsigned int)(dw_regid));                                     \
-		/* Uncommon register */                                                   \
-		if unlikely(*porder == (unwind_order_index_t)-1) {                        \
-			SYM(set_uncommon_order_ffh)(result, temp);                            \
-		} else {                                                                  \
-			result->cs_uncorder[temp] = ++*porder;                                \
-		}                                                                         \
+#define SET_REGISTER(dw_regid, ...)                                                      \
+	LOCAL_IF_SHOULD_APPLY_RULE {                                                         \
+		unwind_regno_t temp;                                                             \
+		temp = cfi_unwind_local_register_dw2uncommon(self->f_addrsize, dw_regid);        \
+		if unlikely(temp >= CFI_UNWIND_LOCAL_UNCOMMON_REGISTER_MAXCOUNT)                 \
+			ERRORF(err_invalid_register, "regno=%u\n",                                   \
+			       (unsigned int)(dw_regid));                                            \
+		/* Uncommon register */                                                          \
+		bitset_insert(result->cs_uncommon, temp);                                        \
+		bitset_insert(result->cs_uncommon, CFI_UNWIND_LOCAL_UNCOMMON_REGISTER_MAXCOUNT); \
 	}
 #else /* CFI_UNWIND_LOCAL_UNCOMMON_REGISTER_MAXCOUNT != 0 */
 #define SET_REGISTER(dw_regid, ...)                \
@@ -454,10 +373,10 @@ NOTHROW_NCX(CC libuw_unwind_fde_exec_rule_until)(unwind_fde_t *__restrict self, 
 					temp = cfi_unwind_local_register_dw2uncommon(self->f_addrsize, operand);
 					if unlikely(temp >= CFI_UNWIND_LOCAL_UNCOMMON_REGISTER_MAXCOUNT)
 						ERRORF(err_invalid_register, "regno=%u\n", (unsigned int)operand);
-					if unlikely(!uncommon_init_regs) {
-						result->cs_uncorder[temp] = 0;
-					} else {
-						result->cs_uncorder[temp] = uncommon_init_regs[temp];
+					bitset_remove(result->cs_uncommon, temp);
+					if likely(uncommon_init_regs && bitset_contains(uncommon_init_regs, temp)) {
+						bitset_insert(result->cs_uncommon, temp);
+						bitset_insert(result->cs_uncommon, CFI_UNWIND_LOCAL_UNCOMMON_REGISTER_MAXCOUNT); ;
 					}
 #else /* CFI_UNWIND_LOCAL_UNCOMMON_REGISTER_MAXCOUNT != 0 */
 					ERRORF(err_invalid_register, "regno=%u\n", (unsigned int)operand);
@@ -538,10 +457,10 @@ NOTHROW_NCX(CC libuw_unwind_fde_exec_rule_until)(unwind_fde_t *__restrict self, 
 						temp = cfi_unwind_local_register_dw2uncommon(self->f_addrsize, reg);
 						if unlikely(temp >= CFI_UNWIND_LOCAL_UNCOMMON_REGISTER_MAXCOUNT)
 							ERRORF(err_invalid_register, "regno=%u\n", (unsigned int)reg);
-						if unlikely(!uncommon_init_regs) {
-							result->cs_uncorder[temp] = 0;
-						} else {
-							result->cs_uncorder[temp] = uncommon_init_regs[temp];
+						bitset_remove(result->cs_uncommon, temp);
+						if likely(uncommon_init_regs && bitset_contains(uncommon_init_regs, temp)) {
+							bitset_insert(result->cs_uncommon, temp);
+							bitset_insert(result->cs_uncommon, CFI_UNWIND_LOCAL_UNCOMMON_REGISTER_MAXCOUNT); ;
 						}
 #else /* CFI_UNWIND_LOCAL_UNCOMMON_REGISTER_MAXCOUNT != 0 */
 						ERRORF(err_invalid_register, "regno=%u\n", (unsigned int)reg);
@@ -587,8 +506,7 @@ NOTHROW_NCX(CC libuw_unwind_fde_exec_rule_until)(unwind_fde_t *__restrict self, 
 					temp = cfi_unwind_local_register_dw2common(self->f_addrsize, reg);
 					if __untraced(temp < CFI_UNWIND_LOCAL_COMMON_REGISTER_MAXCOUNT) {
 						/* Common register */
-						result->cs_regs[temp].cr_rule  = DW_CFA_register_rule_undefined;
-						result->cs_regs[temp].cr_order = 0; /* Don't evaluate */
+						result->cs_regs[temp].cr_rule = DW_CFA_register_rule_undefined;
 					} else
 #endif /* CFI_UNWIND_LOCAL_COMMON_REGISTER_MAXCOUNT != 0 */
 					{
@@ -596,7 +514,7 @@ NOTHROW_NCX(CC libuw_unwind_fde_exec_rule_until)(unwind_fde_t *__restrict self, 
 						temp = cfi_unwind_local_register_dw2uncommon(self->f_addrsize, reg);
 						if __untraced(temp >= CFI_UNWIND_LOCAL_UNCOMMON_REGISTER_MAXCOUNT)
 							ERRORF(err_invalid_register, "regno=%u\n", (unsigned int)reg);
-						result->cs_uncorder[temp] = 0; /* Don't evaluate */
+						bitset_remove(result->cs_uncommon, temp); /* Don't evaluate */
 #else /* CFI_UNWIND_LOCAL_UNCOMMON_REGISTER_MAXCOUNT != 0 */
 						ERRORF(err_invalid_register, "regno=%u\n", (unsigned int)reg);
 #endif /* CFI_UNWIND_LOCAL_UNCOMMON_REGISTER_MAXCOUNT == 0 */

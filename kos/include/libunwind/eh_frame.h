@@ -203,37 +203,9 @@
 #endif /* !... */
 
 
-/* Size for the unwind-register-order type (see below) */
-#undef SIZEOF_UNWIND_ORDER_INDEX_T
-#if (((CFI_UNWIND_COMMON_REGISTER_MAXCOUNT + CFI_UNWIND_UNCOMMON_REGISTER_MAXCOUNT) > 0xffff) || \
-     ((CFI_UNWIND_SIGFRAME_COMMON_REGISTER_MAXCOUNT + CFI_UNWIND_SIGFRAME_UNCOMMON_REGISTER_MAXCOUNT) > 0xffff))
-#define SIZEOF_UNWIND_ORDER_INDEX_T 4
-#elif (((CFI_UNWIND_COMMON_REGISTER_MAXCOUNT + CFI_UNWIND_UNCOMMON_REGISTER_MAXCOUNT) > 0xff) || \
-       ((CFI_UNWIND_SIGFRAME_COMMON_REGISTER_MAXCOUNT + CFI_UNWIND_SIGFRAME_UNCOMMON_REGISTER_MAXCOUNT) > 0xff))
-#define SIZEOF_UNWIND_ORDER_INDEX_T 2
-#else /* ... */
-#define SIZEOF_UNWIND_ORDER_INDEX_T 1
-#endif /* !... */
-
-
 #ifdef __CC__
 __DECL_BEGIN
 
-
-/* Index ordering type used for keeping track of the order
- * in   which  individual  registers  should  be  unwound.
- * While not actually specified by  the DWARF standard, KOS  will
- * follow a strict unwind order where register rules defined last
- * will get executed before rules defined earlier. */
-#if SIZEOF_UNWIND_ORDER_INDEX_T == 4
-typedef __uint32_t unwind_order_index_t;
-#elif SIZEOF_UNWIND_ORDER_INDEX_T == 2
-typedef __uint16_t unwind_order_index_t;
-#elif SIZEOF_UNWIND_ORDER_INDEX_T == 1
-typedef __uint8_t unwind_order_index_t;
-#else /* SIZEOF_UNWIND_ORDER_INDEX_T == ... */
-#error "Invalid `SIZEOF_UNWIND_ORDER_INDEX_T'"
-#endif /* SIZEOF_UNWIND_ORDER_INDEX_T != ... */
 
 #ifndef __unwind_regno_t_defined
 #define __unwind_regno_t_defined
@@ -319,11 +291,8 @@ typedef struct unwind_cfa_register_struct {
 		__intptr_t        cr_value; /* [valid_if(cr_rule != rule_expression && cr_rule != rule_val_expression)]
 		                             * Register value. */
 	};
-	unwind_order_index_t  cr_order; /* Register restore order index (entries with greater values must be restored first). */
 	__uint8_t             cr_rule;  /* Register rule (One of `DW_CFA_register_rule_*') */
-#if (SIZEOF_UNWIND_ORDER_INDEX_T + 1) < __SIZEOF_POINTER__
-	__uint8_t             cr_pad[sizeof(void *) - (1 + sizeof(unwind_order_index_t))]; /* ... */
-#endif /* (SIZEOF_UNWIND_ORDER_INDEX_T + 1) < __SIZEOF_POINTER__ */
+	__uint8_t             cr_pad[sizeof(void *) - 1]; /* ... */
 } unwind_cfa_register_t;
 
 #define UNWIND_CFA_VALUE_UNSET      0 /* Not set... */
@@ -345,10 +314,10 @@ typedef struct unwind_cfa_value_struct {
 
 typedef struct unwind_cfa_state_struct {
 #if CFI_UNWIND_COMMON_REGISTER_MAXCOUNT != 0
-	unwind_cfa_register_t cs_regs[CFI_UNWIND_COMMON_REGISTER_MAXCOUNT];       /* Common register restore rules. */
+	unwind_cfa_register_t cs_regs[CFI_UNWIND_COMMON_REGISTER_MAXCOUNT]; /* Common register restore rules. */
 #endif /* CFI_UNWIND_COMMON_REGISTER_MAXCOUNT != 0 */
 #if CFI_UNWIND_UNCOMMON_REGISTER_MAXCOUNT != 0
-	unwind_order_index_t  cs_uncorder[CFI_UNWIND_UNCOMMON_REGISTER_MAXCOUNT]; /* Restore order for uncommon registers (0 means unused). */
+	byte_t cs_uncommon[(CFI_UNWIND_UNCOMMON_REGISTER_MAXCOUNT + __CHAR_BIT__) / __CHAR_BIT__]; /* Bitset of used uncommon registers. (last bit is set if any of the others are) */
 #endif /* CFI_UNWIND_UNCOMMON_REGISTER_MAXCOUNT != 0 */
 	unwind_cfa_value_t    cs_cfa; /* Canonical Frame Address evaluation rule. */
 } unwind_cfa_state_t;
@@ -362,7 +331,7 @@ typedef struct unwind_cfa_sigframe_state_struct {
 	unwind_cfa_register_t cs_regs[CFI_UNWIND_SIGFRAME_COMMON_REGISTER_MAXCOUNT];       /* Common register restore rules. */
 #endif /* CFI_UNWIND_SIGFRAME_COMMON_REGISTER_MAXCOUNT != 0 */
 #if CFI_UNWIND_SIGFRAME_UNCOMMON_REGISTER_MAXCOUNT != 0
-	unwind_order_index_t  cs_uncorder[CFI_UNWIND_SIGFRAME_UNCOMMON_REGISTER_MAXCOUNT]; /* Restore order for uncommon registers (0 means unused). */
+	byte_t cs_uncommon[(CFI_UNWIND_SIGFRAME_UNCOMMON_REGISTER_MAXCOUNT + __CHAR_BIT__) / __CHAR_BIT__]; /* Bitset of used uncommon registers. (last bit is set if any of the others are) */
 #endif /* CFI_UNWIND_SIGFRAME_UNCOMMON_REGISTER_MAXCOUNT != 0 */
 	unwind_cfa_value_t    cs_cfa; /* Canonical Frame Address evaluation rule. */
 } unwind_cfa_sigframe_state_t;
@@ -373,7 +342,7 @@ typedef struct _unwind_cfa_landing_state_struct {
 	unwind_cfa_register_t cs_regs[CFI_UNWIND_LANDING_COMMON_REGISTER_MAXCOUNT];       /* Common register restore rules. */
 #endif /* CFI_UNWIND_LANDING_COMMON_REGISTER_MAXCOUNT != 0 */
 #if CFI_UNWIND_LANDING_UNCOMMON_REGISTER_MAXCOUNT != 0
-	unwind_order_index_t  cs_uncorder[CFI_UNWIND_LANDING_UNCOMMON_REGISTER_MAXCOUNT]; /* Restore order for uncommon registers (0 means unused). */
+	byte_t cs_uncommon[(CFI_UNWIND_LANDING_UNCOMMON_REGISTER_MAXCOUNT + __CHAR_BIT__) / __CHAR_BIT__]; /* Bitset of used uncommon registers. (last bit is set if any of the others are) */
 #endif /* CFI_UNWIND_LANDING_UNCOMMON_REGISTER_MAXCOUNT != 0 */
 	unwind_cfa_value_t    cs_cfa; /* Canonical Frame Address evaluation rule. */
 } _unwind_cfa_landing_state_t;

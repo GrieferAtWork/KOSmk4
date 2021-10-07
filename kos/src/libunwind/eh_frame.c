@@ -33,6 +33,7 @@
 #include <compat/config.h>
 #include <kos/thread.h>
 #include <kos/types.h>
+#include <sys/param.h> /* NBBY */
 
 #include <assert.h>
 #include <inttypes.h>
@@ -58,7 +59,71 @@
 
 #undef DEBUG_FRAME /* Build the .eh_frame parser! */
 
+
 DECL_BEGIN
+
+STATIC_ASSERT(NBBY == __CHAR_BIT__);
+
+/* Helper macros for working with bitsets */
+#define _bitset_word(base, i)       ((base)[(i) / NBBY])
+#define _bitset_mask(i)             (1 << ((i) % NBBY))
+#define bitset_contains(base, i)    (_bitset_word(base, i) & _bitset_mask(i))
+#define bitset_insert(base, i)      (void)(_bitset_word(base, i) |= _bitset_mask(i))
+#define bitset_remove(base, i)      (void)(_bitset_word(base, i) &= ~_bitset_mask(i))
+#define bitset_insert_from(dst, src, i) (void)(_bitset_word(dst, i) |= (_bitset_word(src, i) & _bitset_mask(i)))
+#define bitset_inherit(dst, src, i)     (void)(_bitset_word(dst, i) = (_bitset_word(dst, i) & ~_bitset_mask(i)) | (_bitset_word(src, i) & _bitset_mask(i)))
+
+
+/* Helper macros for optional code */
+/*[[[deemon
+for (local name: [
+	"CFI_UNWIND_COMMON_REGISTER_MAXCOUNT",
+	"CFI_UNWIND_UNCOMMON_REGISTER_MAXCOUNT",
+	"CFI_UNWIND_SIGFRAME_COMMON_REGISTER_MAXCOUNT",
+	"CFI_UNWIND_SIGFRAME_UNCOMMON_REGISTER_MAXCOUNT",
+	"CFI_UNWIND_LANDING_COMMON_REGISTER_MAXCOUNT",
+	"CFI_UNWIND_LANDING_UNCOMMON_REGISTER_MAXCOUNT",
+]) {
+	print("#if ", name, " != 0");
+	print("#define IF_", name, "(...) __VA_ARGS__");
+	print("#else /" "* ", name, " != 0 *" "/");
+	print("#define IF_", name, "(...) /" "* nothing *" "/");
+	print("#endif /" "* ", name, " == 0 *" "/");
+}
+]]]*/
+#if CFI_UNWIND_COMMON_REGISTER_MAXCOUNT != 0
+#define IF_CFI_UNWIND_COMMON_REGISTER_MAXCOUNT(...) __VA_ARGS__
+#else /* CFI_UNWIND_COMMON_REGISTER_MAXCOUNT != 0 */
+#define IF_CFI_UNWIND_COMMON_REGISTER_MAXCOUNT(...) /* nothing */
+#endif /* CFI_UNWIND_COMMON_REGISTER_MAXCOUNT == 0 */
+#if CFI_UNWIND_UNCOMMON_REGISTER_MAXCOUNT != 0
+#define IF_CFI_UNWIND_UNCOMMON_REGISTER_MAXCOUNT(...) __VA_ARGS__
+#else /* CFI_UNWIND_UNCOMMON_REGISTER_MAXCOUNT != 0 */
+#define IF_CFI_UNWIND_UNCOMMON_REGISTER_MAXCOUNT(...) /* nothing */
+#endif /* CFI_UNWIND_UNCOMMON_REGISTER_MAXCOUNT == 0 */
+#if CFI_UNWIND_SIGFRAME_COMMON_REGISTER_MAXCOUNT != 0
+#define IF_CFI_UNWIND_SIGFRAME_COMMON_REGISTER_MAXCOUNT(...) __VA_ARGS__
+#else /* CFI_UNWIND_SIGFRAME_COMMON_REGISTER_MAXCOUNT != 0 */
+#define IF_CFI_UNWIND_SIGFRAME_COMMON_REGISTER_MAXCOUNT(...) /* nothing */
+#endif /* CFI_UNWIND_SIGFRAME_COMMON_REGISTER_MAXCOUNT == 0 */
+#if CFI_UNWIND_SIGFRAME_UNCOMMON_REGISTER_MAXCOUNT != 0
+#define IF_CFI_UNWIND_SIGFRAME_UNCOMMON_REGISTER_MAXCOUNT(...) __VA_ARGS__
+#else /* CFI_UNWIND_SIGFRAME_UNCOMMON_REGISTER_MAXCOUNT != 0 */
+#define IF_CFI_UNWIND_SIGFRAME_UNCOMMON_REGISTER_MAXCOUNT(...) /* nothing */
+#endif /* CFI_UNWIND_SIGFRAME_UNCOMMON_REGISTER_MAXCOUNT == 0 */
+#if CFI_UNWIND_LANDING_COMMON_REGISTER_MAXCOUNT != 0
+#define IF_CFI_UNWIND_LANDING_COMMON_REGISTER_MAXCOUNT(...) __VA_ARGS__
+#else /* CFI_UNWIND_LANDING_COMMON_REGISTER_MAXCOUNT != 0 */
+#define IF_CFI_UNWIND_LANDING_COMMON_REGISTER_MAXCOUNT(...) /* nothing */
+#endif /* CFI_UNWIND_LANDING_COMMON_REGISTER_MAXCOUNT == 0 */
+#if CFI_UNWIND_LANDING_UNCOMMON_REGISTER_MAXCOUNT != 0
+#define IF_CFI_UNWIND_LANDING_UNCOMMON_REGISTER_MAXCOUNT(...) __VA_ARGS__
+#else /* CFI_UNWIND_LANDING_UNCOMMON_REGISTER_MAXCOUNT != 0 */
+#define IF_CFI_UNWIND_LANDING_UNCOMMON_REGISTER_MAXCOUNT(...) /* nothing */
+#endif /* CFI_UNWIND_LANDING_UNCOMMON_REGISTER_MAXCOUNT == 0 */
+/*[[[end]]]*/
+
+
 
 #undef CONFIG_NO_CFA_SIGFRAME_STATE
 #if (defined(CFI_UNWIND_NO_SIGFRAME_COMMON_UNCOMMON_REGISTERS) || \
@@ -266,21 +331,16 @@ DECL_BEGIN
 
 PRIVATE
 #if CFI_UNWIND_COMMON_REGISTER_MAXCOUNT != 0 && CFI_UNWIND_UNCOMMON_REGISTER_MAXCOUNT != 0
-	NONNULL((1, 4, 5, 6, 7))
+	NONNULL((1, 4, 5, 6))
 #elif CFI_UNWIND_COMMON_REGISTER_MAXCOUNT != 0 || CFI_UNWIND_UNCOMMON_REGISTER_MAXCOUNT != 0
-	NONNULL((1, 3, 4, 5, 6))
+	NONNULL((1, 3, 4, 5))
 #else /* ... */
-	NONNULL((1, 2, 3, 4, 5))
+	NONNULL((1, 2, 3, 4))
 #endif /* !... */
 	unsigned int
 NOTHROW_NCX(CC libuw_unwind_fde_exec_until)(unwind_fde_t *__restrict self, /* Only non-const for lazy initialized fields! */
-#if CFI_UNWIND_COMMON_REGISTER_MAXCOUNT != 0
-                                            unwind_cfa_register_t *common_init_regs,
-#endif /* CFI_UNWIND_COMMON_REGISTER_MAXCOUNT != 0 */
-#if CFI_UNWIND_UNCOMMON_REGISTER_MAXCOUNT != 0
-                                            unwind_regno_t *uncommon_init_regs,
-#endif /* CFI_UNWIND_UNCOMMON_REGISTER_MAXCOUNT != 0 */
-                                            unwind_order_index_t *__restrict porder,
+                                            IF_CFI_UNWIND_COMMON_REGISTER_MAXCOUNT(unwind_cfa_register_t *common_init_regs,)
+                                            IF_CFI_UNWIND_UNCOMMON_REGISTER_MAXCOUNT(byte_t *uncommon_init_regs,)
                                             byte_t const *reader,
                                             byte_t const *end,
                                             unwind_cfa_state_t *__restrict result,
@@ -289,21 +349,16 @@ NOTHROW_NCX(CC libuw_unwind_fde_exec_until)(unwind_fde_t *__restrict self, /* On
 #ifndef CONFIG_NO_CFA_SIGFRAME_STATE
 PRIVATE
 #if CFI_UNWIND_SIGFRAME_COMMON_REGISTER_MAXCOUNT != 0 && CFI_UNWIND_SIGFRAME_UNCOMMON_REGISTER_MAXCOUNT != 0
-	NONNULL((1, 4, 5, 6, 7))
+	NONNULL((1, 4, 5, 6))
 #elif CFI_UNWIND_SIGFRAME_COMMON_REGISTER_MAXCOUNT != 0 || CFI_UNWIND_SIGFRAME_UNCOMMON_REGISTER_MAXCOUNT != 0
-	NONNULL((1, 3, 4, 5, 6))
+	NONNULL((1, 3, 4, 5))
 #else /* ... */
-	NONNULL((1, 2, 3, 4, 5))
+	NONNULL((1, 2, 3, 4))
 #endif /* !... */
 	unsigned int
 NOTHROW_NCX(CC libuw_unwind_sigframe_fde_exec_until)(unwind_fde_t *__restrict self, /* Only non-const for lazy initialized fields! */
-#if CFI_UNWIND_SIGFRAME_COMMON_REGISTER_MAXCOUNT != 0
-                                                     unwind_cfa_register_t *common_init_regs,
-#endif /* CFI_UNWIND_SIGFRAME_COMMON_REGISTER_MAXCOUNT != 0 */
-#if CFI_UNWIND_SIGFRAME_UNCOMMON_REGISTER_MAXCOUNT != 0
-                                                     unwind_regno_t *uncommon_init_regs,
-#endif /* CFI_UNWIND_SIGFRAME_UNCOMMON_REGISTER_MAXCOUNT != 0 */
-                                                     unwind_order_index_t *__restrict porder,
+                                                     IF_CFI_UNWIND_SIGFRAME_COMMON_REGISTER_MAXCOUNT(unwind_cfa_register_t *common_init_regs,)
+                                                     IF_CFI_UNWIND_SIGFRAME_UNCOMMON_REGISTER_MAXCOUNT(byte_t *uncommon_init_regs,)
                                                      byte_t const *reader,
                                                      byte_t const *end,
                                                      unwind_cfa_sigframe_state_t *__restrict result,
@@ -314,21 +369,16 @@ NOTHROW_NCX(CC libuw_unwind_sigframe_fde_exec_until)(unwind_fde_t *__restrict se
 #ifdef LIBUNWIND_CONFIG_SUPPORT_CFI_CAPSULES
 PRIVATE
 #if CFI_UNWIND_LANDING_COMMON_REGISTER_MAXCOUNT != 0 && CFI_UNWIND_LANDING_UNCOMMON_REGISTER_MAXCOUNT != 0
-	NONNULL((1, 4, 5, 6, 7))
+	NONNULL((1, 4, 5, 6))
 #elif CFI_UNWIND_LANDING_COMMON_REGISTER_MAXCOUNT != 0 || CFI_UNWIND_LANDING_UNCOMMON_REGISTER_MAXCOUNT != 0
-	NONNULL((1, 3, 4, 5, 6))
+	NONNULL((1, 3, 4, 5))
 #else /* ... */
-	NONNULL((1, 2, 3, 4, 5))
+	NONNULL((1, 2, 3, 4))
 #endif /* !... */
 	unsigned int
 NOTHROW_NCX(CC libuw_unwind_landing_fde_exec_until)(unwind_fde_t *__restrict self, /* Only non-const for lazy initialized fields! */
-#if CFI_UNWIND_LANDING_COMMON_REGISTER_MAXCOUNT != 0
-                                                    unwind_cfa_register_t *common_init_regs,
-#endif /* CFI_UNWIND_LANDING_COMMON_REGISTER_MAXCOUNT != 0 */
-#if CFI_UNWIND_LANDING_UNCOMMON_REGISTER_MAXCOUNT != 0
-                                                    unwind_regno_t *uncommon_init_regs,
-#endif /* CFI_UNWIND_LANDING_UNCOMMON_REGISTER_MAXCOUNT != 0 */
-                                                    unwind_order_index_t *__restrict porder,
+                                                    IF_CFI_UNWIND_LANDING_COMMON_REGISTER_MAXCOUNT(unwind_cfa_register_t *common_init_regs,)
+                                                    IF_CFI_UNWIND_LANDING_UNCOMMON_REGISTER_MAXCOUNT(byte_t *uncommon_init_regs,)
                                                     byte_t const *reader,
                                                     byte_t const *landing_start_reader,
                                                     byte_t const *end,
@@ -840,58 +890,34 @@ no_capsules:
 	         (uintptr_t)landingpad_pc < capsule_end.cp_pc));
 
 	/* Scan our capsule for unwinding rules. */
-	{
-		unwind_order_index_t order = 0;
-		/* Execute the init-body */
+	/* Execute the init-body */
+	error = libuw_unwind_landing_fde_exec_until(self,
+	                                            IF_CFI_UNWIND_LANDING_COMMON_REGISTER_MAXCOUNT(NULL,)
+	                                            IF_CFI_UNWIND_LANDING_UNCOMMON_REGISTER_MAXCOUNT(NULL,)
+	                                            self->f_inittext,
+	                                            self->f_inittextend,
+	                                            self->f_inittextend,
+	                                            &result->cs_state,
+	                                            (void *)-1);
+	if likely(error == UNWIND_SUCCESS) {
+		IF_CFI_UNWIND_LANDING_COMMON_REGISTER_MAXCOUNT(unwind_cfa_register_t common_init_regs[CFI_UNWIND_LANDING_COMMON_REGISTER_MAXCOUNT];)
+		IF_CFI_UNWIND_LANDING_UNCOMMON_REGISTER_MAXCOUNT(byte_t uncommon_init_regs[(CFI_UNWIND_LANDING_UNCOMMON_REGISTER_MAXCOUNT + NBBY) / NBBY];)
+		IF_CFI_UNWIND_LANDING_COMMON_REGISTER_MAXCOUNT(STATIC_ASSERT(sizeof(common_init_regs) == sizeof(result->cs_state.cs_regs));)
+		IF_CFI_UNWIND_LANDING_COMMON_REGISTER_MAXCOUNT(STATIC_ASSERT(sizeof(uncommon_init_regs) == sizeof(result->cs_state.cs_uncommon));)
+		IF_CFI_UNWIND_LANDING_COMMON_REGISTER_MAXCOUNT(memcpy(common_init_regs, result->cs_state.cs_regs, sizeof(result->cs_state.cs_regs));)
+		IF_CFI_UNWIND_LANDING_UNCOMMON_REGISTER_MAXCOUNT(memcpy(uncommon_init_regs, result->cs_state.cs_uncommon, sizeof(result->cs_state.cs_uncommon));)
+		/* Execute the eval-body */
 		error = libuw_unwind_landing_fde_exec_until(self,
-#if CFI_UNWIND_LANDING_COMMON_REGISTER_MAXCOUNT != 0
-		                                            NULL,
-#endif /* CFI_UNWIND_LANDING_COMMON_REGISTER_MAXCOUNT != 0 */
-#if CFI_UNWIND_LANDING_UNCOMMON_REGISTER_MAXCOUNT != 0
-		                                            NULL,
-#endif /* CFI_UNWIND_LANDING_UNCOMMON_REGISTER_MAXCOUNT != 0 */
-		                                            &order,
-		                                            self->f_inittext,
-		                                            self->f_inittextend,
-		                                            self->f_inittextend,
+		                                            IF_CFI_UNWIND_LANDING_COMMON_REGISTER_MAXCOUNT(common_init_regs,)
+		                                            IF_CFI_UNWIND_LANDING_UNCOMMON_REGISTER_MAXCOUNT(uncommon_init_regs,)
+		                                            self->f_evaltext,
+		                                            capsule_start.cp_reader,
+		                                            capsule_end.cp_reader - 1,
 		                                            &result->cs_state,
-		                                            (void *)-1);
-		if likely(error == UNWIND_SUCCESS) {
-#if CFI_UNWIND_LANDING_COMMON_REGISTER_MAXCOUNT != 0
-			unwind_cfa_register_t common_init_regs[CFI_UNWIND_LANDING_COMMON_REGISTER_MAXCOUNT];
-#endif /* CFI_UNWIND_LANDING_COMMON_REGISTER_MAXCOUNT != 0 */
-#if CFI_UNWIND_LANDING_UNCOMMON_REGISTER_MAXCOUNT != 0
-			unwind_regno_t uncommon_init_regs[CFI_UNWIND_LANDING_UNCOMMON_REGISTER_MAXCOUNT];
-#endif /* CFI_UNWIND_LANDING_UNCOMMON_REGISTER_MAXCOUNT != 0 */
-#if CFI_UNWIND_LANDING_COMMON_REGISTER_MAXCOUNT != 0
-			memcpy(common_init_regs, result->cs_state.cs_regs, sizeof(result->cs_state.cs_regs));
-#endif /* CFI_UNWIND_LANDING_COMMON_REGISTER_MAXCOUNT != 0 */
-#if CFI_UNWIND_LANDING_UNCOMMON_REGISTER_MAXCOUNT != 0
-			memcpy(uncommon_init_regs, result->cs_state.cs_uncorder, sizeof(result->cs_state.cs_uncorder));
-#endif /* CFI_UNWIND_LANDING_UNCOMMON_REGISTER_MAXCOUNT != 0 */
-			/* Execute the eval-body */
-			error = libuw_unwind_landing_fde_exec_until(self,
-#if CFI_UNWIND_LANDING_COMMON_REGISTER_MAXCOUNT != 0
-			                                            common_init_regs,
-#endif /* CFI_UNWIND_LANDING_COMMON_REGISTER_MAXCOUNT != 0 */
-#if CFI_UNWIND_LANDING_UNCOMMON_REGISTER_MAXCOUNT != 0
-			                                            uncommon_init_regs,
-#endif /* CFI_UNWIND_LANDING_UNCOMMON_REGISTER_MAXCOUNT != 0 */
-			                                            &order,
-			                                            self->f_evaltext,
-			                                            capsule_start.cp_reader,
-			                                            capsule_end.cp_reader - 1,
-			                                            &result->cs_state,
-			                                            absolute_pc);
-		}
-		/* When `order' is non-zero, then we know that custom rules were defined,
-		 * and as a consequence, later code must apply register  transformations.
-		 *
-		 * We could technically also just blindly assign `1' (or some other non-
-		 * zero value) here,  but since  we already have  this `order'  variable
-		 * around, we might as well do better and re-use that one here! */
-		result->cs_has_capsules = order;
+		                                            absolute_pc);
 	}
+	/* Indicate that (probably) are capsules that must be unwound. */
+	result->cs_has_capsules = 1;
 	return error;
 err:
 	/* If  we  get here  due  to a  specific  instruction, then
