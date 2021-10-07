@@ -19,10 +19,8 @@
  */
 #ifndef GUARD_LIBDISASM_X86_DB_H
 #define GUARD_LIBDISASM_X86_DB_H 1
-
-#define DISABLE_BRANCH_PROFILING 1
-#define _GNU_SOURCE              1
-#define _KOS_SOURCE              1
+#define _GNU_SOURCE 1
+#define _KOS_SOURCE 1
 
 #include "api.h"
 /**/

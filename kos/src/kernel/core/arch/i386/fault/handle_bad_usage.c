@@ -26,7 +26,7 @@ opt.append("-Os");
 #ifndef GUARD_KERNEL_CORE_ARCH_I386_HANDLE_BAD_USAGE_C
 #define GUARD_KERNEL_CORE_ARCH_I386_HANDLE_BAD_USAGE_C 1
 #define _KOS_SOURCE 1
-#define DISABLE_BRANCH_PROFILING 1
+#define DISABLE_BRANCH_PROFILING
 
 /* NOTE: Alongside emulating  various instructions  that might  not normally  be
  *       available on any X86-PC, KOS extends X86 architecture functionality by:

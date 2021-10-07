@@ -19,7 +19,7 @@
  */
 #ifndef GUARD_KERNEL_CORE_ARCH_I386_BOOT_ACPI_C
 #define GUARD_KERNEL_CORE_ARCH_I386_BOOT_ACPI_C 1
-#define DISABLE_BRANCH_PROFILING 1 /* Don't profile this file */
+#define DISABLE_BRANCH_PROFILING /* Don't profile this file */
 #define _KOS_SOURCE 1
 
 #include <kernel/compiler.h>

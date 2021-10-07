@@ -24,7 +24,7 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
  */
 #ifndef GUARD_KERNEL_SRC_DEBUGGER_RT_C
 #define GUARD_KERNEL_SRC_DEBUGGER_RT_C 1
-#define DISABLE_BRANCH_PROFILING 1
+#define DISABLE_BRANCH_PROFILING
 #define _KOS_SOURCE 1
 
 #include <kernel/compiler.h>

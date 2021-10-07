@@ -24,7 +24,7 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
  */
 #ifndef GUARD_KERNEL_CORE_ARCH_I386_MISC_GDT_C
 #define GUARD_KERNEL_CORE_ARCH_I386_MISC_GDT_C 1
-#define DISABLE_BRANCH_PROFILING 1 /* Don't profile this file */
+#define DISABLE_BRANCH_PROFILING /* Don't profile this file */
 
 #include <kernel/compiler.h>
 

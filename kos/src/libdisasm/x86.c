@@ -25,7 +25,7 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #ifndef GUARD_LIBDISASM_X86_C
 #define GUARD_LIBDISASM_X86_C 1
 
-#define DISABLE_BRANCH_PROFILING   1
+#define DISABLE_BRANCH_PROFILING
 #define _GNU_SOURCE                1
 #define _KOS_SOURCE                1
 #define CONFIG_LIBEMU86_WANT_16BIT 1

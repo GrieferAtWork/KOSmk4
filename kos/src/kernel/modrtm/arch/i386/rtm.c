@@ -19,7 +19,7 @@
  */
 #ifndef GUARD_MODRTM_ARCH_I386_RTM_C
 #define GUARD_MODRTM_ARCH_I386_RTM_C 1
-#define DISABLE_BRANCH_PROFILING 1
+#define DISABLE_BRANCH_PROFILING
 
 #include <hybrid/host.h>
 

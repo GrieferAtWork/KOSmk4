@@ -19,7 +19,7 @@
  */
 #ifndef GUARD_KERNEL_SRC_DEBUGGER_APPS_DMESG_C
 #define GUARD_KERNEL_SRC_DEBUGGER_APPS_DMESG_C 1
-#define DISABLE_BRANCH_PROFILING 1 /* Don't profile this file */
+#define DISABLE_BRANCH_PROFILING /* Don't profile this file */
 #define _KOS_SOURCE 1
 #define SYSLOG_LINEMAX CONFIG_SYSLOG_LINEMAX
 

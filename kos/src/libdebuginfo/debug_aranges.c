@@ -25,7 +25,7 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #ifndef GUARD_LIBDEBUGINFO_DEBUG_ARANGES_C
 #define GUARD_LIBDEBUGINFO_DEBUG_ARANGES_C 1
 #define _KOS_SOURCE 1
-#define DISABLE_BRANCH_PROFILING 1 /* Don't profile this file */
+#define DISABLE_BRANCH_PROFILING /* Don't profile this file */
 
 #include "api.h"
 /**/
