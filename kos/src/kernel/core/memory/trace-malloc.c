@@ -1810,33 +1810,28 @@ NOTHROW(KCALL trace_malloc_generate_traceback)(void const **__restrict buffer, s
                                                struct lcpustate *__restrict state,
                                                unsigned int n_skip) {
 #if 1
-	TRY {
-		struct lcpustate oldstate;
-		/* NOTE: Despite this being for debugging purposes, _DONT_ use `unwind_for_debug()' here!
-		 *       That one has  to make  use of  the kernel heap  (and consequently  us) in  order
-		 *       to be able  to construct user-space  program/section descriptors, etc,  where-as
-		 *       the  normal unwind() function is specifically designed  to _not_ make use of any
-		 *       heap  memory  (which is  also the  reason why  drivers pre-load  their .eh_frame
-		 *       sections during initialization, rather than loading it lazily)
-		 * But the reason this is done isn't only for this, but rather to ensure that throwing
-		 * exceptions  and the like don't just randomly  fail because the kernel couldn't find
-		 * enough memory... */
-		do {
-			if (n_skip == 0) {
-				*buffer++ = lcpustate_getpc(state);
-				if (!--buflen)
-					return;
-			} else {
-				--n_skip;
-			}
-			oldstate = *state;
-		} while (unwind(lcpustate_getpc(&oldstate) - 1,
-		                &unwind_getreg_lcpustate, &oldstate,
-		                &unwind_setreg_lcpustate, state) == UNWIND_SUCCESS);
-	} EXCEPT {
-		if (!was_thrown(E_SEGFAULT) && !was_thrown(E_WOULDBLOCK))
-			RETHROW(); /* This causes panic because we're NOTHROW */
-	}
+	struct lcpustate oldstate;
+	/* NOTE: Despite this being for debugging purposes, _DONT_ use `unwind_for_debug()' here!
+	 *       That one has  to make  use of  the kernel heap  (and consequently  us) in  order
+	 *       to be able  to construct user-space  program/section descriptors, etc,  where-as
+	 *       the  normal unwind() function is specifically designed  to _not_ make use of any
+	 *       heap  memory  (which is  also the  reason why  drivers pre-load  their .eh_frame
+	 *       sections during initialization, rather than loading it lazily)
+	 * But the reason this is done isn't only for this, but rather to ensure that throwing
+	 * exceptions  and the like don't just randomly  fail because the kernel couldn't find
+	 * enough memory... */
+	do {
+		if (n_skip == 0) {
+			*buffer++ = lcpustate_getpc(state);
+			if (!--buflen)
+				return;
+		} else {
+			--n_skip;
+		}
+		oldstate = *state;
+	} while (unwind(lcpustate_getpc(&oldstate) - 1,
+	                &unwind_getreg_lcpustate, &oldstate,
+	                &unwind_setreg_lcpustate, state) == UNWIND_SUCCESS);
 #endif
 	/* Make sure that when there are unused entries, the chain is NULL-terminated */
 	if (buflen)

@@ -750,7 +750,7 @@ syslog_printer(void *level,
 	buffer = &syslog_buffers[(uintptr_t)level];
 	/* Try to lock the buffer. */
 	SYSLOG_BUFFER_LOCK(buffer);
-	TRY {
+	UNNESTED_TRY {
 		/* Check for excessive data lengths. */
 		if unlikely(datalen > (SYSLOG_LINEMAX - 1)) {
 			do {

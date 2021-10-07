@@ -154,8 +154,8 @@ IU(	call   libc_error_info)
 .Llibc_error_rethrow_outside_catch:
 	.cfi_restore_state
 	movl   %esp, %ecx
-	EXTERN(libc_except_badusage_rethrow_outside_catch)
-	call   libc_except_badusage_rethrow_outside_catch
+	EXTERN(libc_error_badusage_rethrow_outside_catch)
+	call   libc_error_badusage_rethrow_outside_catch
 #endif /* !NDEBUG */
 	.cfi_endproc
 END(libc_error_rethrow)
@@ -406,8 +406,8 @@ IU(	popl_cfi %eax)
 	lodsl  /* %eax = argc, %edi == &[argv] */
 	pushl_cfi %edi    /* va_list args */
 	pushl_cfi %eax    /* size_t argc */
-	EXTERN(libc_except_badusage_throw_inside_catch)
-	call   libc_except_badusage_throw_inside_catch
+	EXTERN(libc_error_badusage_throw_inside_catch)
+	call   libc_error_badusage_throw_inside_catch
 	nop    /* For unwinding */
 #endif /* !NDEBUG */
 	.cfi_endproc
@@ -496,8 +496,8 @@ IK(	pushal_cfi_r)
 	movl   %esp, %ecx /* error_register_state_t const *state */
 	pushl_cfi $(0)    /* va_list args */
 	pushl_cfi $(0)    /* size_t argc */
-	EXTERN(libc_except_badusage_throw_inside_catch)
-	call   libc_except_badusage_throw_inside_catch
+	EXTERN(libc_error_badusage_throw_inside_catch)
+	call   libc_error_badusage_throw_inside_catch
 	nop    /* For unwinding */
 #endif /* !NDEBUG */
 END(libc_error_throw_current)
@@ -620,5 +620,16 @@ END(x86_userexcept_unwind_interrupt)
 
 #endif /* !CONFIG_USE_NEW_RPC */
 #endif /* __KERNEL__ */
+
+#ifndef __INTELLISENSE__
+#undef FIELD_ERROR_CODE
+#undef FIELD_ERROR_FLAGS
+#undef FIELD_ERROR_TRACE
+#undef FIELD_ERROR_POINTERS
+#undef FIELD_ERROR_FAULTADDR
+#undef FIELD_ERROR_REGISTERS
+#undef SECTION_EXCEPT_TEXT
+#include "except.S"
+#endif /* !__INTELLISENSE__ */
 
 #endif /* !GUARD_LIBC_HYBRID_ARCH_I386_EXCEPT32_S */

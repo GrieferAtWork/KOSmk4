@@ -373,6 +373,17 @@
 	__ASM_L(pushal_cfi_r)
 
 
+/* Push everything necessary to create an `kcpustate'.
+ * This macro assumes that before being used, `%eip' already exists in `0(%esp)'. */
+#define ASM_PUSH_KCPUSTATE_AFTER_EIP_CFI_R                  \
+	__ASM_L(pushfl_cfi_r)                                   \
+	__ASM_L(pushal_cfi_r)                                   \
+	__ASM_L(addl $8, 12(%esp))        /* fix pushed %esp */ \
+	__ASM_L(.cfi_rel_offset %esp, 12) /* %esp can not be restored from-stack */
+#define ASM_PUSH_KCPUSTATE_AFTER_PIP_CFI_R \
+	ASM_PUSH_KCPUSTATE_AFTER_EIP_CFI_R
+
+
 #endif /* __i386__ && !__x86_64__ */
 
 

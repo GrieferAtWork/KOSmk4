@@ -66,6 +66,8 @@
 )]%[insert:prefix(
 #include <kos/anno.h>
 )]%[insert:prefix(
+#include <hybrid/host.h>
+)]%[insert:prefix(
 #include <kos/bits/except.h>         /* __ERROR_REGISTER_STATE_TYPE */
 )]%[insert:prefix(
 #include <kos/bits/exception_data.h> /* struct exception_data */
@@ -1621,7 +1623,6 @@ restore_saved_exception:
 	}
 }
 
-
 %{
 #ifdef __cplusplus
 /* TODO: In user-space, using TRY and EXCEPT should  leave some sort of marker in  the
@@ -1677,8 +1678,83 @@ public:
 #define __NESTED_EXCEPTION __cxx_exception_nesting __PRIVATE_CXX_EXCEPT_NESTING_NAME
 #endif /* __error_nesting_begin_defined && __error_nesting_end_defined */
 #endif /* __cplusplus */
+}
 
 
+%
+%{
+/* Validation for correct usage of TRY-blocks. Because KOS exceptions  can't
+ * be nested natively, the user must do this for us by use of NESTED_TRY and
+ * and NESTED_EXCEPTION. To ensure that `TRY' doesn't appear as-in inside of
+ * EXCEPT-handlers (without proper nesting), we inject an assertion check to
+ * every use of `TRY' in source code.
+ *
+ * Sadly, this means that O(0) TRY-setup becomes O(1), but these checks are
+ * entirely optional and can be disabled with `-DNDEBUG_EXCEPT_NESTING'  on
+ * a per-file basis.
+ *
+ * >> TRY {
+ * >>     foo();
+ * >> } EXCEPT {
+ * >>     TRY {            // << WRONG! This needs to be `NESTED_TRY'
+ * >>         bar();
+ * >>     } EXCEPT {
+ * >>         baz();
+ * >>         RETHROW();
+ * >>     }
+ * >>     RETHROW();
+ * >> }
+ */
+}
+%#if !defined(NDEBUG) && !defined(NDEBUG_EXCEPT_NESTING)
+%[declare_kernel_export(
+	"_error_badusage_no_nesting",
+	"_error_check_no_nesting",
+)]
+
+@@Assertion check handler for missing `TRY' nesting
+[[cold, userimpl, noreturn, nothrow, impl_include("<hybrid/__assert.h>")]]
+void _error_badusage_no_nesting(void) {
+	__hybrid_assertion_failed("Recursive `TRY' isn't nested; use `NESTED_TRY' instead");
+}
+
+@@Assert that a TRY-block is currently allowed (iow: that no error is active)
+[[userimpl, nothrow, impl_include("<kos/bits/fastexcept.h>")]]
+[[requires_function(error_active)]]
+void _error_check_no_nesting(void) {
+@@pp_ifdef __arch_error_active@@
+	if (__arch_error_active())
+@@pp_else@@
+	if (error_active())
+@@pp_endif@@
+	{
+		_error_badusage_no_nesting();
+	}
+}
+
+%[insert:pp_if($has_function(_error_check_no_nesting))]
+%{
+#if !defined(__OPTIMIZE_SIZE__) && defined(__arch_error_active)
+#define _error_check_no_nesting() (void)(__likely(!__arch_error_active()) || (_error_badusage_no_nesting(), 0))
+#endif /* !__OPTIMIZE_SIZE__ && __arch_error_active */
+#if !defined(TRY) && defined(__TRY)
+#if !defined(__OPTIMIZE_SIZE__) && defined(__arch_error_active)
+#define TRY if __unlikely(__arch_error_active()) _error_badusage_no_nesting(); else __TRY
+#else /* !__OPTIMIZE_SIZE__ && __arch_error_active */
+#define TRY if ((_error_check_no_nesting(), 0)); else __TRY
+#endif /* __OPTIMIZE_SIZE__ || !__arch_error_active */
+#endif /* !TRY && __TRY */
+}
+%[insert:pp_endif]
+%#else /* !NDEBUG && !NDEBUG_EXCEPT_NESTING */
+/* Turn these into no-ops under this configuration. */
+%#define _error_badusage_no_nesting() __builtin_unreachable()
+%#define _error_check_no_nesting()    (void)0
+%#endif /* NDEBUG || NDEBUG_EXCEPT_NESTING */
+
+
+%
+%{
 #if !defined(TRY) && defined(__TRY)
 #define TRY __TRY
 #endif /* !TRY && __TRY */
@@ -1697,6 +1773,12 @@ public:
 #if !defined(NOTHROW_END) && defined(__NOTHROW_END)
 #define NOTHROW_END __NOTHROW_END
 #endif /* !NOTHROW_END && __NOTHROW_END */
+
+/* Same as `TRY', but never do a check for proper nesting. Instead, assume
+ * that the guarded code must be NOEXCEPT when an error is already active. */
+#if !defined(UNNESTED_TRY) && defined(__TRY)
+#define UNNESTED_TRY __TRY
+#endif /* !UNNESTED_TRY && __TRY */
 
 
 #ifndef __INTELLISENSE__

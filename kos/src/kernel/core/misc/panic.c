@@ -27,6 +27,16 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #define DISABLE_BRANCH_PROFILING
 #define _KOS_SOURCE 1
 
+/* Disable exception nesting assertions. Kernel panic handling
+ * uses TRY a lot to deal with situations where trying to dump
+ * exception information might result in more errors.
+ *
+ * Since we're already talking about undefined behavior here,
+ * we'd only make our life harder by introducing more asserts
+ * for  `!error_active()' who's failure  would mean the panic
+ * system recursing in on itself. */
+#define NDEBUG_EXCEPT_NESTING
+
 #include <kernel/compiler.h>
 
 #include <debugger/config.h>

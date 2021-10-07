@@ -43,7 +43,7 @@
 PUBLIC_FUNCTION(__stack_chk_fail)
 	.cfi_startproc
 	/* Generate a full `struct kcpustate' */
-	ASM_PUSH_KCPUSTATE_AFTER_RIP
+	ASM_PUSH_KCPUSTATE_AFTER_RIP_CFI_R
 
 	movq   %rsp, %rdi
 	INTERN(libc_stack_failure_core)
@@ -56,7 +56,7 @@ DEFINE_INTERN_ALIAS(__stack_chk_fail_local, __stack_chk_fail)
 INTERN_FUNCTION(libc_abort)
 	.cfi_startproc
 	/* Generate a full `struct kcpustate' */
-	ASM_PUSH_KCPUSTATE_AFTER_RIP
+	ASM_PUSH_KCPUSTATE_AFTER_RIP_CFI_R
 
 	movq   %rsp, %rdi
 	INTERN(libc_abort_failure_core)
@@ -89,7 +89,7 @@ INTERN_FUNCTION(libc___afail)
 	pushq_cfi %rsi        /* aa_file */
 	pushq_cfi %rdi        /* aa_expr */
 	pushq_cfi (5*8)(%rsp) /* aa_state.kcs_rip */
-	ASM_PUSH_KCPUSTATE_AFTER_RIP_EX(%rax, 6 * 8) /* 6 = # of preceding `pushq_cfi' */
+	ASM_PUSH_KCPUSTATE_AFTER_RIP_CFI_R_EX(%rax, 6 * 8) /* 6 = # of preceding `pushq_cfi' */
 	subq   $(SIZEOF_X86_64_VA_LIST_STRUCT), %rsp /* aa_args */
 	.cfi_adjust_cfa_offset SIZEOF_X86_64_VA_LIST_STRUCT
 	movq   %rsp, %rdi
@@ -123,7 +123,7 @@ INTERN_FUNCTION(libc___afailf)
 	pushq_cfi %rsi        /* aa_file */
 	pushq_cfi %rdi        /* aa_expr */
 	pushq_cfi (5*8)(%rsp) /* aa_state.kcs_rip */
-	ASM_PUSH_KCPUSTATE_AFTER_RIP_EX(%rdx, 6 * 8) /* 6 = # of preceding `pushq_cfi' */
+	ASM_PUSH_KCPUSTATE_AFTER_RIP_CFI_R_EX(%rdx, 6 * 8) /* 6 = # of preceding `pushq_cfi' */
 	leaq   ((6*8) - OFFSET_X86_64_VA_LIST_REG_SAVE_AREA_R9)(%rsp), %rcx
 	pushq_cfi %rcx        /* vl_reg_save_area (== &aa_state.kcs_gpregs.gp_r9 - OFFSET_X86_64_VA_LIST_REG_SAVE_AREA_R9) */
 	pushq_cfi %rdx        /* vl_overflow_arg_area (== aa_state.kcs_gpregs.gp_rsp) */
@@ -168,7 +168,7 @@ INTERN_FUNCTION(libc___acheck)
 	pushq_cfi %rsi        /* aa_file */
 	pushq_cfi %rdi        /* aa_expr */
 	pushq_cfi (5*8)(%rsp) /* aa_state.kcs_rip */
-	ASM_PUSH_KCPUSTATE_AFTER_RIP_EX(%rax, 6 * 8) /* 6 = # of preceding `pushq_cfi' */
+	ASM_PUSH_KCPUSTATE_AFTER_RIP_CFI_R_EX(%rax, 6 * 8) /* 6 = # of preceding `pushq_cfi' */
 	subq   $(SIZEOF_X86_64_VA_LIST_STRUCT), %rsp /* aa_args */
 	.cfi_adjust_cfa_offset SIZEOF_X86_64_VA_LIST_STRUCT
 	movq   %rsp, %rdi
@@ -246,7 +246,7 @@ INTERN_FUNCTION(libc___acheckf)
 	pushq_cfi %rsi        /* aa_file */
 	pushq_cfi %rdi        /* aa_expr */
 	pushq_cfi (5*8)(%rsp) /* aa_state.kcs_rip */
-	ASM_PUSH_KCPUSTATE_AFTER_RIP_EX(%rdx, 6 * 8) /* 6 = # of preceding `pushq_cfi' */
+	ASM_PUSH_KCPUSTATE_AFTER_RIP_CFI_R_EX(%rdx, 6 * 8) /* 6 = # of preceding `pushq_cfi' */
 	leaq   ((6 * 8) - OFFSET_X86_64_VA_LIST_REG_SAVE_AREA_R9)(%rsp), %rcx
 	pushq_cfi %rcx        /* vl_reg_save_area (== &aa_state.kcs_gpregs.gp_r9 - OFFSET_X86_64_VA_LIST_REG_SAVE_AREA_R9) */
 	pushq_cfi %rdx        /* vl_overflow_arg_area (== aa_state.kcs_gpregs.gp_rsp) */
@@ -297,7 +297,7 @@ INTERN_FUNCTION(libc___assert_func)
 	pushq_cfi %rdi        /* aa_file */
 	pushq_cfi %rcx        /* aa_expr */
 	pushq_cfi (5*8)(%rsp) /* aa_state.kcs_rip */
-	ASM_PUSH_KCPUSTATE_AFTER_RIP_EX(%rax, 6 * 8) /* 6 = # of preceding `pushq_cfi' */
+	ASM_PUSH_KCPUSTATE_AFTER_RIP_CFI_R_EX(%rax, 6 * 8) /* 6 = # of preceding `pushq_cfi' */
 	subq   $(SIZEOF_X86_64_VA_LIST_STRUCT), %rsp /* aa_args */
 	.cfi_adjust_cfa_offset SIZEOF_X86_64_VA_LIST_STRUCT
 	movq   %rsp, %rdi
@@ -320,7 +320,7 @@ INTERN_FUNCTION(libc___assert)
 	pushq_cfi %rdi        /* aa_file */
 	pushq_cfi %rdx        /* aa_expr */
 	pushq_cfi (5*8)(%rsp) /* aa_state.kcs_rip */
-	ASM_PUSH_KCPUSTATE_AFTER_RIP_EX(%rax, 6 * 8) /* 6 = # of preceding `pushq_cfi' */
+	ASM_PUSH_KCPUSTATE_AFTER_RIP_CFI_R_EX(%rax, 6 * 8) /* 6 = # of preceding `pushq_cfi' */
 	subq   $(SIZEOF_X86_64_VA_LIST_STRUCT), %rsp /* aa_args */
 	.cfi_adjust_cfa_offset SIZEOF_X86_64_VA_LIST_STRUCT
 	movq   %rsp, %rdi
@@ -343,7 +343,7 @@ INTERN_FUNCTION(libc__assert)
 	pushq_cfi %rsi        /* aa_file */
 	pushq_cfi %rdi        /* aa_expr */
 	pushq_cfi (5*8)(%rsp) /* aa_state.kcs_rip */
-	ASM_PUSH_KCPUSTATE_AFTER_RIP_EX(%rax, 6 * 8) /* 6 = # of preceding `pushq_cfi' */
+	ASM_PUSH_KCPUSTATE_AFTER_RIP_CFI_R_EX(%rax, 6 * 8) /* 6 = # of preceding `pushq_cfi' */
 	subq   $(SIZEOF_X86_64_VA_LIST_STRUCT), %rsp /* aa_args */
 	.cfi_adjust_cfa_offset SIZEOF_X86_64_VA_LIST_STRUCT
 	movq   %rsp, %rdi

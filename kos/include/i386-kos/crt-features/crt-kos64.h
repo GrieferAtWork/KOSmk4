@@ -897,6 +897,8 @@
 #define __CRT_HAVE__environ
 #define __CRT_HAVE__eof
 #define __CRT_HAVE__errno
+#define __CRT_HAVE__error_badusage_no_nesting
+#define __CRT_HAVE__error_check_no_nesting
 #define __CRT_HAVE__exit
 #define __CRT_HAVE__expand_dbg
 #define __CRT_HAVE__fcvt_s

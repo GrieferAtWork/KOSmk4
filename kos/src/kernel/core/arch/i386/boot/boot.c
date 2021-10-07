@@ -765,17 +765,6 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *       thread in this  case) is ready,  which would  get rid of  the risk  of
 	 *       the send operation running into an E_BADALLOC error. */
 
-	/* TODO: Play around with something like:
-	 * >> #define TRY   assert(!error_active()); __TRY
-	 *
-	 * This assertion is allowed since a non-E_OK error code would mean that exception
-	 * nesting would be required in  this scenario, or that  the TRY is redundant  and
-	 * could simply be removed.
-	 *
-	 * XXX: There might be some corner-cases I'm not thinking of, but those should
-	 *      also become noticeable, and such  an assertion could really help  with
-	 *      finding  pieces of code that need (but are missing) exception nesting. */
-
 	/* TODO: Add support for epoll controllers to `(task|proc)_rpc_schedule()' when an
 	 *       event becomes triggered. That's really all that's needed to have RPCs  be
 	 *       executed as the result of _ANY_ pollable event being triggered! */

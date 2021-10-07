@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd661148 */
+/* HASH CRC-32:0x7f1a3762 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -34,6 +34,7 @@
 
 #include <bits/types.h>
 #include <kos/anno.h>
+#include <hybrid/host.h>
 #include <kos/bits/except.h>         /* __ERROR_REGISTER_STATE_TYPE */
 #include <kos/bits/exception_data.h> /* struct exception_data */
 #include <kos/bits/exception_nest.h> /* struct _exception_nesting_data */
@@ -371,6 +372,61 @@ public:
 #endif /* __error_nesting_begin_defined && __error_nesting_end_defined */
 #endif /* __cplusplus */
 
+/* Validation for correct usage of TRY-blocks. Because KOS exceptions  can't
+ * be nested natively, the user must do this for us by use of NESTED_TRY and
+ * and NESTED_EXCEPTION. To ensure that `TRY' doesn't appear as-in inside of
+ * EXCEPT-handlers (without proper nesting), we inject an assertion check to
+ * every use of `TRY' in source code.
+ *
+ * Sadly, this means that O(0) TRY-setup becomes O(1), but these checks are
+ * entirely optional and can be disabled with `-DNDEBUG_EXCEPT_NESTING'  on
+ * a per-file basis.
+ *
+ * >> TRY {
+ * >>     foo();
+ * >> } EXCEPT {
+ * >>     TRY {            // << WRONG! This needs to be `NESTED_TRY'
+ * >>         bar();
+ * >>     } EXCEPT {
+ * >>         baz();
+ * >>         RETHROW();
+ * >>     }
+ * >>     RETHROW();
+ * >> }
+ */
+#if !defined(NDEBUG) && !defined(NDEBUG_EXCEPT_NESTING)
+#ifdef __CRT_HAVE__error_badusage_no_nesting
+/* Assertion check handler for missing `TRY' nesting */
+__CDECLARE_VOID(__ATTR_COLD __ATTR_NORETURN,__NOTHROW,_error_badusage_no_nesting,(void),())
+#else /* __CRT_HAVE__error_badusage_no_nesting */
+#include <libc/local/kos.except/_error_badusage_no_nesting.h>
+/* Assertion check handler for missing `TRY' nesting */
+__NAMESPACE_LOCAL_USING_OR_IMPL(_error_badusage_no_nesting, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_COLD __ATTR_NORETURN void __NOTHROW(__LIBCCALL _error_badusage_no_nesting)(void) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_error_badusage_no_nesting))(); })
+#endif /* !__CRT_HAVE__error_badusage_no_nesting */
+#ifdef __CRT_HAVE__error_check_no_nesting
+/* Assert that a TRY-block is currently allowed (iow: that no error is active) */
+__CDECLARE_VOID(,__NOTHROW,_error_check_no_nesting,(void),())
+#elif defined(__CRT_HAVE_error_active) || defined(__CRT_HAVE_error_code) || defined(__arch_error_code) || defined(__CRT_HAVE_error_data) || defined(__arch_error_data)
+#include <libc/local/kos.except/_error_check_no_nesting.h>
+/* Assert that a TRY-block is currently allowed (iow: that no error is active) */
+__NAMESPACE_LOCAL_USING_OR_IMPL(_error_check_no_nesting, __FORCELOCAL __ATTR_ARTIFICIAL void __NOTHROW(__LIBCCALL _error_check_no_nesting)(void) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_error_check_no_nesting))(); })
+#endif /* ... */
+#if defined(__CRT_HAVE__error_check_no_nesting) || defined(__CRT_HAVE_error_active) || defined(__CRT_HAVE_error_code) || defined(__arch_error_code) || defined(__CRT_HAVE_error_data) || defined(__arch_error_data)
+#if !defined(__OPTIMIZE_SIZE__) && defined(__arch_error_active)
+#define _error_check_no_nesting() (void)(__likely(!__arch_error_active()) || (_error_badusage_no_nesting(), 0))
+#endif /* !__OPTIMIZE_SIZE__ && __arch_error_active */
+#if !defined(TRY) && defined(__TRY)
+#if !defined(__OPTIMIZE_SIZE__) && defined(__arch_error_active)
+#define TRY if __unlikely(__arch_error_active()) _error_badusage_no_nesting(); else __TRY
+#else /* !__OPTIMIZE_SIZE__ && __arch_error_active */
+#define TRY if ((_error_check_no_nesting(), 0)); else __TRY
+#endif /* __OPTIMIZE_SIZE__ || !__arch_error_active */
+#endif /* !TRY && __TRY */
+#endif /* __CRT_HAVE__error_check_no_nesting || __CRT_HAVE_error_active || __CRT_HAVE_error_code || __arch_error_code || __CRT_HAVE_error_data || __arch_error_data */
+#else /* !NDEBUG && !NDEBUG_EXCEPT_NESTING */
+#define _error_badusage_no_nesting() __builtin_unreachable()
+#define _error_check_no_nesting()    (void)0
+#endif /* NDEBUG || NDEBUG_EXCEPT_NESTING */
 
 #if !defined(TRY) && defined(__TRY)
 #define TRY __TRY
@@ -390,6 +446,12 @@ public:
 #if !defined(NOTHROW_END) && defined(__NOTHROW_END)
 #define NOTHROW_END __NOTHROW_END
 #endif /* !NOTHROW_END && __NOTHROW_END */
+
+/* Same as `TRY', but never do a check for proper nesting. Instead, assume
+ * that the guarded code must be NOEXCEPT when an error is already active. */
+#if !defined(UNNESTED_TRY) && defined(__TRY)
+#define UNNESTED_TRY __TRY
+#endif /* !UNNESTED_TRY && __TRY */
 
 
 #ifndef __INTELLISENSE__

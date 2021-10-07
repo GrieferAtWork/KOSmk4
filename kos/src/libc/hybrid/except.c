@@ -65,6 +65,50 @@ DECL_BEGIN
 #endif /* !SECTION_EXCEPT_STRING */
 
 
+
+/* [ 1] TRY {
+ * [ 2]     foo();
+ * [ 3] } EXCEPT {
+ * [ 4]     NESTED_TRY {
+ * [ 5]         bar();
+ * [ 6]     } EXCEPT {
+ * [ 7]         foobar();
+ * [ 8]         RETHROW();
+ * [ 9]     }
+ * [10]     RETHROW();
+ * [11] }
+ *
+ * Equivalent:
+ * >> foo();                                // [ 2]
+ * >> if (EXCEPTION_THROWN) {
+ * >>     __cxa_begin_catch();              // [ 3]
+ * >>     struct _exception_nesting_data nest;
+ * >>     error_nesting_begin(&nest);
+ * >>     bar();                            // [ 5]
+ * >>     if (EXCEPTION_THROWN) {
+ * >>         __cxa_begin_catch();          // [ 6]
+ * >>         foobar();                     // [ 7]
+ * >>         error_rethrow();              // [ 8]
+ * >>         __cxa_end_catch();            // [ 9]
+ * >>         error_nesting_end(&nest);
+ * >>     } else {
+ * >>         error_nesting_end(&nest);
+ * >>         error_rethrow();              // [10]
+ * >>     }
+ * >>     __cxa_end_catch();                // [11]
+ * >> }
+ */
+
+/* Only export  __cxa_* functions  as weak  in user-space,  such  that
+ * libstdc++ can override them, should that library end up being used. */
+#ifdef __KERNEL__
+DEFINE_PUBLIC_ALIAS(__cxa_begin_catch, libc_cxa_begin_catch);
+DEFINE_PUBLIC_ALIAS(__cxa_end_catch, libc_cxa_end_catch);
+#else /* __KERNEL__ */
+DEFINE_PUBLIC_WEAK_ALIAS(__cxa_begin_catch, libc_cxa_begin_catch);
+DEFINE_PUBLIC_WEAK_ALIAS(__cxa_end_catch, libc_cxa_end_catch);
+#endif /* !__KERNEL__ */
+
 INTERN SECTION_EXCEPT_TEXT ATTR_CONST void *CXA_CC
 libc_cxa_begin_catch(cxa_unwind_exception_t *ptr) {
 	/* This function returns the address that would
@@ -147,8 +191,22 @@ libc_cxa_end_catch(void) {
 }
 
 
+/* Bad usage: missing nesting for TRY. */
+INTERN SECTION_EXCEPT_TEXT ATTR_COLD ATTR_NORETURN NONNULL((1)) void
+NOTHROW(FCALL libc_error_badusage_no_nesting)(error_register_state_t const *state) {
+	struct assert_args args;
+	/* FIXME: This assumes that error_register_state_t is kcpustate! */
+	memcpy(&args.aa_state, state, sizeof(struct kcpustate));
+	args.aa_file   = NULL;
+	args.aa_line   = 0;
+	args.aa_func   = NULL;
+	args.aa_format = "Recursive `TRY' isn't nested; use `NESTED_TRY' instead";
+	libc_assertion_failure_core(&args);
+}
+
+
 #ifndef NDEBUG
-PRIVATE ATTR_COLD ATTR_NORETURN NONNULL((1)) void
+PRIVATE SECTION_EXCEPT_TEXT ATTR_COLD ATTR_NORETURN NONNULL((1)) void
 assert_failf_at(error_register_state_t const *state,
                 char const *__restrict expr,
                 char const *__restrict format, ...) {
@@ -164,20 +222,19 @@ assert_failf_at(error_register_state_t const *state,
 	libc_assertion_failure_core(&args);
 }
 
-
 /* Bad usage: Attempted to call `RETHROW()' from outside of a catch-block. */
-INTERN ATTR_COLD ATTR_NORETURN NONNULL((1)) void
-NOTHROW(FCALL libc_except_badusage_rethrow_outside_catch)(error_register_state_t const *state) {
+INTERN SECTION_EXCEPT_TEXT ATTR_COLD ATTR_NORETURN NONNULL((1)) void
+NOTHROW(FCALL libc_error_badusage_rethrow_outside_catch)(error_register_state_t const *state) {
 	assert_failf_at(state, "RETHROW()", "RETHROW() outside of catch-block");
 }
 
 /* Bad usage: Attempted to  call `THROW()'  from inside  of a  catch-block,
  *            without wrapping the throwing code location inside of another
  *            NESTED_TRY-block. */
-INTERN ATTR_COLD ATTR_NORETURN NONNULL((1)) void
-NOTHROW(FCALL libc_except_badusage_throw_inside_catch)(error_register_state_t const *state,
-                                                       error_code_t code, size_t argc,
-                                                       va_list args) {
+INTERN SECTION_EXCEPT_TEXT ATTR_COLD ATTR_NORETURN NONNULL((1)) void
+NOTHROW(FCALL libc_error_badusage_throw_inside_catch)(error_register_state_t const *state,
+                                                      error_code_t code, size_t argc,
+                                                      va_list args) {
 	char args_buf[EXCEPTION_DATA_POINTERS * (4 + sizeof(void *) * 2) + 1];
 	char *endp = args_buf;
 	if unlikely(argc > EXCEPTION_DATA_POINTERS)
@@ -200,49 +257,6 @@ NOTHROW(FCALL libc_except_badusage_throw_inside_catch)(error_register_state_t co
 	                ERROR_SUBCLASS(code));
 }
 #endif /* !NDEBUG */
-
-/* [ 1] TRY {
- * [ 2]     foo();
- * [ 3] } EXCEPT {
- * [ 4]     NESTED_TRY {
- * [ 5]         bar();
- * [ 6]     } EXCEPT {
- * [ 7]         foobar();
- * [ 8]         RETHROW();
- * [ 9]     }
- * [10]     RETHROW();
- * [11] }
- *
- * Equivalent:
- * >> foo();                                // [ 2]
- * >> if (EXCEPTION_THROWN) {
- * >>     __cxa_begin_catch();              // [ 3]
- * >>     struct _exception_nesting_data nest;
- * >>     error_nesting_begin(&nest);
- * >>     bar();                            // [ 5]
- * >>     if (EXCEPTION_THROWN) {
- * >>         __cxa_begin_catch();          // [ 6]
- * >>         foobar();                     // [ 7]
- * >>         error_rethrow();              // [ 8]
- * >>         __cxa_end_catch();            // [ 9]
- * >>         error_nesting_end(&nest);
- * >>     } else {
- * >>         error_nesting_end(&nest);
- * >>         error_rethrow();              // [10]
- * >>     }
- * >>     __cxa_end_catch();                // [11]
- * >> }
- */
-
-/* Only export  __cxa_* functions  as weak  in user-space,  such  that
- * libstdc++ can override them, should that library end up being used. */
-#ifdef __KERNEL__
-DEFINE_PUBLIC_ALIAS(__cxa_begin_catch, libc_cxa_begin_catch);
-DEFINE_PUBLIC_ALIAS(__cxa_end_catch, libc_cxa_end_catch);
-#else /* __KERNEL__ */
-DEFINE_PUBLIC_WEAK_ALIAS(__cxa_begin_catch, libc_cxa_begin_catch);
-DEFINE_PUBLIC_WEAK_ALIAS(__cxa_end_catch, libc_cxa_end_catch);
-#endif /* !__KERNEL__ */
 
 
 DECL_END

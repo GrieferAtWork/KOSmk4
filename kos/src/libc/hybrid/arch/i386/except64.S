@@ -82,7 +82,7 @@ INTERN_FUNCTION(libc_error_rethrow)
 	/* ATTR_NORETURN void error_rethrow(void) */
 	.cfi_startproc
 	.cfi_signal_frame
-	ASM_PUSH_KCPUSTATE_AFTER_RIP
+	ASM_PUSH_KCPUSTATE_AFTER_RIP_CFI_R
 IU(	INTERN(libc_error_info))
 IU(	call   libc_error_info)
 #ifndef NDEBUG
@@ -171,8 +171,8 @@ IU(	call   libc_error_info)
 .Llibc_error_rethrow_outside_catch:
 	.cfi_restore_state
 	movq   %rsp, %rdi
-	EXTERN(libc_except_badusage_rethrow_outside_catch)
-	call   libc_except_badusage_rethrow_outside_catch
+	EXTERN(libc_error_badusage_rethrow_outside_catch)
+	call   libc_error_badusage_rethrow_outside_catch
 #endif /* !NDEBUG */
 	.cfi_endproc
 END(libc_error_rethrow)
@@ -191,7 +191,7 @@ DEFINE_PUBLIC_WEAK_ALIAS(__cxa_rethrow, libc_error_rethrow)
 PUBLIC_FUNCTION(_Unwind_Resume)
 	.cfi_startproc
 	.cfi_signal_frame
-	ASM_PUSH_KCPUSTATE_AFTER_RIP
+	ASM_PUSH_KCPUSTATE_AFTER_RIP_CFI_R
 	goto_Ldo_unwind_rsp
 	.cfi_endproc
 END(_Unwind_Resume)
@@ -202,7 +202,7 @@ END(_Unwind_Resume)
 INTERN_FUNCTION(libc_Unwind_RaiseException)
 	.cfi_startproc
 	.cfi_signal_frame
-	ASM_PUSH_KCPUSTATE_AFTER_RIP
+	ASM_PUSH_KCPUSTATE_AFTER_RIP_CFI_R
 	movq   %rdi, %rsi /* struct _Unwind_Exception *__restrict exception_object */
 	movq   %rsp, %rdi /* error_register_state_t *__restrict state */
 	INTERN(libc_Unwind_RaiseException_impl)
@@ -217,7 +217,7 @@ DEFINE_PUBLIC_ALIAS(_Unwind_RaiseException, libc_Unwind_RaiseException)
 INTERN_FUNCTION(libc_Unwind_Resume)
 	.cfi_startproc
 	.cfi_signal_frame
-	ASM_PUSH_KCPUSTATE_AFTER_RIP
+	ASM_PUSH_KCPUSTATE_AFTER_RIP_CFI_R
 	movq   %rdi, %rsi /* struct _Unwind_Exception *__restrict exception_object */
 	movq   %rsp, %rdi /* error_register_state_t *__restrict state */
 	INTERN(libc_Unwind_Resume_impl)
@@ -232,7 +232,7 @@ DEFINE_PUBLIC_ALIAS(_Unwind_Resume, libc_Unwind_Resume)
 INTERN_FUNCTION(libc_Unwind_Resume_or_Rethrow)
 	.cfi_startproc
 	.cfi_signal_frame
-	ASM_PUSH_KCPUSTATE_AFTER_RIP
+	ASM_PUSH_KCPUSTATE_AFTER_RIP_CFI_R
 	movq   %rdi, %rsi /* struct _Unwind_Exception *__restrict exception_object */
 	movq   %rsp, %rdi /* error_register_state_t *__restrict state */
 	INTERN(libc_Unwind_Resume_or_Rethrow_impl)
@@ -247,7 +247,7 @@ DEFINE_PUBLIC_ALIAS(_Unwind_Resume_or_Rethrow, libc_Unwind_Resume_or_Rethrow)
 INTERN_FUNCTION(libc_Unwind_ForcedUnwind)
 	.cfi_startproc
 	.cfi_signal_frame
-	ASM_PUSH_KCPUSTATE_AFTER_RIP
+	ASM_PUSH_KCPUSTATE_AFTER_RIP_CFI_R
 	movq   %rdx, %rcx /* void *stop_arg */
 	movq   %rsi, %rdx /* _Unwind_Stop_Fn stop */
 	movq   %rdi, %rsi /* struct _Unwind_Exception *__restrict exception_object */
@@ -265,7 +265,7 @@ DEFINE_PUBLIC_ALIAS(_Unwind_ForcedUnwind, libc_Unwind_ForcedUnwind)
 INTERN_FUNCTION(libc_Unwind_Backtrace)
 	.cfi_startproc
 	.cfi_signal_frame
-	ASM_PUSH_KCPUSTATE_AFTER_RIP
+	ASM_PUSH_KCPUSTATE_AFTER_RIP_CFI_R
 	movq   %rsi, %rdx /* void *arg */
 	movq   %rdi, %rsi /* _Unwind_Trace_Fn func */
 	movq   %rsp, %rdi /* error_register_state_t *__restrict state */
@@ -327,7 +327,7 @@ DEFINE_PUBLIC_ALIAS(error_thrown, libc_error_thrown)
 INTERN_FUNCTION(libc_error_thrown)
 	/* ATTR_NORETURN void error_thrown(error_code_t code, unsigned int argc, ...) */
 	.cfi_startproc
-	ASM_PUSH_KCPUSTATE_AFTER_RIP
+	ASM_PUSH_KCPUSTATE_AFTER_RIP_CFI_R
 IU(	INTERN(libc_error_info))
 IU(	call   libc_error_info)
 #ifndef NDEBUG
@@ -463,8 +463,8 @@ IU(	popq_cfi  %rax)
 	pushq_cfi $(5 * 8) /* vl_gp_offset */
 	movq   %rsp, %rcx  /* va_list args */
 
-	EXTERN(libc_except_badusage_throw_inside_catch)
-	call   libc_except_badusage_throw_inside_catch
+	EXTERN(libc_error_badusage_throw_inside_catch)
+	call   libc_error_badusage_throw_inside_catch
 	nop    /* For unwinding */
 #endif /* !NDEBUG */
 	.cfi_endproc
@@ -479,7 +479,7 @@ INTERN_FUNCTION(libc_error_throw)
 	/* ATTR_NORETURN void FCALL error_throw(error_code_t code) */
 
 IU(	.cfi_remember_state)
-IU(	ASM_PUSH_KCPUSTATE_AFTER_RIP)
+IU(	ASM_PUSH_KCPUSTATE_AFTER_RIP_CFI_R)
 IU(	INTERN(libc_error_info))
 IU(	call   libc_error_info)
 IU(	movq   (OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_RDI)(%rsp), %rdi)
@@ -501,7 +501,7 @@ IU(	.cfi_restore_state)
 DEFINE_PUBLIC_ALIAS(error_throw_current, libc_error_throw_current)
 INTERN_FUNCTION(libc_error_throw_current)
 	/* ATTR_NORETURN void error_throw_current(void) */
-	ASM_PUSH_KCPUSTATE_AFTER_RIP
+	ASM_PUSH_KCPUSTATE_AFTER_RIP_CFI_R
 IU(	INTERN(libc_error_info))
 IU(	call   libc_error_info)
 IU(1:)
@@ -542,7 +542,7 @@ IU(	movq   %rcx, FIELD_ERROR_REGISTERS(OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_R
 #ifndef NDEBUG
 IK(	.cfi_restore_state)
 .Llibc_error_throw_inside_catch:
-IK(	ASM_PUSH_KCPUSTATE_AFTER_RIP)
+IK(	ASM_PUSH_KCPUSTATE_AFTER_RIP_CFI_R)
 	/* Pass arguments */
 	movq   %rdi, %rsi  /* error_code_t code */
 	movq   %rsp, %rdi  /* error_register_state_t const *state */
@@ -551,8 +551,8 @@ IK(	ASM_PUSH_KCPUSTATE_AFTER_RIP)
 	pushq_cfi %rsp     /* vl_overflow_arg_area (must be a readable pointer, but doesn't matter) */
 	pushq_cfi $(6 * 8) /* vl_gp_offset */
 	movq   %rsp, %rcx  /* va_list args */
-	EXTERN(libc_except_badusage_throw_inside_catch)
-	call   libc_except_badusage_throw_inside_catch
+	EXTERN(libc_error_badusage_throw_inside_catch)
+	call   libc_error_badusage_throw_inside_catch
 	nop    /* For unwinding */
 #endif /* !NDEBUG */
 END(libc_error_throw_current)
@@ -671,5 +671,16 @@ END(x86_userexcept_unwind_interrupt)
 
 #endif /* !CONFIG_USE_NEW_RPC */
 #endif /* __KERNEL__ */
+
+#ifndef __INTELLISENSE__
+#undef FIELD_ERROR_CODE
+#undef FIELD_ERROR_FLAGS
+#undef FIELD_ERROR_TRACE
+#undef FIELD_ERROR_POINTERS
+#undef FIELD_ERROR_FAULTADDR
+#undef FIELD_ERROR_REGISTERS
+#undef SECTION_EXCEPT_TEXT
+#include "except.S"
+#endif /* !__INTELLISENSE__ */
 
 #endif /* !GUARD_LIBC_HYBRID_ARCH_I386_EXCEPT64_S */

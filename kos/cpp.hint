@@ -1011,6 +1011,7 @@
 
 #define TRY
 #define NESTED_TRY
+#define UNNESTED_TRY
 #define EXCEPT
 #define RETHROW() throw
 #define THROW(...) error_throw(0)

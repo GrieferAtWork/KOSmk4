@@ -545,7 +545,7 @@
  * This macro assumes that before being used, `%rip' already exists in `0(%rsp)'.
  * @param: clobber_gpreg: 64-bit  gp-register  which  may  be  clobbered.
  *                        Must be one of `%rax', `%rcx', `%rdx' or `%rbx' */
-#define ASM_PUSH_KCPUSTATE_AFTER_RIP_EX(clobber_gpreg, sp_addend)    \
+#define ASM_PUSH_KCPUSTATE_AFTER_RIP_CFI_R_EX(clobber_gpreg, sp_addend)    \
 	__ASM_L(pushfq_cfi_r)                                            \
 	__ASM_L(pushq_cfi_r %rax) /* [C] Accumulator register */         \
 	__ASM_L(pushq_cfi_r %rcx) /* [C] Count register */               \
@@ -565,8 +565,10 @@
 	__ASM_L(pushq_cfi_r %r13) /* [P] General purpose register #13 */ \
 	__ASM_L(pushq_cfi_r %r14) /* [P] General purpose register #14 */ \
 	__ASM_L(pushq_cfi_r %r15) /* [P] General purpose register #15 */
-#define ASM_PUSH_KCPUSTATE_AFTER_RIP \
-	ASM_PUSH_KCPUSTATE_AFTER_RIP_EX(%rax, 0)
+#define ASM_PUSH_KCPUSTATE_AFTER_RIP_CFI_R \
+	ASM_PUSH_KCPUSTATE_AFTER_RIP_CFI_R_EX(%rax, 0)
+#define ASM_PUSH_KCPUSTATE_AFTER_PIP_CFI_R \
+	ASM_PUSH_KCPUSTATE_AFTER_RIP_CFI_R
 
 #endif /* __x86_64__ */
 

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd46a1eba */
+/* HASH CRC-32:0x9b4ec90a */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3339,6 +3339,10 @@
 #define __CRT_HAVE__endthreadex
 #define __CRT_HAVE__environ
 #define __CRT_HAVE__eof
+#endif /* !__KERNEL__ */
+#define __CRT_HAVE__error_badusage_no_nesting
+#define __CRT_HAVE__error_check_no_nesting
+#ifndef __KERNEL__
 #define __CRT_HAVE__expand_dbg
 #define __CRT_HAVE__fcvt_s
 #define __CRT_HAVE__filbuf

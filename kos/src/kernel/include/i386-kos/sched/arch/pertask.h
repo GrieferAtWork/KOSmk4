@@ -72,7 +72,7 @@ struct task;
 #define THIS_TASK __get_this_task()
 
 FORCELOCAL ATTR_ARTIFICIAL ATTR_CONST WUNUSED
-struct task *NOTHROW(KCALL __get_this_task)(void) {
+struct task *NOTHROW(__get_this_task)(void) {
 	__register struct task *__result;
 #ifdef __X86_SEG_TASK
 	__result = (struct task *)(*(__X86_SEG_TASK __UINTPTR_TYPE__ const *)0);
@@ -86,7 +86,7 @@ struct task *NOTHROW(KCALL __get_this_task)(void) {
 
 #define PERTASK(x) (*(__typeof__(&(x)))__get_per_task((void *)&(x)))
 FORCELOCAL ATTR_ARTIFICIAL ATTR_CONST ATTR_RETNONNULL WUNUSED
-void *NOTHROW(KCALL __get_per_task)(void *__ptr) {
+void *NOTHROW(__get_per_task)(void *__ptr) {
 	__register void *__result;
 #ifdef __X86_SEG_TASK
 	__result = (void *)(*(__X86_SEG_TASK __UINTPTR_TYPE__ const *)0 + (__UINTPTR_TYPE__)__ptr);

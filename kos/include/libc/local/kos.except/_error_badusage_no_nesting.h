@@ -1,3 +1,4 @@
+/* HASH CRC-32:0x891f514c */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -17,34 +18,18 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_LIBC_USER_KOS_EXCEPT_C
-#define GUARD_LIBC_USER_KOS_EXCEPT_C 1
-
-#include "../api.h"
-/**/
-
-#include "kos.except.h"
-
-DECL_BEGIN
-
-/*[[[skip:libc_error_data]]]*/
-/*[[[skip:libc_error_code]]]*/
-/*[[[skip:libc_error_active]]]*/
-/*[[[skip:libc_error_class]]]*/
-/*[[[skip:libc_error_subclass]]]*/
-/*[[[skip:libc_error_register_state]]]*/
-/*[[[skip:libc_error_info]]]*/
-/*[[[skip:libc_error_unwind]]]*/
-/*[[[skip:libc_error_throw_current]]]*/
-/*[[[skip:libc_error_rethrow]]]*/
-/*[[[skip:libc_error_throw]]]*/
-/*[[[skip:libc_error_thrown]]]*/
-/*[[[skip:libc__error_badusage_no_nesting]]]*/
-/*[[[skip:libc__error_check_no_nesting]]]*/
-
-/*[[[start:exports,hash:CRC-32=0x0]]]*/
-/*[[[end:exports]]]*/
-
-DECL_END
-
-#endif /* !GUARD_LIBC_USER_KOS_EXCEPT_C */
+#ifndef __local__error_badusage_no_nesting_defined
+#define __local__error_badusage_no_nesting_defined
+#include <__crt.h>
+#include <hybrid/__assert.h>
+__NAMESPACE_LOCAL_BEGIN
+__LOCAL_LIBC(_error_badusage_no_nesting) __ATTR_COLD __ATTR_NORETURN void
+__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(_error_badusage_no_nesting))(void) {
+	__hybrid_assertion_failed("Recursive `TRY' isn't nested; use `NESTED_TRY' instead");
+}
+__NAMESPACE_LOCAL_END
+#ifndef __local___localdep__error_badusage_no_nesting_defined
+#define __local___localdep__error_badusage_no_nesting_defined
+#define __localdep__error_badusage_no_nesting __LIBC_LOCAL_NAME(_error_badusage_no_nesting)
+#endif /* !__local___localdep__error_badusage_no_nesting_defined */
+#endif /* !__local__error_badusage_no_nesting_defined */

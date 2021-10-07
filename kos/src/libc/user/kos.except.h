@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6a61c63 */
+/* HASH CRC-32:0x41c98317 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -48,6 +48,12 @@ INTDEF ATTR_COLD ATTR_NORETURN void (LIBKCALL libc_error_rethrow)(void) THROWS(.
 INTDEF ATTR_COLD ATTR_NORETURN void (__ERROR_THROW_CC libc_error_throw)(error_code_t code) THROWS(...);
 /* Throw an exception and load `argc' pointers from varargs */
 INTDEF ATTR_COLD ATTR_NORETURN void (__ERROR_THROWN_CC libc_error_thrown)(error_code_t code, unsigned int _argc, ...) THROWS(...);
+#ifndef __KERNEL__
+/* Assertion check handler for missing `TRY' nesting */
+INTDEF ATTR_COLD ATTR_NORETURN void NOTHROW(LIBCCALL libc__error_badusage_no_nesting)(void);
+/* Assert that a TRY-block is currently allowed (iow: that no error is active) */
+INTDEF void NOTHROW(LIBCCALL libc__error_check_no_nesting)(void);
+#endif /* !__KERNEL__ */
 
 DECL_END
 
