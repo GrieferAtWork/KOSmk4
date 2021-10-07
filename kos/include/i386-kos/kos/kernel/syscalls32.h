@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa8f333fa */
+/* HASH CRC-32:0x165856cc */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -322,7 +322,6 @@
 #define __ARCH_WANT_SYSCALL_PWRITEVF
 #define __ARCH_WANT_SYSCALL_QUERY_MODULE
 #define __ARCH_WANT_SYSCALL_QUOTACTL
-#define __ARCH_WANT_SYSCALL_RAISEAT
 #define __ARCH_WANT_SYSCALL_READ
 #define __ARCH_WANT_SYSCALL_READAHEAD
 #define __ARCH_WANT_SYSCALL_READDIR

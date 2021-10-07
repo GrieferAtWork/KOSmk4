@@ -158,8 +158,6 @@ __FORCELOCAL __ATTR_ARTIFICIAL __syscall_ulong_t (__LIBKCALL __x86_syscall5)(__s
 __FORCELOCAL __ATTR_ARTIFICIAL __syscall_ulong_t (__LIBKCALL __x86_Xsyscall5)(__syscall_ulong_t __sysno, __syscall_ulong_t __arg0, __syscall_ulong_t __arg1, __syscall_ulong_t __arg2, __syscall_ulong_t __arg3, __syscall_ulong_t __arg4) { __register __syscall_ulong_t __res; __register __syscall_ulong_t __r10 __asm__("%r10") = __arg3; __register __syscall_ulong_t __r8 __asm__("%r8") = __arg4; __asm__ __volatile__(__X86_XSYSCALL_ASSEMBLY : "=a" (__res) : "0" (__sysno), "D" (__arg0), "S" (__arg1), "d" (__arg2), "r" (__r10), "r" (__r8) : "memory", "cc", "rcx", "r11"); return __res; }
 __FORCELOCAL __ATTR_ARTIFICIAL __syscall_ulong_t (__LIBKCALL __x86_syscall6)(__syscall_ulong_t __sysno, __syscall_ulong_t __arg0, __syscall_ulong_t __arg1, __syscall_ulong_t __arg2, __syscall_ulong_t __arg3, __syscall_ulong_t __arg4, __syscall_ulong_t __arg5) { __register __syscall_ulong_t __res; __register __syscall_ulong_t __r10 __asm__("%r10") = __arg3; __register __syscall_ulong_t __r8 __asm__("%r8") = __arg4; __register __syscall_ulong_t __r9 __asm__("%r9") = __arg5; __asm__ __volatile__(__X86_SYSCALL_ASSEMBLY : "=a" (__res) : "0" (__sysno), "D" (__arg0), "S" (__arg1), "d" (__arg2), "r" (__r10), "r" (__r8), "r" (__r9) : "memory", "cc", "rcx", "r11"); return __res; }
 __FORCELOCAL __ATTR_ARTIFICIAL __syscall_ulong_t (__LIBKCALL __x86_Xsyscall6)(__syscall_ulong_t __sysno, __syscall_ulong_t __arg0, __syscall_ulong_t __arg1, __syscall_ulong_t __arg2, __syscall_ulong_t __arg3, __syscall_ulong_t __arg4, __syscall_ulong_t __arg5) { __register __syscall_ulong_t __res; __register __syscall_ulong_t __r10 __asm__("%r10") = __arg3; __register __syscall_ulong_t __r8 __asm__("%r8") = __arg4; __register __syscall_ulong_t __r9 __asm__("%r9") = __arg5; __asm__ __volatile__(__X86_XSYSCALL_ASSEMBLY : "=a" (__res) : "0" (__sysno), "D" (__arg0), "S" (__arg1), "d" (__arg2), "r" (__r10), "r" (__r8), "r" (__r9) : "memory", "cc", "rcx", "r11"); return __res; }
-#undef __X86_XSYSCALL_ASSEMBLY
-#undef __X86_SYSCALL_ASSEMBLY
 
 #define __X86_64_SYSCALL_SELECT2(argc)  __x86_syscall##argc
 #define __X86_64_SYSCALL_SELECT(argc)   __X86_64_SYSCALL_SELECT2(argc)
@@ -197,13 +195,13 @@ __FORCELOCAL __ATTR_ARTIFICIAL __syscall_ulong_t (__LIBKCALL __x86_Xsyscall6)(__
 #if defined(__X86_SYSCALL_METHOD_SYSENTER) && 0 /* TODO */
 #define __X86_SYSCALL_ASSEMBLY  TODO
 #define __X86_XSYSCALL_ASSEMBLY TODO
-#define __X86_SYSCALL_MAY_CLOBBER_ECX_EDX 1
+#define __X86_SYSCALL_MAY_CLOBBER_ECX_EDX
 #elif defined(__BUILDING_LIBC)
 __asm__(".hidden libc___i386_syscall\n\t.global libc___i386_syscall\n\t"
         ".hidden libc___i386_Xsyscall\n\t.global libc___i386_Xsyscall\n\t");
 #define __X86_SYSCALL_ASSEMBLY  "call libc___i386_syscall"
 #define __X86_XSYSCALL_ASSEMBLY "call libc___i386_Xsyscall"
-#define __X86_SYSCALL_MAY_CLOBBER_ECX_EDX 1
+#define __X86_SYSCALL_MAY_CLOBBER_ECX_EDX
 #elif (defined(__CRT_HAVE___i386_syscall) && defined(__CRT_HAVE___i386_Xsyscall) &&    \
        0 /* This method doesn't  work since  PLT requires %ebx  to point  to the  GOT, \
           * however  the system call  itself also needs %ebx  as an argument register, \
@@ -211,7 +209,7 @@ __asm__(".hidden libc___i386_syscall\n\t.global libc___i386_syscall\n\t"
           * since it is %ebx that is used to pass the very first argument) */)
 #define __X86_SYSCALL_ASSEMBLY   "call __i386_syscall@PLT"
 #define __X86_XSYSCALL_ASSEMBLY  "call __i386_Xsyscall@PLT"
-#define __X86_SYSCALL_MAY_CLOBBER_ECX_EDX 1
+#define __X86_SYSCALL_MAY_CLOBBER_ECX_EDX
 #endif /* ... */
 
 /* __i386_syscall is called like:
@@ -269,7 +267,6 @@ __FORCELOCAL __ATTR_ARTIFICIAL __syscall_ulong_t (__LIBKCALL __x86_syscall1)(__s
 __FORCELOCAL __ATTR_ARTIFICIAL __syscall_ulong_t (__LIBKCALL __x86_Xsyscall1)(__syscall_ulong_t __sysno, __syscall_ulong_t __arg0) { __register __syscall_ulong_t __res; __asm__ __volatile__(__X86_XSYSCALL_ASSEMBLY : "=a" (__res) : "0" (__sysno), "b" (__arg0) : "memory", "cc" __X86_SYSCALL_CLOBBER_ECX_EDX); return __res; }
 __FORCELOCAL __ATTR_ARTIFICIAL __uint64_t (__LIBKCALL __x86_syscall1_dw)(__syscall_ulong_t __sysno, __syscall_ulong_t __arg0) { __register __uint64_t __res; __asm__ __volatile__(__X86_SYSCALL_ASSEMBLY : "=A" (__res) : "a" (__sysno), "b" (__arg0) : "memory", "cc" __X86_SYSCALL_CLOBBER_ECX_EDX); return __res; }
 __FORCELOCAL __ATTR_ARTIFICIAL __uint64_t (__LIBKCALL __x86_Xsyscall1_dw)(__syscall_ulong_t __sysno, __syscall_ulong_t __arg0) { __register __uint64_t __res; __asm__ __volatile__(__X86_XSYSCALL_ASSEMBLY : "=A" (__res) : "a" (__sysno), "b" (__arg0) : "memory", "cc" __X86_SYSCALL_CLOBBER_ECX_EDX); return __res; }
-#undef __X86_SYSCALL_CLOBBER_ECX_EDX
 
 #ifdef __X86_SYSCALL_MAY_CLOBBER_ECX_EDX
 __FORCELOCAL __ATTR_ARTIFICIAL __syscall_ulong_t (__LIBKCALL __x86_syscall2)(__syscall_ulong_t __sysno, __syscall_ulong_t __arg0, __syscall_ulong_t __arg1) { __register __syscall_ulong_t __ecx; __register __syscall_ulong_t __res; __asm__ __volatile__(__X86_SYSCALL_ASSEMBLY : "=a" (__res), "=&c" (__ecx) : "0" (__sysno), "b" (__arg0), "1" (__arg1) : "memory", "cc", "%edx"); return __res; }
@@ -321,8 +318,7 @@ __FORCELOCAL __ATTR_ARTIFICIAL __syscall_ulong_t (__LIBKCALL __x86_Xsyscall6)(__
 __FORCELOCAL __ATTR_ARTIFICIAL __uint64_t (__LIBKCALL __x86_syscall6_dw)(__syscall_ulong_t __sysno, __syscall_ulong_t __arg0, __syscall_ulong_t __arg1, __syscall_ulong_t __arg2, __syscall_ulong_t __arg3, __syscall_ulong_t __arg4, __syscall_ulong_t __arg5) { __register __uint64_t __res; __kos_syscall6_ebp = __arg5; __asm__ __volatile__(__X86_SYSCALL_WITH_EBP(__X86_SYSCALL_ASSEMBLY) : "=A" (__res) : "a" (__sysno), "b" (__arg0), "c" (__arg1), "d" (__arg2), "S" (__arg3), "D" (__arg4) : "memory", "cc"); return __res; }
 __FORCELOCAL __ATTR_ARTIFICIAL __uint64_t (__LIBKCALL __x86_Xsyscall6_dw)(__syscall_ulong_t __sysno, __syscall_ulong_t __arg0, __syscall_ulong_t __arg1, __syscall_ulong_t __arg2, __syscall_ulong_t __arg3, __syscall_ulong_t __arg4, __syscall_ulong_t __arg5) { __register __uint64_t __res; __kos_syscall6_ebp = __arg5; __asm__ __volatile__(__X86_SYSCALL_WITH_EBP(__X86_XSYSCALL_ASSEMBLY) : "=A" (__res) : "a" (__sysno), "b" (__arg0), "c" (__arg1), "d" (__arg2), "S" (__arg3), "D" (__arg4) : "memory", "cc"); return __res; }
 #endif /* !__X86_SYSCALL_MAY_CLOBBER_ECX_EDX */
-#undef __X86_SYSCALL_WITH_EBP
-#else
+#else /* 0 */
 /* FIXME: `__X86_SYSCALL_TEST_EBP' is incomplete,  and could  never be  complete.
  *        Add an extension to binutils `.ifccont' that behaves similar to `.ifc',
  *        but checks for contains, rather than equals */
@@ -400,13 +396,7 @@ __FORCELOCAL __ATTR_ARTIFICIAL __syscall_ulong_t (__LIBKCALL __x86_Xsyscall6)(__
 __FORCELOCAL __ATTR_ARTIFICIAL __uint64_t (__LIBKCALL __x86_syscall6_dw)(__syscall_ulong_t __sysno, __syscall_ulong_t __arg0, __syscall_ulong_t __arg1, __syscall_ulong_t __arg2, __syscall_ulong_t __arg3, __syscall_ulong_t __arg4, __syscall_ulong_t __arg5) { __register __uint64_t __res; __syscall_ulong_t __temp; __asm__ __volatile__(__X86_SYSCALL_WITH_EBP(__X86_SYSCALL_ASSEMBLY, __X86_DEFINE_SYSCALL6_WRAPPER, "call __x86.syscall6") : "=A" (__res), "=&m" (__temp) : "a" (__sysno), "b" (__arg0), "c" (__arg1), "d" (__arg2), "S" (__arg3), "D" (__arg4), "g" (__arg5) : "memory", "cc"); return __res; }
 __FORCELOCAL __ATTR_ARTIFICIAL __uint64_t (__LIBKCALL __x86_Xsyscall6_dw)(__syscall_ulong_t __sysno, __syscall_ulong_t __arg0, __syscall_ulong_t __arg1, __syscall_ulong_t __arg2, __syscall_ulong_t __arg3, __syscall_ulong_t __arg4, __syscall_ulong_t __arg5) { __register __uint64_t __res; __syscall_ulong_t __temp; __asm__ __volatile__(__X86_SYSCALL_WITH_EBP(__X86_XSYSCALL_ASSEMBLY, __X86_DEFINE_XSYSCALL6_WRAPPER, "call __x86.Xsyscall6") : "=A" (__res), "=&m" (__temp) : "a" (__sysno), "b" (__arg0), "c" (__arg1), "d" (__arg2), "S" (__arg3), "D" (__arg4), "g" (__arg5) : "memory", "cc"); return __res; }
 #endif /* !__X86_SYSCALL_MAY_CLOBBER_ECX_EDX */
-#undef __X86_SYSCALL_WITH_EBP
-#endif
-
-#undef __X86_XSYSCALL_ASSEMBLY
-#undef __X86_SYSCALL_ASSEMBLY
-#undef __X86_XSYSCALL0_ASSEMBLY
-#undef __X86_SYSCALL0_ASSEMBLY
+#endif /* 1 */
 
 #define __I386_SYSCALL_ARG_PLACEHOLDER_1  ,
 #define __I386_SYSCALL_TAKE_SECOND_ARG_IMPL(x, val, ...) val

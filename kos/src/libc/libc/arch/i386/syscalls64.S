@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe8548ee8 */
+/* HASH CRC-32:0xffbc5356 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3812,20 +3812,6 @@ INTERN_FUNCTION(libc_sys_coredump)
 	ret
 END(libc_sys_coredump)
 DEFINE_PUBLIC_ALIAS(sys_coredump, libc_sys_coredump)
-
-/* Raise a signal within the calling thread alongside the given CPU state
- * This system call is used when translating exceptions into POSIX signal in error mode #4
- * @param: state: The state state at which to raise the signal, or `NULL' if the signal should
- *                be raised for the caller's source location. Note that only in the later case
- *                will this function return to its caller. - When `state' is non-NULL, it will
- *                return to the text location described by it. */
-/* errno_t raiseat(struct ucpustate64 const *state, struct __siginfox64_struct const *si) */
-INTERN_FUNCTION(libc_sys_raiseat)
-	movq   $(0xffffffffffffffe4), %rax
-	syscall
-	ret
-END(libc_sys_raiseat)
-DEFINE_PUBLIC_ALIAS(sys_raiseat, libc_sys_raiseat)
 
 /* Create and return a new tty terminal controller connected to the given keyboard and display
  * The  newly created  device automatically gets  assigned an arbitrary  device number, before
@@ -8849,22 +8835,6 @@ INTERN_FUNCTION(libc_sys_Xcoredump)
 	ret
 END(libc_sys_Xcoredump)
 DEFINE_PUBLIC_ALIAS(sys_Xcoredump, libc_sys_Xcoredump)
-
-/* Raise a signal within the calling thread alongside the given CPU state
- * This system call is used when translating exceptions into POSIX signal in error mode #4
- * @param: state: The state state at which to raise the signal, or `NULL' if the signal should
- *                be raised for the caller's source location. Note that only in the later case
- *                will this function return to its caller. - When `state' is non-NULL, it will
- *                return to the text location described by it. */
-/* errno_t raiseat(struct ucpustate64 const *state, struct __siginfox64_struct const *si) */
-INTERN_FUNCTION(libc_sys_Xraiseat)
-	movq   $(0xffffffffffffffe4), %rax
-	std /* Enable exceptions */
-	syscall
-	cld /* Disable exceptions */
-	ret
-END(libc_sys_Xraiseat)
-DEFINE_PUBLIC_ALIAS(sys_Xraiseat, libc_sys_Xraiseat)
 
 /* Create and return a new tty terminal controller connected to the given keyboard and display
  * The  newly created  device automatically gets  assigned an arbitrary  device number, before

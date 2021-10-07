@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x651e54e4 */
+/* HASH CRC-32:0x62a310a4 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18614,49 +18614,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_coredump)
 	iret
 	.cfi_endproc
 END(__x86_asm32_int80_coredump)
-
-/* Raise a signal within the calling thread alongside the given CPU state
- * This system call is used when translating exceptions into POSIX signal in error mode #4
- * @param: state: The state state at which to raise the signal, or `NULL' if the signal should
- *                be raised for the caller's source location. Note that only in the later case
- *                will this function return to its caller. - When `state' is non-NULL, it will
- *                return to the text location described by it. */
-/* errno_t raiseat(struct ucpustate32 const *state, struct __siginfox32_struct const *si) */
-.section .text.x86.asm32_syscall_int80.raiseat
-INTERN_WEAK_FUNCTION(__x86_asm32_int80_raiseat)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm32_int80
-	.cfi_lsda 0, 0xffffffe9
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %esp, 0
-	pushl_cfi %ds
-	.cfi_restore_iret_ds_or_offset -4
-	pushl_cfi %es
-	.cfi_restore_iret_es_or_offset -8
-	pushl_cfi %fs
-	.cfi_restore_iret_fs_or_offset -12
-	movw   $(SEGMENT_USER_DATA_RPL), %ax
-	movw   %ax, %ds
-	movw   %ax, %es
-	movw   $(SEGMENT_KERNEL_FSBASE), %ax
-	movw   %ax, %fs
-	pushl_cfi_r %edx
-	pushl_cfi_r %ecx  /* Arg #1 */
-	pushl_cfi_r %ebx  /* Arg #0 */
-	EXTERN(sys_raiseat)
-	call   sys_raiseat
-	popl_cfi_r %ebx
-	popl_cfi_r %ecx
-	popl_cfi_r %edx
-	popl_cfi %fs
-	.cfi_restore_iret_fs
-	popl_cfi %es
-	.cfi_restore_iret_es
-	popl_cfi %ds
-	.cfi_restore_iret_ds
-	iret
-	.cfi_endproc
-END(__x86_asm32_int80_raiseat)
 
 /* Create and return a new tty terminal controller connected to the given keyboard and display
  * The  newly created  device automatically gets  assigned an arbitrary  device number, before
@@ -38395,49 +38352,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_coredump)
 	X86_IRET_BUT_PREFER_SYSEXIT
 	.cfi_endproc
 END(__x86_asm32_sysenter_coredump)
-
-/* Raise a signal within the calling thread alongside the given CPU state
- * This system call is used when translating exceptions into POSIX signal in error mode #4
- * @param: state: The state state at which to raise the signal, or `NULL' if the signal should
- *                be raised for the caller's source location. Note that only in the later case
- *                will this function return to its caller. - When `state' is non-NULL, it will
- *                return to the text location described by it. */
-/* errno_t raiseat(struct ucpustate32 const *state, struct __siginfox32_struct const *si) */
-.section .text.x86.asm32_syscall_sysenter.raiseat
-INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_raiseat)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
-	.cfi_lsda 0, 0xffffffe9
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %esp, 0
-	pushl_cfi %ds
-	.cfi_restore_iret_ds_or_offset -4
-	pushl_cfi %es
-	.cfi_restore_iret_es_or_offset -8
-	pushl_cfi %fs
-	.cfi_restore_iret_fs_or_offset -12
-	movw   $(SEGMENT_USER_DATA_RPL), %ax
-	movw   %ax, %ds
-	movw   %ax, %es
-	movw   $(SEGMENT_KERNEL_FSBASE), %ax
-	movw   %ax, %fs
-	pushl_cfi_r %edx
-	pushl_cfi_r %ecx  /* Arg #1 */
-	pushl_cfi_r %ebx  /* Arg #0 */
-	EXTERN(sys_raiseat)
-	call   sys_raiseat
-	popl_cfi_r %ebx
-	popl_cfi_r %ecx
-	popl_cfi_r %edx
-	popl_cfi %fs
-	.cfi_restore_iret_fs
-	popl_cfi %es
-	.cfi_restore_iret_es
-	popl_cfi %ds
-	.cfi_restore_iret_ds
-	X86_IRET_BUT_PREFER_SYSEXIT
-	.cfi_endproc
-END(__x86_asm32_sysenter_raiseat)
 
 /* Create and return a new tty terminal controller connected to the given keyboard and display
  * The  newly created  device automatically gets  assigned an arbitrary  device number, before

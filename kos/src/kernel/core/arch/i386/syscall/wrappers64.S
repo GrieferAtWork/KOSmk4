@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x342008da */
+/* HASH CRC-32:0x41cd7d69 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -12029,42 +12029,6 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_coredump)
 	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_coredump)
-
-/* Raise a signal within the calling thread alongside the given CPU state
- * This system call is used when translating exceptions into POSIX signal in error mode #4
- * @param: state: The state state at which to raise the signal, or `NULL' if the signal should
- *                be raised for the caller's source location. Note that only in the later case
- *                will this function return to its caller. - When `state' is non-NULL, it will
- *                return to the text location described by it. */
-/* errno_t raiseat(struct ucpustate64 const *state, struct __siginfox64_struct const *si) */
-.section .text.x86.asm64_syscall.raiseat
-INTERN_WEAK_FUNCTION(__x86_asm64_syscall_raiseat)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm64_syscall
-	.cfi_lsda 0, 0xffffffffffffffe4
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %rsp, 0
-	pushq_cfi_r %rcx
-	pushq_cfi_r %rdx
-	pushq_cfi_r %rsi
-	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
-	EXTERN(sys_raiseat)
-	call   sys_raiseat
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
-	popq_cfi_r %rdi
-	popq_cfi_r %rsi
-	popq_cfi_r %rdx
-	popq_cfi_r %rcx
-	X86_IRET_BUT_PREFER_SYSRET64
-	.cfi_endproc
-END(__x86_asm64_syscall_raiseat)
 
 /* Create and return a new tty terminal controller connected to the given keyboard and display
  * The  newly created  device automatically gets  assigned an arbitrary  device number, before
@@ -29416,44 +29380,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_coredump)
 	.cfi_endproc
 END(__x86_asm32_int80_coredump)
 
-/* Raise a signal within the calling thread alongside the given CPU state
- * This system call is used when translating exceptions into POSIX signal in error mode #4
- * @param: state: The state state at which to raise the signal, or `NULL' if the signal should
- *                be raised for the caller's source location. Note that only in the later case
- *                will this function return to its caller. - When `state' is non-NULL, it will
- *                return to the text location described by it. */
-/* errno_t raiseat(struct ucpustate32 const *state, struct __siginfox32_struct const *si) */
-.section .text.x86.asm32_syscall_int80.raiseat
-INTERN_WEAK_FUNCTION(__x86_asm32_int80_raiseat)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm32_int80
-	.cfi_lsda 0, 0xffffffe9
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %rsp, 0
-	pushq_cfi_r %rcx
-	pushq_cfi_r %rdx
-	pushq_cfi_r %rsi
-	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
-	movzlq %ebx, %rdi /* ARG0 = REG0 */
-	movzlq %ecx, %rsi /* ARG1 = REG1 */
-	EXTERN(sys32_raiseat)
-	call   sys32_raiseat
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
-	popq_cfi_r %rdi
-	popq_cfi_r %rsi
-	popq_cfi_r %rdx
-	popq_cfi_r %rcx
-	intr_exit
-	.cfi_endproc
-END(__x86_asm32_int80_raiseat)
-
 /* Create and return a new tty terminal controller connected to the given keyboard and display
  * The  newly created  device automatically gets  assigned an arbitrary  device number, before
  * being made available under a file `/dev/${name}'  (or rather: as ${name} within the  devfs)
@@ -34599,15 +34525,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_coredump)
 	X86_IRET_BUT_PREFER_SYSRET32
 	.cfi_endproc
 END(__x86_asm32_sysenter_coredump)
-
-/* Raise a signal within the calling thread alongside the given CPU state
- * This system call is used when translating exceptions into POSIX signal in error mode #4
- * @param: state: The state state at which to raise the signal, or `NULL' if the signal should
- *                be raised for the caller's source location. Note that only in the later case
- *                will this function return to its caller. - When `state' is non-NULL, it will
- *                return to the text location described by it. */
-/* errno_t raiseat(struct ucpustate32 const *state, struct __siginfox32_struct const *si) */
-DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_raiseat, __x86_asm32_int80_raiseat)
 
 /* Create and return a new tty terminal controller connected to the given keyboard and display
  * The  newly created  device automatically gets  assigned an arbitrary  device number, before
@@ -41074,23 +40991,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_coredump)
 	jmp    sys32_coredump
 	.cfi_endproc
 END(__x86_asm32_sysrun32_coredump)
-
-/* Raise a signal within the calling thread alongside the given CPU state
- * This system call is used when translating exceptions into POSIX signal in error mode #4
- * @param: state: The state state at which to raise the signal, or `NULL' if the signal should
- *                be raised for the caller's source location. Note that only in the later case
- *                will this function return to its caller. - When `state' is non-NULL, it will
- *                return to the text location described by it. */
-/* errno_t raiseat(struct ucpustate32 const *state, struct __siginfox32_struct const *si) */
-.section .text.x86.asm32_syscall_sysrun32.raiseat
-INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_raiseat)
-	.cfi_startproc
-	movzlq 8(%rdi), %rsi
-	movzlq 0(%rdi), %rdi
-	EXTERN(sys32_raiseat)
-	jmp    sys32_raiseat
-	.cfi_endproc
-END(__x86_asm32_sysrun32_raiseat)
 
 /* Create and return a new tty terminal controller connected to the given keyboard and display
  * The  newly created  device automatically gets  assigned an arbitrary  device number, before

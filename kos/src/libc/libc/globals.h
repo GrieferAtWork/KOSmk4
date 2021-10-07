@@ -26,9 +26,9 @@
 
 #include <kos/types.h>
 
+#ifdef __CC__
 DECL_BEGIN
 
-#ifdef __CC__
 #ifndef __KERNEL__
 
 #if defined(__OPTIMIZE_SIZE__) && 0 /* -Os is a per-file option, so don't do global config based on it! */
@@ -203,8 +203,8 @@ DECLARE_NOREL_GLOBAL_META(int, optopt);
 #define optopt GET_NOREL_GLOBAL(optopt)
 
 #endif /* !__KERNEL__ */
-#endif /* __CC__ */
 
 DECL_END
+#endif /* __CC__ */
 
 #endif /* !GUARD_LIBC_LIBC_GLOBALS_H */

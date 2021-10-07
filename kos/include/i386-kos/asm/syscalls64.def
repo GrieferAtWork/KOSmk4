@@ -118,7 +118,6 @@ ppoll = ppollx64;
 utimensat = utimensatx64;
 rt_sigqueueinfo = rt_sigqueueinfox64;
 rt_tgsigqueueinfo = rt_tgsigqueueinfox64;
-raiseat = raiseatx64;
 coredump = coredumpx64;
 lfutexexpr = lfutexexprx64;
 lfutexlockexpr = lfutexlockexprx64;
@@ -751,7 +750,7 @@ socketcall = socketcallx64;
 -0x0000000000000019:lfutexexpr
 -0x000000000000001a:lfutexlockexpr
 -0x000000000000001b:mktty
--0x000000000000001c:raiseat
+/*x000000000000001c:...*/
 -0x000000000000001d:coredump
 /*x000000000000001e:...*/
 -0x000000000000001f:userviofd

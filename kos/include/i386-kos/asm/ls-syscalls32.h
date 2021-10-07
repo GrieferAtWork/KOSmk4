@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x48a3fe87 */
+/* HASH CRC-32:0xb0097039 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -884,7 +884,7 @@ __TSYSCALL1(userviofd, 0x133, 0x133)
 __TSYSCALL1_UNUSED(0xffffffe6, 0x134, 0x134)
 __TSYSCALL1(stime64, 0x135, 0x135)
 __TSYSCALL1(coredump, 0x136, 0x136)
-__TSYSCALL1(raiseat, 0x137, 0x137)
+__TSYSCALL1_UNUSED(0xffffffe9, 0x137, 0x137)
 __TSYSCALL1(mktty, 0x138, 0x138)
 __TSYSCALL1(lfutexlockexpr, 0x139, 0x139)
 __TSYSCALL1(lfutexexpr, 0x13a, 0x13a)

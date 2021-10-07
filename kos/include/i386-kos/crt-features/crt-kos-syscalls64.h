@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xea8632a */
+/* HASH CRC-32:0xb10b032b */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -271,7 +271,6 @@
 #define __CRT_HAVE_sys_pwritevf
 #define __CRT_HAVE_sys_query_module
 #define __CRT_HAVE_sys_quotactl
-#define __CRT_HAVE_sys_raiseat
 #define __CRT_HAVE_sys_read
 #define __CRT_HAVE_sys_readahead
 #define __CRT_HAVE_sys_readf
@@ -671,7 +670,6 @@
 #define __CRT_HAVE_sys_Xpwritevf
 #define __CRT_HAVE_sys_Xquery_module
 #define __CRT_HAVE_sys_Xquotactl
-#define __CRT_HAVE_sys_Xraiseat
 #define __CRT_HAVE_sys_Xread
 #define __CRT_HAVE_sys_Xreadahead
 #define __CRT_HAVE_sys_Xreadf

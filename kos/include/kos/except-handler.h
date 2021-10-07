@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x83f3aed */
+/* HASH CRC-32:0xa3c69a68 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -173,8 +173,8 @@
  *                which  differs from the usual single-pass unwinding used for handling all
  *                other types of KOS exceptions.
  *         #SIG:  Restore the KOS exception saved in step #1.
- *                Translate the exception into a signal which is then raised
- *                within  the calling thread (s.a. `error_as_signal(3)' and `sys_raiseat(2)')
+ *                Translate the exception into a signal which is raised
+ *                within the calling thread (s.a. `error_as_signal(3)')
  *                If the exception cannot be translated into a signal, move on to step #CORE.
  *         #CORE: Trigger a coredump to terminate the current application. (s.a. `sys_coredump(2)')
  *                If the kernel  is configured  to allow it,  this may  also trigger a  trap in  an

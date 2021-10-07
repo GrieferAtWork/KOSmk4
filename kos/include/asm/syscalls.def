@@ -1688,18 +1688,6 @@ rt_tgsigqueueinfo:(pid_t pid, pid_t tid, signo_t usigno, [tostr(STRUCT_SIGINFO)]
 @@@return: 0 : Always, unconditionally returned.
 [restart(dont)] rpc_serve_sysret:() -> errno_t;
 
-%[startgroup]
-@@Raise a signal within the calling thread alongside the given CPU state
-@@This system call is used when translating exceptions into POSIX signal in error mode #4
-@@@param: state: The state state at which to raise the signal, or `NULL' if the signal should
-@@               be raised for the caller's source location. Note that only in the later case
-@@               will this function return to its caller. - When `state' is non-NULL, it will
-@@               return to the text location described by it.
-[restart(must)] raiseat:([tostr(STRUCT_UCPUSTATE)] struct ucpustate const *state, [tostr(STRUCT_SIGINFO)] struct __siginfo_struct const *si) -> errno_t;
-[doc_alias(raiseat)][restart(must)] raiseatx32:([tostr(STRUCT_UCPUSTATE32)] struct ucpustate32 const *state, [tostr(STRUCT_SIGINFOX32)] struct __siginfox32_struct const *si) -> errno_t;
-[doc_alias(raiseat)][restart(must)] raiseatx64:([tostr(STRUCT_UCPUSTATE64)] struct ucpustate64 const *state, [tostr(STRUCT_SIGINFOX64)] struct __siginfox64_struct const *si) -> errno_t;
-%[endgroup]
-
 sigpending:(struct __sigset_struct *set) -> errno_t;
 rt_sigpending:([tostr(out:STRUCT_SIGSET:sigsetsize)] struct __sigset_struct *set,
                size_t sigsetsize) -> errno_t;

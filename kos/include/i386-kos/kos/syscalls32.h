@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x106810f5 */
+/* HASH CRC-32:0x54831262 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1657,15 +1657,6 @@ __CDECLARE_SC(,__errno_t,query_module,(void),())
 #if __CRT_HAVE_SC(quotactl)
 __CDECLARE_SC(,__errno_t,quotactl,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 #endif /* __CRT_HAVE_SC(quotactl) */
-#if __CRT_HAVE_SC(raiseat)
-/* Raise a signal within the calling thread alongside the given CPU state
- * This system call is used when translating exceptions into POSIX signal in error mode #4
- * @param: state: The state state at which to raise the signal, or `NULL' if the signal should
- *                be raised for the caller's source location. Note that only in the later case
- *                will this function return to its caller. - When `state' is non-NULL, it will
- *                return to the text location described by it. */
-__CDECLARE_SC(,__errno_t,raiseat,(struct ucpustate32 const *__state, struct __siginfox32_struct const *__si),(__state,__si))
-#endif /* __CRT_HAVE_SC(raiseat) */
 #if __CRT_HAVE_SC(read)
 /* Read up to `bufsize' bytes from `fd' into `buf'
  * When  `fd' has the `O_NONBLOCK' flag set, only read as much data as was
@@ -4213,15 +4204,6 @@ __CDECLARE_XSC(,__errno_t,query_module,(void),())
 #if __CRT_HAVE_XSC(quotactl)
 __CDECLARE_XSC(,__errno_t,quotactl,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 #endif /* __CRT_HAVE_XSC(quotactl) */
-#if __CRT_HAVE_XSC(raiseat)
-/* Raise a signal within the calling thread alongside the given CPU state
- * This system call is used when translating exceptions into POSIX signal in error mode #4
- * @param: state: The state state at which to raise the signal, or `NULL' if the signal should
- *                be raised for the caller's source location. Note that only in the later case
- *                will this function return to its caller. - When `state' is non-NULL, it will
- *                return to the text location described by it. */
-__CDECLARE_XSC(,__errno_t,raiseat,(struct ucpustate32 const *__state, struct __siginfox32_struct const *__si),(__state,__si))
-#endif /* __CRT_HAVE_XSC(raiseat) */
 #if __CRT_HAVE_XSC(read)
 /* Read up to `bufsize' bytes from `fd' into `buf'
  * When  `fd' has the `O_NONBLOCK' flag set, only read as much data as was

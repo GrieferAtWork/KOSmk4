@@ -272,8 +272,8 @@ again:
 		RETHROW();
 	}
 	if unlikely(task_receiveall() != NULL) {
-		/* Signals were delivered in the mean time, and we have not have been able
-		 * to transfer  all  of  them  over to  `self->ehm_comp'.  ->  Try  again. */
+		/* Signals  were delivered in the mean time,  and we have not have been
+		 * able to transfer all of them over to `self->ehm_comp'. -> Try again. */
 		sig_multicompletion_disconnectall(&self->ehm_comp);
 		goto again;
 	}

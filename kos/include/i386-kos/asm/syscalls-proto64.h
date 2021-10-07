@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x18ae7d79 */
+/* HASH CRC-32:0xae3557d9 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -411,7 +411,6 @@
 #define __NRAC_rtm_begin                0
 #define __NRAC_userviofd                2
 #define __NRAC_coredump                 6
-#define __NRAC_raiseat                  2
 #define __NRAC_mktty                    4
 #define __NRAC_lfutexlockexpr           6
 #define __NRAC_lfutexexpr               5
@@ -821,7 +820,6 @@
 #define __NRRT_rtm_begin                (rtm_status_t, __rtm_status_t)
 #define __NRRT_userviofd                (fd_t, __fd_t)
 #define __NRRT_coredump                 (errno_t, __errno_t)
-#define __NRRT_raiseat                  (errno_t, __errno_t)
 #define __NRRT_mktty                    (fd_t, __fd_t)
 #define __NRRT_lfutexlockexpr           (errno_t, __errno_t)
 #define __NRRT_lfutexexpr               (errno_t, __errno_t)
@@ -1701,8 +1699,6 @@
 #define __NRAT3_coredump                 (size_t, __size_t)
 #define __NRAT4_coredump                 (union coredump_info64 const *, union coredump_info64 const *)
 #define __NRAT5_coredump                 (syscall_ulong_t, __syscall_ulong_t)
-#define __NRAT0_raiseat                  (struct ucpustate64 const *, struct ucpustate64 const *)
-#define __NRAT1_raiseat                  (struct __siginfox64_struct const *, struct __siginfox64_struct const *)
 #define __NRAT0_mktty                    (char const *, char const *)
 #define __NRAT1_mktty                    (fd_t, __fd_t)
 #define __NRAT2_mktty                    (fd_t, __fd_t)
@@ -2177,7 +2173,6 @@
 #define __NRAM_rtm_begin(a, b, c, d, e, f)                /* nothing */
 #define __NRAM_userviofd(a, b, c, d, e, f)                (__size_t)a, (__syscall_ulong_t)b
 #define __NRAM_coredump(a, b, c, d, e, f)                 (struct ucpustate64 const *)a, (struct ucpustate64 const *)b, (__HYBRID_PTR64(void const) const *)c, (__size_t)d, (union coredump_info64 const *)e, (__syscall_ulong_t)f
-#define __NRAM_raiseat(a, b, c, d, e, f)                  (struct ucpustate64 const *)a, (struct __siginfox64_struct const *)b
 #define __NRAM_mktty(a, b, c, d, e, f)                    (char const *)a, (__fd_t)b, (__fd_t)c, (__syscall_ulong_t)d
 #define __NRAM_lfutexlockexpr(a, b, c, d, e, f)           (__uint64_t *)a, (void *)b, (__size_t)c, (struct lfutexexprx64 const *)d, (struct __timespecx64 const *)e, (__syscall_ulong_t)f
 #define __NRAM_lfutexexpr(a, b, c, d, e, f)               (void *)a, (__size_t)b, (struct lfutexexprx64 const *)c, (struct __timespecx64 const *)d, (__syscall_ulong_t)e
@@ -2587,7 +2582,6 @@
 #define __NRAP_rtm_begin()                                /* nothing */
 #define __NRAP_userviofd(a, b)                            (__syscall_ulong_t)a, (__syscall_ulong_t)b
 #define __NRAP_coredump(a, b, c, d, e, f)                 (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e, (__syscall_ulong_t)f
-#define __NRAP_raiseat(a, b)                              (__syscall_ulong_t)a, (__syscall_ulong_t)b
 #define __NRAP_mktty(a, b, c, d)                          (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
 #define __NRAP_lfutexlockexpr(a, b, c, d, e, f)           (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e, (__syscall_ulong_t)f
 #define __NRAP_lfutexexpr(a, b, c, d, e)                  (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e

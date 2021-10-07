@@ -673,7 +673,6 @@ SC_END_ALL_NOTHROW(rtm_abort)
 
 /* TODO: sigreturn() / rt_sigreturn() */
 /* TODO: clone() */
-/* TODO: raiseat() */
 /* TODO: coredump() */
 /* TODO: sigsuspend() */
 /* TODO: rt_sigsuspend() */

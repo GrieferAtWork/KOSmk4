@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8b0cfa97 */
+/* HASH CRC-32:0xec0ace33 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1116,13 +1116,6 @@
  *                           was  never  actually  performed,  and   `reason'  is  actually  a   `siginfo_t *'
  *                           Ignored when `reason == NULL', in which case `UNWIND_SUCCESS' is assumed instead. */
 #define __NR_coredump                 __UINT64_C(0xffffffffffffffe3) /* errno_t coredump(struct ucpustate64 const *curr_state, struct ucpustate64 const *orig_state, __HYBRID_PTR64(void const) const *traceback_vector, size_t traceback_length, union coredump_info64 const *reason, syscall_ulong_t unwind_error) */
-/* Raise a signal within the calling thread alongside the given CPU state
- * This system call is used when translating exceptions into POSIX signal in error mode #4
- * @param: state: The state state at which to raise the signal, or `NULL' if the signal should
- *                be raised for the caller's source location. Note that only in the later case
- *                will this function return to its caller. - When `state' is non-NULL, it will
- *                return to the text location described by it. */
-#define __NR_raiseat                  __UINT64_C(0xffffffffffffffe4) /* errno_t raiseat(struct ucpustate64 const *state, struct __siginfox64_struct const *si) */
 /* Create and return a new tty terminal controller connected to the given keyboard and display
  * The  newly created  device automatically gets  assigned an arbitrary  device number, before
  * being made available under a file `/dev/${name}'  (or rather: as ${name} within the  devfs)
@@ -1852,7 +1845,6 @@
 #define __NRRM_rtm_begin                0
 #define __NRRM_userviofd                0
 #define __NRRM_coredump                 2
-#define __NRRM_raiseat                  2
 #define __NRRM_mktty                    0
 #define __NRRM_lfutexlockexpr           1
 #define __NRRM_lfutexexpr               1
@@ -2415,7 +2407,6 @@
 #define __NRRC_rtm_begin                0
 #define __NRRC_userviofd                2
 #define __NRRC_coredump                 6
-#define __NRRC_raiseat                  2
 #define __NRRC_mktty                    4
 #define __NRRC_lfutexlockexpr           6
 #define __NRRC_lfutexexpr               5

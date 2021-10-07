@@ -213,9 +213,57 @@
 /* void *LIBCCALL libc_handle(void); */
 #define LIBC_ARCH_HAVE_LIBC_HANDLE 1
 
-#ifdef __x86_64__
+/* ATTR_NORETURN void libc_sys_sigreturn(cpu, fpu, sigmask, sc_info); */
+#define LIBC_ARCH_HAVE_LIBC_SYS_SIGRETURN 1
+
 #ifdef __CC__
+#include <bits/types.h>
+#include <kos/asm/syscall.h>
+#ifndef __NR_rt_sigreturn
+#include <asm/syscalls.h>
+#endif /* !__NR_rt_sigreturn */
+
 DECL_BEGIN
+
+struct ucpustate;
+struct fpustate;
+struct rpc_syscall_info;
+struct __sigset_struct;
+
+/* Need special handling for sys_sigreturn() */
+LOCAL ATTR_NORETURN NONNULL((1)) void
+NOTHROW(libc_sys_sigreturn)(struct ucpustate const *restore_cpu,
+                            struct fpustate const *restore_fpu,
+                            struct __sigset_struct const *restore_sigmask,
+                            struct rpc_syscall_info const *restart_sc_info) {
+#ifdef __x86_64__
+	__register __syscall_ulong_t __r12 __asm__("%r12") = (__syscall_ulong_t)restore_sigmask;
+	__register __syscall_ulong_t __r13 __asm__("%r13") = (__syscall_ulong_t)restart_sc_info;
+	__asm__ __volatile__("movq %q1, %%rbp\n\t"
+	                     "syscall"
+	                     :
+	                     : "a" (__NR_rt_sigreturn)
+	                     , "g" (restore_cpu)
+	                     , "b" (restore_fpu)
+	                     , "r" (__r12)
+	                     , "r" (__r13)
+	                     : "memory");
+#else /* __x86_64__ */
+	__asm__ __volatile__("movl %k1, %%ebp\n\t"
+	                     "call libc___i386_syscall"
+	                     :
+	                     : "a" (__NR_rt_sigreturn)
+	                     , "g" (restore_cpu)
+	                     , "b" (restore_fpu)
+	                     , "S" (restore_sigmask)
+	                     , "D" (restart_sc_info)
+	                     : "memory", "cc");
+#endif /* !__x86_64__ */
+	__builtin_unreachable();
+}
+
+
+#ifdef __x86_64__
 #define libc_handle libc_handle
 LOCAL WUNUSED ATTR_CONST ATTR_RETNONNULL void *NOTHROW(libc_handle)(void) {
 	void *result;
@@ -231,9 +279,10 @@ LOCAL WUNUSED ATTR_CONST ATTR_RETNONNULL void *NOTHROW(libc_handle)(void) {
 	__asm__("movq current@tlsgd(%%rip), %0" : "=r" (result));
 	return result;
 }
+#endif /* __x86_64__ */
+
 DECL_END
 #endif /* __CC__ */
-#endif /* __x86_64__ */
 
 /* Arch-specific RTM optimizations do exist on x86
  * (in the form  of a  dedicated instruction  set) */

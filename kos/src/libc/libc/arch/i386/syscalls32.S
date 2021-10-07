@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x461d2ba9 */
+/* HASH CRC-32:0x204942a2 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -4325,19 +4325,6 @@ INTERN_FUNCTION(libc_sys_coredump)
 	jmp    libc_x86_exec_syscall6
 END(libc_sys_coredump)
 DEFINE_PUBLIC_ALIAS(sys_coredump, libc_sys_coredump)
-
-/* Raise a signal within the calling thread alongside the given CPU state
- * This system call is used when translating exceptions into POSIX signal in error mode #4
- * @param: state: The state state at which to raise the signal, or `NULL' if the signal should
- *                be raised for the caller's source location. Note that only in the later case
- *                will this function return to its caller. - When `state' is non-NULL, it will
- *                return to the text location described by it. */
-/* errno_t raiseat(struct ucpustate32 const *state, struct __siginfox32_struct const *si) */
-INTERN_FUNCTION(libc_sys_raiseat)
-	movl   $(0xffffffe9), %eax
-	jmp    libc_x86_exec_syscall2
-END(libc_sys_raiseat)
-DEFINE_PUBLIC_ALIAS(sys_raiseat, libc_sys_raiseat)
 
 /* Create and return a new tty terminal controller connected to the given keyboard and display
  * The  newly created  device automatically gets  assigned an arbitrary  device number, before
@@ -8835,19 +8822,6 @@ INTERN_FUNCTION(libc_sys_Xcoredump)
 	jmp    libc_x86_exec_Xsyscall6
 END(libc_sys_Xcoredump)
 DEFINE_PUBLIC_ALIAS(sys_Xcoredump, libc_sys_Xcoredump)
-
-/* Raise a signal within the calling thread alongside the given CPU state
- * This system call is used when translating exceptions into POSIX signal in error mode #4
- * @param: state: The state state at which to raise the signal, or `NULL' if the signal should
- *                be raised for the caller's source location. Note that only in the later case
- *                will this function return to its caller. - When `state' is non-NULL, it will
- *                return to the text location described by it. */
-/* errno_t raiseat(struct ucpustate32 const *state, struct __siginfox32_struct const *si) */
-INTERN_FUNCTION(libc_sys_Xraiseat)
-	movl   $(0xffffffe9), %eax
-	jmp    libc_x86_exec_Xsyscall2
-END(libc_sys_Xraiseat)
-DEFINE_PUBLIC_ALIAS(sys_Xraiseat, libc_sys_Xraiseat)
 
 /* Create and return a new tty terminal controller connected to the given keyboard and display
  * The  newly created  device automatically gets  assigned an arbitrary  device number, before

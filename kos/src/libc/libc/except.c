@@ -35,6 +35,7 @@
 #include <kos/kernel/cpu-state-helpers.h>
 #include <kos/kernel/cpu-state.h>
 #include <kos/malloc.h>
+#include <kos/rpc.h>
 #include <kos/syscalls.h>
 #include <sys/syslog.h>
 
@@ -45,6 +46,8 @@
 #include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
+#include <syscall.h>
+#include <unistd.h>
 
 #include <libunwind/dwarf.h>
 #include <libunwind/eh_frame.h>
@@ -53,6 +56,7 @@
 
 #include "dl.h"
 #include "except.h"
+#include "sigreturn.h"
 #include "tls.h"
 
 DECL_BEGIN
@@ -476,15 +480,28 @@ trigger_coredump(error_register_state_t *curr_state,
 }
 
 
-PRIVATE SECTION_EXCEPT_TEXT ATTR_NOINLINE void LIBCCALL
+PRIVATE SECTION_EXCEPT_TEXT ATTR_NOINLINE NONNULL((1, 2)) void LIBCCALL
 try_raise_signal_from_exception(error_register_state_t *__restrict state,
                                 struct exception_data *__restrict error) {
 	siginfo_t si;
 	if (error_as_signal(error, &si)) {
 		/* raise a signal `si' at `*state' */
-		struct ucpustate ust;
-		error_register_state_to_ucpustate(state, &ust);
-		sys_raiseat(&ust, &si);
+		struct ucpustate uc;
+		struct rpc_syscall_info sc_info;
+		error_register_state_to_ucpustate(state, &uc);
+
+		/* Use sigreturn(2) to execute a call to `rt_tgsigqueueinfo(2)' from `uc' */
+		memset(&sc_info, 0, sizeof(sc_info));
+		sc_info.rsi_sysno = SYS_rt_tgsigqueueinfo;
+		sc_info.rsi_flags = RPC_SYSCALL_INFO_METHOD_OTHER | RPC_SYSCALL_INFO_FEXCEPT |
+		                    RPC_SYSCALL_INFO_FREGVALID(1) | RPC_SYSCALL_INFO_FREGVALID(2) |
+		                    RPC_SYSCALL_INFO_FREGVALID(3) | RPC_SYSCALL_INFO_FREGVALID(4);
+		sc_info.rsi_regs[0] = (syscall_ulong_t)getpid();
+		sc_info.rsi_regs[1] = (syscall_ulong_t)gettid();
+		sc_info.rsi_regs[2] = (syscall_ulong_t)si.si_signo;
+		sc_info.rsi_regs[3] = (syscall_ulong_t)&si;
+		libc_sys_sigreturn(&uc, NULL, NULL, &sc_info);
+		__builtin_unreachable();
 	}
 }
 

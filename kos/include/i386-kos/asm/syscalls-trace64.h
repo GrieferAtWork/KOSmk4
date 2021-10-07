@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x730123d1 */
+/* HASH CRC-32:0x3f176d80 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -869,8 +869,6 @@
 #define __NRAN3_coredump                 traceback_length
 #define __NRAN4_coredump                 reason
 #define __NRAN5_coredump                 unwind_error
-#define __NRAN0_raiseat                  state
-#define __NRAN1_raiseat                  si
 #define __NRAN0_mktty                    name
 #define __NRAN1_mktty                    keyboard
 #define __NRAN2_mktty                    display
@@ -2284,9 +2282,6 @@
 #define __NRATR4_coredump                 SC_REPR_STRUCT_EXCEPTION_DATA64                                      /* reason */ 
 #define __NRATR5_coredump                 SC_REPR_UNWIND_ERROR                                                 /* unwind_error */ 
 #define __NRRTR_coredump                  SC_REPR_ERRNO_T                                                      /* return */
-#define __NRATR0_raiseat                  SC_REPR_STRUCT_UCPUSTATE64                                           /* state */ 
-#define __NRATR1_raiseat                  SC_REPR_STRUCT_SIGINFOX64                                            /* si */ 
-#define __NRRTR_raiseat                   SC_REPR_ERRNO_T                                                      /* return */
 #define __NRATR0_mktty                    SC_REPR_STRING                                                       /* name */ 
 #define __NRATR1_mktty                    SC_REPR_FD_T                                                         /* keyboard */ 
 #define __NRATR2_mktty                    SC_REPR_FD_T                                                         /* display */ 

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x165f6f40 */
+/* HASH CRC-32:0xbf0403b3 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -512,7 +512,6 @@
 #define __NR32AC_userviofd                    2
 #define __NR32AC_stime64                      1
 #define __NR32AC_coredump                     6
-#define __NR32AC_raiseat                      2
 #define __NR32AC_mktty                        4
 #define __NR32AC_lfutexlockexpr               6
 #define __NR32AC_lfutexexpr                   5
@@ -1017,7 +1016,6 @@
 #define __NR32RT_userviofd                    (fd_t, __fd_t)
 #define __NR32RT_stime64                      (errno_t, __errno_t)
 #define __NR32RT_coredump                     (errno_t, __errno_t)
-#define __NR32RT_raiseat                      (errno_t, __errno_t)
 #define __NR32RT_mktty                        (fd_t, __fd_t)
 #define __NR32RT_lfutexlockexpr               (errno_t, __errno_t)
 #define __NR32RT_lfutexexpr                   (errno_t, __errno_t)
@@ -2122,8 +2120,6 @@
 #define __NR32AT3_coredump                     (size_t, __size_t)
 #define __NR32AT4_coredump                     (union coredump_info32 const *, union coredump_info32 const *)
 #define __NR32AT5_coredump                     (syscall_ulong_t, __syscall_ulong_t)
-#define __NR32AT0_raiseat                      (struct ucpustate32 const *, struct ucpustate32 const *)
-#define __NR32AT1_raiseat                      (struct __siginfox32_struct const *, struct __siginfox32_struct const *)
 #define __NR32AT0_mktty                        (char const *, char const *)
 #define __NR32AT1_mktty                        (fd_t, __fd_t)
 #define __NR32AT2_mktty                        (fd_t, __fd_t)
@@ -2678,7 +2674,6 @@
 #define __NR32AM_userviofd(a, b, c, d, e, f)                    (__size_t)a, (__syscall_ulong_t)b
 #define __NR32AM_stime64(a, b, c, d, e, f)                      (__time64_t const *)a
 #define __NR32AM_coredump(a, b, c, d, e, f)                     (struct ucpustate32 const *)a, (struct ucpustate32 const *)b, (__HYBRID_PTR32(void const) const *)c, (__size_t)d, (union coredump_info32 const *)e, (__syscall_ulong_t)f
-#define __NR32AM_raiseat(a, b, c, d, e, f)                      (struct ucpustate32 const *)a, (struct __siginfox32_struct const *)b
 #define __NR32AM_mktty(a, b, c, d, e, f)                        (char const *)a, (__fd_t)b, (__fd_t)c, (__syscall_ulong_t)d
 #define __NR32AM_lfutexlockexpr(a, b, c, d, e, f)               (__uint32_t *)a, (void *)b, (__size_t)c, (struct lfutexexprx32 const *)d, (struct __timespecx32_64 const *)e, (__syscall_ulong_t)f
 #define __NR32AM_lfutexexpr(a, b, c, d, e, f)                   (void *)a, (__size_t)b, (struct lfutexexprx32 const *)c, (struct __timespecx32_64 const *)d, (__syscall_ulong_t)e
@@ -3183,7 +3178,6 @@
 #define __NR32AP_userviofd(a, b)                                (__syscall_ulong_t)a, (__syscall_ulong_t)b
 #define __NR32AP_stime64(a)                                     (__syscall_ulong_t)a
 #define __NR32AP_coredump(a, b, c, d, e, f)                     (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e, (__syscall_ulong_t)f
-#define __NR32AP_raiseat(a, b)                                  (__syscall_ulong_t)a, (__syscall_ulong_t)b
 #define __NR32AP_mktty(a, b, c, d)                              (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
 #define __NR32AP_lfutexlockexpr(a, b, c, d, e, f)               (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e, (__syscall_ulong_t)f
 #define __NR32AP_lfutexexpr(a, b, c, d, e)                      (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e

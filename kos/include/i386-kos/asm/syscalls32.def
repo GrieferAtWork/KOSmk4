@@ -163,7 +163,6 @@ utimensat = utimensatx32;
 utimensat_time64 = utimensatx32_64;
 rt_sigqueueinfo = rt_sigqueueinfox32;
 rt_tgsigqueueinfo = rt_tgsigqueueinfox32;
-raiseat = raiseatx32;
 coredump = coredumpx32;
 lfutexexpr = lfutexexprx32_64;
 lfutexlockexpr = lfutexlockexprx32_64;
@@ -686,7 +685,7 @@ select64 = selectx32_64;
 -0x00000014:lfutexexpr
 -0x00000015:lfutexlockexpr
 -0x00000016:mktty
--0x00000017:raiseat
+/*x00000017:...*/
 -0x00000018:coredump
 -0x00000019:stime64
 /*x0000001a:...*/

@@ -30,6 +30,7 @@
 #include <kos/debugtrap.h>
 #include <kos/kernel/cpu-state-helpers.h>
 #include <kos/kernel/cpu-state.h>
+#include <kos/rpc.h>
 #include <kos/syscalls.h>
 #include <sys/ioctl.h>
 #include <sys/syslog.h>
@@ -40,12 +41,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <syscall.h>
 #include <termio.h>
 #include <unistd.h>
 
 #include <libunwind/api.h> /* UNWIND_USER_ABORT */
 
 #include "assert.h"
+#include "sigreturn.h"
 
 
 DECL_BEGIN
@@ -101,12 +104,13 @@ NOTHROW(FCALL libc_stack_failure_core)(struct kcpustate *__restrict state) {
 }
 
 
-/* If a custom signal handler for SIGABRT has been set,
- * sys_raiseat(2) that  signal  at  the  given  `state' */
+/* If  a custom signal handler for SIGABRT was
+ * set, raise that signal at the given `state' */
 PRIVATE ATTR_NOINLINE ATTR_SECTION(".text.crt.assert") NONNULL((1)) void FCALL
 maybe_raise_SIGABRT(struct kcpustate *__restrict state) {
 	struct sigaction sa;
 	struct ucpustate uc;
+	struct rpc_syscall_info sc_info;
 	siginfo_t si;
 	if (sys_rt_sigaction(SIGABRT, NULL, &sa, sizeof(sigset_t)) != EOK)
 		return; /* Shouldn't happen */
@@ -137,18 +141,26 @@ maybe_raise_SIGABRT(struct kcpustate *__restrict state) {
 	memset(&si, 0, sizeof(si));
 	si.si_signo = SIGABRT;
 	si.si_code  = SI_USER;
-	sys_raiseat(&uc, &si);
 
-	/* Probably shouldn't get here, but if we do, we'll just
-	 * end up triggering a coredump anyways, which is pretty
-	 * much all we can even do at this point. */
+	/* Use sigreturn(2) to execute a call to `rt_tgsigqueueinfo(2)' from `uc' */
+	memset(&sc_info, 0, sizeof(sc_info));
+	sc_info.rsi_sysno = SYS_rt_tgsigqueueinfo;
+	sc_info.rsi_flags = RPC_SYSCALL_INFO_METHOD_OTHER | RPC_SYSCALL_INFO_FEXCEPT |
+	                    RPC_SYSCALL_INFO_FREGVALID(1) | RPC_SYSCALL_INFO_FREGVALID(2) |
+	                    RPC_SYSCALL_INFO_FREGVALID(3) | RPC_SYSCALL_INFO_FREGVALID(4);
+	sc_info.rsi_regs[0] = (syscall_ulong_t)getpid();
+	sc_info.rsi_regs[1] = (syscall_ulong_t)gettid();
+	sc_info.rsi_regs[2] = (syscall_ulong_t)si.si_signo;
+	sc_info.rsi_regs[3] = (syscall_ulong_t)&si;
+	libc_sys_sigreturn(&uc, NULL, NULL, &sc_info);
+	__builtin_unreachable();
 }
 
 INTERN ABNORMAL_RETURN ATTR_COLD ATTR_NORETURN ATTR_SECTION(".text.crt.assert") NONNULL((1)) void
 NOTHROW(FCALL libc_abort_failure_core)(struct kcpustate *__restrict state) {
 	/* If the user has defined a custom sigaction for `SIGABRT',
 	 * then instead of directly  triggering a coredump, we  must
-	 * sys_raiseat(2) that signal at the given `state'! */
+	 * raise that signal at the given `state'! */
 	maybe_raise_SIGABRT(state);
 
 	/* Normal abort handling. */

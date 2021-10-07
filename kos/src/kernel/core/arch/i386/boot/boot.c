@@ -765,10 +765,6 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *       thread in this  case) is ready,  which would  get rid of  the risk  of
 	 *       the send operation running into an E_BADALLOC error. */
 
-	/* TODO: The raiseat(2) system call should be removed. Instead, it can be emulated
-	 *       by  chaining `sigreturn(2)' with  `rt_tgsigqueueinfo(2)', where the later
-	 *       is made to point at the calling thread. */
-
 	/* TODO: `sigprocmask(2)' needs special handling  to not needlessly modify  the
 	 *       userprocmask (if set). Needed since the userprocmask may be read-only,
 	 *       in which case sigprocmask() must only attempt to modify it when a  new
@@ -791,6 +787,10 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *       passed to `unwind(3)'  really can't  use the  same buffer  for getters  and
 	 *       setters already (if you try, it'll fail to unwind in certain  GCC-generated
 	 *       functions). As such, unwind order is 100% unnecessary bloat. */
+
+	/* TODO: Add support for epoll controllers to `(task|proc)_rpc_schedule()' when an
+	 *       event becomes triggered. That's really all that's needed to have RPCs  be
+	 *       executed as the result of _ANY_ pollable event being triggered! */
 
 	return state;
 }
