@@ -188,7 +188,7 @@ NOTHROW(KCALL ioctl_complete_exception_info)(unsigned int fd) {
 	switch (code) {
 
 	case ERROR_CODEOF(E_INVALID_HANDLE_OPERATION):
-		if (!PERTASK_GET(this_exception_args.e_invalid_handle.ih_fd)) /* fd */
+		if (!PERTASK_TEST(this_exception_args.e_invalid_handle.ih_fd)) /* fd */
 			PERTASK_SET(this_exception_args.e_invalid_handle.ih_fd, fd);
 		break;
 
@@ -327,8 +327,9 @@ DEFINE_SYSCALL3(syscall_slong_t, ioctl,
 		                      arg);
 	} EXCEPT {
 		if (was_thrown(E_INVALID_ARGUMENT_UNKNOWN_COMMAND) &&
-		    PERTASK_GET(this_exception_args.e_invalid_argument.ia_context) == E_INVALID_ARGUMENT_CONTEXT_IOCTL_COMMAND) {
-			TRY {
+		    PERTASK_EQ(this_exception_args.e_invalid_argument.ia_context,
+		               E_INVALID_ARGUMENT_CONTEXT_IOCTL_COMMAND)) {
+			NESTED_TRY {
 				if (ioctl_generic(command, fd, &hand, arg, &result))
 					goto done;
 			} EXCEPT {
@@ -365,8 +366,9 @@ DEFINE_SYSCALL4(syscall_slong_t, ioctlf,
 		                       mode);
 	} EXCEPT {
 		if (was_thrown(E_INVALID_ARGUMENT_UNKNOWN_COMMAND) &&
-		    PERTASK_GET(this_exception_args.e_invalid_argument.ia_context) == E_INVALID_ARGUMENT_CONTEXT_IOCTL_COMMAND) {
-			TRY {
+		    PERTASK_EQ(this_exception_args.e_invalid_argument.ia_context,
+		               E_INVALID_ARGUMENT_CONTEXT_IOCTL_COMMAND)) {
+			NESTED_TRY {
 				if (ioctl_generic(command, fd, &hand, arg, &result))
 					goto done;
 			} EXCEPT {
@@ -1325,16 +1327,17 @@ NOTHROW(KCALL hop_complete_exception_info)(struct handle *__restrict hand,
 	switch (code) {
 
 	case ERROR_CODEOF(E_INVALID_HANDLE_FILETYPE):
-		if (!PERTASK_GET(this_exception_args.e_invalid_handle.ih_fd))
+		if (!PERTASK_TEST(this_exception_args.e_invalid_handle.ih_fd))
 			PERTASK_SET(this_exception_args.e_invalid_handle.ih_fd, fd);
-		if (!PERTASK_GET(this_exception_args.e_invalid_handle.ih_filetype.f_actual_handle_type))
+		if (!PERTASK_TEST(this_exception_args.e_invalid_handle.ih_filetype.f_actual_handle_type))
 			PERTASK_SET(this_exception_args.e_invalid_handle.ih_filetype.f_actual_handle_type, hand->h_type);
-		if (!PERTASK_GET(this_exception_args.e_invalid_handle.ih_filetype.f_actual_handle_kind))
+		if (!PERTASK_TEST(this_exception_args.e_invalid_handle.ih_filetype.f_actual_handle_kind))
 			PERTASK_SET(this_exception_args.e_invalid_handle.ih_filetype.f_actual_handle_kind, handle_typekind(hand));
 		break;
 
 	case ERROR_CODEOF(E_INVALID_ARGUMENT_UNKNOWN_COMMAND):
-		if (PERTASK_GET(this_exception_args.e_invalid_argument.ia_context) != E_INVALID_ARGUMENT_CONTEXT_HOP_COMMAND)
+		if (PERTASK_NE(this_exception_args.e_invalid_argument.ia_context,
+		               E_INVALID_ARGUMENT_CONTEXT_HOP_COMMAND))
 			break;
 		if ((hop_command >> 16) == HANDLE_TYPE_UNDEFINED ||
 		    (hop_command >> 16) >= HANDLE_TYPE_COUNT)

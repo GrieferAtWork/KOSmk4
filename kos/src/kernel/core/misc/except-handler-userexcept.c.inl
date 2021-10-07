@@ -93,9 +93,9 @@ NOTHROW(FCALL userexcept_sysret)(struct icpustate *__restrict state)
 #define ctx (*(struct rpc_context *)_ctxbuf)
 #endif /* !LOCAL_IS_SYSRET */
 
-	assertf(PERTASK_GET(this_exception_info.ei_flags) == EXCEPT_FNORMAL,
+	assertf(PERTASK_EQ(this_exception_info.ei_flags, EXCEPT_FNORMAL),
 	        "Unexpected exception flags");
-	assertf(PERTASK_GET(this_exception_info.ei_nesting) == 0,
+	assertf(PERTASK_EQ(this_exception_info.ei_nesting, 0),
 	        "There are still saved, nested exception somewhere on our stack");
 	assertf(PREEMPTION_ENABLED(),
 	        "Preemption must be enabled to propagate exceptions to user-space.");

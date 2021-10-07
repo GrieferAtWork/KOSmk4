@@ -148,8 +148,8 @@ socket_isconnected(struct socket *__restrict self) {
 	} EXCEPT {
 		task_popconnections();
 		if (was_thrown(E_INVALID_ARGUMENT_BAD_STATE) &&
-		    PERTASK_GET(this_exception_args.e_invalid_argument.ia_context) ==
-		    E_INVALID_ARGUMENT_CONTEXT_GETPEERNAME_NOT_CONNECTED)
+		    PERTASK_EQ(this_exception_args.e_invalid_argument.ia_context,
+		               E_INVALID_ARGUMENT_CONTEXT_GETPEERNAME_NOT_CONNECTED))
 			return false; /* Not connected. */
 		RETHROW();
 	}
@@ -1595,17 +1595,17 @@ return_intval:
 				                                   optval, optlen, mode);
 				if (result != 0)
 					goto done;
-				if (!PERTASK_GET(this_exception_args.e_invalid_argument.ia_context))
+				if (!PERTASK_TEST(this_exception_args.e_invalid_argument.ia_context))
 					PERTASK_SET(this_exception_args.e_invalid_argument.ia_context, E_INVALID_ARGUMENT_CONTEXT_GETSOCKOPT);
-				if (!PERTASK_GET(this_exception_args.e_invalid_argument.ia_socket_opt.so_level))
+				if (!PERTASK_TEST(this_exception_args.e_invalid_argument.ia_socket_opt.so_level))
 					PERTASK_SET(this_exception_args.e_invalid_argument.ia_socket_opt.so_level, level);
-				if (!PERTASK_GET(this_exception_args.e_invalid_argument.ia_socket_opt.so_optname))
+				if (!PERTASK_TEST(this_exception_args.e_invalid_argument.ia_socket_opt.so_optname))
 					PERTASK_SET(this_exception_args.e_invalid_argument.ia_socket_opt.so_optname, optname);
-				if (!PERTASK_GET(this_exception_args.e_invalid_argument.ia_socket_opt.so_address_family))
+				if (!PERTASK_TEST(this_exception_args.e_invalid_argument.ia_socket_opt.so_address_family))
 					PERTASK_SET(this_exception_args.e_invalid_argument.ia_socket_opt.so_address_family, socket_getfamily(self));
-				if (!PERTASK_GET(this_exception_args.e_invalid_argument.ia_socket_opt.so_socket_type))
+				if (!PERTASK_TEST(this_exception_args.e_invalid_argument.ia_socket_opt.so_socket_type))
 					PERTASK_SET(this_exception_args.e_invalid_argument.ia_socket_opt.so_socket_type, socket_gettype(self));
-				if (!PERTASK_GET(this_exception_args.e_invalid_argument.ia_socket_opt.so_protocol))
+				if (!PERTASK_TEST(this_exception_args.e_invalid_argument.ia_socket_opt.so_protocol))
 					PERTASK_SET(this_exception_args.e_invalid_argument.ia_socket_opt.so_protocol, socket_getprotocol(self));
 			}
 			RETHROW();
@@ -1834,17 +1834,17 @@ socket_setsockopt(struct socket *__restrict self,
 			                                    optval, optlen, mode);
 		} EXCEPT {
 			if (was_thrown(E_INVALID_ARGUMENT_SOCKET_OPT)) {
-				if (!PERTASK_GET(this_exception_args.e_invalid_argument.ia_context))
+				if (!PERTASK_TEST(this_exception_args.e_invalid_argument.ia_context))
 					PERTASK_SET(this_exception_args.e_invalid_argument.ia_context, E_INVALID_ARGUMENT_CONTEXT_SETSOCKOPT);
-				if (!PERTASK_GET(this_exception_args.e_invalid_argument.ia_socket_opt.so_level))
+				if (!PERTASK_TEST(this_exception_args.e_invalid_argument.ia_socket_opt.so_level))
 					PERTASK_SET(this_exception_args.e_invalid_argument.ia_socket_opt.so_level, level);
-				if (!PERTASK_GET(this_exception_args.e_invalid_argument.ia_socket_opt.so_optname))
+				if (!PERTASK_TEST(this_exception_args.e_invalid_argument.ia_socket_opt.so_optname))
 					PERTASK_SET(this_exception_args.e_invalid_argument.ia_socket_opt.so_optname, optname);
-				if (!PERTASK_GET(this_exception_args.e_invalid_argument.ia_socket_opt.so_address_family))
+				if (!PERTASK_TEST(this_exception_args.e_invalid_argument.ia_socket_opt.so_address_family))
 					PERTASK_SET(this_exception_args.e_invalid_argument.ia_socket_opt.so_address_family, socket_getfamily(self));
-				if (!PERTASK_GET(this_exception_args.e_invalid_argument.ia_socket_opt.so_socket_type))
+				if (!PERTASK_TEST(this_exception_args.e_invalid_argument.ia_socket_opt.so_socket_type))
 					PERTASK_SET(this_exception_args.e_invalid_argument.ia_socket_opt.so_socket_type, socket_gettype(self));
-				if (!PERTASK_GET(this_exception_args.e_invalid_argument.ia_socket_opt.so_protocol))
+				if (!PERTASK_TEST(this_exception_args.e_invalid_argument.ia_socket_opt.so_protocol))
 					PERTASK_SET(this_exception_args.e_invalid_argument.ia_socket_opt.so_protocol, socket_getprotocol(self));
 			}
 			RETHROW();

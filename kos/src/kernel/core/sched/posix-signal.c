@@ -683,7 +683,7 @@ PRIVATE ATTR_USED void KCALL
 clone_posix_signals(struct task *__restrict new_thread, uintptr_t flags) {
 	/* Clone the current signal mask. */
 #ifdef CONFIG_HAVE_USERPROCMASK
-	if (PERTASK_GET(this_task.t_flags) & TASK_FUSERPROCMASK) {
+	if (PERTASK_TESTMASK(this_task.t_flags, TASK_FUSERPROCMASK)) {
 		struct userprocmask *um;
 		um = PERTASK_GET(this_userprocmask_address);
 		if (!(flags & CLONE_VM)) {
@@ -769,7 +769,7 @@ inherit_parent_userprocmask:
 			myptr->sp_refcnt = 2;
 			atomic_rwlock_init(&myptr->sp_lock);
 			myptr->sp_hand = NULL;
-			assert(!PERTASK_GET(this_sighand_ptr));
+			assert(!PERTASK_TEST(this_sighand_ptr));
 			PERTASK_SET(this_sighand_ptr, myptr);
 		} else {
 			incref(myptr);
@@ -838,7 +838,7 @@ NOTHROW(KCALL fini_posix_signals)(struct task *__restrict thread) {
 #ifdef CONFIG_HAVE_USERPROCMASK
 PUBLIC WUNUSED USER CHECKED sigset_t const *KCALL
 sigmask_getrd(void) THROWS(E_SEGFAULT) {
-	if (PERTASK_GET(this_task.t_flags) & TASK_FUSERPROCMASK) {
+	if (PERTASK_TESTMASK(this_task.t_flags, TASK_FUSERPROCMASK)) {
 		USER CHECKED sigset_t *result;
 		result = ATOMIC_READ(PERTASK_GET(this_userprocmask_address)->pm_sigmask);
 		validate_readable(result, sizeof(sigset_t));
@@ -886,7 +886,7 @@ sigmask_kernel_getwr(void) THROWS(E_BADALLOC) {
 PUBLIC WUNUSED USER CHECKED sigset_t *KCALL
 sigmask_getwr(void) THROWS(E_BADALLOC, E_SEGFAULT, ...) {
 	USER CHECKED sigset_t *result;
-	if (PERTASK_GET(this_task.t_flags) & TASK_FUSERPROCMASK) {
+	if (PERTASK_TESTMASK(this_task.t_flags, TASK_FUSERPROCMASK)) {
 		result = ATOMIC_READ(PERTASK_GET(this_userprocmask_address)->pm_sigmask);
 		validate_readwrite(result, sizeof(sigset_t));
 	} else {
@@ -2040,7 +2040,7 @@ INTERN void KCALL onexec_posix_signals_reset_action(void) {
 				hand = sighand_ptr_lockread(handptr);
 			} EXCEPT {
 				kfree(newhand);
-				assert(!PERTASK_GET(this_sighand_ptr));
+				assert(!PERTASK_TEST(this_sighand_ptr));
 				PERTASK_SET(this_sighand_ptr, handptr);
 				RETHROW();
 			}
@@ -2075,7 +2075,7 @@ INTERN void KCALL onexec_posix_signals_reset_action(void) {
 			} EXCEPT {
 				kfree(newhand);
 				decref(handptr);
-				assert(!PERTASK_GET(this_sighand_ptr));
+				assert(!PERTASK_TEST(this_sighand_ptr));
 				PERTASK_SET(this_sighand_ptr, handptr);
 				RETHROW();
 			}
@@ -2084,7 +2084,7 @@ INTERN void KCALL onexec_posix_signals_reset_action(void) {
 			handptr->sp_hand = newhand; /* Inherit reference */
 			sync_endwrite(&handptr->sp_lock);
 			/* Restore the old hand-pointer for the calling thread. */
-			assert(!PERTASK_GET(this_sighand_ptr));
+			assert(!PERTASK_TEST(this_sighand_ptr));
 			PERTASK_SET(this_sighand_ptr, handptr);
 			/* Now that we're  using `newhand',  drop
 			 * our shared reference from the original */
@@ -2098,14 +2098,14 @@ INTERN void KCALL onexec_posix_signals_reset_action(void) {
 			} EXCEPT {
 				kfree(newhand);
 				decref(handptr);
-				assert(!PERTASK_GET(this_sighand_ptr));
+				assert(!PERTASK_TEST(this_sighand_ptr));
 				PERTASK_SET(this_sighand_ptr, handptr);
 				RETHROW();
 			}
 			newhandptr->sp_refcnt = 1;
 			atomic_rwlock_init(&newhandptr->sp_lock);
 			newhandptr->sp_hand = newhand; /* Inherit reference */
-			assert(!PERTASK_GET(this_sighand_ptr));
+			assert(!PERTASK_TEST(this_sighand_ptr));
 			PERTASK_SET(this_sighand_ptr, newhandptr); /* Inherit reference */
 done_handptr:
 			decref(handptr);
@@ -3158,7 +3158,7 @@ DEFINE_SYSCALL4(errno_t, rt_sigprocmask, syscall_ulong_t, how,
 			 * retain  it, we may improve the chances of
 			 * not having to do any modifications. */
 #ifdef CONFIG_HAVE_USERPROCMASK
-			if (PERTASK_GET(this_task.t_flags) & TASK_FUSERPROCMASK) {
+			if (PERTASK_TESTMASK(this_task.t_flags, TASK_FUSERPROCMASK)) {
 				if (sigismember(mymask, SIGKILL))
 					sigaddset(&newmask, SIGKILL);
 				if (sigismember(mymask, SIGSTOP))

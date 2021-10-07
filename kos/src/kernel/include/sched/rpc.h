@@ -112,7 +112,7 @@ task_rpc_userunwind(prpc_exec_callback_t func, void *cookie DFL(__NULLPTR))
  *                 preemption was re-enabled if it was disabled before.
  * @return: false: No  RPC needed to be served, and preemption
  *                 remains disabled if it was disabled before. */
-FUNDEF bool FCALL task_serve(void) THROWS(E_INTERRUPT_USER_RPC, ...);
+FUNDEF bool (FCALL task_serve)(void) THROWS(E_INTERRUPT_USER_RPC, ...);
 
 /* Arch-specific function:
  * Same as `task_serve()', but only sevice RPCs that were scheduled as no-throw.
@@ -137,6 +137,16 @@ task_serve_with_icpustate_and_sigmask(struct icpustate *__restrict state,
 		THROWS(E_INTERRUPT_USER_RPC, ...);
 FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) struct icpustate *
 NOTHROW(FCALL task_serve_with_icpustate_nx)(struct icpustate *__restrict state);
+
+#if !defined(__OPTIMIZE_SIZE__) && !defined(__INTELLISENSE__)
+DECL_END
+#include <sched/task.h>
+#include <sched/pertask.h>
+DECL_BEGIN
+/* Inline optimizations for task service calls: when `TASK_FRPC' isn't set, serve calls are no-ops. */
+#define task_serve()    (PERTASK_TESTMASK(((struct task *)0)->t_flags, TASK_FRPC) && (task_serve)())
+#define task_serve_nx() (PERTASK_TESTMASK(((struct task *)0)->t_flags, TASK_FRPC) ? (task_serve_nx)() : TASK_SERVE_NX_NORMAL)
+#endif /* !__OPTIMIZE_SIZE__ && !__INTELLISENSE__ */
 
 #endif /* __CC__ */
 

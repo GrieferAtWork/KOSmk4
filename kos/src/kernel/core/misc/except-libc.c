@@ -55,7 +55,7 @@ NOTHROW_NCX(LIBCCALL libc_error_code)(void) {
 
 INTERN ATTR_PURE WUNUSED bool
 NOTHROW_NCX(LIBCCALL libc_error_active)(void) {
-	return PERTASK_GET(this_exception_code) != E_OK;
+	return PERTASK_NE(this_exception_code, ERROR_CODEOF(E_OK));
 }
 
 INTERN ATTR_PURE WUNUSED error_class_t

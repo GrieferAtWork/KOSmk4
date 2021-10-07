@@ -78,7 +78,7 @@ NOTHROW(FCALL syscall_info_amend_FEXCEPT)(struct rpc_syscall_info *__restrict se
 	if ((void *)ucpustate_getpc(ustate) == (void *)&x86_userexcept_sysret) {
 		assert(!(self->rsi_flags & RPC_SYSCALL_INFO_FEXCEPT));
 		assert(ucpustate_getpflags(ustate) == 0);
-		if (PERTASK_GET(this_x86_sysret_iret.ir_Pflags) & EFLAGS_DF)
+		if (PERTASK_TESTMASK(this_x86_sysret_iret.ir_Pflags, EFLAGS_DF))
 			self->rsi_flags |= RPC_SYSCALL_INFO_FEXCEPT;
 	}
 }

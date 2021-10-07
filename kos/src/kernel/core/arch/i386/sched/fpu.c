@@ -139,14 +139,14 @@ NOTHROW(KCALL fpustate_free)(struct fpustate *__restrict self) {
 /* Ensure that `this_fpustate' has been allocated, allocating
  * and   initializing   it   now   if   it   hasn't  already. */
 PUBLIC void KCALL fpustate_init(void) THROWS(E_BADALLOC) {
-	if (PERTASK_GET(this_fpustate))
+	if (PERTASK_TEST(this_fpustate))
 		return;
 	PERTASK_SET(this_fpustate, fpustate_alloc());
 }
 
 PUBLIC WUNUSED bool NOTHROW(KCALL fpustate_init_nx)(void) {
 	struct fpustate *state;
-	if (PERTASK_GET(this_fpustate))
+	if (PERTASK_TEST(this_fpustate))
 		return true;
 	state = fpustate_alloc_nx();
 	if unlikely(!state)
@@ -167,7 +167,7 @@ PUBLIC NOBLOCK void NOTHROW(KCALL fpustate_save)(void) {
 	if (PERCPU(thiscpu_fputhread) == THIS_TASK) {
 		__clts();
 		/* The FPU state was changed. */
-		assert(PERTASK_GET(this_fpustate));
+		assert(PERTASK_TEST(this_fpustate));
 		x86_fpustate_save(PERTASK_GET(this_fpustate));
 		__wrcr0(__rdcr0() | CR0_TS);
 		PERCPU(thiscpu_fputhread) = NULL;
@@ -246,7 +246,7 @@ PUBLIC NOBLOCK /*WUNUSED*/ USER CHECKED struct fpustate *KCALL
 fpustate_saveinto(USER CHECKED struct fpustate *state)
 		THROWS(E_SEGFAULT) {
 	assert(((uintptr_t)state & 1) == 0);
-	if (!PERTASK_GET(this_fpustate)) {
+	if (!PERTASK_TEST(this_fpustate)) {
 		memset(state, 0, SIZEOF_FPUSTATE);
 		x86_fpustate_init(state);
 		return state;

@@ -1424,7 +1424,8 @@ continue_reading:
 			/* Catch E_IOERROR_BADBOUNDS and handle it as end-of-directory. */
 			result = NULL;
 		} else if (code == E_FSERROR_UNSUPPORTED_OPERATION &&
-		           PERTASK_GET(this_exception_args.e_fserror.f_unsupported_operation.uo_operation_id) == E_FILESYSTEM_OPERATION_READDIR) {
+		           PERTASK_EQ(this_exception_args.e_fserror.f_unsupported_operation.uo_operation_id,
+		                      E_FILESYSTEM_OPERATION_READDIR)) {
 			goto set_unimplemented;
 		} else {
 			RETHROW();
@@ -1553,7 +1554,8 @@ continue_reading:
 			/* Catch E_IOERROR_BADBOUNDS and handle it as end-of-directory. */
 			result = NULL;
 		} else if (code == E_FSERROR_UNSUPPORTED_OPERATION &&
-		           PERTASK_GET(this_exception_args.e_fserror.f_unsupported_operation.uo_operation_id) == E_FILESYSTEM_OPERATION_READDIR) {
+		           PERTASK_EQ(this_exception_args.e_fserror.f_unsupported_operation.uo_operation_id,
+		                      E_FILESYSTEM_OPERATION_READDIR)) {
 			goto set_unimplemented;
 		} else {
 			RETHROW();
@@ -1675,7 +1677,8 @@ directory_getentry(struct directory_node *__restrict self,
 			if (code == ERROR_CODEOF(E_FSERROR_FILE_NOT_FOUND))
 				return NULL;
 			if (code != ERROR_CODEOF(E_FSERROR_UNSUPPORTED_OPERATION) ||
-			    PERTASK_GET(this_exception_args.e_fserror.f_unsupported_operation.uo_operation_id) != E_FILESYSTEM_OPERATION_READDIR)
+			    PERTASK_NE(this_exception_args.e_fserror.f_unsupported_operation.uo_operation_id,
+			               E_FILESYSTEM_OPERATION_READDIR))
 				RETHROW();
 		}
 	}
@@ -1735,7 +1738,8 @@ directory_getcaseentry(struct directory_node *__restrict self,
 			if (code == ERROR_CODEOF(E_FSERROR_FILE_NOT_FOUND))
 				return NULL;
 			if (code != ERROR_CODEOF(E_FSERROR_UNSUPPORTED_OPERATION) ||
-			    PERTASK_GET(this_exception_args.e_fserror.f_unsupported_operation.uo_operation_id) != E_FILESYSTEM_OPERATION_READDIR)
+			    PERTASK_NE(this_exception_args.e_fserror.f_unsupported_operation.uo_operation_id,
+			               E_FILESYSTEM_OPERATION_READDIR))
 				RETHROW();
 		}
 	}
@@ -1820,7 +1824,8 @@ directory_getentry_p(struct directory_node *__restrict self,
 			if (code == ERROR_CODEOF(E_FSERROR_FILE_NOT_FOUND))
 				return NULL;
 			if (code != ERROR_CODEOF(E_FSERROR_UNSUPPORTED_OPERATION) ||
-			    PERTASK_GET(this_exception_args.e_fserror.f_unsupported_operation.uo_operation_id) != E_FILESYSTEM_OPERATION_READDIR)
+			    PERTASK_NE(this_exception_args.e_fserror.f_unsupported_operation.uo_operation_id,
+			               E_FILESYSTEM_OPERATION_READDIR))
 				RETHROW();
 			result = NULL;
 		}
@@ -1884,7 +1889,8 @@ directory_getcaseentry_p(struct directory_node *__restrict self,
 			if (code == ERROR_CODEOF(E_FSERROR_FILE_NOT_FOUND))
 				return NULL;
 			if (code != ERROR_CODEOF(E_FSERROR_UNSUPPORTED_OPERATION) ||
-			    PERTASK_GET(this_exception_args.e_fserror.f_unsupported_operation.uo_operation_id) != E_FILESYSTEM_OPERATION_READDIR)
+			    PERTASK_NE(this_exception_args.e_fserror.f_unsupported_operation.uo_operation_id,
+			               E_FILESYSTEM_OPERATION_READDIR))
 				RETHROW();
 			result = NULL;
 		}

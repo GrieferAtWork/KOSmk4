@@ -123,7 +123,7 @@ THROWS(E_SEGFAULT) {
 	sigdelset(&newmask, SIGSTOP);
 
 #ifdef CONFIG_HAVE_USERPROCMASK
-	if (PERTASK_GET(this_task.t_flags) & TASK_FUSERPROCMASK) {
+	if (PERTASK_TESTMASK(this_task.t_flags, TASK_FUSERPROCMASK)) {
 		unsigned int i;
 		USER UNCHECKED sigset_t *umask;
 		umask = ATOMIC_READ(PERTASK_GET(this_userprocmask_address)->pm_sigmask);

@@ -104,9 +104,9 @@ DATDEF __UINTPTR_TYPE__ ___this_cpu ASMNAME("this_cpu");
 DECL_END
 #endif /* !PERCPU */
 
-#ifndef PERTASK_TEST
-#define PERTASK_TEST(x) (!!PERTASK_GET(x))
-#endif /* !PERTASK_TEST */
+#ifndef PERTASK_TESTMASK
+#define PERTASK_TESTMASK(x, v) ((PERTASK_GET(x) & (v)) != 0)
+#endif /* !PERTASK_TESTMASK */
 #ifndef PERTASK_INC
 #define PERTASK_INC(x) (void)++PERTASK(x)
 #endif /* !PERTASK_INC */
@@ -125,6 +125,9 @@ DECL_END
 #endif /* !PERTASK_NE */
 #endif /* PERTASK_EQ */
 
+#ifndef PERTASK_TEST
+#define PERTASK_TEST(x) PERTASK_NE(x, 0)
+#endif /* !PERTASK_TEST */
 
 #endif /* __CC__ */
 

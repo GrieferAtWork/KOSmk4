@@ -85,7 +85,7 @@ The `task_serve()` functions returns `true` when it re-enabled preemption and (p
 bool task_serve(void) THROWS(E_INTERRUPT_USER_RPC, ...) {
 	bool result;
 	struct icpustate *state;
-	if (!(PERTASK_GET(this_task.t_flags) & TASK_FRPC))
+	if (!PERTASK_TESTMASK(this_task.t_flags, TASK_FRPC))
 		return false;
 	state = ...; /* Custom assembly */
 	state = task_serve_with_icpustate(state);

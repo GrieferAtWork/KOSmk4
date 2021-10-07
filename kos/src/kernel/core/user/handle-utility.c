@@ -540,7 +540,7 @@ PRIVATE ATTR_COLD ATTR_NOINLINE ATTR_NORETURN void FCALL
 handle_getas_complete_except(unsigned int fd)
 		THROWS(...) {
 	if (was_thrown(E_INVALID_HANDLE_FILETYPE)) {
-		if (!PERTASK_GET(this_exception_args.e_invalid_handle.ih_fd))
+		if (!PERTASK_TEST(this_exception_args.e_invalid_handle.ih_fd))
 			PERTASK_SET(this_exception_args.e_invalid_handle.ih_fd, fd);
 	}
 	RETHROW();

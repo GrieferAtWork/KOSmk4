@@ -496,9 +496,9 @@ terminate_app:
 	process_exit_for_exception_after_coredump(&error->ei_data);
 	__builtin_unreachable();
 done:
-	assert(PERTASK_GET(this_exception_info.ei_code) == ERROR_CODEOF(E_OK));
-	assert(PERTASK_GET(this_exception_info.ei_flags) == EXCEPT_FNORMAL);
-	assert(PERTASK_GET(this_exception_info.ei_nesting) == 0);
+	assert(PERTASK_EQ(this_exception_info.ei_code, ERROR_CODEOF(E_OK)));
+	assert(PERTASK_EQ(this_exception_info.ei_flags, EXCEPT_FNORMAL));
+	assert(PERTASK_EQ(this_exception_info.ei_nesting, 0));
 	assert(PREEMPTION_ENABLED());
 	return result;
 }
@@ -1094,8 +1094,8 @@ NOTHROW(FCALL libc_error_unwind)(struct kcpustate *__restrict state) {
 	unwind_fde_t fde;
 	struct kcpustate old_state;
 	void const *pc;
-	assertf(PERTASK_GET(this_exception_info.ei_code) != ERROR_CODEOF(E_OK) ||
-	        PERTASK_GET(this_exception_info.ei_nesting) != 0,
+	assertf(PERTASK_NE(this_exception_info.ei_code, ERROR_CODEOF(E_OK)) ||
+	        PERTASK_NE(this_exception_info.ei_nesting, 0),
 	        "In error_unwind(), but no exception set");
 
 search_fde:
@@ -1272,11 +1272,11 @@ search_fde:
 
 #if EXCEPT_BACKTRACE_SIZE != 0
 	/* Remember the current state PC as a new entry in the exception's traceback. */
-	if (PERTASK_GET(this_exception_trace[EXCEPT_BACKTRACE_SIZE - 1]) == NULL) {
+	if (PERTASK_EQ(this_exception_trace[EXCEPT_BACKTRACE_SIZE - 1], NULL)) {
 #if EXCEPT_BACKTRACE_SIZE > 1
 		unsigned int i;
 		for (i = 0; i < EXCEPT_BACKTRACE_SIZE - 1; ++i) {
-			if (!PERTASK_GET(this_exception_trace[i]))
+			if (!PERTASK_TEST(this_exception_trace[i]))
 				break;
 		}
 		PERTASK_SET(this_exception_trace[i], kcpustate_getpc(state));

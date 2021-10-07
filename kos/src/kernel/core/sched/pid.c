@@ -2124,7 +2124,7 @@ posix_waitfor(idtype_t which,
 #else /* __INTELLISENSE__ */
 #define mygroup FORTASK(proc, this_taskgroup)
 #endif /* !__INTELLISENSE__ */
-	assert(!(PERTASK_GET(this_task.t_flags) & TASK_FKERNTHREAD));
+	assert(!PERTASK_TESTMASK(this_task.t_flags, TASK_FKERNTHREAD));
 	/* Check for special behavior when SIGCLD is being ignored. */
 	{
 		struct sighand_ptr *handptr;

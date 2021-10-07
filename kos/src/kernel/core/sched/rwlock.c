@@ -1681,7 +1681,7 @@ NOTHROW(FCALL __os_rwlock_end)(struct rwlock *__restrict self) {
 
 			/* Deal with parallel-upgrade exceptions. */
 			if (was_thrown(__E_RETRY_RWLOCK) &&
-			    PERTASK_GET(this_exception_args.__e_retry_rwlock._err_lock) == (uintptr_t)self) {
+			    PERTASK_EQ(this_exception_args.__e_retry_rwlock._err_lock, (uintptr_t)self)) {
 				/* Try to yield to the task that is waiting for the lock to become available.
 				 * NOTE: By   using  `task_tryyield()'  here,  we  can  remain  non-blocking! */
 				task_tryyield();

@@ -140,7 +140,7 @@ LOCAL_userexcept_callsignal(struct icpustate *__restrict state,
 	must_restore_sigmask = false;
 	if (action->sa_mask || !(action->sa_flags & SA_NODEFER)) {
 #ifdef CONFIG_HAVE_USERPROCMASK
-		if (PERTASK_GET(this_task.t_flags) & TASK_FUSERPROCMASK) {
+		if (PERTASK_TESTMASK(this_task.t_flags, TASK_FUSERPROCMASK)) {
 			/* NOTE: The below code is _very_ careful not to modify the userprocmask
 			 *       in cases where it's state already reflects what it needs to be.
 			 * This is required because the user's signal mask may point to read-only
@@ -275,7 +275,7 @@ LOCAL_userexcept_callsignal(struct icpustate *__restrict state,
 			user_ucontext->uc_mcontext.mc_cr2 = (ulongptr_t)siginfo->si_addr;
 			user_ucontext->uc_mcontext.mc_flags |= __MCONTEXT_FLAG_HAVECR2;
 		}
-		if (PERTASK_GET(this_fpustate)) {
+		if (PERTASK_TEST(this_fpustate)) {
 			user_fpustate = &user_ucontext->uc_mcontext.mc_fpu;
 			user_fpustate = LOCAL_fpustate_saveinto(user_fpustate);
 			user_ucontext->uc_mcontext.mc_flags |= x86_fpustate_variant == FPU_STATE_SSTATE
@@ -297,7 +297,7 @@ LOCAL_userexcept_callsignal(struct icpustate *__restrict state,
 		COMPILER_WRITE_BARRIER();
 		usp -= sizeof(LOCAL_struct_ucpustate);
 		/* Only save the FPU state if it is in use. */
-		if (PERTASK_GET(this_fpustate)) {
+		if (PERTASK_TEST(this_fpustate)) {
 			/* Only allocate what we need for the used FPU state */
 			usp -= x86_fpustate_variant == FPU_STATE_SSTATE
 			       ? sizeof(struct sfpustate)

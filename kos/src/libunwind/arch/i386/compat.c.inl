@@ -72,7 +72,7 @@ printArrayDefineMacro("DEFINE_386_to_amd64",
 	                                   121, 122, 123, 124, 125, 126 }
 /*[[[end]]]*/
 
-/* Convert a given `CFI_386_UNWIND_REGISTER_*' register number to `CFI_X86_64_*' */
+/* Convert a given `CFI_386_UNWIND_REGISTER_*' register number to `CFI_X86_64_UNWIND_REGISTER_*' */
 PRIVATE ATTR_CONST WUNUSED unwind_regno_t
 NOTHROW(CC regno_i386_to_amd64)(unwind_regno_t regno) {
 	unwind_regno_t result;

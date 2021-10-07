@@ -24,6 +24,7 @@
 
 #include <hybrid/host.h>
 #include <hybrid/typecore.h>
+#include <asm/instr/ttest.h>
 
 DECL_BEGIN
 
@@ -108,24 +109,55 @@ extern ATTR_ERROR("Invalid per-task object size") void __invalid_pertask_object_
 #define __pertask_get16_r(x, result)          __asm__("movw %%gs:%p1, %w0" : "=r" (result) : "mi" (x))
 #define __pertask_get32_r(x, result)          __asm__("movl %%gs:%p1, %k0" : "=r" (result) : "mi" (x))
 #define __pertask_get64_r(x, result)          __asm__("movq %%gs:%p1, %q0" : "=r" (result) : "mi" (x))
-#define __pertask_set8(x, v)                  __asm__("movb %b0, %%gs:%p1" : : "q" (v), "mi" (x))
-#define __pertask_set16(x, v)                 __asm__("movw %w0, %%gs:%p1" : : "r" (v), "mi" (x))
-#define __pertask_set32(x, v)                 __asm__("movl %k0, %%gs:%p1" : : "r" (v), "mi" (x))
-#define __pertask_set64(x, v)                 __asm__("movq %q0, %%gs:%p1" : : "r" (v), "mi" (x))
-#define __pertask_cmp8_r(x, rhs, cc, result)  __asm__("cmpb %%gs:%p2, %b1" : "=@cc" #cc (result) : "q" (rhs), "mi" (x))
-#define __pertask_cmp16_r(x, rhs, cc, result) __asm__("cmpw %%gs:%p2, %w1" : "=@cc" #cc (result) : "r" (rhs), "mi" (x))
-#define __pertask_cmp32_r(x, rhs, cc, result) __asm__("cmpl %%gs:%p2, %k1" : "=@cc" #cc (result) : "r" (rhs), "mi" (x))
-#define __pertask_cmp64_r(x, rhs, cc, result) __asm__("cmpq %%gs:%p2, %q1" : "=@cc" #cc (result) : "r" (rhs), "mi" (x))
+#define __pertask_set8(x, v)                  __asm__("movb %b0, %%gs:%p1" : : "iq" (v), "mi" (x))
+#define __pertask_set16(x, v)                 __asm__("movw %w0, %%gs:%p1" : : "ir" (v), "mi" (x))
+#define __pertask_set32(x, v)                 __asm__("movl %k0, %%gs:%p1" : : "ir" (v), "mi" (x))
+#define __pertask_cmp8_r(x, rhs, cc, result)  __asm__("cmpb %b1, %%gs:%p2" : "=@cc" #cc (result) : "iq" (rhs), "mi" (x))
+#define __pertask_cmp16_r(x, rhs, cc, result) __asm__("cmpw %w1, %%gs:%p2" : "=@cc" #cc (result) : "ir" (rhs), "mi" (x))
+#define __pertask_cmp32_r(x, rhs, cc, result) __asm__("cmpl %k1, %%gs:%p2" : "=@cc" #cc (result) : "ir" (rhs), "mi" (x))
+#define __pertask_test8_r(x, rhs, result)     __asm__("testb %b1, %%gs:%p2" : "=@ccnz" (result) : "iq" (rhs), "mi" (x))
+#define __pertask_test16_r(x, rhs, result)    __asm__("testw %w1, %%gs:%p2" : "=@ccnz" (result) : "ir" (rhs), "mi" (x))
+#define __pertask_test32_r(x, rhs, result)    __asm__("testl %k1, %%gs:%p2" : "=@ccnz" (result) : "ir" (rhs), "mi" (x))
+#define __pertask_ttest_r(x, rhs, result)     __asm__("ttest mask=%p1, loc=%p2, seg=%%gs" : "=@ccnz" (result) : "n" ((__UINT64_TYPE__)(rhs)), "mi" (x))
+
+#define __pertask_set64i(x, v)                 __asm__("movq %q0, %%gs:%p1" : : "ir" (v), "mi" (x))
+#define __pertask_cmp64i_r(x, rhs, cc, result) __asm__("cmpq %q1, %%gs:%p2" : "=@cc" #cc (result) : "ir" (rhs), "mi" (x))
+#define __pertask_test64i_r(x, rhs, result)    __asm__("testq %q1, %%gs:%p2" : "=@ccnz" (result) : "ir" (rhs), "mi" (x))
+#define __pertask_set64r(x, v)                 __asm__("movq %q0, %%gs:%p1" : : "r" (v), "mi" (x))
+#define __pertask_cmp64r_r(x, rhs, cc, result) __asm__("cmpq %q1, %%gs:%p2" : "=@cc" #cc (result) : "r" (rhs), "mi" (x))
+#define __pertask_test64r_r(x, rhs, result)    __asm__("testq %q1, %%gs:%p2" : "=@ccnz" (result) : "r" (rhs), "mi" (x))
+#define __pertask_x64_is32s(v)                 ((__UINT64_TYPE__)(v) == (__UINT64_TYPE__)(__INT64_TYPE__)(__INT32_TYPE__)(__UINT32_TYPE__)(__UINT64_TYPE__)(v))
+#define __pertask_set64(x, v)                  if (__builtin_constant_p(v) && __pertask_x64_is32s(v)) __pertask_set64i(x, v); else __pertask_set64r(x, v)
+#define __pertask_cmp64_r(x, rhs, cc, result)  if (__builtin_constant_p(rhs) && __pertask_x64_is32s(rhs)) __pertask_cmp64i_r(x, rhs, cc, result); else __pertask_cmp64r_r(x, rhs, cc, result)
+#define __pertask_test64_r(x, rhs, result)     if (__builtin_constant_p(rhs) && __pertask_x64_is32s(rhs)) __pertask_test64i_r(x, rhs, result); else __pertask_test64r_r(x, rhs, result)
 #else /* __x86_64__ */
 #define __pertask_get8_r(x, result)           __asm__("movb %%fs:%p1, %b0" : "=q" (result) : "mi" (x))
 #define __pertask_get16_r(x, result)          __asm__("movw %%fs:%p1, %w0" : "=r" (result) : "mi" (x))
 #define __pertask_get32_r(x, result)          __asm__("movl %%fs:%p1, %k0" : "=r" (result) : "mi" (x))
-#define __pertask_set8(x, v)                  __asm__("movb %b0, %%fs:%p1" : : "q" (v), "mi" (x))
-#define __pertask_set16(x, v)                 __asm__("movw %w0, %%fs:%p1" : : "r" (v), "mi" (x))
-#define __pertask_set32(x, v)                 __asm__("movl %k0, %%fs:%p1" : : "r" (v), "mi" (x))
-#define __pertask_cmp8_r(x, rhs, cc, result)  __asm__("cmpb %%fs:%p2, %b1" : "=@cc" #cc (result) : "q" (rhs), "mi" (x))
-#define __pertask_cmp16_r(x, rhs, cc, result) __asm__("cmpw %%fs:%p2, %w1" : "=@cc" #cc (result) : "r" (rhs), "mi" (x))
-#define __pertask_cmp32_r(x, rhs, cc, result) __asm__("cmpl %%fs:%p2, %k1" : "=@cc" #cc (result) : "r" (rhs), "mi" (x))
+#define __pertask_set8(x, v)                  __asm__("movb %b0, %%fs:%p1" : : "iq" (v), "mi" (x))
+#define __pertask_set16(x, v)                 __asm__("movw %w0, %%fs:%p1" : : "ir" (v), "mi" (x))
+#define __pertask_set32(x, v)                 __asm__("movl %k0, %%fs:%p1" : : "ir" (v), "mi" (x))
+#define __pertask_cmp8_r(x, rhs, cc, result)  __asm__("cmpb %b1, %%fs:%p2" : "=@cc" #cc (result) : "iq" (rhs), "mi" (x))
+#define __pertask_cmp16_r(x, rhs, cc, result) __asm__("cmpw %w1, %%fs:%p2" : "=@cc" #cc (result) : "ir" (rhs), "mi" (x))
+#define __pertask_cmp32_r(x, rhs, cc, result) __asm__("cmpl %k1, %%fs:%p2" : "=@cc" #cc (result) : "ir" (rhs), "mi" (x))
+#define __pertask_test8_r(x, rhs, result)     __asm__("testb %b1, %%fs:%p2" : "=@ccnz" (result) : "iq" (rhs), "mi" (x))
+#define __pertask_test16_r(x, rhs, result)    __asm__("testw %w1, %%fs:%p2" : "=@ccnz" (result) : "ir" (rhs), "mi" (x))
+#define __pertask_test32_r(x, rhs, result)    __asm__("testl %k1, %%fs:%p2" : "=@ccnz" (result) : "ir" (rhs), "mi" (x))
+/* NOTE: The mask's cast to `__UINT64_TYPE__' is needed because GCC sucks and outputs the UNSIGNED number
+ *       as _SIGNED_ *ugh*. I  even went so far  as to find  the GCC source line  that causes this  mess:
+ * /binutils/src/gcc-9.1.0/gcc/config/i386/i386.c:18475:
+ * >>if (CONST_INT_P (x))
+ * >>    fprintf (file, HOST_WIDE_INT_PRINT_DEC, INTVAL (x));
+ *
+ * Where  `HOST_WIDE_INT_PRINT_DEC' is `"%" PRId64'.  There aren't any  checks for the signed-ness
+ * of the operand, and the value is always output as-is after being converted to a signed integer.
+ *
+ * This  still happens even though we do  a cast to uint64_t, only that  by doing that we force GCC
+ * to do the sign-extension on a 64-bit number, meaning that we'd only run into the problem if  one
+ * were to try doing: `PERTASK_TESTMASK(foo, UINT64_C(0x8000000000000000))', which would once again
+ * output magically pull this "sign" out of the void and throw it between your legs as you're  just
+ * trying to walk along. */
+#define __pertask_ttest_r(x, rhs, result)     __asm__("ttest mask=%p1, loc=%p2, seg=%%fs" : "=@ccnz" (result) : "n" ((__UINT64_TYPE__)(rhs)), "mi" (x))
 #endif /* !__x86_64__ */
 
 /************************************************************************/
@@ -475,6 +507,100 @@ __NAMESPACE_INT_END
 #define PERTASK_EQ(x, rhs) __X86_PERTASK_CMP(x, rhs, e)
 #define PERTASK_NE(x, rhs) __X86_PERTASK_CMP(x, rhs, ne)
 #endif /* __X86_PERTASK_CMP */
+
+
+
+/************************************************************************/
+/* Define __X86_PERTASK_TEST()                                           */
+/************************************************************************/
+#ifdef __NO_XBLOCK
+/* TODO */
+#elif defined(CONFIG_PERTASK_USE_SWITCH_SIZEOF_VARIABLE)
+#ifdef __pertask_test64_r
+#define __X86_PERTASK_TEST(x, rhs)                            \
+	XBLOCK({                                                  \
+		__BOOL __xpc_res;                                     \
+		switch (sizeof(x)) {                                  \
+		case 1: __pertask_test8_r(x, rhs, __xpc_res); break;  \
+		case 2: __pertask_test16_r(x, rhs, __xpc_res); break; \
+		case 4: __pertask_test32_r(x, rhs, __xpc_res); break; \
+		case 8: __pertask_test64_r(x, rhs, __xpc_res); break; \
+		default: __invalid_pertask_object_size();             \
+		}                                                     \
+		XRETURN __xpc_res;                                    \
+	})
+#else /* __pertask_test64_r */
+#define __X86_PERTASK_TEST(x, rhs)                            \
+	XBLOCK({                                                  \
+		__BOOL __xpc_res;                                     \
+		switch (sizeof(x)) {                                  \
+		case 1: __pertask_test8_r(x, rhs, __xpc_res); break;  \
+		case 2: __pertask_test16_r(x, rhs, __xpc_res); break; \
+		case 4: __pertask_test32_r(x, rhs, __xpc_res); break; \
+		default: __invalid_pertask_object_size();             \
+		}                                                     \
+		XRETURN __xpc_res;                                    \
+	})
+#endif /* !__pertask_test64_r */
+#else /* ... */
+#ifdef __pertask_test64_r
+#define __X86_PERTASK_TEST(x, rhs)                 \
+	XBLOCK({                                       \
+		__BOOL __xpc_res;                          \
+		if __untraced(sizeof(x) == 1) {            \
+			__pertask_test8_r(x, rhs, __xpc_res);  \
+		} else if __untraced(sizeof(x) == 2) {     \
+			__pertask_test16_r(x, rhs, __xpc_res); \
+		} else if __untraced(sizeof(x) == 4) {     \
+			__pertask_test32_r(x, rhs, __xpc_res); \
+		} else if __untraced(sizeof(x) == 8) {     \
+			__pertask_test64_r(x, rhs, __xpc_res); \
+		} else {                                   \
+			__invalid_pertask_object_size();       \
+		}                                          \
+		XRETURN __xpc_res;                         \
+	})
+#else /* __pertask_test64_r */
+#define __X86_PERTASK_TEST(x, rhs)                 \
+	XBLOCK({                                       \
+		__BOOL __xpc_res;                          \
+		if __untraced(sizeof(x) == 1) {            \
+			__pertask_test8_r(x, rhs, __xpc_res);  \
+		} else if __untraced(sizeof(x) == 2) {     \
+			__pertask_test16_r(x, rhs, __xpc_res); \
+		} else if __untraced(sizeof(x) == 4) {     \
+			__pertask_test32_r(x, rhs, __xpc_res); \
+		} else {                                   \
+			__invalid_pertask_object_size();       \
+		}                                          \
+		XRETURN __xpc_res;                         \
+	})
+#endif /* !__pertask_test64_r */
+#endif /* !... */
+#ifdef __NO_XBLOCK
+/* TODO */
+#else /* __NO_XBLOCK */
+#define __X86_PERTASK_TTEST(x, rhs)           \
+	XBLOCK({                                  \
+		__BOOL __xpc_res;                     \
+		__pertask_ttest_r(x, rhs, __xpc_res); \
+		XRETURN __xpc_res;                    \
+	})
+#endif /* !__NO_XBLOCK */
+
+#if defined(__X86_PERTASK_TEST) && defined(__X86_PERTASK_TTEST)
+#ifdef __NO_builtin_choose_expr
+#define PERTASK_TESTMASK(x, mask) \
+	(__builtin_constant_p(mask) ? __X86_PERTASK_TTEST(x, mask) : __X86_PERTASK_TEST(x, mask))
+#else /* __NO_builtin_choose_expr */
+#define PERTASK_TESTMASK(x, mask)                       \
+	__builtin_choose_expr(__builtin_constant_p(mask),   \
+	                      __X86_PERTASK_TTEST(x, mask), \
+	                      __X86_PERTASK_TEST(x, mask))
+#endif /* !__NO_builtin_choose_expr */
+#endif /* __X86_PERTASK_TEST && __X86_PERTASK_TTEST */
+
+
 
 
 #endif /* !__X86_SEG_TASK */

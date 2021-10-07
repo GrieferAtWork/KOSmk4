@@ -76,7 +76,7 @@ PUBLIC ATTR_PERTASK struct user_except_handler this_user_except_handler = {
  *     >>         mman_broadcastfutex(addr);
  *     >>     } EXCEPT {
  *     >>         if (!was_thrown(E_SEGFAULT) ||
- *     >>             (PERTASK_GET(this_exception_args.e_segfault.s_addr) != (uintptr_t)addr))
+ *     >>             PERTASK_NE(this_exception_args.e_segfault.s_addr, (uintptr_t)addr))
  *     >>             error_printf("...");
  *     >>     }
  *     >> }
@@ -116,7 +116,7 @@ INTERN ATTR_USED void NOTHROW(KCALL onexit_this_tid_address)(void) {
 		} EXCEPT {
 			/* Explicitly handle E_SEGFAULT:addr as a no-op */
 			if (!was_thrown(E_SEGFAULT) ||
-			    (PERTASK_GET(this_exception_args.e_segfault.s_addr) != (uintptr_t)addr)) {
+			    PERTASK_NE(this_exception_args.e_segfault.s_addr, (uintptr_t)addr)) {
 				/* We  can't RETHROW() the  exception since our function
 				 * has to be NOTHROW() (especially so since we're called
 				 * as part of thread cleanup)
@@ -442,7 +442,7 @@ DEFINE_SYSCALL1(pid_t, set_tid_address,
 	validate_writable_opt(tidptr, sizeof(*tidptr));
 #ifdef CONFIG_HAVE_USERPROCMASK
 	/* Disable userprocmask, if it was enabled. */
-	if unlikely(PERTASK_GET(this_task.t_flags) & TASK_FUSERPROCMASK) {
+	if unlikely(PERTASK_TESTMASK(this_task.t_flags, TASK_FUSERPROCMASK)) {
 		USER CHECKED struct userprocmask *old_ctl;
 		old_ctl = PERTASK_GET(this_userprocmask_address);
 
@@ -470,7 +470,7 @@ DEFINE_SYSCALL1(pid_t, set_tid_address,
 #ifdef CONFIG_USE_NEW_RPC
 DEFINE_SYSCALL1(errno_t, set_userprocmask_address,
                 USER UNCHECKED struct userprocmask *, ctl) {
-	if unlikely(PERTASK_GET(this_task.t_flags) & TASK_FUSERPROCMASK) {
+	if unlikely(PERTASK_TESTMASK(this_task.t_flags, TASK_FUSERPROCMASK)) {
 		USER CHECKED struct userprocmask *old_ctl;
 		old_ctl = PERTASK_GET(this_userprocmask_address);
 		/* Check for special case: Nothing changed. */
@@ -622,7 +622,7 @@ no_perthread_pending:
 
 DEFINE_SYSCALL1(errno_t, set_userprocmask_address,
                 USER UNCHECKED struct userprocmask *, ctl) {
-	if unlikely(PERTASK_GET(this_task.t_flags) & TASK_FUSERPROCMASK) {
+	if unlikely(PERTASK_TESTMASK(this_task.t_flags, TASK_FUSERPROCMASK)) {
 		USER CHECKED struct userprocmask *old_ctl;
 		old_ctl = PERTASK_GET(this_userprocmask_address);
 		/* Check for special case: Nothing changed. */
