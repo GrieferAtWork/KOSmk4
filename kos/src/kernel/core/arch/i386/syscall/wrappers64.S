@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc9200335 */
+/* HASH CRC-32:0x1119a183 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25184,8 +25184,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fsmode)
 	call   sys32_fsmode
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
-	popq_cfi %rcx
- /* %rdx */	movq   %rax, %rdx
+	popq_cfi %rcx /* %rdx */
+	.cfi_restore %rdx
+	movq   %rax, %rdx
 	shrq   $(32), %rdx
 	popq_cfi_r %rcx
 	intr_exit
@@ -25753,8 +25754,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_lseek64)
 	call   sys32_lseek64
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
-	popq_cfi %rcx
- /* %rdx */	movq   %rax, %rdx
+	popq_cfi %rcx /* %rdx */
+	.cfi_restore %rdx
+	movq   %rax, %rdx
 	shrq   $(32), %rdx
 	popq_cfi_r %rcx
 	intr_exit
@@ -25936,8 +25938,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_time64)
 	call   sys32_time64
 	popq_cfi_r %rdi
 	popq_cfi_r %rsi
-	popq_cfi %rcx
- /* %rdx */	movq   %rax, %rdx
+	popq_cfi %rcx /* %rdx */
+	.cfi_restore %rdx
+	movq   %rax, %rdx
 	shrq   $(32), %rdx
 	popq_cfi_r %rcx
 	intr_exit

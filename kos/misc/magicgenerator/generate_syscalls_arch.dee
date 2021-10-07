@@ -1085,7 +1085,8 @@ function x86_64_printKernelSyscallWrapper_asm32_int80(fp: File, f: Function, sys
 	fp << "	popq_cfi_r %rdi\n";
 	fp << "	popq_cfi_r %rsi\n";
 	if (f.returnType.isReg64) {
-		fp << "	popq_cfi %rcx\n /* %rdx */";
+		fp << "	popq_cfi %rcx /* %rdx */\n";
+		fp << "	.cfi_restore %rdx\n";
 		/* Split the 64-bit return value into %eax:%edx */
 		fp << "	movq   %rax, %rdx\n";
 		fp << "	shrq   $(32), %rdx\n";
