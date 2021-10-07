@@ -101,9 +101,9 @@
 #define orP          orq
 #define adcP         adcq
 #define sbbP         sbbq
-#define subP         subq
 #define andP         andq
 #define subP         subq
+#define subP_imm_cfi subq_imm_cfi
 #define xorP         xorq
 #define cmpP         cmpq
 #define negP         negq
@@ -238,9 +238,9 @@
 #define orP          orl
 #define adcP         adcl
 #define sbbP         sbbl
-#define subP         subl
 #define andP         andl
 #define subP         subl
+#define subP_imm_cfi subl_imm_cfi
 #define xorP         xorl
 #define cmpP         cmpl
 #define negP         negl
