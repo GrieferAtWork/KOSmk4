@@ -54,6 +54,39 @@
 #define R_fcall1q rsi
 #define R_fcall1P rsi
 
+/* Register arguments for SysVAbi */
+#define R_sysvabi0b dil
+#define R_sysvabi0w di
+#define R_sysvabi0l edi
+#define R_sysvabi0q rdi
+#define R_sysvabi0P rdi
+#define R_sysvabi1b sil
+#define R_sysvabi1w si
+#define R_sysvabi1l esi
+#define R_sysvabi1q rsi
+#define R_sysvabi1P rsi
+#define R_sysvabi2b dl
+#define R_sysvabi2w dx
+#define R_sysvabi2l edx
+#define R_sysvabi2q rdx
+#define R_sysvabi2P rdx
+#define R_sysvabi3b cl
+#define R_sysvabi3w cx
+#define R_sysvabi3l ecx
+#define R_sysvabi3q rcx
+#define R_sysvabi3P rcx
+#define R_sysvabi4b r8l
+#define R_sysvabi4w r8w
+#define R_sysvabi4l r8d
+#define R_sysvabi4q r8
+#define R_sysvabi4P r8
+#define R_sysvabi5b r9l
+#define R_sysvabi5w r9w
+#define R_sysvabi5l r9d
+#define R_sysvabi5q r9
+#define R_sysvabi5P r9
+
+
 /* Instructions */
 #define movsbP       movsbq
 #define movswP       movswq

@@ -19,53 +19,9 @@
  */
 #ifndef GUARD_LIBC_HYBRID_ARCH_I386_ALLOCA64_S
 #define GUARD_LIBC_HYBRID_ARCH_I386_ALLOCA64_S 1
-#define __ASSEMBLER__ 1
 
-#include <hybrid/compiler.h>
-#include <asm/cfi.h>
-#include <asm/instr/compat.h>
-
-#undef alloca
-#undef _alloca
-
-.section .text.crt.utility
-INTERN_FUNCTION(libc_alloca)
-	.cfi_startproc
-	popq_cfi %rcx            /* return address */
-	.cfi_register %rip, %rcx
-	addq   $(4 - 1), %rdi
-	andq   $(~(4 - 1)), %rdi /* %rdi = CEIL_ALIGN(num_bytes, 4) */
-	subq   %rdi, %rsp        /* Allocate stack memory */
-	.cfi_same_value %rsp
-	movq   %rsp, %rax        /* Also re-return the new stack pointer in `%rax' */
-	jmpq   *%rcx             /* Return to caller */
-	.cfi_endproc
-END(libc_alloca)
-
-DEFINE_PUBLIC_ALIAS(alloca, libc_alloca)
-#ifndef __KERNEL__
-DEFINE_PUBLIC_ALIAS(_alloca, libc_alloca)
-#endif /* !__KERNEL__ */
-
-#ifndef __KERNEL__
-.section .text.crt.dos.utility
-INTERN_FUNCTION(libd_alloca)
-	.cfi_startproc
-	popq_cfi %rdx            /* return address */
-	.cfi_register %rip, %rdx
-	addq   $(4 - 1), %rcx
-	andq   $(~(4 - 1)), %rcx /* %rcx = CEIL_ALIGN(num_bytes, 4) */
-	subq   %rcx, %rsp        /* Allocate stack memory */
-	.cfi_same_value %rsp
-	movq   %rsp, %rax        /* Also re-return the new stack pointer in `%rax' */
-	jmpq   *%rdx             /* Return to caller */
-	.cfi_endproc
-END(libd_alloca)
-
-DEFINE_PUBLIC_ALIAS(DOS$alloca, libd_alloca)
-DEFINE_PUBLIC_ALIAS(DOS$_alloca, libd_alloca)
-#endif /* !__KERNEL__ */
-
-
+#ifndef __INTELLISENSE__
+#include "alloca.S"
+#endif /* !__INTELLISENSE__ */
 
 #endif /* !GUARD_LIBC_HYBRID_ARCH_I386_ALLOCA64_S */

@@ -19,33 +19,9 @@
  */
 #ifndef GUARD_LIBC_HYBRID_ARCH_I386_ALLOCA32_S
 #define GUARD_LIBC_HYBRID_ARCH_I386_ALLOCA32_S 1
-#define __ASSEMBLER__ 1
 
-#include <hybrid/compiler.h>
-#include <asm/cfi.h>
-#include <asm/instr/compat.h>
-
-#undef alloca
-#undef _alloca
-
-.section .text.crt.utility
-INTERN_FUNCTION(libc_alloca)
-	.cfi_startproc
-	popl_cfi %ecx            /* return address */
-	.cfi_register %eip, %ecx
-	subl   0(%esp), %esp     /* Allocate stack memory */
-	andl   $(~(4 - 1)), %esp /* Re-align stack */
-	.cfi_same_value %esp
-	movl   %esp, %eax        /* Also re-return the new stack pointer in `%eax' */
-	jmpl   *%ecx             /* Return to caller */
-	.cfi_endproc
-END(libc_alloca)
-
-DEFINE_PUBLIC_ALIAS(alloca, libc_alloca)
-#ifndef __KERNEL__
-DEFINE_PUBLIC_ALIAS(_alloca, libc_alloca)
-#endif /* !__KERNEL__ */
-
-
+#ifndef __INTELLISENSE__
+#include "alloca.S"
+#endif /* !__INTELLISENSE__ */
 
 #endif /* !GUARD_LIBC_HYBRID_ARCH_I386_ALLOCA32_S */
