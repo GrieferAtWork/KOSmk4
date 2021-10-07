@@ -842,20 +842,21 @@ INTERN_FUNCTION(_start64)
 
 	/* And that's all the assembly-based initialization done!
 	 * Now we  just  have  to  invoke  `__i386_kernel_main()' */
-	pushq  $(SEGMENT_USER_DATA_RPL)   /* ics_irregs.ir_ss */
-	pushq  $(0)                       /* ics_irregs.ir_rsp (set by `__i386_kernel_main') */
-	pushq  $(EFLAGS_IF)               /* ics_irregs.ir_rflags */
-	pushq  $(SEGMENT_USER_CODE_RPL)   /* ics_irregs.ir_cs */
-	pushq  $(0)                       /* ics_irregs.ir_rip (set by `__i386_kernel_main') */
-	subq   $(SIZEOF_GPREGSNSP), %rsp  /* ics_gpregs */
+	subq   $(SIZEOF_ICPUSTATE), %rsp  /* ics_gpregs */
 	movq   %rsp, %rdi
 	xorq   %rax, %rax
-	movq   $(SIZEOF_GPREGSNSP / 8), %rcx
+	movq   $(SIZEOF_ICPUSTATE / 8), %rcx
 	rep    stosq
+
+	/* Fill in user-space segments registers (these will be used for /bin/init) */
+	movb   $(SEGMENT_USER_DATA_RPL), OFFSET_ICPUSTATE_IRREGS + OFFSET_IRREGS_SS(%rsp)
+	movb   $(EFLAGS_IF >> 8),        OFFSET_ICPUSTATE_IRREGS + OFFSET_IRREGS_RFLAGS + 1(%rsp)
+	movb   $(SEGMENT_USER_CODE_RPL), OFFSET_ICPUSTATE_IRREGS + OFFSET_IRREGS_CS(%rsp)
 
 	movq   %rsp, %rdi
 	EXTERN(__i386_kernel_main)
 	call   __i386_kernel_main
+	movq   %rax, %rsp
 
 	/* TODO: call x86_kernel_unload_free_and_jump_to_userspace */
 

@@ -623,24 +623,24 @@ END(__x86_paging_init_identity_mapped_text)
 	/* Setup the state of /bin/init at our stack base, thus following the
 	 * general expectation that the user-space return state can be  found
 	 * at exactly that location. */
-	pushl  $(SEGMENT_USER_DATA_RPL)   /* ir_ss */
-	pushl  $(0)                       /* ir_esp (set by `__i386_kernel_main') */
-	pushl  $(EFLAGS_IF)               /* ir_eflags */
-	pushl  $(SEGMENT_USER_CODE_RPL)   /* ir_cs */
-	pushl  $(0)                       /* ir_eip (set by `__i386_kernel_main') */
-	pushl  $(SEGMENT_USER_DATA_RPL)   /* ics_ds */
-	pushl  $(SEGMENT_USER_DATA_RPL)   /* ics_es */
-	pushl  $(SEGMENT_USER_FSBASE_RPL) /* ics_fs */
-	pushl  $(0)                       /* gp_eax */
-	pushl  $(0)                       /* gp_ecx */
-	pushl  $(0)                       /* gp_edx */
-	pushl  $(0)                       /* gp_ebx */
-	pushl  $(0)                       /* gp_esp */
-	pushl  $(0)                       /* gp_ebp */
-	pushl  $(0)                       /* gp_esi */
-	pushl  $(0)                       /* gp_edi */
-	pushl  %esp /* struct icpustate *state */
+#define SIZEOF_ICPUSTATE_USER (OFFSET_ICPUSTATE_IRREGS + SIZEOF_IRREGS_USER)
+	subl   $(SIZEOF_ICPUSTATE_USER), %esp
+	movl   %esp, %edi
+	xorl   %eax, %eax
+	movl   $(SIZEOF_ICPUSTATE_USER / 4), %ecx
+	rep    stosl /* Clear out all registers (these will be set by `__i386_kernel_main') */
+
+	/* Fill in user-space segments registers (these will be used for /bin/init) */
+	movb   $(SEGMENT_USER_DATA_RPL),   %al
+	movb   %al,                        OFFSET_ICPUSTATE_IRREGS + OFFSET_IRREGS_SS(%esp)
+	movb   $(EFLAGS_IF >> 8),          OFFSET_ICPUSTATE_IRREGS + OFFSET_IRREGS_EFLAGS + 1(%esp)
+	movb   $(SEGMENT_USER_CODE_RPL),   OFFSET_ICPUSTATE_IRREGS + OFFSET_IRREGS_CS(%esp)
+	movb   %al,                        OFFSET_ICPUSTATE_DS(%esp)
+	movb   %al,                        OFFSET_ICPUSTATE_ES(%esp)
+	movb   $(SEGMENT_USER_FSBASE_RPL), OFFSET_ICPUSTATE_FS(%esp)
+
 	/* Initialize the kernel. */
+	pushl  %esp /* struct icpustate *state */
 	call   __i386_kernel_main
 	movl   %eax, %esp
 	/* TODO: call x86_kernel_unload_free_and_jump_to_userspace */
