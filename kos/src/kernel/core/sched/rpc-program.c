@@ -313,7 +313,7 @@ NOTHROW(FCALL rpc_mem_fini)(struct rpc_mem *__restrict self) {
 /* Returns the futex control word for `addr'. */
 PRIVATE ATTR_RETNONNULL WUNUSED NONNULL((1)) struct rpc_futex *FCALL
 rpc_mem_getfutex(struct rpc_mem *__restrict self, USER UNCHECKED void *addr) {
-	size_t i, reqalloc;
+	size_t reqalloc, i = 0;
 	struct rpc_futex *result;
 	BSEARCH(i, self->rm_futxv, self->rm_futxc, .rf_addr, addr) {
 		return &self->rm_futxv[i];
