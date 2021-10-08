@@ -24,7 +24,6 @@
 
 #include <kernel/compiler.h>
 
-#ifdef CONFIG_USE_NEW_RPC
 #include <kernel/except.h>
 #include <kernel/fpu.h>
 #include <kernel/rt/except-handler.h>
@@ -461,6 +460,5 @@ DEFINE_SYSCALL64_0(void, rt_sigreturn) {
 #endif /* __x86_64__ */
 
 DECL_END
-#endif /* !CONFIG_USE_NEW_RPC */
 
 #endif /* !GUARD_KERNEL_CORE_ARCH_I386_SCHED_POSIX_SIGNAL_C */

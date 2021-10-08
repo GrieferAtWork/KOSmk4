@@ -23,7 +23,6 @@
 #include <kernel/compiler.h>
 
 #include <kernel/types.h>
-#include <sched/arch/except-handler.h> /* TODO: Remove this #include */
 #include <sched/pertask.h>
 
 #include <kos/except-handler.h>

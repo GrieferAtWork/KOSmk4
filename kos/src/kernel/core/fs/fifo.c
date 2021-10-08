@@ -35,6 +35,7 @@
 #include <kernel/malloc.h>
 #include <sched/cred.h>
 #include <sched/posix-signal.h>
+#include <sched/rpc.h> /* task_serve() */
 #include <sched/signal.h>
 
 #include <hybrid/atomic.h>
@@ -190,9 +191,7 @@ again:
 no_readers:
 		/* Posix requires that we raise(SIGPIPE) in this scenario... */
 		task_raisesignalthread(THIS_TASK, SIGPIPE);
-#ifdef CONFIG_USE_NEW_RPC
 		task_serve();
-#endif /* CONFIG_USE_NEW_RPC */
 
 		/* If SIGPIPE is being ignored, we must instead throw some
 		 * exception that  causes user-space  to set  errno=EPIPE. */
@@ -307,9 +306,7 @@ handle_fifo_user_writev(struct fifo_user *__restrict self,
 no_readers:
 		/* Posix requires that we raise(SIGPIPE) in this scenario... */
 		task_raisesignalthread(THIS_TASK, SIGPIPE);
-#ifdef CONFIG_USE_NEW_RPC
 		task_serve();
-#endif /* CONFIG_USE_NEW_RPC */
 
 		/* If SIGPIPE is being ignored, we must instead throw some
 		 * exception that  causes user-space  to set  errno=EPIPE. */

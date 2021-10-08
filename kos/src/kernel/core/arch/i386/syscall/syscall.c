@@ -41,7 +41,6 @@
 #include <kernel/x86/idt.h>
 #include <kernel/x86/syscall-tables.h>
 #include <sched/cpu.h>
-#include <sched/except-handler.h>
 #include <sched/mutex.h>
 #include <sched/pid.h>
 #include <sched/posix-signal.h>
@@ -75,14 +74,18 @@
 
 #include <libunwind/unwind.h>
 
+#ifndef __x86_64__
+#include <kernel/rt/except-handler.h>
+#endif /* !__x86_64__ */
+
 DECL_BEGIN
 
 /* Error  throwing function for when `sysenter' is  used with a illegal extension address
  * Can't happen on x86_64, since it defines any 32-bit user-space address as valid, which
- * is what sysenter extensions vectors are limited to in compatiblity mode. */
-#if !defined(__x86_64__) && defined(CONFIG_USE_NEW_RPC)
-INTERN ATTR_RETNONNULL WUNUSED NONNULL((1)) struct icpustate *FCALL
-__asm32_bad_sysenter_extension_impl(struct icpustate *__restrict state) {
+ * is what sysenter extensions vectors are limited to in compatibility mode. */
+#ifndef __x86_64__
+INTERN ATTR_RETNONNULL WUNUSED NONNULL((1)) struct icpustate *
+NOTHROW(FCALL __asm32_bad_sysenter_extension_impl)(struct icpustate *__restrict state) {
 	struct rpc_syscall_info sc_info;
 	struct exception_info *info = error_info();
 
@@ -98,8 +101,6 @@ __asm32_bad_sysenter_extension_impl(struct icpustate *__restrict state) {
 
 	/* Fill in exception information. */
 	memset(info, 0, sizeof(*info));
-#if EXCEPT_BACKTRACE_SIZE != 0
-#endif /* EXCEPT_BACKTRACE_SIZE != 0 */
 	info->ei_code = ERROR_CODEOF(E_SEGFAULT_UNMAPPED);
 	info->ei_data.e_args.e_segfault.s_addr    = state->ics_gpregs.gp_ebp;
 	info->ei_data.e_args.e_segfault.s_context = E_SEGFAULT_CONTEXT_FAULT;
@@ -114,7 +115,7 @@ __asm32_bad_sysenter_extension_impl(struct icpustate *__restrict state) {
 	/* Restart? - ok... */
 	return state;
 }
-#endif /* !__x86_64__ && CONFIG_USE_NEW_RPC */
+#endif /* !__x86_64__ */
 
 
 #ifndef CONFIG_NO_SYSCALL_TRACING

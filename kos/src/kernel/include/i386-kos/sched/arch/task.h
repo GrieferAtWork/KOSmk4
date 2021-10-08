@@ -313,7 +313,6 @@ NOTHROW(__x86_preemption_pop)(pflag_t flag) {
 
 
 
-#ifdef CONFIG_USE_NEW_RPC
 /* Entry point for IRET tails that have been re-directed for sysret.
  * Used to  redirect  how  the kernel  will  return  to  user-space:
  * >> redirect_iret_for_sysret() {
@@ -337,37 +336,6 @@ NOTHROW(__x86_preemption_pop)(pflag_t flag) {
  *    re-override  the sysret redirection, but modify the saved state when it
  *    comes to the IRET tail. */
 FUNDEF void ASMCALL x86_userexcept_sysret(void);
-#else /* CONFIG_USE_NEW_RPC */
-/* Entry point for IRET tails that have been re-directed for RPC.
- * Used  to redirect  how the  kernel will  return to user-space:
- * >> redirect_iret_to_execute_rpcs() {
- * >>     struct irregs_kernel *irr;
- * >>     PREEMPTION_DISABLE(); // Redirection is only
- * >>     if (IS_VM86_TASK) {
- * >>         irr = GET_KERNEL_STACK_BASE() - sizeof(struct irregs_vm86);
- * >>     } else {
- * >>         irr = GET_KERNEL_STACK_BASE() - sizeof(struct irregs_user);
- * >>     }
- * >>     memcpy(&PERTASK(this_x86_sysret_iret),irr,
- * >>            sizeof(struct irregs_kernel));
- * >>     irr->ir_eip    = &x86_rpc_user_redirection;
- * >>     irr->ir_cs     = SEGMENT_KERNEL_CS;
- * >>     irr->ir_eflags = 0; // Most importantly: disable interrupts
- * >> }
- * The `redirect_iret_to_execute_rpcs()' is then simply called
- * from another, asynchronous kernel RPC:
- * >> task_schedule_asynchronous_rpc(target, &redirect_iret_to_execute_rpcs);
- * Once entered, `x86_rpc_user_redirection()' will then restore the saved IRET
- * tail,  before  proceeding  to  serve  _all_  pending  RPC  callbacks (s.a.:
- * the `Anytime the thread returns to user-space' row in `task_rpc()')
- * WARNING:
- *    Because of the redirection, in order to get/set any of the kernel  IRET
- *    registers when inside of an interrupt/syscall with preemption  enabled,
- *    you must always use the functions below, so-as to ensure that you don't
- *    re-override the RPC  redirection, but  modify the saved  state when  it
- *    comes to the IRET tail. */
-FUNDEF void ASMCALL x86_rpc_user_redirection(void);
-#endif /* !CONFIG_USE_NEW_RPC */
 
 
 #ifdef __x86_64__

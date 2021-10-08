@@ -327,20 +327,10 @@ NOTHROW(FCALL x86_serve_ipi)(struct cpu *__restrict me,
 }
 
 
-#ifdef CONFIG_USE_NEW_RPC
 PRIVATE NONNULL((1)) void PRPC_EXEC_CALLBACK_CC
 task_rpc_serve_ipi(struct rpc_context *__restrict ctx, void *UNUSED(cookie)) {
 	ctx->rc_state = x86_serve_ipi(THIS_CPU, ctx->rc_state);
 }
-#else /* CONFIG_USE_NEW_RPC */
-PRIVATE WUNUSED NONNULL((2)) struct icpustate *FCALL
-task_rpc_serve_ipi(void *UNUSED(arg),
-                   struct icpustate *__restrict state,
-                   unsigned int UNUSED(reason),
-                   struct rpc_syscall_info const *UNUSED(sc_info)) {
-	return x86_serve_ipi(THIS_CPU, state);
-}
-#endif /* !CONFIG_USE_NEW_RPC */
 
 
 /* Modify the  scheduler state  of  `thread' to  have  it
@@ -349,7 +339,7 @@ INTERN NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL x86_task_push_serve_ipi)(struct task *__restrict thread) {
 	struct scpustate *state;
 	state = FORTASK(thread, this_sstate);
-	state = task_push_asynchronous_rpc(state, &task_rpc_serve_ipi, NULL);
+	state = task_asyncrpc_push(state, &task_rpc_serve_ipi, NULL);
 	FORTASK(thread, this_sstate) = state;
 }
 

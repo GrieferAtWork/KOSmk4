@@ -35,6 +35,7 @@
 #include <sched/async.h>
 #include <sched/cred.h>
 #include <sched/posix-signal.h>
+#include <sched/rpc.h> /* task_serve() */
 #include <sched/signal.h>
 #include <sched/tsc.h>
 
@@ -482,9 +483,7 @@ PRIVATE void KCALL raise_sigpipe(void) {
 	NESTED_EXCEPTION;
 	/* Actually send the signal. */
 	task_raisesignalprocess(THIS_TASK, SIGPIPE);
-#ifdef CONFIG_USE_NEW_RPC
 	task_serve();
-#endif /* CONFIG_USE_NEW_RPC */
 }
 
 

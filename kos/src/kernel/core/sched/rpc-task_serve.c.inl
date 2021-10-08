@@ -74,6 +74,7 @@ task_serve_with_icpustate_and_sigmask(struct icpustate *__restrict state,
 #ifdef LOCAL_NOEXCEPT
 	result = TASK_SERVE_NX_NORMAL;
 #else /* LOCAL_NOEXCEPT */
+	assertf(!error_active(), "Then how would we be able to THROW below?");
 	error.ei_code  = ERROR_CODEOF(E_OK);
 	did_serve_rpcs = false;
 	must_unwind    = false;

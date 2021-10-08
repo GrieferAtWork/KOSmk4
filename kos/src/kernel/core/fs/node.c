@@ -3607,17 +3607,10 @@ NOTHROW(KCALL superblock_clear_delnodes)(struct superblock *__restrict self) {
 }
 
 
-INTERN NONNULL((1)) void *
-NOTHROW(FCALL superblock_cleanup_unmounted)(void *pfun, unsigned int action) {
-	void *result;
+PRIVATE NONNULL((1)) void FCALL
+superblock_cleanup_unmounted(struct superblock *__restrict self) {
 	bool did_unmount = false;
-	REF struct superblock *self;
-	self = COMPILER_CONTAINER_OF((struct path **)pfun, struct superblock, s_mount);
-	if (action == BLOCKING_CLEANUP_ACTION_GETNEXT)
-		return (void *)&self->s_cblock_next;
-	result = self->s_cblock_next;
-	if (!sync_write_nx(&self->s_nodes_lock))
-		return BLOCKING_CLEANUP_RETURN_XPENDING;
+	sync_write(&self->s_nodes_lock);
 	superblock_clear_delnodes(self);
 	/* Set the unmounted-flag. */
 	if (!(ATOMIC_FETCHOR(self->s_flags, SUPERBLOCK_FUNMOUNTED) & SUPERBLOCK_FUNMOUNTED)) {
@@ -3643,7 +3636,6 @@ NOTHROW(FCALL superblock_cleanup_unmounted)(void *pfun, unsigned int action) {
 		/* FIXME: This call may throw an exception! */
 		inode_recent_clear();
 	}
-	return result;
 }
 
 INTERN NOBLOCK NONNULL((1)) void
@@ -3665,9 +3657,11 @@ NOTHROW(KCALL superblock_schedule_set_unmounted)(struct superblock *__restrict s
 	assert(self->s_flags & SUPERBLOCK_FMUSTUNMOUNT);
 	assert(self->s_mount == NULL);
 	assert(self->s_umount_pend == NULL);
-	incref(self); /* The reference stored in the cleanup chain. */
-	*(void **)&self->s_mount = (void *)&superblock_cleanup_unmounted;
-	BLOCKING_CLEANUP_SCHEDULE(self, s_mount, s_cblock_next);
+	/* FIXME: This is all messed up because this function may throw, as well as block
+	 *        The  only way to do this properly which I can see is to pre-allocate an
+	 *        async job that does the sync asynchronously. (hint: we're still allowed
+	 *        to incref(self) at this point!) */
+	superblock_cleanup_unmounted(self);
 }
 
 

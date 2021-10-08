@@ -630,7 +630,7 @@ LOCAL_NOTHROW(KCALL LOCAL_heap_realloc)(struct heap *__restrict self,
 		result = LOCAL_heap_alloc_untraced(self, new_bytes, alloc_flags);
 		LOCAL_TRACE_OR_FAIL(result, alloc_flags, goto err;)
 		memcpy(heapptr_getptr(result), old_ptr, old_bytes);
-	
+
 		/* Free the old data block. */
 		heap_free(self, old_ptr, old_bytes,
 		          free_flags & ~GFP_CALLOC);

@@ -83,51 +83,6 @@ DECL_BEGIN
 #endif /* NDEBUG && NDEBUG_FINI */
 
 
-
-#ifndef CONFIG_USE_NEW_RPC
-LOCAL NOBLOCK void
-NOTHROW(KCALL sigqueue_entry_freechain)(struct sigqueue_entry *head) {
-	struct sigqueue_entry *next;
-	while (head) {
-		assert(head != SIGQUEUE_SQ_QUEUE_TERMINATED);
-		next = head->sqe_next;
-		kfree(head);
-		head = next;
-	}
-}
-
-PUBLIC NOBLOCK NONNULL((1)) void
-NOTHROW(KCALL sigqueue_fini)(struct sigqueue *__restrict self) {
-	if (self->sq_queue != SIGQUEUE_SQ_QUEUE_TERMINATED)
-		sigqueue_entry_freechain(self->sq_queue);
-	sig_broadcast_for_fini(&self->sq_newsig);
-}
-
-LOCAL NOBLOCK void
-NOTHROW(KCALL sigqueue_set_term)(struct sigqueue *__restrict self) {
-	struct sigqueue_entry *queue;
-	queue = ATOMIC_XCH(self->sq_queue, SIGQUEUE_SQ_QUEUE_TERMINATED);
-	assertf(queue != SIGQUEUE_SQ_QUEUE_TERMINATED,
-	        "sigqueue_set_term() can only be called once");
-	sigqueue_entry_freechain(queue);
-}
-
-LOCAL NOBLOCK void
-NOTHROW(KCALL process_sigqueue_set_term)(struct process_sigqueue *__restrict self) {
-	struct sigqueue_entry *queue;
-	assert(PREEMPTION_ENABLED());
-	sync_write(&self->psq_lock);
-	queue = ATOMIC_XCH(self->psq_queue.sq_queue, SIGQUEUE_SQ_QUEUE_TERMINATED);
-	assertf(queue != SIGQUEUE_SQ_QUEUE_TERMINATED,
-	        "sigqueue_set_term() can only be called once");
-	sync_endwrite(&self->psq_lock);
-	sigqueue_entry_freechain(queue);
-}
-#endif /* !CONFIG_USE_NEW_RPC */
-
-
-
-
 PRIVATE NOBLOCK NONNULL((1, 2)) void
 NOTHROW(KCALL pidns_remove)(struct pidns *__restrict self,
                             /*inherit(always)*/ struct taskpid *__restrict pid);
@@ -158,38 +113,16 @@ taskpid_gettask_srch(struct taskpid *__restrict self) THROWS(E_PROCESS_EXITED) {
 }
 
 
-#ifndef CONFIG_USE_NEW_RPC
-/* [valid_if(!TASK_FKERNTHREAD)]
- * [lock(LINKED_LIST(APPEND(ATOMIC),CLEAR(THIS_TASK)))]
- * Pending signals for the calling thread. */
-PUBLIC ATTR_PERTASK struct sigqueue this_sigqueue = {
-	/* .sq_newsig = */ SIG_INIT,
-	/* .sq_queue  = */ NULL
-};
-#endif /* !CONFIG_USE_NEW_RPC */
-
-
 /* [1..1][valid_if(!TASK_FKERNTHREAD)][const] The PID associated with the calling thread.
  * NOTE: `NULL' (though assume  UNDEFINED if  the choice  comes up)  for kernel  threads. */
 PUBLIC ATTR_PERTASK struct taskpid *this_taskpid = NULL;
 
 
-#ifdef CONFIG_USE_NEW_RPC
 PRIVATE NONNULL((1)) void PRPC_EXEC_CALLBACK_CC
 rpc_propagate_exit_state_to_worker(struct rpc_context *__restrict ctx, void *cookie) {
 	if (ctx->rc_context != RPC_REASONCTX_SHUTDOWN)
 		THROW(E_EXIT_THREAD, (uintptr_t)cookie);
 }
-#else /* CONFIG_USE_NEW_RPC */
-PRIVATE WUNUSED NONNULL((2)) struct icpustate *FCALL
-rpc_propagate_exit_state_to_worker(void *arg, struct icpustate *__restrict state,
-                                   unsigned int reason,
-                                   struct rpc_syscall_info const *UNUSED(sc_info)) {
-	if (reason != TASK_RPC_REASON_SHUTDOWN)
-		THROW(E_EXIT_THREAD, (uintptr_t)arg);
-	return state;
-}
-#endif /* !CONFIG_USE_NEW_RPC */
 
 
 PRIVATE NOBLOCK void
@@ -198,10 +131,8 @@ NOTHROW(KCALL task_propagate_exit_status_to_worker_thread)(struct task *__restri
                                                            struct task *__restrict origin,
                                                            struct taskpid *__restrict origin_pid) {
 	struct taskgroup *worker_group;
-	struct rpc_entry *rpc;
-#ifndef CONFIG_USE_NEW_RPC
-	int rpc_status;
-#endif /* !CONFIG_USE_NEW_RPC */
+	struct pending_rpc *rpc;
+
 	/* Send an RPC callback to `worker' to propagate the exit status
 	 * that caused the  task associated with  `origin_pid' to  exit. */
 	worker_group = &FORTASK(worker, this_taskgroup);
@@ -209,8 +140,8 @@ NOTHROW(KCALL task_propagate_exit_status_to_worker_thread)(struct task *__restri
 	rpc = ATOMIC_XCH(worker_group->tg_thread_exit, NULL);
 	if unlikely(!rpc)
 		return; /* Shouldn't happen, but would indicate that an RPC was already delivered. */
+
 	/* Save the exit-status from the originating thread, and use that status for the worker. */
-#ifdef CONFIG_USE_NEW_RPC
 	rpc->pr_kern.k_cookie = (void *)(uintptr_t)(unsigned int)origin_pid->tp_status.w_status;
 	if (task_rpc_schedule(worker, rpc))
 		return;
@@ -219,21 +150,6 @@ NOTHROW(KCALL task_propagate_exit_status_to_worker_thread)(struct task *__restri
 
 	/* Cleanup the RPC, since it isn't inherited by `task_rpc_schedule()' upon failure. */
 	pending_rpc_free(rpc);
-#else /* CONFIG_USE_NEW_RPC */
-	rpc->re_arg = (void *)(uintptr_t)(unsigned int)origin_pid->tp_status.w_status;
-	/* Try to deliver the RPC */
-	rpc_status = task_deliver_rpc(worker, rpc, TASK_RPC_FNORMAL);
-	if (TASK_DELIVER_RPC_WASOK(rpc_status))
-		return;
-	/* Failed to deliver the RPC. The only reason this should be able to happen
-	 * is when the worker thread has/is already terminated/terminating, and  is
-	 * no longer able to service any RPCs. */
-	assertf(rpc_status == TASK_DELIVER_RPC_TERMINATED,
-	        "Unexpected failure reason for terminating worker thread\n"
-	        "rpc_status = %d", rpc_status);
-	/* Cleanup the RPC, since it isn't inherited by `task_deliver_rpc()' upon failure. */
-	task_free_rpc(rpc);
-#endif /* !CONFIG_USE_NEW_RPC */
 }
 
 PRIVATE NOBLOCK void
@@ -304,9 +220,6 @@ NOTHROW(KCALL this_taskgroup_cleanup)(void) {
 #else /* __INTELLISENSE__ */
 #define mygroup FORTASK(proc, this_taskgroup)
 #endif /* !__INTELLISENSE__ */
-#ifndef CONFIG_USE_NEW_RPC
-	sigqueue_set_term(&THIS_SIGQUEUE);
-#endif /* !CONFIG_USE_NEW_RPC */
 	proc = task_getprocess();
 	if (!proc) {
 		/* Kernel-space thread */
@@ -367,7 +280,6 @@ NOTHROW(KCALL this_taskgroup_cleanup)(void) {
 				decref(parent);
 			}
 		}
-#ifdef CONFIG_USE_NEW_RPC
 		/* Shutdown any remaining RPCs and mark the per-process RPC list as terminated. */
 		{
 			struct pending_rpc *remain;
@@ -379,9 +291,6 @@ NOTHROW(KCALL this_taskgroup_cleanup)(void) {
 			assert(remain != THIS_RPCS_TERMINATED);
 			task_asyncrpc_destroy_list_for_shutdown(remain);
 		}
-#else /* CONFIG_USE_NEW_RPC */
-		process_sigqueue_set_term(&mygroup.tg_proc_signals);
-#endif /* !CONFIG_USE_NEW_RPC */
 	} else {
 		uintptr_t thread_detach_state;
 		assert(mypid);
@@ -426,9 +335,6 @@ NOTHROW(KCALL this_taskgroup_fini)(struct task *__restrict self) {
 #endif /* !__INTELLISENSE__ */
 	assert(wasdestroyed(self));
 	assert(!mypid || awref_ptr(&mypid->tp_thread) == self);
-#ifndef CONFIG_USE_NEW_RPC
-	sigqueue_fini(&FORTASK(self, this_sigqueue));
-#endif /* !CONFIG_USE_NEW_RPC */
 	if unlikely(mygroup.tg_process == NULL)
 		; /* Incomplete initialization... */
 	else if (mygroup.tg_process != self) {
@@ -436,7 +342,7 @@ NOTHROW(KCALL this_taskgroup_fini)(struct task *__restrict self) {
 		/* Free up the thread-exit RPC (this happens if
 		 * a  thread exits prior to the process leader) */
 		if (mygroup.tg_thread_exit)
-			task_free_rpc(mygroup.tg_thread_exit);
+			pending_rpc_free(mygroup.tg_thread_exit);
 	} else {
 		/* Process leader. */
 		REF struct taskpid *iter, *next;
@@ -492,25 +398,16 @@ NOTHROW(KCALL this_taskgroup_fini)(struct task *__restrict self) {
 			decref_nokill(mypid); /* Reference stored in `mygroup.tg_proc_group' */
 		}
 		/* Finalize any signals that were never delivered. */
-#ifdef CONFIG_USE_NEW_RPC
 		assertf((mygroup.tg_proc_rpcs.ppr_list.slh_first == NULL ||
 		         mygroup.tg_proc_rpcs.ppr_list.slh_first == THIS_RPCS_TERMINATED) &&
 		        sig_isempty(&mygroup.tg_proc_rpcs.ppr_more),
 		        "This shouldn't be because process RPCs should have gotten "
 		        "cleaned up during task_exit(). So how did this happen?");
-#else /* CONFIG_USE_NEW_RPC */
-		sigqueue_fini(&mygroup.tg_proc_signals.psq_queue);
-#endif /* !CONFIG_USE_NEW_RPC */
 	}
 	if (mypid) {
 		awref_clear(&mypid->tp_thread);
 		decref_likely(mypid);
 	}
-#ifndef CONFIG_USE_NEW_RPC
-	/* Finalizer per-task pending signals */
-	if (!(self->t_flags & TASK_FKERNTHREAD))
-		sigqueue_fini(&FORTASK(self, this_sigqueue));
-#endif /* !CONFIG_USE_NEW_RPC */
 #undef mygroup
 }
 
@@ -528,20 +425,10 @@ PUBLIC ATTR_PERTASK struct taskgroup this_taskgroup = {
 	/* .tg_proc_group_lock     = */ ATOMIC_RWLOCK_INIT,
 	/* .tg_proc_group          = */ NULL,                /* Initialized by `task_setprocess()' */
 	/* .tg_proc_group_siblings = */ LIST_ENTRY_UNBOUND_INITIALIZER,
-#ifdef CONFIG_USE_NEW_RPC
 	/* .tg_proc_rpcs           = */ {
 		/* .ppr_lock  = */ ATOMIC_RWLOCK_INIT,
 		/* .ppr_list  = */ SLIST_HEAD_INITIALIZER(this_taskgroup.tg_proc_rpcs.ppr_list)
 	},
-#else /* CONFIG_USE_NEW_RPC */
-	/* .tg_proc_signals        = */ {
-		/* .psq_lock  = */ ATOMIC_RWLOCK_INIT,
-		/* .psq_queue = */ {
-			/* .sq_newsig = */ SIG_INIT,
-			/* .sq_queue  = */ NULL
-		}
-	},
-#endif /* !CONFIG_USE_NEW_RPC */
 	/* .tg_pgrp_processes_lock = */ ATOMIC_RWLOCK_INIT,
 	/* .tg_pgrp_processes      = */ LIST_HEAD_INITIALIZER(this_taskgroup.tg_pgrp_processes),
 	/* .tg_pgrp_session_lock   = */ ATOMIC_RWLOCK_INIT,
@@ -563,7 +450,7 @@ task_setthread(struct task *__restrict self,
 		THROWS(E_WOULDBLOCK) {
 	struct taskpid *next;
 	struct taskpid *pid = FORTASK(self, this_taskpid);
-	struct rpc_entry *exit_rpc;
+	struct pending_rpc *exit_rpc;
 	assertf(pid, "Must call `task_setpid()' before `task_setthread()'");
 	assertf(leader && leader != self,
 	        "Must use `task_setprocess()' to create a new process");
@@ -571,18 +458,14 @@ task_setthread(struct task *__restrict self,
 	        "`task_setthread()' and `task_setprocess()' may only be called once");
 	assertf(!(self->t_flags & TASK_FKERNTHREAD),
 	        "`task_setthread()' and `task_setprocess()' may not be used with kernel threads");
-	leader = task_getprocess_of(leader);
-#ifdef CONFIG_USE_NEW_RPC
+	leader                   = task_getprocess_of(leader);
 	exit_rpc                 = pending_rpc_alloc_kern(GFP_NORMAL);
 	exit_rpc->pr_flags       = RPC_CONTEXT_KERN;
 	exit_rpc->pr_kern.k_func = &rpc_propagate_exit_state_to_worker;
-#else /* CONFIG_USE_NEW_RPC */
-	exit_rpc = task_alloc_synchronous_rpc(&rpc_propagate_exit_state_to_worker);
-#endif /* !CONFIG_USE_NEW_RPC */
 	TRY {
 		sync_write(&FORTASK(leader, this_taskgroup).tg_proc_threads_lock);
 	} EXCEPT {
-		task_free_rpc(exit_rpc);
+		pending_rpc_free(exit_rpc);
 		RETHROW();
 	}
 	FORTASK(self, this_taskgroup).tg_process     = incref(leader);
@@ -603,7 +486,7 @@ task_setthread(struct task *__restrict self,
 			decref_nokill(leader); /* The reference that had already been stored in
 			                        * `FORTASK(self, this_taskgroup).tg_process' */
 			decref_nokill(pid);    /* The reference that had been created for the child chain */
-			task_free_rpc(exit_rpc);
+			pending_rpc_free(exit_rpc);
 			return false;
 		}
 		ATOMIC_WRITE(pid->tp_siblings.le_next, next);

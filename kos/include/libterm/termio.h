@@ -80,16 +80,12 @@ typedef __ATTR_NONNULL((1)) __ssize_t
  * >>	FINALLY_DECREF_UNLIKELY(my_leader);
  * >>	if unlikely(FORTASK(my_leader, this_taskpid) != ATOMIC_READ(term->t_fproc)) {
  * >>		task_raisesignalprocessgroup(my_leader, SIGTTOU);
- * >> #ifdef CONFIG_USE_NEW_RPC
  * >>		task_serve();
- * >> #endif // CONFIG_USE_NEW_RPC
  * >>		// We might get here if the calling process changed its process group
  * >>		// in the mean time. - In this case, just re-raise `SIGTTOU' within the
  * >>		// calling process only.
  * >>		task_raisesignalprocess(task_getprocess(), SIGTTOU);
- * >> #ifdef CONFIG_USE_NEW_RPC
  * >>		task_serve();
- * >> #endif // CONFIG_USE_NEW_RPC
  * >>		// We really shouldn't get here
  * >>	}
  * >>	return 0;

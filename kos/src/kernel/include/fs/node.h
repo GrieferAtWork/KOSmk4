@@ -2100,7 +2100,6 @@ struct superblock
 	                                               *       root node (which is the superblock itself) */
 	struct atomic_rwlock          s_mount_lock;   /* Lock for `s_mount'. */
 	struct path                  *s_mount;        /* [0..1][lock(s_mount_lock)] Chain of mounting points. */
-	void                         *s_cblock_next;  /* [?..?] Used internally to chain blocking cleanup operations... */
 	WEAK REF struct path         *s_umount_pend;  /* [0..1] Chain of paths which are pending to be removed from `s_mount'
 	                                               * [CHAIN(->p_mount->mp_pending)] Chain of paths that are pending to be removed from `s_mount'. */
 	struct superblock            *s_filesystems;  /* [lock(fs_filesystems.f_superlock)] Chain of known filesystems. */

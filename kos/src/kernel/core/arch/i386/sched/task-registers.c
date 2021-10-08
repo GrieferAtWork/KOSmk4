@@ -38,10 +38,6 @@
 
 DECL_BEGIN
 
-#ifdef CONFIG_USE_NEW_RPC
-#define x86_rpc_user_redirection x86_userexcept_sysret
-#endif /* CONFIG_USE_NEW_RPC */
-
 /* Safely get/set the values of saved registers that may be modified by RPC redirection. */
 
 /* Check if `self' returns to user-space. */
@@ -62,7 +58,7 @@ NOTHROW(FCALL irregs_isuser)(struct irregs_kernel const *__restrict self) {
 	if (cs != SEGMENT_KERNEL_CODE)
 		return false;
 	pip = ATOMIC_READ(self->ir_Pip);
-	if unlikely(pip == (uintptr_t)&x86_rpc_user_redirection)
+	if unlikely(pip == (uintptr_t)&x86_userexcept_sysret)
 		return true;
 	return false;
 }
@@ -71,7 +67,7 @@ NOTHROW(FCALL irregs_isuser)(struct irregs_kernel const *__restrict self) {
 PUBLIC NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) uintptr_t
 NOTHROW(FCALL irregs_rdip)(struct irregs_kernel const *__restrict self) {
 	uintptr_t result = ATOMIC_READ(self->ir_Pip);
-	if unlikely(result == (uintptr_t)&x86_rpc_user_redirection)
+	if unlikely(result == (uintptr_t)&x86_userexcept_sysret)
 		result = PERTASK_GET(this_x86_sysret_iret.ir_Pip);
 	return result;
 }
@@ -82,7 +78,7 @@ NOTHROW(FCALL irregs_rdcs)(struct irregs_kernel const *__restrict self) {
 	u16 result = ATOMIC_READ(self->ir_cs16);
 	if (result == SEGMENT_KERNEL_CODE) {
 		uintptr_t pip = ATOMIC_READ(self->ir_Pip);
-		if unlikely(pip == (uintptr_t)&x86_rpc_user_redirection)
+		if unlikely(pip == (uintptr_t)&x86_userexcept_sysret)
 			result = PERTASK_GET(this_x86_sysret_iret.ir_cs16);
 	}
 	return result;
@@ -94,7 +90,7 @@ NOTHROW(FCALL irregs_rdflags)(struct irregs_kernel const *__restrict self) {
 	uintptr_t result = ATOMIC_READ(self->ir_Pflags);
 	if unlikely(result == 0) {
 		uintptr_t pip = ATOMIC_READ(self->ir_Pip);
-		if unlikely(pip == (uintptr_t)&x86_rpc_user_redirection)
+		if unlikely(pip == (uintptr_t)&x86_userexcept_sysret)
 			result = PERTASK_GET(this_x86_sysret_iret.ir_Pflags);
 	}
 	return result;
@@ -107,7 +103,7 @@ NOTHROW(FCALL irregs_rdsp)(struct irregs_kernel const *__restrict self) {
 	u64 result = ATOMIC_READ(self->ir_rsp);
 	if (ADDR_ISKERN(result)) {
 		u64 rip = ATOMIC_READ(self->ir_rip);
-		if unlikely(rip == (u64)&x86_rpc_user_redirection)
+		if unlikely(rip == (u64)&x86_userexcept_sysret)
 			result = PERTASK_GET(this_x86_sysret_iret.ir_rsp);
 	}
 	return result;
@@ -121,7 +117,7 @@ NOTHROW(FCALL irregs_rdsp)(struct irregs_kernel const *__restrict self) {
 	if (cs == SEGMENT_KERNEL_CODE) {
 		u32 eip;
 		eip = ATOMIC_READ(self->ir_eip);
-		if unlikely(eip == (u32)&x86_rpc_user_redirection) {
+		if unlikely(eip == (u32)&x86_userexcept_sysret) {
 is_user_iret:
 			result = *(u32 const *)result;
 		}
@@ -136,7 +132,7 @@ NOTHROW(FCALL irregs_wrip)(struct irregs_kernel *__restrict self, uintptr_t valu
 	uintptr_t oldval;
 	do {
 		oldval = ATOMIC_READ(self->ir_Pip);
-		if unlikely(oldval == (uintptr_t)&x86_rpc_user_redirection) {
+		if unlikely(oldval == (uintptr_t)&x86_userexcept_sysret) {
 			PERTASK_SET(this_x86_sysret_iret.ir_Pip, value);
 			break;
 		}
@@ -149,7 +145,7 @@ NOTHROW(FCALL irregs_wrcs)(struct irregs_kernel *__restrict self, u16 value) {
 	pflag_t was;
 	was = PREEMPTION_PUSHOFF();
 	COMPILER_READ_BARRIER();
-	if unlikely(self->ir_Pip == (uintptr_t)&x86_rpc_user_redirection) {
+	if unlikely(self->ir_Pip == (uintptr_t)&x86_userexcept_sysret) {
 		PERTASK_SET(this_x86_sysret_iret.ir_cs, value);
 	} else {
 		self->ir_cs = value;
@@ -164,7 +160,7 @@ NOTHROW(FCALL irregs_wrflags)(struct irregs_kernel *__restrict self, uintptr_t v
 	pflag_t was;
 	was = PREEMPTION_PUSHOFF();
 	COMPILER_READ_BARRIER();
-	if unlikely(self->ir_Pip == (uintptr_t)&x86_rpc_user_redirection) {
+	if unlikely(self->ir_Pip == (uintptr_t)&x86_userexcept_sysret) {
 		PERTASK_SET(this_x86_sysret_iret.ir_Pflags, value);
 	} else {
 		self->ir_Pflags = value;
@@ -180,7 +176,7 @@ NOTHROW(FCALL irregs_mskflags)(struct irregs_kernel *__restrict self,
 	pflag_t was;
 	was = PREEMPTION_PUSHOFF();
 	COMPILER_READ_BARRIER();
-	if unlikely(self->ir_Pip == (uintptr_t)&x86_rpc_user_redirection) {
+	if unlikely(self->ir_Pip == (uintptr_t)&x86_userexcept_sysret) {
 		uintptr_t newval;
 		newval = PERTASK_GET(this_x86_sysret_iret.ir_Pflags);
 		PERTASK_SET(this_x86_sysret_iret.ir_Pflags, (newval & mask) | flags);
@@ -204,7 +200,7 @@ NOTHROW(FCALL irregs_iscompat)(struct irregs const *__restrict self) {
 		return true;
 	if (cs == SEGMENT_KERNEL_CODE) {
 		u64 rip = ATOMIC_READ(self->ir_rip);
-		if unlikely(rip == (u64)&x86_rpc_user_redirection) {
+		if unlikely(rip == (u64)&x86_userexcept_sysret) {
 			cs = PERTASK_GET(this_x86_sysret_iret.ir_cs16);
 			if (SEGMENT_IS_VALID_USERCODE32(cs))
 				return true;
@@ -219,7 +215,7 @@ NOTHROW(FCALL irregs_rdss)(struct irregs const *__restrict self) {
 	u16 result = ATOMIC_READ(self->ir_ss16);
 	if (result == SEGMENT_KERNEL_DATA0) {
 		u64 rip = ATOMIC_READ(self->ir_rip);
-		if unlikely(rip == (u64)&x86_rpc_user_redirection)
+		if unlikely(rip == (u64)&x86_userexcept_sysret)
 			result = PERTASK_GET(this_x86_sysret_iret.ir_ss16);
 	}
 	return result;
@@ -231,7 +227,7 @@ NOTHROW(FCALL irregs_wrsp)(struct irregs *__restrict self, uintptr_t value) {
 	pflag_t was;
 	was = PREEMPTION_PUSHOFF();
 	COMPILER_READ_BARRIER();
-	if unlikely(self->ir_rip == (u64)&x86_rpc_user_redirection) {
+	if unlikely(self->ir_rip == (u64)&x86_userexcept_sysret) {
 		PERTASK_SET(this_x86_sysret_iret.ir_rsp, value);
 	} else {
 		self->ir_rsp = value;
@@ -246,7 +242,7 @@ NOTHROW(FCALL irregs_wrss)(struct irregs *__restrict self, u16 value) {
 	pflag_t was;
 	was = PREEMPTION_PUSHOFF();
 	COMPILER_READ_BARRIER();
-	if unlikely(self->ir_rip == (u64)&x86_rpc_user_redirection) {
+	if unlikely(self->ir_rip == (u64)&x86_userexcept_sysret) {
 		PERTASK_SET(this_x86_sysret_iret.ir_ss, (u64)value);
 	} else {
 		self->ir_ss = (u64)value;
@@ -266,7 +262,7 @@ NOTHROW(FCALL irregs_isuser_novm86)(struct irregs_kernel const *__restrict self)
 	if (cs & 3)
 		return true;
 	eip = ATOMIC_READ(self->ir_eip);
-	if unlikely(eip == (u32)&x86_rpc_user_redirection)
+	if unlikely(eip == (u32)&x86_userexcept_sysret)
 		return true;
 	return false;
 }
@@ -278,7 +274,7 @@ NOTHROW(FCALL irregs_isvm86)(struct irregs_kernel const *__restrict self) {
 	if (eflags & EFLAGS_VM)
 		return true;
 	eip = ATOMIC_READ(self->ir_eip);
-	if unlikely(eip == (u32)&x86_rpc_user_redirection) {
+	if unlikely(eip == (u32)&x86_userexcept_sysret) {
 		eflags = PERTASK_GET(this_x86_sysret_iret.ir_eflags);
 		if (eflags & EFLAGS_VM)
 			return true;

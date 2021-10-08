@@ -21,6 +21,10 @@
 #define GUARD_KERNEL_CORE_ARCH_I386_FAULT_HANDLE_PAGEFAULT_C 1
 #define _KOS_SOURCE 1
 
+/* TODO: This entire file needs a clean re-write. (possibly even as part of portable code)
+ * Also: VIO emulation needs to be able to run under ABNORMAL_RETURN in order to
+ *       be  able to emulate  system calls under the  new syscall restart model! */
+
 #include <kernel/compiler.h>
 
 #include <debugger/rt.h>
@@ -43,7 +47,6 @@
 #include <kernel/x86/idt.h> /* IDT_CONFIG_ISTRAP() */
 #include <kernel/x86/phys2virt64.h>
 #include <sched/cpu.h>
-#include <sched/except-handler.h>
 #include <sched/pid.h>
 #include <sched/userkern.h>
 #include <sched/x86/iobm.h>
@@ -911,14 +914,7 @@ cleanup_vio_and_pop_connections_and_set_exception_pointers2:
 					 * would get overwritten with the VIO function address. */
 					decref_unlikely(args.vea_args.va_file);
 					decref_unlikely(part);
-#ifdef CONFIG_USE_NEW_RPC
 					RETHROW();
-#else /* CONFIG_USE_NEW_RPC */
-					task_popconnections();
-					if (FAULT_IS_USER)
-						PERTASK_SET(this_exception_faultaddr, icpustate_getpc(state));
-					x86_userexcept_unwind_interrupt(state);
-#endif /* !CONFIG_USE_NEW_RPC */
 				}
 				decref_unlikely(args.vea_args.va_file);
 				decref_unlikely(part);
@@ -1189,12 +1185,6 @@ set_exception_pointers2:
 		unsigned int i;
 		for (i = 2; i < EXCEPTION_DATA_POINTERS; ++i)
 			PERTASK_SET(this_exception_args.e_pointers[i], 0);
-#ifndef CONFIG_USE_NEW_RPC
-#if EXCEPT_BACKTRACE_SIZE != 0
-		for (i = 0; i < EXCEPT_BACKTRACE_SIZE; ++i)
-			PERTASK_SET(this_exception_trace[i], (void const *)NULL);
-#endif /* EXCEPT_BACKTRACE_SIZE != 0 */
-#endif /* !CONFIG_USE_NEW_RPC */
 	}
 	/* Always make the state point to the instruction _after_ the one causing the problem. */
 	PERTASK_SET(this_exception_faultaddr, pc);
@@ -1208,11 +1198,7 @@ do_unwind_state:
 	if (kernel_debugtrap_shouldtrap(KERNEL_DEBUGTRAP_ON_SEGFAULT))
 		state = kernel_debugtrap_r(state, SIGSEGV);
 	assert(error_active());
-#ifdef CONFIG_USE_NEW_RPC
 	error_throw_current_at_icpustate(state);
-#else /* CONFIG_USE_NEW_RPC */
-	x86_userexcept_unwind_interrupt(state);
-#endif /* !CONFIG_USE_NEW_RPC */
 #undef FAULT_IS_USER
 #undef FAULT_IS_WRITE
 #undef GET_PF_CONTEXT_UW_BITS

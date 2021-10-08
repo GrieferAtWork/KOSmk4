@@ -2388,10 +2388,8 @@ DECL_END
 #define DEFINE_task_waitfor
 #include "signal-waitfor.c.inl"
 
-#ifdef CONFIG_USE_NEW_RPC
 #define DEFINE_task_waitfor_with_sigmask
 #include "signal-waitfor.c.inl"
-#endif /* CONFIG_USE_NEW_RPC */
 
 #define DEFINE_task_waitfor_norpc
 #include "signal-waitfor.c.inl"

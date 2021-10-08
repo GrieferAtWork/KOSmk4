@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x54831262 */
+/* HASH CRC-32:0x509a76fb */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -366,8 +366,8 @@ __CDECLARE_SC(,__errno_t,debugtrap,(struct ucpustate32 const *__state, struct de
 #endif /* __CRT_HAVE_SC(debugtrap) */
 #if __CRT_HAVE_SC(delete_module)
 /* Try to unload a driver, given its `name'
- * This system call exists for linux compatiblity, and is implemented
- * as an alias for `KSYSCTL_DRIVER_DELMOD:KSYSCTL_DRIVER_FORMAT_FILE'
+ * This system call exists for linux compatibility, and is implemented
+ * as an alias for  `KSYSCTL_DRIVER_DELMOD:KSYSCTL_DRIVER_FORMAT_FILE'
  * @param: name:  The name of the driver
  * @param: flags: Set of `O_NONBLOCK | O_TRUNC', where:
  *                 - O_NONBLOCK: Don't  wait  for  the driver  to  be unloaded.
@@ -641,11 +641,11 @@ __CDECLARE_SC(,__errno_t,fdatasync,(__fd_t __fd),(__fd))
 __CDECLARE_SC(,__ssize_t,fgetxattr,(__fd_t __fd, char const *__name, void *__buf, __size_t __bufsize),(__fd,__name,__buf,__bufsize))
 #endif /* __CRT_HAVE_SC(fgetxattr) */
 #if __CRT_HAVE_SC(finit_module)
-/* Load a  kernel driver  from  an ELF  image  `module_image...+=len'
- * This system call exists for linux compatiblity, and is implemented
- * as an alias for `KSYSCTL_DRIVER_INSMOD:KSYSCTL_DRIVER_FORMAT_FILE'
+/* Load a  kernel  driver  from an  ELF  image  `module_image...+=len'
+ * This system call exists for linux compatibility, and is implemented
+ * as an alias for  `KSYSCTL_DRIVER_INSMOD:KSYSCTL_DRIVER_FORMAT_FILE'
  * 
- * Note  however that that is where linux compatiblity ends. Since the
+ * Note however that that is where linux compatibility ends. Since the
  * linux kernel does not implement any semblance of a stable ABI,  you
  * have to realize that on KOS, this system call can only load drivers
  * specifically built to run within the KOS kernel!
@@ -1012,11 +1012,11 @@ __CDECLARE_SC(,__syscall_slong_t,hopf,(__fd_t __fd, __syscall_ulong_t __command,
 __CDECLARE_SC(,__errno_t,idle,(void),())
 #endif /* __CRT_HAVE_SC(idle) */
 #if __CRT_HAVE_SC(init_module)
-/* Load a  kernel driver  from  an ELF  image  `module_image...+=len'
- * This system call exists for linux compatiblity, and is implemented
- * as an alias for `KSYSCTL_DRIVER_INSMOD:KSYSCTL_DRIVER_FORMAT_BLOB'
+/* Load a  kernel  driver  from an  ELF  image  `module_image...+=len'
+ * This system call exists for linux compatibility, and is implemented
+ * as an alias for  `KSYSCTL_DRIVER_INSMOD:KSYSCTL_DRIVER_FORMAT_BLOB'
  * 
- * Note  however that that is where linux compatiblity ends. Since the
+ * Note however that that is where linux compatibility ends. Since the
  * linux kernel does not implement any semblance of a stable ABI,  you
  * have to realize that on KOS, this system call can only load drivers
  * specifically built to run within the KOS kernel!
@@ -2913,8 +2913,8 @@ __CDECLARE_XSC(,__errno_t,debugtrap,(struct ucpustate32 const *__state, struct d
 #endif /* __CRT_HAVE_XSC(debugtrap) */
 #if __CRT_HAVE_XSC(delete_module)
 /* Try to unload a driver, given its `name'
- * This system call exists for linux compatiblity, and is implemented
- * as an alias for `KSYSCTL_DRIVER_DELMOD:KSYSCTL_DRIVER_FORMAT_FILE'
+ * This system call exists for linux compatibility, and is implemented
+ * as an alias for  `KSYSCTL_DRIVER_DELMOD:KSYSCTL_DRIVER_FORMAT_FILE'
  * @param: name:  The name of the driver
  * @param: flags: Set of `O_NONBLOCK | O_TRUNC', where:
  *                 - O_NONBLOCK: Don't  wait  for  the driver  to  be unloaded.
@@ -3188,11 +3188,11 @@ __CDECLARE_XSC(,__errno_t,fdatasync,(__fd_t __fd),(__fd))
 __CDECLARE_XSC(,__ssize_t,fgetxattr,(__fd_t __fd, char const *__name, void *__buf, __size_t __bufsize),(__fd,__name,__buf,__bufsize))
 #endif /* __CRT_HAVE_XSC(fgetxattr) */
 #if __CRT_HAVE_XSC(finit_module)
-/* Load a  kernel driver  from  an ELF  image  `module_image...+=len'
- * This system call exists for linux compatiblity, and is implemented
- * as an alias for `KSYSCTL_DRIVER_INSMOD:KSYSCTL_DRIVER_FORMAT_FILE'
+/* Load a  kernel  driver  from an  ELF  image  `module_image...+=len'
+ * This system call exists for linux compatibility, and is implemented
+ * as an alias for  `KSYSCTL_DRIVER_INSMOD:KSYSCTL_DRIVER_FORMAT_FILE'
  * 
- * Note  however that that is where linux compatiblity ends. Since the
+ * Note however that that is where linux compatibility ends. Since the
  * linux kernel does not implement any semblance of a stable ABI,  you
  * have to realize that on KOS, this system call can only load drivers
  * specifically built to run within the KOS kernel!
@@ -3559,11 +3559,11 @@ __CDECLARE_XSC(,__syscall_slong_t,hopf,(__fd_t __fd, __syscall_ulong_t __command
 __CDECLARE_XSC(,__errno_t,idle,(void),())
 #endif /* __CRT_HAVE_XSC(idle) */
 #if __CRT_HAVE_XSC(init_module)
-/* Load a  kernel driver  from  an ELF  image  `module_image...+=len'
- * This system call exists for linux compatiblity, and is implemented
- * as an alias for `KSYSCTL_DRIVER_INSMOD:KSYSCTL_DRIVER_FORMAT_BLOB'
+/* Load a  kernel  driver  from an  ELF  image  `module_image...+=len'
+ * This system call exists for linux compatibility, and is implemented
+ * as an alias for  `KSYSCTL_DRIVER_INSMOD:KSYSCTL_DRIVER_FORMAT_BLOB'
  * 
- * Note  however that that is where linux compatiblity ends. Since the
+ * Note however that that is where linux compatibility ends. Since the
  * linux kernel does not implement any semblance of a stable ABI,  you
  * have to realize that on KOS, this system call can only load drivers
  * specifically built to run within the KOS kernel!

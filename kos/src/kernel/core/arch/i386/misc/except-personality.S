@@ -22,7 +22,7 @@
 #define __ASSEMBLER__ 1
 
 #include <kernel/compiler.h>
-#ifdef CONFIG_USE_NEW_RPC
+
 #include <kernel/rt/except-handler.h>
 #include <kernel/rt/except-personality.h>
 
@@ -133,9 +133,5 @@ INTERN_FUNCTION(_x86_xintr3_userexcept_unwind)
 END(_x86_xintr3_userexcept_unwind)
 #endif /* !__x86_64__ */
 	.cfi_endproc
-
-
-
-#endif /* CONFIG_USE_NEW_RPC */
 
 #endif /* !GUARD_KERNEL_CORE_ARCH_I386_MISC_EXCEPT_PERSONALITY_S */

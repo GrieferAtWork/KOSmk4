@@ -271,13 +271,8 @@ PUBLIC_FUNCTION(x86_syscall_emulate_sysenter_r)
 	/* Check if our user-space return location got re-directed.
 	 * If it was, we need to apply the register override at the
 	 * saved return location, rather than the active one. */
-#ifdef CONFIG_USE_NEW_RPC
 	EXTERN(x86_userexcept_sysret)
 	cmpq   $(x86_userexcept_sysret), OFFSET_IRREGS_RIP(%rsp)
-#else /* CONFIG_USE_NEW_RPC */
-	EXTERN(x86_rpc_user_redirection)
-	cmpq   $(x86_rpc_user_redirection), OFFSET_IRREGS_RIP(%rsp)
-#endif /* !CONFIG_USE_NEW_RPC */
 	jne    1f
 	EXTERN(this_x86_sysret_iret)
 	movq   %rdi, %gs:(this_x86_sysret_iret + OFFSET_IRREGS_RIP) /* RIP := RDI */

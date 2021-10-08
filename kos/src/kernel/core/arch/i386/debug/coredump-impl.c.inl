@@ -244,7 +244,6 @@ LOCAL_sys_coredump_impl(struct icpustate *__restrict return_state,
 	      W_EXITCODE(1, signo & 0x7f) | WCOREFLAG);
 }
 
-#ifdef CONFIG_USE_NEW_RPC
 PRIVATE NONNULL((1, 2)) void PRPC_EXEC_CALLBACK_CC
 LOCAL_sys_coredump_rpc(struct rpc_context *__restrict ctx,
                        void *UNUSED(cookie)) {
@@ -258,23 +257,6 @@ LOCAL_sys_coredump_rpc(struct rpc_context *__restrict ctx,
 	                        (USER UNCHECKED LOCAL_union_coredump_info const *)ctx->rc_scinfo.rsi_regs[4],
 	                        (syscall_ulong_t)ctx->rc_scinfo.rsi_regs[5]);
 }
-#else /* CONFIG_USE_NEW_RPC */
-PRIVATE struct icpustate *FCALL
-LOCAL_sys_coredump_rpc(void *UNUSED(arg),
-                       struct icpustate *__restrict state,
-                       unsigned int reason,
-                       struct rpc_syscall_info const *sc_info) {
-	if unlikely(reason != TASK_RPC_REASON_SYSCALL)
-		return state;
-	LOCAL_sys_coredump_impl(state,
-	                    (USER UNCHECKED LOCAL_struct_ucpustate const *)sc_info->rsi_regs[0],
-	                    (USER UNCHECKED LOCAL_struct_ucpustate const *)sc_info->rsi_regs[1],
-	                    (USER UNCHECKED LOCAL_uintptr_t const *const *)sc_info->rsi_regs[2],
-	                    (size_t)sc_info->rsi_regs[3],
-	                    (USER UNCHECKED LOCAL_union_coredump_info const *)sc_info->rsi_regs[4],
-	                    (syscall_ulong_t)sc_info->rsi_regs[5]);
-}
-#endif /* !CONFIG_USE_NEW_RPC */
 
 /************************************************************************/
 /* coredump()                                                           */
@@ -303,19 +285,9 @@ DEFINE_SYSCALL32_6(errno_t, coredump,
 	(void)traceback_length;
 	(void)reason;
 	(void)unwind_error;
-#ifdef CONFIG_USE_NEW_RPC
 	/* Send an RPC to ourselves, so we can gain access to the user-space register state. */
 	task_rpc_userunwind(&LOCAL_sys_coredump_rpc, NULL);
 	__builtin_unreachable();
-#else /* CONFIG_USE_NEW_RPC */
-	task_schedule_user_rpc(THIS_TASK,
-	                       &LOCAL_sys_coredump_rpc,
-	                       NULL,
-	                       TASK_RPC_FHIGHPRIO |
-	                       TASK_USER_RPC_FINTR,
-	                       GFP_NORMAL);
-	__builtin_unreachable();
-#endif /* !CONFIG_USE_NEW_RPC */
 }
 
 #undef LOCAL_struct_ucpustate

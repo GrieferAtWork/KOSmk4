@@ -112,8 +112,8 @@ __NR32FEAT_SYSCALL_TABLE_FOREACH(DEFINE_KERNEL_SYSCALL_TABLES_METADATA)
 #define kernel_syscall64_doublewide  _kernel_syscall_doublewide
 
 
-/* For compatiblity mode, we need to look at the RPC syscall info method
- * to  figure out which namespace the encoded system call number belongs
+/* For compatibility mode, we need to look at the RPC syscall info method
+ * to figure out which namespace  the encoded system call number  belongs
  * to (either 32-bit, or 64-bit) */
 #define __rpc_syscall_info_iscompat(sc_info) \
 	(((sc_info)->rsi_flags & RPC_SYSCALL_INFO_METHOD_F3264) == RPC_SYSCALL_INFO_METHOD_F32)

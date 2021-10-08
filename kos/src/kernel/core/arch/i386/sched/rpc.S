@@ -23,7 +23,6 @@
 
 #include <kernel/compiler.h>
 
-#ifdef CONFIG_USE_NEW_RPC
 #include <kernel/rt/except-handler.h>
 #include <sched/rpc.h>
 #include <sched/task.h>
@@ -682,12 +681,5 @@ INTERN_FUNCTION(userexcept_handler_ucpustate)
 	jmp    .Ldid_copy_sc_info
 	.cfi_endproc
 END(userexcept_handler_ucpustate)
-
-
-
-
-
-
-#endif /* !CONFIG_USE_NEW_RPC */
 
 #endif /* !GUARD_KERNEL_CORE_ARCH_I386_SCHED_RPC_S */

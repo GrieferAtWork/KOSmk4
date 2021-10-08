@@ -48,11 +48,6 @@
 #define CONFIG_USE_NEW_FS
 #endif
 
-#undef CONFIG_USE_NEW_RPC
-#if 1
-#define CONFIG_USE_NEW_RPC
-#endif
-
 #ifdef CONFIG_USE_NEW_FS
 /* Backward-compatibility */
 #define inode            fnode

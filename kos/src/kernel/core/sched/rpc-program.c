@@ -24,7 +24,6 @@
 
 #include <kernel/compiler.h>
 
-#ifdef CONFIG_USE_NEW_RPC
 #include <kernel/except.h>
 #include <kernel/fpu.h>
 #include <kernel/mman.h>
@@ -69,6 +68,8 @@
 #include <libunwind/cfi.h> /* unwind_getreg_t, unwind_setreg_t */
 
 #if defined(__i386__) || defined(__x86_64__)
+#include <sched/x86/eflags-mask.h>
+
 #include <kos/kernel/cpu-state-verify.h>
 #endif /* __i386__ || __x86_64__ */
 
@@ -2034,6 +2035,12 @@ task_userrpc_runprogram(rpc_cpustate_t *__restrict state,
 		icpustate_setcs(state, ucpustate_getcs(&vm.rv_cpu));
 		icpustate_setuserss(state, ucpustate_getss(&vm.rv_cpu));
 		gpregs_to_gpregsnsp(&vm.rv_cpu.ucs_gpregs, &state->ics_gpregs);
+		{
+			union x86_user_eflags_mask_union word;
+			/* Mask %Pflags, as specified by `x86_user_eflags_mask' */
+			word.uem_word = atomic64_read(&x86_user_eflags_mask);
+			ucpustate_mskpflags(&vm.rv_cpu, word.uem_mask, word.uem_flag);
+		}
 		icpustate_setpflags(state, ucpustate_getpflags(&vm.rv_cpu));
 		icpustate_setpip(state, ucpustate_getpip(&vm.rv_cpu));
 		icpustate_setuserpsp(state, ucpustate_getpsp(&vm.rv_cpu));
@@ -2133,7 +2140,5 @@ DECL_END
 #include "rpc-program-schedule.c.inl"
 #endif /* __ARCH_WANT_COMPAT_SYSCALL_RPC_SCHEDULE */
 #endif /* !__INTELLISENSE__ */
-
-#endif /* CONFIG_USE_NEW_RPC */
 
 #endif /* !GUARD_KERNEL_SRC_SCHED_RPC_PROGRAM_C */

@@ -23,6 +23,7 @@
 //#define DEFINE_x86_userexcept_callsignal64
 #endif /* __INTELLISENSE__ */
 
+#include <sched/x86/eflags-mask.h>
 
 #if (defined(DEFINE_x86_userexcept_callsignal32) + \
      defined(DEFINE_x86_userexcept_callsignal64)) != 1
@@ -483,7 +484,7 @@ LOCAL_userexcept_callsignal(struct icpustate *__restrict state,
 
 	/* Mask %Pflags, as specified by `x86_user_eflags_mask' */
 	{
-		union x86_user_eflags_mask word;
+		union x86_user_eflags_mask_union word;
 		word.uem_word = atomic64_read(&x86_user_eflags_mask);
 		icpustate_mskpflags(state, word.uem_mask, word.uem_flag);
 	}

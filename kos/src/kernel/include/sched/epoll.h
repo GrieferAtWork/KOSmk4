@@ -199,7 +199,6 @@ epoll_controller_wait(struct epoll_controller *__restrict self,
                       ktime_t abs_timeout DFL(KTIME_INFINITE))
 		THROWS(E_BADALLOC, E_WOULDBLOCK, E_SEGFAULT, E_INTERRUPT);
 
-#ifdef CONFIG_USE_NEW_RPC
 #ifndef __sigset_t_defined
 #define __sigset_t_defined
 struct __sigset_struct;
@@ -213,7 +212,6 @@ epoll_controller_wait_with_sigmask(struct epoll_controller *__restrict self,
                                    sigset_t const *__restrict sigmask,
                                    ktime_t abs_timeout DFL(KTIME_INFINITE))
 		THROWS(E_BADALLOC, E_WOULDBLOCK, E_SEGFAULT, E_INTERRUPT);
-#endif /* CONFIG_USE_NEW_RPC */
 
 
 /* Quickly check if there are pending events that can be waited upon. */

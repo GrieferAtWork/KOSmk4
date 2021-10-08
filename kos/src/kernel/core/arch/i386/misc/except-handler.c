@@ -23,47 +23,31 @@
 
 #include <kernel/compiler.h>
 
-#include <kernel/coredump.h>
 #include <kernel/except.h>
 #include <kernel/printk.h>
+#include <kernel/rt/except-syscall.h>
 #include <kernel/syscall-properties.h>
-#include <kernel/syscall.h>
 #include <kernel/user.h>
-#include <sched/except-handler.h>
-#include <sched/pid.h>
-#include <sched/posix-signal.h>
-#include <sched/rpc-internal.h>
-#include <sched/rpc.h>
-#include <sched/signal.h>
-#include <sched/task.h>
+#include <sched/atomic64.h>
+#include <sched/x86/eflags-mask.h>
 
-#include <hybrid/atomic.h>
 #include <hybrid/host.h>
 
-#include <kos/bits/except-handler.h>
 #include <kos/bits/except-handler32.h>
-#include <kos/bits/exception_data.h>
 #include <kos/bits/exception_data32.h>
-#include <kos/kernel/cpu-state-compat.h>
 #include <kos/kernel/cpu-state-helpers.h>
-#include <kos/kernel/cpu-state-helpers32.h>
 #include <kos/kernel/cpu-state.h>
-#include <kos/kernel/cpu-state32.h>
-#include <sys/wait.h>
+#include <kos/rpc.h>
 
-#include <assert.h>
 #include <inttypes.h>
-#include <signal.h>
 #include <stddef.h>
-#include <string.h>
 
-#include <libcpustate/apply.h>
+#ifdef __x86_64__
+#include <kos/bits/except-handler64.h>
+#include <kos/bits/exception_data64.h>
+#endif /* __x86_64__ */
 
 DECL_BEGIN
-
-/* TODO: Under CONFIG_USE_NEW_RPC, all of the `x86_userexcept_*'
- *       function should not  be made  `PUBLIC', but  `PRIVATE'! */
-
 
 LOCAL NOBLOCK NONNULL((1, 2, 3)) void
 NOTHROW(FCALL log_userexcept_errno_propagate)(struct icpustate const *__restrict state,
@@ -212,7 +196,7 @@ userexcept_callhandler(struct icpustate *__restrict state,
 	icpustate_setusersp(state, user_error);
 	icpustate_setpc(state, (void *)handler);
 	{
-		union x86_user_eflags_mask word;
+		union x86_user_eflags_mask_union word;
 		word.uem_word = atomic64_read(&x86_user_eflags_mask);
 		/* Mask %eflags, as specified by `x86_user_eflags_mask' */
 		icpustate_mskpflags(state, word.uem_mask, word.uem_flag);
@@ -276,7 +260,7 @@ x86_userexcept_callhandler64(struct icpustate *__restrict state,
 	icpustate_setusersp(state, user_error);
 	icpustate_setpc(state, (void *)handler);
 	{
-		union x86_user_eflags_mask word;
+		union x86_user_eflags_mask_union word;
 		word.uem_word = atomic64_read(&x86_user_eflags_mask);
 		/* Mask %eflags, as specified by `x86_user_eflags_mask' */
 		icpustate_mskpflags(state, word.uem_mask, word.uem_flag);
@@ -311,20 +295,12 @@ userexcept_callhandler(struct icpustate *__restrict state,
 /* Arch-specific function:
  * Translate the current exception into an errno and set that errno
  * as the return value of  the system call described by  `sc_info'. */
-#ifdef CONFIG_USE_NEW_RPC
 PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3)) struct icpustate *FCALL
 userexcept_seterrno(struct icpustate *__restrict state,
                     struct rpc_syscall_info const *__restrict sc_info,
                     struct exception_data const *__restrict data)
 		/* NOTE: On x86, this implementation is actually NOTHROW... */
-		THROWS(E_SEGFAULT)
-#else /* CONFIG_USE_NEW_RPC */
-PUBLIC NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3)) struct icpustate *
-NOTHROW(FCALL userexcept_seterrno)(struct icpustate *__restrict state,
-                                   struct rpc_syscall_info const *__restrict sc_info,
-                                   struct exception_data const *__restrict data)
-#endif /* !CONFIG_USE_NEW_RPC */
-{
+		THROWS(E_SEGFAULT) {
 	errno_t errval = -error_as_errno(data);
 	log_userexcept_errno_propagate(state, sc_info, data, errval);
 
@@ -340,539 +316,6 @@ NOTHROW(FCALL userexcept_seterrno)(struct icpustate *__restrict state,
 		gpregs_setpdx(&state->ics_gpregs, (uintptr_t)-1); /* sign-extend */
 	return state;
 }
-
-
-
-
-#ifdef CONFIG_USE_NEW_RPC
-/* TODO: Define a personality function that can be used like:
- * >> my_interrupt:
- * >>     .cfi_startproc
- * >>     .cfi_personality 0, interrupt_restart_personality
- * >>     .cfi_lsda        0, my_interrupt
- * >>     iret
- * >>     .cfi_endproc
- *
- * `interrupt_restart_personality' is implemented as
- * >> interrupt_restart_personality(void *lsda) {
- * >>     if (RETURNS_TO_KERNELSPACE)
- * >>         return NORMAL_UNWIND; // Only care about unwind to user
- * >>     struct icpustate *state = unwind();
- * >>     state = userexcept_handler(state, NULL);
- * >>     // When `userexcept_handler()' returns, then we must restart
- * >>     // the interrupt. This is done by constructing a new IRET
- * >>     // tail and loading `lsda' as the new program counter. The
- * >>     // user of our personality function will have accounted for
- * >>     // this by storing the entry point for the interrupt as the
- * >>     // associated lsda.
- * >>     state = PUSH_IRET(state, pc: lsda, cs: SEGMENT_KERNEL_CS);
- * >>     cpu_apply_icpustate(state);
- * >> }
- *
- * This way, the restartable-interrupt requirement can _very_ easily
- * be implemented/supported. */
-
-#else /* CONFIG_USE_NEW_RPC */
-LOCAL ATTR_NORETURN void
-NOTHROW(FCALL process_exit)(int reason) {
-	if (!task_isprocessleader()) {
-		/* We need to terminate the _process_; not just this thread!
-		 * This can be done by re-using our exit RPC, and sending it
-		 * to the process leader. */
-		struct rpc_entry *rpc;
-		rpc = ATOMIC_XCH(PERTASK(this_taskgroup.tg_thread_exit), NULL);
-		/* When `rpc' was already `NULL', then our leader must already be
-		 * in the process of exiting, and already took our exit RPC away,
-		 * trying to terminate us.
-		 * Handle this case by letting it do its thing, even though this
-		 * will cause us to use a different exit reason than the leader. */
-		if likely(rpc) {
-			int rpc_status;
-			rpc->re_arg = (void *)(uintptr_t)(unsigned int)reason;
-			rpc_status = task_deliver_rpc(task_getprocess(), rpc, TASK_RPC_FNORMAL);
-			if (TASK_DELIVER_RPC_WASOK(rpc_status))
-				goto done;
-			/* Failed to deliver the RPC. The only reason this should be able to happen
-			 * is when the process leader has/is already terminated/terminating, and is
-			 * no longer able to service any RPCs. */
-			assertf(rpc_status == TASK_DELIVER_RPC_TERMINATED,
-			        "Unexpected failure reason for terminating process leader\n"
-			        "rpc_status = %d", rpc_status);
-			/* Cleanup the RPC, since it isn't inherited by `task_deliver_rpc()' upon failure. */
-			task_free_rpc(rpc);
-		}
-	}
-done:
-	task_exit(reason);
-}
-
-LOCAL ATTR_NORETURN NONNULL((1)) void
-NOTHROW(FCALL process_exit_for_exception_after_coredump)(struct exception_data const *__restrict error) {
-	siginfo_t si;
-	/* Try to translate the current exception  into a signal, so that  we
-	 * can use that signal code as reason for why the process has exited. */
-	if (!error_as_signal(error, &si))
-		si.si_signo = SIGILL;
-	process_exit(W_EXITCODE(1, si.si_signo) | WCOREFLAG);
-}
-
-
-
-/* Raise a posix signal in user-space for `siginfo'
- * @param: state:   The user-space CPU state (note that `icpustate_isuser(state)' is assumed!)
- * @param: sc_info: When  non-NULL,  information about  the system  call  that caused  the signal.
- *                  Otherwise,  if this argument  is `NULL', the signal  was caused by user-space,
- *                  such as a user-space program causing an `E_SEGFAULT', as opposed to the kernel
- *                  throwing an `E_FSERROR_FILE_NOT_FOUND'
- *            HINT: Additional information about how the system call was invoked can be extracted
- *                  from       `sc_info->rsi_flags'!       (s.a.        `<kos/asm/rpc-method.h>')
- * @param: siginfo: The signal that is being raised
- * @param: except_info: When non-NULL, `siginfo' was generated through `error_as_signal(&except_info->ei_data)',
- *                  and  if a coredump ends up being generated  as a result of the signal being
- *                  raised, that coredump will include information about `error_info()', rather
- *                  than the given `siginfo'
- * @return: * :     The updated interrupt CPU state, modified to invoke the
- *                  user-space signal  handler  once  user-space  execution
- *                  resumes. */
-PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1, 3)) struct icpustate *FCALL
-x86_userexcept_raisesignal(struct icpustate *__restrict state,
-                           struct rpc_syscall_info const *sc_info,
-                           siginfo_t const *__restrict siginfo,
-                           struct exception_info const *except_info) {
-	struct icpustate *result;
-	struct sighand *hand;
-	struct kernel_sigaction action;
-	/* Raise a POSIX signal */
-again_gethand:
-	assert(siginfo->si_signo != 0);
-	assert(siginfo->si_signo < NSIG);
-	if (!THIS_SIGHAND_PTR) {
-		action.sa_handler = SIG_DFL;
-		action.sa_flags   = 0;
-		action.sa_mask    = NULL;
-	} else {
-		hand   = sighand_ptr_lockread(THIS_SIGHAND_PTR);
-		action = hand->sh_actions[siginfo->si_signo - 1];
-		xincref(action.sa_mask);
-		sync_endread(hand);
-	}
-
-	/* Check for special signal handlers. */
-	if (action.sa_handler == SIG_DFL)
-		action.sa_handler = sighand_default_action(siginfo->si_signo);
-	switch ((uintptr_t)(void *)action.sa_handler) {
-
-	case __SIG_IGN:
-		xdecref_unlikely(action.sa_mask);
-#if 0 /* `SA_RESETHAND' only affects user-space signal handler functions */
-		if ((action.sa_flags & SA_RESETHAND) &&
-		    unlikely(!sighand_reset_handler(siginfo->si_signo, &action)))
-			goto again_gethand;
-#endif
-		if (sc_info && except_info)
-			state = userexcept_seterrno(state, sc_info, &except_info->ei_data);
-		return state;
-
-	case __SIG_CORE:
-		xdecref_unlikely(action.sa_mask);
-		if (except_info) {
-			/* If we've gotten here because of a system call, then we can assume that
-			 * the exception does have a kernel-space side, and thus we must  include
-			 * information about that exception's origin. */
-			coredump_create_for_exception(state, except_info, sc_info != NULL);
-		} else {
-			coredump_create_for_signal(state, siginfo);
-		}
-		process_exit(W_EXITCODE(1, siginfo->si_signo) | WCOREFLAG);
-
-	case __SIG_TERM:
-		xdecref_unlikely(action.sa_mask);
-		process_exit(W_EXITCODE(1, siginfo->si_signo));
-
-	case __SIG_EXIT:
-		xdecref_unlikely(action.sa_mask);
-		task_exit(W_EXITCODE(1, siginfo->si_signo));
-
-	case __SIG_CONT:
-		xdecref_unlikely(action.sa_mask);
-#if 0 /* `SA_RESETHAND' only affects user-space signal handler functions */
-		if ((action.sa_flags & SA_RESETHAND) &&
-		    unlikely(!sighand_reset_handler(siginfo->si_signo, &action)))
-			goto again_gethand;
-#endif
-		/* Continue execution. */
-		task_sigcont(THIS_TASK);
-		return state;
-
-	case __SIG_STOP:
-		/* TODO: Mask additional signals by looking at `SA_NODEFER' and `action.sa_mask' */
-		xdecref_unlikely(action.sa_mask);
-#if 0 /* `SA_RESETHAND' only affects user-space signal handler functions */
-		if ((action.sa_flags & SA_RESETHAND) &&
-			unlikely(!sighand_reset_handler(siginfo->si_signo, &action)))
-			goto again_gethand;
-#endif
-		/* Suspend execution. */
-		task_sigstop(W_STOPCODE(siginfo->si_signo));
-		return state;
-
-	default: break;
-	}
-
-	/* Invoke a regular, old signal handler. */
-	{
-		FINALLY_XDECREF_UNLIKELY(action.sa_mask);
-		result = userexcept_callsignal(state,
-		                              &action,
-		                              siginfo,
-		                              sc_info);
-	}
-	if unlikely(!result)
-		goto again_gethand;
-	return result;
-}
-
-
-/* Helper function for  `x86_userexcept_raisesignal()' that  may be  used
- * to raise the appropriate POSIX signal for the currently set exception.
- * @return: NULL: The current exception cannot be translated into a posix signal.
- * @return: * :     The updated interrupt CPU state, modified to invoke the
- *                  user-space signal  handler  once  user-space  execution
- *                  resumes. */
-PUBLIC WUNUSED NONNULL((1, 3)) struct icpustate *FCALL
-x86_userexcept_raisesignal_from_exception(struct icpustate *__restrict state,
-                                          struct rpc_syscall_info const *sc_info,
-                                          struct exception_info const *__restrict except_info) {
-	siginfo_t siginfo;
-	/* Try to translate the current exception into a signal. */
-	if (!error_as_signal(&except_info->ei_data, &siginfo))
-		return NULL;
-	/* Include missing information within the signal info. */
-	switch (siginfo.si_signo) {
-
-	case SIGSYS:
-		siginfo.si_call_addr = (void *)icpustate_getpc(state);
-		break;
-
-	default: break;
-	}
-	return x86_userexcept_raisesignal(state,
-	                                  sc_info,
-	                                  &siginfo,
-	                                  except_info);
-}
-
-
-
-
-/* Propagate the currently  thrown exception  into user-space, using  either the  user-space
- * exception handler, by raising  a POSIX signal,  or by translating  the exception into  an
- * E* error code in  the event of a  system call with exceptions  disabled (on x86,  except-
- * enabled is usually controlled by the DF bit, however this function takes that information
- * from the `RPC_SYSCALL_INFO_FEXCEPT' bit in `sc_info->rsi_flags'). */
-PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1)) struct icpustate *
-NOTHROW(FCALL x86_userexcept_propagate)(struct icpustate *__restrict state,
-                                        struct rpc_syscall_info const *sc_info) {
-	struct icpustate *result;
-	struct exception_info info;
-	struct exception_info *tls_info;
-
-	/* Assert that there are no active connections. */
-#ifndef NDEBUG
-	{
-		struct task_connections *self;
-		struct task_connection *con;
-		self = THIS_CONNECTIONS;
-		con  = self->tcs_con;
-		assertf(con == NULL, "con = %p", con);
-	}
-#endif /* !NDEBUG */
-	tls_info = error_info();
-	memcpy(&info, tls_info, sizeof(info));
-	tls_info->ei_code  = ERROR_CODEOF(E_OK);
-	tls_info->ei_flags = EXCEPT_FNORMAL;
-again:
-	assertf(tls_info->ei_code == ERROR_CODEOF(E_OK),
-	        "Exception wasn't properly deleted");
-	assertf(tls_info->ei_flags == EXCEPT_FNORMAL,
-	        "Unexpected exception flags");
-	assertf(tls_info->ei_nesting == 0,
-	        "There are still saved, nested exception somewhere on our stack");
-	assertf(PREEMPTION_ENABLED(),
-	        "Preemption must be enabled to propagate exceptions to user-space.");
-
-	/* Handle special exception codes */
-	switch (info.ei_code) {
-
-	case ERROR_CODEOF(E_EXIT_PROCESS):
-		process_exit((int)info.ei_data.e_args.e_exit_process.ep_exit_code);
-
-	case ERROR_CODEOF(E_EXIT_THREAD):
-		task_exit((int)info.ei_data.e_args.e_exit_thread.et_exit_code);
-
-	case ERROR_CODEOF(E_UNKNOWN_SYSTEMCALL): {
-		enum { MMASK = RPC_SYSCALL_INFO_FMETHOD & ~RPC_SYSCALL_INFO_METHOD_F3264 };
-		uintptr_t flags;
-		if (!sc_info)
-			break;
-		/* Amend missing information about how a system call was invoked. */
-		flags = info.ei_data.e_args.e_unknown_systemcall.us_flags;
-		if ((flags & MMASK) == (RPC_SYSCALL_INFO_METHOD_OTHER & ~RPC_SYSCALL_INFO_METHOD_F3264)) {
-			flags = (flags & ~MMASK) | (sc_info->rsi_flags & MMASK);
-			info.ei_data.e_args.e_unknown_systemcall.us_flags = flags;
-		}
-	}	break;
-
-	default: break;
-	}
-
-	/* Handle exception unwinding into user-space. */
-	TRY {
-		if (sc_info != NULL) {
-			if (sc_info->rsi_flags & RPC_SYSCALL_INFO_FEXCEPT) {
-				/* System call exceptions are enabled. */
-				/* Propagate the exception to user-space if handlers are enabled. */
-				if ((PERTASK_GET(this_user_except_handler.ueh_mode) &
-				     EXCEPT_HANDLER_MODE_MASK) != EXCEPT_HANDLER_MODE_DISABLED) {
-					result = userexcept_callhandler(state, sc_info, &info.ei_data);
-					if likely(result)
-						goto done;
-				}
-				/* If exceptions don't work, try to propagate a POSIX signal */
-				result = x86_userexcept_raisesignal_from_exception(state, sc_info, &info);
-				if likely(result)
-					goto done;
-				/* If the exception still cannot be handled, terminate the program. */
-				goto terminate_app;
-			}
-			/* Translate the current exception into an errno. */
-			result = userexcept_seterrno(state, sc_info, &info.ei_data);
-			goto done;
-		}
-
-		/* Check if signal exceptions should be propagated in non-syscall scenarios. */
-		if ((PERTASK_GET(this_user_except_handler.ueh_mode) &
-		     EXCEPT_HANDLER_MODE_MASK) == EXCEPT_HANDLER_MODE_SIGHAND) {
-			result = userexcept_callhandler(state, sc_info, &info.ei_data);
-			if likely(result)
-				goto done;
-		}
-		/* Deliver a signal to the calling user-space thread. */
-		result = x86_userexcept_raisesignal_from_exception(state, sc_info, &info);
-		if likely(result)
-			goto done;
-	} EXCEPT {
-		error_printf("raising exception/signal");
-		if (error_priority(tls_info->ei_code) > error_priority(info.ei_code)) {
-			memcpy(&info, tls_info, sizeof(info));
-			assert(PREEMPTION_ENABLED());
-			goto again;
-		}
-	}
-
-terminate_app:
-	/* If we've gotten here because of a system call, then we can assume that
-	 * the exception does have a kernel-space side, and thus we must  include
-	 * information about that exception's origin. */
-	coredump_create_for_exception(state, &info, sc_info != NULL);
-	process_exit_for_exception_after_coredump(&info.ei_data);
-	__builtin_unreachable();
-done:
-	assert(tls_info->ei_code == ERROR_CODEOF(E_OK));
-	assert(tls_info->ei_flags == EXCEPT_FNORMAL);
-	assert(tls_info->ei_nesting == 0);
-	assert(PREEMPTION_ENABLED());
-	return result;
-}
-
-
-
-
-/* Serve all user-space redirection RPCs
- * @return: * : The new CPU state to restore
- * @param: prestart_system_call: If `reason == TASK_RPC_REASON_SYSCALL', whilst an `E_INTERRUPT_USER_RPC'
- *                               exception was handled, when `RPC_KIND_USER_SYNC' RPCs exist that  cannot
- *                               be handled in the current context, then set to true. */
-INTDEF WUNUSED NONNULL((1)) struct icpustate *
-NOTHROW(FCALL rpc_serve_user_redirection_all)(struct icpustate *__restrict state,
-                                              unsigned int reason,
-                                              struct rpc_syscall_info const *sc_info,
-                                              bool *prestart_system_call);
-
-
-/* Given a user-space UCPUSTATE, load that state into the active IRET tail, whilst
- * accounting for additional user-space RPC redirection, before serving user-level
- * RPC functions, and finally propagating the then set exception (if one still is)
- * into user-space with the help of `x86_userexcept_propagate()'.
- * Afterwards, load the updated icpustate at the base of the calling thread's stack,
- * and  finally  fully unwind  into  user-space by  use  of `cpu_apply_icpustate()'. */
-PUBLIC ATTR_NORETURN NONNULL((1)) void
-NOTHROW(FCALL x86_userexcept_unwind)(struct ucpustate *__restrict ustate,
-                                     struct rpc_syscall_info const *sc_info) {
-	struct icpustate *return_state;
-	assert(!(PERTASK_GET(this_task.t_flags) & TASK_FKERNTHREAD));
-	/* Disable interrupts to prevent Async-RPCs from doing even more re-directions! */
-	__cli();
-#define kernel_stack_top() ((byte_t *)PERTASK_GET(this_x86_kernel_psp0))
-	/* Figure out where the return icpustate needs to go. */
-	return_state = (struct icpustate *)(kernel_stack_top() -
-	                                    (
-#ifdef __x86_64__
-	                                    SIZEOF_ICPUSTATE64
-#else /* __x86_64__ */
-	                                    ucpustate_isvm86(ustate)
-	                                    ? OFFSET_ICPUSTATE32_IRREGS + SIZEOF_IRREGS32_VM86
-	                                    : OFFSET_ICPUSTATE32_IRREGS + SIZEOF_IRREGS32_USER
-#endif /* !__x86_64__ */
-	                                    ));
-	/* Check if user-space got redirected (if so, we need to follow some custom unwinding rules). */
-	if (return_state->ics_irregs.ir_Pip == (uintptr_t)&x86_rpc_user_redirection) {
-		/* A re-direction may have happened whilst we were unwinding. - Adjust for that now!
-		 * HINT: The actual user-space return location is stored in `this_x86_sysret_iret' */
-		assert(PERTASK_GET(this_x86_sysret_iret.ir_Pip) != (uintptr_t)&x86_rpc_user_redirection);
-		assert(return_state->ics_irregs.ir_Pflags == 0);
-		assert(SEGMENT_IS_VALID_KERNCODE(return_state->ics_irregs.ir_cs));
-		/* Manually unwind additional FLAGS registers.
-		 * Because .cfi_iret_signal_frame perform a kernel-space unwind
-		 * due to  the  redirection,  we  must  manually  complete  the
-		 * unwind to also include ESP and SS
-		 *  - Right now, ESP points at &irregs_user::ir_esp / &irregs_vm86::ir_esp */
-#ifdef __x86_64__
-		assertf(ustate->ucs_gpregs.gp_rsp == return_state->ics_irregs.ir_rsp,
-		        "ustate->ucs_gpregs.gp_rsp       = %p\n"
-		        "return_state->ics_irregs.ir_rsp = %p\n",
-		        ustate->ucs_gpregs.gp_rsp,
-		        return_state->ics_irregs.ir_rsp);
-#else /* __x86_64__ */
-		assertf(ustate->ucs_gpregs.gp_esp == (u32)&return_state->ics_irregs_u.ir_esp,
-		        "ustate->ucs_gpregs.gp_esp          = %p\n"
-		        "&return_state->ics_irregs_u.ir_esp = %p\n",
-		        ustate->ucs_gpregs.gp_esp,
-		        &return_state->ics_irregs_u.ir_esp);
-#endif /* !__x86_64__ */
-
-#ifdef __x86_64__
-		return_state->ics_irregs.ir_rip    = PERTASK_GET(this_x86_sysret_iret.ir_rip);
-		return_state->ics_irregs.ir_cs     = PERTASK_GET(this_x86_sysret_iret.ir_cs16);
-		return_state->ics_irregs.ir_rflags = PERTASK_GET(this_x86_sysret_iret.ir_rflags);
-		return_state->ics_irregs.ir_rsp    = PERTASK_GET(this_x86_sysret_iret.ir_rsp);
-		return_state->ics_irregs.ir_ss     = PERTASK_GET(this_x86_sysret_iret.ir_ss16);
-#else /* __x86_64__ */
-		return_state->ics_irregs_u.ir_eip    = PERTASK_GET(this_x86_sysret_iret.ir_eip);
-		return_state->ics_irregs_u.ir_cs     = PERTASK_GET(this_x86_sysret_iret.ir_cs16);
-		return_state->ics_irregs_u.ir_eflags = PERTASK_GET(this_x86_sysret_iret.ir_eflags);
-#if 0 /* Still initialized correctly... */
-		return_state->ics_irregs_u.ir_ss     = return_state->ics_irregs_u.ir_ss16;
-		return_state->ics_irregs_u.ir_esp    = return_state->ics_irregs_u.ir_esp;
-#endif
-#endif /* !__x86_64__ */
-	} else {
-		/* Fill in the user-space return location to match `ustate' */
-#ifdef __x86_64__
-		return_state->ics_irregs.ir_rip    = ustate->ucs_rip;
-		return_state->ics_irregs.ir_cs     = ustate->ucs_cs16;
-		return_state->ics_irregs.ir_rflags = ustate->ucs_rflags;
-		return_state->ics_irregs.ir_rsp    = ustate->ucs_gpregs.gp_rsp;
-		return_state->ics_irregs.ir_ss     = ustate->ucs_ss16;
-#else /* __x86_64__ */
-		return_state->ics_irregs_u.ir_eip    = ustate->ucs_eip;
-		return_state->ics_irregs_u.ir_cs     = ustate->ucs_cs16;
-		return_state->ics_irregs_u.ir_eflags = ustate->ucs_eflags;
-		return_state->ics_irregs_u.ir_esp    = ustate->ucs_gpregs.gp_esp;
-		return_state->ics_irregs_u.ir_ss     = ustate->ucs_ss16;
-#endif /* !__x86_64__ */
-	}
-#ifdef __x86_64__
-	gpregs_to_gpregsnsp(&ustate->ucs_gpregs, &return_state->ics_gpregs);
-	__wrds(ustate->ucs_sgregs.sg_ds16);
-	__wres(ustate->ucs_sgregs.sg_es16);
-	__wrfs(ustate->ucs_sgregs.sg_fs16);
-	{
-		struct task *me = THIS_TASK;
-		__wrgs(ustate->ucs_sgregs.sg_gs16);
-		__wrgsbase(me);
-	}
-	/* FIXME: Restoring  segment  base  registers here  is  correct, however
-	 *        unnecessary  in all  current use  cases. -  The solution would
-	 *        be to have  another kind  of cpustate structure  that is  like
-	 *        ucpustate, but don't contain segment base registers on x86_64! */
-	x86_set_user_gsbase(ustate->ucs_sgbase.sg_gsbase);
-	x86_set_user_fsbase(ustate->ucs_sgbase.sg_fsbase);
-#else /* __x86_64__ */
-	return_state->ics_gpregs = ustate->ucs_gpregs;
-	if (ustate->ucs_eflags & EFLAGS_VM) {
-		/* Special case: vm86 return state */
-		return_state->ics_ds             = SEGMENT_USER_DATA_RPL;
-		return_state->ics_es             = SEGMENT_USER_DATA_RPL;
-		return_state->ics_fs             = SEGMENT_USER_FSBASE_RPL;
-		return_state->ics_irregs_v.ir_es = ustate->ucs_sgregs.sg_es16;
-		return_state->ics_irregs_v.ir_ds = ustate->ucs_sgregs.sg_ds16;
-		return_state->ics_irregs_v.ir_fs = ustate->ucs_sgregs.sg_fs16;
-		return_state->ics_irregs_v.ir_gs = ustate->ucs_sgregs.sg_gs16;
-	} else {
-		icpustate_setds_novm86(return_state, ustate->ucs_sgregs.sg_ds16);
-		icpustate_setes_novm86(return_state, ustate->ucs_sgregs.sg_es16);
-		icpustate_setfs_novm86(return_state, ustate->ucs_sgregs.sg_fs16);
-		icpustate_setgs_novm86(return_state, ustate->ucs_sgregs.sg_gs16);
-	}
-#endif /* !__x86_64__ */
-
-	/* Now that we've constructed an entirely valid ICPUSTATE at the base of our
-	 * own stack, we can re-enable interrupts, as it will be this state which is
-	 * (presumably) going to be restored when jumping back into user-space. */
-	__sti();
-
-	x86_userexcept_unwind_i(return_state, sc_info);
-}
-
-/* Same  as  `x86_userexcept_unwind()',  however  the  caller  has  already  done  the work
- * of constructing a `struct icpustate *' at the base of the current thread's kernel stack. */
-PUBLIC ATTR_NORETURN NONNULL((1)) void
-NOTHROW(FCALL x86_userexcept_unwind_i)(struct icpustate *__restrict state,
-                                       struct rpc_syscall_info const *sc_info) {
-	/* Service RPCs before returning to user-space. */
-	assert(!task_wasconnected());
-	assertf(PREEMPTION_ENABLED(),
-	        "Preemption must be enabled to propagate exceptions to user-space.");
-
-	if (sc_info) {
-		bool must_restart_syscall;
-		must_restart_syscall = false;
-		state = rpc_serve_user_redirection_all(state,
-		                                       TASK_RPC_REASON_SYSCALL,
-		                                       sc_info,
-		                                       &must_restart_syscall);
-		assert(PREEMPTION_ENABLED());
-		/* If there is still an active exception (i.e. RPC handling didn't  resolve
-		 * the exception, as would be the case for `E_INTERRUPT_USER_RPC'), then we
-		 * must somehow propagate the exception into user-space. */
-		if (error_code() != E_OK) {
-			assert(!must_restart_syscall);
-			state = x86_userexcept_propagate(state, sc_info);
-		} else if unlikely(must_restart_syscall) {
-			/* Reset the system call by resetting the kernel stack. */
-			syscall_emulate_r(state, sc_info);
-		}
-	} else {
-		state = rpc_serve_user_redirection_all(state,
-		                                       TASK_RPC_REASON_ASYNCUSER,
-		                                       NULL,
-		                                       NULL);
-		/* If there is still an active exception (i.e. RPC handling didn't  resolve
-		 * the exception, as would be the case for `E_INTERRUPT_USER_RPC'), then we
-		 * must somehow propagate the exception into user-space. */
-		if (error_code() != E_OK)
-			state = x86_userexcept_propagate(state, NULL);
-	}
-
-	/* Unwind into to the target state, thus returning back to userspace,
-	 * though with the associated  target potentially changed. Note  that
-	 * at this point no kernel exception remains set! */
-	cpu_apply_icpustate(state);
-}
-#endif /* !CONFIG_USE_NEW_RPC */
-
-
 
 DECL_END
 

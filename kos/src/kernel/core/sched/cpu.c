@@ -89,22 +89,11 @@ INTDEF pertask_onexit_t __kernel_pertask_onexit_start[];
 INTDEF pertask_onexit_t __kernel_pertask_onexit_end[];
 
 
-#ifdef CONFIG_USE_NEW_RPC
 PRIVATE NONNULL((1, 2)) void
 NOTHROW(PRPC_EXEC_CALLBACK_CC task_decref_for_exit_rpc)(struct rpc_context *__restrict UNUSED(ctx),
                                                         void *cookie) {
 	decref((struct task *)cookie);
 }
-#else /* CONFIG_USE_NEW_RPC */
-PRIVATE NOBLOCK WUNUSED NONNULL((1, 2)) struct icpustate *
-NOTHROW(FCALL task_decref_for_exit_rpc)(void *arg,
-                                        struct icpustate *__restrict state,
-                                        unsigned int UNUSED(reason),
-                                        struct rpc_syscall_info const *UNUSED(sc_info)) {
-	decref((struct task *)arg);
-	return state;
-}
-#endif /* !CONFIG_USE_NEW_RPC */
 
 PRIVATE ATTR_KERNEL_PANIC_NORETURN ATTR_COLD ATTR_NOINLINE void
 NOTHROW(FCALL panic_critical_thread_exited)(void) {
@@ -189,9 +178,7 @@ NOTHROW(FCALL task_exit)(int w_status) {
 	{
 		struct scpustate *state;
 		state = FORTASK(next, this_sstate);
-		state = task_push_asynchronous_rpc(state,
-		                                   &task_decref_for_exit_rpc,
-		                                   caller);
+		state = task_asyncrpc_push(state, &task_decref_for_exit_rpc, caller);
 		FORTASK(next, this_sstate) = state;
 	}
 

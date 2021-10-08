@@ -23,7 +23,6 @@
 
 #include <kernel/compiler.h>
 
-#ifdef CONFIG_USE_NEW_RPC
 #include <kernel/rt/except-handler.h>
 #include <kernel/x86/syscall-tables.h>
 #include <sched/cpu.h>
@@ -350,8 +349,6 @@ PUBLIC NOBLOCK void NOTHROW(FCALL userexcept_sysret_inject_self)(void) {
 #endif /* !__x86_64__ */
 }
 
-
 DECL_END
-#endif /* !CONFIG_USE_NEW_RPC */
 
 #endif /* !GUARD_KERNEL_CORE_ARCH_I386_SCHED_RPC_C */

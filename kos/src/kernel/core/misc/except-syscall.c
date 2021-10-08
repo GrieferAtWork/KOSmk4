@@ -32,7 +32,6 @@
 #include <kernel/syscall.h>
 #include <kernel/types.h>
 #include <kernel/user.h>
-#include <sched/except-handler.h>
 #include <sched/pid.h>
 #include <sched/posix-signal.h>
 #include <sched/rpc-internal.h>
@@ -467,7 +466,6 @@ DEFINE_SYSCALL1(pid_t, set_tid_address,
 
 #ifdef CONFIG_HAVE_USERPROCMASK
 #ifdef __ARCH_WANT_SYSCALL_SET_USERPROCMASK_ADDRESS
-#ifdef CONFIG_USE_NEW_RPC
 DEFINE_SYSCALL1(errno_t, set_userprocmask_address,
                 USER UNCHECKED struct userprocmask *, ctl) {
 	if unlikely(PERTASK_TESTMASK(this_task.t_flags, TASK_FUSERPROCMASK)) {
@@ -562,155 +560,6 @@ DEFINE_SYSCALL1(errno_t, set_userprocmask_address,
 done:
 	return -EOK;
 }
-#else /* CONFIG_USE_NEW_RPC */
-PRIVATE NOBLOCK NONNULL((1, 2)) void
-NOTHROW(KCALL restore_perthread_pending_signals)(struct sigqueue *__restrict myqueue,
-                                                 struct sigqueue_entry *__restrict pending) {
-	/* Restore all signals pending for the calling thread. */
-	if unlikely(!ATOMIC_CMPXCH(myqueue->sq_queue, NULL, pending)) {
-		struct sigqueue_entry *last, *next;
-		last = pending;
-		while (last->sqe_next)
-			last = last->sqe_next;
-		do {
-			next = ATOMIC_READ(myqueue->sq_queue);
-			last->sqe_next = next;
-			COMPILER_WRITE_BARRIER();
-		} while (!ATOMIC_CMPXCH_WEAK(myqueue->sq_queue, next, pending));
-	}
-}
-
-/* Gather the set of pending signals.
- * @return: true:  At least one signal was added to `these'
- * @return: false: No signals were added to `these' */
-PRIVATE bool KCALL
-gather_pending_signals(sigset_t *__restrict these) {
-	struct sigqueue *myqueue;
-	struct process_sigqueue *prqueue;
-	struct sigqueue_entry *pending, **piter, *iter;
-	bool result;
-	result  = false;
-	myqueue = &THIS_SIGQUEUE;
-	/* Temporarily steal all pending per-thread signals. */
-	do {
-		pending = ATOMIC_READ(myqueue->sq_queue);
-		if (!pending)
-			goto no_perthread_pending; /* No signals are pending for the calling thread */
-		if unlikely(pending == SIGQUEUE_SQ_QUEUE_TERMINATED)
-			return false; /* Shouldn't happen: The calling thread is currently terminating. */
-	} while (!ATOMIC_CMPXCH_WEAK(myqueue->sq_queue, pending, NULL));
-	iter  = pending;
-	piter = &pending;
-	do {
-		sigaddset(these, iter->sqe_info.si_signo);
-		result = true;
-	} while ((iter = *(piter = &iter->sqe_next)) != NULL);
-	/* Restore all signals pending for the calling thread. */
-	restore_perthread_pending_signals(myqueue, pending);
-no_perthread_pending:
-	/* With per-task signals checked, also check for per-process signals */
-	prqueue = &THIS_PROCESS_SIGQUEUE;
-	sync_read(&prqueue->psq_lock);
-	for (iter = prqueue->psq_queue.sq_queue; iter; iter = iter->sqe_next) {
-		sigaddset(these, iter->sqe_info.si_signo);
-		result = true;
-	}
-	sync_endread(&prqueue->psq_lock);
-	return result;
-}
-
-
-DEFINE_SYSCALL1(errno_t, set_userprocmask_address,
-                USER UNCHECKED struct userprocmask *, ctl) {
-	if unlikely(PERTASK_TESTMASK(this_task.t_flags, TASK_FUSERPROCMASK)) {
-		USER CHECKED struct userprocmask *old_ctl;
-		old_ctl = PERTASK_GET(this_userprocmask_address);
-		/* Check for special case: Nothing changed. */
-		if unlikely(old_ctl == ctl)
-			goto done;
-		/* Load the final userprocmask into kernelspace */
-		load_userprocmask_into_kernelspace(old_ctl);
-	}
-	if unlikely(!ctl) {
-		/* Disable USERPROCMASK mode. */
-		PERTASK_SET(this_userprocmask_address, (struct userprocmask *)NULL);
-		ATOMIC_AND(THIS_TASK->t_flags,
-		           ~(TASK_FUSERPROCMASK |
-		             TASK_FUSERPROCMASK_AFTER_VFORK));
-	} else {
-		size_t sigsetsize;
-		USER UNCHECKED sigset_t *new_sigset;
-		/* Enable USERPROCMASK mode. */
-		validate_readwrite_opt(ctl, sizeof(*ctl));
-		COMPILER_BARRIER();
-
-		/* Verify that the controller's idea of the size of a signal set matches our's */
-		sigsetsize = ATOMIC_READ(ctl->pm_sigsize);
-		if (sigsetsize != sizeof(sigset_t)) {
-			THROW(E_INVALID_ARGUMENT_BAD_VALUE,
-			      E_INVALID_ARGUMENT_CONTEXT_SIGNAL_SIGSET_SIZE,
-			      sigsetsize);
-		}
-
-		/* Load the address for the initial signal mask. We'll be copying
-		 * our threads kernel signal mask into this field for the purpose
-		 * of initialization. */
-		new_sigset = ATOMIC_READ(ctl->pm_sigmask);
-		COMPILER_BARRIER();
-		validate_readwrite(new_sigset, sizeof(sigset_t));
-
-		/* Initialize the user's initial signal mask with what was their
-		 * thread's signal mask before. */
-		{
-			struct kernel_sigmask *kernel_mask;
-			kernel_mask = sigmask_kernel_getrd();
-			memcpy(new_sigset, &kernel_mask->sm_mask, sizeof(sigset_t));
-		}
-
-		/* Fill in the initial set of pending signals for user-space. */
-		{
-			sigset_t pending;
-			uintptr_t flags;
-			sigemptyset(&pending);
-			flags = USERPROCMASK_FLAG_NORMAL;
-			if (gather_pending_signals(&pending))
-				flags |= USERPROCMASK_FLAG_HASPENDING;
-			COMPILER_BARRIER();
-			memcpy(&ctl->pm_pending, &pending, sizeof(sigset_t));
-			COMPILER_BARRIER();
-			ATOMIC_WRITE(ctl->pm_flags, flags);
-			COMPILER_BARRIER();
-		}
-
-		/* Finally, initialize the TID field to that of the calling thread. */
-		ctl->pm_mytid = task_gettid();
-		COMPILER_BARRIER();
-
-		/* Store the controller address for our thread. */
-		PERTASK_SET(this_userprocmask_address, ctl);
-
-		/* Turn on the USERPROCMASK bit in our thread. */
-		{
-			uintptr_t old_flags;
-			old_flags = ATOMIC_FETCHOR(THIS_TASK->t_flags, TASK_FUSERPROCMASK);
-			/* If USERPROCMASK wasn't enabled before, and we're a VFORK thread,
-			 * then we must also set the `TASK_FUSERPROCMASK_AFTER_VFORK' flag,
-			 * such that the process of clearing the `TASK_FVFORK' flag  during
-			 * exec() or exit() will also write NULL to `ctl->pm_sigmask' */
-			if ((old_flags & (TASK_FUSERPROCMASK | TASK_FVFORK)) == TASK_FVFORK)
-				ATOMIC_OR(THIS_TASK->t_flags, TASK_FUSERPROCMASK_AFTER_VFORK);
-		}
-
-		/* NOTE: ___Don't___  call `sigmask_check()' here!  Assuming that the user
-		 *       calls that function when appropriate, none of the pending signals
-		 *       would  currently be unmasked,  and even if  they were, we mustn't
-		 *       check  for them here, since this system call would otherwise look
-		 *       like it failed! */
-	}
-done:
-	return -EOK;
-}
-#endif /* !CONFIG_USE_NEW_RPC */
 #endif /* __ARCH_WANT_SYSCALL_SET_USERPROCMASK_ADDRESS */
 #endif /* CONFIG_HAVE_USERPROCMASK */
 

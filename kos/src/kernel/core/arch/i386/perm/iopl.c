@@ -29,12 +29,12 @@
 #include <kernel/panic.h>
 #include <kernel/syscall.h>
 #include <kernel/types.h>
-#include <sched/arch/posix-signal.h>
 #include <sched/cpu.h>
 #include <sched/cred.h>
 #include <sched/private.h>
 #include <sched/rpc.h>
 #include <sched/task.h>
+#include <sched/x86/eflags-mask.h>
 #include <sched/x86/iopl.h>
 
 #include <hybrid/unaligned.h>
@@ -74,8 +74,8 @@ x86_init_keepiopl(char const *__restrict arg) {
 		if (len == 4 && UNALIGNED_GET32((u32 const *)arg) == ENCODE_INT32('f', 'o', 'r', 'k')) {
 			x86_iopl_keep_after_fork = setstate;
 		} else if (len == 4 && UNALIGNED_GET32((u32 const *)arg) == ENCODE_INT32('e', 'x', 'e', 'c')) {
-			union x86_user_eflags_mask *mask;
-			mask = (union x86_user_eflags_mask *)&x86_exec_eflags_mask;
+			union x86_user_eflags_mask_union *mask;
+			mask = (union x86_user_eflags_mask_union *)&x86_exec_eflags_mask;
 			mask->uem_mask &= ~EFLAGS_IOPLMASK;
 			if (setstate) /* Keep iopl() during exec() */
 				mask->uem_mask |= EFLAGS_IOPLMASK;
@@ -197,7 +197,6 @@ sys_iopl_impl(struct icpustate *__restrict state,
 }
 
 
-#ifdef CONFIG_USE_NEW_RPC
 PRIVATE NONNULL((1)) void PRPC_EXEC_CALLBACK_CC
 sys_iopl_rpc(struct rpc_context *__restrict ctx, void *UNUSED(cookie)) {
 	if (ctx->rc_context != RPC_REASONCTX_SYSCALL)
@@ -214,29 +213,6 @@ DEFINE_SYSCALL1(errno_t, iopl, syscall_ulong_t, level) {
 	task_rpc_userunwind(&sys_iopl_rpc, NULL);
 	__builtin_unreachable();
 }
-#else /* CONFIG_USE_NEW_RPC */
-PRIVATE struct icpustate *FCALL
-sys_iopl_rpc(void *UNUSED(arg), struct icpustate *__restrict state,
-             unsigned int reason, struct rpc_syscall_info const *sc_info) {
-	if (reason == TASK_RPC_REASON_SYSCALL) {
-		state = sys_iopl_impl(state,
-		                      sc_info->rsi_regs[0]);
-	}
-	return state;
-}
-
-DEFINE_SYSCALL1(errno_t, iopl, syscall_ulong_t, level) {
-	(void)level;
-	task_schedule_user_rpc(THIS_TASK,
-	                       &sys_iopl_rpc,
-	                       NULL,
-	                       TASK_RPC_FHIGHPRIO |
-	                       TASK_USER_RPC_FINTR,
-	                       GFP_NORMAL);
-	__builtin_unreachable();
-}
-#endif /* !CONFIG_USE_NEW_RPC */
-
 
 DECL_END
 

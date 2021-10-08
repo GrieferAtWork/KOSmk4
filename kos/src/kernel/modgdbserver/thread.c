@@ -287,7 +287,6 @@ do_normal_stop:
 	return (struct icpustate *)stop_event.e.tse_state;
 }
 
-#ifdef CONFIG_USE_NEW_RPC
 PRIVATE NONNULL((1)) void
 NOTHROW(PRPC_EXEC_CALLBACK_CC GDBThread_StopRPC)(struct rpc_context *__restrict ctx,
                                                  void *cookie) {
@@ -295,19 +294,6 @@ NOTHROW(PRPC_EXEC_CALLBACK_CC GDBThread_StopRPC)(struct rpc_context *__restrict 
 	ctx->rc_state = GDBThread_StopRPCImpl((uintptr_t)cookie, ctx->rc_state);
 	PREEMPTION_POP(was);
 }
-#else /* CONFIG_USE_NEW_RPC */
-PRIVATE struct icpustate *
-NOTHROW(FCALL GDBThread_StopRPC)(void *arg,
-                                 struct icpustate *__restrict state,
-                                 unsigned int UNUSED(reason),
-                                 struct rpc_syscall_info const *UNUSED(sc_info)) {
-	pflag_t was;
-	was   = PREEMPTION_PUSHOFF();
-	state = GDBThread_StopRPCImpl((uintptr_t)arg, state);
-	PREEMPTION_POP(was);
-	return state;
-}
-#endif /* !CONFIG_USE_NEW_RPC */
 
 PRIVATE NOBLOCK NOPREEMPT NONNULL((1, 2)) struct icpustate *
 NOTHROW(FCALL GDBThread_StopAllCpusIPI)(struct icpustate *__restrict state,
@@ -508,7 +494,6 @@ NOTHROW(FCALL GDBThread_HasTerminated)(struct task const *__restrict thread) {
 }
 
 
-#ifdef CONFIG_USE_NEW_RPC
 /* cookie == (struct task *)old_scheduling_override */
 PRIVATE NONNULL((1)) void
 NOTHROW(PRPC_EXEC_CALLBACK_CC GDBThread_StopWithAsyncNotificationRPC)(struct rpc_context *__restrict ctx,
@@ -523,26 +508,6 @@ NOTHROW(PRPC_EXEC_CALLBACK_CC GDBThread_StopWithAsyncNotificationRPC)(struct rpc
 	ctx->rc_state = GDBThread_StopRPCImpl(GDBTHREAD_STOPRPCIMPL_F_SETREASON, ctx->rc_state);
 	PREEMPTION_POP(was);
 }
-#else /* CONFIG_USE_NEW_RPC */
-/* arg == (struct task *)old_scheduling_override */
-PRIVATE struct icpustate *
-NOTHROW(FCALL GDBThread_StopWithAsyncNotificationRPC)(void *arg,
-                                                      struct icpustate *__restrict state,
-                                                      unsigned int UNUSED(reason),
-                                                      struct rpc_syscall_info const *UNUSED(sc_info)) {
-	/* Restore the old CPU override. */
-	struct cpu *me;
-	pflag_t was;
-	was = PREEMPTION_PUSHOFF();
-	me = THIS_CPU;
-	/* TODO: Don't directly access `thiscpu_sched_override'! */
-	FORCPU(me, thiscpu_sched_override) = (REF struct task *)arg;
-	state = GDBThread_StopRPCImpl(GDBTHREAD_STOPRPCIMPL_F_SETREASON,
-	                              state);
-	PREEMPTION_POP(was);
-	return state;
-}
-#endif /* !CONFIG_USE_NEW_RPC */
 
 
 PRIVATE struct sig GDBThread_StopWithAsyncNotificationIPI_Done = SIG_INIT;
@@ -568,13 +533,15 @@ NOTHROW(FCALL GDBThread_StopWithAsyncNotificationIPI)(struct icpustate *__restri
 	          thread,
 	          task_getrootpid_of_s(thread),
 	          task_getroottid_of_s(thread));
-	if (!task_schedule_asynchronous_rpc(thread,
-	                                    &GDBThread_StopWithAsyncNotificationRPC,
-	                                    caller,
-	                                    /* Very important: Set  the  HIGH_PRIORITY flag,  thus ensuring
-	                                     *                 that we immediately switch over to `thread',
-	                                     *                 allowing it to run as the new override. */
-	                                    TASK_RPC_FHIGHPRIO)) {
+	/* Very important: Set  the  HIGH_PRIORITY flag,  thus ensuring
+	 *                 that we immediately switch over to `thread',
+	 *                 allowing it to run as the new override. */
+	if (!task_rpc_exec(thread,
+	                   RPC_CONTEXT_KERN |
+	                   RPC_SYNCMODE_F_ALLOW_ASYNC |
+	                   RPC_PRIORITY_F_HIGH,
+	                   &GDBThread_StopWithAsyncNotificationRPC,
+	                   caller)) {
 		COMPILER_BARRIER();
 		FORCPU(me, thiscpu_sched_override) = GDBServer_Host;
 		COMPILER_BARRIER();
@@ -678,13 +645,15 @@ NOTHROW(FCALL GDBThread_CreateMissingAsyncStopNotification)(struct task *__restr
 			          thread,
 			          task_getrootpid_of_s(thread),
 			          task_getroottid_of_s(thread));
-			if (!task_schedule_asynchronous_rpc(thread,
-			                                    &GDBThread_StopWithAsyncNotificationRPC,
-			                                    GDBServer_Host,
-			                                    /* Very important: Set  the  HIGH_PRIORITY flag,  thus ensuring
-			                                     *                 that we immediately switch over to `thread',
-			                                     *                 allowing it to run as the new override. */
-			                                    TASK_RPC_FHIGHPRIO)) {
+			/* Very important: Set  the  HIGH_PRIORITY flag,  thus ensuring
+			 *                 that we immediately switch over to `thread',
+			 *                 allowing it to run as the new override. */
+			if (!task_rpc_exec(thread,
+			                   RPC_CONTEXT_KERN |
+			                   RPC_SYNCMODE_F_ALLOW_ASYNC |
+			                   RPC_PRIORITY_F_HIGH,
+			                   &GDBThread_StopWithAsyncNotificationRPC,
+			                   GDBServer_Host)) {
 				COMPILER_BARRIER();
 				FORCPU(target_cpu, thiscpu_sched_override) = GDBServer_Host;
 				COMPILER_BARRIER();
@@ -748,11 +717,14 @@ NOTHROW(FCALL GDBThread_Stop)(struct task *__restrict thread,
 	          thread,
 	          task_getrootpid_of_s(thread),
 	          task_getroottid_of_s(thread));
-	if (!task_schedule_asynchronous_rpc(thread, &GDBThread_StopRPC,
-	                                    (void *)(uintptr_t)(generateAsyncStopEvents
-	                                                        ? GDBTHREAD_STOPRPCIMPL_F_SETREASON
-	                                                        : 0),
-	                                    TASK_RPC_FWAITFOR | TASK_RPC_FHIGHPRIO))
+	if (!task_rpc_exec(thread,
+	                   RPC_CONTEXT_KERN |
+	                   RPC_SYNCMODE_F_ALLOW_ASYNC |
+	                   RPC_PRIORITY_F_HIGH,
+	                   &GDBThread_StopRPC,
+	                   (void *)(uintptr_t)(generateAsyncStopEvents
+	                                       ? GDBTHREAD_STOPRPCIMPL_F_SETREASON
+	                                       : 0)))
 		return false; /* The given `thread' has already terminated. */
 	/* If the thread hasn't been started yet, do so now
 	 * (so that it immediately jumps into our stop RPC) */

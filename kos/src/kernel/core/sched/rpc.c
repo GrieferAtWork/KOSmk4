@@ -23,7 +23,6 @@
 
 #include <kernel/compiler.h>
 
-#ifdef CONFIG_USE_NEW_RPC
 #include <kernel/except.h>
 #include <kernel/rt/except-handler.h>
 #include <kernel/types.h>
@@ -694,7 +693,5 @@ NOTHROW(FCALL proc_rpc_pending_trysteal_posix_signal)(sigset_t const *__restrict
 }
 
 DECL_END
-
-#endif /* CONFIG_USE_NEW_RPC */
 
 #endif /* !GUARD_KERNEL_SRC_SCHED_RPC_C */

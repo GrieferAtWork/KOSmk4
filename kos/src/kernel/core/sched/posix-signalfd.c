@@ -68,181 +68,6 @@ signalfd_create(USER CHECKED sigset_t const *mask) THROWS(E_BADALLOC, E_SEGFAULT
 	return result;
 }
 
-#ifndef CONFIG_USE_NEW_RPC
-LOCAL NOBLOCK NONNULL((1, 2)) void
-NOTHROW(KCALL restore_perthread_pending_signals)(struct sigqueue *__restrict myqueue,
-                                                 struct sigqueue_entry *__restrict pending) {
-	/* Restore all signals pending for the calling thread. */
-	if unlikely(!ATOMIC_CMPXCH(myqueue->sq_queue, NULL, pending)) {
-		struct sigqueue_entry *last, *next;
-		last = pending;
-		while (last->sqe_next)
-			last = last->sqe_next;
-		do {
-			next = ATOMIC_READ(myqueue->sq_queue);
-			last->sqe_next = next;
-			COMPILER_WRITE_BARRIER();
-		} while (!ATOMIC_CMPXCH_WEAK(myqueue->sq_queue, next, pending));
-	}
-}
-
-/* Check if masked, pending signals are available.
- * If so:
- *   - When `si' is NULL, simply return `true'
- *   - When  `si' is non-NULL,  pop the signal and
- *     store it into `*si' before returning `true'
- * else:
- *   - return `false'
- */
-PRIVATE bool KCALL
-signalfd_try_read(struct signalfd *__restrict self, siginfo_t *si) {
-	struct sigqueue *myqueue;
-	struct process_sigqueue *prqueue;
-	struct sigqueue_entry *pending, **piter, *iter;
-	myqueue = &THIS_SIGQUEUE;
-	/* Temporarily steal all pending per-thread signals. */
-	do {
-		pending = ATOMIC_READ(myqueue->sq_queue);
-		if (!pending)
-			goto no_perthread_pending; /* No signals are pending for the calling thread */
-		if unlikely(pending == SIGQUEUE_SQ_QUEUE_TERMINATED)
-			return 0; /* Shouldn't happen: The calling thread is currently terminating. */
-	} while (!ATOMIC_CMPXCH_WEAK(myqueue->sq_queue, pending, NULL));
-	/* Go through pending signals and check if there are any that aren't being masked. */
-	iter  = pending;
-	piter = &pending;
-	do {
-		if (sigismember(&self->sf_mask, iter->sqe_info.si_signo)) {
-			/* Found one that's being looked for. */
-			if (!si) {
-				restore_perthread_pending_signals(myqueue, pending);
-				return true;
-			}
-			/* Unlink the signal we've found. */
-			*piter = iter->sqe_next;
-			if (pending)
-				restore_perthread_pending_signals(myqueue, pending);
-			memcpy(si, &iter->sqe_info, sizeof(siginfo_t));
-			kfree(iter);
-			return true;
-		}
-	} while ((iter = *(piter = &iter->sqe_next)) != NULL);
-
-	/* Restore all signals pending for the calling thread. */
-	restore_perthread_pending_signals(myqueue, pending);
-no_perthread_pending:
-	/* With per-task signals checked, also check for per-process signals */
-	prqueue = &THIS_PROCESS_SIGQUEUE;
-	sync_read(&prqueue->psq_lock);
-	if (si) {
-		for (piter = &prqueue->psq_queue.sq_queue;
-			 (iter = *piter) != NULL; piter = &iter->sqe_next) {
-			if (!sigismember(&self->sf_mask, iter->sqe_info.si_signo))
-				continue;
-			/* Found one that's being looked for. */
-			*piter = iter->sqe_next;
-			sync_endread(&prqueue->psq_lock);
-			memcpy(si, &iter->sqe_info, sizeof(siginfo_t));
-			kfree(iter);
-			return true;
-		}
-	} else {
-		for (iter = prqueue->psq_queue.sq_queue;
-			 iter; iter = iter->sqe_next) {
-			if (!sigismember(&self->sf_mask, iter->sqe_info.si_signo))
-				continue;
-			/* Found one that's being looked for. */
-			sync_endread(&prqueue->psq_lock);
-			return true;
-		}
-	}
-	sync_endread(&prqueue->psq_lock);
-	return false;
-}
-
-/* Connect to the signal queue signals of the calling thread and process. */
-LOCAL void KCALL connect_to_my_signal_queues(void) {
-	struct sigqueue *pqueue, *tqueue;
-	pqueue = &FORTASK(task_getprocess(), this_taskgroup).tg_proc_signals.psq_queue;
-	tqueue = &THIS_SIGQUEUE;
-	task_connect(&pqueue->sq_newsig);
-	task_connect(&tqueue->sq_newsig);
-}
-
-
-
-INTERN size_t KCALL
-handle_signalfd_read(struct signalfd *__restrict self,
-                     USER CHECKED void *dst,
-                     size_t num_bytes, iomode_t mode) {
-	size_t result;
-	assert(!task_wasconnected());
-	if unlikely(num_bytes < sizeof(struct signalfd_siginfo)) {
-		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
-		      E_INVALID_ARGUMENT_CONTEXT_SIGNALFD_BUFSIZE,
-		      num_bytes);
-	}
-	result = 0;
-	for (;;) {
-		siginfo_t si;
-		USER CHECKED struct signalfd_siginfo *usi;
-		if (!signalfd_try_read(self, &si)) {
-			bool read_ok;
-			if (mode & IO_NONBLOCK) {
-				if (result)
-					break;
-				if (mode & IO_NODATAZERO)
-					break;
-				THROW(E_WOULDBLOCK_WAITFORSIGNAL);
-			}
-			assert(!task_wasconnected());
-			TRY {
-				connect_to_my_signal_queues();
-				read_ok = signalfd_try_read(self, &si);
-			} EXCEPT {
-				task_disconnectall();
-				RETHROW();
-			}
-			if likely(!read_ok) {
-				task_waitfor();
-				continue;
-			}
-			task_disconnectall();
-		}
-		usi = (USER CHECKED struct signalfd_siginfo *)dst;
-
-		/* Fill in the user-space signalfd info buffer. */
-		COMPILER_WRITE_BARRIER();
-		usi->ssi_signo   = si.si_signo;
-		usi->ssi_errno   = si.si_errno;
-		usi->ssi_code    = si.si_code;
-		usi->ssi_pid     = si.si_pid;
-		usi->ssi_uid     = si.si_uid;
-		usi->ssi_fd      = si.si_fd;
-		usi->ssi_tid     = si.si_timerid;
-		usi->ssi_band    = si.si_band;
-		usi->ssi_overrun = si.si_overrun;
-		usi->ssi_trapno  = 0; /* ??? */
-		usi->ssi_status  = si.si_status;
-		usi->ssi_int     = si.si_int;
-		usi->ssi_ptr     = (u64)(uintptr_t)si.si_ptr;
-		usi->ssi_utime   = si.si_utime;
-		usi->ssi_stime   = si.si_stime;
-		usi->ssi_addr    = (u64)(uintptr_t)si.si_addr;
-		memset(usi->__pad, 0, sizeof(usi->__pad));
-		COMPILER_WRITE_BARRIER();
-
-		result += sizeof(struct signalfd_siginfo);
-		num_bytes -= sizeof(struct signalfd_siginfo);
-		if (num_bytes < sizeof(struct signalfd_siginfo))
-			break;
-		dst = (byte_t *)dst + sizeof(struct signalfd_siginfo);
-	}
-	return result;
-}
-
-#else /* !CONFIG_USE_NEW_RPC */
-
 INTERN size_t KCALL
 handle_signalfd_read(struct signalfd *__restrict self,
                      USER CHECKED void *dst,
@@ -336,25 +161,14 @@ handle_signalfd_read(struct signalfd *__restrict self,
 	}
 	return result;
 }
-#endif /* CONFIG_USE_NEW_RPC */
-
-
 
 
 INTERN NONNULL((1)) void KCALL
 handle_signalfd_pollconnect(struct signalfd *__restrict UNUSED(self),
                             poll_mode_t what) {
 	if (what & POLLINMASK) {
-#ifdef CONFIG_USE_NEW_RPC
 		task_connect_for_poll(&PERTASK(this_rpcs_sig));
 		task_connect_for_poll(&THIS_PROCESS_RPCS.ppr_more);
-#else /* CONFIG_USE_NEW_RPC */
-		struct sigqueue *pqueue, *tqueue;
-		pqueue = &FORTASK(task_getprocess(), this_taskgroup).tg_proc_signals.psq_queue;
-		tqueue = &THIS_SIGQUEUE;
-		task_connect_for_poll(&pqueue->sq_newsig);
-		task_connect_for_poll(&tqueue->sq_newsig);
-#endif /* !CONFIG_USE_NEW_RPC */
 	}
 }
 
@@ -365,14 +179,9 @@ INTERN ATTR_PURE WUNUSED NONNULL((1)) poll_mode_t KCALL
 handle_signalfd_polltest(struct signalfd *__restrict self,
                          poll_mode_t what) {
 	if (what & POLLINMASK) {
-#ifdef CONFIG_USE_NEW_RPC
 		if (task_rpc_pending_oneof(&self->sf_mask) ||
 		    proc_rpc_pending_oneof(&self->sf_mask))
 			return POLLINMASK;
-#else /* CONFIG_USE_NEW_RPC */
-		if (signalfd_try_read(self, NULL))
-			return POLLINMASK;
-#endif /* !CONFIG_USE_NEW_RPC */
 	}
 	return 0;
 }
@@ -430,18 +239,8 @@ update_signalfd(unsigned int fd,
 		 * was shared between processes,  with one process updating  the
 		 * mask  not  actually causing  the  other to  get  the message.
 		 * Oh well... Just mirror what linux does... */
-#ifdef CONFIG_USE_NEW_RPC
 		sig_broadcast(&PERTASK(this_rpcs_sig));
 		sig_broadcast(&THIS_PROCESS_RPCS.ppr_more);
-#else /* CONFIG_USE_NEW_RPC */
-		{
-			struct sigqueue *pqueue, *tqueue;
-			pqueue = &FORTASK(task_getprocess(), this_taskgroup).tg_proc_signals.psq_queue;
-			tqueue = &THIS_SIGQUEUE;
-			sig_broadcast(&pqueue->sq_newsig);
-			sig_broadcast(&tqueue->sq_newsig);
-		}
-#endif /* !CONFIG_USE_NEW_RPC */
 	} EXCEPT {
 		decref(hnd);
 		RETHROW();

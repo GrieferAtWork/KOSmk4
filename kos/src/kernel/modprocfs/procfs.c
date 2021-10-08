@@ -99,7 +99,6 @@ INTERN struct superblock ProcFS = {
 	/* .s_nodes        = */ &ProcFS.s_rootdir.d_node,
 	/* .s_mount_lock   = */ ATOMIC_RWLOCK_INIT,
 	/* .s_mount        = */ NULL,
-	/* .s_cblock_next  = */ NULL,
 	/* .s_umount_pend  = */ NULL,
 	/* .s_filesystems  = */ NULL,
 	/* .s_features     = */ {

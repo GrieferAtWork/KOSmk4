@@ -35,11 +35,11 @@
 #include <kernel/mman/phys.h> /* this_trampoline_node */
 #include <kernel/mman/unmapped.h>
 #include <kernel/printk.h>
+#include <kernel/rt/except-handler.h>
 #include <kernel/syscall.h>
 #include <kernel/user.h>
 #include <kernel/x86/gdt.h>
 #include <sched/cpu.h>
-#include <sched/except-handler.h>
 #include <sched/pid.h>
 #include <sched/posix-signal.h>
 #include <sched/rpc-internal.h>
@@ -97,22 +97,10 @@ DATDEF ATTR_PERTASK struct mnode this_kernel_stackguard_ ASMNAME("this_kernel_st
 #endif /* CONFIG_HAVE_KERNEL_STACK_GUARD */
 
 
-#ifdef CONFIG_USE_NEW_RPC
 PRIVATE NONNULL((1)) void PRPC_EXEC_CALLBACK_CC
 task_srpc_set_child_tid(struct rpc_context *__restrict UNUSED(ctx), void *cookie) {
 	ATOMIC_WRITE(*(USER CHECKED pid_t *)cookie, task_gettid());
 }
-#else /* CONFIG_USE_NEW_RPC */
-PRIVATE WUNUSED NONNULL((2)) struct icpustate *FCALL
-task_srpc_set_child_tid(void *arg,
-                        struct icpustate *__restrict state,
-                        unsigned int UNUSED(reason),
-                        struct rpc_syscall_info const *UNUSED(sc_info)) {
-	ATOMIC_WRITE(*(USER CHECKED pid_t *)arg, task_gettid());
-	return state;
-}
-#endif /* !CONFIG_USE_NEW_RPC */
-
 
 
 #ifndef CONFIG_NO_USERKERN_SEGMENT
@@ -327,9 +315,7 @@ again_lock_mman:
 			 * This always needs to be done in the context of the child, so that exceptions
 			 * during the write are handled in the proper context, as well as in regards to
 			 * the child actually existing in a  different VM when `CLONE_VM' isn't  given. */
-			state = task_push_asynchronous_rpc(state,
-			                                   &task_srpc_set_child_tid,
-			                                   child_tidptr);
+			state = task_asyncrpc_push(state, &task_srpc_set_child_tid, child_tidptr);
 		}
 		FORTASK(result, this_sstate) = state;
 	}
@@ -436,7 +422,7 @@ again_lock_mman:
 					ATOMIC_OR(caller->t_flags, TASK_FUSERPROCMASK);
 					memcpy(user_sigmask, &saved_user_sigset, sizeof(sigset_t));
 					ATOMIC_WRITE(um->pm_sigmask, user_sigmask);
-					sigmask_check_after_except();
+					userexcept_sysret_inject_self();
 					RETHROW();
 				}
 				/* Restore our old kernel-space signal mask. */
@@ -466,7 +452,7 @@ again_lock_mman:
 					waitfor_vfork_completion(result);
 				} EXCEPT {
 					arref_set_inherit(maskref, old_sigmask);
-					sigmask_check_after_except();
+					userexcept_sysret_inject_self();
 					RETHROW();
 				}
 				arref_set_inherit(maskref, old_sigmask);
@@ -474,7 +460,7 @@ again_lock_mman:
 			/* With the original signal mask restored, we must check if
 			 * we (the parent) have received any signals while we  were
 			 * waiting on the child */
-			sigmask_check();
+			task_serve();
 		} else {
 			/* Actually start execution of the newly created thread. */
 			task_start(result);
@@ -495,7 +481,6 @@ again_lock_mman:
 /* clone()                                                              */
 /************************************************************************/
 #if defined(__ARCH_WANT_SYSCALL_CLONE) && defined(__x86_64__)
-#ifdef CONFIG_USE_NEW_RPC
 PRIVATE NONNULL((1)) void PRPC_EXEC_CALLBACK_CC
 sys_clone64_rpc(struct rpc_context *__restrict ctx, void *UNUSED(cookie)) {
 	pid_t child_tid;
@@ -531,57 +516,10 @@ DEFINE_SYSCALL64_5(pid_t, clone,
 	task_rpc_userunwind(&sys_clone64_rpc, NULL);
 	__builtin_unreachable();
 }
-#else /* CONFIG_USE_NEW_RPC */
-PRIVATE struct icpustate *FCALL
-sys_clone64_rpc(void *UNUSED(arg),
-                struct icpustate *__restrict state,
-                unsigned int reason,
-                struct rpc_syscall_info const *sc_info) {
-	assert(reason == TASK_RPC_REASON_ASYNCUSER ||
-	       reason == TASK_RPC_REASON_SYSCALL ||
-	       reason == TASK_RPC_REASON_SHUTDOWN);
-	if (reason == TASK_RPC_REASON_SYSCALL) {
-		pid_t child_tid;
-		child_tid = x86_clone_impl(state,
-		                           sc_info->rsi_regs[0],                         /* clone_flags */
-		                           (USER UNCHECKED void *)sc_info->rsi_regs[1],  /* child_stack */
-		                           (USER UNCHECKED pid_t *)sc_info->rsi_regs[2], /* parent_tidptr */
-		                           (USER UNCHECKED pid_t *)sc_info->rsi_regs[3], /* child_tidptr */
-		                           x86_get_user_gsbase(),
-		                           sc_info->rsi_regs[0] & CLONE_SETTLS ? sc_info->rsi_regs[4]
-		                                                               : x86_get_user_fsbase());
-		gpregs_setpax(&state->ics_gpregs, child_tid);
-	}
-	return state;
-}
-
-DEFINE_SYSCALL64_5(pid_t, clone,
-                   syscall_ulong_t, flags,
-                   USER UNCHECKED void *, child_stack,
-                   USER UNCHECKED pid_t *, ptid,
-                   USER UNCHECKED pid_t *, ctid,
-                   uintptr_t, newtls) {
-	/* Send an RPC to ourself, so we can gain access to the user-space register state. */
-	(void)flags;
-	(void)child_stack;
-	(void)ptid;
-	(void)ctid;
-	(void)newtls;
-	task_schedule_user_rpc(THIS_TASK,
-	                       &sys_clone64_rpc,
-	                       NULL,
-	                       TASK_RPC_FHIGHPRIO |
-	                       TASK_USER_RPC_FINTR,
-	                       GFP_NORMAL);
-	/* Shouldn't get here... */
-	return -EOK;
-}
-#endif /* !CONFIG_USE_NEW_RPC */
 #endif /* __ARCH_WANT_SYSCALL_CLONE && __x86_64__ */
 
 #if (defined(__ARCH_WANT_COMPAT_SYSCALL_CLONE) || \
      (defined(__ARCH_WANT_SYSCALL_CLONE) && !defined(__x86_64__)))
-#ifdef CONFIG_USE_NEW_RPC
 PRIVATE NONNULL((1)) void PRPC_EXEC_CALLBACK_CC
 sys_clone32_rpc(struct rpc_context *__restrict ctx, void *UNUSED(cookie)) {
 	pid_t child_tid;
@@ -617,54 +555,6 @@ DEFINE_SYSCALL32_5(pid_t, clone,
 	task_rpc_userunwind(&sys_clone32_rpc, NULL);
 	__builtin_unreachable();
 }
-
-#else /* CONFIG_USE_NEW_RPC */
-
-PRIVATE struct icpustate *FCALL
-sys_clone32_rpc(void *UNUSED(arg),
-                struct icpustate *__restrict state,
-                unsigned int reason,
-                struct rpc_syscall_info const *sc_info) {
-	assert(reason == TASK_RPC_REASON_ASYNCUSER ||
-	       reason == TASK_RPC_REASON_SYSCALL ||
-	       reason == TASK_RPC_REASON_SHUTDOWN);
-	if (reason == TASK_RPC_REASON_SYSCALL) {
-		pid_t child_tid;
-		child_tid = x86_clone_impl(state,
-		                           sc_info->rsi_regs[0],                         /* clone_flags */
-		                           (USER UNCHECKED void *)sc_info->rsi_regs[1],  /* child_stack */
-		                           (USER UNCHECKED pid_t *)sc_info->rsi_regs[2], /* parent_tidptr */
-		                           (USER UNCHECKED pid_t *)sc_info->rsi_regs[4], /* child_tidptr */
-		                           sc_info->rsi_regs[0] & CLONE_SETTLS ? sc_info->rsi_regs[3]
-		                                                               : x86_get_user_gsbase(),
-		                           x86_get_user_fsbase());
-		gpregs_setpax(&state->ics_gpregs, child_tid);
-	}
-	return state;
-}
-
-DEFINE_SYSCALL32_5(pid_t, clone,
-                   syscall_ulong_t, flags,
-                   USER UNCHECKED void *, child_stack,
-                   USER UNCHECKED pid_t *, ptid,
-                   uintptr_t, newtls,
-                   USER UNCHECKED pid_t *, ctid) {
-	/* Send an RPC to ourself, so we can gain access to the user-space register state. */
-	(void)flags;
-	(void)child_stack;
-	(void)ptid;
-	(void)ctid;
-	(void)newtls;
-	task_schedule_user_rpc(THIS_TASK,
-	                       &sys_clone32_rpc,
-	                       NULL,
-	                       TASK_RPC_FHIGHPRIO |
-	                       TASK_USER_RPC_FINTR,
-	                       GFP_NORMAL);
-	/* Shouldn't get here... */
-	return -EOK;
-}
-#endif /* !CONFIG_USE_NEW_RPC */
 #endif /* __ARCH_WANT_COMPAT_SYSCALL_CLONE || (__ARCH_WANT_SYSCALL_CLONE && !__x86_64__) */
 
 
@@ -689,7 +579,6 @@ sys_fork_impl(struct icpustate *__restrict state) {
 	return state;
 }
 
-#ifdef CONFIG_USE_NEW_RPC
 PRIVATE NONNULL((1)) void PRPC_EXEC_CALLBACK_CC
 sys_fork_rpc(struct rpc_context *__restrict ctx, void *UNUSED(cookie)) {
 	if (ctx->rc_context != RPC_REASONCTX_SYSCALL)
@@ -705,30 +594,6 @@ DEFINE_SYSCALL0(pid_t, fork) {
 	task_rpc_userunwind(&sys_fork_rpc, NULL);
 	__builtin_unreachable();
 }
-#else /* CONFIG_USE_NEW_RPC */
-PRIVATE struct icpustate *FCALL
-sys_fork_rpc(void *UNUSED(arg), struct icpustate *__restrict state,
-             unsigned int reason, struct rpc_syscall_info const *UNUSED(sc_info)) {
-	assert(reason == TASK_RPC_REASON_ASYNCUSER ||
-	       reason == TASK_RPC_REASON_SYSCALL ||
-	       reason == TASK_RPC_REASON_SHUTDOWN);
-	if (reason != TASK_RPC_REASON_SYSCALL)
-		return state;
-	return sys_fork_impl(state);
-}
-
-DEFINE_SYSCALL0(pid_t, fork) {
-	/* Send an RPC to ourself, so we can gain access to the user-space register state. */
-	task_schedule_user_rpc(THIS_TASK,
-	                       &sys_fork_rpc,
-	                       NULL,
-	                       TASK_RPC_FHIGHPRIO |
-	                       TASK_USER_RPC_FINTR,
-	                       GFP_NORMAL);
-	/* Shouldn't get here... */
-	return -EOK;
-}
-#endif /* !CONFIG_USE_NEW_RPC */
 #endif /* __ARCH_WANT_SYSCALL_FORK */
 
 
@@ -753,7 +618,6 @@ sys_vfork_impl(struct icpustate *__restrict state) {
 	return state;
 }
 
-#ifdef CONFIG_USE_NEW_RPC
 PRIVATE NONNULL((1)) void PRPC_EXEC_CALLBACK_CC
 sys_vfork_rpc(struct rpc_context *__restrict ctx, void *UNUSED(cookie)) {
 	if (ctx->rc_context != RPC_REASONCTX_SYSCALL)
@@ -769,33 +633,7 @@ DEFINE_SYSCALL0(pid_t, vfork) {
 	task_rpc_userunwind(&sys_vfork_rpc, NULL);
 	__builtin_unreachable();
 }
-#else /* CONFIG_USE_NEW_RPC */
-PRIVATE struct icpustate *FCALL
-sys_vfork_rpc(void *UNUSED(arg), struct icpustate *__restrict state,
-               unsigned int reason, struct rpc_syscall_info const *UNUSED(sc_info)) {
-	assert(reason == TASK_RPC_REASON_ASYNCUSER ||
-	       reason == TASK_RPC_REASON_SYSCALL ||
-	       reason == TASK_RPC_REASON_SHUTDOWN);
-	if (reason != TASK_RPC_REASON_SYSCALL)
-		return state;
-	return sys_vfork_impl(state);
-}
-
-DEFINE_SYSCALL0(pid_t, vfork) {
-	/* Send an RPC to ourself, so we can gain access to the user-space register state. */
-	task_schedule_user_rpc(THIS_TASK,
-	                       &sys_vfork_rpc,
-	                       NULL,
-	                       TASK_RPC_FHIGHPRIO |
-	                       TASK_USER_RPC_FINTR,
-	                       GFP_NORMAL);
-	/* Shouldn't get here... */
-	return -EOK;
-}
-#endif /* !CONFIG_USE_NEW_RPC */
 #endif /* __ARCH_WANT_SYSCALL_VFORK */
-
-
 
 DECL_END
 

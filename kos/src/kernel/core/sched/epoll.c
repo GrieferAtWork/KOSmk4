@@ -1279,7 +1279,6 @@ again:
 }
 
 
-#ifdef CONFIG_USE_NEW_RPC
 PUBLIC NONNULL((1, 4)) size_t KCALL
 epoll_controller_wait_with_sigmask(struct epoll_controller *__restrict self,
                                    USER CHECKED struct epoll_event *events,
@@ -1309,7 +1308,6 @@ again:
 	}
 	return result;
 }
-#endif /* CONFIG_USE_NEW_RPC */
 
 
 
@@ -1426,7 +1424,6 @@ DEFINE_SYSCALL4(ssize_t, epoll_wait,
 #endif /* __ARCH_WANT_SYSCALL_EPOLL_WAIT */
 
 #ifdef __ARCH_WANT_SYSCALL_EPOLL_PWAIT
-#ifdef CONFIG_USE_NEW_RPC
 
 /* This function is also called from arch-specific, optimized syscall routers. */
 INTERN ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) struct icpustate *FCALL
@@ -1530,7 +1527,6 @@ DEFINE_SYSCALL6(ssize_t, epoll_pwait,
 	return result;
 }
 #endif /* __ARCH_WANT_SYSCALL_EPOLL_PWAIT */
-#endif /* CONFIG_USE_NEW_RPC */
 
 
 DECL_END

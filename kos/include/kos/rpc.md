@@ -55,7 +55,7 @@ All other RPCs are handled by (in order):
 - Enqueueing the RPC in the `this_rpcs` list of the target thread (using `SLIST_ATOMIC_INSERT`, but also checking that `this_rpcs` hasn't been set to `THIS_RPCS_TERMINATED`)
 	- When `THIS_RPCS_TERMINATED` was already set, RPC scheduling functions may indicate to their caller that the targeted thread has already terminated.
 - Setting the `TASK_FRPC` flag (using `ATOMIC_OR(thread->t_flags, TASK_FRPC)`)
-- Sending a sporadic interrupt to the thread (using `task_redirect_usercode_rpc(thread)`, which both wakes the thread and forces it back into kernel-space if it was currently in user-space)
+- Sending a sporadic interrupt to the thread (using `userexcept_sysret_inject_safe(thread)`, which both wakes the thread and forces it back into kernel-space if it was currently in user-space)
 
 The rest of the work is the done in the context of the thread. Assuming a thread that sleeps by following the suggested sleeping method (which is also implemented by `task_waitfor()`):
 

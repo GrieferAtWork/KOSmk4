@@ -28,7 +28,7 @@
 #include <kernel/except.h>
 #include <kernel/types.h>
 #include <kernel/x86/gdt.h>
-#include <sched/arch/posix-signal.h>
+#include <sched/x86/eflags-mask.h>
 
 #include <hybrid/host.h>
 
@@ -87,7 +87,7 @@ elfexec_init_entry(struct icpustate *__restrict user_state,
 	icpustate_setpc(user_state, entry_pc);
 	icpustate_setusersp(user_state, (byte_t const *)ustack_base + ustack_size);
 	{
-		union x86_user_eflags_mask mask;
+		union x86_user_eflags_mask_union mask;
 		mask.uem_word = atomic64_read(&x86_exec_eflags_mask);
 		/* Mask eflags for exec() */
 		icpustate_mskpflags(user_state, mask.uem_mask, mask.uem_flag);
@@ -182,7 +182,7 @@ elfexec_init_rtld(struct icpustate *__restrict user_state,
 	icpustate_setusersp(user_state, dl_data);
 	icpustate_setpc(user_state, linker_loadaddr); /* Entry point is at offset=0 */
 	{
-		union x86_user_eflags_mask mask;
+		union x86_user_eflags_mask_union mask;
 		mask.uem_word = atomic64_read(&x86_exec_eflags_mask);
 		/* Mask eflags for exec() */
 		icpustate_mskpflags(user_state, mask.uem_mask, mask.uem_flag);
@@ -246,7 +246,7 @@ elfexec_init_entry32(struct icpustate *__restrict user_state,
 	icpustate_setpc(user_state, entry_pc);
 	icpustate_setusersp(user_state, (byte_t const *)ustack_base + ustack_size);
 	{
-		union x86_user_eflags_mask mask;
+		union x86_user_eflags_mask_union mask;
 		mask.uem_word = atomic64_read(&x86_exec_eflags_mask);
 		/* Mask eflags for exec() */
 		icpustate_mskpflags(user_state, mask.uem_mask, mask.uem_flag);
@@ -357,7 +357,7 @@ elfexec_init_rtld32(struct icpustate *__restrict user_state,
 	icpustate_setusersp(user_state, dl_data);
 	icpustate_setpc(user_state, linker_loadaddr); /* Entry point is at offset=0 */
 	{
-		union x86_user_eflags_mask mask;
+		union x86_user_eflags_mask_union mask;
 		mask.uem_word = atomic64_read(&x86_exec_eflags_mask);
 		/* Mask eflags for exec() */
 		icpustate_mskpflags(user_state, mask.uem_mask, mask.uem_flag);

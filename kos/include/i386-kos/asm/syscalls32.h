@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x33374c7d */
+/* HASH CRC-32:0xc1ea88fa */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -260,19 +260,19 @@
 /* @param: how: One of `SIG_BLOCK', `SIG_UNBLOCK' or `SIG_SETMASK' */
 #define __NR_sigprocmask                  0x7e                   /* errno_t sigprocmask(syscall_ulong_t how, struct __sigset_struct const *set, struct __sigset_struct *oset) */
 #define __NR_create_module                0x7f                   /* errno_t create_module(void) */
-/* Load a  kernel driver  from  an ELF  image  `module_image...+=len'
- * This system call exists for linux compatiblity, and is implemented
- * as an alias for `KSYSCTL_DRIVER_INSMOD:KSYSCTL_DRIVER_FORMAT_BLOB'
+/* Load a  kernel  driver  from an  ELF  image  `module_image...+=len'
+ * This system call exists for linux compatibility, and is implemented
+ * as an alias for  `KSYSCTL_DRIVER_INSMOD:KSYSCTL_DRIVER_FORMAT_BLOB'
  * 
- * Note  however that that is where linux compatiblity ends. Since the
+ * Note however that that is where linux compatibility ends. Since the
  * linux kernel does not implement any semblance of a stable ABI,  you
  * have to realize that on KOS, this system call can only load drivers
  * specifically built to run within the KOS kernel!
  * @param: uargs: The driver commandline */
 #define __NR_init_module                  0x80                   /* errno_t init_module(void const *module_image, size_t len, char const *uargs) */
 /* Try to unload a driver, given its `name'
- * This system call exists for linux compatiblity, and is implemented
- * as an alias for `KSYSCTL_DRIVER_DELMOD:KSYSCTL_DRIVER_FORMAT_FILE'
+ * This system call exists for linux compatibility, and is implemented
+ * as an alias for  `KSYSCTL_DRIVER_DELMOD:KSYSCTL_DRIVER_FORMAT_FILE'
  * @param: name:  The name of the driver
  * @param: flags: Set of `O_NONBLOCK | O_TRUNC', where:
  *                 - O_NONBLOCK: Don't  wait  for  the driver  to  be unloaded.
@@ -784,11 +784,11 @@
 /* @param: type: One of  `KCMP_FILE',  `KCMP_FILES',  `KCMP_FS',  `KCMP_IO',
  *               `KCMP_SIGHAND', `KCMP_SYSVSEM', `KCMP_VM', `KCMP_EPOLL_TFD' */
 #define __NR_kcmp                         0x15d                  /* syscall_slong_t kcmp(pid_t pid1, pid_t pid2, syscall_ulong_t type, syscall_ulong_t idx1, syscall_ulong_t idx2) */
-/* Load a  kernel driver  from  an ELF  image  `module_image...+=len'
- * This system call exists for linux compatiblity, and is implemented
- * as an alias for `KSYSCTL_DRIVER_INSMOD:KSYSCTL_DRIVER_FORMAT_FILE'
+/* Load a  kernel  driver  from an  ELF  image  `module_image...+=len'
+ * This system call exists for linux compatibility, and is implemented
+ * as an alias for  `KSYSCTL_DRIVER_INSMOD:KSYSCTL_DRIVER_FORMAT_FILE'
  * 
- * Note  however that that is where linux compatiblity ends. Since the
+ * Note however that that is where linux compatibility ends. Since the
  * linux kernel does not implement any semblance of a stable ABI,  you
  * have to realize that on KOS, this system call can only load drivers
  * specifically built to run within the KOS kernel!

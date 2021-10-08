@@ -30,7 +30,6 @@
 #include <kernel/user.h>
 #include <kernel/x86/syscall-info.h>
 #include <kernel/x86/syscall-tables.h>
-#include <sched/except-handler.h>
 #include <sched/rpc.h>
 
 #include <hybrid/atomic.h>

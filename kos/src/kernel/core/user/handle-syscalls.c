@@ -34,12 +34,14 @@
 #include <kernel/iovec.h>
 #include <kernel/mman.h>
 #include <kernel/printk.h>
+#include <kernel/rt/except-handler.h>
 #include <kernel/syscall.h>
 #include <kernel/types.h>
 #include <kernel/user.h>
 #include <sched/cred.h>
 #include <sched/pid.h>
 #include <sched/posix-signal.h>
+#include <sched/rpc.h>
 #include <sched/tsc.h>
 
 #include <hybrid/align.h>
@@ -1743,7 +1745,6 @@ again:
 	goto again;
 }
 
-#ifdef CONFIG_USE_NEW_RPC
 PRIVATE size_t KCALL
 do_poll_with_sigmask(USER CHECKED struct pollfd *fds,
                      size_t nfds, ktime_t abs_timeout,
@@ -1767,7 +1768,6 @@ again:
 	/* Check to see what happened. */
 	goto again;
 }
-#endif /* CONFIG_USE_NEW_RPC */
 #endif /* WANT_SYS_POLL */
 
 #ifdef WANT_SYS_SELECT
@@ -1885,7 +1885,6 @@ again:
 	goto again;
 }
 
-#ifdef CONFIG_USE_NEW_RPC
 PRIVATE size_t KCALL
 do_select_with_sigmask(size_t nfds,
                        USER CHECKED fd_set *readfds,
@@ -1912,135 +1911,7 @@ again:
 	/* Check to see what happened. */
 	goto again;
 }
-#endif /* CONFIG_USE_NEW_RPC */
 #endif /* WANT_SYS_SELECT */
-
-#ifndef CONFIG_USE_NEW_RPC
-#ifdef WANT_SYS_POLLSELECT_SIGSET
-/* POLL/SELECT Helper functions */
-PRIVATE void KCALL
-atomic_sigmask_begin(USER CHECKED sigset_t *mymask,
-                     sigset_t *__restrict oldmask,
-                     USER CHECKED sigset_t const *newmask) {
-	memcpy(oldmask, mymask, sizeof(sigset_t));
-	TRY {
-		memcpy(mymask, &newmask, sizeof(sigset_t));
-		if unlikely(sigismember(mymask, SIGKILL) ||
-		            sigismember(mymask, SIGSTOP)) {
-			sigdelset(mymask, SIGKILL);
-			sigdelset(mymask, SIGSTOP);
-			COMPILER_BARRIER();
-			sigmask_check();
-		}
-	} EXCEPT {
-		bool mandatory_were_masked;
-		mandatory_were_masked = sigismember(mymask, SIGKILL) ||
-		                        sigismember(mymask, SIGSTOP);
-		memcpy(mymask, oldmask, sizeof(sigset_t));
-		if (mandatory_were_masked)
-			sigmask_check_after_except();
-		RETHROW();
-	}
-}
-
-PRIVATE void KCALL
-atomic_sigmask_except(USER CHECKED sigset_t *mymask,
-                      sigset_t const *__restrict oldmask) {
-	memcpy(mymask, oldmask, sizeof(sigset_t));
-	sigmask_check_after_except();
-}
-
-PRIVATE void KCALL
-atomic_sigmask_return(USER CHECKED sigset_t *mymask,
-                      sigset_t const *__restrict oldmask,
-                      syscall_ulong_t syscall_result) {
-	memcpy(mymask, oldmask, sizeof(sigset_t));
-	sigmask_check_after_syscall(syscall_result);
-}
-#endif /* WANT_SYS_POLLSELECT_SIGSET */
-
-#ifdef __ARCH_WANT_SYSCALL_EPOLL_PWAIT
-DEFINE_SYSCALL6(ssize_t, epoll_pwait,
-                fd_t, epfd, USER UNCHECKED struct epoll_event *, events,
-                size_t, maxevents, syscall_slong_t, timeout,
-                USER UNCHECKED sigset_t const *, sigmask, size_t, sigsetsize) {
-	ssize_t result;
-	if (sigmask) {
-		sigset_t oldmask;
-		if unlikely(sigsetsize != sizeof(sigset_t))
-			THROW(E_INVALID_ARGUMENT_BAD_VALUE,
-			      E_INVALID_ARGUMENT_CONTEXT_SIGNAL_SIGSET_SIZE,
-			      sigsetsize);
-		USER CHECKED sigset_t *mymask;
-		mymask = sigmask_getwr();
-		atomic_sigmask_begin(mymask, &oldmask, sigmask);
-		TRY {
-			result = sys_epoll_wait(epfd, events, maxevents, timeout);
-		} EXCEPT {
-			atomic_sigmask_except(mymask, &oldmask);
-			RETHROW();
-		}
-		atomic_sigmask_return(mymask, &oldmask, result);
-	} else {
-		result = sys_epoll_wait(epfd, events, maxevents, timeout);
-	}
-	return result;
-}
-#endif /* __ARCH_WANT_SYSCALL_EPOLL_PWAIT */
-
-#ifdef WANT_SYS_POLL_SIGSET
-PRIVATE size_t KCALL
-do_ppoll(USER CHECKED struct pollfd *fds,
-         size_t nfds, ktime_t abs_timeout,
-         USER CHECKED sigset_t const *sigmask) {
-	size_t result;
-	if (sigmask) {
-		sigset_t oldmask;
-		USER CHECKED sigset_t *mymask;
-		mymask = sigmask_getwr();
-		atomic_sigmask_begin(mymask, &oldmask, sigmask);
-		TRY {
-			result = do_poll(fds, nfds, abs_timeout);
-		} EXCEPT {
-			atomic_sigmask_except(mymask, &oldmask);
-			RETHROW();
-		}
-		atomic_sigmask_return(mymask, &oldmask, result);
-	} else {
-		result = do_poll(fds, nfds, abs_timeout);
-	}
-	return result;
-}
-#endif /* WANT_SYS_POLL_SIGSET */
-
-#ifdef WANT_SYS_SELECT_SIGSET
-PRIVATE size_t KCALL
-do_pselect(size_t nfds,
-           USER CHECKED fd_set *readfds,
-           USER CHECKED fd_set *writefds,
-           USER CHECKED fd_set *exceptfds,
-           ktime_t abs_timeout,
-           USER CHECKED sigset_t const *sigmask) {
-	size_t result;
-	if (sigmask) {
-		sigset_t oldmask;
-		USER CHECKED sigset_t *mymask;
-		mymask = sigmask_getwr();
-		atomic_sigmask_begin(mymask, &oldmask, sigmask);
-		TRY {
-			result = do_select(nfds, readfds, writefds, exceptfds, abs_timeout);
-		} EXCEPT {
-			atomic_sigmask_except(mymask, &oldmask);
-			RETHROW();
-		}
-		atomic_sigmask_return(mymask, &oldmask, result);
-	} else {
-		result = do_select(nfds, readfds, writefds, exceptfds, abs_timeout);
-	}
-	return result;
-}
-#endif /* WANT_SYS_SELECT_SIGSET */
-#endif /* !CONFIG_USE_NEW_RPC */
 
 #ifdef __ARCH_WANT_SYSCALL_POLL
 DEFINE_SYSCALL3(ssize_t, poll,
@@ -2062,7 +1933,6 @@ DEFINE_SYSCALL3(ssize_t, poll,
 #endif /* __ARCH_WANT_SYSCALL_POLL */
 
 
-#ifdef CONFIG_USE_NEW_RPC
 #if (defined(__ARCH_WANT_SYSCALL_PPOLL) ||        \
      defined(__ARCH_WANT_COMPAT_SYSCALL_PPOLL) || \
      defined(__ARCH_WANT_SYSCALL_PPOLL_TIME64) || \
@@ -2354,113 +2224,6 @@ DEFINE_COMPAT_SYSCALL5(ssize_t, ppoll_time64,
 	return (ssize_t)result;
 }
 #endif /* __ARCH_WANT_COMPAT_SYSCALL_PPOLL_TIME64 */
-#else /* CONFIG_USE_NEW_RPC */
-#ifdef __ARCH_WANT_SYSCALL_PPOLL
-DEFINE_SYSCALL5(ssize_t, ppoll,
-                USER UNCHECKED struct pollfd *, fds, size_t, nfds,
-                USER UNCHECKED struct timespec32 const *, timeout_ts,
-                USER UNCHECKED sigset_t const *, sigmask,
-                size_t, sigsetsize) {
-	size_t result;
-	ktime_t abs_timeout;
-	if unlikely(sigsetsize != sizeof(sigset_t))
-		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
-		      E_INVALID_ARGUMENT_CONTEXT_SIGNAL_SIGSET_SIZE,
-		      sigsetsize);
-	validate_readable_opt(sigmask, sizeof(sigset_t));
-	validate_readwritem(fds, nfds, sizeof(struct pollfd));
-	abs_timeout = KTIME_INFINITE;
-	if (timeout_ts) {
-		validate_readable(timeout_ts, sizeof(*timeout_ts));
-		abs_timeout = relktime_from_user_rel(timeout_ts);
-		if (abs_timeout != 0)
-			abs_timeout += ktime();
-	}
-	result = do_ppoll(fds, nfds, abs_timeout, sigmask);
-	return (ssize_t)result;
-}
-#endif /* __ARCH_WANT_SYSCALL_PPOLL */
-
-#ifdef __ARCH_WANT_COMPAT_SYSCALL_PPOLL
-DEFINE_COMPAT_SYSCALL5(ssize_t, ppoll,
-                       USER UNCHECKED struct pollfd *, fds, size_t, nfds,
-                       USER UNCHECKED struct compat_timespec32 const *, timeout_ts,
-                       USER UNCHECKED compat_sigset_t const *, sigmask,
-                       size_t, sigsetsize) {
-	STATIC_ASSERT(sizeof(compat_sigset_t) == sizeof(sigset_t));
-	size_t result;
-	ktime_t abs_timeout;
-	if unlikely(sigsetsize != sizeof(sigset_t))
-		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
-		      E_INVALID_ARGUMENT_CONTEXT_SIGNAL_SIGSET_SIZE,
-		      sigsetsize);
-	compat_validate_readable_opt(sigmask, sizeof(sigset_t));
-	compat_validate_readwritem(fds, nfds, sizeof(struct pollfd));
-	abs_timeout = KTIME_INFINITE;
-	if (timeout_ts) {
-		compat_validate_readable(timeout_ts, sizeof(*timeout_ts));
-		abs_timeout = relktime_from_user_rel(timeout_ts);
-		if (abs_timeout != 0)
-			abs_timeout += ktime();
-	}
-	result = do_ppoll(fds, nfds, abs_timeout, sigmask);
-	return (ssize_t)result;
-}
-#endif /* __ARCH_WANT_COMPAT_SYSCALL_PPOLL */
-
-#ifdef __ARCH_WANT_SYSCALL_PPOLL_TIME64
-DEFINE_SYSCALL5(ssize_t, ppoll_time64,
-                USER UNCHECKED struct pollfd *, fds, size_t, nfds,
-                USER UNCHECKED struct timespec64 const *, timeout_ts,
-                USER UNCHECKED sigset_t const *, sigmask,
-                size_t, sigsetsize) {
-	size_t result;
-	ktime_t abs_timeout;
-	if unlikely(sigsetsize != sizeof(sigset_t))
-		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
-		      E_INVALID_ARGUMENT_CONTEXT_SIGNAL_SIGSET_SIZE,
-		      sigsetsize);
-	validate_readable_opt(sigmask, sizeof(sigset_t));
-	validate_readwritem(fds, nfds, sizeof(struct pollfd));
-	abs_timeout = KTIME_INFINITE;
-	if (timeout_ts) {
-		validate_readable(timeout_ts, sizeof(*timeout_ts));
-		abs_timeout = relktime_from_user_rel(timeout_ts);
-		if (abs_timeout != 0)
-			abs_timeout += ktime();
-	}
-	result = do_ppoll(fds, nfds, abs_timeout, sigmask);
-	return (ssize_t)result;
-}
-#endif /* __ARCH_WANT_SYSCALL_PPOLL_TIME64 */
-
-#ifdef __ARCH_WANT_COMPAT_SYSCALL_PPOLL_TIME64
-DEFINE_COMPAT_SYSCALL5(ssize_t, ppoll_time64,
-                       USER UNCHECKED struct pollfd *, fds, size_t, nfds,
-                       USER UNCHECKED struct compat_timespec64 const *, timeout_ts,
-                       USER UNCHECKED compat_sigset_t const *, sigmask,
-                       size_t, sigsetsize) {
-	STATIC_ASSERT(sizeof(compat_sigset_t) == sizeof(sigset_t));
-	size_t result;
-	ktime_t abs_timeout;
-	if unlikely(sigsetsize != sizeof(sigset_t))
-		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
-		      E_INVALID_ARGUMENT_CONTEXT_SIGNAL_SIGSET_SIZE,
-		      sigsetsize);
-	compat_validate_readable_opt(sigmask, sizeof(sigset_t));
-	compat_validate_readwritem(fds, nfds, sizeof(struct pollfd));
-	abs_timeout = KTIME_INFINITE;
-	if (timeout_ts) {
-		compat_validate_readable(timeout_ts, sizeof(*timeout_ts));
-		abs_timeout = relktime_from_user_rel(timeout_ts);
-		if (abs_timeout != 0)
-			abs_timeout += ktime();
-	}
-	result = do_ppoll(fds, nfds, abs_timeout, sigmask);
-	return (ssize_t)result;
-}
-#endif /* __ARCH_WANT_COMPAT_SYSCALL_PPOLL_TIME64 */
-#endif /* !CONFIG_USE_NEW_RPC */
 
 #if (defined(__ARCH_WANT_SYSCALL_SELECT) || \
      defined(__ARCH_WANT_SYSCALL__NEWSELECT))
@@ -2648,8 +2411,6 @@ DEFINE_COMPAT_SYSCALL5(ssize_t, select_time64, size_t, nfds,
 	return (ssize_t)result;
 }
 #endif /* __ARCH_WANT_COMPAT_SYSCALL_SELECT64 */
-
-#ifdef CONFIG_USE_NEW_RPC
 
 #if (defined(__ARCH_WANT_SYSCALL_PSELECT6) ||        \
      defined(__ARCH_WANT_SYSCALL_PSELECT6_TIME64) || \
@@ -3035,175 +2796,6 @@ DEFINE_COMPAT_SYSCALL6(ssize_t, pselect6_time64, size_t, nfds,
 	return (ssize_t)result;
 }
 #endif /* __ARCH_WANT_COMPAT_SYSCALL_PSELECT6_TIME64 */
-#else /* CONFIG_USE_NEW_RPC */
-#ifdef __ARCH_WANT_SYSCALL_PSELECT6
-DEFINE_SYSCALL6(ssize_t, pselect6, size_t, nfds,
-                USER UNCHECKED fd_set *, readfds,
-                USER UNCHECKED fd_set *, writefds,
-                USER UNCHECKED fd_set *, exceptfds,
-                USER UNCHECKED struct timespec32 const *, timeout,
-                USER UNCHECKED void const *, sigmask_sigset_and_len) {
-	struct sigset_and_len {
-		sigset_t const *ss_ptr;
-		size_t          ss_len;
-	};
-	struct sigset_and_len ss;
-	size_t result, nfd_size;
-	ktime_t abs_timeout;
-	nfd_size = CEILDIV(nfds, __NFDBITS);
-	validate_readable(sigmask_sigset_and_len, sizeof(ss));
-	validate_readwrite_opt(readfds, nfd_size);
-	validate_readwrite_opt(writefds, nfd_size);
-	validate_readwrite_opt(exceptfds, nfd_size);
-	COMPILER_READ_BARRIER();
-	memcpy(&ss, sigmask_sigset_and_len, sizeof(ss));
-	COMPILER_READ_BARRIER();
-	if unlikely(ss.ss_len != sizeof(sigset_t))
-		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
-		      E_INVALID_ARGUMENT_CONTEXT_SIGNAL_SIGSET_SIZE,
-		      ss.ss_len);
-	validate_readable_opt(ss.ss_ptr, sizeof(sigset_t));
-	abs_timeout = KTIME_INFINITE;
-	if (timeout) {
-		validate_readable(timeout, sizeof(*timeout));
-		abs_timeout = relktime_from_user_rel(timeout);
-		if (abs_timeout != 0)
-			abs_timeout += ktime();
-	}
-	result = do_pselect(nfds, readfds, writefds,
-	                    exceptfds, abs_timeout,
-	                    ss.ss_ptr);
-	return (ssize_t)result;
-}
-#endif /* __ARCH_WANT_SYSCALL_PSELECT6 */
-
-#ifdef __ARCH_WANT_SYSCALL_PSELECT6_TIME64
-DEFINE_SYSCALL6(ssize_t, pselect6_time64, size_t, nfds,
-                USER UNCHECKED fd_set *, readfds,
-                USER UNCHECKED fd_set *, writefds,
-                USER UNCHECKED fd_set *, exceptfds,
-                USER UNCHECKED struct timespec64 const *, timeout,
-                USER UNCHECKED void const *, sigmask_sigset_and_len) {
-	struct sigset_and_len {
-		sigset_t const *ss_ptr;
-		size_t          ss_len;
-	};
-	struct sigset_and_len ss;
-	size_t result, nfd_size;
-	ktime_t abs_timeout;
-	nfd_size = CEILDIV(nfds, __NFDBITS);
-	validate_readable(sigmask_sigset_and_len, sizeof(ss));
-	validate_readwrite_opt(readfds, nfd_size);
-	validate_readwrite_opt(writefds, nfd_size);
-	validate_readwrite_opt(exceptfds, nfd_size);
-	COMPILER_READ_BARRIER();
-	memcpy(&ss, sigmask_sigset_and_len, sizeof(ss));
-	COMPILER_READ_BARRIER();
-	if unlikely(ss.ss_len != sizeof(sigset_t))
-		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
-		      E_INVALID_ARGUMENT_CONTEXT_SIGNAL_SIGSET_SIZE,
-		      ss.ss_len);
-	validate_readable_opt(ss.ss_ptr, sizeof(sigset_t));
-	abs_timeout = KTIME_INFINITE;
-	if (timeout) {
-		validate_readable(timeout, sizeof(*timeout));
-		abs_timeout = relktime_from_user_rel(timeout);
-		if (abs_timeout != 0)
-			abs_timeout += ktime();
-	}
-	result = do_pselect(nfds, readfds, writefds,
-	                    exceptfds, abs_timeout,
-	                    ss.ss_ptr);
-	return (ssize_t)result;
-}
-#endif /* __ARCH_WANT_SYSCALL_PSELECT6_TIME64 */
-
-#ifdef __ARCH_WANT_COMPAT_SYSCALL_PSELECT6
-DEFINE_COMPAT_SYSCALL6(ssize_t, pselect6, size_t, nfds,
-                       USER UNCHECKED fd_set *, readfds,
-                       USER UNCHECKED fd_set *, writefds,
-                       USER UNCHECKED fd_set *, exceptfds,
-                       USER UNCHECKED struct compat_timespec32 const *, timeout,
-                       USER UNCHECKED void const *, sigmask_sigset_and_len) {
-	STATIC_ASSERT(sizeof(compat_sigset_t) == sizeof(sigset_t));
-	struct sigset_and_len {
-		compat_ptr(compat_sigset_t const) ss_ptr;
-		compat_size_t                     ss_len;
-	};
-	struct sigset_and_len ss;
-	size_t result, nfd_size;
-	ktime_t abs_timeout;
-	nfd_size = CEILDIV(nfds, __NFDBITS);
-	compat_validate_readable(sigmask_sigset_and_len, sizeof(ss));
-	compat_validate_readwrite_opt(readfds, nfd_size);
-	compat_validate_readwrite_opt(writefds, nfd_size);
-	compat_validate_readwrite_opt(exceptfds, nfd_size);
-	COMPILER_READ_BARRIER();
-	memcpy(&ss, sigmask_sigset_and_len, sizeof(ss));
-	COMPILER_READ_BARRIER();
-	if unlikely(ss.ss_len != sizeof(sigset_t))
-		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
-		      E_INVALID_ARGUMENT_CONTEXT_SIGNAL_SIGSET_SIZE,
-		      ss.ss_len);
-	validate_readable_opt(ss.ss_ptr, sizeof(sigset_t));
-	abs_timeout = KTIME_INFINITE;
-	if (timeout) {
-		compat_validate_readable(timeout, sizeof(*timeout));
-		abs_timeout = relktime_from_user_rel(timeout);
-		if (abs_timeout != 0)
-			abs_timeout += ktime();
-	}
-	result = do_pselect(nfds, readfds, writefds,
-	                    exceptfds, abs_timeout,
-	                    ss.ss_ptr);
-	return (ssize_t)result;
-}
-#endif /* __ARCH_WANT_COMPAT_SYSCALL_PSELECT6 */
-
-#ifdef __ARCH_WANT_COMPAT_SYSCALL_PSELECT6_TIME64
-DEFINE_COMPAT_SYSCALL6(ssize_t, pselect6_time64, size_t, nfds,
-                       USER UNCHECKED fd_set *, readfds,
-                       USER UNCHECKED fd_set *, writefds,
-                       USER UNCHECKED fd_set *, exceptfds,
-                       USER UNCHECKED struct compat_timespec64 const *, timeout,
-                       USER UNCHECKED void const *, sigmask_sigset_and_len) {
-	STATIC_ASSERT(sizeof(compat_sigset_t) == sizeof(sigset_t));
-	struct sigset_and_len {
-		compat_ptr(compat_sigset_t const) ss_ptr;
-		compat_size_t                     ss_len;
-	};
-	struct sigset_and_len ss;
-	size_t result, nfd_size;
-	ktime_t abs_timeout;
-	nfd_size = CEILDIV(nfds, __NFDBITS);
-	compat_validate_readable(sigmask_sigset_and_len, sizeof(ss));
-	compat_validate_readwrite_opt(readfds, nfd_size);
-	compat_validate_readwrite_opt(writefds, nfd_size);
-	compat_validate_readwrite_opt(exceptfds, nfd_size);
-	COMPILER_READ_BARRIER();
-	memcpy(&ss, sigmask_sigset_and_len, sizeof(ss));
-	COMPILER_READ_BARRIER();
-	if unlikely(ss.ss_len != sizeof(sigset_t))
-		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
-		      E_INVALID_ARGUMENT_CONTEXT_SIGNAL_SIGSET_SIZE,
-		      ss.ss_len);
-	validate_readable_opt(ss.ss_ptr, sizeof(sigset_t));
-	abs_timeout = KTIME_INFINITE;
-	if (timeout) {
-		compat_validate_readable(timeout, sizeof(*timeout));
-		abs_timeout = relktime_from_user_rel(timeout);
-		if (abs_timeout != 0)
-			abs_timeout += ktime();
-	}
-	result = do_pselect(nfds, readfds, writefds,
-	                    exceptfds, abs_timeout,
-	                    ss.ss_ptr);
-	return (ssize_t)result;
-}
-#endif /* __ARCH_WANT_COMPAT_SYSCALL_PSELECT6_TIME64 */
-#endif /* !CONFIG_USE_NEW_RPC */
-
-
 
 
 

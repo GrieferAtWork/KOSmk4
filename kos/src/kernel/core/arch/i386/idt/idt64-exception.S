@@ -47,7 +47,6 @@ INTERN_LABEL(_x86_idt_breakpoint_after_enter):
 #endif /* ... */
 	ASM_PUSH_ICPUSTATE_AFTER_IRET_CFI_R
 
-#ifdef CONFIG_USE_NEW_RPC
 #if IDT_CONFIG_PUSHESERRORS(IDT_VECTOR_ID)
 	movq   -8(%rsp), %rbx /* uintptr_t ecode (register alias needed for unwinding) */
 #endif /* IDT_CONFIG_PUSHESERRORS(IDT_VECTOR_ID) */
@@ -80,31 +79,6 @@ INTERN_LABEL(_x86_idt_breakpoint_after_enter):
 #if IDT_CONFIG_PUSHESERRORS(IDT_VECTOR_ID)
 	movq   %rbx, %rsi  /* uintptr_t ecode */
 #endif /* IDT_CONFIG_PUSHESERRORS(IDT_VECTOR_ID) */
-
-
-#else /* CONFIG_USE_NEW_RPC */
-#if IDT_CONFIG_PUSHESERRORS(IDT_VECTOR_ID)
-	movq   -8(%rsp), %rsi /* uintptr_t ecode */
-#endif /* IDT_CONFIG_PUSHESERRORS(IDT_VECTOR_ID) */
-
-	/* Re-enable interrupts for certain exceptions. */
-#if IDT_CONFIG_ISTRAP(IDT_VECTOR_ID)
-	ttest  mask=EFLAGS_IF, loc=(OFFSET_ICPUSTATE64_IRREGS + OFFSET_IRREGS64_RFLAGS)(%rsp)
-	jz     1f
-	sti    /* Re-enable interrupts. */
-1:
-#endif /* TRAP... */
-
-	movq   %rsp, %rdi     /* struct icpustate *state */
-#if IDT_VECTOR_ID == 0x0e
-	movq   %cr2, %rdx /* void *addr */
-	movq   %rdx, %rbp /* void *addr (register alias needed for unwinding) */
-#elif IDT_CONFIG_PUSHESERRORS(IDT_VECTOR_ID)
-	movq   %rsi, %rbx /* uintptr_t ecode (register alias needed for unwinding) */
-#else /* ... */
-#endif /* !... */
-#endif /* !CONFIG_USE_NEW_RPC */
-
 
 	EXTERN(PP_CAT2(x86_handle_, IDT_VECTOR_NAME))
 	call   PP_CAT2(x86_handle_, IDT_VECTOR_NAME)

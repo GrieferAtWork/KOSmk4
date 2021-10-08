@@ -190,7 +190,6 @@ IDT_HANDLER_BEGIN
 	movw   $(SEGMENT_KERNEL_FSBASE), %ax
 	movw   %ax, %fs
 
-#ifdef CONFIG_USE_NEW_RPC
 #if IDT_CONFIG_PUSHESERRORS(IDT_VECTOR_ID)
 	movl   -4(%esp), %ebx /* uintptr_t ecode (register alias needed for unwinding) */
 #endif /* IDT_CONFIG_PUSHESERRORS(IDT_VECTOR_ID) */
@@ -216,19 +215,7 @@ IDT_HANDLER_BEGIN
 	movl   %ebx, %edx     /* uintptr_t ecode */
 #endif /* IDT_CONFIG_PUSHESERRORS(IDT_VECTOR_ID) */
 
-#else /* CONFIG_USE_NEW_RPC */
-	movl   %esp, %ecx     /* struct icpustate *state */
-#if IDT_CONFIG_PUSHESERRORS(IDT_VECTOR_ID)
-	movl   -4(%esp), %edx /* uintptr_t ecode */
-#endif /* IDT_CONFIG_PUSHESERRORS(IDT_VECTOR_ID) */
-#if IDT_VECTOR_ID == 0x0e
-	movl   %cr2, %ebp
-	pushl_cfi %ebp
-#endif /* IDT_VECTOR_ID == 0x0e */
-#endif /* !CONFIG_USE_NEW_RPC */
-
-
-1:	EXTERN(PP_CAT2(x86_handle_, IDT_VECTOR_NAME))
+	EXTERN(PP_CAT2(x86_handle_, IDT_VECTOR_NAME))
 	call   PP_CAT2(x86_handle_, IDT_VECTOR_NAME)
 #if IDT_VECTOR_ID == 0x0e
 	.cfi_adjust_cfa_offset -4

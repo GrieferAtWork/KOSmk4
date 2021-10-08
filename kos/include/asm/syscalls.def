@@ -2745,22 +2745,22 @@ setdomainname:([tostr(STRING:len)] char const *name, size_t len) -> errno_t;
 [cp] ksysctl:([tostr(KSYSCTL_COMMAND)] syscall_ulong_t command,
               [tostr(KSYSCTL_ARG:command)] void *arg) -> syscall_slong_t;
 
-@@Load a  kernel driver  from  an ELF  image  `module_image...+=len'
-@@This system call exists for linux compatiblity, and is implemented
-@@as an alias for `KSYSCTL_DRIVER_INSMOD:KSYSCTL_DRIVER_FORMAT_BLOB'
+@@Load a  kernel  driver  from an  ELF  image  `module_image...+=len'
+@@This system call exists for linux compatibility, and is implemented
+@@as an alias for  `KSYSCTL_DRIVER_INSMOD:KSYSCTL_DRIVER_FORMAT_BLOB'
 @@
-@@Note  however that that is where linux compatiblity ends. Since the
+@@Note however that that is where linux compatibility ends. Since the
 @@linux kernel does not implement any semblance of a stable ABI,  you
 @@have to realize that on KOS, this system call can only load drivers
 @@specifically built to run within the KOS kernel!
 @@@param: uargs: The driver commandline
 init_module:(void const *module_image, size_t len, char const *uargs) -> errno_t;
 
-@@Load a  kernel driver  from  an ELF  image  `module_image...+=len'
-@@This system call exists for linux compatiblity, and is implemented
-@@as an alias for `KSYSCTL_DRIVER_INSMOD:KSYSCTL_DRIVER_FORMAT_FILE'
+@@Load a  kernel  driver  from an  ELF  image  `module_image...+=len'
+@@This system call exists for linux compatibility, and is implemented
+@@as an alias for  `KSYSCTL_DRIVER_INSMOD:KSYSCTL_DRIVER_FORMAT_FILE'
 @@
-@@Note  however that that is where linux compatiblity ends. Since the
+@@Note however that that is where linux compatibility ends. Since the
 @@linux kernel does not implement any semblance of a stable ABI,  you
 @@have to realize that on KOS, this system call can only load drivers
 @@specifically built to run within the KOS kernel!
@@ -2768,8 +2768,8 @@ init_module:(void const *module_image, size_t len, char const *uargs) -> errno_t
 finit_module:(fd_t fd, char const *uargs, syscall_ulong_t flags) -> errno_t;
 
 @@Try to unload a driver, given its `name'
-@@This system call exists for linux compatiblity, and is implemented
-@@as an alias for `KSYSCTL_DRIVER_DELMOD:KSYSCTL_DRIVER_FORMAT_FILE'
+@@This system call exists for linux compatibility, and is implemented
+@@as an alias for  `KSYSCTL_DRIVER_DELMOD:KSYSCTL_DRIVER_FORMAT_FILE'
 @@@param: name:  The name of the driver
 @@@param: flags: Set of `O_NONBLOCK | O_TRUNC', where:
 @@                - O_NONBLOCK: Don't  wait  for  the driver  to  be unloaded.

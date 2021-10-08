@@ -28,7 +28,6 @@
 #include <kernel/types.h>
 #include <kernel/x86/fault.h>
 #include <kernel/x86/idt.h> /* IDT_CONFIG_ISTRAP() */
-#include <sched/except-handler.h>
 
 #include <kos/kernel/cpu-state-helpers.h>
 #include <kos/kernel/cpu-state.h>
@@ -46,18 +45,8 @@ x86_handle_overflow(struct icpustate *__restrict state) {
 	PERTASK_SET(this_exception_code, ERROR_CODEOF(E_OVERFLOW));
 	for (i = 0; i < EXCEPTION_DATA_POINTERS; ++i)
 		PERTASK_SET(this_exception_args.e_pointers[i], 0);
-#ifndef CONFIG_USE_NEW_RPC
-#if EXCEPT_BACKTRACE_SIZE != 0
-	for (i = 0; i < EXCEPT_BACKTRACE_SIZE; ++i)
-		PERTASK_SET(this_exception_trace[i], (void const *)NULL);
-#endif /* EXCEPT_BACKTRACE_SIZE != 0 */
-#endif /* !CONFIG_USE_NEW_RPC */
 	PERTASK_SET(this_exception_faultaddr, icpustate_getpc(state));
-#ifdef CONFIG_USE_NEW_RPC
 	error_throw_current_at_icpustate(state);
-#else /* CONFIG_USE_NEW_RPC */
-	x86_userexcept_unwind_interrupt(state);
-#endif /* !CONFIG_USE_NEW_RPC */
 }
 
 DECL_END

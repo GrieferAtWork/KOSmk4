@@ -28,7 +28,6 @@
 
 #include <kernel/compiler.h>
 
-#ifdef CONFIG_USE_NEW_RPC
 #include <kernel/coredump.h>
 #include <kernel/except.h>
 #include <kernel/printk.h>
@@ -1417,7 +1416,5 @@ DECL_END
 #define DEFINE_userexcept_sysret
 #include "except-handler-userexcept.c.inl"
 #endif /* !__INTELLISENSE__ */
-
-#endif /* CONFIG_USE_NEW_RPC */
 
 #endif /* !GUARD_KERNEL_SRC_MISC_EXCEPT_HANDLER_C */

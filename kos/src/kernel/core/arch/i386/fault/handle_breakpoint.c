@@ -165,18 +165,8 @@ x86_handle_breakpoint(struct icpustate *__restrict state) {
 		unsigned int i;
 		for (i = 0; i < EXCEPTION_DATA_POINTERS; ++i)
 			PERTASK_SET(this_exception_args.e_pointers[i], 0);
-#ifndef CONFIG_USE_NEW_RPC
-#if EXCEPT_BACKTRACE_SIZE != 0
-		for (i = 0; i < EXCEPT_BACKTRACE_SIZE; ++i)
-			PERTASK_SET(this_exception_trace[i], (void const *)NULL);
-#endif /* EXCEPT_BACKTRACE_SIZE != 0 */
-#endif /* !CONFIG_USE_NEW_RPC */
 	}
-#ifdef CONFIG_USE_NEW_RPC
 	error_throw_current_at_icpustate(state);
-#else /* CONFIG_USE_NEW_RPC */
-	x86_userexcept_unwind_interrupt(state);
-#endif /* !CONFIG_USE_NEW_RPC */
 }
 
 

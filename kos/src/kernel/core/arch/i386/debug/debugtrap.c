@@ -340,7 +340,6 @@ DECL_BEGIN
 #endif /* !__INTELLISENSE__ */
 
 
-#ifdef CONFIG_USE_NEW_RPC
 PRIVATE NONNULL((1)) void PRPC_EXEC_CALLBACK_CC
 sys_debugtrap_rpc32(struct rpc_context *__restrict ctx,
                     void *UNUSED(cookie)) {
@@ -403,72 +402,6 @@ DEFINE_SYSCALL32_2(errno_t, debugtrap,
 	return -ENOENT;
 }
 #endif /* __x86_64__ */
-
-#else /* CONFIG_USE_NEW_RPC */
-
-PRIVATE struct icpustate *FCALL
-sys_debugtrap_rpc32(void *UNUSED(arg), struct icpustate *__restrict state,
-                    unsigned int reason, struct rpc_syscall_info const *sc_info) {
-	if (reason == TASK_RPC_REASON_SYSCALL) {
-		state = sys_debugtrap32_impl(state,
-		                             (USER UNCHECKED struct ucpustate32 const *)sc_info->rsi_regs[0],
-		                             (USER UNCHECKED struct debugtrap_reason32 const *)sc_info->rsi_regs[1]);
-	}
-	return state;
-}
-
-#ifdef __x86_64__
-PRIVATE struct icpustate *FCALL
-sys_debugtrap_rpc64(void *UNUSED(arg), struct icpustate *__restrict state,
-                    unsigned int reason, struct rpc_syscall_info const *sc_info) {
-	if (reason == TASK_RPC_REASON_SYSCALL) {
-		state = sys_debugtrap64_impl(state,
-		                             (USER UNCHECKED struct ucpustate64 const *)sc_info->rsi_regs[0],
-		                             (USER UNCHECKED struct debugtrap_reason64 const *)sc_info->rsi_regs[1]);
-	}
-	return state;
-}
-#endif /* __x86_64__ */
-
-DEFINE_SYSCALL2(errno_t, debugtrap,
-                USER UNCHECKED struct ucpustate const *, state,
-                USER UNCHECKED struct debugtrap_reason const *, reason) {
-	(void)state;
-	(void)reason;
-	if (kernel_debugtrap_enabled()) {
-		task_schedule_user_rpc(THIS_TASK,
-#ifdef __x86_64__
-		                       &sys_debugtrap_rpc64,
-#else /* __x86_64__ */
-		                       &sys_debugtrap_rpc32,
-#endif /* !__x86_64__ */
-		                       NULL,
-		                       TASK_RPC_FHIGHPRIO |
-		                       TASK_USER_RPC_FINTR,
-		                       GFP_NORMAL);
-	}
-	return -ENOENT;
-}
-
-#ifdef __x86_64__
-DEFINE_SYSCALL32_2(errno_t, debugtrap,
-                   USER UNCHECKED struct ucpustate32 const *, state,
-                   USER UNCHECKED struct debugtrap_reason32 const *, reason) {
-	(void)state;
-	(void)reason;
-	if (kernel_debugtrap_enabled()) {
-		task_schedule_user_rpc(THIS_TASK,
-		                       &sys_debugtrap_rpc32,
-		                       NULL,
-		                       TASK_RPC_FHIGHPRIO |
-		                       TASK_USER_RPC_FINTR,
-		                       GFP_NORMAL);
-	}
-	return -ENOENT;
-}
-#endif /* __x86_64__ */
-#endif /* !CONFIG_USE_NEW_RPC */
-
 
 DECL_END
 

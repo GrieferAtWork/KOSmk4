@@ -25,9 +25,9 @@
 
 #include <kernel/driver.h>
 #include <kernel/except.h>
-#include <sched/arch/posix-signal.h>
 #include <sched/cred.h>
 #include <sched/pid.h>
+#include <sched/x86/eflags-mask.h>
 #include <sched/x86/iopl.h>
 
 #include <hybrid/atomic.h>
@@ -99,7 +99,7 @@ INTERN NONNULL((1)) ssize_t KCALL
 ProcFS_Sys_X86_KeepIopl_Exec_Print(struct regular_node *__restrict UNUSED(self),
                                    pformatprinter printer, void *arg) {
 	bool keep;
-	union x86_user_eflags_mask mask;
+	union x86_user_eflags_mask_union mask;
 	mask.uem_word = atomic64_read(&x86_exec_eflags_mask);
 	keep = (mask.uem_mask & EFLAGS_IOPLMASK) == EFLAGS_IOPLMASK;
 	return ProcFS_PrintBool(printer, arg, keep);
@@ -110,7 +110,7 @@ ProcFS_Sys_X86_KeepIopl_Exec_Write(struct regular_node *__restrict UNUSED(self),
                                    USER CHECKED void const *buf,
                                    size_t bufsize) {
 	bool keep;
-	union x86_user_eflags_mask oldmask, newmask;
+	union x86_user_eflags_mask_union oldmask, newmask;
 	KeepIopl_Write(buf, bufsize, &keep);
 	for (;;) {
 		oldmask.uem_word = atomic64_read(&x86_exec_eflags_mask);

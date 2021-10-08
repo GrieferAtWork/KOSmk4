@@ -49,12 +49,8 @@ DECL_BEGIN
 #define TASK_FNORMAL       __UINT32_C(0x00000000) /* Normal task flags. */
 #define TASK_FRUNNING      __UINT32_C(0x00000001) /* [lock(PRIVATE(THIS_CPU))] The task is currently running (`s_running' is valid). */
 #define TASK_FTIMEOUT      __UINT32_C(0x00000002) /* [lock(CLEAR(THIS_TASK))] Set by the scheduler when waking a task due to a timeout. */
-#ifdef CONFIG_USE_NEW_RPC
 #define TASK_FRPC          __UINT32_C(0x00000004) /* [lock(CLEAR(THIS_TASK))] Set if there  may be active  RPCs pending  in
                                                    * `this_rpcs' or `THIS_PROCESS_RPCS', and `task_serve()' must be called. */
-#else /* CONFIG_USE_NEW_RPC */
-/*      TASK_F             __UINT32_C(0x00000004)  * ... */
-#endif /* !CONFIG_USE_NEW_RPC */
 /*      TASK_F             __UINT32_C(0x00000008)  * ... */
 #define TASK_FSTARTING     __UINT32_C(0x00000010) /* [lock(WRITE_ONCE)] The thread is currently starting. */
 #define TASK_FSTARTED      __UINT32_C(0x00000020) /* [lock(WRITE_ONCE)] The thread has been started. */
@@ -80,14 +76,10 @@ DECL_BEGIN
 #define TASK_FUSERPROCMASK __UINT32_C(0x00020000) /* [lock(READ(ATOMIC), WRITE(THIS_TASK))] Task has a `userprocmask'. (s.a. `this_userprocmask_address') */
 #define TASK_FUSERPROCMASK_AFTER_VFORK \
                            __UINT32_C(0x00040000) /* [lock(PRIVATE(THIS_TASK))] `TASK_FUSERPROCMASK' was set after `TASK_FVFORK'. (s.a. `this_userprocmask_address') */
-#ifdef CONFIG_USE_NEW_RPC
 #define TASK_FWAKEONMSKRPC __UINT32_C(0x00080000) /* [lock(PRIVATE(THIS_TASK))] The thread wants to receive sporadic interrupts whenever
                                                    * it,  or its process receives a pending user  RPC, even when that RPC's posix signal
                                                    * number is masked within the thread's signal mask (needed for `sigtimedwait(2)'  and
                                                    * `signalfd(2)'). */
-#else /* CONFIG_USE_NEW_RPC */
-/*      TASK_F             __UINT32_C(0x00080000)  * ... */
-#endif /* !CONFIG_USE_NEW_RPC */
 /*      TASK_F             __UINT32_C(0x00100000)  * ... */
 /*      TASK_F             __UINT32_C(0x00200000)  * ... */
 /*      TASK_F             __UINT32_C(0x00400000)  * ... */

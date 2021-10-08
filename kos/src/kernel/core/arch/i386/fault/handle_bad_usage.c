@@ -90,7 +90,6 @@ opt.append("-Os");
 #include <kernel/x86/gdt.h>
 #include <kernel/x86/idt.h> /* IDT_CONFIG_ISTRAP */
 #include <sched/cpu.h>
-#include <sched/except-handler.h>
 #include <sched/pid.h>
 #include <sched/rpc.h>
 #include <sched/task.h>
@@ -422,22 +421,6 @@ loophint(struct icpustate *__restrict state) {
 #undef EMU86_EMULATE_RETURN_AFTER_INTO /* Not needed because we don't emulate the instruction */
 #undef EMU86_EMULATE_THROW_BOUNDERR    /* Not needed because we don't emulate the instruction */
 
-#ifdef CONFIG_USE_NEW_RPC
-#define unwind_interrupt(self) error_throw_current_at_icpustate(self)
-#else /* CONFIG_USE_NEW_RPC */
-PRIVATE ATTR_NORETURN NOBLOCK void
-NOTHROW(FCALL unwind_interrupt)(struct icpustate *__restrict self) {
-#if EXCEPT_BACKTRACE_SIZE != 0
-	{
-		unsigned int i;
-		for (i = 0; i < EXCEPT_BACKTRACE_SIZE; ++i)
-			PERTASK_SET(this_exception_trace[i], (void const *)NULL);
-	}
-#endif /* EXCEPT_BACKTRACE_SIZE != 0 */
-	x86_userexcept_unwind_interrupt(self);
-}
-#endif /* !CONFIG_USE_NEW_RPC */
-
 #define EMU86_EMULATE_TRY \
 	TRY
 #define EMU86_EMULATE_EXCEPT     \
@@ -483,7 +466,7 @@ NOTHROW(FCALL complete_except)(struct icpustate *__restrict self) {
 			icpustate_setpc(self, next_pc);
 		PERTASK_SET(this_exception_faultaddr, pc);
 	}
-	unwind_interrupt(self);
+	error_throw_current_at_icpustate(self);
 }
 
 /* Fill in missing exception pointer. */
@@ -526,7 +509,7 @@ NOTHROW(FCALL throw_illegal_instruction_exception)(struct icpustate *__restrict 
 	/* Try to trigger a debugger trap (if enabled) */
 	if (kernel_debugtrap_shouldtrap(KERNEL_DEBUGTRAP_ON_ILLEGAL_INSTRUCTION))
 		kernel_debugtrap(state, SIGILL);
-	unwind_interrupt(state);
+	error_throw_current_at_icpustate(state);
 }
 
 PRIVATE ABNORMAL_RETURN ATTR_NORETURN NONNULL((1)) void
@@ -545,7 +528,7 @@ NOTHROW(FCALL throw_exception)(struct icpustate *__restrict state,
 	PERTASK_SET(this_exception_args.e_pointers[1], ptr1);
 	for (i = 2; i < EXCEPTION_DATA_POINTERS; ++i)
 		PERTASK_SET(this_exception_args.e_pointers[i], 0);
-	unwind_interrupt(state);
+	error_throw_current_at_icpustate(state);
 }
 
 PRIVATE ABNORMAL_RETURN ATTR_NORETURN NONNULL((1)) void
@@ -1121,7 +1104,7 @@ set_noncanon_pc_exception:
 		icpustate_setpc(state, callsite_pc);
 		printk(KERN_DEBUG "[segfault] PC-Fault at %p [pc=%p] [#GPF]\n",
 		       pc, callsite_pc);
-		unwind_interrupt(state);
+		error_throw_current_at_icpustate(state);
 	}
 }
 

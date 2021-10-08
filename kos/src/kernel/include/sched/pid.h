@@ -121,7 +121,6 @@ DATDEF ATTR_PERTASK struct taskpid *this_taskpid;
 
 
 /* For `posix-signal' */
-#ifdef CONFIG_USE_NEW_RPC
 struct pending_rpc; /* Define in `rpc-internal.h' */
 #ifndef __pending_rpc_slist_defined
 #define __pending_rpc_slist_defined
@@ -149,42 +148,9 @@ NOTHROW(KCALL process_pending_rpcs_fini)(struct process_pending_rpcs *__restrict
 /* Pending RPCs for the calling process. */
 #define THIS_PROCESS_RPCS \
 	FORTASK(task_getprocess(), this_taskgroup.tg_proc_rpcs)
-#else /* CONFIG_USE_NEW_RPC */
-struct sigqueue_entry;
-struct sigqueue {
-	/* Descriptor for pending signals (always per-thread or per-process).
-	 * NOTE: Locking of this also depends on the context, where per-process
-	 *       locking uses an atomic r/w-lock, while per-thread locking uses
-	 *       atomic append operations. */
-	struct sig             sq_newsig; /* Signal send once for every signal that is added to `sq_queue'. */
-	struct sigqueue_entry *sq_queue;  /* [0..1][owned][lock(sq_lock)] List of queued signals.
-	                                   * Set  to   `SIGQUEUE_SQ_QUEUE_TERMINATED'  when   the
-	                                   * thread/process has terminated. */
-#define SIGQUEUE_SQ_QUEUE_TERMINATED ((struct sigqueue_entry *)-1)
-};
-
-struct process_sigqueue {
-	struct atomic_rwlock psq_lock;  /* Lock for `psq_queue'. */
-	struct sigqueue      psq_queue; /* The underlying queue. */
-};
-
-FUNDEF NOBLOCK NONNULL((1)) void
-NOTHROW(KCALL sigqueue_fini)(struct sigqueue *__restrict self);
-
-/* [valid_if(!TASK_FKERNTHREAD)]
- * [lock(LINKED_LIST(APPEND(ATOMIC),CLEAR(THIS_TASK)))]
- * Pending signals for the calling thread. */
-DATDEF ATTR_PERTASK struct sigqueue this_sigqueue;
-#define THIS_SIGQUEUE       PERTASK(this_sigqueue)
-
-/* [valid_if(!TASK_FKERNTHREAD)]
- * Pending signals for the calling process. */
-#define THIS_PROCESS_SIGQUEUE \
-	FORTASK(task_getprocess(), this_taskgroup.tg_proc_signals)
-#endif /* !CONFIG_USE_NEW_RPC */
 
 struct ttybase_device;
-struct rpc_entry;
+struct pending_rpc;
 
 LIST_HEAD(taskpid_list, REF taskpid);
 #ifndef __task_list_defined
@@ -216,13 +182,8 @@ struct taskgroup {
 	                                                      *   - Any kernel thread is always its own process. */
 	/* All of the following fields are only valid when `tg_process == THIS_TASK' (Otherwise, they are all `[0..1][const]') */
 	union {
-#ifdef CONFIG_USE_NEW_RPC
 		struct pending_rpc      *tg_thread_exit;         /* [valid_if(tg_process != THIS_TASK)][lock(PRIVATE(tg_process), CLEAR_ONCE)][0..1][owned]
 		                                                  * A pre-allocated RPC used by the process leader to propagate its exit status to this thread. */
-#else /* CONFIG_USE_NEW_RPC */
-		struct rpc_entry        *tg_thread_exit;         /* [valid_if(tg_process != THIS_TASK)][lock(PRIVATE(tg_process), CLEAR_ONCE)][0..1][owned]
-		                                                  * A pre-allocated RPC used by the process leader to propagate its exit status to this thread. */
-#endif /* !CONFIG_USE_NEW_RPC */
 		struct atomic_rwlock     tg_proc_threads_lock;   /* [valid_if(tg_process == THIS_TASK)] Lock for `tg_proc_threads' */
 	};
 	union {
@@ -265,11 +226,7 @@ struct taskgroup {
 	                                                      *           taskpid_gettask(tg_proc_group) != NULL)]
 	                                                      * Chain of sibling processes within the same process group.
 	                                                      * The base of this chain is `taskpid_gettask(tg_proc_group)->tg_pgrp_processes' */
-#ifdef CONFIG_USE_NEW_RPC
 	struct process_pending_rpcs  tg_proc_rpcs;           /* Pending RPCs of this process as a whole. */
-#else /* CONFIG_USE_NEW_RPC */
-	struct process_sigqueue      tg_proc_signals;        /* Pending signals that are being delivered to this process. */
-#endif /* !CONFIG_USE_NEW_RPC */
 	/* All of the following fields are only valid when `tg_proc_group == THIS_TASKPID' (Otherwise, they are all `[0..1][const]') */
 	struct atomic_rwlock         tg_pgrp_processes_lock; /* Lock for `tg_pgrp_processes' */
 	struct task_list             tg_pgrp_processes;      /* [0..1] Chain of processes within this  process group (excluding the calling  process)

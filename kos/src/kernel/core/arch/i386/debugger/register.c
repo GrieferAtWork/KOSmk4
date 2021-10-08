@@ -415,7 +415,7 @@ NOTHROW(KCALL loadview)(void) {
 			x86_dbg_origstate.fcs_sgregs.sg_ss = ist->ics_irregs.ir_ss16;
 #endif /* __x86_64__ */
 #if 0 /* Don't bend the truth when it comes to IRET tails. */
-			if (x86_dbg_origstate.fcs_Pip == (uintptr_t)&x86_rpc_user_redirection) {
+			if (x86_dbg_origstate.fcs_Pip == (uintptr_t)&x86_userexcept_sysret) {
 				struct irregs_kernel *iret;
 				iret = &FORTASK(ammend->dca_thread, this_x86_sysret_iret);
 				x86_dbg_origstate.fcs_Pip          = iret->ir_Pip;

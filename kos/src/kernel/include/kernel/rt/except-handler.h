@@ -25,7 +25,6 @@
 #include <kernel/compiler.h>
 
 #include <kernel/types.h>
-#include <sched/arch/except-handler.h>
 
 #include <kos/bits/syscall-info.h>
 #include <kos/rpc.h>
@@ -73,12 +72,8 @@
  */
 
 
-#ifdef CONFIG_USE_NEW_RPC
 #ifdef __CC__
 DECL_BEGIN
-
-/* TODO: `userexcept_sysret_inject_nopr' replaces `task_enable_redirect_usercode_rpc' */
-/* TODO: `userexcept_sysret_inject_safe' replaces `task_redirect_usercode_rpc' */
 
 struct icpustate;
 struct task;
@@ -325,6 +320,5 @@ NOTHROW(FCALL userexcept_sysret_injectproc_and_marksignal_safe)(struct task *__r
 
 DECL_END
 #endif /* __CC__ */
-#endif /* CONFIG_USE_NEW_RPC */
 
 #endif /* !GUARD_KERNEL_INCLUDE_KERNEL_RT_EXCEPT_HANDLER_H */

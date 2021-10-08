@@ -22,7 +22,7 @@
 #define _KOS_SOURCE 1
 
 #include <kernel/compiler.h>
-#ifdef CONFIG_USE_NEW_RPC
+
 #include <kernel/rt/except-handler.h>
 #include <kernel/rt/except-personality.h>
 #include <kernel/x86/syscall-info.h>
@@ -325,6 +325,5 @@ NOTHROW(EXCEPT_PERSONALITY_CC x86_xintr3_userexcept_personality)(struct unwind_f
 /************************************************************************/
 
 DECL_END
-#endif /* CONFIG_USE_NEW_RPC */
 
 #endif /* !GUARD_KERNEL_CORE_ARCH_I386_MISC_EXCEPT_PERSONALITY_C */

@@ -24,8 +24,7 @@
 
 #include <kernel/malloc.h>
 #include <kernel/types.h>
-#include <sched/arch/posix-signal.h>
-#include <sched/except-handler.h> /* CONFIG_HAVE_USERPROCMASK */
+#include <kernel/rt/except-syscall.h> /* CONFIG_HAVE_USERPROCMASK */
 #include <sched/pertask.h>
 #include <sched/signal.h>
 
@@ -41,16 +40,6 @@
 #include <stdbool.h>
 
 #include <libc/string.h> /* __libc_memset() */
-
-#ifdef CONFIG_USE_NEW_RPC
-#include <kernel/rt/except-handler.h> /* userexcept_sysret_inject_self() */
-#include <sched/rpc.h>                /* task_serve() */
-
-#define sigmask_check()                             task_serve()                    /* !DEPREACTED! */
-#define sigmask_check_after_syscall(syscall_result) userexcept_sysret_inject_self() /* !DEPREACTED! */
-#define sigmask_check_after_except()                userexcept_sysret_inject_self() /* !DEPREACTED! */
-#endif /* CONFIG_USE_NEW_RPC */
-
 
 #ifndef NSIG
 #define NSIG __NSIG
@@ -76,16 +65,6 @@ struct ucontext;
 typedef void (*user_sighandler_func_t)(signo_t signo);
 typedef void (*user_sigaction_func_t)(signo_t signo, siginfo_t *info, struct ucontext *ctx);
 typedef void (*user_sigrestore_func_t)(void);
-
-
-
-
-
-
-
-
-
-
 
 
 /************************************************************************/
@@ -198,13 +177,6 @@ FUNDEF NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) int
 NOTHROW(FCALL sigmask_ismasked_in)(struct task *__restrict self, signo_t signo);
 #define sigmask_ismasked_in(self, signo, ...) sigmask_ismasked_in(self, signo)
 #endif /* !CONFIG_HAVE_USERPROCMASK */
-
-
-
-
-
-
-
 
 
 
@@ -324,127 +296,9 @@ sighand_reset_handler(signo_t signo,
 
 
 
-
-
-
-
-
-
 /************************************************************************/
 /* SIGNAL SCHEDULING                                                    */
 /************************************************************************/
-#ifndef CONFIG_USE_NEW_RPC
-/* Check for pending signals that are no longer being masked. */
-FUNDEF void FCALL sigmask_check(void) THROWS(E_INTERRUPT, E_WOULDBLOCK);
-
-/* Same as `sigmask_check()', but if a signal gets triggered, act as though
- * it was being serviced after the current system call has exited with  the
- * given `syscall_result' return value. (preventing system call restarting,
- * or indicating an interrupt exception to user-space)
- * If no signal was triggered, simply return normally.
- * This function is meant to  be used to check  for pending signals after  the
- * original signal mask got restored following the completion of a `pselect()'
- * or `ppoll()' system call. (at which point a previously masked signal should
- * no longer cause the system  call to fail and error  out with -EINTR (to  be
- * restarted), but instead  return its  normal value once  returning from  its
- * associated user-space signal handler (if any))
- * With this in mind, the call order for temporarily overriding the signal mask
- * for the purpose of a single system call looks like this:
- * >> sigset_t oldmask;
- * >> USER CHECKED sigset_t *mymask;
- * >> mymask = sigmask_getwr();
- * >> memcpy(&oldmask, mymask, sizeof(sigset_t));
- * >> TRY {
- * >>     memcpy(mymask, &newmask, sizeof(sigset_t));
- * >> } EXCEPT {
- * >>     memcpy(mymask, &oldmask, sizeof(sigset_t));
- * >>     RETHROW();
- * >> }
- * >> TRY {
- * >>     result = do_my_system_call();
- * >> } EXCEPT {
- * >>     memcpy(mymask, &oldmask, sizeof(sigset_t));
- * >>     sigmask_check_after_except();
- * >>     RETHROW();
- * >> }
- * >> memcpy(mymask, &oldmask, sizeof(sigset_t));
- * >> sigmask_check_after_syscall(result);
- * >> return result;
- */
-FUNDEF void FCALL
-sigmask_check_after_syscall(syscall_ulong_t syscall_result)
-		THROWS(E_INTERRUPT, E_WOULDBLOCK);
-
-
-/* Same as `sigmask_check()', but should be called in order to have
- * user-space handle the currently set  exception in case a  signal
- * handler has to be invoked.
- * See the documentation of `sigmask_check_after_syscall()' for when
- * this function needs to be called. */
-FUNDEF void FCALL
-sigmask_check_after_except(void)
-		THROWS(E_INTERRUPT, E_WOULDBLOCK);
-
-struct rpc_syscall_info;
-
-/* Same as `sigmask_check()', but service signals immediately.
- * @param: sc_info: A system call that may be restarted, or NULL.
- * @return: * :                       The updated cpu-state.
- * @return: TASK_RPC_RESTART_SYSCALL: Nothing was handled. */
-FUNDEF struct icpustate *FCALL
-sigmask_check_s(struct icpustate *__restrict state,
-                struct rpc_syscall_info const *sc_info)
-		THROWS(E_WOULDBLOCK, E_SEGFAULT);
-
-struct icpustate;
-struct rpc_syscall_info;
-/* Update the given  `state' to raise  the specified `siginfo'  as
- * a user-space signal  within the calling  thread. The caller  is
- * responsible  to  handle   special  signal  handlers   (`SIG_*')
- * before calling this function! This function should only be used
- * to  enqueue the execution of a signal handler with a user-space
- * entry point.
- * @param: state:   The CPU state describing the return to user-space.
- * @param: action:  The signal action to perform.
- * @param: siginfo: The signal that is being raised.
- * @param: sc_info: When non-NULL, `sc_info'  describes a system  call
- *                  that may be restarted. Note however that ontop  of
- *                  this, [restart({auto,must,dont})] logic will still
- *                  be applied, which is done in cooperation with  the
- *                  system call restart database.
- * @return: * :     The updated CPU state.
- * @return: NULL:   The `SA_RESETHAND' flag was set,
- *                  but `action' differs from the set handler. */
-FUNDEF WUNUSED NONNULL((1, 2)) struct icpustate *KCALL
-userexcept_callsignal(struct icpustate *__restrict state,
-                      struct kernel_sigaction const *__restrict action,
-                      USER CHECKED siginfo_t const *siginfo,
-                      struct rpc_syscall_info const *sc_info)
-		THROWS(E_SEGFAULT, E_WOULDBLOCK);
-
-/* Suspend execution of the calling thread by setting `TASK_FSUSPENDED',
- * and keep  the  thread  suspended until  `task_sigcont()'  is  called.
- * This is used to implement SIGSTOP/SIGCONT behavior.
- * @param: stop_code: The stop code (created with `W_STOPCODE(signo)') */
-FUNDEF void KCALL task_sigstop(int stop_code) THROWS(E_WOULDBLOCK,E_INTERRUPT);
-
-/* Continue execution in `thread', if that thread is currently suspended
- * due to having called `task_sigstop()'
- * WARNING: A race condition exists where `thread' may not have started waiting
- *          yet, in which  case this function  will return `false',  indicating
- *          that the given thread wasn't actually woken.
- * @return: true:  Successfully set `thread' to continue execution
- * @return: false: Either `thread' hasn't started sleeping, or was already continued. */
-FUNDEF NOBLOCK bool NOTHROW(KCALL task_sigcont)(struct task *__restrict thread);
-
-struct sigqueue_entry {
-	/* Descriptor for  a signal  that  was send,  but  was
-	 * blocked and thereby scheduled to be received later. */
-	struct sigqueue_entry *sqe_next;  /* [owned][0..1] Next queued signal. */
-	siginfo_t              sqe_info;  /* Signal information. */
-};
-#endif /* !CONFIG_USE_NEW_RPC */
-
 
 /* Raise a posix signal within a given thread `target'
  * @return: true:  Successfully scheduled/enqueued the signal for delivery to `target'

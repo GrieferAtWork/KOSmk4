@@ -693,7 +693,6 @@ NOTHROW(FCALL task_waitfor_nx)(ktime_t abs_timeout DFL(KTIME_INFINITE));
 FUNDEF struct sig *
 NOTHROW(FCALL task_waitfor_norpc_nx)(ktime_t abs_timeout DFL(KTIME_INFINITE));
 
-#ifdef CONFIG_USE_NEW_RPC
 #ifndef __sigset_t_defined
 #define __sigset_t_defined
 struct __sigset_struct;
@@ -705,8 +704,6 @@ FUNDEF NONNULL((1)) struct sig *FCALL
 task_waitfor_with_sigmask(sigset_t const *__restrict sigmask,
                           ktime_t abs_timeout DFL(KTIME_INFINITE))
 		THROWS(E_INTERRUPT_USER_RPC, E_WOULDBLOCK, ...);
-
-#endif /* CONFIG_USE_NEW_RPC */
 
 #ifdef CONFIG_BUILDING_KERNEL_CORE
 INTDEF NOBLOCK NONNULL((1)) void

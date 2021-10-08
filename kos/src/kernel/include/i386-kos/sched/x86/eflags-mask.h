@@ -17,8 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_INCLUDE_I386_KOS_SCHED_ARCH_POSIX_SIGNAL_H
-#define GUARD_KERNEL_INCLUDE_I386_KOS_SCHED_ARCH_POSIX_SIGNAL_H 1
+#ifndef GUARD_KERNEL_INCLUDE_I386_KOS_SCHED_X86_EFLAGS_MASK_H
+#define GUARD_KERNEL_INCLUDE_I386_KOS_SCHED_X86_EFLAGS_MASK_H 1
 
 #include <kernel/compiler.h>
 
@@ -44,7 +44,7 @@ DECL_BEGIN
  * NOTE: The later only allows for bits  to be changed that are  masked
  *       by `cred_allow_eflags_modify_mask()' for the thread attempting
  *       to perform the modification. */
-union x86_user_eflags_mask {
+union x86_user_eflags_mask_union {
 	struct {
 		uint32_t uem_mask; /* Set of bits masked */
 		uint32_t uem_flag; /* Set of bits set */
@@ -64,4 +64,4 @@ DATDEF atomic64_t x86_exec_eflags_mask;
 DECL_END
 #endif /* __CC__ */
 
-#endif /* !GUARD_KERNEL_INCLUDE_I386_KOS_SCHED_ARCH_POSIX_SIGNAL_H */
+#endif /* !GUARD_KERNEL_INCLUDE_I386_KOS_SCHED_X86_EFLAGS_MASK_H */

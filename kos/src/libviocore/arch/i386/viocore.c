@@ -82,7 +82,6 @@ opt.append("-Os");
 #ifdef __KERNEL__
 #include <kernel/printk.h>
 #include <kernel/user.h>
-#include <sched/except-handler.h>
 #include <sched/task.h>
 #endif /* __KERNEL__ */
 

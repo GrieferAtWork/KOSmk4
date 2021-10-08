@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x62a310a4 */
+/* HASH CRC-32:0x559603dc */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -4846,11 +4846,11 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_create_module)
 	.cfi_endproc
 END(__x86_asm32_int80_create_module)
 
-/* Load a  kernel driver  from  an ELF  image  `module_image...+=len'
- * This system call exists for linux compatiblity, and is implemented
- * as an alias for `KSYSCTL_DRIVER_INSMOD:KSYSCTL_DRIVER_FORMAT_BLOB'
+/* Load a  kernel  driver  from an  ELF  image  `module_image...+=len'
+ * This system call exists for linux compatibility, and is implemented
+ * as an alias for  `KSYSCTL_DRIVER_INSMOD:KSYSCTL_DRIVER_FORMAT_BLOB'
  * 
- * Note  however that that is where linux compatiblity ends. Since the
+ * Note however that that is where linux compatibility ends. Since the
  * linux kernel does not implement any semblance of a stable ABI,  you
  * have to realize that on KOS, this system call can only load drivers
  * specifically built to run within the KOS kernel!
@@ -4893,8 +4893,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_init_module)
 END(__x86_asm32_int80_init_module)
 
 /* Try to unload a driver, given its `name'
- * This system call exists for linux compatiblity, and is implemented
- * as an alias for `KSYSCTL_DRIVER_DELMOD:KSYSCTL_DRIVER_FORMAT_FILE'
+ * This system call exists for linux compatibility, and is implemented
+ * as an alias for  `KSYSCTL_DRIVER_DELMOD:KSYSCTL_DRIVER_FORMAT_FILE'
  * @param: name:  The name of the driver
  * @param: flags: Set of `O_NONBLOCK | O_TRUNC', where:
  *                 - O_NONBLOCK: Don't  wait  for  the driver  to  be unloaded.
@@ -13361,11 +13361,11 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_kcmp)
 	.cfi_endproc
 END(__x86_asm32_int80_kcmp)
 
-/* Load a  kernel driver  from  an ELF  image  `module_image...+=len'
- * This system call exists for linux compatiblity, and is implemented
- * as an alias for `KSYSCTL_DRIVER_INSMOD:KSYSCTL_DRIVER_FORMAT_FILE'
+/* Load a  kernel  driver  from an  ELF  image  `module_image...+=len'
+ * This system call exists for linux compatibility, and is implemented
+ * as an alias for  `KSYSCTL_DRIVER_INSMOD:KSYSCTL_DRIVER_FORMAT_FILE'
  * 
- * Note  however that that is where linux compatiblity ends. Since the
+ * Note however that that is where linux compatibility ends. Since the
  * linux kernel does not implement any semblance of a stable ABI,  you
  * have to realize that on KOS, this system call can only load drivers
  * specifically built to run within the KOS kernel!
@@ -24476,11 +24476,11 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_create_module)
 	.cfi_endproc
 END(__x86_asm32_sysenter_create_module)
 
-/* Load a  kernel driver  from  an ELF  image  `module_image...+=len'
- * This system call exists for linux compatiblity, and is implemented
- * as an alias for `KSYSCTL_DRIVER_INSMOD:KSYSCTL_DRIVER_FORMAT_BLOB'
+/* Load a  kernel  driver  from an  ELF  image  `module_image...+=len'
+ * This system call exists for linux compatibility, and is implemented
+ * as an alias for  `KSYSCTL_DRIVER_INSMOD:KSYSCTL_DRIVER_FORMAT_BLOB'
  * 
- * Note  however that that is where linux compatiblity ends. Since the
+ * Note however that that is where linux compatibility ends. Since the
  * linux kernel does not implement any semblance of a stable ABI,  you
  * have to realize that on KOS, this system call can only load drivers
  * specifically built to run within the KOS kernel!
@@ -24523,8 +24523,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_init_module)
 END(__x86_asm32_sysenter_init_module)
 
 /* Try to unload a driver, given its `name'
- * This system call exists for linux compatiblity, and is implemented
- * as an alias for `KSYSCTL_DRIVER_DELMOD:KSYSCTL_DRIVER_FORMAT_FILE'
+ * This system call exists for linux compatibility, and is implemented
+ * as an alias for  `KSYSCTL_DRIVER_DELMOD:KSYSCTL_DRIVER_FORMAT_FILE'
  * @param: name:  The name of the driver
  * @param: flags: Set of `O_NONBLOCK | O_TRUNC', where:
  *                 - O_NONBLOCK: Don't  wait  for  the driver  to  be unloaded.
@@ -33049,11 +33049,11 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_kcmp)
 	.cfi_endproc
 END(__x86_asm32_sysenter_kcmp)
 
-/* Load a  kernel driver  from  an ELF  image  `module_image...+=len'
- * This system call exists for linux compatiblity, and is implemented
- * as an alias for `KSYSCTL_DRIVER_INSMOD:KSYSCTL_DRIVER_FORMAT_FILE'
+/* Load a  kernel  driver  from an  ELF  image  `module_image...+=len'
+ * This system call exists for linux compatibility, and is implemented
+ * as an alias for  `KSYSCTL_DRIVER_INSMOD:KSYSCTL_DRIVER_FORMAT_FILE'
  * 
- * Note  however that that is where linux compatiblity ends. Since the
+ * Note however that that is where linux compatibility ends. Since the
  * linux kernel does not implement any semblance of a stable ABI,  you
  * have to realize that on KOS, this system call can only load drivers
  * specifically built to run within the KOS kernel!

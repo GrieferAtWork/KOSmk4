@@ -336,7 +336,6 @@ INTERN_FUNCTION(__x86_asm64_syscall_break)
 	movq   $-ENOSYS, %rax
 	intr_exit
 1:
-#ifdef CONFIG_USE_NEW_RPC
 	/* Construct a `struct icpustate' */
 	ASM_PUSH_ICPUSTATE_AFTER_HW_IRET_CFI_R
 
@@ -359,31 +358,6 @@ INTERN_FUNCTION(__x86_asm64_syscall_break)
 	EXTERN(userexcept_handler_nosys)
 	call   userexcept_handler_nosys
 
-#else /* CONFIG_USE_NEW_RPC */
-	EXTERN(x86_syscall_personality_asm64_syscall_break)
-	.cfi_personality 0, x86_syscall_personality_asm64_syscall_break
-
-	pushq_cfi_r %r9  /* ARG[5] */
-	pushq_cfi_r %r8  /* ARG[4] */
-	pushq_cfi_r %r10 /* ARG[3] */
-	pushq_cfi_r %rdx /* ARG[2] */
-	movq   %rsi, %r9 /* ARG[1] */
-	.cfi_register %rsi, %r9
-	movq   %rdi, %r8 /* ARG[0] */
-	.cfi_register %rdi, %r8
-	movq   %rax, %rcx /* SYSNO */
-	.cfi_register %rax, %rcx
-
-	/* Throw an `E_UNKNOWN_SYSTEMCALL' exception */
-	movq   $(RPC_SYSCALL_INFO_METHOD_INT80H_64 | RPC_SYSCALL_INFO_FEXCEPT |  \
-	         RPC_SYSCALL_INFO_FREGVALID(0) | RPC_SYSCALL_INFO_FREGVALID(1) | \
-	         RPC_SYSCALL_INFO_FREGVALID(2) | RPC_SYSCALL_INFO_FREGVALID(3) | \
-	         RPC_SYSCALL_INFO_FREGVALID(4) | RPC_SYSCALL_INFO_FREGVALID(5)), %rdx
-	movq   $(8), %rsi
-	movq   $(ERROR_CODEOF(E_UNKNOWN_SYSTEMCALL)), %rdi
-	EXTERN(error_thrown)
-	call   error_thrown
-#endif /* !CONFIG_USE_NEW_RPC */
 	.cfi_endproc
 END(__x86_asm64_syscall_break)
 

@@ -63,7 +63,6 @@ INTERN_FUNCTION(__x86_asm32_int80_break)
 	intr_exit
 1:
 
-#ifdef CONFIG_USE_NEW_RPC
 	/* Construct a `struct icpustate' */
 	ASM_PUSH_ICPUSTATE_AFTER_HW_IRET_CFI_R
 
@@ -94,62 +93,6 @@ INTERN_FUNCTION(__x86_asm32_int80_break)
 	movP   %Psp,                          %R_fcall1P
 	EXTERN(userexcept_handler_nosys)
 	call   userexcept_handler_nosys
-#else /* CONFIG_USE_NEW_RPC */
-	EXTERN(x86_syscall_personality_asm32_int80_break)
-	.cfi_personality 0, x86_syscall_personality_asm32_int80_break
-
-#ifdef __x86_64__
-	pushq_cfi_r %rbp /* ARG[5] */
-	pushq_cfi_r %rdi /* ARG[4] */
-	pushq_cfi_r %rsi /* ARG[3] */
-	pushq_cfi_r %rdx /* ARG[2] */
-	movq   %rcx, %r9 /* ARG[1] */
-	.cfi_register %rcx, %r9
-	movq   %rbx, %r8 /* ARG[0] */
-	.cfi_register %rbx, %r8
-	movq   %rax, %rcx /* SYSNO */
-	.cfi_register %rax, %rcx
-
-	/* Throw an `E_UNKNOWN_SYSTEMCALL' exception */
-	movq   $(RPC_SYSCALL_INFO_METHOD_INT80H_32 | RPC_SYSCALL_INFO_FEXCEPT |  \
-	         RPC_SYSCALL_INFO_FREGVALID(0) | RPC_SYSCALL_INFO_FREGVALID(1) | \
-	         RPC_SYSCALL_INFO_FREGVALID(2) | RPC_SYSCALL_INFO_FREGVALID(3) | \
-	         RPC_SYSCALL_INFO_FREGVALID(4) | RPC_SYSCALL_INFO_FREGVALID(5)), %rdx
-	movq   $(8), %rsi
-	movq   $(ERROR_CODEOF(E_UNKNOWN_SYSTEMCALL)), %rdi
-#else /* __x86_64__ */
-	pushl_cfi %ds
-	.cfi_restore_iret_ds_or_offset -4
-	pushl_cfi %es
-	.cfi_restore_iret_es_or_offset -8
-	pushl_cfi %fs
-	.cfi_restore_iret_fs_or_offset -12
-
-	pushl_cfi_r %ebp /* ARG[5] */
-	pushl_cfi_r %edi /* ARG[4] */
-	pushl_cfi_r %esi /* ARG[3] */
-	pushl_cfi_r %edx /* ARG[2] */
-	pushl_cfi_r %ecx /* ARG[1] */
-	pushl_cfi_r %ebx /* ARG[0] */
-	pushl_cfi_r %eax /* SYSNO */
-
-	movw   $(SEGMENT_USER_DATA_RPL), %ax
-	movw   %ax, %ds
-	movw   %ax, %es
-	movw   $(SEGMENT_KERNEL_FSBASE), %ax
-	movw   %ax, %fs
-
-	/* Throw an `E_UNKNOWN_SYSTEMCALL' exception */
-	pushl_cfi $(RPC_SYSCALL_INFO_METHOD_INT80H_32 | RPC_SYSCALL_INFO_FEXCEPT |  \
-	            RPC_SYSCALL_INFO_FREGVALID(0) | RPC_SYSCALL_INFO_FREGVALID(1) | \
-	            RPC_SYSCALL_INFO_FREGVALID(2) | RPC_SYSCALL_INFO_FREGVALID(3) | \
-	            RPC_SYSCALL_INFO_FREGVALID(4) | RPC_SYSCALL_INFO_FREGVALID(5))
-	pushl_cfi $(8)
-	pushl_cfi $(ERROR_CODEOF(E_UNKNOWN_SYSTEMCALL))
-#endif /* !__x86_64__ */
-	EXTERN(error_thrown)
-	call   error_thrown
-#endif /* !CONFIG_USE_NEW_RPC */
 	.cfi_endproc
 END(__x86_asm32_int80_break)
 

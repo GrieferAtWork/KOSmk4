@@ -48,7 +48,6 @@
 #include <kernel/user.h>
 #include <sched/cpu.h>
 #include <sched/cred.h>
-#include <sched/except-handler.h>
 #include <sched/pid.h>
 #include <sched/posix-signal.h>
 #include <sched/rpc.h>
@@ -132,6 +131,13 @@
 
 
 DECL_BEGIN
+
+#ifdef __ARCH_HAVE_COMPAT
+#define IF_ARCH_HAVE_COMPAT(...) __VA_ARGS__
+#else /* __ARCH_HAVE_COMPAT */
+#define IF_ARCH_HAVE_COMPAT(...) /* nothing */
+#endif /* !__ARCH_HAVE_COMPAT */
+
 
 /* Ensure that AT_* flags map onto the correct FS_MODE_* flags. */
 STATIC_ASSERT(AT_SYMLINK_NOFOLLOW == FS_MODE_FSYMLINK_NOFOLLOW);
@@ -3182,7 +3188,7 @@ kernel_do_execveat_impl(/*in|out*/ struct execargs *__restrict args) {
 		 * since this also means  that our thread's user-visible  signal
 		 * mask has once again come into effect.
 		 * XXX: Use `sigmask_check_s()' (after all: we _do_ have `state') */
-		sigmask_check();
+		task_serve();
 	} else {
 		args->ea_mman = THIS_MMAN;
 		mman_exec(args);
@@ -3196,7 +3202,7 @@ kernel_do_execveat_impl(/*in|out*/ struct execargs *__restrict args) {
 		 * the  call to exec() at this point (of course, there could always be some
 		 * from during the call...) */
 		if (thread_flags & TASK_FUSERPROCMASK)
-			sigmask_check();
+			task_serve();
 #endif /* CONFIG_HAVE_USERPROCMASK */
 	}
 	/* Upon success, run onexec callbacks (which will clear all CLOEXEC handles). */
@@ -3259,94 +3265,49 @@ kernel_do_execveat(/*in|out*/ struct execargs *__restrict args) {
 
 
 struct kernel_exec_rpc_data {
+	WEAK refcnt_t         er_refcnt; /* Reference counter. */
 	struct execargs       er_args;   /* Exec args. */
 	struct exception_data er_except; /* Information about the exception that caused exec() to fail. */
 	struct sig            er_error;  /* Signal broadcast upon error. */
 };
+#define kernel_exec_rpc_data_destroy(self) (execargs_fini(&(self)->er_args), kfree(self))
+DEFINE_REFCOUNT_FUNCTIONS(struct kernel_exec_rpc_data, er_refcnt, kernel_exec_rpc_data_destroy)
 
-#ifdef CONFIG_USE_NEW_RPC
 PRIVATE NONNULL((1)) void PRPC_EXEC_CALLBACK_CC
-kernel_exec_rpc(struct rpc_context *__restrict ctx, void *cookie)
-#else /* CONFIG_USE_NEW_RPC */
-PRIVATE struct icpustate *FCALL
-kernel_exec_rpc(void *cookie, struct icpustate *__restrict state,
-                unsigned int reason,
-                struct rpc_syscall_info const *UNUSED(sc_info))
-#endif /* !CONFIG_USE_NEW_RPC */
-{
+kernel_exec_rpc(struct rpc_context *__restrict ctx, void *cookie) {
 	struct kernel_exec_rpc_data *data;
-	struct exception_info old_exception_info;
-	struct exception_info *tls_info;
 	data = (struct kernel_exec_rpc_data *)cookie;
-	tls_info = error_info();
-	memcpy(&old_exception_info, tls_info, sizeof(old_exception_info));
-	tls_info->ei_code = ERROR_CODEOF(E_OK);
+	FINALLY_DECREF_UNLIKELY(data);
+	/* Check  for  race  condition:  Our  RPC  only  got  executed  because  the
+	 * main  thread is  currently being terminated.  - In this  case it wouldn't
+	 * make any sense to try and load a new binary into the VM, so just indicate
+	 * to the  receiving thread  that we've  been terminated  by propagating  an
+	 * E_EXIT_THREAD exception to them. */
+	if unlikely(ctx->rc_context == RPC_REASONCTX_SHUTDOWN) {
+		assert(THIS_TASKPID);
+		bzero(&data->er_except.e_args, sizeof(data->er_except.e_args));
+		data->er_except.e_code                            = ERROR_CODEOF(E_EXIT_THREAD);
+		data->er_except.e_args.e_exit_thread.et_exit_code = (uintptr_t)(unsigned int)THIS_TASKPID->tp_status.w_status;
+		goto error_completion;
+	}
 	TRY {
-		/* Check  for  race  condition:  Our  RPC  only  got  executed  because  the
-		 * main  thread is  currently being terminated.  - In this  case it wouldn't
-		 * make any sense to try and load a new binary into the VM, so just indicate
-		 * to the  receiving thread  that we've  been terminated  by propagating  an
-		 * E_EXIT_THREAD exception to them. */
-#ifdef CONFIG_USE_NEW_RPC
-		if unlikely(ctx->rc_context == RPC_REASONCTX_SHUTDOWN)
-#else /* CONFIG_USE_NEW_RPC */
-		if unlikely(reason == TASK_RPC_REASON_SHUTDOWN)
-#endif /* !CONFIG_USE_NEW_RPC */
-		{
-			assert(THIS_TASKPID);
-			bzero(&data->er_except.e_args, sizeof(data->er_except.e_args));
-			data->er_except.e_code                            = ERROR_CODEOF(E_EXIT_THREAD);
-			data->er_except.e_args.e_exit_thread.et_exit_code = (uintptr_t)(unsigned int)THIS_TASKPID->tp_status.w_status;
-			goto done_signal_exception;
-		}
-		/* Actually map the specified file into memory!
-		 * NOTE: For this purpose, we simply re-direct the given user-space
-		 *       CPU state to which the  RPC would have normally  returned! */
-#ifdef CONFIG_USE_NEW_RPC
 		data->er_args.ea_state = ctx->rc_state;
 		kernel_do_execveat(&data->er_args);
 		ctx->rc_state = data->er_args.ea_state;
-#else /* CONFIG_USE_NEW_RPC */
-		data->er_args.ea_state = state;
-		kernel_do_execveat(&data->er_args);
-		state = data->er_args.ea_state;
-#endif /* !CONFIG_USE_NEW_RPC */
 	} EXCEPT {
-		execargs_fini(&data->er_args);
-		memcpy(&data->er_except,
-		       &THIS_EXCEPTION_INFO,
-		       sizeof(data->er_except));
-		goto restore_exception;
+		error_class_t cls = error_class();
+		if (ERRORCLASS_ISRTLPRIORITY(cls))
+			RETHROW();
+		memcpy(&data->er_except, error_data(), sizeof(data->er_except));
+		goto error_completion;
 	}
-	memcpy(tls_info, &old_exception_info, sizeof(old_exception_info));
-	/* Success! -> In  this case _we_ must inherit the given RPC data packet,
-	 *             since the sending  thread will terminate  (or has  already
-	 *             terminated) by having its `task_waitfor()' function return
-	 *             by throwing an E_EXIT_THREAD exception that got caused  by
-	 *            `vmb_apply()' terminating all threads except for the calling
-	 *             one (us) within the current process. */
-	execargs_fini(&data->er_args);
 	kfree(data);
-#ifdef CONFIG_USE_NEW_RPC
+	/* Don't try to restart the system call or something like that! */
+	if (ctx->rc_context == RPC_REASONCTX_SYSCALL)
+		ctx->rc_context = RPC_REASONCTX_SYSRET;
 	return;
-#else /* CONFIG_USE_NEW_RPC */
-	return state;
-#endif /* !CONFIG_USE_NEW_RPC */
-restore_exception:
-	memcpy(tls_info, &old_exception_info, sizeof(old_exception_info));
-done_signal_exception:
-	if (sig_broadcast(&data->er_error) == 0) {
-		/* Can't deliver the error to the original caller of `exec()', since
-		 * they must have died in  the mean time. -  With that in mind,  the
-		 * error  that  caused the  problem must  go  unnoticed, and  we are
-		 * responsible for the cleanup of `data'. */
-		kfree(data);
-	}
-#ifdef CONFIG_USE_NEW_RPC
-	return;
-#else /* CONFIG_USE_NEW_RPC */
-	return state;
-#endif /* !CONFIG_USE_NEW_RPC */
+error_completion:
+	sig_broadcast(&data->er_error);
 }
 
 
@@ -3366,9 +3327,7 @@ kernel_execveat(fd_t dirfd,
                 KERNEL_EXECVEAT_ARGV_TYPE argv,
                 KERNEL_EXECVEAT_ENVP_TYPE envp,
                 atflag_t flags,
-#ifdef __ARCH_HAVE_COMPAT
-                bool argv_is_compat,
-#endif /* __ARCH_HAVE_COMPAT */
+                IF_ARCH_HAVE_COMPAT(bool argv_is_compat,)
                 struct icpustate *__restrict state) {
 	struct fs *f = THIS_FS;
 	struct task *caller = THIS_TASK;
@@ -3405,101 +3364,79 @@ kernel_execveat(fd_t dirfd,
 		/* Fill in exec arguments. */
 		args.ea_argv = argv;
 		args.ea_envp = envp;
-#ifdef __ARCH_HAVE_COMPAT
-		args.ea_argv_is_compat = argv_is_compat;
-#endif /* __ARCH_HAVE_COMPAT */
+		IF_ARCH_HAVE_COMPAT(args.ea_argv_is_compat = argv_is_compat;)
 
-		if (caller == task_getprocess_of(caller)) {
-			args.ea_state = state;
-			kernel_do_execveat(&args);
-			state = args.ea_state;
-		} else {
-			struct kernel_exec_rpc_data *data;
-			struct task *proc = task_getprocess_of(caller);
-			/* Since the new process is  meant to override our's  as a whole, the  actual
-			 * exec() must be performed by the main thread of our own process. - For this
-			 * purpose,  we must use an RPC to load  the new binary from the main thread. */
-			data = (struct kernel_exec_rpc_data *)kmalloc(sizeof(struct kernel_exec_rpc_data),
-			                                              GFP_LOCKED);
-			/* Initialize RPC information. */
-			memcpy(&data->er_args, &args, sizeof(struct execargs));
-			sig_init(&data->er_error);
-			/* Create references for `data->er_args' */
-			incref(args.ea_xdentry);
-			incref(args.ea_xpath);
-			incref(args.ea_xnode);
-			TRY {
-				assert(!task_wasconnected());
-				task_connect(&data->er_error);
-				if (!task_schedule_synchronous_rpc(proc,
-				                                   &kernel_exec_rpc,
-				                                   data,
-				                                   TASK_RPC_FHIGHPRIO,
-				                                   GFP_NORMAL)) {
-					/* The main  thread was  already terminated.  - Propagate  its
-					 * termination signal manually (since we may not have received
-					 * it before in case our thread had been detached). */
-					union wait status;
-					status = FORTASK(caller, this_taskpid)->tp_status;
-					THROW(E_EXIT_THREAD, status.w_status);
-				}
-			} EXCEPT {
-				task_disconnectall();
-				assert(data->er_args.ea_xdentry == args.ea_xdentry);
-				assert(data->er_args.ea_xpath == args.ea_xpath);
-				assert(data->er_args.ea_xnode == args.ea_xnode);
-				/* NoKill, because we still got 1 more reference to each, which will be
-				 * dropped  after `RETHROW()' by the `FINALLY_DECREF_UNLIKELY()' above. */
-				decref_nokill(args.ea_xdentry);
-				decref_nokill(args.ea_xpath);
-				decref_nokill(args.ea_xnode);
-				kfree(data);
-				RETHROW();
-			}
-			/* With the RPC now scheduled, 1 of a couple of things will happen:
-			 *  #1: The  main thread succeeds and is able to load+execute the binary.
-			 *      In  this case,  it will signal  all threads except  for itself to
-			 *      terminate, which is  that case means  us receiving a  synchronous
-			 *      RPC that simply causes an `E_EXIT_THREAD' exception to be thrown,
-			 *      and thus `task_waitfor()' to propagate that exception.
-			 *  #2: The main thread fails to load the binary.
-			 *      In  this  case, the  main  thread will  have  used `sig_broadcast()'  to wake
-			 *      us up  via  the  `&data->er_error' signal.  (The  signal  runtime  guaranties
-			 *      that a non-zero return value of `sig_broadcast()' means that `wait_waitfor()'
-			 *      will always return  in the  receiving thread, meaning  that in  this case  we
-			 *      are guarantied to  be allowed  to continue  execution, without  having to  be
-			 *      afraid of being terminated before we're able to clean up `data'.
-			 *  #3: The RPC was executed only  because the main thread has  terminated.
-			 *      In this case, the RPC function will have forwarded the exit  status
-			 *      as an E_EXIT_THREAD exception that will be handled the same way any
-			 *      other exception caused by case #2 would have been.
-			 */
-#ifdef NDEBUG
-			task_waitfor();
-#else /* NDEBUG */
-			{
-				struct sig *recv;
-				recv = task_waitfor();
-				assert(recv == &data->er_error);
-			}
-#endif /* !NDEBUG */
-			/* We only get here if the exec() failed, in which case the reason will have
-			 * been stored in `data->er_except'. */
-			memcpy(&THIS_EXCEPTION_DATA,
-			       &data->er_except,
-			       sizeof(data->er_except));
-			/* On error, we re-inherit the arguments structure, however the
-			 * references within are always inherited by the RPC  callback! */
-			kfree(data);
-			/* (Re-)throw the exception that caused the exec() to fail. */
-			error_throw_current();
-		}
+		/* Check if we're the main thread. If no, send an
+		 * RPC  to it and  have it do  the exec() for us. */
+		if (caller != task_getprocess_of(caller))
+			goto send_rpc_to_main_thread;
+
+		/* Immediately do the exec */
+		args.ea_state = state;
+		kernel_do_execveat(&args);
+		state = args.ea_state;
 	} EXCEPT {
 		execargs_fini(&args);
 		RETHROW();
 	}
 	execargs_fini(&args);
 	return state;
+	{
+		struct kernel_exec_rpc_data *data;
+		struct task *proc;
+send_rpc_to_main_thread:
+		proc = task_getprocess_of(caller);
+		TRY {
+			data = (struct kernel_exec_rpc_data *)kmalloc(sizeof(struct kernel_exec_rpc_data), GFP_LOCKED);
+		} EXCEPT {
+			execargs_fini(&args);
+			RETHROW();
+		}
+		memcpy(&data->er_args, &args, sizeof(struct execargs));
+		sig_init(&data->er_error);
+		data->er_refcnt = 2;
+		assert(!task_wasconnected());
+		task_connect(&data->er_error);
+		if unlikely(!task_rpc_exec(proc, RPC_CONTEXT_KERN | RPC_SYNCMODE_F_USER | RPC_PRIORITY_F_HIGH,
+		                           &kernel_exec_rpc, data)) {
+			/* The main thread was already terminated. */
+			union wait status;
+			status = FORTASK(caller, this_taskpid)->tp_status;
+			task_disconnectall();
+			kernel_exec_rpc_data_destroy(data);
+			THROW(E_EXIT_THREAD, status.w_status);
+		}
+		FINALLY_DECREF_UNLIKELY(data);
+
+		/* Wait for the main thread to send back an error, or terminate  our
+		 * thread by use of an E_EXIT_THREAD-RPC (the later being the result
+		 * of a successful exec()) */
+
+		/* FIXME: What's supposed to happen if  our thread receives an  interrupt
+		 *        here? Currently, it'll cause us  to return back to  user-space,
+		 *        but when that happens the exec may still succeed asynchronously
+		 *        even though the system call returned with -EINTR...
+		 *
+		 * The best way to handle this would probably be by somehow sending another
+		 * RPC to the main thread that could then attempt to cancel the exec before
+		 * it can finish. */
+#ifdef NDEBUG
+		task_waitfor();
+#else /* NDEBUG */
+		{
+			struct sig *recv;
+			recv = task_waitfor();
+			assert(recv == &data->er_error);
+		}
+#endif /* !NDEBUG */
+
+		/* We only get here if the exec failed, in which case  the
+		 * proper error will have been stored in `data->er_except' */
+		memcpy(error_data(), &data->er_except, sizeof(data->er_except));
+	} /* Scope... */
+
+	/* Throw the exception returned by the main thread. */
+	error_throw_current();
 }
 
 
@@ -3507,7 +3444,6 @@ kernel_execveat(fd_t dirfd,
 /* execveat(), execve()                                                 */
 /************************************************************************/
 #ifdef __ARCH_WANT_SYSCALL_EXECVEAT
-#ifdef CONFIG_USE_NEW_RPC
 PRIVATE NONNULL((1)) void PRPC_EXEC_CALLBACK_CC
 sys_execveat_rpc(struct rpc_context *__restrict ctx, void *UNUSED(cookie)) {
 	if (ctx->rc_context != RPC_REASONCTX_SYSCALL)
@@ -3519,9 +3455,7 @@ sys_execveat_rpc(struct rpc_context *__restrict ctx, void *UNUSED(cookie)) {
 	                                (KERNEL_EXECVEAT_ARGV_TYPE)ctx->rc_scinfo.rsi_regs[2],
 	                                (KERNEL_EXECVEAT_ENVP_TYPE)ctx->rc_scinfo.rsi_regs[3],
 	                                (atflag_t)ctx->rc_scinfo.rsi_regs[4],
-#ifdef __ARCH_HAVE_COMPAT
-	                                false,
-#endif /* __ARCH_HAVE_COMPAT */
+	                                IF_ARCH_HAVE_COMPAT(false,)
 	                                ctx->rc_state);
 
 	/* Indicate that the system call has completed; further RPCs should never try to restart it! */
@@ -3543,52 +3477,9 @@ DEFINE_SYSCALL5(errno_t, execveat, fd_t, dirfd,
 	task_rpc_userunwind(&sys_execveat_rpc, NULL);
 	__builtin_unreachable();
 }
-#else /* CONFIG_USE_NEW_RPC */
-PRIVATE struct icpustate *FCALL
-sys_execveat_rpc(void *UNUSED(arg),
-                 struct icpustate *__restrict state,
-                 unsigned int reason,
-                 struct rpc_syscall_info const *sc_info) {
-	if (reason == TASK_RPC_REASON_SYSCALL) {
-		/* Actually service the exec() system call. */
-		state = kernel_execveat((fd_t)sc_info->rsi_regs[0],
-		                        (USER UNCHECKED char const *)sc_info->rsi_regs[1],
-		                        (KERNEL_EXECVEAT_ARGV_TYPE)sc_info->rsi_regs[2],
-		                        (KERNEL_EXECVEAT_ENVP_TYPE)sc_info->rsi_regs[3],
-		                        (atflag_t)sc_info->rsi_regs[4],
-#ifdef __ARCH_HAVE_COMPAT
-		                        false,
-#endif /* __ARCH_HAVE_COMPAT */
-		                        state);
-	}
-	return state;
-}
-
-DEFINE_SYSCALL5(errno_t, execveat, fd_t, dirfd,
-                USER UNCHECKED char const *, filename,
-                USER UNCHECKED char const *USER UNCHECKED const *, argv,
-                USER UNCHECKED char const *USER UNCHECKED const *, envp,
-                atflag_t, flags) {
-	(void)dirfd;
-	(void)filename;
-	(void)argv;
-	(void)envp;
-	(void)flags;
-	/* Send an RPC to ourself, so we can gain access to the user-space register state. */
-	task_schedule_user_rpc(THIS_TASK,
-	                       &sys_execveat_rpc,
-	                       NULL,
-	                       TASK_RPC_FHIGHPRIO |
-	                       TASK_USER_RPC_FINTR,
-	                       GFP_NORMAL);
-	/* Shouldn't get here... */
-	return -EOK;
-}
-#endif /* !CONFIG_USE_NEW_RPC */
 #endif /* __ARCH_WANT_SYSCALL_EXECVEAT */
 
 #ifdef __ARCH_WANT_COMPAT_SYSCALL_EXECVEAT
-#ifdef CONFIG_USE_NEW_RPC
 PRIVATE NONNULL((1)) void PRPC_EXEC_CALLBACK_CC
 compat_sys_execveat_rpc(struct rpc_context *__restrict ctx, void *UNUSED(cookie)) {
 	if (ctx->rc_context != RPC_REASONCTX_SYSCALL)
@@ -3622,50 +3513,9 @@ DEFINE_COMPAT_SYSCALL5(errno_t, execveat, fd_t, dirfd,
 	task_rpc_userunwind(&compat_sys_execveat_rpc, NULL);
 	__builtin_unreachable();
 }
-#else /* CONFIG_USE_NEW_RPC */
-PRIVATE struct icpustate *FCALL
-compat_sys_execveat_rpc(void *UNUSED(arg),
-                        struct icpustate *__restrict state,
-                        unsigned int reason,
-                        struct rpc_syscall_info const *sc_info) {
-	if (reason == TASK_RPC_REASON_SYSCALL) {
-		/* Actually service the exec() system call. */
-		state = kernel_execveat((fd_t)sc_info->rsi_regs[0],
-		                        (USER UNCHECKED char const *)sc_info->rsi_regs[1],
-		                        (USER UNCHECKED void const *)sc_info->rsi_regs[2],
-		                        (USER UNCHECKED void const *)sc_info->rsi_regs[3],
-		                        (atflag_t)sc_info->rsi_regs[4],
-		                        true,
-		                        state);
-	}
-	return state;
-}
-
-DEFINE_COMPAT_SYSCALL5(errno_t, execveat, fd_t, dirfd,
-                       USER UNCHECKED char const *, filename,
-                       USER UNCHECKED compat_ptr(char const) USER UNCHECKED const *, argv,
-                       USER UNCHECKED compat_ptr(char const) USER UNCHECKED const *, envp,
-                       atflag_t, flags) {
-	(void)dirfd;
-	(void)filename;
-	(void)argv;
-	(void)envp;
-	(void)flags;
-	/* Send an RPC to ourself, so we can gain access to the user-space register state. */
-	task_schedule_user_rpc(THIS_TASK,
-	                       &compat_sys_execveat_rpc,
-	                       NULL,
-	                       TASK_RPC_FHIGHPRIO |
-	                       TASK_USER_RPC_FINTR,
-	                       GFP_NORMAL);
-	/* Shouldn't get here... */
-	return -EOK;
-}
-#endif /* !CONFIG_USE_NEW_RPC */
 #endif /* __ARCH_WANT_COMPAT_SYSCALL_EXECVEAT */
 
 #ifdef __ARCH_WANT_SYSCALL_EXECVE
-#ifdef CONFIG_USE_NEW_RPC
 PRIVATE NONNULL((1)) void PRPC_EXEC_CALLBACK_CC
 sys_execve_rpc(struct rpc_context *__restrict ctx, void *UNUSED(cookie)) {
 	if (ctx->rc_context != RPC_REASONCTX_SYSCALL)
@@ -3676,11 +3526,7 @@ sys_execve_rpc(struct rpc_context *__restrict ctx, void *UNUSED(cookie)) {
 	                                (USER UNCHECKED char const *)ctx->rc_scinfo.rsi_regs[0],
 	                                (KERNEL_EXECVEAT_ARGV_TYPE)ctx->rc_scinfo.rsi_regs[1],
 	                                (KERNEL_EXECVEAT_ENVP_TYPE)ctx->rc_scinfo.rsi_regs[2],
-	                                0,
-#ifdef __ARCH_HAVE_COMPAT
-	                                false,
-#endif /* __ARCH_HAVE_COMPAT */
-	                                ctx->rc_state);
+	                                0, IF_ARCH_HAVE_COMPAT(false,) ctx->rc_state);
 
 	/* Indicate that the system call has completed; further RPCs should never try to restart it! */
 	ctx->rc_context = RPC_REASONCTX_SYSRET;
@@ -3698,49 +3544,9 @@ DEFINE_SYSCALL3(errno_t, execve,
 	task_rpc_userunwind(&sys_execve_rpc, NULL);
 	__builtin_unreachable();
 }
-#else /* CONFIG_USE_NEW_RPC */
-PRIVATE struct icpustate *FCALL
-sys_execve_rpc(void *UNUSED(arg),
-               struct icpustate *__restrict state,
-               unsigned int reason,
-               struct rpc_syscall_info const *sc_info) {
-	if (reason == TASK_RPC_REASON_SYSCALL) {
-		/* Actually service the exec() system call. */
-		state = kernel_execveat(AT_FDCWD,
-		                        (USER UNCHECKED char const *)sc_info->rsi_regs[0],
-		                        (KERNEL_EXECVEAT_ARGV_TYPE)sc_info->rsi_regs[1],
-		                        (KERNEL_EXECVEAT_ENVP_TYPE)sc_info->rsi_regs[2],
-		                        0,
-#ifdef __ARCH_HAVE_COMPAT
-		                        false,
-#endif /* __ARCH_HAVE_COMPAT */
-		                        state);
-	}
-	return state;
-}
-
-DEFINE_SYSCALL3(errno_t, execve,
-                USER UNCHECKED char const *, filename,
-                USER UNCHECKED char const *USER UNCHECKED const *, argv,
-                USER UNCHECKED char const *USER UNCHECKED const *, envp) {
-	(void)filename;
-	(void)argv;
-	(void)envp;
-	/* Send an RPC to ourself, so we can gain access to the user-space register state. */
-	task_schedule_user_rpc(THIS_TASK,
-	                       &sys_execve_rpc,
-	                       NULL,
-	                       TASK_RPC_FHIGHPRIO |
-	                       TASK_USER_RPC_FINTR,
-	                       GFP_NORMAL);
-	/* Shouldn't get here... */
-	return -EOK;
-}
-#endif /* !CONFIG_USE_NEW_RPC */
 #endif /* __ARCH_WANT_SYSCALL_EXECVE */
 
 #ifdef __ARCH_WANT_COMPAT_SYSCALL_EXECVE
-#ifdef CONFIG_USE_NEW_RPC
 PRIVATE NONNULL((1)) void PRPC_EXEC_CALLBACK_CC
 compat_sys_execve_rpc(struct rpc_context *__restrict ctx, void *UNUSED(cookie)) {
 	if (ctx->rc_context != RPC_REASONCTX_SYSCALL)
@@ -3771,43 +3577,6 @@ DEFINE_COMPAT_SYSCALL3(errno_t, execve,
 	task_rpc_userunwind(&compat_sys_execve_rpc, NULL);
 	__builtin_unreachable();
 }
-#else /* CONFIG_USE_NEW_RPC */
-PRIVATE struct icpustate *FCALL
-compat_sys_execve_rpc(void *UNUSED(arg),
-                      struct icpustate *__restrict state,
-                      unsigned int reason,
-                      struct rpc_syscall_info const *sc_info) {
-	if (reason == TASK_RPC_REASON_SYSCALL) {
-		/* Actually service the exec() system call. */
-		state = kernel_execveat(AT_FDCWD,
-		                        (USER UNCHECKED char const *)sc_info->rsi_regs[0],
-		                        (KERNEL_EXECVEAT_ARGV_TYPE)sc_info->rsi_regs[1],
-		                        (KERNEL_EXECVEAT_ENVP_TYPE)sc_info->rsi_regs[2],
-		                        0,
-		                        true,
-		                        state);
-	}
-	return state;
-}
-
-DEFINE_COMPAT_SYSCALL3(errno_t, execve,
-                       USER UNCHECKED char const *, filename,
-                       USER UNCHECKED compat_ptr(char const) USER UNCHECKED const *, argv,
-                       USER UNCHECKED compat_ptr(char const) USER UNCHECKED const *, envp) {
-	(void)filename;
-	(void)argv;
-	(void)envp;
-	/* Send an RPC to ourself, so we can gain access to the user-space register state. */
-	task_schedule_user_rpc(THIS_TASK,
-	                       &compat_sys_execve_rpc,
-	                       NULL,
-	                       TASK_RPC_FHIGHPRIO |
-	                       TASK_USER_RPC_FINTR,
-	                       GFP_NORMAL);
-	/* Shouldn't get here... */
-	return -EOK;
-}
-#endif /* !CONFIG_USE_NEW_RPC */
 #endif /* __ARCH_WANT_COMPAT_SYSCALL_EXECVE */
 
 
