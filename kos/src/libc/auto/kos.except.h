@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x100f5a79 */
+/* HASH CRC-32:0x2b3af5f8 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -53,6 +53,13 @@ DECL_BEGIN
 #define libc_error_info() __arch_error_info()
 #endif /* __arch_error_info */
 #endif /* !__INTELLISENSE__ */
+#include <bits/crt/format-printer.h>
+#ifndef __pformatprinter_defined
+#define __pformatprinter_defined
+typedef __pformatprinter pformatprinter;
+typedef __pformatgetc pformatgetc;
+typedef __pformatungetc pformatungetc;
+#endif /* !__pformatprinter_defined */
 /* Transform the given exception into a posix errno value */
 INTDEF ATTR_PURE WUNUSED NONNULL((1)) errno_t NOTHROW_NCX(LIBKCALL libc_error_as_errno)(struct exception_data const *__restrict self);
 /* Transform the given exception into a posix signal.
@@ -68,6 +75,13 @@ INTDEF ATTR_CONST WUNUSED char const *NOTHROW(LIBKCALL libc_error_name)(error_co
  * lower priorities in  situations where multiple  simultaneous
  * errors can't be prevented. */
 INTDEF ATTR_CONST WUNUSED unsigned int NOTHROW(LIBKCALL libc_error_priority)(error_code_t code);
+/* >> error_print_short_description(3)
+ * Print a short, single-line (without trailing linefeed) description  of
+ * the given error `data', including the error code, name and for certain
+ * errors, prominent error arguments.
+ * @param: flags: Set of `ERROR_PRINT_SHORT_DESCRIPTION_FLAG_*'
+ * @return: * : The usual pformatprinter-compatible return value */
+INTDEF NONNULL((1, 3)) ssize_t NOTHROW_NCX(LIBKCALL libc_error_print_short_description)(pformatprinter printer, void *arg, struct exception_data const *data, uintptr_t flags);
 /* Begin a nested TRY-block. (i.e. inside of another EXCEPT block) */
 INTDEF NONNULL((1)) void NOTHROW(__ERROR_NESTING_BEGIN_CC libc_error_nesting_begin)(struct _exception_nesting_data *__restrict saved);
 /* End a nested TRY-block. (i.e. inside of another EXCEPT block) */

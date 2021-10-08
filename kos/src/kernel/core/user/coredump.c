@@ -32,6 +32,7 @@
 #include <kernel/syslog.h>
 
 #include <kos/coredump.h>
+#include <kos/except.h>
 #include <kos/kernel/cpu-state-helpers.h>
 #include <kos/kernel/cpu-state.h>
 
@@ -55,11 +56,6 @@
 #endif /* CONFIG_HAVE_DEBUGGER */
 
 DECL_BEGIN
-
-/* TODO: This function is current implemented as arch-specific. - Change that! */
-INTDEF void NOTHROW(KCALL print_exception_desc_of)(struct exception_data const *__restrict data,
-                                                   pformatprinter printer, void *arg);
-
 
 #ifdef CONFIG_HAVE_DEBUGGER
 PRIVATE NONNULL((3)) void KCALL
@@ -113,18 +109,8 @@ dbg_coredump(void const *const *traceback_vector,
 		if (COREDUMP_INFO_ISEXCEPT(unwind_error)) {
 			siginfo_t siginfo;
 			unsigned int i;
-			char const *name;
-			dbg_printf(DBGSTR("exception "
-			                  "%#" PRIxN(__SIZEOF_ERROR_CLASS_T__) ":"
-			                  "%#" PRIxN(__SIZEOF_ERROR_SUBCLASS_T__)),
-			           reason->ci_except.e_class,
-			           reason->ci_except.e_subclass);
-			name = error_name(reason->ci_except.e_code);
-			if (name)
-				dbg_printf(DBGSTR(" [%s]"), name);
-			print_exception_desc_of(&reason->ci_except,
-			                        &dbg_printer,
-			                        NULL);
+			error_print_short_description(&dbg_printer, NULL, &reason->ci_except,
+			                              ERROR_PRINT_SHORT_DESCRIPTION_FLAG_TTY);
 			dbg_putc('\n');
 			for (i = 0; i < EXCEPTION_DATA_POINTERS; ++i) {
 				if (!reason->ci_except.e_args.e_pointers[i])
@@ -329,17 +315,8 @@ coredump_create(struct ucpustate const *curr_ustate,
 		if (COREDUMP_INFO_ISEXCEPT(unwind_error)) {
 			siginfo_t siginfo;
 			unsigned int i;
-			char const *name;
-			printk(KERN_ERR "exception "
-			                "%#" PRIxN(__SIZEOF_ERROR_CLASS_T__) ":"
-			                "%#" PRIxN(__SIZEOF_ERROR_SUBCLASS_T__),
-			       reason->ci_except.e_class, reason->ci_except.e_subclass);
-			name = error_name(reason->ci_except.e_code);
-			if (name)
-				printk(KERN_ERR " [%s]", name);
-			print_exception_desc_of(&reason->ci_except,
-			                        &syslog_printer,
-			                        SYSLOG_LEVEL_ERR);
+			error_print_short_description(&syslog_printer, SYSLOG_LEVEL_ERR, &reason->ci_except,
+			                              ERROR_PRINT_SHORT_DESCRIPTION_FLAG_NORMAL);
 			printk(KERN_ERR "\n");
 			for (i = 0; i < EXCEPTION_DATA_POINTERS; ++i) {
 				if (!reason->ci_except.e_args.e_pointers[i])

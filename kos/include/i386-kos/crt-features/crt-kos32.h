@@ -1732,6 +1732,7 @@
 #define __CRT_HAVE_error_nesting_end
 #define __CRT_HAVE_error_one_per_line
 #define __CRT_HAVE_error_print_progname
+#define __CRT_HAVE_error_print_short_description
 #define __CRT_HAVE_error_priority
 #define __CRT_HAVE_error_register_state
 #define __CRT_HAVE_error_rethrow

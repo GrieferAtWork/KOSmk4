@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xaf2cc4f */
+/* HASH CRC-32:0xff2efdbd */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -40,6 +40,7 @@
 #include <kos/bits/exception_nest.h> /* struct _exception_nesting_data */
 #include <kos/except/codes.h>        /* E_OK, ... */
 #include <kos/bits/fastexcept.h>
+#include <bits/crt/format-printer.h>
 
 #ifdef __USE_KOS_KERNEL
 #include <kos/bits/exception_info.h>
@@ -179,6 +180,27 @@ __LIBC __ATTR_CONST __ATTR_WUNUSED unsigned int __NOTHROW(__LIBKCALL error_prior
  * errors can't be prevented. */
 __NAMESPACE_LOCAL_USING_OR_IMPL(error_priority, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED unsigned int __NOTHROW(__LIBKCALL error_priority)(error_code_t __code) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(error_priority))(__code); })
 #endif /* !__CRT_HAVE_error_priority */
+/* Flags for `error_print_short_description()' */
+#define ERROR_PRINT_SHORT_DESCRIPTION_FLAG_NORMAL 0x0000 /* Normal flags */
+#define ERROR_PRINT_SHORT_DESCRIPTION_FLAG_TTY    0x0001 /* Print TTY escape sequences for color highlighting */
+#ifdef __CRT_HAVE_error_print_short_description
+/* >> error_print_short_description(3)
+ * Print a short, single-line (without trailing linefeed) description  of
+ * the given error `data', including the error code, name and for certain
+ * errors, prominent error arguments.
+ * @param: flags: Set of `ERROR_PRINT_SHORT_DESCRIPTION_FLAG_*'
+ * @return: * : The usual pformatprinter-compatible return value */
+__LIBC __ATTR_NONNULL((1, 3)) __SSIZE_TYPE__ __NOTHROW_NCX(__LIBKCALL error_print_short_description)(__pformatprinter __printer, void *__arg, struct exception_data const *__data, __UINTPTR_TYPE__ __flags) __CASMNAME_SAME("error_print_short_description");
+#else /* __CRT_HAVE_error_print_short_description */
+#include <libc/local/kos.except/error_print_short_description.h>
+/* >> error_print_short_description(3)
+ * Print a short, single-line (without trailing linefeed) description  of
+ * the given error `data', including the error code, name and for certain
+ * errors, prominent error arguments.
+ * @param: flags: Set of `ERROR_PRINT_SHORT_DESCRIPTION_FLAG_*'
+ * @return: * : The usual pformatprinter-compatible return value */
+__NAMESPACE_LOCAL_USING_OR_IMPL(error_print_short_description, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 3)) __SSIZE_TYPE__ __NOTHROW_NCX(__LIBKCALL error_print_short_description)(__pformatprinter __printer, void *__arg, struct exception_data const *__data, __UINTPTR_TYPE__ __flags) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(error_print_short_description))(__printer, __arg, __data, __flags); })
+#endif /* !__CRT_HAVE_error_print_short_description */
 #ifdef __USE_KOS_KERNEL
 #if defined(__arch_error_info) && defined(__CRT_HAVE_error_info)
 __COMPILER_EIDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,struct exception_info *,__NOTHROW,__LIBKCALL,error_info,(void),{ return __arch_error_info(); })

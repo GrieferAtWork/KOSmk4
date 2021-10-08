@@ -23,6 +23,7 @@
 
 #include <kernel/compiler.h>
 
+#include <kernel/except.h>
 #include <kernel/rt/except-handler.h>
 #include <kernel/rt/except-personality.h>
 #include <kernel/x86/syscall-info.h>
@@ -323,6 +324,48 @@ NOTHROW(EXCEPT_PERSONALITY_CC x86_xintr3_userexcept_personality)(struct unwind_f
 	x86_xintr3_userexcept_unwind(st, fde->f_lsdaaddr, ecode, addr);
 }
 /************************************************************************/
+
+
+
+
+
+
+/* A helpful, predefined  personality function  that is meant  to be  used for  assembly
+ * function which need to be able to handle exceptions in a fairly user-friendly manner.
+ * NOTE: In order to define handlers, make use of the macros defined above.
+ * NOTE: When   the  handler  is   entered,  callee-clobber  registers   may  have  been  clobbered
+ *       if the exception was thrown  by a called function  that didn't encode CFI  instrumentation
+ *       for preserving those  registers. All other  registers have  the same value  as they  would
+ *       have had after a throwing function had returned normally, or before a throwing instruction
+ *       had been invoked (with the obvious exception of `%Pip')
+ *       Separately, you may include `DW_CFA_GNU_args_size' directives within your function,
+ *       which  are recognized as adjustments for `%esp'  and are applied prior to execution
+ *       or the specified handler. */
+PUBLIC WUNUSED NONNULL((1, 2)) unsigned int
+NOTHROW(EXCEPT_PERSONALITY_CC x86_asm_except_personality)(struct unwind_fde_struct *__restrict fde,
+                                                          struct kcpustate *__restrict state) {
+	struct x86_asm_except_entry const *ent;
+	void const *pc = kcpustate_getpc(state);
+	ent = (struct x86_asm_except_entry const *)fde->f_lsdaaddr;
+	if (ent) {
+		for (; ent->ee_entry != 0; ++ent) {
+			/* NOTE: Adjust for the fact that `pc' */
+			if (pc > ent->ee_start && pc <= ent->ee_end) {
+				if (ent->ee_mask != (uintptr_t)-1) {
+					error_code_t code = error_code();
+					if (ERROR_SUBCLASS(ent->ee_mask) != 0
+					    ? ent->ee_mask != code
+					    : ERROR_CLASS(ent->ee_mask) != ERROR_CLASS(code))
+						continue; /* Different mask. */
+				}
+				kcpustate_setpc(state, ent->ee_entry);
+				return EXCEPT_PERSONALITY_EXECUTE_HANDLER;
+			}
+		}
+	}
+	return EXCEPT_PERSONALITY_CONTINUE_UNWIND;
+}
+
 
 DECL_END
 

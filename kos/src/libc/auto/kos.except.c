@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x692686ef */
+/* HASH CRC-32:0x1e8c5bc8 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,6 +25,7 @@
 #include <hybrid/typecore.h>
 #include <kos/types.h>
 #include "../user/kos.except.h"
+#include "format-printer.h"
 #include "../user/string.h"
 
 DECL_BEGIN
@@ -1105,6 +1106,318 @@ NOTHROW(LIBKCALL libc_error_priority)(error_code_t code) {
 		return 1;
 	return 0;
 }
+#include <bits/crt/inttypes.h>
+#include <libregdump/register.h>
+#include <dlfcn.h>
+#include <libansitty/ctl.h>
+#if defined(__i386__) || defined(__x86_64__)
+#include <asm/registers.h>
+#endif /* __i386__ || __x86_64__ */
+/* >> error_print_short_description(3)
+ * Print a short, single-line (without trailing linefeed) description  of
+ * the given error `data', including the error code, name and for certain
+ * errors, prominent error arguments.
+ * @param: flags: Set of `ERROR_PRINT_SHORT_DESCRIPTION_FLAG_*'
+ * @return: * : The usual pformatprinter-compatible return value */
+INTERN ATTR_SECTION(".text.crt.except.io.utility") NONNULL((1, 3)) ssize_t
+NOTHROW_NCX(LIBKCALL libc_error_print_short_description)(pformatprinter printer,
+                                                         void *arg,
+                                                         struct exception_data const *data,
+                                                         uintptr_t flags) {
+#ifndef PRIxPTR
+#ifdef __PRIP_PREFIX
+#define PRIxPTR __PRIP_PREFIX "x"
+#else /* __PRIP_PREFIX */
+#define PRIxPTR "zx"
+#endif /* !__PRIP_PREFIX */
+#endif /* !PRIxPTR */
+#define FMT(tty, notty) (flags & ERROR_PRINT_SHORT_DESCRIPTION_FLAG_TTY ? tty : notty)
+	ssize_t temp, result = 0;
+	result = libc_format_printf(printer, arg,
+	                       FMT("exception "
+	                           AC_WHITE("%#" __PRIN_PREFIX(__SIZEOF_ERROR_CLASS_T__) "x") ":"
+	                           AC_WHITE("%#" __PRIN_PREFIX(__SIZEOF_ERROR_SUBCLASS_T__) "x"),
+	                           "exception "
+	                           "%#" __PRIN_PREFIX(__SIZEOF_ERROR_CLASS_T__) "x:"
+	                           "%#" __PRIN_PREFIX(__SIZEOF_ERROR_SUBCLASS_T__) "x"),
+	                       data->e_class, data->e_subclass);
+	if unlikely(result < 0)
+		goto done;
+	{
+		char const *name;
+#ifndef __KERNEL__
+		char const *errno_name; /* XXX: Also print in kernel-space? */
+#endif /* !__KERNEL__ */
+		name = libc_error_name(data->e_code);
+#ifndef __KERNEL__
+		errno_name = libc_strerrorname_np(libc_error_as_errno(data));
+#endif /* !__KERNEL__ */
+		if (name) {
+#ifdef __KERNEL__
+			temp = libc_format_printf(printer, arg,
+			                     FMT(" [" AC_WHITE("%s") "]", " [%s]"),
+			                     name);
+#else /* __KERNEL__ */
+			temp = libc_format_printf(printer, arg,
+			                     FMT(" [" AC_WHITE("%s") "%s" AC_WHITE("%s") "]",
+			                         " [%s%s%s]"),
+			                     name,
+			                     errno_name ? "," : "",
+			                     errno_name ? errno_name : "");
+#endif /* !__KERNEL__ */
+			if unlikely(temp < 0)
+				goto err;
+			result += temp;
+		}
+	}
+	temp = 0;
+	switch (data->e_class) {
+
+	case ERROR_CLASS(ERROR_CODEOF(E_BADALLOC)):
+		switch (data->e_subclass) {
+
+		case ERROR_SUBCLASS(ERROR_CODEOF(E_BADALLOC_INSUFFICIENT_HEAP_MEMORY)):
+		case ERROR_SUBCLASS(ERROR_CODEOF(E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY)):
+			temp = libc_format_printf(printer, arg,
+			                     FMT(" [num_bytes:" AC_WHITE("%#" PRIxPTR) "]",
+			                         " [num_bytes:%#" PRIxPTR "]"),
+			                     data->e_args.e_badalloc.ba_insufficient_heap_memory);
+			break;
+
+		default:
+			break;
+		}
+		break;
+
+	/* TODO: More error classes */
+
+	case ERROR_CLASS(ERROR_CODEOF(E_SEGFAULT)): {
+		temp = libc_format_printf(printer, arg,
+#if defined(__i386__) || defined(__x86_64__)
+		                     FMT(" [cr2:" AC_WHITE("%p") "," AC_WHITE("%c%c%c%c%c%c") "]",
+		                         " [cr2:%p,%c%c%c%c%c%c]")
+#else /* __i386__ || __x86_64__ */
+		                     FMT(" [addr:" AC_WHITE("%p") "," AC_WHITE("%c%c%c%c%c%c") "]",
+		                         " [addr:%p,%c%c%c%c%c%c]")
+#endif /* !__i386__ && !__x86_64__ */
+		                     ,
+		                     data->e_args.e_segfault.s_addr,
+		                     data->e_args.e_segfault.s_context & E_SEGFAULT_CONTEXT_FAULT ? 'f' : '-',
+		                     data->e_args.e_segfault.s_context & E_SEGFAULT_CONTEXT_WRITING ? 'w' : '-',
+		                     data->e_args.e_segfault.s_context & E_SEGFAULT_CONTEXT_USERCODE ? 'u' : '-',
+		                     data->e_args.e_segfault.s_context & E_SEGFAULT_CONTEXT_NONCANON ? 'c' : '-',
+		                     data->e_args.e_segfault.s_context & E_SEGFAULT_CONTEXT_EXEC ? 'x' : '-',
+		                     data->e_args.e_segfault.s_context & E_SEGFAULT_CONTEXT_VIO ? 'v' : '-');
+	}	break;
+
+	case ERROR_CLASS(ERROR_CODEOF(E_ILLEGAL_INSTRUCTION)): {
+#if defined(__i386__) || defined(__x86_64__)
+		uintptr_t opcode, opno;
+		opcode = data->e_args.e_illegal_instruction.ii_opcode;
+		opno   = E_ILLEGAL_INSTRUCTION_X86_OPCODE_GETOPC(opcode);
+		if (opno <= 0xff) {
+			temp = libc_format_printf(printer, arg,
+			                     FMT(" [opcode:" AC_WHITE("%#.2" PRIxPTR),
+			                         " [opcode:%#.2" PRIxPTR),
+			                     opno);
+		} else if (opno <= 0xffff) {
+			temp = libc_format_printf(printer, arg,
+			                     FMT(" [opcode:" AC_WHITE("%#.4" PRIxPTR),
+			                         " [opcode:%#.4" PRIxPTR),
+			                     opno);
+		} else {
+			temp = libc_format_printf(printer, arg,
+			                     FMT(" [opcode:" AC_WHITE("%#" PRIxPTR),
+			                         " [opcode:%#" PRIxPTR),
+			                     opno);
+		}
+		if unlikely(temp < 0)
+			goto err;
+		result += temp;
+		if (E_ILLEGAL_INSTRUCTION_X86_OPCODE_HASREG(opcode)) {
+			temp = libc_format_printf(printer, arg, "/%u", (unsigned int)E_ILLEGAL_INSTRUCTION_X86_OPCODE_GETREG(opcode));
+			if unlikely(temp < 0)
+				goto err;
+			result += temp;
+		}
+		temp = (*printer)(arg, "]", 1);
+#else /* __i386__ || __x86_64__ */
+		uintptr_t opcode = data->e_args.e_illegal_instruction.ii_opcode;
+		if (opcode <= 0xff) {
+			temp = libc_format_printf(printer, arg,
+			                     FMT(" [opcode:" AC_WHITE("%#.2" PRIxPTR) "]",
+			                         " [opcode:%#.2" PRIxPTR "]"),
+			                     opcode);
+		} else if (opcode <= 0xffff) {
+			temp = libc_format_printf(printer, arg,
+			                     FMT(" [opcode:" AC_WHITE("%#.4" PRIxPTR) "]",
+			                         " [opcode:%#.4" PRIxPTR "]"),
+			                     opcode);
+		} else {
+			temp = libc_format_printf(printer, arg,
+			                     FMT(" [opcode:" AC_WHITE("%#" PRIxPTR) "]",
+			                         " [opcode:%#" PRIxPTR "]"),
+			                     opcode);
+		}
+#endif /* !__i386__ && !__x86_64__ */
+		if unlikely(temp < 0)
+			goto err;
+		result += temp;
+		switch (data->e_subclass) {
+
+#ifdef E_ILLEGAL_INSTRUCTION_X86_INTERRUPT
+		case ERROR_SUBCLASS(ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_X86_INTERRUPT)):
+			temp = libc_format_printf(printer, arg,
+			                     FMT(" [int:" AC_WHITE("%#.2" PRIxPTR) ","
+			                                  AC_WHITE("%#" PRIxPTR) ","
+			                                  "seg:" AC_WHITE("%#" PRIxPTR) "]",
+			                         " [int:%#.2" PRIxPTR ",%#" PRIxPTR ",seg:%#" PRIxPTR "]"),
+			                     data->e_args.e_illegal_instruction.ii_x86_interrupt.xi_intno,
+			                     data->e_args.e_illegal_instruction.ii_x86_interrupt.xi_ecode,
+			                     data->e_args.e_illegal_instruction.ii_x86_interrupt.xi_segval);
+			break;
+#endif /* E_ILLEGAL_INSTRUCTION_X86_INTERRUPT */
+
+		case ERROR_SUBCLASS(ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_BAD_OPERAND)): {
+			char const *what_name;
+			switch (data->e_args.e_illegal_instruction.ii_bad_operand.bo_what) {
+
+			case E_ILLEGAL_INSTRUCTION_BAD_OPERAND_UNEXPECTED_MEMORY:
+			case E_ILLEGAL_INSTRUCTION_BAD_OPERAND_UNEXPECTED_REGISTER:
+				what_name = "addrmode";
+				break;
+
+			case E_ILLEGAL_INSTRUCTION_BAD_OPERAND_VALUE:
+				what_name = "value";
+				break;
+
+			default:
+				what_name = NULL;
+				break;
+			}
+			if (what_name) {
+				temp = libc_format_printf(printer, arg,
+				                     FMT(" [what=" AC_WHITE("%s") "]",
+				                         " [what=%s]"),
+				                     what_name);
+			} else {
+				temp = libc_format_printf(printer, arg,
+				                     FMT(" [what=" AC_WHITE("?(%#" PRIxPTR ")") "]",
+				                         " [what=?(%#" PRIxPTR ")]"),
+				                     data->e_args.e_illegal_instruction.ii_bad_operand.bo_what);
+			}
+		}	break;
+
+		case ERROR_SUBCLASS(ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_REGISTER)): {
+			char const *what;
+			uintptr_t regno;
+			switch (data->e_args.e_illegal_instruction.ii_register.r_how) {
+			case E_ILLEGAL_INSTRUCTION_REGISTER_RDINV: what = "rdinv"; break; /* Read from invalid register */
+			case E_ILLEGAL_INSTRUCTION_REGISTER_RDPRV: what = "rdprv"; break; /* Read from privileged register */
+			case E_ILLEGAL_INSTRUCTION_REGISTER_WRINV: what = "wrinv"; break; /* Write to invalid register */
+			case E_ILLEGAL_INSTRUCTION_REGISTER_WRPRV: what = "wrprv"; break; /* Write to privileged register */
+			case E_ILLEGAL_INSTRUCTION_REGISTER_WRBAD: what = "wrbad"; break; /* Bad value written to register */
+			default: what = NULL; break;
+			}
+			if (what) {
+				temp = libc_format_printf(printer, arg, " [%s:", what);
+			} else {
+				temp = libc_format_printf(printer, arg, " [?(%#" PRIxPTR "):",
+				                     data->e_args.e_illegal_instruction.ii_register.r_how);
+			}
+			if unlikely(temp < 0)
+				goto err;
+			result += temp;
+			regno = data->e_args.e_illegal_instruction.ii_register.r_regno;
+#if defined(__i386__) || defined(__x86_64__)
+			if (regno == X86_REGISTER_MSR) {
+				temp = libc_format_printf(printer, arg,
+				                     FMT(AC_WHITE("%%msr(%#" PRIxPTR ")") "," AC_WHITE("%#" __PRI8_PREFIX "x") "]",
+				                         "%%msr(%#" PRIxPTR "),%#" __PRI8_PREFIX "x]"),
+				                     data->e_args.e_illegal_instruction.ii_register.r_offset,
+				                     (uint64_t)data->e_args.e_illegal_instruction.ii_register.r_regval |
+				                     (uint64_t)data->e_args.e_illegal_instruction.ii_register.r_regval2 << 32);
+			} else
+#endif /* __i386__ || __x86_64__ */
+			{
+				if (flags & ERROR_PRINT_SHORT_DESCRIPTION_FLAG_TTY) {
+					static char const beginfg[] = AC_FG(ANSITTY_CL_WHITE);
+					temp = (*printer)(arg, beginfg, COMPILER_STRLEN(beginfg));
+					if unlikely(temp < 0)
+						goto err;
+					result += temp;
+				}
+#ifdef LIBREGDUMP_WANT_PROTOTYPES
+				temp = regdump_register_name(printer, arg, regno);
+#else /* LIBREGDUMP_WANT_PROTOTYPES */
+#if defined(__CRT_HAVE_dlopen) && defined(__CRT_HAVE_dlsym)
+				void *libregdump;
+#ifdef RTLD_LOCAL
+				if ((libregdump = dlopen(LIBREGDUMP_LIBRARY_NAME, RTLD_LOCAL)) != NULL)
+#else /* RTLD_LOCAL */
+				if ((libregdump = dlopen(LIBREGDUMP_LIBRARY_NAME, 0)) != NULL)
+#endif /* !RTLD_LOCAL */
+				{
+					PREGDUMP_REGISTER_NAME pdyn_regdump_register_name;
+					*(void **)&pdyn_regdump_register_name = dlsym(libregdump, "regdump_register_name");
+					if unlikely(!pdyn_regdump_register_name) {
+#ifdef __CRT_HAVE_dlclose
+						dlclose(libregdump);
+#endif /* __CRT_HAVE_dlclose */
+						goto print_generic_register_name;
+					}
+					temp = (*pdyn_regdump_register_name)(printer, arg, regno);
+#ifdef __CRT_HAVE_dlclose
+					dlclose(libregdump);
+#endif /* __CRT_HAVE_dlclose */
+				} else
+#endif /* __CRT_HAVE_dlopen && __CRT_HAVE_dlsym */
+				{
+print_generic_register_name:
+					temp = libc_format_printf(printer, arg, "reg.%#" PRIxPTR, regno);
+				}
+#endif /* !LIBREGDUMP_WANT_PROTOTYPES */
+				if unlikely(temp < 0)
+					goto err;
+				result += temp;
+				if (flags & ERROR_PRINT_SHORT_DESCRIPTION_FLAG_TTY) {
+					static char const endfg[] = AC_FGDEF;
+					temp = (*printer)(arg, endfg, COMPILER_STRLEN(endfg));
+					if unlikely(temp < 0)
+						goto err;
+					result += temp;
+				}
+				if (data->e_args.e_illegal_instruction.ii_register.r_regval != 0 ||
+				    (data->e_args.e_illegal_instruction.ii_register.r_how != E_ILLEGAL_INSTRUCTION_REGISTER_RDINV &&
+				     data->e_args.e_illegal_instruction.ii_register.r_how != E_ILLEGAL_INSTRUCTION_REGISTER_RDPRV)) {
+					temp = libc_format_printf(printer, arg,
+					                     FMT("," AC_WHITE("%#" PRIxPTR) "]",
+					                         ",%#" PRIxPTR "]"),
+					                     data->e_args.e_illegal_instruction.ii_register.r_regval);
+				} else {
+					temp = (*printer)(arg, "]", 1);
+				}
+			}
+		}	break;
+
+		default:
+			temp = 0;
+			break;
+		}
+	}	break;
+
+	default:
+		break;
+	}
+	if unlikely(temp < 0)
+		goto err;
+	result += temp;
+done:
+	return result;
+err:
+	return temp;
+#undef FMT
+}
 /* Begin a nested TRY-block. (i.e. inside of another EXCEPT block) */
 INTERN ATTR_SECTION(".text.crt.except.io.utility") NONNULL((1)) void
 NOTHROW(__ERROR_NESTING_BEGIN_CC libc_error_nesting_begin)(struct _exception_nesting_data *__restrict saved) {
@@ -1204,6 +1517,7 @@ DEFINE_PUBLIC_ALIAS(error_as_errno, libc_error_as_errno);
 DEFINE_PUBLIC_ALIAS(error_as_signal, libc_error_as_signal);
 DEFINE_PUBLIC_ALIAS(error_name, libc_error_name);
 DEFINE_PUBLIC_ALIAS(error_priority, libc_error_priority);
+DEFINE_PUBLIC_ALIAS(error_print_short_description, libc_error_print_short_description);
 DEFINE_PUBLIC_ALIAS(error_nesting_begin, libc_error_nesting_begin);
 DEFINE_PUBLIC_ALIAS(error_nesting_end, libc_error_nesting_end);
 

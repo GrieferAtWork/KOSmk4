@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x84d74a49 */
+/* HASH CRC-32:0xc7722860 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -56,6 +56,7 @@
 #define __CRT_HAVE_error_name
 #define __CRT_HAVE_error_nesting_begin
 #define __CRT_HAVE_error_nesting_end
+#define __CRT_HAVE_error_print_short_description
 #define __CRT_HAVE_error_priority
 #define __CRT_HAVE_error_register_state
 #define __CRT_HAVE_error_rethrow
