@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbebd0b6 */
+/* HASH CRC-32:0xc170b47d */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -296,11 +296,22 @@ __NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(error_print_short_description))(__pfo
 			__result += __temp;
 			__regno = __data->e_args.e_illegal_instruction.ii_register.r_regno;
 #if defined(__i386__) || defined(__x86_64__)
-			if (__regno == X86_REGISTER_MSR) {
+			if (__regno == X86_REGISTER_XCR || __regno == X86_REGISTER_PCR || __regno == X86_REGISTER_MSR) {
+				char __extname[4];
+				__extname[0] = 'x';
+				__extname[1] = 'c';
+				__extname[2] = 'r';
+				__extname[3] = 0;
+				if (__regno == X86_REGISTER_PCR) {
+					__extname[0] = 'p';
+				} else if (__regno == X86_REGISTER_MSR) {
+					__extname[0] = 'm';
+					__extname[1] = 's';
+				}
 				__temp = (__NAMESPACE_LOCAL_SYM __localdep_format_printf)(__printer, __arg,
-				                     __FMT(AC_WHITE("%%msr(%#" __PRIxPTR ")") "," AC_WHITE("%#" __PRI8_PREFIX "x") "]",
-				                         "%%msr(%#" __PRIxPTR "),%#" __PRI8_PREFIX "x]"),
-				                     __data->e_args.e_illegal_instruction.ii_register.r_offset,
+				                     __FMT(AC_WHITE("%s(%#" __PRIxPTR ")") "," AC_WHITE("%#" __PRI8_PREFIX "x") "]",
+				                         "%s(%#" __PRIxPTR "),%#" __PRI8_PREFIX "x]"),
+				                     __extname, __data->e_args.e_illegal_instruction.ii_register.r_offset,
 				                     (__UINT64_TYPE__)__data->e_args.e_illegal_instruction.ii_register.r_regval |
 				                     (__UINT64_TYPE__)__data->e_args.e_illegal_instruction.ii_register.r_regval2 << 32);
 			} else

@@ -26,16 +26,24 @@
 #define X86_REGISTER_NONE __UINT16_C(0x0000) /* No/invalid register. */
 
 /* Universal masks for registers. */
-#define X86_REGISTER_IDMASK    __UINT16_C(0x03ff)
-#define X86_REGISTER_SIZEMASK  __UINT16_C(0x0c00)
-#define X86_REGISTER_CLASSMASK __UINT16_C(0xf000)
+#define X86_REGISTER_IDMASK      __UINT16_C(0x03ff)
+#define X86_REGISTER_SIZEMASK    __UINT16_C(0x0c00)
+#define _X86_REGISTER_SIZESHIFT  10
+#define X86_REGISTER_CLASSMASK   __UINT16_C(0xf000)
+#define _X86_REGISTER_CLASSSHIFT 12
 
 /* Return the size of a general-purpose, or misc. register. (in bytes) */
-#define X86_REGISTER_SIZEOF(x) (__SIZE_C(1) << (3 - (((x) & __UINT16_C(0xc00)) >> 14)))
+#define X86_REGISTER_SIZEOF_SHIFT(x) (3 - (((x) & __UINT16_C(0xc00)) >> 14))
+#define X86_REGISTER_SIZEOF(x)       (__SIZE_C(1) << X86_REGISTER_SIZEOF_SHIFT(x))
 #define X86_REGISTER_SIZEMASK_1BYTE __UINT16_C(0x0c00)
 #define X86_REGISTER_SIZEMASK_2BYTE __UINT16_C(0x0800)
 #define X86_REGISTER_SIZEMASK_4BYTE __UINT16_C(0x0400)
 #define X86_REGISTER_SIZEMASK_8BYTE __UINT16_C(0x0000)
+#ifdef __x86_64__
+#define X86_REGISTER_SIZEMASK_PTR X86_REGISTER_SIZEMASK_8BYTE
+#else /* __x86_64__ */
+#define X86_REGISTER_SIZEMASK_PTR X86_REGISTER_SIZEMASK_4BYTE
+#endif /* !__x86_64__ */
 
 
 /* General-purpose registers. */
