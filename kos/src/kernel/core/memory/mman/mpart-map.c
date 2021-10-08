@@ -27,11 +27,11 @@
 #include <kernel/mman/mfile.h>
 #include <kernel/mman/mpart.h>
 
-#ifndef NDEBUG
+#if !defined(NDEBUG) || !defined(NDEBUG_FINI)
 #define DBG_memset memset
-#else /* !NDEBUG */
+#else /* !NDEBUG || !NDEBUG_FINI */
 #define DBG_memset(...) (void)0
-#endif /* NDEBUG */
+#endif /* NDEBUG && NDEBUG_FINI */
 
 #ifndef __INTELLISENSE__
 #define DEFINE_mpart_mmap

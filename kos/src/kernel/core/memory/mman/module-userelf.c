@@ -78,11 +78,11 @@
 #include <inttypes.h>
 #endif /* CONFIG_HAVE_DEBUGGER */
 
-#ifndef NDEBUG
+#if !defined(NDEBUG) || !defined(NDEBUG_FINI)
 #define DBG_memset memset
-#else /* !NDEBUG */
+#else /* !NDEBUG || !NDEBUG_FINI */
 #define DBG_memset(...) (void)0
-#endif /* NDEBUG */
+#endif /* NDEBUG && NDEBUG_FINI */
 
 /* Max # of section headers accepted for UserELF modules.
  * A limit must be imposed to prevent malicious  programs

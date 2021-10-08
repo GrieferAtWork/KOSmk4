@@ -53,11 +53,11 @@
 
 DECL_BEGIN
 
-#ifndef NDEBUG
+#if !defined(NDEBUG) || !defined(NDEBUG_FINI)
 #define DBG_memset memset
-#else /* !NDEBUG */
+#else /* !NDEBUG || !NDEBUG_FINI */
 #define DBG_memset(...) (void)0
-#endif /* NDEBUG */
+#endif /* NDEBUG && NDEBUG_FINI */
 
 #if 0
 #define IPI_DEBUG(...) (printk(KERN_DEBUG "[cpu:%u] ", THIS_CPU->c_id), printk(KERN_DEBUG __VA_ARGS__))

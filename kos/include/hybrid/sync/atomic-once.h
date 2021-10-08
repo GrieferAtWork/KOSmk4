@@ -170,7 +170,7 @@ __NOTHROW(atomic_once_tryenter)(struct atomic_once *__restrict __self) {
 /* Indicate a successful completion of the associated function */
 __LOCAL __ATTR_NONNULL((1)) void
 __NOTHROW(atomic_once_success)(struct atomic_once *__restrict __self) {
-#ifndef NDEBUG
+#if !defined(NDEBUG) && !defined(NDEBUG_SYNC)
 	__UINTPTR_TYPE__ __state;
 	do {
 		__state = __self->ao_state;
@@ -181,15 +181,15 @@ __NOTHROW(atomic_once_success)(struct atomic_once *__restrict __self) {
 	                                      __ATOMIC_ONCE_RUNDONE,
 	                                      __ATOMIC_RELEASE,
 	                                      __ATOMIC_RELEASE));
-#else /* !NDEBUG */
+#else /* !NDEBUG && !NDEBUG_SYNC */
 	__hybrid_atomic_store(__self->ao_state, __ATOMIC_ONCE_RUNDONE, __ATOMIC_RELEASE);
-#endif /* NDEBUG */
+#endif /* NDEBUG || NDEBUG_SYNC */
 }
 
 /* Indicate a failed completion of the associated function */
 __LOCAL __ATTR_NONNULL((1)) void
 __NOTHROW(atomic_once_abort)(struct atomic_once *__restrict __self) {
-#ifndef NDEBUG
+#if !defined(NDEBUG) && !defined(NDEBUG_SYNC)
 	__UINTPTR_TYPE__ __state;
 	do {
 		__state = __self->ao_state;
@@ -200,9 +200,9 @@ __NOTHROW(atomic_once_abort)(struct atomic_once *__restrict __self) {
 	                                      __ATOMIC_ONCE_PENDING,
 	                                      __ATOMIC_RELEASE,
 	                                      __ATOMIC_RELEASE));
-#else /* !NDEBUG */
+#else /* !NDEBUG && !NDEBUG_SYNC */
 	__hybrid_atomic_store(__self->ao_state, __ATOMIC_ONCE_PENDING, __ATOMIC_RELEASE);
-#endif /* NDEBUG */
+#endif /* NDEBUG || NDEBUG_SYNC */
 }
 
 #endif /* !__INTELLISENSE__ */

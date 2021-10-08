@@ -37,11 +37,11 @@
 #endif /* !__ERROR_REGISTER_STATE_TYPE */
 
 #ifndef __EXCEPT_BACKTRACE_SIZE
-#ifdef NDEBUG
+#if defined(NDEBUG) || defined(NDEBUG_EXCEPT_TRACE)
 #define __EXCEPT_BACKTRACE_SIZE 0
-#else /* NDEBUG */
+#else /* NDEBUG || NDEBUG_EXCEPT_TRACE */
 #define __EXCEPT_BACKTRACE_SIZE 16
-#endif /* !NDEBUG */
+#endif /* !NDEBUG && !NDEBUG_EXCEPT_TRACE */
 #endif /* !__EXCEPT_BACKTRACE_SIZE */
 
 #ifdef __CC__

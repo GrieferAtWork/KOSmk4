@@ -48,11 +48,11 @@
 
 DECL_BEGIN
 
-#ifndef NDEBUG
+#if !defined(NDEBUG) || !defined(NDEBUG_FINI)
 #define DBG_memset memset
-#else /* !NDEBUG */
+#else /* !NDEBUG || !NDEBUG_FINI */
 #define DBG_memset(...) (void)0
-#endif /* NDEBUG */
+#endif /* NDEBUG && NDEBUG_FINI */
 
 /* Check if 2 given ranges overlap (that is: share at least 1 common address) */
 #define RANGE_OVERLAPS(a_min, a_max, b_min, b_max) \

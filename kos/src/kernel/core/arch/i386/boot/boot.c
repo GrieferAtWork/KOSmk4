@@ -348,9 +348,6 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	/* Load late commandline options. */
 	kernel_initialize_commandline_options_late();
 
-	/* TODO: libdebuginfo freezes with -gdwarf-2
-	 * TODO: Check if it still does this (it's been quite a while since I wrote that TODO) */
-
 	/* TODO: If we weren't able to figure out the boot device, check if we can
 	 *       somehow make use of the `boot_device' information which was given
 	 *       to us by the bootloader... */
@@ -409,6 +406,9 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	       icpustate_getpc(state),
 	       icpustate_getsp(state));
 
+	/* TODO: libdebuginfo freezes with -gdwarf-2
+	 * TODO: Check if it still does this (it's been quite a while since I wrote that TODO) */
+
 	/* TODO: In the kernel assertion check handler, add a hook that is set
 	 *       by moddbx to print additional information about the values of
 	 *       variables referenced by the assertion-expr.
@@ -446,10 +446,6 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *       Also add DEC32_TRUE_MIN, DEC64_TRUE_MIN and DEC128_TRUE_MIN, alongside everything  from
 	 *       `__STDC_WANT_DEC_FP__'  under  `__USE_ISOC2X' (for  this  purpose, <hybrid/floatcore.h>
 	 *       will also have to be adjusted) */
-
-	/* TODO: The kernel->user-space exception/posix-signal system needs a re-write.
-	 *       Right now, way too much of it resides in arch-specific code, and  it's
-	 *       way too hard to understand the actual control-flow! */
 
 	/* TODO: User-space VIO  callback  functions  should  only  be  allowed  to
 	 *       throw  a  white-listed  sub-set  of  exceptions.  Or  better  yet:

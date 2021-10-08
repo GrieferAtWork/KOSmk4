@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x39e5f07f */
+/* HASH CRC-32:0x8afd4353 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1778,7 +1778,7 @@ NOTHROW_NCX(LIBDCALL libd_format_waprintf_pack)(struct format_c16aprintf_data *_
 	result[self->ap_used] = '\0'; /* NUL-terminate */
 	if (pstrlen)
 		*pstrlen = self->ap_used;
-#ifndef NDEBUG
+#if !defined(NDEBUG) && !defined(NDEBUG_FINI)
 #if __SIZEOF_POINTER__ == 4
 	self->ap_base  = (char16_t *)__UINT32_C(0xcccccccc);
 	self->ap_avail = __UINT32_C(0xcccccccc);
@@ -1788,7 +1788,7 @@ NOTHROW_NCX(LIBDCALL libd_format_waprintf_pack)(struct format_c16aprintf_data *_
 	self->ap_avail = __UINT64_C(0xcccccccccccccccc);
 	self->ap_used  = __UINT64_C(0xcccccccccccccccc);
 #endif /* ... */
-#endif /* !NDEBUG */
+#endif /* !NDEBUG && !NDEBUG_FINI */
 	return result;
 }
 #include <hybrid/__assert.h>
@@ -1842,7 +1842,7 @@ NOTHROW_NCX(LIBKCALL libc_format_waprintf_pack)(struct format_c32aprintf_data *_
 	result[self->ap_used] = '\0'; /* NUL-terminate */
 	if (pstrlen)
 		*pstrlen = self->ap_used;
-#ifndef NDEBUG
+#if !defined(NDEBUG) && !defined(NDEBUG_FINI)
 #if __SIZEOF_POINTER__ == 4
 	self->ap_base  = (char32_t *)__UINT32_C(0xcccccccc);
 	self->ap_avail = __UINT32_C(0xcccccccc);
@@ -1852,7 +1852,7 @@ NOTHROW_NCX(LIBKCALL libc_format_waprintf_pack)(struct format_c32aprintf_data *_
 	self->ap_avail = __UINT64_C(0xcccccccccccccccc);
 	self->ap_used  = __UINT64_C(0xcccccccccccccccc);
 #endif /* ... */
-#endif /* !NDEBUG */
+#endif /* !NDEBUG && !NDEBUG_FINI */
 	return result;
 }
 #include <hybrid/__assert.h>

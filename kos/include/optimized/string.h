@@ -4460,12 +4460,12 @@ extern __ATTR_ERROR("memmoveup(): The passed dst pointer is lower than src (dst 
 #define __ASSERT_MEMMOVEUP_RT(dst, src)                           \
 	if __untraced(!__builtin_constant_p(dst >= src) || dst < src) \
 		__hybrid_assertf(dst >= src, "%p < %p", dst, src)
-#else /* !NDEBUG */
+#else /* !NDEBUG && __OPTIMIZE_STRING_MEMOVE_DIRECTION */
 #define __ASSERT_MEMMOVEDOWN_CT(dst, src) /* nothing */
 #define __ASSERT_MEMMOVEDOWN_RT(dst, src) /* nothing */
 #define __ASSERT_MEMMOVEUP_CT(dst, src)   /* nothing */
 #define __ASSERT_MEMMOVEUP_RT(dst, src)   /* nothing */
-#endif /* NDEBUG */
+#endif /* NDEBUG || !__OPTIMIZE_STRING_MEMOVE_DIRECTION */
 
 #ifdef __UINT64_TYPE__
 #ifndef __fast_memmovedownq_defined

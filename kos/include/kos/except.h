@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7f1a3762 */
+/* HASH CRC-32:0xaf2cc4f */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -334,10 +334,10 @@ __LIBC __ATTR_NONNULL((1)) void __NOTHROW(__ERROR_NESTING_END_CC error_nesting_e
  * debug-mode,  this undefined behavior includes panic/coredump, similar
  * to when an exception is propagated through a NOTHROW function. */
 #ifndef __NOTHROW_BEGIN
-#ifndef NDEBUG
+#if !defined(NDEBUG) && !defined(NDEBUG_EXCEPT) && !defined(NDEBUG_NOTHROW)
 #define __NOTHROW_BEGIN do try
 #define __NOTHROW_END   catch(...) { __builtin_unreachable(); } __WHILE0
-#else /* !NDEBUG */
+#else /* !NDEBUG && !NDEBUG_EXCEPT && !NDEBUG_NOTHROW */
 /* Sadly, GCC doesn't see the optimization potential when  encountering
  * a catch-block that consists of nothing but `__builtin_unreachable()'
  *
@@ -346,7 +346,7 @@ __LIBC __ATTR_NONNULL((1)) void __NOTHROW(__ERROR_NESTING_END_CC error_nesting_e
  * inline function declared as NOTHROW. */
 #define __NOTHROW_BEGIN do
 #define __NOTHROW_END   __WHILE0
-#endif /* NDEBUG */
+#endif /* NDEBUG || NDEBUG_EXCEPT || NDEBUG_NOTHROW */
 #endif /* !__NOTHROW_BEGIN */
 
 /* Nested exception support */
@@ -394,7 +394,7 @@ public:
  * >>     RETHROW();
  * >> }
  */
-#if !defined(NDEBUG) && !defined(NDEBUG_EXCEPT_NESTING)
+#if !defined(NDEBUG) && !defined(NDEBUG_EXCEPT) && !defined(NDEBUG_EXCEPT_NESTING)
 #ifdef __CRT_HAVE__error_badusage_no_nesting
 /* Assertion check handler for missing `TRY' nesting */
 __CDECLARE_VOID(__ATTR_COLD __ATTR_NORETURN,__NOTHROW,_error_badusage_no_nesting,(void),())
@@ -423,10 +423,10 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_error_check_no_nesting, __FORCELOCAL __ATTR_ART
 #endif /* __OPTIMIZE_SIZE__ || !__arch_error_active */
 #endif /* !TRY && __TRY */
 #endif /* __CRT_HAVE__error_check_no_nesting || __CRT_HAVE_error_active || __CRT_HAVE_error_code || __arch_error_code || __CRT_HAVE_error_data || __arch_error_data */
-#else /* !NDEBUG && !NDEBUG_EXCEPT_NESTING */
+#else /* !NDEBUG && !NDEBUG_EXCEPT && !NDEBUG_EXCEPT_NESTING */
 #define _error_badusage_no_nesting() __builtin_unreachable()
 #define _error_check_no_nesting()    (void)0
-#endif /* NDEBUG || NDEBUG_EXCEPT_NESTING */
+#endif /* NDEBUG || NDEBUG_EXCEPT || NDEBUG_EXCEPT_NESTING */
 
 #if !defined(TRY) && defined(__TRY)
 #define TRY __TRY

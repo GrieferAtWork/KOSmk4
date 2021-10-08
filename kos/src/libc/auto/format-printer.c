@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6fab1f21 */
+/* HASH CRC-32:0xc1243003 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1185,7 +1185,7 @@ NOTHROW_NCX(LIBCCALL libc_format_aprintf_pack)(struct format_aprintf_data *__res
 	result[self->ap_used] = '\0'; /* NUL-terminate */
 	if (pstrlen)
 		*pstrlen = self->ap_used;
-#ifndef NDEBUG
+#if !defined(NDEBUG) && !defined(NDEBUG_FINI)
 #if __SIZEOF_POINTER__ == 4
 	self->ap_base  = (char *)__UINT32_C(0xcccccccc);
 	self->ap_avail = __UINT32_C(0xcccccccc);
@@ -1195,7 +1195,7 @@ NOTHROW_NCX(LIBCCALL libc_format_aprintf_pack)(struct format_aprintf_data *__res
 	self->ap_avail = __UINT64_C(0xcccccccccccccccc);
 	self->ap_used  = __UINT64_C(0xcccccccccccccccc);
 #endif /* ... */
-#endif /* !NDEBUG */
+#endif /* !NDEBUG && !NDEBUG_FINI */
 	return result;
 }
 #ifndef __format_aprintf_data_defined

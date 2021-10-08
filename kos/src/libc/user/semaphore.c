@@ -46,11 +46,11 @@
 
 DECL_BEGIN
 
-#ifndef NDEBUG
+#if !defined(NDEBUG) || !defined(NDEBUG_FINI)
 #define DBG_memset memset
-#else /* !NDEBUG */
+#else /* !NDEBUG || !NDEBUG_FINI */
 #define DBG_memset(...) (void)0
-#endif /* NDEBUG */
+#endif /* NDEBUG && NDEBUG_FINI */
 
 #if SEM_VALUE_MAX == INT8_MAX
 #define SEM_COUNT_MASK   UINT8_C(0x7f)

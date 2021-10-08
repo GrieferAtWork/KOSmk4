@@ -49,11 +49,11 @@
 
 DECL_BEGIN
 
-#ifndef NDEBUG
+#if !defined(NDEBUG) || !defined(NDEBUG_FINI)
 #define DBG_memset memset
-#else /* !NDEBUG */
+#else /* !NDEBUG || !NDEBUG_FINI */
 #define DBG_memset(...) (void)0
-#endif /* NDEBUG */
+#endif /* NDEBUG && NDEBUG_FINI */
 
 #define ZT_CACHE_BITS         10
 #define ZT_CACHE_SIZE         (1 << ZT_CACHE_BITS)

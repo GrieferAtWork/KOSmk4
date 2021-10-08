@@ -26,6 +26,7 @@
 #include <hybrid/atomic.h>
 #include <sched/semaphore.h>
 
+#include <assert.h>
 #include <stdbool.h>
 
 DECL_BEGIN
@@ -33,11 +34,12 @@ DECL_BEGIN
 /* Acquire a ticked from the given semaphore, or block until `abs_timeout'.
  * @return: true:  Successfully acquired a ticket.
  * @return: false: The given `abs_timeout' has expired. */
-PUBLIC NONNULL((1)) bool FCALL
+PUBLIC NOCONNECT NONNULL((1)) bool FCALL
 semaphore_wait(struct semaphore *__restrict self, ktime_t abs_timeout)
-		THROWS(E_BADALLOC, E_WOULDBLOCK) {
+		THROWS(E_WOULDBLOCK) {
 	uintptr_t count;
 again:
+	assert(!task_wasconnected());
 	do {
 		count = ATOMIC_READ(self->s_count);
 		if (!count) {
@@ -59,9 +61,7 @@ again:
 do_exchange:
 		;
 #endif /* CONFIG_YIELD_BEFORE_CONNECT */
-	} while (!__hybrid_atomic_cmpxch_weak(self->s_count, count, count - 1,
-	                                      __ATOMIC_SEQ_CST,
-	                                      __ATOMIC_SEQ_CST));
+	} while (!ATOMIC_CMPXCH_WEAK(self->s_count, count, count - 1));
 	return true;
 }
 
@@ -71,11 +71,12 @@ do_exchange:
  * @return: false: The given `abs_timeout' has expired.
  * @return: false: Preemption was disabled, and the operation would have blocked.
  * @return: false: There are pending X-RPCs that could not be serviced. */
-PUBLIC WUNUSED NONNULL((1)) bool
+PUBLIC NOCONNECT WUNUSED NONNULL((1)) bool
 NOTHROW(FCALL semaphore_wait_nx)(struct semaphore *__restrict self,
                                  ktime_t abs_timeout) {
 	uintptr_t count;
 again:
+	assert(!task_wasconnected());
 	do {
 		count = ATOMIC_READ(self->s_count);
 		if (!count) {
@@ -97,9 +98,7 @@ again:
 do_exchange:
 		;
 #endif /* CONFIG_YIELD_BEFORE_CONNECT */
-	} while (!__hybrid_atomic_cmpxch_weak(self->s_count, count, count - 1,
-	                                      __ATOMIC_SEQ_CST,
-	                                      __ATOMIC_SEQ_CST));
+	} while (!ATOMIC_CMPXCH_WEAK(self->s_count, count, count - 1));
 	return true;
 }
 

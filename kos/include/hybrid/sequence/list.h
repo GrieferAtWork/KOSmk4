@@ -27,12 +27,12 @@
 #include "../pp/__va_nargs.h"
 #endif /* !__HYBRID_LIST_RESTRICT_API */
 
-#ifdef NDEBUG
+#if defined(NDEBUG) || defined(NDEBUG_QUEUE)
 #define __HYBRID_Q_ASSERT_(expr) /* nothing */
-#else /* NDEBUG */
+#else /* NDEBUG || NDEBUG_QUEUE */
 #include "../__assert.h"
 #define __HYBRID_Q_ASSERT_(expr) __hybrid_assert(expr),
-#endif /* !NDEBUG */
+#endif /* !NDEBUG && !NDEBUG_QUEUE */
 
 /*
  * General purpose macros to defining various types of intrusive linked lists.
@@ -204,9 +204,9 @@
 #define __HYBRID_Q_KEY(key, item)     (item)->key
 #define __HYBRID_Q_PTH(getpath, item) getpath(item)
 #undef __HYBRID_Q_BADPTR
-#ifdef NDEBUG
+#if defined(NDEBUG) || defined(NDEBUG_QUEUE)
 #define __HYBRID_Q_BADPTR(field) (void)0
-#else /* NDEBUG */
+#else /* NDEBUG || NDEBUG_QUEUE */
 #include "../typecore.h"
 #if __SIZEOF_POINTER__ == 4
 #define __HYBRID_Q_BADPTR(field) (void)(*(void **)&(field) = (void *)__UINT32_C(0xcccccccc))
@@ -222,7 +222,7 @@
 #else /* __SIZEOF_POINTER__ == ... */
 #define __HYBRID_Q_BADPTR(field) (void)0
 #endif /* __SIZEOF_POINTER__ != ... */
-#endif /* !NDEBUG */
+#endif /* !NDEBUG && !NDEBUG_QUEUE */
 #if defined(__cplusplus) && !defined(__HYBRID_LIST_RESTRICT_API)
 #undef __HYBRID_Q_STRUCT
 #undef __HYBRID_Q_CLASS

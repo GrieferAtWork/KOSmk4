@@ -470,11 +470,11 @@ __NOBLOCK __ATTR_NONNULL((1)) void __NOTHROW(pb_buffer_cinit_ex)(struct pb_buffe
 	 sched_signal_cinit(&(self)->pb_psta))
 #endif /* !__INTELLISENSE__ */
 
-#ifdef NDEBUG
+#if defined(NDEBUG) || defined(NDEBUG_FINI)
 #define __pb_buffer_fini_debug(self) (void)0
-#else /* NDEBUG */
+#else /* NDEBUG || NDEBUG_FINI */
 #define __pb_buffer_fini_debug(self) __libc_memset(self, 0xcc, sizeof(struct pb_buffer))
-#endif /* !NDEBUG */
+#endif /* !NDEBUG && !NDEBUG_FINI */
 #define __pb_buffer_cb_fini_ancillary_noop(packet) (void)0
 
 

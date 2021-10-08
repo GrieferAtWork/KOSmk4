@@ -403,7 +403,7 @@ __DECL_END
 
 #ifdef RBTREE_DEBUG
 #undef RBTREE_NDEBUG
-#elif !defined(RBTREE_NDEBUG) && defined(NDEBUG)
+#elif !defined(RBTREE_NDEBUG) && (defined(NDEBUG) || defined(NDEBUG_RBTREE))
 #define RBTREE_NDEBUG
 #elif defined(RBTREE_ASSERT_IS_NOOP)
 #define RBTREE_NDEBUG
@@ -412,7 +412,7 @@ __DECL_END
          *   1: Disable internal debug checks by default (operations take their promised lengths of time)
          */
 #define RBTREE_NDEBUG
-#endif /* !RBTREE_NDEBUG && NDEBUG */
+#endif /* ... */
 
 
 #ifdef RBTREE_NDEBUG

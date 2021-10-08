@@ -293,10 +293,9 @@ struct format_waprintf_data {
 	(__hybrid_assert((self)->ap_base == __NULLPTR), \
 	 __hybrid_assert((self)->ap_avail == 0),        \
 	 __hybrid_assert((self)->ap_used == 0))
-#ifdef NDEBUG
+#if defined(NDEBUG) || defined(NDEBUG_FINI)
 #define format_waprintf_data_fini(self) __libc_free((self)->ap_base)
-#else /* NDEBUG */
-#if __SIZEOF_POINTER__ == 4
+#elif __SIZEOF_POINTER__ == 4
 #define format_waprintf_data_fini(self)                 \
 	(__libc_free((self)->ap_base),                      \
 	 (self)->ap_base  = (char *)__UINT32_C(0xcccccccc), \
@@ -308,10 +307,9 @@ struct format_waprintf_data {
 	 (self)->ap_base  = (char *)__UINT64_C(0xcccccccccccccccc), \
 	 (self)->ap_avail = __UINT64_C(0xcccccccccccccccc),         \
 	 (self)->ap_used  = __UINT64_C(0xcccccccccccccccc))
-#else /* __SIZEOF_POINTER__ == ... */
+#else /* ... */
 #define format_waprintf_data_fini(self) __libc_free((self)->ap_base)
-#endif /* __SIZEOF_POINTER__ != ... */
-#endif /* !NDEBUG */
+#endif /* !... */
 
 }
 
@@ -381,7 +379,7 @@ wchar_t *format_waprintf_pack([[nonnull]] struct format_waprintf_data *__restric
 	result[self->@ap_used@] = '\0'; /* NUL-terminate */
 	if (pstrlen)
 		*pstrlen = self->@ap_used@;
-@@pp_ifndef NDEBUG@@
+@@pp_if !defined(NDEBUG) && !defined(NDEBUG_FINI)@@
 @@pp_if __SIZEOF_POINTER__ == 4@@
 	self->@ap_base@  = (wchar_t *)__UINT32_C(0xcccccccc);
 	self->@ap_avail@ = __UINT32_C(0xcccccccc);

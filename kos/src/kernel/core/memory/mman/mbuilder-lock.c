@@ -43,11 +43,11 @@
 
 DECL_BEGIN
 
-#ifndef NDEBUG
+#if !defined(NDEBUG) || !defined(NDEBUG_FINI)
 #define DBG_memset memset
-#else /* !NDEBUG */
+#else /* !NDEBUG || !NDEBUG_FINI */
 #define DBG_memset(...) (void)0
-#endif /* NDEBUG */
+#endif /* NDEBUG && NDEBUG_FINI */
 
 /* Check if the [inner_min,inner_max] range is entirely contained in [outer_min,outer_max] */
 #define RANGE_CONTAINS(outer_min, outer_max, inner_min, inner_max) \

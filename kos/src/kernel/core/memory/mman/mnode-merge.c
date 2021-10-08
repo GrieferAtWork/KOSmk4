@@ -60,11 +60,11 @@ DECL_BEGIN
 
 #ifdef CONFIG_HAVE_MNODE_MERGE
 
-#ifndef NDEBUG
+#if !defined(NDEBUG) || !defined(NDEBUG_FINI)
 #define DBG_memset memset
-#else /* !NDEBUG */
+#else /* !NDEBUG || !NDEBUG_FINI */
 #define DBG_memset(...) (void)0
-#endif /* NDEBUG */
+#endif /* NDEBUG && NDEBUG_FINI */
 
 /* Check if 2 range overlap. */
 #define RANGES_OVERLAP(r1_min, r1_max, r2_min, r2_max) \

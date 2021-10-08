@@ -257,42 +257,42 @@ extern "C++" {
 
 /* [weak]decref() */
 #ifndef __PRIVATE_REFCNT_IMPL_DECREF
-#ifdef NDEBUG
+#if defined(NDEBUG) || defined(NDEBUG_REFCNT)
 #define __PRIVATE_REFCNT_IMPL_DECREF(T, function, destroy_, refcnt_field, destroy_likelyhood) \
 	if destroy_likelyhood(__hybrid_atomic_decfetch(refcnt_field, __ATOMIC_SEQ_CST) == 0)      \
 		destroy_(__self);
-#else /* NDEBUG */
+#else /* NDEBUG || NDEBUG_REFCNT */
 #define __PRIVATE_REFCNT_IMPL_DECREF(T, function, destroy_, refcnt_field, destroy_likelyhood)                \
 	__PRIVATE_REFCNT_NAME(refcnt_t) __old_refcnt = __hybrid_atomic_fetchdec(refcnt_field, __ATOMIC_SEQ_CST); \
 	__hybrid_assertf(__old_refcnt > 0, #T "::" #function "(%p): Object was already destroyed", __self);      \
 	if destroy_likelyhood(__old_refcnt == 1)                                                                 \
 		destroy_(__self);
-#endif /* !NDEBUG */
+#endif /* !NDEBUG && !NDEBUG_REFCNT */
 #endif /* !__PRIVATE_REFCNT_IMPL_DECREF */
 
 /* [weak]decref_nokill() */
 #ifndef __PRIVATE_REFCNT_IMPL_DECREF_NOKILL
-#ifdef NDEBUG
+#if defined(NDEBUG) || defined(NDEBUG_REFCNT)
 #define __PRIVATE_REFCNT_IMPL_DECREF_NOKILL(T, function, destroy_, refcnt_field) \
 	__hybrid_atomic_dec(refcnt_field, __ATOMIC_SEQ_CST);
-#else /* NDEBUG */
+#else /* NDEBUG || NDEBUG_REFCNT */
 #define __PRIVATE_REFCNT_IMPL_DECREF_NOKILL(T, function, destroy_, refcnt_field)                             \
 	__PRIVATE_REFCNT_NAME(refcnt_t) __old_refcnt = __hybrid_atomic_fetchdec(refcnt_field, __ATOMIC_SEQ_CST); \
 	__hybrid_assertf(__old_refcnt > 0, "decref_nokill(%p): Object was already destroyed", __self);           \
 	__hybrid_assertf(__old_refcnt > 1, "decref_nokill(%p): Object should have been destroyed", __self);
-#endif /* !NDEBUG */
+#endif /* !NDEBUG && !NDEBUG_REFCNT */
 #endif /* !__PRIVATE_REFCNT_IMPL_DECREF_NOKILL */
 
 /* [weak]destroy() */
 #ifndef __PRIVATE_REFCNT_IMPL_DESTROY
-#ifdef NDEBUG
+#if defined(NDEBUG) || defined(NDEBUG_REFCNT)
 #define __PRIVATE_REFCNT_IMPL_DESTROY(T, function, destroy_, refcnt_field) \
 	destroy_(self);
-#else /* NDEBUG */
+#else /* NDEBUG || NDEBUG_REFCNT */
 #define __PRIVATE_REFCNT_IMPL_DESTROY(T, function, destroy_, refcnt_field)                     \
 	__hybrid_atomic_store(refcnt_field, (__PRIVATE_REFCNT_NAME(refcnt_t))0, __ATOMIC_RELEASE); \
 	destroy_(__self);
-#endif /* !NDEBUG */
+#endif /* !NDEBUG && !NDEBUG_REFCNT */
 #endif /* !__PRIVATE_REFCNT_IMPL_DESTROY */
 
 /* try[weak]incref() */

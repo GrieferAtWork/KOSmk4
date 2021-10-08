@@ -115,6 +115,7 @@ NOTHROW(FCALL _sched_assert)(struct cpu *__restrict me) {
 	num_running = 0;
 	pself = &sched_s_running_first;
 	prev_time = 0;
+
 	/* Enumerate running threads. */
 	for (;;) {
 		iter = *pself;
@@ -150,6 +151,7 @@ NOTHROW(FCALL _sched_assert)(struct cpu *__restrict me) {
 	pself = &sched_next(iter);
 	iter  = *pself;
 	prev_time = 0;
+
 	/* Enumerate waiting threads. */
 	while ((iter = *pself) != NULL) {
 		assertf(sched_pself(iter) == pself,
@@ -321,6 +323,7 @@ NOTHROW(FCALL sched_intern_loadpending)(struct cpu *__restrict me,
 	struct task *next;
 	for (;;) {
 		next = KEY__thiscpu_pending_next(chain);
+
 		/* Locally add each of the threads to our CPU */
 		caller = sched_intern_localadd(me, caller, chain, false);
 		if (!next)
@@ -346,6 +349,7 @@ NOTHROW(FCALL sched_intern_add_to_runqueue)(struct cpu *__restrict me,
 	neighbor = sched.s_running_last;
 	thread_stoptime = sched_stoptime(thread);
 	if (thread_stoptime >= sched_stoptime(neighbor)) {
+
 		/* Append at the very end. */
 		LIST_INSERT_AFTER_P(/* predecessor: */ neighbor,
 		                    /* elem:        */ thread,
@@ -353,12 +357,14 @@ NOTHROW(FCALL sched_intern_add_to_runqueue)(struct cpu *__restrict me,
 		sched.s_running_last = thread;
 	} else {
 		neighbor = sched_s_running_first;
+
 		/* Append before some other thread prior to the last running thread.
 		 * NOTE: At this point, we already know that `thread' should be inserted
 		 *       before  the last running thread, since it has a higher priority
 		 *       that said last running thread! */
 		while (thread_stoptime >= sched_stoptime(neighbor))
 			neighbor = sched_next(neighbor);
+
 		/* Insert the new thread before its neighbor. */
 		LIST_INSERT_BEFORE_P(/* successor: */ neighbor,
 		                     /* elem:      */ thread,
@@ -391,6 +397,7 @@ NOTHROW(FCALL sched_intern_add_to_waitqueue)(struct cpu *__restrict me,
 		} else {
 			struct task *first_waiting;
 			first_waiting = sched_s_waiting;
+
 			/* Find the first thread with a greater timeout
 			 * than  the given `timeout'. We know that such
 			 * a thread exists, since we also know that the
@@ -434,6 +441,7 @@ NOTHROW(FCALL sched_intern_unlink_from_waiting)(struct cpu *__restrict me,
 		/* Last waiting thread. */
 		assert(sched.s_waiting_last == thread);
 		sched.s_waiting_last = sched_prev(thread);
+
 		/* Check for special case: The last waiting thread has gone away. */
 		if (sched.s_waiting_last == sched.s_running_last)
 			sched.s_waiting_last = NULL;
@@ -458,6 +466,7 @@ NOTHROW(FCALL move_thread_pair_to_back_of_runqueue)(struct cpu *__restrict me,
 	assert(sched.s_runcount >= 2);
 	if (sched.s_runcount == 2) {
 		struct task *waiting;
+
 		/* Special case: Set the running queue to `{ caller, thread }' */
 		waiting = sched_s_waiting;
 		sched_s_running_first = caller;
@@ -471,6 +480,7 @@ NOTHROW(FCALL move_thread_pair_to_back_of_runqueue)(struct cpu *__restrict me,
 	} else {
 		struct task *last_running;
 		assert(sched.s_runcount >= 3);
+
 		/* Unlink `thread' and `caller' from somewhere within the running queue. */
 		if unlikely(sched.s_running_last == thread)
 			sched.s_running_last = sched_prev(thread);
@@ -483,6 +493,7 @@ NOTHROW(FCALL move_thread_pair_to_back_of_runqueue)(struct cpu *__restrict me,
 		assert(last_running != thread && last_running != caller);
 		if likely(new_stop_time >= sched_stoptime(last_running)) {
 			struct task *first_waiting;
+
 			/* Insert `caller'+`thread' at the back of the running queue. */
 			first_waiting = sched_next(last_running);
 			assert((first_waiting != NULL) == (sched.s_waiting_last != NULL));
@@ -493,6 +504,7 @@ NOTHROW(FCALL move_thread_pair_to_back_of_runqueue)(struct cpu *__restrict me,
 		} else {
 			struct task *first_running;
 			first_running = sched_s_running_first;
+
 			/* Unlikely case: There is a thread in the runqueue with a stop-time
 			 * that is located in the future from  our point of view. - This  is
 			 * something that is allowed, but not something that would  normally
@@ -544,9 +556,11 @@ NOTHROW(FCALL move_thread_to_back_of_runqueue)(struct cpu *__restrict me,
 			sched.s_running_last = last_running;
 		}
 		LIST_REMOVE_P(thread, sched_link);
+
 		/* Re-insert `thread' */
 		if likely(new_stop_time >= sched_stoptime(last_running)) {
 			struct task *first_waiting;
+
 			/* Insert `thread' at the back of the running queue. */
 			first_waiting = sched_next(last_running);
 			assert((first_waiting != NULL) == (sched.s_waiting_last != NULL));
@@ -557,6 +571,7 @@ NOTHROW(FCALL move_thread_to_back_of_runqueue)(struct cpu *__restrict me,
 		} else {
 			struct task *first_running;
 			first_running = sched_s_running_first;
+
 			/* Unlikely case: There is a thread in the runqueue with a stop-time
 			 * that is located in the future from  our point of view. - This  is
 			 * something that is allowed, but not something that would  normally
@@ -606,6 +621,7 @@ NOTHROW(FCALL sched_intern_reload_deadline)(struct cpu *__restrict me,
 		deadline = sched_quantum_max;
 	deadline += now;
 	assert(deadline >= now);
+
 	/* Check if we should cut the quantum short due to a sleeping thread. */
 	FOREACH_thiscpu_waiting(thread, me) {
 		ktime_t distance;
@@ -613,6 +629,7 @@ NOTHROW(FCALL sched_intern_reload_deadline)(struct cpu *__restrict me,
 		ktime_t thrd_priorty_then;
 		if unlikely(sched_timeout(thread) >= deadline)
 			break; /* No sleeping thread will time out before our quantum ends */
+
 		/* Check if the thread will have a greater priority than `NEXT' when it times out. */
 		distance = deadline - sched_timeout(thread);
 		if unlikely(OVERFLOW_USUB(quantum_start, distance, &next_priorty_then))
@@ -635,6 +652,7 @@ do_use_sleeping_thread_timeout:
 
 	/* Convert the effective deadline into a TSC value. */
 	tsc_deadline_value = ktime_future_to_tsc(me, deadline);
+
 	/* Set the final TSC deadline to indicate when
 	 * to trigger the  next preemptive  interrupt. */
 	if (tsc_deadline_value == TSC_MAX) {
@@ -672,10 +690,12 @@ NOTHROW(FCALL sched_intern_high_priority_switch)(struct cpu *__restrict me,
 	ktime_t priority_boost;
 	assert(caller != thread);
 	now = tsc_now_to_ktime(me, tsc_now);
+
 	/* Gift the remainder of `caller's quantum to `thread' */
 	quantum_start = sched_stoptime(caller);
 	if unlikely(quantum_start >= now)
 		return caller; /* Shouldn't happen... */
+
 	/* If the caller only had a really short amount of time left for
 	 * their current quantum, and `thread' has already been  waiting
 	 * for a  really long  time, then  `thread' must  still get  its
@@ -685,8 +705,10 @@ NOTHROW(FCALL sched_intern_high_priority_switch)(struct cpu *__restrict me,
 
 	/* Account for time spent being active. */
 	sched_activetime(caller) += now - quantum_start;
+
 	/* Update the stop timestamps of both `caller' and `next' */
 	move_thread_pair_to_back_of_runqueue(me, caller, thread, now);
+
 	/* If requested to, reload the current deadline. */
 	if (reload_deadline) {
 		thread = sched_intern_reload_deadline(me, thread,
@@ -729,8 +751,10 @@ NOTHROW(FCALL sched_intern_localwake)(struct cpu *__restrict me,
 			/* Unlink the thread from the waiting list. */
 			sched_intern_unlink_from_waiting(me, thread);
 		}
+
 		/* Resume execution of the thread. */
 		ATOMIC_OR(thread->t_flags, TASK_FRUNNING);
+
 		/* Insert the thread into the run-queue */
 		sched_intern_add_to_runqueue(me, thread);
 		if likely(!sched_override) {
@@ -738,9 +762,10 @@ NOTHROW(FCALL sched_intern_localwake)(struct cpu *__restrict me,
 			/* Reload  the  scheduler   deadline,  or   (optionally)
 			 * perform a high-priority switch to the named `thread'. */
 			tsc_now = tsc_get(me);
-			if (high_priority)
-				result = sched_intern_high_priority_switch(me, caller, thread, tsc_now, true);
-			else {
+			if (high_priority) {
+				result = sched_intern_high_priority_switch(me, caller, thread,
+				                                           tsc_now, true);
+			} else {
 				result = sched_intern_reload_deadline(me, result,
 				                                      sched_stoptime(caller), 0,
 				                                      tsc_now_to_ktime(me, tsc_now),
@@ -757,6 +782,7 @@ NOTHROW(FCALL sched_intern_localwake)(struct cpu *__restrict me,
 			break; /* Simple case... (nothing actually changed) */
 		if likely(!sched_override) {
 			tsc_t tsc_now;
+
 			/* Perform a high-priority thread switch. */
 			tsc_now = tsc_get(me);
 			result  = sched_intern_high_priority_switch(me, caller, thread, tsc_now, false);
@@ -782,16 +808,19 @@ NOTHROW(FCALL sched_intern_localadd)(struct cpu *__restrict me,
 	struct task *result = caller;
 	sched_assert();
 	assert(thread->t_flags & TASK_FRUNNING);
+
 	/* Insert the given `thread' into the run-queue */
 	sched_intern_add_to_runqueue(me, thread);
 	if likely(!sched_override) {
 		tsc_t tsc_now;
+
 		/* Reload the scheduler deadline, or perform a
 		 * high-priority switch to the named `thread'. */
 		tsc_now = tsc_get(me);
-		if (high_priority)
-			result = sched_intern_high_priority_switch(me, caller, thread, tsc_now, true);
-		else {
+		if (high_priority) {
+			result = sched_intern_high_priority_switch(me, caller, thread,
+			                                           tsc_now, true);
+		} else {
 			result = sched_intern_reload_deadline(me, caller,
 			                                      sched_stoptime(caller), 0,
 			                                      tsc_now_to_ktime(me, tsc_now),
@@ -852,6 +881,7 @@ NOTHROW(FCALL sched_intern_yield_onexit)(struct cpu *__restrict me,
 		assert(caller == sched_s_running_first);
 		assert(caller == sched.s_running_last);
 		assert(sched_pself(caller) == &sched_s_running_first);
+
 		/* Special case: Must switch to the IDLE thread. */
 		result = &sched_idle;
 		sched_s_running_first = result;
@@ -871,28 +901,35 @@ NOTHROW(FCALL sched_intern_yield_onexit)(struct cpu *__restrict me,
 			sched.s_running_last = sched_prev(caller);
 		LIST_REMOVE_P(caller, sched_link);
 		--sched.s_runcount;
+
 		/* Just switch to whatever thread comes next. */
 		result = sched_s_running_first;
 	}
+
 	/* Perform something similar to a high-priority switch */
 	assert(caller != result);
 	tsc_now = tsc_get(me);
 	now     = tsc_now_to_ktime(me, tsc_now);
+
 	/* Gift the remainder of `caller's quantum to `thread' */
 	quantum_start = sched_stoptime(caller);
 	if unlikely(quantum_start > now)
 		quantum_start = now; /* Shouldn't happen... */
+
 	/* Account for time spent being active. */
 	sched_activetime(caller) += now - quantum_start;
 	sched_stoptime(caller) = now;
+
 	/* If the caller only had a really short amount of time left for
 	 * their current quantum, and `thread' has already been  waiting
 	 * for a  really long  time, then  `thread' must  still get  its
 	 * priority boost! */
 	if (OVERFLOW_USUB(now, sched_stoptime(result), &priority_boost))
 		priority_boost = 0;
+
 	/* Update the stop timestamp of `next' */
 	move_thread_to_back_of_runqueue(me, result, now);
+
 	/* Reload the current deadline. */
 	result = sched_intern_reload_deadline(me, result, quantum_start,
 	                                      priority_boost, now,
@@ -911,15 +948,18 @@ NOTHROW(FCALL waitfor_tsc_deadline_or_interrupt)(struct cpu *__restrict me,
 	tsc_t now;
 	if (deadline == TSC_MAX) {
 		tsc_nodeadline(me);
+
 		/* Wait for a sporadic interrupt. */
 		PREEMPTION_ENABLE_WAIT();
 		return true;
 	}
+
 	/* Set the given deadline. */
 	now = tsc_deadline(me, deadline);
 	if (now < deadline) {
 		/* Wait for the next interrupt to fire. */
 		PREEMPTION_ENABLE_WAIT_DISABLE();
+
 		/* Disable the deadline once again.
 		 * Note that in  the event that  the interrupt was  the
 		 * result  of the deadline  elapsing, the initial check
@@ -999,6 +1039,7 @@ PUBLIC bool NOTHROW(FCALL task_sleep)(ktime_t abs_timeout) {
 		 * -> Wait for the given timeout to expire, or a sporadic interrupt to take place */
 		return waitfor_ktime_or_interrupt(me, abs_timeout);
 	}
+
 	/* Unlink the thread from the run queue. */
 	if unlikely(sched.s_runcount == 1) {
 		struct task *first_waiting_thread;
@@ -1018,9 +1059,11 @@ PUBLIC bool NOTHROW(FCALL task_sleep)(ktime_t abs_timeout) {
 				if (used_timeout > other_timeout)
 					used_timeout = other_timeout;
 			}
+
 			/* Wait for the next closest timeout to expire, or a sporadic interrupt */
 			return waitfor_ktime_or_interrupt(me, used_timeout);
 		}
+
 		/* Special case: Must switch to the IDLE thread. */
 		next = &sched_idle;
 		sched_s_running_first = next;
@@ -1038,10 +1081,12 @@ PUBLIC bool NOTHROW(FCALL task_sleep)(ktime_t abs_timeout) {
 			sched.s_running_last = sched_prev(caller);
 		LIST_REMOVE_P(caller, sched_link);
 		--sched.s_runcount;
+
 		/* Just switch to whatever thread comes next. */
 		next = sched_s_running_first;
 		sched_assert();
 	}
+
 	/* Perform something similar to a high-priority switch */
 	assert(next);
 	assert(next != caller);
@@ -1090,7 +1135,7 @@ PUBLIC bool NOTHROW(FCALL task_sleep)(ktime_t abs_timeout) {
 		sched_assert();
 		cpu_run_current_and_remember_nopr(caller);
 
-		/* HINT: If your debugger  break here, it  means that  your
+		/* HINT: If your debugger breaks  here, it means that  your
 		 *       thread is probably waiting on some kind of signal. */
 		assert(caller->t_flags & TASK_FRUNNING);
 #if 0 /* Can't be asserted: We may have switched CPUs in the mean time! */
@@ -1131,6 +1176,7 @@ NOTHROW(FCALL tsc_deadline_passed)(struct cpu *__restrict me,
 	ktime_t now, next_priority, deadline;
 	struct task *next, *thread;
 	tsc_t tsc_deadline_value;
+
 	/* Check for  special  case:  a scheduler  override  is  present.
 	 * Note that this should really happen, since setting a scheduler
 	 * override  should  have  already  called  `tsc_nodeadline()'...
@@ -1139,23 +1185,28 @@ NOTHROW(FCALL tsc_deadline_passed)(struct cpu *__restrict me,
 	if unlikely(sched_override)
 		return sched_override;
 	sched_assert();
+
 	/* Calculate the current scheduler time. */
 again_with_tsc_now:
 	entropy_giveint_nopr(tsc_now, 3); /* Feed a little bit of entropy */
 	now = tsc_now_to_ktime(me, tsc_now);
 again:
+
 	/* Select the thread with the lowest stop-time as successor. */
 	next          = sched_s_running_first;
 	next_priority = sched_stoptime(next);
+
 	/* Check the timeouts of sleeping threads. */
 	FOREACH_thiscpu_waiting(thread, me) {
 		assert(!(thread->t_flags & TASK_FRUNNING));
+
 		/* Must  compare  `<timeout> >= now' such  that `<timeout>=-1'
 		 * isn't considered as something that could actually time out. */
 		if (sched_timeout(thread) >= now)
 			break; /* No more threads that have timed out. */
 		if unlikely(sched_stoptime(thread) > next_priority)
 			break; /* Thread priority too low for a wake-up */
+
 		/* Wake-up the thread. */
 do_timeout_thread:
 		sched_intern_unlink_from_waiting(me, thread);
@@ -1165,13 +1216,16 @@ do_timeout_thread:
 	}
 	if unlikely(next_priority > now)
 		next_priority = now; /* Shouldn't happen (TM) */
+
 	/* This is the primary deadline formula that
 	 * enables us to do preemptive multitasking. */
 	deadline = /*now + */ (now - next_priority) / sched.s_runcount;
+
 	/* Clamp the relative deadline to prevent situations where all of
 	 * a thread's designated  time is spent  doing context  switches. */
 	if (deadline < sched_quantum_min)
 		deadline = sched_quantum_min;
+
 	/* Update thread state flags. */
 	if (next != caller) {
 		/* Clamp the relative deadline  to prevent situations where  a
@@ -1194,11 +1248,13 @@ do_timeout_thread:
 		} else {
 			/* Account for time spent being active. */
 			sched_activetime(caller) += now - sched_stoptime(caller);
+
 			/* Update the stop timestamp of `caller' */
 			move_thread_to_back_of_runqueue(me, caller, now);
 		}
 	}
 	assert(deadline >= now);
+
 	/* Check if we should cut the quantum short due to a sleeping thread. */
 	FOREACH_thiscpu_waiting(thread, me) {
 		ktime_t distance;
@@ -1206,6 +1262,7 @@ do_timeout_thread:
 		ktime_t thrd_priorty_then;
 		if unlikely(sched_timeout(thread) >= deadline)
 			break; /* No sleeping thread will time out before our quantum ends */
+
 		/* Check if the thread will have a greater priority than `NEXT' when it times out. */
 		distance = deadline - sched_timeout(thread);
 		if unlikely(OVERFLOW_USUB(next_priority, distance, &next_priorty_then))
@@ -1214,6 +1271,7 @@ do_timeout_thread:
 		if (thrd_priorty_then > next_priorty_then) {
 do_use_sleeping_thread_timeout:
 			deadline = sched_timeout(thread);
+
 			/* Must compare `TIMEOUT < NOW' such that TIMEOUT=-1 isn't
 			 * considered  as something that  could actually time out. */
 			if unlikely(deadline < now) {
@@ -1272,12 +1330,14 @@ NOTHROW(FCALL idle_unload_and_switch_to)(struct cpu *__restrict me,
 	assert(next);
 	assert(next->t_flags & TASK_FRUNNING);
 	assert(sched.s_runcount >= 2);
+
 	/* Remove caller (the IDLE thread) from the run queue */
 	if (sched.s_running_last == caller)
 		sched.s_running_last = sched_prev(caller);
 	LIST_REMOVE_P(caller, sched_link);
 	--sched.s_runcount;
 	ATOMIC_AND(caller->t_flags, ~TASK_FRUNNING);
+
 	/* Mark the IDLE thread as unloaded, as documented in,
 	 * and   required   by   `struct scheduler::s_running' */
 	sched_pself(caller) = NULL;
@@ -1389,6 +1449,7 @@ again:
 	PREEMPTION_DISABLE();
 	sched_assert();
 	sched_assert_in_runqueue(caller);
+
 	/* First check: Are there any running threads we can switch to? */
 	if (sched.s_runcount >= 2) {
 		struct task *next;
@@ -1396,6 +1457,7 @@ again:
 		if (next == caller)
 			next = sched_next(next);
 		assert(next != caller);
+
 		/* Switch to the next available thread. */
 		idle_unload_and_switch_to(me, caller, next);
 		return;
@@ -1421,6 +1483,7 @@ again:
 			goto again;
 		}
 	}
+
 	/* Check if there are any pending soft- or hard-ware IPIs */
 	if (arch_cpu_hwipi_pending_nopr() || arch_cpu_swipi_pending_nopr(me)) {
 		cpu_ipi_service_nopr();
@@ -1460,6 +1523,7 @@ again:
 		shutdown_timeout = now + sched_shutdown_delay;
 		if (shutdown_timeout >= timeout)
 			goto cannot_shut_down; /* Don't shut down the CPU! */
+
 		/* Figure out the deadline for when we're allowed to shut down the CPU. */
 		deadline = ktime_future_to_tsc(me, shutdown_timeout);
 		tsc_now  = tsc_deadline(me, deadline);
@@ -1539,15 +1603,18 @@ disable_custom_deadline_and_start_over:
 				 * we might as well stop trying and just get back to
 				 * normal execution. */
 				ATOMIC_WRITE(me->c_state, CPU_STATE_RUNNING);
+
 				/* Must still send wake-up requests to all CPUs that
 				 * received  threads before we've failed to transfer
 				 * the most recent thread. */
 				cpuset_wake(pending_cpu_wake);
 				goto again;
 			}
+
 			/* With all sleeping threads transfered, fix-up the waiting-last pointer. */
 			assert(sched_s_waiting == NULL);
 			sched.s_waiting_last = NULL;
+
 			/* Wake-up all CPUs that received our old threads. */
 			cpuset_wake(pending_cpu_wake);
 		}
@@ -1651,8 +1718,10 @@ NOTHROW(FCALL sched_override_start)(void) {
 	COMPILER_READ_BARRIER();
 	me = caller->t_cpu;
 	assert(!sched_override);
+
 	/* Set the calling thread as scheduling override. */
 	ATOMIC_WRITE(sched_override, caller);
+
 	/* Disable any previously set deadline. */
 	tsc_nodeadline(me);
 	PREEMPTION_POP(was);
@@ -1671,6 +1740,7 @@ NOTHROW(FCALL sched_override_end)(void) {
 	was = PREEMPTION_PUSHOFF();
 	ATOMIC_WRITE(sched_override, NULL);
 	tsc_now = tsc_get(me);
+
 	/* Reload the TSC deadline for the calling thread, thus accounting for
 	 * the additional time  it spent being  an active scheduler  override. */
 	next = sched_intern_reload_deadline(me, caller, sched_stoptime(caller),
@@ -1678,9 +1748,11 @@ NOTHROW(FCALL sched_override_end)(void) {
 	                                    tsc_now, !PREEMPTION_WASENABLED(was));
 	if (next != caller) {
 		assert(PREEMPTION_WASENABLED(was));
+
 		/* Directly resume execution in `next' */
 		FORCPU(me, thiscpu_sched_current) = next;
 		sched_assert();
+
 		/* Switch over to the next thread. */
 		cpu_run_current_and_remember_nopr(caller);
 	}

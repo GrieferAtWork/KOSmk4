@@ -75,10 +75,10 @@ struct shared_rwlock {
 
 LOCAL NOBLOCK NONNULL((1)) __BOOL NOTHROW(FCALL shared_rwlock_tryread)(struct shared_rwlock *__restrict self);
 LOCAL NOBLOCK NONNULL((1)) __BOOL NOTHROW(FCALL shared_rwlock_trywrite)(struct shared_rwlock *__restrict self);
-FUNDEF NONNULL((1)) void FCALL shared_rwlock_read(struct shared_rwlock *__restrict self, ktime_t abs_timeout DFL(KTIME_INFINITE)) THROWS(E_WOULDBLOCK);
-FUNDEF NONNULL((1)) void FCALL shared_rwlock_write(struct shared_rwlock *__restrict self, ktime_t abs_timeout DFL(KTIME_INFINITE)) THROWS(E_WOULDBLOCK);
-FUNDEF NONNULL((1)) __BOOL NOTHROW(FCALL shared_rwlock_read_nx)(struct shared_rwlock *__restrict self, ktime_t abs_timeout DFL(KTIME_INFINITE));
-FUNDEF NONNULL((1)) __BOOL NOTHROW(FCALL shared_rwlock_write_nx)(struct shared_rwlock *__restrict self, ktime_t abs_timeout DFL(KTIME_INFINITE));
+FUNDEF NOCONNECT NONNULL((1)) void FCALL shared_rwlock_read(struct shared_rwlock *__restrict self, ktime_t abs_timeout DFL(KTIME_INFINITE)) THROWS(E_WOULDBLOCK);
+FUNDEF NOCONNECT NONNULL((1)) void FCALL shared_rwlock_write(struct shared_rwlock *__restrict self, ktime_t abs_timeout DFL(KTIME_INFINITE)) THROWS(E_WOULDBLOCK);
+FUNDEF NOCONNECT NONNULL((1)) __BOOL NOTHROW(FCALL shared_rwlock_read_nx)(struct shared_rwlock *__restrict self, ktime_t abs_timeout DFL(KTIME_INFINITE));
+FUNDEF NOCONNECT NONNULL((1)) __BOOL NOTHROW(FCALL shared_rwlock_write_nx)(struct shared_rwlock *__restrict self, ktime_t abs_timeout DFL(KTIME_INFINITE));
 
 /* Try to upgrade a read-lock to a write-lock. Return `FALSE' upon failure. */
 LOCAL NOBLOCK NONNULL((1)) __BOOL
@@ -87,7 +87,7 @@ NOTHROW(FCALL shared_rwlock_tryupgrade)(struct shared_rwlock *__restrict self);
 /* NOTE: The lock is always upgraded, but when `FALSE' is returned, no lock
  *       may  have been  held temporarily,  meaning that  the caller should
  *       re-load local copies of affected resources. */
-LOCAL NONNULL((1)) __BOOL
+LOCAL NOCONNECT NONNULL((1)) __BOOL
 (FCALL shared_rwlock_upgrade)(struct shared_rwlock *__restrict self,
                               ktime_t abs_timeout DFL(KTIME_INFINITE))
 		THROWS(E_WOULDBLOCK);
@@ -97,7 +97,7 @@ LOCAL NONNULL((1)) __BOOL
  *       re-load local copies of affected resources.
  * NOTE: When `0' is returned, the original read-lock created by the caller has
  *       already been released. */
-LOCAL NONNULL((1)) unsigned int
+LOCAL NOCONNECT NONNULL((1)) unsigned int
 NOTHROW(FCALL shared_rwlock_upgrade_nx)(struct shared_rwlock *__restrict self,
                                         ktime_t abs_timeout DFL(KTIME_INFINITE));
 
@@ -241,7 +241,7 @@ NOTHROW(FCALL shared_rwlock_tryupgrade)(struct shared_rwlock *__restrict self) {
 /* NOTE: The lock is always upgraded, but when `FALSE' is returned, no lock
  *       may  have been  held temporarily,  meaning that  the caller should
  *       re-load local copies of affected resources. */
-LOCAL NONNULL((1)) __BOOL
+LOCAL NOCONNECT NONNULL((1)) __BOOL
 (FCALL shared_rwlock_upgrade)(struct shared_rwlock *__restrict self,
                               ktime_t abs_timeout)
 		THROWS(E_WOULDBLOCK) {
@@ -257,7 +257,7 @@ LOCAL NONNULL((1)) __BOOL
  *       re-load local copies of affected resources.
  * NOTE: When `0' is returned, the original read-lock created by the caller has
  *       already been released. */
-LOCAL NONNULL((1)) unsigned int
+LOCAL NOCONNECT NONNULL((1)) unsigned int
 NOTHROW(FCALL shared_rwlock_upgrade_nx)(struct shared_rwlock *__restrict self,
                                         ktime_t abs_timeout) {
 	if (shared_rwlock_tryupgrade(self))

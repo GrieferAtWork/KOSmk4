@@ -398,6 +398,7 @@ NOTHROW(FCALL task_destroy_raw_impl)(Toblockop(mman) *__restrict _lop,
 
 	/* Unlink + unmap the trampoline node. */
 	mman_mappings_removenode(&mman_kernel, &FORTASK(self, this_trampoline_node));
+
 	/* The  `mn_writable' field is only valid when  a part is set, which must
 	 * not be the case for the trampoline node (which is a reserved mapping!) */
 	assert(FORTASK(self, this_trampoline_node).mn_part == NULL);
@@ -463,6 +464,7 @@ NOTHROW(KCALL task_destroy)(struct task *__restrict self) {
 		(*post->oplo_func)(post, &mman_kernel);
 	} else {
 		Toblockop(mman) *lop;
+
 		/* Schedule the task to-be destroyed later. */
 		lop           = (Toblockop(mman) *)self;
 		lop->olo_func = &task_destroy_raw_impl;
@@ -475,11 +477,13 @@ PUBLIC ATTR_MALLOC ATTR_RETNONNULL WUNUSED REF struct task *
 (KCALL task_alloc)(struct mman *__restrict task_mman) THROWS(E_WOULDBLOCK, E_BADALLOC) {
 	REF struct task *result;
 	heapptr_t resptr;
+
 	/* Allocate a new task structure. */
 	resptr = heap_alloc(&kernel_locked_heap,
 	                    (size_t)__kernel_pertask_size,
 	                    GFP_LOCKED | GFP_PREFLT);
 	result = (REF struct task *)heapptr_getptr(resptr);
+
 	/* Copy the per-task initialization template. */
 	memcpy(result, __kernel_pertask_start, (size_t)__kernel_pertask_size);
 	result->t_heapsz = heapptr_getsiz(resptr);
@@ -586,6 +590,7 @@ again_lock_kernel_mman:
 			(**iter)(result);
 	} EXCEPT {
 		ATOMIC_WRITE(result->t_refcnt, 0);
+
 		/* Destroy the task if an initializer threw another exception. */
 		task_destroy(result);
 		RETHROW();

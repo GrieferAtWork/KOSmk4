@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xecf52510 */
+/* HASH CRC-32:0x10dfa1e6 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2114,7 +2114,7 @@ struct format_c32aprintf_data {
 	(__hybrid_assert((self)->ap_base == (char32_t *)__NULLPTR), \
 	 __hybrid_assert((self)->ap_avail == 0),                    \
 	 __hybrid_assert((self)->ap_used == 0))
-#ifdef NDEBUG
+#if defined(NDEBUG) || defined(NDEBUG_FINI)
 #define format_c16aprintf_data_fini(self) __libc_free((self)->ap_base)
 #define format_c32aprintf_data_fini(self) __libc_free((self)->ap_base)
 #elif __SIZEOF_POINTER__ == 4
@@ -2139,10 +2139,10 @@ struct format_c32aprintf_data {
 	 (self)->ap_base  = (char32_t *)__UINT64_C(0xcccccccccccccccc), \
 	 (self)->ap_avail = __UINT64_C(0xcccccccccccccccc),             \
 	 (self)->ap_used  = __UINT64_C(0xcccccccccccccccc))
-#else /* __SIZEOF_POINTER__ == ... */
+#else /* ... */
 #define format_c16aprintf_data_fini(self) __libc_free((self)->ap_base)
 #define format_c32aprintf_data_fini(self) __libc_free((self)->ap_base)
-#endif /* ... */
+#endif /* !... */
 
 #if defined(__CRT_HAVE_format_waprintf_pack) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
 /* Pack  and  finalize  a  given  aprintf  format printer

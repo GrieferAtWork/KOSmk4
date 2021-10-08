@@ -57,13 +57,13 @@ __SYSDECL_BEGIN
 #endif /* !__KERNEL__ */
 #endif /* !__MALLOCA_MAX */
 #ifndef __MALLOCA_MUSTFREE
-#ifdef NDEBUG
+#if defined(NDEBUG) || defined(NDEBUG_INIT)
 #define __MALLOCA_KEY_ALLOCA        0
 #define __MALLOCA_KEY_MALLOC        1
 #define __MALLOCA_SKEW_ALLOCA(p, s) (p)
 #define __MALLOCA_GETKEY(p)         ((__BYTE_TYPE__ *)(p))[-__MALLOCA_ALIGN]
 #define __MALLOCA_MUSTFREE(p)       (__MALLOCA_GETKEY(p) != __MALLOCA_KEY_ALLOCA)
-#else /* NDEBUG */
+#else /* NDEBUG || NDEBUG_INIT */
 #include <hybrid/__assert.h>
 #define __MALLOCA_KEY_ALLOCA 0x7c
 #define __MALLOCA_KEY_MALLOC 0xb3
@@ -73,7 +73,7 @@ __SYSDECL_BEGIN
 	                 __MALLOCA_GETKEY(p) == __MALLOCA_KEY_MALLOC),  \
 	 __MALLOCA_GETKEY(p) == __MALLOCA_KEY_MALLOC)
 #define __MALLOCA_SKEW_ALLOCA(p, s) __libc_memset(p, 0xcd, s)
-#endif /* !NDEBUG */
+#endif /* !NDEBUG && !NDEBUG_INIT */
 #endif /* !__MALLOCA_MUSTFREE */
 
 

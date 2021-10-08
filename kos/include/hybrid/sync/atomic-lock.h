@@ -54,14 +54,14 @@ struct atomic_lock {
 #define atomic_lock_acquired(self)   (__hybrid_atomic_load((self)->a_lock, __ATOMIC_ACQUIRE) != 0)
 #define atomic_lock_available(self)  (__hybrid_atomic_load((self)->a_lock, __ATOMIC_ACQUIRE) == 0)
 #define atomic_lock_tryacquire(self) (__hybrid_atomic_xch((self)->a_lock, 1, __ATOMIC_ACQUIRE) == 0)
-#ifdef NDEBUG
+#if defined(NDEBUG) || defined(NDEBUG_SYNC)
 #define atomic_lock_release(self) \
 	__hybrid_atomic_store((self)->a_lock, 0, __ATOMIC_RELEASE)
-#else /* NDEBUG */
+#else /* NDEBUG || NDEBUG_SYNC */
 #define atomic_lock_release(self)          \
 	(__hybrid_assert((self)->a_lock != 0), \
 	 __hybrid_atomic_store((self)->a_lock, 0, __ATOMIC_RELEASE))
-#endif /* !NDEBUG */
+#endif /* !NDEBUG || !NDEBUG_SYNC */
 
 
 /* Acquire an exclusive lock. */

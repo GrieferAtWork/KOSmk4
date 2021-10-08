@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8758128f */
+/* HASH CRC-32:0x6d7e52c1 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -567,9 +567,9 @@ NOTHROW_NCX(LIBCCALL libc_posix_spawnattr_init)(posix_spawnattr_t *__restrict at
  * @return: 0 : Success */
 INTERN ATTR_SECTION(".text.crt.fs.exec.posix_spawn") NONNULL((1)) errno_t
 NOTHROW_NCX(LIBCCALL libc_posix_spawnattr_destroy)(posix_spawnattr_t *__restrict attr) {
-#ifndef NDEBUG
+#if !defined(NDEBUG) || !defined(NDEBUG_FINI)
 	libc_memset(attr, 0xcc, sizeof(*attr));
-#endif /* !NDEBUG */
+#endif /* !NDEBUG || !NDEBUG_FINI */
 	return 0;
 }
 /* >> posix_spawnattr_setflags(3)
@@ -738,9 +738,9 @@ NOTHROW_NCX(LIBCCALL libc_posix_spawn_file_actions_destroy)(posix_spawn_file_act
 #pragma pop_macro("__used")
 #endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
 #endif /* __CRT_HAVE_free || __CRT_HAVE_cfree */
-#ifndef NDEBUG
+#if !defined(NDEBUG) || !defined(NDEBUG_FINI)
 	libc_memset(file_actions, 0xcc, sizeof(*file_actions));
-#endif /* !NDEBUG */
+#endif /* !NDEBUG || !NDEBUG_FINI */
 	return 0;
 }
 /* Helper functions for allocating an a new file-spawn action entry */

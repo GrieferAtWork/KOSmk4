@@ -55,11 +55,11 @@ DECL_BEGIN
 	((a_end) > (b_start) && (a_start) < (b_end))
 
 
-#ifndef NDEBUG
+#if !defined(NDEBUG) || !defined(NDEBUG_FINI)
 #define DBG_memset memset
-#else /* !NDEBUG */
+#else /* !NDEBUG || !NDEBUG_FINI */
 #define DBG_memset(...) (void)0
-#endif /* NDEBUG */
+#endif /* NDEBUG && NDEBUG_FINI */
 
 
 #ifndef NDEBUG

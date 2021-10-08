@@ -104,22 +104,22 @@ __LOCAL __BOOL __NOTHROW(atomic_rwlock_end)(struct atomic_rwlock *__restrict __s
 #ifndef __INTELLISENSE__
 __LOCAL void __NOTHROW(atomic_rwlock_endwrite)(struct atomic_rwlock *__restrict __self) {
 	__COMPILER_BARRIER();
-#ifdef NDEBUG
+#if defined(NDEBUG) || defined(NDEBUG_SYNC)
 	__hybrid_atomic_store(__self->arw_lock, 0, __ATOMIC_RELEASE);
-#else /* NDEBUG */
+#else /* NDEBUG || NDEBUG_SYNC */
 	__UINTPTR_TYPE__ __f;
 	do {
 		__f = __hybrid_atomic_load(__self->arw_lock, __ATOMIC_ACQUIRE);
 		__hybrid_assertf(__f & __ATOMIC_RWLOCK_WFLAG, "Lock isn't in write-mode (%x)", __f);
 	} while (!__hybrid_atomic_cmpxch_weak(__self->arw_lock, __f, 0, __ATOMIC_RELEASE, __ATOMIC_RELAXED));
-#endif /* !NDEBUG */
+#endif /* !NDEBUG && !NDEBUG_SYNC */
 }
 
 __LOCAL __BOOL __NOTHROW(atomic_rwlock_endread)(struct atomic_rwlock *__restrict __self) {
 	__COMPILER_READ_BARRIER();
-#ifdef NDEBUG
+#if defined(NDEBUG) || defined(NDEBUG_SYNC)
 	return __hybrid_atomic_decfetch(__self->arw_lock, __ATOMIC_RELEASE) == 0;
-#else /* NDEBUG */
+#else /* NDEBUG || NDEBUG_SYNC */
 	__UINTPTR_TYPE__ __f;
 	do {
 		__f = __hybrid_atomic_load(__self->arw_lock, __ATOMIC_ACQUIRE);
@@ -127,7 +127,7 @@ __LOCAL __BOOL __NOTHROW(atomic_rwlock_endread)(struct atomic_rwlock *__restrict
 		__hybrid_assertf(__f != 0, "Lock isn't held by anyone");
 	} while (!__hybrid_atomic_cmpxch_weak(__self->arw_lock, __f, __f - 1, __ATOMIC_RELEASE, __ATOMIC_RELAXED));
 	return __f == 1;
-#endif /* !NDEBUG */
+#endif /* !NDEBUG && !NDEBUG_SYNC */
 }
 
 __LOCAL __BOOL __NOTHROW(atomic_rwlock_end)(struct atomic_rwlock *__restrict __self) {
@@ -233,10 +233,10 @@ __NOTHROW(atomic_rwlock_upgrade_nx)(struct atomic_rwlock *__restrict __self) {
 #endif /* __KERNEL__ && __KOS_VERSION__ >= 400 */
 
 __LOCAL void __NOTHROW(atomic_rwlock_downgrade)(struct atomic_rwlock *__restrict __self) {
-#ifdef NDEBUG
+#if defined(NDEBUG) || defined(NDEBUG_SYNC)
 	__COMPILER_WRITE_BARRIER();
 	__hybrid_atomic_store(__self->arw_lock, 1, __ATOMIC_ACQ_REL);
-#else /* NDEBUG */
+#else /* NDEBUG || NDEBUG_SYNC */
 	__UINTPTR_TYPE__ __f;
 	__COMPILER_WRITE_BARRIER();
 	do {
@@ -244,7 +244,7 @@ __LOCAL void __NOTHROW(atomic_rwlock_downgrade)(struct atomic_rwlock *__restrict
 		__hybrid_assertf(__f == __ATOMIC_RWLOCK_WFLAG, "Lock not in write-mode (%x)", __f);
 	} while (!__hybrid_atomic_cmpxch_weak(__self->arw_lock, __f, 1,
 	                                      __ATOMIC_RELEASE, __ATOMIC_RELAXED));
-#endif /* !NDEBUG */
+#endif /* !NDEBUG && !NDEBUG_SYNC */
 }
 #endif /* !__INTELLISENSE__ */
 

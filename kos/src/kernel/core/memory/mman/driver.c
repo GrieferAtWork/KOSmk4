@@ -109,11 +109,11 @@
 #error "Unsupported sizeof(void *)"
 #endif /* __SIZEOF_POINTER__ != ... */
 
-#ifndef NDEBUG
+#if !defined(NDEBUG) || !defined(NDEBUG_FINI)
 #define DBG_memset memset
-#else /* !NDEBUG */
+#else /* !NDEBUG || !NDEBUG_FINI */
 #define DBG_memset(...) (void)0
-#endif /* NDEBUG */
+#endif /* NDEBUG && NDEBUG_FINI */
 
 /* Max # of section headers accepted for driver modules.
  * A limit must be imposed to prevent malicious programs

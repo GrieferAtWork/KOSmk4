@@ -66,14 +66,14 @@
 
 /* [weak]destroy() */
 #ifndef __PRIVATE_NONATOMIC_REFCNT_IMPL_DESTROY
-#ifdef NDEBUG
+#if defined(NDEBUG) || defined(NDEBUG_REFCNT)
 #define __PRIVATE_NONATOMIC_REFCNT_IMPL_DESTROY(T, function, destroy_, refcnt_field) \
 	destroy_(__self);
-#else /* NDEBUG */
+#else /* NDEBUG || NDEBUG_REFCNT */
 #define __PRIVATE_NONATOMIC_REFCNT_IMPL_DESTROY(T, function, destroy_, refcnt_field) \
 	refcnt_field = 0; /* Satisfy refcnt assertions within `destroy_()' */            \
 	destroy_(__self);
-#endif /* !NDEBUG */
+#endif /* !NDEBUG && !NDEBUG_REFCNT */
 #endif /* !__PRIVATE_NONATOMIC_REFCNT_IMPL_DESTROY */
 
 /* try[weak]incref() */

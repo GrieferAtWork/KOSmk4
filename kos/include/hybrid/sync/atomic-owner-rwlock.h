@@ -155,20 +155,20 @@ __LOCAL __BOOL __NOTHROW(atomic_owner_rwlock_endwrite)(struct atomic_owner_rwloc
 		                 (unsigned long)__f,
 		                 __HYBRID_GETTID_PRINTF_ARG(__hybrid_gettid()),
 		                 __HYBRID_GETTID_PRINTF_ARG(__self->aorw_owner));
-#ifndef NDEBUG
+#if !defined(NDEBUG) && !defined(NDEBUG_SYNC)
 		if (!(__f & __ATOMIC_OWNER_RWLOCK_NMASK))
 			__self->aorw_owner = __HYBRID_GETTID_INVALID;
-#endif /* !NDEBUG */
+#endif /* !NDEBUG && !NDEBUG_SYNC */
 	} while (!__hybrid_atomic_cmpxch_weak(__self->aorw_lock, __f, __f & __ATOMIC_OWNER_RWLOCK_NMASK ? __f - 1 : 0,
 	                                      __ATOMIC_RELEASE, __ATOMIC_RELAXED));
 	return __f & __ATOMIC_OWNER_RWLOCK_NMASK ? 0 : 1; /* Return `true' if the lock was released */
 }
 
 __LOCAL __BOOL __NOTHROW(atomic_owner_rwlock_endread)(struct atomic_owner_rwlock *__restrict __self) {
-#ifdef NDEBUG
+#if defined(NDEBUG) || defined(NDEBUG_SYNC)
 	__COMPILER_READ_BARRIER();
 	return __hybrid_atomic_fetchdec(__self->aorw_lock, __ATOMIC_RELEASE) == 1;
-#else /* NDEBUG */
+#else /* NDEBUG || NDEBUG_SYNC */
 	__UINTPTR_TYPE__ __f;
 	do {
 		__f = __hybrid_atomic_load(__self->aorw_lock, __ATOMIC_ACQUIRE);
@@ -186,7 +186,7 @@ __LOCAL __BOOL __NOTHROW(atomic_owner_rwlock_endread)(struct atomic_owner_rwlock
 	} while (!__hybrid_atomic_cmpxch_weak(__self->aorw_lock, __f, __f - 1,
 	                                      __ATOMIC_RELEASE, __ATOMIC_RELAXED));
 	return __f == 1;
-#endif /* !NDEBUG */
+#endif /* !NDEBUG && !NDEBUG_SYNC */
 }
 
 __LOCAL __BOOL __NOTHROW(atomic_owner_rwlock_end)(struct atomic_owner_rwlock *__restrict __self) {
@@ -197,7 +197,7 @@ __LOCAL __BOOL __NOTHROW(atomic_owner_rwlock_end)(struct atomic_owner_rwlock *__
 		__hybrid_assertf(__f != 0, "Lock isn't held by anyone");
 		__newval = __f - 1;
 		if (__f & __ATOMIC_OWNER_RWLOCK_WFLAG) {
-#ifndef NDEBUG
+#if !defined(NDEBUG) && !defined(NDEBUG_SYNC)
 			__hybrid_assertf(__hybrid_gettid_iscaller(__self->aorw_owner) ||
 			                 __self->aorw_owner == __HYBRID_GETTID_INVALID,
 			                 "Lock is in write-mode (%#lx)\n"
@@ -206,11 +206,11 @@ __LOCAL __BOOL __NOTHROW(atomic_owner_rwlock_end)(struct atomic_owner_rwlock *__
 			                 (unsigned long)__f,
 			                 __HYBRID_GETTID_PRINTF_ARG(__hybrid_gettid()),
 			                 __HYBRID_GETTID_PRINTF_ARG(__self->aorw_owner));
-#endif /* !NDEBUG */
+#endif /* !NDEBUG && !NDEBUG_SYNC */
 			if (!(__f & __ATOMIC_OWNER_RWLOCK_NMASK)) {
-#ifndef NDEBUG
+#if !defined(NDEBUG) && !defined(NDEBUG_SYNC)
 				__self->aorw_owner = __HYBRID_GETTID_INVALID;
-#endif /* !NDEBUG */
+#endif /* !NDEBUG && !NDEBUG_SYNC */
 				__newval = 0;
 			}
 		}
@@ -381,10 +381,10 @@ __NOTHROW(atomic_owner_rwlock_upgrade_nx)(struct atomic_owner_rwlock *__restrict
 
 __LOCAL void
 __NOTHROW(atomic_owner_rwlock_downgrade)(struct atomic_owner_rwlock *__restrict __self) {
-#ifdef NDEBUG
+#if defined(NDEBUG) || defined(NDEBUG_SYNC)
 	__COMPILER_WRITE_BARRIER();
 	ATOMIC_WRITE(__self->aorw_lock, 1);
-#else /* NDEBUG */
+#else /* NDEBUG || NDEBUG_SYNC */
 	__UINTPTR_TYPE__ __f;
 	__COMPILER_WRITE_BARRIER();
 	__hybrid_assertf(__hybrid_gettid_iscaller(__self->aorw_owner),
@@ -411,7 +411,7 @@ __NOTHROW(atomic_owner_rwlock_downgrade)(struct atomic_owner_rwlock *__restrict 
 		                 __HYBRID_GETTID_PRINTF_ARG(__self->aorw_owner));
 	} while (!__hybrid_atomic_cmpxch_weak(__self->aorw_lock, __f, 1,
 	                                      __ATOMIC_RELEASE, __ATOMIC_RELAXED));
-#endif /* !NDEBUG */
+#endif /* !NDEBUG && !NDEBUG_SYNC */
 }
 
 __LOCAL __ATTR_WUNUSED __BOOL

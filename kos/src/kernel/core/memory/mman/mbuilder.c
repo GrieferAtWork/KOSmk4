@@ -73,11 +73,11 @@ STATIC_ASSERT_MSG(offsetof(struct mnode, mn_writable) == offsetof(struct mbnode,
                   "mman, and all of the part<->node links have been set-up.");
 
 
-#ifndef NDEBUG
+#if !defined(NDEBUG) || !defined(NDEBUG_FINI)
 #define DBG_memset memset
-#else /* !NDEBUG */
+#else /* !NDEBUG || !NDEBUG_FINI */
 #define DBG_memset(...) (void)0
-#endif /* NDEBUG */
+#endif /* NDEBUG && NDEBUG_FINI */
 
 #define file_mbnode_destroy(self) \
 	(decref((self)->mbn_file), mbnode_destroy(self))

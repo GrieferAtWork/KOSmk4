@@ -68,10 +68,10 @@ NOBLOCK(FCALL semaphore_trywait)(struct semaphore *__restrict self) {
 /* Acquire a ticked from the given semaphore, or block until `abs_timeout'.
  * @return: true:  Successfully acquired a ticket.
  * @return: false: The given `abs_timeout' has expired. */
-FUNDEF NONNULL((1)) __BOOL FCALL
+FUNDEF NOCONNECT NONNULL((1)) __BOOL FCALL
 semaphore_wait(struct semaphore *__restrict self,
                ktime_t abs_timeout DFL(KTIME_INFINITE))
-		THROWS(E_BADALLOC, E_WOULDBLOCK);
+		THROWS(E_WOULDBLOCK);
 
 
 /* Acquire a ticked from the given semaphore, or block until `abs_timeout'.
@@ -79,7 +79,7 @@ semaphore_wait(struct semaphore *__restrict self,
  * @return: false: The given `abs_timeout' has expired.
  * @return: false: Preemption was disabled, and the operation would have blocked.
  * @return: false: There are pending X-RPCs that could not be serviced. */
-FUNDEF WUNUSED NONNULL((1)) __BOOL
+FUNDEF NOCONNECT WUNUSED NONNULL((1)) __BOOL
 NOTHROW(FCALL semaphore_wait_nx)(struct semaphore *__restrict self,
                                  ktime_t abs_timeout DFL(KTIME_INFINITE));
 
@@ -90,6 +90,7 @@ NOTHROW(FCALL semaphore_wait_nx)(struct semaphore *__restrict self,
 LOCAL NOBLOCK NONNULL((1)) __BOOL
 NOTHROW(FCALL semaphore_post)(struct semaphore *__restrict self) {
 	__hybrid_atomic_inc(self->s_count, __ATOMIC_SEQ_CST);
+
 	/* Wake up exactly one thread for every ticket added. */
 	return sig_send(&self->s_avail);
 }
