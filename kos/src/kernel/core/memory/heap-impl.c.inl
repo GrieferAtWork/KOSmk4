@@ -98,24 +98,25 @@ NOTHROW_NX(KCALL FUNC(core_page_alloc))(struct heap *__restrict self,
 
 
 
-PUBLIC WUNUSED NONNULL((1)) struct heapptr
+PUBLIC WUNUSED NONNULL((1)) heapptr_t
 NOTHROW_NX(KCALL FUNC(heap_alloc_untraced))(struct heap *__restrict self,
                                             size_t num_bytes, gfp_t flags) {
-	struct heapptr result;
+	void *result_ptr;
+	size_t result_siz;
 	struct mfree_list *iter, *end;
 	heap_validate_all_paranoid();
 	TRACE(PP_STR(FUNC(heap_alloc_untraced)) "(%p, %" PRIuSIZ ", %#x)\n", self, num_bytes, flags);
-	if unlikely(OVERFLOW_UADD(num_bytes, (size_t)(HEAP_ALIGNMENT - 1), &result.hp_siz))
+	if unlikely(OVERFLOW_UADD(num_bytes, (size_t)(HEAP_ALIGNMENT - 1), &result_siz))
 		IFELSE_NX(goto err, THROW(E_BADALLOC_INSUFFICIENT_HEAP_MEMORY, num_bytes));
-	result.hp_siz &= ~(HEAP_ALIGNMENT - 1);
-	if unlikely(result.hp_siz < HEAP_MINSIZE)
-		result.hp_siz = HEAP_MINSIZE;
-	iter = &self->h_size[HEAP_BUCKET_OF(result.hp_siz)];
+	result_siz &= ~(HEAP_ALIGNMENT - 1);
+	if unlikely(result_siz < HEAP_MINSIZE)
+		result_siz = HEAP_MINSIZE;
+	iter = &self->h_size[HEAP_BUCKET_OF(result_siz)];
 	end  = COMPILER_ENDOF(self->h_size);
 	HEAP_ASSERTF(iter >= self->h_size &&
 	             iter < COMPILER_ENDOF(self->h_size),
 	             "HEAP_BUCKET_OF(%" PRIuSIZ ") = %" PRIuSIZ "/%" PRIuSIZ,
-	             result.hp_siz, HEAP_BUCKET_OF(result.hp_siz),
+	             result_siz, HEAP_BUCKET_OF(result_siz),
 	             COMPILER_LENOF(self->h_size));
 search_heap:
 	if (!FUNC(heap_acquirelock)(self, flags))
@@ -133,7 +134,7 @@ search_heap:
 			HEAP_ASSERTF(IS_ALIGNED(MFREE_SIZE(chain), HEAP_ALIGNMENT),
 			             "MFREE_SIZE(chain) = %#" PRIxSIZ "\n",
 			             MFREE_SIZE(chain));
-			if (MFREE_SIZE(chain) >= result.hp_siz)
+			if (MFREE_SIZE(chain) >= result_siz)
 				break;
 			chain = LIST_NEXT(chain, mf_lsize);
 		}
@@ -143,24 +144,24 @@ search_heap:
 		LIST_REMOVE(chain, mf_lsize);
 #ifdef CONFIG_HEAP_TRACE_DANGLE
 		/* Track the potentially unused data size as dangling data. */
-		dangle_size = MFREE_SIZE(chain) - result.hp_siz;
+		dangle_size = MFREE_SIZE(chain) - result_siz;
 		HEAP_ADD_DANGLE(self, dangle_size);
 #endif /* CONFIG_HEAP_TRACE_DANGLE */
 		sync_endwrite(&self->h_lock);
 		HEAP_ASSERT(IS_ALIGNED(dangle_size, HEAP_ALIGNMENT));
 		/* We've got the memory! */
-		result.hp_ptr = (void *)chain;
-		chain_flags   = chain->mf_flags;
+		result_ptr  = (void *)chain;
+		chain_flags = chain->mf_flags;
 #ifdef CONFIG_HEAP_TRACE_DANGLE
 		unused_size = dangle_size;
 #else /* CONFIG_HEAP_TRACE_DANGLE */
-		unused_size = MFREE_SIZE(chain) - result.hp_siz;
+		unused_size = MFREE_SIZE(chain) - result_siz;
 #endif /* !CONFIG_HEAP_TRACE_DANGLE */
 		if (unused_size < HEAP_MINSIZE) {
 			/* Remainder is too small. - Allocate it as well. */
-			result.hp_siz += unused_size;
+			result_siz += unused_size;
 		} else {
-			void *unused_begin = (void *)((uintptr_t)chain + result.hp_siz);
+			void *unused_begin = (void *)((uintptr_t)chain + result_siz);
 			/* Free the unused portion. */
 #ifdef CONFIG_HEAP_RANDOMIZE_OFFSETS
 			/* Randomize allocated memory by shifting the
@@ -170,7 +171,7 @@ search_heap:
 			random_offset &= ~(HEAP_ALIGNMENT - 1);
 			if (random_offset >= HEAP_MINSIZE) {
 				/* Set the new resulting pointer. */
-				result.hp_ptr = (void *)((uintptr_t)chain + random_offset);
+				result_ptr = (void *)((uintptr_t)chain + random_offset);
 				/* Rather than allocating `chain...+=num_bytes', instead
 				 * allocate `chain+random_offset...+=num_bytes' and free
 				 * `chain...+=random_offset' and
@@ -189,9 +190,9 @@ search_heap:
 				                          (flags & ~(GFP_CALLOC)) | chain_flags);
 				unused_size -= random_offset;
 				if (unused_size < HEAP_MINSIZE) {
-					result.hp_siz += unused_size;
+					result_siz += unused_size;
 				} else {
-					unused_begin = (void *)((uintptr_t)result.hp_ptr + result.hp_siz);
+					unused_begin = (void *)((uintptr_t)result_ptr + result_siz);
 					heap_free_overallocation(self,
 					                         unused_begin,
 					                         unused_size,
@@ -215,27 +216,27 @@ search_heap:
 		/* Initialize the result memory. */
 		if (flags & GFP_CALLOC) {
 			if (chain_flags & MFREE_FZERO)
-				memset(result.hp_ptr, 0, SIZEOF_MFREE);
+				memset(result_ptr, 0, SIZEOF_MFREE);
 			else {
-				memset(result.hp_ptr, 0, result.hp_siz);
+				memset(result_ptr, 0, result_siz);
 			}
 		}
 #ifdef CONFIG_DEBUG_HEAP
 		else {
-			reset_heap_data((byte_t *)result.hp_ptr,
+			reset_heap_data((byte_t *)result_ptr,
 			                DEBUGHEAP_FRESH_MEMORY,
-			                result.hp_siz);
+			                result_siz);
 		}
 #endif /* CONFIG_DEBUG_HEAP */
-		HEAP_ASSERT(IS_ALIGNED((uintptr_t)result.hp_ptr, HEAP_ALIGNMENT));
-		HEAP_ASSERT(IS_ALIGNED((uintptr_t)result.hp_siz, HEAP_ALIGNMENT));
-		HEAP_ASSERT(result.hp_siz >= HEAP_MINSIZE);
+		HEAP_ASSERT(IS_ALIGNED((uintptr_t)result_ptr, HEAP_ALIGNMENT));
+		HEAP_ASSERT(IS_ALIGNED((uintptr_t)result_siz, HEAP_ALIGNMENT));
+		HEAP_ASSERT(result_siz >= HEAP_MINSIZE);
 		heap_validate_all_paranoid();
-		return result;
+		return heapptr_make(result_ptr, result_siz);
 	}
 #ifdef CONFIG_HEAP_TRACE_DANGLE
 	/* Check for dangling data and don't allocate new memory if enough exists. */
-	if (ATOMIC_READ(self->h_dangle) >= result.hp_siz) {
+	if (ATOMIC_READ(self->h_dangle) >= result_siz) {
 		sync_endwrite(&self->h_lock);
 		/* Let some other thread about to release dangling
 		 * data   do  so,  then  search  the  heap  again. */
@@ -275,8 +276,8 @@ search_heap:
 	{
 		void *pageaddr;
 		size_t page_bytes, unused_size;
-		if unlikely(OVERFLOW_UADD(result.hp_siz, (size_t)(PAGESIZE - 1), &page_bytes))
-			IFELSE_NX(goto err, THROW(E_BADALLOC_INSUFFICIENT_HEAP_MEMORY, result.hp_siz));
+		if unlikely(OVERFLOW_UADD(result_siz, (size_t)(PAGESIZE - 1), &page_bytes))
+			IFELSE_NX(goto err, THROW(E_BADALLOC_INSUFFICIENT_HEAP_MEMORY, result_siz));
 		if (!(flags & GFP_NOOVER)) {
 			/* Add overhead for overallocation. */
 			if unlikely(OVERFLOW_UADD(page_bytes, self->h_overalloc, &page_bytes))
@@ -291,7 +292,7 @@ search_heap:
 		if unlikely(pageaddr == CORE_PAGE_MALLOC_ERROR) {
 allocate_without_overalloc:
 			/* Try again without overallocation. */
-			page_bytes = CEIL_ALIGN(result.hp_siz, PAGESIZE);
+			page_bytes = CEIL_ALIGN(result_siz, PAGESIZE);
 			pageaddr = FUNC(core_page_alloc)(self,
 			                                 CORE_PAGE_MALLOC_AUTO,
 			                                 page_bytes,
@@ -306,12 +307,12 @@ allocate_without_overalloc:
 		                         pageaddr,
 		                         (byte_t *)pageaddr + page_bytes - 1);
 		/* Got it! */
-		result.hp_ptr = pageaddr;
-		unused_size   = page_bytes - result.hp_siz;
+		result_ptr = pageaddr;
+		unused_size   = page_bytes - result_siz;
 		if unlikely(unused_size < HEAP_MINSIZE)
-			result.hp_siz = page_bytes;
+			result_siz = page_bytes;
 		else {
-			void *unused_begin = (void *)((uintptr_t)result.hp_ptr + result.hp_siz);
+			void *unused_begin = (void *)((uintptr_t)result_ptr + result_siz);
 			/* Free unused size. */
 			HEAP_ASSERT(IS_ALIGNED(unused_size, HEAP_ALIGNMENT));
 			HEAP_ASSERT(IS_ALIGNED((uintptr_t)unused_begin, HEAP_ALIGNMENT));
@@ -363,16 +364,14 @@ allocate_without_overalloc:
 			heap_free_raw(self, unused_begin, unused_size, flags);
 		}
 	}
-	HEAP_ASSERT(IS_ALIGNED((uintptr_t)result.hp_ptr, HEAP_ALIGNMENT));
-	HEAP_ASSERT(IS_ALIGNED((uintptr_t)result.hp_siz, HEAP_ALIGNMENT));
-	HEAP_ASSERT(result.hp_siz >= HEAP_MINSIZE);
+	HEAP_ASSERT(IS_ALIGNED((uintptr_t)result_ptr, HEAP_ALIGNMENT));
+	HEAP_ASSERT(IS_ALIGNED((uintptr_t)result_siz, HEAP_ALIGNMENT));
+	HEAP_ASSERT(result_siz >= HEAP_MINSIZE);
 	heap_validate_all_paranoid();
-	return result;
+	return heapptr_make(result_ptr, result_siz);
 #ifdef HEAP_NX
 err:
-	result.hp_ptr = NULL;
-	result.hp_siz = 0;
-	return result;
+	return heapptr_make(NULL, 0);
 #endif /* HEAP_NX */
 }
 
@@ -571,11 +570,13 @@ err:
 }
 
 
-PUBLIC WUNUSED NONNULL((1)) struct heapptr
+PUBLIC WUNUSED NONNULL((1)) heapptr_t
 NOTHROW_NX(KCALL FUNC(heap_align_untraced))(struct heap *__restrict self,
                                             size_t min_alignment, ptrdiff_t offset,
                                             size_t num_bytes, gfp_t flags) {
-	struct heapptr result_base, result;
+	heapptr_t result_base;
+	void *result_ptr;
+	size_t result_siz;
 	size_t nouse_size, alloc_bytes;
 	size_t heap_alloc_bytes;
 	assert(min_alignment != 0);
@@ -658,13 +659,13 @@ NOTHROW_NX(KCALL FUNC(heap_align_untraced))(struct heap *__restrict self,
 			HEAP_ASSERT(IS_ALIGNED((uintptr_t)(alignment_base + offset), min_alignment));
 
 			/* All right! we can actually use this one! */
-			result.hp_ptr = (VIRT void *)alignment_base;
-			result.hp_siz = alloc_bytes;
+			result_ptr = (VIRT void *)alignment_base;
+			result_siz = alloc_bytes;
 			/* Figure out how much memory should be re-freed at the front and back. */
 			chain_flags = chain->mf_flags;
 			hkeep       = (void *)chain;
 			hkeep_size  = (size_t)(alignment_base - (byte_t *)chain);
-			tkeep       = (void *)((uintptr_t)result.hp_ptr + alloc_bytes);
+			tkeep       = (void *)((uintptr_t)result_ptr + alloc_bytes);
 			tkeep_size  = (size_t)(MFREE_END(chain) - (uintptr_t)tkeep);
 #ifdef CONFIG_HEAP_RANDOMIZE_OFFSETS
 			if (tkeep_size > min_alignment) {
@@ -680,7 +681,7 @@ NOTHROW_NX(KCALL FUNC(heap_align_untraced))(struct heap *__restrict self,
 					hkeep_size += random_offset;
 					tkeep_size -= random_offset;
 					tkeep         = (byte_t *)tkeep + random_offset;
-					result.hp_ptr = (byte_t *)result.hp_ptr + random_offset;
+					result_ptr = (byte_t *)result_ptr + random_offset;
 				}
 			}
 #endif /* CONFIG_HEAP_RANDOMIZE_OFFSETS */
@@ -703,11 +704,11 @@ NOTHROW_NX(KCALL FUNC(heap_align_untraced))(struct heap *__restrict self,
 			if (tkeep_size < HEAP_MINSIZE) {
 				/* The tail is too small (or non-existent).
 				 * -> We must allocate it, too. */
-				result.hp_siz += tkeep_size;
+				result_siz += tkeep_size;
 			} else {
 				/* Free the tail pointer. */
 				HEAP_ASSERT((byte_t *)tkeep ==
-				            (byte_t *)result.hp_ptr + result.hp_siz);
+				            (byte_t *)result_ptr + result_siz);
 				heap_free_overallocation(self,
 				                         tkeep,
 				                         tkeep_size,
@@ -721,32 +722,32 @@ NOTHROW_NX(KCALL FUNC(heap_align_untraced))(struct heap *__restrict self,
 			/* Initialize the resulting memory. */
 			if (flags & GFP_CALLOC) {
 				if (chain_flags & MFREE_FZERO)
-					memset(result.hp_ptr, 0, SIZEOF_MFREE);
+					memset(result_ptr, 0, SIZEOF_MFREE);
 				else {
-					memset(result.hp_ptr, 0, result.hp_siz);
+					memset(result_ptr, 0, result_siz);
 				}
 			}
 #ifdef CONFIG_DEBUG_HEAP
 			else {
-				reset_heap_data((byte_t *)result.hp_ptr,
+				reset_heap_data((byte_t *)result_ptr,
 				                DEBUGHEAP_FRESH_MEMORY,
-				                result.hp_siz);
+				                result_siz);
 			}
 #endif /* CONFIG_DEBUG_HEAP */
-			HEAP_ASSERT(IS_ALIGNED((uintptr_t)result.hp_ptr, HEAP_ALIGNMENT));
-			HEAP_ASSERTF(IS_ALIGNED((uintptr_t)result.hp_ptr + offset, min_alignment),
-			             "result.hp_ptr          = %p\n"
-			             "result.hp_ptr + offset = %p\n"
+			HEAP_ASSERT(IS_ALIGNED((uintptr_t)result_ptr, HEAP_ALIGNMENT));
+			HEAP_ASSERTF(IS_ALIGNED((uintptr_t)result_ptr + offset, min_alignment),
+			             "result_ptr          = %p\n"
+			             "result_ptr + offset = %p\n"
 			             "offset                 = %p\n"
 			             "min_alignment          = %p\n",
-			             (uintptr_t)result.hp_ptr,
-			             (uintptr_t)result.hp_ptr + offset,
+			             (uintptr_t)result_ptr,
+			             (uintptr_t)result_ptr + offset,
 			             (uintptr_t)offset,
 			             (uintptr_t)min_alignment);
-			HEAP_ASSERT(IS_ALIGNED((uintptr_t)result.hp_siz, HEAP_ALIGNMENT));
-			HEAP_ASSERT(result.hp_siz >= HEAP_MINSIZE);
+			HEAP_ASSERT(IS_ALIGNED((uintptr_t)result_siz, HEAP_ALIGNMENT));
+			HEAP_ASSERT(result_siz >= HEAP_MINSIZE);
 			heap_validate_all_paranoid();
-			return result;
+			return heapptr_make(result_ptr, result_siz);
 		}
 		sync_endwrite(&self->h_lock);
 	}
@@ -760,15 +761,15 @@ NOTHROW_NX(KCALL FUNC(heap_align_untraced))(struct heap *__restrict self,
 	if unlikely(OVERFLOW_UADD(heap_alloc_bytes, HEAP_MINSIZE, &heap_alloc_bytes))
 		IFELSE_NX(goto err, THROW(E_BADALLOC_INSUFFICIENT_HEAP_MEMORY, heap_alloc_bytes));
 	result_base = FUNC(heap_alloc_untraced)(self, heap_alloc_bytes, flags);
-	HEAP_ASSERT(result_base.hp_siz >= heap_alloc_bytes);
-	result.hp_ptr = (void *)(CEIL_ALIGN((uintptr_t)result_base.hp_ptr +
-	                                    HEAP_MINSIZE + offset,
-	                                    min_alignment) -
-	                         offset);
-	HEAP_ASSERT((uintptr_t)result.hp_ptr + alloc_bytes <=
-	            (uintptr_t)result_base.hp_ptr + result_base.hp_siz);
-	nouse_size = (uintptr_t)result.hp_ptr - (uintptr_t)result_base.hp_ptr;
-	HEAP_ASSERT(nouse_size + alloc_bytes <= result_base.hp_siz);
+	HEAP_ASSERT(heapptr_getsiz(result_base) >= heap_alloc_bytes);
+	result_ptr = (void *)(CEIL_ALIGN((uintptr_t)heapptr_getptr(result_base) +
+	                                 HEAP_MINSIZE + offset,
+	                                 min_alignment) -
+	                      offset);
+	HEAP_ASSERT((byte_t *)result_ptr + alloc_bytes <=
+	            (byte_t *)heapptr_getptr(result_base) + heapptr_getsiz(result_base));
+	nouse_size = (byte_t *)result_ptr - (byte_t *)heapptr_getptr(result_base);
+	HEAP_ASSERT(nouse_size + alloc_bytes <= heapptr_getsiz(result_base));
 	HEAP_ASSERTF(nouse_size >= HEAP_MINSIZE, "nouse_size = %" PRIuSIZ, nouse_size);
 	HEAP_ASSERTF(IS_ALIGNED(nouse_size, HEAP_ALIGNMENT),
 	             "Invalid offset (%" PRIdSIZ ") / alignment (%" PRIuSIZ ")\n"
@@ -776,41 +777,35 @@ NOTHROW_NX(KCALL FUNC(heap_align_untraced))(struct heap *__restrict self,
 	             offset, min_alignment, nouse_size);
 
 	/* Release lower memory (This _MUST_ work because we've overallocated by `HEAP_MINSIZE'). */
-	heap_free_untraced(self, result_base.hp_ptr, nouse_size, flags);
-	result_base.hp_siz -= nouse_size;
-	HEAP_ASSERT(result_base.hp_siz >= HEAP_MINSIZE);
+	heap_free_untraced(self, heapptr_getptr(result_base), nouse_size, flags);
+	result_siz = heapptr_getsiz(result_base) - nouse_size;
 
 	/* Try to release upper memory. */
-	HEAP_ASSERT(result_base.hp_siz >= alloc_bytes);
-	nouse_size = result_base.hp_siz - alloc_bytes;
+	nouse_size = result_siz - alloc_bytes;
 	if (nouse_size >= HEAP_MINSIZE) {
 		heap_free_untraced(self,
-		                   (void *)((uintptr_t)result.hp_ptr + alloc_bytes),
+		                   (void *)((uintptr_t)result_ptr + alloc_bytes),
 		                   nouse_size, flags);
-		result_base.hp_siz -= nouse_size;
+		result_siz -= nouse_size;
 	}
-	HEAP_ASSERT(result_base.hp_siz >= alloc_bytes);
-	HEAP_ASSERT(IS_ALIGNED((uintptr_t)result.hp_ptr + offset, min_alignment));
-	result.hp_siz = result_base.hp_siz;
-	HEAP_ASSERT(IS_ALIGNED((uintptr_t)result.hp_siz, HEAP_ALIGNMENT));
-	HEAP_ASSERT(result.hp_siz >= HEAP_MINSIZE);
+	HEAP_ASSERT(result_siz >= alloc_bytes);
+	HEAP_ASSERT(result_siz >= HEAP_MINSIZE);
+	HEAP_ASSERT(IS_ALIGNED((uintptr_t)result_ptr + offset, min_alignment));
+	HEAP_ASSERT(IS_ALIGNED((uintptr_t)result_siz, HEAP_ALIGNMENT));
 	heap_validate_all_paranoid();
-	return result;
+	return heapptr_make(result_ptr, result_siz);
 #ifdef HEAP_NX
 err:
-	result.hp_ptr = NULL;
-	result.hp_siz = 0;
-	return result;
+	return heapptr_make(NULL, 0);
 #endif /* HEAP_NX */
 }
 
 
-PUBLIC WUNUSED NONNULL((1)) struct heapptr
+PUBLIC WUNUSED NONNULL((1)) heapptr_t
 NOTHROW_NX(KCALL FUNC(heap_realloc_untraced))(struct heap *__restrict self,
                                               VIRT void *old_ptr, size_t old_bytes,
                                               size_t new_bytes, gfp_t alloc_flags,
                                               gfp_t free_flags) {
-	struct heapptr result;
 	size_t missing_bytes;
 	assert(IS_ALIGNED(old_bytes, HEAP_ALIGNMENT));
 	assert(!old_bytes || IS_ALIGNED((uintptr_t)old_ptr, HEAP_ALIGNMENT));
@@ -826,8 +821,6 @@ NOTHROW_NX(KCALL FUNC(heap_realloc_untraced))(struct heap *__restrict self,
 	new_bytes &= ~(HEAP_ALIGNMENT - 1);
 	if unlikely(new_bytes < HEAP_MINSIZE)
 		new_bytes = HEAP_MINSIZE;
-	result.hp_ptr = old_ptr;
-	result.hp_siz = old_bytes;
 	if (new_bytes <= old_bytes) {
 		size_t free_bytes;
 		/* Free trailing memory. */
@@ -835,55 +828,40 @@ NOTHROW_NX(KCALL FUNC(heap_realloc_untraced))(struct heap *__restrict self,
 		if (free_bytes >= HEAP_MINSIZE) {
 			heap_free_untraced(self, (void *)((uintptr_t)old_ptr + new_bytes),
 			                   free_bytes, free_flags);
-			result.hp_siz = new_bytes;
+			old_bytes = new_bytes;
 		}
-		return result;
+		return heapptr_make(old_ptr, old_bytes);
 	}
 	missing_bytes = new_bytes - old_bytes;
 	missing_bytes = FUNC(heap_allat_untraced)(self, (void *)((uintptr_t)old_ptr + old_bytes),
 	                                          missing_bytes, alloc_flags);
 	if (missing_bytes) {
 		/* Managed to extend the data block. */
-		result.hp_siz += missing_bytes;
-		return result;
+		return heapptr_make(old_ptr, old_bytes + missing_bytes);
 	}
 	if (alloc_flags & GFP_NOMOVE)
 		goto err;
-	/* Must allocate an entirely new data block and copy memory to it. */
-	result = FUNC(heap_alloc_untraced)(self, new_bytes, alloc_flags);
-	IFELSE_NX(if (result.hp_siz == 0) goto err;, )
-#if 1
-	memcpy(result.hp_ptr, old_ptr, old_bytes);
-#else
-	TRY {
-		/* The try block is here because of the possibility of a LOA failure.
-		 * NO! This mustn't be something I should worry about -- Make it so
-		 *     that heap memory mapped by the kernel is able to reserve its
-		 *     physical memory! */
-		memcpy(result.hp_ptr, old_ptr, old_bytes);
-	} EXCEPT {
-		heap_free_untraced(self, result.hp_ptr, result.hp_siz,
-		                   alloc_flags & ~GFP_CALLOC);
-		RETHROW();
+	{
+		heapptr_t result;
+		/* Must allocate an entirely new data block and copy memory to it. */
+		result = FUNC(heap_alloc_untraced)(self, new_bytes, alloc_flags);
+		IFELSE_NX(if (heapptr_getsiz(result) == 0) goto err;, )
+		memcpy(heapptr_getptr(result), old_ptr, old_bytes);
+		/* Free the old data block. */
+		heap_free_untraced(self, old_ptr, old_bytes,
+		                   free_flags & ~GFP_CALLOC);
+		return result;
 	}
-#endif
-	/* Free the old data block. */
-	heap_free_untraced(self, old_ptr, old_bytes,
-	                   free_flags & ~GFP_CALLOC);
-	return result;
 err:
-	result.hp_ptr = NULL;
-	result.hp_siz = 0;
-	return result;
+	return heapptr_make(NULL, 0);
 }
 
-PUBLIC WUNUSED NONNULL((1)) struct heapptr
+PUBLIC WUNUSED NONNULL((1)) heapptr_t
 NOTHROW_NX(KCALL FUNC(heap_realign_untraced))(struct heap *__restrict self,
                                               VIRT void *old_ptr, size_t old_bytes,
                                               size_t min_alignment, ptrdiff_t offset,
                                               size_t new_bytes, gfp_t alloc_flags,
                                               gfp_t free_flags) {
-	struct heapptr result;
 	size_t missing_bytes;
 	assert(IS_ALIGNED(old_bytes, HEAP_ALIGNMENT));
 	assert(!old_bytes || IS_ALIGNED((uintptr_t)old_ptr, HEAP_ALIGNMENT));
@@ -897,8 +875,6 @@ NOTHROW_NX(KCALL FUNC(heap_realign_untraced))(struct heap *__restrict self,
 	if unlikely(OVERFLOW_UADD(new_bytes, (size_t)(HEAP_ALIGNMENT - 1), &new_bytes))
 		IFELSE_NX(goto err, THROW(E_BADALLOC_INSUFFICIENT_HEAP_MEMORY, new_bytes - (HEAP_ALIGNMENT - 1)));
 	new_bytes &= ~(HEAP_ALIGNMENT - 1);
-	result.hp_ptr = old_ptr;
-	result.hp_siz = old_bytes;
 	if (new_bytes <= old_bytes) {
 		size_t free_bytes;
 		if unlikely(new_bytes < HEAP_MINSIZE)
@@ -908,50 +884,33 @@ NOTHROW_NX(KCALL FUNC(heap_realign_untraced))(struct heap *__restrict self,
 		if (free_bytes >= HEAP_MINSIZE) {
 			heap_free(self, (void *)((uintptr_t)old_ptr + new_bytes),
 			          free_bytes, free_flags);
-			result.hp_siz = new_bytes;
+			old_bytes = new_bytes;
 		}
-		return result;
+		return heapptr_make(old_ptr, old_bytes);
 	}
 	missing_bytes = new_bytes - old_bytes;
 	missing_bytes = FUNC(heap_allat_untraced)(self, (void *)((uintptr_t)old_ptr + old_bytes),
 	                                          missing_bytes, alloc_flags);
 	if (missing_bytes) {
 		/* Managed to extend the data block. */
-		result.hp_siz += missing_bytes;
-		return result;
+		return heapptr_make(old_ptr, old_bytes + missing_bytes);
 	}
 	if (alloc_flags & GFP_NOMOVE)
 		goto err;
-	/* Must allocate an entirely new data block and copy memory to it. */
-	result = FUNC(heap_align_untraced)(self,
-	                                   min_alignment,
-	                                   offset,
-	                                   new_bytes,
-	                                   alloc_flags);
-	IFELSE_NX(if (result.hp_siz == 0) goto err;, )
-#if 1
-	memcpy(result.hp_ptr, old_ptr, old_bytes);
-#else
-	TRY {
-		/* The try block is here because of the possibility of a LOA failure.
-		 * NO! This mustn't be something I should worry about -- Make it so
-		 *     that heap memory mapped by the kernel is able to reserve its
-		 *     physical memory! */
-		memcpy(result.hp_ptr, old_ptr, old_bytes);
-	} EXCEPT {
-		heap_free_untraced(self, result.hp_ptr, result.hp_siz,
-		                   alloc_flags & ~GFP_CALLOC);
-		RETHROW();
+	{
+		heapptr_t result;
+		/* Must allocate an entirely new data block and copy memory to it. */
+		result = FUNC(heap_align_untraced)(self, min_alignment, offset,
+		                                   new_bytes, alloc_flags);
+		IFELSE_NX(if (heapptr_getsiz(result) == 0) goto err;, )
+		memcpy(heapptr_getptr(result), old_ptr, old_bytes);
+		/* Free the old data block. */
+		heap_free_untraced(self, old_ptr, old_bytes,
+		                   free_flags & ~GFP_CALLOC);
+		return result;
 	}
-#endif
-	/* Free the old data block. */
-	heap_free_untraced(self, old_ptr, old_bytes,
-	                   free_flags & ~GFP_CALLOC);
-	return result;
 err:
-	result.hp_ptr = NULL;
-	result.hp_siz = 0;
-	return result;
+	return heapptr_make(NULL, 0);
 }
 
 

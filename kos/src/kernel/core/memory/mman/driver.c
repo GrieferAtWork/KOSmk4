@@ -2559,17 +2559,17 @@ NOTHROW(FCALL driver_findfde)(struct driver *__restrict self, void const *absolu
 	 * cache for writing would most likely block. */
 	if likely(status == UNWIND_SUCCESS && !kernel_poisoned() &&
 	          atomic_rwlock_canwrite(&self->d_eh_frame_cache_lock)) {
-		struct heapptr cp;
+		heapptr_t cp;
 		assert(absolute_pc >= result->f_pcstart);
 		assert(absolute_pc < result->f_pcend);
 		cp = heap_alloc_untraced_nx(&kernel_locked_heap,
 		                            sizeof(struct driver_fde_cache),
 		                            GFP_ATOMIC | GFP_LOCKED | GFP_PREFLT);
-		if (cp.hp_siz != 0) {
+		if (heapptr_getsiz(cp) != 0) {
 			struct driver_fde_cache *cache;
-			cache = (struct driver_fde_cache *)cp.hp_ptr;
+			cache = (struct driver_fde_cache *)heapptr_getptr(cp);
 			memcpy(&cache->dfc_fde, result, sizeof(unwind_fde_t));
-			cache->dfc_heapsz = cp.hp_siz;
+			cache->dfc_heapsz = heapptr_getsiz(cp);
 			if likely(atomic_rwlock_trywrite(&self->d_eh_frame_cache_lock)) {
 				bool ok;
 				/* Try to insert the entry into the cache. */
@@ -2580,7 +2580,7 @@ NOTHROW(FCALL driver_findfde)(struct driver *__restrict self, void const *absolu
 			} else {
 cannot_cache:
 				heap_free_untraced(&kernel_locked_heap,
-				                   cp.hp_ptr, cp.hp_siz,
+				                   heapptr_getptr(cp), heapptr_getsiz(cp),
 				                   GFP_LOCKED);
 			}
 		}

@@ -57,10 +57,10 @@ DECL_BEGIN
 
 
 #ifdef __KERNEL__
-typedef struct heapptr heapptr_t;
-#define HEAPPTR_ISOK(self) ((self).hp_siz != 0)
-#define HEAPPTR_BASE(self) ((self).hp_ptr)
-#define HEAPPTR_SIZE(self) ((self).hp_siz)
+typedef heapptr_t heapptr_t;
+#define HEAPPTR_ISOK(self) (heapptr_getsiz(self) != 0)
+#define HEAPPTR_BASE       heapptr_getptr
+#define HEAPPTR_SIZE       heapptr_getsiz
 #define HEAP_MALLOC_UNX(num_bytes) \
 	heap_alloc(&kernel_default_heap, num_bytes, GFP_NORMAL)
 #define HEAP_REALLOC_UNX(oldptr, oldsiz, newsiz) \
@@ -69,10 +69,9 @@ typedef struct heapptr heapptr_t;
 	heap_alloc_nx(&kernel_default_heap, num_bytes, GFP_ATOMIC)
 #define HEAP_NONBLOCK_REALLOC_NX(oldptr, oldsiz, newsiz) \
 	heap_realloc_nx(&kernel_default_heap, oldptr, oldsiz, newsiz, GFP_ATOMIC, GFP_ATOMIC)
-#define HEAP_NONBLOCK_REALLOC_IN_PLACE_NX(oldptr, oldsiz, newsiz)      \
-	(heap_realloc_nx(&kernel_default_heap, oldptr, oldsiz, newsiz,     \
-	                 GFP_ATOMIC | GFP_NOMOVE, GFP_ATOMIC | GFP_NOMOVE) \
-	 .hp_siz)
+#define HEAP_NONBLOCK_REALLOC_IN_PLACE_NX(oldptr, oldsiz, newsiz)                \
+	heapptr_getsiz(heap_realloc_nx(&kernel_default_heap, oldptr, oldsiz, newsiz, \
+	                               GFP_ATOMIC | GFP_NOMOVE, GFP_ATOMIC | GFP_NOMOVE))
 #define HEAP_NONBLOCK_TRUNCATE_IN_PLACE_NX HEAP_NONBLOCK_REALLOC_IN_PLACE_NX
 #else /* __KERNEL__ */
 typedef void *heapptr_t;

@@ -730,11 +730,6 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	/* TODO: Look into how  best to protect  from "over-long" utf-8  encodings
 	 *       when it comes to our implementation of functions from <unicode.h> */
 
-	/* TODO: Kernel functions that return `struct heapptr' should be altered
-	 *       to use the same return-through-register  trick as is also  used
-	 *       in  `/kos/src/libservice/com.h'  for  `service_buf_t',  as   it
-	 *       allows GCC to make better use of registers! */
-
 	/* TODO: Change `format_escape()' to include explicit configuration options
 	 *       for  data being UTF-8 or raw bytes, with the default configuration
 	 *       being to determine automatically (that is: assume utf-8 unless the

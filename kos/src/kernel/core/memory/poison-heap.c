@@ -478,14 +478,14 @@ phcore_realign(void *ptr,
 /************************************************************************/
 /* EXPOSED API PROTOTYPES                                               */
 /************************************************************************/
-INTDEF struct heapptr KCALL ph_heap_alloc(struct heap *self, size_t num_bytes, gfp_t flags);
-INTDEF struct heapptr KCALL ph_heap_align(struct heap *self, size_t min_alignment, ptrdiff_t offset, size_t num_bytes, gfp_t flags);
-INTDEF struct heapptr KCALL ph_heap_realloc(struct heap *self, void *old_ptr, size_t old_bytes, size_t new_bytes, gfp_t alloc_flags, gfp_t free_flags);
-INTDEF struct heapptr KCALL ph_heap_realign(struct heap *self, void *old_ptr, size_t old_bytes, size_t min_alignment, ptrdiff_t offset, size_t new_bytes, gfp_t alloc_flags, gfp_t free_flags);
-INTDEF struct heapptr NOTHROW(KCALL ph_heap_alloc_nx)(struct heap *self, size_t num_bytes, gfp_t flags);
-INTDEF struct heapptr NOTHROW(KCALL ph_heap_align_nx)(struct heap *self, size_t min_alignment, ptrdiff_t offset, size_t num_bytes, gfp_t flags);
-INTDEF struct heapptr NOTHROW(KCALL ph_heap_realloc_nx)(struct heap *self, void *old_ptr, size_t old_bytes, size_t new_bytes, gfp_t alloc_flags, gfp_t free_flags);
-INTDEF struct heapptr NOTHROW(KCALL ph_heap_realign_nx)(struct heap *self, void *old_ptr, size_t old_bytes, size_t min_alignment, ptrdiff_t offset, size_t new_bytes, gfp_t alloc_flags, gfp_t free_flags);
+INTDEF heapptr_t KCALL ph_heap_alloc(struct heap *self, size_t num_bytes, gfp_t flags);
+INTDEF heapptr_t KCALL ph_heap_align(struct heap *self, size_t min_alignment, ptrdiff_t offset, size_t num_bytes, gfp_t flags);
+INTDEF heapptr_t KCALL ph_heap_realloc(struct heap *self, void *old_ptr, size_t old_bytes, size_t new_bytes, gfp_t alloc_flags, gfp_t free_flags);
+INTDEF heapptr_t KCALL ph_heap_realign(struct heap *self, void *old_ptr, size_t old_bytes, size_t min_alignment, ptrdiff_t offset, size_t new_bytes, gfp_t alloc_flags, gfp_t free_flags);
+INTDEF heapptr_t NOTHROW(KCALL ph_heap_alloc_nx)(struct heap *self, size_t num_bytes, gfp_t flags);
+INTDEF heapptr_t NOTHROW(KCALL ph_heap_align_nx)(struct heap *self, size_t min_alignment, ptrdiff_t offset, size_t num_bytes, gfp_t flags);
+INTDEF heapptr_t NOTHROW(KCALL ph_heap_realloc_nx)(struct heap *self, void *old_ptr, size_t old_bytes, size_t new_bytes, gfp_t alloc_flags, gfp_t free_flags);
+INTDEF heapptr_t NOTHROW(KCALL ph_heap_realign_nx)(struct heap *self, void *old_ptr, size_t old_bytes, size_t min_alignment, ptrdiff_t offset, size_t new_bytes, gfp_t alloc_flags, gfp_t free_flags);
 #ifdef CONFIG_POISON_HEAP_NEED_VOID_FUNCTIONS
 INTDEF ATTR_CONST void NOTHROW(KCALL ph_heap_free)(struct heap *self, void *ptr, size_t num_bytes, gfp_t flags);
 #endif /* CONFIG_POISON_HEAP_NEED_VOID_FUNCTIONS */
@@ -565,22 +565,23 @@ INTDEF void NOTHROW(KCALL ph_kmalloc_untrace_n)(void *ptr, size_t num_bytes);
 /************************************************************************/
 /* EXPOSED API IMPLEMENTATION                                           */
 /************************************************************************/
-INTERN ATTR_COLDTEXT struct heapptr KCALL
+INTERN ATTR_COLDTEXT heapptr_t KCALL
 ph_heap_alloc(struct heap *self, size_t num_bytes, gfp_t flags) {
 	return ph_heap_align(self, HEAP_ALIGNMENT, 0, num_bytes, flags);
 }
 
-INTERN ATTR_COLDTEXT struct heapptr KCALL
+INTERN ATTR_COLDTEXT heapptr_t KCALL
 ph_heap_align(struct heap *UNUSED(self),
               size_t min_alignment, ptrdiff_t offset,
               size_t num_bytes, gfp_t flags) {
-	struct heapptr result;
-	result.hp_ptr = phcore_memalign(min_alignment, offset, num_bytes, flags);
-	result.hp_siz = phcore_usable_size(result.hp_ptr);
-	return result;
+	void *result_ptr;
+	size_t result_siz;
+	result_ptr = phcore_memalign(min_alignment, offset, num_bytes, flags);
+	result_siz = phcore_usable_size(result_ptr);
+	return heapptr_make(result_ptr, result_siz);
 }
 
-INTERN ATTR_COLDTEXT struct heapptr KCALL
+INTERN ATTR_COLDTEXT heapptr_t KCALL
 ph_heap_realloc(struct heap *self,
                 void *old_ptr, size_t old_bytes,
                 size_t new_bytes, gfp_t alloc_flags,
@@ -590,34 +591,36 @@ ph_heap_realloc(struct heap *self,
 	                       alloc_flags, free_flags);
 }
 
-INTERN ATTR_COLDTEXT struct heapptr KCALL
+INTERN ATTR_COLDTEXT heapptr_t KCALL
 ph_heap_realign(struct heap *UNUSED(self), void *old_ptr,
                 size_t old_bytes, size_t min_alignment,
                 ptrdiff_t offset, size_t new_bytes,
                 gfp_t alloc_flags, gfp_t UNUSED(free_flags)) {
-	struct heapptr result;
-	result.hp_ptr = phcore_realign(old_bytes ? old_ptr : NULL,
-	                               min_alignment, offset,
-	                               new_bytes, alloc_flags);
-	result.hp_siz = phcore_usable_size(result.hp_ptr);
-	return result;
+	void *result_ptr;
+	size_t result_siz;
+	result_ptr = phcore_realign(old_bytes ? old_ptr : NULL,
+	                            min_alignment, offset,
+	                            new_bytes, alloc_flags);
+	result_siz = phcore_usable_size(result_ptr);
+	return heapptr_make(result_ptr, result_siz);
 }
 
-INTERN ATTR_COLDTEXT struct heapptr
+INTERN ATTR_COLDTEXT heapptr_t
 NOTHROW(KCALL ph_heap_alloc_nx)(struct heap *self, size_t num_bytes, gfp_t flags) {
 	return ph_heap_align_nx(self, HEAP_ALIGNMENT, 0, num_bytes, flags);
 }
 
-INTERN ATTR_COLDTEXT struct heapptr
+INTERN ATTR_COLDTEXT heapptr_t
 NOTHROW(KCALL ph_heap_align_nx)(struct heap *UNUSED(self), size_t min_alignment,
                                 ptrdiff_t offset, size_t num_bytes, gfp_t flags) {
-	struct heapptr result;
-	result.hp_ptr = phcore_memalign_nx(min_alignment, offset, num_bytes, flags);
-	result.hp_siz = phcore_usable_size(result.hp_ptr);
-	return result;
+	void *result_ptr;
+	size_t result_siz;
+	result_ptr = phcore_memalign_nx(min_alignment, offset, num_bytes, flags);
+	result_siz = phcore_usable_size(result_ptr);
+	return heapptr_make(result_ptr, result_siz);
 }
 
-INTERN ATTR_COLDTEXT struct heapptr
+INTERN ATTR_COLDTEXT heapptr_t
 NOTHROW(KCALL ph_heap_realloc_nx)(struct heap *self, void *old_ptr,
                                   size_t old_bytes, size_t new_bytes,
                                   gfp_t alloc_flags, gfp_t free_flags) {
@@ -626,17 +629,18 @@ NOTHROW(KCALL ph_heap_realloc_nx)(struct heap *self, void *old_ptr,
 	                          alloc_flags, free_flags);
 }
 
-INTERN ATTR_COLDTEXT struct heapptr
+INTERN ATTR_COLDTEXT heapptr_t
 NOTHROW(KCALL ph_heap_realign_nx)(struct heap *UNUSED(self), void *old_ptr,
                                   size_t old_bytes, size_t min_alignment,
                                   ptrdiff_t offset, size_t new_bytes,
                                   gfp_t alloc_flags, gfp_t UNUSED(free_flags)) {
-	struct heapptr result;
-	result.hp_ptr = phcore_realign_nx(old_bytes ? old_ptr : NULL,
-	                                  min_alignment, offset,
-	                                  new_bytes, alloc_flags);
-	result.hp_siz = phcore_usable_size(result.hp_ptr);
-	return result;
+	void *result_ptr;
+	size_t result_siz;
+	result_ptr = phcore_realign_nx(old_bytes ? old_ptr : NULL,
+	                               min_alignment, offset,
+	                               new_bytes, alloc_flags);
+	result_siz = phcore_usable_size(result_ptr);
+	return heapptr_make(result_ptr, result_siz);
 }
 
 #ifdef CONFIG_POISON_HEAP_NEED_VOID_FUNCTIONS

@@ -378,7 +378,7 @@ PRIVATE struct atomic_rwlock kernel_debug_info_inside_malloc = ATOMIC_RWLOCK_INI
 
 PRIVATE NOBLOCK ATTR_MALLOC WUNUSED void *
 NOTHROW(CC my_kmalloc_untraced_nx)(size_t num_bytes, gfp_t flags) {
-	struct heapptr ptr;
+	heapptr_t ptr;
 	if (kernel_poisoned())
 		return NULL; /* Don't access the heap after a poisoning! */
 	MY_KMALLOC_ACQUIRE_LOCK();
@@ -386,15 +386,15 @@ NOTHROW(CC my_kmalloc_untraced_nx)(size_t num_bytes, gfp_t flags) {
 	                             sizeof(size_t) + num_bytes,
 	                             flags | MY_KMALLOC_GFP);
 	MY_KMALLOC_RELEASE_LOCK();
-	if (!ptr.hp_siz)
+	if (!heapptr_getsiz(ptr))
 		return NULL;
-	*(size_t *)ptr.hp_ptr = ptr.hp_siz;
-	return (size_t *)ptr.hp_ptr + 1;
+	*(size_t *)heapptr_getptr(ptr) = heapptr_getsiz(ptr);
+	return (size_t *)heapptr_getptr(ptr) + 1;
 }
 
 PRIVATE NOBLOCK WUNUSED void *
 NOTHROW(CC my_krealloc_untraced_nx)(void *oldptr, size_t num_bytes, gfp_t flags) {
-	struct heapptr ptr;
+	heapptr_t ptr;
 	if (kernel_poisoned())
 		return NULL; /* Don't access the heap after a poisoning! */
 	MY_KMALLOC_ACQUIRE_LOCK();
@@ -405,10 +405,10 @@ NOTHROW(CC my_krealloc_untraced_nx)(void *oldptr, size_t num_bytes, gfp_t flags)
 	                               flags | MY_KMALLOC_GFP,
 	                               flags | MY_KMALLOC_GFP);
 	MY_KMALLOC_RELEASE_LOCK();
-	if (!ptr.hp_siz)
+	if (!heapptr_getsiz(ptr))
 		return NULL;
-	*(size_t *)ptr.hp_ptr = ptr.hp_siz;
-	return (size_t *)ptr.hp_ptr + 1;
+	*(size_t *)heapptr_getptr(ptr) = heapptr_getsiz(ptr);
+	return (size_t *)heapptr_getptr(ptr) + 1;
 }
 
 PRIVATE NOBLOCK void

@@ -54,13 +54,13 @@ DECL_BEGIN
 
 
 #ifndef __KERNEL__
-struct heapptr {
-	__VIRT void *hp_ptr; /* [1..hp_siz] Pointer base address. */
-	size_t       hp_siz; /* [!0] Size of the pointer. */
-};
-
+typedef struct {
+	__VIRT void *_hp_ptr; /* [1.._hp_siz] Pointer base address. */
+	size_t       _hp_siz; /* [!0] Size of the pointer. */
+} heapptr_t;
+#define heapptr_getptr(self)              ((self)._hp_ptr)
+#define heapptr_getsiz(self)              ((self)._hp_siz)
 #define heap_free(heap, ptr, size, flags) free(ptr)
-
 #endif /* !__KERNEL__ */
 
 
@@ -130,14 +130,13 @@ NOTHROW(CC ringbuffer_trimbuf_and_endwrite)(struct ringbuffer *__restrict self) 
 		thresh       = RINGBUFFER_FREE_THRESHOLD(limit);
 		unused_bytes = self->rb_size - self->rb_avail;
 		if (unused_bytes >= thresh) {
-			KERNEL_SELECT(struct heapptr, void *) ptr;
 			if (!self->rb_avail) {
 				/* Must free the entire buffer. */
 #ifdef __KERNEL__
-				ptr.hp_ptr = self->rb_data;
-				ptr.hp_siz = self->rb_size;
+				void *free_ptr  = self->rb_data;
+				size_t free_siz = self->rb_size;
 #else /* __KERNEL__ */
-				ptr = self->rb_data;
+				void *free_ptr = self->rb_data;
 #endif /* !__KERNEL__ */
 				self->rb_data = NULL;
 				self->rb_size = 0;
@@ -145,11 +144,9 @@ NOTHROW(CC ringbuffer_trimbuf_and_endwrite)(struct ringbuffer *__restrict self) 
 				atomic_rwlock_endwrite(&self->rb_lock);
 #ifdef __KERNEL__
 				heap_free(&kernel_default_heap,
-				          ptr.hp_ptr,
-				          ptr.hp_siz,
-				          GFP_NORMAL);
+				          free_ptr, free_siz, GFP_NORMAL);
 #else /* __KERNEL__ */
-				free(ptr);
+				free(free_ptr);
 #endif /* !__KERNEL__ */
 				return;
 			} else {
@@ -161,16 +158,19 @@ NOTHROW(CC ringbuffer_trimbuf_and_endwrite)(struct ringbuffer *__restrict self) 
 				/* Try to trim the buffer.
 				 * NOTE: We use the NX-variant + GFP_ATOMIC so that we're allowed
 				 *       to use  heap functions  while  holding an  atomic  lock. */
-				ptr = heap_realloc_nx(&kernel_default_heap,
-				                      self->rb_data,
-				                      self->rb_size,
-				                      self->rb_avail,
-				                      GFP_NORMAL | GFP_ATOMIC,
-				                      GFP_NORMAL);
-				if (ptr.hp_siz) {
-					assert(ptr.hp_siz >= self->rb_avail);
-					self->rb_data = (byte_t *)ptr.hp_ptr;
-					self->rb_size = ptr.hp_siz;
+				{
+					heapptr_t ptr;
+					ptr = heap_realloc_nx(&kernel_default_heap,
+					                      self->rb_data,
+					                      self->rb_size,
+					                      self->rb_avail,
+					                      GFP_NORMAL | GFP_ATOMIC,
+					                      GFP_NORMAL);
+					if (heapptr_getsiz(ptr)) {
+						assert(heapptr_getsiz(ptr) >= self->rb_avail);
+						self->rb_data = (byte_t *)heapptr_getptr(ptr);
+						self->rb_size = heapptr_getsiz(ptr);
+					}
 				}
 #else /* __KERNEL__ */
 				/* XXX: atomic_realloc_nx() for user-space? */
@@ -593,7 +593,7 @@ again:
 		if (self->rb_size < limit &&
 		    self->rb_avail >= self->rb_size) {
 			size_t new_bufsize;
-			struct heapptr new_buffer;
+			heapptr_t new_buffer;
 			/* Allocate a larger buffer. */
 			new_bufsize = self->rb_avail + num_bytes;
 			atomic_rwlock_endread(&self->rb_lock);
@@ -605,25 +605,25 @@ again:
 			                        new_bufsize,
 			                        GFP_NORMAL);
 #else /* __KERNEL__ */
-			new_buffer.hp_ptr = malloc(new_bufsize);
-			if unlikely(!new_buffer.hp_ptr)
+			new_buffer._hp_ptr = malloc(new_bufsize);
+			if unlikely(!new_buffer._hp_ptr)
 				return -1;
-			new_buffer.hp_siz = malloc_usable_size(new_buffer.hp_ptr);
+			new_buffer._hp_siz = malloc_usable_size(new_buffer._hp_ptr);
 #endif /* !__KERNEL__ */
-			assert(new_buffer.hp_siz >= new_bufsize);
+			assert(heapptr_getsiz(new_buffer) >= new_bufsize);
 			TRY {
 				atomic_rwlock_write(&self->rb_lock);
 			} EXCEPT {
 				heap_free(&kernel_default_heap,
-				          new_buffer.hp_ptr,
-				          new_buffer.hp_siz,
+				          heapptr_getptr(new_buffer),
+				          heapptr_getsiz(new_buffer),
 				          GFP_NORMAL);
 				RETHROW();
 			}
 			/* Install the new buffer (if it is larger than the current
 			 * one,   but  smaller  than  the  (now)  effective  limit) */
-			if (new_buffer.hp_siz > self->rb_size &&
-			    new_buffer.hp_siz <= ATOMIC_READ(self->rb_limit)) {
+			if (heapptr_getsiz(new_buffer) > self->rb_size &&
+			    heapptr_getsiz(new_buffer) <= ATOMIC_READ(self->rb_limit)) {
 				size_t lo, hi;
 				byte_t *old_buffer_base;
 				size_t old_buffer_size;
@@ -638,10 +638,10 @@ again:
 					} else {
 						lo = self->rb_avail - hi;
 					}
-					memcpy((byte_t *)new_buffer.hp_ptr, old_buffer_base + self->rb_rptr, hi);
-					memcpy((byte_t *)new_buffer.hp_ptr + hi, old_buffer_base, lo);
-					self->rb_data  = (byte_t *)new_buffer.hp_ptr;
-					self->rb_size  = new_buffer.hp_siz;
+					memcpy((byte_t *)heapptr_getptr(new_buffer), old_buffer_base + self->rb_rptr, hi);
+					memcpy((byte_t *)heapptr_getptr(new_buffer) + hi, old_buffer_base, lo);
+					self->rb_data  = (byte_t *)heapptr_getptr(new_buffer);
+					self->rb_size  = heapptr_getsiz(new_buffer);
 					self->rb_rptr  = 0;
 					self->rb_rdtot = 0;
 					atomic_rwlock_endwrite(&self->rb_lock);
@@ -650,8 +650,8 @@ again:
 					          old_buffer_size,
 					          GFP_NORMAL);
 				} else {
-					self->rb_data  = (byte_t *)new_buffer.hp_ptr;
-					self->rb_size  = new_buffer.hp_siz;
+					self->rb_data  = (byte_t *)heapptr_getptr(new_buffer);
+					self->rb_size  = heapptr_getsiz(new_buffer);
 					self->rb_rdtot = 0;
 					assert(self->rb_rptr == 0);
 					assert(self->rb_avail == 0);
@@ -660,8 +660,8 @@ again:
 			} else {
 				atomic_rwlock_endwrite(&self->rb_lock);
 				heap_free(&kernel_default_heap,
-				          new_buffer.hp_ptr,
-				          new_buffer.hp_siz,
+				          heapptr_getptr(new_buffer),
+				          heapptr_getsiz(new_buffer),
 				          GFP_NORMAL);
 			}
 			goto again;

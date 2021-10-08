@@ -194,7 +194,7 @@ character_device_alloc(struct driver *__restrict owner,
                        size_t structure_align)
 		THROWS(E_BADALLOC, E_WOULDBLOCK) {
 	REF struct character_device *result;
-	struct heapptr resptr;
+	heapptr_t resptr;
 	assert(structure_size >= sizeof(struct character_device));
 	assert(owner);
 	resptr = heap_align(CHARACTER_DEVICE_HEAP,
@@ -203,9 +203,9 @@ character_device_alloc(struct driver *__restrict owner,
 	                    CHARACTER_DEVICE_GFP |
 	                    GFP_PREFLT |
 	                    GFP_CALLOC);
-	result                    = (REF struct character_device *)resptr.hp_ptr;
+	result                    = (REF struct character_device *)heapptr_getptr(resptr);
 	result->cd_refcnt         = 1;
-	result->cd_heapsize       = resptr.hp_siz;
+	result->cd_heapsize       = heapptr_getsiz(resptr);
 	result->cd_type.ct_driver = incref(owner);
 	return result;
 }

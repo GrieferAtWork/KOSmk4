@@ -1263,13 +1263,13 @@ PRIVATE ATTR_COLDTEXT NONNULL((1)) void KCALL
 gc_gather_unreachable_slab_segment(struct trace_node **__restrict pleaks,
                                    void *base, size_t num_bytes) {
 	struct trace_node *node;
-	struct heapptr node_ptr;
+	heapptr_t node_ptr;
 	node_ptr = heap_alloc_untraced(&trace_heap,
 	                               offsetof(struct trace_node, tn_trace),
 	                               TRACE_HEAP_FLAGS);
-	node = (struct trace_node *)node_ptr.hp_ptr;
+	node = (struct trace_node *)heapptr_getptr(node_ptr);
 	trace_node_initlink(node, base, num_bytes);
-	node->tn_size        = node_ptr.hp_siz;
+	node->tn_size        = heapptr_getsiz(node_ptr);
 	node->tn_reach       = gc_version - 1;
 	node->tn_visit       = 0;
 	node->tn_kind        = TRACE_NODE_KIND_SLAB;
@@ -1966,7 +1966,8 @@ NOTHROW(KCALL kmalloc_usable_size)(VIRT void *ptr) {
 
 PUBLIC NOBLOCK ATTR_NOINLINE void
 NOTHROW(KCALL kffree)(VIRT void *ptr, gfp_t flags) {
-	struct heapptr user_area;
+	void *user_area_ptr;
+	size_t user_area_siz;
 	struct trace_node *node;
 	if (!ptr)
 		return; /* Ignore NULL-pointers. */
@@ -2026,35 +2027,34 @@ NOTHROW(KCALL kffree)(VIRT void *ptr, gfp_t flags) {
 
 	/* All right! everything checks out, so we can actually move on to
 	 * freeing the associated  node, as well  as the user-data  block. */
-	user_area.hp_ptr = trace_node_uaddr(node);
-	user_area.hp_siz = trace_node_usize(node);
+	user_area_ptr = trace_node_uaddr(node);
+	user_area_siz = trace_node_usize(node);
 
 	/* Load heap-flag properties from the node itself. */
 	flags = (flags & ~__GFP_HEAPMASK) | (node->tn_flags & __GFP_HEAPMASK);
-	assert(user_area.hp_siz >=
+	assert(user_area_siz >=
 	       MAX(HEAP_MINSIZE, CONFIG_MALL_HEAD_SIZE +
 	                         CONFIG_MALL_TAIL_SIZE));
 
 	/* When freeing zero-initialized  memory,
 	 * clean up the head & tail blocks first! */
 	if (flags & GFP_CALLOC) {
-		bzero(user_area.hp_ptr, CONFIG_MALL_HEAD_SIZE);
-		bzero((byte_t *)user_area.hp_ptr +
-		      (user_area.hp_siz - CONFIG_MALL_TAIL_SIZE),
+		bzero(user_area_ptr, CONFIG_MALL_HEAD_SIZE);
+		bzero((byte_t *)user_area_ptr +
+		      (user_area_siz - CONFIG_MALL_TAIL_SIZE),
 		      CONFIG_MALL_TAIL_SIZE);
 	}
 
 	/* Finally, free the actual payload */
 	heap_free_untraced(&kernel_heaps[flags & __GFP_HEAPMASK],
-	                   user_area.hp_ptr,
-	                   user_area.hp_siz,
-	                   flags);
+	                   user_area_ptr, user_area_siz, flags);
 	trace_node_free(node);
 }
 
 PUBLIC NOBLOCK ATTR_NOINLINE void
 NOTHROW(KCALL kfree)(VIRT void *ptr) {
-	struct heapptr user_area;
+	void *user_area_ptr;
+	size_t user_area_siz;
 	struct trace_node *node;
 	gfp_t flags;
 	if (!ptr)
@@ -2115,20 +2115,18 @@ NOTHROW(KCALL kfree)(VIRT void *ptr) {
 
 	/* All right! everything checks out, so we can actually move on to
 	 * freeing the associated  node, as well  as the user-data  block. */
-	user_area.hp_ptr = trace_node_uaddr(node);
-	user_area.hp_siz = trace_node_usize(node);
+	user_area_ptr = trace_node_uaddr(node);
+	user_area_siz = trace_node_usize(node);
 
 	/* Load heap-flag properties from the node itself. */
 	flags = node->tn_flags & __GFP_HEAPMASK;
-	assert(user_area.hp_siz >=
+	assert(user_area_siz >=
 	       MAX(HEAP_MINSIZE, CONFIG_MALL_HEAD_SIZE +
 	                         CONFIG_MALL_TAIL_SIZE));
 
 	/* Finally, free the actual payload */
 	heap_free_untraced(&kernel_heaps[flags & __GFP_HEAPMASK],
-	                   user_area.hp_ptr,
-	                   user_area.hp_siz,
-	                   flags);
+	                   user_area_ptr, user_area_siz, flags);
 	trace_node_free(node);
 }
 

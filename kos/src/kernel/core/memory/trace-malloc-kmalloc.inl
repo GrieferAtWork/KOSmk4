@@ -149,37 +149,37 @@ LOCAL_NOTHROW(KCALL LOCAL_METHOD_malloc)(
 #endif /* LOCAL_HAVE_offset */
                                          size_t n_bytes,
                                          gfp_t flags) {
-	struct heapptr result;
+	heapptr_t result;
 	struct trace_node *node;
 	result = MY_heap_alloc_untraced(CONFIG_MALL_HEAD_SIZE +
 	                                n_bytes +
 	                                CONFIG_MALL_TAIL_SIZE,
 	                                flags);
 #ifdef DEFINE_X_noexcept
-	if unlikely(result.hp_siz == 0)
+	if unlikely(heapptr_getsiz(result) == 0)
 		goto err;
 #endif /* DEFINE_X_noexcept */
-	INITIALIZE_USER_POINTER(result.hp_ptr,
-	                        result.hp_siz);
+	INITIALIZE_USER_POINTER(heapptr_getptr(result),
+	                        heapptr_getsiz(result));
 
 #ifdef DEFINE_X_except
 	TRY
 #endif /* DEFINE_X_noexcept */
 	{
 		struct lcpustate cs;
-		struct heapptr node_ptr;
+		heapptr_t node_ptr;
 		node_ptr = LOCAL_heap_alloc_untraced(&trace_heap,
 		                                     offsetof(struct trace_node, tn_trace) +
 		                                     CONFIG_TRACE_MALLOC_MIN_TRACEBACK * sizeof(void *),
 		                                     TRACE_HEAP_FLAGS | (flags & GFP_INHERIT));
 #ifdef DEFINE_X_noexcept
-		if unlikely(!node_ptr.hp_siz)
+		if unlikely(!heapptr_getsiz(node_ptr))
 			goto err_result;
 #endif /* DEFINE_X_noexcept */
-		node = (struct trace_node *)node_ptr.hp_ptr;
-		node->tn_size = node_ptr.hp_siz;
+		node = (struct trace_node *)heapptr_getptr(node_ptr);
+		node->tn_size = heapptr_getsiz(node_ptr);
 		/* Fill in the newly allocated node. */
-		trace_node_initlink(node, result.hp_ptr, result.hp_siz);
+		trace_node_initlink(node, heapptr_getptr(result), heapptr_getsiz(result));
 		node->tn_reach       = gc_version;
 		node->tn_visit       = 0;
 		node->tn_kind        = TRACE_NODE_KIND_MALL;
@@ -196,18 +196,18 @@ LOCAL_NOTHROW(KCALL LOCAL_METHOD_malloc)(
 #ifdef DEFINE_X_except
 	EXCEPT {
 		heap_free_untraced(&kernel_heaps[flags & __GFP_HEAPMASK],
-		                   result.hp_ptr, result.hp_siz,
+		                   heapptr_getptr(result), heapptr_getsiz(result),
 		                   flags & ~GFP_CALLOC);
 		RETHROW();
 	}
 #endif /* DEFINE_X_noexcept */
-	return (byte_t *)result.hp_ptr + CONFIG_MALL_HEAD_SIZE;
+	return (byte_t *)heapptr_getptr(result) + CONFIG_MALL_HEAD_SIZE;
 #ifdef DEFINE_X_noexcept
 err_result_node:
 	trace_node_free(node);
 err_result:
 	heap_free_untraced(&kernel_heaps[flags & __GFP_HEAPMASK],
-	                   result.hp_ptr, result.hp_siz,
+	                   heapptr_getptr(result), heapptr_getsiz(result),
 	                   flags & ~GFP_CALLOC);
 err:
 	return NULL;
@@ -220,17 +220,17 @@ err:
 /* krealloc(...) */
 #ifdef LOCAL_METHOD_realloc
 #if defined(LOCAL_HAVE_min_alignment) && defined(LOCAL_HAVE_offset)
-#define MY_realloc_PRIFMT PP_STR(LOCAL_METHOD_realloc) "(%p, %" PRIuSIZ ", %" PRIdSIZ ", %" PRIuSIZ ", %#x)"
-#define MY_realloc_PRIARG ptr, min_alignment, offset, n_bytes, flags
+#define LOCAL_realloc_PRIFMT PP_STR(LOCAL_METHOD_realloc) "(%p, %" PRIuSIZ ", %" PRIdSIZ ", %" PRIuSIZ ", %#x)"
+#define LOCAL_realloc_PRIARG ptr, min_alignment, offset, n_bytes, flags
 #elif defined(LOCAL_HAVE_min_alignment)
-#define MY_realloc_PRIFMT PP_STR(LOCAL_METHOD_realloc) "(%p, %" PRIuSIZ ", %" PRIuSIZ ", %#x)"
-#define MY_realloc_PRIARG ptr, min_alignment, n_bytes, flags
+#define LOCAL_realloc_PRIFMT PP_STR(LOCAL_METHOD_realloc) "(%p, %" PRIuSIZ ", %" PRIuSIZ ", %#x)"
+#define LOCAL_realloc_PRIARG ptr, min_alignment, n_bytes, flags
 #elif defined(LOCAL_HAVE_offset)
-#define MY_realloc_PRIFMT PP_STR(LOCAL_METHOD_realloc) "(%p, %" PRIdSIZ ", %" PRIuSIZ ", %#x)"
-#define MY_realloc_PRIARG ptr, offset, n_bytes, flags
+#define LOCAL_realloc_PRIFMT PP_STR(LOCAL_METHOD_realloc) "(%p, %" PRIdSIZ ", %" PRIuSIZ ", %#x)"
+#define LOCAL_realloc_PRIARG ptr, offset, n_bytes, flags
 #else /* ... */
-#define MY_realloc_PRIFMT PP_STR(LOCAL_METHOD_realloc) "(%p, %" PRIuSIZ ", %#x)"
-#define MY_realloc_PRIARG ptr, n_bytes, flags
+#define LOCAL_realloc_PRIFMT PP_STR(LOCAL_METHOD_realloc) "(%p, %" PRIuSIZ ", %#x)"
+#define LOCAL_realloc_PRIARG ptr, n_bytes, flags
 #endif /* !... */
 
 PUBLIC ATTR_NOINLINE WUNUSED void *
@@ -243,7 +243,9 @@ LOCAL_NOTHROW(KCALL LOCAL_METHOD_realloc)(void *ptr,
 #endif /* LOCAL_HAVE_offset */
                                           size_t n_bytes,
                                           gfp_t flags) {
-	struct heapptr result;
+#ifndef DEFINE_METHOD_kmalloc_in_place
+	heapptr_t result;
+#endif /* !DEFINE_METHOD_kmalloc_in_place */
 	struct trace_node *node;
 	size_t old_user_size;
 	size_t new_user_size;
@@ -260,30 +262,30 @@ do_normal_malloc:
 		                                CONFIG_MALL_TAIL_SIZE,
 		                                flags);
 #ifdef DEFINE_X_noexcept
-		if unlikely(result.hp_siz == 0)
+		if unlikely(heapptr_getsiz(result) == 0)
 			goto err;
 #endif /* DEFINE_X_noexcept */
-		INITIALIZE_USER_POINTER(result.hp_ptr,
-		                        result.hp_siz);
+		INITIALIZE_USER_POINTER(heapptr_getptr(result),
+		                        heapptr_getsiz(result));
 
 #ifdef DEFINE_X_except
 		TRY
 #endif /* DEFINE_X_noexcept */
 		{
 			struct lcpustate cs;
-			struct heapptr node_ptr;
+			heapptr_t node_ptr;
 			node_ptr = LOCAL_heap_alloc_untraced(&trace_heap,
 			                                     offsetof(struct trace_node, tn_trace) +
 			                                     CONFIG_TRACE_MALLOC_MIN_TRACEBACK * sizeof(void *),
 			                                     TRACE_HEAP_FLAGS | (flags & GFP_INHERIT));
 #ifdef DEFINE_X_noexcept
-			if unlikely(!node_ptr.hp_siz)
+			if unlikely(!heapptr_getsiz(node_ptr))
 				goto err_result;
 #endif /* DEFINE_X_noexcept */
-			node = (struct trace_node *)node_ptr.hp_ptr;
-			node->tn_size = node_ptr.hp_siz;
+			node = (struct trace_node *)heapptr_getptr(node_ptr);
+			node->tn_size = heapptr_getsiz(node_ptr);
 			/* Fill in the newly allocated node. */
-			trace_node_initlink(node, result.hp_ptr, result.hp_siz);
+			trace_node_initlink(node, heapptr_getptr(result), heapptr_getsiz(result));
 			node->tn_reach       = gc_version;
 			node->tn_visit       = 0;
 			node->tn_kind        = TRACE_NODE_KIND_MALL;
@@ -300,12 +302,12 @@ do_normal_malloc:
 #ifdef DEFINE_X_except
 		EXCEPT {
 			heap_free_untraced(&kernel_heaps[flags & __GFP_HEAPMASK],
-			                   result.hp_ptr, result.hp_siz,
+			                   heapptr_getptr(result), heapptr_getsiz(result),
 			                   flags & ~GFP_CALLOC);
 			RETHROW();
 		}
 #endif /* DEFINE_X_noexcept */
-		return (byte_t *)result.hp_ptr + CONFIG_MALL_HEAD_SIZE;
+		return (byte_t *)heapptr_getptr(result) + CONFIG_MALL_HEAD_SIZE;
 #endif /* !DEFINE_METHOD_kmalloc_in_place */
 	}
 again_nonnull_ptr:
@@ -325,29 +327,29 @@ again_nonnull_ptr:
 		                                CONFIG_MALL_TAIL_SIZE,
 		                                flags);
 #ifdef DEFINE_X_noexcept
-		if unlikely(result.hp_siz == 0)
+		if unlikely(heapptr_getsiz(result) == 0)
 			goto err;
 #endif /* DEFINE_X_noexcept */
-		INITIALIZE_USER_POINTER(result.hp_ptr,
-		                        result.hp_siz);
+		INITIALIZE_USER_POINTER(heapptr_getptr(result),
+		                        heapptr_getsiz(result));
 #ifdef DEFINE_X_except
 		TRY
 #endif /* DEFINE_X_noexcept */
 		{
 			struct lcpustate cs;
-			struct heapptr node_ptr;
+			heapptr_t node_ptr;
 			node_ptr = LOCAL_heap_alloc_untraced(&trace_heap,
 			                                     offsetof(struct trace_node, tn_trace) +
 			                                     CONFIG_TRACE_MALLOC_MIN_TRACEBACK * sizeof(void *),
 			                                     TRACE_HEAP_FLAGS | (flags & GFP_INHERIT));
 #ifdef DEFINE_X_noexcept
-			if unlikely(!node_ptr.hp_siz)
+			if unlikely(!heapptr_getsiz(node_ptr))
 				goto err_result;
 #endif /* DEFINE_X_noexcept */
-			node = (struct trace_node *)node_ptr.hp_ptr;
-			node->tn_size = node_ptr.hp_siz;
+			node = (struct trace_node *)heapptr_getptr(node_ptr);
+			node->tn_size = heapptr_getsiz(node_ptr);
 			/* Fill in the newly allocated node. */
-			trace_node_initlink(node, result.hp_ptr, result.hp_siz);
+			trace_node_initlink(node, heapptr_getptr(result), heapptr_getsiz(result));
 			node->tn_reach       = gc_version;
 			node->tn_visit       = 0;
 			node->tn_kind        = TRACE_NODE_KIND_MALL;
@@ -364,15 +366,18 @@ again_nonnull_ptr:
 #ifdef DEFINE_X_except
 		EXCEPT {
 			heap_free_untraced(&kernel_heaps[flags & __GFP_HEAPMASK],
-			                   result.hp_ptr, result.hp_siz,
+			                   heapptr_getptr(result), heapptr_getsiz(result),
 			                   flags & ~GFP_CALLOC);
 			RETHROW();
 		}
 #endif /* DEFINE_X_noexcept */
-		result.hp_ptr = (byte_t *)result.hp_ptr + CONFIG_MALL_HEAD_SIZE;
-		result.hp_ptr = memcpy(result.hp_ptr, ptr, old_user_size);
-		slab_free(ptr);
-		return result.hp_ptr;
+		{
+			byte_t *result_ptr;
+			result_ptr = (byte_t *)heapptr_getptr(result) + CONFIG_MALL_HEAD_SIZE;
+			result_ptr = (byte_t *)memcpy(result_ptr, ptr, old_user_size);
+			slab_free(ptr);
+			return result_ptr;
+		}
 #endif /* !DEFINE_METHOD_kmalloc_in_place */
 	}
 #endif /* CONFIG_USE_SLAB_ALLOCATORS */
@@ -384,8 +389,8 @@ again_nonnull_ptr:
 	if unlikely(!node) {
 		lock_break();
 		kernel_panic_n(/* n_skip: */ 1,
-		               MY_realloc_PRIFMT ": No node at this address",
-		               MY_realloc_PRIARG);
+		               LOCAL_realloc_PRIFMT ": No node at this address",
+		               LOCAL_realloc_PRIARG);
 		goto do_normal_malloc;
 	}
 
@@ -393,9 +398,9 @@ again_nonnull_ptr:
 		node = trace_node_dupa_tb(node);
 		lock_break();
 		kernel_panic_n(/* n_skip: */ 1,
-		               MY_realloc_PRIFMT ": Node at %p...%p wasn't created by kmalloc()\n"
+		               LOCAL_realloc_PRIFMT ": Node at %p...%p wasn't created by kmalloc()\n"
 		               "%[gen:c]",
-		               MY_realloc_PRIARG,
+		               LOCAL_realloc_PRIARG,
 		               trace_node_umin(node), trace_node_umax(node),
 		               &trace_node_print_traceback, node);
 		goto do_normal_malloc;
@@ -405,10 +410,10 @@ again_nonnull_ptr:
 		node = trace_node_dupa_tb(node);
 		lock_break();
 		kernel_panic_n(/* n_skip: */ 1,
-		               MY_realloc_PRIFMT ": Passed pointer does not match "
+		               LOCAL_realloc_PRIFMT ": Passed pointer does not match "
 		               "start of containing node %p...%p (%p...%p)\n"
 		               "%[gen:c]",
-		               MY_realloc_PRIARG,
+		               LOCAL_realloc_PRIARG,
 		               trace_node_umin(node) + CONFIG_MALL_HEAD_SIZE,
 		               trace_node_umax(node) - CONFIG_MALL_TAIL_SIZE,
 		               trace_node_umin(node), trace_node_umax(node),
@@ -443,12 +448,13 @@ again_nonnull_ptr:
 		}
 		num_free = old_user_size - n_bytes;
 		if (num_free >= HEAP_MINSIZE) {
+			void *free_base;
 			u8 node_flags = node->tn_flags;
 			trace_node_tree_removenode(&nodes, node);
 
 			/* Reduce the effective size of the user-data-block. */
 			node->tn_link.rb_max -= num_free;
-			result.hp_ptr = trace_node_uend(node);
+			free_base = trace_node_uend(node);
 			new_user_size = old_user_size - num_free;
 			/* Re-initialize the tail. */
 #if CONFIG_MALL_TAIL_SIZE != 0
@@ -471,7 +477,7 @@ again_nonnull_ptr:
 			flags = (flags & ~(__GFP_HEAPMASK | GFP_CALLOC)) |
 			        (node_flags & __GFP_HEAPMASK);
 			heap_free_untraced(&kernel_heaps[flags & __GFP_HEAPMASK],
-			                   result.hp_ptr, num_free, flags);
+			                   free_base, num_free, flags);
 		} else {
 realloc_unchanged:
 			/* Don't change the allocated node size. */
@@ -501,6 +507,7 @@ realloc_unchanged:
 #ifdef DEFINE_METHOD_kmalloc_in_place
 			goto err;
 #else /* DEFINE_METHOD_kmalloc_in_place */
+			byte_t *result_ptr;
 			void *oldblock_base;
 			size_t oldblock_size;
 			/* Must allocate a new block */
@@ -509,10 +516,11 @@ realloc_unchanged:
 			                                CONFIG_MALL_TAIL_SIZE,
 			                                flags);
 #ifdef DEFINE_X_noexcept
-			if unlikely(result.hp_siz == 0)
+			if unlikely(heapptr_getsiz(result) == 0)
 				goto err;
 #endif /* DEFINE_X_noexcept */
-			INITIALIZE_USER_POINTER(result.hp_ptr, result.hp_siz);
+			INITIALIZE_USER_POINTER(heapptr_getptr(result),
+			                        heapptr_getsiz(result));
 			lock_regain();
 again_remove_node_for_newchunk:
 			node = trace_node_tree_remove(&nodes, (uintptr_t)ptr);
@@ -526,13 +534,15 @@ again_remove_node_for_newchunk:
 					trace_node_tree_insert(&nodes, node);
 				lock_break();
 				if (flags & GFP_CALLOC) {
-					BZERO_USER_POINTER_HEADTAIL(result.hp_ptr,
-					                            result.hp_siz);
+					BZERO_USER_POINTER_HEADTAIL(heapptr_getptr(result),
+					                            heapptr_getsiz(result));
 				}
 				heap_free_untraced(&kernel_heaps[flags & __GFP_HEAPMASK],
-				                   result.hp_ptr, result.hp_siz, flags);
+				                   heapptr_getptr(result),
+				                   heapptr_getsiz(result), flags);
 				goto again_nonnull_ptr;
 			}
+
 			/* Extract information from the old node. */
 			extension_flags = (extension_flags & __GFP_HEAPMASK) |
 			                  (flags & ~(__GFP_HEAPMASK | GFP_CALLOC));
@@ -542,7 +552,7 @@ again_remove_node_for_newchunk:
 
 			/* Re-write the contents of the node to fit the new block. */
 			node->tn_flags = flags & __GFP_HEAPMASK; /* Remember the heap bits now used by the allocation. */
-			trace_node_initlink(node, result.hp_ptr, result.hp_siz);
+			trace_node_initlink(node, heapptr_getptr(result), heapptr_getsiz(result));
 
 			/* This can fail due to other bitset nodes, and we must handle it when that happens! */
 			if unlikely(!trace_node_tree_tryinsert(&nodes, node)) {
@@ -553,19 +563,19 @@ again_remove_node_for_newchunk:
 				trace_node_tree_insert(&nodes, node);
 #ifdef DEFINE_X_except
 				TRY {
-					LOCAL_insert_trace_node_resolve((uintptr_t)result.hp_ptr,
-					                                (uintptr_t)result.hp_ptr + result.hp_siz - 1,
+					LOCAL_insert_trace_node_resolve((uintptr_t)heapptr_getptr(result),
+					                                (uintptr_t)heapptr_getptr(result) + heapptr_getsiz(result) - 1,
 					                                flags, 1, LOCK_ARGS);
 				} EXCEPT
 #elif defined(DEFINE_X_noexcept)
-				if unlikely(!LOCAL_insert_trace_node_resolve((uintptr_t)result.hp_ptr,
-				                                             (uintptr_t)result.hp_ptr + result.hp_siz - 1,
+				if unlikely(!LOCAL_insert_trace_node_resolve((uintptr_t)heapptr_getptr(result),
+				                                             (uintptr_t)heapptr_getptr(result) + heapptr_getsiz(result) - 1,
 				                                             flags, 1, LOCK_ARGS))
 #endif /* DEFINE_X_noexcept */
 				{
 #ifdef DEFINE_X_except
 					heap_free_untraced(&kernel_heaps[flags & __GFP_HEAPMASK],
-					                   result.hp_ptr, result.hp_siz,
+					                   heapptr_getptr(result), heapptr_getsiz(result),
 					                   flags & ~GFP_CALLOC);
 					RETHROW();
 #elif defined(DEFINE_X_noexcept)
@@ -577,13 +587,13 @@ again_remove_node_for_newchunk:
 			lock_break();
 
 			/* Copy all of the old data into the block. */
-			result.hp_ptr = memcpy((byte_t *)result.hp_ptr + CONFIG_MALL_HEAD_SIZE,
-			                       ptr, old_user_size);
+			result_ptr = (byte_t *)heapptr_getptr(result) + CONFIG_MALL_HEAD_SIZE;
+			result_ptr = (byte_t *)memcpy(result_ptr, ptr, old_user_size);
 			/* Free the old block. */
 			assert(!(extension_flags & GFP_CALLOC));
 			heap_free_untraced(&kernel_heaps[extension_flags & __GFP_HEAPMASK],
 			                   oldblock_base, oldblock_size, extension_flags);
-			return result.hp_ptr;
+			return result_ptr;
 #endif /* !DEFINE_METHOD_kmalloc_in_place */
 		}
 		lock_regain();
@@ -669,7 +679,7 @@ err_result_node:
 	trace_node_free(node);
 err_result:
 	heap_free_untraced(&kernel_heaps[flags & __GFP_HEAPMASK],
-	                   result.hp_ptr, result.hp_siz,
+	                   heapptr_getptr(result), heapptr_getsiz(result),
 	                   flags & ~GFP_CALLOC);
 #endif /* !DEFINE_METHOD_kmalloc_in_place */
 #endif /* DEFINE_X_noexcept */
@@ -678,8 +688,8 @@ err:
 	return NULL;
 #endif /* DEFINE_METHOD_kmalloc_in_place || DEFINE_X_noexcept */
 }
-#undef MY_realloc_PRIFMT
-#undef MY_realloc_PRIARG
+#undef LOCAL_realloc_PRIFMT
+#undef LOCAL_realloc_PRIARG
 #endif /* LOCAL_METHOD_realloc */
 
 

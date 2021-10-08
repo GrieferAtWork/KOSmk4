@@ -474,15 +474,15 @@ NOTHROW(KCALL task_destroy)(struct task *__restrict self) {
 PUBLIC ATTR_MALLOC ATTR_RETNONNULL WUNUSED REF struct task *
 (KCALL task_alloc)(struct mman *__restrict task_mman) THROWS(E_WOULDBLOCK, E_BADALLOC) {
 	REF struct task *result;
-	struct heapptr resptr;
+	heapptr_t resptr;
 	/* Allocate a new task structure. */
 	resptr = heap_alloc(&kernel_locked_heap,
 	                    (size_t)__kernel_pertask_size,
 	                    GFP_LOCKED | GFP_PREFLT);
-	result = (REF struct task *)resptr.hp_ptr;
+	result = (REF struct task *)heapptr_getptr(resptr);
 	/* Copy the per-task initialization template. */
 	memcpy(result, __kernel_pertask_start, (size_t)__kernel_pertask_size);
-	result->t_heapsz = resptr.hp_siz;
+	result->t_heapsz = heapptr_getsiz(resptr);
 	result->t_self   = result;
 	incref(&mfile_ndef); /* FORTASK(result, this_kernel_stackpart_).mp_file */
 #define STN(thread) FORTASK(&thread, this_kernel_stacknode_)
@@ -562,8 +562,8 @@ again_lock_kernel_mman:
 	} EXCEPT {
 		decref_nokill(&mfile_ndef); /* FORTASK(result, this_kernel_stackpart_).mp_file */
 		heap_free(&kernel_locked_heap,
-		          resptr.hp_ptr,
-		          resptr.hp_siz,
+		          heapptr_getptr(resptr),
+		          heapptr_getsiz(resptr),
 		          GFP_NORMAL);
 		RETHROW();
 	}

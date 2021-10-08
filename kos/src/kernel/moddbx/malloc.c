@@ -288,9 +288,9 @@ NOTHROW(FCALL extend_heap)(size_t min_size) {
 }
 
 
-PUBLIC WUNUSED struct heapptr
+PUBLIC WUNUSED heapptr_t
 NOTHROW(FCALL dbx_heap_alloc)(size_t num_bytes) {
-	struct heapptr resptr;
+	size_t result_siz;
 	struct freerange *result;
 	struct freerange **presult;
 	size_t remaining;
@@ -306,28 +306,27 @@ again:
 			break;
 		presult = SLIST_PNEXT(result, fr_link);
 	}
-	remaining     = result->fr_size - num_bytes;
-	resptr.hp_ptr = result;
+	remaining  = result->fr_size - num_bytes;
 	if (remaining < sizeof(struct freerange)) {
 		/* Allocate the whole free-range */
-		resptr.hp_siz = result->fr_size;
-		*presult      = SLIST_NEXT(result, fr_link);
+		result_siz = result->fr_size;
+		*presult   = SLIST_NEXT(result, fr_link);
 	} else {
 		struct freerange *newrange;
 		/* Allocate from the front. */
-		resptr.hp_siz = num_bytes;
+		result_siz = num_bytes;
 		/* Replace the old free-range with a smaller one. */
 		newrange = (struct freerange *)((byte_t *)result + num_bytes);
 		newrange->fr_link = result->fr_link;
 		newrange->fr_size = remaining;
 		*presult = newrange;
 	}
-	DBX_STATIC_HEAP_SETPAT(resptr.hp_ptr,
+	DBX_STATIC_HEAP_SETPAT(result,
 	                       DBX_STATIC_HEAP_PATTERN_USED,
-	                       resptr.hp_siz);
-	DBX_HEAP_TRACEALLOC((byte_t *)resptr.hp_ptr,
-	                    (byte_t *)resptr.hp_ptr + resptr.hp_siz - 1);
-	return resptr;
+	                       result_siz);
+	DBX_HEAP_TRACEALLOC((byte_t *)result,
+	                    (byte_t *)result + result_siz - 1);
+	return heapptr_make(result, result_siz);
 nomem:
 	/* Try to allocate a heap extension, but don't
 	 * do   so  if  the  kernel's  been  poisoned. */
@@ -341,9 +340,7 @@ nomem:
 	if (cmodule_clearcache(false))
 		goto again;
 nope:
-	resptr.hp_ptr = NULL;
-	resptr.hp_siz = 0;
-	return resptr;
+	return heapptr_make(NULL, 0);
 }
 
 /* Try  to allocate at least `num_bytes' at `addr',
@@ -534,13 +531,13 @@ INTERN void KCALL dbx_heap_fini(void) {
 
 PUBLIC ATTR_MALLOC WUNUSED ATTR_ALLOC_SIZE((1)) ATTR_ASSUME_ALIGNED(__SIZEOF_POINTER__) void *
 NOTHROW(FCALL dbx_malloc)(size_t num_bytes) {
-	struct heapptr hp;
+	heapptr_t hp;
 	size_t *result;
 	hp = dbx_heap_alloc(sizeof(size_t) + num_bytes);
-	if unlikely(!hp.hp_siz)
+	if unlikely(!heapptr_getsiz(hp))
 		return NULL;
-	result    = (size_t *)hp.hp_ptr;
-	*result++ = hp.hp_siz - sizeof(size_t);
+	result    = (size_t *)heapptr_getptr(hp);
+	*result++ = heapptr_getsiz(hp) - sizeof(size_t);
 	return result;
 }
 

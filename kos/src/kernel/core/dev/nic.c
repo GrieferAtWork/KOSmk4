@@ -236,7 +236,7 @@ nic_device_write(struct character_device *__restrict self,
 PUBLIC ATTR_RETNONNULL struct nic_rpacket *KCALL
 nic_rpacket_alloc(size_t max_packet_size) THROWS(E_BADALLOC) {
 	struct nic_rpacket *result;
-	struct heapptr resptr;
+	heapptr_t resptr;
 	assertf(max_packet_size >= ETH_ZLEN,
 	        "Packets must always have a max size of at least "
 	        "ETH_ZLEN(%" PRIuSIZ ") bytes (but %" PRIuSIZ " is less than that)",
@@ -246,8 +246,8 @@ nic_rpacket_alloc(size_t max_packet_size) THROWS(E_BADALLOC) {
 	                    offsetof(struct nic_rpacket, rp_data) +
 	                    max_packet_size,
 	                    GFP_NORMAL);
-	result = (struct nic_rpacket *)resptr.hp_ptr;
-	result->rp_size = resptr.hp_siz;
+	result = (struct nic_rpacket *)heapptr_getptr(resptr);
+	result->rp_size = heapptr_getsiz(resptr);
 	return result;
 }
 

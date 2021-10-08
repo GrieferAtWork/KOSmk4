@@ -64,10 +64,13 @@ DECL_BEGIN
 
 #ifndef __KERNEL__
 
-struct heapptr {
-	__VIRT void *hp_ptr; /* [1..hp_siz] Pointer base address. */
-	size_t       hp_siz; /* [!0] Size of the pointer. */
-};
+typedef struct {
+	__VIRT void *_hp_ptr; /* [1.._hp_siz] Pointer base address. */
+	size_t       _hp_siz; /* [!0] Size of the pointer. */
+} heapptr_t;
+#define heapptr_getptr(self)   ((self)._hp_ptr)
+#define heapptr_getsiz(self)   ((self)._hp_siz)
+
 
 
 PRIVATE NONNULL((1)) int CC
@@ -293,7 +296,7 @@ again_locked:
 		 *       allocate the existing buffer without having to allocate 2
 		 *       of them at any point. */
 		size_t new_size;
-		struct heapptr newline;
+		heapptr_t newline;
 #ifdef __KERNEL__
 		new_size = self->lb_line.lc_size + (num_bytes - result);
 #else /* __KERNEL__ */
@@ -309,13 +312,13 @@ again_locked:
 		                          new_size,
 		                          GFP_NORMAL | GFP_ATOMIC,
 		                          GFP_NORMAL | GFP_ATOMIC);
-		if (newline.hp_siz) {
-			assert(newline.hp_siz >= new_size);
-			assert(newline.hp_siz >= self->lb_line.lc_size);
+		if (heapptr_getsiz(newline)) {
+			assert(heapptr_getsiz(newline) >= new_size);
+			assert(heapptr_getsiz(newline) >= self->lb_line.lc_size);
 			/* Install the new buffer directly. */
-			maxwrite               = newline.hp_siz - self->lb_line.lc_size;
-			self->lb_line.lc_base  = (byte_t *)newline.hp_ptr;
-			self->lb_line.lc_alloc = newline.hp_siz;
+			maxwrite               = heapptr_getsiz(newline) - self->lb_line.lc_size;
+			self->lb_line.lc_base  = (byte_t *)heapptr_getptr(newline);
+			self->lb_line.lc_alloc = heapptr_getsiz(newline);
 			if (maxwrite > num_bytes)
 				maxwrite = num_bytes;
 		} else
@@ -323,7 +326,10 @@ again_locked:
 		/* XXX: atomic_realloc_nx() for userspace? */
 #endif /* !__KERNEL__ */
 		{
-			struct heapptr oldline;
+			void *oldline_ptr;
+#ifdef __KERNEL__
+			size_t oldline_siz;
+#endif /* __KERNEL__ */
 			/* Need to release the line-lock to allocate a new buffer. */
 			atomic_lock_release(&self->lb_lock);
 #ifdef __KERNEL__
@@ -331,30 +337,32 @@ again_locked:
 			                     new_size,
 			                     GFP_NORMAL);
 #else /* __KERNEL__ */
-			newline.hp_ptr = malloc(new_size);
-			newline.hp_siz = malloc_usable_size(newline.hp_ptr);
+			newline._hp_ptr = malloc(new_size);
+			newline._hp_siz = malloc_usable_size(newline._hp_ptr);
 #endif /* !__KERNEL__ */
-			oldline = newline;
+			oldline_ptr = heapptr_getptr(newline);
+#ifdef __KERNEL__
+			oldline_siz = heapptr_getsiz(newline);
+#endif /* __KERNEL__ */
 			atomic_lock_acquire(&self->lb_lock);
 			COMPILER_READ_BARRIER();
 			/* Check for race condition: Another thread expanded the buffer in
 			 * the mean time,  or the buffer  was closed/before more  limited. */
 			limit = ATOMIC_READ(self->lb_limt);
-			if likely(self->lb_line.lc_alloc < newline.hp_siz && new_size <= limit) {
+			if likely(self->lb_line.lc_alloc < heapptr_getsiz(newline) && new_size <= limit) {
 				assert(self->lb_line.lc_size <= self->lb_line.lc_alloc);
-				oldline.hp_ptr = self->lb_line.lc_base;
-				oldline.hp_siz = self->lb_line.lc_alloc;
-				memcpy(newline.hp_ptr,
-				       oldline.hp_ptr,
-				       self->lb_line.lc_size);
-				self->lb_line.lc_base  = (byte_t *)newline.hp_ptr;
-				self->lb_line.lc_alloc = newline.hp_siz;
+				oldline_ptr = self->lb_line.lc_base;
+#ifdef __KERNEL__
+				oldline_siz = self->lb_line.lc_alloc;
+#endif /* __KERNEL__ */
+				memcpy(heapptr_getptr(newline), oldline_ptr, self->lb_line.lc_size);
+				self->lb_line.lc_base  = (byte_t *)heapptr_getptr(newline);
+				self->lb_line.lc_alloc = heapptr_getsiz(newline);
 			}
 			atomic_lock_release(&self->lb_lock);
 			/* We could keep our lock to `lb_lock' here, but it's better to
 			 * only  ever be holding atomic locks for as short as possible. */
-			HEAP_FREE(oldline.hp_ptr,
-			          oldline.hp_siz);
+			HEAP_FREE(oldline_ptr, oldline_siz);
 			goto again;
 		}
 		assert(maxwrite != 0);

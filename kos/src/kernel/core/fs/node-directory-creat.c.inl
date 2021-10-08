@@ -195,7 +195,7 @@ directory_mkdir(struct directory_node *__restrict target_directory,
 		/* Must create a new entry. */
 		target_entry = directory_entry_alloc_s(target_name, target_namelen);
 		TRY {
-			struct heapptr resptr;
+			heapptr_t resptr;
 			REF struct directory_entry *existing_entry;
 			/* Check for an existing entry. */
 			existing_entry = MODE_IS_NOCASE
@@ -233,16 +233,16 @@ directory_mkdir(struct directory_node *__restrict target_directory,
 				resptr = heap_alloc(FS_HEAP,
 				                    sizeof(struct fifo_node),
 				                    FS_GFP | GFP_CALLOC);
-				result      = (RETURN_NODE_TYPE *)resptr.hp_ptr;
-				real_result = (struct fifo_node *)resptr.hp_ptr;
+				result      = (RETURN_NODE_TYPE *)heapptr_getptr(resptr);
+				real_result = (struct fifo_node *)heapptr_getptr(resptr);
 				fifo_init(&real_result->f_fifo);
 			} else if (S_ISSOCK(mode)) {
 				struct socket_node *real_result;
 				resptr = heap_alloc(FS_HEAP,
 				                    sizeof(struct socket_node),
 				                    FS_GFP | GFP_CALLOC);
-				result      = (RETURN_NODE_TYPE *)resptr.hp_ptr;
-				real_result = (struct socket_node *)resptr.hp_ptr;
+				result      = (RETURN_NODE_TYPE *)heapptr_getptr(resptr);
+				real_result = (struct socket_node *)heapptr_getptr(resptr);
 				unix_server_init(&real_result->s_server);
 			} else
 #endif /* DEFINE_DIRECTORY_MKNOD */
@@ -258,7 +258,7 @@ directory_mkdir(struct directory_node *__restrict target_directory,
 #endif /* DEFINE_DIRECTORY_SYMLINK */
 				                    ,
 				                    FS_GFP | GFP_CALLOC);
-				result = (RETURN_NODE_TYPE *)resptr.hp_ptr;
+				result = (RETURN_NODE_TYPE *)heapptr_getptr(resptr);
 			}
 #if defined(DEFINE_DIRECTORY_SYMLINK) || defined(DEFINE_DIRECTORY_MKDIR)
 			TRY {
@@ -270,7 +270,7 @@ directory_mkdir(struct directory_node *__restrict target_directory,
 				                                                       FS_GFP | GFP_CALLOC);
 #endif /* ... */
 			} EXCEPT {
-				heap_free(FS_HEAP, resptr.hp_ptr, resptr.hp_siz, FS_GFP);
+				heap_free(FS_HEAP, heapptr_getptr(resptr), heapptr_getsiz(resptr), FS_GFP);
 				RETHROW();
 			}
 #endif /* DEFINE_DIRECTORY_SYMLINK || DEFINE_DIRECTORY_MKDIR */
@@ -279,7 +279,7 @@ directory_mkdir(struct directory_node *__restrict target_directory,
 			mfile_cinit(result, &inode_datablock_type, target_directory->mf_blockshift);
 			rwlock_cinit_write(__inode_lock(result));
 			result->i_super    = target_directory->i_super; /* NOTE: Incref()'d below. */
-			result->i_heapsize = resptr.hp_siz;
+			result->i_heapsize = heapptr_getsiz(resptr);
 			result->i_flags    = INODE_FATTRLOADED;
 			result->i_fileuid  = owner;
 			result->i_filegid  = group;

@@ -168,13 +168,13 @@ NOTHROW(KCALL isr_vector_state_destroy)(struct isr_vector_state *__restrict self
 PRIVATE ATTR_RETNONNULL REF struct isr_vector_state *
 (KCALL isr_vector_state_alloc)(size_t handc) THROWS(E_BADALLOC) {
 	REF struct isr_vector_state *result;
-	struct heapptr ptr;
+	heapptr_t ptr;
 	ptr = heap_alloc(&kernel_locked_heap,
 	                 offsetof(struct isr_vector_state, ivs_handv) +
 	                 handc * sizeof(struct isr_vector_handler),
 	                 GFP_LOCKED | GFP_PREFLT);
-	result = (REF struct isr_vector_state *)ptr.hp_ptr;
-	result->ivs_heapsize = ptr.hp_siz;
+	result = (REF struct isr_vector_state *)heapptr_getptr(ptr);
+	result->ivs_heapsize = heapptr_getsiz(ptr);
 	result->ivs_refcnt   = 1;
 	result->ivs_handc    = handc;
 	return result;
@@ -183,15 +183,15 @@ PRIVATE ATTR_RETNONNULL REF struct isr_vector_state *
 PRIVATE NOBLOCK REF struct isr_vector_state *
 NOTHROW(KCALL isr_vector_state_alloc_atomic_nx)(size_t handc) {
 	REF struct isr_vector_state *result;
-	struct heapptr ptr;
+	heapptr_t ptr;
 	ptr = heap_alloc_nx(&kernel_locked_heap,
 	                    offsetof(struct isr_vector_state, ivs_handv) +
 	                    handc * sizeof(struct isr_vector_handler),
 	                    GFP_LOCKED | GFP_PREFLT | GFP_ATOMIC);
-	if unlikely(!ptr.hp_siz)
+	if unlikely(!heapptr_getsiz(ptr))
 		return NULL;
-	result = (REF struct isr_vector_state *)ptr.hp_ptr;
-	result->ivs_heapsize = ptr.hp_siz;
+	result = (REF struct isr_vector_state *)heapptr_getptr(ptr);
+	result->ivs_heapsize = heapptr_getsiz(ptr);
 	result->ivs_refcnt   = 1;
 	result->ivs_handc    = handc;
 	return result;
@@ -278,16 +278,16 @@ remove_dead_hisr_at_i:
 		/* Since some  handlers got  removed, try  to truncate  the
 		 * ISR vector heap block to release unused trailing memory. */
 		{
-			struct heapptr shrunked_vector;
+			heapptr_t shrunked_vector;
 			shrunked_vector = heap_realloc_nx(&kernel_locked_heap,
 			                                  self, self->ivs_heapsize,
 			                                  offsetof(struct isr_vector_state, ivs_handv) +
 			                                  self->ivs_handc * sizeof(struct isr_vector_handler),
 			                                  GFP_LOCKED | GFP_PREFLT | GFP_ATOMIC,
 			                                  GFP_LOCKED | GFP_PREFLT | GFP_ATOMIC);
-			if likely(shrunked_vector.hp_siz) {
-				self = (struct isr_vector_state *)shrunked_vector.hp_ptr;
-				self->ivs_heapsize = shrunked_vector.hp_siz;
+			if likely(heapptr_getsiz(shrunked_vector)) {
+				self = (struct isr_vector_state *)heapptr_getptr(shrunked_vector);
+				self->ivs_heapsize = heapptr_getsiz(shrunked_vector);
 			}
 		}
 		break;
@@ -1070,7 +1070,7 @@ NOTHROW(KCALL isr_try_reorder_handlers)(size_t vector_index,
                                         struct isr_vector_state *__restrict old_state,
                                         size_t src_handler_index,
                                         size_t dst_handler_index) {
-	struct heapptr ptr; size_t i;
+	heapptr_t ptr; size_t i;
 	struct isr_vector_state *new_state;
 	assert(dst_handler_index < src_handler_index);
 	/* Try to allocate a new state. (Using NX + ATOMIC to make this async-safe) */
@@ -1078,10 +1078,10 @@ NOTHROW(KCALL isr_try_reorder_handlers)(size_t vector_index,
 	                    offsetof(struct isr_vector_state, ivs_handv) +
 	                    old_state->ivs_handc * sizeof(struct isr_vector_handler),
 	                    GFP_LOCKED | GFP_PREFLT | GFP_ATOMIC);
-	if (!ptr.hp_siz)
+	if (!heapptr_getsiz(ptr))
 		return false; /* Allocation failed. */
-	new_state = (struct isr_vector_state *)ptr.hp_ptr;
-	new_state->ivs_heapsize   = ptr.hp_siz;
+	new_state = (struct isr_vector_state *)heapptr_getptr(ptr);
+	new_state->ivs_heapsize   = heapptr_getsiz(ptr);
 	new_state->ivs_refcnt     = 1;
 	new_state->ivs_handc      = old_state->ivs_handc;
 	new_state->ivs_greedy_fun = old_state->ivs_greedy_fun;

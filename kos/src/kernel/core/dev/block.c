@@ -475,14 +475,14 @@ PUBLIC ATTR_MALLOC ATTR_RETNONNULL WUNUSED REF struct block_device *KCALL
 block_device_alloc(size_t sector_size, size_t structure_size)
 		THROWS(E_BADALLOC, E_WOULDBLOCK) {
 	REF struct block_device *result;
-	struct heapptr resptr;
+	heapptr_t resptr;
 	size_t sector_align;
 	assert(sector_size != 0);
 	assert(structure_size >= sizeof(struct block_device));
 	resptr = heap_alloc(&kernel_locked_heap, structure_size,
 	                    GFP_LOCKED | GFP_PREFLT | GFP_CALLOC);
-	result                 = (REF struct block_device *)resptr.hp_ptr;
-	result->bd_heapsize    = resptr.hp_siz;
+	result                 = (REF struct block_device *)heapptr_getptr(resptr);
+	result->bd_heapsize    = heapptr_getsiz(resptr);
 	result->bd_refcnt      = 1;
 	result->bd_max_retry   = 2;
 	result->bd_sector_size = sector_size;
@@ -498,7 +498,7 @@ block_device_alloc(size_t sector_size, size_t structure_size)
 	assert(sector_align != 0);
 	result->bd_cache_ssiz = sector_align;
 	TRY {
-		struct heapptr cacheptr;
+		heapptr_t cacheptr;
 		byte_t volatile *iter, *end;
 		if unlikely(sector_size > PAGESIZE) {
 			kernel_panic("TODO: Ensure that the cache is allocated as physically continuous memory");
@@ -510,17 +510,17 @@ block_device_alloc(size_t sector_size, size_t structure_size)
 		                      result->bd_cache_ssiz,
 		                      GFP_LOCKED | GFP_PREFLT);
 		/* Make sure that all cache pages have been pre-faulted. */
-		iter = (byte_t *)cacheptr.hp_ptr;
-		end  = iter + cacheptr.hp_siz;
+		iter = (byte_t *)heapptr_getptr(cacheptr);
+		end  = iter + heapptr_getsiz(cacheptr);
 		for (; iter < end; iter += PAGESIZE)
 			*iter = 0xcc;
 
-		result->bd_cache_base = (byte_t *)cacheptr.hp_ptr;
-		result->bd_cache_size = cacheptr.hp_siz;
+		result->bd_cache_base = (byte_t *)heapptr_getptr(cacheptr);
+		result->bd_cache_size = heapptr_getsiz(cacheptr);
 	} EXCEPT {
 		heap_free(&kernel_locked_heap,
-		          resptr.hp_ptr,
-		          resptr.hp_siz,
+		          heapptr_getptr(resptr),
+		          heapptr_getsiz(resptr),
 		          GFP_NORMAL);
 		RETHROW();
 	}
@@ -727,7 +727,7 @@ block_device_makepart(struct basic_block_device *__restrict master,
                       guid_t const *part_partguid, uintptr_half_t flags)
 		THROWS(E_BADALLOC, E_WOULDBLOCK, ...) {
 	struct block_device *dev;
-	struct heapptr resptr;
+	heapptr_t resptr;
 	REF struct block_device_partition *result;
 	assert(part_min <= part_max);
 	assert(part_max <= master->bd_sector_count - (lba_t)1);
@@ -750,7 +750,7 @@ block_device_makepart(struct basic_block_device *__restrict master,
 	                       sizeof(struct block_device_partition),
 	                       GFP_LOCKED | GFP_CALLOC |
 	                       GFP_PREFLT | GFP_ATOMIC);
-	if unlikely(!resptr.hp_siz) {
+	if unlikely(!heapptr_getsiz(resptr)) {
 		sync_endwrite(&dev->bd_parts_lock);
 		resptr = heap_alloc(&kernel_locked_heap,
 		                    sizeof(struct block_device_partition),
@@ -759,8 +759,8 @@ block_device_makepart(struct basic_block_device *__restrict master,
 			block_device_acquire_partlock_write(dev);
 		} EXCEPT {
 			heap_free(&kernel_locked_heap,
-			          resptr.hp_ptr,
-			          resptr.hp_siz,
+			          heapptr_getptr(resptr),
+			          heapptr_getsiz(resptr),
 			          GFP_CALLOC);
 			RETHROW();
 		}
@@ -768,16 +768,16 @@ block_device_makepart(struct basic_block_device *__restrict master,
 		if unlikely(result) {
 			sync_endwrite(&dev->bd_parts_lock);
 			heap_free(&kernel_locked_heap,
-			          resptr.hp_ptr,
-			          resptr.hp_siz,
+			          heapptr_getptr(resptr),
+			          heapptr_getsiz(resptr),
 			          GFP_CALLOC);
 			return result;
 		}
 	}
 	/* Setup the new partition. */
-	result = (REF struct block_device_partition *)resptr.hp_ptr;
+	result = (REF struct block_device_partition *)heapptr_getptr(resptr);
 	result->bd_refcnt              = 1;
-	result->bd_heapsize            = resptr.hp_siz;
+	result->bd_heapsize            = heapptr_getsiz(resptr);
 	result->bd_type.dt_read        = &block_device_partition_read;
 	result->bd_type.dt_write       = &block_device_partition_write;
 	result->bd_type.dt_read_phys   = &block_device_partition_read_phys;

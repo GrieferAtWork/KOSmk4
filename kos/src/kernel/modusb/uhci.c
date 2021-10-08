@@ -2293,7 +2293,7 @@ uhci_interrupt_frameentry_init(struct uhci_interrupt_frameentry *__restrict self
 	struct uhci_ostd **pnexttd, *td_iter;
 	pnexttd = &self->ife_tdsf;
 	if likely(buflen < PAGESIZE) {
-		struct heapptr ptr;
+		heapptr_t ptr;
 		size_t min_align;
 		physaddr_t addr;
 		min_align = 1;
@@ -2305,22 +2305,22 @@ uhci_interrupt_frameentry_init(struct uhci_interrupt_frameentry *__restrict self
 		                          GFP_LOCKED | GFP_PREFLT); /* TODO: GFP_32BIT */
 		/* Access the allocated memory at least once to ensure that it was faulted. */
 		COMPILER_WRITE_BARRIER();
-		*(u8 *)ptr.hp_ptr = 0;
+		*(u8 *)heapptr_getptr(ptr) = 0;
 		COMPILER_WRITE_BARRIER();
-		addr = pagedir_translate(ptr.hp_ptr);
+		addr = pagedir_translate(heapptr_getptr(ptr));
 		TRY {
 			uhci_construct_tds_for_interrupt(&pnexttd,
 			                                 ptok, cs, maxpck,
 			                                 addr, buflen);
 		} EXCEPT {
 			heap_free_untraced(&kernel_locked_heap,
-			                   ptr.hp_ptr,
-			                   ptr.hp_siz,
+			                   heapptr_getptr(ptr),
+			                   heapptr_getsiz(ptr),
 			                   GFP_LOCKED);
 			RETHROW();
 		}
-		self->ife_buf     = ptr.hp_ptr;
-		self->ife_bufsize = ptr.hp_siz;
+		self->ife_buf     = heapptr_getptr(ptr);
+		self->ife_bufsize = heapptr_getsiz(ptr);
 	} else {
 		/* Large buffer. */
 		size_t num_pages;

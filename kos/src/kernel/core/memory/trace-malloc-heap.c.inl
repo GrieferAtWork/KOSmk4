@@ -87,27 +87,27 @@ DECL_BEGIN
 
 
 #ifdef DEFINE_X_except
-#define LOCAL_TRACE_OR_FAIL(result_ptr, gfp, nx_on_failure)              \
-	TRY {                                                                \
-		kmalloc_trace((result_ptr).hp_ptr, (result_ptr).hp_siz, gfp, 1); \
-	} EXCEPT {                                                           \
-		heap_free_untraced(self,                                         \
-		                   (result_ptr).hp_ptr,                          \
-		                   (result_ptr).hp_siz,                          \
-		                   gfp);                                         \
-		RETHROW();                                                       \
+#define LOCAL_TRACE_OR_FAIL(result_ptr, gfp, nx_on_failure)                            \
+	TRY {                                                                              \
+		kmalloc_trace(heapptr_getptr(result_ptr), heapptr_getsiz(result_ptr), gfp, 1); \
+	} EXCEPT {                                                                         \
+		heap_free_untraced(self,                                                       \
+		                   heapptr_getptr(result_ptr),                                 \
+		                   heapptr_getsiz(result_ptr),                                 \
+		                   gfp);                                                       \
+		RETHROW();                                                                     \
 	}
 #elif defined(DEFINE_X_noexcept)
-#define LOCAL_TRACE_OR_FAIL(result_ptr, gfp, nx_on_failure)              \
-	if unlikely((result_ptr).hp_siz == 0) {                              \
-		nx_on_failure                                                    \
-	} else if unlikely(!kmalloc_trace_nx((result_ptr).hp_ptr,            \
-	                                     (result_ptr).hp_siz, gfp, 1)) { \
-		heap_free_untraced(self,                                         \
-		                   (result_ptr).hp_ptr,                          \
-		                   (result_ptr).hp_siz,                          \
-		                   gfp);                                         \
-		nx_on_failure                                                    \
+#define LOCAL_TRACE_OR_FAIL(result_ptr, gfp, nx_on_failure)                     \
+	if unlikely(heapptr_getsiz(result_ptr) == 0) {                              \
+		nx_on_failure                                                           \
+	} else if unlikely(!kmalloc_trace_nx(heapptr_getptr(result_ptr),            \
+	                                     heapptr_getsiz(result_ptr), gfp, 1)) { \
+		heap_free_untraced(self,                                                \
+		                   heapptr_getptr(result_ptr),                          \
+		                   heapptr_getsiz(result_ptr),                          \
+		                   gfp);                                                \
+		nx_on_failure                                                           \
 	}
 #endif /* ... */
 
@@ -226,7 +226,7 @@ NOTHROW(FCALL insert_trace_node_resolve_nx)(uintptr_t umin, uintptr_t umax,
 		size_t lo_node_usize, hi_node_usize;
 		size_t new_node_size;
 		struct trace_node **pnewnode, *newnode;
-		struct heapptr node_ptr;
+		heapptr_t node_ptr;
 
 		/* Split `oldnode' into 2 nodes, such that we'll create
 		 * a gap that  allows us to  insert `node' without  any
@@ -255,7 +255,7 @@ NOTHROW(FCALL insert_trace_node_resolve_nx)(uintptr_t umin, uintptr_t umax,
 		                                     TRACE_HEAP_FLAGS |
 		                                     (gfp & GFP_INHERIT));
 #ifdef DEFINE_X_noexcept
-		if unlikely(!node_ptr.hp_siz)
+		if unlikely(!heapptr_getsiz(node_ptr))
 			return false;
 #endif /* DEFINE_X_noexcept */
 		lock_regain();
@@ -263,7 +263,11 @@ NOTHROW(FCALL insert_trace_node_resolve_nx)(uintptr_t umin, uintptr_t umax,
 		oldnode = trace_node_tree_rremove(&nodes,
 		                                  umin,
 		                                  umax);
-#define FREE_NODE_PTR() heap_free_untraced(&trace_heap, node_ptr.hp_ptr, node_ptr.hp_siz, GFP_NORMAL)
+#define FREE_NODE_PTR()                              \
+		heap_free_untraced(&trace_heap,              \
+		                   heapptr_getptr(node_ptr), \
+		                   heapptr_getsiz(node_ptr), \
+		                   GFP_NORMAL)
 		if unlikely(!oldnode)
 			goto again_free_node_ptr;
 		if unlikely(oldnode->tn_kind != TRACE_NODE_KIND_BITSET) {
@@ -314,14 +318,14 @@ again_free_node_ptr:
 		new_node_size = CEILDIV(new_node_size, BITSOF(trace_node_bitset_t)); /* new_node_size = REQ_BITSET_WORDS */
 		new_node_size *= sizeof(trace_node_bitset_t);                        /* new_node_size = sizeof(BITSET) */
 		new_node_size += offsetof(struct trace_node, tn_trace);              /* Header addend. */
-		if unlikely(new_node_size > node_ptr.hp_siz)
+		if unlikely(new_node_size > heapptr_getsiz(node_ptr))
 			goto again_free_node_ptr_insert_oldnode;
 #undef FREE_NODE_PTR
-		newnode   = (struct trace_node *)node_ptr.hp_ptr;
+		newnode   = (struct trace_node *)heapptr_getptr(node_ptr);
 		*pnewnode = newnode;
 
 		/* Initialize the node. */
-		newnode->tn_size  = node_ptr.hp_siz;
+		newnode->tn_size  = heapptr_getsiz(node_ptr);
 		newnode->tn_reach = oldnode->tn_reach;
 		newnode->tn_visit = oldnode->tn_visit;
 		newnode->tn_kind  = TRACE_NODE_KIND_BITSET;
@@ -453,7 +457,7 @@ NOTHROW(KCALL kmalloc_trace_nx)(void *base, size_t num_bytes,
 #endif /* ... */
 {
 	struct trace_node *node;
-	struct heapptr node_ptr;
+	heapptr_t node_ptr;
 	byte_t *umin, *uend;
 	size_t node_size;
 	umin = (byte_t *)base;
@@ -474,14 +478,14 @@ NOTHROW(KCALL kmalloc_trace_nx)(void *base, size_t num_bytes,
 	                                     TRACE_HEAP_FLAGS |
 	                                     (gfp & GFP_INHERIT));
 #ifdef DEFINE_X_noexcept
-	if unlikely(!node_ptr.hp_siz)
+	if unlikely(!heapptr_getsiz(node_ptr))
 		goto err;
 #endif /* DEFINE_X_noexcept */
-	node = (struct trace_node *)node_ptr.hp_ptr;
+	node = (struct trace_node *)heapptr_getptr(node_ptr);
 	/* Initialize the node. */
 	node->tn_link.rb_min = (uintptr_t)umin;
 	node->tn_link.rb_max = (uintptr_t)uend - 1;
-	node->tn_size        = node_ptr.hp_siz;
+	node->tn_size        = heapptr_getsiz(node_ptr);
 	node->tn_reach       = gc_version;
 	node->tn_visit       = 0;
 	node->tn_kind        = TRACE_NODE_KIND_USER;
@@ -520,46 +524,44 @@ done:
 
 
 
-PUBLIC struct heapptr
+PUBLIC heapptr_t
 LOCAL_NOTHROW(KCALL LOCAL_heap_alloc)(struct heap *__restrict self,
                                       size_t num_bytes, gfp_t flags) {
-	struct heapptr result;
+	heapptr_t result;
 	result = LOCAL_heap_alloc_untraced(self, num_bytes, flags);
 	LOCAL_TRACE_OR_FAIL(result, flags, {
-		result.hp_ptr = NULL;
-		result.hp_siz = 0;
+		result = heapptr_make(NULL, 0);
 	})
 	return result;
 }
 
 
-PUBLIC struct heapptr
+PUBLIC heapptr_t
 LOCAL_NOTHROW(KCALL LOCAL_heap_align)(struct heap *__restrict self,
                                       size_t min_alignment, ptrdiff_t offset,
                                       size_t num_bytes, gfp_t flags) {
-	struct heapptr result;
+	heapptr_t result;
 	result = LOCAL_heap_align_untraced(self, min_alignment,
 	                                   offset, num_bytes,
 	                                   flags);
 	LOCAL_TRACE_OR_FAIL(result, flags, {
-		result.hp_ptr = NULL;
-		result.hp_siz = 0;
+		result = heapptr_make(NULL, 0);
 	})
 	return result;
 }
 
 
-PUBLIC struct heapptr
+PUBLIC heapptr_t
 LOCAL_NOTHROW(KCALL LOCAL_heap_realloc)(struct heap *__restrict self,
                                         VIRT void *old_ptr, size_t old_bytes,
                                         size_t new_bytes, gfp_t alloc_flags,
                                         gfp_t free_flags) {
-	struct heapptr result;
 	size_t missing_bytes;
 	assert(IS_ALIGNED(old_bytes, HEAP_ALIGNMENT));
 	assert(!old_bytes || IS_ALIGNED((uintptr_t)old_ptr, HEAP_ALIGNMENT));
 	assert(!old_bytes || old_bytes >= HEAP_MINSIZE);
 	if (old_bytes == 0) {
+		heapptr_t result;
 		if unlikely(alloc_flags & GFP_NOMOVE)
 			goto err;
 		/* Special case: initial allocation */
@@ -578,8 +580,6 @@ LOCAL_NOTHROW(KCALL LOCAL_heap_realloc)(struct heap *__restrict self,
 	new_bytes &= ~(HEAP_ALIGNMENT - 1);
 	if unlikely(new_bytes < HEAP_MINSIZE)
 		new_bytes     = HEAP_MINSIZE;
-	result.hp_ptr = old_ptr;
-	result.hp_siz = old_bytes;
 	if (new_bytes <= old_bytes) {
 		size_t free_bytes;
 		/* Free trailing memory. */
@@ -589,9 +589,9 @@ LOCAL_NOTHROW(KCALL LOCAL_heap_realloc)(struct heap *__restrict self,
 			          (byte_t *)old_ptr + new_bytes,
 			          free_bytes,
 			          free_flags);
-			result.hp_siz = new_bytes;
+			old_bytes = new_bytes;
 		}
-		return result;
+		return heapptr_make(old_ptr, old_bytes);
 	}
 	missing_bytes = new_bytes - old_bytes;
 	missing_bytes = LOCAL_heap_allat_untraced(self,
@@ -600,7 +600,6 @@ LOCAL_NOTHROW(KCALL LOCAL_heap_realloc)(struct heap *__restrict self,
 	                                          alloc_flags);
 	if (missing_bytes) {
 		/* Managed to extend the data block. */
-		result.hp_siz += missing_bytes;
 #ifdef DEFINE_X_except
 		TRY {
 			kmalloc_trace((byte_t *)old_ptr + old_bytes,
@@ -621,37 +620,38 @@ LOCAL_NOTHROW(KCALL LOCAL_heap_realloc)(struct heap *__restrict self,
 			goto err;
 #endif /* ... */
 		}
-		return result;
+		return heapptr_make(old_ptr, old_bytes + missing_bytes);
 	}
 	if (alloc_flags & GFP_NOMOVE)
 		goto err;
-	/* Must allocate an entirely new data block and copy memory to it. */
-	result = LOCAL_heap_alloc_untraced(self, new_bytes, alloc_flags);
-	LOCAL_TRACE_OR_FAIL(result, alloc_flags, goto err;)
-	memcpy(result.hp_ptr, old_ptr, old_bytes);
-
-	/* Free the old data block. */
-	heap_free(self, old_ptr, old_bytes,
-	          free_flags & ~GFP_CALLOC);
-	return result;
+	{
+		heapptr_t result;
+		/* Must allocate an entirely new data block and copy memory to it. */
+		result = LOCAL_heap_alloc_untraced(self, new_bytes, alloc_flags);
+		LOCAL_TRACE_OR_FAIL(result, alloc_flags, goto err;)
+		memcpy(heapptr_getptr(result), old_ptr, old_bytes);
+	
+		/* Free the old data block. */
+		heap_free(self, old_ptr, old_bytes,
+		          free_flags & ~GFP_CALLOC);
+		return result;
+	}
 err:
-	result.hp_ptr = NULL;
-	result.hp_siz = 0;
-	return result;
+	return heapptr_make(NULL, 0);
 }
 
-PUBLIC struct heapptr
+PUBLIC heapptr_t
 LOCAL_NOTHROW(KCALL LOCAL_heap_realign)(struct heap *__restrict self,
                                         VIRT void *old_ptr, size_t old_bytes,
                                         size_t min_alignment, ptrdiff_t offset,
                                         size_t new_bytes, gfp_t alloc_flags,
                                         gfp_t free_flags) {
-	struct heapptr result;
 	size_t missing_bytes;
 	assert(IS_ALIGNED(old_bytes, HEAP_ALIGNMENT));
 	assert(!old_bytes || IS_ALIGNED((uintptr_t)old_ptr, HEAP_ALIGNMENT));
 	assert(!old_bytes || old_bytes >= HEAP_MINSIZE);
 	if (old_bytes == 0) {
+		heapptr_t result;
 		if unlikely(alloc_flags & GFP_NOMOVE)
 			goto err;
 		/* Special case: initial allocation */
@@ -669,8 +669,6 @@ LOCAL_NOTHROW(KCALL LOCAL_heap_realign)(struct heap *__restrict self,
 #endif /* ... */
 	}
 	new_bytes &= ~(HEAP_ALIGNMENT - 1);
-	result.hp_ptr = old_ptr;
-	result.hp_siz = old_bytes;
 	if (new_bytes <= old_bytes) {
 		size_t free_bytes;
 		if unlikely(new_bytes < HEAP_MINSIZE)
@@ -680,9 +678,9 @@ LOCAL_NOTHROW(KCALL LOCAL_heap_realign)(struct heap *__restrict self,
 		if (free_bytes >= HEAP_MINSIZE) {
 			heap_free(self, (byte_t *)old_ptr + new_bytes,
 			          free_bytes, free_flags);
-			result.hp_siz = new_bytes;
+			old_bytes = new_bytes;
 		}
-		return result;
+		return heapptr_make(old_ptr, old_bytes);
 	}
 	missing_bytes = new_bytes - old_bytes;
 	missing_bytes = LOCAL_heap_allat_untraced(self,
@@ -691,7 +689,6 @@ LOCAL_NOTHROW(KCALL LOCAL_heap_realign)(struct heap *__restrict self,
 	                                          alloc_flags);
 	if (missing_bytes) {
 		/* Managed to extend the data block. */
-		result.hp_siz += missing_bytes;
 #ifdef DEFINE_X_except
 		TRY {
 			kmalloc_trace((byte_t *)old_ptr + old_bytes,
@@ -712,26 +709,27 @@ LOCAL_NOTHROW(KCALL LOCAL_heap_realign)(struct heap *__restrict self,
 			goto err;
 #endif /* ... */
 		}
-		return result;
+		return heapptr_make(old_ptr, old_bytes + missing_bytes);
 	}
 	if (alloc_flags & GFP_NOMOVE)
 		goto err;
-	/* Must allocate an entirely new data block and copy memory to it. */
-	result = LOCAL_heap_align_untraced(self,
-	                                   min_alignment,
-	                                   offset,
-	                                   new_bytes,
-	                                   alloc_flags);
-	LOCAL_TRACE_OR_FAIL(result, alloc_flags, goto err;)
-	memcpy(result.hp_ptr, old_ptr, old_bytes);
-	/* Free the old data block. */
-	heap_free(self, old_ptr, old_bytes,
-	          free_flags & ~GFP_CALLOC);
-	return result;
+	{
+		heapptr_t result;
+		/* Must allocate an entirely new data block and copy memory to it. */
+		result = LOCAL_heap_align_untraced(self,
+		                                   min_alignment,
+		                                   offset,
+		                                   new_bytes,
+		                                   alloc_flags);
+		LOCAL_TRACE_OR_FAIL(result, alloc_flags, goto err;)
+		memcpy(heapptr_getptr(result), old_ptr, old_bytes);
+		/* Free the old data block. */
+		heap_free(self, old_ptr, old_bytes,
+		          free_flags & ~GFP_CALLOC);
+		return result;
+	}
 err:
-	result.hp_ptr = NULL;
-	result.hp_siz = 0;
-	return result;
+	return heapptr_make(NULL, 0);
 }
 
 DECL_END

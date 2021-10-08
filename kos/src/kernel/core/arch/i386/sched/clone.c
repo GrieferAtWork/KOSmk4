@@ -167,7 +167,7 @@ x86_clone_impl(struct icpustate const *__restrict init_state,
                uintptr_t gsbase, uintptr_t fsbase)
 		THROWS(E_WOULDBLOCK, E_BADALLOC) {
 	upid_t result_pid;
-	struct heapptr resptr;
+	heapptr_t resptr;
 	REF struct task *result;
 	REF struct mman *result_mman;
 	struct task *caller = THIS_TASK;
@@ -185,10 +185,10 @@ x86_clone_impl(struct icpustate const *__restrict init_state,
 		resptr = heap_alloc(&kernel_locked_heap,
 		                    (size_t)__kernel_pertask_size,
 		                    GFP_LOCKED | GFP_PREFLT);
-		result = (REF struct task *)resptr.hp_ptr;
+		result = (REF struct task *)heapptr_getptr(resptr);
 		/* Copy the per-task initialization template. */
 		memcpy(result, __kernel_pertask_start, (size_t)__kernel_pertask_size);
-		result->t_heapsz = resptr.hp_siz;
+		result->t_heapsz = heapptr_getsiz(resptr);
 		result->t_self   = result;
 		incref(&mfile_zero); /* FORTASK(result, this_kernel_stackpart_).mp_file */
 #define REL(x) ((x) = (__typeof__(x))(uintptr_t)((byte_t *)(x) + (uintptr_t)result))
@@ -279,8 +279,8 @@ again_lock_mman:
 		} EXCEPT {
 			decref_nokill(&mfile_zero); /* FORTASK(result, this_kernel_stacknode_).mp_file */
 			heap_free(&kernel_locked_heap,
-			          resptr.hp_ptr,
-			          resptr.hp_siz,
+			          heapptr_getptr(resptr),
+			          heapptr_getsiz(resptr),
 			          GFP_NORMAL);
 			RETHROW();
 		}

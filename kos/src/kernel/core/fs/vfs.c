@@ -2074,7 +2074,7 @@ vfs_clone(struct vfs *__restrict self) THROWS(E_BADALLOC) {
 /* Allocate a new FS object. */
 PUBLIC ATTR_MALLOC ATTR_RETNONNULL WUNUSED
 REF struct fs *(KCALL fs_alloc)(void) THROWS(E_BADALLOC) {
-	struct heapptr resptr;
+	heapptr_t resptr;
 	REF struct fs *result;
 	REF struct vfs *result_vfs;
 	resptr = heap_alloc(FS_HEAP, sizeof(struct fs),
@@ -2083,14 +2083,14 @@ REF struct fs *(KCALL fs_alloc)(void) THROWS(E_BADALLOC) {
 		result_vfs = vfs_alloc();
 	} EXCEPT {
 		heap_free(FS_HEAP,
-		          resptr.hp_ptr,
-		          resptr.hp_siz,
+		          heapptr_getptr(resptr),
+		          heapptr_getsiz(resptr),
 		          FS_GFP | GFP_CALLOC);
 		RETHROW();
 	}
-	result = (REF struct fs *)resptr.hp_ptr;
+	result = (REF struct fs *)heapptr_getptr(resptr);
 	result->f_refcnt   = 1;
-	result->f_heapsize = resptr.hp_siz;
+	result->f_heapsize = heapptr_getsiz(resptr);
 	result->f_vfs      = result_vfs;
 	atomic_rwlock_cinit(&result->f_pathlock);
 	result->f_root = incref(result_vfs);
@@ -2136,7 +2136,7 @@ NOTHROW(KCALL vfs_findpath_nolock)(struct vfs *__restrict new_vfs,
  * @param: clone_vfs: When true, clone the VFS, else share the same one. */
 PUBLIC ATTR_MALLOC ATTR_RETNONNULL WUNUSED REF struct fs *KCALL
 fs_clone(struct fs *__restrict self, bool clone_vfs) THROWS(E_BADALLOC) {
-	struct heapptr resptr;
+	heapptr_t resptr;
 	REF struct fs *result;
 	REF struct vfs *result_vfs;
 	resptr = heap_alloc(FS_HEAP, sizeof(struct fs),
@@ -2155,12 +2155,12 @@ again_clone:
 			}
 		} EXCEPT {
 			heap_free(FS_HEAP,
-			          resptr.hp_ptr,
-			          resptr.hp_siz,
+			          heapptr_getptr(resptr),
+			          heapptr_getsiz(resptr),
 			          FS_GFP | GFP_CALLOC);
 			RETHROW();
 		}
-		result = (REF struct fs *)resptr.hp_ptr;
+		result = (REF struct fs *)heapptr_getptr(resptr);
 		newpath = vfs_findpath_nolock(result_vfs, self->f_vfs, self->f_root);
 		if unlikely(!newpath) {
 			sync_endread(&self->f_pathlock);
@@ -2197,13 +2197,13 @@ again_clone:
 		sync_endread(&self->f_pathlock);
 	} else {
 		unsigned int i;
-		result = (REF struct fs *)resptr.hp_ptr;
+		result = (REF struct fs *)heapptr_getptr(resptr);
 		TRY {
 			sync_read(&self->f_pathlock);
 		} EXCEPT {
 			heap_free(FS_HEAP,
-			          resptr.hp_ptr,
-			          resptr.hp_siz,
+			          heapptr_getptr(resptr),
+			          heapptr_getsiz(resptr),
 			          FS_GFP | GFP_CALLOC);
 			RETHROW();
 		}
@@ -2222,7 +2222,7 @@ again_clone:
 	result->f_fsgid       = ATOMIC_READ(self->f_fsgid);
 	result->f_mode.f_mode = atomic64_read(&self->f_mode.f_atom);
 	result->f_refcnt      = 1;
-	result->f_heapsize    = resptr.hp_siz;
+	result->f_heapsize    = heapptr_getsiz(resptr);
 	result->f_vfs         = result_vfs; /* Inherit reference. */
 	atomic_rwlock_cinit(&result->f_pathlock);
 	return result;

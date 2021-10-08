@@ -242,15 +242,15 @@ NOTHROW(KCALL directory_entry_destroy)(struct directory_entry *__restrict self) 
  */
 PUBLIC ATTR_MALLOC ATTR_RETNONNULL WUNUSED REF struct directory_entry *KCALL
 directory_entry_alloc(u16 namelen) THROWS(E_BADALLOC) {
-	struct heapptr resptr;
+	heapptr_t resptr;
 	REF struct directory_entry *result;
 	resptr = heap_alloc(FS_HEAP,
 	                    offsetof(struct directory_entry, de_name) +
 	                    (namelen + 1) * sizeof(char),
 	                    FS_GFP);
-	result = (REF struct directory_entry *)resptr.hp_ptr;
+	result = (REF struct directory_entry *)heapptr_getptr(resptr);
 	result->de_refcnt        = 1;
-	result->de_heapsize      = resptr.hp_siz;
+	result->de_heapsize      = heapptr_getsiz(resptr);
 	result->de_namelen       = namelen;
 	result->de_name[namelen] = '\0';
 	return result;
@@ -3971,7 +3971,7 @@ superblock_opennode(struct superblock *__restrict self,
                     struct directory_entry *__restrict parent_directory_entry)
 		THROWS(E_FSERROR_DELETED, E_IOERROR, E_BADALLOC, ...) {
 	REF struct inode *result;
-	struct heapptr resptr;
+	heapptr_t resptr;
 again:
 	superblock_nodeslock_read(self);
 	if unlikely(self->s_flags & SUPERBLOCK_FUNMOUNTED) {
@@ -4024,26 +4024,26 @@ check_result_for_deletion:
 
 		case DT_REG:
 			resptr = heap_alloc(FS_HEAP, sizeof(struct regular_node), FS_GFP | GFP_CALLOC);
-			result = (struct inode *)resptr.hp_ptr;
+			result = (struct inode *)heapptr_getptr(resptr);
 			break;
 
 		case DT_LNK:
 			resptr = heap_alloc(FS_HEAP, sizeof(struct symlink_node), FS_GFP | GFP_CALLOC);
-			result = (struct inode *)resptr.hp_ptr;
+			result = (struct inode *)heapptr_getptr(resptr);
 			break;
 
 		case DT_DIR: {
 			REF struct directory_node *me;
 			resptr = heap_alloc(FS_HEAP, sizeof(struct directory_node), FS_GFP | GFP_CALLOC);
-			result = me = (struct directory_node *)resptr.hp_ptr;
+			result = me = (struct directory_node *)heapptr_getptr(resptr);
 			TRY {
 				me->d_map = (REF struct directory_entry **)kmalloc((DIRECTORY_DEFAULT_MASK + 1) *
 				                                                   sizeof(REF struct directory_entry *),
 				                                                   FS_GFP | GFP_CALLOC);
 			} EXCEPT {
 				heap_free(FS_HEAP,
-				          resptr.hp_ptr,
-				          resptr.hp_siz,
+				          heapptr_getptr(resptr),
+				          heapptr_getsiz(resptr),
 				          FS_GFP | GFP_CALLOC);
 				RETHROW();
 			}
@@ -4057,7 +4057,7 @@ check_result_for_deletion:
 		/* Initialize common INode members. */
 		__inode_cinit_base(result, self->mf_blockshift);
 		result->i_super    = (struct superblock *)incref(self);
-		result->i_heapsize = resptr.hp_siz;
+		result->i_heapsize = heapptr_getsiz(resptr);
 #if INODE_FNORMAL != 0
 		result->i_flags = INODE_FNORMAL;
 #endif /* INODE_FNORMAL != 0 */
@@ -4301,7 +4301,7 @@ superblock_open(struct superblock_type *__restrict type,
 		       E_FSERROR_WRONG_FILE_SYSTEM, E_FSERROR_NO_BLOCK_DEVICE,
 		       E_FSERROR_CORRUPTED_FILE_SYSTEM, E_IOERROR, E_BADALLOC,
 		       E_SEGFAULT, E_WOULDBLOCK, ...) {
-	struct heapptr resptr;
+	heapptr_t resptr;
 	REF struct superblock *result;
 	assert(type);
 	assert(type->st_sizeof_superblock >= sizeof(struct superblock));
@@ -4372,9 +4372,9 @@ superblock_open(struct superblock_type *__restrict type,
 		/* Allocate a new superblock. */
 		resptr = heap_alloc(FS_HEAP, type->st_sizeof_superblock, FS_GFP | GFP_CALLOC);
 		TRY {
-			assert(resptr.hp_siz >= type->st_sizeof_superblock);
+			assert(heapptr_getsiz(resptr) >= type->st_sizeof_superblock);
 
-			result = (struct superblock *)resptr.hp_ptr;
+			result = (struct superblock *)heapptr_getptr(resptr);
 			result->mf_refcnt = 1;
 			result->mf_ops      = &inode_datablock_type;
 			atomic_rwlock_cinit(&result->mf_lock);
@@ -4388,7 +4388,7 @@ superblock_open(struct superblock_type *__restrict type,
 			assert(SLIST_EMPTY(&result->mf_changed));
 			rwlock_cinit(__inode_lock(result));
 			result->i_super     = result;
-			result->i_heapsize  = resptr.hp_siz;
+			result->i_heapsize  = heapptr_getsiz(resptr);
 			result->i_filemode  = S_IFDIR;
 			result->i_filenlink = (nlink_t)1;
 			result->d_mask      = DIRECTORY_DEFAULT_MASK;
@@ -4450,7 +4450,7 @@ superblock_open(struct superblock_type *__restrict type,
 			if (result->s_features.sf_rec_xfer_align == 0)
 				result->s_features.sf_rec_xfer_align = (u32)1 << result->mf_blockshift;
 		} EXCEPT {
-			heap_free(FS_HEAP, resptr.hp_ptr, resptr.hp_siz, FS_GFP);
+			heap_free(FS_HEAP, heapptr_getptr(resptr), heapptr_getsiz(resptr), FS_GFP);
 			RETHROW();
 		}
 		/* Check that required fields have been initialized. */
