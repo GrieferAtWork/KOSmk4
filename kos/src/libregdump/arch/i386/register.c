@@ -234,7 +234,7 @@ libregdump_register_name(pformatprinter printer, void *arg,
 #endif /* !__x86_64__ */
 			unsigned int sz_shft;
 			sz_shft = X86_REGISTER_SIZEOF_SHIFT(regno);
-			ptr     = stpcpy(ptr, sz_prefix[sz_shft + 1]);
+			ptr     = stpcpy(ptr, sz_prefix[sz_shft - 1]);
 			if ((regno & X86_REGISTER_IDMASK) == (X86_REGISTER_MISC_IP & X86_REGISTER_IDMASK)) {
 				ptr = stpcpy(ptr, "ip");
 			} else {
