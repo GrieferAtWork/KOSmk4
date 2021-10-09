@@ -35,8 +35,8 @@
 
 # Don't use the latest patch, but this very specific one that
 # should be usable to drive the entirety of the KOS toolchain.
-#     v -- Fix some problems related to relative module imports
-DEEMON_VERSION="78a9bba0093c9b8e12a4b40ca234f03d89f5664a"
+#     v -- Fix a bug parsing c-style struct initializers in jit
+DEEMON_VERSION="d255619e0b8f2df24ce869bdd026c6f1d14c217b"
 
 MAKE_PARALLEL_COUNT=$(grep -c ^processor /proc/cpuinfo)
 
