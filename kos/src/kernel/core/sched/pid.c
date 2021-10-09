@@ -2015,56 +2015,58 @@ posix_waitfor(idtype_t which,
 		if (handptr) {
 			struct sighand *hand;
 			hand = sighand_ptr_lockread(handptr);
-			if ((hand->sh_actions[SIGCLD - 1].sa_flags & SA_NOCLDWAIT) ||
-			    (hand->sh_actions[SIGCLD - 1].sa_handler == SIG_IGN &&
-			     !(hand->sh_actions[SIGCLD - 1].sa_flags & SA_SIGINFO))) {
-				sync_endread(hand);
-				/* Block until  all child  processes have  exited
-				 * and reap all zombies created in the mean time.
-				 * Then, fail with -ECHILD. */
+			if likely(hand) {
+				if ((hand->sh_actions[SIGCLD - 1].sa_flags & SA_NOCLDWAIT) ||
+				    (hand->sh_actions[SIGCLD - 1].sa_handler == SIG_IGN &&
+				     !(hand->sh_actions[SIGCLD - 1].sa_flags & SA_SIGINFO))) {
+					sync_endread(hand);
+					/* Block until  all child  processes have  exited
+					 * and reap all zombies created in the mean time.
+					 * Then, fail with -ECHILD. */
 reapall_again:
-				task_connect_for_poll(&mygroup.tg_proc_threads_change);
+					task_connect_for_poll(&mygroup.tg_proc_threads_change);
 reapall_check:
-				TRY {
-					sync_read(&mygroup.tg_proc_threads_lock);
+					TRY {
+						sync_read(&mygroup.tg_proc_threads_lock);
 reapall_check_already_locked:
-					child = LIST_FIRST(&mygroup.tg_proc_threads);
-					if (!child) {
-						sync_end(&mygroup.tg_proc_threads_lock);
-						if (task_receiveall())
-							goto reapall_again;
-						return -ECHILD;
-					}
-					if (!(options & WNOREAP)) {
-						for (; child; child = LIST_NEXT(child, tp_siblings)) {
-							if (is_taskpid_terminating(child)) {
-								/* Detach (reap) this child. */
-								if (!sync_writing(&mygroup.tg_proc_threads_lock) &&
-								    !sync_upgrade(&mygroup.tg_proc_threads_lock))
-									goto reapall_check_already_locked;
-								LIST_UNBIND(child, tp_siblings); /* Inherit reference. */
-								sync_endwrite(&mygroup.tg_proc_threads_lock);
-								decref(child);
-								goto reapall_check;
+						child = LIST_FIRST(&mygroup.tg_proc_threads);
+						if (!child) {
+							sync_end(&mygroup.tg_proc_threads_lock);
+							if (task_receiveall())
+								goto reapall_again;
+							return -ECHILD;
+						}
+						if (!(options & WNOREAP)) {
+							for (; child; child = LIST_NEXT(child, tp_siblings)) {
+								if (is_taskpid_terminating(child)) {
+									/* Detach (reap) this child. */
+									if (!sync_writing(&mygroup.tg_proc_threads_lock) &&
+									    !sync_upgrade(&mygroup.tg_proc_threads_lock))
+										goto reapall_check_already_locked;
+									LIST_UNBIND(child, tp_siblings); /* Inherit reference. */
+									sync_endwrite(&mygroup.tg_proc_threads_lock);
+									decref(child);
+									goto reapall_check;
+								}
 							}
 						}
+						sync_end(&mygroup.tg_proc_threads_lock);
+					} EXCEPT {
+						task_disconnectall();
+						RETHROW();
 					}
-					sync_end(&mygroup.tg_proc_threads_lock);
-				} EXCEPT {
-					task_disconnectall();
-					RETHROW();
+					if (options & WNOHANG) {
+						if (task_receiveall())
+							goto reapall_again;
+						return -ECHILD; /* I feel like this should be EAGAIN, but  POSIX
+						                 * says that wait() doesn't return that error... */
+					}
+					/* Wait for more state-change signals. */
+					task_waitfor();
+					goto reapall_again;
 				}
-				if (options & WNOHANG) {
-					if (task_receiveall())
-						goto reapall_again;
-					return -ECHILD; /* I feel like this should be EAGAIN, but  POSIX
-					                 * says that wait() doesn't return that error... */
-				}
-				/* Wait for more state-change signals. */
-				task_waitfor();
-				goto reapall_again;
+				sync_endread(hand);
 			}
-			sync_endread(hand);
 		}
 	}
 

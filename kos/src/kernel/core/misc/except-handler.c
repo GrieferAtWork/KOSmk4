@@ -321,12 +321,15 @@ again_gethand:
 	assert(siginfo.si_signo != 0);
 	assert(siginfo.si_signo < NSIG);
 	if (!THIS_SIGHAND_PTR) {
+default_sighand:
 		action.sa_handler = SIG_DFL;
 		action.sa_flags   = 0;
 		action.sa_mask    = NULL;
 	} else {
 		struct sighand *hand;
-		hand   = sighand_ptr_lockread(THIS_SIGHAND_PTR);
+		hand = sighand_ptr_lockread(THIS_SIGHAND_PTR);
+		if unlikely(!hand)
+			goto default_sighand;
 		action = hand->sh_actions[siginfo.si_signo - 1];
 		xincref(action.sa_mask);
 		sync_endread(hand);
@@ -525,6 +528,7 @@ NOTHROW(FCALL userexcept_exec_user_rpc)(/*in|out*/ struct rpc_context *__restric
 		assert(rpc->pr_psig.si_signo < NSIG);
 again_load_threadsig_action:
 		if (!THIS_SIGHAND_PTR) {
+default_sighand:
 			action.sa_handler = SIG_DFL;
 			action.sa_flags   = 0;
 			action.sa_mask    = NULL;
@@ -532,7 +536,9 @@ again_load_threadsig_action:
 			struct sighand *hand;
 			/* NOTE: This call to `sighand_ptr_lockread()'
 			 * can't throw because preemption is  enabled! */
-			hand   = sighand_ptr_lockread(THIS_SIGHAND_PTR);
+			hand = sighand_ptr_lockread(THIS_SIGHAND_PTR);
+			if unlikely(!hand)
+				goto default_sighand;
 			action = hand->sh_actions[rpc->pr_psig.si_signo - 1];
 			xincref(action.sa_mask);
 			sync_endread(hand);
