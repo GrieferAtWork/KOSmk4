@@ -3598,9 +3598,10 @@ class SystemHeader {
 				local bindingDeps: {string: Function} = b.dependencyFunctions;
 				if (!bindingDeps)
 					continue;
-				local deps: {string...} = dependentFunctionHeaders.get(binding.ppCond);
+				local condStr = str(binding.ppCond);
+				local deps: {string...} = dependentFunctionHeaders.get(condStr);
 				if (deps is none)
-					deps = dependentFunctionHeaders[binding.ppCond] = HashSet();
+					deps = dependentFunctionHeaders[condStr] = HashSet();
 				for (local none, func: bindingDeps) {
 					try {
 						local intName = func.internalFunctionName;

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5715b57 */
+/* HASH CRC-32:0x64a61f61 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,12 +25,12 @@
 #include <hybrid/typecore.h>
 #include <kos/types.h>
 #include "../user/wchar.h"
-#if !defined(LIBC_ARCH_HAVE_C32MEMCMP) && __SIZEOF_INT__ > 4
-#include "../user/string.h"
-#endif /* !LIBC_ARCH_HAVE_C32MEMCMP && __SIZEOF_INT__ > 4 */
 #if !defined(LIBC_ARCH_HAVE_C16MEMCMP) && __SIZEOF_INT__ > 2
 #include "../user/string.h"
 #endif /* !LIBC_ARCH_HAVE_C16MEMCMP && __SIZEOF_INT__ > 2 */
+#if !defined(LIBC_ARCH_HAVE_C32MEMCMP) && __SIZEOF_INT__ > 4
+#include "../user/string.h"
+#endif /* !LIBC_ARCH_HAVE_C32MEMCMP && __SIZEOF_INT__ > 4 */
 #include "format-printer.h"
 #include "parts.wchar.format-printer.h"
 #include "../user/stdio.h"
