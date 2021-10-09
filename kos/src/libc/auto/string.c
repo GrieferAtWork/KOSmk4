@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe39d952f */
+/* HASH CRC-32:0xbc2de779 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,6 +31,7 @@
 
 DECL_BEGIN
 
+#include "../user/stdio.h"
 #ifndef LIBC_ARCH_HAVE_MEMCPY
 /* >> memcpy(3)
  * Copy memory between non-overlapping memory blocks.

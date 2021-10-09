@@ -46,6 +46,9 @@
 %[default:section(".text.crt{|.dos}.string.memory")]
 
 
+%(auto_source){
+#include "../user/stdio.h"
+}
 %(auto_header){
 /* Bind optimized variants  of various string  functions,
  * so those get used when building the automatic portions
@@ -878,7 +881,7 @@ char *strerror($errno_t errnum) {
 		strncpy(result, string, COMPILER_LENOF(strerror_buf) - 1);
 	} else {
 @@pp_ifdef __BUILDING_LIBC@@
-		sprintf(result, "Unknown error %d", errnum);
+		@libc_sprintf@(result, "Unknown error %d", errnum);
 @@pp_else@@
 		/* Can't use sprintf() because that would form a  dependency
 		 * loop with format_vprintf() which uses strerror() in order
