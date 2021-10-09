@@ -162,18 +162,8 @@ panic_uhe_dbg_main(unsigned int unwind_error,
                    struct exception_info *info) {
 	unsigned int i;
 	bool is_first_pointer;
-	char const *name;
 	instrlen_isa_t isa;
-	dbg_printf(DBGSTR(AC_WITHCOLOR(ANSITTY_CL_WHITE, ANSITTY_CL_MAROON, "Unhandled exception") " "
-	                  AC_WHITE("%.4" PRIxN(__SIZEOF_ERROR_CLASS_T__) "") " "
-	                  AC_WHITE("%.4" PRIxN(__SIZEOF_ERROR_SUBCLASS_T__) "")),
-	           info->ei_class,
-	           info->ei_subclass);
-
 	/* Dump the exception that occurred. */
-	name = error_name(info->ei_code);
-	if (name)
-		dbg_printf(DBGSTR(" [" AC_WHITE("%s") "]"), name);
 	error_print_short_description(&dbg_printer, NULL, &info->ei_data,
 	                              ERROR_PRINT_SHORT_DESCRIPTION_FLAG_TTY);
 	dbg_putc('\n');
@@ -225,8 +215,8 @@ panic_uhe_dbg_main(unsigned int unwind_error,
 	}
 #endif /* EXCEPT_BACKTRACE_SIZE != 0 */
 	if (unwind_error == UNWIND_SUCCESS) {
-		dbg_printf(DBGSTR("Unwinding stopped when " AC_WITHFG(ANSITTY_CL_PURPLE, "NOTHROW")
-		                  "() function " "%[vinfo:" AC_WHITE("%n") "] was reached\n"),
+		dbg_printf(DBGSTR("Unwinding stopped when " AC_WITHFG(ANSITTY_CL_PURPLE, "NOTHROW()")
+		                  " function %[vinfo:" AC_WHITE("%n") "] was reached\n"),
 		           instruction_trypred((void const *)last_pc, isa));
 	} else if (unwind_error != UNWIND_NO_FRAME) {
 		dbg_printf(DBGSTR(AC_WITHCOLOR(ANSITTY_CL_WHITE, ANSITTY_CL_MAROON, "Unwinding failed")
@@ -293,7 +283,6 @@ halt_unhandled_exception(unsigned int unwind_error,
 		kcpustate_to_ucpustate(unwind_state, &ustate);
 		kernel_halt_dump_traceback(&syslog_printer, SYSLOG_LEVEL_RAW, &ustate);
 	}
-#ifdef CONFIG_HAVE_DEBUGGER
 	/* Try to trigger a debugger trap (if enabled) */
 	if (kernel_debugtrap_shouldtrap(KERNEL_DEBUGTRAP_ON_UNHANDLED_EXCEPT)) {
 		siginfo_t si;
@@ -301,6 +290,7 @@ halt_unhandled_exception(unsigned int unwind_error,
 			si.si_signo = SIGABRT;
 		kernel_debugtrap(&info->ei_state, si.si_signo);
 	}
+#ifdef CONFIG_HAVE_DEBUGGER
 	{
 		STRUCT_DBG_ENTRY_INFO(3) einfo;
 		/* Enter the debugger */

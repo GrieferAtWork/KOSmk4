@@ -50,7 +50,7 @@ PRIVATE ATTR_DBGTEXT ATTR_PURE WUNUSED NONNULL((1)) uintptr_t FCALL
 dbg_hookiterator_current_driver_loadaddr(struct dbg_hookiterator const *__restrict self) {
 	uintptr_t result;
 	struct driver *drv;
-	TRY {
+	NESTED_TRY {
 		if unlikely(!self->dhi_nextdriver)
 			return 0; /* Kernel core. */
 		if unlikely(self->dhi_nextdriver > self->dhi_drivers->dll_count)
@@ -205,7 +205,7 @@ PUBLIC ATTR_DBGTEXT WUNUSED NONNULL((1)) struct dbg_hookhdr const *FCALL
 dbg_hookiterator_next(struct dbg_hookiterator *__restrict self) {
 	struct dbg_hookhdr *result;
 	struct dbg_hookhdr *next;
-	TRY {
+	NESTED_TRY {
 again:
 		result = self->dhi_sectnext;
 		if (result >= self->dhi_sectend) {
@@ -323,7 +323,7 @@ dbg_hookiterator_next_filtered(struct dbg_hookiterator *__restrict self,
 PUBLIC ATTR_DBGTEXT ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) struct driver *FCALL
 dbg_hookiterator_driver(struct dbg_hookiterator const *__restrict self) {
 	struct driver *drv = &kernel_driver;
-	TRY {
+	NESTED_TRY {
 		if unlikely(!self->dhi_nextdriver)
 			goto done; /* Kernel core. */
 		if unlikely(self->dhi_nextdriver > self->dhi_drivers->dll_count)

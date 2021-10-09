@@ -444,7 +444,7 @@ copyfromphys(USER CHECKED void *dst,
 	        "copyfromphys(dst: %p, src: %" PRIpN(__SIZEOF_PHYSADDR_T__) ", %" PRIuSIZ "): "
 	        "`dst' buffer cannot be apart of the caller's trampoline",
 	        dst, src, num_bytes);
-	TRY {
+	UNNESTED_TRY {
 		for (;;) {
 			size_t avail;
 			avail = PAGESIZE - ((uintptr_t)map & PAGEMASK);
@@ -483,7 +483,7 @@ copytophys(PHYS physaddr_t dst,
 	        "copytophys(dst: %" PRIpN(__SIZEOF_PHYSADDR_T__) ", src: %p, %" PRIuSIZ "): "
 	        "`src' buffer cannot be apart of the caller's trampoline",
 	        dst, src, num_bytes);
-	TRY {
+	UNNESTED_TRY {
 		for (;;) {
 			size_t avail;
 			avail = PAGESIZE - ((uintptr_t)map & PAGEMASK);
@@ -718,7 +718,7 @@ copyfromphys_onepage(USER CHECKED void *dst,
 	        "copyfromphys_onepage(dst: %p, src: %" PRIpN(__SIZEOF_PHYSADDR_T__) ", %" PRIuSIZ "): "
 	        "`dst' buffer cannot be apart of the caller's trampoline",
 	        dst, src, num_bytes);
-	TRY {
+	UNNESTED_TRY {
 		memcpy(dst, map, num_bytes);
 	} EXCEPT {
 		phys_pop();
@@ -744,7 +744,7 @@ copytophys_onepage(PHYS physaddr_t dst,
 	        "copytophys_onepage(dst: %" PRIpN(__SIZEOF_PHYSADDR_T__) ", src: %p, %" PRIuSIZ "): "
 	        "`src' buffer cannot be apart of the caller's trampoline",
 	        dst, src, num_bytes);
-	TRY {
+	UNNESTED_TRY {
 		memcpy(map, src, num_bytes);
 	} EXCEPT {
 		phys_pop();
@@ -871,7 +871,7 @@ copypagefromphys(USER CHECKED void *dst,
 	        "copypagefromphys(dst: %p, src: %" PRIpN(__SIZEOF_PHYSADDR_T__) "): "
 	        "`dst' buffer cannot be apart of the caller's trampoline",
 	        dst, src);
-	TRY {
+	UNNESTED_TRY {
 		memcpy(dst, map, PAGESIZE);
 	} EXCEPT {
 		phys_pop();
@@ -896,7 +896,7 @@ copypagetophys(PAGEDIR_PAGEALIGNED PHYS physaddr_t dst,
 	        "copypagetophys(dst: %" PRIpN(__SIZEOF_PHYSADDR_T__) ", src: %p): "
 	        "`src' buffer cannot be apart of the caller's trampoline",
 	        dst, src);
-	TRY {
+	UNNESTED_TRY {
 		memcpy(map, src, PAGESIZE);
 	} EXCEPT {
 		phys_pop();
@@ -925,7 +925,7 @@ copypagesfromphys(USER CHECKED void *dst,
 	        "copypagesfromphys(dst: %p, src: %" PRIpN(__SIZEOF_PHYSADDR_T__) ", %" PRIuSIZ "): "
 	        "`dst' buffer cannot be apart of the caller's trampoline",
 	        dst, src, num_bytes);
-	TRY {
+	UNNESTED_TRY {
 		for (;;) {
 			memcpy(dst, map, PAGESIZE);
 			num_bytes -= PAGESIZE;
@@ -962,7 +962,7 @@ copypagestophys(PAGEDIR_PAGEALIGNED PHYS physaddr_t dst,
 	        "copypagestophys(dst: %" PRIpN(__SIZEOF_PHYSADDR_T__) ", src: %p, %" PRIuSIZ "): "
 	        "`src' buffer cannot be apart of the caller's trampoline",
 	        dst, src, num_bytes);
-	TRY {
+	UNNESTED_TRY {
 		for (;;) {
 			memcpy(map, src, PAGESIZE);
 			num_bytes -= PAGESIZE;

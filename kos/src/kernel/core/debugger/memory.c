@@ -128,7 +128,7 @@ NOTHROW(KCALL dbg_readmemory)(void const *addr,
 		error = memcpy_nopf(buf, addr, num_bytes);
 		if (unlikely(error != 0) && ALLOW_MANAGED_MEMORY_ACCESS()) {
 			size_t ok = num_bytes - error;
-			TRY {
+			NESTED_TRY {
 				memcpy((byte_t *)buf + ok,
 				       (byte_t const *)addr + ok,
 				       error);
@@ -159,7 +159,7 @@ NOTHROW(KCALL dbg_readmemory)(void const *addr,
 			if (unlikely(error != 0) && ALLOW_MANAGED_MEMORY_ACCESS()) {
 				struct mman *old_mm, *new_mm;
 				size_t ok;
-				TRY {
+				NESTED_TRY {
 					/* Re-validate   in   case  the   memcpy_nopf()  above
 					 * changed something about dbg_current, or its fields. */
 					if unlikely(!ADDR_ISKERN(dbg_current))
@@ -175,7 +175,7 @@ NOTHROW(KCALL dbg_readmemory)(void const *addr,
 				old_mm = THIS_MMAN;
 				ok     = num_bytes - error;
 				PERTASK_SET(this_mman, dbg_current->t_mman);
-				TRY {
+				NESTED_TRY {
 					memcpy((byte_t *)buf + ok,
 					       (byte_t const *)addr + ok,
 					       error);
@@ -213,7 +213,7 @@ again_memcpy_nopf_kernel:
 		if (error != 0) {
 			if (ALLOW_MANAGED_MEMORY_ACCESS()) {
 				size_t ok = num_bytes - error;
-				TRY {
+				NESTED_TRY {
 					memcpy((byte_t *)buf + ok,
 					       (byte_t const *)addr + ok,
 					       error);
@@ -256,7 +256,7 @@ again_memcpy_nopf:
 			if (ALLOW_MANAGED_MEMORY_ACCESS()) {
 				struct mman *old_mm, *new_mm;
 				size_t ok;
-				TRY {
+				NESTED_TRY {
 					/* Re-validate   in   case  the   memcpy_nopf()  above
 					 * changed something about dbg_current, or its fields. */
 					if unlikely(!ADDR_ISKERN(dbg_current))
@@ -272,7 +272,7 @@ again_memcpy_nopf:
 				old_mm = THIS_MMAN;
 				ok     = num_bytes - error;
 				PERTASK_SET(this_mman, dbg_current->t_mman);
-				TRY {
+				NESTED_TRY {
 					memcpy((byte_t *)buf + ok,
 					       (byte_t const *)addr + ok,
 					       error);
