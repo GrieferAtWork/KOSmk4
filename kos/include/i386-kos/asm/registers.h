@@ -33,7 +33,7 @@
 #define _X86_REGISTER_CLASSSHIFT 12
 
 /* Return the size of a general-purpose, or misc. register. (in bytes) */
-#define X86_REGISTER_SIZEOF_SHIFT(x) (3 - (((x) & __UINT16_C(0xc00)) >> 14))
+#define X86_REGISTER_SIZEOF_SHIFT(x) (3 - (((x) & __UINT16_C(0xc00)) >> 10))
 #define X86_REGISTER_SIZEOF(x)       (__SIZE_C(1) << X86_REGISTER_SIZEOF_SHIFT(x))
 #define X86_REGISTER_SIZEMASK_1BYTE __UINT16_C(0x0c00)
 #define X86_REGISTER_SIZEMASK_2BYTE __UINT16_C(0x0800)
