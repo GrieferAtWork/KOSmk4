@@ -194,7 +194,8 @@ libregdump_register_name(pformatprinter printer, void *arg,
 	case X86_REGISTER_YMM: {
 		STATIC_ASSERT(X86_REGISTER_IDMASK == 1023);
 		char regname[COMPILER_STRLEN(numbered_register_prefixes[0]) +
-		             COMPILER_STRLEN("1023") + 1];
+		             COMPILER_STRLEN("1023") + 2];
+		char const *prefix;
 		size_t len;
 
 		if ((regno & X86_REGISTER_SIZEMASK) != 0) {
@@ -214,9 +215,10 @@ libregdump_register_name(pformatprinter printer, void *arg,
 		}
 
 		/* Print the register name */
-		len = sprintf(regname, "%s%u",
-		              numbered_register_prefixes[NUMBERED_CLASS_INDEXOF(regno)],
-		              regno & X86_REGISTER_IDMASK);
+		prefix = numbered_register_prefixes[NUMBERED_CLASS_INDEXOF(regno)];
+		len    = sprintf(regname, "%?4s%u", prefix, regno & X86_REGISTER_IDMASK);
+		if (prefix[COMPILER_STRLEN(numbered_register_prefixes[0]) - 1] == '(')
+			regname[len++] = ')';
 		result = (*printer)(arg, regname, len);
 	}	break;
 
