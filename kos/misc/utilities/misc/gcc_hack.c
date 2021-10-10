@@ -55,7 +55,7 @@ static char const KOS_ROOT_[] = KOS_ROOT;
 #define CSTRLEN(x) ((sizeof(x) / sizeof(*(x))) - 1)
 
 /* Verify that `filename' is non-absolute, or points into the KOS root.
- * If it  doesn't  return  non-zero  and print  a  warning  to  stdout.
+ * If  it  doesn't,  return non-zero  and  print a  warning  to stdout.
  * Otherwise, return `0'
  * @param: op0: First part of the associated operand.
  * @param: op1: Second part of the associated operand. */

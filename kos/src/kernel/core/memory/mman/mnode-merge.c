@@ -2441,8 +2441,10 @@ domerge_locked:
 		mpart_assert_integrity(self);
 		mpart_lock_release(self);
 	} else {
-		/* Enqueue a lockop to eventually merge `self' once the
-		 * lock to `self' becomes available. */
+		/* Enqueue a lockop to eventually merge `self'
+		 * once  the lock to `self' becomes available. */
+		/* FIXME: This asserts `assert(mpart_lock_acquired(part_to_merge = self));',
+		 *        which isn't the case here! */
 		if (async_waitfor_part_and_mergepart(self, self)) {
 			/* Must try to reap lockops (though we may just
 			 * as well also try to acquire the lock  again) */
