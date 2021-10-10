@@ -40,7 +40,7 @@ PUBLIC_FUNCTION(kernel_panic_here)
 	pushal_cfi_r
 	pushl_cfi  $(0)      /* va_list args */
 	pushl_cfi  $(0)      /* char const *format */
-	leal   4(%esp), %edx /* struct ucpustate *state */
+	leal   8(%esp), %edx /* struct ucpustate *state */
 	xorl   %ecx, %ecx    /* unsigned int n_skip */
 	PUBLIC(kernel_vpanic_ucpustate_n)
 	call   kernel_vpanic_ucpustate_n
@@ -62,7 +62,7 @@ PUBLIC_FUNCTION(kernel_panic_here_n)
 	pushal_cfi_r
 	pushl_cfi  $(0)      /* va_list args */
 	pushl_cfi  $(0)      /* char const *format */
-	leal   4(%esp), %edx /* struct ucpustate *state */
+	leal   8(%esp), %edx /* struct ucpustate *state */
 	PUBLIC(kernel_vpanic_ucpustate_n)
 	call   kernel_vpanic_ucpustate_n
 	nop /* For tracebacks... */
@@ -104,7 +104,7 @@ PUBLIC_FUNCTION(kernel_vpanic_n)
 	pushal_cfi_r
 	pushl_cfi SIZEOF_UCPUSTATE(%esp) /* va_list args */
 	pushl_cfi %edx                   /* char const *format */
-	leal   4(%esp), %edx             /* struct ucpustate *state */
+	leal   8(%esp), %edx             /* struct ucpustate *state */
 //	movl   %ecx, %ecx                /* unsigned int n_skip */
 	PUBLIC(kernel_vpanic_ucpustate_n)
 	call   kernel_vpanic_ucpustate_n
