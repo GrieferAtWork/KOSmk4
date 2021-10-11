@@ -329,15 +329,11 @@ struct service_comdesc {
 	 *       list of active commands and marking each of them as having finished  with
 	 *       an exception `E_SERVICE_EXITED' */
 
-	/* TODO: The HUP condition must be signaled to to userspace on some way.
-	 *
-	 * Idea:
-	 *  - Expand the kernel epoll API to allow for custom  actions
-	 *    to be performed when  special conditions arise in  files
-	 *    being monitored, including the raising of posix signals,
-	 *    as well as the scheduling of RPC callbacks. Using  this,
-	 *    we  could then schedule  an RPC to  mark all commands as
-	 *    having exited with `E_SERVICE_EXITED'.
+	/* TODO: The  HUP condition can  be handled asynchronously by  making use epoll RPCs
+	 *       ~ala `epoll_rpc_exec(3)' and having them send to an arbitrary thread within
+	 *       the  client process. In turn, the RPC callback  can then do all of the work
+	 *       related to canceling active commands by  making them as having exited  with
+	 *       `E_SERVICE_EXITED'.
 	 */
 
 	LIST_ENTRY(service_comdesc) scd_link; /* [lock(:s_active_lock)] List of active commands. */
