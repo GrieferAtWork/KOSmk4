@@ -156,6 +156,7 @@ INTDEF s32 x86_syscall_emulate_int80h_r_rel_x86_idt_syscall;
 INTDEF s8 x86_syscall_emulate_r_redirection[2];
 INTDEF byte_t x86_syscall_emulate_traced_r[];
 INTDEF byte_t x86_syscall_emulate_r_redirection_jmp[];
+INTDEF byte_t x86_syscall_emulate_r_redirection_inl[];
 
 #define V2P(addr) (physaddr_t)((uintptr_t)(addr) - KERNEL_CORE_BASE)
 
@@ -228,15 +229,9 @@ PUBLIC bool KCALL arch_syscall_tracing_setenabled(bool enable, bool nx) {
 #endif /* !__x86_64__ */
 
 	/* Modify `syscall_emulate_r()' */
-#ifdef __x86_64__
-#define SYSCALL_EMULATE_DONT_TRACE_WORD 0x48f3 /* rep; REX.W */
-#else /* __x86_64__ */
-#define SYSCALL_EMULATE_DONT_TRACE_WORD 0xa5f3 /* rep; movsl */
-#endif /* !__x86_64__ */
 	pokephysw_unaligned(V2P(&x86_syscall_emulate_r_redirection[0]),
 	                    enable ? (u16)(uintptr_t)x86_syscall_emulate_r_redirection_jmp
-	                           : SYSCALL_EMULATE_DONT_TRACE_WORD);
-#undef SYSCALL_EMULATE_DONT_TRACE_WORD
+	                           : (u16)(uintptr_t)x86_syscall_emulate_r_redirection_inl);
 	__flush_instruction_cache();
 	result = syscall_tracing_enabled;
 	syscall_tracing_enabled = enable;

@@ -27,6 +27,7 @@
 #include <kernel/rt/except-personality.h>
 
 #include <hybrid/host.h>
+#include <hybrid/typecore.h>
 
 #include <asm/cfi.h>
 #include <asm/instr/compat.h>
@@ -34,6 +35,10 @@
 #include <kos/kernel/cpu-state-asm.h>
 #include <kos/kernel/cpu-state-compat.h>
 #include <kos/kernel/cpu-state.h>
+
+#ifndef SIZEOF_POINTER
+#define SIZEOF_POINTER __SIZEOF_POINTER__
+#endif /* !SIZEOF_POINTER */
 
 
 /* Personality function for `syscall_emulate_r' */
@@ -63,7 +68,7 @@ INTERN_FUNCTION(syscall_emulate_r_personality)
 	movP   OFFSET_KCPUSTATE_GPREGS+OFFSET_GPREGS_PBX(%R_fcall1P), %R_fcall1P /* struct rpc_syscall_info *sc_info */
 #else /* __x86_64__ */
 	movP   OFFSET_KCPUSTATE_GPREGS+OFFSET_GPREGS_PDI(%R_fcall1P), %R_fcall1P
-	addP   $(4), %R_fcall1P /* struct rpc_syscall_info *sc_info */
+	addP   $(SIZEOF_POINTER), %R_fcall1P /* struct rpc_syscall_info *sc_info */
 #endif /* !__x86_64__ */
 	leaP   SIZEOF_RPC_SYSCALL_INFO(%R_fcall1P), %R_fcall0P
 	.cfi_remember_state

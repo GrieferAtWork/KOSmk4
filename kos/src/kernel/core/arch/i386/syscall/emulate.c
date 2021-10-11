@@ -338,7 +338,7 @@ do_syscall32:
 			      regs[0], regs[1], regs[2],
 			      regs[3], regs[4], regs[5]);
 		}
-		gpregs_setpax(&state->ics_gpregs, (uintptr_t)(u32)(s32)-ENOSYS);
+		gpregs_setpax(&state->ics_gpregs, (uintptr_t)-ENOSYS);
 	}
 	return state;
 }
@@ -401,7 +401,7 @@ do_syscall32:
 			      args[0], args[1], args[2],
 			      args[3], args[4], args[5]);
 		}
-		gpregs_setpax(&state->ics_gpregs, (uintptr_t)(u32)(s32)-ENOSYS);
+		gpregs_setpax(&state->ics_gpregs, (uintptr_t)-ENOSYS);
 	}
 	return state;
 }
