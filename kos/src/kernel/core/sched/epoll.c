@@ -57,6 +57,10 @@
 #include <stdint.h>
 #include <string.h>
 
+#ifdef CONFIG_HAVE_EPOLL_RPC
+#include <sched/pid.h>
+#endif /* CONFIG_HAVE_EPOLL_RPC */
+
 DECL_BEGIN
 
 #if !defined(NDEBUG) && !defined(NDEBUG_FINI)
@@ -64,13 +68,6 @@ DECL_BEGIN
 #else /* !NDEBUG && !NDEBUG_FINI */
 #define DBG_memset(...) (void)0
 #endif /* NDEBUG || NDEBUG_FINI */
-
-#ifdef CONFIG_HAVE_EPOLL_RPC
-STATIC_ASSERT(offsetof(struct epoll_handle_monitor, ehm_raised) ==
-              offsetof(struct epoll_handle_monitor, _ehm_zero));
-#endif /* CONFIG_HAVE_EPOLL_RPC */
-
-
 
 /* Mask of events which can be polled using epoll */
 #define EPOLL_WHATMASK                                           \
@@ -199,8 +196,15 @@ NOTHROW(FCALL epoll_completion)(struct sig_completion *__restrict self,
 	/* Increment the raise-counter, but make sure not to overrun it. */
 	do {
 		oldraise = ATOMIC_READ(monitor->ehm_raised);
-		if unlikely(oldraise == (uintptr_half_t)-1)
+#ifdef CONFIG_HAVE_EPOLL_RPC
+		/* NOTE: `-1' mustn't be reached, either because that's
+		 *       the marker for  `epoll_handle_monitor_isrpc()' */
+		if unlikely(oldraise >= (uintptr_half_t)-2)
 			break;
+#else /* CONFIG_HAVE_EPOLL_RPC */
+		if unlikely(oldraise >= (uintptr_half_t)-1)
+			break;
+#endif /* !CONFIG_HAVE_EPOLL_RPC */
 		if (oldraise == 0 && bufsize < sizeof(void *))
 			return sizeof(void *);
 	} while (!ATOMIC_CMPXCH_WEAK(monitor->ehm_raised,
@@ -242,7 +246,7 @@ NOTHROW(FCALL epoll_completion)(struct sig_completion *__restrict self,
 PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL epoll_monitor_rpc_destroy)(struct epoll_monitor_rpc *__restrict self) {
 	decref_unlikely(self->emr_target);
-	pending_rpc_free(&self->emr_rpc);
+	task_asyncrpc_destroy_for_shutdown(&self->emr_rpc);
 }
 #endif /* CONFIG_HAVE_EPOLL_RPC */
 
@@ -282,9 +286,9 @@ NOTHROW(FCALL epoll_handle_monitor_destroy)(struct epoll_handle_monitor *__restr
 
 
 /* Connect the given monitor `self' to the monitored signals of `handle_obptr' */
-PRIVATE NONNULL((1, 2)) void KCALL
+PRIVATE NONNULL((1, 2, 3)) void KCALL
 epoll_handle_monitor_pollconnect(struct epoll_handle_monitor *__restrict self,
-                                 void *handle_obptr) {
+                                 void *handle_obptr, sig_completion_t cb) {
 #ifdef CONFIG_HAVE_EPOLL_RPC
 	assertf(!epoll_handle_monitor_isrpc(self),
 	        "RPC monitors have their own version of this function");
@@ -297,7 +301,7 @@ again:
 		(*handle_type_db.h_pollconnect[self->ehm_handtyp])(handle_obptr,
 		                                                   self->ehm_events);
 		sig_multicompletion_connect_from_task(/* completion: */ &self->ehm_comp,
-		                                      /* cb:         */ &epoll_completion,
+		                                      /* cb:         */ cb,
 		                                      /* for_poll:   */ true);
 	} EXCEPT {
 		sig_multicompletion_disconnectall(&self->ehm_comp);
@@ -305,8 +309,8 @@ again:
 		RETHROW();
 	}
 	if unlikely(task_receiveall() != NULL) {
-		/* Signals  were delivered in the mean time,  and we have not have been
-		 * able to transfer all of them over to `self->ehm_comp'. -> Try again. */
+		/* Signals were delivered in the mean time, and we have not been able
+		 * to  transfer all of  them over to  `self->ehm_comp'. -> Try again. */
 		sig_multicompletion_disconnectall(&self->ehm_comp);
 		goto again;
 	}
@@ -354,7 +358,7 @@ was_asserted:
 			return;
 		}
 	}
-	epoll_handle_monitor_pollconnect(self, handptr);
+	epoll_handle_monitor_pollconnect(self, handptr, &epoll_completion);
 	TRY {
 		what = epoll_handle_monitor_polltest(self, handptr);
 		if unlikely(what) {
@@ -625,9 +629,21 @@ NOTHROW(FCALL epoll_controller_intern_rehash_with)(struct epoll_controller *__re
 	self->ec_size = self->ec_used; /* All deleted entries were removed... */
 }
 
-PRIVATE NOBLOCK NONNULL((1, 2)) bool
+/* Return values for:
+ *   - epoll_controller_intern_doadd
+ *   - epoll_controller_intern_addmon */
+#define EPOLL_CONTROLLER_INTERN_ADD_SUCCESS   0 /* Success */
+#define EPOLL_CONTROLLER_INTERN_ADD_EXISTS    1 /* The associated handle is already being monitored. */
+#ifdef CONFIG_HAVE_EPOLL_RPC
+#define EPOLL_CONTROLLER_INTERN_ADD_MUSTREAP  2 /* The  monitor already exists, but it's an already-triggered
+                                                 * RPC that should go away the next time you reap the lockops
+                                                 * of `self' */
+#endif /* CONFIG_HAVE_EPOLL_RPC */
+
+/* @return: * : One of `EPOLL_CONTROLLER_INTERN_ADD_*' */
+PRIVATE NOBLOCK WUNUSED NONNULL((1, 2)) unsigned int
 NOTHROW(FCALL epoll_controller_intern_doadd)(struct epoll_controller *__restrict self,
-                                             /*inherit(always)*/ struct epoll_handle_monitor *__restrict monitor) {
+                                             /*inherit(on_success)*/ struct epoll_handle_monitor *__restrict monitor) {
 	uintptr_t hash, i, perturb;
 	struct epoll_controller_ent *ent;
 	assert((self->ec_size + 1) <= self->ec_mask);
@@ -648,18 +664,56 @@ NOTHROW(FCALL epoll_controller_intern_doadd)(struct epoll_controller *__restrict
 		}
 		/* Check if this is an identical monitor. */
 		if (emon->ehm_handptr == monitor->ehm_handptr &&
-		    emon->ehm_fdkey == monitor->ehm_fdkey)
-			return false; /* Identical (cannot add) */
+		    emon->ehm_fdkey == monitor->ehm_fdkey) {
+#ifdef CONFIG_HAVE_EPOLL_RPC
+			/* Special return value for already-triggered RPC monitors. */
+			if (epoll_handle_monitor_isrpc(emon) && ATOMIC_READ(emon->ehm_rpc) == NULL)
+				return EPOLL_CONTROLLER_INTERN_ADD_MUSTREAP;
+#endif /* CONFIG_HAVE_EPOLL_RPC */
+
+			/* Identical monitor already exists (cannot add) */
+			return EPOLL_CONTROLLER_INTERN_ADD_EXISTS;
+		}
 	}
 	ent->ece_mon = monitor; /* Inherit */
 	++self->ec_used;
-	return true;
+	return EPOLL_CONTROLLER_INTERN_ADD_SUCCESS;
 }
 
+#ifdef CONFIG_HAVE_EPOLL_RPC
+PRIVATE NOBLOCK WUNUSED NONNULL((1, 2)) void
+NOTHROW(FCALL epoll_controller_intern_doadd_force)(struct epoll_controller *__restrict self,
+                                                   /*inherit(always)*/ struct epoll_handle_monitor *__restrict monitor) {
+	uintptr_t hash, i, perturb;
+	struct epoll_controller_ent *ent;
+	assert((self->ec_size + 1) <= self->ec_mask);
+	hash = epoll_controller_hashof(monitor);
+	i = perturb = hash & self->ec_mask;
+	for (;; epoll_controller_hashnx(i, perturb)) {
+		struct epoll_handle_monitor *emon;
+		ent  = &self->ec_list[i & self->ec_mask];
+		emon = ent->ece_mon;
+		if (!emon) {
+			/* Found a free slot */
+			++self->ec_size;
+			break;
+		}
+		if (emon == &deleted_monitor) {
+			/* Re-use a previously deleted slot. */
+			break;
+		}
+		/* Assert that this isn't an identical monitor. */
+		assert(emon->ehm_handptr != monitor->ehm_handptr ||
+		       emon->ehm_fdkey != monitor->ehm_fdkey);
+	}
+	ent->ece_mon = monitor; /* Inherit */
+	++self->ec_used;
+}
+#endif /* CONFIG_HAVE_EPOLL_RPC */
+
 /* Add the given `monitor' to `self'
- * @return: true:  Success.
- * @return: false: An identical monitor had already been added in the past. */
-PRIVATE NONNULL((1, 2)) bool FCALL
+ * @return: * : One of `EPOLL_CONTROLLER_INTERN_ADD_*' */
+PRIVATE NONNULL((1, 2)) unsigned int FCALL
 epoll_controller_intern_addmon(struct epoll_controller *__restrict self,
                                /*inherit(on_success)*/ struct epoll_handle_monitor *__restrict monitor)
 		THROWS(E_BADALLOC) {
@@ -693,8 +747,7 @@ doadd:
 
 /* Try to rehash the given controller following the removing of an monitor. */
 PRIVATE NOBLOCK NONNULL((1)) void
-NOTHROW(FCALL epoll_controller_intern_rehash_after_remove)(struct epoll_controller *__restrict self)
-		THROWS(E_BADALLOC) {
+NOTHROW(FCALL epoll_controller_intern_rehash_after_remove)(struct epoll_controller *__restrict self) {
 	if ((self->ec_used < (self->ec_mask / 3)) &&
 	    self->ec_mask > CONFIG_EPOLL_CONTROLLER_INITIAL_MASK) {
 		/* Try to shrink the hash-vector's mask size. */
@@ -718,8 +771,7 @@ NOTHROW(FCALL epoll_controller_intern_rehash_after_remove)(struct epoll_controll
 /* Remove `monitor' from the set of monitors of `self' */
 PRIVATE NOBLOCK NONNULL((1, 2)) void
 NOTHROW(FCALL epoll_controller_intern_delmon)(struct epoll_controller *__restrict self,
-                                              /*caller_inherit(always)*/ struct epoll_handle_monitor *__restrict monitor)
-		THROWS(E_BADALLOC) {
+                                              /*caller_inherit(always)*/ struct epoll_handle_monitor *__restrict monitor) {
 	uintptr_t hash, i, perturb;
 	struct epoll_controller_ent *ent;
 	assert(self->ec_used);
@@ -734,6 +786,13 @@ NOTHROW(FCALL epoll_controller_intern_delmon)(struct epoll_controller *__restric
 	}
 	ent->ece_mon = &deleted_monitor;
 	--self->ec_used;
+}
+
+/* Helper wrapper for `epoll_controller_intern_delmon()' */
+PRIVATE NOBLOCK NONNULL((1, 2)) void
+NOTHROW(FCALL epoll_controller_intern_delmon_and_maybe_rehash)(struct epoll_controller *__restrict self,
+                                                               /*caller_inherit(always)*/ struct epoll_handle_monitor *__restrict monitor) {
+	epoll_controller_intern_delmon(self, monitor);
 	epoll_controller_intern_rehash_after_remove(self);
 }
 
@@ -741,8 +800,7 @@ NOTHROW(FCALL epoll_controller_intern_delmon)(struct epoll_controller *__restric
  * If no such monitor exists, return NULL instead. */
 PRIVATE NOBLOCK NONNULL((1, 2)) /*inherit(on_success)*/ struct epoll_handle_monitor *
 NOTHROW(FCALL epoll_controller_intern_pop)(struct epoll_controller *__restrict self,
-                                           void *handptr, uint32_t fd_key)
-		THROWS(E_BADALLOC) {
+                                           void *handptr, uint32_t fd_key) {
 	uintptr_t hash, i, perturb;
 	struct epoll_controller_ent *ent;
 	struct epoll_handle_monitor *emon;
@@ -760,7 +818,6 @@ NOTHROW(FCALL epoll_controller_intern_pop)(struct epoll_controller *__restrict s
 	assert(self->ec_used);
 	ent->ece_mon = &deleted_monitor;
 	--self->ec_used;
-	epoll_controller_intern_rehash_after_remove(self);
 	return emon;
 }
 
@@ -793,13 +850,13 @@ NOTHROW(FCALL epoll_controller_intern_lookup)(struct epoll_controller *__restric
 
 
 
-/* Add a monitor for `hand' to the given epoll controller.
+/* Add a monitor for `hand:fd_key' to the given epoll controller.
  * @throw: E_ILLEGAL_REFERENCE_LOOP: `hand' is another epoll controller that is either the same
  *                                   as `self', or is already monitoring `self'. Also thrown if
  *                                   the max depth of nested epoll controllers would exceed the
  *                                   compile-time `CONFIG_EPOLL_MAX_NESTING' limit.
  * @return: true:  Success
- * @return: false: Another monitor for `hand' already exists. */
+ * @return: false: Another monitor for `hand:fd_key' already exists. */
 PUBLIC NONNULL((1, 2)) bool KCALL
 epoll_controller_addmonitor(struct epoll_controller *__restrict self,
                             struct handle const *__restrict hand,
@@ -838,6 +895,9 @@ epoll_controller_addmonitor(struct epoll_controller *__restrict self,
 		 * should be strong enough to correctly deal with a signal that
 		 * is  sending  itself,  so-long as  the  associated completion
 		 * function didn't attempt to re-prime itself. */
+#ifdef CONFIG_HAVE_EPOLL_RPC
+again_acquire:
+#endif /* CONFIG_HAVE_EPOLL_RPC */
 		epoll_controller_acquire_for_monitor_add(self, hand);
 		TRY {
 			/* Acquire a weak reference to the given handle. */
@@ -845,13 +905,19 @@ epoll_controller_addmonitor(struct epoll_controller *__restrict self,
 			assert(newmon->ehm_handptr);
 
 			TRY {
+				unsigned int status;
 				/* Add `newmon' from the monitor list of `self' */
-				if unlikely(!epoll_controller_intern_addmon(self, newmon)) {
+				status = epoll_controller_intern_addmon(self, newmon);
+				if unlikely(status != EPOLL_CONTROLLER_INTERN_ADD_SUCCESS) {
 					/* Cannot add: An identical monitor had already been added in the past... */
 					epoll_controller_lock_release(self);
 					(*handle_type_db.h_weakdecref[newmon->ehm_handtyp])(newmon->ehm_handptr);
 					sig_multicompletion_fini(&newmon->ehm_comp);
 					kfree(newmon);
+#ifdef CONFIG_HAVE_EPOLL_RPC
+					if (status == EPOLL_CONTROLLER_INTERN_ADD_MUSTREAP)
+						goto again_acquire;
+#endif /* CONFIG_HAVE_EPOLL_RPC */
 					return false;
 				}
 
@@ -860,7 +926,7 @@ epoll_controller_addmonitor(struct epoll_controller *__restrict self,
 					epoll_handle_monitor_prime(newmon, hand->h_data, true);
 				} EXCEPT {
 					/* Remove `newmon' from the monitor list of `self' */
-					epoll_controller_intern_delmon(self, newmon);
+					epoll_controller_intern_delmon_and_maybe_rehash(self, newmon);
 					RETHROW();
 				}
 			} EXCEPT {
@@ -879,6 +945,306 @@ epoll_controller_addmonitor(struct epoll_controller *__restrict self,
 	}
 	return true;
 }
+
+#ifdef CONFIG_HAVE_EPOLL_RPC
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL epoll_rpc_trigger)(/*inherit(always)*/ struct epoll_monitor_rpc *__restrict rpc) {
+	bool ok = false;
+	REF struct taskpid *target_pid;
+	REF struct task *target;
+	syscall_ulong_t rpc_flags;
+	target_pid = rpc->emr_target;
+	rpc_flags  = rpc->emr_rpc.pr_flags & RPC_DOMAIN_F_PROC;
+	rpc->emr_rpc.pr_flags &= ~RPC_DOMAIN_F_PROC;
+
+	/* Lookup the actual target */
+	target = taskpid_gettask(target_pid);
+	decref_unlikely(target_pid);
+	if likely(target != NULL) {
+		/* Schedule the RPC, and destroy is if the target already died. */
+		ok = rpc_flags & RPC_DOMAIN_F_PROC ? proc_rpc_schedule(target, &rpc->emr_rpc)
+		                                   : task_rpc_schedule(target, &rpc->emr_rpc);
+		decref_unlikely(target);
+	}
+
+	/* If scheduling failed due to the target terminating, destroy the RPC via shutdown. */
+	if (!ok)
+		task_asyncrpc_destroy_for_shutdown(&rpc->emr_rpc);
+}
+
+PRIVATE NOBLOCK NOPREEMPT NONNULL((1, 2)) void
+NOTHROW(FCALL epoll_rpc_postcompletion)(struct sig_completion_context *__restrict UNUSED(context),
+                                        void *buf) {
+	struct epoll_monitor_rpc *rpc;
+	REF struct epoll_controller *ctrl;
+	rpc  = (struct epoll_monitor_rpc *)(((void **)buf)[0]);    /* Inherit data */
+	ctrl = (REF struct epoll_controller *)(((void **)buf)[1]); /* inherit reference */
+
+	/* Reap lockops of `ctrl' and drop our reference to it.
+	 * This must be done because our caller added a  lockop
+	 * to the controller for the purpose of removing  their
+	 * original controller. However,  reaping could not  be
+	 * done  from a signal-completion  context, as it's not
+	 * an SMP-lock-safe operation, and as such needs to  be
+	 * performed from this post-completion callback. */
+	_epoll_controller_lock_reap(ctrl);
+	decref_unlikely(ctrl);
+
+	/* Trigger the associated RPC */
+	epoll_rpc_trigger(rpc); /* Inherit data */
+}
+
+PRIVATE NOBLOCK NOPREEMPT NONNULL((1, 2)) void
+NOTHROW(FCALL epoll_rpc_postcompletion_with_inherited_lock)(struct sig_completion_context *__restrict UNUSED(context),
+                                                            void *buf) {
+	struct epoll_monitor_rpc *rpc;
+	struct epoll_handle_monitor *monitor;
+	rpc     = (struct epoll_monitor_rpc *)(((void **)buf)[0]); /* Inherit data */
+	monitor = (struct epoll_handle_monitor *)(((void **)buf)[1]);
+
+	/* Remove the monitor from the controller. */
+	epoll_controller_intern_delmon_and_maybe_rehash(monitor->ehm_ctrl, monitor);
+	epoll_controller_lock_release(monitor->ehm_ctrl);
+
+	/* Destroy the monitor. */
+	sig_multicompletion_disconnectall(&monitor->ehm_comp);
+	sig_multicompletion_fini(&monitor->ehm_comp);
+	(*handle_type_db.h_weakdecref[monitor->ehm_handtyp])(monitor->ehm_handptr);
+	kfree(monitor);
+
+	/* Trigger the associated RPC */
+	epoll_rpc_trigger(rpc); /* Inherit data */
+}
+
+PRIVATE NOBLOCK NONNULL((1, 2)) void
+NOTHROW(LOCKOP_CC epoll_rpc_monitor_remove_postlop)(Tobpostlockop(epoll_controller) *__restrict self,
+                                                    struct epoll_controller *__restrict UNUSED(obj)) {
+	struct epoll_handle_monitor *monitor;
+	monitor = container_of(self, struct epoll_handle_monitor, _ehm_plop);
+
+	/* Destroy the monitor. */
+	sig_multicompletion_disconnectall(&monitor->ehm_comp);
+	sig_multicompletion_fini(&monitor->ehm_comp);
+	(*handle_type_db.h_weakdecref[monitor->ehm_handtyp])(monitor->ehm_handptr);
+	kfree(monitor);
+}
+
+PRIVATE NOBLOCK NONNULL((1, 2)) Tobpostlockop(epoll_controller) *
+NOTHROW(LOCKOP_CC epoll_rpc_monitor_remove_lop)(Toblockop(epoll_controller) *__restrict self,
+                                                struct epoll_controller *__restrict obj) {
+	struct epoll_handle_monitor *monitor;
+	monitor = container_of(self, struct epoll_handle_monitor, _ehm_lop);
+
+	/* Remove the monitor from the epoll controller. */
+	epoll_controller_intern_delmon_and_maybe_rehash(obj, monitor);
+
+	/* The  rest of cleanup needs to happen in a post-lockop callback
+	 * as it can't be safely done while we're sitll holding a lock to
+	 * `obj->ec_lock' */
+	monitor->_ehm_plop.oplo_func = &epoll_rpc_monitor_remove_postlop;
+	return &monitor->_ehm_plop;
+}
+
+
+PRIVATE NOBLOCK NOPREEMPT NONNULL((1, 2)) size_t
+NOTHROW(FCALL epoll_rpc_completion)(struct sig_completion *__restrict self,
+                                    struct sig_completion_context *__restrict context,
+                                    void *buf, size_t bufsize) {
+	struct epoll_monitor_rpc *rpc;
+	struct epoll_handle_monitor *monitor;
+	/*sig_multicompletion_trydisconnectall(self);*/ /* TODO: Optimization */
+
+	/* Figure out our monitor. Note that we're safe to access the monitor, as
+	 * well as its controller because the monitor owns `self', and right  now
+	 * our caller is preventing `self'  from being destroyed by holding  onto
+	 * an internal SMP-lock that will block:
+	 *  - `sig_completion_disconnect()', as called by
+	 *  - `sig_multicompletion_disconnectall()', as called by
+	 *  - `epoll_controller_destroy()' */
+	monitor = container_of(sig_multicompletion_controller(self),
+	                       struct epoll_handle_monitor, ehm_comp);
+#ifdef CONFIG_HAVE_EPOLL_RPC
+	assert(epoll_handle_monitor_isrpc(monitor));
+#endif /* CONFIG_HAVE_EPOLL_RPC */
+
+	if (ATOMIC_READ(monitor->ehm_rpc) != NULL && bufsize < 2 * sizeof(void *))
+		return 2 * sizeof(void *);
+	rpc = ATOMIC_XCH(monitor->ehm_rpc, NULL);
+	if (rpc) {
+		struct epoll_controller *ctrl;
+		assert(bufsize >= 2 * sizeof(void *));
+		((void **)buf)[0] = rpc; /* Inherit data */
+
+		/* Asynchronously remove `monitor' from its controller. */
+		ctrl = monitor->ehm_ctrl;
+		if (epoll_controller_lock_tryacquire(ctrl)) {
+			((void **)buf)[1] = monitor; /* Inherit lock to `monitor->ehm_ctrl' */
+			context->scc_post = &epoll_rpc_postcompletion_with_inherited_lock;
+		} else {
+			/* RPC  sending and monitor removal happen asynchronously detached of each other.
+			 * In this case, we make use of lockops to remove the monitor from the associated
+			 * controller. */
+			monitor->_ehm_lop.olo_func = &epoll_rpc_monitor_remove_lop;
+			((void **)buf)[1]          = incref(ctrl); /* Inherit reference */
+			oblockop_enqueue(&ctrl->ec_lops, &monitor->_ehm_lop);
+
+			/* NOTE: Reaping is done by `epoll_rpc_postcompletion()', as it can't
+			 *       be done  here since  it's  not an  SMP-lock-safe  operation. */
+			context->scc_post = &epoll_rpc_postcompletion;
+		}
+		return sizeof(void *);
+	}
+	return 0;
+}
+
+
+/* Add a monitor for `hand' to the given epoll controller. When a raising edge
+ * for the monitored conditions is detected (or if the conditions are  already
+ * met at the time of the this function being called), trigger delivery of the
+ * given RPC before automatically removing  the associated epoll monitor  from
+ * `self'.  When the thread/process  targeted by said  RPC has already exited,
+ * the RPC is silently discarded.
+ * @throw: E_ILLEGAL_REFERENCE_LOOP: `hand' is another epoll controller that is either the same
+ *                                   as `self', or is already monitoring `self'. Also thrown if
+ *                                   the max depth of nested epoll controllers would exceed the
+ *                                   compile-time `CONFIG_EPOLL_MAX_NESTING' limit.
+ * @return: true:  Success
+ * @return: false: Another monitor for `hand:fd_key' already exists. */
+PUBLIC NONNULL((1, 2, 5)) bool KCALL
+epoll_controller_addmonitor_rpc(struct epoll_controller *__restrict self,
+                                struct handle const *__restrict hand,
+                                uint32_t fd_key, uint32_t events,
+                                /*inherit(always)*/ struct epoll_monitor_rpc *__restrict rpc)
+		THROWS(E_BADALLOC, E_WOULDBLOCK, E_ILLEGAL_REFERENCE_LOOP) {
+	struct epoll_handle_monitor *newmon;
+	/* Allocate the controller for the new monitor. */
+	newmon = (struct epoll_handle_monitor *)kmalloc(sizeof(struct epoll_handle_monitor),
+	                                                GFP_NORMAL);
+	/* Already initialize some of the monitor's fields. */
+	newmon->ehm_ctrl = self;
+	DBG_memset(&newmon->ehm_rnext, 0xcc, sizeof(newmon->ehm_rnext));
+	newmon->ehm_handtyp = hand->h_type;
+	newmon->ehm_fdkey   = fd_key;
+	newmon->ehm_events  = events;
+	newmon->ehm_rpc     = rpc;                /* Inherited (always) */
+	newmon->ehm_raised  = (uintptr_half_t)-1; /* Marker for RPC monitors */
+/*	newmon->ehm_handptr = ...; // Filled later */
+	sig_multicompletion_init(&newmon->ehm_comp);
+
+	/* Make sure that these 2 events are always polled for.
+	 * By setting them  here, this  simplifies other  code. */
+	newmon->ehm_events |= EPOLLERR | EPOLLHUP;
+	TRY {
+		/* Acquire  a lock to `self' and assert that adding `hand' won't
+		 * cause any reference loops (or rather: signal loops, where one
+		 * signal  would try  to broadcast  itself from  within a signal
+		 * completion callback)
+		 * Note however that  KOS's signal  completion callback  system
+		 * should be strong enough to correctly deal with a signal that
+		 * is  sending  itself,  so-long as  the  associated completion
+		 * function didn't attempt to re-prime itself. */
+again_acquire:
+		epoll_controller_acquire_for_monitor_add(self, hand);
+		TRY {
+			/* Acquire a weak reference to the given handle. */
+			newmon->ehm_handptr = handle_weakgetref(*hand); /* Inherit reference */
+			assert(newmon->ehm_handptr);
+			TRY {
+				unsigned int status;
+				/* Add `newmon' from the monitor list of `self' */
+				status = epoll_controller_intern_addmon(self, newmon);
+				if unlikely(status != EPOLL_CONTROLLER_INTERN_ADD_SUCCESS) {
+					/* Cannot add: An identical monitor had already been added in the past... */
+					epoll_controller_lock_release(self);
+					(*handle_type_db.h_weakdecref[newmon->ehm_handtyp])(newmon->ehm_handptr);
+					sig_multicompletion_fini(&newmon->ehm_comp);
+					kfree(newmon);
+					epoll_monitor_rpc_destroy(rpc);
+					if (status == EPOLL_CONTROLLER_INTERN_ADD_MUSTREAP)
+						goto again_acquire;
+					return false;
+				}
+			} EXCEPT {
+				(*handle_type_db.h_weakdecref[newmon->ehm_handtyp])(newmon->ehm_handptr);
+				RETHROW();
+			}
+		} EXCEPT {
+			epoll_controller_lock_release(self);
+			RETHROW();
+		}
+	} EXCEPT {
+		sig_multicompletion_fini(&newmon->ehm_comp);
+		kfree(newmon);
+		/* Destroy the RPC */
+		epoll_monitor_rpc_destroy(rpc);
+		RETHROW();
+	}
+	/* At  this point, the monitor is primed and  able to deliver its RPC at any point
+	 * (even though we're still holding a lock to `self->ec_lock'). As such, there are
+	 * code-paths in which we won't  be able to prevent  the RPC from being  delivered
+	 * any more, which is reflected  by below code only  being able to propagate  RTL-
+	 * level exceptions. */
+
+	{
+		poll_mode_t raised;
+		TRY {
+			/* Prime the monitor. */
+			epoll_handle_monitor_pollconnect(newmon, hand->h_data, &epoll_rpc_completion);
+
+			/* Check if any of the monitored event are already raised. */
+			raised = epoll_handle_monitor_polltest(newmon, hand->h_data);
+		} EXCEPT {
+			struct epoll_monitor_rpc *canceled_rpc;
+			/* Try to cancel delivery of the RPC. */
+			canceled_rpc = ATOMIC_XCH(newmon->ehm_rpc, NULL);
+			if (canceled_rpc == NULL) {
+				error_code_t code = error_code();
+				/* RPC was already triggered. - This is bad since we can't
+				 * indicate to our caller that the system call failed,  as
+				 * it really didn't. (The RPC got send...) */
+				if (ERRORCLASS_ISRTLPRIORITY(ERROR_CLASS(code)))
+					RETHROW(); /* Too important to simply discard... */
+				if (code != ERROR_CODEOF(E_INTERRUPT_USER_RPC)) {
+					/* Sorry, but I can't propagate this exception */
+					error_printf("Testing RPC epoll monitor");
+				} else {
+					/* ~breath-of-relieve~ It's only an interrupt request... */
+				}
+				goto done;
+			}
+			assert(canceled_rpc == rpc);
+			/* Managed  to cancel  the RPC.  As such,  we've essentially inherited
+			 * ownership of the monitor and are thus also responsible for removing
+			 * it from the associated epoll controller. */
+			sig_multicompletion_disconnectall(&newmon->ehm_comp);
+			sig_multicompletion_fini(&newmon->ehm_comp);
+			(*handle_type_db.h_weakdecref[newmon->ehm_handtyp])(newmon->ehm_handptr);
+			kfree(newmon);
+
+			/* Destroy the RPC */
+			epoll_monitor_rpc_destroy(rpc);
+			RETHROW();
+		}
+
+		/* If one of the monitored events already triggered, then we must immediacy */
+		if unlikely(raised != 0) {
+			struct epoll_monitor_rpc *canceled_rpc;
+			canceled_rpc = ATOMIC_XCH(newmon->ehm_rpc, NULL);
+			sig_multicompletion_disconnectall(&newmon->ehm_comp);
+			if (canceled_rpc) {
+				sig_multicompletion_fini(&newmon->ehm_comp);
+				(*handle_type_db.h_weakdecref[newmon->ehm_handtyp])(newmon->ehm_handptr);
+				kfree(newmon);
+				epoll_rpc_trigger(canceled_rpc);
+			}
+		}
+	} /* Scope... */
+done:
+	epoll_controller_lock_release(self);
+	return true;
+}
+#endif /* CONFIG_HAVE_EPOLL_RPC */
+
 
 PRIVATE NOBLOCK NONNULL((1, 2)) void
 NOTHROW(FCALL epoll_controller_remove_from_raised_or_pending)(struct epoll_controller *__restrict self,
@@ -900,9 +1266,9 @@ NOTHROW(FCALL epoll_controller_remove_from_raised_or_pending)(struct epoll_contr
 
 
 
-/* Modify the monitor for `hand' within the given epoll controller.
+/* Modify the monitor for `hand:fd_key' within the given epoll controller.
  * @return: true:  Success
- * @return: false: The given `hand' isn't being monitored by `self'. */
+ * @return: false: The given `hand:fd_key' isn't being monitored by `self'. */
 PUBLIC NONNULL((1, 2)) bool KCALL
 epoll_controller_modmonitor(struct epoll_controller *__restrict self,
                             struct handle const *__restrict hand,
@@ -981,9 +1347,14 @@ epoll_controller_modmonitor(struct epoll_controller *__restrict self,
 }
 
 
-/* Delete the monitor for `hand' within the given epoll controller.
+/* Delete the monitor for `hand:fd_key' within the given epoll controller.
+ * When the monitor is attached to an  RPC, that RPC will be canceled  and
+ * this function only returns `true' if it managed to prevent the RPC from
+ * being delivered. If the RPC was already send, this function will return
+ * `false', acting as though the  associated monitor was already  deleted,
+ * even if was still dangling due to race conditions.
  * @return: true:  Success
- * @return: false: The given `hand' isn't being monitored by `self'. */
+ * @return: false: The given `hand:fd_key' isn't being monitored by `self'. */
 PUBLIC NONNULL((1, 2)) bool KCALL
 epoll_controller_delmonitor(struct epoll_controller *__restrict self,
                             struct handle const *__restrict hand,
@@ -1008,19 +1379,45 @@ epoll_controller_delmonitor(struct epoll_controller *__restrict self,
 	/* Note that we've just inherited `monitor', so now we have to destroy it! */
 	sig_multicompletion_disconnectall(&monitor->ehm_comp);
 
-	/* With signal completion callbacks all diconnected (by `sig_multicompletion_disconnectall()'),
-	 * we  must  also   ensure  that   `monitor'  isn't  apart   of  the   raised  monitor   chain.
-	 * If it is, then we must remove it prior to releasing our lock from `ec_lock' */
-	if (monitor->ehm_raised != 0) {
 #ifdef CONFIG_HAVE_EPOLL_RPC
-		assertf(!epoll_handle_monitor_isrpc(monitor),
-		        "For RPC monitors, `ehm_raised' must always "
-		        "be `0' because it overlaps with `_ehm_zero'");
-#endif /* CONFIG_HAVE_EPOLL_RPC */
-		epoll_controller_remove_from_raised_or_pending(self, monitor);
+	if (epoll_handle_monitor_isrpc(monitor)) {
+		/* Try to cancel the RPC.  If the cancel failed, the  we must re-add the  monitor
+		 * to `self' and indicate that deletion  failed. The monitor itself is  currently
+		 * in the progress of removing itself from  our controller, and should we try  to
+		 * interfere, we'd just leave it in an undefined state. (NOTE: in all likelihood,
+		 * there's a lockop pending for  `self' _right_ _now_ that  will get rid of  this
+		 * monitor for us) */
+		struct epoll_monitor_rpc *rpc;
+		rpc = ATOMIC_XCH(monitor->ehm_rpc, NULL);
+		if (rpc == NULL) {
+			/* Cancel failed because the RPC was already send on its way... */
+			epoll_controller_intern_doadd_force(self, monitor);
+			epoll_controller_lock_release(self);
+			return false;
+		}
+		/* Cleanup... */
+		epoll_controller_intern_rehash_after_remove(self);
+		epoll_controller_lock_release(self);
+		/*sig_multicompletion_disconnectall(&monitor->ehm_comp);*/ /* Already done above */
+		sig_multicompletion_fini(&monitor->ehm_comp);
+		(*handle_type_db.h_weakdecref[monitor->ehm_handtyp])(monitor->ehm_handptr);
+		kfree(monitor);
+		/* Destroy the RPC via shutdown */
+		epoll_monitor_rpc_destroy(rpc);
+		return true;
 	}
+#endif /* CONFIG_HAVE_EPOLL_RPC */
 
+	/* With signal completion callbacks all diconnected (by `sig_multicompletion_disconnectall()'),
+	 * we must also ensure that `monitor' isn't apart  of the raised monitor chain. If it is,  then
+	 * we must remove it prior to releasing our lock from `ec_lock' */
+	if (monitor->ehm_raised != 0)
+		epoll_controller_remove_from_raised_or_pending(self, monitor);
+
+	/* Possibly rehash the monitor following the removal of an element. */
+	epoll_controller_intern_rehash_after_remove(self);
 	epoll_controller_lock_release(self);
+
 	/* Finish destroying `monitor' */
 	epoll_handle_monitor_destroy(monitor);
 	return true;
@@ -1129,7 +1526,7 @@ scan_monitors:
 						/* Object was destroyed (this is why we're using weak references)
 						 * In this case, just  get rid of the  monitor and carry on  like
 						 * nothing ever happened. */
-						epoll_controller_intern_delmon(self, monitor);
+						epoll_controller_intern_delmon_and_maybe_rehash(self, monitor);
 						epoll_handle_monitor_destroy(monitor);
 						goto next_monitor;
 					}
@@ -1144,7 +1541,7 @@ scan_monitors:
 							DBG_memset(&monitor->ehm_rnext, 0xcc, sizeof(monitor->ehm_rnext));
 							COMPILER_WRITE_BARRIER();
 							ATOMIC_WRITE(monitor->ehm_raised, 0);
-							epoll_handle_monitor_pollconnect(monitor, monitor_handptr);
+							epoll_handle_monitor_pollconnect(monitor, monitor_handptr, &epoll_completion);
 							what = epoll_handle_monitor_polltest(monitor, monitor_handptr);
 							if unlikely(what != 0) {
 								sig_multicompletion_disconnectall(&monitor->ehm_comp);
@@ -1250,7 +1647,7 @@ next_monitor:
 						if (result_events->ehm_events & EPOLLONESHOT) {
 							if (has_personality(KP_EPOLL_DELETE_ONESHOT)) {
 do_destroy_result_event:
-								epoll_controller_intern_delmon(self, result_events);
+								epoll_controller_intern_delmon_and_maybe_rehash(self, result_events);
 								epoll_handle_monitor_destroy(result_events);
 							} else {
 								/* Mark the monitor as no longer raised. */
@@ -1267,7 +1664,7 @@ do_destroy_result_event:
 								goto do_destroy_result_event;
 							ATOMIC_WRITE(result_events->ehm_raised, 0);
 							TRY {
-								epoll_handle_monitor_pollconnect(result_events, monitor_handptr);
+								epoll_handle_monitor_pollconnect(result_events, monitor_handptr, &epoll_completion);
 							} EXCEPT {
 								epoll_handle_monitor_handle_decref(result_events, monitor_handptr);
 								RETHROW();

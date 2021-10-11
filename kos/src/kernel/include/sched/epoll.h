@@ -54,17 +54,17 @@ DECL_BEGIN
 struct epoll_controller;
 
 #ifdef CONFIG_HAVE_EPOLL_RPC
-struct task;
+struct taskpid;
 struct epoll_monitor_rpc {
 	union {
 		struct pending_rpc emr_rpc;    /* The actual RPC */
 #if OFFSET_PENDING_RPC_LINK == 0
-		REF struct task   *emr_target; /* [1..1][const] RPC target thread/process.
-		                                * What specifically this is depends on `emr_rpc.pr_flags & RPC_DOMAIN_F_PROC' */
+		REF struct taskpid *emr_target; /* [1..1][const] RPC target thread/process.
+		                                 * What specifically this is depends on `emr_rpc.pr_flags & RPC_DOMAIN_F_PROC' */
 #else /* OFFSET_PENDING_RPC_LINK == 0 */
 		struct {
 			__byte_t _emr_pad[OFFSET_PENDING_RPC_LINK];
-			REF struct task *emr_target; /* ... */
+			REF struct taskpid *emr_target; /* ... */
 		};
 #endif /* OFFSET_PENDING_RPC_LINK != 0 */
 	};
@@ -85,19 +85,6 @@ struct epoll_handle_monitor {
 		Tobpostlockop(epoll_controller) _ehm_plop;  /* Used internally... */
 		Toblockop(epoll_controller)     _ehm_lop;   /* Used internally... */
 	};
-	union {
-		uintptr_half_t           ehm_raised;  /* [lock(ATOMIC)][valid_if(!epoll_handle_monitor_isrpc)]
-		                                       * Incremented  once the monitored  condition is met.  When this happens, the
-		                                       * monitor is added to the chain of raised monitors, and `ehm_ctrl->ec_avail'
-		                                       * will be send (using `sig_send()', thus waking up whatever a thread waiting
-		                                       * in  `epoll_wait(2)')  Note  that   `ehm_comp'  doesn't  (and  can't)   use
-		                                       * `sig_completion_reprime()', since the  effective set of  signals to  which
-		                                       * one must listen when polling `ehm_hand' may depend on some internal state,
-		                                       * and  may  change over  time.  As such,  the  consumer of  epoll  events is
-		                                       * responsible for resetting the set of signals monitored by `ehm_comp' every
-		                                       * time that signal is broadcast. */
-		uintptr_half_t          _ehm_zero;    /* [valid_if(epoll_handle_monitor_isrpc)] Always `0' */
-	};
 #else /* CONFIG_HAVE_EPOLL_RPC */
 	struct epoll_controller     *ehm_ctrl;  /* [1..1][const][valid_if(!epoll_handle_monitor_isrpc || ehm_rpc != NULL)]
 	                                         * The  primary epoll controller  (exists once for  every epoll-fd that is
@@ -105,6 +92,7 @@ struct epoll_handle_monitor {
 	                                         * exists once for every monitored file descriptor, aka. handle) */
 	struct epoll_handle_monitor *ehm_rnext; /* [0..1][valid_if(!epoll_handle_monitor_isrpc)]
 	                                         * Next   monitor   that   has   been    raised. */
+#endif /* !CONFIG_HAVE_EPOLL_RPC */
 	uintptr_half_t               ehm_raised;  /* [lock(ATOMIC)][valid_if(!epoll_handle_monitor_isrpc)]
 	                                           * Incremented  once the monitored  condition is met.  When this happens, the
 	                                           * monitor is added to the chain of raised monitors, and `ehm_ctrl->ec_avail'
@@ -115,7 +103,6 @@ struct epoll_handle_monitor {
 	                                           * and  may  change over  time.  As such,  the  consumer of  epoll  events is
 	                                           * responsible for resetting the set of signals monitored by `ehm_comp' every
 	                                           * time that signal is broadcast. */
-#endif /* !CONFIG_HAVE_EPOLL_RPC */
 	uintptr_half_t               ehm_handtyp; /* [const] The type of handle being monitored. */
 	WEAK REF void               *ehm_handptr; /* [const][1..1] Handle type pointer. (always valid in the context of `ehm_handtyp') */
 	uint32_t                     ehm_fdkey;   /* [const] FD-key used to differentiate monitors for the same file. */
@@ -143,8 +130,7 @@ struct epoll_handle_monitor {
 
 /* Check if a given monitor is an RPC event (as opposed to a pollable event) */
 #ifdef CONFIG_HAVE_EPOLL_RPC
-
-#define epoll_handle_monitor_isrpc(self) 0
+#define epoll_handle_monitor_isrpc(self) ((self)->ehm_raised == (uintptr_half_t)-1)
 #endif /* CONFIG_HAVE_EPOLL_RPC */
 
 
@@ -162,6 +148,11 @@ struct epoll_controller {
 	 *       the send-queue) */
 	WEAK refcnt_t                     ec_refcnt;     /* Reference counter. */
 	WEAK refcnt_t                     ec_weakrefcnt; /* Weak reference counter. */
+	/* TODO: Do we really need a mutex here? Wouldn't something like a `struct shared_lock',
+	 *       which currently doesn't exist but  is to `atomic_lock' what `shared_rwlock'  is
+	 *       to `atomic_rwlock', that is essentially a non-recursive mutex?
+	 * iow: Is there any piece of code that relies on the ability for a single to acquire
+	 *      a specific mutex multiple times. */
 	struct mutex                      ec_lock;       /* Lock  for this epoll  controller. This one has  to be held whenever
 	                                                  * making modifications  to, or  scanning the  set of  monitored  file
 	                                                  * descriptors. Additionally, `epoll_wait(2)' will temporarily acquire
@@ -224,13 +215,13 @@ DEFINE_REFCOUNT_FUNCTIONS(struct epoll_controller, ec_refcnt, epoll_controller_d
 FUNDEF ATTR_RETNONNULL WUNUSED REF struct epoll_controller *KCALL
 epoll_controller_create(void) THROWS(E_BADALLOC);
 
-/* Add a monitor for `hand' to the given epoll controller.
+/* Add a monitor for `hand:fd_key' to the given epoll controller.
  * @throw: E_ILLEGAL_REFERENCE_LOOP: `hand' is another epoll controller that is either the same
  *                                   as `self', or is already monitoring `self'. Also thrown if
  *                                   the max depth of nested epoll controllers would exceed the
  *                                   compile-time `CONFIG_EPOLL_MAX_NESTING' limit.
  * @return: true:  Success
- * @return: false: Another monitor for `hand' already exists. */
+ * @return: false: Another monitor for `hand:fd_key' already exists. */
 FUNDEF NONNULL((1, 2)) bool KCALL
 epoll_controller_addmonitor(struct epoll_controller *__restrict self,
                             struct handle const *__restrict hand,
@@ -239,9 +230,35 @@ epoll_controller_addmonitor(struct epoll_controller *__restrict self,
 		THROWS(E_BADALLOC, E_WOULDBLOCK, E_SEGFAULT,
 		       E_ILLEGAL_REFERENCE_LOOP);
 
-/* Modify the monitor for `hand' within the given epoll controller.
+#ifdef CONFIG_HAVE_EPOLL_RPC
+/* Add a monitor for `hand' to the given epoll controller. When a raising edge
+ * for the monitored conditions is detected (or if the conditions are  already
+ * met at the time of the this function being called), trigger delivery of the
+ * given RPC before automatically removing  the associated epoll monitor  from
+ * `self'.  When the thread/process  targeted by said  RPC has already exited,
+ * the RPC is silently discarded.
+ * @param: rpc: The  RPC that should  be delivered upon  a raising-edge event being
+ *              triggered.  Note that  this RPC  is _always_  inherited, and should
+ *              some kind of exception be triggered during creation of the monitor,
+ *              or should this function return `false'
+ * @throw: E_ILLEGAL_REFERENCE_LOOP: `hand' is another epoll controller that is either the same
+ *                                   as `self', or is already monitoring `self'. Also thrown if
+ *                                   the max depth of nested epoll controllers would exceed the
+ *                                   compile-time `CONFIG_EPOLL_MAX_NESTING' limit.
  * @return: true:  Success
- * @return: false: The given `hand' isn't being monitored by `self'. */
+ * @return: false: Another monitor for `hand:fd_key' already exists. */
+FUNDEF NONNULL((1, 2, 5)) bool KCALL
+epoll_controller_addmonitor_rpc(struct epoll_controller *__restrict self,
+                                struct handle const *__restrict hand,
+                                uint32_t fd_key, uint32_t events,
+                                /*inherit(always)*/ struct epoll_monitor_rpc *__restrict rpc)
+		THROWS(E_BADALLOC, E_WOULDBLOCK, E_ILLEGAL_REFERENCE_LOOP);
+#endif /* CONFIG_HAVE_EPOLL_RPC */
+
+
+/* Modify the monitor for `hand:fd_key' within the given epoll controller.
+ * @return: true:  Success
+ * @return: false: The given `hand:fd_key' isn't being monitored by `self'. */
 FUNDEF NONNULL((1, 2)) bool KCALL
 epoll_controller_modmonitor(struct epoll_controller *__restrict self,
                             struct handle const *__restrict hand,
@@ -249,9 +266,14 @@ epoll_controller_modmonitor(struct epoll_controller *__restrict self,
                             USER CHECKED struct epoll_event const *info)
 		THROWS(E_BADALLOC, E_WOULDBLOCK, E_SEGFAULT);
 
-/* Delete the monitor for `hand' within the given epoll controller.
+/* Delete the monitor for `hand:fd_key' within the given epoll controller.
+ * When the monitor is attached to an  RPC, that RPC will be canceled  and
+ * this function only returns `true' if it managed to prevent the RPC from
+ * being delivered. If the RPC was already send, this function will return
+ * `false', acting as though the  associated monitor was already  deleted,
+ * even if was still dangling due to race conditions.
  * @return: true:  Success
- * @return: false: The given `hand' isn't being monitored by `self'. */
+ * @return: false: The given `hand:fd_key' isn't being monitored by `self'. */
 FUNDEF NONNULL((1, 2)) bool KCALL
 epoll_controller_delmonitor(struct epoll_controller *__restrict self,
                             struct handle const *__restrict hand,
