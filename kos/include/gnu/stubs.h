@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xec7313b3 */
+/* HASH CRC-32:0x4dcbfe28 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -213,7 +213,6 @@
 #define __stub_endusershell
 #define __stub_endutent
 #define __stub_endutxent
-#define __stub_epoll_rpc_exec
 #define __stub_erand48
 #define __stub_erand48_r
 #define __stub___erf

@@ -25,15 +25,14 @@
 
 #include <kos/syscalls.h>
 
+#include <string.h>
+
 #include "sys.epoll.h"
 
 DECL_BEGIN
 
-
-
-
-
-
+/* This function is arch-specific */
+INTDEF ATTR_CONST ATTR_RETNONNULL WUNUSED void const *LIBCCALL libc_get_rpc_exec_program(void);
 
 /*[[[head:libc_epoll_create,hash:CRC-32=0x5d5fd124]]]*/
 /* >> epoll_create(2)
@@ -201,16 +200,29 @@ NOTHROW_NCX(LIBCCALL libc_epoll_rpc_exec)(fd_t epfd,
                                           unsigned int mode,
                                           prpc_exec_callback_t func)
 /*[[[body:libc_epoll_rpc_exec]]]*/
-/*AUTO*/{
-	(void)epfd;
-	(void)fd;
-	(void)event;
-	(void)target_tid;
-	(void)mode;
-	(void)func;
-	CRT_UNIMPLEMENTEDF("epoll_rpc_exec(%" PRIxN(__SIZEOF_FD_T__) ", %" PRIxN(__SIZEOF_FD_T__) ", %p, %" PRIxN(__SIZEOF_PID_T__) ", %x, %p)", epfd, fd, event, target_tid, mode, func); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+{
+	void *args[2];
+	struct epoll_rpc_program pinfo;
+	struct epoll_event rpc_event;
+
+	/* Arguments for the arch-specific RPC program */
+	args[0] = (void *)func;
+	args[1] = (void *)event->data.ptr;
+
+	/* Fill in EPOLL RPC program information. */
+	pinfo.erp_target          = (uint64_t)target_tid;
+	pinfo.erp_mode            = (uint64_t)(syscall_ulong_t)mode;
+	pinfo.erp_prog            = (uint64_t)(uintptr_t)libc_get_rpc_exec_program();
+	pinfo.erp_params          = (uint64_t)(uintptr_t)args;
+	pinfo.erp_max_param_count = 2;
+
+	/* Fill in an epoll event descriptor for RPC_PROG */
+	memset(&rpc_event.data, 0, sizeof(rpc_event.data));
+	rpc_event.data.ptr = &pinfo;
+	rpc_event.events   = event->events;
+
+	/* Do the actual epoll control command. */
+	return libc_epoll_ctl(epfd, EPOLL_CTL_RPC_PROG, fd, &rpc_event);
 }
 /*[[[end:libc_epoll_rpc_exec]]]*/
 

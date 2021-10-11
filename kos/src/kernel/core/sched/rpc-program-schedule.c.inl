@@ -66,9 +66,11 @@ DECL_BEGIN
 #ifdef DEFINE_compat_sys_rpc_schedule
 #define LOCAL_validate_readable  compat_validate_readable
 #define LOCAL_validate_readablem compat_validate_readablem
+#define LOCAL_SIZEOF_POINTER     __ARCH_COMPAT_SIZEOF_POINTER
 #else /* DEFINE_compat_sys_rpc_schedule */
 #define LOCAL_validate_readable  validate_readable
 #define LOCAL_validate_readablem validate_readablem
+#define LOCAL_SIZEOF_POINTER     __SIZEOF_POINTER__
 #endif /* !DEFINE_compat_sys_rpc_schedule */
 
 
@@ -253,7 +255,7 @@ DEFINE_SYSCALL5(errno_t, rpc_schedule,
 	}
 
 	LOCAL_validate_readable(program, 1);
-	LOCAL_validate_readablem(params, max_param_count, sizeof(USER UNCHECKED void const *));
+	LOCAL_validate_readablem(params, max_param_count, LOCAL_SIZEOF_POINTER);
 
 	/* If  we intend to wait for the RPC program to complete, then we also
 	 * check  for RPCs pending  within our own thread  before we'll end up
@@ -272,7 +274,7 @@ DEFINE_SYSCALL5(errno_t, rpc_schedule,
 		rpc = (struct pending_rpc *)pending_rpc_alloc(struct_size, GFP_NORMAL);
 	}
 
-	/* Copy arguments. */
+	/* Copy RPC arguments. */
 	TRY {
 #ifdef DEFINE_compat_sys_rpc_schedule
 		size_t i;
@@ -426,6 +428,7 @@ exec_rpc_in_THIS_TASK:
 
 #undef LOCAL_validate_readablem
 #undef LOCAL_validate_readable
+#undef LOCAL_SIZEOF_POINTER
 
 DECL_END
 

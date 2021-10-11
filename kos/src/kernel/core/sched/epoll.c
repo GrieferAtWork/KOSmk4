@@ -58,6 +58,8 @@
 #include <string.h>
 
 #ifdef CONFIG_HAVE_EPOLL_RPC
+#include <kernel/compat.h> /* __ARCH_HAVE_COMPAT, syscall_iscompat() */
+#include <kernel/mman.h>
 #include <sched/pid.h>
 #endif /* CONFIG_HAVE_EPOLL_RPC */
 
@@ -1834,6 +1836,103 @@ DEFINE_SYSCALL1(fd_t, epoll_create, syscall_ulong_t, size) {
 #endif /* __ARCH_WANT_SYSCALL_EPOLL_CREATE */
 
 #ifdef __ARCH_WANT_SYSCALL_EPOLL_CTL
+#ifdef CONFIG_HAVE_EPOLL_RPC
+PRIVATE NONNULL((1, 2)) errno_t KCALL
+epoll_create_rpc_monitor(struct epoll_controller *__restrict self,
+                         struct handle const *__restrict fd_handle,
+                         uint32_t fd, uint32_t events,
+                         USER CHECKED struct epoll_rpc_program const *info) {
+	pid_t target_tid;
+	syscall_ulong_t mode;
+	USER CHECKED void const *program;
+	USER CHECKED void const *params;
+	size_t max_param_count;
+	struct epoll_monitor_rpc *rpc;
+
+	/* Load RPC info. */
+	target_tid      = info->erp_target;
+	mode            = info->erp_mode;
+	program         = (USER CHECKED void const *)(uintptr_t)info->erp_prog;
+	params          = (USER CHECKED void const *)(uintptr_t)info->erp_params;
+	max_param_count = (size_t)info->erp_max_param_count;
+	validate_readable(program, 1);
+	validate_readable(params, 1); /* Yes: only validate 1 byte (because the copy is done linearly,
+	                               * and because at least 1 unmapped page exists between user- and
+	                               * kernel-space, this is good enough) */
+	VALIDATE_FLAGSET(mode,
+	                 RPC_SIGNO_MASK | RPC_SYNCMODE_F_ALLOW_ASYNC |
+	                 RPC_SYNCMODE_F_REQUIRE_SC | RPC_SYNCMODE_F_REQUIRE_CP |
+	                 RPC_SYSRESTART_F_AUTO | RPC_PRIORITY_F_HIGH |
+	                 RPC_DOMAIN_F_PROC,
+	                 E_INVALID_ARGUMENT_CONTEXT_RPC_SCHEDULE_MODE);
+
+	/* Set the default signal number `SIGRPC' if none was specified. */
+	if ((mode & RPC_SIGNO_MASK) == 0)
+		mode |= RPC_SIGNO(SIGRPC);
+	else {
+		signo_t signo = _RPC_GETSIGNO(mode);
+		if unlikely(signo <= 0 || signo >= NSIG) {
+			THROW(E_INVALID_ARGUMENT_BAD_VALUE,
+			      E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGNO,
+			      signo);
+		}
+	}
+
+	/* Allocate the new RPC controller. */
+	{
+		size_t struct_size = offsetof(struct epoll_monitor_rpc, emr_rpc.pr_user.pur_argv) +
+		                     max_param_count * sizeof(USER UNCHECKED void *);
+		if (struct_size < offsetafter(struct epoll_monitor_rpc, emr_rpc.pr_user.pur_error))
+			struct_size = offsetafter(struct epoll_monitor_rpc, emr_rpc.pr_user.pur_error);
+		rpc = (struct epoll_monitor_rpc *)pending_rpc_alloc(struct_size, GFP_NORMAL);
+	}
+
+	TRY {
+		/* Copy RPC arguments. */
+#ifdef __ARCH_HAVE_COMPAT
+		if (syscall_iscompat()) {
+			__ARCH_COMPAT_PTR(USER UNCHECKED void const) USER UNCHECKED const *params_v;
+			params_v = (__ARCH_COMPAT_PTR(USER UNCHECKED void const) USER UNCHECKED const *)params;
+			size_t i;
+			for (i = 0; i < max_param_count; ++i)
+				rpc->emr_rpc.pr_user.pur_argv[i] = params_v[i];
+		} else
+#endif /* __ARCH_HAVE_COMPAT */
+		{
+			memcpy(rpc->emr_rpc.pr_user.pur_argv, params,
+			       max_param_count, sizeof(USER UNCHECKED void *));
+		}
+
+		/* Lookup the target thread. */
+		rpc->emr_target = pidns_lookup(THIS_PIDNS, (upid_t)target_tid);
+	} EXCEPT {
+		pending_rpc_free(&rpc->emr_rpc);
+		RETHROW();
+	}
+
+	/* Fill in RPC information. */
+	rpc->emr_rpc.pr_flags = mode & (RPC_SIGNO_MASK |
+	                                RPC_SYNCMODE_F_ALLOW_ASYNC |
+	                                RPC_SYNCMODE_F_REQUIRE_SC |
+	                                RPC_SYNCMODE_F_REQUIRE_CP |
+	                                RPC_SYSRESTART_F_AUTO |
+	                                RPC_PRIORITY_F_HIGH);
+	rpc->emr_rpc.pr_user.pur_refcnt = 1;
+	rpc->emr_rpc.pr_user.pur_status = PENDING_USER_RPC_STATUS_PENDING;
+	sig_init(&rpc->emr_rpc.pr_user.pur_stchng); /* Never used, but still needed... */
+	rpc->emr_rpc.pr_user.pur_mman = incref(THIS_MMAN);
+	rpc->emr_rpc.pr_user.pur_prog = program;
+	rpc->emr_rpc.pr_user.pur_argc = max_param_count;
+
+	/* Create the monitor.
+	 * NOTE: This function _always_, _unconditionally_ inherits the given `rpc'! */
+	if (!epoll_controller_addmonitor_rpc(self, fd_handle, fd, events, rpc))
+		return -ENOENT;
+	return -EOK;
+}
+
+#endif /* CONFIG_HAVE_EPOLL_RPC */
+
 DEFINE_SYSCALL4(errno_t, epoll_ctl,
                 fd_t, epfd, syscall_ulong_t, op, fd_t, fd,
                 USER UNCHECKED struct epoll_event *, info) {
@@ -1862,6 +1961,20 @@ DEFINE_SYSCALL4(errno_t, epoll_ctl,
 			if (!epoll_controller_delmonitor(self, &fd_handle, (uint32_t)fd))
 				result = -ENOENT;
 			break;
+
+#ifdef CONFIG_HAVE_EPOLL_RPC
+		case EPOLL_CTL_RPC_PROG: {
+			struct epoll_event eventinfo;
+			USER CHECKED struct epoll_rpc_program const *program;
+			validate_readable(info, sizeof(*info));
+			memcpy(&eventinfo, info, sizeof(struct epoll_event));
+			validate_readable(eventinfo.data.ptr, sizeof(struct epoll_rpc_program));
+			program = (USER CHECKED struct epoll_rpc_program const *)eventinfo.data.ptr;
+			/* Create the RPC monitor. */
+			result = epoll_create_rpc_monitor(self, &fd_handle, (uint32_t)fd,
+			                                  eventinfo.events, program);
+		}	break;
+#endif /* CONFIG_HAVE_EPOLL_RPC */
 
 		default:
 			THROW(E_INVALID_ARGUMENT_UNKNOWN_COMMAND,
