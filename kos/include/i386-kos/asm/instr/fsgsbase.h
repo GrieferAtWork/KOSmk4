@@ -26,10 +26,18 @@
 #include <kernel/x86/fsgsbase.h>
 #else /* __KERNEL__ */
 #ifdef __ASSEMBLER__
+#include <hybrid/host.h>
+#ifdef __x86_64__
 #define rdfsbaseq  rdfsbase
 #define rdgsbaseq  rdgsbase
 #define wrfsbaseq  wrfsbase
 #define wrgsbaseq  wrgsbase
+#else /* __x86_64__ */
+#define rdfsbasel  rdfsbase
+#define rdgsbasel  rdgsbase
+#define wrfsbasel  wrfsbase
+#define wrgsbasel  wrgsbase
+#endif /* !__x86_64__ */
 #endif /* __ASSEMBLER__ */
 #endif /* !__KERNEL__ */
 

@@ -827,7 +827,9 @@
 #define __CRT_HAVE___wctrans_l
 #define __CRT_HAVE___wctype_l
 #define __CRT_HAVE___write
+#define __CRT_HAVE___x86_getcontext_rax
 #define __CRT_HAVE___x86_rtm_xtest
+#define __CRT_HAVE___x86_setcontext_rbp
 #define __CRT_HAVE___xpg_basename
 #define __CRT_HAVE___xpg_sigpause
 #define __CRT_HAVE___xpg_strerror_r

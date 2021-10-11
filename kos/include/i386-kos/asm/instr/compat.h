@@ -180,6 +180,7 @@
 #define wrfsbaseP    wrfsbaseq
 #define wrgsbaseP    wrgsbaseq
 #define iretP        iretq
+#define lretP        lretq
 
 #ifdef __KERNEL__
 #define segtls       gs /* THIS_TASK */
@@ -317,6 +318,7 @@
 #define wrfsbaseP    wrfsbasel
 #define wrgsbaseP    wrgsbasel
 #define iretP        iret
+#define lretP        lret
 
 #ifdef __KERNEL__
 #define segtls       fs /* THIS_TASK: SEGMENT_KERNEL_FSBASE */
