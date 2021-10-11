@@ -1802,14 +1802,16 @@ NOTHROW_NCX(CC libcpu_getreg_mcontext)(struct mcontext const *__restrict self, u
 	result = libcpu_getreg_ucpustate(&self->mc_context, regno, buf, buflen);
 	if (result != 0)
 		goto done;
-	if (self->mc_flags & __MCONTEXT_FLAG_HAVEXFPU) {
-		result = libcpu_getreg_xfpustate(&self->mc_fpu.f_xsave, regno, buf, buflen);
-		if (result != 0)
-			goto done;
-	} else if (self->mc_flags & __MCONTEXT_FLAG_HAVESFPU) {
-		result = libcpu_getreg_sfpustate(&self->mc_fpu.f_ssave, regno, buf, buflen);
-		if (result != 0)
-			goto done;
+	if (self->mc_flags & MCONTEXT_FLAG_HAVEFPU) {
+		if (fpustate_isxsave(&self->mc_fpu)) {
+			result = libcpu_getreg_xfpustate(&self->mc_fpu.f_xsave, regno, buf, buflen);
+			if (result != 0)
+				goto done;
+		} else {
+			result = libcpu_getreg_sfpustate(&self->mc_fpu.f_ssave, regno, buf, buflen);
+			if (result != 0)
+				goto done;
+		}
 	}
 	if (((regno & ~X86_REGISTER_SIZEMASK) == X86_REGISTER_CONTROL_CR2) &&
 	    (self->mc_flags & __MCONTEXT_FLAG_HAVECR2))
@@ -1825,14 +1827,16 @@ NOTHROW_NCX(CC libcpu_setreg_mcontext)(struct mcontext *__restrict self, unsigne
 	result = libcpu_setreg_ucpustate(&self->mc_context, regno, buf, buflen);
 	if (result != 0)
 		goto done;
-	if (self->mc_flags & __MCONTEXT_FLAG_HAVEXFPU) {
-		result = libcpu_setreg_xfpustate(&self->mc_fpu.f_xsave, regno, buf, buflen);
-		if (result != 0)
-			goto done;
-	} else if (self->mc_flags & __MCONTEXT_FLAG_HAVESFPU) {
-		result = libcpu_setreg_sfpustate(&self->mc_fpu.f_ssave, regno, buf, buflen);
-		if (result != 0)
-			goto done;
+	if (self->mc_flags & MCONTEXT_FLAG_HAVEFPU) {
+		if (fpustate_isxsave(&self->mc_fpu)) {
+			result = libcpu_setreg_xfpustate(&self->mc_fpu.f_xsave, regno, buf, buflen);
+			if (result != 0)
+				goto done;
+		} else {
+			result = libcpu_setreg_sfpustate(&self->mc_fpu.f_ssave, regno, buf, buflen);
+			if (result != 0)
+				goto done;
+		}
 	}
 	if ((regno & ~X86_REGISTER_SIZEMASK) == X86_REGISTER_CONTROL_CR2) {
 		result = setregptrp((uintptr_t *)&self->mc_cr2, regno, buf, buflen);

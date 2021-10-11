@@ -78,9 +78,11 @@ __SYSDECL_BEGIN
 #define ALIGNOF_XFPUSTATE           ALIGNOF_XFPUSTATE64
 #define xfpustate64                 xfpustate
 
-#define SIZEOF_FPUSTATE    SIZEOF_FPUSTATE64
-#define ALIGNOF_FPUSTATE   ALIGNOF_FPUSTATE64
-#define fpustate64         fpustate
+#define SIZEOF_FPUSTATE  SIZEOF_FPUSTATE64
+#define ALIGNOF_FPUSTATE ALIGNOF_FPUSTATE64
+#define fpustate64       fpustate
+#define fpustate_isssave fpustate64_isssave
+#define fpustate_isxsave fpustate64_isxsave
 #endif /* __x86_64__ */
 
 #define OFFSET_XFPUSTATE64_FCW        0
@@ -156,9 +158,6 @@ struct __ATTR_ALIGNED(ALIGNOF_XFPUSTATE64) xfpustate64 /*[PREFIX(fx_)]*/ {
 #undef f_xsave
 struct __ATTR_ALIGNED(ALIGNOF_FPUSTATE64) fpustate64 /*[PREFIX(f_)]*/ {
 	union {
-		/* NOTE: The FPU state encoding is selected by the least significant bit
-		 *       of  the `struct fpustate32' itself.  When clear it's `f_xsave'.
-		 *       Otherwise, it's `f_ssave'! */
 		struct sfpustate   f_ssave; /* State saved by `fsave' / `fnsave' */
 		struct xfpustate64 f_xsave; /* State saved by `fxsave' */
 	}
@@ -169,6 +168,8 @@ struct __ATTR_ALIGNED(ALIGNOF_FPUSTATE64) fpustate64 /*[PREFIX(f_)]*/ {
 #endif /* !__COMPILER_HAVE_TRANSPARENT_UNION */
 	;
 };
+#define fpustate64_isssave(self) ((self)->f_ssave.__fs_pad2 == 0xffff)
+#define fpustate64_isxsave(self) ((self)->f_ssave.__fs_pad2 != 0xffff)
 #endif /* __CC__ */
 
 __SYSDECL_END

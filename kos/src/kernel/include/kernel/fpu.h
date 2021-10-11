@@ -108,7 +108,7 @@ fpustate_loadfrom(USER CHECKED struct fpustate const *state)
 #endif /* !ARCH_FPU_ARCHHEADER_DEFINES_FPUSTATE_LOADFROM */
 #ifndef ARCH_FPU_ARCHHEADER_DEFINES_FPUSTATE_SAVEINTO
 /* Return the pointer that must eventually be passed to `fpustate_loadfrom()' */
-FUNDEF NOBLOCK /*WUNUSED*/ USER CHECKED struct fpustate *KCALL
+FUNDEF NOBLOCK void KCALL
 fpustate_saveinto(USER CHECKED struct fpustate *state)
 		THROWS(E_SEGFAULT);
 #endif /* !ARCH_FPU_ARCHHEADER_DEFINES_FPUSTATE_SAVEINTO */

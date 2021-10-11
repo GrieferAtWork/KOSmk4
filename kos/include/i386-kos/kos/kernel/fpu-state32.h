@@ -75,6 +75,8 @@ __SYSDECL_BEGIN
 #define SIZEOF_FPUSTATE    SIZEOF_FPUSTATE32
 #define ALIGNOF_FPUSTATE   ALIGNOF_FPUSTATE32
 #define fpustate32         fpustate
+#define fpustate_isssave   fpustate32_isssave
+#define fpustate_isxsave   fpustate32_isxsave
 #endif /* !__x86_64__ */
 
 
@@ -150,9 +152,6 @@ struct __ATTR_ALIGNED(ALIGNOF_XFPUSTATE32) xfpustate32 /*[PREFIX(fx_)]*/ {
 #undef f_xsave
 struct __ATTR_ALIGNED(ALIGNOF_FPUSTATE32) fpustate32 {
 	union {
-		/* NOTE: The FPU state encoding is selected by the least significant bit
-		 *       of  the `struct fpustate32' itself.  When clear it's `f_xsave'.
-		 *       Otherwise, it's `f_ssave'! */
 		struct sfpustate   f_ssave; /* State saved by `fsave' / `fnsave' */
 		struct xfpustate32 f_xsave; /* State saved by `fxsave' */
 	}
@@ -163,6 +162,8 @@ struct __ATTR_ALIGNED(ALIGNOF_FPUSTATE32) fpustate32 {
 #endif /* !__COMPILER_HAVE_TRANSPARENT_UNION */
 	;
 };
+#define fpustate32_isssave(self) ((self)->f_ssave.__fs_pad2 == 0xffff)
+#define fpustate32_isxsave(self) ((self)->f_ssave.__fs_pad2 != 0xffff)
 #endif /* __CC__ */
 
 __SYSDECL_END

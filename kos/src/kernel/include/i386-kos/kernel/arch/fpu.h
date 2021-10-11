@@ -49,10 +49,10 @@ DECL_BEGIN
 /* [const] The type of FPU state used (One of `FPU_STATE_*') */
 DATDEF unsigned int const x86_fpustate_variant;
 
-/* Save/Load the register state of the FPU unit.
+/* Save/Load the register state of the FPU unit (always uses `x86_fpustate_variant').
  * NOTE: `x86_fpustate_save()' may reset the active FPU context before
- *        returning. - If this isn't intended, `x86_fpustate_save_noreset()'
- *        must  be used, which  will leave the  current FPU state unchanged. */
+ *       returning. - If this isn't intended, `x86_fpustate_save_noreset()'
+ *       must  be used, which  will leave the  current FPU state unchanged. */
 FUNDEF NOBLOCK void FCALL x86_fpustate_load(struct fpustate const *__restrict state);
 FUNDEF NOBLOCK void FCALL x86_fpustate_save(struct fpustate *__restrict state);
 FUNDEF NOBLOCK void FCALL x86_fpustate_save_noreset(struct fpustate *__restrict state);
@@ -85,7 +85,7 @@ struct fpustate32;
 FUNDEF NOBLOCK void FCALL
 fpustate32_loadfrom(USER CHECKED struct fpustate32 const *state)
 		THROWS(E_SEGFAULT, E_BADALLOC);
-FUNDEF NOBLOCK /*WUNUSED*/ USER CHECKED struct fpustate32 *FCALL
+FUNDEF NOBLOCK void FCALL
 fpustate32_saveinto(USER CHECKED struct fpustate32 *state)
 		THROWS(E_SEGFAULT);
 #define fpustate64_loadfrom fpustate_loadfrom

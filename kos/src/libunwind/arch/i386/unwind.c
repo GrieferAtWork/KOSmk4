@@ -641,11 +641,13 @@ NOTHROW_NCX(CC libuw_unwind_getreg_mcontext_base)(struct mcontext const *__restr
 	case CFI_X86_64_UNWIND_REGISTER_ST0 ... CFI_X86_64_UNWIND_REGISTER_ST7:
 		dw_regno -= CFI_X86_64_UNWIND_REGISTER_ST0;
 do_fpreg:
-		if (self->mc_flags & MCONTEXT_FLAG_HAVEXFPU) {
-			memcpy((byte_t *)dst, &self->mc_fpu.f_xsave.fx_regs[dw_regno], 16);
-		} else if (self->mc_flags & MCONTEXT_FLAG_HAVESFPU) {
-			memcpy((byte_t *)dst, &self->mc_fpu.f_ssave.fs_regs[dw_regno], 10);
-			memset((byte_t *)dst + 10, 0, 6);
+		if (self->mc_flags & MCONTEXT_FLAG_HAVEFPU) {
+			if (fpustate_isxsave(&self->mc_fpu)) {
+				memcpy((byte_t *)dst, &self->mc_fpu.f_xsave.fx_regs[dw_regno], 16);
+			} else {
+				memcpy((byte_t *)dst, &self->mc_fpu.f_ssave.fs_regs[dw_regno], 10);
+				memset((byte_t *)dst + 10, 0, 6);
+			}
 		} else {
 			goto badreg;
 		}
@@ -653,7 +655,7 @@ do_fpreg:
 
 	case CFI_X86_64_UNWIND_REGISTER_XMM0 ... CFI_X86_64_UNWIND_REGISTER_XMM15:
 		dw_regno -= CFI_X86_64_UNWIND_REGISTER_XMM0;
-		if (self->mc_flags & MCONTEXT_FLAG_HAVEXFPU) {
+		if ((self->mc_flags & MCONTEXT_FLAG_HAVEFPU) && fpustate_isxsave(&self->mc_fpu)) {
 			memcpy((byte_t *)dst, &self->mc_fpu.f_xsave.fx_xmm[dw_regno], 16);
 		} else {
 			goto badreg;
@@ -661,27 +663,31 @@ do_fpreg:
 		break;
 
 	case CFI_X86_64_UNWIND_REGISTER_FCW:
-		if (self->mc_flags & MCONTEXT_FLAG_HAVEXFPU) {
-			*(u32 *)dst = self->mc_fpu.f_xsave.fx_fcw;
-		} else if (self->mc_flags & MCONTEXT_FLAG_HAVESFPU) {
-			*(u32 *)dst = self->mc_fpu.f_ssave.fs_fcw;
+		if (self->mc_flags & MCONTEXT_FLAG_HAVEFPU) {
+			if (fpustate_isxsave(&self->mc_fpu)) {
+				*(u32 *)dst = self->mc_fpu.f_xsave.fx_fcw;
+			} else {
+				*(u32 *)dst = self->mc_fpu.f_ssave.fs_fcw;
+			}
 		} else {
 			goto badreg;
 		}
 		break;
 
 	case CFI_X86_64_UNWIND_REGISTER_FSW:
-		if (self->mc_flags & MCONTEXT_FLAG_HAVEXFPU) {
-			*(u32 *)dst = self->mc_fpu.f_xsave.fx_fsw;
-		} else if (self->mc_flags & MCONTEXT_FLAG_HAVESFPU) {
-			*(u32 *)dst = self->mc_fpu.f_ssave.fs_fsw;
+		if (self->mc_flags & MCONTEXT_FLAG_HAVEFPU) {
+			if (fpustate_isxsave(&self->mc_fpu)) {
+				*(u32 *)dst = self->mc_fpu.f_xsave.fx_fsw;
+			} else {
+				*(u32 *)dst = self->mc_fpu.f_ssave.fs_fsw;
+			}
 		} else {
 			goto badreg;
 		}
 		break;
 
 	case CFI_X86_64_UNWIND_REGISTER_MXCSR:
-		if (self->mc_flags & MCONTEXT_FLAG_HAVEXFPU) {
+		if ((self->mc_flags & MCONTEXT_FLAG_HAVEFPU) && fpustate_isxsave(&self->mc_fpu)) {
 			*(u32 *)dst = self->mc_fpu.f_xsave.fx_mxcsr;
 		} else {
 			goto badreg;
@@ -708,10 +714,12 @@ NOTHROW_NCX(CC libuw_unwind_setreg_mcontext_base)(struct mcontext *__restrict se
 	case CFI_X86_64_UNWIND_REGISTER_ST0 ... CFI_X86_64_UNWIND_REGISTER_ST7:
 		dw_regno -= CFI_X86_64_UNWIND_REGISTER_ST0;
 do_fpreg:
-		if (self->mc_flags & MCONTEXT_FLAG_HAVEXFPU) {
-			memcpy(&self->mc_fpu.f_xsave.fx_regs[dw_regno], src, 16);
-		} else if (self->mc_flags & MCONTEXT_FLAG_HAVESFPU) {
-			memcpy(&self->mc_fpu.f_ssave.fs_regs[dw_regno], src, 10);
+		if (self->mc_flags & MCONTEXT_FLAG_HAVEFPU) {
+			if (fpustate_isxsave(&self->mc_fpu)) {
+				memcpy(&self->mc_fpu.f_xsave.fx_regs[dw_regno], src, 16);
+			} else {
+				memcpy(&self->mc_fpu.f_ssave.fs_regs[dw_regno], src, 10);
+			}
 		} else {
 			goto badreg;
 		}
@@ -719,7 +727,7 @@ do_fpreg:
 
 	case CFI_X86_64_UNWIND_REGISTER_XMM0 ... CFI_X86_64_UNWIND_REGISTER_XMM15:
 		dw_regno -= CFI_X86_64_UNWIND_REGISTER_XMM0;
-		if (self->mc_flags & MCONTEXT_FLAG_HAVEXFPU) {
+		if ((self->mc_flags & MCONTEXT_FLAG_HAVEFPU) && fpustate_isxsave(&self->mc_fpu)) {
 			memcpy(&self->mc_fpu.f_xsave.fx_xmm[dw_regno], src, 16);
 		} else {
 			goto badreg;
@@ -727,27 +735,31 @@ do_fpreg:
 		break;
 
 	case CFI_X86_64_UNWIND_REGISTER_FCW:
-		if (self->mc_flags & MCONTEXT_FLAG_HAVEXFPU) {
-			self->mc_fpu.f_xsave.fx_fcw = (u16)(*(u32 const *)src);
-		} else if (self->mc_flags & MCONTEXT_FLAG_HAVESFPU) {
-			self->mc_fpu.f_ssave.fs_fcw = (u16)(*(u32 const *)src);
+		if (self->mc_flags & MCONTEXT_FLAG_HAVEFPU) {
+			if (fpustate_isxsave(&self->mc_fpu)) {
+				self->mc_fpu.f_xsave.fx_fcw = (u16)(*(u32 const *)src);
+			} else {
+				self->mc_fpu.f_ssave.fs_fcw = (u16)(*(u32 const *)src);
+			}
 		} else {
 			goto badreg;
 		}
 		break;
 
 	case CFI_X86_64_UNWIND_REGISTER_FSW:
-		if (self->mc_flags & MCONTEXT_FLAG_HAVEXFPU) {
-			self->mc_fpu.f_xsave.fx_fsw = (u16)(*(u32 const *)src);
-		} else if (self->mc_flags & MCONTEXT_FLAG_HAVESFPU) {
-			self->mc_fpu.f_ssave.fs_fsw = (u16)(*(u32 const *)src);
+		if (self->mc_flags & MCONTEXT_FLAG_HAVEFPU) {
+			if (fpustate_isxsave(&self->mc_fpu)) {
+				self->mc_fpu.f_xsave.fx_fsw = (u16)(*(u32 const *)src);
+			} else {
+				self->mc_fpu.f_ssave.fs_fsw = (u16)(*(u32 const *)src);
+			}
 		} else {
 			goto badreg;
 		}
 		break;
 
 	case CFI_X86_64_UNWIND_REGISTER_MXCSR:
-		if (self->mc_flags & MCONTEXT_FLAG_HAVEXFPU) {
+		if ((self->mc_flags & MCONTEXT_FLAG_HAVEFPU) && fpustate_isxsave(&self->mc_fpu)) {
 			self->mc_fpu.f_xsave.fx_mxcsr = *(u32 const *)src;
 		} else {
 			goto badreg;
@@ -1222,11 +1234,13 @@ NOTHROW_NCX(CC libuw_unwind_getreg_mcontext_base)(struct mcontext const *__restr
 	case CFI_386_UNWIND_REGISTER_ST0 ... CFI_386_UNWIND_REGISTER_ST7:
 		dw_regno -= CFI_386_UNWIND_REGISTER_ST0;
 do_fpreg:
-		if (self->mc_flags & MCONTEXT_FLAG_HAVEXFPU) {
-			memcpy((byte_t *)dst, &self->mc_fpu.f_xsave.fx_regs[dw_regno], 16);
-		} else if (self->mc_flags & MCONTEXT_FLAG_HAVESFPU) {
-			memcpy((byte_t *)dst, &self->mc_fpu.f_ssave.fs_regs[dw_regno], 10);
-			memset((byte_t *)dst + 10, 0, 6);
+		if (self->mc_flags & MCONTEXT_FLAG_HAVEFPU) {
+			if (fpustate_isxsave(&self->mc_fpu)) {
+				memcpy((byte_t *)dst, &self->mc_fpu.f_xsave.fx_regs[dw_regno], 16);
+			} else {
+				memcpy((byte_t *)dst, &self->mc_fpu.f_ssave.fs_regs[dw_regno], 10);
+				memset((byte_t *)dst + 10, 0, 6);
+			}
 		} else {
 			goto badreg;
 		}
@@ -1234,7 +1248,7 @@ do_fpreg:
 
 	case CFI_386_UNWIND_REGISTER_XMM0 ... CFI_386_UNWIND_REGISTER_XMM7:
 		dw_regno -= CFI_386_UNWIND_REGISTER_XMM0;
-		if (self->mc_flags & MCONTEXT_FLAG_HAVEXFPU) {
+		if ((self->mc_flags & MCONTEXT_FLAG_HAVEFPU) && fpustate_isxsave(&self->mc_fpu)) {
 			memcpy((byte_t *)dst, &self->mc_fpu.f_xsave.fx_xmm[dw_regno], 16);
 		} else {
 			goto badreg;
@@ -1242,27 +1256,31 @@ do_fpreg:
 		break;
 
 	case CFI_386_UNWIND_REGISTER_FCW:
-		if (self->mc_flags & MCONTEXT_FLAG_HAVEXFPU) {
-			*(u32 *)dst = self->mc_fpu.f_xsave.fx_fcw;
-		} else if (self->mc_flags & MCONTEXT_FLAG_HAVESFPU) {
-			*(u32 *)dst = self->mc_fpu.f_ssave.fs_fcw;
+		if (self->mc_flags & MCONTEXT_FLAG_HAVEFPU) {
+			if (fpustate_isxsave(&self->mc_fpu)) {
+				*(u32 *)dst = self->mc_fpu.f_xsave.fx_fcw;
+			} else {
+				*(u32 *)dst = self->mc_fpu.f_ssave.fs_fcw;
+			}
 		} else {
 			goto badreg;
 		}
 		break;
 
 	case CFI_386_UNWIND_REGISTER_FSW:
-		if (self->mc_flags & MCONTEXT_FLAG_HAVEXFPU) {
-			*(u32 *)dst = self->mc_fpu.f_xsave.fx_fsw;
-		} else if (self->mc_flags & MCONTEXT_FLAG_HAVESFPU) {
-			*(u32 *)dst = self->mc_fpu.f_ssave.fs_fsw;
+		if (self->mc_flags & MCONTEXT_FLAG_HAVEFPU) {
+			if (fpustate_isxsave(&self->mc_fpu)) {
+				*(u32 *)dst = self->mc_fpu.f_xsave.fx_fsw;
+			} else {
+				*(u32 *)dst = self->mc_fpu.f_ssave.fs_fsw;
+			}
 		} else {
 			goto badreg;
 		}
 		break;
 
 	case CFI_386_UNWIND_REGISTER_MXCSR:
-		if (self->mc_flags & MCONTEXT_FLAG_HAVEXFPU) {
+		if ((self->mc_flags & MCONTEXT_FLAG_HAVEFPU) && fpustate_isxsave(&self->mc_fpu)) {
 			*(u32 *)dst = self->mc_fpu.f_xsave.fx_mxcsr;
 		} else {
 			goto badreg;
@@ -1306,10 +1324,12 @@ NOTHROW_NCX(CC libuw_unwind_setreg_mcontext_base)(struct mcontext *__restrict se
 	case CFI_386_UNWIND_REGISTER_ST0 ... CFI_386_UNWIND_REGISTER_ST7:
 		dw_regno -= CFI_386_UNWIND_REGISTER_ST0;
 do_fpreg:
-		if (self->mc_flags & MCONTEXT_FLAG_HAVEXFPU) {
-			memcpy(&self->mc_fpu.f_xsave.fx_regs[dw_regno], src, 16);
-		} else if (self->mc_flags & MCONTEXT_FLAG_HAVESFPU) {
-			memcpy(&self->mc_fpu.f_ssave.fs_regs[dw_regno], src, 10);
+		if (self->mc_flags & MCONTEXT_FLAG_HAVEFPU) {
+			if (fpustate_isxsave(&self->mc_fpu)) {
+				memcpy(&self->mc_fpu.f_xsave.fx_regs[dw_regno], src, 16);
+			} else {
+				memcpy(&self->mc_fpu.f_ssave.fs_regs[dw_regno], src, 10);
+			}
 		} else {
 			goto badreg;
 		}
@@ -1317,7 +1337,7 @@ do_fpreg:
 
 	case CFI_386_UNWIND_REGISTER_XMM0 ... CFI_386_UNWIND_REGISTER_XMM7:
 		dw_regno -= CFI_386_UNWIND_REGISTER_XMM0;
-		if (self->mc_flags & MCONTEXT_FLAG_HAVEXFPU) {
+		if ((self->mc_flags & MCONTEXT_FLAG_HAVEFPU) && fpustate_isxsave(&self->mc_fpu)) {
 			memcpy(&self->mc_fpu.f_xsave.fx_xmm[dw_regno], src, 16);
 		} else {
 			goto badreg;
@@ -1325,27 +1345,31 @@ do_fpreg:
 		break;
 
 	case CFI_386_UNWIND_REGISTER_FCW:
-		if (self->mc_flags & MCONTEXT_FLAG_HAVEXFPU) {
-			self->mc_fpu.f_xsave.fx_fcw = (u16)(*(u32 const *)src);
-		} else if (self->mc_flags & MCONTEXT_FLAG_HAVESFPU) {
-			self->mc_fpu.f_ssave.fs_fcw = (u16)(*(u32 const *)src);
+		if (self->mc_flags & MCONTEXT_FLAG_HAVEFPU) {
+			if (fpustate_isxsave(&self->mc_fpu)) {
+				self->mc_fpu.f_xsave.fx_fcw = (u16)(*(u32 const *)src);
+			} else {
+				self->mc_fpu.f_ssave.fs_fcw = (u16)(*(u32 const *)src);
+			}
 		} else {
 			goto badreg;
 		}
 		break;
 
 	case CFI_386_UNWIND_REGISTER_FSW:
-		if (self->mc_flags & MCONTEXT_FLAG_HAVEXFPU) {
-			self->mc_fpu.f_xsave.fx_fsw = (u16)(*(u32 const *)src);
-		} else if (self->mc_flags & MCONTEXT_FLAG_HAVESFPU) {
-			self->mc_fpu.f_ssave.fs_fsw = (u16)(*(u32 const *)src);
+		if (self->mc_flags & MCONTEXT_FLAG_HAVEFPU) {
+			if (fpustate_isxsave(&self->mc_fpu)) {
+				self->mc_fpu.f_xsave.fx_fsw = (u16)(*(u32 const *)src);
+			} else {
+				self->mc_fpu.f_ssave.fs_fsw = (u16)(*(u32 const *)src);
+			}
 		} else {
 			goto badreg;
 		}
 		break;
 
 	case CFI_386_UNWIND_REGISTER_MXCSR:
-		if (self->mc_flags & MCONTEXT_FLAG_HAVEXFPU) {
+		if ((self->mc_flags & MCONTEXT_FLAG_HAVEFPU) && fpustate_isxsave(&self->mc_fpu)) {
 			self->mc_fpu.f_xsave.fx_mxcsr = *(u32 const *)src;
 		} else {
 			goto badreg;

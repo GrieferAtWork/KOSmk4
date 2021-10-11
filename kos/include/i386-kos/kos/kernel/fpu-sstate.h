@@ -60,34 +60,35 @@ struct __ATTR_ALIGNED(ALIGNOF_SFPUENV) __ATTR_PACKED sfpuenv /*[PREFIX(fe_)]*/ {
 };
 #endif /* __CC__ */
 
-#define OFFSET_SFPUSTATE_FCW   0
-#define OFFSET_SFPUSTATE_FSW   4
-#define OFFSET_SFPUSTATE_FTW   8
-#define OFFSET_SFPUSTATE_FIP   12
-#define OFFSET_SFPUSTATE_FCS   16
-#define OFFSET_SFPUSTATE_FOP   18
-#define OFFSET_SFPUSTATE_FDP   20
-#define OFFSET_SFPUSTATE_FDS   24
-#define OFFSET_SFPUSTATE_ST(i) (28 + (i) * 10)
-#define OFFSET_SFPUSTATE_ST0   28 /* [FIELD(fs_regs[0])] */
-#define OFFSET_SFPUSTATE_ST1   38 /* [FIELD(fs_regs[1])] */
-#define OFFSET_SFPUSTATE_ST2   48 /* [FIELD(fs_regs[2])] */
-#define OFFSET_SFPUSTATE_ST3   58 /* [FIELD(fs_regs[3])] */
-#define OFFSET_SFPUSTATE_ST4   68 /* [FIELD(fs_regs[4])] */
-#define OFFSET_SFPUSTATE_ST5   78 /* [FIELD(fs_regs[5])] */
-#define OFFSET_SFPUSTATE_ST6   88 /* [FIELD(fs_regs[6])] */
-#define OFFSET_SFPUSTATE_ST7   98 /* [FIELD(fs_regs[7])] */
-#define OFFSET_SFPUSTATE_MM(i) (28 + (i) * 10)
-#define OFFSET_SFPUSTATE_MM0   28 /* [FIELD(fs_regs[0])] */
-#define OFFSET_SFPUSTATE_MM1   38 /* [FIELD(fs_regs[1])] */
-#define OFFSET_SFPUSTATE_MM2   48 /* [FIELD(fs_regs[2])] */
-#define OFFSET_SFPUSTATE_MM3   58 /* [FIELD(fs_regs[3])] */
-#define OFFSET_SFPUSTATE_MM4   68 /* [FIELD(fs_regs[4])] */
-#define OFFSET_SFPUSTATE_MM5   78 /* [FIELD(fs_regs[5])] */
-#define OFFSET_SFPUSTATE_MM6   88 /* [FIELD(fs_regs[6])] */
-#define OFFSET_SFPUSTATE_MM7   98 /* [FIELD(fs_regs[7])] */
-#define SIZEOF_SFPUSTATE       108
-#define ALIGNOF_SFPUSTATE      4
+#define OFFSET_SFPUSTATE_FCW    0
+#define OFFSET_SFPUSTATE_FSW    4
+#define OFFSET_SFPUSTATE___PAD2 6 /* [FIELD(__fs_pad2)] */
+#define OFFSET_SFPUSTATE_FTW    8
+#define OFFSET_SFPUSTATE_FIP    12
+#define OFFSET_SFPUSTATE_FCS    16
+#define OFFSET_SFPUSTATE_FOP    18
+#define OFFSET_SFPUSTATE_FDP    20
+#define OFFSET_SFPUSTATE_FDS    24
+#define OFFSET_SFPUSTATE_ST(i)  (28 + (i) * 10)
+#define OFFSET_SFPUSTATE_ST0    28 /* [FIELD(fs_regs[0])] */
+#define OFFSET_SFPUSTATE_ST1    38 /* [FIELD(fs_regs[1])] */
+#define OFFSET_SFPUSTATE_ST2    48 /* [FIELD(fs_regs[2])] */
+#define OFFSET_SFPUSTATE_ST3    58 /* [FIELD(fs_regs[3])] */
+#define OFFSET_SFPUSTATE_ST4    68 /* [FIELD(fs_regs[4])] */
+#define OFFSET_SFPUSTATE_ST5    78 /* [FIELD(fs_regs[5])] */
+#define OFFSET_SFPUSTATE_ST6    88 /* [FIELD(fs_regs[6])] */
+#define OFFSET_SFPUSTATE_ST7    98 /* [FIELD(fs_regs[7])] */
+#define OFFSET_SFPUSTATE_MM(i)  (28 + (i) * 10)
+#define OFFSET_SFPUSTATE_MM0    28 /* [FIELD(fs_regs[0])] */
+#define OFFSET_SFPUSTATE_MM1    38 /* [FIELD(fs_regs[1])] */
+#define OFFSET_SFPUSTATE_MM2    48 /* [FIELD(fs_regs[2])] */
+#define OFFSET_SFPUSTATE_MM3    58 /* [FIELD(fs_regs[3])] */
+#define OFFSET_SFPUSTATE_MM4    68 /* [FIELD(fs_regs[4])] */
+#define OFFSET_SFPUSTATE_MM5    78 /* [FIELD(fs_regs[5])] */
+#define OFFSET_SFPUSTATE_MM6    88 /* [FIELD(fs_regs[6])] */
+#define OFFSET_SFPUSTATE_MM7    98 /* [FIELD(fs_regs[7])] */
+#define SIZEOF_SFPUSTATE        108
+#define ALIGNOF_SFPUSTATE       4
 #ifdef __CC__
 #undef fs_env
 #undef fs_fcw
@@ -110,6 +111,13 @@ struct __ATTR_ALIGNED(ALIGNOF_SFPUSTATE) __ATTR_PACKED sfpustate /*[PREFIX(fs_)]
 			__uint16_t          __fs_pad1;    /* ... */
 			__uint16_t            fs_fsw;     /* Floating point status word. (Set of `FSW_*')
 			                                   * Get  using   `__fstsw()'   /   `__fnstsw()'; */
+			/* NOTE: We use  `__fs_pad2 == 0xffff' <=>  is-a-sfpustate as  indicator
+			 *       for sfpustate vs.  xfpustate. All that's  needed is that  every
+			 *       time sfpustate is created, we follow up with __fs_pad2 = 0xffff
+			 * `sfpustate::__fs_pad2'  overlaps  with `xfpustate::fx_fop',  which  is an
+			 * 11-bit field who's upper 5 bits are undefined, meaning that by  following
+			 * up the creation  of a  xfpustate with `fx_fop &= 0x07ff',  we can  ensure
+			 * that there exists a fixed, detectable difference between the two structs. */
 			__uint16_t          __fs_pad2;    /* ... */
 			__uint16_t            fs_ftw;     /* Floating point tag word. (Indicates the contents of `fs_regs' with 2 bits per register; set of `FTW_*') */
 			__uint16_t          __fs_pad3;    /* ... */

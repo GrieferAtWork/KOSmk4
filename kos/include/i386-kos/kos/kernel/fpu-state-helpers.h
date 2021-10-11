@@ -25,15 +25,16 @@
 #include <asm/cpu-flags.h>
 #include <bits/types.h>
 
+#include <libc/string.h>
+
+#include "fpu-sstate.h"
+
 #ifdef __x86_64__
 #include "fpu-state32.h"
 #include "fpu-state64.h"
-/*#include "fpu-state-helpers32.h"*/
-/*#include "fpu-state-helpers64.h"*/
 #include "fpu-state-helperscc.h"
 #else /* __x86_64__ */
 #include "fpu-state32.h"
-/*#include "fpu-state-helpers32.h"*/
 #endif /* !__x86_64__ */
 
 #ifdef __CC__
@@ -122,6 +123,40 @@ __NOTHROW(fpustate_ftwx2ftw_float80)(__uint8_t __ftw, union ieee854_float80 cons
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
+
+
+__LOCAL __ATTR_NONNULL((1, 2)) void
+__NOTHROW(xfpustate_to_sfpustate)(struct xfpustate const *__restrict self,
+                                  struct sfpustate *__restrict result) {
+	unsigned int i;
+	result->fs_fcw = self->fx_fcw;
+	result->fs_fsw = self->fx_fsw;
+	result->fs_ftw = self->fx_ftw;
+	result->fs_fip = self->fx_fip;
+	result->fs_fcs = 0;
+	result->fs_fop = self->fx_fop & 0x07ff;
+	result->fs_fdp = self->fx_fdp;
+	result->fs_fds = 0;
+	for (i = 0; i < 8; ++i) {
+		__libc_memcpy(&result->fs_regs[i], &self->fx_regs[i], 10);
+	}
+}
+
+__LOCAL __ATTR_NONNULL((1, 2)) void
+__NOTHROW(sfpustate_to_xfpustate)(struct sfpustate const *__restrict self,
+                                  struct xfpustate *__restrict result) {
+	__libc_memset(result, 0, sizeof(struct xfpustate));
+	unsigned int i;
+	result->fx_fcw = self->fs_fcw;
+	result->fx_fsw = self->fs_fsw;
+	result->fx_ftw = self->fs_ftw;
+	result->fx_fop = self->fs_fop & 0x07ff;
+	result->fx_fip = self->fs_fip;
+	result->fx_fdp = self->fs_fdp;
+	for (i = 0; i < 8; ++i)
+		__libc_memcpy(&result->fx_regs[i], &self->fs_regs[i], 10);
+}
+
 
 
 __DECL_END

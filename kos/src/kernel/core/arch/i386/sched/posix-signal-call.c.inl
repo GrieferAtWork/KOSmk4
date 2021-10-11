@@ -274,14 +274,12 @@ LOCAL_userexcept_callsignal(struct icpustate *__restrict state,
 		                                              &old_sigmask, sizeof(sigset_t));
 		if (siginfo->si_signo == SIGSEGV) {
 			user_ucontext->uc_mcontext.mc_cr2 = (ulongptr_t)siginfo->si_addr;
-			user_ucontext->uc_mcontext.mc_flags |= __MCONTEXT_FLAG_HAVECR2;
+			user_ucontext->uc_mcontext.mc_flags |= MCONTEXT_FLAG_HAVECR2;
 		}
 		if (PERTASK_TEST(this_fpustate)) {
 			user_fpustate = &user_ucontext->uc_mcontext.mc_fpu;
-			user_fpustate = LOCAL_fpustate_saveinto(user_fpustate);
-			user_ucontext->uc_mcontext.mc_flags |= x86_fpustate_variant == FPU_STATE_SSTATE
-			                                       ? __MCONTEXT_FLAG_HAVESFPU
-			                                       : __MCONTEXT_FLAG_HAVEXFPU;
+			LOCAL_fpustate_saveinto(user_fpustate);
+			user_ucontext->uc_mcontext.mc_flags |= MCONTEXT_FLAG_HAVEFPU;
 		}
 		usp -= sizeof(LOCAL_ucontext_t) + EFFECTIVE_SIZEOF_SIGINFO_T;
 
@@ -308,7 +306,7 @@ LOCAL_userexcept_callsignal(struct icpustate *__restrict state,
 			                  MIN_C(sizeof(struct sfpustate),
 			                        sizeof(LOCAL_struct_xfpustate)));
 			COMPILER_WRITE_BARRIER();
-			user_fpustate = LOCAL_fpustate_saveinto(user_fpustate);
+			LOCAL_fpustate_saveinto(user_fpustate);
 		}
 		/* Only save the sigmask if it was changed. */
 		if (must_restore_sigmask) {

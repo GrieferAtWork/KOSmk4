@@ -52,43 +52,41 @@
 
 
 #ifdef __x86_64__
-#define __MCONTEXT_FLAG_NORMAL   __MCONTEXTX64_FLAG_NORMAL
-#define __MCONTEXT_FLAG_HAVECR2  __MCONTEXTX64_FLAG_HAVECR2
-#define __MCONTEXT_FLAG_HAVESFPU __MCONTEXTX64_FLAG_HAVESFPU
-#define __MCONTEXT_FLAG_HAVEXFPU __MCONTEXTX64_FLAG_HAVEXFPU
-#define __MCONTEXT_REGNO_GSBASE  __MCONTEXTX64_REGNO_GSBASE
-#define __MCONTEXT_REGNO_FSBASE  __MCONTEXTX64_REGNO_FSBASE
-#define __MCONTEXT_REGNO_R15     __MCONTEXTX64_REGNO_R15
-#define __MCONTEXT_REGNO_R14     __MCONTEXTX64_REGNO_R14
-#define __MCONTEXT_REGNO_R13     __MCONTEXTX64_REGNO_R13
-#define __MCONTEXT_REGNO_R12     __MCONTEXTX64_REGNO_R12
-#define __MCONTEXT_REGNO_R11     __MCONTEXTX64_REGNO_R11
-#define __MCONTEXT_REGNO_R10     __MCONTEXTX64_REGNO_R10
-#define __MCONTEXT_REGNO_R9      __MCONTEXTX64_REGNO_R9
-#define __MCONTEXT_REGNO_R8      __MCONTEXTX64_REGNO_R8
-#define __MCONTEXT_REGNO_RDI     __MCONTEXTX64_REGNO_RDI
-#define __MCONTEXT_REGNO_RSI     __MCONTEXTX64_REGNO_RSI
-#define __MCONTEXT_REGNO_RBP     __MCONTEXTX64_REGNO_RBP
-#define __MCONTEXT_REGNO_RSP     __MCONTEXTX64_REGNO_RSP
-#define __MCONTEXT_REGNO_RBX     __MCONTEXTX64_REGNO_RBX
-#define __MCONTEXT_REGNO_RDX     __MCONTEXTX64_REGNO_RDX
-#define __MCONTEXT_REGNO_RCX     __MCONTEXTX64_REGNO_RCX
-#define __MCONTEXT_REGNO_RAX     __MCONTEXTX64_REGNO_RAX
-#define __MCONTEXT_REGNO_GS      __MCONTEXTX64_REGNO_GS
-#define __MCONTEXT_REGNO_FS      __MCONTEXTX64_REGNO_FS
-#define __MCONTEXT_REGNO_ES      __MCONTEXTX64_REGNO_ES
-#define __MCONTEXT_REGNO_DS      __MCONTEXTX64_REGNO_DS
-#define __MCONTEXT_REGNO_CS      __MCONTEXTX64_REGNO_CS
-#define __MCONTEXT_REGNO_SS      __MCONTEXTX64_REGNO_SS
-#define __MCONTEXT_REGNO_RFLAGS  __MCONTEXTX64_REGNO_RFLAGS
-#define __MCONTEXT_REGNO_RIP     __MCONTEXTX64_REGNO_RIP
-#define __MCONTEXT_NGREG         __MCONTEXTX64_NGREG
+#define __MCONTEXT_FLAG_NORMAL  __MCONTEXTX64_FLAG_NORMAL
+#define __MCONTEXT_FLAG_HAVECR2 __MCONTEXTX64_FLAG_HAVECR2
+#define __MCONTEXT_FLAG_HAVEFPU __MCONTEXTX64_FLAG_HAVEFPU
+#define __MCONTEXT_REGNO_GSBASE __MCONTEXTX64_REGNO_GSBASE
+#define __MCONTEXT_REGNO_FSBASE __MCONTEXTX64_REGNO_FSBASE
+#define __MCONTEXT_REGNO_R15    __MCONTEXTX64_REGNO_R15
+#define __MCONTEXT_REGNO_R14    __MCONTEXTX64_REGNO_R14
+#define __MCONTEXT_REGNO_R13    __MCONTEXTX64_REGNO_R13
+#define __MCONTEXT_REGNO_R12    __MCONTEXTX64_REGNO_R12
+#define __MCONTEXT_REGNO_R11    __MCONTEXTX64_REGNO_R11
+#define __MCONTEXT_REGNO_R10    __MCONTEXTX64_REGNO_R10
+#define __MCONTEXT_REGNO_R9     __MCONTEXTX64_REGNO_R9
+#define __MCONTEXT_REGNO_R8     __MCONTEXTX64_REGNO_R8
+#define __MCONTEXT_REGNO_RDI    __MCONTEXTX64_REGNO_RDI
+#define __MCONTEXT_REGNO_RSI    __MCONTEXTX64_REGNO_RSI
+#define __MCONTEXT_REGNO_RBP    __MCONTEXTX64_REGNO_RBP
+#define __MCONTEXT_REGNO_RSP    __MCONTEXTX64_REGNO_RSP
+#define __MCONTEXT_REGNO_RBX    __MCONTEXTX64_REGNO_RBX
+#define __MCONTEXT_REGNO_RDX    __MCONTEXTX64_REGNO_RDX
+#define __MCONTEXT_REGNO_RCX    __MCONTEXTX64_REGNO_RCX
+#define __MCONTEXT_REGNO_RAX    __MCONTEXTX64_REGNO_RAX
+#define __MCONTEXT_REGNO_GS     __MCONTEXTX64_REGNO_GS
+#define __MCONTEXT_REGNO_FS     __MCONTEXTX64_REGNO_FS
+#define __MCONTEXT_REGNO_ES     __MCONTEXTX64_REGNO_ES
+#define __MCONTEXT_REGNO_DS     __MCONTEXTX64_REGNO_DS
+#define __MCONTEXT_REGNO_CS     __MCONTEXTX64_REGNO_CS
+#define __MCONTEXT_REGNO_SS     __MCONTEXTX64_REGNO_SS
+#define __MCONTEXT_REGNO_RFLAGS __MCONTEXTX64_REGNO_RFLAGS
+#define __MCONTEXT_REGNO_RIP    __MCONTEXTX64_REGNO_RIP
+#define __MCONTEXT_NGREG        __MCONTEXTX64_NGREG
 
 #ifdef __USE_KOS_KERNEL
-#define MCONTEXT_FLAG_NORMAL   __MCONTEXT_FLAG_NORMAL
-#define MCONTEXT_FLAG_HAVECR2  __MCONTEXT_FLAG_HAVECR2
-#define MCONTEXT_FLAG_HAVESFPU __MCONTEXT_FLAG_HAVESFPU
-#define MCONTEXT_FLAG_HAVEXFPU __MCONTEXT_FLAG_HAVEXFPU
+#define MCONTEXT_FLAG_NORMAL  __MCONTEXT_FLAG_NORMAL
+#define MCONTEXT_FLAG_HAVECR2 __MCONTEXT_FLAG_HAVECR2
+#define MCONTEXT_FLAG_HAVEFPU __MCONTEXT_FLAG_HAVEFPU
 #endif /* __USE_KOS_KERNEL */
 #ifdef __USE_GNU
 /* Number of each register is the `gregset_t' array. */
@@ -127,14 +125,13 @@
 
 __DECL_BEGIN
 
-#define __MCONTEXTX64_FLAG_NORMAL   0x0000 /* Normal context flags. */
-#define __MCONTEXTX64_FLAG_HAVECR2  0x0001 /* The `mc_cr2' field contains a valid value. */
-#define __MCONTEXTX64_FLAG_HAVESFPU 0x1000 /* The `mc_fpu' structure contains valid data and must be restored.
-                                            * When not set: The FPU hasn't been  initialized yet, and a  context
-                                            *               load will leave the FPU unmodified if it hasn't been
-                                            *               initialized, or will default-initialize itself if it
-                                            *               had been initialized in the mean time. */
-#define __MCONTEXTX64_FLAG_HAVEXFPU 0x2000 /* The `mc_fpu' structure uses the `f_xsave' variant (otherwise, the `f_ssave' variant is used) */
+#define __MCONTEXTX64_FLAG_NORMAL  0x0000 /* Normal context flags. */
+#define __MCONTEXTX64_FLAG_HAVECR2 0x0001 /* The `mc_cr2' field contains a valid value. */
+#define __MCONTEXTX64_FLAG_HAVEFPU 0x1000 /* The `mc_fpu' structure contains valid data and must be restored.
+                                           * When not set: The FPU hasn't been  initialized yet, and a  context
+                                           *               load will leave the FPU unmodified if it hasn't been
+                                           *               initialized, or will default-initialize itself if it
+                                           *               had been initialized in the mean time. */
 
 
 #define __MCONTEXTX64_REGNO_GS      0

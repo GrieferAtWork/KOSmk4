@@ -2084,6 +2084,7 @@ static_assert(offsetof(struct sfpustate, fs_regs[4]) == OFFSET_SFPUSTATE_ST4);
 static_assert(offsetof(struct sfpustate, fs_regs[5]) == OFFSET_SFPUSTATE_ST5);
 static_assert(offsetof(struct sfpustate, fs_regs[6]) == OFFSET_SFPUSTATE_ST6);
 static_assert(offsetof(struct sfpustate, fs_regs[7]) == OFFSET_SFPUSTATE_ST7);
+static_assert(offsetof(struct sfpustate, __fs_pad2) == OFFSET_SFPUSTATE___PAD2);
 static_assert(sizeof(struct sfpustate) == SIZEOF_SFPUSTATE);
 static_assert(alignof(struct sfpustate) == ALIGNOF_SFPUSTATE);
 
