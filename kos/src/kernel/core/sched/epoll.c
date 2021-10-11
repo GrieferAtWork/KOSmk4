@@ -1858,8 +1858,7 @@ epoll_create_rpc_monitor(struct epoll_controller *__restrict self,
 	VALIDATE_FLAGSET(mode,
 	                 RPC_SIGNO_MASK | RPC_SYNCMODE_F_ALLOW_ASYNC |
 	                 RPC_SYNCMODE_F_REQUIRE_SC | RPC_SYNCMODE_F_REQUIRE_CP |
-	                 RPC_SYSRESTART_F_AUTO | RPC_PRIORITY_F_HIGH |
-	                 RPC_DOMAIN_F_PROC,
+	                 RPC_SYSRESTART_F_AUTO | RPC_DOMAIN_F_PROC,
 	                 E_INVALID_ARGUMENT_CONTEXT_RPC_SCHEDULE_MODE);
 
 	/* Set the default signal number `SIGRPC' if none was specified. */
@@ -1911,8 +1910,7 @@ epoll_create_rpc_monitor(struct epoll_controller *__restrict self,
 	                                RPC_SYNCMODE_F_ALLOW_ASYNC |
 	                                RPC_SYNCMODE_F_REQUIRE_SC |
 	                                RPC_SYNCMODE_F_REQUIRE_CP |
-	                                RPC_SYSRESTART_F_AUTO |
-	                                RPC_PRIORITY_F_HIGH);
+	                                RPC_SYSRESTART_F_AUTO);
 	rpc->emr_rpc.pr_user.pur_refcnt = 1;
 	rpc->emr_rpc.pr_user.pur_status = PENDING_USER_RPC_STATUS_PENDING;
 	sig_init(&rpc->emr_rpc.pr_user.pur_stchng); /* Never used, but still needed... */

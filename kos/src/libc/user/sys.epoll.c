@@ -160,7 +160,7 @@ NOTHROW_RPC(LIBCCALL libc_epoll_pwait)(fd_t epfd,
 }
 /*[[[end:libc_epoll_pwait]]]*/
 
-/*[[[head:libc_epoll_rpc_exec,hash:CRC-32=0x33097f3a]]]*/
+/*[[[head:libc_epoll_rpc_exec,hash:CRC-32=0xdda91c53]]]*/
 /* >> epoll_rpc_exec(3)
  * Helper wrapper for  `EPOLL_CTL_RPC_PROG' that  automatically provides  the
  * necessary arch-specific RPC program to invoke `func(..., event->data.ptr)'
@@ -181,7 +181,6 @@ NOTHROW_RPC(LIBCCALL libc_epoll_pwait)(fd_t epfd,
  * @param: target_tid: The TID of the targeted thread
  * @param: mode:       One of  `RPC_SYNCMODE_*', optionally or'd  with
  *                     one of `RPC_SYSRESTART_*', optionally or'd with
- *                     one of  `RPC_PRIORITY_*', optionally or'd  with
  *                     one of `RPC_DOMAIN_*'
  * @param: func:       The function executed by the RPC
  * @return: 0 :                Success

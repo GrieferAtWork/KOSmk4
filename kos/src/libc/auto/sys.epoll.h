@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x99196e87 */
+/* HASH CRC-32:0x1eddd24d */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -108,7 +108,6 @@ INTDEF NONNULL((2)) __STDC_INT_AS_SSIZE_T NOTHROW_RPC(LIBDCALL libd_epoll_pwait)
  * @param: target_tid: The TID of the targeted thread
  * @param: mode:       One of  `RPC_SYNCMODE_*', optionally or'd  with
  *                     one of `RPC_SYSRESTART_*', optionally or'd with
- *                     one of  `RPC_PRIORITY_*', optionally or'd  with
  *                     one of `RPC_DOMAIN_*'
  * @param: func:       The function executed by the RPC
  * @return: 0 :                Success

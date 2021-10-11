@@ -487,7 +487,6 @@ typedef __ATTR_NONNULL((1)) void
 @@@param: target_tid: The TID of the targeted thread
 @@@param: mode:       One of  `RPC_SYNCMODE_*', optionally or'd  with
 @@                    one of `RPC_SYSRESTART_*', optionally or'd with
-@@                    one of  `RPC_PRIORITY_*', optionally or'd  with
 @@                    one of `RPC_DOMAIN_*'
 @@@param: func:       The function executed by the RPC
 @@@return: 0 :                Success

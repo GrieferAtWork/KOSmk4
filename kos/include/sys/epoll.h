@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2a482858 */
+/* HASH CRC-32:0x25ddf86 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -461,7 +461,6 @@ typedef __ATTR_NONNULL((1)) void
  * @param: target_tid: The TID of the targeted thread
  * @param: mode:       One of  `RPC_SYNCMODE_*', optionally or'd  with
  *                     one of `RPC_SYSRESTART_*', optionally or'd with
- *                     one of  `RPC_PRIORITY_*', optionally or'd  with
  *                     one of `RPC_DOMAIN_*'
  * @param: func:       The function executed by the RPC
  * @return: 0 :                Success
