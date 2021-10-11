@@ -34,6 +34,7 @@
 #ifdef __CC__
 __SYSDECL_BEGIN
 
+#ifndef PRPC_EXEC_CALLBACK_CC
 #ifdef __KERNEL__
 typedef struct icpustate rpc_cpustate_t;
 #define PRPC_EXEC_CALLBACK_CC __FCALL
@@ -41,6 +42,7 @@ typedef struct icpustate rpc_cpustate_t;
 typedef struct ucpustate rpc_cpustate_t;
 #define PRPC_EXEC_CALLBACK_CC __LIBKCALL
 #endif /* !__KERNEL__ */
+#endif /* !PRPC_EXEC_CALLBACK_CC */
 
 
 /* The initial value of `rc_context' depends on how the RPC was scheduled:
@@ -111,9 +113,12 @@ NOTHROW_IF(__ctx->rc_context == RPC_REASONCTX_ASYNC_KERN) // You also ~shouldn't
 #endif // __KERNEL__
 */
 /* Callback prototype for RPC functions registered by `rpc_exec()' */
+#ifndef __prpc_exec_callback_t_defined
+#define __prpc_exec_callback_t_defined
 typedef __ATTR_NONNULL((1)) void
 (PRPC_EXEC_CALLBACK_CC *prpc_exec_callback_t)(struct rpc_context *__restrict __ctx, void *__cookie)
 		__THROWS(...);
+#endif /* !__prpc_exec_callback_t_defined */
 
 }
 

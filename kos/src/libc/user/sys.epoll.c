@@ -161,16 +161,70 @@ NOTHROW_RPC(LIBCCALL libc_epoll_pwait)(fd_t epfd,
 }
 /*[[[end:libc_epoll_pwait]]]*/
 
+/*[[[head:libc_epoll_rpc_exec,hash:CRC-32=0x33097f3a]]]*/
+/* >> epoll_rpc_exec(3)
+ * Helper wrapper for  `EPOLL_CTL_RPC_PROG' that  automatically provides  the
+ * necessary arch-specific RPC program to invoke `func(..., event->data.ptr)'
+ * as  soon as any of `event->events' become  raised in `fd'. The monitor for
+ * this  is associated with `epfd' and the  RPC (if not already delieved) can
+ * be cancled by `epoll_ctl(epfd, EPOLL_CTL_DEL, fd, NULL)'. Not that as soon
+ * as  the RPC is  send, the associated monitor  will have automatically been
+ * deleted.
+ *
+ * This function can be used to allow for implement asynchronous notification
+ * of file events to be delivered to arbitrary threads. Using this, you could
+ * implement  asynchronous, non-blocking I/O by sending RPCs to an I/O worker
+ * thread that will perform reads/writes as soon as they become possible.
+ * @param: epfd:       Epoll controller file descriptor
+ * @param: fd:         The file to monitor for events
+ * @param: event:      Epoll event information, including monitored  events,
+ *                     and the cookie argument that will be passed to `func'
+ * @param: target_tid: The TID of the targeted thread
+ * @param: mode:       One of  `RPC_SYNCMODE_*', optionally or'd  with
+ *                     one of `RPC_SYSRESTART_*', optionally or'd with
+ *                     one of  `RPC_PRIORITY_*', optionally or'd  with
+ *                     one of `RPC_DOMAIN_*'
+ * @param: func:       The function executed by the RPC
+ * @return: 0 :                Success
+ * @return: -1: [errno=ESRCH]  The  target  thread has  already  terminated, or
+ *                             doesn't exist. Note  though that  if the  target
+ *                             thread  exits prior to  any monitored file event
+ *                             happening, the epoll  monitor will still  remain
+ *                             intact, and the  RPC will be  discarded as  soon
+ *                             as an attempt to send it is made, or the monitor
+ *                             is manually deleted via `EPOLL_CTL_DEL' */
+INTERN ATTR_SECTION(".text.crt.io.poll") NONNULL((3, 6)) int
+NOTHROW_NCX(LIBCCALL libc_epoll_rpc_exec)(fd_t epfd,
+                                          fd_t fd,
+                                          struct epoll_event *event,
+                                          pid_t target_tid,
+                                          unsigned int mode,
+                                          prpc_exec_callback_t func)
+/*[[[body:libc_epoll_rpc_exec]]]*/
+/*AUTO*/{
+	(void)epfd;
+	(void)fd;
+	(void)event;
+	(void)target_tid;
+	(void)mode;
+	(void)func;
+	CRT_UNIMPLEMENTEDF("epoll_rpc_exec(%" PRIxN(__SIZEOF_FD_T__) ", %" PRIxN(__SIZEOF_FD_T__) ", %p, %" PRIxN(__SIZEOF_PID_T__) ", %x, %p)", epfd, fd, event, target_tid, mode, func); /* TODO */
+	libc_seterrno(ENOSYS);
+	return 0;
+}
+/*[[[end:libc_epoll_rpc_exec]]]*/
 
 
 
 
-/*[[[start:exports,hash:CRC-32=0x69a39cda]]]*/
+
+/*[[[start:exports,hash:CRC-32=0x9879653f]]]*/
 DEFINE_PUBLIC_ALIAS(epoll_create, libc_epoll_create);
 DEFINE_PUBLIC_ALIAS(epoll_create1, libc_epoll_create1);
 DEFINE_PUBLIC_ALIAS(epoll_ctl, libc_epoll_ctl);
 DEFINE_PUBLIC_ALIAS(epoll_wait, libc_epoll_wait);
 DEFINE_PUBLIC_ALIAS(epoll_pwait, libc_epoll_pwait);
+DEFINE_PUBLIC_ALIAS(epoll_rpc_exec, libc_epoll_rpc_exec);
 /*[[[end:exports]]]*/
 
 DECL_END

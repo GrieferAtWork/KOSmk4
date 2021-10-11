@@ -21,6 +21,7 @@
 #define _BITS_OS_KOS_EPOLL_H 1
 
 #include <__stdinc.h>
+#include <features.h>
 
 #include <bits/types.h>
 
@@ -45,6 +46,18 @@ __DECL_BEGIN
 #undef u64
 #undef events
 #undef data
+
+#if defined(__KOS__) && defined(__USE_KOS_KERNEL)
+/* Parameter structure for `EPOLL_CTL_RPC_PROG' */
+struct epoll_rpc_program {
+	__uint64_t erp_target;          /* Target PID/TID */
+	__uint64_t erp_mode;            /* RPC mode (same as the `mode' argument of `sys_rpc_schedule(2)') */
+	__uint64_t erp_prog;            /* RPC program pointer (set as `erp_prog = (uint64_t)(uintptr_t)(void *)prog') */
+	__uint64_t erp_params;          /* RPC program parameters pointer (set as `erp_prog = (uint64_t)(uintptr_t)(void **)prog') */
+	__uint64_t erp_max_param_count; /* RPC program max parameter count */
+};
+#endif /* __KOS__ && __USE_KOS_KERNEL */
+
 
 union epoll_data {
 	void      *ptr;

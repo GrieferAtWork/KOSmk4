@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3da9693b */
+/* HASH CRC-32:0x9a90a936 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1889,6 +1889,7 @@ DFUN(".text.crt.dos.io.poll", libd_epoll_create1, libc_epoll_create1, TIn(__SIZE
 DFUN(".text.crt.dos.io.poll", libd_epoll_ctl, libc_epoll_ctl, TD, 4, TIn(__SIZEOF_FD_T__), TD, TIn(__SIZEOF_FD_T__), TP)
 DFUN(".text.crt.dos.io.poll", libd_epoll_wait, libc_epoll_wait, TD, 4, TIn(__SIZEOF_FD_T__), TP, TD, TD)
 DFUN(".text.crt.dos.io.poll", libd_epoll_pwait, libc_epoll_pwait, TD, 5, TIn(__SIZEOF_FD_T__), TP, TD, TD, TP)
+DFUN(".text.crt.dos.io.poll", libd_epoll_rpc_exec, libc_epoll_rpc_exec, TD, 6, TIn(__SIZEOF_FD_T__), TIn(__SIZEOF_FD_T__), TP, TIn(__SIZEOF_PID_T__), TD, TP)
 
 /* sys.eventfd */
 DFUN(".text.crt.dos.sched.eventfd", libd_eventfd, libc_eventfd, TIn(__SIZEOF_FD_T__), 2, TD, TD)

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1329f099 */
+/* HASH CRC-32:0x99196e87 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -88,6 +88,38 @@ INTDEF NONNULL((2)) __STDC_INT_AS_SSIZE_T NOTHROW_RPC(LIBDCALL libd_epoll_wait)(
  * @return: 0:        No events happened before `timeout' expired.
  * @return: -1:       Error (s.a. `errno') */
 INTDEF NONNULL((2)) __STDC_INT_AS_SSIZE_T NOTHROW_RPC(LIBDCALL libd_epoll_pwait)(fd_t epfd, struct epoll_event *events, __STDC_INT_AS_SIZE_T maxevents, int timeout, sigset_t const *ss);
+/* >> epoll_rpc_exec(3)
+ * Helper wrapper for  `EPOLL_CTL_RPC_PROG' that  automatically provides  the
+ * necessary arch-specific RPC program to invoke `func(..., event->data.ptr)'
+ * as  soon as any of `event->events' become  raised in `fd'. The monitor for
+ * this  is associated with `epfd' and the  RPC (if not already delieved) can
+ * be cancled by `epoll_ctl(epfd, EPOLL_CTL_DEL, fd, NULL)'. Not that as soon
+ * as  the RPC is  send, the associated monitor  will have automatically been
+ * deleted.
+ *
+ * This function can be used to allow for implement asynchronous notification
+ * of file events to be delivered to arbitrary threads. Using this, you could
+ * implement  asynchronous, non-blocking I/O by sending RPCs to an I/O worker
+ * thread that will perform reads/writes as soon as they become possible.
+ * @param: epfd:       Epoll controller file descriptor
+ * @param: fd:         The file to monitor for events
+ * @param: event:      Epoll event information, including monitored  events,
+ *                     and the cookie argument that will be passed to `func'
+ * @param: target_tid: The TID of the targeted thread
+ * @param: mode:       One of  `RPC_SYNCMODE_*', optionally or'd  with
+ *                     one of `RPC_SYSRESTART_*', optionally or'd with
+ *                     one of  `RPC_PRIORITY_*', optionally or'd  with
+ *                     one of `RPC_DOMAIN_*'
+ * @param: func:       The function executed by the RPC
+ * @return: 0 :                Success
+ * @return: -1: [errno=ESRCH]  The  target  thread has  already  terminated, or
+ *                             doesn't exist. Note  though that  if the  target
+ *                             thread  exits prior to  any monitored file event
+ *                             happening, the epoll  monitor will still  remain
+ *                             intact, and the  RPC will be  discarded as  soon
+ *                             as an attempt to send it is made, or the monitor
+ *                             is manually deleted via `EPOLL_CTL_DEL' */
+INTDEF NONNULL((3, 6)) int NOTHROW_NCX(LIBDCALL libd_epoll_rpc_exec)(fd_t epfd, fd_t fd, struct epoll_event *event, pid_t target_tid, unsigned int mode, prpc_exec_callback_t func);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 
 DECL_END

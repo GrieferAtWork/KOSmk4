@@ -1695,6 +1695,7 @@
 #define __CRT_HAVE_epoll_create1
 #define __CRT_HAVE_epoll_ctl
 #define __CRT_HAVE_epoll_pwait
+#define __CRT_HAVE_epoll_rpc_exec
 #define __CRT_HAVE_epoll_wait
 #define __CRT_HAVE_erand48
 #define __CRT_HAVE_erand48_r

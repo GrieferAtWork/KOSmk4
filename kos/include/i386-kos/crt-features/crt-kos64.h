@@ -1537,6 +1537,7 @@
 #define __CRT_HAVE_epoll_create1
 #define __CRT_HAVE_epoll_ctl
 #define __CRT_HAVE_epoll_pwait
+#define __CRT_HAVE_epoll_rpc_exec
 #define __CRT_HAVE_epoll_wait
 #define __CRT_HAVE_erand48
 #define __CRT_HAVE_erand48_r
@@ -6042,6 +6043,7 @@
 #define __CRT_HAVE_KOS$epoll_create1
 #define __CRT_HAVE_KOS$epoll_ctl
 #define __CRT_HAVE_KOS$epoll_pwait
+#define __CRT_HAVE_KOS$epoll_rpc_exec
 #define __CRT_HAVE_KOS$epoll_wait
 #define __CRT_HAVE_KOS$erand48
 #define __CRT_HAVE_KOS$erand48_r
@@ -9451,6 +9453,7 @@
 #define __CRT_HAVE_DOS$epoll_create1
 #define __CRT_HAVE_DOS$epoll_ctl
 #define __CRT_HAVE_DOS$epoll_pwait
+#define __CRT_HAVE_DOS$epoll_rpc_exec
 #define __CRT_HAVE_DOS$epoll_wait
 #define __CRT_HAVE_DOS$erand48
 #define __CRT_HAVE_DOS$erand48_r

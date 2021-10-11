@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4ce2a911 */
+/* HASH CRC-32:0x338f24f6 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -807,6 +807,7 @@
 #define __CRT_HAVE_DOS$epoll_create1
 #define __CRT_HAVE_DOS$epoll_ctl
 #define __CRT_HAVE_DOS$epoll_pwait
+#define __CRT_HAVE_DOS$epoll_rpc_exec
 #define __CRT_HAVE_DOS$epoll_wait
 #define __CRT_HAVE_DOS$erand48
 #define __CRT_HAVE_DOS$erand48_r
@@ -3932,6 +3933,7 @@
 #define __CRT_HAVE_epoll_create1
 #define __CRT_HAVE_epoll_ctl
 #define __CRT_HAVE_epoll_pwait
+#define __CRT_HAVE_epoll_rpc_exec
 #define __CRT_HAVE_epoll_wait
 #define __CRT_HAVE_erand48
 #define __CRT_HAVE_erand48_r

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5b7cb65 */
+/* HASH CRC-32:0x1eb03a4 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2334,6 +2334,7 @@ DEFINE_PUBLIC_ALIAS(DOS$epoll_create1, libd_epoll_create1);
 DEFINE_PUBLIC_ALIAS(DOS$epoll_ctl, libd_epoll_ctl);
 DEFINE_PUBLIC_ALIAS(DOS$epoll_wait, libd_epoll_wait);
 DEFINE_PUBLIC_ALIAS(DOS$epoll_pwait, libd_epoll_pwait);
+DEFINE_PUBLIC_ALIAS(DOS$epoll_rpc_exec, libd_epoll_rpc_exec);
 
 /* sys.eventfd */
 DEFINE_PUBLIC_ALIAS(DOS$eventfd, libd_eventfd);

@@ -20,6 +20,7 @@
 #ifndef _ASM_OS_KOS_EPOLL_H
 #define _ASM_OS_KOS_EPOLL_H 1
 
+#include <__crt.h>
 #include <__stdinc.h>
 
 /************************************************************************/
@@ -45,9 +46,27 @@
 #define __EPOLLHUP      0x00000010 /* Hung up. (writes are no longer possible) */
 
 /* Command codes for the `op' argument of `epoll_ctl(2)'. */
-#define __EPOLL_CTL_ADD 1 /* Add a new file to-be monitored. */
-#define __EPOLL_CTL_DEL 2 /* Stop monitoring a given file. */
-#define __EPOLL_CTL_MOD 3 /* Change the `struct epoll_event' associated with a given file descriptor. */
+#define __EPOLL_CTL_ADD      1 /* Add a new file to-be monitored. */
+#define __EPOLL_CTL_DEL      2 /* Stop monitoring a given file. */
+#define __EPOLL_CTL_MOD      3 /* Change the `struct epoll_event' associated with a given file descriptor. */
+#ifdef __KOS__
+#define __EPOLL_CTL_RPC_PROG 32 /* Add  a file monitor that will deliver an RPC (~aka <kos/rpc.h>) once any of
+                                 * the monitored events are triggered  (iow: on the first raising-edge  event,
+                                 * or immediately if any event is already asserted). This mechanism allows for
+                                 * asynchronous  notification of any pollable file event by means of injecting
+                                 * custom callbacks into arbitrary threads/processes.
+                                 *
+                                 * Monitors created by this command cannot be modified by `EPOLL_CTL_MOD', but
+                                 * can be deleted (read: canceled)  by `EPOLL_CTL_DEL'. When canceled in  this
+                                 * manner, a successful monitor deletion  implies that the RPC program  didn't
+                                 * get invoked.
+                                 *
+                                 * When this command is used,  `event->events' should be filled as  normal
+                                 * with the mask of events  to monitor. However, `event->data' must  first
+                                 * be zero- initialized,  before `event->data.ptr' must  be made to  point
+                                 * at a `struct epoll_rpc_program' which contains RPC-related information. */
+#endif /* __KOS__ */
+
 
 /* Flags accepted by `epoll_create1(2)'. */
 #define __EPOLL_CLOEXEC 0x080000 /* Set the IO_CLOEXEC flag */
