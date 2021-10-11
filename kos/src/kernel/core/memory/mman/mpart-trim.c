@@ -103,11 +103,11 @@ DECL_BEGIN
 #define mpart_maytrim(self) \
 	(!((self)->mp_flags & MPART_F_NOSPLIT))
 
-#if !defined(NDEBUG) || !defined(NDEBUG_FINI)
+#if !defined(NDEBUG) && !defined(NDEBUG_FINI)
 #define DBG_memset memset
-#else /* !NDEBUG || !NDEBUG_FINI */
+#else /* !NDEBUG && !NDEBUG_FINI */
 #define DBG_memset(...) (void)0
-#endif /* NDEBUG && NDEBUG_FINI */
+#endif /* NDEBUG || NDEBUG_FINI */
 
 STATIC_ASSERT_MSG(offsetof(struct mpart, _mp_trmlop_mp.olo_func) == offsetof(struct mpart, _mp_trmlop_mm.olo_func) &&
                   offsetafter(struct mpart, _mp_trmlop_mp.olo_func) == offsetafter(struct mpart, _mp_trmlop_mm.olo_func) &&

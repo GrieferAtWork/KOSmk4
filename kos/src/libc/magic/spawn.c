@@ -686,12 +686,15 @@ $errno_t posix_spawnattr_init([[nonnull]] posix_spawnattr_t *__restrict attr) {
 	return 0;
 }
 
+%[define_replacement(NDEBUG      = NDEBUG)]
+%[define_replacement(NDEBUG_FINI = NDEBUG_FINI)]
+
 @@>> posix_spawnattr_destroy(3)
 @@Destroy a given set of spawn attributes
 @@@return: 0 : Success
 [[decl_include("<bits/crt/posix_spawn.h>")]]
 $errno_t posix_spawnattr_destroy([[nonnull]] posix_spawnattr_t *__restrict attr) {
-@@pp_if !defined(NDEBUG) || !defined(NDEBUG_FINI)@@
+@@pp_if !defined(NDEBUG) && !defined(NDEBUG_FINI)@@
 	memset(attr, 0xcc, sizeof(*attr));
 @@pp_endif@@
 	return 0;
@@ -907,7 +910,7 @@ $errno_t posix_spawn_file_actions_destroy([[nonnull]] posix_spawn_file_actions_t
 #pragma @pop_macro@("__used")
 #endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
 @@pp_endif@@
-@@pp_if !defined(NDEBUG) || !defined(NDEBUG_FINI)@@
+@@pp_if !defined(NDEBUG) && !defined(NDEBUG_FINI)@@
 	memset(file_actions, 0xcc, sizeof(*file_actions));
 @@pp_endif@@
 	return 0;

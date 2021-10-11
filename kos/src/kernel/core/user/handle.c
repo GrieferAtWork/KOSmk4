@@ -64,11 +64,11 @@
 
 DECL_BEGIN
 
-#if !defined(NDEBUG) || !defined(NDEBUG_FINI)
+#if !defined(NDEBUG) && !defined(NDEBUG_FINI)
 #define DBG_memset memset
-#else /* !NDEBUG || !NDEBUG_FINI */
+#else /* !NDEBUG && !NDEBUG_FINI */
 #define DBG_memset(...) (void)0
-#endif /* NDEBUG && NDEBUG_FINI */
+#endif /* NDEBUG || NDEBUG_FINI */
 
 #ifdef NDEBUG
 #define handle_manager_assert_integrity(self) (void)0

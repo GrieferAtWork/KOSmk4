@@ -33,11 +33,11 @@
 
 DECL_BEGIN
 
-#if !defined(NDEBUG) || !defined(NDEBUG_FINI)
+#if !defined(NDEBUG) && !defined(NDEBUG_FINI)
 #define DBG_memset memset
-#else /* !NDEBUG || !NDEBUG_FINI */
+#else /* !NDEBUG && !NDEBUG_FINI */
 #define DBG_memset(...) (void)0
-#endif /* NDEBUG && NDEBUG_FINI */
+#endif /* NDEBUG || NDEBUG_FINI */
 
 /* Stop DMAing by releasing all of the specified DMA locks.
  * NOTE: The  caller  must ensure  that  `lockcnt == return(mman_startdma*())', and

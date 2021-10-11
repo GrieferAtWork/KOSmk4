@@ -45,11 +45,11 @@
 
 DECL_BEGIN
 
-#if !defined(NDEBUG) || !defined(NDEBUG_FINI)
+#if !defined(NDEBUG) && !defined(NDEBUG_FINI)
 #define DBG_memset memset
-#else /* !NDEBUG || !NDEBUG_FINI */
+#else /* !NDEBUG && !NDEBUG_FINI */
 #define DBG_memset(...) (void)0
-#endif /* NDEBUG && NDEBUG_FINI */
+#endif /* NDEBUG || NDEBUG_FINI */
 
 /* Allocate physical memory for use with mem-parts created for `self'
  * This function is a more restrictive version of `page_malloc_part(1, max_pages, res_pages)',

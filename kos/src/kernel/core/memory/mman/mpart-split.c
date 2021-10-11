@@ -62,11 +62,11 @@ DECL_BEGIN
 			(ptr) = _new_ptr;                                              \
 	}	__WHILE0
 
-#if !defined(NDEBUG) || !defined(NDEBUG_FINI)
+#if !defined(NDEBUG) && !defined(NDEBUG_FINI)
 #define DBG_memset memset
-#else /* !NDEBUG || !NDEBUG_FINI */
+#else /* !NDEBUG && !NDEBUG_FINI */
 #define DBG_memset(...) (void)0
-#endif /* NDEBUG && NDEBUG_FINI */
+#endif /* NDEBUG || NDEBUG_FINI */
 
 #define vector_getblockstatus(vector, i)                            \
 	(((vector)[(i) / MPART_BLKST_BLOCKS_PER_WORD] >>                \

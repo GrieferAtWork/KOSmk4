@@ -41,11 +41,11 @@
 
 DECL_BEGIN
 
-#if !defined(NDEBUG) || !defined(NDEBUG_FINI)
+#if !defined(NDEBUG) && !defined(NDEBUG_FINI)
 #define DBG_memset memset
-#else /* !NDEBUG || !NDEBUG_FINI */
+#else /* !NDEBUG && !NDEBUG_FINI */
 #define DBG_memset(...) (void)0
-#endif /* NDEBUG && NDEBUG_FINI */
+#endif /* NDEBUG || NDEBUG_FINI */
 
 /* Assert consistency of `__WANT_MFUTEX__mfu_lop' */
 STATIC_ASSERT(sizeof(struct sig) + sizeof(void *) == sizeof(Toblockop(mpart)));

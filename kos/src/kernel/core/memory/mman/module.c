@@ -67,11 +67,11 @@ DECL_BEGIN
 #define CURRENT_MMAN THIS_MMAN
 #endif /* !CONFIG_HAVE_DEBUGGER */
 
-#if !defined(NDEBUG) || !defined(NDEBUG_FINI)
+#if !defined(NDEBUG) && !defined(NDEBUG_FINI)
 #define DBG_memset memset
-#else /* !NDEBUG || !NDEBUG_FINI */
+#else /* !NDEBUG && !NDEBUG_FINI */
 #define DBG_memset(...) (void)0
-#endif /* NDEBUG && NDEBUG_FINI */
+#endif /* NDEBUG || NDEBUG_FINI */
 
 /* Same as `module_locksection()', but preserve/discard errors and return `NULL' instead. */
 PUBLIC WUNUSED NONNULL((1, 2)) REF struct module_section *

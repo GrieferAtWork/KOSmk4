@@ -49,11 +49,11 @@
 
 DECL_BEGIN
 
-#if !defined(NDEBUG) || !defined(NDEBUG_FINI)
+#if !defined(NDEBUG) && !defined(NDEBUG_FINI)
 #define DBG_memset memset
-#else /* !NDEBUG || !NDEBUG_FINI */
+#else /* !NDEBUG && !NDEBUG_FINI */
 #define DBG_memset(...) (void)0
-#endif /* NDEBUG && NDEBUG_FINI */
+#endif /* NDEBUG || NDEBUG_FINI */
 
 /* [0..n][lock(INSERT(ATOMIC), CLEAR(ATOMIC && THIS_TASK))]
  * Pending RPCs. (Set of `THIS_RPCS_TERMINATED' when RPCs may no longer

@@ -46,11 +46,11 @@ DECL_BEGIN
 #define RANGE_OVERLAPS(a_min, a_max, b_min, b_max) \
 	((a_max) >= (b_min) && (a_min) <= (b_max))
 
-#if !defined(NDEBUG) || !defined(NDEBUG_FINI)
+#if !defined(NDEBUG) && !defined(NDEBUG_FINI)
 #define DBG_memset memset
-#else /* !NDEBUG || !NDEBUG_FINI */
+#else /* !NDEBUG && !NDEBUG_FINI */
 #define DBG_memset(...) (void)0
-#endif /* NDEBUG && NDEBUG_FINI */
+#endif /* NDEBUG || NDEBUG_FINI */
 
 #ifdef CONFIG_USE_NEW_FS
 #define IS_WRITESHARE_MAPPING_OF_READONLY_FILE(self, file)        \

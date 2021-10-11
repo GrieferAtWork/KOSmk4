@@ -66,11 +66,11 @@
 
 DECL_BEGIN
 
-#if !defined(NDEBUG) || !defined(NDEBUG_FINI)
+#if !defined(NDEBUG) && !defined(NDEBUG_FINI)
 #define DBG_memset memset
-#else /* !NDEBUG || !NDEBUG_FINI */
+#else /* !NDEBUG && !NDEBUG_FINI */
 #define DBG_memset(...) (void)0
-#endif /* NDEBUG && NDEBUG_FINI */
+#endif /* NDEBUG || NDEBUG_FINI */
 
 DATDEF ATTR_PERCPU u8 thiscpu_x86_lapicid_ ASMNAME("thiscpu_x86_lapicid");
 DATDEF ATTR_PERCPU u8 thiscpu_x86_lapicversion_ ASMNAME("thiscpu_x86_lapicversion");

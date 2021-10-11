@@ -60,11 +60,11 @@
 DECL_BEGIN
 
 #ifndef DBG_memset
-#if !defined(NDEBUG) || !defined(NDEBUG_FINI)
+#if !defined(NDEBUG) && !defined(NDEBUG_FINI)
 #define DBG_memset memset
-#else /* !NDEBUG || !NDEBUG_FINI */
+#else /* !NDEBUG && !NDEBUG_FINI */
 #define DBG_memset(...) (void)0
-#endif /* NDEBUG && NDEBUG_FINI */
+#endif /* NDEBUG || NDEBUG_FINI */
 #endif /* !DBG_memset */
 
 #if defined(DEFINE_mfile_read) || defined(DEFINE_mfile_tailread)

@@ -59,11 +59,11 @@
 
 DECL_BEGIN
 
-#if !defined(NDEBUG) || !defined(NDEBUG_FINI)
+#if !defined(NDEBUG) && !defined(NDEBUG_FINI)
 #define DBG_memset memset
-#else /* !NDEBUG || !NDEBUG_FINI */
+#else /* !NDEBUG && !NDEBUG_FINI */
 #define DBG_memset(...) (void)0
-#endif /* NDEBUG && NDEBUG_FINI */
+#endif /* NDEBUG || NDEBUG_FINI */
 
 /* Mask of events which can be polled using epoll */
 #define EPOLL_WHATMASK                                           \
@@ -975,13 +975,13 @@ NOTHROW(FCALL epoll_handle_monitor_dc_chain)(struct epoll_handle_monitor *chain)
 
 
 #undef EC_PENDING_INUSE
-#ifndef NDEBUG
+#if !defined(NDEBUG) && !defined(NDEBUG_FINI)
 #if __SIZEOF_POINTER__ == 4
 #define EC_PENDING_INUSE ((WEAK struct epoll_handle_monitor *)UINT32_C(0xcccccccc))
 #elif __SIZEOF_POINTER__ == 8
 #define EC_PENDING_INUSE ((WEAK struct epoll_handle_monitor *)UINT64_C(0xcccccccccccccccc))
 #endif /* __SIZEOF_POINTER__ == ... */
-#endif /* !NDEBUG */
+#endif /* !NDEBUG && !NDEBUG_FINI */
 
 /* Try  to consume  pending events  from `self'.  Note that this
  * function  can throw  E_BADALLOC because  in the  event that a
