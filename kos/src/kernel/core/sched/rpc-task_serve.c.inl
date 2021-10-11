@@ -135,6 +135,22 @@ handle_pending:
 					if (status == SIGMASK_ISMASKED_NOPF_YES)
 						continue; /* Signal is known to be masked! (so skip) */
 #endif /* !LOCAL_HAVE_SIGMASK */
+					/* TODO: For posix-signals (iow: no user-RPCs), check if the current
+					 *       disposition for that signal is  SIG_IGN. If it is, then  we
+					 *       mustn't unwind the current system call, but rather silently
+					 *       discard the RPC and continue execution like normal!
+					 *
+					 * Such semantics are required for stuff like `handle_fifo_user_write',
+					 * which needs to return with EPIPE  when the signal is being  ignored.
+					 *
+					 * But if we were to unwind  normally for ignored signals, then  that
+					 * would result in the RPC only being discarded once the system  call
+					 * has been unwound, after which  point it'll be restarted  silently,
+					 * which would be no-good since it might lead to an infinite loop  of
+					 * the thread sending itself a signal, unwinding the system call, the
+					 * signal  being discarded, the system call being started, and all of
+					 * it starting again by the thread sending itself the signal again! */
+
 				}
 
 #ifdef LOCAL_NOEXCEPT
