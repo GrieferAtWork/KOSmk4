@@ -79,6 +79,8 @@ struct __sigset_struct;
 typedef struct __sigset_struct sigset_t;
 #endif /* !__sigset_t_defined */
 
+#define OFFSET_PENDING_RPC_LINK  0
+#define OFFSET_PENDING_RPC_FLAGS __SIZEOF_POINTER__
 struct pending_rpc {
 	SLIST_ENTRY(pending_rpc) pr_link;  /* [0..1][lock(ATOMIC)] Link in the list of pending RPCs */
 	uintptr_t                pr_flags; /* [const] RPC flags: RPC_CONTEXT_KERN, ...
