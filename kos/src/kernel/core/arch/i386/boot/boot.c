@@ -756,8 +756,6 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *       thread in this  case) is ready,  which would  get rid of  the risk  of
 	 *       the send operation running into an E_BADALLOC error. */
 
-	/* TODO: Add a system test for epoll RPCs */
-
 	return state;
 }
 
