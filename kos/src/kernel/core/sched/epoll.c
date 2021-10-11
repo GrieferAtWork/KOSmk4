@@ -291,10 +291,6 @@ NOTHROW(FCALL epoll_handle_monitor_destroy)(struct epoll_handle_monitor *__restr
 PRIVATE NONNULL((1, 2, 3)) void KCALL
 epoll_handle_monitor_pollconnect(struct epoll_handle_monitor *__restrict self,
                                  void *handle_obptr, sig_completion_t cb) {
-#ifdef CONFIG_HAVE_EPOLL_RPC
-	assertf(!epoll_handle_monitor_isrpc(self),
-	        "RPC monitors have their own version of this function");
-#endif /* CONFIG_HAVE_EPOLL_RPC */
 again:
 	assert(!task_wasconnected());
 	assert(!sig_multicompletion_wasconnected(&self->ehm_comp));
