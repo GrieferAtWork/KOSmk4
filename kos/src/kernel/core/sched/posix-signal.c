@@ -1340,6 +1340,10 @@ task_raisesignalthread(struct task *__restrict target,
                        USER CHECKED siginfo_t const *info)
 		THROWS(E_BADALLOC, E_WOULDBLOCK, E_INVALID_ARGUMENT_BAD_VALUE, E_SEGFAULT) {
 	struct pending_rpc *rpc;
+	/* TODO: If `target's SIGHAND disposition for `info->si_signo' is set
+	 *       to `SIG_IGN', then don't send the signal and silently return
+	 *       with `true'. */
+
 	rpc = pending_rpc_alloc_psig(GFP_NORMAL);
 
 	/* Fill in RPC signal information. */
@@ -1382,6 +1386,10 @@ task_raisesignalprocess(struct task *__restrict target,
                         USER CHECKED siginfo_t const *info)
 		THROWS(E_BADALLOC, E_WOULDBLOCK, E_INVALID_ARGUMENT_BAD_VALUE, E_SEGFAULT) {
 	struct pending_rpc *rpc;
+	/* TODO: If any of `target's threads has a SIGHAND disposition for `info->si_signo'
+	 *       that  is set to `SIG_IGN', then don't  send the signal and silently return
+	 *       with `true'. */
+
 	rpc = pending_rpc_alloc_psig(GFP_NORMAL);
 
 	/* Fill in RPC signal information. */

@@ -89,7 +89,7 @@ task_rpc_userunwind(prpc_exec_callback_t func, void *cookie DFL(__NULLPTR))
  *          in a context where a reset of your current context would have
  *          the potential to resolve the  block. (Reset here meaning  the
  *          current system call being restarted)
- * @return: true:  At   least  one  RPC   function  was  executed,  and
+ * @return: true:  RPC  functions  may  have  been  been  executed, and
  *                 preemption was re-enabled if it was disabled before.
  * @return: false: No  RPC needed to be served, and preemption
  *                 remains disabled if it was disabled before. */
@@ -135,6 +135,6 @@ DECL_END
 /* Return values for `task_serve_nx()' */
 #define TASK_SERVE_NX_NORMAL 0x00 /* Nothing was executed, or needed to be. */
 #define TASK_SERVE_NX_EXCEPT 0x01 /* FLAG: Pending RPC functions that can only be serviced by `task_serve()' still remain. */
-#define TASK_SERVE_NX_DIDRUN 0x02 /* FLAG: NX RPC functions were executed. */
+#define TASK_SERVE_NX_DIDRUN 0x02 /* FLAG: NX RPC functions may have been executed (but preemption was definitely re-enabled). */
 
 #endif /* !GUARD_KERNEL_INCLUDE_SCHED_RPC_H */

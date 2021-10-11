@@ -44,7 +44,7 @@
  *          in a context where a reset of your current context would have
  *          the potential to resolve the  block. (Reset here meaning  the
  *          current system call being restarted)
- * @return: true:  At   least  one  RPC   function  was  executed,  and
+ * @return: true:  RPC  functions  may  have  been  been  executed, and
  *                 preemption was re-enabled if it was disabled before.
  * @return: false: No  RPC needed to be served, and preemption
  *                 remains disabled if it was disabled before. */

@@ -224,10 +224,10 @@ struct sighand_ptr {
 	 * either one of the processes dies or calls exec(), or until
 	 * one of them attempts to modify the sighand table, in which
 	 * case this indirection allows for lazy copy-on-write. */
-	WEAK refcnt_t        sp_refcnt;      /* Amount of threads using `sp_hand' */
-	struct atomic_rwlock sp_lock;        /* Lock for the `sp_hand' pointer. */
-	REF struct sighand  *sp_hand;        /* [0..1][ref(sh_share)][lock(sp_lock,WRITE_ONCE[ALLOW_EXCHANGE])]
-	                                      * Pointer to the shared signal handler table. */
+	WEAK refcnt_t        sp_refcnt; /* Amount of threads using `sp_hand' */
+	struct atomic_rwlock sp_lock;   /* Lock for the `sp_hand' pointer. */
+	REF struct sighand  *sp_hand;   /* [0..1][ref(sh_share)][lock(sp_lock,WRITE_ONCE[ALLOW_EXCHANGE])]
+	                                 * Pointer to the shared signal handler table. */
 };
 __DEFINE_SYNC_PROXY(struct sighand_ptr, sp_lock)
 

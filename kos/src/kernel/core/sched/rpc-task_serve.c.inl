@@ -24,6 +24,8 @@
 #define DEFINE_task_serve_with_icpustate_and_sigmask
 #endif /* __INTELLISENSE__ */
 
+#include <sched/posix-signal.h>
+
 #if (defined(DEFINE_task_serve_with_icpustate) +    \
      defined(DEFINE_task_serve_with_icpustate_nx) + \
      defined(DEFINE_task_serve_with_icpustate_and_sigmask)) != 1
@@ -135,10 +137,11 @@ handle_pending:
 					if (status == SIGMASK_ISMASKED_NOPF_YES)
 						continue; /* Signal is known to be masked! (so skip) */
 #endif /* !LOCAL_HAVE_SIGMASK */
-					/* TODO: For posix-signals (iow: no user-RPCs), check if the current
-					 *       disposition for that signal is  SIG_IGN. If it is, then  we
-					 *       mustn't unwind the current system call, but rather silently
-					 *       discard the RPC and continue execution like normal!
+
+					/* For posix-signals (iow: no user-RPCs), check if the current
+					 * disposition for that signal is  SIG_IGN. If it is, then  we
+					 * mustn't unwind the current system call, but rather silently
+					 * discard the RPC and continue execution like normal!
 					 *
 					 * Such semantics are required for stuff like `handle_fifo_user_write',
 					 * which needs to return with EPIPE  when the signal is being  ignored.
@@ -150,7 +153,39 @@ handle_pending:
 					 * the thread sending itself a signal, unwinding the system call, the
 					 * signal  being discarded, the system call being started, and all of
 					 * it starting again by the thread sending itself the signal again! */
-
+					if (rpc->pr_flags & RPC_CONTEXT_SIGNAL) {
+						user_sighandler_func_t func;
+						struct sighand_ptr *handptr = THIS_SIGHAND_PTR;
+						struct sighand *hand;
+						if (!atomic_rwlock_read_nx(&handptr->sp_lock)) {
+							assert(!PREEMPTION_ENABLED());
+							PREEMPTION_ENABLE();
+							icpustate_setpreemption(ctx.rc_state, 1);
+#ifdef LOCAL_NOEXCEPT
+							result |= TASK_SERVE_NX_DIDRUN;
+#else /* LOCAL_NOEXCEPT */
+							did_serve_rpcs = true;
+#endif /* !LOCAL_NOEXCEPT */
+							/* This can't throw  because it only  could when  preemption
+							 * were disabled, which it isn't because we just enabled it! */
+							atomic_rwlock_read(&handptr->sp_lock);
+						}
+						func = SIG_DFL;
+						if ((hand = handptr->sp_hand) != NULL)
+							func = hand->sh_actions[signo - 1].sa_handler;
+						atomic_rwlock_endread(&handptr->sp_lock);
+						if (func == SIG_DFL)
+							func = sighand_default_action(signo);
+						if (func == SIG_IGN) {
+							/* Yes: discard this signal. */
+							restore_plast = SLIST_PFIRST(&restore);
+							while (*restore_plast != rpc)
+								restore_plast = SLIST_PNEXT(*restore_plast, pr_link);
+							pending_rpc_free(rpc);
+							continue;
+						}
+						atomic_rwlock_endread(&handptr->sp_lock);
+					}
 				}
 
 #ifdef LOCAL_NOEXCEPT

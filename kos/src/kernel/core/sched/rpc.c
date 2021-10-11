@@ -294,6 +294,9 @@ again_test_signo:
 		if (sigismember(&known_masked, signo))
 			continue; /* Known-masked signal */
 		if (sigismember(&known_unmasked, signo)) {
+			/* TODO: If it's a POSIX signal RPC, check if our thread's sighand
+			 *       disposition  indicates that the signal should be ignored.
+			 *       If so, consume and discard the associated RPC! */
 			atomic_rwlock_endread(&proc_rpcs->ppr_lock);
 			return true; /* Known-unmasked signal */
 		}
@@ -309,6 +312,9 @@ again_test_signo:
 			atomic_rwlock_endread(&proc_rpcs->ppr_lock);
 			goto again_test_signo;
 		}
+		/* TODO: If it's a POSIX signal RPC, check if our thread's sighand
+		 *       disposition  indicates that the signal should be ignored.
+		 *       If so, consume and discard the associated RPC! */
 		atomic_rwlock_endread(&proc_rpcs->ppr_lock);
 		return true;
 	}
@@ -344,11 +350,13 @@ PRIVATE WUNUSED bool FCALL are_any_unmasked_process_rpcs_pending(void)
 			return are_any_unmasked_process_rpcs_pending_with_faulty(proc_rpcs, signo);
 		}
 		atomic_rwlock_endread(&proc_rpcs->ppr_lock);
-		return true;
 #else /* CONFIG_HAVE_USERPROCMASK */
 		atomic_rwlock_endread(&proc_rpcs->ppr_lock);
-		return true;
 #endif /* !CONFIG_HAVE_USERPROCMASK */
+		/* TODO: If it's a POSIX signal RPC, check if our thread's sighand
+		 *       disposition  indicates that the signal should be ignored.
+		 *       If so, consume and discard the associated RPC! */
+		return true;
 	}
 	atomic_rwlock_endread(&proc_rpcs->ppr_lock);
 	return false;
