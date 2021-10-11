@@ -761,8 +761,8 @@ epoll_controller_addmonitor(struct epoll_controller *__restrict self,
 	TRY {
 		/* Fill in monitor event information. */
 		COMPILER_READ_BARRIER();
-		newmon->ehm_events   = info->events;
-		newmon->ehm_data.u64 = info->data.u64;
+		newmon->ehm_events = info->events;
+		newmon->ehm_data   = info->data;
 		COMPILER_READ_BARRIER();
 
 		/* Make sure that these 2 events are always polled for.
@@ -880,8 +880,8 @@ epoll_controller_modmonitor(struct epoll_controller *__restrict self,
 			COMPILER_BARRIER();
 
 			/* Apply new monitor settings. */
-			monitor->ehm_events   = new_events.events;
-			monitor->ehm_data.u64 = new_events.data.u64;
+			monitor->ehm_events = new_events.events;
+			monitor->ehm_data   = new_events.data;
 
 			/* Prime the monitor with its new settings. */
 			TRY {
@@ -898,8 +898,8 @@ epoll_controller_modmonitor(struct epoll_controller *__restrict self,
 				RETHROW();
 			}
 		} else {
-			monitor->ehm_events   = new_events.events;
-			monitor->ehm_data.u64 = new_events.data.u64;
+			monitor->ehm_events = new_events.events;
+			monitor->ehm_data   = new_events.data;
 		}
 	} EXCEPT {
 		mutex_release(&self->ec_lock);
@@ -1121,8 +1121,8 @@ next_monitor:
 			for (;;) {
 				/* Write-back information about the event to user-space. */
 				COMPILER_WRITE_BARRIER();
-				events[result].events   = epoll_handle_monitor_getwtest(next_monitor);
-				events[result].data.u64 = next_monitor->ehm_data.u64;
+				events[result].events = epoll_handle_monitor_getwtest(next_monitor);
+				events[result].data   = next_monitor->ehm_data;
 				COMPILER_WRITE_BARRIER();
 				++result;
 

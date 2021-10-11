@@ -92,8 +92,8 @@ struct epoll_controller {
 	struct mutex                      ec_lock;       /* Lock  for this epoll  controller. This one has  to be held whenever
 	                                                  * making modifications  to, or  scanning the  set of  monitored  file
 	                                                  * descriptors. Additionally, `epoll_wait(2)' will temporarily acquire
-	                                                  * a read-lock to this rwlock while searching for handle monitors that
-	                                                  * may have been raised in the mean time. */
+	                                                  * a this lock while searching for handle monitors that may have  been
+	                                                  * raised in the mean time. */
 	WEAK struct epoll_handle_monitor *ec_raised;     /* [0..1][lock(APPEND(ATOMIC), CLEAR(ec_lock))]
 	                                                  * Singly linked list  of raised monitors  (chained via  `ehm_rnext').
 	                                                  * By taking an element from this chain, you implicitly acquire a lock
