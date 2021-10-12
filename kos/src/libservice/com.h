@@ -194,7 +194,7 @@ typedef sigset_t *pflag_t;
  * >>                 break;
  * >>             }
  * >>         }
- * >>         // Returns the function for `SERVICE_COM_EXIT' if `code' doesn't exist
+ * >>         // Returns the function for `SERVICE_COM_BADCMD' if `code' doesn't exist
  * >>         T (*func)(...) = LOOKUP_FUNCTION(code);
  * >>         TRY {
  * >>             T result = (*func)(DECODE_ARGUMENTS(com->sc_generic.g_data));
@@ -234,11 +234,11 @@ typedef sigset_t *pflag_t;
 
 /************************************************************************/
 /* Special commands supported by all servers. (send by the client) */
-#define SERVICE_COM_EXIT           ((uintptr_t)0)     /* Terminate  the connection. Treated  as an invalid command
-                                                       * by the server, who in response, will kill the connection. */
-#define SERVICE_COM_DLSYM          ((uintptr_t)-4094) /* Special command: query symbol */
+#define SERVICE_COM_BADCMD         ((uintptr_t)0)     /* Treated as an invalid command by the server, who will
+                                                       * kill the connection as a response to receiving  this. */
 #define SERVICE_COM_ECHO           ((uintptr_t)-4093) /* Special command: respond with `SERVICE_COM_ST_ECHO' */
-/*      SERVICE_COM_               ((uintptr_t)-4092)  * ... */
+#define SERVICE_COM_DLSYM          ((uintptr_t)-4092) /* Special command: query symbol */
+/*      SERVICE_COM_               ((uintptr_t)-4091)  * ... */
 /************************************************************************/
 
 
@@ -341,19 +341,6 @@ struct service_comdesc {
 };
 
 
-/* Special value assigned to `s_commands' after the service is
- * shut down remotely (as the result of `s_fd_srv'  indicating
- * POLL_HUP).
- *
- * In  turn, this causes  any further attempts  at calling a wrapper
- * functions to fail with errno=ENOSYS, or throw `E_SERVICE_EXITED'.
- *
- * Commands currently active (and blocking), or already pending at
- * the time that the server called `service_api_destroy()' will be
- * made to  complete with  `SERVICE_COM_ST_EXCEPT' translating  to
- * `E_SERVICE_EXITED'. */
-#define SERVICE_SHM_COMMANDS_SHUTDOWN ((lfutex_t)-1)
-
 /* Layout of the shared memory region between client/server */
 struct service_shm {
 	/* The service does the following to consume commands:
@@ -392,10 +379,8 @@ struct service_shm {
 	 * >>     }
 	 * >>     return result;
 	 * >> } */
-	lfutex_t                        s_commands; /* [0..n] List  of  pending  commands in  form  of offset
-	                                             * to  first  pending commands  (futex-send  after added)
-	                                             * Set to `SERVICE_SHM_COMMANDS_SHUTDOWN' once the socket
-	                                             * indicates POLL_HUP. */
+	lfutex_t                        s_commands; /* [0..n] List  of pending commands in form of offset
+	                                             * to first pending commands (futex-send after added) */
 	COMPILER_FLEXIBLE_ARRAY(byte_t, s_data);    /* Buffer area begins here (entirely client-side managed) */
 };
 
@@ -526,7 +511,8 @@ struct service {
 	                                                  /* [lock(s_shm_lock)] Free list by size. (Pointers within all of these are relative to `s_shm') */
 	size_t                            s_fd_shm_size;  /* [lock(s_shm_lock)][== service_shm_handle_getsize(s_shm)]
 	                                                   * Page-aligned, allocated file-size of `s_fd_shm' (s.a. `ftruncate(2)') */
-	fd_t                              s_fd_srv;       /* [const][owned] File descriptor for the unix domain socket connected to the server. */
+	fd_t                              s_fd_ephup;     /* [const][owned] Epoll controller listening for HUPs on `s_fd_srv'. */
+	fd_t                              s_fd_srv;       /* [lock(CLEAR_ONCE)][owned] File descriptor for the unix domain socket connected to the server. */
 	fd_t                              s_fd_shm;       /* [const][owned] File descriptor for the shared memory region. */
 
 	/* List of active commands (added-to/removed-from by com wrappers)
@@ -539,6 +525,8 @@ struct service {
 	 * >>     uintptr_t next;
 	 * >>     do {
 	 * >>         next = s_active_list;
+	 * >>         if (next == SERVICE_ACTIVE_LIST_SHUTDOWN)
+	 * >>             THROW(E_SERVICE_EXITED);
 	 * >>         elem->scd_active_link = next;
 	 * >>         COMPILER_WRITE_BARRIER();
 	 * >>     } while (!ATOMIC_CMPXCH_WEAK(s_active_list, next, shm_offsetof_elem_com));
@@ -583,7 +571,7 @@ struct service {
 	 * >>     uintptr_t chain;
 	 * >>     PREEMPTION_PUSHOFF();
 	 * >>     atomic_lock_acquire(&s_shm_lock);
-	 * >>     chain = ATOMIC_XCH(s_active_list, NULL);
+	 * >>     chain = ATOMIC_XCH(s_active_list, SERVICE_ACTIVE_LIST_SHUTDOWN);
 	 * >>     while (chain) {
 	 * >>         uintptr_t next;
 	 * >>         struct service_comdesc *iter;
@@ -597,6 +585,10 @@ struct service {
 	 * >> }
 	 */
 	uintptr_t                         s_active_list;  /* [0..n][lock(ATOMIC)] List of active commands. */
+
+	/* Special value for `s_active_list' assigned during HUP handling. */
+#define SERVICE_ACTIVE_LIST_SHUTDOWN ((uintptr_t)-1)
+
 
 
 	/* Helpers for keeping track of .text/.eh_frame allocations, as well as function name->address mappings. */
@@ -659,7 +651,7 @@ libservice_dlsym_getinfo(struct service *__restrict self, char const *__restrict
 
 
 /* Abort the given command by trying to CMPXCH the command code of  `com'
- * from `orig_code' to `SERVICE_COM_NOOP', before sending an interrupt to
+ * from `orig_code' to `SERVICE_COM_ECHO', before sending an interrupt to
  * the  server and forcing  the thread currently  serving this command to
  * restart (at which point the NOOP will be able to complete without  any
  * further blocking)

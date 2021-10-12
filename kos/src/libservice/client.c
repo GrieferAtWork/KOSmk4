@@ -19,6 +19,7 @@
  */
 #ifndef GUARD_LIBSERVICE_CLIENT_C
 #define GUARD_LIBSERVICE_CLIENT_C 1
+#define _GNU_SOURCE 1
 #define _KOS_SOURCE 1
 
 #include "api.h"
@@ -28,16 +29,22 @@
 
 #include <kos/except.h>
 #include <kos/malloc.h>
+#include <kos/rpc.h>
+#include <kos/sys/epoll.h>
 #include <kos/sys/mman.h>
 #include <kos/sys/socket.h>
+#include <kos/syscalls.h>
 #include <kos/types.h>
 #include <kos/unistd.h>
+#include <sys/epoll.h>
+#include <sys/poll.h>
 #include <sys/un.h>
 
 #include <alloca.h>
 #include <assert.h>
 #include <errno.h>
 #include <malloc.h>
+#include <sched.h>
 #include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
@@ -55,6 +62,142 @@ DECL_BEGIN
 #else /* !NDEBUG && !NDEBUG_FINI */
 #define DBG_memset(...) (void)0
 #endif /* NDEBUG || NDEBUG_FINI */
+
+/* XXX: Use a different signo for this? */
+#define CLIENT_HUP_SIGNO SIGRPC
+
+
+/* Check if `com_offset' is part of the given `pending_chain' */
+PRIVATE WUNUSED NONNULL((1)) bool
+NOTHROW(CC com_is_pending)(byte_t const *__restrict shm_base,
+                           uintptr_t pending_chain,
+                           uintptr_t com_offset) {
+	while (pending_chain) {
+		struct service_com *com;
+		if (pending_chain == com_offset)
+			return true;
+		com = (struct service_com *)(shm_base + pending_chain);
+		pending_chain = com->sc_link;
+	}
+	return false;
+}
+
+/* Shutdown the given service client in response to a remote HUP event. */
+PRIVATE NONNULL((1)) void
+NOTHROW(CC shutdown_client)(struct service *__restrict self) {
+	uintptr_t comaddr, pending_chain;
+	byte_t *shm_base;
+	/* NOTE: Even though we get here asynchronously, this acquire cannot
+	 *       block because this lock can  only be required when one  has
+	 *       previously  disabled preemption (read:  had their thread be
+	 *       masking all signals).
+	 * Essentially, this right here is an SMP-lock acquisition, should
+	 * you wish  to  use  terminology found  within  the  KOS  kernel. */
+	atomic_lock_acquire(&self->s_shm_lock);
+	comaddr       = ATOMIC_XCH(self->s_active_list, SERVICE_ACTIVE_LIST_SHUTDOWN);
+	pending_chain = ATOMIC_XCH(self->s_shm->ssh_shm->s_commands, 0);
+	shm_base      = self->s_shm->ssh_base;
+	while (comaddr) {
+		uintptr_t next;
+		struct service_com *com;
+		struct service_comdesc *comdesc;
+		com     = (struct service_com *)(shm_base + comaddr);
+		comdesc = container_of(com, struct service_comdesc, scd_com);
+		next    = comdesc->scd_active_link;
+		/* All active commands not part of the pending chain must first be canceled. */
+		if (!com_is_pending(shm_base, pending_chain, comaddr)) {
+			uintptr_t orig_code;
+again_read_orig_code:
+			orig_code = ATOMIC_READ(com->sc_code);
+			if (orig_code == SERVICE_COM_ST_SUCCESS || SERVICE_COM_ISSPECIAL(orig_code))
+				goto next_command; /* Command already completed, so don't shut it down. */
+			/* When a generic COM wrapper receives `SERVICE_COM_ST_ECHO',
+			 * it  will interpret this  as an E_SERVICE_EXITED exception. */
+			if (!ATOMIC_CMPXCH(com->sc_code, orig_code, SERVICE_COM_ST_ECHO))
+				goto again_read_orig_code;
+		} else {
+			/* When a generic COM wrapper receives `SERVICE_COM_ST_ECHO',
+			 * it  will interpret this  as an E_SERVICE_EXITED exception.
+			 *
+			 * Technically,  we could write-back a proper exception here,
+			 * but special `SERVICE_COM_ST_ECHO'  handling already  needs
+			 * to exist for the case where the command is currently being
+			 * executed, so might as well handle this case the same. */
+			ATOMIC_WRITE(com->sc_code, SERVICE_COM_ST_ECHO);
+		}
+next_command:
+		/* Wake-up  anyone listening  for this command.  Always do this  to handle the
+		 * race condition where the server dies after writing back the command status,
+		 * but before it could broadcast the command's completion futex. */
+		sys_lfutex(&com->sc_code, LFUTEX_WAKE, (lfutex_t)-1, NULL, 0);
+
+		comaddr = next;
+	}
+	atomic_lock_release(&self->s_shm_lock);
+}
+
+
+PRIVATE NONNULL((1, 2)) void PRPC_EXEC_CALLBACK_CC
+client_hup_rpc(struct rpc_context *__restrict UNUSED(ctx),
+               struct service *__restrict self) {
+	/* API contracts guaranty that `self' remains valid until we:
+	 *   - ... create an EPOLL monitor (such as an EPOLL RPC) for
+	 *     `self->s_fd_srv' within controller `self->s_fd_ephup'.
+	 *   - ... or  set `self->s_fd_srv = -1;'  as conforming  of
+	 *     having shut down our connection to the remote server. */
+	struct pollfd pfd[1];
+	errno_t saved_errno;
+	sigset_t *oldmask;
+
+	/* Mask all signals. */
+	oldmask = setsigmaskfullptr();
+
+	/* We get here asynchronously, so we mustn't clobber `errno' */
+	saved_errno = errno;
+
+	/* First of: check if the HUP really happened, or it we only
+	 *           got  here in response  to a sporadic interrupt.
+	 *           EPOLL  RPCs make no guaranties that they _only_
+	 *           fire when monitored events actually happen.
+	 * -> They are free to trigger sporadically. */
+	pfd[0].fd      = self->s_fd_srv;
+	pfd[0].events  = POLLHUP | POLLRDHUP;
+	pfd[0].revents = 0;
+	if ((poll(pfd, 1, 0) != 0) || (pfd[0].revents != 0)) {
+		/* Yes: the HUP really did happen! */
+handle_hup:
+		close(self->s_fd_srv);
+		shutdown_client(self);
+		COMPILER_BARRIER();
+		self->s_fd_srv = -1; /* Allow `libservice_cancel_hup_rpc()' to stop blocking. */
+		COMPILER_BARRIER();
+	} else {
+		struct epoll_event evt;
+		/* It's a sporadic interrupt. -> Try to re-schedule  ourselves,
+		 * but if that fails (e.g. due to ENOMEM), then act as though a
+		 * HUP happened since we don't have any other means of handling
+		 * errors at that point. */
+		evt.events   = EPOLLHUP | EPOLLRDHUP;
+		evt.data.ptr = self;
+		COMPILER_BARRIER();
+		if (epoll_rpc_exec(self->s_fd_ephup, self->s_fd_srv, &evt, getpid(),
+		                   RPC_SIGNO(CLIENT_HUP_SIGNO) | RPC_SYNCMODE_ASYNC |
+		                   RPC_SYSRESTART_RESTART | RPC_DOMAIN_PROCESS,
+		                   (prpc_exec_callback_t)&client_hup_rpc) != 0)
+			goto handle_hup;
+		COMPILER_BARRIER();
+		/* With the EPOLL RPC re-scheduled, we're no longer
+		 * allowed to access any  of the fields of  `self'! */
+	}
+
+	/* Restore saved errno. */
+	errno = saved_errno;
+
+	/* Restore previously masked signals. */
+	setsigmaskptr(oldmask);
+}
+
+
 
 /* Exception-enabled version of `libservice_open_nx()'. */
 INTERN ATTR_RETNONNULL WUNUSED NONNULL((1)) struct service *CC
@@ -81,7 +224,7 @@ libservice_open(char const *filename) THROWS(E_FSERROR, E_BADALLOC, E_INTERRUPT)
 			result->s_funcv = NULL;
 
 			/* Create the socket which we're going to use to communicate with the server. */
-			result->s_fd_srv = Socket(AF_UNIX, SOCK_STREAM, PF_UNIX);
+			result->s_fd_srv = Socket(AF_UNIX, SOCK_STREAM | SOCK_CLOEXEC, PF_UNIX);
 			TRY {
 				struct sockaddr_un *sa;
 				socklen_t sa_len;
@@ -138,6 +281,33 @@ libservice_open(char const *filename) THROWS(E_FSERROR, E_BADALLOC, E_INTERRUPT)
 					allfree->ssf_bysize.le_prev = &result->s_shm_freelist[bucket].lh_first;
 					allfree->ssf_bysize.le_next = NULL;
 					result->s_shm_freelist[bucket].lh_first = allfree;
+
+					/* Create the EPOLL controller to listen for remote HUP events. */
+					TRY {
+						result->s_fd_ephup = EPollCreate1(EPOLL_CLOEXEC);
+
+						/* Schedule an RPC to-be delivered upon HUP */
+						TRY {
+							struct epoll_event evt;
+							evt.events   = EPOLLHUP | EPOLLRDHUP;
+							evt.data.ptr = result;
+							EPollRpcExec(result->s_fd_ephup, result->s_fd_srv, &evt, getpid(),
+							             RPC_SIGNO(CLIENT_HUP_SIGNO) | RPC_SYNCMODE_ASYNC |
+							             RPC_SYSRESTART_RESTART | RPC_DOMAIN_PROCESS,
+							             (prpc_exec_callback_t)&client_hup_rpc);
+						} EXCEPT {
+							close(result->s_fd_ephup);
+							RETHROW();
+						}
+						/* FIXME: If  following the creation of an SHM client, the calling process
+						 *        does a fork, everything will continue to function normally,  but
+						 *        if the server then proceeds to terminate the connection, the HUP
+						 *        RPC  will only be delivered to the original process. Children do
+						 *        not receive the async notification! */
+					} EXCEPT {
+						munmap(shm_base, service_shm_handle_getsize(shm));
+						RETHROW();
+					}
 				} EXCEPT {
 					close(result->s_fd_shm);
 					RETHROW();
@@ -171,7 +341,7 @@ libservice_open(char const *filename) THROWS(E_FSERROR, E_BADALLOC, E_INTERRUPT)
  * @return: NULL: [errno=ENOMEM] Insufficient memory. */
 INTERN WUNUSED NONNULL((1)) struct service *
 NOTHROW_RPC(CC libservice_open_nx)(char const *filename) {
-	TRY {
+	NESTED_TRY {
 		return libservice_open(filename);
 	} EXCEPT {
 		error_class_t cls = error_class();
@@ -224,6 +394,34 @@ NOTHROW(CC unregister_text_range_list)(struct service_text_range_slist *__restri
 	}
 }
 
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(CC libservice_cancel_hup_rpc)(struct service *__restrict self) {
+	/* Quick check: has the HUP-RPC callback already finished running? */
+again:
+	if (ATOMIC_READ(self->s_fd_srv) == -1)
+		return;
+	if (epoll_ctl(self->s_fd_ephup, EPOLL_CTL_DEL, self->s_fd_srv, NULL) != 0) {
+		assert(errno == ENOENT);
+
+		/* Special  case: the RPC has already been fired. In this case we have to
+		 * make certain the associated callback isn't being executed at this very
+		 * moment in some other thread of our process.
+		 *
+		 * For this purpose, the RPC callback can complete in 1 of 2 ways:
+		 *   - Confirmation of HUP by setting `self->s_fd_srv = -1'
+		 *   - Sporadic interrupt by re-queuing itself to listen for more HUPs
+		 *
+		 * We check for the former  by seeing if `self->s_fd_srv == -1'  has
+		 * been set, and if it hasn't, we  yield in hopes to get the  thread
+		 * currently hosting the RPC to give it a chance to complete, before
+		 * starting over with our attempt to delete the RPC. */
+		if (ATOMIC_READ(self->s_fd_srv) == -1)
+			return;
+		sched_yield();
+		goto again;
+	}
+}
+
 /* Close/detach a given service. WARNING: After this function was called,
  * all function pointers  returned by `service_dlsym()'  will point  into
  * the void /  into unmapped memory.  As such, it  is up to  the user  to
@@ -235,12 +433,20 @@ INTERN NOBLOCK NONNULL((1)) void
 NOTHROW(CC libservice_close)(struct service *__restrict self) {
 	size_t i;
 
-	/* Destroy all SHM handles. */
-	destroy_shm_handle(self->s_shm);
+	/* Stop  listening for HUPs. This must be done explicitly in case
+	 * the EPOLL controller would continue to exist after the close()
+	 * below, as would be the case when our process got fork'd  after
+	 * a service was created. */
+	libservice_cancel_hup_rpc(self);
 
 	/* Close internal file descriptors. */
-	close(self->s_fd_srv);
+	if (self->s_fd_srv != -1)
+		close(self->s_fd_srv);
+	close(self->s_fd_ephup);
 	close(self->s_fd_shm);
+
+	/* Destroy all SHM handles. */
+	destroy_shm_handle(self->s_shm);
 
 	/* Free Function descriptor */
 	for (i = 0; i < self->s_funcc; ++i)
@@ -284,7 +490,7 @@ INTERN WUNUSED NONNULL((1, 2)) void *
 NOTHROW_RPC(CC libservice_dlsym_nx)(struct service *__restrict self,
                                     char const *__restrict symname) {
 	void *result;
-	TRY {
+	NESTED_TRY {
 		result = libservice_dlsym_lookup_or_create(self, symname, SERVICE_FUNCTION_ENTRY_KIND_NORMAL);
 	} EXCEPT {
 		error_class_t cls = error_class();

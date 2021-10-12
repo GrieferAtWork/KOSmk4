@@ -560,7 +560,8 @@ STATIC_ASSERT(IS_ALIGNED(offsetof(struct service_com, sc_generic.g_data), 4));
  * >>
  * >> // Add the service_comdesc to the list of active commands `cg_service->s_active_list'
  * >>     movP   <cg_service->s_active_list>, %Pax                      # movabs via %Pcx if necessary on x86_64
- * >> 1:  movP   %Pax, service_comdesc::scd_active_link(%R_service_com)
+ * >> 1:  # TODO: Check for SERVICE_ACTIVE_LIST_SHUTDOWN
+ * >>     movP   %Pax, service_comdesc::scd_active_link(%R_service_com)
  * >>     lock   cmpxchgP %Pdx, <cg_service->s_active_list>
  * >>     jne    1b
  * >>
@@ -570,8 +571,7 @@ STATIC_ASSERT(IS_ALIGNED(offsetof(struct service_com, sc_generic.g_data), 4));
  * >>     # Atomically insert the new command into the list
  * >>     # HINT: At this point, %Pdx == ((%R_service_com + service_comdesc::scd_com) - service_shm_handle::ssh_shm(%R_temp_shm_handle))
  * >>     movP   service_shm::s_commands(%R_shmbase), %Pax
- * >> 1:  # TODO: Check for SERVICE_SHM_COMMANDS_SHUTDOWN
- * >>     movP   %Pax, service_comdesc::scd_com::sc_link(%R_service_com)
+ * >> 1:  movP   %Pax, service_comdesc::scd_com::sc_link(%R_service_com)
  * >>     lock   cmpxchgP %Pdx, service_shm::s_commands(%R_shmbase)
  * >>     jne    1b
  * >> .Leh_com_waitfor_begin:
@@ -988,13 +988,13 @@ STATIC_ASSERT(IS_ALIGNED(offsetof(struct service_com, sc_generic.g_data), 4));
  * >>
  * >> // Handling for custom completion status codes
  * >> .Lcom_special_return:
- * >>     cmpP   $SERVICE_COM_ST_EXCEPT, %R_fcall0P
- * >>     je     1f
+ * >>     cmpP   $SERVICE_COM_ST_ECHO, %R_fcall0P
+ * >>     jbe    1f
  * >>     # Normal return with non-zero errno
  * >>     negP   %R_fcall0P
  * >>     call   __set_errno_f
  * >>     jmp    .Lcom_special_return_resume
- * >> 1:  leaP   service_comdesc::scd_com::sc_except(%R_service_com), %R_fcall0P
+ * >> 1:  movP   %R_service_com, %R_fcall1P
  * >> #if !COM_GENERATOR_FEATURE_FEXCEPT
  * >>     call   libservice_aux_load_except_as_errno
  * >> #if cg_buf_paramc != 0
@@ -1003,8 +1003,14 @@ STATIC_ASSERT(IS_ALIGNED(offsetof(struct service_com, sc_generic.g_data), 4));
  * >>     jmp    .Leh_free_service_com_end
  * >> #endif // cg_buf_paramc == 0
  * >> #else // !COM_GENERATOR_FEATURE_FEXCEPT
- * >>     movP   <cg_cfa_offset-P>(%Psp), %R_fcall1P
+ * >> #ifdef __x86_64__
+ * >>     movP   <cg_cfa_offset-P>(%Psp), %R_sysvabi2P
  * >>     call   libservice_aux_load_except_as_error
+ * >> #else // __x86_64__
+ * >>     pushP_cfi <cg_cfa_offset-P>(%Psp)
+ * >>     call   libservice_aux_load_except_as_error
+ * >>     .cfi_adjust_cfa_offset -4
+ * >> #endif // !__x86_64__
  * >> #if cg_buf_paramc != 0
  * >>     jmp    .Leh_free_xbuf_entry
  * >> #else // cg_buf_paramc != 0
@@ -1605,12 +1611,14 @@ INTDEF bool NOTHROW(FCALL libservice_aux_com_discard_nonrt_exception)(void);
 
 
 /* Set `errno' to the error code associated with `info' */
-INTDEF NOBLOCK NONNULL((1)) void
-NOTHROW(FCALL libservice_aux_load_except_as_errno)(struct service_com_exceptinfo *__restrict info);
+INTDEF NOBLOCK NONNULL((2)) void
+NOTHROW(FCALL libservice_aux_load_except_as_errno)(uintptr_t status,
+                                                   struct service_comdesc *__restrict info);
 
 /* Populate `error_data()' with the given information. */
-INTDEF NOBLOCK NONNULL((1, 2)) void
-NOTHROW(FCALL libservice_aux_load_except_as_error)(struct service_com_exceptinfo *__restrict info,
+INTDEF NOBLOCK NONNULL((2, 3)) void
+NOTHROW(FCALL libservice_aux_load_except_as_error)(uintptr_t status,
+                                                   struct service_comdesc *__restrict info,
                                                    void const *faultpc);
 
 

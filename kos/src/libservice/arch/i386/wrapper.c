@@ -95,17 +95,35 @@ STATIC_ASSERT(offsetof(struct service_com_exceptinfo, e_subclass) == offsetof(st
 STATIC_ASSERT(offsetof(struct service_com_exceptinfo, e_args) == offsetof(struct exception_data, e_args));
 
 /* Set `errno' to the error code associated with `info' */
-INTERN NOBLOCK NONNULL((1)) void
-NOTHROW(FCALL libservice_aux_load_except_as_errno)(struct service_com_exceptinfo *__restrict info) {
-	errno =	error_as_errno((struct exception_data const *)info);
+INTERN NOBLOCK NONNULL((2)) void
+NOTHROW(FCALL libservice_aux_load_except_as_errno)(uintptr_t status,
+                                                   struct service_comdesc *__restrict info) {
+	errno_t error;
+	if unlikely(status != SERVICE_COM_ST_EXCEPT) {
+		/* Like below: HUP requested and command was canceled by outside entity. */
+		error = ENOSYS;
+	} else {
+		error = error_as_errno((struct exception_data const *)&info->scd_com.sc_except);
+	}
+	errno =	error;
 }
 
 /* Populate `error_data()' with the given information. */
-INTERN NOBLOCK NONNULL((1, 2)) void
-NOTHROW(FCALL libservice_aux_load_except_as_error)(struct service_com_exceptinfo *__restrict info,
+INTERN NOBLOCK NONNULL((2, 3)) void
+NOTHROW(FCALL libservice_aux_load_except_as_error)(uintptr_t status,
+                                                   struct service_comdesc *__restrict info,
                                                    void const *faultpc) {
 	struct exception_data *d = error_data();
-	memcpy(d, info, sizeof(*info));
+	if unlikely(status != SERVICE_COM_ST_EXCEPT) {
+		/* Special  case: When we read back ECHO,  that can only mean that the
+		 * command was canceled by some outside entity, of which there is only
+		 * the case of a sudden HUP event.
+		 * Simply handle this by throwing an E_SERVICE_EXITED */
+		memset(d, 0, sizeof(info->scd_com.sc_except));
+		d->e_code = ERROR_CODEOF(E_SERVICE_EXITED);
+	} else {
+		memcpy(d, &info->scd_com.sc_except, sizeof(info->scd_com.sc_except));
+	}
 	d->e_faultaddr = faultpc;
 }
 
@@ -3885,13 +3903,13 @@ NOTHROW(FCALL comgen_remove_service_com_tryhard)(struct com_generator *__restric
 
 /* Generate   instructions:
  * >> .Lcom_special_return:
- * >>     cmpP   $SERVICE_COM_ST_EXCEPT, %R_fcall0P
- * >>     je     1f
+ * >>     cmpP   $SERVICE_COM_ST_ECHO, %R_fcall0P
+ * >>     jbe    1f
  * >>     # Normal return with non-zero errno
  * >>     negP   %R_fcall0P
  * >>     call   __set_errno_f
  * >>     jmp    .Lcom_special_return_resume
- * >> 1:  leaP   service_comdesc::scd_com::sc_except(%R_service_com), %R_fcall0P
+ * >> 1:  movP   %R_service_com, %R_fcall1P
  * >> #if !COM_GENERATOR_FEATURE_FEXCEPT
  * >>     call   libservice_aux_load_except_as_errno
  * >> #if cg_buf_paramc != 0
@@ -3900,8 +3918,14 @@ NOTHROW(FCALL comgen_remove_service_com_tryhard)(struct com_generator *__restric
  * >>     jmp    .Leh_free_service_com_end
  * >> #endif // cg_buf_paramc == 0
  * >> #else // !COM_GENERATOR_FEATURE_FEXCEPT
- * >>     movP   <cg_cfa_offset-P>(%Psp), %R_fcall1P
+ * >> #ifdef __x86_64__
+ * >>     movP   <cg_cfa_offset-P>(%Psp), %R_sysvabi2P
  * >>     call   libservice_aux_load_except_as_error
+ * >> #else // __x86_64__
+ * >>     pushP_cfi <cg_cfa_offset-P>(%Psp)
+ * >>     call   libservice_aux_load_except_as_error
+ * >>     .cfi_adjust_cfa_offset -4
+ * >> #endif // !__x86_64__
  * >> #if cg_buf_paramc != 0
  * >>     jmp    .Leh_free_xbuf_entry
  * >> #else // cg_buf_paramc != 0
@@ -3915,13 +3939,13 @@ NOTHROW(FCALL comgen_custom_status_return)(struct com_generator *__restrict self
 	/* >> .Lcom_special_return: */
 	comgen_defsym(self, COM_SYM_Lcom_special_return);
 
-	/* >> cmpP   $SERVICE_COM_ST_EXCEPT, %R_fcall0P */
+	/* >> cmpP   $SERVICE_COM_ST_ECHO, %R_fcall0P */
 	comgen_instr(self, gen86_cmpP_imm_r(&self->cg_txptr,
-	                                    SERVICE_COM_ST_EXCEPT,
+	                                    SERVICE_COM_ST_ECHO,
 	                                    GEN86_R_FCALL0P));
 
-	/* >> je     1f */
-	comgen_instr(self, gen86_jcc8_offset(&self->cg_txptr, GEN86_CC_E, -1));
+	/* >> jbe    1f */
+	comgen_instr(self, gen86_jcc8_offset(&self->cg_txptr, GEN86_CC_BE, -1));
 	pdisp_1 = (int8_t *)(self->cg_txptr - 1);
 
 	/* Normal return with non-zero errno */
@@ -3938,10 +3962,8 @@ NOTHROW(FCALL comgen_custom_status_return)(struct com_generator *__restrict self
 	*pdisp_1 += (int8_t)(uint8_t)(uintptr_t)
 	            (self->cg_txptr - (byte_t *)pdisp_1);
 
-	/* >> leaP   service_comdesc::scd_com::sc_except(%R_service_com), %R_fcall0P */
-	comgen_instr(self, gen86_leaP_db_r(&self->cg_txptr,
-	                                   offsetof(struct service_comdesc, scd_com.sc_except),
-	                                   GEN86_R_service_com, GEN86_R_FCALL0P));
+	/* >> movP   %R_service_com, %R_fcall1P */
+	comgen_instr(self, gen86_movP_r_r(&self->cg_txptr, GEN86_R_service_com, GEN86_R_FCALL1P));
 
 	if (!(self->cg_features & COM_GENERATOR_FEATURE_FEXCEPT)) {
 		unsigned int return_symbol;
@@ -3959,13 +3981,28 @@ NOTHROW(FCALL comgen_custom_status_return)(struct com_generator *__restrict self
 	} else {
 		unsigned int return_symbol;
 
+#ifdef __x86_64__
 		/* >> movP   <cg_cfa_offset-P>(%Psp), %R_fcall1P */
 		comgen_instr(self, gen86_movP_db_r(&self->cg_txptr,
 		                                   self->cg_cfa_offset - SIZEOF_POINTER,
-		                                   GEN86_R_PSP, GEN86_R_FCALL1P));
+		                                   GEN86_R_PSP, GEN86_R_RDX)); /* %rdx <=> %R_sysvabi2P */
+#else  /* __x86_64__ */
+		/* >> pushP_cfi <cg_cfa_offset-P>(%Psp) */
+		comgen_instr(self, gen86_pushP_mod(&self->cg_txptr, gen86_modrm_db,
+		                                   self->cg_cfa_offset - SIZEOF_POINTER,
+		                                   GEN86_R_PSP));
+		comgen_eh_movehere(self);
+		comgen_eh_DW_CFA_adjust_cfa_offset(self, 4);
+#endif /* !__x86_64__ */
 
 		/* >> call   libservice_aux_load_except_as_errno */
 		comgen_instr(self, gen86_call(&self->cg_txptr, &libservice_aux_load_except_as_error));
+
+#ifndef __x86_64__
+		/* >> .cfi_adjust_cfa_offset -4 */
+		comgen_eh_movehere(self);
+		comgen_eh_DW_CFA_adjust_cfa_offset(self, -4);
+#endif /* !__x86_64__ */
 
 		if (self->cg_buf_paramc != 0) {
 			/* >> jmp    .Leh_free_xbuf_entry */
@@ -4636,6 +4673,8 @@ NOTHROW(FCALL comgen_compile)(struct com_generator *__restrict self) {
 	/* Handling for custom completion status codes */
 	comgen_custom_status_return(self);
 	if (!comgen_compile_isok(self))
+		goto fail;
+	if unlikely(!comgen_ehok1(self))
 		goto fail;
 
 	/* Define exception handlers. */
