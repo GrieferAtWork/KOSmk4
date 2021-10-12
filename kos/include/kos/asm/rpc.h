@@ -419,23 +419,20 @@
  *     RPC function returns. */
 #define RPC_SYNCMODE_ASYNC RPC_SYNCMODE_F_ALLOW_ASYNC
 
-/* RPC may only be executed when the target thread is making
- * a system call that is  a cancellation point, after  which
- * that call will be interrupted, the RPC will be  executed,
- * and the system call (may) be restarted.
+/* RPC  may only be executed when the target thread is making
+ * a system call that  blocks or is otherwise  interruptible,
+ * after which that call will be interrupted, the RPC will be
+ * executed, and the system call (may) be restarted.
  *
  * Handled when (if `RPC_SIGNO(signo=SIGRPC)' isn't masked):
- *   - Any system call  or interrupt makes  a call to  `task_serve()'
- *     This includes things like a page-fault blocking due to needing
- *     to read more data from disk, which is handled as the interrupt
- *     being aborted and the RPC being served.
+ *   - Any system call makes a call to `task_serve()'
  *   - _NOT_ handled while  the thread is  in user-space, or  is
  *     only performing operations  that don't  block. Note  that
  *     the exact definition of what is/isn't consider a blocking
  *     operation here (intentionally) isn't well defined.
  *   - If more well-defined behavior is needed, consider making
  *     use of `RPC_SYNCMODE_CP' instead. */
-#define RPC_SYNCMODE_SYNC  0x0000 /* default */
+#define RPC_SYNCMODE_SYNC RPC_SYNCMODE_F_REQUIRE_SC
 
 /* RPC is only handled when  interrupting a system call  that
  * has been marked  as a cancellation  point. Otherwise,  the

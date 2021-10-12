@@ -79,7 +79,7 @@
 #ifdef __x86_64__
 	add    $8               # rc_state
 #else // __x86_64__
-	add    $12              # _STACKPARAM_SIZE + rc_state
+	add    $12              # rc_state
 #endif // !__x86_64__
 	deref                   # Read the value of `ctx->rc_state'
 ]]]*/

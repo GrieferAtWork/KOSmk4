@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1eddd24d */
+/* HASH CRC-32:0xde6ca29d */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -89,12 +89,12 @@ INTDEF NONNULL((2)) __STDC_INT_AS_SSIZE_T NOTHROW_RPC(LIBDCALL libd_epoll_wait)(
  * @return: -1:       Error (s.a. `errno') */
 INTDEF NONNULL((2)) __STDC_INT_AS_SSIZE_T NOTHROW_RPC(LIBDCALL libd_epoll_pwait)(fd_t epfd, struct epoll_event *events, __STDC_INT_AS_SIZE_T maxevents, int timeout, sigset_t const *ss);
 /* >> epoll_rpc_exec(3)
- * Helper wrapper for  `EPOLL_CTL_RPC_PROG' that  automatically provides  the
- * necessary arch-specific RPC program to invoke `func(..., event->data.ptr)'
- * as  soon as any of `event->events' become  raised in `fd'. The monitor for
- * this  is associated with `epfd' and the  RPC (if not already delieved) can
- * be cancled by `epoll_ctl(epfd, EPOLL_CTL_DEL, fd, NULL)'. Not that as soon
- * as  the RPC is  send, the associated monitor  will have automatically been
+ * Helper  wrapper  for `EPOLL_CTL_RPC_PROG'  that automatically  provides the
+ * necessary  arch-specific RPC program to invoke `func(..., event->data.ptr)'
+ * as soon as any  of `event->events' become raised  in `fd'. The monitor  for
+ * this  is associated with `epfd' and the  RPC (if not already delivered) can
+ * be canceled by `epoll_ctl(epfd, EPOLL_CTL_DEL, fd, NULL)'. Not that as soon
+ * as  the RPC  is send, the  associated monitor will  have automatically been
  * deleted.
  *
  * This function can be used to allow for implement asynchronous notification

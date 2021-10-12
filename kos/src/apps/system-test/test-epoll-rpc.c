@@ -74,12 +74,15 @@ DEFINE_TEST(epoll_rpc) {
 	EQss(5, write(pipes[1], "Hello", 5));
 
 	/* Because we're using async RPCs, the RPC should have already been invoked!
-	 * WARNING: Normally when sending  RPCs, there's the  possibility that the  RPC
-	 *          getting send to another CPU brings with it a delivery delay because
-	 *          the RPC may still be in transit for a short time after it got send.
-	 * However, since in this example we're simply sending the RPC to our own thread,
-	 * we're  allowed to  assume that no  such transit-delay exists,  as no cross-CPU
-	 * communication needs to take place. */
+	 * WARNING: Normally when sending RPCs, there's the possibility that the RPC
+	 *          getting send to another thread  brings with it a delivery  delay
+	 *          because  the RPC may still be in  transit for a short time after
+	 *          it got send.
+	 * However, since in this example the call to `write(2)' asserting the EPOLLIN event
+	 * simply causes the RPC  to be send back  to the our own  thread (meaning that  the
+	 * entire RPC delivery process happens synchronously), no such transit-delay  exists
+	 * which allows us to immediately assert that the RPC already finished. */
+	COMPILER_READ_BARRIER();
 	EQu(1, myrpc_called);
 
 	/* Also  make sure that the in-pipe data is correct (though that's

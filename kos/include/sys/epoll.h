@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x25ddf86 */
+/* HASH CRC-32:0x307dda6c */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -442,12 +442,12 @@ typedef __ATTR_NONNULL((1)) void
 		__THROWS(...);
 #endif /* !__prpc_exec_callback_t_defined */
 /* >> epoll_rpc_exec(3)
- * Helper wrapper for  `EPOLL_CTL_RPC_PROG' that  automatically provides  the
- * necessary arch-specific RPC program to invoke `func(..., event->data.ptr)'
- * as  soon as any of `event->events' become  raised in `fd'. The monitor for
- * this  is associated with `epfd' and the  RPC (if not already delieved) can
- * be cancled by `epoll_ctl(epfd, EPOLL_CTL_DEL, fd, NULL)'. Not that as soon
- * as  the RPC is  send, the associated monitor  will have automatically been
+ * Helper  wrapper  for `EPOLL_CTL_RPC_PROG'  that automatically  provides the
+ * necessary  arch-specific RPC program to invoke `func(..., event->data.ptr)'
+ * as soon as any  of `event->events' become raised  in `fd'. The monitor  for
+ * this  is associated with `epfd' and the  RPC (if not already delivered) can
+ * be canceled by `epoll_ctl(epfd, EPOLL_CTL_DEL, fd, NULL)'. Not that as soon
+ * as  the RPC  is send, the  associated monitor will  have automatically been
  * deleted.
  *
  * This function can be used to allow for implement asynchronous notification

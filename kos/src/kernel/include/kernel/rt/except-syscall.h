@@ -83,11 +83,11 @@ DATDEF ATTR_PERTASK USER CHECKED pid_t *this_tid_address;
 
 
 
-/* A system call and ABI for a user-space-controlled sigprocmask() using
- * this, user-space could block/unblock signals without having to do any
- * system calls in case where no signal arrived in the mean time, and in
- * the case where a signal  did arrive in the  mean time, only 1  system
- * call (`sys_rpc_serve(2)') would be required.
+/* A system call and ABI for a user-space-controlled sigprocmask()  using
+ * this, user-space can  block/unblock signals without  having to do  any
+ * system calls in the case where no signal arrived in the mean time, and
+ * in  the case where a signal did arrive in the mean time, only 1 system
+ * call (`sys_rpc_serve_sysret(2)') is required.
  *
  * Purpose:
  *    - A lot of kernel-space code makes use of `PREEMPTION_PUSHOFF()' / `PREEMPTION_POP()'
@@ -120,7 +120,9 @@ DATDEF ATTR_PERTASK USER CHECKED pid_t *this_tid_address;
  *         In this case, rather than modifying its own, original signal mask, the kernel
  *         will instead load the `pm_sigmask' point, and apply the same modifications it
  *         would  have applied to  the thread's internal  (kernel-space) signal mask the
- *         signal set pointed-to by user-space.
+ *         signal set pointed-to by user-space. In this case, the system call doesn't do
+ *         anything  that couldn't already be implemented in user-space, but still works
+ *         as expected for the sake of compatibility.
  *
  * Semantics:
  *
@@ -129,7 +131,7 @@ DATDEF ATTR_PERTASK USER CHECKED pid_t *this_tid_address;
  *      until _after_  the thread  that called  `sys_set_userprocmask_address()' has  exited,
  *      or until another call to `sys_set_userprocmask_address(2)' that assigned a  different
  *      address, or disabled USERPROCMASK by passing NULL, or a call to `set_tid_address(2)',
- *      which will also disable USERPROCMASK)
+ *      which also disables USERPROCMASK)
  *
  *    - Kernel-space  checks for is-signal-masked are only ever  performed in the context of the
  *      thread in question itself.  When some other  thread wishes to  know if a  userprocmask'd
@@ -141,10 +143,10 @@ DATDEF ATTR_PERTASK USER CHECKED pid_t *this_tid_address;
  *      signals, rather than individually for each signal (which would result in race conditions
  *      when  unmasking  one signal  triggers a  signal handler  that would  get executed  in an
  *      inconsistent context)
- *      As such, user-space making use of userprocmask somewhat increases the overhead  needed
- *      for raising signals, however  given that signals in  general aren't something that  is
- *      done by programs with the intend of using them for performance-critical purposes, this
- *      is completely acceptable.
+ *      As such, user-space making use of userprocmask somewhat increases the overhead needed
+ *      for raising signals, however given that  raising signals in general aren't  something
+ *      done  by programs  with the intend  of using them  for performance-critical purposes,
+ *      this is completely acceptable.
  *
  *    - During a (successful) call to exec(), userprocmask-mode is disabled, the same way it
  *      would  also be disabled from user-space calling `sys_set_userprocmask_address(NULL)'
@@ -159,7 +161,7 @@ DATDEF ATTR_PERTASK USER CHECKED pid_t *this_tid_address;
  *    - During a call to clone(CLONE_VM), where the parent is a userprocmask  thread,
  *      prior to clone() returning in either the parent or child, the parent thread's
  *      user-space `pm_sigmask' is copied into  the kernel-space buffer of the  child
- *      thread, while the child thread will start with TASK_FUSERPROCMASK=0.
+ *      thread, before the child thread will start with TASK_FUSERPROCMASK=0.
  *
  *    - During a vfork(2),  where the parent  thread has the  TASK_FUSERPROCMASK
  *      attribute set, the parent's process's `pm_sigmask' will be copied into a
@@ -167,7 +169,7 @@ DATDEF ATTR_PERTASK USER CHECKED pid_t *this_tid_address;
  *      until the child thread indicates that it has successfully called exec(2)
  *      or   _Exit(2),  the  parent  thread's  TASK_FUSERPROCMASK  attribute  is
  *      cleared, and the internal kernel-space signal  mask is set to block  all
- *      signals  (except SIGKILL  and SIGSTOP),  thus mirroring  the behavior of
+ *      signals (except `SIGKILL' and `SIGSTOP'), thus mirroring the behavior of
  *      vfork() without userprocmask.
  *      The  child  thread is  started  with the  `TASK_FUSERPROCMASK'  attribute set,
  *      which will be cleared the normal way once the child performs a successful call
@@ -190,18 +192,18 @@ DATDEF ATTR_PERTASK USER CHECKED pid_t *this_tid_address;
  *      This is done by having the vfork child do `THIS_USERPROCMASK_POINTER->pm_sigmask = NULL',
  *      thus indicating to the parent thread that `sys_set_userprocmask_address(2)' wasn't called
  *      yet.
- *      For this purpose, the kernel will set a thread flag `TASK_FUSERPROCMASK_AFTER_VFORK' when
- *      a call `sys_set_userprocmask_address(<not-NULL>)' is performed  by a thread that  doesn't
- *      already have  the `TASK_FUSERPROCMASK'  attribute set,  but does  have the  `TASK_FVFORK'
+ *      For this purpose, the kernel  sets a thread flag `TASK_FUSERPROCMASK_AFTER_VFORK'  when
+ *      a call `sys_set_userprocmask_address(<not-NULL>)' is performed by a thread that doesn't
+ *      already  have the `TASK_FUSERPROCMASK'  attribute set, but  does have the `TASK_FVFORK'
  *      attribute set.
  *
  *
  * Example code:
  * >> sigset_t os, ns;
  * >> sigfillset(&ns);
- * >> sigprocmask(SIG_SETMASK, &ns, &os);
+ * >> sigprocmask(SIG_SETMASK, &ns, &os);   // PREEMPTION_PUSHOFF()
  * >> ...
- * >> sigprocmask(SIG_SETMASK, &os, NULL);
+ * >> sigprocmask(SIG_SETMASK, &os, NULL);  // PREEMPTION_POP()
  *
  *
  * Implementation of libc's `sigprocmask()':
@@ -243,11 +245,11 @@ DATDEF ATTR_PERTASK USER CHECKED pid_t *this_tid_address;
  * >> // function will disable userprocmask, similar to passing `NULL'
  * >> errno_t sys_set_userprocmask_address(struct userprocmask *ctl);
  * >>
- * >> // Check for pending signals, and keep on handling them until none are left
- * >> // The [restart(must)] is necessary in order to ensure that _all_ unmasked
- * >> // signals get handled until none are left, in case more than one signal
- * >> // became available.
- * >> [restart(must)] errno_t sys_rpc_serve(void);
+ * >> // >> rpc_serve_sysret(2)
+ * >> // Service asynchronous (posix-signal-style) RPCs before returning to user-space
+ * >> // NOTE: Not a cancellation point, and only serves async RPCs!
+ * >> // @return: 0 : Always, unconditionally returned.
+ * >> [restart(dont)] sys_rpc_serve_sysret:() -> errno_t;
  * >>
  * >>
  * >> // Per-thread user-space signal mask controller
@@ -285,7 +287,11 @@ DATDEF ATTR_PERTASK USER CHECKED pid_t *this_tid_address;
  * >>     if (how == SIG_BLOCK)
  * >>         return 0;
  * >>
- * >>     // Check previously pending signals became available
+ * >>     // Optimization: If there are _any_ pending signals, the kernel sets this flag
+ * >>     if (!(mymask.pm_flags & USERPROCMASK_FLAG_HASPENDING))
+ * >>         return 0;
+ * >>
+ * >>     // Check if previously pending signals became available
  * >>     for (signo_t i = 1; i < NSIG; ++i) {
  * >>
  * >>         // HINT: Instead of testing each signal individually, this can be made
@@ -300,19 +306,21 @@ DATDEF ATTR_PERTASK USER CHECKED pid_t *this_tid_address;
  * >>             // have been directed at our process as a whole, and another thread
  * >>             // may have already handled it.
  * >>             sigemptyset(&mymask.pm_pending);
+ * >>             ATOMIC_AND(mymask.pm_flags, ~USERPROCMASK_FLAG_HASPENDING);
  * >>
- * >>             // Calls the kernel's `task_serve()' function
- * >>             sys_rpc_serve();
+ * >>             // Handle all async RPCs (and thus posix signals)
+ * >>             sys_rpc_serve_sysret();
+ * >>             break;
  * >>         }
  * >>     }
  * >>     return 0;
  * >> }
  *
- * Additionally, libc can  expose a  pair of new,  better-optimized signal  mask
- * functions that can be  used to directly  set the address  of the used  signal
- * mask, allowing a program to pre-define/initialize a number of special-purpose
- * signal  masks,  which it  can then  switch to/from,  with the  only remaining
- * overhead being the checking for pending signals
+ * Additionally, this allows libc to expose a pair of new, better-optimized  signal
+ * mask  functions that can be used to directly  set the address of the used signal
+ * mask, allowing a  program to pre-define/initialize  a number of  special-purpose
+ * signal masks, which it can then switch to/from, with the only remaining overhead
+ * being the checking for pending signals
  *
  * >> // New user-space function:
  * >> sigset_t *getsigmaskptr(void) {
@@ -323,11 +331,13 @@ DATDEF ATTR_PERTASK USER CHECKED pid_t *this_tid_address;
  * >> sigset_t *setsigmaskptr(sigset_t *sigmaskptr) {
  * >>     sigset_t *result = mymask.pm_sigmask;
  * >>     mymask.pm_sigmask = sigmaskptr;
- * >>     for (signo_t i = 1; i < NSIG; ++i) {
- * >>         if (sigismember(&mymask.pm_pending, i) && !sigismember(sigmaskptr, i)) {
- * >>             sigemptyset(&mymask.pm_pending);
- * >>             sys_rpc_serve();
- * >>             break;
+ * >>     if (mymask.pm_flags & USERPROCMASK_FLAG_HASPENDING) {
+ * >>         for (signo_t i = 1; i < NSIG; ++i) {
+ * >>             if (sigismember(&mymask.pm_pending, i) && !sigismember(sigmaskptr, i)) {
+ * >>                 sigemptyset(&mymask.pm_pending);
+ * >>                 sys_rpc_serve_sysret();
+ * >>                 break;
+ * >>             }
  * >>         }
  * >>     }
  * >>     return result;
@@ -346,12 +356,12 @@ DATDEF ATTR_PERTASK USER CHECKED pid_t *this_tid_address;
  * >>     // However, this also assumes that `my_function_that_mustnt_get_interrupted()'
  * >>     // doesn't include a call to `sys_sigprocmask(2)' (i.e. _NOT_ the library
  * >>     // variant), since such a call would also try to write to `fullmask'
- * >>     oldset = setsigmaskptr((sigset_t *)&fullmask);
+ * >>     oldset = setsigmaskptr((sigset_t *)&fullmask); // PREEMPTION_PUSHOFF()
  * >>
  * >>     my_function_that_mustnt_get_interrupted();
  * >>
  * >>     // Restore the old signal mask
- * >>     setsigmaskptr(oldset);
+ * >>     setsigmaskptr(oldset);                         // PREEMPTION_POP()
  * >> }
  */
 #ifdef CONFIG_HAVE_USERPROCMASK

@@ -756,6 +756,16 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *       thread in this  case) is ready,  which would  get rid of  the risk  of
 	 *       the send operation running into an E_BADALLOC error. */
 
+	/* TODO: During unwinding, .cfi_signal_frame must result in the NEXT stack-frame
+	 *       searching for the associated FDE _NOT_  decrementing its PC by 1.  Note
+	 *       that this should only affect  the _NEXT_ stack-frame, as signal  frames
+	 *       are meant to be used for  interrupt/signal handlers, in which case  the
+	 *       return  PC may already point to the start of a function (as is the case
+	 *       when  a interrupt arrives during execution of a function's first instr,
+	 *       which then has to be restarted after the interrupt completes, which  is
+	 *       done  by having the interrupt return to  the start of said first instr,
+	 *       meaning that decrementing mustn't be done) */
+
 	return state;
 }
 

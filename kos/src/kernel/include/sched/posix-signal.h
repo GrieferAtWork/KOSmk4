@@ -226,6 +226,7 @@ struct sighand_ptr {
 	 * case this indirection allows for lazy copy-on-write. */
 	WEAK refcnt_t        sp_refcnt; /* Amount of threads using `sp_hand' */
 	struct atomic_rwlock sp_lock;   /* Lock for the `sp_hand' pointer. */
+	/* TODO: Couldn't this structure be implemented much more nicely with `AXREF()'? */
 	REF struct sighand  *sp_hand;   /* [0..1][ref(sh_share)][lock(sp_lock,WRITE_ONCE[ALLOW_EXCHANGE])]
 	                                 * Pointer to the shared signal handler table. */
 };

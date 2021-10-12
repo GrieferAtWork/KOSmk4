@@ -329,12 +329,14 @@ struct service_comdesc {
 	 *       list of active commands and marking each of them as having finished  with
 	 *       an exception `E_SERVICE_EXITED' */
 
-	/* TODO: The  HUP condition can  be handled asynchronously by  making use epoll RPCs
+	/* TODO: The HUP condition can be handled asynchronously by making use of epoll RPCs
 	 *       ~ala `epoll_rpc_exec(3)' and having them send to an arbitrary thread within
 	 *       the  client process. In turn, the RPC callback  can then do all of the work
 	 *       related to canceling active commands by  making them as having exited  with
 	 *       `E_SERVICE_EXITED'.
-	 */
+	 * NOTE: The associated RPC callback also needs to check if the HUP really happened.
+	 *       The invocation may have also just been the result of a sporadic  interrupt,
+	 *       in which case the EPOLL RPC must be re-scheduled. */
 
 	LIST_ENTRY(service_comdesc) scd_link; /* [lock(:s_active_lock)] List of active commands. */
 	struct service_com          scd_com;  /* The underlying command. */

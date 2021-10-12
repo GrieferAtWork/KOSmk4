@@ -561,14 +561,13 @@ char *getenv([[nonnull]] char const *varname) {
 
 		/* Following the assumption that no environment variable string
 		 * (should)  ever consist of an empty string, we can infer that
-		 *
 		 * all  variable strings  should consist  of at  least 2 bytes,
 		 * namely the first character of the name, followed by at least
 		 * the terminating NUL character.
 		 *
-		 * As such, when walking the table of strings, we can speed up
-		 * operation via an initial dismissal check that compares  the
-		 * first 2 characters from the environ-string against the  the
+		 * As such, when walking the  table of strings, we can  speed
+		 * up operation via an initial dismissal check that  compares
+		 * the first 2 characters from the environ-string against the
 		 * expected pattern based on the caller's `varname'.
 		 *
 		 * As far as portability goes, gLibc makes the same assumption. */
