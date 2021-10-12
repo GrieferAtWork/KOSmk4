@@ -53,6 +53,14 @@
 
 DECL_BEGIN
 
+/* This  string (without a  trailing NUL) is send  alongside the initial SHM
+ * file handle by clients connecting to a libservice server. The server will
+ * accept  new connections and receive this initial message, but if received
+ * message differs from this string, or no (or more than 1) file handles are
+ * passed, then the connection will be terminated. */
+#define LIBSERVICE_COM_HANDSHAKE_MESSAGE "libservice.400"
+
+
 #ifndef __sigset_t_defined
 #define __sigset_t_defined
 typedef struct __sigset_struct sigset_t;
@@ -252,7 +260,8 @@ typedef sigset_t *pflag_t;
                                                          * An  errno being set doesn't necessarily mean that
                                                          * the command failed, but when non-zero, the client
                                                          * will modify its own errno to match this value. */
-#define SERVICE_COM_ST_ECHO        ((uintptr_t)-4094)   /* Always (and only) returned by `SERVICE_COM_ECHO' */
+#define SERVICE_COM_ST_ECHO        ((uintptr_t)-4094)   /* Always returned by  `SERVICE_COM_ECHO'. When returned  by
+                                                         * any other command, this means that the server has exited. */
 #define SERVICE_COM_ST_EXCEPT      ((uintptr_t)-4095)   /* Error by means of a KOS exception that will be
                                                          * re-thrown within  the context  of the  client. */
 /************************************************************************/
@@ -467,7 +476,7 @@ struct service_shm_free {
 /* Given a free node size, return its bucket index. */
 #define SERVICE_FREE_LIST_INDEX(size)                                \
 	((size) >= (SERVICE_FREE_LIST_COUNT << _SERVICE_FREE_LIST_SHIFT) \
-	 ? SERVICE_FREE_LIST_COUNT                                       \
+	 ? (SERVICE_FREE_LIST_COUNT - 1)                                 \
 	 : (size) >> _SERVICE_FREE_LIST_SHIFT)
 
 

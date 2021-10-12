@@ -37,6 +37,29 @@
 
 DECL_BEGIN
 
+/*
+ * NOTE: Graceful client disconnect is done as follows:
+ *  - Set a marker-flag that prevents the spawning of new client threads,
+ *    as well as sleeping threads from consuming pending com descriptors.
+ *  - Cancel all still-running service threads for the client.
+ *    In turn, any active command completes with status SERVICE_COM_ST_ECHO,
+ *    which  a connected client will interpret as the service having exited.
+ *  - Once  no more threads  are running for the  purpose of serving client
+ *    commands, (meaning that  nothing else is  still accessing the  client
+ *    data area), simply close(2) the originally accept(2)'ed client socket
+ *    and have the attached client do the rest of the work.
+ *  - Cleanup all remaining data, including our primary SHM mapping.
+ *
+ * NOTE: Forced client disconnect (as the result of a HUP on the originally
+ *       accept(2)'ed client socket) is done the same.
+ *
+ * FIXME: What  about ENOMEM resulting when trying to cancel the worker threads.
+ *        As a matter of fact: this is a problem pthread_cancel() faces as well,
+ *        but currently simply ignores as though it couldn't happen... */
+
+
+
+
 /* Create a service that is reachable under `filename' and exposes the given set of functions.
  * NOTE: The given  set of  functions _must_  be sorted  lexicographically
  *       ascending by name, as binary search is used to locate appropriate
@@ -59,7 +82,7 @@ libservice_api_create(char const *__restrict filename,
 INTERN WUNUSED NONNULL((1, 2)) struct service_api *
 NOTHROW_NCX(CC libservice_api_create_nx)(char const *__restrict filename,
                                          struct service_specs const *__restrict specs) {
-	TRY {
+	NESTED_TRY {
 		return libservice_api_create(filename, specs);
 	} EXCEPT {
 		error_class_t cls = error_class();

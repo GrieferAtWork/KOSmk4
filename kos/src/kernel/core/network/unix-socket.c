@@ -156,7 +156,7 @@ NOTHROW(FCALL unix_client_accept_connection)(struct unix_client *__restrict self
 
 PRIVATE NOBLOCK NONNULL((1)) bool
 NOTHROW(FCALL unix_client_close_connection)(struct unix_client *__restrict self) {
-	/* Tell `self' that their connection request has been accepted. */
+	/* Tell `self' that their connection request has been closed. */
 	if (!ATOMIC_CMPXCH(self->uc_status,
 	                   UNIX_CLIENT_STATUS_ACCEPTED,
 	                   UNIX_CLIENT_STATUS_CLOSED))

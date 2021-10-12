@@ -26,6 +26,7 @@
 /**/
 
 #include <hybrid/align.h>
+#include <hybrid/unaligned.h>
 
 #include <kos/except.h>
 #include <kos/malloc.h>
@@ -68,7 +69,7 @@ DECL_BEGIN
 
 
 /* Check if `com_offset' is part of the given `pending_chain' */
-PRIVATE WUNUSED NONNULL((1)) bool
+PRIVATE ATTR_PURE WUNUSED NONNULL((1)) bool
 NOTHROW(CC com_is_pending)(byte_t const *__restrict shm_base,
                            uintptr_t pending_chain,
                            uintptr_t com_offset) {
@@ -203,9 +204,9 @@ handle_hup:
 INTERN ATTR_RETNONNULL WUNUSED NONNULL((1)) struct service *CC
 libservice_open(char const *filename) THROWS(E_FSERROR, E_BADALLOC, E_INTERRUPT) {
 	struct service *result;
-	REF struct service_shm_handle *shm;
 	result = (struct service *)Malloc(sizeof(struct service));
 	TRY {
+		REF struct service_shm_handle *shm;
 		atomic_lock_init(&result->s_shm_lock);
 		SLIST_INIT(&result->s_shm_lops);
 		shm = service_shm_handle_alloc();
@@ -226,23 +227,8 @@ libservice_open(char const *filename) THROWS(E_FSERROR, E_BADALLOC, E_INTERRUPT)
 			/* Create the socket which we're going to use to communicate with the server. */
 			result->s_fd_srv = Socket(AF_UNIX, SOCK_STREAM | SOCK_CLOEXEC, PF_UNIX);
 			TRY {
-				struct sockaddr_un *sa;
-				socklen_t sa_len;
-				size_t filename_size;
-
-				/* Connect to a unix domain socket bound to the given file. */
-				filename_size  = (strlen(filename) + 1) * sizeof(char);
-				sa_len         = offsetof(struct sockaddr_un, sun_path) + filename_size;
-				sa             = (struct sockaddr_un *)alloca(sa_len);
-				sa->sun_family = AF_UNIX;
-				memcpy(sa->sun_path, filename, filename_size);
-				Connect(result->s_fd_srv, (struct sockaddr *)sa, sa_len);
-
-				/* TODO: Server handshake + acquire SHM handle. */
-
-				(void)filename;
-				abort();
-
+				/* Create the initial SHM fd */
+				result->s_fd_shm = MemFdCreate(filename, MFD_CLOEXEC);
 				TRY {
 					struct service_shm_free *allfree;
 					size_t pagesize = getpagesize();
@@ -282,28 +268,66 @@ libservice_open(char const *filename) THROWS(E_FSERROR, E_BADALLOC, E_INTERRUPT)
 					allfree->ssf_bysize.le_next = NULL;
 					result->s_shm_freelist[bucket].lh_first = allfree;
 
-					/* Create the EPOLL controller to listen for remote HUP events. */
 					TRY {
+						/* Create the EPOLL controller to listen for remote HUP events. */
 						result->s_fd_ephup = EPollCreate1(EPOLL_CLOEXEC);
-
-						/* Schedule an RPC to-be delivered upon HUP */
 						TRY {
-							struct epoll_event evt;
-							evt.events   = EPOLLHUP | EPOLLRDHUP;
-							evt.data.ptr = result;
-							EPollRpcExec(result->s_fd_ephup, result->s_fd_srv, &evt, getpid(),
-							             RPC_SIGNO(CLIENT_HUP_SIGNO) | RPC_SYNCMODE_ASYNC |
-							             RPC_SYSRESTART_RESTART | RPC_DOMAIN_PROCESS,
-							             (prpc_exec_callback_t)&client_hup_rpc);
+							struct sockaddr_un *sa;
+							socklen_t sa_len;
+							size_t filename_size;
+
+							/* Connect to a unix domain socket bound to the given file. */
+							filename_size  = (strlen(filename) + 1) * sizeof(char);
+							sa_len         = offsetof(struct sockaddr_un, sun_path) + filename_size;
+							sa             = (struct sockaddr_un *)alloca(sa_len);
+							sa->sun_family = AF_UNIX;
+							memcpy(sa->sun_path, filename, filename_size);
+							Connect(result->s_fd_srv, (struct sockaddr *)sa, sa_len);
+
+							/* Server handshake + acquire SHM handle. */
+							{
+								struct msghdr msg;
+								struct cmsghdr *cmsg;
+								char fd_buf[CMSG_SPACE(sizeof(fd_t))];
+								char msg_buf[COMPILER_STRLEN(LIBSERVICE_COM_HANDSHAKE_MESSAGE)];
+								struct iovec iov[1];
+								memset(fd_buf, 0, sizeof(fd_buf));
+								memset(&msg, 0, sizeof(msg));
+								memcpy(msg_buf, LIBSERVICE_COM_HANDSHAKE_MESSAGE, sizeof(msg_buf));
+								iov[0].iov_base    = msg_buf;
+								iov[0].iov_len     = sizeof(msg_buf);
+								msg.msg_iov        = iov;
+								msg.msg_iovlen     = COMPILER_LENOF(iov);
+								msg.msg_control    = fd_buf;
+								msg.msg_controllen = sizeof(fd_buf);
+								cmsg               = CMSG_FIRSTHDR(&msg);
+								cmsg->cmsg_level   = SOL_SOCKET;
+								cmsg->cmsg_type    = SCM_RIGHTS;
+								cmsg->cmsg_len     = CMSG_LEN(sizeof(fd_t));
+								UNALIGNED_SET((unsigned int *)CMSG_DATA(cmsg),
+								              (unsigned int)result->s_fd_shm);
+								SendMsg(result->s_fd_srv, &msg, 0);
+							}
+
+							/* Schedule an RPC to-be delivered upon HUP */
+							{
+								struct epoll_event evt;
+								evt.events   = EPOLLHUP | EPOLLRDHUP;
+								evt.data.ptr = result;
+								EPollRpcExec(result->s_fd_ephup, result->s_fd_srv, &evt, getpid(),
+								             RPC_SIGNO(CLIENT_HUP_SIGNO) | RPC_SYNCMODE_ASYNC |
+								             RPC_SYSRESTART_RESTART | RPC_DOMAIN_PROCESS,
+								             (prpc_exec_callback_t)&client_hup_rpc);
+								/* FIXME: If  following the creation of an SHM client, the calling process
+								 *        does a fork, everything will continue to function normally,  but
+								 *        if the server then proceeds to terminate the connection, the HUP
+								 *        RPC  will only be delivered to the original process. Children do
+								 *        not receive the async notification! */
+							}
 						} EXCEPT {
 							close(result->s_fd_ephup);
 							RETHROW();
 						}
-						/* FIXME: If  following the creation of an SHM client, the calling process
-						 *        does a fork, everything will continue to function normally,  but
-						 *        if the server then proceeds to terminate the connection, the HUP
-						 *        RPC  will only be delivered to the original process. Children do
-						 *        not receive the async notification! */
 					} EXCEPT {
 						munmap(shm_base, service_shm_handle_getsize(shm));
 						RETHROW();

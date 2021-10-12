@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xed1dccaa */
+/* HASH CRC-32:0x51ccb2bf */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -825,12 +825,12 @@ struct osockaddr {
 /* size_t CMSG_ALIGN(size_t len) */
 #ifndef CMSG_ALIGN
 #define CMSG_ALIGN(len) \
-	(((len) + __ALIGNOF_CMSGHDR - 1) & __CCAST(__size_t)~(__ALIGNOF_CMSGHDR - 1))
+	((__CCAST(__size_t)(len) + __CCAST(__size_t)(__ALIGNOF_CMSGHDR - 1)) & __CCAST(__size_t)~(__ALIGNOF_CMSGHDR - 1))
 #endif /* !CMSG_ALIGN */
 
 /* size_t CMSG_SPACE(size_t len) */
 #define CMSG_SPACE(len) \
-	(CMSG_ALIGN(len) + CMSG_ALIGN(__OFFSET_CMSGHDR_DATA))
+	(CMSG_ALIGN(__OFFSET_CMSGHDR_DATA) + CMSG_ALIGN(len))
 
 /* size_t CMSG_LEN(size_t len) */
 #define CMSG_LEN(len) \
