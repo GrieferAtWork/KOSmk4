@@ -1160,16 +1160,16 @@ libservice_dlsym_getinfo(struct service *__restrict self, char const *__restrict
 	size_t namsize;
 	size_t comsize;
 	service_buf_t buf;
-	struct service_com *com;
+	struct service_comdesc *com;
 	struct service_shm_handle *shm;
 	namsize = (strlen(name) + 1) * sizeof(char);
-	comsize = offsetof(struct service_com, sc_dlsym.dl_name) + namsize;
+	comsize = offsetof(struct service_comdesc, scd_com.sc_dlsym.dl_name) + namsize;
 
 	/* Make sure that there's enough space for us to receive a
 	 * success  response,  as well  as an  exception response. */
-#define DLSYM_COM_MINSIZE                                    \
-	MAX_C(offsetafter(struct service_com, sc_dlsym_success), \
-	      offsetafter(struct service_com, sc_except))
+#define DLSYM_COM_MINSIZE                                                \
+	MAX_C(offsetafter(struct service_comdesc, scd_com.sc_dlsym_success), \
+	      offsetafter(struct service_comdesc, scd_com.sc_except))
 	if (comsize < DLSYM_COM_MINSIZE)
 		comsize = DLSYM_COM_MINSIZE;
 #undef DLSYM_COM_MINSIZE
@@ -1182,7 +1182,7 @@ libservice_dlsym_getinfo(struct service *__restrict self, char const *__restrict
 
 	/* Allocate a com object to-be used for the request. */
 	buf = libservice_shmbuf_alloc_nopr(self, comsize);
-	com = (struct service_com *)service_buf_getptr(buf);
+	com = (struct service_comdesc *)service_buf_getptr(buf);
 	shm = service_buf_getshm(buf);
 	TRY {
 		uintptr_t com_reladdr;
@@ -1190,15 +1190,19 @@ libservice_dlsym_getinfo(struct service *__restrict self, char const *__restrict
 		struct service_shm *shm_ctl;
 
 		/* Fill in the com descriptor. */
-		com->sc_code = SERVICE_COM_DLSYM;
-		memcpy(com->sc_dlsym.dl_name, name, namsize);
+		com->scd_com.sc_code = SERVICE_COM_DLSYM;
+		memcpy(com->scd_com.sc_dlsym.dl_name, name, namsize);
+
+		/* Add the service_comdesc to the list of active commands `service->s_active_list' */
+		/* TODO */
 
 		/* Post the request to the server */
 		shm_ctl     = shm->ssh_shm;
-		com_reladdr = (uintptr_t)((byte_t *)com - (byte_t *)shm_ctl);
+		com_reladdr = (uintptr_t)((byte_t *)&com->scd_com - (byte_t *)shm_ctl);
 		do {
-			com_nxtaddr  = shm_ctl->s_commands;
-			com->sc_link = com_nxtaddr;
+			com_nxtaddr = shm_ctl->s_commands;
+			/* TODO: Check for `SERVICE_SHM_COMMANDS_SHUTDOWN' */
+			com->scd_com.sc_link = com_nxtaddr;
 			COMPILER_WRITE_BARRIER();
 		} while (!ATOMIC_CMPXCH_WEAK(shm_ctl->s_commands,
 		                             com_nxtaddr, com_reladdr));
@@ -1208,7 +1212,7 @@ libservice_dlsym_getinfo(struct service *__restrict self, char const *__restrict
 
 		/* Wake for the server to respond. */
 		TRY {
-			sys_Xlfutex(&com->sc_code, LFUTEX_WAIT_WHILE,
+			sys_Xlfutex(&com->scd_com.sc_code, LFUTEX_WAIT_WHILE,
 			            SERVICE_COM_DLSYM, NULL, 0);
 		} EXCEPT {
 			error_class_t cls = error_class();
@@ -1219,13 +1223,16 @@ libservice_dlsym_getinfo(struct service *__restrict self, char const *__restrict
 				RETHROW();
 		}
 
+		/* Remove the service_comdesc to the list of active commands `service->s_active_list' */
+		/* TODO */
+
 		/* Check return status. */
-		if (com->sc_code != SERVICE_COM_ST_SUCCESS) {
+		if (com->scd_com.sc_code != SERVICE_COM_ST_SUCCESS) {
 			struct exception_data *e = error_data();
 			assert(e->e_code == ERROR_CODEOF(E_OK));
-			if (com->sc_code == SERVICE_COM_ST_EXCEPT) {
-				e->e_code = com->sc_except.e_code;
-				memcpy(&e->e_args, &com->sc_except.e_args,
+			if (com->scd_com.sc_code == SERVICE_COM_ST_EXCEPT) {
+				e->e_code = com->scd_com.sc_except.e_code;
+				memcpy(&e->e_args, &com->scd_com.sc_except.e_args,
 				       sizeof(union exception_data_pointers));
 			} else {
 				e->e_code = ERROR_CODEOF(E_NO_SUCH_OBJECT);
@@ -1235,7 +1242,7 @@ libservice_dlsym_getinfo(struct service *__restrict self, char const *__restrict
 		}
 
 		/* On success, copy back function information */
-		memcpy(info, &com->sc_dlsym_success,
+		memcpy(info, &com->scd_com.sc_dlsym_success,
 		       sizeof(struct service_com_funinfo));
 	} EXCEPT {
 		libservice_shmbuf_free_fast_nopr(self, shm, com);
@@ -1256,8 +1263,12 @@ libservice_dlsym_getinfo(struct service *__restrict self, char const *__restrict
  * @return: false: The command complete before it could be aborted. */
 INTERN WUNUSED NONNULL((1, 2)) bool
 NOTHROW(FCALL libservice_aux_com_abort)(struct service *__restrict self,
-                                        struct service_com *__restrict com,
+                                        struct service_comdesc *__restrict com,
                                         uintptr_t orig_code) {
+	/* Remove the service_comdesc to the list of active commands `service->s_active_list' */
+	/* TODO */
+
+	/* Cancel the command */
 	/* TODO */
 	(void)self;
 	(void)com;

@@ -143,7 +143,7 @@ STATIC_ASSERT(IS_ALIGNED(offsetof(struct service_com, sc_generic.g_data), 4));
  *  |   CFA-4*P                            SAVED: %Psi         # Only if `COM_GENERATOR_FEATURE_USES_ESI' (restored on exit)
  *  \   CFA-3*P                            SAVED: %Pbx         # %Pbx is needed for system calls
  * #endif // !__x86_64__
- *  \   CFA-2*P                            SAVED: %Pbp         # %Pbp is used for `struct service_com *R_service_com'
+ *  \   CFA-2*P                            SAVED: %Pbp         # %Pbp is used for `struct service_comdesc *R_service_com'
  *  -   CFA-1*P                            RETURN_PC
  *  /   CFA                                [STACK_ARG[0]]
  *  |   CFA+1*P                            [STACK_ARG[1]]
@@ -158,7 +158,7 @@ STATIC_ASSERT(IS_ALIGNED(offsetof(struct service_com, sc_generic.g_data), 4));
  *
  * ================================================================================================
  * ALLOC_SIZE is calculated as:
- *      offsetof(struct service_com, sc_generic.g_data)
+ *      offsetof(struct service_comdesc, scd_com.sc_generic.g_data)
  *    + cg_paramc * sizeof(uintptr_t)                             # Every parameter has (at least) 1 serial word
  * #ifndef __x86_64__
  *    + PARAM_COUNT_OF(SERVICE_TYPE_386_R64) * sizeof(uintptr_t)  # On i386, 64-bit arguments take 2 serial words
@@ -169,7 +169,7 @@ STATIC_ASSERT(IS_ALIGNED(offsetof(struct service_com, sc_generic.g_data), 4));
  * value is stored in `cg_sizeof_service_com'
  *
  * <cibp_buffer_offset> is calculated as:
- *      offsetof(struct service_com, sc_generic.g_data)
+ *      offsetof(struct service_comdesc, scd_com.sc_generic.g_data)
  *    + cg_paramc * sizeof(uintptr_t)
  * #ifndef __x86_64__
  *    + PARAM_COUNT_OF(SERVICE_TYPE_386_R64) * sizeof(uintptr_t)
@@ -200,13 +200,13 @@ STATIC_ASSERT(IS_ALIGNED(offsetof(struct service_com, sc_generic.g_data), 4));
  * >>
  * >> #ifdef __x86_64__
  * >> #define SET_ERROR_RETURN_VALUE() \
- * >>     movq   $<cg_info.dl_error_return.scr_rax>, service_com::sc_retval::scr_rax(%R_service_com)
+ * >>     movq   $<cg_info.dl_error_return.scr_rax>, service_comdesc::scd_com::sc_retval::scr_rax(%R_service_com)
  * >> #else // __x86_64__
- * >> #define SET_ERROR_RETURN_VALUE()                                                                   \
- * >>     #if cg_info.dl_return == SERVICE_TYPE_386_R64                                                  \
- * >>         movl   $<cg_info.dl_error_return.scr_edx>, service_com::sc_retval::scr_edx(%R_service_com) \
- * >>     #endif // cg_info.dl_return == SERVICE_TYPE_386_R64                                            \
- * >>     movl   $<cg_info.dl_error_return.scr_eax>, service_com::sc_retval::scr_eax(%R_service_com)
+ * >> #define SET_ERROR_RETURN_VALUE()                                                                                \
+ * >>     #if cg_info.dl_return == SERVICE_TYPE_386_R64                                                               \
+ * >>         movl   $<cg_info.dl_error_return.scr_edx>, service_comdesc::scd_com::sc_retval::scr_edx(%R_service_com) \
+ * >>     #endif // cg_info.dl_return == SERVICE_TYPE_386_R64                                                         \
+ * >>     movl   $<cg_info.dl_error_return.scr_eax>, service_comdesc::scd_com::sc_retval::scr_eax(%R_service_com)
  * >> #endif // !__x86_64__
  * >>
  * >>
@@ -215,7 +215,7 @@ STATIC_ASSERT(IS_ALIGNED(offsetof(struct service_com, sc_generic.g_data), 4));
  * >>     .cfi_def_cfa_offset 0
  * >>
  * >> // Save registers & allocate stack space
- * >>     pushP_cfi_r %Pbp        # %Pbp is used for `struct service_com *R_service_com'
+ * >>     pushP_cfi_r %Pbp        # %Pbp is used for `struct service_comdesc *R_service_com'
  * >> #ifdef __x86_64__
  * >> #if COM_GENERATOR_FEATURE_USES_RBX
  * >>     pushP_cfi_r %rbx        # Only if used anywhere below (restored on exit)
@@ -515,17 +515,17 @@ STATIC_ASSERT(IS_ALIGNED(offsetof(struct service_com, sc_generic.g_data), 4));
  * >>
  * >>
  * >> // Set the function code within the com descriptor
- * >>     movP   $<cg_info.dl_comid>, service_com::sc_code(%R_service_com)
+ * >>     movP   $<cg_info.dl_comid>, service_comdesc::scd_com::sc_code(%R_service_com)
  * >>
  * >>
  * >>
- * >> // Calculate the SHM-relative address of `service_com'
+ * >> // Calculate the SHM-relative address of `service_comdesc::scd_com'
  * >>     # On i386, `%R_shmbase' is '%Pbx'. On x86_64, `%R_shmbase' is:
  * >>     # (cg_inline_buf_paramc && COM_GENERATOR_FEATURE_INLINE_BUFFERS_MOVS) ? '%r8' : '%Pdi'
- * >>     movP   %R_service_com,                          %Pdx
- * >>     movP   LOC_shm(%Psp),                           %R_shmbase
- * >>     movP   service_shm_handle::ssh_shm(%R_shmbase), %R_shmbase
- * >>     subP   %R_shmbase,                              %Pdx
+ * >>     leaP   service_comdesc::scd_com(%R_service_com), %Pdx
+ * >>     movP   LOC_shm(%Psp),                            %R_shmbase
+ * >>     movP   service_shm_handle::ssh_shm(%R_shmbase),  %R_shmbase
+ * >>     subP   %R_shmbase,                               %Pdx
  * >>
  * >>
  * >>
@@ -533,9 +533,9 @@ STATIC_ASSERT(IS_ALIGNED(offsetof(struct service_com, sc_generic.g_data), 4));
  * >> #if cg_inline_buf_paramc != 0
  * >> {foreach[INLINE_BUFFER_ARGUMENT: <cibp_buffer_offset>, <cibp_sizeof>, <cibp_param_offset>, <cibp_serial_offset>]: {
  * >>     # NOTE: `<cibp_buffer_offset>' (>= `<cibp_buffer_offset>') is the
- * >>     #       offsets from service_com to where inline buffer data is stored.
- * >>     leaP   <cibp_buffer_offset>(%Pdx), %Pax            # SHM-relative address of the inline buffer
- * >>     movP   %Pax, <cibp_serial_offset>(%R_service_com)  # Store relative address in serial stream
+ * >>     #       offset from service_comdesc to where inline buffer data is stored.
+ * >>     leaP   <cibp_buffer_offset - service_comdesc::scd_com>(%Pdx), %Pax # SHM-relative address of the inline buffer
+ * >>     movP   %Pax, <cibp_serial_offset>(%R_service_com)                  # Store relative address in serial stream
  * >> #if ARGUMENT_IS_IN_OR_INOUT_BUFFER # (Referring to the argument being enumerated)
  * >>     # Whether or not movs is used is determined on a per-argument basis
  * >> #if COM_GENERATOR_FEATURE_INLINE_BUFFERS_MOVS
@@ -558,11 +558,17 @@ STATIC_ASSERT(IS_ALIGNED(offsetof(struct service_com, sc_generic.g_data), 4));
  * >>
  * >>
  * >>
+ * >> // Add the service_comdesc to the list of active commands `service->s_active_list'
+ * >>     # TODO
+ * >>
+ * >>
+ * >>
  * >> // Insert the command into the server's pending list
  * >>     # Atomically insert the new command into the list
- * >>     # HINT: At this point, %Pdx == (%R_service_com - service_shm_handle::ssh_shm(%R_temp_shm_handle))
+ * >>     # HINT: At this point, %Pdx == ((%R_service_com + service_comdesc::scd_com) - service_shm_handle::ssh_shm(%R_temp_shm_handle))
  * >>     movP   service_shm::s_commands(%R_shmbase), %Pax
- * >> 1:  movP   %Pax, service_com::sc_link(%R_service_com)
+ * >> 1:  # TODO: Check for SERVICE_SHM_COMMANDS_SHUTDOWN
+ * >>     movP   %Pax, service_comdesc::scd_com::sc_link(%R_service_com)
  * >>     lock   cmpxchgP %Pdx, service_shm::s_commands(%R_shmbase)
  * >>     jne    1b
  * >> .Leh_com_waitfor_begin:
@@ -597,9 +603,9 @@ STATIC_ASSERT(IS_ALIGNED(offsetof(struct service_com, sc_generic.g_data), 4));
  * >> .Lwaitfor_completion:
  * >>     movP   $SYS_lfutex, %Pax
  * >> #ifdef __x86_64__
- * >>     leaq   service_com::sc_code(%R_service_com), %rdi
- * >>     movq   $LFUTEX_WAIT_WHILE,                   %rsi
- * >>     movq   $<cg_info.dl_comid>,                  %rdx
+ * >>     leaq   service_comdesc::scd_com::sc_code(%R_service_com), %rdi
+ * >>     movq   $LFUTEX_WAIT_WHILE,                                %rsi
+ * >>     movq   $<cg_info.dl_comid>,                               %rdx
  * >> #if COM_GENERATOR_FEATURE_FEXCEPT
  * >>     std
  * >>     .cfi_escape 56,22,49,7,146,49,0,11,255,251,26  # Disable EFLAGS.DF during unwind & landing
@@ -610,9 +616,9 @@ STATIC_ASSERT(IS_ALIGNED(offsetof(struct service_com, sc_generic.g_data), 4));
  * >>     syscall
  * >> #endif // !COM_GENERATOR_FEATURE_FEXCEPT
  * >> #else // __x86_64__
- * >>     leaq   service_com::sc_code(%R_service_com), %ebx
- * >>     movl   $LFUTEX_WAIT_WHILE,                   %ecx
- * >>     movl   $<cg_info.dl_comid>,                  %edx
+ * >>     leaq   service_comdesc::scd_com::sc_code(%R_service_com), %ebx
+ * >>     movl   $LFUTEX_WAIT_WHILE,                                %ecx
+ * >>     movl   $<cg_info.dl_comid>,                               %edx
  * >> #if COM_GENERATOR_FEATURE_FEXCEPT
  * >>     call   __i386_Xsyscall
  * >> #else // COM_GENERATOR_FEATURE_FEXCEPT
@@ -624,10 +630,15 @@ STATIC_ASSERT(IS_ALIGNED(offsetof(struct service_com, sc_generic.g_data), 4));
  * >>     ja     .Lerr_com_abort_errno
  * >> #endif // !COM_GENERATOR_FEATURE_FEXCEPT
  * >>     # Check if the operation has completed
- * >>     movP   service_com::sc_code(%R_service_com), %Pax
+ * >>     movP   service_comdesc::scd_com::sc_code(%R_service_com), %Pax
  * >>     cmpP   $<cg_info.dl_comid>, %Pax
  * >>     je     .Lwaitfor_completion
  * >> .Leh_com_waitfor_end:
+ * >>
+ * >>
+ * >>
+ * >> // Remove the service_comdesc to the list of active commands `service->s_active_list'
+ * >>     # TODO
  * >>
  * >>
  * >>
@@ -749,12 +760,12 @@ STATIC_ASSERT(IS_ALIGNED(offsetof(struct service_com, sc_generic.g_data), 4));
  * >> #endif // !__x86_64__
  * >>     movP   LOC_shm(%Psp), %R_fcall1P
  * >> #ifdef __x86_64__
- * >>     movq   service_com::sc_retval::scr_rax+<sizeof(size_t)>(%R_service_com), %rbp # Load return values
+ * >>     movq   service_comdesc::scd_com::sc_retval::scr_rax+<sizeof(size_t)>(%R_service_com), %rbp # Load return values
  * >> #else // __x86_64__
  * >> #if cg_info.dl_return == SERVICE_TYPE_386_R64
- * >>     movl   service_com::sc_retval::scr_edx+<sizeof(size_t)>(%R_service_com), %ebx # Load return values
+ * >>     movl   service_comdesc::scd_com::sc_retval::scr_edx+<sizeof(size_t)>(%R_service_com), %ebx # Load return values
  * >> #endif // cg_info.dl_return == SERVICE_TYPE_386_R64
- * >>     movl   service_com::sc_retval::scr_eax+<sizeof(size_t)>(%R_service_com), %ebp # Load return values
+ * >>     movl   service_comdesc::scd_com::sc_retval::scr_eax+<sizeof(size_t)>(%R_service_com), %ebp # Load return values
  * >> #endif // !__x86_64__
  * >> #if cg_buf_paramc == 0
  * >>     movP   LOC_upm(%Psp), %Pax
@@ -916,7 +927,7 @@ STATIC_ASSERT(IS_ALIGNED(offsetof(struct service_com, sc_generic.g_data), 4));
  * >>     movP   %Pax, %R_fcall0P
  * >>     call   __set_errno_f
  * >>     jmp    .Lcom_special_return_resume
- * >> 1:  leaP   service_com::sc_except(%R_service_com), %R_fcall0P
+ * >> 1:  leaP   service_comdesc::scd_com::sc_except(%R_service_com), %R_fcall0P
  * >> #if !COM_GENERATOR_FEATURE_FEXCEPT
  * >>     call   libservice_aux_load_except_as_errno
  * >> #if cg_buf_paramc != 0
@@ -1114,7 +1125,7 @@ struct com_reloc {
 
 struct com_int_param {
 	int16_t  cip_param_offset;  /* [const] Offset from CFA to where this parameter is stored in memory */
-	uint16_t cip_serial_offset; /* [const] Offset from `struct service_com' to where this parameter's value is stored */
+	uint16_t cip_serial_offset; /* [const] Offset from `struct service_comdesc' to where this parameter's value is stored */
 };
 
 /* Fixed-length buffers with a size <= this value are stored inline with the com descriptor.
@@ -1145,8 +1156,8 @@ struct com_inline_buffer_param {
 	uint8_t  cibp_param_index;   /* [const] Parameter index in `:cg_info.dl_params' */
 	uint8_t  cibp_flags;         /* [const] Parameter flags (set of `COM_INLINE_BUFFER_PARAM_F*') */
 	int16_t  cibp_param_offset;  /* [const] Offset from CFA to where this parameter is stored in memory */
-	uint16_t cibp_serial_offset; /* [const] Offset from `struct service_com' to where the address of this buffer is saved */
-	uint16_t cibp_buffer_offset; /* [const] Offset from `struct service_com' to the buffer itself exists */
+	uint16_t cibp_serial_offset; /* [const] Offset from `struct service_comdesc' to where the address of this buffer is saved */
+	uint16_t cibp_buffer_offset; /* [const] Offset from `struct service_comdesc' to the buffer itself exists */
 	uint16_t cibp_sizeof;        /* [const][== (:cg_info.dl_params[cibp_param_index] & _SERVICE_TYPE_PARAMMASK)]
 	                              * Fixed sizeof this buffer parameter */
 };
@@ -1164,7 +1175,7 @@ struct com_buffer_param {
 	uint8_t  cbp_flags;         /* [const] Parameter flags (set of `COM_BUFFER_PARAM_F*') */
 	int16_t  cbp_param_offset;  /* [const] Offset from CFA to where this parameter is stored in memory:
 	                             * >> value = *(void **)(%Psp + cg_cfa_offset + cbp_param_offset); */
-	uint16_t cbp_serial_offset; /* [const] Offset from `struct service_com' to where the address of this buffer is saved */
+	uint16_t cbp_serial_offset; /* [const] Offset from `struct service_comdesc' to where the address of this buffer is saved */
 };
 
 /* Flags for `struct com_generator::cg_features' */
@@ -1199,7 +1210,7 @@ struct com_generator {
 	                                                   * by buffer type in order of `in, inout, out'. Out
 	                                                   * buffers  with  SERVICE_OUT_SIZEARG_RETURN_MINVAL
 	                                                   * come after those without. */
-	uint16_t                    cg_sizeof_service_com; /* [const] Total required sizeof for the service_com object. (NOT ADJUSTED FOR ALLOCATION INTERNALS!) */
+	uint16_t                    cg_sizeof_service_com; /* [const] Total required sizeof for the service_comdesc object. (NOT ADJUSTED FOR ALLOCATION INTERNALS!) */
 	uint8_t                     cg_inline_buf_paramc; /* [const] # of inline buffer parameters */
 	uint8_t                     cg_buf_paramc;        /* [const] # of buffer parameters */
 	uint8_t                     cg_inbuf_paramc;      /* [const] # of in-buffer parameters     (cg_buf_paramv[0..cg_inbuf_paramc-1]) */

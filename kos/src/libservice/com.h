@@ -332,7 +332,7 @@ struct service_comdesc {
 	/* TODO: The HUP condition can be handled asynchronously by making use of epoll RPCs
 	 *       ~ala `epoll_rpc_exec(3)' and having them send to an arbitrary thread within
 	 *       the  client process. In turn, the RPC callback  can then do all of the work
-	 *       related to canceling active commands by  making them as having exited  with
+	 *       related to canceling active commands by marking them as having exited  with
 	 *       `E_SERVICE_EXITED'.
 	 * NOTE: The associated RPC callback also needs to check if the HUP really happened.
 	 *       The invocation may have also just been the result of a sporadic  interrupt,
@@ -606,7 +606,7 @@ libservice_dlsym_getinfo(struct service *__restrict self, char const *__restrict
  * @return: false: The command complete before it could be aborted. */
 INTDEF WUNUSED NONNULL((1, 2)) bool
 NOTHROW(FCALL libservice_aux_com_abort)(struct service *__restrict self,
-                                        struct service_com *__restrict com,
+                                        struct service_comdesc *__restrict com,
                                         uintptr_t orig_code);
 
 
