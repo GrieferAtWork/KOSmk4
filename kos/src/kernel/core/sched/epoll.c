@@ -1833,7 +1833,7 @@ DEFINE_SYSCALL1(fd_t, epoll_create, syscall_ulong_t, size) {
 
 #ifdef __ARCH_WANT_SYSCALL_EPOLL_CTL
 #ifdef CONFIG_HAVE_EPOLL_RPC
-PRIVATE NONNULL((1, 2)) errno_t KCALL
+PRIVATE NONNULL((1, 2)) bool KCALL
 epoll_create_rpc_monitor(struct epoll_controller *__restrict self,
                          struct handle const *__restrict fd_handle,
                          uint32_t fd, uint32_t events,
@@ -1920,9 +1920,7 @@ epoll_create_rpc_monitor(struct epoll_controller *__restrict self,
 
 	/* Create the monitor.
 	 * NOTE: This function _always_, _unconditionally_ inherits the given `rpc'! */
-	if (!epoll_controller_addmonitor_rpc(self, fd_handle, fd, events, rpc))
-		return -ENOENT;
-	return -EOK;
+	return epoll_controller_addmonitor_rpc(self, fd_handle, fd, events, rpc);
 }
 
 #endif /* CONFIG_HAVE_EPOLL_RPC */
@@ -1942,18 +1940,18 @@ DEFINE_SYSCALL4(errno_t, epoll_ctl,
 		case EPOLL_CTL_ADD:
 			validate_readable(info, sizeof(*info));
 			if (!epoll_controller_addmonitor(self, &fd_handle, (uint32_t)fd, info))
-				result = -EEXIST;
+				result = -EEXIST; /* TODO: Use an exception for this! */
 			break;
 
 		case EPOLL_CTL_MOD:
 			validate_readable(info, sizeof(*info));
 			if (!epoll_controller_modmonitor(self, &fd_handle, (uint32_t)fd, info))
-				result = -ENOENT;
+				result = -ENOENT; /* TODO: Use an exception for this! */
 			break;
 
 		case EPOLL_CTL_DEL:
 			if (!epoll_controller_delmonitor(self, &fd_handle, (uint32_t)fd))
-				result = -ENOENT;
+				result = -ENOENT; /* TODO: Use an exception for this! */
 			break;
 
 #ifdef CONFIG_HAVE_EPOLL_RPC
@@ -1965,8 +1963,9 @@ DEFINE_SYSCALL4(errno_t, epoll_ctl,
 			validate_readable(eventinfo.data.ptr, sizeof(struct epoll_rpc_program));
 			program = (USER CHECKED struct epoll_rpc_program const *)eventinfo.data.ptr;
 			/* Create the RPC monitor. */
-			result = epoll_create_rpc_monitor(self, &fd_handle, (uint32_t)fd,
-			                                  eventinfo.events, program);
+			if (!epoll_create_rpc_monitor(self, &fd_handle, (uint32_t)fd,
+			                              eventinfo.events, program))
+				result = -EEXIST; /* TODO: Use an exception for this! */
 		}	break;
 #endif /* CONFIG_HAVE_EPOLL_RPC */
 

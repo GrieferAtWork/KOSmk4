@@ -116,6 +116,10 @@ DEFINE_XSYSCALL_EXPORT(RemapFilePages, sys_Xremap_file_pages)
 DEFINE_XSYSCALL_EXPORT(MemFdCreate, sys_Xmemfd_create)
 DEFINE_XSYSCALL_EXPORT(MLock2, sys_Xmlock2)
 DEFINE_XSYSCALL_EXPORT(RpcSchedule, sys_Xrpc_schedule)
+DEFINE_XSYSCALL_EXPORT(EPollCreate, sys_Xepoll_create)
+DEFINE_XSYSCALL_EXPORT(EPollCreate1, sys_Xepoll_create1)
+DEFINE_XSYSCALL_EXPORT(EPollCtl, sys_Xepoll_ctl)
+DEFINE_XSYSCALL_EXPORT(EPollWait, sys_Xepoll_wait)
 
 #ifdef __ARCH_HAVE_PKEY
 DEFINE_XSYSCALL_EXPORT(PKeyAlloc, sys_Xpkey_alloc)

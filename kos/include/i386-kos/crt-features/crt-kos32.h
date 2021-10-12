@@ -35,6 +35,12 @@
 #define __CRT_HAVE_Dup
 #define __CRT_HAVE_Dup2
 #define __CRT_HAVE_Dup3
+#define __CRT_HAVE_EPollCreate
+#define __CRT_HAVE_EPollCreate1
+#define __CRT_HAVE_EPollCtl
+#define __CRT_HAVE_EPollPWait
+#define __CRT_HAVE_EPollRpcExec
+#define __CRT_HAVE_EPollWait
 #define __CRT_HAVE_Execl
 #define __CRT_HAVE_Execle
 #define __CRT_HAVE_Execlpe
