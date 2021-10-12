@@ -1,4 +1,4 @@
-#TEST: require_utility vitetris "$TARGET_SYSROOT/bin/tetris"
+#TEST: require_utility vitetris "$TARGET_SYSROOT/bin/vitetris"
 # Copyright (c) 2019-2021 Griefer@Work
 #
 # This software is provided 'as-is', without any express or implied
@@ -22,7 +22,7 @@ if [ -z "$VERSION" ]; then VERSION="0.58.0"; fi
 
 SRCPATH="$KOS_ROOT/binutils/src/vitetris-$VERSION"
 OPTPATH="$BINUTILS_SYSROOT/opt/vitetris-$VERSION"
-EXEPATH="$OPTPATH/tetris"
+EXEPATH="$OPTPATH/vitetris"
 if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -f "$EXEPATH" ]; then
 	set_archpath
 	if [ "$MODE_FORCE_CONF" == yes ] || ! [ -f "$OPTPATH/configure" ]; then
@@ -42,4 +42,4 @@ if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -f "$EXEPATH" ]; then
 	cmd bash configure CC="$CC" CFLAGS="-ggdb"
 	cmd make -j $MAKE_PARALLEL_COUNT
 fi
-install_file /bin/tetris "$EXEPATH"
+install_file /bin/vitetris "$EXEPATH"
