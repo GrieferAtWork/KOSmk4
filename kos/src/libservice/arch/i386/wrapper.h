@@ -558,8 +558,11 @@ STATIC_ASSERT(IS_ALIGNED(offsetof(struct service_com, sc_generic.g_data), 4));
  * >>
  * >>
  * >>
- * >> // Add the service_comdesc to the list of active commands `service->s_active_list'
- * >>     # TODO
+ * >> // Add the service_comdesc to the list of active commands `cg_service->s_active_list'
+ * >>     movP   <cg_service->s_active_list>, %Pax                      # movabs via %Pcx if necessary on x86_64
+ * >> 1:  movP   %Pax, service_comdesc::scd_active_link(%R_service_com)
+ * >>     lock   cmpxchgP %Pdx, <cg_service->s_active_list>
+ * >>     jne    1b
  * >>
  * >>
  * >>
@@ -630,20 +633,26 @@ STATIC_ASSERT(IS_ALIGNED(offsetof(struct service_com, sc_generic.g_data), 4));
  * >>     ja     .Lerr_com_abort_errno
  * >> #endif // !COM_GENERATOR_FEATURE_FEXCEPT
  * >>     # Check if the operation has completed
- * >>     movP   service_comdesc::scd_com::sc_code(%R_service_com), %Pax
- * >>     cmpP   $<cg_info.dl_comid>, %Pax
+ * >>     movP   service_comdesc::scd_com::sc_code(%R_service_com), %R_fcall0P
+ * >>     cmpP   $<cg_info.dl_comid>, %R_fcall0P
  * >>     je     .Lwaitfor_completion
  * >> .Leh_com_waitfor_end:
  * >>
  * >>
  * >>
- * >> // Remove the service_comdesc to the list of active commands `service->s_active_list'
- * >>     # TODO
+ * >> // Remove the service_comdesc to the list of active commands `cg_service->s_active_list'
+ * >>     leaP   service_comdesc::scd_com(%R_service_com), %Pax
+ * >>     movP   LOC_shm(%Psp),                            %Pdx
+ * >>     subP   service_shm_handle::ssh_shm(%Pdx),        %Pax # %Pax == shm_offsetof_elem_com
+ * >>     movP   service_comdesc::scd_active_link(%R_service_com), %Pdx
+ * >>     lock   cmpxchgP %Pdx, <cg_service->s_active_list>  # movabs via %Pcx if necessary on x86_64
+ * >>     jne    .Lremove_service_com_tryhard
+ * >> .Lremove_service_com_tryhard_return:
  * >>
  * >>
  * >>
  * >> // Check if the command completed with a special status code
- * >>     cmpP   $SERVICE_COM_ST_SUCCESS, %Pax
+ * >>     cmpP   $SERVICE_COM_ST_SUCCESS, %R_fcall0P
  * >>     jne    .Lcom_special_return
  * >> .Lcom_special_return_resume:
  * >>
@@ -918,13 +927,71 @@ STATIC_ASSERT(IS_ALIGNED(offsetof(struct service_com, sc_generic.g_data), 4));
  * >>
  * >>
  * >>
+ * >> // Try-hard removal of commands from the active list
+ * >> // s.a. the `REMOVE()' documentation in `service::s_active_list'
+ * >> // NOTE: This sub-routine must preserve `%R_fcall0P', or restore its expected value by means of:
+ * >> //       >> movP   service_comdesc::scd_com::sc_code(%R_service_com), %R_fcall0P
+ * >> .Lremove_service_com_tryhard:
+ * >>     leaP   service_comdesc::scd_com(%R_service_com), %Pdx
+ * >>     movP   LOC_shm(%Psp),                            %Pax
+ * >>     subP   service_shm_handle::ssh_shm(%Pax),        %Pdx # %Pdx = shm_offsetof_elem_com
+ * >> // PREEMPTION_PUSHOFF();
+ * >>     movP   LOC_upm(%Psp), %Pax
+ * >>     movP   $full_sigset,  userprocmask::pm_sigmask(%Pax) # re-disable preemption (movabs via %Pdi on x86_64)
+ * >> // atomic_lock_acquire(&s_shm_lock);
+ * >> 1:  movl   $1, %eax
+ * >>     xchgl  %eax, <cg_service->s_shm_lock.a_lock>         # (movabs via %Pdi on x86_64)
+ * >>     testl  %eax, %eax
+ * >>     jz     2f
+ * >>     movP   $SYS_sched_yield, %Pax
+ * >>     syscall                                              # Or `call __i386_syscall' on i386
+ * >>     jmp    1b
+ * >> 2:  movP   <cg_service->s_active_list>, %Pax                       # uintptr_t first = s_active_list;                     # (movabs via %Pdi on x86_64)
+ * >> 3:  cmpP   %Pdx, %Pax                                              # 3: if (first == shm_offsetof_elem_com) {
+ * >>     jne    4f                                                      #     ...
+ * >>     movP   service_comdesc::scd_active_link(%R_service_com), %Pcx  #     %Pcx = next = elem->scd_active_link;
+ * >>     lock   cmpxchgP %Pcx, <cg_service->s_active_list>              #     if (!ATOMIC_CMPXCH(s_active_list, first, next))  # (movabs via %Pdi on x86_64)
+ * >>     jz     3b                                                      #     { first = s_active_list; goto 3b; }
+ * >>     jmp    6f                                                      # } else
+ * >> 4:  testP  %Pax, %Pax                                              # if (first != 0) {
+ * >>     jz     6f                                                      #     ...
+ * >> 5:  movP   <cg_service->s_shm>, %Pcx                               # 5:  %Pcx = s_shm;                          # (movabs via %Pdi on x86_64)
+ * >>     movP   service_shm_handle::ssh_base(%Pcx), %Pcx                #     %Pcx = s_shm->ssh_base;
+ * >>     addP   %Pax, %Pcx                                              #     %Pcx = &COMDESC_FROM_COM_OFFSET(first)->scd_com
+ * >>     movP   <service_comdesc::scd_active_link-                      #     ...
+ * >>             service_comdesc::scd_com>(%Pcx), %Pax                  #     %Pax = first = container_of(%Pcx, struct service_comdesc, scd_com)->scd_active_link
+ * >>     testP  %Pax, %Pax                                              #     if (first != 0) {
+ * >>     jz     6f                                                      #         ...
+ * >>     cmpP   %Pdx, %Pax                                              #         if (first != shm_offsetof_elem_com)
+ * >>     jne    5b                                                      #             goto 5b;
+ * >>     movP   service_comdesc::scd_active_link(%R_service_com), %Pax  #         %Pax = elem->scd_active_link;
+ * >>     movP   %Pax, <service_comdesc::scd_active_link-                #         ...
+ * >>                   service_comdesc::scd_com>(%Pcx)                  #         container_of(%Pcx, struct service_comdesc, scd_com)->scd_active_link = %Pax;
+ * >>                                                                    #     }
+ * >>                                                                    # }
+ * >> 6:
+ * >> // atomic_lock_release(&s_shm_lock);
+ * >>     movl   $0, <cg_service->s_shm_lock.a_lock>           # (movabs via %Pdi on x86_64)
+ * >> // PREEMPTION_POP();
+ * >>     movP   LOC_oldset(%Psp), %Pdx  # `sigset_t *oldset'
+ * >>     movP   LOC_upm(%Psp),    %Pax  # `struct userprocmask *upm'
+ * >>     movP   %Pdx, userprocmask::pm_sigmask(%Pax)
+ * >>     test   $USERPROCMASK_FLAG_HASPENDING, userprocmask::pm_flags(%Pax)
+ * >>     jnz    8f
+ * >> 7:  movP   service_comdesc::scd_com::sc_code(%R_service_com), %R_fcall0P   # Restore to expected value
+ * >>     jmp    .Lremove_service_com_tryhard_return
+ * >> 8:  call   chkuserprocmask
+ * >>     jmp    7b
+ * >>
+ * >>
+ * >>
+ * >>
  * >> // Handling for custom completion status codes
  * >> .Lcom_special_return:
- * >>     cmpP   $SERVICE_COM_ST_EXCEPT, %Pax
+ * >>     cmpP   $SERVICE_COM_ST_EXCEPT, %R_fcall0P
  * >>     je     1f
  * >>     # Normal return with non-zero errno
- * >>     negP   %Pax
- * >>     movP   %Pax, %R_fcall0P
+ * >>     negP   %R_fcall0P
  * >>     call   __set_errno_f
  * >>     jmp    .Lcom_special_return_resume
  * >> 1:  leaP   service_comdesc::scd_com::sc_except(%R_service_com), %R_fcall0P
@@ -948,7 +1015,7 @@ STATIC_ASSERT(IS_ALIGNED(offsetof(struct service_com, sc_generic.g_data), 4));
  * >>
  * >>
  * >>
- * >> // Remove command from wait queue on interrupt
+ * >> // Remove command from active+wait queue on interrupt
  * >> .Leh_com_waitfor_entry:
  * >>     movP   $<cg_service>,  %R_fcall0P
  * >>     movP   %R_service_com, %R_fcall1P
@@ -1069,6 +1136,8 @@ enum {
 	COM_SYM_Lall_buffers_are_in_band_preemption_reenabled,       /* `.Lall_buffers_are_in_band_preemption_reenabled'                [valid_if(cg_buf_paramc >= 2)] */
 	COM_SYM_Leh_com_waitfor_begin,                               /* `.Leh_com_waitfor_begin' */
 	COM_SYM_Leh_com_waitfor_end,                                 /* `.Leh_com_waitfor_end' */
+	COM_SYM_Lremove_service_com_tryhard,                         /* `.Lremove_service_com_tryhard' */
+	COM_SYM_Lremove_service_com_tryhard_return,                  /* `.Lremove_service_com_tryhard_return' */
 	COM_SYM_Lcom_special_return,                                 /* `.Lcom_special_return' */
 	COM_SYM_Lcom_special_return_resume,                          /* `.Lcom_special_return_resume' */
 	COM_SYM_Leh_free_xbuf_end,                                   /* `.Leh_free_xbuf_end'                                            [valid_if(cg_buf_paramc != 0)] */
@@ -1112,7 +1181,7 @@ struct com_reloc {
 /* Max number of relocations in com wrapper functions */
 /*[[[deemon print("#define COM_RELOC_MAXCOUNT ", (File from deemon)
 	.open("./wrapper.c", "r").read().decode("utf-8").count("comgen_reloc"));]]]*/
-#define COM_RELOC_MAXCOUNT 9
+#define COM_RELOC_MAXCOUNT 10
 /*[[[end]]]*/
 
 

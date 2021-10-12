@@ -319,8 +319,6 @@ struct service_com {
 	};
 };
 
-struct service_comdesc;
-LIST_HEAD(service_comdesc_list, service_comdesc);
 struct service_comdesc {
 	/* TODO: Com wrappers must allocate this structure and link it in `:s_active_list'
 	 *       for the duration of waiting for the command to complete. A list of active
@@ -338,8 +336,8 @@ struct service_comdesc {
 	 *       The invocation may have also just been the result of a sporadic  interrupt,
 	 *       in which case the EPOLL RPC must be re-scheduled. */
 
-	LIST_ENTRY(service_comdesc) scd_link; /* [lock(:s_active_lock)] List of active commands. */
-	struct service_com          scd_com;  /* The underlying command. */
+	uintptr_t          scd_active_link; /* [lock(:s_shm_lock)] List of active commands. */
+	struct service_com scd_com;         /* The underlying command. */
 };
 
 
@@ -531,9 +529,74 @@ struct service {
 	fd_t                              s_fd_srv;       /* [const][owned] File descriptor for the unix domain socket connected to the server. */
 	fd_t                              s_fd_shm;       /* [const][owned] File descriptor for the shared memory region. */
 
-	/* List of active commands (added-to/removed-from by com wrappers) */
-	struct atomic_lock                s_active_lock;     /* Lock for `s_active_list'. */
-	struct service_comdesc_list       s_active_list;     /* [0..n][lock(!PREEMPTION && s_active_lock)] List of active commands. */
+	/* List of active commands (added-to/removed-from by com wrappers)
+	 * NOTE: Only the head of the list can be modified/accessed atomically.
+	 *       All other elements may only  be accessed when `s_shm_lock'  is
+	 *       held, and preemption is disabled.
+	 * NOTE: `shm_offsetof_elem_com' is the SHM-relative offset of `elem->scd_com',
+	 *       and  is  the identical  value  as also  written  to `SHM->s_commands'.
+	 * >> INSERT(struct service_comdesc *elem, uintptr_t shm_offsetof_elem_com) {
+	 * >>     uintptr_t next;
+	 * >>     do {
+	 * >>         next = s_active_list;
+	 * >>         elem->scd_active_link = next;
+	 * >>         COMPILER_WRITE_BARRIER();
+	 * >>     } while (!ATOMIC_CMPXCH_WEAK(s_active_list, next, shm_offsetof_elem_com));
+	 * >> }
+	 * >>
+	 * >> REMOVE(struct service_comdesc *elem, uintptr_t shm_offsetof_elem_com) {
+	 * >>     uintptr_t next = elem->scd_active_link;
+	 * >>     if (ATOMIC_CMPXCH(s_active_list, shm_offsetof_elem_com, next))
+	 * >>         return;
+	 * >>     PREEMPTION_PUSHOFF();
+	 * >>     // This acquire also waits for `ABORT_ALL_COMMANDS_ON_HOP()' to finish
+	 * >>     atomic_lock_acquire(&s_shm_lock);
+	 * >>     COMPILER_BARRIER();
+	 * >> again_inner:
+	 * >>     uintptr_t first = s_active_list;
+	 * >>     if (first == shm_offsetof_elem_com) {
+	 * >>         next = elem->scd_active_link; // Must re-read here!
+	 * >>         if (!ATOMIC_CMPXCH(s_active_list, first, next))
+	 * >>             goto again_inner;
+	 * >>     } else if (first != 0) {
+	 * >> #define COMDESC_FROM_COM_OFFSET(offset) \
+	 * >>         ((struct service_comdesc *)(s_shm->ssh_base + ((offset) - offsetof(struct service_comdesc, scd_com))))
+	 * >>         // Search through list. Even if `elem' is never found, that's OK,
+	 * >>         // since this scenario can happen when `ABORT_ALL_COMMANDS_ON_HOP()'
+	 * >>         // was called.
+	 * >>         uintptr_t *piter, iter;
+	 * >>         piter = &COMDESC_FROM_COM_OFFSET(first)->scd_active_link;
+	 * >>         while ((iter = *piter) != 0) {
+	 * >>             if (iter == shm_offsetof_elem_com) {
+	 * >>                 next = elem->scd_active_link; // Must re-read here!
+	 * >>                 *piter = next;                // Unlink
+	 * >>                 break;
+	 * >>             }
+	 * >>             piter = &COMDESC_FROM_COM_OFFSET(iter)->scd_active_link;
+	 * >>         }
+	 * >>     }
+	 * >>     atomic_lock_release(&s_shm_lock);
+	 * >>     PREEMPTION_POP();
+	 * >> }
+	 * >>
+	 * >> ABORT_ALL_COMMANDS_ON_HOP(void) {
+	 * >>     uintptr_t chain;
+	 * >>     PREEMPTION_PUSHOFF();
+	 * >>     atomic_lock_acquire(&s_shm_lock);
+	 * >>     chain = ATOMIC_XCH(s_active_list, NULL);
+	 * >>     while (chain) {
+	 * >>         uintptr_t next;
+	 * >>         struct service_comdesc *iter;
+	 * >>         iter = COMDESC_FROM_COM_OFFSET(chain);
+	 * >>         next = iter->scd_active_link;
+	 * >>         FILL_IN_SERVICE_EXITED_EXCEPTION(iter);
+	 * >>         chain = next;
+	 * >>     }
+	 * >>     atomic_lock_release(&s_shm_lock);
+	 * >>     PREEMPTION_POP();
+	 * >> }
+	 */
+	uintptr_t                         s_active_list;  /* [0..n][lock(ATOMIC)] List of active commands. */
 
 
 	/* Helpers for keeping track of .text/.eh_frame allocations, as well as function name->address mappings. */

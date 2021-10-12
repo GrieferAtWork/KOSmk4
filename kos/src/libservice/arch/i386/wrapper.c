@@ -2124,6 +2124,55 @@ NOTHROW(FCALL comgen_serialize_inline_buffers)(struct com_generator *__restrict 
 
 
 /* Generate instructions:
+ * >>     movP   <cg_service->s_active_list>, %Pax                      # movabs via %Pcx if necessary on x86_64
+ * >> 1:  movP   %Pax, service_comdesc::scd_active_link(%R_service_com)
+ * >>     lock   cmpxchgP %Pdx, <cg_service->s_active_list>
+ * >>     jne    1b */
+PRIVATE NONNULL((1)) void
+NOTHROW(FCALL comgen_add_to_active)(struct com_generator *__restrict self) {
+	byte_t *loc_1;
+
+	/* >> movP   <cg_service->s_active_list>, %Pax # movabs via %Pcx if necessary on x86_64 */
+#ifdef __x86_64__
+	if (!_gen86_fitsl((uintptr_t)&self->cg_service->s_active_list)) {
+		comgen_instr(self, gen86_movabs_imm_r(&self->cg_txptr, &self->cg_service->s_active_list, GEN86_R_PCX));
+		comgen_instr(self, gen86_movP_b_r(&self->cg_txptr, GEN86_R_PCX, GEN86_R_PAX));
+	} else
+#endif /* __x86_64__ */
+	{
+		comgen_instr(self, gen86_movP_d_r(&self->cg_txptr,
+		                                  (uintptr_t)&self->cg_service->s_active_list,
+		                                  GEN86_R_PAX));
+	}
+
+	/* >> 1: */
+	loc_1 = self->cg_txptr;
+
+	/* >> movP   %Pax, service_comdesc::scd_active_link(%R_service_com) */
+	comgen_instr(self, gen86_movP_r_db(&self->cg_txptr, GEN86_R_PAX,
+	                                   offsetof(struct service_comdesc, scd_active_link),
+	                                   GEN86_R_service_com));
+
+	/* >> lock   cmpxchgP %Pdx, <cg_service->s_active_list> */
+	comgen_instr(self, gen86_lock(&self->cg_txptr));
+#ifdef __x86_64__
+	if (!_gen86_fitsl((uintptr_t)&self->cg_service->s_active_list)) {
+		comgen_instr(self, gen86_cmpxchgP_r_mod(&self->cg_txptr, gen86_modrm_b,
+		                                        GEN86_R_PDX, GEN86_R_PCX));
+	} else
+#endif /* __x86_64__ */
+	{
+		comgen_instr(self, gen86_cmpxchgP_r_mod(&self->cg_txptr, gen86_modrm_d, GEN86_R_PDX,
+		                                        (uintptr_t)&self->cg_service->s_active_list));
+	}
+
+	/* >> jne    1b */
+	comgen_instr(self, gen86_jcc8(&self->cg_txptr, GEN86_CC_NE, loc_1));
+}
+
+
+
+/* Generate instructions:
  * >>     movP   service_shm::s_commands(%R_shmbase), %Pax
  * >> 1:  movP   %Pax, service_comdesc::scd_com::sc_link(%R_service_com)
  * >>     lock   cmpxchgP %Pdx, service_shm::s_commands(%R_shmbase)
@@ -2342,8 +2391,8 @@ NOTHROW(FCALL comgen_wake_server)(struct com_generator *__restrict self)
  * >>     ja     .Lerr_com_abort_errno
  * >> #endif // !COM_GENERATOR_FEATURE_FEXCEPT
  * >>     # Check if the operation has completed
- * >>     movP   service_comdesc::scd_com::sc_code(%R_service_com), %Pax
- * >>     cmpP   $<cg_info.dl_comid>, %Pax
+ * >>     movP   service_comdesc::scd_com::sc_code(%R_service_com), %R_fcall0P
+ * >>     cmpP   $<cg_info.dl_comid>, %R_fcall0P
  * >>     je     .Lwaitfor_completion
  * >> .Leh_com_waitfor_end: */
 PRIVATE NONNULL((1)) void
@@ -2394,21 +2443,76 @@ NOTHROW(FCALL comgen_waitfor_command)(struct com_generator *__restrict self) {
 	}
 
 	/* Check if the operation has completed */
-	/* >> movP   service_comdesc::scd_com::sc_code(%R_service_com), %Pax */
+	/* >> movP   service_comdesc::scd_com::sc_code(%R_service_com), %R_fcall0P */
 	comgen_instr(self, gen86_movP_db_r(&self->cg_txptr,
 	                                   offsetof(struct service_comdesc, scd_com.sc_code),
-	                                   GEN86_R_service_com, GEN86_R_PAX));
+	                                   GEN86_R_service_com, GEN86_R_FCALL0P));
 
-	/* >> cmpP   $<cg_info.dl_comid>, %Pax */
+	/* >> cmpP   $<cg_info.dl_comid>, %R_fcall0P */
 	comgen_instr(self, gen86_cmpP_imm_r(&self->cg_txptr,
 	                                    self->cg_info.dl_comid,
-	                                    GEN86_R_PAX));
+	                                    GEN86_R_FCALL0P));
 
 	/* >> je     .Lwaitfor_completion */
 	comgen_instr(self, gen86_je(&self->cg_txptr, loc_Lwaitfor_completion));
 
 	/* >> .Leh_com_waitfor_end: */
 	comgen_defsym(self, COM_SYM_Leh_com_waitfor_end);
+}
+
+
+
+/* Generate instructions:
+ * >>     leaP   service_comdesc::scd_com(%R_service_com), %Pax
+ * >>     movP   LOC_shm(%Psp),                            %Pdx
+ * >>     subP   service_shm_handle::ssh_shm(%Pdx),        %Pax # %Pax == shm_offsetof_elem_com
+ * >>     movP   service_comdesc::scd_active_link(%R_service_com), %Pdx
+ * >>     lock   cmpxchgP %Pdx, <cg_service->s_active_list>           # movabs via %Pcx if necessary on x86_64
+ * >>     jne    .Lremove_service_com_tryhard
+ * >> .Lremove_service_com_tryhard_return: */
+PRIVATE NONNULL((1)) void
+NOTHROW(FCALL comgen_rem_from_active)(struct com_generator *__restrict self) {
+	/* >> leaP   service_comdesc::scd_com(%R_service_com), %Pax */
+	comgen_instr(self, gen86_leaP_db_r(&self->cg_txptr,
+	                                   offsetof(struct service_comdesc, scd_com),
+	                                   GEN86_R_service_com, GEN86_R_PAX));
+
+	/* >> movP   LOC_shm(%Psp), %Pdx */
+	comgen_instr(self, gen86_movP_db_r(&self->cg_txptr,
+	                                   comgen_spoffsetof_LOC_shm(self),
+	                                   GEN86_R_PSP, GEN86_R_PDX));
+
+	/* >> subP   service_shm_handle::ssh_shm(%Pdx), %Pax # %Pax == shm_offsetof_elem_com */
+	comgen_instr(self, gen86_subP_mod_r(&self->cg_txptr, gen86_modrm_db, GEN86_R_PAX,
+	                                    offsetof(struct service_shm_handle, ssh_shm),
+	                                    GEN86_R_PDX));
+
+	/* >> movP   service_comdesc::scd_active_link(%R_service_com), %Pdx */
+	comgen_instr(self, gen86_movP_db_r(&self->cg_txptr,
+	                                   offsetof(struct service_comdesc, scd_active_link),
+	                                   GEN86_R_service_com, GEN86_R_PDX));
+
+	/* >> lock   cmpxchgP %Pdx, <cg_service->s_active_list> # movabs via %Pcx if necessary on x86_64 */
+#ifdef __x86_64__
+	if (!_gen86_fitsl((uintptr_t)&self->cg_service->s_active_list)) {
+		comgen_instr(self, gen86_movabs_imm_r(&self->cg_txptr, &self->cg_service->s_active_list, GEN86_R_PCX));
+		comgen_instr(self, gen86_lock(&self->cg_txptr));
+		comgen_instr(self, gen86_cmpxchgP_r_mod(&self->cg_txptr, gen86_modrm_b,
+		                                        GEN86_R_PDX, GEN86_R_PCX));
+	} else
+#endif /* __x86_64__ */
+	{
+		comgen_instr(self, gen86_lock(&self->cg_txptr));
+		comgen_instr(self, gen86_cmpxchgP_r_mod(&self->cg_txptr, gen86_modrm_d, GEN86_R_PDX,
+		                                        (uintptr_t)&self->cg_service->s_active_list));
+	}
+
+	/* >> jne    .Lremove_service_com_tryhard */
+	comgen_instr(self, gen86_jccl_offset(&self->cg_txptr, GEN86_CC_NE, -4));
+	comgen_reloc(self, self->cg_txptr - 4, COM_R_PCREL32, COM_SYM_Lremove_service_com_tryhard);
+
+	/* >> .Lremove_service_com_tryhard_return: */
+	comgen_defsym(self, COM_SYM_Lremove_service_com_tryhard_return);
 }
 
 
@@ -3459,13 +3563,332 @@ NOTHROW(FCALL comgen_handle_errno_problems)(struct com_generator *__restrict sel
 
 
 
+/* Generate instructions:
+ * >> .Lremove_service_com_tryhard:
+ * >>     leaP   service_comdesc::scd_com(%R_service_com), %Pdx
+ * >>     movP   LOC_shm(%Psp),                            %Pax
+ * >>     subP   service_shm_handle::ssh_shm(%Pax),        %Pdx # %Pdx = shm_offsetof_elem_com
+ * >> // PREEMPTION_PUSHOFF();
+ * >>     movP   LOC_upm(%Psp), %Pax
+ * >>     movP   $full_sigset,  userprocmask::pm_sigmask(%Pax) # re-disable preemption (movabs via %Pdi on x86_64)
+ * >> // atomic_lock_acquire(&s_shm_lock);
+ * >> 1:  movl   $1, %eax
+ * >>     xchgl  %eax, <cg_service->s_shm_lock.a_lock>         # (movabs via %Pdi on x86_64)
+ * >>     testl  %eax, %eax
+ * >>     jz     2f
+ * >>     movP   $SYS_sched_yield, %Pax
+ * >>     syscall                                              # Or `call __i386_syscall' on i386
+ * >>     jmp    1b
+ * >> 2:  movP   <cg_service->s_active_list>, %Pax                       # uintptr_t first = s_active_list;                     # (movabs via %Pdi on x86_64)
+ * >> 3:  cmpP   %Pdx, %Pax                                              # 3: if (first == shm_offsetof_elem_com) {
+ * >>     jne    4f                                                      #     ...
+ * >>     movP   service_comdesc::scd_active_link(%R_service_com), %Pcx  #     %Pcx = next = elem->scd_active_link;
+ * >>     lock   cmpxchgP %Pcx, <cg_service->s_active_list>              #     if (!ATOMIC_CMPXCH(s_active_list, first, next))  # (movabs via %Pdi on x86_64)
+ * >>     jz     3b                                                      #     { first = s_active_list; goto 3b; }
+ * >>     jmp    6f                                                      # } else
+ * >> 4:  testP  %Pax, %Pax                                              # if (first != 0) {
+ * >>     jz     6f                                                      #     ...
+ * >> 5:  movP   <cg_service->s_shm>, %Pcx                               # 5:  %Pcx = s_shm;                          # (movabs via %Pdi on x86_64)
+ * >>     movP   service_shm_handle::ssh_base(%Pcx), %Pcx                #     %Pcx = s_shm->ssh_base;
+ * >>     addP   %Pax, %Pcx                                              #     %Pcx = &COMDESC_FROM_COM_OFFSET(first)->scd_com
+ * >>     movP   <service_comdesc::scd_active_link-                      #     ...
+ * >>             service_comdesc::scd_com>(%Pcx), %Pax                  #     %Pax = first = container_of(%Pcx, struct service_comdesc, scd_com)->scd_active_link
+ * >>     testP  %Pax, %Pax                                              #     if (first != 0) {
+ * >>     jz     6f                                                      #         ...
+ * >>     cmpP   %Pdx, %Pax                                              #         if (first != shm_offsetof_elem_com)
+ * >>     jne    5b                                                      #             goto 5b;
+ * >>     movP   service_comdesc::scd_active_link(%R_service_com), %Pax  #         %Pax = elem->scd_active_link;
+ * >>     movP   %Pax, <service_comdesc::scd_active_link-                #         ...
+ * >>                   service_comdesc::scd_com>(%Pcx)                  #         container_of(%Pcx, struct service_comdesc, scd_com)->scd_active_link = %Pax;
+ * >>                                                                    #     }
+ * >>                                                                    # }
+ * >> 6:
+ * >> // atomic_lock_release(&s_shm_lock);
+ * >>     movl   $0, <cg_service->s_shm_lock.a_lock>           # (movabs via %Pdi on x86_64)
+ * >> // PREEMPTION_POP();
+ * >>     movP   LOC_oldset(%Psp), %Pdx  # `sigset_t *oldset'
+ * >>     movP   LOC_upm(%Psp),    %Pax  # `struct userprocmask *upm'
+ * >>     movP   %Pdx, userprocmask::pm_sigmask(%Pax)
+ * >>     test   $USERPROCMASK_FLAG_HASPENDING, userprocmask::pm_flags(%Pax)
+ * >>     jnz    8f
+ * >> 7:  movP   service_comdesc::scd_com::sc_code(%R_service_com), %R_fcall0P   # Restore to expected value
+ * >>     jmp    .Lremove_service_com_tryhard_return
+ * >> 8:  call   chkuserprocmask
+ * >>     jmp    7b */
+PRIVATE NONNULL((1)) void
+NOTHROW(FCALL comgen_remove_service_com_tryhard)(struct com_generator *__restrict self) {
+	byte_t *loc_1;
+	int8_t *pdisp_2;
+	byte_t *loc_3;
+	int8_t *pdisp_4;
+	byte_t *loc_5;
+	int8_t *pdisp_6_1;
+	int8_t *pdisp_6_2;
+	int8_t *pdisp_6_3;
+	byte_t *loc_7;
+	int8_t *pdisp_8;
+
+	/* >> .Lremove_service_com_tryhard: */
+	comgen_defsym(self, COM_SYM_Lremove_service_com_tryhard);
+
+	/* >> leaP   service_comdesc::scd_com(%R_service_com), %Pdx */
+	gen86_leaP_db_r(&self->cg_txptr,
+	                offsetof(struct service_comdesc, scd_com),
+	                GEN86_R_service_com, GEN86_R_PDX);
+
+	/* >> movP   LOC_shm(%Psp), %Pax */
+	comgen_instr(self, gen86_movP_db_r(&self->cg_txptr,
+	                                   comgen_spoffsetof_LOC_shm(self),
+	                                   GEN86_R_PSP, GEN86_R_PAX));
+
+	/* >> subP   service_shm_handle::ssh_shm(%Pax), %Pdx # %Pdx = shm_offsetof_elem_com */
+	comgen_instr(self, gen86_subP_mod_r(&self->cg_txptr, gen86_modrm_db, GEN86_R_PDX,
+	                                    offsetof(struct service_shm_handle, ssh_shm),
+	                                    GEN86_R_PAX));
+
+	/* >> movP   LOC_upm(%Psp), %Pax */
+	comgen_instr(self, gen86_movP_db_r(&self->cg_txptr,
+	                                   comgen_spoffsetof_LOC_upm(self),
+	                                   GEN86_R_PSP, GEN86_R_PAX));
+
+	/* >> movP   $full_sigset,  userprocmask::pm_sigmask(%Pax) # re-disable preemption (movabs via %Pdi on x86_64) */
+#if defined(__x86_64__) && defined(__code_model_large__)
+	if (!_gen86_fitsl((uintptr_t)&full_sigset)) {
+		comgen_instr(self, gen86_movabs_imm_r(&self->cg_txptr, &full_sigset, GEN86_R_PDI));
+		comgen_instr(self, gen86_movP_r_db(&self->cg_txptr, GEN86_R_PDI,
+		                                   offsetof(struct userprocmask, pm_sigmask),
+		                                   GEN86_R_PAX));
+	} else
+#endif /* __x86_64__ && __code_model_large__ */
+	{
+		/* >> movP   $full_sigset,  userprocmask::pm_sigmask(%Pax) # re-disable preemption */
+		comgen_instr(self, gen86_movP_imm_db(&self->cg_txptr, (uintptr_t)&full_sigset,
+		                                     offsetof(struct userprocmask, pm_sigmask),
+		                                     GEN86_R_PAX));
+	}
+
+	/* >> 1: */
+	loc_1 = self->cg_txptr;
+
+	/* >> movl   $1, %eax */
+	comgen_instr(self, gen86_movl_imm_r(&self->cg_txptr, 1, GEN86_R_EAX));
+
+	/* >> xchgl  %eax, <cg_service->s_shm_lock.a_lock> # (movabs via %Pdi on x86_64) */
+#ifdef __x86_64__
+	if (!_gen86_fitsl((uintptr_t)&self->cg_service->s_shm_lock.a_lock)) {
+		comgen_instr(self, gen86_movabs_imm_r(&self->cg_txptr, &self->cg_service->s_shm_lock.a_lock, GEN86_R_PDI));
+		comgen_instr(self, gen86_xchgl_r_mod(&self->cg_txptr, gen86_modrm_b, GEN86_R_PAX, GEN86_R_PDI));
+	} else
+#endif /* __x86_64__ */
+	{
+		comgen_instr(self, gen86_xchgl_r_mod(&self->cg_txptr, gen86_modrm_d, GEN86_R_PAX,
+		                                     (uintptr_t)&self->cg_service->s_shm_lock.a_lock));
+	}
+
+	/* >> testl  %eax, %eax */
+	comgen_instr(self, gen86_testl_r_r(&self->cg_txptr, GEN86_R_EAX, GEN86_R_EAX));
+
+	/* >> jz     2f */
+	comgen_instr(self, gen86_jcc8_offset(&self->cg_txptr, GEN86_CC_Z, -1));
+	pdisp_2 = (int8_t *)(self->cg_txptr - 1);
+
+	/* >> movP   $SYS_sched_yield, %Pax */
+	comgen_instr(self, gen86_movP_imm_r(&self->cg_txptr, SYS_sched_yield, GEN86_R_PAX));
+
+	/* >> syscall # Or `call __i386_syscall' on i386 */
+	comgen_do_syscall_nx(self);
+
+	/* >> jmp    1b */
+	comgen_instr(self, gen86_jmp8(&self->cg_txptr, loc_1));
+
+	/* >> 2: */
+	*pdisp_2 += (int8_t)(uint8_t)(uintptr_t)(self->cg_txptr - (byte_t *)pdisp_2);
+
+	/* >> movP   <cg_service->s_active_list>, %Pax # (movabs via %Pdi on x86_64) */
+#ifdef __x86_64__
+	if (!_gen86_fitsl((uintptr_t)&self->cg_service->s_active_list)) {
+		comgen_instr(self, gen86_movabs_imm_r(&self->cg_txptr, &self->cg_service->s_active_list, GEN86_R_PDI));
+		comgen_instr(self, gen86_movP_b_r(&self->cg_txptr, GEN86_R_PDI, GEN86_R_PAX));
+	} else
+#endif /* __x86_64__ */
+	{
+		comgen_instr(self, gen86_movP_d_r(&self->cg_txptr,
+		                                  (uintptr_t)&self->cg_service->s_active_list,
+		                                  GEN86_R_PAX));
+	}
+
+	/* >> 3: */
+	loc_3 = self->cg_txptr;
+
+	/* >> cmpP   %Pdx, %Pax */
+	comgen_instr(self, gen86_cmpP_r_r(&self->cg_txptr, GEN86_R_PDX, GEN86_R_PAX));
+
+	/* >> jne    4f */
+	comgen_instr(self, gen86_jcc8_offset(&self->cg_txptr, GEN86_CC_NE, -1));
+	pdisp_4 = (int8_t *)(self->cg_txptr - 1);
+
+	/* >> movP   service_comdesc::scd_active_link(%R_service_com), %Pcx */
+	comgen_instr(self, gen86_movP_db_r(&self->cg_txptr,
+	                                   offsetof(struct service_comdesc, scd_active_link),
+	                                   GEN86_R_service_com, GEN86_R_PCX));
+
+	/* >> lock   cmpxchgP %Pcx, <cg_service->s_active_list> # (movabs via %Pdi on x86_64) */
+#ifdef __x86_64__
+	if (!_gen86_fitsl((uintptr_t)&self->cg_service->s_active_list)) {
+		comgen_instr(self, gen86_movabs_imm_r(&self->cg_txptr, &self->cg_service->s_active_list, GEN86_R_PDI));
+		comgen_instr(self, gen86_lock(&self->cg_txptr));
+		comgen_instr(self, gen86_cmpxchgP_r_mod(&self->cg_txptr, gen86_modrm_b, GEN86_R_PCX, GEN86_R_PDI));
+	} else
+#endif /* __x86_64__ */
+	{
+		comgen_instr(self, gen86_lock(&self->cg_txptr));
+		comgen_instr(self, gen86_cmpxchgP_r_mod(&self->cg_txptr, gen86_modrm_d, GEN86_R_PCX,
+		                                        (uintptr_t)&self->cg_service->s_active_list));
+	}
+
+	/* >> jz     3b */
+	comgen_instr(self, gen86_jcc8(&self->cg_txptr, GEN86_CC_Z, loc_3));
+
+	/* >> jmp    6f */
+	comgen_instr(self, gen86_jmp8_offset(&self->cg_txptr, -1));
+	pdisp_6_1 = (int8_t *)(self->cg_txptr - 1);
+
+	/* >> 4: */
+	*pdisp_4 += (int8_t)(uint8_t)(uintptr_t)(self->cg_txptr - (byte_t *)pdisp_4);
+
+	/* >> testP  %Pax, %Pax */
+	comgen_instr(self, gen86_testP_r_r(&self->cg_txptr, GEN86_R_PAX, GEN86_R_PAX));
+
+	/* >> jz     6f */
+	comgen_instr(self, gen86_jcc8_offset(&self->cg_txptr, GEN86_CC_Z, -1));
+	pdisp_6_2 = (int8_t *)(self->cg_txptr - 1);
+
+	/* >> 5: */
+	loc_5 = self->cg_txptr;
+
+	/* >> movP   <cg_service->s_shm>, %Pcx # (movabs via %Pdi on x86_64) */
+#ifdef __x86_64__
+	if (!_gen86_fitsl((uintptr_t)&self->cg_service->s_shm)) {
+		comgen_instr(self, gen86_movabs_imm_r(&self->cg_txptr, &self->cg_service->s_shm, GEN86_R_PDI));
+		comgen_instr(self, gen86_movP_b_r(&self->cg_txptr, GEN86_R_PDI, GEN86_R_PCX));
+	} else
+#endif /* __x86_64__ */
+	{
+		comgen_instr(self, gen86_movP_d_r(&self->cg_txptr,
+		                                  (uintptr_t)&self->cg_service->s_shm,
+		                                  GEN86_R_PCX));
+	}
+
+	/* >> movP   service_shm_handle::ssh_base(%Pcx), %Pcx */
+	comgen_instr(self, gen86_movP_db_r(&self->cg_txptr,
+	                                   offsetof(struct service_shm_handle, ssh_base),
+	                                   GEN86_R_PCX, GEN86_R_PCX));
+
+	/* >> addP   %Pax, %Pcx */
+	comgen_instr(self, gen86_addP_r_r(&self->cg_txptr, GEN86_R_PAX, GEN86_R_PCX));
+
+	/* >> movP   <service_comdesc::scd_active_link-service_comdesc::scd_com>(%Pcx), %Pax */
+	comgen_instr(self, gen86_movP_db_r(&self->cg_txptr,
+	                                   (ptrdiff_t)offsetof(struct service_comdesc, scd_active_link) -
+	                                   (ptrdiff_t)offsetof(struct service_comdesc, scd_com),
+	                                   GEN86_R_PCX, GEN86_R_PCX));
+
+	/* >> testP  %Pax, %Pax */
+	comgen_instr(self, gen86_testP_r_r(&self->cg_txptr, GEN86_R_PAX, GEN86_R_PAX));
+
+	/* >> jz     6f */
+	comgen_instr(self, gen86_jcc8_offset(&self->cg_txptr, GEN86_CC_Z, -1));
+	pdisp_6_3 = (int8_t *)(self->cg_txptr - 1);
+
+	/* >> cmpP   %Pdx, %Pax */
+	comgen_instr(self, gen86_cmpP_r_r(&self->cg_txptr, GEN86_R_PDX, GEN86_R_PAX));
+
+	/* >> jne    5b */
+	comgen_instr(self, gen86_jcc8(&self->cg_txptr, GEN86_CC_NE, loc_5));
+
+	/* >> movP   service_comdesc::scd_active_link(%R_service_com), %Pax */
+	comgen_instr(self, gen86_movP_db_r(&self->cg_txptr,
+	                                   offsetof(struct service_comdesc, scd_active_link),
+	                                   GEN86_R_service_com, GEN86_R_PAX));
+
+	/* >> movP   %Pax, <service_comdesc::scd_active_link-service_comdesc::scd_com>(%Pcx) */
+	comgen_instr(self, gen86_movP_r_db(&self->cg_txptr, GEN86_R_PAX,
+	                                   (ptrdiff_t)offsetof(struct service_comdesc, scd_active_link) -
+	                                   (ptrdiff_t)offsetof(struct service_comdesc, scd_com),
+	                                   GEN86_R_PCX));
+
+	/* >> 6: */
+	*pdisp_6_1 += (int8_t)(uint8_t)(uintptr_t)(self->cg_txptr - (byte_t *)pdisp_6_1);
+	*pdisp_6_2 += (int8_t)(uint8_t)(uintptr_t)(self->cg_txptr - (byte_t *)pdisp_6_2);
+	*pdisp_6_3 += (int8_t)(uint8_t)(uintptr_t)(self->cg_txptr - (byte_t *)pdisp_6_3);
+
+	/* >> movl   $0, <cg_service->s_shm_lock.a_lock> # (movabs via %Pdi on x86_64) */
+#ifdef __x86_64__
+	if (!_gen86_fitsl((uintptr_t)&self->cg_service->s_shm_lock.a_lock)) {
+		comgen_instr(self, gen86_movabs_imm_r(&self->cg_txptr, &self->cg_service->s_shm_lock.a_lock, GEN86_R_PDI));
+		comgen_instr(self, gen86_movl_imm_b(&self->cg_txptr, 0, GEN86_R_PDI));
+	} else
+#endif /* __x86_64__ */
+	{
+		comgen_instr(self, gen86_movl_imm_d(&self->cg_txptr, 0,
+		                                    (uintptr_t)&self->cg_service->s_shm_lock.a_lock));
+	}
+
+	/* >> movP   LOC_oldset(%Psp), %Pdx # `sigset_t *oldset' */
+	comgen_instr(self, gen86_movP_db_r(&self->cg_txptr,
+	                                   comgen_spoffsetof_LOC_oldset(self),
+	                                   GEN86_R_PSP, GEN86_R_PDX));
+
+	/* >> movP   LOC_upm(%Psp), %Pax # `struct userprocmask *upm' */
+	comgen_instr(self, gen86_movP_db_r(&self->cg_txptr,
+	                                   comgen_spoffsetof_LOC_upm(self),
+	                                   GEN86_R_PSP, GEN86_R_PAX));
+
+	/* >> movP   %Pdx, userprocmask::pm_sigmask(%Pax) */
+	comgen_instr(self, gen86_movP_r_db(&self->cg_txptr, GEN86_R_PDX,
+	                                   offsetof(struct userprocmask, pm_sigmask),
+	                                   GEN86_R_PAX));
+
+	/* >> test   $USERPROCMASK_FLAG_HASPENDING, userprocmask::pm_flags(%Pax) */
+	comgen_instr(self, gen86_testP_imm_mod(&self->cg_txptr, gen86_modrm_db,
+	                                       USERPROCMASK_FLAG_HASPENDING,
+	                                       offsetof(struct userprocmask, pm_flags),
+	                                       GEN86_R_PAX));
+
+	/* >> jnz    8f */
+	comgen_instr(self, gen86_jcc8_offset(&self->cg_txptr, GEN86_CC_NZ, -1));
+	pdisp_8 = (int8_t *)(self->cg_txptr - 1);
+
+	/* >> 7: */
+	loc_7 = self->cg_txptr;
+
+	/* >> movP   service_comdesc::scd_com::sc_code(%R_service_com), %R_fcall0P # Restore to expected value */
+	comgen_instr(self, gen86_movP_db_r(&self->cg_txptr,
+	                                   offsetof(struct service_comdesc, scd_com.sc_code),
+	                                   GEN86_R_service_com, GEN86_R_FCALL0P));
+
+	/* >> jmp    .Lremove_service_com_tryhard_return */
+	comgen_gen86_jmp_symbol(self, COM_SYM_Lremove_service_com_tryhard_return);
+
+	/* >> 8: */
+	*pdisp_8 += (int8_t)(uint8_t)(uintptr_t)
+	            (self->cg_txptr - (byte_t *)pdisp_8);
+
+	/* >> call   chkuserprocmask */
+	comgen_instr(self, gen86_call(&self->cg_txptr, &chkuserprocmask));
+
+	/* >> jmp    7b */
+	comgen_instr(self, gen86_jmp8(&self->cg_txptr, loc_7));
+}
+
+
+
 /* Generate   instructions:
  * >> .Lcom_special_return:
- * >>     cmpP   $SERVICE_COM_ST_EXCEPT, %Pax
+ * >>     cmpP   $SERVICE_COM_ST_EXCEPT, %R_fcall0P
  * >>     je     1f
  * >>     # Normal return with non-zero errno
- * >>     negP   %Pax
- * >>     movP   %Pax, %R_fcall0P
+ * >>     negP   %R_fcall0P
  * >>     call   __set_errno_f
  * >>     jmp    .Lcom_special_return_resume
  * >> 1:  leaP   service_comdesc::scd_com::sc_except(%R_service_com), %R_fcall0P
@@ -3492,21 +3915,18 @@ NOTHROW(FCALL comgen_custom_status_return)(struct com_generator *__restrict self
 	/* >> .Lcom_special_return: */
 	comgen_defsym(self, COM_SYM_Lcom_special_return);
 
-	/* >> cmpP   $SERVICE_COM_ST_EXCEPT, %Pax */
+	/* >> cmpP   $SERVICE_COM_ST_EXCEPT, %R_fcall0P */
 	comgen_instr(self, gen86_cmpP_imm_r(&self->cg_txptr,
 	                                    SERVICE_COM_ST_EXCEPT,
-	                                    GEN86_R_PAX));
+	                                    GEN86_R_FCALL0P));
 
 	/* >> je     1f */
 	comgen_instr(self, gen86_jcc8_offset(&self->cg_txptr, GEN86_CC_E, -1));
 	pdisp_1 = (int8_t *)(self->cg_txptr - 1);
 
 	/* Normal return with non-zero errno */
-	/* >> negP   %Pax */
-	comgen_instr(self, gen86_negP_r(&self->cg_txptr, GEN86_R_PAX));
-
-	/* >> movP   %Pax, %R_fcall0P */
-	comgen_instr(self, gen86_movP_r_r(&self->cg_txptr, GEN86_R_PAX, GEN86_R_FCALL0P));
+	/* >> negP   %R_fcall0P */
+	comgen_instr(self, gen86_negP_r(&self->cg_txptr, GEN86_R_FCALL0P));
 
 	/* >> call   __set_errno_f */
 	comgen_instr(self, gen86_call(&self->cg_txptr, &USED_SET_ERRNO));
@@ -3519,7 +3939,8 @@ NOTHROW(FCALL comgen_custom_status_return)(struct com_generator *__restrict self
 	            (self->cg_txptr - (byte_t *)pdisp_1);
 
 	/* >> leaP   service_comdesc::scd_com::sc_except(%R_service_com), %R_fcall0P */
-	comgen_instr(self, gen86_leaP_db_r(&self->cg_txptr, offsetof(struct service_comdesc, scd_com.sc_except),
+	comgen_instr(self, gen86_leaP_db_r(&self->cg_txptr,
+	                                   offsetof(struct service_comdesc, scd_com.sc_except),
 	                                   GEN86_R_service_com, GEN86_R_FCALL0P));
 
 	if (!(self->cg_features & COM_GENERATOR_FEATURE_FEXCEPT)) {
@@ -4062,13 +4483,9 @@ NOTHROW(FCALL comgen_compile)(struct com_generator *__restrict self) {
 	/* >> leaP   service_comdesc::scd_com(%R_service_com), %Pdx */
 	if unlikely(!comgen_txok1(self))
 		goto fail;
-	if (offsetof(struct service_comdesc, scd_com) == 0) {
-		gen86_movP_r_r(&self->cg_txptr, GEN86_R_service_com, GEN86_R_PDX);
-	} else {
-		gen86_leaP_db_r(&self->cg_txptr,
-		                offsetof(struct service_comdesc, scd_com),
-		                GEN86_R_service_com, GEN86_R_PDX);
-	}
+	gen86_leaP_db_r(&self->cg_txptr,
+	                offsetof(struct service_comdesc, scd_com),
+	                GEN86_R_service_com, GEN86_R_PDX);
 
 	/* >> movP   LOC_shm(%Psp), %R_shmbase */
 	if unlikely(!comgen_txok1(self))
@@ -4093,6 +4510,9 @@ NOTHROW(FCALL comgen_compile)(struct com_generator *__restrict self) {
 	if unlikely(!comgen_txok1(self))
 		goto fail;
 
+	/* Add the service_comdesc to the list of active commands `cg_service->s_active_list' */
+	comgen_add_to_active(self);
+
 	/* Insert the command into the server's pending list */
 #ifdef __x86_64__
 	comgen_schedule_command(self, GEN86_R_shmbase);
@@ -4114,6 +4534,11 @@ NOTHROW(FCALL comgen_compile)(struct com_generator *__restrict self) {
 	if unlikely(!comgen_txok1(self))
 		goto fail;
 	if unlikely(!comgen_ehok1(self))
+		goto fail;
+
+	/* Remove the service_comdesc to the list of active commands `cg_service->s_active_list' */
+	comgen_rem_from_active(self);
+	if unlikely(!comgen_txok1(self))
 		goto fail;
 
 	/* Check if the command completed with a special status code */
@@ -4202,6 +4627,11 @@ NOTHROW(FCALL comgen_compile)(struct com_generator *__restrict self) {
 		if unlikely(!comgen_ehok1(self))
 			goto fail;
 	}
+
+	/* Try-hard removal of commands from the active list */
+	comgen_remove_service_com_tryhard(self);
+	if (!comgen_compile_isok(self))
+		goto fail;
 
 	/* Handling for custom completion status codes */
 	comgen_custom_status_return(self);
