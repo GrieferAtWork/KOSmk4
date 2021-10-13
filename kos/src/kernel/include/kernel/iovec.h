@@ -86,6 +86,13 @@ struct iov_buffer {
 	struct iov_entry        iv_head; /* Override for `iv_entv[0]' */
 	size_t                  iv_last; /* Override for `iv_entv[iv_entc - 1].ive_size' */
 };
+#define iov_buffer_initone(self, base, size)                   \
+	((self)->iv_entc          = 1,                             \
+	 (self)->iv_entv          = &(self)->iv_head,              \
+	 (self)->iv_head.ive_base = (USER CHECKED byte_t *)(base), \
+	 (self)->iv_head.ive_size = (size),                        \
+	 (self)->iv_last          = (size))
+
 
 struct iov_physentry {
 	physaddr_t ive_base; /* [?..ive_size] Physical base address of the target buffer. */
@@ -104,6 +111,13 @@ struct iov_physbuffer {
 	__byte_t _iv_pad[__ALIGNOF_PHYSADDR_T__ - (__SIZEOF_IOV_PHYSBUFFER % __ALIGNOF_PHYSADDR_T__)]; /* ... */
 #endif /* (__SIZEOF_IOV_PHYSBUFFER % __ALIGNOF_PHYSADDR_T__) != 0 */
 };
+#define iov_physbuffer_initone(self, base, size)               \
+	((self)->iv_entc          = 1,                             \
+	 (self)->iv_entv          = &(self)->iv_head,              \
+	 (self)->iv_head.ive_base = (USER CHECKED byte_t *)(base), \
+	 (self)->iv_head.ive_size = (size),                        \
+	 (self)->iv_last          = (size))
+
 
 /* >> struct iov_entry ent;
  * >> IOV_BUFFER_FOREACH(ent, buf) {

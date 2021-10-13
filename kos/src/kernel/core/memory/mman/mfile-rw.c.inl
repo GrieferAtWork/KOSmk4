@@ -27,16 +27,18 @@
 //#define  DEFINE_mfile_tailread_p
 //#define   DEFINE_mfile_tailreadv
 //#define DEFINE_mfile_tailreadv_p
-//#define       DEFINE_mfile_write
+#define       DEFINE_mfile_write
 //#define     DEFINE_mfile_write_p
 //#define      DEFINE_mfile_writev
 //#define    DEFINE_mfile_writev_p
 //#define   DEFINE_mfile_tailwrite
 //#define DEFINE_mfile_tailwrite_p
-#define DEFINE_mfile_tailwritev
+//#define DEFINE_mfile_tailwritev
 //#define DEFINE_mfile_tailwritev_p
 #endif /* __INTELLISENSE__ */
 
+#include <kernel/fs/node.h>
+#include <kernel/fs/super.h>
 #include <kernel/iovec.h>
 #include <kernel/mman/mfile.h>
 #include <kernel/mman/mpart.h>
@@ -194,7 +196,7 @@ DECL_BEGIN
 #ifdef LOCAL_READING
 PUBLIC WUNUSED NONNULL((1)) size_t KCALL
 #else /* LOCAL_READING */
-PUBLIC NONNULL((1)) void KCALL
+PUBLIC NONNULL((1)) size_t KCALL
 #endif /* !LOCAL_READING */
 LOCAL_mfile_rw(struct mfile *__restrict self,
                LOCAL_buffer_t buffer,
@@ -240,9 +242,7 @@ again:
 	}
 	return result;
 #else /* defined(LOCAL_READING) && defined(LOCAL_TAILIO) */
-#ifdef LOCAL_READING
 	size_t result = 0;
-#endif /* LOCAL_READING */
 	PAGEDIR_PAGEALIGNED pos_t newpart_minaddr;
 	PAGEDIR_PAGEALIGNED pos_t newpart_maxaddr;
 	size_t io_bytes;
@@ -309,9 +309,7 @@ do_io_with_part:
 			LOCAL_buffer_advance(io_bytes);
 			num_bytes -= io_bytes;
 			offset += io_bytes;
-#ifdef LOCAL_READING
 			result += io_bytes;
-#endif /* LOCAL_READING */
 			goto again;
 		}
 		/* Create a new-, or extend an existing part within the bounds of the file */
@@ -471,6 +469,30 @@ destroy_new_part_and_try_again:
 		THROW(E_FSERROR_DISK_FULL);
 	}
 
+	/* Make sure that the file won't grow too large. */
+	if (mfile_isnode(self)) {
+		pos_t max_file_size;
+		max_file_size = mfile_asnode(self)->fn_super->fs_feat.sf_filesize_max;
+		if (offset > max_file_size) {
+			/* Impossible to write anything at this point! */
+			mfile_lock_endread(self);
+
+			/* If we were able to write ~something~ up to this
+			 * point, then don't throw a disk-full exception. */
+			if (result != 0)
+				return result;
+
+			/* If nothing was written, throw a disk-full exception. */
+			THROW(E_FSERROR_DISK_FULL);
+		}
+
+		/* Don't writ more than what can fit within the fs-specific disk limits. */
+		max_file_size -= offset;
+		if (num_bytes > (size_t)max_file_size)
+			num_bytes = (size_t)max_file_size;
+	}
+
+
 	/* Figure out the address range of the missing part. */
 	newpart_minaddr = offset;
 	newpart_maxaddr = offset + num_bytes - 1;
@@ -563,8 +585,8 @@ part_setcore:
 					while (!mpart_setcore_or_unlock(part, &unlock, &sc_data)) {
 						/* Re-acquire locks and make sure that nothing's changed. */
 						mfile_lock_write(self);
-						if (filesize != (pos_t)atomic64_read(&self->mf_filesize) ||
-						    mfile_isanon(self) || (self->mf_flags & (MFILE_F_DELETED | MFILE_F_READONLY | MFILE_F_FIXEDFILESIZE)) ||
+						if (filesize != (pos_t)atomic64_read(&self->mf_filesize) || mfile_isanon(self) ||
+						    (self->mf_flags & (MFILE_F_DELETED | MFILE_F_READONLY | MFILE_F_FIXEDFILESIZE)) ||
 						    part != mpart_tree_locate(self->mf_parts, newpart_minaddr)) {
 							mfile_lock_endwrite_f(self);
 							mpart_setcore_data_fini(&sc_data);
@@ -591,8 +613,8 @@ part_setcore:
 					while (!mpart_unsharecow_or_unlock(part, &unlock, &uc_data, reladdr, io_bytes)) {
 						/* Re-acquire locks and make sure that nothing's changed. */
 						mfile_lock_write(self);
-						if (filesize != (pos_t)atomic64_read(&self->mf_filesize) ||
-						    mfile_isanon(self) || (self->mf_flags & (MFILE_F_DELETED | MFILE_F_READONLY | MFILE_F_FIXEDFILESIZE)) ||
+						if (filesize != (pos_t)atomic64_read(&self->mf_filesize) || mfile_isanon(self) ||
+						    (self->mf_flags & (MFILE_F_DELETED | MFILE_F_READONLY | MFILE_F_FIXEDFILESIZE)) ||
 						    part != mpart_tree_locate(self->mf_parts, newpart_minaddr)) {
 							mfile_lock_endwrite_f(self);
 							mpart_unsharecow_data_fini(&uc_data);
@@ -708,6 +730,7 @@ part_setcore:
 		LOCAL_buffer_advance(io_bytes);
 		num_bytes -= io_bytes;
 		offset += io_bytes;
+		result += io_bytes;
 		goto again;
 	}
 
@@ -840,6 +863,10 @@ restart_after_extendpart_tail:
 			_mfile_buffered_tailwrite(self, buffer, num_bytes, offset);
 #elif defined(DEFINE_mfile_tailwritev)
 			_mfile_buffered_tailwritev(self, buffer, buf_offset, num_bytes, offset);
+#elif defined(DEFINE_mfile_write)
+			_mfile_buffered_write(self, buffer, num_bytes, offset);
+#elif defined(DEFINE_mfile_writev)
+			_mfile_buffered_writev(self, buffer, buf_offset, num_bytes, offset);
 #else /* ... */
 #error "Invalid configuration"
 #endif /* !... */
@@ -865,6 +892,16 @@ restart_after_extendpart_tail:
 		LOCAL_buffer_advance(io_bytes);
 		num_bytes -= io_bytes;
 		offset += io_bytes;
+		result += io_bytes;
+
+		/* Because we altered the file's size, we must also set the ATTRCHANGED flag. */
+		{
+			uintptr_t old_flags;
+			old_flags = ATOMIC_FETCHOR(self->mf_flags, MFILE_F_ATTRCHANGED);
+			if (!(old_flags & MFILE_F_ATTRCHANGED) && self->mf_ops->mo_changed)
+				(*self->mf_ops->mo_changed)(self, old_flags, old_flags | MFILE_F_ATTRCHANGED);
+		}
+
 		goto again;
 extend_undo:
 		mpart_truncate_restore(part, old_part_size);
@@ -1047,6 +1084,7 @@ handle_part_insert_failure:
 #ifdef LOCAL_BUFFER_IS_PHYS
 			goto again;
 #else /* LOCAL_BUFFER_IS_PHYS */
+			result += num_bytes;
 			goto done;
 #endif /* !LOCAL_BUFFER_IS_PHYS */
 		}
@@ -1087,6 +1125,7 @@ handle_part_insert_failure:
 			if (old_flags != new_flags && self->mf_ops->mo_changed)
 				(*self->mf_ops->mo_changed)(self, old_flags, new_flags);
 		}
+		result += num_bytes;
 	} /* Scope.... */
 
 	/* Since we've just written _all_ of the trailing data, we're
@@ -1094,10 +1133,7 @@ handle_part_insert_failure:
 #endif /* !LOCAL_READING */
 
 done:
-#ifdef LOCAL_READING
 	return result;
-#endif /* LOCAL_READING */
-	;
 #undef offset
 #endif /* !LOCAL_READING || !LOCAL_TAILIO */
 }

@@ -1,0 +1,116 @@
+/* Copyright (c) 2019-2021 Griefer@Work                                       *
+ *                                                                            *
+ * This software is provided 'as-is', without any express or implied          *
+ * warranty. In no event will the authors be held liable for any damages      *
+ * arising from the use of this software.                                     *
+ *                                                                            *
+ * Permission is granted to anyone to use this software for any purpose,      *
+ * including commercial applications, and to alter it and redistribute it     *
+ * freely, subject to the following restrictions:                             *
+ *                                                                            *
+ * 1. The origin of this software must not be misrepresented; you must not    *
+ *    claim that you wrote the original software. If you use this software    *
+ *    in a product, an acknowledgement (see the following) in the product     *
+ *    documentation is required:                                              *
+ *    Portions Copyright (c) 2019-2021 Griefer@Work                           *
+ * 2. Altered source versions must be plainly marked as such, and must not be *
+ *    misrepresented as being the original software.                          *
+ * 3. This notice may not be removed or altered from any source distribution. *
+ */
+#ifndef GUARD_KERNEL_INCLUDE_KERNEL_FS_DEVNODE_H
+#define GUARD_KERNEL_INCLUDE_KERNEL_FS_DEVNODE_H 1
+
+#include <kernel/compiler.h>
+
+#ifndef CONFIG_USE_NEW_FS
+#include <fs/node.h>
+#else /* !CONFIG_USE_NEW_FS */
+#include <kernel/fs/node.h>
+#include <kernel/types.h>
+
+#include <kos/io.h>
+
+#ifdef __CC__
+DECL_BEGIN
+
+struct fdevnode;
+struct fdevnode_ops {
+	struct fnode_ops dno_node; /* FNode operators */
+	/* More operators would go here... */
+};
+
+
+struct fdevnode
+#ifndef __WANT_FS_INLINE_STRUCTURES
+    : fnode                /* Underlying file-node */
+#endif /* !__WANT_FS_INLINE_STRUCTURES */
+{
+#ifdef __WANT_FS_INLINE_STRUCTURES
+	struct fnode dn_node;  /* Underlying file-node */
+#define _fdevnode_asnode(x) &(x)->dn_node
+#define _fdevnode_node_     dn_node.
+#else /* __WANT_FS_INLINE_STRUCTURES */
+#define _fdevnode_asnode(x) x
+#define _fdevnode_node_    /* nothing */
+#endif /* !__WANT_FS_INLINE_STRUCTURES */
+	dev_t        dn_devno; /* [const] Device number. */
+};
+
+
+/* Return a pointer to device-node operators of `self' */
+#define fdevnode_getops(self) \
+	((struct fdevnode_ops const *)__COMPILER_REQTYPE(struct fdevnode const *, self)->_fdevnode_node_ _fnode_file_ mf_ops)
+#define _fdevnode_assert_ops_(ops) \
+	_fnode_assert_ops_(&(ops)->dno_node)
+
+#define fdevnode_v_destroy fnode_v_destroy
+#define fdevnode_v_wrattr  fnode_v_wrattr_noop
+
+
+/* Initialize common+basic fields. The caller must still initialize:
+ *  - self->_fdevnode_node_ _fnode_file_ mf_filesize
+ *  - self->_fdevnode_node_ _fnode_file_ mf_atime
+ *  - self->_fdevnode_node_ _fnode_file_ mf_mtime
+ *  - self->_fdevnode_node_ _fnode_file_ mf_ctime
+ *  - self->_fdevnode_node_ fn_uid
+ *  - self->_fdevnode_node_ fn_gid
+ *  - self->_fdevnode_node_ fn_allnodes
+ *  - self->_fdevnode_node_ fn_supent
+ *  - self->_fdevnode_node_ fn_nlink
+ *  - self->_fdevnode_node_ fn_ino
+ *  - self->_fdevnode_node_ fn_mode (with something or'd with S_IFCHR or S_IFBLK)
+ *  - self->dn_devno
+ *  - self->dn_name
+ * @param: struct fdevnode     *self:   Regular node to initialize.
+ * @param: struct fdevnode_ops *ops:    Regular file operators.
+ * @param: struct fsuper       *super:  Filesystem superblock. */
+#define _fdevnode_init(self, ops, super)                                                                               \
+	(_fnode_assert_ops_(ops) _fnode_init_common(_fdevnode_asnode(self)),                                               \
+	 (self)->_fdevnode_node_ _fnode_file_ mf_parts = __NULLPTR,                                                        \
+	 (self)->_fdevnode_node_ _fnode_file_ mf_flags = (super)->fs_root._fdirnode_node_ _fnode_file_ mf_flags &          \
+	                                                 (MFILE_F_DELETED | MFILE_F_PERSISTENT |                           \
+	                                                  MFILE_F_READONLY | MFILE_F_NOATIME |                             \
+	                                                  MFILE_F_NOMTIME),                                                \
+	 (self)->_fdevnode_node_ _fnode_file_ mf_ops        = &(ops)->dno_node.no_file,                                    \
+	 (self)->_fdevnode_node_ _fnode_file_ mf_blockshift = (super)->fs_root._fdirnode_node_ _fnode_file_ mf_blockshift, \
+	 (self)->_fdevnode_node_ _fnode_file_ mf_part_amask = (super)->fs_root._fdirnode_node_ _fnode_file_ mf_part_amask, \
+	 (self)->_fdevnode_node_ fn_super                   = incref(super))
+#define _fdevnode_cinit(self, ops, super)                                                                              \
+	(_fnode_assert_ops_(ops) _fnode_cinit_common(_fdevnode_asnode(self)),                                              \
+	 __hybrid_assert((self)->mf_parts == __NULLPTR),                                                                   \
+	 (self)->_fdevnode_node_ _fnode_file_ mf_flags = (super)->fs_root._fdirnode_node_ _fnode_file_ mf_flags &          \
+	                                                 (MFILE_F_DELETED | MFILE_F_PERSISTENT |                           \
+	                                                  MFILE_F_READONLY | MFILE_F_NOATIME |                             \
+	                                                  MFILE_F_NOMTIME),                                                \
+	 (self)->_fdevnode_node_ _fnode_file_ mf_ops        = &(ops)->dno_node.no_file,                                    \
+	 (self)->_fdevnode_node_ _fnode_file_ mf_blockshift = (super)->fs_root._fdirnode_node_ _fnode_file_ mf_blockshift, \
+	 (self)->_fdevnode_node_ _fnode_file_ mf_part_amask = (super)->fs_root._fdirnode_node_ _fnode_file_ mf_part_amask, \
+	 (self)->_fdevnode_node_ fn_super                   = incref(super))
+/* Finalize a partially initialized `struct fdevnode' (as initialized by `_fdevnode_init()') */
+#define _fdevnode_fini(self) decref_nokill((self)->_fdevnode_node_ fn_super)
+
+DECL_END
+#endif /* __CC__ */
+#endif /* CONFIG_USE_NEW_FS */
+
+#endif /* !GUARD_KERNEL_INCLUDE_KERNEL_FS_DEVNODE_H */

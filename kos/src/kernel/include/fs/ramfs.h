@@ -22,6 +22,11 @@
 
 #include <kernel/compiler.h>
 
+#ifdef CONFIG_USE_NEW_FS
+
+/* TODO */
+
+#else /* CONFIG_USE_NEW_FS */
 #include <fs/node.h>
 #include <kernel/types.h>
 
@@ -81,5 +86,6 @@ devfs_insert(USER CHECKED char const *name,
 #endif /* __CC__ */
 
 DECL_END
+#endif /* !CONFIG_USE_NEW_FS */
 
 #endif /* !GUARD_KERNEL_INCLUDE_FS_RAMFS_H */

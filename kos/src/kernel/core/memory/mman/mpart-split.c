@@ -1240,14 +1240,14 @@ clear_hipart_changed_bit:
 			} while (!SLIST_EMPTY(&dead_mfutex));
 		}
 
-		mpartmeta_ftxlock_endwrite_f(lometa); /* Acquired above (in `Step #3') */
+		_mpartmeta_ftxlock_endwrite(lometa); /* Acquired above (in `Step #3') */
 
 		/* We're still holding references to  _all_ of the futex objects  that
 		 * we managed to transfer over into the himeta-tree. As such, we still
 		 * have to drop all of those references */
 		if (himeta->mpm_ftx != NULL)
 			mfutex_tree_foreach_decref_or_destroy_later(himeta->mpm_ftx);
-		mpartmeta_ftxlock_endwrite_f(himeta);
+		_mpartmeta_ftxlock_endwrite(himeta);
 
 		/* Must reap dead futex objects once again, but this time only have to
 		 * do so because we've just released our locks to the meta-data  futex

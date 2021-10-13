@@ -84,7 +84,7 @@ NOTHROW(CC com_is_pending)(byte_t const *__restrict shm_base,
 }
 
 /* Shutdown the given service client in response to a remote HUP event. */
-PRIVATE NONNULL((1)) void
+PRIVATE NOPREEMPT NONNULL((1)) void
 NOTHROW(CC shutdown_client)(struct service *__restrict self) {
 	uintptr_t comaddr, pending_chain;
 	byte_t *shm_base;

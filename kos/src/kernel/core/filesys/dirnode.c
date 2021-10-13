@@ -17,26 +17,36 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_CORE_FILESYS_FDIRNODE_C
-#define GUARD_KERNEL_CORE_FILESYS_FDIRNODE_C 1
+#ifndef GUARD_KERNEL_CORE_FILESYS_DIRNODE_C
+#define GUARD_KERNEL_CORE_FILESYS_DIRNODE_C 1
 #define _KOS_SOURCE 1
 
 #include <kernel/compiler.h>
 
-#include <kernel/fs/fdirent.h>
-#include <kernel/fs/fdirnode.h>
+#include <kernel/fs/dirent.h>
+#include <kernel/fs/dirnode.h>
+#include <kernel/fs/node.h>
 
 #include <kos/except.h>
 
 #include <assert.h>
 #include <stddef.h>
+#include <string.h>
 
 DECL_BEGIN
 
-/* Default operators for `fdirnode_ops::dno_*' */
+#if !defined(NDEBUG) && !defined(NDEBUG_FINI)
+#define DBG_memset memset
+#else /* !NDEBUG && !NDEBUG_FINI */
+#define DBG_memset(...) (void)0
+#endif /* NDEBUG || NDEBUG_FINI */
+
+/* Default operators for `struct fdirnode_ops' */
 PUBLIC NOBLOCK NONNULL((1)) void
-NOTHROW(KCALL fdirnode_v_destroy)(struct fdirnode *__restrict self) {
-	decref_unlikely(self->dn_parent);
+NOTHROW(KCALL fdirnode_v_destroy)(struct mfile *__restrict self) {
+	struct fdirnode *me = mfile_asdir(self);
+	xdecref_unlikely(me->dn_parent);
+	DBG_memset(&me->dn_parent, 0xcc, sizeof(me->dn_parent));
 	fnode_v_destroy(self);
 }
 
@@ -56,7 +66,7 @@ fdirnode_lookup_fnode(struct fdirnode *__restrict self,
 	if (!dirent)
 		return NULL;
 	{
-		FINALLY_DECREF_UNLIKELY(dirent);
+		FINALLY_DECREF(dirent);
 		result = (*dirent->fd_ops->fdo_opennode)(dirent, self);
 	}
 	return result;
@@ -140,4 +150,4 @@ fdirnode_rename(struct fdirnode *__restrict self,
 
 DECL_END
 
-#endif /* !GUARD_KERNEL_CORE_FILESYS_FDIRNODE_C */
+#endif /* !GUARD_KERNEL_CORE_FILESYS_DIRNODE_C */

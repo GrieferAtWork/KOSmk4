@@ -260,16 +260,16 @@ struct mpart {
 	 *          its remaining  nodes, and  those that  it couldn't  unbind  will
 	 *          have  been added to the dead-nodes chain of the associated part. */
 #ifdef __WANT_MPART_INIT
-#if defined(__WANT_MPART__mp_nodlsts) || defined(__WANT_MPART__mp_dtplop)
+#if defined(__WANT_MPART__mp_nodlsts) || defined(__WANT_MPART__mp_dtplop) || defined(__WANT_MPART__mp_anXplop)
 #define MPART_INIT_mp_copy(...)    {{ __VA_ARGS__
 #define MPART_INIT_mp_share(...)   __VA_ARGS__ }}
-#else /* __WANT_MPART__mp_nodlsts || __WANT_MPART__mp_dtplop */
+#else /* __WANT_MPART__mp_nodlsts || __WANT_MPART__mp_dtplop || __WANT_MPART__mp_anXplop */
 #define MPART_INIT_mp_copy(...)    __VA_ARGS__
 #define MPART_INIT_mp_share(...)   __VA_ARGS__
-#endif /* !__WANT_MPART__mp_nodlsts && !__WANT_MPART__mp_dtplop */
+#endif /* !__WANT_MPART__mp_nodlsts && !__WANT_MPART__mp_dtplop && !__WANT_MPART__mp_anXplop */
 #define MPART_INIT_mp_lockops(...) __VA_ARGS__
 #endif /* __WANT_MPART_INIT */
-#if defined(__WANT_MPART__mp_nodlsts) || defined(__WANT_MPART__mp_dtplop)
+#if defined(__WANT_MPART__mp_nodlsts) || defined(__WANT_MPART__mp_dtplop) || defined(__WANT_MPART__mp_anXplop)
 	union {
 		struct {
 			struct mnode_list     mp_copy;      /* [0..n][lock(MPART_F_LOCKBIT)] List of copy-on-write mappings. */
@@ -281,11 +281,15 @@ struct mpart {
 #ifdef __WANT_MPART__mp_dtplop
 		struct postlockop        _mp_dtplop;     /* Used internally */
 #endif /* __WANT_MPART__mp_dtplop */
+#ifdef __WANT_MPART__mp_anXplop
+		Tobpostlockop(mfile)     _mp_anfplop;
+		Tobpostlockop(mpart)     _mp_anpplop;
+#endif /* __WANT_MPART__mp_anXplop */
 	};
-#else /* __WANT_MPART__mp_nodlsts || __WANT_MPART__mp_dtplop */
+#else /* __WANT_MPART__mp_nodlsts || __WANT_MPART__mp_dtplop || __WANT_MPART__mp_anXplop */
 	struct mnode_list             mp_copy;      /* [0..n][lock(MPART_F_LOCKBIT)] List of copy-on-write mappings. */
 	struct mnode_list             mp_share;     /* [0..n][lock(MPART_F_LOCKBIT)] List of shared mappings. */
-#endif /* !__WANT_MPART__mp_nodlsts && !__WANT_MPART__mp_dtplop */
+#endif /* !__WANT_MPART__mp_nodlsts && !__WANT_MPART__mp_dtplop && !__WANT_MPART__mp_anXplop */
 	Toblockop_slist(mpart)        mp_lockops;   /* [0..n][lock(ATOMIC)] List of lock operations. (s.a. `mpart_lockops_reap()') */
 #ifdef __WANT_MPART__mp_lopall
 #ifdef __WANT_MPART_INIT

@@ -23,10 +23,10 @@
 #include <kernel/compiler.h>
 
 #ifdef CONFIG_USE_NEW_FS
-#include <kernel/fs/fdirnode.h>
-#include <kernel/fs/fnode.h>
-#include <kernel/fs/fregnode.h>
-
+#include <kernel/fs/dirnode.h>
+#include <kernel/fs/node.h>
+#include <kernel/fs/regnode.h>
+#include <kernel/fs/lnknode.h>
 
 #else /* CONFIG_USE_NEW_FS */
 #include <dev/block.h>

@@ -17,8 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_INCLUDE_KERNEL_FS_FDIRENT_H
-#define GUARD_KERNEL_INCLUDE_KERNEL_FS_FDIRENT_H 1
+#ifndef GUARD_KERNEL_INCLUDE_KERNEL_FS_DIRENT_H
+#define GUARD_KERNEL_INCLUDE_KERNEL_FS_DIRENT_H 1
 
 #include <kernel/compiler.h>
 
@@ -30,6 +30,7 @@
 #ifdef __CC__
 DECL_BEGIN
 
+struct fnode;
 struct fdirent;
 struct fdirnode;
 
@@ -56,6 +57,7 @@ struct fdirent {
 	struct fdirent_ops const               *fd_ops;      /* [1..1][const] Operators. */
 	ino_t                                   fd_ino;      /* [const] INode number of this directory entry.
 	                                                      * WARNING: This value becomes invalid if the entry/file is deleted! */
+	uintptr_t                               fd_hash;     /* [const][== fdirent_hash(fd_name, fd_namelen)] Hash of this directory entry. */
 	u16                                     fd_namelen;  /* [const][!0] Length of the directory entry name (in characters). */
 	unsigned char                           fd_type;     /* [const] Directory entry type (one of `DT_*') */
 	COMPILER_FLEXIBLE_ARRAY(/*utf-8*/ char, fd_name);    /* [const][fd_namelen] Directory entry name. (NUL-terminated) */
@@ -64,19 +66,19 @@ struct fdirent {
 #define fdirent_destroy(self) ((*(self)->fd_ops->fdo_destroy)(self))
 DEFINE_REFCOUNT_FUNCTIONS(struct fdirent, fd_refcnt, fdirent_destroy)
 
+/* Open the node associated with this directory entry. */
 #define fdirent_opennode(self, dir) ((*(self)->fd_ops->fdo_opennode)(self, dir))
 
 /* Return the hash of a given directory entry name.
  * This function is used by various APIs related to file lookup.
  * @throw: E_SEGFAULT: Failed to access the given `name'. */
-FUNDEF WUNUSED NONNULL((1)) uintptr_t FCALL
+FUNDEF ATTR_PURE WUNUSED NONNULL((1)) uintptr_t FCALL
 fdirent_hash(CHECKED USER /*utf-8*/ char const *__restrict name, u16 namelen)
 		THROWS(E_SEGFAULT);
-#define fdirent_hashof(ent) fdirent_hash((ent)->fd_name, (ent)->fd_namelen)
-
+#define FDIRENT_EMPTY_HASH 0 /* == fdirent_hash("",0) */
 
 DECL_END
 #endif /* __CC__ */
 #endif /* CONFIG_USE_NEW_FS */
 
-#endif /* !GUARD_KERNEL_INCLUDE_KERNEL_FS_FDIRENT_H */
+#endif /* !GUARD_KERNEL_INCLUDE_KERNEL_FS_DIRENT_H */

@@ -23,6 +23,428 @@
 
 #include <kernel/compiler.h>
 
+#ifdef CONFIG_USE_NEW_FS
+#include <kernel/fs/devnode.h>
+#include <kernel/fs/node.h>
+#include <kernel/fs/super.h>
+#include <kernel/handle-proto.h>
+#include <kernel/handle.h>
+#include <kernel/iovec.h>
+#include <kernel/mman/mfile.h>
+#include <sched/task.h>
+
+#include <hybrid/align.h>
+
+#include <kos/except.h>
+#include <kos/except/reason/fs.h>
+#include <kos/except/reason/inval.h>
+#include <sys/stat.h>
+
+#include <stddef.h>
+#include <string.h>
+
+DECL_BEGIN
+
+/* DATABLOCK HANDLE OPERATIONS */
+DEFINE_HANDLE_REFCNT_FUNCTIONS(mfile, struct mfile);
+
+/************************************************************************/
+/* Handle-specific operator wrappers for `struct mfile'                 */
+/************************************************************************/
+
+INTERN WUNUSED NONNULL((1)) size_t KCALL
+handle_mfile_read(struct mfile *__restrict self,
+                  USER CHECKED void *dst,
+                  size_t num_bytes, iomode_t mode)
+		THROWS(...) {
+	struct mfile_stream_ops const *stream;
+	stream = self->mf_ops->mo_stream;
+	if likely(stream != NULL) {
+		if likely(stream->mso_read)
+			return (*stream->mso_read)(self, dst, num_bytes, mode);
+		if likely(stream->mso_readv) {
+			struct iov_buffer iov;
+			iov_buffer_initone(&iov, dst, num_bytes);
+			return (*stream->mso_readv)(self, &iov, num_bytes, mode);
+		}
+	}
+	THROW(E_FSERROR_UNSUPPORTED_OPERATION,
+	      E_FILESYSTEM_OPERATION_READ);
+}
+
+INTERN WUNUSED NONNULL((1)) size_t KCALL
+handle_mfile_write(struct mfile *__restrict self,
+                   USER CHECKED void const *src,
+                   size_t num_bytes, iomode_t mode)
+		THROWS(...) {
+	struct mfile_stream_ops const *stream;
+	stream = self->mf_ops->mo_stream;
+	if likely(stream != NULL) {
+		if likely(stream->mso_write)
+			return (*stream->mso_write)(self, src, num_bytes, mode);
+		if likely(stream->mso_writev) {
+			struct iov_buffer iov;
+			iov_buffer_initone(&iov, src, num_bytes);
+			return (*stream->mso_writev)(self, &iov, num_bytes, mode);
+		}
+	}
+	if likely((mode & IO_APPEND) && !(self->mf_flags & MFILE_F_NOUSRIO))
+		return mfile_tailwrite(self, src, num_bytes);
+	THROW(E_FSERROR_UNSUPPORTED_OPERATION,
+	      E_FILESYSTEM_OPERATION_WRITE);
+}
+
+INTERN WUNUSED NONNULL((1)) size_t KCALL
+handle_mfile_pread(struct mfile *__restrict self,
+                   USER CHECKED void *dst, size_t num_bytes,
+                   pos_t addr, iomode_t mode)
+		THROWS(...) {
+	struct mfile_stream_ops const *stream;
+	stream = self->mf_ops->mo_stream;
+	if (stream != NULL) {
+		if (stream->mso_pread)
+			return (*stream->mso_pread)(self, dst, num_bytes, addr, mode);
+		if (stream->mso_preadv) {
+			struct iov_buffer iov;
+			iov_buffer_initone(&iov, dst, num_bytes);
+			return (*stream->mso_preadv)(self, &iov, num_bytes, addr, mode);
+		}
+	}
+	if likely(!(self->mf_flags & MFILE_F_NOUSRIO))
+		return mfile_read(self, dst, num_bytes, addr);
+	if (stream != NULL && addr == 0) {
+		if (stream->mso_read)
+			return (*stream->mso_read)(self, dst, num_bytes, mode);
+		if (stream->mso_readv) {
+			struct iov_buffer iov;
+			iov_buffer_initone(&iov, dst, num_bytes);
+			return (*stream->mso_readv)(self, &iov, num_bytes, mode);
+		}
+	}
+	THROW(E_FSERROR_UNSUPPORTED_OPERATION,
+	      E_FILESYSTEM_OPERATION_PREAD);
+}
+
+INTERN WUNUSED NONNULL((1)) size_t KCALL
+handle_mfile_pwrite(struct mfile *__restrict self,
+                    USER CHECKED void const *src, size_t num_bytes,
+                    pos_t addr, iomode_t mode)
+		THROWS(...) {
+	struct mfile_stream_ops const *stream;
+	stream = self->mf_ops->mo_stream;
+	if (stream != NULL) {
+		if (stream->mso_pwrite)
+			return (*stream->mso_pwrite)(self, src, num_bytes, addr, mode);
+		if (stream->mso_pwritev) {
+			struct iov_buffer iov;
+			iov_buffer_initone(&iov, src, num_bytes);
+			return (*stream->mso_pwritev)(self, &iov, num_bytes, addr, mode);
+		}
+	}
+	if likely(!(self->mf_flags & MFILE_F_NOUSRIO))
+		return mfile_write(self, src, num_bytes, addr);
+	if (stream != NULL && addr == 0) {
+		if (stream->mso_write)
+			return (*stream->mso_write)(self, src, num_bytes, mode);
+		if (stream->mso_writev) {
+			struct iov_buffer iov;
+			iov_buffer_initone(&iov, src, num_bytes);
+			return (*stream->mso_writev)(self, &iov, num_bytes, mode);
+		}
+	}
+	THROW(E_FSERROR_UNSUPPORTED_OPERATION,
+	      E_FILESYSTEM_OPERATION_PWRITE);
+}
+
+INTERN WUNUSED NONNULL((1, 2)) size_t KCALL
+handle_mfile_readv(struct mfile *__restrict self,
+                   struct iov_buffer *__restrict dst,
+                   size_t num_bytes, iomode_t mode)
+		THROWS(...) {
+	struct mfile_stream_ops const *stream;
+	stream = self->mf_ops->mo_stream;
+	if likely(stream != NULL && stream->mso_readv)
+		return (*stream->mso_readv)(self, dst, num_bytes, mode);
+	THROW(E_FSERROR_UNSUPPORTED_OPERATION,
+	      E_FILESYSTEM_OPERATION_READ);
+}
+
+INTERN WUNUSED NONNULL((1, 2)) size_t KCALL
+handle_mfile_writev(struct mfile *__restrict self,
+                    struct iov_buffer *__restrict src,
+                    size_t num_bytes, iomode_t mode)
+		THROWS(...) {
+	struct mfile_stream_ops const *stream;
+	stream = self->mf_ops->mo_stream;
+	if likely(stream != NULL && stream->mso_writev)
+		return (*stream->mso_writev)(self, src, num_bytes, mode);
+	THROW(E_FSERROR_UNSUPPORTED_OPERATION,
+	      E_FILESYSTEM_OPERATION_WRITE);
+}
+
+INTERN WUNUSED NONNULL((1, 2)) size_t KCALL
+handle_mfile_preadv(struct mfile *__restrict self,
+                    struct iov_buffer *__restrict dst,
+                    size_t num_bytes, pos_t addr, iomode_t mode)
+		THROWS(...) {
+	struct mfile_stream_ops const *stream;
+	stream = self->mf_ops->mo_stream;
+	if (stream != NULL && stream->mso_preadv)
+		return (*stream->mso_preadv)(self, dst, num_bytes, addr, mode);
+	if likely(!(self->mf_flags & MFILE_F_NOUSRIO))
+		return mfile_readv(self, dst, 0, num_bytes, addr);
+	if (stream != NULL && addr == 0 && stream->mso_readv)
+		return (*stream->mso_readv)(self, dst, num_bytes, mode);
+	THROW(E_FSERROR_UNSUPPORTED_OPERATION,
+	      E_FILESYSTEM_OPERATION_PREAD);
+}
+
+INTERN WUNUSED NONNULL((1, 2)) size_t KCALL
+handle_mfile_pwritev(struct mfile *__restrict self,
+                     struct iov_buffer *__restrict src,
+                     size_t num_bytes, pos_t addr, iomode_t mode)
+		THROWS(...) {
+	struct mfile_stream_ops const *stream;
+	stream = self->mf_ops->mo_stream;
+	if (stream != NULL && stream->mso_pwritev)
+		return (*stream->mso_pwritev)(self, src, num_bytes, addr, mode);
+	if likely(!(self->mf_flags & MFILE_F_NOUSRIO))
+		return mfile_writev(self, src, 0, num_bytes, addr);
+	if (stream != NULL && addr == 0 && stream->mso_writev)
+		return (*stream->mso_writev)(self, src, num_bytes, mode);
+	THROW(E_FSERROR_UNSUPPORTED_OPERATION,
+	      E_FILESYSTEM_OPERATION_PWRITE);
+}
+
+INTERN NONNULL((1)) pos_t KCALL
+handle_mfile_seek(struct mfile *__restrict self,
+                  off_t offset, unsigned int whence)
+		THROWS(...) {
+	struct mfile_stream_ops const *stream;
+	stream = self->mf_ops->mo_stream;
+	if likely(stream != NULL && stream->mso_seek)
+		return (*stream->mso_seek)(self, offset, whence);
+	THROW(E_FSERROR_UNSUPPORTED_OPERATION,
+	      E_FILESYSTEM_OPERATION_SEEK);
+}
+
+INTERN NONNULL((1)) syscall_slong_t KCALL
+handle_mfile_ioctl(struct mfile *__restrict self, syscall_ulong_t cmd,
+                   USER UNCHECKED void *arg, iomode_t mode)
+		THROWS(...) {
+	struct mfile_stream_ops const *stream;
+	stream = self->mf_ops->mo_stream;
+	if likely(stream != NULL && stream->mso_ioctl)
+		return (*stream->mso_ioctl)(self, cmd, arg, mode);
+	THROW(E_INVALID_ARGUMENT_UNKNOWN_COMMAND,
+	      E_INVALID_ARGUMENT_CONTEXT_IOCTL_COMMAND,
+	      cmd);
+}
+
+INTERN NONNULL((1)) void KCALL
+handle_mfile_truncate(struct mfile *__restrict self,
+                      pos_t new_size)
+		THROWS(...) {
+	struct mfile_stream_ops const *stream;
+	stream = self->mf_ops->mo_stream;
+	if (stream != NULL && stream->mso_truncate) {
+		(*stream->mso_truncate)(self, new_size);
+		return;
+	}
+	if likely(!(self->mf_flags & MFILE_F_NOUSRIO)) {
+		mfile_truncate(self, new_size);
+		return;
+	}
+	THROW(E_FSERROR_UNSUPPORTED_OPERATION,
+	      E_FILESYSTEM_OPERATION_TRUNC);
+}
+
+INTERN NONNULL((1, 2)) void KCALL
+handle_mfile_mmap(struct mfile *__restrict self,
+                  struct handle_mmap_info *__restrict info)
+		THROWS(...) {
+	struct mfile_stream_ops const *stream;
+	stream = self->mf_ops->mo_stream;
+	if (stream != NULL && stream->mso_mmap) {
+		(*stream->mso_mmap)(self, info);
+		return;
+	}
+	if likely(!(self->mf_flags & MFILE_F_NOUSRMMAP)) {
+		info->hmi_file = incref(self);
+		return;
+	}
+	THROW(E_FSERROR_UNSUPPORTED_OPERATION,
+	      E_FILESYSTEM_OPERATION_MMAP);
+}
+
+INTERN NONNULL((1)) pos_t KCALL
+handle_mfile_allocate(struct mfile *__restrict self,
+                      fallocate_mode_t mode,
+                      pos_t start, pos_t length)
+		THROWS(...) {
+	struct mfile_stream_ops const *stream;
+	stream = self->mf_ops->mo_stream;
+	if (stream != NULL && stream->mso_allocate) {
+		return (*stream->mso_allocate)(self, mode, start, length);
+	}
+	if likely(!(self->mf_flags & MFILE_F_NOUSRIO)) {
+		/* TODO: mfile_allocate()   (pre-load parts of the file into memory) */
+		return 0;
+	}
+	THROW(E_FSERROR_UNSUPPORTED_OPERATION,
+	      E_FILESYSTEM_OPERATION_ALLOCATE);
+}
+
+INTERN NONNULL((1)) void KCALL
+handle_mfile_sync(struct mfile *__restrict self)
+		THROWS(...) {
+	if (mfile_isnode(self)) {
+		struct fnode *node;
+		node = mfile_asnode(self);
+		fnode_syncdata(node);
+		fnode_syncattr(node);
+	} else {
+		mfile_sync(self);
+	}
+}
+
+INTERN NONNULL((1)) void KCALL
+handle_mfile_datasync(struct mfile *__restrict self)
+		THROWS(...) {
+	if (mfile_isnode(self)) {
+		struct fnode *node;
+		node = mfile_asnode(self);
+		fnode_syncdata(node);
+	} else {
+		mfile_sync(self);
+	}
+}
+
+INTERN NONNULL((1)) void KCALL
+handle_mfile_stat(struct mfile *__restrict self,
+                  USER CHECKED struct stat *result)
+		THROWS(...) {
+	dev_t st_dev;
+	ino_t st_ino;
+	mode_t st_mode;
+	nlink_t st_nlink;
+	uid_t st_uid;
+	gid_t st_gid;
+	dev_t st_rdev;
+	pos_t st_size;
+	blksize_t st_blksize;
+	struct timespec st_atimespec;
+	struct timespec st_mtimespec;
+	struct timespec st_ctimespec;
+
+	mfile_tslock_acquire(self);
+	st_size    = (pos_t)atomic64_read(&self->mf_filesize);
+	st_blksize = (blksize_t)(self->mf_part_amask + 1);
+	memcpy(&st_atimespec, &self->mf_atime, sizeof(struct timespec));
+	memcpy(&st_mtimespec, &self->mf_mtime, sizeof(struct timespec));
+	memcpy(&st_ctimespec, &self->mf_ctime, sizeof(struct timespec));
+	st_dev = st_rdev = 0;
+	if (mfile_isnode(self)) {
+		struct fnode *me;
+		REF struct blkdev *blk;
+		me  = mfile_asnode(self);
+		blk = me->fn_super->fs_dev;
+		/* Fill in extended file-node information */
+		if (blk)
+			st_dev = blk->dn_devno;
+		st_ino   = me->fn_ino;
+		st_mode  = me->fn_mode;
+		st_nlink = me->fn_nlink;
+		st_uid   = me->fn_uid;
+		st_gid   = me->fn_gid;
+		if (fnode_isdev(me))
+			st_rdev = fnode_asdev(me)->dn_devno;
+	} else {
+		st_ino   = 0;
+		st_mode  = 0777 | S_IFBLK;
+		st_nlink = 1;
+		st_uid   = 0;
+		st_gid   = 0;
+	}
+	mfile_tslock_release(self);
+
+	/* Fill in generic default information */
+	result->st_dev               = (typeof(result->st_dev))st_dev;
+	result->st_ino               = (typeof(result->st_ino))st_ino;
+	result->st_mode              = (typeof(result->st_mode))st_mode;
+	result->st_nlink             = (typeof(result->st_nlink))st_nlink;
+	result->st_uid               = (typeof(result->st_uid))st_uid;
+	result->st_gid               = (typeof(result->st_gid))st_gid;
+	result->st_rdev              = (typeof(result->st_rdev))st_rdev;
+	result->st_size              = (typeof(result->st_size))st_size;
+	result->st_blksize           = (typeof(result->st_blksize))st_blksize;
+	result->st_blocks            = (typeof(result->st_blocks))CEILDIV(st_size, st_blksize);
+	result->st_atimespec.tv_sec  = (typeof(result->st_atimespec.tv_sec))st_atimespec.tv_sec;
+	result->st_atimespec.tv_nsec = (typeof(result->st_atimespec.tv_nsec))st_atimespec.tv_nsec;
+	result->st_mtimespec.tv_sec  = (typeof(result->st_mtimespec.tv_sec))st_mtimespec.tv_sec;
+	result->st_mtimespec.tv_nsec = (typeof(result->st_mtimespec.tv_nsec))st_mtimespec.tv_nsec;
+	result->st_ctimespec.tv_sec  = (typeof(result->st_ctimespec.tv_sec))st_ctimespec.tv_sec;
+	result->st_ctimespec.tv_nsec = (typeof(result->st_ctimespec.tv_nsec))st_ctimespec.tv_nsec;
+
+	/* If defined, invoke a stat information override callback. */
+	{
+		struct mfile_stream_ops const *stream;
+		stream = self->mf_ops->mo_stream;
+		if (stream && stream->mso_stat)
+			(*stream->mso_stat)(self, result);
+	}
+}
+
+INTERN NONNULL((1)) void KCALL
+handle_mfile_pollconnect(struct mfile *__restrict self,
+                         poll_mode_t what)
+		THROWS(...) {
+	struct mfile_stream_ops const *stream;
+	stream = self->mf_ops->mo_stream;
+	if (stream && stream->mso_pollconnect)
+		(*stream->mso_pollconnect)(self, what);
+}
+
+INTERN WUNUSED NONNULL((1)) poll_mode_t KCALL
+handle_mfile_polltest(struct mfile *__restrict self,
+                      poll_mode_t what)
+		THROWS(...) {
+	poll_mode_t result;
+	struct mfile_stream_ops const *stream;
+	stream = self->mf_ops->mo_stream;
+	if (stream && stream->mso_polltest)
+		result = (*stream->mso_polltest)(self, what);
+	else {
+		result = what & (POLLINMASK | POLLOUTMASK);
+		if (stream) {
+			if (stream->mso_read || stream->mso_readv)
+				result &= ~POLLINMASK;
+			if (stream->mso_write || stream->mso_writev)
+				result &= ~POLLOUTMASK;
+		}
+	}
+	return result;
+}
+
+INTERN NONNULL((1)) syscall_slong_t KCALL
+handle_mfile_hop(struct mfile *__restrict self,
+                 syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode)
+		THROWS(...) {
+	struct mfile_stream_ops const *stream;
+	/* TODO: Default HOP operations. */
+
+	/* Check for a custom HOP override. */
+	stream = self->mf_ops->mo_stream;
+	if (stream && stream->mso_hop)
+		return (*stream->mso_hop)(self, cmd, arg, mode);
+	THROW(E_INVALID_ARGUMENT_UNKNOWN_COMMAND,
+	      E_INVALID_ARGUMENT_CONTEXT_HOP_COMMAND,
+	      cmd);
+}
+
+DECL_END
+
+#else /* CONFIG_USE_NEW_FS */
 #include <fs/fifo.h>
 #include <fs/node.h>
 #include <fs/special-node.h>
@@ -1092,5 +1514,6 @@ handle_mfile_mmap(struct mfile *__restrict self,
 
 
 DECL_END
+#endif /* !CONFIG_USE_NEW_FS */
 
 #endif /* !GUARD_KERNEL_SRC_MEMORY_MMAN_MFILE_HANDLE_C */
