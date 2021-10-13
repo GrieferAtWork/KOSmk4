@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb530fafd */
+/* HASH CRC-32:0x84e4fa51 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -393,9 +393,10 @@ for (local name: classes.keys.sorted()) {
 #endif /* EINTR */
 
 	case E_INVALID_ARGUMENT:
-#ifdef EINVAL
-		result = EINVAL;
-#endif /* EINVAL */
+#if defined(EPERM) && defined(EINVAL)
+		result = self->e_args.e_invalid_argument.ia_context == E_INVALID_ARGUMENT_CONTEXT_CHOWN_UNSUPP_UID ||
+		        self->e_args.e_invalid_argument.ia_context == E_INVALID_ARGUMENT_CONTEXT_CHOWN_UNSUPP_GID ? EPERM : EINVAL;
+#endif /* EPERM && EINVAL */
 		switch(self->e_subclass) {
 #if defined(EAFNOSUPPORT) && defined(ESOCKTNOSUPPORT) && defined(EPROTONOSUPPORT) && defined(EINVAL)
 		case ERROR_SUBCLASS(ERROR_CODEOF(E_INVALID_ARGUMENT_UNKNOWN_COMMAND)):

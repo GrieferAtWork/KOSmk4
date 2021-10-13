@@ -206,7 +206,8 @@
 /* E_INVALID_ARGUMENT                                                   */
 /************************************************************************/
 #ifndef E_INVALID_ARGUMENT
-#define E_INVALID_ARGUMENT                        (0x0002)                     /* [errno(EINVAL), msg("Invalid argument")]
+#define E_INVALID_ARGUMENT                        (0x0002)                     /* [errno($context == E_INVALID_ARGUMENT_CONTEXT_CHOWN_UNSUPP_UID ||
+                                                                                *        $context == E_INVALID_ARGUMENT_CONTEXT_CHOWN_UNSUPP_GID ? EPERM : EINVAL), msg("Invalid argument")]
                                                                                 * [fld(context: syscall_ulong_t, "Argument context (One of `E_INVALID_ARGUMENT_CONTEXT_*')")] */
 #endif /* !E_INVALID_ARGUMENT */
 #ifndef E_INVALID_ARGUMENT_UNKNOWN_FLAG

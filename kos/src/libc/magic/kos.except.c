@@ -620,8 +620,9 @@ for (local name: classes.keys.sorted()) {
 @@pp_endif@@
 
 	case @E_INVALID_ARGUMENT@:
-@@pp_if defined(EINVAL)@@
-		result = EINVAL;
+@@pp_if defined(EPERM) && defined(EINVAL)@@
+		result = self->@e_args@.@e_invalid_argument@.@ia_context@ == @E_INVALID_ARGUMENT_CONTEXT_CHOWN_UNSUPP_UID@ ||
+		        self->@e_args@.@e_invalid_argument@.@ia_context@ == @E_INVALID_ARGUMENT_CONTEXT_CHOWN_UNSUPP_GID@ ? EPERM : EINVAL;
 @@pp_endif@@
 		switch(self->@e_subclass@) {
 @@pp_if defined(EAFNOSUPPORT) && defined(ESOCKTNOSUPPORT) && defined(EPROTONOSUPPORT) && defined(EINVAL)@@
