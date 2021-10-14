@@ -1,0 +1,124 @@
+/* Copyright (c) 2019-2021 Griefer@Work                                       *
+ *                                                                            *
+ * This software is provided 'as-is', without any express or implied          *
+ * warranty. In no event will the authors be held liable for any damages      *
+ * arising from the use of this software.                                     *
+ *                                                                            *
+ * Permission is granted to anyone to use this software for any purpose,      *
+ * including commercial applications, and to alter it and redistribute it     *
+ * freely, subject to the following restrictions:                             *
+ *                                                                            *
+ * 1. The origin of this software must not be misrepresented; you must not    *
+ *    claim that you wrote the original software. If you use this software    *
+ *    in a product, an acknowledgement (see the following) in the product     *
+ *    documentation is required:                                              *
+ *    Portions Copyright (c) 2019-2021 Griefer@Work                           *
+ * 2. Altered source versions must be plainly marked as such, and must not be *
+ *    misrepresented as being the original software.                          *
+ * 3. This notice may not be removed or altered from any source distribution. *
+ */
+import * from deemon;
+
+/* R/B-tree implementation that is logic-compatible
+ * with that from <hybrid/sequence/rbtree-abi.h>
+ *
+ * Deemon <===> C logic mappings:
+ *
+ * ```
+ *   NULL        <===>   none
+ *   RBTREE_T *  <===>   RbNode | none
+ *   RBTREE_T ** <===>   Cell with (RbNode | none)
+ * ```
+ *
+ */
+
+
+@@Red/Black-tree node structure used by API functions
+class RbNode: WeakRefAble {
+	this = default;
+
+#ifndef RBTREE_LEFT_LEANING
+	@@Node parent link
+	public member par: RbNode | none;
+#endif /* !RBTREE_LEFT_LEANING */
+
+	@@Node LHS link
+	public member lhs: RbNode | none;
+
+	@@Node RHS link
+	public member rhs: RbNode | none;
+
+	@@Node key(s)
+	public member minkey: Object;
+	public member maxkey: Object;
+
+	@@Associated value
+	public member val: Object;
+
+	@@Is this is a red node?
+	public member isred: bool;
+}
+
+#define RBTREE_KEY_EQ(a, b) ((a) == (b))
+#define RBTREE_KEY_NE(a, b) ((a) != (b))
+#define RBTREE_KEY_LO(a, b) ((a) < (b))
+#define RBTREE_KEY_LE(a, b) ((a) <= (b))
+#define RBTREE_KEY_GR(a, b) ((a) > (b))
+#define RBTREE_KEY_GE(a, b) ((a) >= (b))
+
+#define RBTREE_GETLHS(self)        (self).lhs
+#define RBTREE_DELLHS(self)        del((self).lhs)
+#define RBTREE_SETLHS(self, v)     ((self).lhs = (v))
+#define RBTREE_GETRHS(self)        (self).rhs
+#define RBTREE_DELRHS(self)        del((self).rhs)
+#define RBTREE_SETRHS(self, v)     ((self).rhs = (v))
+#define RBTREE_GETPAR(self)        (self).par
+#define RBTREE_DELPAR(self)        del((self).par)
+#define RBTREE_SETPAR(self, v)     ((self).par = (v))
+
+#define RBTREE_ISRED(self)         ((self).isred)
+#define RBTREE_SETRED(self)        ((self).isred = true)
+#define RBTREE_SETBLACK(self)      ((self).isred = false)
+#define RBTREE_FLIPCOLOR(self)     ((self).isred = !(self).isred)
+#define RBTREE_COPYCOLOR(dst, src) ((dst).isred = (src).isred)
+
+#define RBTREE_GETMINKEY(x) ((x).minkey)
+#define RBTREE_GETMAXKEY(x) ((x).maxkey)
+#define RBTREE_XISRED(node) RBTREE_ISRED(node)
+#define RBTREE_REPPAR(self, oldv, newv) RBTREE_SETPAR(self, newv)
+
+#define RBTREE(name) name
+#define RBTREE_T     RbNode
+#define RBTREE_Tkey  Object
+#define RBTREE_NULL  none
+#define RBTREE_ASSERT(expr)                   assert(expr)
+#define _RBTREE_ASSERTF2(expr, message)       assert(expr, message)
+#define _RBTREE_ASSERTF3(expr, message, a)    assert(expr, (message) % (a,))
+#define _RBTREE_ASSERTF4(expr, message, a, b) assert(expr, (message) % (a,b,))
+#define RBTREE_ASSERTF(...)                   _RBTREE_ASSERTF##__VA_NARGS__(__VA_ARGS__)
+
+#define RBTREE_WANT_MINMAXLOCATE
+#ifndef RBTREE_LEFT_LEANING
+#define RBTREE_WANT_PREV_NEXT_NODE
+#endif /* !RBTREE_LEFT_LEANING */
+#define RBTREE_WANT_RREMOVE
+#define RBTREE_WANT_RLOCATE
+#define RBTREE_WANT_TRYINSERT
+#define RBTREE_DEBUG
+#define RBTREE_IMPLEMENTATION_ONLY
+
+#define RBTREE_TRUE  true
+#define RBTREE_FALSE false
+
+#define RBTREE_NODE_EQ(a, b)      ((a) === (b))
+#define RBTREE_NODE_NE(a, b)      ((a) !== (b))
+#define RBTREE_NODE_ISNULL(x)     ((x) is none)
+#define RBTREE_NODE_NOT_ISNULL(x) ((x) !is none)
+#define RBTREE_LOCVAR(T, name)     local name
+#define RBTREE_PROOT_GET(proot)    ((proot).value)
+#define RBTREE_PROOT_SET(proot, v) ((proot).value = (v))
+
+#define RBTREE_DEFINE_FUNCTION(decl, attr, returnType, nothrow, cc, name, params, args) \
+	function name args
+
+#include "../../include/hybrid/sequence/rbtree-abi.h"
