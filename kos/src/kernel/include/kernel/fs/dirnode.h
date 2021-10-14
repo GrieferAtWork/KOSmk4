@@ -43,10 +43,14 @@ typedef uintptr_t fsmode_t; /* Set of `FS_MODE_F*' */
 #endif /* !__fsmode_t_defined */
 
 
+/* Special value for uncalculated hash */
+#define FLOOKUP_INFO_HASH_UNSET 0
+
 /* Info descriptor for looking up directory entries by-name. */
 struct flookup_info {
 	CHECKED USER /*utf-8*/ char const *flu_name;    /* [?..flu_namelen] Name for the new file. */
-	uintptr_t                          flu_hash;    /* Hash for `mkf_name' (s.a. `fdirent_hash()') */
+	uintptr_t                          flu_hash;    /* Hash for `mkf_name' (s.a. `fdirent_hash()') or
+	                                                 * `FLOOKUP_INFO_HASH_UNSET'  if  not calculated. */
 	u16                                flu_namelen; /* Length of `mkf_name' */
 	u16                               _flu_pad;     /* ... */
 	u32                                flu_flags;   /* Set of `0 | FS_MODE_FDOSPATH' */
@@ -77,7 +81,7 @@ struct fmkfile_info {
 	union {
 		struct {
 			CHECKED USER /*utf-8*/ char const *mkf_name;    /* [?..mkf_namelen][in] Name for the new file. */
-			uintptr_t                          mkf_hash;    /* [in] Hash for `mkf_name' (s.a. `fdirent_hash()') */
+			uintptr_t                          mkf_hash;    /* [in] Hash for `mkf_name' (s.a. `fdirent_hash()') (or `FLOOKUP_INFO_HASH_UNSET') */
 			u16                                mkf_namelen; /* [in] Length of `mkf_name' */
 			u16                               _mkf_pad;     /* ... */
 			u32                                mkf_flags;   /* [in|out] Set of `FMKFILE_F_*' */
@@ -96,13 +100,13 @@ struct fmkfile_info {
 		REF struct flnknode           *mkf_rlnk;    /* [1..1][out][valid_if(S_ISLNK(mkf_fmode) || (mkf_fmode == 0 && fnode_islnk(mkf_hrdlnk.hl_node)))] */
 		REF struct ffifonode          *mkf_rfifo;   /* [1..1][out][valid_if(S_ISFIFO(mkf_fmode) || (mkf_fmode == 0 && fnode_isfifo(mkf_hrdlnk.hl_node)))] */
 		REF struct fsocknode          *mkf_rsock;   /* [1..1][out][valid_if(S_ISSOCK(mkf_fmode) || (mkf_fmode == 0 && fnode_issock(mkf_hrdlnk.hl_node)))] */
-		REF struct fdevnode           *mkf_rdev;    /* [1..1][out][valid_if(S_ISDEV(mkf_fmode) || (mkf_fmode == 0 && fnode_isdev(mkf_hrdlnk.hl_node)))] */
+		REF struct fdevnode           *mkf_rdev;    /* [1..1][out][valid_if(S_ISDEV(mkf_fmode) || (mkf_fmode == 0 && fnode_isdevnode(mkf_hrdlnk.hl_node)))] */
 	};
 	union {
 		struct {
 			struct fnode              *hl_node;     /* [1..1][in] The file to which to create a hard-link. */
-		}                      mkf_hrdlnk; /* [valid_if(mkf_fmode == 0)] Hardlink creation info. */
-		struct fcreatfile_info mkf_creat;  /* [valid_if(mkf_fmode != 0)] File creation info. */
+		}                      mkf_hrdlnk; /* [valid_if((mkf_fmode & S_IFMT) == 0)] Hardlink creation info. */
+		struct fcreatfile_info mkf_creat;  /* [valid_if((mkf_fmode & S_IFMT) != 0)] File creation info. */
 	};
 };
 
@@ -111,7 +115,7 @@ struct frename_info {
 	union {
 		struct {
 			CHECKED USER /*utf-8*/ char const *frn_name;    /* [?..frn_namelen][in] Name for the new file. */
-			uintptr_t                          frn_hash;    /* [in] Hash for `frn_name' (s.a. `fdirent_hash()') */
+			uintptr_t                          frn_hash;    /* [in] Hash for `frn_name' (s.a. `fdirent_hash()') (or `FLOOKUP_INFO_HASH_UNSET') */
 			u16                                frn_namelen; /* [in] Length of `frn_name' */
 			u16                               _frn_pad;     /* ... */
 			u32                                frn_flags;   /* [in] Set of `0 | FS_MODE_FDOSPATH' */
@@ -134,7 +138,8 @@ struct fdirenum_ops {
 	/*NOTHROW*/ (KCALL *deo_fini)(struct fdirenum *__restrict self);
 
 	/* [1..1] Directory reader callback.
-	 * When end-of-file has been reached, `0' is returned. */
+	 * When end-of-file has been reached, `0' is returned.
+	 * NOTE: This function mustn't enumerate the `.' and `..' entires! */
 	NONNULL((1)) size_t
 	(KCALL *deo_readdir)(struct fdirenum *__restrict self, USER CHECKED struct dirent *buf,
 	                     size_t bufsize, readdir_mode_t readdir_mode, iomode_t mode)
@@ -152,7 +157,8 @@ struct fdirenum_ops {
 	 * later restoring it is _not_ a  usage-case that has to be  supported)
 	 * NOTE: This function mustn't enumerate the `.' and `..' entires!
 	 * @return: * : The new position (however that may be defined) within
-	 *              the directory stream. */
+	 *              the directory stream.
+	 * @throw: E_INVALID_ARGUMENT_UNKNOWN_COMMAND:E_INVALID_ARGUMENT_CONTEXT_LSEEK_WHENCE:whence: [...] */
 	NONNULL((1)) pos_t
 	(KCALL *deo_seekdir)(struct fdirenum *__restrict self,
 	                     off_t offset, unsigned int whence)
@@ -169,6 +175,24 @@ struct fdirenum {
 #define fdirenum_readdir(self, buf, bufsize, readdir_mode, mode) (*(self)->de_ops->deo_readdir)(self, buf, bufsize, readdir_mode, mode)
 #define fdirenum_seekdir(self, offset, whence)                   (*(self)->de_ops->deo_seekdir)(self, offset, whence)
 
+/* Feed   directory  entry  information  (the  `feed_d_*'  arguments)
+ * into `buf' as requested by  `readdir_mode' ('.' and '..'  handling
+ * is  _NOT_ done by  this function), and  return the expected return
+ * value, or its bitwise-inverse. When a positive number is returned,
+ * the fed directory  entry should be  consumed (read: yielded).  But
+ * when a negative number is returned, the directory entry should not
+ * be  consumed, and the caller should forward the bitwise inverse to
+ * their caller.
+ * @return: >= 0: Advance directory position to next entry and re-return this value.
+ * @return: <  0: Keep current directory position and re-return bitwise inverse ('~') of this value. */
+FUNDEF WUNUSED ssize_t FCALL
+fdirenum_feedent(USER CHECKED struct dirent *buf,
+                 size_t bufsize, readdir_mode_t readdir_mode,
+                 ino_t feed_d_ino, unsigned char feed_d_type,
+                 u16 feed_d_namlen, USER CHECKED char const *feed_d_name)
+		THROWS(E_SEGFAULT);
+
+
 
 struct fdirnode_ops {
 	struct fnode_ops dno_node; /* FNode operators */
@@ -179,8 +203,9 @@ struct fdirnode_ops {
 	(KCALL *dno_lookup)(struct fdirnode *__restrict self,
 	                    struct flookup_info *__restrict info);
 
-	/* [0..1] Optional helper to directly lookup a file-node w/o going
-	 *        through the fdirent indirection.
+	/* [1..1] Helper to directly lookup a file-node w/o going through
+	 * the  fdirent indirection. When no custom implementation exists
+	 * for this purpose, you may assign `&fdirnode_v_lookup_fnode'.
 	 * @return: NULL: No entry exists that is matching the given name. */
 	WUNUSED NONNULL((1, 2)) REF struct fnode *
 	(KCALL *dno_lookup_fnode)(struct fdirnode *__restrict self,
@@ -200,21 +225,21 @@ struct fdirnode_ops {
 	 * another file with the same name already existed, then
 	 * `FMKFILE_F_EXISTS'  is set, and that file is returned
 	 * instead.
-	 * @throw: E_FSERROR_ILLEGAL_PATH:        `info->mkf_name' contains bad characters
-	 * @throw: E_FSERROR_DISK_FULL:           Disk full
-	 * @throw: E_FSERROR_READONLY:            Read-only filesystem
-	 * @throw: E_FSERROR_TOO_MANY_HARD_LINKS: ... */
+	 * @throw: E_FSERROR_ILLEGAL_PATH:          `info->mkf_name' contains bad characters
+	 * @throw: E_FSERROR_DISK_FULL:             Disk full
+	 * @throw: E_FSERROR_READONLY:              Read-only filesystem
+	 * @throw: E_FSERROR_TOO_MANY_HARD_LINKS:   ...
+	 * @throw: E_FSERROR_UNSUPPORTED_OPERATION: The requested S_IFMT isn't supported.
+	 * @throw: E_FSERROR_DELETED:               `self' had been deleted. */
 	NONNULL((1, 2)) void
 	(KCALL *dno_mkfile)(struct fdirnode *__restrict self,
 	                    struct fmkfile_info *__restrict info)
 			THROWS(E_FSERROR_ILLEGAL_PATH, E_FSERROR_DISK_FULL,
-			       E_FSERROR_READONLY, E_FSERROR_TOO_MANY_HARD_LINKS);
+			       E_FSERROR_READONLY, E_FSERROR_TOO_MANY_HARD_LINKS,
+			       E_FSERROR_UNSUPPORTED_OPERATION, E_FSERROR_DELETED);
 
 	/* [0..1] Delete   the  specified  file  from  this  directory.
 	 * This function is also responsible to update `file->fn_nlink'
-	 * @throw: E_FSERROR_FILE_NOT_FOUND:      The file had  already been deleted,  or
-	 *                                        renamed (it no longer exists as `entry'
-	 *                                        within `self').
 	 * @throw: E_FSERROR_DIRECTORY_NOT_EMPTY: `file' is a non-empty directory.
 	 * @throw: E_FSERROR_READONLY:            Read-only filesystem
 	 * @throw: E_FSERROR_DELETED:             The given `entry' was already deleted */
@@ -222,7 +247,7 @@ struct fdirnode_ops {
 	(KCALL *dno_unlink)(struct fdirnode *__restrict self,
 	                    struct fdirent *__restrict entry,
 	                    struct fnode *__restrict file)
-			THROWS(E_FSERROR_FILE_NOT_FOUND, E_FSERROR_DIRECTORY_NOT_EMPTY,
+			THROWS(E_FSERROR_DIRECTORY_NOT_EMPTY,
 			       E_FSERROR_READONLY, E_FSERROR_DELETED);
 
 	/* [0..1] Rename/move the specified file from one location to another
@@ -230,7 +255,9 @@ struct fdirnode_ops {
 	 * @throw: E_FSERROR_DISK_FULL:           Disk full
 	 * @throw: E_FSERROR_READONLY:            Read-only filesystem
 	 * @throw: E_FSERROR_FILE_ALREADY_EXISTS: `info->frn_name' already exists
-	 * @throw: E_FSERROR_DELETED:             The given `entry' was already deleted */
+	 * @throw: E_FSERROR_DELETED:             `self' was already deleted
+	 * @throw: E_FSERROR_DELETED:             `info->frn_oldent' was already deleted
+	 * @throw: E_FSERROR_DELETED:             `info->frn_olddir' was already deleted */
 	NONNULL((1, 2)) void
 	(KCALL *dno_rename)(struct fdirnode *__restrict self,
 	                    struct frename_info *__restrict info)
@@ -248,10 +275,6 @@ struct fdirnode
 	struct fnode         dn_node;    /* Underlying file-node */
 #define _fdirnode_node_     dn_node.
 #define _fdirnode_asnode(x) &(x)->dn_node
-#ifdef __WANT_FS_INIT
-#define FDIRNODE_INIT_EX(refcnt, ops, parts, blockshift, fn_nlink, fn_mode, fn_uid, fn_gid, fn_ino, fn_super, dn_parent) \
-	{ FNODE_INIT_EX(refcnt, &(ops)->dno_node, parts, blockshift, fn_nlink, (fn_mode) | S_IFDIR, fn_uid, fn_gid, fn_ino, fn_super), dn_parent }
-#endif /* __WANT_FS_INIT */
 #else /* __WANT_FS_INLINE_STRUCTURES */
 #define _fdirnode_node_     /* nothing */
 #define _fdirnode_asnode(x) x
@@ -281,6 +304,7 @@ struct fdirnode
  *  - self->_fdirnode_node_ fn_gid
  *  - self->_fdirnode_node_ fn_allnodes
  *  - self->_fdirnode_node_ fn_supent
+ *  - self->_fdirnode_node_ fn_nlink  (to `1')
  *  - self->_fdirnode_node_ fn_ino
  *  - self->_fdirnode_node_ fn_mode (with something or'd with S_IFDIR)
  * @param: struct fdirnode     *self:   Directory node to initialize.
@@ -300,10 +324,9 @@ struct fdirnode
 	 (self)->_fdirnode_node_ _fnode_file_ mf_ops        = &(ops)->dno_node.no_file,                             \
 	 (self)->_fdirnode_node_ _fnode_file_ mf_blockshift = (parent)->_fdirnode_node_ _fnode_file_ mf_blockshift, \
 	 (self)->_fdirnode_node_ _fnode_file_ mf_part_amask = (parent)->_fdirnode_node_ _fnode_file_ mf_part_amask, \
-	 (self)->_fdirnode_node_ _fnode_file_ mf_filesize   = (pos_t)-1,                                            \
-	 (self)->_fdirnode_node_ fn_nlink                   = 1,                                                    \
-	 (self)->_fdirnode_node_ fn_super                   = incref((parent)->_fdirnode_node_ fn_super),           \
-	 (self)->dn_parent                                  = incref(parent))
+	 atomic64_init(&(self)->_fdirnode_node_ _fnode_file_ mf_filesize, (uint64_t)-1),                            \
+	 (self)->_fdirnode_node_ fn_super = incref((parent)->_fdirnode_node_ fn_super),                             \
+	 (self)->dn_parent                = (REF struct fdirnode *)incref(parent))
 #define _fdirnode_cinit(self, ops, super)                                                                       \
 	(_fdirnode_assert_ops_(ops) _fnode_cinit_common(_fdirnode_asnode(self)),                                    \
 	 (self)->mf_parts                              = MFILE_PARTS_ANONYMOUS,                                     \
@@ -318,10 +341,9 @@ struct fdirnode
 	 (self)->_fdirnode_node_ _fnode_file_ mf_ops        = &(ops)->dno_node.no_file,                             \
 	 (self)->_fdirnode_node_ _fnode_file_ mf_blockshift = (parent)->_fdirnode_node_ _fnode_file_ mf_blockshift, \
 	 (self)->_fdirnode_node_ _fnode_file_ mf_part_amask = (parent)->_fdirnode_node_ _fnode_file_ mf_part_amask, \
-	 (self)->_fdirnode_node_ _fnode_file_ mf_filesize   = (pos_t)-1,                                            \
-	 (self)->_fdirnode_node_ fn_nlink                   = 1,                                                    \
-	 (self)->_fdirnode_node_ fn_super                   = incref((parent)->_fdirnode_node_ fn_super),           \
-	 (self)->dn_parent                                  = incref(parent))
+	 atomic64_init(&(self)->_fdirnode_node_ _fnode_file_ mf_filesize, (uint64_t)-1),                            \
+	 (self)->_fdirnode_node_ fn_super = incref((parent)->_fdirnode_node_ fn_super),                             \
+	 (self)->dn_parent                = (REF struct fdirnode *)incref(parent))
 /* Finalize a partially initialized `struct fdirnode' (as initialized by `_fdirnode_init()') */
 #define _fdirnode_fini(self) \
 	(decref_nokill((self)->fn_super), decref_nokill((self)->dn_parent))
@@ -329,6 +351,9 @@ struct fdirnode
 /* Default operators for `struct fdirnode_ops' */
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL fdirnode_v_destroy)(struct mfile *__restrict self);
+FUNDEF WUNUSED NONNULL((1, 2)) REF struct fnode *KCALL
+fdirnode_v_lookup_fnode(struct fdirnode *__restrict self,
+                        struct flookup_info *__restrict info);
 
 
 /* Public API (high-level wrappers around low-level operators) */
@@ -340,10 +365,8 @@ NOTHROW(KCALL fdirnode_v_destroy)(struct mfile *__restrict self);
 
 /* Lookup the INode associated with a given name within `self'.
  * @return: NULL: No entry exists that is matching the given name. */
-FUNDEF WUNUSED NONNULL((1, 2)) REF struct fnode *KCALL
-fdirnode_lookup_fnode(struct fdirnode *__restrict self,
-                      struct flookup_info *__restrict info);
-
+#define fdirnode_lookup_fnode(self, info) \
+	(*fdirnode_getops(self)->dno_lookup_fnode)(self, info)
 
 /* Construct a directory  enumerator object in  `*result'.
  * This function must initialize _all_ fields of `*result'
@@ -358,15 +381,17 @@ fdirnode_lookup_fnode(struct fdirnode *__restrict self,
 /* Create new files within a given directory.
  * If another  file with  the same  name already  existed,  then
  * `FMKFILE_F_EXISTS' is set, and that file is returned instead.
- * @throw: E_FSERROR_ILLEGAL_PATH:        `info->mkf_name' contains bad characters
- * @throw: E_FSERROR_DISK_FULL:           Disk full
- * @throw: E_FSERROR_READONLY:            Read-only filesystem (or unsupported operation)
- * @throw: E_FSERROR_TOO_MANY_HARD_LINKS: ... */
+ * @throw: E_FSERROR_ILLEGAL_PATH:          `info->mkf_name' contains bad characters
+ * @throw: E_FSERROR_DISK_FULL:             Disk full
+ * @throw: E_FSERROR_READONLY:              Read-only filesystem (or unsupported operation)
+ * @throw: E_FSERROR_TOO_MANY_HARD_LINKS:   ...
+ * @throw: E_FSERROR_UNSUPPORTED_OPERATION: The requested S_IFMT isn't supported. */
 FUNDEF NONNULL((1, 2)) void KCALL
 fdirnode_mkfile(struct fdirnode *__restrict self,
                 struct fmkfile_info *__restrict info)
 		THROWS(E_FSERROR_ILLEGAL_PATH, E_FSERROR_DISK_FULL,
-		       E_FSERROR_READONLY, E_FSERROR_TOO_MANY_HARD_LINKS);
+		       E_FSERROR_READONLY, E_FSERROR_TOO_MANY_HARD_LINKS,
+		       E_FSERROR_UNSUPPORTED_OPERATION);
 
 /* Delete the specified file from this directory
  * @throw: E_FSERROR_FILE_NOT_FOUND:      The file had  already been deleted,  or

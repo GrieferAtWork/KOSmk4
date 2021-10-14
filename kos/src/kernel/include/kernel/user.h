@@ -39,7 +39,10 @@ DECL_BEGIN
  * until the next reboot.
  * Also note that these functions may simply  not do anything at all, or  do
  * something 100% predictable, especially in situations where the kernel was
- * configured for debugging, rather than security. */
+ * configured for debugging, rather than security.
+ *
+ * NOTE: These functions guaranty not to modify the least significant 3
+ *       bits of the input pointer, such that `(return & 7) == (p & 7)' */
 #define skew_kernel_pointer(p)   (void *)(p) /* TODO */
 #define unskew_kernel_pointer(p) (void *)(p) /* TODO */
 

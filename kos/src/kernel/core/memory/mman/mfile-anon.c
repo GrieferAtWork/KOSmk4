@@ -218,7 +218,9 @@ again:
 		newfile = incref(&mfile_anon[file->mf_blockshift]);
 		ATOMIC_WRITE(root->mp_file, newfile);
 		decref_nokill(file);
-		if (ATOMIC_FETCHAND(root->mp_flags, ~MPART_F_GLOBAL_REF) & MPART_F_GLOBAL_REF)
+		if (ATOMIC_FETCHAND(root->mp_flags, ~(MPART_F_GLOBAL_REF |
+		                                      MPART_F_PERSISTENT)) &
+		    MPART_F_GLOBAL_REF)
 			decref_nokill(root);
 		/* Try to merge mem-parts after changing the pointed-to file.
 		 * This  must be done to prevent a race condition relating to
@@ -309,9 +311,6 @@ NOTHROW(FCALL mfile_decref_postop)(Tobpostlockop(mfile) *__restrict self,
 	decref_unlikely(me);
 }
 
-PRIVATE NOBLOCK NONNULL((1)) void
-NOTHROW(FCALL mfile_begin_async_delete)(/*inherit(always)*/ REF struct mfile *__restrict self);
-
 PRIVATE NOBLOCK void
 NOTHROW(FCALL mfile_zerotrunc_completion2_cb)(struct sig_completion_context *__restrict UNUSED(context),
                                               void *buf) {
@@ -319,7 +318,7 @@ NOTHROW(FCALL mfile_zerotrunc_completion2_cb)(struct sig_completion_context *__r
 	file = *(REF struct mfile **)buf;
 	/* Re-start async file deletion from scratch, since
 	 * we're  not actually holding any locks right now! */
-	mfile_begin_async_delete(file);
+	mfile_delete_impl(file);
 }
 
 PRIVATE NOBLOCK NOPREEMPT NONNULL((1, 2)) size_t
@@ -462,9 +461,12 @@ NOTHROW(FCALL mfile_delete_withfilelock)(Toblockop(mfile) *__restrict self,
 	return mfile_delete_withfilelock_ex(me, NULL);
 }
 
-/* Initiate async file deletion. */
-PRIVATE NOBLOCK NONNULL((1)) void
-NOTHROW(FCALL mfile_begin_async_delete)(/*inherit(always)*/ REF struct mfile *__restrict self) {
+
+/* Internal implementation of `mfile_delete()' (don't call this one
+ * unless you know that you're doing; otherwise, you may cause race
+ * conditions that can result in data corruption) */
+PUBLIC NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL mfile_delete_impl)(/*inherit(always)*/ REF struct mfile *__restrict self) {
 	if (mfile_lock_trywrite(self)) {
 		Tobpostlockop(mfile) *post;
 		post = mfile_delete_withfilelock(&self->_mf_mflop, self);
@@ -482,9 +484,10 @@ NOTHROW(FCALL mfile_begin_async_delete)(/*inherit(always)*/ REF struct mfile *__
 
 /* Make the given file anonymous+deleted. What this means is that (in order):
  *  - The `MFILE_F_DELETED' flag is set for the file.
+ *  - The `MFILE_F_PERSISTENT' flag is cleared for the file.
  *  - The file-fields of all mem-parts are altered to point
  *    at  anonymous  memory   files.  (s.a.   `mfile_anon')
- *  - The `MPART_F_GLOBAL_REF' flag is cleared for all parts
+ *  - The `MPART_F_GLOBAL_REF' and `MPART_F_PERSISTENT' flag is cleared for all parts
  *  - The `mf_parts' and `mf_changed' fields are set to `MFILE_PARTS_ANONYMOUS'
  *  - The `mf_filesize' field is set to `0'.
  * The result of all of this is that it is no longer possible to
@@ -534,6 +537,8 @@ NOTHROW(FCALL mfile_delete)(struct mfile *__restrict self) {
 	                           MFILE_F_DELETED |
 	                           MFILE_F_NOATIME |
 	                           MFILE_F_NOMTIME);
+	if (old_flags & MFILE_F_PERSISTENT)
+		ATOMIC_AND(self->mf_flags, ~MFILE_F_PERSISTENT); /* Also clear the PERSISTENT flag */
 	mfile_tslock_release(self);
 
 	/* Check if the file has already been marked as deleted. */
@@ -549,12 +554,11 @@ NOTHROW(FCALL mfile_delete)(struct mfile *__restrict self) {
 	 * to  manage  to acquire  a lock  to `self',  and _all_  of the
 	 * parts still found in its part-tree, _at_ _the_ _same_ _time_! */
 
-
-	/* Inherited by `mfile_delete_withfilelock()' */
+	 /* Inherited by `mfile_delete_withfilelock()' */
 	incref(self);
 
 	/* Do the thing! */
-	mfile_begin_async_delete(self);
+	mfile_delete_impl(self);
 }
 
 #else /* CONFIG_USE_NEW_FS */

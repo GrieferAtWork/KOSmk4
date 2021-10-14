@@ -31,16 +31,16 @@ DECL_BEGIN
 
 /* Return the hash of a given directory entry name.
  * This function is used by various APIs related to file lookup.
- * @throw: E_SEGFAULT: Failed to access the given `name'. */
+ * @throw: E_SEGFAULT: Failed to access the given `text'. */
 PUBLIC ATTR_PURE WUNUSED NONNULL((1)) uintptr_t FCALL
-fdirent_hash(CHECKED USER /*utf-8*/ char const *__restrict name, u16 namelen)
+fdirent_hash(CHECKED USER /*utf-8*/ char const *__restrict text, u16 textlen)
 		THROWS(E_SEGFAULT) {
 	uintptr_t hash = FDIRENT_EMPTY_HASH;
 	uintptr_t const *iter, *end;
 
 	/* Setup iterators. */
-	iter = (uintptr_t const *)name;
-	end  = iter + (namelen / sizeof(uintptr_t));
+	iter = (uintptr_t const *)text;
+	end  = iter + (textlen / sizeof(uintptr_t));
 
 	/* Hash whole words */
 	while (iter < end) {
@@ -50,7 +50,7 @@ fdirent_hash(CHECKED USER /*utf-8*/ char const *__restrict name, u16 namelen)
 	}
 
 	/* Hash trailing word */
-	switch (namelen & (sizeof(uintptr_t) - 1)) {
+	switch (textlen & (sizeof(uintptr_t) - 1)) {
 #if __SIZEOF_POINTER__ > 4
 	case 7:
 		hash += (uintptr_t)((byte_t const *)iter)[6] << 48;

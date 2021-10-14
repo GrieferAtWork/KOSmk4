@@ -114,18 +114,29 @@ fsuper_sync(struct fsuper *__restrict self)
 		while (!LIST_EMPTY(&self->fs_changednodes)) {
 			uintptr_t changes;
 			REF struct fnode *changed_node;
-			fsuper_changednodes_lock_acquire(self);
+			fsuper_changednodes_acquire(self);
 			COMPILER_BARRIER();
 			changed_node = LIST_FIRST(&self->fs_changednodes);
 			if (changed_node != NULL)
 				LIST_UNBIND(changed_node, fn_changed);
 			COMPILER_BARRIER();
-			fsuper_changednodes_lock_release(self);
+			fsuper_changednodes_release(self);
 			if (!changed_node)
 				break;
 			assert(changed_node->fn_super == self);
+
 			/* Sync changed parts of `changed_node' */
-			changes = ATOMIC_FETCHAND(changed_node->mf_flags, ~(MFILE_F_CHANGED | MFILE_F_ATTRCHANGED));
+			for (;;) {
+				changes = ATOMIC_READ(changed_node->mf_flags);
+				if (changes & MFILE_F_DELETED) {
+					/* Don't handle changes for deleted files. */
+					changes = 0;
+					break;
+				}
+				if (ATOMIC_CMPXCH_WEAK(changed_node->mf_flags, changes,
+				                       changes & ~(MFILE_F_CHANGED | MFILE_F_ATTRCHANGED)))
+					break;
+			}
 			changes &= (MFILE_F_CHANGED | MFILE_F_ATTRCHANGED);
 			TRY {
 				if (changes & MFILE_F_CHANGED) {

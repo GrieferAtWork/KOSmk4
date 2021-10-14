@@ -107,6 +107,7 @@ NOTHROW(KCALL fclnknode_v_linkstr)(struct flnknode *__restrict self) {
  *  - return->_fclnknode_lnode_ _flnknode_node_ fn_gid
  *  - return->_fclnknode_lnode_ _flnknode_node_ fn_allnodes
  *  - return->_fclnknode_lnode_ _flnknode_node_ fn_supent
+ *  - return->_fclnknode_lnode_ _flnknode_node_ fn_nlink
  *  - return->_fclnknode_lnode_ _flnknode_node_ fn_ino
  *  - return->_fclnknode_lnode_ _flnknode_node_ fn_mode (with something or'd with S_IFLNK)
  *  - return->lnc_text[0 ... text_length-1]    (exactly `text_length' characters; trailing NUL was already initialized) */
@@ -125,7 +126,6 @@ _fclnknode_alloc(struct fsuper *__restrict super, size_t text_length) THROWS(E_B
 	                    MFILE_F_NOUSRMMAP | MFILE_F_NOUSRIO);
 	result->mf_blockshift = (super)->fs_root.mf_blockshift;
 	result->mf_part_amask = (super)->fs_root.mf_part_amask;
-	result->fn_nlink      = 1;
 	result->fn_super      = incref(super);
 	atomic64_init(&result->mf_filesize, text_length);
 	result->lnc_text[text_length] = '\0';

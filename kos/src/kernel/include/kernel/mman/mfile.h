@@ -28,7 +28,6 @@
 #include <sched/atomic64.h>
 #include <sched/signal.h>
 
-#include <hybrid/__minmax.h>
 #include <hybrid/sequence/list.h>
 #include <hybrid/sequence/rbtree.h>
 #include <hybrid/sync/atomic-rwlock.h>
@@ -37,6 +36,10 @@
 #include <kos/lockop.h>
 
 #include <libvio/api.h> /* LIBVIO_CONFIG_ENABLED */
+
+#if defined(__WANT_FS_INIT) || !defined(CONFIG_USE_NEW_FS)
+#include <hybrid/__minmax.h>
+#endif /* __WANT_FS_INIT || !CONFIG_USE_NEW_FS */
 
 #ifdef __WANT_MFILE__mf_compl
 #include <sched/signal-completion.h>
@@ -123,6 +126,8 @@ typedef unsigned int poll_mode_t; /* Set of `POLL*' */
 #ifdef CONFIG_USE_NEW_FS
 struct handle_mmap_info;
 struct stat;
+struct path;
+struct fdirent;
 
 #ifndef __fallocate_mode_t_defined
 #define __fallocate_mode_t_defined
@@ -140,6 +145,8 @@ struct mfile_stream_ops {
 	 *                        is allowed to modify that handle, however it must also take care
 	 *                        to  account  for the  fact  that `hand->h_data'  must  contain a
 	 *                        reference both on entry and exit!
+	 * @param: access_path: [0..1] The path by which the open is being performed (if available)
+	 * @param: access_dent: [0..1] The directory entry of `self' (if available)
 	 * HINT: `hand' is initialized as follows upon entry:
 	 * >> hand->h_type = HANDLE_TYPE_MFILE;
 	 * >> hand->h_mode = ...; // Depending on o-flags passed to open(2).
@@ -148,7 +155,9 @@ struct mfile_stream_ops {
 	 *       `decref_nokill(self)'  and  assign   `incref(new_obj)') */
 	NONNULL((1, 2)) void
 	(KCALL *mso_open)(struct mfile *__restrict self,
-	                  struct handle *__restrict hand);
+	                  struct handle *__restrict hand,
+	                  struct path *access_path,
+	                  struct fdirent *access_dent);
 
 	/* [0..1] Hooks  for `read(2)' and  `readv(2)': stream-oriented file reading.
 	 * Note that for consistency, anything that implements these operators should
@@ -260,7 +269,7 @@ struct mfile_stream_ops {
 	 *   - st_rdev */
 	NONNULL((1)) void
 	(KCALL *mso_stat)(struct mfile *__restrict self,
-	                  struct stat *__restrict result)
+	                  USER CHECKED struct stat *result)
 			THROWS(...);
 
 	/* [0..1] Implementation for poll(2): Connect to signals.
@@ -372,10 +381,12 @@ struct mfile_ops {
 	/* [0..1] Stream operators. */
 	struct mfile_stream_ops const *mo_stream;
 
+#ifdef LIBVIO_CONFIG_ENABLED
 	/* [0..1] VIO file operators. When non-NULL,  then this file is backed  by
 	 * VIO, and the `mo_loadblocks' and `mo_saveblocks' operators are ignored,
 	 * though should still be set to `NULL' for consistency. */
 	struct vio_operators const *mo_vio;
+#endif /* LIBVIO_CONFIG_ENABLED */
 
 #else /* CONFIG_USE_NEW_FS */
 	/* [0..1] Finalize + free the given mem-file. */
@@ -523,9 +534,9 @@ struct mfile_ops {
                                             * and all of its used-to-be parts will be anon, too. */
 /*      MFILE_F_                0x00000040  * ... Reserved: MS_MANDLOCK */
 /*      MFILE_F_                0x00000080  * ... Reserved: MS_DIRSYNC */
-#define MFILE_F_ATTRCHANGED     0x00000100 /* [lock(SET(ATOMIC), CLEAR(WEAK))]
+#define MFILE_F_ATTRCHANGED     0x00000100 /* [lock(SET(ATOMIC), CLEAR(WEAK))][const_SET_if(MFILE_F_DELETED)]
                                             * Indicates that attributes of this file (its size, etc.) have changed. */
-#define MFILE_F_CHANGED         0x00000200 /* [lock(SET(ATOMIC), CLEAR(WEAK))]
+#define MFILE_F_CHANGED         0x00000200 /* [lock(SET(ATOMIC), CLEAR(WEAK))][const_SET_if(MFILE_F_DELETED)]
                                             * This flag is set before `mo_changed()' is invoked, which also won't
                                             * be  invoked again until  this flag has been  cleared, which is done
                                             * as part of a call to `mfile_sync()' */
@@ -600,6 +611,23 @@ struct mfile {
 	unsigned int                  mf_blockshift; /* [const] == log2(FILE_BLOCK_SIZE) */
 
 #ifdef CONFIG_USE_NEW_FS
+#ifdef __WANT_FS_INIT
+#define MFILE_INIT_mf_refcnt(mf_refcnt) mf_refcnt
+#define MFILE_INIT_mf_ops(mf_ops)       mf_ops
+#ifdef CONFIG_MFILE_TRACE_WRLOCK_PC
+#define MFILE_INIT_mf_lock ATOMIC_RWLOCK_INIT, __NULLPTR
+#else /* CONFIG_MFILE_TRACE_WRLOCK_PC */
+#define MFILE_INIT_mf_lock ATOMIC_RWLOCK_INIT
+#endif /* !CONFIG_MFILE_TRACE_WRLOCK_PC */
+#define MFILE_INIT_mf_parts(mf_parts)           mf_parts
+#define MFILE_INIT_mf_initdone                  SIG_INIT
+#define MFILE_INIT_mf_lockops                   SLIST_HEAD_INITIALIZER(~)
+#define MFILE_INIT_mf_changed(mf_changed)       mf_changed
+#define MFILE_INIT_mf_blockshift(mf_blockshift) __hybrid_max_c2(PAGESIZE, (size_t)1 << (mf_blockshift)) - 1, mf_blockshift
+#define MFILE_INIT_mf_flags(mf_flags)           mf_flags
+#define MFILE_INIT_mf_trunclock                 0
+#define MFILE_INIT_mf_filesize(mf_filesize)     ATOMIC64_INIT(mf_filesize)
+#endif /* __WANT_FS_INIT */
 	uintptr_t                     mf_flags;      /* File flags (set of `MFILE_F_*') */
 	WEAK size_t                   mf_trunclock;  /* [lock(INC(RDLOCK(mf_lock) || mpart_lock_acquired(ANY(mf_parts))),
 	                                              *       DEC(ATOMIC))]
@@ -635,6 +663,11 @@ struct mfile {
      defined(__WANT_MFILE__mf_mfplop) || defined(__WANT_MFILE__mf_deadparts) ||     \
      defined(__WANT_MFILE__mf_mpplop) || defined(__WANT_MFILE__mf_compl) ||         \
      defined(__WANT_MFILE__mf_lopX))
+#ifdef __WANT_FS_INIT
+#define MFILE_INIT_mf_atime(mf_atime__tv_sec, mf_atime__tv_nsec) {{ { mf_atime__tv_sec, mf_atime__tv_nsec }
+#define MFILE_INIT_mf_mtime(mf_mtime__tv_sec, mf_mtime__tv_nsec)    { mf_mtime__tv_sec, mf_mtime__tv_nsec }
+#define MFILE_INIT_mf_ctime(mf_ctime__tv_sec, mf_ctime__tv_nsec)    { mf_ctime__tv_sec, mf_ctime__tv_nsec } }}
+#endif /* __WANT_FS_INIT */
 	union {
 		struct {
 			struct timespec       mf_atime;      /* [lock(_MFILE_F_SMP_TSLOCK)][const_if(MFILE_F_NOATIME)][valid_if(!MFILE_F_DELETED)]
@@ -689,6 +722,11 @@ struct mfile {
 #endif /* __WANT_MFILE__mf_lopX */
 	};
 #else /* __WANT_MFILE__mf_... */
+#ifdef __WANT_FS_INIT
+#define MFILE_INIT_mf_atime(mf_atime__tv_sec, mf_atime__tv_nsec) { mf_atime__tv_sec, mf_atime__tv_nsec }
+#define MFILE_INIT_mf_mtime(mf_mtime__tv_sec, mf_mtime__tv_nsec) { mf_mtime__tv_sec, mf_mtime__tv_nsec }
+#define MFILE_INIT_mf_ctime(mf_ctime__tv_sec, mf_ctime__tv_nsec) { mf_ctime__tv_sec, mf_ctime__tv_nsec }
+#endif /* __WANT_FS_INIT */
 	struct timespec               mf_atime;      /* [lock(_MFILE_F_SMP_TSLOCK)][const_if(MFILE_F_NOATIME)][valid_if(!MFILE_F_DELETED)]
 	                                              * Last-accessed timestamp. NOTE!!!  Becomes invalid when  `MFILE_F_DELETED' is  set!
 	                                              * iow: After reading this field, you must first check if `MFILE_F_DELETED' is set
@@ -704,6 +742,7 @@ struct mfile {
 #endif /* !__WANT_MFILE__mf_... */
 #endif /* CONFIG_USE_NEW_FS */
 };
+
 
 
 #ifdef CONFIG_USE_NEW_FS
@@ -840,11 +879,13 @@ NOTHROW(mfile_changed)(struct mfile *__restrict self, uintptr_t what) {
 
 /* Get a [0..1]-pointer to the VIO operators of `self'
  * TODO: Remove this macro once `CONFIG_USE_NEW_FS' becomes the default */
+#ifdef LIBVIO_CONFIG_ENABLED
 #ifndef CONFIG_USE_NEW_FS
 #define mfile_getvio(self) ((self)->mf_vio)
 #else /* !CONFIG_USE_NEW_FS */
 #define mfile_getvio(self) ((self)->mf_ops->mo_vio)
 #endif /* CONFIG_USE_NEW_FS */
+#endif /* LIBVIO_CONFIG_ENABLED */
 
 
 #ifndef CONFIG_USE_NEW_FS
@@ -970,9 +1011,10 @@ DEFINE_REFCOUNT_FUNCTIONS(struct mfile, mf_refcnt, mfile_destroy)
 #ifdef CONFIG_USE_NEW_FS
 /* Make the given file anonymous+deleted. What this means is that (in order):
  *  - The `MFILE_F_DELETED' flag is set for the file.
+ *  - The `MFILE_F_PERSISTENT' flag is cleared for the file.
  *  - The file-fields of all mem-parts are altered to point
  *    at  anonymous  memory   files.  (s.a.   `mfile_anon')
- *  - The `MPART_F_GLOBAL_REF' flag is cleared for all parts
+ *  - The `MPART_F_GLOBAL_REF' and `MPART_F_PERSISTENT' flag is cleared for all parts
  *  - The `mf_parts' and `mf_changed' fields are set to `MFILE_PARTS_ANONYMOUS'
  *  - The `mf_filesize' field is set to `0'.
  * The result of all of this is that it is no longer possible to
@@ -988,6 +1030,12 @@ DEFINE_REFCOUNT_FUNCTIONS(struct mfile, mf_refcnt, mfile_destroy)
  * become available. */
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL mfile_delete)(struct mfile *__restrict self);
+
+/* Internal implementation of `mfile_delete()' (don't call this one
+ * unless you know that you're doing; otherwise, you may cause race
+ * conditions that can result in data corruption) */
+FUNDEF NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL mfile_delete_impl)(/*inherit(always)*/ REF struct mfile *__restrict self);
 
 
 /* Change  the size of the given file. If the new size is smaller than

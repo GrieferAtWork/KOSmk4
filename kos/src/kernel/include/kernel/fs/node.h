@@ -103,7 +103,7 @@ struct chrdev;
  *             |
  *             +----> fdevnode  (S_IFBLK | S_IFCHR)
  *             |        |
- *             |        +-----> fdevfsnode                   Base class for device nodes within devfs
+ *             |        +-----> device                       Base class for device nodes within devfs
  *             |                  |
  *             |                  +-----> blkdev  (S_IFBLK)  (TODO: replacement for `struct block_device')
  *             |                  |
@@ -129,36 +129,32 @@ struct chrdev;
  *      - always: MFILE_F_NOUSRIO;
  *      - always: MFILE_F_FIXEDFILESIZE;
  *   - flnknode:
- *      - always: mf_parts == MFILE_PARTS_ANONYMOUS;
+ *      - always: mf_parts == MFILE_PARTS_ANONYMOUS; // iow: mfile_isanon(self);
  *      - always: MFILE_F_READONLY;
  *      - always: MFILE_F_FIXEDFILESIZE;
  *      - always: MFILE_F_NOUSRMMAP;
  *      - always: MFILE_F_NOUSRIO;
- *      - always: mfile_isanon(self);
  *   - ffifonode:
  *      - always: mf_filesize == 0;
- *      - always: mf_parts == MFILE_PARTS_ANONYMOUS;
+ *      - always: mf_parts == MFILE_PARTS_ANONYMOUS; // iow: mfile_isanon(self);
  *      - always: MFILE_F_READONLY;
  *      - always: MFILE_F_FIXEDFILESIZE;
  *      - always: MFILE_F_NOUSRMMAP;
  *      - always: MFILE_F_NOUSRIO;
- *      - always: mfile_isanon(self);
  *   - fsocknode:
  *      - always: mf_filesize == 0;
- *      - always: mf_parts == MFILE_PARTS_ANONYMOUS;
+ *      - always: mf_parts == MFILE_PARTS_ANONYMOUS; // iow: mfile_isanon(self);
  *      - always: MFILE_F_READONLY;
  *      - always: MFILE_F_FIXEDFILESIZE;
  *      - always: MFILE_F_NOUSRMMAP;
  *      - always: MFILE_F_NOUSRIO;
- *      - always: mfile_isanon(self);
  *   - blkdev:
  *      - always: MFILE_F_FIXEDFILESIZE;
  *   - chrdev:
  *      - usually: mf_filesize == 0;
- *      - usually: mf_parts == MFILE_PARTS_ANONYMOUS;
+ *      - usually: mf_parts == MFILE_PARTS_ANONYMOUS; // iow: mfile_isanon(self);
  *      - usually: MFILE_F_NOUSRMMAP;
  *      - usually: MFILE_F_FIXEDFILESIZE;
- *      - usually: mfile_isanon(self);
  *   - fsuper:
  *      - always: mf_filesize == (pos_t)-1;
  *      - always: fn_nlink == 1;
@@ -221,26 +217,23 @@ struct fnode
 	struct mfile                fn_file;     /* Underlying mem-file */
 #define _fnode_file_ fn_file.
 #define _fnode_asfile(x) &(x)->fn_file
-#ifdef __WANT_FS_INIT
-#define FNODE_INIT_EX(refcnt, ops, parts, blockshift, fn_nlink,                                  \
-                      fn_mode, fn_uid, fn_gid, fn_ino, fn_super)                                 \
-	{                                                                                            \
-		/* .fn_file   = */ MFILE_INIT_EX(refcnt, &(ops)->no_file, parts, __NULLPTR, blockshift), \
-		/* .fn_nlink  = */ fn_nlink,                                                             \
-		/* .fn_mode   = */ fn_mode,                                                              \
-		/* .fn_uid    = */ fn_uid,                                                               \
-		/* .fn_gid    = */ fn_gid,                                                               \
-		/* .fn_ino    = */ fn_ino,                                                               \
-		/* .fn_super  = */ fn_super,                                                             \
-		FNODE_INIT_fn_changed(__NULLPTR),                                                        \
-		/* .fn_supent = */ { __NULLPTR, __NULLPTR },                                             \
-		/* .fn_allnodes = */ { LIST_ENTRY_UNBOUND_INITIALIZER },                                 \
-	}
-#endif /* __WANT_FS_INIT */
 #else /* __WANT_FS_INLINE_STRUCTURES */
 #define _fnode_file_     /* nothing */
 #define _fnode_asfile(x) x
 #endif /* !__WANT_FS_INLINE_STRUCTURES */
+#ifdef __WANT_FS_INIT
+#define FNODE_INIT_fn_nlink(fn_nlink)  fn_nlink
+#define FNODE_INIT_fn_mode(fn_mode)    fn_mode
+#define FNODE_INIT_fn_uid(fn_uid)      fn_uid
+#define FNODE_INIT_fn_gid(fn_gid)      fn_gid
+#define FNODE_INIT_fn_ino(fn_ino)      fn_ino
+#define FNODE_INIT_fn_super(fn_super)  fn_super
+#define FNODE_INIT_fn_supent           { __NULLPTR, __NULLPTR }
+#define FNODE_INIT_fn_supent_EX(...)   __VA_ARGS__
+#define FNODE_INIT_fn_allnodes         { LIST_ENTRY_UNBOUND_INITIALIZER }
+#define FNODE_INIT_fn_allnodes_EX(...) { __VA_ARGS__ }
+#define FNODE_INIT_fn_allsuper_EX(...) { .fn_allsuper = __VA_ARGS__ }
+#endif /* __WANT_FS_INIT */
 	nlink_t                     fn_nlink;    /* [lock(_MFILE_F_SMP_TSLOCK)][<= fn_super->fs_feat.sf_link_max] INode link counter. */
 	mode_t                      fn_mode;     /* [lock(_MFILE_F_SMP_TSLOCK)] INode access mode (but note that file-type bits are [const]). */
 	uid_t                       fn_uid;      /* [lock(_MFILE_F_SMP_TSLOCK)] INode owner UID. (guarantied to be ) */
@@ -257,13 +250,15 @@ struct fnode
 		Toblockop(fsuper)      _fn_chnglop;  /* Used internally... */
 	};
 #ifdef __WANT_FS_INIT
-#define FNODE_INIT_fn_changed(fn_changed) { fn_changed }
+#define FNODE_INIT_fn_changed         { LIST_ENTRY_UNBOUND_INITIALIZER }
+#define FNODE_INIT_fn_changed_EX(...) { __VA_ARGS__ }
 #endif /* __WANT_FS_INIT */
 #else /* __WANT_FNODE__fn_chnglop */
 	LIST_ENTRY(REF fnode)       fn_changed;  /* [0..1][lock(fn_super->fs_changednodes_lock)][LIST(fn_super->fs_changednodes)]
 	                                          * Link entry in the list of changed file-nodes. */
 #ifdef __WANT_FS_INIT
-#define FNODE_INIT_fn_changed(fn_changed) fn_changed
+#define FNODE_INIT_fn_changed         LIST_ENTRY_UNBOUND_INITIALIZER
+#define FNODE_INIT_fn_changed_EX(...) __VA_ARGS__
 #endif /* __WANT_FS_INIT */
 #endif /* !__WANT_FNODE__fn_chnglop */
 	LLRBTREE_NODE(fnode)        fn_supent;   /* [lock(fn_super->fs_nodeslock)][LIST(fn_super->fs_nodes)]
@@ -273,14 +268,14 @@ struct fnode
 	                                          * nodes. In this case, the `MFILE_F_PERSISTENT' flag may be
 	                                          * assumed to have already been cleared. */
 	union {
-		LIST_ENTRY(fnode)       fn_allnodes; /* [0..1][lock(:fnode_all_lock)][valid_if(!fnode_issuper(self))]
-		                                      * Link entry within  the global  list of all  file nodes.  When
-		                                      * `MFILE_FN_GLOBAL_REF' is set,  then the global  list holds  a
-		                                      * reference to this node. (Even when this link isn't bound) */
-		LIST_ENTRY(fsuper)      fn_allsuper; /* [0..1][lock(:fsuper_all_lock)][valid_if(fnode_issuper(self))]
-		                                      * Link entry within the global  list of all super blocks.  When
-		                                      * `MFILE_FN_GLOBAL_REF' is set,  then the global  list holds  a
-		                                      * reference to this node. (Even when this link isn't bound) */
+		LIST_ENTRY(fnode)       fn_allnodes; /* [0..1][lock(:fnode_all_lock && REMOVE_ONCE)][valid_if(!fnode_issuper(self))]
+		                                      * Link entry within the global list of all file nodes. When `MFILE_FN_GLOBAL_REF'
+		                                      * is set, then the global  list holds a reference to  this node. (Even when  this
+		                                      * link isn't bound) */
+		LIST_ENTRY(fsuper)      fn_allsuper; /* [0..1][lock(:fsuper_all_lock && REMOVE_ONCE)][valid_if(fnode_issuper(self))]
+		                                      * Link entry within the global list of all super blocks. When `MFILE_FN_GLOBAL_REF'
+		                                      * is set, then  the global list  holds a reference  to this node.  (Even when  this
+		                                      * link isn't bound) */
 	};
 };
 
@@ -397,50 +392,50 @@ fnode_syncdata(struct fnode *__restrict self)
 
 
 /* Check if a given `struct fnode *self' is one of its many sub-classes. */
-#define fnode_isreg(self)       S_ISREG((self)->fn_mode)
-#define fnode_isdir(self)       S_ISDIR((self)->fn_mode)
-#define fnode_issuper(self)     (_fdirnode_asnode(&(self)->fn_super->fs_root) == (self))
-#define fnode_islnk(self)       S_ISLNK((self)->fn_mode)
-#define fnode_isfifo(self)      S_ISFIFO((self)->fn_mode)
-#define fnode_issock(self)      S_ISSOCK((self)->fn_mode)
-#define fnode_isdev(self)       S_ISDEV((self)->fn_mode)
-#define fnode_isdevfsnode(self) (S_ISDEV((self)->fn_mode) && (self)->fn_super == &devfs)
-#define fnode_isblkdev(self)    (S_ISCHR((self)->fn_mode) && (self)->fn_super == &devfs)
-#define fnode_ischrdev(self)    (S_ISBLK((self)->fn_mode) && (self)->fn_super == &devfs)
-#define fnode_asreg(self)       ((struct fregnode *)(self))
-#define fnode_asdir(self)       ((struct fdirnode *)(self))
-#define fnode_assuper(self)     __COMPILER_CONTAINER_OF((struct fdirnode *)(self), struct fsuper, fs_root)
-#define fnode_aslnk(self)       ((struct flnknode *)(self))
-#define fnode_asfifo(self)      ((struct ffifonode *)(self))
-#define fnode_assock(self)      ((struct fsocknode *)(self))
-#define fnode_asdev(self)       ((struct fdevnode *)(self))
-#define fnode_asdevfsnode(self) ((struct fdevfsnode *)(self))
-#define fnode_asblkdev(self)    ((struct blkdev *)(self))
-#define fnode_aschrdev(self)    ((struct chrdev *)(self))
+#define fnode_isreg(self)     S_ISREG((self)->fn_mode)
+#define fnode_isdir(self)     S_ISDIR((self)->fn_mode)
+#define fnode_issuper(self)   (_fdirnode_asnode(&(self)->fn_super->fs_root) == (self))
+#define fnode_islnk(self)     S_ISLNK((self)->fn_mode)
+#define fnode_isfifo(self)    S_ISFIFO((self)->fn_mode)
+#define fnode_issock(self)    S_ISSOCK((self)->fn_mode)
+#define fnode_isdevnode(self) S_ISDEV((self)->fn_mode)
+#define fnode_isdevice(self)  (S_ISDEV((self)->fn_mode) && (self)->fn_super == _ramfs_super_assuper(&devfs) && (self)->_fnode_file_ mf_ops != &ramfs_devnode_ops.dno_node.no_file)
+#define fnode_isblkdev(self)  (S_ISCHR((self)->fn_mode) && (self)->fn_super == _ramfs_super_assuper(&devfs) && (self)->_fnode_file_ mf_ops != &ramfs_devnode_ops.dno_node.no_file)
+#define fnode_ischrdev(self)  (S_ISBLK((self)->fn_mode) && (self)->fn_super == _ramfs_super_assuper(&devfs) && (self)->_fnode_file_ mf_ops != &ramfs_devnode_ops.dno_node.no_file)
+#define fnode_asreg(self)     ((struct fregnode *)(self))
+#define fnode_asdir(self)     ((struct fdirnode *)(self))
+#define fnode_assuper(self)   __COMPILER_CONTAINER_OF((struct fdirnode *)(self), struct fsuper, fs_root)
+#define fnode_aslnk(self)     ((struct flnknode *)(self))
+#define fnode_asfifo(self)    ((struct ffifonode *)(self))
+#define fnode_assock(self)    ((struct fsocknode *)(self))
+#define fnode_asdevnode(self) ((struct fdevnode *)(self))
+#define fnode_asdevice(self)  ((struct device *)(self))
+#define fnode_asblkdev(self)  ((struct blkdev *)(self))
+#define fnode_aschrdev(self)  ((struct chrdev *)(self))
 
 /* Check if a given `struct mfile *self' is one of its many sub-classes. */
-#define mfile_isnode(self)      ((self)->mf_ops->mo_changed == &fnode_v_changed)
-#define mfile_isreg(self)       (mfile_isnode(self) && fnode_isreg(mfile_asnode(self)))
-#define mfile_isdir(self)       (mfile_isnode(self) && fnode_isdir(mfile_asnode(self)))
-#define mfile_issuper(self)     (mfile_isnode(self) && fnode_issuper(mfile_asnode(self)))
-#define mfile_islnk(self)       (mfile_isnode(self) && fnode_islnk(mfile_asnode(self)))
-#define mfile_isfifo(self)      (mfile_isnode(self) && fnode_isfifo(mfile_asnode(self)))
-#define mfile_issock(self)      (mfile_isnode(self) && fnode_issock(mfile_asnode(self)))
-#define mfile_isdev(self)       (mfile_isnode(self) && fnode_isdev(mfile_asnode(self)))
-#define mfile_isdevfsnode(self) (mfile_isnode(self) && fnode_isdevfsnode(mfile_asnode(self)))
-#define mfile_isblkdev(self)    (mfile_isnode(self) && fnode_isblkdev(mfile_asnode(self)))
-#define mfile_ischrdev(self)    (mfile_isnode(self) && fnode_ischrdev(mfile_asnode(self)))
-#define mfile_asnode(self)      ((struct fnode *)(self))
-#define mfile_asreg(self)       fnode_asreg(mfile_asnode(self))
-#define mfile_asdir(self)       fnode_asdir(mfile_asnode(self))
-#define mfile_assuper(self)     fnode_assuper(mfile_asnode(self))
-#define mfile_aslnk(self)       fnode_aslnk(mfile_asnode(self))
-#define mfile_asfifo(self)      fnode_asfifo(mfile_asnode(self))
-#define mfile_assock(self)      fnode_assock(mfile_asnode(self))
-#define mfile_asdev(self)       fnode_asdev(mfile_asnode(self))
-#define mfile_asdevfsnode(self) fnode_asdevfsnode(mfile_asnode(self))
-#define mfile_asblkdev(self)    fnode_asblkdev(mfile_asnode(self))
-#define mfile_aschrdev(self)    fnode_aschrdev(mfile_asnode(self))
+#define mfile_isnode(self)    ((self)->mf_ops->mo_changed == &fnode_v_changed)
+#define mfile_isreg(self)     (mfile_isnode(self) && fnode_isreg(mfile_asnode(self)))
+#define mfile_isdir(self)     (mfile_isnode(self) && fnode_isdir(mfile_asnode(self)))
+#define mfile_issuper(self)   (mfile_isnode(self) && fnode_issuper(mfile_asnode(self)))
+#define mfile_islnk(self)     (mfile_isnode(self) && fnode_islnk(mfile_asnode(self)))
+#define mfile_isfifo(self)    (mfile_isnode(self) && fnode_isfifo(mfile_asnode(self)))
+#define mfile_issock(self)    (mfile_isnode(self) && fnode_issock(mfile_asnode(self)))
+#define mfile_isdevnode(self) (mfile_isnode(self) && fnode_isdevnode(mfile_asnode(self)))
+#define mfile_isdevice(self)  (mfile_isnode(self) && fnode_isdevice(mfile_asnode(self)))
+#define mfile_isblkdev(self)  (mfile_isnode(self) && fnode_isblkdev(mfile_asnode(self)))
+#define mfile_ischrdev(self)  (mfile_isnode(self) && fnode_ischrdev(mfile_asnode(self)))
+#define mfile_asnode(self)    ((struct fnode *)(self))
+#define mfile_asreg(self)     fnode_asreg(mfile_asnode(self))
+#define mfile_asdir(self)     fnode_asdir(mfile_asnode(self))
+#define mfile_assuper(self)   fnode_assuper(mfile_asnode(self))
+#define mfile_aslnk(self)     fnode_aslnk(mfile_asnode(self))
+#define mfile_asfifo(self)    fnode_asfifo(mfile_asnode(self))
+#define mfile_assock(self)    fnode_assock(mfile_asnode(self))
+#define mfile_asdevnode(self) fnode_asdevnode(mfile_asnode(self))
+#define mfile_asdevice(self)  fnode_asdevice(mfile_asnode(self))
+#define mfile_asblkdev(self)  fnode_asblkdev(mfile_asnode(self))
+#define mfile_aschrdev(self)  fnode_aschrdev(mfile_asnode(self))
 
 /* Filenode tree operations. (for `struct fsuper::fs_nodes') */
 FUNDEF NOBLOCK ATTR_PURE WUNUSED struct fnode *NOTHROW(FCALL fnode_tree_locate)(/*nullable*/ struct fnode *root, ino_t key);

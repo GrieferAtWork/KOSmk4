@@ -189,7 +189,16 @@ mfile_sync(struct mfile *__restrict self)
 	 * currently changed parts  will cause the  CHANGED flag to  be
 	 * set once again, without it ever being cleared when there are
 	 * no changed parts at all. */
-	ATOMIC_AND(self->mf_flags, ~MFILE_F_CHANGED);
+	for (;;) {
+		uintptr_t flags;
+		flags = ATOMIC_READ(self->mf_flags);
+		if (flags & MFILE_F_DELETED)
+			break;
+		if (!(flags & MFILE_F_CHANGED))
+			break;
+		if (ATOMIC_CMPXCH_WEAK(self->mf_flags, flags, flags & ~MFILE_F_CHANGED))
+			break;
+	}
 #endif /* CONFIG_USE_NEW_FS */
 	do {
 		changes = ATOMIC_READ(self->mf_changed.slh_first);

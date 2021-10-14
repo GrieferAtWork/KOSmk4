@@ -108,14 +108,14 @@ NOTHROW(FCALL fnode_add2changed)(struct fnode *__restrict self) {
 	                  "below to be thread- and async-safe");
 
 	/* Try to acquire a lock to the list of changed superblocks */
-	if (fsuper_changednodes_lock_tryacquire(super)) {
+	if (fsuper_changednodes_tryacquire(super)) {
 		bool is_first = false;
 		if (!LIST_ISBOUND(self, fn_changed)) {
 			incref(self);
 			is_first = LIST_EMPTY(&super->fs_changednodes);
 			LIST_INSERT_HEAD(&super->fs_changednodes, self, fn_changed);
 		}
-		fsuper_changednodes_lock_release(super);
+		fsuper_changednodes_release(super);
 		if (is_first) {
 			/* First changed node was added to the superblock.
 			 * -> Mark the superblock as changed (for `sync(2)') */
@@ -201,7 +201,8 @@ PRIVATE NOBLOCK NONNULL((1, 2)) Tobpostlockop(fsuper) *
 NOTHROW(LOCKOP_CC fnode_v_destroy_rmsuper_lop)(Toblockop(fsuper) *__restrict self,
                                                struct fsuper *__restrict obj) {
 	struct fnode *me = container_of(self, struct fnode, _mf_fsuperlop);
-	if (ATOMIC_READ(me->fn_supent.rb_lhs) != FSUPER_NODES_DELETED) {
+	COMPILER_READ_BARRIER();
+	if (me->fn_supent.rb_lhs != FSUPER_NODES_DELETED) {
 		assert(obj->fs_nodes != FSUPER_NODES_DELETED);
 		fsuper_nodes_removenode(obj, me);
 	}
@@ -216,7 +217,7 @@ NOTHROW(LOCKOP_CC fnode_v_destroy_rmsuper_lop)(Toblockop(fsuper) *__restrict sel
  * sub-class destroy-operator. */
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL fnode_v_destroy)(struct fnode *__restrict self) {
-	assertf(!(self->mf_flags & (MFILE_FN_GLOBAL_REF | MFILE_F_PERSISTENT)),
+	assertf(!(self->mf_flags & MFILE_FN_GLOBAL_REF),
 	        "Then why are we being destroyed?");
 
 	/* Remove the node from its superblock's node-tree, as well
@@ -241,16 +242,17 @@ NOTHROW(FCALL fnode_v_destroy)(struct fnode *__restrict self) {
 		REF struct fsuper *super = self->fn_super;
 		/* Remove from the associated superblock's list of nodes. */
 		if (ATOMIC_READ(self->fn_supent.rb_lhs) != FSUPER_NODES_DELETED) {
-			if (fsuper_nodeslock_trywrite(super)) {
-				if (ATOMIC_READ(self->fn_supent.rb_lhs) != FSUPER_NODES_DELETED) {
+			if (fsuper_nodes_trywrite(super)) {
+				COMPILER_READ_BARRIER();
+				if (self->fn_supent.rb_lhs != FSUPER_NODES_DELETED) {
 					assert(super->fs_nodes != FSUPER_NODES_DELETED);
 					fsuper_nodes_removenode(super, self);
 				}
-				fsuper_nodeslock_endwrite(super);
+				fsuper_nodes_endwrite(super);
 			} else {
 				self->_mf_fsuperlop.olo_func = &fnode_v_destroy_rmsuper_lop;
 				oblockop_enqueue(&super->fs_nodeslockops, &self->_mf_fsuperlop);
-				_fsuper_nodeslock_reap(super);
+				_fsuper_nodes_reap(super);
 				decref_unlikely(super);
 				return;
 			}
@@ -473,15 +475,18 @@ fnode_syncattr(struct fnode *__restrict self)
 	uintptr_t old_flags;
 
 	/* Clear the `MFILE_F_ATTRCHANGED' flag. */
-	old_flags = ATOMIC_FETCHAND(self->mf_flags, ~MFILE_F_ATTRCHANGED);
-	if (!(old_flags & MFILE_F_ATTRCHANGED))
-		return;
+	do {
+		old_flags = ATOMIC_READ(self->mf_flags);
+		if (!(old_flags & MFILE_F_ATTRCHANGED) || (old_flags & MFILE_F_DELETED))
+			return;
+	} while (!ATOMIC_CMPXCH_WEAK(self->mf_flags, old_flags,
+	                             old_flags & ~MFILE_F_ATTRCHANGED));
 
 	if (!(old_flags & MFILE_F_CHANGED)) {
 		super = self->fn_super;
 again_acquire_super_changed:
 		TRY {
-			fsuper_changednodes_lock_acquire(super);
+			fsuper_changednodes_acquire(super);
 		} EXCEPT {
 			mfile_changed(self, MFILE_F_ATTRCHANGED);
 			RETHROW();
@@ -491,16 +496,16 @@ again_acquire_super_changed:
 			 * superblock's changed list. In this case we have to let the  LOP
 			 * do its thing before we can safely remove the node. */
 			if unlikely(self->_fn_chnglop.olo_func == &fnode_add2changed_lop) {
-				fsuper_changednodes_lock_release(super);
+				fsuper_changednodes_release(super);
 				goto again_acquire_super_changed;
 			}
 			LIST_UNBIND(self, fn_changed);
 			decref_nokill(self); /* Inherited from the changed list */
 		}
-		fsuper_changednodes_lock_release(super);
+		fsuper_changednodes_release(super);
 
 		/* To prevent race conditions, re-check if the node
-		 * should actually appear within the changed list. */
+		 * should  actually appear within the changed list. */
 		if (ATOMIC_READ(self->mf_flags) & MFILE_F_CHANGED)
 			fnode_add2changed(self);
 	}
@@ -529,15 +534,18 @@ fnode_syncdata(struct fnode *__restrict self)
 	uintptr_t old_flags;
 
 	/* Clear the `MFILE_F_CHANGED' flag. */
-	old_flags = ATOMIC_FETCHAND(self->mf_flags, ~MFILE_F_CHANGED);
-	if (!(old_flags & MFILE_F_CHANGED))
-		return;
+	do {
+		old_flags = ATOMIC_READ(self->mf_flags);
+		if (!(old_flags & MFILE_F_CHANGED) || (old_flags & MFILE_F_DELETED))
+			return;
+	} while (!ATOMIC_CMPXCH_WEAK(self->mf_flags, old_flags,
+	                             old_flags & ~MFILE_F_CHANGED));
 
 	if (!(old_flags & MFILE_F_ATTRCHANGED)) {
 		super = self->fn_super;
 again_acquire_super_changed:
 		TRY {
-			fsuper_changednodes_lock_acquire(super);
+			fsuper_changednodes_acquire(super);
 		} EXCEPT {
 			mfile_changed(self, MFILE_F_CHANGED);
 			RETHROW();
@@ -547,16 +555,16 @@ again_acquire_super_changed:
 			 * superblock's changed list. In this case we have to let the  LOP
 			 * do its thing before we can safely remove the node. */
 			if unlikely(self->_fn_chnglop.olo_func == &fnode_add2changed_lop) {
-				fsuper_changednodes_lock_release(super);
+				fsuper_changednodes_release(super);
 				goto again_acquire_super_changed;
 			}
 			LIST_UNBIND(self, fn_changed);
 			decref_nokill(self); /* Inherited from the changed list */
 		}
-		fsuper_changednodes_lock_release(super);
+		fsuper_changednodes_release(super);
 
 		/* To prevent race conditions, re-check if the node
-		 * should actually appear within the changed list. */
+		 * should  actually appear within the changed list. */
 		if (ATOMIC_READ(self->mf_flags) & MFILE_F_ATTRCHANGED)
 			fnode_add2changed(self);
 	}

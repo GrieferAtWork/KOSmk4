@@ -79,6 +79,7 @@ NOTHROW(KCALL fclnknode_v_linkstr)(struct flnknode *__restrict self);
  *  - return->_fclnknode_lnode_ _flnknode_node_ fn_gid
  *  - return->_fclnknode_lnode_ _flnknode_node_ fn_allnodes
  *  - return->_fclnknode_lnode_ _flnknode_node_ fn_supent
+ *  - return->_fclnknode_lnode_ _flnknode_node_ fn_nlink
  *  - return->_fclnknode_lnode_ _flnknode_node_ fn_ino
  *  - return->_fclnknode_lnode_ _flnknode_node_ fn_mode (with something or'd with S_IFLNK)
  *  - return->lnc_text[0 ... text_length-1]    (exactly `text_length' characters; trailing NUL was already initialized) */

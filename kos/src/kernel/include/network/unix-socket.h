@@ -125,6 +125,10 @@ struct unix_server {
 	((self)->us_max_backlog = 0,         \
 	 (self)->us_acceptme    = __NULLPTR, \
 	 sig_init(&(self)->us_acceptme_sig))
+#define unix_server_cinit(self)                         \
+	(__hybrid_assert((self)->us_max_backlog == 0),      \
+	 __hybrid_assert((self)->us_acceptme == __NULLPTR), \
+	 sig_cinit(&(self)->us_acceptme_sig))
 
 /* Finalize the given Unix domain server */
 FUNDEF NOBLOCK NONNULL((1)) void

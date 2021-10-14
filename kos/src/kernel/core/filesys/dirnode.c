@@ -30,6 +30,7 @@
 #include <kos/except.h>
 
 #include <assert.h>
+#include <dirent.h>
 #include <stddef.h>
 #include <string.h>
 
@@ -41,6 +42,53 @@ DECL_BEGIN
 #define DBG_memset(...) (void)0
 #endif /* NDEBUG || NDEBUG_FINI */
 
+
+/* Feed   directory  entry  information  (the  `feed_d_*'  arguments)
+ * into `buf' as requested by  `readdir_mode' ('.' and '..'  handling
+ * is  _NOT_ done by  this function), and  return the expected return
+ * value, or its bitwise-inverse. When a positive number is returned,
+ * the fed directory  entry should be  consumed (read: yielded).  But
+ * when a negative number is returned, the directory entry should not
+ * be  consumed, and the caller should forward the bitwise inverse to
+ * their caller.
+ * @return: >= 0: Advance directory position to next entry and re-return this value.
+ * @return: <  0: Keep current directory position and re-return bitwise inverse ('~') of this value. */
+PUBLIC WUNUSED ssize_t FCALL
+fdirenum_feedent(USER CHECKED struct dirent *buf,
+                 size_t bufsize, readdir_mode_t readdir_mode,
+                 ino_t feed_d_ino, unsigned char feed_d_type,
+                 u16 feed_d_namlen, USER CHECKED char const *feed_d_name)
+		THROWS(E_SEGFAULT) {
+	size_t result;
+	result = ((offsetof(struct dirent, d_name)) +
+	          (feed_d_namlen + 1) * sizeof(char));
+	if (bufsize >= offsetof(struct dirent, d_name)) {
+		/* Fill in basic members of the user-buffer (CAUTION: E_SEGFAULT) */
+		buf->d_ino    = (typeof(buf->d_ino))feed_d_ino;
+		buf->d_type   = (typeof(buf->d_type))feed_d_type;
+		buf->d_namlen = (typeof(buf->d_ino))feed_d_namlen;
+		bufsize -= offsetof(struct dirent, d_name);
+		if (bufsize >= (size_t)(feed_d_namlen + 1))
+			bufsize = (size_t)(feed_d_namlen + 1);
+		else if ((readdir_mode & READDIR_MODEMASK) == READDIR_DEFAULT) {
+			result ^= (size_t)-1; /* Don't yield */
+		}
+
+		/* Copy the entry name to user-space (CAUTION: E_SEGFAULT) */
+		memcpy(buf->d_name, feed_d_name, bufsize, sizeof(char));
+		COMPILER_WRITE_BARRIER();
+		if ((readdir_mode & READDIR_MODEMASK) == READDIR_PEEK)
+			result ^= (size_t)-1; /* Don't yield */
+	} else {
+		if ((readdir_mode & READDIR_MODEMASK) != READDIR_CONTINUE)
+			result ^= (size_t)-1; /* Don't yield */
+	}
+	return result;
+}
+
+
+
+
 /* Default operators for `struct fdirnode_ops' */
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL fdirnode_v_destroy)(struct mfile *__restrict self) {
@@ -50,18 +98,13 @@ NOTHROW(KCALL fdirnode_v_destroy)(struct mfile *__restrict self) {
 	fnode_v_destroy(self);
 }
 
-/* Lookup the INode associated with a given name within `self'.
- * @return: NULL: No entry exists that is matching the given name. */
 PUBLIC WUNUSED NONNULL((1, 2)) REF struct fnode *KCALL
-fdirnode_lookup_fnode(struct fdirnode *__restrict self,
-                      struct flookup_info *__restrict info) {
+fdirnode_v_lookup_fnode(struct fdirnode *__restrict self,
+                        struct flookup_info *__restrict info) {
 	struct fdirnode_ops const *ops;
 	REF struct fdirent *dirent;
 	REF struct fnode *result;
-	ops = fdirnode_getops(self);
-	if (ops->dno_lookup_fnode)
-		return (*ops->dno_lookup_fnode)(self, info);
-	assert(ops->dno_lookup);
+	ops    = fdirnode_getops(self);
 	dirent = (*ops->dno_lookup)(self, info);
 	if (!dirent)
 		return NULL;
@@ -73,18 +116,23 @@ fdirnode_lookup_fnode(struct fdirnode *__restrict self,
 }
 
 
+
+
+
 /* Create new files within a given directory.
  * If another  file with  the same  name already  existed,  then
  * `FMKFILE_F_EXISTS' is set, and that file is returned instead.
- * @throw: E_FSERROR_ILLEGAL_PATH:        `info->mkf_name' contains bad characters
- * @throw: E_FSERROR_DISK_FULL:           Disk full
- * @throw: E_FSERROR_READONLY:            Read-only filesystem (or unsupported operation)
- * @throw: E_FSERROR_TOO_MANY_HARD_LINKS: ... */
+ * @throw: E_FSERROR_ILLEGAL_PATH:          `info->mkf_name' contains bad characters
+ * @throw: E_FSERROR_DISK_FULL:             Disk full
+ * @throw: E_FSERROR_READONLY:              Read-only filesystem (or unsupported operation)
+ * @throw: E_FSERROR_TOO_MANY_HARD_LINKS:   ...
+ * @throw: E_FSERROR_UNSUPPORTED_OPERATION: The requested S_IFMT isn't supported. */
 PUBLIC NONNULL((1, 2)) void FCALL
 fdirnode_mkfile(struct fdirnode *__restrict self,
                 struct fmkfile_info *__restrict info)
 		THROWS(E_FSERROR_ILLEGAL_PATH, E_FSERROR_DISK_FULL,
-		       E_FSERROR_READONLY, E_FSERROR_TOO_MANY_HARD_LINKS) {
+		       E_FSERROR_READONLY, E_FSERROR_TOO_MANY_HARD_LINKS,
+		       E_FSERROR_UNSUPPORTED_OPERATION) {
 	struct fdirnode_ops const *ops;
 	ops = fdirnode_getops(self);
 	if unlikely(!ops->dno_mkfile)

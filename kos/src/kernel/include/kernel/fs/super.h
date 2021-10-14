@@ -168,11 +168,8 @@ LIST_HEAD(vmount_list, vmount);
 
 struct fsuper {
 	/* More fields of custom (fs-specific) `fsuper' sub-classes go here. */
-	REF_IF([*].mf_flags & MFILE_F_PERSISTENT)
-	LLRBTREE_ROOT(fnode)        fs_nodes;         /* [0..n][lock(fs_nodeslock)] Tree of  known nodes (ordered  by INO  number)
-	                                               * This tree holds a reference to any file that has the `MFILE_F_PERSISTENT'
-	                                               * flag set. When set to  `FSUPER_NODES_DELETED', no further file-nodes  can
-	                                               * be added. */
+	LLRBTREE_ROOT(fnode)        fs_nodes;         /* [0..n][lock(fs_nodeslock)] Tree of known nodes (ordered by INO  number)
+	                                               * When set to `FSUPER_NODES_DELETED', no further file-nodes can be added. */
 	struct atomic_rwlock        fs_nodeslock;     /* Lock for `fs_nodes' */
 	Toblockop_slist(fsuper)     fs_nodeslockops;  /* [lock(ATOMIC)] Pending lock-operations for `fs_nodeslock' */
 	struct vmount_list          fs_mounts;        /* [0..n][lock(fs_mountslock)]  List of mounting points of this superblock.
@@ -185,11 +182,11 @@ struct fsuper {
 	struct atomic_lock          fs_changednodes_lock; /* Lock for `fs_changednodes' */
 	Toblockop_slist(fsuper)     fs_changednodes_lops; /* Lock operators for `fs_changednodes_lock' */
 	struct REF fnode_list       fs_changednodes;  /* [0..n][lock(fs_changednodes_lock)][const_if(FSUPER_NODES_DELETED)]
-	                                               * List  of   changed   node   (set  to   DELETED   during   unmount)
-	                                               * Note  that   for  ramfs   filesystems,  this   list  will   always
-	                                               * be  marked  as   DELETED,  in  order   to  prevent  the   tracking
-	                                               * of  changed  files,  since  there'd   be  no  point  in   tracking
-	                                               * them if one can't write them do any backing storage! */
+	                                               * List of changed  node (set  to DELETED during  unmount). Note  that
+	                                               * for  ramfs filesystems, this list will always be marked as DELETED,
+	                                               * in  order to prevent  the tracking of  changed files, since there'd
+	                                               * be no point in tracking them if one can't write them do any backing
+	                                               * storage! */
 #ifdef __WANT_FSUPER__fs_changedsuper_lop
 	union {
 		LIST_ENTRY(REF fsuper)  fs_changedsuper;  /* [0..1][lock(fchangedsuper_lock)] Entry in the list of changed superblocks. */
@@ -271,7 +268,7 @@ FUNDEF NOBLOCK NONNULL((1)) __BOOL NOTHROW(FCALL fsuper_add2changed)(struct fsup
  * @param: struct fsuper     *self: Directory node to initialize.
  * @param: struct fsuper_ops *ops:  Directory operators.
  * @param: struct ffilesys   *fsys: File system information. */
-#define _fdirnode_init(self, ops, fsys)                                                           \
+#define _fsuper_init(self, ops, fsys)                                                             \
 	(_fsuper_assert_ops_(ops) /**/                                                                \
 	 ((self)->fs_nodes = _fdirnode_asnode(&(self)->fs_root)),                                     \
 	 atomic_rwlock_init(&(self)->fs_nodeslock),                                                   \
@@ -296,7 +293,7 @@ FUNDEF NOBLOCK NONNULL((1)) __BOOL NOTHROW(FCALL fsuper_add2changed)(struct fsup
 	 (self)->fs_root._fdirnode_node_ fn_supent.rb_lhs         = __NULLPTR,                        \
 	 (self)->fs_root._fdirnode_node_ fn_supent.rb_rhs         = __NULLPTR,                        \
 	 (self)->fs_root.dn_parent                                = __NULLPTR)
-#define _fdirnode_cinit(self, ops, fsys)                                                          \
+#define _fsuper_cinit(self, ops, fsys)                                                            \
 	(_fsuper_assert_ops_(ops) /**/                                                                \
 	 ((self)->fs_nodes = _fdirnode_asnode(&(self)->fs_root)),                                     \
 	 atomic_rwlock_cinit(&(self)->fs_nodeslock),                                                  \
@@ -332,66 +329,66 @@ FUNDEF NOBLOCK NONNULL((1)) __BOOL NOTHROW(FCALL fsuper_add2changed)(struct fsup
 
 
 /* Helper macros for `struct fsuper::fs_changednodes_lock' */
-#define _fsuper_changednodes_reap(self)           _oblockop_reap_atomic_lock(&(self)->fs_changednodes_lops, &(self)->fs_changednodes_lock, self)
-#define fsuper_changednodes_reap(self)            oblockop_reap_atomic_lock(&(self)->fs_changednodes_lops, &(self)->fs_changednodes_lock, self)
-#define fsuper_changednodes_mustreap(self)        oblockop_mustreap(&(self)->fs_changednodes_lops)
-#define fsuper_changednodes_lock_tryacquire(self) atomic_lock_tryacquire(&(self)->fs_changednodes_lock)
-#define fsuper_changednodes_lock_acquire(self)    atomic_lock_acquire(&(self)->fs_changednodes_lock)
-#define fsuper_changednodes_lock_acquire_nx(self) atomic_lock_acquire_nx(&(self)->fs_changednodes_lock)
-#define _fsuper_changednodes_lock_release(self)   atomic_lock_release(&(self)->fs_changednodes_lock)
-#define fsuper_changednodes_lock_release(self)    (atomic_lock_release(&(self)->fs_changednodes_lock), fsuper_changednodes_reap(self))
-#define fsuper_changednodes_lock_acquired(self)   atomic_lock_acquired(&(self)->fs_changednodes_lock)
-#define fsuper_changednodes_lock_available(self)  atomic_lock_available(&(self)->fs_changednodes_lock)
+#define _fsuper_changednodes_reap(self)      _oblockop_reap_atomic_lock(&(self)->fs_changednodes_lops, &(self)->fs_changednodes_lock, self)
+#define fsuper_changednodes_reap(self)       oblockop_reap_atomic_lock(&(self)->fs_changednodes_lops, &(self)->fs_changednodes_lock, self)
+#define fsuper_changednodes_mustreap(self)   oblockop_mustreap(&(self)->fs_changednodes_lops)
+#define fsuper_changednodes_tryacquire(self) atomic_lock_tryacquire(&(self)->fs_changednodes_lock)
+#define fsuper_changednodes_acquire(self)    atomic_lock_acquire(&(self)->fs_changednodes_lock)
+#define fsuper_changednodes_acquire_nx(self) atomic_lock_acquire_nx(&(self)->fs_changednodes_lock)
+#define _fsuper_changednodes_release(self)   atomic_lock_release(&(self)->fs_changednodes_lock)
+#define fsuper_changednodes_release(self)    (atomic_lock_release(&(self)->fs_changednodes_lock), fsuper_changednodes_reap(self))
+#define fsuper_changednodes_acquired(self)   atomic_lock_acquired(&(self)->fs_changednodes_lock)
+#define fsuper_changednodes_available(self)  atomic_lock_available(&(self)->fs_changednodes_lock)
 
 /* Helper macros for `struct fsuper::fs_nodeslock' */
-#define fsuper_nodeslock_mustreap(self)   oblockop_mustreap(&(self)->fs_nodeslockops)
-#define fsuper_nodeslock_reap(self)       oblockop_reap_atomic_rwlock(&(self)->fs_nodeslockops, &(self)->fs_nodeslock, self)
-#define _fsuper_nodeslock_reap(self)      _oblockop_reap_atomic_rwlock(&(self)->fs_nodeslockops, &(self)->fs_nodeslock, self)
-#define fsuper_nodeslock_write(self)      atomic_rwlock_write(&(self)->fs_nodeslock)
-#define fsuper_nodeslock_write_nx(self)   atomic_rwlock_write_nx(&(self)->fs_nodeslock)
-#define fsuper_nodeslock_trywrite(self)   atomic_rwlock_trywrite(&(self)->fs_nodeslock)
-#define fsuper_nodeslock_endwrite(self)   (atomic_rwlock_endwrite(&(self)->fs_nodeslock), fsuper_nodeslock_reap(self))
-#define _fsuper_nodeslock_endwrite(self)  atomic_rwlock_endwrite(&(self)->fs_nodeslock)
-#define fsuper_nodeslock_read(self)       atomic_rwlock_read(&(self)->fs_nodeslock)
-#define fsuper_nodeslock_read_nx(self)    atomic_rwlock_read_nx(&(self)->fs_nodeslock)
-#define fsuper_nodeslock_tryread(self)    atomic_rwlock_tryread(&(self)->fs_nodeslock)
-#define _fsuper_nodeslock_endread(self)   atomic_rwlock_endread(&(self)->fs_nodeslock)
-#define fsuper_nodeslock_endread(self)    (void)(atomic_rwlock_endread(&(self)->fs_nodeslock) && (fsuper_nodeslock_reap(self), 0))
-#define _fsuper_nodeslock_end(self)       atomic_rwlock_end(&(self)->fs_nodeslock)
-#define fsuper_nodeslock_end(self)        (void)(atomic_rwlock_end(&(self)->fs_nodeslock) && (fsuper_nodeslock_reap(self), 0))
-#define fsuper_nodeslock_upgrade(self)    atomic_rwlock_upgrade(&(self)->fs_nodeslock)
-#define fsuper_nodeslock_upgrade_nx(self) atomic_rwlock_upgrade_nx(&(self)->fs_nodeslock)
-#define fsuper_nodeslock_tryupgrade(self) atomic_rwlock_tryupgrade(&(self)->fs_nodeslock)
-#define fsuper_nodeslock_downgrade(self)  atomic_rwlock_downgrade(&(self)->fs_nodeslock)
-#define fsuper_nodeslock_reading(self)    atomic_rwlock_reading(&(self)->fs_nodeslock)
-#define fsuper_nodeslock_writing(self)    atomic_rwlock_writing(&(self)->fs_nodeslock)
-#define fsuper_nodeslock_canread(self)    atomic_rwlock_canread(&(self)->fs_nodeslock)
-#define fsuper_nodeslock_canwrite(self)   atomic_rwlock_canwrite(&(self)->fs_nodeslock)
+#define fsuper_nodes_mustreap(self)   oblockop_mustreap(&(self)->fs_nodeslockops)
+#define fsuper_nodes_reap(self)       oblockop_reap_atomic_rwlock(&(self)->fs_nodeslockops, &(self)->fs_nodeslock, (struct fsuper *)(self))
+#define _fsuper_nodes_reap(self)      _oblockop_reap_atomic_rwlock(&(self)->fs_nodeslockops, &(self)->fs_nodeslock, (struct fsuper *)(self))
+#define fsuper_nodes_write(self)      atomic_rwlock_write(&(self)->fs_nodeslock)
+#define fsuper_nodes_write_nx(self)   atomic_rwlock_write_nx(&(self)->fs_nodeslock)
+#define fsuper_nodes_trywrite(self)   atomic_rwlock_trywrite(&(self)->fs_nodeslock)
+#define fsuper_nodes_endwrite(self)   (atomic_rwlock_endwrite(&(self)->fs_nodeslock), fsuper_nodes_reap(self))
+#define _fsuper_nodes_endwrite(self)  atomic_rwlock_endwrite(&(self)->fs_nodeslock)
+#define fsuper_nodes_read(self)       atomic_rwlock_read(&(self)->fs_nodeslock)
+#define fsuper_nodes_read_nx(self)    atomic_rwlock_read_nx(&(self)->fs_nodeslock)
+#define fsuper_nodes_tryread(self)    atomic_rwlock_tryread(&(self)->fs_nodeslock)
+#define _fsuper_nodes_endread(self)   atomic_rwlock_endread(&(self)->fs_nodeslock)
+#define fsuper_nodes_endread(self)    (void)(atomic_rwlock_endread(&(self)->fs_nodeslock) && (fsuper_nodes_reap(self), 0))
+#define _fsuper_nodes_end(self)       atomic_rwlock_end(&(self)->fs_nodeslock)
+#define fsuper_nodes_end(self)        (void)(atomic_rwlock_end(&(self)->fs_nodeslock) && (fsuper_nodes_reap(self), 0))
+#define fsuper_nodes_upgrade(self)    atomic_rwlock_upgrade(&(self)->fs_nodeslock)
+#define fsuper_nodes_upgrade_nx(self) atomic_rwlock_upgrade_nx(&(self)->fs_nodeslock)
+#define fsuper_nodes_tryupgrade(self) atomic_rwlock_tryupgrade(&(self)->fs_nodeslock)
+#define fsuper_nodes_downgrade(self)  atomic_rwlock_downgrade(&(self)->fs_nodeslock)
+#define fsuper_nodes_reading(self)    atomic_rwlock_reading(&(self)->fs_nodeslock)
+#define fsuper_nodes_writing(self)    atomic_rwlock_writing(&(self)->fs_nodeslock)
+#define fsuper_nodes_canread(self)    atomic_rwlock_canread(&(self)->fs_nodeslock)
+#define fsuper_nodes_canwrite(self)   atomic_rwlock_canwrite(&(self)->fs_nodeslock)
 
 /* Helper macros for `struct fsuper::fs_mountslock' */
-#define fsuper_mountslock_mustreap(self)   oblockop_mustreap(&(self)->fs_mountslockops)
-#define fsuper_mountslock_reap(self)       oblockop_reap_atomic_rwlock(&(self)->fs_mountslockops, &(self)->fs_mountslock, self)
-#define _fsuper_mountslock_reap(self)      _oblockop_reap_atomic_rwlock(&(self)->fs_mountslockops, &(self)->fs_mountslock, self)
-#define fsuper_mountslock_write(self)      atomic_rwlock_write(&(self)->fs_mountslock)
-#define fsuper_mountslock_write_nx(self)   atomic_rwlock_write_nx(&(self)->fs_mountslock)
-#define fsuper_mountslock_trywrite(self)   atomic_rwlock_trywrite(&(self)->fs_mountslock)
-#define fsuper_mountslock_endwrite(self)   (atomic_rwlock_endwrite(&(self)->fs_mountslock), fsuper_mountslock_reap(self))
-#define _fsuper_mountslock_endwrite(self)  atomic_rwlock_endwrite(&(self)->fs_mountslock)
-#define fsuper_mountslock_read(self)       atomic_rwlock_read(&(self)->fs_mountslock)
-#define fsuper_mountslock_read_nx(self)    atomic_rwlock_read_nx(&(self)->fs_mountslock)
-#define fsuper_mountslock_tryread(self)    atomic_rwlock_tryread(&(self)->fs_mountslock)
-#define _fsuper_mountslock_endread(self)   atomic_rwlock_endread(&(self)->fs_mountslock)
-#define fsuper_mountslock_endread(self)    (void)(atomic_rwlock_endread(&(self)->fs_mountslock) && (fsuper_mountslock_reap(self), 0))
-#define _fsuper_mountslock_end(self)       atomic_rwlock_end(&(self)->fs_mountslock)
-#define fsuper_mountslock_end(self)        (void)(atomic_rwlock_end(&(self)->fs_mountslock) && (fsuper_mountslock_reap(self), 0))
-#define fsuper_mountslock_upgrade(self)    atomic_rwlock_upgrade(&(self)->fs_mountslock)
-#define fsuper_mountslock_upgrade_nx(self) atomic_rwlock_upgrade_nx(&(self)->fs_mountslock)
-#define fsuper_mountslock_tryupgrade(self) atomic_rwlock_tryupgrade(&(self)->fs_mountslock)
-#define fsuper_mountslock_downgrade(self)  atomic_rwlock_downgrade(&(self)->fs_mountslock)
-#define fsuper_mountslock_reading(self)    atomic_rwlock_reading(&(self)->fs_mountslock)
-#define fsuper_mountslock_writing(self)    atomic_rwlock_writing(&(self)->fs_mountslock)
-#define fsuper_mountslock_canread(self)    atomic_rwlock_canread(&(self)->fs_mountslock)
-#define fsuper_mountslock_canwrite(self)   atomic_rwlock_canwrite(&(self)->fs_mountslock)
+#define fsuper_mounts_mustreap(self)   oblockop_mustreap(&(self)->fs_mountslockops)
+#define fsuper_mounts_reap(self)       oblockop_reap_atomic_rwlock(&(self)->fs_mountslockops, &(self)->fs_mountslock, self)
+#define _fsuper_mounts_reap(self)      _oblockop_reap_atomic_rwlock(&(self)->fs_mountslockops, &(self)->fs_mountslock, self)
+#define fsuper_mounts_write(self)      atomic_rwlock_write(&(self)->fs_mountslock)
+#define fsuper_mounts_write_nx(self)   atomic_rwlock_write_nx(&(self)->fs_mountslock)
+#define fsuper_mounts_trywrite(self)   atomic_rwlock_trywrite(&(self)->fs_mountslock)
+#define fsuper_mounts_endwrite(self)   (atomic_rwlock_endwrite(&(self)->fs_mountslock), fsuper_mounts_reap(self))
+#define _fsuper_mounts_endwrite(self)  atomic_rwlock_endwrite(&(self)->fs_mountslock)
+#define fsuper_mounts_read(self)       atomic_rwlock_read(&(self)->fs_mountslock)
+#define fsuper_mounts_read_nx(self)    atomic_rwlock_read_nx(&(self)->fs_mountslock)
+#define fsuper_mounts_tryread(self)    atomic_rwlock_tryread(&(self)->fs_mountslock)
+#define _fsuper_mounts_endread(self)   atomic_rwlock_endread(&(self)->fs_mountslock)
+#define fsuper_mounts_endread(self)    (void)(atomic_rwlock_endread(&(self)->fs_mountslock) && (fsuper_mounts_reap(self), 0))
+#define _fsuper_mounts_end(self)       atomic_rwlock_end(&(self)->fs_mountslock)
+#define fsuper_mounts_end(self)        (void)(atomic_rwlock_end(&(self)->fs_mountslock) && (fsuper_mounts_reap(self), 0))
+#define fsuper_mounts_upgrade(self)    atomic_rwlock_upgrade(&(self)->fs_mountslock)
+#define fsuper_mounts_upgrade_nx(self) atomic_rwlock_upgrade_nx(&(self)->fs_mountslock)
+#define fsuper_mounts_tryupgrade(self) atomic_rwlock_tryupgrade(&(self)->fs_mountslock)
+#define fsuper_mounts_downgrade(self)  atomic_rwlock_downgrade(&(self)->fs_mountslock)
+#define fsuper_mounts_reading(self)    atomic_rwlock_reading(&(self)->fs_mountslock)
+#define fsuper_mounts_writing(self)    atomic_rwlock_writing(&(self)->fs_mountslock)
+#define fsuper_mounts_canread(self)    atomic_rwlock_canread(&(self)->fs_mountslock)
+#define fsuper_mounts_canwrite(self)   atomic_rwlock_canwrite(&(self)->fs_mountslock)
 
 
 /* Filenode tree operations. (caller must be holding a lock to `self->fs_nodeslock') */
@@ -434,7 +431,6 @@ FUNDEF void KCALL fsuper_syncall(void)
  * mounting  points  using `self'  have  gone away):
  *  - For all nodes in `self->fs_nodes':
  *    - Call `mfile_delete()'
- *    - Clear the `MFILE_F_PERSISTENT' and `MFILE_FN_GLOBAL_REF' flags
  *    - Remove the fnode from the global list of file-nodes
  *  - Mark the `fs_nodes' and `fs_changednodes' as `FSUPER_NODES_DELETED',
  *    and  drop  references from  all  changed files  that  were captured.

@@ -26,12 +26,21 @@
 #include <fs/node.h>
 #else /* !CONFIG_USE_NEW_FS */
 #include <kernel/fs/clnknode.h>
+#include <kernel/fs/devnode.h>
 #include <kernel/fs/dirent.h>
 #include <kernel/fs/dirnode.h>
+#include <kernel/fs/fifonode.h>
+#include <kernel/fs/filesys.h>
 #include <kernel/fs/node.h>
 #include <kernel/fs/regnode.h>
+#include <kernel/fs/socknode.h>
 #include <kernel/fs/super.h>
 #include <kernel/types.h>
+#include <sched/shared_rwlock.h>
+
+#include <hybrid/sequence/rbtree.h>
+
+#include <kos/aref.h>
 
 #ifdef __CC__
 DECL_BEGIN
@@ -39,12 +48,15 @@ DECL_BEGIN
 #define ramfs_lnknode            fclnknode /* Same type... */
 #define _ramfs_lnknode_lnode_    _fclnknode_lnode_
 #define _ramfs_lnknode_aslnknode _fclnknode_aslnknode
-#define ramfs_lnknode_v_readlink fclnknode_v_readlink
-#define ramfs_lnknode_v_linkstr  fclnknode_v_linkstr
-#define ramfs_lnknode_v_destroy  fclnknode_v_destroy
 #define _ramfs_lnknode_alloc     _fclnknode_alloc
 #define _ramfs_lnknode_new       _fclnknode_new
 #define _ramfs_lnknode_destroy   _fclnknode_destroy
+DATDEF struct flnknode_ops const ramfs_lnknode_ops;
+#define ramfs_lnknode_v_readlink fclnknode_v_readlink
+#define ramfs_lnknode_v_linkstr  fclnknode_v_linkstr
+#define ramfs_lnknode_v_wrattr   fnode_v_wrattr_noop
+#define ramfs_lnknode_v_destroy  fclnknode_v_destroy
+
 
 #define ramfs_regnode              fregnode /* Same type... */
 #define _ramfs_regnode_asnode      _fregnode_asnode
@@ -54,20 +66,74 @@ DECL_BEGIN
 #define _ramfs_regnode_init        _fregnode_init
 #define _ramfs_regnode_cinit       _fregnode_cinit
 #define _ramfs_regnode_fini        _fregnode_fini
+DATDEF struct fregnode_ops const ramfs_regnode_ops;
+#define ramfs_regnode_v_wrattr  fnode_v_wrattr_noop
+#define ramfs_regnode_v_destroy fnode_v_destroy
+
+
+#define ramfs_devnode              fdevnode /* Same type... */
+#define _ramfs_devnode_asnode      _fdevnode_asnode
+#define _ramfs_devnode_node_       _fdevnode_node_
+#define ramfs_devnode_getops       fdevnode_getops
+#define _ramfs_devnode_assert_ops_ _fdevnode_assert_ops_
+#define _ramfs_devnode_init        _fdevnode_init
+#define _ramfs_devnode_cinit       _fdevnode_cinit
+#define _ramfs_devnode_fini        _fdevnode_fini
+DATDEF struct fdevnode_ops const ramfs_devnode_ops;
+#define ramfs_devnode_v_open    fdevnode_v_open
+#define ramfs_devnode_v_wrattr  fnode_v_wrattr_noop
+#define ramfs_devnode_v_destroy fdevnode_v_destroy
+
+
+#define ramfs_fifonode              ffifonode /* Same type... */
+#define _ramfs_fifonode_asnode      _ffifonode_asnode
+#define _ramfs_fifonode_node_       _ffifonode_node_
+#define ramfs_fifonode_getops       ffifonode_getops
+#define _ramfs_fifonode_assert_ops_ _ffifonode_assert_ops_
+#define _ramfs_fifonode_init        _ffifonode_init
+#define _ramfs_fifonode_cinit       _ffifonode_cinit
+#define _ramfs_fifonode_fini        _ffifonode_fini
+DATDEF struct ffifonode_ops const ramfs_fifonode_ops;
+#define ramfs_fifonode_v_open     ffifonode_v_open
+#define ramfs_fifonode_v_read     ffifonode_v_read
+#define ramfs_fifonode_v_readv    ffifonode_v_readv
+#define ramfs_fifonode_v_write    ffifonode_v_write
+#define ramfs_fifonode_v_writev   ffifonode_v_writev
+#define ramfs_fifonode_v_truncate ffifonode_v_truncate
+#define ramfs_fifonode_v_stat     ffifonode_v_stat
+#define ramfs_fifonode_v_hop      ffifonode_v_hop
+#define ramfs_fifonode_v_wrattr   fnode_v_wrattr_noop
+#define ramfs_fifonode_v_destroy  ffifonode_v_destroy
+
+
+#define ramfs_socknode              fsocknode /* Same type... */
+#define _ramfs_socknode_asnode      _fsocknode_asnode
+#define _ramfs_socknode_node_       _fsocknode_node_
+#define ramfs_socknode_getops       fsocknode_getops
+#define _ramfs_socknode_assert_ops_ _fsocknode_assert_ops_
+#define _ramfs_socknode_init        _fsocknode_init
+#define _ramfs_socknode_cinit       _fsocknode_cinit
+#define _ramfs_socknode_fini        _fsocknode_fini
+DATDEF struct fsocknode_ops const ramfs_socknode_ops;
+#define ramfs_socknode_v_open     fsocknode_v_open
+#define ramfs_socknode_v_wrattr   fnode_v_wrattr_noop
+#define ramfs_socknode_v_destroy  fsocknode_v_destroy
+
 
 
 struct ramfs_dirent {
-	/* TODO: Delete flag which, if set, causes this structure to decref() itself.
-	 *       Also, when set, an encounter of this structure in `ramfs_dirdata' is
-	 *       considered a no-op.  (NOTE: Async  self-removing can be  done via  a
-	 *       lockop that can be overlay'd on-top of `rde_ent.fd_ino', since  this
-	 *       sort of self-removal is only done once the refcnt of `rde_ent' drops
-	 *       to 0). */
-	/* TODO: LLRBTREE of files within the directory (root is in `ramfs_dirdata') */
-	REF struct fnode *rde_node; /* [1..1][const] Bound file-node (NOTE: This field also holds a  reference
-	                             * to `->fn_nlink', which is decremented when this structure is destroyed) */
-	struct fdirent    rde_ent;  /* Underlying directory entry. */
+	uintptr_t                     rde_isred;    /* [lock(:rdn_dat.rdd_treelock)] Red/black word (0: black; 1: red) */
+#define RAMFS_DIRENT_TREENODE_DELETED ((REF struct ramfs_dirent *)-1)
+	RBTREE_NODE(REF ramfs_dirent) rde_treenode; /* [0..1][lock(:rdn_dat.rdd_treelock)] File tree.
+	                                             * When `.rb_lhs == RAMFS_DIRENT_TREENODE_DELETED', then this dirent has been deleted. */
+	REF struct fnode             *rde_node;     /* [1..1][const] Bound file-node (NOTE: This field also holds a  reference
+	                                             * to `->fn_nlink', which is decremented when this structure is "unlinked"
+	                                             * from its containing directory `rde_dir') */
+	struct fdirent                rde_ent;      /* Underlying directory entry. */
 };
+
+#define ramfs_dirent_destroy(self) ramfs_dirent_v_destroy(&(self)->rde_ent)
+DEFINE_REFCOUNT_FUNCTIONS(struct ramfs_dirent, rde_ent.fd_refcnt, ramfs_dirent_destroy)
 
 /* Directory entry operators for instances of `ramfs_dirent' */
 DATDEF struct fdirent_ops const ramfs_dirent_ops;
@@ -78,12 +144,57 @@ NOTHROW(KCALL ramfs_dirent_v_opennode)(struct fdirent *__restrict self, struct f
 
 
 /* Extended directory data. */
+struct ramfs_dirnode;
 struct ramfs_dirdata {
-	/* TODO: atomic_rwlock          tree_lock; */
-	/* TODO: LOCKOPS                tree_lops; */
-	/* TODO: LLRBROOT(ramfs_dirent) tree; */
-	int placeholder;
+	struct shared_rwlock          rdd_treelock; /* Lock for `rdd_tree' */
+#define RAMFS_DIRDATA_TREE_DELETED ((REF struct ramfs_dirent *)-1)
+	RBTREE_ROOT(REF ramfs_dirent) rdd_tree;     /* [0..n][lock(rdd_treelock)] Files in this directory (using the filename as
+	                                             * key). Set of `RAMFS_DIRDATA_TREE_DELETED' when the directory was deleted. */
 };
+
+/* Ramfs directory by-name tree operations. (For `struct ramfs_dirdata::rdd_tree') */
+FUNDEF NOBLOCK NONNULL((1, 2)) void NOTHROW(FCALL ramfs_direnttree_insert)(struct ramfs_dirent **__restrict proot, struct ramfs_dirent *__restrict node);
+FUNDEF NOBLOCK NONNULL((1, 2)) void NOTHROW(FCALL ramfs_direnttree_removenode)(struct ramfs_dirent **__restrict proot, struct ramfs_dirent *__restrict node);
+FUNDEF NOBLOCK WUNUSED NONNULL((1)) struct ramfs_dirent *NOTHROW(FCALL ramfs_direnttree_prevnode)(struct ramfs_dirent const *__restrict self);
+FUNDEF NOBLOCK WUNUSED NONNULL((1)) struct ramfs_dirent *NOTHROW(FCALL ramfs_direnttree_nextnode)(struct ramfs_dirent const *__restrict self);
+
+
+
+/* Enumeration of ramfs directories. */
+struct ramfs_dirent;
+AXREF(ramfs_dirent_axref, ramfs_dirent);
+struct ramfs_direnum {
+	struct fdirenum_ops const *rde_ops;  /* [1..1][const] Operators. */
+	struct ramfs_dirent_axref  rde_next; /* [0..1][lock(ATOMIC)] Next directory entry to enumerate. */
+	REF struct ramfs_dirnode  *rde_dir;  /* [1..1][const] Associated directory. */
+	/* NOTE: The deleted-file-problem is solved for ramfs since we can enumerate the contents of
+	 *       a  directory in alphabetical order (thanks to  the R/B-tree). When it's the current
+	 *       file that got deleted, then we can still find the *correct* "next" file to yield by
+	 *       searching for the next-greater node within the  tree that comes after the one  that
+	 *       was deleted. Since compare is done lexicographically, and we've still got access to
+	 *       the name of  the deleted file,  this is essentially  handled by "skipping"  deleted
+	 *       files! */
+};
+
+/* Directory enumeration operators for `struct ramfs_direnum' */
+DATDEF struct fdirenum_ops const ramfs_direnum_ops;
+FUNDEF NOBLOCK NONNULL((1)) void
+NOTHROW(KCALL ramfs_direnum_v_fini)(struct fdirenum *__restrict self);
+FUNDEF NONNULL((1)) size_t KCALL
+ramfs_direnum_v_readdir(struct fdirenum *__restrict self, USER CHECKED struct dirent *buf,
+                        size_t bufsize, readdir_mode_t readdir_mode, iomode_t mode)
+		THROWS(...);
+FUNDEF NONNULL((1)) pos_t KCALL
+ramfs_direnum_v_seekdir(struct fdirenum *__restrict self,
+                        off_t offset, unsigned int whence)
+		THROWS(...);
+
+/* Given a dirent `self' that has been deleted (RAMFS_DIRENT_TREENODE_DELETED),
+ * return a pointer  to the first  dirent in `dir'  that has a  lexicographical
+ * order `>= self'. The caller must be holding `dir->rdn_dat.rdd_treelock' */
+FUNDEF NOBLOCK WUNUSED NONNULL((1, 2)) struct ramfs_dirent *
+NOTHROW(FCALL ramfs_dirent_fixdeleted)(struct ramfs_dirent *__restrict self,
+                                       struct ramfs_dirnode *__restrict dir);
 
 
 
@@ -98,19 +209,95 @@ struct ramfs_dirnode
 	struct ramfs_dirdata rdn_dat; /* Directory data */
 };
 
+/* Directory operators for `struct ramfs_dirnode' */
+DATDEF struct fdirnode_ops const ramfs_dirnode_ops;
+#define ramfs_dirnode_v_wrattr  fnode_v_wrattr_noop
+/* Because  directory can only be destroyed when they're
+ * empty, we don't need a custom destroy function, since
+ * the destruction of a fini-able `struct ramfs_dirdata'
+ * is a no-op! */
+#define ramfs_dirnode_v_destroy fdirnode_v_destroy
+FUNDEF WUNUSED NONNULL((1, 2)) REF struct fdirent *KCALL
+ramfs_dirnode_v_lookup(struct fdirnode *__restrict self,
+                       struct flookup_info *__restrict info);
+#define ramfs_dirnode_v_lookup_fnode fdirnode_v_lookup_fnode
+FUNDEF NONNULL((1, 2)) void KCALL
+ramfs_dirnode_v_enum(struct fdirnode *__restrict self,
+                     struct fdirenum *__restrict result);
+FUNDEF NONNULL((1, 2)) void KCALL
+ramfs_dirnode_v_mkfile(struct fdirnode *__restrict self,
+                       struct fmkfile_info *__restrict info)
+		THROWS(E_FSERROR_ILLEGAL_PATH, E_FSERROR_DISK_FULL,
+		       E_FSERROR_READONLY, E_FSERROR_TOO_MANY_HARD_LINKS,
+		       E_FSERROR_UNSUPPORTED_OPERATION, E_FSERROR_DELETED);
+FUNDEF NONNULL((1, 2, 3)) void KCALL
+ramfs_dirnode_v_unlink(struct fdirnode *__restrict self,
+                       struct fdirent *__restrict entry,
+                       struct fnode *__restrict file)
+		THROWS(E_FSERROR_DIRECTORY_NOT_EMPTY,
+		       E_FSERROR_READONLY, E_FSERROR_DELETED);
+FUNDEF NONNULL((1, 2)) void KCALL
+ramfs_dirnode_v_rename(struct fdirnode *__restrict self,
+                       struct frename_info *__restrict info)
+		THROWS(E_FSERROR_ILLEGAL_PATH, E_FSERROR_DISK_FULL,
+		       E_FSERROR_READONLY, E_FSERROR_FILE_ALREADY_EXISTS,
+		       E_FSERROR_DELETED);
+
+
+/* Construct a new fully initialized, but not globally visible, as in:
+ *   - return->fn_supent.rb_lhs == FSUPER_NODES_DELETED;
+ *   - !LIST_ISBOUND(return, fn_allnodes);
+ * ... node for use by ramfs file systems and return it.
+ * When `(info->mkf_fmode & S_IFMT) == 0', blindly re-return `info->mkf_hrdlnk.hl_node'
+ *
+ * The  caller can always  assume that the  returned file-node can be
+ * decref'd normally for the  purpose of (possible) destruction,  and
+ * that `(info->mkf_fmode & S_IFMT) != 0' implies `!isshared(return)' */
+FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) REF struct fnode *KCALL
+ramfs_dirnode_mknode_frominfo(struct fdirnode *__restrict self,
+                              struct fmkfile_info *__restrict info)
+		THROWS(E_FSERROR_UNSUPPORTED_OPERATION);
+
+
+
 struct ramfs_super
 #ifndef __WANT_FS_INLINE_STRUCTURES
     : fsuper                     /* Underlying Superblock */
+#define _ramfs_super_super_     /* nothing */
+#define _ramfs_super_assuper(x) x
 #endif /* !__WANT_FS_INLINE_STRUCTURES */
 {
 #ifdef __WANT_FS_INLINE_STRUCTURES
 	struct fsuper        rs_sup; /* Underlying Superblock */
+#define _ramfs_super_super_     rs_sup.
+#define _ramfs_super_assuper(x) &(x)->rs_sup
 #endif /* __WANT_FS_INLINE_STRUCTURES */
 	struct ramfs_dirdata rs_dat; /* Directory data */
 };
 
+#ifdef __WANT_FS_INLINE_STRUCTURES
+#define ramfs_super_asdir(self) ((struct ramfs_dirnode *)&(self)->rs_sup.fs_root)
+#else /* __WANT_FS_INLINE_STRUCTURES */
+#define ramfs_super_asdir(self) ((struct ramfs_dirnode *)&(self)->fs_root)
+#endif /* !__WANT_FS_INLINE_STRUCTURES */
 
 
+DATDEF struct fsuper_ops const ramfs_super_ops;
+#define ramfs_super_v_destroy fsuper_v_destroy
+#define ramfs_super_v_wrattr  ramfs_dirnode_v_wrattr
+#define ramfs_super_v_lookup  ramfs_dirnode_v_lookup
+#define ramfs_super_v_enum    ramfs_dirnode_v_enum
+#define ramfs_super_v_mkfile  ramfs_dirnode_v_mkfile
+#define ramfs_super_v_unlink  ramfs_dirnode_v_unlink
+#define ramfs_super_v_rename  ramfs_dirnode_v_rename
+
+/* Top-level ram filesystem descriptor. */
+DATDEF struct ffilesys ramfs_filesys;
+
+/* Construct a new ramfs filesystem.
+ * @param: args: USER CHECKED char const *: Mount arguments */
+#define ramfs_new(args) \
+	((*ramfs_filesys.ffs_open)(&ramfs_filesys, __NULLPTR, args))
 
 
 

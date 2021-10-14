@@ -39,7 +39,6 @@ struct fdevnode_ops {
 	/* More operators would go here... */
 };
 
-
 struct fdevnode
 #ifndef __WANT_FS_INLINE_STRUCTURES
     : fnode                /* Underlying file-node */
@@ -63,11 +62,23 @@ struct fdevnode
 #define _fdevnode_assert_ops_(ops) \
 	_fnode_assert_ops_(&(ops)->dno_node)
 
+struct path;
+struct fdirent;
+struct handle;
+
+/* Default  operator  for opening  fdevnode files.  This will
+ * lookup the associated `dn_devno' within `devfs' and return
+ * the file that one points to. */
+FUNDEF NONNULL((1, 2)) void KCALL
+fdevnode_v_open(struct mfile *__restrict self,
+                struct handle *__restrict hand,
+                struct path *access_path,
+                struct fdirent *access_dent);
 #define fdevnode_v_destroy fnode_v_destroy
-#define fdevnode_v_wrattr  fnode_v_wrattr_noop
 
 
 /* Initialize common+basic fields. The caller must still initialize:
+ *  - self->_fdevnode_node_ _fnode_file_ mf_parts
  *  - self->_fdevnode_node_ _fnode_file_ mf_filesize
  *  - self->_fdevnode_node_ _fnode_file_ mf_atime
  *  - self->_fdevnode_node_ _fnode_file_ mf_mtime
@@ -80,13 +91,11 @@ struct fdevnode
  *  - self->_fdevnode_node_ fn_ino
  *  - self->_fdevnode_node_ fn_mode (with something or'd with S_IFCHR or S_IFBLK)
  *  - self->dn_devno
- *  - self->dn_name
- * @param: struct fdevnode     *self:   Regular node to initialize.
- * @param: struct fdevnode_ops *ops:    Regular file operators.
- * @param: struct fsuper       *super:  Filesystem superblock. */
+ * @param: struct fdevnode     *self:  Regular node to initialize.
+ * @param: struct fdevnode_ops *ops:   Regular file operators.
+ * @param: struct fsuper       *super: Filesystem superblock. */
 #define _fdevnode_init(self, ops, super)                                                                               \
-	(_fnode_assert_ops_(ops) _fnode_init_common(_fdevnode_asnode(self)),                                               \
-	 (self)->_fdevnode_node_ _fnode_file_ mf_parts = __NULLPTR,                                                        \
+	(_fdevnode_assert_ops_(ops) _fnode_init_common(_fdevnode_asnode(self)),                                            \
 	 (self)->_fdevnode_node_ _fnode_file_ mf_flags = (super)->fs_root._fdirnode_node_ _fnode_file_ mf_flags &          \
 	                                                 (MFILE_F_DELETED | MFILE_F_PERSISTENT |                           \
 	                                                  MFILE_F_READONLY | MFILE_F_NOATIME |                             \
@@ -96,8 +105,7 @@ struct fdevnode
 	 (self)->_fdevnode_node_ _fnode_file_ mf_part_amask = (super)->fs_root._fdirnode_node_ _fnode_file_ mf_part_amask, \
 	 (self)->_fdevnode_node_ fn_super                   = incref(super))
 #define _fdevnode_cinit(self, ops, super)                                                                              \
-	(_fnode_assert_ops_(ops) _fnode_cinit_common(_fdevnode_asnode(self)),                                              \
-	 __hybrid_assert((self)->mf_parts == __NULLPTR),                                                                   \
+	(_fdevnode_assert_ops_(ops) _fnode_cinit_common(_fdevnode_asnode(self)),                                           \
 	 (self)->_fdevnode_node_ _fnode_file_ mf_flags = (super)->fs_root._fdirnode_node_ _fnode_file_ mf_flags &          \
 	                                                 (MFILE_F_DELETED | MFILE_F_PERSISTENT |                           \
 	                                                  MFILE_F_READONLY | MFILE_F_NOATIME |                             \

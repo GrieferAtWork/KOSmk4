@@ -34,6 +34,7 @@
 #include <sched/task.h>
 
 #include <hybrid/align.h>
+#include <hybrid/atomic.h>
 
 #include <kos/except.h>
 #include <kos/except/reason/fs.h>
@@ -44,6 +45,28 @@
 #include <string.h>
 
 DECL_BEGIN
+
+/* User-visible mem-file access API. (same as the handle access API) */
+DEFINE_PUBLIC_ALIAS(mfile_uread, handle_mfile_read);
+DEFINE_PUBLIC_ALIAS(mfile_uwrite, handle_mfile_write);
+DEFINE_PUBLIC_ALIAS(mfile_upread, handle_mfile_pread);
+DEFINE_PUBLIC_ALIAS(mfile_upwrite, handle_mfile_pwrite);
+DEFINE_PUBLIC_ALIAS(mfile_ureadv, handle_mfile_readv);
+DEFINE_PUBLIC_ALIAS(mfile_uwritev, handle_mfile_writev);
+DEFINE_PUBLIC_ALIAS(mfile_upreadv, handle_mfile_preadv);
+DEFINE_PUBLIC_ALIAS(mfile_upwritev, handle_mfile_pwritev);
+DEFINE_PUBLIC_ALIAS(mfile_useek, handle_mfile_seek);
+DEFINE_PUBLIC_ALIAS(mfile_uioctl, handle_mfile_ioctl);
+DEFINE_PUBLIC_ALIAS(mfile_utruncate, handle_mfile_truncate);
+DEFINE_PUBLIC_ALIAS(mfile_ummap, handle_mfile_mmap);
+DEFINE_PUBLIC_ALIAS(mfile_uallocate, handle_mfile_allocate);
+DEFINE_PUBLIC_ALIAS(mfile_usync, handle_mfile_sync);
+DEFINE_PUBLIC_ALIAS(mfile_udatasync, handle_mfile_datasync);
+DEFINE_PUBLIC_ALIAS(mfile_ustat, handle_mfile_stat);
+DEFINE_PUBLIC_ALIAS(mfile_upollconnect, handle_mfile_pollconnect);
+DEFINE_PUBLIC_ALIAS(mfile_upolltest, handle_mfile_polltest);
+DEFINE_PUBLIC_ALIAS(mfile_uhop, handle_mfile_hop);
+
 
 /* DATABLOCK HANDLE OPERATIONS */
 DEFINE_HANDLE_REFCNT_FUNCTIONS(mfile, struct mfile);
@@ -338,17 +361,21 @@ handle_mfile_stat(struct mfile *__restrict self,
 	struct timespec st_ctimespec;
 
 	mfile_tslock_acquire(self);
-	st_size    = (pos_t)atomic64_read(&self->mf_filesize);
+	st_size = (pos_t)atomic64_read(&self->mf_filesize);
+	if (mfile_isanon(self))
+		st_size = 0;
 	st_blksize = (blksize_t)(self->mf_part_amask + 1);
+
 	memcpy(&st_atimespec, &self->mf_atime, sizeof(struct timespec));
 	memcpy(&st_mtimespec, &self->mf_mtime, sizeof(struct timespec));
 	memcpy(&st_ctimespec, &self->mf_ctime, sizeof(struct timespec));
+
 	st_dev = st_rdev = 0;
 	if (mfile_isnode(self)) {
 		struct fnode *me;
-		REF struct blkdev *blk;
+		struct fdevnode *blk;
 		me  = mfile_asnode(self);
-		blk = me->fn_super->fs_dev;
+		blk = (struct fdevnode *)me->fn_super->fs_dev;
 		/* Fill in extended file-node information */
 		if (blk)
 			st_dev = blk->dn_devno;
@@ -357,8 +384,8 @@ handle_mfile_stat(struct mfile *__restrict self,
 		st_nlink = me->fn_nlink;
 		st_uid   = me->fn_uid;
 		st_gid   = me->fn_gid;
-		if (fnode_isdev(me))
-			st_rdev = fnode_asdev(me)->dn_devno;
+		if (fnode_isdevnode(me))
+			st_rdev = fnode_asdevnode(me)->dn_devno;
 	} else {
 		st_ino   = 0;
 		st_mode  = 0777 | S_IFBLK;
@@ -367,6 +394,13 @@ handle_mfile_stat(struct mfile *__restrict self,
 		st_gid   = 0;
 	}
 	mfile_tslock_release(self);
+
+	/* Check if the file has been deleted. If it has, timestamps are invalid. */
+	if (ATOMIC_READ(self->mf_flags) & MFILE_F_DELETED) {
+		memset(&st_atimespec, 0, sizeof(struct timespec));
+		memset(&st_mtimespec, 0, sizeof(struct timespec));
+		memset(&st_ctimespec, 0, sizeof(struct timespec));
+	}
 
 	/* Fill in generic default information */
 	result->st_dev               = (typeof(result->st_dev))st_dev;

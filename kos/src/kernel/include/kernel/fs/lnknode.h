@@ -98,10 +98,6 @@ struct flnknode
 	struct fnode         ln_node;    /* Underlying file-node */
 #define _flnknode_node_     ln_node.
 #define _flnknode_asnode(x) &(x)->ln_node
-#ifdef __WANT_FS_INIT
-#define FLNKNODE_INIT_EX(refcnt, ops, parts, blockshift, fn_nlink, fn_mode, fn_uid, fn_gid, fn_ino, fn_super) \
-	{ FNODE_INIT_EX(refcnt, &(ops)->lno_node, parts, blockshift, fn_nlink, (fn_mode) | S_IFLNK, fn_uid, fn_gid, fn_ino, fn_super) }
-#endif /* __WANT_FS_INIT */
 #else /* !__cplusplus */
 #define _flnknode_node_     /* nothing */
 #define _flnknode_asnode(x) x
@@ -134,6 +130,7 @@ struct flnknode
  *  - self->_flnknode_node_ fn_gid
  *  - self->_flnknode_node_ fn_allnodes
  *  - self->_flnknode_node_ fn_supent
+ *  - self->_flnknode_node_ fn_nlink
  *  - self->_flnknode_node_ fn_ino
  *  - self->_flnknode_node_ fn_mode (with something or'd with S_IFLNK)
  * @param: struct flnknode     *self:   Directory node to initialize.
@@ -150,7 +147,6 @@ struct flnknode
 	 (self)->_flnknode_node_ _fnode_file_ mf_ops        = &(ops)->lno_node.no_file,                            \
 	 (self)->_flnknode_node_ _fnode_file_ mf_blockshift = (super)->fs_root._fnode_file_ mf_blockshift,         \
 	 (self)->_flnknode_node_ _fnode_file_ mf_part_amask = (super)->fs_root._fnode_file_ mf_part_amask,         \
-	 (self)->_flnknode_node_ fn_nlink                   = 1,                                                   \
 	 (self)->_flnknode_node_ fn_super                   = incref(super))
 #define _flnknode_cinit(self, ops, super)                                                                      \
 	(_flnknode_assert_ops_(ops) _fnode_cinit_common(_flnknode_asnode(self)),                                   \
@@ -163,7 +159,6 @@ struct flnknode
 	 (self)->_flnknode_node_ _fnode_file_ mf_ops        = &(ops)->lno_node.no_file,                            \
 	 (self)->_flnknode_node_ _fnode_file_ mf_blockshift = (super)->fs_root._fnode_file_ mf_blockshift,         \
 	 (self)->_flnknode_node_ _fnode_file_ mf_part_amask = (super)->fs_root._fnode_file_ mf_part_amask,         \
-	 (self)->_flnknode_node_ fn_nlink                   = 1,                                                   \
 	 (self)->_flnknode_node_ fn_super                   = incref(super))
 
 /* Finalize a partially initialized `struct flnknode' (as initialized by `_flnknode_init()') */

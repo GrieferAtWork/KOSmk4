@@ -71,9 +71,9 @@ DEFINE_REFCOUNT_FUNCTIONS(struct fdirent, fd_refcnt, fdirent_destroy)
 
 /* Return the hash of a given directory entry name.
  * This function is used by various APIs related to file lookup.
- * @throw: E_SEGFAULT: Failed to access the given `name'. */
+ * @throw: E_SEGFAULT: Failed to access the given `text'. */
 FUNDEF ATTR_PURE WUNUSED NONNULL((1)) uintptr_t FCALL
-fdirent_hash(CHECKED USER /*utf-8*/ char const *__restrict name, u16 namelen)
+fdirent_hash(CHECKED USER /*utf-8*/ char const *__restrict text, u16 textlen)
 		THROWS(E_SEGFAULT);
 #define FDIRENT_EMPTY_HASH 0 /* == fdirent_hash("",0) */
 

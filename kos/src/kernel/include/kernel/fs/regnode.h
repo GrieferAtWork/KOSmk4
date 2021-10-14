@@ -49,10 +49,6 @@ struct fregnode
 	struct fnode rn_node; /* Underlying file-node */
 #define _fregnode_asnode(x) &(x)->rn_node
 #define _fregnode_node_     rn_node.
-#ifdef __WANT_FS_INIT
-#define FREGNODE_INIT_EX(refcnt, ops, parts, blockshift, fn_nlink, fn_mode, fn_uid, fn_gid, fn_ino, fn_super) \
-	{ FNODE_INIT_EX(refcnt, &(ops)->rno_node, parts, blockshift, fn_nlink, (fn_mode) | S_IFREG, fn_uid, fn_gid, fn_ino, fn_super) }
-#endif /* __WANT_FS_INIT */
 #else /* __WANT_FS_INLINE_STRUCTURES */
 #define _fregnode_asnode(x) x
 #define _fregnode_node_     /* nothing */
@@ -82,7 +78,7 @@ struct fregnode
  * @param: struct fregnode_ops *ops:    Regular file operators.
  * @param: struct fsuper       *super:  Filesystem superblock. */
 #define _fregnode_init(self, ops, super)                                                                               \
-	(_fnode_assert_ops_(ops) _fnode_init_common(_fregnode_asnode(self)),                                               \
+	(_fregnode_assert_ops_(ops) _fnode_init_common(_fregnode_asnode(self)),                                            \
 	 (self)->_fregnode_node_ _fnode_file_ mf_parts = __NULLPTR,                                                        \
 	 (self)->_fregnode_node_ _fnode_file_ mf_flags = (super)->fs_root._fdirnode_node_ _fnode_file_ mf_flags &          \
 	                                                 (MFILE_F_DELETED | MFILE_F_PERSISTENT |                           \
@@ -93,7 +89,7 @@ struct fregnode
 	 (self)->_fregnode_node_ _fnode_file_ mf_part_amask = (super)->fs_root._fdirnode_node_ _fnode_file_ mf_part_amask, \
 	 (self)->_fregnode_node_ fn_super                   = incref(super))
 #define _fregnode_cinit(self, ops, super)                                                                              \
-	(_fnode_assert_ops_(ops) _fnode_cinit_common(_fregnode_asnode(self)),                                              \
+	(_fregnode_assert_ops_(ops) _fnode_cinit_common(_fregnode_asnode(self)),                                           \
 	 __hybrid_assert((self)->mf_parts == __NULLPTR),                                                                   \
 	 (self)->_fregnode_node_ _fnode_file_ mf_flags = (super)->fs_root._fdirnode_node_ _fnode_file_ mf_flags &          \
 	                                                 (MFILE_F_DELETED | MFILE_F_PERSISTENT |                           \

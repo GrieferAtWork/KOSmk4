@@ -86,6 +86,11 @@
                                                    * NOTE: After changing  this value,  be sure  to
                                                    * `touch kos/src/kernel/include/kernel/handle.h' */
 
+/* TODO: For CONFIG_USE_NEW_FS:
+ *    - Rename `HANDLE_TYPE_DIRECTORYENTRY' -> `HANDLE_TYPE_DIRENT'
+ *    - Remove `HANDLE_TYPE_BLOCKDEVICE'     (merged with `HANDLE_TYPE_MFILE')
+ *    - Remove `HANDLE_TYPE_CHARACTERDEVICE' (merged with `HANDLE_TYPE_MFILE') */
+
 /* Invoke `cb(int HANDLE_TYPE, typename T)' for each handle type with an associated struct */
 #define HANDLE_FOREACH_TYPE(cb)                                           \
 	cb(HANDLE_TYPE_MFILE, struct mfile)                                   \
