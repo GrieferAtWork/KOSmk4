@@ -215,8 +215,8 @@ NOTHROW(KCALL ffifonode_v_destroy)(struct mfile *__restrict self);
  *  - self->_ffifonode_node_ fn_nlink
  *  - self->_ffifonode_node_ fn_ino
  *  - self->_ffifonode_node_ fn_mode (with something or'd with S_IFIFO)
- * @param: struct ffifonode     *self:  Regular node to initialize.
- * @param: struct ffifonode_ops *ops:   Regular file operators.
+ * @param: struct ffifonode     *self:  Fifo node to initialize.
+ * @param: struct ffifonode_ops *ops:   Fifo operators.
  * @param: struct fsuper        *super: Filesystem superblock. */
 #define _ffifonode_init(self, ops, super)                                                                               \
 	(_ffifonode_assert_ops_(ops) _fnode_init_common(_ffifonode_asnode(self)),                                           \

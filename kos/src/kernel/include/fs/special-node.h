@@ -22,6 +22,10 @@
 
 #include <kernel/compiler.h>
 
+#ifdef CONFIG_USE_NEW_FS
+#include <kernel/fs/fifonode.h>
+#include <kernel/fs/socknode.h>
+#else /* CONFIG_USE_NEW_FS */
 #include <fs/fifo.h>
 #include <fs/node.h>
 
@@ -49,7 +53,7 @@ struct fifo_node /* S_ISFIFO */
 
 
 #if !defined(__cplusplus) || defined(CONFIG_WANT_FS_AS_STRUCT)
-__DEFINE_SYNC_PROXY(struct symlink_node,sl_node)
+__DEFINE_SYNC_PROXY(struct symlink_node, sl_node)
 #endif /* !__cplusplus || CONFIG_WANT_FS_AS_STRUCT */
 
 
@@ -79,5 +83,6 @@ __DEFINE_SYNC_PROXY(struct symlink_node, sl_node)
 #endif /* __CC__ */
 
 DECL_END
+#endif /* !CONFIG_USE_NEW_FS */
 
 #endif /* !GUARD_KERNEL_INCLUDE_FS_SPECIAL_NODE_H */

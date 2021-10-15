@@ -86,8 +86,6 @@ struct dirhandle {
 FUNDEF NOBLOCK void NOTHROW(KCALL dirhandle_destroy)(struct dirhandle *__restrict self);
 DEFINE_REFCOUNT_FUNCTIONS(struct dirhandle, d_refcnt, dirhandle_destroy)
 
-
-
 #endif /* __CC__ */
 
 DECL_END

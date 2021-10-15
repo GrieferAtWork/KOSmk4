@@ -22,6 +22,9 @@
 
 #include <kernel/compiler.h>
 
+#ifdef CONFIG_USE_NEW_FS
+#include <kernel/fs/fifonode.h>
+#else /* CONFIG_USE_NEW_FS */
 #include <kernel/types.h>
 
 #include <libbuffer/ringbuffer.h>
@@ -181,5 +184,6 @@ fifo_user_create(struct fifo_node *__restrict self, iomode_t iomode)
 #endif /* __CC__ */
 
 DECL_END
+#endif /* !CONFIG_USE_NEW_FS */
 
 #endif /* !GUARD_KERNEL_INCLUDE_FS_FIFO_H */

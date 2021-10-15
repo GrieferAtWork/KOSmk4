@@ -89,8 +89,8 @@ NOTHROW(KCALL fsocknode_v_destroy)(struct mfile *__restrict self);
  *  - self->_fsocknode_node_ fn_nlink
  *  - self->_fsocknode_node_ fn_ino
  *  - self->_fsocknode_node_ fn_mode (with something or'd with S_IFSOCK)
- * @param: struct fsocknode     *self:  Regular node to initialize.
- * @param: struct fsocknode_ops *ops:   Regular file operators.
+ * @param: struct fsocknode     *self:  Socket node to initialize.
+ * @param: struct fsocknode_ops *ops:   Socket operators.
  * @param: struct fsuper        *super: Filesystem superblock. */
 #define _fsocknode_init(self, ops, super)                                                                               \
 	(_fsocknode_assert_ops_(ops) _fnode_init_common(_fsocknode_asnode(self)),                                           \

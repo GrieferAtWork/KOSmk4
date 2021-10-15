@@ -31,6 +31,7 @@
 
 #include <hybrid/sequence/rbtree.h>
 
+#include <bits/os/timespec.h>
 #include <kos/aref.h>
 #include <kos/io.h>
 #include <kos/kernel/paging.h>
@@ -138,6 +139,12 @@ NOTHROW(KCALL device_v_destroy)(struct mfile *__restrict self);
 #define device_getnamelen(self) ((self)->dv_dirent->fdd_dirent.fd_namelen)
 
 
+#ifndef __realtime_defined
+#define __realtime_defined
+FUNDEF NOBLOCK WUNUSED struct timespec NOTHROW(KCALL realtime)(void);
+#endif /* !__realtime_defined */
+
+
 
 /* Initialize common+basic fields. The caller must still initialize:
  *  - self->_device_devnode_ _fdevnode_node_ _fnode_file_ mf_flags
@@ -145,29 +152,32 @@ NOTHROW(KCALL device_v_destroy)(struct mfile *__restrict self);
  *  - self->_device_devnode_ _fdevnode_node_ _fnode_file_ mf_blockshift
  *  - self->_device_devnode_ _fdevnode_node_ _fnode_file_ mf_part_amask
  *  - self->_device_devnode_ _fdevnode_node_ _fnode_file_ mf_filesize
- *  - self->_device_devnode_ _fdevnode_node_ _fnode_file_ mf_atime
- *  - self->_device_devnode_ _fdevnode_node_ _fnode_file_ mf_mtime
- *  - self->_device_devnode_ _fdevnode_node_ _fnode_file_ mf_ctime
  *  - self->_device_devnode_ _fdevnode_node_ fn_allnodes
  *  - self->_device_devnode_ _fdevnode_node_ fn_supent
- *  - self->_device_devnode_ _fdevnode_node_ fn_ino
+ *  - self->_device_devnode_ _fdevnode_node_ fn_ino  (as `devfs_devnode_makeino(fn_mode, dn_devno)')
  *  - self->_device_devnode_ _fdevnode_node_ fn_mode (with something or'd with S_IFCHR or S_IFBLK)
  *  - self->_device_devnode_ dn_devno
  *  - self->dv_driver
  *  - self->dv_dirent
  *  - self->dv_byname_node
- * @param: struct device     *self:  Regular node to initialize.
- * @param: struct device_ops *ops:   Regular file operators. */
+ * @param: struct device     *self:  Device to initialize.
+ * @param: struct device_ops *ops:   Device operators. */
 #define _device_init(self, ops)                                                                         \
 	(_device_assert_ops_(ops) _fnode_init_common(_device_asdevnode(_fdevnode_asnode(self))),            \
 	 (self)->_device_devnode_ _fdevnode_node_ _fnode_file_ mf_ops = &(ops)->dfno_node.dno_node.no_file, \
-	 (self)->_device_devnode_ _fdevnode_node_ fn_super            = incref(&_devfs_super),              \
-	 (self)->_device_devnode_ fn_nlink                            = 1,                                  \
-	 (self)->_device_devnode_ fn_uid                              = 0,                                  \
-	 (self)->_device_devnode_ fn_gid                              = 0)
-#define _device_cinit(self, ops)                                                                         \
+	 (self)->_device_devnode_ _fdevnode_node_ _fnode_file_ mf_atime =                                   \
+	 (self)->_device_devnode_ _fdevnode_node_ _fnode_file_ mf_mtime =                                   \
+	 (self)->_device_devnode_ _fdevnode_node_ _fnode_file_ mf_ctime = realtime(),                       \
+	 (self)->_device_devnode_ _fdevnode_node_ fn_super              = incref(&_devfs_super),            \
+	 (self)->_device_devnode_ fn_nlink                              = 1,                                \
+	 (self)->_device_devnode_ fn_uid                                = 0,                                \
+	 (self)->_device_devnode_ fn_gid                                = 0)
+#define _device_cinit(self, ops)                                                                        \
 	(_device_assert_ops_(ops) _fnode_cinit_common(_device_asdevnode(_fdevnode_asnode(self))),           \
 	 (self)->_device_devnode_ _fdevnode_node_ _fnode_file_ mf_ops = &(ops)->dfno_node.dno_node.no_file, \
+	 (self)->_device_devnode_ _fdevnode_node_ _fnode_file_ mf_atime =                                   \
+	 (self)->_device_devnode_ _fdevnode_node_ _fnode_file_ mf_mtime =                                   \
+	 (self)->_device_devnode_ _fdevnode_node_ _fnode_file_ mf_ctime = realtime(),                       \
 	 (self)->_device_devnode_ _fdevnode_node_ fn_super            = incref(&_devfs_super),              \
 	 (self)->_device_devnode_ fn_nlink                            = 1,                                  \
 	 __hybrid_assert((self)->_device_devnode_ fn_uid == 0),                                             \

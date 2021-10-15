@@ -27,6 +27,8 @@
 #include <kernel/fs/node.h>
 #include <kernel/fs/regnode.h>
 #include <kernel/fs/lnknode.h>
+#include <kernel/fs/chrdev.h>
+#include <kernel/fs/blkdev.h>
 
 #else /* CONFIG_USE_NEW_FS */
 #include <dev/block.h>

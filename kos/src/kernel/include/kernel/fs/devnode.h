@@ -91,8 +91,8 @@ fdevnode_v_open(struct mfile *__restrict self,
  *  - self->_fdevnode_node_ fn_ino
  *  - self->_fdevnode_node_ fn_mode (with something or'd with S_IFCHR or S_IFBLK)
  *  - self->dn_devno
- * @param: struct fdevnode     *self:  Regular node to initialize.
- * @param: struct fdevnode_ops *ops:   Regular file operators.
+ * @param: struct fdevnode     *self:  Device node to initialize.
+ * @param: struct fdevnode_ops *ops:   Device node operators.
  * @param: struct fsuper       *super: Filesystem superblock. */
 #define _fdevnode_init(self, ops, super)                                                                               \
 	(_fdevnode_assert_ops_(ops) _fnode_init_common(_fdevnode_asnode(self)),                                            \
