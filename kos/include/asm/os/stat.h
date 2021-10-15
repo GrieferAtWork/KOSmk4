@@ -20,11 +20,13 @@
 #ifndef _ASM_OS_STAT_H
 #define _ASM_OS_STAT_H 1
 
+#ifndef __DEEMON__
 #include <__stdinc.h>
 
 #if defined(__KOS__) || defined(__linux__)
 #include <asm/os/kos/stat.h>
 #endif /* ... */
+#endif /* !__DEEMON__ */
 
 #ifndef __S_IFMT
 #define __S_ISVTX    01000 /* Save swapped text after use (sticky). */

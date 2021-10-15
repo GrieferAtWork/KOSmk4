@@ -24,6 +24,7 @@
 
 #include <kernel/fs/devfs.h>
 #include <kernel/fs/devnode.h>
+#include <kernel/fs/ramfs.h>
 #include <kernel/fs/super.h>
 #include <kernel/handle.h>
 
@@ -41,8 +42,8 @@ DECL_BEGIN
 PUBLIC NONNULL((1, 2)) void KCALL
 fdevnode_v_open(struct mfile *__restrict self,
                 struct handle *__restrict hand,
-                struct path *UNUSED(access_path),
-                struct fdirent *UNUSED(access_dent)) {
+                struct path *access_path,
+                struct fdirent *access_dent) {
 	ino_t devfs_ino;
 	REF struct device *node;
 	struct fdevnode *me = (struct fdevnode *)self;
@@ -70,8 +71,12 @@ fdevnode_v_open(struct mfile *__restrict self,
 
 	/* Fill in the reference to the *true* file being opened. */
 	assert(fnode_isdevice(node));
-	hand->h_data = node; /* Inherit reference */
-	decref_nokill(me);   /* Drop old reference from `hand->h_data' */
+	hand->h_data = incref(node); /* Inherit reference */
+	decref_nokill(me);           /* Drop old reference from `hand->h_data' */
+
+	/* Open the pointed-to device. */
+	FINALLY_DECREF_UNLIKELY(node);
+	mnode_open(node, hand, access_path, access_dent);
 }
 
 

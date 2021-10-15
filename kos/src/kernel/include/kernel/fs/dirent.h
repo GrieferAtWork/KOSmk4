@@ -27,6 +27,9 @@
 #else /* !CONFIG_USE_NEW_FS */
 #include <kernel/types.h>
 
+#include <hybrid/byteorder.h>
+#include <hybrid/typecore.h>
+
 #ifdef __CC__
 DECL_BEGIN
 
@@ -76,6 +79,18 @@ FUNDEF ATTR_PURE WUNUSED NONNULL((1)) uintptr_t FCALL
 fdirent_hash(CHECKED USER /*utf-8*/ char const *__restrict text, u16 textlen)
 		THROWS(E_SEGFAULT);
 #define FDIRENT_EMPTY_HASH 0 /* == fdirent_hash("",0) */
+
+#if __SIZEOF_POINTER__ == 4 && __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+#define FDIRENT_HASH_INIT(le32, le64, be32, be64) __UINT32_C(le32)
+#elif __SIZEOF_POINTER__ == 8 && __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+#define FDIRENT_HASH_INIT(le32, le64, be32, be64) __UINT64_C(le64)
+#elif __SIZEOF_POINTER__ == 4 && __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+#define FDIRENT_HASH_INIT(le32, le64, be32, be64) __UINT32_C(be32)
+#elif __SIZEOF_POINTER__ == 8 && __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+#define FDIRENT_HASH_INIT(le32, le64, be32, be64) __UINT64_C(be64)
+#else /* __SIZEOF_POINTER__ == ... && __BYTE_ORDER__ == ... */
+#error "Invalid configuration"
+#endif /* __SIZEOF_POINTER__ != ... || __BYTE_ORDER__ != ... */
 
 DECL_END
 #endif /* __CC__ */

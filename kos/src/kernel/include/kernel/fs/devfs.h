@@ -36,6 +36,19 @@
 #include <kos/kernel/paging.h>
 #include <kos/lockop.h>
 
+/* Construct the INode number for a device file within `devfs.fs_nodes', given
+ * that file's typing (`st_mode & S_IFMT' must be `S_IFCHR' or `S_IFBLK'),  as
+ * well as the device number `st_rdev'. */
+#if (S_IFCHR == 0x2000 && S_IFBLK == 0x6000) && __SIZEOF_INO_T__ == 8
+#define devfs_devnode_makeino(st_mode, st_rdev) \
+	((__CCAST(ino_t)(st_rdev) << 3) | (__CCAST(ino_t)((st_mode) & 0x4000) << 49) | __CCAST(ino_t)7)
+#elif (S_IFCHR == 0x2000 && S_IFBLK == 0x6000) && __SIZEOF_INO_T__ == 4
+#define devfs_devnode_makeino(st_mode, st_rdev) \
+	((__CCAST(ino_t)(st_rdev) << 3) | (__CCAST(ino_t)((st_mode) & 0x4000) << 17) | __CCAST(ino_t)7)
+#else /* ... */
+#error "Unsupported configuration"
+#endif /* !... */
+
 #ifdef __CC__
 DECL_BEGIN
 
@@ -45,19 +58,6 @@ struct device_ops {
 	/* More operators would go here... */
 };
 
-
-/* Construct the INode number for a device file within `devfs.fs_nodes', given
- * that file's typing (`st_mode & S_IFMT' must be `S_IFCHR' or `S_IFBLK'),  as
- * well as the device number `st_rdev'. */
-#if (S_IFCHR == 0x2000 && S_IFBLK == 0x6000) && __SIZEOF_INO_T__ == 8
-#define devfs_devnode_makeino(st_mode, st_rdev) \
-	(((ino_t)(st_rdev) << 3) | ((ino_t)((st_mode) & 0x4000) << 49) | (ino_t)7)
-#elif (S_IFCHR == 0x2000 && S_IFBLK == 0x6000) && __SIZEOF_INO_T__ == 4
-#define devfs_devnode_makeino(st_mode, st_rdev) \
-	(((ino_t)(st_rdev) << 3) | ((ino_t)((st_mode) & 0x4000) << 17) | (ino_t)7)
-#else /* ... */
-#error "Unsupported configuration"
-#endif /* !... */
 
 AWREF(device_awref, device);
 
@@ -122,6 +122,7 @@ __DEFINE_REFCOUNT_FUNCTIONS(struct device,
  * `devfs_byname_tree' and does `decref(dv_dirent)') */
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL device_v_destroy)(struct mfile *__restrict self);
+#define device_v_wrattr fnode_v_wrattr_noop
 
 
 
@@ -183,6 +184,7 @@ NOTHROW(KCALL device_v_destroy)(struct mfile *__restrict self);
 /* The /dev/ filesystem superblock */
 struct ramfs_super; /* From `<kernel/fs/ramfs.h>' */
 DATDEF struct ramfs_super devfs;
+DATDEF struct ramfs_dirnode devfs_rootdir;
 DATDEF struct fsuper _devfs_super ASMNAME("devfs");
 DATDEF struct ffilesys devfs_filesys;
 

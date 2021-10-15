@@ -988,9 +988,10 @@ PRIVATE struct fsuper_ops const devfs_ops = {
 };
 
 /* The /dev/ filesystem superblock */
+extern struct fnode _devfs__fs_nodes__INIT[];
 PUBLIC struct ramfs_super devfs = {
 	.rs_sup = {
-		.fs_nodes           = &devfs.rs_sup.fs_root.dn_node,
+		.fs_nodes           = _devfs__fs_nodes__INIT,
 		.fs_nodeslock       = ATOMIC_RWLOCK_INIT,
 		.fs_nodeslockops    = SLIST_HEAD_INITIALIZER(devfs.rs_sup.fs_nodeslockops),
 		.fs_mounts          = LIST_HEAD_INITIALIZER(devfs.rs_sup.fs_mounts),
@@ -1052,15 +1053,16 @@ PUBLIC struct ramfs_super devfs = {
 		},
 	},
 	.rs_dat = {
+		/* TODO */
 	},
 };
 
 
 /* Default operators for `struct device_ops' */
-
 PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(LOCKOP_CC device_v_destroy_postlop)(struct postlockop *__restrict self) {
 	struct device *me;
+	DEFINE_PUBLIC_SYMBOL(devfs_rootdir, &devfs.rs_sup.fs_root, sizeof(struct ramfs_dirnode));
 	me = container_of(self, struct device, dv_devnode.dn_node.fn_file._mf_plop);
 	decref_likely(me->dv_dirent);
 	fdevnode_v_destroy(&me->dv_devnode.dn_node.fn_file);
@@ -1116,9 +1118,10 @@ NOTHROW(KCALL device_v_destroy)(struct mfile *__restrict self) {
 
 
 /* By-name lookup of devices in /dev/ */
-PUBLIC struct shared_rwlock devfs_byname_lock    = SHARED_RWLOCK_INIT;
-PUBLIC struct lockop_slist devfs_byname_lops     = SLIST_HEAD_INITIALIZER(devfs_byname_lops);
-PUBLIC RBTREE_ROOT(device) devfs_byname_tree = NULL;
+PUBLIC struct shared_rwlock devfs_byname_lock = SHARED_RWLOCK_INIT;
+PUBLIC struct lockop_slist devfs_byname_lops  = SLIST_HEAD_INITIALIZER(devfs_byname_lops);
+extern struct device _devfs_byname_tree__INIT[];
+PUBLIC RBTREE_ROOT(device) devfs_byname_tree = _devfs_byname_tree__INIT;
 
 /* Lock accessor helpers for `devfs_byname_lock' and `devfs_byname_tree' */
 PUBLIC NOBLOCK void KCALL _devfs_byname_reap(void) {

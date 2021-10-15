@@ -587,7 +587,7 @@ RBTREE_DEFINE_FUNCTION(RBTREE_IMPL, __ATTR_PURE __ATTR_WUNUSED, RBTREE_T *, RBTR
 #endif /* !RBTREE_OMIT_LOCATE */
 {
 	_RBTREE_VALIDATE(root);
-	while (root) {
+	while (RBTREE_NODE_NOT_ISNULL(root)) {
 		if (RBTREE_KEY_LO(key, RBTREE_GETMINKEY(root))) {
 			root = RBTREE_GETLHS(root);
 			continue;

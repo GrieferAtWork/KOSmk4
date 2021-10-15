@@ -294,8 +294,42 @@ struct mfile_stream_ops {
 	(KCALL *mso_hop)(struct mfile *__restrict self, syscall_ulong_t cmd,
 	                 USER UNCHECKED void *arg, iomode_t mode)
 			THROWS(...);
-
 };
+
+/* Constructs a wrapper object that implements seeking, allowing normal reads/writes to
+ * be dispatched via `mfile_upread()' and `mfile_upwrite()' (which uses the `mso_pread'
+ * and `mso_pwrite' operators, with `mfile_read()' and `mfile_write()' as fallback, so-
+ * long as `MFILE_F_NOUSRIO' isn't set)
+ *
+ * The operators of the following system calls are forwarded 1-on-1 to `mfile_u*':
+ *   - pread(2), preadv(2), pwrite(2), pwritev(2)
+ *   - ioctl(2), truncate(2), mmap(2), fallocate(2)
+ *   - fsync(2), fdatasync(2), stat(2), poll(2), hop(2)
+ * As stated, `lseek(2)', `read(2)' and `write(2)' are dispatched via pread/pwrite
+ *
+ * This function is actually used when trying to open a mem-file with neither `mso_readv',
+ * nor `mso_writev' pre-defined (`mso_read' and `mso_write' don't matter here). As such,
+ * open(2)-ing a generic mfile object uses `mnode_open()' (see below). */
+FUNDEF NONNULL((1, 2)) void KCALL
+mnode_v_open(struct mfile *__restrict self, struct handle *__restrict hand,
+             struct path *access_path, struct fdirent *access_dent);
+
+/* Generic open function for mem-file arbitrary mem-file objects. This function
+ * is unconditionally invoked during a call to `open(2)' in order to construct
+ * wrapper objects and the like. This function is implemented as:
+ * >> struct mfile_stream_ops const *stream = self->mf_ops->mo_stream;
+ * >> if (!stream) {
+ * >>     mnode_v_open(self, hand, access_path, access_dent);
+ * >> } else if (stream->mso_open) {
+ * >>     (*stream->mso_open)(self, hand, access_path, access_dent);
+ * >> } else if (!stream->mso_readv && !stream->mso_writev) {
+ * >>     mnode_v_open(self, hand, access_path, access_dent);
+ * >> } else {
+ * >>     // Open mfile itself (iow: `hand->h_data == self')
+ * >> } */
+FUNDEF NONNULL((1, 2)) void KCALL
+mnode_open(struct mfile *__restrict self, struct handle *__restrict hand,
+           struct path *access_path, struct fdirent *access_dent);
 #endif /* CONFIG_USE_NEW_FS */
 
 
@@ -542,8 +576,9 @@ struct mfile_ops {
                                             * as part of a call to `mfile_sync()' */
 #define MFILE_F_NOATIME         0x00000400 /* [lock(_MFILE_F_SMP_TSLOCK)][const_if(MFILE_F_DELETED)] Don't modify the value of `mf_atime' */
 /*      MFILE_F_                0x00000800  * ... Reserved: MS_NODIRATIME */
-#define MFILE_F_NOUSRMMAP       0x00001000 /* [lock(ATOMIC)] Disallow user-space from mmap(2)-ing this file. */
-#define MFILE_F_NOUSRIO         0x00002000 /* [lock(ATOMIC)] Disallow user-space from read(2)-ing or write(2)-ing this file. */
+#define MFILE_F_NOUSRMMAP       0x00001000 /* [lock(ATOMIC)] Disallow user-space from mmap(2)-ing this file. (doesn't affect `mso_mmap') */
+#define MFILE_F_NOUSRIO         0x00002000 /* [lock(ATOMIC)] Disallow  user-space  from  pread(2)-ing or  pwrite(2)-ing  this file.
+                                            * Doesn't affect `mso_pread' and `mso_pwrite'; only `mfile_read()' and `mfile_write()'. */
 #define MFILE_F_NOMTIME         0x00004000 /* [lock(_MFILE_F_SMP_TSLOCK)][const_if(MFILE_F_DELETED)] Don't modify the value of `mf_mtime' */
 /*efine MFILE_F_                0x00008000  * ... */
 /*      MFILE_F_                0x00010000  * ... Reserved: MS_POSIXACL */
@@ -1270,19 +1305,17 @@ FUNDEF NONNULL((1, 2)) void KCALL mfile_viowritev_p(struct mfile *__restrict sel
 /* Builtin mem files */
 #ifndef __mfile_phys_defined
 #define __mfile_phys_defined
-DATDEF struct mfile /*     */ mfile_phys;     /* Physical memory access (file position is physical memory address) */
+DATDEF struct mfile mfile_phys;     /* Physical memory access (file position is physical memory address) */
 #endif /* !__mfile_phys_defined */
-DATDEF struct mfile_ops const mfile_phys_ops; /* ... */
 #ifndef __mfile_ndef_defined
 #define __mfile_ndef_defined
-DATDEF struct mfile /*     */ mfile_ndef;     /* Random, uninitialized, anonymous memory. */
+DATDEF struct mfile mfile_ndef;     /* Random, uninitialized, anonymous memory. */
 #endif /* !__mfile_ndef_defined */
 DATDEF struct mfile_ops const mfile_ndef_ops; /* ... */
 #ifndef __mfile_zero_defined
 #define __mfile_zero_defined
 DATDEF struct mfile /*     */ mfile_zero;     /* Zero-initialized, anonymous memory. */
 #endif /* !__mfile_zero_defined */
-DATDEF struct mfile_ops const mfile_zero_ops; /* ... */
 
 /* Fallback  files for anonymous memory. These behave the same as `mfile_zero',
  * but one exists for every possible `mf_blockshift' (where the index into this

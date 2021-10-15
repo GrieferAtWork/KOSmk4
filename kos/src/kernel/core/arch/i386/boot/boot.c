@@ -768,6 +768,11 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 
 	/* TODO: Implement support for sys_memfd_create(2) */
 
+	/* TODO: Add the handle_tryas operator to `mfile_stream_ops'. This operators can
+	 *       then be used to implement support for linux's open("/proc/42") behaving
+	 *       the  same as `pidfd_open(42)'. Iow: support is provided by allowing the
+	 *       handled returned by open("/proc/42") to be castable to HANDLE_TYPE_TASK */
+
 	return state;
 }
 

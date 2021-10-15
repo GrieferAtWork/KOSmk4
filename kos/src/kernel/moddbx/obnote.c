@@ -760,15 +760,11 @@ NOTHROW(FCALL mfile_known_name)(struct mfile *__restrict self,
 		result = "[undef]";
 	} else if (self == &mfile_phys) {
 		result = "[/dev/mem]";
-	} else if (ops == &mfile_zero_ops) {
-		result = "[?/dev/zero]";
 	} else if (ops >= mfile_anon_ops && ops < COMPILER_ENDOF(mfile_anon_ops)) {
 		result = buf;
 		sprintf(buf, "[?/dev/zero:anon:%u]", (unsigned int)(ops - mfile_anon_ops));
 	} else if (ops == &mfile_ndef_ops) {
 		result = "[?undef]";
-	} else if (ops == &mfile_phys_ops) {
-		result = "[?/dev/mem]";
 	}
 	return result;
 }

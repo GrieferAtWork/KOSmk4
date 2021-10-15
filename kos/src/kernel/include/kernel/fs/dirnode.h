@@ -354,6 +354,11 @@ NOTHROW(KCALL fdirnode_v_destroy)(struct mfile *__restrict self);
 FUNDEF WUNUSED NONNULL((1, 2)) REF struct fnode *KCALL
 fdirnode_v_lookup_fnode(struct fdirnode *__restrict self,
                         struct flookup_info *__restrict info);
+/* Constructs a wrapper object that implements readdir() */
+FUNDEF NONNULL((1, 2)) void KCALL
+fdirnode_v_open(struct mfile *__restrict self, struct handle *__restrict hand,
+                struct path *access_path, struct fdirent *access_dent);
+
 
 
 /* Public API (high-level wrappers around low-level operators) */

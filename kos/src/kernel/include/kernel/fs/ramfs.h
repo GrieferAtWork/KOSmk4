@@ -67,6 +67,7 @@ DATDEF struct flnknode_ops const ramfs_lnknode_ops;
 #define _ramfs_regnode_cinit       _fregnode_cinit
 #define _ramfs_regnode_fini        _fregnode_fini
 DATDEF struct fregnode_ops const ramfs_regnode_ops;
+#define ramfs_regnode_v_open    mnode_v_open
 #define ramfs_regnode_v_wrattr  fnode_v_wrattr_noop
 #define ramfs_regnode_v_destroy fnode_v_destroy
 

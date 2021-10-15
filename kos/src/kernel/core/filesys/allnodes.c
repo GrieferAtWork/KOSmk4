@@ -24,6 +24,7 @@
 
 #include <kernel/fs/allnodes.h>
 #include <kernel/fs/devfs.h>
+#include <kernel/fs/ramfs.h>
 
 DECL_BEGIN
 
@@ -31,9 +32,10 @@ DECL_BEGIN
 /* List of all file-nodes (excluding superblock root nodes)             */
 /************************************************************************/
 
+extern struct fnode _fallnodes_list__INIT[];
 /* [0..n][lock(fallnodes_list)] List of all file nodes */
 REF_IF([*]._fnode_file_ mf_flags & MFILE_FN_GLOBAL_REF)
-PUBLIC struct fnode_list fallnodes_list = LIST_HEAD_INITIALIZER(fallnodes_list);
+PUBLIC struct fnode_list fallnodes_list = { _fallnodes_list__INIT };
 
 /* Lock for `fallnodes_list' */
 PUBLIC struct atomic_lock fallnodes_lock = ATOMIC_LOCK_INIT;
