@@ -76,7 +76,7 @@ fdevnode_v_open(struct mfile *__restrict self,
 
 	/* Open the pointed-to device. */
 	FINALLY_DECREF_UNLIKELY(node);
-	mnode_open(node, hand, access_path, access_dent);
+	mfile_open(node, hand, access_path, access_dent);
 }
 
 

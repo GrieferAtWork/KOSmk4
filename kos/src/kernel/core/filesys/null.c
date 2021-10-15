@@ -23,6 +23,7 @@
 #include <kernel/compiler.h>
 
 #include <kernel/driver.h>
+#include <kernel/entropy.h>
 #include <kernel/fs/allnodes.h>
 #include <kernel/fs/devfs.h>
 #include <kernel/fs/null.h>
@@ -31,27 +32,36 @@
 #include <kernel/malloc.h>
 #include <kernel/mman/mpart.h>
 #include <kernel/mman/phys.h>
+#include <kernel/syslog.h>
+
+#include <hybrid/atomic.h>
 
 #include <kos/dev.h>
 #include <sys/io.h>
+#include <sys/param.h> /* NBBY */
 
+#include <int128.h>
+#include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
+#include <string.h>
 
-#include <libvio/api.h>
+#include <libvio/vio.h>
+
 
 DECL_BEGIN
 
-#ifdef KERNELSPACE_HIGHMEM
-#define KERNELSPACE_MEMBASE ((uint64_t)KERNELSPACE_BASE)
-#define KERNELSPACE_MEMSIZE ((uint64_t)(0 - KERNELSPACE_BASE))
-#elif defined(KERNELSPACE_LOWMEM)
-#define KERNELSPACE_MEMBASE ((uint64_t)0)
-#define KERNELSPACE_MEMSIZE ((uint64_t)KERNELSPACE_END)
-#else /* ... */
-#define KERNELSPACE_MEMBASE (uint64_t)KERNELSPACE_BASE
-#define KERNELSPACE_MEMSIZE ((uint64_t)KERNELSPACE_END - (uint64_t)KERNELSPACE_BASE)
-#endif /* !... */
+/* TODO: All of the user-buffer-transfer function below should be interruptible,
+ *       as in: if the calling thread receives an RPC (even if it's a synchronous
+ *       RPC), then the copy operation should stop and return the # of bytes that
+ *       were already copied. If no bytes were copied, throw E_INTERRUPT_USER_RPC,
+ *       and if any were copied, return the # of bytes copied. */
+#define interruptible_copyfromphys(dst, src, num_bytes) (copyfromphys(dst, src, num_bytes), num_bytes)
+#define interruptible_copytophys(dst, src, num_bytes)   (copytophys(dst, src, num_bytes), num_bytes)
+#define interruptible_bzero(dst, num_bytes)             (bzero(dst, num_bytes), num_bytes)
+#define interruptible_memcpy(dst, src, num_bytes)       (memcpy(dst, src, num_bytes), num_bytes)
+#define interruptible_insb(port, buf, num_bytes)        (insb(port, buf, num_bytes), num_bytes)
+#define interruptible_outsb(port, buf, num_bytes)       (outsb(port, buf, num_bytes), num_bytes)
 
 
 /************************************************************************/
@@ -60,9 +70,9 @@ DECL_BEGIN
 
 /* Construct a new mmap-able mem-part for /dev/mem */
 PRIVATE ATTR_RETNONNULL NONNULL((1)) REF struct mpart *KCALL
-devmem_newpart(struct mfile *__restrict UNUSED(self),
-             PAGEDIR_PAGEALIGNED pos_t minaddr,
-             PAGEDIR_PAGEALIGNED size_t num_bytes) {
+devmem_v_newpart(struct mfile *__restrict UNUSED(self),
+                 PAGEDIR_PAGEALIGNED pos_t minaddr,
+                 PAGEDIR_PAGEALIGNED size_t num_bytes) {
 	REF struct mpart *result;
 	result = (REF struct mpart *)kmalloc(sizeof(struct mpart), GFP_LOCKED | GFP_PREFLT);
 	/* (re-)configure the part to point to static, physical memory. */
@@ -77,47 +87,141 @@ devmem_newpart(struct mfile *__restrict UNUSED(self),
 }
 
 PRIVATE WUNUSED NONNULL((1)) size_t KCALL
-devmem_pread(struct mfile *__restrict UNUSED(self), USER CHECKED void *dst,
-             size_t num_bytes, pos_t addr, iomode_t UNUSED(mode)) THROWS(...) {
-	copyfromphys(dst, (physaddr_t)addr, num_bytes);
-	return num_bytes;
+devmem_v_pread(struct mfile *__restrict UNUSED(self), USER CHECKED void *dst,
+               size_t num_bytes, pos_t addr, iomode_t UNUSED(mode)) THROWS(...) {
+	return interruptible_copyfromphys(dst, (physaddr_t)addr, num_bytes);
 }
 
 PRIVATE WUNUSED NONNULL((1, 2)) size_t KCALL
-devmem_preadv(struct mfile *__restrict UNUSED(self), struct iov_buffer *__restrict dst,
-              size_t num_bytes, pos_t addr, iomode_t UNUSED(mode)) THROWS(...) {
+devmem_v_preadv(struct mfile *__restrict UNUSED(self), struct iov_buffer *__restrict dst,
+                size_t num_bytes, pos_t addr, iomode_t UNUSED(mode)) THROWS(...) {
+	size_t result = 0;
 	struct iov_entry ent;
 	IOV_BUFFER_FOREACH(ent, dst) {
-		copyfromphys(ent.ive_base, (physaddr_t)addr, ent.ive_size);
+		TRY {
+			result += interruptible_copyfromphys(ent.ive_base, (physaddr_t)addr, ent.ive_size);
+		} EXCEPT {
+			if (was_thrown(E_INTERRUPT_USER_RPC) && result != 0)
+				goto done;
+			RETHROW();
+		}
 		addr += ent.ive_size;
 	}
-	return (size_t)num_bytes;
+done:
+	return (size_t)result;
 }
 
 PRIVATE WUNUSED NONNULL((1)) size_t KCALL
-devmem_pwrite(struct mfile *__restrict UNUSED(self), USER CHECKED void const *src,
-              size_t num_bytes, pos_t addr, iomode_t UNUSED(mode)) THROWS(...) {
-	copytophys((physaddr_t)addr, src, num_bytes);
+devmem_v_pwrite(struct mfile *__restrict UNUSED(self), USER CHECKED void const *src,
+                size_t num_bytes, pos_t addr, iomode_t UNUSED(mode)) THROWS(...) {
+	return interruptible_copytophys((physaddr_t)addr, src, num_bytes);
+}
+
+PRIVATE WUNUSED NONNULL((1, 2)) size_t KCALL
+devmem_v_pwritev(struct mfile *__restrict UNUSED(self), struct iov_buffer *__restrict src,
+                 size_t num_bytes, pos_t addr, iomode_t UNUSED(mode)) THROWS(...) {
+	size_t result = 0;
+	struct iov_entry ent;
+	IOV_BUFFER_FOREACH(ent, src) {
+		TRY {
+			result += interruptible_copytophys((physaddr_t)addr, ent.ive_base, ent.ive_size);
+		} EXCEPT {
+			if (was_thrown(E_INTERRUPT_USER_RPC) && result != 0)
+				goto done;
+			RETHROW();
+		}
+		addr += ent.ive_size;
+	}
+done:
+	return (size_t)result;
+}
+
+PRIVATE struct mfile_stream_ops const devmem_stream_ops = {
+	.mso_pread   = &devmem_v_pread,
+	.mso_preadv  = &devmem_v_preadv,
+	.mso_pwrite  = &devmem_v_pwrite,
+	.mso_pwritev = &devmem_v_pwritev,
+};
+
+
+
+
+
+/************************************************************************/
+/* General-purpose, write-swallow file (/dev/null)                      */
+/************************************************************************/
+PRIVATE WUNUSED NONNULL((1)) size_t KCALL
+devnull_v_read(struct mfile *__restrict UNUSED(self), USER CHECKED void *UNUSED(dst),
+               size_t UNUSED(num_bytes), iomode_t UNUSED(mode)) THROWS(...) {
+	return 0;
+}
+
+PRIVATE WUNUSED NONNULL((1, 2)) size_t KCALL
+devnull_v_readv(struct mfile *__restrict UNUSED(self),
+                struct iov_buffer *__restrict UNUSED(dst),
+                size_t UNUSED(num_bytes), iomode_t UNUSED(mode)) THROWS(...) {
+	return 0;
+}
+
+PRIVATE WUNUSED NONNULL((1)) size_t KCALL
+devnull_v_pread(struct mfile *__restrict UNUSED(self), USER CHECKED void *UNUSED(dst),
+                size_t UNUSED(num_bytes), pos_t UNUSED(addr), iomode_t UNUSED(mode)) THROWS(...) {
+	return 0;
+}
+
+PRIVATE WUNUSED NONNULL((1, 2)) size_t KCALL
+devnull_v_preadv(struct mfile *__restrict UNUSED(self), struct iov_buffer *__restrict UNUSED(dst),
+                 size_t UNUSED(num_bytes), pos_t UNUSED(addr), iomode_t UNUSED(mode)) THROWS(...) {
+	return 0;
+}
+
+PRIVATE WUNUSED NONNULL((1)) size_t KCALL
+devnull_v_write(struct mfile *__restrict UNUSED(self),
+                USER CHECKED void const *UNUSED(src),
+                size_t num_bytes, iomode_t UNUSED(mode)) THROWS(...) {
 	return num_bytes;
 }
 
 PRIVATE WUNUSED NONNULL((1, 2)) size_t KCALL
-devmem_pwritev(struct mfile *__restrict UNUSED(self), struct iov_buffer *__restrict src,
-               size_t num_bytes, pos_t addr, iomode_t UNUSED(mode)) THROWS(...) {
-	struct iov_entry ent;
-	IOV_BUFFER_FOREACH(ent, src) {
-		copytophys((physaddr_t)addr, ent.ive_base, ent.ive_size);
-		addr += ent.ive_size;
-	}
-	return (size_t)num_bytes;
+devnull_v_writev(struct mfile *__restrict UNUSED(self),
+                 struct iov_buffer *__restrict UNUSED(src),
+                 size_t num_bytes, iomode_t UNUSED(mode)) THROWS(...) {
+	return num_bytes;
 }
 
-PRIVATE struct mfile_stream_ops const devmem_stream_ops = {
-	.mso_pread   = &devmem_pread,
-	.mso_preadv  = &devmem_preadv,
-	.mso_pwrite  = &devmem_pwrite,
-	.mso_pwritev = &devmem_pwritev,
+PRIVATE WUNUSED NONNULL((1)) size_t KCALL
+devnull_v_pwrite(struct mfile *__restrict UNUSED(self), USER CHECKED void const *UNUSED(src),
+                 size_t num_bytes, pos_t UNUSED(addr), iomode_t UNUSED(mode)) THROWS(...) {
+	return num_bytes;
+}
+
+PRIVATE WUNUSED NONNULL((1, 2)) size_t KCALL
+devnull_v_pwritev(struct mfile *__restrict UNUSED(self), struct iov_buffer *__restrict UNUSED(src),
+                  size_t num_bytes, pos_t UNUSED(addr), iomode_t UNUSED(mode)) THROWS(...) {
+	return num_bytes;
+}
+
+PRIVATE NONNULL((1)) pos_t KCALL
+devnull_v_seek(struct mfile *__restrict UNUSED(self), off_t UNUSED(offset),
+               unsigned int UNUSED(whence)) THROWS(...) {
+	return 0;
+}
+
+#define devnull_v_loadpages devzero_v_loadpages
+
+PRIVATE struct mfile_stream_ops const devnull_stream_ops = {
+	.mso_read    = &devnull_v_read,
+	.mso_readv   = &devnull_v_readv,
+	.mso_write   = &devnull_v_write,
+	.mso_writev  = &devnull_v_writev,
+	.mso_pread   = &devnull_v_pread,
+	.mso_preadv  = &devnull_v_preadv,
+	.mso_pwrite  = &devnull_v_pwrite,
+	.mso_pwritev = &devnull_v_pwritev,
+	.mso_seek    = &devnull_v_seek,
 };
+
+
 
 
 
@@ -127,18 +231,627 @@ PRIVATE struct mfile_stream_ops const devmem_stream_ops = {
 INTDEF NONNULL((1)) void /* From "memory/mman/mfile.c" */
 NOTHROW(KCALL mfile_zero_loadpages)(struct mfile *__restrict self,
                                     pos_t addr, physaddr_t buf, size_t num_bytes);
-#define devzero_loadpages mfile_zero_loadpages
+#define devzero_v_loadpages mfile_zero_loadpages
 
-PRIVATE struct mfile_stream_ops const devzero_stream_ops = {}; /* TODO */
+PRIVATE WUNUSED NONNULL((1)) size_t KCALL
+devzero_v_read(struct mfile *__restrict UNUSED(self), USER CHECKED void *dst,
+               size_t num_bytes, iomode_t UNUSED(mode)) THROWS(...) {
+	return interruptible_bzero(dst, num_bytes);
+}
+
+PRIVATE WUNUSED NONNULL((1)) size_t KCALL
+devzero_readv(struct iov_buffer *__restrict dst, size_t num_bytes) THROWS(...) {
+	size_t result = 0;
+	struct iov_entry ent;
+	IOV_BUFFER_FOREACH(ent, dst) {
+		TRY {
+			result += interruptible_bzero(ent.ive_base, ent.ive_size);
+		} EXCEPT {
+			if (was_thrown(E_INTERRUPT_USER_RPC) && result != 0)
+				goto done;
+			RETHROW();
+		}
+	}
+done:
+	return (size_t)result;
+}
+
+PRIVATE WUNUSED NONNULL((1, 2)) size_t KCALL
+devzero_v_readv(struct mfile *__restrict UNUSED(self),
+                struct iov_buffer *__restrict dst,
+                size_t num_bytes, iomode_t UNUSED(mode)) THROWS(...) {
+	return devzero_readv(dst, num_bytes);
+}
+
+PRIVATE WUNUSED NONNULL((1)) size_t KCALL
+devzero_v_pread(struct mfile *__restrict UNUSED(self), USER CHECKED void *dst,
+                size_t num_bytes, pos_t UNUSED(addr), iomode_t UNUSED(mode)) THROWS(...) {
+	return interruptible_bzero(dst, num_bytes);
+}
+
+PRIVATE WUNUSED NONNULL((1, 2)) size_t KCALL
+devzero_v_preadv(struct mfile *__restrict UNUSED(self), struct iov_buffer *__restrict dst,
+                 size_t num_bytes, pos_t UNUSED(addr), iomode_t UNUSED(mode)) THROWS(...) {
+	return devzero_readv(dst, num_bytes);
+}
+
+#define devzero_v_write     devnull_v_write
+#define devzero_v_writev    devnull_v_writev
+#define devzero_v_pwrite    devnull_v_pwrite
+#define devzero_v_pwritev   devnull_v_pwritev
+#define devzero_v_seek      devnull_v_seek
+
+PRIVATE struct mfile_stream_ops const devzero_stream_ops = {
+	.mso_read    = &devzero_v_read,
+	.mso_readv   = &devzero_v_readv,
+	.mso_write   = &devzero_v_write,
+	.mso_writev  = &devzero_v_writev,
+	.mso_pread   = &devzero_v_pread,
+	.mso_preadv  = &devzero_v_preadv,
+	.mso_pwrite  = &devzero_v_pwrite,
+	.mso_pwritev = &devzero_v_pwritev,
+	.mso_seek    = &devzero_v_seek,
+};
 
 
-PRIVATE struct mfile_stream_ops const devkmem_stream_ops = {}; /* TODO */
-PRIVATE struct mfile_stream_ops const devnull_stream_ops = {}; /* TODO */
-PRIVATE struct mfile_stream_ops const devport_stream_ops = {}; /* TODO */
-PRIVATE struct mfile_stream_ops const devfull_stream_ops = {}; /* TODO */
-PRIVATE struct mfile_stream_ops const devrandom_stream_ops = {}; /* TODO */
-PRIVATE struct mfile_stream_ops const devurandom_stream_ops = {}; /* TODO */
-PRIVATE struct mfile_stream_ops const devkmsg_stream_ops = {}; /* TODO */
+
+
+
+/************************************************************************/
+/* General-purpose, always-full file (/dev/full)                        */
+/************************************************************************/
+PRIVATE ATTR_NORETURN void KCALL throw_disk_full(void) {
+	THROW(E_FSERROR_DISK_FULL);
+}
+
+PRIVATE WUNUSED NONNULL((1)) size_t KCALL
+devfull_v_write(struct mfile *__restrict UNUSED(self),
+                USER CHECKED void const *UNUSED(src),
+                size_t UNUSED(num_bytes), iomode_t UNUSED(mode)) THROWS(...) {
+	throw_disk_full();
+}
+
+PRIVATE WUNUSED NONNULL((1, 2)) size_t KCALL
+devfull_v_writev(struct mfile *__restrict UNUSED(self),
+                 struct iov_buffer *__restrict UNUSED(src),
+                 size_t UNUSED(num_bytes), iomode_t UNUSED(mode)) THROWS(...) {
+	throw_disk_full();
+}
+
+PRIVATE WUNUSED NONNULL((1)) size_t KCALL
+devfull_v_pwrite(struct mfile *__restrict UNUSED(self), USER CHECKED void const *UNUSED(src),
+                 size_t UNUSED(num_bytes), pos_t UNUSED(addr), iomode_t UNUSED(mode)) THROWS(...) {
+	throw_disk_full();
+}
+
+PRIVATE WUNUSED NONNULL((1, 2)) size_t KCALL
+devfull_v_pwritev(struct mfile *__restrict UNUSED(self), struct iov_buffer *__restrict UNUSED(src),
+                  size_t UNUSED(num_bytes), pos_t UNUSED(addr), iomode_t UNUSED(mode)) THROWS(...) {
+	throw_disk_full();
+}
+
+#define devfull_v_read      devzero_v_read
+#define devfull_v_readv     devzero_v_readv
+#define devfull_v_pread     devzero_v_pread
+#define devfull_v_preadv    devzero_v_preadv
+#define devfull_v_seek      devzero_v_seek
+#define devfull_v_loadpages devzero_v_loadpages
+PRIVATE struct mfile_stream_ops const devfull_stream_ops = {
+	.mso_read    = &devfull_v_read,
+	.mso_readv   = &devfull_v_readv,
+	.mso_write   = &devfull_v_write,
+	.mso_writev  = &devfull_v_writev,
+	.mso_pread   = &devfull_v_pread,
+	.mso_preadv  = &devfull_v_preadv,
+	.mso_pwrite  = &devfull_v_pwrite,
+	.mso_pwritev = &devfull_v_pwritev,
+	.mso_seek    = &devfull_v_seek,
+};
+
+
+
+
+
+/************************************************************************/
+/* Full, unfiltered, kernel memory access (/dev/kmem)                   */
+/************************************************************************/
+PRIVATE WUNUSED NONNULL((1)) size_t KCALL
+devkmem_v_pread(struct mfile *__restrict UNUSED(self), USER CHECKED void *dst,
+                size_t num_bytes, pos_t addr, iomode_t UNUSED(mode)) THROWS(...) {
+	return interruptible_memcpy(dst, (UNCHECKED void const *)(uintptr_t)addr, num_bytes);
+}
+
+PRIVATE WUNUSED NONNULL((1, 2)) size_t KCALL
+devkmem_v_preadv(struct mfile *__restrict UNUSED(self), struct iov_buffer *__restrict dst,
+                 size_t num_bytes, pos_t addr, iomode_t UNUSED(mode)) THROWS(...) {
+	size_t result = 0;
+	struct iov_entry ent;
+	IOV_BUFFER_FOREACH(ent, dst) {
+		TRY {
+			result += interruptible_memcpy(ent.ive_base, (UNCHECKED void const *)(uintptr_t)addr, ent.ive_size);
+		} EXCEPT {
+			if (was_thrown(E_INTERRUPT_USER_RPC) && result != 0)
+				goto done;
+			RETHROW();
+		}
+		addr += ent.ive_size;
+	}
+done:
+	return (size_t)result;
+}
+
+PRIVATE WUNUSED NONNULL((1)) size_t KCALL
+devkmem_v_pwrite(struct mfile *__restrict UNUSED(self), USER CHECKED void const *src,
+                 size_t num_bytes, pos_t addr, iomode_t UNUSED(mode)) THROWS(...) {
+	return interruptible_memcpy((UNCHECKED void *)(uintptr_t)addr, src, num_bytes);
+}
+
+PRIVATE WUNUSED NONNULL((1, 2)) size_t KCALL
+devkmem_v_pwritev(struct mfile *__restrict UNUSED(self), struct iov_buffer *__restrict dst,
+                 size_t num_bytes, pos_t addr, iomode_t UNUSED(mode)) THROWS(...) {
+	size_t result = 0;
+	struct iov_entry ent;
+	IOV_BUFFER_FOREACH(ent, dst) {
+		TRY {
+			result += interruptible_memcpy((UNCHECKED void *)(uintptr_t)addr, ent.ive_base, ent.ive_size);
+		} EXCEPT {
+			if (was_thrown(E_INTERRUPT_USER_RPC) && result != 0)
+				goto done;
+			RETHROW();
+		}
+		addr += ent.ive_size;
+	}
+done:
+	return (size_t)result;
+}
+
+PRIVATE struct mfile_stream_ops const devkmem_stream_ops = {
+	.mso_open    = &mfile_v_open,
+	.mso_pread   = &devkmem_v_pread,
+	.mso_preadv  = &devkmem_v_preadv,
+	.mso_pwrite  = &devkmem_v_pwrite,
+	.mso_pwritev = &devkmem_v_pwritev,
+};
+
+#ifdef LIBVIO_CONFIG_ENABLED
+PRIVATE NONNULL((1)) uint8_t LIBVIO_CC
+devkmem_v_rdb(struct vioargs *__restrict UNUSED(args), vio_addr_t addr) {
+	return *(uint8_t const *)(uintptr_t)addr;
+}
+
+PRIVATE NONNULL((1)) uint16_t LIBVIO_CC
+devkmem_v_rdw(struct vioargs *__restrict UNUSED(args), vio_addr_t addr) {
+	return *(uint16_t const *)(uintptr_t)addr;
+}
+
+PRIVATE NONNULL((1)) uint32_t LIBVIO_CC
+devkmem_v_rdl(struct vioargs *__restrict UNUSED(args), vio_addr_t addr) {
+	return *(uint32_t const *)(uintptr_t)addr;
+}
+
+#ifdef LIBVIO_CONFIG_HAVE_QWORD
+PRIVATE NONNULL((1)) uint64_t LIBVIO_CC
+devkmem_v_rdq(struct vioargs *__restrict UNUSED(args), vio_addr_t addr) {
+	return *(uint64_t const *)(uintptr_t)addr;
+}
+#endif /* LIBVIO_CONFIG_HAVE_QWORD */
+
+PRIVATE NONNULL((1)) void LIBVIO_CC
+devkmem_v_wrb(struct vioargs *__restrict UNUSED(args), vio_addr_t addr, uint8_t value) {
+	*(uint8_t *)(uintptr_t)addr = value;
+}
+
+PRIVATE NONNULL((1)) void LIBVIO_CC
+devkmem_v_wrw(struct vioargs *__restrict UNUSED(args), vio_addr_t addr, uint16_t value) {
+	*(uint16_t *)(uintptr_t)addr = value;
+}
+
+PRIVATE NONNULL((1)) void LIBVIO_CC
+devkmem_v_wrl(struct vioargs *__restrict UNUSED(args), vio_addr_t addr, uint32_t value) {
+	*(uint32_t *)(uintptr_t)addr = value;
+}
+
+#ifdef LIBVIO_CONFIG_HAVE_QWORD
+PRIVATE NONNULL((1)) void LIBVIO_CC
+devkmem_v_wrq(struct vioargs *__restrict UNUSED(args), vio_addr_t addr, uint64_t value) {
+	*(uint64_t *)(uintptr_t)addr = value;
+}
+#endif /* LIBVIO_CONFIG_HAVE_QWORD */
+
+PRIVATE NONNULL((1)) uint8_t LIBVIO_CC
+devkmem_v_cmpxchb(struct vioargs *__restrict UNUSED(args), vio_addr_t addr,
+                  uint8_t oldvalue, uint8_t newvalue, bool UNUSED(atomic)) {
+	return ATOMIC_CMPXCH_VAL(*(uint8_t *)(uintptr_t)addr, oldvalue, newvalue);
+}
+
+PRIVATE NONNULL((1)) uint16_t LIBVIO_CC
+devkmem_v_cmpxchw(struct vioargs *__restrict UNUSED(args), vio_addr_t addr,
+                  uint16_t oldvalue, uint16_t newvalue, bool UNUSED(atomic)) {
+	return ATOMIC_CMPXCH_VAL(*(uint16_t *)(uintptr_t)addr, oldvalue, newvalue);
+}
+
+PRIVATE NONNULL((1)) uint32_t LIBVIO_CC
+devkmem_v_cmpxchl(struct vioargs *__restrict UNUSED(args), vio_addr_t addr,
+                  uint32_t oldvalue, uint32_t newvalue, bool UNUSED(atomic)) {
+	return ATOMIC_CMPXCH_VAL(*(uint32_t *)(uintptr_t)addr, oldvalue, newvalue);
+}
+
+#if defined(LIBVIO_CONFIG_HAVE_QWORD) || defined(LIBVIO_CONFIG_HAVE_QWORD_CMPXCH)
+PRIVATE NONNULL((1)) uint64_t LIBVIO_CC
+devkmem_v_cmpxchq(struct vioargs *__restrict UNUSED(args), vio_addr_t addr,
+                  uint64_t oldvalue, uint64_t newvalue, bool UNUSED(atomic)) {
+	return ATOMIC_CMPXCH_VAL(*(uint64_t *)(uintptr_t)addr, oldvalue, newvalue);
+}
+#endif /* LIBVIO_CONFIG_HAVE_QWORD || LIBVIO_CONFIG_HAVE_QWORD_CMPXCH */
+
+#ifdef LIBVIO_CONFIG_HAVE_XWORD_CMPXCH
+PRIVATE NONNULL((1)) uint128_t LIBVIO_CC
+devkmem_v_cmpxchx(struct vioargs *__restrict UNUSED(args), vio_addr_t addr,
+                  uint128_t oldvalue, uint128_t newvalue, bool UNUSED(atomic)) {
+#ifndef __INTELLISENSE__
+	return ATOMIC_CMPXCH_VAL(*(uint128_t *)(uintptr_t)addr, oldvalue, newvalue);
+#endif /* !__INTELLISENSE__ */
+}
+#endif /* LIBVIO_CONFIG_HAVE_XWORD_CMPXCH */
+
+PRIVATE struct vio_operators const devkmem_vio_ops = {
+	VIO_CALLBACK_INIT_READ(&devkmem_v_rdb, &devkmem_v_rdw, &devkmem_v_rdl, &devkmem_v_rdq),
+	VIO_CALLBACK_INIT_WRITE(&devkmem_v_wrb, &devkmem_v_wrw, &devkmem_v_wrl, &devkmem_v_wrq),
+	VIO_CALLBACK_INIT_CMPXCH(&devkmem_v_cmpxchb, &devkmem_v_cmpxchw, &devkmem_v_cmpxchl, &devkmem_v_cmpxchq, &devkmem_v_cmpxchx),
+};
+#endif /* LIBVIO_CONFIG_ENABLED */
+
+
+
+
+
+/************************************************************************/
+/* Full, unfiltered, system port access (/dev/port)                     */
+/************************************************************************/
+PRIVATE WUNUSED NONNULL((1)) size_t KCALL
+devport_v_pread(struct mfile *__restrict UNUSED(self), USER CHECKED void *dst,
+                size_t num_bytes, pos_t addr, iomode_t UNUSED(mode)) THROWS(...) {
+	return interruptible_insb((port_t)addr, dst, num_bytes);
+}
+
+PRIVATE WUNUSED NONNULL((1, 2)) size_t KCALL
+devport_v_preadv(struct mfile *__restrict UNUSED(self), struct iov_buffer *__restrict dst,
+                 size_t num_bytes, pos_t addr, iomode_t UNUSED(mode)) THROWS(...) {
+	size_t result = 0;
+	struct iov_entry ent;
+	IOV_BUFFER_FOREACH(ent, dst) {
+		TRY {
+			result += interruptible_insb((port_t)addr, ent.ive_base, ent.ive_size);
+		} EXCEPT {
+			if (was_thrown(E_INTERRUPT_USER_RPC) && result != 0)
+				goto done;
+			RETHROW();
+		}
+		addr += ent.ive_size;
+	}
+done:
+	return (size_t)result;
+}
+
+PRIVATE WUNUSED NONNULL((1)) size_t KCALL
+devport_v_pwrite(struct mfile *__restrict UNUSED(self), USER CHECKED void const *src,
+                 size_t num_bytes, pos_t addr, iomode_t UNUSED(mode)) THROWS(...) {
+	return interruptible_outsb((port_t)addr, src, num_bytes);
+}
+
+PRIVATE WUNUSED NONNULL((1, 2)) size_t KCALL
+devport_v_pwritev(struct mfile *__restrict UNUSED(self), struct iov_buffer *__restrict dst,
+                 size_t num_bytes, pos_t addr, iomode_t UNUSED(mode)) THROWS(...) {
+	size_t result = 0;
+	struct iov_entry ent;
+	IOV_BUFFER_FOREACH(ent, dst) {
+		TRY {
+			result += interruptible_outsb((port_t)addr, ent.ive_base, ent.ive_size);
+		} EXCEPT {
+			if (was_thrown(E_INTERRUPT_USER_RPC) && result != 0)
+				goto done;
+			RETHROW();
+		}
+		addr += ent.ive_size;
+	}
+done:
+	return (size_t)result;
+}
+
+PRIVATE struct mfile_stream_ops const devport_stream_ops = {
+	.mso_open    = &mfile_v_open,
+	.mso_pread   = &devport_v_pread,
+	.mso_preadv  = &devport_v_preadv,
+	.mso_pwrite  = &devport_v_pwrite,
+	.mso_pwritev = &devport_v_pwritev,
+};
+
+#ifdef LIBVIO_CONFIG_ENABLED
+PRIVATE NONNULL((1)) uint8_t LIBVIO_CC
+devport_v_rdb(struct vioargs *__restrict UNUSED(args), vio_addr_t addr) {
+	return inb((port_t)addr);
+}
+
+PRIVATE NONNULL((1)) uint16_t LIBVIO_CC
+devport_v_rdw(struct vioargs *__restrict UNUSED(args), vio_addr_t addr) {
+	return inw((port_t)addr);
+}
+
+PRIVATE NONNULL((1)) uint32_t LIBVIO_CC
+devport_v_rdl(struct vioargs *__restrict UNUSED(args), vio_addr_t addr) {
+	return inl((port_t)addr);
+}
+
+PRIVATE NONNULL((1)) void LIBVIO_CC
+devport_v_wrb(struct vioargs *__restrict UNUSED(args), vio_addr_t addr, uint8_t value) {
+	outb((port_t)addr, value);
+}
+
+PRIVATE NONNULL((1)) void LIBVIO_CC
+devport_v_wrw(struct vioargs *__restrict UNUSED(args), vio_addr_t addr, uint16_t value) {
+	outw((port_t)addr, value);
+}
+
+PRIVATE NONNULL((1)) void LIBVIO_CC
+devport_v_wrl(struct vioargs *__restrict UNUSED(args), vio_addr_t addr, uint32_t value) {
+	outl((port_t)addr, value);
+}
+
+PRIVATE struct vio_operators const devport_vio_ops = {
+	VIO_CALLBACK_INIT_READ(&devport_v_rdb, &devport_v_rdw, &devport_v_rdl, NULL),
+	VIO_CALLBACK_INIT_WRITE(&devport_v_wrb, &devport_v_wrw, &devport_v_wrl, NULL),
+};
+#endif /* LIBVIO_CONFIG_ENABLED */
+
+
+
+
+
+/************************************************************************/
+/* True random number generator access (/dev/random)                    */
+/************************************************************************/
+PRIVATE WUNUSED NONNULL((1)) size_t KCALL
+devrandom_readv(struct iov_buffer *__restrict dst, iomode_t mode) THROWS(...) {
+	size_t result = 0;
+	struct iov_entry ent;
+	IOV_BUFFER_FOREACH(ent, dst) {
+		size_t part;
+		if (!ent.ive_size)
+			continue;
+		part = entropy_read(ent.ive_base, ent.ive_size, mode);
+		if (!part)
+			break;
+		result += part;
+		/* Don't keep blocking if at least 1 byte was read! */
+		mode |= IO_NONBLOCK | IO_NODATAZERO;
+	}
+done:
+	return (size_t)result;
+}
+
+PRIVATE WUNUSED NONNULL((1)) size_t KCALL
+devrandom_v_read(struct mfile *__restrict UNUSED(self), USER CHECKED void *dst,
+                 size_t num_bytes, iomode_t mode) THROWS(...) {
+	return entropy_read(dst, num_bytes, mode);
+}
+
+PRIVATE WUNUSED NONNULL((1, 2)) size_t KCALL
+devrandom_v_readv(struct mfile *__restrict UNUSED(self), struct iov_buffer *__restrict dst,
+                  size_t UNUSED(num_bytes), iomode_t mode) THROWS(...) {
+	return devrandom_readv(dst, mode);
+}
+
+PRIVATE WUNUSED NONNULL((1)) size_t KCALL
+devrandom_v_pread(struct mfile *__restrict UNUSED(self), USER CHECKED void *dst,
+                  size_t num_bytes, pos_t UNUSED(addr), iomode_t mode) THROWS(...) {
+	return entropy_read(dst, num_bytes, mode);
+}
+
+PRIVATE WUNUSED NONNULL((1, 2)) size_t KCALL
+devrandom_v_preadv(struct mfile *__restrict UNUSED(self), struct iov_buffer *__restrict dst,
+                   size_t UNUSED(num_bytes), pos_t UNUSED(addr), iomode_t mode) THROWS(...) {
+	return devrandom_readv(dst, mode);
+}
+
+PRIVATE NONNULL((1)) void KCALL
+devrandom_v_pollconnect(struct mfile *__restrict self,
+                        poll_mode_t what)
+		THROWS(...) {
+	if (what & POLLINMASK) {
+		task_connect_for_poll(&entropy_request_sig);
+		/* Make sure that the signal is broadcast once
+		 * at least NBBY  bits have become  available. */
+		for (;;) {
+			size_t oldval;
+			oldval = ATOMIC_READ(entropy_request_bits);
+			if (oldval <= NBBY)
+				break;
+			if (ATOMIC_CMPXCH_WEAK(entropy_request_bits,
+			                       oldval, NBBY))
+				break;
+		}
+	}
+}
+
+PRIVATE WUNUSED NONNULL((1)) poll_mode_t KCALL
+devrandom_v_polltest(struct mfile *__restrict self,
+                     poll_mode_t what)
+		THROWS(...) {
+	/* Wait for non-deterministic random data to become available! */
+	if (what & POLLINMASK) {
+		if (ATOMIC_READ(entropy_bits) >= NBBY)
+			return what & POLLINMASK;
+	}
+	return 0;
+}
+
+
+PRIVATE struct mfile_stream_ops const devrandom_stream_ops = {
+	.mso_read        = &devrandom_v_read,
+	.mso_readv       = &devrandom_v_readv,
+	.mso_pread       = &devrandom_v_pread,
+	.mso_preadv      = &devrandom_v_preadv,
+	.mso_pollconnect = &devrandom_v_pollconnect,
+	.mso_polltest    = &devrandom_v_polltest,
+};
+
+#ifdef LIBVIO_CONFIG_ENABLED
+PRIVATE NONNULL((1)) uint8_t LIBVIO_CC
+devrandom_v_rdb(struct vioargs *__restrict UNUSED(args), vio_addr_t addr) {
+	uint8_t result;
+	entropy_readall(&result, sizeof(result));
+	return result;
+}
+
+PRIVATE NONNULL((1)) uint16_t LIBVIO_CC
+devrandom_v_rdw(struct vioargs *__restrict UNUSED(args), vio_addr_t addr) {
+	uint16_t result;
+	entropy_readall(&result, sizeof(result));
+	return result;
+}
+
+PRIVATE NONNULL((1)) uint32_t LIBVIO_CC
+devrandom_v_rdl(struct vioargs *__restrict UNUSED(args), vio_addr_t addr) {
+	uint32_t result;
+	entropy_readall(&result, sizeof(result));
+	return result;
+}
+
+#ifdef LIBVIO_CONFIG_HAVE_QWORD
+PRIVATE NONNULL((1)) uint64_t LIBVIO_CC
+devrandom_v_rdq(struct vioargs *__restrict UNUSED(args), vio_addr_t addr) {
+	uint64_t result;
+	entropy_readall(&result, sizeof(result));
+	return result;
+}
+#endif /* LIBVIO_CONFIG_HAVE_QWORD */
+
+PRIVATE struct vio_operators const devrandom_vio_ops = {
+	VIO_CALLBACK_INIT_READ(&devrandom_v_rdb, &devrandom_v_rdw,
+	                       &devrandom_v_rdl, &devrandom_v_rdq),
+};
+#endif /* LIBVIO_CONFIG_ENABLED */
+
+
+
+
+
+/************************************************************************/
+/* Pseudo (unlimited) random number generator access (/dev/urandom)     */
+/************************************************************************/
+PRIVATE WUNUSED NONNULL((1)) void KCALL
+devurandom_readv(struct iov_buffer *__restrict dst) THROWS(...) {
+	struct iov_entry ent;
+	IOV_BUFFER_FOREACH(ent, dst) {
+		urandom_read(ent.ive_base, ent.ive_size);
+	}
+}
+
+PRIVATE WUNUSED NONNULL((1)) size_t KCALL
+devurandom_v_read(struct mfile *__restrict UNUSED(self), USER CHECKED void *dst,
+                 size_t num_bytes, iomode_t UNUSED(mode)) THROWS(...) {
+	urandom_read(dst, num_bytes);
+	return num_bytes;
+}
+
+PRIVATE WUNUSED NONNULL((1, 2)) size_t KCALL
+devurandom_v_readv(struct mfile *__restrict UNUSED(self), struct iov_buffer *__restrict dst,
+                  size_t num_bytes, iomode_t UNUSED(mode)) THROWS(...) {
+	devurandom_readv(dst);
+	return num_bytes;
+}
+
+PRIVATE WUNUSED NONNULL((1)) size_t KCALL
+devurandom_v_pread(struct mfile *__restrict UNUSED(self), USER CHECKED void *dst,
+                  size_t num_bytes, pos_t UNUSED(addr), iomode_t UNUSED(mode)) THROWS(...) {
+	urandom_read(dst, num_bytes);
+	return num_bytes;
+}
+
+PRIVATE WUNUSED NONNULL((1, 2)) size_t KCALL
+devurandom_v_preadv(struct mfile *__restrict UNUSED(self), struct iov_buffer *__restrict dst,
+                   size_t num_bytes, pos_t UNUSED(addr), iomode_t UNUSED(mode)) THROWS(...) {
+	devurandom_readv(dst);
+	return num_bytes;
+}
+
+
+PRIVATE struct mfile_stream_ops const devurandom_stream_ops = {
+	.mso_read   = &devurandom_v_read,
+	.mso_readv  = &devurandom_v_readv,
+	.mso_pread  = &devurandom_v_pread,
+	.mso_preadv = &devurandom_v_preadv,
+};
+
+#ifdef LIBVIO_CONFIG_ENABLED
+PRIVATE NONNULL((1)) uint8_t LIBVIO_CC
+devurandom_v_rdb(struct vioargs *__restrict UNUSED(args), vio_addr_t addr) {
+	uint8_t result;
+	urandom_read(&result, sizeof(result));
+	return result;
+}
+
+PRIVATE NONNULL((1)) uint16_t LIBVIO_CC
+devurandom_v_rdw(struct vioargs *__restrict UNUSED(args), vio_addr_t addr) {
+	uint16_t result;
+	urandom_read(&result, sizeof(result));
+	return result;
+}
+
+PRIVATE NONNULL((1)) uint32_t LIBVIO_CC
+devurandom_v_rdl(struct vioargs *__restrict UNUSED(args), vio_addr_t addr) {
+	uint32_t result;
+	urandom_read(&result, sizeof(result));
+	return result;
+}
+
+#ifdef LIBVIO_CONFIG_HAVE_QWORD
+PRIVATE NONNULL((1)) uint64_t LIBVIO_CC
+devurandom_v_rdq(struct vioargs *__restrict UNUSED(args), vio_addr_t addr) {
+	uint64_t result;
+	urandom_read(&result, sizeof(result));
+	return result;
+}
+#endif /* LIBVIO_CONFIG_HAVE_QWORD */
+
+PRIVATE struct vio_operators const devurandom_vio_ops = {
+	VIO_CALLBACK_INIT_READ(&devurandom_v_rdb, &devurandom_v_rdw,
+	                       &devurandom_v_rdl, &devurandom_v_rdq),
+};
+#endif /* LIBVIO_CONFIG_ENABLED */
+
+
+
+
+
+/************************************************************************/
+/* Raw output to the system log (/dev/kmsg)                             */
+/************************************************************************/
+PRIVATE WUNUSED NONNULL((1)) size_t KCALL
+devkmsg_v_write(struct mfile *__restrict UNUSED(self),
+                USER CHECKED void const *src,
+                size_t num_bytes, iomode_t UNUSED(mode)) THROWS(...) {
+	return (size_t)syslog_printer(SYSLOG_LEVEL_RAW, (char const *)src, num_bytes);
+}
+
+PRIVATE WUNUSED NONNULL((1, 2)) size_t KCALL
+devkmsg_v_writev(struct mfile *__restrict UNUSED(self),
+                 struct iov_buffer *__restrict src,
+                 size_t UNUSED(num_bytes), iomode_t UNUSED(mode)) THROWS(...) {
+	size_t result = 0;
+	struct iov_entry ent;
+	IOV_BUFFER_FOREACH(ent, src) {
+		result += (size_t)syslog_printer(SYSLOG_LEVEL_RAW,
+		                                 (char const *)ent.ive_base,
+		                                 ent.ive_size);
+	}
+	return result;
+}
+
+PRIVATE struct mfile_stream_ops const devkmsg_stream_ops = {
+	.mso_write  = &devkmsg_v_write,
+	.mso_writev = &devkmsg_v_writev,
+};
 
 
 
@@ -163,14 +876,14 @@ PRIVATE struct mfile_stream_ops const devkmsg_stream_ops = {}; /* TODO */
 			}                                                                       \
 		}                                                                           \
 	}
-INTERN struct device_ops const dev_mem_ops     = DEVICE_OPS_INIT(&devmem_newpart, NULL, &devmem_stream_ops, NULL);
-INTERN struct device_ops const dev_kmem_ops    = DEVICE_OPS_INIT(NULL, NULL, &devkmem_stream_ops, NULL);
-INTERN struct device_ops const dev_null_ops    = DEVICE_OPS_INIT(NULL, &devzero_loadpages, &devnull_stream_ops, NULL);
-INTERN struct device_ops const dev_port_ops    = DEVICE_OPS_INIT(NULL, NULL, &devport_stream_ops, NULL);
-INTERN struct device_ops const dev_zero_ops    = DEVICE_OPS_INIT(NULL, &devzero_loadpages, &devzero_stream_ops, NULL);
-INTERN struct device_ops const dev_full_ops    = DEVICE_OPS_INIT(NULL, &devzero_loadpages, &devfull_stream_ops, NULL);
-INTERN struct device_ops const dev_random_ops  = DEVICE_OPS_INIT(NULL, NULL, &devrandom_stream_ops, NULL);
-INTERN struct device_ops const dev_urandom_ops = DEVICE_OPS_INIT(NULL, NULL, &devurandom_stream_ops, NULL);
+INTERN struct device_ops const dev_mem_ops     = DEVICE_OPS_INIT(&devmem_v_newpart, NULL, &devmem_stream_ops, NULL);
+INTERN struct device_ops const dev_kmem_ops    = DEVICE_OPS_INIT(NULL, NULL, &devkmem_stream_ops, &devkmem_vio_ops);
+INTERN struct device_ops const dev_null_ops    = DEVICE_OPS_INIT(NULL, &devnull_v_loadpages, &devnull_stream_ops, NULL);
+INTERN struct device_ops const dev_port_ops    = DEVICE_OPS_INIT(NULL, NULL, &devport_stream_ops, &devport_vio_ops);
+INTERN struct device_ops const dev_zero_ops    = DEVICE_OPS_INIT(NULL, &devzero_v_loadpages, &devzero_stream_ops, NULL);
+INTERN struct device_ops const dev_full_ops    = DEVICE_OPS_INIT(NULL, &devfull_v_loadpages, &devfull_stream_ops, NULL);
+INTERN struct device_ops const dev_random_ops  = DEVICE_OPS_INIT(NULL, NULL, &devrandom_stream_ops, &devrandom_vio_ops);
+INTERN struct device_ops const dev_urandom_ops = DEVICE_OPS_INIT(NULL, NULL, &devurandom_stream_ops, &devurandom_vio_ops);
 INTERN struct device_ops const dev_kmsg_ops    = DEVICE_OPS_INIT(NULL, NULL, &devkmsg_stream_ops, NULL);
 #undef DEVICE_OPS_INIT
 #undef IF_VIO_ENABLED

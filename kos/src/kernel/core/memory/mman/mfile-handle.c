@@ -46,6 +46,37 @@
 
 DECL_BEGIN
 
+/* Generic open function for mem-file arbitrary mem-file objects. This function
+ * is unconditionally invoked during a call to `open(2)' in order to  construct
+ * wrapper  objects   and  the   like.  This   function  is   implemented   as:
+ * >> struct mfile_stream_ops const *stream = self->mf_ops->mo_stream;
+ * >> if (!stream) {
+ * >>     mfile_v_open(self, hand, access_path, access_dent);
+ * >> } else if (stream->mso_open) {
+ * >>     (*stream->mso_open)(self, hand, access_path, access_dent);
+ * >> } else if (!stream->mso_read && !stream->mso_readv &&
+ * >>            !stream->mso_write && !stream->mso_writev) {
+ * >>     mfile_v_open(self, hand, access_path, access_dent);
+ * >> } else {
+ * >>     // Open mfile itself (iow: `hand->h_data == self')
+ * >> } */
+PUBLIC NONNULL((1, 2)) void KCALL
+mfile_open(struct mfile *__restrict self, struct handle *__restrict hand,
+           struct path *access_path, struct fdirent *access_dent) {
+	struct mfile_stream_ops const *stream = self->mf_ops->mo_stream;
+	if (!stream) {
+		mfile_v_open(self, hand, access_path, access_dent);
+	} else if (stream->mso_open) {
+		(*stream->mso_open)(self, hand, access_path, access_dent);
+	} else if (!stream->mso_read && !stream->mso_readv &&
+	           !stream->mso_write && !stream->mso_writev) {
+		mfile_v_open(self, hand, access_path, access_dent);
+	} else {
+		/* Open mfile itself (iow: `hand->h_data == self') */
+	}
+}
+
+
 /* User-visible mem-file access API. (same as the handle access API) */
 DEFINE_PUBLIC_ALIAS(mfile_uread, handle_mfile_read);
 DEFINE_PUBLIC_ALIAS(mfile_uwrite, handle_mfile_write);
@@ -186,8 +217,36 @@ handle_mfile_readv(struct mfile *__restrict self,
 		THROWS(...) {
 	struct mfile_stream_ops const *stream;
 	stream = self->mf_ops->mo_stream;
-	if likely(stream != NULL && stream->mso_readv)
-		return (*stream->mso_readv)(self, dst, num_bytes, mode);
+	if likely(stream != NULL) {
+		if (stream->mso_readv)
+			return (*stream->mso_readv)(self, dst, num_bytes, mode);
+		if (stream->mso_read) {
+			size_t result = 0;
+			struct iov_entry ent;
+			IOV_BUFFER_FOREACH(ent, dst) {
+				size_t part;
+				if (!ent.ive_size)
+					continue;
+				TRY {
+					part = (*stream->mso_read)(self, ent.ive_base,
+					                           ent.ive_size, mode);
+				} EXCEPT {
+					if ((was_thrown(E_INTERRUPT_USER_RPC) ||
+					     was_thrown(E_WOULDBLOCK)) &&
+					    result != 0)
+						goto done_read;
+					RETHROW();
+				}
+				result += part;
+				if (part < ent.ive_size)
+					break;
+				/* Don't block for the remainder */
+				mode |= IO_NONBLOCK | IO_NODATAZERO;
+			}
+done_read:
+			return result;
+		}
+	}
 	THROW(E_FSERROR_UNSUPPORTED_OPERATION,
 	      E_FILESYSTEM_OPERATION_READ);
 }
@@ -199,8 +258,36 @@ handle_mfile_writev(struct mfile *__restrict self,
 		THROWS(...) {
 	struct mfile_stream_ops const *stream;
 	stream = self->mf_ops->mo_stream;
-	if likely(stream != NULL && stream->mso_writev)
-		return (*stream->mso_writev)(self, src, num_bytes, mode);
+	if likely(stream != NULL) {
+		if (stream->mso_writev)
+			return (*stream->mso_writev)(self, src, num_bytes, mode);
+		if (stream->mso_write) {
+			size_t result = 0;
+			struct iov_entry ent;
+			IOV_BUFFER_FOREACH(ent, src) {
+				size_t part;
+				if (!ent.ive_size)
+					continue;
+				TRY {
+					part = (*stream->mso_write)(self, ent.ive_base,
+					                            ent.ive_size, mode);
+				} EXCEPT {
+					if ((was_thrown(E_INTERRUPT_USER_RPC) ||
+					     was_thrown(E_WOULDBLOCK)) &&
+					    result != 0)
+						goto done_write;
+					RETHROW();
+				}
+				result += part;
+				if (part < ent.ive_size)
+					break;
+				/* Don't block for the remainder */
+				mode |= IO_NONBLOCK | IO_NODATAZERO;
+			}
+done_write:
+			return result;
+		}
+	}
 	THROW(E_FSERROR_UNSUPPORTED_OPERATION,
 	      E_FILESYSTEM_OPERATION_WRITE);
 }
@@ -212,12 +299,70 @@ handle_mfile_preadv(struct mfile *__restrict self,
 		THROWS(...) {
 	struct mfile_stream_ops const *stream;
 	stream = self->mf_ops->mo_stream;
-	if (stream != NULL && stream->mso_preadv)
-		return (*stream->mso_preadv)(self, dst, num_bytes, addr, mode);
+	if (stream != NULL) {
+		if (stream->mso_preadv)
+			return (*stream->mso_preadv)(self, dst, num_bytes, addr, mode);
+		if (stream->mso_pread) {
+			size_t result = 0;
+			struct iov_entry ent;
+			IOV_BUFFER_FOREACH(ent, dst) {
+				size_t part;
+				if (!ent.ive_size)
+					continue;
+				TRY {
+					part = (*stream->mso_pread)(self, ent.ive_base,
+					                            ent.ive_size, addr,
+					                            mode);
+				} EXCEPT {
+					if ((was_thrown(E_INTERRUPT_USER_RPC) ||
+					     was_thrown(E_WOULDBLOCK)) &&
+					    result != 0)
+						goto done_pread;
+					RETHROW();
+				}
+				result += part;
+				if (part < ent.ive_size)
+					break;
+				addr += part;
+				/* Don't block for the remainder */
+				mode |= IO_NONBLOCK | IO_NODATAZERO;
+			}
+done_pread:
+			return result;
+		}
+	}
 	if likely(!(self->mf_flags & MFILE_F_NOUSRIO))
 		return mfile_readv(self, dst, 0, num_bytes, addr);
-	if (stream != NULL && addr == 0 && stream->mso_readv)
-		return (*stream->mso_readv)(self, dst, num_bytes, mode);
+	if (stream != NULL && addr == 0) {
+		if (stream->mso_readv)
+			return (*stream->mso_readv)(self, dst, num_bytes, mode);
+		if (stream->mso_read) {
+			size_t result = 0;
+			struct iov_entry ent;
+			IOV_BUFFER_FOREACH(ent, dst) {
+				size_t part;
+				if (!ent.ive_size)
+					continue;
+				TRY {
+					part = (*stream->mso_read)(self, ent.ive_base,
+					                           ent.ive_size, mode);
+				} EXCEPT {
+					if ((was_thrown(E_INTERRUPT_USER_RPC) ||
+					     was_thrown(E_WOULDBLOCK)) &&
+					    result != 0)
+						goto done_read;
+					RETHROW();
+				}
+				result += part;
+				if (part < ent.ive_size)
+					break;
+				/* Don't block for the remainder */
+				mode |= IO_NONBLOCK | IO_NODATAZERO;
+			}
+done_read:
+			return result;
+		}
+	}
 	THROW(E_FSERROR_UNSUPPORTED_OPERATION,
 	      E_FILESYSTEM_OPERATION_PREAD);
 }
@@ -229,12 +374,70 @@ handle_mfile_pwritev(struct mfile *__restrict self,
 		THROWS(...) {
 	struct mfile_stream_ops const *stream;
 	stream = self->mf_ops->mo_stream;
-	if (stream != NULL && stream->mso_pwritev)
-		return (*stream->mso_pwritev)(self, src, num_bytes, addr, mode);
+	if (stream != NULL) {
+		if (stream->mso_pwritev)
+			return (*stream->mso_pwritev)(self, src, num_bytes, addr, mode);
+		if (stream->mso_pwrite) {
+			size_t result = 0;
+			struct iov_entry ent;
+			IOV_BUFFER_FOREACH(ent, src) {
+				size_t part;
+				if (!ent.ive_size)
+					continue;
+				TRY {
+					part = (*stream->mso_pwrite)(self, ent.ive_base,
+					                             ent.ive_size, addr,
+					                             mode);
+				} EXCEPT {
+					if ((was_thrown(E_INTERRUPT_USER_RPC) ||
+					     was_thrown(E_WOULDBLOCK)) &&
+					    result != 0)
+						goto done_pwrite;
+					RETHROW();
+				}
+				result += part;
+				if (part < ent.ive_size)
+					break;
+				addr += part;
+				/* Don't block for the remainder */
+				mode |= IO_NONBLOCK | IO_NODATAZERO;
+			}
+done_pwrite:
+			return result;
+		}
+	}
 	if likely(!(self->mf_flags & MFILE_F_NOUSRIO))
 		return mfile_writev(self, src, 0, num_bytes, addr);
-	if (stream != NULL && addr == 0 && stream->mso_writev)
-		return (*stream->mso_writev)(self, src, num_bytes, mode);
+	if (stream != NULL && addr == 0) {
+		if (stream->mso_writev)
+			return (*stream->mso_writev)(self, src, num_bytes, mode);
+		if (stream->mso_write) {
+			size_t result = 0;
+			struct iov_entry ent;
+			IOV_BUFFER_FOREACH(ent, src) {
+				size_t part;
+				if (!ent.ive_size)
+					continue;
+				TRY {
+					part = (*stream->mso_write)(self, ent.ive_base,
+					                            ent.ive_size, mode);
+				} EXCEPT {
+					if ((was_thrown(E_INTERRUPT_USER_RPC) ||
+					     was_thrown(E_WOULDBLOCK)) &&
+					    result != 0)
+						goto done_write;
+					RETHROW();
+				}
+				result += part;
+				if (part < ent.ive_size)
+					break;
+				/* Don't block for the remainder */
+				mode |= IO_NONBLOCK | IO_NODATAZERO;
+			}
+done_write:
+			return result;
+		}
+	}
 	THROW(E_FSERROR_UNSUPPORTED_OPERATION,
 	      E_FILESYSTEM_OPERATION_PWRITE);
 }
@@ -450,11 +653,14 @@ handle_mfile_polltest(struct mfile *__restrict self,
 		result = (*stream->mso_polltest)(self, what);
 	else {
 		result = what & (POLLINMASK | POLLOUTMASK);
-		if (stream) {
-			if (stream->mso_read || stream->mso_readv)
-				result &= ~POLLINMASK;
-			if (stream->mso_write || stream->mso_writev)
-				result &= ~POLLOUTMASK;
+		if (self->mf_flags & MFILE_F_NOUSRIO) {
+			result = 0;
+			if (stream) {
+				if (stream->mso_read || stream->mso_readv)
+					result |= what & POLLINMASK;
+				if (stream->mso_write || stream->mso_writev)
+					result |= what & POLLOUTMASK;
+			}
 		}
 	}
 	return result;

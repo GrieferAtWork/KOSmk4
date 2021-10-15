@@ -279,8 +279,11 @@ struct mfile_stream_ops {
 	                         poll_mode_t what)
 			THROWS(...);
 
-	/* [0..1] Implementation for poll(2): Connect to signals.
-	 * When not implemented, `handle_polltest()' always indicates readable+writable */
+	/* [0..1] Implementation  for  poll(2):  Connect  to  signals.
+	 * When not implemented, `handle_polltest()' always indicates:
+	 *  - readable: when `MFILE_F_NOUSRIO' isn't set, or `mso_read' or `mso_readv' are defined
+	 *  - writable: when `MFILE_F_NOUSRIO' isn't set, or `mso_write' or `mso_writev' are defined
+	 */
 	WUNUSED NONNULL((1)) poll_mode_t
 	(KCALL *mso_polltest)(struct mfile *__restrict self,
 	                      poll_mode_t what)
@@ -307,28 +310,29 @@ struct mfile_stream_ops {
  *   - fsync(2), fdatasync(2), stat(2), poll(2), hop(2)
  * As stated, `lseek(2)', `read(2)' and `write(2)' are dispatched via pread/pwrite
  *
- * This function is actually used when trying to open a mem-file with neither `mso_readv',
- * nor `mso_writev' pre-defined (`mso_read' and `mso_write' don't matter here). As such,
- * open(2)-ing a generic mfile object uses `mnode_open()' (see below). */
+ * This function is actually used when trying to open a mem-file with neither
+ * `mso_read'/`mso_readv', nor `mso_write'/`mso_writev' pre-defined. As such,
+ * open(2)-ing a generic mfile object uses `mfile_open()' (see below). */
 FUNDEF NONNULL((1, 2)) void KCALL
-mnode_v_open(struct mfile *__restrict self, struct handle *__restrict hand,
+mfile_v_open(struct mfile *__restrict self, struct handle *__restrict hand,
              struct path *access_path, struct fdirent *access_dent);
 
 /* Generic open function for mem-file arbitrary mem-file objects. This function
- * is unconditionally invoked during a call to `open(2)' in order to construct
- * wrapper objects and the like. This function is implemented as:
+ * is unconditionally invoked during a call to `open(2)' in order to  construct
+ * wrapper  objects   and  the   like.  This   function  is   implemented   as:
  * >> struct mfile_stream_ops const *stream = self->mf_ops->mo_stream;
  * >> if (!stream) {
- * >>     mnode_v_open(self, hand, access_path, access_dent);
+ * >>     mfile_v_open(self, hand, access_path, access_dent);
  * >> } else if (stream->mso_open) {
  * >>     (*stream->mso_open)(self, hand, access_path, access_dent);
- * >> } else if (!stream->mso_readv && !stream->mso_writev) {
- * >>     mnode_v_open(self, hand, access_path, access_dent);
+ * >> } else if (!stream->mso_read && !stream->mso_readv &&
+ * >>            !stream->mso_write && !stream->mso_writev) {
+ * >>     mfile_v_open(self, hand, access_path, access_dent);
  * >> } else {
  * >>     // Open mfile itself (iow: `hand->h_data == self')
  * >> } */
 FUNDEF NONNULL((1, 2)) void KCALL
-mnode_open(struct mfile *__restrict self, struct handle *__restrict hand,
+mfile_open(struct mfile *__restrict self, struct handle *__restrict hand,
            struct path *access_path, struct fdirent *access_dent);
 #endif /* CONFIG_USE_NEW_FS */
 

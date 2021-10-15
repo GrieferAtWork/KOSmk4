@@ -55,14 +55,6 @@ DECL_BEGIN
 #define NO_USER_IO_WITHOUT_VIO (MFILE_F_NOUSRMMAP | MFILE_F_NOUSRIO)
 #endif /* !LIBVIO_CONFIG_ENABLED */
 
-#ifdef KERNELSPACE_HIGHMEM
-#define KERNELSPACE_MEMSIZE ((uint64_t)(0 - KERNELSPACE_BASE))
-#elif defined(KERNELSPACE_LOWMEM)
-#define KERNELSPACE_MEMSIZE ((uint64_t)KERNELSPACE_END)
-#else /* ... */
-#define KERNELSPACE_MEMSIZE ((uint64_t)KERNELSPACE_END - (uint64_t)KERNELSPACE_BASE)
-#endif /* !... */
-
 /*[[[deemon
 import * from deemon;
 import fdirent_hash from .....misc.libgen.fdirent_hash;
@@ -86,7 +78,7 @@ local DEVICE_EXTFLAGS = {
 
 local DEVICE_SIZES = {
 	"mem":     "(uint64_t)(physaddr_t)-1",
-	"kmem":    "KERNELSPACE_MEMSIZE",
+	"kmem":    "(uint64_t)(size_t)-1",
 	"null":    "0",
 	"port":    "(uint64_t)(port_t)-1",
 	"zero":    "0",
@@ -464,7 +456,7 @@ PUBLIC struct device dev_kmem = {
 				                    NO_USER_IO_WITHOUT_VIO |
 				                    __SELECT_INO(0, 0)),
 				MFILE_INIT_mf_trunclock,
-				MFILE_INIT_mf_filesize(KERNELSPACE_MEMSIZE),
+				MFILE_INIT_mf_filesize((uint64_t)(size_t)-1),
 			},
 			.fn_nlink = 1,
 			.fn_mode  = 0644 | S_IFCHR,
