@@ -74,6 +74,7 @@ local DEVICE_EXTFLAGS = {
 	"random":  "NO_USER_IO_WITHOUT_VIO",
 	"urandom": "NO_USER_IO_WITHOUT_VIO",
 	"kmsg":    "MFILE_F_NOUSRMMAP | MFILE_F_NOUSRIO", // mmap() isn't allowed, and I/O has special behavior
+	"tty":     "MFILE_F_NOUSRMMAP | MFILE_F_NOUSRIO", // It's a TTY, so no mmap() or "normal" I/O
 };
 
 local DEVICE_SIZES = {
@@ -86,18 +87,20 @@ local DEVICE_SIZES = {
 	"random":  "0", // Has a custom stat function
 	"urandom": "(uint64_t)-1",
 	"kmsg":    "0",
+	"tty":     "0", // Has a custom stat function
 };
 
 local DEVICES = {
-	("mem",     0644 | __S_IFCHR, MKDEV(1, 1)),
-	("kmem",    0644 | __S_IFCHR, MKDEV(1, 2)),
-	("null",    0644 | __S_IFCHR, MKDEV(1, 3)),
-	("port",    0644 | __S_IFCHR, MKDEV(1, 4)),
-	("zero",    0644 | __S_IFCHR, MKDEV(1, 5)),
-	("full",    0644 | __S_IFCHR, MKDEV(1, 7)),
-	("random",  0644 | __S_IFCHR, MKDEV(1, 8)),
-	("urandom", 0644 | __S_IFCHR, MKDEV(1, 9)),
+	("mem",     0640 | __S_IFCHR, MKDEV(1, 1)),
+	("kmem",    0640 | __S_IFCHR, MKDEV(1, 2)),
+	("null",    0666 | __S_IFCHR, MKDEV(1, 3)),
+	("port",    0640 | __S_IFCHR, MKDEV(1, 4)),
+	("zero",    0666 | __S_IFCHR, MKDEV(1, 5)),
+	("full",    0666 | __S_IFCHR, MKDEV(1, 7)),
+	("random",  0666 | __S_IFCHR, MKDEV(1, 8)),
+	("urandom", 0666 | __S_IFCHR, MKDEV(1, 9)),
 	("kmsg",    0644 | __S_IFCHR, MKDEV(1, 11)),
+	("tty",     0666 | __S_IFCHR, MKDEV(5, 0)),
 };
 local STMODE_MAP = { __S_IFCHR: "S_IFCHR", __S_IFBLK: "S_IFBLK" };
 
@@ -266,6 +269,7 @@ STATIC_ASSERT(devfs_devnode_makeino(S_IFCHR, MKDEV(1, 7)) == (__FS_TYPE(ino))__S
 STATIC_ASSERT(devfs_devnode_makeino(S_IFCHR, MKDEV(1, 8)) == (__FS_TYPE(ino))__SELECT_INO(UINT32_C(0x800047), UINT64_C(0x800047)));
 STATIC_ASSERT(devfs_devnode_makeino(S_IFCHR, MKDEV(1, 9)) == (__FS_TYPE(ino))__SELECT_INO(UINT32_C(0x80004f), UINT64_C(0x80004f)));
 STATIC_ASSERT(devfs_devnode_makeino(S_IFCHR, MKDEV(1, 11)) == (__FS_TYPE(ino))__SELECT_INO(UINT32_C(0x80005f), UINT64_C(0x80005f)));
+STATIC_ASSERT(devfs_devnode_makeino(S_IFCHR, MKDEV(5, 0)) == (__FS_TYPE(ino))__SELECT_INO(UINT32_C(0x2800007), UINT64_C(0x2800007)));
 #undef __CCAST
 #define __CCAST
 PRIVATE struct fdevfsdirent dirent_dev_mem = {
@@ -376,10 +380,22 @@ PRIVATE struct fdevfsdirent dirent_dev_kmsg = {
 		.fd_name    = "kmsg"
 	}
 };
+PRIVATE struct fdevfsdirent dirent_dev_tty = {
+	.fdd_node   = AWREF_INIT(&dev_tty),
+	.fdd_dirent = {
+		.fd_refcnt  = 2, /* +1: dirent_dev_tty, +1: dev_tty.dv_dirent */
+		.fd_ops     = &fdevfsdirent_ops,
+		.fd_ino     = (ino_t)__SELECT_INO(UINT32_C(0x2800007), UINT64_C(0x2800007)),
+		.fd_hash    = FDIRENT_HASH_INIT(0x797474, 0x797474, 0x797474, 0x797474),
+		.fd_namelen = 3,
+		.fd_type    = IFTODT(S_IFCHR),
+		.fd_name    = "tty"
+	}
+};
 DEFINE_INTERN_ALIAS(_fallnodes_list__INIT, dev_mem);
-__SELECT_INO(DEFINE_INTERN_ALIAS(_devfs__fs_nodes__INIT, dev_null),
-             DEFINE_INTERN_ALIAS(_devfs__fs_nodes__INIT, dev_null));
-DEFINE_INTERN_ALIAS(_devfs_byname_tree__INIT, dev_mem);
+__SELECT_INO(DEFINE_INTERN_ALIAS(_devfs__fs_nodes__INIT, dev_random),
+             DEFINE_INTERN_ALIAS(_devfs__fs_nodes__INIT, dev_random));
+DEFINE_INTERN_ALIAS(_devfs_byname_tree__INIT, dev_port);
 INTDEF struct device_ops const dev_mem_ops;
 INTDEF struct device_ops const dev_kmem_ops;
 INTDEF struct device_ops const dev_null_ops;
@@ -389,6 +405,7 @@ INTDEF struct device_ops const dev_full_ops;
 INTDEF struct device_ops const dev_random_ops;
 INTDEF struct device_ops const dev_urandom_ops;
 INTDEF struct device_ops const dev_kmsg_ops;
+INTDEF struct device_ops const dev_tty_ops;
 
 /* Device: `/dev/mem' */
 PUBLIC struct device dev_mem = {
@@ -406,12 +423,13 @@ PUBLIC struct device dev_mem = {
 				MFILE_INIT_mf_flags(MFILE_FN_GLOBAL_REF | MFILE_F_ATTRCHANGED |
 				                    MFILE_F_CHANGED | MFILE_F_NOATIME |
 				                    MFILE_F_NOMTIME | MFILE_F_FIXEDFILESIZE |
+				                    _MFILE_DEVFS_BYNAME_RED |
 				                    __SELECT_INO(0, 0)),
 				MFILE_INIT_mf_trunclock,
 				MFILE_INIT_mf_filesize((uint64_t)(physaddr_t)-1),
 			},
 			.fn_nlink = 1,
-			.fn_mode  = 0644 | S_IFCHR,
+			.fn_mode  = 0640 | S_IFCHR,
 			.fn_uid   = 0,
 			.fn_gid   = 0,
 			.fn_ino   = (ino_t)__SELECT_INO(UINT32_C(0x80000f), UINT64_C(0x80000f)),
@@ -431,9 +449,9 @@ PUBLIC struct device dev_mem = {
 	.dv_driver = &drv_self,
 	.dv_dirent = &dirent_dev_mem,
 	.dv_byname_node = {
-		.rb_par = NULL,
+		.rb_par = &dev_port,
 		.rb_lhs = &dev_kmem,
-		.rb_rhs = &dev_port
+		.rb_rhs = &dev_null
 	}
 };
 
@@ -459,7 +477,7 @@ PUBLIC struct device dev_kmem = {
 				MFILE_INIT_mf_filesize((uint64_t)(size_t)-1),
 			},
 			.fn_nlink = 1,
-			.fn_mode  = 0644 | S_IFCHR,
+			.fn_mode  = 0640 | S_IFCHR,
 			.fn_uid   = 0,
 			.fn_gid   = 0,
 			.fn_ino   = (ino_t)__SELECT_INO(UINT32_C(0x800017), UINT64_C(0x800017)),
@@ -502,12 +520,12 @@ PUBLIC struct device dev_null = {
 				                    MFILE_F_CHANGED | MFILE_F_NOATIME |
 				                    MFILE_F_NOMTIME | MFILE_F_FIXEDFILESIZE |
 				                    MFILE_F_NOUSRMMAP | MFILE_F_NOUSRIO |
-				                    __SELECT_INO(0, 0)),
+				                    __SELECT_INO(_MFILE_FN__RBRED, _MFILE_FN__RBRED)),
 				MFILE_INIT_mf_trunclock,
 				MFILE_INIT_mf_filesize(0),
 			},
 			.fn_nlink = 1,
-			.fn_mode  = 0644 | S_IFCHR,
+			.fn_mode  = 0666 | S_IFCHR,
 			.fn_uid   = 0,
 			.fn_gid   = 0,
 			.fn_ino   = (ino_t)__SELECT_INO(UINT32_C(0x80001f), UINT64_C(0x80001f)),
@@ -515,7 +533,7 @@ PUBLIC struct device dev_null = {
 			FNODE_INIT_fn_changed,
 			.fn_supent = {
 				.rb_lhs = __SELECT_INO(&dev_mem.dv_devnode.dn_node, &dev_mem.dv_devnode.dn_node),
-				.rb_rhs = __SELECT_INO(&dev_random.dv_devnode.dn_node, &dev_random.dv_devnode.dn_node),
+				.rb_rhs = __SELECT_INO(&dev_zero.dv_devnode.dn_node, &dev_zero.dv_devnode.dn_node),
 			},
 			{.fn_allnodes = {
 				.le_next = &dev_port.dv_devnode.dn_node,
@@ -527,7 +545,7 @@ PUBLIC struct device dev_null = {
 	.dv_driver = &drv_self,
 	.dv_dirent = &dirent_dev_null,
 	.dv_byname_node = {
-		.rb_par = &dev_port,
+		.rb_par = &dev_mem,
 		.rb_lhs = NULL,
 		.rb_rhs = NULL
 	}
@@ -550,13 +568,12 @@ PUBLIC struct device dev_port = {
 				                    MFILE_F_CHANGED | MFILE_F_NOATIME |
 				                    MFILE_F_NOMTIME | MFILE_F_FIXEDFILESIZE |
 				                    NO_USER_IO_WITHOUT_VIO |
-				                    _MFILE_DEVFS_BYNAME_RED |
 				                    __SELECT_INO(0, 0)),
 				MFILE_INIT_mf_trunclock,
 				MFILE_INIT_mf_filesize((uint64_t)(port_t)-1),
 			},
 			.fn_nlink = 1,
-			.fn_mode  = 0644 | S_IFCHR,
+			.fn_mode  = 0640 | S_IFCHR,
 			.fn_uid   = 0,
 			.fn_gid   = 0,
 			.fn_ino   = (ino_t)__SELECT_INO(UINT32_C(0x800027), UINT64_C(0x800027)),
@@ -576,8 +593,8 @@ PUBLIC struct device dev_port = {
 	.dv_driver = &drv_self,
 	.dv_dirent = &dirent_dev_port,
 	.dv_byname_node = {
-		.rb_par = &dev_mem,
-		.rb_lhs = &dev_null,
+		.rb_par = NULL,
+		.rb_lhs = &dev_mem,
 		.rb_rhs = &dev_urandom
 	}
 };
@@ -598,13 +615,12 @@ PUBLIC struct device dev_zero = {
 				MFILE_INIT_mf_flags(MFILE_FN_GLOBAL_REF | MFILE_F_ATTRCHANGED |
 				                    MFILE_F_CHANGED | MFILE_F_NOATIME |
 				                    MFILE_F_NOMTIME | MFILE_F_FIXEDFILESIZE |
-				                    _MFILE_DEVFS_BYNAME_RED |
-				                    __SELECT_INO(_MFILE_FN__RBRED, _MFILE_FN__RBRED)),
+				                    __SELECT_INO(0, 0)),
 				MFILE_INIT_mf_trunclock,
 				MFILE_INIT_mf_filesize(0),
 			},
 			.fn_nlink = 1,
-			.fn_mode  = 0644 | S_IFCHR,
+			.fn_mode  = 0666 | S_IFCHR,
 			.fn_uid   = 0,
 			.fn_gid   = 0,
 			.fn_ino   = (ino_t)__SELECT_INO(UINT32_C(0x80002f), UINT64_C(0x80002f)),
@@ -653,7 +669,7 @@ PUBLIC struct device dev_full = {
 				MFILE_INIT_mf_filesize(0),
 			},
 			.fn_nlink = 1,
-			.fn_mode  = 0644 | S_IFCHR,
+			.fn_mode  = 0666 | S_IFCHR,
 			.fn_uid   = 0,
 			.fn_gid   = 0,
 			.fn_ino   = (ino_t)__SELECT_INO(UINT32_C(0x80003f), UINT64_C(0x80003f)),
@@ -696,20 +712,19 @@ PUBLIC struct device dev_random = {
 				                    MFILE_F_CHANGED | MFILE_F_NOATIME |
 				                    MFILE_F_NOMTIME | MFILE_F_FIXEDFILESIZE |
 				                    NO_USER_IO_WITHOUT_VIO |
-				                    _MFILE_DEVFS_BYNAME_RED |
 				                    __SELECT_INO(0, 0)),
 				MFILE_INIT_mf_trunclock,
 				MFILE_INIT_mf_filesize(0),
 			},
 			.fn_nlink = 1,
-			.fn_mode  = 0644 | S_IFCHR,
+			.fn_mode  = 0666 | S_IFCHR,
 			.fn_uid   = 0,
 			.fn_gid   = 0,
 			.fn_ino   = (ino_t)__SELECT_INO(UINT32_C(0x800047), UINT64_C(0x800047)),
 			.fn_super = &devfs.rs_sup,
 			FNODE_INIT_fn_changed,
 			.fn_supent = {
-				.rb_lhs = __SELECT_INO(&dev_zero.dv_devnode.dn_node, &dev_zero.dv_devnode.dn_node),
+				.rb_lhs = __SELECT_INO(&dev_null.dv_devnode.dn_node, &dev_null.dv_devnode.dn_node),
 				.rb_rhs = __SELECT_INO(&dev_kmsg.dv_devnode.dn_node, &dev_kmsg.dv_devnode.dn_node),
 			},
 			{.fn_allnodes = {
@@ -724,7 +739,7 @@ PUBLIC struct device dev_random = {
 	.dv_byname_node = {
 		.rb_par = &dev_urandom,
 		.rb_lhs = NULL,
-		.rb_rhs = NULL
+		.rb_rhs = &dev_tty
 	}
 };
 
@@ -745,12 +760,13 @@ PUBLIC struct device dev_urandom = {
 				                    MFILE_F_CHANGED | MFILE_F_NOATIME |
 				                    MFILE_F_NOMTIME | MFILE_F_FIXEDFILESIZE |
 				                    NO_USER_IO_WITHOUT_VIO |
-				                    __SELECT_INO(_MFILE_FN__RBRED, _MFILE_FN__RBRED)),
+				                    _MFILE_DEVFS_BYNAME_RED |
+				                    __SELECT_INO(0, 0)),
 				MFILE_INIT_mf_trunclock,
 				MFILE_INIT_mf_filesize((uint64_t)-1),
 			},
 			.fn_nlink = 1,
-			.fn_mode  = 0644 | S_IFCHR,
+			.fn_mode  = 0666 | S_IFCHR,
 			.fn_uid   = 0,
 			.fn_gid   = 0,
 			.fn_ino   = (ino_t)__SELECT_INO(UINT32_C(0x80004f), UINT64_C(0x80004f)),
@@ -807,10 +823,10 @@ PUBLIC struct device dev_kmsg = {
 			FNODE_INIT_fn_changed,
 			.fn_supent = {
 				.rb_lhs = __SELECT_INO(&dev_urandom.dv_devnode.dn_node, &dev_urandom.dv_devnode.dn_node),
-				.rb_rhs = __SELECT_INO(NULL, NULL),
+				.rb_rhs = __SELECT_INO(&dev_tty.dv_devnode.dn_node, &dev_tty.dv_devnode.dn_node),
 			},
 			{.fn_allnodes = {
-				.le_next = NULL,
+				.le_next = &dev_tty.dv_devnode.dn_node,
 				.le_prev = &dev_urandom.dv_devnode.dn_node.fn_allnodes.le_next,
 			}},
 		},
@@ -820,6 +836,55 @@ PUBLIC struct device dev_kmsg = {
 	.dv_dirent = &dirent_dev_kmsg,
 	.dv_byname_node = {
 		.rb_par = &dev_kmem,
+		.rb_lhs = NULL,
+		.rb_rhs = NULL
+	}
+};
+
+/* Device: `/dev/tty' */
+PUBLIC struct device dev_tty = {
+	.dv_devnode = {
+		.dn_node = {
+			.fn_file = {
+				MFILE_INIT_mf_refcnt(2), /* +1: dev_tty, +1: MFILE_FN_GLOBAL_REF */
+				MFILE_INIT_mf_ops(&dev_tty_ops.dfno_node.dno_node.no_file),
+				MFILE_INIT_mf_lock,
+				MFILE_INIT_mf_parts(MFILE_PARTS_ANONYMOUS),
+				MFILE_INIT_mf_initdone,
+				MFILE_INIT_mf_lockops,
+				MFILE_INIT_mf_changed(MFILE_PARTS_ANONYMOUS),
+				MFILE_INIT_mf_blockshift(PAGESHIFT),
+				MFILE_INIT_mf_flags(MFILE_FN_GLOBAL_REF | MFILE_F_ATTRCHANGED |
+				                    MFILE_F_CHANGED | MFILE_F_NOATIME |
+				                    MFILE_F_NOMTIME | MFILE_F_FIXEDFILESIZE |
+				                    MFILE_F_NOUSRMMAP | MFILE_F_NOUSRIO |
+				                    _MFILE_DEVFS_BYNAME_RED |
+				                    __SELECT_INO(0, 0)),
+				MFILE_INIT_mf_trunclock,
+				MFILE_INIT_mf_filesize(0),
+			},
+			.fn_nlink = 1,
+			.fn_mode  = 0666 | S_IFCHR,
+			.fn_uid   = 0,
+			.fn_gid   = 0,
+			.fn_ino   = (ino_t)__SELECT_INO(UINT32_C(0x2800007), UINT64_C(0x2800007)),
+			.fn_super = &devfs.rs_sup,
+			FNODE_INIT_fn_changed,
+			.fn_supent = {
+				.rb_lhs = __SELECT_INO(NULL, NULL),
+				.rb_rhs = __SELECT_INO(NULL, NULL),
+			},
+			{.fn_allnodes = {
+				.le_next = NULL,
+				.le_prev = &dev_kmsg.dv_devnode.dn_node.fn_allnodes.le_next,
+			}},
+		},
+		.dn_devno = MKDEV(5, 0)
+	},
+	.dv_driver = &drv_self,
+	.dv_dirent = &dirent_dev_tty,
+	.dv_byname_node = {
+		.rb_par = &dev_random,
 		.rb_lhs = NULL,
 		.rb_rhs = NULL
 	}

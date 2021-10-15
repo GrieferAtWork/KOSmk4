@@ -28,18 +28,22 @@
 #include <kernel/fs/devfs.h>
 #include <kernel/fs/null.h>
 #include <kernel/fs/ramfs.h>
+#include <kernel/handle.h>
 #include <kernel/iovec.h>
 #include <kernel/malloc.h>
 #include <kernel/mman/mpart.h>
 #include <kernel/mman/phys.h>
 #include <kernel/syslog.h>
+#include <sched/pid-ctty.h>
 
 #include <hybrid/atomic.h>
 
 #include <kos/dev.h>
 #include <sys/io.h>
 #include <sys/param.h> /* NBBY */
+#include <sys/stat.h>
 
+#include <assert.h>
 #include <int128.h>
 #include <stdbool.h>
 #include <stddef.h>
@@ -685,12 +689,21 @@ devrandom_v_polltest(struct mfile *__restrict self,
 	return 0;
 }
 
+PRIVATE NONNULL((1)) void KCALL
+devrandom_v_stat(struct mfile *__restrict UNUSED(self),
+                 USER CHECKED struct stat *result)
+		THROWS(...) {
+	/* Expose the # of available entropy bytes via stat. */
+	result->st_size = ATOMIC_READ(entropy_bits) / NBBY;
+}
+
 
 PRIVATE struct mfile_stream_ops const devrandom_stream_ops = {
 	.mso_read        = &devrandom_v_read,
 	.mso_readv       = &devrandom_v_readv,
 	.mso_pread       = &devrandom_v_pread,
 	.mso_preadv      = &devrandom_v_preadv,
+	.mso_stat        = &devrandom_v_stat,
 	.mso_pollconnect = &devrandom_v_pollconnect,
 	.mso_polltest    = &devrandom_v_polltest,
 };
@@ -857,6 +870,217 @@ PRIVATE struct mfile_stream_ops const devkmsg_stream_ops = {
 
 
 
+/************************************************************************/
+/* Alias device for the process's controlling terminal (/dev/tty)       */
+/************************************************************************/
+
+PRIVATE NONNULL((1, 2)) void KCALL
+devtty_v_open(struct mfile *__restrict UNUSED(self),
+              struct handle *__restrict hand,
+              struct path *access_path,
+              struct fdirent *access_dent) {
+	REF struct device *dev;
+	assert(hand->h_data == &dev_tty);
+	dev = task_getctty();
+	FINALLY_DECREF_UNLIKELY(dev);
+	decref_nokill(&dev_tty); /* Old reference from `hand->h_data' */
+	hand->h_data = dev;
+	/* Recursive open */
+	mfile_open(dev, hand, access_path, access_dent);
+}
+
+PRIVATE WUNUSED NONNULL((1)) size_t KCALL
+devtty_v_read(struct mfile *__restrict UNUSED(self), USER CHECKED void *dst,
+              size_t num_bytes, iomode_t mode) THROWS(...) {
+	REF struct device *dev = task_getctty();
+	FINALLY_DECREF_UNLIKELY(dev);
+	return mfile_uread(dev, dst, num_bytes, mode);
+}
+
+PRIVATE WUNUSED NONNULL((1, 2)) size_t KCALL
+devtty_v_readv(struct mfile *__restrict self, struct iov_buffer *__restrict dst,
+               size_t num_bytes, iomode_t mode) THROWS(...) {
+	REF struct device *dev = task_getctty();
+	FINALLY_DECREF_UNLIKELY(dev);
+	return mfile_ureadv(dev, dst, num_bytes, mode);
+}
+
+PRIVATE WUNUSED NONNULL((1)) size_t KCALL
+devtty_v_write(struct mfile *__restrict self, USER CHECKED void const *src,
+               size_t num_bytes, iomode_t mode) THROWS(...) {
+	REF struct device *dev = task_getctty();
+	FINALLY_DECREF_UNLIKELY(dev);
+	return mfile_uwrite(dev, src, num_bytes, mode);
+}
+
+PRIVATE WUNUSED NONNULL((1, 2)) size_t KCALL
+devtty_v_writev(struct mfile *__restrict self, struct iov_buffer *__restrict src,
+                size_t num_bytes, iomode_t mode) THROWS(...) {
+	REF struct device *dev = task_getctty();
+	FINALLY_DECREF_UNLIKELY(dev);
+	return mfile_uwritev(dev, src, num_bytes, mode);
+}
+
+PRIVATE WUNUSED NONNULL((1)) size_t KCALL
+devtty_v_pread(struct mfile *__restrict self, USER CHECKED void *dst,
+               size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...) {
+	REF struct device *dev = task_getctty();
+	FINALLY_DECREF_UNLIKELY(dev);
+	return mfile_upread(dev, dst, num_bytes, addr, mode);
+}
+
+PRIVATE WUNUSED NONNULL((1, 2)) size_t KCALL
+devtty_v_preadv(struct mfile *__restrict self, struct iov_buffer *__restrict dst,
+                size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...) {
+	REF struct device *dev = task_getctty();
+	FINALLY_DECREF_UNLIKELY(dev);
+	return mfile_upreadv(dev, dst, num_bytes, addr, mode);
+}
+
+PRIVATE WUNUSED NONNULL((1)) size_t KCALL
+devtty_v_pwrite(struct mfile *__restrict self, USER CHECKED void const *src,
+                size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...) {
+	REF struct device *dev = task_getctty();
+	FINALLY_DECREF_UNLIKELY(dev);
+	return mfile_upwrite(dev, src, num_bytes, addr, mode);
+}
+
+PRIVATE WUNUSED NONNULL((1, 2)) size_t KCALL
+devtty_v_pwritev(struct mfile *__restrict self, struct iov_buffer *__restrict src,
+                 size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...) {
+	REF struct device *dev = task_getctty();
+	FINALLY_DECREF_UNLIKELY(dev);
+	return mfile_upwritev(dev, src, num_bytes, addr, mode);
+}
+
+PRIVATE NONNULL((1)) pos_t KCALL
+devtty_v_seek(struct mfile *__restrict self, off_t offset,
+              unsigned int whence) THROWS(...) {
+	REF struct device *dev = task_getctty();
+	FINALLY_DECREF_UNLIKELY(dev);
+	return mfile_useek(dev, offset, whence);
+}
+
+PRIVATE NONNULL((1)) syscall_slong_t KCALL
+devtty_v_ioctl(struct mfile *__restrict self, syscall_ulong_t cmd,
+               USER UNCHECKED void *arg, iomode_t mode)
+		THROWS(E_INVALID_ARGUMENT_UNKNOWN_COMMAND, ...) {
+	REF struct device *dev = task_getctty();
+	FINALLY_DECREF_UNLIKELY(dev);
+	return mfile_uioctl(dev, cmd, arg, mode);
+}
+
+PRIVATE NONNULL((1)) void KCALL
+devtty_v_truncate(struct mfile *__restrict self, pos_t new_size)
+		THROWS(...) {
+	REF struct device *dev = task_getctty();
+	FINALLY_DECREF_UNLIKELY(dev);
+	mfile_utruncate(dev, new_size);
+}
+
+PRIVATE NONNULL((1, 2)) void KCALL
+devtty_v_mmap(struct mfile *__restrict self,
+              struct handle_mmap_info *__restrict info)
+		THROWS(...) {
+	REF struct device *dev = task_getctty();
+	FINALLY_DECREF_UNLIKELY(dev);
+	mfile_ummap(dev, info);
+}
+
+PRIVATE NONNULL((1)) pos_t KCALL
+devtty_v_allocate(struct mfile *__restrict self,
+                  fallocate_mode_t mode,
+                  pos_t start, pos_t length)
+		THROWS(...) {
+	REF struct device *dev = task_getctty();
+	FINALLY_DECREF_UNLIKELY(dev);
+	return mfile_uallocate(dev, mode, start, length);
+}
+
+PRIVATE NONNULL((1)) void KCALL
+devtty_v_stat(struct mfile *__restrict self,
+              USER CHECKED struct stat *result)
+		THROWS(...) {
+	struct stat ctty_stat;
+	REF struct device *dev = task_getctty();
+	FINALLY_DECREF_UNLIKELY(dev);
+	mfile_ustat(dev, &ctty_stat);
+
+	/* Only include certain information within stat. If we'd included
+	 * everything, then it would be impossible to tell the difference
+	 * between /dev/tty and /dev/<actual-tty> */
+	result->st_size              = ctty_stat.st_size;
+	result->st_blocks            = ctty_stat.st_blocks;
+	result->st_blksize           = ctty_stat.st_blksize;
+	result->st_atimespec.tv_sec  = ctty_stat.st_atimespec.tv_sec;
+	result->st_atimespec.tv_nsec = ctty_stat.st_atimespec.tv_nsec;
+	result->st_mtimespec.tv_sec  = ctty_stat.st_mtimespec.tv_sec;
+	result->st_mtimespec.tv_nsec = ctty_stat.st_mtimespec.tv_nsec;
+	result->st_ctimespec.tv_sec  = ctty_stat.st_ctimespec.tv_sec;
+	result->st_ctimespec.tv_nsec = ctty_stat.st_ctimespec.tv_nsec;
+}
+
+PRIVATE NONNULL((1)) void KCALL
+devtty_v_pollconnect(struct mfile *__restrict self,
+                     poll_mode_t what)
+		THROWS(...) {
+	REF struct device *dev = task_getctty();
+	FINALLY_DECREF_UNLIKELY(dev);
+	mfile_upollconnect(dev, what);
+}
+
+PRIVATE WUNUSED NONNULL((1)) poll_mode_t KCALL
+devtty_v_polltest(struct mfile *__restrict self,
+                  poll_mode_t what)
+		THROWS(...) {
+	REF struct device *dev = task_getctty();
+	FINALLY_DECREF_UNLIKELY(dev);
+	return mfile_upolltest(dev, what);
+}
+
+PRIVATE NONNULL((1)) syscall_slong_t KCALL
+devtty_v_hop(struct mfile *__restrict self, syscall_ulong_t cmd,
+             USER UNCHECKED void *arg, iomode_t mode)
+		THROWS(...) {
+	REF struct device *dev = task_getctty();
+	FINALLY_DECREF_UNLIKELY(dev);
+	return mfile_uhop(dev, cmd, arg, mode);
+}
+
+PRIVATE NONNULL((1)) REF void *KCALL
+devtty_v_tryas(struct mfile *__restrict self, uintptr_half_t wanted_type)
+		THROWS(...) {
+	REF struct device *dev = task_getctty();
+	FINALLY_DECREF_UNLIKELY(dev);
+	return mfile_utryas(dev, wanted_type);
+}
+
+PRIVATE struct mfile_stream_ops const devtty_stream_ops = {
+	.mso_open        = &devtty_v_open,
+	.mso_read        = &devtty_v_read,
+	.mso_readv       = &devtty_v_readv,
+	.mso_write       = &devtty_v_write,
+	.mso_writev      = &devtty_v_writev,
+	.mso_pread       = &devtty_v_pread,
+	.mso_preadv      = &devtty_v_preadv,
+	.mso_pwrite      = &devtty_v_pwrite,
+	.mso_pwritev     = &devtty_v_pwritev,
+	.mso_seek        = &devtty_v_seek,
+	.mso_ioctl       = &devtty_v_ioctl,
+	.mso_truncate    = &devtty_v_truncate,
+	.mso_mmap        = &devtty_v_mmap,
+	.mso_allocate    = &devtty_v_allocate,
+	.mso_stat        = &devtty_v_stat,
+	.mso_pollconnect = &devtty_v_pollconnect,
+	.mso_polltest    = &devtty_v_polltest,
+	.mso_hop         = &devtty_v_hop,
+	.mso_tryas       = &devtty_v_tryas,
+};
+
+
+
+
+
 
 #ifdef LIBVIO_CONFIG_ENABLED
 #define IF_VIO_ENABLED(...) __VA_ARGS__
@@ -885,6 +1109,7 @@ INTERN struct device_ops const dev_full_ops    = DEVICE_OPS_INIT(NULL, &devfull_
 INTERN struct device_ops const dev_random_ops  = DEVICE_OPS_INIT(NULL, NULL, &devrandom_stream_ops, &devrandom_vio_ops);
 INTERN struct device_ops const dev_urandom_ops = DEVICE_OPS_INIT(NULL, NULL, &devurandom_stream_ops, &devurandom_vio_ops);
 INTERN struct device_ops const dev_kmsg_ops    = DEVICE_OPS_INIT(NULL, NULL, &devkmsg_stream_ops, NULL);
+INTERN struct device_ops const dev_kmsg_tty    = DEVICE_OPS_INIT(NULL, NULL, &devtty_stream_ops, NULL);
 #undef DEVICE_OPS_INIT
 #undef IF_VIO_ENABLED
 

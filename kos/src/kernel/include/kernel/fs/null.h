@@ -42,6 +42,7 @@ DATDEF struct device dev_full;    /* /dev/full */
 DATDEF struct device dev_random;  /* /dev/random */
 DATDEF struct device dev_urandom; /* /dev/urandom */
 DATDEF struct device dev_kmsg;    /* /dev/kmsg */
+DATDEF struct device dev_tty;     /* /dev/tty */
 
 DECL_END
 #endif /* __CC__ */

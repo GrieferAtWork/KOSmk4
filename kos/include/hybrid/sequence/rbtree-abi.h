@@ -1195,10 +1195,10 @@ again:
 			RBTREE_SETRED(grandparent);
 
 			/* Update the root node in case it got changed by the rotations above. */
-			if (RBTREE_GETPAR(RBTREE_PROOT_GET(proot))) {
+			if (RBTREE_NODE_NOT_ISNULL(RBTREE_GETPAR(RBTREE_PROOT_GET(proot)))) {
 				do {
 					RBTREE_PROOT_SET(proot, RBTREE_GETPAR(RBTREE_PROOT_GET(proot)));
-				} while (RBTREE_GETPAR(RBTREE_PROOT_GET(proot)));
+				} while (RBTREE_NODE_NOT_ISNULL(RBTREE_GETPAR(RBTREE_PROOT_GET(proot))));
 			}
 		}
 	}
