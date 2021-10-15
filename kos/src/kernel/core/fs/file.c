@@ -42,7 +42,7 @@
 
 #include <kos/except/reason/fs.h>
 #include <kos/except/reason/inval.h>
-#include <kos/hop/file.h>
+#include <kos/hop/filehandle.h>
 
 #include <assert.h>
 #include <dirent.h>
@@ -54,7 +54,7 @@
 DECL_BEGIN
 
 PUBLIC NOBLOCK void
-NOTHROW(KCALL file_destroy)(struct file *__restrict self) {
+NOTHROW(KCALL filehandle_destroy)(struct filehandle *__restrict self) {
 	if (INODE_ISDIR(self->f_node))
 		xdecref(self->f_curent);
 	decref(self->f_node);
@@ -67,7 +67,7 @@ NOTHROW(KCALL file_destroy)(struct file *__restrict self) {
 //#define CONFIG_BLOCKING_REGULAR_FILE_READ 1
 
 LOCAL NOBLOCK NONNULL((1)) void
-NOTHROW(KCALL translate_read_exceptions)(struct file *__restrict self) {
+NOTHROW(KCALL translate_read_exceptions)(struct filehandle *__restrict self) {
 	if (error_code() == ERROR_CODEOF(E_FSERROR_UNSUPPORTED_OPERATION) && INODE_ISDIR(self->f_node)) {
 		syscall_ulong_t operation_id;
 		operation_id = PERTASK_GET(this_exception_args.e_fserror.f_unsupported_operation.uo_operation_id);
@@ -81,9 +81,9 @@ NOTHROW(KCALL translate_read_exceptions)(struct file *__restrict self) {
 	}
 }
 
-DEFINE_HANDLE_REFCNT_FUNCTIONS(file, struct file);
+DEFINE_HANDLE_REFCNT_FUNCTIONS(file, struct filehandle);
 INTERN size_t KCALL
-handle_file_read(struct file *__restrict self,
+handle_filehandle_read(struct filehandle *__restrict self,
                  USER CHECKED void *dst,
                  size_t num_bytes,
                  iomode_t UNUSED(mode)) {
@@ -111,7 +111,7 @@ handle_file_read(struct file *__restrict self,
 }
 
 INTERN size_t KCALL
-handle_file_write(struct file *__restrict self,
+handle_filehandle_write(struct filehandle *__restrict self,
                   USER CHECKED void const *src,
                   size_t num_bytes,
                   iomode_t mode) {
@@ -133,7 +133,7 @@ handle_file_write(struct file *__restrict self,
 }
 
 INTERN size_t KCALL
-handle_file_pread(struct file *__restrict self,
+handle_filehandle_pread(struct filehandle *__restrict self,
                   USER CHECKED void *dst,
                   size_t num_bytes, pos_t addr,
                   iomode_t UNUSED(mode)) {
@@ -154,7 +154,7 @@ handle_file_pread(struct file *__restrict self,
 }
 
 INTERN size_t KCALL
-handle_file_pwrite(struct file *__restrict self,
+handle_filehandle_pwrite(struct filehandle *__restrict self,
                    USER CHECKED void const *src,
                    size_t num_bytes,
                    pos_t addr, iomode_t mode) {
@@ -165,7 +165,7 @@ handle_file_pwrite(struct file *__restrict self,
 
 
 INTERN size_t KCALL
-handle_file_readv(struct file *__restrict self,
+handle_filehandle_readv(struct filehandle *__restrict self,
                   struct iov_buffer *__restrict dst,
                   size_t num_bytes,
                   iomode_t UNUSED(mode)) {
@@ -193,7 +193,7 @@ handle_file_readv(struct file *__restrict self,
 }
 
 INTERN size_t KCALL
-handle_file_writev(struct file *__restrict self,
+handle_filehandle_writev(struct filehandle *__restrict self,
                    struct iov_buffer *__restrict src,
                    size_t num_bytes,
                    iomode_t mode) {
@@ -215,7 +215,7 @@ handle_file_writev(struct file *__restrict self,
 }
 
 INTERN size_t KCALL
-handle_file_preadv(struct file *__restrict self,
+handle_filehandle_preadv(struct filehandle *__restrict self,
                    struct iov_buffer *__restrict dst,
                    size_t num_bytes, pos_t addr,
                    iomode_t UNUSED(mode)) {
@@ -236,7 +236,7 @@ handle_file_preadv(struct file *__restrict self,
 }
 
 INTERN size_t KCALL
-handle_file_pwritev(struct file *__restrict self,
+handle_filehandle_pwritev(struct filehandle *__restrict self,
                     struct iov_buffer *__restrict src,
                     size_t num_bytes,
                     pos_t addr, iomode_t mode) {
@@ -246,7 +246,7 @@ handle_file_pwritev(struct file *__restrict self,
 }
 
 INTERN pos_t KCALL
-handle_file_seek(struct file *__restrict self,
+handle_filehandle_seek(struct filehandle *__restrict self,
                  off_t offset,
                  unsigned int whence) {
 	pos_t oldpos, newpos;
@@ -285,7 +285,7 @@ handle_file_seek(struct file *__restrict self,
 
 
 INTERN syscall_slong_t KCALL
-handle_file_ioctl(struct file *__restrict self,
+handle_filehandle_ioctl(struct filehandle *__restrict self,
                   syscall_ulong_t cmd,
                   USER UNCHECKED void *arg,
                   iomode_t mode) {
@@ -293,7 +293,7 @@ handle_file_ioctl(struct file *__restrict self,
 }
 
 INTERN NONNULL((1, 2)) void KCALL
-handle_file_mmap(struct file *__restrict self,
+handle_filehandle_mmap(struct filehandle *__restrict self,
                  struct handle_mmap_info *__restrict info)
 		THROWS(...) {
 	info->hmi_file   = incref(self->f_node);
@@ -303,39 +303,39 @@ handle_file_mmap(struct file *__restrict self,
 
 
 INTERN void KCALL
-handle_file_truncate(struct file *__restrict self, pos_t new_size) {
+handle_filehandle_truncate(struct filehandle *__restrict self, pos_t new_size) {
 	inode_truncate(self->f_node, new_size);
 }
 
 
 INTERN pos_t KCALL /* TODO */
-handle_file_allocate(struct file *__restrict self,
+handle_filehandle_allocate(struct filehandle *__restrict self,
                      fallocate_mode_t mode,
                      pos_t start, pos_t length)
 		THROWS(...);
 
-INTERN void (KCALL handle_file_sync)(struct file *__restrict self) {
+INTERN void (KCALL handle_filehandle_sync)(struct filehandle *__restrict self) {
 	inode_sync(self->f_node);
 }
 
-INTERN void (KCALL handle_file_datasync)(struct file *__restrict self) {
+INTERN void (KCALL handle_filehandle_datasync)(struct filehandle *__restrict self) {
 	mfile_sync(self->f_node);
 }
 
 INTERN void KCALL
-handle_file_stat(struct file *__restrict self,
+handle_filehandle_stat(struct filehandle *__restrict self,
                  USER CHECKED struct stat *result) {
 	inode_stat(self->f_node, result);
 }
 
 INTERN void KCALL
-handle_file_pollconnect(struct file *__restrict self, poll_mode_t what) {
+handle_filehandle_pollconnect(struct filehandle *__restrict self, poll_mode_t what) {
 	if (what & (POLLINMASK | POLLOUTMASK))
 		rwlock_pollconnect(__inode_lock(self->f_node));
 }
 
 INTERN poll_mode_t KCALL
-handle_file_polltest(struct file *__restrict self, poll_mode_t what) {
+handle_filehandle_polltest(struct filehandle *__restrict self, poll_mode_t what) {
 	if (what & POLLOUTMASK) {
 		if (rwlock_canwrite(__inode_lock(self->f_node)))
 			return POLLOUTMASK | POLLINMASK;
@@ -347,7 +347,7 @@ handle_file_polltest(struct file *__restrict self, poll_mode_t what) {
 }
 
 INTERN size_t KCALL
-handle_file_readdir(struct file *__restrict self,
+handle_filehandle_readdir(struct filehandle *__restrict self,
                     USER CHECKED struct dirent *buf,
                     size_t bufsize,
                     readdir_mode_t readdir_mode,
@@ -599,21 +599,21 @@ eof_unlock_node:
 
 
 INTERN syscall_slong_t KCALL
-handle_file_hop(struct file *__restrict self,
+handle_filehandle_hop(struct filehandle *__restrict self,
                 syscall_ulong_t cmd,
                 USER UNCHECKED void *arg,
                 iomode_t mode) {
 	switch (cmd) {
 
-	case HOP_FILE_CMPXCHG_OFFSET: {
+	case HOP_FILEHANDLE_CMPXCHG_OFFSET: {
 		size_t struct_size;
-		struct hop_file_cmpxchg_offset *data;
+		struct hop_filehandle_cmpxchg_offset *data;
 		pos_t exppos, newpos, oldpos;
-		validate_readwrite(arg, sizeof(struct hop_file_cmpxchg_offset));
-		data        = (struct hop_file_cmpxchg_offset *)arg;
+		validate_readwrite(arg, sizeof(struct hop_filehandle_cmpxchg_offset));
+		data        = (struct hop_filehandle_cmpxchg_offset *)arg;
 		struct_size = ATOMIC_READ(data->cxo_struct_size);
-		if (struct_size != sizeof(struct hop_file_cmpxchg_offset))
-			THROW(E_BUFFER_TOO_SMALL, sizeof(struct hop_file_cmpxchg_offset), struct_size);
+		if (struct_size != sizeof(struct hop_filehandle_cmpxchg_offset))
+			THROW(E_BUFFER_TOO_SMALL, sizeof(struct hop_filehandle_cmpxchg_offset), struct_size);
 		COMPILER_READ_BARRIER();
 		exppos = (pos64_t)data->cxo_expoffset;
 		newpos = (pos64_t)data->cxo_newoffset;
@@ -630,7 +630,7 @@ handle_file_hop(struct file *__restrict self,
 		COMPILER_WRITE_BARRIER();
 	}	break;
 
-	case HOP_FILE_OPENNODE: {
+	case HOP_FILEHANDLE_OPENNODE: {
 		struct handle temp;
 		temp.h_type = HANDLE_TYPE_MFILE;
 		temp.h_mode = mode;
@@ -638,7 +638,7 @@ handle_file_hop(struct file *__restrict self,
 		return handle_installhop((USER UNCHECKED struct hop_openfd *)arg, temp);
 	}	break;
 
-	case HOP_FILE_OPENPATH: {
+	case HOP_FILEHANDLE_OPENPATH: {
 		struct handle temp;
 		temp.h_type = HANDLE_TYPE_PATH;
 		temp.h_mode = mode;
@@ -648,7 +648,7 @@ handle_file_hop(struct file *__restrict self,
 		return handle_installhop((USER UNCHECKED struct hop_openfd *)arg, temp);
 	}	break;
 
-	case HOP_FILE_OPENDENTRY: {
+	case HOP_FILEHANDLE_OPENDENTRY: {
 		struct handle temp;
 		temp.h_type = HANDLE_TYPE_DIRECTORYENTRY;
 		temp.h_mode = mode;
@@ -997,41 +997,41 @@ read_entry_pos_0:
 DEFINE_HANDLE_REFCNT_FUNCTIONS(oneshot_directory_file, struct oneshot_directory_file);
 /* TODO: Other handle operators */
 
-DEFINE_INTERN_ALIAS(handle_oneshot_directory_file_read, handle_file_read);
-DEFINE_INTERN_ALIAS(handle_oneshot_directory_file_write, handle_file_write);
-DEFINE_INTERN_ALIAS(handle_oneshot_directory_file_pread, handle_file_pread);
-DEFINE_INTERN_ALIAS(handle_oneshot_directory_file_pwrite, handle_file_pwrite);
-DEFINE_INTERN_ALIAS(handle_oneshot_directory_file_readv, handle_file_readv);
-DEFINE_INTERN_ALIAS(handle_oneshot_directory_file_writev, handle_file_writev);
-DEFINE_INTERN_ALIAS(handle_oneshot_directory_file_preadv, handle_file_preadv);
-DEFINE_INTERN_ALIAS(handle_oneshot_directory_file_pwritev, handle_file_pwritev);
-DEFINE_INTERN_ALIAS(handle_oneshot_directory_file_mmap, handle_file_mmap);
-DEFINE_INTERN_ALIAS(handle_oneshot_directory_file_sync, handle_file_sync);
-DEFINE_INTERN_ALIAS(handle_oneshot_directory_file_datasync, handle_file_datasync);
-DEFINE_INTERN_ALIAS(handle_oneshot_directory_file_pollconnect, handle_file_pollconnect);
-DEFINE_INTERN_ALIAS(handle_oneshot_directory_file_polltest, handle_file_polltest);
-DEFINE_INTERN_ALIAS(handle_oneshot_directory_file_stat, handle_file_stat);
-DEFINE_INTERN_ALIAS(handle_oneshot_directory_file_ioctl, handle_file_ioctl);
-DEFINE_INTERN_ALIAS(handle_oneshot_directory_file_hop, handle_file_hop);
-DEFINE_INTERN_ALIAS(handle_oneshot_directory_file_seek, handle_file_seek);
-DEFINE_INTERN_ALIAS(handle_oneshot_directory_file_truncate, handle_file_truncate);
+DEFINE_INTERN_ALIAS(handle_oneshot_directory_file_read, handle_filehandle_read);
+DEFINE_INTERN_ALIAS(handle_oneshot_directory_file_write, handle_filehandle_write);
+DEFINE_INTERN_ALIAS(handle_oneshot_directory_file_pread, handle_filehandle_pread);
+DEFINE_INTERN_ALIAS(handle_oneshot_directory_file_pwrite, handle_filehandle_pwrite);
+DEFINE_INTERN_ALIAS(handle_oneshot_directory_file_readv, handle_filehandle_readv);
+DEFINE_INTERN_ALIAS(handle_oneshot_directory_file_writev, handle_filehandle_writev);
+DEFINE_INTERN_ALIAS(handle_oneshot_directory_file_preadv, handle_filehandle_preadv);
+DEFINE_INTERN_ALIAS(handle_oneshot_directory_file_pwritev, handle_filehandle_pwritev);
+DEFINE_INTERN_ALIAS(handle_oneshot_directory_file_mmap, handle_filehandle_mmap);
+DEFINE_INTERN_ALIAS(handle_oneshot_directory_file_sync, handle_filehandle_sync);
+DEFINE_INTERN_ALIAS(handle_oneshot_directory_file_datasync, handle_filehandle_datasync);
+DEFINE_INTERN_ALIAS(handle_oneshot_directory_file_pollconnect, handle_filehandle_pollconnect);
+DEFINE_INTERN_ALIAS(handle_oneshot_directory_file_polltest, handle_filehandle_polltest);
+DEFINE_INTERN_ALIAS(handle_oneshot_directory_file_stat, handle_filehandle_stat);
+DEFINE_INTERN_ALIAS(handle_oneshot_directory_file_ioctl, handle_filehandle_ioctl);
+DEFINE_INTERN_ALIAS(handle_oneshot_directory_file_hop, handle_filehandle_hop);
+DEFINE_INTERN_ALIAS(handle_oneshot_directory_file_seek, handle_filehandle_seek);
+DEFINE_INTERN_ALIAS(handle_oneshot_directory_file_truncate, handle_filehandle_truncate);
 
 
-/* Alias the handle_file_tryas() to some other handle types. */
-DEFINE_INTERN_ALIAS(handle_oneshot_directory_file_tryas, handle_file_tryas);
-DEFINE_INTERN_ALIAS(handle_fifo_user_tryas, handle_file_tryas);
+/* Alias the handle_filehandle_tryas() to some other handle types. */
+DEFINE_INTERN_ALIAS(handle_oneshot_directory_file_tryas, handle_filehandle_tryas);
+DEFINE_INTERN_ALIAS(handle_fifo_user_tryas, handle_filehandle_tryas);
 
-STATIC_ASSERT(offsetof(struct file, f_node) == offsetof(struct oneshot_directory_file, d_node));
-STATIC_ASSERT(offsetof(struct file, f_path) == offsetof(struct oneshot_directory_file, d_path));
-STATIC_ASSERT(offsetof(struct file, f_dirent) == offsetof(struct oneshot_directory_file, d_dirent));
-STATIC_ASSERT(offsetof(struct file, f_node) == offsetof(struct fifo_user, fu_fifo));
-STATIC_ASSERT(offsetof(struct file, f_path) == offsetof(struct fifo_user, fu_path));
-STATIC_ASSERT(offsetof(struct file, f_dirent) == offsetof(struct fifo_user, fu_dirent));
+STATIC_ASSERT(offsetof(struct filehandle, f_node) == offsetof(struct oneshot_directory_file, d_node));
+STATIC_ASSERT(offsetof(struct filehandle, f_path) == offsetof(struct oneshot_directory_file, d_path));
+STATIC_ASSERT(offsetof(struct filehandle, f_dirent) == offsetof(struct oneshot_directory_file, d_dirent));
+STATIC_ASSERT(offsetof(struct filehandle, f_node) == offsetof(struct fifo_user, fu_fifo));
+STATIC_ASSERT(offsetof(struct filehandle, f_path) == offsetof(struct fifo_user, fu_path));
+STATIC_ASSERT(offsetof(struct filehandle, f_dirent) == offsetof(struct fifo_user, fu_dirent));
 
 /* This is the most-used handle converter function,
  * since most  open()  calls  return  FILE-objects. */
 INTERN NONNULL((1)) REF void *KCALL
-handle_file_tryas(struct file *__restrict self,
+handle_filehandle_tryas(struct filehandle *__restrict self,
                   uintptr_half_t wanted_type)
 		THROWS(E_WOULDBLOCK) {
 	switch (wanted_type) {

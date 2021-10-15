@@ -440,7 +440,7 @@ local files = {
 	"../../include/kos/hop/mfile.h",
 	"../../include/kos/hop/mpart.h",
 	"../../include/kos/hop/module.h",
-	"../../include/kos/hop/file.h",
+	"../../include/kos/hop/filehandle.h",
 	"../../include/kos/hop/futex.h",
 	"../../include/kos/hop/handle.h",
 	"../../include/kos/hop/openfd.h",
@@ -1680,6 +1680,7 @@ static_assert(sizeof(struct userkern) == SIZEOF_USERKERN);
 #include <kos/bits/userprocmask.h>
 
 /* struct userprocmask */
+static_assert(offsetof(struct userprocmask, pm_flags) == __OFFSET_USERPROCMASK_FLAGS);
 static_assert(offsetof(struct userprocmask, pm_mytid) == __OFFSET_USERPROCMASK_MYTID);
 static_assert(offsetof(struct userprocmask, pm_pending) == __OFFSET_USERPROCMASK_PENDING);
 static_assert(offsetof(struct userprocmask, pm_sigmask) == __OFFSET_USERPROCMASK_SIGMASK);
@@ -1966,14 +1967,14 @@ static_assert(sizeof(struct hop_driver_open_dependency) == __SIZEOF_HOP_DRIVER_O
 
 
 
-#include <kos/hop/file.h>
+#include <kos/hop/filehandle.h>
 
-/* struct hop_file_cmpxchg_offset */
-static_assert(offsetof(struct hop_file_cmpxchg_offset, cxo_expoffset) == __OFFSET_HOP_FILE_CMPXCHG_OFFSET_EXPOFFSET);
-static_assert(offsetof(struct hop_file_cmpxchg_offset, cxo_newoffset) == __OFFSET_HOP_FILE_CMPXCHG_OFFSET_NEWOFFSET);
-static_assert(offsetof(struct hop_file_cmpxchg_offset, cxo_oldoffset) == __OFFSET_HOP_FILE_CMPXCHG_OFFSET_OLDOFFSET);
-static_assert(offsetof(struct hop_file_cmpxchg_offset, cxo_struct_size) == __OFFSET_HOP_FILE_CMPXCHG_OFFSET_STRUCT_SIZE);
-static_assert(sizeof(struct hop_file_cmpxchg_offset) == __SIZEOF_HOP_FILE_CMPXCHG_OFFSET);
+/* struct hop_filehandle_cmpxchg_offset */
+static_assert(offsetof(struct hop_filehandle_cmpxchg_offset, cxo_expoffset) == __OFFSET_HOP_FILEHANDLE_CMPXCHG_OFFSET_EXPOFFSET);
+static_assert(offsetof(struct hop_filehandle_cmpxchg_offset, cxo_newoffset) == __OFFSET_HOP_FILEHANDLE_CMPXCHG_OFFSET_NEWOFFSET);
+static_assert(offsetof(struct hop_filehandle_cmpxchg_offset, cxo_oldoffset) == __OFFSET_HOP_FILEHANDLE_CMPXCHG_OFFSET_OLDOFFSET);
+static_assert(offsetof(struct hop_filehandle_cmpxchg_offset, cxo_struct_size) == __OFFSET_HOP_FILEHANDLE_CMPXCHG_OFFSET_STRUCT_SIZE);
+static_assert(sizeof(struct hop_filehandle_cmpxchg_offset) == __SIZEOF_HOP_FILEHANDLE_CMPXCHG_OFFSET);
 
 
 

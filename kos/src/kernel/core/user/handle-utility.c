@@ -192,10 +192,10 @@ handle_datasize(struct handle const *__restrict self,
 		value = (pos_t)me->de_namelen;
 	}	break;
 
-	case HANDLE_TYPE_FILE:
+	case HANDLE_TYPE_FILEHANDLE:
 	case HANDLE_TYPE_ONESHOT_DIRECTORY_FILE: {
-		struct file *me;
-		me = (struct file *)self->h_data;
+		struct filehandle *me;
+		me = (struct filehandle *)self->h_data;
 		inode_loadattr(me->f_node);
 #ifdef CONFIG_ATOMIC64_SUPPORT_ALWAYS
 		value = ATOMIC_READ(me->f_node->i_filesize);
@@ -326,8 +326,8 @@ handle_print(struct handle const *__restrict self,
 		                       ent->de_namelen, ent->de_name);
 	}	break;
 
-	case HANDLE_TYPE_FILE: {
-		struct file *f = (struct file *)self->h_data;
+	case HANDLE_TYPE_FILEHANDLE: {
+		struct filehandle *f = (struct filehandle *)self->h_data;
 		if (f->f_path && f->f_dirent) {
 			result = path_printent(f->f_path,
 			                       f->f_dirent->de_name,

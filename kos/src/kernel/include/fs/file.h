@@ -36,8 +36,8 @@ struct path;
 struct directory_node;
 struct directory_entry;
 
-struct file {
-	/* [HANDLE_TYPE(HANDLE_TYPE_FILE)] */
+struct filehandle {
+	/* [HANDLE_TYPE(HANDLE_TYPE_FILEHANDLE)] */
 	WEAK refcnt_t               f_refcnt; /* File reference counter. */
 	REF struct inode           *f_node;   /* [1..1][const] The opened file INode. */
 	REF struct path            *f_path;   /* [0..1][const] The path from which `f_node' was opened. */
@@ -51,8 +51,8 @@ struct file {
 };
 
 /* Destroy the given file object. */
-FUNDEF NOBLOCK void NOTHROW(KCALL file_destroy)(struct file *__restrict self);
-DEFINE_REFCOUNT_FUNCTIONS(struct file, f_refcnt, file_destroy)
+FUNDEF NOBLOCK void NOTHROW(KCALL filehandle_destroy)(struct filehandle *__restrict self);
+DEFINE_REFCOUNT_FUNCTIONS(struct filehandle, f_refcnt, filehandle_destroy)
 
 
 /* A special  kind  of  file  stream  that  is  intended  to  be  used

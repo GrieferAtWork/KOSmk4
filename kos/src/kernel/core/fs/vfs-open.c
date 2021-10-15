@@ -176,9 +176,9 @@ NOTHROW(KCALL handle_isdirectory)(struct handle self) {
 			return true;
 	}	break;
 
-	case HANDLE_TYPE_FILE: {
-		struct file *fp;
-		fp = (struct file *)self.h_data;
+	case HANDLE_TYPE_FILEHANDLE: {
+		struct filehandle *fp;
+		fp = (struct filehandle *)self.h_data;
 		if (INODE_ISDIR(fp->f_node))
 			return true;
 	}	break;
@@ -456,11 +456,11 @@ check_result_inode_for_symlink:
 				/* Create a file handle from all of the gathered object pointers. */
 				switch (result_inode->i_filemode & S_IFMT) {
 
-					STATIC_ASSERT(offsetof(struct oneshot_directory_file, d_refcnt) == offsetof(struct file, f_refcnt));
-					STATIC_ASSERT(offsetof(struct oneshot_directory_file, d_node) == offsetof(struct file, f_node));
-					STATIC_ASSERT(offsetof(struct oneshot_directory_file, d_path) == offsetof(struct file, f_path));
-					STATIC_ASSERT(offsetof(struct oneshot_directory_file, d_dirent) == offsetof(struct file, f_dirent));
-					STATIC_ASSERT(offsetof(struct oneshot_directory_file, d_offset) == offsetof(struct file, f_offset));
+					STATIC_ASSERT(offsetof(struct oneshot_directory_file, d_refcnt) == offsetof(struct filehandle, f_refcnt));
+					STATIC_ASSERT(offsetof(struct oneshot_directory_file, d_node) == offsetof(struct filehandle, f_node));
+					STATIC_ASSERT(offsetof(struct oneshot_directory_file, d_path) == offsetof(struct filehandle, f_path));
+					STATIC_ASSERT(offsetof(struct oneshot_directory_file, d_dirent) == offsetof(struct filehandle, f_dirent));
+					STATIC_ASSERT(offsetof(struct oneshot_directory_file, d_offset) == offsetof(struct filehandle, f_offset));
 
 				case S_IFBLK: {
 					/* Open the associated block-device. */
@@ -573,9 +573,9 @@ open_result_inode:
 					}
 					ATTR_FALLTHROUGH
 				default: {
-					REF struct file *result_file;
+					REF struct filehandle *result_file;
 					/* Simply need to return a regular file object for the given INode. */
-					result_file           = (REF struct file *)kmalloc(sizeof(REF struct file), GFP_PREFLT);
+					result_file           = (REF struct filehandle *)kmalloc(sizeof(REF struct filehandle), GFP_PREFLT);
 					result_file->f_refcnt = 1;
 					result_file->f_node   = result_inode;                /* Inherit reference */
 					result_file->f_path   = result_containing_path;      /* Inherit reference */
@@ -584,7 +584,7 @@ open_result_inode:
 					atomic_rwlock_init(&result_file->f_curlck);
 					result_file->f_curidx = 0;
 					result_file->f_curent = NULL;
-					result.h_type  = HANDLE_TYPE_FILE;
+					result.h_type  = HANDLE_TYPE_FILEHANDLE;
 					result.h_data  = result_file;
 					decref_unlikely(result_containing_directory);
 				}	break;

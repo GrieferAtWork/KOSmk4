@@ -325,7 +325,7 @@ INTERN NONNULL((1)) ATTR_SECTION(".text.kernel.handle_undefined.tryas") REF void
 PUBLIC_CONST struct handle_types const handle_type_db = {
 	/* .h_typename = */ {
 		/* [HANDLE_TYPE_UNDEFINED]              = */ "undefined",
-		/* [HANDLE_TYPE_FILE]                   = */ "file",
+		/* [HANDLE_TYPE_FILEHANDLE]             = */ "filehandle",
 		/* [HANDLE_TYPE_SOCKET]                 = */ "socket",
 		/* [HANDLE_TYPE_EPOLL]                  = */ "epoll",
 		/* [HANDLE_TYPE_PIPE]                   = */ "pipe",
@@ -354,7 +354,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 	},
 	/* .h_refcnt = */ {
 		/* [HANDLE_TYPE_UNDEFINED]              = */ (refcnt_t (FCALL *)(void const *__restrict))&handle_undefined_refcnt,
-		/* [HANDLE_TYPE_FILE]                   = */ (refcnt_t (FCALL *)(void const *__restrict))&handle_file_refcnt,
+		/* [HANDLE_TYPE_FILEHANDLE]             = */ (refcnt_t (FCALL *)(void const *__restrict))&handle_filehandle_refcnt,
 		/* [HANDLE_TYPE_SOCKET]                 = */ (refcnt_t (FCALL *)(void const *__restrict))&handle_socket_refcnt,
 		/* [HANDLE_TYPE_EPOLL]                  = */ (refcnt_t (FCALL *)(void const *__restrict))&handle_epoll_refcnt,
 		/* [HANDLE_TYPE_PIPE]                   = */ (refcnt_t (FCALL *)(void const *__restrict))&handle_pipe_refcnt,
@@ -383,7 +383,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 	},
 	/* .h_incref = */ {
 		/* [HANDLE_TYPE_UNDEFINED]              = */ (void (FCALL *)(void *__restrict))&handle_undefined_incref,
-		/* [HANDLE_TYPE_FILE]                   = */ (void (FCALL *)(void *__restrict))&handle_file_incref,
+		/* [HANDLE_TYPE_FILEHANDLE]             = */ (void (FCALL *)(void *__restrict))&handle_filehandle_incref,
 		/* [HANDLE_TYPE_SOCKET]                 = */ (void (FCALL *)(void *__restrict))&handle_socket_incref,
 		/* [HANDLE_TYPE_EPOLL]                  = */ (void (FCALL *)(void *__restrict))&handle_epoll_incref,
 		/* [HANDLE_TYPE_PIPE]                   = */ (void (FCALL *)(void *__restrict))&handle_pipe_incref,
@@ -412,7 +412,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 	},
 	/* .h_decref = */ {
 		/* [HANDLE_TYPE_UNDEFINED]              = */ (void (FCALL *)(REF void *__restrict))&handle_undefined_decref,
-		/* [HANDLE_TYPE_FILE]                   = */ (void (FCALL *)(REF void *__restrict))&handle_file_decref,
+		/* [HANDLE_TYPE_FILEHANDLE]             = */ (void (FCALL *)(REF void *__restrict))&handle_filehandle_decref,
 		/* [HANDLE_TYPE_SOCKET]                 = */ (void (FCALL *)(REF void *__restrict))&handle_socket_decref,
 		/* [HANDLE_TYPE_EPOLL]                  = */ (void (FCALL *)(REF void *__restrict))&handle_epoll_decref,
 		/* [HANDLE_TYPE_PIPE]                   = */ (void (FCALL *)(REF void *__restrict))&handle_pipe_decref,
@@ -441,7 +441,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 	},
 	/* .h_tryincref = */ {
 		/* [HANDLE_TYPE_UNDEFINED]              = */ (__BOOL (FCALL *)(void *__restrict))&handle_undefined_tryincref,
-		/* [HANDLE_TYPE_FILE]                   = */ (__BOOL (FCALL *)(void *__restrict))&handle_file_tryincref,
+		/* [HANDLE_TYPE_FILEHANDLE]             = */ (__BOOL (FCALL *)(void *__restrict))&handle_filehandle_tryincref,
 		/* [HANDLE_TYPE_SOCKET]                 = */ (__BOOL (FCALL *)(void *__restrict))&handle_socket_tryincref,
 		/* [HANDLE_TYPE_EPOLL]                  = */ (__BOOL (FCALL *)(void *__restrict))&handle_epoll_tryincref,
 		/* [HANDLE_TYPE_PIPE]                   = */ (__BOOL (FCALL *)(void *__restrict))&handle_pipe_tryincref,
@@ -470,7 +470,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 	},
 	/* .h_weakgetref = */ {
 		/* [HANDLE_TYPE_UNDEFINED]              = */ (WEAK REF void *(FCALL *)(void *__restrict))&handle_undefined_weakgetref,
-		/* [HANDLE_TYPE_FILE]                   = */ (WEAK REF void *(FCALL *)(void *__restrict))&handle_file_weakgetref,
+		/* [HANDLE_TYPE_FILEHANDLE]             = */ (WEAK REF void *(FCALL *)(void *__restrict))&handle_filehandle_weakgetref,
 		/* [HANDLE_TYPE_SOCKET]                 = */ (WEAK REF void *(FCALL *)(void *__restrict))&handle_socket_weakgetref,
 		/* [HANDLE_TYPE_EPOLL]                  = */ (WEAK REF void *(FCALL *)(void *__restrict))&handle_epoll_weakgetref,
 		/* [HANDLE_TYPE_PIPE]                   = */ (WEAK REF void *(FCALL *)(void *__restrict))&handle_pipe_weakgetref,
@@ -499,7 +499,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 	},
 	/* .h_weaklckref = */ {
 		/* [HANDLE_TYPE_UNDEFINED]              = */ (REF void *(FCALL *)(void *__restrict))&handle_undefined_weaklckref,
-		/* [HANDLE_TYPE_FILE]                   = */ (REF void *(FCALL *)(void *__restrict))&handle_file_weaklckref,
+		/* [HANDLE_TYPE_FILEHANDLE]             = */ (REF void *(FCALL *)(void *__restrict))&handle_filehandle_weaklckref,
 		/* [HANDLE_TYPE_SOCKET]                 = */ (REF void *(FCALL *)(void *__restrict))&handle_socket_weaklckref,
 		/* [HANDLE_TYPE_EPOLL]                  = */ (REF void *(FCALL *)(void *__restrict))&handle_epoll_weaklckref,
 		/* [HANDLE_TYPE_PIPE]                   = */ (REF void *(FCALL *)(void *__restrict))&handle_pipe_weaklckref,
@@ -528,7 +528,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 	},
 	/* .h_weakdecref = */ {
 		/* [HANDLE_TYPE_UNDEFINED]              = */ (void (FCALL *)(WEAK REF void *__restrict))&handle_undefined_weakdecref,
-		/* [HANDLE_TYPE_FILE]                   = */ (void (FCALL *)(WEAK REF void *__restrict))&handle_file_weakdecref,
+		/* [HANDLE_TYPE_FILEHANDLE]             = */ (void (FCALL *)(WEAK REF void *__restrict))&handle_filehandle_weakdecref,
 		/* [HANDLE_TYPE_SOCKET]                 = */ (void (FCALL *)(WEAK REF void *__restrict))&handle_socket_weakdecref,
 		/* [HANDLE_TYPE_EPOLL]                  = */ (void (FCALL *)(WEAK REF void *__restrict))&handle_epoll_weakdecref,
 		/* [HANDLE_TYPE_PIPE]                   = */ (void (FCALL *)(WEAK REF void *__restrict))&handle_pipe_weakdecref,
@@ -557,7 +557,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 	},
 	/* .h_read = */ {
 		/* [HANDLE_TYPE_UNDEFINED]              = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, iomode_t))&handle_undefined_read,
-		/* [HANDLE_TYPE_FILE]                   = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, iomode_t))&handle_file_read,
+		/* [HANDLE_TYPE_FILEHANDLE]             = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, iomode_t))&handle_filehandle_read,
 		/* [HANDLE_TYPE_SOCKET]                 = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, iomode_t))&handle_socket_read,
 		/* [HANDLE_TYPE_EPOLL]                  = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, iomode_t))&handle_epoll_read,
 		/* [HANDLE_TYPE_PIPE]                   = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, iomode_t))&handle_pipe_read,
@@ -586,7 +586,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 	},
 	/* .h_write = */ {
 		/* [HANDLE_TYPE_UNDEFINED]              = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, iomode_t))&handle_undefined_write,
-		/* [HANDLE_TYPE_FILE]                   = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, iomode_t))&handle_file_write,
+		/* [HANDLE_TYPE_FILEHANDLE]             = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, iomode_t))&handle_filehandle_write,
 		/* [HANDLE_TYPE_SOCKET]                 = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, iomode_t))&handle_socket_write,
 		/* [HANDLE_TYPE_EPOLL]                  = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, iomode_t))&handle_epoll_write,
 		/* [HANDLE_TYPE_PIPE]                   = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, iomode_t))&handle_pipe_write,
@@ -615,7 +615,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 	},
 	/* .h_pread = */ {
 		/* [HANDLE_TYPE_UNDEFINED]              = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, pos_t, iomode_t))&handle_undefined_pread,
-		/* [HANDLE_TYPE_FILE]                   = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, pos_t, iomode_t))&handle_file_pread,
+		/* [HANDLE_TYPE_FILEHANDLE]             = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, pos_t, iomode_t))&handle_filehandle_pread,
 		/* [HANDLE_TYPE_SOCKET]                 = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, pos_t, iomode_t))&handle_socket_pread,
 		/* [HANDLE_TYPE_EPOLL]                  = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, pos_t, iomode_t))&handle_epoll_pread,
 		/* [HANDLE_TYPE_PIPE]                   = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, pos_t, iomode_t))&handle_pipe_pread,
@@ -644,7 +644,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 	},
 	/* .h_pwrite = */ {
 		/* [HANDLE_TYPE_UNDEFINED]              = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, pos_t, iomode_t))&handle_undefined_pwrite,
-		/* [HANDLE_TYPE_FILE]                   = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, pos_t, iomode_t))&handle_file_pwrite,
+		/* [HANDLE_TYPE_FILEHANDLE]             = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, pos_t, iomode_t))&handle_filehandle_pwrite,
 		/* [HANDLE_TYPE_SOCKET]                 = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, pos_t, iomode_t))&handle_socket_pwrite,
 		/* [HANDLE_TYPE_EPOLL]                  = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, pos_t, iomode_t))&handle_epoll_pwrite,
 		/* [HANDLE_TYPE_PIPE]                   = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, pos_t, iomode_t))&handle_pipe_pwrite,
@@ -673,7 +673,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 	},
 	/* .h_readv = */ {
 		/* [HANDLE_TYPE_UNDEFINED]              = */ (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_undefined_readv,
-		/* [HANDLE_TYPE_FILE]                   = */ (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_file_readv,
+		/* [HANDLE_TYPE_FILEHANDLE]             = */ (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_filehandle_readv,
 		/* [HANDLE_TYPE_SOCKET]                 = */ (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_socket_readv,
 		/* [HANDLE_TYPE_EPOLL]                  = */ (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_epoll_readv,
 		/* [HANDLE_TYPE_PIPE]                   = */ (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_pipe_readv,
@@ -702,7 +702,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 	},
 	/* .h_writev = */ {
 		/* [HANDLE_TYPE_UNDEFINED]              = */ (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_undefined_writev,
-		/* [HANDLE_TYPE_FILE]                   = */ (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_file_writev,
+		/* [HANDLE_TYPE_FILEHANDLE]             = */ (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_filehandle_writev,
 		/* [HANDLE_TYPE_SOCKET]                 = */ (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_socket_writev,
 		/* [HANDLE_TYPE_EPOLL]                  = */ (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_epoll_writev,
 		/* [HANDLE_TYPE_PIPE]                   = */ (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_pipe_writev,
@@ -731,7 +731,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 	},
 	/* .h_preadv = */ {
 		/* [HANDLE_TYPE_UNDEFINED]              = */ (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_undefined_preadv,
-		/* [HANDLE_TYPE_FILE]                   = */ (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_file_preadv,
+		/* [HANDLE_TYPE_FILEHANDLE]             = */ (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_filehandle_preadv,
 		/* [HANDLE_TYPE_SOCKET]                 = */ (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_socket_preadv,
 		/* [HANDLE_TYPE_EPOLL]                  = */ (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_epoll_preadv,
 		/* [HANDLE_TYPE_PIPE]                   = */ (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_pipe_preadv,
@@ -760,7 +760,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 	},
 	/* .h_pwritev = */ {
 		/* [HANDLE_TYPE_UNDEFINED]              = */ (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_undefined_pwritev,
-		/* [HANDLE_TYPE_FILE]                   = */ (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_file_pwritev,
+		/* [HANDLE_TYPE_FILEHANDLE]             = */ (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_filehandle_pwritev,
 		/* [HANDLE_TYPE_SOCKET]                 = */ (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_socket_pwritev,
 		/* [HANDLE_TYPE_EPOLL]                  = */ (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_epoll_pwritev,
 		/* [HANDLE_TYPE_PIPE]                   = */ (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_pipe_pwritev,
@@ -789,7 +789,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 	},
 	/* .h_readdir = */ {
 		/* [HANDLE_TYPE_UNDEFINED]              = */ (size_t (KCALL *)(void *__restrict, USER CHECKED struct dirent *, size_t, readdir_mode_t, iomode_t))&handle_undefined_readdir,
-		/* [HANDLE_TYPE_FILE]                   = */ (size_t (KCALL *)(void *__restrict, USER CHECKED struct dirent *, size_t, readdir_mode_t, iomode_t))&handle_file_readdir,
+		/* [HANDLE_TYPE_FILEHANDLE]             = */ (size_t (KCALL *)(void *__restrict, USER CHECKED struct dirent *, size_t, readdir_mode_t, iomode_t))&handle_filehandle_readdir,
 		/* [HANDLE_TYPE_SOCKET]                 = */ (size_t (KCALL *)(void *__restrict, USER CHECKED struct dirent *, size_t, readdir_mode_t, iomode_t))&handle_socket_readdir,
 		/* [HANDLE_TYPE_EPOLL]                  = */ (size_t (KCALL *)(void *__restrict, USER CHECKED struct dirent *, size_t, readdir_mode_t, iomode_t))&handle_epoll_readdir,
 		/* [HANDLE_TYPE_PIPE]                   = */ (size_t (KCALL *)(void *__restrict, USER CHECKED struct dirent *, size_t, readdir_mode_t, iomode_t))&handle_pipe_readdir,
@@ -818,7 +818,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 	},
 	/* .h_seek = */ {
 		/* [HANDLE_TYPE_UNDEFINED]              = */ (pos_t (KCALL *)(void *__restrict, off_t, unsigned int))&handle_undefined_seek,
-		/* [HANDLE_TYPE_FILE]                   = */ (pos_t (KCALL *)(void *__restrict, off_t, unsigned int))&handle_file_seek,
+		/* [HANDLE_TYPE_FILEHANDLE]             = */ (pos_t (KCALL *)(void *__restrict, off_t, unsigned int))&handle_filehandle_seek,
 		/* [HANDLE_TYPE_SOCKET]                 = */ (pos_t (KCALL *)(void *__restrict, off_t, unsigned int))&handle_socket_seek,
 		/* [HANDLE_TYPE_EPOLL]                  = */ (pos_t (KCALL *)(void *__restrict, off_t, unsigned int))&handle_epoll_seek,
 		/* [HANDLE_TYPE_PIPE]                   = */ (pos_t (KCALL *)(void *__restrict, off_t, unsigned int))&handle_pipe_seek,
@@ -847,7 +847,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 	},
 	/* .h_ioctl = */ {
 		/* [HANDLE_TYPE_UNDEFINED]              = */ (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_undefined_ioctl,
-		/* [HANDLE_TYPE_FILE]                   = */ (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_file_ioctl,
+		/* [HANDLE_TYPE_FILEHANDLE]             = */ (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_filehandle_ioctl,
 		/* [HANDLE_TYPE_SOCKET]                 = */ (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_socket_ioctl,
 		/* [HANDLE_TYPE_EPOLL]                  = */ (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_epoll_ioctl,
 		/* [HANDLE_TYPE_PIPE]                   = */ (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_pipe_ioctl,
@@ -876,7 +876,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 	},
 	/* .h_truncate = */ {
 		/* [HANDLE_TYPE_UNDEFINED]              = */ (void (KCALL *)(void *__restrict, pos_t))&handle_undefined_truncate,
-		/* [HANDLE_TYPE_FILE]                   = */ (void (KCALL *)(void *__restrict, pos_t))&handle_file_truncate,
+		/* [HANDLE_TYPE_FILEHANDLE]             = */ (void (KCALL *)(void *__restrict, pos_t))&handle_filehandle_truncate,
 		/* [HANDLE_TYPE_SOCKET]                 = */ (void (KCALL *)(void *__restrict, pos_t))&handle_socket_truncate,
 		/* [HANDLE_TYPE_EPOLL]                  = */ (void (KCALL *)(void *__restrict, pos_t))&handle_epoll_truncate,
 		/* [HANDLE_TYPE_PIPE]                   = */ (void (KCALL *)(void *__restrict, pos_t))&handle_pipe_truncate,
@@ -905,7 +905,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 	},
 	/* .h_mmap = */ {
 		/* [HANDLE_TYPE_UNDEFINED]              = */ (void (KCALL *)(void *__restrict, struct handle_mmap_info *__restrict))&handle_undefined_mmap,
-		/* [HANDLE_TYPE_FILE]                   = */ (void (KCALL *)(void *__restrict, struct handle_mmap_info *__restrict))&handle_file_mmap,
+		/* [HANDLE_TYPE_FILEHANDLE]             = */ (void (KCALL *)(void *__restrict, struct handle_mmap_info *__restrict))&handle_filehandle_mmap,
 		/* [HANDLE_TYPE_SOCKET]                 = */ (void (KCALL *)(void *__restrict, struct handle_mmap_info *__restrict))&handle_socket_mmap,
 		/* [HANDLE_TYPE_EPOLL]                  = */ (void (KCALL *)(void *__restrict, struct handle_mmap_info *__restrict))&handle_epoll_mmap,
 		/* [HANDLE_TYPE_PIPE]                   = */ (void (KCALL *)(void *__restrict, struct handle_mmap_info *__restrict))&handle_pipe_mmap,
@@ -934,7 +934,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 	},
 	/* .h_allocate = */ {
 		/* [HANDLE_TYPE_UNDEFINED]              = */ (pos_t (KCALL *)(void *__restrict, fallocate_mode_t, pos_t, pos_t))&handle_undefined_allocate,
-		/* [HANDLE_TYPE_FILE]                   = */ (pos_t (KCALL *)(void *__restrict, fallocate_mode_t, pos_t, pos_t))&handle_file_allocate,
+		/* [HANDLE_TYPE_FILEHANDLE]             = */ (pos_t (KCALL *)(void *__restrict, fallocate_mode_t, pos_t, pos_t))&handle_filehandle_allocate,
 		/* [HANDLE_TYPE_SOCKET]                 = */ (pos_t (KCALL *)(void *__restrict, fallocate_mode_t, pos_t, pos_t))&handle_socket_allocate,
 		/* [HANDLE_TYPE_EPOLL]                  = */ (pos_t (KCALL *)(void *__restrict, fallocate_mode_t, pos_t, pos_t))&handle_epoll_allocate,
 		/* [HANDLE_TYPE_PIPE]                   = */ (pos_t (KCALL *)(void *__restrict, fallocate_mode_t, pos_t, pos_t))&handle_pipe_allocate,
@@ -963,7 +963,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 	},
 	/* .h_sync = */ {
 		/* [HANDLE_TYPE_UNDEFINED]              = */ (void (KCALL *)(void *__restrict))&handle_undefined_sync,
-		/* [HANDLE_TYPE_FILE]                   = */ (void (KCALL *)(void *__restrict))&handle_file_sync,
+		/* [HANDLE_TYPE_FILEHANDLE]             = */ (void (KCALL *)(void *__restrict))&handle_filehandle_sync,
 		/* [HANDLE_TYPE_SOCKET]                 = */ (void (KCALL *)(void *__restrict))&handle_socket_sync,
 		/* [HANDLE_TYPE_EPOLL]                  = */ (void (KCALL *)(void *__restrict))&handle_epoll_sync,
 		/* [HANDLE_TYPE_PIPE]                   = */ (void (KCALL *)(void *__restrict))&handle_pipe_sync,
@@ -992,7 +992,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 	},
 	/* .h_datasync = */ {
 		/* [HANDLE_TYPE_UNDEFINED]              = */ (void (KCALL *)(void *__restrict))&handle_undefined_datasync,
-		/* [HANDLE_TYPE_FILE]                   = */ (void (KCALL *)(void *__restrict))&handle_file_datasync,
+		/* [HANDLE_TYPE_FILEHANDLE]             = */ (void (KCALL *)(void *__restrict))&handle_filehandle_datasync,
 		/* [HANDLE_TYPE_SOCKET]                 = */ (void (KCALL *)(void *__restrict))&handle_socket_datasync,
 		/* [HANDLE_TYPE_EPOLL]                  = */ (void (KCALL *)(void *__restrict))&handle_epoll_datasync,
 		/* [HANDLE_TYPE_PIPE]                   = */ (void (KCALL *)(void *__restrict))&handle_pipe_datasync,
@@ -1021,7 +1021,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 	},
 	/* .h_stat = */ {
 		/* [HANDLE_TYPE_UNDEFINED]              = */ (void (KCALL *)(void *__restrict, USER CHECKED struct stat *))&handle_undefined_stat,
-		/* [HANDLE_TYPE_FILE]                   = */ (void (KCALL *)(void *__restrict, USER CHECKED struct stat *))&handle_file_stat,
+		/* [HANDLE_TYPE_FILEHANDLE]             = */ (void (KCALL *)(void *__restrict, USER CHECKED struct stat *))&handle_filehandle_stat,
 		/* [HANDLE_TYPE_SOCKET]                 = */ (void (KCALL *)(void *__restrict, USER CHECKED struct stat *))&handle_socket_stat,
 		/* [HANDLE_TYPE_EPOLL]                  = */ (void (KCALL *)(void *__restrict, USER CHECKED struct stat *))&handle_epoll_stat,
 		/* [HANDLE_TYPE_PIPE]                   = */ (void (KCALL *)(void *__restrict, USER CHECKED struct stat *))&handle_pipe_stat,
@@ -1050,7 +1050,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 	},
 	/* .h_pollconnect = */ {
 		/* [HANDLE_TYPE_UNDEFINED]              = */ (void (KCALL *)(void *__restrict, poll_mode_t))&handle_undefined_pollconnect,
-		/* [HANDLE_TYPE_FILE]                   = */ (void (KCALL *)(void *__restrict, poll_mode_t))&handle_file_pollconnect,
+		/* [HANDLE_TYPE_FILEHANDLE]             = */ (void (KCALL *)(void *__restrict, poll_mode_t))&handle_filehandle_pollconnect,
 		/* [HANDLE_TYPE_SOCKET]                 = */ (void (KCALL *)(void *__restrict, poll_mode_t))&handle_socket_pollconnect,
 		/* [HANDLE_TYPE_EPOLL]                  = */ (void (KCALL *)(void *__restrict, poll_mode_t))&handle_epoll_pollconnect,
 		/* [HANDLE_TYPE_PIPE]                   = */ (void (KCALL *)(void *__restrict, poll_mode_t))&handle_pipe_pollconnect,
@@ -1079,7 +1079,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 	},
 	/* .h_polltest = */ {
 		/* [HANDLE_TYPE_UNDEFINED]              = */ (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_undefined_polltest,
-		/* [HANDLE_TYPE_FILE]                   = */ (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_file_polltest,
+		/* [HANDLE_TYPE_FILEHANDLE]             = */ (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_filehandle_polltest,
 		/* [HANDLE_TYPE_SOCKET]                 = */ (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_socket_polltest,
 		/* [HANDLE_TYPE_EPOLL]                  = */ (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_epoll_polltest,
 		/* [HANDLE_TYPE_PIPE]                   = */ (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_pipe_polltest,
@@ -1108,7 +1108,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 	},
 	/* .h_hop = */ {
 		/* [HANDLE_TYPE_UNDEFINED]              = */ (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_undefined_hop,
-		/* [HANDLE_TYPE_FILE]                   = */ (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_file_hop,
+		/* [HANDLE_TYPE_FILEHANDLE]             = */ (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_filehandle_hop,
 		/* [HANDLE_TYPE_SOCKET]                 = */ (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_socket_hop,
 		/* [HANDLE_TYPE_EPOLL]                  = */ (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_epoll_hop,
 		/* [HANDLE_TYPE_PIPE]                   = */ (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_pipe_hop,
@@ -1137,7 +1137,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 	},
 	/* .h_tryas = */ {
 		/* [HANDLE_TYPE_UNDEFINED]              = */ (REF void *(KCALL *)(void *__restrict, uintptr_half_t))&handle_undefined_tryas,
-		/* [HANDLE_TYPE_FILE]                   = */ (REF void *(KCALL *)(void *__restrict, uintptr_half_t))&handle_file_tryas,
+		/* [HANDLE_TYPE_FILEHANDLE]             = */ (REF void *(KCALL *)(void *__restrict, uintptr_half_t))&handle_filehandle_tryas,
 		/* [HANDLE_TYPE_SOCKET]                 = */ (REF void *(KCALL *)(void *__restrict, uintptr_half_t))&handle_socket_tryas,
 		/* [HANDLE_TYPE_EPOLL]                  = */ (REF void *(KCALL *)(void *__restrict, uintptr_half_t))&handle_epoll_tryas,
 		/* [HANDLE_TYPE_PIPE]                   = */ (REF void *(KCALL *)(void *__restrict, uintptr_half_t))&handle_pipe_tryas,
@@ -1168,35 +1168,35 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 
 
 
-/* Weakly define operators for `HANDLE_TYPE_FILE' (`struct file') */
-DEFINE_INTERN_WEAK_ALIAS(handle_file_refcnt, handle_undefined_refcnt);
-DEFINE_INTERN_WEAK_ALIAS(handle_file_incref, handle_undefined_incref);
-DEFINE_INTERN_WEAK_ALIAS(handle_file_decref, handle_undefined_decref);
-DEFINE_INTERN_WEAK_ALIAS(handle_file_tryincref, handle_undefined_tryincref);
-DEFINE_INTERN_WEAK_ALIAS(handle_file_weakgetref, handle_undefined_weakgetref);
-DEFINE_INTERN_WEAK_ALIAS(handle_file_weaklckref, handle_undefined_weaklckref);
-DEFINE_INTERN_WEAK_ALIAS(handle_file_weakdecref, handle_undefined_weakdecref);
-DEFINE_INTERN_WEAK_ALIAS(handle_file_read, handle_undefined_read);
-DEFINE_INTERN_WEAK_ALIAS(handle_file_write, handle_undefined_write);
-DEFINE_INTERN_WEAK_ALIAS(handle_file_pread, handle_undefined_pread);
-DEFINE_INTERN_WEAK_ALIAS(handle_file_pwrite, handle_undefined_pwrite);
-DEFINE_INTERN_WEAK_ALIAS(handle_file_readv, handle_undefined_readv);
-DEFINE_INTERN_WEAK_ALIAS(handle_file_writev, handle_undefined_writev);
-DEFINE_INTERN_WEAK_ALIAS(handle_file_preadv, handle_undefined_preadv);
-DEFINE_INTERN_WEAK_ALIAS(handle_file_pwritev, handle_undefined_pwritev);
-DEFINE_INTERN_WEAK_ALIAS(handle_file_readdir, handle_undefined_readdir);
-DEFINE_INTERN_WEAK_ALIAS(handle_file_seek, handle_undefined_seek);
-DEFINE_INTERN_WEAK_ALIAS(handle_file_ioctl, handle_undefined_ioctl);
-DEFINE_INTERN_WEAK_ALIAS(handle_file_truncate, handle_undefined_truncate);
-DEFINE_INTERN_WEAK_ALIAS(handle_file_mmap, handle_undefined_mmap);
-DEFINE_INTERN_WEAK_ALIAS(handle_file_allocate, handle_undefined_allocate);
-DEFINE_INTERN_WEAK_ALIAS(handle_file_sync, handle_undefined_sync);
-DEFINE_INTERN_WEAK_ALIAS(handle_file_datasync, handle_undefined_datasync);
-DEFINE_INTERN_WEAK_ALIAS(handle_file_stat, handle_undefined_stat);
-DEFINE_INTERN_WEAK_ALIAS(handle_file_pollconnect, handle_undefined_pollconnect);
-DEFINE_INTERN_WEAK_ALIAS(handle_file_polltest, handle_undefined_polltest);
-DEFINE_INTERN_WEAK_ALIAS(handle_file_hop, handle_undefined_hop);
-DEFINE_INTERN_WEAK_ALIAS(handle_file_tryas, handle_undefined_tryas);
+/* Weakly define operators for `HANDLE_TYPE_FILEHANDLE' (`struct filehandle') */
+DEFINE_INTERN_WEAK_ALIAS(handle_filehandle_refcnt, handle_undefined_refcnt);
+DEFINE_INTERN_WEAK_ALIAS(handle_filehandle_incref, handle_undefined_incref);
+DEFINE_INTERN_WEAK_ALIAS(handle_filehandle_decref, handle_undefined_decref);
+DEFINE_INTERN_WEAK_ALIAS(handle_filehandle_tryincref, handle_undefined_tryincref);
+DEFINE_INTERN_WEAK_ALIAS(handle_filehandle_weakgetref, handle_undefined_weakgetref);
+DEFINE_INTERN_WEAK_ALIAS(handle_filehandle_weaklckref, handle_undefined_weaklckref);
+DEFINE_INTERN_WEAK_ALIAS(handle_filehandle_weakdecref, handle_undefined_weakdecref);
+DEFINE_INTERN_WEAK_ALIAS(handle_filehandle_read, handle_undefined_read);
+DEFINE_INTERN_WEAK_ALIAS(handle_filehandle_write, handle_undefined_write);
+DEFINE_INTERN_WEAK_ALIAS(handle_filehandle_pread, handle_undefined_pread);
+DEFINE_INTERN_WEAK_ALIAS(handle_filehandle_pwrite, handle_undefined_pwrite);
+DEFINE_INTERN_WEAK_ALIAS(handle_filehandle_readv, handle_undefined_readv);
+DEFINE_INTERN_WEAK_ALIAS(handle_filehandle_writev, handle_undefined_writev);
+DEFINE_INTERN_WEAK_ALIAS(handle_filehandle_preadv, handle_undefined_preadv);
+DEFINE_INTERN_WEAK_ALIAS(handle_filehandle_pwritev, handle_undefined_pwritev);
+DEFINE_INTERN_WEAK_ALIAS(handle_filehandle_readdir, handle_undefined_readdir);
+DEFINE_INTERN_WEAK_ALIAS(handle_filehandle_seek, handle_undefined_seek);
+DEFINE_INTERN_WEAK_ALIAS(handle_filehandle_ioctl, handle_undefined_ioctl);
+DEFINE_INTERN_WEAK_ALIAS(handle_filehandle_truncate, handle_undefined_truncate);
+DEFINE_INTERN_WEAK_ALIAS(handle_filehandle_mmap, handle_undefined_mmap);
+DEFINE_INTERN_WEAK_ALIAS(handle_filehandle_allocate, handle_undefined_allocate);
+DEFINE_INTERN_WEAK_ALIAS(handle_filehandle_sync, handle_undefined_sync);
+DEFINE_INTERN_WEAK_ALIAS(handle_filehandle_datasync, handle_undefined_datasync);
+DEFINE_INTERN_WEAK_ALIAS(handle_filehandle_stat, handle_undefined_stat);
+DEFINE_INTERN_WEAK_ALIAS(handle_filehandle_pollconnect, handle_undefined_pollconnect);
+DEFINE_INTERN_WEAK_ALIAS(handle_filehandle_polltest, handle_undefined_polltest);
+DEFINE_INTERN_WEAK_ALIAS(handle_filehandle_hop, handle_undefined_hop);
+DEFINE_INTERN_WEAK_ALIAS(handle_filehandle_tryas, handle_undefined_tryas);
 
 /* Weakly define operators for `HANDLE_TYPE_SOCKET' (`struct socket') */
 DEFINE_INTERN_WEAK_ALIAS(handle_socket_refcnt, handle_undefined_refcnt);

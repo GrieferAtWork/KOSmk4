@@ -577,6 +577,7 @@ incdir("");
 #include <jmp_buf.h>
 #include <kos/anno.h>
 #include <kos/aref.h>
+#include <kos/asm/rpc.h>
 #include <kos/asm/rtm.h>
 #include <kos/asm/syscall.h>
 #include <kos/bits/coredump.h>
@@ -632,7 +633,7 @@ incdir("");
 #include <kos/guid.h>
 #include <kos/hop/api.h>
 #include <kos/hop/blockdevice.h>
-#include <kos/hop/file.h>
+#include <kos/hop/filehandle.h>
 #include <kos/hop/futex.h>
 #include <kos/hop/handle.h>
 #include <kos/hop/mfile.h>
@@ -668,6 +669,7 @@ incdir("");
 #include <kos/refptr.h>
 #include <kos/rpc.h>
 #include <kos/rtm.h>
+#include <kos/sys/epoll.h>
 #include <kos/sys/ioctl.h>
 #include <kos/sys/mman.h>
 #include <kos/sys/socket.h>
@@ -830,6 +832,7 @@ incdir("");
 #include <libphys/phys.h>
 #include <libregdump/api.h>
 #include <libregdump/printer.h>
+#include <libregdump/register.h>
 #include <libregex/api.h>
 #include <libregex/regex.h>
 #include <libsctrace/api.h>

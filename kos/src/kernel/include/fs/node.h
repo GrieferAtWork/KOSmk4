@@ -172,7 +172,7 @@ struct inode_type {
 		 * >> } else {
 		 * >>     if (s_ISDIR(self->i_filemode) && result_inode->i_type->it_directory.d_readdir)
 		 * >>         return { HANDLE_TYPE_ONESHOT_DIRECTORY_FILE, ... };
-		 * >>     return { HANDLE_TYPE_FILE, ... };
+		 * >>     return { HANDLE_TYPE_FILEHANDLE, ... };
 		 * >> }
 		 * @param: self:                 The INode that is being accessed.
 		 * @param: oflags:               Open flags used during the INode access.

@@ -1741,9 +1741,9 @@ handle_as_path_noinherit(struct handle const *__restrict hnd) {
 	REF struct path *result;
 	switch (hnd->h_type) {
 
-	case HANDLE_TYPE_FILE:
+	case HANDLE_TYPE_FILEHANDLE:
 	case HANDLE_TYPE_ONESHOT_DIRECTORY_FILE:
-		result = incref(((struct file *)hnd->h_data)->f_path);
+		result = incref(((struct filehandle *)hnd->h_data)->f_path);
 		break;
 
 	case HANDLE_TYPE_PATH:

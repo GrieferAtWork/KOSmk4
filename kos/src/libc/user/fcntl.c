@@ -72,7 +72,7 @@ NOTHROW(LIBCCALL oflag_dos2kos)(oflag_t dos_oflags) {
 
 
 
-/*[[[head:libd_open,hash:CRC-32=0x9cc4ec68]]]*/
+/*[[[head:libd_open,hash:CRC-32=0xccad8cc8]]]*/
 /* >> open(2), open64(2), openat(2), openat64(2)
  * Open  a  new  file  handle  to  the  file  specified  by `filename'
  * When  `oflags & O_CREAT',   then  `mode'   specifies  the   initial
@@ -84,7 +84,7 @@ NOTHROW(LIBCCALL oflag_dos2kos)(oflag_t dos_oflags) {
  *   - HANDLE_TYPE_FIFO_USER:              For `S_IFIFO' files
  *   - HANDLE_TYPE_MFILE:                  For `S_IFLNK' files (only when `O_SYMLINK' was given)
  *   - HANDLE_TYPE_ONESHOT_DIRECTORY_FILE: For `S_IFDIR' files from special one-shot directories
- *   - HANDLE_TYPE_FILE:                   For `S_IFREG' and `S_IFDIR' (~normal~) files
+ *   - HANDLE_TYPE_FILEHANDLE:             For `S_IFREG' and `S_IFDIR' (~normal~) files
  *   - *:                                  Certain filesystem names can literally return anything, such
  *                                         as `/proc/self/fd/1234',  which  is  more  like  `dup(1234)' */
 INTERN ATTR_SECTION(".text.crt.dos.io.access") WUNUSED NONNULL((1)) fd_t
@@ -126,7 +126,7 @@ NOTHROW_RPC(VLIBDCALL libd_open)(char const *filename,
 }
 /*[[[end:libd_open]]]*/
 
-/*[[[head:libc_open,hash:CRC-32=0x3f8deef9]]]*/
+/*[[[head:libc_open,hash:CRC-32=0x178a608b]]]*/
 /* >> open(2), open64(2), openat(2), openat64(2)
  * Open  a  new  file  handle  to  the  file  specified  by `filename'
  * When  `oflags & O_CREAT',   then  `mode'   specifies  the   initial
@@ -138,7 +138,7 @@ NOTHROW_RPC(VLIBDCALL libd_open)(char const *filename,
  *   - HANDLE_TYPE_FIFO_USER:              For `S_IFIFO' files
  *   - HANDLE_TYPE_MFILE:                  For `S_IFLNK' files (only when `O_SYMLINK' was given)
  *   - HANDLE_TYPE_ONESHOT_DIRECTORY_FILE: For `S_IFDIR' files from special one-shot directories
- *   - HANDLE_TYPE_FILE:                   For `S_IFREG' and `S_IFDIR' (~normal~) files
+ *   - HANDLE_TYPE_FILEHANDLE:             For `S_IFREG' and `S_IFDIR' (~normal~) files
  *   - *:                                  Certain filesystem names can literally return anything, such
  *                                         as `/proc/self/fd/1234',  which  is  more  like  `dup(1234)' */
 INTERN ATTR_SECTION(".text.crt.io.access") WUNUSED NONNULL((1)) fd_t
@@ -197,7 +197,7 @@ NOTHROW_RPC(LIBCCALL libc_creat)(char const *filename,
 }
 /*[[[end:libc_creat]]]*/
 
-/*[[[head:libd_openat,hash:CRC-32=0xe9b5826c]]]*/
+/*[[[head:libd_openat,hash:CRC-32=0xd1c08d20]]]*/
 /* >> open(2), open64(2), openat(2), openat64(2)
  * Open  a  new  file  handle  to  the  file  specified  by `filename'
  * When  `oflags & O_CREAT',   then  `mode'   specifies  the   initial
@@ -209,7 +209,7 @@ NOTHROW_RPC(LIBCCALL libc_creat)(char const *filename,
  *   - HANDLE_TYPE_FIFO_USER:              For `S_IFIFO' files
  *   - HANDLE_TYPE_MFILE:                  For `S_IFLNK' files (only when `O_SYMLINK' was given)
  *   - HANDLE_TYPE_ONESHOT_DIRECTORY_FILE: For `S_IFDIR' files from special one-shot directories
- *   - HANDLE_TYPE_FILE:                   For `S_IFREG' and `S_IFDIR' (~normal~) files
+ *   - HANDLE_TYPE_FILEHANDLE:             For `S_IFREG' and `S_IFDIR' (~normal~) files
  *   - *:                                  Certain filesystem names can literally return anything, such
  *                                         as `/proc/self/fd/1234',  which  is  more  like  `dup(1234)' */
 INTERN ATTR_SECTION(".text.crt.dos.io.access") WUNUSED NONNULL((2)) fd_t
@@ -242,7 +242,7 @@ NOTHROW_RPC(VLIBDCALL libd_openat)(fd_t dirfd,
 }
 /*[[[end:libd_openat]]]*/
 
-/*[[[head:libc_openat,hash:CRC-32=0xc62681e6]]]*/
+/*[[[head:libc_openat,hash:CRC-32=0x6ebdc868]]]*/
 /* >> open(2), open64(2), openat(2), openat64(2)
  * Open  a  new  file  handle  to  the  file  specified  by `filename'
  * When  `oflags & O_CREAT',   then  `mode'   specifies  the   initial
@@ -254,7 +254,7 @@ NOTHROW_RPC(VLIBDCALL libd_openat)(fd_t dirfd,
  *   - HANDLE_TYPE_FIFO_USER:              For `S_IFIFO' files
  *   - HANDLE_TYPE_MFILE:                  For `S_IFLNK' files (only when `O_SYMLINK' was given)
  *   - HANDLE_TYPE_ONESHOT_DIRECTORY_FILE: For `S_IFDIR' files from special one-shot directories
- *   - HANDLE_TYPE_FILE:                   For `S_IFREG' and `S_IFDIR' (~normal~) files
+ *   - HANDLE_TYPE_FILEHANDLE:             For `S_IFREG' and `S_IFDIR' (~normal~) files
  *   - *:                                  Certain filesystem names can literally return anything, such
  *                                         as `/proc/self/fd/1234',  which  is  more  like  `dup(1234)' */
 INTERN ATTR_SECTION(".text.crt.io.access") WUNUSED NONNULL((2)) fd_t

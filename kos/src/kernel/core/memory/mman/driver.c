@@ -3264,7 +3264,7 @@ driver_runfini_unbindglob(struct driver *__restrict self) {
 	 *   - realtime_clock
 	 * XXX:
 	 *   - What  about  file  handles  that  somehow  reference  the   driver,
-	 *     including  stuff  like  HANDLE_TYPE_FILE->f_node->i_super->s_device
+	 *     including  stuff  like  HANDLE_TYPE_FILEHANDLE->f_node->i_super->s_device
 	 *     We should probably try to find these files, and close them in their
 	 *     accompanying handle manager.
 	 *     We can enumerate open handle managers by enumerating threads!

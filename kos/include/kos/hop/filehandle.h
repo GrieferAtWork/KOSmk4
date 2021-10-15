@@ -17,8 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _KOS_HOP_FILE_H
-#define _KOS_HOP_FILE_H 1
+#ifndef _KOS_HOP_FILEHANDLE_H
+#define _KOS_HOP_FILEHANDLE_H 1
 
 #include "api.h"
 
@@ -33,14 +33,14 @@
 __DECL_BEGIN
 
 
-#define __OFFSET_HOP_FILE_CMPXCHG_OFFSET_STRUCT_SIZE 0
-#define __OFFSET_HOP_FILE_CMPXCHG_OFFSET_EXPOFFSET   8
-#define __OFFSET_HOP_FILE_CMPXCHG_OFFSET_NEWOFFSET   16
-#define __OFFSET_HOP_FILE_CMPXCHG_OFFSET_OLDOFFSET   24
-#define __SIZEOF_HOP_FILE_CMPXCHG_OFFSET             32
+#define __OFFSET_HOP_FILEHANDLE_CMPXCHG_OFFSET_STRUCT_SIZE 0
+#define __OFFSET_HOP_FILEHANDLE_CMPXCHG_OFFSET_EXPOFFSET   8
+#define __OFFSET_HOP_FILEHANDLE_CMPXCHG_OFFSET_NEWOFFSET   16
+#define __OFFSET_HOP_FILEHANDLE_CMPXCHG_OFFSET_OLDOFFSET   24
+#define __SIZEOF_HOP_FILEHANDLE_CMPXCHG_OFFSET             32
 #ifdef __CC__
-struct hop_file_cmpxchg_offset /*[PREFIX(cxo_)]*/ {
-	__uint32_t            cxo_struct_size;   /* [== sizeof(struct hop_file_cmpxchg_offset)]
+struct hop_filehandle_cmpxchg_offset /*[PREFIX(cxo_)]*/ {
+	__uint32_t            cxo_struct_size;   /* [== sizeof(struct hop_filehandle_cmpxchg_offset)]
 	                                          * The kernel may throw an `E_BUFFER_TOO_SMALL' exception if
 	                                          * this value is too small  or doesn't match any  recognized
 	                                          * structure version. */
@@ -55,25 +55,25 @@ struct hop_file_cmpxchg_offset /*[PREFIX(cxo_)]*/ {
 
 
 /************************************************************************/
-/* HANDLE_TYPE_FILE                                                     */
+/* HANDLE_TYPE_FILEHANDLE                                                     */
 /************************************************************************/
-/* [struct hop_file_cmpxchg_offset *arg] Compare-exchange the current file offset. */
-#define HOP_FILE_CMPXCHG_OFFSET HOP_CMD(HANDLE_TYPE_FILE, 0x0001)
+/* [struct hop_filehandle_cmpxchg_offset *arg] Compare-exchange the current file offset. */
+#define HOP_FILEHANDLE_CMPXCHG_OFFSET HOP_CMD(HANDLE_TYPE_FILEHANDLE, 0x0001)
 
 /* [struct hop_openfd *result] Open the Inode that is backing the file.
  * @return: == result->of_hint */
-#define HOP_FILE_OPENNODE       HOP_CMD(HANDLE_TYPE_FILE, 0x0002)
+#define HOP_FILEHANDLE_OPENNODE       HOP_CMD(HANDLE_TYPE_FILEHANDLE, 0x0002)
 
 /* [struct hop_openfd *result] Open the path within which the
  * file is stored (the VFS path of its containing directory).
  * @return: == result->of_hint */
-#define HOP_FILE_OPENPATH       HOP_CMD(HANDLE_TYPE_FILE, 0x0003)
+#define HOP_FILEHANDLE_OPENPATH       HOP_CMD(HANDLE_TYPE_FILEHANDLE, 0x0003)
 
 /* [struct hop_openfd *result] Open the directory entry used to describe the file's INode.
  * @return: == result->of_hint */
-#define HOP_FILE_OPENDENTRY     HOP_CMD(HANDLE_TYPE_FILE, 0x0004)
+#define HOP_FILEHANDLE_OPENDENTRY     HOP_CMD(HANDLE_TYPE_FILEHANDLE, 0x0004)
 
 
 __DECL_END
 
-#endif /* !_KOS_HOP_FILE_H */
+#endif /* !_KOS_HOP_FILEHANDLE_H */

@@ -51,7 +51,7 @@
  * $ deemon -F kos/src/kernel/core/user/handle-router.c kos/src/kernel/include/kernel/handle-proto.h && touch kos/src/kernel/include/kernel/handle.h
  */
 #define HANDLE_TYPE_UNDEFINED              0x0000 /* Undefined/unused handle */
-#define HANDLE_TYPE_FILE                   0x0001 /* `struct file'
+#define HANDLE_TYPE_FILEHANDLE             0x0001 /* `struct filehandle'
                                                    * Castable into: HANDLE_TYPE_PATH, HANDLE_TYPE_MFILE, HANDLE_TYPE_DIRECTORYENTRY */
 #define HANDLE_TYPE_SOCKET                 0x0002 /* `struct socket' */
 #define HANDLE_TYPE_EPOLL                  0x0003 /* `struct epoll_controller' */
@@ -96,7 +96,7 @@
 	cb(HANDLE_TYPE_MFILE, struct mfile)                                   \
 	cb(HANDLE_TYPE_BLOCKDEVICE, struct basic_block_device)                \
 	cb(HANDLE_TYPE_DIRECTORYENTRY, struct directory_entry)                \
-	cb(HANDLE_TYPE_FILE, struct file)                                     \
+	cb(HANDLE_TYPE_FILEHANDLE, struct filehandle)                         \
 	cb(HANDLE_TYPE_ONESHOT_DIRECTORY_FILE, struct oneshot_directory_file) \
 	cb(HANDLE_TYPE_PATH, struct path)                                     \
 	cb(HANDLE_TYPE_FS, struct fs)                                         \

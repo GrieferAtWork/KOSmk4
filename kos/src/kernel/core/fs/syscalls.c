@@ -2291,10 +2291,10 @@ DEFINE_SYSCALL4(ssize_t, frealpath4,
 			                          root);
 		}	break;
 
-		case HANDLE_TYPE_FILE:
+		case HANDLE_TYPE_FILEHANDLE:
 		case HANDLE_TYPE_ONESHOT_DIRECTORY_FILE: {
-			struct file *me;
-			me = (struct file *)hnd.h_data;
+			struct filehandle *me;
+			me = (struct filehandle *)hnd.h_data;
 			if unlikely(!me->f_path)
 				goto bad_handle_type;
 			if unlikely(!me->f_dirent)

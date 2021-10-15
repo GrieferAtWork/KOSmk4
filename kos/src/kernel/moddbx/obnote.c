@@ -700,7 +700,7 @@ NOTHROW(KCALL note_file)(pformatprinter printer, void *arg,
                          KERNEL CHECKED void const *pointer,
                          unsigned int *__restrict pstatus) {
 	ssize_t result;
-	struct file *me = (struct file *)pointer;
+	struct filehandle *me = (struct filehandle *)pointer;
 	struct path *file_path;
 	struct directory_entry *file_dent;
 	TRY {
