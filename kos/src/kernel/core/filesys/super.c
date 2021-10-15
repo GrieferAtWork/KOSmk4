@@ -182,6 +182,14 @@ PUBLIC void KCALL fsuper_syncall(void)
 		REF struct fsuper *changed_superblock;
 		COMPILER_BARRIER();
 		fchangedsuper_acquire();
+		/* TODO: `fchangedsuper_list' must be a TAILQ, and we must always take
+		 *       the _LAST_ element  here. That way,  we can sync  filesystems
+		 *       from least-recently-modified to  most-..., thus resulting  in
+		 *       one filesystem's sync causing modifications to another.
+		 *
+		 * Yes: that makes sense; if a superblock is synced such that disk
+		 * writes are made, then devfs is  marked as changed and would  be
+		 * also be synced at a later point. */
 		changed_superblock = LIST_FIRST(&fchangedsuper_list);
 		if (changed_superblock != NULL)
 			LIST_UNBIND(changed_superblock, fs_changedsuper);

@@ -31,19 +31,19 @@
 DECL_BEGIN
 
 struct chrdev;
-struct device_ops {
-	struct fnode_ops cd_dev; /* Device operators */
+struct chrdev_ops {
+	struct device_ops cdo_dev; /* Device operators */
 	/* More operators would go here... */
 };
 
 
 struct chrdev
 #ifndef __WANT_FS_INLINE_STRUCTURES
-    : device               /* Underlying device */
+    : device              /* Underlying device */
 #endif /* !__WANT_FS_INLINE_STRUCTURES */
 {
 #ifdef __WANT_FS_INLINE_STRUCTURES
-	struct device cd_dev; /* Underlying file-node */
+	struct device cd_dev; /* Underlying device */
 #define _chrdev_asdev(x) &(x)->cd_dev
 #define _chrdev_dev_     cd_dev.
 #else /* __WANT_FS_INLINE_STRUCTURES */
@@ -55,8 +55,6 @@ struct chrdev
 /* Return a pointer to character-device operators of `self' */
 #define chrdev_getops(self) \
 	((struct chrdev_ops const *)__COMPILER_REQTYPE(struct chrdev const *, self)->_chrdev_dev_ _device_devnode_ _fdevnode_node_ _fnode_file_ mf_ops)
-#define _chrdev_assert_ops_(ops) \
-	_fnode_assert_ops_(&(ops)->rno_node)
 
 
 /* Initialize common+basic fields. The caller must still initialize:
@@ -72,13 +70,13 @@ struct chrdev
  * @param: struct chrdev     *self: Character device to initialize.
  * @param: struct chrdev_ops *ops:  Character device operators. */
 #define _chrdev_init(self, ops)                                                                                \
-	(_device_init(_chrdev_asdev(self), &(ops)->cd_dev),                                                        \
+	(_device_init(_chrdev_asdev(self), &(ops)->cdo_dev),                                                       \
 	 (self)->_chrdev_dev_ _device_devnode_ _fdevnode_node_ _fnode_file_ mf_parts      = MFILE_PARTS_ANONYMOUS, \
 	 (self)->_chrdev_dev_ _device_devnode_ _fdevnode_node_ _fnode_file_ mf_blockshift = PAGESHIFT,             \
 	 (self)->_chrdev_dev_ _device_devnode_ _fdevnode_node_ _fnode_file_ mf_part_amask = PAGEMASK,              \
 	 atomic64_init(&(self)->_chrdev_dev_ _device_devnode_ _fdevnode_node_ _fnode_file_ mf_filesize, 0))
 #define _chrdev_cinit(self, ops)                                                                               \
-	(_device_cinit(_chrdev_asdev(self), &(ops)->cd_dev),                                                       \
+	(_device_cinit(_chrdev_asdev(self), &(ops)->cdo_dev),                                                      \
 	 (self)->_chrdev_dev_ _device_devnode_ _fdevnode_node_ _fnode_file_ mf_parts      = MFILE_PARTS_ANONYMOUS, \
 	 (self)->_chrdev_dev_ _device_devnode_ _fdevnode_node_ _fnode_file_ mf_blockshift = PAGESHIFT,             \
 	 (self)->_chrdev_dev_ _device_devnode_ _fdevnode_node_ _fnode_file_ mf_part_amask = PAGEMASK,              \

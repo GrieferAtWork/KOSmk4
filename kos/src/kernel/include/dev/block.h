@@ -230,7 +230,7 @@ struct block_device_partition
 	__BLKDEV_FIELDS
 #endif /* !__cplusplus */
 	REF struct block_device       *bp_master;    /* [1..1][const] The master device for which this is a partition. */
-	SLIST_ENTRY(struct block_device_partition)
+	SLIST_ENTRY(block_device_partition)
 	                               bp_parts;     /* [lock(bp_master->bd_parts_lock)] Chain of partitions. */
 	pos_t                          bp_minaddr;   /* [const][== bp_min * bd_sector_size] Starting position of this partition. */
 	lba_t                          bp_min;       /* [const][<= bp_max] Starting LBA of this partition. */

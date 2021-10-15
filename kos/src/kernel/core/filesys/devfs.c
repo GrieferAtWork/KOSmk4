@@ -1175,6 +1175,14 @@ again:
 			task_yield();
 		goto again;
 	}
+	if (!shared_rwlock_tryread(&devfs.rs_dat.rdd_treelock)) {
+		fallnodes_release();
+		fsuper_nodes_endwrite(&devfs.rs_sup);
+		devfs_byname_endwrite();
+		shared_rwlock_read(&devfs.rs_dat.rdd_treelock);
+		shared_rwlock_endread(&devfs.rs_dat.rdd_treelock);
+		goto again;
+	}
 
 	/* With all required locks held, check if this device already exists. */
 	{
@@ -1191,6 +1199,14 @@ again:
 			devfs_byname_removenode(existing);
 			existing->dv_byname_node.rb_lhs = DEVICE_BYNAME_DELETED;
 		}
+	}
+
+	/* Also check if a custom file with the same name exists within /dev/ */
+	if (ramfs_direnttree_locate_z(devfs.rs_dat.rdd_tree,
+	                              self->dv_dirent->fdd_dirent.fd_name,
+	                              self->dv_dirent->fdd_dirent.fd_namelen) != NULL) {
+		result = DEVBUILDER_REGISTER_EXISTS_NAME;
+		goto done;
 	}
 
 	/* Also check in devfs's INode tree. */
@@ -1219,6 +1235,7 @@ again:
 
 done:
 	/* Release all locks */
+	shared_rwlock_endread(&devfs.rs_dat.rdd_treelock);
 	fallnodes_release();
 	fsuper_nodes_endwrite(&devfs.rs_sup);
 	devfs_byname_endwrite();
