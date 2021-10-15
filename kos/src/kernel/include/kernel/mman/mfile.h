@@ -297,6 +297,16 @@ struct mfile_stream_ops {
 	(KCALL *mso_hop)(struct mfile *__restrict self, syscall_ulong_t cmd,
 	                 USER UNCHECKED void *arg, iomode_t mode)
 			THROWS(...);
+
+	/* [0..1] Try to cast the given mem-file into a different handle type.
+	 * When this operator isn't defined, the mem-file cannot be cast to any
+	 * other handle type. Note that you may assume that `wanted_type' is
+	 * never given as `HANDLE_TYPE_MFILE'.
+	 * @param: wanted_type: The requested handle type.
+	 * @return: NULL:       Cannot cast to `wanted_type'. */
+	NONNULL((1)) REF void *
+	(KCALL *mso_tryas)(struct mfile *__restrict self, uintptr_half_t wanted_type)
+			THROWS(...);
 };
 
 /* Constructs a wrapper object that implements seeking, allowing normal reads/writes to
@@ -1334,10 +1344,12 @@ DATDEF struct mfile_ops const mfile_anon_ops[BITSOF(void *)];
 #ifdef CONFIG_USE_NEW_FS
 FUNDEF WUNUSED NONNULL((1)) size_t KCALL mfile_uread(struct mfile *__restrict self, USER CHECKED void *dst, size_t num_bytes, iomode_t mode) THROWS(...);
 FUNDEF WUNUSED NONNULL((1)) size_t KCALL mfile_uwrite(struct mfile *__restrict self, USER CHECKED void const *src, size_t num_bytes, iomode_t mode) THROWS(...);
+FUNDEF WUNUSED NONNULL((1)) size_t KCALL mfile_utailwrite(struct mfile *__restrict self, USER CHECKED void const *src, size_t num_bytes, iomode_t mode) THROWS(...);
 FUNDEF WUNUSED NONNULL((1)) size_t KCALL mfile_upread(struct mfile *__restrict self, USER CHECKED void *dst, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
 FUNDEF WUNUSED NONNULL((1)) size_t KCALL mfile_upwrite(struct mfile *__restrict self, USER CHECKED void const *src, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
 FUNDEF WUNUSED NONNULL((1, 2)) size_t KCALL mfile_ureadv(struct mfile *__restrict self, struct iov_buffer *__restrict dst, size_t num_bytes, iomode_t mode) THROWS(...);
 FUNDEF WUNUSED NONNULL((1, 2)) size_t KCALL mfile_uwritev(struct mfile *__restrict self, struct iov_buffer *__restrict src, size_t num_bytes, iomode_t mode) THROWS(...);
+FUNDEF WUNUSED NONNULL((1, 2)) size_t KCALL mfile_utailwritev(struct mfile *__restrict self, struct iov_buffer *__restrict src, size_t num_bytes, iomode_t mode) THROWS(...);
 FUNDEF WUNUSED NONNULL((1, 2)) size_t KCALL mfile_upreadv(struct mfile *__restrict self, struct iov_buffer *__restrict dst, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
 FUNDEF WUNUSED NONNULL((1, 2)) size_t KCALL mfile_upwritev(struct mfile *__restrict self, struct iov_buffer *__restrict src, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
 FUNDEF NONNULL((1)) pos_t KCALL mfile_useek(struct mfile *__restrict self, off_t offset, unsigned int whence) THROWS(...);
@@ -1351,6 +1363,7 @@ FUNDEF NONNULL((1)) void KCALL mfile_ustat(struct mfile *__restrict self, USER C
 FUNDEF NONNULL((1)) void KCALL mfile_upollconnect(struct mfile *__restrict self, poll_mode_t what) THROWS(...);
 FUNDEF WUNUSED NONNULL((1)) poll_mode_t KCALL mfile_upolltest(struct mfile *__restrict self, poll_mode_t what) THROWS(...);
 FUNDEF NONNULL((1)) syscall_slong_t KCALL mfile_uhop(struct mfile *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
+FUNDEF NONNULL((1)) REF void *KCALL mfile_utryas(struct mfile *__restrict self, uintptr_half_t wanted_type) THROWS(E_WOULDBLOCK);
 #endif /* CONFIG_USE_NEW_FS */
 
 DECL_END

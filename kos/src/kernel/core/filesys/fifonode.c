@@ -460,7 +460,7 @@ handle_fifo_user_tryas(struct fifo_user *__restrict self,
 	case HANDLE_TYPE_PATH: return xincref(self->fu_path);
 	default: break;
 	}
-	return NULL;
+	return mfile_utryas(self->fu_fifo, wanted_type);
 }
 
 

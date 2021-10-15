@@ -130,6 +130,7 @@ DEFINE_PUBLIC_ALIAS(mfile_ustat, handle_mfile_stat);
 DEFINE_PUBLIC_ALIAS(mfile_upollconnect, handle_mfile_pollconnect);
 DEFINE_PUBLIC_ALIAS(mfile_upolltest, handle_mfile_polltest);
 DEFINE_PUBLIC_ALIAS(mfile_uhop, handle_mfile_hop);
+DEFINE_PUBLIC_ALIAS(mfile_utryas, handle_mfile_tryas);
 
 
 /* DATABLOCK HANDLE OPERATIONS */
@@ -176,6 +177,28 @@ handle_mfile_write(struct mfile *__restrict self,
 		}
 	}
 	if likely((mode & IO_APPEND) && !(self->mf_flags & MFILE_F_NOUSRIO))
+		return mfile_tailwrite(self, src, num_bytes);
+	THROW(E_FSERROR_UNSUPPORTED_OPERATION,
+	      E_FILESYSTEM_OPERATION_WRITE);
+}
+
+PUBLIC WUNUSED NONNULL((1)) size_t KCALL
+mfile_utailwrite(struct mfile *__restrict self,
+                 USER CHECKED void const *src,
+                 size_t num_bytes, iomode_t mode)
+		THROWS(...) {
+	struct mfile_stream_ops const *stream;
+	stream = self->mf_ops->mo_stream;
+	if likely(stream != NULL) {
+		if likely(stream->mso_write)
+			return (*stream->mso_write)(self, src, num_bytes, mode | IO_APPEND);
+		if likely(stream->mso_writev) {
+			struct iov_buffer iov;
+			iov_buffer_initone(&iov, src, num_bytes);
+			return (*stream->mso_writev)(self, &iov, num_bytes, mode | IO_APPEND);
+		}
+	}
+	if likely(!(self->mf_flags & MFILE_F_NOUSRIO))
 		return mfile_tailwrite(self, src, num_bytes);
 	THROW(E_FSERROR_UNSUPPORTED_OPERATION,
 	      E_FILESYSTEM_OPERATION_WRITE);
@@ -321,6 +344,52 @@ done_write:
 			return result;
 		}
 	}
+	if likely(!(self->mf_flags & MFILE_F_NOUSRIO) && (mode & IO_APPEND))
+		return mfile_tailwritev(self, src, 0, num_bytes);
+	THROW(E_FSERROR_UNSUPPORTED_OPERATION,
+	      E_FILESYSTEM_OPERATION_WRITE);
+}
+
+PUBLIC WUNUSED NONNULL((1, 2)) size_t KCALL
+mfile_utailwritev(struct mfile *__restrict self,
+                  struct iov_buffer *__restrict src,
+                  size_t num_bytes, iomode_t mode)
+		THROWS(...) {
+	struct mfile_stream_ops const *stream;
+	stream = self->mf_ops->mo_stream;
+	if likely(stream != NULL) {
+		if (stream->mso_writev)
+			return (*stream->mso_writev)(self, src, num_bytes, mode | IO_APPEND);
+		if (stream->mso_write) {
+			size_t result = 0;
+			struct iov_entry ent;
+			IOV_BUFFER_FOREACH(ent, src) {
+				size_t part;
+				if (!ent.ive_size)
+					continue;
+				TRY {
+					part = (*stream->mso_write)(self, ent.ive_base,
+					                            ent.ive_size,
+					                            mode | IO_APPEND);
+				} EXCEPT {
+					if ((was_thrown(E_INTERRUPT_USER_RPC) ||
+					     was_thrown(E_WOULDBLOCK)) &&
+					    result != 0)
+						goto done_write;
+					RETHROW();
+				}
+				result += part;
+				if (part < ent.ive_size)
+					break;
+				/* Don't block for the remainder */
+				mode |= IO_NONBLOCK | IO_NODATAZERO;
+			}
+done_write:
+			return result;
+		}
+	}
+	if likely(!(self->mf_flags & MFILE_F_NOUSRIO))
+		return mfile_tailwritev(self, src, 0, num_bytes);
 	THROW(E_FSERROR_UNSUPPORTED_OPERATION,
 	      E_FILESYSTEM_OPERATION_WRITE);
 }
@@ -714,6 +783,19 @@ handle_mfile_hop(struct mfile *__restrict self,
 	      E_INVALID_ARGUMENT_CONTEXT_HOP_COMMAND,
 	      cmd);
 }
+
+INTERN NONNULL((1)) REF void *KCALL
+handle_mfile_tryas(struct mfile *__restrict self,
+                   uintptr_half_t wanted_type)
+		THROWS(E_WOULDBLOCK) {
+	struct mfile_stream_ops const *stream;
+	assert(wanted_type != HANDLE_TYPE_MFILE);
+	stream = self->mf_ops->mo_stream;
+	if (stream && stream->mso_tryas)
+		return (*stream->mso_tryas)(self, wanted_type);
+	return NULL;
+}
+
 
 DECL_END
 
