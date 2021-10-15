@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd984997c */
+/* HASH CRC-32:0x8f4e4e13 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1452,15 +1452,15 @@ __CDECLARE_SC(,__errno_t,olduname,(struct linux_olduname *__name),(__name))
  * When  `oflags & O_CREAT',   then  `mode'   specifies  the   initial
  * file  access  permissions with  which  the file  should  be opened.
  * On KOS, the returned handle can be anything, but is usually one of:
- *   - HANDLE_TYPE_PATH:                   When `O_PATH' was given
- *   - HANDLE_TYPE_BLOCKDEVICE:            For `S_IFBLK' files
- *   - HANDLE_TYPE_CHARACTERDEVICE:        For `S_IFCHR' files (in this case, `O_NOCTTY' gains meaning)
- *   - HANDLE_TYPE_FIFO_USER:              For `S_IFIFO' files
- *   - HANDLE_TYPE_MFILE:                  For `S_IFLNK' files (only when `O_SYMLINK' was given)
- *   - HANDLE_TYPE_ONESHOT_DIRECTORY_FILE: For `S_IFDIR' files from special one-shot directories
- *   - HANDLE_TYPE_FILEHANDLE:             For `S_IFREG' and `S_IFDIR' (~normal~) files
- *   - *:                                  Certain filesystem names can literally return anything, such
- *                                         as `/proc/self/fd/1234',  which  is  more  like  `dup(1234)' */
+ *   - HANDLE_TYPE_PATH:            When `O_PATH' was given
+ *   - HANDLE_TYPE_BLOCKDEVICE:     For `S_IFBLK' files
+ *   - HANDLE_TYPE_CHARACTERDEVICE: For `S_IFCHR' files (in this case, `O_NOCTTY' gains meaning)
+ *   - HANDLE_TYPE_FIFO_USER:       For `S_IFIFO' files
+ *   - HANDLE_TYPE_MFILE:           For `S_IFLNK' files (only when `O_SYMLINK' was given)
+ *   - HANDLE_TYPE_DIRHANDLE:       For `S_IFDIR' files from special one-shot directories
+ *   - HANDLE_TYPE_FILEHANDLE:      For `S_IFREG' and `S_IFDIR' (~normal~) files
+ *   - *:                           Certain filesystem names can literally return anything, such
+ *                                  as `/proc/self/fd/1234',  which  is  more  like  `dup(1234)' */
 __CDECLARE_SC(,__fd_t,open,(char const *__filename, __oflag_t __oflags, __mode_t __mode),(__filename,__oflags,__mode))
 #endif /* __CRT_HAVE_SC(open) */
 #if __CRT_HAVE_SC(open_by_handle_at)
@@ -1474,15 +1474,15 @@ __CDECLARE_SC(,__errno_t,open_tree,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
  * When  `oflags & O_CREAT',   then  `mode'   specifies  the   initial
  * file  access  permissions with  which  the file  should  be opened.
  * On KOS, the returned handle can be anything, but is usually one of:
- *   - HANDLE_TYPE_PATH:                   When `O_PATH' was given
- *   - HANDLE_TYPE_BLOCKDEVICE:            For `S_IFBLK' files
- *   - HANDLE_TYPE_CHARACTERDEVICE:        For `S_IFCHR' files (in this case, `O_NOCTTY' gains meaning)
- *   - HANDLE_TYPE_FIFO_USER:              For `S_IFIFO' files
- *   - HANDLE_TYPE_MFILE:                  For `S_IFLNK' files (only when `O_SYMLINK' was given)
- *   - HANDLE_TYPE_ONESHOT_DIRECTORY_FILE: For `S_IFDIR' files from special one-shot directories
- *   - HANDLE_TYPE_FILEHANDLE:             For `S_IFREG' and `S_IFDIR' (~normal~) files
- *   - *:                                  Certain filesystem names can literally return anything, such
- *                                         as `/proc/self/fd/1234',  which  is  more  like  `dup(1234)' */
+ *   - HANDLE_TYPE_PATH:            When `O_PATH' was given
+ *   - HANDLE_TYPE_BLOCKDEVICE:     For `S_IFBLK' files
+ *   - HANDLE_TYPE_CHARACTERDEVICE: For `S_IFCHR' files (in this case, `O_NOCTTY' gains meaning)
+ *   - HANDLE_TYPE_FIFO_USER:       For `S_IFIFO' files
+ *   - HANDLE_TYPE_MFILE:           For `S_IFLNK' files (only when `O_SYMLINK' was given)
+ *   - HANDLE_TYPE_DIRHANDLE:       For `S_IFDIR' files from special one-shot directories
+ *   - HANDLE_TYPE_FILEHANDLE:      For `S_IFREG' and `S_IFDIR' (~normal~) files
+ *   - *:                           Certain filesystem names can literally return anything, such
+ *                                  as `/proc/self/fd/1234',  which  is  more  like  `dup(1234)' */
 __CDECLARE_SC(,__fd_t,openat,(__fd_t __dirfd, char const *__filename, __oflag_t __oflags, __mode_t __mode),(__dirfd,__filename,__oflags,__mode))
 #endif /* __CRT_HAVE_SC(openat) */
 #if __CRT_HAVE_SC(openat2)
@@ -3999,15 +3999,15 @@ __CDECLARE_XSC(,__errno_t,olduname,(struct linux_olduname *__name),(__name))
  * When  `oflags & O_CREAT',   then  `mode'   specifies  the   initial
  * file  access  permissions with  which  the file  should  be opened.
  * On KOS, the returned handle can be anything, but is usually one of:
- *   - HANDLE_TYPE_PATH:                   When `O_PATH' was given
- *   - HANDLE_TYPE_BLOCKDEVICE:            For `S_IFBLK' files
- *   - HANDLE_TYPE_CHARACTERDEVICE:        For `S_IFCHR' files (in this case, `O_NOCTTY' gains meaning)
- *   - HANDLE_TYPE_FIFO_USER:              For `S_IFIFO' files
- *   - HANDLE_TYPE_MFILE:                  For `S_IFLNK' files (only when `O_SYMLINK' was given)
- *   - HANDLE_TYPE_ONESHOT_DIRECTORY_FILE: For `S_IFDIR' files from special one-shot directories
- *   - HANDLE_TYPE_FILEHANDLE:             For `S_IFREG' and `S_IFDIR' (~normal~) files
- *   - *:                                  Certain filesystem names can literally return anything, such
- *                                         as `/proc/self/fd/1234',  which  is  more  like  `dup(1234)' */
+ *   - HANDLE_TYPE_PATH:            When `O_PATH' was given
+ *   - HANDLE_TYPE_BLOCKDEVICE:     For `S_IFBLK' files
+ *   - HANDLE_TYPE_CHARACTERDEVICE: For `S_IFCHR' files (in this case, `O_NOCTTY' gains meaning)
+ *   - HANDLE_TYPE_FIFO_USER:       For `S_IFIFO' files
+ *   - HANDLE_TYPE_MFILE:           For `S_IFLNK' files (only when `O_SYMLINK' was given)
+ *   - HANDLE_TYPE_DIRHANDLE:       For `S_IFDIR' files from special one-shot directories
+ *   - HANDLE_TYPE_FILEHANDLE:      For `S_IFREG' and `S_IFDIR' (~normal~) files
+ *   - *:                           Certain filesystem names can literally return anything, such
+ *                                  as `/proc/self/fd/1234',  which  is  more  like  `dup(1234)' */
 __CDECLARE_XSC(,__fd_t,open,(char const *__filename, __oflag_t __oflags, __mode_t __mode),(__filename,__oflags,__mode))
 #endif /* __CRT_HAVE_XSC(open) */
 #if __CRT_HAVE_XSC(open_by_handle_at)
@@ -4021,15 +4021,15 @@ __CDECLARE_XSC(,__errno_t,open_tree,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
  * When  `oflags & O_CREAT',   then  `mode'   specifies  the   initial
  * file  access  permissions with  which  the file  should  be opened.
  * On KOS, the returned handle can be anything, but is usually one of:
- *   - HANDLE_TYPE_PATH:                   When `O_PATH' was given
- *   - HANDLE_TYPE_BLOCKDEVICE:            For `S_IFBLK' files
- *   - HANDLE_TYPE_CHARACTERDEVICE:        For `S_IFCHR' files (in this case, `O_NOCTTY' gains meaning)
- *   - HANDLE_TYPE_FIFO_USER:              For `S_IFIFO' files
- *   - HANDLE_TYPE_MFILE:                  For `S_IFLNK' files (only when `O_SYMLINK' was given)
- *   - HANDLE_TYPE_ONESHOT_DIRECTORY_FILE: For `S_IFDIR' files from special one-shot directories
- *   - HANDLE_TYPE_FILEHANDLE:             For `S_IFREG' and `S_IFDIR' (~normal~) files
- *   - *:                                  Certain filesystem names can literally return anything, such
- *                                         as `/proc/self/fd/1234',  which  is  more  like  `dup(1234)' */
+ *   - HANDLE_TYPE_PATH:            When `O_PATH' was given
+ *   - HANDLE_TYPE_BLOCKDEVICE:     For `S_IFBLK' files
+ *   - HANDLE_TYPE_CHARACTERDEVICE: For `S_IFCHR' files (in this case, `O_NOCTTY' gains meaning)
+ *   - HANDLE_TYPE_FIFO_USER:       For `S_IFIFO' files
+ *   - HANDLE_TYPE_MFILE:           For `S_IFLNK' files (only when `O_SYMLINK' was given)
+ *   - HANDLE_TYPE_DIRHANDLE:       For `S_IFDIR' files from special one-shot directories
+ *   - HANDLE_TYPE_FILEHANDLE:      For `S_IFREG' and `S_IFDIR' (~normal~) files
+ *   - *:                           Certain filesystem names can literally return anything, such
+ *                                  as `/proc/self/fd/1234',  which  is  more  like  `dup(1234)' */
 __CDECLARE_XSC(,__fd_t,openat,(__fd_t __dirfd, char const *__filename, __oflag_t __oflags, __mode_t __mode),(__dirfd,__filename,__oflags,__mode))
 #endif /* __CRT_HAVE_XSC(openat) */
 #if __CRT_HAVE_XSC(openat2)

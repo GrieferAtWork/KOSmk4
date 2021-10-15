@@ -50,41 +50,41 @@
  * NOTE: Changes to this list must be updated with:
  * $ deemon -F kos/src/kernel/core/user/handle-router.c kos/src/kernel/include/kernel/handle-proto.h && touch kos/src/kernel/include/kernel/handle.h
  */
-#define HANDLE_TYPE_UNDEFINED              0x0000 /* Undefined/unused handle */
-#define HANDLE_TYPE_FILEHANDLE             0x0001 /* `struct filehandle'
-                                                   * Castable into: HANDLE_TYPE_PATH, HANDLE_TYPE_MFILE, HANDLE_TYPE_DIRECTORYENTRY */
-#define HANDLE_TYPE_SOCKET                 0x0002 /* `struct socket' */
-#define HANDLE_TYPE_EPOLL                  0x0003 /* `struct epoll_controller' */
-#define HANDLE_TYPE_PIPE                   0x0004 /* `struct pipe' */
-#define HANDLE_TYPE_PIPE_READER            0x0005 /* `struct pipe_reader' */
-#define HANDLE_TYPE_PIPE_WRITER            0x0006 /* `struct pipe_writer' */
-#define HANDLE_TYPE_FIFO_USER              0x0007 /* `struct fifo_user' */
-#define HANDLE_TYPE_EVENTFD_FENCE          0x0008 /* `struct eventfd' (without `EFD_SEMAPHORE') */
-#define HANDLE_TYPE_EVENTFD_SEMA           0x0009 /* `struct eventfd' (with `EFD_SEMAPHORE') */
-#define HANDLE_TYPE_SIGNALFD               0x000a /* `struct signalfd' */
-#define HANDLE_TYPE_FUTEX                  0x000b /* `struct mfutex' */
-#define HANDLE_TYPE_FUTEXFD                0x000c /* `struct mfutexfd' */
-#define HANDLE_TYPE_ONESHOT_DIRECTORY_FILE 0x000d /* `struct oneshot_directory_file'
-                                                   * Castable into: HANDLE_TYPE_PATH, HANDLE_TYPE_MFILE, HANDLE_TYPE_DIRECTORYENTRY */
-#define HANDLE_TYPE_MFILE                  0x000e /* `struct mfile' (also includes `struct inode') */
-#define HANDLE_TYPE_BLOCKDEVICE            0x000f /* `struct basic_block_device' */
-#define HANDLE_TYPE_DIRECTORYENTRY         0x0010 /* `struct directory_entry' */
-#define HANDLE_TYPE_PATH                   0x0011 /* `struct path' (also includes `struct vfs')
-                                                   * Castable into: HANDLE_TYPE_MFILE, HANDLE_TYPE_DIRECTORYENTRY */
-#define HANDLE_TYPE_FS                     0x0012 /* `struct fs' */
-#define HANDLE_TYPE_MMAN                   0x0013 /* `struct mman' */
-#define HANDLE_TYPE_TASK                   0x0014 /* `struct taskpid'
-                                                   * Castable into: HANDLE_TYPE_FS, HANDLE_TYPE_MMAN, HANDLE_TYPE_PIDNS */
-#define HANDLE_TYPE_MODULE                 0x0015 /* `struct module' */
-#define HANDLE_TYPE_PIDNS                  0x0016 /* `struct pidns' */
-#define HANDLE_TYPE_DRIVER_LOADLIST        0x0017 /* `struct driver_loadlist' */
-#define HANDLE_TYPE_CHARACTERDEVICE        0x0018 /* `struct character_device'
-                                                   * Castable into: HANDLE_TYPE_MFILE (if supported) */
-#define HANDLE_TYPE_MPART                  0x0019 /* `struct mpart' */
-#define HANDLE_TYPE_MODULE_SECTION         0x001a /* `struct module_section' */
-#define HANDLE_TYPE_COUNT                  0x001b /* # of recognized handle types
-                                                   * NOTE: After changing  this value,  be sure  to
-                                                   * `touch kos/src/kernel/include/kernel/handle.h' */
+#define HANDLE_TYPE_UNDEFINED       0x0000 /* Undefined/unused handle */
+#define HANDLE_TYPE_FILEHANDLE      0x0001 /* `struct filehandle'
+                                            * Castable into: HANDLE_TYPE_PATH, HANDLE_TYPE_MFILE, HANDLE_TYPE_DIRECTORYENTRY */
+#define HANDLE_TYPE_SOCKET          0x0002 /* `struct socket' */
+#define HANDLE_TYPE_EPOLL           0x0003 /* `struct epoll_controller' */
+#define HANDLE_TYPE_PIPE            0x0004 /* `struct pipe' */
+#define HANDLE_TYPE_PIPE_READER     0x0005 /* `struct pipe_reader' */
+#define HANDLE_TYPE_PIPE_WRITER     0x0006 /* `struct pipe_writer' */
+#define HANDLE_TYPE_FIFO_USER       0x0007 /* `struct fifo_user' */
+#define HANDLE_TYPE_EVENTFD_FENCE   0x0008 /* `struct eventfd' (without `EFD_SEMAPHORE') */
+#define HANDLE_TYPE_EVENTFD_SEMA    0x0009 /* `struct eventfd' (with `EFD_SEMAPHORE') */
+#define HANDLE_TYPE_SIGNALFD        0x000a /* `struct signalfd' */
+#define HANDLE_TYPE_FUTEX           0x000b /* `struct mfutex' */
+#define HANDLE_TYPE_FUTEXFD         0x000c /* `struct mfutexfd' */
+#define HANDLE_TYPE_DIRHANDLE       0x000d /* `struct dirhandle'
+                                            * Castable into: HANDLE_TYPE_PATH, HANDLE_TYPE_MFILE, HANDLE_TYPE_DIRECTORYENTRY */
+#define HANDLE_TYPE_MFILE           0x000e /* `struct mfile' (also includes `struct inode') */
+#define HANDLE_TYPE_BLOCKDEVICE     0x000f /* `struct basic_block_device' */
+#define HANDLE_TYPE_DIRECTORYENTRY  0x0010 /* `struct directory_entry' */
+#define HANDLE_TYPE_PATH            0x0011 /* `struct path' (also includes `struct vfs')
+                                            * Castable into: HANDLE_TYPE_MFILE, HANDLE_TYPE_DIRECTORYENTRY */
+#define HANDLE_TYPE_FS              0x0012 /* `struct fs' */
+#define HANDLE_TYPE_MMAN            0x0013 /* `struct mman' */
+#define HANDLE_TYPE_TASK            0x0014 /* `struct taskpid'
+                                            * Castable into: HANDLE_TYPE_FS, HANDLE_TYPE_MMAN, HANDLE_TYPE_PIDNS */
+#define HANDLE_TYPE_MODULE          0x0015 /* `struct module' */
+#define HANDLE_TYPE_PIDNS           0x0016 /* `struct pidns' */
+#define HANDLE_TYPE_DRIVER_LOADLIST 0x0017 /* `struct driver_loadlist' */
+#define HANDLE_TYPE_CHARACTERDEVICE 0x0018 /* `struct character_device'
+                                            * Castable into: HANDLE_TYPE_MFILE (if supported) */
+#define HANDLE_TYPE_MPART           0x0019 /* `struct mpart' */
+#define HANDLE_TYPE_MODULE_SECTION  0x001a /* `struct module_section' */
+#define HANDLE_TYPE_COUNT           0x001b /* # of recognized handle types
+                                            * NOTE: After changing  this value,  be sure  to
+                                            * `touch kos/src/kernel/include/kernel/handle.h' */
 
 /* TODO: For CONFIG_USE_NEW_FS:
  *    - Rename `HANDLE_TYPE_DIRECTORYENTRY' -> `HANDLE_TYPE_DIRENT'
@@ -92,28 +92,28 @@
  *    - Remove `HANDLE_TYPE_CHARACTERDEVICE' (merged with `HANDLE_TYPE_MFILE') */
 
 /* Invoke `cb(int HANDLE_TYPE, typename T)' for each handle type with an associated struct */
-#define HANDLE_FOREACH_TYPE(cb)                                           \
-	cb(HANDLE_TYPE_MFILE, struct mfile)                                   \
-	cb(HANDLE_TYPE_BLOCKDEVICE, struct basic_block_device)                \
-	cb(HANDLE_TYPE_DIRECTORYENTRY, struct directory_entry)                \
-	cb(HANDLE_TYPE_FILEHANDLE, struct filehandle)                         \
-	cb(HANDLE_TYPE_ONESHOT_DIRECTORY_FILE, struct oneshot_directory_file) \
-	cb(HANDLE_TYPE_PATH, struct path)                                     \
-	cb(HANDLE_TYPE_FS, struct fs)                                         \
-	cb(HANDLE_TYPE_MMAN, struct mman)                                     \
-	cb(HANDLE_TYPE_TASK, struct taskpid)                                  \
-	cb(HANDLE_TYPE_MODULE, struct driver)                                 \
-	cb(HANDLE_TYPE_PIPE, struct pipe)                                     \
-	cb(HANDLE_TYPE_PIPE_READER, struct pipe_reader)                       \
-	cb(HANDLE_TYPE_PIPE_WRITER, struct pipe_writer)                       \
-	cb(HANDLE_TYPE_PIDNS, struct pidns)                                   \
-	cb(HANDLE_TYPE_DRIVER_LOADLIST, struct driver_state)                  \
-	cb(HANDLE_TYPE_CHARACTERDEVICE, struct character_device)              \
-	cb(HANDLE_TYPE_SIGNALFD, struct signalfd)                             \
-	cb(HANDLE_TYPE_MPART, struct mpart)                                   \
-	cb(HANDLE_TYPE_FUTEX, struct mfutex)                                  \
-	cb(HANDLE_TYPE_FUTEXFD, struct mfutexfd)                              \
-	cb(HANDLE_TYPE_MODULE_SECTION, struct driver_section)                 \
+#define HANDLE_FOREACH_TYPE(cb)                              \
+	cb(HANDLE_TYPE_MFILE, struct mfile)                      \
+	cb(HANDLE_TYPE_BLOCKDEVICE, struct basic_block_device)   \
+	cb(HANDLE_TYPE_DIRECTORYENTRY, struct directory_entry)   \
+	cb(HANDLE_TYPE_FILEHANDLE, struct filehandle)            \
+	cb(HANDLE_TYPE_DIRHANDLE, struct dirhandle)              \
+	cb(HANDLE_TYPE_PATH, struct path)                        \
+	cb(HANDLE_TYPE_FS, struct fs)                            \
+	cb(HANDLE_TYPE_MMAN, struct mman)                        \
+	cb(HANDLE_TYPE_TASK, struct taskpid)                     \
+	cb(HANDLE_TYPE_MODULE, struct driver)                    \
+	cb(HANDLE_TYPE_PIPE, struct pipe)                        \
+	cb(HANDLE_TYPE_PIPE_READER, struct pipe_reader)          \
+	cb(HANDLE_TYPE_PIPE_WRITER, struct pipe_writer)          \
+	cb(HANDLE_TYPE_PIDNS, struct pidns)                      \
+	cb(HANDLE_TYPE_DRIVER_LOADLIST, struct driver_state)     \
+	cb(HANDLE_TYPE_CHARACTERDEVICE, struct character_device) \
+	cb(HANDLE_TYPE_SIGNALFD, struct signalfd)                \
+	cb(HANDLE_TYPE_MPART, struct mpart)                      \
+	cb(HANDLE_TYPE_FUTEX, struct mfutex)                     \
+	cb(HANDLE_TYPE_FUTEXFD, struct mfutexfd)                 \
+	cb(HANDLE_TYPE_MODULE_SECTION, struct driver_section)    \
 	cb(HANDLE_TYPE_SOCKET, struct socket)
 
 /* Invoke `cb(int HANDLE_TYPE, typename T)' for each handle  type

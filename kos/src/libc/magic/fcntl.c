@@ -1659,15 +1659,15 @@ $fd_t open32([[nonnull]] char const *filename, $oflag_t oflags, ...);
 @@When  `oflags & O_CREAT',   then  `mode'   specifies  the   initial
 @@file  access  permissions with  which  the file  should  be opened.
 @@On KOS, the returned handle can be anything, but is usually one of:
-@@  - HANDLE_TYPE_PATH:                   When `O_PATH' was given
-@@  - HANDLE_TYPE_BLOCKDEVICE:            For `S_IFBLK' files
-@@  - HANDLE_TYPE_CHARACTERDEVICE:        For `S_IFCHR' files (in this case, `O_NOCTTY' gains meaning)
-@@  - HANDLE_TYPE_FIFO_USER:              For `S_IFIFO' files
-@@  - HANDLE_TYPE_MFILE:                  For `S_IFLNK' files (only when `O_SYMLINK' was given)
-@@  - HANDLE_TYPE_ONESHOT_DIRECTORY_FILE: For `S_IFDIR' files from special one-shot directories
-@@  - HANDLE_TYPE_FILEHANDLE:             For `S_IFREG' and `S_IFDIR' (~normal~) files
-@@  - *:                                  Certain filesystem names can literally return anything, such
-@@                                        as `/proc/self/fd/1234',  which  is  more  like  `dup(1234)'
+@@  - HANDLE_TYPE_PATH:            When `O_PATH' was given
+@@  - HANDLE_TYPE_BLOCKDEVICE:     For `S_IFBLK' files
+@@  - HANDLE_TYPE_CHARACTERDEVICE: For `S_IFCHR' files (in this case, `O_NOCTTY' gains meaning)
+@@  - HANDLE_TYPE_FIFO_USER:       For `S_IFIFO' files
+@@  - HANDLE_TYPE_MFILE:           For `S_IFLNK' files (only when `O_SYMLINK' was given)
+@@  - HANDLE_TYPE_DIRHANDLE:       For `S_IFDIR' files from special one-shot directories
+@@  - HANDLE_TYPE_FILEHANDLE:      For `S_IFREG' and `S_IFDIR' (~normal~) files
+@@  - *:                           Certain filesystem names can literally return anything, such
+@@                                 as `/proc/self/fd/1234',  which  is  more  like  `dup(1234)'
 [[cp, guard, wunused, vartypes($mode_t), no_crt_self_import]]
 [[if($extended_include_prefix("<features.h>", "<asm/os/oflags.h>")!defined(__USE_FILE_OFFSET64) || !defined(__O_LARGEFILE) || (__O_LARGEFILE+0) == 0), alias("open", "_open", "__open")]]
 [[                                                                                                                                                     alias("open64", "__open64")]]

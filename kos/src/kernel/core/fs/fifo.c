@@ -61,7 +61,7 @@ ringbuffer_pipe_hop(struct ringbuffer *__restrict self,
  * Called from:
  *    - HANDLE_TYPE_MFILE   (When describing a `struct fifo_node *')
  *    - HANDLE_TYPE_FILEHANDLE
- *    - HANDLE_TYPE_ONESHOT_DIRECTORY_FILE
+ *    - HANDLE_TYPE_DIRHANDLE
  *    - HANDLE_TYPE_FIFO_USER
  * This hop-backend implements command codes normally reserved for pipe
  * objects, thus allowing user-space to  make use of pipe hop  commands

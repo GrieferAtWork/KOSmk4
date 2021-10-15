@@ -183,7 +183,7 @@ NOTHROW(KCALL handle_isdirectory)(struct handle self) {
 			return true;
 	}	break;
 
-	case HANDLE_TYPE_ONESHOT_DIRECTORY_FILE:
+	case HANDLE_TYPE_DIRHANDLE:
 	case HANDLE_TYPE_PATH:
 		return true;
 
@@ -456,11 +456,11 @@ check_result_inode_for_symlink:
 				/* Create a file handle from all of the gathered object pointers. */
 				switch (result_inode->i_filemode & S_IFMT) {
 
-					STATIC_ASSERT(offsetof(struct oneshot_directory_file, d_refcnt) == offsetof(struct filehandle, f_refcnt));
-					STATIC_ASSERT(offsetof(struct oneshot_directory_file, d_node) == offsetof(struct filehandle, f_node));
-					STATIC_ASSERT(offsetof(struct oneshot_directory_file, d_path) == offsetof(struct filehandle, f_path));
-					STATIC_ASSERT(offsetof(struct oneshot_directory_file, d_dirent) == offsetof(struct filehandle, f_dirent));
-					STATIC_ASSERT(offsetof(struct oneshot_directory_file, d_offset) == offsetof(struct filehandle, f_offset));
+					STATIC_ASSERT(offsetof(struct dirhandle, d_refcnt) == offsetof(struct filehandle, f_refcnt));
+					STATIC_ASSERT(offsetof(struct dirhandle, d_node) == offsetof(struct filehandle, f_node));
+					STATIC_ASSERT(offsetof(struct dirhandle, d_path) == offsetof(struct filehandle, f_path));
+					STATIC_ASSERT(offsetof(struct dirhandle, d_dirent) == offsetof(struct filehandle, f_dirent));
+					STATIC_ASSERT(offsetof(struct dirhandle, d_offset) == offsetof(struct filehandle, f_offset));
 
 				case S_IFBLK: {
 					/* Open the associated block-device. */
@@ -552,9 +552,9 @@ open_result_inode:
 
 				case S_IFDIR:
 					if (!result_inode->i_type->it_directory.d_readdir) {
-						REF struct oneshot_directory_file *result_file;
+						REF struct dirhandle *result_file;
 						/* Need to return a one-shot-directory-file object. */
-						result_file = (REF struct oneshot_directory_file *)kmalloc(sizeof(REF struct oneshot_directory_file),
+						result_file = (REF struct dirhandle *)kmalloc(sizeof(REF struct dirhandle),
 						                                                           GFP_PREFLT);
 						result_file->d_refcnt = 1;
 						result_file->d_node   = (REF struct directory_node *)result_inode; /* Inherit reference */
@@ -566,7 +566,7 @@ open_result_inode:
 						result_file->d_curent = NULL;
 						result_file->d_curbuf = NULL;
 						result_file->d_buf    = NULL;
-						result.h_type  = HANDLE_TYPE_ONESHOT_DIRECTORY_FILE;
+						result.h_type  = HANDLE_TYPE_DIRHANDLE;
 						result.h_data  = result_file;
 						decref_unlikely(result_containing_directory);
 						break;

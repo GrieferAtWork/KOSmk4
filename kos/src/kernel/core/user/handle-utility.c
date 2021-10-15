@@ -193,7 +193,7 @@ handle_datasize(struct handle const *__restrict self,
 	}	break;
 
 	case HANDLE_TYPE_FILEHANDLE:
-	case HANDLE_TYPE_ONESHOT_DIRECTORY_FILE: {
+	case HANDLE_TYPE_DIRHANDLE: {
 		struct filehandle *me;
 		me = (struct filehandle *)self->h_data;
 		inode_loadattr(me->f_node);
@@ -340,8 +340,8 @@ handle_print(struct handle const *__restrict self,
 		}
 	}	break;
 
-	case HANDLE_TYPE_ONESHOT_DIRECTORY_FILE: {
-		struct oneshot_directory_file *f = (struct oneshot_directory_file *)self->h_data;
+	case HANDLE_TYPE_DIRHANDLE: {
+		struct dirhandle *f = (struct dirhandle *)self->h_data;
 		if (f->d_path && f->d_dirent) {
 			result = path_printent(f->d_path,
 			                       f->d_dirent->de_name,

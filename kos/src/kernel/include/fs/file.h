@@ -64,8 +64,8 @@ DEFINE_REFCOUNT_FUNCTIONS(struct filehandle, f_refcnt, filehandle_destroy)
  *    entries  that will  ever show  up _once_  during the first
  *   `readdir()' operation. */
 struct oneshot_directory_buffer;
-struct oneshot_directory_file {
-	/* [HANDLE_TYPE(HANDLE_TYPE_ONESHOT_DIRECTORY_FILE)] */
+struct dirhandle {
+	/* [HANDLE_TYPE(HANDLE_TYPE_DIRHANDLE)] */
 	WEAK refcnt_t                    d_refcnt; /* File reference counter. */
 	REF struct directory_node       *d_node;   /* [1..1] The opened directory INode. */
 	REF struct path                 *d_path;   /* [0..1] The path from which `d_node' was opened. */
@@ -79,8 +79,8 @@ struct oneshot_directory_file {
 };
 
 /* Destroy the given oneshot-directory-file object. */
-FUNDEF NOBLOCK void NOTHROW(KCALL oneshot_directory_file_destroy)(struct oneshot_directory_file *__restrict self);
-DEFINE_REFCOUNT_FUNCTIONS(struct oneshot_directory_file, d_refcnt, oneshot_directory_file_destroy)
+FUNDEF NOBLOCK void NOTHROW(KCALL dirhandle_destroy)(struct dirhandle *__restrict self);
+DEFINE_REFCOUNT_FUNCTIONS(struct dirhandle, d_refcnt, dirhandle_destroy)
 
 
 

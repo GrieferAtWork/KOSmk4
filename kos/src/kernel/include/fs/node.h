@@ -171,7 +171,7 @@ struct inode_type {
 		 * >>     THROW(E_NOT_IMPLEMENTED_TODO);
 		 * >> } else {
 		 * >>     if (s_ISDIR(self->i_filemode) && result_inode->i_type->it_directory.d_readdir)
-		 * >>         return { HANDLE_TYPE_ONESHOT_DIRECTORY_FILE, ... };
+		 * >>         return { HANDLE_TYPE_DIRHANDLE, ... };
 		 * >>     return { HANDLE_TYPE_FILEHANDLE, ... };
 		 * >> }
 		 * @param: self:                 The INode that is being accessed.

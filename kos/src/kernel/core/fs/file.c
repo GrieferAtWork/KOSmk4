@@ -81,7 +81,7 @@ NOTHROW(KCALL translate_read_exceptions)(struct filehandle *__restrict self) {
 	}
 }
 
-DEFINE_HANDLE_REFCNT_FUNCTIONS(file, struct filehandle);
+DEFINE_HANDLE_REFCNT_FUNCTIONS(filehandle, struct filehandle);
 INTERN size_t KCALL
 handle_filehandle_read(struct filehandle *__restrict self,
                  USER CHECKED void *dst,
@@ -802,7 +802,7 @@ oneshot_getentries(struct directory_node *__restrict node) {
 
 
 PUBLIC NOBLOCK void
-NOTHROW(KCALL oneshot_directory_file_destroy)(struct oneshot_directory_file *__restrict self) {
+NOTHROW(KCALL dirhandle_destroy)(struct dirhandle *__restrict self) {
 	if (self->d_buf)
 		oneshot_freeentries(self->d_buf);
 	decref(self->d_node);
@@ -813,7 +813,7 @@ NOTHROW(KCALL oneshot_directory_file_destroy)(struct oneshot_directory_file *__r
 
 
 INTERN size_t KCALL
-handle_oneshot_directory_file_readdir(struct oneshot_directory_file *__restrict self,
+handle_dirhandle_readdir(struct dirhandle *__restrict self,
                                       USER CHECKED struct dirent *buf,
                                       size_t bufsize,
                                       readdir_mode_t readdir_mode,
@@ -994,36 +994,36 @@ read_entry_pos_0:
 	return result;
 }
 
-DEFINE_HANDLE_REFCNT_FUNCTIONS(oneshot_directory_file, struct oneshot_directory_file);
+DEFINE_HANDLE_REFCNT_FUNCTIONS(dirhandle, struct dirhandle);
 /* TODO: Other handle operators */
 
-DEFINE_INTERN_ALIAS(handle_oneshot_directory_file_read, handle_filehandle_read);
-DEFINE_INTERN_ALIAS(handle_oneshot_directory_file_write, handle_filehandle_write);
-DEFINE_INTERN_ALIAS(handle_oneshot_directory_file_pread, handle_filehandle_pread);
-DEFINE_INTERN_ALIAS(handle_oneshot_directory_file_pwrite, handle_filehandle_pwrite);
-DEFINE_INTERN_ALIAS(handle_oneshot_directory_file_readv, handle_filehandle_readv);
-DEFINE_INTERN_ALIAS(handle_oneshot_directory_file_writev, handle_filehandle_writev);
-DEFINE_INTERN_ALIAS(handle_oneshot_directory_file_preadv, handle_filehandle_preadv);
-DEFINE_INTERN_ALIAS(handle_oneshot_directory_file_pwritev, handle_filehandle_pwritev);
-DEFINE_INTERN_ALIAS(handle_oneshot_directory_file_mmap, handle_filehandle_mmap);
-DEFINE_INTERN_ALIAS(handle_oneshot_directory_file_sync, handle_filehandle_sync);
-DEFINE_INTERN_ALIAS(handle_oneshot_directory_file_datasync, handle_filehandle_datasync);
-DEFINE_INTERN_ALIAS(handle_oneshot_directory_file_pollconnect, handle_filehandle_pollconnect);
-DEFINE_INTERN_ALIAS(handle_oneshot_directory_file_polltest, handle_filehandle_polltest);
-DEFINE_INTERN_ALIAS(handle_oneshot_directory_file_stat, handle_filehandle_stat);
-DEFINE_INTERN_ALIAS(handle_oneshot_directory_file_ioctl, handle_filehandle_ioctl);
-DEFINE_INTERN_ALIAS(handle_oneshot_directory_file_hop, handle_filehandle_hop);
-DEFINE_INTERN_ALIAS(handle_oneshot_directory_file_seek, handle_filehandle_seek);
-DEFINE_INTERN_ALIAS(handle_oneshot_directory_file_truncate, handle_filehandle_truncate);
+DEFINE_INTERN_ALIAS(handle_dirhandle_read, handle_filehandle_read);
+DEFINE_INTERN_ALIAS(handle_dirhandle_write, handle_filehandle_write);
+DEFINE_INTERN_ALIAS(handle_dirhandle_pread, handle_filehandle_pread);
+DEFINE_INTERN_ALIAS(handle_dirhandle_pwrite, handle_filehandle_pwrite);
+DEFINE_INTERN_ALIAS(handle_dirhandle_readv, handle_filehandle_readv);
+DEFINE_INTERN_ALIAS(handle_dirhandle_writev, handle_filehandle_writev);
+DEFINE_INTERN_ALIAS(handle_dirhandle_preadv, handle_filehandle_preadv);
+DEFINE_INTERN_ALIAS(handle_dirhandle_pwritev, handle_filehandle_pwritev);
+DEFINE_INTERN_ALIAS(handle_dirhandle_mmap, handle_filehandle_mmap);
+DEFINE_INTERN_ALIAS(handle_dirhandle_sync, handle_filehandle_sync);
+DEFINE_INTERN_ALIAS(handle_dirhandle_datasync, handle_filehandle_datasync);
+DEFINE_INTERN_ALIAS(handle_dirhandle_pollconnect, handle_filehandle_pollconnect);
+DEFINE_INTERN_ALIAS(handle_dirhandle_polltest, handle_filehandle_polltest);
+DEFINE_INTERN_ALIAS(handle_dirhandle_stat, handle_filehandle_stat);
+DEFINE_INTERN_ALIAS(handle_dirhandle_ioctl, handle_filehandle_ioctl);
+DEFINE_INTERN_ALIAS(handle_dirhandle_hop, handle_filehandle_hop);
+DEFINE_INTERN_ALIAS(handle_dirhandle_seek, handle_filehandle_seek);
+DEFINE_INTERN_ALIAS(handle_dirhandle_truncate, handle_filehandle_truncate);
 
 
 /* Alias the handle_filehandle_tryas() to some other handle types. */
-DEFINE_INTERN_ALIAS(handle_oneshot_directory_file_tryas, handle_filehandle_tryas);
+DEFINE_INTERN_ALIAS(handle_dirhandle_tryas, handle_filehandle_tryas);
 DEFINE_INTERN_ALIAS(handle_fifo_user_tryas, handle_filehandle_tryas);
 
-STATIC_ASSERT(offsetof(struct filehandle, f_node) == offsetof(struct oneshot_directory_file, d_node));
-STATIC_ASSERT(offsetof(struct filehandle, f_path) == offsetof(struct oneshot_directory_file, d_path));
-STATIC_ASSERT(offsetof(struct filehandle, f_dirent) == offsetof(struct oneshot_directory_file, d_dirent));
+STATIC_ASSERT(offsetof(struct filehandle, f_node) == offsetof(struct dirhandle, d_node));
+STATIC_ASSERT(offsetof(struct filehandle, f_path) == offsetof(struct dirhandle, d_path));
+STATIC_ASSERT(offsetof(struct filehandle, f_dirent) == offsetof(struct dirhandle, d_dirent));
 STATIC_ASSERT(offsetof(struct filehandle, f_node) == offsetof(struct fifo_user, fu_fifo));
 STATIC_ASSERT(offsetof(struct filehandle, f_path) == offsetof(struct fifo_user, fu_path));
 STATIC_ASSERT(offsetof(struct filehandle, f_dirent) == offsetof(struct fifo_user, fu_dirent));
