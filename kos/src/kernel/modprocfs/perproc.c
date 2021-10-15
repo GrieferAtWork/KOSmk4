@@ -40,7 +40,7 @@
 DECL_BEGIN
 
 #define DEFINE_DIRECTORY_ENTRY(symbol_name, ino, type, entry_name) \
-	struct directory_entry symbol_name = {                         \
+	struct fdirent symbol_name = {                                 \
 		/* .de_refcnt   = */ 1,                                    \
 		/* .de_heapsize = */ sizeof(symbol_name),                  \
 		/* .de_next     = */ NULL,                                 \
@@ -77,7 +77,7 @@ DECL_BEGIN
 #undef F
 
 #define MKDIR(id, mode, files) \
-	PRIVATE REF struct directory_entry *prd_fsdata_dir_##id[] = { files };
+	PRIVATE REF struct fdirent *prd_fsdata_dir_##id[] = { files };
 #define F(parent_id, name, type, id) &prd_dent_##parent_id##_ent_##id,
 #define F_END NULL /* Sentinel */
 #include "perproc.def"
@@ -157,12 +157,12 @@ ProcFS_PerProc_SaveAttr(struct inode *__restrict self)
 }
 
 
-INTERN NONNULL((1, 2)) REF struct directory_entry *KCALL
+INTERN NONNULL((1, 2)) REF struct fdirent *KCALL
 ProcFS_PerProc_MakeDirent(struct directory_node *__restrict self,
-                          struct directory_entry *__restrict ent) {
-	REF struct directory_entry *result;
-	/* XXX: Come up with a better solution that having to copy the directory_entry each time. */
-	result = directory_entry_alloc(ent->de_namelen);
+                          struct fdirent *__restrict ent) {
+	REF struct fdirent *result;
+	/* XXX: Come up with a better solution that having to copy the fdirent each time. */
+	result = fdirent_alloc(ent->de_namelen);
 	result->de_ino  = ent->de_ino | (self->i_fileino & PROCFS_INOTYPE_PERPROC_PIDMASK);
 	result->de_hash = ent->de_hash;
 	result->de_type = ent->de_type;
@@ -170,19 +170,19 @@ ProcFS_PerProc_MakeDirent(struct directory_node *__restrict self,
 	return result;
 }
 
-PRIVATE NONNULL((1, 2)) struct directory_entry *KCALL
+PRIVATE NONNULL((1, 2)) struct fdirent *KCALL
 ProcFS_PerProc_Directory_Locate(struct directory_node *__restrict self,
                                 CHECKED USER /*utf-8*/ char const *__restrict name,
                                 u16 namelen, uintptr_t hash, fsmode_t mode) {
 	unsigned int i;
-	struct directory_entry **data;
-	struct directory_entry *dent;
-	data = (directory_entry **)self->i_fsdata;
+	struct fdirent **data;
+	struct fdirent *dent;
+	data = (struct fdirent **)self->i_fsdata;
 	for (i = 0; (dent = data[i]) != NULL; ++i) {
 		if (dent->de_namelen != namelen)
 			continue;
 		if (dent->de_hash == (uintptr_t)-1)
-			dent->de_hash = directory_entry_hash(dent->de_name, dent->de_namelen);
+			dent->de_hash = fdirent_hash(dent->de_name, dent->de_namelen);
 		if (dent->de_hash != hash)
 			continue;
 		if (memcmp(dent->de_name, name, namelen * sizeof(char)) != 0)
@@ -204,13 +204,13 @@ ProcFS_PerProc_Directory_Locate(struct directory_node *__restrict self,
 	return NULL;
 }
 
-INTERN NONNULL((1, 2)) REF struct directory_entry *KCALL
+INTERN NONNULL((1, 2)) REF struct fdirent *KCALL
 ProcFS_PerProc_Directory_Lookup(struct directory_node *__restrict self,
                                 CHECKED USER /*utf-8*/ char const *__restrict name,
                                 u16 namelen, uintptr_t hash, fsmode_t mode)
 		THROWS(E_SEGFAULT, E_FSERROR_FILE_NOT_FOUND,
 		       E_FSERROR_UNSUPPORTED_OPERATION, E_IOERROR, ...) {
-	REF struct directory_entry *result;
+	REF struct fdirent *result;
 	result = ProcFS_PerProc_Directory_Locate(self, name, namelen, hash, mode);
 	if (result) /* Create the unique copy */
 		result = ProcFS_PerProc_MakeDirent(self, result);
@@ -223,9 +223,9 @@ ProcFS_PerProc_Directory_Enum(struct directory_node *__restrict self,
                               void *arg)
 		THROWS(E_FSERROR_UNSUPPORTED_OPERATION, E_IOERROR, ...) {
 	unsigned int i;
-	struct directory_entry **data;
-	struct directory_entry *dent;
-	data = (struct directory_entry **)self->i_fsdata;
+	struct fdirent **data;
+	struct fdirent *dent;
+	data = (struct fdirent **)self->i_fsdata;
 	for (i = 0; (dent = data[i]) != NULL; ++i) {
 		ino_t real_ino;
 		real_ino = dent->de_ino;
@@ -412,7 +412,7 @@ INTERN struct inode_type ProcFS_PerProc_DynamicSymlink_Type = {
 /************************************************************************/
 /* ROOT DIRECTORY                                                       */
 /************************************************************************/
-INTERN REF struct directory_entry *ProcFS_PerProcRootDirectory_FsData[] = {
+INTERN REF struct fdirent *ProcFS_PerProcRootDirectory_FsData[] = {
 #define PERPROC_DIRECTORY_ENTRY(name, type, id) &prd_perprocent_##id,
 #include "perproc.def"
 	NULL
@@ -431,9 +431,9 @@ is_process_leader_pid(upid_t pid) {
 	return result;
 }
 
-PRIVATE NONNULL((1, 2)) struct directory_entry *KCALL
+PRIVATE NONNULL((1, 2)) struct fdirent *KCALL
 ProcFS_PerProc_RootDirectory_TranslateSpecialEntry(struct directory_node *__restrict self,
-                                                   struct directory_entry *__restrict ent) {
+                                                   struct fdirent *__restrict ent) {
 	/* Check for special case: Only a process leader has the `task' sub-directory! */
 	if (ent->de_ino == PROCFS_INOMAKE_PERPROC(0, PROCFS_PERPROC_ID_task)) {
 		if (!is_process_leader_pid((upid_t)(self->i_fileino & PROCFS_INOTYPE_PERPROC_PIDMASK)))
@@ -442,13 +442,13 @@ ProcFS_PerProc_RootDirectory_TranslateSpecialEntry(struct directory_node *__rest
 	return ent;
 }
 
-PRIVATE NONNULL((1, 2)) REF struct directory_entry *KCALL
+PRIVATE NONNULL((1, 2)) REF struct fdirent *KCALL
 ProcFS_PerProc_RootDirectory_Lookup(struct directory_node *__restrict self,
                                     CHECKED USER /*utf-8*/ char const *__restrict name,
                                     u16 namelen, uintptr_t hash, fsmode_t mode)
 		THROWS(E_SEGFAULT, E_FSERROR_FILE_NOT_FOUND,
 		       E_FSERROR_UNSUPPORTED_OPERATION, E_IOERROR, ...) {
-	REF struct directory_entry *result;
+	REF struct fdirent *result;
 	result = ProcFS_PerProc_Directory_Locate(self, name, namelen, hash, mode);
 	if (result) {
 		/* Deal with special entires. */
@@ -467,9 +467,9 @@ ProcFS_PerProc_RootDirectory_Enum(struct directory_node *__restrict self,
                                   void *arg)
 		THROWS(E_FSERROR_UNSUPPORTED_OPERATION, E_IOERROR, ...) {
 	unsigned int i;
-	struct directory_entry **data;
-	struct directory_entry *dent;
-	data = (struct directory_entry **)self->i_fsdata;
+	struct fdirent **data;
+	struct fdirent *dent;
+	data = (struct fdirent **)self->i_fsdata;
 	for (i = 0; (dent = data[i]) != NULL; ++i) {
 		/* Deal with special entires. */
 		dent = ProcFS_PerProc_RootDirectory_TranslateSpecialEntry(self, dent);

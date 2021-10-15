@@ -75,7 +75,7 @@ handle_path_tryas(struct path *__restrict self,
 		return result;
 	}	break;
 
-	case HANDLE_TYPE_DIRECTORYENTRY:
+	case HANDLE_TYPE_FDIRENT:
 		return incref(self->p_dirent);
 
 	default:
@@ -234,7 +234,7 @@ handle_path_hop(struct path *__restrict self,
 
 	case HOP_PATH_OPENDENTRY: {
 		struct handle temp;
-		temp.h_type = HANDLE_TYPE_DIRECTORYENTRY;
+		temp.h_type = HANDLE_TYPE_FDIRENT;
 		temp.h_mode = mode;
 		temp.h_data = self->p_dirent;
 		return handle_installhop((USER UNCHECKED struct hop_openfd *)arg, temp);
@@ -1247,7 +1247,7 @@ path_remove(struct path *__restrict self,
             CHECKED USER /*utf-8*/ char const *__restrict name,
             u16 namelen, uintptr_t hash, unsigned int mode,
             /*out*/ REF struct inode **premoved_inode,
-            /*out*/ REF struct directory_entry **premoved_dirent,
+            /*out*/ REF struct fdirent **premoved_dirent,
             /*out*/ REF struct directory_node **pcontaining_directory,
             /*out*/ REF struct path **premoved_path)
 		THROWS(E_FSERROR_DELETED, E_FSERROR_DIRECTORY_NOT_EMPTY,
@@ -1323,8 +1323,8 @@ path_rename(struct path *__restrict source_path,
             struct path *__restrict target_path,
             CHECKED USER /*utf-8*/ char const *__restrict target_name,
             u16 target_namelen, unsigned int mode,
-            /*out*/ REF struct directory_entry **psource_dirent,
-            /*out*/ REF struct directory_entry **ptarget_dirent,
+            /*out*/ REF struct fdirent **psource_dirent,
+            /*out*/ REF struct fdirent **ptarget_dirent,
             /*out*/ REF struct inode **psource_inode,
             /*out*/ REF struct inode **ptarget_inode,
             /*out*/ REF struct directory_node **psource_directory,
@@ -1934,7 +1934,7 @@ NOTHROW(KCALL path_rehash_smaller_nx)(struct path *__restrict self) {
 PUBLIC ATTR_RETNONNULL WUNUSED REF struct path *KCALL
 path_newchild(struct path *__restrict self,
               struct directory_node *__restrict child_dir,
-              struct directory_entry *__restrict child_entry)
+              struct fdirent *__restrict child_entry)
 		THROWS(E_BADALLOC) {
 	REF struct path *result;
 	result = path_alloc(FS_GFP);
@@ -2120,7 +2120,7 @@ NOTHROW(KCALL vfs_findpath_nolock)(struct vfs *__restrict new_vfs,
 	parent = vfs_findpath_nolock(new_vfs, old_vfs, old_path->p_parent);
 	if likely(parent) {
 		struct path *result;
-		struct directory_entry *dent;
+		struct fdirent *dent;
 		dent = old_path->p_dirent;
 		result = parent->p_cldlist[dent->de_hash & parent->p_cldmask];
 		for (; result; result = result->p_dirnext.le_next) {

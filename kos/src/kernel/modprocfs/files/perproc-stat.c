@@ -153,7 +153,7 @@ ProcFS_PerProc_Stat_Printer(struct regular_node *__restrict self,
 	                  "%" PRIuN(__SIZEOF_PID_T__) " (", pid) < 0)
 		goto done;
 	if (mm) {
-		REF struct directory_entry *exec_dent;
+		REF struct fdirent *exec_dent;
 		sync_read(mm);
 		exec_dent = xincref(FORMMAN(mm, thismman_execinfo).mei_dent);
 		sync_endread(mm);

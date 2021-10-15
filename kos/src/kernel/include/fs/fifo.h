@@ -162,7 +162,7 @@ struct fifo_user {
 	WEAK refcnt_t               fu_refcnt;  /* Reference counter */
 	REF struct fifo_node       *fu_fifo;    /* [1..1][const] The associated fifo. */
 	REF struct path            *fu_path;    /* [0..1][const] The path from which `fr_fifo' was opened. */
-	REF struct directory_entry *fu_dirent;  /* [0..1][const] The directory entry associated with `fr_fifo' that was used to open the fifo. */
+	REF struct fdirent *fu_dirent;  /* [0..1][const] The directory entry associated with `fr_fifo' that was used to open the fifo. */
 	iomode_t                    fu_accmode; /* [const] Original I/O mode with which this fifo user was opened (masked by IO_ACCMODE). */
 };
 

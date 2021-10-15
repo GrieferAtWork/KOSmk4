@@ -43,7 +43,7 @@ ProcFS_PerProc_Exe_Printer(struct symlink_node *__restrict self,
 	REF struct task *thread;
 	REF struct mman *mm;
 	struct pidns *myns = THIS_PIDNS;
-	REF struct directory_entry *exec_dent;
+	REF struct fdirent *exec_dent;
 	REF struct path            *exec_path;
 	pid  = (upid_t)(self->i_fileino & PROCFS_INOTYPE_PERPROC_PIDMASK);
 	thread = pidns_lookup_task(myns, pid);

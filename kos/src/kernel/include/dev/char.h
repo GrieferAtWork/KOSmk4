@@ -132,7 +132,7 @@ struct character_device {
 #else /* WANT_CHARACTER_DEVICE_NEXTLINK */
 	REF struct inode            *cd_devfs_inode; /* [lock(WRITE_ONCE)][0..1] Device INode under /dev, or NULL if not created */
 #endif /* !WANT_CHARACTER_DEVICE_NEXTLINK */
-	REF struct directory_entry  *cd_devfs_entry; /* [lock(WRITE_ONCE)][1..1][valid_if(cd_devfs_inode)] Directory entry under /dev */
+	REF struct fdirent  *cd_devfs_entry; /* [lock(WRITE_ONCE)][1..1][valid_if(cd_devfs_inode)] Directory entry under /dev */
 	char                         cd_name[16];    /* [const] Name of the device (auto-generated  when unset during device  registration)
 	                                              * This is the name by which the device can be discovered within the `/dev' directory. */
 };

@@ -22,6 +22,9 @@
 
 #include <kernel/compiler.h>
 
+#ifdef CONFIG_USE_NEW_FS
+#include <kernel/fs/filehandle.h>
+#else /* CONFIG_USE_NEW_FS */
 #include <kernel/types.h>
 #include <sched/atomic64.h>
 
@@ -34,19 +37,19 @@ DECL_BEGIN
 struct inode;
 struct path;
 struct directory_node;
-struct directory_entry;
+struct fdirent;
 
 struct filehandle {
 	/* [HANDLE_TYPE(HANDLE_TYPE_FILEHANDLE)] */
 	WEAK refcnt_t               f_refcnt; /* File reference counter. */
 	REF struct inode           *f_node;   /* [1..1][const] The opened file INode. */
 	REF struct path            *f_path;   /* [0..1][const] The path from which `f_node' was opened. */
-	REF struct directory_entry *f_dirent; /* [0..1][const] The directory entry associated with `f_node' that was used to open the file. */
+	REF struct fdirent *f_dirent; /* [0..1][const] The directory entry associated with `f_node' that was used to open the file. */
 	WEAK atomic64_t             f_offset; /* File I/O read/write position. */
 	struct atomic_rwlock        f_curlck; /* Lock for accessing the current directory entry & its index. */
 	pos_t                       f_curidx; /* [lock(f_curlck)][valid_if(INODE_ISDIR(f_node))]
 	                                       * The index of the directory entry currently selected by `f_curent'. */
-	REF struct directory_entry *f_curent; /* [lock(f_curlck)][valid_if(INODE_ISDIR(f_node))][0..1]
+	REF struct fdirent *f_curent; /* [lock(f_curlck)][valid_if(INODE_ISDIR(f_node))][0..1]
 	                                       * The  f_curidx-2'th  directory of  `f_node',  or NULL. */
 };
 
@@ -69,7 +72,7 @@ struct dirhandle {
 	WEAK refcnt_t                    d_refcnt; /* File reference counter. */
 	REF struct directory_node       *d_node;   /* [1..1] The opened directory INode. */
 	REF struct path                 *d_path;   /* [0..1] The path from which `d_node' was opened. */
-	REF struct directory_entry      *d_dirent; /* [0..1] The directory entry associated with `d_node' that was used to open the file. */
+	REF struct fdirent      *d_dirent; /* [0..1] The directory entry associated with `d_node' that was used to open the file. */
 	WEAK atomic64_t                  d_offset; /* [lock(d_node)] File I/O read/write position. */
 	struct atomic_rwlock             d_curlck; /* Lock for accessing the current directory entry & its index. */
 	pos_t                            d_curidx; /* [lock(d_curlck)] The index of the directory entry currently selected by `d_curent'. */
@@ -87,5 +90,6 @@ DEFINE_REFCOUNT_FUNCTIONS(struct dirhandle, d_refcnt, dirhandle_destroy)
 #endif /* __CC__ */
 
 DECL_END
+#endif /* !CONFIG_USE_NEW_FS */
 
 #endif /* !GUARD_KERNEL_INCLUDE_FS_FILE_H */

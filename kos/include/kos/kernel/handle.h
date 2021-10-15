@@ -52,7 +52,7 @@
  */
 #define HANDLE_TYPE_UNDEFINED       0x0000 /* Undefined/unused handle */
 #define HANDLE_TYPE_FILEHANDLE      0x0001 /* `struct filehandle'
-                                            * Castable into: HANDLE_TYPE_PATH, HANDLE_TYPE_MFILE, HANDLE_TYPE_DIRECTORYENTRY */
+                                            * Castable into: HANDLE_TYPE_PATH, HANDLE_TYPE_MFILE, HANDLE_TYPE_FDIRENT */
 #define HANDLE_TYPE_SOCKET          0x0002 /* `struct socket' */
 #define HANDLE_TYPE_EPOLL           0x0003 /* `struct epoll_controller' */
 #define HANDLE_TYPE_PIPE            0x0004 /* `struct pipe' */
@@ -65,12 +65,12 @@
 #define HANDLE_TYPE_FUTEX           0x000b /* `struct mfutex' */
 #define HANDLE_TYPE_FUTEXFD         0x000c /* `struct mfutexfd' */
 #define HANDLE_TYPE_DIRHANDLE       0x000d /* `struct dirhandle'
-                                            * Castable into: HANDLE_TYPE_PATH, HANDLE_TYPE_MFILE, HANDLE_TYPE_DIRECTORYENTRY */
+                                            * Castable into: HANDLE_TYPE_PATH, HANDLE_TYPE_MFILE, HANDLE_TYPE_FDIRENT */
 #define HANDLE_TYPE_MFILE           0x000e /* `struct mfile' (also includes `struct inode') */
 #define HANDLE_TYPE_BLOCKDEVICE     0x000f /* `struct basic_block_device' */
-#define HANDLE_TYPE_DIRECTORYENTRY  0x0010 /* `struct directory_entry' */
+#define HANDLE_TYPE_FDIRENT         0x0010 /* `struct fdirent' */
 #define HANDLE_TYPE_PATH            0x0011 /* `struct path' (also includes `struct vfs')
-                                            * Castable into: HANDLE_TYPE_MFILE, HANDLE_TYPE_DIRECTORYENTRY */
+                                            * Castable into: HANDLE_TYPE_MFILE, HANDLE_TYPE_FDIRENT */
 #define HANDLE_TYPE_FS              0x0012 /* `struct fs' */
 #define HANDLE_TYPE_MMAN            0x0013 /* `struct mman' */
 #define HANDLE_TYPE_TASK            0x0014 /* `struct taskpid'
@@ -87,7 +87,7 @@
                                             * `touch kos/src/kernel/include/kernel/handle.h' */
 
 /* TODO: For CONFIG_USE_NEW_FS:
- *    - Rename `HANDLE_TYPE_DIRECTORYENTRY' -> `HANDLE_TYPE_DIRENT'
+ *    - Rename `HANDLE_TYPE_FDIRENT' -> `HANDLE_TYPE_FDIRENT'
  *    - Remove `HANDLE_TYPE_BLOCKDEVICE'     (merged with `HANDLE_TYPE_MFILE')
  *    - Remove `HANDLE_TYPE_CHARACTERDEVICE' (merged with `HANDLE_TYPE_MFILE') */
 
@@ -95,7 +95,7 @@
 #define HANDLE_FOREACH_TYPE(cb)                              \
 	cb(HANDLE_TYPE_MFILE, struct mfile)                      \
 	cb(HANDLE_TYPE_BLOCKDEVICE, struct basic_block_device)   \
-	cb(HANDLE_TYPE_DIRECTORYENTRY, struct directory_entry)   \
+	cb(HANDLE_TYPE_FDIRENT, struct fdirent)   \
 	cb(HANDLE_TYPE_FILEHANDLE, struct filehandle)            \
 	cb(HANDLE_TYPE_DIRHANDLE, struct dirhandle)              \
 	cb(HANDLE_TYPE_PATH, struct path)                        \

@@ -36,7 +36,7 @@
 DECL_BEGIN
 
 
-INTERN NONNULL((1, 2)) REF struct directory_entry *KCALL
+INTERN NONNULL((1, 2)) REF struct fdirent *KCALL
 ProcFS_PerProc_Kos_Drives_Lookup(struct directory_node *__restrict self,
                                  CHECKED USER /*utf-8*/ char const *__restrict name,
                                  u16 namelen, uintptr_t UNUSED(hash), fsmode_t mode)
@@ -46,7 +46,7 @@ ProcFS_PerProc_Kos_Drives_Lookup(struct directory_node *__restrict self,
 	unsigned char driveid;
 	REF struct fs *threadfs;
 	REF struct task *thread;
-	REF struct directory_entry *result;
+	REF struct fdirent *result;
 	if (namelen != 1)
 		goto err;
 	driveid = (unsigned char)ATOMIC_READ(name[0]);
@@ -75,23 +75,23 @@ ProcFS_PerProc_Kos_Drives_Lookup(struct directory_node *__restrict self,
 			goto err;
 	}
 	/* This is a bound drive! */
-	result = directory_entry_alloc(1);
+	result = fdirent_alloc(1);
 	result->de_ino     = PROCFS_INOMAKE_DRIVE(pid, driveid);
 	result->de_type    = DT_LNK;
 	result->de_name[0] = 'a' + driveid;
-	result->de_hash    = directory_entry_hash(result->de_name, 1);
+	result->de_hash    = fdirent_hash(result->de_name, 1);
 	return result;
 err:
 	return NULL;
 }
 
-INTERN NONNULL((1, 2)) REF struct directory_entry *KCALL
+INTERN NONNULL((1, 2)) REF struct fdirent *KCALL
 ProcFS_PerProc_Kos_Dcwd_Lookup(struct directory_node *__restrict self,
                                CHECKED USER /*utf-8*/ char const *__restrict name,
                                u16 namelen, uintptr_t hash, fsmode_t mode)
 		THROWS(E_SEGFAULT, E_FSERROR_FILE_NOT_FOUND,
 		       E_FSERROR_UNSUPPORTED_OPERATION, E_IOERROR, ...) {
-	REF struct directory_entry *result;
+	REF struct fdirent *result;
 	result = ProcFS_PerProc_Kos_Drives_Lookup(self, name, namelen, hash, mode);
 	if (result) {
 		result->de_ino &= ~PROCFS_INO_TYPEMASK;

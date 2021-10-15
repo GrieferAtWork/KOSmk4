@@ -49,7 +49,7 @@ PUBLIC ATTR_RETNONNULL NONNULL((1, 2)) REF struct inode *KCALL
 directory_creatfile(struct directory_node *__restrict target_directory,
                     CHECKED USER /*utf-8*/ char const *__restrict target_name, u16 target_namelen,
                     oflag_t open_mode, uid_t owner, gid_t group, mode_t mode,
-                    REF struct directory_entry **ptarget_dirent,
+                    REF struct fdirent **ptarget_dirent,
                     bool *pwas_newly_created)
 		THROWS(E_FSERROR_DELETED, E_FSERROR_ILLEGAL_PATH, E_FSERROR_FILE_ALREADY_EXISTS,
 		       E_FSERROR_FILE_NOT_FOUND, E_FSERROR_DISK_FULL, E_FSERROR_UNSUPPORTED_OPERATION,
@@ -71,7 +71,7 @@ directory_symlink(struct directory_node *__restrict target_directory,
                   CHECKED USER /*utf-8*/ char const *target_name, u16 target_namelen,
                   CHECKED USER /*utf-8*/ char const *link_text, size_t link_text_size,
                   uid_t owner, gid_t group, mode_t mode, unsigned int symlink_mode,
-                  /*out*/ REF struct directory_entry **ptarget_dirent)
+                  /*out*/ REF struct fdirent **ptarget_dirent)
 		THROWS(E_FSERROR_UNSUPPORTED_OPERATION, E_FSERROR_DELETED,
 		       E_FSERROR_ILLEGAL_PATH, E_FSERROR_FILE_ALREADY_EXISTS,
 		       E_FSERROR_DISK_FULL, E_FSERROR_READONLY, E_IOERROR, E_SEGFAULT, ...)
@@ -93,7 +93,7 @@ directory_mknod(struct directory_node *__restrict target_directory,
                 CHECKED USER /*utf-8*/ char const *__restrict target_name,
                 u16 target_namelen, mode_t mode, uid_t owner,
                 gid_t group, dev_t referenced_device, unsigned int mknod_mode,
-                /*out*/ REF struct directory_entry **ptarget_dirent)
+                /*out*/ REF struct fdirent **ptarget_dirent)
 		THROWS(E_FSERROR_UNSUPPORTED_OPERATION, E_FSERROR_DELETED,
 		       E_FSERROR_ILLEGAL_PATH, E_FSERROR_FILE_ALREADY_EXISTS,
 		       E_FSERROR_DISK_FULL, E_FSERROR_READONLY, E_IOERROR, E_SEGFAULT, ...)
@@ -114,7 +114,7 @@ directory_mkdir(struct directory_node *__restrict target_directory,
                 CHECKED USER /*utf-8*/ char const *__restrict target_name,
                 u16 target_namelen, mode_t mode, uid_t owner, gid_t group,
                 unsigned int mkdir_mode,
-                /*out*/ REF struct directory_entry **ptarget_dirent)
+                /*out*/ REF struct fdirent **ptarget_dirent)
 		THROWS(E_FSERROR_UNSUPPORTED_OPERATION, E_FSERROR_DELETED,
 		       E_FSERROR_ILLEGAL_PATH, E_FSERROR_FILE_ALREADY_EXISTS,
 		       E_FSERROR_DISK_FULL, E_FSERROR_READONLY, E_IOERROR, E_SEGFAULT, ...)
@@ -134,7 +134,7 @@ directory_mkdir(struct directory_node *__restrict target_directory,
 #define RETURN_NODE_TYPE  struct directory_node
 	REF struct directory_node *result;
 #endif /* ... */
-	REF struct directory_entry *target_entry;
+	REF struct fdirent *target_entry;
 #ifdef DEFINE_DIRECTORY_CREATFILE
 	assert((mode & ~07777) == 0);
 #elif defined(DEFINE_DIRECTORY_SYMLINK)
@@ -171,7 +171,7 @@ directory_mkdir(struct directory_node *__restrict target_directory,
 		if ((open_mode & (O_CREAT | O_EXCL)) != (O_CREAT | O_EXCL)) {
 			uintptr_t hash;
 			/* Check for existing files without creating a new directory entry. */
-			hash  = directory_entry_hash(target_name, target_namelen);
+			hash  = fdirent_hash(target_name, target_namelen);
 			target_entry = open_mode & O_DOSPATH
 			               ? directory_getcaseentry(target_directory, target_name, target_namelen, hash)
 			               : directory_getentry(target_directory, target_name, target_namelen, hash);
@@ -193,10 +193,10 @@ directory_mkdir(struct directory_node *__restrict target_directory,
 		inode_check_deleted(target_directory, E_FILESYSTEM_DELETED_PATH);
 #endif /* !DEFINE_DIRECTORY_CREATFILE */
 		/* Must create a new entry. */
-		target_entry = directory_entry_alloc_s(target_name, target_namelen);
+		target_entry = fdirent_alloc_s(target_name, target_namelen);
 		TRY {
 			heapptr_t resptr;
-			REF struct directory_entry *existing_entry;
+			REF struct fdirent *existing_entry;
 			/* Check for an existing entry. */
 			existing_entry = MODE_IS_NOCASE
 			                 ? directory_getcaseentry(target_directory,
@@ -265,8 +265,8 @@ directory_mkdir(struct directory_node *__restrict target_directory,
 #ifdef DEFINE_DIRECTORY_SYMLINK
 				memcpy(result->sl_stext, link_text, link_text_size, sizeof(char));
 #elif defined(DEFINE_DIRECTORY_MKDIR)
-				result->d_map = (REF struct directory_entry **)kmalloc((DIRECTORY_DEFAULT_MASK + 1) *
-				                                                       sizeof(REF struct directory_entry *),
+				result->d_map = (REF struct fdirent **)kmalloc((DIRECTORY_DEFAULT_MASK + 1) *
+				                                                       sizeof(REF struct fdirent *),
 				                                                       FS_GFP | GFP_CALLOC);
 #endif /* ... */
 			} EXCEPT {
@@ -324,7 +324,7 @@ again_endwrite_self:
 			}
 			/* Must re-check if the file has appeared in the mean time. */
 			TRY {
-				REF struct directory_entry *existing_entry;
+				REF struct fdirent *existing_entry;
 				existing_entry = MODE_IS_NOCASE
 				                 ? directory_getcaseentry(target_directory,
 				                                          target_entry->de_name,

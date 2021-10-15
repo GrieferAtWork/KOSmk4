@@ -48,7 +48,7 @@ struct module;
 struct module_section;
 struct mfile;
 struct path;
-struct directory_entry;
+struct fdirent;
 struct mman;
 
 struct module_section_ops {
@@ -229,14 +229,14 @@ struct module {
 	union {
 		struct {
 			REF struct path            *md_fspath; /* [0..1][const] Optional mapping path */
-			REF struct directory_entry *md_fsname; /* [0..1][const] Optional mapping name */
+			REF struct fdirent *md_fsname; /* [0..1][const] Optional mapping name */
 		};
 		Toblockop(mman)        _md_mmlop;     /* MMan cleanup lock operation */
 		Tobpostlockop(mman)    _md_mmpostlop; /* MMan cleanup post lock operation */
 	};
 #else /* __WANT_MODULE__md_mmlop */
 	REF struct path            *md_fspath;     /* [0..1][const] Optional mapping path */
-	REF struct directory_entry *md_fsname;     /* [0..1][const] Optional mapping name */
+	REF struct fdirent *md_fsname;     /* [0..1][const] Optional mapping name */
 #endif /* !__WANT_MODULE__md_mmlop */
 #ifdef _MODULE_HAVE_SIZEOF_POINTER
 	byte_t                      md_sizeof_pointer; /* [const] `sizeof(void *)', as seen by this module. */

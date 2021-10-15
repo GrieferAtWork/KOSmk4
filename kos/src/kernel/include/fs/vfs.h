@@ -49,7 +49,7 @@ DECL_BEGIN
 struct path;
 struct vfs;
 struct fs;
-struct directory_entry;
+struct fdirent;
 
 struct mounted_path {
 	struct path                *mp_path;     /* [1..1][const] The associated path. */
@@ -79,7 +79,7 @@ struct path {
 	                                        * NOTE: Query functions such as `path_child()' are allowed
 	                                        *       to  assume  that  this field  is  always non-NULL. */
 	struct mounted_path        *p_mount;   /* [0..1][lock(p_lock)][owned_if(!= &p_vfs->v_rootmount)] Mounting point data. */
-	REF struct directory_entry *p_dirent;  /* [1..1][const] Name of this directory entry (empty for VFS root). */
+	REF struct fdirent *p_dirent;  /* [1..1][const] Name of this directory entry (empty for VFS root). */
 	LIST_ENTRY(path)            p_dirnext; /* [0..1][lock(p_parent->p_lock)][valid_if(p_parent != NULL)]
 	                                        * Next sibling directory  with the same  `p_dirent->de_hash' */
 	size_t                      p_cldmask; /* [lock(p_lock)] Mask for the `p_cldlist' hash-map. */
@@ -378,7 +378,7 @@ path_getcasechild_and_parent_inode(struct path *__restrict self,
 FUNDEF ATTR_RETNONNULL WUNUSED REF struct path *KCALL
 path_newchild(struct path *__restrict self,
               struct directory_node *__restrict child_dir,
-              struct directory_entry *__restrict child_entry)
+              struct fdirent *__restrict child_entry)
 		THROWS(E_BADALLOC);
 
 
@@ -386,7 +386,7 @@ path_newchild(struct path *__restrict self,
  * @param: mode:                  Set of `DIRECTORY_REMOVE_F*', or which at least one of
  *                               `DIRECTORY_REMOVE_FREGULAR' or `DIRECTORY_REMOVE_FDIRECTORY'
  *                                must be given.
- * @param: hash:                  The result of `directory_entry_hash(name,namelen)'
+ * @param: hash:                  The result of `fdirent_hash(name,namelen)'
  * @param: premoved_inode:        Upon success, store a reference to the removed INode here.
  * @param: premoved_dirent:       Upon success, store a reference to the removed INode's directory entry here.
  * @param: pcontaining_directory: Upon success, store a reference to the directory node from which an element got removed here.
@@ -414,7 +414,7 @@ path_remove(struct path *__restrict self,
             CHECKED USER /*utf-8*/ char const *__restrict name, u16 namelen, uintptr_t hash,
             unsigned int mode DFL(DIRECTORY_REMOVE_FREGULAR | DIRECTORY_REMOVE_FDIRECTORY),
             /*out*/ REF struct inode **premoved_inode DFL(__NULLPTR),
-            /*out*/ REF struct directory_entry **premoved_dirent DFL(__NULLPTR),
+            /*out*/ REF struct fdirent **premoved_dirent DFL(__NULLPTR),
             /*out*/ REF struct directory_node **pcontaining_directory DFL(__NULLPTR),
             /*out*/ REF struct path **premoved_path DFL(__NULLPTR))
 		THROWS(E_FSERROR_DELETED, E_FSERROR_DIRECTORY_NOT_EMPTY,
@@ -427,7 +427,7 @@ path_remove(struct path *__restrict self,
 /* Rename/move an entry from one path to another.
  * NOTE: This function will try to emulate an unsupported `rename()' using `link()' + `unlink()'
  * @param: mode: Set of `DIRECTORY_RENAME_F*'
- * @param: source_namehash:   The result of `directory_entry_hash(source_name,source_namelen)'
+ * @param: source_namehash:   The result of `fdirent_hash(source_name,source_namelen)'
  * @param: psource_dirent:    When non-NULL, store a reference to the source directory entry here.
  * @param: ptarget_dirent:    When non-NULL, store a reference to the target directory entry here.
  * @param: psource_inode:     When non-NULL, store a reference to the source INode here.
@@ -462,8 +462,8 @@ path_rename(struct path *__restrict source_path,
             CHECKED USER /*utf-8*/ char const *__restrict target_name,
             u16 target_namelen,
             unsigned int mode DFL(DIRECTORY_RENAME_FNORMAL),
-            /*out*/ REF struct directory_entry **psource_dirent DFL(__NULLPTR),
-            /*out*/ REF struct directory_entry **ptarget_dirent DFL(__NULLPTR),
+            /*out*/ REF struct fdirent **psource_dirent DFL(__NULLPTR),
+            /*out*/ REF struct fdirent **ptarget_dirent DFL(__NULLPTR),
             /*out*/ REF struct inode **psource_inode DFL(__NULLPTR),
             /*out*/ REF struct inode **ptarget_inode DFL(__NULLPTR),
             /*out*/ REF struct directory_node **psource_directory DFL(__NULLPTR),
@@ -605,7 +605,7 @@ path_traversefull_ex(struct fs *__restrict filesystem,
                      u32 *premaining_symlinks DFL(__NULLPTR),
                      REF struct path **pcontaining_path DFL(__NULLPTR),
                      REF struct directory_node **pcontaining_directory DFL(__NULLPTR),
-                     REF struct directory_entry **pcontaining_dirent DFL(__NULLPTR))
+                     REF struct fdirent **pcontaining_dirent DFL(__NULLPTR))
 		THROWS(E_FSERROR_DELETED, E_SEGFAULT, E_FSERROR_UNSUPPORTED_OPERATION, E_FSERROR_ACCESS_DENIED,
 		       E_FSERROR_TOO_MANY_SYMBOLIC_LINKS, E_IOERROR, E_BADALLOC, E_FSERROR_PATH_NOT_FOUND,
 		       E_FSERROR_ILLEGAL_PATH, E_FSERROR_NOT_A_DIRECTORY, ...);
@@ -617,7 +617,7 @@ path_traversefull_at(struct fs *__restrict filesystem, unsigned int dirfd,
                      u32 *premaining_symlinks DFL(__NULLPTR),
                      REF struct path **pcontaining_path DFL(__NULLPTR),
                      REF struct directory_node **pcontaining_directory DFL(__NULLPTR),
-                     REF struct directory_entry **pcontaining_dirent DFL(__NULLPTR))
+                     REF struct fdirent **pcontaining_dirent DFL(__NULLPTR))
 		THROWS(E_FSERROR_DELETED, E_SEGFAULT, E_FSERROR_UNSUPPORTED_OPERATION, E_FSERROR_ACCESS_DENIED,
 		       E_FSERROR_TOO_MANY_SYMBOLIC_LINKS, E_IOERROR, E_BADALLOC, E_FSERROR_PATH_NOT_FOUND,
 		       E_FSERROR_ILLEGAL_PATH, E_FSERROR_NOT_A_DIRECTORY, ...);
@@ -629,7 +629,7 @@ path_traversefull(struct fs *__restrict filesystem,
                   u32 *premaining_symlinks DFL(__NULLPTR),
                   REF struct path **pcontaining_path DFL(__NULLPTR),
                   REF struct directory_node **pcontaining_directory DFL(__NULLPTR),
-                  REF struct directory_entry **pcontaining_dirent DFL(__NULLPTR))
+                  REF struct fdirent **pcontaining_dirent DFL(__NULLPTR))
 		THROWS(E_FSERROR_DELETED, E_SEGFAULT, E_FSERROR_UNSUPPORTED_OPERATION, E_FSERROR_ACCESS_DENIED,
 		       E_FSERROR_TOO_MANY_SYMBOLIC_LINKS, E_IOERROR, E_BADALLOC, E_FSERROR_PATH_NOT_FOUND,
 		       E_FSERROR_ILLEGAL_PATH, E_FSERROR_NOT_A_DIRECTORY, ...);
@@ -643,7 +643,7 @@ path_traversenfull_ex(struct fs *__restrict filesystem,
                       u32 *premaining_symlinks DFL(__NULLPTR),
                       REF struct path **pcontaining_path DFL(__NULLPTR),
                       REF struct directory_node **pcontaining_directory DFL(__NULLPTR),
-                      REF struct directory_entry **pcontaining_dirent DFL(__NULLPTR))
+                      REF struct fdirent **pcontaining_dirent DFL(__NULLPTR))
 		THROWS(E_FSERROR_DELETED, E_SEGFAULT, E_FSERROR_UNSUPPORTED_OPERATION, E_FSERROR_ACCESS_DENIED,
 		       E_FSERROR_TOO_MANY_SYMBOLIC_LINKS, E_IOERROR, E_BADALLOC, E_FSERROR_PATH_NOT_FOUND,
 		       E_FSERROR_ILLEGAL_PATH, E_FSERROR_NOT_A_DIRECTORY, ...);
@@ -655,7 +655,7 @@ path_traversenfull_at(struct fs *__restrict filesystem, unsigned int dirfd,
                       u32 *premaining_symlinks DFL(__NULLPTR),
                       REF struct path **pcontaining_path DFL(__NULLPTR),
                       REF struct directory_node **pcontaining_directory DFL(__NULLPTR),
-                      REF struct directory_entry **pcontaining_dirent DFL(__NULLPTR))
+                      REF struct fdirent **pcontaining_dirent DFL(__NULLPTR))
 		THROWS(E_FSERROR_DELETED, E_SEGFAULT, E_FSERROR_UNSUPPORTED_OPERATION, E_FSERROR_ACCESS_DENIED,
 		       E_FSERROR_TOO_MANY_SYMBOLIC_LINKS, E_IOERROR, E_BADALLOC, E_FSERROR_PATH_NOT_FOUND,
 		       E_FSERROR_ILLEGAL_PATH, E_FSERROR_NOT_A_DIRECTORY, ...);
@@ -667,7 +667,7 @@ path_traversenfull(struct fs *__restrict filesystem,
                    u32 *premaining_symlinks DFL(__NULLPTR),
                    REF struct path **pcontaining_path DFL(__NULLPTR),
                    REF struct directory_node **pcontaining_directory DFL(__NULLPTR),
-                   REF struct directory_entry **pcontaining_dirent DFL(__NULLPTR))
+                   REF struct fdirent **pcontaining_dirent DFL(__NULLPTR))
 		THROWS(E_FSERROR_DELETED, E_SEGFAULT, E_FSERROR_UNSUPPORTED_OPERATION, E_FSERROR_ACCESS_DENIED,
 		       E_FSERROR_TOO_MANY_SYMBOLIC_LINKS, E_IOERROR, E_BADALLOC, E_FSERROR_PATH_NOT_FOUND,
 		       E_FSERROR_ILLEGAL_PATH, E_FSERROR_NOT_A_DIRECTORY, ...);

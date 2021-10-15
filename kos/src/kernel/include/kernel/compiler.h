@@ -59,7 +59,6 @@
 #define socket_node      fsocknode
 #define block_device     blkdev
 #define character_device chrdev
-#define directory_entry  fdirent
 #define superblock_type  ffilesys
 #else /* CONFIG_USE_NEW_FS */
 /* Forward-compatibility */
@@ -72,7 +71,6 @@
 #define fsocknode   socket_node
 #define blkdev      block_device
 #define chrdev      character_device
-#define fdirent     directory_entry
 #define ffilesys    superblock_type
 #endif /* !CONFIG_USE_NEW_FS */
 

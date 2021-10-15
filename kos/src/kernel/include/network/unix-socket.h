@@ -49,7 +49,7 @@ DECL_BEGIN
  */
 
 struct path;
-struct directory_entry;
+struct fdirent;
 struct socket_node;
 
 #define UNIX_CLIENT_STATUS_PENDING  0 /* Client is pending to be accept(2)-ed
@@ -155,7 +155,7 @@ struct unix_socket
 	                                          *                      server accept(2)'s the client!
 	                                          *   - else:            Socket is bound/connected */
 	REF struct path            *us_nodepath; /* [?..1][valid_if(us_node)][lock(WRITE_ONCE)] */
-	REF struct directory_entry *us_nodename; /* [?..1][valid_if(us_node)][lock(WRITE_ONCE)] */
+	REF struct fdirent *us_nodename; /* [?..1][valid_if(us_node)][lock(WRITE_ONCE)] */
 	REF struct unix_client     *us_client;   /* [0..1][valid_if(us_node)][lock(WRITE_ONCE)]
 	                                          * Set  during  bind(== NULL)  and  connect(!= NULL)
 	                                          * When non-NULL, this is a connected client socket.

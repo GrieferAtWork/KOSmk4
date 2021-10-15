@@ -589,7 +589,7 @@ path_traversenfull_ex(struct fs *__restrict filesystem,
                       u32 *premaining_symlinks,
                       REF struct path **pcontaining_path,
                       REF struct directory_node **pcontaining_directory,
-                      REF struct directory_entry **pcontaining_dirent)
+                      REF struct fdirent **pcontaining_dirent)
 #else /* TRAVERSE_N */
 PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3)) REF struct inode *KCALL
 path_traversefull_ex(struct fs *__restrict filesystem,
@@ -600,7 +600,7 @@ path_traversefull_ex(struct fs *__restrict filesystem,
                      u32 *premaining_symlinks,
                      REF struct path **pcontaining_path,
                      REF struct directory_node **pcontaining_directory,
-                     REF struct directory_entry **pcontaining_dirent)
+                     REF struct fdirent **pcontaining_dirent)
 #endif /* !TRAVERSE_N */
 		THROWS(E_FSERROR_DELETED, E_SEGFAULT, E_FSERROR_UNSUPPORTED_OPERATION, E_FSERROR_ACCESS_DENIED,
 		       E_FSERROR_TOO_MANY_SYMBOLIC_LINKS, E_IOERROR, E_BADALLOC, E_FSERROR_PATH_NOT_FOUND,
@@ -645,10 +645,10 @@ path_traversefull_ex(struct fs *__restrict filesystem,
 			/* Special case: Immediate directory access. */
 			result = (REF struct inode *)incref(containing_directory);
 			if (pcontaining_dirent)
-				*pcontaining_dirent = incref(&empty_directory_entry);
+				*pcontaining_dirent = incref(&empty_dirent);
 		} else {
 			uintptr_t hash;
-			hash = directory_entry_hash(last_seg, last_seglen);
+			hash = fdirent_hash(last_seg, last_seglen);
 			COMPILER_READ_BARRIER();
 			result_path = mode & FS_MODE_FDOSPATH
 			              ? path_getcasechild_and_parent_inode(containing_path, last_seg, last_seglen,
@@ -718,7 +718,7 @@ again_follow_symlink:
 								containing_directory = new_containing_directory;
 								goto got_result_path;
 							}
-							symlink_hash = directory_entry_hash(last_seg, last_seglen);
+							symlink_hash = fdirent_hash(last_seg, last_seglen);
 							COMPILER_READ_BARRIER();
 							/* Check for mounting points & cached paths. */
 							result_path = mode & FS_MODE_FDOSPATH
@@ -825,7 +825,7 @@ path_traversenfull_at(struct fs *__restrict filesystem, unsigned int dirfd,
                       u32 *premaining_symlinks,
                       REF struct path **pcontaining_path,
                       REF struct directory_node **pcontaining_directory,
-                      REF struct directory_entry **pcontaining_dirent)
+                      REF struct fdirent **pcontaining_dirent)
 #else /* TRAVERSE_N */
 PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct inode *KCALL
 path_traversefull_at(struct fs *__restrict filesystem, unsigned int dirfd,
@@ -834,7 +834,7 @@ path_traversefull_at(struct fs *__restrict filesystem, unsigned int dirfd,
                      u32 *premaining_symlinks,
                      REF struct path **pcontaining_path,
                      REF struct directory_node **pcontaining_directory,
-                     REF struct directory_entry **pcontaining_dirent)
+                     REF struct fdirent **pcontaining_dirent)
 #endif /* !TRAVERSE_N */
 		THROWS(E_FSERROR_DELETED, E_SEGFAULT, E_FSERROR_UNSUPPORTED_OPERATION, E_FSERROR_ACCESS_DENIED,
 		       E_FSERROR_TOO_MANY_SYMBOLIC_LINKS, E_IOERROR, E_BADALLOC, E_FSERROR_PATH_NOT_FOUND,
@@ -903,7 +903,7 @@ path_traversenfull(struct fs *__restrict filesystem,
                    u32 *premaining_symlinks,
                    REF struct path **pcontaining_path,
                    REF struct directory_node **pcontaining_directory,
-                   REF struct directory_entry **pcontaining_dirent)
+                   REF struct fdirent **pcontaining_dirent)
 #else /* TRAVERSE_N */
 PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct inode *KCALL
 path_traversefull(struct fs *__restrict filesystem,
@@ -912,7 +912,7 @@ path_traversefull(struct fs *__restrict filesystem,
                   u32 *premaining_symlinks,
                   REF struct path **pcontaining_path,
                   REF struct directory_node **pcontaining_directory,
-                  REF struct directory_entry **pcontaining_dirent)
+                  REF struct fdirent **pcontaining_dirent)
 #endif /* !TRAVERSE_N */
 		THROWS(E_FSERROR_DELETED, E_SEGFAULT, E_FSERROR_UNSUPPORTED_OPERATION, E_FSERROR_ACCESS_DENIED,
 		       E_FSERROR_TOO_MANY_SYMBOLIC_LINKS, E_IOERROR, E_BADALLOC, E_FSERROR_PATH_NOT_FOUND,

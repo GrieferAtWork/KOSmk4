@@ -131,7 +131,7 @@ shebang_exec(struct execargs *__restrict args) {
 		{
 			/* Load the interpreter program. */
 			REF struct path /*           */ *interp_path;
-			REF struct directory_entry /**/ *interp_dentry;
+			REF struct fdirent /**/ *interp_dentry;
 			REF struct regular_node /*   */ *interp_node;
 			{
 				struct fs *myfs = THIS_FS;

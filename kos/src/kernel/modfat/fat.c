@@ -722,11 +722,11 @@ typedef struct ATTR_PACKED {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Waddress-of-packed-member"
 
-PRIVATE NONNULL((1, 2)) REF struct directory_entry *KCALL
+PRIVATE NONNULL((1, 2)) REF struct fdirent *KCALL
 Fat_ReadDirectory(struct directory_node *__restrict self,
                   pos_t *__restrict pentry_pos)
 		THROWS(...) {
-	REF struct directory_entry *result;
+	REF struct fdirent *result;
 	pos_t pos = *pentry_pos;
 	ATTR_ALIGNED(2) FatFileStorage filestorage;
 #ifdef __INTELLISENSE__
@@ -850,7 +850,7 @@ continue_reading:
 			if unlikely(dst <= lfn_name)
 				goto dos_8dot3;
 			/* Allocate the directory entry. */
-			result = directory_entry_alloc_s(lfn_name, (u16)(size_t)(dst - lfn_name));
+			result = fdirent_alloc_s(lfn_name, (u16)(size_t)(dst - lfn_name));
 			result->de_pos             = lfn_start;
 			result->de_fsdata.de_start = pos - sizeof(FatFile);
 			/* Use the absolute-ondisk position of the file's FatFile as INode number. */
@@ -935,7 +935,7 @@ dos_8dot3:
 			}
 		}
 		/* Create a short-directory entry. */
-		result = directory_entry_alloc_s(entry_name, name_length);
+		result = fdirent_alloc_s(entry_name, name_length);
 		result->de_pos             = pos - sizeof(FatFile);
 		result->de_fsdata.de_start = result->de_pos;
 		/* Use the absolute on-disk position of the file's FatFile as INode number. */
@@ -1435,7 +1435,7 @@ Fat_TruncateINode(struct inode *__restrict self, pos_t new_size)
 
 PRIVATE NONNULL((1, 2)) void KCALL
 Fat_UnlinkFileFromParentDirectoryImpl(struct directory_node *__restrict containing_directory,
-                                      struct directory_entry *__restrict containing_entry)
+                                      struct fdirent *__restrict containing_entry)
 		THROWS(E_FSERROR_UNSUPPORTED_OPERATION,
 		       E_FSERROR_READONLY, E_IOERROR_READONLY,
 		       E_IOERROR, ...) {
@@ -1457,7 +1457,7 @@ Fat_UnlinkFileFromParentDirectoryImpl(struct directory_node *__restrict containi
 
 PRIVATE NONNULL((1, 2, 3)) void KCALL
 Fat_UnlinkFileFromParentDirectory(struct directory_node *__restrict containing_directory,
-                                  struct directory_entry *__restrict containing_entry,
+                                  struct fdirent *__restrict containing_entry,
                                   struct inode *__restrict node_to_unlink)
 		THROWS(E_FSERROR_UNSUPPORTED_OPERATION,
 		       E_FSERROR_READONLY, E_IOERROR_READONLY,
@@ -1471,7 +1471,7 @@ Fat_UnlinkFileFromParentDirectory(struct directory_node *__restrict containing_d
 
 PRIVATE NONNULL((1, 2, 3)) void KCALL
 Fat_RemoveDirectoryFromParentDirectory(struct directory_node *__restrict containing_directory,
-                                       struct directory_entry *__restrict containing_entry,
+                                       struct fdirent *__restrict containing_entry,
                                        struct directory_node *__restrict node_to_unlink)
 		THROWS(E_FSERROR_UNSUPPORTED_OPERATION,
 		       E_FSERROR_READONLY, E_IOERROR_READONLY,
@@ -1524,7 +1524,7 @@ NOTHROW(KCALL lfn_checksum)(char const *__restrict dos83_name) {
 PRIVATE NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3, 4)) FatFile *KCALL
 Fat_GenerateFileEntries(FatFile *__restrict buffer,
                         u32 *__restrict pbuffer_length,
-                        struct directory_entry *__restrict target_dirent,
+                        struct fdirent *__restrict target_dirent,
                         struct inode *__restrict new_node, uintptr_t cookie,
                         bool inhert_heap_buffer) THROWS(E_BADALLOC) {
 	FatFile dos83;
@@ -1782,7 +1782,7 @@ LOCAL NOBLOCK ATTR_PURE WUNUSED NONNULL((1, 2)) bool
 NOTHROW(KCALL directory_has_dos83)(struct directory_node *__restrict self,
                                    char *__restrict name) {
 	size_t i;
-	struct directory_entry *entry;
+	struct fdirent *entry;
 	for (i = 0; i <= self->d_mask; ++i) {
 		entry = self->d_map[i];
 		for (; entry; entry = entry->de_next) {
@@ -1800,7 +1800,7 @@ PRIVATE NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3, 4, 5)) FatFile *
 (KCALL Fat_GenerateFileEntriesAuto)(struct directory_node *__restrict target_directory,
                                     FatFile *__restrict buffer,
                                     u32 *__restrict pbuffer_length,
-                                    struct directory_entry *__restrict target_dirent,
+                                    struct fdirent *__restrict target_dirent,
                                     struct inode *__restrict new_node)
 		THROWS(E_BADALLOC) {
 	FatFile *result  = buffer;
@@ -1837,7 +1837,7 @@ PRIVATE FatFile const sential_fatfile = { 0 };
 
 PRIVATE NONNULL((1, 2, 3)) void KCALL
 Fat_AddFileToDirectory(struct directory_node *__restrict target_directory,
-                       struct directory_entry *__restrict target_dirent,
+                       struct fdirent *__restrict target_dirent,
                        struct inode *__restrict new_node)
 		THROWS(E_FSERROR_UNSUPPORTED_OPERATION, E_FSERROR_ILLEGAL_PATH,
 		       E_FSERROR_DISK_FULL, E_FSERROR_READONLY,
@@ -1965,7 +1965,7 @@ Fat_AddFileToDirectory(struct directory_node *__restrict target_directory,
 
 PRIVATE NONNULL((1, 2, 3)) void KCALL
 Fat_CreateFileInDirectory(struct directory_node *__restrict target_directory,
-                          struct directory_entry *__restrict target_dirent,
+                          struct fdirent *__restrict target_dirent,
                           struct regular_node *__restrict new_node)
 		THROWS(E_FSERROR_UNSUPPORTED_OPERATION, E_FSERROR_ILLEGAL_PATH,
 		       E_FSERROR_DISK_FULL, E_FSERROR_READONLY,
@@ -2015,7 +2015,7 @@ PRIVATE FatFile const new_directory_pattern[3] = {
 
 PRIVATE NONNULL((1, 2, 3)) void KCALL
 Fat_CreateDirectoryInDirectory(struct directory_node *__restrict target_directory,
-                               struct directory_entry *__restrict target_dirent,
+                               struct fdirent *__restrict target_dirent,
                                struct directory_node *__restrict new_node)
 		THROWS(E_FSERROR_UNSUPPORTED_OPERATION, E_FSERROR_ILLEGAL_PATH,
 		       E_FSERROR_DISK_FULL, E_FSERROR_READONLY,
@@ -2093,9 +2093,9 @@ Fat_CreateDirectoryInDirectory(struct directory_node *__restrict target_director
 
 PRIVATE NONNULL((1, 2, 3, 4, 5)) REF struct inode *KCALL
 Fat_RenameFileInDirectory(struct directory_node *__restrict source_directory,
-                          struct directory_entry *__restrict source_dirent,
+                          struct fdirent *__restrict source_dirent,
                           struct directory_node *__restrict target_directory,
-                          struct directory_entry *__restrict target_dirent,
+                          struct fdirent *__restrict target_dirent,
                           struct inode *__restrict source_node)
 		THROWS(E_FSERROR_UNSUPPORTED_OPERATION, E_FSERROR_ILLEGAL_PATH,
 		       E_FSERROR_DISK_FULL, E_FSERROR_READONLY,
@@ -2142,7 +2142,7 @@ Fat_CygwinReadlink(struct symlink_node *__restrict self)
 
 PRIVATE NONNULL((1, 2, 3)) void KCALL
 Fat_CygwinSymlinkCreate(struct directory_node *__restrict target_directory,
-                        struct directory_entry *__restrict target_dirent,
+                        struct fdirent *__restrict target_dirent,
                         struct symlink_node *__restrict link_node)
 		THROWS(E_FSERROR_UNSUPPORTED_OPERATION, E_FSERROR_ILLEGAL_PATH,
 		       E_FSERROR_DISK_FULL, E_FSERROR_READONLY,
@@ -2780,7 +2780,7 @@ PRIVATE NONNULL((1, 2, 3, 4)) void KCALL
 Fat_OpenINode(FatSuperblock *__restrict UNUSED(self),
               struct inode *__restrict node,
               struct directory_node *__restrict UNUSED(parent_directory),
-              struct directory_entry *__restrict UNUSED(parent_directory_entry))
+              struct fdirent *__restrict UNUSED(parent_dirent))
 		THROWS(E_IOERROR, E_BADALLOC, ...) {
 	switch (node->i_filemode & S_IFMT) {
 
@@ -2900,7 +2900,7 @@ PRIVATE struct superblock_type Fat_SuperblockType = {
 	},
 	/*.st_functions = */ {
 		/*.f_fini     = */ (void(KCALL *)(struct superblock *__restrict))&Fat_FinalizeSuperblock,
-		/*.f_opennode = */ (void(KCALL *)(struct superblock *__restrict,struct inode *__restrict,struct directory_node *__restrict,struct directory_entry *__restrict) THROWS(...))&Fat_OpenINode,
+		/*.f_opennode = */ (void(KCALL *)(struct superblock *__restrict,struct inode *__restrict,struct directory_node *__restrict,struct fdirent *__restrict) THROWS(...))&Fat_OpenINode,
 		/*.f_sync     = */ (void(KCALL *)(struct superblock *__restrict,USER CHECKED struct statfs *) THROWS(...))&Fat_StatSuperblock,
 		/*.f_sync     = */ (void(KCALL *)(struct superblock *__restrict) THROWS(...))&Fat_SynchronizeSuperblock
 	}

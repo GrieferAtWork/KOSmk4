@@ -352,7 +352,7 @@ handle_filehandle_readdir(struct filehandle *__restrict self,
                     size_t bufsize,
                     readdir_mode_t readdir_mode,
                     iomode_t UNUSED(mode)) {
-	struct directory_entry *entry, *orig_entry;
+	struct fdirent *entry, *orig_entry;
 	size_t result;
 	pos_t dirpos, req_index, entry_pos;
 	if unlikely(!INODE_ISDIR(self->f_node))
@@ -519,7 +519,7 @@ got_next_entry:
 				assert(req_index < entry_pos);
 				/* Move backwards by one. */
 				entry = COMPILER_CONTAINER_OF(entry->de_bypos.le_prev,
-				                              struct directory_entry,
+				                              struct fdirent,
 				                              de_bypos.le_next);
 				--entry_pos;
 			}
@@ -650,7 +650,7 @@ handle_filehandle_hop(struct filehandle *__restrict self,
 
 	case HOP_FILEHANDLE_OPENDENTRY: {
 		struct handle temp;
-		temp.h_type = HANDLE_TYPE_DIRECTORYENTRY;
+		temp.h_type = HANDLE_TYPE_FDIRENT;
 		temp.h_mode = mode;
 		temp.h_data = self->f_dirent;
 		return handle_installhop((USER UNCHECKED struct hop_openfd *)arg, temp);
@@ -1039,7 +1039,7 @@ handle_filehandle_tryas(struct filehandle *__restrict self,
 	case HANDLE_TYPE_MFILE:
 		return incref(self->f_node);
 
-	case HANDLE_TYPE_DIRECTORYENTRY:
+	case HANDLE_TYPE_FDIRENT:
 		if (!self->f_dirent)
 			break;
 		return incref(self->f_dirent);

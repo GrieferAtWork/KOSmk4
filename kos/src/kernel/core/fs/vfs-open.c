@@ -60,7 +60,7 @@ openat_create_follow_symlink_dynamic_impl(struct fs *__restrict f,
                                           struct symlink_node *__restrict sl_node,
                                           /*in|out*/ REF struct path **__restrict presult_containing_path,
                                           /*in|out*/ REF struct directory_node **__restrict presult_containing_directory,
-                                          /*in|out*/ REF struct directory_entry **__restrict presult_containing_dirent,
+                                          /*in|out*/ REF struct fdirent **__restrict presult_containing_dirent,
                                           /*in|out*/ REF struct inode **__restrict presult_inode,
                                           /*out*/ bool *__restrict pwas_newly_created,
                                           /*in|out*/ size_t *__restrict pbufsize) {
@@ -69,7 +69,7 @@ openat_create_follow_symlink_dynamic_impl(struct fs *__restrict f,
 	REF struct inode *new_result_inode;
 	REF struct path *new_result_containing_path;
 	REF struct directory_node *new_result_containing_directory;
-	REF struct directory_entry *new_result_containing_dirent;
+	REF struct fdirent *new_result_containing_dirent;
 	size_t bufsize = *pbufsize;
 	char *buf;
 	buf = (char *)malloca(bufsize);
@@ -137,7 +137,7 @@ openat_create_follow_symlink_dynamic(struct fs *__restrict f,
                                      struct symlink_node *__restrict sl_node,
                                      /*in|out*/ REF struct path **__restrict presult_containing_path,
                                      /*in|out*/ REF struct directory_node **__restrict presult_containing_directory,
-                                     /*in|out*/ REF struct directory_entry **__restrict presult_containing_dirent,
+                                     /*in|out*/ REF struct fdirent **__restrict presult_containing_dirent,
                                      /*in|out*/ REF struct inode **__restrict presult_inode,
                                      /*out*/ bool *__restrict pwas_newly_created) {
 	size_t bufsize = 128;
@@ -225,7 +225,7 @@ fs_open_ex(struct fs *__restrict filesystem,
 		REF struct inode *result_inode;
 		REF struct path *result_containing_path;
 		REF struct directory_node *result_containing_directory;
-		REF struct directory_entry *result_containing_dirent;
+		REF struct fdirent *result_containing_dirent;
 		if (!(oflags & O_CREAT)) {
 			/* Simple case: open an existing file. */
 			result_inode = path_traversefull_ex(filesystem,
@@ -303,7 +303,7 @@ check_result_inode_for_symlink:
 								REF struct inode *new_result_inode;
 								REF struct path *new_result_containing_path;
 								REF struct directory_node *new_result_containing_directory;
-								REF struct directory_entry *new_result_containing_dirent;
+								REF struct fdirent *new_result_containing_dirent;
 								/* Traverse the symlink text. */
 								new_result_containing_path = path_traversen_ex(filesystem,
 								                                               result_containing_path,

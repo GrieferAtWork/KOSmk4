@@ -1326,7 +1326,7 @@
 #define __BASIC_BLOCK_DEVICE_FIELDS                                                 \
 	refcnt_t bd_refcnt; size_t bd_heapsize; struct block_device_type bd_type;       \
 	struct { struct basic_block_device *a_min, *a_max; dev_t a_vaddr; } bd_devlink; \
-	struct inode *bd_devfs_inode; struct directory_entry *bd_devfs_entry;           \
+	struct inode *bd_devfs_inode; struct fdirent *bd_devfs_entry;           \
 	pos_t bd_total_bytes; lba_t bd_sector_count; size_t bd_sector_size;             \
 	uintptr_half_t bd_flags; char bd_name[16];
 

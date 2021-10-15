@@ -148,7 +148,7 @@ struct mfile_map_for_reflow: mfile_map {
 	uintptr_t                   mfmfr_nodeflags; /* Finalized values for `mnode::mn_flags'. */
 	uintptr_t                   mfmfr_mapaddr;   /* Finalized mapping base-address. (to-be re-added to all nodes) */
 	REF struct path            *mfmfr_fspath;    /* [0..1] Optional mapping path */
-	REF struct directory_entry *mfmfr_fsname;    /* [0..1] Optional mapping name */
+	REF struct fdirent *mfmfr_fsname;    /* [0..1] Optional mapping name */
 };
 
 

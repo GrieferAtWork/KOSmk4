@@ -456,7 +456,7 @@ handle_fifo_user_tryas(struct fifo_user *__restrict self,
 		THROWS(E_WOULDBLOCK) {
 	switch (wanted_type) {
 	case HANDLE_TYPE_MFILE: return incref(self->fu_fifo);
-	case HANDLE_TYPE_DIRECTORYENTRY: return xincref(self->fu_dent);
+	case HANDLE_TYPE_FDIRENT: return xincref(self->fu_dent);
 	case HANDLE_TYPE_PATH: return xincref(self->fu_path);
 	default: break;
 	}

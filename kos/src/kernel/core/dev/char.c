@@ -816,7 +816,7 @@ handle_characterdevice_tryas(struct character_device *__restrict self,
 			return incref(result);
 	}	break;
 
-	case HANDLE_TYPE_DIRECTORYENTRY: {
+	case HANDLE_TYPE_FDIRENT: {
 		if (ATOMIC_READ(self->cd_devfs_inode))
 			return incref(self->cd_devfs_entry);
 	}	break;

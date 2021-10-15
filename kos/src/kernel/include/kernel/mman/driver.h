@@ -709,7 +709,7 @@ driver_finalize(struct driver *__restrict self,
 FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct driver *KCALL
 driver_loadmod_file(struct mfile *__restrict driver_file,
                     struct path *driver_path DFL(__NULLPTR),
-                    struct directory_entry *driver_dentry DFL(__NULLPTR),
+                    struct fdirent *driver_dentry DFL(__NULLPTR),
                     USER CHECKED char const *driver_cmdline DFL(__NULLPTR),
                     __BOOL *pnew_driver_loaded DFL(__NULLPTR))
 		THROWS(E_SEGFAULT, E_NOT_EXECUTABLE, E_BADALLOC, E_IOERROR);
@@ -728,7 +728,7 @@ extern "C++" {
 FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct driver *KCALL
 driver_loadmod(struct mfile *__restrict driver_file,
                struct path *driver_path DFL(__NULLPTR),
-               struct directory_entry *driver_dentry DFL(__NULLPTR),
+               struct fdirent *driver_dentry DFL(__NULLPTR),
                USER CHECKED char const *driver_cmdline DFL(__NULLPTR),
                __BOOL *pnew_driver_loaded DFL(__NULLPTR))
 		THROWS(E_SEGFAULT, E_NOT_EXECUTABLE, E_BADALLOC, E_IOERROR)
@@ -750,7 +750,7 @@ driver_loadmod(USER CHECKED void const *base, size_t num_bytes,
 FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct driver *KCALL
 driver_insmod_file(struct mfile *__restrict driver_file,
                    struct path *driver_path DFL(__NULLPTR),
-                   struct directory_entry *driver_dentry DFL(__NULLPTR),
+                   struct fdirent *driver_dentry DFL(__NULLPTR),
                    USER CHECKED char const *driver_cmdline DFL(__NULLPTR),
                    __BOOL *pnew_driver_loaded DFL(__NULLPTR))
 		THROWS(E_SEGFAULT, E_NOT_EXECUTABLE, E_BADALLOC, E_IOERROR);
@@ -769,7 +769,7 @@ extern "C++" {
 FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct driver *KCALL
 driver_insmod(struct mfile *__restrict driver_file,
               struct path *driver_path DFL(__NULLPTR),
-              struct directory_entry *driver_dentry DFL(__NULLPTR),
+              struct fdirent *driver_dentry DFL(__NULLPTR),
               USER CHECKED char const *driver_cmdline DFL(__NULLPTR),
               __BOOL *pnew_driver_loaded DFL(__NULLPTR))
 		THROWS(E_SEGFAULT, E_NOT_EXECUTABLE, E_BADALLOC, E_IOERROR)

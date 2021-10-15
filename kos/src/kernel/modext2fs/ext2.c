@@ -430,12 +430,12 @@ ExtINode_Fini(struct inode *__restrict self) {
 	}
 }
 
-INTERN REF struct directory_entry *KCALL
+INTERN REF struct fdirent *KCALL
 ExtDir_ReadDir(struct directory_node *__restrict self,
                pos_t *__restrict pentry_pos) {
 	Ext2DiskDirent entry;
 	u16 entsize, namlen;
-	REF struct directory_entry *result;
+	REF struct fdirent *result;
 	unsigned char entry_type;
 	pos_t entry_pos;
 	inode_loadattr(self);
@@ -487,7 +487,7 @@ again:
 		namlen     = LETOH16(entry.d_namlen);
 	}
 	/* Construct the resulting directory entry. */
-	result = directory_entry_alloc(namlen);
+	result = fdirent_alloc(namlen);
 	TRY {
 		result->de_pos  = entry_pos;
 		result->de_ino  = (ino_t)LETOH32(entry.d_ino);
@@ -512,7 +512,7 @@ again:
 		}
 
 		/* Ensure NUL-termination, and generate the hash. */
-		result->de_hash = directory_entry_hash(result->de_name,
+		result->de_hash = fdirent_hash(result->de_name,
 		                                       namlen);
 	} EXCEPT {
 		kfree(result);
@@ -771,7 +771,7 @@ INTERN void KCALL
 Ext2_OpenINode(Ext2Superblock *__restrict UNUSED(self),
                struct inode *__restrict node,
                struct directory_node *__restrict UNUSED(parent_directory),
-               struct directory_entry *__restrict UNUSED(parent_directory_entry))
+               struct fdirent *__restrict UNUSED(parent_dirent))
 		THROWS(E_IOERROR, E_BADALLOC, ...) {
 	switch (node->i_filemode & S_IFMT) {
 
@@ -826,7 +826,7 @@ INTERN struct superblock_type Ext2_SuperblockType = {
 	},
 	/*.st_functions = */ {
 		/*.f_fini     = */ (void(KCALL *)(struct superblock *__restrict))&Ext2_FinalizeSuperblock,
-		/*.f_opennode = */ (void(KCALL *)(struct superblock *__restrict, struct inode *__restrict, struct directory_node *__restrict, struct directory_entry *__restrict))&Ext2_OpenINode,
+		/*.f_opennode = */ (void(KCALL *)(struct superblock *__restrict, struct inode *__restrict, struct directory_node *__restrict, struct fdirent *__restrict))&Ext2_OpenINode,
 		/*.f_sync     = */ (void(KCALL *)(struct superblock *__restrict, USER CHECKED struct statfs *))&Ext2_StatSuperblock,
 		/*.f_sync     = */ (void(KCALL *)(struct superblock *__restrict))&Ext2_SynchronizeSuperblock
 	}

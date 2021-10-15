@@ -17,76 +17,57 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_CORE_FILESYS_DIRENT_C
-#define GUARD_KERNEL_CORE_FILESYS_DIRENT_C 1
+#ifndef GUARD_KERNEL_CORE_FILESYS_FILEHANDLE_C
+#define GUARD_KERNEL_CORE_FILESYS_FILEHANDLE_C 1
 
 #include <kernel/compiler.h>
 
+#include <fs/vfs.h>
 #include <kernel/fs/dirent.h>
-
-#include <hybrid/unaligned.h>
-#include <hybrid/typecore.h>
+#include <kernel/fs/filehandle.h>
+#include <kernel/handle-proto.h>
+#include <kernel/malloc.h>
+#include <kernel/mman/mfile.h>
 
 DECL_BEGIN
 
-/* Return the hash of a given directory entry name.
- * This function is used by various APIs related to file lookup.
- * @throw: E_SEGFAULT: Failed to access the given `text'. */
-PUBLIC ATTR_PURE WUNUSED NONNULL((1)) uintptr_t FCALL
-fdirent_hash(CHECKED USER /*utf-8*/ char const *__restrict text, u16 textlen)
-		THROWS(E_SEGFAULT) {
-	uintptr_t hash = FDIRENT_EMPTY_HASH;
-	uintptr_t const *iter, *end;
+/* Destroy the given filehandle object. */
+PUBLIC NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL filehandle_destroy)(struct filehandle *__restrict self) {
+	decref_unlikely(self->fh_file);
+	xdecref_unlikely(self->fh_path);
+	xdecref_unlikely(self->fh_dirent);
+	kfree(self);
+}
 
-	/* Setup iterators. */
-	iter = (uintptr_t const *)text;
-	end  = iter + (textlen / sizeof(uintptr_t));
-
-	/* Hash whole words */
-	while (iter < end) {
-		hash += UNALIGNED_GET(iter);
-		hash *= 9;
-		++iter;
-	}
-
-	/* Hash trailing word */
-	switch (textlen & (sizeof(uintptr_t) - 1)) {
-#if __SIZEOF_POINTER__ > 4
-	case 7:
-		hash += (uintptr_t)((byte_t const *)iter)[6] << 48;
-		ATTR_FALLTHROUGH
-	case 6:
-		hash += (uintptr_t)((byte_t const *)iter)[5] << 40;
-		ATTR_FALLTHROUGH
-	case 5:
-		hash += (uintptr_t)((byte_t const *)iter)[4] << 32;
-		ATTR_FALLTHROUGH
-	case 4:
-		hash += (uintptr_t)((byte_t const *)iter)[3] << 24;
-		ATTR_FALLTHROUGH
-#endif /* __SIZEOF_POINTER__ > 4 */
-	case 3:
-		hash += (uintptr_t)((byte_t const *)iter)[2] << 16;
-		ATTR_FALLTHROUGH
-	case 2:
-		hash += (uintptr_t)((byte_t const *)iter)[1] << 8;
-		ATTR_FALLTHROUGH
-	case 1:
-		hash += (uintptr_t)((byte_t const *)iter)[0];
-		break;
-	default: break;
-	}
-	return hash;
+/* Allocate and return a new file handle wrapper for the given  file.
+ * This function is used to implement `mfile_v_open()', which is  the
+ * fallback open operator for mfile-s to implement seek capabilities.
+ *
+ * Handle operates invoked on the returned object are forwarded to the
+ * relevant `mfile_u*' functions, lseek(2) is implemented locally, and
+ * `read(2)' and `write(2)' are implemented via `pread(2)'+`pwrite(2)' */
+PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct filehandle *KCALL
+filehandle_new(struct mfile *__restrict self,
+               struct path *access_path,
+               struct fdirent *access_dent) {
+	REF struct filehandle *result;
+	result = (REF struct filehandle *)kmalloc(sizeof(struct filehandle), GFP_NORMAL);
+	result->fh_refcnt = 1;
+	result->fh_file   = incref(self);
+	result->fh_path   = xincref(access_path);
+	result->fh_dirent = xincref(access_dent);
+	atomic64_init(&result->fh_offset, 0);
 }
 
 
+/************************************************************************/
+/* Handle operators for `HANDLE_TYPE_FILEHANDLE'                        */
+/************************************************************************/
 
-/************************************************************************/
-/* Handle operators for `HANDLE_TYPE_FDIRENT'                           */
-/************************************************************************/
 /* TODO */
 
 
 DECL_END
 
-#endif /* !GUARD_KERNEL_CORE_FILESYS_DIRENT_C */
+#endif /* !GUARD_KERNEL_CORE_FILESYS_FILEHANDLE_C */

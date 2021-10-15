@@ -47,7 +47,7 @@ DECL_BEGIN
 
 struct wall_clock;
 
-PRIVATE NONNULL((1, 2)) REF struct directory_entry *KCALL
+PRIVATE NONNULL((1, 2)) REF struct fdirent *KCALL
 ProcFS_PerProc_Fd_Lookup(struct directory_node *__restrict self,
                          CHECKED USER /*utf-8*/ char const *__restrict name,
                          u16 namelen, uintptr_t UNUSED(hash), fsmode_t UNUSED(mode))
@@ -78,8 +78,8 @@ ProcFS_PerProc_Fd_Lookup(struct directory_node *__restrict self,
 				}
 				FINALLY_DECREF_UNLIKELY(hman);
 				if (handle_existsin(fdno, hman)) {
-					REF struct directory_entry *result;
-					result = directory_entry_alloc(namelen);
+					REF struct fdirent *result;
+					result = fdirent_alloc(namelen);
 #ifdef NDEBUG
 					sprintf(result->de_name, "%u", (unsigned int)fdno);
 #else /* NDEBUG */
@@ -91,7 +91,7 @@ ProcFS_PerProc_Fd_Lookup(struct directory_node *__restrict self,
 #endif /* !NDEBUG */
 					/* NOTE: We can't actually trust user-space that `hash' is valid, since
 					 *       the  user  may have  changed the  string  in the  mean time... */
-					result->de_hash = directory_entry_hash(result->de_name, namelen);
+					result->de_hash = fdirent_hash(result->de_name, namelen);
 					result->de_ino  = PROCFS_INOMAKE_FD(pid, fdno);
 					result->de_type = DT_LNK;
 					return result;
@@ -264,7 +264,7 @@ ProcFS_PerProc_Fd_Entry_Open(struct inode *__restrict self,
                              oflag_t UNUSED(oflags),
                              struct path *UNUSED(containing_path),
                              struct directory_node *UNUSED(containing_directory),
-                             struct directory_entry *UNUSED(containing_dirent))
+                             struct fdirent *UNUSED(containing_dirent))
 		THROWS(...) {
 	upid_t pid;
 	unsigned int fdno;

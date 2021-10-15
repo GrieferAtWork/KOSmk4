@@ -58,7 +58,7 @@ struct path;
 struct inode;
 struct inode_data;
 struct superblock;
-struct directory_entry;
+struct fdirent;
 struct directory_node;
 struct symlink_node;
 struct driver;
@@ -184,7 +184,7 @@ struct inode_type {
 		                                  oflag_t oflags,
 		                                  struct path *containing_path,
 		                                  struct directory_node *containing_directory,
-		                                  struct directory_entry *containing_dirent)
+		                                  struct fdirent *containing_dirent)
 				THROWS(...);
 
 	} it_attr;
@@ -347,7 +347,7 @@ struct inode_type {
 			 * @throw: E_IOERROR_BADBOUNDS: Same as returning `NULL'
 			 * @throw: E_IOERROR:     Failed to read data from disk. */
 			NONNULL((1, 2))
-			REF struct directory_entry *(KCALL *d_readdir)(struct directory_node *__restrict self,
+			REF struct fdirent *(KCALL *d_readdir)(struct directory_node *__restrict self,
 			                                               pos_t *__restrict pentry_pos)
 					THROWS(E_FSERROR_UNSUPPORTED_OPERATION, E_IOERROR, ...);
 
@@ -361,8 +361,8 @@ struct inode_type {
 				 * accommodate dynamically  allocated directory  entries.
 				 * When  implemented,  this   operator  is  used   during
 				 * path traversion instead of using `d_readdir' for that.
-				 * NOTE: The implementation of this function is free to make  use
-				 *       of the following fields of the returned directory_entry,
+				 * NOTE: The implementation of this function is free to  make
+				 *       use of the following fields of the returned fdirent,
 				 *       as it sees fit:
 				 *           - return->de_next
 				 *           - return->de_bypos
@@ -376,7 +376,7 @@ struct inode_type {
 				 *                        [...] (Same as not implementing)
 				 * @throw: E_IOERROR:     Failed to read data from disk. */
 				NONNULL((1, 2))
-				REF struct directory_entry *(KCALL *o_lookup)(struct directory_node *__restrict self,
+				REF struct fdirent *(KCALL *o_lookup)(struct directory_node *__restrict self,
 				                                              CHECKED USER /*utf-8*/ char const *__restrict name,
 				                                              u16 namelen, uintptr_t hash, fsmode_t mode)
 						THROWS(E_SEGFAULT, E_FSERROR_FILE_NOT_FOUND,
@@ -437,7 +437,7 @@ struct inode_type {
 			 * @throw: E_IOERROR:              Failed to read/write data to/from disk. */
 			NONNULL((1, 2, 3))
 			void (KCALL *d_creat)(struct directory_node *__restrict target_directory,
-			                      struct directory_entry *__restrict target_dirent,
+			                      struct fdirent *__restrict target_dirent,
 			                      struct regular_node *__restrict new_node)
 					THROWS(E_FSERROR_UNSUPPORTED_OPERATION, E_FSERROR_ILLEGAL_PATH,
 					       E_FSERROR_DISK_FULL, E_FSERROR_READONLY,
@@ -483,7 +483,7 @@ struct inode_type {
 			 * @throw: E_IOERROR:              Failed to read/write data to/from disk. */
 			NONNULL((1, 2, 3))
 			void (KCALL *d_mkdir)(struct directory_node *__restrict target_directory,
-			                      struct directory_entry *__restrict target_dirent,
+			                      struct fdirent *__restrict target_dirent,
 			                      struct directory_node *__restrict new_directory)
 					THROWS(E_FSERROR_UNSUPPORTED_OPERATION, E_FSERROR_ILLEGAL_PATH,
 					       E_FSERROR_DISK_FULL, E_FSERROR_READONLY,
@@ -520,7 +520,7 @@ struct inode_type {
 			 * @throw: E_IOERROR:              Failed to read/write data to/from disk. */
 			NONNULL((1, 2, 3))
 			void (KCALL *d_symlink)(struct directory_node *__restrict target_directory,
-			                        struct directory_entry *__restrict target_dirent,
+			                        struct fdirent *__restrict target_dirent,
 			                        struct symlink_node *__restrict link_node)
 					THROWS(E_FSERROR_UNSUPPORTED_OPERATION, E_FSERROR_ILLEGAL_PATH,
 					       E_FSERROR_DISK_FULL, E_FSERROR_READONLY,
@@ -572,7 +572,7 @@ struct inode_type {
 			 * @throw: E_IOERROR:              Failed to read/write data to/from disk. */
 			NONNULL((1, 2, 3))
 			void (KCALL *d_mknod)(struct directory_node *__restrict target_directory,
-			                      struct directory_entry *__restrict target_dirent,
+			                      struct fdirent *__restrict target_dirent,
 			                      struct inode *__restrict nod)
 					THROWS(E_FSERROR_UNSUPPORTED_OPERATION, E_FSERROR_ILLEGAL_PATH,
 					       E_FSERROR_DISK_FULL, E_FSERROR_READONLY,
@@ -603,7 +603,7 @@ struct inode_type {
 			 * @throw: E_IOERROR:              Failed to read/write data to/from disk. */
 			NONNULL((1, 2, 3))
 			void (KCALL *d_link)(struct directory_node *__restrict target_directory,
-			                     struct directory_entry *__restrict target_dirent,
+			                     struct fdirent *__restrict target_dirent,
 			                     struct inode *__restrict link_target)
 					THROWS(E_FSERROR_UNSUPPORTED_OPERATION, E_FSERROR_ILLEGAL_PATH,
 					       E_FSERROR_DISK_FULL, E_FSERROR_READONLY,
@@ -658,9 +658,9 @@ struct inode_type {
 			 * @throw: E_IOERROR:              Failed to read/write data to/from disk. */
 			NONNULL((1, 2, 3, 4, 5))
 			REF struct inode *(KCALL *d_rename)(struct directory_node *__restrict source_directory,
-			                                    struct directory_entry *__restrict source_dirent,
+			                                    struct fdirent *__restrict source_dirent,
 			                                    struct directory_node *__restrict target_directory,
-			                                    struct directory_entry *__restrict target_dirent,
+			                                    struct fdirent *__restrict target_dirent,
 			                                    struct inode *__restrict source_node)
 					THROWS(E_FSERROR_UNSUPPORTED_OPERATION, E_FSERROR_ILLEGAL_PATH,
 					       E_FSERROR_DISK_FULL, E_FSERROR_READONLY,
@@ -692,7 +692,7 @@ struct inode_type {
 			 * @throw: E_IOERROR:              Failed to read/write data to/from disk. */
 			NONNULL((1, 2, 3))
 			void (KCALL *d_unlink)(struct directory_node *__restrict containing_directory,
-			                       struct directory_entry *__restrict containing_entry,
+			                       struct fdirent *__restrict containing_entry,
 			                       struct inode *__restrict node_to_unlink)
 					THROWS(E_FSERROR_UNSUPPORTED_OPERATION,
 					       E_FSERROR_READONLY, E_IOERROR_READONLY,
@@ -715,7 +715,7 @@ struct inode_type {
 			 * @throw: E_IOERROR:              Failed to read/write data to/from disk. */
 			NONNULL((1, 2, 3))
 			void (KCALL *d_rmdir)(struct directory_node *__restrict containing_directory,
-			                      struct directory_entry *__restrict containing_entry,
+			                      struct fdirent *__restrict containing_entry,
 			                      struct directory_node *__restrict node_to_unlink)
 					THROWS(E_FSERROR_UNSUPPORTED_OPERATION,
 					       E_FSERROR_READONLY, E_IOERROR_READONLY,
@@ -976,11 +976,11 @@ __DEFINE_SYNC_RWLOCK(struct inode,
 
 
 
-struct directory_entry {
+struct fdirent {
 	WEAK refcnt_t                      de_refcnt;  /* Reference counter for this data structure. */
 	size_t                             de_heapsize;/* [const] Allocated heap size. */
-	struct directory_entry            *de_next;    /* [0..1][lock(this)] Next directory entry with the same hash. */
-	LIST_ENTRY(directory_entry)        de_bypos;   /* [lock(this)] Chain of directory entires, sorted by their in-directory position.
+	struct fdirent            *de_next;    /* [0..1][lock(this)] Next directory entry with the same hash. */
+	LIST_ENTRY(fdirent)        de_bypos;   /* [lock(this)] Chain of directory entires, sorted by their in-directory position.
 	                                                * NOTE: When a directory entry is removed, this link is set to NULL,
 	                                                *       meaning that enumerating a directory is as simple as  taking
 	                                                *      `:d_bypos' of the directory node while holding `this'
@@ -1011,11 +1011,11 @@ struct directory_entry {
 	COMPILER_FLEXIBLE_ARRAY(/*utf-8*/ char, de_name); /* [const][de_namelen] Directory entry name. (NUL-terminated) */
 };
 
-DATDEF struct directory_entry empty_directory_entry;
+DATDEF struct fdirent empty_dirent;
 
 FUNDEF NOBLOCK NONNULL((1)) void
-NOTHROW(KCALL directory_entry_destroy)(struct directory_entry *__restrict self);
-DEFINE_REFCOUNT_FUNCTIONS(struct directory_entry, de_refcnt, directory_entry_destroy)
+NOTHROW(KCALL fdirent_destroy)(struct fdirent *__restrict self);
+DEFINE_REFCOUNT_FUNCTIONS(struct fdirent, de_refcnt, fdirent_destroy)
 
 /* Allocate a  new directory  entry.
  * The caller must still initialize:
@@ -1024,25 +1024,25 @@ DEFINE_REFCOUNT_FUNCTIONS(struct directory_entry, de_refcnt, directory_entry_des
  *   - de_fsdata (as needed)
  *   - de_pos
  *   - de_ino
- *   - de_hash   (`directory_entry_alloc' only)
+ *   - de_hash   (`fdirent_alloc' only)
  *   - de_type
- *   - de_name   (`directory_entry_alloc' only)
+ *   - de_name   (`fdirent_alloc' only)
  * NOTE: These functions will have already ensured that
  *       `return->de_name[namelen] == '\0''
  */
-FUNDEF ATTR_MALLOC ATTR_RETNONNULL WUNUSED REF struct directory_entry *KCALL
-directory_entry_alloc(u16 namelen) THROWS(E_BADALLOC);
-FUNDEF ATTR_MALLOC ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct directory_entry *KCALL
-directory_entry_alloc_s(USER CHECKED /*utf-8*/ char const *name, u16 namelen) THROWS(E_BADALLOC,E_SEGFAULT);
+FUNDEF ATTR_MALLOC ATTR_RETNONNULL WUNUSED REF struct fdirent *KCALL
+fdirent_alloc(u16 namelen) THROWS(E_BADALLOC);
+FUNDEF ATTR_MALLOC ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct fdirent *KCALL
+fdirent_alloc_s(USER CHECKED /*utf-8*/ char const *name, u16 namelen) THROWS(E_BADALLOC,E_SEGFAULT);
 
 
 
 /* Return the hash of a given directory entry name.
  * @throw: E_SEGFAULT: Failed to access the given `name'. */
 FUNDEF WUNUSED NONNULL((1)) uintptr_t KCALL
-directory_entry_hash(CHECKED USER /*utf-8*/ char const *__restrict name, u16 namelen)
+fdirent_hash(CHECKED USER /*utf-8*/ char const *__restrict name, u16 namelen)
 		THROWS(E_SEGFAULT);
-#define DIRECTORY_ENTRY_EMPTY_HASH 0 /* == directory_entry_hash("",0) */
+#define FDIRENT_EMPTY_HASH 0 /* == fdirent_hash("",0) */
 
 
 
@@ -1080,9 +1080,9 @@ struct directory_node
 	pos_t                        d_dirend;   /* [lock(this)] Starting address of the next directory entry which hasn't been read yet. */
 	size_t                       d_size;     /* [lock(this)] Amount of directory entries. */
 	size_t                       d_mask;     /* [lock(this)] Allocated directory entry hash-map mask. */
-	REF struct directory_entry **d_map;      /* [0..1][lock(this)][1..d_mask+1][owned] Hash-map of directory entries. */
-	struct directory_entry      *d_bypos;    /* [lock(this)][0..1] Chain of all known directory entries, ordered by address. */
-	struct directory_entry      *d_bypos_end;/* [lock(this)][0..1] Last directory entry that marks the end of the directory. */
+	REF struct fdirent **d_map;      /* [0..1][lock(this)][1..d_mask+1][owned] Hash-map of directory entries. */
+	struct fdirent      *d_bypos;    /* [lock(this)][0..1] Chain of all known directory entries, ordered by address. */
+	struct fdirent      *d_bypos_end;/* [lock(this)][0..1] Last directory entry that marks the end of the directory. */
 };
 
 #if !defined(__cplusplus) || defined(CONFIG_WANT_FS_AS_STRUCT)
@@ -1415,13 +1415,13 @@ symlink_node_readlink(struct symlink_node *__restrict self,
  * @throw: E_FSERROR_UNSUPPORTED_OPERATION:E_FILESYSTEM_OPERATION_READDIR:
  *                             [...]
  * @throw: E_IOERROR:          [...] */
-FUNDEF NONNULL((1)) struct directory_entry *KCALL
+FUNDEF NONNULL((1)) struct fdirent *KCALL
 directory_readnext(struct directory_node *__restrict self)
 		THROWS(E_FSERROR_UNSUPPORTED_OPERATION, E_IOERROR, ...);
 
 /* Same as `directory_readnext()', but return  the
  * self-pointer of the newly read directory entry. */
-FUNDEF WUNUSED NONNULL((1)) struct directory_entry **KCALL
+FUNDEF WUNUSED NONNULL((1)) struct fdirent **KCALL
 directory_readnext_p(struct directory_node *__restrict self)
 		THROWS(E_FSERROR_UNSUPPORTED_OPERATION, E_IOERROR, ...);
 
@@ -1437,7 +1437,7 @@ directory_readnext_p(struct directory_node *__restrict self)
  * @throw: E_FSERROR_UNSUPPORTED_OPERATION:E_FILESYSTEM_OPERATION_READDIR:
  *                             [...]
  * @throw: E_IOERROR:          [...] */
-FUNDEF WUNUSED NONNULL((1)) REF struct directory_entry *KCALL
+FUNDEF WUNUSED NONNULL((1)) REF struct fdirent *KCALL
 directory_getentry(struct directory_node *__restrict self,
                    CHECKED USER /*utf-8*/ char const *name,
                    u16 namelen, uintptr_t hash)
@@ -1445,7 +1445,7 @@ directory_getentry(struct directory_node *__restrict self,
 		       E_FSERROR_UNSUPPORTED_OPERATION,
 		       E_IOERROR, ...);
 
-FUNDEF WUNUSED NONNULL((1)) REF struct directory_entry *KCALL
+FUNDEF WUNUSED NONNULL((1)) REF struct fdirent *KCALL
 directory_getcaseentry(struct directory_node *__restrict self,
                        CHECKED USER /*utf-8*/ char const *name,
                        u16 namelen, uintptr_t hash)
@@ -1455,29 +1455,29 @@ directory_getcaseentry(struct directory_node *__restrict self,
 
 #ifdef __cplusplus
 extern "C++" {
-FORCELOCAL ATTR_ARTIFICIAL WUNUSED NONNULL((1)) REF struct directory_entry *KCALL
+FORCELOCAL ATTR_ARTIFICIAL WUNUSED NONNULL((1)) REF struct fdirent *KCALL
 directory_getentry(struct directory_node *__restrict self,
                    CHECKED USER /*utf-8*/ char const *name, u16 namelen)
 		THROWS(E_FSERROR_DELETED, E_SEGFAULT,
 		       E_FSERROR_UNSUPPORTED_OPERATION,
 		       E_IOERROR, ...) {
 	return directory_getentry(self, name, namelen,
-	                          directory_entry_hash(name,
+	                          fdirent_hash(name,
 	                                               namelen));
 }
 
-FORCELOCAL ATTR_ARTIFICIAL WUNUSED NONNULL((1)) REF struct directory_entry *KCALL
+FORCELOCAL ATTR_ARTIFICIAL WUNUSED NONNULL((1)) REF struct fdirent *KCALL
 directory_getcaseentry(struct directory_node *__restrict self,
                        CHECKED USER /*utf-8*/ char const *name, u16 namelen)
 		THROWS(E_FSERROR_DELETED, E_SEGFAULT,
 		       E_FSERROR_UNSUPPORTED_OPERATION,
 		       E_IOERROR, ...) {
 	return directory_getcaseentry(self, name, namelen,
-	                              directory_entry_hash(name,
+	                              fdirent_hash(name,
 	                                                   namelen));
 }
 
-FORCELOCAL ATTR_ARTIFICIAL WUNUSED NONNULL((1)) REF struct directory_entry *KCALL
+FORCELOCAL ATTR_ARTIFICIAL WUNUSED NONNULL((1)) REF struct fdirent *KCALL
 directory_getentry(struct directory_node *__restrict self,
                    CHECKED USER /*utf-8*/ char const *name)
 		THROWS(E_FSERROR_DELETED, E_SEGFAULT,
@@ -1486,7 +1486,7 @@ directory_getentry(struct directory_node *__restrict self,
 	return directory_getentry(self, name, __libc_strlen(name));
 }
 
-FORCELOCAL ATTR_ARTIFICIAL WUNUSED NONNULL((1)) REF struct directory_entry *KCALL
+FORCELOCAL ATTR_ARTIFICIAL WUNUSED NONNULL((1)) REF struct fdirent *KCALL
 directory_getcaseentry(struct directory_node *__restrict self,
                        CHECKED USER /*utf-8*/ char const *name)
 		THROWS(E_FSERROR_DELETED, E_SEGFAULT,
@@ -1514,63 +1514,63 @@ directory_getcaseentry(struct directory_node *__restrict self,
  * @throw: E_FSERROR_UNSUPPORTED_OPERATION:E_FILESYSTEM_OPERATION_READDIR:
  *                             [...]
  * @throw: E_IOERROR:          [...] */
-FUNDEF WUNUSED NONNULL((1, 5)) struct directory_entry **KCALL
+FUNDEF WUNUSED NONNULL((1, 5)) struct fdirent **KCALL
 directory_getentry_p(struct directory_node *__restrict self,
                      CHECKED USER /*utf-8*/ char const *name,
                      u16 namelen, uintptr_t hash,
-                     /*out*/ REF struct directory_entry **__restrict poneshot_entry)
+                     /*out*/ REF struct fdirent **__restrict poneshot_entry)
 		THROWS(E_FSERROR_DELETED, E_SEGFAULT,
 		       E_FSERROR_UNSUPPORTED_OPERATION,
 		       E_IOERROR, E_SEGFAULT, ...);
-FUNDEF WUNUSED NONNULL((1, 5)) struct directory_entry **KCALL
+FUNDEF WUNUSED NONNULL((1, 5)) struct fdirent **KCALL
 directory_getcaseentry_p(struct directory_node *__restrict self,
                          CHECKED USER /*utf-8*/ char const *name,
                          u16 namelen, uintptr_t hash,
-                         /*out*/ REF struct directory_entry **__restrict poneshot_entry)
+                         /*out*/ REF struct fdirent **__restrict poneshot_entry)
 		THROWS(E_FSERROR_DELETED, E_SEGFAULT,
 		       E_FSERROR_UNSUPPORTED_OPERATION,
 		       E_IOERROR, E_SEGFAULT, ...);
 
 #ifdef __cplusplus
 extern "C++" {
-FORCELOCAL ATTR_ARTIFICIAL WUNUSED NONNULL((1, 4)) struct directory_entry **KCALL
+FORCELOCAL ATTR_ARTIFICIAL WUNUSED NONNULL((1, 4)) struct fdirent **KCALL
 directory_getentry_p(struct directory_node *__restrict self,
                      CHECKED USER /*utf-8*/ char const *name, u16 namelen,
-                     /*out*/ REF struct directory_entry **__restrict poneshot_entry)
+                     /*out*/ REF struct fdirent **__restrict poneshot_entry)
 		THROWS(E_FSERROR_DELETED, E_SEGFAULT,
 		       E_FSERROR_UNSUPPORTED_OPERATION,
 		       E_IOERROR, E_SEGFAULT, ...) {
 	return directory_getentry_p(self, name, namelen,
-	                            directory_entry_hash(name, namelen),
+	                            fdirent_hash(name, namelen),
 	                            poneshot_entry);
 }
 
-FORCELOCAL ATTR_ARTIFICIAL WUNUSED NONNULL((1, 4)) struct directory_entry **KCALL
+FORCELOCAL ATTR_ARTIFICIAL WUNUSED NONNULL((1, 4)) struct fdirent **KCALL
 directory_getcaseentry_p(struct directory_node *__restrict self,
                          CHECKED USER /*utf-8*/ char const *name, u16 namelen,
-                         /*out*/ REF struct directory_entry **__restrict poneshot_entry)
+                         /*out*/ REF struct fdirent **__restrict poneshot_entry)
 		THROWS(E_FSERROR_DELETED, E_SEGFAULT,
 		       E_FSERROR_UNSUPPORTED_OPERATION,
 		       E_IOERROR, E_SEGFAULT, ...) {
 	return directory_getcaseentry_p(self, name, namelen,
-	                                directory_entry_hash(name, namelen),
+	                                fdirent_hash(name, namelen),
 	                                poneshot_entry);
 }
 
-FORCELOCAL ATTR_ARTIFICIAL WUNUSED NONNULL((1, 3)) struct directory_entry **KCALL
+FORCELOCAL ATTR_ARTIFICIAL WUNUSED NONNULL((1, 3)) struct fdirent **KCALL
 directory_getentry_p(struct directory_node *__restrict self,
                      CHECKED USER /*utf-8*/ char const *name,
-                     /*out*/ REF struct directory_entry **__restrict poneshot_entry)
+                     /*out*/ REF struct fdirent **__restrict poneshot_entry)
 		THROWS(E_FSERROR_DELETED, E_SEGFAULT,
 		       E_FSERROR_UNSUPPORTED_OPERATION,
 		       E_IOERROR, E_SEGFAULT, ...) {
 	return directory_getentry_p(self, name, __libc_strlen(name), poneshot_entry);
 }
 
-FORCELOCAL ATTR_ARTIFICIAL WUNUSED NONNULL((1, 3)) struct directory_entry **KCALL
+FORCELOCAL ATTR_ARTIFICIAL WUNUSED NONNULL((1, 3)) struct fdirent **KCALL
 directory_getcaseentry_p(struct directory_node *__restrict self,
                          CHECKED USER /*utf-8*/ char const *name,
-                         /*out*/ REF struct directory_entry **__restrict poneshot_entry)
+                         /*out*/ REF struct fdirent **__restrict poneshot_entry)
 		THROWS(E_FSERROR_DELETED, E_SEGFAULT,
 		       E_FSERROR_UNSUPPORTED_OPERATION,
 		       E_IOERROR, E_SEGFAULT, ...) {
@@ -1594,7 +1594,7 @@ FUNDEF WUNUSED NONNULL((1)) REF struct inode *KCALL
 directory_getnode(struct directory_node *__restrict self,
                   CHECKED USER /*utf-8*/ char const *name,
                   u16 namelen, uintptr_t hash,
-                  REF struct directory_entry **pentry DFL(__NULLPTR))
+                  REF struct fdirent **pentry DFL(__NULLPTR))
 		THROWS(E_FSERROR_DELETED, E_SEGFAULT,
 		       E_FSERROR_UNSUPPORTED_OPERATION,
 		       E_IOERROR, E_SEGFAULT, ...);
@@ -1603,7 +1603,7 @@ FUNDEF WUNUSED NONNULL((1)) REF struct inode *KCALL
 directory_getcasenode(struct directory_node *__restrict self,
                       CHECKED USER /*utf-8*/ char const *name,
                       u16 namelen, uintptr_t hash,
-                      REF struct directory_entry **pentry DFL(__NULLPTR))
+                      REF struct fdirent **pentry DFL(__NULLPTR))
 		THROWS(E_FSERROR_DELETED, E_SEGFAULT,
 		       E_FSERROR_UNSUPPORTED_OPERATION,
 		       E_IOERROR, E_SEGFAULT, ...);
@@ -1613,31 +1613,31 @@ extern "C++" {
 FORCELOCAL ATTR_ARTIFICIAL WUNUSED NONNULL((1)) REF struct inode *KCALL
 directory_getnode(struct directory_node *__restrict self,
                   CHECKED USER /*utf-8*/ char const *name, u16 namelen,
-                  REF struct directory_entry **pentry DFL(__NULLPTR))
+                  REF struct fdirent **pentry DFL(__NULLPTR))
 		THROWS(E_FSERROR_DELETED, E_SEGFAULT,
 		       E_FSERROR_UNSUPPORTED_OPERATION,
 		       E_IOERROR, E_SEGFAULT, ...) {
 	return directory_getnode(self, name, namelen,
-	                         directory_entry_hash(name, namelen),
+	                         fdirent_hash(name, namelen),
 	                         pentry);
 }
 
 FORCELOCAL ATTR_ARTIFICIAL WUNUSED NONNULL((1)) REF struct inode *KCALL
 directory_getcasenode(struct directory_node *__restrict self,
                       CHECKED USER /*utf-8*/ char const *name, u16 namelen,
-                      REF struct directory_entry **pentry DFL(__NULLPTR))
+                      REF struct fdirent **pentry DFL(__NULLPTR))
 		THROWS(E_FSERROR_DELETED, E_SEGFAULT,
 		       E_FSERROR_UNSUPPORTED_OPERATION,
 		       E_IOERROR, E_SEGFAULT, ...) {
 	return directory_getcasenode(self, name, namelen,
-								 directory_entry_hash(name, namelen),
+								 fdirent_hash(name, namelen),
 								 pentry);
 }
 
 FORCELOCAL ATTR_ARTIFICIAL WUNUSED NONNULL((1)) REF struct inode *KCALL
 directory_getnode(struct directory_node *__restrict self,
                   CHECKED USER /*utf-8*/ char const *name,
-                  REF struct directory_entry **pentry DFL(__NULLPTR))
+                  REF struct fdirent **pentry DFL(__NULLPTR))
 		THROWS(E_FSERROR_DELETED, E_SEGFAULT,
 		       E_FSERROR_UNSUPPORTED_OPERATION,
 		       E_IOERROR, E_SEGFAULT, ...) {
@@ -1647,7 +1647,7 @@ directory_getnode(struct directory_node *__restrict self,
 FORCELOCAL ATTR_ARTIFICIAL WUNUSED NONNULL((1)) REF struct inode *KCALL
 directory_getcasenode(struct directory_node *__restrict self,
                       CHECKED USER /*utf-8*/ char const *name,
-                      REF struct directory_entry **pentry DFL(__NULLPTR))
+                      REF struct fdirent **pentry DFL(__NULLPTR))
 		THROWS(E_FSERROR_DELETED, E_SEGFAULT,
 		       E_FSERROR_UNSUPPORTED_OPERATION,
 		       E_IOERROR, E_SEGFAULT, ...) {
@@ -1678,7 +1678,7 @@ FUNDEF ATTR_RETNONNULL NONNULL((1, 2)) REF struct inode *KCALL
 directory_creatfile(struct directory_node *__restrict target_directory,
                     CHECKED USER /*utf-8*/ char const *__restrict target_name, u16 target_namelen,
                     oflag_t open_mode, uid_t owner, gid_t group, mode_t mode,
-                    REF struct directory_entry **ptarget_dirent DFL(__NULLPTR),
+                    REF struct fdirent **ptarget_dirent DFL(__NULLPTR),
                     bool *pwas_newly_created DFL(__NULLPTR))
 		THROWS(E_FSERROR_DELETED, E_FSERROR_ILLEGAL_PATH, E_FSERROR_FILE_ALREADY_EXISTS,
 		       E_FSERROR_FILE_NOT_FOUND, E_FSERROR_DISK_FULL, E_FSERROR_UNSUPPORTED_OPERATION,
@@ -1737,7 +1737,7 @@ directory_remove(struct directory_node *__restrict self,
                  CHECKED USER /*utf-8*/ char const *__restrict name, u16 namelen, uintptr_t hash,
                  unsigned int mode DFL(DIRECTORY_REMOVE_FREGULAR | DIRECTORY_REMOVE_FDIRECTORY),
                  /*out*/ REF struct inode **premoved_inode DFL(__NULLPTR),
-                 /*out*/ REF struct directory_entry **premoved_dirent DFL(__NULLPTR),
+                 /*out*/ REF struct fdirent **premoved_dirent DFL(__NULLPTR),
                  struct path *containing_path DFL(__NULLPTR),
                  /*out*/ REF struct path **premoved_path DFL(__NULLPTR))
 		THROWS(E_FSERROR_DELETED, E_FSERROR_DIRECTORY_NOT_EMPTY,
@@ -1792,8 +1792,8 @@ directory_rename(struct directory_node *__restrict source_directory,
                  struct directory_node *__restrict target_directory,
                  CHECKED USER /*utf-8*/ char const *__restrict target_name,
                  u16 target_namelen, unsigned int mode DFL(DIRECTORY_RENAME_FNORMAL),
-                 /*out*/ REF struct directory_entry **psource_dirent DFL(__NULLPTR),
-                 /*out*/ REF struct directory_entry **ptarget_dirent DFL(__NULLPTR),
+                 /*out*/ REF struct fdirent **psource_dirent DFL(__NULLPTR),
+                 /*out*/ REF struct fdirent **ptarget_dirent DFL(__NULLPTR),
                  /*out*/ REF struct inode **psource_inode DFL(__NULLPTR),
                  /*out*/ REF struct inode **ptarget_inode DFL(__NULLPTR),
                  struct path *source_path DFL(__NULLPTR),
@@ -1829,7 +1829,7 @@ directory_link(struct directory_node *__restrict target_directory,
                CHECKED USER /*utf-8*/ char const *__restrict target_name,
                u16 target_namelen, struct inode *__restrict link_target,
                unsigned int link_mode DFL(DIRECTORY_LINK_FNORMAL),
-               /*out*/ REF struct directory_entry **ptarget_dirent DFL(__NULLPTR))
+               /*out*/ REF struct fdirent **ptarget_dirent DFL(__NULLPTR))
 		THROWS(E_FSERROR_UNSUPPORTED_OPERATION, E_FSERROR_DELETED,
 		       E_FSERROR_CROSS_DEVICE_LINK, E_FSERROR_ILLEGAL_PATH,
 		       E_FSERROR_FILE_ALREADY_EXISTS, E_FSERROR_DISK_FULL,
@@ -1856,7 +1856,7 @@ directory_symlink(struct directory_node *__restrict target_directory,
                   CHECKED USER /*utf-8*/ char const *link_text, size_t link_text_size,
                   uid_t owner, gid_t group, mode_t mode,
                   unsigned int symlink_mode DFL(DIRECTORY_SYMLINK_FNORMAL),
-                  /*out*/ REF struct directory_entry **ptarget_dirent DFL(__NULLPTR))
+                  /*out*/ REF struct fdirent **ptarget_dirent DFL(__NULLPTR))
 		THROWS(E_FSERROR_UNSUPPORTED_OPERATION, E_FSERROR_DELETED,
 		       E_FSERROR_ILLEGAL_PATH, E_FSERROR_FILE_ALREADY_EXISTS,
 		       E_FSERROR_DISK_FULL, E_FSERROR_READONLY, E_IOERROR, E_SEGFAULT, ...);
@@ -1881,7 +1881,7 @@ directory_mknod(struct directory_node *__restrict target_directory,
                 u16 target_namelen, mode_t mode, uid_t owner,
                 gid_t group, dev_t referenced_device,
                 unsigned int mknod_mode DFL(DIRECTORY_MKNOD_FNORMAL),
-                /*out*/ REF struct directory_entry **ptarget_dirent DFL(__NULLPTR))
+                /*out*/ REF struct fdirent **ptarget_dirent DFL(__NULLPTR))
 		THROWS(E_FSERROR_UNSUPPORTED_OPERATION, E_FSERROR_DELETED,
 		       E_FSERROR_ILLEGAL_PATH, E_FSERROR_FILE_ALREADY_EXISTS,
 		       E_FSERROR_DISK_FULL, E_FSERROR_READONLY, E_IOERROR, E_SEGFAULT, ...);
@@ -1905,7 +1905,7 @@ directory_mkdir(struct directory_node *__restrict target_directory,
                 CHECKED USER /*utf-8*/ char const *__restrict target_name,
                 u16 target_namelen, mode_t mode, uid_t owner, gid_t group,
                 unsigned int mkdir_mode DFL(DIRECTORY_MKDIR_FNORMAL),
-                /*out*/ REF struct directory_entry **ptarget_dirent DFL(__NULLPTR))
+                /*out*/ REF struct fdirent **ptarget_dirent DFL(__NULLPTR))
 		THROWS(E_FSERROR_UNSUPPORTED_OPERATION, E_FSERROR_DELETED,
 		       E_FSERROR_ILLEGAL_PATH, E_FSERROR_FILE_ALREADY_EXISTS,
 		       E_FSERROR_DISK_FULL, E_FSERROR_READONLY, E_IOERROR, E_SEGFAULT, ...);
@@ -2006,7 +2006,7 @@ struct superblock_type {
 		void (KCALL *f_opennode)(struct superblock *__restrict self,
 		                         struct inode *__restrict node,
 		                         struct directory_node *__restrict parent_directory,
-		                         struct directory_entry *__restrict parent_directory_entry)
+		                         struct fdirent *__restrict parent_dirent)
 				THROWS(E_IOERROR, E_BADALLOC, ...);
 
 		/* [0..1][const]
@@ -2209,7 +2209,7 @@ NOTHROW(KCALL superblock_clear_caches)(struct superblock *__restrict self);
 FUNDEF ATTR_RETNONNULL NONNULL((1, 2, 3)) REF struct inode *KCALL
 superblock_opennode(struct superblock *__restrict self,
                     struct directory_node *__restrict parent_directory,
-                    struct directory_entry *__restrict parent_directory_entry)
+                    struct fdirent *__restrict parent_dirent)
 		THROWS(E_FSERROR_DELETED, E_IOERROR, E_BADALLOC, ...);
 
 /* Find some  mounting point  that is  apart of  the given  `ns'

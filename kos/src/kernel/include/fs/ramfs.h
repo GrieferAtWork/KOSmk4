@@ -60,7 +60,7 @@ DATDEF struct superblock devfs;
  *       then this function is a no-op. */
 FUNDEF NOBLOCK void
 NOTHROW(KCALL devfs_remove)(struct inode *__restrict node,
-                            struct directory_entry *__restrict entry);
+                            struct fdirent *__restrict entry);
 
 /* Insert a new device node into /dev, using `name' as the
  * filename  of  the   file  to-be   placed  under   /dev.
@@ -79,7 +79,7 @@ FUNDEF bool KCALL
 devfs_insert(USER CHECKED char const *name,
              mode_t kind, dev_t devno,
              REF struct inode **pdevfs_node,
-             REF struct directory_entry **pdevfs_entry)
+             REF struct fdirent **pdevfs_entry)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT);
 
 

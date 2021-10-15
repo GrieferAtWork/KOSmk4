@@ -47,13 +47,13 @@
 DECL_BEGIN
 
 
-PRIVATE NONNULL((1, 2)) REF struct directory_entry *KCALL
+PRIVATE NONNULL((1, 2)) REF struct fdirent *KCALL
 ProcFS_PerProc_Task_Lookup(struct directory_node *__restrict self,
                            CHECKED USER /*utf-8*/ char const *__restrict name,
                            u16 namelen, uintptr_t UNUSED(hash), fsmode_t UNUSED(mode))
 		THROWS(E_SEGFAULT, E_FSERROR_FILE_NOT_FOUND,
 		       E_FSERROR_UNSUPPORTED_OPERATION, E_IOERROR, ...) {
-	REF struct directory_entry *result;
+	REF struct fdirent *result;
 	upid_t pidno, leader_pid;
 	size_t i;
 	char ch;
@@ -85,7 +85,7 @@ ProcFS_PerProc_Task_Lookup(struct directory_node *__restrict self,
 		if (real_leader_pidno != leader_pid)
 			goto notapid;
 	}
-	result = directory_entry_alloc(namelen);
+	result = fdirent_alloc(namelen);
 #ifdef NDEBUG
 	sprintf(result->de_name, "%u", (unsigned int)pidno);
 #else /* NDEBUG */
@@ -97,7 +97,7 @@ ProcFS_PerProc_Task_Lookup(struct directory_node *__restrict self,
 #endif /* !NDEBUG */
 	/* NOTE: We can't actually trust user-space that `hash' is valid, since
 	 *       the  user  may have  changed the  string  in the  mean time... */
-	result->de_hash = directory_entry_hash(result->de_name, namelen);
+	result->de_hash = fdirent_hash(result->de_name, namelen);
 	result->de_ino  = PROCFS_INOMAKE_PERPROC(pidno, PROCFS_PERPROC_ROOT);
 	result->de_type = DT_DIR;
 	return result;

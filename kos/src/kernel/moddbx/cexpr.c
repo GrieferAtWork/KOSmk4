@@ -3312,7 +3312,7 @@ got_symbol_type:
 				if (cmodule_isuser(expr.v_module) &&
 				    expr.v_module->cm_module->md_fspath == NULL &&
 				    expr.v_module->cm_module->md_fsname != NULL) {
-					struct directory_entry *dent = expr.v_module->cm_module->md_fsname;
+					struct fdirent *dent = expr.v_module->cm_module->md_fsname;
 					if ((dent->de_namelen == COMPILER_STRLEN(RTLD_LIBDL) &&
 					     memcmp(dent->de_name, RTLD_LIBDL, sizeof(RTLD_LIBDL)) == 0)
 #ifdef __ARCH_HAVE_COMPAT

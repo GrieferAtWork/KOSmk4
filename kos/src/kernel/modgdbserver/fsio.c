@@ -464,7 +464,7 @@ NOTHROW(KCALL GDBFs_Unlink)(char *filename) {
 			path_remove(p,
 			            last_seg,
 			            last_seglen,
-			            directory_entry_hash(last_seg, last_seglen),
+			            fdirent_hash(last_seg, last_seglen),
 			            DIRECTORY_REMOVE_FREGULAR,
 			            NULL,
 			            NULL,

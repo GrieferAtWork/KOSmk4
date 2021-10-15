@@ -438,7 +438,7 @@ INTDEF void KCALL
 Ext2_OpenINode(Ext2Superblock *__restrict self,
                struct inode *__restrict node,
                struct directory_node *__restrict parent_directory,
-               struct directory_entry *__restrict parent_directory_entry)
+               struct fdirent *__restrict parent_dirent)
 		THROWS(E_IOERROR, E_BADALLOC, ...);
 
 INTDEF void KCALL

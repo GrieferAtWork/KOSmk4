@@ -121,12 +121,12 @@ Iso9660INode_LoadAttr(struct inode *__restrict self) {
 }
 
 STATIC_ASSERT(sizeof(DirectoryEntry) == 256);
-INTERN REF struct directory_entry *KCALL
+INTERN REF struct fdirent *KCALL
 Iso9660Inode_ReadDir(struct directory_node *__restrict self,
                      pos_t *__restrict pentry_pos) {
 	DirectoryEntry ent;
 	pos_t entry_pos;
-	REF struct directory_entry *result;
+	REF struct fdirent *result;
 	entry_pos = *pentry_pos;
 	inode_loadattr(self);
 again:
@@ -145,7 +145,7 @@ again:
 		entry_pos += ent.de_length;
 		goto again;
 	}
-	result = directory_entry_alloc(ent.de_namelen);
+	result = fdirent_alloc(ent.de_namelen);
 	result->de_pos                        = entry_pos;
 	result->de_ino                        = (ino_t)entry_pos; /* INO == Address of directory entry. */
 	result->de_type                       = DT_REG;
@@ -156,7 +156,7 @@ again:
 	memcpy(result->de_name, ent.de_name, ent.de_namelen, sizeof(char));
 
 	/* Ensure NUL-termination, and generate the hash. */
-	result->de_hash = directory_entry_hash(result->de_name,
+	result->de_hash = fdirent_hash(result->de_name,
 	                                       ent.de_namelen);
 
 	entry_pos += ent.de_length;
@@ -168,11 +168,11 @@ INTERN void KCALL
 Iso9660_OpenINode(Iso9660Superblock *__restrict self,
                   struct inode *__restrict node,
                   struct directory_node *__restrict UNUSED(parent_directory),
-                  struct directory_entry *__restrict parent_directory_entry)
+                  struct fdirent *__restrict parent_dirent)
 		THROWS(E_IOERROR, E_BADALLOC, ...) {
 	/* Load INode attributes from fs-specific directory entry data. */
-	node->i_filesize  = (pos_t)(*(u32 const *)&parent_directory_entry->de_fsdata.de_data[4]);
-	node->i_fsdata    = (struct inode_data *)(uintptr_t)(*(u32 const *)&parent_directory_entry->de_fsdata.de_data[0]);
+	node->i_filesize  = (pos_t)(*(u32 const *)&parent_dirent->de_fsdata.de_data[4]);
+	node->i_fsdata    = (struct inode_data *)(uintptr_t)(*(u32 const *)&parent_dirent->de_fsdata.de_data[0]);
 	node->i_filenlink = (nlink_t)1;
 	node->i_fileuid   = self->i_fileuid;
 	node->i_filegid   = self->i_filegid;
@@ -373,7 +373,7 @@ INTERN struct superblock_type Iso9660_SuperblockType = {
 	},
 	/* .st_functions = */ {
 		/* .f_fini     = */ NULL,
-		/* .f_opennode = */ (void(KCALL *)(struct superblock *__restrict, struct inode *__restrict, struct directory_node *__restrict, struct directory_entry *__restrict))&Iso9660_OpenINode,
+		/* .f_opennode = */ (void(KCALL *)(struct superblock *__restrict, struct inode *__restrict, struct directory_node *__restrict, struct fdirent *__restrict))&Iso9660_OpenINode,
 		/* .f_statfs   = */ (void(KCALL *)(struct superblock *__restrict, USER CHECKED struct statfs *))&Iso9660_StatFs,
 		/* .f_sync     = */ NULL
 	}

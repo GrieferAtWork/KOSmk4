@@ -119,7 +119,7 @@ struct driver;
 struct icpustate;
 struct mman;
 struct path;
-struct directory_entry;
+struct fdirent;
 struct regular_node;
 
 struct execargs {
@@ -133,7 +133,7 @@ struct execargs {
 	                                             * Note however that  in the  case of a  dynamic binary,  a dynamic  linker
 	                                             * may be injected to perform dynamic linking whilst already in user-space. */
 	REF struct path            *ea_xpath;       /* [1..1] Filesystem path for the directory inside of which `ea_xnode' is located. */
-	REF struct directory_entry *ea_xdentry;     /* [1..1] Directory entry containing the filename of `ea_xnode'. */
+	REF struct fdirent *ea_xdentry;     /* [1..1] Directory entry containing the filename of `ea_xnode'. */
 	REF struct regular_node    *ea_xnode;       /* [1..1] The filesystem node which should be loaded as an executable binary. */
 	byte_t                      ea_header[CONFIG_EXECABI_MAXHEADER];
 	                                            /* The first `CONFIG_EXECABI_MAXHEADER' bytes of `ea_xnode'. Of this  buffer,

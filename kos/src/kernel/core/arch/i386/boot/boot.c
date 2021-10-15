@@ -383,7 +383,7 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 		cd = superblock_open("iso9660", "/dev/hdb");
 		{
 			SCOPED_READLOCK((struct mfile *)cd);
-			REF struct directory_entry *ent;
+			REF struct fdirent *ent;
 			while ((ent = directory_readnext(cd)) != NULL) {
 				printk("ENTRY: %$q, %u, %" PRIuN(__SIZEOF_INO_T__) "\n",
 				       (size_t)ent->de_namelen,

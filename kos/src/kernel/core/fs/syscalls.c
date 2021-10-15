@@ -603,7 +603,7 @@ DEFINE_SYSCALL3(errno_t, unlinkat, fd_t, dirfd,
 		path_remove(p,
 		            last_seg,
 		            last_seglen,
-		            directory_entry_hash(last_seg, last_seglen),
+		            fdirent_hash(last_seg, last_seglen),
 		            remove_mode,
 		            NULL,
 		            NULL,
@@ -640,7 +640,7 @@ DEFINE_SYSCALL1(errno_t, unlink, USER UNCHECKED char const *, pathname) {
 		path_remove(p,
 		            last_seg,
 		            last_seglen,
-		            directory_entry_hash(last_seg, last_seglen),
+		            fdirent_hash(last_seg, last_seglen),
 		            remove_mode,
 		            NULL,
 		            NULL,
@@ -677,7 +677,7 @@ DEFINE_SYSCALL1(errno_t, rmdir, USER UNCHECKED char const *, pathname) {
 		path_remove(p,
 		            last_seg,
 		            last_seglen,
-		            directory_entry_hash(last_seg, last_seglen),
+		            fdirent_hash(last_seg, last_seglen),
 		            remove_mode,
 		            NULL,
 		            NULL,
@@ -1147,7 +1147,7 @@ have_paths:
 			path_rename(source_path,
 			            old_last_seg,
 			            old_last_seglen,
-			            directory_entry_hash(old_last_seg,
+			            fdirent_hash(old_last_seg,
 			                                 old_last_seglen),
 			            target_path,
 			            new_last_seg,
@@ -2383,7 +2383,7 @@ DEFINE_SYSCALL5(ssize_t, frealpathat,
 	unsigned int print_mode = PATH_PRINT_MODE_NORMAL;
 	REF struct path *cwd, *root;
 	REF struct path *containing_path;
-	REF struct directory_entry *containing_dentry;
+	REF struct fdirent *containing_dentry;
 	validate_writable(buf, buflen);
 	VALIDATE_FLAGSET(flags,
 	                 AT_SYMLINK_NOFOLLOW | AT_ALTPATH | AT_READLINK_REQSIZE | AT_DOSPATH,

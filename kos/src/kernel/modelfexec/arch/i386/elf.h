@@ -42,7 +42,7 @@ DECL_BEGIN
 
 struct icpustate;
 struct path;
-struct directory_entry;
+struct fdirent;
 struct regular_node;
 
 /* Initialize user-space for program execution. */
@@ -56,7 +56,7 @@ elfexec_init_entry32(struct icpustate *__restrict user_state,
 INTDEF ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3, 4, 5, 6)) struct icpustate *KCALL
 elfexec_init_rtld32(struct icpustate *__restrict user_state,
                     struct path *__restrict exec_path,
-                    struct directory_entry *__restrict exec_dentry,
+                    struct fdirent *__restrict exec_dentry,
                     struct regular_node *__restrict exec_node,
                     Elf32_Ehdr const *__restrict ehdr,
                     Elf32_Phdr const *__restrict phdr_vec, Elf32_Half phdr_cnt,

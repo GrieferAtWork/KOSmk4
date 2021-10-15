@@ -63,7 +63,7 @@ handle_blockdevice_tryas(struct basic_block_device *__restrict self,
 			return incref(result);
 	}	break;
 
-	case HANDLE_TYPE_DIRECTORYENTRY: {
+	case HANDLE_TYPE_FDIRENT: {
 		if (ATOMIC_READ(self->bd_devfs_inode))
 			return incref(self->bd_devfs_entry);
 	}	break;

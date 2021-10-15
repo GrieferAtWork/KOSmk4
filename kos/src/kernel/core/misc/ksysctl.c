@@ -86,7 +86,7 @@ load_driver_from_file_handles(unsigned int fd_node,
 	REF struct driver *result;
 	REF struct regular_node *driver_node;
 	REF struct path *driver_path;
-	REF struct directory_entry *driver_dentry;
+	REF struct fdirent *driver_dentry;
 	driver_path   = NULL;
 	driver_dentry = NULL;
 	driver_node   = NULL;
@@ -95,14 +95,14 @@ load_driver_from_file_handles(unsigned int fd_node,
 	TRY {
 		REF struct handle nodehand;
 		if (fd_dent != (unsigned int)-1)
-			driver_dentry = handle_get_directory_entry(fd_dent);
+			driver_dentry = handle_get_fdirent(fd_dent);
 		nodehand = handle_lookup(fd_node);
 		TRY {
 			/* (Try to) fill in missing filesystem information from `f_node' */
 			if (!driver_path)
 				driver_path = (REF struct path *)handle_tryas_noinherit(nodehand, HANDLE_TYPE_PATH);
 			if (!driver_dentry)
-				driver_dentry = (REF struct directory_entry *)handle_tryas_noinherit(nodehand, HANDLE_TYPE_DIRECTORYENTRY);
+				driver_dentry = (REF struct fdirent *)handle_tryas_noinherit(nodehand, HANDLE_TYPE_FDIRENT);
 			/* Lookup the actual INode from which to load the driver. */
 			driver_node = handle_as_regular_node(nodehand);
 		} EXCEPT {

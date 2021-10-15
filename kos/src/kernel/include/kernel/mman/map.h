@@ -140,7 +140,7 @@ DECL_BEGIN
 struct mman;
 struct mfile;
 struct path;
-struct directory_entry;
+struct fdirent;
 
 #ifndef __mfile_phys_defined
 #define __mfile_phys_defined
@@ -192,7 +192,7 @@ mman_map(struct mman *__restrict self,
          unsigned int flags DFL(0),
          struct mfile *__restrict file DFL(&mfile_zero),
          struct path *file_fspath DFL(__NULLPTR),
-         struct directory_entry *file_fsname DFL(__NULLPTR),
+         struct fdirent *file_fsname DFL(__NULLPTR),
          pos_t file_pos DFL(0),
          size_t min_alignment DFL(PAGESIZE))
 		THROWS(E_WOULDBLOCK, E_BADALLOC,
@@ -227,7 +227,7 @@ mman_map_subrange(struct mman *__restrict self,
                   unsigned int flags DFL(0),
                   struct mfile *__restrict file DFL(&mfile_zero),
                   struct path *file_fspath DFL(__NULLPTR),
-                  struct directory_entry *file_fsname DFL(__NULLPTR),
+                  struct fdirent *file_fsname DFL(__NULLPTR),
                   pos_t file_pos DFL(0),
                   pos_t file_map_minaddr DFL(0),
                   pos_t file_map_maxaddr DFL((pos_t)-1),

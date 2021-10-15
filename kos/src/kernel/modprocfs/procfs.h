@@ -113,7 +113,7 @@ struct procfs_singleton_data {
 struct procfs_singleton_dir_data {
 	/* FS-data for singletons defined as `MKDIR()' */
 	PROCFS_SINGLETON_DATA_FIELDS
-	COMPILER_FLEXIBLE_ARRAY(REF struct directory_entry *, pdd_ents); /* [1..1|SENTINEL(NULL)][const]
+	COMPILER_FLEXIBLE_ARRAY(REF struct fdirent *, pdd_ents); /* [1..1|SENTINEL(NULL)][const]
 	                                                                  * NULL-terminated list of contained files
 	                                                                  * Hash set to `(uintptr_t)-1' are calculated lazily. */
 };
@@ -254,7 +254,7 @@ INTDEF struct inode_type ProcFS_Singleton_RegularRo_Type;      /* Type for gener
 INTDEF struct inode_type ProcFS_Singleton_RegularRw_Type;      /* Type for general-purpose singleton read/write files */
 INTDEF struct inode_type ProcFS_Singleton_DynamicSymlink_Type; /* Type for general-purpose singleton dynamic symlink files */
 
-/* For MIDIR:           `REF struct directory_entry **'
+/* For MIDIR:           `REF struct fdirent **'
  * For MKREG_RO:        `PROCFS_REG_PRINTER'
  * For DYNAMIC_SYMLINK: `PROCFS_SYMLINK_READLINK'
  * For CUSTOM:          `NULL' */
@@ -272,7 +272,7 @@ INTDEF NONNULL((1)) void KCALL ProcFS_Singleton_LoadAttr(struct inode *__restric
 INTDEF NONNULL((1)) void KCALL ProcFS_Singleton_SaveAttr(struct inode *__restrict self) THROWS(E_FSERROR_UNSUPPORTED_OPERATION, E_FSERROR_READONLY, E_IOERROR, ...);
 
 /* ProcFS_Singleton_Directory_Type.it_directory.d_oneshot.o_lookup */
-INTDEF NONNULL((1, 2)) REF struct directory_entry *KCALL
+INTDEF NONNULL((1, 2)) REF struct fdirent *KCALL
 ProcFS_Singleton_Directory_Lookup(struct directory_node *__restrict self,
                                   CHECKED USER /*utf-8*/ char const *__restrict name,
                                   u16 namelen, uintptr_t hash, fsmode_t mode)
@@ -293,7 +293,7 @@ ProcFS_PerProc_StatInode(struct inode *__restrict self,
 		THROWS(E_WOULDBLOCK, E_SEGFAULT);
 
 
-INTDEF REF struct directory_entry *ProcFS_PerProcRootDirectory_FsData[];
+INTDEF REF struct fdirent *ProcFS_PerProcRootDirectory_FsData[];
 INTDEF struct procfs_singleton_dir_data ProcFS_RootDirectory_FsData;
 INTDEF struct inode_type ProcFS_RootDirectory_Type;            /* /proc */
 INTDEF struct inode_type ProcFS_PerProcRootDirectory_Type;     /* /proc/[pid]       (for `PROCFS_PERPROC_ROOT') */
@@ -310,7 +310,7 @@ INTDEF NONNULL((1, 2, 3, 4)) void KCALL
 ProcFS_OpenNode(struct superblock *__restrict self,
                 struct inode *__restrict node,
                 struct directory_node *__restrict parent_directory,
-                struct directory_entry *__restrict parent_directory_entry)
+                struct fdirent *__restrict parent_dirent)
 		THROWS(E_IOERROR, E_BADALLOC, ...) ;
 
 

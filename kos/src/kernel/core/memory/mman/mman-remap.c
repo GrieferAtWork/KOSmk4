@@ -89,7 +89,7 @@ duplicate_shared_mapping(struct mman *__restrict self,
 	struct mnode *node;
 	REF struct mpart *part;
 	REF struct path *node_fspath;
-	REF struct directory_entry *node_fsname;
+	REF struct fdirent *node_fsname;
 	struct mfile_map_with_unlockinfo map;
 	struct mnode_slist old_mappings;
 	uintptr_t mnode_flags;
@@ -317,7 +317,7 @@ something_changed:
 struct mappinginfo {
 	REF struct mfile           *mi_file;      /* [0..1] The file being mapped (or `NULL' for RESERVED mappings) */
 	REF struct path            *mi_fspath;    /* [0..1] Filesystem path for this mapping */
-	REF struct directory_entry *mi_fsname;    /* [0..1] Filesystem name for this mapping */
+	REF struct fdirent *mi_fsname;    /* [0..1] Filesystem name for this mapping */
 	PAGEDIR_PAGEALIGNED pos_t   mi_fpos;      /* Starting offset into `mi_file' of the first mapped byte. */
 	uintptr_t                   mi_nodeflags; /* Set of `MNODE_F_* & MREMAP_KEPT_MNODE_FLAGS' for node flags. */
 };

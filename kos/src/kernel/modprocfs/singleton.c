@@ -40,7 +40,7 @@
 DECL_BEGIN
 
 #define DEFINE_DIRECTORY_ENTRY(symbol_name, ino, type, entry_name) \
-	struct directory_entry symbol_name = {                         \
+	struct fdirent symbol_name = {                         \
 		/* .de_refcnt   = */ 1,                                    \
 		/* .de_heapsize = */ sizeof(symbol_name),                  \
 		/* .de_next     = */ NULL,                                 \
@@ -224,7 +224,7 @@ ProcFS_Singleton_SaveAttr(struct inode *__restrict self)
 	data->psd_gid  = self->i_filegid;
 }
 
-INTERN NONNULL((1, 2)) REF struct directory_entry *KCALL
+INTERN NONNULL((1, 2)) REF struct fdirent *KCALL
 ProcFS_Singleton_Directory_Lookup(struct directory_node *__restrict self,
                                   CHECKED USER /*utf-8*/ char const *__restrict name,
                                   u16 namelen, uintptr_t hash, fsmode_t mode)
@@ -232,13 +232,13 @@ ProcFS_Singleton_Directory_Lookup(struct directory_node *__restrict self,
 		       E_FSERROR_UNSUPPORTED_OPERATION, E_IOERROR, ...) {
 	unsigned int i;
 	struct procfs_singleton_dir_data *data;
-	struct directory_entry *dent;
+	struct fdirent *dent;
 	data = (struct procfs_singleton_dir_data *)self->i_fsdata;
 	for (i = 0; (dent = data->pdd_ents[i]) != NULL; ++i) {
 		if (dent->de_namelen != namelen)
 			continue;
 		if (dent->de_hash == (uintptr_t)-1)
-			dent->de_hash = directory_entry_hash(dent->de_name, dent->de_namelen);
+			dent->de_hash = fdirent_hash(dent->de_name, dent->de_namelen);
 		if (dent->de_hash != hash)
 			continue;
 		if (memcmp(dent->de_name, name, namelen * sizeof(char)) != 0)
@@ -267,7 +267,7 @@ ProcFS_Singleton_Directory_Enum(struct directory_node *__restrict self,
 		THROWS(E_FSERROR_UNSUPPORTED_OPERATION, E_IOERROR, ...) {
 	unsigned int i;
 	struct procfs_singleton_dir_data *data;
-	struct directory_entry *dent;
+	struct fdirent *dent;
 	data = (struct procfs_singleton_dir_data *)self->i_fsdata;
 	for (i = 0; (dent = data->pdd_ents[i]) != NULL; ++i) {
 		(*callback)(arg,

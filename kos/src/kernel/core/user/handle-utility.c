@@ -186,9 +186,9 @@ handle_datasize(struct handle const *__restrict self,
 		return character_device_datasize(me, presult);
 	}	break;
 
-	case HANDLE_TYPE_DIRECTORYENTRY: {
-		struct directory_entry *me;
-		me = (struct directory_entry *)self->h_data;
+	case HANDLE_TYPE_FDIRENT: {
+		struct fdirent *me;
+		me = (struct fdirent *)self->h_data;
 		value = (pos_t)me->de_namelen;
 	}	break;
 
@@ -320,9 +320,9 @@ handle_print(struct handle const *__restrict self,
 		}
 	}	break;
 
-	case HANDLE_TYPE_DIRECTORYENTRY: {
-		struct directory_entry *ent = (struct directory_entry *)self->h_data;
-		result = format_printf(printer, arg, "anon_inode:[directory_entry:%$s]",
+	case HANDLE_TYPE_FDIRENT: {
+		struct fdirent *ent = (struct fdirent *)self->h_data;
+		result = format_printf(printer, arg, "anon_inode:[dirent:%$s]",
 		                       ent->de_namelen, ent->de_name);
 	}	break;
 
@@ -349,7 +349,7 @@ handle_print(struct handle const *__restrict self,
 			                       printer, arg);
 		} else {
 			result = format_printf(printer, arg,
-			                       "anon_inode:[oneshot_directory_file:"
+			                       "anon_inode:[dirhandle:"
 			                       "inode:%" PRIuN(__SIZEOF_INO_T__) "]",
 			                       f->d_node->i_fileino);
 		}

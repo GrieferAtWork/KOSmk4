@@ -700,9 +700,9 @@ PRIVATE struct module_ops const kernel_module_ops = {
 };
 
 PRIVATE ATTR_COLDRODATA char const kernel_driver_name[] = KERNEL_DRIVER_NAME;
-PRIVATE ATTR_COLDDATA struct directory_entry kernel_driver_fsname = {
+PRIVATE ATTR_COLDDATA struct fdirent kernel_driver_fsname = {
 	.de_refcnt   = 1, /* +1: kernel_driver.d_module.md_fsname */
-	.de_heapsize = offsetof(struct directory_entry, de_name) + sizeof(KERNEL_DRIVER_FILENAME),
+	.de_heapsize = offsetof(struct fdirent, de_name) + sizeof(KERNEL_DRIVER_FILENAME),
 	.de_next     = NULL,
 	.de_bypos    = LIST_ENTRY_UNBOUND_INITIALIZER,
 	.de_fsdata   = {},
@@ -4761,7 +4761,7 @@ got_dynsym_size:
 PRIVATE WUNUSED NONNULL((1)) struct mnode *FCALL
 create_mnode_for_phdr(ElfW(Phdr) const *__restrict phdr,
                       USER CHECKED byte_t const *base, size_t num_bytes,
-                      struct path *drv_fspath, struct directory_entry *drv_fsname) {
+                      struct path *drv_fspath, struct fdirent *drv_fsname) {
 	struct mnode *node;
 	struct mpart *part;
 	/* Allocate a new node/part pair. */
@@ -4877,7 +4877,7 @@ create_mnode_for_phdr(ElfW(Phdr) const *__restrict phdr,
 PRIVATE ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct driver *KCALL
 driver_create(USER CHECKED byte_t const *base, size_t num_bytes,
               struct mfile *drv_file, struct path *drv_fspath,
-              struct directory_entry *drv_fsname,
+              struct fdirent *drv_fsname,
               USER CHECKED char const *drv_cmdline,
               bool *pnew_driver_loaded)
 		THROWS(E_SEGFAULT, E_NOT_EXECUTABLE, E_BADALLOC, E_IOERROR) {
@@ -5416,7 +5416,7 @@ again_acquire_mman_lock:
 PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct driver *KCALL
 driver_loadmod_file(struct mfile *__restrict driver_file,
                     struct path *driver_path,
-                    struct directory_entry *driver_dentry,
+                    struct fdirent *driver_dentry,
                     USER CHECKED char const *driver_cmdline,
                     bool *pnew_driver_loaded)
 		THROWS(E_SEGFAULT, E_NOT_EXECUTABLE, E_BADALLOC, E_IOERROR) {
@@ -5502,7 +5502,7 @@ driver_loadmod_filename(USER CHECKED char const *driver_filename,
 	REF struct mfile *driver_file;
 	REF struct path *driver_path;
 	REF struct directory_node *driver_directory;
-	REF struct directory_entry *driver_dentry;
+	REF struct fdirent *driver_dentry;
 	u16 driver_namelen;
 	/* Open the specified file. */
 	driver_path = path_traverse(THIS_FS, driver_filename,
@@ -5515,7 +5515,7 @@ driver_loadmod_filename(USER CHECKED char const *driver_filename,
 	{
 		FINALLY_DECREF_UNLIKELY(driver_directory);
 		driver_file = directory_getnode(driver_directory, driver_name, driver_namelen,
-		                                directory_entry_hash(driver_name, driver_namelen),
+		                                fdirent_hash(driver_name, driver_namelen),
 		                                &driver_dentry);
 		if unlikely(!driver_file)
 			THROW(E_FSERROR_FILE_NOT_FOUND);
@@ -5831,7 +5831,7 @@ driver_loadmod(USER CHECKED char const *driver_name,
 PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct driver *KCALL
 driver_insmod_file(struct mfile *__restrict driver_file,
                    struct path *driver_path,
-                   struct directory_entry *driver_dentry,
+                   struct fdirent *driver_dentry,
                    USER CHECKED char const *driver_cmdline,
                    bool *pnew_driver_loaded)
 		THROWS(E_SEGFAULT, E_NOT_EXECUTABLE, E_BADALLOC, E_IOERROR) {

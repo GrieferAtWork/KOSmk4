@@ -127,7 +127,7 @@ NOTHROW(KCALL note_task)(pformatprinter printer, void *arg,
 	struct cpu *thread_cpu;
 	unsigned int thread_cpu_id;
 	TRY {
-		REF struct directory_entry *dent;
+		REF struct fdirent *dent;
 		/* Do some basic verification of the task header. */
 		if (thread->t_self != thread)
 			goto badobj;
@@ -143,7 +143,7 @@ NOTHROW(KCALL note_task)(pformatprinter printer, void *arg,
 		if (dent) {
 			if (dent->de_refcnt == 0)
 				goto badobj;
-			if (dent->de_heapsize < offsetof(struct directory_entry, de_name) +
+			if (dent->de_heapsize < offsetof(struct fdirent, de_name) +
 			                        (dent->de_namelen + 1) * sizeof(char))
 				goto badobj;
 			exec_name    = dent->de_name;
@@ -453,10 +453,10 @@ badobj:
 }
 
 PRIVATE NONNULL((1, 3, 4)) ssize_t
-NOTHROW(KCALL note_directory_entry)(pformatprinter printer, void *arg,
-                                    KERNEL CHECKED void const *pointer,
-                                    unsigned int *__restrict pstatus) {
-	struct directory_entry *me = (struct directory_entry *)pointer;
+NOTHROW(KCALL note_fdirent)(pformatprinter printer, void *arg,
+                            KERNEL CHECKED void const *pointer,
+                            unsigned int *__restrict pstatus) {
+	struct fdirent *me = (struct fdirent *)pointer;
 	char const *dent_name;
 	size_t dent_namelen;
 	unsigned char dent_type;
@@ -465,11 +465,11 @@ NOTHROW(KCALL note_directory_entry)(pformatprinter printer, void *arg,
 			goto badobj;
 		dent_name    = me->de_name;
 		dent_namelen = me->de_namelen;
-		if (me->de_heapsize < offsetof(struct directory_entry, de_name) +
+		if (me->de_heapsize < offsetof(struct fdirent, de_name) +
 		                      (dent_namelen + 1) * sizeof(char))
 			goto badobj;
 		dent_type    = me->de_type;
-		if (me->de_hash != directory_entry_hash(dent_name, dent_namelen))
+		if (me->de_hash != fdirent_hash(dent_name, dent_namelen))
 			goto badobj;
 		readmem(dent_name, dent_namelen * sizeof(char));
 		/* TODO: Verify  `dent_type',  and  print  its  name.
@@ -566,7 +566,7 @@ NOTHROW(KCALL note_path_impl)(pformatprinter printer, void *arg,
 	ssize_t temp, result;
 	struct path *me = (struct path *)pointer;
 	struct path *parent_path = NULL;
-	struct directory_entry *dent;
+	struct fdirent *dent;
 	TRY {
 		if (me->p_refcnt == 0)
 			goto badobj;
@@ -599,7 +599,7 @@ NOTHROW(KCALL note_path_impl)(pformatprinter printer, void *arg,
 			goto err;
 		result += temp;
 	}
-	temp = note_directory_entry(printer, arg, dent, pstatus);
+	temp = note_fdirent(printer, arg, dent, pstatus);
 	if unlikely(temp < 0)
 		goto err;
 	result += temp;
@@ -622,7 +622,7 @@ NOTHROW(KCALL note_path)(pformatprinter printer, void *arg,
 PRIVATE NONNULL((1, 4, 5)) ssize_t
 NOTHROW(KCALL note_pathpair)(pformatprinter printer, void *arg,
                              KERNEL CHECKED struct path const *p,
-                             KERNEL CHECKED struct directory_entry const *d,
+                             KERNEL CHECKED struct fdirent const *d,
                              unsigned int *__restrict pstatus) {
 	ssize_t temp, result = 0;
 	if (p) {
@@ -634,7 +634,7 @@ NOTHROW(KCALL note_pathpair)(pformatprinter printer, void *arg,
 			goto err;
 		result += temp;
 	}
-	temp = note_directory_entry(printer, arg, d, pstatus);
+	temp = note_fdirent(printer, arg, d, pstatus);
 	if unlikely(temp < 0)
 		goto err;
 	result += temp;
@@ -651,7 +651,7 @@ NOTHROW(KCALL note_mman)(pformatprinter printer, void *arg,
 	ssize_t result;
 	struct mman *me = (struct mman *)pointer;
 	struct path *exec_path;
-	struct directory_entry *exec_dent;
+	struct fdirent *exec_dent;
 	TRY {
 		if (!IS_ALIGNED((uintptr_t)me, PAGEDIR_ALIGN))
 			goto badobj;
@@ -702,7 +702,7 @@ NOTHROW(KCALL note_file)(pformatprinter printer, void *arg,
 	ssize_t result;
 	struct filehandle *me = (struct filehandle *)pointer;
 	struct path *file_path;
-	struct directory_entry *file_dent;
+	struct fdirent *file_dent;
 	TRY {
 		if (me->f_refcnt == 0)
 			goto badobj;
@@ -777,7 +777,7 @@ NOTHROW(KCALL note_mnode)(pformatprinter printer, void *arg,
 	ssize_t result, temp;
 	struct mnode *me = (struct mnode *)pointer;
 	struct path *file_path = NULL;
-	struct directory_entry *file_dent = NULL;
+	struct fdirent *file_dent = NULL;
 	struct mpart *part;
 	struct mfile *file = NULL;
 	struct mfile_ops const *file_ops = NULL;
@@ -884,7 +884,7 @@ badobj:
 PRIVATE NONNULL((1, 2, 3, 4)) bool FCALL
 mpart_tree_extract_name(KERNEL CHECKED struct mpart *self,
                         struct path **p_file_path,
-                        struct directory_entry **p_file_dent,
+                        struct fdirent **p_file_dent,
                         unsigned int *__restrict pstatus,
                         unsigned int depth_limit) {
 	unsigned int i;
@@ -944,7 +944,7 @@ badobj:
 PRIVATE NONNULL((2, 3, 4)) bool KCALL
 mfile_extract_name(struct mfile const *self,
                    struct path **__restrict p_fspath,
-                   struct directory_entry **__restrict p_fsname,
+                   struct fdirent **__restrict p_fsname,
                    unsigned int *__restrict pstatus) {
 	struct mpart *root;
 	if (!ADDR_ISKERN(self))
@@ -974,7 +974,7 @@ NOTHROW(KCALL note_mfile)(pformatprinter printer, void *arg,
 	struct mfile *me = (struct mfile *)pointer;
 	struct mfile_ops const *ops;
 	struct path *file_path = NULL;
-	struct directory_entry *file_dent = NULL;
+	struct fdirent *file_dent = NULL;
 	TRY {
 		ops = me->mf_ops;
 		if (!ADDR_ISKERN(ops))
@@ -1013,7 +1013,7 @@ NOTHROW(KCALL note_mpart)(pformatprinter printer, void *arg,
 	ssize_t result, temp;
 	struct mpart *me = (struct mpart *)pointer;
 	struct path *file_path = NULL;
-	struct directory_entry *file_dent = NULL;
+	struct fdirent *file_dent = NULL;
 	struct mfile *file;
 	struct mfile_ops const *file_ops;
 	pos_t minaddr, maxaddr;
@@ -1097,7 +1097,7 @@ NOTHROW(KCALL note_mfutex)(pformatprinter printer, void *arg,
 	struct mfutex *me = (struct mfutex *)pointer;
 	struct mpart *part;
 	struct path *file_path            = NULL;
-	struct directory_entry *file_dent = NULL;
+	struct fdirent *file_dent = NULL;
 	struct mfile *file                = NULL;
 	struct mfile_ops const *file_ops  = NULL;
 	pos_t part_minaddr                = 0;
@@ -1198,10 +1198,11 @@ PRIVATE struct obnote_entry const notes[] = {
 	{ "block_device", &note_block_device },
 	{ "character_device", &note_character_device },
 	{ "cpu", &note_cpu },
-	{ "directory_entry", &note_directory_entry },
+	{ "dirhandle", &note_file },
 	{ "driver", &note_module },
 	{ "driver_section", &note_module_section },
-	{ "file", &note_file },
+	{ "fdirent", &note_fdirent },
+	{ "filehandle", &note_file },
 	/* TODO: `struct handle'                 (print the contents handle's /proc/self/fd-style link) */
 	{ "keyboard_device", &note_character_device },
 	{ "mbnode", &note_mnode },
@@ -1214,7 +1215,6 @@ PRIVATE struct obnote_entry const notes[] = {
 	{ "mouse_device", &note_character_device },
 	{ "mpart", &note_mpart },
 	{ "nic_device", &note_character_device },
-	{ "oneshot_directory_file", &note_file },
 	{ "path", &note_path },
 	{ "pty_master", &note_character_device },
 	{ "pty_slave", &note_character_device },

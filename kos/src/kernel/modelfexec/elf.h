@@ -40,7 +40,7 @@ DECL_BEGIN
 
 struct icpustate;
 struct path;
-struct directory_entry;
+struct fdirent;
 struct regular_node;
 
 /* Initialize user-space for program execution. */
@@ -57,7 +57,7 @@ elfexec_init_entry(struct icpustate *__restrict user_state,
 INTDEF ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3, 4, 5, 6)) struct icpustate *KCALL
 elfexec_init_rtld(struct icpustate *__restrict user_state,
                   struct path *__restrict exec_path,
-                  struct directory_entry *__restrict exec_dentry,
+                  struct fdirent *__restrict exec_dentry,
                   struct regular_node *__restrict exec_node,
                   KERNEL ElfW(Ehdr) const *__restrict ehdr,
                   KERNEL ElfW(Phdr) const *__restrict phdr_vec,
@@ -84,7 +84,7 @@ compat_elfexec_init_entry(struct icpustate *__restrict user_state,
 INTDEF ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3, 4, 5, 6)) struct icpustate *KCALL
 compat_elfexec_init_rtld(struct icpustate *__restrict user_state,
                          struct path *__restrict exec_path,
-                         struct directory_entry *__restrict exec_dentry,
+                         struct fdirent *__restrict exec_dentry,
                          struct regular_node *__restrict exec_node,
                          KERNEL COMPAT_ElfW(Ehdr) const *__restrict ehdr,
                          KERNEL COMPAT_ElfW(Phdr) const *__restrict phdr_vec,

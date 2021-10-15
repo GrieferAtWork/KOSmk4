@@ -519,7 +519,7 @@ UnixSocket_Bind(struct socket *__restrict self,
 	USER CHECKED struct sockaddr_un *addr_un;
 	REF struct socket_node *bind_node;
 	REF struct path *bind_path;
-	REF struct directory_entry *bind_name;
+	REF struct fdirent *bind_name;
 	struct fs *f = THIS_FS;
 	USER CHECKED char const *socket_filename_ptr;
 	u16 socket_filename_len;
@@ -617,7 +617,7 @@ struct async_accept_wait: async {
 	REF struct unix_client     *aw_client;    /* [0..1] The client descriptor. */
 	REF struct socket_node     *aw_bind_node; /* [0..1] The socket to which to connect */
 	REF struct path            *aw_bind_path; /* [0..1] The path containing `ac_bind_node' */
-	REF struct directory_entry *aw_bind_name; /* [0..1] The name of `ac_bind_node' */
+	REF struct fdirent *aw_bind_name; /* [0..1] The name of `ac_bind_node' */
 };
 
 
@@ -741,7 +741,7 @@ UnixSocket_Connect(struct socket *__restrict self,
 	UnixSocket *me = (UnixSocket *)self;
 	REF struct socket_node *bind_node;
 	REF struct path *bind_path;
-	REF struct directory_entry *bind_name;
+	REF struct fdirent *bind_name;
 	USER CHECKED struct sockaddr_un *addr_un;
 	addr_un = (USER CHECKED struct sockaddr_un *)addr;
 	/* We need  at  least  1  character  in  the  path-buffer.

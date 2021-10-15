@@ -48,7 +48,7 @@ struct dirent;
 struct stat;
 struct aio_multihandle;
 struct path;
-struct directory_entry;
+struct fdirent;
 
 /* Closing a handle (for the last  time) is allowed to automatically  remove
  * that handle from every epoll controller that may have been monitoring it.
@@ -95,7 +95,7 @@ struct handle_mmap_info {
 	                                          * mapped within  that area,  rather than  the intended  file being  mapped.
 	                                          * s.a. `mman_map_subrange()' and `mfile_getpart()' */
 	REF struct path            *hmi_fspath;  /* [0..1][in|out] Filesystem path of `hmi_file' */
-	REF struct directory_entry *hmi_fsname;  /* [0..1][in|out] Filesystem name of `hmi_file' */
+	REF struct fdirent *hmi_fsname;  /* [0..1][in|out] Filesystem name of `hmi_file' */
 };
 
 #ifdef __INTELLISENSE__
@@ -675,7 +675,7 @@ struct directory_node;
 struct symlink_node;
 struct fifo_node;
 struct socket_node;
-struct directory_entry;
+struct fdirent;
 struct mfile;
 struct superblock;
 struct path;
@@ -711,8 +711,8 @@ handle_get_directory_node(unsigned int fd)
 		THROWS(E_WOULDBLOCK, E_INVALID_HANDLE_FILE,
 		       E_INVALID_HANDLE_FILETYPE);
 
-FUNDEF ATTR_RETNONNULL WUNUSED REF struct directory_entry *FCALL
-handle_get_directory_entry(unsigned int fd)
+FUNDEF ATTR_RETNONNULL WUNUSED REF struct fdirent *FCALL
+handle_get_fdirent(unsigned int fd)
 		THROWS(E_WOULDBLOCK, E_INVALID_HANDLE_FILE,
 		       E_INVALID_HANDLE_FILETYPE);
 
@@ -739,7 +739,7 @@ handle_get_vfs(unsigned int fd)
 
 
 #define handle_get_datablock(fd)        ((REF struct mfile *)handle_getas(fd, HANDLE_TYPE_MFILE))
-#define handle_get_directory_entry(fd)  ((REF struct directory_entry *)handle_getas(fd, HANDLE_TYPE_DIRECTORYENTRY))
+#define handle_get_fdirent(fd)          ((REF struct fdirent *)handle_getas(fd, HANDLE_TYPE_FDIRENT))
 #define handle_get_path(fd)             ((REF struct path *)handle_getas(fd, HANDLE_TYPE_PATH))
 #define handle_get_taskpid(fd)          ((REF struct taskpid *)handle_getas(fd, HANDLE_TYPE_TASK))
 #define handle_get_mman(fd)             ((REF struct mman *)handle_getas(fd, HANDLE_TYPE_MMAN))
@@ -823,7 +823,7 @@ handle_as_vfs(/*inherit(on_success)*/ REF struct handle const *__restrict self)
 
 
 #define handle_as_mfile(self)            ((REF struct mfile *)handle_as(self, HANDLE_TYPE_MFILE))
-#define handle_as_directory_entry(self)  ((REF struct directory_entry *)handle_as(self, HANDLE_TYPE_DIRECTORYENTRY))
+#define handle_as_fdirent(self)          ((REF struct fdirent *)handle_as(self, HANDLE_TYPE_FDIRENT))
 #define handle_as_path(self)             ((REF struct path *)handle_as(self, HANDLE_TYPE_PATH))
 #define handle_as_taskpid(self)          ((REF struct taskpid *)handle_as(self, HANDLE_TYPE_TASK))
 #define handle_as_mman(self)             ((REF struct mman *)handle_as(self, HANDLE_TYPE_MMAN))

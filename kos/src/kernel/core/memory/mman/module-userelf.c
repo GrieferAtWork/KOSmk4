@@ -1498,7 +1498,7 @@ AXREF(mfile_axref, mfile);
 /* Open the filesystem location for the given `rtld_fsfile' */
 PRIVATE WUNUSED NONNULL((1, 2)) REF struct mfile *FCALL
 open_system_rtld_fsfile(struct mfile_axref *__restrict rtld_fsfile,
-                        struct directory_entry *__restrict rtld_name) {
+                        struct fdirent *__restrict rtld_name) {
 	REF struct mfile *result;
 again:
 	result = axref_get(rtld_fsfile);
@@ -1543,7 +1543,7 @@ PRIVATE WUNUSED NONNULL((1, 2, 3, 4)) REF struct userelf_module *FCALL
 uem_create_system_rtld(struct mman *__restrict self,
                        struct mfile *__restrict rtld_file,
                        struct mfile_axref *__restrict rtld_fsfile,
-                       struct directory_entry *__restrict rtld_name,
+                       struct fdirent *__restrict rtld_name,
                        USER CHECKED byte_t *node_addr, pos_t node_fpos) {
 	REF struct userelf_module *result;
 	REF struct mfile *file;
@@ -1906,9 +1906,9 @@ not_an_elf_file:
 
 
 PRIVATE struct mfile_axref system_rtld_fsfile = AXREF_INIT(NULL);
-PRIVATE struct directory_entry system_rtld_dirent = {
+PRIVATE struct fdirent system_rtld_dirent = {
 	.de_refcnt   = 1, /* +1: system_rtld_dirent */
-	.de_heapsize = offsetof(struct directory_entry, de_name) + sizeof(RTLD_LIBDL),
+	.de_heapsize = offsetof(struct fdirent, de_name) + sizeof(RTLD_LIBDL),
 	.de_next     = NULL,
 	.de_bypos    = LIST_ENTRY_UNBOUND_INITIALIZER,
 	.de_fsdata   = {},
@@ -1930,9 +1930,9 @@ PRIVATE struct directory_entry system_rtld_dirent = {
 
 #ifdef __ARCH_HAVE_COMPAT
 PRIVATE struct mfile_axref compat_system_rtld_fsfile = AXREF_INIT(NULL);
-PRIVATE struct directory_entry compat_system_rtld_dirent = {
+PRIVATE struct fdirent compat_system_rtld_dirent = {
 	.de_refcnt   = 1, /* +1: compat_system_rtld_dirent */
-	.de_heapsize = offsetof(struct directory_entry, de_name) + sizeof(COMPAT_RTLD_LIBDL),
+	.de_heapsize = offsetof(struct fdirent, de_name) + sizeof(COMPAT_RTLD_LIBDL),
 	.de_next     = NULL,
 	.de_bypos    = LIST_ENTRY_UNBOUND_INITIALIZER,
 	.de_fsdata   = {},

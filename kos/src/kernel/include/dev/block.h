@@ -128,7 +128,7 @@ struct block_device_type {
 #ifdef __CC__
 struct block_device_partition;
 struct inode;
-struct directory_entry;
+struct fdirent;
 
 #define __BASIC_BLOCK_DEVICE_FIELDS                                                                                                      \
 	REF refcnt_t                   bd_refcnt;       /* Reference counter */                                                              \
@@ -137,7 +137,7 @@ struct directory_entry;
 	ATREE_NODE_SINGLE(struct basic_block_device, dev_t)                                                                                  \
 	                               bd_devlink;      /* [lock(WRITE_ONCE)] Device number / tree (`DEV_UNSET' if unset). */                \
 	REF struct inode              *bd_devfs_inode;  /* [lock(WRITE_ONCE)][0..1] Device INode under /dev, or NULL if not created */       \
-	REF struct directory_entry    *bd_devfs_entry;  /* [lock(WRITE_ONCE)][1..1][valid_if(bd_devfs_inode)] Directory entry under /dev */  \
+	REF struct fdirent    *bd_devfs_entry;  /* [lock(WRITE_ONCE)][1..1][valid_if(bd_devfs_inode)] Directory entry under /dev */  \
 	pos_t                          bd_total_bytes;  /* [!0][const] The total number of bytes (== bd_sector_count * bd_sector_size). */   \
 	lba_t                          bd_sector_count; /* [!0][const] Number of available sectors. */                                       \
 	size_t                         bd_sector_size;  /* [!0][const] Size of a single sector (in bytes). */                                \

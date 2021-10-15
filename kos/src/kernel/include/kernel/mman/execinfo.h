@@ -28,12 +28,12 @@
 DECL_BEGIN
 
 struct inode;
-struct directory_entry;
+struct fdirent;
 struct path;
 
 struct mexecinfo {
 	REF struct inode           *mei_node; /* [0..1][lock(:THIS_MMAN->mm_lock)] Exec INode */
-	REF struct directory_entry *mei_dent; /* [0..1][lock(:THIS_MMAN->mm_lock)] Exec directory entry */
+	REF struct fdirent *mei_dent; /* [0..1][lock(:THIS_MMAN->mm_lock)] Exec directory entry */
 	REF struct path            *mei_path; /* [0..1][lock(:THIS_MMAN->mm_lock)] Exec path */
 	USER CHECKED void          *mei_peb;  /* [?..1][lock(:THIS_MMAN->mm_lock)] PEB base address. */
 #ifdef __ARCH_HAVE_COMPAT

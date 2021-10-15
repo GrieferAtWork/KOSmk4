@@ -138,7 +138,7 @@ ramfs_truncate(struct inode *__restrict UNUSED(self), pos_t UNUSED(new_size))
 
 
 
-PRIVATE NONNULL((1, 2)) REF struct directory_entry *KCALL
+PRIVATE NONNULL((1, 2)) REF struct fdirent *KCALL
 ramfs_readdir(struct directory_node *__restrict UNUSED(self),
               pos_t *__restrict UNUSED(pentry_pos))
 		THROWS(E_FSERROR_UNSUPPORTED_OPERATION, E_IOERROR, ...) {
@@ -149,7 +149,7 @@ ramfs_readdir(struct directory_node *__restrict UNUSED(self),
 
 PRIVATE NONNULL((1, 2, 3)) void KCALL
 ramfs_creat(struct directory_node *__restrict UNUSED(target_directory),
-            struct directory_entry *__restrict target_dirent,
+            struct fdirent *__restrict target_dirent,
             struct regular_node *__restrict new_node)
 		THROWS(E_FSERROR_UNSUPPORTED_OPERATION, E_FSERROR_ILLEGAL_PATH,
 		       E_FSERROR_DISK_FULL, E_FSERROR_READONLY,
@@ -171,7 +171,7 @@ ramfs_creat(struct directory_node *__restrict UNUSED(target_directory),
 
 PRIVATE NONNULL((1, 2, 3)) void KCALL
 ramfs_mkdir(struct directory_node *__restrict UNUSED(target_directory),
-            struct directory_entry *__restrict target_dirent,
+            struct fdirent *__restrict target_dirent,
             struct directory_node *__restrict new_directory)
 		THROWS(E_FSERROR_UNSUPPORTED_OPERATION, E_FSERROR_ILLEGAL_PATH,
 		       E_FSERROR_DISK_FULL, E_FSERROR_READONLY,
@@ -193,7 +193,7 @@ ramfs_mkdir(struct directory_node *__restrict UNUSED(target_directory),
 
 PRIVATE NONNULL((1, 2, 3)) void KCALL
 ramfs_symlink(struct directory_node *__restrict UNUSED(target_directory),
-              struct directory_entry *__restrict target_dirent,
+              struct fdirent *__restrict target_dirent,
               struct symlink_node *__restrict link_node)
 		THROWS(E_FSERROR_UNSUPPORTED_OPERATION, E_FSERROR_ILLEGAL_PATH,
 		       E_FSERROR_DISK_FULL, E_FSERROR_READONLY,
@@ -215,7 +215,7 @@ ramfs_symlink(struct directory_node *__restrict UNUSED(target_directory),
 
 PRIVATE NONNULL((1, 2, 3)) void KCALL
 ramfs_mknod(struct directory_node *__restrict UNUSED(target_directory),
-            struct directory_entry *__restrict target_dirent,
+            struct fdirent *__restrict target_dirent,
             struct inode *__restrict nod)
 		THROWS(E_FSERROR_UNSUPPORTED_OPERATION, E_FSERROR_ILLEGAL_PATH,
 		       E_FSERROR_DISK_FULL, E_FSERROR_READONLY,
@@ -245,7 +245,7 @@ ramfs_mknod(struct directory_node *__restrict UNUSED(target_directory),
 
 PRIVATE NONNULL((1, 2, 3)) void KCALL
 ramfs_link(struct directory_node *__restrict UNUSED(target_directory),
-           struct directory_entry *__restrict target_dirent,
+           struct fdirent *__restrict target_dirent,
            struct inode *__restrict link_target)
 		THROWS(E_FSERROR_UNSUPPORTED_OPERATION, E_FSERROR_ILLEGAL_PATH,
 		       E_FSERROR_DISK_FULL, E_FSERROR_READONLY,
@@ -258,7 +258,7 @@ ramfs_link(struct directory_node *__restrict UNUSED(target_directory),
 
 PRIVATE NONNULL((1, 2, 3)) void KCALL
 ramfs_unlink(struct directory_node *__restrict UNUSED(containing_directory),
-             struct directory_entry *__restrict UNUSED(containing_entry),
+             struct fdirent *__restrict UNUSED(containing_entry),
              struct inode *__restrict node_to_unlink)
 		THROWS(E_FSERROR_UNSUPPORTED_OPERATION,
 		       E_FSERROR_READONLY, E_IOERROR_READONLY,
@@ -270,7 +270,7 @@ ramfs_unlink(struct directory_node *__restrict UNUSED(containing_directory),
 
 PRIVATE NONNULL((1, 2, 3)) void KCALL
 ramfs_rmdir(struct directory_node *__restrict containing_directory,
-            struct directory_entry *__restrict containing_entry,
+            struct fdirent *__restrict containing_entry,
             struct directory_node *__restrict node_to_unlink)
 		THROWS(E_FSERROR_UNSUPPORTED_OPERATION,
 		       E_FSERROR_READONLY, E_IOERROR_READONLY,
@@ -408,7 +408,7 @@ PRIVATE NONNULL((1, 2, 3, 4)) void KCALL
 ramfs_opennode(struct superblock *__restrict UNUSED(self),
                struct inode *__restrict UNUSED(node),
                struct directory_node *__restrict UNUSED(parent_directory),
-               struct directory_entry *__restrict UNUSED(parent_directory_entry))
+               struct fdirent *__restrict UNUSED(parent_dirent))
 		THROWS(E_IOERROR, E_BADALLOC, ...) {
 	/* INode  are  only  ever  created  newly  and  exist  solely  in-cache!
 	 * This function would be used to open a persistent node stored on-disk,

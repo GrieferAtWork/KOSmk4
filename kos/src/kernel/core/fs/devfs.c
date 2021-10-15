@@ -132,7 +132,7 @@ PUBLIC bool KCALL
 devfs_insert(USER CHECKED char const *name,
              mode_t kind, dev_t devno,
              REF struct inode **pdevfs_node,
-             REF struct directory_entry **pdevfs_entry)
+             REF struct fdirent **pdevfs_entry)
        THROWS(E_WOULDBLOCK, E_BADALLOC,E_SEGFAULT) {
 	REF struct inode *node;
 	assert(kind == S_IFCHR || kind == S_IFBLK);
@@ -168,8 +168,8 @@ devfs_insert(USER CHECKED char const *name,
 INTERN ATTR_FREETEXT void
 NOTHROW(KCALL kernel_initialize_devfs_driver)(void) {
 	/* Allocate the initial directory map. */
-	devfs.s_rootdir.d_map = (REF struct directory_entry **)kmalloc((DEVFS_INITIAL_ROOTDIR_MASK + 1) *
-	                                                               sizeof(REF struct directory_entry *),
+	devfs.s_rootdir.d_map = (REF struct fdirent **)kmalloc((DEVFS_INITIAL_ROOTDIR_MASK + 1) *
+	                                                               sizeof(REF struct fdirent *),
 	                                                               FS_GFP | GFP_CALLOC);
 	/* Register the devfs filesystem type */
 	register_filesystem_type(&ramfs_type); /* As good-a-place as any to do this! */
@@ -188,15 +188,15 @@ NOTHROW(KCALL superblock_delete_inode)(struct superblock *__restrict super,
                                        struct inode *__restrict self);
 
 #define DEVFS_PENDING_DELETE_NEXT(x) \
-	(*(struct directory_entry **)(x)->de_fsdata.de_data)
-PRIVATE ATTR_READMOSTLY REF struct directory_entry *devfs_pending_delete = NULL;
+	(*(struct fdirent **)(x)->de_fsdata.de_data)
+PRIVATE ATTR_READMOSTLY REF struct fdirent *devfs_pending_delete = NULL;
 
 INTDEF NOBLOCK NONNULL((1, 2)) void
 NOTHROW(KCALL directory_delentry)(struct directory_node *__restrict self,
-                                  /*out*/ REF struct directory_entry *__restrict entry);
+                                  /*out*/ REF struct fdirent *__restrict entry);
 
 PRIVATE NOBLOCK void
-NOTHROW(KCALL devfs_remove_directory_entry)(struct directory_entry *__restrict ent) {
+NOTHROW(KCALL devfs_remove_dirent)(struct fdirent *__restrict ent) {
 	/* Check if the entry had already been removed. */
 	if (ent->de_bypos.le_prev != NULL) {
 		/* Remove the entry from its parent directory. */
@@ -210,12 +210,12 @@ NOTHROW(KCALL devfs_remove_directory_entry)(struct directory_entry *__restrict e
 	(ATOMIC_READ(devfs_pending_delete) != NULL)
 LOCAL NOBLOCK void
 NOTHROW(KCALL devfs_service_pending_delete)(void) {
-	REF struct directory_entry *pend, *next;
+	REF struct fdirent *pend, *next;
 	COMPILER_READ_BARRIER();
 	pend = ATOMIC_XCH(devfs_pending_delete, NULL);
 	while (pend) {
 		next = DEVFS_PENDING_DELETE_NEXT(pend);
-		devfs_remove_directory_entry(pend);
+		devfs_remove_dirent(pend);
 		decref(pend);
 		pend = next;
 	}
@@ -226,7 +226,7 @@ NOTHROW(KCALL devfs_service_pending_delete)(void) {
  * root  directory  of  the  /dev  filesystem */
 PUBLIC NOBLOCK void
 NOTHROW(KCALL devfs_remove)(struct inode *__restrict node,
-                            struct directory_entry *__restrict entry) {
+                            struct fdirent *__restrict entry) {
 	/* Remove the given INode from the devfs superblock */
 	superblock_delete_inode(&devfs, node);
 	/* Try to remove the given node from the recent-cache */
@@ -236,10 +236,10 @@ NOTHROW(KCALL devfs_remove)(struct inode *__restrict node,
 		return;
 	/* Remove the directory entry */
 	if (devfs_lock_trywrite()) {
-		devfs_remove_directory_entry(entry);
+		devfs_remove_dirent(entry);
 		devfs_lock_endwrite();
 	} else {
-		struct directory_entry *next;
+		struct fdirent *next;
 		/* Schedule the entry for removal at the next convenient time */
 		incref(entry);
 		do {

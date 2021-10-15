@@ -120,7 +120,7 @@ NOTHROW(FCALL GDBInfo_PrintThreadExecFile)(pformatprinter printer, void *arg,
                                            bool filename_only) {
 	ssize_t result;
 	REF struct mman *v;
-	REF struct directory_entry *dent;
+	REF struct fdirent *dent;
 	REF struct path            *path;
 	if (task_getrootpid_of_s(thread) == 0 ||
 	    task_getroottid_of_s(thread) == 0)

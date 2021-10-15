@@ -35,7 +35,7 @@
 
 DECL_BEGIN
 
-PRIVATE NONNULL((1, 2)) REF struct directory_entry *KCALL
+PRIVATE NONNULL((1, 2)) REF struct fdirent *KCALL
 ProcFS_RootDirectory_Lookup(struct directory_node *__restrict self,
                             CHECKED USER /*utf-8*/ char const *__restrict name,
                             u16 namelen, uintptr_t hash, fsmode_t mode)
@@ -58,9 +58,9 @@ ProcFS_RootDirectory_Lookup(struct directory_node *__restrict self,
 			}
 			thread = pidns_trylookup_task(THIS_PIDNS, pidno);
 			if likely(thread) {
-				REF struct directory_entry *result;
+				REF struct fdirent *result;
 				decref_unlikely(thread);
-				result = directory_entry_alloc(namelen);
+				result = fdirent_alloc(namelen);
 #ifdef NDEBUG
 				sprintf(result->de_name, "%u", (unsigned int)pidno);
 #else /* NDEBUG */
@@ -72,7 +72,7 @@ ProcFS_RootDirectory_Lookup(struct directory_node *__restrict self,
 #endif /* !NDEBUG */
 				/* NOTE: We can't actually trust user-space that `hash' is valid, since
 				 *       the  user  may have  changed the  string  in the  mean time... */
-				result->de_hash = directory_entry_hash(result->de_name, namelen);
+				result->de_hash = fdirent_hash(result->de_name, namelen);
 				result->de_ino  = PROCFS_INOMAKE_PERPROC(pidno, PROCFS_PERPROC_ROOT);
 				result->de_type = DT_DIR;
 				return result;

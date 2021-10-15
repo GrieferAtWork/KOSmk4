@@ -133,7 +133,7 @@ struct mnode; /* Memory range descriptor. */
 struct mman;  /* Memory manager. */
 
 struct path;
-struct directory_entry;
+struct fdirent;
 
 #ifndef __mpart_reladdr_t_defined
 #define __mpart_reladdr_t_defined
@@ -193,7 +193,7 @@ struct mnode {
 	/*REF*/ struct mpart               *mn_part;     /* [0..1][const] The bound mem-part.
 	                                                  * When set to NULL, then this node represents a reserved node. */
 	/*REF*/ struct path                *mn_fspath;   /* [0..1][const] Optional mapping path (only used for memory->disk mapping listings) */
-	/*REF*/ struct directory_entry     *mn_fsname;   /* [0..1][const] Optional mapping name (only used for memory->disk mapping listings) */
+	/*REF*/ struct fdirent     *mn_fsname;   /* [0..1][const] Optional mapping name (only used for memory->disk mapping listings) */
 #ifdef __WANT_MNODE__mn_alloc
 	union {
 		/*WEAK REF*/ struct mman       *mn_mman;     /* [1..1][const] Associated memory manager.
@@ -253,7 +253,7 @@ struct mnode {
 	REF struct mpart                   *mn_part;     /* [0..1][const] The bound mem-part.
 	                                                  * When set to NULL, then this node represents a reserved node. */
 	REF struct path                    *mn_fspath;   /* [0..1][const] Optional mapping path (only used for memory->disk mapping listings) */
-	REF struct directory_entry         *mn_fsname;   /* [0..1][const] Optional mapping name (only used for memory->disk mapping listings) */
+	REF struct fdirent         *mn_fsname;   /* [0..1][const] Optional mapping name (only used for memory->disk mapping listings) */
 #ifdef __WANT_MNODE__mn_alloc
 	union {
 		WEAK REF struct mman           *mn_mman;     /* [1..1][const] Associated memory manager.

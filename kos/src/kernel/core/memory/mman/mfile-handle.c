@@ -25,6 +25,7 @@
 
 #ifdef CONFIG_USE_NEW_FS
 #include <kernel/fs/devnode.h>
+#include <kernel/fs/filehandle.h>
 #include <kernel/fs/node.h>
 #include <kernel/fs/super.h>
 #include <kernel/handle-proto.h>
@@ -41,10 +42,42 @@
 #include <kos/except/reason/inval.h>
 #include <sys/stat.h>
 
+#include <assert.h>
 #include <stddef.h>
 #include <string.h>
 
 DECL_BEGIN
+
+/* Constructs a wrapper object that implements seeking, allowing normal reads/writes to
+ * be dispatched via `mfile_upread()' and `mfile_upwrite()' (which uses the `mso_pread'
+ * and `mso_pwrite' operators, with `mfile_read()' and `mfile_write()' as fallback, so-
+ * long as `MFILE_F_NOUSRIO' isn't set)
+ *
+ * The operators of the following system calls are forwarded 1-on-1 to `mfile_u*':
+ *   - pread(2), preadv(2), pwrite(2), pwritev(2)
+ *   - ioctl(2), truncate(2), mmap(2), fallocate(2)
+ *   - fsync(2), fdatasync(2), stat(2), poll(2), hop(2)
+ * As stated, `lseek(2)', `read(2)' and `write(2)' are dispatched via pread/pwrite
+ *
+ * This function is actually used when trying to open a mem-file with neither
+ * `mso_read'/`mso_readv', nor `mso_write'/`mso_writev' pre-defined. As such,
+ * open(2)-ing a generic mfile object uses `mfile_open()' (see below). */
+PUBLIC NONNULL((1, 2)) void KCALL
+mfile_v_open(struct mfile *__restrict self, struct handle *__restrict hand,
+             struct path *access_path, struct fdirent *access_dent) {
+	REF struct filehandle *fh;
+	assert(hand->h_type == HANDLE_TYPE_MFILE);
+	assert(hand->h_data == self);
+
+	/* Construct the filehandle wrapper object. */
+	fh = filehandle_new(self, access_path, access_dent);
+
+	/* Write-back the file-handle wrapper. */
+	hand->h_type = HANDLE_TYPE_FILEHANDLE;
+	hand->h_data = fh;   /* Inherit reference */
+	decref_nokill(self); /* Old reference from `hand->h_data' */
+}
+
 
 /* Generic open function for mem-file arbitrary mem-file objects. This function
  * is unconditionally invoked during a call to `open(2)' in order to  construct
@@ -994,7 +1027,7 @@ handle_mfile_hop(struct mfile *__restrict self, syscall_ulong_t cmd,
 		u16 namelen, openflags;
 		uintptr_t hash;
 		REF struct inode *child_node;
-		REF struct directory_entry *child_entry;
+		REF struct fdirent *child_entry;
 		struct handle temp;
 		struct directory_node *me;
 		if (!vm_datablock_isinode(self) || !INODE_ISDIR((struct inode *)self))
@@ -1019,7 +1052,7 @@ handle_mfile_hop(struct mfile *__restrict self, syscall_ulong_t cmd,
 		VALIDATE_FLAGSET(openflags,
 		                 HOP_DIRECTORY_OPENNODE_FNOCASE,
 		                 E_INVALID_ARGUMENT_CONTEXT_HOP_DIRECTORY_OPENNODE_FLAGS);
-		hash = directory_entry_hash(name, namelen);
+		hash = fdirent_hash(name, namelen);
 		if (!capable(CAP_DAC_READ_SEARCH)) {
 			inode_loadattr(me);
 			inode_access(me, R_OK | X_OK);
@@ -1043,7 +1076,7 @@ handle_mfile_hop(struct mfile *__restrict self, syscall_ulong_t cmd,
 			}
 			fd = ATOMIC_READ(data->don_dent);
 			if (fd) {
-				temp.h_type = HANDLE_TYPE_DIRECTORYENTRY;
+				temp.h_type = HANDLE_TYPE_FDIRENT;
 				temp.h_mode = mode;
 				temp.h_data = child_entry;
 				handle_installhop(fd, temp);
@@ -1058,7 +1091,7 @@ handle_mfile_hop(struct mfile *__restrict self, syscall_ulong_t cmd,
 		u16 namelen;
 		oflag_t oflags;
 		REF struct inode *child_node;
-		REF struct directory_entry *child_entry;
+		REF struct fdirent *child_entry;
 		struct handle temp;
 		mode_t newfile_mode;
 		uid_t newfile_owner;
@@ -1121,7 +1154,7 @@ handle_mfile_hop(struct mfile *__restrict self, syscall_ulong_t cmd,
 			}
 			fd = ATOMIC_READ(data->dcf_dent);
 			if (fd) {
-				temp.h_type = HANDLE_TYPE_DIRECTORYENTRY;
+				temp.h_type = HANDLE_TYPE_FDIRENT;
 				temp.h_mode = mode;
 				temp.h_data = child_entry;
 				handle_installhop(fd, temp);
@@ -1144,7 +1177,7 @@ handle_mfile_hop(struct mfile *__restrict self, syscall_ulong_t cmd,
 		unsigned int remove_mode;
 		unsigned int remove_status;
 		REF struct inode *child_node;
-		REF struct directory_entry *child_entry;
+		REF struct fdirent *child_entry;
 		struct handle temp;
 		if (!vm_datablock_isinode(self) || !INODE_ISDIR((struct inode *)self))
 			THROW(E_INVALID_HANDLE_FILETYPE,
@@ -1176,7 +1209,7 @@ handle_mfile_hop(struct mfile *__restrict self, syscall_ulong_t cmd,
 			      HOP_DIRECTORY_REMOVE_FLAG_REGULAR | HOP_DIRECTORY_REMOVE_FLAG_DIRECTORY,
 			      0);
 		}
-		hash = directory_entry_hash(name, namelen);
+		hash = fdirent_hash(name, namelen);
 		cred_require_sysadmin(); /* TODO: More finely grained access! */
 		remove_status = directory_remove((struct directory_node *)self,
 		                                 name,
@@ -1202,7 +1235,7 @@ handle_mfile_hop(struct mfile *__restrict self, syscall_ulong_t cmd,
 			}
 			fd = ATOMIC_READ(data->drm_dent);
 			if (fd) {
-				temp.h_type = HANDLE_TYPE_DIRECTORYENTRY;
+				temp.h_type = HANDLE_TYPE_FDIRENT;
 				temp.h_mode = mode;
 				temp.h_data = child_entry;
 				handle_installhop(fd, temp);
@@ -1222,8 +1255,8 @@ handle_mfile_hop(struct mfile *__restrict self, syscall_ulong_t cmd,
 		unsigned int rename_mode, dstdir;
 		REF struct inode *srcchild_node;
 		REF struct inode *dstchild_node;
-		REF struct directory_entry *srcchild_entry;
-		REF struct directory_entry *dstchild_entry;
+		REF struct fdirent *srcchild_entry;
+		REF struct fdirent *dstchild_entry;
 		REF struct directory_node *target_dir;
 		struct handle temp;
 		if (!vm_datablock_isinode(self) || !INODE_ISDIR((struct inode *)self))
@@ -1263,7 +1296,7 @@ handle_mfile_hop(struct mfile *__restrict self, syscall_ulong_t cmd,
 			directory_rename((struct directory_node *)self,
 			                 srcname,
 			                 srcnamelen,
-			                 directory_entry_hash(srcname, srcnamelen),
+			                 fdirent_hash(srcname, srcnamelen),
 			                 target_dir,
 			                 dstname,
 			                 dstnamelen,
@@ -1289,7 +1322,7 @@ handle_mfile_hop(struct mfile *__restrict self, syscall_ulong_t cmd,
 				handle_installhop(fd, temp);
 			}
 			if ((fd = ATOMIC_READ(data->drn_srcdent)) != NULL) {
-				temp.h_type = HANDLE_TYPE_DIRECTORYENTRY;
+				temp.h_type = HANDLE_TYPE_FDIRENT;
 				temp.h_mode = mode;
 				temp.h_data = srcchild_entry;
 				handle_installhop(fd, temp);
@@ -1301,7 +1334,7 @@ handle_mfile_hop(struct mfile *__restrict self, syscall_ulong_t cmd,
 				handle_installhop(fd, temp);
 			}
 			if ((fd = ATOMIC_READ(data->drn_dstdent)) != NULL) {
-				temp.h_type = HANDLE_TYPE_DIRECTORYENTRY;
+				temp.h_type = HANDLE_TYPE_FDIRENT;
 				temp.h_mode = mode;
 				temp.h_data = dstchild_entry;
 				handle_installhop(fd, temp);
@@ -1318,7 +1351,7 @@ handle_mfile_hop(struct mfile *__restrict self, syscall_ulong_t cmd,
 		u16 namelen;
 		unsigned int link_mode;
 		REF struct inode *link_node;
-		REF struct directory_entry *child_entry;
+		REF struct fdirent *child_entry;
 		unsigned int link_nodefd;
 		struct handle temp;
 		if (!vm_datablock_isinode(self) || !INODE_ISDIR((struct inode *)self))
@@ -1359,7 +1392,7 @@ handle_mfile_hop(struct mfile *__restrict self, syscall_ulong_t cmd,
 			FINALLY_DECREF(child_entry);
 			/* Install handles for objects that the caller wants to open */
 			if ((fd = ATOMIC_READ(data->dli_dent)) != NULL) {
-				temp.h_type = HANDLE_TYPE_DIRECTORYENTRY;
+				temp.h_type = HANDLE_TYPE_FDIRENT;
 				temp.h_mode = mode;
 				temp.h_data = child_entry;
 				handle_installhop(fd, temp);
@@ -1378,7 +1411,7 @@ handle_mfile_hop(struct mfile *__restrict self, syscall_ulong_t cmd,
 		size_t textlen;
 		unsigned int symlink_createmode;
 		REF struct symlink_node *child_node;
-		REF struct directory_entry *child_entry;
+		REF struct fdirent *child_entry;
 		struct handle temp;
 		mode_t symlink_mode;
 		uid_t symlink_owner;
@@ -1439,7 +1472,7 @@ handle_mfile_hop(struct mfile *__restrict self, syscall_ulong_t cmd,
 				handle_installhop(fd, temp);
 			}
 			if ((fd = ATOMIC_READ(data->dsl_dent)) != NULL) {
-				temp.h_type = HANDLE_TYPE_DIRECTORYENTRY;
+				temp.h_type = HANDLE_TYPE_FDIRENT;
 				temp.h_mode = mode;
 				temp.h_data = child_entry;
 				handle_installhop(fd, temp);
@@ -1456,7 +1489,7 @@ handle_mfile_hop(struct mfile *__restrict self, syscall_ulong_t cmd,
 		u16 namelen;
 		unsigned int mknod_mode;
 		REF struct inode *child_node;
-		REF struct directory_entry *child_entry;
+		REF struct fdirent *child_entry;
 		struct handle temp;
 		mode_t newfile_mode;
 		uid_t newfile_owner;
@@ -1524,7 +1557,7 @@ handle_mfile_hop(struct mfile *__restrict self, syscall_ulong_t cmd,
 				handle_installhop(fd, temp);
 			}
 			if ((fd = ATOMIC_READ(data->dmn_dent)) != NULL) {
-				temp.h_type = HANDLE_TYPE_DIRECTORYENTRY;
+				temp.h_type = HANDLE_TYPE_FDIRENT;
 				temp.h_mode = mode;
 				temp.h_data = child_entry;
 				handle_installhop(fd, temp);
@@ -1541,7 +1574,7 @@ handle_mfile_hop(struct mfile *__restrict self, syscall_ulong_t cmd,
 		u16 namelen;
 		unsigned int mkdir_mode;
 		REF struct directory_node *child_node;
-		REF struct directory_entry *child_entry;
+		REF struct fdirent *child_entry;
 		struct handle temp;
 		mode_t newfile_mode;
 		uid_t newfile_owner;
@@ -1597,7 +1630,7 @@ handle_mfile_hop(struct mfile *__restrict self, syscall_ulong_t cmd,
 				handle_installhop(fd, temp);
 			}
 			if ((fd = ATOMIC_READ(data->dmd_dent)) != NULL) {
-				temp.h_type = HANDLE_TYPE_DIRECTORYENTRY;
+				temp.h_type = HANDLE_TYPE_FDIRENT;
 				temp.h_mode = mode;
 				temp.h_data = child_entry;
 				handle_installhop(fd, temp);

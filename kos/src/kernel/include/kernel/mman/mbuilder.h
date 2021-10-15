@@ -97,7 +97,7 @@ struct mbnode {
 	REF struct mpart                   *mbn_part;     /* [0..1][const] The bound mem-part.
 	                                                   * When set to NULL, then this node represents a reserved node. */
 	REF struct path                    *mbn_fspath;   /* [0..1][const] Optional mapping path (only used for memory->disk mapping listings) */
-	REF struct directory_entry         *mbn_fsname;   /* [0..1][const] Optional mapping name (only used for memory->disk mapping listings) */
+	REF struct fdirent         *mbn_fsname;   /* [0..1][const] Optional mapping name (only used for memory->disk mapping listings) */
 	union {
 		WEAK REF struct mman          *_mbn_mman;     /* s.a. `struct mnode::mn_mman' */
 		SLIST_ENTRY(mbnode)            _mbn_alloc;    /* Internal list of freshly allocated nodes. */
@@ -439,7 +439,7 @@ mbuilder_map(struct mbuilder_norpc *__restrict self,
              unsigned int flags DFL(0),
              struct mfile *__restrict file DFL(&mfile_zero),
              struct path *file_fspath DFL(__NULLPTR),
-             struct directory_entry *file_fsname DFL(__NULLPTR),
+             struct fdirent *file_fsname DFL(__NULLPTR),
              pos_t file_pos DFL(0),
              size_t min_alignment DFL(PAGESIZE))
 		THROWS(E_WOULDBLOCK, E_BADALLOC,
@@ -467,7 +467,7 @@ mbuilder_map_subrange(struct mbuilder_norpc *__restrict self,
                       unsigned int flags DFL(0),
                       struct mfile *__restrict file DFL(&mfile_zero),
                       struct path *file_fspath DFL(__NULLPTR),
-                      struct directory_entry *file_fsname DFL(__NULLPTR),
+                      struct fdirent *file_fsname DFL(__NULLPTR),
                       pos_t file_pos DFL(0),
                       pos_t file_map_minaddr DFL(0),
                       pos_t file_map_maxaddr DFL((pos_t)-1),

@@ -112,13 +112,13 @@ err:
 }
 
 
-INTERN NONNULL((1, 2)) REF struct directory_entry *KCALL
+INTERN NONNULL((1, 2)) REF struct fdirent *KCALL
 ProcFS_PerProc_MapFiles_Lookup(struct directory_node *__restrict self,
                                CHECKED USER /*utf-8*/ char const *name,
                                u16 namelen, uintptr_t UNUSED(hash), fsmode_t mode)
 		THROWS(E_SEGFAULT, E_FSERROR_FILE_NOT_FOUND,
 		       E_FSERROR_UNSUPPORTED_OPERATION, E_IOERROR, ...) {
-	REF struct directory_entry *result;
+	REF struct fdirent *result;
 	upid_t pid;
 	REF struct task *thread;
 	REF struct mman *threadmm;
@@ -188,7 +188,7 @@ unlock_threadmm_and_goto_err:
 		mman_lock_endread(threadmm);
 
 		/* Found it! - It's the `nodeid'th node! */
-		result = directory_entry_alloc(namelen);
+		result = fdirent_alloc(namelen);
 
 		/* Re-print  the  proper  filename to  prevent  duplicate access
 		 * to a (potentially)  user-space string, as  well as deal  with
@@ -201,7 +201,7 @@ unlock_threadmm_and_goto_err:
 		        minaddr, maxaddr);
 		result->de_ino  = PROCFS_INOMAKE_MAPFILES(pid, nodeid);
 		result->de_type = DT_LNK;
-		result->de_hash = directory_entry_hash(result->de_name, 1);
+		result->de_hash = fdirent_hash(result->de_name, 1);
 	}
 	return result;
 err:
@@ -298,7 +298,7 @@ ProcFS_PerProc_MapFiles_Entry_Readlink(struct symlink_node *__restrict self,
 	REF struct task *thread;
 	REF struct mman *threadmm;
 	REF struct path *fspath;
-	REF struct directory_entry *fsname;
+	REF struct fdirent *fsname;
 	size_t nth, result;
 	upid_t pid;
 	/* Lookup the associated thread. */

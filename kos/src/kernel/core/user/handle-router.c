@@ -340,7 +340,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_DIRHANDLE]       = */ "dirhandle",
 		/* [HANDLE_TYPE_MFILE]           = */ "mfile",
 		/* [HANDLE_TYPE_BLOCKDEVICE]     = */ "blockdevice",
-		/* [HANDLE_TYPE_DIRECTORYENTRY]  = */ "directoryentry",
+		/* [HANDLE_TYPE_FDIRENT]         = */ "fdirent",
 		/* [HANDLE_TYPE_PATH]            = */ "path",
 		/* [HANDLE_TYPE_FS]              = */ "fs",
 		/* [HANDLE_TYPE_MMAN]            = */ "mman",
@@ -369,7 +369,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_DIRHANDLE]       = */ (refcnt_t (FCALL *)(void const *__restrict))&handle_dirhandle_refcnt,
 		/* [HANDLE_TYPE_MFILE]           = */ (refcnt_t (FCALL *)(void const *__restrict))&handle_mfile_refcnt,
 		/* [HANDLE_TYPE_BLOCKDEVICE]     = */ (refcnt_t (FCALL *)(void const *__restrict))&handle_blockdevice_refcnt,
-		/* [HANDLE_TYPE_DIRECTORYENTRY]  = */ (refcnt_t (FCALL *)(void const *__restrict))&handle_directoryentry_refcnt,
+		/* [HANDLE_TYPE_FDIRENT]         = */ (refcnt_t (FCALL *)(void const *__restrict))&handle_fdirent_refcnt,
 		/* [HANDLE_TYPE_PATH]            = */ (refcnt_t (FCALL *)(void const *__restrict))&handle_path_refcnt,
 		/* [HANDLE_TYPE_FS]              = */ (refcnt_t (FCALL *)(void const *__restrict))&handle_fs_refcnt,
 		/* [HANDLE_TYPE_MMAN]            = */ (refcnt_t (FCALL *)(void const *__restrict))&handle_mman_refcnt,
@@ -398,7 +398,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_DIRHANDLE]       = */ (void (FCALL *)(void *__restrict))&handle_dirhandle_incref,
 		/* [HANDLE_TYPE_MFILE]           = */ (void (FCALL *)(void *__restrict))&handle_mfile_incref,
 		/* [HANDLE_TYPE_BLOCKDEVICE]     = */ (void (FCALL *)(void *__restrict))&handle_blockdevice_incref,
-		/* [HANDLE_TYPE_DIRECTORYENTRY]  = */ (void (FCALL *)(void *__restrict))&handle_directoryentry_incref,
+		/* [HANDLE_TYPE_FDIRENT]         = */ (void (FCALL *)(void *__restrict))&handle_fdirent_incref,
 		/* [HANDLE_TYPE_PATH]            = */ (void (FCALL *)(void *__restrict))&handle_path_incref,
 		/* [HANDLE_TYPE_FS]              = */ (void (FCALL *)(void *__restrict))&handle_fs_incref,
 		/* [HANDLE_TYPE_MMAN]            = */ (void (FCALL *)(void *__restrict))&handle_mman_incref,
@@ -427,7 +427,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_DIRHANDLE]       = */ (void (FCALL *)(REF void *__restrict))&handle_dirhandle_decref,
 		/* [HANDLE_TYPE_MFILE]           = */ (void (FCALL *)(REF void *__restrict))&handle_mfile_decref,
 		/* [HANDLE_TYPE_BLOCKDEVICE]     = */ (void (FCALL *)(REF void *__restrict))&handle_blockdevice_decref,
-		/* [HANDLE_TYPE_DIRECTORYENTRY]  = */ (void (FCALL *)(REF void *__restrict))&handle_directoryentry_decref,
+		/* [HANDLE_TYPE_FDIRENT]         = */ (void (FCALL *)(REF void *__restrict))&handle_fdirent_decref,
 		/* [HANDLE_TYPE_PATH]            = */ (void (FCALL *)(REF void *__restrict))&handle_path_decref,
 		/* [HANDLE_TYPE_FS]              = */ (void (FCALL *)(REF void *__restrict))&handle_fs_decref,
 		/* [HANDLE_TYPE_MMAN]            = */ (void (FCALL *)(REF void *__restrict))&handle_mman_decref,
@@ -456,7 +456,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_DIRHANDLE]       = */ (__BOOL (FCALL *)(void *__restrict))&handle_dirhandle_tryincref,
 		/* [HANDLE_TYPE_MFILE]           = */ (__BOOL (FCALL *)(void *__restrict))&handle_mfile_tryincref,
 		/* [HANDLE_TYPE_BLOCKDEVICE]     = */ (__BOOL (FCALL *)(void *__restrict))&handle_blockdevice_tryincref,
-		/* [HANDLE_TYPE_DIRECTORYENTRY]  = */ (__BOOL (FCALL *)(void *__restrict))&handle_directoryentry_tryincref,
+		/* [HANDLE_TYPE_FDIRENT]         = */ (__BOOL (FCALL *)(void *__restrict))&handle_fdirent_tryincref,
 		/* [HANDLE_TYPE_PATH]            = */ (__BOOL (FCALL *)(void *__restrict))&handle_path_tryincref,
 		/* [HANDLE_TYPE_FS]              = */ (__BOOL (FCALL *)(void *__restrict))&handle_fs_tryincref,
 		/* [HANDLE_TYPE_MMAN]            = */ (__BOOL (FCALL *)(void *__restrict))&handle_mman_tryincref,
@@ -485,7 +485,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_DIRHANDLE]       = */ (WEAK REF void *(FCALL *)(void *__restrict))&handle_dirhandle_weakgetref,
 		/* [HANDLE_TYPE_MFILE]           = */ (WEAK REF void *(FCALL *)(void *__restrict))&handle_mfile_weakgetref,
 		/* [HANDLE_TYPE_BLOCKDEVICE]     = */ (WEAK REF void *(FCALL *)(void *__restrict))&handle_blockdevice_weakgetref,
-		/* [HANDLE_TYPE_DIRECTORYENTRY]  = */ (WEAK REF void *(FCALL *)(void *__restrict))&handle_directoryentry_weakgetref,
+		/* [HANDLE_TYPE_FDIRENT]         = */ (WEAK REF void *(FCALL *)(void *__restrict))&handle_fdirent_weakgetref,
 		/* [HANDLE_TYPE_PATH]            = */ (WEAK REF void *(FCALL *)(void *__restrict))&handle_path_weakgetref,
 		/* [HANDLE_TYPE_FS]              = */ (WEAK REF void *(FCALL *)(void *__restrict))&handle_fs_weakgetref,
 		/* [HANDLE_TYPE_MMAN]            = */ (WEAK REF void *(FCALL *)(void *__restrict))&handle_mman_weakgetref,
@@ -514,7 +514,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_DIRHANDLE]       = */ (REF void *(FCALL *)(void *__restrict))&handle_dirhandle_weaklckref,
 		/* [HANDLE_TYPE_MFILE]           = */ (REF void *(FCALL *)(void *__restrict))&handle_mfile_weaklckref,
 		/* [HANDLE_TYPE_BLOCKDEVICE]     = */ (REF void *(FCALL *)(void *__restrict))&handle_blockdevice_weaklckref,
-		/* [HANDLE_TYPE_DIRECTORYENTRY]  = */ (REF void *(FCALL *)(void *__restrict))&handle_directoryentry_weaklckref,
+		/* [HANDLE_TYPE_FDIRENT]         = */ (REF void *(FCALL *)(void *__restrict))&handle_fdirent_weaklckref,
 		/* [HANDLE_TYPE_PATH]            = */ (REF void *(FCALL *)(void *__restrict))&handle_path_weaklckref,
 		/* [HANDLE_TYPE_FS]              = */ (REF void *(FCALL *)(void *__restrict))&handle_fs_weaklckref,
 		/* [HANDLE_TYPE_MMAN]            = */ (REF void *(FCALL *)(void *__restrict))&handle_mman_weaklckref,
@@ -543,7 +543,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_DIRHANDLE]       = */ (void (FCALL *)(WEAK REF void *__restrict))&handle_dirhandle_weakdecref,
 		/* [HANDLE_TYPE_MFILE]           = */ (void (FCALL *)(WEAK REF void *__restrict))&handle_mfile_weakdecref,
 		/* [HANDLE_TYPE_BLOCKDEVICE]     = */ (void (FCALL *)(WEAK REF void *__restrict))&handle_blockdevice_weakdecref,
-		/* [HANDLE_TYPE_DIRECTORYENTRY]  = */ (void (FCALL *)(WEAK REF void *__restrict))&handle_directoryentry_weakdecref,
+		/* [HANDLE_TYPE_FDIRENT]         = */ (void (FCALL *)(WEAK REF void *__restrict))&handle_fdirent_weakdecref,
 		/* [HANDLE_TYPE_PATH]            = */ (void (FCALL *)(WEAK REF void *__restrict))&handle_path_weakdecref,
 		/* [HANDLE_TYPE_FS]              = */ (void (FCALL *)(WEAK REF void *__restrict))&handle_fs_weakdecref,
 		/* [HANDLE_TYPE_MMAN]            = */ (void (FCALL *)(WEAK REF void *__restrict))&handle_mman_weakdecref,
@@ -572,7 +572,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_DIRHANDLE]       = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, iomode_t))&handle_dirhandle_read,
 		/* [HANDLE_TYPE_MFILE]           = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, iomode_t))&handle_mfile_read,
 		/* [HANDLE_TYPE_BLOCKDEVICE]     = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, iomode_t))&handle_blockdevice_read,
-		/* [HANDLE_TYPE_DIRECTORYENTRY]  = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, iomode_t))&handle_directoryentry_read,
+		/* [HANDLE_TYPE_FDIRENT]         = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, iomode_t))&handle_fdirent_read,
 		/* [HANDLE_TYPE_PATH]            = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, iomode_t))&handle_path_read,
 		/* [HANDLE_TYPE_FS]              = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, iomode_t))&handle_fs_read,
 		/* [HANDLE_TYPE_MMAN]            = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, iomode_t))&handle_mman_read,
@@ -601,7 +601,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_DIRHANDLE]       = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, iomode_t))&handle_dirhandle_write,
 		/* [HANDLE_TYPE_MFILE]           = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, iomode_t))&handle_mfile_write,
 		/* [HANDLE_TYPE_BLOCKDEVICE]     = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, iomode_t))&handle_blockdevice_write,
-		/* [HANDLE_TYPE_DIRECTORYENTRY]  = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, iomode_t))&handle_directoryentry_write,
+		/* [HANDLE_TYPE_FDIRENT]         = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, iomode_t))&handle_fdirent_write,
 		/* [HANDLE_TYPE_PATH]            = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, iomode_t))&handle_path_write,
 		/* [HANDLE_TYPE_FS]              = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, iomode_t))&handle_fs_write,
 		/* [HANDLE_TYPE_MMAN]            = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, iomode_t))&handle_mman_write,
@@ -630,7 +630,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_DIRHANDLE]       = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, pos_t, iomode_t))&handle_dirhandle_pread,
 		/* [HANDLE_TYPE_MFILE]           = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, pos_t, iomode_t))&handle_mfile_pread,
 		/* [HANDLE_TYPE_BLOCKDEVICE]     = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, pos_t, iomode_t))&handle_blockdevice_pread,
-		/* [HANDLE_TYPE_DIRECTORYENTRY]  = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, pos_t, iomode_t))&handle_directoryentry_pread,
+		/* [HANDLE_TYPE_FDIRENT]         = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, pos_t, iomode_t))&handle_fdirent_pread,
 		/* [HANDLE_TYPE_PATH]            = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, pos_t, iomode_t))&handle_path_pread,
 		/* [HANDLE_TYPE_FS]              = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, pos_t, iomode_t))&handle_fs_pread,
 		/* [HANDLE_TYPE_MMAN]            = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, pos_t, iomode_t))&handle_mman_pread,
@@ -659,7 +659,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_DIRHANDLE]       = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, pos_t, iomode_t))&handle_dirhandle_pwrite,
 		/* [HANDLE_TYPE_MFILE]           = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, pos_t, iomode_t))&handle_mfile_pwrite,
 		/* [HANDLE_TYPE_BLOCKDEVICE]     = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, pos_t, iomode_t))&handle_blockdevice_pwrite,
-		/* [HANDLE_TYPE_DIRECTORYENTRY]  = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, pos_t, iomode_t))&handle_directoryentry_pwrite,
+		/* [HANDLE_TYPE_FDIRENT]         = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, pos_t, iomode_t))&handle_fdirent_pwrite,
 		/* [HANDLE_TYPE_PATH]            = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, pos_t, iomode_t))&handle_path_pwrite,
 		/* [HANDLE_TYPE_FS]              = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, pos_t, iomode_t))&handle_fs_pwrite,
 		/* [HANDLE_TYPE_MMAN]            = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, pos_t, iomode_t))&handle_mman_pwrite,
@@ -688,7 +688,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_DIRHANDLE]       = */ (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_dirhandle_readv,
 		/* [HANDLE_TYPE_MFILE]           = */ (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_mfile_readv,
 		/* [HANDLE_TYPE_BLOCKDEVICE]     = */ (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_blockdevice_readv,
-		/* [HANDLE_TYPE_DIRECTORYENTRY]  = */ (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_directoryentry_readv,
+		/* [HANDLE_TYPE_FDIRENT]         = */ (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_fdirent_readv,
 		/* [HANDLE_TYPE_PATH]            = */ (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_path_readv,
 		/* [HANDLE_TYPE_FS]              = */ (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_fs_readv,
 		/* [HANDLE_TYPE_MMAN]            = */ (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_mman_readv,
@@ -717,7 +717,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_DIRHANDLE]       = */ (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_dirhandle_writev,
 		/* [HANDLE_TYPE_MFILE]           = */ (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_mfile_writev,
 		/* [HANDLE_TYPE_BLOCKDEVICE]     = */ (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_blockdevice_writev,
-		/* [HANDLE_TYPE_DIRECTORYENTRY]  = */ (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_directoryentry_writev,
+		/* [HANDLE_TYPE_FDIRENT]         = */ (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_fdirent_writev,
 		/* [HANDLE_TYPE_PATH]            = */ (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_path_writev,
 		/* [HANDLE_TYPE_FS]              = */ (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_fs_writev,
 		/* [HANDLE_TYPE_MMAN]            = */ (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_mman_writev,
@@ -746,7 +746,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_DIRHANDLE]       = */ (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_dirhandle_preadv,
 		/* [HANDLE_TYPE_MFILE]           = */ (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_mfile_preadv,
 		/* [HANDLE_TYPE_BLOCKDEVICE]     = */ (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_blockdevice_preadv,
-		/* [HANDLE_TYPE_DIRECTORYENTRY]  = */ (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_directoryentry_preadv,
+		/* [HANDLE_TYPE_FDIRENT]         = */ (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_fdirent_preadv,
 		/* [HANDLE_TYPE_PATH]            = */ (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_path_preadv,
 		/* [HANDLE_TYPE_FS]              = */ (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_fs_preadv,
 		/* [HANDLE_TYPE_MMAN]            = */ (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_mman_preadv,
@@ -775,7 +775,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_DIRHANDLE]       = */ (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_dirhandle_pwritev,
 		/* [HANDLE_TYPE_MFILE]           = */ (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_mfile_pwritev,
 		/* [HANDLE_TYPE_BLOCKDEVICE]     = */ (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_blockdevice_pwritev,
-		/* [HANDLE_TYPE_DIRECTORYENTRY]  = */ (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_directoryentry_pwritev,
+		/* [HANDLE_TYPE_FDIRENT]         = */ (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_fdirent_pwritev,
 		/* [HANDLE_TYPE_PATH]            = */ (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_path_pwritev,
 		/* [HANDLE_TYPE_FS]              = */ (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_fs_pwritev,
 		/* [HANDLE_TYPE_MMAN]            = */ (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_mman_pwritev,
@@ -804,7 +804,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_DIRHANDLE]       = */ (size_t (KCALL *)(void *__restrict, USER CHECKED struct dirent *, size_t, readdir_mode_t, iomode_t))&handle_dirhandle_readdir,
 		/* [HANDLE_TYPE_MFILE]           = */ (size_t (KCALL *)(void *__restrict, USER CHECKED struct dirent *, size_t, readdir_mode_t, iomode_t))&handle_mfile_readdir,
 		/* [HANDLE_TYPE_BLOCKDEVICE]     = */ (size_t (KCALL *)(void *__restrict, USER CHECKED struct dirent *, size_t, readdir_mode_t, iomode_t))&handle_blockdevice_readdir,
-		/* [HANDLE_TYPE_DIRECTORYENTRY]  = */ (size_t (KCALL *)(void *__restrict, USER CHECKED struct dirent *, size_t, readdir_mode_t, iomode_t))&handle_directoryentry_readdir,
+		/* [HANDLE_TYPE_FDIRENT]         = */ (size_t (KCALL *)(void *__restrict, USER CHECKED struct dirent *, size_t, readdir_mode_t, iomode_t))&handle_fdirent_readdir,
 		/* [HANDLE_TYPE_PATH]            = */ (size_t (KCALL *)(void *__restrict, USER CHECKED struct dirent *, size_t, readdir_mode_t, iomode_t))&handle_path_readdir,
 		/* [HANDLE_TYPE_FS]              = */ (size_t (KCALL *)(void *__restrict, USER CHECKED struct dirent *, size_t, readdir_mode_t, iomode_t))&handle_fs_readdir,
 		/* [HANDLE_TYPE_MMAN]            = */ (size_t (KCALL *)(void *__restrict, USER CHECKED struct dirent *, size_t, readdir_mode_t, iomode_t))&handle_mman_readdir,
@@ -833,7 +833,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_DIRHANDLE]       = */ (pos_t (KCALL *)(void *__restrict, off_t, unsigned int))&handle_dirhandle_seek,
 		/* [HANDLE_TYPE_MFILE]           = */ (pos_t (KCALL *)(void *__restrict, off_t, unsigned int))&handle_mfile_seek,
 		/* [HANDLE_TYPE_BLOCKDEVICE]     = */ (pos_t (KCALL *)(void *__restrict, off_t, unsigned int))&handle_blockdevice_seek,
-		/* [HANDLE_TYPE_DIRECTORYENTRY]  = */ (pos_t (KCALL *)(void *__restrict, off_t, unsigned int))&handle_directoryentry_seek,
+		/* [HANDLE_TYPE_FDIRENT]         = */ (pos_t (KCALL *)(void *__restrict, off_t, unsigned int))&handle_fdirent_seek,
 		/* [HANDLE_TYPE_PATH]            = */ (pos_t (KCALL *)(void *__restrict, off_t, unsigned int))&handle_path_seek,
 		/* [HANDLE_TYPE_FS]              = */ (pos_t (KCALL *)(void *__restrict, off_t, unsigned int))&handle_fs_seek,
 		/* [HANDLE_TYPE_MMAN]            = */ (pos_t (KCALL *)(void *__restrict, off_t, unsigned int))&handle_mman_seek,
@@ -862,7 +862,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_DIRHANDLE]       = */ (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_dirhandle_ioctl,
 		/* [HANDLE_TYPE_MFILE]           = */ (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_mfile_ioctl,
 		/* [HANDLE_TYPE_BLOCKDEVICE]     = */ (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_blockdevice_ioctl,
-		/* [HANDLE_TYPE_DIRECTORYENTRY]  = */ (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_directoryentry_ioctl,
+		/* [HANDLE_TYPE_FDIRENT]         = */ (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_fdirent_ioctl,
 		/* [HANDLE_TYPE_PATH]            = */ (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_path_ioctl,
 		/* [HANDLE_TYPE_FS]              = */ (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_fs_ioctl,
 		/* [HANDLE_TYPE_MMAN]            = */ (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_mman_ioctl,
@@ -891,7 +891,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_DIRHANDLE]       = */ (void (KCALL *)(void *__restrict, pos_t))&handle_dirhandle_truncate,
 		/* [HANDLE_TYPE_MFILE]           = */ (void (KCALL *)(void *__restrict, pos_t))&handle_mfile_truncate,
 		/* [HANDLE_TYPE_BLOCKDEVICE]     = */ (void (KCALL *)(void *__restrict, pos_t))&handle_blockdevice_truncate,
-		/* [HANDLE_TYPE_DIRECTORYENTRY]  = */ (void (KCALL *)(void *__restrict, pos_t))&handle_directoryentry_truncate,
+		/* [HANDLE_TYPE_FDIRENT]         = */ (void (KCALL *)(void *__restrict, pos_t))&handle_fdirent_truncate,
 		/* [HANDLE_TYPE_PATH]            = */ (void (KCALL *)(void *__restrict, pos_t))&handle_path_truncate,
 		/* [HANDLE_TYPE_FS]              = */ (void (KCALL *)(void *__restrict, pos_t))&handle_fs_truncate,
 		/* [HANDLE_TYPE_MMAN]            = */ (void (KCALL *)(void *__restrict, pos_t))&handle_mman_truncate,
@@ -920,7 +920,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_DIRHANDLE]       = */ (void (KCALL *)(void *__restrict, struct handle_mmap_info *__restrict))&handle_dirhandle_mmap,
 		/* [HANDLE_TYPE_MFILE]           = */ (void (KCALL *)(void *__restrict, struct handle_mmap_info *__restrict))&handle_mfile_mmap,
 		/* [HANDLE_TYPE_BLOCKDEVICE]     = */ (void (KCALL *)(void *__restrict, struct handle_mmap_info *__restrict))&handle_blockdevice_mmap,
-		/* [HANDLE_TYPE_DIRECTORYENTRY]  = */ (void (KCALL *)(void *__restrict, struct handle_mmap_info *__restrict))&handle_directoryentry_mmap,
+		/* [HANDLE_TYPE_FDIRENT]         = */ (void (KCALL *)(void *__restrict, struct handle_mmap_info *__restrict))&handle_fdirent_mmap,
 		/* [HANDLE_TYPE_PATH]            = */ (void (KCALL *)(void *__restrict, struct handle_mmap_info *__restrict))&handle_path_mmap,
 		/* [HANDLE_TYPE_FS]              = */ (void (KCALL *)(void *__restrict, struct handle_mmap_info *__restrict))&handle_fs_mmap,
 		/* [HANDLE_TYPE_MMAN]            = */ (void (KCALL *)(void *__restrict, struct handle_mmap_info *__restrict))&handle_mman_mmap,
@@ -949,7 +949,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_DIRHANDLE]       = */ (pos_t (KCALL *)(void *__restrict, fallocate_mode_t, pos_t, pos_t))&handle_dirhandle_allocate,
 		/* [HANDLE_TYPE_MFILE]           = */ (pos_t (KCALL *)(void *__restrict, fallocate_mode_t, pos_t, pos_t))&handle_mfile_allocate,
 		/* [HANDLE_TYPE_BLOCKDEVICE]     = */ (pos_t (KCALL *)(void *__restrict, fallocate_mode_t, pos_t, pos_t))&handle_blockdevice_allocate,
-		/* [HANDLE_TYPE_DIRECTORYENTRY]  = */ (pos_t (KCALL *)(void *__restrict, fallocate_mode_t, pos_t, pos_t))&handle_directoryentry_allocate,
+		/* [HANDLE_TYPE_FDIRENT]         = */ (pos_t (KCALL *)(void *__restrict, fallocate_mode_t, pos_t, pos_t))&handle_fdirent_allocate,
 		/* [HANDLE_TYPE_PATH]            = */ (pos_t (KCALL *)(void *__restrict, fallocate_mode_t, pos_t, pos_t))&handle_path_allocate,
 		/* [HANDLE_TYPE_FS]              = */ (pos_t (KCALL *)(void *__restrict, fallocate_mode_t, pos_t, pos_t))&handle_fs_allocate,
 		/* [HANDLE_TYPE_MMAN]            = */ (pos_t (KCALL *)(void *__restrict, fallocate_mode_t, pos_t, pos_t))&handle_mman_allocate,
@@ -978,7 +978,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_DIRHANDLE]       = */ (void (KCALL *)(void *__restrict))&handle_dirhandle_sync,
 		/* [HANDLE_TYPE_MFILE]           = */ (void (KCALL *)(void *__restrict))&handle_mfile_sync,
 		/* [HANDLE_TYPE_BLOCKDEVICE]     = */ (void (KCALL *)(void *__restrict))&handle_blockdevice_sync,
-		/* [HANDLE_TYPE_DIRECTORYENTRY]  = */ (void (KCALL *)(void *__restrict))&handle_directoryentry_sync,
+		/* [HANDLE_TYPE_FDIRENT]         = */ (void (KCALL *)(void *__restrict))&handle_fdirent_sync,
 		/* [HANDLE_TYPE_PATH]            = */ (void (KCALL *)(void *__restrict))&handle_path_sync,
 		/* [HANDLE_TYPE_FS]              = */ (void (KCALL *)(void *__restrict))&handle_fs_sync,
 		/* [HANDLE_TYPE_MMAN]            = */ (void (KCALL *)(void *__restrict))&handle_mman_sync,
@@ -1007,7 +1007,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_DIRHANDLE]       = */ (void (KCALL *)(void *__restrict))&handle_dirhandle_datasync,
 		/* [HANDLE_TYPE_MFILE]           = */ (void (KCALL *)(void *__restrict))&handle_mfile_datasync,
 		/* [HANDLE_TYPE_BLOCKDEVICE]     = */ (void (KCALL *)(void *__restrict))&handle_blockdevice_datasync,
-		/* [HANDLE_TYPE_DIRECTORYENTRY]  = */ (void (KCALL *)(void *__restrict))&handle_directoryentry_datasync,
+		/* [HANDLE_TYPE_FDIRENT]         = */ (void (KCALL *)(void *__restrict))&handle_fdirent_datasync,
 		/* [HANDLE_TYPE_PATH]            = */ (void (KCALL *)(void *__restrict))&handle_path_datasync,
 		/* [HANDLE_TYPE_FS]              = */ (void (KCALL *)(void *__restrict))&handle_fs_datasync,
 		/* [HANDLE_TYPE_MMAN]            = */ (void (KCALL *)(void *__restrict))&handle_mman_datasync,
@@ -1036,7 +1036,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_DIRHANDLE]       = */ (void (KCALL *)(void *__restrict, USER CHECKED struct stat *))&handle_dirhandle_stat,
 		/* [HANDLE_TYPE_MFILE]           = */ (void (KCALL *)(void *__restrict, USER CHECKED struct stat *))&handle_mfile_stat,
 		/* [HANDLE_TYPE_BLOCKDEVICE]     = */ (void (KCALL *)(void *__restrict, USER CHECKED struct stat *))&handle_blockdevice_stat,
-		/* [HANDLE_TYPE_DIRECTORYENTRY]  = */ (void (KCALL *)(void *__restrict, USER CHECKED struct stat *))&handle_directoryentry_stat,
+		/* [HANDLE_TYPE_FDIRENT]         = */ (void (KCALL *)(void *__restrict, USER CHECKED struct stat *))&handle_fdirent_stat,
 		/* [HANDLE_TYPE_PATH]            = */ (void (KCALL *)(void *__restrict, USER CHECKED struct stat *))&handle_path_stat,
 		/* [HANDLE_TYPE_FS]              = */ (void (KCALL *)(void *__restrict, USER CHECKED struct stat *))&handle_fs_stat,
 		/* [HANDLE_TYPE_MMAN]            = */ (void (KCALL *)(void *__restrict, USER CHECKED struct stat *))&handle_mman_stat,
@@ -1065,7 +1065,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_DIRHANDLE]       = */ (void (KCALL *)(void *__restrict, poll_mode_t))&handle_dirhandle_pollconnect,
 		/* [HANDLE_TYPE_MFILE]           = */ (void (KCALL *)(void *__restrict, poll_mode_t))&handle_mfile_pollconnect,
 		/* [HANDLE_TYPE_BLOCKDEVICE]     = */ (void (KCALL *)(void *__restrict, poll_mode_t))&handle_blockdevice_pollconnect,
-		/* [HANDLE_TYPE_DIRECTORYENTRY]  = */ (void (KCALL *)(void *__restrict, poll_mode_t))&handle_directoryentry_pollconnect,
+		/* [HANDLE_TYPE_FDIRENT]         = */ (void (KCALL *)(void *__restrict, poll_mode_t))&handle_fdirent_pollconnect,
 		/* [HANDLE_TYPE_PATH]            = */ (void (KCALL *)(void *__restrict, poll_mode_t))&handle_path_pollconnect,
 		/* [HANDLE_TYPE_FS]              = */ (void (KCALL *)(void *__restrict, poll_mode_t))&handle_fs_pollconnect,
 		/* [HANDLE_TYPE_MMAN]            = */ (void (KCALL *)(void *__restrict, poll_mode_t))&handle_mman_pollconnect,
@@ -1094,7 +1094,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_DIRHANDLE]       = */ (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_dirhandle_polltest,
 		/* [HANDLE_TYPE_MFILE]           = */ (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_mfile_polltest,
 		/* [HANDLE_TYPE_BLOCKDEVICE]     = */ (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_blockdevice_polltest,
-		/* [HANDLE_TYPE_DIRECTORYENTRY]  = */ (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_directoryentry_polltest,
+		/* [HANDLE_TYPE_FDIRENT]         = */ (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_fdirent_polltest,
 		/* [HANDLE_TYPE_PATH]            = */ (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_path_polltest,
 		/* [HANDLE_TYPE_FS]              = */ (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_fs_polltest,
 		/* [HANDLE_TYPE_MMAN]            = */ (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_mman_polltest,
@@ -1123,7 +1123,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_DIRHANDLE]       = */ (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_dirhandle_hop,
 		/* [HANDLE_TYPE_MFILE]           = */ (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_mfile_hop,
 		/* [HANDLE_TYPE_BLOCKDEVICE]     = */ (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_blockdevice_hop,
-		/* [HANDLE_TYPE_DIRECTORYENTRY]  = */ (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_directoryentry_hop,
+		/* [HANDLE_TYPE_FDIRENT]         = */ (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_fdirent_hop,
 		/* [HANDLE_TYPE_PATH]            = */ (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_path_hop,
 		/* [HANDLE_TYPE_FS]              = */ (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_fs_hop,
 		/* [HANDLE_TYPE_MMAN]            = */ (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_mman_hop,
@@ -1152,7 +1152,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_DIRHANDLE]       = */ (REF void *(KCALL *)(void *__restrict, uintptr_half_t))&handle_dirhandle_tryas,
 		/* [HANDLE_TYPE_MFILE]           = */ (REF void *(KCALL *)(void *__restrict, uintptr_half_t))&handle_mfile_tryas,
 		/* [HANDLE_TYPE_BLOCKDEVICE]     = */ (REF void *(KCALL *)(void *__restrict, uintptr_half_t))&handle_blockdevice_tryas,
-		/* [HANDLE_TYPE_DIRECTORYENTRY]  = */ (REF void *(KCALL *)(void *__restrict, uintptr_half_t))&handle_directoryentry_tryas,
+		/* [HANDLE_TYPE_FDIRENT]         = */ (REF void *(KCALL *)(void *__restrict, uintptr_half_t))&handle_fdirent_tryas,
 		/* [HANDLE_TYPE_PATH]            = */ (REF void *(KCALL *)(void *__restrict, uintptr_half_t))&handle_path_tryas,
 		/* [HANDLE_TYPE_FS]              = */ (REF void *(KCALL *)(void *__restrict, uintptr_half_t))&handle_fs_tryas,
 		/* [HANDLE_TYPE_MMAN]            = */ (REF void *(KCALL *)(void *__restrict, uintptr_half_t))&handle_mman_tryas,
@@ -1618,35 +1618,35 @@ DEFINE_INTERN_WEAK_ALIAS(handle_blockdevice_polltest, handle_undefined_polltest)
 DEFINE_INTERN_WEAK_ALIAS(handle_blockdevice_hop, handle_undefined_hop);
 DEFINE_INTERN_WEAK_ALIAS(handle_blockdevice_tryas, handle_undefined_tryas);
 
-/* Weakly define operators for `HANDLE_TYPE_DIRECTORYENTRY' (`struct directory_entry') */
-DEFINE_INTERN_WEAK_ALIAS(handle_directoryentry_refcnt, handle_undefined_refcnt);
-DEFINE_INTERN_WEAK_ALIAS(handle_directoryentry_incref, handle_undefined_incref);
-DEFINE_INTERN_WEAK_ALIAS(handle_directoryentry_decref, handle_undefined_decref);
-DEFINE_INTERN_WEAK_ALIAS(handle_directoryentry_tryincref, handle_undefined_tryincref);
-DEFINE_INTERN_WEAK_ALIAS(handle_directoryentry_weakgetref, handle_undefined_weakgetref);
-DEFINE_INTERN_WEAK_ALIAS(handle_directoryentry_weaklckref, handle_undefined_weaklckref);
-DEFINE_INTERN_WEAK_ALIAS(handle_directoryentry_weakdecref, handle_undefined_weakdecref);
-DEFINE_INTERN_WEAK_ALIAS(handle_directoryentry_read, handle_undefined_read);
-DEFINE_INTERN_WEAK_ALIAS(handle_directoryentry_write, handle_undefined_write);
-DEFINE_INTERN_WEAK_ALIAS(handle_directoryentry_pread, handle_undefined_pread);
-DEFINE_INTERN_WEAK_ALIAS(handle_directoryentry_pwrite, handle_undefined_pwrite);
-DEFINE_INTERN_WEAK_ALIAS(handle_directoryentry_readv, handle_undefined_readv);
-DEFINE_INTERN_WEAK_ALIAS(handle_directoryentry_writev, handle_undefined_writev);
-DEFINE_INTERN_WEAK_ALIAS(handle_directoryentry_preadv, handle_undefined_preadv);
-DEFINE_INTERN_WEAK_ALIAS(handle_directoryentry_pwritev, handle_undefined_pwritev);
-DEFINE_INTERN_WEAK_ALIAS(handle_directoryentry_readdir, handle_undefined_readdir);
-DEFINE_INTERN_WEAK_ALIAS(handle_directoryentry_seek, handle_undefined_seek);
-DEFINE_INTERN_WEAK_ALIAS(handle_directoryentry_ioctl, handle_undefined_ioctl);
-DEFINE_INTERN_WEAK_ALIAS(handle_directoryentry_truncate, handle_undefined_truncate);
-DEFINE_INTERN_WEAK_ALIAS(handle_directoryentry_mmap, handle_undefined_mmap);
-DEFINE_INTERN_WEAK_ALIAS(handle_directoryentry_allocate, handle_undefined_allocate);
-DEFINE_INTERN_WEAK_ALIAS(handle_directoryentry_sync, handle_undefined_sync);
-DEFINE_INTERN_WEAK_ALIAS(handle_directoryentry_datasync, handle_undefined_datasync);
-DEFINE_INTERN_WEAK_ALIAS(handle_directoryentry_stat, handle_undefined_stat);
-DEFINE_INTERN_WEAK_ALIAS(handle_directoryentry_pollconnect, handle_undefined_pollconnect);
-DEFINE_INTERN_WEAK_ALIAS(handle_directoryentry_polltest, handle_undefined_polltest);
-DEFINE_INTERN_WEAK_ALIAS(handle_directoryentry_hop, handle_undefined_hop);
-DEFINE_INTERN_WEAK_ALIAS(handle_directoryentry_tryas, handle_undefined_tryas);
+/* Weakly define operators for `HANDLE_TYPE_FDIRENT' (`struct fdirent') */
+DEFINE_INTERN_WEAK_ALIAS(handle_fdirent_refcnt, handle_undefined_refcnt);
+DEFINE_INTERN_WEAK_ALIAS(handle_fdirent_incref, handle_undefined_incref);
+DEFINE_INTERN_WEAK_ALIAS(handle_fdirent_decref, handle_undefined_decref);
+DEFINE_INTERN_WEAK_ALIAS(handle_fdirent_tryincref, handle_undefined_tryincref);
+DEFINE_INTERN_WEAK_ALIAS(handle_fdirent_weakgetref, handle_undefined_weakgetref);
+DEFINE_INTERN_WEAK_ALIAS(handle_fdirent_weaklckref, handle_undefined_weaklckref);
+DEFINE_INTERN_WEAK_ALIAS(handle_fdirent_weakdecref, handle_undefined_weakdecref);
+DEFINE_INTERN_WEAK_ALIAS(handle_fdirent_read, handle_undefined_read);
+DEFINE_INTERN_WEAK_ALIAS(handle_fdirent_write, handle_undefined_write);
+DEFINE_INTERN_WEAK_ALIAS(handle_fdirent_pread, handle_undefined_pread);
+DEFINE_INTERN_WEAK_ALIAS(handle_fdirent_pwrite, handle_undefined_pwrite);
+DEFINE_INTERN_WEAK_ALIAS(handle_fdirent_readv, handle_undefined_readv);
+DEFINE_INTERN_WEAK_ALIAS(handle_fdirent_writev, handle_undefined_writev);
+DEFINE_INTERN_WEAK_ALIAS(handle_fdirent_preadv, handle_undefined_preadv);
+DEFINE_INTERN_WEAK_ALIAS(handle_fdirent_pwritev, handle_undefined_pwritev);
+DEFINE_INTERN_WEAK_ALIAS(handle_fdirent_readdir, handle_undefined_readdir);
+DEFINE_INTERN_WEAK_ALIAS(handle_fdirent_seek, handle_undefined_seek);
+DEFINE_INTERN_WEAK_ALIAS(handle_fdirent_ioctl, handle_undefined_ioctl);
+DEFINE_INTERN_WEAK_ALIAS(handle_fdirent_truncate, handle_undefined_truncate);
+DEFINE_INTERN_WEAK_ALIAS(handle_fdirent_mmap, handle_undefined_mmap);
+DEFINE_INTERN_WEAK_ALIAS(handle_fdirent_allocate, handle_undefined_allocate);
+DEFINE_INTERN_WEAK_ALIAS(handle_fdirent_sync, handle_undefined_sync);
+DEFINE_INTERN_WEAK_ALIAS(handle_fdirent_datasync, handle_undefined_datasync);
+DEFINE_INTERN_WEAK_ALIAS(handle_fdirent_stat, handle_undefined_stat);
+DEFINE_INTERN_WEAK_ALIAS(handle_fdirent_pollconnect, handle_undefined_pollconnect);
+DEFINE_INTERN_WEAK_ALIAS(handle_fdirent_polltest, handle_undefined_polltest);
+DEFINE_INTERN_WEAK_ALIAS(handle_fdirent_hop, handle_undefined_hop);
+DEFINE_INTERN_WEAK_ALIAS(handle_fdirent_tryas, handle_undefined_tryas);
 
 /* Weakly define operators for `HANDLE_TYPE_PATH' (`struct path') */
 DEFINE_INTERN_WEAK_ALIAS(handle_path_refcnt, handle_undefined_refcnt);

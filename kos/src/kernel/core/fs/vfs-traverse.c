@@ -59,7 +59,7 @@ path_follow_symlink_dynamic_impl(struct fs *__restrict filesystem,
                                  struct symlink_node *__restrict sl_node,
                                  fsmode_t mode,
                                  u32 *__restrict premaining_symlinks,
-                                 /*out*/ REF struct directory_entry **pcontaining_dirent,
+                                 /*out*/ REF struct fdirent **pcontaining_dirent,
                                  /*out*/ REF struct directory_node **__restrict pnew_containing_directory,
                                  /*out*/ REF struct path **__restrict presult_path,
                                  /*out*/ REF struct inode **__restrict pnew_result,
@@ -100,7 +100,7 @@ path_follow_symlink_dynamic_impl(struct fs *__restrict filesystem,
 			*presult_path = incref(*pcontaining_path);
 			goto got_result_path;
 		}
-		hash = directory_entry_hash(last_seg, last_seglen);
+		hash = fdirent_hash(last_seg, last_seglen);
 		COMPILER_READ_BARRIER();
 		/* Check for mounting points & cached paths. */
 		*presult_path = mode & FS_MODE_FDOSPATH
@@ -156,7 +156,7 @@ path_follow_symlink_dynamic(struct fs *__restrict filesystem,
                             struct symlink_node *__restrict sl_node,
                             fsmode_t mode,
                             u32 *__restrict premaining_symlinks,
-                            /*out*/ REF struct directory_entry **pcontaining_dirent,
+                            /*out*/ REF struct fdirent **pcontaining_dirent,
                             /*out*/ REF struct directory_node **__restrict pnew_containing_directory,
                             /*out*/ REF struct path **__restrict presult_path,
                             /*out*/ REF struct inode **__restrict pnew_result) {
@@ -205,7 +205,7 @@ PRIVATE ATTR_RETNONNULL REF struct path *KCALL
 path_expandchild(struct path *__restrict parent_path,
                  struct path *__restrict root_path,
                  struct inode *__restrict child_node,
-                 struct directory_entry *__restrict child_entry,
+                 struct fdirent *__restrict child_entry,
                  u32 *__restrict premaining_links) {
 	/* Simple case: the child is a directory. */
 	if (INODE_ISDIR(child_node))
@@ -275,8 +275,8 @@ path_walkchild(struct path *__restrict self,
 	REF struct path *result;
 	REF struct directory_node *parent_directory;
 	REF struct inode *child_node;
-	REF struct directory_entry *child_entry;
-	hash = directory_entry_hash(name_start, name_length);
+	REF struct fdirent *child_entry;
+	hash = fdirent_hash(name_start, name_length);
 	result = path_getchild_or_parent_inode(self, name_start, name_length,
 	                                       hash, &parent_directory);
 	if (result)
@@ -317,8 +317,8 @@ path_walkcasechild(struct path *__restrict self,
 	REF struct path *result;
 	REF struct directory_node *parent_directory;
 	REF struct inode *child_node;
-	REF struct directory_entry *child_entry;
-	hash = directory_entry_hash(name_start, name_length);
+	REF struct fdirent *child_entry;
+	hash = fdirent_hash(name_start, name_length);
 	result = path_getcasechild_or_parent_inode(self, name_start, name_length,
 	                                           hash, &parent_directory);
 	if (result)

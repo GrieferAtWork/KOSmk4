@@ -88,10 +88,10 @@
 
 DECL_BEGIN
 
-DEFINE_HANDLE_REFCNT_FUNCTIONS(directoryentry, struct directory_entry);
+DEFINE_HANDLE_REFCNT_FUNCTIONS(directoryentry, struct fdirent);
 
 INTERN size_t KCALL
-handle_directoryentry_pread(struct directory_entry *__restrict self,
+handle_fdirent_pread(struct fdirent *__restrict self,
                             USER CHECKED void *dst, size_t num_bytes,
                             pos_t addr, iomode_t UNUSED(mode)) {
 	size_t result;
@@ -105,24 +105,24 @@ handle_directoryentry_pread(struct directory_entry *__restrict self,
 }
 
 INTERN size_t KCALL
-handle_directoryentry_read(struct directory_entry *__restrict self,
+handle_fdirent_read(struct fdirent *__restrict self,
                            USER CHECKED void *dst, size_t num_bytes,
                            iomode_t mode) {
-	return handle_directoryentry_pread(self, dst, num_bytes, 0, mode);
+	return handle_fdirent_pread(self, dst, num_bytes, 0, mode);
 }
 
 LOCAL ATTR_PURE NONNULL((1)) size_t KCALL
-directory_entry_usersize(struct directory_entry const *__restrict self) {
+fdirent_usersize(struct fdirent const *__restrict self) {
 	return offsetof(struct dirent, d_name) + (self->de_namelen + 1) * sizeof(char);
 }
 
 INTERN NONNULL((1)) size_t KCALL
-handle_directoryentry_readdir(struct directory_entry *__restrict self,
+handle_fdirent_readdir(struct fdirent *__restrict self,
                               USER CHECKED struct dirent *buf, size_t bufsize,
                               readdir_mode_t UNUSED(readdir_mode),
                               iomode_t UNUSED(mode)) {
 	size_t result;
-	result = directory_entry_usersize(self);
+	result = fdirent_usersize(self);
 	if (bufsize >= offsetafter(struct dirent, d_ino64))
 		buf->d_ino64 = (__ino64_t)self->de_ino;
 	if (bufsize >= offsetafter(struct dirent, d_type))
@@ -138,7 +138,7 @@ handle_directoryentry_readdir(struct directory_entry *__restrict self,
 }
 
 INTERN NONNULL((1)) void KCALL
-handle_directoryentry_stat(struct directory_entry *__restrict self,
+handle_fdirent_stat(struct fdirent *__restrict self,
                            USER CHECKED struct stat *result) {
 	memset(result, 0, sizeof(*result));
 	result->st_size = (self->de_namelen + 1) * sizeof(char);
@@ -147,28 +147,28 @@ handle_directoryentry_stat(struct directory_entry *__restrict self,
 }
 
 INTERN NONNULL((1)) void KCALL
-handle_directoryentry_pollconnect(struct directory_entry *__restrict UNUSED(self),
+handle_fdirent_pollconnect(struct fdirent *__restrict UNUSED(self),
                                   poll_mode_t UNUSED(what)) {
 }
 
 INTERN ATTR_CONST NONNULL((1)) poll_mode_t KCALL
-handle_directoryentry_polltest(struct directory_entry *__restrict UNUSED(self),
+handle_fdirent_polltest(struct fdirent *__restrict UNUSED(self),
                                poll_mode_t what) {
 	return what & POLLINMASK;
 }
 
 INTERN syscall_slong_t KCALL /* TODO: Add hop functions for reading all of the different fields. */
-handle_directoryentry_hop(struct directory_entry *__restrict self, syscall_ulong_t cmd,
+handle_fdirent_hop(struct fdirent *__restrict self, syscall_ulong_t cmd,
                           USER UNCHECKED void *arg, iomode_t mode);
 
 
 
 
 PUBLIC ATTR_PURE WUNUSED NONNULL((1)) uintptr_t KCALL
-directory_entry_hash(CHECKED USER /*utf-8*/ char const *__restrict name,
+fdirent_hash(CHECKED USER /*utf-8*/ char const *__restrict name,
                      u16 namelen) THROWS(E_SEGFAULT) {
 	size_t const *iter, *end;
-	size_t hash = DIRECTORY_ENTRY_EMPTY_HASH;
+	size_t hash = FDIRENT_EMPTY_HASH;
 	end = (iter = (size_t const *)name) + (namelen / sizeof(size_t));
 	while (iter < end)
 		hash += *iter++, hash *= 9;
@@ -201,9 +201,9 @@ directory_entry_hash(CHECKED USER /*utf-8*/ char const *__restrict name,
 	return hash;
 }
 
-PUBLIC struct directory_entry empty_directory_entry = {
+PUBLIC struct fdirent empty_dirent = {
 	/* .de_refcnt   = */ 1,
-	/* .de_heapsize = */ sizeof(empty_directory_entry),
+	/* .de_heapsize = */ sizeof(empty_dirent),
 	/* .de_next     = */ NULL,
 	/* .de_bypos    = */ { NULL, NULL },
 	/* .de_fsdata   = */ {
@@ -212,7 +212,7 @@ PUBLIC struct directory_entry empty_directory_entry = {
 	},
 	/* .de_pos      = */ (pos_t)0,
 	/* .de_ino      = */ (ino_t)0,
-	/* .de_hash     = */ DIRECTORY_ENTRY_EMPTY_HASH,
+	/* .de_hash     = */ FDIRENT_EMPTY_HASH,
 	/* .de_namelen  = */ 0,
 #if 1
 	/* .de_type     = */ DT_DIR, /* DIR, because this entry is used as entry in `open("/")' */
@@ -223,7 +223,7 @@ PUBLIC struct directory_entry empty_directory_entry = {
 };
 
 PUBLIC NOBLOCK NONNULL((1)) void
-NOTHROW(KCALL directory_entry_destroy)(struct directory_entry *__restrict self) {
+NOTHROW(KCALL fdirent_destroy)(struct fdirent *__restrict self) {
 	heap_free(FS_HEAP, self, self->de_heapsize, FS_GFP);
 }
 
@@ -234,21 +234,21 @@ NOTHROW(KCALL directory_entry_destroy)(struct directory_entry *__restrict self) 
  *   - de_fsdata (as needed)
  *   - de_pos
  *   - de_ino
- *   - de_hash   (`directory_entry_alloc' only)
+ *   - de_hash   (`fdirent_alloc' only)
  *   - de_type
- *   - de_name   (`directory_entry_alloc' only)
+ *   - de_name   (`fdirent_alloc' only)
  * NOTE: These functions will have already ensured that
  *       `return->de_name[namelen] == '\0''
  */
-PUBLIC ATTR_MALLOC ATTR_RETNONNULL WUNUSED REF struct directory_entry *KCALL
-directory_entry_alloc(u16 namelen) THROWS(E_BADALLOC) {
+PUBLIC ATTR_MALLOC ATTR_RETNONNULL WUNUSED REF struct fdirent *KCALL
+fdirent_alloc(u16 namelen) THROWS(E_BADALLOC) {
 	heapptr_t resptr;
-	REF struct directory_entry *result;
+	REF struct fdirent *result;
 	resptr = heap_alloc(FS_HEAP,
-	                    offsetof(struct directory_entry, de_name) +
+	                    offsetof(struct fdirent, de_name) +
 	                    (namelen + 1) * sizeof(char),
 	                    FS_GFP);
-	result = (REF struct directory_entry *)heapptr_getptr(resptr);
+	result = (REF struct fdirent *)heapptr_getptr(resptr);
 	result->de_refcnt        = 1;
 	result->de_heapsize      = heapptr_getsiz(resptr);
 	result->de_namelen       = namelen;
@@ -256,18 +256,18 @@ directory_entry_alloc(u16 namelen) THROWS(E_BADALLOC) {
 	return result;
 }
 
-PUBLIC ATTR_MALLOC ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct directory_entry *KCALL
-directory_entry_alloc_s(USER CHECKED /*utf-8*/ char const *name, u16 namelen)
+PUBLIC ATTR_MALLOC ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct fdirent *KCALL
+fdirent_alloc_s(USER CHECKED /*utf-8*/ char const *name, u16 namelen)
 		THROWS(E_BADALLOC, E_SEGFAULT) {
-	REF struct directory_entry *result;
-	result = directory_entry_alloc(namelen);
+	REF struct fdirent *result;
+	result = fdirent_alloc(namelen);
 	TRY {
 		memcpy(result->de_name, name, namelen, sizeof(char));
 	} EXCEPT {
-		directory_entry_destroy(result);
+		fdirent_destroy(result);
 		RETHROW();
 	}
-	result->de_hash = directory_entry_hash(result->de_name, namelen);
+	result->de_hash = fdirent_hash(result->de_name, namelen);
 	return result;
 }
 
@@ -1317,14 +1317,14 @@ symlink_node_readlink(struct symlink_node *__restrict self,
 
 PRIVATE NONNULL((1)) void
 NOTHROW(KCALL directory_rehash_nx)(struct directory_node *__restrict self) {
-	REF struct directory_entry **new_map;
-	REF struct directory_entry *iter, *next;
+	REF struct fdirent **new_map;
+	REF struct fdirent *iter, *next;
 	size_t i, new_mask;
 	assert(sync_writing(self));
 	new_mask = (self->d_mask << 1) | 1;
 	/* Allocate the new directory map. */
-	new_map = (REF struct directory_entry **)kmalloc_nx((new_mask + 1) *
-	                                                    sizeof(REF struct directory_entry *),
+	new_map = (REF struct fdirent **)kmalloc_nx((new_mask + 1) *
+	                                                    sizeof(REF struct fdirent *),
 	                                                    FS_GFP | GFP_CALLOC);
 	if unlikely(!new_map)
 		return; /* Ignore failure to allocate a larger map. */
@@ -1348,8 +1348,8 @@ NOTHROW(KCALL directory_rehash_nx)(struct directory_node *__restrict self) {
 
 PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL directory_rehash_smaller_nx)(struct directory_node *__restrict self) {
-	REF struct directory_entry **new_map;
-	REF struct directory_entry *iter, *next;
+	REF struct fdirent **new_map;
+	REF struct fdirent *iter, *next;
 	size_t i, new_mask;
 	assert(sync_writing(self));
 	new_mask = (self->d_mask >> 1);
@@ -1358,8 +1358,8 @@ NOTHROW(KCALL directory_rehash_smaller_nx)(struct directory_node *__restrict sel
 	if (new_mask < DIRECTORY_DEFAULT_MASK)
 		return;
 	/* Allocate the new directory map. */
-	new_map = (REF struct directory_entry **)kmalloc_nx((new_mask + 1) *
-	                                                    sizeof(REF struct directory_entry *),
+	new_map = (REF struct fdirent **)kmalloc_nx((new_mask + 1) *
+	                                                    sizeof(REF struct fdirent *),
 	                                                    FS_GFP | GFP_ATOMIC | GFP_CALLOC);
 	if unlikely(!new_map)
 		return; /* Ignore failure to allocate a smaller map. */
@@ -1391,11 +1391,11 @@ NOTHROW(KCALL directory_rehash_smaller_nx)(struct directory_node *__restrict sel
  * @throw: E_FSERROR_UNSUPPORTED_OPERATION:E_FILESYSTEM_OPERATION_READDIR:
  *                             [...]
  * @throw: E_IOERROR:          [...] */
-PUBLIC WUNUSED NONNULL((1)) struct directory_entry **KCALL
+PUBLIC WUNUSED NONNULL((1)) struct fdirent **KCALL
 directory_readnext_p(struct directory_node *__restrict self)
 		THROWS(E_FSERROR_UNSUPPORTED_OPERATION, E_IOERROR, ...) {
-	struct directory_entry **presult;
-	struct directory_entry *result;
+	struct fdirent **presult;
+	struct fdirent *result;
 	pos_t last_directory_position;
 #ifndef NDEBUG
 	pos_t entry_start_position;
@@ -1438,7 +1438,7 @@ continue_reading:
 		return NULL;
 	}
 	assert(result->de_namelen != 0);
-	assert(result->de_hash == directory_entry_hash(result->de_name, result->de_namelen));
+	assert(result->de_hash == fdirent_hash(result->de_name, result->de_namelen));
 	assertf(!memchr(result->de_name, 0, result->de_namelen),
 	        "%$[hex]", (size_t)result->de_namelen, result->de_name);
 	TRY {
@@ -1468,14 +1468,14 @@ continue_reading:
 			result->de_bypos.le_prev = &self->d_bypos;
 			result->de_bypos.le_next  = NULL;
 		} else if (result->de_pos < self->d_bypos_end->de_pos) {
-			struct directory_entry *insert_after;
+			struct fdirent *insert_after;
 			/* When the directory is being re-loaded after a  umount(),
 			 * an older entry for this directory entry may still exist,
 			 * or we just have to insert the new entry somewhere else. */
 			insert_after = self->d_bypos_end;
 			do
 				insert_after = COMPILER_CONTAINER_OF(insert_after->de_bypos.le_prev,
-				                                     struct directory_entry, de_bypos.le_next);
+				                                     struct fdirent, de_bypos.le_next);
 			while (insert_after->de_pos > result->de_pos);
 			/* Check if the entry already exists! */
 			if (insert_after->de_pos == result->de_pos)
@@ -1497,7 +1497,7 @@ continue_reading:
 		++self->d_size;
 		/* Add the directory entry to the hash-map. */
 		if (self->d_size >= (self->d_mask / 3) * 2) {
-			struct directory_entry *ent;
+			struct fdirent *ent;
 			/* Try to re-hash the directory. */
 			directory_rehash_nx(self);
 			/* Must re-discover the result self-pointer. */
@@ -1522,10 +1522,10 @@ unlock_write_and_continue_reading:
 }
 
 
-PUBLIC NONNULL((1)) struct directory_entry *KCALL
+PUBLIC NONNULL((1)) struct fdirent *KCALL
 directory_readnext(struct directory_node *__restrict self)
 		THROWS(E_FSERROR_UNSUPPORTED_OPERATION, E_IOERROR, ...) {
-	struct directory_entry *result;
+	struct fdirent *result;
 	pos_t last_directory_position;
 #ifndef NDEBUG
 	pos_t entry_start_position;
@@ -1568,11 +1568,11 @@ continue_reading:
 		return NULL;
 	}
 	assert(result->de_namelen != 0);
-	assert(result->de_hash == directory_entry_hash(result->de_name, result->de_namelen));
+	assert(result->de_hash == fdirent_hash(result->de_name, result->de_namelen));
 	assertf(!memchr(result->de_name, 0, result->de_namelen),
 	        "%$[hex]", (size_t)result->de_namelen, result->de_name);
 	TRY {
-		struct directory_entry **presult;
+		struct fdirent **presult;
 		SCOPED_WRITELOCK(INODE_SCOPED_LOCK_FOR(self));
 #ifndef NDEBUG
 		/* `rwlock_write()' will have thrown an error if it didn't
@@ -1599,14 +1599,14 @@ continue_reading:
 			result->de_bypos.le_prev = &self->d_bypos;
 			result->de_bypos.le_next  = NULL;
 		} else if (result->de_pos < self->d_bypos_end->de_pos) {
-			struct directory_entry *insert_after;
+			struct fdirent *insert_after;
 			/* When the directory is being re-loaded after a  umount(),
 			 * an older entry for this directory entry may still exist,
 			 * or we just have to insert the new entry somewhere else. */
 			insert_after = self->d_bypos_end;
 			do {
 				insert_after = COMPILER_CONTAINER_OF(insert_after->de_bypos.le_prev,
-				                                     struct directory_entry, de_bypos.le_next);
+				                                     struct fdirent, de_bypos.le_next);
 			} while (insert_after->de_pos > result->de_pos);
 			/* Check if the entry already exists! */
 			if (insert_after->de_pos == result->de_pos)
@@ -1657,13 +1657,13 @@ unlock_write_and_continue_reading:
  * @throw: E_FSERROR_UNSUPPORTED_OPERATION:E_FILESYSTEM_OPERATION_READDIR:
  *                             [...]
  * @throw: E_IOERROR:          [...] */
-PUBLIC WUNUSED NONNULL((1)) REF struct directory_entry *KCALL
+PUBLIC WUNUSED NONNULL((1)) REF struct fdirent *KCALL
 directory_getentry(struct directory_node *__restrict self,
                    CHECKED USER /*utf-8*/ char const *name,
                    u16 namelen, uintptr_t hash)
 		THROWS(E_FSERROR_DELETED, E_SEGFAULT,
 		       E_FSERROR_UNSUPPORTED_OPERATION, E_IOERROR, ...) {
-	struct directory_entry *result;
+	struct fdirent *result;
 	assert(sync_reading(self));
 	if (self->i_type->it_directory.d_oneshot.o_lookup) {
 		TRY {
@@ -1687,7 +1687,7 @@ directory_getentry(struct directory_node *__restrict self,
 	assert(self->d_map);
 	result = self->d_map[hash & self->d_mask];
 	for (; result; result = result->de_next) {
-		assert(result->de_hash == directory_entry_hash(result->de_name, result->de_namelen));
+		assert(result->de_hash == fdirent_hash(result->de_name, result->de_namelen));
 		assert((result->de_hash & self->d_mask) == (hash & self->d_mask));
 		/* Check hash and name-length. */
 		if (result->de_hash != hash)
@@ -1702,7 +1702,7 @@ directory_getentry(struct directory_node *__restrict self,
 	/* Read more directory entries. */
 read_directory:
 	while ((result = directory_readnext(self)) != NULL) {
-		assert(result->de_hash == directory_entry_hash(result->de_name, result->de_namelen));
+		assert(result->de_hash == fdirent_hash(result->de_name, result->de_namelen));
 		/* Check if this is the one. */
 		if (result->de_hash != hash)
 			continue;
@@ -1718,13 +1718,13 @@ read_directory:
 }
 
 
-PUBLIC WUNUSED NONNULL((1)) REF struct directory_entry *KCALL
+PUBLIC WUNUSED NONNULL((1)) REF struct fdirent *KCALL
 directory_getcaseentry(struct directory_node *__restrict self,
                        CHECKED USER /*utf-8*/ char const *name,
                        u16 namelen, uintptr_t hash)
 		THROWS(E_FSERROR_DELETED, E_SEGFAULT,
 		       E_FSERROR_UNSUPPORTED_OPERATION, E_IOERROR, ...) {
-	struct directory_entry *result;
+	struct fdirent *result;
 	assert(sync_reading(self));
 	if (self->i_type->it_directory.d_oneshot.o_lookup) {
 		TRY {
@@ -1803,14 +1803,14 @@ read_directory:
  * @throw: E_FSERROR_UNSUPPORTED_OPERATION:E_FILESYSTEM_OPERATION_READDIR:
  *                             [...]
  * @throw: E_IOERROR:          [...] */
-PUBLIC WUNUSED NONNULL((1, 5)) REF struct directory_entry **KCALL
+PUBLIC WUNUSED NONNULL((1, 5)) REF struct fdirent **KCALL
 directory_getentry_p(struct directory_node *__restrict self,
                      CHECKED USER /*utf-8*/ char const *name,
                      u16 namelen, uintptr_t hash,
-                     /*out*/ REF struct directory_entry **__restrict poneshot_entry)
+                     /*out*/ REF struct fdirent **__restrict poneshot_entry)
 		THROWS(E_FSERROR_DELETED, E_SEGFAULT,
 		       E_FSERROR_UNSUPPORTED_OPERATION, E_IOERROR, ...) {
-	struct directory_entry **presult, *result;
+	struct fdirent **presult, *result;
 	assert(sync_reading(self));
 	if (self->i_type->it_directory.d_oneshot.o_lookup) {
 		TRY {
@@ -1868,14 +1868,14 @@ read_directory:
 	return presult;
 }
 
-PUBLIC WUNUSED NONNULL((1, 5)) struct directory_entry **KCALL
+PUBLIC WUNUSED NONNULL((1, 5)) struct fdirent **KCALL
 directory_getcaseentry_p(struct directory_node *__restrict self,
                          CHECKED USER /*utf-8*/ char const *name,
                          u16 namelen, uintptr_t hash,
-                         /*out*/ REF struct directory_entry **__restrict poneshot_entry)
+                         /*out*/ REF struct fdirent **__restrict poneshot_entry)
 		THROWS(E_FSERROR_DELETED, E_SEGFAULT,
 		       E_FSERROR_UNSUPPORTED_OPERATION, E_IOERROR, ...) {
-	struct directory_entry **presult, *result;
+	struct fdirent **presult, *result;
 	assert(sync_reading(self));
 	if (self->i_type->it_directory.d_oneshot.o_lookup) {
 		TRY {
@@ -1964,10 +1964,10 @@ PUBLIC WUNUSED NONNULL((1)) REF struct inode *KCALL
 directory_getnode(struct directory_node *__restrict self,
                   CHECKED USER /*utf-8*/ char const *name,
                   u16 namelen, uintptr_t hash,
-                  REF struct directory_entry **pentry)
+                  REF struct fdirent **pentry)
 		THROWS(E_FSERROR_DELETED, E_SEGFAULT,
 		       E_FSERROR_UNSUPPORTED_OPERATION, E_IOERROR, ...) {
-	struct directory_entry *entry;
+	struct fdirent *entry;
 	REF struct inode *result;
 again:
 	rwlock_read(__inode_lock(self));
@@ -2001,10 +2001,10 @@ PUBLIC WUNUSED NONNULL((1)) REF struct inode *KCALL
 directory_getcasenode(struct directory_node *__restrict self,
                       CHECKED USER /*utf-8*/ char const *name,
                       u16 namelen, uintptr_t hash,
-                      REF struct directory_entry **pentry)
+                      REF struct fdirent **pentry)
 		THROWS(E_FSERROR_DELETED, E_SEGFAULT,
 		       E_FSERROR_UNSUPPORTED_OPERATION, E_IOERROR, ...) {
-	struct directory_entry *entry;
+	struct fdirent *entry;
 	REF struct inode *result;
 again:
 	rwlock_read(__inode_lock(self));
@@ -2038,9 +2038,9 @@ again:
 
 PRIVATE NONNULL((1, 2)) void
 NOTHROW(KCALL directory_addentry)(struct directory_node *__restrict self,
-                                  /*in*/ REF struct directory_entry *__restrict entry) {
-	struct directory_entry *insert_after;
-	struct directory_entry **pdirent;
+                                  /*in*/ REF struct fdirent *__restrict entry) {
+	struct fdirent *insert_after;
+	struct fdirent **pdirent;
 	assert(entry);
 
 	/* Add the directory entry to the by-position chain of directory entries. */
@@ -2074,7 +2074,7 @@ NOTHROW(KCALL directory_addentry)(struct directory_node *__restrict self,
 		/* Find the entry after which we must insert this one. */
 		do {
 			insert_after = COMPILER_CONTAINER_OF(insert_after->de_bypos.le_prev,
-			                                     struct directory_entry,
+			                                     struct fdirent,
 			                                     de_bypos.le_next);
 		} while (entry->de_pos < insert_after->de_pos);
 		assert(insert_after->de_bypos.le_next);
@@ -2101,7 +2101,7 @@ NOTHROW(KCALL directory_addentry)(struct directory_node *__restrict self,
 
 LOCAL NOBLOCK NONNULL((1, 2)) void
 NOTHROW(KCALL directory_delentry_bypos)(struct directory_node *__restrict self,
-                                        struct directory_entry *__restrict entry) {
+                                        struct fdirent *__restrict entry) {
 	/* Remove the entry from the by-position chain. */
 	if (entry == self->d_bypos_end) {
 		if (entry == self->d_bypos) {
@@ -2120,8 +2120,8 @@ NOTHROW(KCALL directory_delentry_bypos)(struct directory_node *__restrict self,
 
 INTERN NOBLOCK NONNULL((1, 2)) void
 NOTHROW(KCALL directory_delentry)(struct directory_node *__restrict self,
-                                  /*out*/ REF struct directory_entry *__restrict entry) {
-	struct directory_entry **pdirent, *iter;
+                                  /*out*/ REF struct fdirent *__restrict entry) {
+	struct fdirent **pdirent, *iter;
 	/* Remove the entry from the by-position chain. */
 	directory_delentry_bypos(self, entry);
 	/* Add the new entry to the hash-map. */
@@ -2202,7 +2202,7 @@ NOTHROW(KCALL path_rehash_smaller_nx)(struct path *__restrict self);
 
 LOCAL NOBLOCK void
 NOTHROW(KCALL remove_dirent_from_directory)(struct directory_node *__restrict self,
-                                            struct directory_entry *__restrict entry) {
+                                            struct fdirent *__restrict entry) {
 	assert(self->d_size >= 1);
 	assert((self->d_bypos != NULL) == (self->d_bypos_end != NULL));
 	/* Remove the entry from the by-position chain. */
@@ -2248,7 +2248,7 @@ directory_remove(struct directory_node *__restrict self,
                  CHECKED USER /*utf-8*/ char const *__restrict name,
                  u16 namelen, uintptr_t hash, unsigned int mode,
                  /*out*/ REF struct inode **premoved_inode,
-                 /*out*/ REF struct directory_entry **premoved_dirent,
+                 /*out*/ REF struct fdirent **premoved_dirent,
                  struct path *containing_path,
                  /*out*/ REF struct path **premoved_path)
 		THROWS(E_FSERROR_UNSUPPORTED_OPERATION, E_FSERROR_DELETED,
@@ -2258,8 +2258,8 @@ directory_remove(struct directory_node *__restrict self,
 		       E_FSERROR_DIRECTORY_MOVE_TO_CHILD, E_FSERROR_ACCESS_DENIED,
 		       E_FSERROR_IS_A_MOUNTING_POINT, E_FSERROR_READONLY,
 		       E_IOERROR, E_SEGFAULT, ...) {
-	struct directory_entry **pentry, *entry;
-	REF struct directory_entry *oneshot_entry; /* [0..1] */
+	struct fdirent **pentry, *entry;
+	REF struct fdirent *oneshot_entry; /* [0..1] */
 	REF struct inode *node;
 	REF struct path *removed_path;
 	unsigned int result;
@@ -2538,8 +2538,8 @@ directory_rename(struct directory_node *__restrict source_directory,
                  struct directory_node *__restrict target_directory,
                  CHECKED USER /*utf-8*/ char const *__restrict target_name,
                  u16 target_namelen, unsigned int mode,
-                 /*out*/ REF struct directory_entry **psource_dirent,
-                 /*out*/ REF struct directory_entry **ptarget_dirent,
+                 /*out*/ REF struct fdirent **psource_dirent,
+                 /*out*/ REF struct fdirent **ptarget_dirent,
                  /*out*/ REF struct inode **psource_inode,
                  /*out*/ REF struct inode **ptarget_inode,
                  struct path *source_path,
@@ -2550,7 +2550,7 @@ directory_rename(struct directory_node *__restrict source_directory,
 		       E_FSERROR_DISK_FULL, E_FSERROR_TOO_MANY_HARD_LINKS,
 		       E_FSERROR_DIRECTORY_MOVE_TO_CHILD, E_FSERROR_ACCESS_DENIED,
 		       E_FSERROR_READONLY, E_IOERROR, E_SEGFAULT, ...) {
-	REF struct directory_entry *target_entry;
+	REF struct fdirent *target_entry;
 	REF struct inode *source_inode;
 	struct path *removed_path;
 	/* Check for cross-device links. */
@@ -2562,7 +2562,7 @@ directory_rename(struct directory_node *__restrict source_directory,
 		*premoved_path = NULL;
 
 	/* Construct a directory entry for the target filename. */
-	target_entry = directory_entry_alloc_s(target_name, target_namelen);
+	target_entry = fdirent_alloc_s(target_name, target_namelen);
 	TRY {
 		/* Acquire all of the necessary locks to the source and target directories. */
 acquire_sourcedir_writelock:
@@ -2576,9 +2576,9 @@ acquire_sourcedir_writelock:
 			}
 		}
 		TRY {
-			REF struct directory_entry *source_oneshot = NULL;
-			struct directory_entry *source_entry; /* NOTE: Becomes a [0..1]-REF upon successful completion. */
-			struct directory_entry **psource_entry;
+			REF struct fdirent *source_oneshot = NULL;
+			struct fdirent *source_entry; /* NOTE: Becomes a [0..1]-REF upon successful completion. */
+			struct fdirent **psource_entry;
 
 			/* Check if the source or target directories have been deleted. */
 			inode_check_deleted(source_directory, E_FILESYSTEM_DELETED_PATH);
@@ -2600,7 +2600,7 @@ acquire_sourcedir_writelock:
 				if unlikely(!sync_trywrite(source_inode))
 					goto wait_for_source_node_and_retry;
 				TRY {
-					REF struct directory_entry *existing_entry;
+					REF struct fdirent *existing_entry;
 					/* Check if the source node has been deleted. */
 					inode_check_deleted(source_inode);
 					/* In order to allow for file rename, the caller needs
@@ -3047,13 +3047,13 @@ PUBLIC NONNULL((1, 2, 4)) void KCALL
 directory_link(struct directory_node *__restrict target_directory,
                CHECKED USER /*utf-8*/ char const *__restrict target_name,
                u16 target_namelen, struct inode *__restrict link_target, unsigned int link_mode,
-               /*out*/ REF struct directory_entry **ptarget_dirent)
+               /*out*/ REF struct fdirent **ptarget_dirent)
 		THROWS(E_FSERROR_UNSUPPORTED_OPERATION, E_FSERROR_DELETED,
 		       E_FSERROR_CROSS_DEVICE_LINK, E_FSERROR_ILLEGAL_PATH,
 		       E_FSERROR_FILE_ALREADY_EXISTS, E_FSERROR_DISK_FULL,
 		       E_FSERROR_TOO_MANY_HARD_LINKS, E_FSERROR_READONLY,
 		       E_IOERROR, E_SEGFAULT, ...) {
-	REF struct directory_entry *target_dirent;
+	REF struct fdirent *target_dirent;
 	/* Check for cross-device links. */
 	if unlikely(link_target->i_super != target_directory->i_super)
 		THROW(E_FSERROR_CROSS_DEVICE_LINK);
@@ -3066,13 +3066,13 @@ directory_link(struct directory_node *__restrict target_directory,
 		THROW(E_FSERROR_ILLEGAL_PATH);
 
 	/* Construct a directory entry for the target filename. */
-	target_dirent = directory_entry_alloc_s(target_name, target_namelen);
+	target_dirent = fdirent_alloc_s(target_name, target_namelen);
 	TRY {
 		/* Acquire a write-lock to only the target directory at first. */
 		sync_write(target_directory);
 		sync_write(link_target);
 		TRY {
-			struct directory_entry *existing_entry;
+			struct fdirent *existing_entry;
 			inode_check_deleted(target_directory, E_FILESYSTEM_DELETED_PATH);
 			/* Check if a directory entry matching the target name already exists. */
 			existing_entry = link_mode & DIRECTORY_LINK_FNOCASE
@@ -3962,7 +3962,7 @@ NOTHROW(KCALL superblock_mountlock_upgrade_nx)(struct superblock *__restrict sel
 PUBLIC ATTR_RETNONNULL NONNULL((1, 2, 3)) REF struct inode *KCALL
 superblock_opennode(struct superblock *__restrict self,
                     struct directory_node *__restrict parent_directory,
-                    struct directory_entry *__restrict parent_directory_entry)
+                    struct fdirent *__restrict parent_dirent)
 		THROWS(E_FSERROR_DELETED, E_IOERROR, E_BADALLOC, ...) {
 	REF struct inode *result;
 	heapptr_t resptr;
@@ -3975,7 +3975,7 @@ again:
 
 	/* Search for an existing INode. */
 	assert(self->s_nodes);
-	result = inode_tree_locate(self->s_nodes, parent_directory_entry->de_ino);
+	result = inode_tree_locate(self->s_nodes, parent_dirent->de_ino);
 	if (result && tryincref(result)) {
 		superblock_nodeslock_endread(self);
 check_result_for_deletion:
@@ -3988,7 +3988,7 @@ check_result_for_deletion:
 				decref_unlikely(result);
 				RETHROW();
 			}
-			new_node = inode_tree_remove(&self->s_nodes, parent_directory_entry->de_ino);
+			new_node = inode_tree_remove(&self->s_nodes, parent_dirent->de_ino);
 			if (unlikely(new_node != result) && new_node)
 				inode_tree_insert(&self->s_nodes, new_node);
 			superblock_nodeslock_endwrite(self);
@@ -4001,7 +4001,7 @@ check_result_for_deletion:
 	}
 	TRY {
 		if (!superblock_nodeslock_upgrade(self)) {
-			result = inode_tree_locate(self->s_nodes, parent_directory_entry->de_ino);
+			result = inode_tree_locate(self->s_nodes, parent_dirent->de_ino);
 			if (result && tryincref(result)) {
 				superblock_nodeslock_endwrite(self);
 				goto check_result_for_deletion;
@@ -4014,7 +4014,7 @@ check_result_for_deletion:
 	}
 	TRY {
 		/* Node wasn't in cache. Allocate a new descriptor. */
-		switch (parent_directory_entry->de_type) {
+		switch (parent_dirent->de_type) {
 
 		case DT_REG:
 			resptr = heap_alloc(FS_HEAP, sizeof(struct regular_node), FS_GFP | GFP_CALLOC);
@@ -4031,8 +4031,8 @@ check_result_for_deletion:
 			resptr = heap_alloc(FS_HEAP, sizeof(struct directory_node), FS_GFP | GFP_CALLOC);
 			result = me = (struct directory_node *)heapptr_getptr(resptr);
 			TRY {
-				me->d_map = (REF struct directory_entry **)kmalloc((DIRECTORY_DEFAULT_MASK + 1) *
-				                                                   sizeof(REF struct directory_entry *),
+				me->d_map = (REF struct fdirent **)kmalloc((DIRECTORY_DEFAULT_MASK + 1) *
+				                                                   sizeof(REF struct fdirent *),
 				                                                   FS_GFP | GFP_CALLOC);
 			} EXCEPT {
 				heap_free(FS_HEAP,
@@ -4055,18 +4055,18 @@ check_result_for_deletion:
 #if INODE_FNORMAL != 0
 		result->i_flags = INODE_FNORMAL;
 #endif /* INODE_FNORMAL != 0 */
-		result->i_fileino  = parent_directory_entry->de_ino;
-		result->i_filemode = DTTOIF(parent_directory_entry->de_type);
+		result->i_fileino  = parent_dirent->de_ino;
+		result->i_filemode = DTTOIF(parent_dirent->de_type);
 
 		TRY {
 			/* Invoke the open-node operator. */
 			(*self->s_type->st_functions.f_opennode)(self,
 			                                         result,
 			                                         parent_directory,
-			                                         parent_directory_entry);
+			                                         parent_dirent);
 		} EXCEPT {
 			assert(!isshared(result));
-			if (parent_directory_entry->de_type == DT_DIR) {
+			if (parent_dirent->de_type == DT_DIR) {
 				decref(((struct directory_node *)result)->d_parent);
 				kffree(((struct directory_node *)result)->d_map, GFP_CALLOC);
 			}
@@ -4074,12 +4074,12 @@ check_result_for_deletion:
 			RETHROW();
 		}
 		assertf(result->i_type != NULL, "`f_opennode' must fill in `i_type'");
-		assert(result->i_fileino == parent_directory_entry->de_ino);
+		assert(result->i_fileino == parent_dirent->de_ino);
 		assertf((result->i_filemode & S_IFMT) ==
-		        (DTTOIF(parent_directory_entry->de_type) & S_IFMT),
+		        (DTTOIF(parent_dirent->de_type) & S_IFMT),
 		        "%u != %u",
 		        (unsigned int)IFTODT(result->i_filemode & S_IFMT),
-		        (unsigned int)parent_directory_entry->de_type);
+		        (unsigned int)parent_dirent->de_type);
 		if unlikely(ATOMIC_READ(result->i_flags) & INODE_FDELETED) {
 			/* Might happen due to race conditions. (start over...) */
 			superblock_nodeslock_endwrite(self);
@@ -4386,8 +4386,8 @@ superblock_open(struct superblock_type *__restrict type,
 			result->i_filemode  = S_IFDIR;
 			result->i_filenlink = (nlink_t)1;
 			result->d_mask      = DIRECTORY_DEFAULT_MASK;
-			result->d_map = (REF struct directory_entry **)kmalloc((DIRECTORY_DEFAULT_MASK + 1) *
-			                                                       sizeof(REF struct directory_entry *),
+			result->d_map = (REF struct fdirent **)kmalloc((DIRECTORY_DEFAULT_MASK + 1) *
+			                                                       sizeof(REF struct fdirent *),
 			                                                       FS_GFP | GFP_CALLOC);
 			result->s_type = type;
 			if (!(type->st_flags & SUPERBLOCK_TYPE_FNODEV))
@@ -4497,7 +4497,7 @@ NOTHROW(KCALL inode_destroy)(struct inode *__restrict self) {
 		me = (struct directory_node *)self;
 		if (me->d_map) { /* NOTE: `d_map' may be `NULL' if the INode wasn't fully constructed. */
 			for (i = 0; i <= me->d_mask; ++i) {
-				struct directory_entry *iter, *next;
+				struct fdirent *iter, *next;
 				iter = me->d_map[i];
 				while (iter) {
 					next = iter->de_next;
