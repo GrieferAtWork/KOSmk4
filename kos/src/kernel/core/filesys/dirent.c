@@ -23,9 +23,16 @@
 #include <kernel/compiler.h>
 
 #include <kernel/fs/dirent.h>
+#include <kernel/fs/dirnode.h>
+#include <kernel/handle-proto.h>
+#include <kernel/iovec.h>
 
-#include <hybrid/unaligned.h>
 #include <hybrid/typecore.h>
+#include <hybrid/unaligned.h>
+
+#include <sys/stat.h>
+
+#include <string.h>
 
 DECL_BEGIN
 
@@ -84,7 +91,69 @@ fdirent_hash(CHECKED USER /*utf-8*/ char const *__restrict text, u16 textlen)
 /************************************************************************/
 /* Handle operators for `HANDLE_TYPE_FDIRENT'                           */
 /************************************************************************/
-/* TODO */
+DEFINE_HANDLE_REFCNT_FUNCTIONS(fdirent, struct fdirent);
+
+INTERN WUNUSED NONNULL((1)) size_t KCALL
+handle_fdirent_pread(struct fdirent *__restrict self,
+                     USER CHECKED void *dst, size_t num_bytes,
+                     pos_t addr, iomode_t UNUSED(mode)) THROWS(...) {
+	size_t avail;
+	if (addr >= self->fd_namelen)
+		return 0;
+	avail = self->fd_namelen - (u16)addr;
+	if (num_bytes > avail)
+		num_bytes = avail;
+	memcpy(dst, self->fd_name + (u16)addr, num_bytes);
+	return num_bytes;
+}
+
+INTERN WUNUSED NONNULL((1, 2)) size_t KCALL
+handle_fdirent_preadv(struct fdirent *__restrict self,
+                      struct iov_buffer *__restrict dst, size_t num_bytes,
+                      pos_t addr, iomode_t mode) THROWS(...) {
+	size_t result = 0;
+	struct iov_entry ent;
+	IOV_BUFFER_FOREACH(ent, dst) {
+		size_t temp;
+		if (!ent.ive_size)
+			continue;
+		temp = handle_fdirent_pread(self, ent.ive_base,
+		                            ent.ive_size, addr,
+		                            mode);
+		result += temp;
+		if (temp < ent.ive_size)
+			break;
+		addr += temp;
+	}
+	return result;
+}
+
+INTERN WUNUSED NONNULL((1)) size_t KCALL
+handle_fdirent_readdir(struct fdirent *__restrict self,
+                       USER CHECKED struct dirent *buf, size_t bufsize,
+                       readdir_mode_t readdir_mode, iomode_t UNUSED(mode)) THROWS(...) {
+	ssize_t result;
+	result = fdirenum_feedent(buf, bufsize, readdir_mode,
+	                          self->fd_ino, self->fd_type,
+	                          self->fd_namelen, self->fd_name);
+	if (result < 0)
+		result = ~result;
+	return (size_t)result;
+}
+
+INTERN NONNULL((1)) void KCALL
+handle_fdirent_stat(struct fdirent *__restrict self,
+                    USER CHECKED struct stat *result) THROWS(...) {
+	memset(result, 0, sizeof(*result));
+	result->st_ino  = (typeof(result->st_ino))self->fd_ino;
+	result->st_size = (typeof(result->st_size))self->fd_namelen;
+}
+
+INTERN WUNUSED NONNULL((1)) poll_mode_t KCALL
+handle_fdirent_polltest(struct fdirent *__restrict UNUSED(self),
+                        poll_mode_t what) THROWS(...) {
+	return what & POLLINMASK;
+}
 
 
 DECL_END

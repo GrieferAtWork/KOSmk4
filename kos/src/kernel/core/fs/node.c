@@ -88,7 +88,7 @@
 
 DECL_BEGIN
 
-DEFINE_HANDLE_REFCNT_FUNCTIONS(directoryentry, struct fdirent);
+DEFINE_HANDLE_REFCNT_FUNCTIONS(fdirent, struct fdirent);
 
 INTERN size_t KCALL
 handle_fdirent_pread(struct fdirent *__restrict self,
