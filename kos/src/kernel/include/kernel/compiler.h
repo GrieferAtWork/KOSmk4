@@ -57,7 +57,6 @@
 #define symlink_node     flnknode
 #define fifo_node        ffifonode
 #define socket_node      fsocknode
-#define block_device     blkdev
 #define character_device chrdev
 #define superblock_type  ffilesys
 #else /* CONFIG_USE_NEW_FS */
@@ -69,7 +68,6 @@
 #define flnknode    symlink_node
 #define ffifonode   fifo_node
 #define fsocknode   socket_node
-#define blkdev      block_device
 #define chrdev      character_device
 #define ffilesys    superblock_type
 #endif /* !CONFIG_USE_NEW_FS */

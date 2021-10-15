@@ -103,7 +103,7 @@ lsmm_enum_callback(void *UNUSED(arg), struct mmapinfo *__restrict info) {
 	ino_t ino = 0;
 	if (info->mmi_file && vm_datablock_isinode(info->mmi_file)) {
 		struct inode *node = (struct inode *)info->mmi_file;
-		struct basic_block_device *superdev;
+		struct blkdev *superdev;
 		ino      = node->i_fileino;
 		superdev = node->i_super->s_device;
 		if (superdev)

@@ -1409,13 +1409,13 @@ DEFINE_SYSCALL5(errno_t, mount,
 		                      SUPERBLOCK_TYPE_FSINGLE)) {
 			/* Don't need a device */
 			super = superblock_open(type,
-			                        (struct basic_block_device *)NULL,
+			                        (struct blkdev *)NULL,
 			                        super_flags,
 			                        (char *)data,
 			                        NULL);
 		} else {
 			REF struct inode *source_node;
-			REF struct basic_block_device *source_dev;
+			REF struct blkdev *source_dev;
 			if unlikely(!source)
 				THROW(E_FSERROR_NO_BLOCK_DEVICE);
 			validate_readable(source, 1);
@@ -2265,7 +2265,7 @@ DEFINE_SYSCALL4(ssize_t, frealpath4,
 		switch (hnd.h_type) {
 
 		case HANDLE_TYPE_CHARACTERDEVICE:
-		case HANDLE_TYPE_BLOCKDEVICE: {
+		case HANDLE_TYPE_BLKDEV: {
 			/* Figure out where (if at all) devfs is mounted. */
 			REF struct path *mount;
 			char const *devname;

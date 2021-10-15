@@ -900,7 +900,7 @@ NOTHROW(FCALL uhci_int_do_invoke)(struct uhci_interrupt *__restrict ui,
 do_stop:
 		result = USB_INTERRUPT_HANDLER_RETURN_STOP;
 	} else if (intflags & USB_INTERRUPT_FLAG_ISABLK) {
-		REF struct basic_block_device *dev;
+		REF struct blkdev *dev;
 		dev = awref_get(&ui->ui_bind.ui_blk);
 		if unlikely(!dev)
 			goto do_stop;

@@ -17,8 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _KOS_HOP_BLOCKDEVICE_H
-#define _KOS_HOP_BLOCKDEVICE_H 1
+#ifndef _KOS_HOP_BLKDEV_H
+#define _KOS_HOP_BLKDEV_H 1
 
 #include "api.h"
 
@@ -38,18 +38,18 @@ __DECL_BEGIN
 #define BLOCK_DEVICE_FLAG_PARTITION 0x8000 /* [const] This one's a partition */
 #endif /* !BLOCK_DEVICE_FLAG_NORMAL */
 
-#define __OFFSET_HOP_BLOCKDEVICE_STAT_STRUCT_SIZE  0
-#define __OFFSET_HOP_BLOCKDEVICE_STAT_DEVNO        8
-#define __OFFSET_HOP_BLOCKDEVICE_STAT_TOTAL_BYTES  16
-#define __OFFSET_HOP_BLOCKDEVICE_STAT_SECTOR_COUNT 24
-#define __OFFSET_HOP_BLOCKDEVICE_STAT_SECTOR_SIZE  32
-#define __OFFSET_HOP_BLOCKDEVICE_STAT_DEVICE_FLAG  40
-#define __OFFSET_HOP_BLOCKDEVICE_STAT_PARTCOUNT    44
-#define __OFFSET_HOP_BLOCKDEVICE_STAT_NAME         48
-#define __SIZEOF_HOP_BLOCKDEVICE_STAT              128
+#define __OFFSET_HOP_BLKDEV_STAT_STRUCT_SIZE  0
+#define __OFFSET_HOP_BLKDEV_STAT_DEVNO        8
+#define __OFFSET_HOP_BLKDEV_STAT_TOTAL_BYTES  16
+#define __OFFSET_HOP_BLKDEV_STAT_SECTOR_COUNT 24
+#define __OFFSET_HOP_BLKDEV_STAT_SECTOR_SIZE  32
+#define __OFFSET_HOP_BLKDEV_STAT_DEVICE_FLAG  40
+#define __OFFSET_HOP_BLKDEV_STAT_PARTCOUNT    44
+#define __OFFSET_HOP_BLKDEV_STAT_NAME         48
+#define __SIZEOF_HOP_BLKDEV_STAT              128
 #ifdef __CC__
-struct hop_blockdevice_stat /*[PREFIX(bs_)]*/ {
-	__uint32_t   bs_struct_size;   /* [== sizeof(struct hop_blockdevice_stat)]
+struct hop_blkdev_stat /*[PREFIX(bs_)]*/ {
+	__uint32_t   bs_struct_size;   /* [== sizeof(struct hop_blkdev_stat)]
 	                                * The kernel may throw an `E_BUFFER_TOO_SMALL' exception if
 	                                * this value is too small  or doesn't match any  recognized
 	                                * structure version. */
@@ -65,13 +65,13 @@ struct hop_blockdevice_stat /*[PREFIX(bs_)]*/ {
 };
 #endif /* __CC__ */
 
-#define __OFFSET_HOP_BLOCKDEVICE_OPENPART_STRUCT_SIZE 0
-#define __OFFSET_HOP_BLOCKDEVICE_OPENPART_PARTNO      4
-#define __OFFSET_HOP_BLOCKDEVICE_OPENPART_OPENFD      8
-#define __SIZEOF_HOP_BLOCKDEVICE_OPENPART             16
+#define __OFFSET_HOP_BLKDEV_OPENPART_STRUCT_SIZE 0
+#define __OFFSET_HOP_BLKDEV_OPENPART_PARTNO      4
+#define __OFFSET_HOP_BLKDEV_OPENPART_OPENFD      8
+#define __SIZEOF_HOP_BLKDEV_OPENPART             16
 #ifdef __CC__
-struct hop_blockdevice_openpart /*[PREFIX(bop_)]*/ {
-	__uint32_t        bop_struct_size; /* [== sizeof(struct hop_blockdevice_openpart)]
+struct hop_blkdev_openpart /*[PREFIX(bop_)]*/ {
+	__uint32_t        bop_struct_size; /* [== sizeof(struct hop_blkdev_openpart)]
 	                                    * The kernel may throw an `E_BUFFER_TOO_SMALL' exception if
 	                                    * this value is too small  or doesn't match any  recognized
 	                                    * structure version. */
@@ -81,43 +81,43 @@ struct hop_blockdevice_openpart /*[PREFIX(bop_)]*/ {
 #endif /* __CC__ */
 
 /************************************************************************/
-/* HANDLE_TYPE_BLOCKDEVICE                                              */
+/* HANDLE_TYPE_BLKDEV                                              */
 /************************************************************************/
 
-/* [struct hop_blockdevice_stat *result] Read information about the device */
-#define HOP_BLOCKDEVICE_STAT HOP_CMD(HANDLE_TYPE_BLOCKDEVICE, 0x0001)
+/* [struct hop_blkdev_stat *result] Read information about the device */
+#define HOP_BLKDEV_STAT HOP_CMD(HANDLE_TYPE_BLKDEV, 0x0001)
 
 /* Write any modified, but unsaved sectors to disk. */
-#define HOP_BLOCKDEVICE_SYNC HOP_CMD(HANDLE_TYPE_BLOCKDEVICE, 0x0002)
+#define HOP_BLKDEV_SYNC HOP_CMD(HANDLE_TYPE_BLKDEV, 0x0002)
 
 /* @return: (0|1): Check if the given block-device is in read-only mode */
-#define HOP_BLOCKDEVICE_RDREADONLY HOP_CMD(HANDLE_TYPE_BLOCKDEVICE, 0x0003)
+#define HOP_BLKDEV_RDREADONLY HOP_CMD(HANDLE_TYPE_BLKDEV, 0x0003)
 
 /* [uint32_t enabled] Set the read-only mode for the given block-device.
  * WARNING: Setting a drive root to read-only will prevent writes to partitions,
  *          even though the partitions will continue to indicate being writable!
  * To ensure that read-only is disabled for a partition & drive, do this:
- * >> hop(fd, HOP_BLOCKDEVICE_WRREADONLY, 0);  // Drive
+ * >> hop(fd, HOP_BLKDEV_WRREADONLY, 0);  // Drive
  * >> struct hop_openfd root;
  * >> root.of_mode  = HOP_OPENFD_MODE_AUTO;
  * >> root.of_flags = 0;
- * >> hop(fd, HOP_BLOCKDEVICE_OPENDRIVEROOT, &root);
- * >> hop(root.of_hint, HOP_BLOCKDEVICE_WRREADONLY, 0);
+ * >> hop(fd, HOP_BLKDEV_OPENDRIVEROOT, &root);
+ * >> hop(root.of_hint, HOP_BLKDEV_WRREADONLY, 0);
  * >> close(root.of_hint); */
-#define HOP_BLOCKDEVICE_WRREADONLY HOP_CMD(HANDLE_TYPE_BLOCKDEVICE, 0x0004)
+#define HOP_BLKDEV_WRREADONLY HOP_CMD(HANDLE_TYPE_BLKDEV, 0x0004)
 
 /* [struct hop_openfd *arg] Open the drive root of a partition, or re-open a drive root.
  * @return: == arg->of_hint
  * @throw: E_INVALID_HANDLE_FILETYPE: The given handle wasn't a block-device. */
-#define HOP_BLOCKDEVICE_OPENDRIVEROOT HOP_CMD(HANDLE_TYPE_BLOCKDEVICE, 0x0005)
+#define HOP_BLKDEV_OPENDRIVEROOT HOP_CMD(HANDLE_TYPE_BLKDEV, 0x0005)
 
-/* [struct hop_blockdevice_openpart *arg] Open a given partition.
+/* [struct hop_blkdev_openpart *arg] Open a given partition.
  * If the given handle already refers to a partition, open a sibling partition instead.
  * @return: == arg->of_hint
  * @throw: E_INVALID_HANDLE_FILETYPE:   The given handle wasn't a block-device.
  * @throw: E_INDEX_ERROR_OUT_OF_BOUNDS: The given partition index is invalid. */
-#define HOP_BLOCKDEVICE_OPENDRIVEPART HOP_CMD(HANDLE_TYPE_BLOCKDEVICE, 0x0006)
+#define HOP_BLKDEV_OPENDRIVEPART HOP_CMD(HANDLE_TYPE_BLKDEV, 0x0006)
 
 __DECL_END
 
-#endif /* !_KOS_HOP_BLOCKDEVICE_H */
+#endif /* !_KOS_HOP_BLKDEV_H */

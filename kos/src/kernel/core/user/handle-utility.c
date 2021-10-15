@@ -81,10 +81,10 @@ NOTHROW(KCALL handle_typekind)(struct handle const *__restrict self) {
 		}
 		break;
 
-	case HANDLE_TYPE_BLOCKDEVICE:
+	case HANDLE_TYPE_BLKDEV:
 		if (block_device_ispartition((struct block_device *)self->h_data))
-			return HANDLE_TYPEKIND_BLOCKDEVICE_PARTITION;
-		return HANDLE_TYPEKIND_BLOCKDEVICE_DRIVEROOT;
+			return HANDLE_TYPEKIND_BLKDEV_PARTITION;
+		return HANDLE_TYPEKIND_BLKDEV_DRIVEROOT;
 		break;
 
 	case HANDLE_TYPE_CHARACTERDEVICE: {
@@ -173,9 +173,9 @@ handle_datasize(struct handle const *__restrict self,
 #endif /* !CONFIG_ATOMIC64_SUPPORT_ALWAYS */
 	}	break;
 
-	case HANDLE_TYPE_BLOCKDEVICE: {
-		struct basic_block_device *me;
-		me = (struct basic_block_device *)self->h_data;
+	case HANDLE_TYPE_BLKDEV: {
+		struct blkdev *me;
+		me = (struct blkdev *)self->h_data;
 		value = ((pos_t)me->bd_sector_count *
 		         (pos_t)me->bd_sector_size);
 	}	break;
@@ -295,7 +295,7 @@ handle_print(struct handle const *__restrict self,
 		}
 	}	break;
 
-	case HANDLE_TYPE_BLOCKDEVICE:
+	case HANDLE_TYPE_BLKDEV:
 	case HANDLE_TYPE_CHARACTERDEVICE: {
 		REF struct path *mount;
 		char const *devname;

@@ -72,14 +72,14 @@ NOTHROW(LIBCCALL oflag_dos2kos)(oflag_t dos_oflags) {
 
 
 
-/*[[[head:libd_open,hash:CRC-32=0xc20d75ce]]]*/
+/*[[[head:libd_open,hash:CRC-32=0x50004a33]]]*/
 /* >> open(2), open64(2), openat(2), openat64(2)
  * Open  a  new  file  handle  to  the  file  specified  by `filename'
  * When  `oflags & O_CREAT',   then  `mode'   specifies  the   initial
  * file  access  permissions with  which  the file  should  be opened.
  * On KOS, the returned handle can be anything, but is usually one of:
  *   - HANDLE_TYPE_PATH:            When `O_PATH' was given
- *   - HANDLE_TYPE_BLOCKDEVICE:     For `S_IFBLK' files
+ *   - HANDLE_TYPE_BLKDEV:          For `S_IFBLK' files
  *   - HANDLE_TYPE_CHARACTERDEVICE: For `S_IFCHR' files (in this case, `O_NOCTTY' gains meaning)
  *   - HANDLE_TYPE_FIFO_USER:       For `S_IFIFO' files
  *   - HANDLE_TYPE_MFILE:           For `S_IFLNK' files (only when `O_SYMLINK' was given)
@@ -126,14 +126,14 @@ NOTHROW_RPC(VLIBDCALL libd_open)(char const *filename,
 }
 /*[[[end:libd_open]]]*/
 
-/*[[[head:libc_open,hash:CRC-32=0xd75874ac]]]*/
+/*[[[head:libc_open,hash:CRC-32=0x67693380]]]*/
 /* >> open(2), open64(2), openat(2), openat64(2)
  * Open  a  new  file  handle  to  the  file  specified  by `filename'
  * When  `oflags & O_CREAT',   then  `mode'   specifies  the   initial
  * file  access  permissions with  which  the file  should  be opened.
  * On KOS, the returned handle can be anything, but is usually one of:
  *   - HANDLE_TYPE_PATH:            When `O_PATH' was given
- *   - HANDLE_TYPE_BLOCKDEVICE:     For `S_IFBLK' files
+ *   - HANDLE_TYPE_BLKDEV:          For `S_IFBLK' files
  *   - HANDLE_TYPE_CHARACTERDEVICE: For `S_IFCHR' files (in this case, `O_NOCTTY' gains meaning)
  *   - HANDLE_TYPE_FIFO_USER:       For `S_IFIFO' files
  *   - HANDLE_TYPE_MFILE:           For `S_IFLNK' files (only when `O_SYMLINK' was given)
@@ -197,14 +197,14 @@ NOTHROW_RPC(LIBCCALL libc_creat)(char const *filename,
 }
 /*[[[end:libc_creat]]]*/
 
-/*[[[head:libd_openat,hash:CRC-32=0x124a5086]]]*/
+/*[[[head:libd_openat,hash:CRC-32=0x46a4d420]]]*/
 /* >> open(2), open64(2), openat(2), openat64(2)
  * Open  a  new  file  handle  to  the  file  specified  by `filename'
  * When  `oflags & O_CREAT',   then  `mode'   specifies  the   initial
  * file  access  permissions with  which  the file  should  be opened.
  * On KOS, the returned handle can be anything, but is usually one of:
  *   - HANDLE_TYPE_PATH:            When `O_PATH' was given
- *   - HANDLE_TYPE_BLOCKDEVICE:     For `S_IFBLK' files
+ *   - HANDLE_TYPE_BLKDEV:          For `S_IFBLK' files
  *   - HANDLE_TYPE_CHARACTERDEVICE: For `S_IFCHR' files (in this case, `O_NOCTTY' gains meaning)
  *   - HANDLE_TYPE_FIFO_USER:       For `S_IFIFO' files
  *   - HANDLE_TYPE_MFILE:           For `S_IFLNK' files (only when `O_SYMLINK' was given)
@@ -242,14 +242,14 @@ NOTHROW_RPC(VLIBDCALL libd_openat)(fd_t dirfd,
 }
 /*[[[end:libd_openat]]]*/
 
-/*[[[head:libc_openat,hash:CRC-32=0xf03e7f12]]]*/
+/*[[[head:libc_openat,hash:CRC-32=0x85a3552]]]*/
 /* >> open(2), open64(2), openat(2), openat64(2)
  * Open  a  new  file  handle  to  the  file  specified  by `filename'
  * When  `oflags & O_CREAT',   then  `mode'   specifies  the   initial
  * file  access  permissions with  which  the file  should  be opened.
  * On KOS, the returned handle can be anything, but is usually one of:
  *   - HANDLE_TYPE_PATH:            When `O_PATH' was given
- *   - HANDLE_TYPE_BLOCKDEVICE:     For `S_IFBLK' files
+ *   - HANDLE_TYPE_BLKDEV:          For `S_IFBLK' files
  *   - HANDLE_TYPE_CHARACTERDEVICE: For `S_IFCHR' files (in this case, `O_NOCTTY' gains meaning)
  *   - HANDLE_TYPE_FIFO_USER:       For `S_IFIFO' files
  *   - HANDLE_TYPE_MFILE:           For `S_IFLNK' files (only when `O_SYMLINK' was given)

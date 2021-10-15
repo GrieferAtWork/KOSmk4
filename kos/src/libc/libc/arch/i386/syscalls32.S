@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe504bb9d */
+/* HASH CRC-32:0xccc2195e */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -270,7 +270,7 @@ DEFINE_PUBLIC_ALIAS(sys_write, libc_sys_write)
  * file  access  permissions with  which  the file  should  be opened.
  * On KOS, the returned handle can be anything, but is usually one of:
  *   - HANDLE_TYPE_PATH:            When `O_PATH' was given
- *   - HANDLE_TYPE_BLOCKDEVICE:     For `S_IFBLK' files
+ *   - HANDLE_TYPE_BLKDEV:          For `S_IFBLK' files
  *   - HANDLE_TYPE_CHARACTERDEVICE: For `S_IFCHR' files (in this case, `O_NOCTTY' gains meaning)
  *   - HANDLE_TYPE_FIFO_USER:       For `S_IFIFO' files
  *   - HANDLE_TYPE_MFILE:           For `S_IFLNK' files (only when `O_SYMLINK' was given)
@@ -2566,7 +2566,7 @@ DEFINE_PUBLIC_ALIAS(sys_migrate_pages, libc_sys_migrate_pages)
  * file  access  permissions with  which  the file  should  be opened.
  * On KOS, the returned handle can be anything, but is usually one of:
  *   - HANDLE_TYPE_PATH:            When `O_PATH' was given
- *   - HANDLE_TYPE_BLOCKDEVICE:     For `S_IFBLK' files
+ *   - HANDLE_TYPE_BLKDEV:          For `S_IFBLK' files
  *   - HANDLE_TYPE_CHARACTERDEVICE: For `S_IFCHR' files (in this case, `O_NOCTTY' gains meaning)
  *   - HANDLE_TYPE_FIFO_USER:       For `S_IFIFO' files
  *   - HANDLE_TYPE_MFILE:           For `S_IFLNK' files (only when `O_SYMLINK' was given)
@@ -4793,7 +4793,7 @@ DEFINE_PUBLIC_ALIAS(sys_Xwrite, libc_sys_Xwrite)
  * file  access  permissions with  which  the file  should  be opened.
  * On KOS, the returned handle can be anything, but is usually one of:
  *   - HANDLE_TYPE_PATH:            When `O_PATH' was given
- *   - HANDLE_TYPE_BLOCKDEVICE:     For `S_IFBLK' files
+ *   - HANDLE_TYPE_BLKDEV:          For `S_IFBLK' files
  *   - HANDLE_TYPE_CHARACTERDEVICE: For `S_IFCHR' files (in this case, `O_NOCTTY' gains meaning)
  *   - HANDLE_TYPE_FIFO_USER:       For `S_IFIFO' files
  *   - HANDLE_TYPE_MFILE:           For `S_IFLNK' files (only when `O_SYMLINK' was given)
@@ -7063,7 +7063,7 @@ DEFINE_PUBLIC_ALIAS(sys_Xmigrate_pages, libc_sys_Xmigrate_pages)
  * file  access  permissions with  which  the file  should  be opened.
  * On KOS, the returned handle can be anything, but is usually one of:
  *   - HANDLE_TYPE_PATH:            When `O_PATH' was given
- *   - HANDLE_TYPE_BLOCKDEVICE:     For `S_IFBLK' files
+ *   - HANDLE_TYPE_BLKDEV:          For `S_IFBLK' files
  *   - HANDLE_TYPE_CHARACTERDEVICE: For `S_IFCHR' files (in this case, `O_NOCTTY' gains meaning)
  *   - HANDLE_TYPE_FIFO_USER:       For `S_IFIFO' files
  *   - HANDLE_TYPE_MFILE:           For `S_IFLNK' files (only when `O_SYMLINK' was given)

@@ -792,7 +792,7 @@ print_dev_blk(pformatprinter printer, void *arg, dev_t devno) {
 	                       MINOR(devno));
 #ifdef __KERNEL__
 	if likely(result >= 0) {
-		REF struct basic_block_device *dev;
+		REF struct blkdev *dev;
 		dev = block_device_lookup_nx(devno);
 		if (dev) {
 			ssize_t temp;

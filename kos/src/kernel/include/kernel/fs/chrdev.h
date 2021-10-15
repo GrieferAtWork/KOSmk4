@@ -52,7 +52,7 @@ struct chrdev
 #endif /* !__WANT_FS_INLINE_STRUCTURES */
 };
 
-/* Return a pointer to chrular-node operators of `self' */
+/* Return a pointer to character-device operators of `self' */
 #define chrdev_getops(self) \
 	((struct chrdev_ops const *)__COMPILER_REQTYPE(struct chrdev const *, self)->_chrdev_dev_ _device_devnode_ _fdevnode_node_ _fnode_file_ mf_ops)
 #define _chrdev_assert_ops_(ops) \

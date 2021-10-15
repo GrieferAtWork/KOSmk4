@@ -1194,7 +1194,7 @@ badobj:
 
 PRIVATE struct obnote_entry const notes[] = {
 	{ "ansitty_device", &note_character_device },
-	{ "basic_block_device", &note_block_device },
+	{ "blkdev", &note_block_device },
 	{ "block_device", &note_block_device },
 	{ "character_device", &note_character_device },
 	{ "cpu", &note_cpu },

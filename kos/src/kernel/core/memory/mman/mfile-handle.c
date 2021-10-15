@@ -1720,7 +1720,7 @@ handle_mfile_hop(struct mfile *__restrict self, syscall_ulong_t cmd,
 		}
 	}	break;
 
-	case HOP_SUPERBLOCK_OPEN_BLOCKDEVICE: {
+	case HOP_SUPERBLOCK_OPEN_BLKDEV: {
 		struct handle result_handle;
 		if (!vm_datablock_isinode(self) || !INODE_ISSUPER((struct inode *)self))
 			THROW(E_INVALID_HANDLE_FILETYPE,
@@ -1732,9 +1732,9 @@ handle_mfile_hop(struct mfile *__restrict self, syscall_ulong_t cmd,
 		cred_require_sysadmin(); /* TODO: More finely grained access! */
 		result_handle.h_data = ((struct superblock *)self)->s_device;
 		if (!result_handle.h_data)
-			THROW(E_NO_SUCH_BLOCKDEVICE);
+			THROW(E_NO_DEVICE, E_NO_DEVICE_KIND_BLOCK_DEVICE);
 		result_handle.h_mode = mode;
-		result_handle.h_type = HANDLE_TYPE_BLOCKDEVICE;
+		result_handle.h_type = HANDLE_TYPE_BLKDEV;
 		return handle_installhop((USER UNCHECKED struct hop_openfd *)arg, result_handle);
 	}	break;
 

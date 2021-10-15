@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8f4e4e13 */
+/* HASH CRC-32:0xe4591f56 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1453,7 +1453,7 @@ __CDECLARE_SC(,__errno_t,olduname,(struct linux_olduname *__name),(__name))
  * file  access  permissions with  which  the file  should  be opened.
  * On KOS, the returned handle can be anything, but is usually one of:
  *   - HANDLE_TYPE_PATH:            When `O_PATH' was given
- *   - HANDLE_TYPE_BLOCKDEVICE:     For `S_IFBLK' files
+ *   - HANDLE_TYPE_BLKDEV:          For `S_IFBLK' files
  *   - HANDLE_TYPE_CHARACTERDEVICE: For `S_IFCHR' files (in this case, `O_NOCTTY' gains meaning)
  *   - HANDLE_TYPE_FIFO_USER:       For `S_IFIFO' files
  *   - HANDLE_TYPE_MFILE:           For `S_IFLNK' files (only when `O_SYMLINK' was given)
@@ -1475,7 +1475,7 @@ __CDECLARE_SC(,__errno_t,open_tree,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
  * file  access  permissions with  which  the file  should  be opened.
  * On KOS, the returned handle can be anything, but is usually one of:
  *   - HANDLE_TYPE_PATH:            When `O_PATH' was given
- *   - HANDLE_TYPE_BLOCKDEVICE:     For `S_IFBLK' files
+ *   - HANDLE_TYPE_BLKDEV:          For `S_IFBLK' files
  *   - HANDLE_TYPE_CHARACTERDEVICE: For `S_IFCHR' files (in this case, `O_NOCTTY' gains meaning)
  *   - HANDLE_TYPE_FIFO_USER:       For `S_IFIFO' files
  *   - HANDLE_TYPE_MFILE:           For `S_IFLNK' files (only when `O_SYMLINK' was given)
@@ -4000,7 +4000,7 @@ __CDECLARE_XSC(,__errno_t,olduname,(struct linux_olduname *__name),(__name))
  * file  access  permissions with  which  the file  should  be opened.
  * On KOS, the returned handle can be anything, but is usually one of:
  *   - HANDLE_TYPE_PATH:            When `O_PATH' was given
- *   - HANDLE_TYPE_BLOCKDEVICE:     For `S_IFBLK' files
+ *   - HANDLE_TYPE_BLKDEV:          For `S_IFBLK' files
  *   - HANDLE_TYPE_CHARACTERDEVICE: For `S_IFCHR' files (in this case, `O_NOCTTY' gains meaning)
  *   - HANDLE_TYPE_FIFO_USER:       For `S_IFIFO' files
  *   - HANDLE_TYPE_MFILE:           For `S_IFLNK' files (only when `O_SYMLINK' was given)
@@ -4022,7 +4022,7 @@ __CDECLARE_XSC(,__errno_t,open_tree,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
  * file  access  permissions with  which  the file  should  be opened.
  * On KOS, the returned handle can be anything, but is usually one of:
  *   - HANDLE_TYPE_PATH:            When `O_PATH' was given
- *   - HANDLE_TYPE_BLOCKDEVICE:     For `S_IFBLK' files
+ *   - HANDLE_TYPE_BLKDEV:          For `S_IFBLK' files
  *   - HANDLE_TYPE_CHARACTERDEVICE: For `S_IFCHR' files (in this case, `O_NOCTTY' gains meaning)
  *   - HANDLE_TYPE_FIFO_USER:       For `S_IFIFO' files
  *   - HANDLE_TYPE_MFILE:           For `S_IFLNK' files (only when `O_SYMLINK' was given)

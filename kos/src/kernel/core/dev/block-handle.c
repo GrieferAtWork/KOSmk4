@@ -37,7 +37,7 @@
 #include <hybrid/unaligned.h>
 
 #include <kos/except/reason/inval.h>
-#include <kos/hop/blockdevice.h>
+#include <kos/hop/blkdev.h>
 #include <kos/io.h>
 #include <linux/fs.h>
 #include <sys/mount.h>
@@ -48,10 +48,10 @@
 DECL_BEGIN
 
 
-DEFINE_HANDLE_REFCNT_FUNCTIONS(blockdevice, struct basic_block_device);
+DEFINE_HANDLE_REFCNT_FUNCTIONS(blkdev, struct blkdev);
 
 INTERN NONNULL((1)) REF void *KCALL
-handle_blockdevice_tryas(struct basic_block_device *__restrict self,
+handle_blkdev_tryas(struct blkdev *__restrict self,
                          uintptr_half_t wanted_type)
 		THROWS(E_WOULDBLOCK) {
 	switch (wanted_type) {
@@ -76,7 +76,7 @@ handle_blockdevice_tryas(struct basic_block_device *__restrict self,
 
 
 INTERN size_t KCALL
-handle_blockdevice_pread(struct basic_block_device *__restrict self,
+handle_blkdev_pread(struct blkdev *__restrict self,
                          USER CHECKED void *dst, size_t num_bytes,
                          pos_t addr, iomode_t mode) {
 	/* TODO: IO_NONBLOCK */
@@ -89,7 +89,7 @@ handle_blockdevice_pread(struct basic_block_device *__restrict self,
 }
 
 INTERN size_t KCALL
-handle_blockdevice_pwrite(struct basic_block_device *__restrict self,
+handle_blkdev_pwrite(struct blkdev *__restrict self,
                           USER CHECKED void const *src, size_t num_bytes,
                           pos_t addr, iomode_t mode) {
 	/* TODO: IO_NONBLOCK */
@@ -102,7 +102,7 @@ handle_blockdevice_pwrite(struct basic_block_device *__restrict self,
 }
 
 INTERN size_t KCALL
-handle_blockdevice_preadv(struct basic_block_device *__restrict self,
+handle_blkdev_preadv(struct blkdev *__restrict self,
                           struct iov_buffer *__restrict dst, size_t num_bytes,
                           pos_t addr, iomode_t mode) {
 	/* TODO: IO_NONBLOCK */
@@ -115,7 +115,7 @@ handle_blockdevice_preadv(struct basic_block_device *__restrict self,
 }
 
 INTERN size_t KCALL
-handle_blockdevice_pwritev(struct basic_block_device *__restrict self,
+handle_blkdev_pwritev(struct blkdev *__restrict self,
                            struct iov_buffer *__restrict src, size_t num_bytes,
                            pos_t addr, iomode_t mode) {
 	/* TODO: IO_NONBLOCK */
@@ -129,12 +129,12 @@ handle_blockdevice_pwritev(struct basic_block_device *__restrict self,
 
 
 LOCAL ATTR_PURE NONNULL((1)) size_t KCALL
-block_device_get_readahead(struct basic_block_device *__restrict self) {
+block_device_get_readahead(struct blkdev *__restrict self) {
 	return self->bd_sector_size;
 }
 
 LOCAL NONNULL((1)) void KCALL
-block_device_set_readahead(struct basic_block_device *__restrict self, size_t value) {
+block_device_set_readahead(struct blkdev *__restrict self, size_t value) {
 	require(CAP_SET_BLOCKDEV_READAHEAD);
 	/* KOS doesn't implement read-ahead on the block-device layer.
 	 * Instead,  read-ahead (if at all) is only done on a per-file
@@ -144,24 +144,24 @@ block_device_set_readahead(struct basic_block_device *__restrict self, size_t va
 }
 
 LOCAL ATTR_PURE NONNULL((1)) size_t KCALL
-block_device_get_fsreadahead(struct basic_block_device *__restrict self) {
+block_device_get_fsreadahead(struct blkdev *__restrict self) {
 	return block_device_get_readahead(self);
 }
 
 LOCAL NONNULL((1)) void KCALL
-block_device_set_fsreadahead(struct basic_block_device *__restrict self, size_t value) {
+block_device_set_fsreadahead(struct blkdev *__restrict self, size_t value) {
 	block_device_set_readahead(self, value);
 }
 
 LOCAL ATTR_PURE NONNULL((1)) u16 KCALL
-block_device_get_max_sectors_per_request(struct basic_block_device *__restrict self) {
+block_device_get_max_sectors_per_request(struct blkdev *__restrict self) {
 	(void)self;
 	/* XXX: Implement me? */
 	return (u16)-1;
 }
 
 LOCAL NONNULL((1)) void KCALL
-block_device_set_max_sectors_per_request(struct basic_block_device *__restrict self, u16 value) {
+block_device_set_max_sectors_per_request(struct blkdev *__restrict self, u16 value) {
 	require(CAP_SET_BLOCKDEV_SECTORS_PER_REQUEST);
 	(void)self;
 	(void)value;
@@ -169,12 +169,12 @@ block_device_set_max_sectors_per_request(struct basic_block_device *__restrict s
 }
 
 LOCAL ATTR_PURE NONNULL((1)) size_t KCALL
-block_device_get_sector_size(struct basic_block_device *__restrict self) {
+block_device_get_sector_size(struct blkdev *__restrict self) {
 	return self->bd_sector_size;
 }
 
 LOCAL NONNULL((1)) void KCALL
-block_device_set_sector_size(struct basic_block_device *__restrict self, size_t value) {
+block_device_set_sector_size(struct blkdev *__restrict self, size_t value) {
 	require(CAP_SET_BLOCKDEV_SECTORSIZE);
 	/* XXX: Throw some kind of error when `value != self->bd_sector_size' */
 	(void)self;
@@ -183,7 +183,7 @@ block_device_set_sector_size(struct basic_block_device *__restrict self, size_t 
 
 
 INTERN syscall_slong_t KCALL
-handle_blockdevice_ioctl(struct basic_block_device *__restrict self,
+handle_blkdev_ioctl(struct blkdev *__restrict self,
                          syscall_ulong_t command, USER UNCHECKED void *arg,
                          iomode_t mode) {
 	switch (command) {
@@ -213,9 +213,9 @@ handle_blockdevice_ioctl(struct basic_block_device *__restrict self,
 		if (block_device_ispartition(self))
 			THROW(E_INVALID_HANDLE_FILETYPE,
 			      0, /* Filled in by the caller */
-			      HANDLE_TYPE_BLOCKDEVICE,
+			      HANDLE_TYPE_BLKDEV,
 			      0,
-			      HANDLE_TYPEKIND_BLOCKDEVICE_DRIVEROOT,
+			      HANDLE_TYPEKIND_BLKDEV_DRIVEROOT,
 			      0);
 		block_device_delparts((struct block_device *)self);
 		block_device_autopart(self);
@@ -404,18 +404,18 @@ do_BLKFRAGET_compat:
 
 /* TODO: Load the given address range into the block-device cache. */
 INTERN pos_t KCALL
-handle_blockdevice_allocate(struct basic_block_device *__restrict self,
+handle_blkdev_allocate(struct blkdev *__restrict self,
                             fallocate_mode_t mode, pos_t start, pos_t length);
 
 INTERN void KCALL
-handle_blockdevice_sync(struct basic_block_device *__restrict self) {
+handle_blkdev_sync(struct blkdev *__restrict self) {
 	block_device_sync(self);
 }
-DEFINE_INTERN_ALIAS(handle_blockdevice_datasync,
-                    handle_blockdevice_sync);
+DEFINE_INTERN_ALIAS(handle_blkdev_datasync,
+                    handle_blkdev_sync);
 
 INTERN void KCALL
-handle_blockdevice_stat(struct basic_block_device *__restrict self,
+handle_blkdev_stat(struct blkdev *__restrict self,
                         USER CHECKED struct stat *result) {
 	struct inode *node;
 	memset(result, 0, sizeof(*result));
@@ -431,7 +431,7 @@ handle_blockdevice_stat(struct basic_block_device *__restrict self,
 }
 
 INTERN void KCALL
-handle_blockdevice_pollconnect(struct basic_block_device *__restrict self, poll_mode_t what) {
+handle_blkdev_pollconnect(struct blkdev *__restrict self, poll_mode_t what) {
 	if (what & (POLLINMASK | POLLOUTMASK)) {
 		struct block_device *block;
 		block = (struct block_device *)self;
@@ -442,7 +442,7 @@ handle_blockdevice_pollconnect(struct basic_block_device *__restrict self, poll_
 }
 
 INTERN poll_mode_t KCALL
-handle_blockdevice_polltest(struct basic_block_device *__restrict self, poll_mode_t what) {
+handle_blkdev_polltest(struct blkdev *__restrict self, poll_mode_t what) {
 	struct block_device *block;
 	block = (struct block_device *)self;
 	if (block_device_ispartition(self))
@@ -458,14 +458,14 @@ handle_blockdevice_polltest(struct basic_block_device *__restrict self, poll_mod
 }
 
 INTERN syscall_slong_t KCALL
-handle_blockdevice_hop(struct basic_block_device *__restrict self,
+handle_blkdev_hop(struct blkdev *__restrict self,
                        syscall_ulong_t cmd,
                        USER UNCHECKED void *arg,
                        iomode_t mode) {
 	switch (cmd) {
 
-	case HOP_BLOCKDEVICE_STAT: {
-		struct hop_blockdevice_stat st;
+	case HOP_BLKDEV_STAT: {
+		struct hop_blkdev_stat st;
 		memset(&st, 0, sizeof(st));
 		st.bs_struct_size  = sizeof(st);
 		st.bs_total_bytes  = (u64)self->bd_total_bytes;
@@ -489,9 +489,9 @@ handle_blockdevice_hop(struct basic_block_device *__restrict self,
 		             sizeof(self->bd_name)));
 		COMPILER_BARRIER();
 		{
-			USER CHECKED struct hop_blockdevice_stat *data;
+			USER CHECKED struct hop_blkdev_stat *data;
 			size_t info_size;
-			data = (USER CHECKED struct hop_blockdevice_stat *)arg;
+			data = (USER CHECKED struct hop_blkdev_stat *)arg;
 			validate_readwrite(data, sizeof(*data));
 			info_size = ATOMIC_READ(data->bs_struct_size);
 			if (info_size != sizeof(*data))
@@ -500,15 +500,15 @@ handle_blockdevice_hop(struct basic_block_device *__restrict self,
 		}
 	}	break;
 
-	case HOP_BLOCKDEVICE_SYNC:
+	case HOP_BLKDEV_SYNC:
 		/*require(CAP_SYS_ADMIN);*/ /* Linux does this... Why? */
 		block_device_sync(self);
 		break;
 
-	case HOP_BLOCKDEVICE_RDREADONLY:
+	case HOP_BLKDEV_RDREADONLY:
 		return ATOMIC_READ(self->bd_flags) & BLOCK_DEVICE_FLAG_READONLY ? 1 : 0;
 
-	case HOP_BLOCKDEVICE_WRREADONLY:
+	case HOP_BLKDEV_WRREADONLY:
 		require(CAP_SET_BLOCKDEV_READONLY);
 		if (arg)
 			ATOMIC_OR(self->bd_flags, BLOCK_DEVICE_FLAG_READONLY);
@@ -517,9 +517,9 @@ handle_blockdevice_hop(struct basic_block_device *__restrict self,
 		}
 		break;
 
-	case HOP_BLOCKDEVICE_OPENDRIVEROOT: {
+	case HOP_BLKDEV_OPENDRIVEROOT: {
 		struct handle result_handle;
-		result_handle.h_type = HANDLE_TYPE_BLOCKDEVICE;
+		result_handle.h_type = HANDLE_TYPE_BLKDEV;
 		result_handle.h_mode = mode;
 		result_handle.h_data = self;
 		if (block_device_ispartition(self))
@@ -528,14 +528,14 @@ handle_blockdevice_hop(struct basic_block_device *__restrict self,
 		return handle_installhop((USER UNCHECKED struct hop_openfd *)arg, result_handle);
 	}	break;
 
-	case HOP_BLOCKDEVICE_OPENDRIVEPART: {
+	case HOP_BLKDEV_OPENDRIVEPART: {
 		struct handle result_handle;
 		u32 index, count;
 		struct block_device_partition *part;
 		size_t struct_size;
 		unsigned int result;
-		USER CHECKED struct hop_blockdevice_openpart *data;
-		data = (USER CHECKED struct hop_blockdevice_openpart *)arg;
+		USER CHECKED struct hop_blkdev_openpart *data;
+		data = (USER CHECKED struct hop_blkdev_openpart *)arg;
 		validate_readwrite(data, sizeof(*data));
 		if (block_device_ispartition(self))
 			self = ((struct block_device_partition *)self)->bp_master;
@@ -555,7 +555,7 @@ handle_blockdevice_hop(struct basic_block_device *__restrict self,
 		}
 		incref(part);
 		sync_endread(&((struct block_device *)self)->bd_parts_lock);
-		result_handle.h_type = HANDLE_TYPE_BLOCKDEVICE;
+		result_handle.h_type = HANDLE_TYPE_BLKDEV;
 		result_handle.h_mode = mode;
 		result_handle.h_data = part;
 		TRY {

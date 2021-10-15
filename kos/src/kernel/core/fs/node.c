@@ -728,7 +728,7 @@ PUBLIC NONNULL((1)) void KCALL
 inode_stat(struct inode *__restrict self,
            USER CHECKED struct stat *result)
 		THROWS(E_IOERROR, ...) {
-	struct basic_block_device *dev;
+	struct blkdev *dev;
 	inode_loadattr(self);
 	dev                = self->i_super->s_device;
 	result->st_dev     = (__dev_t)(dev ? block_device_devno(dev) : 0);
@@ -4143,7 +4143,7 @@ superblock_statfs(struct superblock *__restrict self,
 		fsflags |= (ST_NOATIME | ST_NODIRATIME);
 	/* Check if the associated device is marked as read-only */
 	if (self->s_device) {
-		struct basic_block_device *dev;
+		struct blkdev *dev;
 		dev = self->s_device;
 		if (dev->bd_flags & BLOCK_DEVICE_FLAG_READONLY)
 			fsflags |= ST_RDONLY;
@@ -4288,7 +4288,7 @@ lookup_filesystem_type(USER CHECKED char const *name)
  * @throws: E_BADALLOC:                       [...] */
 PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct superblock *KCALL
 superblock_open(struct superblock_type *__restrict type,
-                struct basic_block_device *device,
+                struct blkdev *device,
                 uintptr_t flags, UNCHECKED USER char *args,
                 bool *pnew_superblock_created)
 		THROWS(E_FSERROR_DEVICE_ALREADY_MOUNTED, E_FSERROR_UNKNOWN_FILE_SYSTEM,

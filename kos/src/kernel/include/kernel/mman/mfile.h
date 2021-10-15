@@ -399,7 +399,7 @@ struct mfile_ops {
 	 * NOTE: WRITABLE_BUFFER_SIZE means that this function is allowed to write until the aligned
 	 *       end of the last  file-block when `num_bytes' isn't  aligned by whole blocks,  where
 	 *       the size of a block is defined as `1 << self->mf_blockshift'. */
-	/* TODO: Change this function to add support for iov-based I/O   */
+	/* TODO: Change this function to add support for iov-based I/O */
 	NONNULL((1)) void (KCALL *mo_loadblocks)(struct mfile *__restrict self, pos_t addr,
 	                                         physaddr_t buf, size_t num_bytes);
 
@@ -413,7 +413,7 @@ struct mfile_ops {
 	 * NOTE: READABLE_BUFFER_SIZE means that this function is allowed to read until the aligned
 	 *       end  of the last file-block when `num_bytes'  isn't aligned by whole blocks, where
 	 *       the size of a block is defined as `1 << self->mf_blockshift'. */
-	/* TODO: Change this function to add support for iov-based I/O   */
+	/* TODO: Change this function to add support for iov-based I/O */
 	NONNULL((1)) void (KCALL *mo_saveblocks)(struct mfile *__restrict self, pos_t addr,
 	                                         physaddr_t buf, size_t num_bytes);
 

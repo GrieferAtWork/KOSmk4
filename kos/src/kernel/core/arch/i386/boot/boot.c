@@ -361,7 +361,7 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 * that the user started the  kernel with a boot=... commandline  parameter. */
 	if unlikely(boot_partition == NULL)
 		kernel_panic(FREESTR("Unable to detect boot partition (reboot with `boot=...')"));
-	if unlikely(boot_partition == (struct basic_block_device *)-1)
+	if unlikely(boot_partition == (struct blkdev *)-1)
 		kernel_panic(FREESTR("Detected boot partition is ambiguous (reboot with `boot=...')"));
 
 	/* TODO: Don't hard-code fat here. - Instead, try every currently loaded filesystem driver.

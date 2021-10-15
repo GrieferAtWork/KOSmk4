@@ -47,7 +47,7 @@
 DECL_BEGIN
 
 PRIVATE NONNULL((1)) REF struct block_device_partition *KCALL
-block_device_autopart_efi_impl(struct basic_block_device *__restrict self,
+block_device_autopart_efi_impl(struct blkdev *__restrict self,
                                lba_t part_min, lba_t part_max) {
 	struct efi_descriptor efi;
 	REF struct block_device_partition *result = NULL, *new_result;
@@ -235,7 +235,7 @@ block_device_autopart_efi_impl(struct basic_block_device *__restrict self,
  *       tables like they usually would, though new  partitions will still be added to  the
  *       master device, as `block_device_makepart()' is used to create them. */
 PRIVATE NONNULL((1)) REF struct block_device_partition *KCALL
-block_device_autopart_impl(struct basic_block_device *__restrict self,
+block_device_autopart_impl(struct blkdev *__restrict self,
                            lba_t part_min, lba_t part_max)
 		THROWS(E_BADALLOC, E_WOULDBLOCK) {
 	REF struct block_device_partition *result = NULL;
@@ -362,7 +362,7 @@ load_normal_partition:
 }
 
 PUBLIC NONNULL((1)) REF struct block_device_partition *KCALL
-block_device_autopart_ex(struct basic_block_device *__restrict self)
+block_device_autopart_ex(struct blkdev *__restrict self)
 		THROWS(E_BADALLOC, E_WOULDBLOCK) {
 	REF struct block_device_partition *result;
 	result = block_device_autopart_impl(self, (lba_t)0, self->bd_sector_count - (lba_t)1);
@@ -372,7 +372,7 @@ block_device_autopart_ex(struct basic_block_device *__restrict self)
 }
 
 PUBLIC NONNULL((1)) void KCALL
-block_device_autopart(struct basic_block_device *__restrict self)
+block_device_autopart(struct blkdev *__restrict self)
 		THROWS(E_BADALLOC, E_WOULDBLOCK) {
 	REF struct block_device_partition *active_part;
 	active_part = block_device_autopart_ex(self);
@@ -390,7 +390,7 @@ block_device_autopart(struct basic_block_device *__restrict self)
 		       active_part->bd_name);
 		if likely(!boot_partition) {
 			boot_partition = active_part; /* Inherit reference. */
-		} else if unlikely(boot_partition == (REF struct basic_block_device *)-1) {
+		} else if unlikely(boot_partition == (REF struct blkdev *)-1) {
 do_decref_active_part:
 			decref_unlikely(active_part);
 		} else {
@@ -405,7 +405,7 @@ do_decref_active_part:
 			       boot_partition->bd_name);
 			decref(active_part);
 			decref(boot_partition);
-			boot_partition = (REF struct basic_block_device *)-1;
+			boot_partition = (REF struct blkdev *)-1;
 		}
 	}
 }

@@ -67,7 +67,7 @@
 #define ATREE_CALL    KCALL
 #define ATREE_NOTHROW NOTHROW
 #define Tkey          dev_t
-#define T             struct basic_block_device
+#define T             struct blkdev
 #define N_NODEPATH    bd_devlink
 #define ATREE_SINGLE  1
 #include <hybrid/sequence/atree-abi.h>
@@ -76,12 +76,12 @@
 DECL_BEGIN
 
 /* [0..1] The  block  device  / partition  from  which the  kernel  was booted.
- * Set to `(struct basic_block_device *)-1' if indeterminate during early boot. */
-PUBLIC REF struct basic_block_device *boot_partition = NULL;
+ * Set to `(struct blkdev *)-1' if indeterminate during early boot. */
+PUBLIC REF struct blkdev *boot_partition = NULL;
 
 PRIVATE ATTR_USED ATTR_FREETEXT void KCALL
 kernel_boot_option_handler(char *__restrict arg) {
-	REF struct basic_block_device *new_boot;
+	REF struct blkdev *new_boot;
 	new_boot = block_device_lookup(arg);
 	if unlikely(!new_boot) {
 #ifdef CONFIG_HAVE_DEBUGGER
@@ -91,7 +91,7 @@ kernel_boot_option_handler(char *__restrict arg) {
 #endif /* !CONFIG_HAVE_DEBUGGER */
 	}
 	if (boot_partition != NULL &&
-	    boot_partition != (REF struct basic_block_device *)-1)
+	    boot_partition != (REF struct blkdev *)-1)
 		decref(boot_partition);
 	boot_partition = new_boot; /* Inherit reference */
 }
@@ -293,7 +293,7 @@ NOTHROW(KCALL block_device_acquire_partlock_trywrite)(struct block_device *__res
 
 
 /* The tree used to quickly look up a block device from its ID */
-PRIVATE REF ATREE_HEAD(struct basic_block_device) block_device_tree = NULL;
+PRIVATE REF ATREE_HEAD(struct blkdev) block_device_tree = NULL;
 PRIVATE dev_t block_device_next_auto = MKDEV(DEV_MAJOR_AUTO,0);
 PRIVATE struct atomic_rwlock block_device_lock = ATOMIC_RWLOCK_INIT;
 DEFINE_DBG_BZERO_OBJECT(block_device_lock);
@@ -303,8 +303,8 @@ DEFINE_DBG_BZERO_OBJECT(block_device_lock);
 PRIVATE NOBLOCK struct icpustate *
 NOTHROW(FCALL ipi_destroy_block_device)(struct icpustate *__restrict state,
                                         void *args[CPU_IPI_ARGCOUNT]) {
-	struct basic_block_device *dev;
-	dev = (struct basic_block_device *)args[0];
+	struct blkdev *dev;
+	dev = (struct blkdev *)args[0];
 	block_device_destroy(dev);
 	return state;
 }
@@ -312,7 +312,7 @@ NOTHROW(FCALL ipi_destroy_block_device)(struct icpustate *__restrict state,
 
 /* Destroy a given block device. */
 PUBLIC NOBLOCK NONNULL((1)) void
-NOTHROW(KCALL block_device_destroy)(struct basic_block_device *__restrict self) {
+NOTHROW(KCALL block_device_destroy)(struct blkdev *__restrict self) {
 	if (self->bd_type.dt_fini) {
 #ifndef CONFIG_NO_SMP
 		if (cpu_count > 1) {
@@ -380,9 +380,9 @@ NOTHROW(KCALL block_device_destroy)(struct basic_block_device *__restrict self) 
 
 /* Lookup  a block device associated with `devno'  and return a reference to it.
  * When no block device is associated that device number, return `NULL' instead. */
-PUBLIC WUNUSED REF struct basic_block_device *KCALL
+PUBLIC WUNUSED REF struct blkdev *KCALL
 block_device_lookup(dev_t devno) THROWS(E_WOULDBLOCK) {
-	REF struct basic_block_device *result;
+	REF struct blkdev *result;
 	sync_read(&block_device_lock);
 	result = bdev_tree_locate(block_device_tree, devno);
 	/* Try to acquire a reference to the block device. */
@@ -394,9 +394,9 @@ block_device_lookup(dev_t devno) THROWS(E_WOULDBLOCK) {
 
 
 /* Same as `block_device_lookup()', but return `NULL' if the lookup would have caused an exception. */
-PUBLIC WUNUSED REF struct basic_block_device *
+PUBLIC WUNUSED REF struct blkdev *
 NOTHROW(KCALL block_device_lookup_nx)(dev_t devno) {
-	REF struct basic_block_device *result;
+	REF struct blkdev *result;
 	if (!sync_read_nx(&block_device_lock))
 		return NULL;
 	result = bdev_tree_locate(block_device_tree, devno);
@@ -409,15 +409,15 @@ NOTHROW(KCALL block_device_lookup_nx)(dev_t devno) {
 
 
 
-PRIVATE WUNUSED REF struct basic_block_device *KCALL
-bdev_tree_search_name(struct basic_block_device *__restrict node,
+PRIVATE WUNUSED REF struct blkdev *KCALL
+bdev_tree_search_name(struct blkdev *__restrict node,
                       char const *__restrict name) {
 again:
 	if (strcmp(node->bd_name, name) == 0)
 		return (likely(tryincref(node))) ? node : NULL;
 	if (node->bd_devlink.a_min) {
 		if (node->bd_devlink.a_max) {
-			REF struct basic_block_device *result;
+			REF struct blkdev *result;
 			result = bdev_tree_search_name(node->bd_devlink.a_max, name);
 			if (result)
 				return result;
@@ -446,13 +446,13 @@ again:
  * kernel's boot partition (in case the kernel can't auto-detect its partition
  * properly).
  * @return: NULL: No device matching `name' exists. */
-PUBLIC WUNUSED REF struct basic_block_device *KCALL
+PUBLIC WUNUSED REF struct blkdev *KCALL
 block_device_lookup_name(USER CHECKED char const *name)
 		THROWS(E_WOULDBLOCK) {
-	REF struct basic_block_device *result = NULL;
+	REF struct blkdev *result = NULL;
 	u32 dev_major, dev_minor;
 	size_t name_len;
-	char name_buf[COMPILER_LENOF(((struct basic_block_device *)0)->bd_name)];
+	char name_buf[COMPILER_LENOF(((struct blkdev *)0)->bd_name)];
 	if (sscanf(name, "%u:%u", &dev_major, &dev_minor) == 2)
 		return block_device_lookup(MKDEV(dev_major, dev_minor));
 	if (memcmp(name, "/dev/", 5 * sizeof(char)) == 0)
@@ -530,7 +530,7 @@ block_device_alloc(size_t sector_size, size_t structure_size)
 
 
 PRIVATE NONNULL((1)) void KCALL
-block_device_add_to_devfs(struct basic_block_device *__restrict self) {
+block_device_add_to_devfs(struct blkdev *__restrict self) {
 	if (!self->bd_name[0]) {
 		struct block_device *master;
 		/* Auto-generate the name */
@@ -575,7 +575,7 @@ block_device_add_to_devfs(struct basic_block_device *__restrict self) {
  * @return: true:  Successfully unregistered the given.
  * @return: false: The device was never registered to begin with. */
 PUBLIC NONNULL((1)) bool KCALL
-block_device_unregister(struct basic_block_device *__restrict self)
+block_device_unregister(struct blkdev *__restrict self)
 		THROWS(E_WOULDBLOCK) {
 	bool result = false;
 	/* FIXME: Running  `partprobe /dev/hda'  causes  the a  soft-lock  where the
@@ -585,7 +585,7 @@ block_device_unregister(struct basic_block_device *__restrict self)
 		sync_write(&block_device_lock);
 		COMPILER_READ_BARRIER();
 		if likely(self->bd_devlink.a_vaddr != DEV_UNSET) {
-			struct basic_block_device *pop_dev;
+			struct blkdev *pop_dev;
 			pop_dev = bdev_tree_remove(&block_device_tree,
 			                           self->bd_devlink.a_vaddr);
 			assert(pop_dev == self);
@@ -609,7 +609,7 @@ block_device_unregister(struct basic_block_device *__restrict self)
  * NOTE: When empty, `bd_name' will be set to `"%.2x:%.2x" % (MAJOR(devno),MINOR(devno))'
  * NOTE: This function will also cause the device to appear in `/dev' (unless the device's name is already taken) */
 PUBLIC NONNULL((1)) void KCALL
-block_device_register(struct basic_block_device *__restrict self, dev_t devno)
+block_device_register(struct blkdev *__restrict self, dev_t devno)
        THROWS(E_WOULDBLOCK, E_BADALLOC) {
 	sync_write(&block_device_lock);
 	/* Insert the new device into the block-device tree. */
@@ -619,7 +619,7 @@ block_device_register(struct basic_block_device *__restrict self, dev_t devno)
 	TRY {
 		block_device_add_to_devfs(self);
 	} EXCEPT {
-		struct basic_block_device *pop_dev;
+		struct blkdev *pop_dev;
 		sync_write(&block_device_lock);
 		pop_dev = bdev_tree_remove(&block_device_tree, devno);
 		if likely(pop_dev == self) {
@@ -643,7 +643,7 @@ block_device_register(struct basic_block_device *__restrict self, dev_t devno)
  * NOTE: When empty, `bd_name' will be set to `"%.2x:%.2x" % (MAJOR(devno),MINOR(devno))'
  * NOTE: This function will also cause the device to appear in `/dev' (unless the device's name is already taken) */
 PUBLIC NONNULL((1)) void KCALL
-block_device_register_auto(struct basic_block_device *__restrict self)
+block_device_register_auto(struct blkdev *__restrict self)
 		THROWS(E_WOULDBLOCK, E_BADALLOC) {
 	dev_t devno;
 	if (block_device_ispartition(self)) {
@@ -677,7 +677,7 @@ again_master:
 	TRY {
 		block_device_add_to_devfs(self);
 	} EXCEPT {
-		struct basic_block_device *pop_dev;
+		struct blkdev *pop_dev;
 		sync_write(&block_device_lock);
 		pop_dev = bdev_tree_remove(&block_device_tree, devno);
 		if likely(pop_dev == self) {
@@ -720,7 +720,7 @@ NOTHROW(KCALL block_device_findpart)(struct block_device *__restrict self,
  * @param: part_typeguid: The partition type GUID, or `NULL'
  * @param: part_partguid: The partition GUID, or `NULL' */
 PUBLIC ATTR_RETNONNULL NONNULL((1)) REF struct block_device_partition *KCALL
-block_device_makepart(struct basic_block_device *__restrict master,
+block_device_makepart(struct blkdev *__restrict master,
                       lba_t part_min, lba_t part_max,
                       char const *part_label, size_t part_label_size,
                       u8 part_sysid, guid_t const *part_typeguid,
@@ -1527,7 +1527,7 @@ _block_device_write(struct block_device *__restrict self,
 
 #ifdef CONFIG_HAVE_DEBUGGER
 PRIVATE ATTR_DBGTEXT void KCALL
-do_dump_block_device(struct basic_block_device *__restrict self,
+do_dump_block_device(struct blkdev *__restrict self,
                      size_t longest_device_name,
                      size_t longest_driver_name) {
 	u64 total_bytes_adj = (u64)self->bd_total_bytes;
@@ -1565,7 +1565,7 @@ do_dump_block_device(struct basic_block_device *__restrict self,
 }
 
 PRIVATE ATTR_DBGTEXT void KCALL
-dump_block_device(struct basic_block_device *__restrict self,
+dump_block_device(struct blkdev *__restrict self,
                   size_t longest_device_name,
                   size_t longest_driver_name) {
 again:
@@ -1598,7 +1598,7 @@ again:
 }
 
 PRIVATE ATTR_DBGTEXT void KCALL
-gather_longest_name_lengths(struct basic_block_device *__restrict self,
+gather_longest_name_lengths(struct blkdev *__restrict self,
                             size_t *__restrict pmax_device_namelen,
                             size_t *__restrict pmax_driver_namelen) {
 	REF struct driver *drv;

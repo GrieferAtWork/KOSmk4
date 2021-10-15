@@ -159,7 +159,7 @@ extern "C++" {
 LOCAL NONNULL((1, 2)) void KCALL
 path_mount(struct path *__restrict self,
            struct superblock_type *__restrict filesystem_mount_type,
-           struct basic_block_device *filesystem_mount_device,
+           struct blkdev *filesystem_mount_device,
            uintptr_t filesystem_mount_flags DFL(SUPERBLOCK_FNORMAL),
            UNCHECKED USER char *filesystem_mount_args DFL(__NULLPTR),
            bool *pfilesystem_mount_new_superblock_created DFL(__NULLPTR),
@@ -214,7 +214,7 @@ path_mount(struct path *__restrict self,
 LOCAL NONNULL((1)) void KCALL
 path_mount(struct path *__restrict self,
            USER CHECKED char const *filesystem_mount_type,
-           struct basic_block_device *filesystem_mount_device,
+           struct blkdev *filesystem_mount_device,
            uintptr_t filesystem_mount_flags DFL(SUPERBLOCK_FNORMAL),
            UNCHECKED USER char *filesystem_mount_args DFL(__NULLPTR),
            bool *pfilesystem_mount_new_superblock_created DFL(__NULLPTR),

@@ -67,7 +67,7 @@
 #define HANDLE_TYPE_DIRHANDLE       0x000d /* `struct dirhandle'
                                             * Castable into: HANDLE_TYPE_PATH, HANDLE_TYPE_MFILE, HANDLE_TYPE_FDIRENT */
 #define HANDLE_TYPE_MFILE           0x000e /* `struct mfile' (also includes `struct inode') */
-#define HANDLE_TYPE_BLOCKDEVICE     0x000f /* `struct basic_block_device' */
+#define HANDLE_TYPE_BLKDEV          0x000f /* `struct blkdev' */
 #define HANDLE_TYPE_FDIRENT         0x0010 /* `struct fdirent' */
 #define HANDLE_TYPE_PATH            0x0011 /* `struct path' (also includes `struct vfs')
                                             * Castable into: HANDLE_TYPE_MFILE, HANDLE_TYPE_FDIRENT */
@@ -88,14 +88,14 @@
 
 /* TODO: For CONFIG_USE_NEW_FS:
  *    - Rename `HANDLE_TYPE_FDIRENT' -> `HANDLE_TYPE_FDIRENT'
- *    - Remove `HANDLE_TYPE_BLOCKDEVICE'     (merged with `HANDLE_TYPE_MFILE')
+ *    - Remove `HANDLE_TYPE_BLKDEV'     (merged with `HANDLE_TYPE_MFILE')
  *    - Remove `HANDLE_TYPE_CHARACTERDEVICE' (merged with `HANDLE_TYPE_MFILE') */
 
 /* Invoke `cb(int HANDLE_TYPE, typename T)' for each handle type with an associated struct */
 #define HANDLE_FOREACH_TYPE(cb)                              \
 	cb(HANDLE_TYPE_MFILE, struct mfile)                      \
-	cb(HANDLE_TYPE_BLOCKDEVICE, struct basic_block_device)   \
-	cb(HANDLE_TYPE_FDIRENT, struct fdirent)   \
+	cb(HANDLE_TYPE_BLKDEV, struct blkdev)                    \
+	cb(HANDLE_TYPE_FDIRENT, struct fdirent)                  \
 	cb(HANDLE_TYPE_FILEHANDLE, struct filehandle)            \
 	cb(HANDLE_TYPE_DIRHANDLE, struct dirhandle)              \
 	cb(HANDLE_TYPE_PATH, struct path)                        \
@@ -121,7 +121,7 @@
  * as `register_async_worker()' or `hisr_register()') */
 #define HANDLE_FOREACH_CUSTOMTYPE(cb)                        \
 	cb(HANDLE_TYPE_MFILE, struct mfile)                      \
-	cb(HANDLE_TYPE_BLOCKDEVICE, struct basic_block_device)   \
+	cb(HANDLE_TYPE_BLKDEV, struct blkdev)                    \
 	cb(HANDLE_TYPE_MMAN, struct mman)                        \
 	cb(HANDLE_TYPE_MODULE, struct driver)                    \
 	cb(HANDLE_TYPE_CHARACTERDEVICE, struct character_device) \
@@ -142,12 +142,12 @@
 #define HANDLE_TYPEKIND_DATABLOCK_FIFONODE    0x0006 /* The handle refers to a `struct fifo_node' */
 #define HANDLE_TYPEKIND_DATABLOCK_SOCKETNODE  0x0007 /* The handle refers to a `struct socket_node' */
 
-/* Handle kinds for `HANDLE_TYPE_BLOCKDEVICE' */
-#define HANDLE_TYPEKIND_BLOCKDEVICE_GENERIC   0x0000 /* The handle refers to a `struct basic_block_device' */
-#define HANDLE_TYPEKIND_BLOCKDEVICE_PARTITION 0x0001 /* The handle refers to a `struct block_device_partition' */
-#define HANDLE_TYPEKIND_BLOCKDEVICE_DRIVEROOT 0x0002 /* The handle refers to a `struct block_device' */
-
+/* Handle kinds for `HANDLE_TYPE_BLKDEV' */
+#define HANDLE_TYPEKIND_BLKDEV_GENERIC   0x0000 /* The handle refers to a `struct blkdev' */
+#define HANDLE_TYPEKIND_BLKDEV_PARTITION 0x0001 /* The handle refers to a `struct block_device_partition' */
+#define HANDLE_TYPEKIND_BLKDEV_DRIVEROOT 0x0002 /* The handle refers to a `struct block_device' */
 /* Handle kinds for `HANDLE_TYPE_CHARACTERDEVICE' */
+
 #define HANDLE_TYPEKIND_CHARACTERDEVICE_GENERIC  0x0000 /* The handle refers to a `struct character_device' */
 #define HANDLE_TYPEKIND_CHARACTERDEVICE_TTYBASE  0x0001 /* The handle refers to a `struct ttybase_device' */
 #define HANDLE_TYPEKIND_CHARACTERDEVICE_TTY      0x0002 /* The handle refers to a `struct tty_device' and `struct ttybase_device' */

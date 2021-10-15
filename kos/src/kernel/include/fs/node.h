@@ -161,7 +161,7 @@ struct inode_type {
 		 *
 		 * When this operator is set to `NULL', the inode will be opened as:
 		 * >> if (S_ISBLK(self->i_filemode)) {
-		 * >>     return { HANDLE_TYPE_BLOCKDEVICE, block_device_lookup(devno) };
+		 * >>     return { HANDLE_TYPE_BLKDEV, block_device_lookup(devno) };
 		 * >> } else if (S_ISCHR(self->i_filemode)) {
 		 * >>     result = { HANDLE_TYPE_CHARACTERDEVICE, character_device_lookup(devno) };
 		 * >>     if (cdev->cd_type.ct_open)
@@ -2077,7 +2077,7 @@ struct superblock
 	struct directory_node         s_rootdir;      /* The underlying superblock root directory. */
 #endif /* !__cplusplus || CONFIG_WANT_FS_AS_STRUCT */
 	struct superblock_type const *s_type;         /* [1..1][const] Superblock type & operations. */
-	REF struct basic_block_device*s_device;       /* [0..1][const] The device supposedly carrying the data of this superblock. */
+	REF struct blkdev*s_device;       /* [0..1][const] The device supposedly carrying the data of this superblock. */
 	REF struct driver            *s_driver;       /* [1..1][const] The driver implementing this superblock. */
 	uintptr_t                     s_flags;        /* Superblock flags (Set of `SUPERBLOCK_F*') */
 	struct atomic_lock            s_changed_lock; /* Lock that must be held when removing nodes from, or clearing `s_changed' */
@@ -2162,7 +2162,7 @@ FUNDEF WUNUSED NONNULL((1)) unsigned int NOTHROW(KCALL superblock_mountlock_upgr
  * @throws: E_BADALLOC:                       [...] */
 FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct superblock *KCALL
 superblock_open(struct superblock_type *__restrict type,
-                struct basic_block_device *device,
+                struct blkdev *device,
                 uintptr_t flags DFL(SUPERBLOCK_FNORMAL),
                 UNCHECKED USER char *args DFL(__NULLPTR),
                 bool *pnew_superblock_created DFL(__NULLPTR))
@@ -2310,7 +2310,7 @@ extern "C++" {
 /* Convenience overloads */
 LOCAL ATTR_RETNONNULL WUNUSED REF struct superblock *
 (KCALL superblock_open)(USER CHECKED char const *filesystem_type_name,
-                        struct basic_block_device *device,
+                        struct blkdev *device,
                         uintptr_t flags DFL(SUPERBLOCK_FNORMAL),
                         UNCHECKED USER char *args DFL(__NULLPTR),
                         bool *pnew_superblock_created DFL(__NULLPTR))
@@ -2336,7 +2336,7 @@ LOCAL ATTR_RETNONNULL WUNUSED REF struct superblock *
 		       E_FSERROR_WRONG_FILE_SYSTEM, E_FSERROR_NO_BLOCK_DEVICE,
 		       E_FSERROR_CORRUPTED_FILE_SYSTEM, E_IOERROR, E_BADALLOC,
 		       E_SEGFAULT, E_WOULDBLOCK, ...) {
-	REF struct basic_block_device *dev;
+	REF struct blkdev *dev;
 	dev = block_device_lookup_name(device_name);
 	if unlikely(!dev)
 		THROW(E_FSERROR_NOT_A_BLOCK_DEVICE);
@@ -2354,7 +2354,7 @@ LOCAL ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct superblock *
 		       E_FSERROR_WRONG_FILE_SYSTEM, E_FSERROR_NO_BLOCK_DEVICE,
 		       E_FSERROR_CORRUPTED_FILE_SYSTEM, E_IOERROR, E_BADALLOC,
 		       E_SEGFAULT, E_WOULDBLOCK, ...) {
-	REF struct basic_block_device *dev;
+	REF struct blkdev *dev;
 	dev = block_device_lookup_name(device_name);
 	if unlikely(!dev)
 		THROW(E_FSERROR_NOT_A_BLOCK_DEVICE);
@@ -2372,7 +2372,7 @@ FORCELOCAL ATTR_ARTIFICIAL ATTR_RETNONNULL WUNUSED REF struct superblock *
 		       E_FSERROR_CORRUPTED_FILE_SYSTEM, E_IOERROR, E_BADALLOC,
 		       E_SEGFAULT, E_WOULDBLOCK, ...) {
 	return superblock_open(filesystem_type_name,
-	                       (struct basic_block_device *)__NULLPTR,
+	                       (struct blkdev *)__NULLPTR,
 	                       flags,
 	                       args,
 	                       pnew_superblock_created);
@@ -2388,7 +2388,7 @@ FORCELOCAL ATTR_ARTIFICIAL ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct super
 		       E_FSERROR_CORRUPTED_FILE_SYSTEM, E_IOERROR, E_BADALLOC,
 		       E_SEGFAULT, E_WOULDBLOCK, ...) {
 	return superblock_open(type,
-	                       (struct basic_block_device *)__NULLPTR,
+	                       (struct blkdev *)__NULLPTR,
 	                       flags,
 	                       args,
 	                       pnew_superblock_created);

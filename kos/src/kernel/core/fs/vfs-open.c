@@ -472,7 +472,7 @@ check_result_inode_for_symlink:
 					result.h_data = block_device_lookup(devno);
 					if unlikely(!result.h_data)
 						THROW(E_NO_DEVICE, E_NO_DEVICE_KIND_BLOCK_DEVICE, devno);
-					result.h_type = HANDLE_TYPE_BLOCKDEVICE;
+					result.h_type = HANDLE_TYPE_BLKDEV;
 					decref(result_inode);
 					decref(result_containing_path);
 					decref(result_containing_directory);

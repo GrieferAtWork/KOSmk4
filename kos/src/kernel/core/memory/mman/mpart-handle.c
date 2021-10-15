@@ -95,7 +95,7 @@ handle_mpart_stat(struct mpart *__restrict self,
 	mpart_lock_release(self);
 	FINALLY_DECREF_UNLIKELY(file);
 	if (vm_datablock_isinode(file)) {
-		struct basic_block_device *dev;
+		struct blkdev *dev;
 		struct inode *ino = (struct inode *)file;
 		dev = ino->i_super->s_device;
 		result->st_dev   = (__dev_t)(dev ? block_device_devno(dev) : 0);

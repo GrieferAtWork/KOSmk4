@@ -632,7 +632,7 @@ incdir("");
 #include <kos/futexlock.h>
 #include <kos/guid.h>
 #include <kos/hop/api.h>
-#include <kos/hop/blockdevice.h>
+#include <kos/hop/blkdev.h>
 #include <kos/hop/filehandle.h>
 #include <kos/hop/futex.h>
 #include <kos/hop/handle.h>

@@ -43,8 +43,8 @@
 #define CAP_SET_BLOCKDEV_SECTORS_PER_REQUEST CAP_SYS_ADMIN       /* Allow use of `BLKSECTSET' */
 #define CAP_SET_BLOCKDEV_SECTORSIZE          CAP_SYS_ADMIN       /* Allow use of `BLKBSZSET' */
 #define CAP_SET_BLOCKDEV_READONLY            CAP_SYS_ADMIN       /* Allow use of `BLKROSET' */
-#define CAP_OPEN_BLOCKDEV_ROOT               CAP_SYS_ADMIN       /* Allow use of `HOP_BLOCKDEVICE_OPENDRIVEROOT' */
-#define CAP_OPEN_BLOCKDEV_PART               CAP_SYS_ADMIN       /* Allow use of `HOP_BLOCKDEVICE_OPENDRIVEPART' */
+#define CAP_OPEN_BLOCKDEV_ROOT               CAP_SYS_ADMIN       /* Allow use of `HOP_BLKDEV_OPENDRIVEROOT' */
+#define CAP_OPEN_BLOCKDEV_PART               CAP_SYS_ADMIN       /* Allow use of `HOP_BLKDEV_OPENDRIVEPART' */
 #define CAP_SET_TTY_BUFFER_SIZES             CAP_SYS_RESOURCE    /* Allow use of `TTYIO_IBUF_SETLIMIT', `TTYIO_CANON_SETLIMIT', `TTYIO_OPEND_SETLIMIT', `TTYIO_IPEND_SETLIMIT' */
 #define CAP_DRIVER_QUERY                     CAP_SYS_MODULE      /* Allow use of  `KSYSCTL_DRIVER_LSMOD', `KSYSCTL_DRIVER_GETMOD',  `KSYSCTL_DRIVER_GET_LIBRARY_PATH',
                                                                   * as well as `HOP_DRIVER_LOADLIST_GET_DRIVER', `HOP_DRIVER_OPEN_FILE', `HOP_DRIVER_OPEN_DEPENDENCY',

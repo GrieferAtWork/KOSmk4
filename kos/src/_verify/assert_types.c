@@ -436,7 +436,7 @@ local files = {
 	"../../include/kos/exec/bits/peb.h",
 	"../../include/kos/exec/elf.h",
 	"../../include/kos/hop/api.h",
-	"../../include/kos/hop/blockdevice.h",
+	"../../include/kos/hop/blkdev.h",
 	"../../include/kos/hop/mfile.h",
 	"../../include/kos/hop/mpart.h",
 	"../../include/kos/hop/module.h",
@@ -1718,24 +1718,24 @@ static_assert(offsetof(struct process_peb, pp_envp) == OFFSET_PROCESS_PEB_ENVP);
 
 
 
-#include <kos/hop/blockdevice.h>
+#include <kos/hop/blkdev.h>
 
-/* struct hop_blockdevice_stat */
-static_assert(offsetof(struct hop_blockdevice_stat, bs_device_flag) == __OFFSET_HOP_BLOCKDEVICE_STAT_DEVICE_FLAG);
-static_assert(offsetof(struct hop_blockdevice_stat, bs_devno) == __OFFSET_HOP_BLOCKDEVICE_STAT_DEVNO);
-static_assert(offsetof(struct hop_blockdevice_stat, bs_name) == __OFFSET_HOP_BLOCKDEVICE_STAT_NAME);
-static_assert(offsetof(struct hop_blockdevice_stat, bs_partcount) == __OFFSET_HOP_BLOCKDEVICE_STAT_PARTCOUNT);
-static_assert(offsetof(struct hop_blockdevice_stat, bs_sector_count) == __OFFSET_HOP_BLOCKDEVICE_STAT_SECTOR_COUNT);
-static_assert(offsetof(struct hop_blockdevice_stat, bs_sector_size) == __OFFSET_HOP_BLOCKDEVICE_STAT_SECTOR_SIZE);
-static_assert(offsetof(struct hop_blockdevice_stat, bs_struct_size) == __OFFSET_HOP_BLOCKDEVICE_STAT_STRUCT_SIZE);
-static_assert(offsetof(struct hop_blockdevice_stat, bs_total_bytes) == __OFFSET_HOP_BLOCKDEVICE_STAT_TOTAL_BYTES);
-static_assert(sizeof(struct hop_blockdevice_stat) == __SIZEOF_HOP_BLOCKDEVICE_STAT);
+/* struct hop_blkdev_stat */
+static_assert(offsetof(struct hop_blkdev_stat, bs_device_flag) == __OFFSET_HOP_BLKDEV_STAT_DEVICE_FLAG);
+static_assert(offsetof(struct hop_blkdev_stat, bs_devno) == __OFFSET_HOP_BLKDEV_STAT_DEVNO);
+static_assert(offsetof(struct hop_blkdev_stat, bs_name) == __OFFSET_HOP_BLKDEV_STAT_NAME);
+static_assert(offsetof(struct hop_blkdev_stat, bs_partcount) == __OFFSET_HOP_BLKDEV_STAT_PARTCOUNT);
+static_assert(offsetof(struct hop_blkdev_stat, bs_sector_count) == __OFFSET_HOP_BLKDEV_STAT_SECTOR_COUNT);
+static_assert(offsetof(struct hop_blkdev_stat, bs_sector_size) == __OFFSET_HOP_BLKDEV_STAT_SECTOR_SIZE);
+static_assert(offsetof(struct hop_blkdev_stat, bs_struct_size) == __OFFSET_HOP_BLKDEV_STAT_STRUCT_SIZE);
+static_assert(offsetof(struct hop_blkdev_stat, bs_total_bytes) == __OFFSET_HOP_BLKDEV_STAT_TOTAL_BYTES);
+static_assert(sizeof(struct hop_blkdev_stat) == __SIZEOF_HOP_BLKDEV_STAT);
 
-/* struct hop_blockdevice_openpart */
-static_assert(offsetof(struct hop_blockdevice_openpart, bop_openfd) == __OFFSET_HOP_BLOCKDEVICE_OPENPART_OPENFD);
-static_assert(offsetof(struct hop_blockdevice_openpart, bop_partno) == __OFFSET_HOP_BLOCKDEVICE_OPENPART_PARTNO);
-static_assert(offsetof(struct hop_blockdevice_openpart, bop_struct_size) == __OFFSET_HOP_BLOCKDEVICE_OPENPART_STRUCT_SIZE);
-static_assert(sizeof(struct hop_blockdevice_openpart) == __SIZEOF_HOP_BLOCKDEVICE_OPENPART);
+/* struct hop_blkdev_openpart */
+static_assert(offsetof(struct hop_blkdev_openpart, bop_openfd) == __OFFSET_HOP_BLKDEV_OPENPART_OPENFD);
+static_assert(offsetof(struct hop_blkdev_openpart, bop_partno) == __OFFSET_HOP_BLKDEV_OPENPART_PARTNO);
+static_assert(offsetof(struct hop_blkdev_openpart, bop_struct_size) == __OFFSET_HOP_BLKDEV_OPENPART_STRUCT_SIZE);
+static_assert(sizeof(struct hop_blkdev_openpart) == __SIZEOF_HOP_BLKDEV_OPENPART);
 
 
 

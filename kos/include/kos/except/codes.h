@@ -455,17 +455,14 @@
 #ifndef E_NO_SUCH_OBJECT
 #define E_NO_SUCH_OBJECT                          (0x0009)                   /* [errno(ENODATA), msg("The specified object doesn't exist")] */
 #endif /* !E_NO_SUCH_OBJECT */
-#ifndef E_NO_SUCH_BLOCKDEVICE
-#define E_NO_SUCH_BLOCKDEVICE                     (E_NO_SUCH_OBJECT, 0x0001) /* [msg("No block device has been bound")] */
-#endif /* !E_NO_SUCH_BLOCKDEVICE */
 #ifndef E_NO_SUCH_PROCESS
-#define E_NO_SUCH_PROCESS                         (E_NO_SUCH_OBJECT, 0x0002) /* [msg("No process has been bound")] */
+#define E_NO_SUCH_PROCESS                         (E_NO_SUCH_OBJECT, 0x0001) /* [msg("No process has been bound")] */
 #endif /* !E_NO_SUCH_PROCESS */
 #ifndef E_NO_SUCH_PIDNS
-#define E_NO_SUCH_PIDNS                           (E_NO_SUCH_OBJECT, 0x0003) /* [msg("No pid namespace has been bound")] */
+#define E_NO_SUCH_PIDNS                           (E_NO_SUCH_OBJECT, 0x0002) /* [msg("No pid namespace has been bound")] */
 #endif /* !E_NO_SUCH_PIDNS */
 #ifndef E_NO_CTTY
-#define E_NO_CTTY                                 (E_NO_SUCH_OBJECT, 0x0004) /* [msg("No controlling terminal has been assigned to the calling session")] */
+#define E_NO_CTTY                                 (E_NO_SUCH_OBJECT, 0x0003) /* [msg("No controlling terminal has been assigned to the calling session")] */
 #endif /* !E_NO_CTTY */
 
 
