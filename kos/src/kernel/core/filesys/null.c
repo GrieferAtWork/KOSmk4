@@ -234,7 +234,8 @@ PRIVATE struct mfile_stream_ops const devnull_stream_ops = {
 /************************************************************************/
 INTDEF NONNULL((1)) void /* From "memory/mman/mfile.c" */
 NOTHROW(KCALL mfile_zero_loadpages)(struct mfile *__restrict self,
-                                    pos_t addr, physaddr_t buf, size_t num_bytes);
+                                    pos_t addr, physaddr_t buf, size_t num_bytes,
+                                    struct aio_multihandle *__restrict aio);
 #define devzero_v_loadpages mfile_zero_loadpages
 
 PRIVATE WUNUSED NONNULL((1)) size_t KCALL

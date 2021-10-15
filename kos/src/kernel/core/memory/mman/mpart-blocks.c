@@ -24,6 +24,7 @@
 
 #include <kernel/compiler.h>
 
+#include <kernel/aio.h>
 #include <kernel/mman.h>
 #include <kernel/mman/mfile.h>
 #include <kernel/mman/mnode.h>
@@ -51,6 +52,39 @@ STATIC_ASSERT((MPART_BLOCK_ST_NDEF & MPART_BLOCK_ST_MASK) == MPART_BLOCK_ST_NDEF
 STATIC_ASSERT((MPART_BLOCK_ST_INIT & MPART_BLOCK_ST_MASK) == MPART_BLOCK_ST_INIT);
 STATIC_ASSERT((MPART_BLOCK_ST_LOAD & MPART_BLOCK_ST_MASK) == MPART_BLOCK_ST_LOAD);
 STATIC_ASSERT((MPART_BLOCK_ST_CHNG & MPART_BLOCK_ST_MASK) == MPART_BLOCK_ST_CHNG);
+
+
+/* Helper wrapper for invocation of `mfile_ops::mo_loadblocks' and `mfile_ops::mo_saveblocks'
+ * within  a synchronous context. This function will invoke `io' with a locally allocated AIO
+ * handle before proceeding to wait for I/O to complete.
+ *
+ * If the calling thread is interrupted during  waiting, I/O is canceled and the  function
+ * returned with an exception. Otherwise, the function returns normally once I/O completed
+ * successfully. In the event of an I/O error, this function will re-throw said error. */
+PUBLIC NONNULL((1, 2)) void KCALL
+mfile_dosyncio(struct mfile *__restrict self,
+               NONNULL((1, 5)) void (KCALL *io)(struct mfile *__restrict self, pos_t addr,
+                                                physaddr_t buf, size_t num_bytes,
+                                                struct aio_multihandle *__restrict aio),
+               pos_t addr, physaddr_t buf, size_t num_bytes) {
+	struct aio_multihandle_generic hand;
+	aio_multihandle_generic_init(&hand);
+	TRY {
+		(*io)(self, addr, buf, num_bytes, &hand);
+		aio_multihandle_done(&hand);
+	} EXCEPT {
+		aio_multihandle_fail(&hand);
+	}
+	TRY {
+		aio_multihandle_generic_waitfor(&hand);
+		aio_multihandle_generic_checkerror(&hand);
+	} EXCEPT {
+		aio_multihandle_generic_fini(&hand);
+		RETHROW();
+	}
+}
+
+
 
 
 /* Return  the # of pages containing MPART_BLOCK_ST_CHNG-
@@ -688,7 +722,7 @@ mpart_memload_and_unlock(struct mpart *__restrict self,
 					load_bytes = (size_t)(filesize - addr);
 					assert(load_bytes < num_bytes);
 					if likely(mo_loadblocks != NULL)
-						(*mo_loadblocks)(file, addr, min_addr, load_bytes);
+						mfile_dosyncio(file, mo_loadblocks, addr, min_addr, load_bytes);
 					bzerophyscc(min_addr + load_bytes,
 					            num_bytes - load_bytes);
 				}
@@ -697,7 +731,7 @@ mpart_memload_and_unlock(struct mpart *__restrict self,
 		}
 #endif /* CONFIG_USE_NEW_FS */
 		if likely(mo_loadblocks != NULL)
-			(*mo_loadblocks)(file, addr, min_addr, num_bytes);
+			mfile_dosyncio(file, mo_loadblocks, addr, min_addr, num_bytes);
 	} EXCEPT {
 		/* Change back all INIT-parts to UNDEF */
 		for (i = min; i <= max; ++i)
@@ -914,7 +948,15 @@ again_read_st:
 				 *       cases of hinted memory mappings. */
 				(*mo_loadblocks)(self->mp_file,
 				                 mpart_getminaddr(self) + (block_index << PAGESHIFT),
-				                 pl.mppl_addr, PAGESIZE);
+				                 pl.mppl_addr, PAGESIZE,
+				                 /* Because of requirements  for hinted mappings  (which
+				                  * include  them  needing to  be non-blocking  and non-
+				                  * throwing), we can infer that the initializer of such
+				                  * a mapping couldn't possibly make use of AIO.
+				                  *
+				                  * For  force a kernel  crash if it  still tries to, we
+				                  * pass a guarantied faulty pointer for the AIO handle. */
+				                 (struct aio_multihandle *)-1);
 			}
 		}
 

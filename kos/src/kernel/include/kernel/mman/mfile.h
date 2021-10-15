@@ -298,9 +298,9 @@ struct mfile_stream_ops {
 	                 USER UNCHECKED void *arg, iomode_t mode)
 			THROWS(...);
 
-	/* [0..1] Try to cast the given mem-file into a different handle type.
+	/* [0..1] Try  to cast the given mem-file into a different handle type.
 	 * When this operator isn't defined, the mem-file cannot be cast to any
-	 * other handle type. Note that you may assume that `wanted_type' is
+	 * other  handle type. Note  that you may  assume that `wanted_type' is
 	 * never given as `HANDLE_TYPE_MFILE'.
 	 * @param: wanted_type: The requested handle type.
 	 * @return: NULL:       Cannot cast to `wanted_type'. */
@@ -346,9 +346,23 @@ mfile_open(struct mfile *__restrict self, struct handle *__restrict hand,
            struct path *access_path, struct fdirent *access_dent);
 #endif /* CONFIG_USE_NEW_FS */
 
+struct aio_multihandle;
+
+/* Helper wrapper for invocation of `mfile_ops::mo_loadblocks' and `mfile_ops::mo_saveblocks'
+ * within  a synchronous context. This function will invoke `io' with a locally allocated AIO
+ * handle before proceeding to wait for I/O to complete.
+ *
+ * If the calling thread is interrupted during  waiting, I/O is canceled and the  function
+ * returned with an exception. Otherwise, the function returns normally once I/O completed
+ * successfully. In the event of an I/O error, this function will re-throw said error. */
+FUNDEF NONNULL((1, 2)) void KCALL
+mfile_dosyncio(struct mfile *__restrict self,
+               NONNULL((1, 5)) void (KCALL *io)(struct mfile *__restrict self, pos_t addr,
+                                                physaddr_t buf, size_t num_bytes,
+                                                struct aio_multihandle *__restrict aio),
+               pos_t addr, physaddr_t buf, size_t num_bytes);
 
 struct mfile_ops {
-#ifdef CONFIG_USE_NEW_FS
 	/* [0..1] Finalize + free the given mem-file. */
 	NOBLOCK NONNULL((1)) void
 	/*NOTHROW*/ (KCALL *mo_destroy)(struct mfile *__restrict self);
@@ -389,6 +403,14 @@ struct mfile_ops {
 	                    PAGEDIR_PAGEALIGNED pos_t minaddr,
 	                    PAGEDIR_PAGEALIGNED size_t num_bytes);
 
+	/* NOTE: Don't get any ideas about adding IOV support for mo_loadblocks/mo_saveblocks (again).
+	 *
+	 * Since these functions  include AIO support,  IOV could simply  be implemented on-top  of
+	 * AIO by invoking the callback once for every IOV entry (using the same AIO multi-handle).
+	 * Afterwards, just do the normal waitfor-and-cancel-on-error-then-rethow-io-error sequence
+	 * to  wait for all of the operations to  complete, whilst allowing hardware to perform all
+	 * of the read/write operations (potentially) in parallel! */
+
 	/* [0..1] Load/initialize the given physical memory buffer (this is the read-from-disk callback)
 	 * @assume(IS_ALIGNED(buf, (size_t)1 << MIN(self->mf_blockshift, PAGESHIFT)));
 	 * @assume(IS_ALIGNED(addr, (size_t)1 << self->mf_blockshift));
@@ -398,10 +420,11 @@ struct mfile_ops {
 	 * @assume(WRITABLE_BUFFER_SIZE(buf) >= CEIL_ALIGN(num_bytes, 1 << self->mf_blockshift));
 	 * NOTE: WRITABLE_BUFFER_SIZE means that this function is allowed to write until the aligned
 	 *       end of the last  file-block when `num_bytes' isn't  aligned by whole blocks,  where
-	 *       the size of a block is defined as `1 << self->mf_blockshift'. */
-	/* TODO: Change this function to add support for iov-based I/O */
-	NONNULL((1)) void (KCALL *mo_loadblocks)(struct mfile *__restrict self, pos_t addr,
-	                                         physaddr_t buf, size_t num_bytes);
+	 *       the size of a block is defined as `1 << self->mf_blockshift'.
+	 * NOTE: This callback must _NOT_ invoke `aio_multihandle_done(aio)' (that's the caller's job) */
+	NONNULL((1, 5)) void (KCALL *mo_loadblocks)(struct mfile *__restrict self, pos_t addr,
+	                                            physaddr_t buf, size_t num_bytes,
+	                                            struct aio_multihandle *__restrict aio);
 
 	/* [0..1] Save/write-back the given physical memory buffer (this is the write-to-disk callback)
 	 * @assume(IS_ALIGNED(buf, (size_t)1 << MIN(self->mf_blockshift, PAGESHIFT)));
@@ -412,11 +435,13 @@ struct mfile_ops {
 	 * @assume(READABLE_BUFFER_SIZE(buf) >= CEIL_ALIGN(num_bytes, 1 << self->mf_blockshift));
 	 * NOTE: READABLE_BUFFER_SIZE means that this function is allowed to read until the aligned
 	 *       end  of the last file-block when `num_bytes'  isn't aligned by whole blocks, where
-	 *       the size of a block is defined as `1 << self->mf_blockshift'. */
-	/* TODO: Change this function to add support for iov-based I/O */
-	NONNULL((1)) void (KCALL *mo_saveblocks)(struct mfile *__restrict self, pos_t addr,
-	                                         physaddr_t buf, size_t num_bytes);
+	 *       the size of a block is defined as `1 << self->mf_blockshift'.
+	 * NOTE: This callback must _NOT_ invoke `aio_multihandle_done(aio)' (that's the caller's job) */
+	NONNULL((1, 5)) void (KCALL *mo_saveblocks)(struct mfile *__restrict self, pos_t addr,
+	                                            physaddr_t buf, size_t num_bytes,
+	                                            struct aio_multihandle *__restrict aio);
 
+#ifdef CONFIG_USE_NEW_FS
 	/* [0..1] Called after `MFILE_F_CHANGED' and/or `MFILE_F_ATTRCHANGED' becomes set.
 	 * @param: oldflags: Old file flags. (set of `MFILE_F_*')
 	 * @param: newflags: New file flags. (set of `MFILE_F_*')
@@ -437,69 +462,6 @@ struct mfile_ops {
 #endif /* LIBVIO_CONFIG_ENABLED */
 
 #else /* CONFIG_USE_NEW_FS */
-	/* [0..1] Finalize + free the given mem-file. */
-	NOBLOCK NONNULL((1)) void
-	/*NOTHROW*/ (KCALL *mo_destroy)(struct mfile *__restrict self);
-
-	/* [0..1] Construct a new given mem-part. When not implemented, use the default
-	 *        mechanism for the creation of new mem-parts.
-	 * This function is mainly intended to be used by `mfile_pyhs' in order to create
-	 * custom, already-initialized mem-parts for use with a given physical  location.
-	 * NOTE: This function may assume that the given address range is aligned by `mf_part_amask'.
-	 * The following fields should _NOT_ already be initialized by this
-	 * function, and will unconditionally be initialized by the caller:
-	 *  - mp_refcnt                      (Initialized to whatever is the correct value)
-	 *  - mp_flags & MPART_F_GLOBAL_REF  (Set if `self' isn't anonymous)
-	 *  - mp_flags & MPART_F_LOCKBIT     (Must not be set)
-	 *  - mp_flags & MPART_F_CHANGED     (Must not be set)
-	 *  - mp_flags & MPART_F_PERSISTENT  (Set if `self' isn't anonymous and has the `MFILE_F_PERSISTENT' flag set)
-	 *  - mp_flags & MPART_F__RBRED      (Needed of the file-tree)
-	 *  - mp_file                        (Set to `self' or `mfile_anon[*]')
-	 *  - mp_copy                        (Initialized as empty)
-	 *  - mp_share                       (Initialized as empty)
-	 *  - mp_lockops                     (Initialized as empty)
-	 *  - mp_allparts                    (The part (may be) added to the all-list only _after_ all other fields were initialized)
-	 *  - mp_minaddr                     (Set to `minaddr' by the caller)
-	 *  - mp_maxaddr                     (Set to `minaddr + num_bytes - 1' by the caller)
-	 *  - mp_changed                     (Intentionally left uninitialized)
-	 *  - mp_filent                      (Needed of the file-tree; set to indicate an anon-part if `self' was anonymous)
-	 * As such, this function may only initialize:
-	 *  - mp_flags & ...                 (All flags except for the above)
-	 *  - mp_state                       (usually `MPART_ST_VOID' or `MPART_ST_MEM')
-	 *  - mp_blkst_ptr / mp_blkst_inl    (Containing the fully initialized initial block-status bitset)
-	 *  - mp_mem / mp_mem_sc / ...       (Containing the initial backing storage location; s.a. `mp_state')
-	 *  - mp_meta                        (usually `NULL') */
-	ATTR_RETNONNULL NONNULL((1)) REF struct mpart *
-	(KCALL *mo_newpart)(struct mfile *__restrict self,
-	                    PAGEDIR_PAGEALIGNED pos_t minaddr,
-	                    PAGEDIR_PAGEALIGNED size_t num_bytes);
-
-	/* [0..1] Load/initialize the given physical memory buffer (this is the read-from-disk callback)
-	 * @assume(IS_ALIGNED(buf, (size_t)1 << MIN(self->mf_blockshift, PAGESHIFT)));
-	 * @assume(IS_ALIGNED(addr, (size_t)1 << self->mf_blockshift));
-	 * @assume(addr + num_bytes <= self->mf_filesize);
-	 * @assume(self->mf_trunclock != 0);
-	 * @assume(num_bytes != 0);
-	 * @assume(WRITABLE_BUFFER_SIZE(buf) >= CEIL_ALIGN(num_bytes, 1 << self->mf_blockshift));
-	 * NOTE: WRITABLE_BUFFER_SIZE means that this function is allowed to write until the aligned
-	 *       end of the last  file-block when `num_bytes' isn't  aligned by whole blocks,  where
-	 *       the size of a block is defined as `1 << self->mf_blockshift'. */
-	NONNULL((1)) void (KCALL *mo_loadblocks)(struct mfile *__restrict self, pos_t addr,
-	                                         physaddr_t buf, size_t num_bytes);
-
-	/* [0..1] Save/write-back the given physical memory buffer (this is the write-to-disk callback)
-	 * @assume(IS_ALIGNED(buf, (size_t)1 << MIN(self->mf_blockshift, PAGESHIFT)));
-	 * @assume(IS_ALIGNED(addr, (size_t)1 << self->mf_blockshift));
-	 * @assume(addr + num_bytes <= self->mf_filesize);
-	 * @assume(self->mf_trunclock != 0);
-	 * @assume(num_bytes != 0);
-	 * @assume(READABLE_BUFFER_SIZE(buf) >= CEIL_ALIGN(num_bytes, 1 << self->mf_blockshift));
-	 * NOTE: READABLE_BUFFER_SIZE means that this function is allowed to read until the aligned
-	 *       end  of the last file-block when `num_bytes'  isn't aligned by whole blocks, where
-	 *       the size of a block is defined as `1 << self->mf_blockshift'. */
-	NONNULL((1)) void (KCALL *mo_saveblocks)(struct mfile *__restrict self, pos_t addr,
-	                                         physaddr_t buf, size_t num_bytes);
-
 	/* [0..1] Called the first time the `MPART_F_CHANGED' flag is set for `part'.
 	 * WARNING: This  function  is  called  while  a  lock  to  `part'  is  held!
 	 * NOTE: Not invoked if a new change part is created as the result

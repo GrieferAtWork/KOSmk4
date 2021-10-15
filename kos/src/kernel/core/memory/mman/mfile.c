@@ -332,7 +332,8 @@ PRIVATE NONNULL((1)) void
 #endif /* !CONFIG_USE_NEW_FS */
 NOTHROW(KCALL mfile_zero_loadpages)(struct mfile *__restrict UNUSED(self),
                                     pos_t UNUSED(addr),
-                                    physaddr_t buf, size_t num_bytes) {
+                                    physaddr_t buf, size_t num_bytes,
+                                    struct aio_multihandle *__restrict UNUSED(aio)) {
 	size_t start, end, num_pages;
 	physpage_t page;
 	/* Skip pages that were already zero-initialized before-hand! */
@@ -358,7 +359,8 @@ NOTHROW(KCALL mfile_zero_loadpages)(struct mfile *__restrict UNUSED(self),
 PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL mfile_zero_loadblocks)(struct mfile *__restrict UNUSED(self),
                                      pos_t UNUSED(addr),
-                                     physaddr_t buf, size_t num_bytes) {
+                                     physaddr_t buf, size_t num_bytes,
+                                     struct aio_multihandle *__restrict UNUSED(aio)) {
 	memsetphys(buf, 0, num_bytes);
 }
 

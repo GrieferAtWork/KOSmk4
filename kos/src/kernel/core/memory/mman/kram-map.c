@@ -48,7 +48,8 @@ DECL_BEGIN
 PRIVATE NONNULL((1)) void KCALL
 mfile_dbgheap_loadblocks(struct mfile *__restrict UNUSED(self),
                          pos_t UNUSED(addr),
-                         physaddr_t buf, size_t num_bytes) {
+                         physaddr_t buf, size_t num_bytes,
+                         struct aio_multihandle *__restrict UNUSED(aio)) {
 	PHYS_VARS;
 	byte_t *map;
 	assert(IS_ALIGNED(buf, PAGESIZE));

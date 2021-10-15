@@ -920,7 +920,7 @@ mpart_load_or_unlock(struct mpart *__restrict self,
 						load_bytes = (size_t)(filesize - addr);
 						assert(load_bytes < num_bytes);
 						if likely(mo_loadblocks != NULL)
-							(*mo_loadblocks)(file, addr, loc.mppl_addr, load_bytes);
+							mfile_dosyncio(file, mo_loadblocks, addr, loc.mppl_addr, load_bytes);
 						bzerophyscc(loc.mppl_addr + load_bytes,
 						            num_bytes - load_bytes);
 					}
@@ -929,7 +929,7 @@ mpart_load_or_unlock(struct mpart *__restrict self,
 			}
 #endif /* CONFIG_USE_NEW_FS */
 			if likely(mo_loadblocks != NULL)
-				(*mo_loadblocks)(file, addr, loc.mppl_addr, num_bytes);
+				mfile_dosyncio(file, mo_loadblocks, addr, loc.mppl_addr, num_bytes);
 		} EXCEPT {
 			/* Set block states back to NDEF */
 			for (i = start; i < end; ++i)

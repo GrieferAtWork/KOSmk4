@@ -351,12 +351,16 @@ NOTHROW(KCALL aio_multihandle_done)(struct aio_multihandle *__restrict self) {
 		if (ATOMIC_CMPXCH_WEAK(self->am_status, old_status, old_status | AIO_MULTIHANDLE_STATUS_ALLRUNNING))
 			break;
 	}
+
+	/* Check if all AIO handles have already completed. */
 	if ((old_status & AIO_MULTIHANDLE_STATUS_RUNMASK) == 0) {
 		unsigned int status;
 		pflag_t was;
+
 		/* Completion functions must  be called  with preemption  disabled,
 		 * so satisfy that requirement by disabling preemption temporarily. */
 		was = PREEMPTION_PUSHOFF();
+
 		/* All handles have already completed. */
 		status = (old_status & AIO_MULTIHANDLE_STATUS_STATUSMASK) >> AIO_MULTIHANDLE_STATUS_STATUSSHFT;
 		if (status == AIO_COMPLETION_FAILURE) {
@@ -364,6 +368,7 @@ NOTHROW(KCALL aio_multihandle_done)(struct aio_multihandle *__restrict self) {
 			my_exc = &THIS_EXCEPTION_DATA;
 			memcpy(&old_exc, &my_exc, sizeof(my_exc));
 			memcpy(my_exc, &self->am_error, sizeof(self->am_error));
+
 			/* Invoke the completion callback. */
 			(*self->am_func)(self, status);
 			memcpy(&my_exc, &old_exc, sizeof(my_exc));

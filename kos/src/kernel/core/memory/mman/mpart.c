@@ -742,7 +742,8 @@ again:
 
 			/* Actually do the save. */
 			result += num_bytes;
-			(*file->mf_ops->mo_saveblocks)(file, addr, loc.mppl_addr, num_bytes);
+			mfile_dosyncio(file, file->mf_ops->mo_saveblocks,
+			               addr, loc.mppl_addr, num_bytes);
 		} EXCEPT {
 			/* The write-back failed. - As such we must restore the ST_CHNG status
 			 * of all of the pages we've altered to INIT, as well as broadcast the
