@@ -17,8 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_INCLUDE_FS_PIPE_H
-#define GUARD_KERNEL_INCLUDE_FS_PIPE_H 1
+#ifndef GUARD_KERNEL_INCLUDE_KERNEL_PIPE_H
+#define GUARD_KERNEL_INCLUDE_KERNEL_PIPE_H 1
 
 #include <kernel/compiler.h>
 
@@ -74,4 +74,4 @@ pipe_writer_create(struct pipe *__restrict self) THROWS(E_BADALLOC);
 
 DECL_END
 
-#endif /* !GUARD_KERNEL_INCLUDE_FS_PIPE_H */
+#endif /* !GUARD_KERNEL_INCLUDE_KERNEL_PIPE_H */

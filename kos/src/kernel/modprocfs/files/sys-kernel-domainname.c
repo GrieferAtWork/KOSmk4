@@ -20,10 +20,10 @@
 #ifndef GUARD_MODPROCFS_FILES_SYS_KERNEL_DOMAINNAME_C
 #define GUARD_MODPROCFS_FILES_SYS_KERNEL_DOMAINNAME_C 1
 #define _KOS_SOURCE 1 /* snprintf returns size_t */
+#define _GNU_SOURCE 1 /* `struct uname::domainname' */
 
 #include <kernel/compiler.h>
 
-#include <fs/pipe.h>
 #include <kernel/except.h>
 #include <kernel/uname.h>
 #include <sched/cred.h>

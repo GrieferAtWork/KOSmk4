@@ -27,7 +27,6 @@
 #include <dev/char.h>
 #include <fs/file.h>
 #include <fs/node.h>
-#include <fs/pipe.h>
 #include <fs/vfs.h>
 #include <kernel/handle.h>
 #include <sched/enum.h>

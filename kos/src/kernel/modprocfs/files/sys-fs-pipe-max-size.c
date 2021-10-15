@@ -23,7 +23,7 @@
 
 #include <kernel/compiler.h>
 
-#include <fs/pipe.h>
+#include <kernel/pipe.h>
 
 #include <hybrid/atomic.h>
 

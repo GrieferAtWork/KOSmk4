@@ -17,14 +17,13 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_CORE_FS_PIPE_C
-#define GUARD_KERNEL_CORE_FS_PIPE_C 1
+#ifndef GUARD_KERNEL_CORE_MISC_PIPE_C
+#define GUARD_KERNEL_CORE_MISC_PIPE_C 1
 #define _KOS_SOURCE 1
 #define _GNU_SOURCE 1
 
 #include <kernel/compiler.h>
 
-#include <fs/pipe.h>
 #include <kernel/aio.h>
 #include <kernel/driver-param.h>
 #include <kernel/except.h>
@@ -32,6 +31,7 @@
 #include <kernel/handle.h>
 #include <kernel/iovec.h>
 #include <kernel/malloc.h>
+#include <kernel/pipe.h>
 #include <kernel/syscall.h>
 #include <kernel/user.h>
 #include <sched/cred.h>
@@ -152,7 +152,7 @@ handle_pipe_reader_tryas(struct pipe_reader *__restrict self,
 
 
 
-INTERN size_t KCALL
+INTERN size_t KCALL /* INTERN because used in "user/handle.c" */
 ringbuffer_set_pipe_limit(struct ringbuffer *__restrict self,
                           size_t new_lim) {
 	size_t result;
@@ -826,4 +826,4 @@ DEFINE_COMPAT_SYSCALL1(errno_t, pipe, USER UNCHECKED fd_t *, pipedes) {
 
 DECL_END
 
-#endif /* !GUARD_KERNEL_CORE_FS_PIPE_C */
+#endif /* !GUARD_KERNEL_CORE_MISC_PIPE_C */

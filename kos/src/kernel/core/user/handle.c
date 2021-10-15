@@ -31,7 +31,6 @@
 #include <fs/fifo.h>
 #include <fs/file.h>
 #include <fs/node.h>
-#include <fs/pipe.h>
 #include <fs/special-node.h>
 #include <fs/vfs.h>
 #include <kernel/except.h>
@@ -39,6 +38,7 @@
 #include <kernel/malloc.h>
 #include <kernel/mman/event.h>
 #include <kernel/paging.h>
+#include <kernel/pipe.h>
 #include <kernel/types.h>
 #include <kernel/user.h>
 #include <sched/cpu.h>
@@ -2086,7 +2086,7 @@ handle_chflags(struct handle_manager *__restrict self,
 }
 
 
-INTDEF size_t KCALL
+INTDEF size_t KCALL /* from "misc/pipe.c" */
 ringbuffer_set_pipe_limit(struct ringbuffer *__restrict self,
                           size_t new_lim);
 

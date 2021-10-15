@@ -23,7 +23,6 @@
 
 #include <kernel/compiler.h>
 
-#include <fs/pipe.h>
 #include <kernel/except.h>
 #include <kernel/uname.h>
 #include <sched/cred.h>

@@ -34,13 +34,13 @@
 #include <fs/fifo.h>
 #include <fs/file.h>
 #include <fs/node.h>
-#include <fs/pipe.h>
 #include <fs/ramfs.h>
 #include <fs/special-node.h>
 #include <fs/vfs.h>
 #include <kernel/handle.h>
 #include <kernel/mman/driver.h>
 #include <kernel/mman/module.h>
+#include <kernel/pipe.h>
 #include <kernel/types.h>
 #include <kernel/user.h>
 #include <sched/atomic64.h>
