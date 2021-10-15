@@ -181,6 +181,8 @@ struct ramfs_direnum {
 DATDEF struct fdirenum_ops const ramfs_direnum_ops;
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL ramfs_direnum_v_fini)(struct fdirenum *__restrict self);
+FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct fdirnode *
+NOTHROW(KCALL ramfs_direnum_v_getdir)(struct fdirenum *__restrict self);
 FUNDEF NONNULL((1)) size_t KCALL
 ramfs_direnum_v_readdir(struct fdirenum *__restrict self, USER CHECKED struct dirent *buf,
                         size_t bufsize, readdir_mode_t readdir_mode, iomode_t mode)

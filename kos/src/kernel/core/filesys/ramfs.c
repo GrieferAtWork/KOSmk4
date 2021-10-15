@@ -167,12 +167,24 @@ NOTHROW(KCALL ramfs_dirent_v_opennode)(struct fdirent *__restrict self,
 
 
 /* Directory enumeration operators for `struct ramfs_direnum' */
-PUBLIC struct fdirenum_ops const ramfs_direnum_ops;
+PUBLIC struct fdirenum_ops const ramfs_direnum_ops = {
+	.deo_fini    = &ramfs_direnum_v_fini,
+	.deo_getdir  = &ramfs_direnum_v_getdir,
+	.deo_readdir = &ramfs_direnum_v_readdir,
+	.deo_seekdir = &ramfs_direnum_v_seekdir,
+};
+
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL ramfs_direnum_v_fini)(struct fdirenum *__restrict self) {
 	struct ramfs_direnum *me = (struct ramfs_direnum *)self;
 	axref_fini(&me->rde_next);
 	decref(me->rde_dir);
+}
+
+PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct fdirnode *
+NOTHROW(KCALL ramfs_direnum_v_getdir)(struct fdirenum *__restrict self) {
+	struct ramfs_direnum *me = (struct ramfs_direnum *)self;
+	return mfile_asdir(incref(me->rde_dir));
 }
 
 

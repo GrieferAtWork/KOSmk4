@@ -137,6 +137,13 @@ struct fdirenum_ops {
 	NOBLOCK NONNULL((1)) void
 	/*NOTHROW*/ (KCALL *deo_fini)(struct fdirenum *__restrict self);
 
+	/* [1..1] Return a reference to the directory being enumerated.
+	 * @return: NULL: Directory has been deleted. (same as throwing
+	 *                `E_FSERROR_DELETED:E_FILESYSTEM_DELETED_PATH') */
+	WUNUSED NONNULL((1)) REF struct fdirnode *
+	(KCALL *deo_getdir)(struct fdirenum *__restrict self)
+			THROWS(...);
+
 	/* [1..1] Directory reader callback.
 	 * When end-of-file has been reached, `0' is returned.
 	 * NOTE: This function mustn't enumerate the `.' and `..' entires! */
@@ -172,6 +179,7 @@ struct fdirenum {
 
 /* Helper macros for operating with `struct fdirenum' */
 #define fdirenum_fini(self)                                      (*(self)->de_ops->deo_fini)(self)
+#define fdirenum_getdir(self)                                    (*(self)->de_ops->deo_getdir)(self)
 #define fdirenum_readdir(self, buf, bufsize, readdir_mode, mode) (*(self)->de_ops->deo_readdir)(self, buf, bufsize, readdir_mode, mode)
 #define fdirenum_seekdir(self, offset, whence)                   (*(self)->de_ops->deo_seekdir)(self, offset, whence)
 
@@ -268,18 +276,18 @@ struct fdirnode_ops {
 
 struct fdirnode
 #ifndef __WANT_FS_INLINE_STRUCTURES
-    : fnode                          /* Underlying file-node */
+    : fnode                         /* Underlying file-node */
 #endif /* !__WANT_FS_INLINE_STRUCTURES */
 {
 #ifdef __WANT_FS_INLINE_STRUCTURES
-	struct fnode         dn_node;    /* Underlying file-node */
+	struct fnode         dn_node;   /* Underlying file-node */
 #define _fdirnode_node_     dn_node.
 #define _fdirnode_asnode(x) &(x)->dn_node
 #else /* __WANT_FS_INLINE_STRUCTURES */
 #define _fdirnode_node_     /* nothing */
 #define _fdirnode_asnode(x) x
 #endif /* !__WANT_FS_INLINE_STRUCTURES */
-	REF struct fdirnode *dn_parent;  /* [0..1][const] Parent directory (or `NULL' if `fnode_issuper(self)'). */
+	REF struct fdirnode *dn_parent; /* [0..1][const] Parent directory (or `NULL' if `fnode_issuper(self)'). */
 };
 
 
@@ -354,7 +362,7 @@ NOTHROW(KCALL fdirnode_v_destroy)(struct mfile *__restrict self);
 FUNDEF WUNUSED NONNULL((1, 2)) REF struct fnode *KCALL
 fdirnode_v_lookup_fnode(struct fdirnode *__restrict self,
                         struct flookup_info *__restrict info);
-/* Constructs a wrapper object that implements readdir() */
+/* Constructs a wrapper object that implements readdir() (s.a. `dirhandle_new()') */
 FUNDEF NONNULL((1, 2)) void KCALL
 fdirnode_v_open(struct mfile *__restrict self, struct handle *__restrict hand,
                 struct path *access_path, struct fdirent *access_dent);

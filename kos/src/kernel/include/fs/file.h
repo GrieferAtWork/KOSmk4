@@ -23,6 +23,7 @@
 #include <kernel/compiler.h>
 
 #ifdef CONFIG_USE_NEW_FS
+#include <kernel/fs/dirhandle.h>
 #include <kernel/fs/filehandle.h>
 #else /* CONFIG_USE_NEW_FS */
 #include <kernel/types.h>
@@ -72,7 +73,7 @@ struct dirhandle {
 	WEAK refcnt_t                    d_refcnt; /* File reference counter. */
 	REF struct directory_node       *d_node;   /* [1..1] The opened directory INode. */
 	REF struct path                 *d_path;   /* [0..1] The path from which `d_node' was opened. */
-	REF struct fdirent      *d_dirent; /* [0..1] The directory entry associated with `d_node' that was used to open the file. */
+	REF struct fdirent              *d_dirent; /* [0..1] The directory entry associated with `d_node' that was used to open the file. */
 	WEAK atomic64_t                  d_offset; /* [lock(d_node)] File I/O read/write position. */
 	struct atomic_rwlock             d_curlck; /* Lock for accessing the current directory entry & its index. */
 	pos_t                            d_curidx; /* [lock(d_curlck)] The index of the directory entry currently selected by `d_curent'. */

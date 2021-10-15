@@ -232,6 +232,12 @@ NOTHROW(KCALL devfs_root_direnum_v_fini)(struct fdirenum *__restrict self) {
 	axref_fini(&me->drd_next);
 }
 
+PRIVATE ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct fdirnode *
+NOTHROW(KCALL devfs_root_direnum_v_getdir)(struct fdirenum *__restrict UNUSED(self)) {
+	return mfile_asdir(incref(&devfs.rs_sup.fs_root.dn_node.fn_file));
+}
+
+
 
 PRIVATE NOBLOCK WUNUSED NONNULL((1)) struct device *
 NOTHROW(FCALL device_fixdeleted)(struct fdevfsdirent *__restrict self) {
@@ -410,6 +416,7 @@ devfs_root_direnum_v_seekdir(struct fdirenum *__restrict self,
 
 PRIVATE struct fdirenum_ops const devfs_root_direnum_ops = {
 	.deo_fini    = &devfs_root_direnum_v_fini,
+	.deo_getdir  = &devfs_root_direnum_v_getdir,
 	.deo_readdir = &devfs_root_direnum_v_readdir,
 	.deo_seekdir = &devfs_root_direnum_v_seekdir,
 };
