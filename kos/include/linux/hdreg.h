@@ -90,13 +90,22 @@ struct hd_driveid {
 	__UINT16_TYPE__     vendor0;          /* vendor unique */
 	__UINT16_TYPE__     vendor1;          /* vendor unique */
 	__UINT16_TYPE__     vendor2;          /* Retired vendor unique */
+#ifdef __USE_KOS_ALTERATIONS
+	char                serial_no[20];    /* 0 = not_specified */
+#else /* __USE_KOS_ALTERATIONS */
 	__UINT8_TYPE__      serial_no[20];    /* 0 = not_specified */
+#endif /* !__USE_KOS_ALTERATIONS */
 	__UINT16_TYPE__     buf_type;         /* Retired */
 	__UINT16_TYPE__     buf_size;         /* Retired, 512 byte increments
 	                                       * 0 = not_specified */
 	__UINT16_TYPE__     ecc_bytes;        /* for r/w long cmds; 0 = not_specified */
+#ifdef __USE_KOS_ALTERATIONS
+	char                fw_rev[8];        /* 0 = not_specified */
+	char                model[40];        /* 0 = not_specified */
+#else /* __USE_KOS_ALTERATIONS */
 	__UINT8_TYPE__      fw_rev[8];        /* 0 = not_specified */
 	__UINT8_TYPE__      model[40];        /* 0 = not_specified */
+#endif /* !__USE_KOS_ALTERATIONS */
 	__UINT8_TYPE__      max_multsect;     /* 0=not_implemented */
 	__UINT8_TYPE__      vendor3;          /* vendor unique */
 	__UINT16_TYPE__     dword_io;         /* 0=not_implemented; 1=implemented */

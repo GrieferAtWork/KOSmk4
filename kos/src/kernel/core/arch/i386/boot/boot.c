@@ -773,6 +773,10 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *       the  same as `pidfd_open(42)'. Iow: support is provided by allowing the
 	 *       handled returned by open("/proc/42") to be castable to HANDLE_TYPE_TASK */
 
+	/* TODO: Add a new handle operator `ssize_t handle_printdesc(T *self, pformatprinter printer, void *arg)'
+	 *       that  can be implemented on a per-handle basis to facilitate the strings to which symlinks under
+	 *       /proc/[pid]/fd/[fileno] expand when read. */
+
 	return state;
 }
 

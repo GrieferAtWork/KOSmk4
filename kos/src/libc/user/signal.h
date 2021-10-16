@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1f457b8e */
+/* HASH CRC-32:0x5d6504ef */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -102,7 +102,7 @@ INTDEF sighandler_t NOTHROW_NCX(LIBDCALL libd_ssignal)(signo_t signo, sighandler
  * @return: SIG_ERR: Error (s.a. `errno') */
 INTDEF sighandler_t NOTHROW_NCX(LIBCCALL libc_ssignal)(signo_t signo, sighandler_t handler);
 /* >> gsignal(3)
- * Raise a software-signal  by invocing  a previously  established
+ * Raise a software-signal  by invoking  a previously  established
  * software-signal-handler,  as   set  by   `ssignal(signo, ...)'.
  * This method by which a software signal is raised may or may not
  * be distinct from normal signal handlers.
@@ -111,7 +111,7 @@ INTDEF sighandler_t NOTHROW_NCX(LIBCCALL libc_ssignal)(signo_t signo, sighandler
  * @return: -1: [errno=EINVAL] The given `signo' is invalid */
 INTDEF int NOTHROW_NCX(LIBDCALL libd_gsignal)(signo_t signo);
 /* >> gsignal(3)
- * Raise a software-signal  by invocing  a previously  established
+ * Raise a software-signal  by invoking  a previously  established
  * software-signal-handler,  as   set  by   `ssignal(signo, ...)'.
  * This method by which a software signal is raised may or may not
  * be distinct from normal signal handlers.

@@ -1365,7 +1365,7 @@ $sighandler_t ssignal($signo_t signo, $sighandler_t handler) {
 }
 
 @@>> gsignal(3)
-@@Raise a software-signal  by invocing  a previously  established
+@@Raise a software-signal  by invoking  a previously  established
 @@software-signal-handler,  as   set  by   `ssignal(signo, ...)'.
 @@This method by which a software signal is raised may or may not
 @@be distinct from normal signal handlers.

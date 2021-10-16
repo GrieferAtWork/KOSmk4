@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd280f9b1 */
+/* HASH CRC-32:0x1e8791e6 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1414,7 +1414,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(ssignal, __FORCELOCAL __ATTR_ARTIFICIAL __sighan
 #endif /* ... */
 #ifdef __CRT_HAVE_gsignal
 /* >> gsignal(3)
- * Raise a software-signal  by invocing  a previously  established
+ * Raise a software-signal  by invoking  a previously  established
  * software-signal-handler,  as   set  by   `ssignal(signo, ...)'.
  * This method by which a software signal is raised may or may not
  * be distinct from normal signal handlers.
@@ -1425,7 +1425,7 @@ __CDECLARE(,int,__NOTHROW_NCX,gsignal,(__signo_t __signo),(__signo))
 #elif defined(__CRT_HAVE_raise) || (defined(__CRT_HAVE_pthread_kill) && (defined(__CRT_HAVE_pthread_self) || defined(__CRT_HAVE_thrd_current))) || (defined(__CRT_HAVE_kill) && (defined(__CRT_HAVE_getpid) || defined(__CRT_HAVE__getpid) || defined(__CRT_HAVE___getpid)))
 #include <libc/local/signal/gsignal.h>
 /* >> gsignal(3)
- * Raise a software-signal  by invocing  a previously  established
+ * Raise a software-signal  by invoking  a previously  established
  * software-signal-handler,  as   set  by   `ssignal(signo, ...)'.
  * This method by which a software signal is raised may or may not
  * be distinct from normal signal handlers.

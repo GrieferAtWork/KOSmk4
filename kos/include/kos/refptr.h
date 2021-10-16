@@ -24,7 +24,7 @@
 
 #include <kos/refcnt.h>
 
-#if defined(__cplusplus) && defined(__CC__)
+#ifdef __cplusplus
 #include <__stdcxx.h>
 #include <features.h>
 
@@ -200,7 +200,7 @@ public: /* Constructor / Destructor */
 
 } /* namespace kos */
 } /* extern "C++" */
-#endif /* !__cplusplus || !__CC__ */
+#endif /* __cplusplus */
 
 
 #endif /* !_KOS_REFPTR_H */

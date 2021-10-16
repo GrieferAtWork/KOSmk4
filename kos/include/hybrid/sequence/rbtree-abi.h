@@ -1650,7 +1650,7 @@ RBTREE_DEFINE_FUNCTION(__PRIVATE, __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1))
 /* Find the lowest and greatest nodes that are overlapping with the given key-range. */
 #ifdef RBTREE_DEFINE_FUNCTION
 #ifdef __DEEMON__
-RBTREE_DEFINE_FUNCTION(RBTREE_IMPL, __ATTR_NONNULL((4)), ,
+RBTREE_DEFINE_FUNCTION(RBTREE_IMPL, __ATTR_NONNULL((4)), ~,
                        RBTREE_NOTHROW_U, RBTREE_CC, RBTREE(minmaxlocate),
                        (RBTREE_T *root, RBTREE_Tkey minkey, RBTREE_Tkey maxkey),
                        (root, minkey, maxkey))
