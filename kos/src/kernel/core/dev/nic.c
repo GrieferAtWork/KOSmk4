@@ -158,7 +158,7 @@ NOTHROW(KCALL nic_device_cinit)(struct nic_device *__restrict self,
 /* Default finalizer for NIC devices.
  * NOTE: Must be called by drivers when `cd_type.ct_fini' gets overwritten. */
 PUBLIC NOBLOCK NONNULL((1)) void
-NOTHROW(KCALL nic_device_fini)(struct character_device *__restrict self) {
+NOTHROW(KCALL nic_device_fini)(struct chrdev *__restrict self) {
 	struct nic_device *me;
 	me = (struct nic_device *)self,
 	network_fini(&me->nd_net);
@@ -198,7 +198,7 @@ nic_device_send_background(struct nic_device *__restrict self,
 
 /* Default write-operator for NIC devices. */
 PUBLIC NONNULL((1)) size_t KCALL
-nic_device_write(struct character_device *__restrict self,
+nic_device_write(struct chrdev *__restrict self,
                  USER CHECKED void const *src,
                  size_t num_bytes, iomode_t UNUSED(mode))
 		THROWS(...) {

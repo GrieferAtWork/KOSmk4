@@ -399,26 +399,26 @@ do_check_truncate:
 			devno = node->i_filerdev;
 			COMPILER_READ_BARRIER();
 			decref(node);
-			result->h_data = block_device_lookup(devno);
+			result->h_data = blkdev_lookup(devno);
 			if unlikely(!result->h_data)
-				THROW(E_NO_DEVICE /*, E_NO_DEVICE_KIND_BLOCK_DEVICE, devno*/);
+				THROW(E_NO_DEVICE /*, E_NO_DEVICE_KIND_BLKDEV, devno*/);
 			result->h_type = HANDLE_TYPE_BLKDEV;
 		}	break;
 
 		case S_IFCHR: {
 			/* Open the associated character-device. */
 			dev_t devno;
-			REF struct character_device *cdev;
+			REF struct chrdev *cdev;
 			inode_loadattr(node);
 			COMPILER_READ_BARRIER();
 			devno = node->i_filerdev;
 			COMPILER_READ_BARRIER();
 			decref(node);
-			cdev = character_device_lookup(devno);
+			cdev = chrdev_lookup(devno);
 			if unlikely(!cdev)
-				THROW(E_NO_DEVICE /*, E_NO_DEVICE_KIND_CHARACTER_DEVICE, devno*/);
+				THROW(E_NO_DEVICE /*, E_NO_DEVICE_KIND_CHRDEV, devno*/);
 			result->h_data = cdev;
-			result->h_type = HANDLE_TYPE_CHARACTERDEVICE;
+			result->h_type = HANDLE_TYPE_CHRDEV;
 			if (cdev->cd_type.ct_open) {
 				incref(cdev);
 				FINALLY_DECREF_UNLIKELY(cdev);

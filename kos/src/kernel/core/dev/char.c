@@ -20,7 +20,7 @@
 #ifndef GUARD_KERNEL_SRC_DEV_CHAR_C
 #define GUARD_KERNEL_SRC_DEV_CHAR_C 1
 #define _KOS_SOURCE 1
-#define WANT_CHARACTER_DEVICE_NEXTLINK 1
+#define __WANT_CHRDEV_NEXTLINK
 
 #include <kernel/compiler.h>
 
@@ -63,12 +63,12 @@
 #include <stdio.h>
 #include <string.h>
 
-/* Implement the ABI for the address tree used by character_device. */
+/* Implement the ABI for the address tree used by chrdev. */
 #define ATREE(x)      cdev_tree_##x
 #define ATREE_CALL    KCALL
 #define ATREE_NOTHROW NOTHROW
 #define Tkey          dev_t
-#define T             struct character_device
+#define T             struct chrdev
 #define N_NODEPATH    cd_devlink
 #define ATREE_SINGLE  1
 #include <hybrid/sequence/atree-abi.h>
@@ -86,18 +86,18 @@ DECL_BEGIN
 
 /* The tree used to quickly look up a character device from its ID */
 PRIVATE /*REF_IF(!(->cd_flags & CHARACTER_DEVICE_FLAG_WEAKREG))*/
-ATREE_HEAD(struct character_device) character_device_tree = NULL;
+ATREE_HEAD(struct chrdev) chrdev_tree = NULL;
 PRIVATE dev_t character_device_next_auto = MKDEV(DEV_MAJOR_AUTO,0);
 PRIVATE struct atomic_rwlock character_device_lock = ATOMIC_RWLOCK_INIT;
 DEFINE_DBG_BZERO_OBJECT(character_device_lock);
 
 /* [0..1] Chain of weakly referenced, dead character devices.
  * These are serviced whenever a lock to `character_device_lock' is acquired. */
-PRIVATE WEAK struct character_device *dead_character_devices = NULL;
+PRIVATE WEAK struct chrdev *dead_character_devices = NULL;
 #define dead_character_devices_NEXTP(x) (x)->cd_nextdead
 
 LOCAL NOBLOCK void
-NOTHROW(KCALL character_device_free)(struct character_device *__restrict self) {
+NOTHROW(KCALL character_device_free)(struct chrdev *__restrict self) {
 	decref(self->cd_type.ct_driver);
 	heap_free(CHARACTER_DEVICE_HEAP,
 	          self,
@@ -106,14 +106,14 @@ NOTHROW(KCALL character_device_free)(struct character_device *__restrict self) {
 }
 
 LOCAL NOBLOCK void
-NOTHROW(KCALL remove_character_device_from_tree)(struct character_device *__restrict self) {
-	struct character_device *removed;
+NOTHROW(KCALL remove_character_device_from_tree)(struct chrdev *__restrict self) {
+	struct chrdev *removed;
 	if (self->cd_devlink.a_vaddr != DEV_UNSET) {
-		removed = cdev_tree_remove(&character_device_tree,
-								   character_device_devno(self));
+		removed = cdev_tree_remove(&chrdev_tree,
+								   chrdev_devno(self));
 		if unlikely(removed != self) {
 			if likely(removed)
-				cdev_tree_insert(&character_device_tree, removed);
+				cdev_tree_insert(&chrdev_tree, removed);
 		}
 	}
 }
@@ -122,7 +122,7 @@ NOTHROW(KCALL remove_character_device_from_tree)(struct character_device *__rest
 	(ATOMIC_READ(dead_character_devices) != NULL)
 PRIVATE NOBLOCK ATTR_COLD void
 NOTHROW(KCALL service_dead_character_devices)(void) {
-	struct character_device *chain, *next;
+	struct chrdev *chain, *next;
 	chain = ATOMIC_XCH(dead_character_devices, NULL);
 	while (chain) {
 		next = dead_character_devices_NEXTP(chain);
@@ -146,7 +146,7 @@ DECL_BEGIN
 
 /* Destroy a given character device. */
 PUBLIC NOBLOCK NONNULL((1)) void
-NOTHROW(KCALL character_device_destroy)(struct character_device *__restrict self) {
+NOTHROW(KCALL chrdev_destroy)(struct chrdev *__restrict self) {
 	assert(self->cd_type.ct_driver);
 	/* Invoke a custom finalizer callback */
 	if (self->cd_type.ct_fini)
@@ -165,7 +165,7 @@ NOTHROW(KCALL character_device_destroy)(struct character_device *__restrict self
 				remove_character_device_from_tree(self);
 				cdl_endwrite();
 			} else {
-				struct character_device *next;
+				struct chrdev *next;
 				/* Add the device to the chain of devices that are pending to be removed. */
 				do {
 					next = ATOMIC_READ(dead_character_devices);
@@ -189,14 +189,14 @@ NOTHROW(KCALL character_device_destroy)(struct character_device *__restrict self
  * As well as optionally:
  *   >> return->cd_name
  */
-PUBLIC ATTR_MALLOC ATTR_RETNONNULL WUNUSED REF struct character_device *KCALL
-character_device_alloc(struct driver *__restrict owner,
+PUBLIC ATTR_MALLOC ATTR_RETNONNULL WUNUSED REF struct chrdev *KCALL
+chrdev_alloc(struct driver *__restrict owner,
                        size_t structure_size,
                        size_t structure_align)
 		THROWS(E_BADALLOC, E_WOULDBLOCK) {
-	REF struct character_device *result;
+	REF struct chrdev *result;
 	heapptr_t resptr;
-	assert(structure_size >= sizeof(struct character_device));
+	assert(structure_size >= sizeof(struct chrdev));
 	assert(owner);
 	resptr = heap_align(CHARACTER_DEVICE_HEAP,
 	                    structure_align, 0,
@@ -204,7 +204,7 @@ character_device_alloc(struct driver *__restrict owner,
 	                    CHARACTER_DEVICE_GFP |
 	                    GFP_PREFLT |
 	                    GFP_CALLOC);
-	result                    = (REF struct character_device *)heapptr_getptr(resptr);
+	result                    = (REF struct chrdev *)heapptr_getptr(resptr);
 	result->cd_refcnt         = 1;
 	result->cd_heapsize       = heapptr_getsiz(resptr);
 	result->cd_type.ct_driver = incref(owner);
@@ -213,11 +213,11 @@ character_device_alloc(struct driver *__restrict owner,
 
 /* Lookup  a character device associated with `devno'  and return a reference to it.
  * When no character device is associated that device number, return `NULL' instead. */
-PUBLIC WUNUSED REF struct character_device *KCALL
-character_device_lookup(dev_t devno) THROWS(E_WOULDBLOCK) {
-	REF struct character_device *result;
+PUBLIC WUNUSED REF struct chrdev *KCALL
+chrdev_lookup(dev_t devno) THROWS(E_WOULDBLOCK) {
+	REF struct chrdev *result;
 	cdl_read();
-	result = cdev_tree_locate(character_device_tree, devno);
+	result = cdev_tree_locate(chrdev_tree, devno);
 	/* Try to acquire a reference to the character device. */
 	if (result && unlikely(!tryincref(result)))
 		result = NULL;
@@ -225,14 +225,14 @@ character_device_lookup(dev_t devno) THROWS(E_WOULDBLOCK) {
 	return result;
 }
 
-/* Same as `character_device_lookup()', but return `NULL'
+/* Same as `chrdev_lookup()', but return `NULL'
  * if   the  lookup  would   have  caused  an  exception. */
-PUBLIC WUNUSED REF struct character_device *
-NOTHROW(KCALL character_device_lookup_nx)(dev_t devno) {
-	REF struct character_device *result;
+PUBLIC WUNUSED REF struct chrdev *
+NOTHROW(KCALL chrdev_lookup_nx)(dev_t devno) {
+	REF struct chrdev *result;
 	if (!cdl_read_nx())
 		return NULL;
-	result = cdev_tree_locate(character_device_tree, devno);
+	result = cdev_tree_locate(chrdev_tree, devno);
 	/* Try to acquire a reference to the character device. */
 	if (result && unlikely(!tryincref(result)))
 		result = NULL;
@@ -241,15 +241,15 @@ NOTHROW(KCALL character_device_lookup_nx)(dev_t devno) {
 }
 
 
-PRIVATE WUNUSED REF struct character_device *KCALL
-cdev_tree_search_name(struct character_device *__restrict node,
+PRIVATE WUNUSED REF struct chrdev *KCALL
+cdev_tree_search_name(struct chrdev *__restrict node,
                       char const *__restrict name) {
 again:
 	if (strcmp(node->cd_name, name) == 0)
 		return likely(tryincref(node)) ? node : NULL;
 	if (node->cd_devlink.a_min) {
 		if (node->cd_devlink.a_max) {
-			REF struct character_device *result;
+			REF struct chrdev *result;
 			result = cdev_tree_search_name(node->cd_devlink.a_max, name);
 			if (result)
 				return result;
@@ -270,19 +270,19 @@ again:
  * Alternatively, the given `name' may also be in the form of `MAJOR:MINOR',
  * an  encoding that is  always attempted first by  attempting to decode the
  * given name using `scanf("%u:%u")'
- * >> character_device_lookup_name("3:64");      // MKDEV(3, 64)
- * >> character_device_lookup_name("/dev/hdc1"); // MKDEV(22, 0) + 1
- * >> character_device_lookup_name("hda2");      // MKDEV(3, 0)  + 2
+ * >> chrdev_lookup_name("3:64");      // MKDEV(3, 64)
+ * >> chrdev_lookup_name("/dev/hdc1"); // MKDEV(22, 0) + 1
+ * >> chrdev_lookup_name("hda2");      // MKDEV(3, 0)  + 2
  * @return: NULL: No device matching `name' exists. */
-PUBLIC WUNUSED REF struct character_device *KCALL
-character_device_lookup_name(USER CHECKED char const *name)
+PUBLIC WUNUSED REF struct chrdev *KCALL
+chrdev_lookup_name(USER CHECKED char const *name)
 		THROWS(E_WOULDBLOCK, E_SEGFAULT) {
-	REF struct character_device *result = NULL;
+	REF struct chrdev *result = NULL;
 	u32 dev_major, dev_minor;
 	size_t name_len;
-	char name_buf[COMPILER_LENOF(((struct character_device *)0)->cd_name)];
+	char name_buf[COMPILER_LENOF(((struct chrdev *)0)->cd_name)];
 	if (sscanf(name, "%u:%u", &dev_major, &dev_minor) == 2)
-		return character_device_lookup(MKDEV(dev_major, dev_minor));
+		return chrdev_lookup(MKDEV(dev_major, dev_minor));
 	if (memcmp(name, "/dev/", 5 * sizeof(char)) == 0)
 		name += 5;
 	name_len = strnlen(name, COMPILER_LENOF(name_buf));
@@ -291,15 +291,15 @@ character_device_lookup_name(USER CHECKED char const *name)
 	memcpy(name_buf, name, name_len, sizeof(char));
 	name_buf[name_len] = '\0';
 	cdl_read();
-	if likely(character_device_tree)
-		result = cdev_tree_search_name(character_device_tree, name_buf);
+	if likely(chrdev_tree)
+		result = cdev_tree_search_name(chrdev_tree, name_buf);
 	cdl_endread();
 	return result;
 }
 
 
 PRIVATE NONNULL((1)) void KCALL
-character_device_add_to_devfs_impl(struct character_device *__restrict self) {
+character_device_add_to_devfs_impl(struct chrdev *__restrict self) {
 	/* Add the device's node to `/dev'
 	 * NOTE: If the file already exists, ignore that fact, as
 	 *      `devfs_insert()' will already set `self->cd_devfs_inode'
@@ -308,14 +308,14 @@ character_device_add_to_devfs_impl(struct character_device *__restrict self) {
 	if likely(!self->cd_devfs_inode) {
 		devfs_insert(self->cd_name,
 		             S_IFCHR,
-		             character_device_devno(self),
+		             chrdev_devno(self),
 		             &self->cd_devfs_inode, /* XXX: What about concurrent register() + unregister()? */
 		             &self->cd_devfs_entry);
 	}
 }
 
 PRIVATE NONNULL((1)) void KCALL
-character_device_add_to_devfs(struct character_device *__restrict self) {
+character_device_add_to_devfs(struct chrdev *__restrict self) {
 	if (!self->cd_name[0]) {
 		/* Auto-generate the name */
 		sprintf(self->cd_name,
@@ -333,7 +333,7 @@ character_device_add_to_devfs(struct character_device *__restrict self) {
  * @return: true:  Successfully unregistered the given.
  * @return: false: The device was never registered to begin with. */
 PUBLIC NONNULL((1)) bool KCALL
-character_device_unregister(struct character_device *__restrict self)
+chrdev_unregister(struct chrdev *__restrict self)
 		THROWS(E_WOULDBLOCK) {
 	bool result = false;
 	printk(KERN_INFO "[chr] Removing character-device `/dev/%s'\n", self->cd_name);
@@ -341,8 +341,8 @@ character_device_unregister(struct character_device *__restrict self)
 		cdl_write();
 		COMPILER_READ_BARRIER();
 		if likely(self->cd_devlink.a_vaddr != DEV_UNSET) {
-			struct character_device *pop_dev;
-			pop_dev = cdev_tree_remove(&character_device_tree,
+			struct chrdev *pop_dev;
+			pop_dev = cdev_tree_remove(&chrdev_tree,
 			                           self->cd_devlink.a_vaddr);
 			assert(pop_dev == self);
 			self->cd_devlink.a_vaddr = DEV_UNSET;
@@ -365,7 +365,7 @@ character_device_unregister(struct character_device *__restrict self)
  * NOTE: When empty, `cd_name' will be set to `"%.2x:%.2x" % (MAJOR(devno),MINOR(devno))'
  * NOTE: This function will also cause the device to appear in `/dev' (unless the device's name is already taken) */
 PUBLIC NONNULL((1)) void KCALL
-character_device_register(struct character_device *__restrict self, dev_t devno)
+chrdev_register(struct chrdev *__restrict self, dev_t devno)
 		THROWS(E_WOULDBLOCK, E_BADALLOC) {
 	//assert(self->cd_type.ct_driver);
 	cdl_write();
@@ -373,20 +373,20 @@ character_device_register(struct character_device *__restrict self, dev_t devno)
 	self->cd_devlink.a_vaddr = devno;
 	if (!(self->cd_flags & CHARACTER_DEVICE_FLAG_WEAKREG))
 		incref(self);
-	cdev_tree_insert(&character_device_tree, self);
+	cdev_tree_insert(&chrdev_tree, self);
 	cdl_endwrite();
 	TRY {
 		character_device_add_to_devfs(self);
 	} EXCEPT {
-		struct character_device *pop_dev;
+		struct chrdev *pop_dev;
 		cdl_write();
-		pop_dev = cdev_tree_remove(&character_device_tree, devno);
+		pop_dev = cdev_tree_remove(&chrdev_tree, devno);
 		if likely(pop_dev == self) {
 			cdl_endwrite();
 			self->cd_devlink.a_vaddr = DEV_UNSET;
 			decref_nokill(self); /* The caller still has a reference */
 		} else {
-			cdev_tree_insert(&character_device_tree, pop_dev);
+			cdev_tree_insert(&chrdev_tree, pop_dev);
 			cdl_endwrite();
 		}
 		RETHROW();
@@ -394,7 +394,7 @@ character_device_register(struct character_device *__restrict self, dev_t devno)
 }
 
 PRIVATE void KCALL
-pty_assign_name(struct character_device *__restrict self,
+pty_assign_name(struct chrdev *__restrict self,
                 char prefix, minor_t id) {
 	if (id >= PTY_DEVCNT) {
 		/* KOS Extension: Since we allocate '20' bits for minor device numbers,
@@ -436,12 +436,12 @@ pty_register(struct pty_master *__restrict master,
 	cdl_write();
 	/* Insert the new device into the character-device tree. */
 	used_minor = 0;
-	while (cdev_tree_locate(character_device_tree, MKDEV(MAJOR(PTY_MASTER(0)), used_minor)) ||
-	       cdev_tree_locate(character_device_tree, MKDEV(MAJOR(PTY_SLAVE(0)), used_minor))) {
+	while (cdev_tree_locate(chrdev_tree, MKDEV(MAJOR(PTY_MASTER(0)), used_minor)) ||
+	       cdev_tree_locate(chrdev_tree, MKDEV(MAJOR(PTY_SLAVE(0)), used_minor))) {
 		if unlikely(used_minor == (minor_t)-1) {
 			cdl_endwrite();
 			THROW(E_BADALLOC_INSUFFICIENT_DEVICE_NUMBERS,
-			      E_NO_DEVICE_KIND_CHARACTER_DEVICE);
+			      E_NO_DEVICE_KIND_CHRDEV);
 		}
 		++used_minor;
 	}
@@ -451,10 +451,10 @@ pty_register(struct pty_master *__restrict master,
 	pty_assign_name(slave, 't', used_minor);
 	if (!(master->cd_flags & CHARACTER_DEVICE_FLAG_WEAKREG))
 		incref(master);
-	cdev_tree_insert(&character_device_tree, master);
+	cdev_tree_insert(&chrdev_tree, master);
 	if (!(slave->cd_flags & CHARACTER_DEVICE_FLAG_WEAKREG))
 		incref(slave);
-	cdev_tree_insert(&character_device_tree, slave);
+	cdev_tree_insert(&chrdev_tree, slave);
 	cdl_endwrite();
 	TRY {
 		character_device_add_to_devfs_impl(master);
@@ -468,16 +468,16 @@ pty_register(struct pty_master *__restrict master,
 			RETHROW();
 		}
 	} EXCEPT {
-		struct character_device *pop_dev_a;
-		struct character_device *pop_dev_b;
+		struct chrdev *pop_dev_a;
+		struct chrdev *pop_dev_b;
 		cdl_write();
-		pop_dev_a = cdev_tree_remove(&character_device_tree, master->cd_devlink.a_vaddr);
-		pop_dev_b = cdev_tree_remove(&character_device_tree, slave->cd_devlink.a_vaddr);
+		pop_dev_a = cdev_tree_remove(&chrdev_tree, master->cd_devlink.a_vaddr);
+		pop_dev_b = cdev_tree_remove(&chrdev_tree, slave->cd_devlink.a_vaddr);
 		if unlikely(pop_dev_a != master) {
-			cdev_tree_insert(&character_device_tree, pop_dev_a);
+			cdev_tree_insert(&chrdev_tree, pop_dev_a);
 		}
 		if unlikely(pop_dev_b != slave) {
-			cdev_tree_insert(&character_device_tree, pop_dev_b);
+			cdev_tree_insert(&chrdev_tree, pop_dev_b);
 		}
 		cdl_endwrite();
 		if likely(pop_dev_a == master) {
@@ -500,7 +500,7 @@ pty_register(struct pty_master *__restrict master,
  *       `"%.2" PRIxN(__SIZEOF_MAJOR_T__) ":%.2" PRIxN(__SIZEOF_MINOR_T__) % (MAJOR(devno),MINOR(devno))'
  * NOTE: This function will also cause the device to appear in `/dev' (unless the device's name is already taken) */
 PUBLIC NONNULL((1)) void KCALL
-character_device_register_auto(struct character_device *__restrict self)
+chrdev_register_auto(struct chrdev *__restrict self)
 		THROWS(E_WOULDBLOCK, E_BADALLOC) {
 	dev_t devno;
 	cdl_write();
@@ -511,20 +511,20 @@ character_device_register_auto(struct character_device *__restrict self)
 	/* Insert the new device into the character-device tree. */
 	if (!(self->cd_flags & CHARACTER_DEVICE_FLAG_WEAKREG))
 		incref(self);
-	cdev_tree_insert(&character_device_tree, self);
+	cdev_tree_insert(&chrdev_tree, self);
 	cdl_endwrite();
 	TRY {
 		character_device_add_to_devfs(self);
 	} EXCEPT {
-		struct character_device *pop_dev;
+		struct chrdev *pop_dev;
 		cdl_write();
-		pop_dev = cdev_tree_remove(&character_device_tree, devno);
+		pop_dev = cdev_tree_remove(&chrdev_tree, devno);
 		if likely(pop_dev == self) {
 			self->cd_devlink.a_vaddr = DEV_UNSET;
 			cdl_endwrite();
 			decref_nokill(self); /* The caller still has a reference */
 		} else {
-			cdev_tree_insert(&character_device_tree, pop_dev);
+			cdev_tree_insert(&chrdev_tree, pop_dev);
 			cdl_endwrite();
 		}
 		RETHROW();
@@ -536,10 +536,10 @@ character_device_register_auto(struct character_device *__restrict self)
 
 
 
-DEFINE_HANDLE_REFCNT_FUNCTIONS(characterdevice, struct character_device);
+DEFINE_HANDLE_REFCNT_FUNCTIONS(chrdev, struct chrdev);
 
 INTERN size_t KCALL
-handle_characterdevice_read(struct character_device *__restrict self,
+handle_chrdev_read(struct chrdev *__restrict self,
                             USER CHECKED void *dst, size_t num_bytes,
                             iomode_t mode) {
 	if likely(self->cd_type.ct_read)
@@ -551,7 +551,7 @@ handle_characterdevice_read(struct character_device *__restrict self,
 }
 
 INTERN size_t KCALL
-handle_characterdevice_write(struct character_device *__restrict self,
+handle_chrdev_write(struct chrdev *__restrict self,
                              USER CHECKED void const *src, size_t num_bytes,
                              iomode_t mode) {
 	if likely(self->cd_type.ct_write)
@@ -563,7 +563,7 @@ handle_characterdevice_write(struct character_device *__restrict self,
 }
 
 INTERN size_t KCALL
-handle_characterdevice_pread(struct character_device *__restrict self,
+handle_chrdev_pread(struct chrdev *__restrict self,
                              USER CHECKED void *dst, size_t num_bytes,
                              pos_t addr, iomode_t mode) {
 	if likely(self->cd_type.ct_pread)
@@ -573,7 +573,7 @@ handle_characterdevice_pread(struct character_device *__restrict self,
 }
 
 INTERN size_t KCALL
-handle_characterdevice_pwrite(struct character_device *__restrict self,
+handle_chrdev_pwrite(struct chrdev *__restrict self,
                               USER CHECKED void const *src, size_t num_bytes,
                               pos_t addr, iomode_t mode) {
 	if likely(self->cd_type.ct_pwrite)
@@ -583,7 +583,7 @@ handle_characterdevice_pwrite(struct character_device *__restrict self,
 }
 
 INTERN size_t KCALL
-handle_characterdevice_readv(struct character_device *__restrict self,
+handle_chrdev_readv(struct chrdev *__restrict self,
                              struct iov_buffer *__restrict dst,
                              size_t num_bytes, iomode_t mode) {
 	struct iov_entry ent;
@@ -619,7 +619,7 @@ handle_characterdevice_readv(struct character_device *__restrict self,
 }
 
 INTERN size_t KCALL
-handle_characterdevice_writev(struct character_device *__restrict self,
+handle_chrdev_writev(struct chrdev *__restrict self,
                               struct iov_buffer *__restrict src,
                               size_t num_bytes, iomode_t mode) {
 	struct iov_entry ent;
@@ -655,7 +655,7 @@ handle_characterdevice_writev(struct character_device *__restrict self,
 }
 
 INTERN size_t KCALL
-handle_characterdevice_preadv(struct character_device *__restrict self,
+handle_chrdev_preadv(struct chrdev *__restrict self,
                               struct iov_buffer *__restrict dst,
                               size_t num_bytes, pos_t addr, iomode_t mode) {
 	struct iov_entry ent;
@@ -683,7 +683,7 @@ handle_characterdevice_preadv(struct character_device *__restrict self,
 }
 
 INTERN size_t KCALL
-handle_characterdevice_pwritev(struct character_device *__restrict self,
+handle_chrdev_pwritev(struct chrdev *__restrict self,
                                struct iov_buffer *__restrict src,
                                size_t num_bytes, pos_t addr, iomode_t mode) {
 	struct iov_entry ent;
@@ -711,7 +711,7 @@ handle_characterdevice_pwritev(struct character_device *__restrict self,
 }
 
 INTERN syscall_slong_t KCALL
-handle_characterdevice_ioctl(struct character_device *__restrict self, syscall_ulong_t cmd,
+handle_chrdev_ioctl(struct chrdev *__restrict self, syscall_ulong_t cmd,
                              USER UNCHECKED void *arg, iomode_t mode) {
 	if likely(self->cd_type.ct_ioctl)
 		return (*self->cd_type.ct_ioctl)(self, cmd, arg, mode);
@@ -721,7 +721,7 @@ handle_characterdevice_ioctl(struct character_device *__restrict self, syscall_u
 }
 
 INTERN NONNULL((1, 2)) void KCALL
-handle_characterdevice_mmap(struct character_device *__restrict self,
+handle_chrdev_mmap(struct chrdev *__restrict self,
                             struct handle_mmap_info *__restrict info)
 		THROWS(...) {
 	if unlikely(!self->cd_type.ct_mmap) {
@@ -743,13 +743,13 @@ handle_characterdevice_mmap(struct character_device *__restrict self,
 }
 
 INTERN void KCALL
-handle_characterdevice_sync(struct character_device *__restrict self) {
+handle_chrdev_sync(struct chrdev *__restrict self) {
 	if (self->cd_type.ct_sync)
 		(*self->cd_type.ct_sync)(self);
 }
 
 INTERN void KCALL
-handle_characterdevice_stat(struct character_device *__restrict self,
+handle_chrdev_stat(struct chrdev *__restrict self,
                             USER CHECKED struct stat *result) {
 	struct inode *node;
 	memset(result, 0, sizeof(*result));
@@ -757,14 +757,14 @@ handle_characterdevice_stat(struct character_device *__restrict self,
 	if (node)
 		inode_stat(node, result);
 	result->st_mode = (result->st_mode & ~S_IFMT) | S_IFCHR;
-	result->st_dev  = (__dev_t)character_device_devno(self);
-	result->st_rdev = (__dev_t)character_device_devno(self);
+	result->st_dev  = (__dev_t)chrdev_devno(self);
+	result->st_rdev = (__dev_t)chrdev_devno(self);
 	if (self->cd_type.ct_stat)
 		(*self->cd_type.ct_stat)(self, result);
 }
 
 INTERN void KCALL
-handle_characterdevice_pollconnect(struct character_device *__restrict self,
+handle_chrdev_pollconnect(struct chrdev *__restrict self,
                                    poll_mode_t what) {
 	assert((self->cd_type.ct_pollconnect != NULL) ==
 	       (self->cd_type.ct_polltest != NULL));
@@ -773,7 +773,7 @@ handle_characterdevice_pollconnect(struct character_device *__restrict self,
 }
 
 INTERN poll_mode_t KCALL
-handle_characterdevice_polltest(struct character_device *__restrict self,
+handle_chrdev_polltest(struct chrdev *__restrict self,
                                 poll_mode_t what) {
 	assert((self->cd_type.ct_pollconnect != NULL) ==
 	       (self->cd_type.ct_polltest != NULL));
@@ -783,7 +783,7 @@ handle_characterdevice_polltest(struct character_device *__restrict self,
 }
 
 INTERN syscall_slong_t KCALL
-handle_characterdevice_hop(struct character_device *__restrict self,
+handle_chrdev_hop(struct chrdev *__restrict self,
                            syscall_ulong_t cmd,
                            USER UNCHECKED void *arg,
                            iomode_t mode) {
@@ -805,7 +805,7 @@ handle_characterdevice_hop(struct character_device *__restrict self,
 }
 
 INTERN NONNULL((1)) REF void *KCALL
-handle_characterdevice_tryas(struct character_device *__restrict self,
+handle_chrdev_tryas(struct chrdev *__restrict self,
                              uintptr_half_t wanted_type)
 		THROWS(E_WOULDBLOCK) {
 	switch (wanted_type) {
@@ -831,31 +831,31 @@ handle_characterdevice_tryas(struct character_device *__restrict self,
 
 
 
-DEFINE_PUBLIC_ALIAS(character_device_read, handle_characterdevice_read);
-DEFINE_PUBLIC_ALIAS(character_device_write, handle_characterdevice_write);
-DEFINE_PUBLIC_ALIAS(character_device_pread, handle_characterdevice_pread);
-DEFINE_PUBLIC_ALIAS(character_device_pwrite, handle_characterdevice_pwrite);
-DEFINE_PUBLIC_ALIAS(character_device_ioctl, handle_characterdevice_ioctl);
-DEFINE_PUBLIC_ALIAS(character_device_mmap, handle_characterdevice_mmap);
-DEFINE_PUBLIC_ALIAS(character_device_sync, handle_characterdevice_sync);
-DEFINE_PUBLIC_ALIAS(character_device_stat, handle_characterdevice_stat);
-DEFINE_PUBLIC_ALIAS(character_device_pollconnect, handle_characterdevice_pollconnect);
-DEFINE_PUBLIC_ALIAS(character_device_polltest, handle_characterdevice_polltest);
+DEFINE_PUBLIC_ALIAS(chrdev_read, handle_chrdev_read);
+DEFINE_PUBLIC_ALIAS(chrdev_write, handle_chrdev_write);
+DEFINE_PUBLIC_ALIAS(chrdev_pread, handle_chrdev_pread);
+DEFINE_PUBLIC_ALIAS(chrdev_pwrite, handle_chrdev_pwrite);
+DEFINE_PUBLIC_ALIAS(chrdev_ioctl, handle_chrdev_ioctl);
+DEFINE_PUBLIC_ALIAS(chrdev_mmap, handle_chrdev_mmap);
+DEFINE_PUBLIC_ALIAS(chrdev_sync, handle_chrdev_sync);
+DEFINE_PUBLIC_ALIAS(chrdev_stat, handle_chrdev_stat);
+DEFINE_PUBLIC_ALIAS(chrdev_pollconnect, handle_chrdev_pollconnect);
+DEFINE_PUBLIC_ALIAS(chrdev_polltest, handle_chrdev_polltest);
 
 
 #ifdef CONFIG_HAVE_DEBUGGER
 PRIVATE ATTR_DBGTEXT void KCALL
-do_dump_character_device(struct character_device *__restrict self,
+do_dump_character_device(struct chrdev *__restrict self,
                          size_t max_device_namelen,
                          size_t max_driver_namelen) {
 	char const *kind;
-	if (character_device_isattybase(self))
+	if (chrdev_isttybase(self))
 		kind = ttybase_isapty((struct ttybase_device *)self)
 		       ? DBGSTR("pty")
 		       : DBGSTR("tty");
-	else if (character_device_isakeyboard(self))
+	else if (chrdev_iskeyboard(self))
 		kind = DBGSTR("keyboard");
-	else if (character_device_isamouse(self))
+	else if (chrdev_ismouse(self))
 		kind = DBGSTR("mouse");
 	else {
 		kind = DBGSTR("other");
@@ -865,8 +865,8 @@ do_dump_character_device(struct character_device *__restrict self,
 	                  "%-3.2" PRIxN(__SIZEOF_MINOR_T__) "  "
 	                  "%*-s  %-8s  "),
 	           (unsigned int)max_device_namelen, self->cd_name,
-	           (unsigned int)MAJOR(character_device_devno(self)),
-	           (unsigned int)MINOR(character_device_devno(self)),
+	           (unsigned int)MAJOR(chrdev_devno(self)),
+	           (unsigned int)MINOR(chrdev_devno(self)),
 	           (unsigned int)max_driver_namelen,
 	           self->cd_type.ct_driver ? self->cd_type.ct_driver->d_name
 	                                   : DBGSTR("?"),
@@ -884,7 +884,7 @@ do_dump_character_device(struct character_device *__restrict self,
 }
 
 PRIVATE ATTR_DBGTEXT void KCALL
-dump_character_device(struct character_device *__restrict self,
+dump_character_device(struct chrdev *__restrict self,
                       size_t max_device_namelen,
                       size_t max_driver_namelen) {
 again:
@@ -907,7 +907,7 @@ again:
 }
 
 PRIVATE ATTR_DBGTEXT void KCALL
-gather_longest_name_lengths(struct character_device *__restrict self,
+gather_longest_name_lengths(struct chrdev *__restrict self,
                             size_t *__restrict pmax_device_namelen,
                             size_t *__restrict pmax_driver_namelen) {
 	size_t namelen;
@@ -950,8 +950,8 @@ DBG_COMMAND(lschr,
             "\t\t" AC_WHITE("p") ": Supports " AC_WHITE("poll") "\n") {
 	size_t longest_device_name = COMPILER_STRLEN("name");
 	size_t longest_driver_name = COMPILER_STRLEN("driver");
-	if (character_device_tree) {
-		gather_longest_name_lengths(character_device_tree,
+	if (chrdev_tree) {
+		gather_longest_name_lengths(chrdev_tree,
 		                            &longest_device_name,
 		                            &longest_driver_name);
 	}
@@ -962,8 +962,8 @@ DBG_COMMAND(lschr,
 	if (longest_driver_name > COMPILER_STRLEN("driver"))
 		format_repeat(&dbg_printer, NULL, ' ', longest_driver_name - COMPILER_STRLEN("driver"));
 	dbg_print(DBGSTR("  kind      features\n"));
-	if (character_device_tree) {
-		dump_character_device(character_device_tree,
+	if (chrdev_tree) {
+		dump_character_device(chrdev_tree,
 		                      longest_device_name,
 		                      longest_driver_name);
 	}

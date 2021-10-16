@@ -1367,7 +1367,7 @@ strange_device:
  * a registration, other than physically removing the associated device.
  */
 PUBLIC void KCALL
-usb_register_block_device(struct usb_device *__restrict usb_dev,
+usb_register_blkdev(struct usb_device *__restrict usb_dev,
                           struct block_device *__restrict dev)
 		THROWS(E_WOULDBLOCK, E_BADALLOC) {
 	/* TODO */
@@ -1376,8 +1376,8 @@ usb_register_block_device(struct usb_device *__restrict usb_dev,
 }
 
 PUBLIC void KCALL
-usb_register_character_device(struct usb_device *__restrict usb_dev,
-                              struct character_device *__restrict dev)
+usb_register_chrdev(struct usb_device *__restrict usb_dev,
+                              struct chrdev *__restrict dev)
 		THROWS(E_WOULDBLOCK, E_BADALLOC) {
 	/* TODO */
 	(void)usb_dev;

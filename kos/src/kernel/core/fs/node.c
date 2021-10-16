@@ -4147,7 +4147,7 @@ superblock_statfs(struct superblock *__restrict self,
 		dev = self->s_device;
 		if (dev->bd_flags & BLOCK_DEVICE_FLAG_READONLY)
 			fsflags |= ST_RDONLY;
-		else if (block_device_ispartition(dev)) {
+		else if (blkdev_ispart(dev)) {
 			dev = ((struct block_device_partition *)dev)->bp_master;
 			if (dev->bd_flags & BLOCK_DEVICE_FLAG_READONLY)
 				fsflags |= ST_RDONLY;

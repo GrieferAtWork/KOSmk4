@@ -63,10 +63,9 @@ fdevnode_v_open(struct mfile *__restrict self,
 
 	/* Handle with lookup failures */
 	if unlikely(!node) {
-		THROW(E_NO_DEVICE,
-		      (me->fn_mode & S_IFMT) == S_IFCHR ? E_NO_DEVICE_KIND_BLOCK_DEVICE
-		                                        : E_NO_DEVICE_KIND_CHARACTER_DEVICE,
-		      me->dn_devno);
+		STATIC_ASSERT(E_NO_DEVICE_KIND_BLKDEV == S_IFBLK);
+		STATIC_ASSERT(E_NO_DEVICE_KIND_CHRDEV == S_IFCHR);
+		THROW(E_NO_DEVICE, me->fn_mode & S_IFMT, me->dn_devno);
 	}
 
 	/* Fill in the reference to the *true* file being opened. */

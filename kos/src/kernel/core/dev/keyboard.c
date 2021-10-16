@@ -623,10 +623,10 @@ NOTHROW(KCALL keyboard_device_do_translate)(struct keyboard_device *__restrict s
 done:
 		atty = NULL;
 		tty  = awref_get(&self->kd_tty);
-		if (tty && tty->t_ohandle_typ == HANDLE_TYPE_CHARACTERDEVICE) {
+		if (tty && tty->t_ohandle_typ == HANDLE_TYPE_CHRDEV) {
 			struct ansitty_device *ttydev;
 			ttydev = (struct ansitty_device *)tty->t_ohandle_ptr;
-			if (character_device_isanansitty(ttydev))
+			if (chrdev_isansitty(ttydev))
 				atty = &ttydev->at_ansi;
 		}
 		/* Encode a misc. key using the currently active ANSI tty settings. */
@@ -653,10 +653,10 @@ NOTHROW(KCALL keyboard_device_encode_cp)(struct keyboard_device *__restrict self
 	tty = awref_get(&self->kd_tty);
 	if (!tty)
 		goto done;
-	if (tty->t_ohandle_typ != HANDLE_TYPE_CHARACTERDEVICE)
+	if (tty->t_ohandle_typ != HANDLE_TYPE_CHRDEV)
 		goto done_tty;
 	atty = (struct ansitty_device *)tty->t_ohandle_ptr;
-	if (!character_device_isanansitty(atty))
+	if (!chrdev_isansitty(atty))
 		goto done_tty;
 	/* When  the TTY uses CP#0 (UTF-8), then  we don't actually need to re-encode
 	 * the input text sequence, since both input and output would use pure UTF-8.
@@ -869,7 +869,7 @@ done:
 
 /* Keyboard character device operators */
 PUBLIC NONNULL((1)) size_t KCALL
-keyboard_device_read(struct character_device *__restrict self,
+keyboard_device_read(struct chrdev *__restrict self,
                      USER CHECKED void *dst, size_t num_bytes,
                      iomode_t mode) THROWS(...) {
 	struct keyboard_device *me;
@@ -908,7 +908,7 @@ do_append_ch:
 }
 
 PUBLIC NONNULL((1)) void KCALL
-keyboard_device_stat(struct character_device *__restrict self,
+keyboard_device_stat(struct chrdev *__restrict self,
                      USER CHECKED struct stat *result) THROWS(...) {
 	struct keyboard_device *me;
 	size_t bufsize;
@@ -930,7 +930,7 @@ keyboard_device_canread(struct keyboard_device *__restrict self) {
 }
 
 PUBLIC NONNULL((1)) void KCALL
-keyboard_device_pollconnect(struct character_device *__restrict self,
+keyboard_device_pollconnect(struct chrdev *__restrict self,
                             poll_mode_t what) THROWS(...) {
 	struct keyboard_device *me;
 	me = (struct keyboard_device *)self;
@@ -939,7 +939,7 @@ keyboard_device_pollconnect(struct character_device *__restrict self,
 }
 
 PUBLIC NONNULL((1)) poll_mode_t KCALL
-keyboard_device_polltest(struct character_device *__restrict self,
+keyboard_device_polltest(struct chrdev *__restrict self,
                          poll_mode_t what) THROWS(...) {
 	struct keyboard_device *me;
 	me = (struct keyboard_device *)self;
@@ -997,7 +997,7 @@ linux_keyboard_setmeta(struct keyboard_device *__restrict self,
 
 
 PUBLIC NONNULL((1)) syscall_slong_t KCALL
-keyboard_device_ioctl(struct character_device *__restrict self,
+keyboard_device_ioctl(struct chrdev *__restrict self,
                       syscall_ulong_t cmd, USER UNCHECKED void *arg,
                       iomode_t mode) THROWS(...) {
 	struct keyboard_device *me;
@@ -1462,7 +1462,7 @@ NOTHROW(KCALL keyboard_device_init)(struct keyboard_device *__restrict self,
                                     struct keyboard_device_ops const *__restrict ops) {
 	memcpy(&self->kd_ops, ops, sizeof(struct keyboard_device_ops));
 	assert(self->cd_type.ct_driver != NULL);
-	self->cd_type.ct_fini        = (void(KCALL *)(struct character_device *__restrict))&keyboard_device_fini;
+	self->cd_type.ct_fini        = (void(KCALL *)(struct chrdev *__restrict))&keyboard_device_fini;
 	self->cd_type.ct_read        = &keyboard_device_read;
 	self->cd_type.ct_ioctl       = &keyboard_device_ioctl;
 	self->cd_type.ct_stat        = &keyboard_device_stat;

@@ -1431,9 +1431,9 @@ DEFINE_SYSCALL5(errno_t, mount,
 			if unlikely(!S_ISBLK(source_node->i_filemode))
 				THROW(E_FSERROR_NOT_A_BLOCK_DEVICE);
 			inode_loadattr(source_node);
-			source_dev = block_device_lookup(source_node->i_filerdev);
+			source_dev = blkdev_lookup(source_node->i_filerdev);
 			if unlikely(!source_dev)
-				THROW(E_NO_DEVICE, E_NO_DEVICE_KIND_BLOCK_DEVICE, source_node->i_filerdev);
+				THROW(E_NO_DEVICE, E_NO_DEVICE_KIND_BLKDEV, source_node->i_filerdev);
 			super = superblock_open(type,
 			                        source_dev,
 			                        super_flags,
@@ -2264,14 +2264,14 @@ DEFINE_SYSCALL4(ssize_t, frealpath4,
 	TRY {
 		switch (hnd.h_type) {
 
-		case HANDLE_TYPE_CHARACTERDEVICE:
+		case HANDLE_TYPE_CHRDEV:
 		case HANDLE_TYPE_BLKDEV: {
 			/* Figure out where (if at all) devfs is mounted. */
 			REF struct path *mount;
 			char const *devname;
-			if (hnd.h_type == HANDLE_TYPE_CHARACTERDEVICE) {
-				struct character_device *me;
-				me      = (struct character_device *)hnd.h_data;
+			if (hnd.h_type == HANDLE_TYPE_CHRDEV) {
+				struct chrdev *me;
+				me      = (struct chrdev *)hnd.h_data;
 				devname = me->cd_name;
 			} else {
 				struct block_device *me;

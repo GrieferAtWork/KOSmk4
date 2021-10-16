@@ -135,7 +135,7 @@ typedef struct {
 #define ATA_BUS_STATE_ONEPIO   0x0010 /* A single want-pio ticket. */
 
 
-struct ata_bus_struct: character_device {
+struct ata_bus_struct: chrdev {
 	WEAK uintptr_t          ab_state;       /* [lock(ATOMIC)] ATA bus state. (one of `ATA_BUS_STATE_*') */
 	WEAK struct aio_handle *ab_aio_pending; /* [0..1][lock(ATOMIC)] Chain of scheduled AIO operations. */
 	WEAK struct aio_handle *ab_aio_current; /* [0..1][clear(ON_CANCEL)] The current AIO operation. */

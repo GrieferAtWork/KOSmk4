@@ -67,19 +67,19 @@ tty_device_oprinter(struct terminal *__restrict term,
 
 
 PRIVATE NOBLOCK NONNULL((1)) void
-NOTHROW(KCALL tty_device_fini)(struct character_device *__restrict self) {
+NOTHROW(KCALL tty_device_fini)(struct chrdev *__restrict self) {
 	struct tty_device *me;
 	me = (struct tty_device *)self;
 	/* Stop the associated forwarding thread (if one is running) */
 	tty_device_stopfwd(me);
-	if (me->t_ihandle_typ == HANDLE_TYPE_CHARACTERDEVICE &&
-	    character_device_isakeyboard((struct character_device *)me->t_ihandle_ptr)) {
+	if (me->t_ihandle_typ == HANDLE_TYPE_CHRDEV &&
+	    chrdev_iskeyboard((struct chrdev *)me->t_ihandle_ptr)) {
 		struct keyboard_device *idev;
 		idev = (struct keyboard_device *)me->t_ihandle_ptr;
 		awref_cmpxch(&idev->kd_tty, me, NULL);
 	}
-	if (me->t_ohandle_typ == HANDLE_TYPE_CHARACTERDEVICE &&
-	    character_device_isanansitty((struct character_device *)me->t_ohandle_ptr)) {
+	if (me->t_ohandle_typ == HANDLE_TYPE_CHRDEV &&
+	    chrdev_isansitty((struct chrdev *)me->t_ohandle_ptr)) {
 		struct ansitty_device *odev;
 		odev = (struct ansitty_device *)me->t_ohandle_ptr;
 		/* Try to unbind this TTY from an ansi tty output device. */
@@ -94,7 +94,7 @@ NOTHROW(KCALL tty_device_fini)(struct character_device *__restrict self) {
 
 
 PUBLIC NONNULL((1)) void KCALL
-tty_device_pollconnect(struct character_device *__restrict self, poll_mode_t what) THROWS(...) {
+tty_device_pollconnect(struct chrdev *__restrict self, poll_mode_t what) THROWS(...) {
 	struct tty_device *me;
 	me = (struct tty_device *)self;
 	if (what & POLLINMASK) {
@@ -111,7 +111,7 @@ tty_device_pollconnect(struct character_device *__restrict self, poll_mode_t wha
 }
 
 PUBLIC NONNULL((1)) poll_mode_t KCALL
-tty_device_polltest(struct character_device *__restrict self, poll_mode_t what) THROWS(...) {
+tty_device_polltest(struct chrdev *__restrict self, poll_mode_t what) THROWS(...) {
 	poll_mode_t result = 0;
 	struct tty_device *me;
 	me = (struct tty_device *)self;
@@ -217,7 +217,7 @@ NOTHROW(KCALL tty_device_stopfwd)(struct tty_device *__restrict self) {
 
 
 PRIVATE NONNULL((1)) syscall_slong_t KCALL
-tty_device_ioctl(struct character_device *__restrict self, syscall_ulong_t cmd,
+tty_device_ioctl(struct chrdev *__restrict self, syscall_ulong_t cmd,
                  USER UNCHECKED void *arg, iomode_t mode) THROWS(...) {
 	struct tty_device *me;
 	me = (struct tty_device *)self;
@@ -301,7 +301,7 @@ predict_output_device_command:
 
 
 PRIVATE NONNULL((1, 2)) void KCALL
-tty_device_mmap(struct character_device *__restrict self,
+tty_device_mmap(struct chrdev *__restrict self,
                 struct handle_mmap_info *__restrict info)
 		THROWS(...) {
 	struct tty_device *me;
@@ -318,15 +318,15 @@ tty_device_mmap(struct character_device *__restrict self,
  * handles, such that character-based keyboard input is taken from `ihandle_ptr',
  * and   ansi-compliant   display    output   is    written   to    `ohandle_ptr'
  * For   this   purpose,  special   handling   is  done   for   certain  handles:
- *   - ohandle_typ  ==   HANDLE_TYPE_CHARACTERDEVICE   &&   character_device_isanansitty(ohandle_ptr):
+ *   - ohandle_typ  ==   HANDLE_TYPE_CHRDEV   &&   chrdev_isansitty(ohandle_ptr):
  *     `((struct ansitty_device *)ohandle_ptr)->at_tty' will be bound to the newly created tty  device
  *     (s.a.. `return'), such that its output gets injected as `terminal_iwrite(&return->t_term, ...)'
  *     When the returned tty device is destroyed, this link gets severed automatically.
  * Upon success, the caller should:
  *   - Initialize `return->cd_name'
  *   - Register the device using one of:
- *      - `character_device_register(return, ...)'
- *      - `character_device_register_auto(return)' */
+ *      - `chrdev_register(return, ...)'
+ *      - `chrdev_register_auto(return)' */
 PUBLIC ATTR_RETNONNULL REF struct tty_device *KCALL
 tty_device_alloc(uintptr_half_t ihandle_typ, void *ihandle_ptr,
                  uintptr_half_t ohandle_typ, void *ohandle_ptr)
@@ -338,7 +338,7 @@ tty_device_alloc(uintptr_half_t ihandle_typ, void *ihandle_ptr,
 	REF struct tty_device *result;
 	assert(ihandle_typ < HANDLE_TYPE_COUNT);
 	assert(ohandle_typ < HANDLE_TYPE_COUNT);
-	result = CHARACTER_DEVICE_ALLOC(struct tty_device);
+	result = CHRDEV_ALLOC(struct tty_device);
 	ttybase_device_cinit(result, &tty_device_oprinter);
 	result->cd_type.ct_fini        = &tty_device_fini;
 	result->cd_type.ct_write       = &ttybase_device_owrite;
@@ -355,9 +355,9 @@ tty_device_alloc(uintptr_half_t ihandle_typ, void *ihandle_ptr,
 	result->t_ihandle_polltest     = handle_type_db.h_polltest[ihandle_typ];
 	result->t_ohandle_write        = handle_type_db.h_write[ohandle_typ];
 	/* Optimization to by-pass handle operators for known character devices. */
-	if (ihandle_typ == HANDLE_TYPE_CHARACTERDEVICE) {
-		struct character_device *cdev;
-		cdev = (struct character_device *)ihandle_ptr;
+	if (ihandle_typ == HANDLE_TYPE_CHRDEV) {
+		struct chrdev *cdev;
+		cdev = (struct chrdev *)ihandle_ptr;
 		if (cdev->cd_type.ct_read)
 			result->t_ihandle_read = (phandle_read_function_t)cdev->cd_type.ct_read;
 		assert((cdev->cd_type.ct_pollconnect != NULL) ==
@@ -367,9 +367,9 @@ tty_device_alloc(uintptr_half_t ihandle_typ, void *ihandle_ptr,
 			result->t_ihandle_polltest    = (phandle_polltest_function_t)cdev->cd_type.ct_polltest;
 		}
 	}
-	if (ohandle_typ == HANDLE_TYPE_CHARACTERDEVICE) {
-		struct character_device *cdev;
-		cdev = (struct character_device *)ohandle_ptr;
+	if (ohandle_typ == HANDLE_TYPE_CHRDEV) {
+		struct chrdev *cdev;
+		cdev = (struct chrdev *)ohandle_ptr;
 		if (cdev->cd_type.ct_write)
 			result->t_ohandle_write = (phandle_write_function_t)cdev->cd_type.ct_write;
 	}
@@ -379,8 +379,8 @@ tty_device_alloc(uintptr_half_t ihandle_typ, void *ihandle_ptr,
 	COMPILER_BARRIER();
 	/* Special case: Always   read   characters  from   a  connected
 	 *               keyboard device, rather than reading key codes. */
-	if (ihandle_typ == HANDLE_TYPE_CHARACTERDEVICE &&
-	    character_device_isakeyboard((struct character_device *)ihandle_ptr)) {
+	if (ihandle_typ == HANDLE_TYPE_CHRDEV &&
+	    chrdev_iskeyboard((struct chrdev *)ihandle_ptr)) {
 		struct keyboard_device *idev;
 		idev = (struct keyboard_device *)ihandle_ptr;
 		COMPILER_BARRIER();
@@ -388,15 +388,15 @@ tty_device_alloc(uintptr_half_t ihandle_typ, void *ihandle_ptr,
 		 * that ansitty within the keyboard,  such that the keyboard can  call
 		 * into `ansitty_translate()' for the encoding of keyboard input  into
 		 * a CP-specific, encoded byte sequence! */
-		if (ohandle_typ == HANDLE_TYPE_CHARACTERDEVICE &&
-		    character_device_isanansitty((struct character_device *)ohandle_ptr))
+		if (ohandle_typ == HANDLE_TYPE_CHRDEV &&
+		    chrdev_isansitty((struct chrdev *)ohandle_ptr))
 			awref_cmpxch(&idev->kd_tty, NULL, result);
 	}
 	/* Try to bind  the new  TTY device to  an ANSI  TTY output  device.
 	 * Note  that a single  output device may  have multiple TTY drivers
 	 * associated with it, as is the case for the CTRL+ALT+F{1-12} TTYs. */
-	if (ohandle_typ == HANDLE_TYPE_CHARACTERDEVICE &&
-	    character_device_isanansitty((struct character_device *)ohandle_ptr)) {
+	if (ohandle_typ == HANDLE_TYPE_CHRDEV &&
+	    chrdev_isansitty((struct chrdev *)ohandle_ptr)) {
 		struct ansitty_device *odev;
 		odev = (struct ansitty_device *)ohandle_ptr;
 		awref_cmpxch(&odev->at_tty, NULL, result);
@@ -427,11 +427,11 @@ DEFINE_SYSCALL4(fd_t, mktty,
 		      reserved);
 	}
 	namelen = strlen(name);
-	if unlikely(namelen >= COMPILER_LENOF(((struct character_device *)0)->cd_name)) {
+	if unlikely(namelen >= COMPILER_LENOF(((struct chrdev *)0)->cd_name)) {
 		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
 		      E_INVALID_ARGUMENT_CONTEXT_MKTTY_NAME,
 		      namelen,
-		      COMPILER_LENOF(((struct character_device *)0)->cd_name));
+		      COMPILER_LENOF(((struct chrdev *)0)->cd_name));
 	}
 	hkeyboard = handle_lookup((unsigned int)keyboard);
 	TRY {
@@ -460,18 +460,18 @@ DEFINE_SYSCALL4(fd_t, mktty,
 				memcpy(tty->cd_name, name, namelen, sizeof(char));
 				assert(tty->cd_name[namelen] == '\0');
 				/* Register the device, and add it to the devfs. */
-				character_device_register_auto(tty);
+				chrdev_register_auto(tty);
 				TRY {
 					struct handle htty;
 					/* Start forwarding input data. */
 					tty_device_startfwd(tty);
 					/* Store the new TTY into a handle. */
-					htty.h_type = HANDLE_TYPE_CHARACTERDEVICE;
+					htty.h_type = HANDLE_TYPE_CHRDEV;
 					htty.h_mode = IO_RDWR;
 					htty.h_data = tty;
 					result = handle_install(THIS_HANDLE_MANAGER, htty);
 				} EXCEPT {
-					character_device_unregister(tty);
+					chrdev_unregister(tty);
 					RETHROW();
 				}
 			} EXCEPT {

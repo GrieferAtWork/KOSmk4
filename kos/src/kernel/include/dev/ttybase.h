@@ -47,11 +47,11 @@ AWREF(taskpid_awref, taskpid);
 
 struct ttybase_device
 #ifdef __cplusplus
-    : character_device
+    : chrdev
 #endif /* __cplusplus */
 {
 #ifndef __cplusplus
-	struct character_device t_cdev;  /* The underling character-device */
+	struct chrdev t_cdev;  /* The underling character-device */
 #endif /* !__cplusplus */
 	struct terminal         t_term;  /* The associated terminal driver controller. */
 	struct taskpid_awref    t_cproc; /* [0..1] Controlling terminal support.
@@ -72,7 +72,7 @@ FUNDEF ssize_t LIBTERM_CC kernel_terminal_raise(struct terminal *__restrict self
 FUNDEF void KCALL kernel_terminal_check_sigttin(struct terminal *__restrict self);
 
 /* Check if a given character device is actually a ttybase */
-#define character_device_isattybase(self)                                                         \
+#define chrdev_isttybase(self)                                                         \
 	((self)->cd_heapsize >= sizeof(struct ttybase_device) &&                                      \
 	 ((struct ttybase_device *)(self))->t_term.t_chk_sigttou == &kernel_terminal_check_sigttou && \
 	 ((struct ttybase_device *)(self))->t_term.t_raise == &kernel_terminal_raise)
@@ -97,14 +97,14 @@ struct stat;
  * These functions will call forward to `terminal_iread()' and `terminal_owrite()'
  * NOTE: The implementation of these functions assumes that the oprinter associated
  *       with the terminal never returns negative values! */
-FUNDEF NONNULL((1)) size_t KCALL ttybase_device_iread(struct character_device *__restrict self, USER CHECKED void *dst, size_t num_bytes, iomode_t mode) THROWS(...);
-FUNDEF NONNULL((1)) size_t KCALL ttybase_device_owrite(struct character_device *__restrict self, USER CHECKED void const *src, size_t num_bytes, iomode_t mode) THROWS(...);
-FUNDEF NONNULL((1)) syscall_slong_t KCALL ttybase_device_ioctl(struct character_device *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
+FUNDEF NONNULL((1)) size_t KCALL ttybase_device_iread(struct chrdev *__restrict self, USER CHECKED void *dst, size_t num_bytes, iomode_t mode) THROWS(...);
+FUNDEF NONNULL((1)) size_t KCALL ttybase_device_owrite(struct chrdev *__restrict self, USER CHECKED void const *src, size_t num_bytes, iomode_t mode) THROWS(...);
+FUNDEF NONNULL((1)) syscall_slong_t KCALL ttybase_device_ioctl(struct chrdev *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
 /* @return: -EINVAL: Unsupported `cmd' */
-FUNDEF NONNULL((1)) syscall_slong_t KCALL ttybase_device_tryioctl(struct character_device *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
-FUNDEF NONNULL((1)) void KCALL ttybase_device_pollconnect(struct character_device *__restrict self, poll_mode_t what) THROWS(...);
-FUNDEF NONNULL((1)) poll_mode_t KCALL ttybase_device_polltest(struct character_device *__restrict self, poll_mode_t what) THROWS(...);
-FUNDEF NONNULL((1)) void KCALL ttybase_device_stat(struct character_device *__restrict self, USER CHECKED struct stat *result) THROWS(...);
+FUNDEF NONNULL((1)) syscall_slong_t KCALL ttybase_device_tryioctl(struct chrdev *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
+FUNDEF NONNULL((1)) void KCALL ttybase_device_pollconnect(struct chrdev *__restrict self, poll_mode_t what) THROWS(...);
+FUNDEF NONNULL((1)) poll_mode_t KCALL ttybase_device_polltest(struct chrdev *__restrict self, poll_mode_t what) THROWS(...);
+FUNDEF NONNULL((1)) void KCALL ttybase_device_stat(struct chrdev *__restrict self, USER CHECKED struct stat *result) THROWS(...);
 
 
 /* [IMPL(TIOCSCTTY)] Set the given tty device as the controlling terminal of the calling session.
@@ -142,7 +142,7 @@ NOTHROW(KCALL ttybase_device_hupctty)(struct ttybase_device *required_old_ctty D
  *       or  in other words: You must call this from a function which you must then
  *       assign to `self->cd_type.ct_fini'! */
 FUNDEF NOBLOCK NONNULL((1)) void
-NOTHROW(KCALL ttybase_device_fini)(struct character_device *__restrict self);
+NOTHROW(KCALL ttybase_device_fini)(struct chrdev *__restrict self);
 
 /* Returns a reference to the controlling- or foreground process's
  * PID descriptor, or NULL if the specified field hasn't been set. */

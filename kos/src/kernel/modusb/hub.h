@@ -29,11 +29,11 @@ DECL_BEGIN
 
 struct usb_hub_device
 #ifdef __cplusplus
-	: character_device
+	: chrdev
 #endif /* __cplusplus */
 {
 #ifndef __cplusplus
-	struct character_device    uh_dev;          /* The underlying character device. */
+	struct chrdev    uh_dev;          /* The underlying character device. */
 #endif /* !__cplusplus */
 	REF struct usb_controller *uh_ctrl;         /* [1..1][const] The associated USB controller. */
 	REF struct usb_interface  *uh_intf;         /* [1..1][const] The interface of the HUB */

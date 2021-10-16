@@ -1248,7 +1248,7 @@ PRIVATE struct nic_device_ops const Ne2k_NICDeviceOps = {
 };
 
 PRIVATE NOBLOCK NONNULL((1)) void
-NOTHROW(KCALL Ne2k_Fini)(struct character_device *__restrict self) {
+NOTHROW(KCALL Ne2k_Fini)(struct chrdev *__restrict self) {
 	Ne2kDevice *me;
 	me = (Ne2kDevice *)self;
 	hisr_unregister(&Ne2k_InterruptHandler, me);
@@ -1311,7 +1311,7 @@ Ne2k_ProbePciDevice(struct pci_device *__restrict dev) THROWS(...) {
 	NE2K_DEBUG("[ne2k] PROM:\n%$[hex]\n", sizeof(prom), prom);
 
 	/* Construct the device. */
-	self = CHARACTER_DEVICE_ALLOC(Ne2kDevice);
+	self = CHRDEV_ALLOC(Ne2kDevice);
 	FINALLY_DECREF_UNLIKELY(self);
 	nic_device_cinit(self, &Ne2k_NICDeviceOps);
 	sig_cinit(&self->nk_stidle);
@@ -1364,7 +1364,7 @@ Ne2k_ProbePciDevice(struct pci_device *__restrict dev) THROWS(...) {
 		sprintf(self->cd_name, "ne2k%u", n++);
 	}
 
-	character_device_register_auto(self);
+	chrdev_register_auto(self);
 
 	/* XXX: Collect a list of devices, then use some kind of config
 	 *      to determine which one should  be used as the  default! */

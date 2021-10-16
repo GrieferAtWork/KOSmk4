@@ -298,10 +298,10 @@ struct ksysctl_driver_set_library_path /*[PREFIX(slp_)]*/ {
 #define KSYSCTL_DRIVER_SET_LIBRARY_PATH        0x000d0006 /* [struct ksysctl_driver_set_library_path *data] Set the kernel driver library path.
                                                            * @return: 0 :      Successfully set the new driver library path.
                                                            * @return: -EPERM: `glp_oldpath' was given, but the currently set path was different */
-/* TODO: Wrapper for `block_device_lookup' */
-/* TODO: Wrapper for `block_device_lookup_name' */
-/* TODO: Wrapper for `character_device_lookup' */
-/* TODO: Wrapper for `character_device_lookup_name' */
+/* TODO: Wrapper for `blkdev_lookup' */
+/* TODO: Wrapper for `blkdev_lookup_name' */
+/* TODO: Wrapper for `chrdev_lookup' */
+/* TODO: Wrapper for `chrdev_lookup_name' */
 
 #define KSYSCTL_OPEN_KERNEL_VFS                0xfffe0001 /* [struct hop_openfd *result] Open a handle `HANDLE_TYPE_PATH' to `vfs_kernel'
                                                            * @return: == result->of_hint */

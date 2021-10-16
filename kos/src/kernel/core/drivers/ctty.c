@@ -48,107 +48,107 @@ getctty(void) THROWS(E_WOULDBLOCK, E_NO_CTTY) {
 
 
 PRIVATE NONNULL((1)) size_t KCALL
-ctty_read(struct character_device *__restrict UNUSED(self),
+ctty_read(struct chrdev *__restrict UNUSED(self),
           USER CHECKED void *dst, size_t num_bytes,
           iomode_t mode) THROWS(...) {
 	size_t result;
 	REF struct ttybase_device *ctty = getctty();
 	FINALLY_DECREF_UNLIKELY(ctty);
-	result = character_device_read(ctty, dst, num_bytes, mode);
+	result = chrdev_read(ctty, dst, num_bytes, mode);
 	return result;
 }
 
 PRIVATE NONNULL((1)) size_t KCALL
-ctty_write(struct character_device *__restrict UNUSED(self),
+ctty_write(struct chrdev *__restrict UNUSED(self),
            USER CHECKED void const *src, size_t num_bytes,
            iomode_t mode) THROWS(...) {
 	size_t result;
 	REF struct ttybase_device *ctty = getctty();
 	FINALLY_DECREF_UNLIKELY(ctty);
-	result = character_device_write(ctty, src, num_bytes, mode);
+	result = chrdev_write(ctty, src, num_bytes, mode);
 	return result;
 }
 
 PRIVATE NONNULL((1)) size_t KCALL
-ctty_pread(struct character_device *__restrict UNUSED(self),
+ctty_pread(struct chrdev *__restrict UNUSED(self),
            USER CHECKED void *dst, size_t num_bytes,
            pos_t addr, iomode_t mode) THROWS(...) {
 	size_t result;
 	REF struct ttybase_device *ctty = getctty();
 	FINALLY_DECREF_UNLIKELY(ctty);
-	result = character_device_pread(ctty, dst, num_bytes, addr, mode);
+	result = chrdev_pread(ctty, dst, num_bytes, addr, mode);
 	return result;
 }
 
 PRIVATE NONNULL((1)) size_t KCALL
-ctty_pwrite(struct character_device *__restrict UNUSED(self),
+ctty_pwrite(struct chrdev *__restrict UNUSED(self),
             USER CHECKED void const *src, size_t num_bytes,
             pos_t addr, iomode_t mode) THROWS(...) {
 	size_t result;
 	REF struct ttybase_device *ctty = getctty();
 	FINALLY_DECREF_UNLIKELY(ctty);
-	result = character_device_pwrite(ctty, src, num_bytes, addr, mode);
+	result = chrdev_pwrite(ctty, src, num_bytes, addr, mode);
 	return result;
 }
 
 PRIVATE NONNULL((1)) syscall_slong_t KCALL
-ctty_ioctl(struct character_device *__restrict UNUSED(self),
+ctty_ioctl(struct chrdev *__restrict UNUSED(self),
            syscall_ulong_t cmd,
            USER UNCHECKED void *arg, iomode_t mode) THROWS(...) {
 	syscall_slong_t result;
 	REF struct ttybase_device *ctty = getctty();
 	FINALLY_DECREF_UNLIKELY(ctty);
-	result = character_device_ioctl(ctty, cmd, arg, mode);
+	result = chrdev_ioctl(ctty, cmd, arg, mode);
 	return result;
 }
 
 PRIVATE NONNULL((1, 2)) void KCALL
-ctty_mmap(struct character_device *__restrict UNUSED(self),
+ctty_mmap(struct chrdev *__restrict UNUSED(self),
           struct handle_mmap_info *__restrict info) THROWS(...) {
 	REF struct ttybase_device *ctty = getctty();
 	FINALLY_DECREF_UNLIKELY(ctty);
-	character_device_mmap(ctty, info);
+	chrdev_mmap(ctty, info);
 }
 
 PRIVATE NONNULL((1)) void KCALL
-ctty_sync(struct character_device *__restrict UNUSED(self)) THROWS(...) {
+ctty_sync(struct chrdev *__restrict UNUSED(self)) THROWS(...) {
 	REF struct ttybase_device *ctty = getctty();
 	FINALLY_DECREF_UNLIKELY(ctty);
-	character_device_sync(ctty);
+	chrdev_sync(ctty);
 }
 
 PRIVATE NONNULL((1)) void KCALL
-ctty_stat(struct character_device *__restrict UNUSED(self),
+ctty_stat(struct chrdev *__restrict UNUSED(self),
           USER CHECKED struct stat *result) THROWS(...) {
 	REF struct ttybase_device *ctty = getctty();
 	FINALLY_DECREF_UNLIKELY(ctty);
-	character_device_stat(ctty, result);
+	chrdev_stat(ctty, result);
 }
 
 PRIVATE NONNULL((1)) void KCALL
-ctty_pollconnect(struct character_device *__restrict UNUSED(self),
+ctty_pollconnect(struct chrdev *__restrict UNUSED(self),
                  poll_mode_t what) THROWS(...) {
 	REF struct ttybase_device *ctty = getctty();
 	FINALLY_DECREF_UNLIKELY(ctty);
-	character_device_pollconnect(ctty, what);
+	chrdev_pollconnect(ctty, what);
 }
 
 PRIVATE NONNULL((1)) poll_mode_t KCALL
-ctty_polltest(struct character_device *__restrict UNUSED(self),
+ctty_polltest(struct chrdev *__restrict UNUSED(self),
               poll_mode_t what) THROWS(...) {
 	poll_mode_t result;
 	REF struct ttybase_device *ctty = getctty();
 	FINALLY_DECREF_UNLIKELY(ctty);
-	result = character_device_polltest(ctty, what);
+	result = chrdev_polltest(ctty, what);
 	return result;
 }
 
 PRIVATE NONNULL((1, 2)) void KCALL
-ctty_open(struct character_device *__restrict self,
+ctty_open(struct chrdev *__restrict self,
           struct handle *__restrict hand) {
 	assert(self == &dev_tty);
 	assert(self == hand->h_data);
-	assert(hand->h_type == HANDLE_TYPE_CHARACTERDEVICE);
+	assert(hand->h_type == HANDLE_TYPE_CHRDEV);
 	decref_nokill(self);
 	hand->h_data = getctty();
 }
@@ -157,7 +157,7 @@ ctty_open(struct character_device *__restrict self,
 /* The character device made available under /dev/tty
  * This device implements all operators as direct aliasing callbacks
  * to  the TTY character device addressable through `task_getctty()' */
-PUBLIC struct character_device dev_tty = {
+PUBLIC struct chrdev dev_tty = {
 	/* .cd_refcnt   = */ 1,
 	/* .cd_heapsize = */ sizeof(dev_tty),
 	/* .cd_type     = */ {
@@ -187,7 +187,7 @@ PUBLIC struct character_device dev_tty = {
 INTERN ATTR_FREETEXT void
 NOTHROW(KCALL kernel_initialize_ctty_device)(void) {
 	TRY {
-		character_device_register(&dev_tty, MKDEV(5, 0));
+		chrdev_register(&dev_tty, MKDEV(5, 0));
 	} EXCEPT {
 		error_printf(FREESTR("Registering /dev/tty"));
 	}

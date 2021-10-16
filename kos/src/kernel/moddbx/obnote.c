@@ -487,16 +487,16 @@ badobj:
 }
 
 PRIVATE NONNULL((1, 3, 4)) ssize_t
-NOTHROW(KCALL note_character_device)(pformatprinter printer, void *arg,
+NOTHROW(KCALL note_chrdev)(pformatprinter printer, void *arg,
                                      KERNEL CHECKED void const *pointer,
                                      unsigned int *__restrict pstatus) {
-	struct character_device *me = (struct character_device *)pointer;
+	struct chrdev *me = (struct chrdev *)pointer;
 	char const *dev_name;
 	size_t dev_namelen;
 	TRY {
 		if (me->cd_refcnt == 0)
 			goto badobj;
-		if (me->cd_heapsize < sizeof(struct character_device))
+		if (me->cd_heapsize < sizeof(struct chrdev))
 			goto badobj;
 		if (!verify_driver(me->cd_type.ct_driver))
 			goto badobj;
@@ -1193,10 +1193,10 @@ badobj:
 
 
 PRIVATE struct obnote_entry const notes[] = {
-	{ "ansitty_device", &note_character_device },
+	{ "ansitty_device", &note_chrdev },
 	{ "blkdev", &note_block_device },
 	{ "block_device", &note_block_device },
-	{ "character_device", &note_character_device },
+	{ "chrdev", &note_chrdev },
 	{ "cpu", &note_cpu },
 	{ "dirhandle", &note_file },
 	{ "driver", &note_module },
@@ -1204,7 +1204,7 @@ PRIVATE struct obnote_entry const notes[] = {
 	{ "fdirent", &note_fdirent },
 	{ "filehandle", &note_file },
 	/* TODO: `struct handle'                 (print the contents handle's /proc/self/fd-style link) */
-	{ "keyboard_device", &note_character_device },
+	{ "keyboard_device", &note_chrdev },
 	{ "mbnode", &note_mnode },
 	{ "mfile", &note_mfile },
 	{ "mfutex", &note_mfutex },
@@ -1212,15 +1212,15 @@ PRIVATE struct obnote_entry const notes[] = {
 	{ "mnode", &note_mnode },
 	{ "module", &note_module },
 	{ "module_section", &note_module_section },
-	{ "mouse_device", &note_character_device },
+	{ "mouse_device", &note_chrdev },
 	{ "mpart", &note_mpart },
-	{ "nic_device", &note_character_device },
+	{ "nic_device", &note_chrdev },
 	{ "path", &note_path },
-	{ "pty_master", &note_character_device },
-	{ "pty_slave", &note_character_device },
+	{ "pty_master", &note_chrdev },
+	{ "pty_slave", &note_chrdev },
 	{ "task", &note_task },
 	{ "taskpid", &note_taskpid },
-	{ "ttybase_device", &note_character_device },
+	{ "ttybase_device", &note_chrdev },
 	{ "userelf_module", &note_module },
 	{ "userelf_module_section", &note_module_section },
 };

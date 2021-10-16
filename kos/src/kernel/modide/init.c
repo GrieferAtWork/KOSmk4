@@ -57,7 +57,7 @@ DEFINE_CMDLINE_FLAG_VAR(ide_nodma, "ide_nodma");
 
 
 PRIVATE NOBLOCK ATTR_COLDTEXT NONNULL((1)) void
-NOTHROW(KCALL AtaBus_Fini)(struct character_device *__restrict self) {
+NOTHROW(KCALL AtaBus_Fini)(struct chrdev *__restrict self) {
 	AtaBus *me = (AtaBus *)self;
 	hisr_unregister((isr_function_t)AtaBus_HW_GetInterruptHandler(me), me);
 	if (me->ab_prdt)
@@ -120,7 +120,7 @@ Ata_InitializeDrive(struct ata_ports *__restrict ports,
 			REF AtaDrive *drive;
 			AtaBus *bus = *pbus;
 			if (!bus) {
-				*pbus = bus = CHARACTER_DEVICE_ALLOC(AtaBus);
+				*pbus = bus = CHRDEV_ALLOC(AtaBus);
 				TRY {
 #if ATA_BUS_STATE_READY != 0
 					bus->ab_state = ATA_BUS_STATE_READY;
@@ -146,9 +146,9 @@ Ata_InitializeDrive(struct ata_ports *__restrict ports,
 					                 bus);
 					if (is_default_ide)
 						sprintf(bus->cd_name, "ide%c", is_primary_bus ? 'a' : 'b');
-					character_device_register_auto(bus);
+					chrdev_register_auto(bus);
 				} EXCEPT {
-					character_device_destroy(bus);
+					chrdev_destroy(bus);
 					*pbus = NULL;
 					RETHROW();
 				}
@@ -339,11 +339,11 @@ calculate_chs:
 					drive->bd_name[2] = (is_primary_bus ? 'a' : 'c') +
 					                    (drive_id == ATA_DRIVE_MASTER ? 0 : 1);
 					drive->bd_name[3] = 0;
-					block_device_register(drive, devno);
+					blkdev_register(drive, devno);
 				} else {
-					block_device_register_auto(drive);
+					blkdev_register_auto(drive);
 				}
-				block_device_autopart(drive);
+				blkdev_repart(drive);
 			} EXCEPT {
 				decref(drive);
 				RETHROW();

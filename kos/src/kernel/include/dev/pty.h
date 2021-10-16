@@ -77,11 +77,11 @@ struct pty_slave
 
 struct pty_master
 #ifdef __cplusplus
-    : character_device
+    : chrdev
 #endif /* __cplusplus */
 {
 #ifndef __cplusplus
-	struct character_device pm_base;  /* The underlying base-tty */
+	struct chrdev pm_base;  /* The underlying base-tty */
 #endif /* !__cplusplus */
 	struct pty_slave_awref  pm_slave; /* [0..1] The terminal's slave side (cleared when destroyed) */
 };
@@ -89,8 +89,8 @@ struct pty_master
 /* Check if a given TTY/character device is a `struct pty_slave'. */
 #define ttybase_isapty(self) \
 	((self)->t_term.t_oprint == &kernel_pty_oprinter)
-#define character_device_isapty(self) \
-	(character_device_isattybase(self) && ttybase_isapty((struct ttybase_device *)(self)))
+#define chrdev_ispty(self) \
+	(chrdev_isttybase(self) && ttybase_isapty((struct ttybase_device *)(self)))
 
 /* oprinter callback for `struct pty_slave' tty objects. */
 FUNDEF ssize_t LIBTERM_CC

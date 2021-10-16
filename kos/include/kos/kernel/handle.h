@@ -78,7 +78,7 @@
 #define HANDLE_TYPE_MODULE          0x0015 /* `struct module' */
 #define HANDLE_TYPE_PIDNS           0x0016 /* `struct pidns' */
 #define HANDLE_TYPE_DRIVER_LOADLIST 0x0017 /* `struct driver_loadlist' */
-#define HANDLE_TYPE_CHARACTERDEVICE 0x0018 /* `struct character_device'
+#define HANDLE_TYPE_CHRDEV          0x0018 /* `struct chrdev'
                                             * Castable into: HANDLE_TYPE_MFILE (if supported) */
 #define HANDLE_TYPE_MPART           0x0019 /* `struct mpart' */
 #define HANDLE_TYPE_MODULE_SECTION  0x001a /* `struct module_section' */
@@ -89,42 +89,42 @@
 /* TODO: For CONFIG_USE_NEW_FS:
  *    - Rename `HANDLE_TYPE_FDIRENT' -> `HANDLE_TYPE_FDIRENT'
  *    - Remove `HANDLE_TYPE_BLKDEV'     (merged with `HANDLE_TYPE_MFILE')
- *    - Remove `HANDLE_TYPE_CHARACTERDEVICE' (merged with `HANDLE_TYPE_MFILE') */
+ *    - Remove `HANDLE_TYPE_CHRDEV' (merged with `HANDLE_TYPE_MFILE') */
 
 /* Invoke `cb(int HANDLE_TYPE, typename T)' for each handle type with an associated struct */
-#define HANDLE_FOREACH_TYPE(cb)                              \
-	cb(HANDLE_TYPE_MFILE, struct mfile)                      \
-	cb(HANDLE_TYPE_BLKDEV, struct blkdev)                    \
-	cb(HANDLE_TYPE_FDIRENT, struct fdirent)                  \
-	cb(HANDLE_TYPE_FILEHANDLE, struct filehandle)            \
-	cb(HANDLE_TYPE_DIRHANDLE, struct dirhandle)              \
-	cb(HANDLE_TYPE_PATH, struct path)                        \
-	cb(HANDLE_TYPE_FS, struct fs)                            \
-	cb(HANDLE_TYPE_MMAN, struct mman)                        \
-	cb(HANDLE_TYPE_TASK, struct taskpid)                     \
-	cb(HANDLE_TYPE_MODULE, struct driver)                    \
-	cb(HANDLE_TYPE_PIPE, struct pipe)                        \
-	cb(HANDLE_TYPE_PIPE_READER, struct pipe_reader)          \
-	cb(HANDLE_TYPE_PIPE_WRITER, struct pipe_writer)          \
-	cb(HANDLE_TYPE_PIDNS, struct pidns)                      \
-	cb(HANDLE_TYPE_DRIVER_LOADLIST, struct driver_state)     \
-	cb(HANDLE_TYPE_CHARACTERDEVICE, struct character_device) \
-	cb(HANDLE_TYPE_SIGNALFD, struct signalfd)                \
-	cb(HANDLE_TYPE_MPART, struct mpart)                      \
-	cb(HANDLE_TYPE_FUTEX, struct mfutex)                     \
-	cb(HANDLE_TYPE_FUTEXFD, struct mfutexfd)                 \
-	cb(HANDLE_TYPE_MODULE_SECTION, struct driver_section)    \
+#define HANDLE_FOREACH_TYPE(cb)                           \
+	cb(HANDLE_TYPE_MFILE, struct mfile)                   \
+	cb(HANDLE_TYPE_BLKDEV, struct blkdev)                 \
+	cb(HANDLE_TYPE_FDIRENT, struct fdirent)               \
+	cb(HANDLE_TYPE_FILEHANDLE, struct filehandle)         \
+	cb(HANDLE_TYPE_DIRHANDLE, struct dirhandle)           \
+	cb(HANDLE_TYPE_PATH, struct path)                     \
+	cb(HANDLE_TYPE_FS, struct fs)                         \
+	cb(HANDLE_TYPE_MMAN, struct mman)                     \
+	cb(HANDLE_TYPE_TASK, struct taskpid)                  \
+	cb(HANDLE_TYPE_MODULE, struct driver)                 \
+	cb(HANDLE_TYPE_PIPE, struct pipe)                     \
+	cb(HANDLE_TYPE_PIPE_READER, struct pipe_reader)       \
+	cb(HANDLE_TYPE_PIPE_WRITER, struct pipe_writer)       \
+	cb(HANDLE_TYPE_PIDNS, struct pidns)                   \
+	cb(HANDLE_TYPE_DRIVER_LOADLIST, struct driver_state)  \
+	cb(HANDLE_TYPE_CHRDEV, struct chrdev)                 \
+	cb(HANDLE_TYPE_SIGNALFD, struct signalfd)             \
+	cb(HANDLE_TYPE_MPART, struct mpart)                   \
+	cb(HANDLE_TYPE_FUTEX, struct mfutex)                  \
+	cb(HANDLE_TYPE_FUTEXFD, struct mfutexfd)              \
+	cb(HANDLE_TYPE_MODULE_SECTION, struct driver_section) \
 	cb(HANDLE_TYPE_SOCKET, struct socket)
 
 /* Invoke `cb(int HANDLE_TYPE, typename T)' for each handle  type
  * that could reasonably be used for callback registrations (such
  * as `register_async_worker()' or `hisr_register()') */
-#define HANDLE_FOREACH_CUSTOMTYPE(cb)                        \
-	cb(HANDLE_TYPE_MFILE, struct mfile)                      \
-	cb(HANDLE_TYPE_BLKDEV, struct blkdev)                    \
-	cb(HANDLE_TYPE_MMAN, struct mman)                        \
-	cb(HANDLE_TYPE_MODULE, struct driver)                    \
-	cb(HANDLE_TYPE_CHARACTERDEVICE, struct character_device) \
+#define HANDLE_FOREACH_CUSTOMTYPE(cb)     \
+	cb(HANDLE_TYPE_MFILE, struct mfile)   \
+	cb(HANDLE_TYPE_BLKDEV, struct blkdev) \
+	cb(HANDLE_TYPE_MMAN, struct mman)     \
+	cb(HANDLE_TYPE_MODULE, struct driver) \
+	cb(HANDLE_TYPE_CHRDEV, struct chrdev) \
 	cb(HANDLE_TYPE_SOCKET, struct socket)
 
 
@@ -133,27 +133,27 @@
 #define HANDLE_TYPEKIND_GENERIC 0x0000 /* Generic catch-all handle-type kind */
 
 /* Handle kinds for `HANDLE_TYPE_MFILE' */
-#define HANDLE_TYPEKIND_DATABLOCK_GENERIC     0x0000 /* The handle refers to a `struct mfile' */
-#define HANDLE_TYPEKIND_DATABLOCK_INODE       0x0001 /* The handle refers to a `struct inode' */
-#define HANDLE_TYPEKIND_DATABLOCK_REGULARNODE 0x0002 /* The handle refers to a `struct regular_node' */
-#define HANDLE_TYPEKIND_DATABLOCK_DIRECTORY   0x0003 /* The handle refers to a `struct directory_node' */
-#define HANDLE_TYPEKIND_DATABLOCK_SUPERBLOCK  0x0004 /* The handle refers to a `struct superblock' */
-#define HANDLE_TYPEKIND_DATABLOCK_SYMLINKNODE 0x0005 /* The handle refers to a `struct symlink_node' */
-#define HANDLE_TYPEKIND_DATABLOCK_FIFONODE    0x0006 /* The handle refers to a `struct fifo_node' */
-#define HANDLE_TYPEKIND_DATABLOCK_SOCKETNODE  0x0007 /* The handle refers to a `struct socket_node' */
+#define HANDLE_TYPEKIND_MFILE_GENERIC     0x0000 /* The handle refers to a `struct mfile' */
+#define HANDLE_TYPEKIND_MFILE_INODE       0x0001 /* The handle refers to a `struct inode' */
+#define HANDLE_TYPEKIND_MFILE_REGULARNODE 0x0002 /* The handle refers to a `struct regular_node' */
+#define HANDLE_TYPEKIND_MFILE_DIRECTORY   0x0003 /* The handle refers to a `struct directory_node' */
+#define HANDLE_TYPEKIND_MFILE_SUPERBLOCK  0x0004 /* The handle refers to a `struct superblock' */
+#define HANDLE_TYPEKIND_MFILE_SYMLINKNODE 0x0005 /* The handle refers to a `struct symlink_node' */
+#define HANDLE_TYPEKIND_MFILE_FIFONODE    0x0006 /* The handle refers to a `struct fifo_node' */
+#define HANDLE_TYPEKIND_MFILE_SOCKETNODE  0x0007 /* The handle refers to a `struct socket_node' */
 
 /* Handle kinds for `HANDLE_TYPE_BLKDEV' */
 #define HANDLE_TYPEKIND_BLKDEV_GENERIC   0x0000 /* The handle refers to a `struct blkdev' */
 #define HANDLE_TYPEKIND_BLKDEV_PARTITION 0x0001 /* The handle refers to a `struct block_device_partition' */
 #define HANDLE_TYPEKIND_BLKDEV_DRIVEROOT 0x0002 /* The handle refers to a `struct block_device' */
-/* Handle kinds for `HANDLE_TYPE_CHARACTERDEVICE' */
+/* Handle kinds for `HANDLE_TYPE_CHRDEV' */
 
-#define HANDLE_TYPEKIND_CHARACTERDEVICE_GENERIC  0x0000 /* The handle refers to a `struct character_device' */
-#define HANDLE_TYPEKIND_CHARACTERDEVICE_TTYBASE  0x0001 /* The handle refers to a `struct ttybase_device' */
-#define HANDLE_TYPEKIND_CHARACTERDEVICE_TTY      0x0002 /* The handle refers to a `struct tty_device' and `struct ttybase_device' */
-#define HANDLE_TYPEKIND_CHARACTERDEVICE_PTY      0x0003 /* The handle refers to a `struct pty_master' and `struct ttybase_device' */
-#define HANDLE_TYPEKIND_CHARACTERDEVICE_KEYBOARD 0x0004 /* The handle refers to a `struct keyboard_device' */
-#define HANDLE_TYPEKIND_CHARACTERDEVICE_MOUSE    0x0005 /* The handle refers to a `struct mouse_device' */
+#define HANDLE_TYPEKIND_CHRDEV_GENERIC  0x0000 /* The handle refers to a `struct chrdev' */
+#define HANDLE_TYPEKIND_CHRDEV_TTYBASE  0x0001 /* The handle refers to a `struct ttybase_device' */
+#define HANDLE_TYPEKIND_CHRDEV_TTY      0x0002 /* The handle refers to a `struct tty_device' and `struct ttybase_device' */
+#define HANDLE_TYPEKIND_CHRDEV_PTY      0x0003 /* The handle refers to a `struct pty_master' and `struct ttybase_device' */
+#define HANDLE_TYPEKIND_CHRDEV_KEYBOARD 0x0004 /* The handle refers to a `struct keyboard_device' */
+#define HANDLE_TYPEKIND_CHRDEV_MOUSE    0x0005 /* The handle refers to a `struct mouse_device' */
 
 /* Handle kinds for `HANDLE_TYPE_PATH' */
 #define HANDLE_TYPEKIND_PATH_GENERIC          0x0000 /* The handle refers to a `struct path' */

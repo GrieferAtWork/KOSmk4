@@ -45,7 +45,7 @@ DECL_BEGIN
 PRIVATE ATTR_PURE WUNUSED NONNULL((1)) pos_t
 NOTHROW(KCALL BlockDevice_GetPartitionStart)(struct block_device const *__restrict self) {
 	struct block_device_partition *part;
-	if (!block_device_ispartition(self))
+	if (!blkdev_ispart(self))
 		return 0;
 	part = (struct block_device_partition *)self;
 	return part->bp_minaddr;

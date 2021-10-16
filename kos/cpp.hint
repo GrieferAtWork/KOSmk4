@@ -1324,7 +1324,7 @@
 #define DEFINE_PREALLOCATION_CACHE_ALLOC_NX(decl,name,T)
 
 #define __BLKDEV_FIELDS                                                 \
-	refcnt_t bd_refcnt; size_t bd_heapsize; struct block_device_type bd_type;       \
+	refcnt_t bd_refcnt; size_t bd_heapsize; struct blkdev_ops bd_type;       \
 	struct { struct blkdev *a_min, *a_max; dev_t a_vaddr; } bd_devlink; \
 	struct inode *bd_devfs_inode; struct fdirent *bd_devfs_entry;           \
 	pos_t bd_total_bytes; lba_t bd_sector_count; size_t bd_sector_size;             \

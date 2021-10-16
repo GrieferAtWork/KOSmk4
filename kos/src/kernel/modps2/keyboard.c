@@ -456,7 +456,7 @@ ps2_keyboard_create(struct ps2_probe_data *__restrict probe_data,
 		       portno + 1, used_scanset);
 		used_scanset = 2;
 	}
-	kbd = CHARACTER_DEVICE_ALLOC(struct ps2_keyboard);
+	kbd = CHRDEV_ALLOC(struct ps2_keyboard);
 	TRY {
 		keyboard_device_init(kbd, &ps2_keyboard_ops);
 		mutex_cinit(&kbd->pk_cmdlock);
@@ -478,7 +478,7 @@ ps2_keyboard_create(struct ps2_probe_data *__restrict probe_data,
 		COMPILER_BARRIER();
 		hisr_register_at(PS2_GET_ISR_FOR_PORT(portno), &ps2_keyboard_isr_handler, kbd);
 		TRY {
-			character_device_register_auto(kbd);
+			chrdev_register_auto(kbd);
 		} EXCEPT {
 			hisr_unregister_at(PS2_GET_ISR_FOR_PORT(portno), &ps2_keyboard_isr_handler, kbd);
 			RETHROW();

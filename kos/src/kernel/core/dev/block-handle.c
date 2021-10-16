@@ -210,7 +210,7 @@ handle_blkdev_ioctl(struct blkdev *__restrict self,
 	}	break;
 
 	case BLKRRPART:
-		if (block_device_ispartition(self))
+		if (blkdev_ispart(self))
 			THROW(E_INVALID_HANDLE_FILETYPE,
 			      0, /* Filled in by the caller */
 			      HANDLE_TYPE_BLKDEV,
@@ -218,7 +218,7 @@ handle_blkdev_ioctl(struct blkdev *__restrict self,
 			      HANDLE_TYPEKIND_BLKDEV_DRIVEROOT,
 			      0);
 		block_device_delparts((struct block_device *)self);
-		block_device_autopart(self);
+		blkdev_repart(self);
 		break;
 
 	case BLKGETSIZE:
@@ -435,7 +435,7 @@ handle_blkdev_pollconnect(struct blkdev *__restrict self, poll_mode_t what) {
 	if (what & (POLLINMASK | POLLOUTMASK)) {
 		struct block_device *block;
 		block = (struct block_device *)self;
-		if (block_device_ispartition(self))
+		if (blkdev_ispart(self))
 			block = ((struct block_device_partition *)self)->bp_master;
 		rwlock_pollconnect(&block->bd_cache_lock);
 	}
@@ -445,7 +445,7 @@ INTERN poll_mode_t KCALL
 handle_blkdev_polltest(struct blkdev *__restrict self, poll_mode_t what) {
 	struct block_device *block;
 	block = (struct block_device *)self;
-	if (block_device_ispartition(self))
+	if (blkdev_ispart(self))
 		block = ((struct block_device_partition *)self)->bp_master;
 	if (what & POLLOUTMASK) {
 		if (rwlock_canwrite(&block->bd_cache_lock))
@@ -474,7 +474,7 @@ handle_blkdev_hop(struct blkdev *__restrict self,
 		st.bs_device_flag  = self->bd_flags;
 		st.bs_partcount    = 0;
 		st.bs_devno        = (u64)block_device_devno(self);
-		if (!block_device_ispartition(self)) {
+		if (!blkdev_ispart(self)) {
 			struct block_device *me;
 			struct block_device_partition *iter;
 			me = (struct block_device *)self;
@@ -522,7 +522,7 @@ handle_blkdev_hop(struct blkdev *__restrict self,
 		result_handle.h_type = HANDLE_TYPE_BLKDEV;
 		result_handle.h_mode = mode;
 		result_handle.h_data = self;
-		if (block_device_ispartition(self))
+		if (blkdev_ispart(self))
 			result_handle.h_data = ((struct block_device_partition *)self)->bp_master;
 		require(CAP_OPEN_BLOCKDEV_ROOT);
 		return handle_installhop((USER UNCHECKED struct hop_openfd *)arg, result_handle);
@@ -537,7 +537,7 @@ handle_blkdev_hop(struct blkdev *__restrict self,
 		USER CHECKED struct hop_blkdev_openpart *data;
 		data = (USER CHECKED struct hop_blkdev_openpart *)arg;
 		validate_readwrite(data, sizeof(*data));
-		if (block_device_ispartition(self))
+		if (blkdev_ispart(self))
 			self = ((struct block_device_partition *)self)->bp_master;
 		struct_size = ATOMIC_READ(data->bop_struct_size);
 		if (struct_size != sizeof(*data))

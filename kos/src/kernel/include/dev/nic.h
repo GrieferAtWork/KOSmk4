@@ -187,11 +187,11 @@ struct nic_addresses {
 
 struct nic_device
 #ifdef __cplusplus
-    : character_device
+    : chrdev
 #endif /* __cplusplus */
 {
 #ifndef __cplusplus
-	struct character_device nd_base;    /* The underlying character device */
+	struct chrdev nd_base;    /* The underlying character device */
 #endif /* !__cplusplus */
 	struct nic_device_ops   nd_ops;     /* Device operators. */
 	WEAK uintptr_t          nd_ifflags; /* [lock(INTERN)] Netword interface flags (set of `IFF_*') */
@@ -244,16 +244,16 @@ NOTHROW(KCALL nic_device_cinit)(struct nic_device *__restrict self,
 /* Default finalizer for NIC devices.
  * NOTE: Must be called by drivers when `cd_type.ct_fini' gets overwritten. */
 FUNDEF NOBLOCK NONNULL((1)) void
-NOTHROW(KCALL nic_device_fini)(struct character_device *__restrict self);
+NOTHROW(KCALL nic_device_fini)(struct chrdev *__restrict self);
 
 /* Check if a given character device is a NIC. */
-#define character_device_isanic(self)                    \
+#define chrdev_isnic(self)                    \
 	((self)->cd_heapsize >= sizeof(struct nic_device) && \
 	 (self)->cd_type.ct_write == &nic_device_write)
 
 /* Default write-operator for NIC devices. */
 FUNDEF NONNULL((1)) size_t KCALL
-nic_device_write(struct character_device *__restrict self,
+nic_device_write(struct chrdev *__restrict self,
                  USER CHECKED void const *src,
                  size_t num_bytes, iomode_t mode) THROWS(...);
 

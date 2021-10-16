@@ -372,7 +372,7 @@ block_device_autopart_ex(struct blkdev *__restrict self)
 }
 
 PUBLIC NONNULL((1)) void KCALL
-block_device_autopart(struct blkdev *__restrict self)
+blkdev_repart(struct blkdev *__restrict self)
 		THROWS(E_BADALLOC, E_WOULDBLOCK) {
 	REF struct block_device_partition *active_part;
 	active_part = block_device_autopart_ex(self);

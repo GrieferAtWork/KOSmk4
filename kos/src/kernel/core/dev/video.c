@@ -67,7 +67,7 @@ video_device_set_first_format(struct video_device *__restrict self,
 
 /* Generic video device ioctl() handler. */
 PUBLIC NONNULL((1)) syscall_slong_t KCALL
-video_device_ioctl(struct character_device *__restrict self, syscall_ulong_t cmd,
+video_device_ioctl(struct chrdev *__restrict self, syscall_ulong_t cmd,
                    USER UNCHECKED void *arg, iomode_t mode) THROWS(...) {
 	struct video_device *me;
 	me = (struct video_device *)self;

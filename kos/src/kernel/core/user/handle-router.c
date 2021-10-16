@@ -348,7 +348,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_MODULE]          = */ "module",
 		/* [HANDLE_TYPE_PIDNS]           = */ "pidns",
 		/* [HANDLE_TYPE_DRIVER_LOADLIST] = */ "driver_loadlist",
-		/* [HANDLE_TYPE_CHARACTERDEVICE] = */ "characterdevice",
+		/* [HANDLE_TYPE_CHRDEV]          = */ "chrdev",
 		/* [HANDLE_TYPE_MPART]           = */ "mpart",
 		/* [HANDLE_TYPE_MODULE_SECTION]  = */ "module_section"
 	},
@@ -377,7 +377,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_MODULE]          = */ (refcnt_t (FCALL *)(void const *__restrict))&handle_module_refcnt,
 		/* [HANDLE_TYPE_PIDNS]           = */ (refcnt_t (FCALL *)(void const *__restrict))&handle_pidns_refcnt,
 		/* [HANDLE_TYPE_DRIVER_LOADLIST] = */ (refcnt_t (FCALL *)(void const *__restrict))&handle_driver_loadlist_refcnt,
-		/* [HANDLE_TYPE_CHARACTERDEVICE] = */ (refcnt_t (FCALL *)(void const *__restrict))&handle_characterdevice_refcnt,
+		/* [HANDLE_TYPE_CHRDEV]          = */ (refcnt_t (FCALL *)(void const *__restrict))&handle_chrdev_refcnt,
 		/* [HANDLE_TYPE_MPART]           = */ (refcnt_t (FCALL *)(void const *__restrict))&handle_mpart_refcnt,
 		/* [HANDLE_TYPE_MODULE_SECTION]  = */ (refcnt_t (FCALL *)(void const *__restrict))&handle_module_section_refcnt
 	},
@@ -406,7 +406,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_MODULE]          = */ (void (FCALL *)(void *__restrict))&handle_module_incref,
 		/* [HANDLE_TYPE_PIDNS]           = */ (void (FCALL *)(void *__restrict))&handle_pidns_incref,
 		/* [HANDLE_TYPE_DRIVER_LOADLIST] = */ (void (FCALL *)(void *__restrict))&handle_driver_loadlist_incref,
-		/* [HANDLE_TYPE_CHARACTERDEVICE] = */ (void (FCALL *)(void *__restrict))&handle_characterdevice_incref,
+		/* [HANDLE_TYPE_CHRDEV]          = */ (void (FCALL *)(void *__restrict))&handle_chrdev_incref,
 		/* [HANDLE_TYPE_MPART]           = */ (void (FCALL *)(void *__restrict))&handle_mpart_incref,
 		/* [HANDLE_TYPE_MODULE_SECTION]  = */ (void (FCALL *)(void *__restrict))&handle_module_section_incref
 	},
@@ -435,7 +435,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_MODULE]          = */ (void (FCALL *)(REF void *__restrict))&handle_module_decref,
 		/* [HANDLE_TYPE_PIDNS]           = */ (void (FCALL *)(REF void *__restrict))&handle_pidns_decref,
 		/* [HANDLE_TYPE_DRIVER_LOADLIST] = */ (void (FCALL *)(REF void *__restrict))&handle_driver_loadlist_decref,
-		/* [HANDLE_TYPE_CHARACTERDEVICE] = */ (void (FCALL *)(REF void *__restrict))&handle_characterdevice_decref,
+		/* [HANDLE_TYPE_CHRDEV]          = */ (void (FCALL *)(REF void *__restrict))&handle_chrdev_decref,
 		/* [HANDLE_TYPE_MPART]           = */ (void (FCALL *)(REF void *__restrict))&handle_mpart_decref,
 		/* [HANDLE_TYPE_MODULE_SECTION]  = */ (void (FCALL *)(REF void *__restrict))&handle_module_section_decref
 	},
@@ -464,7 +464,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_MODULE]          = */ (__BOOL (FCALL *)(void *__restrict))&handle_module_tryincref,
 		/* [HANDLE_TYPE_PIDNS]           = */ (__BOOL (FCALL *)(void *__restrict))&handle_pidns_tryincref,
 		/* [HANDLE_TYPE_DRIVER_LOADLIST] = */ (__BOOL (FCALL *)(void *__restrict))&handle_driver_loadlist_tryincref,
-		/* [HANDLE_TYPE_CHARACTERDEVICE] = */ (__BOOL (FCALL *)(void *__restrict))&handle_characterdevice_tryincref,
+		/* [HANDLE_TYPE_CHRDEV]          = */ (__BOOL (FCALL *)(void *__restrict))&handle_chrdev_tryincref,
 		/* [HANDLE_TYPE_MPART]           = */ (__BOOL (FCALL *)(void *__restrict))&handle_mpart_tryincref,
 		/* [HANDLE_TYPE_MODULE_SECTION]  = */ (__BOOL (FCALL *)(void *__restrict))&handle_module_section_tryincref
 	},
@@ -493,7 +493,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_MODULE]          = */ (WEAK REF void *(FCALL *)(void *__restrict))&handle_module_weakgetref,
 		/* [HANDLE_TYPE_PIDNS]           = */ (WEAK REF void *(FCALL *)(void *__restrict))&handle_pidns_weakgetref,
 		/* [HANDLE_TYPE_DRIVER_LOADLIST] = */ (WEAK REF void *(FCALL *)(void *__restrict))&handle_driver_loadlist_weakgetref,
-		/* [HANDLE_TYPE_CHARACTERDEVICE] = */ (WEAK REF void *(FCALL *)(void *__restrict))&handle_characterdevice_weakgetref,
+		/* [HANDLE_TYPE_CHRDEV]          = */ (WEAK REF void *(FCALL *)(void *__restrict))&handle_chrdev_weakgetref,
 		/* [HANDLE_TYPE_MPART]           = */ (WEAK REF void *(FCALL *)(void *__restrict))&handle_mpart_weakgetref,
 		/* [HANDLE_TYPE_MODULE_SECTION]  = */ (WEAK REF void *(FCALL *)(void *__restrict))&handle_module_section_weakgetref
 	},
@@ -522,7 +522,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_MODULE]          = */ (REF void *(FCALL *)(void *__restrict))&handle_module_weaklckref,
 		/* [HANDLE_TYPE_PIDNS]           = */ (REF void *(FCALL *)(void *__restrict))&handle_pidns_weaklckref,
 		/* [HANDLE_TYPE_DRIVER_LOADLIST] = */ (REF void *(FCALL *)(void *__restrict))&handle_driver_loadlist_weaklckref,
-		/* [HANDLE_TYPE_CHARACTERDEVICE] = */ (REF void *(FCALL *)(void *__restrict))&handle_characterdevice_weaklckref,
+		/* [HANDLE_TYPE_CHRDEV]          = */ (REF void *(FCALL *)(void *__restrict))&handle_chrdev_weaklckref,
 		/* [HANDLE_TYPE_MPART]           = */ (REF void *(FCALL *)(void *__restrict))&handle_mpart_weaklckref,
 		/* [HANDLE_TYPE_MODULE_SECTION]  = */ (REF void *(FCALL *)(void *__restrict))&handle_module_section_weaklckref
 	},
@@ -551,7 +551,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_MODULE]          = */ (void (FCALL *)(WEAK REF void *__restrict))&handle_module_weakdecref,
 		/* [HANDLE_TYPE_PIDNS]           = */ (void (FCALL *)(WEAK REF void *__restrict))&handle_pidns_weakdecref,
 		/* [HANDLE_TYPE_DRIVER_LOADLIST] = */ (void (FCALL *)(WEAK REF void *__restrict))&handle_driver_loadlist_weakdecref,
-		/* [HANDLE_TYPE_CHARACTERDEVICE] = */ (void (FCALL *)(WEAK REF void *__restrict))&handle_characterdevice_weakdecref,
+		/* [HANDLE_TYPE_CHRDEV]          = */ (void (FCALL *)(WEAK REF void *__restrict))&handle_chrdev_weakdecref,
 		/* [HANDLE_TYPE_MPART]           = */ (void (FCALL *)(WEAK REF void *__restrict))&handle_mpart_weakdecref,
 		/* [HANDLE_TYPE_MODULE_SECTION]  = */ (void (FCALL *)(WEAK REF void *__restrict))&handle_module_section_weakdecref
 	},
@@ -580,7 +580,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_MODULE]          = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, iomode_t))&handle_module_read,
 		/* [HANDLE_TYPE_PIDNS]           = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, iomode_t))&handle_pidns_read,
 		/* [HANDLE_TYPE_DRIVER_LOADLIST] = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, iomode_t))&handle_driver_loadlist_read,
-		/* [HANDLE_TYPE_CHARACTERDEVICE] = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, iomode_t))&handle_characterdevice_read,
+		/* [HANDLE_TYPE_CHRDEV]          = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, iomode_t))&handle_chrdev_read,
 		/* [HANDLE_TYPE_MPART]           = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, iomode_t))&handle_mpart_read,
 		/* [HANDLE_TYPE_MODULE_SECTION]  = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, iomode_t))&handle_module_section_read
 	},
@@ -609,7 +609,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_MODULE]          = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, iomode_t))&handle_module_write,
 		/* [HANDLE_TYPE_PIDNS]           = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, iomode_t))&handle_pidns_write,
 		/* [HANDLE_TYPE_DRIVER_LOADLIST] = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, iomode_t))&handle_driver_loadlist_write,
-		/* [HANDLE_TYPE_CHARACTERDEVICE] = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, iomode_t))&handle_characterdevice_write,
+		/* [HANDLE_TYPE_CHRDEV]          = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, iomode_t))&handle_chrdev_write,
 		/* [HANDLE_TYPE_MPART]           = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, iomode_t))&handle_mpart_write,
 		/* [HANDLE_TYPE_MODULE_SECTION]  = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, iomode_t))&handle_module_section_write
 	},
@@ -638,7 +638,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_MODULE]          = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, pos_t, iomode_t))&handle_module_pread,
 		/* [HANDLE_TYPE_PIDNS]           = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, pos_t, iomode_t))&handle_pidns_pread,
 		/* [HANDLE_TYPE_DRIVER_LOADLIST] = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, pos_t, iomode_t))&handle_driver_loadlist_pread,
-		/* [HANDLE_TYPE_CHARACTERDEVICE] = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, pos_t, iomode_t))&handle_characterdevice_pread,
+		/* [HANDLE_TYPE_CHRDEV]          = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, pos_t, iomode_t))&handle_chrdev_pread,
 		/* [HANDLE_TYPE_MPART]           = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, pos_t, iomode_t))&handle_mpart_pread,
 		/* [HANDLE_TYPE_MODULE_SECTION]  = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, pos_t, iomode_t))&handle_module_section_pread
 	},
@@ -667,7 +667,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_MODULE]          = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, pos_t, iomode_t))&handle_module_pwrite,
 		/* [HANDLE_TYPE_PIDNS]           = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, pos_t, iomode_t))&handle_pidns_pwrite,
 		/* [HANDLE_TYPE_DRIVER_LOADLIST] = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, pos_t, iomode_t))&handle_driver_loadlist_pwrite,
-		/* [HANDLE_TYPE_CHARACTERDEVICE] = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, pos_t, iomode_t))&handle_characterdevice_pwrite,
+		/* [HANDLE_TYPE_CHRDEV]          = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, pos_t, iomode_t))&handle_chrdev_pwrite,
 		/* [HANDLE_TYPE_MPART]           = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, pos_t, iomode_t))&handle_mpart_pwrite,
 		/* [HANDLE_TYPE_MODULE_SECTION]  = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, pos_t, iomode_t))&handle_module_section_pwrite
 	},
@@ -696,7 +696,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_MODULE]          = */ (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_module_readv,
 		/* [HANDLE_TYPE_PIDNS]           = */ (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_pidns_readv,
 		/* [HANDLE_TYPE_DRIVER_LOADLIST] = */ (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_driver_loadlist_readv,
-		/* [HANDLE_TYPE_CHARACTERDEVICE] = */ (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_characterdevice_readv,
+		/* [HANDLE_TYPE_CHRDEV]          = */ (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_chrdev_readv,
 		/* [HANDLE_TYPE_MPART]           = */ (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_mpart_readv,
 		/* [HANDLE_TYPE_MODULE_SECTION]  = */ (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_module_section_readv
 	},
@@ -725,7 +725,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_MODULE]          = */ (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_module_writev,
 		/* [HANDLE_TYPE_PIDNS]           = */ (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_pidns_writev,
 		/* [HANDLE_TYPE_DRIVER_LOADLIST] = */ (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_driver_loadlist_writev,
-		/* [HANDLE_TYPE_CHARACTERDEVICE] = */ (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_characterdevice_writev,
+		/* [HANDLE_TYPE_CHRDEV]          = */ (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_chrdev_writev,
 		/* [HANDLE_TYPE_MPART]           = */ (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_mpart_writev,
 		/* [HANDLE_TYPE_MODULE_SECTION]  = */ (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_module_section_writev
 	},
@@ -754,7 +754,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_MODULE]          = */ (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_module_preadv,
 		/* [HANDLE_TYPE_PIDNS]           = */ (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_pidns_preadv,
 		/* [HANDLE_TYPE_DRIVER_LOADLIST] = */ (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_driver_loadlist_preadv,
-		/* [HANDLE_TYPE_CHARACTERDEVICE] = */ (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_characterdevice_preadv,
+		/* [HANDLE_TYPE_CHRDEV]          = */ (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_chrdev_preadv,
 		/* [HANDLE_TYPE_MPART]           = */ (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_mpart_preadv,
 		/* [HANDLE_TYPE_MODULE_SECTION]  = */ (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_module_section_preadv
 	},
@@ -783,7 +783,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_MODULE]          = */ (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_module_pwritev,
 		/* [HANDLE_TYPE_PIDNS]           = */ (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_pidns_pwritev,
 		/* [HANDLE_TYPE_DRIVER_LOADLIST] = */ (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_driver_loadlist_pwritev,
-		/* [HANDLE_TYPE_CHARACTERDEVICE] = */ (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_characterdevice_pwritev,
+		/* [HANDLE_TYPE_CHRDEV]          = */ (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_chrdev_pwritev,
 		/* [HANDLE_TYPE_MPART]           = */ (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_mpart_pwritev,
 		/* [HANDLE_TYPE_MODULE_SECTION]  = */ (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_module_section_pwritev
 	},
@@ -812,7 +812,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_MODULE]          = */ (size_t (KCALL *)(void *__restrict, USER CHECKED struct dirent *, size_t, readdir_mode_t, iomode_t))&handle_module_readdir,
 		/* [HANDLE_TYPE_PIDNS]           = */ (size_t (KCALL *)(void *__restrict, USER CHECKED struct dirent *, size_t, readdir_mode_t, iomode_t))&handle_pidns_readdir,
 		/* [HANDLE_TYPE_DRIVER_LOADLIST] = */ (size_t (KCALL *)(void *__restrict, USER CHECKED struct dirent *, size_t, readdir_mode_t, iomode_t))&handle_driver_loadlist_readdir,
-		/* [HANDLE_TYPE_CHARACTERDEVICE] = */ (size_t (KCALL *)(void *__restrict, USER CHECKED struct dirent *, size_t, readdir_mode_t, iomode_t))&handle_characterdevice_readdir,
+		/* [HANDLE_TYPE_CHRDEV]          = */ (size_t (KCALL *)(void *__restrict, USER CHECKED struct dirent *, size_t, readdir_mode_t, iomode_t))&handle_chrdev_readdir,
 		/* [HANDLE_TYPE_MPART]           = */ (size_t (KCALL *)(void *__restrict, USER CHECKED struct dirent *, size_t, readdir_mode_t, iomode_t))&handle_mpart_readdir,
 		/* [HANDLE_TYPE_MODULE_SECTION]  = */ (size_t (KCALL *)(void *__restrict, USER CHECKED struct dirent *, size_t, readdir_mode_t, iomode_t))&handle_module_section_readdir
 	},
@@ -841,7 +841,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_MODULE]          = */ (pos_t (KCALL *)(void *__restrict, off_t, unsigned int))&handle_module_seek,
 		/* [HANDLE_TYPE_PIDNS]           = */ (pos_t (KCALL *)(void *__restrict, off_t, unsigned int))&handle_pidns_seek,
 		/* [HANDLE_TYPE_DRIVER_LOADLIST] = */ (pos_t (KCALL *)(void *__restrict, off_t, unsigned int))&handle_driver_loadlist_seek,
-		/* [HANDLE_TYPE_CHARACTERDEVICE] = */ (pos_t (KCALL *)(void *__restrict, off_t, unsigned int))&handle_characterdevice_seek,
+		/* [HANDLE_TYPE_CHRDEV]          = */ (pos_t (KCALL *)(void *__restrict, off_t, unsigned int))&handle_chrdev_seek,
 		/* [HANDLE_TYPE_MPART]           = */ (pos_t (KCALL *)(void *__restrict, off_t, unsigned int))&handle_mpart_seek,
 		/* [HANDLE_TYPE_MODULE_SECTION]  = */ (pos_t (KCALL *)(void *__restrict, off_t, unsigned int))&handle_module_section_seek
 	},
@@ -870,7 +870,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_MODULE]          = */ (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_module_ioctl,
 		/* [HANDLE_TYPE_PIDNS]           = */ (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_pidns_ioctl,
 		/* [HANDLE_TYPE_DRIVER_LOADLIST] = */ (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_driver_loadlist_ioctl,
-		/* [HANDLE_TYPE_CHARACTERDEVICE] = */ (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_characterdevice_ioctl,
+		/* [HANDLE_TYPE_CHRDEV]          = */ (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_chrdev_ioctl,
 		/* [HANDLE_TYPE_MPART]           = */ (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_mpart_ioctl,
 		/* [HANDLE_TYPE_MODULE_SECTION]  = */ (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_module_section_ioctl
 	},
@@ -899,7 +899,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_MODULE]          = */ (void (KCALL *)(void *__restrict, pos_t))&handle_module_truncate,
 		/* [HANDLE_TYPE_PIDNS]           = */ (void (KCALL *)(void *__restrict, pos_t))&handle_pidns_truncate,
 		/* [HANDLE_TYPE_DRIVER_LOADLIST] = */ (void (KCALL *)(void *__restrict, pos_t))&handle_driver_loadlist_truncate,
-		/* [HANDLE_TYPE_CHARACTERDEVICE] = */ (void (KCALL *)(void *__restrict, pos_t))&handle_characterdevice_truncate,
+		/* [HANDLE_TYPE_CHRDEV]          = */ (void (KCALL *)(void *__restrict, pos_t))&handle_chrdev_truncate,
 		/* [HANDLE_TYPE_MPART]           = */ (void (KCALL *)(void *__restrict, pos_t))&handle_mpart_truncate,
 		/* [HANDLE_TYPE_MODULE_SECTION]  = */ (void (KCALL *)(void *__restrict, pos_t))&handle_module_section_truncate
 	},
@@ -928,7 +928,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_MODULE]          = */ (void (KCALL *)(void *__restrict, struct handle_mmap_info *__restrict))&handle_module_mmap,
 		/* [HANDLE_TYPE_PIDNS]           = */ (void (KCALL *)(void *__restrict, struct handle_mmap_info *__restrict))&handle_pidns_mmap,
 		/* [HANDLE_TYPE_DRIVER_LOADLIST] = */ (void (KCALL *)(void *__restrict, struct handle_mmap_info *__restrict))&handle_driver_loadlist_mmap,
-		/* [HANDLE_TYPE_CHARACTERDEVICE] = */ (void (KCALL *)(void *__restrict, struct handle_mmap_info *__restrict))&handle_characterdevice_mmap,
+		/* [HANDLE_TYPE_CHRDEV]          = */ (void (KCALL *)(void *__restrict, struct handle_mmap_info *__restrict))&handle_chrdev_mmap,
 		/* [HANDLE_TYPE_MPART]           = */ (void (KCALL *)(void *__restrict, struct handle_mmap_info *__restrict))&handle_mpart_mmap,
 		/* [HANDLE_TYPE_MODULE_SECTION]  = */ (void (KCALL *)(void *__restrict, struct handle_mmap_info *__restrict))&handle_module_section_mmap
 	},
@@ -957,7 +957,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_MODULE]          = */ (pos_t (KCALL *)(void *__restrict, fallocate_mode_t, pos_t, pos_t))&handle_module_allocate,
 		/* [HANDLE_TYPE_PIDNS]           = */ (pos_t (KCALL *)(void *__restrict, fallocate_mode_t, pos_t, pos_t))&handle_pidns_allocate,
 		/* [HANDLE_TYPE_DRIVER_LOADLIST] = */ (pos_t (KCALL *)(void *__restrict, fallocate_mode_t, pos_t, pos_t))&handle_driver_loadlist_allocate,
-		/* [HANDLE_TYPE_CHARACTERDEVICE] = */ (pos_t (KCALL *)(void *__restrict, fallocate_mode_t, pos_t, pos_t))&handle_characterdevice_allocate,
+		/* [HANDLE_TYPE_CHRDEV]          = */ (pos_t (KCALL *)(void *__restrict, fallocate_mode_t, pos_t, pos_t))&handle_chrdev_allocate,
 		/* [HANDLE_TYPE_MPART]           = */ (pos_t (KCALL *)(void *__restrict, fallocate_mode_t, pos_t, pos_t))&handle_mpart_allocate,
 		/* [HANDLE_TYPE_MODULE_SECTION]  = */ (pos_t (KCALL *)(void *__restrict, fallocate_mode_t, pos_t, pos_t))&handle_module_section_allocate
 	},
@@ -986,7 +986,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_MODULE]          = */ (void (KCALL *)(void *__restrict))&handle_module_sync,
 		/* [HANDLE_TYPE_PIDNS]           = */ (void (KCALL *)(void *__restrict))&handle_pidns_sync,
 		/* [HANDLE_TYPE_DRIVER_LOADLIST] = */ (void (KCALL *)(void *__restrict))&handle_driver_loadlist_sync,
-		/* [HANDLE_TYPE_CHARACTERDEVICE] = */ (void (KCALL *)(void *__restrict))&handle_characterdevice_sync,
+		/* [HANDLE_TYPE_CHRDEV]          = */ (void (KCALL *)(void *__restrict))&handle_chrdev_sync,
 		/* [HANDLE_TYPE_MPART]           = */ (void (KCALL *)(void *__restrict))&handle_mpart_sync,
 		/* [HANDLE_TYPE_MODULE_SECTION]  = */ (void (KCALL *)(void *__restrict))&handle_module_section_sync
 	},
@@ -1015,7 +1015,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_MODULE]          = */ (void (KCALL *)(void *__restrict))&handle_module_datasync,
 		/* [HANDLE_TYPE_PIDNS]           = */ (void (KCALL *)(void *__restrict))&handle_pidns_datasync,
 		/* [HANDLE_TYPE_DRIVER_LOADLIST] = */ (void (KCALL *)(void *__restrict))&handle_driver_loadlist_datasync,
-		/* [HANDLE_TYPE_CHARACTERDEVICE] = */ (void (KCALL *)(void *__restrict))&handle_characterdevice_datasync,
+		/* [HANDLE_TYPE_CHRDEV]          = */ (void (KCALL *)(void *__restrict))&handle_chrdev_datasync,
 		/* [HANDLE_TYPE_MPART]           = */ (void (KCALL *)(void *__restrict))&handle_mpart_datasync,
 		/* [HANDLE_TYPE_MODULE_SECTION]  = */ (void (KCALL *)(void *__restrict))&handle_module_section_datasync
 	},
@@ -1044,7 +1044,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_MODULE]          = */ (void (KCALL *)(void *__restrict, USER CHECKED struct stat *))&handle_module_stat,
 		/* [HANDLE_TYPE_PIDNS]           = */ (void (KCALL *)(void *__restrict, USER CHECKED struct stat *))&handle_pidns_stat,
 		/* [HANDLE_TYPE_DRIVER_LOADLIST] = */ (void (KCALL *)(void *__restrict, USER CHECKED struct stat *))&handle_driver_loadlist_stat,
-		/* [HANDLE_TYPE_CHARACTERDEVICE] = */ (void (KCALL *)(void *__restrict, USER CHECKED struct stat *))&handle_characterdevice_stat,
+		/* [HANDLE_TYPE_CHRDEV]          = */ (void (KCALL *)(void *__restrict, USER CHECKED struct stat *))&handle_chrdev_stat,
 		/* [HANDLE_TYPE_MPART]           = */ (void (KCALL *)(void *__restrict, USER CHECKED struct stat *))&handle_mpart_stat,
 		/* [HANDLE_TYPE_MODULE_SECTION]  = */ (void (KCALL *)(void *__restrict, USER CHECKED struct stat *))&handle_module_section_stat
 	},
@@ -1073,7 +1073,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_MODULE]          = */ (void (KCALL *)(void *__restrict, poll_mode_t))&handle_module_pollconnect,
 		/* [HANDLE_TYPE_PIDNS]           = */ (void (KCALL *)(void *__restrict, poll_mode_t))&handle_pidns_pollconnect,
 		/* [HANDLE_TYPE_DRIVER_LOADLIST] = */ (void (KCALL *)(void *__restrict, poll_mode_t))&handle_driver_loadlist_pollconnect,
-		/* [HANDLE_TYPE_CHARACTERDEVICE] = */ (void (KCALL *)(void *__restrict, poll_mode_t))&handle_characterdevice_pollconnect,
+		/* [HANDLE_TYPE_CHRDEV]          = */ (void (KCALL *)(void *__restrict, poll_mode_t))&handle_chrdev_pollconnect,
 		/* [HANDLE_TYPE_MPART]           = */ (void (KCALL *)(void *__restrict, poll_mode_t))&handle_mpart_pollconnect,
 		/* [HANDLE_TYPE_MODULE_SECTION]  = */ (void (KCALL *)(void *__restrict, poll_mode_t))&handle_module_section_pollconnect
 	},
@@ -1102,7 +1102,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_MODULE]          = */ (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_module_polltest,
 		/* [HANDLE_TYPE_PIDNS]           = */ (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_pidns_polltest,
 		/* [HANDLE_TYPE_DRIVER_LOADLIST] = */ (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_driver_loadlist_polltest,
-		/* [HANDLE_TYPE_CHARACTERDEVICE] = */ (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_characterdevice_polltest,
+		/* [HANDLE_TYPE_CHRDEV]          = */ (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_chrdev_polltest,
 		/* [HANDLE_TYPE_MPART]           = */ (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_mpart_polltest,
 		/* [HANDLE_TYPE_MODULE_SECTION]  = */ (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_module_section_polltest
 	},
@@ -1131,7 +1131,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_MODULE]          = */ (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_module_hop,
 		/* [HANDLE_TYPE_PIDNS]           = */ (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_pidns_hop,
 		/* [HANDLE_TYPE_DRIVER_LOADLIST] = */ (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_driver_loadlist_hop,
-		/* [HANDLE_TYPE_CHARACTERDEVICE] = */ (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_characterdevice_hop,
+		/* [HANDLE_TYPE_CHRDEV]          = */ (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_chrdev_hop,
 		/* [HANDLE_TYPE_MPART]           = */ (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_mpart_hop,
 		/* [HANDLE_TYPE_MODULE_SECTION]  = */ (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_module_section_hop
 	},
@@ -1160,7 +1160,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_MODULE]          = */ (REF void *(KCALL *)(void *__restrict, uintptr_half_t))&handle_module_tryas,
 		/* [HANDLE_TYPE_PIDNS]           = */ (REF void *(KCALL *)(void *__restrict, uintptr_half_t))&handle_pidns_tryas,
 		/* [HANDLE_TYPE_DRIVER_LOADLIST] = */ (REF void *(KCALL *)(void *__restrict, uintptr_half_t))&handle_driver_loadlist_tryas,
-		/* [HANDLE_TYPE_CHARACTERDEVICE] = */ (REF void *(KCALL *)(void *__restrict, uintptr_half_t))&handle_characterdevice_tryas,
+		/* [HANDLE_TYPE_CHRDEV]          = */ (REF void *(KCALL *)(void *__restrict, uintptr_half_t))&handle_chrdev_tryas,
 		/* [HANDLE_TYPE_MPART]           = */ (REF void *(KCALL *)(void *__restrict, uintptr_half_t))&handle_mpart_tryas,
 		/* [HANDLE_TYPE_MODULE_SECTION]  = */ (REF void *(KCALL *)(void *__restrict, uintptr_half_t))&handle_module_section_tryas
 	},
@@ -1858,35 +1858,35 @@ DEFINE_INTERN_WEAK_ALIAS(handle_driver_loadlist_polltest, handle_undefined_pollt
 DEFINE_INTERN_WEAK_ALIAS(handle_driver_loadlist_hop, handle_undefined_hop);
 DEFINE_INTERN_WEAK_ALIAS(handle_driver_loadlist_tryas, handle_undefined_tryas);
 
-/* Weakly define operators for `HANDLE_TYPE_CHARACTERDEVICE' (`struct character_device') */
-DEFINE_INTERN_WEAK_ALIAS(handle_characterdevice_refcnt, handle_undefined_refcnt);
-DEFINE_INTERN_WEAK_ALIAS(handle_characterdevice_incref, handle_undefined_incref);
-DEFINE_INTERN_WEAK_ALIAS(handle_characterdevice_decref, handle_undefined_decref);
-DEFINE_INTERN_WEAK_ALIAS(handle_characterdevice_tryincref, handle_undefined_tryincref);
-DEFINE_INTERN_WEAK_ALIAS(handle_characterdevice_weakgetref, handle_undefined_weakgetref);
-DEFINE_INTERN_WEAK_ALIAS(handle_characterdevice_weaklckref, handle_undefined_weaklckref);
-DEFINE_INTERN_WEAK_ALIAS(handle_characterdevice_weakdecref, handle_undefined_weakdecref);
-DEFINE_INTERN_WEAK_ALIAS(handle_characterdevice_read, handle_undefined_read);
-DEFINE_INTERN_WEAK_ALIAS(handle_characterdevice_write, handle_undefined_write);
-DEFINE_INTERN_WEAK_ALIAS(handle_characterdevice_pread, handle_undefined_pread);
-DEFINE_INTERN_WEAK_ALIAS(handle_characterdevice_pwrite, handle_undefined_pwrite);
-DEFINE_INTERN_WEAK_ALIAS(handle_characterdevice_readv, handle_undefined_readv);
-DEFINE_INTERN_WEAK_ALIAS(handle_characterdevice_writev, handle_undefined_writev);
-DEFINE_INTERN_WEAK_ALIAS(handle_characterdevice_preadv, handle_undefined_preadv);
-DEFINE_INTERN_WEAK_ALIAS(handle_characterdevice_pwritev, handle_undefined_pwritev);
-DEFINE_INTERN_WEAK_ALIAS(handle_characterdevice_readdir, handle_undefined_readdir);
-DEFINE_INTERN_WEAK_ALIAS(handle_characterdevice_seek, handle_undefined_seek);
-DEFINE_INTERN_WEAK_ALIAS(handle_characterdevice_ioctl, handle_undefined_ioctl);
-DEFINE_INTERN_WEAK_ALIAS(handle_characterdevice_truncate, handle_undefined_truncate);
-DEFINE_INTERN_WEAK_ALIAS(handle_characterdevice_mmap, handle_undefined_mmap);
-DEFINE_INTERN_WEAK_ALIAS(handle_characterdevice_allocate, handle_undefined_allocate);
-DEFINE_INTERN_WEAK_ALIAS(handle_characterdevice_sync, handle_undefined_sync);
-DEFINE_INTERN_WEAK_ALIAS(handle_characterdevice_datasync, handle_undefined_datasync);
-DEFINE_INTERN_WEAK_ALIAS(handle_characterdevice_stat, handle_undefined_stat);
-DEFINE_INTERN_WEAK_ALIAS(handle_characterdevice_pollconnect, handle_undefined_pollconnect);
-DEFINE_INTERN_WEAK_ALIAS(handle_characterdevice_polltest, handle_undefined_polltest);
-DEFINE_INTERN_WEAK_ALIAS(handle_characterdevice_hop, handle_undefined_hop);
-DEFINE_INTERN_WEAK_ALIAS(handle_characterdevice_tryas, handle_undefined_tryas);
+/* Weakly define operators for `HANDLE_TYPE_CHRDEV' (`struct chrdev') */
+DEFINE_INTERN_WEAK_ALIAS(handle_chrdev_refcnt, handle_undefined_refcnt);
+DEFINE_INTERN_WEAK_ALIAS(handle_chrdev_incref, handle_undefined_incref);
+DEFINE_INTERN_WEAK_ALIAS(handle_chrdev_decref, handle_undefined_decref);
+DEFINE_INTERN_WEAK_ALIAS(handle_chrdev_tryincref, handle_undefined_tryincref);
+DEFINE_INTERN_WEAK_ALIAS(handle_chrdev_weakgetref, handle_undefined_weakgetref);
+DEFINE_INTERN_WEAK_ALIAS(handle_chrdev_weaklckref, handle_undefined_weaklckref);
+DEFINE_INTERN_WEAK_ALIAS(handle_chrdev_weakdecref, handle_undefined_weakdecref);
+DEFINE_INTERN_WEAK_ALIAS(handle_chrdev_read, handle_undefined_read);
+DEFINE_INTERN_WEAK_ALIAS(handle_chrdev_write, handle_undefined_write);
+DEFINE_INTERN_WEAK_ALIAS(handle_chrdev_pread, handle_undefined_pread);
+DEFINE_INTERN_WEAK_ALIAS(handle_chrdev_pwrite, handle_undefined_pwrite);
+DEFINE_INTERN_WEAK_ALIAS(handle_chrdev_readv, handle_undefined_readv);
+DEFINE_INTERN_WEAK_ALIAS(handle_chrdev_writev, handle_undefined_writev);
+DEFINE_INTERN_WEAK_ALIAS(handle_chrdev_preadv, handle_undefined_preadv);
+DEFINE_INTERN_WEAK_ALIAS(handle_chrdev_pwritev, handle_undefined_pwritev);
+DEFINE_INTERN_WEAK_ALIAS(handle_chrdev_readdir, handle_undefined_readdir);
+DEFINE_INTERN_WEAK_ALIAS(handle_chrdev_seek, handle_undefined_seek);
+DEFINE_INTERN_WEAK_ALIAS(handle_chrdev_ioctl, handle_undefined_ioctl);
+DEFINE_INTERN_WEAK_ALIAS(handle_chrdev_truncate, handle_undefined_truncate);
+DEFINE_INTERN_WEAK_ALIAS(handle_chrdev_mmap, handle_undefined_mmap);
+DEFINE_INTERN_WEAK_ALIAS(handle_chrdev_allocate, handle_undefined_allocate);
+DEFINE_INTERN_WEAK_ALIAS(handle_chrdev_sync, handle_undefined_sync);
+DEFINE_INTERN_WEAK_ALIAS(handle_chrdev_datasync, handle_undefined_datasync);
+DEFINE_INTERN_WEAK_ALIAS(handle_chrdev_stat, handle_undefined_stat);
+DEFINE_INTERN_WEAK_ALIAS(handle_chrdev_pollconnect, handle_undefined_pollconnect);
+DEFINE_INTERN_WEAK_ALIAS(handle_chrdev_polltest, handle_undefined_polltest);
+DEFINE_INTERN_WEAK_ALIAS(handle_chrdev_hop, handle_undefined_hop);
+DEFINE_INTERN_WEAK_ALIAS(handle_chrdev_tryas, handle_undefined_tryas);
 
 /* Weakly define operators for `HANDLE_TYPE_MPART' (`struct mpart') */
 DEFINE_INTERN_WEAK_ALIAS(handle_mpart_refcnt, handle_undefined_refcnt);

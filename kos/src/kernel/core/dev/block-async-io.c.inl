@@ -376,10 +376,10 @@ done_success:
 #endif /* !DEFINE_IO_WRITE */
 		}
 		/* Deal with partition offsets. */
-		if likely(block_device_ispartition(self)) {
+		if likely(blkdev_ispart(self)) {
 			device_position += ((struct block_device_partition *)self)->bp_minaddr;
 			self = ((struct block_device_partition *)self)->bp_master;
-			assert(!block_device_ispartition(self));
+			assert(!blkdev_ispart(self));
 #ifdef DEFINE_IO_WRITE
 			/* Also check the drive master for being read-only. */
 			if unlikely(self->bd_flags & BLOCK_DEVICE_FLAG_READONLY)

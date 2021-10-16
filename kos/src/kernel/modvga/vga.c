@@ -1273,7 +1273,7 @@ VGA_DisableGraphicsMode(VGA *__restrict self) {
 
 
 PRIVATE NONNULL((1)) syscall_slong_t KCALL
-VGA_Ioctl(struct character_device *__restrict self, syscall_ulong_t cmd,
+VGA_Ioctl(struct chrdev *__restrict self, syscall_ulong_t cmd,
           USER UNCHECKED void *arg, iomode_t mode) THROWS(...) {
 	VGA *me = (VGA *)self;
 	(void)mode;
@@ -1314,7 +1314,7 @@ VGA_Ioctl(struct character_device *__restrict self, syscall_ulong_t cmd,
 }
 
 PRIVATE NONNULL((1, 2)) void KCALL
-VGA_MMap(struct character_device *__restrict self,
+VGA_MMap(struct chrdev *__restrict self,
          struct handle_mmap_info *__restrict info) THROWS(...) {
 	VGA *me = (VGA *)self;
 	info->hmi_file    = incref(&mfile_phys);
@@ -1564,7 +1564,7 @@ NOTHROW(KCALL vga_disable_annoying_blinking)(void) {
 
 PRIVATE ATTR_FREETEXT DRIVER_INIT void KCALL init(void) {
 	vga_disable_annoying_blinking();
-	vga_device = CHARACTER_DEVICE_ALLOC(VGA);
+	vga_device = CHRDEV_ALLOC(VGA);
 	TRY {
 		void *vram_base;
 		atomic_lock_cinit(&vga_device->v_lock);
@@ -1622,7 +1622,7 @@ PRIVATE ATTR_FREETEXT DRIVER_INIT void KCALL init(void) {
 			vga_state_text();
 
 			/* Register the VGA adapter device. */
-			character_device_register_auto(vga_device);
+			chrdev_register_auto(vga_device);
 		} EXCEPT {
 			NESTED_EXCEPTION;
 			mman_unmap(&mman_kernel, vram_base, vga_device->v_vram_size);
@@ -1637,7 +1637,7 @@ PRIVATE ATTR_FREETEXT DRIVER_INIT void KCALL init(void) {
 
 PRIVATE DRIVER_FINI void KCALL fini(void) {
 	if (vga_device) {
-		character_device_unregister(vga_device);
+		chrdev_unregister(vga_device);
 		decref(vga_device);
 	}
 }

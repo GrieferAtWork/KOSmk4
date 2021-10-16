@@ -161,9 +161,9 @@ struct inode_type {
 		 *
 		 * When this operator is set to `NULL', the inode will be opened as:
 		 * >> if (S_ISBLK(self->i_filemode)) {
-		 * >>     return { HANDLE_TYPE_BLKDEV, block_device_lookup(devno) };
+		 * >>     return { HANDLE_TYPE_BLKDEV, blkdev_lookup(devno) };
 		 * >> } else if (S_ISCHR(self->i_filemode)) {
-		 * >>     result = { HANDLE_TYPE_CHARACTERDEVICE, character_device_lookup(devno) };
+		 * >>     result = { HANDLE_TYPE_CHRDEV, chrdev_lookup(devno) };
 		 * >>     if (cdev->cd_type.ct_open)
 		 * >>         (*cdev->cd_type.ct_open)(cdev, &result);
 		 * >>     return result;
@@ -2337,7 +2337,7 @@ LOCAL ATTR_RETNONNULL WUNUSED REF struct superblock *
 		       E_FSERROR_CORRUPTED_FILE_SYSTEM, E_IOERROR, E_BADALLOC,
 		       E_SEGFAULT, E_WOULDBLOCK, ...) {
 	REF struct blkdev *dev;
-	dev = block_device_lookup_name(device_name);
+	dev = blkdev_lookup_name(device_name);
 	if unlikely(!dev)
 		THROW(E_FSERROR_NOT_A_BLOCK_DEVICE);
 	FINALLY_DECREF_UNLIKELY(dev);
@@ -2355,7 +2355,7 @@ LOCAL ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct superblock *
 		       E_FSERROR_CORRUPTED_FILE_SYSTEM, E_IOERROR, E_BADALLOC,
 		       E_SEGFAULT, E_WOULDBLOCK, ...) {
 	REF struct blkdev *dev;
-	dev = block_device_lookup_name(device_name);
+	dev = blkdev_lookup_name(device_name);
 	if unlikely(!dev)
 		THROW(E_FSERROR_NOT_A_BLOCK_DEVICE);
 	FINALLY_DECREF_UNLIKELY(dev);

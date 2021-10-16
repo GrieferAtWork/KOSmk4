@@ -107,7 +107,7 @@ kernel_terminal_check_sigtty(struct terminal *__restrict self,
 	struct ttybase_device *term;
 	REF struct taskpid *my_leader_pid;
 	term = container_of(self, struct ttybase_device, t_term);
-	assert(character_device_isattybase(term));
+	assert(chrdev_isttybase(term));
 	my_leader_pid = task_getprocessgroupleaderpid();
 	FINALLY_DECREF_UNLIKELY(my_leader_pid);
 	if unlikely(my_leader_pid != axref_ptr(&term->t_fproc)) {
@@ -229,7 +229,7 @@ kernel_terminal_raise(struct terminal *__restrict self,
 	REF struct taskpid *fg_pid;
 	struct ttybase_device *term;
 	term = container_of(self, struct ttybase_device, t_term);
-	assert(character_device_isattybase(term));
+	assert(chrdev_isttybase(term));
 	fg_pid = ttybase_device_getfproc(term);
 	if (fg_pid) {
 		REF struct task *fg;
@@ -256,12 +256,12 @@ kernel_terminal_check_sigttin(struct terminal *__restrict self) {
 /* Default character-device read/write  operator implementations  for tty  devices
  * These functions will call forward to `terminal_iread()' and `terminal_owrite()' */
 PUBLIC NONNULL((1)) size_t KCALL
-ttybase_device_iread(struct character_device *__restrict self,
+ttybase_device_iread(struct chrdev *__restrict self,
                      USER CHECKED void *dst,
                      size_t num_bytes, iomode_t mode) THROWS(...) {
 	size_t result;
 	struct ttybase_device *me;
-	assert(character_device_isattybase(self));
+	assert(chrdev_isttybase(self));
 	me = (struct ttybase_device *)self;
 	kernel_terminal_check_sigtty(&me->t_term, false);
 	result = terminal_iread(&me->t_term, dst, num_bytes, mode);
@@ -270,12 +270,12 @@ ttybase_device_iread(struct character_device *__restrict self,
 }
 
 PUBLIC NONNULL((1)) size_t KCALL
-ttybase_device_owrite(struct character_device *__restrict self,
+ttybase_device_owrite(struct chrdev *__restrict self,
                       USER CHECKED void const *src,
                       size_t num_bytes, iomode_t mode) THROWS(...) {
 	ssize_t result;
 	struct ttybase_device *me;
-	assert(character_device_isattybase(self));
+	assert(chrdev_isttybase(self));
 	me     = (struct ttybase_device *)self;
 	result = terminal_owrite(&me->t_term, src, num_bytes, mode);
 	assert((size_t)result <= num_bytes);
@@ -284,7 +284,7 @@ ttybase_device_owrite(struct character_device *__restrict self,
 
 
 PUBLIC NOBLOCK NONNULL((1)) void
-NOTHROW(KCALL ttybase_device_fini)(struct character_device *__restrict self) {
+NOTHROW(KCALL ttybase_device_fini)(struct chrdev *__restrict self) {
 	struct ttybase_device *me;
 	me = (struct ttybase_device *)self;
 	assertf(!awref_ptr(&me->t_cproc),
@@ -397,10 +397,10 @@ termiox_to_termios(USER CHECKED struct termios *__restrict dst,
 
 
 PUBLIC NONNULL((1)) syscall_slong_t KCALL /* @return: -EINVAL: Unsupported `cmd' */
-ttybase_device_tryioctl(struct character_device *__restrict self, syscall_ulong_t cmd,
+ttybase_device_tryioctl(struct chrdev *__restrict self, syscall_ulong_t cmd,
                         USER UNCHECKED void *arg, iomode_t UNUSED(mode)) THROWS(...) {
 	struct ttybase_device *me;
-	assert(character_device_isattybase(self));
+	assert(chrdev_isttybase(self));
 	me = (struct ttybase_device *)self;
 	switch (cmd) {
 
@@ -886,7 +886,7 @@ done:
 }
 
 PUBLIC NONNULL((1)) syscall_slong_t KCALL
-ttybase_device_ioctl(struct character_device *__restrict self, syscall_ulong_t cmd,
+ttybase_device_ioctl(struct chrdev *__restrict self, syscall_ulong_t cmd,
                      USER UNCHECKED void *arg, iomode_t mode) THROWS(...) {
 	syscall_slong_t result;
 	result = ttybase_device_tryioctl(self, cmd, arg, mode);
@@ -899,10 +899,10 @@ ttybase_device_ioctl(struct character_device *__restrict self, syscall_ulong_t c
 }
 
 PUBLIC NONNULL((1)) void KCALL
-ttybase_device_pollconnect(struct character_device *__restrict self,
+ttybase_device_pollconnect(struct chrdev *__restrict self,
                            poll_mode_t what) THROWS(...) {
 	struct ttybase_device *me;
-	assert(character_device_isattybase(self));
+	assert(chrdev_isttybase(self));
 	me = (struct ttybase_device *)self;
 	if (what & POLLINMASK)
 		terminal_pollconnect_iread(&me->t_term);
@@ -915,11 +915,11 @@ ttybase_device_pollconnect(struct character_device *__restrict self,
 }
 
 PUBLIC NONNULL((1)) poll_mode_t KCALL
-ttybase_device_polltest(struct character_device *__restrict self,
+ttybase_device_polltest(struct chrdev *__restrict self,
                         poll_mode_t what) THROWS(...) {
 	poll_mode_t result = 0;
 	struct ttybase_device *me;
-	assert(character_device_isattybase(self));
+	assert(chrdev_isttybase(self));
 	me = (struct ttybase_device *)self;
 	if (what & POLLINMASK) {
 		if (terminal_caniread(&me->t_term))
@@ -935,10 +935,10 @@ ttybase_device_polltest(struct character_device *__restrict self,
 
 
 PUBLIC NONNULL((1)) void KCALL
-ttybase_device_stat(struct character_device *__restrict self,
+ttybase_device_stat(struct chrdev *__restrict self,
                     USER CHECKED struct stat *result) THROWS(...) {
 	struct ttybase_device *me;
-	assert(character_device_isattybase(self));
+	assert(chrdev_isttybase(self));
 	me = (struct ttybase_device *)self;
 	/* Try to give user-space an estimate on the number of unread input bytes. */
 	result->st_size = ATOMIC_READ(me->t_term.t_ibuf.rb_avail) +
@@ -959,7 +959,7 @@ NOTHROW(KCALL ttybase_device_setctty)(struct ttybase_device *__restrict self,
 	REF struct task *session;
 	struct taskpid *session_pid;
 	assert(self);
-	assert(character_device_isattybase(self));
+	assert(chrdev_isttybase(self));
 	proc    = task_getprocess();
 	session = task_getsessionleader_srch_of(proc);
 	FINALLY_DECREF_UNLIKELY(session);
@@ -1076,7 +1076,7 @@ NOTHROW(KCALL ttybase_device_hupctty)(struct ttybase_device *required_old_ctty,
 	struct task *proc;
 	struct taskpid *session_pid;
 	REF struct task *session;
-	assert(!required_old_ctty || character_device_isattybase(required_old_ctty));
+	assert(!required_old_ctty || chrdev_isttybase(required_old_ctty));
 	proc    = task_getprocess();
 	session = task_getsessionleader_srch_of(proc);
 	FINALLY_DECREF_UNLIKELY(session);

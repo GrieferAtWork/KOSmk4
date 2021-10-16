@@ -44,7 +44,7 @@
 DECL_BEGIN
 
 PUBLIC NONNULL((1)) size_t KCALL
-ansitty_device_write(struct character_device *__restrict self,
+ansitty_device_write(struct chrdev *__restrict self,
                      USER CHECKED void const *src,
                      size_t num_bytes, iomode_t UNUSED(mode)) THROWS(...) {
 	struct ansitty_device *me = (struct ansitty_device *)self;
@@ -55,7 +55,7 @@ ansitty_device_write(struct character_device *__restrict self,
 }
 
 PUBLIC NONNULL((1)) syscall_slong_t KCALL
-ansitty_device_ioctl(struct character_device *__restrict self, syscall_ulong_t cmd,
+ansitty_device_ioctl(struct chrdev *__restrict self, syscall_ulong_t cmd,
                      USER UNCHECKED void *arg, iomode_t UNUSED(mode)) THROWS(...) {
 	struct ansitty_device *me = (struct ansitty_device *)self;
 	switch (cmd) {
@@ -145,8 +145,8 @@ ansitty_device_setled(struct ansitty *__restrict self,
 	output = awref_get(&me->at_tty);
 	if (output) {
 		FINALLY_DECREF_UNLIKELY(output);
-		if (output->t_ihandle_typ == HANDLE_TYPE_CHARACTERDEVICE &&
-		    character_device_isakeyboard((struct character_device *)output->t_ihandle_ptr)) {
+		if (output->t_ihandle_typ == HANDLE_TYPE_CHRDEV &&
+		    chrdev_iskeyboard((struct chrdev *)output->t_ihandle_ptr)) {
 			struct keyboard_device *kbd;
 			uintptr_t new_leds;
 			kbd = (struct keyboard_device *)output->t_ihandle_ptr;

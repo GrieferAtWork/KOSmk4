@@ -38,26 +38,26 @@ AWREF(tty_device_awref, tty_device);
 
 struct ansitty_device
 #ifdef __cplusplus
-	: character_device
+	: chrdev
 #endif /* __cplusplus */
 {
 #ifndef __cplusplus
-	struct character_device at_cdev; /* The underling character-device */
+	struct chrdev at_cdev; /* The underling character-device */
 #endif /* !__cplusplus */
 	struct ansitty          at_ansi; /* Ansi TTY support. */
 	struct tty_device_awref at_tty;  /* [0..1] Weak reference to a connected TTY (used for injecting keyboard input) */
 };
 
-#define character_device_isanansitty(self)                   \
+#define chrdev_isansitty(self)                               \
 	((self)->cd_heapsize >= sizeof(struct ansitty_device) && \
 	 (self)->cd_type.ct_write == &ansitty_device_write)
 
 FUNDEF NONNULL((1)) size_t KCALL
-ansitty_device_write(struct character_device *__restrict self,
+ansitty_device_write(struct chrdev *__restrict self,
                      USER CHECKED void const *src,
                      size_t num_bytes, iomode_t mode) THROWS(...);
 FUNDEF NONNULL((1)) syscall_slong_t KCALL
-ansitty_device_ioctl(struct character_device *__restrict self, syscall_ulong_t cmd,
+ansitty_device_ioctl(struct chrdev *__restrict self, syscall_ulong_t cmd,
                      USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
 #define ansitty_device_fini(self) (void)0 /* For now... */
 

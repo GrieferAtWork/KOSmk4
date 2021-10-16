@@ -50,26 +50,24 @@
 
 #ifdef CONFIG_USE_NEW_FS
 /* Backward-compatibility */
-#define inode            fnode
-#define regular_node     fregnode
-#define directory_node   fdirnode
-#define superblock       fsuper
-#define symlink_node     flnknode
-#define fifo_node        ffifonode
-#define socket_node      fsocknode
-#define character_device chrdev
-#define superblock_type  ffilesys
+#define inode           fnode
+#define regular_node    fregnode
+#define directory_node  fdirnode
+#define superblock      fsuper
+#define symlink_node    flnknode
+#define fifo_node       ffifonode
+#define socket_node     fsocknode
+#define superblock_type ffilesys
 #else /* CONFIG_USE_NEW_FS */
 /* Forward-compatibility */
-#define fnode       inode
-#define fregnode    regular_node
-#define fdirnode    directory_node
-#define fsuper      superblock
-#define flnknode    symlink_node
-#define ffifonode   fifo_node
-#define fsocknode   socket_node
-#define chrdev      character_device
-#define ffilesys    superblock_type
+#define fnode     inode
+#define fregnode  regular_node
+#define fdirnode  directory_node
+#define fsuper    superblock
+#define flnknode  symlink_node
+#define ffifonode fifo_node
+#define fsocknode socket_node
+#define ffilesys  superblock_type
 #endif /* !CONFIG_USE_NEW_FS */
 
 

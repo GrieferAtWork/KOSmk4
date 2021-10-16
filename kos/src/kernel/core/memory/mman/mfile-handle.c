@@ -1042,7 +1042,7 @@ handle_mfile_hop(struct mfile *__restrict self, syscall_ulong_t cmd,
 			      0, /* Filled in by the caller */
 			      HANDLE_TYPE_MFILE,
 			      0,
-			      HANDLE_TYPEKIND_DATABLOCK_INODE,
+			      HANDLE_TYPEKIND_MFILE_INODE,
 			      0);
 		}
 		result_handle.h_mode = mode;
@@ -1062,7 +1062,7 @@ handle_mfile_hop(struct mfile *__restrict self, syscall_ulong_t cmd,
 			      0, /* Filled in by the caller */
 			      HANDLE_TYPE_MFILE,
 			      0,
-			      HANDLE_TYPEKIND_DATABLOCK_INODE,
+			      HANDLE_TYPEKIND_MFILE_INODE,
 			      0);
 		validate_readwrite(arg, sizeof(struct hop_inode_chmod));
 		data        = (struct hop_inode_chmod *)arg;
@@ -1085,7 +1085,7 @@ handle_mfile_hop(struct mfile *__restrict self, syscall_ulong_t cmd,
 			      0, /* Filled in by the caller */
 			      HANDLE_TYPE_MFILE,
 			      0,
-			      HANDLE_TYPEKIND_DATABLOCK_INODE,
+			      HANDLE_TYPEKIND_MFILE_INODE,
 			      0);
 		validate_readwrite(arg, sizeof(struct hop_inode_chown));
 		data        = (struct hop_inode_chown *)arg;
@@ -1117,7 +1117,7 @@ handle_mfile_hop(struct mfile *__restrict self, syscall_ulong_t cmd,
 			      0, /* Filled in by the caller */
 			      HANDLE_TYPE_MFILE,
 			      0,
-			      HANDLE_TYPEKIND_DATABLOCK_DIRECTORY,
+			      HANDLE_TYPEKIND_MFILE_DIRECTORY,
 			      0);
 		me = (struct directory_node *)self;
 		validate_readwrite(arg, sizeof(struct hop_directory_opennode));
@@ -1184,7 +1184,7 @@ handle_mfile_hop(struct mfile *__restrict self, syscall_ulong_t cmd,
 			      0, /* Filled in by the caller */
 			      HANDLE_TYPE_MFILE,
 			      0,
-			      HANDLE_TYPEKIND_DATABLOCK_DIRECTORY,
+			      HANDLE_TYPEKIND_MFILE_DIRECTORY,
 			      0);
 		validate_readwrite(arg, sizeof(struct hop_directory_creatfile));
 		data        = (struct hop_directory_creatfile *)arg;
@@ -1266,7 +1266,7 @@ handle_mfile_hop(struct mfile *__restrict self, syscall_ulong_t cmd,
 			      0, /* Filled in by the caller */
 			      HANDLE_TYPE_MFILE,
 			      0,
-			      HANDLE_TYPEKIND_DATABLOCK_DIRECTORY,
+			      HANDLE_TYPEKIND_MFILE_DIRECTORY,
 			      0);
 		validate_readwrite(arg, sizeof(struct hop_directory_remove));
 		data        = (struct hop_directory_remove *)arg;
@@ -1346,7 +1346,7 @@ handle_mfile_hop(struct mfile *__restrict self, syscall_ulong_t cmd,
 			      0, /* Filled in by the caller */
 			      HANDLE_TYPE_MFILE,
 			      0,
-			      HANDLE_TYPEKIND_DATABLOCK_DIRECTORY,
+			      HANDLE_TYPEKIND_MFILE_DIRECTORY,
 			      0);
 		validate_readwrite(arg, sizeof(struct hop_directory_rename));
 		data        = (struct hop_directory_rename *)arg;
@@ -1441,7 +1441,7 @@ handle_mfile_hop(struct mfile *__restrict self, syscall_ulong_t cmd,
 			      0, /* Filled in by the caller */
 			      HANDLE_TYPE_MFILE,
 			      0,
-			      HANDLE_TYPEKIND_DATABLOCK_DIRECTORY,
+			      HANDLE_TYPEKIND_MFILE_DIRECTORY,
 			      0);
 		validate_readwrite(arg, sizeof(struct hop_directory_link));
 		data        = (struct hop_directory_link *)arg;
@@ -1503,7 +1503,7 @@ handle_mfile_hop(struct mfile *__restrict self, syscall_ulong_t cmd,
 			      0, /* Filled in by the caller */
 			      HANDLE_TYPE_MFILE,
 			      0,
-			      HANDLE_TYPEKIND_DATABLOCK_DIRECTORY,
+			      HANDLE_TYPEKIND_MFILE_DIRECTORY,
 			      0);
 		validate_readwrite(arg, sizeof(struct hop_directory_symlink));
 		data        = (struct hop_directory_symlink *)arg;
@@ -1582,7 +1582,7 @@ handle_mfile_hop(struct mfile *__restrict self, syscall_ulong_t cmd,
 			      0, /* Filled in by the caller */
 			      HANDLE_TYPE_MFILE,
 			      0,
-			      HANDLE_TYPEKIND_DATABLOCK_DIRECTORY,
+			      HANDLE_TYPEKIND_MFILE_DIRECTORY,
 			      0);
 		validate_readwrite(arg, sizeof(struct hop_directory_mknod));
 		data        = (struct hop_directory_mknod *)arg;
@@ -1666,7 +1666,7 @@ handle_mfile_hop(struct mfile *__restrict self, syscall_ulong_t cmd,
 			      0, /* Filled in by the caller */
 			      HANDLE_TYPE_MFILE,
 			      0,
-			      HANDLE_TYPEKIND_DATABLOCK_DIRECTORY,
+			      HANDLE_TYPEKIND_MFILE_DIRECTORY,
 			      0);
 		validate_readwrite(arg, sizeof(struct hop_directory_mkdir));
 		data        = (struct hop_directory_mkdir *)arg;
@@ -1727,12 +1727,12 @@ handle_mfile_hop(struct mfile *__restrict self, syscall_ulong_t cmd,
 			      0, /* Filled in by the caller */
 			      HANDLE_TYPE_MFILE,
 			      0,
-			      HANDLE_TYPEKIND_DATABLOCK_SUPERBLOCK,
+			      HANDLE_TYPEKIND_MFILE_SUPERBLOCK,
 			      0);
 		cred_require_sysadmin(); /* TODO: More finely grained access! */
 		result_handle.h_data = ((struct superblock *)self)->s_device;
 		if (!result_handle.h_data)
-			THROW(E_NO_DEVICE, E_NO_DEVICE_KIND_BLOCK_DEVICE);
+			THROW(E_NO_DEVICE, E_NO_DEVICE_KIND_BLKDEV);
 		result_handle.h_mode = mode;
 		result_handle.h_type = HANDLE_TYPE_BLKDEV;
 		return handle_installhop((USER UNCHECKED struct hop_openfd *)arg, result_handle);
@@ -1745,7 +1745,7 @@ handle_mfile_hop(struct mfile *__restrict self, syscall_ulong_t cmd,
 			      0, /* Filled in by the caller */
 			      HANDLE_TYPE_MFILE,
 			      0,
-			      HANDLE_TYPEKIND_DATABLOCK_SUPERBLOCK,
+			      HANDLE_TYPEKIND_MFILE_SUPERBLOCK,
 			      0);
 		cred_require_sysadmin();
 		result_handle.h_type = HANDLE_TYPE_MODULE;
@@ -1760,7 +1760,7 @@ handle_mfile_hop(struct mfile *__restrict self, syscall_ulong_t cmd,
 			      0, /* Filled in by the caller */
 			      HANDLE_TYPE_MFILE,
 			      0,
-			      HANDLE_TYPEKIND_DATABLOCK_SUPERBLOCK,
+			      HANDLE_TYPEKIND_MFILE_SUPERBLOCK,
 			      0);
 		superblock_sync((struct superblock *)self,
 		                (unsigned int)(uintptr_t)arg != 0);
@@ -1776,7 +1776,7 @@ handle_mfile_hop(struct mfile *__restrict self, syscall_ulong_t cmd,
 			      0, /* Filled in by the caller */
 			      HANDLE_TYPE_MFILE,
 			      0,
-			      HANDLE_TYPEKIND_DATABLOCK_INODE,
+			      HANDLE_TYPEKIND_MFILE_INODE,
 			      0);
 		}
 		validate_readwrite(arg, sizeof(struct hop_superblock_features));

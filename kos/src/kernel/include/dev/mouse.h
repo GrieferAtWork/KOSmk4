@@ -68,11 +68,11 @@ struct mouse_state {
 
 struct mouse_device
 #ifdef __cplusplus
-	: character_device
+	: chrdev
 #endif /* __cplusplus */
 {
 #ifndef __cplusplus
-	struct character_device md_dev;   /* The underlying character device. */
+	struct chrdev md_dev;   /* The underlying character device. */
 #endif /* !__cplusplus */
 	struct mouse_buffer     md_buf;   /* [lock(md_lock)] Mouse input buffer. */
 	struct mouse_state      md_state; /* [lock(md_lock)] Current mouse state at the head of the buffer of pending inputs. */
@@ -84,7 +84,7 @@ struct mouse_device
 };
 
 
-#define character_device_isamouse(self)                    \
+#define chrdev_ismouse(self)                    \
 	((self)->cd_heapsize >= sizeof(struct mouse_device) && \
 	 (self)->cd_type.ct_read == &mouse_device_read)
 
@@ -104,11 +104,11 @@ FUNDEF NOBLOCK void NOTHROW(KCALL mouse_device_init)(struct mouse_device *__rest
 
 
 /* Mouse character device operators */
-FUNDEF NONNULL((1)) size_t KCALL mouse_device_read(struct character_device *__restrict self, USER CHECKED void *dst, size_t num_bytes, iomode_t mode) THROWS(...);
-FUNDEF NONNULL((1)) syscall_slong_t KCALL mouse_device_ioctl(struct character_device *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
-FUNDEF NONNULL((1)) void KCALL mouse_device_stat(struct character_device *__restrict self, USER CHECKED struct stat *result) THROWS(...);
-FUNDEF NONNULL((1)) void KCALL mouse_device_pollconnect(struct character_device *__restrict self, poll_mode_t what) THROWS(...);
-FUNDEF NONNULL((1)) poll_mode_t KCALL mouse_device_polltest(struct character_device *__restrict self, poll_mode_t what) THROWS(...);
+FUNDEF NONNULL((1)) size_t KCALL mouse_device_read(struct chrdev *__restrict self, USER CHECKED void *dst, size_t num_bytes, iomode_t mode) THROWS(...);
+FUNDEF NONNULL((1)) syscall_slong_t KCALL mouse_device_ioctl(struct chrdev *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
+FUNDEF NONNULL((1)) void KCALL mouse_device_stat(struct chrdev *__restrict self, USER CHECKED struct stat *result) THROWS(...);
+FUNDEF NONNULL((1)) void KCALL mouse_device_pollconnect(struct chrdev *__restrict self, poll_mode_t what) THROWS(...);
+FUNDEF NONNULL((1)) poll_mode_t KCALL mouse_device_polltest(struct chrdev *__restrict self, poll_mode_t what) THROWS(...);
 
 /* Read packets from a given mouse device buffer. */
 FUNDEF NOBLOCK mouse_packet_t NOTHROW(KCALL mouse_buffer_trygetpacket)(struct mouse_buffer *__restrict self);

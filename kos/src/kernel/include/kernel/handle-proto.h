@@ -328,7 +328,7 @@ struct taskpid;
 struct module;
 struct pidns;
 struct driver_loadlist;
-struct character_device;
+struct chrdev;
 struct mpart;
 struct module_section;
 
@@ -1024,35 +1024,35 @@ INTDEF WUNUSED NONNULL((1)) poll_mode_t KCALL handle_driver_loadlist_polltest(st
 INTDEF NONNULL((1)) syscall_slong_t KCALL handle_driver_loadlist_hop(struct driver_loadlist *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
 INTDEF NONNULL((1)) REF void *KCALL handle_driver_loadlist_tryas(struct driver_loadlist *__restrict self, uintptr_half_t wanted_type) THROWS(E_WOULDBLOCK);
 
-/* Handle operators for `HANDLE_TYPE_CHARACTERDEVICE' (`struct character_device') */
-INTDEF NOBLOCK WUNUSED NONNULL((1)) refcnt_t NOTHROW(FCALL handle_characterdevice_refcnt)(struct character_device const *__restrict self);
-INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_characterdevice_incref)(struct character_device *__restrict self);
-INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_characterdevice_decref)(REF struct character_device *__restrict self);
-INTDEF NOBLOCK WUNUSED NONNULL((1)) __BOOL NOTHROW(FCALL handle_characterdevice_tryincref)(struct character_device *__restrict self);
-INTDEF NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1)) WEAK REF void *NOTHROW(FCALL handle_characterdevice_weakgetref)(struct character_device *__restrict self);
-INTDEF NOBLOCK WUNUSED NONNULL((1)) REF struct character_device *NOTHROW(FCALL handle_characterdevice_weaklckref)(void *__restrict weakref_ptr);
-INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_characterdevice_weakdecref)(WEAK REF void *__restrict weakref_ptr);
-INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_characterdevice_read(struct character_device *__restrict self, USER CHECKED void *dst, size_t num_bytes, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_characterdevice_write(struct character_device *__restrict self, USER CHECKED void const *src, size_t num_bytes, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_characterdevice_pread(struct character_device *__restrict self, USER CHECKED void *dst, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_characterdevice_pwrite(struct character_device *__restrict self, USER CHECKED void const *src, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_characterdevice_readv(struct character_device *__restrict self, struct iov_buffer *__restrict dst, size_t num_bytes, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_characterdevice_writev(struct character_device *__restrict self, struct iov_buffer *__restrict src, size_t num_bytes, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_characterdevice_preadv(struct character_device *__restrict self, struct iov_buffer *__restrict dst, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_characterdevice_pwritev(struct character_device *__restrict self, struct iov_buffer *__restrict src, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_characterdevice_readdir(struct character_device *__restrict self, USER CHECKED struct dirent *buf, size_t bufsize, readdir_mode_t readdir_mode, iomode_t mode) THROWS(...);
-INTDEF NONNULL((1)) pos_t KCALL handle_characterdevice_seek(struct character_device *__restrict self, off_t offset, unsigned int whence) THROWS(...);
-INTDEF NONNULL((1)) syscall_slong_t KCALL handle_characterdevice_ioctl(struct character_device *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
-INTDEF NONNULL((1)) void KCALL handle_characterdevice_truncate(struct character_device *__restrict self, pos_t new_size) THROWS(...);
-INTDEF NONNULL((1, 2)) void KCALL handle_characterdevice_mmap(struct character_device *__restrict self, struct handle_mmap_info *__restrict info) THROWS(...);
-INTDEF NONNULL((1)) pos_t KCALL handle_characterdevice_allocate(struct character_device *__restrict self, fallocate_mode_t mode, pos_t start, pos_t length) THROWS(...);
-INTDEF NONNULL((1)) void KCALL handle_characterdevice_sync(struct character_device *__restrict self) THROWS(...);
-INTDEF NONNULL((1)) void KCALL handle_characterdevice_datasync(struct character_device *__restrict self) THROWS(...);
-INTDEF NONNULL((1)) void KCALL handle_characterdevice_stat(struct character_device *__restrict self, USER CHECKED struct stat *result) THROWS(...);
-INTDEF NONNULL((1)) void KCALL handle_characterdevice_pollconnect(struct character_device *__restrict self, poll_mode_t what) THROWS(...);
-INTDEF WUNUSED NONNULL((1)) poll_mode_t KCALL handle_characterdevice_polltest(struct character_device *__restrict self, poll_mode_t what) THROWS(...);
-INTDEF NONNULL((1)) syscall_slong_t KCALL handle_characterdevice_hop(struct character_device *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
-INTDEF NONNULL((1)) REF void *KCALL handle_characterdevice_tryas(struct character_device *__restrict self, uintptr_half_t wanted_type) THROWS(E_WOULDBLOCK);
+/* Handle operators for `HANDLE_TYPE_CHRDEV' (`struct chrdev') */
+INTDEF NOBLOCK WUNUSED NONNULL((1)) refcnt_t NOTHROW(FCALL handle_chrdev_refcnt)(struct chrdev const *__restrict self);
+INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_chrdev_incref)(struct chrdev *__restrict self);
+INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_chrdev_decref)(REF struct chrdev *__restrict self);
+INTDEF NOBLOCK WUNUSED NONNULL((1)) __BOOL NOTHROW(FCALL handle_chrdev_tryincref)(struct chrdev *__restrict self);
+INTDEF NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1)) WEAK REF void *NOTHROW(FCALL handle_chrdev_weakgetref)(struct chrdev *__restrict self);
+INTDEF NOBLOCK WUNUSED NONNULL((1)) REF struct chrdev *NOTHROW(FCALL handle_chrdev_weaklckref)(void *__restrict weakref_ptr);
+INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_chrdev_weakdecref)(WEAK REF void *__restrict weakref_ptr);
+INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_chrdev_read(struct chrdev *__restrict self, USER CHECKED void *dst, size_t num_bytes, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_chrdev_write(struct chrdev *__restrict self, USER CHECKED void const *src, size_t num_bytes, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_chrdev_pread(struct chrdev *__restrict self, USER CHECKED void *dst, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_chrdev_pwrite(struct chrdev *__restrict self, USER CHECKED void const *src, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_chrdev_readv(struct chrdev *__restrict self, struct iov_buffer *__restrict dst, size_t num_bytes, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_chrdev_writev(struct chrdev *__restrict self, struct iov_buffer *__restrict src, size_t num_bytes, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_chrdev_preadv(struct chrdev *__restrict self, struct iov_buffer *__restrict dst, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_chrdev_pwritev(struct chrdev *__restrict self, struct iov_buffer *__restrict src, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_chrdev_readdir(struct chrdev *__restrict self, USER CHECKED struct dirent *buf, size_t bufsize, readdir_mode_t readdir_mode, iomode_t mode) THROWS(...);
+INTDEF NONNULL((1)) pos_t KCALL handle_chrdev_seek(struct chrdev *__restrict self, off_t offset, unsigned int whence) THROWS(...);
+INTDEF NONNULL((1)) syscall_slong_t KCALL handle_chrdev_ioctl(struct chrdev *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
+INTDEF NONNULL((1)) void KCALL handle_chrdev_truncate(struct chrdev *__restrict self, pos_t new_size) THROWS(...);
+INTDEF NONNULL((1, 2)) void KCALL handle_chrdev_mmap(struct chrdev *__restrict self, struct handle_mmap_info *__restrict info) THROWS(...);
+INTDEF NONNULL((1)) pos_t KCALL handle_chrdev_allocate(struct chrdev *__restrict self, fallocate_mode_t mode, pos_t start, pos_t length) THROWS(...);
+INTDEF NONNULL((1)) void KCALL handle_chrdev_sync(struct chrdev *__restrict self) THROWS(...);
+INTDEF NONNULL((1)) void KCALL handle_chrdev_datasync(struct chrdev *__restrict self) THROWS(...);
+INTDEF NONNULL((1)) void KCALL handle_chrdev_stat(struct chrdev *__restrict self, USER CHECKED struct stat *result) THROWS(...);
+INTDEF NONNULL((1)) void KCALL handle_chrdev_pollconnect(struct chrdev *__restrict self, poll_mode_t what) THROWS(...);
+INTDEF WUNUSED NONNULL((1)) poll_mode_t KCALL handle_chrdev_polltest(struct chrdev *__restrict self, poll_mode_t what) THROWS(...);
+INTDEF NONNULL((1)) syscall_slong_t KCALL handle_chrdev_hop(struct chrdev *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
+INTDEF NONNULL((1)) REF void *KCALL handle_chrdev_tryas(struct chrdev *__restrict self, uintptr_half_t wanted_type) THROWS(E_WOULDBLOCK);
 
 /* Handle operators for `HANDLE_TYPE_MPART' (`struct mpart') */
 INTDEF NOBLOCK WUNUSED NONNULL((1)) refcnt_t NOTHROW(FCALL handle_mpart_refcnt)(struct mpart const *__restrict self);

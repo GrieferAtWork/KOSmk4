@@ -323,7 +323,7 @@ PRIVATE u16 const usb_key_table[256] = {
 
 
 PRIVATE NOBLOCK unsigned int
-NOTHROW(KCALL usb_keyboard_interrupt_handler)(struct character_device *__restrict self,
+NOTHROW(KCALL usb_keyboard_interrupt_handler)(struct chrdev *__restrict self,
                                               unsigned int status,
                                               void const *data, size_t datalen) {
 	struct usb_keyboard_device *me;
@@ -421,7 +421,7 @@ done_notlast:
 
 
 PRIVATE NOBLOCK void
-NOTHROW(KCALL usb_keyboard_fini)(struct character_device *__restrict self) {
+NOTHROW(KCALL usb_keyboard_fini)(struct chrdev *__restrict self) {
 	struct usb_keyboard_device *me;
 	me = (struct usb_keyboard_device *)self;
 	if (me->uk_intr)
@@ -475,7 +475,7 @@ usb_keyboard_probe(struct usb_controller *__restrict self,
 	usb_controller_request_sync(self, data->ue_interface, &req, NULL);
 
 	/* Allocate the keyboard device. */
-	result = CHARACTER_DEVICE_ALLOC(struct usb_keyboard_device);
+	result = CHRDEV_ALLOC(struct usb_keyboard_device);
 	keyboard_device_init(result, &usb_keyboard_ops);
 	result->cd_type.ct_fini = &usb_keyboard_fini;
 	FINALLY_DECREF_UNLIKELY(result);
@@ -493,7 +493,7 @@ usb_keyboard_probe(struct usb_controller *__restrict self,
 		sprintf(result->cd_name, "usbkb%c", 'a' + n++);
 	}
 	/* Register the new device. */
-	character_device_register_auto(result);
+	chrdev_register_auto(result);
 	return true;
 }
 

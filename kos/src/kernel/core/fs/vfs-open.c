@@ -437,8 +437,8 @@ check_result_inode_for_symlink:
 				}
 				/* Assign a controlling terminal to the calling process. */
 				if (!(oflags & O_NOCTTY) &&
-				    result.h_type == HANDLE_TYPE_CHARACTERDEVICE &&
-				    character_device_isattybase((struct character_device *)result.h_data) &&
+				    result.h_type == HANDLE_TYPE_CHRDEV &&
+				    chrdev_isttybase((struct chrdev *)result.h_data) &&
 				    awref_ptr(&((struct ttybase_device *)result.h_data)->t_cproc) == NULL) {
 					/* NOTE: `ttybase_device_setctty()' is NOTHROW(), so no need to guard this call! */
 					ttybase_device_setctty((struct ttybase_device *)result.h_data);
@@ -469,9 +469,9 @@ check_result_inode_for_symlink:
 					COMPILER_READ_BARRIER();
 					devno = result_inode->i_filerdev;
 					COMPILER_READ_BARRIER();
-					result.h_data = block_device_lookup(devno);
+					result.h_data = blkdev_lookup(devno);
 					if unlikely(!result.h_data)
-						THROW(E_NO_DEVICE, E_NO_DEVICE_KIND_BLOCK_DEVICE, devno);
+						THROW(E_NO_DEVICE, E_NO_DEVICE_KIND_BLKDEV, devno);
 					result.h_type = HANDLE_TYPE_BLKDEV;
 					decref(result_inode);
 					decref(result_containing_path);
@@ -482,16 +482,16 @@ check_result_inode_for_symlink:
 				case S_IFCHR: {
 					/* Open the associated character-device. */
 					dev_t devno;
-					REF struct character_device *cdev;
+					REF struct chrdev *cdev;
 					inode_loadattr(result_inode);
 					COMPILER_READ_BARRIER();
 					devno = result_inode->i_filerdev;
 					COMPILER_READ_BARRIER();
-					cdev = character_device_lookup(devno);
+					cdev = chrdev_lookup(devno);
 					if unlikely(!cdev)
-						THROW(E_NO_DEVICE, E_NO_DEVICE_KIND_CHARACTER_DEVICE, devno);
+						THROW(E_NO_DEVICE, E_NO_DEVICE_KIND_CHRDEV, devno);
 					result.h_data = cdev; /* Inherit reference. */
-					result.h_type = HANDLE_TYPE_CHARACTERDEVICE;
+					result.h_type = HANDLE_TYPE_CHRDEV;
 					/* Allow custom callbacks during open(2) */
 					if unlikely(cdev->cd_type.ct_open) {
 						/* Keep an additional reference around during the callbacks
@@ -503,7 +503,7 @@ check_result_inode_for_symlink:
 						(*cdev->cd_type.ct_open)(cdev, &result);
 					}
 					/* Assign a controlling terminal to the calling process. */
-					if (!(oflags & O_NOCTTY) && character_device_isattybase(cdev) &&
+					if (!(oflags & O_NOCTTY) && chrdev_isttybase(cdev) &&
 					    awref_ptr(&((struct ttybase_device *)cdev)->t_cproc) == NULL) {
 						/* NOTE: `ttybase_device_setctty()' is NOTHROW(), so no need to guard this call! */
 						ttybase_device_setctty((struct ttybase_device *)cdev);

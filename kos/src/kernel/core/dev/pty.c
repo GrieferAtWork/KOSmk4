@@ -57,7 +57,7 @@ kernel_pty_oprinter(struct terminal *__restrict term,
 }
 
 PRIVATE NOBLOCK NONNULL((1)) void
-NOTHROW(KCALL pty_slave_fini)(struct character_device *__restrict self) {
+NOTHROW(KCALL pty_slave_fini)(struct chrdev *__restrict self) {
 	struct pty_slave *me;
 	REF struct pty_master *master;
 	me = (struct pty_slave *)self;
@@ -77,7 +77,7 @@ NOTHROW(KCALL pty_slave_fini)(struct character_device *__restrict self) {
 }
 
 PRIVATE NONNULL((1)) syscall_slong_t KCALL
-pty_slave_ioctl(struct character_device *__restrict self,
+pty_slave_ioctl(struct chrdev *__restrict self,
                 syscall_ulong_t cmd,
                 USER UNCHECKED void *arg,
                 iomode_t mode)
@@ -98,7 +98,7 @@ pty_slave_ioctl(struct character_device *__restrict self,
 
 
 PRIVATE NOBLOCK NONNULL((1)) void
-NOTHROW(KCALL pty_master_fini)(struct character_device *__restrict self) {
+NOTHROW(KCALL pty_master_fini)(struct chrdev *__restrict self) {
 	struct pty_master *me;
 	REF struct pty_slave *slave;
 	me    = (struct pty_master *)self;
@@ -117,7 +117,7 @@ NOTHROW(KCALL pty_master_fini)(struct character_device *__restrict self) {
 }
 
 PRIVATE NONNULL((1)) size_t KCALL
-pty_master_read(struct character_device *__restrict self,
+pty_master_read(struct chrdev *__restrict self,
                 USER CHECKED void *dst,
                 size_t num_bytes, iomode_t mode)
 		THROWS(...) {
@@ -163,7 +163,7 @@ again_read:
 }
 
 PRIVATE NONNULL((1)) size_t KCALL
-pty_master_write(struct character_device *__restrict self,
+pty_master_write(struct chrdev *__restrict self,
                  USER CHECKED void const *src,
                  size_t num_bytes, iomode_t mode)
 		THROWS(...) {
@@ -216,7 +216,7 @@ again_write:
 }
 
 PRIVATE NONNULL((1)) syscall_slong_t KCALL
-pty_master_ioctl(struct character_device *__restrict self,
+pty_master_ioctl(struct chrdev *__restrict self,
                  syscall_ulong_t cmd,
                  USER UNCHECKED void *arg,
                  iomode_t mode)
@@ -228,8 +228,8 @@ pty_master_ioctl(struct character_device *__restrict self,
 	slave = awref_get(&me->pm_slave);
 	if unlikely(!slave) {
 		THROW(E_NO_DEVICE,
-		      E_NO_DEVICE_KIND_CHARACTER_DEVICE,
-		      PTY_SLAVE(MINOR(character_device_devno(self))));
+		      E_NO_DEVICE_KIND_CHRDEV,
+		      PTY_SLAVE(MINOR(chrdev_devno(self))));
 	}
 	{
 		FINALLY_DECREF_UNLIKELY(slave);
@@ -239,7 +239,7 @@ pty_master_ioctl(struct character_device *__restrict self,
 }
 
 PRIVATE NONNULL((1)) void KCALL
-pty_master_stat(struct character_device *__restrict self,
+pty_master_stat(struct chrdev *__restrict self,
                 USER CHECKED struct stat *result)
 		THROWS(...) {
 	struct pty_master *me;
@@ -255,7 +255,7 @@ pty_master_stat(struct character_device *__restrict self,
 }
 
 PRIVATE NONNULL((1)) void KCALL
-pty_master_pollconnect(struct character_device *__restrict self,
+pty_master_pollconnect(struct chrdev *__restrict self,
                        poll_mode_t what)
 		THROWS(E_BADALLOC, E_WOULDBLOCK) {
 	struct pty_master *me;
@@ -278,7 +278,7 @@ pty_master_pollconnect(struct character_device *__restrict self,
 }
 
 PRIVATE NONNULL((1)) poll_mode_t KCALL
-pty_master_polltest(struct character_device *__restrict self,
+pty_master_polltest(struct chrdev *__restrict self,
                     poll_mode_t what)
 		THROWS(E_BADALLOC, E_WOULDBLOCK) {
 	struct pty_master *me;
@@ -302,7 +302,7 @@ pty_master_polltest(struct character_device *__restrict self,
 
 LOCAL REF struct pty_slave *KCALL pty_slave_alloc(void) {
 	REF struct pty_slave *result;
-	result = CHARACTER_DEVICE_ALLOC(struct pty_slave);
+	result = CHRDEV_ALLOC(struct pty_slave);
 	/* Initialize the underlying TTY-device base layer. */
 	ttybase_device_cinit(result, &kernel_pty_oprinter);
 	/* Override device operators. */
@@ -315,7 +315,7 @@ LOCAL REF struct pty_slave *KCALL pty_slave_alloc(void) {
 
 LOCAL REF struct pty_master *KCALL pty_master_alloc(void) {
 	REF struct pty_master *result;
-	result = CHARACTER_DEVICE_ALLOC(struct pty_master);
+	result = CHRDEV_ALLOC(struct pty_master);
 	/* Initialize device operators. */
 	result->cd_type.ct_fini        = &pty_master_fini;
 	result->cd_type.ct_read        = &pty_master_read;
@@ -409,7 +409,7 @@ DEFINE_SYSCALL5(errno_t, openpty,
 	FINALLY_DECREF_UNLIKELY(slave);
 	if (name)
 		sprintf(name, "/dev/%s", master->cd_name);
-	temp.h_type = HANDLE_TYPE_CHARACTERDEVICE;
+	temp.h_type = HANDLE_TYPE_CHRDEV;
 	temp.h_mode = IO_RDWR;
 	temp.h_data = master;
 	fdmaster    = handle_install(THIS_HANDLE_MANAGER, temp);

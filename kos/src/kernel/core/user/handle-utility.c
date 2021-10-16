@@ -66,41 +66,41 @@ NOTHROW(KCALL handle_typekind)(struct handle const *__restrict self) {
 	case HANDLE_TYPE_MFILE:
 		if (vm_datablock_isinode((struct mfile *)self->h_data)) {
 			if (INODE_ISSUPER((struct inode *)self->h_data))
-				return HANDLE_TYPEKIND_DATABLOCK_SUPERBLOCK;
+				return HANDLE_TYPEKIND_MFILE_SUPERBLOCK;
 			if (INODE_ISREG((struct inode *)self->h_data))
-				return HANDLE_TYPEKIND_DATABLOCK_REGULARNODE;
+				return HANDLE_TYPEKIND_MFILE_REGULARNODE;
 			if (INODE_ISDIR((struct inode *)self->h_data))
-				return HANDLE_TYPEKIND_DATABLOCK_DIRECTORY;
+				return HANDLE_TYPEKIND_MFILE_DIRECTORY;
 			if (INODE_ISLNK((struct inode *)self->h_data))
-				return HANDLE_TYPEKIND_DATABLOCK_SYMLINKNODE;
+				return HANDLE_TYPEKIND_MFILE_SYMLINKNODE;
 			if (INODE_ISFIFO((struct inode *)self->h_data))
-				return HANDLE_TYPEKIND_DATABLOCK_FIFONODE;
+				return HANDLE_TYPEKIND_MFILE_FIFONODE;
 			if (INODE_ISSOCK((struct inode *)self->h_data))
-				return HANDLE_TYPEKIND_DATABLOCK_SOCKETNODE;
-			return HANDLE_TYPEKIND_DATABLOCK_INODE;
+				return HANDLE_TYPEKIND_MFILE_SOCKETNODE;
+			return HANDLE_TYPEKIND_MFILE_INODE;
 		}
 		break;
 
 	case HANDLE_TYPE_BLKDEV:
-		if (block_device_ispartition((struct block_device *)self->h_data))
+		if (blkdev_ispart((struct block_device *)self->h_data))
 			return HANDLE_TYPEKIND_BLKDEV_PARTITION;
 		return HANDLE_TYPEKIND_BLKDEV_DRIVEROOT;
 		break;
 
-	case HANDLE_TYPE_CHARACTERDEVICE: {
-		struct character_device *me;
-		me = (struct character_device *)self;
-		if (character_device_isattybase(me)) {
+	case HANDLE_TYPE_CHRDEV: {
+		struct chrdev *me;
+		me = (struct chrdev *)self;
+		if (chrdev_isttybase(me)) {
 			if (ttybase_isapty((struct ttybase_device *)me))
-				return HANDLE_TYPEKIND_CHARACTERDEVICE_PTY;
+				return HANDLE_TYPEKIND_CHRDEV_PTY;
 			if (ttybase_isatty((struct ttybase_device *)me))
-				return HANDLE_TYPEKIND_CHARACTERDEVICE_TTY;
-			return HANDLE_TYPEKIND_CHARACTERDEVICE_TTYBASE;
+				return HANDLE_TYPEKIND_CHRDEV_TTY;
+			return HANDLE_TYPEKIND_CHRDEV_TTYBASE;
 		}
-		if (character_device_isakeyboard(me))
-			return HANDLE_TYPEKIND_CHARACTERDEVICE_KEYBOARD;
-		if (character_device_isamouse(me))
-			return HANDLE_TYPEKIND_CHARACTERDEVICE_MOUSE;
+		if (chrdev_iskeyboard(me))
+			return HANDLE_TYPEKIND_CHRDEV_KEYBOARD;
+		if (chrdev_ismouse(me))
+			return HANDLE_TYPEKIND_CHRDEV_MOUSE;
 	}	break;
 
 	case HANDLE_TYPE_PATH: {
@@ -129,8 +129,8 @@ NOTHROW(KCALL handle_typekind)(struct handle const *__restrict self) {
 
 
 LOCAL WUNUSED NONNULL((1, 2)) bool KCALL
-character_device_datasize(struct character_device *__restrict self,
-                          pos_t *__restrict presult) {
+chrdev_datasize(struct chrdev *__restrict self,
+                pos_t *__restrict presult) {
 	struct stat st;
 	if (!self->cd_type.ct_stat)
 		return false;
@@ -180,10 +180,10 @@ handle_datasize(struct handle const *__restrict self,
 		         (pos_t)me->bd_sector_size);
 	}	break;
 
-	case HANDLE_TYPE_CHARACTERDEVICE: {
-		struct character_device *me;
-		me = (struct character_device *)self->h_data;
-		return character_device_datasize(me, presult);
+	case HANDLE_TYPE_CHRDEV: {
+		struct chrdev *me;
+		me = (struct chrdev *)self->h_data;
+		return chrdev_datasize(me, presult);
 	}	break;
 
 	case HANDLE_TYPE_FDIRENT: {
@@ -296,12 +296,12 @@ handle_print(struct handle const *__restrict self,
 	}	break;
 
 	case HANDLE_TYPE_BLKDEV:
-	case HANDLE_TYPE_CHARACTERDEVICE: {
+	case HANDLE_TYPE_CHRDEV: {
 		REF struct path *mount;
 		char const *devname;
-		if (self->h_type == HANDLE_TYPE_CHARACTERDEVICE) {
-			struct character_device *me;
-			me      = (struct character_device *)self->h_data;
+		if (self->h_type == HANDLE_TYPE_CHRDEV) {
+			struct chrdev *me;
+			me      = (struct chrdev *)self->h_data;
 			devname = me->cd_name;
 		} else {
 			struct block_device *me;
@@ -701,7 +701,7 @@ handle_as_inode(/*inherit(on_success)*/ REF struct handle const *__restrict self
 	}
 	throw_invalid_handle_type(self,
 	                          HANDLE_TYPE_MFILE,
-	                          HANDLE_TYPEKIND_DATABLOCK_INODE);
+	                          HANDLE_TYPEKIND_MFILE_INODE);
 }
 
 PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct regular_node *FCALL
@@ -725,7 +725,7 @@ handle_as_regular_node(/*inherit(on_success)*/ REF struct handle const *__restri
 	}
 	throw_invalid_handle_type(self,
 	                          HANDLE_TYPE_MFILE,
-	                          HANDLE_TYPEKIND_DATABLOCK_REGULARNODE);
+	                          HANDLE_TYPEKIND_MFILE_REGULARNODE);
 }
 
 PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct directory_node *FCALL
@@ -749,7 +749,7 @@ handle_as_directory_node(/*inherit(on_success)*/ REF struct handle const *__rest
 	}
 	throw_invalid_handle_type(self,
 	                          HANDLE_TYPE_MFILE,
-	                          HANDLE_TYPEKIND_DATABLOCK_DIRECTORY);
+	                          HANDLE_TYPEKIND_MFILE_DIRECTORY);
 }
 
 PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct superblock *FCALL
@@ -773,7 +773,7 @@ handle_as_superblock(/*inherit(on_success)*/ REF struct handle const *__restrict
 	}
 	throw_invalid_handle_type(self,
 	                          HANDLE_TYPE_MFILE,
-	                          HANDLE_TYPEKIND_DATABLOCK_SUPERBLOCK);
+	                          HANDLE_TYPEKIND_MFILE_SUPERBLOCK);
 }
 
 PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct superblock *FCALL
@@ -803,7 +803,7 @@ handle_as_superblock_relaxed(/*inherit(on_success)*/ REF struct handle const *__
 	}
 	throw_invalid_handle_type(self,
 	                          HANDLE_TYPE_MFILE,
-	                          HANDLE_TYPEKIND_DATABLOCK_SUPERBLOCK);
+	                          HANDLE_TYPEKIND_MFILE_SUPERBLOCK);
 }
 
 PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct symlink_node *FCALL
@@ -827,7 +827,7 @@ handle_as_symlink_node(/*inherit(on_success)*/ REF struct handle const *__restri
 	}
 	throw_invalid_handle_type(self,
 	                          HANDLE_TYPE_MFILE,
-	                          HANDLE_TYPEKIND_DATABLOCK_SYMLINKNODE);
+	                          HANDLE_TYPEKIND_MFILE_SYMLINKNODE);
 }
 
 PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct fifo_node *FCALL
@@ -851,7 +851,7 @@ handle_as_fifo_node(/*inherit(on_success)*/ REF struct handle const *__restrict 
 	}
 	throw_invalid_handle_type(self,
 	                          HANDLE_TYPE_MFILE,
-	                          HANDLE_TYPEKIND_DATABLOCK_FIFONODE);
+	                          HANDLE_TYPEKIND_MFILE_FIFONODE);
 }
 
 PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct socket_node *FCALL
@@ -875,7 +875,7 @@ handle_as_socket_node(/*inherit(on_success)*/ REF struct handle const *__restric
 	}
 	throw_invalid_handle_type(self,
 	                          HANDLE_TYPE_MFILE,
-	                          HANDLE_TYPEKIND_DATABLOCK_SOCKETNODE);
+	                          HANDLE_TYPEKIND_MFILE_SOCKETNODE);
 }
 
 /* @throw: E_PROCESS_EXITED: `fd' belongs to a task that is no longer allocated. */

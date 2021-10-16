@@ -421,12 +421,12 @@
                                                             * [fld(devno: dev_t, "The number for the named device")] */
 #endif /* !E_NO_DEVICE */
 /*[[[end]]]*/
-#ifndef E_NO_DEVICE_KIND_BLOCK_DEVICE
-#define E_NO_DEVICE_KIND_BLOCK_DEVICE     1 /* A block device was missing */
-#endif /* !E_NO_DEVICE_KIND_BLOCK_DEVICE */
-#ifndef E_NO_DEVICE_KIND_CHARACTER_DEVICE
-#define E_NO_DEVICE_KIND_CHARACTER_DEVICE 2 /* A character device was missing */
-#endif /* !E_NO_DEVICE_KIND_CHARACTER_DEVICE */
+#ifndef E_NO_DEVICE_KIND_BLKDEV
+#define E_NO_DEVICE_KIND_BLKDEV 0x6000 /* A block device was missing (== S_IFBLK) */
+#endif /* !E_NO_DEVICE_KIND_BLKDEV */
+#ifndef E_NO_DEVICE_KIND_CHRDEV
+#define E_NO_DEVICE_KIND_CHRDEV 0x2000 /* A character device was missing (== S_IFCHR) */
+#endif /* !E_NO_DEVICE_KIND_CHRDEV */
 /*[[[begin]]]*/
 
 

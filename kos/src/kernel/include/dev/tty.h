@@ -29,7 +29,7 @@ DECL_BEGIN
 
 /* Terminal display  drivers such  as VGA  should not  implement  the
  * tty  interface.  Instead,  they  should  only  need  to  implement
- * the normal character_device interface and provide a write-operator
+ * the normal chrdev interface and provide a write-operator
  * that  implements an ansi-compliant display port (using libansitty)
  *
  * An actual `struct tty_device' shouldn't actually be something that gets created
@@ -78,24 +78,24 @@ struct tty_device
 
 #define ttybase_isatty(self) \
 	((self)->cd_type.ct_pollconnect == &tty_device_pollconnect)
-#define character_device_isatty(self) \
+#define chrdev_istty(self) \
 	((self)->cd_type.ct_pollconnect == &tty_device_pollconnect)
-FUNDEF NONNULL((1)) void KCALL tty_device_pollconnect(struct character_device *__restrict self, poll_mode_t what) THROWS(...);
-FUNDEF NONNULL((1)) poll_mode_t KCALL tty_device_polltest(struct character_device *__restrict self, poll_mode_t what) THROWS(...);
+FUNDEF NONNULL((1)) void KCALL tty_device_pollconnect(struct chrdev *__restrict self, poll_mode_t what) THROWS(...);
+FUNDEF NONNULL((1)) poll_mode_t KCALL tty_device_polltest(struct chrdev *__restrict self, poll_mode_t what) THROWS(...);
 
 /* Create (but  don't register)  a new  TTY device  that connects  the two  given
  * handles, such that character-based keyboard input is taken from `ihandle_ptr',
  * and   ansi-compliant   display    output   is    written   to    `ohandle_ptr'
  * For   this   purpose,  special   handling   is  done   for   certain  handles:
- *   - `ohandle_typ == HANDLE_TYPE_CHARACTERDEVICE && character_device_isanansitty(ohandle_ptr)':
+ *   - `ohandle_typ == HANDLE_TYPE_CHRDEV && chrdev_isansitty(ohandle_ptr)':
  *     `((struct ansitty_device *)ohandle_ptr)->at_tty' will be bound to the newly created tty  device
  *     (s.a.. `return'), such that its output gets injected as `terminal_iwrite(&return->t_term, ...)'
  *     When the returned tty device is destroyed, this link gets severed automatically.
  * Upon success, the caller should:
  *   - Initialize `return->cd_name'
  *   - Register the device using one of:
- *      - `character_device_register(return, ...)'
- *      - `character_device_register_auto(return)'
+ *      - `chrdev_register(return, ...)'
+ *      - `chrdev_register_auto(return)'
  * NOTE: The TTY is created with data forwarding disabled. */
 FUNDEF ATTR_RETNONNULL REF struct tty_device *KCALL
 tty_device_alloc(uintptr_half_t ihandle_typ, void *ihandle_ptr,

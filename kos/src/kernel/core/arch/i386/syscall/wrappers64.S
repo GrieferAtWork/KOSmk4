@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x22816cd6 */
+/* HASH CRC-32:0xb9fb11d0 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -114,15 +114,15 @@ END(__x86_asm64_syscall_write)
  * When  `oflags & O_CREAT',   then  `mode'   specifies  the   initial
  * file  access  permissions with  which  the file  should  be opened.
  * On KOS, the returned handle can be anything, but is usually one of:
- *   - HANDLE_TYPE_PATH:            When `O_PATH' was given
- *   - HANDLE_TYPE_BLKDEV:          For `S_IFBLK' files
- *   - HANDLE_TYPE_CHARACTERDEVICE: For `S_IFCHR' files (in this case, `O_NOCTTY' gains meaning)
- *   - HANDLE_TYPE_FIFO_USER:       For `S_IFIFO' files
- *   - HANDLE_TYPE_MFILE:           For `S_IFLNK' files (only when `O_SYMLINK' was given)
- *   - HANDLE_TYPE_DIRHANDLE:       For `S_IFDIR' files from special one-shot directories
- *   - HANDLE_TYPE_FILEHANDLE:      For `S_IFREG' and `S_IFDIR' (~normal~) files
- *   - *:                           Certain filesystem names can literally return anything, such
- *                                  as `/proc/self/fd/1234',  which  is  more  like  `dup(1234)' */
+ *   - HANDLE_TYPE_PATH:       When `O_PATH' was given
+ *   - HANDLE_TYPE_BLKDEV:     For `S_IFBLK' files
+ *   - HANDLE_TYPE_CHRDEV:     For `S_IFCHR' files (in this case, `O_NOCTTY' gains meaning)
+ *   - HANDLE_TYPE_FIFO_USER:  For `S_IFIFO' files
+ *   - HANDLE_TYPE_MFILE:      For `S_IFLNK' files (only when `O_SYMLINK' was given)
+ *   - HANDLE_TYPE_DIRHANDLE:  For `S_IFDIR' files from special one-shot directories
+ *   - HANDLE_TYPE_FILEHANDLE: For `S_IFREG' and `S_IFDIR' (~normal~) files
+ *   - *:                      Certain filesystem names can literally return anything, such
+ *                             as `/proc/self/fd/1234',  which  is  more  like  `dup(1234)' */
 /* fd_t open(char const *filename, oflag_t oflags, mode_t mode) */
 .section .text.x86.asm64_syscall.open
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_open)
@@ -8210,15 +8210,15 @@ END(__x86_asm64_syscall_migrate_pages)
  * When  `oflags & O_CREAT',   then  `mode'   specifies  the   initial
  * file  access  permissions with  which  the file  should  be opened.
  * On KOS, the returned handle can be anything, but is usually one of:
- *   - HANDLE_TYPE_PATH:            When `O_PATH' was given
- *   - HANDLE_TYPE_BLKDEV:          For `S_IFBLK' files
- *   - HANDLE_TYPE_CHARACTERDEVICE: For `S_IFCHR' files (in this case, `O_NOCTTY' gains meaning)
- *   - HANDLE_TYPE_FIFO_USER:       For `S_IFIFO' files
- *   - HANDLE_TYPE_MFILE:           For `S_IFLNK' files (only when `O_SYMLINK' was given)
- *   - HANDLE_TYPE_DIRHANDLE:       For `S_IFDIR' files from special one-shot directories
- *   - HANDLE_TYPE_FILEHANDLE:      For `S_IFREG' and `S_IFDIR' (~normal~) files
- *   - *:                           Certain filesystem names can literally return anything, such
- *                                  as `/proc/self/fd/1234',  which  is  more  like  `dup(1234)' */
+ *   - HANDLE_TYPE_PATH:       When `O_PATH' was given
+ *   - HANDLE_TYPE_BLKDEV:     For `S_IFBLK' files
+ *   - HANDLE_TYPE_CHRDEV:     For `S_IFCHR' files (in this case, `O_NOCTTY' gains meaning)
+ *   - HANDLE_TYPE_FIFO_USER:  For `S_IFIFO' files
+ *   - HANDLE_TYPE_MFILE:      For `S_IFLNK' files (only when `O_SYMLINK' was given)
+ *   - HANDLE_TYPE_DIRHANDLE:  For `S_IFDIR' files from special one-shot directories
+ *   - HANDLE_TYPE_FILEHANDLE: For `S_IFREG' and `S_IFDIR' (~normal~) files
+ *   - *:                      Certain filesystem names can literally return anything, such
+ *                             as `/proc/self/fd/1234',  which  is  more  like  `dup(1234)' */
 /* fd_t openat(fd_t dirfd, char const *filename, oflag_t oflags, mode_t mode) */
 .section .text.x86.asm64_syscall.openat
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_openat)
@@ -13270,15 +13270,15 @@ END(__x86_asm32_int80_write)
  * When  `oflags & O_CREAT',   then  `mode'   specifies  the   initial
  * file  access  permissions with  which  the file  should  be opened.
  * On KOS, the returned handle can be anything, but is usually one of:
- *   - HANDLE_TYPE_PATH:            When `O_PATH' was given
- *   - HANDLE_TYPE_BLKDEV:          For `S_IFBLK' files
- *   - HANDLE_TYPE_CHARACTERDEVICE: For `S_IFCHR' files (in this case, `O_NOCTTY' gains meaning)
- *   - HANDLE_TYPE_FIFO_USER:       For `S_IFIFO' files
- *   - HANDLE_TYPE_MFILE:           For `S_IFLNK' files (only when `O_SYMLINK' was given)
- *   - HANDLE_TYPE_DIRHANDLE:       For `S_IFDIR' files from special one-shot directories
- *   - HANDLE_TYPE_FILEHANDLE:      For `S_IFREG' and `S_IFDIR' (~normal~) files
- *   - *:                           Certain filesystem names can literally return anything, such
- *                                  as `/proc/self/fd/1234',  which  is  more  like  `dup(1234)' */
+ *   - HANDLE_TYPE_PATH:       When `O_PATH' was given
+ *   - HANDLE_TYPE_BLKDEV:     For `S_IFBLK' files
+ *   - HANDLE_TYPE_CHRDEV:     For `S_IFCHR' files (in this case, `O_NOCTTY' gains meaning)
+ *   - HANDLE_TYPE_FIFO_USER:  For `S_IFIFO' files
+ *   - HANDLE_TYPE_MFILE:      For `S_IFLNK' files (only when `O_SYMLINK' was given)
+ *   - HANDLE_TYPE_DIRHANDLE:  For `S_IFDIR' files from special one-shot directories
+ *   - HANDLE_TYPE_FILEHANDLE: For `S_IFREG' and `S_IFDIR' (~normal~) files
+ *   - *:                      Certain filesystem names can literally return anything, such
+ *                             as `/proc/self/fd/1234',  which  is  more  like  `dup(1234)' */
 /* fd_t open(char const *filename, oflag_t oflags, mode_t mode) */
 .section .text.x86.asm32_syscall_int80.open
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_open)
@@ -20460,15 +20460,15 @@ END(__x86_asm32_int80_migrate_pages)
  * When  `oflags & O_CREAT',   then  `mode'   specifies  the   initial
  * file  access  permissions with  which  the file  should  be opened.
  * On KOS, the returned handle can be anything, but is usually one of:
- *   - HANDLE_TYPE_PATH:            When `O_PATH' was given
- *   - HANDLE_TYPE_BLKDEV:          For `S_IFBLK' files
- *   - HANDLE_TYPE_CHARACTERDEVICE: For `S_IFCHR' files (in this case, `O_NOCTTY' gains meaning)
- *   - HANDLE_TYPE_FIFO_USER:       For `S_IFIFO' files
- *   - HANDLE_TYPE_MFILE:           For `S_IFLNK' files (only when `O_SYMLINK' was given)
- *   - HANDLE_TYPE_DIRHANDLE:       For `S_IFDIR' files from special one-shot directories
- *   - HANDLE_TYPE_FILEHANDLE:      For `S_IFREG' and `S_IFDIR' (~normal~) files
- *   - *:                           Certain filesystem names can literally return anything, such
- *                                  as `/proc/self/fd/1234',  which  is  more  like  `dup(1234)' */
+ *   - HANDLE_TYPE_PATH:       When `O_PATH' was given
+ *   - HANDLE_TYPE_BLKDEV:     For `S_IFBLK' files
+ *   - HANDLE_TYPE_CHRDEV:     For `S_IFCHR' files (in this case, `O_NOCTTY' gains meaning)
+ *   - HANDLE_TYPE_FIFO_USER:  For `S_IFIFO' files
+ *   - HANDLE_TYPE_MFILE:      For `S_IFLNK' files (only when `O_SYMLINK' was given)
+ *   - HANDLE_TYPE_DIRHANDLE:  For `S_IFDIR' files from special one-shot directories
+ *   - HANDLE_TYPE_FILEHANDLE: For `S_IFREG' and `S_IFDIR' (~normal~) files
+ *   - *:                      Certain filesystem names can literally return anything, such
+ *                             as `/proc/self/fd/1234',  which  is  more  like  `dup(1234)' */
 /* fd_t openat(fd_t dirfd, char const *filename, oflag_t oflags, mode_t mode) */
 .section .text.x86.asm32_syscall_int80.openat
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_openat)
@@ -26435,15 +26435,15 @@ DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_write, __x86_asm32_int80_write)
  * When  `oflags & O_CREAT',   then  `mode'   specifies  the   initial
  * file  access  permissions with  which  the file  should  be opened.
  * On KOS, the returned handle can be anything, but is usually one of:
- *   - HANDLE_TYPE_PATH:            When `O_PATH' was given
- *   - HANDLE_TYPE_BLKDEV:          For `S_IFBLK' files
- *   - HANDLE_TYPE_CHARACTERDEVICE: For `S_IFCHR' files (in this case, `O_NOCTTY' gains meaning)
- *   - HANDLE_TYPE_FIFO_USER:       For `S_IFIFO' files
- *   - HANDLE_TYPE_MFILE:           For `S_IFLNK' files (only when `O_SYMLINK' was given)
- *   - HANDLE_TYPE_DIRHANDLE:       For `S_IFDIR' files from special one-shot directories
- *   - HANDLE_TYPE_FILEHANDLE:      For `S_IFREG' and `S_IFDIR' (~normal~) files
- *   - *:                           Certain filesystem names can literally return anything, such
- *                                  as `/proc/self/fd/1234',  which  is  more  like  `dup(1234)' */
+ *   - HANDLE_TYPE_PATH:       When `O_PATH' was given
+ *   - HANDLE_TYPE_BLKDEV:     For `S_IFBLK' files
+ *   - HANDLE_TYPE_CHRDEV:     For `S_IFCHR' files (in this case, `O_NOCTTY' gains meaning)
+ *   - HANDLE_TYPE_FIFO_USER:  For `S_IFIFO' files
+ *   - HANDLE_TYPE_MFILE:      For `S_IFLNK' files (only when `O_SYMLINK' was given)
+ *   - HANDLE_TYPE_DIRHANDLE:  For `S_IFDIR' files from special one-shot directories
+ *   - HANDLE_TYPE_FILEHANDLE: For `S_IFREG' and `S_IFDIR' (~normal~) files
+ *   - *:                      Certain filesystem names can literally return anything, such
+ *                             as `/proc/self/fd/1234',  which  is  more  like  `dup(1234)' */
 /* fd_t open(char const *filename, oflag_t oflags, mode_t mode) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_open, __x86_asm32_int80_open)
 
@@ -28225,15 +28225,15 @@ DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_migrate_pages, __x86_asm32_int80_m
  * When  `oflags & O_CREAT',   then  `mode'   specifies  the   initial
  * file  access  permissions with  which  the file  should  be opened.
  * On KOS, the returned handle can be anything, but is usually one of:
- *   - HANDLE_TYPE_PATH:            When `O_PATH' was given
- *   - HANDLE_TYPE_BLKDEV:          For `S_IFBLK' files
- *   - HANDLE_TYPE_CHARACTERDEVICE: For `S_IFCHR' files (in this case, `O_NOCTTY' gains meaning)
- *   - HANDLE_TYPE_FIFO_USER:       For `S_IFIFO' files
- *   - HANDLE_TYPE_MFILE:           For `S_IFLNK' files (only when `O_SYMLINK' was given)
- *   - HANDLE_TYPE_DIRHANDLE:       For `S_IFDIR' files from special one-shot directories
- *   - HANDLE_TYPE_FILEHANDLE:      For `S_IFREG' and `S_IFDIR' (~normal~) files
- *   - *:                           Certain filesystem names can literally return anything, such
- *                                  as `/proc/self/fd/1234',  which  is  more  like  `dup(1234)' */
+ *   - HANDLE_TYPE_PATH:       When `O_PATH' was given
+ *   - HANDLE_TYPE_BLKDEV:     For `S_IFBLK' files
+ *   - HANDLE_TYPE_CHRDEV:     For `S_IFCHR' files (in this case, `O_NOCTTY' gains meaning)
+ *   - HANDLE_TYPE_FIFO_USER:  For `S_IFIFO' files
+ *   - HANDLE_TYPE_MFILE:      For `S_IFLNK' files (only when `O_SYMLINK' was given)
+ *   - HANDLE_TYPE_DIRHANDLE:  For `S_IFDIR' files from special one-shot directories
+ *   - HANDLE_TYPE_FILEHANDLE: For `S_IFREG' and `S_IFDIR' (~normal~) files
+ *   - *:                      Certain filesystem names can literally return anything, such
+ *                             as `/proc/self/fd/1234',  which  is  more  like  `dup(1234)' */
 /* fd_t openat(fd_t dirfd, char const *filename, oflag_t oflags, mode_t mode) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_openat, __x86_asm32_int80_openat)
 
@@ -31176,15 +31176,15 @@ END(__x86_asm32_sysrun32_write)
  * When  `oflags & O_CREAT',   then  `mode'   specifies  the   initial
  * file  access  permissions with  which  the file  should  be opened.
  * On KOS, the returned handle can be anything, but is usually one of:
- *   - HANDLE_TYPE_PATH:            When `O_PATH' was given
- *   - HANDLE_TYPE_BLKDEV:          For `S_IFBLK' files
- *   - HANDLE_TYPE_CHARACTERDEVICE: For `S_IFCHR' files (in this case, `O_NOCTTY' gains meaning)
- *   - HANDLE_TYPE_FIFO_USER:       For `S_IFIFO' files
- *   - HANDLE_TYPE_MFILE:           For `S_IFLNK' files (only when `O_SYMLINK' was given)
- *   - HANDLE_TYPE_DIRHANDLE:       For `S_IFDIR' files from special one-shot directories
- *   - HANDLE_TYPE_FILEHANDLE:      For `S_IFREG' and `S_IFDIR' (~normal~) files
- *   - *:                           Certain filesystem names can literally return anything, such
- *                                  as `/proc/self/fd/1234',  which  is  more  like  `dup(1234)' */
+ *   - HANDLE_TYPE_PATH:       When `O_PATH' was given
+ *   - HANDLE_TYPE_BLKDEV:     For `S_IFBLK' files
+ *   - HANDLE_TYPE_CHRDEV:     For `S_IFCHR' files (in this case, `O_NOCTTY' gains meaning)
+ *   - HANDLE_TYPE_FIFO_USER:  For `S_IFIFO' files
+ *   - HANDLE_TYPE_MFILE:      For `S_IFLNK' files (only when `O_SYMLINK' was given)
+ *   - HANDLE_TYPE_DIRHANDLE:  For `S_IFDIR' files from special one-shot directories
+ *   - HANDLE_TYPE_FILEHANDLE: For `S_IFREG' and `S_IFDIR' (~normal~) files
+ *   - *:                      Certain filesystem names can literally return anything, such
+ *                             as `/proc/self/fd/1234',  which  is  more  like  `dup(1234)' */
 /* fd_t open(char const *filename, oflag_t oflags, mode_t mode) */
 .section .text.x86.asm32_syscall_sysrun32.open
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_open)
@@ -34398,15 +34398,15 @@ END(__x86_asm32_sysrun32_migrate_pages)
  * When  `oflags & O_CREAT',   then  `mode'   specifies  the   initial
  * file  access  permissions with  which  the file  should  be opened.
  * On KOS, the returned handle can be anything, but is usually one of:
- *   - HANDLE_TYPE_PATH:            When `O_PATH' was given
- *   - HANDLE_TYPE_BLKDEV:          For `S_IFBLK' files
- *   - HANDLE_TYPE_CHARACTERDEVICE: For `S_IFCHR' files (in this case, `O_NOCTTY' gains meaning)
- *   - HANDLE_TYPE_FIFO_USER:       For `S_IFIFO' files
- *   - HANDLE_TYPE_MFILE:           For `S_IFLNK' files (only when `O_SYMLINK' was given)
- *   - HANDLE_TYPE_DIRHANDLE:       For `S_IFDIR' files from special one-shot directories
- *   - HANDLE_TYPE_FILEHANDLE:      For `S_IFREG' and `S_IFDIR' (~normal~) files
- *   - *:                           Certain filesystem names can literally return anything, such
- *                                  as `/proc/self/fd/1234',  which  is  more  like  `dup(1234)' */
+ *   - HANDLE_TYPE_PATH:       When `O_PATH' was given
+ *   - HANDLE_TYPE_BLKDEV:     For `S_IFBLK' files
+ *   - HANDLE_TYPE_CHRDEV:     For `S_IFCHR' files (in this case, `O_NOCTTY' gains meaning)
+ *   - HANDLE_TYPE_FIFO_USER:  For `S_IFIFO' files
+ *   - HANDLE_TYPE_MFILE:      For `S_IFLNK' files (only when `O_SYMLINK' was given)
+ *   - HANDLE_TYPE_DIRHANDLE:  For `S_IFDIR' files from special one-shot directories
+ *   - HANDLE_TYPE_FILEHANDLE: For `S_IFREG' and `S_IFDIR' (~normal~) files
+ *   - *:                      Certain filesystem names can literally return anything, such
+ *                             as `/proc/self/fd/1234',  which  is  more  like  `dup(1234)' */
 /* fd_t openat(fd_t dirfd, char const *filename, oflag_t oflags, mode_t mode) */
 .section .text.x86.asm32_syscall_sysrun32.openat
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_openat)

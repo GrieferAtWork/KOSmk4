@@ -43,7 +43,7 @@
 DECL_BEGIN
 
 PRIVATE NOBLOCK NONNULL((1)) void
-NOTHROW(KCALL usb_hub_fini)(struct character_device *__restrict self) {
+NOTHROW(KCALL usb_hub_fini)(struct chrdev *__restrict self) {
 	struct usb_hub_device *me;
 	me = (struct usb_hub_device *)self;
 	decref(me->uh_intf);
@@ -164,7 +164,7 @@ usb_hub_probe(struct usb_controller *__restrict self,
 	(void)endpc;
 	(void)endpv;
 
-	result = CHARACTER_DEVICE_ALLOC(struct usb_hub_device);
+	result = CHRDEV_ALLOC(struct usb_hub_device);
 	result->uh_ctrl         = (REF struct usb_controller *)incref(self);
 	result->uh_intf         = (REF struct usb_interface *)incref(intf);
 	result->uh_num_ports    = desc.uh_num_ports;
@@ -179,12 +179,12 @@ usb_hub_probe(struct usb_controller *__restrict self,
 		static int n = 0; /* TODO: better naming */
 		sprintf(result->cd_name, "usbhub%c", 'a' + n++);
 	}
-	character_device_register_auto(result);
+	chrdev_register_auto(result);
 	TRY {
-		usb_register_character_device(intf->ui_device,
+		usb_register_chrdev(intf->ui_device,
 		                              result);
 	} EXCEPT {
-		character_device_unregister(result);
+		chrdev_unregister(result);
 		RETHROW();
 	}
 

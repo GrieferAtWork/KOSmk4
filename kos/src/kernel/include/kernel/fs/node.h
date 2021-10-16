@@ -107,7 +107,7 @@ struct chrdev;
  *             |                  |
  *             |                  +-----> blkdev  (S_IFBLK)  (TODO: replacement for `struct block_device')
  *             |                  |
- *             |                  +-----> chrdev  (S_IFCHR)  (TODO: replacement for `struct character_device')
+ *             |                  +-----> chrdev  (S_IFCHR)  (TODO: replacement for `struct chrdev')
  *             |
  *             +----> ffifonode (S_IFIFO)                    (TODO: replacement for `struct fifo_node')
  *             |

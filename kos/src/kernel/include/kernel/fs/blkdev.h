@@ -75,14 +75,17 @@ struct blkdev_ops {
 
 	/* [0..1] Do some additional work to sync writes on a hardware level.
 	 *        This function is called by `fsuper_sync[all]()' once all other
-	 *        outstanding modifications to have been synced, as well as by
-	 *        `fnode_syncdata()' (if changes existed) when invoked on the
+	 *        outstanding modifications to have been  synced, as well as  by
+	 *        `fnode_syncdata()' (if changes  existed) when  invoked on  the
 	 *        block-device itself.
 	 * Furthermore, block device partitions will try to invoke their master's
 	 * sync callback if theirs was invoked. */
 	NONNULL((1)) void
 	(KCALL *bdo_sync)(struct blkdev *__restrict self)
 			THROWS(...);
+	/* TODO: The `bdo_sync' operator should really be added to `mfile_stream_ops'!
+	 *       Any arbitrary mfile-based object should be able to define  additional
+	 *       operations to-be performed during data syncing! */
 
 	/* More operators would go here... */
 };
@@ -203,7 +206,7 @@ DATDEF struct blkdev_ops const blkpart_ops;
 	mfile_dosyncio(_fnode_asfile(_fdevnode_asnode(_device_asdevnode(_blkdev_asdev(self)))),                                                           \
 	               __COMPILER_REQTYPE(struct blkdev const *, self)->_blkdev_dev_ _device_devnode_ _fdevnode_node_ _fnode_file_ mf_ops->mo_saveblocks, \
 	               addr, buf, num_bytes)
-	
+
 
 #define __blkdev_init_common(self, ops)                                                                   \
 	(_device_init(_blkdev_asdev(self), &(ops)->bdo_dev),                                                  \

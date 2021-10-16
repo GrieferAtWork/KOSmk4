@@ -755,7 +755,7 @@ NOTHROW(KCALL mouse_device_init)(struct mouse_device *__restrict self) {
 
 /* Mouse character device operators */
 PUBLIC NONNULL((1)) size_t KCALL
-mouse_device_read(struct character_device *__restrict self,
+mouse_device_read(struct chrdev *__restrict self,
                   USER CHECKED void *dst, size_t num_bytes,
                   iomode_t mode) THROWS(...) {
 	size_t result;
@@ -796,7 +796,7 @@ empty:
 }
 
 PUBLIC NONNULL((1)) void KCALL
-mouse_device_stat(struct character_device *__restrict self,
+mouse_device_stat(struct chrdev *__restrict self,
                   USER CHECKED struct stat *result) THROWS(...) {
 	struct mouse_device *me;
 	me = (struct mouse_device *)self;
@@ -814,7 +814,7 @@ mouse_device_canread(struct mouse_device *__restrict self) {
 
 
 PUBLIC NONNULL((1)) void KCALL
-mouse_device_pollconnect(struct character_device *__restrict self,
+mouse_device_pollconnect(struct chrdev *__restrict self,
                          poll_mode_t what) THROWS(...) {
 	struct mouse_device *me;
 	me = (struct mouse_device *)self;
@@ -823,7 +823,7 @@ mouse_device_pollconnect(struct character_device *__restrict self,
 }
 
 PUBLIC NONNULL((1)) poll_mode_t KCALL
-mouse_device_polltest(struct character_device *__restrict self,
+mouse_device_polltest(struct chrdev *__restrict self,
                       poll_mode_t what) THROWS(...) {
 	struct mouse_device *me;
 	me = (struct mouse_device *)self;
@@ -835,7 +835,7 @@ mouse_device_polltest(struct character_device *__restrict self,
 }
 
 PUBLIC NONNULL((1)) syscall_slong_t KCALL
-mouse_device_ioctl(struct character_device *__restrict self,
+mouse_device_ioctl(struct chrdev *__restrict self,
                    syscall_ulong_t cmd, USER UNCHECKED void *arg,
                    iomode_t mode) THROWS(...) {
 	struct mouse_device *me;

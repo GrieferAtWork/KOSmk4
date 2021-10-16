@@ -83,7 +83,7 @@ PUBLIC REF struct blkdev *boot_partition = NULL;
 PRIVATE ATTR_USED ATTR_FREETEXT void KCALL
 kernel_boot_option_handler(char *__restrict arg) {
 	REF struct blkdev *new_boot;
-	new_boot = block_device_lookup(arg);
+	new_boot = blkdev_lookup(arg);
 	if unlikely(!new_boot) {
 #ifdef CONFIG_HAVE_DEBUGGER
 		kernel_panic(FREESTR("No such boot block device %q (use `lsblk' for detected devices)"), arg);
@@ -228,7 +228,7 @@ block_device_partition_ioctl(struct block_device *__restrict self,
                              iomode_t mode) THROWS(...) {
 	struct block_device *master;
 	assert(self == partition);
-	assert(block_device_ispartition(self));
+	assert(blkdev_ispart(self));
 	master = ((struct block_device_partition *)self)->bp_master;
 	if (master->bd_type.dt_ioctl)
 		return (*master->bd_type.dt_ioctl)(master, self, cmd, arg, mode);
@@ -294,7 +294,7 @@ NOTHROW(KCALL block_device_acquire_partlock_trywrite)(struct block_device *__res
 
 
 /* The tree used to quickly look up a block device from its ID */
-PRIVATE REF ATREE_HEAD(struct blkdev) block_device_tree = NULL;
+PRIVATE REF ATREE_HEAD(struct blkdev) blkdev_tree = NULL;
 PRIVATE dev_t block_device_next_auto = MKDEV(DEV_MAJOR_AUTO,0);
 PRIVATE struct atomic_rwlock block_device_lock = ATOMIC_RWLOCK_INIT;
 DEFINE_DBG_BZERO_OBJECT(block_device_lock);
@@ -343,7 +343,7 @@ NOTHROW(KCALL block_device_destroy)(struct blkdev *__restrict self) {
 		decref_likely(self->bd_devfs_inode);
 		decref_likely(self->bd_devfs_entry);
 	}
-	if (block_device_ispartition(self)) {
+	if (blkdev_ispart(self)) {
 		struct block_device_partition *part;
 		struct block_device *master;
 		part   = (struct block_device_partition *)self;
@@ -382,10 +382,10 @@ NOTHROW(KCALL block_device_destroy)(struct blkdev *__restrict self) {
 /* Lookup  a block device associated with `devno'  and return a reference to it.
  * When no block device is associated that device number, return `NULL' instead. */
 PUBLIC WUNUSED REF struct blkdev *KCALL
-block_device_lookup(dev_t devno) THROWS(E_WOULDBLOCK) {
+blkdev_lookup(dev_t devno) THROWS(E_WOULDBLOCK) {
 	REF struct blkdev *result;
 	sync_read(&block_device_lock);
-	result = bdev_tree_locate(block_device_tree, devno);
+	result = bdev_tree_locate(blkdev_tree, devno);
 	/* Try to acquire a reference to the block device. */
 	if (result && unlikely(!tryincref(result)))
 		result = NULL;
@@ -394,13 +394,13 @@ block_device_lookup(dev_t devno) THROWS(E_WOULDBLOCK) {
 }
 
 
-/* Same as `block_device_lookup()', but return `NULL' if the lookup would have caused an exception. */
+/* Same as `blkdev_lookup()', but return `NULL' if the lookup would have caused an exception. */
 PUBLIC WUNUSED REF struct blkdev *
-NOTHROW(KCALL block_device_lookup_nx)(dev_t devno) {
+NOTHROW(KCALL blkdev_lookup_nx)(dev_t devno) {
 	REF struct blkdev *result;
 	if (!sync_read_nx(&block_device_lock))
 		return NULL;
-	result = bdev_tree_locate(block_device_tree, devno);
+	result = bdev_tree_locate(blkdev_tree, devno);
 	/* Try to acquire a reference to the block device. */
 	if (result && unlikely(!tryincref(result)))
 		result = NULL;
@@ -439,23 +439,23 @@ again:
  * Alternatively, the given `name' may also be in the form of `MAJOR:MINOR',
  * an  encoding that is  always attempted first by  attempting to decode the
  * given name using `scanf("%u:%u")'
- * >> block_device_lookup_name("3:64");      // MKDEV(3, 64)
- * >> block_device_lookup_name("/dev/hdc1"); // MKDEV(22, 0) + 1
- * >> block_device_lookup_name("hda2");      // MKDEV(3, 0)  + 2
+ * >> blkdev_lookup_name("3:64");      // MKDEV(3, 64)
+ * >> blkdev_lookup_name("/dev/hdc1"); // MKDEV(22, 0) + 1
+ * >> blkdev_lookup_name("hda2");      // MKDEV(3, 0)  + 2
  * This function is mainly intended for decoding device names from commandline
  * arguments, such as  the kernel's `boot=<NAME>'  option which overrides  the
  * kernel's boot partition (in case the kernel can't auto-detect its partition
  * properly).
  * @return: NULL: No device matching `name' exists. */
 PUBLIC WUNUSED REF struct blkdev *KCALL
-block_device_lookup_name(USER CHECKED char const *name)
+blkdev_lookup_name(USER CHECKED char const *name)
 		THROWS(E_WOULDBLOCK) {
 	REF struct blkdev *result = NULL;
 	u32 dev_major, dev_minor;
 	size_t name_len;
 	char name_buf[COMPILER_LENOF(((struct blkdev *)0)->bd_name)];
 	if (sscanf(name, "%u:%u", &dev_major, &dev_minor) == 2)
-		return block_device_lookup(MKDEV(dev_major, dev_minor));
+		return blkdev_lookup(MKDEV(dev_major, dev_minor));
 	if (memcmp(name, "/dev/", 5 * sizeof(char)) == 0)
 		name += 5;
 	name_len = strnlen(name, COMPILER_LENOF(name_buf));
@@ -464,8 +464,8 @@ block_device_lookup_name(USER CHECKED char const *name)
 	memcpy(name_buf, name, name_len, sizeof(char));
 	name_buf[name_len] = '\0';
 	sync_read(&block_device_lock);
-	if likely(block_device_tree)
-		result = bdev_tree_search_name(block_device_tree, name_buf);
+	if likely(blkdev_tree)
+		result = bdev_tree_search_name(blkdev_tree, name_buf);
 	sync_endread(&block_device_lock);
 	return result;
 }
@@ -535,7 +535,7 @@ block_device_add_to_devfs(struct blkdev *__restrict self) {
 	if (!self->bd_name[0]) {
 		struct block_device *master;
 		/* Auto-generate the name */
-		if (block_device_ispartition(self) &&
+		if (blkdev_ispart(self) &&
 		    (master = ((struct block_device_partition *)self)->bp_master,
 		     master->bd_name[0])) {
 			snprintf(self->bd_name, sizeof(self->bd_name),
@@ -552,7 +552,7 @@ block_device_add_to_devfs(struct blkdev *__restrict self) {
 			        MINOR(self->bd_devlink.a_vaddr));
 		}
 	}
-	if (block_device_ispartition(self) &&
+	if (blkdev_ispart(self) &&
 	    ((struct block_device_partition *)self)->bp_label[0]) {
 		printk(KERN_INFO "[blk] Register new block-device `/dev/%s' (labeled as %q)\n",
 		       self->bd_name, ((struct block_device_partition *)self)->bp_label);
@@ -576,7 +576,7 @@ block_device_add_to_devfs(struct blkdev *__restrict self) {
  * @return: true:  Successfully unregistered the given.
  * @return: false: The device was never registered to begin with. */
 PUBLIC NONNULL((1)) bool KCALL
-block_device_unregister(struct blkdev *__restrict self)
+blkdev_unregister(struct blkdev *__restrict self)
 		THROWS(E_WOULDBLOCK) {
 	bool result = false;
 	/* FIXME: Running  `partprobe /dev/hda'  causes  the a  soft-lock  where the
@@ -587,7 +587,7 @@ block_device_unregister(struct blkdev *__restrict self)
 		COMPILER_READ_BARRIER();
 		if likely(self->bd_devlink.a_vaddr != DEV_UNSET) {
 			struct blkdev *pop_dev;
-			pop_dev = bdev_tree_remove(&block_device_tree,
+			pop_dev = bdev_tree_remove(&blkdev_tree,
 			                           self->bd_devlink.a_vaddr);
 			assert(pop_dev == self);
 			self->bd_devlink.a_vaddr = DEV_UNSET;
@@ -610,25 +610,25 @@ block_device_unregister(struct blkdev *__restrict self)
  * NOTE: When empty, `bd_name' will be set to `"%.2x:%.2x" % (MAJOR(devno),MINOR(devno))'
  * NOTE: This function will also cause the device to appear in `/dev' (unless the device's name is already taken) */
 PUBLIC NONNULL((1)) void KCALL
-block_device_register(struct blkdev *__restrict self, dev_t devno)
+blkdev_register(struct blkdev *__restrict self, dev_t devno)
        THROWS(E_WOULDBLOCK, E_BADALLOC) {
 	sync_write(&block_device_lock);
 	/* Insert the new device into the block-device tree. */
 	self->bd_devlink.a_vaddr = devno;
-	bdev_tree_insert(&block_device_tree, incref(self));
+	bdev_tree_insert(&blkdev_tree, incref(self));
 	sync_endwrite(&block_device_lock);
 	TRY {
 		block_device_add_to_devfs(self);
 	} EXCEPT {
 		struct blkdev *pop_dev;
 		sync_write(&block_device_lock);
-		pop_dev = bdev_tree_remove(&block_device_tree, devno);
+		pop_dev = bdev_tree_remove(&blkdev_tree, devno);
 		if likely(pop_dev == self) {
 			sync_endwrite(&block_device_lock);
 			self->bd_devlink.a_vaddr = DEV_UNSET;
 			decref_nokill(self); /* The caller still has a reference */
 		} else {
-			bdev_tree_insert(&block_device_tree, pop_dev);
+			bdev_tree_insert(&blkdev_tree, pop_dev);
 			sync_endwrite(&block_device_lock);
 		}
 		RETHROW();
@@ -637,17 +637,17 @@ block_device_register(struct blkdev *__restrict self, dev_t devno)
 
 
 /* Automatically   register  the  given  block-device,  assigning  it  an  auto-generated  device  ID.
- * If   `self'   is  a   partition  (s.a.   `block_device_ispartition()'),   assign  based   on  other
+ * If   `self'   is  a   partition  (s.a.   `blkdev_ispart()'),   assign  based   on  other
  * preexisting partitions `MKDEV(MAJOR(bp_master),MINOR(EXISTING_PARTITION_WITH_GREATEST_MINOR) + 1)',
  * or assign `MKDEV(MAJOR(bp_master),MINOR(bp_master) + 1)'.
  * All other devices are assigned some unique major device number `>= DEV_MAJOR_AUTO' with MINOR set to `0'.
  * NOTE: When empty, `bd_name' will be set to `"%.2x:%.2x" % (MAJOR(devno),MINOR(devno))'
  * NOTE: This function will also cause the device to appear in `/dev' (unless the device's name is already taken) */
 PUBLIC NONNULL((1)) void KCALL
-block_device_register_auto(struct blkdev *__restrict self)
+blkdev_register_auto(struct blkdev *__restrict self)
 		THROWS(E_WOULDBLOCK, E_BADALLOC) {
 	dev_t devno;
-	if (block_device_ispartition(self)) {
+	if (blkdev_ispart(self)) {
 		struct block_device_partition *me;
 		struct block_device *master;
 		me     = (struct block_device_partition *)self;
@@ -657,14 +657,14 @@ again_master:
 		sync_write(&block_device_lock);
 		if unlikely(master->bd_devlink.a_vaddr == DEV_UNSET) {
 			sync_endwrite(&block_device_lock);
-			block_device_register_auto(master);
+			blkdev_register_auto(master);
 			goto again_master;
 		}
 		devno = master->bd_devlink.a_vaddr;
 		/* Search the first smallest unused minor index. */
 		do {
 			devno += MKDEV(0, 1);
-		} while (bdev_tree_locate(block_device_tree, devno));
+		} while (bdev_tree_locate(blkdev_tree, devno));
 	} else {
 		sync_write(&block_device_lock);
 		devno = block_device_next_auto;
@@ -673,20 +673,20 @@ again_master:
 	self->bd_devlink.a_vaddr = devno;
 
 	/* Insert the new device into the block-device tree. */
-	bdev_tree_insert(&block_device_tree, incref(self));
+	bdev_tree_insert(&blkdev_tree, incref(self));
 	sync_endwrite(&block_device_lock);
 	TRY {
 		block_device_add_to_devfs(self);
 	} EXCEPT {
 		struct blkdev *pop_dev;
 		sync_write(&block_device_lock);
-		pop_dev = bdev_tree_remove(&block_device_tree, devno);
+		pop_dev = bdev_tree_remove(&blkdev_tree, devno);
 		if likely(pop_dev == self) {
 			self->bd_devlink.a_vaddr = DEV_UNSET;
 			sync_endwrite(&block_device_lock);
 			decref_nokill(self); /* The caller still has a reference */
 		} else {
-			bdev_tree_insert(&block_device_tree, pop_dev);
+			bdev_tree_insert(&blkdev_tree, pop_dev);
 			sync_endwrite(&block_device_lock);
 		}
 		RETHROW();
@@ -712,7 +712,7 @@ NOTHROW(KCALL block_device_findpart)(struct block_device *__restrict self,
 
 
 /* Create a new sub-partition for `master', placing it as the given address.
- * Following this, automatically register the new partition with `block_device_register_auto()',
+ * Following this, automatically register the new partition with `blkdev_register_auto()',
  * after  assigning  the  name   `"%s%u" % (master->bd_name,MINOR(block_device_devno(return)))'.
  * NOTE: If another partition with the same `part_min' and `part_max', no new
  *       partition is created, and that  partition will be returned  instead.
@@ -733,13 +733,13 @@ block_device_makepart(struct blkdev *__restrict master,
 	assert(part_min <= part_max);
 	assert(part_max <= master->bd_sector_count - (lba_t)1);
 	dev = (struct block_device *)master;
-	if (block_device_ispartition(dev)) {
+	if (blkdev_ispart(dev)) {
 		struct block_device_partition *master_part;
 		master_part = (struct block_device_partition *)dev;
 		part_min += master_part->bp_min;
 		part_max += master_part->bp_min;
 		dev = master_part->bp_master;
-		assert(!block_device_ispartition(dev));
+		assert(!blkdev_ispart(dev));
 	}
 	block_device_acquire_partlock_write(dev);
 	result = block_device_findpart(dev, part_min, part_max);
@@ -812,7 +812,7 @@ block_device_makepart(struct blkdev *__restrict master,
 	sync_endwrite(&dev->bd_parts_lock);
 	/* Automatically register the newly created partition. */
 	TRY {
-		block_device_register_auto(result);
+		blkdev_register_auto(result);
 	} EXCEPT {
 		decref(result);
 		RETHROW();
@@ -838,7 +838,7 @@ again:
 	sync_endwrite(&self->bd_parts_lock);
 	if (part) {
 		FINALLY_DECREF_LIKELY(part);
-		block_device_unregister(part);
+		blkdev_unregister(part);
 		goto again;
 	}
 }
@@ -982,9 +982,9 @@ _block_device_sync(struct block_device *__restrict self)
 	unsigned int i;
 	size_t result = 0;
 	struct aio_multihandle_generic hand;
-	if (block_device_ispartition(self))
+	if (blkdev_ispart(self))
 		self = ((struct block_device_partition *)self)->bp_master;
-	assert(!block_device_ispartition(self));
+	assert(!blkdev_ispart(self));
 	assert(!task_wasconnected());
 	assert(self->bd_cache_ssiz != 0);
 	SCOPED_WRITELOCK(&self->bd_cache_lock);
@@ -1426,10 +1426,10 @@ _block_device_read(struct block_device *__restrict self,
 	}
 	assert(!task_wasconnected());
 	/* Deal with partition offsets. */
-	if likely(block_device_ispartition(self)) {
+	if likely(blkdev_ispart(self)) {
 		device_position += ((struct block_device_partition *)self)->bp_minaddr;
 		self = ((struct block_device_partition *)self)->bp_master;
-		assert(!block_device_ispartition(self));
+		assert(!blkdev_ispart(self));
 		/* Also check the drive master for being read-only. */
 		if unlikely(self->bd_flags & BLOCK_DEVICE_FLAG_READONLY)
 			THROW(E_IOERROR_READONLY, (uintptr_t)E_IOERROR_SUBSYSTEM_HARDDISK);
@@ -1486,10 +1486,10 @@ _block_device_write(struct block_device *__restrict self,
 		THROW(E_IOERROR_BADBOUNDS, (uintptr_t)E_IOERROR_SUBSYSTEM_HARDDISK);
 	assert(!task_wasconnected());
 	/* Deal with partition offsets. */
-	if likely(block_device_ispartition(self)) {
+	if likely(blkdev_ispart(self)) {
 		device_position += ((struct block_device_partition *)self)->bp_minaddr;
 		self = ((struct block_device_partition *)self)->bp_master;
-		assert(!block_device_ispartition(self));
+		assert(!blkdev_ispart(self));
 		/* Also check the drive master for being read-only. */
 		if unlikely(self->bd_flags & BLOCK_DEVICE_FLAG_READONLY)
 			THROW(E_IOERROR_READONLY, (uintptr_t)E_IOERROR_SUBSYSTEM_HARDDISK);
@@ -1544,7 +1544,7 @@ do_dump_block_device(struct blkdev *__restrict self,
 		total_bytes_adj /= (u64)1024;
 		total_bytes_name = DBGSTR("KiB");
 	}
-	drv = driver_fromaddr(block_device_ispartition(self)
+	drv = driver_fromaddr(blkdev_ispart(self)
 	                      ? (void *)((struct block_device_partition *)self)->bp_master->bd_type.dt_read
 	                      : (void *)self->bd_type.dt_read);
 	dbg_printf(DBGSTR("/dev/" AC_WHITE("%-*s") "  "
@@ -1570,7 +1570,7 @@ dump_block_device(struct blkdev *__restrict self,
                   size_t longest_device_name,
                   size_t longest_driver_name) {
 again:
-	if (!block_device_ispartition(self)) {
+	if (!blkdev_ispart(self)) {
 		struct block_device *me;
 		struct block_device_partition *parts;
 		me = (struct block_device *)self;
@@ -1608,7 +1608,7 @@ again:
 	namelen = strlen(self->bd_name);
 	if (*pmax_device_namelen < namelen)
 		*pmax_device_namelen = namelen;
-	drv = driver_fromaddr(block_device_ispartition(self)
+	drv = driver_fromaddr(blkdev_ispart(self)
 	                      ? (void *)((struct block_device_partition *)self)->bp_master->bd_type.dt_read
 	                      : (void *)self->bd_type.dt_read);
 	if (drv) {
@@ -1637,8 +1637,8 @@ DBG_COMMAND(lsblk,
             "\tList all defined block devices\n") {
 	size_t longest_device_name = COMPILER_STRLEN("name");
 	size_t longest_driver_name = COMPILER_STRLEN("driver");
-	if (block_device_tree) {
-		gather_longest_name_lengths(block_device_tree,
+	if (blkdev_tree) {
+		gather_longest_name_lengths(blkdev_tree,
 		                            &longest_device_name,
 		                            &longest_driver_name);
 	}
@@ -1649,8 +1649,8 @@ DBG_COMMAND(lsblk,
 	if (longest_driver_name > COMPILER_STRLEN("driver"))
 		format_repeat(&dbg_printer, NULL, ' ', longest_driver_name - COMPILER_STRLEN("driver"));
 	dbg_print(DBGSTR("  size      sectors      sector-size\n"));
-	if (block_device_tree) {
-		dump_block_device(block_device_tree,
+	if (blkdev_tree) {
+		dump_block_device(blkdev_tree,
 		                  longest_device_name,
 		                  longest_driver_name);
 	}

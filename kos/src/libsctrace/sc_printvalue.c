@@ -793,7 +793,7 @@ print_dev_blk(pformatprinter printer, void *arg, dev_t devno) {
 #ifdef __KERNEL__
 	if likely(result >= 0) {
 		REF struct blkdev *dev;
-		dev = block_device_lookup_nx(devno);
+		dev = blkdev_lookup_nx(devno);
 		if (dev) {
 			ssize_t temp;
 			FINALLY_DECREF_UNLIKELY(dev);
@@ -822,8 +822,8 @@ print_dev_chr(pformatprinter printer, void *arg, dev_t devno) {
 	                       MINOR(devno));
 #ifdef __KERNEL__
 	if likely(result >= 0) {
-		REF struct character_device *dev;
-		dev = character_device_lookup_nx(devno);
+		REF struct chrdev *dev;
+		dev = chrdev_lookup_nx(devno);
 		if (dev) {
 			ssize_t temp;
 			FINALLY_DECREF_UNLIKELY(dev);

@@ -42,7 +42,7 @@ struct iov_buffer;
 struct iov_physbuffer;
 __HYBRID_ALTINT_TYPEDEF(u64, lba_t, false); /* LinearBlockAddress */
 
-struct block_device_type {
+struct blkdev_ops {
 	/* [0..1] Finalizer callback.
 	 * NOTE: In  order to ensure  a safe cleanup, this  function (while required to
 	 *       be async-safe) will always be executed in the context of the boot CPU.
@@ -133,7 +133,7 @@ struct fdirent;
 #define __BLKDEV_FIELDS                                                                                                      \
 	REF refcnt_t                   bd_refcnt;       /* Reference counter */                                                              \
 	size_t                         bd_heapsize;     /* [const] Allocated heap-size of this block-device. */                              \
-	struct block_device_type       bd_type;         /* [1..1][const] Block device type + callbacks. */                                   \
+	struct blkdev_ops       bd_type;         /* [1..1][const] Block device type + callbacks. */                                   \
 	ATREE_NODE_SINGLE(struct blkdev, dev_t)                                                                                  \
 	                               bd_devlink;      /* [lock(WRITE_ONCE)] Device number / tree (`DEV_UNSET' if unset). */                \
 	REF struct inode              *bd_devfs_inode;  /* [lock(WRITE_ONCE)][0..1] Device INode under /dev, or NULL if not created */       \
@@ -280,12 +280,12 @@ block_device_alloc(size_t sector_size DFL(512),
 /* Lookup  a block device associated with `devno'  and return a reference to it.
  * When no block device is associated that device number, return `NULL' instead. */
 FUNDEF WUNUSED REF struct blkdev *KCALL
-block_device_lookup(dev_t devno) THROWS(E_WOULDBLOCK);
+blkdev_lookup(dev_t devno) THROWS(E_WOULDBLOCK);
 
-/* Same as `block_device_lookup()', but return `NULL'
+/* Same as `blkdev_lookup()', but return `NULL'
  * if  the  lookup  would have  caused  an exception. */
 FUNDEF WUNUSED REF struct blkdev *
-NOTHROW(KCALL block_device_lookup_nx)(dev_t devno);
+NOTHROW(KCALL blkdev_lookup_nx)(dev_t devno);
 
 /* Lookup a block device, given its `name`, with is its default filename
  * as will appear in the /dev/ directory, and may optionally be prefixed
@@ -293,23 +293,23 @@ NOTHROW(KCALL block_device_lookup_nx)(dev_t devno);
  * Alternatively, the given `name' may also be in the form of `MAJOR:MINOR',
  * an  encoding that is  always attempted first by  attempting to decode the
  * given name using `scanf("%u:%u")'
- * >> block_device_lookup_name("3:64");      // MKDEV(3, 64)
- * >> block_device_lookup_name("/dev/hdc1"); // MKDEV(22, 0) + 1
- * >> block_device_lookup_name("hda2");      // MKDEV(3, 0)  + 2
+ * >> blkdev_lookup_name("3:64");      // MKDEV(3, 64)
+ * >> blkdev_lookup_name("/dev/hdc1"); // MKDEV(22, 0) + 1
+ * >> blkdev_lookup_name("hda2");      // MKDEV(3, 0)  + 2
  * This function is mainly intended for decoding device names from commandline
  * arguments, such as  the kernel's `boot=<NAME>'  option which overrides  the
  * kernel's boot partition (in case the kernel can't auto-detect its partition
  * properly).
  * @return: NULL: No device matching `name' exists. */
 FUNDEF WUNUSED REF struct blkdev *KCALL
-block_device_lookup_name(USER CHECKED char const *name)
+blkdev_lookup_name(USER CHECKED char const *name)
 		THROWS(E_WOULDBLOCK, E_SEGFAULT);
 #ifdef __cplusplus
 extern "C++" {
 FUNDEF WUNUSED REF struct blkdev *KCALL
-block_device_lookup(USER CHECKED char const *name)
+blkdev_lookup(USER CHECKED char const *name)
 		THROWS(E_WOULDBLOCK, E_SEGFAULT)
-		ASMNAME("block_device_lookup_name");
+		ASMNAME("blkdev_lookup_name");
 }
 #endif /* __cplusplus */
 
@@ -319,33 +319,33 @@ block_device_lookup(USER CHECKED char const *name)
  * @return: true:  Successfully unregistered the given.
  * @return: false: The device was never registered to begin with. */
 FUNDEF NONNULL((1)) bool KCALL
-block_device_unregister(struct blkdev *__restrict self)
+blkdev_unregister(struct blkdev *__restrict self)
 		THROWS(E_WOULDBLOCK);
 
 /* Register a block device with a fixed device number.
  * NOTE: When empty, `bd_name' will be set to `"%.2x:%.2x" % (MAJOR(devno),MINOR(devno))'
  * NOTE: This function will also cause the device to appear in `/dev' (unless the device's name is already taken) */
 FUNDEF NONNULL((1)) void KCALL
-block_device_register(struct blkdev *__restrict self, dev_t devno)
+blkdev_register(struct blkdev *__restrict self, dev_t devno)
 		THROWS(E_WOULDBLOCK, E_BADALLOC);
 
 /* Automatically register the given block-device, assigning it an auto-generated device ID.
- * If `self'  is a  partition (s.a.  `block_device_ispartition()'), assign  based on  other
+ * If `self'  is a  partition (s.a.  `blkdev_ispart()'), assign  based on  other
  * preexisting   partitions   `MKDEV(MAJOR(bp_master),LOWEST_UNUSED_MINOR)',   or    assign
  * `MKDEV(MAJOR(bp_master),MINOR(bp_master) + 1)'.
  * All other devices are assigned some unique major device number `>= DEV_MAJOR_AUTO' with MINOR set to `0'.
  * NOTE:   When   empty,    `bd_name'   will   be    set   to    `"%.2x:%.2x" % (MAJOR(devno),MINOR(devno))'
  * NOTE: This function will also cause the device to appear in `/dev' (unless the device's name is already taken) */
 FUNDEF NONNULL((1)) void KCALL
-block_device_register_auto(struct blkdev *__restrict self)
+blkdev_register_auto(struct blkdev *__restrict self)
 		THROWS(E_WOULDBLOCK, E_BADALLOC);
 
 /* Check if `self' is a partition. */
-#define block_device_ispartition(self) \
+#define blkdev_ispart(self) \
 	((self)->bd_type.dt_read == &block_device_partition_read)
 
 /* Create a new sub-partition for `master', placing it as the given address.
- * Following this, automatically register the new partition with `block_device_register_auto()',
+ * Following this, automatically register the new partition with `blkdev_register_auto()',
  * after assigning the name `"%s%u" % (master->bd_name,MINOR(block_device_devno(return)) - MINOR(block_device_devno(master)))'.
  * NOTE: If another partition with the same `part_min' and `part_max', no new
  *       partition is created, and that  partition will be returned  instead.
@@ -374,7 +374,7 @@ block_device_makepart(struct blkdev *__restrict master,
  *       tables like they usually would, though new  partitions will still be added to  the
  *       master device, as `block_device_makepart()' is used to create them. */
 FUNDEF NONNULL((1)) void KCALL
-block_device_autopart(struct blkdev *__restrict self)
+blkdev_repart(struct blkdev *__restrict self)
 		THROWS(E_BADALLOC, E_WOULDBLOCK);
 FUNDEF WUNUSED NONNULL((1)) REF struct block_device_partition *KCALL
 block_device_autopart_ex(struct blkdev *__restrict self)

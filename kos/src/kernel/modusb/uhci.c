@@ -907,7 +907,7 @@ do_stop:
 		result = (*ui->ui_handler)(dev, status, data, datalen);
 		decref_unlikely(dev);
 	} else {
-		REF struct character_device *dev;
+		REF struct chrdev *dev;
 		dev = awref_get(&ui->ui_bind.ui_chr);
 		if unlikely(!dev)
 			goto do_stop;
@@ -1507,7 +1507,7 @@ done_tdint:
 
 
 PRIVATE NOBLOCK NONNULL((1)) void
-NOTHROW(KCALL uhci_fini)(struct character_device *__restrict self) {
+NOTHROW(KCALL uhci_fini)(struct chrdev *__restrict self) {
 	struct uhci_controller *me;
 	REF struct uhci_interrupt *iter, *next;
 	unsigned int i;
@@ -2429,7 +2429,7 @@ NOTHROW(FCALL uhci_count_isotds_for_interval_and_offset)(struct uhci_controller 
 /* Create an interrupt descriptor.
  * @param: endp:                          The endpoint from which to poll data.
  * @param: handler:                       The handler to-be invoked.
- * @param: character_or_block_device:     Either a `struct character_device' or `struct block_device',
+ * @param: character_or_block_device:     Either a `struct chrdev' or `struct block_device',
  *                                        depending  on  the  setting  of  `USB_INTERRUPT_FLAG_ISABLK'
  * @param: buflen:                        The (max) number of bytes of data to-be pulled from the device.
  *                                        Note that unless `USB_INTERRUPT_FLAG_SHORT' is set, this is the
@@ -3021,7 +3021,7 @@ usb_probe_uhci(struct pci_device *__restrict dev) {
 		return;
 	}
 
-	result = CHARACTER_DEVICE_ALLOC(struct uhci_controller);
+	result = CHRDEV_ALLOC(struct uhci_controller);
 	FINALLY_DECREF_UNLIKELY(result);
 
 	result->cd_type.ct_fini = &uhci_fini;
@@ -3128,7 +3128,7 @@ usb_probe_uhci(struct pci_device *__restrict dev) {
 		static int n = 0; /* TODO: better naming */
 		sprintf(result->cd_name, "uhci%c", 'a' + n++);
 	}
-	character_device_register_auto(result);
+	chrdev_register_auto(result);
 
 	/* Reset & probe for new connections. */
 	for (i = 0; i < result->uc_portnum; ++i)

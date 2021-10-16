@@ -1760,9 +1760,9 @@ done:
 
 #ifdef CONFIG_HAVE_DEBUGGER
 PRIVATE ATTR_DBGTEXT void KCALL
-do_dump_block_device(struct blkdev *__restrict self,
-                     size_t longest_device_name,
-                     size_t longest_driver_name) {
+do_dump_blkdev(struct blkdev *__restrict self,
+               size_t longest_device_name,
+               size_t longest_driver_name) {
 	uint64_t total_bytes_adj = (uint64_t)blkdev_getsize(self);
 	char const *total_bytes_name = DBGSTR("b");
 	if (total_bytes_adj >= (uint64_t)1024 * 1024 * 1024) {
@@ -1794,23 +1794,23 @@ do_dump_block_device(struct blkdev *__restrict self,
 }
 
 PRIVATE ATTR_DBGTEXT void KCALL
-dump_block_device(struct fnode *__restrict self,
-                  size_t longest_device_name,
-                  size_t longest_driver_name) {
+dump_blkdev(struct fnode *__restrict self,
+            size_t longest_device_name,
+            size_t longest_driver_name) {
 again:
 	if (fnode_isblkroot(self)) {
 		struct blkdev *me = fnode_asblkdev(self);
 		struct blkdev *part;
-		do_dump_block_device(me,
+		do_dump_blkdev(me,
 		                     longest_device_name,
 		                     longest_driver_name);
 		LIST_FOREACH (part, &me->bd_rootinfo.br_parts, bd_partinfo.bp_partlink) {
-			do_dump_block_device(part, longest_device_name, longest_driver_name);
+			do_dump_blkdev(part, longest_device_name, longest_driver_name);
 		}
 	}
 	if (self->fn_supent.rb_lhs) {
 		if (self->fn_supent.rb_rhs) {
-			dump_block_device(self->fn_supent.rb_rhs,
+			dump_blkdev(self->fn_supent.rb_rhs,
 			                  longest_device_name,
 			                  longest_driver_name);
 		}
@@ -1871,27 +1871,27 @@ DBG_COMMAND(lsblk,
 		format_repeat(&dbg_printer, NULL, ' ', longest_driver_name - COMPILER_STRLEN("driver"));
 	dbg_print(DBGSTR("  size      sectors      sector-size\n"));
 	if (devfs.rs_sup.fs_nodes) {
-		dump_block_device(devfs.rs_sup.fs_nodes,
-		                  longest_device_name,
-		                  longest_driver_name);
+		dump_blkdev(devfs.rs_sup.fs_nodes,
+		            longest_device_name,
+		            longest_driver_name);
 	}
 	return 0;
 }
 
 
 PRIVATE ATTR_DBGTEXT void KCALL
-do_dump_character_device(struct chrdev *__restrict self,
-                         size_t longest_device_name,
-                         size_t longest_driver_name) {
+do_dump_chrdev(struct chrdev *__restrict self,
+               size_t longest_device_name,
+               size_t longest_driver_name) {
 	char const *kind;
 	struct mfile_stream_ops const *ops;
-	if (character_device_isattybase(self))                   /* TODO */
+	if (chrdev_isttybase(self))                   /* TODO */
 		kind = ttybase_isapty((struct ttybase_device *)self) /* TODO */
 		       ? DBGSTR("pty")                               /* TODO */
 		       : DBGSTR("tty");                              /* TODO */
-	else if (character_device_isakeyboard(self))             /* TODO */
+	else if (chrdev_iskeyboard(self))             /* TODO */
 		kind = DBGSTR("keyboard");                           /* TODO */
-	else if (character_device_isamouse(self))                /* TODO */
+	else if (chrdev_ismouse(self))                /* TODO */
 		kind = DBGSTR("mouse");                              /* TODO */
 	else {
 		kind = DBGSTR("other");
@@ -1920,18 +1920,18 @@ do_dump_character_device(struct chrdev *__restrict self,
 }
 
 PRIVATE ATTR_DBGTEXT void KCALL
-dump_character_device(struct fnode *__restrict self,
-                      size_t longest_device_name,
-                      size_t longest_driver_name) {
+dump_chrdev(struct fnode *__restrict self,
+            size_t longest_device_name,
+            size_t longest_driver_name) {
 again:
 	if (fnode_ischrdev(self)) {
-		do_dump_character_device(fnode_aschrdev(self),
+		do_dump_chrdev(fnode_aschrdev(self),
 		                         longest_device_name,
 		                         longest_driver_name);
 	}
 	if (self->fn_supent.rb_lhs) {
 		if (self->fn_supent.rb_rhs) {
-			dump_character_device(self->fn_supent.rb_rhs,
+			dump_chrdev(self->fn_supent.rb_rhs,
 			                      longest_device_name,
 			                      longest_driver_name);
 		}
@@ -1971,9 +1971,9 @@ DBG_COMMAND(lschr,
 		format_repeat(&dbg_printer, NULL, ' ', longest_driver_name - COMPILER_STRLEN("driver"));
 	dbg_print(DBGSTR("  kind      features\n"));
 	if (devfs.rs_sup.fs_nodes) {
-		dump_character_device(devfs.rs_sup.fs_nodes,
-		                      longest_device_name,
-		                      longest_driver_name);
+		dump_chrdev(devfs.rs_sup.fs_nodes,
+		            longest_device_name,
+		            longest_driver_name);
 	}
 	return 0;
 }

@@ -435,8 +435,8 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	/* TODO: Alter all instances  where the kernel  currently uses <hybrid/sequence/atree.h>  to
 	 *       instead make use of <hybrid/sequence/rbtree.h>. Doing this consistently may greatly
 	 *       improve performance throughout the kernel:
-	 *        - block_device_tree
-	 *        - character_device_tree
+	 *        - blkdev_tree
+	 *        - chrdev_tree
 	 *        - struct driver::d_eh_frame_cache
 	 *        - struct superblock::s_nodes
 	 * TODO: Also make use of RB-trees to implement `struct epoll_controller::ec_list' */

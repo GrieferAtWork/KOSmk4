@@ -823,7 +823,7 @@ struct hop_superblock_features /*[PREFIX(sbf_)]*/ {
 
 /* [struct hop_openfd *arg] Open the block-device associated with a superblock.
  * @throw: E_INVALID_HANDLE_FILETYPE:                 The given handle wasn't a superblock.
- * @throw: E_NO_DEVICE:E_NO_DEVICE_KIND_BLOCK_DEVICE: No block device is bound to the given superblock.
+ * @throw: E_NO_DEVICE:E_NO_DEVICE_KIND_BLKDEV: No block device is bound to the given superblock.
  * @return: == arg->of_hint */
 #define HOP_SUPERBLOCK_OPEN_BLKDEV                HOP_CMD(HANDLE_TYPE_MFILE, 0x0501)
 
