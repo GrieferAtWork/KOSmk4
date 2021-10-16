@@ -1,4 +1,3 @@
-/* HASH CRC-32:0x71c542f3 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,22 +17,21 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _KOS_GUID_H
-#define _KOS_GUID_H 1
+%[default:section(".text.crt{|.dos}.sched.rpc")]
 
-#include <__stdinc.h>
-#include <__crt.h>
-
-#ifdef __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER
-#pragma GCC system_header
-#endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
-
+%[insert:prefix(
 #include <features.h>
+)]%[insert:prefix(
 #include <hybrid/__byteswap.h>
+)]%[insert:prefix(
 #include <hybrid/byteorder.h>
+)]%{
 
+}%[insert:prefix(
 #include <bits/crt/inttypes.h>
+)]%[insert:prefix(
 #include <bits/types.h>
+)]%{
 
 #define __OFFSET_GUID_A 0
 #define __OFFSET_GUID_B 4
@@ -153,26 +151,67 @@ typedef union __ATTR_PACKED {
 		(__u8)((__UINT64_C(0x##e) & __UINT64_C(0x0000000000ff)))        \
 	}}
 
-#ifdef __CRT_HAVE_guid_fromstr
-/* >> guid_fromstr(3)
- * Convert a given `string' into a GUID
- * >> guid_t g;
- * >> guid_fromstr("054b1def-b2ae-4d99-a99c-54b9730c3dc3", &g);
- * @return: string + GUID_STRLEN: Success
- * @return: NULL:                 `string' isn't a valid GUID. */
-__CDECLARE(__ATTR_NONNULL((1, 2)),char const *,__NOTHROW_NCX,guid_fromstr,(char const __string[GUID_STRLEN], guid_t *__restrict __result),(__string,__result))
-#else /* __CRT_HAVE_guid_fromstr */
-#include <libc/local/kos.guid/guid_fromstr.h>
-/* >> guid_fromstr(3)
- * Convert a given `string' into a GUID
- * >> guid_t g;
- * >> guid_fromstr("054b1def-b2ae-4d99-a99c-54b9730c3dc3", &g);
- * @return: string + GUID_STRLEN: Success
- * @return: NULL:                 `string' isn't a valid GUID. */
-__NAMESPACE_LOCAL_USING_OR_IMPL(guid_fromstr, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) char const *__NOTHROW_NCX(__LIBCCALL guid_fromstr)(char const __string[GUID_STRLEN], guid_t *__restrict __result) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(guid_fromstr))(__string, __result); })
-#endif /* !__CRT_HAVE_guid_fromstr */
+}
+
+%[define_replacement(guid_t = guid_t)]
+
+
+@@>> guid_fromstr(3)
+@@Convert a given `string' into a GUID
+@@>> guid_t g;
+@@>> guid_fromstr("054b1def-b2ae-4d99-a99c-54b9730c3dc3", &g);
+@@@return: string + GUID_STRLEN: Success
+@@@return: NULL:                 `string' isn't a valid GUID.
+[[kernel]]
+char const *guid_fromstr([[nonnull]] char const string[@GUID_STRLEN@],
+                         [[nonnull]] guid_t *__restrict result) {
+	unsigned int i;
+	for (i = 0; i < 16; ++i) {
+		byte_t nibbles[2];
+		unsigned int j;
+
+		/* [05][4b][1d][ef]-[b2][ae]-[4d][99]-[a9][9c]-[54][b9][73][0c][3d][c3]
+		 *  0   1   2   3    4   5    6   7    8   9    10  11  12  13  14  15
+		 *
+		 * There are mandatory '-' characters before bytes: 4, 6, 8 and 10 */
+		if (!(i & 1) && i >= 4 && i <= 10) {
+			if (*string != '-')
+				goto inval;
+			++string;
+		}
+
+		/* Decode nibbles */
+		for (j = 0; j < 2; ++j) {
+			char ch = *string++;
+			if (ch >= '0' && ch <= '9') {
+				nibbles[j] = ch - '0';
+			} else if (ch >= 'a' && ch <= 'f') {
+				nibbles[j] = 10 + ch - 'a';
+			} else if (ch >= 'A' && ch <= 'F') {
+				nibbles[j] = 10 + ch - 'A';
+			} else {
+				goto inval;
+			}
+		}
+
+		/* Convert nibbles to byte */
+		nibbles[0] <<= 4;
+		nibbles[0] |= nibbles[1];
+
+		/* Write byte to result GUID */
+		((byte_t *)result)[i] = nibbles[0];
+	}
+	return string;
+inval:
+	return NULL;
+}
+
+
+
+
+%{
 
 __SYSDECL_END
 #endif /* __CC__ */
 
-#endif /* !_KOS_GUID_H */
+}

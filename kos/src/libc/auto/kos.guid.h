@@ -1,3 +1,4 @@
+/* HASH CRC-32:0xf8f9f1aa */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -17,39 +18,34 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_CORE_FILESYS_SOCKNODE_C
-#define GUARD_KERNEL_CORE_FILESYS_SOCKNODE_C 1
+#ifndef GUARD_LIBC_AUTO_KOS_GUID_H
+#define GUARD_LIBC_AUTO_KOS_GUID_H 1
 
-#include <kernel/compiler.h>
+#include "../api.h"
 
-#include <kernel/fs/socknode.h>
-
-#include <kos/except.h>
-#include <kos/except/reason/illop.h>
-
-#include <assert.h>
+#include <hybrid/typecore.h>
+#include <kos/types.h>
+#include <kos/guid.h>
 
 DECL_BEGIN
 
-/* Default operator for opening fsocknode files. This will unconditionally
- * throw:  `E_ILLEGAL_OPERATION:E_ILLEGAL_OPERATION_CONTEXT_OPEN_S_IFSOCK' */
-PUBLIC NONNULL((1, 2)) void KCALL
-fsocknode_v_open(struct mfile *__restrict UNUSED(self),
-                 struct handle *__restrict UNUSED(hand),
-                 struct path *UNUSED(access_path),
-                 struct fdirent *UNUSED(access_dent))
-		THROWS(E_ILLEGAL_OPERATION) {
-	THROW(E_ILLEGAL_OPERATION,
-	      E_ILLEGAL_OPERATION_CONTEXT_OPEN_S_IFSOCK);
-}
-
-PUBLIC NOBLOCK NONNULL((1)) void
-NOTHROW(KCALL fsocknode_v_destroy)(struct mfile *__restrict self) {
-	struct fsocknode *me = mfile_assock(self);
-	unix_server_fini(&me->sun_server);
-	fnode_v_destroy(self);
-}
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* >> guid_fromstr(3)
+ * Convert a given `string' into a GUID
+ * >> guid_t g;
+ * >> guid_fromstr("054b1def-b2ae-4d99-a99c-54b9730c3dc3", &g);
+ * @return: string + GUID_STRLEN: Success
+ * @return: NULL:                 `string' isn't a valid GUID. */
+INTDEF NONNULL((1, 2)) char const *NOTHROW_NCX(LIBDCALL libd_guid_fromstr)(char const string[GUID_STRLEN], guid_t *__restrict result);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+/* >> guid_fromstr(3)
+ * Convert a given `string' into a GUID
+ * >> guid_t g;
+ * >> guid_fromstr("054b1def-b2ae-4d99-a99c-54b9730c3dc3", &g);
+ * @return: string + GUID_STRLEN: Success
+ * @return: NULL:                 `string' isn't a valid GUID. */
+INTDEF NONNULL((1, 2)) char const *NOTHROW_NCX(LIBCCALL libc_guid_fromstr)(char const string[GUID_STRLEN], guid_t *__restrict result);
 
 DECL_END
 
-#endif /* !GUARD_KERNEL_CORE_FILESYS_SOCKNODE_C */
+#endif /* !GUARD_LIBC_AUTO_KOS_GUID_H */

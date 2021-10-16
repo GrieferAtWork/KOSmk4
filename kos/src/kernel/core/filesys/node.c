@@ -30,7 +30,10 @@
 #include <kernel/compiler.h>
 
 #include <kernel/fs/allnodes.h>
+#include <kernel/fs/blkdev.h>
+#include <kernel/fs/devfs.h>
 #include <kernel/fs/node.h>
+#include <kernel/fs/ramfs.h>
 #include <kernel/fs/super.h>
 #include <kernel/mman/nopf.h>
 #include <sched/cred.h>
@@ -572,6 +575,17 @@ again_acquire_super_changed:
 	/* Write modified attributes to disk. */
 	TRY {
 		mfile_sync(self);
+
+		/* Special case: if we're a block device, also invoke its sync operator. */
+		if (fnode_isblkdev(self)) {
+			struct blkdev *me;
+			struct blkdev_ops const *ops;
+			me  = fnode_asblkdev(self);
+			ops = blkdev_getops(me);
+			if (ops->bdo_sync != NULL)
+				(*ops->bdo_sync)(me);
+		}
+
 	} EXCEPT {
 		/* Add back to changed list on error. */
 		mfile_changed(self, MFILE_F_CHANGED);

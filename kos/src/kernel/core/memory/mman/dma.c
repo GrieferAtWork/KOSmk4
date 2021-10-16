@@ -49,7 +49,7 @@ NOTHROW(FCALL mman_stopdma)(struct mdmalock *__restrict lockvec,
 	size_t i;
 	/* Release all DMA locks first, and then decref everything in a  second
 	 * pass, thus improving cache-locality, as well as semantics, such that
-	 * we're invocing decref() with less locks held that we'd do otherwise. */
+	 * we're invoking decref() with less locks held that we'd do otherwise. */
 	for (i = lockcnt; i--;)
 		lockvec[i].mdl_part = mpart_dma_dellock(lockvec[i].mdl_part);
 	for (i = lockcnt; i--;)

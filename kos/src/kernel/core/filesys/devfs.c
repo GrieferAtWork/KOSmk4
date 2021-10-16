@@ -30,6 +30,7 @@
 #include <kernel/compiler.h>
 
 #include <kernel/fs/allnodes.h>
+#include <kernel/fs/blkdev.h>
 #include <kernel/fs/devfs.h>
 #include <kernel/fs/devnode.h>
 #include <kernel/fs/filesys.h>
@@ -43,13 +44,17 @@
 
 #include <hybrid/atomic.h>
 
+#include <kos/dev.h>
 #include <kos/except.h>
 #include <kos/except/reason/fs.h>
 #include <kos/except/reason/inval.h>
+#include <kos/guid.h>
 #include <linux/magic.h>
 
 #include <assert.h>
 #include <stddef.h>
+#include <stdint.h>
+#include <stdio.h>
 #include <string.h>
 
 /* Devfs by-name tree operations. (For `devfs_byname_tree') */
@@ -177,6 +182,43 @@ PUBLIC struct ffilesys devfs_filesys = {
 	.ffs_flags = FFILESYS_F_SINGLE,
 	.ffs_name  = "devfs",
 };
+
+
+/* TODO:
+ *       /dev/disk/by-id/        -- Symlinks for block-devices
+ *       /dev/disk/by-label/     -- Symlinks for block-devices
+ *       /dev/disk/by-partlabel/ -- Symlinks for block-devices
+ *       /dev/disk/by-partuuid/  -- Symlinks for block-devices
+ *       /dev/disk/by-path/      -- Symlinks for block-devices
+ *       /dev/disk/by-uuid/      -- Symlinks for block-devices
+ *       /dev/block/             -- Contains symlinks for the /dev device, such as 8:0 -> ../sda
+ *       /dev/char/              -- Contains symlinks for the /dev device, such as 1:1 -> ../mem
+ *       /dev/cpu/[id]/cpuid     -- A readable file to access `cpuid' data for a given CPU.
+ * All of these should be implemented in "devfs.c" by dynamic means (similar to how /proc/ works)
+ * Also  note that unlike the root directory, these special sub-directories are _NOT_ writable on
+ * KOS. The files found within cannot be renamed, moved, deleted, etc. and no custom files can be
+ * created  either. Only the root directory, and  any dynamically created sub-directory is usable
+ * for the purpose of RAMFS.
+ *
+ * Enumeration here is done in O(N) by walking `devfs.rs_sup.fs_nodes'. The additional complexity
+ * of adding individual trees/maps for each of these would be too great, though information about
+ * what  filenames appear in these folders must still  be stored on a per-device basis. Also note
+ * that some of those folders contain more than just partitions; namely: the actual root devices.
+ *
+ * TODO: The  devfs root directory node should have INO=1.  Because we use mask &7 for encoding
+ *       different  INO namespaces (&7=0 for RAMFS, and &7=7 for by-name devices), we also need
+ *       one more namespace for special directories like root, and another for dynamic files as
+ *       those described above!
+ *
+ * NOTE: All of these special INodes actually _DONT_ appear in `devfs.rs_sup.fs_nodes'! This  can
+ *       be achieved because INode access within the new fs is not done via `super_opennode' with
+ *       the  associated inode number,  but instead via `fdirent_opennode()',  which hides all of
+ *       the association details for fdirent->fnode mapping from prying eyes. Technically, it  is
+ *       actually possible to create a filesystem that  _NEVER_ makes use of `fs_nodes', and  the
+ *       only  reason why unique inode number ~should~ still be assigned is for the sake of user-
+ *       space  and programs that rely on the POSIX-guarantied unique-ness of stat::st_dev:st_ino
+ *
+ */
 
 
 /* Lookup a device file by name, or fall back  to
@@ -436,16 +478,6 @@ devfs_root_v_enum(struct fdirnode *__restrict self,
 }
 
 
-INTDEF ATTR_PURE WUNUSED struct ramfs_dirent *FCALL /* From "./ramfs.c" */
-ramfs_direnttree_locate_z(/*nullable*/ struct ramfs_dirent *root,
-                          USER CHECKED char const *key,
-                          size_t keylen);
-
-INTDEF ATTR_PURE WUNUSED NONNULL((1)) struct ramfs_dirent *FCALL /* From "./ramfs.c" */
-ramfs_direnttree_caselocate_z(struct ramfs_dirent *__restrict root,
-                              USER CHECKED char const *key,
-                              u16 keylen);
-
 /* Special  handling  for  file  renaming  in  devfs, since
  * device files may not be moved out of the root directory. */
 PRIVATE NONNULL((1, 2)) void KCALL
@@ -560,14 +592,14 @@ again_acquire_lock_for_insert:
 			{
 				struct ramfs_dirent *old_dirent;
 				assert(devfs.rs_dat.rdd_tree != RAMFS_DIRDATA_TREE_DELETED);
-				old_dirent = ramfs_direnttree_locate_z(devfs.rs_dat.rdd_tree,
-				                                       new_dirent->rde_ent.fd_name,
-				                                       new_dirent->rde_ent.fd_namelen);
+				old_dirent = ramfs_direnttree_locate(devfs.rs_dat.rdd_tree,
+				                                     new_dirent->rde_ent.fd_name,
+				                                     new_dirent->rde_ent.fd_namelen);
 				if (!old_dirent && (info->mkf_flags & FMKFILE_F_NOCASE) && devfs.rs_dat.rdd_tree) {
 					/* Do a case-insensitive search */
-					old_dirent = ramfs_direnttree_caselocate_z(devfs.rs_dat.rdd_tree,
-					                                           new_dirent->rde_ent.fd_name,
-					                                           new_dirent->rde_ent.fd_namelen);
+					old_dirent = _ramfs_direnttree_caselocate(devfs.rs_dat.rdd_tree,
+					                                          new_dirent->rde_ent.fd_name,
+					                                          new_dirent->rde_ent.fd_namelen);
 				}
 				if unlikely(old_dirent) {
 					/* Special case: file already exists. */
@@ -716,14 +748,10 @@ devfs_root_v_unlink(struct fdirnode *__restrict self,
 		awref_clear(&real_entry->fdd_node); /* Disconnect the directory entry from the device file. */
 		devfs_byname_endwrite();
 
-		/* With this, the device file has been removed from the filesystem.
-		 * However,  the device is  still active and  may still have global
-		 * references attached. Get rid of these also! */
-		if (ATOMIC_FETCHAND(real_file->dv_devnode.dn_node.fn_file.mf_flags, ~MFILE_FN_GLOBAL_REF) & MFILE_FN_GLOBAL_REF)
-			decref_nokill(&real_file->dv_devnode.dn_node.fn_file); /* Caller also got a reference */
-
-		/* Delete the file (this also sets the `MFILE_F_DELETED' flag) */
-		mfile_delete(&real_file->dv_devnode.dn_node.fn_file);
+#if 0 /* No: user-space shouldn't have this power; Only ~true~ hardware device-disappeared,
+       *     as well as driver-unload operations should be able to do something like  this! */
+		device_delete(real_file);
+#endif
 	} else {
 		ramfs_dirnode_v_unlink(self, entry, file);
 	}
@@ -880,13 +908,13 @@ again_acquire_locks:
 		assert(devfs.rs_dat.rdd_tree != RAMFS_DIRDATA_TREE_DELETED);
 
 		/* Check if the file already exists. */
-		if (ramfs_direnttree_locate_z(devfs.rs_dat.rdd_tree,
-		                              new_dirent->rde_ent.fd_name,
-		                              new_dirent->rde_ent.fd_namelen) ||
+		if (ramfs_direnttree_locate(devfs.rs_dat.rdd_tree,
+		                            new_dirent->rde_ent.fd_name,
+		                            new_dirent->rde_ent.fd_namelen) ||
 		    ((info->frn_flags & FS_MODE_FDOSPATH) && devfs.rs_dat.rdd_tree &&
-		     ramfs_direnttree_caselocate_z(devfs.rs_dat.rdd_tree,
-		                                   new_dirent->rde_ent.fd_name,
-		                                   new_dirent->rde_ent.fd_namelen))) {
+		     _ramfs_direnttree_caselocate(devfs.rs_dat.rdd_tree,
+		                                  new_dirent->rde_ent.fd_name,
+		                                  new_dirent->rde_ent.fd_namelen))) {
 unlock_and_throw_file_already_exists_error:
 			devfs_byname_endread();
 			shared_rwlock_endwrite(&devfs.rs_dat.rdd_treelock);
@@ -939,9 +967,9 @@ unlock_and_throw_file_already_exists_error:
 		/* Check if the file still exists within the  old
 		 * directory, and if so, remove it from said dir. */
 		old_dirent = container_of(info->frn_oldent, struct ramfs_dirent, rde_ent);
-		if (ramfs_direnttree_locate_z(olddir->rdn_dat.rdd_tree,
-		                              old_dirent->rde_ent.fd_name,
-		                              old_dirent->rde_ent.fd_namelen) != old_dirent) {
+		if (ramfs_direnttree_locate(olddir->rdn_dat.rdd_tree,
+		                            old_dirent->rde_ent.fd_name,
+		                            old_dirent->rde_ent.fd_namelen) != old_dirent) {
 			if (ramfs_super_asdir(&devfs) != olddir)
 				shared_rwlock_endwrite(&olddir->rdn_dat.rdd_treelock);
 			devfs_byname_endread();
@@ -1150,9 +1178,15 @@ PUBLIC NOBLOCK void KCALL _devfs_byname_reap(void) {
  *  - fallnodes_list
  * This  function never creates additional references for `self',
  * but leaves the job of setting up global references (though use
- * of the flags `MFILE_FN_GLOBAL_REF') to the caller */
+ * of the flags `MFILE_FN_GLOBAL_REF') to the caller
+ *
+ * This function initializes (before making `self' globally visible):
+ *  - self->_device_devnode_ _fdevnode_node_ fn_allnodes
+ *  - self->_device_devnode_ _fdevnode_node_ fn_supent
+ *  - self->dv_byname_node
+ * @return: * : One of `DEVICE_TRYREGISTER_*' */
 PUBLIC NONNULL((1)) unsigned int FCALL
-device_register(struct device *__restrict self)
+device_tryregister(struct device *__restrict self)
 		THROWS(E_WOULDBLOCK) {
 	unsigned int result;
 	assert(self->dv_devnode.dn_node.fn_ino ==
@@ -1191,7 +1225,7 @@ again:
 		                               self->dv_dirent->fdd_dirent.fd_namelen);
 		if (existing != NULL) {
 			if (!wasdestroyed(existing)) {
-				result = DEVBUILDER_REGISTER_EXISTS_NAME;
+				result = DEVICE_TRYREGISTER_EXISTS_NAME;
 				goto done;
 			}
 
@@ -1202,10 +1236,10 @@ again:
 	}
 
 	/* Also check if a custom file with the same name exists within /dev/ */
-	if (ramfs_direnttree_locate_z(devfs.rs_dat.rdd_tree,
-	                              self->dv_dirent->fdd_dirent.fd_name,
-	                              self->dv_dirent->fdd_dirent.fd_namelen) != NULL) {
-		result = DEVBUILDER_REGISTER_EXISTS_NAME;
+	if (ramfs_direnttree_locate(devfs.rs_dat.rdd_tree,
+	                            self->dv_dirent->fdd_dirent.fd_name,
+	                            self->dv_dirent->fdd_dirent.fd_namelen) != NULL) {
+		result = DEVICE_TRYREGISTER_EXISTS_NAME;
 		goto done;
 	}
 
@@ -1216,12 +1250,12 @@ again:
 		existing = fsuper_nodes_locate(&devfs.rs_sup, self->dv_devnode.dn_node.fn_ino);
 		if (existing != NULL) {
 			if (!wasdestroyed(&existing->fn_file)) {
-				result = DEVBUILDER_REGISTER_EXISTS_DEVNO;
+				result = DEVICE_TRYREGISTER_EXISTS_DEVNO;
 				goto done;
 			}
 			/* Unlink destroyed device. */
 			fsuper_nodes_removenode(&devfs.rs_sup, existing);
-			existing->fn_supent.rb_lhs = FSUPER_NODES_DELETED;
+			ATOMIC_WRITE(existing->fn_supent.rb_lhs, FSUPER_NODES_DELETED);
 		}
 	}
 
@@ -1231,16 +1265,123 @@ again:
 	LIST_INSERT_HEAD(&fallnodes_list, &self->dv_devnode.dn_node, fn_allnodes);
 
 	/* Indicate success */
-	result = DEVBUILDER_REGISTER_SUCCESS;
+	result = DEVICE_TRYREGISTER_SUCCESS;
 
 done:
 	/* Release all locks */
+	COMPILER_BARRIER();
 	shared_rwlock_endread(&devfs.rs_dat.rdd_treelock);
 	fallnodes_release();
 	fsuper_nodes_endwrite(&devfs.rs_sup);
 	devfs_byname_endwrite();
 	return result;
 }
+
+
+/* Same as `device_tryregister()', but automatically handle duplicate dev_t and names:
+ *  - If  the device's name already exists, mark the device's file as having been deleted,
+ *    and don't add it to the by-name tree. As such, the device won't appear in /dev/, and
+ *    accessing it will only be possible by creating a device node using its dev_t
+ *  - If the device's `dev_t dn_devno'  (read: `ino_t fn_ino') already exists,  increment
+ *    the device number by 1 and re-generate the `fn_ino', then try to add it once again.
+ *
+ * This function initializes (before making `self' globally visible):
+ *  - self->_device_devnode_ _fdevnode_node_ fn_allnodes
+ *  - self->_device_devnode_ _fdevnode_node_ fn_supent
+ *  - self->dv_byname_node */
+PUBLIC NONNULL((1)) void FCALL
+device_register(struct device *__restrict self)
+		THROWS(E_WOULDBLOCK) {
+	assert(self->dv_devnode.dn_node.fn_ino ==
+	       devfs_devnode_makeino(self->dv_devnode.dn_node.fn_mode,
+	                             self->dv_devnode.dn_devno));
+	/* Acquire all required locks. */
+again:
+	devfs_byname_write();
+	if (!fsuper_nodes_trywrite(&devfs.rs_sup)) {
+		devfs_byname_endwrite();
+		while (!fsuper_nodes_canwrite(&devfs.rs_sup))
+			task_yield();
+		goto again;
+	}
+	if (!fallnodes_tryacquire()) {
+		fsuper_nodes_endwrite(&devfs.rs_sup);
+		devfs_byname_endwrite();
+		while (!fallnodes_available())
+			task_yield();
+		goto again;
+	}
+	if (!shared_rwlock_tryread(&devfs.rs_dat.rdd_treelock)) {
+		fallnodes_release();
+		fsuper_nodes_endwrite(&devfs.rs_sup);
+		devfs_byname_endwrite();
+		shared_rwlock_read(&devfs.rs_dat.rdd_treelock);
+		shared_rwlock_endread(&devfs.rs_dat.rdd_treelock);
+		goto again;
+	}
+
+	/* With all required locks held, check if this device already exists. */
+	{
+		struct device *existing;
+		existing = devfs_byname_locate(self->dv_dirent->fdd_dirent.fd_name,
+		                               self->dv_dirent->fdd_dirent.fd_namelen);
+		if (existing != NULL) {
+			if (!wasdestroyed(existing)) {
+				self->dv_byname_node.rb_lhs = DEVICE_BYNAME_DELETED;
+				goto done_add2byname;
+			}
+			/* Unlink destroyed device. */
+			devfs_byname_removenode(existing);
+			existing->dv_byname_node.rb_lhs = DEVICE_BYNAME_DELETED;
+		}
+	}
+
+	/* Also check if a custom file with the same name exists within /dev/ */
+	if (ramfs_direnttree_locate(devfs.rs_dat.rdd_tree,
+	                            self->dv_dirent->fdd_dirent.fd_name,
+	                            self->dv_dirent->fdd_dirent.fd_namelen) != NULL) {
+		self->dv_byname_node.rb_lhs = DEVICE_BYNAME_DELETED;
+		goto done_add2byname;
+	}
+
+	/* Add to the by-name tree. */
+	devfs_byname_insert(self);
+done_add2byname:
+
+	/* Try to add the device to the nodes tree. */
+	for (;;) {
+		struct fnode *existing;
+		assert(devfs.rs_sup.fs_nodes != FSUPER_NODES_DELETED);
+		existing = fsuper_nodes_locate(&devfs.rs_sup, self->dv_devnode.dn_node.fn_ino);
+		if likely(!existing)
+			break;
+		if (wasdestroyed(&existing->fn_file)) {
+			/* Unlink destroyed device. */
+			fsuper_nodes_removenode(&devfs.rs_sup, existing);
+			ATOMIC_WRITE(existing->fn_supent.rb_lhs, FSUPER_NODES_DELETED);
+			break;
+		}
+
+		/* Create a new device number */
+		++self->dv_devnode.dn_devno;
+		self->dv_devnode.dn_node.fn_ino = devfs_devnode_makeino(self->dv_devnode.dn_node.fn_mode,
+		                                                        self->dv_devnode.dn_devno);
+	}
+	/* Add to the inode tree (for lookup by dev_t) */
+	fsuper_nodes_insert(&devfs.rs_sup, &self->dv_devnode.dn_node);
+
+	/* Insert into the all-nodes list. */
+	LIST_INSERT_HEAD(&fallnodes_list, &self->dv_devnode.dn_node, fn_allnodes);
+
+done:
+	/* Release all locks */
+	COMPILER_BARRIER();
+	shared_rwlock_endread(&devfs.rs_dat.rdd_treelock);
+	fallnodes_release();
+	fsuper_nodes_endwrite(&devfs.rs_sup);
+	devfs_byname_endwrite();
+}
+
 
 
 
@@ -1253,7 +1394,6 @@ done:
 /************************************************************************/
 /* Helpers for `device_delete()'                                        */
 /************************************************************************/
-
 PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(LOCKOP_CC device_delete_remove_from_allnodes_postlop)(struct postlockop *__restrict self) {
 	REF struct device *me;
@@ -1361,9 +1501,10 @@ NOTHROW(LOCKOP_CC device_delete_remove_from_byino_lop)(Toblockop(fsuper) *__rest
 	assert(obj == &devfs.rs_sup);
 	(void)obj;
 	me = container_of(self, struct device, dv_devnode.dn_node.fn_file._mf_fsuperlop);
+	COMPILER_READ_BARRIER();
 	if (me->dv_devnode.dn_node.fn_supent.rb_lhs != FSUPER_NODES_DELETED) {
 		fsuper_nodes_removenode(&devfs.rs_sup, &me->dv_devnode.dn_node);
-		me->dv_devnode.dn_node.fn_supent.rb_lhs = FSUPER_NODES_DELETED;
+		ATOMIC_WRITE(me->dv_devnode.dn_node.fn_supent.rb_lhs, FSUPER_NODES_DELETED);
 	}
 	me->dv_devnode.dn_node.fn_file._mf_fsuperplop.oplo_func = &device_delete_remove_from_byino_postlop; /* Inherit reference */
 	return &me->dv_devnode.dn_node.fn_file._mf_fsuperplop;
@@ -1382,7 +1523,7 @@ NOTHROW(LOCKOP_CC device_delete_remove_from_byname_postlop)(struct postlockop *_
 			COMPILER_READ_BARRIER();
 			if (me->dv_devnode.dn_node.fn_supent.rb_lhs != FSUPER_NODES_DELETED) {
 				fsuper_nodes_removenode(&devfs.rs_sup, &me->dv_devnode.dn_node);
-				me->dv_devnode.dn_node.fn_supent.rb_lhs = FSUPER_NODES_DELETED;
+				ATOMIC_WRITE(me->dv_devnode.dn_node.fn_supent.rb_lhs, FSUPER_NODES_DELETED);
 			}
 			fsuper_nodes_endwrite(&devfs.rs_sup);
 		} else {
@@ -1413,10 +1554,7 @@ NOTHROW(LOCKOP_CC device_delete_remove_from_byname_lop)(struct lockop *__restric
 /* Unregister a given device node from /dev/ and devfs's inode tree, and proceed
  * to call `mfile_delete()'. This process is done asynchronously and can be used
  * to  delete device files  in situations where  devices disappear, or something
- * similar happened.
- *
- * Also note that what this function does, userspace can do as well by issuing
- * a call to `unlink("/dev/<device-file-name>")' */
+ * similar happened. */
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL device_delete)(struct device *__restrict self) {
 	uintptr_t old_flags;
@@ -1461,6 +1599,150 @@ NOTHROW(FCALL device_delete)(struct device *__restrict self) {
 		}
 	}
 	device_delete_remove_from_byname_postlop(&self->dv_devnode.dn_node.fn_file._mf_plop); /* Inherit reference */
+}
+
+
+
+
+/************************************************************************/
+/* Device lookup                                                        */
+/************************************************************************/
+
+/* Lookup a device within devfs, given its INode number.
+ * @return: NULL: No such device. */
+PUBLIC WUNUSED REF struct device *FCALL
+device_lookup_byino(ino_t ino) THROWS(E_WOULDBLOCK) {
+	REF struct device *result;
+	fsuper_nodes_read(&devfs.rs_sup);
+	result = (REF struct device *)fsuper_nodes_locate(&devfs.rs_sup, ino);
+	if (result && !tryincref(result))
+		result = NULL; /* Device already destroyed */
+	fsuper_nodes_endread(&devfs.rs_sup);
+	return result;
+}
+
+/* Lookup a device within devfs, given its name (and possibly type).
+ * @param: name:    NUL-terminated device name string.
+ * @param: st_mode: Either `0', `S_IFCHR' or `S_IFBLK'
+ * @return: NULL: No such device. */
+PUBLIC WUNUSED REF struct device *FCALL
+device_lookup_byname(USER CHECKED char const *name,
+                     size_t namelen, mode_t st_mode)
+		THROWS(E_SEGFAULT, E_WOULDBLOCK) {
+	REF struct device *result;
+	if unlikely(namelen > UINT16_MAX)
+		return NULL; /* No device could have this long a name. */
+	devfs_byname_read();
+	TRY {
+		result = devfs_byname_locate(name, namelen);
+	} EXCEPT {
+		devfs_byname_endread();
+		RETHROW();
+	}
+	if (result && st_mode != 0 &&
+	    (result->dv_devnode.dn_node.fn_mode & S_IFMT) != (st_mode & S_IFMT))
+		result = NULL; /* Wrong mode */
+	if (result && !tryincref(result))
+		result = NULL; /* Device already destroyed */
+	devfs_byname_endread();
+	return result;
+}
+
+
+PRIVATE NOBLOCK WUNUSED NONNULL((1, 2)) struct blkdev *
+NOTHROW(FCALL devfs_find_partguid)(struct fnode *__restrict root,
+                                   guid_t const *__restrict guid,
+                                   struct blkdev *result) {
+again:
+	if (fnode_isblkpart(root)) {
+		struct blkdev *dev;
+		dev = fnode_asblkdev(root);
+		if (memcmp(&dev->bd_partinfo.bp_efi_partguid, guid, sizeof(guid_t)) == 0)
+			result = result ? (struct blkdev *)-1 : dev;
+	}
+	if (root->fn_supent.rb_lhs) {
+		if (root->fn_supent.rb_rhs)
+			result = devfs_find_partguid(root->fn_supent.rb_rhs, guid, result);
+		root = root->fn_supent.rb_lhs;
+		goto again;
+	}
+	if (root->fn_supent.rb_rhs) {
+		root = root->fn_supent.rb_rhs;
+		goto again;
+	}
+	return result;
+}
+
+/* Lookup a block device partition  by its `bp_efi_partguid'. Also  make
+ * sure that in the event of a partition being found, no other partition
+ * exists that has the same GUID. If anything other than exactly 1  part
+ * is found, return `NULL'. */
+PUBLIC WUNUSED NONNULL((1)) REF struct blkdev *FCALL
+device_lookup_bypartguid(guid_t const *__restrict guid)
+		THROWS(E_WOULDBLOCK) {
+	REF struct blkdev *result;
+	fsuper_nodes_read(&devfs.rs_sup);
+	result = NULL;
+	assert(devfs.rs_sup.fs_nodes != FSUPER_NODES_DELETED);
+	if likely(devfs.rs_sup.fs_nodes != NULL) {
+		result = devfs_find_partguid(devfs.rs_sup.fs_nodes, guid, NULL);
+		if (result == (REF struct blkdev *)-1)
+			result = NULL; /* Ambiguous */
+	}
+	if (result && !tryincref(&result->bd_dev))
+		result = NULL;
+	fsuper_nodes_endread(&devfs.rs_sup);
+	return result;
+}
+
+/* Slightly more advanced version of `device_lookup_byname()':
+ *  #1: If str starts with "/dev/": string += 5; stringlen -= 5;
+ *  #2: Pass `string' to `device_lookup_byname()', and re-return if non-NULL
+ *  #3: if `!S_ISCHR(st_mode)' and `string' matches FORMAT_GUID_T, decode a
+ *      GUID and make use of `device_lookup_bypartguid'.
+ *  #4: if `st_mode != 0',  do `sscanf(string, "%u:%u")'  for a  MAJOR/MINOR
+ *      pair, construct a dev_t, and pass to `device_lookup_bydev()', and
+ *      re-return if non-NULL
+ *  #5: If all else failed, return `NULL' */
+FUNDEF WUNUSED REF struct device *FCALL
+device_lookup_bystring(USER CHECKED char const *string,
+                       size_t stringlen, mode_t st_mode)
+		THROWS(E_SEGFAULT, E_WOULDBLOCK) {
+	REF struct device *result;
+	static char const devfs_prefix[] = "/dev/";
+	if (stringlen >= COMPILER_STRLEN(devfs_prefix) &&
+	    memcmp(string, devfs_prefix, COMPILER_STRLEN(devfs_prefix) * sizeof(char)) == 0) {
+		string += COMPILER_STRLEN(devfs_prefix);
+		stringlen -= COMPILER_STRLEN(devfs_prefix);
+	}
+	result = device_lookup_byname(string, stringlen, st_mode);
+	if (result != NULL)
+		goto done;
+	if (!S_ISCHR(st_mode) && stringlen == GUID_STRLEN) {
+		guid_t guid;
+		if (guid_fromstr(string, &guid)) {
+			result = (REF struct device *)device_lookup_bypartguid(&guid);
+			if (result != NULL)
+				goto done;
+		}
+	}
+	/* sscanf for a valid device ID */
+	if (st_mode != 0 && stringlen < 128) {
+		major_t major;
+		minor_t minor;
+		char text[128];
+		*(char *)mempcpy(text, string, stringlen, sizeof(char)) = '\0';
+		if (sscanf(text, "%u:%u", &major, &minor) == 2) {
+			dev_t devno;
+			devno  = MKDEV(major, minor);
+			result = device_lookup_bydev(st_mode, devno);
+			if (result != NULL)
+				goto done;
+		}
+	}
+
+done:
+	return result;
 }
 
 

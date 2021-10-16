@@ -2347,6 +2347,7 @@
 #define __CRT_HAVE_group_member
 #define __CRT_HAVE_gsignal
 #define __CRT_HAVE_gtty
+#define __CRT_HAVE_guid_fromstr
 #define __CRT_HAVE_hasmntopt
 #define __CRT_HAVE_hcreate
 #define __CRT_HAVE_hcreate_r

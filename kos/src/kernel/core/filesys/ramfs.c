@@ -78,7 +78,10 @@ DECL_BEGIN
 
 PUBLIC struct flnknode_ops const ramfs_lnknode_ops = {
 	.lno_node = {
-		.no_file = { .mo_destroy = &ramfs_lnknode_v_destroy },
+		.no_file = {
+			.mo_destroy = &ramfs_lnknode_v_destroy,
+			.mo_changed = &fnode_v_changed,
+		},
 		.no_wrattr = &ramfs_lnknode_v_wrattr,
 	},
 	.lno_readlink = &ramfs_lnknode_v_readlink,
@@ -87,7 +90,10 @@ PUBLIC struct flnknode_ops const ramfs_lnknode_ops = {
 
 PUBLIC struct fregnode_ops const ramfs_regnode_ops = {
 	.rno_node = {
-		.no_file = { .mo_destroy = &ramfs_regnode_v_destroy },
+		.no_file = {
+			.mo_destroy = &ramfs_regnode_v_destroy,
+			.mo_changed = &fnode_v_changed,
+		},
 		.no_wrattr = &ramfs_regnode_v_wrattr,
 	},
 };
@@ -99,6 +105,7 @@ PUBLIC struct fdevnode_ops const ramfs_devnode_ops = {
 	.dno_node = {
 		.no_file = {
 			.mo_destroy = &ramfs_devnode_v_destroy,
+			.mo_changed = &fnode_v_changed,
 			.mo_stream  = &ramfs_devnode_stream_ops,
 		},
 		.no_wrattr = &ramfs_devnode_v_wrattr,
@@ -120,6 +127,7 @@ PUBLIC struct ffifonode_ops const ramfs_fifonode_ops = {
 	.fno_node = {
 		.no_file = {
 			.mo_destroy = &ramfs_fifonode_v_destroy,
+			.mo_changed = &fnode_v_changed,
 			.mo_stream  = &ramfs_fifonode_stream_ops,
 		},
 		.no_wrattr = &ramfs_fifonode_v_wrattr,
@@ -134,6 +142,7 @@ PUBLIC struct fsocknode_ops const ramfs_socknode_ops = {
 	.suno_node = {
 		.no_file = {
 			.mo_destroy = &ramfs_socknode_v_destroy,
+			.mo_changed = &fnode_v_changed,
 			.mo_stream  = &ramfs_socknode_stream_ops,
 		},
 		.no_wrattr = &ramfs_socknode_v_wrattr,
@@ -431,10 +440,10 @@ do_seek_end:
 }
 
 
-INTERN ATTR_PURE WUNUSED struct ramfs_dirent *FCALL
-ramfs_direnttree_locate_z(/*nullable*/ struct ramfs_dirent *root,
-                          USER CHECKED char const *key,
-                          size_t keylen) {
+PUBLIC ATTR_PURE WUNUSED struct ramfs_dirent *FCALL
+ramfs_direnttree_locate(/*nullable*/ struct ramfs_dirent *root,
+                        USER CHECKED char const *key,
+                        size_t keylen) THROWS(E_SEGFAULT) {
 	while (root) {
 		int cmp = strcmpz(root->rde_ent.fd_name, key, keylen);
 		if (cmp > 0) {
@@ -450,10 +459,10 @@ ramfs_direnttree_locate_z(/*nullable*/ struct ramfs_dirent *root,
 	return root;
 }
 
-INTERN ATTR_PURE WUNUSED NONNULL((1)) struct ramfs_dirent *FCALL
-ramfs_direnttree_caselocate_z(struct ramfs_dirent *__restrict root,
-                              USER CHECKED char const *key,
-                              u16 keylen) {
+PUBLIC ATTR_PURE WUNUSED NONNULL((1)) struct ramfs_dirent *FCALL
+_ramfs_direnttree_caselocate(struct ramfs_dirent *__restrict root,
+                             USER CHECKED char const *key, size_t keylen)
+		THROWS(E_SEGFAULT) {
 again:
 	if (root->rde_ent.fd_namelen == keylen &&
 	    memcasecmp(root->rde_ent.fd_name, key, keylen * sizeof(char)) == 0)
@@ -462,8 +471,8 @@ again:
 	if (root->rde_treenode.rb_lhs) {
 		if (root->rde_treenode.rb_rhs) {
 			struct ramfs_dirent *result;
-			result = ramfs_direnttree_caselocate_z(root->rde_treenode.rb_rhs,
-			                                       key, keylen);
+			result = _ramfs_direnttree_caselocate(root->rde_treenode.rb_rhs,
+			                                      key, keylen);
 			if (result)
 				return result;
 		}
@@ -482,7 +491,7 @@ PUBLIC struct fdirnode_ops const ramfs_dirnode_ops = {
 	.dno_node = {
 		.no_file = {
 			.mo_destroy = &ramfs_dirnode_v_destroy,
-			.mo_changed = &fnode_v_changed
+			.mo_changed = &fnode_v_changed,
 		},
 		.no_wrattr = &ramfs_dirnode_v_wrattr,
 	},
@@ -499,15 +508,15 @@ ramfs_dirdata_lookup(struct ramfs_dirnode *__restrict self,
                      struct flookup_info *__restrict info) {
 	struct ramfs_dirent *result;
 	assert(self->rdn_dat.rdd_tree != RAMFS_DIRDATA_TREE_DELETED);
-	result = ramfs_direnttree_locate_z(self->rdn_dat.rdd_tree,
-	                                   info->flu_name,
-	                                   info->flu_namelen);
+	result = ramfs_direnttree_locate(self->rdn_dat.rdd_tree,
+	                                 info->flu_name,
+	                                 info->flu_namelen);
 	if (!result) {
 		if ((info->flu_flags & FS_MODE_FDOSPATH) && self->rdn_dat.rdd_tree) {
 			/* Do a case-insensitive search */
-			result = ramfs_direnttree_caselocate_z(self->rdn_dat.rdd_tree,
-			                                       info->flu_name,
-			                                       info->flu_namelen);
+			result = _ramfs_direnttree_caselocate(self->rdn_dat.rdd_tree,
+			                                      info->flu_name,
+			                                      info->flu_namelen);
 		}
 	}
 	return result;
@@ -715,12 +724,12 @@ again_acquire_lock_for_insert:
 			shared_rwlock_write(&me->rdn_dat.rdd_treelock);
 			if unlikely(ATOMIC_READ(me->rdn_dat.rdd_tree) == RAMFS_DIRDATA_TREE_DELETED)
 				THROW(E_FSERROR_DELETED, E_FILESYSTEM_DELETED_PATH);
-			old_dirent = ramfs_direnttree_locate_z(me->rdn_dat.rdd_tree,
+			old_dirent = ramfs_direnttree_locate(me->rdn_dat.rdd_tree,
 			                                       new_dirent->rde_ent.fd_name,
 			                                       new_dirent->rde_ent.fd_namelen);
 			if (!old_dirent && (info->mkf_flags & FMKFILE_F_NOCASE) && me->rdn_dat.rdd_tree) {
 				/* Do a case-insensitive search */
-				old_dirent = ramfs_direnttree_caselocate_z(me->rdn_dat.rdd_tree,
+				old_dirent = _ramfs_direnttree_caselocate(me->rdn_dat.rdd_tree,
 				                                           new_dirent->rde_ent.fd_name,
 				                                           new_dirent->rde_ent.fd_namelen);
 			}
@@ -812,9 +821,9 @@ again:
 		THROW(E_FSERROR_DELETED, E_FILESYSTEM_DELETED_PATH);
 	}
 	/* Check that `entry' is still correct. */
-	known_entry = ramfs_direnttree_locate_z(me->rdn_dat.rdd_tree,
-	                                        entry->fd_name,
-	                                        entry->fd_namelen);
+	known_entry = ramfs_direnttree_locate(me->rdn_dat.rdd_tree,
+	                                      entry->fd_name,
+	                                      entry->fd_namelen);
 	if unlikely(&known_entry->rde_ent != entry) {
 		shared_rwlock_endwrite(&me->rdn_dat.rdd_treelock);
 		THROW(E_FSERROR_DELETED, E_FILESYSTEM_DELETED_FILE);
@@ -940,13 +949,13 @@ again_acquire_locks:
 	}
 
 	/* Check if the file already exists. */
-	if (ramfs_direnttree_locate_z(me->rdn_dat.rdd_tree,
-	                              new_dirent->rde_ent.fd_name,
-	                              new_dirent->rde_ent.fd_namelen) ||
+	if (ramfs_direnttree_locate(me->rdn_dat.rdd_tree,
+	                            new_dirent->rde_ent.fd_name,
+	                            new_dirent->rde_ent.fd_namelen) ||
 	    ((info->frn_flags & FS_MODE_FDOSPATH) && me->rdn_dat.rdd_tree &&
-	     ramfs_direnttree_caselocate_z(me->rdn_dat.rdd_tree,
-	                                   new_dirent->rde_ent.fd_name,
-	                                   new_dirent->rde_ent.fd_namelen))) {
+	     _ramfs_direnttree_caselocate(me->rdn_dat.rdd_tree,
+	                                  new_dirent->rde_ent.fd_name,
+	                                  new_dirent->rde_ent.fd_namelen))) {
 		shared_rwlock_endwrite(&me->rdn_dat.rdd_treelock);
 		kfree(new_dirent);
 		THROW(E_FSERROR_FILE_ALREADY_EXISTS);
@@ -978,9 +987,9 @@ again_acquire_locks:
 	/* Check if the file still exists within the  old
 	 * directory, and if so, remove it from said dir. */
 	old_dirent = container_of(info->frn_oldent, struct ramfs_dirent, rde_ent);
-	if (ramfs_direnttree_locate_z(olddir->rdn_dat.rdd_tree,
-	                              old_dirent->rde_ent.fd_name,
-	                              old_dirent->rde_ent.fd_namelen) != old_dirent) {
+	if (ramfs_direnttree_locate(olddir->rdn_dat.rdd_tree,
+	                            old_dirent->rde_ent.fd_name,
+	                            old_dirent->rde_ent.fd_namelen) != old_dirent) {
 		if (me != olddir)
 			shared_rwlock_endwrite(&olddir->rdn_dat.rdd_treelock);
 		shared_rwlock_endwrite(&me->rdn_dat.rdd_treelock);

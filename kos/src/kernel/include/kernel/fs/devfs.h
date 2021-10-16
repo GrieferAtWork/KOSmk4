@@ -33,6 +33,7 @@
 
 #include <bits/os/timespec.h>
 #include <kos/aref.h>
+#include <kos/guid.h>
 #include <kos/io.h>
 #include <kos/kernel/paging.h>
 #include <kos/lockop.h>
@@ -55,7 +56,7 @@ DECL_BEGIN
 
 struct device;
 struct device_ops {
-	struct fdevnode_ops dfno_node; /* FNode operators */
+	struct fdevnode_ops do_node; /* FNode operators */
 	/* More operators would go here... */
 };
 
@@ -131,7 +132,7 @@ NOTHROW(KCALL device_v_destroy)(struct mfile *__restrict self);
 #define device_getops(self) \
 	((struct device_ops const *)__COMPILER_REQTYPE(struct device const *, self)->_device_devnode_ _fdevnode_node_ _fnode_file_ mf_ops)
 #define _device_assert_ops_(ops) \
-	_fdevnode_assert_ops_(&(ops)->dfno_node)
+	_fdevnode_assert_ops_(&(ops)->do_node)
 
 /* Return a pointer to the name of the given devfs device node.
  * NOTE: The caller must be holding a lock to `devfs_byname_lock'! */
@@ -164,7 +165,7 @@ FUNDEF NOBLOCK WUNUSED struct timespec NOTHROW(KCALL realtime)(void);
  * @param: struct device_ops *ops:   Device operators. */
 #define _device_init(self, ops)                                                                         \
 	(_device_assert_ops_(ops) _fnode_init_common(_device_asdevnode(_fdevnode_asnode(self))),            \
-	 (self)->_device_devnode_ _fdevnode_node_ _fnode_file_ mf_ops = &(ops)->dfno_node.dno_node.no_file, \
+	 (self)->_device_devnode_ _fdevnode_node_ _fnode_file_ mf_ops = &(ops)->do_node.dno_node.no_file, \
 	 (self)->_device_devnode_ _fdevnode_node_ _fnode_file_ mf_atime =                                   \
 	 (self)->_device_devnode_ _fdevnode_node_ _fnode_file_ mf_mtime =                                   \
 	 (self)->_device_devnode_ _fdevnode_node_ _fnode_file_ mf_ctime = realtime(),                       \
@@ -174,7 +175,7 @@ FUNDEF NOBLOCK WUNUSED struct timespec NOTHROW(KCALL realtime)(void);
 	 (self)->_device_devnode_ fn_gid                                = 0)
 #define _device_cinit(self, ops)                                                                        \
 	(_device_assert_ops_(ops) _fnode_cinit_common(_device_asdevnode(_fdevnode_asnode(self))),           \
-	 (self)->_device_devnode_ _fdevnode_node_ _fnode_file_ mf_ops = &(ops)->dfno_node.dno_node.no_file, \
+	 (self)->_device_devnode_ _fdevnode_node_ _fnode_file_ mf_ops = &(ops)->do_node.dno_node.no_file, \
 	 (self)->_device_devnode_ _fdevnode_node_ _fnode_file_ mf_atime =                                   \
 	 (self)->_device_devnode_ _fdevnode_node_ _fnode_file_ mf_mtime =                                   \
 	 (self)->_device_devnode_ _fdevnode_node_ _fnode_file_ mf_ctime = realtime(),                       \
@@ -253,24 +254,90 @@ devfs_byname_caselocate(USER CHECKED char const *name, u16 namelen) THROWS(E_SEG
  *  - fallnodes_list
  * This  function never creates additional references for `self',
  * but leaves the job of setting up global references (though use
- * of the flags `MFILE_FN_GLOBAL_REF') to the caller */
+ * of the flags `MFILE_FN_GLOBAL_REF') to the caller
+ *
+ * This function initializes (before making `self' globally visible):
+ *  - self->_device_devnode_ _fdevnode_node_ fn_allnodes
+ *  - self->_device_devnode_ _fdevnode_node_ fn_supent
+ *  - self->dv_byname_node
+ * @return: * : One of `DEVICE_TRYREGISTER_*' */
 FUNDEF NONNULL((1)) unsigned int FCALL
+device_tryregister(struct device *__restrict self)
+		THROWS(E_WOULDBLOCK);
+#define DEVICE_TRYREGISTER_SUCCESS      0 /* Success. */
+#define DEVICE_TRYREGISTER_EXISTS_DEVNO 1 /* Another device with the same mode+devno already exists. */
+#define DEVICE_TRYREGISTER_EXISTS_NAME  2 /* Another device with the same name already exists. */
+
+/* Same as `device_tryregister()', but automatically handle duplicate dev_t and names:
+ *  - If  the device's name already exists, mark the device's file as having been deleted,
+ *    and don't add it to the by-name tree. As such, the device won't appear in /dev/, and
+ *    accessing it will only be possible by creating a device node using its dev_t
+ *  - If the device's `dev_t dn_devno'  (read: `ino_t fn_ino') already exists,  increment
+ *    the device number by 1 and re-generate the `fn_ino', then try to add it once again.
+ *
+ * This function initializes (before making `self' globally visible):
+ *  - self->_device_devnode_ _fdevnode_node_ fn_allnodes
+ *  - self->_device_devnode_ _fdevnode_node_ fn_supent
+ *  - self->dv_byname_node */
+FUNDEF NONNULL((1)) void FCALL
 device_register(struct device *__restrict self)
 		THROWS(E_WOULDBLOCK);
-#define DEVBUILDER_REGISTER_SUCCESS      0 /* Success. */
-#define DEVBUILDER_REGISTER_EXISTS_DEVNO 1 /* Another device with the same mode+devno already exists. */
-#define DEVBUILDER_REGISTER_EXISTS_NAME  2 /* Another device with the same name already exists. */
+
 
 
 /* Unregister a given device node from /dev/ and devfs's inode tree, and proceed
  * to call `mfile_delete()'. This process is done asynchronously and can be used
  * to  delete device files  in situations where  devices disappear, or something
- * similar happened.
- *
- * Also note that what this function does, userspace can do as well by issuing
- * a call to `unlink("/dev/<device-file-name>")' */
+ * similar happened. */
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL device_delete)(struct device *__restrict self);
+
+
+/* Lookup a device within devfs, given its INode number.
+ * @return: NULL: No such device. */
+FUNDEF WUNUSED REF struct device *FCALL
+device_lookup_byino(ino_t ino) THROWS(E_WOULDBLOCK);
+
+/* Lookup a device within devfs, given its device type and device number.
+ * @param: st_mode: Either `S_IFCHR' or `S_IFBLK'
+ * @param: st_rdev: Real device number (`MKDEV(...)')
+ * @return: NULL: No such device. */
+#define device_lookup_bydev(st_mode, st_rdev) \
+	device_lookup_byino(devfs_devnode_makeino(st_mode, st_rdev))
+
+/* Lookup a device within devfs, given its name (and possibly type).
+ * @param: name:    NUL-terminated device name string.
+ * @param: st_mode: Either `0', `S_IFCHR' or `S_IFBLK'
+ * @return: NULL: No such device. */
+FUNDEF WUNUSED REF struct device *FCALL
+device_lookup_byname(USER CHECKED char const *name,
+                     size_t namelen, mode_t st_mode DFL(0))
+		THROWS(E_SEGFAULT, E_WOULDBLOCK);
+
+struct blkdev;
+
+/* Lookup a block device partition  by its `bp_efi_partguid'. Also  make
+ * sure that in the event of a partition being found, no other partition
+ * exists that has the same GUID. If anything other than exactly 1  part
+ * is found, return `NULL'. */
+FUNDEF WUNUSED NONNULL((1)) REF struct blkdev *FCALL
+device_lookup_bypartguid(guid_t const *__restrict guid)
+		THROWS(E_WOULDBLOCK);
+
+/* Slightly more advanced version of `device_lookup_byname()':
+ *  #1: If str starts with "/dev/": string += 5; stringlen -= 5;
+ *  #2: Pass `string' to `device_lookup_byname()', and re-return if non-NULL
+ *  #3: if `!S_ISCHR(st_mode)' and `string' matches FORMAT_GUID_T, decode a
+ *      GUID and make use of `device_lookup_bypartguid'.
+ *  #4: if `st_mode != 0',  do `sscanf(string, "%u:%u")'  for a  MAJOR/MINOR
+ *      pair, construct a dev_t, and pass to `device_lookup_bydev()', and
+ *      re-return if non-NULL
+ *  #5: If all else failed, return `NULL' */
+FUNDEF WUNUSED REF struct device *FCALL
+device_lookup_bystring(USER CHECKED char const *string,
+                       size_t stringlen, mode_t st_mode DFL(0))
+		THROWS(E_SEGFAULT, E_WOULDBLOCK);
+
 
 
 DECL_END

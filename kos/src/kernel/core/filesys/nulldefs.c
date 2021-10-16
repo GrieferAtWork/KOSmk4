@@ -1,3 +1,9 @@
+/*[[[magic
+options["COMPILE.language"] = "c";
+local gcc_opt = options.setdefault("GCC.options", []);
+gcc_opt.remove("-fno-rtti");
+gcc_opt.remove("-g"); // Disable debug informations for this file!
+]]]*/
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -109,10 +115,14 @@ for (local name, none, none: DEVICES)
 	rbtree.insert(byNameTree, rbtree.RbNode(minkey: name, maxkey: name, val: "dev_" + name));
 function devfs_devnode_makeino_4(st_mode, st_rdev) -> (st_rdev << 3) | ((st_mode & 0x4000) << 49) | 7;
 function devfs_devnode_makeino_8(st_mode, st_rdev) -> (st_rdev << 3) | ((st_mode & 0x4000) << 17) | 7;
+
+@@Possible encoding mechanisms for ino_t. The elements of this list must
+@@correspond to the arguments of `__SELECT_INO`, using the same order.
 local MAKEINO_FUNCTIONS = {
 	("UINT32_C", devfs_devnode_makeino_4),
 	("UINT64_C", devfs_devnode_makeino_8)
 };
+
 
 function generateInoTree(fun): Cell with llrbtree.RbNode {
 	local result = Cell(none);
@@ -124,7 +134,8 @@ function generateInoTree(fun): Cell with llrbtree.RbNode {
 	return result;
 }
 local byInoTrees: {(string, Callable, Cell with llrbtree.RbNode)...} = List(
-	for (local c, fun: MAKEINO_FUNCTIONS) (c, fun, generateInoTree(fun)));
+	for (local c, fun: MAKEINO_FUNCTIONS)
+		(c, fun, generateInoTree(fun)));
 
 // Generate the static initialization for the all-nodes list
 local allNodesList: {string: (string, string)} = Dict();
@@ -203,7 +214,7 @@ for (local name, st_mode, st_rdev: DEVICES) {
 	print("		.dn_node = {");
 	print("			.fn_file = {");
 	print("				MFILE_INIT_mf_refcnt(2), /" "* +1: dev_", name, ", +1: MFILE_FN_GLOBAL_REF *" "/");
-	print("				MFILE_INIT_mf_ops(&dev_", name, "_ops.dfno_node.dno_node.no_file),");
+	print("				MFILE_INIT_mf_ops(&dev_", name, "_ops.do_node.dno_node.no_file),");
 	print("				MFILE_INIT_mf_lock,");
 	print("				MFILE_INIT_mf_parts(MFILE_PARTS_ANONYMOUS),");
 	print("				MFILE_INIT_mf_initdone,");
@@ -413,7 +424,7 @@ PUBLIC struct device dev_mem = {
 		.dn_node = {
 			.fn_file = {
 				MFILE_INIT_mf_refcnt(2), /* +1: dev_mem, +1: MFILE_FN_GLOBAL_REF */
-				MFILE_INIT_mf_ops(&dev_mem_ops.dfno_node.dno_node.no_file),
+				MFILE_INIT_mf_ops(&dev_mem_ops.do_node.dno_node.no_file),
 				MFILE_INIT_mf_lock,
 				MFILE_INIT_mf_parts(MFILE_PARTS_ANONYMOUS),
 				MFILE_INIT_mf_initdone,
@@ -461,7 +472,7 @@ PUBLIC struct device dev_kmem = {
 		.dn_node = {
 			.fn_file = {
 				MFILE_INIT_mf_refcnt(2), /* +1: dev_kmem, +1: MFILE_FN_GLOBAL_REF */
-				MFILE_INIT_mf_ops(&dev_kmem_ops.dfno_node.dno_node.no_file),
+				MFILE_INIT_mf_ops(&dev_kmem_ops.do_node.dno_node.no_file),
 				MFILE_INIT_mf_lock,
 				MFILE_INIT_mf_parts(MFILE_PARTS_ANONYMOUS),
 				MFILE_INIT_mf_initdone,
@@ -509,7 +520,7 @@ PUBLIC struct device dev_null = {
 		.dn_node = {
 			.fn_file = {
 				MFILE_INIT_mf_refcnt(2), /* +1: dev_null, +1: MFILE_FN_GLOBAL_REF */
-				MFILE_INIT_mf_ops(&dev_null_ops.dfno_node.dno_node.no_file),
+				MFILE_INIT_mf_ops(&dev_null_ops.do_node.dno_node.no_file),
 				MFILE_INIT_mf_lock,
 				MFILE_INIT_mf_parts(MFILE_PARTS_ANONYMOUS),
 				MFILE_INIT_mf_initdone,
@@ -557,7 +568,7 @@ PUBLIC struct device dev_port = {
 		.dn_node = {
 			.fn_file = {
 				MFILE_INIT_mf_refcnt(2), /* +1: dev_port, +1: MFILE_FN_GLOBAL_REF */
-				MFILE_INIT_mf_ops(&dev_port_ops.dfno_node.dno_node.no_file),
+				MFILE_INIT_mf_ops(&dev_port_ops.do_node.dno_node.no_file),
 				MFILE_INIT_mf_lock,
 				MFILE_INIT_mf_parts(MFILE_PARTS_ANONYMOUS),
 				MFILE_INIT_mf_initdone,
@@ -605,7 +616,7 @@ PUBLIC struct device dev_zero = {
 		.dn_node = {
 			.fn_file = {
 				MFILE_INIT_mf_refcnt(2), /* +1: dev_zero, +1: MFILE_FN_GLOBAL_REF */
-				MFILE_INIT_mf_ops(&dev_zero_ops.dfno_node.dno_node.no_file),
+				MFILE_INIT_mf_ops(&dev_zero_ops.do_node.dno_node.no_file),
 				MFILE_INIT_mf_lock,
 				MFILE_INIT_mf_parts(MFILE_PARTS_ANONYMOUS),
 				MFILE_INIT_mf_initdone,
@@ -652,7 +663,7 @@ PUBLIC struct device dev_full = {
 		.dn_node = {
 			.fn_file = {
 				MFILE_INIT_mf_refcnt(2), /* +1: dev_full, +1: MFILE_FN_GLOBAL_REF */
-				MFILE_INIT_mf_ops(&dev_full_ops.dfno_node.dno_node.no_file),
+				MFILE_INIT_mf_ops(&dev_full_ops.do_node.dno_node.no_file),
 				MFILE_INIT_mf_lock,
 				MFILE_INIT_mf_parts(MFILE_PARTS_ANONYMOUS),
 				MFILE_INIT_mf_initdone,
@@ -701,7 +712,7 @@ PUBLIC struct device dev_random = {
 		.dn_node = {
 			.fn_file = {
 				MFILE_INIT_mf_refcnt(2), /* +1: dev_random, +1: MFILE_FN_GLOBAL_REF */
-				MFILE_INIT_mf_ops(&dev_random_ops.dfno_node.dno_node.no_file),
+				MFILE_INIT_mf_ops(&dev_random_ops.do_node.dno_node.no_file),
 				MFILE_INIT_mf_lock,
 				MFILE_INIT_mf_parts(MFILE_PARTS_ANONYMOUS),
 				MFILE_INIT_mf_initdone,
@@ -749,7 +760,7 @@ PUBLIC struct device dev_urandom = {
 		.dn_node = {
 			.fn_file = {
 				MFILE_INIT_mf_refcnt(2), /* +1: dev_urandom, +1: MFILE_FN_GLOBAL_REF */
-				MFILE_INIT_mf_ops(&dev_urandom_ops.dfno_node.dno_node.no_file),
+				MFILE_INIT_mf_ops(&dev_urandom_ops.do_node.dno_node.no_file),
 				MFILE_INIT_mf_lock,
 				MFILE_INIT_mf_parts(MFILE_PARTS_ANONYMOUS),
 				MFILE_INIT_mf_initdone,
@@ -798,7 +809,7 @@ PUBLIC struct device dev_kmsg = {
 		.dn_node = {
 			.fn_file = {
 				MFILE_INIT_mf_refcnt(2), /* +1: dev_kmsg, +1: MFILE_FN_GLOBAL_REF */
-				MFILE_INIT_mf_ops(&dev_kmsg_ops.dfno_node.dno_node.no_file),
+				MFILE_INIT_mf_ops(&dev_kmsg_ops.do_node.dno_node.no_file),
 				MFILE_INIT_mf_lock,
 				MFILE_INIT_mf_parts(MFILE_PARTS_ANONYMOUS),
 				MFILE_INIT_mf_initdone,
@@ -847,7 +858,7 @@ PUBLIC struct device dev_tty = {
 		.dn_node = {
 			.fn_file = {
 				MFILE_INIT_mf_refcnt(2), /* +1: dev_tty, +1: MFILE_FN_GLOBAL_REF */
-				MFILE_INIT_mf_ops(&dev_tty_ops.dfno_node.dno_node.no_file),
+				MFILE_INIT_mf_ops(&dev_tty_ops.do_node.dno_node.no_file),
 				MFILE_INIT_mf_lock,
 				MFILE_INIT_mf_parts(MFILE_PARTS_ANONYMOUS),
 				MFILE_INIT_mf_initdone,

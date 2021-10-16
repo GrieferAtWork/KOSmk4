@@ -25,6 +25,7 @@
 #include <kernel/compiler.h>
 
 #include <kernel/fs/allnodes.h>
+#include <kernel/fs/blkdev.h>
 #include <kernel/fs/filesys.h>
 #include <kernel/fs/super.h>
 
@@ -167,6 +168,26 @@ fsuper_sync(struct fsuper *__restrict self)
 			if (ops->so_sync != NULL)
 				(*ops->so_sync)(self);
 		}
+
+		/* Sync the associated device file. */
+		{
+			struct blkdev *dev;
+			dev = self->fs_dev;
+			if (dev != NULL) {
+				struct blkdev_ops const *ops;
+				/* fnode_syncdata() would also work here, but that function
+				 * only conditionally invokes  `bdo_sync', whereas we  have
+				 * to  invoke that operator (if it exists) unconditionally!
+				 *
+				 * As such, just do a normal file sync, followed by always
+				 * invoking the `bdo_sync' operator. */
+				mfile_sync(dev);
+				ops = blkdev_getops(dev);
+				if (ops->bdo_sync != NULL)
+					(*ops->bdo_sync)(dev);
+			}
+		}
+
 	} EXCEPT {
 		/* Upon error, re-add the superblock to the list of changed ones. */
 		fsuper_add2changed(self);

@@ -2188,6 +2188,7 @@
 #define __CRT_HAVE_group_member
 #define __CRT_HAVE_gsignal
 #define __CRT_HAVE_gtty
+#define __CRT_HAVE_guid_fromstr
 #define __CRT_HAVE_hasmntopt
 #define __CRT_HAVE_hcreate
 #define __CRT_HAVE_hcreate_r
@@ -6512,6 +6513,7 @@
 #define __CRT_HAVE_KOS$group_member
 #define __CRT_HAVE_KOS$gsignal
 #define __CRT_HAVE_KOS$gtty
+#define __CRT_HAVE_KOS$guid_fromstr
 #define __CRT_HAVE_KOS$hasmntopt
 #define __CRT_HAVE_KOS$hcreate
 #define __CRT_HAVE_KOS$hcreate_r
@@ -9922,6 +9924,7 @@
 #define __CRT_HAVE_DOS$group_member
 #define __CRT_HAVE_DOS$gsignal
 #define __CRT_HAVE_DOS$gtty
+#define __CRT_HAVE_DOS$guid_fromstr
 #define __CRT_HAVE_DOS$hasmntopt
 #define __CRT_HAVE_DOS$hcreate
 #define __CRT_HAVE_DOS$hcreate_r

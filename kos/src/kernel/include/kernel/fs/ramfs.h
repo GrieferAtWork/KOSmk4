@@ -158,6 +158,9 @@ FUNDEF NOBLOCK NONNULL((1, 2)) void NOTHROW(FCALL ramfs_direnttree_insert)(struc
 FUNDEF NOBLOCK NONNULL((1, 2)) void NOTHROW(FCALL ramfs_direnttree_removenode)(struct ramfs_dirent **__restrict proot, struct ramfs_dirent *__restrict node);
 FUNDEF NOBLOCK WUNUSED NONNULL((1)) struct ramfs_dirent *NOTHROW(FCALL ramfs_direnttree_prevnode)(struct ramfs_dirent const *__restrict self);
 FUNDEF NOBLOCK WUNUSED NONNULL((1)) struct ramfs_dirent *NOTHROW(FCALL ramfs_direnttree_nextnode)(struct ramfs_dirent const *__restrict self);
+FUNDEF ATTR_PURE WUNUSED struct ramfs_dirent *FCALL ramfs_direnttree_locate(/*nullable*/ struct ramfs_dirent *root, USER CHECKED char const *key, size_t keylen) THROWS(E_SEGFAULT);
+FUNDEF ATTR_PURE WUNUSED NONNULL((1)) struct ramfs_dirent *FCALL _ramfs_direnttree_caselocate(struct ramfs_dirent *__restrict root, USER CHECKED char const *key, size_t keylen) THROWS(E_SEGFAULT);
+#define ramfs_direnttree_caselocate(root, key, keylen) ((root) ? _ramfs_direnttree_caselocate(root, key, keylen) : __NULLPTR)
 
 
 

@@ -27,6 +27,13 @@
 #else /* !CONFIG_USE_NEW_FS */
 #include <kernel/fs/devfs.h>
 
+#include <hybrid/sync/atomic-lock.h>
+
+#include <kos/guid.h>
+#include <kos/lockop.h>
+
+#include <libc/string.h>
+
 #ifdef __CC__
 DECL_BEGIN
 
@@ -65,6 +72,18 @@ DECL_BEGIN
 struct blkdev;
 struct blkdev_ops {
 	struct device_ops bdo_dev; /* Device operators */
+
+	/* [0..1] Do some additional work to sync writes on a hardware level.
+	 *        This function is called by `fsuper_sync[all]()' once all other
+	 *        outstanding modifications to have been synced, as well as by
+	 *        `fnode_syncdata()' (if changes existed) when invoked on the
+	 *        block-device itself.
+	 * Furthermore, block device partitions will try to invoke their master's
+	 * sync callback if theirs was invoked. */
+	NONNULL((1)) void
+	(KCALL *bdo_sync)(struct blkdev *__restrict self)
+			THROWS(...);
+
 	/* More operators would go here... */
 };
 
@@ -74,6 +93,8 @@ struct blkdev_ops {
 #define BLKDEV_MAX_RETRY_DEFAULT 2
 #endif /* !BLKDEV_MAX_RETRY_DEFAULT */
 
+struct blkdev;
+LIST_HEAD(blkdev_list, blkdev);
 struct blkdev
 #ifndef __WANT_FS_INLINE_STRUCTURES
     : device                     /* Underlying device */
@@ -87,22 +108,78 @@ struct blkdev
 #define _blkdev_asdev(x) x
 #define _blkdev_dev_     /* nothing */
 #endif /* !__WANT_FS_INLINE_STRUCTURES */
+	union {
 
-	/* TODO: doubly-linked list with weak references to partitions. (always empty for partitions) */
-	/* NOTE: block-device partitions can easily be detected via `mf_ops', which points to `blkpart_ops',
-	 *       since all block-device partitions can be implemented via a single, common set of operators. */
-	unsigned int         bd_max_retry;  /* How often to re-attempt I/O, not counting the first attempt.
-	                                     * Set to 0xff to allow infinite retries.
-	                                     * TODO: The ATA driver needs to make use of this! */
+		/* Device root information. */
+		struct {
+			struct atomic_lock      br_partslock;         /* Lock for `br_parts' */
+			Toblockop_slist(blkdev) br_partslops;         /* Lock operations for `br_partslock' */
+			struct blkdev_list      br_parts;             /* [0..n][lock(br_partslock)] Weak references to sub-partition of this device. */
+			unsigned int            br_max_retry;         /* [lock(ATOMIC)] How often to re-attempt I/O, not counting the first attempt. */
+			char                    br_ata_serial_no[21]; /* [const] NUL-termianted string (`struct hd_driveid::serial_no', or empty if unknown or N/A) */
+			char                    br_ata_fw_rev[9];     /* [const] NUL-termianted string (`struct hd_driveid::fw_rev', or empty if unknown or N/A) */
+			char                    br_ata_model[41];     /* [const] NUL-termianted string (`struct hd_driveid::model', or empty if unknown or N/A) */
+			char                    br_mbr_diskuid[11];   /* [lock(br_partslock)] MBR disk uid (`struct mbr_sector::mbr_diskuid', or empty if unknown or N/A) */
+			guid_t                  br_efi_guid;          /* [lock(br_partslock)] EFI disk GUID (`struct efi_descriptor::gpt_guid', or all zeroes if unknown or N/A) */
+		} bd_rootinfo; /* [valid_if(blkdev_isroot(this))] */
+
+		/* Device partition information. */
+		struct {
+			REF struct blkdev  *bp_master;        /* [1..1][const] Underlying master device. */
+			LIST_ENTRY(blkdev)  bp_partlink;      /* [0..1][lock(bp_master->bd_rootinfo.br_partslock)] Link in list of partitions */
+#ifdef __WANT_BLKDEV_bd_partinfo__bp_blkdevlop
+			union {
+				struct {
+					pos_t       bp_partstart;     /* [const] Starting offset of partition. */
+					minor_t     bp_partno;        /* [const] Partition index (position of this part in `bp_master->bd_rootinfo.br_parts') */
+					uint8_t     bp_mbr_sysno;     /* [const] MBR system ID (`struct mbr_partition_common::pt_sysid', or `0' if unknown or N/A) */
+					char        bp_efi_name[109]; /* [const] NUL-termianted string (`struct efi_partition::p_name', or empty if unknown or N/A) */
+				};
+				Toblockop(blkdev)     _bp_blkdevlop;  /* Used internally during destruction... */
+				Tobpostlockop(blkdev) _bp_blkdevplop; /* Used internally during destruction... */
+			};
+#else /* __WANT_BLKDEV_bd_partinfo__bp_blkdevlop */
+			pos_t               bp_partstart;     /* [const] Starting offset of partition. */
+			minor_t             bp_partno;        /* [const] Partition index (position of this part in `bp_master->bd_rootinfo.br_parts') */
+			uint8_t             bp_mbr_sysno;     /* [const] MBR system ID (`struct mbr_partition_common::pt_sysid', or `0' if unknown or N/A) */
+			char                bp_efi_name[109]; /* [const] NUL-termianted string (`struct efi_partition::p_name', or empty if unknown or N/A) */
+#endif /* !__WANT_BLKDEV_bd_partinfo__bp_blkdevlop */
+			uint8_t             bp_active;        /* [const] Non-zero if this partition is "active" (s.a. `PART_BOOTABLE_ACTICE', `EFI_PART_F_ACTIVE') */
+			guid_t              bp_efi_typeguid;  /* [const] EFI part type GUID (`struct efi_partition::p_type_guid', or all zeroes if unknown or N/A) */
+			guid_t              bp_efi_partguid;  /* [const] EFI part type GUID (`struct efi_partition::p_part_guid', or all zeroes if unknown or N/A) */
+		} bd_partinfo; /* [valid_if(blkdev_ispart(this))] */
+
+	};
 };
+
+/* Default operators for block devices */
+#define blkdev_v_destroy device_v_destroy
+#define blkdev_v_wrattr  device_v_wrattr
+
+/* Operators used for block device partitions */
+DATDEF struct blkdev_ops const blkpart_ops;
+
+
+/* Helper macros for `struct blkdev::bd_rootinfo::br_partslock' */
+#define _blkdev_root_partslock_reap(self)      _oblockop_reap_atomic_lock(&(self)->bd_rootinfo.br_partslops, &(self)->bd_rootinfo.br_partslock, self)
+#define blkdev_root_partslock_reap(self)       oblockop_reap_atomic_lock(&(self)->bd_rootinfo.br_partslops, &(self)->bd_rootinfo.br_partslock, self)
+#define blkdev_root_partslock_mustreap(self)   oblockop_mustreap(&(self)->bd_rootinfo.br_partslops)
+#define blkdev_root_partslock_tryacquire(self) atomic_lock_tryacquire(&(self)->bd_rootinfo.br_partslock)
+#define blkdev_root_partslock_acquire(self)    atomic_lock_acquire(&(self)->bd_rootinfo.br_partslock)
+#define blkdev_root_partslock_acquire_nx(self) atomic_lock_acquire_nx(&(self)->bd_rootinfo.br_partslock)
+#define _blkdev_root_partslock_release(self)   atomic_lock_release(&(self)->bd_rootinfo.br_partslock)
+#define blkdev_root_partslock_release(self)    (atomic_lock_release(&(self)->bd_rootinfo.br_partslock), blkdev_root_partslock_reap(self))
+#define blkdev_root_partslock_acquired(self)   atomic_lock_acquired(&(self)->bd_rootinfo.br_partslock)
+#define blkdev_root_partslock_available(self)  atomic_lock_available(&(self)->bd_rootinfo.br_partslock)
+
 
 /* Return a pointer to character-device operators of `self' */
 #define blkdev_getops(self) \
 	((struct blkdev_ops const *)__COMPILER_REQTYPE(struct blkdev const *, self)->_blkdev_dev_ _device_devnode_ _fdevnode_node_ _fnode_file_ mf_ops)
 
-/* Check if `self' is a `struct blkpart' */
+/* Check if `self' is a block-device partition or root. */
 #define blkdev_ispart(self) (blkdev_getops(self) == &blkpart_ops)
-#define blkdev_aspart(self) ((struct blkpart *)__COMPILER_REQTYPE(struct blkdev *, self))
+#define blkdev_isroot(self) (blkdev_getops(self) != &blkpart_ops)
 
 /* Return the sector shift/size/count of the block device. */
 #define blkdev_getsectorshift(self) ((self)->_blkdev_dev_ _device_devnode_ _fdevnode_node_ _fnode_file_ mf_blockshift)
@@ -115,9 +192,18 @@ struct blkdev
 #define blkdev_wrsectors(self, addr, buf, num_bytes, aio) \
 	((*__COMPILER_REQTYPE(struct blkdev const *, self)->_blkdev_dev_ _device_devnode_ _fdevnode_node_ _fnode_file_ mf_ops->mo_saveblocks)(_fnode_asfile(_fdevnode_asnode(_device_asdevnode(_blkdev_asdev(self)))), addr, buf, num_bytes, aio))
 
+#define __blkdev_init_common(self, ops)                                                                   \
+	(_device_init(_blkdev_asdev(self), &(ops)->bdo_dev),                                                  \
+	 (self)->_blkdev_dev_ _device_devnode_ _fdevnode_node_ _fnode_file_ mf_flags = MFILE_F_FIXEDFILESIZE, \
+	 (self)->_blkdev_dev_ _device_devnode_ _fdevnode_node_ _fnode_file_ mf_parts = __NULLPTR)
+#define __blkdev_cinit_common(self, ops)                                                                  \
+	(_device_cinit(_blkdev_asdev(self), &(ops)->bdo_dev),                                                 \
+	 (self)->_blkdev_dev_ _device_devnode_ _fdevnode_node_ _fnode_file_ mf_flags = MFILE_F_FIXEDFILESIZE, \
+	 __hybrid_assert((self)->_blkdev_dev_ _device_devnode_ _fdevnode_node_ _fnode_file_ mf_parts == __NULLPTR))
+#define __blkdev_fini_common(self) _device_fini(_blkdev_asdev(self))
+
 
 /* Initialize common+basic fields. The caller must still initialize:
- *  - self->_blkdev_dev_ _device_devnode_ _fdevnode_node_ _fnode_file_ mf_flags  (pre-initialized to `MFILE_F_FIXEDFILESIZE')
  *  - self->_blkdev_dev_ _device_devnode_ _fdevnode_node_ _fnode_file_ mf_blockshift
  *  - self->_blkdev_dev_ _device_devnode_ _fdevnode_node_ _fnode_file_ mf_part_amask
  *  - self->_blkdev_dev_ _device_devnode_ _fdevnode_node_ _fnode_file_ mf_filesize  (to the total device size in bytes)
@@ -129,46 +215,51 @@ struct blkdev
  *  - self->_blkdev_dev_ dv_driver
  *  - self->_blkdev_dev_ dv_dirent
  *  - self->_blkdev_dev_ dv_byname_node
+ *  - self->bd_rootinfo.br_ata_serial_no
+ *  - self->bd_rootinfo.br_ata_fw_rev
+ *  - self->bd_rootinfo.br_ata_model
  * @param: struct blkdev     *self: Block device to initialize.
  * @param: struct blkdev_ops *ops:  Block device operators. */
-#define _blkdev_init(self, ops)                                                                           \
-	(_device_init(_blkdev_asdev(self), &(ops)->bdo_dev),                                                  \
-	 (self)->_blkdev_dev_ _device_devnode_ _fdevnode_node_ _fnode_file_ mf_flags = MFILE_F_FIXEDFILESIZE, \
-	 (self)->_blkdev_dev_ _device_devnode_ _fdevnode_node_ _fnode_file_ mf_parts = __NULLPTR,             \
-	 (self)->bd_max_retry                                                        = BLKDEV_MAX_RETRY_DEFAULT)
-#define _blkdev_cinit(self, ops)                                                                                \
-	(_device_cinit(_blkdev_asdev(self), &(ops)->bdo_dev),                                                       \
-	 (self)->_blkdev_dev_ _device_devnode_ _fdevnode_node_ _fnode_file_ mf_flags = MFILE_F_FIXEDFILESIZE,       \
-	 __hybrid_assert((self)->_blkdev_dev_ _device_devnode_ _fdevnode_node_ _fnode_file_ mf_parts == __NULLPTR), \
-	 (self)->bd_max_retry = BLKDEV_MAX_RETRY_DEFAULT)
+#define _blkdev_init(self, ops)                                        \
+	(__blkdev_init_common(self, ops),                                  \
+	 atomic_lock_init(&(self)->bd_rootinfo.br_partslock),              \
+	 SLIST_INIT(&(self)->bd_rootinfo.br_partslops),                    \
+	 LIST_INIT(&(self)->bd_rootinfo.br_parts),                         \
+	 (self)->bd_rootinfo.br_max_retry      = BLKDEV_MAX_RETRY_DEFAULT, \
+	 (self)->bd_rootinfo.br_mbr_diskuid[0] = '\0',                     \
+	 __libc_memset((self)->bd_rootinfo.br_efi_guid, 0, sizeof(guid_t)))
+#define _blkdev_cinit(self, ops)                                      \
+	(__blkdev_cinit_common(self, ops),                                \
+	 atomic_lock_cinit(&(self)->bd_rootinfo.br_partslock),            \
+	 __hybrid_assert(SLIST_EMPTY(&(self)->bd_rootinfo.br_partslops)), \
+	 __hybrid_assert(LIST_EMPTY(&(self)->bd_rootinfo.br_parts)),      \
+	 (self)->bd_rootinfo.br_max_retry = BLKDEV_MAX_RETRY_DEFAULT,     \
+	 __hybrid_assert((self)->bd_rootinfo.br_mbr_diskuid[0] == '\0'))
 
 /* Finalize a partially initialized `struct blkdev' (as initialized by `_blkdev_init()') */
-#define _blkdev_fini(self) _device_fini(_blkdev_asdev(self))
+#define _blkdev_fini(self) __blkdev_fini_common(self)
 
 
-/* >> FUNDEF void KCALL blkdev_repart(struct blkdev *__restrict self);
- * TODO: (also used to implement `')
+
+/* Reconstruct/Reload partitions of `self':
  *   - Step #0: If `self' is a partition, return immediately.
- *   - Step #1: Assign device IDs and names to partitions (same scheme as the old FS used)
- *   - Step #2: Decode headers and construct new partition objects.
- *   - Step #3: Acquire locks to:
- *               - TODO_PARTITION_INFO_TABLES_LOCK
- *               - self->TODO_PARTITIONS_LIST_LOCK
+ *   - Step #1: Construct new partitions and assign device IDs and names to partitions
+ *   - Step #2: Acquire locks to:
+ *               - self->bd_rootinfo.br_partslock
  *               - devfs_byname_lock
  *               - devfs.rs_sup.fs_nodeslock
- *               - devfs.rs_dat.rdd_treelock
+ *               - devfs.rs_dat.rdd_treelock  // read-only
  *               - fallnodes_lock
- *   - Step #4: Clear `self->TODO_PARTITIONS_LIST' and:
+ *   - Step #3: Clear `self->bd_rootinfo.br_parts' and:
  *               - tryincref() every partition. Those for which this
  *                 fails are  immediately discarded  from the  list.
  *              Remove all old partitions from:
- *               - TODO_PARTITION_INFO_TABLES
  *               - devfs_byname_list
  *               - devfs.rs_sup.fs_nodes
  *               - fallnodes_list
  *               - Also clear `MFILE_FN_GLOBAL_REF' and decref_nokill(partition) if it was set
- *   - Step #5: Register all of the new partitions:
- *               - self->TODO_PARTITIONS_LIST    -- Sort by partition start offset
+ *   - Step #4: Register all of the new partitions:
+ *               - self->bd_rootinfo.br_parts    -- Sort by partition start offset
  *               - devfs_byname_list             -- If same-named file already exists here (or in `devfs.rs_dat.rdd_tree'),
  *                                                  then simply don't add to the tree, but instead set:
  *                                                  >> `dv_byname_node.rb_lhs = DEVICE_BYNAME_DELETED'
@@ -176,85 +267,42 @@ struct blkdev
  *                                                  device's dev_t, before generating a new INO until no more collisions
  *                                                  happen.
  *               - fallnodes_list                -- Also set `MFILE_FN_GLOBAL_REF' for the new partition and incref() it
- *   - Step #6: Release locks from:
- *               - TODO_PARTITION_INFO_TABLES_LOCK
- *               - self->TODO_PARTITIONS_LIST_LOCK
+ *   - Step #5: Release locks from:
  *               - devfs_byname_lock
  *               - devfs.rs_sup.fs_nodeslock
- *               - devfs.rs_dat.rdd_treelock
+ *               - devfs.rs_dat.rdd_treelock  // read-only
  *               - fallnodes_lock
- *   - Step #7: Drop references from all of the old partitions
- */
+ *   - Step #6: Drop references from all of the old partitions
+ *   - Step #7: Release lock to `self->bd_rootinfo.br_partslock' */
+FUNDEF NONNULL((1)) void KCALL
+blkdev_repart(struct blkdev *__restrict self)
+		THROWS(E_WOULDBLOCK, E_BADALLOC);
 
-
-
-
-/************************************************************************/
-/* Block device partition                                               */
-/************************************************************************/
-
-struct blkpart
-#ifndef __WANT_FS_INLINE_STRUCTURES
-    : blkdev                      /* Underlying block-device */
-#endif /* !__WANT_FS_INLINE_STRUCTURES */
-{
-#ifdef __WANT_FS_INLINE_STRUCTURES
-	struct blkdev         bp_blk; /* Underlying block-device */
-#define _blkpart_asblk(x) &(x)->bp_blk
-#define _blkpart_blk_     bp_blk.
-#else /* __WANT_FS_INLINE_STRUCTURES */
-#define _blkpart_asblk(x) x
-#define _blkpart_blk_     /* nothing */
-#endif /* !__WANT_FS_INLINE_STRUCTURES */
-	REF struct blkdev    *bp_master; /* [1..1][const] Underlying master device. */
-	/* TODO: Partition info fields. (for all of the by-* global tables)
-	 *
-	 * Additionally,  each of these should also come with an LLRBTREE_NODE, one
-	 * which can be marked as rb_lhs == BLKPART_BYINFO_DELETED to indicate that
-	 * the partition has been unlinked from the global info tables. The destroy
-	 * operator  of `blkpart_ops' then  checks if global  info tables are still
-	 * bound, and if they are, will use lockops to remove itself from them. */
-};
-
-
-/* Operators used for block device partitions */
-DATDEF struct blkdev_ops const blkpart_ops;
-
-/* TODO: TODO_PARTITION_INFO_TABLES -- Global tables for partitions.
- * Each of these contains self-clearing-on-destroy pointers to individual partitions:
- *       /dev/disk/by-id/        -- Symlinks for block-devices
- *       /dev/disk/by-label/     -- Symlinks for block-devices
- *       /dev/disk/by-partlabel/ -- Symlinks for block-devices
- *       /dev/disk/by-partuuid/  -- Symlinks for block-devices
- *       /dev/disk/by-path/      -- Symlinks for block-devices
- *       /dev/disk/by-uuid/      -- Symlinks for block-devices
+/* The  combination of `device_register()' and `blkdev_repart()', but implemented
+ * in such a manner that either all of the new devices become visible at the same
+ * time, or none of them do (in case of an exception).
  *
- * On that note, also add support for:
- *       /dev/block/             -- Contains symlinks for the /dev device, such as 8:0 -> ../sda
- *       /dev/char/              -- Contains symlinks for the /dev device, such as 1:1 -> ../mem
- *       /dev/cpu/[id]/cpuid     -- A readable file to access `cpuid' data for a given CPU.
- * All of these should be implemented in `devfs.c' by dynamic means (similar to how /proc/ works)
- * Also  note that unlike the root directory, these special sub-directories are _NOT_ writable on
- * KOS. The files found within cannot be renamed, moved, deleted, etc. and no custom files can be
- * created  either. Only the root directory, and  any dynamically created sub-directory is usable
- * for the purpose of RAMFS.
+ * This prevents race conditions that would arise from the alternative:
+ * >> device_register(self);
+ * >> TRY {
+ * >>     blkdev_repart(self);
+ * >> } EXCEPT {
+ * >>     // If we get here, device was globally visible for a short moment.
+ * >>     // This can be prevented by using `blkdev_repart_and_register()'
+ * >>     device_delete(self);
+ * >>     RETHROW();
+ * >> }
  *
- * TODO: The  devfs root directory node should have INO=1.  Because we use mask &7 for encoding
- *       different  INO namespaces (&7=0 for RAMFS, and &7=7 for by-name devices), we also need
- *       one more namespace for special directories like root, and another for dynamic files as
- *       those described above!
- *
- * NOTE: All of these special INodes actually _DONT_ appear in `devfs.rs_sup.fs_nodes'! This  can
- *       be achieved because INode access within the new fs is not done via `super_opennode' with
- *       the  associated inode number,  but instead via `fdirent_opennode()',  which hides all of
- *       the association details for fdirent->fnode mapping from prying eyes. Technically, it  is
- *       actually possible to create a filesystem that  _NEVER_ makes use of `fs_nodes', and  the
- *       only  reason why unique inode number ~should~ still be assigned is for the sake of user-
- *       space  and programs that rely on the POSIX-guarantied unique-ness of stat::st_dev:st_ino
- *
- */
-
-
+ * This function assumes:
+ *  - LIST_EMPTY(&self->bd_rootinfo.br_parts)
+ *  - blkdev_isroot(self)
+ * This function initializes (before making `self' globally visible):
+ *  - self->_device_devnode_ _fdevnode_node_ fn_allnodes
+ *  - self->_device_devnode_ _fdevnode_node_ fn_supent
+ *  - self->dv_byname_node */
+FUNDEF NONNULL((1)) void KCALL
+blkdev_repart_and_register(struct blkdev *__restrict self)
+		THROWS(E_WOULDBLOCK, E_BADALLOC);
 
 DECL_END
 #endif /* __CC__ */
