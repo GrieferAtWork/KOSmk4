@@ -32,13 +32,22 @@
 #include "__stdinc.h"
 /**/
 
+#include <features.h>
+
 #include <hybrid/__alloca.h>
 
 #ifdef __CC__
 #ifndef __hybrid_alloca
 #error "alloca() isn't support on this platform"
 #endif /* !__hybrid_alloca */
-#define alloca(s) __hybrid_alloca((s))
+#define alloca(num_bytes) __hybrid_alloca(num_bytes)
+
+#ifdef __USE_KOS
+#if __has_builtin(__builtin_alloca_with_align) || defined(__INTELLISENSE_GCC__)
+#define aligned_alloca(num_bytes, min_alignment) __builtin_alloca_with_align(num_bytes, min_alignment)
+#endif /* __has_builtin(__builtin_alloca_with_align) || __INTELLISENSE_GCC__ */
+#endif /* __USE_KOS */
+
 #endif /* __CC__ */
 
 #endif /* !_ALLOCA_H */

@@ -185,12 +185,25 @@ DATDEF struct blkdev_ops const blkpart_ops;
 #define blkdev_getsectorshift(self) ((self)->_blkdev_dev_ _device_devnode_ _fdevnode_node_ _fnode_file_ mf_blockshift)
 #define blkdev_getsectorsize(self)  ((size_t)1 << blkdev_getsectorshift(self))
 #define blkdev_getsectorcount(self) (__atomic64_val((self)->_blkdev_dev_ _device_devnode_ _fdevnode_node_ _fnode_file_ mf_filesize) >> blkdev_getsectorshift(self))
+#define blkdev_getsize(self)        ((pos_t)__atomic64_val((self)->_blkdev_dev_ _device_devnode_ _fdevnode_node_ _fnode_file_ mf_filesize))
+
+#define blkdev_part_getsectormin(self) ((uint64_t)(self)->bd_partinfo.bp_partstart >> blkdev_getsectorshift(self))
+#define blkdev_part_getsectormax(self) (blkdev_part_getsectormin(self) + blkdev_getsectorcount(self) - 1)
 
 /* Read/Write whole sectors */
-#define blkdev_rdsectors(self, addr, buf, num_bytes, aio) \
+#define blkdev_rdsectors_async(self, addr, buf, num_bytes, aio) \
 	((*__COMPILER_REQTYPE(struct blkdev const *, self)->_blkdev_dev_ _device_devnode_ _fdevnode_node_ _fnode_file_ mf_ops->mo_loadblocks)(_fnode_asfile(_fdevnode_asnode(_device_asdevnode(_blkdev_asdev(self)))), addr, buf, num_bytes, aio))
-#define blkdev_wrsectors(self, addr, buf, num_bytes, aio) \
+#define blkdev_wrsectors_async(self, addr, buf, num_bytes, aio) \
 	((*__COMPILER_REQTYPE(struct blkdev const *, self)->_blkdev_dev_ _device_devnode_ _fdevnode_node_ _fnode_file_ mf_ops->mo_saveblocks)(_fnode_asfile(_fdevnode_asnode(_device_asdevnode(_blkdev_asdev(self)))), addr, buf, num_bytes, aio))
+#define blkdev_rdsectors(self, addr, buf, num_bytes)                                                                                                  \
+	mfile_dosyncio(_fnode_asfile(_fdevnode_asnode(_device_asdevnode(_blkdev_asdev(self)))),                                                           \
+	               __COMPILER_REQTYPE(struct blkdev const *, self)->_blkdev_dev_ _device_devnode_ _fdevnode_node_ _fnode_file_ mf_ops->mo_loadblocks, \
+	               addr, buf, num_bytes)
+#define blkdev_wrsectors(self, addr, buf, num_bytes)                                                                                                  \
+	mfile_dosyncio(_fnode_asfile(_fdevnode_asnode(_device_asdevnode(_blkdev_asdev(self)))),                                                           \
+	               __COMPILER_REQTYPE(struct blkdev const *, self)->_blkdev_dev_ _device_devnode_ _fdevnode_node_ _fnode_file_ mf_ops->mo_saveblocks, \
+	               addr, buf, num_bytes)
+	
 
 #define __blkdev_init_common(self, ops)                                                                   \
 	(_device_init(_blkdev_asdev(self), &(ops)->bdo_dev),                                                  \
@@ -227,7 +240,7 @@ DATDEF struct blkdev_ops const blkpart_ops;
 	 LIST_INIT(&(self)->bd_rootinfo.br_parts),                         \
 	 (self)->bd_rootinfo.br_max_retry      = BLKDEV_MAX_RETRY_DEFAULT, \
 	 (self)->bd_rootinfo.br_mbr_diskuid[0] = '\0',                     \
-	 __libc_memset((self)->bd_rootinfo.br_efi_guid, 0, sizeof(guid_t)))
+	 __libc_memset(&(self)->bd_rootinfo.br_efi_guid, 0, sizeof(guid_t)))
 #define _blkdev_cinit(self, ops)                                      \
 	(__blkdev_cinit_common(self, ops),                                \
 	 atomic_lock_cinit(&(self)->bd_rootinfo.br_partslock),            \

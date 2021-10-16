@@ -21,6 +21,7 @@
 #define GUARD_KERNEL_CORE_FILESYS_BLKDEV_C 1
 #define __WANT_BLKDEV_bd_partinfo__bp_blkdevlop
 #define _KOS_SOURCE 1
+#define _GNU_SOURCE 1
 
 #include <kernel/compiler.h>
 
@@ -33,18 +34,27 @@
 #include <kernel/fs/super.h>
 #include <kernel/malloc.h>
 #include <kernel/mman/mfile.h>
+#include <kernel/paging.h>
 #include <kernel/printk.h>
 #include <sched/task.h>
 
 #include <hybrid/atomic.h>
+#include <hybrid/byteorder.h>
+#include <hybrid/byteswap.h>
+#include <hybrid/overflow.h>
 
 #include <hw/disk/part/efi.h>
 #include <hw/disk/part/mbr.h>
+#include <kos/dev.h>
 #include <kos/except.h>
 #include <kos/except/reason/inval.h>
 
+#include <alloca.h>
 #include <assert.h>
+#include <inttypes.h>
+#include <stdbool.h>
 #include <stddef.h>
+#include <stdio.h>
 #include <string.h>
 
 DECL_BEGIN
@@ -54,6 +64,10 @@ DECL_BEGIN
 #else /* !NDEBUG && !NDEBUG_FINI */
 #define DBG_memset(...) (void)0
 #endif /* NDEBUG || NDEBUG_FINI */
+
+/* Check if 2 given ranges overlap (that is: share at least 1 common address) */
+#define RANGE_OVERLAPS(a_min, a_max, b_min, b_max) \
+	((a_max) >= (b_min) && (a_min) <= (b_max))
 
 
 PRIVATE NOBLOCK NONNULL((1, 2)) void
@@ -112,7 +126,7 @@ blkpart_v_loadblocks(struct mfile *__restrict self, pos_t addr,
 	struct blkdev *me = mfile_asblkdev(self);
 	struct blkdev *ms = me->bd_partinfo.bp_master;
 	addr += me->bd_partinfo.bp_partstart;
-	blkdev_rdsectors(ms, addr, buf, num_bytes, aio);
+	blkdev_rdsectors_async(ms, addr, buf, num_bytes, aio);
 }
 
 PRIVATE NONNULL((1, 5)) void KCALL
@@ -121,8 +135,11 @@ blkpart_v_saveblocks(struct mfile *__restrict self, pos_t addr,
                      struct aio_multihandle *__restrict aio) {
 	struct blkdev *me = mfile_asblkdev(self);
 	struct blkdev *ms = me->bd_partinfo.bp_master;
+	/* Verify that the master device isn't set to read-only. */
+	if unlikely(ms->mf_flags & MFILE_F_READONLY)
+		THROW(E_FSERROR_READONLY);
 	addr += me->bd_partinfo.bp_partstart;
-	blkdev_wrsectors(ms, addr, buf, num_bytes, aio);
+	blkdev_wrsectors_async(ms, addr, buf, num_bytes, aio);
 }
 
 
@@ -230,12 +247,268 @@ PUBLIC struct blkdev_ops const blkpart_ops = {
 
 
 /* Helper to destroy the (mostly) initialized parts returned by `blkdev_makeparts()' */
-#define blkdev_destroy_incomplete_part(self)         \
-	(decref_nokill((self)->bd_partinfo.bp_master),   \
-	 decref_nokill((self)->dv_driver),               \
-	 destroy((self)->dv_dirent),                     \
-	 decref_nokill(&devfs), /* for self->fn_super */ \
+#define blkdev_destroy_incomplete_part(self)                   \
+	(decref_nokill((self)->bd_partinfo.bp_master),             \
+	 decref_nokill((self)->dv_driver),                         \
+	 (self)->dv_dirent ? destroy((self)->dv_dirent) : (void)0, \
+	 decref_nokill(&devfs), /* for self->fn_super */           \
 	 kfree(self))
+
+
+PRIVATE NONNULL((1)) void
+NOTHROW(FCALL blkdev_destroy_incomplete_parts)(struct blkdev_list const *__restrict self) {
+	struct blkdev *dev;
+	LIST_FOREACH_SAFE (dev, self, bd_partinfo.bp_partlink) {
+		blkdev_destroy_incomplete_part(dev);
+	}
+}
+
+
+/* Check if  a given  list  of partitions  contains  at
+ * least one that overlaps with the given sector-range. */
+PRIVATE NOBLOCK WUNUSED NONNULL((1)) bool
+NOTHROW(FCALL blkdev_list_overlaps)(struct blkdev_list const *__restrict self,
+                                    uint64_t newpart_sectormin,
+                                    uint64_t newpart_sectormax) {
+	struct blkdev *dev;
+	LIST_FOREACH (dev, self, bd_partinfo.bp_partlink) {
+		uint64_t part_sector_min;
+		uint64_t part_sector_max;
+		assert(blkdev_ispart(dev));
+		part_sector_min = blkdev_part_getsectormin(dev);
+		part_sector_max = blkdev_part_getsectormax(dev);
+		if (RANGE_OVERLAPS(part_sector_min, part_sector_max,
+		                   newpart_sectormin, newpart_sectormax))
+			return true;
+	}
+	return false;
+}
+
+
+
+/* Create a new partition and add  it to the `parts' (in  the
+ * proper place), as well as return it. The caller must still
+ * initialize the following fields:
+ *  - return->_blkdev_dev_ _device_devnode_ _fdevnode_node_ fn_allnodes
+ *  - return->_blkdev_dev_ _device_devnode_ _fdevnode_node_ fn_supent
+ *  - return->_blkdev_dev_ _device_devnode_ _fdevnode_node_ fn_ino  (as `devfs_devnode_makeino(S_IFBLK, dn_devno)')
+ *  - return->_blkdev_dev_ _device_devnode_ dn_devno
+ *  - return->_blkdev_dev_ dv_dirent
+ *  - return->_blkdev_dev_ dv_byname_node
+ *  - return->bd_partinfo.bp_partno
+ *  - return->bd_partinfo.bp_mbr_sysno
+ *  - return->bd_partinfo.bp_efi_name
+ *  - return->bd_partinfo.bp_active
+ *  - return->bd_partinfo.bp_efi_typeguid
+ *  - return->bd_partinfo.bp_efi_partguid */
+PRIVATE ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) struct blkdev *FCALL
+blkdev_makeparts_create(struct blkdev *__restrict self,
+                        struct blkdev_list *__restrict parts,
+                        uint64_t part_sectormin,
+                        uint64_t part_sectorcnt) {
+	struct blkdev *dev;
+	/* Must allocate as LOCKED since may end up being used for SWAP */
+	dev = (struct blkdev *)kmalloc(offsetafter(struct blkdev, bd_partinfo),
+	                               GFP_LOCKED | GFP_PREFLT);
+	__blkdev_init_common(dev, &blkpart_ops);
+	dev->mf_blockshift = self->mf_blockshift;
+	dev->mf_part_amask = self->mf_part_amask;
+	atomic64_init(&dev->mf_filesize, part_sectorcnt << self->mf_blockshift);
+	dev->dv_dirent = NULL; /* Initialized later, but set to NULL (for now) for error cleanup. */
+	dev->fn_mode   = self->fn_mode;
+	dev->dv_driver = incref(self->dv_driver); /* Technically, we could also use `kernel_driver' here... */
+	assert(S_ISBLK(self->fn_mode));
+
+	/* Fill in part information. */
+	dev->bd_partinfo.bp_master    = (REF struct blkdev *)incref(self);
+	dev->bd_partinfo.bp_partstart = (pos_t)part_sectormin << self->mf_blockshift;
+
+	/* sorted-insert into the list of parts. */
+	{
+		struct blkdev **pnext, *next;
+		pnext = LIST_PFIRST(parts);
+		while ((next = *pnext) != NULL &&
+		       next->bd_partinfo.bp_partstart < part_sectormin)
+			pnext = LIST_PNEXT(next, bd_partinfo.bp_partlink);
+		LIST_P_INSERT_BEFORE(pnext, dev, bd_partinfo.bp_partlink);
+	}
+
+	/* Return the new device to the caller. */
+	return dev;
+}
+
+
+
+/* Try  to decode EFI partitions. If the pointed sector(s) don't actually
+ * contain a proper EFI partition table, return `false'. Otherwise, parse
+ * the table and create partitions. */
+PRIVATE NONNULL((1, 2)) bool FCALL
+blkdev_makeparts_loadefi(struct blkdev *__restrict self,
+                         struct blkdev_list *__restrict parts,
+                         uint64_t efipart_sectormin,
+                         uint64_t efipart_sectorcnt) {
+	/* TODO */
+	return false;
+}
+
+
+
+/* Forward declaration... */
+PRIVATE ATTR_NOINLINE NONNULL((1, 2)) void FCALL
+blkdev_makeparts_loadmbr(struct blkdev *__restrict self,
+                         struct blkdev_list *__restrict parts,
+                         uint64_t subpart_sectormin,
+                         uint64_t subpart_sectorcnt);
+
+PRIVATE NONNULL((1, 2, 3)) void FCALL
+blkdev_makeparts_from_mbr(struct blkdev *__restrict self,
+                          struct blkdev_list *__restrict parts,
+                          struct mbr_sector const *__restrict mbr,
+                          uint64_t subpart_sectormin,
+                          uint64_t subpart_sectorcnt) {
+	unsigned int i;
+	uint64_t subpart_sectormax;
+	assert(subpart_sectorcnt != 0);
+	subpart_sectormax = subpart_sectormin + subpart_sectorcnt - 1;
+
+	/* Verify the MBR "valid bootsector" signature  */
+	if unlikely(mbr->mbr_sig[0] != MBR_SIG0)
+		return;
+	if unlikely(mbr->mbr_sig[1] != MBR_SIG1)
+		return;
+
+	/* Load MBR partitions. */
+	for (i = 0; i < COMPILER_LENOF(mbr->mbr_part); ++i) {
+		/* NOTE: LBA is ADDR >> blkdev_getsectorshift(self) */
+		uint64_t lba_min, lba_max, lba_cnt;
+		if (mbr->mbr_part[i].pt.pt_sysid == MBR_SYSID_UNUSED)
+			continue; /* Unused partition */
+		if (mbr_partition_is48(&mbr->mbr_part[i])) {
+			lba_min = LETOH32(mbr->mbr_part[i].pt_48.pt_lbastart);
+			lba_min |= LETOH16(mbr->mbr_part[i].pt_48.pt_lbastarthi) << 32;
+			lba_cnt = LETOH32(mbr->mbr_part[i].pt_48.pt_lbasize);
+			lba_cnt |= LETOH16(mbr->mbr_part[i].pt_48.pt_lbasizehi) << 32;
+		} else {
+			lba_min = LETOH32(mbr->mbr_part[i].pt_32.pt_lbastart);
+			lba_cnt = LETOH32(mbr->mbr_part[i].pt_32.pt_lbasize);
+		}
+		if unlikely(!lba_cnt) {
+			bool has_other_partitions;
+			/* Check if this is a whole-disk partition. */
+			if (i != 0)
+				continue; /* Nope... */
+			has_other_partitions = false;
+			for (i = 1; i < 4; ++i) {
+				if (mbr_partition_is48(&mbr->mbr_part[i])
+				    ? (mbr->mbr_part[i].pt_32.pt_lbasize != (__le32)0)
+				    : (mbr->mbr_part[i].pt_48.pt_lbasize != (__le32)0 ||
+				       mbr->mbr_part[i].pt_48.pt_lbasizehi != (__le16)0)) {
+					has_other_partitions = true;
+					break;
+				}
+			}
+			if (has_other_partitions)
+				continue;
+			/* It is a whole-disk partition! */
+			lba_cnt = subpart_sectorcnt - lba_min;
+		}
+
+		/* Adjust LBA addresses for sub-partition base */
+		if unlikely(OVERFLOW_UADD(lba_min, subpart_sectormin, &lba_min))
+			continue; /* Overflow */
+		if unlikely(OVERFLOW_UADD(lba_min, lba_cnt - 1, &lba_max))
+			lba_max = (uint64_t)-1;
+		if unlikely(lba_max > subpart_sectormax) {
+			printk(KERN_WARNING "[blk] MBR Partition #%u of %q expands past the end of the disk ("
+			                    "part:%#" PRIx64 "-%#" PRIx64 ","
+			                    "disk:%#" PRIx64 "-%#" PRIx64 ") (truncate it)\n",
+			       i, device_getname(self), lba_min, lba_max,
+			       subpart_sectormin, subpart_sectormax);
+			lba_max = subpart_sectormax;
+		}
+
+		/* Truncate LBA addresses based on block-shift. This is to make sure
+		 * that all addresses can be  expressed as absolute byte  positions.
+		 *
+		 * Since pos_t is 64-bit, and `lba_*' variables are too, we don't need
+		 * to do any additional casts here! */
+		lba_min <<= blkdev_getsectorshift(self);
+		lba_min >>= blkdev_getsectorshift(self);
+		lba_max <<= blkdev_getsectorshift(self);
+		lba_max >>= blkdev_getsectorshift(self);
+		lba_cnt = (lba_max - lba_min) + 1;
+
+		/* Prevent negative-sized partitions */
+		if unlikely(lba_min >= lba_max)
+			continue;
+
+		/* Verify that no other partition overlaps with this one. */
+		if unlikely(blkdev_list_overlaps(parts, lba_min, lba_max)) {
+			printk(KERN_WARNING "[blk] MBR Partition #%u of %q overlaps with another partition ("
+			                    "part:%#" PRIx64 "-%#" PRIx64 ","
+			                    "disk:%#" PRIx64 "-%#" PRIx64 ")\n",
+			       i, device_getname(self), lba_min, lba_max,
+			       subpart_sectormin, subpart_sectormax);
+			continue;
+		}
+
+		/* Process the partition */
+		switch (mbr->mbr_part[i].pt.pt_sysid) {
+
+		case MBR_SYSID_EXT:
+		case MBR_SYSID_EXT_ALT:
+			/* Recursively load+parse an MBR */
+			blkdev_makeparts_loadmbr(self, parts, lba_min, lba_cnt);
+			break;
+
+		case MBR_SYSID_EFI:
+			if (blkdev_makeparts_loadefi(self, parts, lba_min, lba_cnt))
+				break;
+			/* Not a valid EFI partition; fall through to creating a normal partition. */
+			ATTR_FALLTHROUGH
+		default: {
+			struct blkdev *dev;
+			/* Create a normal EFI partition */
+			dev = blkdev_makeparts_create(self, parts, lba_min, lba_cnt);
+
+			/* Fill in partition information. */
+			dev->bd_partinfo.bp_mbr_sysno = mbr->mbr_part[i].pt.pt_sysid;
+			DBG_memset(dev->bd_partinfo.bp_efi_name, 0xcc, sizeof(dev->bd_partinfo.bp_efi_name));
+			dev->bd_partinfo.bp_efi_name[0] = '\0';
+			dev->bd_partinfo.bp_active      = mbr->mbr_part[i].pt.pt_bootable & PART_BOOTABLE_ACTICE;
+			memset(&dev->bd_partinfo.bp_efi_typeguid, 0, sizeof(dev->bd_partinfo.bp_efi_typeguid));
+			memset(&dev->bd_partinfo.bp_efi_partguid, 0, sizeof(dev->bd_partinfo.bp_efi_partguid));
+		}	break;
+
+		}
+	}
+}
+
+PRIVATE ATTR_NOINLINE NONNULL((1, 2)) void FCALL
+blkdev_makeparts_loadmbr(struct blkdev *__restrict self,
+                         struct blkdev_list *__restrict parts,
+                         uint64_t subpart_sectormin,
+                         uint64_t subpart_sectorcnt) {
+	struct mbr_sector *mbr;
+	pos_t mbr_pos;
+
+	/* Read the MBR */
+	mbr_pos = (pos_t)subpart_sectormin << blkdev_getsectorshift(self);
+	if likely(blkdev_getsectorsize(self) == sizeof(struct mbr_sector)) {
+		mbr = (struct mbr_sector *)aligned_alloca(sizeof(struct mbr_sector),
+		                                          sizeof(struct mbr_sector));
+		blkdev_rdsectors(self, mbr_pos, pagedir_translate(mbr), sizeof(struct mbr_sector));
+	} else {
+		mbr = (struct mbr_sector *)alloca(sizeof(struct mbr_sector));
+		mfile_read(self, mbr, sizeof(struct mbr_sector), mbr_pos);
+	}
+
+	/* Parse the MBR */
+	blkdev_makeparts_from_mbr(self, parts, mbr,
+	                          subpart_sectormin,
+	                          subpart_sectorcnt);
+}
+
 
 
 /* Generate a list of partitions by reading MSB/EFI headers.
@@ -246,29 +519,82 @@ PUBLIC struct blkdev_ops const blkpart_ops = {
  *  - self->bd_partinfo.bp_partlink     (Because of this, you must cannot just decref() these devices,
  *                                       must instead use `blkdev_destroy_incomplete_part()' if  you
  *                                       come into a situation where these new devices must go away) */
-PRIVATE ATTR_NOINLINE WUNUSED struct REF blkdev_list FCALL
+PRIVATE WUNUSED NONNULL((1)) struct REF blkdev_list FCALL
 blkdev_makeparts(struct blkdev *__restrict self) {
-	struct mbr_sector mbr;
 	struct REF blkdev_list result;
-
-	/* Read the MBR */
-	/* TODO */
-
 	LIST_INIT(&result);
-	/* TODO */
 
+	/* This should never fail, but is required for `blkdev_makeparts_from_mbr()'
+	 * being allowed to assume that  its given `subpart_sectorcnt' is  non-zero! */
+	if likely(blkdev_getsectorcount(self) != 0) {
+		TRY {
+			struct blkdev *part;
+			struct fdevfsdirent *bname;
+			minor_t index;
 
-	/* TODO: Sort partitions by base-address */
-	return result;
-}
+			/* Load+parse the MBR */
+			blkdev_makeparts_loadmbr(self, &result, 0,
+			                         blkdev_getsectorcount(self));
 
+			/* Assign indices partition indices and dev_t-s. The functions above
+			 * will have also added elements onto the list such that it was kept
+			 * sorted. */
+			bname = self->dv_dirent;
+			index = 0;
+			LIST_FOREACH (part, &result, bd_partinfo.bp_partlink) {
+				REF struct fdevfsdirent *devname;
+				char *writer;
+#if __SIZEOF_MINOR_T__ == 4
+				char numbuf[sizeof("4294967295")];
+#elif __SIZEOF_MINOR_T__ == 8
+				char numbuf[sizeof("18446744073709551615")];
+#else /* __SIZEOF_MINOR_T__ == ... */
+#error "Unsupported sizeof(minor_t)"
+#endif /* __SIZEOF_MINOR_T__ != ... */
+				size_t numlen, namlen;
 
-PRIVATE NONNULL((1)) void
-NOTHROW(FCALL blkdev_destroy_incomplete_parts)(struct blkdev_list const *__restrict self) {
-	struct blkdev *dev;
-	LIST_FOREACH_SAFE (dev, self, bd_partinfo.bp_partlink) {
-		blkdev_destroy_incomplete_part(dev);
+				part->bd_partinfo.bp_partno = index;
+				part->dn_devno = self->dn_devno + MKDEV(0, index);
+				part->fn_ino   = devfs_devnode_makeino(S_IFBLK, part->dn_devno);
+				++index;
+
+				/* Allocate and assign `part->dv_dirent' */
+				numlen = sprintf(numbuf, "%" PRIuN(__SIZEOF_MINOR_T__), index);
+				namlen = bname->fdd_dirent.fd_namelen + numlen;
+
+				devname = (REF struct fdevfsdirent *)kmalloc(offsetof(struct fdevfsdirent,
+				                                                      fdd_dirent.fd_name) +
+				                                             (namlen + 1) * sizeof(char),
+				                                             GFP_NORMAL);
+				awref_init(&devname->fdd_dev, part);
+				devname->fdd_dirent.fd_refcnt  = 1; /* +1: part->dv_dirent */
+				devname->fdd_dirent.fd_ops     = &fdevfsdirent_ops;
+				devname->fdd_dirent.fd_ino     = part->fn_ino;
+				devname->fdd_dirent.fd_namelen = (u16)namlen;
+				devname->fdd_dirent.fd_type    = DT_BLK;
+
+				/* Put together the name. */
+				writer = devname->fdd_dirent.fd_name;
+				writer = (char *)mempcpy(writer, bname->fdd_dirent.fd_name,
+				                         bname->fdd_dirent.fd_namelen, sizeof(char));
+				writer = (char *)mempcpy(writer, numbuf, numlen, sizeof(char));
+				/* NUL-terminate */
+				*writer = '\0';
+
+				/* Calculate the hash for the name. */
+				devname->fdd_dirent.fd_hash = fdirent_hash(devname->fdd_dirent.fd_name,
+				                                           devname->fdd_dirent.fd_namelen);
+
+				/* Inherit reference */
+				part->dv_dirent = devname;
+			}
+		} EXCEPT {
+			/* Destroy parts already created. */
+			blkdev_destroy_incomplete_parts(&result);
+			RETHROW();
+		}
 	}
+	return result;
 }
 
 
@@ -404,7 +730,13 @@ NOTHROW(FCALL devfs_insert_into_inode_tree)(struct device *__restrict self) {
 		++self->dn_devno;
 		assert(S_ISBLK(self->fn_mode));
 		self->fn_ino = devfs_devnode_makeino(S_IFBLK, self->dn_devno);
+
+		/* Also update the INO value stored in the associated  dirent.
+		 * This is still thread-safe since the dirent hasn't been made
+		 * globally visible, yet. */
+		self->dv_dirent->fdd_dirent.fd_ino = self->fn_ino;
 	}
+
 	/* Do the actual insert */
 	fsuper_nodes_insert(&devfs, self);
 }

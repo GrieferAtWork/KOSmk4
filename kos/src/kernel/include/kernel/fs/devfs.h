@@ -65,7 +65,7 @@ AWREF(device_awref, device);
 
 /* Directory entry descriptor for /dev/ device files */
 struct fdevfsdirent {
-	struct device_awref fdd_node;   /* [0..1] Weak reference to associated devfs node. */
+	struct device_awref fdd_dev;    /* [0..1] Weak reference to associated devfs node. */
 	struct fdirent      fdd_dirent; /* Underlying directory entry. */
 };
 

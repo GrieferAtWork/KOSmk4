@@ -161,7 +161,7 @@ fdevfsdirent_v_opennode(struct fdirent *__restrict self,
 	assert(dir == &devfs.rs_sup.fs_root);
 	(void)dir;
 	me = container_of(self, struct fdevfsdirent, fdd_dirent);
-	return (REF struct fnode *)awref_get(&me->fdd_node);
+	return (REF struct fnode *)awref_get(&me->fdd_dev);
 }
 
 
@@ -311,7 +311,7 @@ devfs_root_next(struct fdirent *__restrict self)
 		REF struct device *curr;
 		me = fdirent_asdevfs(self);
 		devfs_byname_read();
-		curr = awref_get(&me->fdd_node);
+		curr = awref_get(&me->fdd_dev);
 		if (curr == NULL) {
 			struct device *next;
 			next = device_fixdeleted(me);
@@ -744,8 +744,8 @@ devfs_root_v_unlink(struct fdirnode *__restrict self,
 		}
 		devfs_byname_removenode(real_file);
 		real_file->dv_byname_node.rb_lhs = DEVICE_BYNAME_DELETED;
-		assert(awref_ptr(&real_entry->fdd_node) == real_file);
-		awref_clear(&real_entry->fdd_node); /* Disconnect the directory entry from the device file. */
+		assert(awref_ptr(&real_entry->fdd_dev) == real_file);
+		awref_clear(&real_entry->fdd_dev); /* Disconnect the directory entry from the device file. */
 		devfs_byname_endwrite();
 
 #if 0 /* No: user-space shouldn't have this power; Only ~true~ hardware device-disappeared,
@@ -796,7 +796,7 @@ devfs_root_v_rename(struct fdirnode *__restrict self,
 			new_dirent->fdd_dirent.fd_ino     = devfile->dv_devnode.dn_node.fn_ino; /* INO numbers are constant here. */
 			new_dirent->fdd_dirent.fd_namelen = info->frn_namelen;
 			new_dirent->fdd_dirent.fd_type    = IFTODT(devfile->dv_devnode.dn_node.fn_mode);
-			awref_init(&new_dirent->fdd_node, devfile);
+			awref_init(&new_dirent->fdd_dev, devfile);
 
 			/* Lock the by-name tree */
 			devfs_byname_write();
@@ -851,7 +851,7 @@ devfs_root_v_rename(struct fdirnode *__restrict self,
 		/* Clear the back-link from `old_dirent' to the device file in question.
 		 * As far as the directory entry  should be concerned, it's device  file
 		 * has been deleted. */
-		awref_clear(&old_dirent->fdd_node);
+		awref_clear(&old_dirent->fdd_dev);
 
 		/* Inherited  from  `devfile->dv_dirent'  (nokill  because
 		 * the caller still has a reference in `info->frn_oldent') */
@@ -1126,7 +1126,7 @@ NOTHROW(KCALL device_v_destroy)(struct mfile *__restrict self) {
 	decref_unlikely(me->dv_driver);
 
 	/* Clear the weak reference held by our /dev/-directory entry. */
-	awref_clear(&me->dv_dirent->fdd_node);
+	awref_clear(&me->dv_dirent->fdd_dev);
 
 	/* Must remove `me' from `devfs_byname_tree' */
 	if (ATOMIC_READ(me->dv_byname_node.rb_lhs) != DEVICE_BYNAME_DELETED) {

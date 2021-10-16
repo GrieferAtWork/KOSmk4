@@ -168,7 +168,7 @@ print("#define __CCAST");
 // Print directory entries.
 for (local name, st_mode, st_rdev: DEVICES) {
 	print("PRIVATE struct fdevfsdirent dirent_dev_", name, " = {");
-	print("	.fdd_node   = AWREF_INIT(&dev_", name, "),");
+	print("	.fdd_dev   = AWREF_INIT(&dev_", name, "),");
 	print("	.fdd_dirent = {");
 	print("		.fd_refcnt  = 2, /" "* +1: dirent_dev_", name, ", +1: dev_", name, ".dv_dirent *" "/");
 	print("		.fd_ops     = &fdevfsdirent_ops,");
@@ -284,7 +284,7 @@ STATIC_ASSERT(devfs_devnode_makeino(S_IFCHR, MKDEV(5, 0)) == (__FS_TYPE(ino))__S
 #undef __CCAST
 #define __CCAST
 PRIVATE struct fdevfsdirent dirent_dev_mem = {
-	.fdd_node   = AWREF_INIT(&dev_mem),
+	.fdd_dev   = AWREF_INIT(&dev_mem),
 	.fdd_dirent = {
 		.fd_refcnt  = 2, /* +1: dirent_dev_mem, +1: dev_mem.dv_dirent */
 		.fd_ops     = &fdevfsdirent_ops,
@@ -296,7 +296,7 @@ PRIVATE struct fdevfsdirent dirent_dev_mem = {
 	}
 };
 PRIVATE struct fdevfsdirent dirent_dev_kmem = {
-	.fdd_node   = AWREF_INIT(&dev_kmem),
+	.fdd_dev   = AWREF_INIT(&dev_kmem),
 	.fdd_dirent = {
 		.fd_refcnt  = 2, /* +1: dirent_dev_kmem, +1: dev_kmem.dv_dirent */
 		.fd_ops     = &fdevfsdirent_ops,
@@ -308,7 +308,7 @@ PRIVATE struct fdevfsdirent dirent_dev_kmem = {
 	}
 };
 PRIVATE struct fdevfsdirent dirent_dev_null = {
-	.fdd_node   = AWREF_INIT(&dev_null),
+	.fdd_dev   = AWREF_INIT(&dev_null),
 	.fdd_dirent = {
 		.fd_refcnt  = 2, /* +1: dirent_dev_null, +1: dev_null.dv_dirent */
 		.fd_ops     = &fdevfsdirent_ops,
@@ -320,7 +320,7 @@ PRIVATE struct fdevfsdirent dirent_dev_null = {
 	}
 };
 PRIVATE struct fdevfsdirent dirent_dev_port = {
-	.fdd_node   = AWREF_INIT(&dev_port),
+	.fdd_dev   = AWREF_INIT(&dev_port),
 	.fdd_dirent = {
 		.fd_refcnt  = 2, /* +1: dirent_dev_port, +1: dev_port.dv_dirent */
 		.fd_ops     = &fdevfsdirent_ops,
@@ -332,7 +332,7 @@ PRIVATE struct fdevfsdirent dirent_dev_port = {
 	}
 };
 PRIVATE struct fdevfsdirent dirent_dev_zero = {
-	.fdd_node   = AWREF_INIT(&dev_zero),
+	.fdd_dev   = AWREF_INIT(&dev_zero),
 	.fdd_dirent = {
 		.fd_refcnt  = 2, /* +1: dirent_dev_zero, +1: dev_zero.dv_dirent */
 		.fd_ops     = &fdevfsdirent_ops,
@@ -344,7 +344,7 @@ PRIVATE struct fdevfsdirent dirent_dev_zero = {
 	}
 };
 PRIVATE struct fdevfsdirent dirent_dev_full = {
-	.fdd_node   = AWREF_INIT(&dev_full),
+	.fdd_dev   = AWREF_INIT(&dev_full),
 	.fdd_dirent = {
 		.fd_refcnt  = 2, /* +1: dirent_dev_full, +1: dev_full.dv_dirent */
 		.fd_ops     = &fdevfsdirent_ops,
@@ -356,7 +356,7 @@ PRIVATE struct fdevfsdirent dirent_dev_full = {
 	}
 };
 PRIVATE struct fdevfsdirent dirent_dev_random = {
-	.fdd_node   = AWREF_INIT(&dev_random),
+	.fdd_dev   = AWREF_INIT(&dev_random),
 	.fdd_dirent = {
 		.fd_refcnt  = 2, /* +1: dirent_dev_random, +1: dev_random.dv_dirent */
 		.fd_ops     = &fdevfsdirent_ops,
@@ -368,7 +368,7 @@ PRIVATE struct fdevfsdirent dirent_dev_random = {
 	}
 };
 PRIVATE struct fdevfsdirent dirent_dev_urandom = {
-	.fdd_node   = AWREF_INIT(&dev_urandom),
+	.fdd_dev   = AWREF_INIT(&dev_urandom),
 	.fdd_dirent = {
 		.fd_refcnt  = 2, /* +1: dirent_dev_urandom, +1: dev_urandom.dv_dirent */
 		.fd_ops     = &fdevfsdirent_ops,
@@ -380,7 +380,7 @@ PRIVATE struct fdevfsdirent dirent_dev_urandom = {
 	}
 };
 PRIVATE struct fdevfsdirent dirent_dev_kmsg = {
-	.fdd_node   = AWREF_INIT(&dev_kmsg),
+	.fdd_dev   = AWREF_INIT(&dev_kmsg),
 	.fdd_dirent = {
 		.fd_refcnt  = 2, /* +1: dirent_dev_kmsg, +1: dev_kmsg.dv_dirent */
 		.fd_ops     = &fdevfsdirent_ops,
@@ -392,7 +392,7 @@ PRIVATE struct fdevfsdirent dirent_dev_kmsg = {
 	}
 };
 PRIVATE struct fdevfsdirent dirent_dev_tty = {
-	.fdd_node   = AWREF_INIT(&dev_tty),
+	.fdd_dev   = AWREF_INIT(&dev_tty),
 	.fdd_dirent = {
 		.fd_refcnt  = 2, /* +1: dirent_dev_tty, +1: dev_tty.dv_dirent */
 		.fd_ops     = &fdevfsdirent_ops,

@@ -268,20 +268,20 @@
 #define __PRIVATE_MIN_S1  (-__INT8_C(127)-__INT8_C(1))
 #define __PRIVATE_MAX_S1    __INT8_C(127)
 #define __PRIVATE_MIN_U1    __UINT8_C(0)
-#define __PRIVATE_MAX_U1    __UINT8_C(0xff)
+#define __PRIVATE_MAX_U1    __UINT8_C(0xff) /* 255 */
 #define __PRIVATE_MIN_S2  (-__INT16_C(32767)-__INT16_C(1))
 #define __PRIVATE_MAX_S2    __INT16_C(32767)
 #define __PRIVATE_MIN_U2    __UINT16_C(0)
-#define __PRIVATE_MAX_U2    __UINT16_C(0xffff)
+#define __PRIVATE_MAX_U2    __UINT16_C(0xffff) /* 65535 */
 #define __PRIVATE_MIN_S4  (-__INT32_C(2147483647)-__INT32_C(1))
 #define __PRIVATE_MAX_S4    __INT32_C(2147483647)
 #define __PRIVATE_MIN_U4    __UINT32_C(0)
-#define __PRIVATE_MAX_U4    __UINT32_C(0xffffffff)
+#define __PRIVATE_MAX_U4    __UINT32_C(0xffffffff) /* 4294967295 */
 #ifdef __INT64_C
 #define __PRIVATE_MIN_S8  (-__INT64_C(9223372036854775807)-__INT64_C(1))
 #define __PRIVATE_MAX_S8    __INT64_C(9223372036854775807)
 #define __PRIVATE_MIN_U8    __UINT64_C(0)
-#define __PRIVATE_MAX_U8    __UINT64_C(0xffffffffffffffff)
+#define __PRIVATE_MAX_U8    __UINT64_C(0xffffffffffffffff) /* 18446744073709551615 */
 #endif /* __INT64_C */
 #ifdef __INT128_C
 #define __PRIVATE_MIN_S16 (-__INT128_C(170141183460469231731687303715884105727)-__INT128_C(1))

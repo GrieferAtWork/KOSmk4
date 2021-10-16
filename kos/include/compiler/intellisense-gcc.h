@@ -818,7 +818,7 @@ int __builtin_fesetexceptflag(void const *, int);
 int __builtin_fesetround(int);
 int __builtin_fetestexcept(int);
 int __builtin_feupdateenv(void const *);
-void *__builtin_alloca_with_align_and_max(__INTELLISENSE_SIZE_TYPE__, __INTELLISENSE_SIZE_TYPE__, __INTELLISENSE_SIZE_TYPE__);
+void *__builtin_alloca_with_align_and_max(__INTELLISENSE_SIZE_TYPE__, __INTELLISENSE_SIZE_TYPE__, __INTELLISENSE_SIZE_TYPE__ max_size);
 __INTELLISENSE_SIZE_TYPE__ __builtin_strnlen(char const *, __INTELLISENSE_SIZE_TYPE__);
 long __builtin_expect_with_probability(long __exp, long __c, double __probability);
 int __builtin_strcmp_eq(void const *, void const *, __INTELLISENSE_SIZE_TYPE__); /* Yes, that's the prototype... */

@@ -31,13 +31,21 @@ __DECL_BEGIN
 #define PART_BOOTABLE_ACTICE 0x80
 #define PART_BOOTABLE_LBA48  0x01
 
+
+/* Values for `pt_sysid' */
+#define MBR_SYSID_UNUSED  0x00 /* Unused partition */
+#define MBR_SYSID_EFI     0xee /* (probable) EFI partition (s.a. <hw/disk/part/efi.h>) */
+#define MBR_SYSID_EXT     0x05 /* Extended partition; recursively points to another MBR */
+#define MBR_SYSID_EXT_ALT 0x0f /* Alias for `MBR_SYSID_EXT' */
+
+
 #ifdef __CC__
 /* http://wiki.osdev.org/Partition_Table */
 struct __ATTR_PACKED mbr_partition_common {
 	/* HDD Partition */
 	__u8         pt_bootable;  /* Boot indicator bit flag: 0 = no, 0x80 = bootable (or "active") */
 	__u8       __pt_data1[3];
-	__u8         pt_sysid;     /* System ID (s.a.: `BLKSYS_*') */
+	__u8         pt_sysid;     /* System ID (s.a.: `MBR_SYSID_*') */
 	__u8       __pt_data2[11];
 };
 
@@ -47,7 +55,7 @@ struct __ATTR_PACKED mbr_partition_32 {
 	__u8         pt_headstart;      /* Starting Head */
 	unsigned int pt_sectstart : 6;  /* Starting Sector */
 	unsigned int pt_cylistart : 10; /* Starting Cylinder */
-	__u8         pt_sysid;          /* System ID (s.a.: `BLKSYS_*') */
+	__u8         pt_sysid;          /* System ID (s.a.: `MBR_SYSID_*') */
 	__u8         pt_headend;        /* Ending Head */
 	unsigned int pt_sectend : 6;    /* Ending Sector */
 	unsigned int pt_cyliend : 10;   /* Ending Cylinder */
@@ -66,7 +74,7 @@ struct __ATTR_PACKED mbr_partition_48 {
 	__u8         pt_bootable;   /* Boot indicator bit flag: 1 = no, 0x81 = bootable (or "active") */
 	__u8         pt_sig1;       /* Signature #1 (== 0x14) */
 	__le16       pt_lbastarthi; /* High 2 bytes for pt_lbastart */
-	__u8         pt_sysid;      /* System ID (s.a.: `BLKSYS_*') */
+	__u8         pt_sysid;      /* System ID (s.a.: `MBR_SYSID_*') */
 	__u8         pt_sig2;       /* Signature #2 (== 0xeb) */
 	__le16       pt_lbasizehi;  /* High 2 bytes for pt_lbasize */
 	__le32       pt_lbastart;   /* Relative Sector (to start of partition -- also equals the partition's starting LBA value) */
@@ -78,8 +86,16 @@ union __ATTR_PACKED mbr_partition {
 	struct mbr_partition_32     pt_32;
 	struct mbr_partition_48     pt_48;
 };
+#define mbr_partition_is48(self)                       \
+	(((self)->pt.pt_bootable & PART_BOOTABLE_LBA48) && \
+	 ((self)->pt_48.pt_sig1 == PART48_SIG1 &&          \
+	  (self)->pt_48.pt_sig2 == PART48_SIG2))
 #endif /* __CC__ */
 
+
+/* MBR Signature */
+#define MBR_SIG0 0x55 /* Required value for `mbr_sig[0]' */
+#define MBR_SIG1 0xaa /* Required value for `mbr_sig[1]' */
 
 
 /* offsetof `struct mbr_data' within the first sector. */
@@ -89,7 +105,7 @@ union __ATTR_PACKED mbr_partition {
 struct __ATTR_PACKED mbr_data {          /* Master boot record */
 	char                mbr_diskuid[10]; /* Optional "unique" disk ID */
 	union mbr_partition mbr_part[4];     /* Partition table entries */
-	__u8                mbr_sig[2];      /* "Valid bootsector" signature bytes (== 0x55, 0xAA) */
+	__u8                mbr_sig[2];      /* "Valid bootsector" signature bytes (== MBR_SIG0, MBR_SIG1) */
 };
 
 /* http://wiki.osdev.org/MBR_(x86) */
@@ -97,7 +113,7 @@ struct __ATTR_PACKED mbr_sector {           /* Master boot record */
 	__u8                mbr_bootstrap[436]; /* MBR Bootstrap (flat binary executable code) */
 	char                mbr_diskuid[10];    /* Optional "unique" disk ID */
 	union mbr_partition mbr_part[4];        /* Partition table entries */
-	__u8                mbr_sig[2];         /* "Valid bootsector" signature bytes (== 0x55, 0xAA) */
+	__u8                mbr_sig[2];         /* "Valid bootsector" signature bytes (== MBR_SIG0, MBR_SIG1) */
 };
 #endif /* __CC__ */
 
