@@ -23,6 +23,7 @@
 
 #include <kernel/compiler.h>
 
+#ifndef CONFIG_USE_NEW_FS
 #include <debugger/config.h>
 #include <debugger/hook.h>
 #include <debugger/io.h>
@@ -1659,7 +1660,7 @@ DBG_COMMAND(lsblk,
 
 #endif /* CONFIG_HAVE_DEBUGGER */
 
-
 DECL_END
+#endif /* !CONFIG_USE_NEW_FS */
 
 #endif /* !GUARD_KERNEL_SRC_DEV_BLOCK_C */

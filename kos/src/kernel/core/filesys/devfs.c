@@ -29,8 +29,10 @@
 
 #include <kernel/compiler.h>
 
+#include <debugger/config.h>
 #include <kernel/fs/allnodes.h>
 #include <kernel/fs/blkdev.h>
+#include <kernel/fs/chrdev.h>
 #include <kernel/fs/devfs.h>
 #include <kernel/fs/devnode.h>
 #include <kernel/fs/filesys.h>
@@ -56,6 +58,14 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
+
+#ifdef CONFIG_HAVE_DEBUGGER
+#include <debugger/hook.h>
+#include <debugger/io.h>
+
+#include <format-printer.h>
+#include <inttypes.h>
+#endif /* CONFIG_HAVE_DEBUGGER */
 
 /* Devfs by-name tree operations. (For `devfs_byname_tree') */
 #undef RBTREE_LEFT_LEANING
@@ -1746,6 +1756,229 @@ done:
 }
 
 
+
+
+#ifdef CONFIG_HAVE_DEBUGGER
+PRIVATE ATTR_DBGTEXT void KCALL
+do_dump_block_device(struct blkdev *__restrict self,
+                     size_t longest_device_name,
+                     size_t longest_driver_name) {
+	uint64_t total_bytes_adj = (uint64_t)blkdev_getsize(self);
+	char const *total_bytes_name = DBGSTR("b");
+	if (total_bytes_adj >= (uint64_t)1024 * 1024 * 1024) {
+		total_bytes_adj /= (uint64_t)1024 * 1024 * 1024;
+		total_bytes_name = DBGSTR("GiB");
+	} else if (total_bytes_adj >= (uint64_t)1024 * 1024) {
+		total_bytes_adj /= (uint64_t)1024 * 1024;
+		total_bytes_name = DBGSTR("MiB");
+	} else if (total_bytes_adj >= (uint64_t)1024) {
+		total_bytes_adj /= (uint64_t)1024;
+		total_bytes_name = DBGSTR("KiB");
+	}
+	dbg_printf(DBGSTR("/dev/" AC_WHITE("%-*s") "  "
+	                  "%3.2" PRIxN(__SIZEOF_MAJOR_T__) ":"
+	                  "%-3.2" PRIxN(__SIZEOF_MINOR_T__) "  "
+	                  "%*-s  "
+	                  "%5" PRIu64 "%s  "
+	                  "%-11" PRIu64 "  "
+	                  "%" PRIuSIZ "\n"),
+	           (unsigned int)longest_device_name,
+	           device_getname(&self->bd_dev),
+	           (unsigned int)MAJOR(self->bd_dev.dv_devnode.dn_devno),
+	           (unsigned int)MINOR(self->bd_dev.dv_devnode.dn_devno),
+	           (unsigned int)longest_driver_name,
+	           self->bd_dev.dv_driver->d_name,
+	           total_bytes_adj, total_bytes_name,
+	           (uint64_t)blkdev_getsectorcount(self),
+	           (size_t)blkdev_getsectorsize(self));
+}
+
+PRIVATE ATTR_DBGTEXT void KCALL
+dump_block_device(struct fnode *__restrict self,
+                  size_t longest_device_name,
+                  size_t longest_driver_name) {
+again:
+	if (fnode_isblkroot(self)) {
+		struct blkdev *me = fnode_asblkdev(self);
+		struct blkdev *part;
+		do_dump_block_device(me,
+		                     longest_device_name,
+		                     longest_driver_name);
+		LIST_FOREACH (part, &me->bd_rootinfo.br_parts, bd_partinfo.bp_partlink) {
+			do_dump_block_device(part, longest_device_name, longest_driver_name);
+		}
+	}
+	if (self->fn_supent.rb_lhs) {
+		if (self->fn_supent.rb_rhs) {
+			dump_block_device(self->fn_supent.rb_rhs,
+			                  longest_device_name,
+			                  longest_driver_name);
+		}
+		self = self->fn_supent.rb_lhs;
+		goto again;
+	}
+	if (self->fn_supent.rb_rhs) {
+		self = self->fn_supent.rb_rhs;
+		goto again;
+	}
+}
+
+PRIVATE ATTR_DBGTEXT void KCALL
+gather_longest_name_lengths(struct fnode *__restrict self, mode_t mode,
+                            size_t *__restrict pmax_device_namelen,
+                            size_t *__restrict pmax_driver_namelen) {
+again:
+	if (fnode_isdevice(self) && (self->fn_mode & S_IFMT) == mode) {
+		struct device *me = fnode_asdevice(self);
+		size_t namelen;
+		namelen = me->dv_dirent->fdd_dirent.fd_namelen;
+		if (*pmax_device_namelen < namelen)
+			*pmax_device_namelen = namelen;
+		namelen = strlen(me->dv_driver->d_name);
+		if (*pmax_driver_namelen < namelen)
+			*pmax_driver_namelen = namelen;
+	}
+	if (self->fn_supent.rb_lhs) {
+		if (self->fn_supent.rb_rhs) {
+			gather_longest_name_lengths(self->fn_supent.rb_rhs, mode,
+			                            pmax_device_namelen,
+			                            pmax_driver_namelen);
+		}
+		self = self->fn_supent.rb_lhs;
+		goto again;
+	}
+	if (self->fn_supent.rb_rhs) {
+		self = self->fn_supent.rb_rhs;
+		goto again;
+	}
+}
+
+DBG_COMMAND(lsblk,
+            "lsblk\n"
+            "\tList all defined block devices\n") {
+	size_t longest_device_name = COMPILER_STRLEN("name");
+	size_t longest_driver_name = COMPILER_STRLEN("driver");
+	if (devfs.rs_sup.fs_nodes) {
+		gather_longest_name_lengths(devfs.rs_sup.fs_nodes, S_IFBLK,
+		                            &longest_device_name,
+		                            &longest_driver_name);
+	}
+	dbg_print(DBGSTR("     name"));
+	if (longest_device_name > COMPILER_STRLEN("name"))
+		format_repeat(&dbg_printer, NULL, ' ', longest_device_name - COMPILER_STRLEN("name"));
+	dbg_print(DBGSTR("  devno    driver"));
+	if (longest_driver_name > COMPILER_STRLEN("driver"))
+		format_repeat(&dbg_printer, NULL, ' ', longest_driver_name - COMPILER_STRLEN("driver"));
+	dbg_print(DBGSTR("  size      sectors      sector-size\n"));
+	if (devfs.rs_sup.fs_nodes) {
+		dump_block_device(devfs.rs_sup.fs_nodes,
+		                  longest_device_name,
+		                  longest_driver_name);
+	}
+	return 0;
+}
+
+
+PRIVATE ATTR_DBGTEXT void KCALL
+do_dump_character_device(struct chrdev *__restrict self,
+                         size_t longest_device_name,
+                         size_t longest_driver_name) {
+	char const *kind;
+	struct mfile_stream_ops const *ops;
+	if (character_device_isattybase(self))                   /* TODO */
+		kind = ttybase_isapty((struct ttybase_device *)self) /* TODO */
+		       ? DBGSTR("pty")                               /* TODO */
+		       : DBGSTR("tty");                              /* TODO */
+	else if (character_device_isakeyboard(self))             /* TODO */
+		kind = DBGSTR("keyboard");                           /* TODO */
+	else if (character_device_isamouse(self))                /* TODO */
+		kind = DBGSTR("mouse");                              /* TODO */
+	else {
+		kind = DBGSTR("other");
+	}
+	dbg_printf(DBGSTR("/dev/" AC_WHITE("%-*s") "  "
+	                  "%3.2" PRIxN(__SIZEOF_MAJOR_T__) ":"
+	                  "%-3.2" PRIxN(__SIZEOF_MINOR_T__) "  "
+	                  "%*-s  %-8s  "),
+	           (unsigned int)longest_device_name,
+	           self->cd_dev.dv_dirent->fdd_dirent.fd_name,
+	           (unsigned int)MAJOR(self->cd_dev.dv_devnode.dn_devno),
+	           (unsigned int)MINOR(self->cd_dev.dv_devnode.dn_devno),
+	           (unsigned int)longest_driver_name,
+	           self->cd_dev.dv_driver->d_name,
+	           kind);
+	ops = self->cd_dev.dv_devnode.dn_node.fn_file.mf_ops->mo_stream;
+	dbg_putc((ops->mso_read || ops->mso_readv) ? 'r' : '-');
+	dbg_putc((ops->mso_write || ops->mso_writev) ? 'w' : '-');
+	dbg_putc((ops->mso_pread || ops->mso_preadv) ? 'R' : '-');
+	dbg_putc((ops->mso_pwrite || ops->mso_pwritev) ? 'W' : '-');
+	dbg_putc(ops->mso_ioctl ? 'i' : '-');
+	dbg_putc(ops->mso_mmap ? 'm' : '-');
+	dbg_putc(ops->mso_stat ? 't' : '-');
+	dbg_putc((ops->mso_pollconnect || ops->mso_polltest) ? 'p' : '-');
+	dbg_putc('\n');
+}
+
+PRIVATE ATTR_DBGTEXT void KCALL
+dump_character_device(struct fnode *__restrict self,
+                      size_t longest_device_name,
+                      size_t longest_driver_name) {
+again:
+	if (fnode_ischrdev(self)) {
+		do_dump_character_device(fnode_aschrdev(self),
+		                         longest_device_name,
+		                         longest_driver_name);
+	}
+	if (self->fn_supent.rb_lhs) {
+		if (self->fn_supent.rb_rhs) {
+			dump_character_device(self->fn_supent.rb_rhs,
+			                      longest_device_name,
+			                      longest_driver_name);
+		}
+		self = self->fn_supent.rb_lhs;
+		goto again;
+	}
+	if (self->fn_supent.rb_rhs) {
+		self = self->fn_supent.rb_rhs;
+		goto again;
+	}
+}
+
+DBG_COMMAND(lschr,
+            "lschr\n"
+            "\tList all defined character devices\n"
+            "\tfeatures:\n"
+            "\t\t" AC_WHITE("r") ": Supports " AC_WHITE("read") "\n"
+            "\t\t" AC_WHITE("w") ": Supports " AC_WHITE("write") "\n"
+            "\t\t" AC_WHITE("R") ": Supports " AC_WHITE("pread") "\n"
+            "\t\t" AC_WHITE("W") ": Supports " AC_WHITE("pwrite") "\n"
+            "\t\t" AC_WHITE("i") ": Supports " AC_WHITE("ioctl") "\n"
+            "\t\t" AC_WHITE("m") ": Supports " AC_WHITE("mmap") "\n"
+            "\t\t" AC_WHITE("t") ": Supports " AC_WHITE("stat") "\n"
+            "\t\t" AC_WHITE("p") ": Supports " AC_WHITE("poll") "\n") {
+	size_t longest_device_name = COMPILER_STRLEN("name");
+	size_t longest_driver_name = COMPILER_STRLEN("driver");
+	if (devfs.rs_sup.fs_nodes) {
+		gather_longest_name_lengths(devfs.rs_sup.fs_nodes, S_IFCHR,
+		                            &longest_device_name,
+		                            &longest_driver_name);
+	}
+	dbg_print(DBGSTR("     name"));
+	if (longest_device_name > COMPILER_STRLEN("name"))
+		format_repeat(&dbg_printer, NULL, ' ', longest_device_name - COMPILER_STRLEN("name"));
+	dbg_print(DBGSTR("  devno    driver"));
+	if (longest_driver_name > COMPILER_STRLEN("driver"))
+		format_repeat(&dbg_printer, NULL, ' ', longest_driver_name - COMPILER_STRLEN("driver"));
+	dbg_print(DBGSTR("  kind      features\n"));
+	if (devfs.rs_sup.fs_nodes) {
+		dump_character_device(devfs.rs_sup.fs_nodes,
+		                      longest_device_name,
+		                      longest_driver_name);
+	}
+	return 0;
+}
+
+#endif /* CONFIG_HAVE_DEBUGGER */
 
 
 DECL_END
