@@ -9,6 +9,11 @@ disk: Disk specifications
 	- scsi  (/dev/sda)
 	- ...
 
+disk/part: Partitioning schemed
+	- mbr
+	- efi
+	- ...
+
 hid: Human Interface Devices
 	- ps2kbd
 	- ps2mouse

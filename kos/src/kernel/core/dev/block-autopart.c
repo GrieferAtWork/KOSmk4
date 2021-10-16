@@ -21,8 +21,6 @@
 #define GUARD_KERNEL_SRC_DEV_BLOCK_AUTOPART_C 1
 #define _KOS_SOURCE 1
 
-#include "block-autopart.h"
-
 #include <kernel/compiler.h>
 
 #include <dev/block.h>
@@ -37,6 +35,8 @@
 #include <hybrid/byteswap.h>
 #include <hybrid/overflow.h>
 
+#include <hw/disk/part/efi.h>
+#include <hw/disk/part/mbr.h>
 #include <kos/dev.h>
 #include <kos/guid.h>
 
