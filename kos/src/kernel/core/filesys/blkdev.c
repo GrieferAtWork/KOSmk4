@@ -51,11 +51,13 @@
 
 #include <alloca.h>
 #include <assert.h>
+#include <ctype.h>
 #include <inttypes.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdio.h>
 #include <string.h>
+#include <unicode.h>
 
 DECL_BEGIN
 
@@ -64,6 +66,12 @@ DECL_BEGIN
 #else /* !NDEBUG && !NDEBUG_FINI */
 #define DBG_memset(...) (void)0
 #endif /* NDEBUG || NDEBUG_FINI */
+
+/* Assert that string buffers from `blkdev' are big enough for what they're meant to hold. */
+STATIC_ASSERT(COMPILER_LENOF(((struct blkdev *)0)->bd_rootinfo.br_mbr_diskuid) >
+              COMPILER_LENOF(((struct mbr_sector *)0)->mbr_diskuid));
+STATIC_ASSERT(COMPILER_LENOF(((struct blkdev *)0)->bd_partinfo.bp_efi_name) >
+              UNICODE_16TO8_MAXBUF(COMPILER_LENOF(((struct efi_partition *)0)->p_name)));
 
 /* Check if 2 given ranges overlap (that is: share at least 1 common address) */
 #define RANGE_OVERLAPS(a_min, a_max, b_min, b_max) \
@@ -285,6 +293,14 @@ NOTHROW(FCALL blkdev_list_overlaps)(struct blkdev_list const *__restrict self,
 }
 
 
+struct blkdev_makeparts_info {
+	/* New value for `struct blkdev::br_mbr_diskuid' */
+	char br_mbr_diskuid[COMPILER_LENOF(((struct blkdev *)0)->bd_rootinfo.br_mbr_diskuid)];
+
+	/* New value for `struct blkdev::br_efi_guid' */
+	guid_t br_efi_guid;
+};
+
 
 /* Create a new partition and add  it to the `parts' (in  the
  * proper place), as well as return it. The caller must still
@@ -342,12 +358,206 @@ blkdev_makeparts_create(struct blkdev *__restrict self,
 /* Try  to decode EFI partitions. If the pointed sector(s) don't actually
  * contain a proper EFI partition table, return `false'. Otherwise, parse
  * the table and create partitions. */
-PRIVATE NONNULL((1, 2)) bool FCALL
+PRIVATE ATTR_NOINLINE NONNULL((1, 2, 3)) bool FCALL
 blkdev_makeparts_loadefi(struct blkdev *__restrict self,
                          struct blkdev_list *__restrict parts,
+                         struct blkdev_makeparts_info *__restrict info,
                          uint64_t efipart_sectormin,
                          uint64_t efipart_sectorcnt) {
-	/* TODO */
+	struct efi_descriptor *efi;
+	pos_t efi_pos;
+	uint32_t efi_hdrsize;
+	uint32_t efi_entcnt;
+	uint32_t efi_entsize;
+	pos_t efi_entbase;
+
+	/* Read the EFI table */
+	efi_pos = (pos_t)efipart_sectormin << blkdev_getsectorshift(self);
+	if likely(blkdev_getsectorsize(self) == sizeof(struct mbr_sector)) {
+		STATIC_ASSERT(sizeof(struct efi_descriptor) <= sizeof(struct mbr_sector));
+		STATIC_ASSERT(sizeof(struct efi_partition) <= sizeof(struct mbr_sector));
+		efi = (struct efi_descriptor *)aligned_alloca(sizeof(struct mbr_sector),
+		                                              sizeof(struct mbr_sector));
+		blkdev_rdsectors(self, efi_pos, pagedir_translate(efi), sizeof(struct mbr_sector));
+	} else {
+		efi = (struct efi_descriptor *)alloca(sizeof(struct efi_descriptor));
+		mfile_read(self, efi, sizeof(struct efi_descriptor), efi_pos);
+	}
+
+	/* Validate the EFI signature magic. */
+	if unlikely(efi->gpt_signature[0] != EFIMAG0)
+		goto fail_badsig;
+	if unlikely(efi->gpt_signature[1] != EFIMAG1)
+		goto fail_badsig;
+	if unlikely(efi->gpt_signature[2] != EFIMAG2)
+		goto fail_badsig;
+	if unlikely(efi->gpt_signature[3] != EFIMAG3)
+		goto fail_badsig;
+	if unlikely(efi->gpt_signature[4] != EFIMAG4)
+		goto fail_badsig;
+	if unlikely(efi->gpt_signature[5] != EFIMAG5)
+		goto fail_badsig;
+	if unlikely(efi->gpt_signature[6] != EFIMAG6)
+		goto fail_badsig;
+	if unlikely(efi->gpt_signature[7] != EFIMAG7)
+		goto fail_badsig;
+
+	/* Save partition GUID */
+	memcpy(&info->br_efi_guid, &efi->gpt_guid, sizeof(guid_t));
+
+	printk(KERN_INFO "[blk] EFI partition found at %#" PRIx64 "...%#" PRIx64 " on "
+	                 "%.2" PRIxN(__SIZEOF_MAJOR_T__) ":"
+	                 "%.2" PRIxN(__SIZEOF_MINOR_T__) " (%q)\n",
+	       efipart_sectormin, efipart_sectormin + efipart_sectorcnt - 1,
+	       MAJOR(self->dn_devno), MINOR(self->dn_devno),
+	       device_getname(self));
+	efi_hdrsize = LETOH32(efi->gpt_hdrsize);
+	if unlikely(efi_hdrsize < offsetafter(struct efi_descriptor, gpt_partition_count))
+		goto fail_hdr_toosmall;
+
+	/* Substitute missing members. */
+	if (efi_hdrsize < offsetafter(struct efi_descriptor, gpt_partition_entsz))
+		efi->gpt_partition_entsz = HTOLE32(128);
+	efi_entsize = LETOH32(efi->gpt_partition_entsz);
+	if unlikely(efi_entsize < offsetafter(struct efi_partition, p_part_end))
+		goto fail_ent_toosmall;
+
+	efi_entbase = (pos_t)LETOH64(efi->gpt_partition_start);
+	if (((efi_entbase >> blkdev_getsectorshift(self)) << blkdev_getsectorshift(self)) != efi_entbase)
+		goto fail_bad_partition_vector;
+	efi_entcnt = LETOH32(efi->gpt_partition_count);
+
+	/* Load EFI partition entries. */
+	for (; efi_entcnt; --efi_entcnt, efi_entbase += efi_entsize) {
+		struct blkdev *dev;
+		struct efi_partition part;
+		uint64_t lba_min, lba_max, part_flags;
+		char16_t part_name[COMPILER_LENOF(part.p_name)];
+		unsigned int i;
+		size_t part_name_len;
+
+		/* Load the EFI partition descriptor from disk. */
+		if likely(blkdev_getsectorsize(self) == sizeof(struct mbr_sector)) {
+			size_t offset, avail;
+			size_t sector_size  = blkdev_getsectorsize(self);
+			pos_t efi_entsector = efi_entbase & ~(sector_size - 1);
+			if (efi_pos != efi_entsector) {
+				blkdev_rdsectors(self, efi_pos, pagedir_translate(efi), sizeof(struct mbr_sector));
+				efi_pos = efi_entsector;
+			}
+			offset = (size_t)efi_entbase & (sector_size - 1);
+			avail  = sector_size - offset;
+			if (avail >= efi_entsize) {
+				memcpy((byte_t *)&part, (byte_t *)efi + offset, efi_entsize);
+			} else {
+				/* Entry is split across multiple sectors. */
+				size_t missing = efi_entsize - avail;
+				memcpy((byte_t *)&part, (byte_t *)efi + offset, avail);
+				efi_pos = efi_entsector + sector_size;
+				blkdev_rdsectors(self, efi_pos, pagedir_translate(efi), sizeof(struct mbr_sector));
+				memcpy((byte_t *)&part + avail, (byte_t *)efi, missing);
+			}
+		} else {
+			mfile_read(self, &part, efi_entsize, efi_entbase);
+		}
+
+		/* At this point, the partition in question was loaded into `part'.
+		 * Time to decode information. */
+		lba_min    = LETOH64(part.p_part_min);
+		lba_max    = LETOH64(part.p_part_end) - 1;
+		part_flags = LETOH64(part.p_flags);
+		if (efi_entsize < offsetafter(struct efi_partition, p_flags))
+			part_flags = 0; /* Don't have flags */
+		part_name_len = 0;
+		if (efi_entsize > offsetof(struct efi_partition, p_name)) {
+			part_name_len = (efi_entsize - offsetof(struct efi_partition, p_name)) / 2;
+			if (part_name_len > COMPILER_LENOF(part.p_name))
+				part_name_len = COMPILER_LENOF(part.p_name);
+		}
+		for (i = 0; i < part_name_len; ++i)
+			part_name[i] = (char16_t)LETOH16(part.p_name[i]);
+
+		/* Truncate LBA addresses based on block-shift. This is to make sure
+		 * that all addresses can be  expressed as absolute byte  positions.
+		 *
+		 * Since pos_t is 64-bit, and `lba_*' variables are too, we don't need
+		 * to do any additional casts here! */
+		lba_min <<= blkdev_getsectorshift(self);
+		lba_min >>= blkdev_getsectorshift(self);
+		lba_max <<= blkdev_getsectorshift(self);
+		lba_max >>= blkdev_getsectorshift(self);
+
+		/* Verify partition info. */
+		if (lba_min > lba_max) {
+			if (lba_min == lba_max + 1)
+				continue; /* Empty partition (allowed and ignored) */
+			printk(KERN_ERR "[blk] EFI partition from EFI table in %#" PRIx64 "...%#" PRIx64 " on "
+			                "%.2" PRIxN(__SIZEOF_MAJOR_T__) ":"
+			                "%.2" PRIxN(__SIZEOF_MINOR_T__) " (%q) "
+			                "ends at %" PRIu64 " before it starts at %" PRIu64 "\n",
+			       efipart_sectormin, efipart_sectormin + efipart_sectorcnt - 1,
+			       MAJOR(self->dn_devno), MINOR(self->dn_devno), device_getname(self),
+			       lba_max + 1, lba_min);
+			continue;
+		}
+		if (blkdev_list_overlaps(parts, lba_min, lba_max)) {
+			printk(KERN_WARNING "[blk] EFI Partition of %q overlaps with another partition ("
+			                    "part:%#" PRIx64 "-%#" PRIx64 ")\n",
+			       device_getname(self), lba_min, lba_max);
+			continue;
+		}
+
+		/* Create a new partition */
+		dev = blkdev_makeparts_create(self, parts, lba_min, (lba_max - lba_min) + 1);
+
+		/* Fill in partition information. */
+		dev->bd_partinfo.bp_mbr_sysno = 0;
+		*unicode_16to8(dev->bd_partinfo.bp_efi_name, part_name, part_name_len) = '\0';
+#if EFI_PART_F_ACTIVE <= 0xff
+		dev->bd_partinfo.bp_active = (part_flags & EFI_PART_F_ACTIVE);
+#else /* EFI_PART_F_ACTIVE <= 0xff */
+		dev->bd_partinfo.bp_active = (part_flags & EFI_PART_F_ACTIVE) != 0;
+#endif /* EFI_PART_F_ACTIVE > 0xff */
+		if (part_flags & EFI_PART_F_READONLY)
+			dev->mf_flags |= MFILE_F_READONLY; /* Sure: let's respect this flag! */
+		memcpy(&dev->bd_partinfo.bp_efi_typeguid, &part.p_type_guid, sizeof(guid_t));
+		memcpy(&dev->bd_partinfo.bp_efi_partguid, &part.p_part_guid, sizeof(guid_t));
+	}
+
+	return true;
+fail_bad_partition_vector:
+	printk(KERN_ERR "[blk] EFI partition table address in %#" PRIx64 "...%#" PRIx64 " on "
+	                "%.2" PRIxN(__SIZEOF_MAJOR_T__) ":"
+	                "%.2" PRIxN(__SIZEOF_MINOR_T__) " (%q) overflows "
+	                "(sector %" PRIu64 " * %" PRIuSIZ " bytes per sector)\n",
+	       efipart_sectormin, efipart_sectormin + efipart_sectorcnt - 1,
+	       MAJOR(self->dn_devno), MINOR(self->dn_devno),
+	       device_getname(self), efi_entbase, blkdev_getsectorsize(self));
+	return false;
+fail_ent_toosmall:
+	printk(KERN_ERR "[blk] EFI partition entires in %#" PRIx64 "...%#" PRIx64 " on "
+	                "%.2" PRIxN(__SIZEOF_MAJOR_T__) ":"
+	                "%.2" PRIxN(__SIZEOF_MINOR_T__) " (%q) are too small (%" PRIu32 " bytes)\n",
+	       efipart_sectormin, efipart_sectormin + efipart_sectorcnt - 1,
+	       MAJOR(self->dn_devno), MINOR(self->dn_devno),
+	       device_getname(self), efi_entsize);
+	return false;
+fail_hdr_toosmall:
+	printk(KERN_ERR "[blk] EFI header table at %#" PRIx64 "...%#" PRIx64 " on "
+	                "%.2" PRIxN(__SIZEOF_MAJOR_T__) ":"
+	                "%.2" PRIxN(__SIZEOF_MINOR_T__) " (%q) is too small (%" PRIu32 " bytes)\n",
+	       efipart_sectormin, efipart_sectormin + efipart_sectorcnt - 1,
+	       MAJOR(self->dn_devno), MINOR(self->dn_devno),
+	       device_getname(self), efi_hdrsize);
+	return false;
+fail_badsig:
+	printk(KERN_WARNING "[blk] Invalid EFI signature in EFI partition at "
+	                    "%#" PRIx64 "...%#" PRIx64 " on "
+	                    "%.2" PRIxN(__SIZEOF_MAJOR_T__) ":"
+	                    "%.2" PRIxN(__SIZEOF_MINOR_T__) " (%q)\n",
+	       efipart_sectormin, efipart_sectormin + efipart_sectorcnt - 1,
+	       MAJOR(self->dn_devno), MINOR(self->dn_devno),
+	       device_getname(self));
 	return false;
 }
 
@@ -357,12 +567,14 @@ blkdev_makeparts_loadefi(struct blkdev *__restrict self,
 PRIVATE ATTR_NOINLINE NONNULL((1, 2)) void FCALL
 blkdev_makeparts_loadmbr(struct blkdev *__restrict self,
                          struct blkdev_list *__restrict parts,
+                         struct blkdev_makeparts_info *info,
                          uint64_t subpart_sectormin,
                          uint64_t subpart_sectorcnt);
 
-PRIVATE NONNULL((1, 2, 3)) void FCALL
+PRIVATE NONNULL((1, 2, 4)) void FCALL
 blkdev_makeparts_from_mbr(struct blkdev *__restrict self,
                           struct blkdev_list *__restrict parts,
+                          struct blkdev_makeparts_info *info,
                           struct mbr_sector const *__restrict mbr,
                           uint64_t subpart_sectormin,
                           uint64_t subpart_sectorcnt) {
@@ -376,6 +588,21 @@ blkdev_makeparts_from_mbr(struct blkdev *__restrict self,
 		return;
 	if unlikely(mbr->mbr_sig[1] != MBR_SIG1)
 		return;
+
+	/* Save MBR's "diskuid" (and strip leading/trailing spaces) */
+	{
+		char *writer;
+		writer = (char *)mempcpy(info->br_mbr_diskuid, mbr->mbr_diskuid, sizeof(mbr->mbr_diskuid));
+		*writer = '\0';
+		writer = strend(info->br_mbr_diskuid);
+		while (writer > info->br_mbr_diskuid && isspace(writer[-1]))
+			--writer;
+		while (info->br_mbr_diskuid[0] && isspace(info->br_mbr_diskuid[0])) {
+			memmovedown(&info->br_mbr_diskuid[0], &info->br_mbr_diskuid[1],
+			            COMPILER_LENOF(info->br_mbr_diskuid) - 1,
+			            sizeof(char));
+		}
+	}
 
 	/* Load MBR partitions. */
 	for (i = 0; i < COMPILER_LENOF(mbr->mbr_part); ++i) {
@@ -458,17 +685,18 @@ blkdev_makeparts_from_mbr(struct blkdev *__restrict self,
 		case MBR_SYSID_EXT:
 		case MBR_SYSID_EXT_ALT:
 			/* Recursively load+parse an MBR */
-			blkdev_makeparts_loadmbr(self, parts, lba_min, lba_cnt);
+			blkdev_makeparts_loadmbr(self, parts, NULL, lba_min, lba_cnt);
 			break;
 
 		case MBR_SYSID_EFI:
-			if (blkdev_makeparts_loadefi(self, parts, lba_min, lba_cnt))
+			if (info != NULL &&
+			    blkdev_makeparts_loadefi(self, parts, info, lba_min, lba_cnt))
 				break;
 			/* Not a valid EFI partition; fall through to creating a normal partition. */
 			ATTR_FALLTHROUGH
 		default: {
 			struct blkdev *dev;
-			/* Create a normal EFI partition */
+			/* Create a normal MBR partition */
 			dev = blkdev_makeparts_create(self, parts, lba_min, lba_cnt);
 
 			/* Fill in partition information. */
@@ -476,8 +704,8 @@ blkdev_makeparts_from_mbr(struct blkdev *__restrict self,
 			DBG_memset(dev->bd_partinfo.bp_efi_name, 0xcc, sizeof(dev->bd_partinfo.bp_efi_name));
 			dev->bd_partinfo.bp_efi_name[0] = '\0';
 			dev->bd_partinfo.bp_active      = mbr->mbr_part[i].pt.pt_bootable & PART_BOOTABLE_ACTICE;
-			memset(&dev->bd_partinfo.bp_efi_typeguid, 0, sizeof(dev->bd_partinfo.bp_efi_typeguid));
-			memset(&dev->bd_partinfo.bp_efi_partguid, 0, sizeof(dev->bd_partinfo.bp_efi_partguid));
+			memset(&dev->bd_partinfo.bp_efi_typeguid, 0, sizeof(guid_t));
+			memset(&dev->bd_partinfo.bp_efi_partguid, 0, sizeof(guid_t));
 		}	break;
 
 		}
@@ -487,6 +715,7 @@ blkdev_makeparts_from_mbr(struct blkdev *__restrict self,
 PRIVATE ATTR_NOINLINE NONNULL((1, 2)) void FCALL
 blkdev_makeparts_loadmbr(struct blkdev *__restrict self,
                          struct blkdev_list *__restrict parts,
+                         struct blkdev_makeparts_info *info,
                          uint64_t subpart_sectormin,
                          uint64_t subpart_sectorcnt) {
 	struct mbr_sector *mbr;
@@ -504,7 +733,7 @@ blkdev_makeparts_loadmbr(struct blkdev *__restrict self,
 	}
 
 	/* Parse the MBR */
-	blkdev_makeparts_from_mbr(self, parts, mbr,
+	blkdev_makeparts_from_mbr(self, parts, info, mbr,
 	                          subpart_sectormin,
 	                          subpart_sectorcnt);
 }
@@ -519,10 +748,14 @@ blkdev_makeparts_loadmbr(struct blkdev *__restrict self,
  *  - self->bd_partinfo.bp_partlink     (Because of this, you must cannot just decref() these devices,
  *                                       must instead use `blkdev_destroy_incomplete_part()' if  you
  *                                       come into a situation where these new devices must go away) */
-PRIVATE WUNUSED NONNULL((1)) struct REF blkdev_list FCALL
-blkdev_makeparts(struct blkdev *__restrict self) {
+PRIVATE WUNUSED NONNULL((1, 2)) struct REF blkdev_list FCALL
+blkdev_makeparts(struct blkdev *__restrict self,
+                 struct blkdev_makeparts_info *__restrict info) {
 	struct REF blkdev_list result;
 	LIST_INIT(&result);
+
+	/* Default to no additional information. */
+	memset(info, 0, sizeof(*info));
 
 	/* This should never fail, but is required for `blkdev_makeparts_from_mbr()'
 	 * being allowed to assume that  its given `subpart_sectorcnt' is  non-zero! */
@@ -533,7 +766,7 @@ blkdev_makeparts(struct blkdev *__restrict self) {
 			minor_t index;
 
 			/* Load+parse the MBR */
-			blkdev_makeparts_loadmbr(self, &result, 0,
+			blkdev_makeparts_loadmbr(self, &result, info, 0,
 			                         blkdev_getsectorcount(self));
 
 			/* Assign indices partition indices and dev_t-s. The functions above
@@ -782,13 +1015,14 @@ blkdev_repart(struct blkdev *__restrict self)
 	struct blkdev *dev;
 	struct REF blkdev_list oldparts;
 	struct REF blkdev_list newparts;
+	struct blkdev_makeparts_info info;
 
 	/* Step #0: If `self' is a partition, return immediately. */
 	if unlikely(!blkdev_isroot(self))
 		return;
 
 	/* Step #1: Construct new partitions and assign device IDs and names to partitions */
-	newparts = blkdev_makeparts(self);
+	newparts = blkdev_makeparts(self, &info);
 
 	/* Step #2: Acquire locks */
 	TRY {
@@ -850,6 +1084,10 @@ blkdev_repart(struct blkdev *__restrict self)
 		decref_unlikely(dev);
 	}
 
+	/* Save updated information. */
+	memcpy(self->bd_rootinfo.br_mbr_diskuid, info.br_mbr_diskuid, sizeof(info.br_mbr_diskuid));
+	memcpy(&self->bd_rootinfo.br_efi_guid, &info.br_efi_guid, sizeof(info.br_efi_guid));
+
 	/* Step #7: Release lock to `self->bd_rootinfo.br_partslock' */
 	_blkdev_root_partslock_release(self);
 
@@ -888,11 +1126,16 @@ blkdev_repart_and_register(struct blkdev *__restrict self)
 		THROWS(E_WOULDBLOCK, E_BADALLOC) {
 	struct blkdev *dev;
 	struct REF blkdev_list newparts;
+	struct blkdev_makeparts_info info;
 	assert(LIST_EMPTY(&self->bd_rootinfo.br_parts));
 	assert(blkdev_isroot(self));
 
 	/* Construct new partitions and assign device IDs and names to partitions */
-	newparts = blkdev_makeparts(self);
+	newparts = blkdev_makeparts(self, &info);
+
+	/* Save root device information. */
+	memcpy(self->bd_rootinfo.br_mbr_diskuid, info.br_mbr_diskuid, sizeof(info.br_mbr_diskuid));
+	memcpy(&self->bd_rootinfo.br_efi_guid, &info.br_efi_guid, sizeof(info.br_efi_guid));
 
 	/* Acquire locks */
 	TRY {
