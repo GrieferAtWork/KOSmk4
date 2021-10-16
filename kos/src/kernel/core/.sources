@@ -112,11 +112,15 @@ BEGIN
 		"memory/*.c",
 		"memory/mman/*.c",
 		"dev/*.c",
+#if 1 // #ifndef CONFIG_USE_NEW_FS
 		"fs/*.c",
+		"drivers/*.c",
+#else
+		"filesys/*.c",
+#endif
 		"misc/*.c",
 		"network/*.c",
 		"sched/*.c",
-		"drivers/*.c",
 		"user/*.c",
 		"arch/" + XARCH + "/*.c",
 	];

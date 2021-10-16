@@ -22,6 +22,9 @@
 
 #include <kernel/compiler.h>
 
+#ifdef CONFIG_USE_NEW_FS
+#include <kernel/fs/blkdev.h>
+#else /* CONFIG_USE_NEW_FS */
 #include <kernel/paging.h>
 #include <kernel/types.h>
 #include <sched/rwlock.h>
@@ -449,7 +452,7 @@ FUNDEF NONNULL((1)) size_t KCALL block_device_sync(struct blkdev *__restrict sel
 DATDEF REF struct blkdev *boot_partition;
 #endif /* __CC__ */
 
-
 DECL_END
+#endif /* !CONFIG_USE_NEW_FS */
 
 #endif /* !GUARD_KERNEL_INCLUDE_DEV_BLOCK_H */

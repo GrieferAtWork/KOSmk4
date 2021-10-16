@@ -23,9 +23,7 @@
 #include <kernel/compiler.h>
 
 #ifdef CONFIG_USE_NEW_FS
-
-/* TODO */
-
+#include <kernel/fs/ramfs.h>
 #else /* CONFIG_USE_NEW_FS */
 #include <fs/node.h>
 #include <kernel/types.h>

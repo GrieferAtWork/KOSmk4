@@ -1022,6 +1022,57 @@ again_acquire_locks:
 
 
 
+PRIVATE WUNUSED NONNULL((1)) REF struct fsuper *KCALL
+ramfs_open(struct ffilesys *__restrict UNUSED(filesys),
+           struct blkdev *UNUSED(dev),
+           UNCHECKED USER char *UNUSED(args)) {
+	REF struct ramfs_super *result;
+	/* Allocate superblock */
+	result = (REF struct ramfs_super *)kmalloc(sizeof(struct ramfs_super),
+	                                           GFP_NORMAL);
+
+	/* Ramfs-specific fields */
+	result->rs_dat.rdd_tree = NULL;
+	shared_rwlock_init(&result->rs_dat.rdd_treelock);
+
+	/* Generic fields. */
+	result->fs_root.mf_ops        = &ramfs_super_ops.so_fdir.dno_node.no_file;
+	result->fs_root.mf_parts      = NULL;
+	result->fs_root.mf_blockshift = PAGESHIFT;
+	result->fs_root.mf_flags      = MFILE_F_NORMAL;
+	result->fs_root.fn_ino        = (ino_t)skew_kernel_pointer(&result->fs_root);
+
+	/* Fill in filesystem features. */
+	result->fs_feat.sf_filesize_max       = (pos_t)-1;
+	result->fs_feat.sf_uid_max            = (uid_t)-1;
+	result->fs_feat.sf_gid_max            = (gid_t)-1;
+	result->fs_feat.sf_symlink_max        = (pos_t)-1;
+	result->fs_feat.sf_link_max           = (nlink_t)-1;
+	result->fs_feat.sf_magic              = RAMFS_MAGIC;
+	result->fs_feat.sf_rec_incr_xfer_size = PAGESIZE;
+	result->fs_feat.sf_rec_max_xfer_size  = PAGESIZE;
+	result->fs_feat.sf_rec_min_xfer_size  = PAGESIZE;
+	result->fs_feat.sf_rec_xfer_align     = PAGESIZE;
+	result->fs_feat.sf_name_max           = (u16)-1;
+	result->fs_feat.sf_filesizebits       = BITSOF(pos_t);
+
+	/* Done! */
+	return result;
+}
+
+
+/* Top-level ram filesystem descriptor. */
+PUBLIC struct ffilesys ramfs_filesys = {
+	.ffs_link = { .le_next = NULL, .le_prev = &devfs_filesys.ffs_link.le_next },
+	.ffs_drv  = &drv_self,
+	{ .ffs_open = &ramfs_open },
+	.ffs_flags = FFILESYS_F_NODEV,
+	.ffs_name  = "ramfs",
+};
+
+
+
+
 DECL_END
 
 #endif /* !GUARD_KERNEL_CORE_FILESYS_RAMFS_C */

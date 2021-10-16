@@ -48,9 +48,9 @@ struct driver;
 #define FFILESYS_F_SINGLE 0x80 /* This filesystem is actually a singleton. */
 
 struct ffilesys;
-LIST_HEAD(ffilesys_list, ffilesys);
+SLIST_HEAD(ffilesys_slist, ffilesys);
 struct ffilesys {
-	LIST_ENTRY(ffilesys)          ffs_link;  /* [0..1][lock(INTERNAL)] Link entry of known filesystems. */
+	SLIST_ENTRY(ffilesys) ffs_link;  /* [0..1][lock(INTERNAL)] Link entry of known filesystems. */
 	union {
 		struct lockop     _ffs_lop;  /* Used internally by `ffilesys_unregister()' */
 		struct postlockop _ffs_plop; /* Used internally by `ffilesys_unregister()' */
@@ -62,6 +62,62 @@ struct ffilesys {
 		 * Construct  a new superblock  instance of this  filesystem type that uses
 		 * the  given `dev'.  May return `NULL'  (if and only  if `dev != NULL') if
 		 * that device doesn't contain a valid instance of the expected filesystem.
+		 *
+		 * This function must _ONLY_ initialize the following fields:
+		 *   - return->fs_root._fdirnode_node_ _fnode_file_ mf_ops        = ...;  # Fs-specific operators for superblocks
+		 *   - return->fs_root._fdirnode_node_ _fnode_file_ mf_parts      = ...;  # Properly with `NULL' (though `MFILE_PARTS_ANONYMOUS' and anything else is also OK)
+		 *   - return->fs_root._fdirnode_node_ _fnode_file_ mf_blockshift = ...;  # Address <=> block shift used by the filesystem
+		 *   - return->fs_root._fdirnode_node_ _fnode_file_ mf_flags      = ...;  # Set of `MFILE_F_READONLY | MFILE_FS_NOSUID | MFILE_FS_NOEXEC |
+		 *                                                                        #         MFILE_F_NOATIME | MFILE_F_NOMTIME | MFILE_F_PERSISTENT |
+		 *                                                                        #         MFILE_FM_ATTRREADONLY'
+		 *   - return->fs_root._fdirnode_node_ fn_ino                     = ...;  # Special INode number used for the fs-root
+		 *   - return->fs_feat                                            = ...;  # Filesystem feature information
+		 *   - *                                                                  # Any field added by a sub-class of `struct fsuper'
+		 *
+		 * The following fields will be initialized by the caller:
+		 *   - return->fs_root._fdirnode_node_ _fnode_file_ mf_refcnt     = 1;
+		 *   - return->fs_root._fdirnode_node_ _fnode_file_ mf_lock       = ATOMIC_RWLOCK_INIT;
+		 *   - return->fs_root._fdirnode_node_ _fnode_file_ mf_initdone   = SIG_INIT;
+		 *   - return->fs_root._fdirnode_node_ _fnode_file_ mf_lockops    = SLIST_HEAD_INITIALIZER(~);
+		 *   - return->fs_root._fdirnode_node_ _fnode_file_ mf_changed    = SLIST_HEAD_INITIALIZER(~);
+		 *   - return->fs_root._fdirnode_node_ _fnode_file_ mf_part_amask = MAX(PAGESIZE, 1 << mf_blockshift) - 1;
+		 *   - return->fs_root._fdirnode_node_ _fnode_file_ mf_flags |= ... & (MFILE_F_READONLY | MFILE_FS_NOSUID | MFILE_FS_NOEXEC | # Conditionally set
+		 *                                                                     MFILE_F_NOATIME | MFILE_F_NOMTIME);                    # ...
+		 *   - return->fs_root._fdirnode_node_ _fnode_file_ mf_flags |= MFILE_F_NOUSRMMAP | MFILE_F_NOUSRIO | MFILE_F_FIXEDFILESIZE;  # Unconditionally set
+		 *   - return->fs_root._fdirnode_node_ _fnode_file_ mf_trunclock  = 0;
+		 *   - return->fs_root._fdirnode_node_ _fnode_file_ mf_filesize   = (pos_t)-1;
+		 *   - return->fs_root._fdirnode_node_ _fnode_file_ mf_atime      = realtime();
+		 *   - return->fs_root._fdirnode_node_ _fnode_file_ mf_mtime      = realtime();
+		 *   - return->fs_root._fdirnode_node_ _fnode_file_ mf_ctime      = realtime();
+		 *   - return->fs_root._fdirnode_node_ fn_nlink                   = 1;
+		 *   - return->fs_root._fdirnode_node_ fn_mode                    = S_IFDIR | 0777;
+		 *   - return->fs_root._fdirnode_node_ fn_uid                     = 0;
+		 *   - return->fs_root._fdirnode_node_ fn_gid                     = 0;
+		 *   - return->fs_root._fdirnode_node_ fn_super                   = return;
+		 *   - return->fs_root._fdirnode_node_ fn_changed                 = <UNINIT>;
+		 *   - return->fs_root._fdirnode_node_ fn_supent.rb_lhs           = NULL;
+		 *   - return->fs_root._fdirnode_node_ fn_supent.rb_rhs           = NULL;
+		 *   - return->fs_root._fdirnode_node_ fn_allsuper                = ...;               // Caller will add to `fallsuper_list' once that should happen
+		 *   - return->fs_root.dn_parent                                  = NULL;
+		 *   - return->fs_nodes                                           = &return->fs_root;
+		 *   - return->fs_nodeslock                                       = ATOMIC_RWLOCK_INIT;
+		 *   - return->fs_nodeslockops                                    = SLIST_HEAD_INITIALIZER(~);
+		 *   - return->fs_mounts                                          = LIST_HEAD_INITIALIZER(~);
+		 *   - return->fs_mountslock                                      = ATOMIC_RWLOCK_INIT;
+		 *   - return->fs_mountslockops                                   = SLIST_HEAD_INITIALIZER(~);
+		 *   - return->fs_sys                                             = incref(filesys);
+		 *   - return->fs_dev                                             = xincref(dev);
+		 *   - return->fs_changednodes                                    = LIST_HEAD_INITIALIZER(~);
+		 *   - return->fs_changednodes_lock                               = ATOMIC_LOCK_INIT;
+		 *   - return->fs_changednodes_lops                               = SLIST_HEAD_INITIALIZER(~);
+		 *   - return->fs_changedsuper                                    = LIST_ENTRY_UNBOUND_INITIALIZER;
+		 *
+		 * When the superblock should be  discarded without being mounted,  destroy(return)
+		 * is called with caller-initialized fields in the same configuration as documented
+		 * in the initialized-by-the-caller section, with the following additions:
+		 *   - return->fs_root._fdirnode_node_ _fnode_file_ mf_refcnt = 0;
+		 *   - return->fs_root._fdirnode_node_ fn_allsuper            = LIST_ENTRY_UNBOUND_INITIALIZER;
+		 *
 		 * @param: dev: [1..1][!FFILESYS_F_NODEV] The backing storage device for the filesystem.
 		 * @param: dev: [0..0][FFILESYS_F_NODEV] Always NULL
 		 * @return: * : A new instance of a superblock for `dev' */
@@ -70,7 +126,8 @@ struct ffilesys {
 		                  struct blkdev *dev, UNCHECKED USER char *args);
 
 		/* [1..1][valid_if(FFILESYS_F_SINGLE)]
-		 * Singleton instance of a superblock associated with this filesystem type. */
+		 * Singleton instance of a superblock associated with this filesystem type.
+		 * _ONLY_ used for devfs */
 		REF struct fsuper        *ffs_single;
 	};
 	uint8_t                       ffs_flags; /* Filesystem type flags (Set of `FFILESYS_F_*') */
@@ -84,9 +141,9 @@ DEFINE_REFCOUNT_FUNCTIONS_P(struct ffilesys, _ffilesys_refcnt_p, ffilesys_destro
 
 
 /* Global set of registered filesystem formats. */
-DATDEF struct ffilesys_list ffilesys_formats_list; /* [0..n][lock(ffilesys_formats_lock)] */
-DATDEF struct atomic_lock ffilesys_formats_lock;   /* Lock for `ffilesys_formats_list' */
-DATDEF struct lockop_slist ffilesys_formats_lops;  /* Lock operations for `ffilesys_formats_lock' */
+DATDEF struct ffilesys_slist ffilesys_formats_list; /* [0..n][lock(ffilesys_formats_lock)] */
+DATDEF struct atomic_lock ffilesys_formats_lock;    /* Lock for `ffilesys_formats_list' */
+DATDEF struct lockop_slist ffilesys_formats_lops;   /* Lock operations for `ffilesys_formats_lock' */
 
 /* Helper macros for working with `fchangedsuper_lock' */
 #define _ffilesys_formats_reap()      _lockop_reap_atomic_lock(&ffilesys_formats_lops, &ffilesys_formats_lock)
@@ -99,6 +156,50 @@ DATDEF struct lockop_slist ffilesys_formats_lops;  /* Lock operations for `ffile
 #define ffilesys_formats_release()    (atomic_lock_release(&ffilesys_formats_lock), ffilesys_formats_reap())
 #define ffilesys_formats_acquired()   atomic_lock_acquired(&ffilesys_formats_lock)
 #define ffilesys_formats_available()  atomic_lock_available(&ffilesys_formats_lock)
+
+
+/* Open  a new superblock and return it.  This function is a high-level wrapper
+ * around `ffs_open()' that does all of the fixed initialization of fields left
+ * uninitialized by `ffs_open()' itself,  with the exception of  `fn_allsuper',
+ * which is initialized as `LIST_ENTRY_UNBOUND_INIT()'.
+ *
+ * The returned superblock is _only_ visible to the caller, unless it's a  singleton
+ * superblock  (`FFILESYS_F_SINGLE'; iow:  is `devfs'),  in which  case the returned
+ * superblock is fully initialized and its fields must _NOT_ be modified willy-nilly
+ * by the caller.
+ *
+ * @return: * : isshared(return):  `FFILESYS_F_SINGLE' was set, and `return' must NOT
+ *                                 be modified under a false assumption of you  being
+ *                                 the only one using the superblock!
+ * @return: * : !isshared(return): A new superblock was opened. The superblock has yet to
+ *                                 be made globally  visible, and if  mounting should  be
+ *                                 aborted, you can simply destroy() (or decref()) it.
+ * @return: NULL: `FFILESYS_F_NODEV' isn't set, and `dev' cannot be mounted as a
+ *                filesystem of this type. */
+FUNDEF WUNUSED NONNULL((1)) REF struct fsuper *FCALL
+ffilesys_open(struct ffilesys *__restrict self,
+              struct blkdev *dev, UNCHECKED USER char *args)
+		THROWS(E_BADALLOC);
+
+/* Helper wrapper for `ffilesys_open()' that blindly goes through all  filesystem
+ * types and tries to open `dev' with each of those needing a device, that aren't
+ * singleton filesystems.
+ * @return: * :   @assume(!isshared(return));
+ *                A new superblock was opened. The superblock has yet to
+ *                be made globally  visible, and if  mounting should  be
+ *                aborted, you can simply destroy() (or decref()) it.
+ * @return: NULL: `dev' doesn't contain any known filesystem. */
+FUNDEF WUNUSED NONNULL((1)) REF struct fsuper *FCALL
+ffilesys_opendev(struct blkdev *dev, UNCHECKED USER char *args)
+		THROWS(E_BADALLOC);
+
+
+/* Lookup a filesystem type, given its name.
+ * @return: * :   The named filesystem type.
+ * @return: NULL: No such filesystem. */
+FUNDEF WUNUSED NONNULL((1)) REF struct ffilesys *FCALL
+ffilesys_byname(USER CHECKED char const *name, size_t namelen)
+		THROWS(E_SEGFAULT, E_WOULDBLOCK);
 
 
 /* Register a given filesystem format.

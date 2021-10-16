@@ -301,9 +301,14 @@ DATDEF struct fsuper_ops const ramfs_super_ops;
 DATDEF struct ffilesys ramfs_filesys;
 
 /* Construct a new ramfs filesystem.
+ * @assume(!isshared(return));
+ * @return: * : A new superblock was opened. The superblock has yet
+ *              to be made globally visible, and if mounting should
+ *              be  aborted, you can simply destroy() (or decref())
+ *              it.
  * @param: args: USER CHECKED char const *: Mount arguments */
 #define ramfs_new(args) \
-	((*ramfs_filesys.ffs_open)(&ramfs_filesys, __NULLPTR, args))
+	ffilesys_open(&ramfs_filesys, __NULLPTR, args))
 
 
 

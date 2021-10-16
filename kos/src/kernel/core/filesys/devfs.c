@@ -1058,9 +1058,9 @@ PUBLIC struct ramfs_super devfs = {
 			.sf_name_max           = (u16)-1,
 			.sf_filesizebits       = BITSOF(pos_t),
 		},
+		.fs_changednodes      = LIST_HEAD_INITIALIZER(devfs.rs_sup.fs_changednodes),
 		.fs_changednodes_lock = ATOMIC_LOCK_INIT,
 		.fs_changednodes_lops = SLIST_HEAD_INITIALIZER(devfs.rs_sup.fs_changednodes_lops),
-		.fs_changednodes      = LIST_HEAD_INITIALIZER(devfs.rs_sup.fs_changednodes),
 		.fs_changedsuper      = LIST_ENTRY_UNBOUND_INITIALIZER,
 		.fs_root = {
 			.dn_node = {

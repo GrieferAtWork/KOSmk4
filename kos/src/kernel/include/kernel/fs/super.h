@@ -179,14 +179,14 @@ struct fsuper {
 	REF struct ffilesys        *fs_sys;           /* [1..1][const] fs-descriptor of this superblock. */
 	REF struct blkdev          *fs_dev;           /* [0..1][const] Underlying block-device. (if any) */
 	struct fsuperfeat           fs_feat;          /* [const] Filesystem features. */
-	struct atomic_lock          fs_changednodes_lock; /* Lock for `fs_changednodes' */
-	Toblockop_slist(fsuper)     fs_changednodes_lops; /* Lock operators for `fs_changednodes_lock' */
 	struct REF fnode_list       fs_changednodes;  /* [0..n][lock(fs_changednodes_lock)][const_if(FSUPER_NODES_DELETED)]
 	                                               * List of changed  node (set  to DELETED during  unmount). Note  that
 	                                               * for  ramfs filesystems, this list will always be marked as DELETED,
 	                                               * in  order to prevent  the tracking of  changed files, since there'd
 	                                               * be no point in tracking them if one can't write them do any backing
 	                                               * storage! */
+	struct atomic_lock          fs_changednodes_lock; /* Lock for `fs_changednodes' */
+	Toblockop_slist(fsuper)     fs_changednodes_lops; /* Lock operators for `fs_changednodes_lock' */
 #ifdef __WANT_FSUPER__fs_changedsuper_lop
 	union {
 		LIST_ENTRY(REF fsuper)  fs_changedsuper;  /* [0..1][lock(fchangedsuper_lock)] Entry in the list of changed superblocks. */

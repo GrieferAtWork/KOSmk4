@@ -22,6 +22,9 @@
 
 #include <kernel/compiler.h>
 
+#ifdef CONFIG_USE_NEW_FS
+#include <kernel/fs/chrdev.h>
+#else /* CONFIG_USE_NEW_FS */
 #include <kernel/types.h>
 
 #include <hybrid/sequence/atree.h>
@@ -278,5 +281,6 @@ chrdev_polltest(struct chrdev *__restrict self,
 #endif /* __CC__ */
 
 DECL_END
+#endif /* !CONFIG_USE_NEW_FS */
 
 #endif /* !GUARD_KERNEL_INCLUDE_DEV_CHAR_H */
