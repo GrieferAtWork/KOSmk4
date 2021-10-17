@@ -28,8 +28,6 @@
 #include <kernel/fs/node.h>
 #include <kernel/types.h>
 
-#include <kos/io.h>
-
 #include <libbuffer/ringbuffer.h>
 
 #ifdef __CC__

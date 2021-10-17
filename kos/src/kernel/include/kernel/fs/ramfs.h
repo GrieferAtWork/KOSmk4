@@ -153,6 +153,31 @@ struct ramfs_dirdata {
 	                                             * key). Set of `RAMFS_DIRDATA_TREE_DELETED' when the directory was deleted. */
 };
 
+/* Helpers for accessing `rdd_treelock' */
+#define _ramfs_dirdata_treelock_reap(self)      (void)0
+#define ramfs_dirdata_treelock_reap(self)       (void)0
+#define ramfs_dirdata_treelock_write(self)      shared_rwlock_write(&(self)->rdd_treelock)
+#define ramfs_dirdata_treelock_write_nx(self)   shared_rwlock_write_nx(&(self)->rdd_treelock)
+#define ramfs_dirdata_treelock_trywrite(self)   shared_rwlock_trywrite(&(self)->rdd_treelock)
+#define ramfs_dirdata_treelock_endwrite(self)   (shared_rwlock_endwrite(&(self)->rdd_treelock), ramfs_dirdata_treelock_reap(self))
+#define _ramfs_dirdata_treelock_endwrite(self)  shared_rwlock_endwrite(&(self)->rdd_treelock)
+#define ramfs_dirdata_treelock_read(self)       shared_rwlock_read(&(self)->rdd_treelock)
+#define ramfs_dirdata_treelock_read_nx(self)    shared_rwlock_read_nx(&(self)->rdd_treelock)
+#define ramfs_dirdata_treelock_tryread(self)    shared_rwlock_tryread(&(self)->rdd_treelock)
+#define _ramfs_dirdata_treelock_endread(self)   shared_rwlock_endread(&(self)->rdd_treelock)
+#define ramfs_dirdata_treelock_endread(self)    (void)(shared_rwlock_endread(&(self)->rdd_treelock) && (ramfs_dirdata_treelock_reap(self), 0))
+#define _ramfs_dirdata_treelock_end(self)       shared_rwlock_end(&(self)->rdd_treelock)
+#define ramfs_dirdata_treelock_end(self)        (void)(shared_rwlock_end(&(self)->rdd_treelock) && (ramfs_dirdata_treelock_reap(self), 0))
+#define ramfs_dirdata_treelock_upgrade(self)    shared_rwlock_upgrade(&(self)->rdd_treelock)
+#define ramfs_dirdata_treelock_upgrade_nx(self) shared_rwlock_upgrade_nx(&(self)->rdd_treelock)
+#define ramfs_dirdata_treelock_tryupgrade(self) shared_rwlock_tryupgrade(&(self)->rdd_treelock)
+#define ramfs_dirdata_treelock_downgrade(self)  shared_rwlock_downgrade(&(self)->rdd_treelock)
+#define ramfs_dirdata_treelock_reading(self)    shared_rwlock_reading(&(self)->rdd_treelock)
+#define ramfs_dirdata_treelock_writing(self)    shared_rwlock_writing(&(self)->rdd_treelock)
+#define ramfs_dirdata_treelock_canread(self)    shared_rwlock_canread(&(self)->rdd_treelock)
+#define ramfs_dirdata_treelock_canwrite(self)   shared_rwlock_canwrite(&(self)->rdd_treelock)
+
+
 /* Ramfs directory by-name tree operations. (For `struct ramfs_dirdata::rdd_tree') */
 FUNDEF NOBLOCK NONNULL((1, 2)) void NOTHROW(FCALL ramfs_direnttree_insert)(struct ramfs_dirent **__restrict proot, struct ramfs_dirent *__restrict node);
 FUNDEF NOBLOCK NONNULL((1, 2)) void NOTHROW(FCALL ramfs_direnttree_removenode)(struct ramfs_dirent **__restrict proot, struct ramfs_dirent *__restrict node);

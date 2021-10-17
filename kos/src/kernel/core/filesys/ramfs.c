@@ -231,7 +231,7 @@ ramfs_dirent_next(struct ramfs_dirent *__restrict self,
                   struct ramfs_dirnode *__restrict dir)
 		THROWS(...) {
 	REF struct ramfs_dirent *result;
-	shared_rwlock_read(&dir->rdn_dat.rdd_treelock);
+	ramfs_dirdata_treelock_read(&dir->rdn_dat);
 	COMPILER_READ_BARRIER();
 	/* Check for special case: `self' was deleted. */
 	if unlikely(self->rde_treenode.rb_lhs == RAMFS_DIRENT_TREENODE_DELETED) {
@@ -243,7 +243,7 @@ ramfs_dirent_next(struct ramfs_dirent *__restrict self,
 		result = ramfs_direnttree_nextnode(self);
 	}
 	xincref(result);
-	shared_rwlock_endread(&dir->rdn_dat.rdd_treelock);
+	ramfs_dirdata_treelock_endread(&dir->rdn_dat);
 	return result;
 }
 
@@ -323,7 +323,7 @@ ramfs_direnum_v_seekdir(struct fdirenum *__restrict self,
 again:
 	oldent = axref_get(&me->rde_next);
 	TRY {
-		shared_rwlock_write(&dir->rdn_dat.rdd_treelock);
+		ramfs_dirdata_treelock_write(&dir->rdn_dat);
 	} EXCEPT {
 		xdecref_unlikely(oldent);
 		RETHROW();
@@ -422,7 +422,7 @@ do_seek_end:
 	}	break;
 
 	default:
-		shared_rwlock_endwrite(&dir->rdn_dat.rdd_treelock);
+		ramfs_dirdata_treelock_endwrite(&dir->rdn_dat);
 		xdecref_unlikely(oldent);
 		THROW(E_INVALID_ARGUMENT_UNKNOWN_COMMAND,
 		      E_INVALID_ARGUMENT_CONTEXT_LSEEK_WHENCE,
@@ -430,7 +430,7 @@ do_seek_end:
 		break;
 	}
 	xincref(newent);
-	shared_rwlock_endwrite(&dir->rdn_dat.rdd_treelock);
+	ramfs_dirdata_treelock_endwrite(&dir->rdn_dat);
 	xdecref_unlikely(oldent); /* Returned by `axref_get()' */
 	if (!axref_cmpxch_inherit_new(&me->rde_next, oldent, newent)) {
 		xdecref_unlikely(newent); /* Not inherited on cmpxch failure. */
@@ -512,7 +512,7 @@ ramfs_dirdata_lookup(struct ramfs_dirnode *__restrict self,
 	                                 info->flu_name,
 	                                 info->flu_namelen);
 	if (!result) {
-		if ((info->flu_flags & FS_MODE_FDOSPATH) && self->rdn_dat.rdd_tree) {
+		if ((info->flu_flags & AT_DOSPATH) && self->rdn_dat.rdd_tree) {
 			/* Do a case-insensitive search */
 			result = _ramfs_direnttree_caselocate(self->rdn_dat.rdd_tree,
 			                                      info->flu_name,
@@ -528,12 +528,18 @@ ramfs_dirnode_v_lookup(struct fdirnode *__restrict self,
 	struct ramfs_dirent *result;
 	struct ramfs_dirnode *me;
 	me = (struct ramfs_dirnode *)self;
-	shared_rwlock_read(&me->rdn_dat.rdd_treelock);
-	FINALLY_ENDREAD(&me->rdn_dat.rdd_treelock);
+	ramfs_dirdata_treelock_read(&me->rdn_dat);
 	if (me->rdn_dat.rdd_tree == RAMFS_DIRDATA_TREE_DELETED)
 		return NULL; /* Directory was deleted. */
-	result = ramfs_dirdata_lookup(me, info);
-	return xincref(&result->rde_ent);
+	TRY {
+		result = ramfs_dirdata_lookup(me, info);
+		xincref(&result->rde_ent);
+	} EXCEPT {
+		ramfs_dirdata_treelock_endread(&me->rdn_dat);
+		RETHROW();
+	}
+	ramfs_dirdata_treelock_endread(&me->rdn_dat);
+	return &result->rde_ent;
 }
 
 PUBLIC NONNULL((1, 2)) void KCALL
@@ -544,7 +550,7 @@ ramfs_dirnode_v_enum(struct fdirnode *__restrict self,
 	me = &((struct ramfs_dirnode *)self)->rdn_dat;
 	rt = (struct ramfs_direnum *)result;
 	/* Fill in information */
-	shared_rwlock_read(&me->rdd_treelock);
+	ramfs_dirdata_treelock_read(me);
 	if (me->rdd_tree != NULL &&
 	    me->rdd_tree != RAMFS_DIRDATA_TREE_DELETED) {
 		struct ramfs_dirent *ent;
@@ -553,10 +559,10 @@ ramfs_dirnode_v_enum(struct fdirnode *__restrict self,
 		while (ent->rde_treenode.rb_lhs)
 			ent = ent->rde_treenode.rb_lhs;
 		incref(ent);
-		shared_rwlock_endread(&me->rdd_treelock);
+		ramfs_dirdata_treelock_endread(me);
 		axref_init(&rt->rde_next, ent);
 	} else {
-		shared_rwlock_endread(&me->rdd_treelock);
+		ramfs_dirdata_treelock_endread(me);
 		axref_init(&rt->rde_next, NULL);
 	}
 	rt->rde_ops = &ramfs_direnum_ops;
@@ -673,24 +679,24 @@ ramfs_dirnode_v_mkfile(struct fdirnode *__restrict self,
 	me = (struct ramfs_dirnode *)self;
 
 #ifndef __OPTIMIZE_SIZE__
-	shared_rwlock_read(&me->rdn_dat.rdd_treelock);
+	ramfs_dirdata_treelock_read(&me->rdn_dat);
 	/* Check for an existing file before doing any allocations */
 	TRY {
 		if unlikely(me->rdn_dat.rdd_tree == RAMFS_DIRDATA_TREE_DELETED)
 			THROW(E_FSERROR_DELETED, E_FILESYSTEM_DELETED_PATH);
 		old_dirent = ramfs_dirdata_lookup(me, &info->mkf_lookup_info);
 	} EXCEPT {
-		shared_rwlock_endread(&me->rdn_dat.rdd_treelock);
+		ramfs_dirdata_treelock_endread(&me->rdn_dat);
 		RETHROW();
 	}
 	if unlikely(old_dirent) {
 		info->mkf_dent = incref(&old_dirent->rde_ent);
-		shared_rwlock_endread(&me->rdn_dat.rdd_treelock);
+		ramfs_dirdata_treelock_endread(&me->rdn_dat);
 		info->mkf_rnode = (REF struct fnode *)incref(old_dirent->rde_node);
 		info->mkf_flags |= FMKFILE_F_EXISTS;
 		return;
 	}
-	shared_rwlock_endread(&me->rdn_dat.rdd_treelock);
+	ramfs_dirdata_treelock_endread(&me->rdn_dat);
 #endif /* !__OPTIMIZE_SIZE__ */
 
 	/* Allocate the new file-node */
@@ -721,7 +727,7 @@ ramfs_dirnode_v_mkfile(struct fdirnode *__restrict self,
 
 			/* Insert the new file */
 again_acquire_lock_for_insert:
-			shared_rwlock_write(&me->rdn_dat.rdd_treelock);
+			ramfs_dirdata_treelock_write(&me->rdn_dat);
 			if unlikely(ATOMIC_READ(me->rdn_dat.rdd_tree) == RAMFS_DIRDATA_TREE_DELETED)
 				THROW(E_FSERROR_DELETED, E_FILESYSTEM_DELETED_PATH);
 			old_dirent = ramfs_direnttree_locate(me->rdn_dat.rdd_tree,
@@ -736,7 +742,7 @@ again_acquire_lock_for_insert:
 			if unlikely(old_dirent) {
 				/* Special case: file already exists. */
 				incref(&old_dirent->rde_ent);
-				shared_rwlock_endwrite(&me->rdn_dat.rdd_treelock);
+				ramfs_dirdata_treelock_endwrite(&me->rdn_dat);
 				kfree(new_dirent);
 				decref_likely(new_node);
 				info->mkf_dent  = &old_dirent->rde_ent;
@@ -756,14 +762,20 @@ again_acquire_lock_for_insert:
 				assert(new_node->mf_flags & MFILE_F_PERSISTENT);
 				assert(new_node->mf_refcnt == 1);
 				if (!fsuper_nodes_trywrite(super)) {
-					shared_rwlock_endwrite(&me->rdn_dat.rdd_treelock);
+					ramfs_dirdata_treelock_endwrite(&me->rdn_dat);
 					while (!fsuper_nodes_canwrite(super))
 						task_yield();
 					goto again_acquire_lock_for_insert;
 				}
+				/* Check if the filesystem has been deleted. */
+				if unlikely(super->fs_nodes == FSUPER_NODES_DELETED) {
+					fsuper_nodes_endwrite(super);
+					ramfs_dirdata_treelock_endwrite(&me->rdn_dat);
+					THROW(E_FSERROR_DELETED, E_FILESYSTEM_DELETED_UNMOUNTED);
+				}
 				if (!fallnodes_tryacquire()) {
 					fsuper_nodes_endwrite(super);
-					shared_rwlock_endwrite(&me->rdn_dat.rdd_treelock);
+					ramfs_dirdata_treelock_endwrite(&me->rdn_dat);
 					while (!fallnodes_available())
 						task_yield();
 					goto again_acquire_lock_for_insert;
@@ -793,7 +805,7 @@ again_acquire_lock_for_insert:
 			ramfs_direnttree_insert(&me->rdn_dat.rdd_tree, new_dirent); /* Inherit reference */
 
 			/* And with that, the "file" has been created! */
-			shared_rwlock_endwrite(&me->rdn_dat.rdd_treelock);
+			ramfs_dirdata_treelock_endwrite(&me->rdn_dat);
 		} EXCEPT {
 			kfree(new_dirent);
 			RETHROW();
@@ -815,9 +827,9 @@ ramfs_dirnode_v_unlink(struct fdirnode *__restrict self,
 	struct ramfs_dirent *known_entry;
 	struct ramfs_dirnode *me = (struct ramfs_dirnode *)self;
 again:
-	shared_rwlock_write(&me->rdn_dat.rdd_treelock);
+	ramfs_dirdata_treelock_write(&me->rdn_dat);
 	if unlikely(me->rdn_dat.rdd_tree == RAMFS_DIRDATA_TREE_DELETED) {
-		shared_rwlock_endwrite(&me->rdn_dat.rdd_treelock);
+		ramfs_dirdata_treelock_endwrite(&me->rdn_dat);
 		THROW(E_FSERROR_DELETED, E_FILESYSTEM_DELETED_PATH);
 	}
 	/* Check that `entry' is still correct. */
@@ -825,7 +837,7 @@ again:
 	                                      entry->fd_name,
 	                                      entry->fd_namelen);
 	if unlikely(&known_entry->rde_ent != entry) {
-		shared_rwlock_endwrite(&me->rdn_dat.rdd_treelock);
+		ramfs_dirdata_treelock_endwrite(&me->rdn_dat);
 		THROW(E_FSERROR_DELETED, E_FILESYSTEM_DELETED_FILE);
 	}
 	/* When `file' is a directory, we must interlock setting its tree
@@ -837,34 +849,34 @@ again:
 		assert(file->mf_ops == &ramfs_dirnode_ops.dno_node.no_file);
 		filedir = (struct ramfs_dirnode *)mfile_asdir(file);
 		assert(filedir != self);
-		if (!shared_rwlock_trywrite(&filedir->rdn_dat.rdd_treelock)) {
-			shared_rwlock_endwrite(&me->rdn_dat.rdd_treelock);
-			shared_rwlock_write(&filedir->rdn_dat.rdd_treelock);
-			shared_rwlock_endwrite(&filedir->rdn_dat.rdd_treelock);
+		if (!ramfs_dirdata_treelock_trywrite(&filedir->rdn_dat)) {
+			ramfs_dirdata_treelock_endwrite(&me->rdn_dat);
+			ramfs_dirdata_treelock_write(&filedir->rdn_dat);
+			ramfs_dirdata_treelock_endwrite(&filedir->rdn_dat);
 			goto again;
 		}
 		/* Assert that `file' is an empty directory. */
 		if (filedir->rdn_dat.rdd_tree != NULL) {
-			shared_rwlock_endwrite(&filedir->rdn_dat.rdd_treelock);
-			shared_rwlock_endwrite(&me->rdn_dat.rdd_treelock);
+			ramfs_dirdata_treelock_endwrite(&filedir->rdn_dat);
+			ramfs_dirdata_treelock_endwrite(&me->rdn_dat);
 			/* Non-empty directory! */
 			THROW(E_FSERROR_DIRECTORY_NOT_EMPTY);
 		}
 
 		/* Mark the directory as deleted. */
 		filedir->rdn_dat.rdd_tree = RAMFS_DIRDATA_TREE_DELETED;
-		shared_rwlock_endwrite(&filedir->rdn_dat.rdd_treelock);
+		ramfs_dirdata_treelock_endwrite(&filedir->rdn_dat);
 
 		/* Remove entry from our directory tree. */
 		ramfs_direnttree_removenode(&me->rdn_dat.rdd_tree, known_entry);
 		known_entry->rde_treenode.rb_lhs = RAMFS_DIRENT_TREENODE_DELETED; /* Mark as deleted. */
 
-		shared_rwlock_endwrite(&me->rdn_dat.rdd_treelock);
+		ramfs_dirdata_treelock_endwrite(&me->rdn_dat);
 	} else {
 		bool last_link_went_away;
 		ramfs_direnttree_removenode(&me->rdn_dat.rdd_tree, known_entry);
 		known_entry->rde_treenode.rb_lhs = RAMFS_DIRENT_TREENODE_DELETED; /* Mark as deleted. */
-		shared_rwlock_endwrite(&me->rdn_dat.rdd_treelock);
+		ramfs_dirdata_treelock_endwrite(&me->rdn_dat);
 		decref_nokill(known_entry); /* From `me->rdn_dat.rdd_tree' */
 
 		/* For non-directory files, must decrement the NLINK counter. */
@@ -895,17 +907,17 @@ ramfs_dirnode_v_rename(struct fdirnode *__restrict self,
 	assert(info->frn_dent->fd_ops == &ramfs_dirent_ops);
 #ifndef __OPTIMIZE_SIZE__
 	/* Check for an existing file before doing any allocations */
-	shared_rwlock_read(&me->rdn_dat.rdd_treelock);
+	ramfs_dirdata_treelock_read(&me->rdn_dat);
 	TRY {
 		if unlikely(me->rdn_dat.rdd_tree == RAMFS_DIRDATA_TREE_DELETED)
 			THROW(E_FSERROR_DELETED, E_FILESYSTEM_DELETED_PATH);
 		if unlikely(ramfs_dirdata_lookup(me, &info->frn_lookup_info))
 			THROW(E_FSERROR_FILE_ALREADY_EXISTS);
 	} EXCEPT {
-		shared_rwlock_endread(&me->rdn_dat.rdd_treelock);
+		ramfs_dirdata_treelock_endread(&me->rdn_dat);
 		RETHROW();
 	}
-	shared_rwlock_endread(&me->rdn_dat.rdd_treelock);
+	ramfs_dirdata_treelock_endread(&me->rdn_dat);
 #endif /* !__OPTIMIZE_SIZE__ */
 
 	/* Allocate the new directory entry. */
@@ -937,13 +949,13 @@ ramfs_dirnode_v_rename(struct fdirnode *__restrict self,
 	/* Acquire locks. */
 again_acquire_locks:
 	TRY {
-		shared_rwlock_write(&me->rdn_dat.rdd_treelock);
+		ramfs_dirdata_treelock_write(&me->rdn_dat);
 	} EXCEPT {
 		kfree(new_dirent);
 		RETHROW();
 	}
 	if unlikely(me->rdn_dat.rdd_tree == RAMFS_DIRDATA_TREE_DELETED) {
-		shared_rwlock_endwrite(&me->rdn_dat.rdd_treelock);
+		ramfs_dirdata_treelock_endwrite(&me->rdn_dat);
 		kfree(new_dirent);
 		THROW(E_FSERROR_DELETED, E_FILESYSTEM_DELETED_PATH);
 	}
@@ -952,33 +964,33 @@ again_acquire_locks:
 	if (ramfs_direnttree_locate(me->rdn_dat.rdd_tree,
 	                            new_dirent->rde_ent.fd_name,
 	                            new_dirent->rde_ent.fd_namelen) ||
-	    ((info->frn_flags & FS_MODE_FDOSPATH) && me->rdn_dat.rdd_tree &&
+	    ((info->frn_flags & AT_DOSPATH) && me->rdn_dat.rdd_tree &&
 	     _ramfs_direnttree_caselocate(me->rdn_dat.rdd_tree,
 	                                  new_dirent->rde_ent.fd_name,
 	                                  new_dirent->rde_ent.fd_namelen))) {
-		shared_rwlock_endwrite(&me->rdn_dat.rdd_treelock);
+		ramfs_dirdata_treelock_endwrite(&me->rdn_dat);
 		kfree(new_dirent);
 		THROW(E_FSERROR_FILE_ALREADY_EXISTS);
 	}
 
 	/* Acquire a lock to the old directory. */
 	if (me != olddir) {
-		if (!shared_rwlock_trywrite(&olddir->rdn_dat.rdd_treelock)) {
-			shared_rwlock_endwrite(&me->rdn_dat.rdd_treelock);
+		if (!ramfs_dirdata_treelock_trywrite(&olddir->rdn_dat)) {
+			ramfs_dirdata_treelock_endwrite(&me->rdn_dat);
 			TRY {
-				shared_rwlock_write(&olddir->rdn_dat.rdd_treelock);
+				ramfs_dirdata_treelock_write(&olddir->rdn_dat);
 			} EXCEPT {
 				kfree(new_dirent);
 				RETHROW();
 			}
-			shared_rwlock_endwrite(&olddir->rdn_dat.rdd_treelock);
+			ramfs_dirdata_treelock_endwrite(&olddir->rdn_dat);
 			goto again_acquire_locks;
 		}
 	
 		/* Check if the old directory has already been deleted. */
 		if unlikely(olddir->rdn_dat.rdd_tree == RAMFS_DIRDATA_TREE_DELETED) {
-			shared_rwlock_endwrite(&olddir->rdn_dat.rdd_treelock);
-			shared_rwlock_endwrite(&me->rdn_dat.rdd_treelock);
+			ramfs_dirdata_treelock_endwrite(&olddir->rdn_dat);
+			ramfs_dirdata_treelock_endwrite(&me->rdn_dat);
 			kfree(new_dirent);
 			THROW(E_FSERROR_DELETED, E_FILESYSTEM_DELETED_PATH);
 		}
@@ -991,8 +1003,8 @@ again_acquire_locks:
 	                            old_dirent->rde_ent.fd_name,
 	                            old_dirent->rde_ent.fd_namelen) != old_dirent) {
 		if (me != olddir)
-			shared_rwlock_endwrite(&olddir->rdn_dat.rdd_treelock);
-		shared_rwlock_endwrite(&me->rdn_dat.rdd_treelock);
+			ramfs_dirdata_treelock_endwrite(&olddir->rdn_dat);
+		ramfs_dirdata_treelock_endwrite(&me->rdn_dat);
 		kfree(new_dirent);
 		THROW(E_FSERROR_DELETED, E_FILESYSTEM_DELETED_FILE);
 	}
@@ -1009,8 +1021,8 @@ again_acquire_locks:
 
 	/* Release locks */
 	if (me != olddir)
-		shared_rwlock_endwrite(&olddir->rdn_dat.rdd_treelock);
-	shared_rwlock_endwrite(&me->rdn_dat.rdd_treelock);
+		ramfs_dirdata_treelock_endwrite(&olddir->rdn_dat);
+	ramfs_dirdata_treelock_endwrite(&me->rdn_dat);
 
 	/* Inherited   from   `olddir->rdn_dat.rdd_tree'
 	 * (nokill because caller still has a reference) */
@@ -1063,7 +1075,7 @@ ramfs_open(struct ffilesys *__restrict UNUSED(filesys),
 
 /* Top-level ram filesystem descriptor. */
 PUBLIC struct ffilesys ramfs_filesys = {
-	.ffs_link = { .le_next = NULL, .le_prev = &devfs_filesys.ffs_link.le_next },
+	.ffs_link = { .sle_next = NULL },
 	.ffs_drv  = &drv_self,
 	{ .ffs_open = &ramfs_open },
 	.ffs_flags = FFILESYS_F_NODEV,

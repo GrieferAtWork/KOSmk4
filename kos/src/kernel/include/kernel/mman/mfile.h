@@ -592,7 +592,12 @@ struct mfile_ops {
 #define _MFILE_F_SMP_TSLOCK     0x80000000 /* [lock(ATOMIC)] SMP-lock for TimeStamps (`mf_atime', `mf_mtime'). */
 #endif /* !CONFIG_NO_SMP */
 
+#if defined(__WANT_MFILE__mf_fsuperlop) || defined(__WANT_MFILE__mf_fsuperplop)
 struct fsuper;
+#endif /* __WANT_MFILE__mf_fsuperlop || __WANT_MFILE__mf_fsuperplop */
+#ifdef __WANT_MFILE__mf_delfnodes
+struct fnode;
+#endif /* __WANT_MFILE__mf_delfnodes */
 #endif /* CONFIG_USE_NEW_FS */
 
 struct mfile {
@@ -709,9 +714,16 @@ struct mfile {
 #ifdef __WANT_MFILE__mf_fsuperlop
 		Toblockop(fsuper)        _mf_fsuperlop;  /* filesystem-super lock operation */
 #endif /* __WANT_MFILE__mf_fsuperlop */
-#ifdef __WANT_MFILE__mf_fsuperplop
+#if defined(__WANT_MFILE__mf_fsuperplop) && defined(__WANT_MFILE__mf_delfnodes)
+		struct {
+			Tobpostlockop(fsuper) _mf_fsuperplop; /* filesystem-super post-lock operation */
+			REF struct fnode     *_mf_delfnodes;  /* Used during `fsuper_delete()' */
+		};
+#elif defined(__WANT_MFILE__mf_fsuperplop)
 		Tobpostlockop(fsuper)    _mf_fsuperplop; /* filesystem-super post-lock operation */
-#endif /* __WANT_MFILE__mf_fsuperplop */
+#elif defined(__WANT_MFILE__mf_delfnodes)
+#error "__WANT_MFILE__mf_delfnodes requires __WANT_MFILE__mf_fsuperplop"
+#endif /* ... */
 #if defined(__WANT_MFILE__mf_mfplop) && defined(__WANT_MFILE__mf_deadparts)
 		struct {
 			Tobpostlockop(mfile) _mf_mfplop;     /* mem-file post-lock operation */

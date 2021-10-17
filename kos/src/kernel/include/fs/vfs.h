@@ -22,6 +22,10 @@
 
 #include <kernel/compiler.h>
 
+#ifdef CONFIG_USE_NEW_FS
+#include <kernel/fs/path.h>
+#include <kernel/fs/vfs.h>
+#else /* CONFIG_USE_NEW_FS */
 #include <fs/node.h>
 #include <kernel/cache.h>
 #include <kernel/types.h>
@@ -954,5 +958,6 @@ NOTHROW(KCALL fs_getmode)(atflag_t flags) {
 #endif /* __CC__ */
 
 DECL_END
+#endif /* !CONFIG_USE_NEW_FS */
 
 #endif /* !GUARD_KERNEL_INCLUDE_FS_VFS_H */

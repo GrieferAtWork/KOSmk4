@@ -864,24 +864,25 @@ again:
 	}
 
 	/* devfs.rs_dat.rdd_treelock... // read-only */
-	if (!shared_rwlock_tryread(&devfs.rs_dat.rdd_treelock)) {
+	if (!ramfs_dirdata_treelock_tryread(&devfs.rs_dat)) {
 		_fsuper_nodes_endwrite(&devfs);
 		_blkdev_root_partslock_release(self);
 		_devfs_byname_endwrite();
 		fsuper_nodes_reap(&devfs);
 		blkdev_root_partslock_reap(self);
 		devfs_byname_reap();
-		shared_rwlock_read(&devfs.rs_dat.rdd_treelock);
-		shared_rwlock_endread(&devfs.rs_dat.rdd_treelock);
+		ramfs_dirdata_treelock_read(&devfs.rs_dat);
+		ramfs_dirdata_treelock_endread(&devfs.rs_dat);
 		goto again;
 	}
 
 	/* fallnodes_lock... */
 	if (!fallnodes_tryacquire()) {
-		shared_rwlock_endread(&devfs.rs_dat.rdd_treelock);
+		_ramfs_dirdata_treelock_endread(&devfs.rs_dat);
 		_fsuper_nodes_endwrite(&devfs);
 		_blkdev_root_partslock_release(self);
 		_devfs_byname_endwrite();
+		ramfs_dirdata_treelock_reap(&devfs.rs_dat);
 		fsuper_nodes_reap(&devfs);
 		blkdev_root_partslock_reap(self);
 		devfs_byname_reap();
@@ -1074,7 +1075,7 @@ blkdev_repart(struct blkdev *__restrict self)
 	/* Step #5: Release locks. */
 	_fallnodes_release();
 	_devfs_byname_endwrite();
-	shared_rwlock_endread(&devfs.rs_dat.rdd_treelock);
+	_ramfs_dirdata_treelock_endread(&devfs.rs_dat);
 	_fsuper_nodes_endwrite(&devfs);
 
 	/* Step #6: Drop references from all of the old partitions (Also mark then as unlinked). */
@@ -1091,7 +1092,8 @@ blkdev_repart(struct blkdev *__restrict self)
 	/* Step #7: Release lock to `self->bd_rootinfo.br_partslock' */
 	_blkdev_root_partslock_release(self);
 
-	/* Reap all of the locks released above (NOTE: `devfs.rs_dat.rdd_treelock' doesn't have lops!) */
+	/* Reap all of the locks released above */
+	ramfs_dirdata_treelock_reap(&devfs.rs_dat);
 	fallnodes_reap();
 	devfs_byname_reap();
 	fsuper_nodes_reap(&devfs);
@@ -1179,13 +1181,14 @@ blkdev_repart_and_register(struct blkdev *__restrict self)
 	/* Step #5: Release locks. */
 	_fallnodes_release();
 	_devfs_byname_endwrite();
-	shared_rwlock_endread(&devfs.rs_dat.rdd_treelock);
+	_ramfs_dirdata_treelock_endread(&devfs.rs_dat);
 	_fsuper_nodes_endwrite(&devfs);
 	_blkdev_root_partslock_release(self);
 
-	/* Reap all of the locks released above (NOTE: `devfs.rs_dat.rdd_treelock' doesn't have lops!) */
+	/* Reap all of the locks released above */
 	fallnodes_reap();
 	devfs_byname_reap();
+	ramfs_dirdata_treelock_reap(&devfs.rs_dat);
 	fsuper_nodes_reap(&devfs);
 	blkdev_root_partslock_reap(self);
 }

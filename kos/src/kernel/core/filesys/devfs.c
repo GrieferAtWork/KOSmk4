@@ -23,7 +23,6 @@
 #define __WANT_MFILE__mf_plop
 #define __WANT_MFILE__mf_fsuperlop
 #define __WANT_MFILE__mf_fsuperplop
-#define __WANT_FS_INIT
 #define _KOS_SOURCE 1
 #define _GNU_SOURCE 1
 
@@ -51,7 +50,6 @@
 #include <kos/except/reason/fs.h>
 #include <kos/except/reason/inval.h>
 #include <kos/guid.h>
-#include <linux/magic.h>
 
 #include <assert.h>
 #include <stddef.h>
@@ -166,9 +164,8 @@ NOTHROW(KCALL fdevfsdirent_v_destroy)(struct fdirent *__restrict self) {
 PRIVATE WUNUSED NONNULL((1, 2)) REF struct fnode *KCALL
 fdevfsdirent_v_opennode(struct fdirent *__restrict self,
                         struct fdirnode *__restrict dir) {
-	STATIC_ASSERT(offsetof(struct device, dv_devnode.dn_node.fn_file) == 0);
 	struct fdevfsdirent *me;
-	assert(dir == &devfs.rs_sup.fs_root);
+	assert(dir == &devfs.fs_root);
 	(void)dir;
 	me = container_of(self, struct fdevfsdirent, fdd_dirent);
 	return (REF struct fnode *)awref_get(&me->fdd_dev);
@@ -186,9 +183,9 @@ PUBLIC struct fdirent_ops const fdevfsdirent_ops = {
 
 
 PUBLIC struct ffilesys devfs_filesys = {
-	.ffs_link = { .le_next = &ramfs_filesys, .le_prev = &ffilesys_formats_list.lh_first },
+	.ffs_link = { .sle_next = &ramfs_filesys },
 	.ffs_drv  = &drv_self,
-	{ .ffs_single = &devfs.rs_sup },
+	{ .ffs_single = &devfs },
 	.ffs_flags = FFILESYS_F_SINGLE,
 	.ffs_name  = "devfs",
 };
@@ -210,7 +207,7 @@ PUBLIC struct ffilesys devfs_filesys = {
  * created  either. Only the root directory, and  any dynamically created sub-directory is usable
  * for the purpose of RAMFS.
  *
- * Enumeration here is done in O(N) by walking `devfs.rs_sup.fs_nodes'. The additional complexity
+ * Enumeration here is done in O(N) by walking `devfs.fs_nodes'. The additional complexity
  * of adding individual trees/maps for each of these would be too great, though information about
  * what  filenames appear in these folders must still  be stored on a per-device basis. Also note
  * that some of those folders contain more than just partitions; namely: the actual root devices.
@@ -220,7 +217,7 @@ PUBLIC struct ffilesys devfs_filesys = {
  *       one more namespace for special directories like root, and another for dynamic files as
  *       those described above!
  *
- * NOTE: All of these special INodes actually _DONT_ appear in `devfs.rs_sup.fs_nodes'! This  can
+ * NOTE: All of these special INodes actually _DONT_ appear in `devfs.fs_nodes'! This  can
  *       be achieved because INode access within the new fs is not done via `super_opennode' with
  *       the  associated inode number,  but instead via `fdirent_opennode()',  which hides all of
  *       the association details for fdirent->fnode mapping from prying eyes. Technically, it  is
@@ -237,12 +234,12 @@ PRIVATE WUNUSED NONNULL((1, 2)) REF struct fdirent *KCALL
 devfs_root_v_lookup(struct fdirnode *__restrict self,
                     struct flookup_info *__restrict info) {
 	struct device *node;
-	assert(self == &devfs.rs_sup.fs_root);
+	assert(self == &devfs.fs_root);
 
 	/* Check if we can find a device with the specified name. */
 	devfs_byname_read();
 	node = devfs_byname_locate(info->flu_name, info->flu_namelen);
-	if (!node && (info->flu_flags & FS_MODE_FDOSPATH))
+	if (!node && (info->flu_flags & AT_DOSPATH))
 		node = devfs_byname_caselocate(info->flu_name, info->flu_namelen);
 	if (node) {
 		REF struct fdirent *result;
@@ -286,7 +283,7 @@ NOTHROW(KCALL devfs_root_direnum_v_fini)(struct fdirenum *__restrict self) {
 
 PRIVATE ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct fdirnode *
 NOTHROW(KCALL devfs_root_direnum_v_getdir)(struct fdirenum *__restrict UNUSED(self)) {
-	return mfile_asdir(incref(&devfs.rs_sup.fs_root.dn_node.fn_file));
+	return mfile_asdir(incref(&devfs.fs_root));
 }
 
 
@@ -340,7 +337,7 @@ devfs_root_next(struct fdirent *__restrict self)
 unlock_byname_and_return_first_ramfs:
 				devfs_byname_endread();
 				/* Return the first file from the ramfs portion. */
-				shared_rwlock_read(&devfs.rs_dat.rdd_treelock);
+				ramfs_dirdata_treelock_read(&devfs.rs_dat);
 				assertf(devfs.rs_dat.rdd_tree != RAMFS_DIRDATA_TREE_DELETED,
 				        "The devfs root directory shouldn't be deletable");
 				first = devfs.rs_dat.rdd_tree;
@@ -349,14 +346,14 @@ unlock_byname_and_return_first_ramfs:
 						first = first->rde_treenode.rb_lhs;
 					result = incref(&first->rde_ent);
 				}
-				shared_rwlock_endread(&devfs.rs_dat.rdd_treelock);
+				ramfs_dirdata_treelock_endread(&devfs.rs_dat);
 			}
 		}
 	} else {
 		struct ramfs_dirent *me;
 		assert(fdirent_isramfs(self));
 		me = fdirent_asramfs(self);
-		shared_rwlock_read(&devfs.rs_dat.rdd_treelock);
+		ramfs_dirdata_treelock_read(&devfs.rs_dat);
 		COMPILER_READ_BARRIER();
 		/* Check for special case: `self' was deleted. */
 		if unlikely(me->rde_treenode.rb_lhs == RAMFS_DIRENT_TREENODE_DELETED) {
@@ -369,7 +366,7 @@ unlock_byname_and_return_first_ramfs:
 		}
 		if (me != NULL)
 			result = incref(&me->rde_ent);
-		shared_rwlock_endread(&devfs.rs_dat.rdd_treelock);
+		ramfs_dirdata_treelock_endread(&devfs.rs_dat);
 	}
 	return result;
 }
@@ -416,14 +413,14 @@ devfs_root_first_ramfs_dirent(void) {
 	REF struct fdirent *result = NULL;
 	struct ramfs_dirent *ent;
 	/* Start enumeration at the left-most node */
-	shared_rwlock_read(&devfs.rs_dat.rdd_treelock);
+	ramfs_dirdata_treelock_read(&devfs.rs_dat);
 	ent = devfs.rs_dat.rdd_tree;
 	if likely(ent) {
 		while (ent->rde_treenode.rb_lhs)
 			ent = ent->rde_treenode.rb_lhs;
 		result = incref(&ent->rde_ent);
 	}
-	shared_rwlock_endread(&devfs.rs_dat.rdd_treelock);
+	ramfs_dirdata_treelock_endread(&devfs.rs_dat);
 	return result;
 }
 
@@ -479,7 +476,7 @@ devfs_root_v_enum(struct fdirnode *__restrict self,
                   struct fdirenum *__restrict result) {
 	struct devfs_root_direnum *rt;
 	REF struct fdirent *firstent;
-	assert(self == &devfs.rs_sup.fs_root);
+	assert(self == &devfs.fs_root);
 	(void)self;
 	rt = (struct devfs_root_direnum *)result;
 	firstent    = devfs_root_first_dirent();
@@ -528,7 +525,7 @@ devfs_root_v_mkfile(struct fdirnode *__restrict self,
 		       E_FSERROR_UNSUPPORTED_OPERATION) {
 	REF struct ramfs_dirent *new_dirent;
 	REF struct fnode *new_node;
-	assert(self == &devfs.rs_sup.fs_root);
+	assert(self == &devfs.fs_root);
 	(void)self;
 
 	/* Check check for already-exists. */
@@ -540,7 +537,7 @@ again_lookup:
 		if unlikely(old_dirent) {
 			REF struct fnode *oldnode;
 			TRY {
-				oldnode = fdirent_opennode(old_dirent, &devfs.rs_sup.fs_root);
+				oldnode = fdirent_opennode(old_dirent, &devfs.fs_root);
 			} EXCEPT {
 				decref_unlikely(old_dirent);
 				RETHROW();
@@ -549,7 +546,7 @@ again_lookup:
 				goto again_lookup; /* Deleted */
 			info->mkf_dent  = old_dirent; /* Inherit reference */
 			info->mkf_rnode = oldnode;    /* Inherit reference */
-			info->mkf_flags |= FMKFILE_F_EXISTS;
+			info->mkf_flags |= AT_EXISTS;
 			return;
 		}
 	}
@@ -558,7 +555,7 @@ again_lookup:
 	/* Check for special case: not allowed to hard-link device files.
 	 * Every device file can only ever have a single directory entry! */
 	if ((info->mkf_fmode & S_IFMT) == 0 && S_ISDEV(info->mkf_hrdlnk.hl_node->fn_mode) &&
-	    info->mkf_hrdlnk.hl_node->fn_file.mf_ops != &ramfs_devnode_ops.dno_node.no_file)
+	    info->mkf_hrdlnk.hl_node->mf_ops != &ramfs_devnode_ops.dno_node.no_file)
 		THROW(E_FSERROR_TOO_MANY_HARD_LINKS);
 
 create_ramfs_file:
@@ -569,8 +566,8 @@ create_ramfs_file:
 	 * device files cannot not be  moved out of the  root
 	 * directory) */
 	if (S_ISDIR(info->mkf_fmode)) {
-		assert(new_node->fn_file.mf_ops == &ramfs_dirnode_ops.dno_node.no_file);
-		new_node->fn_file.mf_ops = &devfs_dirnode_ops.dno_node.no_file;
+		assert(new_node->mf_ops == &ramfs_dirnode_ops.dno_node.no_file);
+		new_node->mf_ops = &devfs_dirnode_ops.dno_node.no_file;
 	}
 
 	/* Construct the new directory entry. */
@@ -598,14 +595,14 @@ create_ramfs_file:
 
 			/* Insert the new file */
 again_acquire_lock_for_insert:
-			shared_rwlock_write(&devfs.rs_dat.rdd_treelock);
+			ramfs_dirdata_treelock_write(&devfs.rs_dat);
 			{
 				struct ramfs_dirent *old_dirent;
 				assert(devfs.rs_dat.rdd_tree != RAMFS_DIRDATA_TREE_DELETED);
 				old_dirent = ramfs_direnttree_locate(devfs.rs_dat.rdd_tree,
 				                                     new_dirent->rde_ent.fd_name,
 				                                     new_dirent->rde_ent.fd_namelen);
-				if (!old_dirent && (info->mkf_flags & FMKFILE_F_NOCASE) && devfs.rs_dat.rdd_tree) {
+				if (!old_dirent && (info->mkf_flags & AT_DOSPATH) && devfs.rs_dat.rdd_tree) {
 					/* Do a case-insensitive search */
 					old_dirent = _ramfs_direnttree_caselocate(devfs.rs_dat.rdd_tree,
 					                                          new_dirent->rde_ent.fd_name,
@@ -614,12 +611,12 @@ again_acquire_lock_for_insert:
 				if unlikely(old_dirent) {
 					/* Special case: file already exists. */
 					incref(&old_dirent->rde_ent);
-					shared_rwlock_endwrite(&devfs.rs_dat.rdd_treelock);
+					ramfs_dirdata_treelock_endwrite(&devfs.rs_dat);
 					kfree(new_dirent);
-					decref_likely(&new_node->fn_file);
+					decref_likely(new_node);
 					info->mkf_dent  = &old_dirent->rde_ent;
-					info->mkf_rnode = mfile_asnode(incref(&old_dirent->rde_node->fn_file));
-					info->mkf_flags |= FMKFILE_F_EXISTS;
+					info->mkf_rnode = mfile_asnode(incref(old_dirent->rde_node));
+					info->mkf_flags |= AT_EXISTS;
 					return;
 				}
 			}
@@ -629,7 +626,7 @@ again_acquire_lock_for_insert:
 			 * with  the same name is added while we're in here), it's OK to only acquire
 			 * a read-lock. */
 			if (!devfs_byname_tryread()) {
-				shared_rwlock_endwrite(&devfs.rs_dat.rdd_treelock);
+				ramfs_dirdata_treelock_endwrite(&devfs.rs_dat);
 				devfs_byname_read();
 				devfs_byname_endread();
 				goto again_acquire_lock_for_insert;
@@ -640,7 +637,7 @@ again_acquire_lock_for_insert:
 				struct device *existing_device;
 				existing_device = devfs_byname_locate(new_dirent->rde_ent.fd_name,
 				                                      new_dirent->rde_ent.fd_namelen);
-				if (!existing_device && (info->mkf_flags & FMKFILE_F_NOCASE)) {
+				if (!existing_device && (info->mkf_flags & AT_DOSPATH)) {
 					existing_device = devfs_byname_caselocate(new_dirent->rde_ent.fd_name,
 					                                          new_dirent->rde_ent.fd_namelen);
 				}
@@ -650,13 +647,13 @@ again_acquire_lock_for_insert:
 						existing_device->dv_byname_node.rb_lhs = DEVICE_BYNAME_DELETED;
 					} else {
 						/* Special case: file already exists. */
-						shared_rwlock_endwrite(&devfs.rs_dat.rdd_treelock);
+						ramfs_dirdata_treelock_endwrite(&devfs.rs_dat);
 						info->mkf_dent = incref(&existing_device->dv_dirent->fdd_dirent);
 						devfs_byname_endread();
-						info->mkf_rnode = &existing_device->dv_devnode.dn_node;
+						info->mkf_rnode = existing_device;
 						kfree(new_dirent);
-						decref_likely(&new_node->fn_file);
-						info->mkf_flags |= FMKFILE_F_EXISTS;
+						decref_likely(new_node);
+						info->mkf_flags |= AT_EXISTS;
 						return;
 					}
 				}
@@ -668,57 +665,57 @@ again_acquire_lock_for_insert:
 				 *  - new_node->fn_supent */
 				assert(!LIST_ISBOUND(new_node, fn_allnodes));
 				assert(new_node->fn_supent.rb_lhs == FSUPER_NODES_DELETED);
-				assert(!(new_node->fn_file.mf_flags & MFILE_FN_GLOBAL_REF));
-				assert(new_node->fn_file.mf_flags & MFILE_F_PERSISTENT);
-				assert(new_node->fn_file.mf_refcnt == 1);
-				if (!fsuper_nodes_trywrite(&devfs.rs_sup)) {
+				assert(!(new_node->mf_flags & MFILE_FN_GLOBAL_REF));
+				assert(new_node->mf_flags & MFILE_F_PERSISTENT);
+				assert(new_node->mf_refcnt == 1);
+				if (!fsuper_nodes_trywrite(&devfs)) {
 					devfs_byname_endread();
-					shared_rwlock_endwrite(&devfs.rs_dat.rdd_treelock);
-					while (!fsuper_nodes_canwrite(&devfs.rs_sup))
+					ramfs_dirdata_treelock_endwrite(&devfs.rs_dat);
+					while (!fsuper_nodes_canwrite(&devfs))
 						task_yield();
 					goto again_acquire_lock_for_insert;
 				}
 				if (!fallnodes_tryacquire()) {
-					fsuper_nodes_endwrite(&devfs.rs_sup);
+					fsuper_nodes_endwrite(&devfs);
 					devfs_byname_endread();
-					shared_rwlock_endwrite(&devfs.rs_dat.rdd_treelock);
+					ramfs_dirdata_treelock_endwrite(&devfs.rs_dat);
 					while (!fallnodes_available())
 						task_yield();
 					goto again_acquire_lock_for_insert;
 				}
-				new_node->fn_file.mf_flags |= MFILE_FN_GLOBAL_REF;
-				new_node->fn_file.mf_refcnt += 1; /* For `MFILE_FN_GLOBAL_REF' */
+				new_node->mf_flags |= MFILE_FN_GLOBAL_REF;
+				new_node->mf_refcnt += 1; /* For `MFILE_FN_GLOBAL_REF' */
 				COMPILER_BARRIER();
 
 				/* Make the newly created node globally visible. */
-				fsuper_nodes_insert(&devfs.rs_sup, new_node);
+				fsuper_nodes_insert(&devfs, new_node);
 				LIST_INSERT_HEAD(&fallnodes_list, new_node, fn_allnodes);
 
 				/* Release locks. */
 				fallnodes_release();
-				fsuper_nodes_endwrite(&devfs.rs_sup);
+				fsuper_nodes_endwrite(&devfs);
 			} else {
 				/* Hard link -> increment the nlink counter */
-				mfile_tslock_acquire(&new_node->fn_file);
+				mfile_tslock_acquire(new_node);
 				ATOMIC_INC(new_node->fn_nlink);
-				mfile_tslock_release(&new_node->fn_file);
+				mfile_tslock_release(new_node);
 			}
 
 			/* Construct missing references for `new_dirent' */
-			incref(&new_node->fn_file); /* For `new_dirent->rde_node' (or `info->mkf_rnode', depending on view) */
+			incref(new_node); /* For `new_dirent->rde_node' (or `info->mkf_rnode', depending on view) */
 
 			/* Insert the new directory entry. */
 			ramfs_direnttree_insert(&devfs.rs_dat.rdd_tree, new_dirent); /* Inherit reference */
 
 			/* And with that, the "file" has been created! */
 			devfs_byname_endread();
-			shared_rwlock_endwrite(&devfs.rs_dat.rdd_treelock);
+			ramfs_dirdata_treelock_endwrite(&devfs.rs_dat);
 		} EXCEPT {
 			kfree(new_dirent);
 			RETHROW();
 		}
 	} EXCEPT {
-		decref_likely(&new_node->fn_file);
+		decref_likely(new_node);
 		RETHROW();
 	}
 	info->mkf_dent  = &new_dirent->rde_ent; /* Inherit reference */
@@ -732,7 +729,7 @@ devfs_root_v_unlink(struct fdirnode *__restrict self,
                     struct fnode *__restrict file)
 		THROWS(E_FSERROR_DIRECTORY_NOT_EMPTY,
 		       E_FSERROR_READONLY, E_FSERROR_DELETED) {
-	assert(self == &devfs.rs_sup.fs_root);
+	assert(self == &devfs.fs_root);
 	(void)self;
 
 	/* Check for device files. */
@@ -742,7 +739,7 @@ devfs_root_v_unlink(struct fdirnode *__restrict self,
 		struct fdevfsdirent *real_entry;
 		struct device *real_file;
 		real_entry = container_of(entry, struct fdevfsdirent, fdd_dirent);
-		real_file  = container_of(file, struct device, dv_devnode.dn_node);
+		real_file  = fnode_asdevice(file);
 		if (real_file->dv_byname_node.rb_lhs == DEVICE_BYNAME_DELETED)
 			THROW(E_FSERROR_DELETED, E_FILESYSTEM_DELETED_FILE);
 		devfs_byname_write();
@@ -776,7 +773,7 @@ devfs_root_v_rename(struct fdirnode *__restrict self,
 		THROWS(E_FSERROR_ILLEGAL_PATH, E_FSERROR_DISK_FULL,
 		       E_FSERROR_READONLY, E_FSERROR_FILE_ALREADY_EXISTS,
 		       E_FSERROR_DELETED) {
-	assert(self == &devfs.rs_sup.fs_root);
+	assert(self == &devfs.fs_root);
 	assert(fdirent_isdevfs(info->frn_oldent) ||
 	       fdirent_isramfs(info->frn_oldent));
 	if (fdirent_isdevfs(info->frn_oldent)) {
@@ -784,7 +781,7 @@ devfs_root_v_rename(struct fdirnode *__restrict self,
 		REF struct fdevfsdirent *old_dirent;
 		REF struct fdevfsdirent *new_dirent;
 		struct device *devfile;
-		assert(info->frn_olddir == &devfs.rs_sup.fs_root);
+		assert(info->frn_olddir == &devfs.fs_root);
 		assert(fnode_isdevice(info->frn_file));
 		devfile    = fnode_asdevice(info->frn_file);
 		new_dirent = (REF struct fdevfsdirent *)kmalloc(offsetof(struct fdevfsdirent, fdd_dirent.fd_name) +
@@ -803,9 +800,9 @@ devfs_root_v_rename(struct fdirnode *__restrict self,
 			new_dirent->fdd_dirent.fd_refcnt  = 2; /* +1: info->mkf_dent, +1: devfile->dv_dirent */
 			new_dirent->fdd_dirent.fd_ops     = &ramfs_dirent_ops;
 			new_dirent->fdd_dirent.fd_hash    = info->frn_hash;
-			new_dirent->fdd_dirent.fd_ino     = devfile->dv_devnode.dn_node.fn_ino; /* INO numbers are constant here. */
+			new_dirent->fdd_dirent.fd_ino     = devfile->fn_ino; /* INO numbers are constant here. */
 			new_dirent->fdd_dirent.fd_namelen = info->frn_namelen;
-			new_dirent->fdd_dirent.fd_type    = IFTODT(devfile->dv_devnode.dn_node.fn_mode);
+			new_dirent->fdd_dirent.fd_type    = IFTODT(devfile->fn_mode);
 			awref_init(&new_dirent->fdd_dev, devfile);
 
 			/* Lock the by-name tree */
@@ -830,7 +827,7 @@ devfs_root_v_rename(struct fdirnode *__restrict self,
 			struct device *existing_device;
 			existing_device = devfs_byname_locate(new_dirent->fdd_dirent.fd_name,
 			                                      new_dirent->fdd_dirent.fd_namelen);
-			if (!existing_device && (info->frn_flags & FS_MODE_FDOSPATH)) {
+			if (!existing_device && (info->frn_flags & AT_DOSPATH)) {
 				existing_device = devfs_byname_caselocate(new_dirent->fdd_dirent.fd_name,
 				                                          new_dirent->fdd_dirent.fd_namelen);
 			}
@@ -904,9 +901,9 @@ devfs_root_v_rename(struct fdirnode *__restrict self,
 		/* Acquire locks. */
 again_acquire_locks:
 		TRY {
-			shared_rwlock_write(&devfs.rs_dat.rdd_treelock);
+			ramfs_dirdata_treelock_write(&devfs.rs_dat);
 			if (!devfs_byname_tryread()) {
-				shared_rwlock_endwrite(&devfs.rs_dat.rdd_treelock);
+				ramfs_dirdata_treelock_endwrite(&devfs.rs_dat);
 				devfs_byname_read();
 				devfs_byname_endread();
 				goto again_acquire_locks;
@@ -921,13 +918,13 @@ again_acquire_locks:
 		if (ramfs_direnttree_locate(devfs.rs_dat.rdd_tree,
 		                            new_dirent->rde_ent.fd_name,
 		                            new_dirent->rde_ent.fd_namelen) ||
-		    ((info->frn_flags & FS_MODE_FDOSPATH) && devfs.rs_dat.rdd_tree &&
+		    ((info->frn_flags & AT_DOSPATH) && devfs.rs_dat.rdd_tree &&
 		     _ramfs_direnttree_caselocate(devfs.rs_dat.rdd_tree,
 		                                  new_dirent->rde_ent.fd_name,
 		                                  new_dirent->rde_ent.fd_namelen))) {
 unlock_and_throw_file_already_exists_error:
 			devfs_byname_endread();
-			shared_rwlock_endwrite(&devfs.rs_dat.rdd_treelock);
+			ramfs_dirdata_treelock_endwrite(&devfs.rs_dat);
 			kfree(new_dirent);
 			THROW(E_FSERROR_FILE_ALREADY_EXISTS);
 		}
@@ -935,7 +932,7 @@ unlock_and_throw_file_already_exists_error:
 			struct device *existing_device;
 			existing_device = devfs_byname_locate(new_dirent->rde_ent.fd_name,
 			                                      new_dirent->rde_ent.fd_namelen);
-			if (!existing_device && (info->frn_flags & FS_MODE_FDOSPATH)) {
+			if (!existing_device && (info->frn_flags & AT_DOSPATH)) {
 				existing_device = devfs_byname_caselocate(new_dirent->rde_ent.fd_name,
 				                                          new_dirent->rde_ent.fd_namelen);
 			}
@@ -951,24 +948,24 @@ unlock_and_throw_file_already_exists_error:
 
 		/* Acquire a lock to the old directory. */
 		if (ramfs_super_asdir(&devfs) != olddir) {
-			if (!shared_rwlock_trywrite(&olddir->rdn_dat.rdd_treelock)) {
+			if (!ramfs_dirdata_treelock_trywrite(&olddir->rdn_dat)) {
 				devfs_byname_endread();
-				shared_rwlock_endwrite(&devfs.rs_dat.rdd_treelock);
+				ramfs_dirdata_treelock_endwrite(&devfs.rs_dat);
 				TRY {
-					shared_rwlock_write(&olddir->rdn_dat.rdd_treelock);
+					ramfs_dirdata_treelock_write(&olddir->rdn_dat);
 				} EXCEPT {
 					kfree(new_dirent);
 					RETHROW();
 				}
-				shared_rwlock_endwrite(&olddir->rdn_dat.rdd_treelock);
+				ramfs_dirdata_treelock_endwrite(&olddir->rdn_dat);
 				goto again_acquire_locks;
 			}
 
 			/* Check if the old directory has already been deleted. */
 			if unlikely(olddir->rdn_dat.rdd_tree == RAMFS_DIRDATA_TREE_DELETED) {
 				devfs_byname_endread();
-				shared_rwlock_endwrite(&olddir->rdn_dat.rdd_treelock);
-				shared_rwlock_endwrite(&devfs.rs_dat.rdd_treelock);
+				ramfs_dirdata_treelock_endwrite(&olddir->rdn_dat);
+				ramfs_dirdata_treelock_endwrite(&devfs.rs_dat);
 				kfree(new_dirent);
 				THROW(E_FSERROR_DELETED, E_FILESYSTEM_DELETED_PATH);
 			}
@@ -981,9 +978,9 @@ unlock_and_throw_file_already_exists_error:
 		                            old_dirent->rde_ent.fd_name,
 		                            old_dirent->rde_ent.fd_namelen) != old_dirent) {
 			if (ramfs_super_asdir(&devfs) != olddir)
-				shared_rwlock_endwrite(&olddir->rdn_dat.rdd_treelock);
+				ramfs_dirdata_treelock_endwrite(&olddir->rdn_dat);
 			devfs_byname_endread();
-			shared_rwlock_endwrite(&devfs.rs_dat.rdd_treelock);
+			ramfs_dirdata_treelock_endwrite(&devfs.rs_dat);
 			kfree(new_dirent);
 			THROW(E_FSERROR_DELETED, E_FILESYSTEM_DELETED_FILE);
 		}
@@ -996,13 +993,13 @@ unlock_and_throw_file_already_exists_error:
 		ramfs_direnttree_insert(&devfs.rs_dat.rdd_tree, new_dirent);
 
 		/* For `new_dirent->rde_node' */
-		incref(&info->frn_file->fn_file);
+		incref(info->frn_file);
 
 		/* Release locks */
 		if (ramfs_super_asdir(&devfs) != olddir)
-			shared_rwlock_endwrite(&olddir->rdn_dat.rdd_treelock);
+			ramfs_dirdata_treelock_endwrite(&olddir->rdn_dat);
 		devfs_byname_endread();
-		shared_rwlock_endwrite(&devfs.rs_dat.rdd_treelock);
+		ramfs_dirdata_treelock_endwrite(&devfs.rs_dat);
 
 		/* Inherited   from   `olddir->rdn_dat.rdd_tree'
 		 * (nokill because caller still has a reference) */
@@ -1014,7 +1011,8 @@ unlock_and_throw_file_already_exists_error:
 }
 
 
-PRIVATE struct fsuper_ops const devfs_ops = {
+/* INTERN because needed in "./devfsdefs.c" */
+INTERN_CONST struct fsuper_ops const devfs_super_ops = {
 	.so_fdir = {
 		.dno_node = {
 			.no_file = {
@@ -1032,94 +1030,25 @@ PRIVATE struct fsuper_ops const devfs_ops = {
 	},
 };
 
-/* The /dev/ filesystem superblock */
-extern struct fnode _devfs__fs_nodes__INIT[];
-PUBLIC struct ramfs_super devfs = {
-	.rs_sup = {
-		.fs_nodes           = _devfs__fs_nodes__INIT,
-		.fs_nodeslock       = ATOMIC_RWLOCK_INIT,
-		.fs_nodeslockops    = SLIST_HEAD_INITIALIZER(devfs.rs_sup.fs_nodeslockops),
-		.fs_mounts          = LIST_HEAD_INITIALIZER(devfs.rs_sup.fs_mounts),
-		.fs_mountslock      = ATOMIC_RWLOCK_INIT,
-		.fs_mountslockops   = SLIST_HEAD_INITIALIZER(devfs.rs_sup.fs_mountslockops),
-		.fs_sys             = &devfs_filesys,
-		.fs_dev             = NULL,
-		.fs_feat = {
-			.sf_filesize_max       = (pos_t)-1,
-			.sf_uid_max            = (uid_t)-1,
-			.sf_gid_max            = (gid_t)-1,
-			.sf_symlink_max        = (pos_t)-1,
-			.sf_link_max           = (nlink_t)-1,
-			.sf_magic              = DEVFS_SUPER_MAGIC,
-			.sf_rec_incr_xfer_size = PAGESIZE,
-			.sf_rec_max_xfer_size  = PAGESIZE,
-			.sf_rec_min_xfer_size  = PAGESIZE,
-			.sf_rec_xfer_align     = PAGESIZE,
-			.sf_name_max           = (u16)-1,
-			.sf_filesizebits       = BITSOF(pos_t),
-		},
-		.fs_changednodes      = LIST_HEAD_INITIALIZER(devfs.rs_sup.fs_changednodes),
-		.fs_changednodes_lock = ATOMIC_LOCK_INIT,
-		.fs_changednodes_lops = SLIST_HEAD_INITIALIZER(devfs.rs_sup.fs_changednodes_lops),
-		.fs_changedsuper      = LIST_ENTRY_UNBOUND_INITIALIZER,
-		.fs_root = {
-			.dn_node = {
-				.fn_file = {
-					MFILE_INIT_mf_refcnt(2), /* +1: devfs, +1: MFILE_FN_GLOBAL_REF */
-					MFILE_INIT_mf_ops(&devfs_ops.so_fdir.dno_node.no_file),
-					MFILE_INIT_mf_lock,
-					MFILE_INIT_mf_parts(MFILE_PARTS_ANONYMOUS),
-					MFILE_INIT_mf_initdone,
-					MFILE_INIT_mf_lockops,
-					MFILE_INIT_mf_changed(MFILE_PARTS_ANONYMOUS),
-					MFILE_INIT_mf_blockshift(PAGESHIFT),
-					MFILE_INIT_mf_flags(MFILE_FS_NOSUID | MFILE_FN_GLOBAL_REF | MFILE_FS_NOEXEC |
-					                    MFILE_F_NOATIME | MFILE_F_NOUSRMMAP | MFILE_F_NOUSRIO |
-					                    MFILE_F_NOMTIME | MFILE_F_PERSISTENT | MFILE_F_FIXEDFILESIZE |
-					                    MFILE_FM_ATTRREADONLY),
-					MFILE_INIT_mf_trunclock,
-					MFILE_INIT_mf_filesize((uint64_t)-1),
-					/* TODO: Have an initializer that copies `boottime' into these 3! */
-					MFILE_INIT_mf_atime(0, 0),
-					MFILE_INIT_mf_mtime(0, 0),
-					MFILE_INIT_mf_ctime(0, 0),
-				},
-				FNODE_INIT_fn_nlink(1),
-				FNODE_INIT_fn_mode(S_IFDIR | 0755),
-				FNODE_INIT_fn_uid(0), /* root */
-				FNODE_INIT_fn_gid(0), /* root */
-				FNODE_INIT_fn_ino(0), /* Fixed INO for root directory */
-				FNODE_INIT_fn_super(&devfs.rs_sup),
-				FNODE_INIT_fn_changed,
-				FNODE_INIT_fn_supent,
-				FNODE_INIT_fn_allsuper_EX({ NULL, &fallsuper_list.lh_first }),
-			},
-			.dn_parent = NULL,
-		},
-	},
-	.rs_dat = {
-		/* TODO */
-	},
-};
 
 
 /* Default operators for `struct device_ops' */
 PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(LOCKOP_CC device_v_destroy_postlop)(struct postlockop *__restrict self) {
 	struct device *me;
-	DEFINE_PUBLIC_SYMBOL(devfs_rootdir, &devfs.rs_sup.fs_root, sizeof(struct ramfs_dirnode));
-	me = container_of(self, struct device, dv_devnode.dn_node.fn_file._mf_plop);
+	DEFINE_PUBLIC_SYMBOL(devfs_rootdir, &devfs.fs_root, sizeof(struct ramfs_dirnode));
+	me = container_of(self, struct device, _mf_plop);
 	decref_likely(me->dv_dirent);
-	fdevnode_v_destroy(&me->dv_devnode.dn_node.fn_file);
+	fdevnode_v_destroy(me);
 }
 PRIVATE NOBLOCK NONNULL((1)) struct postlockop *
 NOTHROW(LOCKOP_CC device_v_destroy_lop)(struct lockop *__restrict self) {
 	struct device *me;
-	me = container_of(self, struct device, dv_devnode.dn_node.fn_file._mf_lop);
+	me = container_of(self, struct device, _mf_lop);
 	if (me->dv_byname_node.rb_lhs != DEVICE_BYNAME_DELETED)
 		devfs_byname_removenode(me);
-	me->dv_devnode.dn_node.fn_file._mf_plop.plo_func = &device_v_destroy_postlop;
-	return &me->dv_devnode.dn_node.fn_file._mf_plop;
+	me->_mf_plop.plo_func = &device_v_destroy_postlop;
+	return &me->_mf_plop;
 }
 
 
@@ -1129,7 +1058,7 @@ PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL device_v_destroy)(struct mfile *__restrict self) {
 	struct device *me;
 	me = mfile_asdevice(self);
-	assert(me->dv_devnode.dn_node.fn_super == &devfs.rs_sup);
+	assert(me->fn_super == &devfs);
 	assert(me->dv_dirent);
 
 	/* Drop reference to associated driver. */
@@ -1147,15 +1076,15 @@ NOTHROW(KCALL device_v_destroy)(struct mfile *__restrict self) {
 			devfs_byname_endwrite();
 		} else {
 			/* Use a lock-op to do the removal */
-			me->dv_devnode.dn_node.fn_file._mf_lop.lo_func = &device_v_destroy_lop;
-			lockop_enqueue(&devfs_byname_lops, &me->dv_devnode.dn_node.fn_file._mf_lop);
+			me->_mf_lop.lo_func = &device_v_destroy_lop;
+			lockop_enqueue(&devfs_byname_lops, &me->_mf_lop);
 			_devfs_byname_reap();
 			return;
 		}
 	}
 
 	decref_likely(me->dv_dirent);
-	fdevnode_v_destroy(&me->dv_devnode.dn_node.fn_file);
+	fdevnode_v_destroy(me);
 }
 
 
@@ -1169,7 +1098,7 @@ extern struct device _devfs_byname_tree__INIT[];
 PUBLIC RBTREE_ROOT(device) devfs_byname_tree = _devfs_byname_tree__INIT;
 
 /* Lock accessor helpers for `devfs_byname_lock' and `devfs_byname_tree' */
-PUBLIC NOBLOCK void KCALL _devfs_byname_reap(void) {
+PUBLIC NOBLOCK void NOTHROW(KCALL _devfs_byname_reap)(void) {
 #ifndef __INTELLISENSE__
 #define __LOCAL_self      (&devfs_byname_lops)
 #define __LOCAL_trylock() devfs_byname_trywrite()
@@ -1199,32 +1128,32 @@ PUBLIC NONNULL((1)) unsigned int FCALL
 device_tryregister(struct device *__restrict self)
 		THROWS(E_WOULDBLOCK) {
 	unsigned int result;
-	assert(self->dv_devnode.dn_node.fn_ino ==
-	       devfs_devnode_makeino(self->dv_devnode.dn_node.fn_mode,
-	                             self->dv_devnode.dn_devno));
+	assert(self->fn_ino ==
+	       devfs_devnode_makeino(self->fn_mode,
+	                             self->dn_devno));
 
 	/* Acquire all required locks. */
 again:
 	devfs_byname_write();
-	if (!fsuper_nodes_trywrite(&devfs.rs_sup)) {
+	if (!fsuper_nodes_trywrite(&devfs)) {
 		devfs_byname_endwrite();
-		while (!fsuper_nodes_canwrite(&devfs.rs_sup))
+		while (!fsuper_nodes_canwrite(&devfs))
 			task_yield();
 		goto again;
 	}
 	if (!fallnodes_tryacquire()) {
-		fsuper_nodes_endwrite(&devfs.rs_sup);
+		fsuper_nodes_endwrite(&devfs);
 		devfs_byname_endwrite();
 		while (!fallnodes_available())
 			task_yield();
 		goto again;
 	}
-	if (!shared_rwlock_tryread(&devfs.rs_dat.rdd_treelock)) {
+	if (!ramfs_dirdata_treelock_tryread(&devfs.rs_dat)) {
 		fallnodes_release();
-		fsuper_nodes_endwrite(&devfs.rs_sup);
+		fsuper_nodes_endwrite(&devfs);
 		devfs_byname_endwrite();
-		shared_rwlock_read(&devfs.rs_dat.rdd_treelock);
-		shared_rwlock_endread(&devfs.rs_dat.rdd_treelock);
+		ramfs_dirdata_treelock_read(&devfs.rs_dat);
+		ramfs_dirdata_treelock_endread(&devfs.rs_dat);
 		goto again;
 	}
 
@@ -1256,23 +1185,23 @@ again:
 	/* Also check in devfs's INode tree. */
 	{
 		struct fnode *existing;
-		assert(devfs.rs_sup.fs_nodes != FSUPER_NODES_DELETED);
-		existing = fsuper_nodes_locate(&devfs.rs_sup, self->dv_devnode.dn_node.fn_ino);
+		assert(devfs.fs_nodes != FSUPER_NODES_DELETED);
+		existing = fsuper_nodes_locate(&devfs, self->fn_ino);
 		if (existing != NULL) {
-			if (!wasdestroyed(&existing->fn_file)) {
+			if (!wasdestroyed(existing)) {
 				result = DEVICE_TRYREGISTER_EXISTS_DEVNO;
 				goto done;
 			}
 			/* Unlink destroyed device. */
-			fsuper_nodes_removenode(&devfs.rs_sup, existing);
+			fsuper_nodes_removenode(&devfs, existing);
 			ATOMIC_WRITE(existing->fn_supent.rb_lhs, FSUPER_NODES_DELETED);
 		}
 	}
 
 	/* Doesn't exist yet -> register our new one! */
-	fsuper_nodes_insert(&devfs.rs_sup, &self->dv_devnode.dn_node);
+	fsuper_nodes_insert(&devfs, self);
 	devfs_byname_insert(self);
-	LIST_INSERT_HEAD(&fallnodes_list, &self->dv_devnode.dn_node, fn_allnodes);
+	LIST_INSERT_HEAD(&fallnodes_list, self, fn_allnodes);
 
 	/* Indicate success */
 	result = DEVICE_TRYREGISTER_SUCCESS;
@@ -1280,9 +1209,9 @@ again:
 done:
 	/* Release all locks */
 	COMPILER_BARRIER();
-	shared_rwlock_endread(&devfs.rs_dat.rdd_treelock);
+	ramfs_dirdata_treelock_endread(&devfs.rs_dat);
 	fallnodes_release();
-	fsuper_nodes_endwrite(&devfs.rs_sup);
+	fsuper_nodes_endwrite(&devfs);
 	devfs_byname_endwrite();
 	return result;
 }
@@ -1302,31 +1231,31 @@ done:
 PUBLIC NONNULL((1)) void FCALL
 device_register(struct device *__restrict self)
 		THROWS(E_WOULDBLOCK) {
-	assert(self->dv_devnode.dn_node.fn_ino ==
-	       devfs_devnode_makeino(self->dv_devnode.dn_node.fn_mode,
-	                             self->dv_devnode.dn_devno));
+	assert(self->fn_ino ==
+	       devfs_devnode_makeino(self->fn_mode,
+	                             self->dn_devno));
 	/* Acquire all required locks. */
 again:
 	devfs_byname_write();
-	if (!fsuper_nodes_trywrite(&devfs.rs_sup)) {
+	if (!fsuper_nodes_trywrite(&devfs)) {
 		devfs_byname_endwrite();
-		while (!fsuper_nodes_canwrite(&devfs.rs_sup))
+		while (!fsuper_nodes_canwrite(&devfs))
 			task_yield();
 		goto again;
 	}
 	if (!fallnodes_tryacquire()) {
-		fsuper_nodes_endwrite(&devfs.rs_sup);
+		fsuper_nodes_endwrite(&devfs);
 		devfs_byname_endwrite();
 		while (!fallnodes_available())
 			task_yield();
 		goto again;
 	}
-	if (!shared_rwlock_tryread(&devfs.rs_dat.rdd_treelock)) {
+	if (!ramfs_dirdata_treelock_tryread(&devfs.rs_dat)) {
 		fallnodes_release();
-		fsuper_nodes_endwrite(&devfs.rs_sup);
+		fsuper_nodes_endwrite(&devfs);
 		devfs_byname_endwrite();
-		shared_rwlock_read(&devfs.rs_dat.rdd_treelock);
-		shared_rwlock_endread(&devfs.rs_dat.rdd_treelock);
+		ramfs_dirdata_treelock_read(&devfs.rs_dat);
+		ramfs_dirdata_treelock_endread(&devfs.rs_dat);
 		goto again;
 	}
 
@@ -1361,35 +1290,41 @@ done_add2byname:
 	/* Try to add the device to the nodes tree. */
 	for (;;) {
 		struct fnode *existing;
-		assert(devfs.rs_sup.fs_nodes != FSUPER_NODES_DELETED);
-		existing = fsuper_nodes_locate(&devfs.rs_sup, self->dv_devnode.dn_node.fn_ino);
+		assert(devfs.fs_nodes != FSUPER_NODES_DELETED);
+		existing = fsuper_nodes_locate(&devfs, self->fn_ino);
 		if likely(!existing)
 			break;
-		if (wasdestroyed(&existing->fn_file)) {
+		if (wasdestroyed(existing)) {
 			/* Unlink destroyed device. */
-			fsuper_nodes_removenode(&devfs.rs_sup, existing);
+			fsuper_nodes_removenode(&devfs, existing);
 			ATOMIC_WRITE(existing->fn_supent.rb_lhs, FSUPER_NODES_DELETED);
 			break;
 		}
 
 		/* Create a new device number */
-		++self->dv_devnode.dn_devno;
-		self->dv_devnode.dn_node.fn_ino = devfs_devnode_makeino(self->dv_devnode.dn_node.fn_mode,
-		                                                        self->dv_devnode.dn_devno);
+		++self->dn_devno;
+		self->fn_ino = devfs_devnode_makeino(self->fn_mode,
+		                                                        self->dn_devno);
 	}
 	/* Add to the inode tree (for lookup by dev_t) */
-	fsuper_nodes_insert(&devfs.rs_sup, &self->dv_devnode.dn_node);
+	fsuper_nodes_insert(&devfs, self);
 
 	/* Insert into the all-nodes list. */
-	LIST_INSERT_HEAD(&fallnodes_list, &self->dv_devnode.dn_node, fn_allnodes);
+	LIST_INSERT_HEAD(&fallnodes_list, self, fn_allnodes);
 
 done:
 	/* Release all locks */
 	COMPILER_BARRIER();
-	shared_rwlock_endread(&devfs.rs_dat.rdd_treelock);
-	fallnodes_release();
-	fsuper_nodes_endwrite(&devfs.rs_sup);
-	devfs_byname_endwrite();
+	_ramfs_dirdata_treelock_endread(&devfs.rs_dat);
+	_fallnodes_release();
+	_fsuper_nodes_endwrite(&devfs);
+	_devfs_byname_endwrite();
+
+	/* Reap locks */
+	ramfs_dirdata_treelock_reap(&devfs.rs_dat);
+	fallnodes_reap();
+	fsuper_nodes_reap(&devfs);
+	devfs_byname_reap();
 }
 
 
@@ -1407,24 +1342,24 @@ done:
 PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(LOCKOP_CC device_delete_remove_from_allnodes_postlop)(struct postlockop *__restrict self) {
 	REF struct device *me;
-	me = container_of(self, struct device, dv_devnode.dn_node.fn_file._mf_plop);
+	me = container_of(self, struct device, _mf_plop);
 
 	/* At this point, all of the global hooks of `me' have been  removed.
 	 * The rest of the deletion work relates only to the underlying mfile
 	 * and includes stuff  like anonymizing any  bound mem-parts  (should
 	 * the device include direct mmap capabilities) */
-	mfile_delete_impl(&me->dv_devnode.dn_node.fn_file); /* Inherit reference */
+	mfile_delete_impl(me); /* Inherit reference */
 }
 
 PRIVATE NOBLOCK NONNULL((1)) struct postlockop *
 NOTHROW(LOCKOP_CC device_delete_remove_from_allnodes_lop)(struct lockop *__restrict self) {
 	REF struct device *me;
-	me = container_of(self, struct device, dv_devnode.dn_node.fn_file._mf_lop);
+	me = container_of(self, struct device, _mf_lop);
 	COMPILER_READ_BARRIER();
-	if (LIST_ISBOUND(&me->dv_devnode.dn_node, fn_allnodes))
-		LIST_UNBIND(&me->dv_devnode.dn_node, fn_allnodes);
-	me->dv_devnode.dn_node.fn_file._mf_plop.plo_func = &device_delete_remove_from_allnodes_postlop; /* Inherit reference */
-	return &me->dv_devnode.dn_node.fn_file._mf_plop;
+	if (LIST_ISBOUND(me, fn_allnodes))
+		LIST_UNBIND(me, fn_allnodes);
+	me->_mf_plop.plo_func = &device_delete_remove_from_allnodes_postlop; /* Inherit reference */
+	return &me->_mf_plop;
 }
 
 
@@ -1432,92 +1367,92 @@ PRIVATE NOBLOCK NONNULL((1, 2)) void
 NOTHROW(LOCKOP_CC device_delete_remove_from_changed_postlop)(Tobpostlockop(fsuper) *__restrict self,
                                                              struct fsuper *__restrict obj) {
 	REF struct device *me;
-	assert(obj == &devfs.rs_sup);
+	assert(obj == &devfs);
 	(void)obj;
-	me = container_of(self, struct device, dv_devnode.dn_node.fn_file._mf_fsuperplop);
+	me = container_of(self, struct device, _mf_fsuperplop);
 
 	/* Remove from `fallnodes_list'. */
 	COMPILER_READ_BARRIER();
-	if (LIST_ISBOUND(&me->dv_devnode.dn_node, fn_allnodes)) {
+	if (LIST_ISBOUND(me, fn_allnodes)) {
 		COMPILER_READ_BARRIER();
 		if (fallnodes_tryacquire()) {
 			COMPILER_READ_BARRIER();
-			if (LIST_ISBOUND(&me->dv_devnode.dn_node, fn_allnodes))
-				LIST_UNBIND(&me->dv_devnode.dn_node, fn_allnodes);
+			if (LIST_ISBOUND(me, fn_allnodes))
+				LIST_UNBIND(me, fn_allnodes);
 			COMPILER_READ_BARRIER();
 			fallnodes_release();
 		} else {
-			me->dv_devnode.dn_node.fn_file._mf_lop.lo_func = &device_delete_remove_from_allnodes_lop; /* Inherit reference */
-			lockop_enqueue(&fallnodes_lockops, &me->dv_devnode.dn_node.fn_file._mf_lop);
+			me->_mf_lop.lo_func = &device_delete_remove_from_allnodes_lop; /* Inherit reference */
+			lockop_enqueue(&fallnodes_lockops, &me->_mf_lop);
 			_fallnodes_reap();
 			return;
 		}
 	}
-	device_delete_remove_from_allnodes_postlop(&me->dv_devnode.dn_node.fn_file._mf_plop); /* Inherit reference */
+	device_delete_remove_from_allnodes_postlop(&me->_mf_plop); /* Inherit reference */
 }
 
 PRIVATE NOBLOCK NONNULL((1, 2)) Tobpostlockop(fsuper) *
 NOTHROW(LOCKOP_CC device_delete_remove_from_changed_lop)(Toblockop(fsuper) *__restrict self,
                                                          struct fsuper *__restrict obj) {
 	REF struct device *me;
-	assert(obj == &devfs.rs_sup);
+	assert(obj == &devfs);
 	(void)obj;
-	me = container_of(self, struct device, dv_devnode.dn_node.fn_file._mf_fsuperlop);
-	if (LIST_ISBOUND(&me->dv_devnode.dn_node, fn_changed)) {
-		LIST_UNBIND(&me->dv_devnode.dn_node, fn_changed);
+	me = container_of(self, struct device, _mf_fsuperlop);
+	if (LIST_ISBOUND(me, fn_changed)) {
+		LIST_UNBIND(me, fn_changed);
 		decref_nokill(me); /* Reference from the `fn_changed' list. */
 	}
 
-	me->dv_devnode.dn_node.fn_file._mf_fsuperplop.oplo_func = &device_delete_remove_from_changed_postlop; /* Inherit reference */
-	return &me->dv_devnode.dn_node.fn_file._mf_fsuperplop;
+	me->_mf_fsuperplop.oplo_func = &device_delete_remove_from_changed_postlop; /* Inherit reference */
+	return &me->_mf_fsuperplop;
 }
 
 PRIVATE NOBLOCK NONNULL((1, 2)) void
 NOTHROW(LOCKOP_CC device_delete_remove_from_byino_postlop)(Tobpostlockop(fsuper) *__restrict self,
                                                            struct fsuper *__restrict obj) {
 	REF struct device *me;
-	assert(obj == &devfs.rs_sup);
+	assert(obj == &devfs);
 	(void)obj;
-	me = container_of(self, struct device, dv_devnode.dn_node.fn_file._mf_fsuperplop);
+	me = container_of(self, struct device, _mf_fsuperplop);
 
-	/* Remove from `devfs.rs_sup.fs_changednodes'. */
+	/* Remove from `devfs.fs_changednodes'. */
 	COMPILER_READ_BARRIER();
-	if (LIST_ISBOUND(&me->dv_devnode.dn_node, fn_changed)) {
+	if (LIST_ISBOUND(me, fn_changed)) {
 		COMPILER_READ_BARRIER();
-		if (fsuper_changednodes_tryacquire(&devfs.rs_sup)) {
+		if (fsuper_changednodes_tryacquire(&devfs)) {
 			COMPILER_READ_BARRIER();
-			if (LIST_ISBOUND(&me->dv_devnode.dn_node, fn_changed)) {
-				LIST_UNBIND(&me->dv_devnode.dn_node, fn_changed);
+			if (LIST_ISBOUND(me, fn_changed)) {
+				LIST_UNBIND(me, fn_changed);
 				decref_nokill(me); /* Reference from the `fn_changed' list. */
 			}
 			COMPILER_READ_BARRIER();
-			fsuper_changednodes_release(&devfs.rs_sup);
+			fsuper_changednodes_release(&devfs);
 		} else {
-			me->dv_devnode.dn_node.fn_file._mf_fsuperlop.olo_func = &device_delete_remove_from_changed_lop; /* Inherit reference */
-			oblockop_enqueue(&devfs.rs_sup.fs_changednodes_lops, &me->dv_devnode.dn_node.fn_file._mf_fsuperlop);
-			_fsuper_changednodes_reap(&devfs.rs_sup);
+			me->_mf_fsuperlop.olo_func = &device_delete_remove_from_changed_lop; /* Inherit reference */
+			oblockop_enqueue(&devfs.fs_changednodes_lops, &me->_mf_fsuperlop);
+			_fsuper_changednodes_reap(&devfs);
 			return;
 		}
 	}
 
-	device_delete_remove_from_changed_postlop(&me->dv_devnode.dn_node.fn_file._mf_fsuperplop,
-	                                          &devfs.rs_sup); /* Inherit reference */
+	device_delete_remove_from_changed_postlop(&me->_mf_fsuperplop,
+	                                          &devfs); /* Inherit reference */
 }
 
 PRIVATE NOBLOCK NONNULL((1, 2)) Tobpostlockop(fsuper) *
 NOTHROW(LOCKOP_CC device_delete_remove_from_byino_lop)(Toblockop(fsuper) *__restrict self,
                                                        struct fsuper *__restrict obj) {
 	REF struct device *me;
-	assert(obj == &devfs.rs_sup);
+	assert(obj == &devfs);
 	(void)obj;
-	me = container_of(self, struct device, dv_devnode.dn_node.fn_file._mf_fsuperlop);
+	me = container_of(self, struct device, _mf_fsuperlop);
 	COMPILER_READ_BARRIER();
-	if (me->dv_devnode.dn_node.fn_supent.rb_lhs != FSUPER_NODES_DELETED) {
-		fsuper_nodes_removenode(&devfs.rs_sup, &me->dv_devnode.dn_node);
-		ATOMIC_WRITE(me->dv_devnode.dn_node.fn_supent.rb_lhs, FSUPER_NODES_DELETED);
+	if (me->fn_supent.rb_lhs != FSUPER_NODES_DELETED) {
+		fsuper_nodes_removenode(&devfs, me);
+		ATOMIC_WRITE(me->fn_supent.rb_lhs, FSUPER_NODES_DELETED);
 	}
-	me->dv_devnode.dn_node.fn_file._mf_fsuperplop.oplo_func = &device_delete_remove_from_byino_postlop; /* Inherit reference */
-	return &me->dv_devnode.dn_node.fn_file._mf_fsuperplop;
+	me->_mf_fsuperplop.oplo_func = &device_delete_remove_from_byino_postlop; /* Inherit reference */
+	return &me->_mf_fsuperplop;
 }
 
 
@@ -1525,39 +1460,39 @@ NOTHROW(LOCKOP_CC device_delete_remove_from_byino_lop)(Toblockop(fsuper) *__rest
 PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(LOCKOP_CC device_delete_remove_from_byname_postlop)(struct postlockop *__restrict self) {
 	REF struct device *me;
-	me = container_of(self, struct device, dv_devnode.dn_node.fn_file._mf_plop);
+	me = container_of(self, struct device, _mf_plop);
 
 	/* Remove from the devfs's INode tree. */
-	if (ATOMIC_READ(me->dv_devnode.dn_node.fn_supent.rb_lhs) != FSUPER_NODES_DELETED) {
-		if (fsuper_nodes_trywrite(&devfs.rs_sup)) {
+	if (ATOMIC_READ(me->fn_supent.rb_lhs) != FSUPER_NODES_DELETED) {
+		if (fsuper_nodes_trywrite(&devfs)) {
 			COMPILER_READ_BARRIER();
-			if (me->dv_devnode.dn_node.fn_supent.rb_lhs != FSUPER_NODES_DELETED) {
-				fsuper_nodes_removenode(&devfs.rs_sup, &me->dv_devnode.dn_node);
-				ATOMIC_WRITE(me->dv_devnode.dn_node.fn_supent.rb_lhs, FSUPER_NODES_DELETED);
+			if (me->fn_supent.rb_lhs != FSUPER_NODES_DELETED) {
+				fsuper_nodes_removenode(&devfs, me);
+				ATOMIC_WRITE(me->fn_supent.rb_lhs, FSUPER_NODES_DELETED);
 			}
-			fsuper_nodes_endwrite(&devfs.rs_sup);
+			fsuper_nodes_endwrite(&devfs);
 		} else {
-			me->dv_devnode.dn_node.fn_file._mf_fsuperlop.olo_func = &device_delete_remove_from_byino_lop; /* Inherit reference */
-			oblockop_enqueue(&devfs.rs_sup.fs_nodeslockops, &me->dv_devnode.dn_node.fn_file._mf_fsuperlop);
-			_fsuper_nodes_reap(&devfs.rs_sup);
+			me->_mf_fsuperlop.olo_func = &device_delete_remove_from_byino_lop; /* Inherit reference */
+			oblockop_enqueue(&devfs.fs_nodeslockops, &me->_mf_fsuperlop);
+			_fsuper_nodes_reap(&devfs);
 			return;
 		}
 	}
-	device_delete_remove_from_byino_postlop(&me->dv_devnode.dn_node.fn_file._mf_fsuperplop,
-	                                        &devfs.rs_sup); /* Inherit reference */
+	device_delete_remove_from_byino_postlop(&me->_mf_fsuperplop,
+	                                        &devfs); /* Inherit reference */
 }
 
 PRIVATE NOBLOCK NONNULL((1)) struct postlockop *
 NOTHROW(LOCKOP_CC device_delete_remove_from_byname_lop)(struct lockop *__restrict self) {
 	REF struct device *me;
-	me = container_of(self, struct device, dv_devnode.dn_node.fn_file._mf_lop);
+	me = container_of(self, struct device, _mf_lop);
 	COMPILER_READ_BARRIER();
 	if (me->dv_byname_node.rb_lhs != DEVICE_BYNAME_DELETED) {
 		devfs_byname_removenode(me);
 		me->dv_byname_node.rb_lhs = DEVICE_BYNAME_DELETED;
 	}
-	me->dv_devnode.dn_node.fn_file._mf_plop.plo_func = &device_delete_remove_from_byname_postlop; /* Inherit reference */
-	return &me->dv_devnode.dn_node.fn_file._mf_plop;
+	me->_mf_plop.plo_func = &device_delete_remove_from_byname_postlop; /* Inherit reference */
+	return &me->_mf_plop;
 }
 
 
@@ -1568,24 +1503,25 @@ NOTHROW(LOCKOP_CC device_delete_remove_from_byname_lop)(struct lockop *__restric
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL device_delete)(struct device *__restrict self) {
 	uintptr_t old_flags;
-	assert(self->dv_devnode.dn_node.fn_super == &devfs.rs_sup);
+	assert(self->fn_super == &devfs);
 
 	/* Delete global reference to the device. */
-	if (ATOMIC_FETCHAND(self->dv_devnode.dn_node.fn_file.mf_flags, ~(MFILE_FN_GLOBAL_REF |
+	if (ATOMIC_FETCHAND(self->mf_flags, ~(MFILE_FN_GLOBAL_REF |
 	                                                                 MFILE_F_PERSISTENT)) &
-	    MFILE_FN_GLOBAL_REF)
-		decref_nokill(&self->dv_devnode.dn_node.fn_file);
+	    MFILE_FN_GLOBAL_REF) {
+		decref_nokill(self);
+	}
 
 	/* Mark the device as deleted (and make available use of the file fields) */
-	mfile_tslock_acquire(&self->dv_devnode.dn_node.fn_file);
-	old_flags = ATOMIC_FETCHOR(self->dv_devnode.dn_node.fn_file.mf_flags,
+	mfile_tslock_acquire(self);
+	old_flags = ATOMIC_FETCHOR(self->mf_flags,
 	                           MFILE_F_DELETED | MFILE_F_NOATIME | MFILE_F_NOMTIME |
 	                           MFILE_F_CHANGED | MFILE_F_ATTRCHANGED | MFILE_F_FIXEDFILESIZE |
 	                           MFILE_FM_ATTRREADONLY | MFILE_F_NOUSRMMAP | MFILE_F_NOUSRIO |
 	                           MFILE_FS_NOSUID | MFILE_FS_NOEXEC | MFILE_F_READONLY);
 	if (old_flags & MFILE_F_PERSISTENT)
-		ATOMIC_AND(self->dv_devnode.dn_node.fn_file.mf_flags, ~MFILE_F_PERSISTENT); /* Also clear the PERSISTENT flag */
-	mfile_tslock_release(&self->dv_devnode.dn_node.fn_file);
+		ATOMIC_AND(self->mf_flags, ~MFILE_F_PERSISTENT); /* Also clear the PERSISTENT flag */
+	mfile_tslock_release(self);
 
 	if (old_flags & MFILE_F_DELETED)
 		return; /* Already deleted, or deletion already in progress. */
@@ -1602,13 +1538,13 @@ NOTHROW(FCALL device_delete)(struct device *__restrict self) {
 			}
 			devfs_byname_endwrite();
 		} else {
-			self->dv_devnode.dn_node.fn_file._mf_lop.lo_func = &device_delete_remove_from_byname_lop; /* Inherit reference */
-			lockop_enqueue(&devfs_byname_lops, &self->dv_devnode.dn_node.fn_file._mf_lop);
+			self->_mf_lop.lo_func = &device_delete_remove_from_byname_lop; /* Inherit reference */
+			lockop_enqueue(&devfs_byname_lops, &self->_mf_lop);
 			_devfs_byname_reap();
 			return;
 		}
 	}
-	device_delete_remove_from_byname_postlop(&self->dv_devnode.dn_node.fn_file._mf_plop); /* Inherit reference */
+	device_delete_remove_from_byname_postlop(&self->_mf_plop); /* Inherit reference */
 }
 
 
@@ -1623,11 +1559,11 @@ NOTHROW(FCALL device_delete)(struct device *__restrict self) {
 PUBLIC WUNUSED REF struct device *FCALL
 device_lookup_byino(ino_t ino) THROWS(E_WOULDBLOCK) {
 	REF struct device *result;
-	fsuper_nodes_read(&devfs.rs_sup);
-	result = (REF struct device *)fsuper_nodes_locate(&devfs.rs_sup, ino);
+	fsuper_nodes_read(&devfs);
+	result = (REF struct device *)fsuper_nodes_locate(&devfs, ino);
 	if (result && !tryincref(result))
 		result = NULL; /* Device already destroyed */
-	fsuper_nodes_endread(&devfs.rs_sup);
+	fsuper_nodes_endread(&devfs);
 	return result;
 }
 
@@ -1650,7 +1586,7 @@ device_lookup_byname(USER CHECKED char const *name,
 		RETHROW();
 	}
 	if (result && st_mode != 0 &&
-	    (result->dv_devnode.dn_node.fn_mode & S_IFMT) != (st_mode & S_IFMT))
+	    (result->fn_mode & S_IFMT) != (st_mode & S_IFMT))
 		result = NULL; /* Wrong mode */
 	if (result && !tryincref(result))
 		result = NULL; /* Device already destroyed */
@@ -1691,17 +1627,17 @@ PUBLIC WUNUSED NONNULL((1)) REF struct blkdev *FCALL
 device_lookup_bypartguid(guid_t const *__restrict guid)
 		THROWS(E_WOULDBLOCK) {
 	REF struct blkdev *result;
-	fsuper_nodes_read(&devfs.rs_sup);
+	fsuper_nodes_read(&devfs);
 	result = NULL;
-	assert(devfs.rs_sup.fs_nodes != FSUPER_NODES_DELETED);
-	if likely(devfs.rs_sup.fs_nodes != NULL) {
-		result = devfs_find_partguid(devfs.rs_sup.fs_nodes, guid, NULL);
+	assert(devfs.fs_nodes != FSUPER_NODES_DELETED);
+	if likely(devfs.fs_nodes != NULL) {
+		result = devfs_find_partguid(devfs.fs_nodes, guid, NULL);
 		if (result == (REF struct blkdev *)-1)
 			result = NULL; /* Ambiguous */
 	}
-	if (result && !tryincref(&result->bd_dev))
+	if (result && !tryincref(result))
 		result = NULL;
-	fsuper_nodes_endread(&devfs.rs_sup);
+	fsuper_nodes_endread(&devfs);
 	return result;
 }
 
@@ -1783,11 +1719,11 @@ do_dump_blkdev(struct blkdev *__restrict self,
 	                  "%-11" PRIu64 "  "
 	                  "%" PRIuSIZ "\n"),
 	           (unsigned int)longest_device_name,
-	           device_getname(&self->bd_dev),
-	           (unsigned int)MAJOR(self->bd_dev.dv_devnode.dn_devno),
-	           (unsigned int)MINOR(self->bd_dev.dv_devnode.dn_devno),
+	           device_getname(self),
+	           (unsigned int)MAJOR(self->dn_devno),
+	           (unsigned int)MINOR(self->dn_devno),
 	           (unsigned int)longest_driver_name,
-	           self->bd_dev.dv_driver->d_name,
+	           self->dv_driver->d_name,
 	           total_bytes_adj, total_bytes_name,
 	           (uint64_t)blkdev_getsectorcount(self),
 	           (size_t)blkdev_getsectorsize(self));
@@ -1858,8 +1794,8 @@ DBG_COMMAND(lsblk,
             "\tList all defined block devices\n") {
 	size_t longest_device_name = COMPILER_STRLEN("name");
 	size_t longest_driver_name = COMPILER_STRLEN("driver");
-	if (devfs.rs_sup.fs_nodes) {
-		gather_longest_name_lengths(devfs.rs_sup.fs_nodes, S_IFBLK,
+	if (devfs.fs_nodes) {
+		gather_longest_name_lengths(devfs.fs_nodes, S_IFBLK,
 		                            &longest_device_name,
 		                            &longest_driver_name);
 	}
@@ -1870,8 +1806,8 @@ DBG_COMMAND(lsblk,
 	if (longest_driver_name > COMPILER_STRLEN("driver"))
 		format_repeat(&dbg_printer, NULL, ' ', longest_driver_name - COMPILER_STRLEN("driver"));
 	dbg_print(DBGSTR("  size      sectors      sector-size\n"));
-	if (devfs.rs_sup.fs_nodes) {
-		dump_blkdev(devfs.rs_sup.fs_nodes,
+	if (devfs.fs_nodes) {
+		dump_blkdev(devfs.fs_nodes,
 		            longest_device_name,
 		            longest_driver_name);
 	}
@@ -1901,13 +1837,13 @@ do_dump_chrdev(struct chrdev *__restrict self,
 	                  "%-3.2" PRIxN(__SIZEOF_MINOR_T__) "  "
 	                  "%*-s  %-8s  "),
 	           (unsigned int)longest_device_name,
-	           self->cd_dev.dv_dirent->fdd_dirent.fd_name,
-	           (unsigned int)MAJOR(self->cd_dev.dv_devnode.dn_devno),
-	           (unsigned int)MINOR(self->cd_dev.dv_devnode.dn_devno),
+	           self->dv_dirent->fdd_dirent.fd_name,
+	           (unsigned int)MAJOR(self->dn_devno),
+	           (unsigned int)MINOR(self->dn_devno),
 	           (unsigned int)longest_driver_name,
-	           self->cd_dev.dv_driver->d_name,
+	           self->dv_driver->d_name,
 	           kind);
-	ops = self->cd_dev.dv_devnode.dn_node.fn_file.mf_ops->mo_stream;
+	ops = self->mf_ops->mo_stream;
 	dbg_putc((ops->mso_read || ops->mso_readv) ? 'r' : '-');
 	dbg_putc((ops->mso_write || ops->mso_writev) ? 'w' : '-');
 	dbg_putc((ops->mso_pread || ops->mso_preadv) ? 'R' : '-');
@@ -1958,8 +1894,8 @@ DBG_COMMAND(lschr,
             "\t\t" AC_WHITE("p") ": Supports " AC_WHITE("poll") "\n") {
 	size_t longest_device_name = COMPILER_STRLEN("name");
 	size_t longest_driver_name = COMPILER_STRLEN("driver");
-	if (devfs.rs_sup.fs_nodes) {
-		gather_longest_name_lengths(devfs.rs_sup.fs_nodes, S_IFCHR,
+	if (devfs.fs_nodes) {
+		gather_longest_name_lengths(devfs.fs_nodes, S_IFCHR,
 		                            &longest_device_name,
 		                            &longest_driver_name);
 	}
@@ -1970,8 +1906,8 @@ DBG_COMMAND(lschr,
 	if (longest_driver_name > COMPILER_STRLEN("driver"))
 		format_repeat(&dbg_printer, NULL, ' ', longest_driver_name - COMPILER_STRLEN("driver"));
 	dbg_print(DBGSTR("  kind      features\n"));
-	if (devfs.rs_sup.fs_nodes) {
-		dump_chrdev(devfs.rs_sup.fs_nodes,
+	if (devfs.fs_nodes) {
+		dump_chrdev(devfs.fs_nodes,
 		            longest_device_name,
 		            longest_driver_name);
 	}

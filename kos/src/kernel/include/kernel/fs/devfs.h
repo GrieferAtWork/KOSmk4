@@ -34,7 +34,7 @@
 #include <bits/os/timespec.h>
 #include <kos/aref.h>
 #include <kos/guid.h>
-#include <kos/io.h>
+#include <kos/io.h> /* S_IFCHR, S_IFBLK */
 #include <kos/kernel/paging.h>
 #include <kos/lockop.h>
 
@@ -206,7 +206,7 @@ DATDEF struct lockop_slist devfs_byname_lops;     /* Lock operations for `devfs_
 DATDEF RBTREE_ROOT(device) devfs_byname_tree; /* [0..n][lock(devfs_byname_lock)] By-name tree of device files. */
 
 /* Lock accessor helpers for `devfs_byname_lock' and `devfs_byname_tree' */
-FUNDEF NOBLOCK void KCALL _devfs_byname_reap(void);
+FUNDEF NOBLOCK void NOTHROW(KCALL _devfs_byname_reap)(void);
 #ifdef __OPTIMIZE_SIZE__
 #define devfs_byname_reap() _devfs_byname_reap()
 #else /* __OPTIMIZE_SIZE__ */

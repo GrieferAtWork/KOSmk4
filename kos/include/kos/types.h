@@ -321,7 +321,7 @@ typedef __signo_t signo_t; /* Signal number (one of `SIG*' from <signal.h>) */
 
 #ifndef __atflag_t_defined
 #define __atflag_t_defined
-typedef __atflag_t atflag_t;
+typedef __atflag_t atflag_t; /* Set of `AT_*' */
 #endif /* !atflag_t_defined */
 
 #ifndef __pid_t_defined

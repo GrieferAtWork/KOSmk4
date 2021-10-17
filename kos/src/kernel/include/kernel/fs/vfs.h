@@ -1,0 +1,202 @@
+/* Copyright (c) 2019-2021 Griefer@Work                                       *
+ *                                                                            *
+ * This software is provided 'as-is', without any express or implied          *
+ * warranty. In no event will the authors be held liable for any damages      *
+ * arising from the use of this software.                                     *
+ *                                                                            *
+ * Permission is granted to anyone to use this software for any purpose,      *
+ * including commercial applications, and to alter it and redistribute it     *
+ * freely, subject to the following restrictions:                             *
+ *                                                                            *
+ * 1. The origin of this software must not be misrepresented; you must not    *
+ *    claim that you wrote the original software. If you use this software    *
+ *    in a product, an acknowledgement (see the following) in the product     *
+ *    documentation is required:                                              *
+ *    Portions Copyright (c) 2019-2021 Griefer@Work                           *
+ * 2. Altered source versions must be plainly marked as such, and must not be *
+ *    misrepresented as being the original software.                          *
+ * 3. This notice may not be removed or altered from any source distribution. *
+ */
+#ifndef GUARD_KERNEL_INCLUDE_KERNEL_FS_VFS_H
+#define GUARD_KERNEL_INCLUDE_KERNEL_FS_VFS_H 1
+
+#include <kernel/compiler.h>
+
+#ifndef CONFIG_USE_NEW_FS
+#include <fs/node.h>
+#else /* !CONFIG_USE_NEW_FS */
+#include <kernel/types.h>
+#include <sched/atomic64.h>
+#include <sched/pertask.h>
+
+#include <hybrid/sequence/list.h>
+#include <hybrid/sync/atomic-lock.h>
+#include <hybrid/sync/atomic-rwlock.h>
+
+#include <kos/lockop.h>
+
+#ifdef __CC__
+DECL_BEGIN
+
+struct path;
+struct pathmount;
+#ifndef __path_tailq_defined
+#define __path_tailq_defined
+TAILQ_HEAD(path_tailq, path);
+#endif /* !__path_tailq_defined */
+#ifndef __pathmount_list_defined
+#define __pathmount_list_defined
+LIST_HEAD(pathmount_list, pathmount);
+#endif /* !__pathmount_list_defined */
+
+/* # of different DOS drives. */
+#define VFS_DRIVECOUNT  (('Z' - 'A') + 1)
+
+
+/* VFS is the controller hub for mounting points and DOS drive roots,
+ * as well  as keeper  of the  true filesystem  root mounting  point. */
+struct vfs {
+	WEAK refcnt_t             vf_refcnt;     /* Reference counter */
+	REF struct path          *vf_root;       /* [1..1][lock(vf_rootlock)] True VFS root path. */
+	struct atomic_rwlock      vf_rootlock;   /* Lock for `vf_root' */
+	struct REF pathmount_list vf_mounts;     /* [0..n][lock(vf_mountslock)] List of mounting points. */
+	struct atomic_lock        vf_mountslock; /* Lock for `vf_mounts' */
+	struct REF path_tailq     vf_recent;     /* [0..n][lock(vf_recentlock)] List of recently used paths. */
+	size_t                    vf_recentcnt;  /* [lock(vf_recentlock)] # of paths in `vf_recent' */
+	WEAK size_t               vf_recentmax;  /* [lock(ATOMIC)] Max # of paths in `vf_recent'. When a new
+	                                          * path becomes recently used that hasn't already been used
+	                                          * recently, the least recently  used path is removed  from
+	                                          * the cache if `vf_recentcnt >= vf_recentmax'. */
+	struct atomic_lock        vf_recentlock; /* Lock for `vf_recent' */
+	REF struct path          *vf_drives[VFS_DRIVECOUNT]; /* [0..1][lock(vf_driveslock)][*] DOS Drive roots. */
+	struct atomic_rwlock      vf_driveslock; /* Lock for for DOS drives. */
+};
+
+/* Helper macros for working with `struct vfs::vf_driveslock' */
+#define _vfs_driveslock_reap(self)      (void)0
+#define vfs_driveslock_reap(self)       (void)0
+#define vfs_driveslock_write(self)      atomic_rwlock_write(&(self)->vf_driveslock)
+#define vfs_driveslock_write_nx(self)   atomic_rwlock_write_nx(&(self)->vf_driveslock)
+#define vfs_driveslock_trywrite(self)   atomic_rwlock_trywrite(&(self)->vf_driveslock)
+#define vfs_driveslock_endwrite(self)   (atomic_rwlock_endwrite(&(self)->vf_driveslock), vfs_driveslock_reap(self))
+#define _vfs_driveslock_endwrite(self)  atomic_rwlock_endwrite(&(self)->vf_driveslock)
+#define vfs_driveslock_read(self)       atomic_rwlock_read(&(self)->vf_driveslock)
+#define vfs_driveslock_read_nx(self)    atomic_rwlock_read_nx(&(self)->vf_driveslock)
+#define vfs_driveslock_tryread(self)    atomic_rwlock_tryread(&(self)->vf_driveslock)
+#define _vfs_driveslock_endread(self)   atomic_rwlock_endread(&(self)->vf_driveslock)
+#define vfs_driveslock_endread(self)    (void)(atomic_rwlock_endread(&(self)->vf_driveslock) && (vfs_driveslock_reap(self), 0))
+#define _vfs_driveslock_end(self)       atomic_rwlock_end(&(self)->vf_driveslock)
+#define vfs_driveslock_end(self)        (void)(atomic_rwlock_end(&(self)->vf_driveslock) && (vfs_driveslock_reap(self), 0))
+#define vfs_driveslock_upgrade(self)    atomic_rwlock_upgrade(&(self)->vf_driveslock)
+#define vfs_driveslock_upgrade_nx(self) atomic_rwlock_upgrade_nx(&(self)->vf_driveslock)
+#define vfs_driveslock_tryupgrade(self) atomic_rwlock_tryupgrade(&(self)->vf_driveslock)
+#define vfs_driveslock_downgrade(self)  atomic_rwlock_downgrade(&(self)->vf_driveslock)
+#define vfs_driveslock_reading(self)    atomic_rwlock_reading(&(self)->vf_driveslock)
+#define vfs_driveslock_writing(self)    atomic_rwlock_writing(&(self)->vf_driveslock)
+#define vfs_driveslock_canread(self)    atomic_rwlock_canread(&(self)->vf_driveslock)
+#define vfs_driveslock_canwrite(self)   atomic_rwlock_canwrite(&(self)->vf_driveslock)
+
+
+/* Default kernel and /bin/init VFS controller. */
+DATDEF struct vfs vfs_kernel;
+
+/* Clone the given VFS, duplicating the sub-tree of paths from `self' that  are
+ * formed by paths reachable from `vf_drives',  or `vf_mounts', as well as  the
+ * root `vf_root' itself. (Only contents of the recent cache aren't duplicated) */
+FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct vfs *KCALL
+vfs_clone(struct vfs *__restrict self) THROWS(E_BADALLOC);
+
+
+/* (try) to add the given path `self' to the cache of recently used paths.
+ * If the  lock to  `path_vfs->vf_recentlock' cannot  be acquired  without
+ * blocking, simply do nothing.
+ * @return: * : Always re-returns `self'. */
+FUNDEF NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) struct path *
+NOTHROW(FCALL vfs_recent)(struct vfs *__restrict path_vfs,
+                          struct path *__restrict self);
+
+
+
+
+
+
+typedef union {
+	struct {
+		WEAK u32    f_atmask; /* File system operations mode mask (Set of negated `FS_MODE_F*'). */
+		WEAK u32    f_atflag; /* File system operations mode flags (Set of negated `FS_MODE_F*'). */
+	};
+	WEAK u64        f_mode;   /* File system operations mode. */
+	WEAK atomic64_t f_atom;   /* File system operations mode. */
+} fs_mask_t;
+
+
+/* FS is the high-level filesystem controller that expands upon VFS by
+ * adding commonly thought-of as "per-process" variables such as  PWD,
+ * CHROOT, UMASK, and other configuration variables, as well as  DOS's
+ * per-drive PWD directories. */
+struct fs {
+	WEAK refcnt_t        fs_refcnt;               /* Reference counter. */
+	REF struct vfs      *fs_vfs;                  /* [1..1][const] The underlying VFS. */
+	struct atomic_rwlock fs_pathlock;             /* Lock for accessing dynamic filesystem paths (cwd, root, drive-local CWDs) */
+	REF struct path     *fs_root;                 /* [1..1][lock(fs_pathlock)] Root directory. */
+	REF struct path     *fs_cwd;                  /* [1..1][lock(fs_pathlock)] Current working directory. */
+	REF struct path     *fs_dcwd[VFS_DRIVECOUNT]; /* [0..1][lock(fs_pathlock)][*] Per-drive working directories.
+	                                               * NOTE: When `NULL', use `f_vfs->v_drives[INDEX]' instead. */
+	WEAK mode_t          fs_umask;                /* [lock(ATOMIC)] The currently effective UMASK.
+	                                               * NOTE: All bits not masked by `0777' _MUST_ always be ZERO(0)! */
+	WEAK u32             fs_lnkmax;               /* The max number of symbolic links allowed during resolution of a path.
+	                                               * This field defaults to `SYMLOOP_MAX'. */
+	fs_mask_t            fs_mode;                 /* Filesystem mode */
+};
+
+/* Helper macros for working with `struct fs::fs_pathlock' */
+#define _fs_pathlock_reap(self)      (void)0
+#define fs_pathlock_reap(self)       (void)0
+#define fs_pathlock_write(self)      atomic_rwlock_write(&(self)->fs_pathlock)
+#define fs_pathlock_write_nx(self)   atomic_rwlock_write_nx(&(self)->fs_pathlock)
+#define fs_pathlock_trywrite(self)   atomic_rwlock_trywrite(&(self)->fs_pathlock)
+#define fs_pathlock_endwrite(self)   (atomic_rwlock_endwrite(&(self)->fs_pathlock), fs_pathlock_reap(self))
+#define _fs_pathlock_endwrite(self)  atomic_rwlock_endwrite(&(self)->fs_pathlock)
+#define fs_pathlock_read(self)       atomic_rwlock_read(&(self)->fs_pathlock)
+#define fs_pathlock_read_nx(self)    atomic_rwlock_read_nx(&(self)->fs_pathlock)
+#define fs_pathlock_tryread(self)    atomic_rwlock_tryread(&(self)->fs_pathlock)
+#define _fs_pathlock_endread(self)   atomic_rwlock_endread(&(self)->fs_pathlock)
+#define fs_pathlock_endread(self)    (void)(atomic_rwlock_endread(&(self)->fs_pathlock) && (fs_pathlock_reap(self), 0))
+#define _fs_pathlock_end(self)       atomic_rwlock_end(&(self)->fs_pathlock)
+#define fs_pathlock_end(self)        (void)(atomic_rwlock_end(&(self)->fs_pathlock) && (fs_pathlock_reap(self), 0))
+#define fs_pathlock_upgrade(self)    atomic_rwlock_upgrade(&(self)->fs_pathlock)
+#define fs_pathlock_upgrade_nx(self) atomic_rwlock_upgrade_nx(&(self)->fs_pathlock)
+#define fs_pathlock_tryupgrade(self) atomic_rwlock_tryupgrade(&(self)->fs_pathlock)
+#define fs_pathlock_downgrade(self)  atomic_rwlock_downgrade(&(self)->fs_pathlock)
+#define fs_pathlock_reading(self)    atomic_rwlock_reading(&(self)->fs_pathlock)
+#define fs_pathlock_writing(self)    atomic_rwlock_writing(&(self)->fs_pathlock)
+#define fs_pathlock_canread(self)    atomic_rwlock_canread(&(self)->fs_pathlock)
+#define fs_pathlock_canwrite(self)   atomic_rwlock_canwrite(&(self)->fs_pathlock)
+
+/* Default kernel and /bin/init FS controller. */
+DATDEF struct fs fs_kernel;
+
+/* [1..1][const] Filesystem controller for the current thread */
+DATDEF ATTR_PERTASK REF struct fs *this_fs;
+#define THIS_FS        PERTASK_GET(this_fs)
+#define THIS_VFS       (THIS_FS->fs_vfs)
+
+/* Clone the given FS
+ * @param: clone_vfs: When true, also clone the VFS, else share the same one. */
+FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct fs *KCALL
+fs_clone(struct fs *__restrict self, bool clone_vfs) THROWS(E_BADALLOC);
+
+
+/* Return currently set CWD/ROOT of the given filesystem. */
+FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct path *FCALL
+fs_getcwd(struct fs *__restrict self) THROWS(E_WOULDBLOCK);
+FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct path *FCALL
+fs_getroot(struct fs *__restrict self) THROWS(E_WOULDBLOCK);
+
+
+
+DECL_END
+#endif /* __CC__ */
+#endif /* CONFIG_USE_NEW_FS */
+
+#endif /* !GUARD_KERNEL_INCLUDE_KERNEL_FS_VFS_H */

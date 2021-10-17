@@ -144,9 +144,6 @@
 #endif /* __KOS_VERSION__ >= 400 */
 #else /* __KOS_VERSION__ >= 300 */
 #define __AT_REMOVEREG        0x40000 /* ... */
-#ifdef __USE_KOS_KERNEL
-#define __AT_REMOVEMNT        0x80000 /* Used internally by the kernel: Delete a mounting point. (Userspace must use `unmount()') */
-#endif /* __USE_KOS_KERNEL */
 #endif /* __KOS_VERSION__ < 300 */
 #define __AT_DOSPATH         0x100000 /* Interpret '\\'  as  '/',  and ignore  casing  during  path  resolution.
                                        * Additionally,  recognize  `<LETTER>:'-style  drive  prefixes,  as  well

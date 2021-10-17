@@ -1043,13 +1043,6 @@ enum __pid_type {
 #define AT_ALTPATH __AT_ALTPATH
 #endif /* !AT_ALTPATH && __AT_ALTPATH */
 
-#ifdef __USE_KOS_KERNEL
-/* Used internally by the kernel: Delete a mounting point. (Userspace must use `unmount()') */
-#if !defined(AT_REMOVEMNT) && defined(__AT_REMOVEMNT)
-#define AT_REMOVEMNT __AT_REMOVEMNT
-#endif /* !AT_REMOVEMNT && __AT_REMOVEMNT */
-#endif /* __USE_KOS_KERNEL */
-
 /* Interpret '\\'  as  '/',  and ignore  casing  during  path  resolution.
  * Additionally,  recognize  `<LETTER>:'-style  drive  prefixes,  as  well
  * as make use of per-drive working directories, as well as drive-relative

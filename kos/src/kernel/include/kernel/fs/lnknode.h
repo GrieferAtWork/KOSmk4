@@ -28,9 +28,6 @@
 #include <kernel/fs/node.h>
 #include <kernel/types.h>
 
-#include <bits/os/timespec.h>
-#include <kos/io.h>
-
 #ifdef __CC__
 DECL_BEGIN
 
@@ -76,6 +73,23 @@ struct flnknode_ops {
 	/*ATTR_PURE*/ ATTR_RETNONNULL WUNUSED NONNULL((1)) char const *
 	(KCALL *lno_linkstr)(struct flnknode *__restrict self)
 			THROWS(E_IOERROR, E_BADALLOC, ...);
+
+	/* [0..1] Optional helper function that is used when open(2) is called with
+	 *        this  symbolic link being the last component of the given path.
+	 *        When this operator returns `false', the behavior is the same as
+	 *        when it isn't provided at all.
+	 * This function should fill `result->h_data' and `result->h_type' with the
+	 * object which should be opened if the link `self' were dereferenced. When
+	 * this operator isn't implement or returns `false', use `lno_linkstr'  and
+	 * `lno_readlink'  to do a  normal filesystem path walk  to follow the link
+	 * contents.
+	 *
+	 * This operator is mainly needed to implement the special dup()-behavior
+	 * of `open("/proc/[pid]/fd/[no]")' */
+	WUNUSED NONNULL((1)) __BOOL
+	(KCALL *lno_openlink)(struct flnknode *__restrict self,
+	                      struct handle *__restrict result)
+			THROWS(E_IOERROR, E_BADALLOC, ...);
 };
 
 
@@ -118,6 +132,7 @@ struct flnknode
 	((*flnknode_getops(self)->lno_readlink)(self, buf, bufsize))
 #define flnknode_haslinkstr(self) (flnknode_getops(self)->lno_linkstr != __NULLPTR) /* Check if available */
 #define flnknode_getlinkstr(self) ((*flnknode_getops(self)->lno_linkstr)(self))     /* Return link string */
+#define flnknode_getlinklen(self) (__COMPILER_READ_BARRIER(), (size_t)__atomic64_val((self)->_flnknode_node_ _fnode_file_ mf_filesize))
 
 
 

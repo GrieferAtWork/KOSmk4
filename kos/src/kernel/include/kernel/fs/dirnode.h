@@ -28,19 +28,19 @@
 #include <kernel/fs/node.h>
 #include <kernel/types.h>
 
+#include <asm/os/fcntl.h> /* __AT_DOSPATH */
 #include <bits/os/timespec.h>
-#include <kos/io.h>
+#include <kos/io.h> /* readdir_mode_t */
+
+#if !defined(AT_DOSPATH) && defined(__AT_DOSPATH)
+#define AT_DOSPATH __AT_DOSPATH
+#endif /* !AT_DOSPATH && __AT_DOSPATH */
 
 #ifdef __CC__
 DECL_BEGIN
 
 struct fdirent;
 struct fdirnode;
-
-#ifndef __fsmode_t_defined
-#define __fsmode_t_defined
-typedef uintptr_t fsmode_t; /* Set of `FS_MODE_F*' */
-#endif /* !__fsmode_t_defined */
 
 
 /* Special value for uncalculated hash */
@@ -53,13 +53,15 @@ struct flookup_info {
 	                                                 * `FLOOKUP_INFO_HASH_UNSET'  if  not calculated. */
 	u16                                flu_namelen; /* Length of `mkf_name' */
 	u16                               _flu_pad;     /* ... */
-	u32                                flu_flags;   /* Set of `0 | FS_MODE_FDOSPATH' */
+	atflag_t                           flu_flags;   /* Set of `0 | AT_DOSPATH' (other flags are silently ignored) */
 };
 
-/* Flags for `fmkfile_info::mkf_flags' */
-#define FMKFILE_F_NORMAL 0x0000           /* [in] Normal flags */
-#define FMKFILE_F_NOCASE FS_MODE_FDOSPATH /* [in] Ignore case */
-#define FMKFILE_F_EXISTS 0x0001           /* [out] File already existed (no new file created) */
+/* Additional flags for `fmkfile_info::mkf_flags' */
+#if AT_DOSPATH == 1
+#define AT_EXISTS 2 /* [out] File already existed (no new file created) */
+#else /* AT_DOSPATH == 1 */
+#define AT_EXISTS 1 /* [out] File already existed (no new file created) */
+#endif /* AT_DOSPATH != 1 */
 
 struct fcreatfile_info {
 	uid_t                      c_owner;     /* [in] File owner */
@@ -84,7 +86,7 @@ struct fmkfile_info {
 			uintptr_t                          mkf_hash;    /* [in] Hash for `mkf_name' (s.a. `fdirent_hash()') (or `FLOOKUP_INFO_HASH_UNSET') */
 			u16                                mkf_namelen; /* [in] Length of `mkf_name' */
 			u16                               _mkf_pad;     /* ... */
-			u32                                mkf_flags;   /* [in|out] Set of `FMKFILE_F_*' */
+			atflag_t                           mkf_flags;   /* [in|out] Set of `0 | AT_DOSPATH' (on [out], `AT_EXISTS' may get set) */
 		};
 		struct flookup_info            mkf_lookup_info;     /* [in] Lookup info for the new file being created. */
 	};
@@ -118,7 +120,7 @@ struct frename_info {
 			uintptr_t                          frn_hash;    /* [in] Hash for `frn_name' (s.a. `fdirent_hash()') (or `FLOOKUP_INFO_HASH_UNSET') */
 			u16                                frn_namelen; /* [in] Length of `frn_name' */
 			u16                               _frn_pad;     /* ... */
-			u32                                frn_flags;   /* [in] Set of `0 | FS_MODE_FDOSPATH' */
+			atflag_t                           frn_flags;   /* [in] Set of `0 | AT_DOSPATH' */
 		};
 		struct flookup_info            frn_lookup_info;     /* [in] Lookup info for the new file being created. */
 	};

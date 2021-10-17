@@ -28,8 +28,6 @@
 #include <kernel/fs/node.h>
 #include <kernel/types.h>
 
-#include <kos/io.h>
-
 #ifdef __CC__
 DECL_BEGIN
 

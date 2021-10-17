@@ -89,13 +89,14 @@ NOTHROW(LOCKOP_CC fnode_add2changed_lop)(Toblockop(fsuper) *__restrict self,
                                          struct fsuper *__restrict obj) {
 	/* Insert into the changed list (our caller is holding its lock) */
 	REF struct fnode *me = container_of(self, struct fnode, _fn_chnglop);
-	bool is_first;
-	is_first = LIST_EMPTY(&obj->fs_changednodes);
-	LIST_INSERT_HEAD(&obj->fs_changednodes, me, fn_changed);
-	/* First changed node was added to the superblock.
-	 * -> Mark the superblock as changed (for `sync(2)') */
-	if (is_first)
-		fsuper_add2changed(obj);
+	if (obj->fs_changednodes.lh_first != FSUPER_NODES_DELETED) {
+		bool is_first = LIST_EMPTY(&obj->fs_changednodes);
+		LIST_INSERT_HEAD(&obj->fs_changednodes, me, fn_changed);
+		/* First changed node was added to the superblock.
+		 * -> Mark the superblock as changed (for `sync(2)') */
+		if (is_first)
+			fsuper_add2changed(obj);
+	}
 	return NULL;
 }
 
@@ -113,7 +114,8 @@ NOTHROW(FCALL fnode_add2changed)(struct fnode *__restrict self) {
 	/* Try to acquire a lock to the list of changed superblocks */
 	if (fsuper_changednodes_tryacquire(super)) {
 		bool is_first = false;
-		if (!LIST_ISBOUND(self, fn_changed)) {
+		if (!LIST_ISBOUND(self, fn_changed) &&
+		    super->fs_changednodes.lh_first != FSUPER_NODES_DELETED) {
 			incref(self);
 			is_first = LIST_EMPTY(&super->fs_changednodes);
 			LIST_INSERT_HEAD(&super->fs_changednodes, self, fn_changed);
@@ -591,6 +593,54 @@ again_acquire_super_changed:
 		mfile_changed(self, MFILE_F_CHANGED);
 		RETHROW();
 	}
+}
+
+
+
+
+/* Check if the calling thread is allowed to access `self' as described by `type'
+ * @param: type:   Set of `R_OK | W_OK | X_OK' (all specified types must be allowed)
+ * @return: true:  Access granted
+ * @return: false: Access denied. */
+PUBLIC ATTR_PURE WUNUSED NONNULL((1)) bool FCALL
+fnode_mayaccess(struct fnode *__restrict self,
+                unsigned int type)
+		THROWS(E_WOULDBLOCK) {
+	unsigned int how;
+	mode_t mode = ATOMIC_READ(self->fn_mode);
+	for (how = 1; how <= 4; how <<= 1) {
+		if (!(type & how))
+			continue; /* Access not checked. */
+		if likely(mode & how)
+			continue; /* Access is allowed for everyone. */
+		if (mode & (how << 3)) {
+			gid_t gid = ATOMIC_READ(self->fn_gid);
+			if likely(cred_isfsgroupmember(gid))
+				continue; /* The calling thread's user is part of the file owner's group */
+		}
+		if (mode & (how << 6)) {
+			uid_t uid = ATOMIC_READ(self->fn_uid);
+			if likely(uid == cred_getfsuid())
+				continue; /* The calling thread's user is the file's owner */
+			/* CAP_FOWNER: ... Ignore filesystem-uid checks ... */
+			if likely(capable(CAP_FOWNER))
+				continue;
+		}
+		return false;
+	}
+	return true;
+}
+
+/* Helper wrapper for `fnode_mayaccess()' that asserts access
+ * and throws `E_FSERROR_ACCESS_DENIED' is access was denied.
+ * @param: type: Set of `R_OK | W_OK | X_OK' (all specified types must be allowed)
+ * @return:                         Access granted
+ * @throw: E_FSERROR_ACCESS_DENIED: Access denied. */
+PUBLIC NONNULL((1)) void FCALL
+fnode_access(struct fnode *__restrict self, unsigned int type)
+		THROWS(E_FSERROR_ACCESS_DENIED) {
+	if unlikely(!fnode_mayaccess(self, type))
+		THROW(E_FSERROR_ACCESS_DENIED);
 }
 
 

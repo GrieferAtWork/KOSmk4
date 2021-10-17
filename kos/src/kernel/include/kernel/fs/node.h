@@ -31,8 +31,6 @@
 #include <hybrid/sequence/list.h>
 #include <hybrid/sequence/rbtree.h>
 
-#include <kos/io.h>
-
 #ifdef __CC__
 DECL_BEGIN
 
@@ -387,6 +385,25 @@ fnode_syncattr(struct fnode *__restrict self)
 FUNDEF NONNULL((1)) void KCALL
 fnode_syncdata(struct fnode *__restrict self)
 		THROWS(E_WOULDBLOCK, E_IOERROR, ...);
+
+
+/* Check if the calling thread is allowed to access `self' as described by `type'
+ * @param: type:   Set of `R_OK | W_OK | X_OK' (all specified types must be allowed)
+ * @return: true:  Access granted
+ * @return: false: Access denied. */
+FUNDEF ATTR_PURE WUNUSED NONNULL((1)) __BOOL FCALL
+fnode_mayaccess(struct fnode *__restrict self,
+                unsigned int type)
+		THROWS(E_WOULDBLOCK);
+
+/* Helper wrapper for `fnode_mayaccess()' that asserts access
+ * and throws `E_FSERROR_ACCESS_DENIED' is access was denied.
+ * @param: type: Set of `R_OK | W_OK | X_OK' (all specified types must be allowed)
+ * @return:                         Access granted
+ * @throw: E_FSERROR_ACCESS_DENIED: Access denied. */
+FUNDEF NONNULL((1)) void FCALL
+fnode_access(struct fnode *__restrict self, unsigned int type)
+		THROWS(E_WOULDBLOCK, E_FSERROR_ACCESS_DENIED);
 
 
 

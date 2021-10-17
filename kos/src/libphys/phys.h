@@ -78,11 +78,11 @@ INTDEF NOBLOCK void NOTHROW(CC libphys_memsetphys)(PHYS physaddr_t dst, int byte
  * error (s.a. `errno' and `mmap(2)')
  * Memory is always mapped as `PROT_READ | PROT_WRITE'.
  *
- * The returned memory block should be unmapped as `munmapphys(return, num_bytes)'
- * The  caller  need not  concern  themself with  the  alignment of  `addr' and/or
- * `num_bytes', as  this  function  will automatically  CEIL_ALIGN  the  requested
- * address  range  to  contain  whole  pages,  and  later  adjusted  the  returned
- * pointed  to  account  for  a  potential  in-page  alignment  offset  of  `addr'
+ * The returned pointer should be unmapped as `munmapphys(return, num_bytes)'
+ * The caller need not concern themself  with the alignment of `addr'  and/or
+ * `num_bytes', as this function will automatically CEIL_ALIGN the  requested
+ * address range  to contain  whole pages,  and later  adjusted the  returned
+ * pointed to  account for  a potential  in-page alignment  offset of  `addr'
  * This adjustment will later be undone automatically by `munmapphys(3)'
  *
  * @return: * :         Base address of the newly created memory mapping.

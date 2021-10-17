@@ -36,7 +36,6 @@
 #include <hybrid/sync/atomic-rwlock.h>
 
 #include <asm/os/statvfs.h>
-#include <kos/io.h>
 #include <kos/lockop.h>
 
 #ifndef REF_IF
@@ -159,11 +158,11 @@ LIST_HEAD(fnode_list, fnode);
  * node-tree,  thus also  causing all  loaded files  to be deleted. */
 #define FSUPER_NODES_DELETED ((struct fnode *)-1)
 
-struct vmount; /* Mounting point descriptor. */
-#ifndef __vmount_list_defined
-#define __vmount_list_defined
-LIST_HEAD(vmount_list, vmount);
-#endif /* !__vmount_list_defined */
+struct pathmount; /* Mounting point descriptor. */
+#ifndef __pathmount_list_defined
+#define __pathmount_list_defined
+LIST_HEAD(pathmount_list, pathmount);
+#endif /* !__pathmount_list_defined */
 
 
 struct fsuper {
@@ -172,19 +171,17 @@ struct fsuper {
 	                                               * When set to `FSUPER_NODES_DELETED', no further file-nodes can be added. */
 	struct atomic_rwlock        fs_nodeslock;     /* Lock for `fs_nodes' */
 	Toblockop_slist(fsuper)     fs_nodeslockops;  /* [lock(ATOMIC)] Pending lock-operations for `fs_nodeslock' */
-	struct vmount_list          fs_mounts;        /* [0..n][lock(fs_mountslock)]  List of mounting points of this superblock.
-	                                               * When this list becomes empty, `fsuper_delete()' is automatically called. */
+	struct pathmount_list       fs_mounts;        /* [0..n][lock(fs_mountslock)]  List of mounting points of this superblock.
+	                                               * When this list becomes empty, set to `FSUPER_MOUNTS_DELETED' followed by
+	                                               * `fsuper_delete()' being called. */
+#define FSUPER_MOUNTS_DELETED ((struct pathmount *)-1) /* Marker for deleted mounting point list */
 	struct atomic_rwlock        fs_mountslock;    /* Lock for `fs_mounts' */
 	Toblockop_slist(fsuper)     fs_mountslockops; /* [lock(ATOMIC)] Pending lock-operations for `fs_mountslock' */
 	REF struct ffilesys        *fs_sys;           /* [1..1][const] fs-descriptor of this superblock. */
 	REF struct blkdev          *fs_dev;           /* [0..1][const] Underlying block-device. (if any) */
 	struct fsuperfeat           fs_feat;          /* [const] Filesystem features. */
 	struct REF fnode_list       fs_changednodes;  /* [0..n][lock(fs_changednodes_lock)][const_if(FSUPER_NODES_DELETED)]
-	                                               * List of changed  node (set  to DELETED during  unmount). Note  that
-	                                               * for  ramfs filesystems, this list will always be marked as DELETED,
-	                                               * in  order to prevent  the tracking of  changed files, since there'd
-	                                               * be no point in tracking them if one can't write them do any backing
-	                                               * storage! */
+	                                               * List of changed node (set to FSUPER_NODES_DELETED during unmount). */
 	struct atomic_lock          fs_changednodes_lock; /* Lock for `fs_changednodes' */
 	Toblockop_slist(fsuper)     fs_changednodes_lops; /* Lock operators for `fs_changednodes_lock' */
 #ifdef __WANT_FSUPER__fs_changedsuper_lop
@@ -329,8 +326,8 @@ FUNDEF NOBLOCK NONNULL((1)) __BOOL NOTHROW(FCALL fsuper_add2changed)(struct fsup
 
 
 /* Helper macros for `struct fsuper::fs_changednodes_lock' */
-#define _fsuper_changednodes_reap(self)      _oblockop_reap_atomic_lock(&(self)->fs_changednodes_lops, &(self)->fs_changednodes_lock, self)
-#define fsuper_changednodes_reap(self)       oblockop_reap_atomic_lock(&(self)->fs_changednodes_lops, &(self)->fs_changednodes_lock, self)
+#define _fsuper_changednodes_reap(self)      _oblockop_reap_atomic_lock(&(self)->fs_changednodes_lops, &(self)->fs_changednodes_lock, (struct fsuper *)(self))
+#define fsuper_changednodes_reap(self)       oblockop_reap_atomic_lock(&(self)->fs_changednodes_lops, &(self)->fs_changednodes_lock, (struct fsuper *)(self))
 #define fsuper_changednodes_mustreap(self)   oblockop_mustreap(&(self)->fs_changednodes_lops)
 #define fsuper_changednodes_tryacquire(self) atomic_lock_tryacquire(&(self)->fs_changednodes_lock)
 #define fsuper_changednodes_acquire(self)    atomic_lock_acquire(&(self)->fs_changednodes_lock)
@@ -367,8 +364,8 @@ FUNDEF NOBLOCK NONNULL((1)) __BOOL NOTHROW(FCALL fsuper_add2changed)(struct fsup
 
 /* Helper macros for `struct fsuper::fs_mountslock' */
 #define fsuper_mounts_mustreap(self)   oblockop_mustreap(&(self)->fs_mountslockops)
-#define fsuper_mounts_reap(self)       oblockop_reap_atomic_rwlock(&(self)->fs_mountslockops, &(self)->fs_mountslock, self)
-#define _fsuper_mounts_reap(self)      _oblockop_reap_atomic_rwlock(&(self)->fs_mountslockops, &(self)->fs_mountslock, self)
+#define fsuper_mounts_reap(self)       oblockop_reap_atomic_rwlock(&(self)->fs_mountslockops, &(self)->fs_mountslock, (struct fsuper *)(self))
+#define _fsuper_mounts_reap(self)      _oblockop_reap_atomic_rwlock(&(self)->fs_mountslockops, &(self)->fs_mountslock, (struct fsuper *)(self))
 #define fsuper_mounts_write(self)      atomic_rwlock_write(&(self)->fs_mountslock)
 #define fsuper_mounts_write_nx(self)   atomic_rwlock_write_nx(&(self)->fs_mountslock)
 #define fsuper_mounts_trywrite(self)   atomic_rwlock_trywrite(&(self)->fs_mountslock)
@@ -437,7 +434,7 @@ FUNDEF void KCALL fsuper_syncall(void)
  * Note that the caller should first invoke `fsuper_sync()' to ensure
  * that any unwritten changes are written to disk.
  *
- * Anything from the above that couldn't be done via synchronously via
+ * Anything  from the  above that  couldn't be  done synchronously via
  * non-blocking operations will  instead be completed  asynchronously,
  * meaning that the caller should let the superblock cleanup itself as
  * required locks become available... */

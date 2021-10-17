@@ -597,7 +597,8 @@ epoll_loop:
 	}
 }
 
-/* Add `monitor' to the hash-vector of monitors of `self' */
+
+/* Rehash with the given list buffer */
 PRIVATE NOBLOCK NONNULL((1, 2)) void
 NOTHROW(FCALL epoll_controller_intern_rehash_with)(struct epoll_controller *__restrict self,
                                                    struct epoll_controller_ent *__restrict new_list,
