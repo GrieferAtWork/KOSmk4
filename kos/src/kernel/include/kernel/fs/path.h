@@ -179,10 +179,10 @@ struct path {
 #define path_parent(self)   ((self)->p_parent)
 
 
-/* Check if `child' is a descendent of `parent' */
+/* Check if `child' is a descendant of `root' (including `child == root') */
 FUNDEF NOBLOCK ATTR_PURE WUNUSED NONNULL((1, 2)) __BOOL
-NOTHROW(FCALL path_isdescendentof)(struct path const *parent,
-                                   struct path const *child);
+NOTHROW(FCALL path_isdescendantof)(struct path const *child,
+                                   struct path const *root);
 
 /* Return a pointer to the VFS associated with `self' */
 FUNDEF NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) struct vfs *
@@ -392,8 +392,8 @@ path_expandchildnode(struct path *__restrict self, u32 *__restrict premaining_sy
 FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((2)) REF struct path *KCALL
 path_traverse_ex(struct path *cwd, u32 *__restrict premaining_symlinks,
                  USER CHECKED /*utf-8*/ char const *upath,
-                 USER CHECKED /*utf-8*/ char const **plastseg DFL(__NULLPTR),
-                 u16 *plastlen DFL(__NULLPTR), atflag_t atflags DFL(0))
+                 /*out_opt*/ USER CHECKED /*utf-8*/ char const **plastseg DFL(__NULLPTR),
+                 /*out_opt*/ u16 *plastlen DFL(__NULLPTR), atflag_t atflags DFL(0))
 		THROWS(E_WOULDBLOCK, E_SEGFAULT, E_FSERROR_ACCESS_DENIED, E_FSERROR_PATH_NOT_FOUND,
 		       E_FSERROR_TOO_MANY_SYMBOLIC_LINKS, E_FSERROR_NOT_A_DIRECTORY, E_IOERROR,
 		       E_BADALLOC, ...);
@@ -402,8 +402,8 @@ path_traverse_ex(struct path *cwd, u32 *__restrict premaining_symlinks,
  * as well as pass `cwd = fd_cwd == AT_FDCWD ? NULL : handle_get_path(fd_cwd)' */
 FUNDEF ATTR_RETNONNULL WUNUSED REF struct path *KCALL
 path_traverse(fd_t fd_cwd, USER CHECKED /*utf-8*/ char const *upath,
-              USER CHECKED /*utf-8*/ char const **plastseg DFL(__NULLPTR),
-              u16 *plastlen DFL(__NULLPTR), atflag_t atflags DFL(0))
+              /*out_opt*/ USER CHECKED /*utf-8*/ char const **plastseg DFL(__NULLPTR),
+              /*out_opt*/ u16 *plastlen DFL(__NULLPTR), atflag_t atflags DFL(0))
 		THROWS(E_WOULDBLOCK, E_SEGFAULT, E_FSERROR_ACCESS_DENIED, E_FSERROR_PATH_NOT_FOUND,
 		       E_FSERROR_TOO_MANY_SYMBOLIC_LINKS, E_FSERROR_NOT_A_DIRECTORY,
 		       E_IOERROR, E_BADALLOC, ...);
@@ -488,7 +488,8 @@ path_rename(struct path *__restrict oldpath, USER CHECKED /*utf-8*/ char const *
             atflag_t atflags DFL(0),
             /*out[1..1]_opt*/ REF struct fnode **prenamed_node DFL(__NULLPTR),
             /*out[1..1]_opt*/ REF struct fdirent **pold_dirent DFL(__NULLPTR),
-            /*out[1..1]_opt*/ REF struct fdirent **pnew_dirent DFL(__NULLPTR))
+            /*out[1..1]_opt*/ REF struct fdirent **pnew_dirent DFL(__NULLPTR),
+            /*out[0..1]_opt*/ REF struct path **pdeleted_path DFL(__NULLPTR))
 		THROWS(E_WOULDBLOCK, E_SEGFAULT, E_FSERROR_DELETED, E_FSERROR_ACCESS_DENIED, E_FSERROR_IS_A_MOUNTING_POINT,
 		       E_FSERROR_FILE_NOT_FOUND, E_FSERROR_CROSS_DEVICE_LINK, E_FSERROR_FILE_ALREADY_EXISTS,
 		       E_FSERROR_ILLEGAL_PATH, E_FSERROR_DIRECTORY_MOVE_TO_CHILD, E_FSERROR_DISK_FULL,
