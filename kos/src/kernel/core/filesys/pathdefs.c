@@ -135,22 +135,6 @@ PUBLIC struct fdirent fdirent_empty = {
 	.fd_name    = "",
 };
 
-/* Special path pointed-to by newly-allocated VFS */
-PUBLIC struct path path_unmounted_root = {
-	.p_refcnt  = 1, /* +1: path_unmounted_root */
-	.p_flags   = PATH_F_NORMAL,
-	.p_parent  = NULL,
-	.p_name    = &fdirent_empty,
-	.p_dir     = &fsuper_unmounted.rs_sup.fs_root,
-	.p_recent  = TAILQ_ENTRY_UNBOUND_INITIALIZER,
-	.p_cldlock = SHARED_RWLOCK_INIT,
-	.p_cldlops = SLIST_HEAD_INITIALIZER(path_unmounted_root.p_cldlops),
-	.p_cldused = 0,
-	.p_cldsize = 0,
-	.p_cldmask = 0,
-	.p_cldlist = PATH_CLDLIST_DELETED,
-};
-
 
 DECL_END
 

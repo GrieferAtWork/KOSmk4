@@ -29,6 +29,7 @@
 #include <kernel/fs/lnknode.h>
 #include <kernel/fs/node.h>
 #include <kernel/fs/path.h>
+#include <kernel/fs/ramfs.h>
 #include <kernel/fs/super.h>
 #include <kernel/fs/vfs.h>
 #include <kernel/handle.h>
@@ -65,12 +66,22 @@ DECL_BEGIN
 PUBLIC NOBLOCK ATTR_PURE WUNUSED NONNULL((1, 2)) bool
 NOTHROW(FCALL path_isdescendentof)(struct path const *parent,
                                    struct path const *child) {
-	do {
+	for (;;) {
 		if (parent == child)
 			return true;
-		child = child->p_parent;
-	} while (child != NULL);
+		if (path_isroot(child))
+			break;
+		child = path_parent(child);
+	}
 	return false;
+}
+
+/* Return a pointer to the VFS associated with `self' */
+PUBLIC NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) struct vfs *
+NOTHROW(FCALL _path_getvfs)(struct path const *__restrict self) {
+	while (!path_isroot(self))
+		self = path_parent(self);
+	return self->_p_vfs;
 }
 
 
@@ -173,15 +184,17 @@ NOTHROW(LOCKOP_CC path_remove_from_parent_lop)(Toblockop(path) *__restrict self,
                                                struct path *__restrict obj) {
 	struct path *me = container_of(self, struct path, _p_pthlop);
 	COMPILER_READ_BARRIER();
-	if likely(obj->p_cldlist != PATH_CLDLIST_DELETED)
-		path_cldlist_remove(obj, me);
+	if likely(obj->p_cldlist != PATH_CLDLIST_DELETED) {
+		if (path_cldlist_remove(obj, me))
+			path_cldlist_rehash_after_remove(obj);
+	}
 	me->_p_pthplop.oplo_func = &path_remove_from_parent_postlop;
 	return &me->_p_pthplop;
 }
 
 
 /* Destroy a given path, automatically removing it from:
- *  - p_parent->p_cldlist             (asynchronously via lockops in p_parent->p_cldlops)
+ *  - path_parent(self)->p_cldlist    (asynchronously via lockops in path_parent(self)->p_cldlops)
  *  - path_getsuper(self)->fs_mounts  (asynchronously via lockops in  path_getsuper(self)->fs_mountslockops.
  *                                    If this path was the last mounting point, also call `fsuper_delete()') */
 PUBLIC NOBLOCK NONNULL((1)) void
@@ -195,27 +208,36 @@ NOTHROW(FCALL path_destroy)(struct path *__restrict self) {
 	DBG_memset(&self->p_cldmask, 0xcc, sizeof(self->p_cldmask));
 	DBG_memset(&self->p_cldlist, 0xcc, sizeof(self->p_cldlist));
 
-	/* Remove the path from its parent's child list (possibly asynchronously) */
-	parent = self->p_parent;
-	DBG_memset(&self->p_parent, 0xcc, sizeof(self->p_parent));
-	if (parent != NULL) {
-		COMPILER_READ_BARRIER();
-		if likely(parent->p_cldlist != PATH_CLDLIST_DELETED) {
-			if (path_cldlock_trywrite(parent)) {
-				COMPILER_READ_BARRIER();
-				if likely(parent->p_cldlist != PATH_CLDLIST_DELETED)
-					path_cldlist_remove(parent, self);
-				path_cldlock_endwrite(parent);
-			} else {
-				/* Have to use lockops... */
-				self->_p_pthlop.olo_func = &path_remove_from_parent_lop;
-				oblockop_enqueue(&parent->p_cldlops, &self->_p_pthlop);
-				_path_cldlock_reap(parent);
-				decref_unlikely(parent);
-				return;
+	if unlikely(path_isroot(self)) {
+		/* Special case for VFS root path nodes. */
+		WEAK REF struct vfs *myvfs = self->_p_vfs;
+		DBG_memset(&self->_p_vfs, 0xcc, sizeof(self->_p_vfs));
+		weakdecref(myvfs);
+	} else {
+		/* Remove the path from its parent's child list (possibly asynchronously) */
+		parent = path_parent(self);
+		DBG_memset(&self->p_parent, 0xcc, sizeof(self->p_parent));
+		if (parent != NULL) {
+			COMPILER_READ_BARRIER();
+			if likely(parent->p_cldlist != PATH_CLDLIST_DELETED) {
+				if (path_cldlock_trywrite(parent)) {
+					COMPILER_READ_BARRIER();
+					if likely(parent->p_cldlist != PATH_CLDLIST_DELETED) {
+						if (path_cldlist_remove(parent, self))
+							path_cldlist_rehash_after_remove(parent);
+					}
+					path_cldlock_endwrite(parent);
+				} else {
+					/* Have to use lockops... */
+					self->_p_pthlop.olo_func = &path_remove_from_parent_lop;
+					oblockop_enqueue(&parent->p_cldlops, &self->_p_pthlop);
+					_path_cldlock_reap(parent);
+					decref_unlikely(parent);
+					return;
+				}
 			}
+			decref_unlikely(parent);
 		}
-		decref_unlikely(parent);
 	}
 	path_remove_from_parent_postlop(&self->_p_pthplop, parent);
 }
@@ -239,6 +261,23 @@ NOTHROW(KCALL _path_cldlock_reap)(struct path *__restrict self) {
 }
 
 
+
+
+/* Special path pointed-to by newly-allocated VFS */
+PRIVATE struct path deleted_path = {
+	.p_refcnt  = 1, /* +1: deleted_path */
+	.p_flags   = PATH_F_NORMAL,
+	{ .p_parent  = NULL }, /* Technically, this isn't allowed, but it's the best we can do. */
+	.p_name    = &fdirent_empty,
+	.p_dir     = &fsuper_unmounted.fs_root,
+	.p_recent  = TAILQ_ENTRY_UNBOUND_INITIALIZER,
+	.p_cldlock = SHARED_RWLOCK_INIT,
+	.p_cldlops = SLIST_HEAD_INITIALIZER(deleted_path.p_cldlops),
+	{{ 0, 0, 0 }},
+	.p_cldlist = PATH_CLDLIST_DELETED,
+};
+
+
 /* Rehash with the given list buffer */
 PRIVATE NOBLOCK NONNULL((1, 2)) void
 NOTHROW(FCALL path_cldlist_rehash_with)(struct path *__restrict self,
@@ -252,7 +291,7 @@ NOTHROW(FCALL path_cldlist_rehash_with)(struct path *__restrict self,
 		struct path *pth;
 		uintptr_t hash;
 		pth = self->p_cldlist[i].pb_path;
-		if (!pth || pth == &_path_deleted)
+		if (!pth || pth == &deleted_path)
 			continue; /* Empty, or deleted. */
 		hash = path_hashof(pth);
 		j = perturb = hash & new_mask;
@@ -300,8 +339,8 @@ path_cldlist_rehash_before_insert(struct path *__restrict self)
 	}
 }
 
-/* Try to rehash the given controller following the removing of an monitor. */
-PRIVATE NOBLOCK NONNULL((1)) void
+/* Try to rehash the child-path list of `self' following the removal of a child. */
+PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL path_cldlist_rehash_after_remove)(struct path *__restrict self) {
 	if ((self->p_cldused < (self->p_cldmask / 3)) &&
 	    self->p_cldmask > CONFIG_PATH_CLDLIST_INITIAL_MASK) {
@@ -323,8 +362,10 @@ NOTHROW(FCALL path_cldlist_rehash_after_remove)(struct path *__restrict self) {
 	}
 }
 
-/* Remove `elem' from the child-list of `self' */
-PUBLIC NOBLOCK NONNULL((1, 2)) void
+/* Remove `elem' from the child-list of `self'
+ * @return: true:  Successfully removed.
+ * @return: false: Wasn't actually a member. */
+PUBLIC NOBLOCK NONNULL((1, 2)) bool
 NOTHROW(KCALL path_cldlist_remove)(struct path *__restrict self,
                                    struct path *__restrict elem) {
 	uintptr_t hash, i, perturb;
@@ -338,13 +379,40 @@ NOTHROW(KCALL path_cldlist_remove)(struct path *__restrict self,
 	i = perturb = hash & self->p_cldmask;
 	for (;; path_hashnx(i, perturb)) {
 		bucket = &self->p_cldlist[i & self->p_cldmask];
-		assert(bucket->pb_path);
+		if (bucket->pb_path == NULL)
+			return false; /* Not found... */
 		if (bucket->pb_path == elem)
 			break;
 	}
-	bucket->pb_path = &_path_deleted;
+	bucket->pb_path = &deleted_path;
+	--self->p_cldused;
+	return true;
+}
+
+/* Same as `path_cldlist_remove()', but UD  if
+ * `elem' isn't actually in `self's child list */
+PUBLIC NOBLOCK NONNULL((1, 2)) void
+NOTHROW(KCALL path_cldlist_remove_force)(struct path *__restrict self,
+                                         struct path *__restrict elem) {
+	uintptr_t hash, i, perturb;
+	struct path_bucket *bucket;
+	assert(self->p_cldlist != PATH_CLDLIST_DELETED);
+	assert(self->p_cldlist != _path_empty_cldlist);
+	assert(self->p_cldused != 0);
+	assert(self->p_cldsize != 0);
+	assert((self->p_cldsize + 1) <= self->p_cldmask);
+	hash = path_hashof(elem);
+	i = perturb = hash & self->p_cldmask;
+	for (;; path_hashnx(i, perturb)) {
+		bucket = &self->p_cldlist[i & self->p_cldmask];
+		assert(bucket->pb_path != NULL);
+		if (bucket->pb_path == elem)
+			break;
+	}
+	bucket->pb_path = &deleted_path;
 	--self->p_cldused;
 }
+
 
 
 /* Insert `elem' into the child-list of `self'
@@ -366,7 +434,7 @@ NOTHROW(KCALL path_cldlist_insert)(struct path *__restrict self,
 			++self->p_cldsize;
 			break;
 		}
-		if (pth == &_path_deleted)
+		if (pth == &deleted_path)
 			break; /* Re-use a previously deleted slot. */
 	}
 	ent->pb_path = elem;
@@ -401,8 +469,15 @@ path_lookupchild(struct path *__restrict self,
 		RETHROW();
 	}
 	/* Try to get a reference to the path. */
-	if (!tryincref(result))
+	if (tryincref(result)) {
+		/* Still alive */
+	} else {
+		/* Even though it would also happen async,
+		 * remove the  dead child-path  ourselves. */
+		path_cldlist_remove_force(self, result);
+		path_cldlist_rehash_after_remove(self);
 		result = NULL;
+	}
 	path_cldlock_endread(self);
 	return result;
 }
@@ -433,7 +508,7 @@ path_lookupchild_withlock(struct path *__restrict self,
 			continue; /* Wrong name length */
 		if unlikely(memcmp(result->p_name->fd_name, name, namelen * sizeof(char)) != 0)
 			continue; /* Wrong name */
-		if unlikely(result == &_path_deleted)
+		if unlikely(result == &deleted_path)
 			continue; /* Prevent any chance of *this* happening... */
 		/* Found it! */
 		return result;
@@ -449,7 +524,7 @@ path_lookupchild_withlock(struct path *__restrict self,
 				continue; /* Wrong name length */
 			if unlikely(memcasecmp(result->p_name->fd_name, name, namelen * sizeof(char)) != 0)
 				continue; /* Wrong name */
-			if unlikely(result == &_path_deleted)
+			if unlikely(result == &deleted_path)
 				continue; /* Prevent any chance of *this* happening... */
 			/* Found it! */
 			return result;
@@ -491,7 +566,6 @@ path_makechild(struct path *__restrict self, atflag_t atflags,
 	/* Try to cache the new path element. */
 	TRY {
 		struct path *existing;
-again_acquire_lock:
 		path_cldlock_write(self);
 
 		/* Check if the a path with an identical name showed in the mean time... */
@@ -503,24 +577,22 @@ again_acquire_lock:
 			RETHROW();
 		}
 		if unlikely(existing != NULL) {
-			bool inc_ok;
-			inc_ok = tryincref(existing);
-			path_cldlock_endwrite(self);
-			if (!inc_ok) {
-				/* The existing path is dead; wait for it to remove itself... */
-				task_yield();
-				goto again_acquire_lock;
+			if (!tryincref(existing)) {
+				/* Race condition: another thread must have created it in the mean time... */
+				_path_free(result);
+				decref_unlikely(dir);
+				decref_unlikely(dent);
+				return existing;
 			}
+			/* The existing path is  dead; remove it ourselves  even
+			 * though it should also have been able to it by itself. */
+			path_cldlist_remove_force(self, existing);
 
-			/* Race condition: another thread must have created it in the mean time... */
-			_path_free(result);
-			decref_unlikely(dir);
-			decref_unlikely(dent);
-			return existing;
+			/* Don't rehash since we're about to add another element again! */
+		} else {
+			/* Nothing in here already; but ensure that there's enough space for one more entry! */
+			path_cldlist_rehash_before_insert(self);
 		}
-
-		/* Nothing in here already; but ensure that there's enough space for one more entry! */
-		path_cldlist_rehash_before_insert(self);
 
 		/* All right! let's add this new entry! */
 		path_cldlist_insert(self, result);
@@ -897,8 +969,8 @@ path_traverse_ex(struct path *cwd, u32 *__restrict premaining_symlinks,
                  USER CHECKED /*utf-8*/ char const **plastseg,
                  u16 *plastlen, atflag_t atflags)
 		THROWS(E_WOULDBLOCK, E_SEGFAULT, E_FSERROR_ACCESS_DENIED, E_FSERROR_PATH_NOT_FOUND,
-		       E_FSERROR_TOO_MANY_SYMBOLIC_LINKS, E_FSERROR_NOT_A_DIRECTORY,
-		       E_IOERROR, E_BADALLOC, ...) {
+		       E_FSERROR_TOO_MANY_SYMBOLIC_LINKS, E_FSERROR_NOT_A_DIRECTORY, E_IOERROR,
+		       E_BADALLOC, ...) {
 	/* Flags for the purpose of selecting which slashes we accept (AT_DOSPATH) */
 	atflag_t sep_atflags = atflags;
 
@@ -993,8 +1065,8 @@ do_drive_root_rel:
 				}
 				root_ref = myfs->fs_root;
 				while (cwd != root_ref && !path_isdrive(cwd)) {
-					assert(cwd->p_parent != NULL);
-					cwd = cwd->p_parent;
+					assert(!path_isroot(cwd));
+					cwd = path_parent(cwd);
 				}
 				ATOMIC_ADD(cwd->p_refcnt, 2);
 				fs_pathlock_endread(myfs);
@@ -1011,6 +1083,8 @@ do_drive_root_rel:
 			}
 		}
 	}
+
+	/* The main loop for processing path segments. */
 	TRY {
 		char ch;
 		size_t seg_len;
@@ -1105,8 +1179,8 @@ do_walk_segment:
 							 * chroot that is  a dos  drive, or the  unix chroot  itself. */
 							root_ref = cwd_ref;
 							while (root_ref != myfs->fs_root && !path_isdrive(root_ref)) {
-								assert(root_ref->p_parent);
-								root_ref = root_ref->p_parent;
+								assert(!path_isroot(root_ref));
+								root_ref = path_parent(root_ref);
 							}
 							incref(root_ref);
 						} else {
@@ -1127,8 +1201,8 @@ do_walk_segment:
 						 * chroot that is  a dos  drive, or the  unix chroot  itself. */
 						root_ref = cwd;
 						while (root_ref != myfs->fs_root && !path_isdrive(root_ref)) {
-							assert(root_ref->p_parent);
-							root_ref = root_ref->p_parent;
+							assert(!path_isroot(root_ref));
+							root_ref = path_parent(root_ref);
 						}
 						incref(root_ref);
 						fs_pathlock_endread(myfs);
@@ -1147,14 +1221,15 @@ do_walk_segment:
 
 				/* Walk up the directory tree (but stop once we've reached the root) */
 				if (cwd != root_ref) {
+					assert(!path_isroot(cwd));
 					if (cwd_ref) {
-						cwd = cwd->p_parent;
+						cwd = path_parent(cwd);
 						decref_unlikely(cwd_ref);
 						cwd_ref = incref(cwd);
 					} else {
 						/* No need for  references here,  since the  caller
 						 * will keep on holding a ref to the original `cwd' */
-						cwd = cwd->p_parent;
+						cwd = path_parent(cwd);
 					}
 				}
 				break;
@@ -1227,23 +1302,18 @@ path_traversefull_ex(struct path *cwd, u32 *__restrict premaining_symlinks,
 	u16 lastlen;
 
 	/* Traverse everything except for the last path component. */
-	rpath = path_traverse_ex(cwd, premaining_symlinks, upath, &lastseg, &lastlen, atflags);
-
-	/* Cache the path as having been used recently. */
-	rpath = vfs_recent(THIS_VFS, rpath);
+	rpath = path_traverse_ex_r(cwd, premaining_symlinks, upath, &lastseg, &lastlen, atflags);
 
 	/* Check for special case: no last segment. */
 	if (lastlen == 0) {
-		if (presult_path) {
-			struct path *parent = rpath->p_parent;
-			if (!parent) /* Technically, there is no parent, but this is the best we can do here... */
-				parent = &path_unmounted_root;
-			*presult_path = incref(parent);
-		}
-		if (presult_dirent)
-			*presult_dirent = incref(rpath->p_name);
 		result = mfile_asnode(incref(rpath->p_dir));
-		decref_unlikely(rpath);
+		if (presult_dirent)
+			*presult_dirent = incref(&fdirent_empty);
+		if (presult_path) {
+			*presult_path = rpath; /* Inherit reference */
+		} else {
+			decref_unlikely(rpath);
+		}
 		return result;
 	}
 
@@ -1273,6 +1343,283 @@ path_traversefull(fd_t fd_cwd, USER CHECKED /*utf-8*/ char const *upath, atflag_
 	FINALLY_DECREF_UNLIKELY(used_cwd);
 	return path_traversefull_ex(used_cwd, &remaining_symlinks, upath, atflags, presult_path, presult_dirent);
 }
+
+
+PRIVATE NOBLOCK NONNULL((1, 2)) void
+NOTHROW(LOCKOP_CC path_remove_from_recent_postlop)(Tobpostlockop(vfs) *__restrict self,
+                                                   struct vfs *__restrict obj) {
+	REF struct path *me;
+	me = container_of(self, struct path, _p_vfsplop);
+	decref(me);
+}
+
+PRIVATE NOBLOCK NONNULL((1, 2)) Tobpostlockop(vfs) *
+NOTHROW(LOCKOP_CC path_remove_from_recent_lop)(Toblockop(vfs) *__restrict self,
+                                               struct vfs *__restrict obj) {
+	REF struct path *me = container_of(self, struct path, _p_vfslop);
+	COMPILER_READ_BARRIER();
+	if likely(TAILQ_ISBOUND(me, p_recent)) {
+		TAILQ_UNBIND(&obj->vf_recent, me, p_recent);
+		decref_nokill(me);
+	}
+	me->_p_vfsplop.oplo_func = &path_remove_from_recent_postlop;
+	return &me->_p_vfsplop;
+}
+
+/* Remove `self' from the recent-cache of the associated VFS (possibly asynchronously)
+ * This function must be called after doing `self->p_cldlist = PATH_CLDLIST_DELETED' */
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL path_remove_from_recent)(struct path *__restrict self) {
+	COMPILER_READ_BARRIER();
+	if (TAILQ_ISBOUND(self, p_recent)) {
+		/* Lookup the proper VFS context. */
+		struct vfs *pathvfs = _path_getvfs(self);
+		if likely(tryincref(pathvfs)) {
+			if (vfs_recentlock_tryacquire(pathvfs)) {
+				COMPILER_READ_BARRIER();
+				if (TAILQ_ISBOUND(self, p_recent)) {
+					TAILQ_UNBIND(&pathvfs->vf_recent, self, p_recent);
+					decref_nokill(self);
+				}
+				vfs_recentlock_release(pathvfs);
+			} else {
+				/* Must use lock operations to do the removal! */
+				incref(self); /* Inherited by `path_remove_from_recent_lop' */
+				self->_p_vfslop.olo_func = &path_remove_from_recent_lop;
+				oblockop_enqueue(&pathvfs->vf_recentlops, &self->_p_vfslop);
+				_vfs_recentlock_reap(pathvfs);
+			}
+			decref_unlikely(pathvfs);
+		}
+	}
+}
+
+
+/* High-level implementation of `unlink(2)' / `rmdir(2)'.
+ * @param: atflags: At least one of `AT_REMOVEREG | AT_REMOVEDIR', optionally
+ *                  or'd with `AT_DOSPATH' (other flags are silently ignored)
+ * @throw: E_WOULDBLOCK:                                Preemption is disabled, and operation would have blocked.
+ * @throw: E_SEGFAULT:                                  Faulty pointer
+ * @throw: E_FSERROR_DELETED:E_FILESYSTEM_DELETED_PATH: `self' has already been deleted.
+ * @throw: E_FSERROR_DELETED:E_FILESYSTEM_DELETED_FILE: `name' has already been deleted.
+ * @throw: E_FSERROR_ACCESS_DENIED:                     Missing W/X permissions for `self'
+ * @throw: E_FSERROR_NOT_A_DIRECTORY:E_FILESYSTEM_NOT_A_DIRECTORY_RMDIR: `name' is S_IFREG, but `AT_REMOVEREG' isn't given
+ * @throw: E_FSERROR_IS_A_DIRECTORY:E_FILESYSTEM_IS_A_DIRECTORY_UNLINK:  `name' is S_IFDIR, but `AT_REMOVEDIR' isn't given
+ * @throw: E_FSERROR_IS_A_MOUNTING_POINT:               `name' refers to a mounting point
+ * @throw: E_FSERROR_FILE_NOT_FOUND:                    `name' could not be found
+ * @throw: E_FSERROR_READONLY:                          ...
+ * @throw: E_IOERROR:                                   ...
+ * @throw: E_BADALLOC:                                  ... */
+PUBLIC NONNULL((1)) void KCALL
+path_remove(struct path *__restrict self,
+            USER CHECKED /*utf-8*/ char const *name, u16 namelen, atflag_t atflags,
+            /*out[1..1]_opt*/ REF struct fnode **pdeleted_node,
+            /*out[1..1]_opt*/ REF struct fdirent **pdeleted_dirent,
+            /*out[0..1]_opt*/ REF struct path **pdeleted_path)
+		THROWS(E_WOULDBLOCK, E_SEGFAULT, E_FSERROR_DELETED, E_FSERROR_ACCESS_DENIED,
+		       E_FSERROR_IS_A_MOUNTING_POINT, E_FSERROR_FILE_NOT_FOUND, E_FSERROR_READONLY,
+		       E_IOERROR, E_BADALLOC, ...) {
+	uintptr_t namehash;
+	struct path *existing_path;
+	REF struct fdirent *dent;
+	REF struct fnode *node;
+
+	/* Assert permissions */
+	fnode_access(self->p_dir, W_OK | X_OK);
+
+	namehash = fdirent_hash(name, namelen);
+again_acquire_cldlock:
+	path_cldlock_write(self);
+
+	/* Check if `self' has been deleted. */
+	if unlikely(self->p_cldlist == PATH_CLDLIST_DELETED) {
+		path_cldlock_endwrite(self);
+		THROW(E_FSERROR_DELETED, E_FILESYSTEM_DELETED_PATH);
+	}
+
+	TRY {
+		/* Check if we're to remove a child path. */
+		existing_path = path_lookupchild_withlock(self, name, namelen,
+		                                          namehash, atflags);
+	} EXCEPT {
+		path_cldlock_endwrite(self);
+		RETHROW();
+	}
+	if (existing_path) {
+		assert(existing_path != self);
+		if (!tryincref(existing_path)) {
+			/* Existing path is being destroyed and is probably trying to remove
+			 * itself right now, but  since we need it  gone _now_, just do  the
+			 * removal for it! */
+			path_cldlist_remove_force(self, existing_path);
+		} else {
+			struct path_bucket *old_buckets;
+
+			/* Check if we're even allowed to remove directories. */
+			if (!(atflags & AT_REMOVEDIR)) {
+				path_cldlock_endwrite(self);
+				decref_unlikely(existing_path);
+
+				/* Welp... better use rmdir(2) next time... */
+				THROW(E_FSERROR_IS_A_DIRECTORY, E_FILESYSTEM_IS_A_DIRECTORY_UNLINK);
+			}
+
+			/* Check if it's a mounting point. */
+			if unlikely(path_ismount(existing_path)) {
+				path_cldlock_endwrite(self);
+				decref_unlikely(existing_path);
+
+				/* You'll have to use `path_umount()' */
+				THROW(E_FSERROR_IS_A_MOUNTING_POINT);
+			}
+
+			/* Ok: so this is where it gets a little bit complicated:
+			 *  - We have to acquire another lock to the child path
+			 *  - Then, while holding locks to both paths, invoke the
+			 *    underlying fdirnode's unlink operator
+			 *  - Once that operator returns with success, mark the
+			 *    child  path's  `p_cldlist = PATH_CLDLIST_DELETED'
+			 *  - Release locks and we're done
+			 *
+			 * All of the is-directory-empty checking is done on  the
+			 * FS-layer, and we  can't safely assume  that the  child
+			 * path's child-table being non-empty means that the real
+			 * directory is also  non-empty: filesystems are  allowed
+			 * to remove files and directories for reasons other than
+			 * explicit unlink/rmdir calls.
+			 * This is especially important for stuff like procfs! */
+			if (path_cldlock_trywrite(existing_path)) {
+				/* Wait for the existing path to become available. */
+				path_cldlock_endwrite(self);
+				FINALLY_DECREF_UNLIKELY(existing_path);
+				path_cldlock_write(existing_path);
+				path_cldlock_endwrite(existing_path);
+				goto again_acquire_cldlock;
+			}
+
+			/* Do the fs-level unlink (or rather: rmdir) */
+			TRY {
+				fdirnode_unlink(self->p_dir,
+				                existing_path->p_name,
+				                existing_path->p_dir);
+			} EXCEPT {
+				path_cldlock_endwrite(existing_path);
+				path_cldlock_endwrite(self);
+				RETHROW();
+			}
+
+			/* Remove the deleted `existing_path' from `self' */
+			path_cldlist_remove_force(self, existing_path);
+			path_cldlist_rehash_after_remove(self);
+			path_cldlock_endwrite(self);
+
+			/* Mark `existing_path' as having been deleted. */
+			old_buckets = existing_path->p_cldlist;
+			existing_path->p_cldlist = PATH_CLDLIST_DELETED;
+			DBG_memset(&existing_path->p_cldused, 0xcc, sizeof(existing_path->p_cldused));
+			DBG_memset(&existing_path->p_cldsize, 0xcc, sizeof(existing_path->p_cldsize));
+			DBG_memset(&existing_path->p_cldmask, 0xcc, sizeof(existing_path->p_cldmask));
+			path_cldlock_endwrite(existing_path);
+			if (old_buckets != PATH_CLDLIST_DELETED &&
+			    old_buckets != path_empty_cldlist)
+				kfree(old_buckets);
+
+			/* Remove `existing_path' from the recent-cache of the VFS. (Possibly through use of a LOP) */
+			path_remove_from_recent(existing_path);
+
+			/* Write-back information about what got deleted (if requested) */
+			if (pdeleted_node)
+				*pdeleted_node = mfile_asnode(incref(existing_path->p_dir));
+			if (pdeleted_dirent)
+				*pdeleted_dirent = incref(existing_path->p_name);
+			if (pdeleted_path)
+				*pdeleted_path = existing_path;
+			else {
+				decref(existing_path);
+			}
+			return;
+		}
+	}
+	path_cldlock_endwrite(self);
+
+	/* Consult the filesystem about what the caller wants to delete. */
+	{
+		struct flookup_info info;
+		info.flu_name    = name;
+		info.flu_hash    = namehash;
+		info.flu_namelen = namelen;
+		info.flu_flags   = atflags;
+
+		/* Do the lookup */
+		dent = fdirnode_lookup(self->p_dir, &info);
+	}
+
+	/* Whatever you're trying to delete, it's doesn't exist... */
+	if unlikely(!dent)
+		THROW(E_FSERROR_FILE_NOT_FOUND);
+
+	/* Load the file-node associated with `node' */
+	TRY {
+		node = fdirent_opennode(dent, self->p_dir);
+		if unlikely(!node)
+			THROW(E_FSERROR_DELETED, E_FILESYSTEM_DELETED_FILE);
+		TRY {
+			/* Check if we're even allowed  to delete `node', and in  the
+			 * case of `node' being  a directory, re-acquire a  read-lock
+			 * to `self' to ensure that it hasn't appeared in-cache since
+			 * we checked earlier,  and won't appear  until FS says  that
+			 * it's  done deleting the file (at which point we can assume
+			 * that later fdirnode_lookup() calls will no longer indicate
+			 * that the file still exists) */
+			if (fnode_isdir(node)) {
+				if (!(atflags & AT_REMOVEDIR))
+					THROW(E_FSERROR_IS_A_DIRECTORY, E_FILESYSTEM_IS_A_DIRECTORY_UNLINK);
+				path_cldlock_read(self);
+
+				/* double-check that nothing with this name exists in-cache. */
+				if unlikely(path_lookupchild_withlock(self, name, namelen, namehash, 0) != NULL) {
+					path_cldlock_endread(self);
+					decref_unlikely(node);
+					decref_unlikely(dent);
+					goto again_acquire_cldlock; /* Let's try again... */
+				}
+
+				/* Ask the filesystem to remove the directory. */
+				TRY {
+					fdirnode_unlink(self->p_dir, dent, node);
+				} EXCEPT {
+					path_cldlock_endread(self);
+					RETHROW();
+				}
+				path_cldlock_endread(self);
+			} else {
+				/* Remove something that isn't a directory. */
+				fdirnode_unlink(self->p_dir, dent, node);
+			}
+		} EXCEPT {
+			decref_unlikely(node);
+			RETHROW();
+		}
+	} EXCEPT {
+		decref_unlikely(dent);
+		RETHROW();
+	}
+
+	/* Write-back information about what got deleted (if requested) */
+	if (pdeleted_node)
+		*pdeleted_node = node;
+	else {
+		decref_unlikely(node);
+	}
+	if (pdeleted_dirent)
+		*pdeleted_dirent = dent;
+	else {
+		decref_unlikely(dent);
+	}
+	if (pdeleted_path)
+		*pdeleted_path = NULL; /* Wasn't a path that got removed... */
+}
+
 
 
 

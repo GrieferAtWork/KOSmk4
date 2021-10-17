@@ -78,12 +78,15 @@ DECL_BEGIN
  *      ^
  *      |
  *    MOUNT=PATH --parent-> PATH --parent-> PATH
- *      ^     ^              ^               ^ |
- *      |     |              |               | |
- *      |     +-recent_cache-+---------------+ |
- *      |          |                           |
- *      |          |                           |
+ *      ^   | ^              ^               ^ |
+ *      |   | |              |               | |
+ *      |   | +-recent_cache-+---------------+ |
+ *      |   |       |                          |
+ *      |   +-[*]-+ |                          |
+ *      |         v |                          |
  *     MOUNTS---- VFS --> ROOT <-----parent----+
+ *
+ * [*] Weak reference (PATH->VFS)
  *
  * - PATH:         `struct path'
  * - MOUNT:        `struct pathmount'
@@ -95,6 +98,7 @@ DECL_BEGIN
  *
  */
 
+
 struct fdirnode;
 struct path;
 struct vfs;
@@ -103,7 +107,7 @@ struct vfs;
 struct path_bucket {
 	struct path *pb_path; /* [0..1][:p_cldlock] One of:
 	                       *  - Child path
-	                       *  - `_path_deleted' for deleted paths
+	                       *  - INTERNAL:`deleted_path' for deleted paths
 	                       *  - `NULL' for sentinel. */
 };
 
@@ -111,27 +115,30 @@ struct path_bucket {
 /* Flags for `struct path::p_flags' */
 #define PATH_F_NORMAL  0x0000 /* Normal flags */
 #define PATH_F_ISMOUNT 0x0001 /* [const] This path is a mounting point. */
-#define PATH_F_ISDRIVE 0x0002 /* [lock(:VFS->vf_driveslock)] The path is (at least one) DOS drive mount. */
+#define PATH_F_ISROOT  0x0002 /* [const] This path is a hard-root (iow: doesn't have a parent). */
+#define PATH_F_ISDRIVE 0x0003 /* [lock(:VFS->vf_driveslock)] The path is (at least one) DOS drive mount. */
 
 
 /* Marker for `struct path::p_cldlist': This path node has been deleted. */
 #define PATH_CLDLIST_DELETED ((struct path_bucket *)-1)
 
 struct path {
-	WEAK refcnt_t         p_refcnt;  /* Reference counter */
-	uintptr_t             p_flags;   /* Path flags (set of `PATH_F_*') */
-	REF struct path      *p_parent;  /* [0..1][const] Parent path, or NULL for root directory. */
-	REF struct fdirent   *p_name;    /* [1..1][const] Name of this directory (`fdirent_empty' for root directory). */
-	REF struct fdirnode  *p_dir;     /* [1..1][const] Directory to which this path refers. An unmounted
-	                                  * root directory  has this  set to  `fdirnode_unmounted.fs_root'. */
-	TAILQ_ENTRY(REF path) p_recent;  /* [0..1][lock(:VFS->vf_recent_lock)] Cache entry for recently used paths.
-	                                  * [const_if(this == &path_unmounted_root)] For unmounted VFS root,  this
-	                                  * link entry acts as though it were bound, such that attempts to add the
-	                                  * path to the recent cache are no-ops. However, you must not attempt  to
-	                                  * remove  the path from the recent cache,  as it's not actually apart of
-	                                  * it! */
-	struct shared_rwlock  p_cldlock; /* Lock for this path. */
-	Toblockop_slist(path) p_cldlops; /* Lock operations for `p_cldlock'. */
+	WEAK refcnt_t             p_refcnt;  /* Reference counter */
+	uintptr_t                 p_flags;   /* Path flags (set of `PATH_F_*') */
+	union {
+		REF struct path      *p_parent;  /* [1..1][const] Parent path, or NULL for root directory. */
+		WEAK REF struct vfs *_p_vfs;     /* [1..1][const] VFS context of this path-tree. */
+	};
+	REF struct fdirent       *p_name;    /* [1..1][const] Name of this directory (`fdirent_empty' for root directory). */
+	REF struct fdirnode      *p_dir;     /* [1..1][const] Directory to which this path refers. An unmounted
+	                                      * root directory  has this  set to  `fdirnode_unmounted.fs_root'. */
+	TAILQ_ENTRY(REF path)     p_recent;  /* [0..1][lock(:VFS->vf_recent_lock)] Cache entry for recently used paths.
+	                                      * NOTE: Once a path has been marked as deleted (p_cldlist = PATH_CLDLIST_DELETED),
+	                                      *       it should be removed  from the recent  cache by use  of a lock  operation.
+	                                      *       For this purpose, it is the responsibility of whoever marked the paths  as
+	                                      *       deleted (PATH_CLDLIST_DELETED) to initialize this lock operation! */
+	struct shared_rwlock      p_cldlock; /* Lock for this path. */
+	Toblockop_slist(path)     p_cldlops; /* Lock operations for `p_cldlock'. */
 #ifdef __WANT_PATH__p_LOPS
 	union {
 		struct {
@@ -143,6 +150,8 @@ struct path {
 		Tobpostlockop(path)   _p_pthplop;  /* Used internally for async remove from `p_parent->p_cldlist' */
 		Toblockop(fsuper)     _p_suplop;   /* Used internally for async remove from `path_getsuper(this)->fs_mounts' */
 		Tobpostlockop(fsuper) _p_supplop;  /* Used internally for async remove from `path_getsuper(this)->fs_mounts' */
+		Toblockop(vfs)        _p_vfslop;   /* Used internally for async remove from `struct vfs::vf_recent' */
+		Tobpostlockop(vfs)    _p_vfsplop;  /* Used internally for async remove from `struct vfs::vf_recent' */
 	};
 #else /* __WANT_PATH__p_LOPS */
 	size_t                p_cldused; /* [valid_if(p_cldlist != PATH_CLDLIST_DELETED)][lock(p_cldlock)] Amount of used (non-NULL and non-deleted) child paths */
@@ -166,6 +175,8 @@ struct path {
 #define path_ismount(self)  ((self)->p_flags & PATH_F_ISMOUNT)
 #define path_asmount(self)  ((struct pathmount *)(self))
 #define path_isdrive(self)  ((self)->p_flags & PATH_F_ISDRIVE)
+#define path_isroot(self)   ((self)->p_flags & PATH_F_ISROOT)
+#define path_parent(self)   ((self)->p_parent)
 
 
 /* Check if `child' is a descendent of `parent' */
@@ -173,9 +184,13 @@ FUNDEF NOBLOCK ATTR_PURE WUNUSED NONNULL((1, 2)) __BOOL
 NOTHROW(FCALL path_isdescendentof)(struct path const *parent,
                                    struct path const *child);
 
+/* Return a pointer to the VFS associated with `self' */
+FUNDEF NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) struct vfs *
+NOTHROW(FCALL _path_getvfs)(struct path const *__restrict self);
+
 
 /* Destroy a given path, automatically removing it from:
- *  - p_parent->p_cldlist             (asynchronously via lockops in p_parent->p_cldlops)
+ *  - path_parent(self)->p_cldlist    (asynchronously via lockops in path_parent(self)->p_cldlops)
  *  - path_getsuper(self)->fs_mounts  (asynchronously via lockops in path_getsuper(self)->fs_mountslockops.
  *                                    If  this path  was the  last mounting  point, call `fsuper_delete()') */
 FUNDEF NOBLOCK NONNULL((1)) void
@@ -189,12 +204,6 @@ DEFINE_REFCOUNT_FUNCTIONS(struct path, p_refcnt, path_destroy)
 DATDEF struct ramfs_super fsuper_unmounted;
 DATDEF struct fdirent fdirent_empty;
 #define fdirnode_unmounted fsuper_unmounted._ramfs_super_super_ fs_root
-
-/* Special path pointed-to by newly-allocated VFS  */
-DATDEF struct path path_unmounted_root;
-
-/* Special value for paths deleted from child-lists. */
-#define _path_deleted path_unmounted_root
 
 /* Empty hash-vector for `struct path::p_cldlist' */
 DATDEF struct path_bucket const _path_empty_cldlist[1] ASMNAME("path_empty_cldlist");
@@ -228,10 +237,21 @@ FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(KCALL _path_cldlock_reap)(struct path *
 #define path_cldlock_canread(self)    shared_rwlock_canread(&(self)->p_cldlock)
 #define path_cldlock_canwrite(self)   shared_rwlock_canwrite(&(self)->p_cldlock)
 
-/* Remove `elem' from the child-list of `self' */
-FUNDEF NOBLOCK NONNULL((1, 2)) void
+/* Remove `elem' from the child-list of `self'
+ * @return: true:  Successfully removed.
+ * @return: false: Wasn't actually a member. */
+FUNDEF NOBLOCK NONNULL((1, 2)) __BOOL
 NOTHROW(KCALL path_cldlist_remove)(struct path *__restrict self,
                                    struct path *__restrict elem);
+/* Same as `path_cldlist_remove()', but UD  if
+ * `elem' isn't actually in `self's child list */
+FUNDEF NOBLOCK NONNULL((1, 2)) void
+NOTHROW(KCALL path_cldlist_remove_force)(struct path *__restrict self,
+                                         struct path *__restrict elem);
+
+/* Try to rehash the child-path list of `self' following the removal of a child. */
+FUNDEF NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL path_cldlist_rehash_after_remove)(struct path *__restrict self);
 
 
 
@@ -375,8 +395,8 @@ path_traverse_ex(struct path *cwd, u32 *__restrict premaining_symlinks,
                  USER CHECKED /*utf-8*/ char const **plastseg DFL(__NULLPTR),
                  u16 *plastlen DFL(__NULLPTR), atflag_t atflags DFL(0))
 		THROWS(E_WOULDBLOCK, E_SEGFAULT, E_FSERROR_ACCESS_DENIED, E_FSERROR_PATH_NOT_FOUND,
-		       E_FSERROR_TOO_MANY_SYMBOLIC_LINKS, E_FSERROR_NOT_A_DIRECTORY,
-		       E_IOERROR, E_BADALLOC, ...);
+		       E_FSERROR_TOO_MANY_SYMBOLIC_LINKS, E_FSERROR_NOT_A_DIRECTORY, E_IOERROR,
+		       E_BADALLOC, ...);
 
 /* Same as  `path_traverse_ex',  but  automatically keep  track  of  symlinks,
  * as well as pass `cwd = fd_cwd == AT_FDCWD ? NULL : handle_get_path(fd_cwd)' */
@@ -387,6 +407,10 @@ path_traverse(fd_t fd_cwd, USER CHECKED /*utf-8*/ char const *upath,
 		THROWS(E_WOULDBLOCK, E_SEGFAULT, E_FSERROR_ACCESS_DENIED, E_FSERROR_PATH_NOT_FOUND,
 		       E_FSERROR_TOO_MANY_SYMBOLIC_LINKS, E_FSERROR_NOT_A_DIRECTORY,
 		       E_IOERROR, E_BADALLOC, ...);
+#define path_traverse_ex_r(...) vfs_recent(THIS_VFS, path_traverse_ex(__VA_ARGS__))
+#define path_traverse_r(...)    vfs_recent(THIS_VFS, path_traverse(__VA_ARGS__))
+
+
 
 /* Helper wrapper that combines `path_traverse_ex()' with `path_expandchildnode()'
  * @param: atflags: Set of: `AT_DOSPATH | AT_NO_AUTOMOUNT | AT_EMPTY_PATH | AT_SYMLINK_NOFOLLOW' */
@@ -416,15 +440,21 @@ path_traversefull(fd_t fd_cwd, USER CHECKED /*utf-8*/ char const *upath, atflag_
  * @throw: E_WOULDBLOCK:                                Preemption is disabled, and operation would have blocked.
  * @throw: E_SEGFAULT:                                  Faulty pointer
  * @throw: E_FSERROR_DELETED:E_FILESYSTEM_DELETED_PATH: `self' has already been deleted.
- * @throw: E_FSERROR_ACCESS_DENIED:                     Missing write permissions for old/new directory
+ * @throw: E_FSERROR_DELETED:E_FILESYSTEM_DELETED_FILE: `name' has already been deleted.
+ * @throw: E_FSERROR_ACCESS_DENIED:                     Missing W/X permissions for `self'
+ * @throw: E_FSERROR_NOT_A_DIRECTORY:E_FILESYSTEM_NOT_A_DIRECTORY_RMDIR: `name' is S_IFREG, but `AT_REMOVEREG' isn't given
+ * @throw: E_FSERROR_IS_A_DIRECTORY:E_FILESYSTEM_IS_A_DIRECTORY_UNLINK:  `name' is S_IFDIR, but `AT_REMOVEDIR' isn't given
  * @throw: E_FSERROR_IS_A_MOUNTING_POINT:               `name' refers to a mounting point
  * @throw: E_FSERROR_FILE_NOT_FOUND:                    `name' could not be found
  * @throw: E_FSERROR_READONLY:                          ...
  * @throw: E_IOERROR:                                   ...
  * @throw: E_BADALLOC:                                  ... */
-FUNDEF NONNULL((1, 2)) void KCALL
-path_remove(struct vfs *__restrict path_vfs, struct path *__restrict self,
-            USER CHECKED /*utf-8*/ char const *name, u16 namelen, atflag_t atflags DFL(0))
+FUNDEF NONNULL((1)) void KCALL
+path_remove(struct path *__restrict self,
+            USER CHECKED /*utf-8*/ char const *name, u16 namelen, atflag_t atflags DFL(0),
+            /*out[1..1]_opt*/ REF struct fnode **pdeleted_node DFL(__NULLPTR),
+            /*out[1..1]_opt*/ REF struct fdirent **pdeleted_dirent DFL(__NULLPTR),
+            /*out[0..1]_opt*/ REF struct path **pdeleted_path DFL(__NULLPTR))
 		THROWS(E_WOULDBLOCK, E_SEGFAULT, E_FSERROR_DELETED, E_FSERROR_ACCESS_DENIED,
 		       E_FSERROR_IS_A_MOUNTING_POINT, E_FSERROR_FILE_NOT_FOUND, E_FSERROR_READONLY,
 		       E_IOERROR, E_BADALLOC, ...);
@@ -452,11 +482,13 @@ path_remove(struct vfs *__restrict path_vfs, struct path *__restrict self,
  * @throw: E_FSERROR_READONLY:                          ...
  * @throw: E_IOERROR:                                   ...
  * @throw: E_BADALLOC:                                  ... */
-FUNDEF NONNULL((1, 2, 5)) void KCALL
-path_rename(struct vfs *__restrict path_vfs,
-            struct path *__restrict oldpath, USER CHECKED /*utf-8*/ char const *oldname, u16 oldnamelen,
+FUNDEF NONNULL((1, 4)) void KCALL
+path_rename(struct path *__restrict oldpath, USER CHECKED /*utf-8*/ char const *oldname, u16 oldnamelen,
             struct path *__restrict newpath, USER CHECKED /*utf-8*/ char const *newname, u16 newnamelen,
-            atflag_t atflags DFL(0))
+            atflag_t atflags DFL(0),
+            /*out[1..1]_opt*/ REF struct fnode **prenamed_node DFL(__NULLPTR),
+            /*out[1..1]_opt*/ REF struct fdirent **pold_dirent DFL(__NULLPTR),
+            /*out[1..1]_opt*/ REF struct fdirent **pnew_dirent DFL(__NULLPTR))
 		THROWS(E_WOULDBLOCK, E_SEGFAULT, E_FSERROR_DELETED, E_FSERROR_ACCESS_DENIED, E_FSERROR_IS_A_MOUNTING_POINT,
 		       E_FSERROR_FILE_NOT_FOUND, E_FSERROR_CROSS_DEVICE_LINK, E_FSERROR_FILE_ALREADY_EXISTS,
 		       E_FSERROR_ILLEGAL_PATH, E_FSERROR_DIRECTORY_MOVE_TO_CHILD, E_FSERROR_DISK_FULL,
@@ -472,7 +504,7 @@ path_rename(struct vfs *__restrict path_vfs,
  *   - AT_DOSPATH:              Print the path as a DOS-path (including drive letters).
  *                              NOTE: In this mode,  if the path  reaches `root' before  a
  *                                    DOS drive is encountered, the path will be pre-fixed
- *                                    with  "\\\\unix\\", indicative of  it being relative
+ *                                    with "\\\\unix\\", indicative  of it being  relative
  *                                    to the UNIX filesystem root.
  *   - _AT_PATHPRINT_REACHABLE: Assume that `root' is reachable from `self'. When this  flag
  *                              isn't given, a check is made for `self' being reachable, and
@@ -531,53 +563,58 @@ struct pathmount
 #define path_free(p) (path_ismount(p) ? _pathmount_free(p) : _path_free(p))
 #endif
 
-/* Replace `self' with a mounting point for `dir' in the context of the
- * given `path_vfs' to  which `self' must  belong. If appropriate,  the
- * caller is responsible  for checking for  an existing mounting  point
- * (by use of `path_ismount(self)'), if  such a case isn't allowed,  as
+
+/* Replace `self' with a mounting point for `dir'. If appropriate, the
+ * caller is responsible for checking  for an existing mounting  point
+ * (by  use of `path_ismount(self)'), if such a case isn't allowed, as
  * usually handled by throwing `E_FSERROR_PATH_ALREADY_MOUNTED'.
  * @throw: E_FSERROR_DELETED:E_FILESYSTEM_DELETED_PATH:
- *         `self' has a parent which has been marked as `PATH_CLDLIST_DELETED'
+ *         `self' has a parent which has been marked as `PATH_CLDLIST_DELETED',
+ *         or `self' is a VFS root path who's VFS controller has been destroyed
+ *         or altered to point to some other path.
  * @throw: E_FSERROR_DELETED:E_FILESYSTEM_DELETED_UNMOUNTED:
  *         The superblock of `dir' indicate `FSUPER_MOUNTS_DELETED'
- * @return: * : The new path node replacing `self' and pointing to  `dir'.
- *              This path node is also referenced by `path_vfs->vf_mounts'
- *              and  has replaced `self'  within the filesystem hierarchy,
- *              though any  path-relative filesystem  operations that  use
- *              some existing reference to `self' will continue to operate
- *              with  the old path  `self' (since the  old path didn't get
- *              modified but replaced with a newly allocated path). */
-FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3)) REF struct pathmount *KCALL
+ * @return: * : The  new  path  node  replacing   `self'  and  pointing  to   `dir'.
+ *              This path node is also referenced by `_path_getvfs(self)->vf_mounts'
+ *              and has replaced `self' within the filesystem hierarchy, though  any
+ *              path-relative filesystem operations that use some existing reference
+ *              to `self' will continue to operate  with the old path `self'  (since
+ *              the old path didn't get modified but replaced with a newly allocated
+ *              path). */
+FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) REF struct pathmount *KCALL
 path_mount(struct path *__restrict self,
-           struct vfs *__restrict path_vfs,
            struct fdirnode *__restrict dir)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, E_FSERROR_DELETED);
 
 /* Unmount the a given path `self', as well as all child-paths of
  * it which  may  also  be  mounting points.  This  is  done  by:
  *  - Acquire a lock to `self->p_parent->p_cldlock', or if `self' has
- *    not parent, a lock to `path_vfs->vf_rootlock'.
+ *    not parent, a lock  to `self->_p_vfs->vf_rootlock'. If the  VFS
+ *    has already been destroyed here, simply return `false'
  *  - Acquire locks to `self->p_cldlock', as well as any tryincref()-albe
  *    path  that is  recursively reachable  via the  list of child-paths.
  *  - For  every recursively reachable child (including `self'), clear + free its
  *    `p_cldlist' fields and set it to `PATH_CLDLIST_DELETED' to mark as deleted.
- *  - Remove all recursively reachable children (including `self'), from the
- *    recent-cache  of `path_vfs'. In  case one of those  children is also a
- *    mounting point, remove from the mount list of `path_vfs', and in  case
- *    of DOS drive roots, also remove from those tables.
+ *  - Remove all  recursively  reachable  children (including  `self'),  from  the
+ *    recent-cache of `_path_getvfs(self)'. If the VFS has already been destroyed,
+ *    simply skip the removal of elements from the recent cache (since that  cache
+ *    has also been destroyed). In case one  of those children is also a  mounting
+ *    point,  remove from the  mount list of `_path_getvfs(self)',  and in case of
+ *    DOS drive roots, also remove from those tables. (Again if VFS was destroyed,
+ *    instead assert that  no mounting points  exists, and none  of the paths  are
+ *    part of any recent caches)
  *  - Release locks to all of the recursively reachable children, including `self'
  *  - When `self->p_parent != NULL', remove `self'  from its parent's list  of
  *    child paths. The return value of this value here is indicative of `self'
  *    having been found in this map.
- *  - When `self->p_parent == NULL', check if `self == path_vfs->vf_root'.
- *    - If so, this function returns `true' and `path_vfs->vf_root = incref(&path_unmounted_root)'
- *    - If not, this function returns `false' and `path_vfs->vf_root' isn't modified.
+ *  - When `self->p_parent == NULL', check if `self == self->_p_vfs->vf_root'.
+ *    - If so, this function returns `true' and `self->_p_vfs->vf_root = ALLOC_UNMOUNTED_ROOT()'
+ *    - If not, this function returns `false'
  * @return: true:  `self' was unmounted.
  * @return: false: `self' had already been unmounted. */
-FUNDEF NONNULL((1, 2)) __BOOL KCALL
-path_umount(struct pathmount *__restrict self,
-            struct vfs *__restrict path_vfs)
-		THROWS(E_WOULDBLOCK, E_BADALLOC);
+FUNDEF NONNULL((1)) __BOOL KCALL
+path_umount(struct pathmount *__restrict self)
+		THROWS(E_WOULDBLOCK);
 
 
 

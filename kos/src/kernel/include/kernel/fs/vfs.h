@@ -49,14 +49,20 @@ TAILQ_HEAD(path_tailq, path);
 LIST_HEAD(pathmount_list, pathmount);
 #endif /* !__pathmount_list_defined */
 
+#ifndef ____os_free_defined
+#define ____os_free_defined
+FUNDEF NOBLOCK void NOTHROW(KCALL __os_free)(VIRT void *ptr) ASMNAME("kfree");
+#endif /* !____os_free_defined */
+
+
 /* # of different DOS drives. */
 #define VFS_DRIVECOUNT  (('Z' - 'A') + 1)
-
 
 /* VFS is the controller hub for mounting points and DOS drive roots,
  * as well  as keeper  of the  true filesystem  root mounting  point. */
 struct vfs {
 	WEAK refcnt_t             vf_refcnt;     /* Reference counter */
+	WEAK refcnt_t             vf_weakrefcnt; /* Weak reference counter */
 	REF struct path          *vf_root;       /* [1..1][lock(vf_rootlock)] True VFS root path. */
 	struct atomic_rwlock      vf_rootlock;   /* Lock for `vf_root' */
 	struct REF pathmount_list vf_mounts;     /* [0..n][lock(vf_mountslock)] List of mounting points. */
@@ -68,13 +74,69 @@ struct vfs {
 	                                          * recently, the least recently  used path is removed  from
 	                                          * the cache if `vf_recentcnt >= vf_recentmax'. */
 	struct atomic_lock        vf_recentlock; /* Lock for `vf_recent' */
+	Toblockop_slist(vfs)      vf_recentlops; /* Lock operations for `vf_recentlock' */
 	REF struct path          *vf_drives[VFS_DRIVECOUNT]; /* [0..1][lock(vf_driveslock)][*] DOS Drive roots. */
 	struct atomic_rwlock      vf_driveslock; /* Lock for for DOS drives. */
 };
 
+#define vfs_free(self) __os_free(self)
+DEFINE_WEAKREFCOUNT_FUNCTIONS(struct vfs, vf_weakrefcnt, vfs_free)
+FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL vfs_destroy)(struct vfs *__restrict self);
+DEFINE_REFCOUNT_FUNCTIONS(struct vfs, vf_refcnt, vfs_destroy)
+
+/* Helper macros for working with `struct vfs::vf_rootlock' */
+#define _vfs_rootlock_reap(self)      (void)0
+#define vfs_rootlock_reap(self)       (void)0
+#define vfs_rootlock_mustreap(self)   0
+#define vfs_rootlock_write(self)      atomic_rwlock_write(&(self)->vf_rootlock)
+#define vfs_rootlock_write_nx(self)   atomic_rwlock_write_nx(&(self)->vf_rootlock)
+#define vfs_rootlock_trywrite(self)   atomic_rwlock_trywrite(&(self)->vf_rootlock)
+#define vfs_rootlock_endwrite(self)   (atomic_rwlock_endwrite(&(self)->vf_rootlock), vfs_rootlock_reap(self))
+#define _vfs_rootlock_endwrite(self)  atomic_rwlock_endwrite(&(self)->vf_rootlock)
+#define vfs_rootlock_read(self)       atomic_rwlock_read(&(self)->vf_rootlock)
+#define vfs_rootlock_read_nx(self)    atomic_rwlock_read_nx(&(self)->vf_rootlock)
+#define vfs_rootlock_tryread(self)    atomic_rwlock_tryread(&(self)->vf_rootlock)
+#define _vfs_rootlock_endread(self)   atomic_rwlock_endread(&(self)->vf_rootlock)
+#define vfs_rootlock_endread(self)    (void)(atomic_rwlock_endread(&(self)->vf_rootlock) && (vfs_rootlock_reap(self), 0))
+#define _vfs_rootlock_end(self)       atomic_rwlock_end(&(self)->vf_rootlock)
+#define vfs_rootlock_end(self)        (void)(atomic_rwlock_end(&(self)->vf_rootlock) && (vfs_rootlock_reap(self), 0))
+#define vfs_rootlock_upgrade(self)    atomic_rwlock_upgrade(&(self)->vf_rootlock)
+#define vfs_rootlock_upgrade_nx(self) atomic_rwlock_upgrade_nx(&(self)->vf_rootlock)
+#define vfs_rootlock_tryupgrade(self) atomic_rwlock_tryupgrade(&(self)->vf_rootlock)
+#define vfs_rootlock_downgrade(self)  atomic_rwlock_downgrade(&(self)->vf_rootlock)
+#define vfs_rootlock_reading(self)    atomic_rwlock_reading(&(self)->vf_rootlock)
+#define vfs_rootlock_writing(self)    atomic_rwlock_writing(&(self)->vf_rootlock)
+#define vfs_rootlock_canread(self)    atomic_rwlock_canread(&(self)->vf_rootlock)
+#define vfs_rootlock_canwrite(self)   atomic_rwlock_canwrite(&(self)->vf_rootlock)
+
+/* Helper macros for `struct fsuper::vf_mountslock' */
+#define _vfs_mountslock_reap(self)      (void)0
+#define vfs_mountslock_reap(self)       (void)0
+#define vfs_mountslock_mustreap(self)   0
+#define vfs_mountslock_tryacquire(self) atomic_lock_tryacquire(&(self)->vf_mountslock)
+#define vfs_mountslock_acquire(self)    atomic_lock_acquire(&(self)->vf_mountslock)
+#define vfs_mountslock_acquire_nx(self) atomic_lock_acquire_nx(&(self)->vf_mountslock)
+#define _vfs_mountslock_release(self)   atomic_lock_release(&(self)->vf_mountslock)
+#define vfs_mountslock_release(self)    (atomic_lock_release(&(self)->vf_mountslock), vfs_mountslock_reap(self))
+#define vfs_mountslock_acquired(self)   atomic_lock_acquired(&(self)->vf_mountslock)
+#define vfs_mountslock_available(self)  atomic_lock_available(&(self)->vf_mountslock)
+
+/* Helper macros for `struct fsuper::vf_recentlock' */
+#define _vfs_recentlock_reap(self)      _oblockop_reap_atomic_lock(&(self)->vf_recentlops, &(self)->vf_recentlock, self)
+#define vfs_recentlock_reap(self)       oblockop_reap_atomic_lock(&(self)->vf_recentlops, &(self)->vf_recentlock, self)
+#define vfs_recentlock_mustreap(self)   oblockop_mustreap(&(self)->vf_recentlops)
+#define vfs_recentlock_tryacquire(self) atomic_lock_tryacquire(&(self)->vf_recentlock)
+#define vfs_recentlock_acquire(self)    atomic_lock_acquire(&(self)->vf_recentlock)
+#define vfs_recentlock_acquire_nx(self) atomic_lock_acquire_nx(&(self)->vf_recentlock)
+#define _vfs_recentlock_release(self)   atomic_lock_release(&(self)->vf_recentlock)
+#define vfs_recentlock_release(self)    (atomic_lock_release(&(self)->vf_recentlock), vfs_recentlock_reap(self))
+#define vfs_recentlock_acquired(self)   atomic_lock_acquired(&(self)->vf_recentlock)
+#define vfs_recentlock_available(self)  atomic_lock_available(&(self)->vf_recentlock)
+
 /* Helper macros for working with `struct vfs::vf_driveslock' */
 #define _vfs_driveslock_reap(self)      (void)0
 #define vfs_driveslock_reap(self)       (void)0
+#define vfs_driveslock_mustreap(self)   0
 #define vfs_driveslock_write(self)      atomic_rwlock_write(&(self)->vf_driveslock)
 #define vfs_driveslock_write_nx(self)   atomic_rwlock_write_nx(&(self)->vf_driveslock)
 #define vfs_driveslock_trywrite(self)   atomic_rwlock_trywrite(&(self)->vf_driveslock)
@@ -176,7 +238,12 @@ struct fs {
 /* Default kernel and /bin/init FS controller. */
 DATDEF struct fs fs_kernel;
 
-/* [1..1][const] Filesystem controller for the current thread */
+/* [1..1][lock(PRIVATE(THIS_TASK))] Filesystem controller for the current thread.
+ * Even  though this pointer can be modified by the thread itself, it must not be
+ * altered from within any kind of RPC. Lots of filesystem functionality  assumes
+ * that this pointer cannot changed over  the course of some operation.  However,
+ * it  is OK for this pointer to change  outside the context of any FS operation,
+ * such as a top-level system call. */
 DATDEF ATTR_PERTASK REF struct fs *this_fs;
 #define THIS_FS        PERTASK_GET(this_fs)
 #define THIS_VFS       (THIS_FS->fs_vfs)
