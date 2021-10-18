@@ -344,6 +344,7 @@ again_acquire_cldlock:
  * @throw: E_WOULDBLOCK:                                Preemption is disabled, and operation would have blocked.
  * @throw: E_SEGFAULT:                                  Faulty pointer
  * @throw: E_FSERROR_DELETED:E_FILESYSTEM_DELETED_PATH: Either `oldpath' or `newpath' have already been deleted.
+ * @throw: E_FSERROR_DELETED:E_FILESYSTEM_DELETED_FILE: The specified `oldname' was already deleted/renamed
  * @throw: E_FSERROR_ACCESS_DENIED:                     Missing write permissions for old/new directory
  * @throw: E_FSERROR_IS_A_MOUNTING_POINT:               `oldname' refers to a mounting point
  * @throw: E_FSERROR_FILE_NOT_FOUND:                    `oldname' could not be found
@@ -369,6 +370,104 @@ path_rename(struct path *__restrict oldpath, USER CHECKED /*utf-8*/ char const *
 		       E_FSERROR_FILE_NOT_FOUND, E_FSERROR_CROSS_DEVICE_LINK, E_FSERROR_FILE_ALREADY_EXISTS,
 		       E_FSERROR_ILLEGAL_PATH, E_FSERROR_DIRECTORY_MOVE_TO_CHILD, E_FSERROR_DISK_FULL,
 		       E_FSERROR_READONLY, E_IOERROR, E_BADALLOC, ...) {
+	/* TODO: Eyes-opened moment: `rename()' actually _OVERRIDES_ the a target file
+	 *       if it already exists! Yes! I know that sounds insane, but it's  true:
+	 * $ mkdir -p /opt/demo && cd /opt/demo
+	 * $ echo foo > a
+	 * $ echo bar > b
+	 * $ mv a b            # << Yes: this succeeds
+	 * $ cat a
+	 * cat: a: No such file or directory
+	 * $ cat b
+	 * foo
+	 * $ ls | wc -l
+	 * 1                   # << Only one file left
+	 */
+
+	/* This is why renameat2() exists with `RENAME_NOREPLACE'
+	 * Also: Since we're rewriting the whole FS anyways, this
+	 *       is a good point to add support for  renameat2():
+	 *        - RENAME_EXCHANGE
+	 *        - RENAME_NOREPLACE
+	 *
+	 * Idea: `RENAME_NOREPLACE' can be implemented by adding additional
+	 *       fields `struct frename_info::frn_delfile', to specify  the
+	 *       exact fnode which  should be overwritten  and may also  be
+	 *       set exact fnode which should  be overwritten and may  also
+	 *       be set to NULL to indicate  that no existing file must  be
+	 *       overwritten. As  an extension  to this,  `RENAME_EXCHANGE'
+	 *       can then be implemented as an additional `atflag_t'  which
+	 *       may be used to atomically exchange 2 existing files.
+	 * Also: To  prevent the  need to always  do a lookup  before doing a
+	 *       rename on the  fs-layer, rename itself  should also be  able
+	 *       to return with an exists-error when the target file  already
+	 *       exists, similar to the mknod operator. That way, unix-rename
+	 *       is implemented by first calling dno_rename and handling  its
+	 *       "exists" error (which also tells the exact node that existed
+	 *       at the specified target  name), before re-attempting the  op
+	 *       with `frn_delfile' set  to the fnode  returned by the  first
+	 *       call. (if this second call  says the node was deleted,  just
+	 *       start over)
+	 *
+	 * NOTE: Looking back,  I do  believe this  is why  X11's log  file
+	 *       system didn't work out-of-the-box on KOS, since it renames
+	 *       an existing log file to "foo.log.old", but didn't  include
+	 *       any checks for rename() returning EEXIST.
+	 *       -> That's because unix's rename() DOESN'T RETURN EEXIST!
+	 *
+	 * NOTE: Unix's rename() also  doesn't support the  automatic-move-to-
+	 *       directory feature (`>a; mkdir b; mv a b;'), but handles  this
+	 *       case by erroring out with  `EISDIR' (probably in relation  to
+	 *       this weird rename-overrides-files  anti-feature). This  whole
+	 *       functionality is only added by mv(1)! But trying rename() one
+	 *       directory onto another still causes the override behavior  to
+	 *       happen (so-long as the new  directory is empty; if it  isn't,
+	 *       then it'll error out with ENOTEMPTY (or EEXIST?? WTF? WHY ARE
+	 *       YOU SO INCONSISTENT UNIX?!?!?!))
+	 *
+	 * -> I feel like KOS should still support this though, probably
+	 *    through  use  of a  kos-specific  flag `RENAME_MOVETODIR'.
+	 *
+	 *
+	 * Unix behavior:
+	 * ```
+	 * $ cat ./test.c
+	 * #include <stdlib.h>
+	 * #include <stdio.h>
+	 * #include <errno.h>
+	 * #include <string.h>
+	 * int main(int argc, char **argv) {
+	 *     if (rename(argv[1], argv[2]) != 0)
+	 *         printf("errno = %d (%s)\n", errno, strerror(errno));
+	 *     return 0;
+	 * }
+	 * $ gcc -o test test.c
+	 * $ > a
+	 * $ > b
+	 * $ ./test a b                    # <<<<<<< This is insane, unix!
+	 * $ ls
+	 * b  test  test.c                 # <<<<<<< Yes: file "a" replaced "b"
+	 * $ mkdir a
+	 * $ ./test a b                    # <<<<<<< You can't "replace" a regular file with a directory
+	 * errno = 20 (Not a directory)    # <<<<<<< error-reason given: "a isn't a directory"
+	 * $ ./test b a                    # <<<<<<< You can't "replace" a directory with a regular file
+	 * errno = 21 (Is a directory)     # <<<<<<< error-reason given: "b is a directory"
+	 * $ unlink b && mkdir b
+	 * $ ls a                          # Empty directory
+	 * $ ls b                          # Empty directory
+	 * $ mv a b                        # mv(1) has sane semantics (because it's more than just a rename(2)-wrapper)
+	 * $ ls b                          # mv(1) implements move-to-directory semantics (which I _THOUGHT_ rename(2) did, too)
+	 * a
+	 * $ mv b/a .
+	 * $ ./test a b                    # <<<<<<< Yes: one directory can replace another (though only if the "other" is empty)
+	 * $ ls                            # As you can see: "a" is gone...
+	 * b  test  test.c
+	 * $ ls b                          # ... but it didn't get moved-into-b; IT F-ING REPLACED "b"!
+	 * ```
+	 *
+	 */
+
+
 	/* TODO */
 }
 

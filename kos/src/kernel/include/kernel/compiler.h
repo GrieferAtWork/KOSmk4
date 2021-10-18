@@ -44,7 +44,7 @@
 #endif /* !CONFIG_NO_SMP */
 
 #undef CONFIG_USE_NEW_FS
-#if 0
+#if 1
 #define CONFIG_USE_NEW_FS
 #endif
 

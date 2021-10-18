@@ -165,28 +165,14 @@ fdirnode_unlink(struct fdirnode *__restrict self,
  * @throw: E_FSERROR_DISK_FULL:               Disk full
  * @throw: E_FSERROR_READONLY:                Read-only filesystem
  * @throw: E_FSERROR_FILE_ALREADY_EXISTS:     `info->frn_name' already exists
- * @throw: E_FSERROR_DELETED:                 The given `entry' was already deleted
- * @throw: E_FSERROR_CROSS_DEVICE_LINK:       ...
- * @throw: E_FSERROR_DIRECTORY_MOVE_TO_CHILD: ... */
+ * @throw: E_FSERROR_DELETED:                 The given `entry' was already deleted */
 PUBLIC NONNULL((1, 2)) void FCALL
 fdirnode_rename(struct fdirnode *__restrict self,
                 struct frename_info *__restrict info)
 		THROWS(E_FSERROR_ILLEGAL_PATH, E_FSERROR_DISK_FULL,
 		       E_FSERROR_READONLY, E_FSERROR_FILE_ALREADY_EXISTS,
-		       E_FSERROR_DELETED, E_FSERROR_CROSS_DEVICE_LINK,
-		       E_FSERROR_DIRECTORY_MOVE_TO_CHILD) {
+		       E_FSERROR_DELETED) {
 	struct fdirnode_ops const *ops;
-	struct fdirnode *olddir, *iter;
-	/* Make sure that `self' isn't a child-directory of `info->frn_olddir',
-	 * or belongs to a different superblock. */
-	olddir = info->frn_olddir;
-	if unlikely(self->fn_super != olddir->fn_super)
-		THROW(E_FSERROR_CROSS_DEVICE_LINK);
-	iter = self;
-	do {
-		if unlikely(iter == olddir)
-			THROW(E_FSERROR_DIRECTORY_MOVE_TO_CHILD);
-	} while ((iter = iter->dn_parent) != NULL);
 
 	/* Do the low-level rename operation */
 	ops = fdirnode_getops(self);

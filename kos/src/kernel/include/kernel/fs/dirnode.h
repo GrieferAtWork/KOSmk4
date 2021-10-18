@@ -260,14 +260,18 @@ struct fdirnode_ops {
 			THROWS(E_FSERROR_DIRECTORY_NOT_EMPTY,
 			       E_FSERROR_READONLY, E_FSERROR_DELETED);
 
-	/* [0..1] Rename/move the specified file from one location to another
-	 * @throw: E_FSERROR_ILLEGAL_PATH:        `info->frn_name' contains bad characters
-	 * @throw: E_FSERROR_DISK_FULL:           Disk full
-	 * @throw: E_FSERROR_READONLY:            Read-only filesystem
-	 * @throw: E_FSERROR_FILE_ALREADY_EXISTS: `info->frn_name' already exists
-	 * @throw: E_FSERROR_DELETED:             `self' was already deleted
-	 * @throw: E_FSERROR_DELETED:             `info->frn_oldent' was already deleted
-	 * @throw: E_FSERROR_DELETED:             `info->frn_olddir' was already deleted */
+	/* [0..1] Rename/move the specified file from one location to  another.
+	 * The caller must ensure that  `self' and `info->frn_olddir' are  part
+	 * of the same filesystem, and (if `fnode_isdir(info->frn_file)'), that
+	 * `self' isn't its child:
+	 * >> self->[dn_parent->...] != fnode_asdir(info->frn_file);
+	 * @throw: E_FSERROR_ILLEGAL_PATH:                      `info->frn_name' contains bad characters
+	 * @throw: E_FSERROR_DISK_FULL:                         Disk full
+	 * @throw: E_FSERROR_READONLY:                          Read-only filesystem
+	 * @throw: E_FSERROR_FILE_ALREADY_EXISTS:               `info->frn_name' already exists
+	 * @throw: E_FSERROR_DELETED:E_FILESYSTEM_DELETED_PATH: `self' was already deleted
+	 * @throw: E_FSERROR_DELETED:E_FILESYSTEM_DELETED_PATH: `info->frn_olddir' was already deleted
+	 * @throw: E_FSERROR_DELETED:E_FILESYSTEM_DELETED_FILE: `info->frn_oldent' was already deleted/renamed */
 	NONNULL((1, 2)) void
 	(KCALL *dno_rename)(struct fdirnode *__restrict self,
 	                    struct frename_info *__restrict info)
@@ -427,16 +431,13 @@ fdirnode_unlink(struct fdirnode *__restrict self,
  * @throw: E_FSERROR_DISK_FULL:               Disk full
  * @throw: E_FSERROR_READONLY:                Read-only filesystem
  * @throw: E_FSERROR_FILE_ALREADY_EXISTS:     `info->frn_name' already exists
- * @throw: E_FSERROR_DELETED:                 The given `entry' was already deleted
- * @throw: E_FSERROR_CROSS_DEVICE_LINK:       ...
- * @throw: E_FSERROR_DIRECTORY_MOVE_TO_CHILD: ... */
+ * @throw: E_FSERROR_DELETED:                 The given `entry' was already deleted */
 FUNDEF NONNULL((1, 2)) void KCALL
 fdirnode_rename(struct fdirnode *__restrict self,
                 struct frename_info *__restrict info)
 		THROWS(E_FSERROR_ILLEGAL_PATH, E_FSERROR_DISK_FULL,
 		       E_FSERROR_READONLY, E_FSERROR_FILE_ALREADY_EXISTS,
-		       E_FSERROR_DELETED, E_FSERROR_CROSS_DEVICE_LINK,
-		       E_FSERROR_DIRECTORY_MOVE_TO_CHILD);
+		       E_FSERROR_DELETED);
 
 
 DECL_END

@@ -469,6 +469,7 @@ path_remove(struct path *__restrict self,
  * @throw: E_WOULDBLOCK:                                Preemption is disabled, and operation would have blocked.
  * @throw: E_SEGFAULT:                                  Faulty pointer
  * @throw: E_FSERROR_DELETED:E_FILESYSTEM_DELETED_PATH: Either `oldpath' or `newpath' have already been deleted.
+ * @throw: E_FSERROR_DELETED:E_FILESYSTEM_DELETED_FILE: The specified `oldname' was already deleted/renamed
  * @throw: E_FSERROR_ACCESS_DENIED:                     Missing write permissions for old/new directory
  * @throw: E_FSERROR_IS_A_MOUNTING_POINT:               `oldname' refers to a mounting point
  * @throw: E_FSERROR_FILE_NOT_FOUND:                    `oldname' could not be found
