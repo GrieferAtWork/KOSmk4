@@ -54,6 +54,10 @@ LIST_HEAD(pathmount_list, pathmount);
 FUNDEF NOBLOCK void NOTHROW(KCALL __os_free)(VIRT void *ptr) ASMNAME("kfree");
 #endif /* !____os_free_defined */
 
+#ifndef CONFIG_VFS_RECENT_MAX_DEFAULT
+#define CONFIG_VFS_RECENT_MAX_DEFAULT 128
+#endif /* !CONFIG_VFS_RECENT_MAX_DEFAULT */
+
 
 /* # of different DOS drives. */
 #define VFS_DRIVECOUNT  (('Z' - 'A') + 1)
@@ -81,7 +85,10 @@ struct vfs {
 
 #define vfs_free(self) __os_free(self)
 DEFINE_WEAKREFCOUNT_FUNCTIONS(struct vfs, vf_weakrefcnt, vfs_free)
-FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL vfs_destroy)(struct vfs *__restrict self);
+
+/* Destroy the given VFS controller. */
+FUNDEF NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL vfs_destroy)(struct vfs *__restrict self);
 DEFINE_REFCOUNT_FUNCTIONS(struct vfs, vf_refcnt, vfs_destroy)
 
 /* Helper macros for working with `struct vfs::vf_rootlock' */
@@ -162,13 +169,6 @@ DEFINE_REFCOUNT_FUNCTIONS(struct vfs, vf_refcnt, vfs_destroy)
 /* Default kernel and /bin/init VFS controller. */
 DATDEF struct vfs vfs_kernel;
 
-/* Clone the given VFS, duplicating the sub-tree of paths from `self' that  are
- * formed by paths reachable from `vf_drives',  or `vf_mounts', as well as  the
- * root `vf_root' itself. (Only contents of the recent cache aren't duplicated) */
-FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct vfs *KCALL
-vfs_clone(struct vfs *__restrict self) THROWS(E_BADALLOC);
-
-
 /* (try) to add the given path `self' to the cache of recently used paths.
  * If the  lock to  `path_vfs->vf_recentlock' cannot  be acquired  without
  * blocking, simply do nothing.
@@ -184,8 +184,8 @@ NOTHROW(FCALL vfs_recent)(struct vfs *__restrict path_vfs,
 
 typedef union {
 	struct {
-		WEAK u32    f_atmask; /* File system operations mode mask (Set of negated `FS_MODE_F*'). */
-		WEAK u32    f_atflag; /* File system operations mode flags (Set of negated `FS_MODE_F*'). */
+		WEAK u32    f_atmask; /* File system operations mode mask (Set of negated `AT_*'). */
+		WEAK u32    f_atflag; /* File system operations mode flags (Set of negated `AT_*'). */
 	};
 	WEAK u64        f_mode;   /* File system operations mode. */
 	WEAK atomic64_t f_atom;   /* File system operations mode. */
@@ -195,7 +195,6 @@ typedef union {
 
 /* Default value for `struct fs::fs_umask' */
 #define CONFIG_FS_UMASK_DEFAULT 0022 /* S_IWGRP|S_IWOTH */
-
 
 /* FS is the high-level filesystem controller that expands upon VFS by
  * adding commonly thought-of as "per-process" variables such as  PWD,
@@ -215,6 +214,12 @@ struct fs {
 	                                               * This field defaults to `SYMLOOP_MAX'. */
 	fs_mask_t            fs_mode;                 /* Filesystem mode */
 };
+
+/* Destroy the given FS controller. */
+FUNDEF NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL fs_destroy)(struct fs *__restrict self);
+DEFINE_REFCOUNT_FUNCTIONS(struct fs, fs_refcnt, fs_destroy)
+
 
 /* Helper macros for working with `struct fs::fs_pathlock' */
 #define _fs_pathlock_reap(self)      (void)0
@@ -252,6 +257,16 @@ DATDEF struct fs fs_kernel;
 DATDEF ATTR_PERTASK REF struct fs *this_fs;
 #define THIS_FS        PERTASK_GET(this_fs)
 #define THIS_VFS       (THIS_FS->fs_vfs)
+
+
+/* Return the filesystem controller of the given thread. */
+FUNDEF NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct fs *
+NOTHROW(FCALL task_getfs)(struct task *__restrict thread);
+
+/* Exchange the filesystem controller of the calling thread. */
+FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct fs *
+NOTHROW(FCALL task_setfs)(struct fs *__restrict newfs);
+
 
 /* Clone the given FS
  * @param: clone_vfs: When true, also clone the VFS, else share the same one. */

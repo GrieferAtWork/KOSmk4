@@ -393,6 +393,8 @@ typedef unsigned int poll_mode_t; /* Set of `POLL*' */
 
 
 /* File system mode (`atflag_t') */
+/* TODO: Once `CONFIG_USE_NEW_FS' becomes  the default, remove  all of  these
+ *       flags. Instead of these, the kernel just directly uses `AT_*' flags! */
 #ifndef FS_MODE_FNORMAL
 #define FS_MODE_FNORMAL                   0x00000000 /* Operate normally. */
 #define FS_MODE_FIGNORE_TRAILING_SLASHES  0x00000002 /* Ignore empty trailing path segments. */

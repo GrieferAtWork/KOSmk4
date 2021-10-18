@@ -63,7 +63,9 @@ NOTHROW(LOCKOP_CC path_remove_from_recent_lop)(Toblockop(vfs) *__restrict self,
 	REF struct path *me = container_of(self, struct path, _p_vfslop);
 	COMPILER_READ_BARRIER();
 	if likely(TAILQ_ISBOUND(me, p_recent)) {
+		assert(obj->vf_recentcnt != 0);
 		TAILQ_UNBIND(&obj->vf_recent, me, p_recent);
+		--obj->vf_recentcnt;
 		decref_nokill(me);
 	}
 	me->_p_vfsplop.oplo_func = &path_remove_from_recent_postlop;
@@ -71,7 +73,7 @@ NOTHROW(LOCKOP_CC path_remove_from_recent_lop)(Toblockop(vfs) *__restrict self,
 }
 
 /* Remove `self' from the recent-cache of the associated VFS (possibly asynchronously)
- * This function must be called after doing `self->p_cldlist = PATH_CLDLIST_DELETED' */
+ * This  function must be  called after doing `self->p_cldlist = PATH_CLDLIST_DELETED' */
 PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL path_remove_from_recent)(struct path *__restrict self) {
 	COMPILER_READ_BARRIER();
@@ -82,7 +84,9 @@ NOTHROW(FCALL path_remove_from_recent)(struct path *__restrict self) {
 			if (vfs_recentlock_tryacquire(pathvfs)) {
 				COMPILER_READ_BARRIER();
 				if (TAILQ_ISBOUND(self, p_recent)) {
+					assert(pathvfs->vf_recentcnt != 0);
 					TAILQ_UNBIND(&pathvfs->vf_recent, self, p_recent);
+					--pathvfs->vf_recentcnt;
 					decref_nokill(self);
 				}
 				vfs_recentlock_release(pathvfs);
