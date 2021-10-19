@@ -63,7 +63,13 @@
 
 
 /* Not available to user-space: ignore trailing slashes */
-#define AT_IGNORE_TRAILING_SLASHES 2
+#define AT_IGNORE_TRAILING_SLASHES 0x10
+
+/* Not available to user-space: path_print() should print a trailing slash */
+#define AT_PATHPRINT_INCTRAIL      0x20 /* Include a trailing slash/backslash. */
+
+/* Not available to user-space: path_print() may assume that `root' is reachable from `self' */
+#define _AT_PATHPRINT_REACHABLE    0x40 /* Assume that `root' is reachable from `self' */
 
 
 /* Special fd_t values. */
@@ -535,7 +541,31 @@ path_remove(struct path *__restrict self,
 		       E_FSERROR_READONLY, E_IOERROR, E_BADALLOC, ...);
 
 
-/* TODO: Copy doc */
+/* High-level  implementation of the `rename(2)' system call.
+ * This function also handles the case where `newname' refers
+ * to a pre-existing  directory, in which  case `oldname'  is
+ * moved into said directory, though will keep its name after
+ * the process has completed.
+ * @param: atflags: Set of `0 | AT_DOSPATH | AT_RENAME_NOREPLACE | AT_RENAME_EXCHANGE |
+ *                          AT_RENAME_MOVETODIR' (other flags are silently ignored)
+ *                  NOTE: `AT_RENAME_MOVETODIR' supersedes the absence of `AT_RENAME_NOREPLACE'
+ * @throw: E_WOULDBLOCK:                      Preemption is disabled, and operation would have blocked.
+ * @throw: E_SEGFAULT:                        Faulty pointer
+ * @throw: E_FSERROR_ACCESS_DENIED:           Missing write permissions for old/new directory
+ * @throw: E_FSERROR_FILE_NOT_FOUND:          `oldname' could not be found
+ * @throw: E_FSERROR_FILE_NOT_FOUND:          `newname' could not be found and `AT_RENAME_EXCHANGE' was given
+ * @throw: E_FSERROR_CROSS_DEVICE_LINK:       Paths point to different filesystems
+ * @throw: E_FSERROR_NOT_A_DIRECTORY:E_FILESYSTEM_NOT_A_DIRECTORY_RENAME: ...
+ * @throw: E_FSERROR_IS_A_DIRECTORY:E_FILESYSTEM_IS_A_DIRECTORY_RENAME: ...
+ * @throw: E_FSERROR_FILE_ALREADY_EXISTS:     `AT_RENAME_NOREPLACE' was given and `newname' already exists.
+ *                                            When `AT_RENAME_MOVETODIR' is also given: ... and isn't  dir,
+ *                                            or is is a directory and already contains a file `oldname'
+ * @throw: E_FSERROR_ILLEGAL_PATH:            newname isn't a valid filename for the target filesystem
+ * @throw: E_FSERROR_DIRECTORY_MOVE_TO_CHILD: The move would make a directory become a child of itself
+ * @throw: E_FSERROR_DISK_FULL:               ...
+ * @throw: E_FSERROR_READONLY:                ...
+ * @throw: E_IOERROR:                         ...
+ * @throw: E_BADALLOC:                        ... */
 FUNDEF NONNULL((1, 4)) void KCALL
 path_rename(struct path *oldpath, /*utf-8*/ USER CHECKED char const *oldname, u16 oldnamelen,
             struct path *newpath, /*utf-8*/ USER CHECKED char const *newname, u16 newnamelen,
@@ -543,7 +573,8 @@ path_rename(struct path *oldpath, /*utf-8*/ USER CHECKED char const *oldname, u1
             /*out[1..1]_opt*/ REF struct fdirent **pold_dirent DFL(__NULLPTR),
             /*out[1..1]_opt*/ REF struct fdirent **pnew_dirent DFL(__NULLPTR),
             /*out[1..1]_opt*/ REF struct fnode **prenamed_node DFL(__NULLPTR),
-            /*out[0..1]_opt*/ REF struct fnode **preplaced_node DFL(__NULLPTR))
+            /*out[0..1]_opt*/ REF struct fnode **preplaced_node DFL(__NULLPTR),
+            /*out[1..1]_opt*/ REF struct path **ptarget_path DFL(__NULLPTR))
 		THROWS(E_WOULDBLOCK, E_SEGFAULT, E_FSERROR_PATH_NOT_FOUND, E_FSERROR_ACCESS_DENIED, E_FSERROR_IS_A_MOUNTING_POINT,
 		       E_FSERROR_FILE_NOT_FOUND, E_FSERROR_CROSS_DEVICE_LINK, E_FSERROR_FILE_ALREADY_EXISTS,
 		       E_FSERROR_ILLEGAL_PATH, E_FSERROR_DIRECTORY_MOVE_TO_CHILD, E_FSERROR_DISK_FULL,
@@ -571,8 +602,6 @@ path_rename(struct path *oldpath, /*utf-8*/ USER CHECKED char const *oldname, u1
 FUNDEF NONNULL((1, 2)) ssize_t KCALL
 path_print(struct path *__restrict self, __pformatprinter printer, void *arg,
            atflag_t atflags DFL(0), struct path *root DFL(__NULLPTR));
-#define AT_PATHPRINT_INCTRAIL   1 /* Include a trailing slash/backslash. */
-#define _AT_PATHPRINT_REACHABLE 4 /* Assume that `root' is reachable from `self' */
 
 /* Helper  wrapper for `path_print' that follows up the call by printing
  * the given `dentry_name...+=dentry_namelen'. You should always include

@@ -37,6 +37,7 @@
 #include <kos/lockop.h>
 
 #include <assert.h>
+#include <fcntl.h>
 #include <stddef.h>
 #include <string.h>
 
@@ -47,6 +48,48 @@ DECL_BEGIN
 #else /* !NDEBUG && !NDEBUG_FINI */
 #define DBG_memset(...) (void)0
 #endif /* NDEBUG || NDEBUG_FINI */
+
+
+
+/* Check if the given flag is a user-space AT_* flag */
+#define IS_USER_ATFLAG(x)          \
+	((x) == AT_SYMLINK_NOFOLLOW || \
+	 (x) == AT_NO_AUTOMOUNT ||     \
+	 (x) == AT_EMPTY_PATH ||       \
+	 (x) == AT_DOSPATH ||          \
+	 (x) == AT_REMOVEREG ||        \
+	 (x) == AT_REMOVEDIR ||        \
+	 (x) == AT_EACCESS ||          \
+	 (x) == AT_SYMLINK_FOLLOW ||   \
+	 (x) == AT_SYMLINK_REGULAR ||  \
+	 (x) == AT_CHANGE_CTIME ||     \
+	 (x) == AT_READLINK_REQSIZE || \
+	 (x) == AT_ALTPATH)
+
+/* Assert that custom AT_* codes don't overlap with standard ones, and aren't equal to each other. */
+STATIC_ASSERT(!IS_USER_ATFLAG(AT_RENAME_NOREPLACE));
+STATIC_ASSERT(!IS_USER_ATFLAG(AT_RENAME_EXCHANGE));
+STATIC_ASSERT(!IS_USER_ATFLAG(AT_RENAME_MOVETODIR));
+STATIC_ASSERT(!IS_USER_ATFLAG(AT_IGNORE_TRAILING_SLASHES));
+STATIC_ASSERT(!IS_USER_ATFLAG(AT_PATHPRINT_INCTRAIL));
+STATIC_ASSERT(!IS_USER_ATFLAG(_AT_PATHPRINT_REACHABLE));
+STATIC_ASSERT(AT_RENAME_NOREPLACE != AT_RENAME_EXCHANGE);
+STATIC_ASSERT(AT_RENAME_NOREPLACE != AT_RENAME_MOVETODIR);
+STATIC_ASSERT(AT_RENAME_NOREPLACE != AT_IGNORE_TRAILING_SLASHES);
+STATIC_ASSERT(AT_RENAME_NOREPLACE != AT_PATHPRINT_INCTRAIL);
+STATIC_ASSERT(AT_RENAME_NOREPLACE != _AT_PATHPRINT_REACHABLE);
+STATIC_ASSERT(AT_RENAME_EXCHANGE != AT_RENAME_MOVETODIR);
+STATIC_ASSERT(AT_RENAME_EXCHANGE != AT_IGNORE_TRAILING_SLASHES);
+STATIC_ASSERT(AT_RENAME_EXCHANGE != AT_PATHPRINT_INCTRAIL);
+STATIC_ASSERT(AT_RENAME_EXCHANGE != _AT_PATHPRINT_REACHABLE);
+STATIC_ASSERT(AT_RENAME_MOVETODIR != AT_IGNORE_TRAILING_SLASHES);
+STATIC_ASSERT(AT_RENAME_MOVETODIR != AT_PATHPRINT_INCTRAIL);
+STATIC_ASSERT(AT_RENAME_MOVETODIR != _AT_PATHPRINT_REACHABLE);
+STATIC_ASSERT(AT_IGNORE_TRAILING_SLASHES != AT_PATHPRINT_INCTRAIL);
+STATIC_ASSERT(AT_IGNORE_TRAILING_SLASHES != _AT_PATHPRINT_REACHABLE);
+STATIC_ASSERT(AT_PATHPRINT_INCTRAIL != _AT_PATHPRINT_REACHABLE);
+#undef IS_USER_ATFLAG
+
 
 
 
@@ -915,9 +958,7 @@ fdirnode_rename_in_path(struct path *oldpath, struct path *newpath,
  *                  NOTE: `AT_RENAME_MOVETODIR' supersedes the absence of `AT_RENAME_NOREPLACE'
  * @throw: E_WOULDBLOCK:                      Preemption is disabled, and operation would have blocked.
  * @throw: E_SEGFAULT:                        Faulty pointer
- * @throw: E_FSERROR_PATH_NOT_FOUND:          `oldpath' or `newpath' were deleted.
  * @throw: E_FSERROR_ACCESS_DENIED:           Missing write permissions for old/new directory
- * @throw: E_FSERROR_IS_A_MOUNTING_POINT:     `oldname' refers to a mounting point
  * @throw: E_FSERROR_FILE_NOT_FOUND:          `oldname' could not be found
  * @throw: E_FSERROR_FILE_NOT_FOUND:          `newname' could not be found and `AT_RENAME_EXCHANGE' was given
  * @throw: E_FSERROR_CROSS_DEVICE_LINK:       Paths point to different filesystems
@@ -926,7 +967,6 @@ fdirnode_rename_in_path(struct path *oldpath, struct path *newpath,
  * @throw: E_FSERROR_FILE_ALREADY_EXISTS:     `AT_RENAME_NOREPLACE' was given and `newname' already exists.
  *                                            When `AT_RENAME_MOVETODIR' is also given: ... and isn't  dir,
  *                                            or is is a directory and already contains a file `oldname'
- * @throw: E_FSERROR_ILLEGAL_PATH:            `newnamelen == 0'
  * @throw: E_FSERROR_ILLEGAL_PATH:            newname isn't a valid filename for the target filesystem
  * @throw: E_FSERROR_DIRECTORY_MOVE_TO_CHILD: The move would make a directory become a child of itself
  * @throw: E_FSERROR_DISK_FULL:               ...
@@ -942,10 +982,10 @@ path_rename(struct path *oldpath, /*utf-8*/ USER CHECKED char const *oldname, u1
             /*out[1..1]_opt*/ REF struct fnode **prenamed_node,
             /*out[0..1]_opt*/ REF struct fnode **preplaced_node,
             /*out[1..1]_opt*/ REF struct path **ptarget_path)
-		THROWS(E_WOULDBLOCK, E_SEGFAULT, E_FSERROR_ACCESS_DENIED, E_FSERROR_IS_A_MOUNTING_POINT,
-		       E_FSERROR_FILE_NOT_FOUND, E_FSERROR_CROSS_DEVICE_LINK, E_FSERROR_FILE_ALREADY_EXISTS,
-		       E_FSERROR_ILLEGAL_PATH, E_FSERROR_DIRECTORY_MOVE_TO_CHILD, E_FSERROR_DISK_FULL,
-		       E_FSERROR_READONLY, E_IOERROR, E_BADALLOC, ...) {
+		THROWS(E_WOULDBLOCK, E_SEGFAULT, E_FSERROR_ACCESS_DENIED, E_FSERROR_FILE_NOT_FOUND,
+		       E_FSERROR_CROSS_DEVICE_LINK, E_FSERROR_FILE_ALREADY_EXISTS,
+		       E_FSERROR_ILLEGAL_PATH, E_FSERROR_DIRECTORY_MOVE_TO_CHILD,
+		       E_FSERROR_DISK_FULL, E_FSERROR_READONLY, E_IOERROR, E_BADALLOC, ...) {
 	REF struct path *status;
 	struct frename_info info;
 	REF struct fdirent *exchange_newname_dirent; /* [0..1] */

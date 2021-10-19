@@ -229,7 +229,7 @@ struct frename_info {
 #define FDIRNODE_RENAME_SUCCESS 0 /* Success. `info' is modified like:
                                    * >> info->frn_dent = incref(NEW_DIRENT_OF(info->frn_file));
                                    * >> MARKED_AS_DELETED(info->frn_oldent);
-                                   * >> if (info->frn_repfile) MARKED_AS_DELETED(info->frn_repfile); */
+                                   * >> if (info->frn_repfile) MARKED_AS_DELETED(DIRENT_OF(info->frn_repfile)); */
 #define FDIRNODE_RENAME_EXISTS  1 /* Special case: the file `info->frn_name' already exists. `info' is modified like:
                                    * >> info->frn_repfile = incref(EXISTING_FILE);
                                    * >> info->frn_dent    = incref(NEW_DIRENT_OF(EXISTING_FILE)); */

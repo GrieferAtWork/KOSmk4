@@ -43,37 +43,6 @@ DECL_BEGIN
 #define DBG_memset(...) (void)0
 #endif /* NDEBUG || NDEBUG_FINI */
 
-/* Check if the given flag is a user-space AT_* flag */
-#define IS_USER_ATFLAG(x)          \
-	((x) == AT_SYMLINK_NOFOLLOW || \
-	 (x) == AT_NO_AUTOMOUNT ||     \
-	 (x) == AT_EMPTY_PATH ||       \
-	 (x) == AT_DOSPATH ||          \
-	 (x) == AT_REMOVEREG ||        \
-	 (x) == AT_REMOVEDIR ||        \
-	 (x) == AT_EACCESS ||          \
-	 (x) == AT_SYMLINK_FOLLOW ||   \
-	 (x) == AT_SYMLINK_REGULAR ||  \
-	 (x) == AT_CHANGE_CTIME ||     \
-	 (x) == AT_READLINK_REQSIZE || \
-	 (x) == AT_ALTPATH)
-
-/* Assert that custom AT_* codes don't overlap with standard ones. */
-STATIC_ASSERT(!IS_USER_ATFLAG(AT_RENAME_NOREPLACE));
-STATIC_ASSERT(!IS_USER_ATFLAG(AT_RENAME_EXCHANGE));
-STATIC_ASSERT(!IS_USER_ATFLAG(AT_RENAME_MOVETODIR));
-STATIC_ASSERT(!IS_USER_ATFLAG(AT_EXISTS));
-STATIC_ASSERT(AT_RENAME_NOREPLACE != AT_RENAME_EXCHANGE);
-STATIC_ASSERT(AT_RENAME_NOREPLACE != AT_RENAME_MOVETODIR);
-STATIC_ASSERT(AT_RENAME_NOREPLACE != AT_EXISTS);
-STATIC_ASSERT(AT_RENAME_EXCHANGE != AT_RENAME_MOVETODIR);
-STATIC_ASSERT(AT_RENAME_EXCHANGE != AT_EXISTS);
-STATIC_ASSERT(AT_RENAME_MOVETODIR != AT_EXISTS);
-#undef IS_USER_ATFLAG
-
-
-
-
 
 /* Feed   directory  entry  information  (the  `feed_d_*'  arguments)
  * into `buf' as requested by  `readdir_mode' ('.' and '..'  handling

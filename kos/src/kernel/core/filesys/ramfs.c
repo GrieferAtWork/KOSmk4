@@ -665,7 +665,7 @@ ramfs_dirnode_mknode_frominfo(struct fdirnode *__restrict self,
 
 
 
-PUBLIC NONNULL((1, 2)) void KCALL
+PUBLIC NONNULL((1, 2)) unsigned int KCALL
 ramfs_dirnode_v_mkfile(struct fdirnode *__restrict self,
                        struct fmkfile_info *__restrict info)
 		THROWS(E_FSERROR_ILLEGAL_PATH, E_FSERROR_DISK_FULL,
@@ -692,8 +692,7 @@ ramfs_dirnode_v_mkfile(struct fdirnode *__restrict self,
 		info->mkf_dent = incref(&old_dirent->rde_ent);
 		ramfs_dirdata_treelock_endread(&me->rdn_dat);
 		info->mkf_rnode = (REF struct fnode *)incref(old_dirent->rde_node);
-		info->mkf_flags |= FMKFILE_F_EXISTS;
-		return;
+		return FDIRNODE_MKFILE_EXISTS;
 	}
 	ramfs_dirdata_treelock_endread(&me->rdn_dat);
 #endif /* !__OPTIMIZE_SIZE__ */
@@ -732,7 +731,7 @@ again_acquire_lock_for_insert:
 			old_dirent = ramfs_direnttree_locate(me->rdn_dat.rdd_tree,
 			                                       new_dirent->rde_ent.fd_name,
 			                                       new_dirent->rde_ent.fd_namelen);
-			if (!old_dirent && (info->mkf_flags & FMKFILE_F_NOCASE) && me->rdn_dat.rdd_tree) {
+			if (!old_dirent && (info->mkf_flags & AT_DOSPATH) && me->rdn_dat.rdd_tree) {
 				/* Do a case-insensitive search */
 				old_dirent = _ramfs_direnttree_caselocate(me->rdn_dat.rdd_tree,
 				                                           new_dirent->rde_ent.fd_name,
@@ -746,8 +745,7 @@ again_acquire_lock_for_insert:
 				decref_likely(new_node);
 				info->mkf_dent  = &old_dirent->rde_ent;
 				info->mkf_rnode = (REF struct fnode *)incref(old_dirent->rde_node);
-				info->mkf_flags |= FMKFILE_F_EXISTS;
-				return;
+				return FDIRNODE_MKFILE_EXISTS;
 			}
 
 			if ((info->mkf_fmode & S_IFMT) != 0) {
@@ -815,9 +813,10 @@ again_acquire_lock_for_insert:
 	}
 	info->mkf_dent  = &new_dirent->rde_ent; /* Inherit reference */
 	info->mkf_rnode = new_node;             /* Inherit reference */
+	return FDIRNODE_MKFILE_SUCCESS;
 }
 
-PUBLIC NONNULL((1, 2, 3)) void KCALL
+PUBLIC NONNULL((1, 2, 3)) unsigned int KCALL
 ramfs_dirnode_v_unlink(struct fdirnode *__restrict self,
                        struct fdirent *__restrict entry,
                        struct fnode *__restrict file)
@@ -837,7 +836,7 @@ again:
 	                                      entry->fd_namelen);
 	if unlikely(&known_entry->rde_ent != entry) {
 		ramfs_dirdata_treelock_endwrite(&me->rdn_dat);
-		THROW(E_FSERROR_DELETED, E_FILESYSTEM_DELETED_FILE);
+		return FDIRNODE_UNLINK_DELETED;
 	}
 	/* When `file' is a directory, we must interlock setting its tree
 	 * to `RAMFS_DIRDATA_TREE_DELETED' with the removal of its entry. */
@@ -890,28 +889,43 @@ again:
 		if (last_link_went_away)
 			mfile_delete(file);
 	}
+	return FDIRNODE_UNLINK_SUCCESS;
 }
 
 
-PUBLIC NONNULL((1, 2)) void KCALL
+PUBLIC NONNULL((1, 2)) unsigned int KCALL
 ramfs_dirnode_v_rename(struct fdirnode *__restrict self,
                        struct frename_info *__restrict info)
 		THROWS(E_FSERROR_ILLEGAL_PATH, E_FSERROR_DISK_FULL,
-		       E_FSERROR_READONLY, E_FSERROR_FILE_ALREADY_EXISTS,
-		       E_FSERROR_DELETED) {
+		       E_FSERROR_READONLY, E_FSERROR_DELETED) {
 	struct ramfs_dirent *new_dirent;
 	struct ramfs_dirnode *me     = (struct ramfs_dirnode *)self;
 	struct ramfs_dirnode *olddir = (struct ramfs_dirnode *)info->frn_olddir;
 	struct ramfs_dirent *old_dirent;
 	assert(info->frn_dent->fd_ops == &ramfs_dirent_ops);
+	if (info->frn_flags & AT_RENAME_EXCHANGE)
+		THROW(E_NOT_IMPLEMENTED_TODO); /* TODO */
+
 #ifndef __OPTIMIZE_SIZE__
 	/* Check for an existing file before doing any allocations */
 	ramfs_dirdata_treelock_read(&me->rdn_dat);
 	TRY {
+		struct ramfs_dirent *existing;
 		if unlikely(me->rdn_dat.rdd_tree == RAMFS_DIRDATA_TREE_DELETED)
 			THROW(E_FSERROR_DELETED, E_FILESYSTEM_DELETED_PATH);
-		if unlikely(ramfs_dirdata_lookup(me, &info->frn_lookup_info))
-			THROW(E_FSERROR_FILE_ALREADY_EXISTS);
+		existing = ramfs_dirdata_lookup(me, &info->frn_lookup_info);
+		if unlikely(existing) {
+			if (info->frn_repfile != existing->rde_node) {
+				info->frn_dent    = incref(&existing->rde_ent);
+				info->frn_repfile = mfile_asnode(incref(existing->rde_node));
+				ramfs_dirdata_treelock_endread(&me->rdn_dat);
+				return FDIRNODE_RENAME_EXISTS;
+			}
+		} else if (info->frn_repfile != NULL) {
+			ramfs_dirdata_treelock_endread(&me->rdn_dat);
+			info->frn_repfile = NULL;
+			return FDIRNODE_RENAME_EXISTS;
+		}
 	} EXCEPT {
 		ramfs_dirdata_treelock_endread(&me->rdn_dat);
 		RETHROW();
@@ -960,16 +974,32 @@ again_acquire_locks:
 	}
 
 	/* Check if the file already exists. */
-	if (ramfs_direnttree_locate(me->rdn_dat.rdd_tree,
-	                            new_dirent->rde_ent.fd_name,
-	                            new_dirent->rde_ent.fd_namelen) ||
-	    ((info->frn_flags & AT_DOSPATH) && me->rdn_dat.rdd_tree &&
-	     _ramfs_direnttree_caselocate(me->rdn_dat.rdd_tree,
-	                                  new_dirent->rde_ent.fd_name,
-	                                  new_dirent->rde_ent.fd_namelen))) {
-		ramfs_dirdata_treelock_endwrite(&me->rdn_dat);
-		kfree(new_dirent);
-		THROW(E_FSERROR_FILE_ALREADY_EXISTS);
+	{
+		struct ramfs_dirent *existing;
+		existing = ramfs_direnttree_locate(me->rdn_dat.rdd_tree,
+		                                   new_dirent->rde_ent.fd_name,
+		                                   new_dirent->rde_ent.fd_namelen);
+		if (!existing && (info->frn_flags & AT_DOSPATH) && me->rdn_dat.rdd_tree) {
+			existing = _ramfs_direnttree_caselocate(me->rdn_dat.rdd_tree,
+			                                        new_dirent->rde_ent.fd_name,
+			                                        new_dirent->rde_ent.fd_namelen);
+		}
+		if (existing) {
+			if (info->frn_repfile != existing->rde_node) {
+				info->frn_dent    = incref(&existing->rde_ent);
+				info->frn_repfile = mfile_asnode(incref(existing->rde_node));
+				ramfs_dirdata_treelock_endwrite(&me->rdn_dat);
+				kfree(new_dirent);
+				return FDIRNODE_RENAME_EXISTS;
+			}
+			/* TODO: Remove `existing' */
+			ramfs_dirdata_treelock_endwrite(&me->rdn_dat);
+			THROW(E_NOT_IMPLEMENTED_TODO);
+		} else if (info->frn_repfile != NULL) {
+			ramfs_dirdata_treelock_endwrite(&me->rdn_dat);
+			info->frn_repfile = NULL;
+			return FDIRNODE_RENAME_EXISTS;
+		}
 	}
 
 	/* Acquire a lock to the old directory. */
@@ -1005,7 +1035,7 @@ again_acquire_locks:
 			ramfs_dirdata_treelock_endwrite(&olddir->rdn_dat);
 		ramfs_dirdata_treelock_endwrite(&me->rdn_dat);
 		kfree(new_dirent);
-		THROW(E_FSERROR_DELETED, E_FILESYSTEM_DELETED_FILE);
+		return FDIRNODE_RENAME_DELETED;
 	}
 
 	/* Remove `old_dirent' from its tree. */
@@ -1029,6 +1059,7 @@ again_acquire_locks:
 
 	/* Write-back results. */
 	info->frn_dent = &new_dirent->rde_ent; /* Inherit reference */
+	return FDIRNODE_RENAME_SUCCESS;
 }
 
 

@@ -485,7 +485,7 @@ devfs_root_v_enum(struct fdirnode *__restrict self,
 
 /* Special  handling  for  file  renaming  in  devfs, since
  * device files may not be moved out of the root directory. */
-PRIVATE NONNULL((1, 2)) void KCALL
+PRIVATE NONNULL((1, 2)) unsigned int KCALL
 devfs_dirnode_v_rename(struct fdirnode *__restrict self,
                        struct frename_info *__restrict info)
 		THROWS(E_FSERROR_ILLEGAL_PATH, E_FSERROR_DISK_FULL,
@@ -493,7 +493,7 @@ devfs_dirnode_v_rename(struct fdirnode *__restrict self,
 		       E_FSERROR_DELETED) {
 	if (info->frn_oldent->fd_ops != &ramfs_dirent_ops)
 		THROW(E_FSERROR_READONLY);
-	ramfs_dirnode_v_rename(self, info);
+	return ramfs_dirnode_v_rename(self, info);
 }
 
 
@@ -514,7 +514,7 @@ PUBLIC struct fdirnode_ops const devfs_dirnode_ops = {
 
 
 
-PRIVATE NONNULL((1, 2)) void KCALL
+PRIVATE NONNULL((1, 2)) unsigned int KCALL
 devfs_root_v_mkfile(struct fdirnode *__restrict self,
                     struct fmkfile_info *__restrict info)
 		THROWS(E_FSERROR_ILLEGAL_PATH, E_FSERROR_DISK_FULL,
@@ -543,8 +543,7 @@ again_lookup:
 				goto again_lookup; /* Deleted */
 			info->mkf_dent  = old_dirent; /* Inherit reference */
 			info->mkf_rnode = oldnode;    /* Inherit reference */
-			info->mkf_flags |= AT_EXISTS;
-			return;
+			return FDIRNODE_MKFILE_EXISTS;
 		}
 	}
 #endif /* !__OPTIMIZE_SIZE__ */
@@ -613,8 +612,7 @@ again_acquire_lock_for_insert:
 					decref_likely(new_node);
 					info->mkf_dent  = &old_dirent->rde_ent;
 					info->mkf_rnode = mfile_asnode(incref(old_dirent->rde_node));
-					info->mkf_flags |= AT_EXISTS;
-					return;
+					return FDIRNODE_MKFILE_EXISTS;
 				}
 			}
 
@@ -650,8 +648,7 @@ again_acquire_lock_for_insert:
 						info->mkf_rnode = existing_device;
 						kfree(new_dirent);
 						decref_likely(new_node);
-						info->mkf_flags |= AT_EXISTS;
-						return;
+						return FDIRNODE_MKFILE_EXISTS;
 					}
 				}
 			}
@@ -717,10 +714,11 @@ again_acquire_lock_for_insert:
 	}
 	info->mkf_dent  = &new_dirent->rde_ent; /* Inherit reference */
 	info->mkf_rnode = new_node;             /* Inherit reference */
+	return FDIRNODE_MKFILE_SUCCESS;
 }
 
 
-PRIVATE NONNULL((1, 2, 3)) void KCALL
+PRIVATE NONNULL((1, 2, 3)) unsigned int KCALL
 devfs_root_v_unlink(struct fdirnode *__restrict self,
                     struct fdirent *__restrict entry,
                     struct fnode *__restrict file)
@@ -738,13 +736,13 @@ devfs_root_v_unlink(struct fdirnode *__restrict self,
 		real_entry = container_of(entry, struct fdevfsdirent, fdd_dirent);
 		real_file  = fnode_asdevice(file);
 		if (real_file->dv_byname_node.rb_lhs == DEVICE_BYNAME_DELETED)
-			THROW(E_FSERROR_DELETED, E_FILESYSTEM_DELETED_FILE);
+			return FDIRNODE_UNLINK_DELETED;
 		devfs_byname_write();
 		COMPILER_READ_BARRIER();
 		if (real_file->dv_dirent != real_entry || /* File was renamed */
 		    real_file->dv_byname_node.rb_lhs == DEVICE_BYNAME_DELETED /* File was deleted */) {
 			devfs_byname_endwrite();
-			THROW(E_FSERROR_DELETED, E_FILESYSTEM_DELETED_FILE);
+			return FDIRNODE_UNLINK_DELETED;
 		}
 		devfs_byname_removenode(real_file);
 		real_file->dv_byname_node.rb_lhs = DEVICE_BYNAME_DELETED;
@@ -756,23 +754,25 @@ devfs_root_v_unlink(struct fdirnode *__restrict self,
        *     as well as driver-unload operations should be able to do something like  this! */
 		device_delete(real_file);
 #endif
-	} else {
-		ramfs_dirnode_v_unlink(self, entry, file);
+
+		return FDIRNODE_UNLINK_SUCCESS;
 	}
+	return ramfs_dirnode_v_unlink(self, entry, file);
 }
 
 
 
 
-PRIVATE NONNULL((1, 2)) void KCALL
+PRIVATE NONNULL((1, 2)) unsigned int KCALL
 devfs_root_v_rename(struct fdirnode *__restrict self,
                     struct frename_info *__restrict info)
 		THROWS(E_FSERROR_ILLEGAL_PATH, E_FSERROR_DISK_FULL,
-		       E_FSERROR_READONLY, E_FSERROR_FILE_ALREADY_EXISTS,
-		       E_FSERROR_DELETED) {
+		       E_FSERROR_READONLY, E_FSERROR_DELETED) {
 	assert(self == &devfs.fs_root);
 	assert(fdirent_isdevfs(info->frn_oldent) ||
 	       fdirent_isramfs(info->frn_oldent));
+	if (info->frn_flags & AT_RENAME_EXCHANGE)
+		THROW(E_NOT_IMPLEMENTED_TODO); /* TODO */
 	if (fdirent_isdevfs(info->frn_oldent)) {
 		/* Rename device files */
 		REF struct fdevfsdirent *old_dirent;
@@ -814,9 +814,9 @@ devfs_root_v_rename(struct fdirnode *__restrict self,
 		COMPILER_READ_BARRIER();
 		old_dirent = devfile->dv_dirent;
 		if unlikely(devfile->dv_byname_node.rb_lhs == DEVICE_BYNAME_DELETED || /* Deleted */
-		            &old_dirent->fdd_dirent != info->frn_oldent) {                  /* Renamed */
+		            &old_dirent->fdd_dirent != info->frn_oldent) {             /* Renamed */
 			devfs_byname_endwrite();
-			THROW(E_FSERROR_DELETED, E_FILESYSTEM_DELETED_FILE);
+			return FDIRNODE_RENAME_DELETED;
 		}
 
 		/* Check if another device file with the same name already exists. */
@@ -829,14 +829,25 @@ devfs_root_v_rename(struct fdirnode *__restrict self,
 				                                          new_dirent->fdd_dirent.fd_namelen);
 			}
 			if (existing_device) {
-				if (wasdestroyed(existing_device)) {
-					devfs_byname_removenode(existing_device);
-					existing_device->dv_byname_node.rb_lhs = DEVICE_BYNAME_DELETED;
+				if (info->frn_repfile != existing_device) {
+					if (!tryincref(existing_device)) {
+						devfs_byname_removenode(existing_device);
+						existing_device->dv_byname_node.rb_lhs = DEVICE_BYNAME_DELETED;
+					} else {
+						info->frn_repfile = existing_device; /* Inherit reference */
+						devfs_byname_endwrite();
+						kfree(new_dirent);
+						return FDIRNODE_RENAME_EXISTS;
+					}
 				} else {
+					/* TODO: Remove `existing_device' */
 					devfs_byname_endwrite();
-					kfree(new_dirent);
-					THROW(E_FSERROR_FILE_ALREADY_EXISTS);
+					THROW(E_NOT_IMPLEMENTED_TODO);
 				}
+			} else if (info->frn_repfile != NULL) {
+				devfs_byname_endwrite();
+				kfree(new_dirent);
+				return FDIRNODE_RENAME_EXISTS;
 			}
 		}
 
@@ -912,19 +923,34 @@ again_acquire_locks:
 		assert(devfs.rs_dat.rdd_tree != RAMFS_DIRDATA_TREE_DELETED);
 
 		/* Check if the file already exists. */
-		if (ramfs_direnttree_locate(devfs.rs_dat.rdd_tree,
-		                            new_dirent->rde_ent.fd_name,
-		                            new_dirent->rde_ent.fd_namelen) ||
-		    ((info->frn_flags & AT_DOSPATH) && devfs.rs_dat.rdd_tree &&
-		     _ramfs_direnttree_caselocate(devfs.rs_dat.rdd_tree,
-		                                  new_dirent->rde_ent.fd_name,
-		                                  new_dirent->rde_ent.fd_namelen))) {
-unlock_and_throw_file_already_exists_error:
-			devfs_byname_endread();
-			ramfs_dirdata_treelock_endwrite(&devfs.rs_dat);
-			kfree(new_dirent);
-			THROW(E_FSERROR_FILE_ALREADY_EXISTS);
+		{
+			struct ramfs_dirent *existing;
+			existing = ramfs_direnttree_locate(devfs.rs_dat.rdd_tree,
+			                                   new_dirent->rde_ent.fd_name,
+			                                   new_dirent->rde_ent.fd_namelen);
+			if (!existing && (info->frn_flags & AT_DOSPATH) && devfs.rs_dat.rdd_tree) {
+				existing = _ramfs_direnttree_caselocate(devfs.rs_dat.rdd_tree,
+				                                        new_dirent->rde_ent.fd_name,
+				                                        new_dirent->rde_ent.fd_namelen);
+			}
+			if (existing) {
+				if (info->frn_repfile != existing->rde_node) {
+					info->frn_dent    = incref(&existing->rde_ent);
+					info->frn_repfile = mfile_asnode(incref(existing->rde_node));
+					ramfs_dirdata_treelock_endwrite(&devfs.rs_dat);
+					kfree(new_dirent);
+					return FDIRNODE_RENAME_EXISTS;
+				}
+				/* TODO: Remove `existing' */
+				ramfs_dirdata_treelock_endwrite(&devfs.rs_dat);
+				THROW(E_NOT_IMPLEMENTED_TODO);
+			} else if (info->frn_repfile != NULL) {
+				ramfs_dirdata_treelock_endwrite(&devfs.rs_dat);
+				info->frn_repfile = NULL;
+				return FDIRNODE_RENAME_EXISTS;
+			}
 		}
+
 		{
 			struct device *existing_device;
 			existing_device = devfs_byname_locate(new_dirent->rde_ent.fd_name,
@@ -934,14 +960,27 @@ unlock_and_throw_file_already_exists_error:
 				                                          new_dirent->rde_ent.fd_namelen);
 			}
 			if (existing_device) {
-				if (!wasdestroyed(existing_device))
-					goto unlock_and_throw_file_already_exists_error;
-				/* Unlink destroyed device. */
-				devfs_byname_removenode(existing_device);
-				existing_device->dv_byname_node.rb_lhs = DEVICE_BYNAME_DELETED;
+				if (info->frn_repfile != existing_device) {
+					if (!tryincref(existing_device)) {
+						devfs_byname_removenode(existing_device);
+						existing_device->dv_byname_node.rb_lhs = DEVICE_BYNAME_DELETED;
+					} else {
+						info->frn_repfile = existing_device; /* Inherit reference */
+						devfs_byname_endwrite();
+						kfree(new_dirent);
+						return FDIRNODE_RENAME_EXISTS;
+					}
+				} else {
+					/* TODO: Remove `existing_device' */
+					devfs_byname_endwrite();
+					THROW(E_NOT_IMPLEMENTED_TODO);
+				}
+			} else if (info->frn_repfile != NULL) {
+				devfs_byname_endwrite();
+				kfree(new_dirent);
+				return FDIRNODE_RENAME_EXISTS;
 			}
 		}
-
 
 		/* Acquire a lock to the old directory. */
 		if (ramfs_super_asdir(&devfs) != olddir) {
@@ -979,7 +1018,7 @@ unlock_and_throw_file_already_exists_error:
 			devfs_byname_endread();
 			ramfs_dirdata_treelock_endwrite(&devfs.rs_dat);
 			kfree(new_dirent);
-			THROW(E_FSERROR_DELETED, E_FILESYSTEM_DELETED_FILE);
+			return FDIRNODE_RENAME_DELETED;
 		}
 
 		/* Remove `old_dirent' from its tree. */
@@ -1005,6 +1044,7 @@ unlock_and_throw_file_already_exists_error:
 		/* Write-back results. */
 		info->frn_dent = &new_dirent->rde_ent; /* Inherit reference */
 	}
+	return FDIRNODE_RENAME_SUCCESS;
 }
 
 

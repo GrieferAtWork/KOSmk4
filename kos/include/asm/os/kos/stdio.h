@@ -38,7 +38,7 @@
 #define __RENAME_EXCHANGE  0x02 /* Exchange source and dest */
 #define __RENAME_WHITEOUT  0x04 /* Whiteout source */
 #ifdef __KOS__
-#define __RENAME_MOVETODIR 0x40 /* If `newpath' is a directory, move `oldpath' into it. */
+#define __RENAME_MOVETODIR 0x80 /* If `newpath' is a directory, move `oldpath' into it. */
 #endif /* __KOS__ */
 
 

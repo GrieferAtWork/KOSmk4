@@ -254,19 +254,19 @@ ramfs_dirnode_v_lookup(struct fdirnode *__restrict self,
 FUNDEF NONNULL((1, 2)) void KCALL
 ramfs_dirnode_v_enum(struct fdirnode *__restrict self,
                      struct fdirenum *__restrict result);
-FUNDEF NONNULL((1, 2)) void KCALL
+FUNDEF NONNULL((1, 2)) unsigned int KCALL
 ramfs_dirnode_v_mkfile(struct fdirnode *__restrict self,
                        struct fmkfile_info *__restrict info)
 		THROWS(E_FSERROR_ILLEGAL_PATH, E_FSERROR_DISK_FULL,
 		       E_FSERROR_READONLY, E_FSERROR_TOO_MANY_HARD_LINKS,
 		       E_FSERROR_UNSUPPORTED_OPERATION, E_FSERROR_DELETED);
-FUNDEF NONNULL((1, 2, 3)) void KCALL
+FUNDEF NONNULL((1, 2, 3)) unsigned int KCALL
 ramfs_dirnode_v_unlink(struct fdirnode *__restrict self,
                        struct fdirent *__restrict entry,
                        struct fnode *__restrict file)
 		THROWS(E_FSERROR_DIRECTORY_NOT_EMPTY,
 		       E_FSERROR_READONLY, E_FSERROR_DELETED);
-FUNDEF NONNULL((1, 2)) void KCALL
+FUNDEF NONNULL((1, 2)) unsigned int KCALL
 ramfs_dirnode_v_rename(struct fdirnode *__restrict self,
                        struct frename_info *__restrict info)
 		THROWS(E_FSERROR_ILLEGAL_PATH, E_FSERROR_DISK_FULL,
