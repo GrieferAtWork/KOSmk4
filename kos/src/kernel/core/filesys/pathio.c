@@ -1222,6 +1222,123 @@ waitfor_status_writelock:
 
 
 
+
+
+
+/* Print a human-readable representation of a given path `self':
+ * @param: atflags: Set of:
+ *   - AT_PATHPRINT_INCTRAIL:   Print a trailing backslash unless one was already printed
+ *                              by  the path itself (as is the case when printing `root')
+ *   - AT_DOSPATH:              Print the path as a DOS-path (including drive letters).
+ *                              NOTE: In this mode,  if the path  reaches `root' before  a
+ *                                    DOS drive is encountered, the path will be pre-fixed
+ *                                    with "\\\\unix\\", indicative  of it being  relative
+ *                                    to the UNIX filesystem root.
+ *   - _AT_PATHPRINT_REACHABLE: Assume that `root' is reachable from `self'. When this  flag
+ *                              isn't given, a check is made for `self' being reachable, and
+ *                              if it turns out that it isn't, "\\\\?\\" is printed, and the
+ *                              function returns immediately.
+ * @param: root: When non-NULL, stop printing with this path is reached. Otherwise,
+ *               print the entire path-tree until the *true* filesystem root  path,
+ *               which is the one with a NULL parent pointer. */
+PUBLIC NONNULL((1, 2)) ssize_t KCALL
+path_print(struct path *__restrict self, __pformatprinter printer,
+           void *arg, atflag_t atflags, struct path *root) {
+	ssize_t result;
+	if (!(atflags & _AT_PATHPRINT_REACHABLE)) {
+		/* Check that `self' is a descendant of `root' */
+		if (root && !path_isdescendantof(self, root)) {
+			result = (*printer)(arg, "\\\\?\\", 4);
+			goto done;
+		}
+		atflags |= _AT_PATHPRINT_REACHABLE;
+	}
+	if ((atflags & AT_DOSPATH) && path_isdrive(self)) {
+		unsigned int i;
+		struct vfs *path_vfs = _path_getvfs(self);
+		vfs_driveslock_read(path_vfs);
+		for (i = 0; i < COMPILER_LENOF(path_vfs->vf_drives); ++i) {
+			if (path_vfs->vf_drives[i] == self)
+				break;
+		}
+		vfs_driveslock_endread(path_vfs);
+		if (i < COMPILER_LENOF(path_vfs->vf_drives)) {
+			char buf[3];
+			buf[0] = 'A' + i;
+			buf[1] = ':';
+			buf[2] = '\\';
+			result = (*printer)(arg, buf, (atflags & AT_PATHPRINT_INCTRAIL) ? 3 : 2);
+			goto done;
+		}
+	}
+	if (self != root && !path_isroot(self)) {
+		REF struct path *parent;
+		/* Recursively print our parent first (with a trailing slash). */
+		parent = path_getparent(self);
+		FINALLY_DECREF_UNLIKELY(parent);
+		result = path_print(parent, printer, arg,
+		                    atflags | AT_PATHPRINT_INCTRAIL,
+		                    root);
+	} else {
+		/* UNIX root directory. */
+		if (atflags & AT_DOSPATH) {
+			result = (*printer)(arg, "\\\\unix\\", 7);
+		} else {
+			result = (*printer)(arg, "/", 1);
+		}
+		goto done;
+	}
+	if unlikely(result < 0)
+		goto done;
+
+	/* Print the name of this directory. */
+	{
+		ssize_t temp;
+		temp = (*printer)(arg, self->p_name->fd_name, self->p_name->fd_namelen);
+		if unlikely(temp < 0)
+			return temp;
+		result += temp;
+	}
+	/* Print a trailing slash (if needed). */
+	if (atflags & AT_PATHPRINT_INCTRAIL) {
+		ssize_t temp;
+		temp = (*printer)(arg, (atflags & AT_DOSPATH) ? "\\" : "/", 1);
+		if unlikely(temp < 0)
+			return temp;
+		result += temp;
+	}
+done:
+	return result;
+}
+
+
+/* Helper  wrapper for `path_print' that follows up the call by printing
+ * the given `dentry_name...+=dentry_namelen'. You should always include
+ * `AT_PATHPRINT_INCTRAIL'  when calling this function; else the printed
+ * path may be invalid. */
+PUBLIC NONNULL((1, 4)) ssize_t KCALL
+path_printent(struct path *__restrict self,
+              USER CHECKED char const *dentry_name, u16 dentry_namelen,
+              __pformatprinter printer, void *arg, atflag_t atflags,
+              struct path *root) {
+	ssize_t result;
+	result = path_print(self, printer, arg, atflags, root);
+	if likely(result >= 0) {
+		ssize_t temp;
+		temp = (*printer)(arg, dentry_name, dentry_namelen);
+		if likely(temp >= 0) {
+			result += temp;
+		} else {
+			result = temp;
+		}
+	}
+	return result;
+}
+
+
+
+
+
 DECL_END
 
 #endif /* !GUARD_KERNEL_CORE_FILESYS_PATHIO_C */
