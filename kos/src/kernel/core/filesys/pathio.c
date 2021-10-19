@@ -168,276 +168,11 @@ NOTHROW(FCALL path_delete_and_unlock)(struct path *__restrict self) {
 
 
 
-/* High-level implementation of `unlink(2)' / `rmdir(2)'.
- * @param: atflags: At least one of `AT_REMOVEREG | AT_REMOVEDIR', optionally
- *                  or'd with `AT_DOSPATH' (other flags are silently ignored)
- * @throw: E_WOULDBLOCK:                  Preemption is disabled, and operation would have blocked.
- * @throw: E_SEGFAULT:                    Faulty pointer
- * @throw: E_FSERROR_ACCESS_DENIED:       Missing W/X permissions for `self'
- * @throw: E_FSERROR_NOT_A_DIRECTORY:E_FILESYSTEM_NOT_A_DIRECTORY_RMDIR: `name' is S_IFREG, but `AT_REMOVEREG' isn't given
- * @throw: E_FSERROR_IS_A_DIRECTORY:E_FILESYSTEM_IS_A_DIRECTORY_UNLINK:  `name' is S_IFDIR, but `AT_REMOVEDIR' isn't given
- * @throw: E_FSERROR_IS_A_MOUNTING_POINT: `name' refers to a mounting point
- * @throw: E_FSERROR_FILE_NOT_FOUND:      `name' could not be found
- * @throw: E_FSERROR_READONLY:            ...
- * @throw: E_IOERROR:                     ...
- * @throw: E_BADALLOC:                    ... */
-PUBLIC NONNULL((1)) void KCALL
-path_remove(struct path *__restrict self,
-            /*utf-8*/ USER CHECKED char const *name, u16 namelen, atflag_t atflags,
-            /*out[1..1]_opt*/ REF struct fnode **pdeleted_node,
-            /*out[1..1]_opt*/ REF struct fdirent **pdeleted_dirent,
-            /*out[0..1]_opt*/ REF struct path **pdeleted_path)
-		THROWS(E_WOULDBLOCK, E_SEGFAULT, E_FSERROR_ACCESS_DENIED,
-		       E_FSERROR_IS_A_MOUNTING_POINT, E_FSERROR_FILE_NOT_FOUND,
-		       E_FSERROR_READONLY, E_IOERROR, E_BADALLOC, ...) {
-	unsigned int status;
-	uintptr_t namehash;
-	struct path *existing_path;
-	REF struct fdirent *dent;
-	REF struct fnode *node;
-
-	/* Assert permissions */
-	fnode_access(self->p_dir, W_OK | X_OK);
-
-	namehash = fdirent_hash(name, namelen);
-again_acquire_cldlock:
-	path_cldlock_write(self);
-
-	TRY {
-		/* Check if we're to remove a child path. */
-		existing_path = path_lookupchild_withlock(self, name, namelen,
-		                                          namehash, atflags);
-	} EXCEPT {
-		path_cldlock_endwrite(self);
-		RETHROW();
-	}
-	if (existing_path) {
-		assert(existing_path != self);
-		if (!tryincref(existing_path)) {
-			/* Existing path is being destroyed and is probably trying to remove
-			 * itself right now, but  since we need it  gone _now_, just do  the
-			 * removal for it! */
-			path_cldlist_remove_force(self, existing_path);
-		} else {
-			struct path_bucket *old_buckets;
-
-			/* Check if we're even allowed to remove directories. */
-			if (!(atflags & AT_REMOVEDIR)) {
-				path_cldlock_endwrite(self);
-				decref_unlikely(existing_path);
-
-				/* Welp... better use rmdir(2) next time... */
-				THROW(E_FSERROR_IS_A_DIRECTORY, E_FILESYSTEM_IS_A_DIRECTORY_UNLINK);
-			}
-
-			/* Check if it's a mounting point. */
-			if unlikely(path_ismount(existing_path)) {
-				path_cldlock_endwrite(self);
-				decref_unlikely(existing_path);
-
-				/* You'll have to use `path_umount()' */
-				THROW(E_FSERROR_IS_A_MOUNTING_POINT);
-			}
-
-			/* Ok: so this is where it gets a little bit complicated:
-			 *  - We have to acquire another lock to the child path
-			 *  - Then, while holding locks to both paths, invoke the
-			 *    underlying fdirnode's unlink operator
-			 *  - Once that operator returns with success, mark the
-			 *    child  path's  `p_cldlist = PATH_CLDLIST_DELETED'
-			 *  - Release locks and we're done
-			 *
-			 * All of the is-directory-empty checking is done on  the
-			 * FS-layer, and we  can't safely assume  that the  child
-			 * path's child-table being non-empty means that the real
-			 * directory is also  non-empty: filesystems are  allowed
-			 * to remove files and directories for reasons other than
-			 * explicit unlink/rmdir calls.
-			 * This is especially important for stuff like procfs! */
-			if (path_cldlock_trywrite(existing_path)) {
-				/* Wait for the existing path to become available. */
-				path_cldlock_endwrite(self);
-				FINALLY_DECREF_UNLIKELY(existing_path);
-				path_cldlock_write(existing_path);
-				path_cldlock_endwrite(existing_path);
-				goto again_acquire_cldlock;
-			}
-
-			/* Do the fs-level unlink (or rather: rmdir) */
-			TRY {
-				status = fdirnode_unlink(self->p_dir,
-				                         existing_path->p_name,
-				                         existing_path->p_dir);
-			} EXCEPT {
-				path_cldlock_endwrite(existing_path);
-				decref_unlikely(existing_path);
-				path_cldlock_endwrite(self);
-				RETHROW();
-			}
-			assert(status == FDIRNODE_UNLINK_SUCCESS ||
-			       status == FDIRNODE_UNLINK_DELETED);
-			if (status == FDIRNODE_UNLINK_DELETED) {
-				path_cldlock_endwrite(existing_path);
-				decref_unlikely(existing_path);
-				path_cldlock_endwrite(self);
-				goto again_acquire_cldlock;
-			}
-
-			/* Remove the deleted `existing_path' from `self' */
-			path_cldlist_remove_force(self, existing_path);
-			path_cldlist_rehash_after_remove(self);
-			path_cldlock_endwrite(self);
-
-			/* Mark `existing_path' as having been deleted. */
-			if (pdeleted_dirent)
-				*pdeleted_dirent = incref(existing_path->p_name);
-			path_delete_and_unlock(existing_path);
-
-			/* Write-back information about what got deleted (if requested) */
-			if (pdeleted_node)
-				*pdeleted_node = mfile_asnode(incref(existing_path->p_dir));
-			if (pdeleted_path)
-				*pdeleted_path = existing_path;
-			else {
-				decref(existing_path);
-			}
-			return;
-		}
-	}
-	path_cldlock_endwrite(self);
-
-	/* Consult the filesystem about what the caller wants to delete. */
-	{
-		struct flookup_info info;
-again_lookup_dent:
-		info.flu_name    = name;
-		info.flu_hash    = namehash;
-		info.flu_namelen = namelen;
-		info.flu_flags   = atflags;
-
-		/* Do the lookup */
-		dent = fdirnode_lookup(self->p_dir, &info);
-	}
-
-	/* Whatever you're trying to delete, it's doesn't exist... */
-	if unlikely(!dent)
-		THROW(E_FSERROR_FILE_NOT_FOUND);
-
-	/* Load the file-node associated with `node' */
-	TRY {
-		node = fdirent_opennode(dent, self->p_dir);
-		if unlikely(!node) {
-			decref_unlikely(dent);
-			goto again_lookup_dent;
-		}
-		TRY {
-			/* Check if we're even allowed  to delete `node', and in  the
-			 * case of `node' being  a directory, re-acquire a  read-lock
-			 * to `self' to ensure that it hasn't appeared in-cache since
-			 * we checked earlier,  and won't appear  until FS says  that
-			 * it's  done deleting the file (at which point we can assume
-			 * that later fdirnode_lookup() calls will no longer indicate
-			 * that the file still exists) */
-			if (fnode_isdir(node)) {
-				if (!(atflags & AT_REMOVEDIR))
-					THROW(E_FSERROR_IS_A_DIRECTORY, E_FILESYSTEM_IS_A_DIRECTORY_UNLINK);
-				path_cldlock_read(self);
-
-				/* double-check that nothing with this name exists in-cache. */
-				if unlikely(path_lookupchild_withlock(self, name, namelen, namehash, 0) != NULL) {
-					path_cldlock_endread(self);
-					decref_unlikely(node);
-					decref_unlikely(dent);
-					goto again_acquire_cldlock; /* Let's try again... */
-				}
-
-				/* Ask the filesystem to remove the directory. */
-				TRY {
-					status = fdirnode_unlink(self->p_dir, dent, node);
-				} EXCEPT {
-					path_cldlock_endread(self);
-					RETHROW();
-				}
-				path_cldlock_endread(self);
-			} else {
-				/* Remove something that isn't a directory. */
-				status = fdirnode_unlink(self->p_dir, dent, node);
-			}
-		} EXCEPT {
-			decref_unlikely(node);
-			RETHROW();
-		}
-	} EXCEPT {
-		decref_unlikely(dent);
-		RETHROW();
-	}
-	assert(status == FDIRNODE_UNLINK_SUCCESS ||
-	       status == FDIRNODE_UNLINK_DELETED);
-	if (status == FDIRNODE_UNLINK_DELETED) {
-		decref_unlikely(node);
-		decref_unlikely(dent);
-		goto again_lookup_dent;
-	}
-
-	/* Write-back information about what got deleted (if requested) */
-	if (pdeleted_node)
-		*pdeleted_node = node;
-	else {
-		decref_unlikely(node);
-	}
-	if (pdeleted_dirent)
-		*pdeleted_dirent = dent;
-	else {
-		decref_unlikely(dent);
-	}
-	if (pdeleted_path)
-		*pdeleted_path = NULL; /* Wasn't a path that got removed... */
-}
-
-
-
-
-
-
-PRIVATE NONNULL((1, 2)) void
-NOTHROW(KCALL path_acquire_locks)(struct path *a, struct path *b) {
-again:
-	path_cldlock_write(a);
-	if (b != a) {
-		if (!path_cldlock_trywrite(b)) {
-			path_cldlock_endwrite(a);
-			path_cldlock_write(b);
-			if (!path_cldlock_trywrite(a)) {
-				path_cldlock_endwrite(b);
-				goto again;
-			}
-		}
-	}
-}
-
-PRIVATE NONNULL((1, 2)) void
-NOTHROW(KCALL path_release_locks)(struct path *a, struct path *b) {
-	if (b != a)
-		path_cldlock_endwrite(b);
-	path_cldlock_endwrite(a);
-}
-
-
-
-
-/* Special return values for `fdirnode_rename_in_path()' */
-#define FDIRNODE_RENAME_IN_PATH_SUCCESS ((REF struct path *)FDIRNODE_RENAME_SUCCESS)
-#define FDIRNODE_RENAME_IN_PATH_EXISTS  ((REF struct path *)FDIRNODE_RENAME_EXISTS)
-#define FDIRNODE_RENAME_IN_PATH_DELETED ((REF struct path *)FDIRNODE_RENAME_DELETED)
-STATIC_ASSERT(!ADDR_ISKERN(FDIRNODE_RENAME_IN_PATH_SUCCESS));
-STATIC_ASSERT(!ADDR_ISKERN(FDIRNODE_RENAME_IN_PATH_EXISTS));
-STATIC_ASSERT(!ADDR_ISKERN(FDIRNODE_RENAME_IN_PATH_DELETED));
-
 INTDEF struct path deleted_path; /* from "./path.c" */
 
 /* Release a lock as previously acquired by `path_tryincref_and_trylock_whole_tree()'. */
 PRIVATE NONNULL((1)) void
-NOTHROW(FCALL path_decref_and_unlock_whole_tree)(struct path *__restrict self) {
+NOTHROW(FCALL path_decref_and_unlock_whole_tree)(REF struct path *__restrict self) {
 	size_t mask;
 	struct path_bucket *buckets;
 	mask    = self->p_cldmask;
@@ -446,12 +181,13 @@ NOTHROW(FCALL path_decref_and_unlock_whole_tree)(struct path *__restrict self) {
 		size_t i;
 		for (i = 0; i <= mask; ++i) {
 			struct path *child = buckets[i].pb_path;
-			if (child && child != &deleted_path && !wasdestroyed(child))
+			if (child && child != &deleted_path && !wasdestroyed(child)) {
 				path_decref_and_unlock_whole_tree(child);
+				decref_unlikely(self);
+			}
 		}
 	}
 	path_cldlock_endwrite(self);
-	decref_unlikely(self);
 }
 
 /* Acquire a lock to `self' and all child-paths reachable from there.
@@ -538,6 +274,285 @@ NOTHROW(FCALL path_decref_and_delete_and_unlock_whole_tree)(struct path *__restr
 	}
 }
 
+
+
+
+
+
+
+/* High-level implementation of `unlink(2)' / `rmdir(2)'.
+ * @param: atflags: At least one of `AT_REMOVEREG | AT_REMOVEDIR', optionally
+ *                  or'd with `AT_DOSPATH' (other flags are silently ignored)
+ * @throw: E_WOULDBLOCK:                  Preemption is disabled, and operation would have blocked.
+ * @throw: E_SEGFAULT:                    Faulty pointer
+ * @throw: E_FSERROR_ACCESS_DENIED:       Missing W/X permissions for `self'
+ * @throw: E_FSERROR_NOT_A_DIRECTORY:E_FILESYSTEM_NOT_A_DIRECTORY_RMDIR: `name' is S_IFREG, but `AT_REMOVEREG' isn't given
+ * @throw: E_FSERROR_IS_A_DIRECTORY:E_FILESYSTEM_IS_A_DIRECTORY_UNLINK:  `name' is S_IFDIR, but `AT_REMOVEDIR' isn't given
+ * @throw: E_FSERROR_IS_A_MOUNTING_POINT: `name' refers to a mounting point
+ * @throw: E_FSERROR_FILE_NOT_FOUND:      `name' could not be found
+ * @throw: E_FSERROR_READONLY:            ...
+ * @throw: E_IOERROR:                     ...
+ * @throw: E_BADALLOC:                    ... */
+PUBLIC NONNULL((1)) void KCALL
+path_remove(struct path *__restrict self,
+            /*utf-8*/ USER CHECKED char const *name, u16 namelen, atflag_t atflags,
+            /*out[1..1]_opt*/ REF struct fnode **pdeleted_node,
+            /*out[1..1]_opt*/ REF struct fdirent **pdeleted_dirent,
+            /*out[0..1]_opt*/ REF struct path **pdeleted_path)
+		THROWS(E_WOULDBLOCK, E_SEGFAULT, E_FSERROR_ACCESS_DENIED,
+		       E_FSERROR_IS_A_MOUNTING_POINT, E_FSERROR_FILE_NOT_FOUND,
+		       E_FSERROR_READONLY, E_IOERROR, E_BADALLOC, ...) {
+	unsigned int status;
+	uintptr_t namehash;
+	struct path *existing_path;
+	REF struct fdirent *dent;
+	REF struct fnode *node;
+
+	/* Assert permissions */
+	fnode_access(self->p_dir, W_OK | X_OK);
+
+	namehash = fdirent_hash(name, namelen);
+again_acquire_cldlock:
+	path_cldlock_write(self);
+	TRY {
+		/* Check if we're to remove a child path. */
+		existing_path = path_lookupchild_withlock(self, name, namelen,
+		                                          namehash, atflags);
+	} EXCEPT {
+		path_cldlock_endwrite(self);
+		RETHROW();
+	}
+	if (existing_path) {
+		assert(existing_path != self);
+		if (!tryincref(existing_path)) {
+			/* Existing path is being destroyed and is probably trying to remove
+			 * itself right now, but  since we need it  gone _now_, just do  the
+			 * removal for it! */
+			path_cldlist_remove_force(self, existing_path);
+		} else {
+			REF struct path *blocking_path;
+
+			/* Check if we're even allowed to remove directories. */
+			if (!(atflags & AT_REMOVEDIR)) {
+				path_cldlock_endwrite(self);
+				decref_unlikely(existing_path);
+
+				/* Welp... better use rmdir(2) next time... */
+				THROW(E_FSERROR_IS_A_DIRECTORY, E_FILESYSTEM_IS_A_DIRECTORY_UNLINK);
+			}
+
+			/* Check if it's a mounting point. */
+			if unlikely(path_ismount(existing_path)) {
+				path_cldlock_endwrite(self);
+				decref_unlikely(existing_path);
+
+				/* You'll have to use `path_umount()' */
+				THROW(E_FSERROR_IS_A_MOUNTING_POINT);
+			}
+
+			/* Ok: so this is where it gets a little bit complicated:
+			 *  - We have to acquire another lock to the child path
+			 *  - Then, while holding locks to both paths, invoke the
+			 *    underlying fdirnode's unlink operator
+			 *  - Once that operator returns with success, mark the
+			 *    child  path's  `p_cldlist = PATH_CLDLIST_DELETED'
+			 *  - Release locks and we're done
+			 *
+			 * All of the is-directory-empty checking is done on  the
+			 * FS-layer, and we  can't safely assume  that the  child
+			 * path's child-table being non-empty means that the real
+			 * directory is also  non-empty: filesystems are  allowed
+			 * to remove files and directories for reasons other than
+			 * explicit unlink/rmdir calls.
+			 * This is especially important for stuff like procfs! */
+
+			/* Acquire locks to this entire path-tree. */
+			blocking_path = path_tryincref_and_trylock_whole_tree(existing_path);
+			if unlikely(blocking_path) {
+				/* Wait for the existing path to become available. */
+				path_cldlock_endwrite(self);
+				decref_unlikely(existing_path);
+				FINALLY_DECREF_UNLIKELY(blocking_path);
+				path_cldlock_write(blocking_path);
+				path_cldlock_endwrite(blocking_path);
+				goto again_acquire_cldlock;
+			}
+
+			/* Do the fs-level unlink (or rather: rmdir) */
+			TRY {
+				status = fdirnode_unlink(self->p_dir,
+				                         existing_path->p_name,
+				                         existing_path->p_dir);
+			} EXCEPT {
+				path_decref_and_unlock_whole_tree(existing_path);
+				decref_unlikely(existing_path);
+				path_cldlock_endwrite(self);
+				RETHROW();
+			}
+			assert(status == FDIRNODE_UNLINK_SUCCESS ||
+			       status == FDIRNODE_UNLINK_DELETED);
+			if (status == FDIRNODE_UNLINK_DELETED) {
+				path_decref_and_unlock_whole_tree(existing_path);
+				decref_unlikely(existing_path);
+				path_cldlock_endwrite(self);
+				goto again_acquire_cldlock;
+			}
+
+			/* Remove the deleted `existing_path' from `self' */
+			path_cldlist_remove_force(self, existing_path);
+			path_cldlist_rehash_after_remove(self);
+			path_cldlock_endwrite(self);
+
+			/* Mark `existing_path' (and its entire sub-tree) as having been deleted. */
+			if (pdeleted_dirent)
+				*pdeleted_dirent = incref(existing_path->p_name);
+			path_decref_and_delete_and_unlock_whole_tree(existing_path);
+
+			/* Write-back information about what got deleted (if requested) */
+			if (pdeleted_node)
+				*pdeleted_node = mfile_asnode(incref(existing_path->p_dir));
+			if (pdeleted_path)
+				*pdeleted_path = existing_path;
+			else {
+				decref(existing_path);
+			}
+			return;
+		}
+	}
+	path_cldlock_endwrite(self);
+
+	/* Consult the filesystem about what the caller wants to delete. */
+	{
+		struct flookup_info info;
+again_lookup_dent:
+		info.flu_name    = name;
+		info.flu_hash    = namehash;
+		info.flu_namelen = namelen;
+		info.flu_flags   = atflags;
+
+		/* Do the lookup */
+		dent = fdirnode_lookup(self->p_dir, &info);
+	}
+
+	/* Whatever you're trying to delete, it's doesn't exist... */
+	if unlikely(!dent)
+		THROW(E_FSERROR_FILE_NOT_FOUND);
+
+	/* Load the file-node associated with `node' */
+	TRY {
+		node = fdirent_opennode(dent, self->p_dir);
+		if unlikely(!node) {
+			decref_unlikely(dent);
+			goto again_lookup_dent;
+		}
+		TRY {
+			/* Check if we're even allowed  to delete `node', and in  the
+			 * case of `node' being  a directory, re-acquire a  read-lock
+			 * to `self' to ensure that it hasn't appeared in-cache since
+			 * we checked earlier,  and won't appear  until FS says  that
+			 * it's  done deleting the file (at which point we can assume
+			 * that later fdirnode_lookup() calls will no longer indicate
+			 * that the file still exists) */
+			if (fnode_isdir(node)) {
+				if (!(atflags & AT_REMOVEDIR))
+					THROW(E_FSERROR_IS_A_DIRECTORY, E_FILESYSTEM_IS_A_DIRECTORY_UNLINK);
+				path_cldlock_read(self);
+
+				/* double-check that nothing with this name exists in-cache. */
+				if unlikely(path_lookupchild_withlock(self, name, namelen, namehash, 0) != NULL) {
+					path_cldlock_endread(self);
+					decref_unlikely(node);
+					decref_unlikely(dent);
+					goto again_acquire_cldlock; /* Let's try again... */
+				}
+
+				/* Ask the filesystem to remove the directory. */
+				TRY {
+					status = fdirnode_unlink(self->p_dir, dent, node);
+				} EXCEPT {
+					path_cldlock_endread(self);
+					RETHROW();
+				}
+				path_cldlock_endread(self);
+			} else {
+				if (!(atflags & AT_REMOVEREG))
+					THROW(E_FSERROR_NOT_A_DIRECTORY, E_FILESYSTEM_NOT_A_DIRECTORY_RMDIR);
+
+				/* Remove something that isn't a directory. */
+				status = fdirnode_unlink(self->p_dir, dent, node);
+			}
+		} EXCEPT {
+			decref_unlikely(node);
+			RETHROW();
+		}
+	} EXCEPT {
+		decref_unlikely(dent);
+		RETHROW();
+	}
+	assert(status == FDIRNODE_UNLINK_SUCCESS ||
+	       status == FDIRNODE_UNLINK_DELETED);
+	if (status == FDIRNODE_UNLINK_DELETED) {
+		decref_unlikely(node);
+		decref_unlikely(dent);
+		goto again_lookup_dent;
+	}
+
+	/* Write-back information about what got deleted (if requested) */
+	if (pdeleted_node)
+		*pdeleted_node = node;
+	else {
+		decref_unlikely(node);
+	}
+	if (pdeleted_dirent)
+		*pdeleted_dirent = dent;
+	else {
+		decref_unlikely(dent);
+	}
+	if (pdeleted_path)
+		*pdeleted_path = NULL; /* Wasn't a path that got removed... */
+}
+
+
+
+
+
+
+/* Acquire locks for 2 paths */
+PRIVATE NONNULL((1, 2)) void KCALL
+twopaths_acquire_locks(struct path *a, struct path *b)
+		THROWS(E_WOULDBLOCK) {
+again:
+	path_cldlock_write(a);
+	if (b != a) {
+		if (!path_cldlock_trywrite(b)) {
+			path_cldlock_endwrite(a);
+			path_cldlock_write(b);
+			if (!path_cldlock_trywrite(a)) {
+				path_cldlock_endwrite(b);
+				goto again;
+			}
+		}
+	}
+}
+
+/* Release locks from 2 paths */
+PRIVATE NOBLOCK NONNULL((1, 2)) void
+NOTHROW(KCALL twopaths_release_locks)(struct path *a, struct path *b) {
+	if (b != a)
+		path_cldlock_endwrite(b);
+	path_cldlock_endwrite(a);
+}
+
+
+
+
+/* Special return values for `fdirnode_rename_in_path()' */
+#define FDIRNODE_RENAME_IN_PATH_SUCCESS ((REF struct path *)FDIRNODE_RENAME_SUCCESS)
+#define FDIRNODE_RENAME_IN_PATH_EXISTS  ((REF struct path *)FDIRNODE_RENAME_EXISTS)
+#define FDIRNODE_RENAME_IN_PATH_DELETED ((REF struct path *)FDIRNODE_RENAME_DELETED)
+STATIC_ASSERT(!ADDR_ISKERN(FDIRNODE_RENAME_IN_PATH_SUCCESS));
+STATIC_ASSERT(!ADDR_ISKERN(FDIRNODE_RENAME_IN_PATH_EXISTS));
+STATIC_ASSERT(!ADDR_ISKERN(FDIRNODE_RENAME_IN_PATH_DELETED));
 
 PRIVATE WUNUSED NONNULL((1, 2, 3)) REF struct path *KCALL
 fdirnode_exchange_paths(struct path *oldpath, struct path *newpath,
@@ -999,7 +1014,7 @@ again_acquire_lock:
 	exchange_newname_node   = NULL;
 	replaced_node           = NULL;
 	newpath_ref             = NULL;
-	path_acquire_locks(oldpath, newpath);
+	twopaths_acquire_locks(oldpath, newpath);
 	TRY {
 		/* Don't do any replacements by default. */
 		info.frn_repfile = NULL;
@@ -1150,14 +1165,14 @@ again_rename:
 			goto again_rename;
 		}
 	} EXCEPT {
-		path_release_locks(oldpath, newpath);
+		twopaths_release_locks(oldpath, newpath);
 		xdecref_unlikely(newpath_ref);
 		xdecref_unlikely(exchange_newname_dirent);
 		xdecref_unlikely(exchange_newname_node);
 		xdecref_unlikely(replaced_node);
 		RETHROW();
 	}
-	path_release_locks(oldpath, newpath);
+	twopaths_release_locks(oldpath, newpath);
 	/* Success! */
 	if (pold_dirent)
 		*pold_dirent = incref(info.frn_oldent);
@@ -1188,7 +1203,7 @@ again_rename:
 	return;
 	{
 waitfor_newpath_ref_writelock:
-		path_release_locks(oldpath, newpath);
+		twopaths_release_locks(oldpath, newpath);
 		FINALLY_DECREF_UNLIKELY(newpath_ref);
 		path_cldlock_write(newpath_ref);
 		path_cldlock_endwrite(newpath_ref);
@@ -1196,7 +1211,7 @@ waitfor_newpath_ref_writelock:
 	goto again_acquire_lock;
 	{
 waitfor_status_writelock:
-		path_release_locks(oldpath, newpath);
+		twopaths_release_locks(oldpath, newpath);
 		FINALLY_DECREF_UNLIKELY(status);
 		path_cldlock_write(status);
 		path_cldlock_endwrite(status);
