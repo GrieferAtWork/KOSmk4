@@ -519,18 +519,21 @@
 #endif /* !E_FSERROR_NOT_A_DIRECTORY */
 /*[[[end]]]*/
 #ifndef E_FILESYSTEM_NOT_A_DIRECTORY_WALK
-#define E_FILESYSTEM_NOT_A_DIRECTORY_WALK    0x0001 /* Thrown as the  result of attempting  to traverse a  non-directory
-                                                     * item as though it was one (e.g. `open("/opt/readme.txt/foobar")') */
+#define E_FILESYSTEM_NOT_A_DIRECTORY_WALK    1 /* Thrown as the  result of attempting  to traverse a  non-directory
+                                                * item as though it was one (e.g. `open("/opt/readme.txt/foobar")') */
 #endif /* !E_FILESYSTEM_NOT_A_DIRECTORY_WALK */
 #ifndef E_FILESYSTEM_NOT_A_DIRECTORY_OPEN
-#define E_FILESYSTEM_NOT_A_DIRECTORY_OPEN    0x0002 /* Thrown as the result of `open(path, O_DIRECTORY)', where `path' isn't a directory */
+#define E_FILESYSTEM_NOT_A_DIRECTORY_OPEN    2 /* Thrown as the result of `open(path, O_DIRECTORY)', where `path' isn't a directory */
 #endif /* !E_FILESYSTEM_NOT_A_DIRECTORY_OPEN */
 #ifndef E_FILESYSTEM_NOT_A_DIRECTORY_RMDIR
-#define E_FILESYSTEM_NOT_A_DIRECTORY_RMDIR   0x0003 /* Thrown as the result of `rmdir(path)', where `path' isn't a directory */
+#define E_FILESYSTEM_NOT_A_DIRECTORY_RMDIR   3 /* Thrown as the result of `rmdir(path)', where `path' isn't a directory */
 #endif /* !E_FILESYSTEM_NOT_A_DIRECTORY_RMDIR */
 #ifndef E_FILESYSTEM_NOT_A_DIRECTORY_READDIR
-#define E_FILESYSTEM_NOT_A_DIRECTORY_READDIR 0x0004 /* Thrown as the result of `readdir(path)', where `path' isn't a directory */
+#define E_FILESYSTEM_NOT_A_DIRECTORY_READDIR 4 /* Thrown as the result of `readdir(path)', where `path' isn't a directory */
 #endif /* !E_FILESYSTEM_NOT_A_DIRECTORY_READDIR */
+#ifndef E_FILESYSTEM_NOT_A_DIRECTORY_RENAME
+#define E_FILESYSTEM_NOT_A_DIRECTORY_RENAME  5 /* `rename(2)' tried to override a directory with a non-directory */
+#endif /* !E_FILESYSTEM_NOT_A_DIRECTORY_RENAME */
 
 /* SPLIT: All error codes above should be interpreted as  FILE-NOT-FOUND
  *        in situations where a list of paths is searched for a specific

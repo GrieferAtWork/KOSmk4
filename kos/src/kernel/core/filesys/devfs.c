@@ -253,8 +253,6 @@ devfs_root_v_lookup(struct fdirnode *__restrict self,
 	return ramfs_dirnode_v_lookup(self, info);
 }
 
-#define devfs_root_v_lookup_fnode fdirnode_v_lookup_fnode
-
 
 #ifndef __fdirent_axref_defined
 #define __fdirent_axref_defined
@@ -507,12 +505,11 @@ PUBLIC struct fdirnode_ops const devfs_dirnode_ops = {
 		},
 		.no_wrattr = &ramfs_dirnode_v_wrattr,
 	},
-	.dno_lookup       = &ramfs_dirnode_v_lookup,
-	.dno_lookup_fnode = &ramfs_dirnode_v_lookup_fnode,
-	.dno_enum         = &ramfs_dirnode_v_enum,
-	.dno_mkfile       = &ramfs_dirnode_v_mkfile,
-	.dno_unlink       = &ramfs_dirnode_v_unlink,
-	.dno_rename       = &devfs_dirnode_v_rename,
+	.dno_lookup = &ramfs_dirnode_v_lookup,
+	.dno_enum   = &ramfs_dirnode_v_enum,
+	.dno_mkfile = &ramfs_dirnode_v_mkfile,
+	.dno_unlink = &ramfs_dirnode_v_unlink,
+	.dno_rename = &devfs_dirnode_v_rename,
 };
 
 
@@ -1022,7 +1019,6 @@ INTERN_CONST struct fsuper_ops const devfs_super_ops = {
 			.no_wrattr = &fnode_v_wrattr_noop,
 		},
 		.dno_lookup       = &devfs_root_v_lookup,
-		.dno_lookup_fnode = &devfs_root_v_lookup_fnode,
 		.dno_enum         = &devfs_root_v_enum,
 		.dno_mkfile       = &devfs_root_v_mkfile,
 		.dno_unlink       = &devfs_root_v_unlink,

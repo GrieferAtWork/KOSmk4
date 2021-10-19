@@ -79,7 +79,8 @@ enum {
 	E_FILESYSTEM_IS_A_DIRECTORY_GENERIC, /* Generic reason for `E_FSERROR_IS_A_DIRECTORY' */
 	E_FILESYSTEM_IS_A_DIRECTORY_UNLINK,  /* Thrown as the result of `unlink(path)', where `path' is a directory */
 	E_FILESYSTEM_IS_A_DIRECTORY_EXEC,    /* Thrown as the result of `exec(path)', where `path' is a directory */
-	E_FILESYSTEM_IS_A_DIRECTORY_READ     /* Thrown as the result of attempting to read from a directory */
+	E_FILESYSTEM_IS_A_DIRECTORY_READ,    /* Thrown as the result of attempting to read from a directory */
+	E_FILESYSTEM_IS_A_DIRECTORY_RENAME,  /* `rename(2)' tried to override a non-directory with a directory */
 };
 #endif /* __CC__ */
 /*[[[AUTO]]]*/
@@ -88,11 +89,13 @@ enum {
 #define E_FILESYSTEM_IS_A_DIRECTORY_UNLINK  E_FILESYSTEM_IS_A_DIRECTORY_UNLINK  /* Thrown as the result of `unlink(path)', where `path' is a directory */
 #define E_FILESYSTEM_IS_A_DIRECTORY_EXEC    E_FILESYSTEM_IS_A_DIRECTORY_EXEC    /* Thrown as the result of `exec(path)', where `path' is a directory */
 #define E_FILESYSTEM_IS_A_DIRECTORY_READ    E_FILESYSTEM_IS_A_DIRECTORY_READ    /* Thrown as the result of attempting to read from a directory */
+#define E_FILESYSTEM_IS_A_DIRECTORY_RENAME  E_FILESYSTEM_IS_A_DIRECTORY_RENAME  /* `rename(2)' tried to override a non-directory with a directory */
 #else /* __COMPILER_PREFERR_ENUMS */
 #define E_FILESYSTEM_IS_A_DIRECTORY_GENERIC 0 /* Generic reason for `E_FSERROR_IS_A_DIRECTORY' */
 #define E_FILESYSTEM_IS_A_DIRECTORY_UNLINK  1 /* Thrown as the result of `unlink(path)', where `path' is a directory */
 #define E_FILESYSTEM_IS_A_DIRECTORY_EXEC    2 /* Thrown as the result of `exec(path)', where `path' is a directory */
 #define E_FILESYSTEM_IS_A_DIRECTORY_READ    3 /* Thrown as the result of attempting to read from a directory */
+#define E_FILESYSTEM_IS_A_DIRECTORY_RENAME  4 /* `rename(2)' tried to override a non-directory with a directory */
 #endif /* !__COMPILER_PREFERR_ENUMS */
 /*[[[end]]]*/
 

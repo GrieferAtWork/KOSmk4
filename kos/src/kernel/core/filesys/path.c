@@ -62,24 +62,75 @@ DECL_BEGIN
 #endif /* !CONFIG_PATH_CLDLIST_INITIAL_MASK */
 
 /* Check if `child' is a descendant of `root' (including `child == root') */
-PUBLIC NOBLOCK ATTR_PURE WUNUSED NONNULL((1, 2)) bool
-NOTHROW(FCALL path_isdescendantof)(struct path const *child,
+PUBLIC NOBLOCK WUNUSED NONNULL((1, 2)) bool
+NOTHROW(FCALL path_isdescendantof)(struct path *child,
                                    struct path const *root) {
+#ifdef CONFIG_NO_SMP
+	pflag_t was;
+	if (root == child)
+		return true;
+	if (path_isroot(child))
+		return false;
+	was = PREEMPTION_PUSHOFF();
 	for (;;) {
-		if (root == child)
+		child = child->p_parent;
+		if (root == child) {
+			PREEMPTION_POP(was);
 			return true;
+		}
 		if (path_isroot(child))
 			break;
-		child = path_parent(child);
 	}
+	PREEMPTION_POP(was);
+#else /* CONFIG_NO_SMP */
+	REF struct path *iter;
+	if (root == child)
+		return true;
+	if (path_isroot(child))
+		return false;
+	child = path_getparent(child);
+	for (;;) {
+		if (root == child) {
+			decref_unlikely(child);
+			return true;
+		}
+		if (path_isroot(child))
+			break;
+		iter = path_getparent(child);
+		decref_unlikely(child);
+		child = iter;
+	}
+	decref_unlikely(child);
+#endif /* !CONFIG_NO_SMP */
 	return false;
 }
 
 /* Return a pointer to the VFS associated with `self' */
-PUBLIC NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) struct vfs *
-NOTHROW(FCALL _path_getvfs)(struct path const *__restrict self) {
-	while (!path_isroot(self))
-		self = path_parent(self);
+PUBLIC NOBLOCK WUNUSED NONNULL((1)) struct vfs *
+NOTHROW(FCALL _path_getvfs)(struct path *__restrict self) {
+	if (!path_isroot(self)) {
+#ifdef CONFIG_NO_SMP
+		pflag_t was;
+		was = PREEMPTION_PUSHOFF();
+		do {
+			self = path_parent(self);
+		} while (!path_isroot(self));
+		PREEMPTION_POP(was);
+#else /* CONFIG_NO_SMP */
+		struct vfs *result;
+		self = path_getparent(self);
+		while (!path_isroot(self)) {
+			REF struct path *next;
+			next = path_getparent(self);
+			decref_unlikely(self);
+			self = next;
+		}
+		/* Don't need to incref(_p_vfs) w/ a lock: paths aren't allowed to change VFS */
+		result = self->_p_vfs;
+		decref_unlikely(self);
+		return result;
+#endif /* !CONFIG_NO_SMP */
+	}
 	return self->_p_vfs;
 }
 
@@ -214,7 +265,7 @@ NOTHROW(FCALL path_destroy)(struct path *__restrict self) {
 		weakdecref(myvfs);
 	} else {
 		/* Remove the path from its parent's child list (possibly asynchronously) */
-		parent = path_parent(self);
+		parent = self->p_parent;
 		DBG_memset(&self->p_parent, 0xcc, sizeof(self->p_parent));
 		if (parent != NULL) {
 			COMPILER_READ_BARRIER();
@@ -263,7 +314,7 @@ NOTHROW(KCALL _path_cldlock_reap)(struct path *__restrict self) {
 
 
 /* Special path pointed-to by newly-allocated VFS */
-PRIVATE struct path deleted_path = {
+INTERN struct path deleted_path = {
 	.p_refcnt  = 1, /* +1: deleted_path */
 	.p_flags   = PATH_F_NORMAL,
 	{ .p_parent  = NULL }, /* Technically, this isn't allowed, but it's the best we can do. */
@@ -308,8 +359,9 @@ NOTHROW(FCALL path_cldlist_rehash_with)(struct path *__restrict self,
 }
 
 
-/* Ensure that sufficient space exists for the addition of another path to the child list */
-PRIVATE NONNULL((1)) void FCALL
+/* Ensure that sufficient space exists for the addition of another path to the child list
+ * Caller must be holding a lock to `self'. */
+PUBLIC NONNULL((1)) void FCALL
 path_cldlist_rehash_before_insert(struct path *__restrict self)
 		THROWS(E_BADALLOC) {
 	if (((self->p_cldsize + 1) * 3) / 2 >= self->p_cldmask) {
@@ -416,7 +468,7 @@ NOTHROW(KCALL path_cldlist_remove_force)(struct path *__restrict self,
 
 /* Insert `elem' into the child-list of `self'
  * Caller must have made a call to `path_cldlist_rehash_before_insert()' */
-PRIVATE NOBLOCK NONNULL((1, 2)) void
+PUBLIC NOBLOCK NONNULL((1, 2)) void
 NOTHROW(KCALL path_cldlist_insert)(struct path *__restrict self,
                                    struct path *__restrict elem) {
 	uintptr_t hash, i, perturb;
@@ -468,14 +520,16 @@ path_lookupchild(struct path *__restrict self,
 		RETHROW();
 	}
 	/* Try to get a reference to the path. */
-	if (tryincref(result)) {
-		/* Still alive */
-	} else {
-		/* Even though it would also happen async,
-		 * remove the  dead child-path  ourselves. */
-		path_cldlist_remove_force(self, result);
-		path_cldlist_rehash_after_remove(self);
-		result = NULL;
+	if (result != NULL) {
+		if (tryincref(result)) {
+			/* Still alive */
+		} else {
+			/* Even though it would also happen async,
+			 * remove the  dead child-path  ourselves. */
+			path_cldlist_remove_force(self, result);
+			path_cldlist_rehash_after_remove(self);
+			result = NULL;
+		}
 	}
 	path_cldlock_endread(self);
 	return result;
@@ -533,6 +587,31 @@ path_lookupchild_withlock(struct path *__restrict self,
 	/* Nope; don't know anything about this one... */
 	return NULL;
 }
+
+PUBLIC WUNUSED NONNULL((1)) REF struct path *KCALL
+path_lookupchildref_withlock(struct path *__restrict self,
+                             /*utf-8*/ USER CHECKED char const *name,
+                             u16 namelen, uintptr_t namehash,
+                             atflag_t atflags DFL(0))
+		THROWS(E_FSERROR_DELETED, E_SEGFAULT) {
+	REF struct path *result;
+	result = path_lookupchild_withlock(self, name, namelen,
+	                                   namehash, atflags);
+	/* Try to get a reference to the path. */
+	if (result != NULL) {
+		if (tryincref(result)) {
+			/* Still alive */
+		} else {
+			/* Even though it would also happen async,
+			 * remove the  dead child-path  ourselves. */
+			path_cldlist_remove_force(self, result);
+			path_cldlist_rehash_after_remove(self);
+			result = NULL;
+		}
+	}
+	return result;
+}
+
 
 
 
@@ -678,7 +757,7 @@ path_walklink(struct path *__restrict self,
  * @throw: E_WOULDBLOCK:                      Preemption is disabled, and operation would have blocked.
  * @throw: E_SEGFAULT:                        The given `name' is faulty.
  * @throw: E_FSERROR_ACCESS_DENIED:           Not allowed to traverse `self' of a dir walked by the symlink
- * @throw: E_FSERROR_PATH_NOT_FOUND:          `self' doesn't have a child `name...+=namelen'
+ * @throw: E_FSERROR_PATH_NOT_FOUND:E_FILESYSTEM_PATH_NOT_FOUND_DIR: `self' doesn't have a child `name...+=namelen'
  * @throw: E_FSERROR_TOO_MANY_SYMBOLIC_LINKS: Too many symbolic link encountered during expansion
  * @throw: E_FSERROR_NOT_A_DIRECTORY:         The named child isn't a directory or symlink (or the symlink expands to a non-directory)
  * @throw: E_IOERROR:                         ...
@@ -707,6 +786,7 @@ path_expandchild(struct path *__restrict self, u32 *__restrict premaining_symlin
 	/* Entry isn't pre-cached; time to query the directory itself */
 	{
 		struct flookup_info info;
+again_lookup_dent:
 		info.flu_name    = name;
 		info.flu_hash    = namehash;
 		info.flu_namelen = namelen;
@@ -720,8 +800,10 @@ path_expandchild(struct path *__restrict self, u32 *__restrict premaining_symlin
 	/* Open the associated node. */
 	TRY {
 		node = fdirent_opennode(dent, self->p_dir);
-		if unlikely(!node)
-			THROW(E_FSERROR_DELETED, E_FILESYSTEM_DELETED_PATH);
+		if unlikely(!node) {
+			decref_unlikely(dent);
+			goto again_lookup_dent;
+		}
 		TRY {
 			/* Check what we're dealing with. */
 			if (fnode_isdir(node))
@@ -843,22 +925,40 @@ path_expandchildnode(struct path *__restrict self, u32 *__restrict premaining_sy
 	/* Do a normal lookup for child nodes. */
 	{
 		REF struct path *pth;
-		pth = path_lookupchild(self, name, namelen, namehash, atflags);
-		if (pth != NULL) {
-			if (presult_dirent)
-				*presult_dirent = incref(pth->p_name);
-			result = mfile_asnode(incref(pth->p_dir));
-			if (presult_path) {
-				*presult_path = incref(self);
-			}
-			decref_unlikely(pth);
-			return result;
+		path_cldlock_read(self);
+		TRY {
+			pth = path_lookupchild_withlock(self, name, namelen,
+			                                namehash, atflags);
+		} EXCEPT {
+			path_cldlock_endread(self);
+			RETHROW();
 		}
+		/* Try to get a reference to the path. */
+		if (pth != NULL) {
+			if (tryincref(pth)) {
+				/* Still alive */
+				if (presult_dirent)
+					*presult_dirent = incref(pth->p_name);
+				path_cldlock_endread(self);
+				result = mfile_asnode(incref(pth->p_dir));
+				if (presult_path)
+					*presult_path = incref(self);
+				decref_unlikely(pth);
+				return result;
+			} else {
+				/* Even though it would also happen async,
+				 * remove the  dead child-path  ourselves. */
+				path_cldlist_remove_force(self, pth);
+				path_cldlist_rehash_after_remove(self);
+			}
+		}
+		path_cldlock_endread(self);
 	}
 
 	/* Time to query the directory itself */
 	{
 		struct flookup_info info;
+again_lookup_dent:
 		info.flu_name    = name;
 		info.flu_hash    = namehash;
 		info.flu_namelen = namelen;
@@ -873,8 +973,10 @@ path_expandchildnode(struct path *__restrict self, u32 *__restrict premaining_sy
 	/* Open the associated node. */
 	TRY {
 		result = fdirent_opennode(dent, self->p_dir);
-		if unlikely(!result)
-			THROW(E_FSERROR_DELETED, E_FILESYSTEM_DELETED_PATH);
+		if unlikely(!result) {
+			decref_unlikely(dent);
+			goto again_lookup_dent;
+		}
 	} EXCEPT {
 		decref_unlikely(dent);
 		RETHROW();
@@ -1063,11 +1165,15 @@ do_drive_root_rel:
 					}
 				}
 				root_ref = myfs->fs_root;
+				incref(cwd);
 				while (cwd != root_ref && !path_isdrive(cwd)) {
+					REF struct path *nextcwd;
 					assert(!path_isroot(cwd));
-					cwd = path_parent(cwd);
+					nextcwd = path_getparent(cwd);
+					decref_unlikely(cwd);
+					cwd = nextcwd;
 				}
-				ATOMIC_ADD(cwd->p_refcnt, 2);
+				incref(cwd);
 				fs_pathlock_endread(myfs);
 				root_ref = cwd_ref = cwd;
 			}
@@ -1141,6 +1247,11 @@ throw_segment_too_long:
 
 			/* Last segment reached. */
 			if (plastlen) {
+				/* Certain segment names cannot be used as last-segments. */
+				if (seg_len == 1 && seg_str[0] == '.')
+					goto do_pwd_segment;
+				if (seg_len == 2 && seg_str[0] == '.' && seg_str[1] == '.')
+					goto do_par_segment;
 				*plastseg = seg_str;
 				*plastlen = (u16)seg_len;
 				goto done;
@@ -1160,12 +1271,15 @@ do_walk_segment:
 			break;
 
 		case 1:
-			if (seg_str[0] == '.')
+			if (seg_str[0] == '.') {
+do_pwd_segment:
 				break; /* Current directory reference... */
+			}
 			goto normal_segment;
 
 		case 2:
 			if (seg_str[0] == '.' && seg_str[1] == '.') {
+do_par_segment:
 				/* Parent directory reference...
 				 * When we haven't loaded the root yet, this can get kind-of complicated
 				 * since we have to verify that some custom caller-given cwd is actually
@@ -1181,11 +1295,14 @@ do_walk_segment:
 							/* `root_ref' must become the first directory before the unix
 							 * chroot that is  a dos  drive, or the  unix chroot  itself. */
 							root_ref = cwd_ref;
-							while (root_ref != myfs->fs_root && !path_isdrive(root_ref)) {
-								assert(!path_isroot(root_ref));
-								root_ref = path_parent(root_ref);
-							}
 							incref(root_ref);
+							while (root_ref != myfs->fs_root && !path_isdrive(root_ref)) {
+								REF struct path *next_root_ref;
+								assert(!path_isroot(root_ref));
+								next_root_ref = path_getparent(root_ref);
+								decref_unlikely(root_ref);
+								root_ref = next_root_ref;
+							}
 						} else {
 							root_ref = incref(myfs->fs_root);
 						}
@@ -1204,11 +1321,14 @@ do_walk_segment:
 						/* `root_ref' must become the first directory before the unix
 						 * chroot that is  a dos  drive, or the  unix chroot  itself. */
 						root_ref = cwd;
-						while (root_ref != myfs->fs_root && !path_isdrive(root_ref)) {
-							assert(!path_isroot(root_ref));
-							root_ref = path_parent(root_ref);
-						}
 						incref(root_ref);
+						while (root_ref != myfs->fs_root && !path_isdrive(root_ref)) {
+							REF struct path *next_root_ref;
+							assert(!path_isroot(root_ref));
+							next_root_ref = path_getparent(root_ref);
+							decref_unlikely(root_ref);
+							root_ref = next_root_ref;
+						}
 						fs_pathlock_endread(myfs);
 					} else {
 						root_ref = fs_getroot(THIS_FS);
@@ -1227,16 +1347,11 @@ throw_not_found_after_bad_descendant:
 
 				/* Walk up the directory tree (but stop once we've reached the root) */
 				if (cwd != root_ref) {
+					REF struct path *nextcwd;
 					assert(!path_isroot(cwd));
-					if (cwd_ref) {
-						cwd = path_parent(cwd);
-						decref_unlikely(cwd_ref);
-						cwd_ref = incref(cwd);
-					} else {
-						/* No need for  references here,  since the  caller
-						 * will keep on holding a ref to the original `cwd' */
-						cwd = path_parent(cwd);
-					}
+					nextcwd = path_getparent(cwd);
+					xdecref_unlikely(cwd_ref);
+					cwd = cwd_ref = nextcwd;
 				}
 				break;
 			}

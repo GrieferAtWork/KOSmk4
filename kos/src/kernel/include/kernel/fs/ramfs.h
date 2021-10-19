@@ -251,7 +251,6 @@ DATDEF struct fdirnode_ops const ramfs_dirnode_ops;
 FUNDEF WUNUSED NONNULL((1, 2)) REF struct fdirent *KCALL
 ramfs_dirnode_v_lookup(struct fdirnode *__restrict self,
                        struct flookup_info *__restrict info);
-#define ramfs_dirnode_v_lookup_fnode fdirnode_v_lookup_fnode
 FUNDEF NONNULL((1, 2)) void KCALL
 ramfs_dirnode_v_enum(struct fdirnode *__restrict self,
                      struct fdirenum *__restrict result);

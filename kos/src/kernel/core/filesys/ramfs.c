@@ -495,12 +495,11 @@ PUBLIC struct fdirnode_ops const ramfs_dirnode_ops = {
 		},
 		.no_wrattr = &ramfs_dirnode_v_wrattr,
 	},
-	.dno_lookup       = &ramfs_dirnode_v_lookup,
-	.dno_lookup_fnode = &ramfs_dirnode_v_lookup_fnode,
-	.dno_enum         = &ramfs_dirnode_v_enum,
-	.dno_mkfile       = &ramfs_dirnode_v_mkfile,
-	.dno_unlink       = &ramfs_dirnode_v_unlink,
-	.dno_rename       = &ramfs_dirnode_v_rename,
+	.dno_lookup = &ramfs_dirnode_v_lookup,
+	.dno_enum   = &ramfs_dirnode_v_enum,
+	.dno_mkfile = &ramfs_dirnode_v_mkfile,
+	.dno_unlink = &ramfs_dirnode_v_unlink,
+	.dno_rename = &ramfs_dirnode_v_rename,
 };
 
 PRIVATE WUNUSED NONNULL((1, 2)) struct ramfs_dirent *KCALL

@@ -32,4 +32,14 @@
 #define __SEEK_DATA 3 /* Seek to next data. */
 #define __SEEK_HOLE 4 /* Seek to next hole. */
 
+
+/* Flags for `renameat2(2)' */
+#define __RENAME_NOREPLACE 0x01 /* Don't overwrite target */
+#define __RENAME_EXCHANGE  0x02 /* Exchange source and dest */
+#define __RENAME_WHITEOUT  0x04 /* Whiteout source */
+#ifdef __KOS__
+#define __RENAME_MOVETODIR 0x40 /* If `newpath' is a directory, move `oldpath' into it. */
+#endif /* __KOS__ */
+
+
 #endif /* !_ASM_OS_KOS_STDIO_H */

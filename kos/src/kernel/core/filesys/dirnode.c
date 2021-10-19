@@ -30,6 +30,7 @@
 #include <kos/except.h>
 
 #include <assert.h>
+#include <fcntl.h>
 #include <dirent.h>
 #include <stddef.h>
 #include <string.h>
@@ -41,6 +42,37 @@ DECL_BEGIN
 #else /* !NDEBUG && !NDEBUG_FINI */
 #define DBG_memset(...) (void)0
 #endif /* NDEBUG || NDEBUG_FINI */
+
+/* Check if the given flag is a user-space AT_* flag */
+#define IS_USER_ATFLAG(x)          \
+	((x) == AT_SYMLINK_NOFOLLOW || \
+	 (x) == AT_NO_AUTOMOUNT ||     \
+	 (x) == AT_EMPTY_PATH ||       \
+	 (x) == AT_DOSPATH ||          \
+	 (x) == AT_REMOVEREG ||        \
+	 (x) == AT_REMOVEDIR ||        \
+	 (x) == AT_EACCESS ||          \
+	 (x) == AT_SYMLINK_FOLLOW ||   \
+	 (x) == AT_SYMLINK_REGULAR ||  \
+	 (x) == AT_CHANGE_CTIME ||     \
+	 (x) == AT_READLINK_REQSIZE || \
+	 (x) == AT_ALTPATH)
+
+/* Assert that custom AT_* codes don't overlap with standard ones. */
+STATIC_ASSERT(!IS_USER_ATFLAG(AT_RENAME_NOREPLACE));
+STATIC_ASSERT(!IS_USER_ATFLAG(AT_RENAME_EXCHANGE));
+STATIC_ASSERT(!IS_USER_ATFLAG(AT_RENAME_MOVETODIR));
+STATIC_ASSERT(!IS_USER_ATFLAG(AT_EXISTS));
+STATIC_ASSERT(AT_RENAME_NOREPLACE != AT_RENAME_EXCHANGE);
+STATIC_ASSERT(AT_RENAME_NOREPLACE != AT_RENAME_MOVETODIR);
+STATIC_ASSERT(AT_RENAME_NOREPLACE != AT_EXISTS);
+STATIC_ASSERT(AT_RENAME_EXCHANGE != AT_RENAME_MOVETODIR);
+STATIC_ASSERT(AT_RENAME_EXCHANGE != AT_EXISTS);
+STATIC_ASSERT(AT_RENAME_MOVETODIR != AT_EXISTS);
+#undef IS_USER_ATFLAG
+
+
+
 
 
 /* Feed   directory  entry  information  (the  `feed_d_*'  arguments)
@@ -98,36 +130,17 @@ NOTHROW(KCALL fdirnode_v_destroy)(struct mfile *__restrict self) {
 	fnode_v_destroy(self);
 }
 
-PUBLIC WUNUSED NONNULL((1, 2)) REF struct fnode *KCALL
-fdirnode_v_lookup_fnode(struct fdirnode *__restrict self,
-                        struct flookup_info *__restrict info) {
-	struct fdirnode_ops const *ops;
-	REF struct fdirent *dirent;
-	REF struct fnode *result;
-	ops    = fdirnode_getops(self);
-	dirent = (*ops->dno_lookup)(self, info);
-	if (!dirent)
-		return NULL;
-	{
-		FINALLY_DECREF(dirent);
-		result = (*dirent->fd_ops->fdo_opennode)(dirent, self);
-	}
-	return result;
-}
-
-
 
 
 
 /* Create new files within a given directory.
- * If another  file with  the same  name already  existed,  then
- * `FMKFILE_F_EXISTS' is set, and that file is returned instead.
  * @throw: E_FSERROR_ILLEGAL_PATH:          `info->mkf_name' contains bad characters
  * @throw: E_FSERROR_DISK_FULL:             Disk full
  * @throw: E_FSERROR_READONLY:              Read-only filesystem (or unsupported operation)
  * @throw: E_FSERROR_TOO_MANY_HARD_LINKS:   ...
- * @throw: E_FSERROR_UNSUPPORTED_OPERATION: The requested S_IFMT isn't supported. */
-PUBLIC NONNULL((1, 2)) void FCALL
+ * @throw: E_FSERROR_UNSUPPORTED_OPERATION: The requested S_IFMT isn't supported.
+ * @return: * : One of `FDIRNODE_MKFILE_*' **/
+PUBLIC WUNUSED NONNULL((1, 2)) unsigned int FCALL
 fdirnode_mkfile(struct fdirnode *__restrict self,
                 struct fmkfile_info *__restrict info)
 		THROWS(E_FSERROR_ILLEGAL_PATH, E_FSERROR_DISK_FULL,
@@ -137,7 +150,7 @@ fdirnode_mkfile(struct fdirnode *__restrict self,
 	ops = fdirnode_getops(self);
 	if unlikely(!ops->dno_mkfile)
 		THROW(E_FSERROR_READONLY);
-	(*ops->dno_mkfile)(self, info);
+	return (*ops->dno_mkfile)(self, info);
 }
 
 /* Delete the specified file from this directory
@@ -146,39 +159,35 @@ fdirnode_mkfile(struct fdirnode *__restrict self,
  *                                        within `self').
  * @throw: E_FSERROR_DIRECTORY_NOT_EMPTY: `file' is a non-empty directory.
  * @throw: E_FSERROR_READONLY:            Read-only filesystem (or unsupported operation)
- * @throw: E_FSERROR_DELETED:             The given `entry' was already deleted */
-PUBLIC NONNULL((1, 2)) void FCALL
+ * @return: * : One of `FDIRNODE_UNLINK_*' */
+PUBLIC WUNUSED NONNULL((1, 2)) unsigned int FCALL
 fdirnode_unlink(struct fdirnode *__restrict self,
                 struct fdirent *__restrict entry,
                 struct fnode *__restrict file)
-		THROWS(E_FSERROR_FILE_NOT_FOUND, E_FSERROR_DIRECTORY_NOT_EMPTY,
-		       E_FSERROR_READONLY, E_FSERROR_DELETED) {
+		THROWS(E_FSERROR_FILE_NOT_FOUND, E_FSERROR_DIRECTORY_NOT_EMPTY, E_FSERROR_READONLY) {
 	struct fdirnode_ops const *ops;
 	ops = fdirnode_getops(self);
 	if unlikely(!ops->dno_unlink)
 		THROW(E_FSERROR_READONLY);
-	(*ops->dno_unlink)(self, entry, file);
+	return (*ops->dno_unlink)(self, entry, file);
 }
 
 /* Rename/move the specified file from one location to another
- * @throw: E_FSERROR_ILLEGAL_PATH:            `info->frn_name' contains bad characters
- * @throw: E_FSERROR_DISK_FULL:               Disk full
- * @throw: E_FSERROR_READONLY:                Read-only filesystem
- * @throw: E_FSERROR_FILE_ALREADY_EXISTS:     `info->frn_name' already exists
- * @throw: E_FSERROR_DELETED:                 The given `entry' was already deleted */
-PUBLIC NONNULL((1, 2)) void FCALL
+ * @throw: E_FSERROR_ILLEGAL_PATH: `info->frn_name' contains bad characters
+ * @throw: E_FSERROR_DISK_FULL:    Disk full
+ * @throw: E_FSERROR_READONLY:     Read-only filesystem
+ * @return: * : One of `FDIRNODE_RENAME_*' */
+PUBLIC WUNUSED NONNULL((1, 2)) unsigned int FCALL
 fdirnode_rename(struct fdirnode *__restrict self,
                 struct frename_info *__restrict info)
-		THROWS(E_FSERROR_ILLEGAL_PATH, E_FSERROR_DISK_FULL,
-		       E_FSERROR_READONLY, E_FSERROR_FILE_ALREADY_EXISTS,
-		       E_FSERROR_DELETED) {
+		THROWS(E_FSERROR_ILLEGAL_PATH, E_FSERROR_DISK_FULL, E_FSERROR_READONLY) {
 	struct fdirnode_ops const *ops;
 
 	/* Do the low-level rename operation */
 	ops = fdirnode_getops(self);
 	if unlikely(!ops->dno_rename)
 		THROW(E_FSERROR_READONLY);
-	(*ops->dno_rename)(self, info);
+	return (*ops->dno_rename)(self, info);
 }
 
 

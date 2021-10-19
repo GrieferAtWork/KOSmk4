@@ -20,6 +20,7 @@
 #ifndef GUARD_KERNEL_CORE_FILESYS_PATHIO_C
 #define GUARD_KERNEL_CORE_FILESYS_PATHIO_C 1
 #define __WANT_PATH__p_LOPS
+#define _GNU_SOURCE 1
 #define _KOS_SOURCE 1
 
 #include <kernel/compiler.h>
@@ -102,31 +103,51 @@ NOTHROW(FCALL path_remove_from_recent)(struct path *__restrict self) {
 	}
 }
 
+/* Mark `self' as deleted before unlocking it and asynchronously removing it from the recent-cache. */
+PRIVATE NONNULL((1)) void
+NOTHROW(FCALL path_delete_and_unlock)(struct path *__restrict self) {
+	struct path_bucket *old_buckets;
+
+	/* Mark `self' as having been deleted. */
+	old_buckets = self->p_cldlist;
+	self->p_cldlist = PATH_CLDLIST_DELETED;
+	DBG_memset(&self->p_cldused, 0xcc, sizeof(self->p_cldused));
+	DBG_memset(&self->p_cldsize, 0xcc, sizeof(self->p_cldsize));
+	DBG_memset(&self->p_cldmask, 0xcc, sizeof(self->p_cldmask));
+	path_cldlock_endwrite(self);
+	if (old_buckets != PATH_CLDLIST_DELETED &&
+		old_buckets != path_empty_cldlist)
+		kfree(old_buckets);
+
+	/* Remove `self' from the recent-cache of the VFS. (Possibly through use of a LOP) */
+	path_remove_from_recent(self);
+}
+
+
 
 /* High-level implementation of `unlink(2)' / `rmdir(2)'.
  * @param: atflags: At least one of `AT_REMOVEREG | AT_REMOVEDIR', optionally
  *                  or'd with `AT_DOSPATH' (other flags are silently ignored)
- * @throw: E_WOULDBLOCK:                                Preemption is disabled, and operation would have blocked.
- * @throw: E_SEGFAULT:                                  Faulty pointer
- * @throw: E_FSERROR_DELETED:E_FILESYSTEM_DELETED_PATH: `self' has already been deleted.
- * @throw: E_FSERROR_DELETED:E_FILESYSTEM_DELETED_FILE: `name' has already been deleted.
- * @throw: E_FSERROR_ACCESS_DENIED:                     Missing W/X permissions for `self'
+ * @throw: E_WOULDBLOCK:                  Preemption is disabled, and operation would have blocked.
+ * @throw: E_SEGFAULT:                    Faulty pointer
+ * @throw: E_FSERROR_ACCESS_DENIED:       Missing W/X permissions for `self'
  * @throw: E_FSERROR_NOT_A_DIRECTORY:E_FILESYSTEM_NOT_A_DIRECTORY_RMDIR: `name' is S_IFREG, but `AT_REMOVEREG' isn't given
  * @throw: E_FSERROR_IS_A_DIRECTORY:E_FILESYSTEM_IS_A_DIRECTORY_UNLINK:  `name' is S_IFDIR, but `AT_REMOVEDIR' isn't given
- * @throw: E_FSERROR_IS_A_MOUNTING_POINT:               `name' refers to a mounting point
- * @throw: E_FSERROR_FILE_NOT_FOUND:                    `name' could not be found
- * @throw: E_FSERROR_READONLY:                          ...
- * @throw: E_IOERROR:                                   ...
- * @throw: E_BADALLOC:                                  ... */
+ * @throw: E_FSERROR_IS_A_MOUNTING_POINT: `name' refers to a mounting point
+ * @throw: E_FSERROR_FILE_NOT_FOUND:      `name' could not be found
+ * @throw: E_FSERROR_READONLY:            ...
+ * @throw: E_IOERROR:                     ...
+ * @throw: E_BADALLOC:                    ... */
 PUBLIC NONNULL((1)) void KCALL
 path_remove(struct path *__restrict self,
-            USER CHECKED /*utf-8*/ char const *name, u16 namelen, atflag_t atflags,
+            /*utf-8*/ USER CHECKED char const *name, u16 namelen, atflag_t atflags,
             /*out[1..1]_opt*/ REF struct fnode **pdeleted_node,
             /*out[1..1]_opt*/ REF struct fdirent **pdeleted_dirent,
             /*out[0..1]_opt*/ REF struct path **pdeleted_path)
-		THROWS(E_WOULDBLOCK, E_SEGFAULT, E_FSERROR_DELETED, E_FSERROR_ACCESS_DENIED,
-		       E_FSERROR_IS_A_MOUNTING_POINT, E_FSERROR_FILE_NOT_FOUND, E_FSERROR_READONLY,
-		       E_IOERROR, E_BADALLOC, ...) {
+		THROWS(E_WOULDBLOCK, E_SEGFAULT, E_FSERROR_ACCESS_DENIED,
+		       E_FSERROR_IS_A_MOUNTING_POINT, E_FSERROR_FILE_NOT_FOUND,
+		       E_FSERROR_READONLY, E_IOERROR, E_BADALLOC, ...) {
+	unsigned int status;
 	uintptr_t namehash;
 	struct path *existing_path;
 	REF struct fdirent *dent;
@@ -138,12 +159,6 @@ path_remove(struct path *__restrict self,
 	namehash = fdirent_hash(name, namelen);
 again_acquire_cldlock:
 	path_cldlock_write(self);
-
-	/* Check if `self' has been deleted. */
-	if unlikely(self->p_cldlist == PATH_CLDLIST_DELETED) {
-		path_cldlock_endwrite(self);
-		THROW(E_FSERROR_DELETED, E_FILESYSTEM_DELETED_PATH);
-	}
 
 	TRY {
 		/* Check if we're to remove a child path. */
@@ -207,13 +222,22 @@ again_acquire_cldlock:
 
 			/* Do the fs-level unlink (or rather: rmdir) */
 			TRY {
-				fdirnode_unlink(self->p_dir,
-				                existing_path->p_name,
-				                existing_path->p_dir);
+				status = fdirnode_unlink(self->p_dir,
+				                         existing_path->p_name,
+				                         existing_path->p_dir);
 			} EXCEPT {
 				path_cldlock_endwrite(existing_path);
+				decref_unlikely(existing_path);
 				path_cldlock_endwrite(self);
 				RETHROW();
+			}
+			assert(status == FDIRNODE_UNLINK_SUCCESS ||
+			       status == FDIRNODE_UNLINK_DELETED);
+			if (status == FDIRNODE_UNLINK_DELETED) {
+				path_cldlock_endwrite(existing_path);
+				decref_unlikely(existing_path);
+				path_cldlock_endwrite(self);
+				goto again_acquire_cldlock;
 			}
 
 			/* Remove the deleted `existing_path' from `self' */
@@ -222,24 +246,13 @@ again_acquire_cldlock:
 			path_cldlock_endwrite(self);
 
 			/* Mark `existing_path' as having been deleted. */
-			old_buckets = existing_path->p_cldlist;
-			existing_path->p_cldlist = PATH_CLDLIST_DELETED;
-			DBG_memset(&existing_path->p_cldused, 0xcc, sizeof(existing_path->p_cldused));
-			DBG_memset(&existing_path->p_cldsize, 0xcc, sizeof(existing_path->p_cldsize));
-			DBG_memset(&existing_path->p_cldmask, 0xcc, sizeof(existing_path->p_cldmask));
-			path_cldlock_endwrite(existing_path);
-			if (old_buckets != PATH_CLDLIST_DELETED &&
-			    old_buckets != path_empty_cldlist)
-				kfree(old_buckets);
-
-			/* Remove `existing_path' from the recent-cache of the VFS. (Possibly through use of a LOP) */
-			path_remove_from_recent(existing_path);
+			if (pdeleted_dirent)
+				*pdeleted_dirent = incref(existing_path->p_name);
+			path_delete_and_unlock(existing_path);
 
 			/* Write-back information about what got deleted (if requested) */
 			if (pdeleted_node)
 				*pdeleted_node = mfile_asnode(incref(existing_path->p_dir));
-			if (pdeleted_dirent)
-				*pdeleted_dirent = incref(existing_path->p_name);
 			if (pdeleted_path)
 				*pdeleted_path = existing_path;
 			else {
@@ -253,6 +266,7 @@ again_acquire_cldlock:
 	/* Consult the filesystem about what the caller wants to delete. */
 	{
 		struct flookup_info info;
+again_lookup_dent:
 		info.flu_name    = name;
 		info.flu_hash    = namehash;
 		info.flu_namelen = namelen;
@@ -269,8 +283,10 @@ again_acquire_cldlock:
 	/* Load the file-node associated with `node' */
 	TRY {
 		node = fdirent_opennode(dent, self->p_dir);
-		if unlikely(!node)
-			THROW(E_FSERROR_DELETED, E_FILESYSTEM_DELETED_FILE);
+		if unlikely(!node) {
+			decref_unlikely(dent);
+			goto again_lookup_dent;
+		}
 		TRY {
 			/* Check if we're even allowed  to delete `node', and in  the
 			 * case of `node' being  a directory, re-acquire a  read-lock
@@ -294,7 +310,7 @@ again_acquire_cldlock:
 
 				/* Ask the filesystem to remove the directory. */
 				TRY {
-					fdirnode_unlink(self->p_dir, dent, node);
+					status = fdirnode_unlink(self->p_dir, dent, node);
 				} EXCEPT {
 					path_cldlock_endread(self);
 					RETHROW();
@@ -302,7 +318,7 @@ again_acquire_cldlock:
 				path_cldlock_endread(self);
 			} else {
 				/* Remove something that isn't a directory. */
-				fdirnode_unlink(self->p_dir, dent, node);
+				status = fdirnode_unlink(self->p_dir, dent, node);
 			}
 		} EXCEPT {
 			decref_unlikely(node);
@@ -311,6 +327,13 @@ again_acquire_cldlock:
 	} EXCEPT {
 		decref_unlikely(dent);
 		RETHROW();
+	}
+	assert(status == FDIRNODE_UNLINK_SUCCESS ||
+	       status == FDIRNODE_UNLINK_DELETED);
+	if (status == FDIRNODE_UNLINK_DELETED) {
+		decref_unlikely(node);
+		decref_unlikely(dent);
+		goto again_lookup_dent;
 	}
 
 	/* Write-back information about what got deleted (if requested) */
@@ -333,6 +356,553 @@ again_acquire_cldlock:
 
 
 
+PRIVATE NONNULL((1, 2)) void
+NOTHROW(KCALL path_acquire_locks)(struct path *a, struct path *b) {
+again:
+	path_cldlock_write(a);
+	if (b != a) {
+		if (!path_cldlock_trywrite(b)) {
+			path_cldlock_endwrite(a);
+			path_cldlock_write(b);
+			if (!path_cldlock_trywrite(a)) {
+				path_cldlock_endwrite(b);
+				goto again;
+			}
+		}
+	}
+}
+
+PRIVATE NONNULL((1, 2)) void
+NOTHROW(KCALL path_release_locks)(struct path *a, struct path *b) {
+	if (b != a)
+		path_cldlock_endwrite(b);
+	path_cldlock_endwrite(a);
+}
+
+
+
+
+/* Special return values for `fdirnode_rename_in_path()' */
+#define FDIRNODE_RENAME_IN_PATH_SUCCESS ((REF struct path *)FDIRNODE_RENAME_SUCCESS)
+#define FDIRNODE_RENAME_IN_PATH_EXISTS  ((REF struct path *)FDIRNODE_RENAME_EXISTS)
+#define FDIRNODE_RENAME_IN_PATH_DELETED ((REF struct path *)FDIRNODE_RENAME_DELETED)
+STATIC_ASSERT(!ADDR_ISKERN(FDIRNODE_RENAME_IN_PATH_SUCCESS));
+STATIC_ASSERT(!ADDR_ISKERN(FDIRNODE_RENAME_IN_PATH_EXISTS));
+STATIC_ASSERT(!ADDR_ISKERN(FDIRNODE_RENAME_IN_PATH_DELETED));
+
+INTDEF struct path deleted_path; /* from "./path.c" */
+
+/* Release a lock as previously acquired by `path_tryincref_and_trylock_whole_tree()'. */
+PRIVATE NONNULL((1)) void
+NOTHROW(FCALL path_decref_and_unlock_whole_tree)(struct path *__restrict self) {
+	size_t mask;
+	struct path_bucket *buckets;
+	mask    = self->p_cldmask;
+	buckets = self->p_cldlist;
+	if (buckets != PATH_CLDLIST_DELETED) {
+		size_t i;
+		for (i = 0; i <= mask; ++i) {
+			struct path *child = buckets[i].pb_path;
+			if (child && child != &deleted_path && !wasdestroyed(child))
+				path_decref_and_unlock_whole_tree(child);
+		}
+	}
+	path_cldlock_endwrite(self);
+	decref_unlikely(self);
+}
+
+/* Acquire a lock to `self' and all child-paths reachable from there.
+ * @return: * : Reference to path that was blocking. */
+PRIVATE WUNUSED NONNULL((1)) REF struct path *
+NOTHROW(FCALL path_tryincref_and_trylock_whole_tree)(struct path *__restrict self) {
+	size_t i, mask;
+	struct path_bucket *buckets;
+	if (!path_cldlock_trywrite(self))
+		return incref(self);
+	mask    = self->p_cldmask;
+	buckets = self->p_cldlist;
+	if (buckets != PATH_CLDLIST_DELETED) {
+		size_t i;
+		for (i = 0; i <= mask; ++i) {
+			REF struct path *result;
+			struct path *child = buckets[i].pb_path;
+			if (!child)
+				continue;
+			if (child == &deleted_path)
+				continue;
+			if (!tryincref(child))
+				continue;
+			/* Recursion... */
+			result = path_tryincref_and_trylock_whole_tree(child);
+			if unlikely(result) {
+				/* Release locks already acquired */
+				while (i--) {
+					child = buckets[i].pb_path;
+					if (!child || child == &deleted_path)
+						continue;
+					if (!wasdestroyed(child))
+						path_decref_and_unlock_whole_tree(child);
+				}
+				path_cldlock_endwrite(self);
+				return result;
+			}
+		}
+	}
+	return NULL;
+}
+
+/* Release a lock as previously acquired by `path_tryincref_and_trylock_whole_tree()'. */
+PRIVATE NONNULL((1)) void
+NOTHROW(FCALL path_decref_and_delete_and_unlock_whole_tree)(struct path *__restrict self) {
+	size_t old_mask;
+	struct path_bucket *old_buckets;
+
+	/* Mark `self' as having been deleted. */
+	old_mask        = self->p_cldmask;
+	old_buckets     = self->p_cldlist;
+	self->p_cldlist = PATH_CLDLIST_DELETED;
+
+	/* Remove children that have already been destroyed. */
+	if (old_buckets != PATH_CLDLIST_DELETED &&
+	    old_buckets != path_empty_cldlist) {
+		size_t i;
+		for (i = 0; i <= old_mask; ++i) {
+			struct path *child = old_buckets[i].pb_path;
+			if (child && wasdestroyed(child))
+				old_buckets[i].pb_path = NULL;
+		}
+		kfree(old_buckets);
+	}
+	DBG_memset(&self->p_cldused, 0xcc, sizeof(self->p_cldused));
+	DBG_memset(&self->p_cldsize, 0xcc, sizeof(self->p_cldsize));
+	DBG_memset(&self->p_cldmask, 0xcc, sizeof(self->p_cldmask));
+	path_cldlock_endwrite(self);
+	/* Remove `self' from the recent-cache of the VFS. (Possibly through use of a LOP) */
+	path_remove_from_recent(self);
+	decref(self);
+
+	if (old_buckets != PATH_CLDLIST_DELETED &&
+	    old_buckets != path_empty_cldlist) {
+		/* Recursively mark child paths as deleted (and also unlock them) */
+		size_t i;
+		for (i = 0; i <= old_mask; ++i) {
+			struct path *child = old_buckets[i].pb_path;
+			if (!child || child == &deleted_path)
+				continue;
+			path_decref_and_delete_and_unlock_whole_tree(child);
+		}
+		kfree(old_buckets);
+	}
+}
+
+
+PRIVATE WUNUSED NONNULL((1, 2, 3)) REF struct path *KCALL
+fdirnode_exchange_paths(struct path *oldpath, struct path *newpath,
+                        struct frename_info *__restrict info)
+		THROWS(...) {
+	REF struct path *status;
+	REF struct path *oldpath_subpath_with_oldname = NULL;
+	REF struct path *oldpath_subpath_with_newname = NULL;
+	REF struct path *newpath_subpath_with_oldname = NULL;
+	REF struct path *newpath_subpath_with_newname = NULL;
+	TRY {
+		uintptr_t oldnamehash, newnamehash;
+		char const *oldname, *newname;
+		u16 oldnamelen, newnamelen;
+		REF struct path *blocking_path;
+
+		/* Lookup existing path cache entries which may get replaced/removed:
+		 * Worst-case:
+		 *     /oldpath/foo [externally_deleted; still in-cache]
+		 *     /oldpath/bar [in-cache]
+		 *     /newpath/foo   [in-cache]
+		 *     /newpath/bar   [externally_deleted; still in-cache]
+		 *
+		 * Operation:
+		 * >> renameat2("/oldpath/bar", "/newpath/foo", RENAME_EXCHANGE);
+		 *
+		 * In this case, variables are assigned as follows:
+		 *   - oldpath_subpath_with_oldname = PATH("/oldpath/bar");  -- Move from `oldpath' to `newpath' on success
+		 *   - oldpath_subpath_with_newname = PATH("/oldpath/foo");  -- To-be deleted from cache on success
+		 *   - newpath_subpath_with_oldname = PATH("/newpath/bar");  -- To-be deleted from cache on success
+		 *   - newpath_subpath_with_newname = PATH("/newpath/foo");  -- Move from `newpath' to `oldpath' on success
+		 */
+
+		/* Load old/new name variables. */
+		oldnamehash = info->frn_oldent->fd_hash;
+		oldname     = info->frn_oldent->fd_name;
+		oldnamelen  = info->frn_oldent->fd_namelen;
+		newnamehash = info->frn_hash;
+		newname     = info->frn_name;
+		newnamelen  = info->frn_namelen;
+
+		/* Lookup paths. */
+		oldpath_subpath_with_oldname = path_lookupchildref_withlock(oldpath, oldname, oldnamelen, oldnamehash, info->frn_flags);
+		newpath_subpath_with_newname = path_lookupchildref_withlock(newpath, newname, newnamelen, newnamehash, info->frn_flags);
+		if (oldpath != newpath) {
+			oldpath_subpath_with_newname = path_lookupchildref_withlock(oldpath, newname, newnamelen, newnamehash, info->frn_flags);
+			newpath_subpath_with_oldname = path_lookupchildref_withlock(newpath, oldname, oldnamelen, oldnamehash, info->frn_flags);
+		} else {
+			/* Check for special case: rename to unchanged name within same directory. */
+			if unlikely(oldpath_subpath_with_oldname &&
+			            oldpath_subpath_with_oldname == newpath_subpath_with_newname) {
+				decref_unlikely(oldpath_subpath_with_oldname);
+				decref_unlikely(newpath_subpath_with_newname);
+				return FDIRNODE_RENAME_IN_PATH_SUCCESS;
+			}
+		}
+
+		/* Integrity checks: none of these paths should be identical. */
+		assert(!oldpath_subpath_with_oldname ||
+		       (oldpath_subpath_with_oldname != oldpath_subpath_with_newname &&
+		        oldpath_subpath_with_oldname != newpath_subpath_with_oldname &&
+		        oldpath_subpath_with_oldname != newpath_subpath_with_newname));
+		assert(!oldpath_subpath_with_newname ||
+		       (oldpath_subpath_with_newname != oldpath_subpath_with_oldname &&
+		        oldpath_subpath_with_newname != newpath_subpath_with_oldname &&
+		        oldpath_subpath_with_newname != newpath_subpath_with_newname));
+		assert(!newpath_subpath_with_oldname ||
+		       (newpath_subpath_with_oldname != oldpath_subpath_with_oldname &&
+		        newpath_subpath_with_oldname != oldpath_subpath_with_newname &&
+		        newpath_subpath_with_oldname != newpath_subpath_with_newname));
+		assert(!newpath_subpath_with_newname ||
+		       (newpath_subpath_with_newname != oldpath_subpath_with_oldname &&
+		        newpath_subpath_with_newname != oldpath_subpath_with_newname &&
+		        newpath_subpath_with_newname != newpath_subpath_with_oldname));
+
+		/* If path caches exist for the 2 files being exchanged, then
+		 * must make sure to allocate enough memory within the  resp.
+		 * target paths where they'll be moved to. */
+		if (oldpath != newpath) {
+			if (oldpath_subpath_with_oldname)
+				path_cldlist_rehash_before_insert(newpath); /* Must move sub-path `oldpath_subpath_with_oldname' from `oldpath' to `newpath' */
+			if (newpath_subpath_with_newname)
+				path_cldlist_rehash_before_insert(oldpath); /* Must move sub-path `newpath_subpath_with_newname' from `newpath' to `oldpath' */
+		}
+
+		/* Must acquire whole-tree locks to paths that will
+		 * become stale if  the rename operation  succeeds. */
+		if unlikely(oldpath_subpath_with_newname) {
+			blocking_path = path_tryincref_and_trylock_whole_tree(oldpath_subpath_with_newname);
+			if unlikely(blocking_path != NULL) {
+waitfor_blocking_path:
+				if (oldpath != newpath) {
+					if (oldpath_subpath_with_oldname)
+						path_cldlist_rehash_after_remove(newpath);
+					if (newpath_subpath_with_newname)
+						path_cldlist_rehash_after_remove(oldpath);
+				}
+				xdecref_unlikely(oldpath_subpath_with_oldname);
+				xdecref_unlikely(oldpath_subpath_with_newname);
+				xdecref_unlikely(newpath_subpath_with_oldname);
+				xdecref_unlikely(newpath_subpath_with_newname);
+				return blocking_path;
+			}
+		}
+		TRY {
+			if unlikely(newpath_subpath_with_oldname) {
+				blocking_path = path_tryincref_and_trylock_whole_tree(newpath_subpath_with_oldname);
+				if unlikely(blocking_path != NULL)
+					goto waitfor_blocking_path;
+			}
+			TRY {
+				/* Invoke the FS-level rename operation */
+				status = (REF struct path *)fdirnode_rename(newpath->p_dir, info);
+			} EXCEPT {
+				if unlikely(newpath_subpath_with_oldname)
+					path_decref_and_unlock_whole_tree(newpath_subpath_with_oldname);
+				RETHROW();
+			}
+		} EXCEPT {
+			if unlikely(oldpath_subpath_with_newname)
+				path_decref_and_unlock_whole_tree(oldpath_subpath_with_newname);
+			RETHROW();
+		}
+	} EXCEPT {
+		if (oldpath_subpath_with_oldname)
+			path_cldlist_rehash_after_remove(newpath);
+		if (newpath_subpath_with_newname)
+			path_cldlist_rehash_after_remove(oldpath);
+		xdecref_unlikely(oldpath_subpath_with_oldname);
+		xdecref_unlikely(oldpath_subpath_with_newname);
+		xdecref_unlikely(newpath_subpath_with_oldname);
+		xdecref_unlikely(newpath_subpath_with_newname);
+		RETHROW();
+	}
+
+	/* Must perform previously prepared path transformations on success. */
+	if (status == FDIRNODE_RENAME_IN_PATH_SUCCESS) {
+		/* Deltas for child paths added/removed in terms of available space. */
+		int oldpath_child_delta = 0;
+		int newpath_child_delta = 0;
+		if (oldpath != newpath) {
+			if (oldpath_subpath_with_oldname)
+				++newpath_child_delta;
+			if (newpath_subpath_with_newname)
+				++oldpath_child_delta;
+		}
+
+		/* Start by removing paths. This must  be done before we can  proceed
+		 * to add paths since the paths that get removed here may share names
+		 * with those we'll be adding below.  Also: these are the same  paths
+		 * as those we're re-adding below. */
+		if (oldpath_subpath_with_oldname) {
+			path_cldlist_remove_force(oldpath, oldpath_subpath_with_oldname);
+			++oldpath_child_delta;
+		}
+		if unlikely(oldpath_subpath_with_newname) {
+			path_cldlist_remove_force(oldpath, oldpath_subpath_with_newname);
+			++oldpath_child_delta;
+		}
+		if unlikely(newpath_subpath_with_oldname) {
+			path_cldlist_remove_force(newpath, newpath_subpath_with_oldname);
+			++newpath_child_delta;
+		}
+		if (newpath_subpath_with_newname) {
+			path_cldlist_remove_force(newpath, newpath_subpath_with_newname);
+			++newpath_child_delta;
+		}
+
+		/* (Re-)add paths to the proper parents, and update their parent pointers. */
+		if (oldpath_subpath_with_oldname) {
+			REF struct fdirent *oldname;
+			/* Assign new name to the path. */
+			oldname = oldpath_subpath_with_oldname->p_name; /* Inherit reference. */
+			oldpath_subpath_with_oldname->p_name = incref(info->frn_dent);
+			path_cldlist_insert(newpath, oldpath_subpath_with_oldname);
+			decref_unlikely(oldname);
+			--newpath_child_delta;
+			path_plock_acquire(oldpath_subpath_with_oldname);
+			assert(oldpath_subpath_with_oldname->p_parent == oldpath);
+			oldpath_subpath_with_oldname->p_parent = incref(newpath);
+			path_plock_release(oldpath_subpath_with_oldname);
+			decref_nokill(oldpath);
+		}
+		if (newpath_subpath_with_newname) {
+			REF struct fdirent *oldname;
+			/* Assign new name to the path. */
+			oldname = newpath_subpath_with_newname->p_name; /* Inherit reference. */
+			newpath_subpath_with_newname->p_name = incref(info->frn_oldent);
+			path_cldlist_insert(oldpath, newpath_subpath_with_newname);
+			decref_unlikely(oldname);
+			--oldpath_child_delta;
+			path_plock_acquire(newpath_subpath_with_newname);
+			assert(newpath_subpath_with_newname->p_parent == newpath);
+			newpath_subpath_with_newname->p_parent = incref(oldpath);
+			path_plock_release(newpath_subpath_with_newname);
+			decref_nokill(newpath);
+		}
+		assert(newpath_child_delta >= 0);
+		assert(oldpath_child_delta >= 0);
+
+		/* Truncate child lists if not all slots ended up being used. */
+		if (newpath_child_delta > 0)
+			path_cldlist_rehash_after_remove(newpath);
+		if (oldpath_child_delta > 0)
+			path_cldlist_rehash_after_remove(oldpath);
+
+		/* Delete paths that had already been stale to begin with. */
+		if unlikely(newpath_subpath_with_oldname)
+			path_decref_and_delete_and_unlock_whole_tree(newpath_subpath_with_oldname);
+		if unlikely(oldpath_subpath_with_newname)
+			path_decref_and_delete_and_unlock_whole_tree(oldpath_subpath_with_newname);
+	} else {
+		if unlikely(newpath_subpath_with_oldname)
+			path_decref_and_unlock_whole_tree(newpath_subpath_with_oldname);
+		if unlikely(oldpath_subpath_with_newname)
+			path_decref_and_unlock_whole_tree(oldpath_subpath_with_newname);
+		if (oldpath_subpath_with_oldname)
+			path_cldlist_rehash_after_remove(newpath);
+		if (newpath_subpath_with_newname)
+			path_cldlist_rehash_after_remove(oldpath);
+	}
+	xdecref_unlikely(oldpath_subpath_with_oldname);
+	xdecref_unlikely(oldpath_subpath_with_newname);
+	xdecref_unlikely(newpath_subpath_with_oldname);
+	xdecref_unlikely(newpath_subpath_with_newname);
+	return status;
+}
+
+
+
+PRIVATE WUNUSED NONNULL((1, 2, 3)) REF struct path *KCALL
+fdirnode_replace_paths(struct path *oldpath, struct path *newpath,
+                       struct frename_info *__restrict info)
+		THROWS(...) {
+	REF struct path *status;
+	REF struct path *move_path = NULL; /* [0..1] Path that is being moved */
+	REF struct path *ovrd_path = NULL; /* [0..1] Path that gets overwritten. */
+	TRY {
+		uintptr_t oldnamehash, newnamehash;
+		char const *oldname, *newname;
+		u16 oldnamelen, newnamelen;
+
+		/* Load old/new name variables. */
+		oldnamehash = info->frn_oldent->fd_hash;
+		oldname     = info->frn_oldent->fd_name;
+		oldnamelen  = info->frn_oldent->fd_namelen;
+		newnamehash = info->frn_hash;
+		newname     = info->frn_name;
+		newnamelen  = info->frn_namelen;
+
+		/* Look through the path cache for the paths being renamed. */
+		if (fnode_isdir(info->frn_file))
+			move_path = path_lookupchildref_withlock(oldpath, oldname, oldnamelen, oldnamehash, info->frn_flags);
+		ovrd_path = path_lookupchildref_withlock(newpath, newname, newnamelen, newnamehash, info->frn_flags);
+		if unlikely(ovrd_path && ovrd_path == move_path) {
+			/* Special case: nothing is actually being renamed. */
+			decref_unlikely(move_path);
+			decref_unlikely(ovrd_path);
+			return FDIRNODE_RENAME_IN_PATH_SUCCESS;
+		}
+
+		/* If there's a path that'll get overwritten, then we must lock its entire tree beforehand. */
+		if (ovrd_path) {
+			REF struct path *blocking_path;
+			blocking_path = path_tryincref_and_trylock_whole_tree(ovrd_path);
+			if unlikely(blocking_path != NULL) {
+/*waitfor_blocking_path:*/
+				xdecref_unlikely(move_path);
+				xdecref_unlikely(ovrd_path);
+				return blocking_path;
+			}
+		} else {
+			/* If no path gets overwritten, then we must prepare `newpath' for the addition of another child. */
+			if (move_path)
+				path_cldlist_rehash_before_insert(newpath);
+		}
+
+		TRY {
+			/* Invoke the FS-level rename operation */
+			status = (REF struct path *)fdirnode_rename(newpath->p_dir, info);
+		} EXCEPT {
+			if (ovrd_path) {
+				path_decref_and_unlock_whole_tree(ovrd_path);
+			} else if (move_path) {
+				path_cldlist_rehash_after_remove(newpath);
+			}
+			RETHROW();
+		}
+	} EXCEPT {
+		xdecref_unlikely(move_path);
+		xdecref_unlikely(ovrd_path);
+		RETHROW();
+	}
+	if (status == FDIRNODE_RENAME_IN_PATH_SUCCESS) {
+		/* Perform the path transformation that were prepared above. */
+		if (ovrd_path) {
+			path_cldlist_remove_force(newpath, ovrd_path);           /* Remove path that gets overwritten */
+			path_decref_and_delete_and_unlock_whole_tree(ovrd_path); /* Mark overwritten tree as deleted. */
+			if (!move_path)
+				path_cldlist_rehash_after_remove(newpath);
+		}
+		if (move_path) {
+			REF struct fdirent *oldname;
+			/* Move the renamed path to its new home. */
+			path_cldlist_remove_force(oldpath, move_path);
+
+			/* Assign new name to the path. */
+			oldname = move_path->p_name; /* Inherit reference. */
+			move_path->p_name = incref(info->frn_dent);
+			path_cldlist_insert(newpath, move_path);
+			decref_unlikely(oldname);
+
+			/* Rehash the old path following the removing of the moved path. */
+			path_cldlist_rehash_after_remove(oldpath);
+		}
+	} else {
+		if (ovrd_path) {
+			path_decref_and_unlock_whole_tree(ovrd_path);
+		} else if (move_path) {
+			path_cldlist_rehash_after_remove(newpath);
+		}
+	}
+	xdecref_unlikely(move_path);
+	xdecref_unlikely(ovrd_path);
+	return status;
+}
+
+
+
+
+/* Returns one of `FDIRNODE_RENAME_IN_PATH_*', or a reference pointer to
+ * a `struct path' which the caller should wait for to become available,
+ * before restarting the rename operation. */
+PRIVATE WUNUSED NONNULL((1, 2, 3)) REF struct path *KCALL
+fdirnode_rename_in_path(struct path *oldpath, struct path *newpath,
+                        struct frename_info *__restrict info)
+		THROWS(...) {
+	REF struct path *status;
+	assert(!(info->frn_flags & AT_RENAME_EXCHANGE) || info->frn_repfile);
+
+	/* Check for E_FSERROR_CROSS_DEVICE_LINK */
+	assert(info->frn_olddir->fn_super == info->frn_file->fn_super);
+	if unlikely(newpath->p_dir->fn_super != info->frn_olddir->fn_super)
+		THROW(E_FSERROR_CROSS_DEVICE_LINK);
+
+	/* Check for E_FSERROR_DIRECTORY_MOVE_TO_CHILD */
+	if (fnode_isdir(info->frn_file)) {
+		struct fdirnode *iter = newpath->p_dir;
+		do {
+			if (iter == mfile_asdir(info->frn_file))
+				THROW(E_FSERROR_DIRECTORY_MOVE_TO_CHILD);
+		} while ((iter = iter->dn_parent) != NULL);
+	}
+
+	/* Deal with replacement files. */
+	if (info->frn_repfile) {
+		if (!(info->frn_flags & AT_RENAME_EXCHANGE)) {
+			bool old_isdir, new_isdir;
+			/* Check that we're not replacing a directory with a regular file, or the opposite. */
+			old_isdir = fnode_isdir(info->frn_file);
+			new_isdir = fnode_isdir(info->frn_repfile);
+			if unlikely(old_isdir != new_isdir) {
+				if (!old_isdir) {
+					THROW(E_FSERROR_NOT_A_DIRECTORY, E_FILESYSTEM_NOT_A_DIRECTORY_RENAME);
+				} else {
+					THROW(E_FSERROR_IS_A_DIRECTORY, E_FILESYSTEM_IS_A_DIRECTORY_RENAME);
+				}
+			}
+		}
+	}
+
+	/* Deal with the path cache. */
+	if (fnode_isdir(info->frn_file) || (info->frn_repfile && fnode_isdir(info->frn_repfile))) {
+		/* Special case: we may need to shift around path caches. */
+		char *newname_copy         = NULL;
+		char const *orig_info_name = info->frn_name;
+		TRY {
+			if (!ADDR_ISKERN(orig_info_name)) {
+				/* Prevent problems relating to user-space changing backing memory. */
+				newname_copy = (char *)kmalloc((info->frn_namelen + 1) * sizeof(char), GFP_NORMAL);
+				*(char *)mempcpy(newname_copy, orig_info_name, info->frn_namelen, sizeof(char)) = '\0';
+				info->frn_name = newname_copy;
+				info->frn_hash = fdirent_hash(newname_copy, info->frn_namelen);
+			} else if (info->frn_hash == FLOOKUP_INFO_HASH_UNSET) {
+				info->frn_hash = fdirent_hash(info->frn_name, info->frn_namelen);
+			}
+			if (info->frn_flags & AT_RENAME_EXCHANGE) {
+				/* do cache transformations for: exchange path */
+				status = fdirnode_exchange_paths(oldpath, newpath, info);
+			} else {
+				/* do cache transformations for: replace path */
+				status = fdirnode_replace_paths(oldpath, newpath, info);
+			}
+		} EXCEPT {
+			info->frn_name = orig_info_name;
+			kfree(newname_copy);
+			RETHROW();
+		}
+		info->frn_name = orig_info_name;
+		kfree(newname_copy);
+	} else {
+		/* Invoke the FS-level rename operation */
+		status = (REF struct path *)fdirnode_rename(newpath->p_dir, info);
+	}
+
+	return (REF struct path *)status;
+}
+
 
 
 /* High-level  implementation of the `rename(2)' system call.
@@ -340,135 +910,258 @@ again_acquire_cldlock:
  * to a pre-existing  directory, in which  case `oldname'  is
  * moved into said directory, though will keep its name after
  * the process has completed.
- * @param: atflags: Set of `0 | AT_DOSPATH' (other flags are silently ignored)
- * @throw: E_WOULDBLOCK:                                Preemption is disabled, and operation would have blocked.
- * @throw: E_SEGFAULT:                                  Faulty pointer
- * @throw: E_FSERROR_DELETED:E_FILESYSTEM_DELETED_PATH: Either `oldpath' or `newpath' have already been deleted.
- * @throw: E_FSERROR_DELETED:E_FILESYSTEM_DELETED_FILE: The specified `oldname' was already deleted/renamed
- * @throw: E_FSERROR_ACCESS_DENIED:                     Missing write permissions for old/new directory
- * @throw: E_FSERROR_IS_A_MOUNTING_POINT:               `oldname' refers to a mounting point
- * @throw: E_FSERROR_FILE_NOT_FOUND:                    `oldname' could not be found
- * @throw: E_FSERROR_CROSS_DEVICE_LINK:                 Paths point to different filesystems
- * @throw: E_FSERROR_FILE_ALREADY_EXISTS:               `newname'  already exists and isn't directory, or is
- *                                                      is a directory and already contains a file `oldname'
- * @throw: E_FSERROR_ILLEGAL_PATH:                      `newnamelen == 0'
- * @throw: E_FSERROR_ILLEGAL_PATH:                      newname isn't a valid filename for the target filesystem
- * @throw: E_FSERROR_DIRECTORY_MOVE_TO_CHILD:           The move would make a directory become a child of itself
- * @throw: E_FSERROR_DISK_FULL:                         ...
- * @throw: E_FSERROR_READONLY:                          ...
- * @throw: E_IOERROR:                                   ...
- * @throw: E_BADALLOC:                                  ... */
+ * @param: atflags: Set of `0 | AT_DOSPATH | AT_RENAME_NOREPLACE | AT_RENAME_EXCHANGE |
+ *                          AT_RENAME_MOVETODIR' (other flags are silently ignored)
+ *                  NOTE: `AT_RENAME_MOVETODIR' supersedes the absence of `AT_RENAME_NOREPLACE'
+ * @throw: E_WOULDBLOCK:                      Preemption is disabled, and operation would have blocked.
+ * @throw: E_SEGFAULT:                        Faulty pointer
+ * @throw: E_FSERROR_PATH_NOT_FOUND:          `oldpath' or `newpath' were deleted.
+ * @throw: E_FSERROR_ACCESS_DENIED:           Missing write permissions for old/new directory
+ * @throw: E_FSERROR_IS_A_MOUNTING_POINT:     `oldname' refers to a mounting point
+ * @throw: E_FSERROR_FILE_NOT_FOUND:          `oldname' could not be found
+ * @throw: E_FSERROR_FILE_NOT_FOUND:          `newname' could not be found and `AT_RENAME_EXCHANGE' was given
+ * @throw: E_FSERROR_CROSS_DEVICE_LINK:       Paths point to different filesystems
+ * @throw: E_FSERROR_NOT_A_DIRECTORY:E_FILESYSTEM_NOT_A_DIRECTORY_RENAME: ...
+ * @throw: E_FSERROR_IS_A_DIRECTORY:E_FILESYSTEM_IS_A_DIRECTORY_RENAME: ...
+ * @throw: E_FSERROR_FILE_ALREADY_EXISTS:     `AT_RENAME_NOREPLACE' was given and `newname' already exists.
+ *                                            When `AT_RENAME_MOVETODIR' is also given: ... and isn't  dir,
+ *                                            or is is a directory and already contains a file `oldname'
+ * @throw: E_FSERROR_ILLEGAL_PATH:            `newnamelen == 0'
+ * @throw: E_FSERROR_ILLEGAL_PATH:            newname isn't a valid filename for the target filesystem
+ * @throw: E_FSERROR_DIRECTORY_MOVE_TO_CHILD: The move would make a directory become a child of itself
+ * @throw: E_FSERROR_DISK_FULL:               ...
+ * @throw: E_FSERROR_READONLY:                ...
+ * @throw: E_IOERROR:                         ...
+ * @throw: E_BADALLOC:                        ... */
 PUBLIC NONNULL((1, 4)) void KCALL
-path_rename(struct path *__restrict oldpath, USER CHECKED /*utf-8*/ char const *oldname, u16 oldnamelen,
-            struct path *__restrict newpath, USER CHECKED /*utf-8*/ char const *newname, u16 newnamelen,
+path_rename(struct path *oldpath, /*utf-8*/ USER CHECKED char const *oldname, u16 oldnamelen,
+            struct path *newpath, /*utf-8*/ USER CHECKED char const *newname, u16 newnamelen,
             atflag_t atflags,
-            /*out[1..1]_opt*/ REF struct fnode **prenamed_node,
             /*out[1..1]_opt*/ REF struct fdirent **pold_dirent,
             /*out[1..1]_opt*/ REF struct fdirent **pnew_dirent,
-            /*out[0..1]_opt*/ REF struct path **pdeleted_path)
-		THROWS(E_WOULDBLOCK, E_SEGFAULT, E_FSERROR_DELETED, E_FSERROR_ACCESS_DENIED, E_FSERROR_IS_A_MOUNTING_POINT,
+            /*out[1..1]_opt*/ REF struct fnode **prenamed_node,
+            /*out[0..1]_opt*/ REF struct fnode **preplaced_node,
+            /*out[1..1]_opt*/ REF struct path **ptarget_path)
+		THROWS(E_WOULDBLOCK, E_SEGFAULT, E_FSERROR_ACCESS_DENIED, E_FSERROR_IS_A_MOUNTING_POINT,
 		       E_FSERROR_FILE_NOT_FOUND, E_FSERROR_CROSS_DEVICE_LINK, E_FSERROR_FILE_ALREADY_EXISTS,
 		       E_FSERROR_ILLEGAL_PATH, E_FSERROR_DIRECTORY_MOVE_TO_CHILD, E_FSERROR_DISK_FULL,
 		       E_FSERROR_READONLY, E_IOERROR, E_BADALLOC, ...) {
-	/* TODO: Eyes-opened moment: `rename()' actually _OVERRIDES_ the a target file
-	 *       if it already exists! Yes! I know that sounds insane, but it's  true:
-	 * $ mkdir -p /opt/demo && cd /opt/demo
-	 * $ echo foo > a
-	 * $ echo bar > b
-	 * $ mv a b            # << Yes: this succeeds
-	 * $ cat a
-	 * cat: a: No such file or directory
-	 * $ cat b
-	 * foo
-	 * $ ls | wc -l
-	 * 1                   # << Only one file left
-	 */
+	REF struct path *status;
+	struct frename_info info;
+	REF struct fdirent *exchange_newname_dirent; /* [0..1] */
+	REF struct fnode *exchange_newname_node;     /* [0..1] */
+	REF struct fnode *replaced_node;             /* [0..1] */
+	REF struct path *newpath_ref;                /* [0..1] */
 
-	/* This is why renameat2() exists with `RENAME_NOREPLACE'
-	 * Also: Since we're rewriting the whole FS anyways, this
-	 *       is a good point to add support for  renameat2():
-	 *        - RENAME_EXCHANGE
-	 *        - RENAME_NOREPLACE
-	 *
-	 * Idea: `RENAME_NOREPLACE' can be implemented by adding additional
-	 *       fields `struct frename_info::frn_delfile', to specify  the
-	 *       exact fnode which  should be overwritten  and may also  be
-	 *       set exact fnode which should  be overwritten and may  also
-	 *       be set to NULL to indicate  that no existing file must  be
-	 *       overwritten. As  an extension  to this,  `RENAME_EXCHANGE'
-	 *       can then be implemented as an additional `atflag_t'  which
-	 *       may be used to atomically exchange 2 existing files.
-	 * Also: To  prevent the  need to always  do a lookup  before doing a
-	 *       rename on the  fs-layer, rename itself  should also be  able
-	 *       to return with an exists-error when the target file  already
-	 *       exists, similar to the mknod operator. That way, unix-rename
-	 *       is implemented by first calling dno_rename and handling  its
-	 *       "exists" error (which also tells the exact node that existed
-	 *       at the specified target  name), before re-attempting the  op
-	 *       with `frn_delfile' set  to the fnode  returned by the  first
-	 *       call. (if this second call  says the node was deleted,  just
-	 *       start over)
-	 *
-	 * NOTE: Looking back,  I do  believe this  is why  X11's log  file
-	 *       system didn't work out-of-the-box on KOS, since it renames
-	 *       an existing log file to "foo.log.old", but didn't  include
-	 *       any checks for rename() returning EEXIST.
-	 *       -> That's because unix's rename() DOESN'T RETURN EEXIST!
-	 *
-	 * NOTE: Unix's rename() also  doesn't support the  automatic-move-to-
-	 *       directory feature (`>a; mkdir b; mv a b;'), but handles  this
-	 *       case by erroring out with  `EISDIR' (probably in relation  to
-	 *       this weird rename-overrides-files  anti-feature). This  whole
-	 *       functionality is only added by mv(1)! But trying rename() one
-	 *       directory onto another still causes the override behavior  to
-	 *       happen (so-long as the new  directory is empty; if it  isn't,
-	 *       then it'll error out with ENOTEMPTY (or EEXIST?? WTF? WHY ARE
-	 *       YOU SO INCONSISTENT UNIX?!?!?!))
-	 *
-	 * -> I feel like KOS should still support this though, probably
-	 *    through  use  of a  kos-specific  flag `RENAME_MOVETODIR'.
-	 *
-	 *
-	 * Unix behavior:
-	 * ```
-	 * $ cat ./test.c
-	 * #include <stdlib.h>
-	 * #include <stdio.h>
-	 * #include <errno.h>
-	 * #include <string.h>
-	 * int main(int argc, char **argv) {
-	 *     if (rename(argv[1], argv[2]) != 0)
-	 *         printf("errno = %d (%s)\n", errno, strerror(errno));
-	 *     return 0;
-	 * }
-	 * $ gcc -o test test.c
-	 * $ > a
-	 * $ > b
-	 * $ ./test a b                    # <<<<<<< This is insane, unix!
-	 * $ ls
-	 * b  test  test.c                 # <<<<<<< Yes: file "a" replaced "b"
-	 * $ mkdir a
-	 * $ ./test a b                    # <<<<<<< You can't "replace" a regular file with a directory
-	 * errno = 20 (Not a directory)    # <<<<<<< error-reason given: "a isn't a directory"
-	 * $ ./test b a                    # <<<<<<< You can't "replace" a directory with a regular file
-	 * errno = 21 (Is a directory)     # <<<<<<< error-reason given: "b is a directory"
-	 * $ unlink b && mkdir b
-	 * $ ls a                          # Empty directory
-	 * $ ls b                          # Empty directory
-	 * $ mv a b                        # mv(1) has sane semantics (because it's more than just a rename(2)-wrapper)
-	 * $ ls b                          # mv(1) implements move-to-directory semantics (which I _THOUGHT_ rename(2) did, too)
-	 * a
-	 * $ mv b/a .
-	 * $ ./test a b                    # <<<<<<< Yes: one directory can replace another (though only if the "other" is empty)
-	 * $ ls                            # As you can see: "a" is gone...
-	 * b  test  test.c
-	 * $ ls b                          # ... but it didn't get moved-into-b; IT F-ING REPLACED "b"!
-	 * ```
-	 *
-	 */
+	info.frn_flags = atflags;
+again_acquire_lock:
+	exchange_newname_dirent = NULL;
+	exchange_newname_node   = NULL;
+	replaced_node           = NULL;
+	newpath_ref             = NULL;
+	path_acquire_locks(oldpath, newpath);
+	TRY {
+		/* Don't do any replacements by default. */
+		info.frn_repfile = NULL;
 
+		/* Load the replacement file in EXCHANGE-mode */
+		if (info.frn_flags & AT_RENAME_EXCHANGE) {
+			info.frn_lookup_info.flu_name    = newname;
+			info.frn_lookup_info.flu_namelen = newnamelen;
+			info.frn_lookup_info.flu_hash    = FLOOKUP_INFO_HASH_UNSET;
+again_lookup_newent:
+			exchange_newname_dirent = fdirnode_lookup(newpath->p_dir, &info.frn_lookup_info);
+			if unlikely(!exchange_newname_dirent)
+				THROW(E_FSERROR_FILE_NOT_FOUND);
+			exchange_newname_node = fdirent_opennode(exchange_newname_dirent, newpath->p_dir);
+			if unlikely(!exchange_newname_node)
+				goto again_lookup_newent;
+			info.frn_repfile = exchange_newname_node;
+		}
 
-	/* TODO */
+		info.frn_name    = oldname;
+		info.frn_namelen = oldnamelen;
+		info.frn_hash    = FLOOKUP_INFO_HASH_UNSET;
+		DBG_memset(&info.frn_dent, 0xcc, sizeof(info.frn_dent));
+
+again_lookup_oldent:
+		/* Looking `oldname' within its directory. */
+		info.frn_olddir = oldpath->p_dir;
+		info.frn_oldent = fdirnode_lookup(info.frn_olddir, &info.frn_lookup_info);
+		if unlikely(!info.frn_oldent)
+			THROW(E_FSERROR_FILE_NOT_FOUND);
+
+		/* Open the node associated with `frn_oldent' */
+		FINALLY_DECREF_UNLIKELY(info.frn_oldent);
+		info.frn_file = fdirent_opennode(info.frn_oldent, info.frn_olddir);
+		if unlikely(!info.frn_file)
+			goto again_lookup_oldent;
+		FINALLY_DECREF_UNLIKELY(info.frn_file);
+
+		info.frn_name    = newname;
+		info.frn_namelen = newnamelen;
+		info.frn_hash    = FLOOKUP_INFO_HASH_UNSET;
+		if (exchange_newname_dirent) {
+set_rename_newname_for_exchange:
+			info.frn_name    = exchange_newname_dirent->fd_name;
+			info.frn_namelen = exchange_newname_dirent->fd_namelen;
+			info.frn_hash    = exchange_newname_dirent->fd_hash;
+		}
+
+again_rename:
+		DBG_memset(&info.frn_dent, 0xcc, sizeof(info.frn_dent));
+
+		/* Do the rename operation. */
+		status = fdirnode_rename_in_path(oldpath, newpath, &info);
+
+		if (status != FDIRNODE_RENAME_IN_PATH_SUCCESS) {
+			if (status == FDIRNODE_RENAME_IN_PATH_DELETED)
+				goto again_lookup_oldent; /* Race condition; -> repeat the lookup */
+			if (status != FDIRNODE_RENAME_IN_PATH_EXISTS) {
+				/* Wait for a given path to become available. */
+				assert(ADDR_ISKERN(status));
+				goto waitfor_status_writelock;
+			}
+			assert(info.frn_dent && !wasdestroyed(info.frn_dent));
+			assert(info.frn_repfile && !wasdestroyed(info.frn_repfile));
+			if (info.frn_flags & AT_RENAME_EXCHANGE) {
+				/* Update exchange information. */
+				assert(exchange_newname_dirent != info.frn_dent);
+				decref_unlikely(exchange_newname_dirent);
+				decref_unlikely(exchange_newname_node);
+				exchange_newname_dirent = info.frn_dent;    /* Inherit reference */
+				exchange_newname_node   = info.frn_repfile; /* Inherit reference */
+				goto set_rename_newname_for_exchange;
+			}
+
+			/* File already exists -> check if it's a directory for move-to-directory. */
+			if (fnode_isdir(info.frn_repfile) && (info.frn_flags & AT_RENAME_MOVETODIR)) {
+				/* Perform a move-to-directory operation. */
+				assert(!newpath_ref);
+				FINALLY_DECREF_UNLIKELY(info.frn_dent);
+				/* Lookup or create the path for `info.frn_dent' */
+				newpath_ref = path_lookupchildref_withlock(newpath,
+				                                           info.frn_dent->fd_name,
+				                                           info.frn_dent->fd_namelen,
+				                                           info.frn_dent->fd_hash,
+				                                           info.frn_flags);
+				if (newpath_ref) {
+					/* move-to-dir with mounting points would result in cross-device links. */
+					if unlikely(path_ismount(newpath_ref))
+						THROW(E_FSERROR_CROSS_DEVICE_LINK);
+
+					/* Acquire a write-lock to `newpath_ref' */
+					if (newpath_ref != oldpath && !path_cldlock_trywrite(newpath_ref))
+						goto waitfor_newpath_ref_writelock;
+				} else {
+					path_cldlist_rehash_before_insert(newpath);
+					TRY {
+						newpath_ref = _path_alloc();
+					} EXCEPT {
+						path_cldlist_rehash_after_remove(newpath);
+						RETHROW();
+					}
+					newpath_ref->p_refcnt = 1;
+					newpath_ref->p_flags  = PATH_F_NORMAL;
+					newpath_ref->p_parent = incref(newpath);
+					newpath_ref->p_name   = incref(info.frn_dent);
+					newpath_ref->p_dir    = fnode_asdir(info.frn_repfile);
+					TAILQ_ENTRY_UNBOUND_INIT(&newpath_ref->p_recent);
+					shared_rwlock_init_write(&newpath_ref->p_cldlock); /* We start out with a write-lock! */
+					SLIST_INIT(&newpath_ref->p_cldlops);
+					newpath_ref->p_cldused = 0;
+					newpath_ref->p_cldsize = 0;
+					newpath_ref->p_cldmask = 0;
+					newpath_ref->p_cldlist = path_empty_cldlist;
+
+					/* Insert into `newpath's child-list */
+					path_cldlist_insert(newpath, newpath_ref);
+				}
+
+				/* Drop our own newpath-write-lock (we've got a ne one for `newpath_ref') */
+				if (newpath != oldpath)
+					path_cldlock_endwrite(newpath);
+
+				/* Use this path from now on! */
+				newpath = newpath_ref;
+
+				/* The filename within the target directory is the original name of the file. */
+				info.frn_name    = info.frn_oldent->fd_name;
+				info.frn_namelen = info.frn_oldent->fd_namelen;
+				info.frn_hash    = info.frn_oldent->fd_hash;
+				info.frn_repfile = NULL;
+
+				/* Don't allow recursive move-to-dir */
+				info.frn_flags &= ~AT_RENAME_MOVETODIR;
+				goto again_rename;
+			}
+
+			/* File already exists -> check if we're allowed to replace it. */
+			if (info.frn_flags & AT_RENAME_NOREPLACE) {
+				decref_unlikely(info.frn_dent);
+				decref_unlikely(info.frn_repfile);
+				THROW(E_FSERROR_FILE_ALREADY_EXISTS);
+			}
+
+			/* Reattempt the rename for the purpose of doing a file replacement */
+			decref_unlikely(info.frn_dent);
+			xdecref_unlikely(replaced_node);
+			replaced_node = info.frn_repfile; /* Inherit reference */
+			goto again_rename;
+		}
+	} EXCEPT {
+		path_release_locks(oldpath, newpath);
+		xdecref_unlikely(newpath_ref);
+		xdecref_unlikely(exchange_newname_dirent);
+		xdecref_unlikely(exchange_newname_node);
+		xdecref_unlikely(replaced_node);
+		RETHROW();
+	}
+	path_release_locks(oldpath, newpath);
+	/* Success! */
+	if (pold_dirent)
+		*pold_dirent = incref(info.frn_oldent);
+	if (pnew_dirent)
+		*pnew_dirent = info.frn_dent; /* Inherit reference */
+	else {
+		decref_unlikely(info.frn_dent);
+	}
+	if (prenamed_node)
+		*prenamed_node = mfile_asnode(incref(info.frn_file));
+	if (preplaced_node)
+		*preplaced_node = info.frn_repfile; /* Inherit reference */
+	else {
+		xdecref(info.frn_repfile);
+	}
+	if (newpath_ref) {
+		if (ptarget_path) {
+			*ptarget_path = newpath_ref; /* Inherit reference */
+		} else {
+			decref_unlikely(newpath_ref);
+		}
+	} else {
+		if (ptarget_path)
+			*ptarget_path = incref(newpath);
+	}
+	xdecref_unlikely(exchange_newname_dirent);
+	xdecref_unlikely(exchange_newname_node);
+	return;
+	{
+waitfor_newpath_ref_writelock:
+		path_release_locks(oldpath, newpath);
+		FINALLY_DECREF_UNLIKELY(newpath_ref);
+		path_cldlock_write(newpath_ref);
+		path_cldlock_endwrite(newpath_ref);
+	}
+	goto again_acquire_lock;
+	{
+waitfor_status_writelock:
+		path_release_locks(oldpath, newpath);
+		FINALLY_DECREF_UNLIKELY(status);
+		path_cldlock_write(status);
+		path_cldlock_endwrite(status);
+	}
+	goto again_acquire_lock;
 }
 
 

@@ -44,7 +44,9 @@ struct fdirent_ops {
 
 	/* [1..1] Open the node  associated with  this directory  entry.
 	 * If the entry has already been deleted, return `NULL' instead.
-	 * @param: dir: The directory that contains `self' */
+	 * @param: dir: The directory that contains `self'
+	 * @return: NULL: `self'  was  deleted and  you must  re-query the
+	 *                containing directory `dir' for the proper entry. */
 	WUNUSED NONNULL((1, 2)) REF struct fnode *
 	(KCALL *fdo_opennode)(struct fdirent *__restrict self,
 	                      struct fdirnode *__restrict dir);

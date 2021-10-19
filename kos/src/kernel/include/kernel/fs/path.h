@@ -34,6 +34,12 @@
 #include <bits/crt/format-printer.h>
 #include <kos/lockop.h>
 
+#ifndef CONFIG_NO_SMP
+#ifndef __INTELLISENSE__
+#include <sched/task.h>
+#endif /* !__INTELLISENSE__ */
+#include <hybrid/__atomic.h>
+#endif /* !CONFIG_NO_SMP */
 
 /* atflag_t values. */
 #if !defined(AT_SYMLINK_NOFOLLOW) && defined(__AT_SYMLINK_NOFOLLOW)
@@ -116,7 +122,10 @@ struct path_bucket {
 #define PATH_F_NORMAL  0x0000 /* Normal flags */
 #define PATH_F_ISMOUNT 0x0001 /* [const] This path is a mounting point. */
 #define PATH_F_ISROOT  0x0002 /* [const] This path is a hard-root (iow: doesn't have a parent). */
-#define PATH_F_ISDRIVE 0x0003 /* [lock(:VFS->vf_driveslock)] The path is (at least one) DOS drive mount. */
+#define PATH_F_ISDRIVE 0x0004 /* [lock(:VFS->vf_driveslock)] The path is (at least one) DOS drive mount. */
+#ifndef CONFIG_NO_SMP
+#define _PATH_F_PLOCK  0x8000 /* SMP-lock for `p_parent' */
+#endif /* !CONFIG_NO_SMP */
 
 
 /* Marker for `struct path::p_cldlist': This path node has been deleted. */
@@ -126,10 +135,14 @@ struct path {
 	WEAK refcnt_t             p_refcnt;  /* Reference counter */
 	uintptr_t                 p_flags;   /* Path flags (set of `PATH_F_*') */
 	union {
-		REF struct path      *p_parent;  /* [1..1][const] Parent path, or NULL for root directory. */
+		REF struct path      *p_parent;  /* [1..1][lock(RD(p_parent->p_cldlock || _PATH_F_PLOCK),
+		                                  *             WR(p_parent->p_cldlock && _PATH_F_PLOCK))] // old p_parent during WR
+		                                  * Parent path. */
 		WEAK REF struct vfs *_p_vfs;     /* [1..1][const] VFS context of this path-tree. */
 	};
-	REF struct fdirent       *p_name;    /* [1..1][const] Name of this directory (`fdirent_empty' for root directory). */
+	REF struct fdirent       *p_name;    /* [1..1][lock(RD(p_parent->p_cldlock || _PATH_F_PLOCK),
+		                                  *             WR(p_parent->p_cldlock && _PATH_F_PLOCK))]
+		                                  * Name of this directory (`fdirent_empty' for root directory). */
 	REF struct fdirnode      *p_dir;     /* [1..1][const] Directory to which this path refers. An unmounted
 	                                      * root directory  has this  set to  `fdirnode_unmounted.fs_root'. */
 	TAILQ_ENTRY(REF path)     p_recent;  /* [0..1][lock(:VFS->vf_recent_lock)] Cache entry for recently used paths.
@@ -176,21 +189,67 @@ struct path {
 #define path_asmount(self)  ((struct pathmount *)(self))
 #define path_isdrive(self)  ((self)->p_flags & PATH_F_ISDRIVE)
 #define path_isroot(self)   ((self)->p_flags & PATH_F_ISROOT)
-#define path_parent(self)   ((self)->p_parent)
+
+/* Helpers for working with the PLOCK (ParentLOCK) of paths. */
+#ifndef CONFIG_NO_SMP
+#define path_plock_tryacquire_nopr(self) \
+	(!(__hybrid_atomic_fetchor((self)->p_flags, _PATH_F_PLOCK, __ATOMIC_SEQ_CST) & _PATH_F_PLOCK))
+#define path_plock_release_nopr(self) \
+	__hybrid_atomic_and((self)->p_flags, ~_PATH_F_PLOCK, __ATOMIC_SEQ_CST)
+LOCAL NOBLOCK NONNULL((1)) void
+NOTHROW(path_plock_acquire_nopr)(struct path *__restrict self) {
+#ifndef __INTELLISENSE__
+	while (!path_plock_tryacquire_nopr(self))
+		task_pause();
+#endif /* !__INTELLISENSE__ */
+}
+#else /* !CONFIG_NO_SMP */
+#define path_plock_tryacquire_nopr(self) 1
+#define path_plock_release_nopr(self)    (void)0
+#define path_plock_acquire_nopr(self)    (void)0
+#endif /* CONFIG_NO_SMP */
+#ifdef __INTELLISENSE__
+#define path_plock_acquire(self) \
+	do {                         \
+		path_plock_acquire_nopr(self)
+#define path_plock_release(self)       \
+		path_plock_release_nopr(self); \
+	}	__WHILE0
+#else /* __INTELLISENSE__ */
+#define path_plock_acquire(self)                 \
+	do {                                         \
+		pflag_t _ppl_was = PREEMPTION_PUSHOFF(); \
+		path_plock_acquire_nopr(self)
+#define path_plock_release(self)       \
+		path_plock_release_nopr(self); \
+		PREEMPTION_POP(_ppl_was);      \
+	}	__WHILE0
+#endif /* !__INTELLISENSE__ */
+
+LOCAL ATTR_RETNONNULL WUNUSED REF struct path *
+NOTHROW(path_getparent)(struct path *__restrict self) {
+	REF struct path *result;
+	path_plock_acquire(self);
+	result = incref(self->p_parent);
+	path_plock_release(self);
+	return result;
+}
+
+
 
 
 /* Check if `child' is a descendant of `root' (including `child == root') */
-FUNDEF NOBLOCK ATTR_PURE WUNUSED NONNULL((1, 2)) __BOOL
-NOTHROW(FCALL path_isdescendantof)(struct path const *child,
+FUNDEF NOBLOCK WUNUSED NONNULL((1, 2)) __BOOL
+NOTHROW(FCALL path_isdescendantof)(struct path *child,
                                    struct path const *root);
 
 /* Return a pointer to the VFS associated with `self' */
-FUNDEF NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) struct vfs *
-NOTHROW(FCALL _path_getvfs)(struct path const *__restrict self);
+FUNDEF NOBLOCK WUNUSED NONNULL((1)) struct vfs *
+NOTHROW(FCALL _path_getvfs)(struct path *__restrict self);
 
 
 /* Destroy a given path, automatically removing it from:
- *  - path_parent(self)->p_cldlist    (asynchronously via lockops in path_parent(self)->p_cldlops)
+ *  - self->p_parent->p_cldlist       (asynchronously via lockops in self->p_parent->p_cldlops)
  *  - path_getsuper(self)->fs_mounts  (asynchronously via lockops in path_getsuper(self)->fs_mountslockops.
  *                                    If  this path  was the  last mounting  point, call `fsuper_delete()') */
 FUNDEF NOBLOCK NONNULL((1)) void
@@ -253,6 +312,18 @@ NOTHROW(KCALL path_cldlist_remove_force)(struct path *__restrict self,
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL path_cldlist_rehash_after_remove)(struct path *__restrict self);
 
+/* Ensure that sufficient space exists for the addition of another path to the child list
+ * Caller must be holding a lock to `self'. */
+FUNDEF NONNULL((1)) void FCALL
+path_cldlist_rehash_before_insert(struct path *__restrict self)
+		THROWS(E_BADALLOC);
+
+/* Insert `elem' into the child-list of `self'
+ * Caller must have made a call to `path_cldlist_rehash_before_insert()' */
+FUNDEF NOBLOCK NONNULL((1, 2)) void
+NOTHROW(KCALL path_cldlist_insert)(struct path *__restrict self,
+                                   struct path *__restrict elem);
+
 
 
 /* Lookup a child with a given path, but don't construct new child paths
@@ -268,23 +339,29 @@ NOTHROW(FCALL path_cldlist_rehash_after_remove)(struct path *__restrict self);
  * @throw: E_FSERROR_DELETED:E_FILESYSTEM_DELETED_PATH: `self' was marked as `PATH_CLDLIST_DELETED' */
 FUNDEF WUNUSED NONNULL((1)) REF struct path *KCALL
 path_lookupchild(struct path *__restrict self,
-                 USER CHECKED /*utf-8*/ char const *name,
+                 /*utf-8*/ USER CHECKED char const *name,
                  u16 namelen, uintptr_t namehash,
                  atflag_t atflags DFL(0))
 		THROWS(E_FSERROR_DELETED, E_WOULDBLOCK, E_SEGFAULT);
 /* Same as `path_lookupchild()', but caller must be holding a lock `path_cldlock_read(self)' */
 FUNDEF WUNUSED NONNULL((1)) struct path *KCALL
 path_lookupchild_withlock(struct path *__restrict self,
-                          USER CHECKED /*utf-8*/ char const *name,
+                          /*utf-8*/ USER CHECKED char const *name,
                           u16 namelen, uintptr_t namehash,
                           atflag_t atflags DFL(0))
+		THROWS(E_FSERROR_DELETED, E_SEGFAULT);
+FUNDEF WUNUSED NONNULL((1)) REF struct path *KCALL
+path_lookupchildref_withlock(struct path *__restrict self,
+                             /*utf-8*/ USER CHECKED char const *name,
+                             u16 namelen, uintptr_t namehash,
+                             atflag_t atflags DFL(0))
 		THROWS(E_FSERROR_DELETED, E_SEGFAULT);
 
 
 
 /* Expand a child path of `self' and re-return the new path.
  *   - If caller doesn't have EXEC permission for `self', THROW(E_FSERROR_ACCESS_DENIED)
- *   - If the path is marked as `PATH_CLDLIST_DELETED', THROW(E_FSERROR_DELETED, E_FILESYSTEM_DELETED_PATH);
+ *   - If the path is marked as `PATH_CLDLIST_DELETED', THROW(E_FSERROR_PATH_NOT_FOUND, E_FILESYSTEM_PATH_NOT_FOUND_DIR);
  *   - If the named child is a member of the child-list of `self', return that member.
  *   - Make a call to `fdirnode_lookup()' and inspect the returned node:
  *   - If NULL, `THROW(E_FSERROR_PATH_NOT_FOUND, E_FILESYSTEM_PATH_NOT_FOUND_DIR);'
@@ -302,14 +379,14 @@ path_lookupchild_withlock(struct path *__restrict self,
  * @throw: E_WOULDBLOCK:                      Preemption is disabled, and operation would have blocked.
  * @throw: E_SEGFAULT:                        The given `name' is faulty.
  * @throw: E_FSERROR_ACCESS_DENIED:           Not allowed to traverse `self' of a dir walked by the symlink
- * @throw: E_FSERROR_PATH_NOT_FOUND:          `self' doesn't have a child `name...+=namelen'
+ * @throw: E_FSERROR_PATH_NOT_FOUND:E_FILESYSTEM_PATH_NOT_FOUND_DIR: `self' doesn't have a child `name...+=namelen'
  * @throw: E_FSERROR_TOO_MANY_SYMBOLIC_LINKS: Too many symbolic link encountered during expansion
  * @throw: E_FSERROR_NOT_A_DIRECTORY:         The named child isn't a directory or symlink (or the symlink expands to a non-directory)
  * @throw: E_IOERROR:                         ...
  * @throw: E_BADALLOC:                        ... */
 FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) REF struct path *KCALL
 path_expandchild(struct path *__restrict self, u32 *__restrict premaining_symlinks,
-                 USER CHECKED /*utf-8*/ char const *name,
+                 /*utf-8*/ USER CHECKED char const *name,
                  u16 namelen, uintptr_t namehash, atflag_t atflags DFL(0))
 		THROWS(E_WOULDBLOCK, E_SEGFAULT, E_FSERROR_ACCESS_DENIED, E_FSERROR_PATH_NOT_FOUND,
 		       E_FSERROR_TOO_MANY_SYMBOLIC_LINKS, E_FSERROR_NOT_A_DIRECTORY,
@@ -328,7 +405,7 @@ path_expandchild(struct path *__restrict self, u32 *__restrict premaining_symlin
  */
 FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) REF struct fnode *KCALL
 path_expandchildnode(struct path *__restrict self, u32 *__restrict premaining_symlinks,
-                     USER CHECKED /*utf-8*/ char const *name,
+                     /*utf-8*/ USER CHECKED char const *name,
                      u16 namelen, uintptr_t namehash, atflag_t atflags DFL(0),
                      /*out[1..1]_opt*/ REF struct path **presult_path DFL(__NULLPTR),
                      /*out[1..1]_opt*/ REF struct fdirent **presult_dirent DFL(__NULLPTR))
@@ -391,8 +468,8 @@ path_expandchildnode(struct path *__restrict self, u32 *__restrict premaining_sy
  *  - Other flags are silently ignored. */
 FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((2)) REF struct path *KCALL
 path_traverse_ex(struct path *cwd, u32 *__restrict premaining_symlinks,
-                 USER CHECKED /*utf-8*/ char const *upath,
-                 /*out_opt*/ USER CHECKED /*utf-8*/ char const **plastseg DFL(__NULLPTR),
+                 /*utf-8*/ USER CHECKED char const *upath,
+                 /*out_opt*/ /*utf-8*/ USER CHECKED char const **plastseg DFL(__NULLPTR),
                  /*out_opt*/ u16 *plastlen DFL(__NULLPTR), atflag_t atflags DFL(0))
 		THROWS(E_WOULDBLOCK, E_SEGFAULT, E_FSERROR_ACCESS_DENIED, E_FSERROR_PATH_NOT_FOUND,
 		       E_FSERROR_TOO_MANY_SYMBOLIC_LINKS, E_FSERROR_NOT_A_DIRECTORY, E_IOERROR,
@@ -401,8 +478,8 @@ path_traverse_ex(struct path *cwd, u32 *__restrict premaining_symlinks,
 /* Same as  `path_traverse_ex',  but  automatically keep  track  of  symlinks,
  * as well as pass `cwd = fd_cwd == AT_FDCWD ? NULL : handle_get_path(fd_cwd)' */
 FUNDEF ATTR_RETNONNULL WUNUSED REF struct path *KCALL
-path_traverse(fd_t fd_cwd, USER CHECKED /*utf-8*/ char const *upath,
-              /*out_opt*/ USER CHECKED /*utf-8*/ char const **plastseg DFL(__NULLPTR),
+path_traverse(fd_t fd_cwd, /*utf-8*/ USER CHECKED char const *upath,
+              /*out_opt*/ /*utf-8*/ USER CHECKED char const **plastseg DFL(__NULLPTR),
               /*out_opt*/ u16 *plastlen DFL(__NULLPTR), atflag_t atflags DFL(0))
 		THROWS(E_WOULDBLOCK, E_SEGFAULT, E_FSERROR_ACCESS_DENIED, E_FSERROR_PATH_NOT_FOUND,
 		       E_FSERROR_TOO_MANY_SYMBOLIC_LINKS, E_FSERROR_NOT_A_DIRECTORY,
@@ -416,7 +493,7 @@ path_traverse(fd_t fd_cwd, USER CHECKED /*utf-8*/ char const *upath,
  * @param: atflags: Set of: `AT_DOSPATH | AT_NO_AUTOMOUNT | AT_EMPTY_PATH | AT_SYMLINK_NOFOLLOW' */
 FUNDEF ATTR_RETNONNULL WUNUSED REF struct fnode *KCALL
 path_traversefull_ex(struct path *cwd, u32 *__restrict premaining_symlinks,
-                     USER CHECKED /*utf-8*/ char const *upath, atflag_t atflags DFL(0),
+                     /*utf-8*/ USER CHECKED char const *upath, atflag_t atflags DFL(0),
                      /*out[1..1]_opt*/ REF struct path **presult_path DFL(__NULLPTR),
                      /*out[1..1]_opt*/ REF struct fdirent **presult_dirent DFL(__NULLPTR))
 		THROWS(E_WOULDBLOCK, E_SEGFAULT, E_FSERROR_ACCESS_DENIED, E_FSERROR_PATH_NOT_FOUND,
@@ -426,7 +503,7 @@ path_traversefull_ex(struct path *cwd, u32 *__restrict premaining_symlinks,
 /* Helper wrapper that combines `path_traverse()' with `path_expandchildnode()'
  * @param: atflags: Set of: `AT_DOSPATH | AT_NO_AUTOMOUNT | AT_EMPTY_PATH | AT_SYMLINK_NOFOLLOW' */
 FUNDEF ATTR_RETNONNULL WUNUSED REF struct fnode *KCALL
-path_traversefull(fd_t fd_cwd, USER CHECKED /*utf-8*/ char const *upath, atflag_t atflags DFL(0),
+path_traversefull(fd_t fd_cwd, /*utf-8*/ USER CHECKED char const *upath, atflag_t atflags DFL(0),
                   /*out[1..1]_opt*/ REF struct path **presult_path DFL(__NULLPTR),
                   /*out[1..1]_opt*/ REF struct fdirent **presult_dirent DFL(__NULLPTR))
 		THROWS(E_WOULDBLOCK, E_SEGFAULT, E_FSERROR_ACCESS_DENIED, E_FSERROR_PATH_NOT_FOUND,
@@ -437,61 +514,37 @@ path_traversefull(fd_t fd_cwd, USER CHECKED /*utf-8*/ char const *upath, atflag_
 /* High-level implementation of `unlink(2)' / `rmdir(2)'.
  * @param: atflags: At least one of `AT_REMOVEREG | AT_REMOVEDIR', optionally
  *                  or'd with `AT_DOSPATH' (other flags are silently ignored)
- * @throw: E_WOULDBLOCK:                                Preemption is disabled, and operation would have blocked.
- * @throw: E_SEGFAULT:                                  Faulty pointer
- * @throw: E_FSERROR_DELETED:E_FILESYSTEM_DELETED_PATH: `self' has already been deleted.
- * @throw: E_FSERROR_DELETED:E_FILESYSTEM_DELETED_FILE: `name' has already been deleted.
- * @throw: E_FSERROR_ACCESS_DENIED:                     Missing W/X permissions for `self'
+ * @throw: E_WOULDBLOCK:                  Preemption is disabled, and operation would have blocked.
+ * @throw: E_SEGFAULT:                    Faulty pointer
+ * @throw: E_FSERROR_ACCESS_DENIED:       Missing W/X permissions for `self'
  * @throw: E_FSERROR_NOT_A_DIRECTORY:E_FILESYSTEM_NOT_A_DIRECTORY_RMDIR: `name' is S_IFREG, but `AT_REMOVEREG' isn't given
  * @throw: E_FSERROR_IS_A_DIRECTORY:E_FILESYSTEM_IS_A_DIRECTORY_UNLINK:  `name' is S_IFDIR, but `AT_REMOVEDIR' isn't given
- * @throw: E_FSERROR_IS_A_MOUNTING_POINT:               `name' refers to a mounting point
- * @throw: E_FSERROR_FILE_NOT_FOUND:                    `name' could not be found
- * @throw: E_FSERROR_READONLY:                          ...
- * @throw: E_IOERROR:                                   ...
- * @throw: E_BADALLOC:                                  ... */
+ * @throw: E_FSERROR_IS_A_MOUNTING_POINT: `name' refers to a mounting point
+ * @throw: E_FSERROR_FILE_NOT_FOUND:      `name' could not be found
+ * @throw: E_FSERROR_READONLY:            ...
+ * @throw: E_IOERROR:                     ...
+ * @throw: E_BADALLOC:                    ... */
 FUNDEF NONNULL((1)) void KCALL
 path_remove(struct path *__restrict self,
-            USER CHECKED /*utf-8*/ char const *name, u16 namelen, atflag_t atflags DFL(0),
+            /*utf-8*/ USER CHECKED char const *name, u16 namelen, atflag_t atflags DFL(0),
             /*out[1..1]_opt*/ REF struct fnode **pdeleted_node DFL(__NULLPTR),
             /*out[1..1]_opt*/ REF struct fdirent **pdeleted_dirent DFL(__NULLPTR),
             /*out[0..1]_opt*/ REF struct path **pdeleted_path DFL(__NULLPTR))
-		THROWS(E_WOULDBLOCK, E_SEGFAULT, E_FSERROR_DELETED, E_FSERROR_ACCESS_DENIED,
-		       E_FSERROR_IS_A_MOUNTING_POINT, E_FSERROR_FILE_NOT_FOUND, E_FSERROR_READONLY,
-		       E_IOERROR, E_BADALLOC, ...);
+		THROWS(E_WOULDBLOCK, E_SEGFAULT, E_FSERROR_ACCESS_DENIED,
+		       E_FSERROR_IS_A_MOUNTING_POINT, E_FSERROR_FILE_NOT_FOUND,
+		       E_FSERROR_READONLY, E_IOERROR, E_BADALLOC, ...);
 
 
-/* High-level  implementation of the `rename(2)' system call.
- * This function also handles the case where `newname' refers
- * to a pre-existing  directory, in which  case `oldname'  is
- * moved into said directory, though will keep its name after
- * the process has completed.
- * @param: atflags: Set of `0 | AT_DOSPATH' (other flags are silently ignored)
- * @throw: E_WOULDBLOCK:                                Preemption is disabled, and operation would have blocked.
- * @throw: E_SEGFAULT:                                  Faulty pointer
- * @throw: E_FSERROR_DELETED:E_FILESYSTEM_DELETED_PATH: Either `oldpath' or `newpath' have already been deleted.
- * @throw: E_FSERROR_DELETED:E_FILESYSTEM_DELETED_FILE: The specified `oldname' was already deleted/renamed
- * @throw: E_FSERROR_ACCESS_DENIED:                     Missing write permissions for old/new directory
- * @throw: E_FSERROR_IS_A_MOUNTING_POINT:               `oldname' refers to a mounting point
- * @throw: E_FSERROR_FILE_NOT_FOUND:                    `oldname' could not be found
- * @throw: E_FSERROR_CROSS_DEVICE_LINK:                 Paths point to different filesystems
- * @throw: E_FSERROR_FILE_ALREADY_EXISTS:               `newname'  already exists and isn't directory, or is
- *                                                      is a directory and already contains a file `oldname'
- * @throw: E_FSERROR_ILLEGAL_PATH:                      `newnamelen == 0'
- * @throw: E_FSERROR_ILLEGAL_PATH:                      newname isn't a valid filename for the target filesystem
- * @throw: E_FSERROR_DIRECTORY_MOVE_TO_CHILD:           The move would make a directory become a child of itself
- * @throw: E_FSERROR_DISK_FULL:                         ...
- * @throw: E_FSERROR_READONLY:                          ...
- * @throw: E_IOERROR:                                   ...
- * @throw: E_BADALLOC:                                  ... */
+/* TODO: Copy doc */
 FUNDEF NONNULL((1, 4)) void KCALL
-path_rename(struct path *__restrict oldpath, USER CHECKED /*utf-8*/ char const *oldname, u16 oldnamelen,
-            struct path *__restrict newpath, USER CHECKED /*utf-8*/ char const *newname, u16 newnamelen,
+path_rename(struct path *oldpath, /*utf-8*/ USER CHECKED char const *oldname, u16 oldnamelen,
+            struct path *newpath, /*utf-8*/ USER CHECKED char const *newname, u16 newnamelen,
             atflag_t atflags DFL(0),
-            /*out[1..1]_opt*/ REF struct fnode **prenamed_node DFL(__NULLPTR),
             /*out[1..1]_opt*/ REF struct fdirent **pold_dirent DFL(__NULLPTR),
             /*out[1..1]_opt*/ REF struct fdirent **pnew_dirent DFL(__NULLPTR),
-            /*out[0..1]_opt*/ REF struct path **pdeleted_path DFL(__NULLPTR))
-		THROWS(E_WOULDBLOCK, E_SEGFAULT, E_FSERROR_DELETED, E_FSERROR_ACCESS_DENIED, E_FSERROR_IS_A_MOUNTING_POINT,
+            /*out[1..1]_opt*/ REF struct fnode **prenamed_node DFL(__NULLPTR),
+            /*out[0..1]_opt*/ REF struct fnode **preplaced_node DFL(__NULLPTR))
+		THROWS(E_WOULDBLOCK, E_SEGFAULT, E_FSERROR_PATH_NOT_FOUND, E_FSERROR_ACCESS_DENIED, E_FSERROR_IS_A_MOUNTING_POINT,
 		       E_FSERROR_FILE_NOT_FOUND, E_FSERROR_CROSS_DEVICE_LINK, E_FSERROR_FILE_ALREADY_EXISTS,
 		       E_FSERROR_ILLEGAL_PATH, E_FSERROR_DIRECTORY_MOVE_TO_CHILD, E_FSERROR_DISK_FULL,
 		       E_FSERROR_READONLY, E_IOERROR, E_BADALLOC, ...);
