@@ -178,6 +178,16 @@ NOTHROW(FCALL vfs_recent)(struct vfs *__restrict path_vfs,
                           struct path *__restrict self);
 
 
+struct fdirnode;
+
+/* Return the path used to mount the given `dir' within `self'.
+ * If the given directory doesn't have a mounting point  within
+ * the given VFS `self', return `NULL' */
+FUNDEF WUNUSED NONNULL((1, 2)) REF struct pathmount *FCALL
+vfs_mount_location(struct vfs *__restrict self,
+                   struct fdirnode *__restrict dir);
+
+
 
 
 
@@ -279,6 +289,12 @@ FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct path *FCALL
 fs_getcwd(struct fs *__restrict self) THROWS(E_WOULDBLOCK);
 FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct path *FCALL
 fs_getroot(struct fs *__restrict self) THROWS(E_WOULDBLOCK);
+
+EIDECLARE(ATTR_PURE WUNUSED, atflag_t, NOTHROW, FCALL, fs_atflags, (atflag_t atflags), (atflags), {
+	fs_mask_t mask;
+	mask.f_mode = atomic64_read(&THIS_FS->fs_mode.f_atom);
+	return (atflags & mask.f_atmask) | mask.f_atflag;
+});
 
 
 

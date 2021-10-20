@@ -98,7 +98,7 @@ handle_mpart_stat(struct mpart *__restrict self,
 		struct blkdev *dev;
 		struct inode *ino = (struct inode *)file;
 		dev = ino->i_super->s_device;
-		result->st_dev   = (__dev_t)(dev ? block_device_devno(dev) : 0);
+		result->st_dev   = (__dev_t)(dev ? blkdev_devno(dev) : 0);
 		result->st_ino   = (__FS_TYPE(ino))ino->i_fileino;
 		result->st_mode  = (__mode_t)ino->i_filemode;
 		result->st_nlink = (__nlink_t)ino->i_filenlink;

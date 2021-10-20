@@ -2761,8 +2761,8 @@ Fat_OpenSuperblock(FatSuperblock *__restrict self, UNCHECKED USER char *args)
 	                 "%.2" PRIxN(__SIZEOF_MINOR_T__) " "
 	                 "(%q) [oem=%q] [label=%q] [sysname=%q]\n",
 	       self->f_type == FAT12 ? 12 : self->f_type == FAT16 ? 16 : 32,
-	       MAJOR(block_device_devno(self->s_device)),
-	       MINOR(block_device_devno(self->s_device)),
+	       MAJOR(blkdev_devno(self->s_device)),
+	       MINOR(blkdev_devno(self->s_device)),
 	       self->s_device->bd_name,
 	       self->f_oem, self->f_label, self->f_sysname);
 }

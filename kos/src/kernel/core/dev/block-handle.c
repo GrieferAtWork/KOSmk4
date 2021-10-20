@@ -423,8 +423,8 @@ handle_blkdev_stat(struct blkdev *__restrict self,
 	if (node)
 		inode_stat(node, result);
 	result->st_mode = (result->st_mode & ~S_IFMT) | S_IFBLK;
-	result->st_dev     = (__dev_t)block_device_devno(self);
-	result->st_rdev    = (__dev_t)block_device_devno(self);
+	result->st_dev     = (__dev_t)blkdev_devno(self);
+	result->st_rdev    = (__dev_t)blkdev_devno(self);
 	result->st_size    = (__pos64_t)self->bd_total_bytes;
 	result->st_blksize = (__blksize_t)self->bd_sector_size;
 	result->st_blocks  = (__blkcnt64_t)self->bd_sector_count;
@@ -473,7 +473,7 @@ handle_blkdev_hop(struct blkdev *__restrict self,
 		st.bs_sector_size  = (u64)self->bd_sector_size;
 		st.bs_device_flag  = self->bd_flags;
 		st.bs_partcount    = 0;
-		st.bs_devno        = (u64)block_device_devno(self);
+		st.bs_devno        = (u64)blkdev_devno(self);
 		if (!blkdev_ispart(self)) {
 			struct block_device *me;
 			struct block_device_partition *iter;

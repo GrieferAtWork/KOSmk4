@@ -89,7 +89,7 @@ maps_printer_cb(void *arg, struct mmapinfo *__restrict info) {
 		ino      = node->i_fileino;
 		superdev = node->i_super->s_device;
 		if (superdev)
-			dev = block_device_devno(superdev);
+			dev = blkdev_devno(superdev);
 	}
 	ctx = (struct maps_printer_data *)arg;
 	result = format_printf(ctx->pd_printer,

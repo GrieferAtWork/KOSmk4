@@ -35,9 +35,12 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #include <debugger/hook.h>
 #include <debugger/io.h>
 #include <debugger/rt.h>
+#include <dev/block.h>
 #include <fs/node.h>
 #include <fs/vfs.h>
 #include <kernel/execabi.h> /* execabi_system_rtld_file */
+#include <kernel/fs/dirent.h>
+#include <kernel/fs/path.h>
 #include <kernel/mman.h>
 #include <kernel/mman/enum.h>
 #include <kernel/mman/map.h>
@@ -101,13 +104,13 @@ PRIVATE ATTR_DBGTEXT ssize_t FCALL
 lsmm_enum_callback(void *UNUSED(arg), struct mmapinfo *__restrict info) {
 	dev_t dev = 0;
 	ino_t ino = 0;
-	if (info->mmi_file && vm_datablock_isinode(info->mmi_file)) {
+	if (info->mmi_file && mfile_isnode(info->mmi_file)) {
 		struct inode *node = (struct inode *)info->mmi_file;
 		struct blkdev *superdev;
 		ino      = node->i_fileino;
 		superdev = node->i_super->s_device;
 		if (superdev)
-			dev = block_device_devno(superdev);
+			dev = blkdev_devno(superdev);
 	}
 	dbg_printf(DBGSTR(AC_WHITE("%.8" PRIxPTR) "-"           /* from- */
 	                  AC_WHITE("%.8" PRIxPTR) " "           /* to */

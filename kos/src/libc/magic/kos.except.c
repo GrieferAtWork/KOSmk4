@@ -479,9 +479,9 @@ for (local name: classes.keys.sorted()) {
 			result = EMLINK;
 			break;
 @@pp_endif@@
-@@pp_if defined(EISDIR)@@
+@@pp_if defined(EPERM) && defined(EISDIR)@@
 		case @ERROR_SUBCLASS@(@ERROR_CODEOF@(@E_FSERROR_IS_A_DIRECTORY@)):
-			result = EISDIR;
+			result = self->@e_args@.@e_fserror@.@f_is_a_directory@.@iad_action_context@ == @E_FILESYSTEM_IS_A_DIRECTORY_LINK@ ? EPERM : EISDIR;
 			break;
 @@pp_endif@@
 @@pp_if defined(ENOENT)@@

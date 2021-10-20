@@ -777,54 +777,9 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *       that  can be implemented on a per-handle basis to facilitate the strings to which symlinks under
 	 *       /proc/[pid]/fd/[fileno] expand when read. */
 
-	/* TODO: <fs/path.h> needs to be re-implemented for the new FS.
-	 * NOTE: VFS  and VFS_ROOT need to be 2 different objects. If this is done, the
-	 *       reference loops between ROOT=VFS->MOUNTS->MOUNT->PATH[->PATH...]->ROOT
-	 *       can go away:
-	 *
-	 * Currently:
-	 *    MOUNT  -> SUPER
-	 *     ^ |
-	 *     | +------> PATH --parent-> PATH --parent-> PATH
-	 *     |            ^              ^               ^ |
-	 *     |            |              |               | |
-	 *     |            +-recent_cache-+---------------+ |
-	 *     |                 |                           |
-	 *     |                 |                           |
-	 *     +-----MOUNTS--- ROOT=VFS <---------parent-----+
-	 *
-	 * Solution:
-	 *    
-	 *    SUPER
-	 *       ^
-	 *       |
-	 *    MOUNT=PATH --parent-> PATH --parent-> PATH
-	 *       ^     ^              ^               ^ |
-	 *       |     |              |               | |
-	 *       |     +-recent_cache-+---------------+ |
-	 *       |          |                           |
-	 *       |          |                           |
-	 *      MOUNTS---- VFS --> ROOT <-----parent----+
-	 *
-	 * NOTE: MOUNT=PATH means that MOUNT is a sub-class of PATH
-	 *
-	 * This way, no more reference loops exist!
-	 *
-	 * NOTE: Also  get  rid of  the `p_vfs'  field _ENTIRELY_!
-	 *       It's entirely unused  by fundamental  data-logic,
-	 *       and with the  new ref-model,  PATH _CANNOT_  make
-	 *       any claims of knowing some particular VFS object,
-	 *       as it is this very link that was capped.
-	 * -> When operating on a PATH  and needing to know the  associated
-	 *    VFS, that object _ALWAYS_ have to be passed along by whatever
-	 *    caller  would already  know about  it (since  the original FS
-	 *    access entry point was said VFS object)
-	 *
-	 * TODO: Adding a PATH to the recent_cache should include a check
-	 *       where that path's parent is removed from the cache, if it
-	 *       was apart of it before.
-	 *
-	 */
+	/* TODO: Get rid of the `sys_frenameat' system call (`sys_renameat2()' should be used instead) */
+
+	/* TODO: Get rid of `O_SYMLINK' */
 
 	return state;
 }

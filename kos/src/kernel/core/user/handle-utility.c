@@ -563,65 +563,65 @@ handle_getas(unsigned int fd, uintptr_half_t wanted_type)
 }
 
 PUBLIC ATTR_RETNONNULL WUNUSED REF struct inode *FCALL
-handle_get_inode(unsigned int fd)
+handle_get_fnode(unsigned int fd)
 		THROWS(E_WOULDBLOCK, E_INVALID_HANDLE_FILE,
 		       E_INVALID_HANDLE_FILETYPE) {
 	REF struct handle hnd;
 	hnd = handle_lookup(fd);
 	TRY {
-		return handle_as_inode(hnd);
+		return handle_as_fnode(hnd);
 	} EXCEPT {
 		handle_getas_complete_except(fd);
 	}
 }
 
 PUBLIC ATTR_RETNONNULL WUNUSED REF struct regular_node *FCALL
-handle_get_regular_node(unsigned int fd)
+handle_get_regnode(unsigned int fd)
 		THROWS(E_WOULDBLOCK, E_INVALID_HANDLE_FILE,
 		       E_INVALID_HANDLE_FILETYPE) {
 	REF struct handle hnd;
 	hnd = handle_lookup(fd);
 	TRY {
-		return handle_as_regular_node(&hnd);
+		return handle_as_regnode(&hnd);
 	} EXCEPT {
 		handle_getas_complete_except(fd);
 	}
 }
 
 PUBLIC ATTR_RETNONNULL WUNUSED REF struct directory_node *FCALL
-handle_get_directory_node(unsigned int fd)
+handle_get_dirnode(unsigned int fd)
 		THROWS(E_WOULDBLOCK, E_INVALID_HANDLE_FILE,
 		       E_INVALID_HANDLE_FILETYPE) {
 	REF struct handle hnd;
 	hnd = handle_lookup(fd);
 	TRY {
-		return handle_as_directory_node(&hnd);
+		return handle_as_dirnode(&hnd);
 	} EXCEPT {
 		handle_getas_complete_except(fd);
 	}
 }
 
 PUBLIC ATTR_RETNONNULL WUNUSED REF struct superblock *FCALL
-handle_get_superblock(unsigned int fd)
+handle_get_super(unsigned int fd)
 		THROWS(E_WOULDBLOCK, E_INVALID_HANDLE_FILE,
 		       E_INVALID_HANDLE_FILETYPE) {
 	REF struct handle hnd;
 	hnd = handle_lookup(fd);
 	TRY {
-		return handle_as_superblock(&hnd);
+		return handle_as_super(&hnd);
 	} EXCEPT {
 		handle_getas_complete_except(fd);
 	}
 }
 
 PUBLIC ATTR_RETNONNULL WUNUSED REF struct superblock *FCALL
-handle_get_superblock_relaxed(unsigned int fd)
+handle_get_super_relaxed(unsigned int fd)
 		THROWS(E_WOULDBLOCK, E_INVALID_HANDLE_FILE,
 		       E_INVALID_HANDLE_FILETYPE) {
 	REF struct handle hnd;
 	hnd = handle_lookup(fd);
 	TRY {
-		return handle_as_superblock_relaxed(&hnd);
+		return handle_as_super_relaxed(&hnd);
 	} EXCEPT {
 		handle_getas_complete_except(fd);
 	}
@@ -681,7 +681,7 @@ handle_get_vfs(unsigned int fd)
 
 /* Extended handle converted functions */
 PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct inode *FCALL
-handle_as_inode(/*inherit(on_success)*/ REF struct handle const *__restrict self)
+handle_as_fnode(/*inherit(on_success)*/ REF struct handle const *__restrict self)
 		THROWS(E_INVALID_HANDLE_FILETYPE) {
 	REF struct inode *result;
 	/* Special case: The handle already has the correct typing */
@@ -705,7 +705,7 @@ handle_as_inode(/*inherit(on_success)*/ REF struct handle const *__restrict self
 }
 
 PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct regular_node *FCALL
-handle_as_regular_node(/*inherit(on_success)*/ REF struct handle const *__restrict self)
+handle_as_regnode(/*inherit(on_success)*/ REF struct handle const *__restrict self)
 		THROWS(E_INVALID_HANDLE_FILETYPE) {
 	REF struct regular_node *result;
 	/* Special case: The handle already has the correct typing */
@@ -729,7 +729,7 @@ handle_as_regular_node(/*inherit(on_success)*/ REF struct handle const *__restri
 }
 
 PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct directory_node *FCALL
-handle_as_directory_node(/*inherit(on_success)*/ REF struct handle const *__restrict self)
+handle_as_dirnode(/*inherit(on_success)*/ REF struct handle const *__restrict self)
 		THROWS(E_INVALID_HANDLE_FILETYPE) {
 	REF struct directory_node *result;
 	/* Special case: The handle already has the correct typing */
@@ -753,7 +753,7 @@ handle_as_directory_node(/*inherit(on_success)*/ REF struct handle const *__rest
 }
 
 PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct superblock *FCALL
-handle_as_superblock(/*inherit(on_success)*/ REF struct handle const *__restrict self)
+handle_as_super(/*inherit(on_success)*/ REF struct handle const *__restrict self)
 		THROWS(E_INVALID_HANDLE_FILETYPE) {
 	REF struct superblock *result;
 	/* Special case: The handle already has the correct typing */
@@ -777,7 +777,7 @@ handle_as_superblock(/*inherit(on_success)*/ REF struct handle const *__restrict
 }
 
 PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct superblock *FCALL
-handle_as_superblock_relaxed(/*inherit(on_success)*/ REF struct handle const *__restrict self)
+handle_as_super_relaxed(/*inherit(on_success)*/ REF struct handle const *__restrict self)
 		THROWS(E_INVALID_HANDLE_FILETYPE) {
 	REF struct superblock *result;
 	REF struct inode *ino;
@@ -807,7 +807,7 @@ handle_as_superblock_relaxed(/*inherit(on_success)*/ REF struct handle const *__
 }
 
 PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct symlink_node *FCALL
-handle_as_symlink_node(/*inherit(on_success)*/ REF struct handle const *__restrict self)
+handle_as_lnknode(/*inherit(on_success)*/ REF struct handle const *__restrict self)
 		THROWS(E_INVALID_HANDLE_FILETYPE) {
 	REF struct symlink_node *result;
 	/* Special case: The handle already has the correct typing */
@@ -831,7 +831,7 @@ handle_as_symlink_node(/*inherit(on_success)*/ REF struct handle const *__restri
 }
 
 PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct fifo_node *FCALL
-handle_as_fifo_node(/*inherit(on_success)*/ REF struct handle const *__restrict self)
+handle_as_fifonode(/*inherit(on_success)*/ REF struct handle const *__restrict self)
 		THROWS(E_INVALID_HANDLE_FILETYPE) {
 	REF struct fifo_node *result;
 	/* Special case: The handle already has the correct typing */
@@ -855,7 +855,7 @@ handle_as_fifo_node(/*inherit(on_success)*/ REF struct handle const *__restrict 
 }
 
 PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct socket_node *FCALL
-handle_as_socket_node(/*inherit(on_success)*/ REF struct handle const *__restrict self)
+handle_as_socketnode(/*inherit(on_success)*/ REF struct handle const *__restrict self)
 		THROWS(E_INVALID_HANDLE_FILETYPE) {
 	REF struct socket_node *result;
 	/* Special case: The handle already has the correct typing */

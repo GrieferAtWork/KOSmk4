@@ -490,8 +490,13 @@ path_traverse(fd_t fd_cwd, /*utf-8*/ USER CHECKED char const *upath,
 		THROWS(E_WOULDBLOCK, E_SEGFAULT, E_FSERROR_ACCESS_DENIED, E_FSERROR_PATH_NOT_FOUND,
 		       E_FSERROR_TOO_MANY_SYMBOLIC_LINKS, E_FSERROR_NOT_A_DIRECTORY,
 		       E_IOERROR, E_BADALLOC, ...);
+#ifdef __INTELLISENSE__
+#define path_traverse_ex_r path_traverse_ex
+#define path_traverse_r    path_traverse
+#else /* __INTELLISENSE__ */
 #define path_traverse_ex_r(...) vfs_recent(THIS_VFS, path_traverse_ex(__VA_ARGS__))
 #define path_traverse_r(...)    vfs_recent(THIS_VFS, path_traverse(__VA_ARGS__))
+#endif /* !__INTELLISENSE__ */
 
 
 
@@ -569,7 +574,7 @@ path_remove(struct path *__restrict self,
 FUNDEF NONNULL((1, 4)) void KCALL
 path_rename(struct path *oldpath, /*utf-8*/ USER CHECKED char const *oldname, u16 oldnamelen,
             struct path *newpath, /*utf-8*/ USER CHECKED char const *newname, u16 newnamelen,
-            atflag_t atflags DFL(0),
+            atflag_t atflags DFL(0), __BOOL check_permissions DFL(1),
             /*out[1..1]_opt*/ REF struct fdirent **pold_dirent DFL(__NULLPTR),
             /*out[1..1]_opt*/ REF struct fdirent **pnew_dirent DFL(__NULLPTR),
             /*out[1..1]_opt*/ REF struct fnode **prenamed_node DFL(__NULLPTR),
@@ -613,6 +618,18 @@ path_printent(struct path *__restrict self,
               __pformatprinter printer, void *arg,
               atflag_t atflags DFL(AT_PATHPRINT_INCTRAIL),
               struct path *root DFL(__NULLPTR));
+
+
+/* Helper functions for printing a path into a user-space buffer.
+ * @return: * : The required buffer size (including a trailing NUL-character) */
+FUNDEF NONNULL((1)) size_t KCALL
+path_sprint(struct path *__restrict self, USER CHECKED char *buffer, size_t buflen,
+            atflag_t atflags DFL(0), struct path *root DFL(__NULLPTR)) THROWS(E_SEGFAULT);
+FUNDEF NONNULL((1)) size_t KCALL
+path_sprintent(struct path *__restrict self,
+               USER CHECKED char const *dentry_name, u16 dentry_namelen,
+               USER CHECKED char *buffer, size_t buflen,
+               atflag_t atflags DFL(0), struct path *root DFL(__NULLPTR)) THROWS(E_SEGFAULT);
 
 
 
@@ -700,6 +717,17 @@ FUNDEF NONNULL((1)) __BOOL KCALL
 path_umount(struct pathmount *__restrict self)
 		THROWS(E_WOULDBLOCK);
 
+
+
+
+/* Open (or create) a file, the same way user-space open(2) works. */
+FUNDEF WUNUSED NONNULL((2)) REF struct handle KCALL
+path_open_ex(struct path *cwd, u32 *__restrict premaining_symlinks,
+             USER CHECKED char const *filename,
+             oflag_t oflags, mode_t mode DFL(0));
+FUNDEF WUNUSED REF struct handle KCALL
+path_open(fd_t fd_cwd, USER CHECKED char const *filename,
+          oflag_t oflags, mode_t mode DFL(0));
 
 
 DECL_END

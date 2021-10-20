@@ -115,18 +115,25 @@ NOTHROW(FCALL vfs_recent)(struct vfs *__restrict path_vfs,
 		/* Check if a parent-path of `self' are already in-cache.
 		 * If so, replace that parent with `self'. */
 		if (!path_isroot(self)) {
-			struct path *iter = path_parent(self);
+			REF struct path *iter;
+			iter = path_getparent(self);
 			for (;;) {
+				REF struct path *next;
 				if (TAILQ_ISBOUND(iter, p_recent)) {
 					TAILQ_UNBIND(&path_vfs->vf_recent, iter, p_recent);
 					vfs_recentlock_release(path_vfs);
 					/* Drop old reference */
+					decref_nokill(iter);
 					decref(iter);
 					goto done;
 				}
-				if (path_isroot(iter))
+				if (path_isroot(iter)) {
+					decref_unlikely(iter);
 					break;
-				iter = path_parent(iter);
+				}
+				next = path_getparent(iter);
+				decref_unlikely(iter);
+				iter = next;
 			}
 		}
 
@@ -149,6 +156,26 @@ NOTHROW(FCALL vfs_recent)(struct vfs *__restrict path_vfs,
 done:
 	return self;
 }
+
+
+/* Return the path used to mount the given `dir' within `self'.
+ * If the given directory doesn't have a mounting point  within
+ * the given VFS `self', return `NULL' */
+PUBLIC WUNUSED NONNULL((1, 2)) REF struct pathmount *FCALL
+vfs_mount_location(struct vfs *__restrict self,
+                   struct fdirnode *__restrict dir) {
+	REF struct pathmount *result;
+	vfs_mountslock_acquire(self);
+	LIST_FOREACH (result, &self->vf_mounts, pm_vsmount) {
+		if (result->p_dir == dir) {
+			incref(result);
+			break;
+		}
+	}
+	vfs_mountslock_release(self);
+	return result;
+}
+
 
 
 
@@ -280,6 +307,16 @@ fs_getroot(struct fs *__restrict self) THROWS(E_WOULDBLOCK) {
 	fs_pathlock_endread(self);
 	return result;
 }
+
+
+PUBLIC ATTR_PURE WUNUSED atflag_t
+NOTHROW(FCALL fs_atflags)(atflag_t atflags) {
+	fs_mask_t mask;
+	mask.f_mode = atomic64_read(&THIS_FS->fs_mode.f_atom);
+	return (atflags & mask.f_atmask) | mask.f_atflag;
+}
+
+
 
 
 

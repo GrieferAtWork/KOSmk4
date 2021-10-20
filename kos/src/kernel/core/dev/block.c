@@ -306,14 +306,14 @@ NOTHROW(FCALL ipi_destroy_block_device)(struct icpustate *__restrict state,
                                         void *args[CPU_IPI_ARGCOUNT]) {
 	struct blkdev *dev;
 	dev = (struct blkdev *)args[0];
-	block_device_destroy(dev);
+	blkdev_destroy(dev);
 	return state;
 }
 #endif /* !CONFIG_NO_SMP */
 
 /* Destroy a given block device. */
 PUBLIC NOBLOCK NONNULL((1)) void
-NOTHROW(KCALL block_device_destroy)(struct blkdev *__restrict self) {
+NOTHROW(KCALL blkdev_destroy)(struct blkdev *__restrict self) {
 	if (self->bd_type.dt_fini) {
 #ifndef CONFIG_NO_SMP
 		if (cpu_count > 1) {
@@ -541,8 +541,8 @@ block_device_add_to_devfs(struct blkdev *__restrict self) {
 			snprintf(self->bd_name, sizeof(self->bd_name),
 			         "%s%" PRIuN(__SIZEOF_MINOR_T__),
 			         master->bd_name,
-			         MINOR(block_device_devno(self)) -
-			         MINOR(block_device_devno(master)));
+			         MINOR(blkdev_devno(self)) -
+			         MINOR(blkdev_devno(master)));
 			self->bd_name[COMPILER_LENOF(self->bd_name) - 1] = 0;
 		} else {
 			sprintf(self->bd_name,
@@ -565,7 +565,7 @@ block_device_add_to_devfs(struct blkdev *__restrict self) {
 	 *       to `NULL' for us */
 	devfs_insert(self->bd_name,
 	             S_IFBLK,
-	             block_device_devno(self),
+	             blkdev_devno(self),
 	             &self->bd_devfs_inode,
 	             &self->bd_devfs_entry);
 }
@@ -713,7 +713,7 @@ NOTHROW(KCALL block_device_findpart)(struct block_device *__restrict self,
 
 /* Create a new sub-partition for `master', placing it as the given address.
  * Following this, automatically register the new partition with `blkdev_register_auto()',
- * after  assigning  the  name   `"%s%u" % (master->bd_name,MINOR(block_device_devno(return)))'.
+ * after  assigning  the  name   `"%s%u" % (master->bd_name,MINOR(blkdev_devno(return)))'.
  * NOTE: If another partition with the same `part_min' and `part_max', no new
  *       partition is created, and that  partition will be returned  instead.
  * @param: part_label:    The name of the partition, or `NULL'
@@ -968,8 +968,8 @@ NOTHROW(KCALL log_sync)(struct block_device *__restrict self, lba_t sector_id) {
 	                 "%.2" PRIxN(__SIZEOF_MAJOR_T__) ":%.2" PRIxN(__SIZEOF_MINOR_T__) "]"
 	                 " Syncing sector %#" PRIx64 " (%#" PRIx64 "-%#" PRIx64 ")\n",
 	       self->bd_name,
-	       MAJOR(block_device_devno(self)),
-	       MINOR(block_device_devno(self)),
+	       MAJOR(blkdev_devno(self)),
+	       MINOR(blkdev_devno(self)),
 	       (u64)sector_id, (u64)(sector_id * self->bd_sector_size),
 	       (u64)(((sector_id + 1) * self->bd_sector_size) - 1));
 }
@@ -1037,8 +1037,8 @@ _block_device_sync(struct block_device *__restrict self)
 		                   "%.2" PRIxN(__SIZEOF_MINOR_T__) "] "
 		                   "Block device was synced\n",
 		       self->bd_name,
-		       MAJOR(block_device_devno(self)),
-		       MINOR(block_device_devno(self)));
+		       MAJOR(blkdev_devno(self)),
+		       MINOR(blkdev_devno(self)));
 	}
 	return result;
 }
@@ -1555,8 +1555,8 @@ do_dump_block_device(struct blkdev *__restrict self,
 	                  "%-11" PRIu64 "  "
 	                  "%" PRIuSIZ "\n"),
 	           (unsigned int)longest_device_name, self->bd_name,
-	           (unsigned int)MAJOR(block_device_devno(self)),
-	           (unsigned int)MINOR(block_device_devno(self)),
+	           (unsigned int)MAJOR(blkdev_devno(self)),
+	           (unsigned int)MINOR(blkdev_devno(self)),
 	           (unsigned int)longest_driver_name,
 	           drv ? drv->d_name : "?",
 	           total_bytes_adj, total_bytes_name,

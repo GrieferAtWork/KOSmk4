@@ -60,6 +60,9 @@ struct fdevnode
 #define _fdevnode_assert_ops_(ops) \
 	_fnode_assert_ops_(&(ops)->dno_node)
 
+#define fdevnode_getdevno(self) ((self)->dn_devno)
+
+
 struct path;
 struct fdirent;
 struct handle;

@@ -30,6 +30,7 @@
 #include <kernel/fs/node.h>
 #include <kernel/fs/path.h>
 #include <kernel/fs/vfs.h>
+#include <kernel/handle.h>
 
 #include <kos/except.h>
 #include <kos/except/reason/fs.h>
@@ -38,6 +39,7 @@
 
 #include <assert.h>
 #include <fcntl.h>
+#include <format-printer.h>
 #include <stddef.h>
 #include <string.h>
 
@@ -70,21 +72,28 @@ DECL_BEGIN
 STATIC_ASSERT(!IS_USER_ATFLAG(AT_RENAME_NOREPLACE));
 STATIC_ASSERT(!IS_USER_ATFLAG(AT_RENAME_EXCHANGE));
 STATIC_ASSERT(!IS_USER_ATFLAG(AT_RENAME_MOVETODIR));
+STATIC_ASSERT(!IS_USER_ATFLAG(__RENAME_WHITEOUT));
 STATIC_ASSERT(!IS_USER_ATFLAG(AT_IGNORE_TRAILING_SLASHES));
 STATIC_ASSERT(!IS_USER_ATFLAG(AT_PATHPRINT_INCTRAIL));
 STATIC_ASSERT(!IS_USER_ATFLAG(_AT_PATHPRINT_REACHABLE));
 STATIC_ASSERT(AT_RENAME_NOREPLACE != AT_RENAME_EXCHANGE);
 STATIC_ASSERT(AT_RENAME_NOREPLACE != AT_RENAME_MOVETODIR);
+STATIC_ASSERT(AT_RENAME_NOREPLACE != __RENAME_WHITEOUT);
 STATIC_ASSERT(AT_RENAME_NOREPLACE != AT_IGNORE_TRAILING_SLASHES);
 STATIC_ASSERT(AT_RENAME_NOREPLACE != AT_PATHPRINT_INCTRAIL);
 STATIC_ASSERT(AT_RENAME_NOREPLACE != _AT_PATHPRINT_REACHABLE);
 STATIC_ASSERT(AT_RENAME_EXCHANGE != AT_RENAME_MOVETODIR);
+STATIC_ASSERT(AT_RENAME_EXCHANGE != __RENAME_WHITEOUT);
 STATIC_ASSERT(AT_RENAME_EXCHANGE != AT_IGNORE_TRAILING_SLASHES);
 STATIC_ASSERT(AT_RENAME_EXCHANGE != AT_PATHPRINT_INCTRAIL);
 STATIC_ASSERT(AT_RENAME_EXCHANGE != _AT_PATHPRINT_REACHABLE);
+STATIC_ASSERT(AT_RENAME_MOVETODIR != __RENAME_WHITEOUT);
 STATIC_ASSERT(AT_RENAME_MOVETODIR != AT_IGNORE_TRAILING_SLASHES);
 STATIC_ASSERT(AT_RENAME_MOVETODIR != AT_PATHPRINT_INCTRAIL);
 STATIC_ASSERT(AT_RENAME_MOVETODIR != _AT_PATHPRINT_REACHABLE);
+STATIC_ASSERT(__RENAME_WHITEOUT != AT_IGNORE_TRAILING_SLASHES);
+STATIC_ASSERT(__RENAME_WHITEOUT != AT_PATHPRINT_INCTRAIL);
+STATIC_ASSERT(__RENAME_WHITEOUT != _AT_PATHPRINT_REACHABLE);
 STATIC_ASSERT(AT_IGNORE_TRAILING_SLASHES != AT_PATHPRINT_INCTRAIL);
 STATIC_ASSERT(AT_IGNORE_TRAILING_SLASHES != _AT_PATHPRINT_REACHABLE);
 STATIC_ASSERT(AT_PATHPRINT_INCTRAIL != _AT_PATHPRINT_REACHABLE);
@@ -991,7 +1000,7 @@ fdirnode_rename_in_path(struct path *oldpath, struct path *newpath,
 PUBLIC NONNULL((1, 4)) void KCALL
 path_rename(struct path *oldpath, /*utf-8*/ USER CHECKED char const *oldname, u16 oldnamelen,
             struct path *newpath, /*utf-8*/ USER CHECKED char const *newname, u16 newnamelen,
-            atflag_t atflags,
+            atflag_t atflags, bool check_permissions,
             /*out[1..1]_opt*/ REF struct fdirent **pold_dirent,
             /*out[1..1]_opt*/ REF struct fdirent **pnew_dirent,
             /*out[1..1]_opt*/ REF struct fnode **prenamed_node,
@@ -1014,6 +1023,13 @@ again_acquire_lock:
 	exchange_newname_node   = NULL;
 	replaced_node           = NULL;
 	newpath_ref             = NULL;
+
+	/* Assert permissions. */
+	if (check_permissions) {
+		fnode_access(oldpath->p_dir, W_OK);
+		fnode_access(newpath->p_dir, W_OK);
+	}
+
 	twopaths_acquire_locks(oldpath, newpath);
 	TRY {
 		/* Don't do any replacements by default. */
@@ -1094,43 +1110,54 @@ again_rename:
 				/* Perform a move-to-directory operation. */
 				assert(!newpath_ref);
 				FINALLY_DECREF_UNLIKELY(info.frn_dent);
-				/* Lookup or create the path for `info.frn_dent' */
-				newpath_ref = path_lookupchildref_withlock(newpath,
-				                                           info.frn_dent->fd_name,
-				                                           info.frn_dent->fd_namelen,
-				                                           info.frn_dent->fd_hash,
-				                                           info.frn_flags);
-				if (newpath_ref) {
-					/* move-to-dir with mounting points would result in cross-device links. */
-					if unlikely(path_ismount(newpath_ref))
-						THROW(E_FSERROR_CROSS_DEVICE_LINK);
 
-					/* Acquire a write-lock to `newpath_ref' */
-					if (newpath_ref != oldpath && !path_cldlock_trywrite(newpath_ref))
-						goto waitfor_newpath_ref_writelock;
-				} else {
-					path_cldlist_rehash_before_insert(newpath);
-					TRY {
-						newpath_ref = _path_alloc();
-					} EXCEPT {
-						path_cldlist_rehash_after_remove(newpath);
-						RETHROW();
+				TRY {
+					/* Assert read+exec access for the new directory. */
+					if (check_permissions)
+						fnode_access(info.frn_repfile, W_OK);
+	
+					/* Lookup or create the path for `info.frn_dent' */
+					newpath_ref = path_lookupchildref_withlock(newpath,
+					                                           info.frn_dent->fd_name,
+					                                           info.frn_dent->fd_namelen,
+					                                           info.frn_dent->fd_hash,
+					                                           info.frn_flags);
+					if (newpath_ref) {
+						/* move-to-dir with mounting points would result in cross-device links. */
+						if unlikely(path_ismount(newpath_ref))
+							THROW(E_FSERROR_CROSS_DEVICE_LINK);
+						decref_unlikely(info.frn_repfile);
+	
+						/* Acquire a write-lock to `newpath_ref' */
+						if (newpath_ref != oldpath && !path_cldlock_trywrite(newpath_ref))
+							goto waitfor_newpath_ref_writelock;
+					} else {
+						path_cldlist_rehash_before_insert(newpath);
+						TRY {
+							newpath_ref = _path_alloc();
+						} EXCEPT {
+							path_cldlist_rehash_after_remove(newpath);
+							RETHROW();
+						}
+						newpath_ref->p_refcnt = 1;
+						newpath_ref->p_flags  = PATH_F_NORMAL;
+						newpath_ref->p_parent = incref(newpath);
+						newpath_ref->p_name   = incref(info.frn_dent);
+						newpath_ref->p_dir    = fnode_asdir(info.frn_repfile); /* Inherit reference */
+						TAILQ_ENTRY_UNBOUND_INIT(&newpath_ref->p_recent);
+						shared_rwlock_init_write(&newpath_ref->p_cldlock); /* We start out with a write-lock! */
+						SLIST_INIT(&newpath_ref->p_cldlops);
+						newpath_ref->p_cldused = 0;
+						newpath_ref->p_cldsize = 0;
+						newpath_ref->p_cldmask = 0;
+						newpath_ref->p_cldlist = path_empty_cldlist;
+	
+						/* Insert into `newpath's child-list */
+						path_cldlist_insert(newpath, newpath_ref);
 					}
-					newpath_ref->p_refcnt = 1;
-					newpath_ref->p_flags  = PATH_F_NORMAL;
-					newpath_ref->p_parent = incref(newpath);
-					newpath_ref->p_name   = incref(info.frn_dent);
-					newpath_ref->p_dir    = fnode_asdir(info.frn_repfile);
-					TAILQ_ENTRY_UNBOUND_INIT(&newpath_ref->p_recent);
-					shared_rwlock_init_write(&newpath_ref->p_cldlock); /* We start out with a write-lock! */
-					SLIST_INIT(&newpath_ref->p_cldlops);
-					newpath_ref->p_cldused = 0;
-					newpath_ref->p_cldsize = 0;
-					newpath_ref->p_cldmask = 0;
-					newpath_ref->p_cldlist = path_empty_cldlist;
-
-					/* Insert into `newpath's child-list */
-					path_cldlist_insert(newpath, newpath_ref);
+				} EXCEPT {
+					decref_unlikely(info.frn_repfile);
+					RETHROW();
 				}
 
 				/* Drop our own newpath-write-lock (we've got a ne one for `newpath_ref') */
@@ -1335,6 +1362,40 @@ path_printent(struct path *__restrict self,
 	return result;
 }
 
+
+
+/* Helper functions for printing a path into a user-space buffer.
+ * @return: * : The required buffer size (including a trailing NUL-character) */
+PUBLIC NONNULL((1)) size_t KCALL
+path_sprint(struct path *__restrict self, USER CHECKED char *buffer, size_t buflen,
+            atflag_t atflags, struct path *root) THROWS(E_SEGFAULT) {
+	size_t result;
+	struct format_snprintf_data data;
+	format_snprintf_init(&data, buffer, buflen);
+	result = (size_t)path_print(self, &format_snprintf_printer,
+	                            &data, atflags, root);
+	if (result < buflen)
+		buffer[result] = '\0';
+	++result;
+	return result;
+}
+
+PUBLIC NONNULL((1)) size_t KCALL
+path_sprintent(struct path *__restrict self,
+               USER CHECKED char const *dentry_name, u16 dentry_namelen,
+               USER CHECKED char *buffer, size_t buflen,
+               atflag_t atflags, struct path *root) THROWS(E_SEGFAULT) {
+	size_t result;
+	struct format_snprintf_data data;
+	format_snprintf_init(&data, buffer, buflen);
+	result = (size_t)path_printent(self, dentry_name, dentry_namelen,
+	                               &format_snprintf_printer, &data,
+	                               atflags, root);
+	if (result < buflen)
+		buffer[result] = '\0';
+	++result;
+	return result;
+}
 
 
 

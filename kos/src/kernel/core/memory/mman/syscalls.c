@@ -204,6 +204,8 @@ sys_mmap_impl(USER UNCHECKED void *addr, size_t length, syscall_ulong_t prot,
 			assert(file.hmi_file != NULL);
 #endif /* !NDEBUG */
 		} EXCEPT {
+			xdecref_unlikely(file.hmi_fspath);
+			xdecref_unlikely(file.hmi_fsname);
 			decref(hand);
 			RETHROW();
 		}

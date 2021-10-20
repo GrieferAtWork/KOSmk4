@@ -534,6 +534,9 @@
 #ifndef E_FILESYSTEM_NOT_A_DIRECTORY_RENAME
 #define E_FILESYSTEM_NOT_A_DIRECTORY_RENAME  5 /* `rename(2)' tried to override a directory with a non-directory */
 #endif /* !E_FILESYSTEM_NOT_A_DIRECTORY_RENAME */
+#ifndef E_FILESYSTEM_NOT_A_DIRECTORY_MOUNT_BIND
+#define E_FILESYSTEM_NOT_A_DIRECTORY_MOUNT_BIND 6 /* `mount(2)' with MS_BIND was given a non-directory. */
+#endif /* !E_FILESYSTEM_NOT_A_DIRECTORY_MOUNT_BIND */
 
 /* SPLIT: All error codes above should be interpreted as  FILE-NOT-FOUND
  *        in situations where a list of paths is searched for a specific
@@ -561,7 +564,7 @@
 #define E_FSERROR_TOO_MANY_HARD_LINKS             (E_FSERROR, 0x000a) /* [errno(EMLINK), msg("Too many hard links already exist for a given file")] */
 #endif /* !E_FSERROR_TOO_MANY_HARD_LINKS */
 #ifndef E_FSERROR_IS_A_DIRECTORY
-#define E_FSERROR_IS_A_DIRECTORY                  (E_FSERROR, 0x000b) /* [errno(EISDIR), msg("Did not expect a directory")]
+#define E_FSERROR_IS_A_DIRECTORY                  (E_FSERROR, 0x000b) /* [errno($action_context == E_FILESYSTEM_IS_A_DIRECTORY_LINK ? EPERM : EISDIR), msg("Did not expect a directory")]
                                                                        * [fld(action_context: uintptr_t, "The context in which a filesystem component was required to not be\n"
                                                                        *                                 "a directory, but was one (One of `E_FILESYSTEM_IS_A_DIRECTORY_*')")]
                                                                        * A directory was found, but something else was expected */

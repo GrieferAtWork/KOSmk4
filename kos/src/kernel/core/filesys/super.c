@@ -38,6 +38,7 @@
 #include <hybrid/atomic.h>
 
 #include <kos/except.h>
+#include <sys/statfs.h>
 
 #include <assert.h>
 #include <stdbool.h>
@@ -557,6 +558,36 @@ NOTHROW(FCALL fsuper_delete)(struct fsuper *__restrict self) {
 	fsuper_delete_remove_from_all_postlop(&self->fs_root._mf_plop); /* Inherit reference */
 }
 
+
+
+/* Gather information about the filesystem and store that information in `*result' */
+PUBLIC NONNULL((1, 2)) void FCALL
+fsuper_statfs(struct fsuper *__restrict self,
+              USER CHECKED struct statfs *result)
+		THROWS(E_IOERROR, E_SEGFAULT, ...) {
+	struct fsuper_ops const *ops = fsuper_getops(self);
+
+	/* Fill in default fields. */
+	result->f_type    = (typeof(result->f_type))self->fs_feat.sf_magic;
+	result->f_bsize   = (typeof(result->f_bsize))1 << self->fs_root.mf_blockshift;
+	result->f_blocks  = self->fs_dev ? (typeof(result->f_blocks))(blkdev_getsize(self->fs_dev) >> self->fs_root.mf_blockshift) : 0;
+	result->f_namelen = (typeof(result->f_namelen))self->fs_feat.sf_name_max;
+	result->f_frsize  = (typeof(result->f_frsize))1 << self->fs_root.mf_blockshift;
+	result->f_flags   = (typeof(result->f_flags))statvfs_flags_from_mfile_flags(self->fs_root.mf_flags);
+
+	/* If defined, invoke the statfs operator for remaining fields. */
+	if (ops->so_statfs) {
+		(*ops->so_statfs)(self, result);
+	} else {
+		/* Fill remaining fields with all zeroes. */
+		result->f_bfree         = (typeof(result->f_bfree))0;
+		result->f_bavail        = (typeof(result->f_bavail))0;
+		result->f_files         = (typeof(result->f_files))0;
+		result->f_ffree         = (typeof(result->f_ffree))0;
+		result->f_fsid.__val[0] = (typeof(result->f_fsid.__val[0]))0;
+		result->f_fsid.__val[1] = (typeof(result->f_fsid.__val[1]))0;
+	}
+}
 
 
 

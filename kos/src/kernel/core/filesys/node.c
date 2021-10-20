@@ -42,6 +42,7 @@
 #include <hybrid/atomic.h>
 
 #include <kos/except.h>
+#include <kos/except/reason/fs.h>
 #include <kos/except/reason/inval.h>
 
 #include <assert.h>
@@ -467,6 +468,48 @@ again_read_old_values:
 	if (changed)
 		mfile_changed(self, MFILE_F_ATTRCHANGED);
 }
+
+
+
+/* Change all non-NULL the timestamp that are given.
+ * @throw: E_FSERROR_DELETED:E_FILESYSTEM_DELETED_FILE: The `MFILE_F_DELETED' is set.
+ * @throw: E_FSERROR_READONLY: The `MFILE_FM_ATTRREADONLY' flag is set. */
+PUBLIC NONNULL((1)) void KCALL
+mfile_chtime(struct mfile *__restrict self,
+             struct timespec const *new_atime,
+             struct timespec const *new_mtime,
+             struct timespec const *new_ctime)
+		THROWS(E_FSERROR_READONLY) {
+	if unlikely(self->mf_flags & MFILE_FM_ATTRREADONLY)
+		THROW(E_FSERROR_READONLY);
+	mfile_tslock_acquire(self);
+	/* Check if the file was deleted. (If it was,
+	 * then timestamps must no longer be modified
+	 * sine they're re-used for lops & the like) */
+	COMPILER_READ_BARRIER();
+	if (self->mf_flags & MFILE_F_DELETED) {
+		mfile_tslock_release_br(self);
+		THROW(E_FSERROR_DELETED, E_FILESYSTEM_DELETED_FILE);
+	}
+	/* Fill in new timestamps. */
+	if (new_atime) {
+		self->mf_atime.tv_sec  = new_atime->tv_sec;
+		self->mf_atime.tv_nsec = new_atime->tv_nsec;
+	}
+	if (new_mtime) {
+		self->mf_mtime.tv_sec  = new_mtime->tv_sec;
+		self->mf_mtime.tv_nsec = new_mtime->tv_nsec;
+	}
+	if (new_ctime) {
+		self->mf_ctime.tv_sec  = new_ctime->tv_sec;
+		self->mf_ctime.tv_nsec = new_ctime->tv_nsec;
+	}
+	mfile_tslock_release(self);
+
+	/* Mark attributes of this file as having changed. */
+	mfile_changed(self, MFILE_F_ATTRCHANGED);
+}
+
 
 
 /* Clear the `MFILE_F_ATTRCHANGED' flag and  remove `self' from the  associated

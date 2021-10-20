@@ -214,7 +214,9 @@ struct frename_info {
 
 
 /* Return values for `dno_mkfile' */
-#define FDIRNODE_MKFILE_SUCCESS 0 /* Success */
+#define FDIRNODE_MKFILE_SUCCESS 0 /* Success. `info' is modified like:
+                                   * >> info->mkf_rnode = incref(NEW_FILE);
+                                   * >> info->mkf_dent  = incref(DIRENT_OF(NEW_FILE)); */
 #define FDIRNODE_MKFILE_EXISTS  1 /* Special case: the file `info->mkf_name' already exists. `info' is modified like:
                                    * >> info->mkf_rnode = incref(EXISTING_FILE);
                                    * >> info->mkf_dent  = incref(DIRENT_OF(EXISTING_FILE)); */

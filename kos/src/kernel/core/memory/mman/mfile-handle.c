@@ -24,10 +24,14 @@
 #include <kernel/compiler.h>
 
 #ifdef CONFIG_USE_NEW_FS
+#include <kernel/fs/devfs.h>
 #include <kernel/fs/devnode.h>
 #include <kernel/fs/filehandle.h>
 #include <kernel/fs/node.h>
+#include <kernel/fs/path.h>
+#include <kernel/fs/ramfs.h>
 #include <kernel/fs/super.h>
+#include <kernel/fs/vfs.h>
 #include <kernel/handle-proto.h>
 #include <kernel/handle.h>
 #include <kernel/iovec.h>
@@ -592,11 +596,30 @@ handle_mfile_mmap(struct mfile *__restrict self,
                   struct handle_mmap_info *__restrict info)
 		THROWS(...) {
 	struct mfile_stream_ops const *stream;
+
+	/* Special case for device files (which have fixed filesystem names) */
+	if (mfile_isdevice(self)) {
+		if (!info->hmi_fsname) {
+			struct device *dev = mfile_asdevice(self);
+			devfs_byname_read();
+			if (dev->dv_byname_node.rb_lhs != DEVICE_BYNAME_DELETED)
+				info->hmi_fsname = incref(&dev->dv_dirent->fdd_dirent);
+			devfs_byname_endread();
+		}
+		if (!info->hmi_fspath)
+			info->hmi_fspath = vfs_mount_location(THIS_VFS, &devfs.fs_root);
+	}
+
+	/* Invoke the optional streams override operator. */
 	stream = self->mf_ops->mo_stream;
 	if (stream != NULL && stream->mso_mmap) {
 		(*stream->mso_mmap)(self, info);
 		return;
 	}
+
+	/* Fallback: any mfile can be mmap'd (because that's what they're there for)
+	 *           However, the `MFILE_F_NOUSRMMAP' flag can be used to deny user-
+	 *           space the right to do that. */
 	if likely(!(self->mf_flags & MFILE_F_NOUSRMMAP)) {
 		info->hmi_file = incref(self);
 		return;
@@ -1370,7 +1393,7 @@ handle_mfile_hop(struct mfile *__restrict self, syscall_ulong_t cmd,
 		if (dstdir == (unsigned int)-1) {
 			target_dir = (REF struct directory_node *)incref(self);
 		} else {
-			target_dir = handle_get_directory_node(dstdir);
+			target_dir = handle_get_dirnode(dstdir);
 		}
 		{
 			FINALLY_DECREF(target_dir);
@@ -1458,7 +1481,7 @@ handle_mfile_hop(struct mfile *__restrict self, syscall_ulong_t cmd,
 		VALIDATE_FLAGSET(link_mode,
 		                 HOP_DIRECTORY_LINK_FNOCASE,
 		                 E_INVALID_ARGUMENT_CONTEXT_HOP_DIRECTORY_LINK_FLAGS);
-		link_node = handle_get_inode(link_nodefd);
+		link_node = handle_get_fnode(link_nodefd);
 		{
 			FINALLY_DECREF(link_node);
 			cred_require_sysadmin(); /* TODO: More finely grained access! */

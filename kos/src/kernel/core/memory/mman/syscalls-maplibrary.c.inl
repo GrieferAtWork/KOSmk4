@@ -126,6 +126,8 @@ DEFINE_COMPAT_SYSCALL5(void *, maplibrary,
 			assert(file.hmi_file != NULL);
 #endif /* !NDEBUG */
 		} EXCEPT {
+			xdecref_unlikely(file.hmi_fspath);
+			xdecref_unlikely(file.hmi_fsname);
 			decref(hand);
 			RETHROW();
 		}

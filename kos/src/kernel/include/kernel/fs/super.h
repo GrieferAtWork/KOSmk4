@@ -136,7 +136,7 @@ struct fsuper_ops {
 	 *   - f_fsid */
 	NONNULL((1)) void
 	(KCALL *so_statfs)(struct fsuper *__restrict self,
-	                        USER CHECKED struct statfs *result)
+	                   USER CHECKED struct statfs *result)
 			THROWS(E_IOERROR, E_SEGFAULT, ...);
 
 	struct fdirnode_ops so_fdir; /* FDirNode operators */
@@ -441,6 +441,12 @@ FUNDEF void KCALL fsuper_syncall(void)
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL fsuper_delete)(struct fsuper *__restrict self);
 
+
+/* Gather information about the filesystem and store that information in `*result' */
+FUNDEF NONNULL((1, 2)) void FCALL
+fsuper_statfs(struct fsuper *__restrict self,
+              USER CHECKED struct statfs *result)
+		THROWS(E_IOERROR, E_SEGFAULT, ...);
 
 
 

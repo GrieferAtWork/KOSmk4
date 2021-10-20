@@ -456,7 +456,7 @@ handle_fifo_user_tryas(struct fifo_user *__restrict self,
 		THROWS(E_WOULDBLOCK) {
 	switch (wanted_type) {
 	case HANDLE_TYPE_MFILE: return incref(self->fu_fifo);
-	case HANDLE_TYPE_FDIRENT: return xincref(self->fu_dent);
+	case HANDLE_TYPE_FDIRENT: return xincref(self->fu_dirent);
 	case HANDLE_TYPE_PATH: return xincref(self->fu_path);
 	default: break;
 	}
@@ -478,14 +478,14 @@ NOTHROW(FCALL fifo_user_destroy)(struct fifo_user *__restrict self) {
 			sig_broadcast(&fifo->ff_buffer.rb_nempty);
 	}
 	decref(fifo);
-	xdecref(self->fu_dent);
+	xdecref(self->fu_dirent);
 	xdecref(self->fu_path);
 	kfree(self);
 }
 
 /* Create a reader/writer for the given fifo `self'
- * NOTE: If  applicable,  the caller  should fill  in `fu_path'
- *       and/or `fu_dent' directly after calling this function.
+ * NOTE: If  applicable,  the  caller  should  fill  in `fu_path'
+ *       and/or `fu_dirent' directly after calling this function.
  * @param: iomode: Set of `IO_ACCMODE | IO_NONBLOCK' (other bits are silently ignored)
  * @throw: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_OPEN_FIFO_WRITER_NO_READERS: [...] */
 PUBLIC ATTR_MALLOC ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct fifo_user *FCALL
@@ -559,7 +559,7 @@ fifo_user_create(struct ffifonode *__restrict self, iomode_t iomode,
 	result->fu_fifo    = (REF struct ffifonode *)incref(self);
 	result->fu_accmode = iomode & IO_ACCMODE;
 	result->fu_path    = xincref(access_path);
-	result->fu_dent  = xincref(access_dent);
+	result->fu_dirent  = xincref(access_dent);
 	return result;
 }
 

@@ -24,6 +24,11 @@
 
 #ifdef CONFIG_USE_NEW_FS
 #include <kernel/fs/blkdev.h>
+
+#define blkdev_devno(self)       device_getdevno(self)
+#define blkdev_lookup(devno)     ((REF struct blkdev *)device_lookup_bydev(S_IFBLK, devno))
+#define blkdev_lookup_name(name) ((REF struct blkdev *)device_lookup_bystring(name, strlen(name), S_IFBLK))
+
 #else /* CONFIG_USE_NEW_FS */
 #include <kernel/paging.h>
 #include <kernel/types.h>
@@ -259,8 +264,8 @@ FUNDEF NONNULL((1)) syscall_slong_t KCALL block_device_partition_ioctl(struct bl
 
 /* Destroy a given block device. */
 FUNDEF NOBLOCK NONNULL((1)) void
-NOTHROW(KCALL block_device_destroy)(struct blkdev *__restrict self);
-DEFINE_REFCOUNT_FUNCTIONS(struct blkdev, bd_refcnt, block_device_destroy)
+NOTHROW(KCALL blkdev_destroy)(struct blkdev *__restrict self);
+DEFINE_REFCOUNT_FUNCTIONS(struct blkdev, bd_refcnt, blkdev_destroy)
 
 /* Allocate and initialize a new block device.
  * The   caller    must   still    initialize:
@@ -278,7 +283,7 @@ block_device_alloc(size_t sector_size DFL(512),
 		THROWS(E_BADALLOC, E_WOULDBLOCK);
 
 /* Returns the device number of `self', or `DEV_UNSET' if not set. */
-#define block_device_devno(self) ((self)->bd_devlink.a_vaddr)
+#define blkdev_devno(self) ((self)->bd_devlink.a_vaddr)
 
 /* Lookup  a block device associated with `devno'  and return a reference to it.
  * When no block device is associated that device number, return `NULL' instead. */
@@ -349,7 +354,7 @@ blkdev_register_auto(struct blkdev *__restrict self)
 
 /* Create a new sub-partition for `master', placing it as the given address.
  * Following this, automatically register the new partition with `blkdev_register_auto()',
- * after assigning the name `"%s%u" % (master->bd_name,MINOR(block_device_devno(return)) - MINOR(block_device_devno(master)))'.
+ * after assigning the name `"%s%u" % (master->bd_name,MINOR(blkdev_devno(return)) - MINOR(blkdev_devno(master)))'.
  * NOTE: If another partition with the same `part_min' and `part_max', no new
  *       partition is created, and that  partition will be returned  instead.
  * @param: part_label:    The name of the partition, or `NULL'

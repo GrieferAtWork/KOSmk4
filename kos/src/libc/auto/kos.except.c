@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe2ab4004 */
+/* HASH CRC-32:0xca6fc869 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -260,11 +260,11 @@ for (local name: classes.keys.sorted()) {
 			result = EMLINK;
 			break;
 #endif /* EMLINK */
-#ifdef EISDIR
+#if defined(EPERM) && defined(EISDIR)
 		case ERROR_SUBCLASS(ERROR_CODEOF(E_FSERROR_IS_A_DIRECTORY)):
-			result = EISDIR;
+			result = self->e_args.e_fserror.f_is_a_directory.iad_action_context == E_FILESYSTEM_IS_A_DIRECTORY_LINK ? EPERM : EISDIR;
 			break;
-#endif /* EISDIR */
+#endif /* EPERM && EISDIR */
 #ifdef ENOENT
 		case ERROR_SUBCLASS(ERROR_CODEOF(E_FSERROR_NOT_A_SYMBOLIC_LINK)):
 			result = ENOENT;

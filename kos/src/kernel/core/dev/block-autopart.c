@@ -62,8 +62,8 @@ block_device_autopart_efi_impl(struct blkdev *__restrict self,
 		                    "%.2" PRIxN(__SIZEOF_MAJOR_T__) ":"
 		                    "%.2" PRIxN(__SIZEOF_MINOR_T__) " (%q)\n",
 		       (u64)part_min, (u64)part_max,
-		       MAJOR(block_device_devno(self)),
-		       MINOR(block_device_devno(self)),
+		       MAJOR(blkdev_devno(self)),
+		       MINOR(blkdev_devno(self)),
 		       self->bd_name);
 		/* Load the supposed EFI partition as a normal partition. */
 		return (REF struct block_device_partition *)-2;
@@ -72,8 +72,8 @@ block_device_autopart_efi_impl(struct blkdev *__restrict self,
 	                 "%.2" PRIxN(__SIZEOF_MAJOR_T__) ":"
 	                 "%.2" PRIxN(__SIZEOF_MINOR_T__) " (%q)\n",
 	       (u64)part_min, (u64)part_max,
-	       MAJOR(block_device_devno(self)),
-	       MINOR(block_device_devno(self)),
+	       MAJOR(blkdev_devno(self)),
+	       MINOR(blkdev_devno(self)),
 	       self->bd_name);
 	efi.gpt_revision        = (le32)LETOH32(efi.gpt_revision);
 	efi.gpt_hdrsize         = (le32)LETOH32(efi.gpt_hdrsize);
@@ -91,8 +91,8 @@ block_device_autopart_efi_impl(struct blkdev *__restrict self,
 		                "%.2" PRIxN(__SIZEOF_MAJOR_T__) ":"
 		                "%.2" PRIxN(__SIZEOF_MINOR_T__) " (%q) is too small (%" PRIu32 " bytes)\n",
 		       (u64)part_min, (u64)part_max,
-		       MAJOR(block_device_devno(self)),
-		       MINOR(block_device_devno(self)),
+		       MAJOR(blkdev_devno(self)),
+		       MINOR(blkdev_devno(self)),
 		       self->bd_name, (u32)efi.gpt_hdrsize);
 		return (REF struct block_device_partition *)-2;
 	}
@@ -104,8 +104,8 @@ block_device_autopart_efi_impl(struct blkdev *__restrict self,
 		                "%.2" PRIxN(__SIZEOF_MAJOR_T__) ":"
 		                "%.2" PRIxN(__SIZEOF_MINOR_T__) " (%q) are too small (%" PRIu32 " bytes)\n",
 		       (u64)part_min, (u64)part_max,
-		       MAJOR(block_device_devno(self)),
-		       MINOR(block_device_devno(self)),
+		       MAJOR(blkdev_devno(self)),
+		       MINOR(blkdev_devno(self)),
 		       self->bd_name, (u32)efi.gpt_partition_entsz);
 		return (REF struct block_device_partition *)-2;
 	}
@@ -118,8 +118,8 @@ block_device_autopart_efi_impl(struct blkdev *__restrict self,
 			                "%.2" PRIxN(__SIZEOF_MINOR_T__) " (%q) overflows "
 			                "(sector %" PRIu64 " * %" PRIuSIZ " bytes per sector)\n",
 			       (u64)part_min, (u64)part_max,
-			       MAJOR(block_device_devno(self)),
-			       MINOR(block_device_devno(self)),
+			       MAJOR(blkdev_devno(self)),
+			       MINOR(blkdev_devno(self)),
 			       self->bd_name,
 			       (u64)efi.gpt_partition_start,
 			       (size_t)self->bd_sector_size);
@@ -145,8 +145,8 @@ block_device_autopart_efi_impl(struct blkdev *__restrict self,
 				                "%.2" PRIxN(__SIZEOF_MINOR_T__) " (%q) "
 				                "ends at %" PRIu64 " before it starts at %" PRIu64 "\n",
 				       (u64)part_min, (u64)part_max,
-				       MAJOR(block_device_devno(self)),
-				       MINOR(block_device_devno(self)),
+				       MAJOR(blkdev_devno(self)),
+				       MINOR(blkdev_devno(self)),
 				       self->bd_name,
 				       (u64)part.p_part_min,
 				       (u64)part.p_part_end);
@@ -198,22 +198,22 @@ block_device_autopart_efi_impl(struct blkdev *__restrict self,
 						                    "%.2" PRIxN(__SIZEOF_MAJOR_T__) ":%.2" PRIxN(__SIZEOF_MINOR_T__) " collides with "
 						                    "%.2" PRIxN(__SIZEOF_MAJOR_T__) ":%.2" PRIxN(__SIZEOF_MINOR_T__) " on "
 						                    "%.2" PRIxN(__SIZEOF_MAJOR_T__) ":%.2" PRIxN(__SIZEOF_MINOR_T__) "\n",
-						       MAJOR(block_device_devno(new_result)),
-						       MINOR(block_device_devno(new_result)),
-						       MAJOR(block_device_devno(result)),
-						       MINOR(block_device_devno(result)),
-						       MAJOR(block_device_devno(self)),
-						       MINOR(block_device_devno(self)));
+						       MAJOR(blkdev_devno(new_result)),
+						       MINOR(blkdev_devno(new_result)),
+						       MAJOR(blkdev_devno(result)),
+						       MINOR(blkdev_devno(result)),
+						       MAJOR(blkdev_devno(self)),
+						       MINOR(blkdev_devno(self)));
 						decref(result);
 						result = (REF struct block_device_partition *)-1;
 					} else {
 						printk(KERN_WARNING "[blk] Three or more active EFI partition "
 						                    "%.2" PRIxN(__SIZEOF_MAJOR_T__) ":%.2" PRIxN(__SIZEOF_MINOR_T__) " on "
 						                    "%.2" PRIxN(__SIZEOF_MAJOR_T__) ":%.2" PRIxN(__SIZEOF_MINOR_T__) "\n",
-						       MAJOR(block_device_devno(new_result)),
-						       MINOR(block_device_devno(new_result)),
-						       MAJOR(block_device_devno(self)),
-						       MINOR(block_device_devno(self)));
+						       MAJOR(blkdev_devno(new_result)),
+						       MINOR(blkdev_devno(new_result)),
+						       MAJOR(blkdev_devno(self)),
+						       MINOR(blkdev_devno(self)));
 					}
 					decref(new_result);
 				}
@@ -335,22 +335,22 @@ load_normal_partition:
 					                    "%.2" PRIxN(__SIZEOF_MAJOR_T__) ":%.2" PRIxN(__SIZEOF_MINOR_T__) " collides with "
 					                    "%.2" PRIxN(__SIZEOF_MAJOR_T__) ":%.2" PRIxN(__SIZEOF_MINOR_T__) " on "
 					                    "%.2" PRIxN(__SIZEOF_MAJOR_T__) ":%.2" PRIxN(__SIZEOF_MINOR_T__) "\n",
-					       MAJOR(block_device_devno(new_result)),
-					       MINOR(block_device_devno(new_result)),
-					       MAJOR(block_device_devno(result)),
-					       MINOR(block_device_devno(result)),
-					       MAJOR(block_device_devno(self)),
-					       MINOR(block_device_devno(self)));
+					       MAJOR(blkdev_devno(new_result)),
+					       MINOR(blkdev_devno(new_result)),
+					       MAJOR(blkdev_devno(result)),
+					       MINOR(blkdev_devno(result)),
+					       MAJOR(blkdev_devno(self)),
+					       MINOR(blkdev_devno(self)));
 					decref(result);
 					result = (REF struct block_device_partition *)-1;
 				} else {
 					printk(KERN_WARNING "[blk] Three or more active partition "
 					                    "%.2" PRIxN(__SIZEOF_MAJOR_T__) ":%.2" PRIxN(__SIZEOF_MINOR_T__) " on "
 					                    "%.2" PRIxN(__SIZEOF_MAJOR_T__) ":%.2" PRIxN(__SIZEOF_MINOR_T__) "\n",
-					       MAJOR(block_device_devno(new_result)),
-					       MINOR(block_device_devno(new_result)),
-					       MAJOR(block_device_devno(self)),
-					       MINOR(block_device_devno(self)));
+					       MAJOR(blkdev_devno(new_result)),
+					       MINOR(blkdev_devno(new_result)),
+					       MAJOR(blkdev_devno(self)),
+					       MINOR(blkdev_devno(self)));
 				}
 				decref(new_result);
 			} else {

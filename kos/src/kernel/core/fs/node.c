@@ -731,7 +731,7 @@ inode_stat(struct inode *__restrict self,
 	struct blkdev *dev;
 	inode_loadattr(self);
 	dev                = self->i_super->s_device;
-	result->st_dev     = (__dev_t)(dev ? block_device_devno(dev) : 0);
+	result->st_dev     = (__dev_t)(dev ? blkdev_devno(dev) : 0);
 	result->st_ino     = (__FS_TYPE(ino))self->i_fileino;
 	result->st_mode    = (__mode_t)self->i_filemode;
 	result->st_nlink   = (__nlink_t)self->i_filenlink;

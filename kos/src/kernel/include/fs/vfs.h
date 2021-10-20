@@ -25,6 +25,23 @@
 #ifdef CONFIG_USE_NEW_FS
 #include <kernel/fs/path.h>
 #include <kernel/fs/vfs.h>
+
+/* struct vfs */
+#define v_drives_lock vf_driveslock
+#define v_drives      vf_drives
+
+/* struct fs */
+#define f_refcnt   fs_refcnt
+#define f_vfs      fs_vfs
+#define f_pathlock fs_pathlock
+#define f_root     fs_root
+#define f_cwd      fs_cwd
+#define f_dcwd     fs_dcwd
+#define f_umask    fs_umask
+#define f_lnkmax   fs_lnkmax
+#define f_mode     fs_mode
+
+
 #else /* CONFIG_USE_NEW_FS */
 #include <fs/node.h>
 #include <kernel/cache.h>

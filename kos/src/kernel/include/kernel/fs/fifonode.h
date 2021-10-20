@@ -256,11 +256,12 @@ NOTHROW(KCALL ffifonode_v_destroy)(struct mfile *__restrict self);
 
 
 struct fifo_user {
+	/* TODO: Rename this structure to `struct fifohandle' */
 	/* HANDLE:HANDLE_TYPE_FIFO_USER */
 	WEAK refcnt_t         fu_refcnt;  /* Reference counter */
 	REF struct ffifonode *fu_fifo;    /* [1..1][const] The associated fifo. */
 	REF struct path      *fu_path;    /* [0..1][const] The path from which `fr_fifo' was opened. */
-	REF struct fdirent   *fu_dent;    /* [0..1][const] The directory entry associated with `fr_fifo' that was used to open the fifo. */
+	REF struct fdirent   *fu_dirent;  /* [0..1][const] The directory entry associated with `fr_fifo' that was used to open the fifo. */
 	iomode_t              fu_accmode; /* [const] Original I/O mode with which this fifo user was opened (masked by IO_ACCMODE). */
 };
 
@@ -268,8 +269,8 @@ FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL fifo_user_destroy)(struct fifo_us
 DEFINE_REFCOUNT_FUNCTIONS(struct fifo_user, fu_refcnt, fifo_user_destroy)
 
 /* Create a reader/writer for the given fifo `self'
- * NOTE: If  applicable,  the caller  should fill  in `fu_path'
- *       and/or `fu_dent' directly after calling this function.
+ * NOTE: If  applicable,  the  caller  should  fill  in `fu_path'
+ *       and/or `fu_dirent' directly after calling this function.
  * @param: iomode: Set of `IO_ACCMODE | IO_NONBLOCK' (other bits are silently ignored)
  * @throw: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_OPEN_FIFO_WRITER_NO_READERS: [...] */
 FUNDEF ATTR_MALLOC ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct fifo_user *FCALL

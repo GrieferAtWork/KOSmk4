@@ -138,6 +138,7 @@ NOTHROW(KCALL device_v_destroy)(struct mfile *__restrict self);
  * NOTE: The caller must be holding a lock to `devfs_byname_lock'! */
 #define device_getname(self)    ((self)->dv_dirent->fdd_dirent.fd_name)
 #define device_getnamelen(self) ((self)->dv_dirent->fdd_dirent.fd_namelen)
+#define device_getdevno(self)   ((self)->_device_devnode_ dn_devno)
 
 
 #ifndef __realtime_defined

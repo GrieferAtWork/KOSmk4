@@ -43,9 +43,9 @@ struct fdirent;
 struct dirhandle {
 	/* [HANDLE_TYPE(HANDLE_TYPE_DIRHANDLE)] */
 	WEAK refcnt_t       dh_refcnt; /* File reference counter. */
+	uintptr_t           dh_dots;   /* [lock(ATOMIC)] 0: Neither was read; 1: "." was read; 2: ".." was read. */
 	REF struct path    *dh_path;   /* [0..1][const] The path from which `fh_dir' was opened (if any). */
 	REF struct fdirent *dh_dirent; /* [0..1][const] The directory entry associated with `fh_dir' (if any). */
-	uintptr_t           dh_dots;   /* [lock(ATOMIC)] 0: Neither was read; 1: "." was read; 2: ".." was read. */
 	/* NOTE: When seeking within the actual directory using SEEK_CUR or SEEK_END, it's not
 	 *       possible  to rewind back to where `dh_dots'  will be emitted once again. Only
 	 *       SEEK_SET (as used by `rewinddir(3)') can go back to that point.

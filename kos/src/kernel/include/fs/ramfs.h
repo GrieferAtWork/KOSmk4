@@ -24,6 +24,7 @@
 
 #ifdef CONFIG_USE_NEW_FS
 #include <kernel/fs/ramfs.h>
+#include <kernel/fs/devfs.h>
 #else /* CONFIG_USE_NEW_FS */
 #include <fs/node.h>
 #include <kernel/types.h>

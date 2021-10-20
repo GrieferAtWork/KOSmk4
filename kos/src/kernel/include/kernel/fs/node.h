@@ -365,9 +365,21 @@ fnode_chmod(struct fnode *__restrict self, mode_t perm_mask,
  * @throw: E_INVALID_ARGUMENT_BAD_VALUE:E_INVALID_ARGUMENT_CONTEXT_CHOWN_UNSUPP_GID:gid: [...] */
 FUNDEF NONNULL((1)) void KCALL
 fnode_chown(struct fnode *__restrict self, uid_t owner, gid_t group,
-            USER CHECKED uid_t *pold_owner, USER CHECKED gid_t *pold_group,
+            USER CHECKED uid_t *pold_owner DFL(__NULLPTR),
+            USER CHECKED gid_t *pold_group DFL(__NULLPTR),
             __BOOL check_permissions DFL(1))
 		THROWS(E_SEGFAULT, E_FSERROR_READONLY, E_INSUFFICIENT_RIGHTS, E_INVALID_ARGUMENT_BAD_VALUE);
+
+/* Change all non-NULL the timestamp that are given.
+ * @throw: E_FSERROR_DELETED:E_FILESYSTEM_DELETED_FILE: The `MFILE_F_DELETED' is set.
+ * @throw: E_FSERROR_READONLY: The `MFILE_FM_ATTRREADONLY' flag is set. */
+PUBLIC NONNULL((1)) void KCALL
+mfile_chtime(struct mfile *__restrict self,
+             struct timespec const *new_atime,
+             struct timespec const *new_mtime,
+             struct timespec const *new_ctime)
+		THROWS(E_FSERROR_READONLY);
+
 
 
 /* Clear the `MFILE_F_ATTRCHANGED' flag and  remove `self' from the  associated
@@ -417,8 +429,8 @@ fnode_access(struct fnode *__restrict self, unsigned int type)
 #define fnode_issock(self)    S_ISSOCK((self)->fn_mode)
 #define fnode_isdevnode(self) S_ISDEV((self)->fn_mode)
 #define fnode_isdevice(self)  (S_ISDEV((self)->fn_mode) && (self)->fn_super == _ramfs_super_assuper(&devfs) && (self)->_fnode_file_ mf_ops != &ramfs_devnode_ops.dno_node.no_file)
-#define fnode_ischrdev(self)  (S_ISBLK((self)->fn_mode) && (self)->fn_super == _ramfs_super_assuper(&devfs) && (self)->_fnode_file_ mf_ops != &ramfs_devnode_ops.dno_node.no_file)
-#define fnode_isblkdev(self)  (S_ISCHR((self)->fn_mode) && (self)->fn_super == _ramfs_super_assuper(&devfs) && (self)->_fnode_file_ mf_ops != &ramfs_devnode_ops.dno_node.no_file)
+#define fnode_ischrdev(self)  (S_ISCHR((self)->fn_mode) && (self)->fn_super == _ramfs_super_assuper(&devfs) && (self)->_fnode_file_ mf_ops != &ramfs_devnode_ops.dno_node.no_file)
+#define fnode_isblkdev(self)  (S_ISBLK((self)->fn_mode) && (self)->fn_super == _ramfs_super_assuper(&devfs) && (self)->_fnode_file_ mf_ops != &ramfs_devnode_ops.dno_node.no_file)
 #define fnode_isblkroot(self) mfile_isblkroot(_fnode_asfile(self))
 #define fnode_isblkpart(self) mfile_isblkpart(_fnode_asfile(self))
 #define fnode_asreg(self)     ((struct fregnode *)(self))

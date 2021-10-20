@@ -26,6 +26,7 @@
 
 #include <kernel/fs/dirent.h>
 #include <kernel/fs/dirnode.h>
+#include <kernel/fs/filehandle.h>
 #include <kernel/fs/lnknode.h>
 #include <kernel/fs/node.h>
 #include <kernel/fs/path.h>
@@ -34,16 +35,20 @@
 #include <kernel/fs/vfs.h>
 #include <kernel/handle.h>
 #include <kernel/malloc.h>
+#include <kernel/personality.h>
+#include <sched/cred.h>
+#include <sched/tsc.h>
 
 #include <hybrid/atomic.h>
 
 #include <kos/except.h>
 #include <kos/except/reason/fs.h>
+#include <kos/except/reason/inval.h>
 #include <kos/lockop.h>
 
-#include <alloca.h>
 #include <assert.h>
 #include <ctype.h>
+#include <malloca.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <string.h>
@@ -690,31 +695,39 @@ PRIVATE ATTR_NOINLINE WUNUSED NONNULL((1, 2, 3, 4)) REF struct path *KCALL
 path_readlink_and_walk(struct path *__restrict self,
                        u32 *__restrict premaining_symlinks,
                        struct flnknode *__restrict lnk,
-                       size_t *__restrict pbufsize)
+                       size_t *__restrict pbufsize, atflag_t atflags)
 		THROWS(E_IOERROR, E_BADALLOC, ...) {
+	REF struct path *result;
 	size_t reqsize, bufsize;
 	char *buf;
 	bufsize = *pbufsize;
-	buf     = (char *)alloca(bufsize);
-	reqsize = flnknode_readlink(lnk, buf, bufsize);
-	if (reqsize >= bufsize) {
-		/* Need more space */
-		*pbufsize = reqsize + 1;
-		return NULL;
+	buf     = (char *)malloca(bufsize);
+	TRY {
+		reqsize = flnknode_readlink(lnk, buf, bufsize);
+		if (reqsize >= bufsize) {
+			/* Need more space */
+			*pbufsize = reqsize + 1;
+			return NULL;
+		}
+
+		/* NUL-terminate buffer. */
+		buf[reqsize] = '\0';
+
+		/* Do the walk */
+		result = path_traverse_ex(self, premaining_symlinks, buf, NULL, NULL, atflags);
+	} EXCEPT {
+		freea(buf);
+		RETHROW();
 	}
-
-	/* NUL-terminate buffer. */
-	buf[reqsize] = '\0';
-
-	/* Do the walk */
-	return path_traverse_ex(self, premaining_symlinks, buf, NULL, NULL, 0);
+	freea(buf);
+	return result;
 }
 
 /* Walk a given symlink */
 PRIVATE ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3)) REF struct path *KCALL
 path_walklink(struct path *__restrict self,
               u32 *__restrict premaining_symlinks,
-              struct flnknode *__restrict lnk)
+              struct flnknode *__restrict lnk, atflag_t atflags)
 		THROWS(E_IOERROR, E_BADALLOC, ...) {
 	REF struct path *result;
 	size_t bufsize;
@@ -724,14 +737,14 @@ path_walklink(struct path *__restrict self,
 	/* Direct link text access */
 	if (ops->lno_linkstr != NULL) {
 		char const *str = (*ops->lno_linkstr)(lnk);
-		return path_traverse_ex(self, premaining_symlinks, str, NULL, NULL, 0);
+		return path_traverse_ex(self, premaining_symlinks, str, NULL, NULL, atflags);
 	}
 
 	/* Fallback: must read link contents into temporary buffer. */
 	bufsize = 256;
 	do {
 		result = path_readlink_and_walk(self, premaining_symlinks,
-		                                lnk, &bufsize);
+		                                lnk, &bufsize, atflags);
 	} while (!result);
 	return result;
 }
@@ -829,7 +842,8 @@ again_lookup_dent:
 
 		/* Walk a symbolic link. */
 		return path_walklink(self, premaining_symlinks,
-		                     fnode_aslnk(node));
+		                     fnode_aslnk(node),
+		                     atflags & AT_NO_AUTOMOUNT);
 	}
 
 	/* Got something other than a directory... */
@@ -846,25 +860,34 @@ path_readlink_and_walknode(struct path *__restrict self,
                            struct flnknode *__restrict lnk,
                            size_t *__restrict pbufsize,
                            /*out[1..1]_opt*/ REF struct path **presult_path,
-                           /*out[1..1]_opt*/ REF struct fdirent **presult_dirent)
+                           /*out[1..1]_opt*/ REF struct fdirent **presult_dirent,
+                           atflag_t atflags)
 		THROWS(E_IOERROR, E_BADALLOC, ...) {
+	REF struct fnode *result;
 	size_t reqsize, bufsize;
 	char *buf;
 	bufsize = *pbufsize;
-	buf     = (char *)alloca(bufsize);
-	reqsize = flnknode_readlink(lnk, buf, bufsize);
-	if (reqsize >= bufsize) {
-		/* Need more space */
-		*pbufsize = reqsize + 1;
-		return NULL;
+	buf     = (char *)malloca(bufsize);
+	TRY {
+		reqsize = flnknode_readlink(lnk, buf, bufsize);
+		if (reqsize >= bufsize) {
+			/* Need more space */
+			*pbufsize = reqsize + 1;
+			return NULL;
+		}
+
+		/* NUL-terminate buffer. */
+		buf[reqsize] = '\0';
+
+		/* Do the walk */
+		result = path_traversefull_ex(self, premaining_symlinks, buf,
+		                              atflags, presult_path, presult_dirent);
+	} EXCEPT {
+		freea(buf);
+		RETHROW();
 	}
-
-	/* NUL-terminate buffer. */
-	buf[reqsize] = '\0';
-
-	/* Do the walk */
-	return path_traversefull_ex(self, premaining_symlinks, buf,
-	                            0, presult_path, presult_dirent);
+	freea(buf);
+	return result;
 }
 
 /* Walk a given symlink */
@@ -873,7 +896,8 @@ path_walklinknode(struct path *__restrict self,
                   u32 *__restrict premaining_symlinks,
                   struct flnknode *__restrict lnk,
                   /*out[1..1]_opt*/ REF struct path **presult_path,
-                  /*out[1..1]_opt*/ REF struct fdirent **presult_dirent)
+                  /*out[1..1]_opt*/ REF struct fdirent **presult_dirent,
+                  atflag_t atflags)
 		THROWS(E_IOERROR, E_BADALLOC, ...) {
 	REF struct fnode *result;
 	size_t bufsize;
@@ -884,14 +908,14 @@ path_walklinknode(struct path *__restrict self,
 	if (ops->lno_linkstr != NULL) {
 		char const *str = (*ops->lno_linkstr)(lnk);
 		return path_traversefull_ex(self, premaining_symlinks, str,
-		                            0, presult_path, presult_dirent);
+		                            atflags, presult_path, presult_dirent);
 	}
 
 	/* Fallback: must read link contents into temporary buffer. */
 	bufsize = 256;
 	do {
 		result = path_readlink_and_walknode(self, premaining_symlinks, lnk, &bufsize,
-		                                    presult_path, presult_dirent);
+		                                    presult_path, presult_dirent, atflags);
 	} while (!result);
 	return result;
 }
@@ -994,7 +1018,8 @@ again_lookup_dent:
 		--*premaining_symlinks;
 
 		return path_walklinknode(self, premaining_symlinks, lnk,
-		                         presult_path, presult_dirent);
+		                         presult_path, presult_dirent,
+		                         atflags & AT_NO_AUTOMOUNT);
 	}
 
 	/* Default case: return the pointed-to node. */
@@ -1473,6 +1498,328 @@ path_traversefull(fd_t fd_cwd, USER CHECKED /*utf-8*/ char const *upath, atflag_
 	FINALLY_DECREF_UNLIKELY(used_cwd);
 	return path_traversefull_ex(used_cwd, &remaining_symlinks, upath, atflags, presult_path, presult_dirent);
 }
+
+
+
+
+
+
+
+
+
+/************************************************************************/
+/* open(2)                                                              */
+/************************************************************************/
+
+PRIVATE NONNULL((1, 2, 3, 4, 5)) unsigned int KCALL
+create_symlink_target_with_text(struct path *__restrict symlink_path,
+                                u32 *__restrict premaining_symlinks,
+                                char const *__restrict text,
+                                struct fmkfile_info *__restrict creat_info,
+                                REF struct path **__restrict presult_path,
+                                atflag_t atflags) {
+	unsigned int status;
+	REF struct path *result_path;
+	result_path = path_traverse_ex(symlink_path, premaining_symlinks, text,
+	                               &creat_info->mkf_name,
+	                               &creat_info->mkf_namelen, atflags);
+	/* (Try to) create the pointed-to file. */
+	TRY {
+		status = fdirnode_mkfile(result_path->p_dir, creat_info);
+	} EXCEPT {
+		decref_unlikely(result_path);
+		RETHROW();
+	}
+	*presult_path = result_path; /* Inherit reference. */
+	return status;
+}
+
+
+#define CREATE_SYMLINK_TARGET_WITH_BUFSIZ_MORE ((unsigned int)-1)
+PRIVATE ATTR_NOINLINE NONNULL((1, 2, 3, 4, 5, 6)) unsigned int KCALL
+create_symlink_target_with_bufsiz(struct path *__restrict symlink_path,
+                                  u32 *__restrict premaining_symlinks,
+                                  struct flnknode *__restrict lnk,
+                                  struct fmkfile_info *__restrict creat_info,
+                                  REF struct path **__restrict presult_path,
+                                  size_t *__restrict pbufsize, atflag_t atflags) {
+	unsigned int result;
+	size_t reqsize, bufsize;
+	char *buf;
+	bufsize = *pbufsize;
+	buf     = (char *)malloca(bufsize);
+	TRY {
+		reqsize = flnknode_readlink(lnk, buf, bufsize);
+		if (reqsize >= bufsize) {
+			/* Need more space */
+			*pbufsize = reqsize + 1;
+			return CREATE_SYMLINK_TARGET_WITH_BUFSIZ_MORE;
+		}
+
+		/* NUL-terminate buffer. */
+		buf[reqsize] = '\0';
+
+		/* Do the walk */
+		result = create_symlink_target_with_text(symlink_path, premaining_symlinks,
+		                                         buf, creat_info, presult_path, atflags);
+	} EXCEPT {
+		freea(buf);
+		RETHROW();
+	}
+	freea(buf);
+	return result;
+}
+
+
+/* Must write references to `creat_info->mkf_dent' and `creat_info->mkf_rnode' */
+PRIVATE NONNULL((1, 2, 3, 4, 5)) unsigned int KCALL
+create_symlink_target(struct path *__restrict symlink_path,
+                      u32 *__restrict premaining_symlinks,
+                      struct flnknode *__restrict lnk,
+                      struct fmkfile_info *__restrict creat_info,
+                      REF struct path **__restrict presult_path,
+                      atflag_t atflags) {
+	unsigned int result;
+	size_t bufsize;
+	struct flnknode_ops const *ops;
+	ops = flnknode_getops(lnk);
+	if (!*premaining_symlinks)
+		THROW(E_FSERROR_TOO_MANY_SYMBOLIC_LINKS);
+	--*premaining_symlinks;
+
+	/* Direct link text access */
+	if (ops->lno_linkstr != NULL) {
+		char const *str = (*ops->lno_linkstr)(lnk);
+		return create_symlink_target_with_text(symlink_path, premaining_symlinks,
+		                                       str, creat_info, presult_path, atflags);
+	}
+
+	/* Fallback: must read link contents into temporary buffer. */
+	bufsize = 256;
+	do {
+		result = create_symlink_target_with_bufsiz(symlink_path, premaining_symlinks,
+		                                           lnk, creat_info, presult_path,
+		                                           &bufsize, atflags);
+	} while (result == CREATE_SYMLINK_TARGET_WITH_BUFSIZ_MORE);
+	return result;
+}
+
+
+
+/* Open (or create) a file, the same way user-space open(2) works. */
+PUBLIC WUNUSED NONNULL((2)) REF struct handle KCALL
+path_open_ex(struct path *cwd, u32 *__restrict premaining_symlinks,
+             USER CHECKED char const *filename,
+             oflag_t oflags, mode_t mode) {
+	atflag_t atflags;
+	REF struct handle result;
+	if (oflags & O_CREAT) {
+		if (has_personality(KP_OPEN_CREAT_CHECK_MODE)) {
+			if unlikely(mode & ~07777) {
+				THROW(E_INVALID_ARGUMENT_UNKNOWN_FLAG,
+				      E_INVALID_ARGUMENT_CONTEXT_OPEN_MODE,
+				      mode, ~07777 /*, 0*/);
+			}
+		}
+		/* Unconditionally mask mode flags. */
+		mode &= 07777;
+	}
+#ifdef __O_ACCMODE_INVALID
+	if ((oflags & O_ACCMODE) == __O_ACCMODE_INVALID) {
+		THROW(E_INVALID_ARGUMENT_BAD_FLAG_COMBINATION,
+		      E_INVALID_ARGUMENT_CONTEXT_OPEN_OFLAG,
+		      oflags, O_ACCMODE, __O_ACCMODE_INVALID);
+	}
+#endif /* __O_ACCMODE_INVALID */
+	atflags = 0;
+	if (oflags & O_NOFOLLOW)
+		atflags |= AT_SYMLINK_NOFOLLOW;
+	if (oflags & O_DOSPATH)
+		atflags |= AT_DOSPATH;
+	atflags = fs_atflags(atflags);
+
+	if (oflags & O_PATH) {
+		/* Only need to lookup the resulting path object. */
+		if (oflags & ~(O_ACCMODE | O_APPEND | O_NONBLOCK | O_SYNC |
+		               O_DSYNC | O_ASYNC | O_DIRECT | O_LARGEFILE |
+		               O_DIRECTORY | O_NOFOLLOW | O_NOATIME | O_CLOEXEC |
+		               O_CLOFORK | O_PATH | O_DOSPATH)) {
+			THROW(E_INVALID_ARGUMENT_UNKNOWN_FLAG,
+			      E_INVALID_ARGUMENT_CONTEXT_OPEN_OFLAG,
+			      oflags,
+			      ~(O_ACCMODE | O_APPEND | O_NONBLOCK | O_SYNC |
+			        O_DSYNC | O_ASYNC | O_DIRECT | O_LARGEFILE |
+			        O_DIRECTORY | O_NOFOLLOW | O_NOATIME | O_CLOEXEC |
+			        O_CLOFORK | O_PATH | O_DOSPATH),
+			      O_PATH | (oflags & O_DIRECTORY));
+		}
+		result.h_type = HANDLE_TYPE_PATH;
+		result.h_data = path_traverse_ex(cwd, premaining_symlinks,
+		                                 filename, NULL, NULL, atflags);
+
+		/* Set access mode. */
+		result.h_mode = IO_FROM_OPENFLAG(oflags);
+	} else if (oflags & O_CREAT) {
+		REF struct filehandle *rhand;
+		REF struct mfile *file;
+		REF struct path *access_path;
+		REF struct fdirent *access_dent;
+		struct fmkfile_info info;
+		VALIDATE_FLAGSET(oflags,
+		                 O_ACCMODE | O_CREAT | O_EXCL | O_NOCTTY | O_TRUNC | O_APPEND |
+		                 O_NONBLOCK | O_SYNC | O_DSYNC | O_ASYNC | O_DIRECT | O_LARGEFILE |
+		                 O_NOFOLLOW | O_NOATIME | O_CLOEXEC | O_CLOFORK | O_PATH |
+		                 O_TMPFILE | O_DOSPATH,
+		                 E_INVALID_ARGUMENT_CONTEXT_OPEN_OFLAG);
+		access_path = path_traverse_ex(cwd, premaining_symlinks, filename,
+		                               &info.mkf_name, &info.mkf_namelen, atflags);
+		TRY {
+			fnode_access(access_path->p_dir, W_OK);
+			info.mkf_hash          = FLOOKUP_INFO_HASH_UNSET;
+			info.mkf_flags         = atflags;
+			info.mkf_fmode         = S_IFREG | mode;
+			info.mkf_creat.c_owner = cred_getfsuid();
+			info.mkf_creat.c_group = cred_getfsgid();
+			info.mkf_creat.c_atime = realtime();
+			info.mkf_creat.c_mtime = info.mkf_creat.c_atime;
+			info.mkf_creat.c_ctime = info.mkf_creat.c_atime;
+
+			/* Allocate the resulting file handle _before_ creating the file,
+			 * so  no file is created in the  event that the handle cannot be
+			 * allocated. (FIXME: this still leaves the case where we're  not
+			 * able to register the FD...) */
+			rhand = (REF struct filehandle *)kmalloc(sizeof(struct filehandle), GFP_NORMAL);
+			TRY {
+				unsigned int status;
+				status = fdirnode_mkfile(access_path->p_dir, &info);
+				if (status != FDIRNODE_MKFILE_SUCCESS) {
+					assert(status == FDIRNODE_MKFILE_EXISTS);
+					/* Check for special case: `info.mkf_rnode' is a symlink */
+					if (fnode_islnk(info.mkf_rnode) && !(atflags & AT_SYMLINK_NOFOLLOW)) {
+						/* Dereference and create pointed-to filename. */
+						REF struct path *new_access_path;
+						REF struct flnknode *lnknode;
+again_deref_lnknode:
+						lnknode = fnode_aslnk(info.mkf_rnode); /* Inherit reference */
+						decref_unlikely(info.mkf_dent);
+						FINALLY_DECREF_UNLIKELY(lnknode);
+						DBG_memset(&info.mkf_rnode, 0xcc, sizeof(info.mkf_rnode));
+						/* Create the pointed-to file. */
+						status = create_symlink_target(access_path, premaining_symlinks, lnknode, &info,
+						                               &new_access_path, atflags & AT_NO_AUTOMOUNT);
+						decref_unlikely(access_path);
+						access_path = new_access_path;
+						/* Keep on dereferencing paths until we get a LOOP error, or hit a non-symlink node. */
+						if (status == FDIRNODE_MKFILE_EXISTS && fnode_islnk(info.mkf_rnode))
+							goto again_deref_lnknode;
+					}
+					if (status != FDIRNODE_MKFILE_SUCCESS) {
+						assert(status == FDIRNODE_MKFILE_EXISTS);
+						TRY {
+							if (oflags & O_EXCL)
+								THROW(E_FSERROR_FILE_ALREADY_EXISTS); /* open-exclusive */
+							/* Clear a regular file if O_TRUNC was given. */
+							if ((oflags & O_TRUNC) && (oflags & O_ACCMODE) != O_RDONLY &&
+							    fnode_isreg(info.mkf_rnode))
+								mfile_utruncate(info.mkf_rnode, 0);
+						} EXCEPT {
+							decref_unlikely(info.mkf_dent);
+							decref_unlikely(info.mkf_rnode);
+							RETHROW();
+						}
+					}
+				}
+			} EXCEPT {
+				kfree(rhand);
+				RETHROW();
+			}
+		} EXCEPT {
+			decref_unlikely(access_path);
+			RETHROW();
+		}
+
+		/* Fill in the new access handle. */
+		rhand->fh_refcnt = 1;
+		rhand->fh_file   = info.mkf_rnode; /* Inherit reference */
+		rhand->fh_path   = access_path;    /* Inherit reference */
+		rhand->fh_dirent = info.mkf_dent;  /* Inherit reference */
+		atomic64_init(&rhand->fh_offset, 0);
+
+		/* Initialize result handle. */
+		result.h_mode = IO_FROM_OPENFLAG(oflags);
+		result.h_data = rhand; /* Inherit reference. */
+		result.h_type = HANDLE_TYPE_FILEHANDLE;
+	} else {
+		REF struct fnode *file;
+		REF struct path *access_path;
+		REF struct fdirent *access_dent;
+		if (oflags & O_DIRECTORY) {
+			if (oflags & ~(O_ACCMODE | O_NOCTTY | O_TRUNC | O_APPEND | O_NONBLOCK |
+			               O_SYNC | O_DSYNC | O_ASYNC | O_DIRECT | O_LARGEFILE |
+			               O_DIRECTORY | O_NOFOLLOW | O_NOATIME | O_CLOEXEC |
+			               O_CLOFORK | O_PATH | O_TMPFILE | O_DOSPATH)) {
+				THROW(E_INVALID_ARGUMENT_UNKNOWN_FLAG,
+				      E_INVALID_ARGUMENT_CONTEXT_OPEN_OFLAG,
+				      oflags,
+				      ~(O_ACCMODE | O_APPEND | O_NONBLOCK | O_SYNC | O_DSYNC |
+				        O_ASYNC | O_DIRECT | O_LARGEFILE | O_DIRECTORY | O_NOFOLLOW |
+				        O_NOATIME | O_CLOEXEC | O_CLOFORK | O_PATH | O_DOSPATH),
+				      O_DIRECTORY);
+			}
+		} else {
+			VALIDATE_FLAGSET(oflags,
+			                 O_ACCMODE | O_CREAT | O_EXCL | O_NOCTTY | O_TRUNC | O_APPEND |
+			                 O_NONBLOCK | O_SYNC | O_DSYNC | O_ASYNC | O_DIRECT | O_LARGEFILE |
+			                 O_DIRECTORY | O_NOFOLLOW | O_NOATIME | O_CLOEXEC | O_CLOFORK |
+			                 O_PATH | O_TMPFILE | O_DOSPATH,
+			                 E_INVALID_ARGUMENT_CONTEXT_OPEN_OFLAG);
+		}
+
+		/* Open the named node */
+		file = path_traversefull_ex(cwd, premaining_symlinks, filename,
+		                            atflags, &access_path, &access_dent);
+		FINALLY_DECREF_UNLIKELY(file);
+		FINALLY_DECREF_UNLIKELY(access_path);
+		FINALLY_DECREF_UNLIKELY(access_dent);
+
+		/* Deal with `O_DIRECTORY' */
+		if ((oflags & O_DIRECTORY) && !fnode_isdir(file))
+			THROW(E_FSERROR_NOT_A_DIRECTORY, E_FILESYSTEM_NOT_A_DIRECTORY_OPEN);
+
+		/* Initialize result handle. */
+		result.h_mode = IO_FROM_OPENFLAG(oflags);
+		result.h_type = HANDLE_TYPE_MFILE;
+		result.h_data = incref(file);
+
+		/* Invoke custom open operators (and create a `filehandle' if necessary). */
+		TRY {
+			mfile_open(file, &result, access_path, access_dent);
+
+			/* Clear a regular file if O_TRUNC was given. */
+			if ((oflags & O_TRUNC) && (oflags & O_ACCMODE) != O_RDONLY && fnode_isreg(file))
+				mfile_utruncate(file, 0);
+		} EXCEPT {
+			decref(result);
+			RETHROW();
+		}
+	}
+
+	return result;
+}
+
+
+PUBLIC WUNUSED REF struct handle KCALL
+path_open(fd_t fd_cwd, USER CHECKED char const *filename,
+          oflag_t oflags, mode_t mode) {
+	REF struct path *used_cwd;
+	u32 remaining_symlinks = ATOMIC_READ(THIS_FS->fs_lnkmax);
+	if likely(fd_cwd == AT_FDCWD)
+		return path_open_ex(NULL, &remaining_symlinks, filename, oflags, mode);
+	used_cwd = handle_get_path(fd_cwd);
+	FINALLY_DECREF_UNLIKELY(used_cwd);
+	return path_open_ex(used_cwd, &remaining_symlinks, filename, oflags, mode);
+}
+
 
 
 DECL_END

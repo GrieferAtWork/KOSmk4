@@ -104,7 +104,7 @@ load_driver_from_file_handles(unsigned int fd_node,
 			if (!driver_dentry)
 				driver_dentry = (REF struct fdirent *)handle_tryas_noinherit(nodehand, HANDLE_TYPE_FDIRENT);
 			/* Lookup the actual INode from which to load the driver. */
-			driver_node = handle_as_regular_node(nodehand);
+			driver_node = handle_as_regnode(nodehand);
 		} EXCEPT {
 			if (was_thrown(E_INVALID_HANDLE_FILETYPE)) {
 				if (!PERTASK_TEST(this_exception_args.e_invalid_handle.ih_fd))
@@ -316,7 +316,7 @@ DEFINE_SYSCALL2(syscall_slong_t, ksysctl,
 
 		case KSYSCTL_DRIVER_FORMAT_FILE: {
 			REF struct regular_node *node;
-			node = handle_get_regular_node((unsigned int)ATOMIC_READ(data->dm_file));
+			node = handle_get_regnode((unsigned int)ATOMIC_READ(data->dm_file));
 			FINALLY_DECREF_UNLIKELY(node);
 			require(CAP_SYS_MODULE);
 			error = driver_delmod(node, delmod_flags);
@@ -364,7 +364,7 @@ DEFINE_SYSCALL2(syscall_slong_t, ksysctl,
 			unsigned int fileno;
 			fileno = (unsigned int)ATOMIC_READ(data->gm_file);
 			COMPILER_READ_BARRIER();
-			node = handle_get_regular_node(fileno);
+			node = handle_get_regnode(fileno);
 			FINALLY_DECREF_UNLIKELY(node);
 			require(CAP_DRIVER_QUERY);
 			drv = driver_fromfile(node);
