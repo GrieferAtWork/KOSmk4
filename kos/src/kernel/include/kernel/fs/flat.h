@@ -42,16 +42,23 @@
 #include <kernel/types.h>
 #include <sched/shared_rwlock.h>
 
-#include <hybrid/sequence/rbtree.h>
-
 #ifdef __CC__
 DECL_BEGIN
 
+/************************************************************************/
+/* TODO: REMOVE_ME                                                      */
+/* REMINDER: Before using this API for implementing FAT, finish its     */
+/*           implementation. Otherwise, you'll likely end up doing      */
+/*           everything twice in case some aspects of the API still     */
+/*           need to be changed.                                        */
+/************************************************************************/
 
+
+struct fflatdirnode;
 struct fflatdirent;
+
 TAILQ_HEAD(fflatdirent_tailq, fflatdirent);
 struct fflatdirent {
-	RBTREE_NODE(fflatdirent)     fde_node;  /* [0..1][lock(:fdn_data.fdd_lock)] Node in associated directory's tree. */
 	pos_t                        fde_pos;   /* [const] Starting position in directory file-stream. */
 	size_t                       fde_size;  /* [const] Total size (in bytes) of entry in directory file-stream. */
 	TAILQ_ENTRY(REF fflatdirent) fde_bypos; /* [0..1][lock(:fdn_data.fdd_lock)] By-`fde_pos'-sorted list of dir entries.
@@ -59,6 +66,11 @@ struct fflatdirent {
 	                                         * this directory entry may be considered as having been deleted. */
 	struct fdirent               fde_ent;   /* Underlying directory entry. */
 };
+
+#define fflatdirent_destroy(self) fdirent_destroy(&(self)->fde_ent)
+DEFINE_REFCOUNT_FUNCTIONS(struct fflatdirent, fde_ent.fd_refcnt, fflatdirent_destroy)
+
+#define fdirent_asflat(self)      COMPILER_CONTAINER_OF(self, struct fflatdirent, fde_ent)
 #define fflatdirent_endaddr(self) ((self)->fde_pos + (self)->fde_size)
 
 /* Check if `self' was deleted. */
@@ -77,14 +89,15 @@ fflatdirent_v_opennode(struct fdirent *__restrict self,
 
 
 
-struct fflatdirnode;
 struct fflatdirnode_xops {
 	/* [1..1][lock(READ(self->fdn_data.fdd_lock))]
-	 * Read & return an entry from  the directory stream of `self',  with
-	 * backing  stream data loaded  from-disk via `mfile_read(self)'. The
-	 * caller is responsible  to guaranty that  `pos' either equals  `0',
-	 * or the `fde_pos+fde_size' of some other directory entry previously
-	 * returned by this function.
+	 * - Read & return an entry from the directory stream of `self', with
+	 *   backing  stream  data loaded  from-disk  via `mfile_read(self)'.
+	 * - The caller is responsible to guaranty that `pos' either equals `0',
+	 *   or the `fde_pos+fde_size' of some other directory entry  previously
+	 *   returned by this function.
+	 * - This operator will not be called if `MFILE_F_DELETED' was found to be  set
+	 *   at some point after the read-lock to self->fdn_data.fdd_lock was acquired.
 	 * This function must initialize:
 	 *  - return->fde_ent.fd_ops     = ...;     # likely set to `fflatdirent_ops'
 	 *  - return->fde_ent.fd_ino     = ...;     # FS-specific (important for `fflatsuper_ops::ffso_makenode')
@@ -94,11 +107,11 @@ struct fflatdirnode_xops {
 	 *  - return->fde_pos            = ...;     # Some value >= pos
 	 *  - return->fde_size           = ...;     # Some value > 0
 	 * The caller of this function will initialize:
-	 *  - return->fde_node          = ...;      # Caller will insert  into name-tree (case-sensitive,  duplicate
-	 *                                          # names are automatically corrected by deleting duplicate files)
 	 *  - return->fde_bypos         = ...;      # Caller will insert into by-position list
 	 *  - return->fde_ent.fd_refcnt = 1;
 	 *  - return->fde_ent.fd_hash   = fdirent_hash(return->fde_ent.fd_name, return->fde_ent.fd_namelen);
+	 *  - ...;                                  # Caller will insert into hash-vector (case-sensitive; duplicate
+	 *                                          # names are automatically corrected by deleting duplicate files)
 	 * @return: * :   Newly allocated, partially initialized dirent. (see above)
 	 * @return: NULL: No more entries exist past `pos'; end-of-directory */
 	WUNUSED struct fflatdirent *
@@ -106,9 +119,11 @@ struct fflatdirnode_xops {
 			THROWS(E_BADALLOC, E_IOERROR);
 
 	/* [1..1][lock(WRITE(self->fdn_data.fdd_lock))]
-	 * Write a directory entry `ent' pointing to `file' into the stream of  `self'.
-	 * The caller of this function must check for `MFILE_F_READONLY' and not invoke
-	 * it if that flag was set at the time of the check.
+	 * - Write a directory entry `ent' pointing to `file' into the stream of  `self'.
+	 * - The caller of this function must check for `MFILE_F_READONLY' and not invoke
+	 *   it if that flag was set at the time of the check.
+	 * - This  operator will not be called if  `MFILE_F_DELETED' was found to be set
+	 *   at some point after the write-lock to self->fdn_data.fdd_lock was acquired.
 	 *
 	 * Implementation:
 	 * >> pos_t entpos;
@@ -158,7 +173,9 @@ struct fflatdirnode_xops {
 	 * - If appropriate, the _CALLER_ will decrement `file->fn_nlink'! If in
 	 *   this case `fn_nlink' drops to `0', `fdnx_deletefil' will be called.
 	 * - The caller of this function must check for `MFILE_F_READONLY' and
-	 *   not invoke it  if that flag  was set  at the time  of the  check. */
+	 *   not invoke it  if that flag  was set  at the time  of the  check.
+	 * - This  operator will not be called if  `MFILE_F_DELETED' was found to be set
+	 *   at some point after the write-lock to self->fdn_data.fdd_lock was acquired. */
 	NONNULL((1, 2, 3)) void
 	(KCALL *fdnx_deleteent)(struct fflatdirnode *__restrict self,
 	                        struct fflatdirent const *__restrict ent,
@@ -166,10 +183,12 @@ struct fflatdirnode_xops {
 			THROWS(E_IOERROR);
 
 	/* [1..1][lock(WRITE(self->fdn_data.fdd_lock))]
-	 * Create  a new file & directory entry (but _DONT_ try to add the entry to `self')
-	 * This function is only supposed to allocate a new file-node as will be needed for
-	 * representing the file specified by `info'  in memory. NOTE: This function  isn't
-	 * called when `info->mkf_fmode == 0' (iow: for the hardlink case)
+	 * - Create  a new file & directory entry (but _DONT_ try to add the entry to `self')
+	 * - This function is only supposed to allocate a new file-node as will be needed for
+	 *   representing the file specified by `info'  in memory. NOTE: This function  isn't
+	 *   called when `info->mkf_fmode == 0' (iow: for the hardlink case)
+	 * - This  operator will not be called if  `MFILE_F_DELETED' was found to be set
+	 *   at some point after the write-lock to self->fdn_data.fdd_lock was acquired.
 	 *
 	 * This function must allocate+initialize the returned file:
 	 *  - return->_fnode_file_ mf_ops        = ...;                # As appropriate
@@ -223,13 +242,13 @@ struct fflatdirnode_xops {
 	 *  - return->fde_pos            = ...;  # Initialized by/with help of `fdnx_writedir()'
 	 *  - return->fde_size           = ...;  # Initialized by/with help of `fdnx_writedir()'
 	 *  - return->fde_bypos          = ...;  # Initialized after successful `fdnx_writedir()'
-	 *  - return->fde_node           = ...;  # Initialized after successful `fdnx_writedir()'
 	 *  - return->fde_ent.fd_refcnt  = 1;
 	 *  - return->fde_ent.fd_ino     = file->fn_ino;
 	 *  - return->fde_ent.fd_namelen = info->mkf_namelen;
 	 *  - return->fde_ent.fd_type    = IFTODT(file->fn_mode);
 	 *  - *(char *)mempcpy(return->fde_ent.fd_name, info->mkf_name, info->mkf_namelen, sizeof(char)) = '\0';
 	 *  - return->fde_ent.fd_hash    = info->mkf_hash;     # or `fdirent_hash(return->fde_ent.fd_name, return->fde_ent.fd_namelen)'
+	 *  - ...;                               # Caller will insert into hash-vector after successful `fdnx_writedir()'
 	 * @return: * : The newly allocated (and partially initialized) directory entry. */
 	ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) struct fflatdirent *
 	(KCALL *fdnx_mkent)(struct fflatdirnode *__restrict self,
@@ -293,10 +312,19 @@ struct fflatdirnode_ops {
 };
 
 /* Default operators for `struct fflatdirnode'-derived directories. */
+FUNDEF NOBLOCK NONNULL((1)) void
+NOTHROW(KCALL fflatdirnode_v_destroy)(struct mfile *__restrict self);
 FUNDEF WUNUSED NONNULL((1, 2)) REF struct fdirent *KCALL
 fflatdirnode_v_lookup(struct fdirnode *__restrict self,
                       struct flookup_info *__restrict info)
 		THROWS(E_BADALLOC, E_IOERROR);
+/* NOTE: `fflatdirnode_v_enum()' fixes the  deleted-file problem by  searching
+ *       though the directory for the next dirent with a position >= any entry
+ *       that got deleted.
+ *       Other than that, seekdir() addressing uses `fde_pos', with readdir()
+ *       rounding up to the nearest  existing entry with a starting  position
+ *       that is >= the seek'd address. (SEEK_END is relative to the fde_pos+
+ *       fde_size of the last directory entry) */
 FUNDEF NONNULL((1, 2)) void KCALL
 fflatdirnode_v_enum(struct fdirnode *__restrict self,
                     struct fdirenum *__restrict result);
@@ -317,28 +345,72 @@ fflatdirnode_v_rename(struct fdirnode *__restrict self,
                       struct frename_info *__restrict info)
 		THROWS(E_BADALLOC, E_IOERROR, E_FSERROR_ILLEGAL_PATH,
 		       E_FSERROR_DISK_FULL, E_FSERROR_READONLY);
+/* TODO: fflatdirnode_v_clearcache() -- Can be implemented  by `fdd_goteof = false',  followed
+ *                                      by decref'ing all directory entries which have already
+ *                                      been pre-loaded from disk. */
 
 
+struct fflatdir_bucket {
+	REF struct fflatdirent *ffdb_ent; /* [0..1] Directory entry, internal-stub for deleted, or NULL for sentinel */
+};
 
 struct fflatdirdata {
-	struct shared_rwlock         fdd_lock;   /* Lock for directory data. */
-	LLRBTREE_ROOT(fflatdirent)   fdd_files;  /* [0..n][lock(fdd_lock)] Tree of files (by name) within this directory. */
-	struct REF fflatdirent_tailq fdd_bypos;  /* [0..n][lock(fdd_lock)] List of files sorted by position in directory stream. */
-	__BOOL                       fdd_goteof; /* [lock(fdd_lock)] Set when `fdnx_readdir(this, fflatdirent_endaddr(TAILQ_LAST(&fdd_bypos))) == NULL' */
+	struct shared_rwlock         fdd_lock;        /* Lock for directory data. */
+	struct REF fflatdirent_tailq fdd_bypos;       /* [0..n][lock(fdd_lock)] List of files sorted by position in directory  stream.
+	                                               * The files in this list are _IDENTICAL_ to those in `fdd_fileslist'. This list
+	                                               * is simply an alternative way of looking at the contents of the directory. */
+	size_t                       fdd_biggest_gap; /* [lock(fdd_lock)] Size of the biggest gap between directory entries in `fdd_bypos'
+	                                               * Used during file creation to pick between searching for a suitable gap to put new
+	                                               * files, or appending them at the end of the directory. */
+	__BOOL                       fdd_goteof;      /* [lock(fdd_lock)] Set when `fdnx_readdir(this, fflatdirent_endaddr(TAILQ_LAST(&fdd_bypos))) == NULL' */
+	/* TODO: Instead of constantly re-implementing hash-vectors, add a code
+	 *       generator template <hybrid/sequence/hashvector-abi.h> that can
+	 *       just be re-used over and over.
+	 * Some good base-line functions for working with hash-vectors are those
+	 * used to implement `struct path::p_cldlist':
+	 *  - path_cldlist_remove()
+	 *  - path_cldlist_remove_force()
+	 *  - path_cldlist_rehash_after_remove()
+	 *  - path_cldlist_rehash_before_insert()
+	 *  - path_cldlist_insert()
+	 * Obviously, this would still also need a lookup-function.
+	 */
+	size_t                       fdd_filessize;   /* [lock(fdd_lock)] Amount of used (non-NULL and non-deleted) directory entries */
+	size_t                       fdd_filesused;   /* [lock(fdd_lock)] Amount of (non-NULL) directory entries */
+	size_t                       fdd_filesmask;   /* [lock(fdd_lock)] Hash-mask for `p_cldlist' */
+	struct fflatdir_bucket      *fdd_fileslist;   /* [1..fdd_filesmask+1][owned_if(!= fflatdir_empty_buckets)]
+	                                               * [lock(fdd_lock)] Hash-vector  of  files in  this directory.
+	                                               * Elements may no longer be added if `MFILE_F_DELETED' is set */
 };
+
+/* Empty hash-vector */
+DATDEF struct fflatdir_bucket fflatdir_empty_buckets[1];
 
 #define fflatdirdata_init(self)             \
 	(shared_rwlock_init(&(self)->fdd_lock), \
 	 (self)->fdd_files = __NULLPTR,         \
-	 TAILQ_INIT((self)->fdd_bypos),         \
-	 (self)->fdd_goteof = 0)
-#define fflatdirdata_cinit(self)                      \
-	(shared_rwlock_cinit(&(self)->fdd_lock),          \
-	 __hybrid_assert((self)->fdd_files == __NULLPTR), \
-	 __hybrid_assert(TAILQ_EMPTY((self)->fdd_bypos)), \
-	 __hybrid_assert((self)->fdd_goteof == 0))
+	 TAILQ_INIT(&(self)->fdd_bypos),        \
+	 (self)->fdd_biggest_gap = 0,           \
+	 (self)->fdd_goteof      = 0,           \
+	 (self)->fdd_filessize   = 0,           \
+	 (self)->fdd_filesused   = 0,           \
+	 (self)->fdd_filesmask   = 0,           \
+	 (self)->fdd_fileslist   = fflatdir_empty_buckets)
+#define fflatdirdata_cinit(self)                       \
+	(shared_rwlock_cinit(&(self)->fdd_lock),           \
+	 __hybrid_assert((self)->fdd_files == __NULLPTR),  \
+	 __hybrid_assert(TAILQ_EMPTY(&(self)->fdd_bypos)), \
+	 __hybrid_assert((self)->fdd_biggest_gap == 0),    \
+	 __hybrid_assert((self)->fdd_goteof == 0),         \
+	 __hybrid_assert((self)->fdd_filessize == 0),      \
+	 __hybrid_assert((self)->fdd_filesused == 0),      \
+	 __hybrid_assert((self)->fdd_filesmask == 0),      \
+	 (self)->fdd_fileslist = fflatdir_empty_buckets)
+
+/* Finalize the given flat directory data container. */
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL fflatdirdata_fini)(struct fflatdirdata *__restrict self);
+
 
 
 /* Helpers for accessing `fdd_lock' */
@@ -382,6 +454,11 @@ struct fflatdirnode
 	struct fflatdirdata fdn_data; /* Flat directory node data. */
 };
 
+
+/* Helper conversion functions */
+#define fdirnode_asflat(self) ((struct fflatdirnode *)(self))
+#define fnode_asflatdir(self) fdirnode_asflat(fnode_asdir(self))
+#define mfile_asflatdir(self) fdirnode_asflat(mfile_asdir(self))
 
 
 /* Return a pointer to directory-node operators of `self' */
@@ -428,9 +505,9 @@ struct fflatdirnode
 /************************************************************************/
 struct fflatsuper_ops {
 
-	/* [1..1] Allocate a new file-node object for `ent' in `dir'
+	/* [1..1][lock(READ(dir->fdn_data.fdd_lock))]
+	 * Allocate a new file-node object for `ent' in `dir'
 	 * This function may assume:
-	 *  - fflatdirdata_reading(dir);
 	 *  - !fflatdirent_wasdeleted(ent);
 	 * This function must allocate+initialize the returned node:
 	 *  - return->_fnode_file_ mf_ops        = ...;                # As appropriate
@@ -479,6 +556,21 @@ struct fflatsuper {
 	struct fsuper       ffs_super;    /* Underlying superblock. */
 	struct fflatdirdata ffs_rootdata; /* Directory data for the filesystem root. */
 };
+
+/* Helper conversion functions */
+#define fsuper_asflat(self)        COMPILER_CONTAINER_OF(self, struct fflatsuper, ffs_super)
+#define fdirnode_asflatsuper(self) COMPILER_CONTAINER_OF(self, struct fflatsuper, ffs_super.fs_root)
+#define fnode_asflatsuper(self)    fdirnode_asflatsuper(fnode_asdir(self))
+#define mfile_asflatsuper(self)    fdirnode_asflatsuper(mfile_asdir(self))
+
+/* Return the root directory of a given `struct fflatsuper' */
+#define fflatsuper_getroot(self)   fdirnode_asflat(&(self)->ffs_super.fs_root)
+
+/* Return a pointer to flat-super operators of `self' */
+#define fflatsuper_getops(self)                                                                                                         \
+	__COMPILER_CONTAINER_OF(__COMPILER_REQTYPE(struct fflatsuper const *, self)->ffs_super.fs_root._fdirnode_node_ _fnode_file_ mf_ops, \
+	                        struct fflatsuper_ops, ffso_super.so_fdir.dno_node.no_file)
+
 
 
 /* Open the  file-node associated  with  a given  directory  entry.

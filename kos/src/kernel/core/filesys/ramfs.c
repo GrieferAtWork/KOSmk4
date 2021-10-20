@@ -63,6 +63,7 @@
 #define RBTREE_COPYCOLOR(dst, src) (void)((dst)->rde_isred = (src)->rde_isred)
 #define RBTREE_CC                  FCALL
 #define RBTREE_NOTHROW             NOTHROW
+#define RBTREE_NOTHROW_U           /* nothing */
 #define RBTREE_DECL                FUNDEF
 #define RBTREE_IMPL                PUBLIC
 #define RBTREE_KEY_EQ(a, b)        (strcmp(a, b) == 0)
@@ -870,6 +871,7 @@ again:
 		known_entry->rde_treenode.rb_lhs = RAMFS_DIRENT_TREENODE_DELETED; /* Mark as deleted. */
 
 		ramfs_dirdata_treelock_endwrite(&me->rdn_dat);
+		mfile_delete(filedir);
 	} else {
 		bool last_link_went_away;
 		ramfs_direnttree_removenode(&me->rdn_dat.rdd_tree, known_entry);

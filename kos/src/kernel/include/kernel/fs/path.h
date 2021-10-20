@@ -162,7 +162,7 @@ struct path {
 	union {
 		struct {
 			size_t        p_cldused; /* [valid_if(p_cldlist != PATH_CLDLIST_DELETED)][lock(p_cldlock)] Amount of used (non-NULL and non-deleted) child paths */
-			size_t        p_cldsize; /* [valid_if(p_cldlist != PATH_CLDLIST_DELETED)][lock(p_cldlock)] Amount of (non-NULL) child paths. */
+			size_t        p_cldsize; /* [valid_if(p_cldlist != PATH_CLDLIST_DELETED)][lock(p_cldlock)] Amount of (non-NULL) child paths */
 			size_t        p_cldmask; /* [valid_if(p_cldlist != PATH_CLDLIST_DELETED)][lock(p_cldlock)] Hash-mask for `p_cldlist' */
 		};
 		Toblockop(path)       _p_pthlop;   /* Used internally for async remove from `p_parent->p_cldlist' */
@@ -174,11 +174,11 @@ struct path {
 	};
 #else /* __WANT_PATH__p_LOPS */
 	size_t                p_cldused; /* [valid_if(p_cldlist != PATH_CLDLIST_DELETED)][lock(p_cldlock)] Amount of used (non-NULL and non-deleted) child paths */
-	size_t                p_cldsize; /* [valid_if(p_cldlist != PATH_CLDLIST_DELETED)][lock(p_cldlock)] Amount of (non-NULL) child paths. */
+	size_t                p_cldsize; /* [valid_if(p_cldlist != PATH_CLDLIST_DELETED)][lock(p_cldlock)] Amount of (non-NULL) child paths */
 	size_t                p_cldmask; /* [valid_if(p_cldlist != PATH_CLDLIST_DELETED)][lock(p_cldlock)] Hash-mask for `p_cldlist' */
 #endif /* !__WANT_PATH__p_LOPS */
-	struct path_bucket   *p_cldlist; /* [1..p_cldmask+1][owned][lock(p_cldlock)]  Hash-vector  of  child
-	                                  * paths. Set to `PATH_CLDLIST_DELETED' when this path was deleted. */
+	struct path_bucket   *p_cldlist; /* [1..p_cldmask+1][owned][lock(p_cldlock)]  Hash-vector  of child
+	                                  * paths. Set to `PATH_CLDLIST_DELETED' when this path was deleted */
 };
 
 /* Allocate normal paths */

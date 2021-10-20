@@ -148,6 +148,12 @@ NOTHROW(KCALL ramfs_dirent_v_opennode)(struct fdirent *__restrict self, struct f
 struct ramfs_dirnode;
 struct ramfs_dirdata {
 	struct shared_rwlock          rdd_treelock; /* Lock for `rdd_tree' */
+	/* TODO: Get  rid  of `RAMFS_DIRDATA_TREE_DELETED'!
+	 * Instead, `ramfs_dirnode_v_unlink()' must set the
+	 * MFILE_F_DELETED  flag while still holding a lock
+	 * to `rdd_treelock', and  any piece  of code  that
+	 * wants to add new entries to this tree must first
+	 * check if `MFILE_F_DELETED' has already been set! */
 #define RAMFS_DIRDATA_TREE_DELETED ((REF struct ramfs_dirent *)-1)
 	RBTREE_ROOT(REF ramfs_dirent) rdd_tree;     /* [0..n][lock(rdd_treelock)] Files in this directory (using the filename as
 	                                             * key). Set of `RAMFS_DIRDATA_TREE_DELETED' when the directory was deleted. */
