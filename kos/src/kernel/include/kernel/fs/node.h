@@ -274,8 +274,32 @@ struct fnode
 		                                      * Link entry within the global list of all super blocks. When `MFILE_FN_GLOBAL_REF'
 		                                      * is set, then  the global list  holds a reference  to this node.  (Even when  this
 		                                      * link isn't bound) */
+#ifdef __WANT_FNODE__fn_alllop
+		struct lockop _fn_alllop; /* Lock operator used for async add-to-all-nodes */
+#endif /* __WANT_FNODE__fn_alllop */
 	};
 };
+
+#ifdef __WANT_FNODE__fn_alllop
+/* For use with `_fn_alllop': asynchronously add the node to the list of all nodes.
+ * This function needs to be exposed publicly because it being set requires special
+ * care if set during custom fnode destructors.
+ * Note that the default `fnode_v_destroy()' includes correct handling for this. */
+FUNDEF NOBLOCK NONNULL((1)) struct postlockop *
+NOTHROW(LOCKOP_CC fnode_add2all_lop)(struct lockop *__restrict self);
+#endif /* __WANT_FNODE__fn_alllop */
+
+/* Add the given node `self'  to the list of all  nodes. The caller must  ensure
+ * that this function is _NOT_ called such that it would violate the REMOVE_ONCE
+ * constraint  of `fn_allnodes'. Iow:  don't call this  function when `self' has
+ * already become globally visible by some other means.
+ *
+ * This function can be used to initialize:
+ *  - self->fn_allnodes
+ * ... but  may only be called once _all_ other fields of `self' have already been
+ *     initialized, and only if `self' isn't globally visible by some other means. */
+FUNDEF NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL fnode_init_add2all)(struct fnode *__restrict self);
 
 
 /* Return a pointer to file-node operators of `self' */

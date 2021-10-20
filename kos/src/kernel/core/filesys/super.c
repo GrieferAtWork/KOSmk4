@@ -25,6 +25,7 @@
 #define __WANT_MFILE__mf_fsuperlop
 #define __WANT_MFILE__mf_fsuperplop
 #define __WANT_MFILE__mf_delfnodes
+#define __WANT_FNODE__fn_alllop
 #define _KOS_SOURCE 1
 
 #include <kernel/compiler.h>
@@ -313,6 +314,12 @@ NOTHROW(LOCKOP_CC fnode_remove_from_allnodes_lop)(struct lockop *__restrict self
 	REF struct fnode *me;
 	me = container_of(self, struct fnode, _mf_lop);
 	COMPILER_READ_BARRIER();
+	if unlikely(me->_fn_alllop.lo_func == &fnode_add2all_lop) {
+		/* Must let `fnode_add2all_lop()' finish first! */
+		me->_mf_lop.lo_func = &fnode_remove_from_allnodes_lop;
+		lockop_enqueue(&fallnodes_lockops, &me->_mf_lop);
+		return NULL;
+	}
 	if (LIST_ISBOUND(me, fn_allnodes))
 		LIST_UNBIND(me, fn_allnodes);
 	me->_mf_plop.plo_func = &fnode_remove_from_allnodes_postlop;
@@ -324,10 +331,15 @@ NOTHROW(LOCKOP_CC fnode_remove_from_allnodes_lop)(struct lockop *__restrict self
 PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(LOCKOP_CC fnode_delete_impl)(REF struct fnode *__restrict self) {
 	/* Try to remove the node from the global list of all nodes. */
+again_unbind_allnodes:
 	COMPILER_READ_BARRIER();
 	if (LIST_ISBOUND(self, fn_allnodes)) {
 		if (fallnodes_tryacquire()) {
 			COMPILER_READ_BARRIER();
+			if unlikely(self->_fn_alllop.lo_func == &fnode_add2all_lop) {
+				fallnodes_release(); /* This should reap & invoke fnode_add2all_lop() */
+				goto again_unbind_allnodes;
+			}
 			if (LIST_ISBOUND(self, fn_allnodes))
 				LIST_UNBIND(self, fn_allnodes);
 			fallnodes_release();

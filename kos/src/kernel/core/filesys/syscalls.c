@@ -2392,8 +2392,12 @@ kernel_execveat(fd_t dirfd,
 		if unlikely(!fnode_isreg(args.ea_xnode))
 			THROW(E_NOT_EXECUTABLE_NOT_REGULAR);
 
+		if unlikely(args.ea_xnode->fn_super->fs_root.mf_flags & MFILE_FS_NOEXEC)
+			THROW(E_NOT_EXECUTABLE_NOEXEC); /* XXX: Some other exception for this case? */
+
 		/* Check for execute permissions? */
-		fnode_access(args.ea_xnode, R_OK | X_OK);
+		if (!fnode_mayaccess(args.ea_xnode, R_OK | X_OK))
+			THROW(E_NOT_EXECUTABLE_NOEXEC);
 
 		/* Fill in exec arguments. */
 		args.ea_argv = argv;

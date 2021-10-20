@@ -25,6 +25,7 @@
 #define __WANT_MFILE__mf_fsuperplop
 #define __WANT_MFILE__mf_lopX
 #define __WANT_FNODE__fn_chnglop
+#define __WANT_FNODE__fn_alllop
 #define _KOS_SOURCE 1
 
 #include <kernel/compiler.h>
@@ -163,6 +164,7 @@ NOTHROW(LOCKOP_CC fnode_v_destroy_rmall_postlop)(struct postlockop *__restrict s
 PRIVATE NOBLOCK NONNULL((1)) struct postlockop *
 NOTHROW(LOCKOP_CC fnode_v_destroy_rmallsuper_lop)(struct lockop *__restrict self) {
 	struct fsuper *me = container_of(self, struct fsuper, fs_root._mf_lop);
+	assert(me->fs_root._fn_alllop.lo_func != &fnode_add2all_lop);
 	if (LIST_ISBOUND(me, fs_root.fn_allsuper))
 		LIST_REMOVE(me, fs_root.fn_allsuper);
 	me->fs_root._mf_plop.plo_func = &fnode_v_destroy_rmall_postlop;
@@ -172,6 +174,12 @@ NOTHROW(LOCKOP_CC fnode_v_destroy_rmallsuper_lop)(struct lockop *__restrict self
 PRIVATE NOBLOCK NONNULL((1)) struct postlockop *
 NOTHROW(LOCKOP_CC fnode_v_destroy_rmallnodes_lop)(struct lockop *__restrict self) {
 	struct fnode *me = container_of(self, struct fnode, _mf_lop);
+	if unlikely(me->_fn_alllop.lo_func == &fnode_add2all_lop) {
+		/* Must let `fnode_add2all_lop()' finish first! */
+		me->_mf_lop.lo_func = &fnode_v_destroy_rmallnodes_lop;
+		lockop_enqueue(&fallnodes_lockops, &me->_mf_lop);
+		return NULL;
+	}
 	if (LIST_ISBOUND(me, fn_allnodes))
 		LIST_REMOVE(me, fn_allnodes);
 	me->_mf_plop.plo_func = &fnode_v_destroy_rmall_postlop;
@@ -185,8 +193,15 @@ NOTHROW(LOCKOP_CC fnode_v_destroy_rmsuper_postlop)(Tobpostlockop(fsuper) *__rest
 	struct fnode *me = container_of(self, struct fnode, _mf_fsuperplop);
 
 	/* Remove the node from the list of all nodes. */
+again_unbind_allnodes:
+	COMPILER_READ_BARRIER();
 	if (LIST_ISBOUND(me, fn_allnodes)) {
 		if (fallnodes_tryacquire()) {
+			COMPILER_READ_BARRIER();
+			if unlikely(me->_fn_alllop.lo_func == &fnode_add2all_lop) {
+				fallnodes_release(); /* This should reap & invoke fnode_add2all_lop() */
+				goto again_unbind_allnodes;
+			}
 			if (LIST_ISBOUND(me, fn_allnodes))
 				LIST_REMOVE(me, fn_allnodes);
 			fallnodes_release();
@@ -233,6 +248,7 @@ NOTHROW(FCALL fnode_v_destroy)(struct fnode *__restrict self) {
 		if (LIST_ISBOUND(me, fs_root.fn_allsuper)) {
 			/* Remove from `fallsuper_list' */
 			if (fallsuper_tryacquire()) {
+				assert(me->fs_root._fn_alllop.lo_func != &fnode_add2all_lop);
 				if (LIST_ISBOUND(me, fs_root.fn_allsuper))
 					LIST_REMOVE(me, fs_root.fn_allsuper);
 				fallsuper_release();
@@ -266,8 +282,15 @@ NOTHROW(FCALL fnode_v_destroy)(struct fnode *__restrict self) {
 		decref_unlikely(super);
 
 		/* Remove the node from the list of all nodes. */
+again_unbind_allnodes:
+		COMPILER_READ_BARRIER();
 		if (LIST_ISBOUND(self, fn_allnodes)) {
 			if (fallnodes_tryacquire()) {
+				COMPILER_READ_BARRIER();
+				if unlikely(self->_fn_alllop.lo_func == &fnode_add2all_lop) {
+					fallnodes_release(); /* This should reap & invoke fnode_add2all_lop() */
+					goto again_unbind_allnodes;
+				}
 				if (LIST_ISBOUND(self, fn_allnodes))
 					LIST_REMOVE(self, fn_allnodes);
 				fallnodes_release();
@@ -284,6 +307,52 @@ NOTHROW(FCALL fnode_v_destroy)(struct fnode *__restrict self) {
 	/* Destroy the underlying mem-file. */
 	mfile_destroy(_fnode_asfile(self));
 }
+
+
+
+/* For use with `_fn_alllop': asynchronously add the node to the list of all nodes.
+ * This function needs to be exposed publicly because it being set requires special
+ * care if set during custom fnode destructors.
+ * Note that the default `fnode_v_destroy()' includes correct handling for this. */
+PUBLIC NOBLOCK NONNULL((1)) struct postlockop *
+NOTHROW(LOCKOP_CC fnode_add2all_lop)(struct lockop *__restrict self) {
+	STATIC_ASSERT(offsetof(struct fnode, fn_allnodes.le_prev) == offsetof(struct fnode, _fn_alllop.lo_func));
+	struct fnode *me = container_of(self, struct fnode, _fn_alllop);
+	assert(me->_fn_alllop.lo_func == &fnode_add2all_lop);
+	ATOMIC_WRITE(me->fn_allnodes.le_prev, &fallnodes_list.lh_first); /* This write needs to be atomic */
+	if ((me->fn_allnodes.le_next = fallnodes_list.lh_first) != NULL)
+		me->fn_allnodes.le_next->fn_allnodes.le_prev = &me->fn_allnodes.le_next;
+	return NULL;
+}
+
+
+
+/* Add the given node `self'  to the list of all  nodes. The caller must  ensure
+ * that this function is _NOT_ called such that it would violate the REMOVE_ONCE
+ * constraint  of `fn_allnodes'. Iow:  don't call this  function when `self' has
+ * already become globally visible by some other means.
+ *
+ * This function can be used to initialize:
+ *  - self->fn_allnodes
+ * ... but  may only be called once _all_ other fields of `self' have already been
+ *     initialized, and only if `self' isn't globally visible by some other means. */
+PUBLIC NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL fnode_init_add2all)(struct fnode *__restrict self) {
+	/* Yes: we do a raw init! */
+	DBG_memset(&self->fn_allnodes, 0xcc, sizeof(self->fn_allnodes));
+	if (fallnodes_tryacquire()) {
+		LIST_INSERT_HEAD(&fallnodes_list, self, fn_allnodes);
+		fallnodes_release();
+	} else {
+		/* Use a lock operator. */
+		self->_fn_alllop.lo_func = &fnode_add2all_lop;
+		COMPILER_WRITE_BARRIER();
+		lockop_enqueue(&fallnodes_lockops, &self->_fn_alllop);
+		_fallnodes_reap();
+	}
+}
+
+
 
 
 
