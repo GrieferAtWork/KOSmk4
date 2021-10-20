@@ -120,8 +120,9 @@ struct ffilesys {
 		 *
 		 * @param: dev: [1..1][!FFILESYS_F_NODEV] The backing storage device for the filesystem.
 		 * @param: dev: [0..0][FFILESYS_F_NODEV] Always NULL
-		 * @return: * : A new instance of a superblock for `dev' */
-		WUNUSED NONNULL((1)) REF struct fsuper *
+		 * @return: * : A new instance of a superblock for `dev'
+		 * @return: NULL: `dev' cannot be mounted using this filesystem. */
+		WUNUSED NONNULL((1)) struct fsuper *
 		(KCALL *ffs_open)(struct ffilesys *__restrict filesys,
 		                  struct blkdev *dev, UNCHECKED USER char *args);
 

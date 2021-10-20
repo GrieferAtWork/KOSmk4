@@ -916,7 +916,8 @@ sys_mount_impl(USER UNCHECKED char const *source,
 				}
 				FINALLY_DECREF_UNLIKELY(dev);
 				/* Open the superblock with the associated block-device. */
-				super = ffilesys_open(type, fnode_asblkdev(dev), (USER UNCHECKED char *)data);
+				super = type ? ffilesys_open(type, fnode_asblkdev(dev), (USER UNCHECKED char *)data)
+				             : ffilesys_opendev(fnode_asblkdev(dev), (USER UNCHECKED char *)data);
 			}
 		}
 		if unlikely(!super)

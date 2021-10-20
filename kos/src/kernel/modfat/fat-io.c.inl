@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifdef __INTELLISENSE__
-#include "fat.c"
+#include "oldfat.c"
 
 /* TODO: Refactor this to use the newer `#define DEFINE_<funcname>' format */
 #define DEFINE_IO_READ 1
@@ -122,7 +122,7 @@ FUNC1(Fat32_)(struct inode *__restrict self,
 	VECTOR_TYPE view2;
 #endif /* DEFINE_IO_VECTOR */
 	FatSuperblock *fat = (FatSuperblock *)self->i_super;
-	assert(fat != self || fat->f_type == FAT32);
+	assert(fat != self || fat->ft_type == FAT32);
 	assert(sync_reading(self));
 	if (!bufsize)
 		return;
@@ -130,8 +130,8 @@ FUNC1(Fat32_)(struct inode *__restrict self,
 		struct aio_handle *handle;
 		FatClusterIndex cluster;
 		pos_t diskpos;
-		size_t cluster_number = (size_t)(pos / fat->f_clustersize);
-		size_t cluster_offset = (size_t)(pos % fat->f_clustersize);
+		size_t cluster_number = (size_t)(pos / fat->ft_clustersize);
+		size_t cluster_offset = (size_t)(pos % fat->ft_clustersize);
 		size_t max_io;
 		assert(sync_reading(self));
 		cluster = Fat_GetFileCluster(self, cluster_number,
@@ -143,7 +143,7 @@ FUNC1(Fat32_)(struct inode *__restrict self,
 #endif /* !DEFINE_IO_READ */
 		                             );
 #ifdef DEFINE_IO_READ
-		if (cluster >= fat->f_cluster_eof) {
+		if (cluster >= fat->ft_cluster_eof) {
 			/* Read all ZEROes after EOF. */
 			DST_MEMSET(0, 0, bufsize);
 			return;
@@ -151,7 +151,7 @@ FUNC1(Fat32_)(struct inode *__restrict self,
 #endif /* DEFINE_IO_READ */
 		diskpos = FAT_CLUSTERADDR(fat, cluster);
 		diskpos += cluster_offset;
-		max_io = fat->f_clustersize - cluster_offset;
+		max_io = fat->ft_clustersize - cluster_offset;
 		/* Optimization: When reading  large amounts  of data,  check if  the
 		 *               underlying disk chunks were allocated consecutively.
 		 *               If they were, then we  can simply do one  continuous
@@ -166,7 +166,7 @@ FUNC1(Fat32_)(struct inode *__restrict self,
 #endif /* !DEFINE_IO_READ */
 		                          ) ==
 		       cluster + 1) {
-			max_io += fat->f_clustersize;
+			max_io += fat->ft_clustersize;
 			++cluster_number;
 			++cluster;
 		}
@@ -218,8 +218,8 @@ FUNC2(Fat16_)(FatSuperblock *__restrict self,
 	size_t max_io;
 	struct aio_handle *handle;
 	assert(self->i_super == self);
-	assert(self->f_type != FAT32);
-	max_io = self->i_fsdata->i16_root.f16_rootsiz;
+	assert(self->ft_type != FAT32);
+	max_io = self->i_fsdata->fn16_root.r16_rootsiz;
 	if (pos >= (pos_t)max_io) {
 #ifdef DEFINE_IO_READ
 		DST_MEMSET(0, 0, bufsize);
@@ -245,7 +245,7 @@ FUNC2(Fat16_)(FatSuperblock *__restrict self,
 			BLOCK_DEVICE_IO(self->s_device,
 			                &view,
 			                max_io,
-			                self->i_fsdata->i16_root.f16_rootpos + pos,
+			                self->i_fsdata->fn16_root.r16_rootpos + pos,
 			                handle);
 			return;
 		}
@@ -260,7 +260,7 @@ FUNC2(Fat16_)(FatSuperblock *__restrict self,
 	BLOCK_DEVICE_IO(self->s_device,
 	                buf,
 	                max_io,
-	                self->i_fsdata->i16_root.f16_rootpos + pos,
+	                self->i_fsdata->fn16_root.r16_rootpos + pos,
 	                handle);
 #ifndef DEFINE_IO_READ
 	return;
@@ -275,7 +275,7 @@ INTERN NONNULL((1, 5)) void KCALL
 FUNC1(Fat_)(struct inode *__restrict self,
             BUFFER_TYPE buf, size_t bufsize, pos_t pos,
             struct aio_multihandle *__restrict aio) {
-	if (self != self->i_super || ((FatSuperblock *)self)->f_type == FAT32) {
+	if (self != self->i_super || ((FatSuperblock *)self)->ft_type == FAT32) {
 		FUNC1(Fat32_)(self, buf, bufsize, pos, aio);
 	} else {
 		FUNC2(Fat16_)((FatSuperblock *)self, buf, bufsize, pos, aio);

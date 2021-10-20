@@ -17,8 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_CORE_FS_LINUX_READDIR_C
-#define GUARD_KERNEL_CORE_FS_LINUX_READDIR_C 1
+#ifndef GUARD_KERNEL_CORE_MISC_LINUX_READDIR_C
+#define GUARD_KERNEL_CORE_MISC_LINUX_READDIR_C 1
 #define _KOS_SOURCE 1
 
 #include <kernel/compiler.h>
@@ -535,4 +535,4 @@ done:
 DECL_END
 #endif /* WANT_LINUX_READDIR */
 
-#endif /* !GUARD_KERNEL_CORE_FS_LINUX_READDIR_C */
+#endif /* !GUARD_KERNEL_CORE_MISC_LINUX_READDIR_C */
