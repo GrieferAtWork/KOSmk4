@@ -199,9 +199,8 @@ FUNDEF ATTR_PURE WUNUSED NONNULL((1)) struct ramfs_dirent *FCALL _ramfs_direnttr
 struct ramfs_dirent;
 AXREF(ramfs_dirent_axref, ramfs_dirent);
 struct ramfs_direnum {
-	struct fdirenum_ops const *rde_ops;  /* [1..1][const] Operators. */
+	FDIRENUM_HEADER
 	struct ramfs_dirent_axref  rde_next; /* [0..1][lock(ATOMIC)] Next directory entry to enumerate. */
-	REF struct ramfs_dirnode  *rde_dir;  /* [1..1][const] Associated directory. */
 	/* NOTE: The deleted-file-problem is solved for ramfs since we can enumerate the contents of
 	 *       a  directory in alphabetical order (thanks to  the R/B-tree). When it's the current
 	 *       file that got deleted, then we can still find the *correct* "next" file to yield by
@@ -215,8 +214,6 @@ struct ramfs_direnum {
 DATDEF struct fdirenum_ops const ramfs_direnum_ops;
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL ramfs_direnum_v_fini)(struct fdirenum *__restrict self);
-FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct fdirnode *
-NOTHROW(KCALL ramfs_direnum_v_getdir)(struct fdirenum *__restrict self);
 FUNDEF NONNULL((1)) size_t KCALL
 ramfs_direnum_v_readdir(struct fdirenum *__restrict self, USER CHECKED struct dirent *buf,
                         size_t bufsize, readdir_mode_t readdir_mode, iomode_t mode)
@@ -257,9 +254,8 @@ DATDEF struct fdirnode_ops const ramfs_dirnode_ops;
 FUNDEF WUNUSED NONNULL((1, 2)) REF struct fdirent *KCALL
 ramfs_dirnode_v_lookup(struct fdirnode *__restrict self,
                        struct flookup_info *__restrict info);
-FUNDEF NONNULL((1, 2)) void KCALL
-ramfs_dirnode_v_enum(struct fdirnode *__restrict self,
-                     struct fdirenum *__restrict result);
+FUNDEF NONNULL((1)) void KCALL
+ramfs_dirnode_v_enum(struct fdirenum *__restrict result);
 FUNDEF NONNULL((1, 2)) unsigned int KCALL
 ramfs_dirnode_v_mkfile(struct fdirnode *__restrict self,
                        struct fmkfile_info *__restrict info)

@@ -119,7 +119,7 @@ fdirent_empty_opennode(struct fdirent *__restrict UNUSED(self),
 }
 
 
-PRIVATE struct fdirent_ops const fdirent_empty_ops = {
+PUBLIC_CONST struct fdirent_ops const fdirent_empty_ops = {
 	.fdo_destroy  = (void(KCALL *)(struct fdirent *__restrict))(void *)(uintptr_t)-1,
 	.fdo_opennode = &fdirent_empty_opennode,
 };

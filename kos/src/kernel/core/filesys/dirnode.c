@@ -109,6 +109,28 @@ fdirnode_v_open(struct mfile *__restrict self, struct handle *__restrict hand,
 }
 
 
+/* Construct a directory  enumerator object in  `*result'.
+ * This function must initialize _all_ fields of `*result'
+ * It  is undefined if files created or  deleted after the creation of an
+ * enumerator, will still be enumerated by said enumerator. It is however
+ * guarantied that all files created  before, and not deleted after  will
+ * always be enumerated */
+PUBLIC NONNULL((1, 2)) void FCALL
+fdirnode_enum(struct fdirnode *__restrict self,
+              struct fdirenum *__restrict result) {
+	DBG_memset(result, 0xcc, sizeof(*result));
+	result->de_dir = mfile_asdir(incref(self));
+	TRY {
+		struct fdirnode_ops const *ops;
+		ops = fdirnode_getops(self);
+		(*ops->dno_enum)(result);
+	} EXCEPT {
+		decref_unlikely(result->de_dir);
+		RETHROW();
+	}
+}
+
+
 /* Create new files within a given directory.
  * @throw: E_FSERROR_ILLEGAL_PATH:          `info->mkf_name' contains bad characters
  * @throw: E_FSERROR_DISK_FULL:             Disk full

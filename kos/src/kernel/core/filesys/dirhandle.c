@@ -112,10 +112,9 @@ again_dots:
 		} else {
 			ino_t ino;
 			ssize_t result;
-			REF struct fdirnode *mydir;
-			mydir = fdirenum_getdir(&self->dh_enum);
-			if unlikely(!mydir)
-				THROW(E_FSERROR_DELETED, E_FILESYSTEM_DELETED_PATH);
+			struct fdirnode *mydir;
+			mydir = self->dh_enum.de_dir;
+
 			/* Try to emit "." */
 			if (dots == 0) {
 				uintptr_t newdots;
@@ -127,7 +126,6 @@ again_dots:
 				mfile_tslock_acquire(mydir);
 				ino = mydir->fn_ino;
 				mfile_tslock_release(mydir);
-				decref_unlikely(mydir);
 
 				/* Feed the special "." entry */
 				result = fdirenum_feedent(buf, bufsize, readdir_mode,
@@ -142,7 +140,6 @@ again_dots:
 
 			/* Try to emit ".." */
 			if unlikely(fdirnode_issuper(mydir)) {
-				decref_unlikely(mydir);
 				/* Superblock roots don't have parent nodes, and thus no ".." entry. */
 				if (!ATOMIC_CMPXCH(self->dh_dots, dots, 2))
 					goto again_dots;
@@ -159,7 +156,6 @@ again_dots:
 					mfile_tslock_release(parent);
 				}
 			}
-			decref_unlikely(mydir);
 
 			/* Feed the special ".." entry */
 			result = fdirenum_feedent(buf, bufsize, readdir_mode,
@@ -177,17 +173,9 @@ read_normal_entry:
 	return fdirenum_readdir(&self->dh_enum, buf, bufsize, readdir_mode, mode);
 }
 
-PRIVATE WUNUSED bool KCALL
-dirhandle_isfsroot(struct dirhandle *__restrict self) {
-	bool result;
-	REF struct fdirnode *dir;
-	dir = fdirenum_getdir(&self->dh_enum);
-	if unlikely(!dir)
-		THROW(E_FSERROR_DELETED, E_FILESYSTEM_DELETED_PATH);
-	result = fdirnode_issuper(dir);
-	decref_unlikely(dir);
-	return result;
-}
+
+#define dirhandle_isfsroot(self) \
+	fdirnode_issuper((self)->dh_enum.de_dir)
 
 INTDEF NONNULL((1)) pos_t KCALL
 handle_dirhandle_seek(struct dirhandle *__restrict self,
@@ -312,35 +300,20 @@ do_normal_seek:
 INTDEF NONNULL((1)) syscall_slong_t KCALL
 handle_dirhandle_ioctl(struct dirhandle *__restrict self, syscall_ulong_t cmd,
                        USER UNCHECKED void *arg, iomode_t mode) THROWS(...) {
-	REF struct fdirnode *dir;
-	dir = fdirenum_getdir(&self->dh_enum);
-	if unlikely(!dir)
-		THROW(E_FSERROR_DELETED, E_FILESYSTEM_DELETED_PATH);
-	FINALLY_DECREF_UNLIKELY(dir);
-	return mfile_uioctl(dir, cmd, arg, mode);
+	return mfile_uioctl(self->dh_enum.de_dir, cmd, arg, mode);
 }
 
 INTDEF NONNULL((1)) void KCALL
 handle_dirhandle_stat(struct dirhandle *__restrict self,
                       USER CHECKED struct stat *result) THROWS(...) {
-	REF struct fdirnode *dir;
-	dir = fdirenum_getdir(&self->dh_enum);
-	if unlikely(!dir)
-		THROW(E_FSERROR_DELETED, E_FILESYSTEM_DELETED_PATH);
-	FINALLY_DECREF_UNLIKELY(dir);
-	return mfile_ustat(dir, result);
+	return mfile_ustat(self->dh_enum.de_dir, result);
 }
 
 INTDEF NONNULL((1)) syscall_slong_t KCALL
 handle_dirhandle_hop(struct dirhandle *__restrict self, syscall_ulong_t cmd,
                      USER UNCHECKED void *arg, iomode_t mode) THROWS(...) {
-	REF struct fdirnode *dir;
 	/* XXX: dirhandle-specific HOPs? */
-	dir = fdirenum_getdir(&self->dh_enum);
-	if unlikely(!dir)
-		THROW(E_FSERROR_DELETED, E_FILESYSTEM_DELETED_PATH);
-	FINALLY_DECREF_UNLIKELY(dir);
-	return mfile_uhop(dir, cmd, arg, mode);
+	return mfile_uhop(self->dh_enum.de_dir, cmd, arg, mode);
 }
 
 INTDEF NONNULL((1)) REF void *KCALL
@@ -349,21 +322,14 @@ handle_dirhandle_tryas(struct dirhandle *__restrict self,
 	REF struct fdirnode *dir;
 	switch (wanted_type) {
 	case HANDLE_TYPE_MFILE:
-		dir = fdirenum_getdir(&self->dh_enum);
-		if unlikely(!dir)
-			THROW(E_FSERROR_DELETED, E_FILESYSTEM_DELETED_PATH);
-		return dir;
+		return incref(self->dh_enum.de_dir);
 	case HANDLE_TYPE_FDIRENT:
 		return xincref(self->dh_dirent);
 	case HANDLE_TYPE_PATH:
 		return xincref(self->dh_path);
 	default: break;
 	}
-	dir = fdirenum_getdir(&self->dh_enum);
-	if unlikely(!dir)
-		THROW(E_FSERROR_DELETED, E_FILESYSTEM_DELETED_PATH);
-	FINALLY_DECREF_UNLIKELY(dir);
-	return mfile_utryas(dir, wanted_type);
+	return mfile_utryas(self->dh_enum.de_dir, wanted_type);
 }
 
 

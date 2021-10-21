@@ -305,7 +305,7 @@ PUBLIC struct path_bucket const _path_empty_cldlist[1] = { { NULL } };
 
 /* Helper macros for working with `struct path::p_cldlock' */
 PUBLIC NOBLOCK NONNULL((1)) void
-NOTHROW(KCALL _path_cldlock_reap)(struct path *__restrict self) {
+NOTHROW(FCALL _path_cldlock_reap)(struct path *__restrict self) {
 #ifndef __INTELLISENSE__
 #define __LOCAL_self      (&self->p_cldlops)
 #define __LOCAL_obj       self
@@ -422,12 +422,12 @@ NOTHROW(FCALL path_cldlist_rehash_after_remove)(struct path *__restrict self) {
  * @return: true:  Successfully removed.
  * @return: false: Wasn't actually a member. */
 PUBLIC NOBLOCK NONNULL((1, 2)) bool
-NOTHROW(KCALL path_cldlist_remove)(struct path *__restrict self,
+NOTHROW(FCALL path_cldlist_remove)(struct path *__restrict self,
                                    struct path *__restrict elem) {
 	uintptr_t hash, i, perturb;
 	struct path_bucket *bucket;
 	assert(self->p_cldlist != PATH_CLDLIST_DELETED);
-	assert(self->p_cldlist != _path_empty_cldlist);
+	assert(self->p_cldlist != path_empty_cldlist);
 	assert(self->p_cldused != 0);
 	assert(self->p_cldsize != 0);
 	assert((self->p_cldsize + 1) <= self->p_cldmask);
@@ -448,12 +448,12 @@ NOTHROW(KCALL path_cldlist_remove)(struct path *__restrict self,
 /* Same as `path_cldlist_remove()', but UD  if
  * `elem' isn't actually in `self's child list */
 PUBLIC NOBLOCK NONNULL((1, 2)) void
-NOTHROW(KCALL path_cldlist_remove_force)(struct path *__restrict self,
+NOTHROW(FCALL path_cldlist_remove_force)(struct path *__restrict self,
                                          struct path *__restrict elem) {
 	uintptr_t hash, i, perturb;
 	struct path_bucket *bucket;
 	assert(self->p_cldlist != PATH_CLDLIST_DELETED);
-	assert(self->p_cldlist != _path_empty_cldlist);
+	assert(self->p_cldlist != path_empty_cldlist);
 	assert(self->p_cldused != 0);
 	assert(self->p_cldsize != 0);
 	assert((self->p_cldsize + 1) <= self->p_cldmask);
@@ -474,7 +474,7 @@ NOTHROW(KCALL path_cldlist_remove_force)(struct path *__restrict self,
 /* Insert `elem' into the child-list of `self'
  * Caller must have made a call to `path_cldlist_rehash_before_insert()' */
 PUBLIC NOBLOCK NONNULL((1, 2)) void
-NOTHROW(KCALL path_cldlist_insert)(struct path *__restrict self,
+NOTHROW(FCALL path_cldlist_insert)(struct path *__restrict self,
                                    struct path *__restrict elem) {
 	uintptr_t hash, i, perturb;
 	struct path_bucket *ent;
@@ -1631,13 +1631,30 @@ path_open_ex(struct path *cwd, u32 *__restrict premaining_symlinks,
 		      oflags, O_ACCMODE, __O_ACCMODE_INVALID);
 	}
 #endif /* __O_ACCMODE_INVALID */
+
+	/* Convert `oflags' into `atflags' */
+#if (O_NOFOLLOW == AT_SYMLINK_NOFOLLOW && O_DOSPATH == AT_DOSPATH)
+	atflags = oflags & (AT_SYMLINK_NOFOLLOW | AT_DOSPATH);
+#elif O_NOFOLLOW == AT_SYMLINK_NOFOLLOW
+	atflags = oflags & AT_SYMLINK_NOFOLLOW;
+	if (oflags & O_DOSPATH)
+		atflags |= AT_DOSPATH;
+#elif O_DOSPATH == AT_DOSPATH
+	atflags = oflags & AT_DOSPATH;
+	if (oflags & O_NOFOLLOW)
+		atflags |= AT_SYMLINK_NOFOLLOW;
+#else /* ... */
 	atflags = 0;
 	if (oflags & O_NOFOLLOW)
 		atflags |= AT_SYMLINK_NOFOLLOW;
 	if (oflags & O_DOSPATH)
 		atflags |= AT_DOSPATH;
+#endif /* !... */
+
+	/* Transform `atflags' based on local fs overrides. */
 	atflags = fs_atflags(atflags);
 
+	/* Figure out how the open() should be performed. */
 	if (oflags & O_PATH) {
 		/* Only need to lookup the resulting path object. */
 		if (oflags & ~(O_ACCMODE | O_APPEND | O_NONBLOCK | O_SYNC |
@@ -1791,7 +1808,7 @@ again_deref_lnknode:
 		result.h_type = HANDLE_TYPE_MFILE;
 		result.h_data = incref(file);
 
-		/* Invoke custom open operators (and create a `filehandle' if necessary). */
+		/* Invoke custom open operators (and create a `struct filehandle' if necessary). */
 		TRY {
 			mfile_open(file, &result, access_path, access_dent);
 

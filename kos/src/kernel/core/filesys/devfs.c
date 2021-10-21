@@ -260,12 +260,12 @@ AXREF(fdirent_axref, fdirent);
 #endif /* !__fdirent_axref_defined */
 
 struct devfs_root_direnum {
-	struct fdirenum_ops const *drd_ops;  /* [1..1][const] Operators. (== &devfs_root_direnum_ops) */
-	struct fdirent_axref       drd_next; /* [0..1][lock(ATOMIC)] Next directory  entry to  enumerate.
-	                                      * Either  a  `struct ramfs_dirent' (ramfs_dirent_ops)  or a
-	                                      * `struct fdevfsdirent' (fdevfsdirent_ops). The 2 directory
-	                                      * data sources `devfs_byname_tree'  and `devfs.rs_dat'  are
-	                                      * enumerated in succession (in that same order) */
+	FDIRENUM_HEADER
+	struct fdirent_axref drd_next; /* [0..1][lock(ATOMIC)] Next directory  entry to  enumerate.
+	                                * Either  a  `struct ramfs_dirent' (ramfs_dirent_ops)  or a
+	                                * `struct fdevfsdirent' (fdevfsdirent_ops). The 2 directory
+	                                * data sources `devfs_byname_tree'  and `devfs.rs_dat'  are
+	                                * enumerated in succession (in that same order) */
 };
 #define fdirent_isdevfs(self) ((self)->fd_ops == &fdevfsdirent_ops)
 #define fdirent_asdevfs(self) container_of(self, struct fdevfsdirent, fdd_dirent)
@@ -278,12 +278,6 @@ NOTHROW(KCALL devfs_root_direnum_v_fini)(struct fdirenum *__restrict self) {
 	me = (struct devfs_root_direnum *)self;
 	axref_fini(&me->drd_next);
 }
-
-PRIVATE ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct fdirnode *
-NOTHROW(KCALL devfs_root_direnum_v_getdir)(struct fdirenum *__restrict UNUSED(self)) {
-	return mfile_asdir(incref(&devfs.fs_root));
-}
-
 
 
 PRIVATE NOBLOCK WUNUSED NONNULL((1)) struct device *
@@ -463,22 +457,19 @@ devfs_root_direnum_v_seekdir(struct fdirenum *__restrict self,
 
 PRIVATE struct fdirenum_ops const devfs_root_direnum_ops = {
 	.deo_fini    = &devfs_root_direnum_v_fini,
-	.deo_getdir  = &devfs_root_direnum_v_getdir,
 	.deo_readdir = &devfs_root_direnum_v_readdir,
 	.deo_seekdir = &devfs_root_direnum_v_seekdir,
 };
 
 
-PRIVATE NONNULL((1, 2)) void KCALL
-devfs_root_v_enum(struct fdirnode *__restrict self,
-                  struct fdirenum *__restrict result) {
+PRIVATE NONNULL((1)) void KCALL
+devfs_root_v_enum(struct fdirenum *__restrict result) {
 	struct devfs_root_direnum *rt;
 	REF struct fdirent *firstent;
-	assert(self == &devfs.fs_root);
-	(void)self;
+	assert(result->de_dir == &devfs.fs_root);
 	rt = (struct devfs_root_direnum *)result;
-	firstent    = devfs_root_first_dirent();
-	rt->drd_ops = &devfs_root_direnum_ops;
+	firstent   = devfs_root_first_dirent();
+	rt->de_ops = &devfs_root_direnum_ops;
 	axref_init(&rt->drd_next, firstent); /* Inherit reference. */
 }
 

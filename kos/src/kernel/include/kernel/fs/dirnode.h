@@ -58,12 +58,6 @@ struct fdirenum_ops {
 	NOBLOCK NONNULL((1)) void
 	/*NOTHROW*/ (KCALL *deo_fini)(struct fdirenum *__restrict self);
 
-	/* [1..1] Return a reference to the directory being enumerated.
-	 * @return: NULL: Directory has been deleted. */
-	WUNUSED NONNULL((1)) REF struct fdirnode *
-	(KCALL *deo_getdir)(struct fdirenum *__restrict self)
-			THROWS(...);
-
 	/* [1..1] Directory reader callback.
 	 * When end-of-file has been reached, `0' is returned.
 	 * NOTE: This function mustn't enumerate the `.' and `..' entires! */
@@ -92,16 +86,27 @@ struct fdirenum_ops {
 			THROWS(...);
 };
 
+#define FDIRENUM_HEADER                                               \
+	struct fdirenum_ops const *de_ops; /* [1..1][const] Operators. */ \
+	REF struct fdirnode       *de_dir; /* [1..1][const] Directory being enumerated. */
+
+
 struct fdirenum {
-	struct fdirenum_ops const *de_ops;      /* [1..1][const] Operators. */
-	void                      *de_data[15]; /* Filesystem-specific data. */
+	FDIRENUM_HEADER
+	void *de_data[14]; /* Filesystem-specific data. */
 };
 
 /* Helper macros for operating with `struct fdirenum' */
-#define fdirenum_fini(self)                                      (*(self)->de_ops->deo_fini)(self)
-#define fdirenum_getdir(self)                                    (*(self)->de_ops->deo_getdir)(self)
-#define fdirenum_readdir(self, buf, bufsize, readdir_mode, mode) (*(self)->de_ops->deo_readdir)(self, buf, bufsize, readdir_mode, mode)
-#define fdirenum_seekdir(self, offset, whence)                   (*(self)->de_ops->deo_seekdir)(self, offset, whence)
+#define fdirenum_init(self, ops, dir) \
+	((self)->de_ops = (ops),          \
+	 (self)->de_dir = mfile_asdir(incref(dir)))
+#define fdirenum_fini(self)             \
+	((*(self)->de_ops->deo_fini)(self), \
+	 decref_unlikely((self)->de_dir))
+#define fdirenum_readdir(self, buf, bufsize, readdir_mode, mode) \
+	(*(self)->de_ops->deo_readdir)(self, buf, bufsize, readdir_mode, mode)
+#define fdirenum_seekdir(self, offset, whence) \
+	(*(self)->de_ops->deo_seekdir)(self, offset, whence)
 
 /* Feed   directory  entry  information  (the  `feed_d_*'  arguments)
  * into `buf' as requested by  `readdir_mode' ('.' and '..'  handling
@@ -253,11 +258,17 @@ struct fdirnode_ops {
 	 * This  function  must  initialize _all_  fields  of `*result'
 	 * It  is undefined if files created or  deleted after the creation of an
 	 * enumerator, will still be enumerated by said enumerator. It is however
-	 * guarantied that all files  not created/deleted afterwards will  always
-	 * be enumerated */
-	NONNULL((1, 2)) void
-	(KCALL *dno_enum)(struct fdirnode *__restrict self,
-	                  struct fdirenum *__restrict result);
+	 * guarantied that all files created  before, and not deleted after  will
+	 * always be enumerated.
+	 * The caller of this function has already initialized:
+	 *  - result->de_dir = incref(DIR);
+	 * This function must initialize:
+	 *  - result->de_ops = ...;          # FS-specific
+	 *  - result->*      = ...;          # Additional fs-specific fields
+	 * If this operator returns with an exception, the caller will decref()
+	 * whatever directory  is stored  in  `result->de_dir' at  that  point. */
+	NONNULL((1)) void
+	(KCALL *dno_enum)(struct fdirenum *__restrict result);
 
 	/* [0..1] Create  new files within a given directory.
 	 * @throw: E_FSERROR_ILLEGAL_PATH:          `info->mkf_name' contains bad characters
@@ -473,10 +484,11 @@ fdirnode_v_open(struct mfile *__restrict self, struct handle *__restrict hand,
  * This function must initialize _all_ fields of `*result'
  * It  is undefined if files created or  deleted after the creation of an
  * enumerator, will still be enumerated by said enumerator. It is however
- * guarantied that all files  not created/deleted afterwards will  always
- * be enumerated */
-#define fdirnode_enum(self, result) \
-	(*fdirnode_getops(self)->dno_enum)(self, result)
+ * guarantied that all files created  before, and not deleted after  will
+ * always be enumerated */
+FUNDEF NONNULL((1, 2)) void FCALL
+fdirnode_enum(struct fdirnode *__restrict self,
+              struct fdirenum *__restrict result);
 
 
 /* Create new files within a given directory.

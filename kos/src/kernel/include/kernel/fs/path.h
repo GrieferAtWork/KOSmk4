@@ -268,6 +268,7 @@ DEFINE_REFCOUNT_FUNCTIONS(struct path, p_refcnt, path_destroy)
  *      root dirs, as is the case when `struct path::p_parent == NULL'. */
 DATDEF struct ramfs_super fsuper_unmounted;
 DATDEF struct fdirent fdirent_empty;
+DATDEF struct fdirent_ops const fdirent_empty_ops;
 #define fdirnode_unmounted fsuper_unmounted._ramfs_super_super_ fs_root
 
 /* Empty hash-vector for `struct path::p_cldlist' */
@@ -275,7 +276,7 @@ DATDEF struct path_bucket const _path_empty_cldlist[1] ASMNAME("path_empty_cldli
 #define path_empty_cldlist ((struct path_bucket *)_path_empty_cldlist)
 
 /* Helper macros for working with `struct path::p_cldlock' */
-FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(KCALL _path_cldlock_reap)(struct path *__restrict self);
+FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL _path_cldlock_reap)(struct path *__restrict self);
 #ifdef __OPTIMIZE_SIZE__
 #define path_cldlock_reap(self) _path_cldlock_reap(self)
 #else /* __OPTIMIZE_SIZE__ */
@@ -306,12 +307,12 @@ FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(KCALL _path_cldlock_reap)(struct path *
  * @return: true:  Successfully removed.
  * @return: false: Wasn't actually a member. */
 FUNDEF NOBLOCK NONNULL((1, 2)) __BOOL
-NOTHROW(KCALL path_cldlist_remove)(struct path *__restrict self,
+NOTHROW(FCALL path_cldlist_remove)(struct path *__restrict self,
                                    struct path *__restrict elem);
 /* Same as `path_cldlist_remove()', but UD  if
  * `elem' isn't actually in `self's child list */
 FUNDEF NOBLOCK NONNULL((1, 2)) void
-NOTHROW(KCALL path_cldlist_remove_force)(struct path *__restrict self,
+NOTHROW(FCALL path_cldlist_remove_force)(struct path *__restrict self,
                                          struct path *__restrict elem);
 
 /* Try to rehash the child-path list of `self' following the removal of a child. */
@@ -327,7 +328,7 @@ path_cldlist_rehash_before_insert(struct path *__restrict self)
 /* Insert `elem' into the child-list of `self'
  * Caller must have made a call to `path_cldlist_rehash_before_insert()' */
 FUNDEF NOBLOCK NONNULL((1, 2)) void
-NOTHROW(KCALL path_cldlist_insert)(struct path *__restrict self,
+NOTHROW(FCALL path_cldlist_insert)(struct path *__restrict self,
                                    struct path *__restrict elem);
 
 

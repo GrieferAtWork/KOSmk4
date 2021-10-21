@@ -179,7 +179,6 @@ NOTHROW(KCALL ramfs_dirent_v_opennode)(struct fdirent *__restrict self,
 /* Directory enumeration operators for `struct ramfs_direnum' */
 PUBLIC struct fdirenum_ops const ramfs_direnum_ops = {
 	.deo_fini    = &ramfs_direnum_v_fini,
-	.deo_getdir  = &ramfs_direnum_v_getdir,
 	.deo_readdir = &ramfs_direnum_v_readdir,
 	.deo_seekdir = &ramfs_direnum_v_seekdir,
 };
@@ -188,13 +187,6 @@ PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL ramfs_direnum_v_fini)(struct fdirenum *__restrict self) {
 	struct ramfs_direnum *me = (struct ramfs_direnum *)self;
 	axref_fini(&me->rde_next);
-	decref(me->rde_dir);
-}
-
-PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct fdirnode *
-NOTHROW(KCALL ramfs_direnum_v_getdir)(struct fdirenum *__restrict self) {
-	struct ramfs_direnum *me = (struct ramfs_direnum *)self;
-	return mfile_asdir(incref(me->rde_dir));
 }
 
 
@@ -272,7 +264,7 @@ again:
 			return (size_t)~result; /* Don't advance directory position. */
 
 		/* Advance the enumerator to the next entry. */
-		next = ramfs_dirent_next(ent, me->rde_dir);
+		next = ramfs_dirent_next(ent, (struct ramfs_dirnode *)me->de_dir);
 		if (!axref_cmpxch_inherit_new(&me->rde_next, ent, next)) {
 			/* Race condition: some other thread modified our `rde_next' before
 			 * we were able to modify it. As such, we must re-attempt the read. */
@@ -320,7 +312,7 @@ ramfs_direnum_v_seekdir(struct fdirenum *__restrict self,
 	REF struct ramfs_dirent *oldent;
 	REF struct ramfs_dirent *newent;
 	struct ramfs_direnum *me  = (struct ramfs_direnum *)self;
-	struct ramfs_dirnode *dir = me->rde_dir;
+	struct ramfs_dirnode *dir = (struct ramfs_dirnode *)me->de_dir;
 again:
 	oldent = axref_get(&me->rde_next);
 	TRY {
@@ -542,13 +534,12 @@ ramfs_dirnode_v_lookup(struct fdirnode *__restrict self,
 	return &result->rde_ent;
 }
 
-PUBLIC NONNULL((1, 2)) void KCALL
-ramfs_dirnode_v_enum(struct fdirnode *__restrict self,
-                     struct fdirenum *__restrict result) {
+PUBLIC NONNULL((1)) void KCALL
+ramfs_dirnode_v_enum(struct fdirenum *__restrict result) {
 	struct ramfs_dirdata *me;
 	struct ramfs_direnum *rt;
-	me = &((struct ramfs_dirnode *)self)->rdn_dat;
 	rt = (struct ramfs_direnum *)result;
+	me = &((struct ramfs_dirnode *)rt->de_dir)->rdn_dat;
 	/* Fill in information */
 	ramfs_dirdata_treelock_read(me);
 	if (me->rdd_tree != NULL &&
@@ -565,8 +556,7 @@ ramfs_dirnode_v_enum(struct fdirnode *__restrict self,
 		ramfs_dirdata_treelock_endread(me);
 		axref_init(&rt->rde_next, NULL);
 	}
-	rt->rde_ops = &ramfs_direnum_ops;
-	rt->rde_dir = (REF struct ramfs_dirnode *)incref(self);
+	rt->de_ops = &ramfs_direnum_ops;
 }
 
 

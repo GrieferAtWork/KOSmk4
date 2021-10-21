@@ -171,6 +171,10 @@ struct fflatdirnode_xops {
 	 * >> ent->fde_pos  = entpos;
 	 * >> ent->fde_size = reqsiz;
 	 * >> return true;
+	 * @return: true:  New entry was written to disk
+	 * @return: false: Insufficient space at `ent->fde_pos'  (which may have been  moved
+	 *                 to a higher location in case it overlapped with a reserved area).
+	 *                 The requires space was saved in `ent->fde_size'.
 	 * @throw: E_FSERROR_ILLEGAL_PATH: `ent->fde_ent.fd_name' contains illegal characters.
 	 * @throw: E_FSERROR_DISK_FULL:    Unable to write many more data: disk is full. */
 	WUNUSED NONNULL((1, 2, 3)) __BOOL
@@ -348,9 +352,8 @@ fflatdirnode_v_lookup(struct fdirnode *__restrict self,
  *       rounding up to the nearest  existing entry with a starting  position
  *       that is >= the seek'd address. (SEEK_END is relative to the fde_pos+
  *       fde_size of the last directory entry) */
-FUNDEF NONNULL((1, 2)) void KCALL
-fflatdirnode_v_enum(struct fdirnode *__restrict self,
-                    struct fdirenum *__restrict result);
+FUNDEF NONNULL((1)) void KCALL
+fflatdirnode_v_enum(struct fdirenum *__restrict result);
 FUNDEF WUNUSED NONNULL((1, 2)) unsigned int KCALL
 fflatdirnode_v_mkfile(struct fdirnode *__restrict self,
                       struct fmkfile_info *__restrict info)
@@ -371,7 +374,7 @@ fflatdirnode_v_rename(struct fdirnode *__restrict self,
 
 
 struct fflatdir_bucket {
-	REF struct fflatdirent *ffdb_ent; /* [0..1] Directory entry, internal-stub for deleted, or NULL for sentinel */
+	struct fflatdirent *ffdb_ent; /* [0..1] Directory entry, internal-stub for deleted, or NULL for sentinel */
 };
 
 struct fflatdirdata {
@@ -383,20 +386,6 @@ struct fflatdirdata {
 	                                               * Used during file creation to pick between searching for a suitable gap to put new
 	                                               * files, or appending them at the end of the directory. */
 	__BOOL                       fdd_goteof;      /* [lock(fdd_lock)] Set when `fdnx_readdir(this, fflatdirent_endaddr(TAILQ_LAST(&fdd_bypos))) == NULL' */
-	/* TODO: Instead of constantly re-implementing hash-vectors, add a code
-	 *       generator template <hybrid/sequence/hashvector-abi.h> that can
-	 *       just be re-used over and over.
-	 * Some good base-line functions for working with hash-vectors are those
-	 * used to implement `struct path::p_cldlist':
-	 *  - path_cldlist_remove()
-	 *  - path_cldlist_remove_force()
-	 *  - path_cldlist_rehash_after_remove()
-	 *  - path_cldlist_rehash_before_insert()
-	 *  - path_cldlist_insert()
-	 * Obviously, this would still also need a lookup-function,  and
-	 * `remove_force' should become `remove', while `remove' becomes
-	 * `tryremove'. Also, we're missing a `tryinsert()' function.
-	 */
 	size_t                       fdd_filessize;   /* [lock(fdd_lock)] Amount of used (non-NULL and non-deleted) directory entries */
 	size_t                       fdd_filesused;   /* [lock(fdd_lock)] Amount of (non-NULL) directory entries */
 	size_t                       fdd_filesmask;   /* [lock(fdd_lock)] Hash-mask for `p_cldlist' */
@@ -405,8 +394,13 @@ struct fflatdirdata {
 	                                               * Elements may no longer be added if `MFILE_F_DELETED' is set */
 };
 
+/* Hash-vector iteration helper macros */
+#define fflatdirent_hashof(self)       ((self)->fde_ent.fd_hash)
+#define fflatdirent_hashnx(i, perturb) ((i) = (((i) << 2) + (i) + (perturb) + 1), (perturb) >>= 5)
+
 /* Empty hash-vector */
-DATDEF struct fflatdir_bucket fflatdir_empty_buckets[1];
+DATDEF struct fflatdir_bucket const _fflatdir_empty_buckets[1] ASMNAME("fflatdir_empty_buckets");
+#define fflatdir_empty_buckets ((struct fflatdir_bucket *)_fflatdir_empty_buckets)
 
 #define fflatdirdata_init(self)             \
 	(shared_rwlock_init(&(self)->fdd_lock), \
@@ -432,6 +426,28 @@ DATDEF struct fflatdir_bucket fflatdir_empty_buckets[1];
 /* Finalize the given flat directory data container. */
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL fflatdirdata_fini)(struct fflatdirdata *__restrict self);
+
+/* Helper functions for adding/removing directory entries  to the files list of  `self'
+ * These functions _ONLY_ modify `fdd_fileslist' and friends; the caller is responsible
+ * for `fdd_bypos', as well as to be holding a lock to `self->fdn_data.fdd_lock'. */
+FUNDEF NOBLOCK NONNULL((1, 2)) void NOTHROW(FCALL fflatdirnode_fileslist_removeent)(struct fflatdirnode *__restrict self, struct fflatdirent *__restrict ent);
+FUNDEF NOBLOCK NONNULL((1, 2)) void NOTHROW(FCALL fflatdirnode_fileslist_insertent)(struct fflatdirnode *__restrict self, struct fflatdirent *__restrict ent);
+FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL fflatdirnode_fileslist_rehash_after_remove)(struct fflatdirnode *__restrict self);
+FUNDEF NONNULL((1)) void FCALL fflatdirnode_fileslist_rehash_before_insert(struct fflatdirnode *__restrict self) THROWS(E_BADALLOC);
+
+/* Lookup the named entry, returning `NULL' if not found. */
+FUNDEF NOBLOCK NONNULL((1, 2)) struct fflatdirent *FCALL
+fflatdirnode_fileslist_lookup(struct fflatdirnode *__restrict self,
+                              struct flookup_info *__restrict info)
+		THROWS(E_SEGFAULT);
+/* Remove the named entry, returning `NULL' if not found.
+ * Same as `fflatdirnode_fileslist_lookup' + `fflatdirnode_fileslist_removeent' */
+FUNDEF NOBLOCK NONNULL((1, 2)) struct fflatdirent *FCALL
+fflatdirnode_fileslist_remove(struct fflatdirnode *__restrict self,
+                              struct flookup_info *__restrict info)
+		THROWS(E_SEGFAULT);
+
+
 
 
 
