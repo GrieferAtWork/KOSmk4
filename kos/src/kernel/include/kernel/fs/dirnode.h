@@ -199,7 +199,7 @@ struct frename_info {
 		struct flookup_info             frn_lookup_info;    /* [in] Lookup info for the new file being created. */
 	};
 	/*OUT_REF*/ struct fnode           *frn_repfile; /* [0..1][in] The existing file that should be replaced with `frn_file',
-	                                                  *            or `NULL' if no pre-existing file should be replaced, and
+	                                                  *            or `NULL' if no pre-existing file should be replaced,  and
 	                                                  *            only new files should be created.
 	                                                  * [0..1][out_if(FDIRNODE_RENAME_EXISTS)]. */
 	/*OUT_REF*/ struct fdirent         *frn_dent;    /* [0..1][out] New directory entry for the file (or `frn_repfile' for `FDIRNODE_RENAME_EXISTS') */
@@ -214,7 +214,7 @@ struct frename_info {
 
 
 /* Return values for `dno_mkfile' */
-#define FDIRNODE_MKFILE_SUCCESS 0 /* Success. `info' is modified like:
+#define FDIRNODE_MKFILE_SUCCESS 0 /* Success.  `info'  is  modified   like:
                                    * >> info->mkf_rnode = incref(NEW_FILE);
                                    * >> info->mkf_dent  = incref(DIRENT_OF(NEW_FILE)); */
 #define FDIRNODE_MKFILE_EXISTS  1 /* Special case: the file `info->mkf_name' already exists. `info' is modified like:
@@ -319,8 +319,7 @@ struct fdirnode_ops {
 	/* [0..1] Rename/move the specified file from one location to  another.
 	 * The caller must ensure that  `self' and `info->frn_olddir' are  part
 	 * of the same filesystem, and (if `fnode_isdir(info->frn_file)'), that
-	 * `self' isn't its child:
-	 * >> self->[dn_parent->...] != fnode_asdir(info->frn_file);
+	 * `self' isn't its child.
 	 * @throw: E_FSERROR_ILLEGAL_PATH: `info->frn_name' contains bad characters
 	 * @throw: E_FSERROR_DISK_FULL:    Disk full
 	 * @throw: E_FSERROR_READONLY:     Read-only filesystem
@@ -387,7 +386,6 @@ struct fdirnode
 #define _fdirnode_node_     /* nothing */
 #define _fdirnode_asnode(x) x
 #endif /* !__WANT_FS_INLINE_STRUCTURES */
-	REF struct fdirnode *dn_parent; /* [0..1][const] Parent directory (or `NULL' if `fnode_issuper(self)'). */
 };
 
 
@@ -415,51 +413,49 @@ struct fdirnode
  *  - self->_fdirnode_node_ fn_nlink  (to `1')
  *  - self->_fdirnode_node_ fn_ino
  *  - self->_fdirnode_node_ fn_mode (with something or'd with S_IFDIR)
- * @param: struct fdirnode     *self:   Directory node to initialize.
- * @param: struct fdirnode_ops *ops:    Directory operators.
- * @param: struct fdirnode     *parent: Parent directory. */
-#define _fdirnode_init(self, ops, parent)                                                                       \
-	(_fdirnode_assert_ops_(ops) _fnode_init_common(_fdirnode_asnode(self)),                                     \
-	 (self)->_fdirnode_node_ _fnode_file_ mf_parts = MFILE_PARTS_ANONYMOUS,                                     \
-	 (self)->_fdirnode_node_ _fnode_file_ mf_flags = (parent)->_fdirnode_node_ _fnode_file_ mf_flags &          \
-	                                                 (MFILE_F_DELETED | MFILE_F_PERSISTENT |                    \
-	                                                  MFILE_F_READONLY | MFILE_F_NOATIME |                      \
-	                                                  MFILE_F_NOMTIME | MFILE_F_NOUSRMMAP |                     \
-	                                                  MFILE_F_NOUSRIO | MFILE_F_FIXEDFILESIZE),                 \
-	 __hybrid_assert(((self)->_fdirnode_node_ _fnode_file_ mf_flags &                                           \
-	                  (MFILE_F_NOUSRMMAP | MFILE_F_NOUSRIO | MFILE_F_FIXEDFILESIZE)) ==                         \
-	                 (MFILE_F_NOUSRMMAP | MFILE_F_NOUSRIO | MFILE_F_FIXEDFILESIZE)),                            \
-	 (self)->_fdirnode_node_ _fnode_file_ mf_ops        = &(ops)->dno_node.no_file,                             \
-	 (self)->_fdirnode_node_ _fnode_file_ mf_blockshift = (parent)->_fdirnode_node_ _fnode_file_ mf_blockshift, \
-	 (self)->_fdirnode_node_ _fnode_file_ mf_part_amask = (parent)->_fdirnode_node_ _fnode_file_ mf_part_amask, \
-	 atomic64_init(&(self)->_fdirnode_node_ _fnode_file_ mf_filesize, (uint64_t)-1),                            \
-	 (self)->_fdirnode_node_ fn_super = incref((parent)->_fdirnode_node_ fn_super),                             \
-	 (self)->dn_parent                = (REF struct fdirnode *)incref(parent))
-#define _fdirnode_cinit(self, ops, super)                                                                       \
-	(_fdirnode_assert_ops_(ops) _fnode_cinit_common(_fdirnode_asnode(self)),                                    \
-	 (self)->mf_parts                              = MFILE_PARTS_ANONYMOUS,                                     \
-	 (self)->_fdirnode_node_ _fnode_file_ mf_flags = (parent)->_fdirnode_node_ _fnode_file_ mf_flags &          \
-	                                                 (MFILE_F_DELETED | MFILE_F_PERSISTENT |                    \
-	                                                  MFILE_F_READONLY | MFILE_F_NOATIME |                      \
-	                                                  MFILE_F_NOMTIME | MFILE_F_NOUSRMMAP |                     \
-	                                                  MFILE_F_NOUSRIO | MFILE_F_FIXEDFILESIZE),                 \
-	 __hybrid_assert(((self)->_fdirnode_node_ _fnode_file_ mf_flags &                                           \
-	                  (MFILE_F_NOUSRMMAP | MFILE_F_NOUSRIO | MFILE_F_FIXEDFILESIZE)) ==                         \
-	                 (MFILE_F_NOUSRMMAP | MFILE_F_NOUSRIO | MFILE_F_FIXEDFILESIZE)),                            \
-	 (self)->_fdirnode_node_ _fnode_file_ mf_ops        = &(ops)->dno_node.no_file,                             \
-	 (self)->_fdirnode_node_ _fnode_file_ mf_blockshift = (parent)->_fdirnode_node_ _fnode_file_ mf_blockshift, \
-	 (self)->_fdirnode_node_ _fnode_file_ mf_part_amask = (parent)->_fdirnode_node_ _fnode_file_ mf_part_amask, \
-	 atomic64_init(&(self)->_fdirnode_node_ _fnode_file_ mf_filesize, (uint64_t)-1),                            \
-	 (self)->_fdirnode_node_ fn_super = incref((parent)->_fdirnode_node_ fn_super),                             \
-	 (self)->dn_parent                = (REF struct fdirnode *)incref(parent))
+ * @param: struct fdirnode     *self:  Directory node to initialize.
+ * @param: struct fdirnode_ops *ops:   Directory operators.
+ * @param: struct fsuper       *super: Associated superblock. */
+#define _fdirnode_init(self, ops, super)                                                                               \
+	(_fdirnode_assert_ops_(ops) _fnode_init_common(_fdirnode_asnode(self)),                                            \
+	 (self)->_fdirnode_node_ _fnode_file_ mf_parts = MFILE_PARTS_ANONYMOUS,                                            \
+	 (self)->_fdirnode_node_ _fnode_file_ mf_flags = (super)->fs_root._fdirnode_node_ _fnode_file_ mf_flags &          \
+	                                                 (MFILE_F_DELETED | MFILE_F_PERSISTENT |                           \
+	                                                  MFILE_F_READONLY | MFILE_F_NOATIME |                             \
+	                                                  MFILE_F_NOMTIME | MFILE_F_NOUSRMMAP |                            \
+	                                                  MFILE_F_NOUSRIO | MFILE_F_FIXEDFILESIZE),                        \
+	 __hybrid_assert(((self)->_fdirnode_node_ _fnode_file_ mf_flags &                                                  \
+	                  (MFILE_F_NOUSRMMAP | MFILE_F_NOUSRIO | MFILE_F_FIXEDFILESIZE)) ==                                \
+	                 (MFILE_F_NOUSRMMAP | MFILE_F_NOUSRIO | MFILE_F_FIXEDFILESIZE)),                                   \
+	 (self)->_fdirnode_node_ _fnode_file_ mf_ops        = &(ops)->dno_node.no_file,                                    \
+	 (self)->_fdirnode_node_ _fnode_file_ mf_blockshift = (super)->fs_root._fdirnode_node_ _fnode_file_ mf_blockshift, \
+	 (self)->_fdirnode_node_ _fnode_file_ mf_part_amask = (super)->fs_root._fdirnode_node_ _fnode_file_ mf_part_amask, \
+	 atomic64_init(&(self)->_fdirnode_node_ _fnode_file_ mf_filesize, (uint64_t)-1),                                   \
+	 (self)->_fdirnode_node_ fn_super = incref(super))
+#define _fdirnode_cinit(self, ops, super)                                                                              \
+	(_fdirnode_assert_ops_(ops) _fnode_cinit_common(_fdirnode_asnode(self)),                                           \
+	 (self)->mf_parts                              = MFILE_PARTS_ANONYMOUS,                                            \
+	 (self)->_fdirnode_node_ _fnode_file_ mf_flags = (super)->fs_root._fdirnode_node_ _fnode_file_ mf_flags &          \
+	                                                 (MFILE_F_DELETED | MFILE_F_PERSISTENT |                           \
+	                                                  MFILE_F_READONLY | MFILE_F_NOATIME |                             \
+	                                                  MFILE_F_NOMTIME | MFILE_F_NOUSRMMAP |                            \
+	                                                  MFILE_F_NOUSRIO | MFILE_F_FIXEDFILESIZE),                        \
+	 __hybrid_assert(((self)->_fdirnode_node_ _fnode_file_ mf_flags &                                                  \
+	                  (MFILE_F_NOUSRMMAP | MFILE_F_NOUSRIO | MFILE_F_FIXEDFILESIZE)) ==                                \
+	                 (MFILE_F_NOUSRMMAP | MFILE_F_NOUSRIO | MFILE_F_FIXEDFILESIZE)),                                   \
+	 (self)->_fdirnode_node_ _fnode_file_ mf_ops        = &(ops)->dno_node.no_file,                                    \
+	 (self)->_fdirnode_node_ _fnode_file_ mf_blockshift = (super)->fs_root._fdirnode_node_ _fnode_file_ mf_blockshift, \
+	 (self)->_fdirnode_node_ _fnode_file_ mf_part_amask = (super)->fs_root._fdirnode_node_ _fnode_file_ mf_part_amask, \
+	 atomic64_init(&(self)->_fdirnode_node_ _fnode_file_ mf_filesize, (uint64_t)-1),                                   \
+	 (self)->_fdirnode_node_ fn_super = incref(super))
 /* Finalize a partially initialized `struct fdirnode' (as initialized by `_fdirnode_init()') */
 #define _fdirnode_fini(self) \
-	(decref_nokill((self)->fn_super), decref_nokill((self)->dn_parent))
+	(decref_nokill((self)->_fdirnode_node_ fn_super))
 
 /* Default operators for `struct fdirnode_ops' */
-FUNDEF NOBLOCK NONNULL((1)) void
-NOTHROW(KCALL fdirnode_v_destroy)(struct mfile *__restrict self);
+#define fdirnode_v_destroy fnode_v_destroy
 /* Constructs a wrapper object that implements readdir() (s.a. `dirhandle_new()') */
+struct handle;
 FUNDEF NONNULL((1, 2)) void KCALL
 fdirnode_v_open(struct mfile *__restrict self, struct handle *__restrict hand,
                 struct path *access_path, struct fdirent *access_dent);

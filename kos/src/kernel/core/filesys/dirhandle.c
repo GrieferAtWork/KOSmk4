@@ -25,7 +25,9 @@
 #include <fs/vfs.h>
 #include <kernel/fs/dirent.h>
 #include <kernel/fs/dirhandle.h>
+#include <kernel/fs/super.h>
 #include <kernel/handle-proto.h>
+#include <kernel/handle.h>
 #include <kernel/malloc.h>
 #include <kernel/mman/mfile.h>
 #include <sched/task.h>
@@ -119,7 +121,7 @@ again_dots:
 				uintptr_t newdots;
 
 				/* Figure out of we should later skip the ".." entry. */
-				newdots = mydir->dn_parent ? 1 : 2;
+				newdots = fdirnode_issuper(mydir) ? 1 : 2;
 
 				/* Read the directory's INode number. */
 				mfile_tslock_acquire(mydir);
@@ -139,7 +141,7 @@ again_dots:
 			assert(dots == 1);
 
 			/* Try to emit ".." */
-			if unlikely(!mydir->dn_parent) {
+			if unlikely(fdirnode_issuper(mydir)) {
 				decref_unlikely(mydir);
 				/* Superblock roots don't have parent nodes, and thus no ".." entry. */
 				if (!ATOMIC_CMPXCH(self->dh_dots, dots, 2))
@@ -147,10 +149,16 @@ again_dots:
 				goto read_normal_entry;
 			}
 
-			/* Read the parent directory's Inode number. */
-			mfile_tslock_acquire(mydir->dn_parent);
-			ino = mydir->dn_parent->fn_ino;
-			mfile_tslock_release(mydir->dn_parent);
+			/* (Try to) read the parent directory's Inode number. */
+			ino = 0;
+			if (self->dh_path) {
+				struct fdirnode *parent = self->dh_path->p_dir;
+				if (parent->fn_super == mydir->fn_super) {
+					mfile_tslock_acquire(parent);
+					ino = parent->fn_ino;
+					mfile_tslock_release(parent);
+				}
+			}
 			decref_unlikely(mydir);
 
 			/* Feed the special ".." entry */
@@ -176,7 +184,7 @@ dirhandle_isfsroot(struct dirhandle *__restrict self) {
 	dir = fdirenum_getdir(&self->dh_enum);
 	if unlikely(!dir)
 		THROW(E_FSERROR_DELETED, E_FILESYSTEM_DELETED_PATH);
-	result = dir->dn_parent == NULL;
+	result = fdirnode_issuper(dir);
 	decref_unlikely(dir);
 	return result;
 }
@@ -220,7 +228,7 @@ again_seek_cur_dots:
 				break;
 			}
 			if (offset < 0) {
-				/* We're at the very start, or after "." (with ".." following),
+				/* We're  at the very start, or after "." (with ".." following),
 				 * and the seek offset is negative. In all cases, go back to the
 				 * very start! */
 				if (!ATOMIC_CMPXCH(self->dh_dots, dots, 0))

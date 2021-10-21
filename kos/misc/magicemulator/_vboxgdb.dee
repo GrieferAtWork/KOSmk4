@@ -299,7 +299,7 @@ function vmReadMemoryAt(addr: int | string): Bytes {
 	 *       only make this parser more complicated.
 	 *       Futhermore,  if the memory contains an ASCII string
 	 *       equal to "error:",  our response processing  system
-	 *       wouldn't be able to differenciate between something
+	 *       wouldn't be able to differentiate between something
 	 *       like the ASCII string, and an actual error... */
 	local hexaddr = addr;
 	if (addr is int)

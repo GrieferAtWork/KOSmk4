@@ -53,7 +53,7 @@
      (defined(_MSC_FULL_VER) && _MSC_FULL_VER >= 190023026))
 #ifdef _MSC_VER
 /* Some stupid warning about adding `const' even though
- * we  already  differenciate  with  C++14   constexpr. */
+ * we  already  differentiate  with  C++14   constexpr. */
 #pragma warning(disable: 4814)
 #endif /* _MSC_VER */
 #define __COMPILER_HAVE_CXX11_CONSTEXPR

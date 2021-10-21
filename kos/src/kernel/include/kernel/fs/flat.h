@@ -67,6 +67,20 @@ struct fflatdirent {
 	struct fdirent               fde_ent;   /* Underlying directory entry. */
 };
 
+/* Default allocator/free functions for `fflatdirent'.
+ *
+ * - Note that `fflatdirent_ops' (and  `fflatdirent_v_destroy')
+ *   make use of these to free the entry, but custom sub-clases
+ *   are free to define their  own alloc/free functions by  use
+ *   of a custom destroy and `fdnx_mkent'.
+ * - `_fflatdirent_alloc()' is used when `fdnx_mkent' isn't defined. */
+#define _fflatdirent_alloc(namelen)                                                          \
+	((struct fflatdirent *)kmalloc(__builtin_offsetof(struct fflatdirent, fde_ent.fd_name) + \
+	                               ((namelen) + 1) * sizeof(char),                           \
+	                               GFP_NORMAL))
+#define _fflatdirent_free(self) kfree(__COMPILER_REQTYPE(struct fflatdirent *, self))
+
+
 #define fflatdirent_destroy(self) fdirent_destroy(&(self)->fde_ent)
 DEFINE_REFCOUNT_FUNCTIONS(struct fflatdirent, fde_ent.fd_refcnt, fflatdirent_destroy)
 
@@ -302,6 +316,15 @@ struct fflatdirnode_xops {
 	                        struct fnode *__restrict file)
 			THROWS(E_IOERROR);
 
+	/* [0..1][lock(WRITE(self->fdn_data.fdd_lock))]
+	 * Optional callback invoked  when the parent  of this directory  changes.
+	 * May be used to update on-disk meta-data as present on some filesystems. */
+	NONNULL((1, 2, 3)) void
+	(KCALL *fdnx_changeparent)(struct fflatdirnode *__restrict self,
+	                           struct fflatdirnode *__restrict oldparent,
+	                           struct fflatdirnode *__restrict newparent)
+			THROWS(E_IOERROR);
+
 	/* More operators go here. */
 };
 
@@ -345,9 +368,6 @@ fflatdirnode_v_rename(struct fdirnode *__restrict self,
                       struct frename_info *__restrict info)
 		THROWS(E_BADALLOC, E_IOERROR, E_FSERROR_ILLEGAL_PATH,
 		       E_FSERROR_DISK_FULL, E_FSERROR_READONLY);
-/* TODO: fflatdirnode_v_clearcache() -- Can be implemented  by `fdd_goteof = false',  followed
- *                                      by decref'ing all directory entries which have already
- *                                      been pre-loaded from disk. */
 
 
 struct fflatdir_bucket {
@@ -373,7 +393,9 @@ struct fflatdirdata {
 	 *  - path_cldlist_rehash_after_remove()
 	 *  - path_cldlist_rehash_before_insert()
 	 *  - path_cldlist_insert()
-	 * Obviously, this would still also need a lookup-function.
+	 * Obviously, this would still also need a lookup-function,  and
+	 * `remove_force' should become `remove', while `remove' becomes
+	 * `tryremove'. Also, we're missing a `tryinsert()' function.
 	 */
 	size_t                       fdd_filessize;   /* [lock(fdd_lock)] Amount of used (non-NULL and non-deleted) directory entries */
 	size_t                       fdd_filesused;   /* [lock(fdd_lock)] Amount of (non-NULL) directory entries */
@@ -504,6 +526,7 @@ struct fflatdirnode
 /* Flat superblock                                                      */
 /************************************************************************/
 struct fflatsuper_ops {
+	/* More operators go here. */
 
 	/* [1..1][lock(READ(dir->fdn_data.fdd_lock))]
 	 * Allocate a new file-node object for `ent' in `dir'
@@ -556,6 +579,7 @@ struct fflatsuper {
 	struct fsuper       ffs_super;    /* Underlying superblock. */
 	struct fflatdirdata ffs_rootdata; /* Directory data for the filesystem root. */
 };
+
 
 /* Helper conversion functions */
 #define fsuper_asflat(self)        COMPILER_CONTAINER_OF(self, struct fflatsuper, ffs_super)

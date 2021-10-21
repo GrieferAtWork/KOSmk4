@@ -127,7 +127,7 @@
  * [---------------]
  * [N N N N N   N  ]  void [*]_REMOVE_IF(self, out_pelem, [type], key, condition)
  * |               |             NOTE: `*out_pelem' is written to before `condition' is
- * |               |                   evaluated to test is `*out_pelem' should be removed
+ * |               |                   evaluated to test if `*out_pelem' should be removed
  * |               |             Assumes that `condition' is true for at least 1 element.
  * [  N N          ]  void [*]_TRYREMOVE(self, elem, [type], key, on_failure)
  * [N N N N N   N  ]  void [*]_TRYREMOVE_IF(self, out_pelem, [type], key, condition, on_failure)

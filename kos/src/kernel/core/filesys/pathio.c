@@ -31,6 +31,7 @@
 #include <kernel/fs/path.h>
 #include <kernel/fs/vfs.h>
 #include <kernel/handle.h>
+#include <sched/task.h>
 
 #include <kos/except.h>
 #include <kos/except/reason/fs.h>
@@ -891,6 +892,135 @@ fdirnode_replace_paths(struct path *oldpath, struct path *newpath,
 
 
 
+/* Find the mounting point of `subpath' and acquire _PATH_F_PLOCK for all paths
+ * leading up to  the mounting  point (including `subpath',  but excluding  the
+ * mounting point itself).
+ * #ifndef CONFIG_NO_SMP
+ * If any of the locks couldn't be acquired immediately, return `NULL'
+ * #endif
+ * If `movedir' is encounted, return `FINDMOUNT_AND_PLOCK_TREE_NOPR_MOVE2CHILD' */
+#define FINDMOUNT_AND_PLOCK_TREE_NOPR_MOVE2CHILD ((struct path *)-1)
+PRIVATE NOPREEMPT NOBLOCK WUNUSED NONNULL((1)) struct path *
+NOTHROW(FCALL findmount_and_plock_tree_nopr)(struct path *__restrict subpath,
+                                             struct fdirnode *__restrict movedir) {
+	struct path *result;
+	if (subpath->p_dir == movedir)
+		return FINDMOUNT_AND_PLOCK_TREE_NOPR_MOVE2CHILD;
+	if (path_ismount(subpath))
+		return subpath;
+	if (!path_plock_tryacquire_nopr(subpath))
+		return NULL;
+	result = findmount_and_plock_tree_nopr(subpath->p_parent, movedir);
+#ifndef CONFIG_NO_SMP
+	if (result == NULL || result == FINDMOUNT_AND_PLOCK_TREE_NOPR_MOVE2CHILD)
+		path_plock_release_nopr(subpath);
+#endif /* !CONFIG_NO_SMP */
+	return result;
+}
+
+#ifndef CONFIG_NO_SMP
+PRIVATE NOPREEMPT NOBLOCK WUNUSED NONNULL((1)) void
+NOTHROW(FCALL findmount_and_punlock_tree_nopr)(struct path *__restrict subpath) {
+	if (path_ismount(subpath))
+		return;
+	findmount_and_punlock_tree_nopr(subpath->p_parent);
+	path_plock_release_nopr(subpath);
+}
+#else /* !CONFIG_NO_SMP */
+#define findmount_and_punlock_tree_nopr(subpath) (void)0
+#endif /* CONFIG_NO_SMP */
+
+#define IS_PART_OF_DIFFERENT_MOUNT_NOPR_NO    0 /* No: it's the same tree */
+#define IS_PART_OF_DIFFERENT_MOUNT_NOPR_YES   1 /* Yes: it's the different tree */
+#ifndef CONFIG_NO_SMP
+#define IS_PART_OF_DIFFERENT_MOUNT_NOPR_RETRY 2 /* SMP lock was blocking; yield and try again */
+#endif /* !CONFIG_NO_SMP */
+PRIVATE NOPREEMPT NOBLOCK WUNUSED NONNULL((1, 2, 3)) unsigned int
+NOTHROW(FCALL is_part_of_different_mount_nopr)(struct path *oldpath,
+                                               struct path *newpath,
+                                               struct path *mount) {
+	unsigned int result;
+	if (oldpath == mount)
+		return IS_PART_OF_DIFFERENT_MOUNT_NOPR_NO; /* Same mount tree. */
+	if (path_ismount(oldpath)) {
+		/* Reached another mounting point before `mount' -> Different mount-tree! */
+		return IS_PART_OF_DIFFERENT_MOUNT_NOPR_YES;
+	}
+#ifndef CONFIG_NO_SMP
+	if (!path_plock_tryacquire_nopr(oldpath)) {
+		/* There are 2 reasons why `oldpath' can't be locked:
+		 *  #1: Because it's  already locked  as the  result of  being  one
+		 *      of the directories between `newpath' and `mount' (including
+		 *      `newpath',  but excluding `mount'  since the later wouldn't
+		 *      be blocking, and has already  been checked above). In  this
+		 *      case  we must tell  our caller that yes:  the 2 given paths
+		 *      are part of the same  mounting tree, and we're not  dealing
+		 *      with a move-to-child scenario.
+		 *      >> IS_PART_OF_DIFFERENT_MOUNT_NOPR_NO
+		 *  #2: Another CPU is holding the SMP lock. This is the case  when
+		 *      we don't find `oldpath' within the already-locked tree, and
+		 *      this case must be handled by releasing all of our SMP locks
+		 *      and  telling our caller  to wait for  whatever other CPU is
+		 *      currently holding this blocking lock.
+		 *      >> IS_PART_OF_DIFFERENT_MOUNT_NOPR_RETRY */
+		struct path *iter;
+		for (iter = newpath; iter != mount; iter = iter->p_parent) {
+			/* The 2 parent chains re-join before the mounting point, and
+			 * the reason why we couldn't get the lock if because it  was
+			 * already acquired in `findmount_and_plock_tree_nopr()' */
+			if (oldpath == iter)
+				return IS_PART_OF_DIFFERENT_MOUNT_NOPR_NO;
+		}
+		return IS_PART_OF_DIFFERENT_MOUNT_NOPR_RETRY;
+	}
+#endif /* !CONFIG_NO_SMP */
+	result = is_part_of_different_mount_nopr(oldpath->p_parent, newpath, mount);
+	path_plock_release_nopr(oldpath);
+	return result;
+}
+
+PRIVATE NOBLOCK WUNUSED NONNULL((1, 2, 3)) bool
+NOTHROW(FCALL check_move_to_child)(struct path *__restrict oldpath,
+                                   struct path *__restrict newpath,
+                                   struct fdirnode *__restrict movedir) {
+	pflag_t was;
+	struct path *mount;
+	unsigned int result;
+#ifndef CONFIG_NO_SMP
+again:
+#endif /* !CONFIG_NO_SMP */
+	was   = PREEMPTION_PUSHOFF();
+	mount = findmount_and_plock_tree_nopr(newpath, movedir);
+	if (mount == FINDMOUNT_AND_PLOCK_TREE_NOPR_MOVE2CHILD) {
+		/* Yes: this is a move-to-child scenario. */
+		PREEMPTION_POP(was);
+		return true;
+	}
+#ifndef CONFIG_NO_SMP
+	if (!mount) {
+		PREEMPTION_POP(was);
+		task_tryyield_or_pause();
+		goto again;
+	}
+#endif /* !CONFIG_NO_SMP */
+
+	/* With the mounting point root deduced, also check that
+	 * `oldpath' is part of the same mount tree.  Otherwise,
+	 * we have no  way of guarantying  the on-disk  relation
+	 * between `oldpath/movedir' and `newpath' */
+	result = is_part_of_different_mount_nopr(oldpath, newpath, mount);
+	findmount_and_punlock_tree_nopr(newpath);
+	PREEMPTION_POP(was);
+#ifndef CONFIG_NO_SMP
+	if (result == IS_PART_OF_DIFFERENT_MOUNT_NOPR_RETRY) {
+		/* Wait for a blocking lock to (hopefully) go away. */
+		task_tryyield_or_pause();
+		goto again;
+	}
+#endif /* !CONFIG_NO_SMP */
+	return result != IS_PART_OF_DIFFERENT_MOUNT_NOPR_NO;
+}
+
 
 /* Returns one of `FDIRNODE_RENAME_IN_PATH_*', or a reference pointer to
  * a `struct path' which the caller should wait for to become available,
@@ -907,13 +1037,22 @@ fdirnode_rename_in_path(struct path *oldpath, struct path *newpath,
 	if unlikely(newpath->p_dir->fn_super != info->frn_olddir->fn_super)
 		THROW(E_FSERROR_CROSS_DEVICE_LINK);
 
-	/* Check for E_FSERROR_DIRECTORY_MOVE_TO_CHILD */
-	if (fnode_isdir(info->frn_file)) {
-		struct fdirnode *iter = newpath->p_dir;
-		do {
-			if (iter == mfile_asdir(info->frn_file))
-				THROW(E_FSERROR_DIRECTORY_MOVE_TO_CHILD);
-		} while ((iter = iter->dn_parent) != NULL);
+	/* Check for E_FSERROR_DIRECTORY_MOVE_TO_CHILD. For this purpose,
+	 * we don't allow moving files across different mounting  points,
+	 * meaning that we assert that `oldpath' and `newpath' share  the
+	 * same common mounting point, and  that none of the parent's  of
+	 * `newpath' (along  the chain  leading to  the nearest  mounting
+	 * point) are actually pointing at `fnode_asdir(info->frn_file)'.
+	 *
+	 * Also  note that in regards to _PATH_F_PLOCK, we need to acquire
+	 * _all_ locks along the chain of `oldpath' and `newpath'  leading
+	 * back to the associated filesystem  root are locked at the  same
+	 * time.  Otherwise, there's a race condition with moving a dir at
+	 * the same time as moving the destination dir into a child of the
+	 * first directory. */
+	if (fnode_isdir(info->frn_file) && oldpath != newpath) {
+		if unlikely(check_move_to_child(oldpath, newpath, fnode_asdir(info->frn_file)))
+			THROW(E_FSERROR_DIRECTORY_MOVE_TO_CHILD);
 	}
 
 	/* Deal with replacement files. */
@@ -1115,7 +1254,7 @@ again_rename:
 					/* Assert read+exec access for the new directory. */
 					if (check_permissions)
 						fnode_access(info.frn_repfile, W_OK);
-	
+
 					/* Lookup or create the path for `info.frn_dent' */
 					newpath_ref = path_lookupchildref_withlock(newpath,
 					                                           info.frn_dent->fd_name,
@@ -1127,7 +1266,7 @@ again_rename:
 						if unlikely(path_ismount(newpath_ref))
 							THROW(E_FSERROR_CROSS_DEVICE_LINK);
 						decref_unlikely(info.frn_repfile);
-	
+
 						/* Acquire a write-lock to `newpath_ref' */
 						if (newpath_ref != oldpath && !path_cldlock_trywrite(newpath_ref))
 							goto waitfor_newpath_ref_writelock;
@@ -1151,7 +1290,7 @@ again_rename:
 						newpath_ref->p_cldsize = 0;
 						newpath_ref->p_cldmask = 0;
 						newpath_ref->p_cldlist = path_empty_cldlist;
-	
+
 						/* Insert into `newpath's child-list */
 						path_cldlist_insert(newpath, newpath_ref);
 					}

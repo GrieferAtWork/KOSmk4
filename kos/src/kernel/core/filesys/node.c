@@ -363,13 +363,17 @@ NOTHROW(FCALL fnode_init_add2all)(struct fnode *__restrict self) {
  * The new file mode is calculated as `(old_mode & perm_mask) | perm_flag', before  being
  * masked by what the underlying filesystem is capable of representing.
  * @return: * : The old file mode
- * @throw: E_FSERROR_READONLY:    The `MFILE_FM_ATTRREADONLY' flag is set.
+ * @throw: E_FSERROR_READONLY:    The `MFILE_FM_ATTRREADONLY' flag is (or was) set.
  * @throw: E_INSUFFICIENT_RIGHTS: `check_permissions' is true and you're not allowed to do this. */
 PUBLIC NONNULL((1)) mode_t KCALL
 fnode_chmod(struct fnode *__restrict self, mode_t perm_mask,
             mode_t perm_flag, bool check_permissions)
 		THROWS(E_FSERROR_READONLY, E_INSUFFICIENT_RIGHTS) {
 	mode_t old_mode, new_mode;
+
+	/* Check if file attributes may be modified. */
+	if unlikely(self->mf_flags & MFILE_FM_ATTRREADONLY)
+		THROW(E_FSERROR_READONLY);
 
 	/* Only these bits can be modified at all! */
 	perm_mask &= 07777;
@@ -433,7 +437,7 @@ again_check_permissions:
 
 /* Change the owner and group of the given file. NOTE: either attribute is only
  * altered when  `owner != (uid_t)-1'  and  `group != (gid_t)-1'  respectively.
- * @throw: E_FSERROR_READONLY:    The `MFILE_FM_ATTRREADONLY' flag is set.
+ * @throw: E_FSERROR_READONLY:    The `MFILE_FM_ATTRREADONLY' flag is (or was) set.
  * @throw: E_INSUFFICIENT_RIGHTS: `check_permissions' is true and you're not allowed to do this.
  * @throw: E_INVALID_ARGUMENT_BAD_VALUE:E_INVALID_ARGUMENT_CONTEXT_CHOWN_UNSUPP_UID:uid: [...]
  * @throw: E_INVALID_ARGUMENT_BAD_VALUE:E_INVALID_ARGUMENT_CONTEXT_CHOWN_UNSUPP_GID:gid: [...] */
@@ -446,6 +450,10 @@ fnode_chown(struct fnode *__restrict self, uid_t owner, gid_t group,
 	bool changed = false;
 	uid_t old_owner, new_owner;
 	gid_t old_group, new_group;
+
+	/* Check if file attributes may be modified. */
+	if unlikely(self->mf_flags & MFILE_FM_ATTRREADONLY)
+		THROW(E_FSERROR_READONLY);
 
 	/* Verify that the filesystem allows the given owner/group */
 	if (owner != (uid_t)-1 && !fsuper_validuid(self->fn_super, owner))
@@ -542,7 +550,7 @@ again_read_old_values:
 
 /* Change all non-NULL the timestamp that are given.
  * @throw: E_FSERROR_DELETED:E_FILESYSTEM_DELETED_FILE: The `MFILE_F_DELETED' is set.
- * @throw: E_FSERROR_READONLY: The `MFILE_FM_ATTRREADONLY' flag is set. */
+ * @throw: E_FSERROR_READONLY: The `MFILE_FM_ATTRREADONLY' flag is (or was) set. */
 PUBLIC NONNULL((1)) void KCALL
 mfile_chtime(struct mfile *__restrict self,
              struct timespec const *new_atime,

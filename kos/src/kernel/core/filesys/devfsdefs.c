@@ -98,7 +98,6 @@ PUBLIC struct ramfs_super devfs = {
 				FNODE_INIT_fn_supent,
 				FNODE_INIT_fn_allsuper_EX({ NULL, &fallsuper_list.lh_first }),
 			},
-			.dn_parent = NULL,
 		},
 	},
 	.rs_dat = {

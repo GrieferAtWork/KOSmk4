@@ -56,7 +56,7 @@ PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL fflatdirent_v_destroy)(struct fdirent *__restrict self) {
 	struct fflatdirent *me;
 	me = fdirent_asflat(self);
-	kfree(me);
+	_fflatdirent_free(me);
 }
 
 PUBLIC WUNUSED NONNULL((1, 2)) REF struct fnode *KCALL
@@ -136,6 +136,10 @@ again:
 	}
 
 	/* Do common auxiliary initialization for both the success- and retry paths. */
+	assertf(!(result->mf_flags & (MFILE_F_READONLY | MFILE_F_NOUSRMMAP |
+	                              MFILE_F_NOUSRIO | MFILE_F_FIXEDFILESIZE |
+	                              MFILE_FM_ATTRREADONLY)),
+	        "As per documentation, `ffso_makenode()' may only set these flags!");
 	result->mf_flags |= dir->mf_flags & (MFILE_F_READONLY | MFILE_F_NOATIME | MFILE_F_NOMTIME);
 	atomic_rwlock_init(&result->mf_lock);
 	sig_init(&result->mf_initdone);
@@ -147,7 +151,7 @@ again:
 	result->fn_super      = incref(dir->_fdirnode_node_ fn_super);
 	LIST_ENTRY_UNBOUND_INIT(&result->fn_changed);
 
-	/* Re-acquire alock to the nodes cache. */
+	/* Re-acquire a lock to the nodes cache. */
 	if (!fsuper_nodes_trywrite(&super->ffs_super)) {
 		/* Nodes cache not available right now; unlock everything and try again. */
 		fflatdirdata_endread(&dir->fdn_data);

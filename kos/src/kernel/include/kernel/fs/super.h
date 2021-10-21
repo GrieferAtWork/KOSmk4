@@ -288,8 +288,7 @@ FUNDEF NOBLOCK NONNULL((1)) __BOOL NOTHROW(FCALL fsuper_add2changed)(struct fsup
 	 (self)->fs_root._fdirnode_node_ fn_nlink                 = 1,                                \
 	 (self)->fs_root._fdirnode_node_ fn_super                 = (self),                           \
 	 (self)->fs_root._fdirnode_node_ fn_supent.rb_lhs         = __NULLPTR,                        \
-	 (self)->fs_root._fdirnode_node_ fn_supent.rb_rhs         = __NULLPTR,                        \
-	 (self)->fs_root.dn_parent                                = __NULLPTR)
+	 (self)->fs_root._fdirnode_node_ fn_supent.rb_rhs         = __NULLPTR)
 #define _fsuper_cinit(self, ops, fsys)                                                            \
 	(_fsuper_assert_ops_(ops) /**/                                                                \
 	 ((self)->fs_nodes = _fdirnode_asnode(&(self)->fs_root)),                                     \
@@ -313,8 +312,7 @@ FUNDEF NOBLOCK NONNULL((1)) __BOOL NOTHROW(FCALL fsuper_add2changed)(struct fsup
 	 (self)->fs_root._fdirnode_node_ fn_nlink                 = 1,                                \
 	 (self)->fs_root._fdirnode_node_ fn_super                 = (self),                           \
 	 __hybrid_assert((self)->fs_root._fdirnode_node_ fn_supent.rb_lhs == __NULLPTR),              \
-	 __hybrid_assert((self)->fs_root._fdirnode_node_ fn_supent.rb_rhs == __NULLPTR),              \
-	 __hybrid_assert((self)->fs_root.dn_parent == __NULLPTR))
+	 __hybrid_assert((self)->fs_root._fdirnode_node_ fn_supent.rb_rhs == __NULLPTR))
 
 /* Finalize a partially initialized `struct fsuper' (as initialized by `_fdirnode_init()') */
 #define _fsuper_fini(self) \

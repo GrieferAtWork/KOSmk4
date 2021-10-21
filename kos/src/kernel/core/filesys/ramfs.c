@@ -594,10 +594,10 @@ ramfs_dirnode_mknode_frominfo(struct fdirnode *__restrict self,
 	case S_IFDIR: {
 		struct ramfs_dirnode *node;
 		node = (struct ramfs_dirnode *)kmalloc(sizeof(struct ramfs_dirnode), GFP_NORMAL);
-		_fdirnode_init(node, &ramfs_dirnode_ops, self);
+		_fdirnode_init(node, &ramfs_dirnode_ops, self->fn_super);
 		shared_rwlock_init(&node->rdn_dat.rdd_treelock);
 		node->rdn_dat.rdd_tree = NULL;
-		result               = node;
+		result = node;
 	}	break;
 
 	case S_IFCHR:

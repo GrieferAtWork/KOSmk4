@@ -117,8 +117,7 @@ ffilesys_open(struct ffilesys *__restrict self,
 		result->fs_root.fn_supent.rb_lhs = NULL;
 		result->fs_root.fn_supent.rb_rhs = NULL;
 		LIST_ENTRY_UNBOUND_INIT(&result->fs_root.fn_allsuper); /* Must eventually be initialized by the caller */
-		result->fs_root.dn_parent = NULL;
-		result->fs_nodes          = &result->fs_root;
+		result->fs_nodes = &result->fs_root;
 		atomic_rwlock_init(&result->fs_nodeslock);
 		SLIST_INIT(&result->fs_nodeslockops);
 		LIST_INIT(&result->fs_mounts);

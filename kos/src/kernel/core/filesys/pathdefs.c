@@ -99,7 +99,6 @@ PUBLIC struct ramfs_super fsuper_unmounted = {
 				.fn_supent = { FSUPER_NODES_DELETED, NULL },
 				FNODE_INIT_fn_allsuper_EX(LIST_ENTRY_UNBOUND_INITIALIZER),
 			},
-			.dn_parent = NULL,
 		},
 	},
 	.rs_dat = {

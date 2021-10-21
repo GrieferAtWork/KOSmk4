@@ -24,14 +24,16 @@
 #include <kernel/compiler.h>
 
 #include <kernel/fs/dirent.h>
+#include <kernel/fs/dirhandle.h>
 #include <kernel/fs/dirnode.h>
 #include <kernel/fs/node.h>
+#include <kernel/handle.h>
 
 #include <kos/except.h>
 
 #include <assert.h>
-#include <fcntl.h>
 #include <dirent.h>
+#include <fcntl.h>
 #include <stddef.h>
 #include <string.h>
 
@@ -91,15 +93,20 @@ fdirenum_feedent(USER CHECKED struct dirent *buf,
 
 
 /* Default operators for `struct fdirnode_ops' */
-PUBLIC NOBLOCK NONNULL((1)) void
-NOTHROW(KCALL fdirnode_v_destroy)(struct mfile *__restrict self) {
-	struct fdirnode *me = mfile_asdir(self);
-	xdecref_unlikely(me->dn_parent);
-	DBG_memset(&me->dn_parent, 0xcc, sizeof(me->dn_parent));
-	fnode_v_destroy(self);
+
+/* Constructs a wrapper object that implements readdir() (s.a. `dirhandle_new()') */
+PUBLIC NONNULL((1, 2)) void KCALL
+fdirnode_v_open(struct mfile *__restrict self, struct handle *__restrict hand,
+                struct path *access_path, struct fdirent *access_dent) {
+	REF struct dirhandle *dh;
+	/* Construct the directory handle. */
+	dh = dirhandle_new(mfile_asdir(self), access_path, access_dent);
+	assert(hand->h_type == HANDLE_TYPE_MFILE);
+	assert(hand->h_data == self);
+	hand->h_type = HANDLE_TYPE_DIRHANDLE;
+	hand->h_data = dh;
+	decref_nokill(self);
 }
-
-
 
 
 /* Create new files within a given directory.

@@ -98,7 +98,6 @@ struct ffilesys {
 		 *   - return->fs_root._fdirnode_node_ fn_supent.rb_lhs           = NULL;
 		 *   - return->fs_root._fdirnode_node_ fn_supent.rb_rhs           = NULL;
 		 *   - return->fs_root._fdirnode_node_ fn_allsuper                = ...;               // Caller will add to `fallsuper_list' once that should happen
-		 *   - return->fs_root.dn_parent                                  = NULL;
 		 *   - return->fs_nodes                                           = &return->fs_root;
 		 *   - return->fs_nodeslock                                       = ATOMIC_RWLOCK_INIT;
 		 *   - return->fs_nodeslockops                                    = SLIST_HEAD_INITIALIZER(~);

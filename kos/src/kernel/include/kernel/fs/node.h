@@ -278,6 +278,17 @@ struct fnode
 		struct lockop _fn_alllop; /* Lock operator used for async add-to-all-nodes */
 #endif /* __WANT_FNODE__fn_alllop */
 	};
+#ifndef FNODE_FSDATA_T
+#define FNODE_FSDATA_T void
+#endif /* !FNODE_FSDATA_T */
+	FNODE_FSDATA_T    *fn_fsdata; /* [?..?][lock(?)] Optional,  fs-specific data  pointer or  data-word.
+	                               * Since the different standard sub-classes of `fnode' have  different
+	                               * struct sizes, it is normally quite difficult for filesystems to add
+	                               * additional  data fields common to _all_ nodes (since the offset for
+	                               * such data would be different for every node type). This is what you
+	                               * can use this field for: have it point to somewhere else in the node
+	                               * structure,  preferably to a fs-specific data blob which can then be
+	                               * shared by _all_ nodes allocated for your filesystem. */
 };
 
 #ifdef __WANT_FNODE__fn_alllop
@@ -374,7 +385,7 @@ NOTHROW(KCALL fnode_v_destroy)(struct mfile *__restrict self);
  * The new file mode is calculated as `(old_mode & perm_mask) | perm_flag', before  being
  * masked by what the underlying filesystem is capable of representing.
  * @return: * : The old file mode
- * @throw: E_FSERROR_READONLY:    The `MFILE_FM_ATTRREADONLY' flag is set.
+ * @throw: E_FSERROR_READONLY:    The `MFILE_FM_ATTRREADONLY' flag is (or was) set.
  * @throw: E_INSUFFICIENT_RIGHTS: `check_permissions' is true and you're not allowed to do this. */
 FUNDEF NONNULL((1)) mode_t KCALL
 fnode_chmod(struct fnode *__restrict self, mode_t perm_mask,
@@ -383,7 +394,7 @@ fnode_chmod(struct fnode *__restrict self, mode_t perm_mask,
 
 /* Change the owner and group of the given file. NOTE: either attribute is only
  * altered when  `owner != (uid_t)-1'  and  `group != (gid_t)-1'  respectively.
- * @throw: E_FSERROR_READONLY:    The `MFILE_FM_ATTRREADONLY' flag is set.
+ * @throw: E_FSERROR_READONLY:    The `MFILE_FM_ATTRREADONLY' flag is (or was) set.
  * @throw: E_INSUFFICIENT_RIGHTS: `check_permissions' is true and you're not allowed to do this.
  * @throw: E_INVALID_ARGUMENT_BAD_VALUE:E_INVALID_ARGUMENT_CONTEXT_CHOWN_UNSUPP_UID:uid: [...]
  * @throw: E_INVALID_ARGUMENT_BAD_VALUE:E_INVALID_ARGUMENT_CONTEXT_CHOWN_UNSUPP_GID:gid: [...] */
@@ -396,7 +407,7 @@ fnode_chown(struct fnode *__restrict self, uid_t owner, gid_t group,
 
 /* Change all non-NULL the timestamp that are given.
  * @throw: E_FSERROR_DELETED:E_FILESYSTEM_DELETED_FILE: The `MFILE_F_DELETED' is set.
- * @throw: E_FSERROR_READONLY: The `MFILE_FM_ATTRREADONLY' flag is set. */
+ * @throw: E_FSERROR_READONLY: The `MFILE_FM_ATTRREADONLY' flag is (or was) set. */
 PUBLIC NONNULL((1)) void KCALL
 mfile_chtime(struct mfile *__restrict self,
              struct timespec const *new_atime,
