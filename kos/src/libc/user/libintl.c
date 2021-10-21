@@ -792,7 +792,7 @@ NOTHROW_NCX(__FCALL mo_extract_plural_from_metadata)(char const *__restrict head
 	 * the `n'  argument  given  to  `dcngettext(3)'  differs  from  `1'.
 	 *
 	 * The expression parser treats these characters as EOF:
-	 *     - ';',        (just a semicollon)
+	 *     - ';',        (just a semicolon)
 	 *     - 0 ... 31    (all control characters, but excluding `isspace(3)' ones)
 	 *     - ')'         (only if unmatched by a preceding ')')
 	 */
