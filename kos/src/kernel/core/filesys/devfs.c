@@ -1497,32 +1497,7 @@ PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(LOCKOP_CC device_delete_remove_from_byname_postlop)(struct postlockop *__restrict self) {
 	REF struct device *me;
 	me = container_of(self, struct device, _mf_plop);
-
-	/* Remove from the devfs's INode tree. */
-	if (ATOMIC_READ(me->fn_supent.rb_rhs) != FSUPER_NODES_DELETED) {
-again_lock_devfs:
-		if (fsuper_nodes_trywrite(&devfs)) {
-			COMPILER_READ_BARRIER();
-			if (me->fn_supent.rb_rhs != FSUPER_NODES_DELETED) {
-				if unlikely(me->_fn_suplop.olo_func == &fnode_add2sup_lop) {
-					/* Reap+retry */
-					_fsuper_nodes_endwrite(&devfs);
-					_fsuper_nodes_reap(&devfs);
-					goto again_lock_devfs;
-				}
-				fsuper_nodes_removenode(&devfs, me);
-				ATOMIC_WRITE(me->fn_supent.rb_rhs, FSUPER_NODES_DELETED);
-			}
-			fsuper_nodes_endwrite(&devfs);
-		} else {
-			me->_mf_fsuperlop.olo_func = &device_delete_remove_from_byino_lop; /* Inherit reference */
-			oblockop_enqueue(&devfs.fs_nodeslockops, &me->_mf_fsuperlop);
-			_fsuper_nodes_reap(&devfs);
-			return;
-		}
-	}
-	device_delete_remove_from_byino_postlop(&me->_mf_fsuperplop,
-	                                        &devfs); /* Inherit reference */
+	fnode_delete_impl(me); /* Inherit reference */
 }
 
 PRIVATE NOBLOCK NONNULL((1)) struct postlockop *

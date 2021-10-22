@@ -263,6 +263,42 @@ NOTHROW(FCALL xdestroy_partially_initialized_flatdirent)(struct fflatdirent *sel
 	}
 }
 
+
+
+/* Anonymize all mem-parts living beyond `threshold' */
+PRIVATE NONNULL((1)) void
+NOTHROW(KCALL fflatdirnode_anon_parts_after)(struct mfile *__restrict self,
+                                             pos_t threshold) {
+	(void)self;
+	(void)threshold;
+	COMPILER_IMPURE();
+	/* XXX: Implement me? (Not strictly required, but still kind-of necessary function)
+	 *      Without  this, the underlying mem-parts of large directories can't be freed
+	 *      as files are removed from the directory.
+	 * XXX: As a matter of  fact: this shouldn't only  happen when removing from  the
+	 *      end of a directory; it should happen no matter where the removal is done,
+	 *      and unload all parts bound to address ranges consisting only of gaps! */
+}
+
+
+/* Helper  wrapper for `fdnx_deleteent'  that will follow  up the call by
+ * anonymizing any mpart-s of the mfile underlying `self' only containing
+ * data after `fflatdirent_endaddr(ent)' */
+PRIVATE NONNULL((1, 2)) void KCALL
+fflatdirnode_delete_entry(struct fflatdirnode *__restrict self,
+                          struct fflatdirent const *__restrict ent,
+                          bool at_end_of_dir) {
+	TRY {
+		(*fflatdirnode_getops(self)->fdno_flat.fdnx_deleteent)(self, ent, at_end_of_dir);
+	} EXCEPT {
+		if (at_end_of_dir)
+			fflatdirnode_anon_parts_after(self, fflatdirent_endaddr(ent));
+		RETHROW();
+	}
+	if (at_end_of_dir)
+		fflatdirnode_anon_parts_after(self, fflatdirent_endaddr(ent));
+}
+
 PUBLIC WUNUSED NONNULL((1, 2)) REF struct fdirent *KCALL
 fflatdirnode_v_lookup(struct fdirnode *__restrict self,
                       struct flookup_info *__restrict info)
@@ -383,8 +419,12 @@ handle_result_after_wrlock:
 				                                            next_result->fde_ent.fd_namelen);
 			}
 			if (ops->fdno_flat.fdnx_deleteent && !(me->mf_flags & MFILE_F_READONLY)) {
-				/* Delete any directory entry with a duplicate name. */
-				(*ops->fdno_flat.fdnx_deleteent)(me, result, next_result == NULL);
+				/* Delete any directory entry with a duplicate name.
+				 * NOTE: Because duplicate names  shouldn't happen at  all,
+				 *       don't bother trying to decrement the NLINK counter
+				 *       in  this case; minimize further corruption by only
+				 *       "fixing" imminent errors. */
+				fflatdirnode_delete_entry(me, result, next_result == NULL);
 			} else {
 				nextpos = fflatdirent_endaddr(result);
 			}
@@ -508,8 +548,12 @@ handle_ent_after_wrlock:
 				                                         next_ent->fde_ent.fd_namelen);
 			}
 			if (ops->fdno_flat.fdnx_deleteent && !(self->mf_flags & MFILE_F_READONLY)) {
-				/* Delete any directory entry with a duplicate name. */
-				(*ops->fdno_flat.fdnx_deleteent)(self, ent, next_ent == NULL);
+				/* Delete any directory entry with a duplicate name.
+				 * NOTE: Because duplicate names  shouldn't happen at  all,
+				 *       don't bother trying to decrement the NLINK counter
+				 *       in  this case; minimize further corruption by only
+				 *       "fixing" imminent errors. */
+				fflatdirnode_delete_entry(self, ent, next_ent == NULL);
 			} else {
 				nextpos = fflatdirent_endaddr(ent);
 			}
@@ -886,6 +930,13 @@ handle_existing:
 					/* Write directory entries for new node+ent */
 					fflatdirnode_addentry_to_stream(me, ent, node);
 
+					/* Ensure that `fdnx_deleteent' is available in case we end up needing it. */
+					assertf(ops->fdno_flat.fdnx_deleteent != NULL,
+					        "As per specs, `fdnx_deleteent' is mandatory when `fdnx_writedir' "
+					        "is provided, the later already having been asserted inside of "
+					        "`fflatdirnode_addentry_to_stream' (which thrown `E_FSERROR_READONLY' "
+					        "when said operator isn't present)");
+
 					/* Deal with hardlinks. */
 					if (info->mkf_fmode == 0) {
 						bool nlink_ok;
@@ -901,7 +952,7 @@ handle_existing:
 							mfile_changed(node, MFILE_F_ATTRCHANGED);
 						} else {
 							TRY {
-								(*ops->fdno_flat.fdnx_deleteent)(me, ent, TAILQ_NEXT(ent, fde_bypos) == NULL);
+								fflatdirnode_delete_entry(me, ent, TAILQ_NEXT(ent, fde_bypos) == NULL);
 							} EXCEPT {
 								/* _Always_ remove `ent' from the `fdd_bypos' list. */
 								fflatdirnode_remove_from_bypos(me, ent);
@@ -921,7 +972,7 @@ handle_existing:
 								 * Note the use of  nested exceptions, as `fdnx_deleteent'  is also allowed to  throw
 								 * its own exceptions. */
 								NESTED_TRY {
-									(*ops->fdno_flat.fdnx_deleteent)(me, ent, TAILQ_NEXT(ent, fde_bypos) == NULL);
+									fflatdirnode_delete_entry(me, ent, TAILQ_NEXT(ent, fde_bypos) == NULL);
 								} EXCEPT {
 									/* _Always_ remove `ent' from the `fdd_bypos' list. */
 									fflatdirnode_remove_from_bypos(me, ent);
@@ -974,9 +1025,76 @@ fflatdirnode_v_unlink(struct fdirnode *__restrict self,
                       struct fnode *__restrict file)
 		THROWS(E_BADALLOC, E_IOERROR, E_FSERROR_DIRECTORY_NOT_EMPTY,
 		       E_FSERROR_READONLY) {
-	struct fflatdirnode *me = fdirnode_asflat(self);
-	/* TODO */
-	/* NOTE: If necessary, must wait for `file' to add itself to the super's node-tree first. */
+	struct fflatdirnode_ops const *ops;
+	struct fflatdirnode *me;
+	struct fflatdirent *ent;
+	me  = fdirnode_asflat(self);
+	ops = fflatdirnode_getops(me);
+	ent = fdirent_asflat(entry);
+
+	/* Lock the directory. */
+again:
+	fflatdirnode_write(me);
+
+again_locked:
+	/* Check if `entry' has already been deleted. */
+	if (!TAILQ_ISBOUND(ent, fde_bypos)) {
+		fflatdirnode_endwrite(me);
+		return FDIRNODE_UNLINK_DELETED;
+	}
+
+	/* Check if we're able to delete entries. */
+	if unlikely(!ops->fdno_flat.fdnx_deleteent) {
+		fflatdirnode_endwrite(me);
+		THROW(E_FSERROR_READONLY);
+	}
+
+	/* In order to pass the correct value for `fdnx_deleteent::at_end_of_dir', we
+	 * first need to check if `ent' really is the last entry of the directory, or
+	 * if there might still be more entries after it. */
+	if (TAILQ_NEXT(ent, fde_bypos) == NULL && !(me->fdn_data.fdd_flags & FFLATDIR_F_EOF)) {
+		fflatdirnode_downgrade(me);
+		if (fflatdirnode_readdir_and_upgrade(me))
+			goto again_locked;
+		goto again;
+	}
+
+	/* Ask the FS-specific implementation to delete file entries. */
+	TRY {
+		fflatdirnode_delete_entry(me, ent, TAILQ_NEXT(ent, fde_bypos) == NULL);
+	} EXCEPT {
+		fflatdirnode_endwrite(me);
+		RETHROW();
+	}
+
+	/* Remove the directory relating to `entry' */
+	fflatdirnode_fileslist_removeent(me, ent);
+	fflatdirnode_fileslist_rehash_after_remove(me);
+	TAILQ_UNBIND(&me->fdn_data.fdd_bypos, ent, fde_bypos);
+	fflatdirnode_endwrite(me);
+
+	/* Decrement the NLINK counter of `file' */
+	{
+		bool deleted;
+		mfile_tslock_acquire(file);
+		assert(file->fn_nlink != 0);
+		--file->fn_nlink;
+		deleted = file->fn_nlink == 0;
+		mfile_tslock_release(file);
+		if (deleted) {
+			/* Last link went away -> must delete the file. */
+			fnode_delete(file);
+
+			/* If defined, also invoke the custom file-deleted operator.
+			 * As  you can see, even if this operator throws, the unlink
+			 * will not become undone. As a matter of fact, there is  no
+			 * way to undo the delete without out-of-scope data races! */
+			if (ops->fdno_flat.fdnx_deletefil != NULL)
+				(*ops->fdno_flat.fdnx_deletefil)(me, ent, file);
+		}
+	} /* Scope... */
+
+	return FDIRNODE_UNLINK_SUCCESS;
 }
 
 

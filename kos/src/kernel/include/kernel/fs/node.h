@@ -259,7 +259,7 @@ struct fnode
 #endif /* !__WANT_FNODE__fn_chnglop */
 #ifdef __WANT_FNODE__fn_suplop
 	union {
-		Toblockop(fsuper)      _fn_suplop;   /* Used internally... */
+		Toblockop(fsuper)      _fn_suplop;   /* Used for `fnode_add2sup_lop' */
 		LLRBTREE_NODE(fnode)    fn_supent;   /* ... */
 	};
 #ifdef __WANT_FS_INIT
@@ -501,6 +501,26 @@ FUNDEF NONNULL((1)) void FCALL
 fnode_access(struct fnode *__restrict self, unsigned int type)
 		THROWS(E_WOULDBLOCK, E_FSERROR_ACCESS_DENIED);
 
+
+/* Perform all of the async work needed for deleting `self' as the result of `fn_nlink == 0'
+ * This function will do the following (asynchronously if necessary)
+ *  - Set flags: MFILE_F_DELETED,  MFILE_F_NOATIME,  MFILE_F_NOMTIME, MFILE_F_CHANGED,
+ *               MFILE_F_ATTRCHANGED,  MFILE_F_FIXEDFILESIZE,   MFILE_FM_ATTRREADONLY,
+ *               MFILE_F_NOUSRMMAP, MFILE_F_NOUSRIO, MFILE_FS_NOSUID, MFILE_FS_NOEXEC,
+ *               MFILE_F_READONLY
+ *    If `MFILE_F_DELETED' was already set, none of the below are done!
+ *  - Unlink `self->fn_supent' (if bound)
+ *  - Unlink `self->fn_changed' (if bound)
+ *  - Unlink `self->fn_allnodes' (if bound)
+ *  - Call `mfile_delete()' (technically `mfile_delete_impl()') */
+FUNDEF NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL fnode_delete)(struct fnode *__restrict self);
+
+/* Internal implementation of `fnode_delete()' (don't call this one
+ * unless you know that you're doing; otherwise, you may cause race
+ * conditions that can result in data corruption) */
+FUNDEF NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL fnode_delete_impl)(/*inherit(always)*/ REF struct fnode *__restrict self);
 
 
 

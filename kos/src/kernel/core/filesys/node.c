@@ -899,6 +899,204 @@ fnode_access(struct fnode *__restrict self, unsigned int type)
 
 
 
+
+
+
+/************************************************************************/
+/* Implementation of `fnode_delete()'                                   */
+/************************************************************************/
+
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(LOCKOP_CC fnode_delete_remove_from_allnodes_postlop)(struct postlockop *__restrict self) {
+	REF struct fnode *me;
+	me = container_of(self, struct fnode, _mf_plop);
+
+	/* At this point, all of the global hooks of `me' have been  removed.
+	 * The rest of the deletion work relates only to the underlying mfile
+	 * and includes stuff like anonymizing any bound mem-parts. */
+	mfile_delete_impl(me); /* Inherit reference */
+}
+
+PRIVATE NOBLOCK NONNULL((1)) struct postlockop *
+NOTHROW(LOCKOP_CC fnode_delete_remove_from_allnodes_lop)(struct lockop *__restrict self) {
+	REF struct fnode *me;
+	me = container_of(self, struct fnode, _mf_lop);
+	COMPILER_READ_BARRIER();
+	if (LIST_ISBOUND(me, fn_allnodes))
+		LIST_UNBIND(me, fn_allnodes);
+	me->_mf_plop.plo_func = &fnode_delete_remove_from_allnodes_postlop; /* Inherit reference */
+	return &me->_mf_plop;
+}
+
+
+PRIVATE NOBLOCK NONNULL((1, 2)) void
+NOTHROW(LOCKOP_CC fnode_delete_remove_from_changed_postlop)(Tobpostlockop(fsuper) *__restrict self,
+                                                            struct fsuper *__restrict UNUSED(obj)) {
+	REF struct fnode *me;
+	me = container_of(self, struct fnode, _mf_fsuperplop);
+
+	/* Remove from `fallnodes_list'. */
+	COMPILER_READ_BARRIER();
+	if (LIST_ISBOUND(me, fn_allnodes)) {
+		COMPILER_READ_BARRIER();
+		if (fallnodes_tryacquire()) {
+			COMPILER_READ_BARRIER();
+			if (LIST_ISBOUND(me, fn_allnodes))
+				LIST_UNBIND(me, fn_allnodes);
+			COMPILER_READ_BARRIER();
+			fallnodes_release();
+		} else {
+			me->_mf_lop.lo_func = &fnode_delete_remove_from_allnodes_lop; /* Inherit reference */
+			lockop_enqueue(&fallnodes_lockops, &me->_mf_lop);
+			_fallnodes_reap();
+			return;
+		}
+	}
+	fnode_delete_remove_from_allnodes_postlop(&me->_mf_plop); /* Inherit reference */
+}
+
+PRIVATE NOBLOCK NONNULL((1, 2)) Tobpostlockop(fsuper) *
+NOTHROW(LOCKOP_CC fnode_delete_remove_from_changed_lop)(Toblockop(fsuper) *__restrict self,
+                                                        struct fsuper *__restrict UNUSED(obj)) {
+	REF struct fnode *me;
+	me = container_of(self, struct fnode, _mf_fsuperlop);
+	if (LIST_ISBOUND(me, fn_changed)) {
+		LIST_UNBIND(me, fn_changed);
+		decref_nokill(me); /* Reference from the `fn_changed' list. */
+	}
+
+	me->_mf_fsuperplop.oplo_func = &fnode_delete_remove_from_changed_postlop; /* Inherit reference */
+	return &me->_mf_fsuperplop;
+}
+
+PRIVATE NOBLOCK NONNULL((1, 2)) void
+NOTHROW(LOCKOP_CC fnode_delete_remove_from_byino_postlop)(Tobpostlockop(fsuper) *__restrict self,
+                                                          struct fsuper *__restrict obj) {
+	REF struct fnode *me;
+	me = container_of(self, struct fnode, _mf_fsuperplop);
+
+	/* Remove from `obj->fs_changednodes'. */
+	COMPILER_READ_BARRIER();
+	if (LIST_ISBOUND(me, fn_changed)) {
+		COMPILER_READ_BARRIER();
+		if (fsuper_changednodes_tryacquire(obj)) {
+			COMPILER_READ_BARRIER();
+			if (LIST_ISBOUND(me, fn_changed)) {
+				LIST_UNBIND(me, fn_changed);
+				decref_nokill(me); /* Reference from the `fn_changed' list. */
+			}
+			COMPILER_READ_BARRIER();
+			fsuper_changednodes_release(obj);
+		} else {
+			me->_mf_fsuperlop.olo_func = &fnode_delete_remove_from_changed_lop; /* Inherit reference */
+			oblockop_enqueue(&obj->fs_changednodes_lops, &me->_mf_fsuperlop);
+			_fsuper_changednodes_reap(obj);
+			return;
+		}
+	}
+
+	fnode_delete_remove_from_changed_postlop(&me->_mf_fsuperplop, obj); /* Inherit reference */
+}
+
+PRIVATE NOBLOCK NONNULL((1, 2)) Tobpostlockop(fsuper) *
+NOTHROW(LOCKOP_CC fnode_delete_remove_from_byino_lop)(Toblockop(fsuper) *__restrict self,
+                                                      struct fsuper *__restrict obj) {
+	REF struct fnode *me;
+	me = container_of(self, struct fnode, _mf_fsuperlop);
+	COMPILER_READ_BARRIER();
+	if (me->fn_supent.rb_rhs != FSUPER_NODES_DELETED) {
+		if unlikely(me->_fn_suplop.olo_func == &fnode_add2sup_lop) {
+			/* Device is still being async-added to the nodes tree.
+			 * In this case, we must wait for it to finish doing so
+			 * before trying to repeat the remove-from-tree lop. */
+			me->_mf_fsuperlop.olo_func = &fnode_delete_remove_from_byino_lop;
+			oblockop_enqueue(&obj->fs_nodeslockops, &me->_mf_fsuperlop); /* Retry later... */
+			return NULL;
+		}
+		fsuper_nodes_removenode(obj, me);
+		ATOMIC_WRITE(me->fn_supent.rb_rhs, FSUPER_NODES_DELETED);
+	}
+	me->_mf_fsuperplop.oplo_func = &fnode_delete_remove_from_byino_postlop; /* Inherit reference */
+	return &me->_mf_fsuperplop;
+}
+
+
+
+/* Internal implementation of `fnode_delete()' (don't call this one
+ * unless you know that you're doing; otherwise, you may cause race
+ * conditions that can result in data corruption) */
+PUBLIC NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL fnode_delete_impl)(/*inherit(always)*/ REF struct fnode *__restrict self) {
+	struct fsuper *super = self->fn_super;
+
+	/* Remove from the superblock's INode tree. */
+	if (ATOMIC_READ(self->fn_supent.rb_rhs) != FSUPER_NODES_DELETED) {
+again_lock_super:
+		if (fsuper_nodes_trywrite(super)) {
+			COMPILER_READ_BARRIER();
+			if (self->fn_supent.rb_rhs != FSUPER_NODES_DELETED) {
+				if unlikely(self->_fn_suplop.olo_func == &fnode_add2sup_lop) {
+					/* Reap+retry */
+					_fsuper_nodes_endwrite(super);
+					_fsuper_nodes_reap(super);
+					goto again_lock_super;
+				}
+				fsuper_nodes_removenode(super, self);
+				ATOMIC_WRITE(self->fn_supent.rb_rhs, FSUPER_NODES_DELETED);
+			}
+			fsuper_nodes_endwrite(super);
+		} else {
+			self->_mf_fsuperlop.olo_func = &fnode_delete_remove_from_byino_lop; /* Inherit reference */
+			oblockop_enqueue(&super->fs_nodeslockops, &self->_mf_fsuperlop);
+			_fsuper_nodes_reap(super);
+			return;
+		}
+	}
+	fnode_delete_remove_from_byino_postlop(&self->_mf_fsuperplop, super); /* Inherit reference */
+}
+
+/* Perform all of the async work needed for deleting `self' as the result of `fn_nlink == 0'
+ * This function will do the following (asynchronously if necessary)
+ *  - Set flags: MFILE_F_DELETED,  MFILE_F_NOATIME,  MFILE_F_NOMTIME, MFILE_F_CHANGED,
+ *               MFILE_F_ATTRCHANGED,  MFILE_F_FIXEDFILESIZE,   MFILE_FM_ATTRREADONLY,
+ *               MFILE_F_NOUSRMMAP, MFILE_F_NOUSRIO, MFILE_FS_NOSUID, MFILE_FS_NOEXEC,
+ *               MFILE_F_READONLY
+ *    If `MFILE_F_DELETED' was already set, none of the below are done!
+ *  - Unlink `self->fn_supent' (if bound)
+ *  - Unlink `self->fn_changed' (if bound)
+ *  - Unlink `self->fn_allnodes' (if bound)
+ *  - Call `mfile_delete()' (technically `mfile_delete_impl()') */
+PUBLIC NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL fnode_delete)(struct fnode *__restrict self) {
+	uintptr_t old_flags;
+
+	/* Delete global reference to the file-node. */
+	if (ATOMIC_FETCHAND(self->mf_flags, ~(MFILE_FN_GLOBAL_REF |
+	                                      MFILE_F_PERSISTENT)) &
+	    MFILE_FN_GLOBAL_REF) {
+		decref_nokill(self);
+	}
+
+	/* Mark the file as deleted (and make available use of the timestamp fields) */
+	mfile_tslock_acquire(self);
+	old_flags = ATOMIC_FETCHOR(self->mf_flags,
+	                           MFILE_F_DELETED | MFILE_F_NOATIME | MFILE_F_NOMTIME |
+	                           MFILE_F_CHANGED | MFILE_F_ATTRCHANGED | MFILE_F_FIXEDFILESIZE |
+	                           MFILE_FM_ATTRREADONLY | MFILE_F_NOUSRMMAP | MFILE_F_NOUSRIO |
+	                           MFILE_FS_NOSUID | MFILE_FS_NOEXEC | MFILE_F_READONLY);
+	if (old_flags & MFILE_F_PERSISTENT)
+		ATOMIC_AND(self->mf_flags, ~MFILE_F_PERSISTENT); /* Also clear the PERSISTENT flag */
+	mfile_tslock_release(self);
+
+	if (old_flags & MFILE_F_DELETED)
+		return; /* Already deleted, or deletion already in progress. */
+
+	incref(self);
+	fnode_delete_impl(self);
+}
+
+
+
 DECL_END
 
 #endif /* !GUARD_KERNEL_CORE_FILESYS_NODE_C */
