@@ -61,6 +61,11 @@ DECL_BEGIN
 
 #undef LC_COUNT
 
+#ifndef FCALL
+#define FCALL __FCALL
+#endif /* !FCALL */
+
+
 /*[[[deemon
 local offset = 0;
 
@@ -231,9 +236,9 @@ struct mo_file {
 	 *     getenv("LC_ALL")   ?:
 	 *     getenv(CATEGORY_NAME(category)) ?: // For the `category' given to `dcngettext(3)'
 	 *     getenv("LANG") ?:
-	 *     NULL                                // In this case, no translating is performed,
-	 *                                         // meaning that  gettext() simply  re-returns
-	 *                                         // its argument.
+	 *     NULL                               // In this case, no translating is performed,
+	 *                                        // meaning that  gettext(3) simply re-returns
+	 *                                        // its argument.
 	 * ```
 	 */
 	LLRBTREE_NODE(mo_file)           mf_node;     /* [lock(mofiletree_lock)] R/B Tree node */
@@ -241,7 +246,7 @@ struct mo_file {
 	uintptr_half_t                   mf_red;      /* [lock(mofiletree_lock)] Red/Black bit for the tree of mo files. */
 	size_t                           mf_size;     /* [const] Total size of file (== mmap'd size) */
 	union {
-		byte_t                      *mf_base;     /* [1..mf_size][owned][const] File base address / data blob. (mmap'd) */
+		byte_t const                *mf_base;     /* [1..mf_size][owned][const] File base address / data blob. (mmap'd) */
 		struct mo_file_header const *mf_hdr;      /* [1..1][const] File header. */
 	};
 	/* Cached fields. */
@@ -262,7 +267,7 @@ DECL_END
 #define RBTREE(name)               mofiletree_##name
 #define RBTREE_T                   struct mo_file
 #define RBTREE_Tkey                char const *
-#define RBTREE_CC                  __FCALL
+#define RBTREE_CC                  FCALL
 #define RBTREE_NOTHROW             NOTHROW
 #define RBTREE_KEY_LO(a, b)        (strcmp(a, b) < 0)
 #define RBTREE_KEY_LE(a, b)        (strcmp(a, b) <= 0)
@@ -307,7 +312,7 @@ PRIVATE char const unknown_language_name[] = "";
  *   - textdomain(3)
  *   - bindtextdomain(3)
  *   - bind_textdomain_codeset(3) */
-PRIVATE void NOTHROW(__FCALL clear_language_cache)(void) {
+PRIVATE void NOTHROW(FCALL clear_language_cache)(void) {
 	unsigned int i;
 	for (i = 0; i < LC_COUNT; ++i) {
 		char *lang = language_names[i];
@@ -324,7 +329,7 @@ PRIVATE void NOTHROW(__FCALL clear_language_cache)(void) {
  * NOTE: The caller must ensure that `category' is valid.
  * NOTE: Leading or trailing slashes will have been removed */
 PRIVATE ATTR_RETNONNULL WUNUSED char const *
-NOTHROW(__FCALL get_language_name)(int category) {
+NOTHROW(FCALL get_language_name)(int category) {
 	char const *result;
 	result = language_names[(unsigned int)category];
 	if (!result) {
@@ -385,7 +390,7 @@ PRIVATE struct domain_directory *domain_directory_list = NULL;
 PRIVATE char const default_domain_dir[] = _PATH_TEXTDOMAIN;
 
 /* Return the directory against which `domainname' is bound. */
-PRIVATE ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) char const *__FCALL
+PRIVATE ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) char const *FCALL
 get_domain_directory(char const *__restrict domainname) {
 	size_t lo = 0, hi = domain_directory_size;
 	/* Binary search for the correct entry. */
@@ -429,7 +434,7 @@ struct plural_parser {
 
 /* Plural expression tokenization. */
 PRIVATE NONNULL((1)) void
-NOTHROW_NCX(__FCALL plural_yield)(struct plural_parser *__restrict self) {
+NOTHROW_NCX(FCALL plural_yield)(struct plural_parser *__restrict self) {
 	plural_tok_t result;
 	char const *ptr = self->pp_ptr;
 	char ch;
@@ -601,7 +606,7 @@ eof:
 }
 
 /* The following c-like operators are supported (in this priority order):
- *   UNARY  ::=  '!' UNARY | <CONST> | '(' COND ')'
+ *   UNARY  ::=  '!' UNARY | '-' UNARY | <CONST> | '(' COND ')'
  *   PROD   ::=  UNARY | UNARY '*' PROD | UNARY '/' PROD | UNARY '%' PROD
  *   SUM    ::=  PROD | PROD '+' SUM | PROD '-' SUM
  *   CMP    ::=  SUM | SUM '<' CMP | SUM '>' CMP | SUM '<=' CMP | SUM '>=' CMP
@@ -612,9 +617,9 @@ eof:
  */
 
 PRIVATE WUNUSED NONNULL((1)) longptr_t
-NOTHROW_NCX(__FCALL plural_cond)(struct plural_parser *__restrict self);
+NOTHROW_NCX(FCALL plural_cond)(struct plural_parser *__restrict self);
 PRIVATE WUNUSED NONNULL((1)) longptr_t
-NOTHROW_NCX(__FCALL plural_unary)(struct plural_parser *__restrict self) {
+NOTHROW_NCX(FCALL plural_unary)(struct plural_parser *__restrict self) {
 	longptr_t result;
 	plural_tok_t tok;
 	tok = self->pp_tok;
@@ -652,7 +657,7 @@ NOTHROW_NCX(__FCALL plural_unary)(struct plural_parser *__restrict self) {
 }
 
 PRIVATE WUNUSED NONNULL((1)) longptr_t
-NOTHROW_NCX(__FCALL plural_prod)(struct plural_parser *__restrict self) {
+NOTHROW_NCX(FCALL plural_prod)(struct plural_parser *__restrict self) {
 	longptr_t other, result = plural_unary(self);
 	while (self->pp_tok == '*' || self->pp_tok == '/' || self->pp_tok == '%') {
 		plural_tok_t cmd = self->pp_tok;
@@ -669,7 +674,7 @@ NOTHROW_NCX(__FCALL plural_prod)(struct plural_parser *__restrict self) {
 }
 
 PRIVATE WUNUSED NONNULL((1)) longptr_t
-NOTHROW_NCX(__FCALL plural_sum)(struct plural_parser *__restrict self) {
+NOTHROW_NCX(FCALL plural_sum)(struct plural_parser *__restrict self) {
 	longptr_t other, result = plural_prod(self);
 	while (self->pp_tok == '+' || self->pp_tok == '-') {
 		plural_tok_t cmd = self->pp_tok;
@@ -682,7 +687,7 @@ NOTHROW_NCX(__FCALL plural_sum)(struct plural_parser *__restrict self) {
 }
 
 PRIVATE WUNUSED NONNULL((1)) longptr_t
-NOTHROW_NCX(__FCALL plural_cmp)(struct plural_parser *__restrict self) {
+NOTHROW_NCX(FCALL plural_cmp)(struct plural_parser *__restrict self) {
 	longptr_t other, result = plural_sum(self);
 	while (self->pp_tok == '<' || self->pp_tok == PLURAL_TOK_LE ||
 	       self->pp_tok == '>' || self->pp_tok == PLURAL_TOK_GE) {
@@ -703,7 +708,7 @@ NOTHROW_NCX(__FCALL plural_cmp)(struct plural_parser *__restrict self) {
 }
 
 PRIVATE WUNUSED NONNULL((1)) longptr_t
-NOTHROW_NCX(__FCALL plural_cmpeq)(struct plural_parser *__restrict self) {
+NOTHROW_NCX(FCALL plural_cmpeq)(struct plural_parser *__restrict self) {
 	longptr_t other, result = plural_cmp(self);
 	while (self->pp_tok == PLURAL_TOK_EQ || self->pp_tok == PLURAL_TOK_NE) {
 		plural_tok_t cmd = self->pp_tok;
@@ -716,29 +721,29 @@ NOTHROW_NCX(__FCALL plural_cmpeq)(struct plural_parser *__restrict self) {
 }
 
 PRIVATE WUNUSED NONNULL((1)) longptr_t
-NOTHROW_NCX(__FCALL plural_land)(struct plural_parser *__restrict self) {
-	longptr_t result;
-	result = plural_cmpeq(self);
+NOTHROW_NCX(FCALL plural_land)(struct plural_parser *__restrict self) {
+	longptr_t other, result = plural_cmpeq(self);
 	while (self->pp_tok == PLURAL_TOK_LAND) {
 		plural_yield(self);
-		result = result && plural_cmpeq(self);
+		other  = plural_cmpeq(self);
+		result = result && other;
 	}
 	return result;
 }
 
 PRIVATE WUNUSED NONNULL((1)) longptr_t
-NOTHROW_NCX(__FCALL plural_lor)(struct plural_parser *__restrict self) {
-	longptr_t result;
-	result = plural_land(self);
+NOTHROW_NCX(FCALL plural_lor)(struct plural_parser *__restrict self) {
+	longptr_t other, result = plural_land(self);
 	while (self->pp_tok == PLURAL_TOK_LOR) {
 		plural_yield(self);
-		result = result || plural_land(self);
+		other  = plural_land(self);
+		result = result || other;
 	}
 	return result;
 }
 
 PRIVATE WUNUSED NONNULL((1)) longptr_t
-NOTHROW_NCX(__FCALL plural_cond)(struct plural_parser *__restrict self) {
+NOTHROW_NCX(FCALL plural_cond)(struct plural_parser *__restrict self) {
 	longptr_t result;
 	result = plural_lor(self);
 	if (self->pp_tok == '?') {
@@ -755,7 +760,8 @@ NOTHROW_NCX(__FCALL plural_cond)(struct plural_parser *__restrict self) {
 
 /* Evaluate a plural expression and return the strend^N index to-be used. */
 PRIVATE ATTR_PURE WUNUSED NONNULL((1)) ulongptr_t
-NOTHROW_NCX(__FCALL eval_plural_expression)(char const *__restrict expr, longptr_t n) {
+NOTHROW_NCX(FCALL eval_plural_expression)(char const *__restrict expr,
+                                          longptr_t n) {
 	longptr_t result;
 	struct plural_parser parser;
 	parser.pp_ptr = expr;
@@ -775,8 +781,8 @@ NOTHROW_NCX(__FCALL eval_plural_expression)(char const *__restrict expr, longptr
 
 /* Parse meta-data information. */
 PRIVATE ATTR_PURE WUNUSED NONNULL((1)) char const *
-NOTHROW_NCX(__FCALL mo_extract_plural_from_metadata)(char const *__restrict header,
-                                                     size_t header_len) {
+NOTHROW_NCX(FCALL mo_extract_plural_from_metadata)(char const *__restrict header,
+                                                   size_t header_len) {
 	char const *header_end;
 	/* We only care about plural information. The header contains line-wise
 	 * instructions of where to find that sort of information, and the line
@@ -853,7 +859,7 @@ NOTHROW_NCX(__FCALL mo_extract_plural_from_metadata)(char const *__restrict head
 
 /* Try to open a .mo file for the given specs. */
 PRIVATE ATTR_NOINLINE WUNUSED NONNULL((1)) struct mo_file *
-NOTHROW_NCX(__FCALL open_mo_file)(char const *__restrict domainname, int category) {
+NOTHROW_NCX(FCALL open_mo_file)(char const *__restrict domainname, int category) {
 	struct mo_file *result;
 	char const *lng; /* Used language name */
 	char const *dir; /* Used domain directory */
@@ -970,7 +976,7 @@ err_r_map:
 		}
 
 		result->mf_size   = (size_t)st.st_size;
-		result->mf_base   = (byte_t *)base;
+		result->mf_base   = (byte_t const *)base;
 		result->mf_strcnt = base->mo_strcount;
 		result->mf_strtab = (struct mo_file_string const *)((byte_t const *)base + base->mo_stroffs);
 		result->mf_trntab = (struct mo_file_string const *)((byte_t const *)base + base->mo_trnoffs);
@@ -1006,7 +1012,7 @@ err_r_map:
 	if unlikely(!mofiletree_tryinsert(&mofiletree_root, result)) {
 		/* Race condition: another thread was faster. */
 		atomic_rwlock_endwrite(&mofiletree_lock);
-		munmap(result->mf_base, result->mf_size);
+		munmap((void *)result->mf_base, result->mf_size);
 		free(result);
 		goto again_load_from_tree;
 	}
@@ -1033,7 +1039,7 @@ PRIVATE char const /*    */ *last_domainname = NULL;
 
 
 /* Return the .mo file associated with the given arguments. */
-PRIVATE WUNUSED NONNULL((1)) struct mo_file *__FCALL
+PRIVATE WUNUSED NONNULL((1)) struct mo_file *FCALL
 get_mo_file(char const *__restrict domainname, int category) {
 	struct mo_file *result;
 	atomic_rwlock_read(&last_lock);
@@ -1086,7 +1092,7 @@ PRIVATE char *current_domainname = NULL;
 
 /* Translate the given message. */
 PRIVATE ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) char const *
-NOTHROW_NCX(__FCALL mo_file_translate)(struct mo_file *__restrict self,
+NOTHROW_NCX(FCALL mo_file_translate)(struct mo_file *__restrict self,
                                        char const *__restrict msgid) {
 	size_t lo, hi;
 	/* The specs promise that strings are sorted lexicographically.
@@ -1135,7 +1141,7 @@ corrupt:
 
 /* Translate the given message. */
 PRIVATE ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) char const *
-NOTHROW_NCX(__FCALL mo_file_translate_plural)(struct mo_file *__restrict self,
+NOTHROW_NCX(FCALL mo_file_translate_plural)(struct mo_file *__restrict self,
                                               char const *__restrict msgid,
                                               ulongptr_t index) {
 	size_t lo, hi;
