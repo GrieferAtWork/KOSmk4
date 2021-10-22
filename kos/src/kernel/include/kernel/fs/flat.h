@@ -85,6 +85,7 @@ struct fflatdirent {
 DEFINE_REFCOUNT_FUNCTIONS(struct fflatdirent, fde_ent.fd_refcnt, fflatdirent_destroy)
 
 #define fdirent_asflat(self)      COMPILER_CONTAINER_OF(self, struct fflatdirent, fde_ent)
+#define fflatdirent_basaddr(self) ((self)->fde_pos)
 #define fflatdirent_endaddr(self) ((self)->fde_pos + (self)->fde_size)
 
 /* Check if `self' was deleted. */
@@ -132,12 +133,16 @@ struct fflatdirnode_xops {
 	(KCALL *fdnx_readdir)(struct fflatdirnode *__restrict self, pos_t pos)
 			THROWS(E_BADALLOC, E_IOERROR);
 
-	/* [1..1][lock(WRITE(self->fdn_data.fdd_lock))]
+	/* [0..1][lock(WRITE(self->fdn_data.fdd_lock))]
 	 * - Write a directory entry `ent' pointing to `file' into the stream of  `self'.
 	 * - The caller of this function must check for `MFILE_F_READONLY' and not invoke
 	 *   it if that flag was set at the time of the check.
 	 * - This  operator will not be called if  `MFILE_F_DELETED' was found to be set
 	 *   at some point after the write-lock to self->fdn_data.fdd_lock was acquired.
+	 * - When `FFLATSUPER_FEAT_WRITEDIR_CHANGES_INO' is set, this operator may alter:
+	 *   - file->fn_ino          (in this case though, only while holding `mfile_tslock_acquire()')
+	 *   - ent->fde_ent.fd_ino   (must remain in-sync with `file->fn_ino'; no
+	 *                           lock  is needed when  writing to this field)
 	 *
 	 * Implementation:
 	 * >> pos_t entpos;
@@ -171,6 +176,7 @@ struct fflatdirnode_xops {
 	 * >> ent->fde_pos  = entpos;
 	 * >> ent->fde_size = reqsiz;
 	 * >> return true;
+	 * @param: at_end_of_dir: Entry is being created at the end of the directory.
 	 * @return: true:  New entry was written to disk
 	 * @return: false: Insufficient space at `ent->fde_pos'  (which may have been  moved
 	 *                 to a higher location in case it overlapped with a reserved area).
@@ -180,27 +186,31 @@ struct fflatdirnode_xops {
 	WUNUSED NONNULL((1, 2, 3)) __BOOL
 	(KCALL *fdnx_writedir)(struct fflatdirnode *__restrict self,
 	                       struct fflatdirent *__restrict ent,
-	                       struct fnode *__restrict file)
+	                       struct fnode *__restrict file,
+	                       __BOOL at_end_of_dir)
 			THROWS(E_IOERROR, E_FSERROR_DISK_FULL, E_FSERROR_ILLEGAL_PATH);
 
-	/* [1..1][lock(WRITE(self->fdn_data.fdd_lock))]
+	/* [0..1][lock(WRITE(self->fdn_data.fdd_lock))]
+	 * [if(fdnx_writedir != NULL, [1..1])]
 	 * - Modify the on-disk data for `ent' to mark it as having been deleted.
 	 * - This function is invoked during error-cleanup paths, and even though
 	 *   it is allowed to throw exceptions,  it should refrain from doing  so
 	 *   since the act might lead to filesystem errors.
-	 * - If appropriate, the _CALLER_ will decrement `file->fn_nlink'! If in
-	 *   this case `fn_nlink' drops to `0', `fdnx_deletefil' will be called.
+	 * - If  appropriate,  the _CALLER_  will decrement  `[file]->fn_nlink'! If
+	 *   in this case `fn_nlink' drops to `0', `fdnx_deletefil' will be called.
 	 * - The caller of this function must check for `MFILE_F_READONLY' and
 	 *   not invoke it  if that flag  was set  at the time  of the  check.
 	 * - This  operator will not be called if  `MFILE_F_DELETED' was found to be set
-	 *   at some point after the write-lock to self->fdn_data.fdd_lock was acquired. */
-	NONNULL((1, 2, 3)) void
+	 *   at some point after the write-lock to self->fdn_data.fdd_lock was acquired.
+	 * @param: at_end_of_dir: When `true', the delete is happening such that `ent'
+	 *                        scrapes against the far end of the directory stream. */
+	NONNULL((1, 2)) void
 	(KCALL *fdnx_deleteent)(struct fflatdirnode *__restrict self,
 	                        struct fflatdirent const *__restrict ent,
-	                        struct fnode *__restrict file)
+	                        __BOOL at_end_of_dir)
 			THROWS(E_IOERROR);
 
-	/* [1..1][lock(WRITE(self->fdn_data.fdd_lock))]
+	/* [1..1]
 	 * - Create  a new file & directory entry (but _DONT_ try to add the entry to `self')
 	 * - This function is only supposed to allocate a new file-node as will be needed for
 	 *   representing the file specified by `info'  in memory. NOTE: This function  isn't
@@ -215,7 +225,8 @@ struct fflatdirnode_xops {
 	 *  - return->_fnode_file_ mf_flags      = ... & (MFILE_F_READONLY | MFILE_F_NOUSRMMAP |    # directories require `MFILE_F_FIXEDFILESIZE', and should
 	 *                                                MFILE_F_NOUSRIO | MFILE_F_FIXEDFILESIZE | # probably also have `MFILE_F_NOUSRMMAP | MFILE_F_NOUSRIO'
 	 *                                                MFILE_FM_ATTRREADONLY);
-	 *  - return->fn_ino                     = <unallocated>;      # FS-specific, inode number for non-allocated files
+	 *  - return->_fnode_file_ mf_filesize   = S_ISDIR(info->mkf_fmode) ? (pos_t)-1 : (pos_t)...;
+	 *  - return->fn_ino                     = <unallocated>;      # FS-specific, inode number for non-allocated files (later allocated in `fdnx_allocfile' or `fdnx_writedir')
 	 *  - return->*                          = ...;                # Any fields from sub-classes of `fnode'
 	 * The caller of this function will do the following additional init:
 	 *  - return->_fnode_file_ mf_refcnt     = 1 + ...;   # +1: MFILE_FN_GLOBAL_REF
@@ -227,7 +238,6 @@ struct fflatdirnode_xops {
 	 *  - return->_fnode_file_ mf_changed    = SLIST_HEAD_INITIALIZER(~);
 	 *  - return->_fnode_file_ mf_part_amask = MAX(PAGESIZE, 1 << mf_blockshift) - 1;
 	 *  - return->_fnode_file_ mf_trunclock  = 0;
-	 *  - return->_fnode_file_ mf_filesize   = S_ISDIR(info->mkf_fmode) ? (pos_t)-1 : (pos_t)0;
 	 *  - return->_fnode_file_ mf_atime      = info->mkf_creat.c_atime;
 	 *  - return->_fnode_file_ mf_mtime      = info->mkf_creat.c_mtime;
 	 *  - return->_fnode_file_ mf_ctime      = info->mkf_creat.c_ctime;
@@ -238,7 +248,7 @@ struct fflatdirnode_xops {
 	 *  - return->fn_super                   = incref(dir->_fdirnode_node_ fn_super);
 	 *  - return->fn_changed                 = LIST_ENTRY_UNBOUND_INITIALIZER;
 	 *  - return->fn_supent                  = ...;    # By adding to the superblock's node-tree (or marking as unbound)
-	 *  - return->fn_allnodes                = ...;    # via `fnode_init_add2all()'
+	 *  - return->fn_allnodes                = ...;    # via `fnode_init_addtoall()'
 	 * @return: * : The newly allocated (and partially initialized) file.
 	 * @throw: E_FSERROR_UNSUPPORTED_OPERATION: Filesystem doesn't support `info->mkf_fmode & S_IFMT' */
 	ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) struct fnode *
@@ -246,7 +256,7 @@ struct fflatdirnode_xops {
 	                     struct fmkfile_info const *__restrict info)
 			THROWS(E_BADALLOC, E_IOERROR, E_FSERROR_UNSUPPORTED_OPERATION);
 
-	/* [0..1][lock(WRITE(self->fdn_data.fdd_lock))]
+	/* [0..1]
 	 * - Allocate  a new flat-directory-entry for a given `file' returned by `fdnx_mkfile()'
 	 *   This operator is optional, and if not  implemented will be substituted by a  direct
 	 *   allocation of a `struct fflatdirent' object (using `fflatdirent_ops' for operators)
@@ -268,7 +278,7 @@ struct fflatdirnode_xops {
 	 *  - return->fde_ent.fd_hash    = info->mkf_hash;     # or `fdirent_hash(return->fde_ent.fd_name, return->fde_ent.fd_namelen)'
 	 *  - ...;                               # Caller will insert into hash-vector after successful `fdnx_writedir()'
 	 * @return: * : The newly allocated (and partially initialized) directory entry. */
-	ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) struct fflatdirent *
+	ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3)) struct fflatdirent *
 	(KCALL *fdnx_mkent)(struct fflatdirnode *__restrict self,
 	                    struct fmkfile_info const *__restrict info,
 	                    struct fnode *__restrict file)
@@ -292,14 +302,17 @@ struct fflatdirnode_xops {
 	 * written by `fdnx_writedir()' will be marked as deleted (`fdnx_deleteent'). */
 	NONNULL((1, 2, 3)) void
 	(KCALL *fdnx_allocfile)(struct fflatdirnode *__restrict self,
-	                        struct fnode *__restrict file,
-	                        struct fflatdirent *__restrict ent)
+	                        struct fflatdirent *__restrict ent,
+	                        struct fnode *__restrict file)
 			THROWS(E_BADALLOC, E_IOERROR);
 
 	/* [0..1]
 	 * Following deletion of `deleted_ent', the nlink counter of `file' reached `0'.
 	 * As the result of this,  this operator is invoked  for the purpose of  freeing
 	 * any remaining on-disk data of `file'.
+	 *
+	 * At the point at which this operator is invoked, `self' will have already been
+	 * marked as deleted
 	 *
 	 * Used for:
 	 *   - FAT:  Free the cluster chain used for backing data of `file'
@@ -377,15 +390,22 @@ struct fflatdir_bucket {
 	struct fflatdirent *ffdb_ent; /* [0..1] Directory entry, internal-stub for deleted, or NULL for sentinel */
 };
 
+
+/* Flags for `struct fflatdirdata::fdd_flags' */
+#define FFLATDIR_F_NORMAL         0x0000 /* Normal flags */
+#define FFLATDIR_F_EOF            0x0001 /* EOF was reached (`fdnx_readdir(this, fflatdirent_endaddr(TAILQ_LAST(&fdd_bypos))) == NULL') */
+#define FFLATDIR_F_GAP_NOTLARGEST 0x0002 /* `fdd_biggest_gap' may not necessarily be the largest gap. */
+
 struct fflatdirdata {
 	struct shared_rwlock         fdd_lock;        /* Lock for directory data. */
 	struct REF fflatdirent_tailq fdd_bypos;       /* [0..n][lock(fdd_lock)] List of files sorted by position in directory  stream.
 	                                               * The files in this list are _IDENTICAL_ to those in `fdd_fileslist'. This list
 	                                               * is simply an alternative way of looking at the contents of the directory. */
-	size_t                       fdd_biggest_gap; /* [lock(fdd_lock)] Size of the biggest gap between directory entries in `fdd_bypos'
+	pos_t                        fdd_biggest_gap; /* [lock(fdd_lock)] Size of the biggest gap between directory entries in `fdd_bypos'
 	                                               * Used during file creation to pick between searching for a suitable gap to put new
 	                                               * files, or appending them at the end of the directory. */
-	__BOOL                       fdd_goteof;      /* [lock(fdd_lock)] Set when `fdnx_readdir(this, fflatdirent_endaddr(TAILQ_LAST(&fdd_bypos))) == NULL' */
+	struct fflatdirent          *fdd_biggest_suc; /* [lock(fdd_lock)][1..1][valid_if(fdd_biggest_gap != 0)] Successor after `fdd_biggest_gap' */
+	uintptr_t                    fdd_flags;       /* [lock(fdd_lock)] */
 	size_t                       fdd_filessize;   /* [lock(fdd_lock)] Amount of used (non-NULL and non-deleted) directory entries */
 	size_t                       fdd_filesused;   /* [lock(fdd_lock)] Amount of (non-NULL) directory entries */
 	size_t                       fdd_filesmask;   /* [lock(fdd_lock)] Hash-mask for `p_cldlist' */
@@ -402,25 +422,25 @@ struct fflatdirdata {
 DATDEF struct fflatdir_bucket const _fflatdir_empty_buckets[1] ASMNAME("fflatdir_empty_buckets");
 #define fflatdir_empty_buckets ((struct fflatdir_bucket *)_fflatdir_empty_buckets)
 
-#define fflatdirdata_init(self)             \
-	(shared_rwlock_init(&(self)->fdd_lock), \
-	 (self)->fdd_files = __NULLPTR,         \
-	 TAILQ_INIT(&(self)->fdd_bypos),        \
-	 (self)->fdd_biggest_gap = 0,           \
-	 (self)->fdd_goteof      = 0,           \
-	 (self)->fdd_filessize   = 0,           \
-	 (self)->fdd_filesused   = 0,           \
-	 (self)->fdd_filesmask   = 0,           \
+#define fflatdirdata_init(self)                   \
+	(shared_rwlock_init(&(self)->fdd_lock),       \
+	 (self)->fdd_files = __NULLPTR,               \
+	 TAILQ_INIT(&(self)->fdd_bypos),              \
+	 (self)->fdd_biggest_gap = 0,                 \
+	 (self)->fdd_flags       = FFLATDIR_F_NORMAL, \
+	 (self)->fdd_filessize   = 0,                 \
+	 (self)->fdd_filesused   = 0,                 \
+	 (self)->fdd_filesmask   = 0,                 \
 	 (self)->fdd_fileslist   = fflatdir_empty_buckets)
-#define fflatdirdata_cinit(self)                       \
-	(shared_rwlock_cinit(&(self)->fdd_lock),           \
-	 __hybrid_assert((self)->fdd_files == __NULLPTR),  \
-	 __hybrid_assert(TAILQ_EMPTY(&(self)->fdd_bypos)), \
-	 __hybrid_assert((self)->fdd_biggest_gap == 0),    \
-	 __hybrid_assert((self)->fdd_goteof == 0),         \
-	 __hybrid_assert((self)->fdd_filessize == 0),      \
-	 __hybrid_assert((self)->fdd_filesused == 0),      \
-	 __hybrid_assert((self)->fdd_filesmask == 0),      \
+#define fflatdirdata_cinit(self)                              \
+	(shared_rwlock_cinit(&(self)->fdd_lock),                  \
+	 __hybrid_assert((self)->fdd_files == __NULLPTR),         \
+	 __hybrid_assert(TAILQ_EMPTY(&(self)->fdd_bypos)),        \
+	 __hybrid_assert((self)->fdd_biggest_gap == 0),           \
+	 __hybrid_assert((self)->fdd_flags == FFLATDIR_F_NORMAL), \
+	 __hybrid_assert((self)->fdd_filessize == 0),             \
+	 __hybrid_assert((self)->fdd_filesused == 0),             \
+	 __hybrid_assert((self)->fdd_filesmask == 0),             \
 	 (self)->fdd_fileslist = fflatdir_empty_buckets)
 
 /* Finalize the given flat directory data container. */
@@ -432,6 +452,7 @@ NOTHROW(FCALL fflatdirdata_fini)(struct fflatdirdata *__restrict self);
  * for `fdd_bypos', as well as to be holding a lock to `self->fdn_data.fdd_lock'. */
 FUNDEF NOBLOCK NONNULL((1, 2)) void NOTHROW(FCALL fflatdirnode_fileslist_removeent)(struct fflatdirnode *__restrict self, struct fflatdirent *__restrict ent);
 FUNDEF NOBLOCK NONNULL((1, 2)) void NOTHROW(FCALL fflatdirnode_fileslist_insertent)(struct fflatdirnode *__restrict self, struct fflatdirent *__restrict ent);
+FUNDEF NOBLOCK WUNUSED NONNULL((1, 2)) __BOOL NOTHROW(FCALL fflatdirnode_fileslist_tryinsertent)(struct fflatdirnode *__restrict self, struct fflatdirent *__restrict ent);
 FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL fflatdirnode_fileslist_rehash_after_remove)(struct fflatdirnode *__restrict self);
 FUNDEF NONNULL((1)) void FCALL fflatdirnode_fileslist_rehash_before_insert(struct fflatdirnode *__restrict self) THROWS(E_BADALLOC);
 
@@ -511,6 +532,31 @@ struct fflatdirnode
 #define fflatdirnode_assuper(self) __COMPILER_CONTAINER_OF(self, struct fflatsuper, ffs_super.fs_root)
 
 
+/* Helpers for accessing `fdn_data.fdd_lock' */
+#define _fflatdirnode_reap(self)      _fflatdirdata_reap(&(self)->fdn_data)
+#define fflatdirnode_reap(self)       fflatdirdata_reap(&(self)->fdn_data)
+#define fflatdirnode_write(self)      fflatdirdata_write(&(self)->fdn_data)
+#define fflatdirnode_write_nx(self)   fflatdirdata_write_nx(&(self)->fdn_data)
+#define fflatdirnode_trywrite(self)   fflatdirdata_trywrite(&(self)->fdn_data)
+#define fflatdirnode_endwrite(self)   fflatdirdata_endwrite(&(self)->fdn_data)
+#define _fflatdirnode_endwrite(self)  _fflatdirdata_endwrite(&(self)->fdn_data)
+#define fflatdirnode_read(self)       fflatdirdata_read(&(self)->fdn_data)
+#define fflatdirnode_read_nx(self)    fflatdirdata_read_nx(&(self)->fdn_data)
+#define fflatdirnode_tryread(self)    fflatdirdata_tryread(&(self)->fdn_data)
+#define _fflatdirnode_endread(self)   _fflatdirdata_endread(&(self)->fdn_data)
+#define fflatdirnode_endread(self)    fflatdirdata_endread(&(self)->fdn_data)
+#define _fflatdirnode_end(self)       _fflatdirdata_end(&(self)->fdn_data)
+#define fflatdirnode_end(self)        fflatdirdata_end(&(self)->fdn_data)
+#define fflatdirnode_upgrade(self)    fflatdirdata_upgrade(&(self)->fdn_data)
+#define fflatdirnode_upgrade_nx(self) fflatdirdata_upgrade_nx(&(self)->fdn_data)
+#define fflatdirnode_tryupgrade(self) fflatdirdata_tryupgrade(&(self)->fdn_data)
+#define fflatdirnode_downgrade(self)  fflatdirdata_downgrade(&(self)->fdn_data)
+#define fflatdirnode_reading(self)    fflatdirdata_reading(&(self)->fdn_data)
+#define fflatdirnode_writing(self)    fflatdirdata_writing(&(self)->fdn_data)
+#define fflatdirnode_canread(self)    fflatdirdata_canread(&(self)->fdn_data)
+#define fflatdirnode_canwrite(self)   fflatdirdata_canwrite(&(self)->fdn_data)
+
+
 /* Initialize common+basic fields. The caller must still initialize:
  *  - self->_fflatdirnode_dir_ _fdirnode_node_ _fnode_file_ mf_atime
  *  - self->_fflatdirnode_dir_ _fdirnode_node_ _fnode_file_ mf_mtime
@@ -578,7 +624,7 @@ struct fflatsuper_ops {
 	 *  - return->fn_super                   = incref(dir->_fdirnode_node_ fn_super);
 	 *  - return->fn_changed                 = LIST_ENTRY_UNBOUND_INITIALIZER;
 	 *  - return->fn_supent                  = ...;    # By adding to the superblock's node-tree (or marking as unbound)
-	 *  - return->fn_allnodes                = ...;    # via `fnode_init_add2all()'
+	 *  - return->fn_allnodes                = ...;    # via `fnode_init_addtoall()'
 	 * @return: * : The newly allocated (and partially initialized) node. */
 	ATTR_RETNONNULL WUNUSED NONNULL((1)) struct fnode *
 	(KCALL *ffso_makenode)(struct fflatsuper *__restrict self,
@@ -590,8 +636,14 @@ struct fflatsuper_ops {
 	struct fflatdirnode_xops ffso_flat;  /* Flat root directory operators */
 };
 
+
+/* Flags for `struct fflatsuper::ffs_features' */
+#define FFLATSUPER_FEAT_NORMAL               0x0000 /* No special features. */
+#define FFLATSUPER_FEAT_WRITEDIR_CHANGES_INO 0x0001 /* The `fdnx_writedir' operator of directories may alter the INode number of a file. */
+
 struct fflatsuper {
 	/* flat-superblock-specific data goes here. */
+	uintptr_t           ffs_features; /* Set of `FFLATSUPER_FEAT_*' */
 	struct fsuper       ffs_super;    /* Underlying superblock. */
 	struct fflatdirdata ffs_rootdata; /* Directory data for the filesystem root. */
 };

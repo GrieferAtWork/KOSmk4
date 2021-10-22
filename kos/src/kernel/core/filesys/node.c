@@ -26,6 +26,7 @@
 #define __WANT_MFILE__mf_lopX
 #define __WANT_FNODE__fn_chnglop
 #define __WANT_FNODE__fn_alllop
+#define __WANT_FNODE__fn_suplop
 #define _KOS_SOURCE 1
 
 #include <kernel/compiler.h>
@@ -54,6 +55,7 @@
 
 /* Filenode tree operations. (for `struct fsuper::fs_nodes') */
 #define RBTREE_LEFT_LEANING
+#define RBTREE_WANT_TRYINSERT
 #define RBTREE(name)               fnode_tree_##name
 #define RBTREE_T                   struct fnode
 #define RBTREE_Tkey                ino_t
@@ -164,7 +166,7 @@ NOTHROW(LOCKOP_CC fnode_v_destroy_rmall_postlop)(struct postlockop *__restrict s
 PRIVATE NOBLOCK NONNULL((1)) struct postlockop *
 NOTHROW(LOCKOP_CC fnode_v_destroy_rmallsuper_lop)(struct lockop *__restrict self) {
 	struct fsuper *me = container_of(self, struct fsuper, fs_root._mf_lop);
-	assert(me->fs_root._fn_alllop.lo_func != &fnode_add2all_lop);
+	assert(me->fs_root._fn_alllop.lo_func != &fnode_addtoall_lop);
 	if (LIST_ISBOUND(me, fs_root.fn_allsuper))
 		LIST_REMOVE(me, fs_root.fn_allsuper);
 	me->fs_root._mf_plop.plo_func = &fnode_v_destroy_rmall_postlop;
@@ -174,8 +176,8 @@ NOTHROW(LOCKOP_CC fnode_v_destroy_rmallsuper_lop)(struct lockop *__restrict self
 PRIVATE NOBLOCK NONNULL((1)) struct postlockop *
 NOTHROW(LOCKOP_CC fnode_v_destroy_rmallnodes_lop)(struct lockop *__restrict self) {
 	struct fnode *me = container_of(self, struct fnode, _mf_lop);
-	if unlikely(me->_fn_alllop.lo_func == &fnode_add2all_lop) {
-		/* Must let `fnode_add2all_lop()' finish first! */
+	if unlikely(me->_fn_alllop.lo_func == &fnode_addtoall_lop) {
+		/* Must let `fnode_addtoall_lop()' finish first! */
 		me->_mf_lop.lo_func = &fnode_v_destroy_rmallnodes_lop;
 		lockop_enqueue(&fallnodes_lockops, &me->_mf_lop);
 		return NULL;
@@ -198,8 +200,8 @@ again_unbind_allnodes:
 	if (LIST_ISBOUND(me, fn_allnodes)) {
 		if (fallnodes_tryacquire()) {
 			COMPILER_READ_BARRIER();
-			if unlikely(me->_fn_alllop.lo_func == &fnode_add2all_lop) {
-				fallnodes_release(); /* This should reap & invoke fnode_add2all_lop() */
+			if unlikely(me->_fn_alllop.lo_func == &fnode_addtoall_lop) {
+				fallnodes_release(); /* This should reap & invoke fnode_addtoall_lop() */
 				goto again_unbind_allnodes;
 			}
 			if (LIST_ISBOUND(me, fn_allnodes))
@@ -223,7 +225,12 @@ NOTHROW(LOCKOP_CC fnode_v_destroy_rmsuper_lop)(Toblockop(fsuper) *__restrict sel
                                                struct fsuper *__restrict obj) {
 	struct fnode *me = container_of(self, struct fnode, _mf_fsuperlop);
 	COMPILER_READ_BARRIER();
-	if (me->fn_supent.rb_lhs != FSUPER_NODES_DELETED) {
+	assertf(me->_fn_suplop.olo_func != &fnode_add2sup_lop,
+	        "The `fnode_add2sup_lop' function owns a reference to the node, "
+	        "and we only get here then the reference counter reaches 0, so "
+	        "there should be no way the object is still trying to async-add "
+	        "itself to the nodes list!");
+	if (me->fn_supent.rb_rhs != FSUPER_NODES_DELETED) {
 		assert(obj->fs_nodes != FSUPER_NODES_DELETED);
 		fsuper_nodes_removenode(obj, me);
 	}
@@ -248,7 +255,7 @@ NOTHROW(FCALL fnode_v_destroy)(struct fnode *__restrict self) {
 		if (LIST_ISBOUND(me, fs_root.fn_allsuper)) {
 			/* Remove from `fallsuper_list' */
 			if (fallsuper_tryacquire()) {
-				assert(me->fs_root._fn_alllop.lo_func != &fnode_add2all_lop);
+				assert(me->fs_root._fn_alllop.lo_func != &fnode_addtoall_lop);
 				if (LIST_ISBOUND(me, fs_root.fn_allsuper))
 					LIST_REMOVE(me, fs_root.fn_allsuper);
 				fallsuper_release();
@@ -263,10 +270,15 @@ NOTHROW(FCALL fnode_v_destroy)(struct fnode *__restrict self) {
 	} else {
 		REF struct fsuper *super = self->fn_super;
 		/* Remove from the associated superblock's list of nodes. */
-		if (ATOMIC_READ(self->fn_supent.rb_lhs) != FSUPER_NODES_DELETED) {
+		if (ATOMIC_READ(self->fn_supent.rb_rhs) != FSUPER_NODES_DELETED) {
 			if (fsuper_nodes_trywrite(super)) {
 				COMPILER_READ_BARRIER();
-				if (self->fn_supent.rb_lhs != FSUPER_NODES_DELETED) {
+				if (self->fn_supent.rb_rhs != FSUPER_NODES_DELETED) {
+					assertf(self->_fn_suplop.olo_func != &fnode_add2sup_lop,
+					        "The `fnode_add2sup_lop' function owns a reference to the node, "
+					        "and we only get here then the reference counter reaches 0, so "
+					        "there should be no way the object is still trying to async-add "
+					        "itself to the nodes list!");
 					assert(super->fs_nodes != FSUPER_NODES_DELETED);
 					fsuper_nodes_removenode(super, self);
 				}
@@ -287,8 +299,8 @@ again_unbind_allnodes:
 		if (LIST_ISBOUND(self, fn_allnodes)) {
 			if (fallnodes_tryacquire()) {
 				COMPILER_READ_BARRIER();
-				if unlikely(self->_fn_alllop.lo_func == &fnode_add2all_lop) {
-					fallnodes_release(); /* This should reap & invoke fnode_add2all_lop() */
+				if unlikely(self->_fn_alllop.lo_func == &fnode_addtoall_lop) {
+					fallnodes_release(); /* This should reap & invoke fnode_addtoall_lop() */
 					goto again_unbind_allnodes;
 				}
 				if (LIST_ISBOUND(self, fn_allnodes))
@@ -315,10 +327,10 @@ again_unbind_allnodes:
  * care if set during custom fnode destructors.
  * Note that the default `fnode_v_destroy()' includes correct handling for this. */
 PUBLIC NOBLOCK NONNULL((1)) struct postlockop *
-NOTHROW(LOCKOP_CC fnode_add2all_lop)(struct lockop *__restrict self) {
+NOTHROW(LOCKOP_CC fnode_addtoall_lop)(struct lockop *__restrict self) {
 	STATIC_ASSERT(offsetof(struct fnode, fn_allnodes.le_prev) == offsetof(struct fnode, _fn_alllop.lo_func));
 	struct fnode *me = container_of(self, struct fnode, _fn_alllop);
-	assert(me->_fn_alllop.lo_func == &fnode_add2all_lop);
+	assert(me->_fn_alllop.lo_func == &fnode_addtoall_lop);
 	ATOMIC_WRITE(me->fn_allnodes.le_prev, &fallnodes_list.lh_first); /* This write needs to be atomic */
 	if ((me->fn_allnodes.le_next = fallnodes_list.lh_first) != NULL)
 		me->fn_allnodes.le_next->fn_allnodes.le_prev = &me->fn_allnodes.le_next;
@@ -337,7 +349,7 @@ NOTHROW(LOCKOP_CC fnode_add2all_lop)(struct lockop *__restrict self) {
  * ... but  may only be called once _all_ other fields of `self' have already been
  *     initialized, and only if `self' isn't globally visible by some other means. */
 PUBLIC NOBLOCK NONNULL((1)) void
-NOTHROW(FCALL fnode_init_add2all)(struct fnode *__restrict self) {
+NOTHROW(FCALL fnode_init_addtoall)(struct fnode *__restrict self) {
 	/* Yes: we do a raw init! */
 	DBG_memset(&self->fn_allnodes, 0xcc, sizeof(self->fn_allnodes));
 	if (fallnodes_tryacquire()) {
@@ -345,10 +357,132 @@ NOTHROW(FCALL fnode_init_add2all)(struct fnode *__restrict self) {
 		fallnodes_release();
 	} else {
 		/* Use a lock operator. */
-		self->_fn_alllop.lo_func = &fnode_add2all_lop;
+		self->_fn_alllop.lo_func = &fnode_addtoall_lop;
 		COMPILER_WRITE_BARRIER();
 		lockop_enqueue(&fallnodes_lockops, &self->_fn_alllop);
 		_fallnodes_reap();
+	}
+}
+
+
+PRIVATE NOBLOCK NONNULL((1, 2)) void
+NOTHROW(LOCKOP_CC destroy_node_from_super_postlop)(Tobpostlockop(fsuper) *__restrict self,
+                                                   struct fsuper *__restrict obj) {
+	struct fnode *me;
+	me = container_of(self, struct fnode, _mf_fsuperplop);
+	mfile_destroy(me);
+}
+
+/* For use with `_fn_suplop': The node is currently adding itself to the superblock
+ * by  means of an asynchronous operation. NOTE: This lock operator unconditionally
+ * inherits a reference  to `container_of(self, struct fnode, _fn_suplop)', and  as
+ * such  you may assume that a fnode which  has been destroyed would no longer make
+ * use of this.
+ *
+ * However, in situations where `fsuper_nodes_removenode(node)' is called, you  must
+ * first check  if  `node->_fn_suplop.olo_func == &fnode_add2sup_lop',  and  if  so,
+ * must  release your lock to the superblock before reacquiring it in order to allow
+ * the node to fully add itself to the superblock's node tree so that you may safely
+ * remove it later.
+ *
+ * Similarly, `fsuper_nodes_locate()' or `fsuper_nodes_remove()' returning NULL when
+ * `fsuper_nodes_mustreap()' does not necessarily mean  that the node you're  trying
+ * to lookup/remove doesn't exist; it may just be trying to add itself right now. */
+PUBLIC NOBLOCK NONNULL((1, 2)) Tobpostlockop(fsuper) *
+NOTHROW(LOCKOP_CC fnode_add2sup_lop)(Toblockop(fsuper) *__restrict self,
+                                     struct fsuper *__restrict obj) {
+	REF struct fnode *me;
+	me = container_of(self, struct fnode, _fn_suplop);
+	assert(obj == me->fn_super);
+
+	/* Check for special  case: if  the node has  been marked  as
+	 * deleted, then we mustn't add it to the super's Inode tree. */
+	if unlikely(me->mf_flags & MFILE_F_DELETED) {
+		ATOMIC_WRITE(me->fn_supent.rb_rhs, FSUPER_NODES_DELETED);
+		return NULL;
+	}
+	if unlikely(!fsuper_nodes_tryinsert(obj, me)) {
+		struct fnode *existing;
+		existing = fsuper_nodes_remove(obj, me->fn_ino);
+		assert(existing);
+		existing->fn_supent.rb_rhs = FSUPER_NODES_DELETED;
+		fsuper_nodes_insert(obj, me);
+	}
+
+	/* Inherit one reference from `me' */
+	if unlikely(ATOMIC_DECFETCH(me->mf_refcnt) == 0) {
+		/* Don't do the destroy here; use a post-operator for that! */
+		me->_mf_fsuperplop.oplo_func = &destroy_node_from_super_postlop;
+		return &me->_mf_fsuperplop;
+	}
+	return NULL;
+}
+
+/* The async combination of adding `self' to its superblock's node tree, as  well
+ * as to the global list of all nodes. The caller must ensure that `self->fn_ino'
+ * isn't already in use any  other file-node. If another  node with the same  INO
+ * number  already exists, said other node is  first removed from the INode tree.
+ *
+ * This function can be used to initialize:
+ *  - self->fn_supent
+ *  - self->fn_allnodes
+ * ... but  may only be called once _all_ other fields of `self' have already been
+ *     initialized, and only if `self' isn't globally visible by some other means,
+ *     though the fields initialized  by this are pretty  much the only fields  by
+ *     which nodes *normally* become globally visible. */
+PUBLIC NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL fnode_init_addtosuper_and_all)(struct fnode *__restrict self) {
+	struct fsuper *super = self->fn_super;
+	assert(!(self->mf_flags & MFILE_F_DELETED));
+	if (fsuper_nodes_trywrite(super)) {
+		if unlikely(!fsuper_nodes_tryinsert(super, self)) {
+			struct fnode *existing;
+			existing = fsuper_nodes_remove(super, self->fn_ino);
+			assert(existing);
+			existing->fn_supent.rb_rhs = FSUPER_NODES_DELETED;
+			fsuper_nodes_insert(super, self);
+		}
+
+		/* Also add to the list of all nodes.
+		 * NOTE: Like required by `fnode_init_addtoall()', this function must be
+		 *       called _BEFORE_ `self' becomes globally visible, which is still
+		 *       the case so-long as we've not `fsuper_nodes_endwrite(super)'. */
+		fnode_init_addtoall(self);
+
+		/* Release the super-nodes lock. */
+		fsuper_nodes_endwrite(super);
+	} else {
+		STATIC_ASSERT_MSG(offsetof(struct fnode, _fn_suplop.olo_func) ==
+		                  offsetof(struct fnode, fn_supent.rb_rhs),
+		                  "This is a requirement to ensure that the node can't "
+		                  "accidentally appear as `rb_rhs == FSUPER_NODES_DELETED', "
+		                  "which would indicate that it had been removed from the "
+		                  "super's node tree, when in fact it's still in limbo as "
+		                  "to whether or not it's part of said tree.");
+
+		/* Use lock operations to have the INode add itself to the  */
+		++self->mf_refcnt; /* +1: inherited by `fnode_add2sup_lop()' */
+		self->_fn_suplop.olo_func = &fnode_add2sup_lop;
+		COMPILER_WRITE_BARRIER();
+
+		/* Also add to the all-nodes list. */
+		fnode_init_addtoall(self);
+		COMPILER_BARRIER();
+
+		/* At this point we would normally have a race condition since `node'
+		 * has yet to be added to its superblock's node-tree, but (may)  have
+		 * already become globally visible (via the all-nodes list).
+		 *
+		 * But this is resolved by  `node->_fn_suplop.olo_func = &fnode_add2sup_lop',
+		 * which for one makes it so that `fn_supent.rb_rhs != FSUPER_NODES_DELETED',
+		 * marking  the file as _NOT_ removed from its super's Inode tree, as well as
+		 * by this special scenario being publicly documented by requiring other code
+		 * to reap a superblock's node-lops before trying to remove an INode that  is
+		 * marked  as  `node->_fn_suplop.olo_func == &fnode_add2sup_lop', as  well as
+		 * also reaping if trying (and failing) to remove from a super that's got any
+		 * pending lops. */
+		oblockop_enqueue(&super->fs_nodeslockops, &self->_fn_suplop);
+		_fsuper_nodes_reap(super);
 	}
 }
 

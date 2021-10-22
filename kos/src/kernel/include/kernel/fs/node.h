@@ -226,8 +226,6 @@ struct fnode
 #define FNODE_INIT_fn_gid(fn_gid)      fn_gid
 #define FNODE_INIT_fn_ino(fn_ino)      fn_ino
 #define FNODE_INIT_fn_super(fn_super)  fn_super
-#define FNODE_INIT_fn_supent           { __NULLPTR, __NULLPTR }
-#define FNODE_INIT_fn_supent_EX(...)   __VA_ARGS__
 #define FNODE_INIT_fn_allnodes         { LIST_ENTRY_UNBOUND_INITIALIZER }
 #define FNODE_INIT_fn_allnodes_EX(...) { __VA_ARGS__ }
 #define FNODE_INIT_fn_allsuper_EX(...) { .fn_allsuper = __VA_ARGS__ }
@@ -259,12 +257,27 @@ struct fnode
 #define FNODE_INIT_fn_changed_EX(...) __VA_ARGS__
 #endif /* __WANT_FS_INIT */
 #endif /* !__WANT_FNODE__fn_chnglop */
+#ifdef __WANT_FNODE__fn_suplop
+	union {
+		Toblockop(fsuper)      _fn_suplop;   /* Used internally... */
+		LLRBTREE_NODE(fnode)    fn_supent;   /* ... */
+	};
+#ifdef __WANT_FS_INIT
+#define FNODE_INIT_fn_supent           { { __NULLPTR, __NULLPTR } }
+#define FNODE_INIT_fn_supent_EX(...)   { __VA_ARGS__ }
+#endif /* __WANT_FS_INIT */
+#else /* __WANT_FNODE__fn_suplop */
+#ifdef __WANT_FS_INIT
+#define FNODE_INIT_fn_supent           { __NULLPTR, __NULLPTR }
+#define FNODE_INIT_fn_supent_EX(...)   __VA_ARGS__
+#endif /* __WANT_FS_INIT */
 	LLRBTREE_NODE(fnode)        fn_supent;   /* [lock(fn_super->fs_nodeslock)][LIST(fn_super->fs_nodes)]
 	                                          * Tree entry within the  super block's tree of  file-nodes.
-	                                          * When  `rb_lhs' is set to `FSUPER_NODES_DELETED', then the
+	                                          * When  `rb_rhs' is set to `FSUPER_NODES_DELETED', then the
 	                                          * file-node  is no longer apart of the super's tree of file
 	                                          * nodes. In this case, the `MFILE_F_PERSISTENT' flag may be
 	                                          * assumed to have already been cleared. */
+#endif /* !__WANT_FNODE__fn_suplop */
 	union {
 		LIST_ENTRY(fnode)       fn_allnodes; /* [0..1][lock(:fnode_all_lock && REMOVE_ONCE)][valid_if(!fnode_issuper(self))]
 		                                      * Link entry within the global list of all file nodes. When `MFILE_FN_GLOBAL_REF'
@@ -297,8 +310,29 @@ struct fnode
  * care if set during custom fnode destructors.
  * Note that the default `fnode_v_destroy()' includes correct handling for this. */
 FUNDEF NOBLOCK NONNULL((1)) struct postlockop *
-NOTHROW(LOCKOP_CC fnode_add2all_lop)(struct lockop *__restrict self);
+NOTHROW(LOCKOP_CC fnode_addtoall_lop)(struct lockop *__restrict self);
 #endif /* __WANT_FNODE__fn_alllop */
+
+#ifdef __WANT_FNODE__fn_suplop
+/* For use with `_fn_suplop': The node is currently adding itself to the superblock
+ * by  means of an asynchronous operation. NOTE: This lock operator unconditionally
+ * inherits a reference  to `container_of(self, struct fnode, _fn_suplop)', and  as
+ * such  you may assume that a fnode which  has been destroyed would no longer make
+ * use of this.
+ *
+ * However, in situations where `fsuper_nodes_removenode(node)' is called, you  must
+ * first check  if  `node->_fn_suplop.olo_func == &fnode_add2sup_lop',  and  if  so,
+ * must  release your lock to the superblock before reacquiring it in order to allow
+ * the node to fully add itself to the superblock's node tree so that you may safely
+ * remove it later.
+ *
+ * Similarly, `fsuper_nodes_locate()' or `fsuper_nodes_remove()' returning NULL when
+ * `fsuper_nodes_mustreap()' does not necessarily mean  that the node you're  trying
+ * to lookup/remove doesn't exist; it may just be trying to add itself right now. */
+FUNDEF NOBLOCK NONNULL((1, 2)) Tobpostlockop(fsuper) *
+NOTHROW(LOCKOP_CC fnode_add2sup_lop)(Toblockop(fsuper) *__restrict self,
+                                     struct fsuper *__restrict obj);
+#endif /* __WANT_FNODE__fn_suplop */
 
 /* Add the given node `self'  to the list of all  nodes. The caller must  ensure
  * that this function is _NOT_ called such that it would violate the REMOVE_ONCE
@@ -310,7 +344,22 @@ NOTHROW(LOCKOP_CC fnode_add2all_lop)(struct lockop *__restrict self);
  * ... but  may only be called once _all_ other fields of `self' have already been
  *     initialized, and only if `self' isn't globally visible by some other means. */
 FUNDEF NOBLOCK NONNULL((1)) void
-NOTHROW(FCALL fnode_init_add2all)(struct fnode *__restrict self);
+NOTHROW(FCALL fnode_init_addtoall)(struct fnode *__restrict self);
+
+/* The async combination of adding `self' to its superblock's node tree, as  well
+ * as to the global list of all nodes. The caller must ensure that `self->fn_ino'
+ * isn't already in use any  other file-node. If another  node with the same  INO
+ * number  already exists, said other node is  first removed from the INode tree.
+ *
+ * This function can be used to initialize:
+ *  - self->fn_supent
+ *  - self->fn_allnodes
+ * ... but  may only be called once _all_ other fields of `self' have already been
+ *     initialized, and only if `self' isn't globally visible by some other means,
+ *     though the fields initialized  by this are pretty  much the only fields  by
+ *     which nodes *normally* become globally visible. */
+FUNDEF NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL fnode_init_addtosuper_and_all)(struct fnode *__restrict self);
 
 
 /* Return a pointer to file-node operators of `self' */
@@ -507,6 +556,7 @@ fnode_access(struct fnode *__restrict self, unsigned int type)
 
 /* Filenode tree operations. (for `struct fsuper::fs_nodes') */
 FUNDEF NOBLOCK ATTR_PURE WUNUSED struct fnode *NOTHROW(FCALL fnode_tree_locate)(/*nullable*/ struct fnode *root, ino_t key);
+FUNDEF NOBLOCK WUNUSED NONNULL((1, 2)) __BOOL NOTHROW(FCALL fnode_tree_tryinsert)(struct fnode **__restrict proot, struct fnode *__restrict node);
 FUNDEF NOBLOCK NONNULL((1, 2)) void NOTHROW(FCALL fnode_tree_insert)(struct fnode **__restrict proot, struct fnode *__restrict node);
 FUNDEF NOBLOCK WUNUSED NONNULL((1)) struct fnode *NOTHROW(FCALL fnode_tree_remove)(struct fnode **__restrict proot, ino_t key);
 FUNDEF NOBLOCK NONNULL((1, 2)) void NOTHROW(FCALL fnode_tree_removenode)(struct fnode **__restrict proot, struct fnode *__restrict node);

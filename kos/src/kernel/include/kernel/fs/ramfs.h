@@ -162,6 +162,7 @@ struct ramfs_dirdata {
 /* Helpers for accessing `rdd_treelock' */
 #define _ramfs_dirdata_treelock_reap(self)      (void)0
 #define ramfs_dirdata_treelock_reap(self)       (void)0
+#define ramfs_dirdata_treelock_mustreap(self)   0
 #define ramfs_dirdata_treelock_write(self)      shared_rwlock_write(&(self)->rdd_treelock)
 #define ramfs_dirdata_treelock_write_nx(self)   shared_rwlock_write_nx(&(self)->rdd_treelock)
 #define ramfs_dirdata_treelock_trywrite(self)   shared_rwlock_trywrite(&(self)->rdd_treelock)
@@ -277,7 +278,7 @@ ramfs_dirnode_v_rename(struct fdirnode *__restrict self,
 
 
 /* Construct a new fully initialized, but not globally visible, as in:
- *   - return->fn_supent.rb_lhs == FSUPER_NODES_DELETED;
+ *   - return->fn_supent.rb_rhs == FSUPER_NODES_DELETED;
  *   - !LIST_ISBOUND(return, fn_allnodes);
  * ... node for use by ramfs file systems and return it.
  * When `(info->mkf_fmode & S_IFMT) == 0', blindly re-return `info->mkf_hrdlnk.hl_node'

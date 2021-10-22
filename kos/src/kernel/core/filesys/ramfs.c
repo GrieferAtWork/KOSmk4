@@ -561,7 +561,7 @@ ramfs_dirnode_v_enum(struct fdirenum *__restrict result) {
 
 
 /* Construct a new fully initialized, but not globally visible, as in:
- *   - return->fn_supent.rb_lhs == FSUPER_NODES_DELETED;
+ *   - return->fn_supent.rb_rhs == FSUPER_NODES_DELETED;
  *   - !LIST_ISBOUND(return, fn_allnodes);
  * ... node for use by ramfs file systems and return it.
  * When `(info->mkf_fmode & S_IFMT) == 0', blindly re-return `info->mkf_hrdlnk.hl_node'
@@ -650,7 +650,7 @@ ramfs_dirnode_mknode_frominfo(struct fdirnode *__restrict self,
 	result->fn_gid   = info->mkf_creat.c_group;
 	result->fn_nlink = 1;
 	LIST_ENTRY_UNBOUND_INIT(&result->fn_allnodes);
-	result->fn_supent.rb_lhs = FSUPER_NODES_DELETED;
+	result->fn_supent.rb_rhs = FSUPER_NODES_DELETED;
 	return result;
 }
 
@@ -745,7 +745,7 @@ again_acquire_lock_for_insert:
 				 *  - new_node->fn_allnodes
 				 *  - new_node->fn_supent */
 				assert(!LIST_ISBOUND(new_node, fn_allnodes));
-				assert(new_node->fn_supent.rb_lhs == FSUPER_NODES_DELETED);
+				assert(new_node->fn_supent.rb_rhs == FSUPER_NODES_DELETED);
 				assert(!(new_node->mf_flags & MFILE_FN_GLOBAL_REF));
 				assert(new_node->mf_flags & MFILE_F_PERSISTENT);
 				assert(new_node->mf_refcnt == 1);

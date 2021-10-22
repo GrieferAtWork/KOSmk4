@@ -62,6 +62,7 @@
 #define i_fileatime                                                _fnode_file_ mf_atime
 #define i_filemtime                                                _fnode_file_ mf_mtime
 #define i_filectime                                                _fnode_file_ mf_ctime
+#define i_fsdata                                                   fn_fsdata
 #define INODE_ISSUPER                                              fnode_issuper
 #define INODE_ISREG                                                fnode_isreg
 #define INODE_ISDIR                                                fnode_isdir

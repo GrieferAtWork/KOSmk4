@@ -314,8 +314,8 @@ NOTHROW(LOCKOP_CC fnode_remove_from_allnodes_lop)(struct lockop *__restrict self
 	REF struct fnode *me;
 	me = container_of(self, struct fnode, _mf_lop);
 	COMPILER_READ_BARRIER();
-	if unlikely(me->_fn_alllop.lo_func == &fnode_add2all_lop) {
-		/* Must let `fnode_add2all_lop()' finish first! */
+	if unlikely(me->_fn_alllop.lo_func == &fnode_addtoall_lop) {
+		/* Must let `fnode_addtoall_lop()' finish first! */
 		me->_mf_lop.lo_func = &fnode_remove_from_allnodes_lop;
 		lockop_enqueue(&fallnodes_lockops, &me->_mf_lop);
 		return NULL;
@@ -336,8 +336,8 @@ again_unbind_allnodes:
 	if (LIST_ISBOUND(self, fn_allnodes)) {
 		if (fallnodes_tryacquire()) {
 			COMPILER_READ_BARRIER();
-			if unlikely(self->_fn_alllop.lo_func == &fnode_add2all_lop) {
-				fallnodes_release(); /* This should reap & invoke fnode_add2all_lop() */
+			if unlikely(self->_fn_alllop.lo_func == &fnode_addtoall_lop) {
+				fallnodes_release(); /* This should reap & invoke fnode_addtoall_lop() */
 				goto again_unbind_allnodes;
 			}
 			if (LIST_ISBOUND(self, fn_allnodes))
@@ -384,8 +384,8 @@ again:
 	rhs = tree->fn_supent.rb_rhs;
 
 	/* Mark this node as deleted */
-	ATOMIC_WRITE(tree->fn_supent.rb_lhs, FSUPER_NODES_DELETED);
-	DBG_memset(&tree->fn_supent.rb_rhs, 0xcc, sizeof(tree->fn_supent.rb_rhs));
+	DBG_memset(&tree->fn_supent, 0xcc, sizeof(tree->fn_supent));
+	ATOMIC_WRITE(tree->fn_supent.rb_rhs, FSUPER_NODES_DELETED);
 
 	/* Try to get a reference to this tree-node. */
 	if (tryincref(tree)) {

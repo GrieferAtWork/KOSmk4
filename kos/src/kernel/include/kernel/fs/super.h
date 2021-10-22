@@ -388,6 +388,7 @@ FUNDEF NOBLOCK NONNULL((1)) __BOOL NOTHROW(FCALL fsuper_add2changed)(struct fsup
 
 /* Filenode tree operations. (caller must be holding a lock to `self->fs_nodeslock') */
 #define fsuper_nodes_locate(self, ino)      fnode_tree_locate((self)->fs_nodes, ino)
+#define fsuper_nodes_tryinsert(self, node)  fnode_tree_tryinsert(&(self)->fs_nodes, node)
 #define fsuper_nodes_insert(self, node)     fnode_tree_insert(&(self)->fs_nodes, node)
 #define fsuper_nodes_remove(self, ino)      fnode_tree_remove(&(self)->fs_nodes, ino)
 #define fsuper_nodes_removenode(self, node) fnode_tree_removenode(&(self)->fs_nodes, node)

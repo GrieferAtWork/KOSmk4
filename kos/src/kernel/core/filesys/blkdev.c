@@ -20,6 +20,7 @@
 #ifndef GUARD_KERNEL_CORE_FILESYS_BLKDEV_C
 #define GUARD_KERNEL_CORE_FILESYS_BLKDEV_C 1
 #define __WANT_BLKDEV_bd_partinfo__bp_blkdevlop
+#define __WANT_FNODE__fn_suplop
 #define _KOS_SOURCE 1
 #define _GNU_SOURCE 1
 
@@ -863,6 +864,17 @@ again:
 		goto again;
 	}
 
+	/* This is needed to prevent instances of `fnode_add2sup_lop()' */
+	if unlikely(fsuper_nodes_mustreap(&devfs)) {
+		_fsuper_nodes_endwrite(&devfs);
+		_blkdev_root_partslock_release(self);
+		_devfs_byname_endwrite();
+		_fsuper_nodes_reap(&devfs);
+		blkdev_root_partslock_reap(self);
+		devfs_byname_reap();
+		goto again;
+	}
+
 	/* devfs.rs_dat.rdd_treelock... // read-only */
 	if (!ramfs_dirdata_treelock_tryread(&devfs.rs_dat)) {
 		_fsuper_nodes_endwrite(&devfs);
@@ -909,9 +921,11 @@ NOTHROW(FCALL device_unlink_from_globals)(struct device *__restrict self) {
 	}
 
 	/* devfs.rs_sup.fs_nodes... */
-	if (self->fn_supent.rb_lhs != FSUPER_NODES_DELETED) {
+	assertf(self->_fn_suplop.olo_func != &fnode_add2sup_lop,
+	        "Handled by the check for lock-operations in blkdev_repart_locks_acquire");
+	if (self->fn_supent.rb_rhs != FSUPER_NODES_DELETED) {
 		fsuper_nodes_removenode(&devfs, self);
-		self->fn_supent.rb_lhs = FSUPER_NODES_DELETED;
+		self->fn_supent.rb_rhs = FSUPER_NODES_DELETED;
 	}
 
 	/* fallnodes_list... */
@@ -957,7 +971,7 @@ NOTHROW(FCALL devfs_insert_into_inode_tree)(struct device *__restrict self) {
 		if (wasdestroyed(existing)) {
 			/* Unlink destroyed device. */
 			fsuper_nodes_removenode(&devfs, existing);
-			ATOMIC_WRITE(existing->fn_supent.rb_lhs, FSUPER_NODES_DELETED);
+			ATOMIC_WRITE(existing->fn_supent.rb_rhs, FSUPER_NODES_DELETED);
 			break;
 		}
 		/* Create a new device number */

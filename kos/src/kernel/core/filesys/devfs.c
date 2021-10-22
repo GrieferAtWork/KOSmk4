@@ -23,6 +23,7 @@
 #define __WANT_MFILE__mf_plop
 #define __WANT_MFILE__mf_fsuperlop
 #define __WANT_MFILE__mf_fsuperplop
+#define __WANT_FNODE__fn_suplop
 #define _KOS_SOURCE 1
 #define _GNU_SOURCE 1
 
@@ -649,7 +650,7 @@ again_acquire_lock_for_insert:
 				 *  - new_node->fn_allnodes
 				 *  - new_node->fn_supent */
 				assert(!LIST_ISBOUND(new_node, fn_allnodes));
-				assert(new_node->fn_supent.rb_lhs == FSUPER_NODES_DELETED);
+				assert(new_node->fn_supent.rb_rhs == FSUPER_NODES_DELETED);
 				assert(!(new_node->mf_flags & MFILE_FN_GLOBAL_REF));
 				assert(new_node->mf_flags & MFILE_F_PERSISTENT);
 				assert(new_node->mf_refcnt == 1);
@@ -1221,7 +1222,7 @@ again:
 			}
 			/* Unlink destroyed device. */
 			fsuper_nodes_removenode(&devfs, existing);
-			ATOMIC_WRITE(existing->fn_supent.rb_lhs, FSUPER_NODES_DELETED);
+			ATOMIC_WRITE(existing->fn_supent.rb_rhs, FSUPER_NODES_DELETED);
 		}
 	}
 
@@ -1324,14 +1325,14 @@ done_add2byname:
 		if (wasdestroyed(existing)) {
 			/* Unlink destroyed device. */
 			fsuper_nodes_removenode(&devfs, existing);
-			ATOMIC_WRITE(existing->fn_supent.rb_lhs, FSUPER_NODES_DELETED);
+			ATOMIC_WRITE(existing->fn_supent.rb_rhs, FSUPER_NODES_DELETED);
 			break;
 		}
 
 		/* Create a new device number */
 		++self->dn_devno;
 		self->fn_ino = devfs_devnode_makeino(self->fn_mode,
-		                                                        self->dn_devno);
+		                                     self->dn_devno);
 	}
 	/* Add to the inode tree (for lookup by dev_t) */
 	fsuper_nodes_insert(&devfs, self);
@@ -1474,9 +1475,17 @@ NOTHROW(LOCKOP_CC device_delete_remove_from_byino_lop)(Toblockop(fsuper) *__rest
 	(void)obj;
 	me = container_of(self, struct device, _mf_fsuperlop);
 	COMPILER_READ_BARRIER();
-	if (me->fn_supent.rb_lhs != FSUPER_NODES_DELETED) {
+	if (me->fn_supent.rb_rhs != FSUPER_NODES_DELETED) {
+		if unlikely(me->_fn_suplop.olo_func == &fnode_add2sup_lop) {
+			/* Device is still being async-added to the nodes tree.
+			 * In this case, we must wait for it to finish doing so
+			 * before trying to repeat the remove-from-tree lop. */
+			me->_mf_fsuperlop.olo_func = &device_delete_remove_from_byino_lop;
+			oblockop_enqueue(&devfs.fs_nodeslockops, &me->_mf_fsuperlop); /* Retry later... */
+			return NULL;
+		}
 		fsuper_nodes_removenode(&devfs, me);
-		ATOMIC_WRITE(me->fn_supent.rb_lhs, FSUPER_NODES_DELETED);
+		ATOMIC_WRITE(me->fn_supent.rb_rhs, FSUPER_NODES_DELETED);
 	}
 	me->_mf_fsuperplop.oplo_func = &device_delete_remove_from_byino_postlop; /* Inherit reference */
 	return &me->_mf_fsuperplop;
@@ -1490,12 +1499,19 @@ NOTHROW(LOCKOP_CC device_delete_remove_from_byname_postlop)(struct postlockop *_
 	me = container_of(self, struct device, _mf_plop);
 
 	/* Remove from the devfs's INode tree. */
-	if (ATOMIC_READ(me->fn_supent.rb_lhs) != FSUPER_NODES_DELETED) {
+	if (ATOMIC_READ(me->fn_supent.rb_rhs) != FSUPER_NODES_DELETED) {
+again_lock_devfs:
 		if (fsuper_nodes_trywrite(&devfs)) {
 			COMPILER_READ_BARRIER();
-			if (me->fn_supent.rb_lhs != FSUPER_NODES_DELETED) {
+			if (me->fn_supent.rb_rhs != FSUPER_NODES_DELETED) {
+				if unlikely(me->_fn_suplop.olo_func == &fnode_add2sup_lop) {
+					/* Reap+retry */
+					_fsuper_nodes_endwrite(&devfs);
+					_fsuper_nodes_reap(&devfs);
+					goto again_lock_devfs;
+				}
 				fsuper_nodes_removenode(&devfs, me);
-				ATOMIC_WRITE(me->fn_supent.rb_lhs, FSUPER_NODES_DELETED);
+				ATOMIC_WRITE(me->fn_supent.rb_rhs, FSUPER_NODES_DELETED);
 			}
 			fsuper_nodes_endwrite(&devfs);
 		} else {

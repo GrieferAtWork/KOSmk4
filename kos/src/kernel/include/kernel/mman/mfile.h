@@ -531,13 +531,13 @@ struct mfile_ops {
 #define MFILE_FN_GLOBAL_REF     0x00000004 /* [lock(CLEAR_ONCE)] fnode-specific: The global list of fnode-s or fsuper-s holds a reference to this one. */
 #define MFILE_FS_NOEXEC         0x00000008 /* [lock(ATOMIC)] fsuper-specific: Disallow execution of files. */
 /*      MFILE_F_                0x00000010  * ... Reserved: MS_SYNCHRONOUS */
-#define MFILE_F_DELETED         0x00000020 /* [lock(WRITE_ONCE)][const_if(MFILE_F_READONLY)] The  file has  been marked  as
-                                            * deleted. When this flag is set, new parts may be created with `mfile_anon[*]'
-                                            * set  for  their  pointed-to  `mp_file'  field.  This  flag  also  means  that
-                                            * `mfile_isanon(self)' and `mf_filesize == 0' will be the same sooner or later,
-                                            * though  this may not be the case yet,  since file anonymization & all of that
-                                            * jazz happens asynchronously through use of lockops!
-                                            * Note that  this flag  implies `MFILE_F_READONLY|MFILE_F_FIXEDFILESIZE',  except
+#define MFILE_F_DELETED         0x00000020 /* [lock(WRITE_ONCE)] The file has been marked as  deleted. When this flag is  set,
+                                            * new parts may be created with `mfile_anon[*]' set for their pointed-to `mp_file'
+                                            * field. This  flag also  means that  `mfile_isanon(self)' and  `mf_filesize == 0'
+                                            * will be the same  sooner or later, though  this may not be  the case yet,  since
+                                            * file anonymization &  all of  that jazz  happens asynchronously  through use  of
+                                            * lockops!
+                                            * Note  that this flag implies `MFILE_F_READONLY | MFILE_F_FIXEDFILESIZE', except
                                             * that the delete-operation itself will eventually  be allowed to set the  file's
                                             * size to `0'. Once async deletion is complete, the file's part-tree and changed-
                                             * list will be set to  MFILE_PARTS_ANONYMOUS, the file will  have a zero of  `0',
@@ -1262,10 +1262,10 @@ FUNDEF NONNULL((1)) size_t KCALL mfile_tailwrite(struct mfile *__restrict self, 
 FUNDEF NONNULL((1)) size_t KCALL mfile_tailwrite_p(struct mfile *__restrict self, physaddr_t src, size_t num_bytes) THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
 FUNDEF NONNULL((1, 2)) size_t KCALL mfile_tailwritev(struct mfile *__restrict self, struct iov_buffer const *__restrict buf, size_t buf_offset, size_t num_bytes) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
 FUNDEF NONNULL((1, 2)) size_t KCALL mfile_tailwritev_p(struct mfile *__restrict self, struct iov_physbuffer const *__restrict buf, size_t buf_offset, size_t num_bytes) THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
-FUNDEF WUNUSED NONNULL((1)) void KCALL mfile_readall(struct mfile *__restrict self, USER CHECKED void *dst, size_t num_bytes, pos_t src_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
-FUNDEF WUNUSED NONNULL((1)) void KCALL mfile_readall_p(struct mfile *__restrict self, physaddr_t dst, size_t num_bytes, pos_t src_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
-FUNDEF WUNUSED NONNULL((1, 2)) void KCALL mfile_readvall(struct mfile *__restrict self, struct iov_buffer const *__restrict buf, size_t buf_offset, size_t num_bytes, pos_t src_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
-FUNDEF WUNUSED NONNULL((1, 2)) void KCALL mfile_readallv_p(struct mfile *__restrict self, struct iov_physbuffer const *__restrict buf, size_t buf_offset, size_t num_bytes, pos_t src_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
+FUNDEF NONNULL((1)) void KCALL mfile_readall(struct mfile *__restrict self, USER CHECKED void *dst, size_t num_bytes, pos_t src_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
+FUNDEF NONNULL((1)) void KCALL mfile_readall_p(struct mfile *__restrict self, physaddr_t dst, size_t num_bytes, pos_t src_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
+FUNDEF NONNULL((1, 2)) void KCALL mfile_readvall(struct mfile *__restrict self, struct iov_buffer const *__restrict buf, size_t buf_offset, size_t num_bytes, pos_t src_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
+FUNDEF NONNULL((1, 2)) void KCALL mfile_readallv_p(struct mfile *__restrict self, struct iov_physbuffer const *__restrict buf, size_t buf_offset, size_t num_bytes, pos_t src_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
 
 /* Same as the above, but these use an intermediate (stack) buffer for  transfer.
  * As such, these functions are called by the above when `memcpy_nopf()' produces
