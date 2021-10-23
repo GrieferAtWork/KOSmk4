@@ -610,7 +610,11 @@ again:
 }
 
 
-/* Create a new directory entry based on specs. */
+/* Create a new directory entry based on specs.
+ * The caller must still initialize:
+ *  - return->fde_ent.fd_refcnt
+ *  - return->fde_bypos
+ * ... as well as add it it `self->fdn_data.fdd_fileslist' */
 PRIVATE ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3)) struct fflatdirent *
 NOTHROW(KCALL fflatdirnode_mkent)(struct fflatdirnode *__restrict self,
                                   struct fmkfile_info *__restrict info,
@@ -675,12 +679,17 @@ NOTHROW(FCALL fflatdirnode_update_biggest_gap)(struct fflatdirnode *__restrict s
  * allowed to make modifications to `ent->fde_ent.fd_ino' and `file->fn_ino' */
 PRIVATE NONNULL((1, 2, 3)) void KCALL
 fflatdirnode_addentry_to_stream(struct fflatdirnode *__restrict self,
-                                struct fflatdirent *__restrict ent,
+                                REF struct fflatdirent *__restrict ent,
                                 struct fnode *__restrict file) {
 	struct fflatdirnode_ops const *ops;
 	ops = fflatdirnode_getops(self);
-	if unlikely(!ops->fdno_flat.fdnx_writedir)
-		THROW(E_FSERROR_READONLY);
+	DBG_memset(&ent->fde_bypos, 0xcc, sizeof(ent->fde_bypos));
+
+	/* Safety check for "." and ".." filenames. */
+	if unlikely(ent->fde_ent.fd_namelen <= 2 && ent->fde_ent.fd_name[0] == '.' &&
+	            (ent->fde_ent.fd_namelen == 1 || ent->fde_ent.fd_name[1] == '.'))
+		THROW(E_FSERROR_ILLEGAL_PATH);
+
 	if (self->fdn_data.fdd_biggest_gap != 0) {
 		/* Try to insert into the largest. */
 again_try_biggest_gap:
@@ -846,6 +855,10 @@ handle_existing:
 		return FDIRNODE_MKFILE_EXISTS;
 	}
 
+	/* Check that we're able to write new entries. */
+	if unlikely(!ops->fdno_flat.fdnx_writedir)
+		THROW(E_FSERROR_READONLY);
+
 	/* Create the new node, or use the given one for hardlinks. */
 	if (info->mkf_fmode == 0) {
 		node = info->mkf_hrdlnk.hl_node;
@@ -913,8 +926,7 @@ handle_existing:
 					existing = &existing_ent->fde_ent; /* Inherit reference */
 
 					/* Destroy partially constructed objects. */
-					ent->fde_ent.fd_refcnt = 0;
-					destroy(ent);
+					destroy_partially_initialized_flatdirent(ent);
 					decref_likely(node);
 
 					/* Deal with `existing' */
@@ -932,10 +944,8 @@ handle_existing:
 
 					/* Ensure that `fdnx_deleteent' is available in case we end up needing it. */
 					assertf(ops->fdno_flat.fdnx_deleteent != NULL,
-					        "As per specs, `fdnx_deleteent' is mandatory when `fdnx_writedir' "
-					        "is provided, the later already having been asserted inside of "
-					        "`fflatdirnode_addentry_to_stream' (which thrown `E_FSERROR_READONLY' "
-					        "when said operator isn't present)");
+					        "As per specs, `fdnx_deleteent' is mandatory when `fdnx_writedir' is provided, "
+					        "the later already having been asserted above by `E_FSERROR_READONLY'");
 
 					/* Deal with hardlinks. */
 					if (info->mkf_fmode == 0) {
@@ -1005,8 +1015,7 @@ handle_existing:
 			/* Release lock */
 			fflatdirnode_endwrite(me);
 		} EXCEPT {
-			ent->fde_ent.fd_refcnt = 0;
-			destroy(ent);
+			destroy_partially_initialized_flatdirent(ent);
 			RETHROW();
 		}
 	} EXCEPT {
@@ -1070,7 +1079,7 @@ again_locked:
 	/* Remove the directory relating to `entry' */
 	fflatdirnode_fileslist_removeent(me, ent);
 	fflatdirnode_fileslist_rehash_after_remove(me);
-	TAILQ_UNBIND(&me->fdn_data.fdd_bypos, ent, fde_bypos);
+	fflatdirnode_remove_from_bypos(me, ent);
 	fflatdirnode_endwrite(me);
 
 	/* Decrement the NLINK counter of `file' */
@@ -1098,13 +1107,413 @@ again_locked:
 }
 
 
+
+
+PRIVATE NOBLOCK NONNULL((1, 2)) void
+NOTHROW(FCALL release_locks_for_rename)(struct fflatdirnode *nd,
+                                        struct fflatdirnode *od) {
+	if (od != nd)
+		fflatdirnode_endwrite(od);
+	fflatdirnode_endwrite(nd);
+}
+
+PRIVATE NONNULL((1, 2, 3)) void FCALL
+maybe_update_parent(struct fflatdirnode *__restrict file,
+                    struct fflatdirnode *__restrict oldparent,
+                    struct fflatdirnode *__restrict newparent) {
+	struct fflatdirnode_ops const *ofile_ops;
+	ofile_ops = fflatdirnode_getops(file);
+	if (ofile_ops->fdno_flat.fdnx_changeparent != NULL)
+		(*ofile_ops->fdno_flat.fdnx_changeparent)(file, oldparent, newparent);
+}
+
 PUBLIC WUNUSED NONNULL((1, 2)) unsigned int KCALL
 fflatdirnode_v_rename(struct fdirnode *__restrict self,
                       struct frename_info *__restrict info)
 		THROWS(E_BADALLOC, E_IOERROR, E_FSERROR_ILLEGAL_PATH,
 		       E_FSERROR_DISK_FULL, E_FSERROR_READONLY) {
-	struct fflatdirnode *me = fdirnode_asflat(self);
-	/* TODO */
+	struct fmkfile_info mki;
+	struct fflatdirnode *nd    = fdirnode_asflat(self);
+	struct fflatdirnode *od    = fdirnode_asflat(info->frn_olddir);
+	struct fflatdirent *oldent = fdirent_asflat(info->frn_oldent);
+again:
+	/* Need  a write-lock to the new directory, as well as to make sure that
+	 * all  directory entries from  the new directory have  been read (so we
+	 * can make sure that no entry matching the new filename already exists) */
+	fflatdirnode_lockwrite_and_populate(nd);
+	if (od != nd) {
+		/* Must also acquire a write-lock to the old directory `od' */
+		if (!fflatdirnode_trywrite(od)) {
+			fflatdirnode_endwrite(nd);
+			fflatdirnode_write(od);
+			fflatdirnode_endwrite(od);
+			goto again;
+		}
+	}
+
+	/* Check if `oldent' was deleted. */
+	if unlikely(fflatdirent_wasdeleted(oldent)) {
+		release_locks_for_rename(nd, od);
+		return FDIRNODE_RENAME_DELETED;
+	}
+
+	/* Because it's kind-of complicated, get `AT_RENAME_EXCHANGE' out of the way */
+	if (info->frn_flags & AT_RENAME_EXCHANGE) {
+		assert(info->frn_repfile);
+		/* When exchanging files, we must ensure that `od' has also been populated. */
+		if (!(od->fdn_data.fdd_flags & FFLATDIR_F_EOF)) {
+			assertf(od != nd, "else, fflatdirnode_lockwrite_and_populate(nd) would have already set `FFLATDIR_F_EOF'");
+			fflatdirnode_endwrite(nd);
+			fflatdirnode_lockwrite_and_populate(od);
+			fflatdirnode_endwrite(od);
+			goto again;
+		}
+		TRY {
+			struct fflatdirnode_ops const *od_ops, *nd_ops;
+			struct fflatdirent *newent;
+			struct fnode *ofile = info->frn_file;
+			struct fnode *nfile = info->frn_repfile;
+			struct fflatdirent *new_oent; /* New directory entry for `ofile' */
+			struct fflatdirent *new_nent; /* New directory entry for `nfile' */
+
+			/* Lookup the other directory entry of the exchange. */
+			newent = fflatdirnode_fileslist_lookup(nd, &info->frn_lookup_info);
+			if unlikely(!newent) {
+				release_locks_for_rename(nd, od);
+
+				/* The exchange target was deleted (tell so the  caller)
+				 * We indicate this with an EXISTS error saying that the
+				 * existing file is `NULL' (which differs from the  non-
+				 * NULL caller-given `frn_repfile'; asserted above) */
+				info->frn_repfile = NULL;
+				info->frn_dent    = NULL;
+				return FDIRNODE_RENAME_EXISTS;
+			}
+
+			/* Check that the Inode pointed-to by the directory matches
+			 * the Inode with which the exchange is supposed to happen. */
+			if unlikely(newent->fde_ent.fd_ino != nfile->fn_ino ||
+			            newent->fde_ent.fd_type != IFTODT(nfile->fn_mode)) {
+				info->frn_dent = incref(&newent->fde_ent);
+				goto err_exists_fill_in_repnode;
+			}
+
+			/* Handles still appear up-to-date. - Let's do this! */
+			od_ops = fflatdirnode_getops(od);
+			nd_ops = fflatdirnode_getops(nd);
+
+			/* Check that both directories support required operators. */
+			if (!od_ops->fdno_flat.fdnx_writedir || !nd_ops->fdno_flat.fdnx_writedir)
+				THROW(E_FSERROR_READONLY);
+
+			assert(od_ops->fdno_flat.fdnx_deleteent);
+			assert(nd_ops->fdno_flat.fdnx_deleteent);
+
+			/* NOTE: Can never re-use directory entries because of custom `fdnx_mkent',
+			 *       and because the old entries  may be externally visible, and  we're
+			 *       not allowed to change their [const] fields.
+			 * In theory, we could re-use them when there is no custom `fdnx_mkent',
+			 * and `isshared()' indicates no untracable references, but we don't  do
+			 * that for the sake of simplicity. */
+			DBG_memset(&mki.mkf_dent, 0xcc, sizeof(mki.mkf_dent));
+			DBG_memset(&mki.mkf_rnode, 0xcc, sizeof(mki.mkf_rnode));
+			mki.mkf_name           = newent->fde_ent.fd_name;
+			mki.mkf_hash           = newent->fde_ent.fd_hash;
+			mki.mkf_namelen        = newent->fde_ent.fd_namelen;
+			mki.mkf_flags          = 0;
+			mki.mkf_fmode          = 0;
+			mki.mkf_hrdlnk.hl_node = ofile;
+			new_oent = fflatdirnode_mkent(nd, &mki, ofile); /* New entry in `nd' (for `ofile') */
+			TRY {
+				DBG_memset(&mki.mkf_dent, 0xcc, sizeof(mki.mkf_dent));
+				DBG_memset(&mki.mkf_rnode, 0xcc, sizeof(mki.mkf_rnode));
+				mki.mkf_name    = oldent->fde_ent.fd_name;
+				mki.mkf_hash    = oldent->fde_ent.fd_hash;
+				mki.mkf_namelen = oldent->fde_ent.fd_namelen;
+				assert(mki.mkf_flags == 0);
+				assert(mki.mkf_fmode == 0);
+				mki.mkf_hrdlnk.hl_node = nfile;
+				new_nent = fflatdirnode_mkent(od, &mki, nfile); /* New entry in `od' (for `nfile') */
+				TRY {
+					/* At this point, all high-level allocations have been made.
+					 * -> Time to modify the actual directory streams:
+					 *
+					 *  - Create `new_nent' in `od' (fdnx_writedir)
+					 *  - Create `new_oent' in `nd' (fdnx_writedir)   (on except: Delete `new_nent' in `od' (fdnx_deleteent))
+					 *  - Delete `oldent' in `od' (fdnx_deleteent)    (on except: Delete `new_oent' in `nd' (fdnx_deleteent),
+					 *                                                            Delete `new_nent' in `od' (fdnx_deleteent))
+					 *  - Delete `newent' in `nd' (fdnx_deleteent)    (on except: Create  `oldent'  in  `od'  (fdnx_writedir)
+					 *                                                            Delete `new_oent' in `nd' (fdnx_deleteent),
+					 *                                                            Delete `new_nent' in `od' (fdnx_deleteent))
+					 * -- CUT: Errors after this point will not cause the operation to be undone
+					 *  - if (fnode_isdir(ofile)) fdnx_changeparent(ofile, od, nd);
+					 *  - if (fnode_isdir(nfile)) fdnx_changeparent(nfile, nd, od);
+					 */
+					new_nent->fde_ent.fd_refcnt = 2;
+					fflatdirnode_addentry_to_stream(od, new_nent, nfile);
+					TRY {
+						new_oent->fde_ent.fd_refcnt = 2;
+						fflatdirnode_addentry_to_stream(nd, new_oent, ofile);
+						TRY {
+							fflatdirnode_delete_entry(od, oldent, TAILQ_NEXT(oldent, fde_bypos) == NULL);
+							fflatdirnode_remove_from_bypos(od, oldent);
+							decref_nokill(oldent); /* Returned by `fflatdirnode_remove_from_bypos()' */
+							TRY {
+								fflatdirnode_delete_entry(nd, newent, TAILQ_NEXT(newent, fde_bypos) == NULL);
+								fflatdirnode_remove_from_bypos(nd, newent);
+							} EXCEPT {
+								{
+									NESTED_EXCEPTION;
+									TRY {
+										/* Try to re-add to the old directory, but if that fails,
+										 * admit defeat and get rid  of the file (even though  it
+										 * should stay, we've got no way to make it do that) */
+										fflatdirnode_addentry_to_stream(od, oldent, ofile);
+									} EXCEPT {
+										fflatdirnode_fileslist_removeent(od, oldent);
+										fflatdirnode_fileslist_rehash_after_remove(od);
+										RETHROW();
+									}
+									incref(oldent); /* Used by `fflatdirnode_addentry_to_stream()' */
+								}
+								RETHROW();
+							}
+						} EXCEPT {
+							{
+								NESTED_EXCEPTION;
+								RAII_FINALLY { fflatdirnode_remove_from_bypos(nd, new_oent); };
+								fflatdirnode_delete_entry(nd, new_oent, TAILQ_NEXT(new_oent, fde_bypos) == NULL);
+							}
+							RETHROW();
+						}
+					} EXCEPT {
+						{
+							NESTED_EXCEPTION;
+							RAII_FINALLY { fflatdirnode_remove_from_bypos(od, new_nent); };
+							fflatdirnode_delete_entry(od, new_nent, TAILQ_NEXT(new_nent, fde_bypos) == NULL);
+						}
+						RETHROW();
+					}
+
+					/* Update files from hash-vectors. */
+					fflatdirnode_fileslist_removeent(od, oldent);
+					fflatdirnode_fileslist_removeent(nd, newent);
+					fflatdirnode_fileslist_insertent(od, new_nent);
+					fflatdirnode_fileslist_insertent(nd, new_oent);
+
+					/* Update the directory entry for the old file (which has now become the new file) */
+					assert(&oldent->fde_ent == info->frn_oldent);
+					decref_unlikely(newent);               /* Inherited from `fflatdirnode_remove_from_bypos(nd, newent);' */
+					decref_unlikely(oldent);               /* Stolen from `info->frn_oldent' */
+					info->frn_oldent = &new_nent->fde_ent; /* Inherit reference */
+					info->frn_dent   = &new_oent->fde_ent; /* Inherit reference */
+				} EXCEPT {
+					destroy_partially_initialized_flatdirent(new_oent);
+					RETHROW();
+				}
+			} EXCEPT {
+				destroy_partially_initialized_flatdirent(new_oent);
+				RETHROW();
+			}
+
+			/* Invoke `fdnx_changeparent' if directories were renamed */
+			if (od != nd) {
+				if (fnode_isdir(ofile)) {
+					TRY {
+						maybe_update_parent(fnode_asflatdir(ofile), od, nd);
+					} EXCEPT {
+						if (fnode_isdir(nfile)) {
+							NESTED_EXCEPTION;
+							maybe_update_parent(fnode_asflatdir(nfile), nd, od);
+						}
+						RETHROW();
+					}
+				}
+				if (fnode_isdir(nfile))
+					maybe_update_parent(fnode_asflatdir(nfile), nd, od);
+			}
+		} EXCEPT {
+			release_locks_for_rename(nd, od);
+			RETHROW();
+		}
+		release_locks_for_rename(nd, od);
+		return FDIRNODE_RENAME_SUCCESS;
+	}
+
+	/* Even without exchange, we'll need to  know if `oldent' is the  last
+	 * entry from `od', so if that isn't know at the moment, read one more
+	 * entry now that we can still easily release locks. */
+	if (TAILQ_NEXT(oldent, fde_bypos) == NULL && !(od->fdn_data.fdd_flags & FFLATDIR_F_EOF)) {
+		assertf(od != nd, "else, fflatdirnode_lockwrite_and_populate(nd) would have already set `FFLATDIR_F_EOF'");
+		fflatdirnode_endwrite(nd);
+		fflatdirnode_downgrade(od);
+		if (fflatdirnode_readdir_and_upgrade(od))
+			fflatdirnode_endwrite(od);
+		goto again;
+	}
+
+	TRY {
+		/* Check for an existing file. */
+		struct fflatdirent *newent;
+		struct fflatdirent *existing;
+		existing = fflatdirnode_fileslist_lookup(nd, &info->frn_lookup_info);
+		if (existing) {
+			/* Check if we're really supposed to override this file. */
+			if unlikely(!info->frn_repfile ||
+			            existing->fde_ent.fd_ino != info->frn_repfile->fn_ino ||
+			            existing->fde_ent.fd_type != IFTODT(info->frn_repfile->fn_mode)) {
+				info->frn_dent = incref(&existing->fde_ent);
+				goto err_exists_fill_in_repnode;
+			}
+		} else {
+			if (info->frn_repfile != NULL) {
+				/* Nope: there's nothing here already... */
+				info->frn_repfile = NULL;
+				release_locks_for_rename(nd, od);
+				return FDIRNODE_RENAME_EXISTS;
+			}
+		}
+
+		/* Create a new directory for the file after it's been renamed. */
+		DBG_memset(&mki.mkf_dent, 0xcc, sizeof(mki.mkf_dent));
+		DBG_memset(&mki.mkf_rnode, 0xcc, sizeof(mki.mkf_rnode));
+		if (existing) {
+			mki.mkf_name    = existing->fde_ent.fd_name;
+			mki.mkf_hash    = existing->fde_ent.fd_hash;
+			mki.mkf_namelen = existing->fde_ent.fd_namelen;
+		} else {
+			mki.mkf_name    = info->frn_name;
+			mki.mkf_hash    = info->frn_hash;
+			mki.mkf_namelen = info->frn_namelen;
+		}
+		mki.mkf_flags          = 0;
+		mki.mkf_fmode          = 0;
+		mki.mkf_hrdlnk.hl_node = info->frn_file;
+		newent = fflatdirnode_mkent(nd, &mki, info->frn_file);
+		TRY {
+			/* +1: fflatdirnode_addentry_to_stream(nd, newent, info->frn_file),
+			 * +1: info->frn_dent */
+			newent->fde_ent.fd_refcnt = 2;
+
+			/* If nothing gets overwritten, we'll need to rehash for the later-added file. */
+			if (!existing)
+				fflatdirnode_fileslist_rehash_before_insert(nd);
+
+			/* Add the new entry to the target directory. */
+			fflatdirnode_addentry_to_stream(nd, newent, info->frn_file);
+
+			/* If present, delete the pre-existing file in `nd' */
+			if (existing) {
+				TRY {
+					/* Remove the directory relating to `entry' */
+					fflatdirnode_delete_entry(nd, existing, TAILQ_NEXT(existing, fde_bypos) == NULL);
+				} EXCEPT {
+					{
+						NESTED_EXCEPTION;
+						RAII_FINALLY { fflatdirnode_remove_from_bypos(nd, newent); };
+						fflatdirnode_delete_entry(nd, newent, TAILQ_NEXT(newent, fde_bypos) == NULL);
+					}
+					RETHROW();
+				}
+			}
+		} EXCEPT {
+			destroy_partially_initialized_flatdirent(newent);
+			RETHROW();
+		}
+		/* Point of no return --- From this on, we don't try to undo the rename if an error happens. */
+
+		/* _Always_ remove `oldent' from `od' on the cache-level. */
+		RAII_FINALLY {
+			fflatdirnode_remove_from_bypos(od, oldent);
+			fflatdirnode_fileslist_removeent(od, oldent);
+			fflatdirnode_fileslist_rehash_after_remove(od);
+			decref_nokill(oldent); /* Inherited from `fflatdirnode_remove_from_bypos()' */
+		};
+
+		/* If present, delete the pre-existing file in `nd' */
+		if (existing) {
+			bool deleted;
+			fflatdirnode_fileslist_removeent(nd, existing);
+			fflatdirnode_remove_from_bypos(nd, existing);
+			FINALLY_DECREF_UNLIKELY(existing); /* Inherited from `fflatdirnode_remove_from_bypos(nd, existing);' */
+
+			/* Decrement the NLINK counter of `info->frn_repfile' */
+			mfile_tslock_acquire(info->frn_repfile);
+			assert(info->frn_repfile->fn_nlink != 0);
+			--info->frn_repfile->fn_nlink;
+			deleted = info->frn_repfile->fn_nlink == 0;
+			mfile_tslock_release(info->frn_repfile);
+			if (deleted) {
+				struct fflatdirnode_ops const *ops;
+				/* Last link went away -> must delete the file. */
+				fnode_delete(info->frn_repfile);
+
+				/* If defined, also invoke the custom file-deleted operator.
+				 * As  you can see, even if this operator throws, the rename
+				 * will not become undone. As a matter of fact, there is  no
+				 * way to undo the rename without risk of more exceptions! */
+				ops = fflatdirnode_getops(nd);
+				if (ops->fdno_flat.fdnx_deletefil != NULL) {
+					TRY {
+						(*ops->fdno_flat.fdnx_deletefil)(nd, existing, info->frn_repfile);
+					} EXCEPT {
+						decref_unlikely(newent);
+						{
+							NESTED_EXCEPTION;
+							/* Remove `oldent' from `od' on the fs-level */
+							TRY {
+								fflatdirnode_delete_entry(od, oldent, TAILQ_NEXT(oldent, fde_bypos) == NULL);
+							} EXCEPT {
+								if (fnode_isdir(info->frn_file)) {
+									NESTED_EXCEPTION;
+									maybe_update_parent(fnode_asflatdir(info->frn_file), od, nd);
+								}
+								RETHROW();
+							}
+							if (fnode_isdir(info->frn_file))
+								maybe_update_parent(fnode_asflatdir(info->frn_file), od, nd);
+						}
+						RETHROW();
+					}
+				}
+			}
+		}
+
+		/* Remove `oldent' from `od' on the fs-level */
+		TRY {
+			fflatdirnode_delete_entry(od, oldent, TAILQ_NEXT(oldent, fde_bypos) == NULL);
+		} EXCEPT {
+			decref_unlikely(newent);
+			if (fnode_isdir(info->frn_file)) {
+				NESTED_EXCEPTION;
+				maybe_update_parent(fnode_asflatdir(info->frn_file), od, nd);
+			}
+			RETHROW();
+		}
+		if (fnode_isdir(info->frn_file))
+			maybe_update_parent(fnode_asflatdir(info->frn_file), od, nd);
+		info->frn_dent = &newent->fde_ent; /* Inherit reference */
+	} EXCEPT {
+		release_locks_for_rename(nd, od);
+		RETHROW();
+	}
+	release_locks_for_rename(nd, od);
+	return FDIRNODE_RENAME_SUCCESS;
+err_exists_fill_in_repnode:
+	release_locks_for_rename(nd, od);
+	TRY {
+		info->frn_repfile = fflatdirent_v_opennode(info->frn_dent, nd);
+	} EXCEPT {
+		decref_unlikely(info->frn_dent);
+		DBG_memset(&info->frn_dent, 0xcc, sizeof(info->frn_dent));
+		RETHROW();
+	}
+	/* Check for (rare) race condition: deleted since we released the lock above. */
+	if unlikely(!info->frn_repfile) {
+		decref_unlikely(info->frn_dent);
+		info->frn_dent = NULL;
+	}
+	return FDIRNODE_RENAME_EXISTS;
 }
 
 

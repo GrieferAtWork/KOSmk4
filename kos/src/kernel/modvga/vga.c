@@ -1624,8 +1624,10 @@ PRIVATE ATTR_FREETEXT DRIVER_INIT void KCALL init(void) {
 			/* Register the VGA adapter device. */
 			chrdev_register_auto(vga_device);
 		} EXCEPT {
-			NESTED_EXCEPTION;
-			mman_unmap(&mman_kernel, vram_base, vga_device->v_vram_size);
+			{
+				NESTED_EXCEPTION;
+				mman_unmap(&mman_kernel, vram_base, vga_device->v_vram_size);
+			}
 			RETHROW();
 		}
 	} EXCEPT {

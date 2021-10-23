@@ -570,31 +570,12 @@ fdirnode_exchange_paths(struct path *oldpath, struct path *newpath,
 		THROWS(...) {
 	REF struct path *status;
 	REF struct path *oldpath_subpath_with_oldname = NULL;
-	REF struct path *oldpath_subpath_with_newname = NULL;
-	REF struct path *newpath_subpath_with_oldname = NULL;
 	REF struct path *newpath_subpath_with_newname = NULL;
 	TRY {
 		uintptr_t oldnamehash, newnamehash;
 		char const *oldname, *newname;
 		u16 oldnamelen, newnamelen;
 		REF struct path *blocking_path;
-
-		/* Lookup existing path cache entries which may get replaced/removed:
-		 * Worst-case:
-		 *     /oldpath/foo [externally_deleted; still in-cache]
-		 *     /oldpath/bar [in-cache]
-		 *     /newpath/foo   [in-cache]
-		 *     /newpath/bar   [externally_deleted; still in-cache]
-		 *
-		 * Operation:
-		 * >> renameat2("/oldpath/bar", "/newpath/foo", RENAME_EXCHANGE);
-		 *
-		 * In this case, variables are assigned as follows:
-		 *   - oldpath_subpath_with_oldname = PATH("/oldpath/bar");  -- Move from `oldpath' to `newpath' on success
-		 *   - oldpath_subpath_with_newname = PATH("/oldpath/foo");  -- To-be deleted from cache on success
-		 *   - newpath_subpath_with_oldname = PATH("/newpath/bar");  -- To-be deleted from cache on success
-		 *   - newpath_subpath_with_newname = PATH("/newpath/foo");  -- Move from `newpath' to `oldpath' on success
-		 */
 
 		/* Load old/new name variables. */
 		oldnamehash = info->frn_oldent->fd_hash;
@@ -607,36 +588,18 @@ fdirnode_exchange_paths(struct path *oldpath, struct path *newpath,
 		/* Lookup paths. */
 		oldpath_subpath_with_oldname = path_lookupchildref_withlock(oldpath, oldname, oldnamelen, oldnamehash, info->frn_flags);
 		newpath_subpath_with_newname = path_lookupchildref_withlock(newpath, newname, newnamelen, newnamehash, info->frn_flags);
-		if (oldpath != newpath) {
-			oldpath_subpath_with_newname = path_lookupchildref_withlock(oldpath, newname, newnamelen, newnamehash, info->frn_flags);
-			newpath_subpath_with_oldname = path_lookupchildref_withlock(newpath, oldname, oldnamelen, oldnamehash, info->frn_flags);
-		} else {
-			/* Check for special case: rename to unchanged name within same directory. */
-			if unlikely(oldpath_subpath_with_oldname &&
-			            oldpath_subpath_with_oldname == newpath_subpath_with_newname) {
-				decref_unlikely(oldpath_subpath_with_oldname);
-				decref_unlikely(newpath_subpath_with_newname);
-				return FDIRNODE_RENAME_IN_PATH_SUCCESS;
-			}
+
+		/* Check for special case: rename to unchanged name within same directory. */
+		if unlikely(oldpath == newpath && oldpath_subpath_with_oldname &&
+		            oldpath_subpath_with_oldname == newpath_subpath_with_newname) {
+			decref_unlikely(oldpath_subpath_with_oldname);
+			decref_unlikely(newpath_subpath_with_newname);
+			return FDIRNODE_RENAME_IN_PATH_SUCCESS;
 		}
 
 		/* Integrity checks: none of these paths should be identical. */
-		assert(!oldpath_subpath_with_oldname ||
-		       (oldpath_subpath_with_oldname != oldpath_subpath_with_newname &&
-		        oldpath_subpath_with_oldname != newpath_subpath_with_oldname &&
-		        oldpath_subpath_with_oldname != newpath_subpath_with_newname));
-		assert(!oldpath_subpath_with_newname ||
-		       (oldpath_subpath_with_newname != oldpath_subpath_with_oldname &&
-		        oldpath_subpath_with_newname != newpath_subpath_with_oldname &&
-		        oldpath_subpath_with_newname != newpath_subpath_with_newname));
-		assert(!newpath_subpath_with_oldname ||
-		       (newpath_subpath_with_oldname != oldpath_subpath_with_oldname &&
-		        newpath_subpath_with_oldname != oldpath_subpath_with_newname &&
-		        newpath_subpath_with_oldname != newpath_subpath_with_newname));
-		assert(!newpath_subpath_with_newname ||
-		       (newpath_subpath_with_newname != oldpath_subpath_with_oldname &&
-		        newpath_subpath_with_newname != oldpath_subpath_with_newname &&
-		        newpath_subpath_with_newname != newpath_subpath_with_oldname));
+		assert(oldpath_subpath_with_oldname != newpath_subpath_with_newname ||
+		       (!oldpath_subpath_with_oldname && !newpath_subpath_with_newname));
 
 		/* If path caches exist for the 2 files being exchanged, then
 		 * must make sure to allocate enough memory within the  resp.
@@ -647,53 +610,14 @@ fdirnode_exchange_paths(struct path *oldpath, struct path *newpath,
 			if (newpath_subpath_with_newname)
 				path_cldlist_rehash_before_insert(oldpath); /* Must move sub-path `newpath_subpath_with_newname' from `newpath' to `oldpath' */
 		}
-
-		/* Must acquire whole-tree locks to paths that will
-		 * become stale if  the rename operation  succeeds. */
-		if unlikely(oldpath_subpath_with_newname) {
-			blocking_path = path_tryincref_and_trylock_whole_tree(oldpath_subpath_with_newname);
-			if unlikely(blocking_path != NULL) {
-waitfor_blocking_path:
-				if (oldpath != newpath) {
-					if (oldpath_subpath_with_oldname)
-						path_cldlist_rehash_after_remove(newpath);
-					if (newpath_subpath_with_newname)
-						path_cldlist_rehash_after_remove(oldpath);
-				}
-				xdecref_unlikely(oldpath_subpath_with_oldname);
-				xdecref_unlikely(oldpath_subpath_with_newname);
-				xdecref_unlikely(newpath_subpath_with_oldname);
-				xdecref_unlikely(newpath_subpath_with_newname);
-				return blocking_path;
-			}
-		}
-		TRY {
-			if unlikely(newpath_subpath_with_oldname) {
-				blocking_path = path_tryincref_and_trylock_whole_tree(newpath_subpath_with_oldname);
-				if unlikely(blocking_path != NULL)
-					goto waitfor_blocking_path;
-			}
-			TRY {
-				/* Invoke the FS-level rename operation */
-				status = (REF struct path *)fdirnode_rename(newpath->p_dir, info);
-			} EXCEPT {
-				if unlikely(newpath_subpath_with_oldname)
-					path_decref_and_unlock_whole_tree(newpath_subpath_with_oldname);
-				RETHROW();
-			}
-		} EXCEPT {
-			if unlikely(oldpath_subpath_with_newname)
-				path_decref_and_unlock_whole_tree(oldpath_subpath_with_newname);
-			RETHROW();
-		}
+		/* Invoke the FS-level rename operation */
+		status = (REF struct path *)fdirnode_rename(newpath->p_dir, info);
 	} EXCEPT {
 		if (oldpath_subpath_with_oldname)
 			path_cldlist_rehash_after_remove(newpath);
 		if (newpath_subpath_with_newname)
 			path_cldlist_rehash_after_remove(oldpath);
 		xdecref_unlikely(oldpath_subpath_with_oldname);
-		xdecref_unlikely(oldpath_subpath_with_newname);
-		xdecref_unlikely(newpath_subpath_with_oldname);
 		xdecref_unlikely(newpath_subpath_with_newname);
 		RETHROW();
 	}
@@ -717,14 +641,6 @@ waitfor_blocking_path:
 		if (oldpath_subpath_with_oldname) {
 			path_cldlist_remove_force(oldpath, oldpath_subpath_with_oldname);
 			++oldpath_child_delta;
-		}
-		if unlikely(oldpath_subpath_with_newname) {
-			path_cldlist_remove_force(oldpath, oldpath_subpath_with_newname);
-			++oldpath_child_delta;
-		}
-		if unlikely(newpath_subpath_with_oldname) {
-			path_cldlist_remove_force(newpath, newpath_subpath_with_oldname);
-			++newpath_child_delta;
 		}
 		if (newpath_subpath_with_newname) {
 			path_cldlist_remove_force(newpath, newpath_subpath_with_newname);
@@ -768,25 +684,13 @@ waitfor_blocking_path:
 			path_cldlist_rehash_after_remove(newpath);
 		if (oldpath_child_delta > 0)
 			path_cldlist_rehash_after_remove(oldpath);
-
-		/* Delete paths that had already been stale to begin with. */
-		if unlikely(newpath_subpath_with_oldname)
-			path_decref_and_delete_and_unlock_whole_tree(newpath_subpath_with_oldname);
-		if unlikely(oldpath_subpath_with_newname)
-			path_decref_and_delete_and_unlock_whole_tree(oldpath_subpath_with_newname);
 	} else {
-		if unlikely(newpath_subpath_with_oldname)
-			path_decref_and_unlock_whole_tree(newpath_subpath_with_oldname);
-		if unlikely(oldpath_subpath_with_newname)
-			path_decref_and_unlock_whole_tree(oldpath_subpath_with_newname);
 		if (oldpath_subpath_with_oldname)
 			path_cldlist_rehash_after_remove(newpath);
 		if (newpath_subpath_with_newname)
 			path_cldlist_rehash_after_remove(oldpath);
 	}
 	xdecref_unlikely(oldpath_subpath_with_oldname);
-	xdecref_unlikely(oldpath_subpath_with_newname);
-	xdecref_unlikely(newpath_subpath_with_oldname);
 	xdecref_unlikely(newpath_subpath_with_newname);
 	return status;
 }
@@ -1089,7 +993,14 @@ fdirnode_rename_in_path(struct path *oldpath, struct path *newpath,
 			}
 			if (info->frn_flags & AT_RENAME_EXCHANGE) {
 				/* do cache transformations for: exchange path */
-				status = fdirnode_exchange_paths(oldpath, newpath, info);
+				incref(info->frn_oldent);
+				TRY {
+					status = fdirnode_exchange_paths(oldpath, newpath, info);
+				} EXCEPT {
+					decref_unlikely(info->frn_oldent);
+					RETHROW();
+				}
+				decref_unlikely(info->frn_oldent);
 			} else {
 				/* do cache transformations for: replace path */
 				status = fdirnode_replace_paths(oldpath, newpath, info);
@@ -1201,8 +1112,21 @@ again_lookup_oldent:
 		if unlikely(!info.frn_oldent)
 			THROW(E_FSERROR_FILE_NOT_FOUND);
 
+		/* NOTE: Can't  use `FINALLY_DECREF_UNLIKELY()' since that one will
+		 *       decref the object originally given it, and not whatever is
+		 *       set at the time of the FINALLY being unwound.
+		 * As such, simply use RAII with a lambda function.
+		 *
+		 * NOTE: `info.frn_oldent' might change in case of `AT_RENAME_EXCHANGE',
+		 *       where the field becomes [in|out]  REF. Because it's [const]  in
+		 *       all other cases, we can simply always decref whatever is stored
+		 *       within once this statement goes out-of-scope. */
+		/*FINALLY_DECREF_UNLIKELY(info.frn_oldent);*/
+		RAII_FINALLY {
+			decref_unlikely(*&info.frn_oldent);
+		};
+
 		/* Open the node associated with `frn_oldent' */
-		FINALLY_DECREF_UNLIKELY(info.frn_oldent);
 		info.frn_file = fdirent_opennode(info.frn_oldent, info.frn_olddir);
 		if unlikely(!info.frn_file)
 			goto again_lookup_oldent;
@@ -1241,6 +1165,17 @@ again_rename:
 				decref_unlikely(exchange_newname_node);
 				exchange_newname_dirent = info.frn_dent;    /* Inherit reference */
 				exchange_newname_node   = info.frn_repfile; /* Inherit reference */
+				if unlikely(!exchange_newname_dirent)
+					THROW(E_FSERROR_FILE_NOT_FOUND); /* Exchange target got deleted. */
+				if unlikely(!exchange_newname_node) {
+					/* Very strange case, but another race condition relating to partially deleted files.
+					 * Just  start over from scratch and pick up on the error wherever it truly happened. */
+					twopaths_release_locks(oldpath, newpath);
+					xdecref_unlikely(newpath_ref);
+					xdecref_unlikely(exchange_newname_dirent);
+					xdecref_unlikely(replaced_node);
+					goto again_acquire_lock;
+				}
 				goto set_rename_newname_for_exchange;
 			}
 
@@ -1330,6 +1265,12 @@ again_rename:
 			replaced_node = info.frn_repfile; /* Inherit reference */
 			goto again_rename;
 		}
+		/* Success! */
+		twopaths_release_locks(oldpath, newpath);
+		if (pold_dirent)
+			*pold_dirent = incref(info.frn_oldent);
+		if (prenamed_node)
+			*prenamed_node = mfile_asnode(incref(info.frn_file));
 	} EXCEPT {
 		twopaths_release_locks(oldpath, newpath);
 		xdecref_unlikely(newpath_ref);
@@ -1338,17 +1279,11 @@ again_rename:
 		xdecref_unlikely(replaced_node);
 		RETHROW();
 	}
-	twopaths_release_locks(oldpath, newpath);
-	/* Success! */
-	if (pold_dirent)
-		*pold_dirent = incref(info.frn_oldent);
 	if (pnew_dirent)
 		*pnew_dirent = info.frn_dent; /* Inherit reference */
 	else {
 		decref_unlikely(info.frn_dent);
 	}
-	if (prenamed_node)
-		*prenamed_node = mfile_asnode(incref(info.frn_file));
 	if (preplaced_node)
 		*preplaced_node = info.frn_repfile; /* Inherit reference */
 	else {

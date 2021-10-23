@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xff2efdbd */
+/* HASH CRC-32:0x9b8ed4a8 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -340,6 +340,30 @@ __LIBC __ATTR_NONNULL((1)) void __NOTHROW(__ERROR_NESTING_BEGIN_CC error_nesting
 __LIBC __ATTR_NONNULL((1)) void __NOTHROW(__ERROR_NESTING_END_CC error_nesting_end)(struct _exception_nesting_data *__restrict __saved) __CASMNAME_SAME("error_nesting_end");
 #endif /* !__error_nesting_end_defined && __CRT_HAVE_error_nesting_end */
 #ifdef __cplusplus
+extern "C++" {
+__NAMESPACE_INT_BEGIN
+template<class __F> struct __FinallyAction {
+	__F __c;
+	__CXX_CLASSMEMBER __FinallyAction(__F __f) __CXX_NOEXCEPT: __c(__f) {}
+	__CXX_CLASSMEMBER ~__FinallyAction() __CXX_NOEXCEPT { __c(); }
+};
+struct __FinallyBase {
+	template<class __F> __CXX_CLASSMEMBER __FinallyAction<__F>
+	operator ->* (__F __f) __CXX_NOEXCEPT { return __FinallyAction<__F>(__f); }
+};
+__NAMESPACE_INT_END
+} /* extern "C++" */
+#ifndef __COMPILER_UNIQUE
+#define __COMPILER_UNIQUE_IMPL2(x, y) x##y
+#define __COMPILER_UNIQUE_IMPL(x, y) __COMPILER_UNIQUE_IMPL2(x, y)
+#ifdef __COUNTER__
+#define __COMPILER_UNIQUE(x) __COMPILER_UNIQUE_IMPL(x, __COUNTER__)
+#else /* __COUNTER__ */
+#define __COMPILER_UNIQUE(x) __COMPILER_UNIQUE_IMPL(x, __LINE__)
+#endif /* !__COUNTER__ */
+#endif /* !__COMPILER_UNIQUE */
+#define __RAII_FINALLY       auto __COMPILER_UNIQUE(__raii_finally) = __NAMESPACE_INT_SYM __FinallyBase()->*[&]
+
 /* TODO: In user-space, using TRY and EXCEPT should  leave some sort of marker in  the
  *       binary  that allows for libc to consider these handlers as `dlexceptaware(3)'
  *       when operating in except-mode #4. However, I  am unsure as to how this  could
@@ -468,6 +492,9 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_error_check_no_nesting, __FORCELOCAL __ATTR_ART
 #if !defined(NOTHROW_END) && defined(__NOTHROW_END)
 #define NOTHROW_END __NOTHROW_END
 #endif /* !NOTHROW_END && __NOTHROW_END */
+#if !defined(RAII_FINALLY) && defined(__RAII_FINALLY)
+#define RAII_FINALLY __RAII_FINALLY
+#endif /* !RAII_FINALLY && __RAII_FINALLY */
 
 /* Same as `TRY', but never do a check for proper nesting. Instead, assume
  * that the guarded code must be NOEXCEPT when an error is already active. */

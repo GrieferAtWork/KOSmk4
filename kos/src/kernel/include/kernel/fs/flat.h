@@ -333,9 +333,12 @@ struct fflatdirnode_xops {
 	                        struct fnode *__restrict file)
 			THROWS(E_IOERROR);
 
-	/* [0..1][lock(WRITE(self->fdn_data.fdd_lock))]
+	/* [0..1][lock(WRITE(oldparent->fdn_data.fdd_lock) &&
+	 *             WRITE(newparent->fdn_data.fdd_lock))]
 	 * Optional callback invoked  when the parent  of this directory  changes.
-	 * May be used to update on-disk meta-data as present on some filesystems. */
+	 * May be used to update on-disk meta-data as present on some filesystems.
+	 *
+	 * Even if this operator returns with an exception, a rename is not aborted. */
 	NONNULL((1, 2, 3)) void
 	(KCALL *fdnx_changeparent)(struct fflatdirnode *__restrict self,
 	                           struct fflatdirnode *__restrict oldparent,

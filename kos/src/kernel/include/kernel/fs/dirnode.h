@@ -205,11 +205,13 @@ struct frename_info {
 	};
 	/*OUT_REF*/ struct fnode           *frn_repfile; /* [0..1][in] The existing file that should be replaced with `frn_file',
 	                                                  *            or `NULL' if no pre-existing file should be replaced,  and
-	                                                  *            only new files should be created.
+	                                                  *            only new files should be created (mandatory field when the
+	                                                  *            `AT_RENAME_EXCHANGE' flag was given).
 	                                                  * [0..1][out_if(FDIRNODE_RENAME_EXISTS)]. */
 	/*OUT_REF*/ struct fdirent         *frn_dent;    /* [0..1][out] New directory entry for the file (or `frn_repfile' for `FDIRNODE_RENAME_EXISTS') */
 	struct fnode                       *frn_file;    /* [1..1][in] The file that should be renamed. */
-	struct fdirent                     *frn_oldent;  /* [1..1][in] Directory of `frn_file' in `frn_olddir' */
+	struct fdirent                     *frn_oldent;  /* [1..1][in] Directory of `frn_file' in `frn_olddir'
+	                                                  * Under `AT_RENAME_EXCHANGE', this is [in|out]  REF. */
 	struct fdirnode                    *frn_olddir;  /* [1..1][in] Old containing directory. (Part of the same superblock!)
 	                                                  * NOTE: The new  directory  is  guarantied  not to  be  a  child  of  this
 	                                                  *       directory! (this must be asserted by the caller of `dno_rename()') */
@@ -374,8 +376,11 @@ struct fdirnode_ops {
 	 * >> REMOVE_DIRECTORY_ENTRY(info->frn_olddir, info->frn_oldent);
 	 * >> MARK_DELETED(info->frn_oldent);
 	 * >> INSERT_DIRECTORY_ENTRY(self, newent);
-	 * >> if (repent)
+	 * >> if (repent) {
 	 * >>     INSERT_DIRECTORY_ENTRY(info->frn_olddir, repent);
+	 * >>     decref_unlikely(info->frn_oldent);
+	 * >>     info->frn_oldent = incref(repent);
+	 * >> }
 	 * >> info->frn_dent = incref(newent);
 	 * >> return FDIRNODE_RENAME_SUCCESS; */
 	WUNUSED NONNULL((1, 2)) unsigned int

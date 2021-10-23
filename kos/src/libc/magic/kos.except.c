@@ -1977,6 +1977,30 @@ restore_saved_exception:
 
 %{
 #ifdef __cplusplus
+extern "C++" {
+__NAMESPACE_INT_BEGIN
+template<class __F> struct __FinallyAction {
+	__F __c;
+	__CXX_CLASSMEMBER __FinallyAction(__F __f) __CXX_NOEXCEPT: __c(__f) {}
+	__CXX_CLASSMEMBER ~__FinallyAction() __CXX_NOEXCEPT { __c(); }
+};
+struct __FinallyBase {
+	template<class __F> __CXX_CLASSMEMBER __FinallyAction<__F>
+	operator ->* (__F __f) __CXX_NOEXCEPT { return __FinallyAction<__F>(__f); }
+};
+__NAMESPACE_INT_END
+} /* extern "C++" */
+#ifndef __COMPILER_UNIQUE
+#define __COMPILER_UNIQUE_IMPL2(x, y) x##y
+#define __COMPILER_UNIQUE_IMPL(x, y) __COMPILER_UNIQUE_IMPL2(x, y)
+#ifdef __COUNTER__
+#define __COMPILER_UNIQUE(x) __COMPILER_UNIQUE_IMPL(x, __COUNTER__)
+#else /* __COUNTER__ */
+#define __COMPILER_UNIQUE(x) __COMPILER_UNIQUE_IMPL(x, __LINE__)
+#endif /* !__COUNTER__ */
+#endif /* !__COMPILER_UNIQUE */
+#define __RAII_FINALLY       auto __COMPILER_UNIQUE(__raii_finally) = __NAMESPACE_INT_SYM __FinallyBase()->*[&]
+
 /* TODO: In user-space, using TRY and EXCEPT should  leave some sort of marker in  the
  *       binary  that allows for libc to consider these handlers as `dlexceptaware(3)'
  *       when operating in except-mode #4. However, I  am unsure as to how this  could
@@ -2125,6 +2149,9 @@ void _error_check_no_nesting(void) {
 #if !defined(NOTHROW_END) && defined(__NOTHROW_END)
 #define NOTHROW_END __NOTHROW_END
 #endif /* !NOTHROW_END && __NOTHROW_END */
+#if !defined(RAII_FINALLY) && defined(__RAII_FINALLY)
+#define RAII_FINALLY __RAII_FINALLY
+#endif /* !RAII_FINALLY && __RAII_FINALLY */
 
 /* Same as `TRY', but never do a check for proper nesting. Instead, assume
  * that the guarded code must be NOEXCEPT when an error is already active. */
