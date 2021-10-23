@@ -89,7 +89,8 @@ DEFINE_REFCOUNT_FUNCTIONS(struct fflatdirent, fde_ent.fd_refcnt, fflatdirent_des
 #define fflatdirent_endaddr(self) ((self)->fde_pos + (self)->fde_size)
 
 /* Check if `self' was deleted. */
-#define fflatdirent_wasdeleted(self) (!TAILQ_ISBOUND(self, fde_bypos))
+#define fflatdirent_wasdeleted(self)        (!TAILQ_ISBOUND(self, fde_bypos))
+#define fflatdirent_wasdeleted_atomic(self) (__hybrid_atomic_load((self)->fde_bypos.tqe_prev, __ATOMIC_ACQUIRE) == NULL)
 
 
 /* Operators for `struct fflatdirent'. These are implemented

@@ -35,6 +35,7 @@
 #include <hybrid/overflow.h>
 
 #include <kos/except.h>
+#include <kos/except/reason/inval.h>
 
 #include <assert.h>
 #include <dirent.h>
@@ -454,14 +455,6 @@ handle_result_after_wrlock:
 	fflatdirnode_endwrite(me);
 	return &result->fde_ent;
 }
-
-
-PUBLIC NONNULL((1)) void KCALL
-fflatdirnode_v_enum(struct fdirenum *__restrict result) {
-	struct fflatdirnode *me = fdirnode_asflat(result->de_dir);
-	/* TODO */
-}
-
 
 
 /* Unconditionally inherit a read-lock to `self' to:
@@ -1515,6 +1508,259 @@ err_exists_fill_in_repnode:
 	}
 	return FDIRNODE_RENAME_EXISTS;
 }
+
+
+
+struct fflatdirenum {
+	FDIRENUM_HEADER
+	REF struct fflatdirent *ffde_next; /* [0..1][lock(SMP(ffde_lock))] Next entry to read.
+	                                    * When NULL, load the next entry with a position `>= ffde_pos' */
+	pos_t                   ffde_pos;  /* [valid_if(!ffde_next)][lock(SMP(ffde_lock))] Next position. */
+#ifndef CONFIG_NO_SMP
+	struct atomic_lock      ffde_lock; /* Lock for the above. */
+#endif /* !CONFIG_NO_SMP */
+};
+#define fdirenum_asflat(self) ((struct fflatdirenum *)(self))
+
+#ifdef CONFIG_NO_SMP
+#define fflatdirenum_lock_acquire_nopr(self) (void)0
+#define fflatdirenum_lock_release_nopr(self) (void)0
+#else /* CONFIG_NO_SMP */
+#define fflatdirenum_lock_acquire_nopr(self) atomic_lock_acquire_nopr(&(self)->ffde_lock)
+#define fflatdirenum_lock_release_nopr(self) atomic_lock_release(&(self)->ffde_lock)
+#endif /* !CONFIG_NO_SMP */
+#define fflatdirenum_lock_acquire(self)      \
+	do {                                     \
+		pflag_t _was = PREEMPTION_PUSHOFF(); \
+		fflatdirenum_lock_acquire_nopr(self)
+#define fflatdirenum_lock_release_br(self)     \
+		(fflatdirenum_lock_release_nopr(self), \
+		 PREEMPTION_POP(_was))
+#define fflatdirenum_lock_release(self)     \
+		fflatdirenum_lock_release_br(self); \
+	}	__WHILE0
+
+
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(KCALL fflatdirenum_v_fini)(struct fdirenum *__restrict self) {
+	struct fflatdirenum *me = fdirenum_asflat(self);
+	xdecref(me->ffde_next);
+}
+
+/* Return a reference to the first directory entry at a position `>= pos'
+ * If no such entry exists, return `NULL' instead. */
+PRIVATE WUNUSED NONNULL((1)) REF struct fflatdirent *KCALL
+fflatdirnode_entafter(struct fflatdirnode *__restrict self, pos_t pos)
+		THROWS(...) {
+	REF struct fflatdirent *result;
+again:
+	fflatdirnode_read(self);
+again_locked:
+	result = TAILQ_LAST(&self->fdn_data.fdd_bypos);
+	if (result && fflatdirent_basaddr(result) >= pos) {
+		/* The requested entry has already been loaded. */
+		if (pos <= fflatdirent_endaddr(result) / 2) {
+			/* Scan from the front */
+			result = TAILQ_FIRST(&self->fdn_data.fdd_bypos);
+			for (;;) {
+				assert(result);
+				if (fflatdirent_basaddr(result) >= pos)
+					break;
+				result = TAILQ_NEXT(result, fde_bypos);
+			}
+		} else {
+			/* Scan from the back */
+			while (TAILQ_PREV(result, fde_bypos) &&
+			       fflatdirent_basaddr(TAILQ_PREV(result, fde_bypos)) >= pos)
+				result = TAILQ_PREV(result, fde_bypos);
+		}
+		/* At this point, `result' is the first entry with a position >= pos! */
+		incref(result);
+		fflatdirnode_endread(self);
+		return result;
+	}
+
+	/* If EOF has been reached, then the requested entry doesn't exist. */
+	if (self->fdn_data.fdd_flags & FFLATDIR_F_EOF) {
+		fflatdirnode_endread(self);
+		return NULL;
+	}
+
+	/* Load more entries. */
+	if (!fflatdirnode_readdir_and_upgrade(self))
+		goto again;
+	fflatdirnode_downgrade(self);
+	goto again_locked;
+}
+
+PRIVATE NONNULL((1)) size_t KCALL
+fflatdirenum_v_readdir(struct fdirenum *__restrict self, USER CHECKED struct dirent *buf,
+                       size_t bufsize, readdir_mode_t readdir_mode, iomode_t mode)
+		THROWS(...) {
+	ssize_t result;
+	pos_t oldpos, real_oldpos;
+	struct fflatdirnode *dir;
+	REF struct fflatdirent *ent, *oldent;
+	struct fflatdirenum *me;
+	me  = fdirenum_asflat(self);
+	dir = fdirnode_asflat(me->de_dir);
+again:
+	fflatdirenum_lock_acquire(me);
+	ent    = me->ffde_next;
+	oldpos = me->ffde_pos;
+	if (ent) {
+		incref(ent);
+		oldpos = fflatdirent_basaddr(ent);
+	}
+	fflatdirenum_lock_release(me);
+	if (!ent) {
+		/* load directory entries, or find the one most suitable for `oldpos' */
+next_next_ent:
+		ent = fflatdirnode_entafter(dir, oldpos);
+	} else if (fflatdirent_wasdeleted_atomic(ent)) {
+		decref_unlikely(ent);
+		goto next_next_ent;
+	}
+
+	/* Yield `ent' to user-space. */
+	FINALLY_DECREF_UNLIKELY(ent);
+	result = fdirenum_feedent(buf, bufsize, readdir_mode, ent->fde_ent.fd_ino,
+	                          ent->fde_ent.fd_type, ent->fde_ent.fd_namelen,
+	                          ent->fde_ent.fd_name);
+	if (result < 0)
+		return (size_t)~result;
+
+	/* Yield to the next entry. */
+	fflatdirnode_read(dir);
+	fflatdirenum_lock_acquire(me);
+	real_oldpos = me->ffde_pos;
+	oldent      = me->ffde_next; /* Inherit reference (on success) */
+	if (oldent)
+		real_oldpos = fflatdirent_basaddr(oldent);
+
+	/* Check if the enumerator position changed during the read. */
+	if unlikely(oldpos != real_oldpos) {
+		fflatdirenum_lock_release_br(me);
+		fflatdirnode_endread(dir);
+		goto again;
+	}
+
+	/* Update the enumerator position. */
+	me->ffde_pos = fflatdirent_endaddr(ent);
+	if unlikely(fflatdirent_wasdeleted(ent)) {
+		me->ffde_next = NULL;
+	} else {
+		me->ffde_next = TAILQ_NEXT(ent, fde_bypos);
+		if (me->ffde_next) {
+			incref(me->ffde_next);
+			DBG_memset(&me->ffde_pos, 0xcc, sizeof(me->ffde_pos));
+		}
+	}
+	fflatdirenum_lock_release(me);
+	fflatdirnode_endread(dir);
+	xdecref_unlikely(oldent);
+	return (size_t)result;
+}
+
+PRIVATE NONNULL((1)) pos_t KCALL
+fflatdirenum_v_seekdir(struct fdirenum *__restrict self,
+                       off_t offset, unsigned int whence)
+		THROWS(...) {
+	pos_t oldpos, newpos;
+	struct fflatdirenum *me = fdirenum_asflat(self);
+	fflatdirenum_lock_acquire(me);
+	oldpos = me->ffde_pos;
+	if (me->ffde_next)
+		oldpos = fflatdirent_basaddr(me->ffde_next);
+	fflatdirenum_lock_release(me);
+again_switch:
+	switch (whence) {
+
+	case SEEK_SET:
+		newpos = (pos_t)offset;
+		break;
+
+	case SEEK_CUR:
+		newpos = oldpos + (pos_t)offset;
+		if unlikely(offset < 0 ? newpos > oldpos
+		                       : newpos < oldpos)
+			THROW(E_OVERFLOW);
+		break;
+
+	case SEEK_END: {
+		/* Must lock the directory to get the absolute end position. */
+		pos_t dirsiz = 0;
+		struct fflatdirent *last;
+		struct fflatdirnode *dir = fdirnode_asflat(me->de_dir);
+		fflatdirnode_lockread_and_populate(dir);
+		last = TAILQ_LAST(&dir->fdn_data.fdd_bypos);
+		if (last)
+			dirsiz = fflatdirent_endaddr(last);
+		fflatdirnode_endread(dir);
+		newpos = dirsiz + (pos_t)offset;
+		if unlikely(offset < 0 ? newpos > dirsiz
+		                       : newpos < dirsiz)
+			THROW(E_OVERFLOW);
+	}	break;
+
+	default:
+		THROW(E_INVALID_ARGUMENT_UNKNOWN_COMMAND,
+		      E_INVALID_ARGUMENT_CONTEXT_LSEEK_WHENCE,
+		      whence);
+	}
+	fflatdirenum_lock_acquire(me);
+	if (whence == SEEK_CUR) {
+		/* Check if the old position changed. */
+		pos_t real_oldpos = me->ffde_pos;
+		if (me->ffde_next)
+			real_oldpos = fflatdirent_basaddr(me->ffde_next);
+		if (oldpos != real_oldpos) {
+			fflatdirenum_lock_release_br(me);
+			oldpos = real_oldpos;
+			goto again_switch;
+		}
+	}
+	if (newpos != oldpos) {
+		REF struct fflatdirent *ent;
+		/* Position changed. */
+		ent = me->ffde_next;
+		me->ffde_next = NULL;
+		me->ffde_pos  = newpos;
+		fflatdirenum_lock_release_br(me);
+		xdecref_unlikely(ent);
+		return newpos;
+	}
+	fflatdirenum_lock_release(me);
+	return newpos;
+}
+
+
+/* Flat directory enumeration operators. */
+PRIVATE struct fdirenum_ops const fflatdirenum_ops = {
+	.deo_fini    = &fflatdirenum_v_fini,
+	.deo_readdir = &fflatdirenum_v_readdir,
+	.deo_seekdir = &fflatdirenum_v_seekdir,
+};
+
+PUBLIC NONNULL((1)) void KCALL
+fflatdirnode_v_enum(struct fdirenum *__restrict result) {
+	struct fflatdirenum *rt = (struct fflatdirenum *)result;
+	struct fflatdirnode *me = fdirnode_asflat(rt->de_dir);
+
+	/* Fill in the enumerator. */
+#ifndef CONFIG_NO_SMP
+	atomic_lock_init(&rt->ffde_lock);
+#endif /* !CONFIG_NO_SMP */
+	rt->ffde_pos = 0;
+	fflatdirnode_read(me);
+	rt->ffde_next = xincref(TAILQ_FIRST(&me->fdn_data.fdd_bypos));
+	fflatdirnode_endread(me);
+	rt->de_ops = &fflatdirenum_ops;
+}
+
+
+
+
 
 
 

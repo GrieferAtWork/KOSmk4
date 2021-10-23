@@ -218,6 +218,8 @@ FUNDEF void NOTHROW(KCALL BREAKPOINT)(void);
 #endif /* CONFIG_NO_DEBUGGER */
 #endif /* !... */
 
+
+#ifndef __COMPILER_UNIQUE
 #define __COMPILER_UNIQUE_IMPL2(x, y) x##y
 #define __COMPILER_UNIQUE_IMPL(x, y) __COMPILER_UNIQUE_IMPL2(x, y)
 #ifdef __COUNTER__
@@ -225,6 +227,7 @@ FUNDEF void NOTHROW(KCALL BREAKPOINT)(void);
 #else /* __COUNTER__ */
 #define __COMPILER_UNIQUE(x) __COMPILER_UNIQUE_IMPL(x, __LINE__)
 #endif /* !__COUNTER__ */
+#endif /* !__COMPILER_UNIQUE */
 
 
 
