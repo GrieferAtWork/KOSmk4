@@ -281,6 +281,21 @@ typedef u32 FatClusterIndex; /* Cluster/Fat index number. */
 typedef struct fatregnode FatRegNode;
 typedef struct fatdirnode FatDirNode;
 
+struct fatdirent {
+	char               fad_83[8 + 3]; /* [const] 8.3 filename */
+	struct fflatdirent fad_ent;       /* Underlying directory entry. */
+};
+#define fdirent_asfat(self)     COMPILER_CONTAINER_OF(self, struct fatdirent, fad_ent.fde_ent)
+#define fflatdirent_asfat(self) COMPILER_CONTAINER_OF(self, struct fatdirent, fad_ent)
+
+#define _fatdirent_alloc(namelen)                                                                \
+	((struct fatdirent *)kmalloc(__builtin_offsetof(struct fatdirent, fad_ent.fde_ent.fd_name) + \
+	                             ((namelen) + 1) * sizeof(char),                                 \
+	                             GFP_NORMAL))
+#define _fatdirent_free(self) kfree(__COMPILER_REQTYPE(struct fatdirent *, self))
+
+
+
 typedef struct inode_data {
 	REF struct fflatdirent *fn_ent; /* [0..1][lock(fn_dir + _MFILE_F_SMP_TSLOCK)] Directory entry of this INode (or `NULL' for root directory) */
 	REF FatDirNode         *fn_dir; /* [0..1][lock(fn_dir + _MFILE_F_SMP_TSLOCK)] Directory containing this INode (or `NULL' for root directory) */
@@ -307,7 +322,6 @@ typedef struct inode_data {
 		u16                    ff_arb;        /* [valid_if(SUPERBLOCK->ft_features & FAT_FEATURE_ARB)] ARB. */
 	}                          fn_file;
 } FatNodeData;
-
 
 
 struct fatregnode: fregnode {

@@ -170,6 +170,24 @@ NOTHROW(FCALL FatFileMTime_Decode)(struct fat_filemtime const *__restrict self,
 
 
 /************************************************************************/
+/* FAT directory entry helper functions                                 */
+/************************************************************************/
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(KCALL fatdirent_v_destroy)(struct fdirent *__restrict self) {
+	struct fatdirent *me;
+	me = fdirent_asfat(self);
+	_fatdirent_free(me);
+}
+PRIVATE struct fdirent_ops const fatdirent_ops = {
+	.fdo_destroy  = &fatdirent_v_destroy,
+	.fdo_opennode = &fflatdirent_v_opennode,
+};
+
+
+
+
+
+/************************************************************************/
 /* FAT Cluster helper functions                                         */
 /************************************************************************/
 PRIVATE WUNUSED NONNULL((1)) FatClusterIndex KCALL
@@ -308,6 +326,7 @@ FatDir_WriteDir(struct fflatdirnode *__restrict self,
 		THROWS(E_IOERROR, E_FSERROR_DISK_FULL, E_FSERROR_ILLEGAL_PATH) {
 	FatDirNode *me = fflatdirnode_asfat(self);
 	/* TODO: Write directory entries. */
+	/* TODO: Set `ent->fad_83' */
 	/* TODO: Set `file->fn_ino = ABSOLUTE_ON_DISK_POS(ent);'. (also update the INO field of `ent') */
 	/* TODO: Set `file->fn_fsdata->fn_ent = ent' (possibly decref() the old value). */
 }
@@ -325,6 +344,14 @@ PRIVATE ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) struct fnode *KCALL
 FatDir_MkFile(struct fflatdirnode *__restrict self,
               struct fmkfile_info const *__restrict info)
 		THROWS(E_BADALLOC, E_IOERROR, E_FSERROR_UNSUPPORTED_OPERATION);
+
+PRIVATE ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3)) struct fflatdirent *KCALL
+FatDir_MkEnt(struct fflatdirnode *__restrict self,
+             struct fmkfile_info const *__restrict info,
+             struct fnode *__restrict file)
+		THROWS(E_BADALLOC, E_IOERROR) {
+	/* TODO: Allocate the new entry (the 8.3 filename will be set by `FatDir_WriteDir') */
+}
 
 PRIVATE NONNULL((1, 2, 3)) void KCALL
 FatDir_AllocFile(struct fflatdirnode *__restrict self,
@@ -403,7 +430,7 @@ PRIVATE struct fflatdirnode_ops const Fat_DirOps = {
 		.fdnx_writedir      = &FatDir_WriteDir,
 		.fdnx_deleteent     = &FatDir_DeleteEnt,
 		.fdnx_mkfile        = &FatDir_MkFile,
-		.fdnx_mkent         = NULL, /* Use default operator */
+		.fdnx_mkent         = &FatDir_MkEnt,
 		.fdnx_allocfile     = &FatDir_AllocFile,
 		.fdnx_deletefile    = &FatDir_DeleteFile,
 		.fdnx_parentchanged = &FatDir_ParentChanged,
@@ -542,7 +569,7 @@ PRIVATE struct fflatsuper_ops const Fat16_SuperOps = {
 		.fdnx_writedir      = &FatDir_WriteDir,
 		.fdnx_deleteent     = &FatDir_DeleteEnt,
 		.fdnx_mkfile        = &FatDir_MkFile,
-		.fdnx_mkent         = NULL, /* Use default operator */
+		.fdnx_mkent         = &FatDir_MkEnt,
 		.fdnx_allocfile     = &FatDir_AllocFile,
 		.fdnx_deletefile    = &FatDir_DeleteFile,
 		.fdnx_parentchanged = NULL, /* Parent of root directory can't change */
@@ -579,7 +606,7 @@ PRIVATE struct fflatsuper_ops const Fat32_SuperOps = {
 		.fdnx_writedir      = &FatDir_WriteDir,
 		.fdnx_deleteent     = &FatDir_DeleteEnt,
 		.fdnx_mkfile        = &FatDir_MkFile,
-		.fdnx_mkent         = NULL, /* Use default operator */
+		.fdnx_mkent         = &FatDir_MkEnt,
 		.fdnx_allocfile     = &FatDir_AllocFile,
 		.fdnx_deletefile    = &FatDir_DeleteFile,
 		.fdnx_parentchanged = NULL, /* Parent of root directory can't change */
