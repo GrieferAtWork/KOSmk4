@@ -485,11 +485,30 @@ Fat_GetAbsDiskPosWithClusters(struct fnode *__restrict self, pos_t pos,
 	((pos) + fnode_asfatsup(self)->ft_fdat.fn16_root.r16_rootpos)
 
 PRIVATE NONNULL((1)) pos_t KCALL
-Fat_GetAbsDiskPos(struct fnode *__restrict self, pos_t pos,
-                  unsigned int mode = FAT_GETCLUSTER_MODE_FCREATE) THROWS(...) {
-	if (fnode_has_fat_clusters(self))
-		return Fat_GetAbsDiskPosWithClusters(self, pos, mode);
-	return Fat_GetAbsDiskPosWithoutFatClusters(self, pos);
+Fat_GetAbsDiskPos(struct fnode *__restrict self, pos_t pos) THROWS(...) {
+	FatNodeData *dat = self->fn_fsdata;
+	pos_t result;
+	if (fnode_has_fat_clusters(self)) {
+		for (;;) {
+			FatNodeData_Read(dat);
+			TRY {
+				result = Fat_GetAbsDiskPosWithClusters(self, pos, FAT_GETCLUSTER_MODE_FCREATE);
+			} EXCEPT {
+				FatNodeData_EndRead(dat);
+				RETHROW();
+			}
+			FatNodeData_EndRead(dat);
+			if (result != 0)
+				break;
+
+			/* Wait for writing to become possible. */
+			FatNodeData_Write(dat);
+			FatNodeData_EndWrite(dat);
+		}
+	} else {
+		result = Fat_GetAbsDiskPosWithoutFatClusters(self, pos);
+	}
+	return result;
 }
 
 
@@ -1055,6 +1074,7 @@ dos_8dot3:
 		if unlikely(!dos8dot3_dirent_strok(usedname, usedname_len)) {
 			printk(KERN_ERR "[fat] Illegal character in filename %$q (skipping entry)\n",
 			       (size_t)usedname_len, usedname);
+			pos += sizeof(struct fat_dirent);
 			goto readnext;
 		}
 
@@ -1065,18 +1085,22 @@ dos_8dot3:
 				printk(KERN_ERR "[fat] Unnamed directory entry at "
 				                "ino:%#" PRIxN(__SIZEOF_INO_T__) ","
 				                "off=%" PRIuN(__SIZEOF_POS_T__) "\n",
-				       self->fn_ino, pos - sizeof(struct fat_dirent));
+				       self->fn_ino, pos);
+				pos += sizeof(struct fat_dirent);
 				goto readnext;
 			}
 			if (usedname[0] == '.') {
-				/* The kernel implements these itself, so
-				 * we don't actually  want to emit  them! */
-
-				/* XXX: Remember the address of special entries? (so `FatDir_WriteDir' can avoid them?) */
-				if (usedname_len == 1)
+				/* The kernel implements these itself, so we don't actually want to emit them! */
+				if (usedname_len == 1) {
+					ATOMIC_CMPXCH(me->fdn_1dot, (uint32_t)-1, (uint32_t)pos);
+					pos += sizeof(struct fat_dirent);
 					goto readnext; /* Directory-self-reference. */
-				if (usedname[1] == '.')
+				}
+				if (usedname[1] == '.') {
+					ATOMIC_CMPXCH(me->fdn_2dot, (uint32_t)-1, (uint32_t)pos);
+					pos += sizeof(struct fat_dirent);
 					goto readnext; /* Directory-parent-reference. */
+				}
 			}
 		}
 
@@ -1148,6 +1172,28 @@ FatDir_WriteDir(struct fflatdirnode *__restrict self,
                 bool at_end_of_dir)
 		THROWS(E_IOERROR, E_FSERROR_DISK_FULL, E_FSERROR_ILLEGAL_PATH) {
 	FatDirNode *me = fflatdirnode_asfat(self);
+	assert((ent->fde_pos % sizeof(struct fat_dirent)) == 0);
+
+	/* Deal with reserved positions (the "." and ".." entries).
+	 * NOTE: No need for atomic reads here, or worrying about
+	 *       these entries already  having been  encountered:
+	 * Assuming  the caller did everything right, a directory
+	 * write should never happen at some random position, but
+	 * only  at a known gap (which are produced as the result
+	 * of  address ranges returned by `FatDir_ReadDir()'), or
+	 * at the end of the directory (which can only be reached
+	 * once `FatDir_ReadDir()' says it has been been).
+	 *
+	 * Furthermore, assuming that the directory doesn't contain
+	 * more than "." or ".." entry each, we can pretty much act
+	 * as though `fdn_1dot' and `fdn_2dot' were [const] at this
+	 * point! */
+	while (ent->fde_pos == me->fdn_1dot || ent->fde_pos == me->fdn_2dot) {
+		ent->fde_pos += sizeof(struct fat_dirent);
+		if (OVERFLOW_USUB(ent->fde_size, sizeof(struct fat_dirent), &ent->fde_size))
+			ent->fde_size = 0;
+	}
+
 	/* TODO: Write directory entries. */
 	/* TODO: Set `file->fn_ino = ABSOLUTE_ON_DISK_POS(ent);'. (also update the INO field of `ent') */
 	/* TODO: Set `file->fn_fsdata->fn_ent = ent' (possibly decref() the old value). */
@@ -1244,9 +1290,10 @@ FatDir_AllocFile(struct fflatdirnode *__restrict self,
 		/* Allocate template for `file'. */
 		struct fat_dirent hdr[3];
 		FatClusterIndex fil_cluster;
+		FatDirNode *fdir = fnode_asfatdir(file);
 
-		/* Determine the initial cluster of `file' */
-		fil_cluster = FatNode_GetFirstCluster(file);
+		/* Determine the initial cluster of `fdir' */
+		fil_cluster = FatNode_GetFirstCluster(fdir);
 
 		/* Initialize the header template. */
 		memcpy(hdr, new_directory_pattern, sizeof(hdr));
@@ -1265,18 +1312,18 @@ FatDir_AllocFile(struct fflatdirnode *__restrict self,
 			 *           https://en.wikipedia.org/wiki/Design_of_the_FAT_file_system */
 		}
 
-		mfile_tslock_acquire(file);
+		mfile_tslock_acquire(fdir);
 		if (super->ft_features & FAT_FEATURE_UGID) {
 			/* UID/GID support */
-			hdr[0].f_uid = (u8)file->fn_uid;
-			hdr[0].f_gid = (u8)file->fn_gid;
+			hdr[0].f_uid = (u8)fdir->fn_uid;
+			hdr[0].f_gid = (u8)fdir->fn_gid;
 		} else {
 			/* Last-access timestamp support */
-			FatFileATime_Encode(&hdr[0].f_atime, &file->mf_atime);
+			FatFileATime_Encode(&hdr[0].f_atime, &fdir->mf_atime);
 		}
-		FatFileMTime_Encode(&hdr[0].f_mtime, &file->mf_mtime);
-		FatFileCTime_Encode(&hdr[0].f_ctime, &file->mf_ctime);
-		mfile_tslock_release(file);
+		FatFileMTime_Encode(&hdr[0].f_mtime, &fdir->mf_mtime);
+		FatFileCTime_Encode(&hdr[0].f_ctime, &fdir->mf_ctime);
+		mfile_tslock_release(fdir);
 		hdr[1].f_atime             = hdr[0].f_atime;
 		hdr[1].f_mtime.fc_date     = hdr[0].f_mtime.fc_date;
 		hdr[1].f_mtime.fc_time     = hdr[0].f_mtime.fc_time;
@@ -1285,7 +1332,11 @@ FatDir_AllocFile(struct fflatdirnode *__restrict self,
 		hdr[1].f_ctime.fc_sectenth = hdr[0].f_ctime.fc_sectenth;
 
 		/* Write the directory header into the directory stream file. */
-		mfile_write(file, hdr, sizeof(hdr), 0);
+		mfile_write(fdir, hdr, sizeof(hdr), 0);
+
+		/* Remember offsets of "." and ".." */
+		ATOMIC_WRITE(fdir->fdn_1dot, 0 * sizeof(struct fat_dirent));
+		ATOMIC_WRITE(fdir->fdn_2dot, 1 * sizeof(struct fat_dirent));
 	}
 #ifdef CONFIG_FAT_CYGWIN_SYMLINKS
 	else if (fnode_islnk(file)) {
@@ -1529,6 +1580,8 @@ FatDir_MkFile(struct fflatdirnode *__restrict self,
 		atomic64_init(&node->mf_filesize, (uint64_t)-1);
 		node->fn_fsdata = &node->fdn_fdat;
 		fflatdirdata_init(&node->fdn_data);
+		node->fdn_1dot = (uint32_t)-1;
+		node->fdn_2dot = (uint32_t)-1;
 		result = node;
 	}	break;
 
@@ -1577,28 +1630,6 @@ FatSuper_MakeNode(struct fflatsuper *__restrict self,
 	FatDirNode *dir       = fflatdirnode_asfat(dir_);
 	FatSuperblock *super  = fflatsuper_asfat(self);
 	FatNodeData *dat;
-	ino_t ino;
-
-	/* FAT uses the absolute on-disk position of file entries as INode number */
-	if (fnode_has_fat_clusters(dir)) {
-		for (;;) {
-			FatNodeData_Read(&dir->fdn_fdat);
-			TRY {
-				ino = (ino_t)Fat_GetAbsDiskPosWithClusters(dir, ent->fad_ent.fde_pos);
-			} EXCEPT {
-				FatNodeData_EndRead(&dir->fdn_fdat);
-				RETHROW();
-			}
-			FatNodeData_EndRead(&dir->fdn_fdat);
-			if (ino != 0)
-				break;
-			/* Wait for writing to become possible. */
-			FatNodeData_Write(&dir->fdn_fdat);
-			FatNodeData_EndWrite(&dir->fdn_fdat);
-		}
-	} else {
-		ino = (ino_t)Fat_GetAbsDiskPosWithoutFatClusters(dir, ent->fad_ent.fde_pos);
-	}
 
 	/* Allocate a new file-node with FAT operators */
 	switch (ent->fad_ent.fde_ent.fd_type) {
@@ -1619,6 +1650,8 @@ FatSuper_MakeNode(struct fflatsuper *__restrict self,
 		node->mf_flags = MFILE_F_NOUSRIO | MFILE_F_NOUSRMMAP;
 		node->fn_fsdata = &node->fdn_fdat;
 		fflatdirdata_init(&node->fdn_data);
+		node->fdn_1dot = (uint32_t)-1;
+		node->fdn_2dot = (uint32_t)-1;
 		result = node;
 	}	break;
 
@@ -1637,6 +1670,10 @@ FatSuper_MakeNode(struct fflatsuper *__restrict self,
 	}
 	dat = result->fn_fsdata;
 	TRY {
+		/* FAT uses the absolute on-disk position of file entries as INode number */
+		result->fn_ino = (ino_t)Fat_GetAbsDiskPos(dir, ent->fad_ent.fde_pos);
+
+		/* Allocate the initial cluster vector. */
 		dat->fn_clusterv = (FatClusterIndex *)kmalloc(sizeof(FatClusterIndex), GFP_NORMAL);
 	} EXCEPT {
 		kfree(result);
@@ -1708,11 +1745,10 @@ FatSuper_MakeNode(struct fflatsuper *__restrict self,
 		                    &result->mf_atime);
 	}
 
-	/* Fill in remaining fields w. */
+	/* Fill in remaining fields. */
 	result->mf_parts = NULL;
 	dat->fn_ent      = incref(ent);
 	dat->fn_dir      = mfile_asfatdir(incref(dir));
-	result->fn_ino   = ino;
 	shared_rwlock_init(&dat->fn_lock);
 	result->mf_blockshift = dir->mf_blockshift;
 	return result;

@@ -159,8 +159,9 @@ struct fflatdirnode_xops {
 	 * >>     ent->fde_pos = end;
 	 * >> }
 	 * >> entpos = ent->fde_pos;
-	 * >> if (!IS_PROPERLY_ALIGNED(entpos)) {
-	 * >>     // Directory entries may require special alignment
+	 * >> if (!IS_PROPERLY_ALIGNED(entpos)) { // Only needed if different entries have different alignments,
+	 * >>                                     // or rather: the end of an entry isn't a properly aligned start
+	 * >>                                     // of another.
 	 * >>     pos_t newpos = CEIL_ALIGN(entpos);
 	 * >>     size_t delta = end - entpos;
 	 * >>     if (OVERFLOW_USUB(ent->fde_size, delta, &ent->fde_size))

@@ -368,6 +368,8 @@ struct fatregnode: fregnode {
 
 struct fatdirnode: fflatdirnode {
 	FatNodeData fdn_fdat; /* Fat node data. */
+	uint32_t    fdn_1dot; /* [lock(ATOMIC && WRITE_ONCE)] Position of "." entry in directory stream (or `(uint32_t)-1' if unknown). */
+	uint32_t    fdn_2dot; /* [lock(ATOMIC && WRITE_ONCE)] Position of ".." entry in directory stream (or `(uint32_t)-1' if unknown). */
 };
 #define FatDirNode_AsSuper(self) ((FatSuperblock *)fflatdirnode_assuper((struct fflatdirnode *)(self)))
 
