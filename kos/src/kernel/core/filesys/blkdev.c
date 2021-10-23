@@ -375,6 +375,7 @@ blkdev_makeparts_loadefi(struct blkdev *__restrict self,
 	/* Read the EFI table */
 	efi_pos = (pos_t)efipart_sectormin << blkdev_getsectorshift(self);
 	if likely(blkdev_getsectorsize(self) == sizeof(struct mbr_sector)) {
+		STATIC_ASSERT(PAGESIZE >= sizeof(struct mbr_sector));
 		STATIC_ASSERT(sizeof(struct efi_descriptor) <= sizeof(struct mbr_sector));
 		STATIC_ASSERT(sizeof(struct efi_partition) <= sizeof(struct mbr_sector));
 		efi = (struct efi_descriptor *)aligned_alloca(sizeof(struct mbr_sector),
@@ -725,6 +726,7 @@ blkdev_makeparts_loadmbr(struct blkdev *__restrict self,
 	/* Read the MBR */
 	mbr_pos = (pos_t)subpart_sectormin << blkdev_getsectorshift(self);
 	if likely(blkdev_getsectorsize(self) == sizeof(struct mbr_sector)) {
+		STATIC_ASSERT(PAGESIZE >= sizeof(struct mbr_sector));
 		mbr = (struct mbr_sector *)aligned_alloca(sizeof(struct mbr_sector),
 		                                          sizeof(struct mbr_sector));
 		blkdev_rdsectors(self, mbr_pos, pagedir_translate(mbr), sizeof(struct mbr_sector));

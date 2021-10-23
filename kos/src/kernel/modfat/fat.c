@@ -66,6 +66,7 @@
 #include <stdint.h>
 #include <string.h>
 #include <time.h>
+#include <unicode.h>
 
 DECL_BEGIN
 
@@ -823,11 +824,321 @@ FatLnk_Stat(struct mfile *__restrict self,
 }
 #endif /* CONFIG_FAT_CYGWIN_SYMLINKS */
 
+PRIVATE NONNULL((1)) void
+NOTHROW(FCALL strlwrz)(char *__restrict str, size_t len) {
+	size_t i;
+	for (i = 0; i < len; ++i)
+		str[i] = tolower(str[i]);
+}
+
+PRIVATE u8 const dos8dot3_valid[256 / 8] = {
+/*[[[deemon
+import * from deemon;
+function is_valid(ch) {
+	if (ch <= 31 || ch == 127)
+		return false;
+	return string.chr(ch) !in "\"*+,/:;<=>?\\[]|.";
+}
+local valid_chars = [false] * 256;
+for (local x: [:256])
+	valid_chars[x] = is_valid(x);
+local valid_bits = [0] * (256 / 8);
+for (local x: [:256/8]) {
+	local mask = 0;
+	for (local y: [:8]) {
+		if (valid_chars[x*8+y])
+			mask = mask | (1 << y);
+	}
+	valid_bits[x] = mask;
+}
+for (local x: [:256/8]) {
+	if ((x % 8) == 0)
+		print("\t"),;
+	print("0x%.2I8x," % valid_bits[x]),;
+	if ((x % 8) == 7)
+		print;
+	else {
+		print(" "),;
+	}
+}
+]]]*/
+	0x00, 0x00, 0x00, 0x00, 0xfb, 0x23, 0xff, 0x03,
+	0xff, 0xff, 0xff, 0xc7, 0xff, 0xff, 0xff, 0x6f,
+	0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+	0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+/*[[[end]]]*/
+};
+#define dos8dot3_chok(ch) \
+	(dos8dot3_valid[((u8)(ch)) / 8] & (1 << (((u8)(ch)) % 8)))
+
+
+/* Check if the given string is a valid DOS 8.3 filename. */
+PRIVATE NONNULL((1)) bool
+NOTHROW(FCALL dos8dot3_dirent_strok)(char const *__restrict str, size_t len) {
+	size_t i;
+	for (i = 0; i < len; ++i) {
+		char ch = str[i];
+		if (!dos8dot3_chok(ch) && ch != '.')
+			return false;
+	}
+	return true;
+}
+
+
 PRIVATE WUNUSED struct fflatdirent *KCALL
 FatDir_ReadDir(struct fflatdirnode *__restrict self, pos_t pos)
 		THROWS(E_BADALLOC, E_IOERROR) {
+	struct fatdirent *result;
+	struct fat_dirent ent;
 	FatDirNode *me = fflatdirnode_asfat(self);
-	/* TODO: Read directory entries. (including support for LFN entries) */
+	assert((pos % sizeof(struct fat_dirent)) == 0);
+
+	/* Read the next entry from disk. */
+readnext:
+	mfile_readall(self, &ent, sizeof(struct fat_dirent), pos);
+
+	/* Check for special markers. */
+	if (ent.f_marker == MARKER_DIREND)
+		return NULL; /* End of directory */
+	if (ent.f_marker == MARKER_UNUSED) {
+		pos += sizeof(struct fat_dirent);
+		goto readnext;
+	}
+
+	/* Check for LFN entries. */
+	if (ent.f_attr == FAT_ATTR_LONGFILENAME) {
+		char lfn_name[LFN_SEQNUM_MAXCOUNT * UNICODE_16TO8_MAXBUF(LFN_NAME)];
+		u32 lfn_valid   = 0;
+		pos_t lfn_start = pos;
+		pos += sizeof(struct fat_dirent);
+		do {
+			unsigned int index = (ent.lfn_seqnum & 0x1f) - 1;
+			char *dst = lfn_name + index * UNICODE_16TO8_MAXBUF(LFN_NAME);
+			char *end = dst + UNICODE_16TO8_MAXBUF(LFN_NAME);
+			char16_t *textend;
+			lfn_valid |= 1 << index;
+#if __BYTE_ORDER__ != __ORDER_LITTLE_ENDIAN__
+			{
+				unsigned int i;
+				for (i = 0; i < LFN_NAME1; ++i)
+					ent.lfn_name_1[i] = HTOLE16((u16)ent.lfn_name_1[i]);
+				for (i = 0; i < LFN_NAME2; ++i)
+					ent.lfn_name_2[i] = HTOLE16((u16)ent.lfn_name_2[i]);
+				for (i = 0; i < LFN_NAME3; ++i)
+					ent.lfn_name_3[i] = HTOLE16((u16)ent.lfn_name_3[i]);
+			}
+#endif /* __BYTE_ORDER__ != __ORDER_LITTLE_ENDIAN__ */
+			textend = (char16_t *)memchrw(ent.lfn_name_1, 0xffff, LFN_NAME1);
+			if (textend) {
+				dst = unicode_16to8(dst, (char16_t *)ent.lfn_name_1,
+				                    textend - (char16_t *)ent.lfn_name_1);
+			} else {
+				dst     = unicode_16to8(dst, (char16_t *)ent.lfn_name_1, LFN_NAME1);
+				textend = (char16_t *)memchrw(ent.lfn_name_2, 0xffff, LFN_NAME2);
+				if (textend) {
+					dst = unicode_16to8(dst, (char16_t *)ent.lfn_name_2,
+					                    textend - (char16_t *)ent.lfn_name_2);
+				} else {
+					dst = unicode_16to8(dst, (char16_t *)ent.lfn_name_2, LFN_NAME2);
+					dst = unicode_16to8(dst, (char16_t *)ent.lfn_name_3,
+					                    memlenw(ent.lfn_name_3, 0xffff, LFN_NAME3));
+				}
+			}
+			assert(dst <= end);
+			memset(dst, 0, (size_t)(end - dst));
+			do {
+				mfile_readall(self, &ent, sizeof(struct fat_dirent), pos);
+				pos += sizeof(struct fat_dirent);
+			} while (ent.f_marker == MARKER_UNUSED);
+
+			/* This really shouldn't  happen, but also  deal
+			 * with end-of-directory inside of LFN sequence. */
+			if unlikely(ent.f_marker == MARKER_DIREND)
+				return NULL;
+		} while (ent.f_attr == FAT_ATTR_LONGFILENAME);
+
+		if unlikely(lfn_valid & (lfn_valid + 1)) {
+			/* `lfn_valid' isn't  a complete  mask.  (some part  of  the
+			 * name might have been corrupted, or accidentally deleted?)
+			 * Anyways: don't raise hell about this one and just  delete
+			 *          the string portions that were affected (that way
+			 *          we  at  least preserve  whatever portion  of the
+			 *          filename can still be recovered) */
+			unsigned int index = 0;
+			u32 mask;
+			while ((mask = 1 << index, lfn_valid >= mask)) {
+				if (lfn_valid & mask) {
+					++index;
+					continue;
+				}
+				memmovedown(lfn_name, lfn_name + UNICODE_16TO8_MAXBUF(LFN_NAME),
+				            (size_t)(LFN_SEQNUM_MAXCOUNT - 1) - index,
+				            UNICODE_16TO8_MAXBUF(LFN_NAME) * sizeof(char));
+				lfn_valid |= mask;
+				lfn_valid >>= 1;
+			}
+		}
+		/* Merge LFN filename segments. */
+		{
+			char *dst, *src, *end;
+			size_t len;
+			dst = src = lfn_name;
+			end = src + POPCOUNT(lfn_valid) * UNICODE_16TO8_MAXBUF(LFN_NAME);
+			for (; src < end;) {
+				size_t off = strnlen(src, (size_t)(end - src));
+				if (dst != src)
+					memcpy(dst, src, off, sizeof(char));
+				dst += off;
+				/* Skip ahead to the next segment. */
+				off += (size_t)(src - lfn_name);
+				off += UNICODE_16TO8_MAXBUF(LFN_NAME) - 1;
+				off = off - (off % UNICODE_16TO8_MAXBUF(LFN_NAME));
+				src = lfn_name + off;
+			}
+
+			/* Safety check: if the LFN filename ends up empty, use the 8.3 name instead! */
+			if unlikely(dst <= lfn_name)
+				goto dos_8dot3;
+
+			/* Allocate the directory entry. */
+			len    = (size_t)(dst - lfn_name);
+			result = _fatdirent_alloc(len);
+			result->fad_ent.fde_ent.fd_namelen = (u16)len;
+			*(char *)mempcpy(result->fad_ent.fde_ent.fd_name, lfn_name, len, sizeof(char)) = '\0';
+			result->fad_ent.fde_pos  = lfn_start;
+			result->fad_ent.fde_size = (size_t)(pos - lfn_start);
+		}
+
+		/* Use the position of the DOS file entry as INode number. */
+		pos -= sizeof(struct fat_dirent);
+	} else {
+		uint8_t usedname_len;
+		char usedname[13], *dstptr;
+		char fixedname[11], *srcptr;
+dos_8dot3:
+		memcpy(fixedname, ent.f_nameext, 11);
+
+		/* Fix lowercase filenames. */
+		if (ent.f_ntflags & NTFLAG_LOWBASE)
+			strlwrz(fixedname, 8);
+		if (ent.f_ntflags & NTFLAG_LOWEXT)
+			strlwrz(fixedname + 8, 3);
+		/* Deal with this one... */
+		if unlikely(ent.f_marker == MARKER_IS0XE5)
+			fixedname[0] = 0xe5;
+
+		/* Construct the proper, human-readable filename. */
+		dstptr = usedname;
+		srcptr = fixedname;
+		while (srcptr < fixedname + 8 && isspace(*srcptr))
+			++srcptr;
+		dstptr = (char *)mempcpy(dstptr, srcptr,
+		                         (size_t)((fixedname + 8) - srcptr),
+		                         sizeof(char));
+		while (dstptr > usedname && isspace(dstptr[-1]))
+			--dstptr;
+		*dstptr++ = '.';
+		srcptr = fixedname + 8;
+		while (srcptr < fixedname + 11 && isspace(*srcptr))
+			++srcptr;
+		dstptr = (char *)mempcpy(dstptr, srcptr,
+		                         (size_t)((fixedname + 11) - srcptr),
+		                         sizeof(char));
+		while (dstptr > usedname && isspace(dstptr[-1]))
+			--dstptr;
+		if (dstptr > usedname && dstptr[-1] == '.')
+			--dstptr;
+		*dstptr = 0;
+		usedname_len = (uint8_t)(dstptr - usedname);
+
+		/* Make sure there aren't any illegal characters */
+		if unlikely(!dos8dot3_dirent_strok(usedname, usedname_len)) {
+			printk(KERN_ERR "[fat] Illegal character in filename %$q (skipping entry)\n",
+			       (size_t)usedname_len, usedname);
+			goto readnext;
+		}
+
+		/* Check for entries that we're _supposed_ to skip over. */
+		if (usedname_len <= 2) {
+			if unlikely(!usedname_len) {
+				/* Empty name? (well... this shouldn't happen!) */
+				printk(KERN_ERR "[fat] Unnamed directory entry at "
+				                "ino:%#" PRIxN(__SIZEOF_INO_T__) ","
+				                "off=%" PRIuN(__SIZEOF_POS_T__) "\n",
+				       self->fn_ino, pos - sizeof(struct fat_dirent));
+				goto readnext;
+			}
+			if (usedname[0] == '.') {
+				/* The kernel implements these itself, so
+				 * we don't actually  want to emit  them! */
+
+				/* XXX: Remember the address of special entries? (so `FatDir_WriteDir' can avoid them?) */
+				if (usedname_len == 1)
+					goto readnext; /* Directory-self-reference. */
+				if (usedname[1] == '.')
+					goto readnext; /* Directory-parent-reference. */
+			}
+		}
+
+		/* Create a short-directory entry. */
+		result = _fatdirent_alloc(usedname_len);
+
+		/* Fill in remaining. */
+		result->fad_ent.fde_ent.fd_ops  = &fatdirent_ops;
+		memcpy(result->fad_ent.fde_ent.fd_name, usedname, usedname_len + 1, sizeof(char));
+		result->fad_ent.fde_ent.fd_namelen = usedname_len;
+		result->fad_ent.fde_pos  = pos;
+		result->fad_ent.fde_size = sizeof(struct fat_dirent);
+	}
+
+	/* Use the absolute on-disk position of the file's struct fat_dirent as INode number. */
+	TRY {
+		result->fad_ent.fde_ent.fd_ino = (ino_t)Fat_GetAbsDiskPos(self, pos);
+	} EXCEPT {
+		_fatdirent_free(result);
+		RETHROW();
+	}
+
+	/* Fill in generic fields. */
+	result->fad_ent.fde_ent.fd_ops = &fatdirent_ops;
+	memcpy(&result->fad_dos, &ent, sizeof(struct fat_dirent));
+	if (ent.f_attr & FAT_ATTR_DIRECTORY) {
+		result->fad_ent.fde_ent.fd_type = DT_DIR;
+	} else {
+		result->fad_ent.fde_ent.fd_type = DT_REG;
+
+#ifdef CONFIG_FAT_CYGWIN_SYMLINKS
+		/* Check if this is actually a symbolic link. */
+		if ((ent.f_attr & FAT_ATTR_SYSTEM) &&
+		    LETOH32(ent.f_size) >= FAT_SYMLINK_FILE_MINSIZE) {
+			FatSuperblock *super = fsuper_asfat(me->fn_super);
+			if (!(super->ft_features & FAT_FEATURE_NO_CYGWIN_SYMLINK)) {
+				FatClusterIndex cluster = LETOH16(ent.f_clusterlo);
+				if (!(super->ft_features & FAT_FEATURE_ARB))
+					cluster |= (u32)LETOH16(ent.f_clusterhi) << 16;
+				if (cluster < super->ft_cluster_eof) {
+					byte_t hdr[sizeof(Fat_CygwinSymlinkMagic)];
+					pos_t diskpos = FAT_CLUSTERADDR(super, cluster);
+					TRY {
+						/* XXX: This  read kind-of pollutes the device cache, especially
+						 *      considering that `FatLnk_ReadLink()' doesn't make use of
+						 *      this same cache! */
+						mfile_readall(super->ft_super.ffs_super.fs_dev, hdr, sizeof(hdr), diskpos);
+					} EXCEPT {
+						kfree(result);
+						RETHROW();
+					}
+					if (memcmp(hdr, Fat_CygwinSymlinkMagic, sizeof(hdr)) == 0) {
+						/* Jup! It sure looks like a symlink to me :) */
+						result->fad_ent.fde_ent.fd_type = DT_LNK;
+					}
+				}
+			}
+		}
+#endif /* CONFIG_FAT_CYGWIN_SYMLINKS */
+	}
+
+	return &result->fad_ent;
 }
 
 PRIVATE WUNUSED NONNULL((1, 2, 3)) bool KCALL
@@ -1792,6 +2103,10 @@ Fat_OpenFileSystem(struct ffilesys *__restrict filesys,
 				                                /* file_fspath: */ NULL,
 				                                /* file_fsname: */ NULL,
 				                                /* file_pos:    */ FAT_SECTORADDR(result, result->ft_fat_start));
+				/* TODO: This file mapping only syncs to a single FAT!
+				 *       As such, syncing will appear inconsistent in other OSes when `self->ft_fat_count > 1'
+				 * The best solution for that scenario is probably to create a private struct mfile that
+				 * dispatches loadparts to the device,  and saveparts to each  of the FATs in  sequence. */
 			} EXCEPT {
 				kfree(result->ft_freefat);
 				RETHROW();
