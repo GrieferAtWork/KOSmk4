@@ -228,6 +228,7 @@ struct fflatdirnode_xops {
 	 *                                                MFILE_FM_ATTRREADONLY);
 	 *  - return->_fnode_file_ mf_filesize   = S_ISDIR(info->mkf_fmode) ? (pos_t)-1 : (pos_t)...;
 	 *  - return->fn_ino                     = <unallocated>;      # FS-specific, inode number for non-allocated files (later allocated in `fdnx_allocfile' or `fdnx_writedir')
+	 *  - return->fn_fsdata                  = ...;                # Optional...
 	 *  - return->*                          = ...;                # Any fields from sub-classes of `fnode'
 	 * The caller of this function will do the following additional init:
 	 *  - return->_fnode_file_ mf_refcnt     = 1 + ...;   # +1: MFILE_FN_GLOBAL_REF
@@ -301,10 +302,11 @@ struct fflatdirnode_xops {
 	 *
 	 * If this operator returns with an exception, the directory entry previously
 	 * written by `fdnx_writedir()' will be marked as deleted (`fdnx_deleteent'). */
-	NONNULL((1, 2, 3)) void
+	NONNULL((1, 2, 3, 4)) void
 	(KCALL *fdnx_allocfile)(struct fflatdirnode *__restrict self,
 	                        struct fflatdirent *__restrict ent,
-	                        struct fnode *__restrict file)
+	                        struct fnode *__restrict file,
+	                        struct fmkfile_info const *__restrict info)
 			THROWS(E_BADALLOC, E_IOERROR);
 
 	/* [0..1]
@@ -611,6 +613,7 @@ struct fflatsuper_ops {
 	 *  - return->fn_mode                    = ...;                # As read from disk  (S_IFMT must match `DTTOIF(ent->fde_ent.fd_type)')
 	 *  - return->fn_uid                     = ...;                # As read from disk
 	 *  - return->fn_gid                     = ...;                # As read from disk
+	 *  - return->fn_fsdata                  = ...;                # Optional...
 	 *  - return->*                          = ...;                # Any fields from sub-classes of `fnode'
 	 * The caller of this function will do the following additional init:
 	 *  - return->_fnode_file_ mf_refcnt     = 2;      # +1: MFILE_FN_GLOBAL_REF, +1: return of `fflatsuper_opennode'

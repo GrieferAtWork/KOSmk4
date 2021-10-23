@@ -281,12 +281,29 @@ typedef u32 FatClusterIndex; /* Cluster/Fat index number. */
 typedef struct fatregnode FatRegNode;
 typedef struct fatdirnode FatDirNode;
 
+/*
+ * To prevent dead-locks, the following locking order must be ensured:
+ *
+ * #1: if (fnode_isdir(self)) self->fdn_data.fdd_lock;
+ * #2: self->fn_fsdata->fn_lock;
+ * #3: fsuper_asfat(self->fn_super)->ft_fat_lock;
+ *
+ * (If multiple locks are needed, those with a higher priority must
+ * be acquired first if later locks are still allowed to block when
+ * being acquired).
+ */
+
+
 struct fatdirent {
-	char               fad_83[8 + 3]; /* [const] 8.3 filename */
-	struct fflatdirent fad_ent;       /* Underlying directory entry. */
+	struct fat_dirent  fad_dos; /* [lock(:DIR->fdn_data.fdd_lock)] DOS directory  entry.
+	                             * This entry lives on-disk at `fatdirent_dosaddr(self)' */
+	struct fflatdirent fad_ent; /* Underlying directory entry. */
 };
 #define fdirent_asfat(self)     COMPILER_CONTAINER_OF(self, struct fatdirent, fad_ent.fde_ent)
 #define fflatdirent_asfat(self) COMPILER_CONTAINER_OF(self, struct fatdirent, fad_ent)
+
+/* Return the in-directory stream address where `fad_dos' lives. */
+#define fatdirent_dosaddr(self) (fflatdirent_endaddr(&(self)->fad_ent) - sizeof(struct fat_dirent))
 
 #define _fatdirent_alloc(namelen)                                                                \
 	((struct fatdirent *)kmalloc(__builtin_offsetof(struct fatdirent, fad_ent.fde_ent.fd_name) + \
@@ -297,8 +314,8 @@ struct fatdirent {
 
 
 typedef struct inode_data {
-	REF struct fflatdirent *fn_ent; /* [0..1][lock(fn_dir + _MFILE_F_SMP_TSLOCK)] Directory entry of this INode (or `NULL' for root directory) */
-	REF FatDirNode         *fn_dir; /* [0..1][lock(fn_dir + _MFILE_F_SMP_TSLOCK)] Directory containing this INode (or `NULL' for root directory) */
+	REF struct fatdirent *fn_ent; /* [0..1][lock(fn_dir->fdn_data.fdd_lock + _MFILE_F_SMP_TSLOCK)] Directory entry of this INode (or `NULL' for root directory) */
+	REF FatDirNode       *fn_dir; /* [0..1][lock(fn_dir->fdn_data.fdd_lock + _MFILE_F_SMP_TSLOCK)] Directory containing this INode (or `NULL' for root directory) */
 	union ATTR_PACKED {
 		struct ATTR_PACKED {
 			pos_t              r16_rootpos;   /* [const] On-disk starting address of the root directory segment. (Aligned by `result->ft_sectorsize') */
@@ -306,8 +323,8 @@ typedef struct inode_data {
 		}                      fn16_root;     /* [valid_if(:ft_type != FAT32 && :self == :s_root)] */
 		struct ATTR_PACKED {
 			struct shared_rwlock fn_lock;     /* Lock for the vector of clusters. */
-			size_t               fn_clusterc; /* [lock(fn_lock)] Amount of loaded cluster indices. */
-			FatClusterIndex     *fn_clusterv; /* [0..fn_clusterc][lock(fn_lock)]
+			size_t               fn_clusterc; /* [!0][lock(fn_lock)] Amount of loaded cluster indices. */
+			FatClusterIndex     *fn_clusterv; /* [1..fn_clusterc][lock(fn_lock)]
 			                                   * - Vector of file cluster starting indices. Indices are  passed
 			                                   *   to `FAT_CLUSTERADDR()' to convert them into absolute on-disk
 			                                   *   locations.
@@ -316,12 +333,33 @@ typedef struct inode_data {
 			                                   *   clusters have been loaded. */
 		};
 	};
-	struct ATTR_PACKED { /* File header data. */
-		u8                     ff_attr;       /* File attr. */
-		u8                     ff_ntflags;    /* NT Flags (Set of `NTFLAG_*'). */
-		u16                    ff_arb;        /* [valid_if(SUPERBLOCK->ft_features & FAT_FEATURE_ARB)] ARB. */
-	}                          fn_file;
 } FatNodeData;
+
+/* Helpers for accessing `fn_lock' */
+#define _FatNodeData_Reap(self)      (void)0
+#define FatNodeData_Reap(self)       (void)0
+#define FatNodeData_MustReap(self)   0
+#define FatNodeData_Write(self)      shared_rwlock_write(&(self)->fn_lock)
+#define FatNodeData_WriteNx(self)    shared_rwlock_write_nx(&(self)->fn_lock)
+#define FatNodeData_TryWrite(self)   shared_rwlock_trywrite(&(self)->fn_lock)
+#define FatNodeData_EndWrite(self)   (shared_rwlock_endwrite(&(self)->fn_lock), FatNodeData_Reap(self))
+#define _FatNodeData_EndWrite(self)  shared_rwlock_endwrite(&(self)->fn_lock)
+#define FatNodeData_Read(self)       shared_rwlock_read(&(self)->fn_lock)
+#define FatNodeData_ReadNx(self)     shared_rwlock_read_nx(&(self)->fn_lock)
+#define FatNodeData_TryRead(self)    shared_rwlock_tryread(&(self)->fn_lock)
+#define _FatNodeData_EndRead(self)   shared_rwlock_endread(&(self)->fn_lock)
+#define FatNodeData_EndRead(self)    (void)(shared_rwlock_endread(&(self)->fn_lock) && (FatNodeData_Reap(self), 0))
+#define _FatNodeData_End(self)       shared_rwlock_end(&(self)->fn_lock)
+#define FatNodeData_End(self)        (void)(shared_rwlock_end(&(self)->fn_lock) && (FatNodeData_Reap(self), 0))
+#define FatNodeData_Upgrade(self)    shared_rwlock_upgrade(&(self)->fn_lock)
+#define FatNodeData_UpgradeNx(self)  shared_rwlock_upgrade_nx(&(self)->fn_lock)
+#define FatNodeData_TryUpgrade(self) shared_rwlock_tryupgrade(&(self)->fn_lock)
+#define FatNodeData_Downgrade(self)  shared_rwlock_downgrade(&(self)->fn_lock)
+#define FatNodeData_Reading(self)    shared_rwlock_reading(&(self)->fn_lock)
+#define FatNodeData_Writing(self)    shared_rwlock_writing(&(self)->fn_lock)
+#define FatNodeData_CanRead(self)    shared_rwlock_canread(&(self)->fn_lock)
+#define FatNodeData_CanWrite(self)   shared_rwlock_canwrite(&(self)->fn_lock)
+
 
 
 struct fatregnode: fregnode {
@@ -380,7 +418,7 @@ struct fatsuper {
 	u8                     _ft_pad;         /* ... */
 	u8                      ft_fat_count;   /* [const] Amount of redundant FAT copies. */
 #ifdef __INTELLISENSE__
-	size_t                  ft_sectorshift; /* [const] ilog2(ft_sectorsize) (in bytes). */
+	unsigned int            ft_sectorshift; /* [const] ilog2(ft_sectorsize) (in bytes). */
 #else /* __INTELLISENSE__ */
 #define ft_sectorshift      ft_super.ffs_super.fs_root.mf_blockshift  /* [const] ilog2(ft_sectorsize) (in bytes). */
 #endif /* !__INTELLISENSE__ */
@@ -410,6 +448,7 @@ struct fatsuper {
 
 
 /* Helpers for accessing `ft_fat_lock' */
+/* TODO: Refactor these helpers into CamelCase */
 #define _fatsuper_fatlock_reap(self)      (void)0
 #define fatsuper_fatlock_reap(self)       (void)0
 #define fatsuper_fatlock_write(self)      shared_rwlock_write(&(self)->ft_fat_lock)
@@ -432,8 +471,6 @@ struct fatsuper {
 #define fatsuper_fatlock_writing(self)    shared_rwlock_writing(&(self)->ft_fat_lock)
 #define fatsuper_fatlock_canread(self)    shared_rwlock_canread(&(self)->ft_fat_lock)
 #define fatsuper_fatlock_canwrite(self)   shared_rwlock_canwrite(&(self)->ft_fat_lock)
-
-
 
 /* Get/Set  a  FAT table  indirection.  (These function  access  the `ft_fat_table'  memory mapping)
  * As such, changes made by these functions must be synced to-disk via `mfile_sync(ft_super.fs_dev)' */

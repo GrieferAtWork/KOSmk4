@@ -969,7 +969,7 @@ handle_existing:
 						/* Invoke the `fdnx_allocfile' operator (if defined). */
 						if (ops->fdno_flat.fdnx_allocfile) {
 							TRY {
-								(*ops->fdno_flat.fdnx_allocfile)(me, ent, node);
+								(*ops->fdno_flat.fdnx_allocfile)(me, ent, node, info);
 							} EXCEPT {
 								/* Invoke the `fdnx_deleteent' operator to (try) remove the previously written entry.
 								 * Note the use of  nested exceptions, as `fdnx_deleteent'  is also allowed to  throw
