@@ -1583,9 +1583,6 @@ create_symlink_target(struct path *__restrict symlink_path,
 	size_t bufsize;
 	struct flnknode_ops const *ops;
 	ops = flnknode_getops(lnk);
-	if (!*premaining_symlinks)
-		THROW(E_FSERROR_TOO_MANY_SYMBOLIC_LINKS);
-	--*premaining_symlinks;
 
 	/* Direct link text access */
 	if (ops->lno_linkstr != NULL) {
@@ -1680,7 +1677,6 @@ path_open_ex(struct path *cwd, u32 *__restrict premaining_symlinks,
 		REF struct filehandle *rhand;
 		REF struct mfile *file;
 		REF struct path *access_path;
-		REF struct fdirent *access_dent;
 		struct fmkfile_info info;
 		VALIDATE_FLAGSET(oflags,
 		                 O_ACCMODE | O_CREAT | O_EXCL | O_NOCTTY | O_TRUNC | O_APPEND |
@@ -1716,11 +1712,31 @@ path_open_ex(struct path *cwd, u32 *__restrict premaining_symlinks,
 						/* Dereference and create pointed-to filename. */
 						REF struct path *new_access_path;
 						REF struct flnknode *lnknode;
+						struct flnknode_ops const *lnknode_ops;
 again_deref_lnknode:
 						lnknode = fnode_aslnk(info.mkf_rnode); /* Inherit reference */
-						decref_unlikely(info.mkf_dent);
 						FINALLY_DECREF_UNLIKELY(lnknode);
 						DBG_memset(&info.mkf_rnode, 0xcc, sizeof(info.mkf_rnode));
+						{
+							FINALLY_DECREF_UNLIKELY(info.mkf_dent);
+	
+							/* Decrement the remaining-links counter. */
+							if (!*premaining_symlinks)
+								THROW(E_FSERROR_TOO_MANY_SYMBOLIC_LINKS);
+							--*premaining_symlinks;
+	
+							/* Check for `lno_openlink' support */
+							lnknode_ops = flnknode_getops(lnknode);
+							if (lnknode_ops->lno_openlink &&
+							    (*lnknode_ops->lno_openlink)(lnknode, &result,
+							                                 access_path, info.mkf_dent)) {
+								decref_unlikely(access_path);
+								kfree(rhand);
+								result.h_mode = IO_FROM_OPENFLAG(oflags);
+								return result;
+							}
+						} /* Scope... */
+
 						/* Create the pointed-to file. */
 						status = create_symlink_target(access_path, premaining_symlinks, lnknode, &info,
 						                               &new_access_path, atflags & AT_NO_AUTOMOUNT);
@@ -1794,10 +1810,38 @@ again_deref_lnknode:
 
 		/* Open the named node */
 		file = path_traversefull_ex(cwd, premaining_symlinks, filename,
-		                            atflags, &access_path, &access_dent);
+		                            atflags | AT_SYMLINK_NOFOLLOW,
+		                            &access_path, &access_dent);
+again_handle_traversed_file:
 		FINALLY_DECREF_UNLIKELY(file);
 		FINALLY_DECREF_UNLIKELY(access_path);
 		FINALLY_DECREF_UNLIKELY(access_dent);
+		if (fnode_islnk(file)) {
+			struct flnknode_ops const *lnknode_ops;
+			struct flnknode *lnknode = fnode_aslnk(file);
+
+			/* Check that we're allowed to walk a symlink. */
+			if unlikely(atflags & AT_SYMLINK_NOFOLLOW)
+				THROW(E_FSERROR_IS_A_SYMBOLIC_LINK, E_FILESYSTEM_IS_A_SYMBOLIC_LINK_OPEN);
+			if unlikely(*premaining_symlinks == 0)
+				THROW(E_FSERROR_TOO_MANY_SYMBOLIC_LINKS);
+			--*premaining_symlinks;
+
+			/* Check for `lno_openlink' support */
+			lnknode_ops = flnknode_getops(lnknode);
+			if (lnknode_ops->lno_openlink &&
+			    (*lnknode_ops->lno_openlink)(lnknode, &result,
+			                                 access_path, access_dent)) {
+				result.h_mode = IO_FROM_OPENFLAG(oflags);
+				return result;
+			}
+
+			/* Do normal expansion of symlink nodes. */
+			file = path_walklinknode(access_path, premaining_symlinks,
+			                         lnknode, &access_path, &access_dent,
+			                         (atflags & AT_NO_AUTOMOUNT) | AT_SYMLINK_NOFOLLOW);
+			goto again_handle_traversed_file;
+		}
 
 		/* Deal with `O_DIRECTORY' */
 		if ((oflags & O_DIRECTORY) && !fnode_isdir(file))

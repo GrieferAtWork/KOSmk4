@@ -22,11 +22,16 @@
 
 #include <kernel/compiler.h>
 
-#include <kernel/types.h>
-
 #ifdef CONFIG_USE_NEW_FS
+DECL_BEGIN
+struct inode_data;
+DECL_END
+#define FNODE_FSDATA_T struct inode_data
+
+#include <kernel/types.h>
 #include <kernel/fs/dirent.h>
 #include <kernel/fs/dirnode.h>
+#include <kernel/fs/flat.h>
 #include <kernel/fs/lnknode.h>
 #include <kernel/fs/node.h>
 #include <kernel/fs/regnode.h>
@@ -35,6 +40,7 @@
 
 #include <hybrid/minmax.h>
 #else /* CONFIG_USE_NEW_FS */
+#include <kernel/types.h>
 #include <sched/rwlock.h>
 #include <fs/node.h>
 #endif /* !CONFIG_USE_NEW_FS */
@@ -66,6 +72,7 @@ DECL_BEGIN
 #ifdef __CC__
 
 struct fatsuper;
+typedef struct fatsuper FatSuperblock;
 
 /* FAT filesystem type (One of `FAT12', `FAT16' or `FAT32'). */
 #define FAT12 0
@@ -148,7 +155,7 @@ struct ATTR_PACKED fat_dirent {
 #define NTFLAG_LOWBASE            0x08           /* Lowercase basename. */
 #define NTFLAG_LOWEXT             0x10           /* Lowercase extension. */
 			u8                    f_ntflags;     /* NT Flags (Set of `NTFLAG_*'). */
-			struct fat_filectime   f_ctime;       /* Creation time. */
+			struct fat_filectime  f_ctime;       /* Creation time. */
 			union ATTR_PACKED {
 				struct ATTR_PACKED {
 					u8              f_uid;   /* User ID */
@@ -173,8 +180,8 @@ struct ATTR_PACKED fat_dirent {
 				le16 f_clusterhi; /* High 2 bytes of the file's cluster. */
 			};
 			struct fat_filemtime f_mtime;     /* Last modification time. */
-			le16                  f_clusterlo;   /* Lower 2 bytes of the file's cluster. */
-			le32                  f_size;        /* File size. */
+			le16                 f_clusterlo;   /* Lower 2 bytes of the file's cluster. */
+			le32                 f_size;        /* File size. */
 		};
 /* Sizes of the three name portions. */
 #define LFN_NAME1 5
@@ -268,98 +275,76 @@ typedef u32 FatClusterIndex; /* Cluster/Fat index number. */
 #define FAT_CLUSTER_FAT16_ROOT 0 /* Cluster ID found in parent-directory entries referring to the ROOT directory. */
 
 
+/* NOTE: On FAT, Inode numbers are the on-disk address of `struct fat_dirent' */
 
 #ifdef CONFIG_USE_NEW_FS
+typedef struct fatregnode FatRegNode;
+typedef struct fatdirnode FatDirNode;
 
-
-#ifdef CONFIG_FAT_CYGWIN_SYMLINKS
-#define _OFFSET_FATNODE_DATA \
-	MAX_C(sizeof(struct fregnode), sizeof(struct fdirnode), sizeof(struct flnknode))
-#else /* CONFIG_FAT_CYGWIN_SYMLINKS */
-#define _OFFSET_FATNODE_DATA \
-	MAX_C(sizeof(struct fregnode), sizeof(struct fdirnode))
-#endif /* !CONFIG_FAT_CYGWIN_SYMLINKS */
-
-struct fatnode: fnode {
-	byte_t _fn_pad[_OFFSET_FATNODE_DATA - sizeof(struct fnode)];
-	union {
-		struct {
-			pos_t              r16_rootpos;  /* [const] On-disk starting address of the root directory segment. */
-			u32                r16_rootsiz;  /* [const] Max size of the root-directory segment (in bytes) */
+typedef struct inode_data {
+	REF struct fflatdirent *fn_ent; /* [0..1][lock(fn_dir + _MFILE_F_SMP_TSLOCK)] Directory entry of this INode (or `NULL' for root directory) */
+	REF FatDirNode         *fn_dir; /* [0..1][lock(fn_dir + _MFILE_F_SMP_TSLOCK)] Directory containing this INode (or `NULL' for root directory) */
+	union ATTR_PACKED {
+		struct ATTR_PACKED {
+			pos_t              r16_rootpos;   /* [const] On-disk starting address of the root directory segment. (Aligned by `result->ft_sectorsize') */
+			u32                r16_rootsiz;   /* [const] Max size of the root-directory segment (in bytes) */
 		}                      fn16_root;     /* [valid_if(:ft_type != FAT32 && :self == :s_root)] */
-		struct {
-			size_t             fn_clusterc;  /* [lock(:mf_lock)]
-			                                  * [if(:ft_type != FAT32 && :self == :s_root,[== 0])]
-			                                  * [if(:ft_type == FAT32 || :self != :s_root,[!0])]
-			                                  * Amount of loaded cluster indices. */
-			size_t             fn_clustera;  /* [lock(:mf_lock)]
-			                                  * [if(:ft_type != FAT32 && :self == :s_root,[== 0])]
-			                                  * [if(:ft_type == FAT32 || :self != :s_root,[!0])]
-			                                  * Allocated amount of cluster indices. */
-			FatClusterIndex   *fn_clusterv;  /* [lock(:mf_lock)]
-			                                  * [if(:ft_type != FAT32 && :self == :s_root,[== NULL])]
-			                                  * [if(:ft_type == FAT32 || :self != :s_root,[1..fn_clusterc|alloc(fn_clustera)][owned])]
-			                                  * Vector    of    file    cluster    starting     indices.
-			                                  * Indices   are   passed    to   `FAT_CLUSTERADDR()'    to
-			                                  * convert   them   into   absolute   on-disk    locations.
-			                                  * Each cluster has  a length  of `:ft_clustersize'  bytes.
-			                                  * If `fn_clusterv[fn_clusterc-1] >= :ft_cluster_eof', then
-			                                  * all clusters have been loaded. */
+		struct ATTR_PACKED {
+			struct shared_rwlock fn_lock;     /* Lock for the vector of clusters. */
+			size_t               fn_clusterc; /* [lock(fn_lock)] Amount of loaded cluster indices. */
+			FatClusterIndex     *fn_clusterv; /* [0..fn_clusterc][lock(fn_lock)]
+			                                   * - Vector of file cluster starting indices. Indices are  passed
+			                                   *   to `FAT_CLUSTERADDR()' to convert them into absolute on-disk
+			                                   *   locations.
+			                                   * - Each cluster has a length of `:ft_clustersize' bytes.  If
+			                                   *   `fn_clusterv[fn_clusterc-1] >= :ft_cluster_eof', then all
+			                                   *   clusters have been loaded. */
 		};
 	};
-	struct { /* File header data. */
-		u8                     f_attr;       /* File attr. */
-		u8                     f_ntflags;    /* NT Flags (Set of `NTFLAG_*'). */
-		u16                    f_arb;        /* [valid_if(SUPERBLOCK->ft_features & FAT_FEATURE_ARB)] ARB. */
+	struct ATTR_PACKED { /* File header data. */
+		u8                     ff_attr;       /* File attr. */
+		u8                     ff_ntflags;    /* NT Flags (Set of `NTFLAG_*'). */
+		u16                    ff_arb;        /* [valid_if(SUPERBLOCK->ft_features & FAT_FEATURE_ARB)] ARB. */
 	}                          fn_file;
+} FatNodeData;
+
+
+
+struct fatregnode: fregnode {
+	FatNodeData frn_fdat; /* Fat node data. */
 };
-#define fdirnode_asfatnode        fnode_asfatnode
-#define fdirnode_asfatsuper(self) COMPILER_CONTAINER_OF(self, struct fatsuper, ft_super.fs_root)
-#define fsuper_asfatsuper(self)   COMPILER_CONTAINER_OF(self, struct fatsuper, ft_super)
-#define fatnode_asdir(self)       ((struct fregnode *)(self))
-#define fatnode_asreg(self)       ((struct fdirnode *)(self))
-#define fatnode_asfatsuper(self)  fdirnode_asfatsuper(fatnode_asdir(self))
-#define fnode_asfatnode(self)     ((struct fatnode *)(self))
-#define fnode_asfatsuper(self)    fdirnode_asfatsuper(fnode_asdir(self))
-#define mfile_asfatnode(self)     fnode_asfatnode(mfile_asnode(self))
-#define mfile_asfatsuper(self)    fdirnode_asfatsuper(mfile_asdir(self))
-#define fatnode_super(self)       fnode_asfatsuper((self)->fn_super)
 
-
-struct fatdirent {
-	struct fdirent fd_ent; /* Underlying directory entry. */
+struct fatdirnode: fflatdirnode {
+	FatNodeData fdn_fdat; /* Fat node data. */
 };
-#define fdirent_asfatdirent(self) COMPILER_CONTAINER_OF(self, FatDirent, fd_ent)
+#define FatDirNode_AsSuper(self) ((FatSuperblock *)fflatdirnode_assuper((struct fflatdirnode *)(self)))
+
+#ifdef CONFIG_FAT_CYGWIN_SYMLINKS
+typedef struct fatlnknode FatLnkNode;
+struct fatlnknode: flnknode {
+	FatNodeData fln_fdat; /* Fat node data. */
+};
+#endif /* CONFIG_FAT_CYGWIN_SYMLINKS */
+
+#define fregnode_asfat(self)     ((FatRegNode *)(self))
+#define fflatdirnode_asfat(self) ((FatDirNode *)(self))
+#define fdirnode_asfat(self)     fflatdirnode_asfat(fdirnode_asflat(self))
+#define fdirnode_asfatsup(self)  FatDirNode_AsSuper(fdirnode_asfat(self))
+#ifdef CONFIG_FAT_CYGWIN_SYMLINKS
+#define flnknode_asfat(self)     ((FatLnkNode *)(self))
+#endif /* CONFIG_FAT_CYGWIN_SYMLINKS */
+#define fnode_asfatreg(self)   fregnode_asfat(fnode_asreg(self))
+#define fnode_asfatdir(self)   fflatdirnode_asfat(fnode_asflatdir(self))
+#define fnode_asfatlnk(self)   flnknode_asfat(fnode_aslnk(self))
+#define fnode_asfatsup(self)   FatDirNode_AsSuper(fnode_asfatdir(self))
+#define mfile_asfatreg(self)   fregnode_asfat(mfile_asreg(self))
+#define mfile_asfatdir(self)   fflatdirnode_asfat(mfile_asflatdir(self))
+#define mfile_asfatlnk(self)   flnknode_asfat(mfile_aslnk(self))
+#define mfile_asfatsup(self)   FatDirNode_AsSuper(mfile_asfatdir(self))
 
 
-
-/* Returns the cluster index of the `nth_cluster' cluster that is allocated for `self'.
- * NOTE: The caller must be holding at least a read-lock on `self'
- * @param: mode: Set of `FAT_GETCLUSTER_MODE_F*' */
-PRIVATE NONNULL((1)) FatClusterIndex KCALL
-Fat_GetFileCluster(struct fatnode *__restrict self,
-                   size_t nth_cluster,
-                   unsigned int mode);
-#define FAT_GETCLUSTER_MODE_FNORMAL 0x0000 /* If  that  cluster  hasn't  been  loaded  yet,  load  it  now.
-                                            * If the cluster doesn't exist, return `ft_cluster_eof_marker'. */
-#define FAT_GETCLUSTER_MODE_FCREATE 0x0001 /* Allocate missing clusters. */
-#define FAT_GETCLUSTER_MODE_FNOZERO 0x0002 /* Do not ZERO-initialize newly allocated clusters.
-                                            * NOTE: This flag is implied when `node' isn't a regular file. */
-#define FAT_GETCLUSTER_MODE_FNCHNGE 0x0004 /* Don't mark the node as changed if the initial cluster was allocated. */
-
-
-
-typedef NOBLOCK NONNULL((1)) FatClusterIndex (FCALL *PFatGetFatIndirection)(struct fatsuper const *__restrict self, FatClusterIndex index);
-typedef NOBLOCK NONNULL((1)) void (FCALL *PFatSetFatIndirection)(struct fatsuper *__restrict self, FatClusterIndex index, FatClusterIndex indirection_target);
-
-#define FAT_METALOAD  0x1 /* When set, the associated sector has been loaded. */
-#define FAT_METACHNG  0x2 /* When set, the associated sector has been changed (Write data when syncing the filesystem). */
-#define FAT_METAMASK  0x3 /* Mask of known meta-data bits. */
-#define FAT_METABITS    2 /* The number of FAT metadata bits per FileAllocationTable cluster. */
-
-
-
-
+typedef NOBLOCK NONNULL((1)) FatClusterIndex (FCALL *PFatGetFatIndirection)(FatSuperblock const *__restrict self, FatClusterIndex index);
+typedef NOBLOCK NONNULL((1)) void (FCALL *PFatSetFatIndirection)(FatSuperblock *__restrict self, FatClusterIndex index, FatClusterIndex indirection_target);
 
 struct fatsuper {
 	mode_t                  ft_mode;        /* [valid_if(!(ft_features & FAT_FEATURE_ARB))] Default permissions for every file on this filesystem (Defaults to 0777). */
@@ -383,7 +368,7 @@ struct fatsuper {
 #ifdef __INTELLISENSE__
 	size_t                  ft_sectorshift; /* [const] ilog2(ft_sectorsize) (in bytes). */
 #else /* __INTELLISENSE__ */
-#define ft_sectorshift      ft_super.fs_root.mf_blockshift  /* [const] ilog2(ft_sectorsize) (in bytes). */
+#define ft_sectorshift      ft_super.ffs_super.fs_root.mf_blockshift  /* [const] ilog2(ft_sectorsize) (in bytes). */
 #endif /* !__INTELLISENSE__ */
 	size_t                  ft_sectorsize;  /* [const][== 1 << ft_sectorshift] Size of a sector (in bytes). */
 	size_t                  ft_clustersize; /* [const][== ft_sec4clus << ft_sectorshift] Size of a cluster (in bytes). */
@@ -403,9 +388,12 @@ struct fatsuper {
 	void                   *ft_fat_table;   /* [lock(ft_fat_lock)][1..ft_fat_size][owned][const] Memory-mapping of the FAT table. */
 	struct mman_unmap_kram_job *ft_freefat; /* [1..1][owned][const] Used for unmapping `ft_fat_table' */
 	FatClusterIndex         ft_free_pos;    /* [lock(ft_fat_lock)] Next cluster index that should be considered when search for free clusters. */
-	struct fsuper           ft_super;       /* Underlying superblock */
-	/* Fat root directory data lives here... (everything after struct fatnode::_fn_pad) */
+	struct fflatsuper       ft_super;       /* Underlying superblock */
+	FatNodeData             ft_fdat;        /* Fat root directory node data. */
 };
+#define fflatsuper_asfat(self) COMPILER_CONTAINER_OF(self, FatSuperblock, ft_super)
+#define fsuper_asfat(self)     COMPILER_CONTAINER_OF(self, FatSuperblock, ft_super.ffs_super)
+
 
 /* Helpers for accessing `ft_fat_lock' */
 #define _fatsuper_fatlock_reap(self)      (void)0
@@ -453,8 +441,6 @@ struct fatsuper {
 
 #else /* CONFIG_USE_NEW_FS */
 
-typedef struct fatsuper FatSuperblock;
-
 typedef struct inode_data {
 	union ATTR_PACKED {
 		struct ATTR_PACKED {
@@ -487,6 +473,8 @@ typedef struct inode_data {
 		u16                    ff_arb;        /* [valid_if(SUPERBLOCK->ft_features & FAT_FEATURE_ARB)] ARB. */
 	}                          fn_file;
 } FatNodeData;
+
+
 
 /* Returns the cluster index of the `nth_cluster' cluster that is allocated for `self'.
  * NOTE: The caller must be holding at least a read-lock on `self'

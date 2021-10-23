@@ -108,6 +108,12 @@ fdirnode_v_open(struct mfile *__restrict self, struct handle *__restrict hand,
 	decref_nokill(self);
 }
 
+/* Default stream operators for directories (using `fdirnode_v_open') */
+PUBLIC_CONST struct mfile_stream_ops const fdirnode_v_stream_ops = {
+	.mso_open = &fdirnode_v_open,
+};
+
+
 
 /* Construct a directory  enumerator object in  `*result'.
  * This function must initialize _all_ fields of `*result'

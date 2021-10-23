@@ -1091,8 +1091,8 @@ again_locked:
 			 * As  you can see, even if this operator throws, the unlink
 			 * will not become undone. As a matter of fact, there is  no
 			 * way to undo the delete without out-of-scope data races! */
-			if (ops->fdno_flat.fdnx_deletefil != NULL)
-				(*ops->fdno_flat.fdnx_deletefil)(me, ent, file);
+			if (ops->fdno_flat.fdnx_deletefile != NULL)
+				(*ops->fdno_flat.fdnx_deletefile)(me, ent, file);
 		}
 	} /* Scope... */
 
@@ -1116,8 +1116,8 @@ maybe_update_parent(struct fflatdirnode *__restrict file,
                     struct fflatdirnode *__restrict newparent) {
 	struct fflatdirnode_ops const *ofile_ops;
 	ofile_ops = fflatdirnode_getops(file);
-	if (ofile_ops->fdno_flat.fdnx_changeparent != NULL)
-		(*ofile_ops->fdno_flat.fdnx_changeparent)(file, oldparent, newparent);
+	if (ofile_ops->fdno_flat.fdnx_parentchanged != NULL)
+		(*ofile_ops->fdno_flat.fdnx_parentchanged)(file, oldparent, newparent);
 }
 
 PUBLIC WUNUSED NONNULL((1, 2)) unsigned int KCALL
@@ -1239,8 +1239,8 @@ again:
 					 *                                                            Delete `new_oent' in `nd' (fdnx_deleteent),
 					 *                                                            Delete `new_nent' in `od' (fdnx_deleteent))
 					 * -- CUT: Errors after this point will not cause the operation to be undone
-					 *  - if (fnode_isdir(ofile)) fdnx_changeparent(ofile, od, nd);
-					 *  - if (fnode_isdir(nfile)) fdnx_changeparent(nfile, nd, od);
+					 *  - if (fnode_isdir(ofile)) fdnx_parentchanged(ofile, od, nd);
+					 *  - if (fnode_isdir(nfile)) fdnx_parentchanged(nfile, nd, od);
 					 */
 					new_nent->fde_ent.fd_refcnt = 2;
 					fflatdirnode_addentry_to_stream(od, new_nent, nfile);
@@ -1309,7 +1309,7 @@ again:
 				RETHROW();
 			}
 
-			/* Invoke `fdnx_changeparent' if directories were renamed */
+			/* Invoke `fdnx_parentchanged' if directories were renamed */
 			if (od != nd) {
 				if (fnode_isdir(ofile)) {
 					TRY {
@@ -1446,9 +1446,9 @@ again:
 				 * will not become undone. As a matter of fact, there is  no
 				 * way to undo the rename without risk of more exceptions! */
 				ops = fflatdirnode_getops(nd);
-				if (ops->fdno_flat.fdnx_deletefil != NULL) {
+				if (ops->fdno_flat.fdnx_deletefile != NULL) {
 					TRY {
-						(*ops->fdno_flat.fdnx_deletefil)(nd, existing, info->frn_repfile);
+						(*ops->fdno_flat.fdnx_deletefile)(nd, existing, info->frn_repfile);
 					} EXCEPT {
 						decref_unlikely(newent);
 						{
@@ -2081,6 +2081,20 @@ fflatdirnode_fileslist_remove(struct fflatdirnode *__restrict self,
 	return NULL;
 }
 
+
+
+
+
+/* Default operators for `struct fflatsuper'-derived superblocks. */
+PUBLIC NOBLOCK NONNULL((1)) void
+NOTHROW(KCALL fflatsuper_v_destroy)(struct mfile *__restrict self) {
+	struct fflatsuper *me = mfile_asflatsuper(self);
+	STATIC_ASSERT((offsetof(struct fflatsuper, ffs_rootdata) -
+	               offsetof(struct fflatsuper, ffs_super.fs_root)) ==
+	              offsetof(struct fflatdirnode, fdn_data));
+	fflatdirdata_fini(&me->ffs_rootdata);
+	fsuper_v_destroy(self);
+}
 
 
 DECL_END

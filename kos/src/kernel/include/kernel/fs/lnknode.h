@@ -31,7 +31,11 @@
 #ifdef __CC__
 DECL_BEGIN
 
+struct path;
+struct handle;
+struct fdirent;
 struct flnknode;
+
 struct flnknode_ops {
 	struct fnode_ops lno_node; /* FNode operators */
 
@@ -86,9 +90,11 @@ struct flnknode_ops {
 	 *
 	 * This operator is mainly needed to implement the special dup()-behavior
 	 * of `open("/proc/[pid]/fd/[no]")' */
-	WUNUSED NONNULL((1)) __BOOL
+	WUNUSED NONNULL((1, 2, 3, 4)) __BOOL
 	(KCALL *lno_openlink)(struct flnknode *__restrict self,
-	                      struct handle *__restrict result)
+	                      struct handle *__restrict result,
+	                      struct path *__restrict access_path,
+	                      struct fdirent *__restrict access_dent)
 			THROWS(E_IOERROR, E_BADALLOC, ...);
 };
 

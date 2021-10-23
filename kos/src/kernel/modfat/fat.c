@@ -22,6 +22,9 @@
 #define _KOS_SOURCE        1
 #define _GNU_SOURCE        1
 
+#include "fat.h"
+/**/
+
 #include <kernel/compiler.h>
 
 #ifdef CONFIG_USE_NEW_FS
@@ -49,6 +52,7 @@
 #include <kos/dev.h>
 #include <kos/except.h>
 #include <linux/magic.h>
+#include <sys/stat.h>
 
 #include <alloca.h>
 #include <assert.h>
@@ -59,8 +63,6 @@
 #include <stdint.h>
 #include <string.h>
 #include <time.h>
-
-#include "fat.h"
 
 DECL_BEGIN
 
@@ -171,7 +173,7 @@ NOTHROW(FCALL FatFileMTime_Decode)(struct fat_filemtime const *__restrict self,
 /* FAT Cluster helper functions                                         */
 /************************************************************************/
 PRIVATE WUNUSED NONNULL((1)) FatClusterIndex KCALL
-FatSuper_FindFreeCluster(struct fatsuper *__restrict self) {
+FatSuper_FindFreeCluster(FatSuperblock *__restrict self) {
 	FatClusterIndex result;
 	assert(fatsuper_fatlock_reading(self));
 	result = self->ft_free_pos;
@@ -193,7 +195,7 @@ found_one:
 }
 
 INTERN NONNULL((1)) void KCALL
-FatSuper_DeleteClusterChain(struct fatsuper *__restrict self,
+FatSuper_DeleteClusterChain(FatSuperblock *__restrict self,
                             FatClusterIndex first_delete_index) {
 	fatsuper_fatlock_write(self);
 	TRY {
@@ -215,81 +217,273 @@ FatSuper_DeleteClusterChain(struct fatsuper *__restrict self,
 /************************************************************************/
 /* FAT operator implementations.                                        */
 /************************************************************************/
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL FatNodeData_Fini)(FatNodeData *__restrict self) {
+	decref(self->fn_ent);
+	decref(self->fn_dir);
+	kfree(self->fn_clusterv);
+}
 
-PRIVATE WUNUSED NONNULL((1, 2)) REF struct fdirent *KCALL
-FatDir_Lookup(struct fdirnode *__restrict self,
-              struct flookup_info *__restrict info) {
-	struct fatnode *me = fdirnode_asfatnode(self);
-	/* TODO */
+PRIVATE NONNULL((1, 5)) void KCALL
+Fat_LoadBlocks(struct mfile *__restrict self, pos_t addr,
+               physaddr_t buf, size_t num_bytes,
+               struct aio_multihandle *__restrict aio) {
+	struct fnode *me = mfile_asnode(self);
+	FatNodeData *dat = me->fn_fsdata;
+	/* TODO: Read disk data via `dat->fn_clusterv' (preferably unbuffered) */
+}
+
+PRIVATE NONNULL((1, 5)) void KCALL
+Fat_SaveBlocks(struct mfile *__restrict self, pos_t addr,
+               physaddr_t buf, size_t num_bytes,
+               struct aio_multihandle *__restrict aio) {
+	struct fnode *me = mfile_asnode(self);
+	FatNodeData *dat = me->fn_fsdata;
+	/* TODO: Write disk data via `dat->fn_clusterv' (preferably unbuffered) */
+}
+
+PRIVATE NONNULL((1)) void KCALL
+Fat_WrAttr(struct fnode *__restrict self)
+		THROWS(E_IOERROR, ...) {
+	FatNodeData *dat = self->fn_fsdata;
+	/* TODO: write into `dat->fn_dir' (buffered) */
+}
+
+
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(KCALL FatReg_Destroy)(struct mfile *__restrict self) {
+	FatRegNode *me = mfile_asfatreg(self);
+	FatNodeData_Fini(&me->frn_fdat);
+	fflatdirnode_v_destroy(self);
+}
+
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(KCALL FatDir_Destroy)(struct mfile *__restrict self) {
+	FatDirNode *me = mfile_asfatdir(self);
+	FatNodeData_Fini(&me->fdn_fdat);
+	fflatdirnode_v_destroy(self);
+}
+
+#ifdef CONFIG_FAT_CYGWIN_SYMLINKS
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(KCALL FatLnk_Destroy)(struct mfile *__restrict self) {
+	FatLnkNode *me = mfile_asfatlnk(self);
+	FatNodeData_Fini(&me->fln_fdat);
+	fflatdirnode_v_destroy(self);
+}
+
+PRIVATE byte_t const Fat_CygwinSymlinkMagic[] = { '!', '<', 's', 'y', 'm', 'l', 'i', 'n', 'k', '>' };
+
+PRIVATE WUNUSED NONNULL((1)) size_t KCALL
+FatLnk_ReadLink(struct flnknode *__restrict self,
+                USER CHECKED /*utf-8*/ char *buf,
+                size_t bufsize)
+		THROWS(E_SEGFAULT, E_IOERROR, ...) {
+	FatLnkNode *me = flnknode_asfat(self);
+	/* TODO: Read file contents */
+}
+
+PRIVATE NONNULL((1)) void KCALL
+FatLnk_Stat(struct mfile *__restrict self,
+            USER CHECKED struct stat *result)
+		THROWS(...) {
+	FatLnkNode *me  = flnknode_asfat(self);
+	result->st_size = __atomic64_val(me->mf_filesize) -
+	                  (sizeof(Fat_CygwinSymlinkMagic) + 1);
+}
+#endif /* CONFIG_FAT_CYGWIN_SYMLINKS */
+
+PRIVATE WUNUSED struct fflatdirent *KCALL
+FatDir_ReadDir(struct fflatdirnode *__restrict self, pos_t pos)
+		THROWS(E_BADALLOC, E_IOERROR) {
+	FatDirNode *me = fflatdirnode_asfat(self);
+	/* TODO: Read directory entries. */
+}
+
+PRIVATE WUNUSED NONNULL((1, 2, 3)) bool KCALL
+FatDir_WriteDir(struct fflatdirnode *__restrict self,
+                struct fflatdirent *__restrict ent,
+                struct fnode *__restrict file,
+                bool at_end_of_dir)
+		THROWS(E_IOERROR, E_FSERROR_DISK_FULL, E_FSERROR_ILLEGAL_PATH) {
+	FatDirNode *me = fflatdirnode_asfat(self);
+	/* TODO: Write directory entries. */
+	/* TODO: Set `file->fn_ino = ABSOLUTE_ON_DISK_POS(ent);'. (also update the INO field of `ent') */
+	/* TODO: Set `file->fn_fsdata->fn_ent = ent' (possibly decref() the old value). */
 }
 
 PRIVATE NONNULL((1, 2)) void KCALL
-FatDir_Enum(struct fdirnode *__restrict self,
-            struct fdirenum *__restrict result) {
-	struct fatnode *me = fdirnode_asfatnode(self);
-	/* TODO */
+FatDir_DeleteEnt(struct fflatdirnode *__restrict self,
+                 struct fflatdirent const *__restrict ent,
+                 bool at_end_of_dir)
+		THROWS(E_IOERROR) {
+	FatDirNode *me = fflatdirnode_asfat(self);
+	/* TODO: Mark directory entries as deleted. */
 }
 
-PRIVATE WUNUSED NONNULL((1, 2)) unsigned int KCALL
-FatDir_MkFile(struct fdirnode *__restrict self,
-              struct fmkfile_info *__restrict info)
-		THROWS(E_FSERROR_ILLEGAL_PATH, E_FSERROR_DISK_FULL,
-		       E_FSERROR_READONLY, E_FSERROR_TOO_MANY_HARD_LINKS,
-		       E_FSERROR_UNSUPPORTED_OPERATION) {
-	struct fatnode *me = fdirnode_asfatnode(self);
-	/* TODO */
+PRIVATE ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) struct fnode *KCALL
+FatDir_MkFile(struct fflatdirnode *__restrict self,
+              struct fmkfile_info const *__restrict info)
+		THROWS(E_BADALLOC, E_IOERROR, E_FSERROR_UNSUPPORTED_OPERATION);
+
+PRIVATE NONNULL((1, 2, 3)) void KCALL
+FatDir_AllocFile(struct fflatdirnode *__restrict self,
+                 struct fflatdirent *__restrict ent,
+                 struct fnode *__restrict file)
+		THROWS(E_BADALLOC, E_IOERROR) {
+	FatDirNode *me = fflatdirnode_asfat(self);
+	assert(file->fn_fsdata->fn_dir == self);
+	assert(file->fn_fsdata->fn_ent == ent);
+	if (fnode_isdir(file)) {
+		/* TODO: Allocate template for `file'. */
+		/* TODO: Write `f_clusterlo' & `f_clusterhi' into `me' relative to `ent'. */
+	}
 }
 
-PRIVATE WUNUSED NONNULL((1, 2, 3)) unsigned int KCALL
-FatDir_Unlink(struct fdirnode *__restrict self,
-              struct fdirent *__restrict entry,
-              struct fnode *__restrict file)
-		THROWS(E_FSERROR_DIRECTORY_NOT_EMPTY,
-		       E_FSERROR_READONLY) {
-	struct fatnode *me = fdirnode_asfatnode(self);
-	/* TODO */
+PRIVATE NONNULL((1, 2, 3)) void KCALL
+FatDir_DeleteFile(struct fflatdirnode *__restrict self,
+                  struct fflatdirent *__restrict deleted_ent,
+                  struct fnode *__restrict file)
+		THROWS(E_IOERROR) {
+	FatDirNode *me = fflatdirnode_asfat(self);
+	assert(file->fn_fsdata->fn_dir == self);
+	assert(file->fn_fsdata->fn_ent == deleted_ent);
+	/* TODO: Free cluster chain of `file' */
 }
 
-PRIVATE WUNUSED NONNULL((1, 2)) unsigned int KCALL
-FatDir_Rename(struct fdirnode *__restrict self,
-              struct frename_info *__restrict info)
-		THROWS(E_FSERROR_ILLEGAL_PATH, E_FSERROR_DISK_FULL, E_FSERROR_READONLY) {
-	struct fatnode *me = fdirnode_asfatnode(self);
-	/* TODO */
+PRIVATE NONNULL((1, 2, 3)) void KCALL
+FatDir_ParentChanged(struct fflatdirnode *__restrict self,
+                     struct fflatdirnode *__restrict oldparent,
+                     struct fflatdirnode *__restrict newparent)
+		THROWS(E_IOERROR) {
+	FatDirNode *me = fflatdirnode_asfat(self);
+	assert(me->fdn_fdat.fn_dir == oldparent);
+	/* TODO: Re-write the parent-cluster value within the directory header (the ".." entry) */
+	/* TODO: Set `me->fdn_fdat.fn_dir = newparent' */
 }
+
 
 
 
 /************************************************************************/
 /* FAT operator tables.                                                 */
 /************************************************************************/
-PRIVATE struct fdirent_ops const FatDirent_Ops;
-PRIVATE struct fregnode_ops const FatNode_RegOps;
-
+PRIVATE struct fregnode_ops const Fat_RegOps = {
+	.rno_node = {
+		.no_file = {
+			.mo_destroy    = &FatDir_Destroy,
+			.mo_loadblocks = &Fat_LoadBlocks,
+			.mo_saveblocks = &Fat_SaveBlocks,
+			.mo_changed    = &fnode_v_changed,
+			.mo_stream     = NULL,
+		},
+		.no_wrattr = &Fat_WrAttr,
+	},
+};
+PRIVATE struct fflatdirnode_ops const Fat_DirOps = {
+	.fdno_dir = {
+		.dno_node = {
+			.no_file = {
+				.mo_destroy    = &FatDir_Destroy,
+				.mo_loadblocks = &Fat_LoadBlocks,
+				.mo_saveblocks = &Fat_SaveBlocks,
+				.mo_changed    = &fnode_v_changed,
+				.mo_stream     = &fdirnode_v_stream_ops,
+			},
+			.no_wrattr = &Fat_WrAttr,
+		},
+		.dno_lookup = &fflatdirnode_v_lookup,
+		.dno_enum   = &fflatdirnode_v_enum,
+		.dno_mkfile = &fflatdirnode_v_mkfile,
+		.dno_unlink = &fflatdirnode_v_unlink,
+		.dno_rename = &fflatdirnode_v_rename,
+	},
+	.fdno_flat = {
+		.fdnx_readdir       = &FatDir_ReadDir,
+		.fdnx_writedir      = &FatDir_WriteDir,
+		.fdnx_deleteent     = &FatDir_DeleteEnt,
+		.fdnx_mkfile        = &FatDir_MkFile,
+		.fdnx_mkent         = NULL, /* Use default operator */
+		.fdnx_allocfile     = &FatDir_AllocFile,
+		.fdnx_deletefile    = &FatDir_DeleteFile,
+		.fdnx_parentchanged = &FatDir_ParentChanged,
+	},
+};
 #ifdef CONFIG_FAT_CYGWIN_SYMLINKS
-PRIVATE struct flnknode_ops const FatNode_LnkOps;
+PRIVATE struct mfile_stream_ops const Fat_LnkStreamOps = {
+	.mso_stat = &FatLnk_Stat,
+};
+PRIVATE struct flnknode_ops const Fat_LnkOps = {
+	.lno_node = {
+		.no_file = {
+			.mo_destroy    = &FatLnk_Destroy,
+			.mo_loadblocks = &Fat_LoadBlocks,
+			.mo_saveblocks = &Fat_SaveBlocks,
+			.mo_changed    = &fnode_v_changed,
+			.mo_stream     = &Fat_LnkStreamOps,
+		},
+		.no_wrattr = &Fat_WrAttr,
+	},
+	.lno_readlink = &FatLnk_ReadLink,
+};
 #endif /* CONFIG_FAT_CYGWIN_SYMLINKS */
 
 
 /************************************************************************/
 /* FAT Superblock operators.                                            */
 /************************************************************************/
+PRIVATE NONNULL((1, 5)) void KCALL
+Fat16Root_LoadBlocks(struct mfile *__restrict self, pos_t addr,
+                     physaddr_t buf, size_t num_bytes,
+                     struct aio_multihandle *__restrict aio) {
+	FatSuperblock *me = mfile_asfatsup(self);
+	/* TODO: Read disk data from `r16_rootpos' (preferably unbuffered) */
+}
+
+PRIVATE NONNULL((1, 5)) void KCALL
+Fat16Root_SaveBlocks(struct mfile *__restrict self, pos_t addr,
+                     physaddr_t buf, size_t num_bytes,
+                     struct aio_multihandle *__restrict aio) {
+	FatSuperblock *me = mfile_asfatsup(self);
+	/* TODO: Write disk data to `r16_rootpos' (preferably unbuffered) */
+}
+
 PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL FatSuper_Destroy)(struct mfile *__restrict self) {
-	struct fatsuper *me = mfile_asfatsuper(self);
-	mman_unmap_kram_and_kfree(me->ft_fat_table, me->ft_fat_size, me->ft_freefat);
-	fsuper_v_destroy(&me->ft_super.fs_root);
+	FatSuperblock *me = mfile_asfatsup(self);
+	if (me->ft_type == FAT32)
+		kfree(me->ft_fdat.fn_clusterv);
+	mman_unmap_kram_and_kfree(me->ft_fat_table,
+	                          me->ft_fat_size,
+	                          me->ft_freefat);
+	fflatsuper_v_destroy(self);
+}
+
+PRIVATE ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) struct fnode *KCALL
+FatDir_MkFile(struct fflatdirnode *__restrict self,
+              struct fmkfile_info const *__restrict info)
+		THROWS(E_BADALLOC, E_IOERROR, E_FSERROR_UNSUPPORTED_OPERATION) {
+	FatDirNode *me = fflatdirnode_asfat(self);
+	/* TODO: Allocate a new file-node with FAT operators */
+}
+
+PRIVATE ATTR_RETNONNULL WUNUSED NONNULL((1)) struct fnode *KCALL
+FatSuper_MakeNode(struct fflatsuper *__restrict self,
+                  struct fflatdirent *__restrict ent,
+                  struct fflatdirnode *__restrict dir)
+		THROWS(E_BADALLOC, E_IOERROR) {
+	/* TODO: Allocate a new file-node with FAT operators */
 }
 
 PRIVATE WUNUSED NONNULL((1)) bool
 NOTHROW(KCALL FatSuper_ValidUid)(struct fsuper *__restrict self, uid_t uid) {
-	struct fatsuper *me = fsuper_asfatsuper(self);
+	FatSuperblock *me = fsuper_asfat(self);
 	return uid == me->ft_uid;
 }
 
 PRIVATE WUNUSED NONNULL((1)) bool
 NOTHROW(KCALL FatSuper_ValidGid)(struct fsuper *__restrict self, gid_t gid) {
-	struct fatsuper *me = fsuper_asfatsuper(self);
+	FatSuperblock *me = fsuper_asfat(self);
 	return gid == me->ft_gid;
 }
 
@@ -317,19 +511,80 @@ NOTHROW(KCALL FatSuper_TruncateCTime)(struct fsuper *__restrict UNUSED(self),
 	FatFileCTime_Decode(&ts, tms);
 }
 
-
-PRIVATE struct fsuper_ops const Fat16_SuperOps = {
-	.so_validuid       = &FatSuper_ValidUid,
-	.so_validgid       = &FatSuper_ValidGid,
-	.so_truncate_atime = &FatSuper_TruncateATime,
-	.so_truncate_mtime = &FatSuper_TruncateMTime,
-	.so_truncate_ctime = &FatSuper_TruncateCTime,
-	.so_fdir = {
-		.dno_node = {
+PRIVATE struct fflatsuper_ops const Fat16_SuperOps = {
+	.ffso_makenode = &FatSuper_MakeNode,
+	.ffso_super = {
+		.so_validuid       = &FatSuper_ValidUid,
+		.so_validgid       = &FatSuper_ValidGid,
+		.so_truncate_atime = &FatSuper_TruncateATime,
+		.so_truncate_mtime = &FatSuper_TruncateMTime,
+		.so_truncate_ctime = &FatSuper_TruncateCTime,
+		.so_fdir = {
+			.dno_node = {
+				.no_file = {
+					.mo_destroy    = &FatSuper_Destroy,
+					.mo_loadblocks = &Fat16Root_LoadBlocks,
+					.mo_saveblocks = &Fat16Root_SaveBlocks,
+					.mo_changed    = &fnode_v_changed,
+					.mo_stream     = &fdirnode_v_stream_ops,
+				},
+				.no_wrattr = &fnode_v_wrattr_noop,
+			},
+			.dno_lookup = &fflatdirnode_v_lookup,
+			.dno_enum   = &fflatdirnode_v_enum,
+			.dno_mkfile = &fflatdirnode_v_mkfile,
+			.dno_unlink = &fflatdirnode_v_unlink,
+			.dno_rename = &fflatdirnode_v_rename,
 		},
 	},
+	.ffso_flat = {
+		.fdnx_readdir       = &FatDir_ReadDir,
+		.fdnx_writedir      = &FatDir_WriteDir,
+		.fdnx_deleteent     = &FatDir_DeleteEnt,
+		.fdnx_mkfile        = &FatDir_MkFile,
+		.fdnx_mkent         = NULL, /* Use default operator */
+		.fdnx_allocfile     = &FatDir_AllocFile,
+		.fdnx_deletefile    = &FatDir_DeleteFile,
+		.fdnx_parentchanged = NULL, /* Parent of root directory can't change */
+	},
 };
-PRIVATE struct fsuper_ops const Fat32_SuperOps;
+PRIVATE struct fflatsuper_ops const Fat32_SuperOps = {
+	.ffso_makenode = &FatSuper_MakeNode,
+	.ffso_super = {
+		.so_validuid       = &FatSuper_ValidUid,
+		.so_validgid       = &FatSuper_ValidGid,
+		.so_truncate_atime = &FatSuper_TruncateATime,
+		.so_truncate_mtime = &FatSuper_TruncateMTime,
+		.so_truncate_ctime = &FatSuper_TruncateCTime,
+		.so_fdir = {
+			.dno_node = {
+				.no_file = {
+					.mo_destroy    = &FatSuper_Destroy,
+					.mo_loadblocks = &Fat_LoadBlocks,
+					.mo_saveblocks = &Fat_SaveBlocks,
+					.mo_changed    = &fnode_v_changed,
+					.mo_stream     = &fdirnode_v_stream_ops,
+				},
+				.no_wrattr = &fnode_v_wrattr_noop,
+			},
+			.dno_lookup = &fflatdirnode_v_lookup,
+			.dno_enum   = &fflatdirnode_v_enum,
+			.dno_mkfile = &fflatdirnode_v_mkfile,
+			.dno_unlink = &fflatdirnode_v_unlink,
+			.dno_rename = &fflatdirnode_v_rename,
+		},
+	},
+	.ffso_flat = {
+		.fdnx_readdir       = &FatDir_ReadDir,
+		.fdnx_writedir      = &FatDir_WriteDir,
+		.fdnx_deleteent     = &FatDir_DeleteEnt,
+		.fdnx_mkfile        = &FatDir_MkFile,
+		.fdnx_mkent         = NULL, /* Use default operator */
+		.fdnx_allocfile     = &FatDir_AllocFile,
+		.fdnx_deletefile    = &FatDir_DeleteFile,
+		.fdnx_parentchanged = NULL, /* Parent of root directory can't change */
+	},
+};
 
 
 
@@ -341,7 +596,7 @@ PRIVATE struct fsuper_ops const Fat32_SuperOps;
 /* The FAT get/set implementation for different table sizes.            */
 /************************************************************************/
 PRIVATE NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) FatClusterIndex
-NOTHROW(FCALL Fat12_GetFatIndirection)(struct fatsuper const *__restrict self,
+NOTHROW(FCALL Fat12_GetFatIndirection)(FatSuperblock const *__restrict self,
                                        FatClusterIndex index) {
 	u16 val;
 	assertf(index < self->ft_fat_length,
@@ -357,7 +612,7 @@ NOTHROW(FCALL Fat12_GetFatIndirection)(struct fatsuper const *__restrict self,
 }
 
 PRIVATE NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) FatClusterIndex
-NOTHROW(FCALL Fat16_GetFatIndirection)(struct fatsuper const *__restrict self,
+NOTHROW(FCALL Fat16_GetFatIndirection)(FatSuperblock const *__restrict self,
                                        FatClusterIndex index) {
 	assertf(index < self->ft_fat_length,
 	        "Out-of-bounds FAT index: %" PRIu32 " >= %" PRIu32 "",
@@ -366,7 +621,7 @@ NOTHROW(FCALL Fat16_GetFatIndirection)(struct fatsuper const *__restrict self,
 }
 
 PRIVATE NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) FatClusterIndex
-NOTHROW(FCALL Fat32_GetFatIndirection)(struct fatsuper const *__restrict self,
+NOTHROW(FCALL Fat32_GetFatIndirection)(FatSuperblock const *__restrict self,
                                        FatClusterIndex index) {
 	assertf(index < self->ft_fat_length,
 	        "Out-of-bounds FAT index: %" PRIu32 " >= %" PRIu32 "",
@@ -375,7 +630,7 @@ NOTHROW(FCALL Fat32_GetFatIndirection)(struct fatsuper const *__restrict self,
 }
 
 PRIVATE NOBLOCK NONNULL((1)) void
-NOTHROW(FCALL Fat12_SetFatIndirection)(struct fatsuper *__restrict self,
+NOTHROW(FCALL Fat12_SetFatIndirection)(FatSuperblock *__restrict self,
                                        FatClusterIndex index,
                                        FatClusterIndex indirection_target) {
 	u16 *pval;
@@ -391,7 +646,7 @@ NOTHROW(FCALL Fat12_SetFatIndirection)(struct fatsuper *__restrict self,
 }
 
 PRIVATE NOBLOCK NONNULL((1)) void
-NOTHROW(FCALL Fat16_SetFatIndirection)(struct fatsuper *__restrict self,
+NOTHROW(FCALL Fat16_SetFatIndirection)(FatSuperblock *__restrict self,
                                        FatClusterIndex index,
                                        FatClusterIndex indirection_target) {
 	assertf(index < self->ft_fat_length,
@@ -401,7 +656,7 @@ NOTHROW(FCALL Fat16_SetFatIndirection)(struct fatsuper *__restrict self,
 }
 
 PRIVATE NOBLOCK NONNULL((1)) void
-NOTHROW(FCALL Fat32_SetFatIndirection)(struct fatsuper *__restrict self,
+NOTHROW(FCALL Fat32_SetFatIndirection)(FatSuperblock *__restrict self,
                                        FatClusterIndex index,
                                        FatClusterIndex indirection_target) {
 	assertf(index < self->ft_fat_length,
@@ -436,11 +691,11 @@ trimspecstring(char *__restrict buf, size_t size) {
 PRIVATE WUNUSED NONNULL((1)) struct fsuper *KCALL
 Fat_OpenFileSystem(struct ffilesys *__restrict filesys,
                    struct blkdev *dev, UNCHECKED USER char *args) {
-	struct fatsuper *result;
+	FatSuperblock *result;
 	FatDiskHeader *disk;
 	u16 sector_size;
 
-	(void)args; /* TODO: User-arguments. */
+	(void)args; /* XXX: User-arguments. */
 	assert(dev);
 
 	/* Read the FAT disk header. */
@@ -469,12 +724,8 @@ Fat_OpenFileSystem(struct ffilesys *__restrict filesys,
 		return NULL;
 
 	/* Allocate the FAT superblock controller. */
-	result = (struct fatsuper *)kmalloc(offsetof(struct fatsuper, ft_super) +
-	                                  sizeof(struct fatnode),
-	                                  GFP_NORMAL);
+	result = (FatSuperblock *)kmalloc(sizeof(FatSuperblock), GFP_NORMAL);
 	TRY {
-		struct fatnode *root;
-		root                   = (struct fatnode *)&result->ft_super.fs_root;
 		result->ft_sectorshift = CTZ(sector_size);
 
 		/* Fill in filesystem info. */
@@ -541,21 +792,21 @@ Fat_OpenFileSystem(struct ffilesys *__restrict filesys,
 			result->ft_cluster_eof        = (result->ft_sec4fat << result->ft_sectorshift) / 4;
 			result->ft_cluster_eof_marker = 0xffffffff;
 			/* Must lookup the cluster of the root directory. */
-			root->fn_clusterc     = 1;
-			root->fn_clustera     = 2;
-			root->fn_clusterv     = (FatClusterIndex *)kmalloc(2 * sizeof(FatClusterIndex), GFP_NORMAL);
-			root->fn_clusterv[0]  = LETOH32(disk->fat32.f32_root_cluster);
-			result->ft_fat_get    = &Fat32_GetFatIndirection;
-			result->ft_fat_set    = &Fat32_SetFatIndirection;
+			shared_rwlock_init(&result->ft_fdat.fn_lock);
+			result->ft_fdat.fn_clusterc    = 1;
+			result->ft_fdat.fn_clusterv    = (FatClusterIndex *)kmalloc(sizeof(FatClusterIndex), GFP_NORMAL);
+			result->ft_fdat.fn_clusterv[0] = LETOH32(disk->fat32.f32_root_cluster);
+			result->ft_fat_get = &Fat32_GetFatIndirection;
+			result->ft_fat_set = &Fat32_SetFatIndirection;
 		} else {
 			if (result->ft_type == FAT12) {
 				result->ft_cluster_eof_marker = 0xfff;
-				result->ft_fat_get            = &Fat12_GetFatIndirection;
-				result->ft_fat_set            = &Fat12_SetFatIndirection;
+				result->ft_fat_get = &Fat12_GetFatIndirection;
+				result->ft_fat_set = &Fat12_SetFatIndirection;
 			} else {
 				result->ft_cluster_eof_marker = 0xffff;
-				result->ft_fat_get            = &Fat16_GetFatIndirection;
-				result->ft_fat_set            = &Fat16_SetFatIndirection;
+				result->ft_fat_get = &Fat16_GetFatIndirection;
+				result->ft_fat_set = &Fat16_SetFatIndirection;
 			}
 			if (disk->fat16.f16_signature != 0x28 &&
 			    disk->fat16.f16_signature != 0x29)
@@ -563,12 +814,12 @@ Fat_OpenFileSystem(struct ffilesys *__restrict filesys,
 			result->ft_volid = LETOH32(disk->fat16.f16_volid);
 			memcpy(result->ft_label, disk->fat16.f16_label, sizeof(disk->fat16.f16_label));
 			memcpy(result->ft_sysname, disk->fat16.f16_sysname, sizeof(disk->fat16.f16_sysname));
-			root->fn16_root.r16_rootpos = (pos_t)LETOH16(disk->bpb.bpb_reserved_sectors);
-			root->fn16_root.r16_rootpos += (disk->bpb.bpb_fatc * LETOH16(disk->bpb.bpb_sectors_per_fat));
-			root->fn16_root.r16_rootpos <<= result->ft_sectorshift;
-			result->ft_sec4fat          = LETOH16(disk->bpb.bpb_sectors_per_fat);
-			root->fn16_root.r16_rootsiz = (u32)LETOH16(disk->bpb.bpb_maxrootsize);
-			root->fn16_root.r16_rootsiz *= sizeof(struct fat_dirent);
+			result->ft_fdat.fn16_root.r16_rootpos = (pos_t)LETOH16(disk->bpb.bpb_reserved_sectors);
+			result->ft_fdat.fn16_root.r16_rootpos += (disk->bpb.bpb_fatc * LETOH16(disk->bpb.bpb_sectors_per_fat));
+			result->ft_fdat.fn16_root.r16_rootpos <<= result->ft_sectorshift;
+			result->ft_sec4fat                    = LETOH16(disk->bpb.bpb_sectors_per_fat);
+			result->ft_fdat.fn16_root.r16_rootsiz = (u32)LETOH16(disk->bpb.bpb_maxrootsize);
+			result->ft_fdat.fn16_root.r16_rootsiz *= sizeof(struct fat_dirent);
 			result->ft_cluster_eof = (result->ft_sec4fat << result->ft_sectorshift) / 2;
 			/* It is possible  to create  a FAT16 filesystem  with 0x10000  sectors.
 			 * This is a special case since sector 0xffff still needs to be reserved
@@ -608,32 +859,37 @@ Fat_OpenFileSystem(struct ffilesys *__restrict filesys,
 			}
 		} EXCEPT {
 			if (result->ft_type == FAT32)
-				kfree(root->fn_clusterv);
+				kfree(result->ft_fdat.fn_clusterv);
 			RETHROW();
 		}
 
 		/* Fill in mandatory superblock fields. */
-		/*result->ft_super.fs_root.mf_blockshift       = result->ft_sectorshift;*/ /* It's the same field! */
-		result->ft_super.fs_root.mf_parts              = NULL;
-		result->ft_super.fs_root.mf_flags              = MFILE_F_NORMAL;
-		result->ft_super.fs_root.fn_ino                = 0;
-		result->ft_super.fs_feat.sf_filesize_max       = (pos_t)UINT32_MAX;
-		result->ft_super.fs_feat.sf_uid_max            = 0;
-		result->ft_super.fs_feat.sf_gid_max            = 0;
-		result->ft_super.fs_feat.sf_symlink_max        = 0;
-		result->ft_super.fs_feat.sf_link_max           = 1;
-		result->ft_super.fs_feat.sf_magic              = MSDOS_SUPER_MAGIC;
-		result->ft_super.fs_feat.sf_rec_incr_xfer_size = 0;
-		result->ft_super.fs_feat.sf_rec_max_xfer_size  = 0;
-		result->ft_super.fs_feat.sf_rec_min_xfer_size  = 0;
-		result->ft_super.fs_feat.sf_rec_xfer_align     = 0;
-		result->ft_super.fs_feat.sf_name_max           = LFN_SEQNUM_MAXCOUNT * LFN_NAME;
-		result->ft_super.fs_feat.sf_filesizebits       = 32;
+		/*result->ft_super.ffs_super.fs_root.mf_blockshift       = result->ft_sectorshift;*/ /* It's the same field! */
+		result->ft_super.ffs_super.fs_root.mf_parts              = NULL;
+		result->ft_super.ffs_super.fs_root.mf_flags              = MFILE_F_NORMAL;
+		result->ft_super.ffs_super.fs_root.fn_ino                = 0;
+		result->ft_super.ffs_super.fs_feat.sf_filesize_max       = (pos_t)UINT32_MAX;
+		result->ft_super.ffs_super.fs_feat.sf_uid_max            = 0;
+		result->ft_super.ffs_super.fs_feat.sf_gid_max            = 0;
+		result->ft_super.ffs_super.fs_feat.sf_symlink_max        = 0;
+		result->ft_super.ffs_super.fs_feat.sf_link_max           = 1;
+		result->ft_super.ffs_super.fs_feat.sf_magic              = MSDOS_SUPER_MAGIC;
+		result->ft_super.ffs_super.fs_feat.sf_rec_incr_xfer_size = 0;
+		result->ft_super.ffs_super.fs_feat.sf_rec_max_xfer_size  = 0;
+		result->ft_super.ffs_super.fs_feat.sf_rec_min_xfer_size  = 0;
+		result->ft_super.ffs_super.fs_feat.sf_rec_xfer_align     = 0;
+		result->ft_super.ffs_super.fs_feat.sf_name_max           = LFN_SEQNUM_MAXCOUNT * LFN_NAME;
+		result->ft_super.ffs_super.fs_feat.sf_filesizebits       = 32;
+		result->ft_super.ffs_super.fs_root.fn_fsdata             = &result->ft_fdat;
 
 		/* Select root directory operators. */
-		result->ft_super.fs_root.mf_ops = result->ft_type == FAT32
-		                                  ? &Fat32_SuperOps.so_fdir.dno_node.no_file
-		                                  : &Fat16_SuperOps.so_fdir.dno_node.no_file;
+		result->ft_super.ffs_super.fs_root.mf_ops = result->ft_type == FAT32
+		                                            ? &Fat32_SuperOps.ffso_super.so_fdir.dno_node.no_file
+		                                            : &Fat16_SuperOps.ffso_super.so_fdir.dno_node.no_file;
+
+		/* Fill in fields relating to `fflatsuper' */
+		result->ft_super.ffs_features = FFLATSUPER_FEAT_WRITEDIR_CHANGES_INO;
+		fflatdirdata_init(&result->ft_super.ffs_rootdata);
 	} EXCEPT {
 		kfree(result);
 		RETHROW();
@@ -645,7 +901,7 @@ Fat_OpenFileSystem(struct ffilesys *__restrict filesys,
 	       result->ft_type == FAT12 ? 12 : result->ft_type == FAT16 ? 16 : 32,
 	       MAJOR(dev->dn_devno), MINOR(dev->dn_devno),
 	       result->ft_oem, result->ft_label, result->ft_sysname);
-	return &result->ft_super;
+	return &result->ft_super.ffs_super;
 }
 
 
@@ -660,6 +916,12 @@ PRIVATE struct ffilesys Fat_Filesys = {
 	.ffs_name  = "fat",
 };
 
+STATIC_ASSERT((offsetof(FatSuperblock, ft_super.ffs_rootdata) -
+               offsetof(FatSuperblock, ft_super.ffs_super.fs_root)) ==
+              offsetof(FatDirNode, fdn_data));
+STATIC_ASSERT((offsetof(FatSuperblock, ft_fdat) -
+               offsetof(FatSuperblock, ft_super.ffs_super.fs_root)) ==
+              offsetof(FatDirNode, fdn_fdat));
 
 
 
@@ -683,6 +945,6 @@ PRIVATE DRIVER_FINI void KCALL Fat_Fini(void) {
 
 DECL_END
 
-#endif /* !CONFIG_USE_NEW_FS */
+#endif /* CONFIG_USE_NEW_FS */
 
 #endif /* !GUARD_MODFAT_FAT_C */

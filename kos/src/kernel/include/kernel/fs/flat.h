@@ -197,8 +197,8 @@ struct fflatdirnode_xops {
 	 * - This function is invoked during error-cleanup paths, and even though
 	 *   it is allowed to throw exceptions,  it should refrain from doing  so
 	 *   since the act might lead to filesystem errors.
-	 * - If  appropriate,  the _CALLER_  will decrement  `[file]->fn_nlink'! If
-	 *   in this case `fn_nlink' drops to `0', `fdnx_deletefil' will be called.
+	 * - If  appropriate,  the  _CALLER_ will  decrement  `[file]->fn_nlink'! If
+	 *   in this case `fn_nlink' drops to `0', `fdnx_deletefile' will be called.
 	 * - The caller of this function must check for `MFILE_F_READONLY' and
 	 *   not invoke it  if that flag  was set  at the time  of the  check.
 	 * - This  operator will not be called if  `MFILE_F_DELETED' was found to be set
@@ -329,9 +329,9 @@ struct fflatdirnode_xops {
 	 * holding any sort of lock to `self'! Instead, it can be invoked as a stand-
 	 * alone function. */
 	NONNULL((1, 2, 3)) void
-	(KCALL *fdnx_deletefil)(struct fflatdirnode *__restrict self,
-	                        struct fflatdirent *__restrict deleted_ent,
-	                        struct fnode *__restrict file)
+	(KCALL *fdnx_deletefile)(struct fflatdirnode *__restrict self,
+	                         struct fflatdirent *__restrict deleted_ent,
+	                         struct fnode *__restrict file)
 			THROWS(E_IOERROR);
 
 	/* [0..1][lock(WRITE(oldparent->fdn_data.fdd_lock) &&
@@ -341,9 +341,9 @@ struct fflatdirnode_xops {
 	 *
 	 * Even if this operator returns with an exception, a rename is not aborted. */
 	NONNULL((1, 2, 3)) void
-	(KCALL *fdnx_changeparent)(struct fflatdirnode *__restrict self,
-	                           struct fflatdirnode *__restrict oldparent,
-	                           struct fflatdirnode *__restrict newparent)
+	(KCALL *fdnx_parentchanged)(struct fflatdirnode *__restrict self,
+	                            struct fflatdirnode *__restrict oldparent,
+	                            struct fflatdirnode *__restrict newparent)
 			THROWS(E_IOERROR);
 
 	/* More operators go here. */
@@ -428,7 +428,6 @@ DATDEF struct fflatdir_bucket const _fflatdir_empty_buckets[1] ASMNAME("fflatdir
 
 #define fflatdirdata_init(self)                   \
 	(shared_rwlock_init(&(self)->fdd_lock),       \
-	 (self)->fdd_files = __NULLPTR,               \
 	 TAILQ_INIT(&(self)->fdd_bypos),              \
 	 (self)->fdd_biggest_gap = 0,                 \
 	 (self)->fdd_flags       = FFLATDIR_F_NORMAL, \
@@ -438,7 +437,6 @@ DATDEF struct fflatdir_bucket const _fflatdir_empty_buckets[1] ASMNAME("fflatdir
 	 (self)->fdd_fileslist   = fflatdir_empty_buckets)
 #define fflatdirdata_cinit(self)                              \
 	(shared_rwlock_cinit(&(self)->fdd_lock),                  \
-	 __hybrid_assert((self)->fdd_files == __NULLPTR),         \
 	 __hybrid_assert(TAILQ_EMPTY(&(self)->fdd_bypos)),        \
 	 __hybrid_assert((self)->fdd_biggest_gap == 0),           \
 	 __hybrid_assert((self)->fdd_flags == FFLATDIR_F_NORMAL), \
@@ -533,7 +531,7 @@ struct fflatdirnode
 
 /* Check if a given `struct fflatdirnode *self' is a fsuper. */
 #define fflatdirnode_issuper(self) (&(self)->_fflatdirnode_dir_ _fdirnode_node_ fn_super->fs_root == _fflatdirnode_asdir(self))
-#define fflatdirnode_assuper(self) __COMPILER_CONTAINER_OF(self, struct fflatsuper, ffs_super.fs_root)
+#define fflatdirnode_assuper(self) __COMPILER_CONTAINER_OF((struct fdirnode *)(self), struct fflatsuper, ffs_super.fs_root)
 
 
 /* Helpers for accessing `fdn_data.fdd_lock' */
@@ -666,6 +664,10 @@ struct fflatsuper {
 #define fflatsuper_getops(self)                                                                                                         \
 	__COMPILER_CONTAINER_OF(__COMPILER_REQTYPE(struct fflatsuper const *, self)->ffs_super.fs_root._fdirnode_node_ _fnode_file_ mf_ops, \
 	                        struct fflatsuper_ops, ffso_super.so_fdir.dno_node.no_file)
+
+/* Default operators for `struct fflatsuper'-derived superblocks. */
+FUNDEF NOBLOCK NONNULL((1)) void
+NOTHROW(KCALL fflatsuper_v_destroy)(struct mfile *__restrict self);
 
 
 

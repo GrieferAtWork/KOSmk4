@@ -476,6 +476,9 @@ FUNDEF NONNULL((1, 2)) void KCALL
 fdirnode_v_open(struct mfile *__restrict self, struct handle *__restrict hand,
                 struct path *access_path, struct fdirent *access_dent);
 
+/* Default stream operators for directories (using `fdirnode_v_open') */
+DATDEF struct mfile_stream_ops const fdirnode_v_stream_ops;
+
 
 
 /* Public API (high-level wrappers around low-level operators) */
