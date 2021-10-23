@@ -338,14 +338,18 @@ struct fflatdirnode_xops {
 
 	/* [0..1][lock(WRITE(oldparent->fdn_data.fdd_lock) &&
 	 *             WRITE(newparent->fdn_data.fdd_lock))]
-	 * Optional callback invoked  when the parent  of this directory  changes.
-	 * May be used to update on-disk meta-data as present on some filesystems.
+	 * Optional callback invoked when the directory entry of a file changes,
+	 * alongside  which a change in directory may also occurr. This operator
+	 * is invoked from `oldparent' and may  be used to update on-disk  meta-
+	 * data for special directory entries present on some filesystems.
 	 *
 	 * Even if this operator returns with an exception, a rename is not aborted. */
-	NONNULL((1, 2, 3)) void
-	(KCALL *fdnx_parentchanged)(struct fflatdirnode *__restrict self,
-	                            struct fflatdirnode *__restrict oldparent,
-	                            struct fflatdirnode *__restrict newparent)
+	NONNULL((1, 2, 3, 4, 5)) void
+	(KCALL *fdnx_direntchanged)(struct fnode *__restrict self,
+	                            struct fflatdirnode *oldparent,
+	                            struct fflatdirnode *newparent,
+	                            struct fflatdirent *__restrict old_ent,
+	                            struct fflatdirent *__restrict new_ent)
 			THROWS(E_IOERROR);
 
 	/* More operators go here. */
@@ -479,6 +483,7 @@ fflatdirnode_fileslist_remove(struct fflatdirnode *__restrict self,
 /* Helpers for accessing `fdd_lock' */
 #define _fflatdirdata_reap(self)      (void)0
 #define fflatdirdata_reap(self)       (void)0
+#define fflatdirdata_mustreap(self)   0
 #define fflatdirdata_write(self)      shared_rwlock_write(&(self)->fdd_lock)
 #define fflatdirdata_write_nx(self)   shared_rwlock_write_nx(&(self)->fdd_lock)
 #define fflatdirdata_trywrite(self)   shared_rwlock_trywrite(&(self)->fdd_lock)
@@ -539,6 +544,7 @@ struct fflatdirnode
 /* Helpers for accessing `fdn_data.fdd_lock' */
 #define _fflatdirnode_reap(self)      _fflatdirdata_reap(&(self)->fdn_data)
 #define fflatdirnode_reap(self)       fflatdirdata_reap(&(self)->fdn_data)
+#define fflatdirnode_mustreap(self)   fflatdirdata_mustreap(&(self)->fdn_data)
 #define fflatdirnode_write(self)      fflatdirdata_write(&(self)->fdn_data)
 #define fflatdirnode_write_nx(self)   fflatdirdata_write_nx(&(self)->fdn_data)
 #define fflatdirnode_trywrite(self)   fflatdirdata_trywrite(&(self)->fdn_data)

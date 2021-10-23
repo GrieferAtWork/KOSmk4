@@ -448,29 +448,29 @@ struct fatsuper {
 
 
 /* Helpers for accessing `ft_fat_lock' */
-/* TODO: Refactor these helpers into CamelCase */
-#define _fatsuper_fatlock_reap(self)      (void)0
-#define fatsuper_fatlock_reap(self)       (void)0
-#define fatsuper_fatlock_write(self)      shared_rwlock_write(&(self)->ft_fat_lock)
-#define fatsuper_fatlock_write_nx(self)   shared_rwlock_write_nx(&(self)->ft_fat_lock)
-#define fatsuper_fatlock_trywrite(self)   shared_rwlock_trywrite(&(self)->ft_fat_lock)
-#define fatsuper_fatlock_endwrite(self)   (shared_rwlock_endwrite(&(self)->ft_fat_lock), fatsuper_fatlock_reap(self))
-#define _fatsuper_fatlock_endwrite(self)  shared_rwlock_endwrite(&(self)->ft_fat_lock)
-#define fatsuper_fatlock_read(self)       shared_rwlock_read(&(self)->ft_fat_lock)
-#define fatsuper_fatlock_read_nx(self)    shared_rwlock_read_nx(&(self)->ft_fat_lock)
-#define fatsuper_fatlock_tryread(self)    shared_rwlock_tryread(&(self)->ft_fat_lock)
-#define _fatsuper_fatlock_endread(self)   shared_rwlock_endread(&(self)->ft_fat_lock)
-#define fatsuper_fatlock_endread(self)    (void)(shared_rwlock_endread(&(self)->ft_fat_lock) && (fatsuper_fatlock_reap(self), 0))
-#define _fatsuper_fatlock_end(self)       shared_rwlock_end(&(self)->ft_fat_lock)
-#define fatsuper_fatlock_end(self)        (void)(shared_rwlock_end(&(self)->ft_fat_lock) && (fatsuper_fatlock_reap(self), 0))
-#define fatsuper_fatlock_upgrade(self)    shared_rwlock_upgrade(&(self)->ft_fat_lock)
-#define fatsuper_fatlock_upgrade_nx(self) shared_rwlock_upgrade_nx(&(self)->ft_fat_lock)
-#define fatsuper_fatlock_tryupgrade(self) shared_rwlock_tryupgrade(&(self)->ft_fat_lock)
-#define fatsuper_fatlock_downgrade(self)  shared_rwlock_downgrade(&(self)->ft_fat_lock)
-#define fatsuper_fatlock_reading(self)    shared_rwlock_reading(&(self)->ft_fat_lock)
-#define fatsuper_fatlock_writing(self)    shared_rwlock_writing(&(self)->ft_fat_lock)
-#define fatsuper_fatlock_canread(self)    shared_rwlock_canread(&(self)->ft_fat_lock)
-#define fatsuper_fatlock_canwrite(self)   shared_rwlock_canwrite(&(self)->ft_fat_lock)
+#define _FatSuper_FatLockReap(self)      (void)0
+#define FatSuper_FatLockReap(self)       (void)0
+#define FatSuper_FatLockMustReap(self)   0
+#define FatSuper_FatLockWrite(self)      shared_rwlock_write(&(self)->ft_fat_lock)
+#define FatSuper_FatLockWriteNx(self)    shared_rwlock_write_nx(&(self)->ft_fat_lock)
+#define FatSuper_FatLockTryWrite(self)   shared_rwlock_trywrite(&(self)->ft_fat_lock)
+#define FatSuper_FatLockEndWrite(self)   (shared_rwlock_endwrite(&(self)->ft_fat_lock), FatSuper_FatLockReap(self))
+#define _FatSuper_FatLockEndWrite(self)  shared_rwlock_endwrite(&(self)->ft_fat_lock)
+#define FatSuper_FatLockRead(self)       shared_rwlock_read(&(self)->ft_fat_lock)
+#define FatSuper_FatLockReadNx(self)     shared_rwlock_read_nx(&(self)->ft_fat_lock)
+#define FatSuper_FatLockTryRead(self)    shared_rwlock_tryread(&(self)->ft_fat_lock)
+#define _FatSuper_FatLockEndRead(self)   shared_rwlock_endread(&(self)->ft_fat_lock)
+#define FatSuper_FatLockEndRead(self)    (void)(shared_rwlock_endread(&(self)->ft_fat_lock) && (FatSuper_FatLockReap(self), 0))
+#define _FatSuper_FatLockEnd(self)       shared_rwlock_end(&(self)->ft_fat_lock)
+#define FatSuper_FatLockEnd(self)        (void)(shared_rwlock_end(&(self)->ft_fat_lock) && (FatSuper_FatLockReap(self), 0))
+#define FatSuper_FatLockUpgrade(self)    shared_rwlock_upgrade(&(self)->ft_fat_lock)
+#define FatSuper_FatLockUpgradeNx(self)  shared_rwlock_upgrade_nx(&(self)->ft_fat_lock)
+#define FatSuper_FatLockTryUpgrade(self) shared_rwlock_tryupgrade(&(self)->ft_fat_lock)
+#define FatSuper_FatLockDowngrade(self)  shared_rwlock_downgrade(&(self)->ft_fat_lock)
+#define FatSuper_FatLockReading(self)    shared_rwlock_reading(&(self)->ft_fat_lock)
+#define FatSuper_FatLockWriting(self)    shared_rwlock_writing(&(self)->ft_fat_lock)
+#define FatSuper_FatLockCanRead(self)    shared_rwlock_canread(&(self)->ft_fat_lock)
+#define FatSuper_FatLockCanWrite(self)   shared_rwlock_canwrite(&(self)->ft_fat_lock)
 
 /* Get/Set  a  FAT table  indirection.  (These function  access  the `ft_fat_table'  memory mapping)
  * As such, changes made by these functions must be synced to-disk via `mfile_sync(ft_super.fs_dev)' */

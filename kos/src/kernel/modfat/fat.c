@@ -203,7 +203,7 @@ PRIVATE struct fdirent_ops const fatdirent_ops = {
 PRIVATE WUNUSED NONNULL((1)) FatClusterIndex KCALL
 Fat_FindFreeCluster(FatSuperblock *__restrict self) {
 	FatClusterIndex result;
-	assert(fatsuper_fatlock_reading(self));
+	assert(FatSuper_FatLockReading(self));
 	result = self->ft_free_pos;
 	for (; result < self->ft_cluster_eof; ++result) {
 		if (Fat_GetFatIndirection(self, result) == FAT_CLUSTER_UNUSED)
@@ -226,7 +226,7 @@ found_one:
 INTERN NONNULL((1)) void KCALL
 Fat_DeleteClusterChain(FatSuperblock *__restrict self,
                        FatClusterIndex first_delete_index) {
-	fatsuper_fatlock_write(self);
+	FatSuper_FatLockWrite(self);
 	TRY {
 		while (first_delete_index < self->ft_cluster_eof &&
 		       first_delete_index != FAT_CLUSTER_UNUSED) {
@@ -235,10 +235,10 @@ Fat_DeleteClusterChain(FatSuperblock *__restrict self,
 			first_delete_index = next;
 		}
 	} EXCEPT {
-		fatsuper_fatlock_endwrite(self);
+		FatSuper_FatLockEndWrite(self);
 		RETHROW();
 	}
-	fatsuper_fatlock_endwrite(self);
+	FatSuper_FatLockEndWrite(self);
 }
 
 
@@ -382,7 +382,7 @@ Fat_GetFileCluster(struct fnode *__restrict self,
 create_more_clusters_already_locked:
 	TRY {
 		preallocate_cluster_vector_entries(self, dat, super, nth_cluster + 1);
-		fatsuper_fatlock_write(super);
+		FatSuper_FatLockWrite(super);
 		TRY {
 			assert(dat->fn_clusterv[dat->fn_clusterc - 1] >= super->ft_cluster_eof);
 			assert((kmalloc_usable_size(dat->fn_clusterv) / sizeof(FatClusterIndex)) >= nth_cluster + 1);
@@ -440,10 +440,10 @@ create_more_clusters_already_locked:
 				}
 			}
 		} EXCEPT {
-			fatsuper_fatlock_endwrite(super);
+			FatSuper_FatLockEndWrite(super);
 			RETHROW();
 		}
-		fatsuper_fatlock_endwrite(super);
+		FatSuper_FatLockEndWrite(super);
 	} EXCEPT {
 		if (!(mode & FAT_GETCLUSTER_MODE_WRLOCK))
 			FatNodeData_Downgrade(dat);
@@ -880,17 +880,101 @@ FatDir_MkEnt(struct fflatdirnode *__restrict UNUSED(self),
 	return &result->fad_ent;
 }
 
+PRIVATE struct fat_dirent const new_directory_pattern[3] = {
+#ifndef __INTELLISENSE__
+	[0] = { /* '.' */
+		{{{{{.f_name    = { '.', ' ', ' ', ' ', ' ', ' ', ' ', ' ' }},
+			.f_ext     = { ' ', ' ', ' ' }}},
+			.f_attr    = FAT_ATTR_DIRECTORY,
+			.f_ntflags = NTFLAG_NONE }}},
+	[1] = { /* '..' */
+		{{{{{.f_name    = { '.', '.', ' ', ' ', ' ', ' ', ' ', ' ' }},
+			.f_ext      = { ' ', ' ', ' ' }}},
+			.f_attr     = FAT_ATTR_DIRECTORY,
+			.f_ntflags  = NTFLAG_NONE }}},
+	[2] = {{{{{{ .f_marker  = MARKER_DIREND }}}}}}
+#endif /* !__INTELLISENSE__ */
+};
+
+PRIVATE NONNULL((1)) FatClusterIndex KCALL
+FatNode_GetFirstCluster(struct fnode *__restrict self)
+		THROWS(E_BADALLOC, E_IOERROR) {
+	FatNodeData *dat = self->fn_fsdata;
+	FatClusterIndex result;
+	for (;;) {
+		FatNodeData_Read(dat);
+		TRY {
+			result = Fat_GetFileCluster(self, 0, FAT_GETCLUSTER_MODE_FCREATE);
+		} EXCEPT {
+			FatNodeData_EndRead(dat);
+			RETHROW();
+		}
+		FatNodeData_EndRead(dat);
+		if likely(result != FAT_GETFILECLUSTER_NEED_WRLOCK)
+			break;
+		FatNodeData_Write(dat);
+		FatNodeData_EndWrite(dat);
+	}
+	return result;
+}
+
 PRIVATE NONNULL((1, 2, 3, 4)) void KCALL
 FatDir_AllocFile(struct fflatdirnode *__restrict self,
                  struct fflatdirent *__restrict ent,
                  struct fnode *__restrict file,
                  struct fmkfile_info const *__restrict info)
 		THROWS(E_BADALLOC, E_IOERROR) {
-	FatDirNode *me = fflatdirnode_asfat(self);
-	assert(file->fn_fsdata->fn_dir == self);
-	assert(file->fn_fsdata->fn_ent == fflatdirent_asfat(ent));
+	FatDirNode *me       = fflatdirnode_asfat(self);
+	FatNodeData *dat     = file->fn_fsdata;
+	FatSuperblock *super = fsuper_asfat(file->fn_super);
+	assert(dat->fn_dir == self);
+	assert(dat->fn_ent == fflatdirent_asfat(ent));
 	if (fnode_isdir(file)) {
-		/* TODO: Allocate template for `file'. */
+		/* Allocate template for `file'. */
+		struct fat_dirent hdr[3];
+		FatClusterIndex fil_cluster;
+
+		/* Determine the initial cluster of `file' */
+		fil_cluster = FatNode_GetFirstCluster(file);
+
+		/* Initialize the header template. */
+		memcpy(hdr, new_directory_pattern, sizeof(hdr));
+		hdr[0].f_clusterlo = HTOLE16(fil_cluster & 0xffff);
+		if (!(super->ft_features & FAT_FEATURE_ARB))
+			hdr[0].f_clusterhi = HTOLE16((u16)(fil_cluster >> 16));
+		if (fnode_has_fat_clusters(me)) {
+			FatClusterIndex par_cluster;
+			par_cluster = FatNode_GetFirstCluster(me);
+			hdr[1].f_clusterlo = HTOLE16(par_cluster & 0xffff);
+			if (!(super->ft_features & FAT_FEATURE_ARB))
+				hdr[1].f_clusterhi = HTOLE16((u16)(par_cluster >> 16));
+		} else {
+			/* 0x0000 -- Free Cluster; also used by DOS to refer to the parent directory starting cluster
+			 *           in ".." entries of subdirectories of  the root directory on FAT12/FAT16  volumes
+			 *           https://en.wikipedia.org/wiki/Design_of_the_FAT_file_system */
+		}
+
+		mfile_tslock_acquire(file);
+		if (super->ft_features & FAT_FEATURE_UGID) {
+			/* UID/GID support */
+			hdr[0].f_uid = (u8)file->fn_uid;
+			hdr[0].f_gid = (u8)file->fn_gid;
+		} else {
+			/* Last-access timestamp support */
+			FatFileATime_Encode(&hdr[0].f_atime, &file->mf_atime);
+		}
+		FatFileMTime_Encode(&hdr[0].f_mtime, &file->mf_mtime);
+		FatFileCTime_Encode(&hdr[0].f_ctime, &file->mf_ctime);
+		mfile_tslock_release(file);
+		hdr[1].f_atime             = hdr[0].f_atime;
+		hdr[1].f_mtime.fc_date     = hdr[0].f_mtime.fc_date;
+		hdr[1].f_mtime.fc_time     = hdr[0].f_mtime.fc_time;
+		hdr[1].f_ctime.fc_date     = hdr[0].f_ctime.fc_date;
+		hdr[1].f_ctime.fc_time     = hdr[0].f_ctime.fc_time;
+		hdr[1].f_ctime.fc_sectenth = hdr[0].f_ctime.fc_sectenth;
+
+		/* Write the directory header into the directory stream file. */
+		mfile_write(file, hdr, sizeof(hdr), 0);
 	}
 #ifdef CONFIG_FAT_CYGWIN_SYMLINKS
 	else if (fnode_islnk(file)) {
@@ -946,15 +1030,30 @@ FatDir_DeleteFile(struct fflatdirnode *__restrict self,
 	 * get here, there's nowhere the file could (or should) be synced  _TO_. */
 }
 
-PRIVATE NONNULL((1, 2, 3)) void KCALL
-FatDir_ParentChanged(struct fflatdirnode *__restrict self,
-                     struct fflatdirnode *__restrict oldparent,
-                     struct fflatdirnode *__restrict newparent)
+PRIVATE NONNULL((1, 2, 3, 4, 5)) void KCALL
+FatDir_DirentChanged(struct fnode *__restrict self,
+                     struct fflatdirnode *oldparent,
+                     struct fflatdirnode *newparent,
+                     struct fflatdirent *__restrict old_ent,
+                     struct fflatdirent *__restrict new_ent)
 		THROWS(E_IOERROR) {
-	FatDirNode *me = fflatdirnode_asfat(self);
-	assert(me->fdn_fdat.fn_dir == oldparent);
-	/* TODO: Re-write the parent-cluster value within the directory header (the ".." entry) */
-	/* TODO: Set `me->fdn_fdat.fn_dir = newparent' */
+	FatNodeData *dat = self->fn_fsdata;
+	assert(dat->fn_ent == fflatdirent_asfat(old_ent));
+	assert(dat->fn_dir == fflatdirnode_asfat(oldparent));
+
+	/* Update saved meta-data values. */
+	incref(new_ent);
+	incref(newparent);
+	mfile_tslock_acquire(self);
+	dat->fn_ent = fflatdirent_asfat(new_ent);    /* Inherit reference */
+	dat->fn_dir = fflatdirnode_asfat(newparent); /* Inherit reference */
+	mfile_tslock_release(self);
+	decref_nokill(fflatdirent_asfat(old_ent)); /* Old value of `dat->fn_ent' */
+	decref_nokill(oldparent);                  /* Old value of `dat->fn_dir' */
+
+	if (fnode_isdir(self) && oldparent != newparent) {
+		/* TODO: Re-write the parent-cluster value within the directory header (the ".." entry) */
+	}
 }
 
 
@@ -1001,7 +1100,7 @@ PRIVATE struct fflatdirnode_ops const Fat_DirOps = {
 		.fdnx_mkent         = &FatDir_MkEnt,
 		.fdnx_allocfile     = &FatDir_AllocFile,
 		.fdnx_deletefile    = &FatDir_DeleteFile,
-		.fdnx_parentchanged = &FatDir_ParentChanged,
+		.fdnx_direntchanged = &FatDir_DirentChanged,
 	},
 };
 #ifdef CONFIG_FAT_CYGWIN_SYMLINKS
@@ -1380,14 +1479,13 @@ PRIVATE struct fflatsuper_ops const Fat16_SuperOps = {
 		},
 	},
 	.ffso_flat = {
-		.fdnx_readdir       = &FatDir_ReadDir,
-		.fdnx_writedir      = &FatDir_WriteDir,
-		.fdnx_deleteent     = &FatDir_DeleteEnt,
-		.fdnx_mkfile        = &FatDir_MkFile,
-		.fdnx_mkent         = &FatDir_MkEnt,
-		.fdnx_allocfile     = &FatDir_AllocFile,
-		.fdnx_deletefile    = &FatDir_DeleteFile,
-		.fdnx_parentchanged = NULL, /* Parent of root directory can't change */
+		.fdnx_readdir    = &FatDir_ReadDir,
+		.fdnx_writedir   = &FatDir_WriteDir,
+		.fdnx_deleteent  = &FatDir_DeleteEnt,
+		.fdnx_mkfile     = &FatDir_MkFile,
+		.fdnx_mkent      = &FatDir_MkEnt,
+		.fdnx_allocfile  = &FatDir_AllocFile,
+		.fdnx_deletefile = &FatDir_DeleteFile,
 	},
 };
 PRIVATE struct fflatsuper_ops const Fat32_SuperOps = {
@@ -1417,14 +1515,13 @@ PRIVATE struct fflatsuper_ops const Fat32_SuperOps = {
 		},
 	},
 	.ffso_flat = {
-		.fdnx_readdir       = &FatDir_ReadDir,
-		.fdnx_writedir      = &FatDir_WriteDir,
-		.fdnx_deleteent     = &FatDir_DeleteEnt,
-		.fdnx_mkfile        = &FatDir_MkFile,
-		.fdnx_mkent         = &FatDir_MkEnt,
-		.fdnx_allocfile     = &FatDir_AllocFile,
-		.fdnx_deletefile    = &FatDir_DeleteFile,
-		.fdnx_parentchanged = NULL, /* Parent of root directory can't change */
+		.fdnx_readdir    = &FatDir_ReadDir,
+		.fdnx_writedir   = &FatDir_WriteDir,
+		.fdnx_deleteent  = &FatDir_DeleteEnt,
+		.fdnx_mkfile     = &FatDir_MkFile,
+		.fdnx_mkent      = &FatDir_MkEnt,
+		.fdnx_allocfile  = &FatDir_AllocFile,
+		.fdnx_deletefile = &FatDir_DeleteFile,
 	},
 };
 
@@ -1688,7 +1785,7 @@ Fat_OpenFileSystem(struct ffilesys *__restrict filesys,
 			TRY {
 				result->ft_fat_table = mman_map(/* self:        */ &mman_kernel,
 				                                /* hint:        */ MHINT_GETADDR(KERNEL_MHINT_DEVICE),
-				                                /* num_bytes:   */ 0x100,
+				                                /* num_bytes:   */ result->ft_fat_size,
 				                                /* prot:        */ PROT_READ | PROT_WRITE | PROT_SHARED,
 				                                /* flags:       */ MHINT_GETMODE(KERNEL_MHINT_DEVICE),
 				                                /* file:        */ dev,
@@ -1716,13 +1813,24 @@ Fat_OpenFileSystem(struct ffilesys *__restrict filesys,
 		result->ft_super.ffs_super.fs_feat.sf_symlink_max        = 0;
 		result->ft_super.ffs_super.fs_feat.sf_link_max           = 1;
 		result->ft_super.ffs_super.fs_feat.sf_magic              = MSDOS_SUPER_MAGIC;
-		result->ft_super.ffs_super.fs_feat.sf_rec_incr_xfer_size = 0;
-		result->ft_super.ffs_super.fs_feat.sf_rec_max_xfer_size  = 0;
-		result->ft_super.ffs_super.fs_feat.sf_rec_min_xfer_size  = 0;
-		result->ft_super.ffs_super.fs_feat.sf_rec_xfer_align     = 0;
+		result->ft_super.ffs_super.fs_feat.sf_rec_incr_xfer_size = result->ft_sectorsize;
+		result->ft_super.ffs_super.fs_feat.sf_rec_max_xfer_size  = result->ft_sectorsize;
+		result->ft_super.ffs_super.fs_feat.sf_rec_min_xfer_size  = result->ft_sectorsize;
+		result->ft_super.ffs_super.fs_feat.sf_rec_xfer_align     = result->ft_sectorsize;
 		result->ft_super.ffs_super.fs_feat.sf_name_max           = LFN_SEQNUM_MAXCOUNT * LFN_NAME;
 		result->ft_super.ffs_super.fs_feat.sf_filesizebits       = 32;
 		result->ft_super.ffs_super.fs_root.fn_fsdata             = &result->ft_fdat;
+
+		/* Special case for when uid/gid support is available. */
+		if (result->ft_features & FAT_FEATURE_UGID) {
+			result->ft_super.ffs_super.fs_feat.sf_uid_max = (uid_t)0xff;
+			result->ft_super.ffs_super.fs_feat.sf_gid_max = (gid_t)0xff;
+		}
+#ifdef CONFIG_FAT_CYGWIN_SYMLINKS
+		if (!(result->ft_features & FAT_FEATURE_NO_CYGWIN_SYMLINK))
+			result->ft_super.ffs_super.fs_feat.sf_symlink_max = (pos_t)FAT_SYMLINK_FILE_TEXTLEN(UINT32_MAX);
+#endif /* CONFIG_FAT_CYGWIN_SYMLINKS */
+
 
 		/* Select root directory operators. */
 		result->ft_super.ffs_super.fs_root.mf_ops = result->ft_type == FAT32

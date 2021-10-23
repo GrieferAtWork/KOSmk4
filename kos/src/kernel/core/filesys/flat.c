@@ -1110,14 +1110,16 @@ NOTHROW(FCALL release_locks_for_rename)(struct fflatdirnode *nd,
 	fflatdirnode_endwrite(nd);
 }
 
-PRIVATE NONNULL((1, 2, 3)) void FCALL
-maybe_update_parent(struct fflatdirnode *__restrict file,
-                    struct fflatdirnode *__restrict oldparent,
-                    struct fflatdirnode *__restrict newparent) {
+PRIVATE NONNULL((1, 2, 3, 4, 5)) void FCALL
+call_update_dirent(struct fnode *__restrict file,
+                   struct fflatdirnode *oldparent,
+                   struct fflatdirnode *newparent,
+                   struct fflatdirent *__restrict oldent,
+                   struct fflatdirent *__restrict newent) {
 	struct fflatdirnode_ops const *ofile_ops;
-	ofile_ops = fflatdirnode_getops(file);
-	if (ofile_ops->fdno_flat.fdnx_parentchanged != NULL)
-		(*ofile_ops->fdno_flat.fdnx_parentchanged)(file, oldparent, newparent);
+	ofile_ops = fflatdirnode_getops(oldparent);
+	if (ofile_ops->fdno_flat.fdnx_direntchanged != NULL)
+		(*ofile_ops->fdno_flat.fdnx_direntchanged)(file, oldparent, newparent, oldent, newent);
 }
 
 PUBLIC WUNUSED NONNULL((1, 2)) unsigned int KCALL
@@ -1239,8 +1241,8 @@ again:
 					 *                                                            Delete `new_oent' in `nd' (fdnx_deleteent),
 					 *                                                            Delete `new_nent' in `od' (fdnx_deleteent))
 					 * -- CUT: Errors after this point will not cause the operation to be undone
-					 *  - if (fnode_isdir(ofile)) fdnx_parentchanged(ofile, od, nd);
-					 *  - if (fnode_isdir(nfile)) fdnx_parentchanged(nfile, nd, od);
+					 *  - if (fnode_isdir(ofile)) fdnx_direntchanged(ofile, od, nd);
+					 *  - if (fnode_isdir(nfile)) fdnx_direntchanged(nfile, nd, od);
 					 */
 					new_nent->fde_ent.fd_refcnt = 2;
 					fflatdirnode_addentry_to_stream(od, new_nent, nfile);
@@ -1296,8 +1298,6 @@ again:
 
 					/* Update the directory entry for the old file (which has now become the new file) */
 					assert(&oldent->fde_ent == info->frn_oldent);
-					decref_unlikely(newent);               /* Inherited from `fflatdirnode_remove_from_bypos(nd, newent);' */
-					decref_unlikely(oldent);               /* Stolen from `info->frn_oldent' */
 					info->frn_oldent = &new_nent->fde_ent; /* Inherit reference */
 					info->frn_dent   = &new_oent->fde_ent; /* Inherit reference */
 				} EXCEPT {
@@ -1308,23 +1308,20 @@ again:
 				destroy_partially_initialized_flatdirent(new_oent);
 				RETHROW();
 			}
+			FINALLY_DECREF_UNLIKELY(newent); /* Inherited from `fflatdirnode_remove_from_bypos(nd, newent);' */
+			FINALLY_DECREF_UNLIKELY(oldent); /* Stolen from `info->frn_oldent' */
 
-			/* Invoke `fdnx_parentchanged' if directories were renamed */
-			if (od != nd) {
-				if (fnode_isdir(ofile)) {
-					TRY {
-						maybe_update_parent(fnode_asflatdir(ofile), od, nd);
-					} EXCEPT {
-						if (fnode_isdir(nfile)) {
-							NESTED_EXCEPTION;
-							maybe_update_parent(fnode_asflatdir(nfile), nd, od);
-						}
-						RETHROW();
-					}
+			/* Invoke `fdnx_direntchanged' if directories were renamed */
+			TRY {
+				call_update_dirent(fnode_asflatdir(ofile), od, nd, oldent, new_oent);
+			} EXCEPT {
+				{
+					NESTED_EXCEPTION;
+					call_update_dirent(fnode_asflatdir(nfile), nd, od, newent, new_nent);
 				}
-				if (fnode_isdir(nfile))
-					maybe_update_parent(fnode_asflatdir(nfile), nd, od);
+				RETHROW();
 			}
+			call_update_dirent(fnode_asflatdir(nfile), nd, od, newent, new_nent);
 		} EXCEPT {
 			release_locks_for_rename(nd, od);
 			RETHROW();
@@ -1420,7 +1417,9 @@ again:
 			fflatdirnode_remove_from_bypos(od, oldent);
 			fflatdirnode_fileslist_removeent(od, oldent);
 			fflatdirnode_fileslist_rehash_after_remove(od);
-			decref_nokill(oldent); /* Inherited from `fflatdirnode_remove_from_bypos()' */
+			/* Inherited from `fflatdirnode_remove_from_bypos()'
+			 * >> *_nokill because caller still has ref in `info->frn_oldent' */
+			decref_nokill(oldent);
 		};
 
 		/* If present, delete the pre-existing file in `nd' */
@@ -1450,21 +1449,22 @@ again:
 					TRY {
 						(*ops->fdno_flat.fdnx_deletefile)(nd, existing, info->frn_repfile);
 					} EXCEPT {
-						decref_unlikely(newent);
 						{
-							NESTED_EXCEPTION;
-							/* Remove `oldent' from `od' on the fs-level */
-							TRY {
-								fflatdirnode_delete_entry(od, oldent, TAILQ_NEXT(oldent, fde_bypos) == NULL);
-							} EXCEPT {
-								if (fnode_isdir(info->frn_file)) {
-									NESTED_EXCEPTION;
-									maybe_update_parent(fnode_asflatdir(info->frn_file), od, nd);
+							FINALLY_DECREF_UNLIKELY(newent);
+							{
+								NESTED_EXCEPTION;
+								/* Remove `oldent' from `od' on the fs-level */
+								TRY {
+									fflatdirnode_delete_entry(od, oldent, TAILQ_NEXT(oldent, fde_bypos) == NULL);
+								} EXCEPT {
+									{
+										NESTED_EXCEPTION;
+										call_update_dirent(fnode_asflatdir(info->frn_file), od, nd, oldent, newent);
+									}
+									RETHROW();
 								}
-								RETHROW();
+								call_update_dirent(fnode_asflatdir(info->frn_file), od, nd, oldent, newent);
 							}
-							if (fnode_isdir(info->frn_file))
-								maybe_update_parent(fnode_asflatdir(info->frn_file), od, nd);
 						}
 						RETHROW();
 					}
@@ -1476,15 +1476,16 @@ again:
 		TRY {
 			fflatdirnode_delete_entry(od, oldent, TAILQ_NEXT(oldent, fde_bypos) == NULL);
 		} EXCEPT {
-			decref_unlikely(newent);
-			if (fnode_isdir(info->frn_file)) {
-				NESTED_EXCEPTION;
-				maybe_update_parent(fnode_asflatdir(info->frn_file), od, nd);
+			{
+				FINALLY_DECREF_UNLIKELY(newent);
+				{
+					NESTED_EXCEPTION;
+					call_update_dirent(fnode_asflatdir(info->frn_file), od, nd, oldent, newent);
+				}
 			}
 			RETHROW();
 		}
-		if (fnode_isdir(info->frn_file))
-			maybe_update_parent(fnode_asflatdir(info->frn_file), od, nd);
+		call_update_dirent(fnode_asflatdir(info->frn_file), od, nd, oldent, newent);
 		info->frn_dent = &newent->fde_ent; /* Inherit reference */
 	} EXCEPT {
 		release_locks_for_rename(nd, od);
