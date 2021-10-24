@@ -91,7 +91,7 @@ NOTHROW(KCALL handle_typekind)(struct handle const *__restrict self) {
 		struct chrdev *me;
 		me = (struct chrdev *)self;
 		if (chrdev_istty(me)) {
-			if (ttybase_isapty((struct ttydev *)me))
+			if (ttydev_isptyslave((struct ttydev *)me))
 				return HANDLE_TYPEKIND_CHRDEV_PTY;
 			if (ttydev_ismktty((struct ttydev *)me))
 				return HANDLE_TYPEKIND_CHRDEV_TTY;

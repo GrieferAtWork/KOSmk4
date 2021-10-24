@@ -175,7 +175,7 @@ urandom_read(USER CHECKED void *buf, size_t num_bytes)
  *   >>     double mean  = (double)perbit_num1 / num_chunks; // Average tendency over time
  *   >>     double error = 2.0 * fabs(0.5 - mean);           // How close is the mean to the perfect mean of 0.5
  *   >>     double worth = 1.0 - error;                      // How much worth to assign to the given `b'
- *   >>     // The value appears to be truely random <worth*100>% of the time
+ *   >>     // The value appears to be truly random <worth*100>% of the time
  *   >>     perbit_worth += worth;                           // Accumulate worth over time
  *   >>     if (perbit_worth >= 1.0) {                       // With enough worth to approximate
  *   >>                                                      // the mean, post combined bit entropy
@@ -183,8 +183,6 @@ urandom_read(USER CHECKED void *buf, size_t num_bytes)
  *   >>         perbit_worth -= 1.0;
  *   >>     }
  *   >> }
- *   >>
- *
  */
 
 

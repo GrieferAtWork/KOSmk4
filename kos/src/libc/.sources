@@ -152,28 +152,7 @@ BEGIN
 		 * NOTE: Don't forget to turn on `L_FLAGS("-Wl,--gc-sections")', to prevent
 		 *       any  function  that you  didn't  use from  clobbering  your binary */
 		SET_STATIC_OUTPUT(TARGET_BINPATH + DISK_LIBPATH + "libc.a")
-		/* WARNING: Because `AR' is  shitty and doesn't  understand weak  symbols,
-		 *          the order of SOURCE files here is important in that all  files
-		 *          containing weak declarations must come _AFTER_ files which may
-		 *          contain   the  strong  declarations  of  those  same  symbols.
-		 *          In our case this  is quite simple, as  all it really means  is
-		 *          placing the auto-implementations  last. However  this is  just
-		 *          once again another  example of how  inconsistent and  outdated
-		 *          of a toolchain  the GCC  backend truely is...  (not hating  on
-		 *          GCC itself, just on its backing toolchain)
-		 *     -> The error here lies in:
-		 *        - AR,  for creating archives  with duplicate symbols without
-		 *          taking a closer  look at those  symbols and selecting  the
-		 *          ones that aren't declared as WEAK, and neither  displaying
-		 *          an error when more than one symbol is declared as non-WEAK
-		 *        - LD, for  blindly trusting  AR  archives and  always  choosing
-		 *          the first matching symbol, without looking further to  notice
-		 *          that there is more than one option for how that symbol should
-		 *          be bound.
-		 * (Good thing our libc sources don't really feature files containing both
-		 *  weak and strong symbols, so we can just order them from strong to weak)
-		 * REF: https://stackoverflow.com/questions/23079997/override-weak-symbols-in-static-library
-		 */
+
 		SOURCE({
 			"hybrid/arch/" + XARCH + "/*.c",
 			"hybrid/arch/" + XARCH_ASMFILES,

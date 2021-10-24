@@ -151,7 +151,7 @@
 #define HANDLE_TYPEKIND_CHRDEV_GENERIC  0x0000 /* The handle refers to a `struct chrdev' */
 #define HANDLE_TYPEKIND_CHRDEV_TTYBASE  0x0001 /* The handle refers to a `struct ttydev' */
 #define HANDLE_TYPEKIND_CHRDEV_TTY      0x0002 /* The handle refers to a `struct mkttydev' and `struct ttydev' */
-#define HANDLE_TYPEKIND_CHRDEV_PTY      0x0003 /* The handle refers to a `struct pty_master' and `struct ttydev' */
+#define HANDLE_TYPEKIND_CHRDEV_PTY      0x0003 /* The handle refers to a `struct ptymaster' and `struct ttydev' */
 #define HANDLE_TYPEKIND_CHRDEV_KEYBOARD 0x0004 /* The handle refers to a `struct kbddev' */
 #define HANDLE_TYPEKIND_CHRDEV_MOUSE    0x0005 /* The handle refers to a `struct mousedev' */
 

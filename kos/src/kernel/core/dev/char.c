@@ -110,7 +110,7 @@ NOTHROW(KCALL remove_character_device_from_tree)(struct chrdev *__restrict self)
 	struct chrdev *removed;
 	if (self->cd_devlink.a_vaddr != DEV_UNSET) {
 		removed = cdev_tree_remove(&chrdev_tree,
-								   chrdev_devno(self));
+								   chrdev_getdevno(self));
 		if unlikely(removed != self) {
 			if likely(removed)
 				cdev_tree_insert(&chrdev_tree, removed);
@@ -308,7 +308,7 @@ character_device_add_to_devfs_impl(struct chrdev *__restrict self) {
 	if likely(!self->cd_devfs_inode) {
 		devfs_insert(self->cd_name,
 		             S_IFCHR,
-		             chrdev_devno(self),
+		             chrdev_getdevno(self),
 		             &self->cd_devfs_inode, /* XXX: What about concurrent register() + unregister()? */
 		             &self->cd_devfs_entry);
 	}
@@ -429,8 +429,8 @@ pty_assign_name(struct chrdev *__restrict self,
 /* Register a PTY master/slave pair within devfs, as well
  * as  assign matching character  device numbers to each. */
 INTERN void KCALL
-pty_register(struct pty_master *__restrict master,
-             struct pty_slave *__restrict slave)
+pty_register(struct ptymaster *__restrict master,
+             struct ptyslave *__restrict slave)
 		THROWS(E_WOULDBLOCK, E_BADALLOC) {
 	minor_t used_minor;
 	cdl_write();
@@ -757,8 +757,8 @@ handle_chrdev_stat(struct chrdev *__restrict self,
 	if (node)
 		inode_stat(node, result);
 	result->st_mode = (result->st_mode & ~S_IFMT) | S_IFCHR;
-	result->st_dev  = (__dev_t)chrdev_devno(self);
-	result->st_rdev = (__dev_t)chrdev_devno(self);
+	result->st_dev  = (__dev_t)chrdev_getdevno(self);
+	result->st_rdev = (__dev_t)chrdev_getdevno(self);
 	if (self->cd_type.ct_stat)
 		(*self->cd_type.ct_stat)(self, result);
 }
@@ -850,7 +850,7 @@ do_dump_character_device(struct chrdev *__restrict self,
                          size_t max_driver_namelen) {
 	char const *kind;
 	if (chrdev_istty(self))
-		kind = ttybase_isapty((struct ttydev *)self)
+		kind = ttydev_isptyslave((struct ttydev *)self)
 		       ? DBGSTR("pty")
 		       : DBGSTR("tty");
 	else if (chrdev_iskbd(self))
@@ -865,8 +865,8 @@ do_dump_character_device(struct chrdev *__restrict self,
 	                  "%-3.2" PRIxN(__SIZEOF_MINOR_T__) "  "
 	                  "%*-s  %-8s  "),
 	           (unsigned int)max_device_namelen, self->cd_name,
-	           (unsigned int)MAJOR(chrdev_devno(self)),
-	           (unsigned int)MINOR(chrdev_devno(self)),
+	           (unsigned int)MAJOR(chrdev_getdevno(self)),
+	           (unsigned int)MINOR(chrdev_getdevno(self)),
 	           (unsigned int)max_driver_namelen,
 	           self->cd_type.ct_driver ? self->cd_type.ct_driver->d_name
 	                                   : DBGSTR("?"),

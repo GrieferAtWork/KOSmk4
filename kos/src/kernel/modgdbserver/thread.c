@@ -478,8 +478,8 @@ NOTHROW(FCALL GDBThread_IsStopped)(struct task const *__restrict thread) {
 	return (ATOMIC_READ(thread->t_flags) & TASK_FGDB_STOPPED) != 0;
 }
 
-/* Same as `GDBThread_IsStopped()', but the thread doesn't count as truely
- * stopped, unless it was stopped  explicitly (rather than implicitly,  as
+/* Same as `GDBThread_IsStopped()', but the thread doesn't count as truly
+ * stopped, unless it was stopped explicitly (rather than implicitly,  as
  * would be the case when `GDBThread_IsAllStopModeActive == true') */
 INTERN NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) bool
 NOTHROW(FCALL GDBThread_IsStoppedExplicitly)(struct task const *__restrict thread) {

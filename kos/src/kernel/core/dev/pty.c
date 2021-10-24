@@ -27,10 +27,14 @@
 #include <dev/pty.h>
 #include <kernel/driver.h>
 #include <kernel/except.h>
+#include <kernel/fs/devfs.h>
+#include <kernel/fs/ramfs.h>
 #include <kernel/handle.h>
 #include <kernel/syscall.h>
 #include <kernel/types.h>
 #include <kernel/user.h>
+#include <sched/cred.h>
+#include <sched/task.h>
 
 #include <hybrid/atomic.h>
 
@@ -38,6 +42,7 @@
 
 #include <assert.h>
 #include <errno.h>
+#include <inttypes.h>
 #include <stddef.h>
 #include <stdio.h>
 #include <string.h>
@@ -45,45 +50,47 @@
 DECL_BEGIN
 
 /* oprinter callback for PTY tty objects. */
-PUBLIC ssize_t LIBTERM_CC
-kernel_pty_oprinter(struct terminal *__restrict term,
+#ifdef CONFIG_USE_NEW_FS
+PRIVATE ssize_t LIBTERM_CC
+ptyslave_v_oprinter(struct terminal *__restrict term,
                     void const *__restrict src,
-                    size_t num_bytes, iomode_t mode) {
-	struct pty_slave *self;
-	self = container_of(term, struct pty_slave, t_term);
+                    size_t num_bytes, iomode_t mode)
+#else /* CONFIG_USE_NEW_FS */
+PUBLIC ssize_t LIBTERM_CC
+ptyslave_v_oprinter(struct terminal *__restrict term,
+                    void const *__restrict src,
+                    size_t num_bytes, iomode_t mode)
+#endif /* !CONFIG_USE_NEW_FS */
+{
+	struct ptyslave *self;
+	self = container_of(term, struct ptyslave, t_term);
 	return mode & IO_NONBLOCK
 	       ? (ssize_t)ringbuffer_write_nonblock(&self->ps_obuf, src, num_bytes)
 	       : (ssize_t)ringbuffer_write(&self->ps_obuf, src, num_bytes);
 }
 
-PRIVATE NOBLOCK NONNULL((1)) void
-NOTHROW(KCALL pty_slave_fini)(struct chrdev *__restrict self) {
-	struct pty_slave *me;
-	REF struct pty_master *master;
-	me = (struct pty_slave *)self;
-	/* Try to clear the master's back-link to our structure. */
-	master = awref_get(&me->ps_master);
-	if (master) {
-		assert(awref_ptr(&master->pm_slave) == me);
-		awref_clear(&master->pm_slave);
-		/* Unlikely,  since the controlling application is probably
-		 * still holding a reference to the master side of the PTY. */
-		decref_unlikely(master);
-	}
-	/* Finalize the used ring buffer. */
-	ringbuffer_fini(&me->ps_obuf);
-	/* Finalize the underlying TTY-base device. */
-	ttydev_v_fini(me);
-}
 
+#ifdef CONFIG_USE_NEW_FS
 PRIVATE NONNULL((1)) syscall_slong_t KCALL
-pty_slave_ioctl(struct chrdev *__restrict self,
-                syscall_ulong_t cmd,
-                USER UNCHECKED void *arg,
-                iomode_t mode)
-		THROWS(...) {
-	struct pty_slave *me;
-	me = (struct pty_slave *)self;
+ptyslave_v_ioctl(struct mfile *__restrict self,
+                 syscall_ulong_t cmd,
+                 USER UNCHECKED void *arg,
+                 iomode_t mode)
+		THROWS(...)
+#else /* CONFIG_USE_NEW_FS */
+PRIVATE NONNULL((1)) syscall_slong_t KCALL
+ptyslave_v_ioctl(struct chrdev *__restrict self,
+                 syscall_ulong_t cmd,
+                 USER UNCHECKED void *arg,
+                 iomode_t mode)
+		THROWS(...)
+#endif /* !CONFIG_USE_NEW_FS */
+{
+#ifdef CONFIG_USE_NEW_FS
+	struct ptyslave *me = mfile_asptyslave(self);
+#else /* CONFIG_USE_NEW_FS */
+	struct ptyslave *me = (struct ptyslave *)self;
+#endif /* !CONFIG_USE_NEW_FS */
 	switch (cmd) {
 
 	/* TODO */
@@ -96,12 +103,57 @@ pty_slave_ioctl(struct chrdev *__restrict self,
 }
 
 
-
+#ifdef CONFIG_USE_NEW_FS
 PRIVATE NOBLOCK NONNULL((1)) void
-NOTHROW(KCALL pty_master_fini)(struct chrdev *__restrict self) {
-	struct pty_master *me;
-	REF struct pty_slave *slave;
-	me    = (struct pty_master *)self;
+NOTHROW(KCALL ptyslave_v_destroy)(struct mfile *__restrict self)
+#else /* CONFIG_USE_NEW_FS */
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(KCALL ptyslave_v_fini)(struct chrdev *__restrict self)
+#endif /* !CONFIG_USE_NEW_FS */
+{
+	REF struct ptymaster *master;
+#ifdef CONFIG_USE_NEW_FS
+	struct ptyslave *me = mfile_asptyslave(self);
+#else /* CONFIG_USE_NEW_FS */
+	struct ptyslave *me = (struct ptyslave *)self;
+#endif /* !CONFIG_USE_NEW_FS */
+
+	/* Try to clear the master's back-link to our structure. */
+	master = awref_get(&me->ps_master);
+	if (master) {
+		assert(awref_ptr(&master->pm_slave) == me);
+		awref_clear(&master->pm_slave);
+		/* Unlikely,  since the controlling application is probably
+		 * still holding a reference to the master side of the PTY. */
+		decref_unlikely(master);
+	}
+
+	/* Finalize the used ring buffer. */
+	ringbuffer_fini(&me->ps_obuf);
+
+	/* Finalize the underlying TTY-base device. */
+#ifdef CONFIG_USE_NEW_FS
+	ttydev_v_destroy(self);
+#else /* CONFIG_USE_NEW_FS */
+	ttydev_v_fini(me);
+#endif /* !CONFIG_USE_NEW_FS */
+}
+
+
+#ifdef CONFIG_USE_NEW_FS
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(KCALL ptymaster_v_destroy)(struct mfile *__restrict self)
+#else /* CONFIG_USE_NEW_FS */
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(KCALL ptymaster_v_fini)(struct chrdev *__restrict self)
+#endif /* !CONFIG_USE_NEW_FS */
+{
+#ifdef CONFIG_USE_NEW_FS
+	struct ptymaster *me = mfile_asptymaster(self);
+#else /* CONFIG_USE_NEW_FS */
+	struct ptymaster *me = (struct ptymaster *)self;
+#endif /* !CONFIG_USE_NEW_FS */
+	REF struct ptyslave *slave;
 	slave = awref_get(&me->pm_slave);
 	if (slave) {
 		assert(awref_ptr(&slave->ps_master) == self);
@@ -114,21 +166,39 @@ NOTHROW(KCALL pty_master_fini)(struct chrdev *__restrict self) {
 		linebuffer_close(&slave->t_term.t_canon);
 		decref_unlikely(slave);
 	}
+#ifdef CONFIG_USE_NEW_FS
+	chrdev_v_destroy(self);
+#endif /* CONFIG_USE_NEW_FS */
 }
 
+
+#ifdef CONFIG_USE_NEW_FS
 PRIVATE NONNULL((1)) size_t KCALL
-pty_master_read(struct chrdev *__restrict self,
-                USER CHECKED void *dst,
-                size_t num_bytes, iomode_t mode)
-		THROWS(...) {
+ptymaster_v_read(struct mfile *__restrict self,
+                 USER CHECKED void *dst,
+                 size_t num_bytes, iomode_t mode)
+		THROWS(...)
+#else /* CONFIG_USE_NEW_FS */
+PRIVATE NONNULL((1)) size_t KCALL
+ptymaster_v_read(struct chrdev *__restrict self,
+                 USER CHECKED void *dst,
+                 size_t num_bytes, iomode_t mode)
+		THROWS(...)
+#endif /* !CONFIG_USE_NEW_FS */
+{
+#ifdef CONFIG_USE_NEW_FS
+	struct ptymaster *me = mfile_asptymaster(self);
+#else /* CONFIG_USE_NEW_FS */
+	struct ptymaster *me = (struct ptymaster *)self;
+#endif /* !CONFIG_USE_NEW_FS */
 	size_t result;
-	struct pty_master *me;
-	REF struct pty_slave *slave;
-	me = (struct pty_master *)self;
+	REF struct ptyslave *slave;
+
 again_getslave:
 	slave = awref_get(&me->pm_slave);
 	if unlikely(!slave)
 		return 0; /* EOF */
+
 	/* Read from the PTY output buffer (allowing the master application to process TTY output) */
 again_read:
 	TRY {
@@ -162,19 +232,34 @@ again_read:
 	return result;
 }
 
+
+#ifdef CONFIG_USE_NEW_FS
 PRIVATE NONNULL((1)) size_t KCALL
-pty_master_write(struct chrdev *__restrict self,
-                 USER CHECKED void const *src,
-                 size_t num_bytes, iomode_t mode)
-		THROWS(...) {
+ptymaster_v_write(struct mfile *__restrict self,
+                  USER CHECKED void const *src,
+                  size_t num_bytes, iomode_t mode)
+		THROWS(...)
+#else /* CONFIG_USE_NEW_FS */
+PRIVATE NONNULL((1)) size_t KCALL
+ptymaster_v_write(struct chrdev *__restrict self,
+                  USER CHECKED void const *src,
+                  size_t num_bytes, iomode_t mode)
+		THROWS(...)
+#endif /* !CONFIG_USE_NEW_FS */
+{
+#ifdef CONFIG_USE_NEW_FS
+	struct ptymaster *me = mfile_asptymaster(self);
+#else /* CONFIG_USE_NEW_FS */
+	struct ptymaster *me = (struct ptymaster *)self;
+#endif /* !CONFIG_USE_NEW_FS */
 	ssize_t result;
-	struct pty_master *me;
-	REF struct pty_slave *slave;
-	me = (struct pty_master *)self;
+	REF struct ptyslave *slave;
+
 again_getslave:
 	slave = awref_get(&me->pm_slave);
 	if unlikely(!slave)
 		return 0; /* EOF */
+
 	/* Write to the input buffer, allowing the master application to provide keyboard input. */
 again_write:
 	TRY {
@@ -215,36 +300,58 @@ again_write:
 	return (size_t)result;
 }
 
+
+#ifdef CONFIG_USE_NEW_FS
 PRIVATE NONNULL((1)) syscall_slong_t KCALL
-pty_master_ioctl(struct chrdev *__restrict self,
-                 syscall_ulong_t cmd,
-                 USER UNCHECKED void *arg,
-                 iomode_t mode)
-		THROWS(...) {
-	struct pty_master *me;
-	REF struct pty_slave *slave;
+ptymaster_v_ioctl(struct mfile *__restrict self, syscall_ulong_t cmd,
+                  USER UNCHECKED void *arg, iomode_t mode)
+		THROWS(...)
+#else /* CONFIG_USE_NEW_FS */
+PRIVATE NONNULL((1)) syscall_slong_t KCALL
+ptymaster_v_ioctl(struct chrdev *__restrict self, syscall_ulong_t cmd,
+                  USER UNCHECKED void *arg, iomode_t mode)
+		THROWS(...)
+#endif /* !CONFIG_USE_NEW_FS */
+{
+#ifdef CONFIG_USE_NEW_FS
+	struct ptymaster *me = mfile_asptymaster(self);
+#else /* CONFIG_USE_NEW_FS */
+	struct ptymaster *me = (struct ptymaster *)self;
+#endif /* !CONFIG_USE_NEW_FS */
+	REF struct ptyslave *slave;
 	syscall_slong_t result;
-	me    = (struct pty_master *)self;
 	slave = awref_get(&me->pm_slave);
 	if unlikely(!slave) {
 		THROW(E_NO_DEVICE,
 		      E_NO_DEVICE_KIND_CHRDEV,
-		      PTY_SLAVE(MINOR(chrdev_devno(self))));
+		      PTY_SLAVE(MINOR(chrdev_getdevno(me))));
 	}
 	{
 		FINALLY_DECREF_UNLIKELY(slave);
-		result = pty_slave_ioctl(slave, cmd, arg, mode);
+		result = ptyslave_v_ioctl(slave, cmd, arg, mode);
 	}
 	return result;
 }
 
+
+#ifdef CONFIG_USE_NEW_FS
 PRIVATE NONNULL((1)) void KCALL
-pty_master_stat(struct chrdev *__restrict self,
-                USER CHECKED struct stat *result)
-		THROWS(...) {
-	struct pty_master *me;
-	REF struct pty_slave *slave;
-	me    = (struct pty_master *)self;
+ptymaster_v_stat(struct mfile *__restrict self,
+                 USER CHECKED struct stat *result)
+		THROWS(...)
+#else /* CONFIG_USE_NEW_FS */
+PRIVATE NONNULL((1)) void KCALL
+ptymaster_v_stat(struct chrdev *__restrict self,
+                 USER CHECKED struct stat *result)
+		THROWS(...)
+#endif /* !CONFIG_USE_NEW_FS */
+{
+#ifdef CONFIG_USE_NEW_FS
+	struct ptymaster *me = mfile_asptymaster(self);
+#else /* CONFIG_USE_NEW_FS */
+	struct ptymaster *me = (struct ptymaster *)self;
+#endif /* !CONFIG_USE_NEW_FS */
+	REF struct ptyslave *slave;
 	slave = awref_get(&me->pm_slave);
 	if (slave) {
 		FINALLY_DECREF_UNLIKELY(slave);
@@ -254,17 +361,28 @@ pty_master_stat(struct chrdev *__restrict self,
 	}
 }
 
+
+#ifdef CONFIG_USE_NEW_FS
 PRIVATE NONNULL((1)) void KCALL
-pty_master_pollconnect(struct chrdev *__restrict self,
-                       poll_mode_t what)
-		THROWS(E_BADALLOC, E_WOULDBLOCK) {
-	struct pty_master *me;
-	REF struct pty_slave *slave;
-	me    = (struct pty_master *)self;
+ptymaster_v_pollconnect(struct mfile *__restrict self,
+                        poll_mode_t what)
+		THROWS(E_BADALLOC, E_WOULDBLOCK)
+#else /* CONFIG_USE_NEW_FS */
+PRIVATE NONNULL((1)) void KCALL
+ptymaster_v_pollconnect(struct chrdev *__restrict self,
+                        poll_mode_t what)
+		THROWS(E_BADALLOC, E_WOULDBLOCK)
+#endif /* !CONFIG_USE_NEW_FS */
+{
+#ifdef CONFIG_USE_NEW_FS
+	struct ptymaster *me = mfile_asptymaster(self);
+#else /* CONFIG_USE_NEW_FS */
+	struct ptymaster *me = (struct ptymaster *)self;
+#endif /* !CONFIG_USE_NEW_FS */
+	REF struct ptyslave *slave;
 	slave = awref_get(&me->pm_slave);
-	if (!slave)
-		;
-	else {
+	if (!slave) {
+	} else {
 		FINALLY_DECREF_UNLIKELY(slave);
 		if (what & POLLINMASK)
 			ringbuffer_pollconnect_read(&slave->ps_obuf); /* Poll for read() */
@@ -277,14 +395,26 @@ pty_master_pollconnect(struct chrdev *__restrict self,
 	}
 }
 
+
+#ifdef CONFIG_USE_NEW_FS
 PRIVATE NONNULL((1)) poll_mode_t KCALL
-pty_master_polltest(struct chrdev *__restrict self,
-                    poll_mode_t what)
-		THROWS(E_BADALLOC, E_WOULDBLOCK) {
-	struct pty_master *me;
-	REF struct pty_slave *slave;
+ptymaster_v_polltest(struct mfile *__restrict self,
+                     poll_mode_t what)
+		THROWS(E_BADALLOC, E_WOULDBLOCK)
+#else /* CONFIG_USE_NEW_FS */
+PRIVATE NONNULL((1)) poll_mode_t KCALL
+ptymaster_v_polltest(struct chrdev *__restrict self,
+                     poll_mode_t what)
+		THROWS(E_BADALLOC, E_WOULDBLOCK)
+#endif /* !CONFIG_USE_NEW_FS */
+{
+#ifdef CONFIG_USE_NEW_FS
+	struct ptymaster *me = mfile_asptymaster(self);
+#else /* CONFIG_USE_NEW_FS */
+	struct ptymaster *me = (struct ptymaster *)self;
+#endif /* !CONFIG_USE_NEW_FS */
+	REF struct ptyslave *slave;
 	poll_mode_t result = 0;
-	me    = (struct pty_master *)self;
 	slave = awref_get(&me->pm_slave);
 	if (!slave)
 		result = what;
@@ -300,49 +430,268 @@ pty_master_polltest(struct chrdev *__restrict self,
 
 
 
-LOCAL REF struct pty_slave *KCALL pty_slave_alloc(void) {
-	REF struct pty_slave *result;
-	result = CHRDEV_ALLOC(struct pty_slave);
+
+#ifdef CONFIG_USE_NEW_FS
+
+/* Operators used by `struct ptyslave' */
+PRIVATE struct mfile_stream_ops const ptyslave_stream_ops = {
+	.mso_read        = &ttydev_v_read,
+	.mso_write       = &ttydev_v_write,
+	.mso_ioctl       = &ptyslave_v_ioctl,
+	.mso_stat        = &ttydev_v_stat,
+	.mso_pollconnect = &ttydev_v_pollconnect,
+	.mso_polltest    = &ttydev_v_polltest,
+};
+PUBLIC struct ttydev_ops const ptyslave_ops = {{{{{
+	.no_file = {
+		.mo_destroy = &ptyslave_v_destroy,
+		.mo_changed = &ttydev_v_changed,
+		.mo_stream  = &ptyslave_stream_ops,
+	},
+	.no_wrattr = &ttydev_v_wrattr,
+}}}}};
+
+/* Operators used by `struct ptymaster' */
+PRIVATE struct mfile_stream_ops const ptymaster_stream_ops = {
+	.mso_read        = &ptymaster_v_read,
+	.mso_write       = &ptymaster_v_write,
+	.mso_ioctl       = &ptymaster_v_ioctl,
+	.mso_stat        = &ptymaster_v_stat,
+	.mso_pollconnect = &ptymaster_v_pollconnect,
+	.mso_polltest    = &ptymaster_v_polltest,
+};
+PUBLIC struct chrdev_ops const ptymaster_ops = {{{{
+	.no_file = {
+		.mo_destroy = &ptymaster_v_destroy,
+		.mo_changed = &chrdev_v_changed,
+		.mo_stream  = &ptymaster_stream_ops,
+	},
+	.no_wrattr = &chrdev_v_wrattr,
+}}}};
+
+
+/* Set the given `minor' to-be referenced by `name' */
+PRIVATE NONNULL((1)) void
+NOTHROW(FCALL set_pty_name_minor)(struct fdevfsdirent *__restrict name,
+                                  minor_t minor) {
+	if (minor >= PTY_DEVCNT) {
+		/* KOS-specific, extended PTY device. */
+		STATIC_ASSERT(MINORBITS / 4 == 5);
+		sprintf(name->fdd_dirent.fd_name + 3,
+		        "X%.5" PRIxN(__SIZEOF_MINOR_T__), minor);
+		name->fdd_dirent.fd_namelen = 9;
+	} else {
+		/* Old (BSD-style) PTY master/slave device names. */
+		char temp = 'p' + (minor / 16);
+		if (temp > 'z')
+			temp = 'a' + (temp - 'z');
+		name->fdd_dirent.fd_name[3] = temp;
+		minor %= 16;
+		name->fdd_dirent.fd_name[4] = minor >= 10 ? 'a' + (minor - 10) : '0' + minor;
+		name->fdd_dirent.fd_name[5] = '\0';
+		name->fdd_dirent.fd_namelen = 5;
+	}
+}
+
+
+PRIVATE NONNULL((1, 2)) void FCALL
+register_pty_pair(struct ptymaster *__restrict master,
+                  struct ptyslave *__restrict slave)
+		THROWS(E_BADALLOC, E_WOULDBLOCK) {
+	REF struct fdevfsdirent *master_name, *slave_name;
+	/* KOS Extension: Since we allocate '20' bits for minor device numbers,
+	 *                it's actually possible  to get _much_  more than  256
+	 *                pty devices in KOS (1048576 to be exact).
+	 *             >> But for all those additional nodes, we need a new
+	 *                naming  scheme that isn't standardized due to its
+	 *                nature of being an extension:
+	 * MASTER: /dev/ptyX12345
+	 * SLAVE:  /dev/ttyX12345
+	 * NOTE: The 12345 is the hex value of the minor device number, using lower-case letters. */
+	STATIC_ASSERT(MINORBITS / 4 == 5);
+	master_name = fdevfsdirent_newf("ptyX.....");
+	TRY {
+		slave_name = fdevfsdirent_newf("ttyX.....");
+		TRY {
+			minor_t min;
+			/* Mark the 2 devices such that they're _NOT_ part of the all-nodes list.
+			 * No part of the kernel holds explicit reference to PTY devices, which is
+			 * important for allowing such devices to implicitly delete themselves as
+			 * soon as no-one is holding any more references to them. */
+			LIST_ENTRY_UNBOUND_INIT(&master->fn_allnodes);
+			LIST_ENTRY_UNBOUND_INIT(&slave->fn_allnodes);
+			assert(!(master->mf_flags & MFILE_FN_GLOBAL_REF));
+			assert(!(slave->mf_flags & MFILE_FN_GLOBAL_REF));
+
+			/* Link directory entries with PTY devices. */
+			awref_init(&master_name->fdd_dev, master);
+			awref_init(&slave_name->fdd_dev, slave);
+			master->dv_dirent = master_name; /* Inherit reference */
+			slave->dv_dirent  = slave_name;  /* Inherit reference */
+
+			/* Acquire locks needed for registering new devices. */
+			_device_register_lock_acquire(false);
+
+			/* Find the first unused minor */
+			for (min = 0;; ++min) {
+				/* Assign device number */
+				master->dn_devno = PTY_MASTER(min);
+				slave->dn_devno  = PTY_SLAVE(min);
+				master->fn_ino   = devfs_devnode_makeino(S_IFCHR, master->dn_devno);
+				slave->fn_ino    = devfs_devnode_makeino(S_IFCHR, slave->dn_devno);
+				if (!_device_register_inuse_ino(master->fn_ino) &&
+				    !_device_register_inuse_ino(slave->fn_ino))
+					break; /* This one's not in use already! */
+				if unlikely(min >= 0xfffff) {
+					_device_register_lock_release(false);
+					THROW(E_BADALLOC_INSUFFICIENT_DEVICE_NUMBERS,
+					      E_NO_DEVICE_KIND_CHRDEV);
+				}
+			}
+
+			/* Insert into the devfs INode tree. */
+			fsuper_nodes_insert(&devfs, master);
+			fsuper_nodes_insert(&devfs, slave);
+
+			/* Set device names (based on minor numbers). */
+			set_pty_name_minor(master_name, min);
+			set_pty_name_minor(slave_name, min);
+
+			/* Only register within the filesystem if the name isn't already in use. */
+			if unlikely(_device_register_inuse_name(master_name->fdd_dirent.fd_name,
+			                                        master_name->fdd_dirent.fd_namelen)) {
+				master->dv_byname_node.rb_lhs = DEVICE_BYNAME_DELETED;
+			} else {
+				devfs_byname_insert(master);
+			}
+			if unlikely(_device_register_inuse_name(slave_name->fdd_dirent.fd_name,
+			                                        slave_name->fdd_dirent.fd_namelen)) {
+				slave->dv_byname_node.rb_lhs = DEVICE_BYNAME_DELETED;
+			} else {
+				devfs_byname_insert(slave);
+			}
+
+			/* Release locks. */
+			_device_register_lock_release(false);
+		} EXCEPT {
+			kfree(slave_name);
+			RETHROW();
+		}
+	} EXCEPT {
+		kfree(master_name);
+		RETHROW();
+	}
+}
+
+
+/* Allocate a new PTY master/slave pair.
+ * Note that the device pair will have already been registered. */
+PUBLIC NONNULL((1, 2)) void KCALL
+pty_alloc(REF struct ptymaster **__restrict p_master,
+          REF struct ptyslave **__restrict p_slave,
+          USER CHECKED struct termios const *termp,
+          USER CHECKED struct winsize const *winp)
+		THROWS(E_BADALLOC) {
+	struct ptymaster *master;
+	struct ptyslave *slave;
+	/* Allocate objects. */
+	master = (struct ptymaster *)kmalloc(sizeof(struct ptymaster), GFP_NORMAL);
+	_chrdev_init(master, &ptymaster_ops);
+	master->dv_driver = incref(&drv_self);
+	TRY {
+		slave = (struct ptyslave *)kmalloc(sizeof(struct ptyslave), GFP_NORMAL);
+		_ttydev_init(slave, &ptyslave_ops, &ptyslave_v_oprinter);
+		slave->dv_driver = incref(&drv_self);
+		TRY {
+			/* Initialize objects. */
+			master->fn_mode = S_IFCHR | 0644;
+			slave->fn_mode  = S_IFCHR | 0644;
+			master->fn_uid  = cred_getfsuid();
+			master->fn_gid  = cred_getfsgid();
+			slave->fn_uid   = master->fn_uid;
+			slave->fn_gid   = master->fn_gid;
+
+			/* Link the slave and master against each other. */
+			awref_cinit(&slave->ps_master, master);
+			awref_cinit(&master->pm_slave, slave);
+
+			/* Load user-space provided initializers. */
+			if (termp != NULL)
+				memcpy(&slave->t_term.t_ios, termp, sizeof(struct termios));
+			if (winp != NULL)
+				memcpy(&slave->ps_wsize, termp, sizeof(struct winsize));
+			else {
+				slave->ps_wsize.ws_xpixel = slave->ps_wsize.ws_col = 80;
+				slave->ps_wsize.ws_ypixel = slave->ps_wsize.ws_row = 25;
+			}
+
+			/* Register the 2 devices. */
+			register_pty_pair(master, slave);
+		} EXCEPT {
+			decref_nokill(&drv_self);
+			_ttydev_fini(slave);
+			kfree(slave);
+			RETHROW();
+		}
+	} EXCEPT {
+		decref_nokill(&drv_self);
+		_chrdev_fini(master);
+		kfree(master);
+		RETHROW();
+	}
+	*p_master = master; /* Inherit reference */
+	*p_slave  = slave;  /* Inherit reference */
+}
+
+#else /* CONFIG_USE_NEW_FS */
+
+LOCAL REF struct ptyslave *KCALL pty_slave_alloc(void) {
+	REF struct ptyslave *result;
+	result = CHRDEV_ALLOC(struct ptyslave);
+
 	/* Initialize the underlying TTY-device base layer. */
-	ttydev_cinit(result, &kernel_pty_oprinter);
+	ttydev_cinit(result, &ptyslave_v_oprinter);
+
 	/* Override device operators. */
-	result->cd_type.ct_fini  = &pty_slave_fini;
-	result->cd_type.ct_ioctl = &pty_slave_ioctl;
+	result->cd_type.ct_fini  = &ptyslave_v_fini;
+	result->cd_type.ct_ioctl = &ptyslave_v_ioctl;
+
 	/* Initialize the output buffer. */
 	ringbuffer_cinit(&result->ps_obuf);
 	return result;
 }
 
-LOCAL REF struct pty_master *KCALL pty_master_alloc(void) {
-	REF struct pty_master *result;
-	result = CHRDEV_ALLOC(struct pty_master);
+LOCAL REF struct ptymaster *KCALL pty_master_alloc(void) {
+	REF struct ptymaster *result;
+	result = CHRDEV_ALLOC(struct ptymaster);
+
 	/* Initialize device operators. */
-	result->cd_type.ct_fini        = &pty_master_fini;
-	result->cd_type.ct_read        = &pty_master_read;
-	result->cd_type.ct_write       = &pty_master_write;
-	result->cd_type.ct_ioctl       = &pty_master_ioctl;
-	result->cd_type.ct_stat        = &pty_master_stat;
-	result->cd_type.ct_pollconnect = &pty_master_pollconnect;
-	result->cd_type.ct_polltest    = &pty_master_polltest;
+	result->cd_type.ct_fini        = &ptymaster_v_fini;
+	result->cd_type.ct_read        = &ptymaster_v_read;
+	result->cd_type.ct_write       = &ptymaster_v_write;
+	result->cd_type.ct_ioctl       = &ptymaster_v_ioctl;
+	result->cd_type.ct_stat        = &ptymaster_v_stat;
+	result->cd_type.ct_pollconnect = &ptymaster_v_pollconnect;
+	result->cd_type.ct_polltest    = &ptymaster_v_polltest;
 	return result;
 }
 
 INTDEF void KCALL
-pty_register(struct pty_master *__restrict master,
-             struct pty_slave *__restrict slave)
+pty_register(struct ptymaster *__restrict master,
+             struct ptyslave *__restrict slave)
 		THROWS(E_WOULDBLOCK, E_BADALLOC);
 
 
 /* Allocate a new PTY master/slave pair.
  * Note that the device pair will have already been registered. */
 PUBLIC NONNULL((1, 2)) void KCALL
-pty_alloc(REF struct pty_master **__restrict pmaster,
-          REF struct pty_slave **__restrict pslave,
+pty_alloc(REF struct ptymaster **__restrict pmaster,
+          REF struct ptyslave **__restrict pslave,
           USER CHECKED struct termios const *termp,
           USER CHECKED struct winsize const *winp)
 		THROWS(E_BADALLOC) {
-	REF struct pty_slave *slave;
-	REF struct pty_master *master;
+	REF struct ptyslave *slave;
+	REF struct ptymaster *master;
 	/* Allocate the slave and master control structures. */
 	slave = pty_slave_alloc();
 	TRY {
@@ -379,6 +728,7 @@ pty_alloc(REF struct pty_master **__restrict pmaster,
 	*pslave  = slave;  /* Inherit reference */
 	*pmaster = master; /* Inherit reference */
 }
+#endif /* !CONFIG_USE_NEW_FS */
 
 
 
@@ -396,8 +746,8 @@ DEFINE_SYSCALL5(errno_t, openpty,
                 USER UNCHECKED struct winsize const *, winp) {
 	struct handle temp;
 	fd_t fdmaster, fdslave;
-	REF struct pty_master *master;
-	REF struct pty_slave *slave;
+	REF struct ptymaster *master;
+	REF struct ptyslave *slave;
 	validate_readable_opt(termp, sizeof(*termp));
 	validate_readable_opt(winp, sizeof(*winp));
 	validate_writable_opt(name, 1);
@@ -407,8 +757,19 @@ DEFINE_SYSCALL5(errno_t, openpty,
 	pty_alloc(&master, &slave, termp, winp);
 	FINALLY_DECREF_UNLIKELY(master);
 	FINALLY_DECREF_UNLIKELY(slave);
-	if (name)
+	if (name) {
+#ifdef CONFIG_USE_NEW_FS
+		REF struct fdevfsdirent *devname;
+		device_getname_lock_acquire(master);
+		devname = incref(master->dv_dirent);
+		device_getname_lock_release(master);
+		FINALLY_DECREF_UNLIKELY(devname);
+		sprintf(name, "/dev/%s", devname->fdd_dirent.fd_name);
+#else /* CONFIG_USE_NEW_FS */
 		sprintf(name, "/dev/%s", master->cd_name);
+#endif /* !CONFIG_USE_NEW_FS */
+	}
+
 	temp.h_type = HANDLE_TYPE_CHRDEV;
 	temp.h_mode = IO_RDWR;
 	temp.h_data = master;
@@ -421,11 +782,17 @@ DEFINE_SYSCALL5(errno_t, openpty,
 			ATOMIC_WRITE(*amaster, fdmaster);
 			ATOMIC_WRITE(*aslave, fdslave);
 		} EXCEPT {
-			handle_tryclose_nosym(fdslave, THIS_HANDLE_MANAGER);
+			{
+				NESTED_EXCEPTION;
+				handle_tryclose_nosym(fdslave, THIS_HANDLE_MANAGER);
+			}
 			RETHROW();
 		}
 	} EXCEPT {
-		handle_tryclose_nosym(fdmaster, THIS_HANDLE_MANAGER);
+		{
+			NESTED_EXCEPTION;
+			handle_tryclose_nosym(fdmaster, THIS_HANDLE_MANAGER);
+		}
 		RETHROW();
 	}
 	return -EOK;

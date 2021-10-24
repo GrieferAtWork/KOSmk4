@@ -497,7 +497,7 @@ NOTHROW(KCALL kernel_initialize_null_devices)(void) {
 	for (i = 0; i < COMPILER_LENOF(null_devices); ++i) {
 		TRY {
 			chrdev_register(&null_devices[i],
-			                          chrdev_devno(&null_devices[i]));
+			                          chrdev_getdevno(&null_devices[i]));
 		} EXCEPT {
 			error_printf(FREESTR("Registering character device /dev/%s"),
 			             null_devices[i].cd_name);

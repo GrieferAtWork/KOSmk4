@@ -60,26 +60,31 @@
 
 DECL_BEGIN
 
-PRIVATE NOBLOCK void
+PRIVATE NOBLOCK NONNULL((1, 2, 3)) void
 NOTHROW(KCALL ttybase_log_setsession)(struct ttydev *__restrict self,
                                       struct task *__restrict UNUSED(session),
                                       struct taskpid *__restrict session_pid) {
+	chrdev_getname_lock_acquire(self);
 	printk(KERN_NOTICE "[ctty][+] Assign tty %q as controller for session %u\n",
-	       self->cd_name, taskpid_getrootpid(session_pid));
+	       chrdev_getname(self), taskpid_getrootpid(session_pid));
+	chrdev_getname_lock_release(self);
 }
 
-PRIVATE NOBLOCK void
+PRIVATE NOBLOCK NONNULL((1, 2, 3)) void
 NOTHROW(KCALL ttybase_log_delsession)(struct ttydev *__restrict self,
                                       struct task *__restrict UNUSED(session),
                                       struct taskpid *__restrict session_pid) {
+	chrdev_getname_lock_acquire(self);
 	printk(KERN_NOTICE "[ctty][-] Remove tty %q as controller for session %u\n",
-	       self->cd_name, taskpid_getrootpid(session_pid));
+	       chrdev_getname(self), taskpid_getrootpid(session_pid));
+	chrdev_getname_lock_release(self);
 }
 
 
 
+#ifndef CONFIG_USE_NEW_FS
 /* Initialize a given TTY character device. */
-PUBLIC NOBLOCK void
+PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL ttydev_cinit)(struct ttydev *__restrict self,
                                     pterminal_oprinter_t oprinter) {
 	awref_cinit(&self->t_cproc, NULL);
@@ -94,14 +99,14 @@ NOTHROW(KCALL ttydev_cinit)(struct ttydev *__restrict self,
 	/* Initialize the terminal driver. */
 	terminal_init(&self->t_term,
 	              oprinter,
-	              &kernel_terminal_raise,
-	              &kernel_terminal_check_sigttou);
+	              &__ttydev_v_raise,
+	              &__ttydev_v_chk_sigttou);
 }
+#endif /* !CONFIG_USE_NEW_FS */
 
 
 
-
-LOCAL void KCALL
+PRIVATE NONNULL((1)) void KCALL
 kernel_terminal_check_sigtty(struct terminal *__restrict self,
                              bool is_SIGTTOU) {
 	struct ttydev *term;
@@ -142,9 +147,13 @@ do_try_override_fproc:
 
 		/* 11.1.4 -- Terminal Access Control */
 		if (is_SIGTTOU) {
-			printk(KERN_INFO "[tty:%q] Background process group %p [pgid=%" PRIuN(__SIZEOF_PID_T__) "] tried to write\n",
-			       term->cd_name, awref_ptr(&my_leader_pid->tp_thread),
+			chrdev_getname_lock_acquire(term);
+			printk(KERN_INFO "[tty:%q] Background process group %p "
+			                 "[pgid=%" PRIuN(__SIZEOF_PID_T__) "] tried to write\n",
+			       chrdev_getname(term), awref_ptr(&my_leader_pid->tp_thread),
 			       taskpid_getrootpid(my_leader_pid));
+			chrdev_getname_lock_release(term);
+
 			/* ...  Attempts by a process in a background process group to write to its controlling
 			 * terminal shall cause the process group to be sent a SIGTTOU signal unless one of the
 			 * following special cases applies:
@@ -181,9 +190,13 @@ do_throw_ttou:
 			/* We might get here if `SIGTTOU' is being ignored by the calling thread.
 			 * -> As described by POSIX, allow the process to write in this scenario. */
 		} else {
-			printk(KERN_INFO "[tty:%q] Background process group %p [pgid=%" PRIuN(__SIZEOF_PID_T__) "] tried to read\n",
-			       term->cd_name, my_leader_pid,
+			chrdev_getname_lock_acquire(term);
+			printk(KERN_INFO "[tty:%q] Background process group %p "
+			                 "[pgid=%" PRIuN(__SIZEOF_PID_T__) "] tried to read\n",
+			       chrdev_getname(term), my_leader_pid,
 			       taskpid_getrootpid(my_leader_pid));
+			chrdev_getname_lock_release(term);
+
 			/* ... if the reading process is ignoring or blocking the SIGTTIN signal, or if
 			 * the process group of the reading process isorphaned, the read() shall return
 			 * -1, with errno set to [EIO] and no signal shall be sent. */
@@ -217,15 +230,15 @@ do_throw_ttin:
 }
 
 /* Kernel-level implementations for terminal system operators. */
-PUBLIC ssize_t LIBTERM_CC
-kernel_terminal_check_sigttou(struct terminal *__restrict self) {
+PUBLIC NONNULL((1)) ssize_t LIBTERM_CC
+ttydev_v_chk_sigttou(struct terminal *__restrict self) {
 	kernel_terminal_check_sigtty(self, true);
 	return 0;
 }
 
-PUBLIC ssize_t LIBTERM_CC
-kernel_terminal_raise(struct terminal *__restrict self,
-                      signo_t signo) {
+PUBLIC NONNULL((1)) ssize_t LIBTERM_CC
+ttydev_v_raise(struct terminal *__restrict self,
+               signo_t signo) {
 	REF struct taskpid *fg_pid;
 	struct ttydev *term;
 	term = container_of(self, struct ttydev, t_term);
@@ -246,53 +259,81 @@ kernel_terminal_raise(struct terminal *__restrict self,
 	return 0;
 }
 
-/* Check if the calling thread is allowed to read from `self'
- * This  function must be  called by read-operator overrides! */
-PUBLIC void KCALL
-kernel_terminal_check_sigttin(struct terminal *__restrict self) {
-	kernel_terminal_check_sigtty(self, false);
-}
-
-/* Default character-device read/write  operator implementations  for tty  devices
- * These functions will call forward to `terminal_iread()' and `terminal_owrite()' */
+/* Default tty operators. */
+#ifdef CONFIG_USE_NEW_FS
+PUBLIC NONNULL((1)) size_t KCALL
+ttydev_v_read(struct mfile *__restrict self,
+              USER CHECKED void *dst,
+              size_t num_bytes, iomode_t mode) THROWS(...)
+#else /* CONFIG_USE_NEW_FS */
 PUBLIC NONNULL((1)) size_t KCALL
 ttydev_v_read(struct chrdev *__restrict self,
-                     USER CHECKED void *dst,
-                     size_t num_bytes, iomode_t mode) THROWS(...) {
+              USER CHECKED void *dst,
+              size_t num_bytes, iomode_t mode) THROWS(...)
+#endif /* !CONFIG_USE_NEW_FS */
+{
 	size_t result;
-	struct ttydev *me;
+#ifdef CONFIG_USE_NEW_FS
+	struct ttydev *me = mfile_astty(self);
+	assert(mfile_istty(self));
+#else /* CONFIG_USE_NEW_FS */
+	struct ttydev *me = (struct ttydev *)self;
 	assert(chrdev_istty(self));
-	me = (struct ttydev *)self;
+#endif /* !CONFIG_USE_NEW_FS */
 	kernel_terminal_check_sigtty(&me->t_term, false);
 	result = terminal_iread(&me->t_term, dst, num_bytes, mode);
 	assert(result <= num_bytes);
 	return result;
 }
 
+#ifdef CONFIG_USE_NEW_FS
+PUBLIC NONNULL((1)) size_t KCALL
+ttydev_v_write(struct mfile *__restrict self,
+               USER CHECKED void const *src,
+               size_t num_bytes, iomode_t mode) THROWS(...)
+#else /* CONFIG_USE_NEW_FS */
 PUBLIC NONNULL((1)) size_t KCALL
 ttydev_v_write(struct chrdev *__restrict self,
-                      USER CHECKED void const *src,
-                      size_t num_bytes, iomode_t mode) THROWS(...) {
+               USER CHECKED void const *src,
+               size_t num_bytes, iomode_t mode) THROWS(...)
+#endif /* !CONFIG_USE_NEW_FS */
+{
 	ssize_t result;
-	struct ttydev *me;
+#ifdef CONFIG_USE_NEW_FS
+	struct ttydev *me = mfile_astty(self);
+	assert(mfile_istty(self));
+#else /* CONFIG_USE_NEW_FS */
+	struct ttydev *me = (struct ttydev *)self;
 	assert(chrdev_istty(self));
-	me     = (struct ttydev *)self;
+#endif /* !CONFIG_USE_NEW_FS */
 	result = terminal_owrite(&me->t_term, src, num_bytes, mode);
 	assert((size_t)result <= num_bytes);
 	return (size_t)result;
 }
 
 
+#ifdef CONFIG_USE_NEW_FS
 PUBLIC NOBLOCK NONNULL((1)) void
-NOTHROW(KCALL ttydev_v_fini)(struct chrdev *__restrict self) {
-	struct ttydev *me;
-	me = (struct ttydev *)self;
+NOTHROW(KCALL ttydev_v_destroy)(struct mfile *__restrict self)
+#else /* CONFIG_USE_NEW_FS */
+PUBLIC NOBLOCK NONNULL((1)) void
+NOTHROW(KCALL ttydev_v_fini)(struct chrdev *__restrict self)
+#endif /* !CONFIG_USE_NEW_FS */
+{
+#ifdef CONFIG_USE_NEW_FS
+	struct ttydev *me = mfile_astty(self);
+#else /* CONFIG_USE_NEW_FS */
+	struct ttydev *me = (struct ttydev *)self;
+#endif /* !CONFIG_USE_NEW_FS */
 	assertf(!awref_ptr(&me->t_cproc),
 	        "An session leader should be holding a reference to their CTTY, "
-	        "meaning that if we truely were supposed to be a CTTY, the associated "
-	        "session should have kept us from being destroyed");
+	        "meaning that if we truly were supposed to be a CTTY, the "
+	        "associated session should have kept us from being destroyed");
 	terminal_fini(&me->t_term);
 	axref_fini(&me->t_fproc);
+#ifdef CONFIG_USE_NEW_FS
+	chrdev_v_destroy(self);
+#endif /* CONFIG_USE_NEW_FS */
 }
 
 
@@ -396,12 +437,24 @@ termiox_to_termios(USER CHECKED struct termios *__restrict dst,
 
 
 
-PUBLIC NONNULL((1)) syscall_slong_t KCALL /* @return: -EINVAL: Unsupported `cmd' */
+/* @return: -EINVAL: Unsupported `cmd' */
+#ifdef CONFIG_USE_NEW_FS
+PUBLIC NONNULL((1)) syscall_slong_t KCALL
+_ttydev_tryioctl(struct mfile *__restrict self, syscall_ulong_t cmd,
+                 USER UNCHECKED void *arg, iomode_t UNUSED(mode)) THROWS(...)
+#else /* CONFIG_USE_NEW_FS */
+PUBLIC NONNULL((1)) syscall_slong_t KCALL
 _ttydev_tryioctl(struct chrdev *__restrict self, syscall_ulong_t cmd,
-                        USER UNCHECKED void *arg, iomode_t UNUSED(mode)) THROWS(...) {
-	struct ttydev *me;
+                 USER UNCHECKED void *arg, iomode_t UNUSED(mode)) THROWS(...)
+#endif /* !CONFIG_USE_NEW_FS */
+{
+#ifdef CONFIG_USE_NEW_FS
+	struct ttydev *me = mfile_astty(self);
+	assert(mfile_istty(self));
+#else /* CONFIG_USE_NEW_FS */
+	struct ttydev *me = (struct ttydev *)self;
 	assert(chrdev_istty(self));
-	me = (struct ttydev *)self;
+#endif /* !CONFIG_USE_NEW_FS */
 	switch (cmd) {
 
 	case TCGETS:
@@ -534,8 +587,10 @@ do_TCSETA: {
 			FINALLY_DECREF_UNLIKELY(newthread);
 			newpid = task_getprocessgroupleaderpid_of(newthread);
 		}
+		chrdev_getname_lock_acquire(me);
 		printk(KERN_TRACE "[tty:%q] Set foreground process group to [pgid=%" PRIuN(__SIZEOF_PID_T__) "]\n",
-		       me->cd_name, taskpid_getrootpid(newpid));
+		       chrdev_getname(me), taskpid_getrootpid(newpid));
+		chrdev_getname_lock_release(me);
 		oldpid = axref_xch_inherit(&me->t_fproc, newpid);
 		xdecref(oldpid);
 	}	break;
@@ -767,7 +822,7 @@ do_TCSETX:
 			      E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGNO,
 			      signo);
 		}
-		kernel_terminal_raise(&me->t_term, signo);
+		ttydev_v_raise(&me->t_term, signo);
 	}	break;
 
 	/* XXX: TIOCVHANGUP? */
@@ -885,9 +940,17 @@ done:
 	return 0;
 }
 
+
+#ifdef CONFIG_USE_NEW_FS
+PUBLIC NONNULL((1)) syscall_slong_t KCALL
+ttydev_v_ioctl(struct mfile *__restrict self, syscall_ulong_t cmd,
+               USER UNCHECKED void *arg, iomode_t mode) THROWS(...)
+#else /* CONFIG_USE_NEW_FS */
 PUBLIC NONNULL((1)) syscall_slong_t KCALL
 ttydev_v_ioctl(struct chrdev *__restrict self, syscall_ulong_t cmd,
-                     USER UNCHECKED void *arg, iomode_t mode) THROWS(...) {
+               USER UNCHECKED void *arg, iomode_t mode) THROWS(...)
+#endif /* !CONFIG_USE_NEW_FS */
+{
 	syscall_slong_t result;
 	result = _ttydev_tryioctl(self, cmd, arg, mode);
 	if (result == -EINVAL) {
@@ -898,12 +961,23 @@ ttydev_v_ioctl(struct chrdev *__restrict self, syscall_ulong_t cmd,
 	return result;
 }
 
+#ifdef CONFIG_USE_NEW_FS
+PUBLIC NONNULL((1)) void KCALL
+ttydev_v_pollconnect(struct mfile *__restrict self,
+                     poll_mode_t what) THROWS(...)
+#else /* CONFIG_USE_NEW_FS */
 PUBLIC NONNULL((1)) void KCALL
 ttydev_v_pollconnect(struct chrdev *__restrict self,
-                           poll_mode_t what) THROWS(...) {
-	struct ttydev *me;
+                     poll_mode_t what) THROWS(...)
+#endif /* !CONFIG_USE_NEW_FS */
+{
+#ifdef CONFIG_USE_NEW_FS
+	struct ttydev *me = mfile_astty(self);
+	assert(mfile_istty(self));
+#else /* CONFIG_USE_NEW_FS */
+	struct ttydev *me = (struct ttydev *)self;
 	assert(chrdev_istty(self));
-	me = (struct ttydev *)self;
+#endif /* !CONFIG_USE_NEW_FS */
 	if (what & POLLINMASK)
 		terminal_pollconnect_iread(&me->t_term);
 	if (what & POLLOUTMASK) {
@@ -914,13 +988,24 @@ ttydev_v_pollconnect(struct chrdev *__restrict self,
 	}
 }
 
+#ifdef CONFIG_USE_NEW_FS
+PUBLIC NONNULL((1)) poll_mode_t KCALL
+ttydev_v_polltest(struct mfile *__restrict self,
+                  poll_mode_t what) THROWS(...)
+#else /* CONFIG_USE_NEW_FS */
 PUBLIC NONNULL((1)) poll_mode_t KCALL
 ttydev_v_polltest(struct chrdev *__restrict self,
-                        poll_mode_t what) THROWS(...) {
+                  poll_mode_t what) THROWS(...)
+#endif /* !CONFIG_USE_NEW_FS */
+{
 	poll_mode_t result = 0;
-	struct ttydev *me;
+#ifdef CONFIG_USE_NEW_FS
+	struct ttydev *me = mfile_astty(self);
+	assert(mfile_istty(self));
+#else /* CONFIG_USE_NEW_FS */
+	struct ttydev *me = (struct ttydev *)self;
 	assert(chrdev_istty(self));
-	me = (struct ttydev *)self;
+#endif /* !CONFIG_USE_NEW_FS */
 	if (what & POLLINMASK) {
 		if (terminal_caniread(&me->t_term))
 			result |= POLLINMASK;
@@ -934,12 +1019,24 @@ ttydev_v_polltest(struct chrdev *__restrict self,
 }
 
 
+#ifdef CONFIG_USE_NEW_FS
+PUBLIC NONNULL((1)) void KCALL
+ttydev_v_stat(struct mfile *__restrict self,
+              USER CHECKED struct stat *result) THROWS(...)
+#else /* CONFIG_USE_NEW_FS */
 PUBLIC NONNULL((1)) void KCALL
 ttydev_v_stat(struct chrdev *__restrict self,
-                    USER CHECKED struct stat *result) THROWS(...) {
-	struct ttydev *me;
+              USER CHECKED struct stat *result) THROWS(...)
+#endif /* !CONFIG_USE_NEW_FS */
+{
+#ifdef CONFIG_USE_NEW_FS
+	struct ttydev *me = mfile_astty(self);
+	assert(mfile_istty(self));
+#else /* CONFIG_USE_NEW_FS */
+	struct ttydev *me = (struct ttydev *)self;
 	assert(chrdev_istty(self));
-	me = (struct ttydev *)self;
+#endif /* !CONFIG_USE_NEW_FS */
+
 	/* Try to give user-space an estimate on the number of unread input bytes. */
 	result->st_size = ATOMIC_READ(me->t_term.t_ibuf.rb_avail) +
 	                  ATOMIC_READ(me->t_term.t_ipend.lb_line.lc_size) +
@@ -950,11 +1047,11 @@ ttydev_v_stat(struct chrdev *__restrict self,
  * @param: steal_from_other_session: Allow the terminal to be stolen from another session.
  * @param: override_different_ctty:  If the calling session already had a CTTY assigned, override it.
  * @return: * : One of `TTYDEV_SETCTTY_*' */
-PUBLIC NOBLOCK int
+PUBLIC NOBLOCK NONNULL((1)) int
 NOTHROW(KCALL ttydev_setctty)(struct ttydev *__restrict self,
-                                      bool caller_must_be_leader,
-                                      bool steal_from_other_session,
-                                      bool override_different_ctty) {
+                              bool caller_must_be_leader,
+                              bool steal_from_other_session,
+                              bool override_different_ctty) {
 	struct task *proc;
 	REF struct task *session;
 	struct taskpid *session_pid;
@@ -981,42 +1078,46 @@ again_check_t_cproc_inner:
 				REF struct taskpid *old_cproc;
 				old_cproc = awref_get(&self->t_cproc);
 				if (old_cproc) {
+					REF struct task *old_cproc_task;
 					FINALLY_DECREF_UNLIKELY(old_cproc);
 					if unlikely(old_cproc == session_pid)
 						return TTYDEV_SETCTTY_ALREADY;
 					if (!steal_from_other_session)
 						return TTYDEV_SETCTTY_INUSE;
+
 					/* Change the TTY's session pointer to the new session. */
 					if unlikely(!awref_cmpxch(&self->t_cproc, old_cproc, session_pid))
 						goto again_check_t_cproc_inner;
+
 					/* Set the TTY link of the new session task descriptor. */
 					if unlikely(!axref_cmpxch(&FORTASK(session, this_taskgroup).tg_ctty, old_ctty, self)) {
 						awref_cmpxch(&self->t_cproc, session_pid, old_cproc);
 						goto again_check_tg_ctty;
 					}
-					{
-						/* Delete the TTY link from the old session task descriptor */
-						REF struct task *old_cproc_task;
-						old_cproc_task = taskpid_gettask(old_cproc);
-						if likely(old_cproc_task) {
-							if (axref_cmpxch(&FORTASK(old_cproc_task, this_taskgroup).tg_ctty, self, NULL))
-								ttybase_log_delsession(self, old_cproc_task, old_cproc);
-							decref_unlikely(old_cproc_task);
-						}
+
+					/* Delete the TTY link from the old session task descriptor */
+					old_cproc_task = taskpid_gettask(old_cproc);
+					if likely(old_cproc_task) {
+						if (axref_cmpxch(&FORTASK(old_cproc_task, this_taskgroup).tg_ctty, self, NULL))
+							ttybase_log_delsession(self, old_cproc_task, old_cproc);
+						decref_unlikely(old_cproc_task);
 					}
 					goto remove_from_old_ctty_and_succeed;
 				}
 			}
+
 			/* Change the TTY's session pointer to the new session. */
 			if unlikely(!awref_cmpxch(&self->t_cproc, NULL, session_pid))
 				goto again_check_t_cproc_inner;
+
 			/* Change the calling session's CTTY link to the new TTY */
 			if unlikely(!axref_cmpxch(&FORTASK(session, this_taskgroup).tg_ctty, old_ctty, self)) {
 				awref_cmpxch(&self->t_cproc, session_pid, NULL);
 				goto again_check_tg_ctty;
 			}
-remove_from_old_ctty_and_succeed:
+
 			/* Remove the calling session from the old TTY's session link */
+remove_from_old_ctty_and_succeed:
 			if (awref_cmpxch(&old_ctty->t_cproc, session_pid, NULL))
 				ttybase_log_delsession(old_ctty, session, session_pid);
 			ttybase_log_setsession(self, session, session_pid);
@@ -1034,14 +1135,17 @@ again_check_t_cproc:
 				return TTYDEV_SETCTTY_ALREADY;
 			if (!steal_from_other_session)
 				return TTYDEV_SETCTTY_INUSE;
+
 			/* Change the TTY's session pointer to the new session. */
 			if unlikely(!awref_cmpxch(&self->t_cproc, old_cproc, session_pid))
 				goto again_check_t_cproc;
-				/* Set the TTY link of the new session task descriptor. */
+
+			/* Set the TTY link of the new session task descriptor. */
 			if unlikely(!axref_cmpxch(&FORTASK(session, this_taskgroup).tg_ctty, NULL, self)) {
 				awref_cmpxch(&self->t_cproc, session_pid, old_cproc);
 				goto again_check_tg_ctty;
 			}
+
 			/* Delete the TTY link from the old session task descriptor */
 			old_cproc_task = taskpid_gettask(old_cproc);
 			if likely(old_cproc_task) {
@@ -1053,9 +1157,11 @@ again_check_t_cproc:
 			return TTYDEV_SETCTTY_SUCCESS;
 		}
 	}
+
 	/* Set the TTY's session pointer to the calling session. */
 	if (!awref_cmpxch(&self->t_cproc, NULL, session_pid))
 		goto again_check_t_cproc;
+
 	/* Set the TTY link of the session task descriptor. */
 	if unlikely(!axref_cmpxch(&FORTASK(session, this_taskgroup).tg_ctty, NULL, self)) {
 		awref_cmpxch(&self->t_cproc, FORTASK(session, this_taskpid), NULL);
@@ -1069,10 +1175,10 @@ again_check_t_cproc:
  * @param: old_ctty:  The expected old CTTY, or NULL if the CTTY should always be given up.
  * @param: pold_ctty: When non-NULL, store the old CTTY here upon success.
  * @return: * : One of `TTYDEV_HUPCTTY_*' */
-PUBLIC NOBLOCK int
+PUBLIC NOBLOCK NONNULL((1)) int
 NOTHROW(KCALL ttydev_hupctty)(struct ttydev *required_old_ctty,
-                                      bool caller_must_be_leader,
-                                      REF struct ttydev **pold_ctty) {
+                              bool caller_must_be_leader,
+                              REF struct ttydev **pold_ctty) {
 	struct task *proc;
 	struct taskpid *session_pid;
 	REF struct task *session;

@@ -24,7 +24,11 @@
 
 #ifdef CONFIG_USE_NEW_FS
 #include <kernel/fs/chrdev.h>
-#define chrdev_devno device_getdevno
+#define chrdev_getdevno             device_getdevno
+#define chrdev_getname              device_getname
+#define chrdev_getname_lock_acquire device_getname_lock_acquire
+#define chrdev_getname_lock_release device_getname_lock_release
+
 #else /* CONFIG_USE_NEW_FS */
 #include <kernel/types.h>
 
@@ -161,7 +165,10 @@ chrdev_alloc(struct driver *__restrict owner,
 	((REF T *)chrdev_alloc(&drv_self, sizeof(T), COMPILER_ALIGNOF(T)))
 
 /* Returns the device number of `self', or `DEV_UNSET' if not set. */
-#define chrdev_devno(self) ((self)->cd_devlink.a_vaddr)
+#define chrdev_getdevno(self) ((self)->cd_devlink.a_vaddr)
+#define chrdev_getname(self)  ((self)->cd_name)
+#define chrdev_getname_lock_acquire(self) do{do;__WHILE0
+#define chrdev_getname_lock_release(self) }__WHILE0
 
 /* Lookup  a character device associated with `devno'  and return a reference to it.
  * When no character device is associated that device number, return `NULL' instead. */

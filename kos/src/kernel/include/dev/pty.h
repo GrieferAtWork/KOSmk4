@@ -33,8 +33,6 @@
 
 #include <libbuffer/ringbuffer.h>
 
-DECL_BEGIN
-
 /* PTY device numbers.
  * NOTE: These must only  be used for  drivers allocated by  `openpty()'.
  *       Any other  sub-system  making  use of,  or  extending  upon  PTY
@@ -48,67 +46,113 @@ DECL_BEGIN
 
 
 #ifdef __CC__
+DECL_BEGIN
 
-struct pty_master;
-struct pty_slave;
+struct ptymaster;
+struct ptyslave;
 
-#ifndef __pty_master_awref_defined
-#define __pty_master_awref_defined
-AWREF(pty_master_awref, pty_master);
-#endif /* !__pty_master_awref_defined */
+#ifndef __ptymaster_awref_defined
+#define __ptymaster_awref_defined
+AWREF(ptymaster_awref, ptymaster);
+#endif /* !__ptymaster_awref_defined */
 
-#ifndef __pty_slave_awref_defined
-#define __pty_slave_awref_defined
-AWREF(pty_slave_awref, pty_slave);
-#endif /* !__pty_slave_awref_defined */
+#ifndef __ptyslave_awref_defined
+#define __ptyslave_awref_defined
+AWREF(ptyslave_awref, ptyslave);
+#endif /* !__ptyslave_awref_defined */
 
-struct pty_slave
-#ifdef __cplusplus
-    : ttydev
-#endif /* __cplusplus */
+struct ptyslave
+#ifndef __WANT_FS_INLINE_STRUCTURES
+    : ttydev                          /* The underlying tty device */
+#endif /* !__WANT_FS_INLINE_STRUCTURES */
 {
-#ifndef __cplusplus
-	struct ttydev   ps_base;   /* The underlying base-tty */
-#endif /* !__cplusplus */
-	struct ringbuffer       ps_obuf;   /* Output buffer (use the PTY master to read from this) */
-	WEAK struct winsize     ps_wsize;  /* Terminal window size. */
-	struct pty_master_awref ps_master; /* [0..1] The terminal's master side (cleared when destroyed) */
+#ifdef __WANT_FS_INLINE_STRUCTURES
+	struct ttydev          ps_tty;    /* The underlying tty device */
+#define _ptyslave_astty(x) &(x)->ps_tty
+#define _ptyslave_tty_     ps_tty.
+#else /* __WANT_FS_INLINE_STRUCTURES */
+#define _ptyslave_astty(x) x
+#define _ptyslave_tty_     /* nothing */
+#endif /* !__WANT_FS_INLINE_STRUCTURES */
+	struct ringbuffer      ps_obuf;   /* Output buffer (use the PTY master to read from this) */
+	WEAK struct winsize    ps_wsize;  /* Terminal window size. */
+	struct ptymaster_awref ps_master; /* [0..1] The terminal's master side (cleared when destroyed) */
 };
 
-struct pty_master
+struct ptymaster
 #ifdef __cplusplus
-    : chrdev
+    : chrdev                         /* The underlying character device */
 #endif /* __cplusplus */
 {
-#ifndef __cplusplus
-	struct chrdev pm_base;  /* The underlying base-tty */
-#endif /* !__cplusplus */
-	struct pty_slave_awref  pm_slave; /* [0..1] The terminal's slave side (cleared when destroyed) */
+#ifdef __WANT_FS_INLINE_STRUCTURES
+	struct chrdev          pm_cdev;  /* The underlying character device */
+#define _ptymaster_aschr(x) &(x)->pm_cdev
+#define _ptymaster_chr_     pm_cdev.
+#else /* __WANT_FS_INLINE_STRUCTURES */
+#define _ptymaster_aschr(x) x
+#define _ptymaster_chr_     /* nothing */
+#endif /* !__WANT_FS_INLINE_STRUCTURES */
+	struct ptyslave_awref  pm_slave; /* [0..1] The terminal's slave side (cleared when destroyed) */
 };
 
-/* Check if a given TTY/character device is a `struct pty_slave'. */
-#define ttybase_isapty(self) \
-	((self)->t_term.t_oprint == &kernel_pty_oprinter)
-#define chrdev_ispty(self) \
-	(chrdev_istty(self) && ttybase_isapty((struct ttydev *)(self)))
+#ifdef CONFIG_USE_NEW_FS
 
-/* oprinter callback for `struct pty_slave' tty objects. */
+/* Operators used by `struct ptyslave' */
+DATDEF struct ttydev_ops const ptyslave_ops;
+
+/* Operators used by `struct ptymaster' */
+DATDEF struct chrdev_ops const ptymaster_ops;
+
+/* Helper macros for `struct ptyslave' */
+#define mfile_isptyslave(self)   ((self)->mf_ops == &ptyslave_ops.to_cdev.cdo_dev.do_node.dno_node.no_file)
+#define mfile_asptyslave(self)   ((struct ptyslave *)(self))
+#define fnode_isptyslave(self)   mfile_isptyslave(_fnode_asfile(self))
+#define fnode_asptyslave(self)   mfile_asptyslave(_fnode_asfile(self))
+#define devnode_isptyslave(self) fnode_isptyslave(_fdevnode_asnode(self))
+#define devnode_asptyslave(self) fnode_asptyslave(_fdevnode_asnode(self))
+#define device_isptyslave(self)  devnode_isptyslave(_device_asdevnode(self))
+#define device_asptyslave(self)  devnode_asptyslave(_device_asdevnode(self))
+#define chrdev_isptyslave(self)  device_isptyslave(_chrdev_asdev(self))
+#define chrdev_asptyslave(self)  device_asptyslave(_chrdev_asdev(self))
+#define ttydev_isptyslave(self)  chrdev_isptyslave(_ttydev_aschr(self))
+#define ttydev_asptyslave(self)  chrdev_asptyslave(_ttydev_aschr(self))
+
+/* Helper macros for `struct ptymaster' */
+#define mfile_isptymaster(self)   ((self)->mf_ops == &ptymaster_ops.cdo_dev.do_node.dno_node.no_file)
+#define mfile_asptymaster(self)   ((struct ptymaster *)(self))
+#define fnode_isptymaster(self)   mfile_isptymaster(_fnode_asfile(self))
+#define fnode_asptymaster(self)   mfile_asptymaster(_fnode_asfile(self))
+#define devnode_isptymaster(self) fnode_isptymaster(_fdevnode_asnode(self))
+#define devnode_asptymaster(self) fnode_asptymaster(_fdevnode_asnode(self))
+#define device_isptymaster(self)  devnode_isptymaster(_device_asdevnode(self))
+#define device_asptymaster(self)  devnode_asptymaster(_device_asdevnode(self))
+#define chrdev_isptymaster(self)  device_isptymaster(_chrdev_asdev(self))
+#define chrdev_asptymaster(self)  device_asptymaster(_chrdev_asdev(self))
+
+#else /* CONFIG_USE_NEW_FS */
+
+/* Check if a given TTY/character device is a `struct ptyslave'. */
+#define ttydev_isptyslave(self) ((self)->t_term.t_oprint == &ptyslave_v_oprinter)
+#define chrdev_isptyslave(self) (chrdev_istty(self) && ttydev_isptyslave((struct ttydev *)(self)))
+
+/* oprinter callback for `struct ptyslave' tty objects. */
 FUNDEF ssize_t LIBTERM_CC
-kernel_pty_oprinter(struct terminal *__restrict term,
+ptyslave_v_oprinter(struct terminal *__restrict term,
                     void const *__restrict src,
                     size_t num_bytes, iomode_t mode);
+#endif /* !CONFIG_USE_NEW_FS */
 
 /* Allocate a new PTY master/slave pair.
  * Note that the device pair will have already been registered. */
 FUNDEF NONNULL((1, 2)) void KCALL
-pty_alloc(REF struct pty_master **__restrict pmaster,
-          REF struct pty_slave **__restrict pslave,
+pty_alloc(REF struct ptymaster **__restrict p_master,
+          REF struct ptyslave **__restrict p_slave,
           USER CHECKED struct termios const *termp,
           USER CHECKED struct winsize const *winp)
 		THROWS(E_BADALLOC);
 
-#endif /* __CC__ */
 
 DECL_END
+#endif /* __CC__ */
 
 #endif /* !GUARD_KERNEL_INCLUDE_DEV_PTY_H */

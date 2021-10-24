@@ -163,8 +163,8 @@ mousedev_v_polltest(struct mfile *__restrict self,
  *  - self->_mousedev_chr_ _chrdev_dev_ dv_dirent;                                     # s.a. `device_registerf()'
  *  - self->_mousedev_chr_ _chrdev_dev_ dv_byname_node;                                # s.a. `device_registerf()'
  *  - self->md_rect
- * @param: struct mousedev     *self: Character device to initialize.
- * @param: struct mousedev_ops *ops:  Character device operators. */
+ * @param: struct mousedev     *self: Mouse to initialize.
+ * @param: struct mousedev_ops *ops:  Mouse operators. */
 #define _mousedev_init(self, ops)                          \
 	(___mousedev_assert_ops_(ops)                          \
 	 _chrdev_init(_mousedev_aschr(self), &(ops)->mo_cdev), \

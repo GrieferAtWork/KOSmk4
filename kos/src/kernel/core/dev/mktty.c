@@ -53,9 +53,9 @@
 DECL_BEGIN
 
 PRIVATE ssize_t LIBTERM_CC
-tty_device_oprinter(struct terminal *__restrict term,
-                    void const *__restrict src,
-                    size_t num_bytes, iomode_t mode) {
+mktty_v_oprinter(struct terminal *__restrict term,
+                 void const *__restrict src,
+                 size_t num_bytes, iomode_t mode) {
 	size_t result;
 	struct mkttydev *me;
 	me = container_of(term, struct mkttydev, t_term);
@@ -67,7 +67,7 @@ tty_device_oprinter(struct terminal *__restrict term,
 
 
 PRIVATE NOBLOCK NONNULL((1)) void
-NOTHROW(KCALL tty_device_fini)(struct chrdev *__restrict self) {
+NOTHROW(KCALL mkttydev_v_fini)(struct chrdev *__restrict self) {
 	struct mkttydev *me;
 	me = (struct mkttydev *)self;
 	/* Stop the associated forwarding thread (if one is running) */
@@ -217,8 +217,8 @@ NOTHROW(KCALL mkttydev_stopfwd)(struct mkttydev *__restrict self) {
 
 
 PRIVATE NONNULL((1)) syscall_slong_t KCALL
-tty_device_ioctl(struct chrdev *__restrict self, syscall_ulong_t cmd,
-                 USER UNCHECKED void *arg, iomode_t mode) THROWS(...) {
+mkttydev_v_ioctl(struct chrdev *__restrict self, syscall_ulong_t cmd,
+              USER UNCHECKED void *arg, iomode_t mode) THROWS(...) {
 	struct mkttydev *me;
 	me = (struct mkttydev *)self;
 	switch (cmd) {
@@ -301,8 +301,8 @@ predict_output_device_command:
 
 
 PRIVATE NONNULL((1, 2)) void KCALL
-tty_device_mmap(struct chrdev *__restrict self,
-                struct handle_mmap_info *__restrict info)
+mkttydev_v_mmap(struct chrdev *__restrict self,
+             struct handle_mmap_info *__restrict info)
 		THROWS(...) {
 	struct mkttydev *me;
 	me = (struct mkttydev *)self;
@@ -339,13 +339,12 @@ mkttydev_alloc(uintptr_half_t ihandle_typ, void *ihandle_ptr,
 	assert(ihandle_typ < HANDLE_TYPE_COUNT);
 	assert(ohandle_typ < HANDLE_TYPE_COUNT);
 	result = CHRDEV_ALLOC(struct mkttydev);
-	ttydev_cinit(result, &tty_device_oprinter);
-	result->cd_type.ct_fini        = &tty_device_fini;
-	result->cd_type.ct_write       = &ttydev_v_write;
+	ttydev_cinit(result, &mktty_v_oprinter);
+	result->cd_type.ct_fini        = &mkttydev_v_fini;
 	result->cd_type.ct_pollconnect = &mkttydev_v_pollconnect;
 	result->cd_type.ct_polltest    = &mkttydev_v_polltest;
-	result->cd_type.ct_ioctl       = &tty_device_ioctl;
-	result->cd_type.ct_mmap        = &tty_device_mmap;
+	result->cd_type.ct_ioctl       = &mkttydev_v_ioctl;
+	result->cd_type.ct_mmap        = &mkttydev_v_mmap;
 	result->mtd_ihandle_typ          = ihandle_typ;
 	result->mtd_ohandle_typ          = ohandle_typ;
 	result->mtd_ihandle_ptr          = ihandle_ptr;

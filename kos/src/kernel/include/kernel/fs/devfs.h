@@ -27,6 +27,7 @@
 #else /* !CONFIG_USE_NEW_FS */
 #include <kernel/fs/devnode.h>
 #include <kernel/fs/dirent.h>
+#include <kernel/fs/super.h>
 #include <kernel/types.h>
 
 #include <hybrid/sequence/rbtree.h>
@@ -103,7 +104,7 @@ struct device
 	 * >> decref(somedev);
 	 * >> // At this point, the device will lazily unload itself. */
 	REF struct driver       *dv_driver;      /* [1..1][const] The kernel driver implementing this device. */
-	REF struct fdevfsdirent *dv_dirent;      /* [1..1][lock(:devfs_byname_lock)][const_if(wasdestroyed(this))]
+	REF struct fdevfsdirent *dv_dirent;      /* [1..1][lock(:devfs_byname_lock + _MFILE_F_SMP_TSLOCK)][const_if(wasdestroyed(this))]
 	                                          * Device directory entry (including its name) */
 	RBTREE_NODE(device)      dv_byname_node; /* [lock(:devfs_byname_lock)] By-name tree of devfs devices.
 	                                          * When `.rb_lhs == DEVICE_BYNAME_DELETED', then this  entry
@@ -136,10 +137,19 @@ NOTHROW(KCALL device_v_destroy)(struct mfile *__restrict self);
 	_fdevnode_assert_ops_(&(ops)->do_node)
 
 /* Return a pointer to the name of the given devfs device node.
- * NOTE: The caller must be holding a lock to `devfs_byname_lock'! */
+ * NOTE: The caller must be holding a lock to `devfs_byname_lock' or `_MFILE_F_SMP_TSLOCK'! */
 #define device_getname(self)    ((self)->dv_dirent->fdd_dirent.fd_name)
 #define device_getnamelen(self) ((self)->dv_dirent->fdd_dirent.fd_namelen)
 #define device_getdevno(self)   ((self)->_device_devnode_ dn_devno)
+
+/* Helpers for acquiring a non-blocking SMP-lock for `device_getname()' */
+#define device_getname_lock_acquire      mfile_tslock_acquire
+#define device_getname_lock_release      mfile_tslock_release
+#define device_getname_lock_acquire_nopr mfile_tslock_acquire_nopr
+#define device_getname_lock_release_nopr mfile_tslock_release_nopr
+#define device_getname_lock_acquire_br   mfile_tslock_acquire_br
+#define device_getname_lock_release_br   mfile_tslock_release_br
+#define device_getname_lock_tryacquire   mfile_tslock_tryacquire
 
 
 #ifndef __realtime_defined
@@ -286,6 +296,14 @@ device_tryregister(struct device *__restrict self)
 FUNDEF NONNULL((1)) void FCALL
 device_register(struct device *__restrict self)
 		THROWS(E_WOULDBLOCK);
+
+/* The following are used internally to implement `device_register()' */
+FUNDEF void FCALL _device_register_lock_acquire(__BOOL allnodes) THROWS(E_WOULDBLOCK);
+FUNDEF NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) __BOOL
+NOTHROW(FCALL _device_register_inuse_name)(char const *__restrict name, u16 len);
+FUNDEF NOBLOCK ATTR_PURE WUNUSED __BOOL
+NOTHROW(FCALL _device_register_inuse_ino)(ino_t ino);
+FUNDEF NOBLOCK void NOTHROW(FCALL _device_register_lock_release)(__BOOL allnodes);
 
 
 /* Helper wrapper for `device_register()' that sets a custom device name, and initialize:

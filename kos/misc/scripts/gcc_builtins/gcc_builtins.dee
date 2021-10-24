@@ -350,7 +350,7 @@ local gccReleaseCommits: {(string, (int,int,int))...} = {
 	("cf873f20399b64bfa0ea8c15d8d3104f7a72827f", (2, 97, 0)),
 	/* builtins.def didn't exist in earlier versions...
 	 * Also: The absurdly small # of builtins at this point leads me
-	 *       to believe that this point  truely is the inception  of
+	 *       to believe that  this point truly  is the inception  of
 	 *       GCC's __builtin_* system. */
 //	("f7aefc28b8c9f42684b5af4f68ad990a8c169cbf", (2, 96,  0)),
 //	("4818dc3c9883db1c1f87f3dbf947e54a1f5ec0bb", (2, 93, 22)),

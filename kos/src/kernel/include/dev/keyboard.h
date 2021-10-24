@@ -202,8 +202,8 @@ kbddev_v_polltest(struct mfile *__restrict self,
  *  - self->_kbddev_chr_ _chrdev_dev_ dv_driver;                                     # As `incref(drv_self)'
  *  - self->_kbddev_chr_ _chrdev_dev_ dv_dirent;                                     # s.a. `device_registerf()'
  *  - self->_kbddev_chr_ _chrdev_dev_ dv_byname_node;                                # s.a. `device_registerf()'
- * @param: struct kbddev     *self: Character device to initialize.
- * @param: struct kbddev_ops *ops:  Character device operators. */
+ * @param: struct kbddev     *self: Keyboard to initialize.
+ * @param: struct kbddev_ops *ops:  Keyboard operators. */
 #define _kbddev_init(self, ops)                          \
 	(___kbddev_assert_ops_(ops)                          \
 	 _chrdev_init(_kbddev_aschr(self), &(ops)->ko_cdev), \
