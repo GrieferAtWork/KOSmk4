@@ -272,10 +272,10 @@ PUBLIC ATTR_PERCPU struct task *thiscpu_sched_current = NULL;
 
 /* [lock(PRIVATE(THIS_CPU))] The scheduler for the associated CPU */
 PUBLIC ATTR_PERCPU struct scheduler thiscpu_scheduler = {
-	/* .s_running      = */ LIST_HEAD_INITIALIZER(thiscpu_scheduler.s_running),
-	/* .s_running_last = */ NULL,
-	/* .s_runcount     = */ 1,
-	/* .s_waiting_last = */ NULL
+	.s_running      = LIST_HEAD_INITIALIZER(thiscpu_scheduler.s_running),
+	.s_running_last = NULL,
+	.s_runcount     = 1,
+	.s_waiting_last = NULL
 };
 
 /* [0..1][lock(PRIVATE(THIS_CPU))]

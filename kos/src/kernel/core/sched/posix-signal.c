@@ -87,9 +87,9 @@ STATIC_ASSERT_MSG(NSIG - 1 <= 0xff,
 
 /* An empty signal mask used to initialize `this_kernel_sigmask' */
 PUBLIC struct kernel_sigmask kernel_sigmask_empty = {
-	/* .sm_refcnt = */ 2,
-	/* .sm_share  = */ 2,
-	/* .sm_mask   = */ { { 0 } }
+	.sm_refcnt = 2,
+	.sm_share  = 2,
+	.sm_mask   = {{ 0 }}
 };
 
 
@@ -100,9 +100,9 @@ PUBLIC struct kernel_sigmask kernel_sigmask_empty = {
 
 /* A full signal mask (i.e. one that blocks all signals (except for SIGKILL and SIGSTOP)) */
 PUBLIC struct kernel_sigmask kernel_sigmask_full = {
-	/* .sm_refcnt = */ 2,
-	/* .sm_share  = */ 2,
-	/* .sm_mask   = */ {{
+	.sm_refcnt = 2,
+	.sm_share  = 2,
+	.sm_mask   = {{
 /*[[[deemon
 
 // Supported values for various signal constants

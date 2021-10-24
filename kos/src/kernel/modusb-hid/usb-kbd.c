@@ -433,7 +433,7 @@ NOTHROW(KCALL usb_keyboard_fini)(struct chrdev *__restrict self) {
 }
 
 PRIVATE struct kbddev_ops const usb_keyboard_ops = {
-	/* .ko_setleds = */ NULL /* TODO */
+	.ko_setleds = NULL /* TODO */
 };
 
 

@@ -282,10 +282,10 @@ NOTHROW(FCALL dmesg_sink_impl)(struct syslog_sink *__restrict UNUSED(self),
  * This sink is part of the default set of syslog sinks, alongside
  * the    optional,    arch-specific    `ARCH_DEFAULT_SYSLOG_SINK' */
 PUBLIC struct syslog_sink dmesg_sink = {
-	/* .ss_refcnt = */ 2, /* +1: dmesg_sink, +1: default_syslog_sink_array */
-	/* .ss_levels = */ (uintptr_t)-1,
-	/* .ss_sink   = */ &dmesg_sink_impl,
-	/* .ss_fini   = */ NULL
+	.ss_refcnt = 2, /* +1: dmesg_sink, +1: default_syslog_sink_array */
+	.ss_levels = (uintptr_t)-1,
+	.ss_sink   = &dmesg_sink_impl,
+	.ss_fini   = NULL,
 };
 
 /* While running  the builtin  debugger, don't  write log  messages to  dmesg.

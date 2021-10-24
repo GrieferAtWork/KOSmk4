@@ -290,7 +290,7 @@ fs_getcwd(struct fs *__restrict self) THROWS(E_WOULDBLOCK);
 FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct path *FCALL
 fs_getroot(struct fs *__restrict self) THROWS(E_WOULDBLOCK);
 
-EIDECLARE(ATTR_PURE WUNUSED, atflag_t, NOTHROW, FCALL, fs_atflags, (atflag_t atflags), (atflags), {
+EIDECLARE(ATTR_PURE WUNUSED,atflag_t,NOTHROW,FCALL,fs_atflags,(atflag_t atflags),{
 	fs_mask_t mask;
 	mask.f_mode = atomic64_read(&THIS_FS->fs_mode.f_atom);
 	return (atflags & mask.f_atmask) | mask.f_atflag;

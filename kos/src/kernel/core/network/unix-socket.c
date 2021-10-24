@@ -478,10 +478,22 @@ UnixSocket_GetName(UnixSocket *__restrict self,
 		bufsize = 0;
 	/* Print and return the bound path.
 	 * NOTE: `path_sprintent()' always returns to include the trailing NUL-byte! */
+#ifdef CONFIG_USE_NEW_FS
+	{
+		REF struct path *root = fs_getroot(THIS_FS);
+		FINALLY_DECREF_UNLIKELY(root);
+		result = path_sprintent(self->us_nodepath,
+		                        self->us_nodename->de_name,
+		                        self->us_nodename->de_namelen,
+		                        addr->sun_path, bufsize,
+		                        fs_atflags(0), root);
+	}
+#else /* CONFIG_USE_NEW_FS */
 	result = path_sprintent(addr->sun_path, bufsize,
 	                        self->us_nodepath,
 	                        self->us_nodename->de_name,
 	                        self->us_nodename->de_namelen);
+#endif /* !CONFIG_USE_NEW_FS */
 	/* Account for the path-offset. */
 	result += offsetof(struct sockaddr_un, sun_path);
 	return result;
@@ -1822,33 +1834,26 @@ again:
 
 /* Socket operators for UDP sockets. */
 PUBLIC struct socket_ops unix_socket_ops = {
-	/* .so_family      = */ AF_UNIX,
-	/* .so_fini        = */ &UnixSocket_Fini,
-	/* .so_pollconnect = */ &UnixSocket_PollConnect,
-	/* .so_polltest    = */ &UnixSocket_PollTest,
-	/* .so_getsockname = */ &UnixSocket_GetSockName,
-	/* .so_getpeername = */ &UnixSocket_GetPeerName,
-	/* .so_bind        = */ &UnixSocket_Bind,
-	/* .so_connect     = */ &UnixSocket_Connect,
-	/* .so_send        = */ NULL,
-	/* .so_sendv       = */ &UnixSocket_Sendv,
-	/* .so_sendto      = */ NULL,
-	/* .so_sendtov     = */ NULL,
-	/* .so_recv        = */ NULL,
-	/* .so_recvv       = */ &UnixSocket_Recvv,
-	/* .so_recvfrom    = */ NULL,
-	/* .so_recvfromv   = */ NULL,
-	/* .so_listen      = */ &UnixSocket_Listen,
-	/* .so_accept      = */ &UnixSocket_Accept,
-	/* .so_shutdown    = */ &UnixSocket_Shutdown,
-	/* .so_getsockopt  = */ &UnixSocket_GetSockOpt,
-	/* .so_setsockopt  = */ NULL, /* XXX: Implement me? */
-	/* .so_ioctl       = */ NULL, /* XXX: Implement me? */
-	/* .so_free        = */ NULL,
-	/* .so_getrcvbuf   = */ &UnixSocket_GetRcvBuf,
-	/* .so_setrcvbuf   = */ &UnixSocket_SetRcvBuf,
-	/* .so_getsndbuf   = */ &UnixSocket_GetSndBuf,
-	/* .so_setsndbuf   = */ &UnixSocket_SetSndBuf,
+	.so_family      = AF_UNIX,
+	.so_fini        = &UnixSocket_Fini,
+	.so_pollconnect = &UnixSocket_PollConnect,
+	.so_polltest    = &UnixSocket_PollTest,
+	.so_getsockname = &UnixSocket_GetSockName,
+	.so_getpeername = &UnixSocket_GetPeerName,
+	.so_bind        = &UnixSocket_Bind,
+	.so_connect     = &UnixSocket_Connect,
+	.so_sendv       = &UnixSocket_Sendv,
+	.so_recvv       = &UnixSocket_Recvv,
+	.so_listen      = &UnixSocket_Listen,
+	.so_accept      = &UnixSocket_Accept,
+	.so_shutdown    = &UnixSocket_Shutdown,
+	.so_getsockopt  = &UnixSocket_GetSockOpt,
+	.so_setsockopt  = NULL, /* XXX: Implement me? */
+	.so_ioctl       = NULL, /* XXX: Implement me? */
+	.so_getrcvbuf   = &UnixSocket_GetRcvBuf,
+	.so_setrcvbuf   = &UnixSocket_SetRcvBuf,
+	.so_getsndbuf   = &UnixSocket_GetSndBuf,
+	.so_setsndbuf   = &UnixSocket_SetSndBuf,
 };
 
 

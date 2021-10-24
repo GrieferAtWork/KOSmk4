@@ -83,14 +83,14 @@ DATDEF struct cpu *cpu_vector_[CONFIG_MAX_CPU_COUNT] ASMNAME("cpu_vector");
 /* Saved GDT register.
  * usually: { (SEGMENT_COUNT * SIZEOF_SEGMENT_DESCRIPTOR) - 1, thiscpu_x86_gdt } */
 PUBLIC ATTR_PERCPU struct desctab thiscpu_x86_saved_gdtr = {
-	/* .dt_limit = */ sizeof(bootcpu_x86_gdt) - 1,
-	/* .dt_base  = */ (uintptr_t)bootcpu_x86_gdt
+	.dt_limit = sizeof(bootcpu_x86_gdt) - 1,
+	.dt_base  = (uintptr_t)bootcpu_x86_gdt
 };
 
 /* Saved IDT register. (usually `x86_idt_ptr') */
 PUBLIC ATTR_PERCPU struct desctab thiscpu_x86_saved_idtr = {
-	/* .dt_limit = */ sizeof(x86_idt) - 1,
-	/* .dt_base  = */ (uintptr_t)x86_idt
+	.dt_limit = sizeof(x86_idt) - 1,
+	.dt_base  = (uintptr_t)x86_idt
 };
 
 /* Saved LDT register. (usually `SEGMENT_CPU_LDT') */
@@ -118,7 +118,7 @@ INTERN ATTR_FREEBSS volatile u8 cpu_offline_mask[CEILDIV(CONFIG_MAX_CPU_COUNT, 8
 #define CPU_ALL_ONLINE  (ATOMIC_READ(*(u16 const *)cpu_offline_mask) == 0)
 #elif CEILDIV(CONFIG_MAX_CPU_COUNT, 8) == 4
 #define CPU_ALL_ONLINE  (ATOMIC_READ(*(u32 const *)cpu_offline_mask) == 0)
-#else
+#else /* ... */
 LOCAL bool KCALL all_all_cpus_online(void) {
 	unsigned int i;
 	for (i = 0; i < COMPILER_LENOF(cpu_offline_mask); ++i)
@@ -127,7 +127,7 @@ LOCAL bool KCALL all_all_cpus_online(void) {
 	return true;
 }
 #define CPU_ALL_ONLINE   all_all_cpus_online()
-#endif
+#endif /* !... */
 
 INTDEF FREE void NOTHROW(KCALL x86_calibrate_boottsc)(void);
 INTDEF FREE void NOTHROW(KCALL x86_altcore_entry)(void);

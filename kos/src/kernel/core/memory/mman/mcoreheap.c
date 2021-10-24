@@ -91,8 +91,8 @@ STATIC_ASSERT(sizeof(struct mcorepage) <= PAGESIZE);
 
 /* The initial mem-core page. (needed to kick-start the mem-core system) */
 PRIVATE ATTR_ALIGNED(PAGESIZE) struct mcorepage _mcore_initpage = {
-	/* .mcp_link = */ { NULL, &mcoreheap_freelist.lh_first },
-	/* .mcp_used = */ { 0, },
+	.mcp_link = { NULL, &mcoreheap_freelist.lh_first },
+	.mcp_used = { 0, },
 	/* ... */
 };
 

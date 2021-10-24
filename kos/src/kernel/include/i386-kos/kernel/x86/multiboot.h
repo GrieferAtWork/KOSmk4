@@ -294,13 +294,13 @@ struct mb2_header {
 			u32 header_length; /* Total header length.  */
 			u32 checksum;      /* The above fields plus this one must equal 0 mod 2^32. */
 		};
-#else
+#else /* __SIZEOF_POINTER__ >= 8 */
 		struct ATTR_PACKED {
 			u32 header_length; /* Total header length.  */
 			u32 checksum;      /* The above fields plus this one must equal 0 mod 2^32. */
 		};
 		u64 header_length_and_checksum;
-#endif
+#endif /* __SIZEOF_POINTER__ < 8 */
 	};
 };
 

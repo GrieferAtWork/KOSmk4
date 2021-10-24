@@ -334,7 +334,7 @@ NOTHROW(LOCKOP_CC fnode_remove_from_allnodes_lop)(struct lockop *__restrict self
 
 /* Deletion implementation for file-nodes. */
 PRIVATE NOBLOCK NONNULL((1)) void
-NOTHROW(LOCKOP_CC fnode_delete_impl)(REF struct fnode *__restrict self) {
+NOTHROW(LOCKOP_CC fnode_delete_from_all_impl)(REF struct fnode *__restrict self) {
 	/* Try to remove the node from the global list of all nodes. */
 again_unbind_allnodes:
 	COMPILER_READ_BARRIER();
@@ -352,6 +352,7 @@ again_unbind_allnodes:
 			self->_mf_lop.lo_func = &fnode_remove_from_allnodes_lop;
 			lockop_enqueue(&fallnodes_lockops, &self->_mf_lop);
 			_fallnodes_reap();
+			return;
 		}
 	}
 
@@ -373,7 +374,7 @@ NOTHROW(LOCKOP_CC fsuper_clearnodes_postlop)(Tobpostlockop(fsuper) *__restrict s
 	while (me->fs_root._mf_delfnodes) {
 		REF struct fnode *node    = me->fs_root._mf_delfnodes;
 		me->fs_root._mf_delfnodes = node->_mf_delfnodes;
-		fnode_delete_impl(node); /* This inherits the reference for us! */
+		fnode_delete_from_all_impl(node); /* This inherits the reference for us! */
 	}
 
 	/* Finalize deletion of the superblock by deleting the mfile backing its root directory. */
@@ -442,7 +443,7 @@ NOTHROW(LOCKOP_CC fsuper_clear_changed_postlop)(Tobpostlockop(fsuper) *__restric
 	while (me->fs_root._mf_delfnodes) {
 		REF struct fnode *node    = me->fs_root._mf_delfnodes;
 		me->fs_root._mf_delfnodes = node->_mf_delfnodes;
-		fnode_delete_impl(node); /* This inherits the reference for us! */
+		fnode_delete_from_all_impl(node); /* This inherits the reference for us! */
 	}
 
 	/* Set `me->fs_nodes = FSUPER_NODES_DELETED' */
@@ -546,8 +547,6 @@ NOTHROW(LOCKOP_CC fsuper_delete_remove_from_all_lop)(struct lockop *__restrict s
  * required locks become available... */
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL fsuper_delete)(struct fsuper *__restrict self) {
-	uintptr_t old_flags;
-
 	/* Check for special case: singleton filesystems mustn't be marked as DELETED */
 	if (self->fs_sys->ffs_flags & FFILESYS_F_SINGLE)
 		return;

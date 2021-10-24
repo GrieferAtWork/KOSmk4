@@ -40,8 +40,8 @@ DECL_BEGIN
 
 /* Empty network peer address list. */
 PUBLIC struct net_peeraddrs net_peeraddrs_empty = {
-	/* .npa_refcnt = */ 1, /* +1: net_peeraddrs_empty */
-	/* .npa_count  = */ 0
+	.nps_refcnt = 1, /* +1: net_peeraddrs_empty */
+	.nps_count  = 0,
 };
 
 

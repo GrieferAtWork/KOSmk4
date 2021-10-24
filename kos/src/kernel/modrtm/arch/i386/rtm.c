@@ -1564,9 +1564,9 @@ rtm_failure:
 }
 
 INTERN struct mrtm_driver_hooks rtm_hooks = {
-	/* .rdh_driver = */ &drv_self,
-	/* .rdh_hooks  = */ {
-		/* .rh_xbegin = */ &x86_emulate_xbegin
+	.rdh_driver = &drv_self,
+	.rdh_hooks  = {
+		.rh_xbegin = &x86_emulate_xbegin
 	}
 };
 

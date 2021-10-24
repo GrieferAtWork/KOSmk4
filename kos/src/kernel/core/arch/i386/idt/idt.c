@@ -101,8 +101,8 @@ PUBLIC ATTR_HOTDATA struct idt_segment x86_idt[256] = {
 };
 
 PUBLIC_CONST ATTR_COLDRODATA struct desctab const x86_idt_ptr = {
-	/* .dt_limit = */ sizeof(x86_idt) - 1,
-	/* .dt_base  = */ (uintptr_t)x86_idt
+	.dt_limit = sizeof(x86_idt) - 1,
+	.dt_base  = (uintptr_t)x86_idt
 };
 
 
@@ -117,8 +117,8 @@ PUBLIC ATTR_COLDDATA struct idt_segment x86_dbgidt[256] = {
 };
 
 PUBLIC_CONST ATTR_COLDRODATA struct desctab const x86_dbgidt_ptr = {
-	/* .dt_limit = */ sizeof(x86_dbgidt) - 1,
-	/* .dt_base  = */ (uintptr_t)x86_dbgidt
+	.dt_limit = sizeof(x86_dbgidt) - 1,
+	.dt_base  = (uintptr_t)x86_dbgidt
 };
 
 #ifndef CONFIG_NO_SMP
@@ -129,8 +129,8 @@ PUBLIC ATTR_COLDDATA struct idt_segment x86_dbgaltcoreidt[256] = {
 };
 
 PUBLIC_CONST ATTR_COLDRODATA struct desctab const x86_dbgaltcoreidt_ptr = {
-	/* .dt_limit = */ sizeof(x86_dbgaltcoreidt) - 1,
-	/* .dt_base  = */ (uintptr_t)x86_dbgaltcoreidt
+	.dt_limit = sizeof(x86_dbgaltcoreidt) - 1,
+	.dt_base  = (uintptr_t)x86_dbgaltcoreidt
 };
 #endif /* !CONFIG_NO_SMP */
 #endif /* !CONFIG_NO_DEBUGGER */

@@ -82,11 +82,11 @@ DECL_BEGIN
 
 
 PUBLIC ATTR_PERTASK struct read_locks this_read_locks = {
-	/* .rls_sbuf = */ { },
-	/* .rls_use  = */ 0,
-	/* .rls_cnt  = */ 0,
-	/* .rls_msk  = */ CONFIG_TASK_STATIC_READLOCKS - 1,
-	/* .rls_vec  = */ NULL /* Set in `readlocks_init()' */
+	.rls_sbuf = { },
+	.rls_use  = 0,
+	.rls_cnt  = 0,
+	.rls_msk  = CONFIG_TASK_STATIC_READLOCKS - 1,
+	.rls_vec  = NULL /* Set in `readlocks_init()' */
 };
 
 DEFINE_PERTASK_INIT(pertask_readlocks_init);

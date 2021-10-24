@@ -25,6 +25,13 @@
 #ifdef CONFIG_USE_NEW_FS
 #include <kernel/fs/dirhandle.h>
 #include <kernel/fs/filehandle.h>
+
+#define f_refcnt fh_refcnt
+#define f_node   fh_file
+#define f_path   fh_path
+#define f_dirent fh_dirent
+#define f_offset fh_offset
+
 #else /* CONFIG_USE_NEW_FS */
 #include <kernel/types.h>
 #include <sched/atomic64.h>

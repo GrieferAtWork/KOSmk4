@@ -227,12 +227,7 @@ mfile_sync(struct mfile *__restrict self)
 }
 
 
-PUBLIC_CONST struct mfile_ops const mfile_ndef_ops = {
-	/* .mo_destroy    = */ NULL,
-	/* .mo_initpart   = */ NULL,
-	/* .mo_loadblocks = */ NULL,
-	/* .mo_saveblocks = */ NULL,
-};
+PUBLIC_CONST struct mfile_ops const mfile_ndef_ops = { NULL, };
 PUBLIC struct mfile mfile_ndef = MFILE_INIT_ANON(&mfile_ndef_ops, PAGESHIFT);
 
 
@@ -367,12 +362,9 @@ NOTHROW(KCALL mfile_zero_loadblocks)(struct mfile *__restrict UNUSED(self),
 
 
 PUBLIC_CONST struct mfile_ops const mfile_anon_ops[BITSOF(void *)] = {
-#define INIT_ANON_OPS(i)                                    \
-	{                                                       \
-		/* .mo_destroy    = */ NULL,                        \
-		/* .mo_initpart   = */ NULL,                        \
-		/* .mo_loadblocks = */ ANON_LOADBLOCKS_CALLBACK(i), \
-		/* .mo_saveblocks = */ NULL,                        \
+#define INIT_ANON_OPS(i)                             \
+	{                                                \
+		.mo_loadblocks = ANON_LOADBLOCKS_CALLBACK(i) \
 	}
 	INIT_ANON_OPS(0),
 	INIT_ANON_OPS(1),

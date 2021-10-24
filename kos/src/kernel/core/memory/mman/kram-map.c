@@ -76,9 +76,7 @@ mfile_dbgheap_loadblocks(struct mfile *__restrict UNUSED(self),
 
 
 PUBLIC_CONST struct mfile_ops const mfile_dbgheap_ops = {
-	/* .mo_destroy    = */ NULL,
-	/* .mo_initpart   = */ NULL,
-	/* .mo_loadblocks = */ &mfile_dbgheap_loadblocks,
+	.mo_loadblocks = &mfile_dbgheap_loadblocks,
 };
 
 /* Special file used to initialize debug-heap memory. */

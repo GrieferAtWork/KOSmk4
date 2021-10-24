@@ -145,8 +145,8 @@ INTDEF struct driver_state empty_driver_state;
 DEFINE_INTERN_ALIAS(empty_driver_state, callback_list_empty);
 
 PUBLIC struct callback_list_struct callback_list_empty = {
-	/* .cl_refcnt  = */ 2, /* +1: empty_driver_state, +1: current_driver_state */
-	/* .cl_count   = */ 0
+	.cl_refcnt = 2, /* +1: empty_driver_state, +1: current_driver_state */
+	.cl_count  = 0,
 };
 
 DECL_END

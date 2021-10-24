@@ -626,10 +626,8 @@ NOTHROW(FCALL tohex)(byte_t nibble) {
 
 
 PRIVATE struct cprinter const lenprinter = {
-	/* .cp_printer    = */ &format_length,
-	/* .cp_arg        = */ NULL,
-	/* .cp_format     = */ NULL,
-	/* .cp_format_arg = */ NULL,
+	.cp_printer = &format_length,
+	.cp_format  = NULL,
 };
 
 

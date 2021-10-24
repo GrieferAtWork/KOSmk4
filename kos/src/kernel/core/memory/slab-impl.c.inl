@@ -46,12 +46,12 @@ DECL_BEGIN
 #define SEGMENTS(s)     ((struct FUNC(segment) *)((byte_t *)(s) + SEGMENT_OFFSET))
 
 INTERN struct slab_descriptor DESC = {
-	/* .sd_lock = */ ATOMIC_LOCK_INIT,
-	/* .sd_free = */ NULL,
+	.sd_lock = ATOMIC_LOCK_INIT,
+	.sd_free = NULL,
 #ifdef CONFIG_TRACE_MALLOC
-	/* .sd_used = */ NULL,
+	.sd_used = NULL,
 #endif /* CONFIG_TRACE_MALLOC */
-	/* .sd_pend = */ NULL
+	.sd_pend = NULL,
 };
 
 struct FUNC(segment) {

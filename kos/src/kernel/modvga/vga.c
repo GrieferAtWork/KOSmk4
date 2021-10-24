@@ -1101,19 +1101,17 @@ NOTHROW(LIBANSITTY_CC VGA_FillCell)(struct ansitty *__restrict self,
 
 
 PRIVATE struct ansitty_operators const vga_ansi_operators = {
-	/* .ato_putc         = */ &VGA_Putc,
-	/* .ato_setcursor    = */ &VGA_SetCursor,
-	/* .ato_getcursor    = */ &VGA_GetCursor,
-	/* .ato_getsize      = */ &VGA_GetSize,
-	/* .ato_copycell     = */ &VGA_CopyCell,
-	/* .ato_fillcell     = */ &VGA_FillCell,
-	/* .ato_scroll       = */ NULL, /* TODO */
-	/* .ato_cls          = */ NULL, /* TODO */
-	/* .ato_el           = */ NULL, /* TODO */
-	/* .ato_setcolor     = */ NULL,
-	/* .ato_setattrib    = */ NULL,
-	/* .ato_setttymode   = */ &VGA_SetTTYMode,
-	/* .ato_scrollregion = */ &VGA_SetScrollRegion,
+	.ato_putc         = &VGA_Putc,
+	.ato_setcursor    = &VGA_SetCursor,
+	.ato_getcursor    = &VGA_GetCursor,
+	.ato_getsize      = &VGA_GetSize,
+	.ato_copycell     = &VGA_CopyCell,
+	.ato_fillcell     = &VGA_FillCell,
+	.ato_scroll       = NULL, /* TODO */
+	.ato_cls          = NULL, /* TODO */
+	.ato_el           = NULL, /* TODO */
+	.ato_setttymode   = &VGA_SetTTYMode,
+	.ato_scrollregion = &VGA_SetScrollRegion,
 };
 
 
@@ -1564,11 +1562,11 @@ PRIVATE struct videodev_ops const vga_operators = {
 };
 #else /* CONFIG_USE_NEW_FS */
 PRIVATE struct videodev_ops const vga_operators = {
-	/* .vdf_listfmt = */ &VGA_ListFmt,
-	/* .vdf_getfmt  = */ &VGA_GetFmt,
-	/* .vdf_setfmt  = */ &VGA_SetFmt,
-	/* .vdf_getpal  = */ &VGA_GetPal,
-	/* .vdf_setpal  = */ &VGA_SetPal,
+	.vdf_listfmt = &VGA_ListFmt,
+	.vdf_getfmt  = &VGA_GetFmt,
+	.vdf_setfmt  = &VGA_SetFmt,
+	.vdf_getpal  = &VGA_GetPal,
+	.vdf_setpal  = &VGA_SetPal,
 };
 #endif /* !CONFIG_USE_NEW_FS */
 

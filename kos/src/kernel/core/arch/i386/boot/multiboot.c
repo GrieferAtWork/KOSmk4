@@ -58,9 +58,9 @@ struct mb_tag {
 #define MB_FLAGS (/*MB_PAGE_ALIGN |*/ MB_MEMORY_INFO /*| MB_VIDEO_MODE*/)
 PRIVATE ATTR_SECTION(".x86.mb") ATTR_ALIGNED(MB_HEADER_ALIGN)
 ATTR_USED struct mb_tag mb_multiboot = {
-	/* .mt_magic    = */ MB_HEADER_MAGIC,
-	/* .mt_flags    = */ MB_FLAGS,
-	/* .mt_checksum = */ (u32) - (MB_HEADER_MAGIC + MB_FLAGS),
+	.mt_magic    = MB_HEADER_MAGIC,
+	.mt_flags    = MB_FLAGS,
+	.mt_checksum = (u32) - (MB_HEADER_MAGIC + MB_FLAGS),
 };
 
 /* Multiboot2 header */
@@ -74,9 +74,9 @@ ATTR_USED struct mb_tag mb_multiboot = {
 PRIVATE ATTR_SECTION(".x86.mb2.tag.end")
         ATTR_ALIGNED(MB2_TAG_ALIGN)
 ATTR_USED struct mb2_header_tag tag_empty = {
-	/* .type  = */ MB2_HEADER_TAG_END,
-	/* .flags = */ 0,
-	/* .size  = */ sizeof(struct mb2_header_tag),
+	.type  = MB2_HEADER_TAG_END,
+	.flags = 0,
+	.size  = sizeof(struct mb2_header_tag),
 };
 
 
@@ -88,8 +88,8 @@ INTDEF byte_t __386_kernel_mb2_chksum[];
 #endif /* !__x86_64__ */
 PRIVATE ATTR_SECTION(".x86.mb2") ATTR_ALIGNED(MB2_HEADER_ALIGN)
 ATTR_USED struct mb2_header mb_multiboot2 = {
-	/* .magic         = */ MB2_HEADER_MAGIC,
-	/* .architecture  = */ MB2_ARCHITECTURE_I386,
+	.magic        = MB2_HEADER_MAGIC,
+	.architecture = MB2_ARCHITECTURE_I386,
 	{
 #ifdef __x86_64__
 		(u64)__x86_kernel_mb2_hdrlen_and_chksum

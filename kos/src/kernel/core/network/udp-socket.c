@@ -322,29 +322,18 @@ udp_recvfromv(struct socket *__restrict self,
 
 /* Socket operators for UDP sockets. */
 PUBLIC struct socket_ops udp_socket_ops = {
-	/* .so_family      = */ AF_INET,
-	/* .so_fini        = */ &udp_fini,
-	/* .so_pollconnect = */ NULL,
-	/* .so_polltest    = */ NULL,
-	/* .so_getsockname = */ &udp_getsockname,
-	/* .so_getpeername = */ &udp_getpeername,
-	/* .so_bind        = */ &udp_bind,
-	/* .so_connect     = */ &udp_connect,
-	/* .so_send        = */ NULL,
-	/* .so_sendv       = */ NULL,
-	/* .so_sendto      = */ NULL,
-	/* .so_sendtov     = */ &udp_sendtov,
-	/* .so_recv        = */ NULL,
-	/* .so_recvv       = */ NULL,
-	/* .so_recvfrom    = */ NULL,
-	/* .so_recvfromv   = */ &udp_recvfromv,
-	/* .so_listen      = */ NULL,
-	/* .so_accept      = */ NULL,
-	/* .so_shutdown    = */ NULL,
-	/* .so_getsockopt  = */ NULL, /* TODO: There are _many_ options that are specific to UDP */
-	/* .so_setsockopt  = */ NULL, /* TODO: There are _many_ options that are specific to UDP */
-	/* .so_ioctl       = */ NULL,
-	/* .so_free        = */ NULL,
+	.so_family      = AF_INET,
+	.so_fini        = &udp_fini,
+	.so_pollconnect = NULL, /* TODO: Wait for incoming packets */
+	.so_polltest    = NULL, /* TODO: Wait for incoming packets */
+	.so_getsockname = &udp_getsockname,
+	.so_getpeername = &udp_getpeername,
+	.so_bind        = &udp_bind,
+	.so_connect     = &udp_connect,
+	.so_sendtov     = &udp_sendtov,
+	.so_recvfromv   = &udp_recvfromv,
+	.so_getsockopt  = NULL, /* TODO: There are _many_ options that are specific to UDP */
+	.so_setsockopt  = NULL, /* TODO: There are _many_ options that are specific to UDP */
 };
 
 

@@ -64,6 +64,7 @@ filehandle_new(struct mfile *__restrict self,
 	result->fh_path   = xincref(access_path);
 	result->fh_dirent = xincref(access_dent);
 	atomic64_init(&result->fh_offset, 0);
+	return result;
 }
 
 

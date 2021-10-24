@@ -117,16 +117,16 @@ NOTHROW(FCALL syslog_sink_array_destroy)(struct syslog_sink_array *__restrict se
 
 /* The default array of syslog sinks. */
 PRIVATE struct syslog_sink_array default_syslog_sink_array = {
-	/* .ssa_refcnt = */ 2, /* +1: default_syslog_sink_array, +1: syslog_sinks */
+	.ssa_refcnt = 2, /* +1: default_syslog_sink_array, +1: syslog_sinks */
 #ifdef ARCH_DEFAULT_SYSLOG_SINK
-	/* .ssa_count  = */ 2,
-	/* .ssa_sinks  = */ {
+	.ssa_count = 2,
+	.ssa_sinks = {
 		&dmesg_sink,
 		ARCH_DEFAULT_SYSLOG_SINK
 	}
 #else /* ARCH_DEFAULT_SYSLOG_SINK */
-	/* .ssa_count  = */ 1,
-	/* .ssa_sinks  = */ {
+	.ssa_count = 1,
+	.ssa_sinks = {
 		&dmesg_sink
 	}
 #endif /* !ARCH_DEFAULT_SYSLOG_SINK */

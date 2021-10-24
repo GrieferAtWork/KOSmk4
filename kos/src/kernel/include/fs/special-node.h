@@ -25,6 +25,8 @@
 #ifdef CONFIG_USE_NEW_FS
 #include <kernel/fs/fifonode.h>
 #include <kernel/fs/socknode.h>
+
+#define s_server sun_server
 #else /* CONFIG_USE_NEW_FS */
 #include <fs/fifo.h>
 #include <fs/node.h>

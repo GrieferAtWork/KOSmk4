@@ -228,10 +228,8 @@ kos_unwind_exception_cleanup(_Unwind_Reason_Code UNUSED(reason),
 }
 
 PRIVATE SECTION_EXCEPT_DATA struct _Unwind_Exception kos_unwind_exception = {
-	/* .exception_class   = */ _UEC_KERNKOS,
-	/* .exception_cleanup = */ NULL, /* Filled in lazily */
-	/* .private_1         = */ 0,
-	/* .private_2         = */ 0,
+	.exception_class   = _UEC_KERNKOS,
+	.exception_cleanup = NULL, /* Filled in lazily */
 };
 
 PRIVATE ATTR_RETNONNULL SECTION_EXCEPT_TEXT WUNUSED struct _Unwind_Exception *LIBCCALL

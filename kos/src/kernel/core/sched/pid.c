@@ -412,28 +412,24 @@ NOTHROW(KCALL this_taskgroup_fini)(struct task *__restrict self) {
 }
 
 PUBLIC ATTR_PERTASK struct taskgroup this_taskgroup = {
-	/* .tg_process             = */ NULL,                /* Initialized by `task_setthread()' / `task_setprocess()' */
-	{
-		/* .tg_proc_threads_lock = */ ATOMIC_RWLOCK_INIT
+	.tg_process = NULL, /* Initialized by `task_setthread()' / `task_setprocess()' */
+	{ .tg_proc_threads_lock = ATOMIC_RWLOCK_INIT },
+	{ .tg_proc_threads = LIST_HEAD_INITIALIZER(this_taskgroup.tg_proc_threads) },
+	.tg_proc_threads_change = SIG_INIT,
+	.tg_proc_parent_lock    = ATOMIC_RWLOCK_INIT,
+	.tg_proc_parent         = NULL,                /* Initialized by `task_setprocess()' */
+	.tg_proc_group_lock     = ATOMIC_RWLOCK_INIT,
+	.tg_proc_group          = NULL,                /* Initialized by `task_setprocess()' */
+	.tg_proc_group_siblings = LIST_ENTRY_UNBOUND_INITIALIZER,
+	.tg_proc_rpcs = {
+		.ppr_lock = ATOMIC_RWLOCK_INIT,
+		.ppr_list = SLIST_HEAD_INITIALIZER(this_taskgroup.tg_proc_rpcs.ppr_list)
 	},
-	{
-		/* .tg_proc_threads    = */ LIST_HEAD_INITIALIZER(this_taskgroup.tg_proc_threads)
-	},
-	/* .tg_proc_threads_change = */ SIG_INIT,
-	/* .tg_proc_parent_lock    = */ ATOMIC_RWLOCK_INIT,
-	/* .tg_proc_parent         = */ NULL,                /* Initialized by `task_setprocess()' */
-	/* .tg_proc_group_lock     = */ ATOMIC_RWLOCK_INIT,
-	/* .tg_proc_group          = */ NULL,                /* Initialized by `task_setprocess()' */
-	/* .tg_proc_group_siblings = */ LIST_ENTRY_UNBOUND_INITIALIZER,
-	/* .tg_proc_rpcs           = */ {
-		/* .ppr_lock  = */ ATOMIC_RWLOCK_INIT,
-		/* .ppr_list  = */ SLIST_HEAD_INITIALIZER(this_taskgroup.tg_proc_rpcs.ppr_list)
-	},
-	/* .tg_pgrp_processes_lock = */ ATOMIC_RWLOCK_INIT,
-	/* .tg_pgrp_processes      = */ LIST_HEAD_INITIALIZER(this_taskgroup.tg_pgrp_processes),
-	/* .tg_pgrp_session_lock   = */ ATOMIC_RWLOCK_INIT,
-	/* .tg_pgrp_session        = */ NULL,                /* Initialized by `task_setprocess()' */
-	/* .tg_ctty                = */ AXREF_INIT(NULL)
+	.tg_pgrp_processes_lock = ATOMIC_RWLOCK_INIT,
+	.tg_pgrp_processes      = LIST_HEAD_INITIALIZER(this_taskgroup.tg_pgrp_processes),
+	.tg_pgrp_session_lock   = ATOMIC_RWLOCK_INIT,
+	.tg_pgrp_session        = NULL,                /* Initialized by `task_setprocess()' */
+	.tg_ctty                = AXREF_INIT(NULL)
 };
 
 
@@ -968,16 +964,16 @@ INTERN struct pidns_entry empty_pidns_list[1] = {
 
 /* The root PID namespace. */
 PUBLIC struct pidns pidns_root = {
-	/* .pn_refcnt      = */ 1,
-	/* .pn_indirection = */ 0,
-	/* .pn_parent      = */ NULL,
-	/* .pn_lock        = */ ATOMIC_RWLOCK_INIT,
-	/* .pn_used        = */ 0,
-	/* .pn_size        = */ 0,
-	/* .pn_mask        = */ 0,
-	/* .pn_list        = */ empty_pidns_list,
-	/* .pn_dead        = */ NULL,
-	/* .pn_nextpid     = */ PIDNS_FIRST_NONRESERVED_PID
+	.pn_refcnt      = 1,
+	.pn_indirection = 0,
+	.pn_parent      = NULL,
+	.pn_lock        = ATOMIC_RWLOCK_INIT,
+	.pn_used        = 0,
+	.pn_size        = 0,
+	.pn_mask        = 0,
+	.pn_list        = empty_pidns_list,
+	.pn_dead        = NULL,
+	.pn_nextpid     = PIDNS_FIRST_NONRESERVED_PID
 };
 
 

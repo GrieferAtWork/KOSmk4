@@ -676,10 +676,10 @@ struct atexit_vector_struct {
 
 PRIVATE ATTR_SECTION(".bss.crt.application.exit")
 struct atexit_vector_struct atexit_vector = {
-	/* .av_lock = */ ATOMIC_RWLOCK_INIT,
-	/* .av_size = */ 0,
-	/* .av_vect = */ NULL,
-	/* .av_stat = */ 0
+	.av_lock = ATOMIC_RWLOCK_INIT,
+	.av_size = 0,
+	.av_vect = NULL,
+	.av_stat = 0
 };
 
 

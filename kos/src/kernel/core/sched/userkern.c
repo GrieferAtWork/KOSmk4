@@ -208,16 +208,16 @@ PUBLIC struct mpart userkern_segment_part = {
 
 
 PUBLIC struct mfile userkern_segment_file = {
-	/* .mf_refcnt     = */ 2, /* +1: `userkern_segment_file', +1: `userkern_segment_part.mn_file' */
-	/* .mf_ops        = */ &mfile_ndef_ops,
-	/* .mf_vio        = */ &userkern_segment_vio,
-	/* .mf_lock       = */ ATOMIC_RWLOCK_INIT, __MFILE_INIT_WRLOCKPC
-	/* .mf_parts      = */ &userkern_segment_part,
-	/* .mf_initdone   = */ SIG_INIT,
-	/* .mf_lockops    = */ SLIST_HEAD_INITIALIZER(userkern_segment_file.mf_lockops),
-	/* .mf_changed    = */ SLIST_HEAD_INITIALIZER(userkern_segment_file.mf_changed),
-	/* .mf_blockshift = */ PAGESHIFT,
-	/* .mf_part_amask = */ PAGEMASK,
+	.mf_refcnt     = 2, /* +1: `userkern_segment_file', +1: `userkern_segment_part.mn_file' */
+	.mf_ops        = &mfile_ndef_ops,
+	.mf_vio        = &userkern_segment_vio,
+	.mf_lock       = ATOMIC_RWLOCK_INIT, __MFILE_INIT_WRLOCKPC
+	.mf_parts      = &userkern_segment_part,
+	.mf_initdone   = SIG_INIT,
+	.mf_lockops    = SLIST_HEAD_INITIALIZER(userkern_segment_file.mf_lockops),
+	.mf_changed    = SLIST_HEAD_INITIALIZER(userkern_segment_file.mf_changed),
+	.mf_part_amask = PAGEMASK,
+	.mf_blockshift = PAGESHIFT,
 };
 
 
@@ -325,16 +325,16 @@ PUBLIC struct mpart userkern_segment_part_compat = {
 };
 
 PUBLIC struct mfile userkern_segment_file_compat = {
-	/* .mf_refcnt     = */ 2, /* +1: `userkern_segment_file', +1: `userkern_segment_part.mn_file' */
-	/* .mf_ops        = */ &mfile_ndef_ops,
-	/* .mf_vio        = */ &userkern_segment_vio_compat,
-	/* .mf_lock       = */ ATOMIC_RWLOCK_INIT, __MFILE_INIT_WRLOCKPC
-	/* .mf_parts      = */ &userkern_segment_part_compat,
-	/* .mf_initdone   = */ SIG_INIT,
-	/* .mf_lockops    = */ SLIST_HEAD_INITIALIZER(userkern_segment_file_compat.mf_lockops),
-	/* .mf_changed    = */ SLIST_HEAD_INITIALIZER(userkern_segment_file_compat.mf_changed),
-	/* .mf_blockshift = */ PAGESHIFT,
-	/* .mf_part_amask = */ PAGEMASK,
+	.mf_refcnt     = 2, /* +1: `userkern_segment_file', +1: `userkern_segment_part.mn_file' */
+	.mf_ops        = &mfile_ndef_ops,
+	.mf_vio        = &userkern_segment_vio_compat,
+	.mf_lock       = ATOMIC_RWLOCK_INIT, __MFILE_INIT_WRLOCKPC
+	.mf_parts      = &userkern_segment_part_compat,
+	.mf_initdone   = SIG_INIT,
+	.mf_lockops    = SLIST_HEAD_INITIALIZER(userkern_segment_file_compat.mf_lockops),
+	.mf_changed    = SLIST_HEAD_INITIALIZER(userkern_segment_file_compat.mf_changed),
+	.mf_part_amask = PAGEMASK,
+	.mf_blockshift = PAGESHIFT,
 };
 #endif /* __ARCH_HAVE_COMPAT */
 

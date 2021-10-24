@@ -123,8 +123,8 @@ DEFINE_REFCOUNT_FUNCTIONS(struct sct_table_struct, tt_refcnt, sct_table_destroy)
 
 /* Define the empty SCT Table. */
 PRIVATE struct sct_table_struct empty_sct_table = {
-	/* .tt_refcnt = */ 2, /* +1: sct_table, +1: empty_sct_table */
-	/* .tt_count  = */ 0
+	.tt_refcnt = 2, /* +1: sct_table, +1: empty_sct_table */
+	.tt_count  = 0,
 };
 
 ARREF(sct_table_struct_arref, sct_table_struct);

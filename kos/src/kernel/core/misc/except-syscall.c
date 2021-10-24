@@ -60,9 +60,9 @@ DECL_BEGIN
 
 /* User-space exception handler mode for the current thread. */
 PUBLIC ATTR_PERTASK struct user_except_handler this_user_except_handler = {
-	/* .ueh_mode    = */ EXCEPT_HANDLER_MODE_DISABLED,
-	/* .ueh_handler = */ NULL,
-	/* .ueh_stack   = */ EXCEPT_HANDLER_SP_CURRENT,
+	.ueh_mode    = EXCEPT_HANDLER_MODE_DISABLED,
+	.ueh_handler = NULL,
+	.ueh_stack   = EXCEPT_HANDLER_SP_CURRENT,
 };
 
 /* [0..1][lock(PRIVATE(THIS_TASK))]

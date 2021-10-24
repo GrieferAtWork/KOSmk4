@@ -112,6 +112,10 @@ struct path {
 	                                        * This field represents the number of drives for which this path is the root. */
 };
 
+/* Forward compatibility... */
+#define path_isdrive(self) (__hybrid_atomic_load((self)->p_isdrive, __ATOMIC_ACQUIRE) != 0)
+#define path_isroot(self)  ((self)->p_parent == __NULLPTR)
+
 /* Path allocation functions. (using a cache, because of  how
  * often path objects can potentially be allocated and freed) */
 DECLARE_PREALLOCATION_CACHE(FUNDEF, path, struct path)

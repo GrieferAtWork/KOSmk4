@@ -32,6 +32,7 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #include <kernel/boot.h>
 #include <kernel/driver-param.h>
 #include <kernel/fpu.h> /* CONFIG_FPU */
+#include <kernel/malloc.h>
 #include <kernel/memory.h>
 #include <kernel/printk.h>
 #include <kernel/rand.h>

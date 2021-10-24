@@ -57,9 +57,9 @@ enum {
 
 /* Define execution ABIs built into the kernel core. */
 PRIVATE struct execabis_struct default_execabis = {
-	/* .eas_refcnt = */ 2, /* +1: default_execabis, +1: execabis */
-	/* .eas_count  = */ DEFAULT_EXECABIS_COUNT,
-	/* .eas_abis   = */ {
+	.eas_refcnt = 2, /* +1: default_execabis, +1: execabis */
+	.eas_count  = DEFAULT_EXECABIS_COUNT,
+	.eas_abis   = {
 #ifdef CONFIG_EXECABI_HAVE_BUILTIN_ELF
 		EXECABI_INIT_ELF,
 #endif /* CONFIG_EXECABI_HAVE_BUILTIN_ELF */

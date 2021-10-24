@@ -1113,8 +1113,8 @@ done_unschedule:
 
 STATIC_ASSERT(sizeof(Ne2kAIOHandleData) <= (AIO_HANDLE_DRIVER_POINTER_COUNT * sizeof(void *)));
 PRIVATE struct aio_handle_type Ne2k_TxAioType = {
-	/* .ht_fini   = */ &Ne2k_TxAioFini,
-	/* .ht_cancel = */ &Ne2k_TxAioCancel,
+	.ht_fini   = &Ne2k_TxAioFini,
+	.ht_cancel = &Ne2k_TxAioCancel,
 };
 
 
@@ -1243,8 +1243,8 @@ Ne2k_SetFlags(struct nicdev *__restrict self,
 
 
 PRIVATE struct nicdev_ops const Ne2k_NICDeviceOps = {
-	/* .nd_send     = */ &Ne2k_SendPacket,
-	/* .nd_setflags = */ &Ne2k_SetFlags,
+	.nd_send     = &Ne2k_SendPacket,
+	.nd_setflags = &Ne2k_SetFlags,
 };
 
 PRIVATE NOBLOCK NONNULL((1)) void

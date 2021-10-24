@@ -37,47 +37,39 @@ DECL_BEGIN
 /* LIBC per-thread data instance. */
 INTERN ATTR_THREAD struct pthread current = {
 #ifdef __LIBC_CONFIG_HAVE_USERPROCMASK
-	/* .pt_pmask       = */ {
-		/* .lpm_pmask = */ USERPROCMASK_INIT(/* mytid:   */ 0,
-		                                     /* sigsize: */ sizeof(sigset_t),
-		                                     /* sigmask: */ NULL,
-		                                     /* flags:   */ USERPROCMASK_FLAG_NORMAL,
-		                                     /* pending: */ SIGSET_INIT_EMPTY),
-		/* .lpm_masks = */ {
-			/* [0] = */ SIGSET_INIT_EMPTY,
-			/* [1] = */ SIGSET_INIT_EMPTY
+	.pt_pmask = {
+		.lpm_pmask = USERPROCMASK_INIT(/* mytid:   */ 0,
+		                               /* sigsize: */ sizeof(sigset_t),
+		                               /* sigmask: */ NULL,
+		                               /* flags:   */ USERPROCMASK_FLAG_NORMAL,
+		                               /* pending: */ SIGSET_INIT_EMPTY),
+		.lpm_masks = {
+			[0] = SIGSET_INIT_EMPTY,
+			[1] = SIGSET_INIT_EMPTY
 		}
 	},
 #else /* __LIBC_CONFIG_HAVE_USERPROCMASK */
-	/* .pt_tid         = */ 0,
-#if __SIZEOF_PID_T__ < __SIZEOF_POINTER__
-	/* .__pt_pad       = */ { 0, },
-#endif /* __SIZEOF_PID_T__ < __SIZEOF_POINTER__ */
+	.pt_tid         = 0,
 #endif /* !__LIBC_CONFIG_HAVE_USERPROCMASK */
-	/* .pt_refcnt      = */ 2,
-	/* .pt_retval      = */ NULL,
-	/* .pt_tls         = */ NULL,
-	/* .pt_stackaddr   = */ NULL,
-	/* .pt_stacksize   = */ 0,
-	/* .pt_flags       = */ PTHREAD_FUSERSTACK | PTHREAD_FNOSTACK,
-	/* .pt_cpuset      = */ NULL,
-	/* .pt_cpusetsize  = */ 0,
-	/* .pt_except      = */ {
-		/* .ei_state   = */ {},
-		{
-			/* .ei_code = */ ERROR_CODEOF(E_OK)
-		},
+	.pt_refcnt      = 2,
+	.pt_retval      = NULL,
+	.pt_tls         = NULL,
+	.pt_stackaddr   = NULL,
+	.pt_stacksize   = 0,
+	.pt_flags       = PTHREAD_FUSERSTACK | PTHREAD_FNOSTACK,
+	.pt_cpuset      = NULL,
+	.pt_cpusetsize  = 0,
+	.pt_except = {
+		.ei_state = {},
+		{ .ei_code = ERROR_CODEOF(E_OK) },
 #if EXCEPT_BACKTRACE_SIZE != 0
-		/* .ei_trace   = */ {},
+		.ei_trace = { NULL, },
 #endif /* EXCEPT_BACKTRACE_SIZE != 0 */
-		/* .ei_flags   = */ EXCEPT_FNORMAL,
-#if __SIZEOF_POINTER__ >= 4
-		/* .__ei_pad   = */ { 0, },
-#endif /* __SIZEOF_POINTER__ >= 4 */
-		/* .ei_nesting = */ 0,
+		.ei_flags = EXCEPT_FNORMAL,
+		.ei_nesting = 0,
 	},
-	/* .pt_errno_kind  = */ LIBC_ERRNO_KIND_KOS,
-	/* .pt_errno_value = */ EOK
+	.pt_errno_kind  = LIBC_ERRNO_KIND_KOS,
+	.pt_errno_value = EOK
 };
 
 

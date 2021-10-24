@@ -591,9 +591,9 @@ hw_progress:
 
 /* Type used for DMA-AIO handles. */
 INTERN struct aio_handle_type AtaDrive_DmaAioHandleType = {
-	/* .ht_fini     = */ &AtaDrive_DmaAioHandle_Fini,
-	/* .ht_cancel   = */ &AtaDrive_DmaAioHandle_Cancel,
-	/* .ht_progress = */ &AtaDrive_DmaAioHandle_Progress,
+	.ht_fini     = &AtaDrive_DmaAioHandle_Fini,
+	.ht_cancel   = &AtaDrive_DmaAioHandle_Cancel,
+	.ht_progress = &AtaDrive_DmaAioHandle_Progress,
 };
 
 DECL_END

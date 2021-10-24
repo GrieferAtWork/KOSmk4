@@ -132,15 +132,14 @@ struct ramfs_dirent {
 	struct fdirent                rde_ent;      /* Underlying directory entry. */
 };
 
-#define ramfs_dirent_destroy(self) ramfs_dirent_v_destroy(&(self)->rde_ent)
-DEFINE_REFCOUNT_FUNCTIONS(struct ramfs_dirent, rde_ent.fd_refcnt, ramfs_dirent_destroy)
-
 /* Directory entry operators for instances of `ramfs_dirent' */
 DATDEF struct fdirent_ops const ramfs_dirent_ops;
 FUNDEF NOBLOCK NONNULL((1)) void /* == ramfs_dirent_ops.fdo_destroy */
 NOTHROW(KCALL ramfs_dirent_v_destroy)(struct fdirent *__restrict self);
 FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) REF struct fnode * /* == ramfs_dirent_ops.fdo_opennode */
 NOTHROW(KCALL ramfs_dirent_v_opennode)(struct fdirent *__restrict self, struct fdirnode *__restrict dir);
+#define ramfs_dirent_destroy(self) ramfs_dirent_v_destroy(&(self)->rde_ent)
+DEFINE_REFCOUNT_FUNCTIONS(struct ramfs_dirent, rde_ent.fd_refcnt, ramfs_dirent_destroy)
 
 
 /* Extended directory data. */

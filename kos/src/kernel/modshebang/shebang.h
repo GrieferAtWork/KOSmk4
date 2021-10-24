@@ -42,12 +42,12 @@ INTDEF WUNUSED NONNULL((1)) unsigned int FCALL
 shebang_exec(struct execargs *__restrict args);
 
 /* ExecABI initializer for #! */
-#define EXECABI_INIT_SHEBANG              \
-	{                                     \
-		/* .ea_driver = */ &drv_self,     \
-		/* .ea_magsiz = */ 2,             \
-		/* .ea_magic  = */ { '#', '!' },  \
-		/* .ea_exec   = */ &shebang_exec, \
+#define EXECABI_INIT_SHEBANG        \
+	{                               \
+		.ea_driver = &drv_self,     \
+		.ea_magsiz = 2,             \
+		.ea_magic  = { '#', '!' },  \
+		.ea_exec   = &shebang_exec, \
 	}
 
 

@@ -64,11 +64,11 @@ DECL_BEGIN
 
 /* Root connections set. */
 PUBLIC ATTR_PERTASK struct task_connections this_root_connections = {
-	/* .tsc_prev   = */ NULL,
-	/* .tcs_thread = */ NULL, /* Fill in by `pertask_init_task_connections()' */
-	/* .tcs_con    = */ NULL,
-	/* .tcs_dlvr   = */ NULL,
-	/* .tcs_static = */ { }
+	.tsc_prev   = NULL,
+	.tcs_thread = NULL, /* Fill in by `pertask_init_task_connections()' */
+	.tcs_con    = NULL,
+	.tcs_dlvr   = NULL,
+	.tcs_static = { }
 };
 
 /* [1..1][lock(PRIVATE(THIS_TASK))]  Current   set   of   in-use   connections.

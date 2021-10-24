@@ -430,15 +430,9 @@ DEFINE_BINARY_VIO_OPERATOR_ATOMIC(uvio_operator_xorq, q, uint64_t, UVIO_OPCODE_X
 
 /* VIO operator callbacks for UVIO datablocks. */
 PUBLIC_CONST struct vio_operators const uvio_operators = {
-	/* .vo_read   = */ VIO_CALLBACK_INIT(&uvio_operator_readb,
-	                                     &uvio_operator_readw,
-	                                     &uvio_operator_readl,
-	                                     &uvio_operator_readq),
-	/* .vo_write  = */ VIO_CALLBACK_INIT(&uvio_operator_writeb,
-	                                     &uvio_operator_writew,
-	                                     &uvio_operator_writel,
-	                                     &uvio_operator_writeq),
-	/* .vo_cmpxch = */ {
+	.vo_read  = VIO_CALLBACK_INIT(&uvio_operator_readb, &uvio_operator_readw, &uvio_operator_readl, &uvio_operator_readq),
+	.vo_write = VIO_CALLBACK_INIT(&uvio_operator_writeb, &uvio_operator_writew, &uvio_operator_writel, &uvio_operator_writeq),
+	.vo_cmpxch = {
 		&uvio_operator_cmpxchb,
 		&uvio_operator_cmpxchw,
 		&uvio_operator_cmpxchl,
@@ -449,30 +443,12 @@ PUBLIC_CONST struct vio_operators const uvio_operators = {
 		&uvio_operator_cmpxchx,
 #endif /* LIBVIO_CONFIG_HAVE_XWORD_CMPXCH */
 	},
-	/* .vo_xch    = */ VIO_CALLBACK_INIT(&uvio_operator_xchb,
-	                                     &uvio_operator_xchw,
-	                                     &uvio_operator_xchl,
-	                                     &uvio_operator_xchq),
-	/* .vo_add    = */ VIO_CALLBACK_INIT(&uvio_operator_addb,
-	                                     &uvio_operator_addw,
-	                                     &uvio_operator_addl,
-	                                     &uvio_operator_addq),
-	/* .vo_sub    = */ VIO_CALLBACK_INIT(&uvio_operator_subb,
-	                                     &uvio_operator_subw,
-	                                     &uvio_operator_subl,
-	                                     &uvio_operator_subq),
-	/* .vo_and    = */ VIO_CALLBACK_INIT(&uvio_operator_andb,
-	                                     &uvio_operator_andw,
-	                                     &uvio_operator_andl,
-	                                     &uvio_operator_andq),
-	/* .vo_or     = */ VIO_CALLBACK_INIT(&uvio_operator_orb,
-	                                     &uvio_operator_orw,
-	                                     &uvio_operator_orl,
-	                                     &uvio_operator_orq),
-	/* .vo_xor    = */ VIO_CALLBACK_INIT(&uvio_operator_xorb,
-	                                     &uvio_operator_xorw,
-	                                     &uvio_operator_xorl,
-	                                     &uvio_operator_xorq),
+	.vo_xch = VIO_CALLBACK_INIT(&uvio_operator_xchb, &uvio_operator_xchw, &uvio_operator_xchl, &uvio_operator_xchq),
+	.vo_add = VIO_CALLBACK_INIT(&uvio_operator_addb, &uvio_operator_addw, &uvio_operator_addl, &uvio_operator_addq),
+	.vo_sub = VIO_CALLBACK_INIT(&uvio_operator_subb, &uvio_operator_subw, &uvio_operator_subl, &uvio_operator_subq),
+	.vo_and = VIO_CALLBACK_INIT(&uvio_operator_andb, &uvio_operator_andw, &uvio_operator_andl, &uvio_operator_andq),
+	.vo_or  = VIO_CALLBACK_INIT(&uvio_operator_orb, &uvio_operator_orw, &uvio_operator_orl, &uvio_operator_orq),
+	.vo_xor = VIO_CALLBACK_INIT(&uvio_operator_xorb, &uvio_operator_xorw, &uvio_operator_xorl, &uvio_operator_xorq),
 };
 
 
@@ -949,15 +925,10 @@ NOTHROW(KCALL uvio_server_polltest)(struct mfile *__restrict self,
 
 /* The datablock type used by UVIO objects. */
 PUBLIC_CONST struct mfile_ops const uvio_datablock_type = {
-	/* .mo_destroy            = */ NULL,
-	/* .mo_initpart           = */ NULL,
-	/* .mo_loadpart           = */ NULL,
-	/* .mo_savepart           = */ NULL,
-	/* .mo_changed            = */ NULL,
-	/* .mo_handle_read        = */ &uvio_server_read,
-	/* .mo_handle_write       = */ &uvio_server_write,
-	/* .mo_handle_pollconnect = */ &uvio_server_pollconnect,
-	/* .mo_handle_polltest    = */ &uvio_server_polltest,
+	.mo_stream_read        = &uvio_server_read,
+	.mo_stream_write       = &uvio_server_write,
+	.dt_handle_pollconnect = &uvio_server_pollconnect,
+	.dt_handle_polltest    = &uvio_server_polltest,
 };
 
 /* Construct a new UVIO object.

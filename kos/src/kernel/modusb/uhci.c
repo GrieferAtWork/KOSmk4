@@ -614,10 +614,10 @@ PRIVATE NOBLOCK NONNULL((1, 2)) unsigned int NOTHROW(KCALL uhci_aio_progress)(st
 PRIVATE NOBLOCK WUNUSED NONNULL((1)) size_t NOTHROW(KCALL uhci_aio_retsize)(struct aio_handle *__restrict self);
 STATIC_ASSERT(sizeof(struct uhci_aio_data) <= (AIO_HANDLE_DRIVER_POINTER_COUNT * sizeof(void *)));
 PRIVATE struct aio_handle_type uhci_aio_type = {
-	/* .ht_fini     = */ &uhci_aio_fini,
-	/* .ht_cancel   = */ &uhci_aio_cancel,
-	/* .ht_progress = */ &uhci_aio_progress,
-	/* .ht_retsize  = */ &uhci_aio_retsize,
+	.ht_fini     = &uhci_aio_fini,
+	.ht_cancel   = &uhci_aio_cancel,
+	.ht_progress = &uhci_aio_progress,
+	.ht_retsize  = &uhci_aio_retsize,
 };
 
 
@@ -2030,10 +2030,9 @@ NOTHROW(KCALL uhci_aio_sync_retsize)(struct aio_handle *__restrict self) {
 
 /* No-op AIO handle type (intended for synchronous operations) */
 PRIVATE struct aio_handle_type uhci_aio_sync_type = {
-	/* .ht_fini     = */ &uhci_aio_noop_noarg,
-	/* .ht_cancel   = */ &uhci_aio_noop_noarg,
-	/* .ht_progress = */ NULL,
-	/* .ht_retsize  = */ &uhci_aio_sync_retsize
+	.ht_fini    = &uhci_aio_noop_noarg,
+	.ht_cancel  = &uhci_aio_noop_noarg,
+	.ht_retsize = &uhci_aio_sync_retsize
 };
 
 

@@ -139,23 +139,23 @@ again:
 
 /* Generic kernel credentials / credentials for /bin/init */
 PUBLIC struct cred cred_kernel = {
-	/* .c_refcnt          = */ 2, /* +1: `cred_kernel', +1: FORTASK(&boottask, this_cred) */
-	/* .c_lock            = */ ATOMIC_RWLOCK_INIT,
-	/* .c_ruid            = */ (uid_t)0,
-	/* .c_rgid            = */ (gid_t)0,
-	/* .c_euid            = */ (uid_t)0,
-	/* .c_egid            = */ (gid_t)0,
-	/* .c_suid            = */ (uid_t)0,
-	/* .c_sgid            = */ (gid_t)0,
-	/* .c_fsuid           = */ (uid_t)0,
-	/* .c_fsgid           = */ (gid_t)0,
-	/* .c_ngroups         = */ 0,
-	/* .c_groups          = */ NULL,
-	/* .c_cap_permitted   = */ CREDCAP_INIT_FULL,
-	/* .c_cap_inheritable = */ CREDCAP_INIT_FULL,
-	/* .c_cap_effective   = */ CREDCAP_INIT_FULL,
-	/* .c_cap_bounding    = */ CREDCAP_INIT_FULL,
-	/* .c_cap_ambient     = */ CREDCAP_INIT_FULL,
+	.c_refcnt          = 2, /* +1: `cred_kernel', +1: FORTASK(&boottask, this_cred) */
+	.c_lock            = ATOMIC_RWLOCK_INIT,
+	.c_ruid            = (uid_t)0,
+	.c_rgid            = (gid_t)0,
+	.c_euid            = (uid_t)0,
+	.c_egid            = (gid_t)0,
+	.c_suid            = (uid_t)0,
+	.c_sgid            = (gid_t)0,
+	.c_fsuid           = (uid_t)0,
+	.c_fsgid           = (gid_t)0,
+	.c_ngroups         = 0,
+	.c_groups          = NULL,
+	.c_cap_permitted   = CREDCAP_INIT_FULL,
+	.c_cap_inheritable = CREDCAP_INIT_FULL,
+	.c_cap_effective   = CREDCAP_INIT_FULL,
+	.c_cap_bounding    = CREDCAP_INIT_FULL,
+	.c_cap_ambient     = CREDCAP_INIT_FULL,
 };
 
 /* [1..1][lock(read(THIS_TASK || INTERN(lock)), write(THIS_TASK && INTERN(lock)))]

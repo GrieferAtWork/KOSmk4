@@ -120,9 +120,8 @@ NOTHROW(KCALL awork_vector_destroy)(struct awork_vector *__restrict self) {
 DEFINE_REFCOUNT_FUNCTIONS(struct awork_vector, av_refcnt, awork_vector_destroy)
 
 PRIVATE struct awork_vector empty_awork = {
-	/* .aws_refcnt = */ 2, /* +1: empty_awork; +1: awork */
-	/* .awc_testc  = */ 0, /* No workers defined by default... */
-	/* .awc_workc  = */ 0  /* No workers defined by default... */
+	.av_refcnt = 2, /* +1: empty_awork; +1: awork */
+	.av_workc  = 0, /* No workers defined by default... */
 };
 
 ARREF(awork_vector_arref, awork_vector);

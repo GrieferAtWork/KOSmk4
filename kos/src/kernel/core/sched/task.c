@@ -78,16 +78,14 @@ STATIC_ASSERT(offsetof(struct task, _t_next) == OFFSET_TASK__NEXT);
 
 PRIVATE ATTR_USED ATTR_SECTION(".data.pertask.head")
 struct task task_header = {
-	/* .t_self       = */ NULL, /* Filled in by the initializer. */
-	/* .t_refcnt     = */ 1,
-	/* .t_flags      = */ TASK_FNORMAL,
-	/* .t_cpu        = */ &bootcpu,
-	/* .t_mman       = */ &mman_kernel,
-	/* .t_mman_tasks = */ LIST_ENTRY_UNBOUND_INITIALIZER,
-	/* .t_heapsz     = */ (size_t)__kernel_pertask_size,
-	{
-		/* .t_state  = */ NULL
-	}
+	.t_self       = NULL, /* Filled in by the initializer. */
+	.t_refcnt     = 1,
+	.t_flags      = TASK_FNORMAL,
+	.t_cpu        = &bootcpu,
+	.t_mman       = &mman_kernel,
+	.t_mman_tasks = LIST_ENTRY_UNBOUND_INITIALIZER,
+	.t_heapsz     = (size_t)__kernel_pertask_size,
+	{ .t_state = NULL }
 };
 
 DATDEF ATTR_PERTASK struct mpart this_kernel_stackpart_ ASMNAME("this_kernel_stackpart");

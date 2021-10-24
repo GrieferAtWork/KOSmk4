@@ -290,17 +290,15 @@ NOTHROW(KCALL ioperm_bitmap_setrange)(struct ioperm_bitmap *__restrict self,
 
 INTDEF byte_t __x86_iob_empty_base[];
 PUBLIC struct ioperm_bitmap ioperm_bitmap_empty = {
-	/* .ib_refcnt = */ 1, /* _ioperm_bitmap_empty */
-	/* .ib_share  = */ 2, /* Prevent modifications */
-	/* .ib_pages  = */ {
-		{
-			(uintptr_t)__x86_iob_empty_base - KERNEL_CORE_BASE
+	.ib_refcnt = 1, /* _ioperm_bitmap_empty */
+	.ib_share  = 2, /* Prevent modifications */
+	{{
+		(uintptr_t)__x86_iob_empty_base - KERNEL_CORE_BASE
 #if __SIZEOF_PHYSADDR_T__ > __SIZEOF_POINTER__
-			,
-			0
+		,
+		0
 #endif /* __SIZEOF_PHYSADDR_T__ > __SIZEOF_POINTER__ */
-		}
-	}
+	}}
 };
 
 

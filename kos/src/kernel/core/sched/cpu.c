@@ -72,13 +72,10 @@ PUBLIC struct cpu *_cpu_vector[CONFIG_MAX_CPU_COUNT] ASMNAME("cpu_vector") = { &
 
 PRIVATE ATTR_USED ATTR_SECTION(".data.percpu.head")
 struct cpu cpu_header = {
-	/* .c_id       = */ 0,
-	/* .c_state    = */ CPU_STATE_RUNNING,
-#if ((__SIZEOF_INT__ + 2) % __SIZEOF_POINTER__) != 0
-	/* ._c_pad     = */ { 0, },
-#endif /* ((__SIZEOF_INT__ + 2) % __SIZEOF_POINTER__) != 0 */
+	.c_id    = 0,
+	.c_state = CPU_STATE_RUNNING,
 #ifndef CONFIG_NO_SMP
-	/* .c_pdir     = */ pagedir_kernel_phys
+	.c_pdir  = pagedir_kernel_phys
 #endif /* !CONFIG_NO_SMP */
 };
 

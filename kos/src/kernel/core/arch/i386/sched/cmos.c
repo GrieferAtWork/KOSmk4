@@ -59,16 +59,14 @@ DECL_BEGIN
 /* The CMOS realtime clock driver descriptor structure */
 PUBLIC struct x86_cmos_struct x86_cmos = {
 #ifndef CONFIG_NO_SMP
-	/* .cr_lock         = */ ATOMIC_LOCK_INIT,
+	.cr_lock = ATOMIC_LOCK_INIT,
 #endif /* !CONFIG_NO_SMP */
-	/* .cr_century      = */ 0,
-	/* .cr_stb          = */ 0,
-	/* .cr_nmi          = */ 0,
-	/* ._cr_pad1        = */ 0,
-	/* .cr_alarm_second = */ 0xff,
-	/* .cr_alarm_minute = */ 0xff,
-	/* .cr_alarm_hour   = */ 0xff,
-	/* ._cr_pad2        = */ 0
+	.cr_century      = 0,
+	.cr_stb          = 0,
+	.cr_nmi          = 0,
+	.cr_alarm_second = 0xff,
+	.cr_alarm_minute = 0xff,
+	.cr_alarm_hour   = 0xff,
 };
 
 

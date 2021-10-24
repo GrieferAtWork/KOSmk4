@@ -103,12 +103,12 @@ INTDEF WUNUSED NONNULL((1)) unsigned int FCALL
 elfabi_exec(/*in|out*/ struct execargs *__restrict args);
 
 /* ExecABI initializer for ELF. */
-#define EXECABI_INIT_ELF                                           \
-	{                                                              \
-		/* .ea_driver = */ &drv_self,                              \
-		/* .ea_magsiz = */ SELFMAG,                                \
-		/* .ea_magic  = */ { ELFMAG0, ELFMAG1, ELFMAG2, ELFMAG3 }, \
-		/* .ea_exec   = */ &elfabi_exec,                           \
+#define EXECABI_INIT_ELF                                     \
+	{                                                        \
+		.ea_driver = &drv_self,                              \
+		.ea_magsiz = SELFMAG,                                \
+		.ea_magic  = { ELFMAG0, ELFMAG1, ELFMAG2, ELFMAG3 }, \
+		.ea_exec   = &elfabi_exec,                           \
 	}
 
 
