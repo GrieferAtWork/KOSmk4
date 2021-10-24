@@ -23,6 +23,7 @@
 
 #include <kernel/compiler.h>
 
+#ifndef CONFIG_USE_NEW_FS
 #include <dev/block.h>
 #include <fs/vfs.h>
 #include <kernel/except.h>
@@ -410,8 +411,7 @@ do_decref_active_part:
 	}
 }
 
-
-
 DECL_END
+#endif /* !CONFIG_USE_NEW_FS */
 
 #endif /* !GUARD_KERNEL_SRC_DEV_BLOCK_AUTOPART_C */

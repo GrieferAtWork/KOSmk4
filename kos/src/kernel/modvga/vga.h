@@ -117,13 +117,13 @@ LOCAL void KCALL vga_wattr(u8 reg, u8 val) {
 
 
 #ifdef __cplusplus
-typedef struct: video_device
+typedef struct: videodev
 #else /* __cplusplus */
 typedef struct
 #endif /* !__cplusplus */
 {
 #ifndef __cplusplus
-	struct video_device     v_dev;       /* The underlying ansi video device. */
+	struct videodev     v_dev;       /* The underlying ansi video device. */
 #endif /* !__cplusplus */
 	struct atomic_lock      v_lock;      /* Lock for accessing the VGA Hardware. */
 	PHYS physaddr_t         v_vram_addr; /* [const] VRAM base address (physical). */

@@ -31,6 +31,7 @@
 
 #include <inttypes.h>
 
+#ifndef CONFIG_USE_NEW_FS
 #if !defined(DEFINE_IO_READ) && !defined(DEFINE_IO_WRITE)
 #error "Must #define DEFINE_IO_READ or DEFINE_IO_WRITE"
 #elif defined(DEFINE_IO_READ) && defined(DEFINE_IO_WRITE)
@@ -564,3 +565,4 @@ PUBLIC NONNULL((1)) void
 #undef DEFINE_IO_READ
 
 DECL_END
+#endif /* !CONFIG_USE_NEW_FS */

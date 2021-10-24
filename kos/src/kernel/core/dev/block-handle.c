@@ -23,6 +23,7 @@
 
 #include <kernel/compiler.h>
 
+#ifndef CONFIG_USE_NEW_FS
 #include <dev/block.h>
 #include <fs/node.h>
 #include <kernel/aio.h>
@@ -577,8 +578,7 @@ handle_blkdev_hop(struct blkdev *__restrict self,
 	return 0;
 }
 
-
-
 DECL_END
+#endif /* !CONFIG_USE_NEW_FS */
 
 #endif /* !GUARD_KERNEL_SRC_DEV_BLOCK_HANDLE_C */

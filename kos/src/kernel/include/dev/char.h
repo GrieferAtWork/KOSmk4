@@ -167,7 +167,7 @@ chrdev_alloc(struct driver *__restrict owner,
 /* Returns the device number of `self', or `DEV_UNSET' if not set. */
 #define chrdev_getdevno(self) ((self)->cd_devlink.a_vaddr)
 #define chrdev_getname(self)  ((self)->cd_name)
-#define chrdev_getname_lock_acquire(self) do{do;__WHILE0
+#define chrdev_getname_lock_acquire(self) do{do{}__WHILE0
 #define chrdev_getname_lock_release(self) }__WHILE0
 
 /* Lookup  a character device associated with `devno'  and return a reference to it.

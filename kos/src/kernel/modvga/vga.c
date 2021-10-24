@@ -1307,7 +1307,7 @@ VGA_Ioctl(struct chrdev *__restrict self, syscall_ulong_t cmd,
 
 	default:
 		/* Fallback: Try to service a generic video ioctl() */
-		return video_device_ioctl(self, cmd, arg, mode);
+		return videodev_v_ioctl(self, cmd, arg, mode);
 		break;
 	}
 	return 0;
@@ -1363,7 +1363,7 @@ VGA_GetFmtByIndex(VGA *__restrict self,
 }
 
 PRIVATE size_t KCALL
-VGA_ListFmt(struct video_device *__restrict self,
+VGA_ListFmt(struct videodev *__restrict self,
             USER CHECKED struct vd_format *fmt,
             size_t offset, size_t limit)
 		THROWS(E_SEGFAULT, E_IOERROR, ...) {
@@ -1377,7 +1377,7 @@ VGA_ListFmt(struct video_device *__restrict self,
 }
 
 PRIVATE void KCALL
-VGA_GetFmt(struct video_device *__restrict self,
+VGA_GetFmt(struct videodev *__restrict self,
            USER CHECKED struct vd_format *fmt)
 		THROWS(E_SEGFAULT, E_IOERROR, ...) {
 	VGA *me = (VGA *)self;
@@ -1405,7 +1405,7 @@ do_return_tty_mode:
 }
 
 PRIVATE void KCALL
-VGA_SetFmt(struct video_device *__restrict self,
+VGA_SetFmt(struct videodev *__restrict self,
            USER CHECKED struct vd_format const *fmt)
 		THROWS(E_SEGFAULT, E_IOERROR, ...) {
 	VGA *me = (VGA *)self;
@@ -1447,7 +1447,7 @@ badcodec:
 }
 
 PRIVATE void KCALL
-VGA_GetPal(struct video_device *__restrict self,
+VGA_GetPal(struct videodev *__restrict self,
            vd_codec_t codec, USER CHECKED struct vd_palette *pal)
 		THROWS(E_SEGFAULT, E_IOERROR, ...) {
 	VGA *me = (VGA *)self;
@@ -1482,7 +1482,7 @@ VGA_GetPal(struct video_device *__restrict self,
 }
 
 PRIVATE void KCALL
-VGA_SetPal(struct video_device *__restrict self,
+VGA_SetPal(struct videodev *__restrict self,
            vd_codec_t codec, USER CHECKED struct vd_palette const *pal)
 		THROWS(E_SEGFAULT, E_IOERROR, ...) {
 	VGA *me = (VGA *)self;
@@ -1525,7 +1525,7 @@ VGA_SetPal(struct video_device *__restrict self,
 }
 
 
-PRIVATE struct video_device_ops const vga_video_operators = {
+PRIVATE struct videodev_ops const vga_video_operators = {
 	/* .vdf_listfmt = */ &VGA_ListFmt,
 	/* .vdf_getfmt  = */ &VGA_GetFmt,
 	/* .vdf_setfmt  = */ &VGA_SetFmt,
@@ -1592,7 +1592,7 @@ PRIVATE ATTR_FREETEXT DRIVER_INIT void KCALL init(void) {
 				vga_device->v_is1_r = VGA_IS1_RM;
 			}
 			/* Initialize the video and ansi layers */
-			video_device_cinit(vga_device,
+			videodev_cinit(vga_device,
 			                   &vga_video_operators,
 			                   &vga_ansi_operators);
 
