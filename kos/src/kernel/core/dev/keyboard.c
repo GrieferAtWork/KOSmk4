@@ -1542,6 +1542,16 @@ NOTHROW(KCALL kbddev_v_destroy)(struct mfile *__restrict self) {
 	kfree((byte_t *)me->kd_map.km_ext);
 	chrdev_v_destroy(self);
 }
+
+/* Default set of stream operators for keyboard devices (s.a.: the operators above) */
+PUBLIC_CONST struct mfile_stream_ops const kbddev_v_stream_ops = {
+	.mso_read        = &kbddev_v_read,
+	.mso_ioctl       = &kbddev_v_ioctl,
+	.mso_stat        = &kbddev_v_stat,
+	.mso_pollconnect = &kbddev_v_pollconnect,
+	.mso_polltest    = &kbddev_v_polltest,
+};
+
 #else /* CONFIG_USE_NEW_FS */
 
 /* Initialize/finalize the given keyboard device.

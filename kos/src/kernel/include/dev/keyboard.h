@@ -183,6 +183,9 @@ kbddev_v_pollconnect(struct mfile *__restrict self,
 FUNDEF NONNULL((1)) poll_mode_t KCALL
 kbddev_v_polltest(struct mfile *__restrict self,
                   poll_mode_t what) THROWS(...);
+/* Default set of stream operators for keyboard devices (s.a.: the operators above) */
+DATDEF struct mfile_stream_ops const kbddev_v_stream_ops;
+
 
 #if !defined(CONFIG_NO_DEBUGGER) && defined(KEYBOARD_DEVICE_FLAG_DBGF12)
 #define __kbddev_init_flags(self) (self)->kd_flags = K_UNICODE | KEYBOARD_DEVICE_FLAG_DBGF12
@@ -216,7 +219,7 @@ kbddev_v_polltest(struct mfile *__restrict self,
 	 (self)->kd_pendsz     = 0,                          \
 	 mutex_init(&(self)->kd_leds_lock),                  \
 	 (self)->kd_leds = 0,                                \
-	 awref_init((self)->kd_tty, __NULLPTR))
+	 awref_init(&(self)->kd_tty, __NULLPTR))
 #define _kbddev_cinit(self, ops)                          \
 	(___kbddev_assert_ops_(ops)                           \
 	 _chrdev_cinit(_kbddev_aschr(self), &(ops)->ko_cdev), \
@@ -229,7 +232,7 @@ kbddev_v_polltest(struct mfile *__restrict self,
 	 __hybrid_assert((self)->kd_pendsz == 0),             \
 	 mutex_cinit(&(self)->kd_leds_lock),                  \
 	 __hybrid_assert((self)->kd_leds == 0),               \
-	 awref_cinit((self)->kd_tty, __NULLPTR))
+	 awref_cinit(&(self)->kd_tty, __NULLPTR))
 /* Finalize a partially initialized `struct kbddev' (as initialized by `_kbddev_init()') */
 #define _kbddev_fini(self) _chrdev_fini(_kbddev_aschr(self))
 

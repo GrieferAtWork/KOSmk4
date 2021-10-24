@@ -124,28 +124,31 @@ BEGIN
 #define DEFINE_SIMPLE_ARCH_DRIVER(name)         DEFINE_SIMPLE_ARCH_DRIVER_EX("mod", name)
 #define DEFINE_SIMPLE_ARCH_DRIVER_LIBRARY(name) DEFINE_SIMPLE_ARCH_DRIVER_EX("../lib", name)
 
+
+#ifndef CONFIG_USE_NEW_FS /* TODO: These drivers have yet to be ported */
 		DEFINE_SIMPLE_DRIVER("ext2fs")
 		DEFINE_SIMPLE_DRIVER("iso9660")
 		DEFINE_SIMPLE_DRIVER("ne2k")
+		DEFINE_SIMPLE_DRIVER("usb-hid", LIB(":usb")) /* Link against usb driver */
+		DEFINE_SIMPLE_DRIVER("usb-storage", LIB(":usb")) /* Link against usb driver */
+		DEFINE_SIMPLE_DRIVER("procfs",
+			SOURCE({
+				"modprocfs/files/*.c",
+				"modprocfs/arch/" + XARCH + "/*.c"
+			}))
+		DEFINE_SIMPLE_DRIVER("usb")
+#endif /* !CONFIG_USE_NEW_FS */
+
+
 		DEFINE_SIMPLE_DRIVER("vga")
 		DEFINE_SIMPLE_DRIVER("ps2")
 		DEFINE_SIMPLE_DRIVER("sctrace", SOURCE({ "../libsctrace/*.c" })) /* Include libsctrace source files */
-		DEFINE_SIMPLE_DRIVER("usb-hid", LIB(":usb")) /* Link against usb driver */
-		DEFINE_SIMPLE_DRIVER("usb-storage", LIB(":usb")) /* Link against usb driver */
 		DEFINE_SIMPLE_ARCH_DRIVER("gdbserver")
 		DEFINE_SIMPLE_DRIVER("dbx") /* DeBug eXtensions */
 
 		if (TARGET_ARCH in ["i386", "x86_64"]) {
 			DEFINE_SIMPLE_ARCH_DRIVER("rtm")
 		}
-
-		DEFINE_SIMPLE_DRIVER("procfs",
-			SOURCE({
-				"modprocfs/files/*.c",
-				"modprocfs/arch/" + XARCH + "/*.c"
-			}))
-
-		DEFINE_SIMPLE_DRIVER("usb")
 
 #undef DEFINE_SIMPLE_ARCH_DRIVER
 #undef DEFINE_SIMPLE_DRIVER

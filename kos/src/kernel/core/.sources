@@ -18,6 +18,11 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 
+#undef CONFIG_USE_NEW_FS
+#if 0 /* s.a. "kernel/compiler.h" */
+#define CONFIG_USE_NEW_FS
+#endif
+
 
 BEGIN
 	DEFINE({ "CONFIG_BUILDING_KERNEL_CORE" : "1" })
@@ -112,12 +117,12 @@ BEGIN
 		"memory/*.c",
 		"memory/mman/*.c",
 		"dev/*.c",
-#if 1 // #ifndef CONFIG_USE_NEW_FS
+#ifndef CONFIG_USE_NEW_FS
 		"fs/*.c",
 		"drivers/*.c",
-#else
+#else /* !CONFIG_USE_NEW_FS */
 		"filesys/*.c",
-#endif
+#endif /* CONFIG_USE_NEW_FS */
 		"misc/*.c",
 		"network/*.c",
 		"sched/*.c",

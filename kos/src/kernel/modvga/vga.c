@@ -1543,7 +1543,7 @@ VGA_SetPal(struct videodev *__restrict self,
 
 #ifdef CONFIG_USE_NEW_FS
 PRIVATE struct mfile_stream_ops const vga_stream_operators = {
-	.mso_write = &ansittydev_v_write,
+	.mso_write = &videodev_v_write,
 	.mso_ioctl = &VGA_Ioctl,
 	.mso_mmap  = &VGA_MMap,
 };
@@ -1551,6 +1551,7 @@ PRIVATE struct videodev_ops const vga_operators = {
 	.vdf_tty = {{{{{
 		.no_file = {
 			.mo_destroy = &videodev_v_destroy, /* XXX: Destructor for VGA? */
+			.mo_changed = &videodev_v_changed,
 			.mo_stream  = &vga_stream_operators,
 		},
 		.no_wrattr = &videodev_v_wrattr,
