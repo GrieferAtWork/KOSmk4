@@ -208,9 +208,7 @@ NOTHROW(KCALL aio_multihandle_fini)(struct aio_multihandle *__restrict self) {
 
 
 /* Allocate handles for the purpose of AIO completion.
- * WARNING: Don't free a handle after you already started using it in the context of an AIO parameter.
- * NOTE: `aio_multihandle_allochandle()' calls `aio_multihandle_fail()' upon
- *       error, before returning  propagating an error  / returning  `NULL'. */
+ * WARNING: Don't free a handle after you already started using it in the context of an AIO parameter. */
 PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1)) struct aio_handle *KCALL
 aio_multihandle_allochandle(struct aio_multihandle *__restrict self)
 		THROWS(E_BADALLOC) {

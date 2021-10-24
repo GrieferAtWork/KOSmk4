@@ -82,7 +82,8 @@
                                             * Castable into: HANDLE_TYPE_MFILE (if supported) */
 #define HANDLE_TYPE_MPART           0x0019 /* `struct mpart' */
 #define HANDLE_TYPE_MODULE_SECTION  0x001a /* `struct module_section' */
-#define HANDLE_TYPE_COUNT           0x001b /* # of recognized handle types
+#define HANDLE_TYPE_REFCOUNTABLE    0x001b /* `struct refcountable' */
+#define HANDLE_TYPE_COUNT           0x001c /* # of recognized handle types
                                             * NOTE: After changing  this value,  be sure  to
                                             * `touch kos/src/kernel/include/kernel/handle.h' */
 
@@ -114,7 +115,8 @@
 	cb(HANDLE_TYPE_FUTEX, struct mfutex)                  \
 	cb(HANDLE_TYPE_FUTEXFD, struct mfutexfd)              \
 	cb(HANDLE_TYPE_MODULE_SECTION, struct driver_section) \
-	cb(HANDLE_TYPE_SOCKET, struct socket)
+	cb(HANDLE_TYPE_SOCKET, struct socket)                 \
+	cb(HANDLE_TYPE_REFCOUNTABLE, struct refcountable)
 
 /* Invoke `cb(int HANDLE_TYPE, typename T)' for each handle  type
  * that could reasonably be used for callback registrations (such
@@ -125,7 +127,8 @@
 	cb(HANDLE_TYPE_MMAN, struct mman)     \
 	cb(HANDLE_TYPE_MODULE, struct driver) \
 	cb(HANDLE_TYPE_CHRDEV, struct chrdev) \
-	cb(HANDLE_TYPE_SOCKET, struct socket)
+	cb(HANDLE_TYPE_SOCKET, struct socket) \
+	cb(HANDLE_TYPE_REFCOUNTABLE, struct refcountable)
 
 
 

@@ -1085,6 +1085,12 @@ blkdev_repart(struct blkdev *__restrict self)
 
 		/* Insert into the all-parts list. */
 		LIST_INSERT_HEAD(&fallnodes_list, dev, fn_allnodes);
+
+		assert(!(dev->mf_flags & MFILE_FN_GLOBAL_REF));
+		if (self->mf_flags & MFILE_FN_GLOBAL_REF) {
+			dev->mf_flags |= MFILE_FN_GLOBAL_REF;
+			++dev->mf_refcnt; /* For `MFILE_FN_GLOBAL_REF' (in `fallnodes_list') */
+		}
 	}
 	self->bd_rootinfo.br_parts = newparts;
 
@@ -1174,6 +1180,10 @@ blkdev_repart_and_register(struct blkdev *__restrict self)
 	}
 	devfs_insert_into_inode_tree(self);
 	LIST_INSERT_HEAD(&fallnodes_list, self, fn_allnodes);
+	if (!(self->mf_flags & MFILE_FN_GLOBAL_REF)) {
+		self->mf_flags |= MFILE_FN_GLOBAL_REF;
+		++self->mf_refcnt; /* For `MFILE_FN_GLOBAL_REF' (in `fallnodes_list') */
+	}
 
 	/* Register all of the new partitions */
 	LIST_FOREACH (dev, &newparts, bd_partinfo.bp_partlink) {
@@ -1191,6 +1201,10 @@ blkdev_repart_and_register(struct blkdev *__restrict self)
 
 		/* Insert into the all-parts list. */
 		LIST_INSERT_HEAD(&fallnodes_list, dev, fn_allnodes);
+
+		assert(!(dev->mf_flags & MFILE_FN_GLOBAL_REF));
+		dev->mf_flags |= MFILE_FN_GLOBAL_REF;
+		++dev->mf_refcnt; /* For `MFILE_FN_GLOBAL_REF' (in `fallnodes_list') */
 	}
 	self->bd_rootinfo.br_parts = newparts;
 

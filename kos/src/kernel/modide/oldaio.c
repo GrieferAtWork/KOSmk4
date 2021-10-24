@@ -515,7 +515,7 @@ NOTHROW(KCALL AtaDrive_DmaAioHandle_Cancel)(struct aio_handle *__restrict self) 
 	was = PREEMPTION_PUSHOFF();
 	prd.hd_prd_vector = ATOMIC_XCH(data->hd_prd.hd_prd_vector, NULL);
 	if (prd.hd_prd_vector != NULL) {
-		/* Cancelled before started */
+		/* Canceled before started */
 		if (!(data->hd_flags & ATA_AIO_HANDLE_FONEPRD))
 			kfree(prd.hd_prd_vector);
 		/* Remove  the entry from  pending AIO. Having successfully

@@ -188,6 +188,7 @@ DATDEF struct blkdev_ops const blkpart_ops;
 /* Return the sector shift/size/count of the block device. */
 #define blkdev_getsectorshift(self) ((self)->_blkdev_dev_ _device_devnode_ _fdevnode_node_ _fnode_file_ mf_blockshift)
 #define blkdev_getsectorsize(self)  ((size_t)1 << blkdev_getsectorshift(self))
+#define blkdev_getsectormask(self)  (blkdev_getsectorsize(self) - 1)
 #define blkdev_getsectorcount(self) (__atomic64_val((self)->_blkdev_dev_ _device_devnode_ _fdevnode_node_ _fnode_file_ mf_filesize) >> blkdev_getsectorshift(self))
 #define blkdev_getsize(self)        ((pos_t)__atomic64_val((self)->_blkdev_dev_ _device_devnode_ _fdevnode_node_ _fnode_file_ mf_filesize))
 

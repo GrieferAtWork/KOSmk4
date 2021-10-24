@@ -176,7 +176,7 @@ got_identify_signal:
 		/* TODO: Permission checks? */
 		validate_writable(arg, sizeof(int));
 		COMPILER_WRITE_BARRIER();
-		*(USER CHECKED int *)arg = (self->ad_features & ATA_DRIVE_FEATURE_FFLUSH) ? 1 : 0;
+		*(USER CHECKED int *)arg = (self->ad_features & ATA_DRIVE_FEATURE_F_FLUSH) ? 1 : 0;
 		COMPILER_WRITE_BARRIER();
 	}	break;
 
@@ -190,9 +190,9 @@ got_identify_signal:
 		COMPILER_READ_BARRIER();
 		if (cache_mode) {
 			/* WARNING: The drive may not actually support this... */
-			ATOMIC_OR(self->ad_features, ATA_DRIVE_FEATURE_FFLUSH);
+			ATOMIC_OR(self->ad_features, ATA_DRIVE_FEATURE_F_FLUSH);
 		} else {
-			ATOMIC_AND(self->ad_features, ~ATA_DRIVE_FEATURE_FFLUSH);
+			ATOMIC_AND(self->ad_features, ~ATA_DRIVE_FEATURE_F_FLUSH);
 		}
 	}	break;
 

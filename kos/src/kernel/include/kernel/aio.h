@@ -167,7 +167,7 @@ DECL_BEGIN
  * │                                           [ 2] >> was = PREEMPTION_PUSHOFF();                 │
  * │                                           [ 3] >> cmd = ATOMIC_XCH(aio->ah_data[1], NULL);  <─┘
  * v                                           [ 4] >> if (cmd) {
- * [aio_progress(aio)]                         [ 5] >>     // Cancelled before started
+ * [aio_progress(aio)]                         [ 5] >>     // Canceled before started
  * Optional, but in case of multi-step         [ 6] >>     decref_likely(cmd);
  * commands, this can easily be implemented    [ 7] >>     // Remove the entry from pending AIO. Having successfully
  * by keeping track of how many steps have     [ 8] >>     // cleared the command-pointer, we know that `async_work()'
@@ -407,7 +407,7 @@ NOTHROW(KCALL aio_handle_fini)(struct aio_handle *__restrict self) {
 }
 
 /* Check if the given AIO handle's callback has already been invoked. */
-LOCAL NOBLOCK NONNULL((1)) bool
+LOCAL NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) bool
 NOTHROW(KCALL aio_handle_completed)(struct aio_handle const *__restrict self) {
 	return __hybrid_atomic_load(self->ah_next, __ATOMIC_ACQUIRE) == AIO_HANDLE_NEXT_COMPLETED;
 }
@@ -593,7 +593,7 @@ struct ATTR_ALIGNED(AIO_HANDLE_ALIGNMENT) aio_handle_multiple
 #endif /* __cplusplus */
 #define AIO_HANDLE_MULTIPLE_CONTROLLER_UNUSED_IS_ZERO 1
 #define AIO_HANDLE_MULTIPLE_CONTROLLER_UNUSED   ((struct aio_multihandle *)0)  /* Unused entry */
-#define AIO_HANDLE_MULTIPLE_CONTROLLER_COMPLETE ((struct aio_multihandle *)-1) /* Completed/Cancelled entry */
+#define AIO_HANDLE_MULTIPLE_CONTROLLER_COMPLETE ((struct aio_multihandle *)-1) /* Completed/Canceled entry */
 	struct aio_multihandle *hg_controller; /* [0..1][lock(WRITE_ONCE(AIO_HANDLE_MULTIPLE_CONTROLLER_COMPLETE))]
 	                                        * Associated controller. Set to `AIO_HANDLE_MULTIPLE_CONTROLLER_COMPLETE'
 	                                        * after this handle's operation has completed. */

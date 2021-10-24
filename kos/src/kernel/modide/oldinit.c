@@ -75,10 +75,10 @@ NOTHROW(KCALL AtaDrive_Fini)(struct block_device *__restrict self) {
 
 
 PRIVATE ATTR_FREETEXT ATTR_NOINLINE bool KCALL
-Ata_InitializeDrive(struct ata_ports *__restrict ports,
-                    /*(in|out)_opt*/ REF AtaBus **__restrict pbus,
-                    u8 drive_id, bool is_primary_bus,
-                    bool is_default_ide) {
+AtaInit_InitializeDrive(struct ata_ports *__restrict ports,
+                        /*(in|out)_opt*/ REF AtaBus **__restrict p_bus,
+                        u8 drive_id, bool is_primary_bus,
+                        bool is_default_ide) {
 	u8 cl, ch;
 	struct hd_driveid specs;
 	assert(drive_id == ATA_DRIVE_MASTER ||
@@ -100,7 +100,6 @@ Ata_InitializeDrive(struct ata_ports *__restrict ports,
 				return false; /* Floating bus */
 		}
 
-
 		/* Do a soft reset on both ATA device control ports. */
 		AtaBus_HW_ResetBus_P(ports->a_ctrl);
 
@@ -109,7 +108,7 @@ Ata_InitializeDrive(struct ata_ports *__restrict ports,
 		AtaBus_HW_SelectDelay_P(ports->a_ctrl);
 
 		/* Wait for the command to be acknowledged. */
-		if (AtaBus_HW_WaitForBusy_P(ports->a_ctrl, (ktime_t)3 * NSEC_PER_SEC) != ATA_ERROR_OK)
+		if (AtaBus_HW_WaitForBusy_P(ports->a_ctrl, relktime_from_seconds(3)) != ATA_ERROR_OK)
 			return false;
 
 		/* Figure out what kind of drive this is. */
@@ -119,9 +118,9 @@ Ata_InitializeDrive(struct ata_ports *__restrict ports,
 		if ((cl == 0x00 && ch == 0x00) || /* PATA */
 		    (cl == 0x3c && ch == 0xc3)) { /* SATA */
 			REF AtaDrive *drive;
-			AtaBus *bus = *pbus;
+			AtaBus *bus = *p_bus;
 			if (!bus) {
-				*pbus = bus = CHRDEV_ALLOC(AtaBus);
+				*p_bus = bus = CHRDEV_ALLOC(AtaBus);
 				TRY {
 #if ATA_BUS_STATE_READY != 0
 					bus->ab_state = ATA_BUS_STATE_READY;
@@ -136,9 +135,9 @@ Ata_InitializeDrive(struct ata_ports *__restrict ports,
 					bus->ab_dmaio  = ports->a_dma;
 					bus->ab_dma_retry   = 3;
 					bus->ab_pio_retry   = 3;
-					bus->ab_timeout_BSY = (ktime_t)3 * NSEC_PER_SEC;
-					bus->ab_timeout_DRQ = (ktime_t)3 * NSEC_PER_SEC;
-					bus->ab_timeout_dat = (ktime_t)2 * NSEC_PER_SEC;
+					bus->ab_timeout_BSY = relktime_from_seconds(3);
+					bus->ab_timeout_DRQ = relktime_from_seconds(3);
+					bus->ab_timeout_dat = relktime_from_seconds(2);
 					assert(bus->ab_prdt == NULL);
 					/* The BUS structure must be registered alongside an interrupt registration. */
 					hisr_register_at(is_primary_bus ? X86_INTNO_PIC2_ATA1 /* TODO: Non-portable! */
@@ -150,7 +149,7 @@ Ata_InitializeDrive(struct ata_ports *__restrict ports,
 					chrdev_register_auto(bus);
 				} EXCEPT {
 					chrdev_destroy(bus);
-					*pbus = NULL;
+					*p_bus = NULL;
 					RETHROW();
 				}
 			}
@@ -230,7 +229,7 @@ got_identify_signal:
 			drive->ad_chs_sectors_per_track = (u8)specs.sectors;
 			/*drive->bd_type.dt_fini = NULL;*/
 			if (specs.command_set_2 & HD_DRIVEID_COMMAND_SET_2_FLUSH)
-				drive->ad_features |= ATA_DRIVE_FEATURE_FFLUSH;
+				drive->ad_features |= ATA_DRIVE_FEATURE_F_FLUSH;
 			if (specs.capability & HD_DRIVEID_CAPABILITY_DMA) {
 				AtaDmaDrive *ddrive = (AtaDmaDrive *)drive;
 				if (!bus->ab_prdt) {
@@ -365,14 +364,14 @@ calculate_chs:
 }
 
 PRIVATE ATTR_FREETEXT ATTR_NOINLINE bool KCALL
-initialize_ata(struct ata_ports *__restrict ports,
-               bool is_primary_bus,
-               bool is_default_ide) {
+AtaInit_InitializeAta(struct ata_ports *__restrict ports,
+                      bool is_primary_bus,
+                      bool is_default_ide) {
 	REF AtaBus *bus = NULL;
 	bool result;
 	TRY {
-		result = Ata_InitializeDrive(ports, &bus, ATA_DRIVE_MASTER, is_primary_bus, is_default_ide);
-		result |= Ata_InitializeDrive(ports, &bus, ATA_DRIVE_SLAVE, is_primary_bus, is_default_ide);
+		result = AtaInit_InitializeDrive(ports, &bus, ATA_DRIVE_MASTER, is_primary_bus, is_default_ide);
+		result |= AtaInit_InitializeDrive(ports, &bus, ATA_DRIVE_SLAVE, is_primary_bus, is_default_ide);
 	} EXCEPT {
 		xdecref_unlikely(bus);
 		RETHROW();
@@ -382,7 +381,7 @@ initialize_ata(struct ata_ports *__restrict ports,
 }
 
 PRIVATE ATTR_FREETEXT ATTR_NOINLINE bool KCALL
-initialize_ide(struct ide_ports *__restrict self, bool is_default_ide) {
+AtaInit_InitializeIde(struct ide_ports *__restrict self, bool is_default_ide) {
 	struct ata_ports a;
 	bool result;
 	printk(FREESTR(KERN_INFO "[ata] Attempting to initialize IDE device {"
@@ -399,20 +398,20 @@ initialize_ide(struct ide_ports *__restrict self, bool is_default_ide) {
 	a.a_bus  = self->i_primary_bus;
 	a.a_ctrl = self->i_primary_ctrl;
 	a.a_dma  = self->i_dma_ctrl;
-	result   = initialize_ata(&a, true, is_default_ide);
+	result   = AtaInit_InitializeAta(&a, true, is_default_ide);
 	a.a_bus  = self->i_secondary_bus;
 	a.a_ctrl = self->i_secondary_ctrl;
 	a.a_dma  = self->i_dma_ctrl;
 	if (a.a_dma != (port_t)-1)
 		a.a_dma += (DMA_SECONDARY_COMMAND - DMA_PRIMARY_COMMAND);
-	result |= initialize_ata(&a, false, is_default_ide);
+	result |= AtaInit_InitializeAta(&a, false, is_default_ide);
 	return result;
 }
 
 /* @return: true:  Primary IDE device found.
  * @return: false: Secondary IDE device found, or initialization failed. */
 PRIVATE ATTR_FREETEXT ATTR_NOINLINE bool KCALL
-kernel_load_pci_ide(struct pci_device *__restrict dev) {
+AtaInit_LoadPciIDE(struct pci_device *__restrict dev) {
 	bool result = false;
 	struct ide_ports i;
 	if (dev->pd_regions[0].pmr_size == 0) {
@@ -484,21 +483,21 @@ kernel_load_pci_ide(struct pci_device *__restrict dev) {
 	/* Forceably disable DMA, the same way a bus without support would */
 	if (ide_nodma)
 		i.i_dma_ctrl = (port_t)-1;
-	return initialize_ide(&i, result) ? result : false;
+	return AtaInit_InitializeIde(&i, result) ? result : false;
 }
 
 
 #ifdef CONFIG_BUILDING_KERNEL_CORE
 INTERN ATTR_FREETEXT void KCALL kernel_initialize_ide_driver(void)
 #else /* CONFIG_BUILDING_KERNEL_CORE */
-PRIVATE DRIVER_INIT ATTR_FREETEXT void KCALL ata_init(void)
+PRIVATE DRIVER_INIT ATTR_FREETEXT void KCALL AtaInit(void)
 #endif /* !CONFIG_BUILDING_KERNEL_CORE */
 {
 	bool has_primary = false;
 	struct pci_device *dev;
 	/* Search for IDE PCI devices. */
 	PCI_FOREACH_DEVICE_CLASS (dev, PCI_DEV8_CLASS_STORAGE, 1) {
-		has_primary |= kernel_load_pci_ide(dev);
+		has_primary |= AtaInit_LoadPciIDE(dev);
 	}
 	if (!has_primary) {
 		/* Check for an IDE device at the default location. */
@@ -508,7 +507,7 @@ PRIVATE DRIVER_INIT ATTR_FREETEXT void KCALL ata_init(void)
 		i.i_secondary_bus  = ATA_DEFAULT_SECONDARY_BUS;
 		i.i_secondary_ctrl = ATA_DEFAULT_SECONDARY_CTRL;
 		i.i_dma_ctrl       = (port_t)-1;
-		initialize_ide(&i, true);
+		AtaInit_InitializeIde(&i, true);
 	}
 }
 

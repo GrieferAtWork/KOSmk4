@@ -144,7 +144,7 @@ struct ata_bus_struct: chrdev {
 	struct sig              ab_piointr;     /* Signal broadcast for interrupts while in `ATA_BUS_STATE_INPIO' */
 #define ATA_PIOINTR_ALT_ENCODE(status) ((struct sig *)((uintptr_t)0x100 | (uintptr_t)(u8)(status)))
 #define ATA_PIOINTR_ALT_DECODE(resp)   ((u8)((uintptr_t)(resp) & 0xff))
-	AtaPRD                 *ab_prdt;        /* [1..ATA_PRD_MAXCOUNT][valid_if(b_dmaio != (port_t)-1)][owned]
+	AtaPRD                 *ab_prdt;        /* [1..ATA_PRD_MAXCOUNT][valid_if(ab_dmaio != (port_t)-1)][owned]
 	                                         * NOTE: This pointer is allocated using `vpage_alloc_untraced()',
 	                                         *       and   spans   a   single   page   of   physical   memory. */
 	port_t                  ab_busio;       /* [const] ATA_DEFAULT_PRIMARY_BUS:  I/O port for the ATA bus. */
@@ -164,8 +164,8 @@ struct ata_drive_struct: block_device {
 	u8                  ad_chs_sectors_per_track; /* [const] # of sectors per track for CHS addressing */
 	u8                  ad_chs_number_of_heads;   /* [const] # of heads for CHS addressing */
 	u8                  ad_drive;                 /* [const] Used drive (either `ATA_DRIVE_MASTER' or `ATA_DRIVE_SLAVE') */
-#define ATA_DRIVE_FEATURE_FNORMAL 0x00            /* Normal features */
-#define ATA_DRIVE_FEATURE_FFLUSH  0x01            /* The drive supports `ATA_COMMAND_CACHE_FLUSH' function (TODO: Currently unused) */
+#define ATA_DRIVE_FEATURE_F_NORMAL 0x00            /* Normal features */
+#define ATA_DRIVE_FEATURE_F_FLUSH  0x01            /* The drive supports `ATA_COMMAND_CACHE_FLUSH' function (TODO: Currently unused) */
 	u8                  ad_features;              /* [const] Set of `ATA_DRIVE_FEATURE_F*' */
 };
 

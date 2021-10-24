@@ -29,7 +29,8 @@
 __DECL_BEGIN
 
 /* Default sector size for all ATA disks. */
-#define DEFAULT_ATA_SECTOR_SIZE 512
+#define DEFAULT_ATA_SECTOR_SIZE  512
+#define DEFAULT_ATA_SECTOR_SHIFT 9 /* == log2(DEFAULT_ATA_SECTOR_SIZE) */
 
 /* Default ATA port numbers (probe these when PCI
  * doesn't enumerate any ATA drives) */
