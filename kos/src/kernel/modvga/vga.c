@@ -1272,9 +1272,16 @@ VGA_DisableGraphicsMode(VGA *__restrict self) {
 }
 
 
+#ifdef CONFIG_USE_NEW_FS
+PRIVATE NONNULL((1)) syscall_slong_t KCALL
+VGA_Ioctl(struct mfile *__restrict self, syscall_ulong_t cmd,
+          USER UNCHECKED void *arg, iomode_t mode) THROWS(...)
+#else /* CONFIG_USE_NEW_FS */
 PRIVATE NONNULL((1)) syscall_slong_t KCALL
 VGA_Ioctl(struct chrdev *__restrict self, syscall_ulong_t cmd,
-          USER UNCHECKED void *arg, iomode_t mode) THROWS(...) {
+          USER UNCHECKED void *arg, iomode_t mode) THROWS(...)
+#endif /* !CONFIG_USE_NEW_FS */
+{
 	VGA *me = (VGA *)self;
 	(void)mode;
 	switch (cmd) {
@@ -1313,9 +1320,17 @@ VGA_Ioctl(struct chrdev *__restrict self, syscall_ulong_t cmd,
 	return 0;
 }
 
+
+#ifdef CONFIG_USE_NEW_FS
+PRIVATE NONNULL((1, 2)) void KCALL
+VGA_MMap(struct mfile *__restrict self,
+         struct handle_mmap_info *__restrict info) THROWS(...)
+#else /* CONFIG_USE_NEW_FS */
 PRIVATE NONNULL((1, 2)) void KCALL
 VGA_MMap(struct chrdev *__restrict self,
-         struct handle_mmap_info *__restrict info) THROWS(...) {
+         struct handle_mmap_info *__restrict info) THROWS(...)
+#endif /* !CONFIG_USE_NEW_FS */
+{
 	VGA *me = (VGA *)self;
 	info->hmi_file    = incref(&mfile_phys);
 	info->hmi_minaddr = (pos_t)me->v_vram_addr;
@@ -1525,13 +1540,36 @@ VGA_SetPal(struct videodev *__restrict self,
 }
 
 
-PRIVATE struct videodev_ops const vga_video_operators = {
+
+#ifdef CONFIG_USE_NEW_FS
+PRIVATE struct mfile_stream_ops const vga_stream_operators = {
+	.mso_write = &ansittydev_v_write,
+	.mso_ioctl = &VGA_Ioctl,
+	.mso_mmap  = &VGA_MMap,
+};
+PRIVATE struct videodev_ops const vga_operators = {
+	.vdf_tty = {{{{{
+		.no_file = {
+			.mo_destroy = &videodev_v_destroy, /* XXX: Destructor for VGA? */
+			.mo_stream  = &vga_stream_operators,
+		},
+		.no_wrattr = &videodev_v_wrattr,
+	}}}}},
+	.vdf_listfmt = &VGA_ListFmt,
+	.vdf_getfmt  = &VGA_GetFmt,
+	.vdf_setfmt  = &VGA_SetFmt,
+	.vdf_getpal  = &VGA_GetPal,
+	.vdf_setpal  = &VGA_SetPal,
+};
+#else /* CONFIG_USE_NEW_FS */
+PRIVATE struct videodev_ops const vga_operators = {
 	/* .vdf_listfmt = */ &VGA_ListFmt,
 	/* .vdf_getfmt  = */ &VGA_GetFmt,
 	/* .vdf_setfmt  = */ &VGA_SetFmt,
 	/* .vdf_getpal  = */ &VGA_GetPal,
 	/* .vdf_setpal  = */ &VGA_SetPal,
 };
+#endif /* !CONFIG_USE_NEW_FS */
 
 
 
@@ -1564,7 +1602,14 @@ NOTHROW(KCALL vga_disable_annoying_blinking)(void) {
 
 PRIVATE ATTR_FREETEXT DRIVER_INIT void KCALL init(void) {
 	vga_disable_annoying_blinking();
+#ifdef CONFIG_USE_NEW_FS
+	vga_device = (REF VGA *)kmalloc(sizeof(VGA), GFP_CALLOC);
+	_videodev_cinit(vga_device, &vga_operators, &vga_ansi_operators);
+	vga_device->fn_mode   = S_IFCHR | 0600;
+	vga_device->dv_driver = incref(&drv_self);
+#else /* CONFIG_USE_NEW_FS */
 	vga_device = CHRDEV_ALLOC(VGA);
+#endif /* !CONFIG_USE_NEW_FS */
 	TRY {
 		void *vram_base;
 		atomic_lock_cinit(&vga_device->v_lock);
@@ -1591,15 +1636,16 @@ PRIVATE ATTR_FREETEXT DRIVER_INIT void KCALL init(void) {
 				vga_device->v_crt_d = VGA_CRT_DM;
 				vga_device->v_is1_r = VGA_IS1_RM;
 			}
+
+#ifndef CONFIG_USE_NEW_FS
 			/* Initialize the video and ansi layers */
 			videodev_cinit(vga_device,
-			                   &vga_video_operators,
+			                   &vga_operators,
 			                   &vga_ansi_operators);
-
 			vga_device->cd_type.ct_ioctl = &VGA_Ioctl;
 			vga_device->cd_type.ct_mmap  = &VGA_MMap;
-
 			strcpy(vga_device->cd_name, FREESTR("vga"));
+#endif /* !CONFIG_USE_NEW_FS */
 
 			/* Configure text-mode pointers. */
 			vga_device->v_textbase_real = (u16 *)(vga_device->v_vram + 0x18000);
@@ -1622,7 +1668,11 @@ PRIVATE ATTR_FREETEXT DRIVER_INIT void KCALL init(void) {
 			vga_state_text();
 
 			/* Register the VGA adapter device. */
+#ifdef CONFIG_USE_NEW_FS
+			device_registerf(vga_device, MKDEV(DEV_MAJOR_AUTO, 0), "vga");
+#else /* CONFIG_USE_NEW_FS */
 			chrdev_register_auto(vga_device);
+#endif /* !CONFIG_USE_NEW_FS */
 		} EXCEPT {
 			{
 				NESTED_EXCEPTION;
@@ -1631,7 +1681,13 @@ PRIVATE ATTR_FREETEXT DRIVER_INIT void KCALL init(void) {
 			RETHROW();
 		}
 	} EXCEPT {
+#ifdef CONFIG_USE_NEW_FS
+		_videodev_fini(vga_device);
+		decref_nokill(&drv_self);
+		kfree(vga_device);
+#else /* CONFIG_USE_NEW_FS */
 		destroy(vga_device);
+#endif /* !CONFIG_USE_NEW_FS */
 		vga_device = NULL;
 		RETHROW();
 	}
@@ -1639,7 +1695,11 @@ PRIVATE ATTR_FREETEXT DRIVER_INIT void KCALL init(void) {
 
 PRIVATE DRIVER_FINI void KCALL fini(void) {
 	if (vga_device) {
+#ifdef CONFIG_USE_NEW_FS
+		device_delete(vga_device);
+#else /* CONFIG_USE_NEW_FS */
 		chrdev_unregister(vga_device);
+#endif /* !CONFIG_USE_NEW_FS */
 		decref(vga_device);
 	}
 }

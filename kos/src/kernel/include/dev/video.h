@@ -39,7 +39,7 @@ struct videodev;
 
 struct videodev_ops {
 #ifdef CONFIG_USE_NEW_FS
-	struct ansittydev vdf_tty; /* Ansi tty operators. */
+	struct ansittydev_ops vdf_tty; /* Ansi tty operators. */
 #endif /* CONFIG_USE_NEW_FS */
 
 	/* [1..1] Enumerate available display formats for the given video device.
