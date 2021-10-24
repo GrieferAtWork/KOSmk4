@@ -17,14 +17,15 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_MODIDE_INIT_C
-#define GUARD_MODIDE_INIT_C 1
+#ifndef GUARD_MODIDE_OLDINIT_C
+#define GUARD_MODIDE_OLDINIT_C 1
 #define _KOS_SOURCE 1
 
-#include "ata.h"
-/**/
-
 #include <kernel/compiler.h>
+
+#ifndef CONFIG_USE_NEW_FS
+#include "oldata.h"
+/**/
 
 #include <kernel/driver-param.h>
 #include <kernel/driver.h>
@@ -512,5 +513,6 @@ PRIVATE DRIVER_INIT ATTR_FREETEXT void KCALL ata_init(void)
 }
 
 DECL_END
+#endif /* !CONFIG_USE_NEW_FS */
 
-#endif /* !GUARD_MODIDE_INIT_C */
+#endif /* !GUARD_MODIDE_OLDINIT_C */

@@ -17,14 +17,15 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_MODIDE_HW_C
-#define GUARD_MODIDE_HW_C 1
+#ifndef GUARD_MODIDE_OLDHW_C
+#define GUARD_MODIDE_OLDHW_C 1
 #define _KOS_SOURCE 1
 
-#include "ata.h"
-/**/
-
 #include <kernel/compiler.h>
+
+#ifndef CONFIG_USE_NEW_FS
+#include "oldata.h"
+/**/
 
 #include <kernel/paging.h>
 #include <sched/tsc.h>
@@ -121,8 +122,7 @@ NOTHROW(FCALL AtaBus_HW_ResetBusAndInitializeDMA)(AtaBus *__restrict self) {
 	outl(self->ab_dmaio + DMA_PRIMARY_PRDT, (u32)phys);
 }
 
-
-
 DECL_END
+#endif /* !CONFIG_USE_NEW_FS */
 
-#endif /* !GUARD_MODIDE_HW_C */
+#endif /* !GUARD_MODIDE_OLDHW_C */

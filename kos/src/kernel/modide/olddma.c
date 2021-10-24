@@ -17,14 +17,15 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_MODIDE_DMA_C
-#define GUARD_MODIDE_DMA_C 1
+#ifndef GUARD_MODIDE_OLDDMA_C
+#define GUARD_MODIDE_OLDDMA_C 1
 #define _KOS_SOURCE 1
 
-#include "ata.h"
-/**/
-
 #include <kernel/compiler.h>
+
+#ifndef CONFIG_USE_NEW_FS
+#include "oldata.h"
+/**/
 
 #include <hybrid/atomic.h>
 
@@ -279,7 +280,7 @@ NOTHROW(FCALL AtaBus_HW_GetDmaProgress)(AtaBus *__restrict self) {
 	return 0;
 }
 
-
 DECL_END
+#endif /* !CONFIG_USE_NEW_FS */
 
-#endif /* !GUARD_MODIDE_DMA_C */
+#endif /* !GUARD_MODIDE_OLDDMA_C */

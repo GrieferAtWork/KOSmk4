@@ -17,14 +17,15 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_MODIDE_INTERRUPT_C
-#define GUARD_MODIDE_INTERRUPT_C 1
+#ifndef GUARD_MODIDE_OLDINTERRUPT_C
+#define GUARD_MODIDE_OLDINTERRUPT_C 1
 #define _KOS_SOURCE 1
 
-#include "ata.h"
-/**/
-
 #include <kernel/compiler.h>
+
+#ifndef CONFIG_USE_NEW_FS
+#include "oldata.h"
+/**/
 
 #include <kernel/entropy.h>
 #include <kernel/isr.h>
@@ -140,5 +141,6 @@ NOTHROW(FCALL AtaBus_HW_InterruptHandler)(AtaBus *__restrict self) {
 }
 
 DECL_END
+#endif /* !CONFIG_USE_NEW_FS */
 
-#endif /* !GUARD_MODIDE_INTERRUPT_C */
+#endif /* !GUARD_MODIDE_OLDINTERRUPT_C */

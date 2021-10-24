@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifdef __INTELLISENSE__
-#include "io.c"
+#include "oldio.c"
 //#define DEFINE_RW_Read
 #define DEFINE_RW_Write
 
@@ -28,6 +28,9 @@
 //#define DEFINE_DATA_PhysVector
 #endif /* __INTELLISENSE__ */
 
+#include <kernel/compiler.h>
+
+#ifndef CONFIG_USE_NEW_FS
 #include <kernel/iovec.h>
 #include <kernel/mman/phys.h>
 #include <sched/tsc.h>
@@ -255,3 +258,4 @@ DECL_END
 #undef DEFINE_DATA_Phys
 #undef DEFINE_DATA_VirtVector
 #undef DEFINE_DATA_PhysVector
+#endif /* !CONFIG_USE_NEW_FS */

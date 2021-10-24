@@ -17,11 +17,12 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_MODIDE_ATA_H
-#define GUARD_MODIDE_ATA_H 1
+#ifndef GUARD_MODIDE_OLDATA_H
+#define GUARD_MODIDE_OLDATA_H 1
 
 #include <kernel/compiler.h>
 
+#ifndef CONFIG_USE_NEW_FS
 #include <dev/block.h>
 #include <dev/char.h>
 #include <kernel/aio.h>
@@ -383,5 +384,6 @@ NOTHROW(FCALL AtaBus_HW_ResetBusAndInitializeDMA)(AtaBus *__restrict self);
 
 
 DECL_END
+#endif /* !CONFIG_USE_NEW_FS */
 
-#endif /* !GUARD_MODIDE_ATA_H */
+#endif /* !GUARD_MODIDE_OLDATA_H */

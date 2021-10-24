@@ -17,14 +17,15 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_MODIDE_AIO_C
-#define GUARD_MODIDE_AIO_C 1
+#ifndef GUARD_MODIDE_OLDAIO_C
+#define GUARD_MODIDE_OLDAIO_C 1
 #define _KOS_SOURCE 1
 
-#include "ata.h"
-/**/
-
 #include <kernel/compiler.h>
+
+#ifndef CONFIG_USE_NEW_FS
+#include "oldata.h"
+/**/
 
 #include <hybrid/atomic.h>
 
@@ -595,8 +596,7 @@ INTERN struct aio_handle_type AtaDrive_DmaAioHandleType = {
 	/* .ht_progress = */ &AtaDrive_DmaAioHandle_Progress,
 };
 
-
-
 DECL_END
+#endif /* !CONFIG_USE_NEW_FS */
 
-#endif /* !GUARD_MODIDE_AIO_C */
+#endif /* !GUARD_MODIDE_OLDAIO_C */

@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifdef __INTELLISENSE__
-#include "io.c"
+#include "oldio.c"
 #define DEFINE_RW_Read
 //#define DEFINE_RW_Write
 
@@ -33,6 +33,9 @@
 //#define DEFINE_IOMETHOD_Lba48
 #endif /* __INTELLISENSE__ */
 
+#include <kernel/compiler.h>
+
+#ifndef CONFIG_USE_NEW_FS
 #include <kernel/iovec.h>
 
 #include <hybrid/atomic.h>
@@ -533,3 +536,4 @@ DECL_END
 #undef DEFINE_IOMETHOD_Chs
 #undef DEFINE_IOMETHOD_Lba28
 #undef DEFINE_IOMETHOD_Lba48
+#endif /* !CONFIG_USE_NEW_FS */

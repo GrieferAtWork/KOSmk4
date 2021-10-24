@@ -17,11 +17,14 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_MODIDE_IO_C
-#define GUARD_MODIDE_IO_C 1
+#ifndef GUARD_MODIDE_OLDIO_C
+#define GUARD_MODIDE_OLDIO_C 1
 #define _KOS_SOURCE 1
 
-#include "ata.h"
+#include <kernel/compiler.h>
+
+#ifndef CONFIG_USE_NEW_FS
+#include "oldata.h"
 /**/
 
 DECL_BEGIN
@@ -43,119 +46,119 @@ DECL_END
 
 #define DEFINE_DATA_Virt
 #define DEFINE_RW_Read
-#include "io-transfer.c.inl"
+#include "oldio-transfer.c.inl"
 
 #define DEFINE_DATA_Virt
 #define DEFINE_RW_Write
-#include "io-transfer.c.inl"
+#include "oldio-transfer.c.inl"
 
 #define DEFINE_DATA_Phys
 #define DEFINE_RW_Read
-#include "io-transfer.c.inl"
+#include "oldio-transfer.c.inl"
 
 #define DEFINE_DATA_Phys
 #define DEFINE_RW_Write
-#include "io-transfer.c.inl"
+#include "oldio-transfer.c.inl"
 
 #define DEFINE_DATA_VirtVector
 #define DEFINE_RW_Read
-#include "io-transfer.c.inl"
+#include "oldio-transfer.c.inl"
 
 #define DEFINE_DATA_VirtVector
 #define DEFINE_RW_Write
-#include "io-transfer.c.inl"
+#include "oldio-transfer.c.inl"
 
 #define DEFINE_DATA_PhysVector
 #define DEFINE_RW_Read
-#include "io-transfer.c.inl"
+#include "oldio-transfer.c.inl"
 
 #define DEFINE_DATA_PhysVector
 #define DEFINE_RW_Write
-#include "io-transfer.c.inl"
+#include "oldio-transfer.c.inl"
 
 
 
 #define DEFINE_IOMETHOD_Dma
 #define DEFINE_DATA_Virt
 #define DEFINE_RW_Read
-#include "io.c.inl"
+#include "oldio.c.inl"
 
 #define DEFINE_IOMETHOD_Dma
 #define DEFINE_DATA_Virt
 #define DEFINE_RW_Write
-#include "io.c.inl"
+#include "oldio.c.inl"
 
 #define DEFINE_IOMETHOD_Dma
 #define DEFINE_DATA_Phys
 #define DEFINE_RW_Read
-#include "io.c.inl"
+#include "oldio.c.inl"
 
 #define DEFINE_IOMETHOD_Dma
 #define DEFINE_DATA_Phys
 #define DEFINE_RW_Write
-#include "io.c.inl"
+#include "oldio.c.inl"
 
 #define DEFINE_IOMETHOD_Dma
 #define DEFINE_DATA_VirtVector
 #define DEFINE_RW_Read
-#include "io.c.inl"
+#include "oldio.c.inl"
 
 #define DEFINE_IOMETHOD_Dma
 #define DEFINE_DATA_VirtVector
 #define DEFINE_RW_Write
-#include "io.c.inl"
+#include "oldio.c.inl"
 
 #define DEFINE_IOMETHOD_Dma
 #define DEFINE_DATA_PhysVector
 #define DEFINE_RW_Read
-#include "io.c.inl"
+#include "oldio.c.inl"
 
 #define DEFINE_IOMETHOD_Dma
 #define DEFINE_DATA_PhysVector
 #define DEFINE_RW_Write
-#include "io.c.inl"
+#include "oldio.c.inl"
 
 
 
 #define DEFINE_IOMETHOD_Chs
 #define DEFINE_DATA_Virt
 #define DEFINE_RW_Read
-#include "io.c.inl"
+#include "oldio.c.inl"
 
 #define DEFINE_IOMETHOD_Chs
 #define DEFINE_DATA_Virt
 #define DEFINE_RW_Write
-#include "io.c.inl"
+#include "oldio.c.inl"
 
 #define DEFINE_IOMETHOD_Chs
 #define DEFINE_DATA_Phys
 #define DEFINE_RW_Read
-#include "io.c.inl"
+#include "oldio.c.inl"
 
 #define DEFINE_IOMETHOD_Chs
 #define DEFINE_DATA_Phys
 #define DEFINE_RW_Write
-#include "io.c.inl"
+#include "oldio.c.inl"
 
 #define DEFINE_IOMETHOD_Chs
 #define DEFINE_DATA_VirtVector
 #define DEFINE_RW_Read
-#include "io.c.inl"
+#include "oldio.c.inl"
 
 #define DEFINE_IOMETHOD_Chs
 #define DEFINE_DATA_VirtVector
 #define DEFINE_RW_Write
-#include "io.c.inl"
+#include "oldio.c.inl"
 
 #define DEFINE_IOMETHOD_Chs
 #define DEFINE_DATA_PhysVector
 #define DEFINE_RW_Read
-#include "io.c.inl"
+#include "oldio.c.inl"
 
 #define DEFINE_IOMETHOD_Chs
 #define DEFINE_DATA_PhysVector
 #define DEFINE_RW_Write
-#include "io.c.inl"
+#include "oldio.c.inl"
 
 
 
@@ -163,42 +166,42 @@ DECL_END
 #define DEFINE_IOMETHOD_Lba28
 #define DEFINE_DATA_Virt
 #define DEFINE_RW_Read
-#include "io.c.inl"
+#include "oldio.c.inl"
 
 #define DEFINE_IOMETHOD_Lba28
 #define DEFINE_DATA_Virt
 #define DEFINE_RW_Write
-#include "io.c.inl"
+#include "oldio.c.inl"
 
 #define DEFINE_IOMETHOD_Lba28
 #define DEFINE_DATA_Phys
 #define DEFINE_RW_Read
-#include "io.c.inl"
+#include "oldio.c.inl"
 
 #define DEFINE_IOMETHOD_Lba28
 #define DEFINE_DATA_Phys
 #define DEFINE_RW_Write
-#include "io.c.inl"
+#include "oldio.c.inl"
 
 #define DEFINE_IOMETHOD_Lba28
 #define DEFINE_DATA_VirtVector
 #define DEFINE_RW_Read
-#include "io.c.inl"
+#include "oldio.c.inl"
 
 #define DEFINE_IOMETHOD_Lba28
 #define DEFINE_DATA_VirtVector
 #define DEFINE_RW_Write
-#include "io.c.inl"
+#include "oldio.c.inl"
 
 #define DEFINE_IOMETHOD_Lba28
 #define DEFINE_DATA_PhysVector
 #define DEFINE_RW_Read
-#include "io.c.inl"
+#include "oldio.c.inl"
 
 #define DEFINE_IOMETHOD_Lba28
 #define DEFINE_DATA_PhysVector
 #define DEFINE_RW_Write
-#include "io.c.inl"
+#include "oldio.c.inl"
 
 
 
@@ -206,43 +209,44 @@ DECL_END
 #define DEFINE_IOMETHOD_Lba48
 #define DEFINE_DATA_Virt
 #define DEFINE_RW_Read
-#include "io.c.inl"
+#include "oldio.c.inl"
 
 #define DEFINE_IOMETHOD_Lba48
 #define DEFINE_DATA_Virt
 #define DEFINE_RW_Write
-#include "io.c.inl"
+#include "oldio.c.inl"
 
 #define DEFINE_IOMETHOD_Lba48
 #define DEFINE_DATA_Phys
 #define DEFINE_RW_Read
-#include "io.c.inl"
+#include "oldio.c.inl"
 
 #define DEFINE_IOMETHOD_Lba48
 #define DEFINE_DATA_Phys
 #define DEFINE_RW_Write
-#include "io.c.inl"
+#include "oldio.c.inl"
 
 #define DEFINE_IOMETHOD_Lba48
 #define DEFINE_DATA_VirtVector
 #define DEFINE_RW_Read
-#include "io.c.inl"
+#include "oldio.c.inl"
 
 #define DEFINE_IOMETHOD_Lba48
 #define DEFINE_DATA_VirtVector
 #define DEFINE_RW_Write
-#include "io.c.inl"
+#include "oldio.c.inl"
 
 #define DEFINE_IOMETHOD_Lba48
 #define DEFINE_DATA_PhysVector
 #define DEFINE_RW_Read
-#include "io.c.inl"
+#include "oldio.c.inl"
 
 #define DEFINE_IOMETHOD_Lba48
 #define DEFINE_DATA_PhysVector
 #define DEFINE_RW_Write
-#include "io.c.inl"
+#include "oldio.c.inl"
 
 #endif /* !__INTELLISENSE__ */
+#endif /* !CONFIG_USE_NEW_FS */
 
-#endif /* !GUARD_MODIDE_IO_C */
+#endif /* !GUARD_MODIDE_OLDIO_C */

@@ -17,15 +17,16 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_MODIDE_PRD_C
-#define GUARD_MODIDE_PRD_C 1
+#ifndef GUARD_MODIDE_OLDPRD_C
+#define GUARD_MODIDE_OLDPRD_C 1
 #define _KOS_SOURCE 1
 
-#include "ata.h"
+#include "oldata.h"
 /**/
 
 #include <kernel/compiler.h>
 
+#ifndef CONFIG_USE_NEW_FS
 #include <kernel/aio.h>
 #include <kernel/iovec.h>
 #include <kernel/mman.h>
@@ -395,7 +396,7 @@ err:
 	return 0;
 }
 
-
 DECL_END
+#endif /* !CONFIG_USE_NEW_FS */
 
-#endif /* !GUARD_MODIDE_PRD_C */
+#endif /* !GUARD_MODIDE_OLDPRD_C */
