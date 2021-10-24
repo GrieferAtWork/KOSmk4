@@ -41,7 +41,7 @@ struct iphdr;
 /* Route a UDP packet.
  * @assume(packet_size >= sizeof(struct udphdr)); */
 FUNDEF NOBLOCK NONNULL((1, 2)) void KCALL
-udp_routepacket(struct nic_device *__restrict dev,
+udp_routepacket(struct nicdev *__restrict dev,
                 struct udphdr const *__restrict packet, u16 packet_size,
                 struct iphdr const *__restrict ip_header);
 

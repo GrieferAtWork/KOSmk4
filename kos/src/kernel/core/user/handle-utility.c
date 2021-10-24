@@ -27,10 +27,10 @@
 #include <dev/block.h>
 #include <dev/char.h>
 #include <dev/keyboard.h>
+#include <dev/mktty.h>
 #include <dev/mouse.h>
 #include <dev/pty.h>
 #include <dev/tty.h>
-#include <dev/ttybase.h>
 #include <fs/fifo.h>
 #include <fs/file.h>
 #include <fs/node.h>
@@ -90,14 +90,14 @@ NOTHROW(KCALL handle_typekind)(struct handle const *__restrict self) {
 	case HANDLE_TYPE_CHRDEV: {
 		struct chrdev *me;
 		me = (struct chrdev *)self;
-		if (chrdev_isttybase(me)) {
-			if (ttybase_isapty((struct ttybase_device *)me))
+		if (chrdev_istty(me)) {
+			if (ttybase_isapty((struct ttydev *)me))
 				return HANDLE_TYPEKIND_CHRDEV_PTY;
-			if (ttybase_isatty((struct ttybase_device *)me))
+			if (ttydev_ismktty((struct ttydev *)me))
 				return HANDLE_TYPEKIND_CHRDEV_TTY;
 			return HANDLE_TYPEKIND_CHRDEV_TTYBASE;
 		}
-		if (chrdev_iskeyboard(me))
+		if (chrdev_iskbd(me))
 			return HANDLE_TYPEKIND_CHRDEV_KEYBOARD;
 		if (chrdev_ismouse(me))
 			return HANDLE_TYPEKIND_CHRDEV_MOUSE;

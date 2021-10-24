@@ -32,7 +32,7 @@ DECL_BEGIN
 /* Route an ARP packet.
  * @assume(packet_size >= 8); */
 FUNDEF NOBLOCK NONNULL((1, 2)) void KCALL
-arp_routepacket(struct nic_device *__restrict dev,
+arp_routepacket(struct nicdev *__restrict dev,
                 void const *__restrict packet_data,
                 size_t packet_size);
 
@@ -42,7 +42,7 @@ arp_routepacket(struct nic_device *__restrict dev,
  *       allocated, and that its MAC field  will be filled in once  the
  *       named device responds back to the given NIC. */
 FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct nic_packet *KCALL
-arp_makemacrequest(struct nic_device *__restrict dev, be32 ip);
+arp_makemacrequest(struct nicdev *__restrict dev, be32 ip);
 
 #endif /* __CC__ */
 

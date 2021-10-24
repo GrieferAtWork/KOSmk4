@@ -22,105 +22,142 @@
 
 #include <kernel/compiler.h>
 
-#include <dev/ttybase.h>
-#include <sched/mutex.h>
+#include <dev/char.h>
+#include <kernel/types.h>
+#include <sched/pid.h>
+
+#include <kos/dev.h>
+
+#include <libterm/termio.h>
 
 DECL_BEGIN
 
-/* Terminal display  drivers such  as VGA  should not  implement  the
- * tty  interface.  Instead,  they  should  only  need  to  implement
- * the normal chrdev interface and provide a write-operator
- * that  implements an ansi-compliant display port (using libansitty)
- *
- * An actual `struct tty_device' shouldn't actually be something that gets created
- * implicitly, but should  be created  explicitly (using the  mktty() syscall)  by
- * combining  2  arbitrary file  descriptors,  one providing  a  read-operator and
- * presumably  being  implemented  by  something  like  the  ps2  driver,  and the
- * other  providing  a   write-operator  and  presumably   being  implemented   by
- * something like the VGA driver.
- *
- * The actual `struct tty_device' then uses `struct terminal' to implement the TERMIOS
- * interface, forwarding/pulling  data from  its connected  read/write object  handles
- * as needed, while also encapsulating all of the required POSIX job control
- *
- * On-top  of this, it would then also be  possible to allow the tty objects to
- * react to the CTRL+ALT+F{1-NN} key combinations to switch between each other.
- *
- * The common base-class of this and PTY objects is `struct ttybase_device'
- */
-
+/* The base type for PTY and TTY devices */
 #ifdef __CC__
-struct tty_device_forward;
-struct tty_device
+struct taskpid;
+#ifndef __taskpid_axref_defined
+#define __taskpid_axref_defined
+AXREF(taskpid_axref, taskpid);
+#endif /* !__taskpid_axref_defined */
+
+#ifndef __taskpid_awref_defined
+#define __taskpid_awref_defined
+AWREF(taskpid_awref, taskpid);
+#endif /* !__taskpid_awref_defined */
+
+struct ttydev
 #ifdef __cplusplus
-    : ttybase_device
+    : chrdev                      /* The underling character-device */
 #endif /* __cplusplus */
 {
 #ifndef __cplusplus
-	struct ttybase_device t_base;        /* The underlying base-tty */
+	struct chrdev        t_cdev;  /* The underling character-device */
 #endif /* !__cplusplus */
-	uintptr_half_t        t_ihandle_typ; /* [const] Input (keyboard) handle type (One of `HANDLE_TYPE_*') */
-	uintptr_half_t        t_ohandle_typ; /* [const] Output (display) handle type (One of `HANDLE_TYPE_*') */
-	REF void             *t_ihandle_ptr; /* [1..1][const] Input handle pointer. */
-	REF void             *t_ohandle_ptr; /* [1..1][const] Output handle pointer. */
-	/* [1..1][const] Input handle read operator callback. */
-	size_t (KCALL *t_ihandle_read)(void *__restrict ptr, USER CHECKED void *dst,
-	                               size_t num_bytes, iomode_t mode) /*THROWS(...)*/;
-	/* [1..1][const] Input handle poll operator callback. */
-	void (KCALL *t_ihandle_pollconnect)(void *__restrict ptr, poll_mode_t what) /*THROWS(...)*/;
-	poll_mode_t (KCALL *t_ihandle_polltest)(void *__restrict ptr, poll_mode_t what) /*THROWS(...)*/;
-	/* [1..1][const] Output handle write operator callback. */
-	size_t (KCALL *t_ohandle_write)(void *__restrict ptr, USER CHECKED void const *src,
-	                                size_t num_bytes, iomode_t mode) /*THROWS(...)*/;
+	struct terminal      t_term;  /* The associated terminal driver controller. */
+	struct taskpid_awref t_cproc; /* [0..1] Controlling terminal support.
+	                               * When  non-NULL,  points  to  a  session  leader  thread,  such that
+	                               * `FORTASK(taskpid_gettask(t_cproc), this_taskgroup).tg_ctty == self'
+	                               * is the case. */
+	struct taskpid_axref t_fproc; /* [0..1] PID of the foreground process group leader.
+	                               * This process is usually apart of the same session as `t_cproc' */
 };
 
 
+/* Kernel-level implementations for terminal system operators. */
+FUNDEF ssize_t LIBTERM_CC kernel_terminal_check_sigttou(struct terminal *__restrict self);
+FUNDEF ssize_t LIBTERM_CC kernel_terminal_raise(struct terminal *__restrict self, signo_t signo);
 
-#define ttybase_isatty(self) \
-	((self)->cd_type.ct_pollconnect == &tty_device_pollconnect)
-#define chrdev_istty(self) \
-	((self)->cd_type.ct_pollconnect == &tty_device_pollconnect)
-FUNDEF NONNULL((1)) void KCALL tty_device_pollconnect(struct chrdev *__restrict self, poll_mode_t what) THROWS(...);
-FUNDEF NONNULL((1)) poll_mode_t KCALL tty_device_polltest(struct chrdev *__restrict self, poll_mode_t what) THROWS(...);
+/* Check if the calling thread is allowed to read from `self'
+ * This  function must be  called by read-operator overrides! */
+FUNDEF void KCALL kernel_terminal_check_sigttin(struct terminal *__restrict self);
 
-/* Create (but  don't register)  a new  TTY device  that connects  the two  given
- * handles, such that character-based keyboard input is taken from `ihandle_ptr',
- * and   ansi-compliant   display    output   is    written   to    `ohandle_ptr'
- * For   this   purpose,  special   handling   is  done   for   certain  handles:
- *   - `ohandle_typ == HANDLE_TYPE_CHRDEV && chrdev_isansitty(ohandle_ptr)':
- *     `((struct ansitty_device *)ohandle_ptr)->at_tty' will be bound to the newly created tty  device
- *     (s.a.. `return'), such that its output gets injected as `terminal_iwrite(&return->t_term, ...)'
- *     When the returned tty device is destroyed, this link gets severed automatically.
- * Upon success, the caller should:
- *   - Initialize `return->cd_name'
- *   - Register the device using one of:
- *      - `chrdev_register(return, ...)'
- *      - `chrdev_register_auto(return)'
- * NOTE: The TTY is created with data forwarding disabled. */
-FUNDEF ATTR_RETNONNULL REF struct tty_device *KCALL
-tty_device_alloc(uintptr_half_t ihandle_typ, void *ihandle_ptr,
-                 uintptr_half_t ohandle_typ, void *ohandle_ptr)
-		THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
 
-/* Start/Stop forwarding  input  handle  data  on  the  given  TTY
- * Note that for any given input handle, only a single TTY  should
- * ever be allowed to process data. - Allowing multiple TTYs to do
- * so could result  in weakly  undefined behavior as  it would  no
- * longer  be clear  who should  actually receive  data, causing a
- * soft race condition with the potential of data being  scattered
- * between readers, or some random reader getting all of the data.
- * @return: true:  The FWD thread was started/stopped
- * @return: false: The FWD thread was already running/halted */
-FUNDEF bool KCALL
-tty_device_startfwd(struct tty_device *__restrict self)
-		THROWS(E_WOULDBLOCK, E_BADALLOC);
-FUNDEF NOBLOCK bool
-NOTHROW(KCALL tty_device_stopfwd)(struct tty_device *__restrict self);
+/* Check if a given character device is actually a ttybase */
+#define chrdev_istty(self)                                                                \
+	((self)->cd_heapsize >= sizeof(struct ttydev) &&                                      \
+	 ((struct ttydev *)(self))->t_term.t_chk_sigttou == &kernel_terminal_check_sigttou && \
+	 ((struct ttydev *)(self))->t_term.t_raise == &kernel_terminal_raise)
 
+
+/* Initialize a given TTY character device.
+ * NOTE: This function initializes the following operators:
+ *   - cd_type.ct_fini        = &ttydev_v_fini;  // Must be called as fallback by overrides
+ *   - cd_type.ct_read        = &ttydev_v_read; // Must invoke `kernel_terminal_check_sigttin()'
+ *   - cd_type.ct_write       = &ttydev_v_write;
+ *   - cd_type.ct_ioctl       = &ttydev_v_ioctl; // Must be called as fallback by overrides
+ *   - cd_type.ct_pollconnect = &ttydev_v_pollconnect;
+ *   - cd_type.ct_polltest    = &ttydev_v_polltest;
+ *   - cd_type.ct_stat        = &ttydev_v_stat;
+ */
+FUNDEF NOBLOCK void
+NOTHROW(KCALL ttydev_cinit)(struct ttydev *__restrict self,
+                            pterminal_oprinter_t oprinter);
+struct stat;
+
+/* Default character-device read/write  operator implementations  for tty  devices
+ * These functions will call forward to `terminal_iread()' and `terminal_owrite()'
+ * NOTE: The implementation of these functions assumes that the oprinter associated
+ *       with the terminal never returns negative values! */
+FUNDEF NONNULL((1)) size_t KCALL ttydev_v_read(struct chrdev *__restrict self, USER CHECKED void *dst, size_t num_bytes, iomode_t mode) THROWS(...);
+FUNDEF NONNULL((1)) size_t KCALL ttydev_v_write(struct chrdev *__restrict self, USER CHECKED void const *src, size_t num_bytes, iomode_t mode) THROWS(...);
+FUNDEF NONNULL((1)) syscall_slong_t KCALL ttydev_v_ioctl(struct chrdev *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
+/* @return: -EINVAL: Unsupported `cmd' */
+FUNDEF NONNULL((1)) syscall_slong_t KCALL _ttydev_tryioctl(struct chrdev *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
+FUNDEF NONNULL((1)) void KCALL ttydev_v_pollconnect(struct chrdev *__restrict self, poll_mode_t what) THROWS(...);
+FUNDEF NONNULL((1)) poll_mode_t KCALL ttydev_v_polltest(struct chrdev *__restrict self, poll_mode_t what) THROWS(...);
+FUNDEF NONNULL((1)) void KCALL ttydev_v_stat(struct chrdev *__restrict self, USER CHECKED struct stat *result) THROWS(...);
+
+
+/* [IMPL(TIOCSCTTY)] Set the given tty device as the controlling terminal of the calling session.
+ * @param: steal_from_other_session: Allow the terminal to be stolen from another session.
+ * @param: override_different_ctty:  If the calling session already had a CTTY assigned, override it.
+ * @param: caller_must_be_leader:    Fail if the calling process isn't the session leader.
+ * @return: * : One of `TTYDEV_SETCTTY_*' */
+FUNDEF NOBLOCK int
+NOTHROW(KCALL ttydev_setctty)(struct ttydev *__restrict self,
+                              __BOOL caller_must_be_leader DFL(1),
+                              __BOOL steal_from_other_session DFL(0),
+                              __BOOL override_different_ctty DFL(0));
+#define TTYDEV_SETCTTY_ALREADY     1  /* `self' was already the controlling terminal of the calling session. */
+#define TTYDEV_SETCTTY_SUCCESS     0  /* Successfully assigned `self' as CTTY. */
+#define TTYDEV_SETCTTY_NOTLEADER (-1) /* The calling process isn't the session leader, and `caller_must_be_leader' was true. */
+#define TTYDEV_SETCTTY_DIFFERENT (-2) /* The calling session already had a CTTY assigned, and `override_different_ctty' was false. */
+#define TTYDEV_SETCTTY_INUSE     (-3) /* The tty is already used as the CTTY of another session, and `steal_from_other_session' was false. */
+
+/* [IMPL(TIOCNOTTY)] Give up the controlling terminal of the calling session.
+ * @param: required_old_ctty: The expected old CTTY, or NULL if the CTTY should always be given up.
+ * @param: pold_ctty:         When non-NULL, store the old CTTY here upon success.
+ * @return: * : One of `TTYDEV_HUPCTTY_*' */
+FUNDEF NOBLOCK int
+NOTHROW(KCALL ttydev_hupctty)(struct ttydev *required_old_ctty DFL(__NULLPTR),
+                              __BOOL caller_must_be_leader DFL(1),
+                              REF struct ttydev **pold_ctty DFL(__NULLPTR));
+#define TTYDEV_HUPCTTY_ALREADY      1  /* The calling session didn't have a CTTY to begin with */
+#define TTYDEV_HUPCTTY_SUCCESS      0  /* Successfully gave up control of the CTTY (when `pold_ctty' was non-NULL, that old CTTY is stored there) */
+#define TTYDEV_HUPCTTY_NOTLEADER  (-1) /* The calling process isn't the session leader, and `caller_must_be_leader' was true. */
+#define TTYDEV_HUPCTTY_DIFFERENT  (-2) /* `required_old_ctty' was non-NULL and differed from the actually set old CTTY */
+
+
+/* Finalize a given TTY character device.
+ * NOTE: This function must be called from a user-provided, device-level finalizer,
+ *       or  in other words: You must call this from a function which you must then
+ *       assign to `self->cd_type.ct_fini'! */
+FUNDEF NOBLOCK NONNULL((1)) void
+NOTHROW(KCALL ttydev_v_fini)(struct chrdev *__restrict self);
+
+/* Returns a reference to the controlling- or foreground process's
+ * PID descriptor, or NULL if the specified field hasn't been set. */
+#define ttydev_getcproc(self) awref_get(&(self)->t_cproc)
+#define ttydev_getfproc(self) axref_get(&(self)->t_fproc)
 
 #endif /* __CC__ */
 
-
 DECL_END
+
+#ifdef GUARD_KERNEL_INCLUDE_SCHED_PID_H
+#ifndef GUARD_KERNEL_INCLUDE_SCHED_PID_CTTY_H
+#include <sched/pid-ctty.h>
+#endif /* !GUARD_KERNEL_INCLUDE_SCHED_PID_CTTY_H */
+#endif /* GUARD_KERNEL_INCLUDE_SCHED_PID_H */
 
 #endif /* !GUARD_KERNEL_INCLUDE_DEV_TTY_H */

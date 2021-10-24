@@ -70,7 +70,7 @@ NOTHROW(FCALL ps2_keyboard_postkey)(struct ps2_keyboard *__restrict self, u16 ke
 	       self->cd_name, key, (unsigned int)self->pk_state);
 #endif
 	/* Schedule the key */
-	if unlikely(!keyboard_device_putkey_nopr(self, key)) {
+	if unlikely(!kbddev_putkey_nopr(self, key)) {
 		printk(KERN_WARNING "[ps2:%q] Keyboard buffer is full (dropping %#.4I16x)\n",
 		       self->cd_name, key);
 	}
@@ -401,7 +401,7 @@ again:
 }
 
 PRIVATE void KCALL
-ps2_keyboard_setleds(struct keyboard_device *__restrict self,
+ps2_keyboard_setleds(struct kbddev *__restrict self,
                      uintptr_t new_leds) THROWS(E_IOERROR) {
 	struct ps2_keyboard *me;
 	u8 new_ps2_leds;
@@ -424,7 +424,7 @@ ps2_keyboard_setleds(struct keyboard_device *__restrict self,
 }
 
 
-PRIVATE struct keyboard_device_ops const ps2_keyboard_ops = {
+PRIVATE struct kbddev_ops const ps2_keyboard_ops = {
 	/* .ko_setleds = */ &ps2_keyboard_setleds
 };
 
@@ -458,7 +458,7 @@ ps2_keyboard_create(struct ps2_probe_data *__restrict probe_data,
 	}
 	kbd = CHRDEV_ALLOC(struct ps2_keyboard);
 	TRY {
-		keyboard_device_init(kbd, &ps2_keyboard_ops);
+		kbddev_init(kbd, &ps2_keyboard_ops);
 		mutex_cinit(&kbd->pk_cmdlock);
 		kbd->pk_portno = portno;
 		sprintf(kbd->cd_name, "ps2kbd%u", portno + 1);

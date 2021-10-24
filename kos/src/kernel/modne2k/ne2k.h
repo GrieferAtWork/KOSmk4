@@ -102,7 +102,7 @@ typedef union {
 	};
 } Ne2kState;
 
-typedef struct ne2k_device: nic_device {
+typedef struct ne2k_device: nicdev {
 	/* NOTE: Ne2k uses an async worker to:
 	 *  TX_UPLOAD:
 	 *    - Load the first AIO handle from `nk_tranit' into `nk_current'

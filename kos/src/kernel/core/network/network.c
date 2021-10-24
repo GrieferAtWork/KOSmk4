@@ -69,7 +69,7 @@ NOTHROW(KCALL net_peeraddrs_destroy)(struct net_peeraddrs *__restrict self) {
 
 /* Ensure that a peer entry exists for `ip', returning its descriptor. */
 FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct net_peeraddr *KCALL
-nic_device_requireip(struct nic_device *__restrict self, be32 ip)
+nic_device_requireip(struct nicdev *__restrict self, be32 ip)
 		THROWS(E_BADALLOC) {
 	size_t i, lo, hi;
 	REF struct net_peeraddr *result;

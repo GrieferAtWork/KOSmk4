@@ -26,7 +26,7 @@
 
 #include <dev/block.h>
 #include <dev/char.h>
-#include <dev/tty.h>
+#include <dev/mktty.h>
 #include <fs/fifo.h>
 #include <fs/file.h>
 #include <fs/node.h>
@@ -438,10 +438,10 @@ check_result_inode_for_symlink:
 				/* Assign a controlling terminal to the calling process. */
 				if (!(oflags & O_NOCTTY) &&
 				    result.h_type == HANDLE_TYPE_CHRDEV &&
-				    chrdev_isttybase((struct chrdev *)result.h_data) &&
-				    awref_ptr(&((struct ttybase_device *)result.h_data)->t_cproc) == NULL) {
-					/* NOTE: `ttybase_device_setctty()' is NOTHROW(), so no need to guard this call! */
-					ttybase_device_setctty((struct ttybase_device *)result.h_data);
+				    chrdev_istty((struct chrdev *)result.h_data) &&
+				    awref_ptr(&((struct ttydev *)result.h_data)->t_cproc) == NULL) {
+					/* NOTE: `ttydev_setctty()' is NOTHROW(), so no need to guard this call! */
+					ttydev_setctty((struct ttydev *)result.h_data);
 				}
 				decref(result_inode);
 				decref(result_containing_path);
@@ -503,10 +503,10 @@ check_result_inode_for_symlink:
 						(*cdev->cd_type.ct_open)(cdev, &result);
 					}
 					/* Assign a controlling terminal to the calling process. */
-					if (!(oflags & O_NOCTTY) && chrdev_isttybase(cdev) &&
-					    awref_ptr(&((struct ttybase_device *)cdev)->t_cproc) == NULL) {
-						/* NOTE: `ttybase_device_setctty()' is NOTHROW(), so no need to guard this call! */
-						ttybase_device_setctty((struct ttybase_device *)cdev);
+					if (!(oflags & O_NOCTTY) && chrdev_istty(cdev) &&
+					    awref_ptr(&((struct ttydev *)cdev)->t_cproc) == NULL) {
+						/* NOTE: `ttydev_setctty()' is NOTHROW(), so no need to guard this call! */
+						ttydev_setctty((struct ttydev *)cdev);
 					}
 					decref(result_inode);
 					decref(result_containing_path);

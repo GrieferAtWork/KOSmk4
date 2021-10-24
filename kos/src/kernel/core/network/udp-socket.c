@@ -60,13 +60,13 @@ udp_verify_sockaddr(USER CHECKED struct sockaddr const *addr,
 	return in;
 }
 
-PRIVATE ATTR_RETNONNULL struct nic_device *KCALL
+PRIVATE ATTR_RETNONNULL struct nicdev *KCALL
 udp_getnic(struct udp_socket *__restrict me) {
-	struct nic_device *result;
+	struct nicdev *result;
 again:
 	result = me->us_dev;
 	if (!result) {
-		result = nic_device_getdefault();
+		result = nicdev_getdefault();
 		if unlikely(!result)
 			THROW(E_NO_SUCH_OBJECT);
 		if (!ATOMIC_CMPXCH(me->us_dev, NULL, result)) {
@@ -227,7 +227,7 @@ udp_sendtov(struct socket *__restrict self,
             struct ancillary_message const *msg_control, syscall_ulong_t msg_flags,
             /*out*/ struct aio_handle *__restrict aio) {
 	struct udp_socket *me;
-	struct nic_device *dev;
+	struct nicdev *dev;
 	USER CHECKED struct sockaddr_in const *in;
 	REF struct nic_packet *packet;
 	(void)msg_flags;
@@ -258,7 +258,7 @@ udp_sendtov(struct socket *__restrict self,
 	if unlikely(bufsize > (0xffff - sizeof(struct udphdr)))
 		THROW(E_NET_MESSAGE_TOO_LONG, bufsize, 0xffff - sizeof(struct udphdr));
 	/* Construct the UDP packet to-be sent. */
-	packet = nic_device_newpacketv(dev, buf,
+	packet = nicdev_newpacketv(dev, buf,
 	                               UDP_PACKET_HEADSIZE,
 	                               UDP_PACKET_TAILSIZE);
 	(void)bufsize;

@@ -73,7 +73,7 @@ NOTHROW(KCALL pty_slave_fini)(struct chrdev *__restrict self) {
 	/* Finalize the used ring buffer. */
 	ringbuffer_fini(&me->ps_obuf);
 	/* Finalize the underlying TTY-base device. */
-	ttybase_device_fini(me);
+	ttydev_v_fini(me);
 }
 
 PRIVATE NONNULL((1)) syscall_slong_t KCALL
@@ -90,7 +90,7 @@ pty_slave_ioctl(struct chrdev *__restrict self,
 
 	default:
 		/* Fallback: Have the underlying TTY base device handle the ioctl() */
-		return ttybase_device_ioctl(me, cmd, arg, mode);
+		return ttydev_v_ioctl(me, cmd, arg, mode);
 	}
 	return 0;
 }
@@ -304,7 +304,7 @@ LOCAL REF struct pty_slave *KCALL pty_slave_alloc(void) {
 	REF struct pty_slave *result;
 	result = CHRDEV_ALLOC(struct pty_slave);
 	/* Initialize the underlying TTY-device base layer. */
-	ttybase_device_cinit(result, &kernel_pty_oprinter);
+	ttydev_cinit(result, &kernel_pty_oprinter);
 	/* Override device operators. */
 	result->cd_type.ct_fini  = &pty_slave_fini;
 	result->cd_type.ct_ioctl = &pty_slave_ioctl;

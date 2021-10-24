@@ -28,7 +28,7 @@
 
 #include <dev/block.h>
 #include <dev/char.h>
-#include <dev/ttybase.h>
+#include <dev/tty.h>
 #include <fs/fifo.h>
 #include <fs/file.h>
 #include <fs/node.h>

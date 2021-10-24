@@ -187,7 +187,7 @@ video_device_ioctl(struct chrdev *__restrict self, syscall_ulong_t cmd,
 	default:
 		/* Fallback: Try to service a generic ansi ioctl() */
 fallback:
-		return ansitty_device_ioctl(self, cmd, arg, mode);
+		return ansittydev_v_ioctl(self, cmd, arg, mode);
 		break;
 	}
 	return 0;
@@ -209,9 +209,9 @@ PRIVATE struct ansitty_operators const video_stubtty = {
  * NOTE: `ops->ato_output' must be set to NULL when calling this  function.
  *       The internal routing of this callback to injecting keyboard output
  *       is done dynamically when the ANSI  TTY is connected to the  output
- *       channel of a `struct tty_device'
+ *       channel of a `struct mkttydev'
  * This function initializes the following operators:
- *   - cd_type.ct_write = &ansitty_device_write;  // Mustn't be re-assigned!
+ *   - cd_type.ct_write = &ansittydev_v_write;  // Mustn't be re-assigned!
  *   - cd_type.ct_fini  = &video_device_fini;     // Must be called by an override
  *   - cd_type.ct_ioctl = &video_device_ioctl;    // Must be called by an override
  * The following operators must still be defined by the caller:
@@ -231,7 +231,7 @@ NOTHROW(KCALL video_device_cinit)(struct video_device *__restrict self,
 	memcpy(&self->vd_ops, ops, sizeof(struct video_device_ops));
 	if (!tty_ops)
 		tty_ops = &video_stubtty;
-	ansitty_device_cinit(self, tty_ops);
+	ansittydev_cinit(self, tty_ops);
 }
 
 

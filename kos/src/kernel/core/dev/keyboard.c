@@ -55,18 +55,18 @@
 DECL_BEGIN
 
 #ifdef CONFIG_HAVE_DEBUGGER
-PUBLIC NOBLOCK bool
-NOTHROW(KCALL keyboard_device_putkey)(struct keyboard_device *__restrict self, u16 key) {
+PUBLIC NOBLOCK NONNULL((1)) bool
+NOTHROW(FCALL kbddev_putkey)(struct kbddev *__restrict self, u16 key) {
 	pflag_t was;
 	bool result;
 	assert(key != KEY_NONE);
 	was = PREEMPTION_PUSHOFF();
-	result = keyboard_device_putkey_nopr(self, key);
+	result = kbddev_putkey_nopr(self, key);
 	PREEMPTION_POP(was);
 	return result;
 }
-PUBLIC NOBLOCK bool
-NOTHROW(KCALL keyboard_device_putkey_nopr)(struct keyboard_device *__restrict self, u16 key) {
+PUBLIC NOBLOCK NOPREEMPT NONNULL((1)) bool
+NOTHROW(FCALL kbddev_putkey_nopr)(struct kbddev *__restrict self, u16 key) {
 	if (key == KEY_F12) {
 		uintptr_t flags;
 again_read_flags:
@@ -81,7 +81,7 @@ again_read_flags:
 		/* Clear the F12 counter mask. */
 		ATOMIC_AND(self->kd_flags, ~KEYBOARD_DEVICE_FLAG_DBGF12_MASK);
 	}
-	return keyboard_buffer_putkey_nopr(&self->kd_buf, key);
+	return kbdbuf_putkey_nopr(&self->kd_buf, key);
 }
 #endif /* CONFIG_HAVE_DEBUGGER */
 
@@ -89,20 +89,20 @@ again_read_flags:
  * NOTE: The caller must not pass `KEY_NONE' for `key'
  * @return: true:  Successfully added the key.
  * @return: false: The buffer is already full and the key was not added. */
-PUBLIC NOBLOCK bool
-NOTHROW(KCALL keyboard_buffer_putkey)(struct keyboard_buffer *__restrict self, u16 key) {
+PUBLIC NOBLOCK NONNULL((1)) bool
+NOTHROW(FCALL kbdbuf_putkey)(struct kbdbuf *__restrict self, u16 key) {
 	pflag_t was;
 	bool result;
 	assert(key != KEY_NONE);
 	was = PREEMPTION_PUSHOFF();
-	result = keyboard_buffer_putkey_nopr(self, key);
+	result = kbdbuf_putkey_nopr(self, key);
 	PREEMPTION_POP(was);
 	return result;
 }
 
-PUBLIC NOBLOCK NOPREEMPT bool
-NOTHROW(KCALL keyboard_buffer_putkey_nopr)(struct keyboard_buffer *__restrict self, u16 key) {
-	union keyboard_buffer_state oldstate, newstate;
+PUBLIC NOBLOCK NOPREEMPT NONNULL((1)) bool
+NOTHROW(FCALL kbdbuf_putkey_nopr)(struct kbdbuf *__restrict self, u16 key) {
+	union kbdbuf_state oldstate, newstate;
 	assert(!PREEMPTION_ENABLED());
 	assert(key != KEY_NONE);
 	for (;;) {
@@ -139,11 +139,11 @@ NOTHROW(KCALL keyboard_buffer_putkey_nopr)(struct keyboard_buffer *__restrict se
 
 /* Try to read a key stroke from the given keyboard buffer.
  * @return: KEY_NONE: The buffer is empty. */
-PUBLIC NOBLOCK u16
-NOTHROW(KCALL keyboard_buffer_trygetkey)(struct keyboard_buffer *__restrict self) {
+PUBLIC NOBLOCK NONNULL((1)) u16
+NOTHROW(KCALL kbdbuf_trygetkey)(struct kbdbuf *__restrict self) {
 	u16 result;
 	for (;;) {
-		union keyboard_buffer_state oldstate, newstate;
+		union kbdbuf_state oldstate, newstate;
 		oldstate.bs_word = ATOMIC_READ(self->kb_bufstate.bs_word);
 		if (oldstate.bs_state.s_used == 0)
 			return KEY_NONE;
@@ -168,14 +168,14 @@ NOTHROW(KCALL keyboard_buffer_trygetkey)(struct keyboard_buffer *__restrict self
 	return result;
 }
 
-PUBLIC u16 KCALL
-keyboard_buffer_getkey(struct keyboard_buffer *__restrict self)
+PUBLIC NONNULL((1)) u16 KCALL
+kbdbuf_getkey(struct kbdbuf *__restrict self)
 		THROWS(E_WOULDBLOCK) {
 	u16 result;
 	assert(!task_wasconnected());
-	while ((result = keyboard_buffer_trygetkey(self)) == KEY_NONE) {
+	while ((result = kbdbuf_trygetkey(self)) == KEY_NONE) {
 		task_connect(&self->kb_avail);
-		result = keyboard_buffer_trygetkey(self);
+		result = kbdbuf_trygetkey(self);
 		if unlikely(result != KEY_NONE) {
 			task_disconnectall();
 			break;
@@ -187,10 +187,10 @@ keyboard_buffer_getkey(struct keyboard_buffer *__restrict self)
 
 
 PRIVATE NOBLOCK struct keyboard_key_packet
-NOTHROW(KCALL keyboard_device_trygetkey_locked_noled)(struct keyboard_device *__restrict self) {
+NOTHROW(KCALL keyboard_device_trygetkey_locked_noled)(struct kbddev *__restrict self) {
 	struct keyboard_key_packet result;
 	assert(sync_reading(&self->kd_map_lock));
-	result.kp_key = keyboard_buffer_trygetkey(&self->kd_buf);
+	result.kp_key = kbdbuf_trygetkey(&self->kd_buf);
 	switch (result.kp_key) {
 
 	case KEY_LCTRL:
@@ -350,7 +350,7 @@ STATIC_ASSERT(KEYBOARD_LED_SCROLLLOCK == KEYMOD_SCROLLLOCK);
 #define KEYMOD_LEDMASK (KEYMOD_CAPSLOCK | KEYMOD_NUMLOCK | KEYMOD_SCROLLLOCK)
 
 PRIVATE void KCALL
-sync_leds(struct keyboard_device *__restrict self)
+sync_leds(struct kbddev *__restrict self)
 		THROWS(E_IOERROR, ...) {
 	for (;;) {
 		u16 curmod, oldled, newled;
@@ -365,9 +365,11 @@ sync_leds(struct keyboard_device *__restrict self)
 		COMPILER_READ_BARRIER();
 		if likely(self->kd_leds == oldled) {
 			/* Update LEDs on the keyboard */
-			if (self->kd_ops.ko_setleds) {
+			struct kbddev_ops const *ops;
+			ops = kbddev_getops(self);
+			if (ops->ko_setleds) {
 				TRY {
-					(*self->kd_ops.ko_setleds)(self, newled);
+					(*ops->ko_setleds)(self, newled);
 				} EXCEPT {
 					sync_endwrite(&self->kd_leds_lock);
 					if (!was_thrown(E_IOERROR))
@@ -388,8 +390,8 @@ sync_leds(struct keyboard_device *__restrict self)
 
 /* Try to read a key stroke from the given keyboard.
  * @return: { KEY_NONE, ? }: The buffer is empty. */
-PUBLIC struct keyboard_key_packet KCALL
-keyboard_device_trygetkey(struct keyboard_device *__restrict self)
+PUBLIC NONNULL((1)) struct keyboard_key_packet KCALL
+kbddev_trygetkey(struct kbddev *__restrict self)
 		THROWS(E_WOULDBLOCK, E_IOERROR, ...) {
 	struct keyboard_key_packet result;
 	sync_read(&self->kd_map_lock);
@@ -402,18 +404,18 @@ keyboard_device_trygetkey(struct keyboard_device *__restrict self)
 	return result;
 }
 
-PUBLIC struct keyboard_key_packet KCALL
-keyboard_device_getkey(struct keyboard_device *__restrict self)
+PUBLIC NONNULL((1)) struct keyboard_key_packet KCALL
+kbddev_getkey(struct kbddev *__restrict self)
 		THROWS(E_WOULDBLOCK, E_IOERROR, ...) {
 	struct keyboard_key_packet result;
 	assert(!task_wasconnected());
 	for (;;) {
-		result = keyboard_device_trygetkey(self);
+		result = kbddev_trygetkey(self);
 		if (result.kp_key != KEY_NONE)
 			break;
 		task_connect(&self->kd_buf.kb_avail);
 		TRY {
-			result = keyboard_device_trygetkey(self);
+			result = kbddev_trygetkey(self);
 		} EXCEPT {
 			task_disconnectall();
 			RETHROW();
@@ -548,7 +550,7 @@ NOTHROW(KCALL get_control_key)(u8 ch) {
  *       keymap  program,  before  doing  UNIX  ascii  escape  sequencing.
  */
 PRIVATE NOBLOCK size_t
-NOTHROW(KCALL keyboard_device_do_translate)(struct keyboard_device *__restrict self,
+NOTHROW(KCALL keyboard_device_do_translate)(struct kbddev *__restrict self,
                                             uint16_t key, uint16_t mod) {
 	size_t result;
 	assert(sync_writing(&self->kd_map_lock));
@@ -618,14 +620,19 @@ NOTHROW(KCALL keyboard_device_do_translate)(struct keyboard_device *__restrict s
 		}
 	}
 	{
-		REF struct tty_device *tty;
+		REF struct mkttydev *tty;
 		struct ansitty *atty;
 done:
 		atty = NULL;
 		tty  = awref_get(&self->kd_tty);
-		if (tty && tty->t_ohandle_typ == HANDLE_TYPE_CHRDEV) {
-			struct ansitty_device *ttydev;
-			ttydev = (struct ansitty_device *)tty->t_ohandle_ptr;
+#ifdef CONFIG_USE_NEW_FS
+		if (tty && tty->mtd_ohandle_typ == HANDLE_TYPE_MFILE)
+#else /* CONFIG_USE_NEW_FS */
+		if (tty && tty->mtd_ohandle_typ == HANDLE_TYPE_CHRDEV)
+#endif /* !CONFIG_USE_NEW_FS */
+		{
+			struct ansittydev *ttydev;
+			ttydev = (struct ansittydev *)tty->mtd_ohandle_ptr;
 			if (chrdev_isansitty(ttydev))
 				atty = &ttydev->at_ansi;
 		}
@@ -643,21 +650,27 @@ nope:
 /* Apply  transformations  mandated by  the currently
  * set code-page of a potentially connected ANSI tty. */
 PRIVATE NOBLOCK /*utf-8*/ size_t
-NOTHROW(KCALL keyboard_device_encode_cp)(struct keyboard_device *__restrict self,
+NOTHROW(KCALL keyboard_device_encode_cp)(struct kbddev *__restrict self,
                                          size_t len) {
-	REF struct tty_device *tty;
-	struct ansitty_device *atty;
+	REF struct mkttydev *tty;
+	struct ansittydev *atty;
 	char const *reader, *end;
 	char newbuf[COMPILER_LENOF(self->kd_pend)];
 	size_t newlen;
 	tty = awref_get(&self->kd_tty);
 	if (!tty)
 		goto done;
-	if (tty->t_ohandle_typ != HANDLE_TYPE_CHRDEV)
+#ifdef CONFIG_USE_NEW_FS
+	if (tty->mtd_ohandle_typ != HANDLE_TYPE_MFILE)
 		goto done_tty;
-	atty = (struct ansitty_device *)tty->t_ohandle_ptr;
+#else /* CONFIG_USE_NEW_FS */
+	if (tty->mtd_ohandle_typ != HANDLE_TYPE_CHRDEV)
+		goto done_tty;
+#endif /* !CONFIG_USE_NEW_FS */
+	atty = (struct ansittydev *)tty->mtd_ohandle_ptr;
 	if (!chrdev_isansitty(atty))
 		goto done_tty;
+
 	/* When  the TTY uses CP#0 (UTF-8), then  we don't actually need to re-encode
 	 * the input text sequence, since both input and output would use pure UTF-8.
 	 * And given that the most likely situation has the ANSITTY be in UTF-8 mode,
@@ -665,6 +678,7 @@ NOTHROW(KCALL keyboard_device_encode_cp)(struct keyboard_device *__restrict self
 	 * for this highly likely case and optimize for it. */
 	if likely(atty->at_ansi.at_codepage == 0)
 		goto done_tty;
+
 	/* Re-encode unicode characters */
 	reader = (char const *)self->kd_pend;
 	end    = (char const *)self->kd_pend + len;
@@ -697,10 +711,10 @@ done:
 
 
 /* Try to read a single byte from the keyboard data stream.
- * Same as `keyboard_device_read()'.
+ * Same as `kbddev_v_read()'.
  * @return: -1: No data is available at the moment. */
-PUBLIC int KCALL
-keyboard_device_trygetc(struct keyboard_device *__restrict self)
+PUBLIC NONNULL((1)) int KCALL
+kbddev_trygetc(struct kbddev *__restrict self)
 		THROWS(E_IOERROR, ...) {
 	int result;
 again:
@@ -809,8 +823,12 @@ again_getkey:
 				len = keyboard_device_do_translate(self, packet.kp_key, packet.kp_mod);
 				len = keyboard_device_encode_cp(self, len);
 				if (len == 0) {
-					printk(KERN_DEBUG "[keyboard:%q] translate(%#" PRIx16 ",%#" PRIx16 "): <empty>\n",
-					       self->cd_name, packet.kp_key, packet.kp_mod);
+					printk(KERN_DEBUG "[keyboard:"
+					                  "%" PRIuN(__SIZEOF_MAJOR_T__) "u:"
+					                  "%" PRIuN(__SIZEOF_MINOR_T__) "] "
+					                  "translate(%#" PRIx16 ",%#" PRIx16 "): <empty>\n",
+					       MAJOR(chrdev_devno(self)), MINOR(chrdev_devno(self)),
+					       packet.kp_key, packet.kp_mod);
 check_led_and_try_again:
 					sync_endwrite(&self->kd_map_lock);
 					if (packet.kp_key == KEY_CAPSLOCK ||
@@ -819,9 +837,12 @@ check_led_and_try_again:
 						sync_leds(self);
 					goto again;
 				}
-				printk(KERN_DEBUG "[keyboard:%q] translate(%#" PRIx16 ",%#" PRIx16 "): %$q\n",
-				       self->cd_name, packet.kp_key, packet.kp_mod,
-				       len, self->kd_pend);
+				printk(KERN_DEBUG "[keyboard:"
+				                  "%" PRIuN(__SIZEOF_MAJOR_T__) "u:"
+				                  "%" PRIuN(__SIZEOF_MINOR_T__) "] "
+				                  "translate(%#" PRIx16 ",%#" PRIx16 "): %$q\n",
+				       MAJOR(chrdev_devno(self)), MINOR(chrdev_devno(self)),
+				       packet.kp_key, packet.kp_mod, len, self->kd_pend);
 				break;
 			}
 			result = (int)(unsigned int)(unsigned char)self->kd_pend[0];
@@ -841,16 +862,16 @@ check_led_and_try_again:
 
 }
 
-PUBLIC byte_t KCALL
-keyboard_device_getc(struct keyboard_device *__restrict self)
+PUBLIC NONNULL((1)) byte_t KCALL
+kbddev_getc(struct kbddev *__restrict self)
 		THROWS(E_WOULDBLOCK, E_IOERROR, ...) {
 	int result;
 again:
-	result = keyboard_device_trygetc(self);
+	result = kbddev_trygetc(self);
 	if (result == -1) {
 		task_connect(&self->kd_buf.kb_avail);
 		TRY {
-			result = keyboard_device_trygetc(self);
+			result = kbddev_trygetc(self);
 		} EXCEPT {
 			task_disconnectall();
 			RETHROW();
@@ -868,17 +889,28 @@ done:
 
 
 /* Keyboard character device operators */
+#ifdef CONFIG_USE_NEW_FS
 PUBLIC NONNULL((1)) size_t KCALL
-keyboard_device_read(struct chrdev *__restrict self,
-                     USER CHECKED void *dst, size_t num_bytes,
-                     iomode_t mode) THROWS(...) {
-	struct keyboard_device *me;
+kbddev_v_read(struct mfile *__restrict self,
+              USER CHECKED void *dst, size_t num_bytes,
+              iomode_t mode) THROWS(...)
+#else /* CONFIG_USE_NEW_FS */
+PUBLIC NONNULL((1)) size_t KCALL
+kbddev_v_read(struct chrdev *__restrict self,
+              USER CHECKED void *dst, size_t num_bytes,
+              iomode_t mode) THROWS(...)
+#endif /* !CONFIG_USE_NEW_FS */
+{
+#ifdef CONFIG_USE_NEW_FS
+	struct kbddev *me = mfile_askbd(self);
+#else /* CONFIG_USE_NEW_FS */
+	struct kbddev *me = (struct kbddev *)self;
+#endif /* !CONFIG_USE_NEW_FS */
 	size_t result;
-	me = (struct keyboard_device *)self;
 	for (result = 0; result < num_bytes; ++result) {
 		int ch;
 again_read_ch:
-		ch = keyboard_device_trygetc(me);
+		ch = kbddev_trygetc(me);
 		if (ch == -1) {
 			if (result)
 				break;
@@ -889,7 +921,7 @@ again_read_ch:
 			}
 			task_connect(&me->kd_buf.kb_avail);
 			TRY {
-				ch = keyboard_device_trygetc(me);
+				ch = kbddev_trygetc(me);
 			} EXCEPT {
 				task_disconnectall();
 				RETHROW();
@@ -902,26 +934,38 @@ again_read_ch:
 			goto again_read_ch;
 		}
 do_append_ch:
-		((byte_t *)dst)[result] = (byte_t)(unsigned int)ch;
+		((USER CHECKED byte_t *)dst)[result] = (byte_t)(unsigned int)ch;
 	}
 	return result;
 }
 
+#ifdef CONFIG_USE_NEW_FS
 PUBLIC NONNULL((1)) void KCALL
-keyboard_device_stat(struct chrdev *__restrict self,
-                     USER CHECKED struct stat *result) THROWS(...) {
-	struct keyboard_device *me;
+kbddev_v_stat(struct mfile *__restrict self,
+              USER CHECKED struct stat *result) THROWS(...) {
+	struct kbddev *me = mfile_askbd(self);
 	size_t bufsize;
-	me = (struct keyboard_device *)self;
+	bufsize = ATOMIC_READ(me->kd_pendsz);
+	bufsize += ATOMIC_READ(me->kd_buf.kb_bufstate.bs_state.s_used); /* XXX: This is inexact */
+	result->st_size = bufsize;
+}
+#else /* CONFIG_USE_NEW_FS */
+PUBLIC NONNULL((1)) void KCALL
+kbddev_v_stat(struct chrdev *__restrict self,
+              USER CHECKED struct stat *result) THROWS(...) {
+	struct kbddev *me;
+	size_t bufsize;
+	me = (struct kbddev *)self;
 	result->st_blksize = sizeof(char);
 	bufsize = ATOMIC_READ(me->kd_pendsz);
 	bufsize += ATOMIC_READ(me->kd_buf.kb_bufstate.bs_state.s_used); /* XXX: This is inexact */
 	result->st_size = bufsize;
 }
+#endif /* !CONFIG_USE_NEW_FS */
 
 
 LOCAL bool KCALL
-keyboard_device_canread(struct keyboard_device *__restrict self) {
+keyboard_device_canread(struct kbddev *__restrict self) {
 	uintptr_half_t used;
 	if (ATOMIC_READ(self->kd_pendsz) != 0)
 		return true;
@@ -929,34 +973,57 @@ keyboard_device_canread(struct keyboard_device *__restrict self) {
 	return used != 0;
 }
 
+#ifdef CONFIG_USE_NEW_FS
 PUBLIC NONNULL((1)) void KCALL
-keyboard_device_pollconnect(struct chrdev *__restrict self,
-                            poll_mode_t what) THROWS(...) {
-	struct keyboard_device *me;
-	me = (struct keyboard_device *)self;
+kbddev_v_pollconnect(struct mfile *__restrict self,
+                     poll_mode_t what) THROWS(...) {
+	struct kbddev *me = mfile_askbd(self);
 	if (what & POLLINMASK)
 		task_connect_for_poll(&me->kd_buf.kb_avail);
 }
 
 PUBLIC NONNULL((1)) poll_mode_t KCALL
-keyboard_device_polltest(struct chrdev *__restrict self,
-                         poll_mode_t what) THROWS(...) {
-	struct keyboard_device *me;
-	me = (struct keyboard_device *)self;
+kbddev_v_polltest(struct mfile *__restrict self,
+                  poll_mode_t what) THROWS(...) {
+	struct kbddev *me = mfile_askbd(self);
 	if (what & POLLINMASK) {
 		if (keyboard_device_canread(me))
 			return POLLINMASK;
 	}
 	return 0;
 }
+#else /* CONFIG_USE_NEW_FS */
+PUBLIC NONNULL((1)) void KCALL
+kbddev_v_pollconnect(struct chrdev *__restrict self,
+                            poll_mode_t what) THROWS(...) {
+	struct kbddev *me;
+	me = (struct kbddev *)self;
+	if (what & POLLINMASK)
+		task_connect_for_poll(&me->kd_buf.kb_avail);
+}
+
+PUBLIC NONNULL((1)) poll_mode_t KCALL
+kbddev_v_polltest(struct chrdev *__restrict self,
+                  poll_mode_t what) THROWS(...) {
+	struct kbddev *me;
+	me = (struct kbddev *)self;
+	if (what & POLLINMASK) {
+		if (keyboard_device_canread(me))
+			return POLLINMASK;
+	}
+	return 0;
+}
+#endif /* !CONFIG_USE_NEW_FS */
+
+
 
 LOCAL unsigned int KCALL
-linux_keyboard_getmode(struct keyboard_device *__restrict self) {
+linux_keyboard_getmode(struct kbddev *__restrict self) {
 	return ATOMIC_READ(self->kd_flags) & KEYBOARD_DEVICE_FLAG_RDMODE;
 }
 
 LOCAL void KCALL
-linux_keyboard_setmode(struct keyboard_device *__restrict self,
+linux_keyboard_setmode(struct kbddev *__restrict self,
                        unsigned int mode) {
 	if (mode >= K_RAW && mode <= K_OFF) {
 		uintptr_t flags;
@@ -972,13 +1039,13 @@ linux_keyboard_setmode(struct keyboard_device *__restrict self,
 }
 
 LOCAL unsigned int KCALL
-linux_keyboard_getmeta(struct keyboard_device *__restrict self) {
+linux_keyboard_getmeta(struct kbddev *__restrict self) {
 	(void)self;
 	return K_ESCPREFIX;
 }
 
 LOCAL void KCALL
-linux_keyboard_setmeta(struct keyboard_device *__restrict self,
+linux_keyboard_setmeta(struct kbddev *__restrict self,
                        unsigned int mode) {
 	(void)self;
 	/* TODO: This should configure if pressing ALT will:
@@ -996,19 +1063,30 @@ linux_keyboard_setmeta(struct keyboard_device *__restrict self,
 
 
 
+#ifdef CONFIG_USE_NEW_FS
 PUBLIC NONNULL((1)) syscall_slong_t KCALL
-keyboard_device_ioctl(struct chrdev *__restrict self,
-                      syscall_ulong_t cmd, USER UNCHECKED void *arg,
-                      iomode_t mode) THROWS(...) {
-	struct keyboard_device *me;
+kbddev_v_ioctl(struct mfile *__restrict self,
+               syscall_ulong_t cmd, USER UNCHECKED void *arg,
+               iomode_t mode) THROWS(...)
+#else /* CONFIG_USE_NEW_FS */
+PUBLIC NONNULL((1)) syscall_slong_t KCALL
+kbddev_v_ioctl(struct chrdev *__restrict self,
+               syscall_ulong_t cmd, USER UNCHECKED void *arg,
+               iomode_t mode) THROWS(...)
+#endif /* !CONFIG_USE_NEW_FS */
+{
+#ifdef CONFIG_USE_NEW_FS
+	struct kbddev *me = mfile_askbd(self);
+#else /* CONFIG_USE_NEW_FS */
+	struct kbddev *me = (struct kbddev *)self;
+#endif /* !CONFIG_USE_NEW_FS */
 	(void)mode;
-	me = (struct keyboard_device *)self;
 	switch (cmd) {
 
 	case KBDIO_TRYGETKEY: {
 		struct keyboard_key_packet key;
 		validate_writable(arg, sizeof(struct keyboard_key_packet));
-		key = keyboard_device_trygetkey(me);
+		key = kbddev_trygetkey(me);
 		if (!key.kp_key)
 			return -EAGAIN;
 		COMPILER_WRITE_BARRIER();
@@ -1019,7 +1097,7 @@ keyboard_device_ioctl(struct chrdev *__restrict self,
 	case KBDIO_GETKEY: {
 		struct keyboard_key_packet key;
 		validate_writable(arg, sizeof(struct keyboard_key_packet));
-		key = keyboard_device_getkey(me);
+		key = kbddev_getkey(me);
 		COMPILER_WRITE_BARRIER();
 		memcpy(arg, &key, sizeof(struct keyboard_key_packet));
 		COMPILER_WRITE_BARRIER();
@@ -1042,9 +1120,11 @@ keyboard_device_ioctl(struct chrdev *__restrict self,
 		COMPILER_READ_BARRIER();
 		sync_write(&me->kd_leds_lock);
 		if (me->kd_leds != new_mods) {
-			if (me->kd_ops.ko_setleds) {
+			struct kbddev_ops const *ops;
+			ops = kbddev_getops(me);
+			if (ops->ko_setleds) {
 				TRY {
-					(*me->kd_ops.ko_setleds)(me, new_mods);
+					(*ops->ko_setleds)(me, new_mods);
 				} EXCEPT {
 					sync_endwrite(&me->kd_leds_lock);
 					RETHROW();
@@ -1070,9 +1150,11 @@ keyboard_device_ioctl(struct chrdev *__restrict self,
 		old_leds = me->kd_leds;
 		new_mods = ((old_leds & led_mask) | led_flag) ^ led_fxor;
 		if (old_leds != new_mods) {
-			if (me->kd_ops.ko_setleds) {
+			struct kbddev_ops const *ops;
+			ops = kbddev_getops(me);
+			if (ops->ko_setleds) {
 				TRY {
-					(*me->kd_ops.ko_setleds)(me, new_mods);
+					(*ops->ko_setleds)(me, new_mods);
 				} EXCEPT {
 					sync_endwrite(&me->kd_leds_lock);
 					RETHROW();
@@ -1232,7 +1314,7 @@ continue_copy_keymap:
 	case KBDIO_FLUSHPENDING: {
 		for (;;) {
 			struct keyboard_key_packet packet;
-			packet = keyboard_device_trygetkey(me);
+			packet = kbddev_trygetkey(me);
 			if (packet.kp_key == KEY_NONE)
 				break; /* Buffer became empty. */
 		}
@@ -1288,7 +1370,7 @@ continue_copy_keymap:
 		COMPILER_READ_BARRIER();
 		key = *(u16 const *)arg;
 		COMPILER_READ_BARRIER();
-		return keyboard_device_putkey(me, key);
+		return kbddev_putkey(me, key);
 	}	break;
 
 	case KBDIO_GETDBGF12: {
@@ -1348,9 +1430,11 @@ continue_copy_keymap:
 		sync_write(&me->kd_leds_lock);
 		new_leds |= me->kd_leds & ~((K_SCROLLLOCK | K_NUMLOCK | K_CAPSLOCK) << 8);
 		if (me->kd_leds != new_leds) {
-			if (me->kd_ops.ko_setleds) {
+			struct kbddev_ops const *ops;
+			ops = kbddev_getops(me);
+			if (ops->ko_setleds) {
 				TRY {
-					(*me->kd_ops.ko_setleds)(me, new_leds);
+					(*ops->ko_setleds)(me, new_leds);
 				} EXCEPT {
 					sync_endwrite(&me->kd_leds_lock);
 					RETHROW();
@@ -1434,7 +1518,6 @@ continue_copy_keymap:
 	 *       already  been  cached (the  ones  that were  pressed),  and which
 	 *       had to be freshly cached then (the ones that weren't) */
 
-
 	default:
 		THROW(E_INVALID_ARGUMENT_UNKNOWN_COMMAND,
 		      E_INVALID_ARGUMENT_CONTEXT_IOCTL_COMMAND,
@@ -1446,28 +1529,37 @@ continue_copy_keymap:
 
 
 
+#ifdef CONFIG_USE_NEW_FS
+FUNDEF NOBLOCK NONNULL((1)) void
+NOTHROW(KCALL kbddev_v_destroy)(struct mfile *__restrict self) {
+	struct kbddev *me = mfile_askbd(self);
+	kfree((byte_t *)me->kd_map.km_ext);
+	chrdev_v_destroy(self);
+}
+#else /* CONFIG_USE_NEW_FS */
+
 /* Initialize/finalize the given keyboard device.
  * NOTE: Drivers that override  the `ct_fini' operator  of a given  keyboard
  *       must ensure that `keyboard_device_fini()' is still invoked by their
  *       override.
  * NOTE: The following operators are intrinsically provided by keyboard,
- *       get  initialized by `keyboard_device_init()', and should not be
+ *       get  initialized by `kbddev_init()', and should not be
  *       overwritten:
  *         - ct_read
  *         - ct_ioctl
  *         - ct_stat
  *         - ct_poll */
 PUBLIC NOBLOCK void
-NOTHROW(KCALL keyboard_device_init)(struct keyboard_device *__restrict self,
-                                    struct keyboard_device_ops const *__restrict ops) {
-	memcpy(&self->kd_ops, ops, sizeof(struct keyboard_device_ops));
+NOTHROW(KCALL kbddev_init)(struct kbddev *__restrict self,
+                                    struct kbddev_ops const *__restrict ops) {
+	memcpy(&self->kd_ops, ops, sizeof(struct kbddev_ops));
 	assert(self->cd_type.ct_driver != NULL);
 	self->cd_type.ct_fini        = (void(KCALL *)(struct chrdev *__restrict))&keyboard_device_fini;
-	self->cd_type.ct_read        = &keyboard_device_read;
-	self->cd_type.ct_ioctl       = &keyboard_device_ioctl;
-	self->cd_type.ct_stat        = &keyboard_device_stat;
-	self->cd_type.ct_pollconnect = &keyboard_device_pollconnect;
-	self->cd_type.ct_polltest    = &keyboard_device_polltest;
+	self->cd_type.ct_read        = &kbddev_v_read;
+	self->cd_type.ct_ioctl       = &kbddev_v_ioctl;
+	self->cd_type.ct_stat        = &kbddev_v_stat;
+	self->cd_type.ct_pollconnect = &kbddev_v_pollconnect;
+	self->cd_type.ct_polltest    = &kbddev_v_polltest;
 	self->kd_flags = K_UNICODE; /* Use unicode by default. */
 	/* Enable DBGF12 by default when building with the builtin debugger enabled. */
 #if !defined(CONFIG_NO_DEBUGGER) && defined(KEYBOARD_DEVICE_FLAG_DBGF12)
@@ -1479,9 +1571,10 @@ NOTHROW(KCALL keyboard_device_init)(struct keyboard_device *__restrict self,
 }
 
 PUBLIC NOBLOCK void
-NOTHROW(KCALL keyboard_device_fini)(struct keyboard_device *__restrict self) {
+NOTHROW(KCALL keyboard_device_fini)(struct kbddev *__restrict self) {
 	kfree((byte_t *)self->kd_map.km_ext);
 }
+#endif /* !CONFIG_USE_NEW_FS */
 
 
 

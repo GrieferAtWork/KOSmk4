@@ -132,6 +132,14 @@
 
 #define mfile_isnode vm_datablock_isinode
 
+#ifndef __WANT_FS_INLINE_STRUCTURES
+#ifndef __cplusplus
+#define __WANT_FS_INLINE_STRUCTURES
+#elif defined(__WANT_FS_INIT)
+#define __WANT_FS_INLINE_STRUCTURES
+#endif /* ... */
+#endif /* !__WANT_FS_INLINE_STRUCTURES */
+
 DECL_BEGIN
 
 

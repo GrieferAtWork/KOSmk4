@@ -47,9 +47,9 @@ DECL_BEGIN
 
 
 PUBLIC NOBLOCK NOPREEMPT bool
-NOTHROW(KCALL mouse_buffer_putpacket_nopr)(struct mouse_buffer *__restrict self,
+NOTHROW(KCALL mouse_buffer_putpacket_nopr)(struct mousebuf *__restrict self,
                                            mouse_packet_t packet) {
-	union mouse_buffer_state oldstate, newstate;
+	union mousebuf_state oldstate, newstate;
 	assert(!PREEMPTION_ENABLED());
 	assert(packet.mp_type != MOUSE_PACKET_TYPE_NONE);
 	for (;;) {
@@ -84,10 +84,10 @@ NOTHROW(KCALL mouse_buffer_putpacket_nopr)(struct mouse_buffer *__restrict self,
 }
 
 PUBLIC NOBLOCK bool
-NOTHROW(KCALL mouse_buffer_putpackets_nopr)(struct mouse_buffer *__restrict self,
+NOTHROW(KCALL mouse_buffer_putpackets_nopr)(struct mousebuf *__restrict self,
                                             mouse_packet_t *__restrict packetv,
                                             uintptr_half_t packetc) {
-	union mouse_buffer_state oldstate, newstate;
+	union mousebuf_state oldstate, newstate;
 	assert(packetc != 0);
 	assert(packetc <= MOUSE_PACKET_SEQMAX);
 	assert(!PREEMPTION_ENABLED());
@@ -160,7 +160,7 @@ STATIC_ASSERT((int32_t)INT6_MIN  == (int32_t)0xffffffe0);
 STATIC_ASSERT((int32_t)INT6_MAX  == (int32_t)0x0000001f);
 
 PRIVATE NOBLOCK bool
-NOTHROW(KCALL mouse_device_do_post_s32s32s32s32)(struct mouse_device *__restrict self,
+NOTHROW(KCALL mouse_device_do_post_s32s32s32s32)(struct mousedev *__restrict self,
                                                  unsigned int type,
                                                  s32 data1, s32 data2,
                                                  s32 data3, s32 data4) {
@@ -339,7 +339,7 @@ NOTHROW(KCALL mouse_device_do_post_s32s32s32s32)(struct mouse_device *__restrict
 }
 
 PRIVATE NOBLOCK bool
-NOTHROW(KCALL mouse_device_do_post_s32s32)(struct mouse_device *__restrict self,
+NOTHROW(KCALL mouse_device_do_post_s32s32)(struct mousedev *__restrict self,
                                            unsigned int type, s32 data1, s32 data2) {
 	assert(!MOUSE_PACKET_TYPE_IS4FIELD(type));
 	if ((data1 >= INT12_MIN && data1 <= INT12_MAX) &&
@@ -386,7 +386,7 @@ NOTHROW(KCALL mouse_device_do_post_s32s32)(struct mouse_device *__restrict self,
 }
 
 PRIVATE NOBLOCK bool
-NOTHROW(KCALL mouse_device_do_motion_nopr_locked)(struct mouse_device *__restrict self,
+NOTHROW(KCALL mouse_device_do_motion_nopr_locked)(struct mousedev *__restrict self,
                                                   s32 relx, s32 rely) {
 	bool result;
 	s32 new_absx, new_absy;
@@ -422,7 +422,7 @@ NOTHROW(KCALL mouse_device_do_motion_nopr_locked)(struct mouse_device *__restric
 }
 
 PRIVATE NOBLOCK bool
-NOTHROW(KCALL mouse_device_do_button_nopr_locked)(struct mouse_device *__restrict self,
+NOTHROW(KCALL mouse_device_do_button_nopr_locked)(struct mousedev *__restrict self,
                                                   u32 new_buttons) {
 	bool result;
 	result = mouse_device_do_post_s32s32(self,
@@ -435,13 +435,13 @@ NOTHROW(KCALL mouse_device_do_button_nopr_locked)(struct mouse_device *__restric
 }
 
 PRIVATE NOBLOCK bool
-NOTHROW(KCALL mouse_device_do_wheel_nopr_locked)(struct mouse_device *__restrict self,
+NOTHROW(KCALL mouse_device_do_wheel_nopr_locked)(struct mousedev *__restrict self,
                                                  unsigned int type, s32 diff) {
 	return mouse_device_do_post_s32s32(self, type, 0, diff);
 }
 
 PRIVATE NOBLOCK bool
-NOTHROW(KCALL mouse_device_do_moveto_nopr_locked)(struct mouse_device *__restrict self,
+NOTHROW(KCALL mouse_device_do_moveto_nopr_locked)(struct mousedev *__restrict self,
                                                   s32 absx, s32 absy) {
 	return mouse_device_do_motion_nopr_locked(self,
 	                                          absx - self->md_state.ms_abs_x,
@@ -450,11 +450,11 @@ NOTHROW(KCALL mouse_device_do_moveto_nopr_locked)(struct mouse_device *__restric
 
 
 /* Read packets from a given mouse device buffer. */
-PUBLIC NOBLOCK mouse_packet_t
-NOTHROW(KCALL mouse_buffer_trygetpacket)(struct mouse_buffer *__restrict self) {
+PUBLIC NONNULL((1)) NOBLOCK mouse_packet_t
+NOTHROW(KCALL mousebuf_trygetpacket)(struct mousebuf *__restrict self) {
 	mouse_packet_t result;
 	for (;;) {
-		union mouse_buffer_state oldstate, newstate;
+		union mousebuf_state oldstate, newstate;
 		oldstate.bs_word = ATOMIC_READ(self->mb_bufstate.bs_word);
 		if (oldstate.bs_state.s_used == 0) {
 			result.mp_word = 0;
@@ -483,16 +483,16 @@ NOTHROW(KCALL mouse_buffer_trygetpacket)(struct mouse_buffer *__restrict self) {
 	return result;
 }
 
-PUBLIC mouse_packet_t KCALL
-mouse_buffer_getpacket(struct mouse_buffer *__restrict self) THROWS(E_WOULDBLOCK) {
+PUBLIC NONNULL((1)) mouse_packet_t KCALL
+mousebuf_getpacket(struct mousebuf *__restrict self) THROWS(E_WOULDBLOCK) {
 	mouse_packet_t result;
 	assert(!task_wasconnected());
 	for (;;) {
-		result = mouse_buffer_trygetpacket(self);
+		result = mousebuf_trygetpacket(self);
 		if (result.mp_type != MOUSE_PACKET_TYPE_NONE)
 			break;
 		task_connect(&self->mb_avail);
-		result = mouse_buffer_trygetpacket(self);
+		result = mousebuf_trygetpacket(self);
 		if unlikely(result.mp_type != MOUSE_PACKET_TYPE_NONE) {
 			task_disconnectall();
 			break;
@@ -540,8 +540,8 @@ mouse_buffer_getpacket(struct mouse_buffer *__restrict self) THROWS(E_WOULDBLOCK
 /* Generate mouse input packets
  * Note  that when generating event packets, the motion
  * packets should always be created before other events */
-PUBLIC bool KCALL
-mouse_device_motion(struct mouse_device *__restrict self,
+PUBLIC NONNULL((1)) bool KCALL
+mousedev_motion(struct mousedev *__restrict self,
                     s32 relx, s32 rely) {
 	bool result;
 	pflag_t was;
@@ -553,8 +553,8 @@ mouse_device_motion(struct mouse_device *__restrict self,
 	return result;
 }
 
-PUBLIC bool KCALL
-mouse_device_moveto(struct mouse_device *__restrict self,
+PUBLIC NONNULL((1)) bool KCALL
+mousedev_moveto(struct mousedev *__restrict self,
                     s32 absx, s32 absy) {
 	bool result;
 	pflag_t was;
@@ -569,8 +569,8 @@ mouse_device_moveto(struct mouse_device *__restrict self,
 	return result;
 }
 
-PUBLIC bool KCALL
-mouse_device_button(struct mouse_device *__restrict self,
+PUBLIC NONNULL((1)) bool KCALL
+mousedev_button(struct mousedev *__restrict self,
                     u32 mask, u32 flag) {
 	bool result;
 	pflag_t was;
@@ -585,8 +585,9 @@ mouse_device_button(struct mouse_device *__restrict self,
 	MD_LOCK_ENDWRITE(self, was);
 	return result;
 }
-PUBLIC bool KCALL
-mouse_device_button_ex(struct mouse_device *__restrict self,
+
+PUBLIC NONNULL((1)) bool KCALL
+mousedev_button_ex(struct mousedev *__restrict self,
                        u32 mask, u32 flag, u32 xflg,
                        u32 *__restrict pold_buttons,
                        u32 *__restrict pnew_buttons) {
@@ -608,8 +609,8 @@ mouse_device_button_ex(struct mouse_device *__restrict self,
 	return result;
 }
 
-PUBLIC bool KCALL
-mouse_device_vwheel(struct mouse_device *__restrict self, s32 lines) {
+PUBLIC NONNULL((1)) bool KCALL
+mousedev_vwheel(struct mousedev *__restrict self, s32 lines) {
 	bool result;
 	pflag_t was;
 	if unlikely(!lines)
@@ -622,8 +623,8 @@ mouse_device_vwheel(struct mouse_device *__restrict self, s32 lines) {
 	return result;
 }
 
-PUBLIC bool KCALL
-mouse_device_hwheel(struct mouse_device *__restrict self, s32 rows) {
+PUBLIC NONNULL((1)) bool KCALL
+mousedev_hwheel(struct mousedev *__restrict self, s32 rows) {
 	bool result;
 	pflag_t was;
 	if unlikely(!rows)
@@ -636,8 +637,8 @@ mouse_device_hwheel(struct mouse_device *__restrict self, s32 rows) {
 	return result;
 }
 
-PUBLIC NOBLOCK bool
-NOTHROW(KCALL mouse_device_motion_nopr)(struct mouse_device *__restrict self,
+PUBLIC NOBLOCK NONNULL((1)) bool
+NOTHROW(KCALL mousedev_motion_nopr)(struct mousedev *__restrict self,
                                         s32 relx, s32 rely) {
 	bool result;
 	if (!relx && !rely)
@@ -648,8 +649,8 @@ NOTHROW(KCALL mouse_device_motion_nopr)(struct mouse_device *__restrict self,
 	return result;
 }
 
-PUBLIC NOBLOCK bool
-NOTHROW(KCALL mouse_device_moveto_nopr)(struct mouse_device *__restrict self,
+PUBLIC NOBLOCK NONNULL((1)) bool
+NOTHROW(KCALL mousedev_moveto_nopr)(struct mousedev *__restrict self,
                                         s32 absx, s32 absy) {
 	bool result;
 	MD_LOCK_WRITE_NOPR(self);
@@ -663,8 +664,8 @@ NOTHROW(KCALL mouse_device_moveto_nopr)(struct mouse_device *__restrict self,
 	return result;
 }
 
-PUBLIC NOBLOCK bool
-NOTHROW(KCALL mouse_device_button_nopr)(struct mouse_device *__restrict self,
+PUBLIC NOBLOCK NONNULL((1)) bool
+NOTHROW(KCALL mousedev_button_nopr)(struct mousedev *__restrict self,
                                         u32 mask, u32 flag) {
 	bool result;
 	u32 new_buttons;
@@ -679,8 +680,8 @@ NOTHROW(KCALL mouse_device_button_nopr)(struct mouse_device *__restrict self,
 	return result;
 }
 
-PUBLIC NOBLOCK bool
-NOTHROW(KCALL mouse_device_button_ex_nopr)(struct mouse_device *__restrict self,
+PUBLIC NOBLOCK NONNULL((1)) bool
+NOTHROW(KCALL mousedev_button_ex_nopr)(struct mousedev *__restrict self,
                                            u32 mask, u32 flag, u32 xflg,
                                            u32 *__restrict pold_buttons,
                                            u32 *__restrict pnew_buttons) {
@@ -701,8 +702,8 @@ NOTHROW(KCALL mouse_device_button_ex_nopr)(struct mouse_device *__restrict self,
 	return result;
 }
 
-PUBLIC NOBLOCK bool
-NOTHROW(KCALL mouse_device_vwheel_nopr)(struct mouse_device *__restrict self,
+PUBLIC NOBLOCK NONNULL((1)) bool
+NOTHROW(KCALL mousedev_vwheel_nopr)(struct mousedev *__restrict self,
                                         s32 lines) {
 	bool result;
 	if unlikely(!lines)
@@ -715,8 +716,8 @@ NOTHROW(KCALL mouse_device_vwheel_nopr)(struct mouse_device *__restrict self,
 	return result;
 }
 
-PUBLIC NOBLOCK bool
-NOTHROW(KCALL mouse_device_hwheel_nopr)(struct mouse_device *__restrict self,
+PUBLIC NOBLOCK NONNULL((1)) bool
+NOTHROW(KCALL mousedev_hwheel_nopr)(struct mousedev *__restrict self,
                                         s32 rows) {
 	bool result;
 	if unlikely(!rows)
@@ -731,51 +732,65 @@ NOTHROW(KCALL mouse_device_hwheel_nopr)(struct mouse_device *__restrict self,
 
 
 
+#ifndef CONFIG_USE_NEW_FS
 /* Initialize/finalize the given mouse device.
  * NOTE: Drivers that override  the `ct_fini' operator  of a given  mouse
- *       must ensure that `mouse_device_fini()' is still invoked by their
+ *       must ensure that `mousedev_v_fini()' is still invoked by their
  *       override.
  * NOTE: The following operators are intrinsically provided by mouse,
- *       get  initialized by `mouse_device_init()', and should not be
+ *       get  initialized by `mousedev_init()', and should not be
  *       overwritten:
  *         - ct_read
  *         - ct_ioctl
  *         - ct_stat
  *         - ct_poll */
-PUBLIC NOBLOCK void
-NOTHROW(KCALL mouse_device_init)(struct mouse_device *__restrict self) {
+PUBLIC NOBLOCK NONNULL((1)) void
+NOTHROW(KCALL mousedev_init)(struct mousedev *__restrict self) {
 	assert(self->cd_type.ct_driver != NULL);
-	self->cd_type.ct_read        = &mouse_device_read;
-	self->cd_type.ct_ioctl       = &mouse_device_ioctl;
-	self->cd_type.ct_stat        = &mouse_device_stat;
-	self->cd_type.ct_pollconnect = &mouse_device_pollconnect;
-	self->cd_type.ct_polltest    = &mouse_device_polltest;
+	self->cd_type.ct_read        = &mousedev_v_read;
+	self->cd_type.ct_ioctl       = &mousedev_v_ioctl;
+	self->cd_type.ct_stat        = &mousedev_v_stat;
+	self->cd_type.ct_pollconnect = &mousedev_v_pollconnect;
+	self->cd_type.ct_polltest    = &mousedev_v_polltest;
 	atomic_rwlock_cinit(&self->md_lock);
 }
+#endif /* !CONFIG_USE_NEW_FS */
+
 
 /* Mouse character device operators */
+#ifdef CONFIG_USE_NEW_FS
 PUBLIC NONNULL((1)) size_t KCALL
-mouse_device_read(struct chrdev *__restrict self,
-                  USER CHECKED void *dst, size_t num_bytes,
-                  iomode_t mode) THROWS(...) {
+mousedev_v_read(struct mfile *__restrict self,
+                USER CHECKED void *dst, size_t num_bytes,
+                iomode_t mode) THROWS(...)
+#else /* CONFIG_USE_NEW_FS */
+PUBLIC NONNULL((1)) size_t KCALL
+mousedev_v_read(struct chrdev *__restrict self,
+                USER CHECKED void *dst, size_t num_bytes,
+                iomode_t mode) THROWS(...)
+#endif /* !CONFIG_USE_NEW_FS */
+{
 	size_t result;
-	struct mouse_device *me;
 	mouse_packet_t packet;
+#ifdef CONFIG_USE_NEW_FS
+	struct mousedev *me = mfile_asmouse(self);
+#else /* CONFIG_USE_NEW_FS */
+	struct mousedev *me = (struct mousedev *)self;
+#endif /* !CONFIG_USE_NEW_FS */
 	if unlikely(num_bytes < sizeof(mouse_packet_t)) {
 		if (num_bytes != 0)
 			THROW(E_BUFFER_TOO_SMALL, sizeof(mouse_packet_t), num_bytes);
 		goto empty;
 	}
-	me = (struct mouse_device *)self;
 	if (mode & IO_NONBLOCK) {
-		packet = mouse_buffer_trygetpacket(&me->md_buf);
+		packet = mousebuf_trygetpacket(&me->md_buf);
 		if (packet.mp_type == MOUSE_PACKET_TYPE_NONE) {
 			if (mode & IO_NODATAZERO)
 				goto empty;
 			THROW(E_WOULDBLOCK_WAITFORSIGNAL);
 		}
 	} else {
-		packet = mouse_buffer_getpacket(&me->md_buf);
+		packet = mousebuf_getpacket(&me->md_buf);
 		assert(packet.mp_type != MOUSE_PACKET_TYPE_NONE);
 	}
 	memcpy(dst, &packet, sizeof(mouse_packet_t));
@@ -783,7 +798,7 @@ mouse_device_read(struct chrdev *__restrict self,
 	while (num_bytes >= 2 * sizeof(mouse_packet_t)) {
 		dst = (byte_t *)dst + sizeof(mouse_packet_t);
 		num_bytes -= sizeof(mouse_packet_t);
-		packet = mouse_buffer_trygetpacket(&me->md_buf);
+		packet = mousebuf_trygetpacket(&me->md_buf);
 		if (packet.mp_type == MOUSE_PACKET_TYPE_NONE)
 			break;
 		COMPILER_WRITE_BARRIER();
@@ -795,52 +810,98 @@ empty:
 	return 0;
 }
 
+#ifdef CONFIG_USE_NEW_FS
 PUBLIC NONNULL((1)) void KCALL
-mouse_device_stat(struct chrdev *__restrict self,
-                  USER CHECKED struct stat *result) THROWS(...) {
-	struct mouse_device *me;
-	me = (struct mouse_device *)self;
-	result->st_blksize = sizeof(mouse_packet_t);
-	result->st_size = (ATOMIC_READ(me->md_buf.mb_bufstate.bs_state.s_used) *
-	                   sizeof(mouse_packet_t));
+mousedev_v_stat(struct mfile *__restrict self,
+                USER CHECKED struct stat *result) THROWS(...)
+#else /* CONFIG_USE_NEW_FS */
+PUBLIC NONNULL((1)) void KCALL
+mousedev_v_stat(struct chrdev *__restrict self,
+                USER CHECKED struct stat *result) THROWS(...)
+#endif /* !CONFIG_USE_NEW_FS */
+{
+#ifdef CONFIG_USE_NEW_FS
+	struct mousedev *me = mfile_asmouse(self);
+#else /* CONFIG_USE_NEW_FS */
+	struct mousedev *me = (struct mousedev *)self;
+#endif /* !CONFIG_USE_NEW_FS */
+	uintptr_half_t count = ATOMIC_READ(me->md_buf.mb_bufstate.bs_state.s_used);
+
+	/* Write info to user-space. */
+	result->st_blksize = (typeof(result->st_blksize))sizeof(mouse_packet_t);
+	result->st_blocks  = (typeof(result->st_blocks))count;
+	result->st_size    = (typeof(result->st_size))count * sizeof(mouse_packet_t);
 }
 
 LOCAL bool KCALL
-mouse_device_canread(struct mouse_device *__restrict self) {
+mouse_device_canread(struct mousedev *__restrict self) {
 	uintptr_half_t used;
 	used = ATOMIC_READ(self->md_buf.mb_bufstate.bs_state.s_used);
 	return used != 0;
 }
 
 
+#ifdef CONFIG_USE_NEW_FS
 PUBLIC NONNULL((1)) void KCALL
-mouse_device_pollconnect(struct chrdev *__restrict self,
-                         poll_mode_t what) THROWS(...) {
-	struct mouse_device *me;
-	me = (struct mouse_device *)self;
+mousedev_v_pollconnect(struct mfile *__restrict self,
+                       poll_mode_t what) THROWS(...) {
+	struct mousedev *me = mfile_asmouse(self);
 	if (what & POLLINMASK)
 		task_connect_for_poll(&me->md_buf.mb_avail);
 }
 
 PUBLIC NONNULL((1)) poll_mode_t KCALL
-mouse_device_polltest(struct chrdev *__restrict self,
-                      poll_mode_t what) THROWS(...) {
-	struct mouse_device *me;
-	me = (struct mouse_device *)self;
+mousedev_v_polltest(struct mfile *__restrict self,
+                    poll_mode_t what) THROWS(...) {
+	struct mousedev *me = mfile_asmouse(self);
 	if (what & POLLINMASK) {
 		if (mouse_device_canread(me))
 			return POLLINMASK;
 	}
 	return 0;
 }
+#else /* CONFIG_USE_NEW_FS */
+PUBLIC NONNULL((1)) void KCALL
+mousedev_v_pollconnect(struct chrdev *__restrict self,
+                       poll_mode_t what) THROWS(...) {
+	struct mousedev *me;
+	me = (struct mousedev *)self;
+	if (what & POLLINMASK)
+		task_connect_for_poll(&me->md_buf.mb_avail);
+}
 
+PUBLIC NONNULL((1)) poll_mode_t KCALL
+mousedev_v_polltest(struct chrdev *__restrict self,
+                      poll_mode_t what) THROWS(...) {
+	struct mousedev *me;
+	me = (struct mousedev *)self;
+	if (what & POLLINMASK) {
+		if (mouse_device_canread(me))
+			return POLLINMASK;
+	}
+	return 0;
+}
+#endif /* !CONFIG_USE_NEW_FS */
+
+
+#ifdef CONFIG_USE_NEW_FS
 PUBLIC NONNULL((1)) syscall_slong_t KCALL
-mouse_device_ioctl(struct chrdev *__restrict self,
-                   syscall_ulong_t cmd, USER UNCHECKED void *arg,
-                   iomode_t mode) THROWS(...) {
-	struct mouse_device *me;
+mousedev_v_ioctl(struct mfile *__restrict self,
+                 syscall_ulong_t cmd, USER UNCHECKED void *arg,
+                 iomode_t mode) THROWS(...)
+#else /* CONFIG_USE_NEW_FS */
+PUBLIC NONNULL((1)) syscall_slong_t KCALL
+mousedev_v_ioctl(struct chrdev *__restrict self,
+                 syscall_ulong_t cmd, USER UNCHECKED void *arg,
+                 iomode_t mode) THROWS(...)
+#endif /* !CONFIG_USE_NEW_FS */
+{
+#ifdef CONFIG_USE_NEW_FS
+	struct mousedev *me = mfile_asmouse(self);
+#else /* CONFIG_USE_NEW_FS */
+	struct mousedev *me = (struct mousedev *)self;
+#endif /* !CONFIG_USE_NEW_FS */
 	(void)mode;
-	me = (struct mouse_device *)self;
 	switch (cmd) {
 
 	case MOUSEIO_GETABSMODE:
@@ -930,7 +991,7 @@ mouse_device_ioctl(struct chrdev *__restrict self,
 		COMPILER_READ_BARRIER();
 		memcpy(&motion, arg, sizeof(struct mouse_fake_motion));
 		COMPILER_READ_BARRIER();
-		if (!mouse_device_motion(me, motion.mfm_relx, motion.mfm_rely))
+		if (!mousedev_motion(me, motion.mfm_relx, motion.mfm_rely))
 			goto err_buffer_full;
 	}	break;
 
@@ -950,7 +1011,7 @@ mouse_device_ioctl(struct chrdev *__restrict self,
 		COMPILER_READ_BARRIER();
 		memcpy(&moveto, arg, sizeof(struct mouse_position));
 		COMPILER_READ_BARRIER();
-		if (!mouse_device_moveto(me, moveto.mp_absx, moveto.mp_absy))
+		if (!mousedev_moveto(me, moveto.mp_absx, moveto.mp_absy))
 			goto err_buffer_full;
 	}	break;
 
@@ -969,7 +1030,7 @@ mouse_device_ioctl(struct chrdev *__restrict self,
 		COMPILER_READ_BARRIER();
 		new_buttons = *(USER CHECKED u32 const *)arg;
 		COMPILER_READ_BARRIER();
-		if (!mouse_device_button(me, (u32)~0, new_buttons))
+		if (!mousedev_button(me, (u32)~0, new_buttons))
 			goto err_buffer_full;
 	}	break;
 
@@ -979,7 +1040,7 @@ mouse_device_ioctl(struct chrdev *__restrict self,
 		COMPILER_READ_BARRIER();
 		memcpy(&button, arg, sizeof(struct mouse_fake_button));
 		COMPILER_READ_BARRIER();
-		if (!mouse_device_button_ex(me,
+		if (!mousedev_button_ex(me,
 		                            button.mfb_mask,
 		                            button.mfb_flag,
 		                            button.mfb_xflg,
@@ -998,7 +1059,7 @@ mouse_device_ioctl(struct chrdev *__restrict self,
 		COMPILER_READ_BARRIER();
 		relmove = *(USER CHECKED s32 const *)arg;
 		COMPILER_READ_BARRIER();
-		if (!mouse_device_vwheel(me, relmove))
+		if (!mousedev_vwheel(me, relmove))
 			goto err_buffer_full;
 	}	break;
 
@@ -1008,14 +1069,14 @@ mouse_device_ioctl(struct chrdev *__restrict self,
 		COMPILER_READ_BARRIER();
 		relmove = *(USER CHECKED s32 const *)arg;
 		COMPILER_READ_BARRIER();
-		if (!mouse_device_hwheel(me, relmove))
+		if (!mousedev_hwheel(me, relmove))
 			goto err_buffer_full;
 	}	break;
 
 	case MOUSEIO_FLUSHPENDING: {
 		mouse_packet_t packet;
 		for (;;) {
-			packet = mouse_buffer_trygetpacket(&me->md_buf);
+			packet = mousebuf_trygetpacket(&me->md_buf);
 			if (packet.mp_type == MOUSE_PACKET_TYPE_NONE)
 				break;
 		}

@@ -37,9 +37,9 @@
 
 DECL_BEGIN
 
-LOCAL ATTR_RETNONNULL WUNUSED REF struct ttybase_device *
+LOCAL ATTR_RETNONNULL WUNUSED REF struct ttydev *
 getctty(void) THROWS(E_WOULDBLOCK, E_NO_CTTY) {
-	REF struct ttybase_device *result;
+	REF struct ttydev *result;
 	result = task_getctty();
 	if unlikely(!result)
 		THROW(E_NO_CTTY);
@@ -52,7 +52,7 @@ ctty_read(struct chrdev *__restrict UNUSED(self),
           USER CHECKED void *dst, size_t num_bytes,
           iomode_t mode) THROWS(...) {
 	size_t result;
-	REF struct ttybase_device *ctty = getctty();
+	REF struct ttydev *ctty = getctty();
 	FINALLY_DECREF_UNLIKELY(ctty);
 	result = chrdev_read(ctty, dst, num_bytes, mode);
 	return result;
@@ -63,7 +63,7 @@ ctty_write(struct chrdev *__restrict UNUSED(self),
            USER CHECKED void const *src, size_t num_bytes,
            iomode_t mode) THROWS(...) {
 	size_t result;
-	REF struct ttybase_device *ctty = getctty();
+	REF struct ttydev *ctty = getctty();
 	FINALLY_DECREF_UNLIKELY(ctty);
 	result = chrdev_write(ctty, src, num_bytes, mode);
 	return result;
@@ -74,7 +74,7 @@ ctty_pread(struct chrdev *__restrict UNUSED(self),
            USER CHECKED void *dst, size_t num_bytes,
            pos_t addr, iomode_t mode) THROWS(...) {
 	size_t result;
-	REF struct ttybase_device *ctty = getctty();
+	REF struct ttydev *ctty = getctty();
 	FINALLY_DECREF_UNLIKELY(ctty);
 	result = chrdev_pread(ctty, dst, num_bytes, addr, mode);
 	return result;
@@ -85,7 +85,7 @@ ctty_pwrite(struct chrdev *__restrict UNUSED(self),
             USER CHECKED void const *src, size_t num_bytes,
             pos_t addr, iomode_t mode) THROWS(...) {
 	size_t result;
-	REF struct ttybase_device *ctty = getctty();
+	REF struct ttydev *ctty = getctty();
 	FINALLY_DECREF_UNLIKELY(ctty);
 	result = chrdev_pwrite(ctty, src, num_bytes, addr, mode);
 	return result;
@@ -96,7 +96,7 @@ ctty_ioctl(struct chrdev *__restrict UNUSED(self),
            syscall_ulong_t cmd,
            USER UNCHECKED void *arg, iomode_t mode) THROWS(...) {
 	syscall_slong_t result;
-	REF struct ttybase_device *ctty = getctty();
+	REF struct ttydev *ctty = getctty();
 	FINALLY_DECREF_UNLIKELY(ctty);
 	result = chrdev_ioctl(ctty, cmd, arg, mode);
 	return result;
@@ -105,14 +105,14 @@ ctty_ioctl(struct chrdev *__restrict UNUSED(self),
 PRIVATE NONNULL((1, 2)) void KCALL
 ctty_mmap(struct chrdev *__restrict UNUSED(self),
           struct handle_mmap_info *__restrict info) THROWS(...) {
-	REF struct ttybase_device *ctty = getctty();
+	REF struct ttydev *ctty = getctty();
 	FINALLY_DECREF_UNLIKELY(ctty);
 	chrdev_mmap(ctty, info);
 }
 
 PRIVATE NONNULL((1)) void KCALL
 ctty_sync(struct chrdev *__restrict UNUSED(self)) THROWS(...) {
-	REF struct ttybase_device *ctty = getctty();
+	REF struct ttydev *ctty = getctty();
 	FINALLY_DECREF_UNLIKELY(ctty);
 	chrdev_sync(ctty);
 }
@@ -120,7 +120,7 @@ ctty_sync(struct chrdev *__restrict UNUSED(self)) THROWS(...) {
 PRIVATE NONNULL((1)) void KCALL
 ctty_stat(struct chrdev *__restrict UNUSED(self),
           USER CHECKED struct stat *result) THROWS(...) {
-	REF struct ttybase_device *ctty = getctty();
+	REF struct ttydev *ctty = getctty();
 	FINALLY_DECREF_UNLIKELY(ctty);
 	chrdev_stat(ctty, result);
 }
@@ -128,7 +128,7 @@ ctty_stat(struct chrdev *__restrict UNUSED(self),
 PRIVATE NONNULL((1)) void KCALL
 ctty_pollconnect(struct chrdev *__restrict UNUSED(self),
                  poll_mode_t what) THROWS(...) {
-	REF struct ttybase_device *ctty = getctty();
+	REF struct ttydev *ctty = getctty();
 	FINALLY_DECREF_UNLIKELY(ctty);
 	chrdev_pollconnect(ctty, what);
 }
@@ -137,7 +137,7 @@ PRIVATE NONNULL((1)) poll_mode_t KCALL
 ctty_polltest(struct chrdev *__restrict UNUSED(self),
               poll_mode_t what) THROWS(...) {
 	poll_mode_t result;
-	REF struct ttybase_device *ctty = getctty();
+	REF struct ttydev *ctty = getctty();
 	FINALLY_DECREF_UNLIKELY(ctty);
 	result = chrdev_polltest(ctty, what);
 	return result;

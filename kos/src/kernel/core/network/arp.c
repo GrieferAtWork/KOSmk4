@@ -59,7 +59,7 @@ struct ATTR_PACKED ATTR_ALIGNED(2) arphdr_ether_in /*[PREFIX(ar_)]*/ {
 
 
 PRIVATE NOBLOCK NONNULL((1, 2)) void KCALL
-arp_reply_myip(struct nic_device *__restrict dev,
+arp_reply_myip(struct nicdev *__restrict dev,
                struct arphdr_ether_in const *__restrict packet) {
 	struct etharphdr_ether_in *response;
 	REF struct nic_packet *response_packet;
@@ -67,7 +67,7 @@ arp_reply_myip(struct nic_device *__restrict dev,
 	                  "that we are " NET_PRINTF_IPADDR_FMT " [mac:" NET_PRINTF_MACADDR_FMT "]\n",
 	       NET_PRINTF_IPADDR_ARG(packet->ar_sip.s_addr), NET_PRINTF_MACADDR_ARG(packet->ar_sha),
 	       NET_PRINTF_IPADDR_ARG(dev->nd_addr.na_ip), NET_PRINTF_MACADDR_ARG(dev->nd_addr.na_hwmac));
-	response_packet = nic_device_newpacketk(dev, (void **)&response, sizeof(*response));
+	response_packet = nicdev_newpacketk(dev, (void **)&response, sizeof(*response));
 	FINALLY_DECREF_UNLIKELY(response_packet);
 	/* Construct an ARP response containing our MAC and IP addresses. */
 	memcpy(response->ar_eth.h_dest, packet->ar_sha, ETH_ALEN);
@@ -83,14 +83,14 @@ arp_reply_myip(struct nic_device *__restrict dev,
 	memcpy(response->ar_tha, packet->ar_sha, ETH_ALEN);
 	response->ar_tip.s_addr = packet->ar_sip.s_addr;
 	/* Send back the response in the background. */
-	nic_device_send_background(dev, response_packet);
+	nicdev_send_background(dev, response_packet);
 }
 
 
 /* Route an ARP packet.
  * @assume(packet_size >= 8); */
 PUBLIC NOBLOCK NONNULL((1, 2)) void KCALL
-arp_routepacket(struct nic_device *__restrict dev,
+arp_routepacket(struct nicdev *__restrict dev,
                 void const *__restrict packet_data,
                 size_t packet_size) {
 	struct arphdr *ahdr;
@@ -166,10 +166,10 @@ arp_routepacket(struct nic_device *__restrict dev,
 
 /* Construct and return a mac address request packet. */
 PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct nic_packet *KCALL
-arp_makemacrequest(struct nic_device *__restrict dev, be32 ip) {
+arp_makemacrequest(struct nicdev *__restrict dev, be32 ip) {
 	struct etharphdr_ether_in *req;
 	REF struct nic_packet *packet;
-	packet = nic_device_newpacketk(dev, (void **)&req, sizeof(*req));
+	packet = nicdev_newpacketk(dev, (void **)&req, sizeof(*req));
 	memset(req->ar_eth.h_dest, 0xff, ETH_ALEN); /* Broadcast */
 	memcpy(req->ar_eth.h_source, dev->nd_addr.na_hwmac, ETH_ALEN);
 	req->ar_eth.h_proto = htons(ETH_P_ARP);

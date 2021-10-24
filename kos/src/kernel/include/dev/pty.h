@@ -23,7 +23,7 @@
 #include <kernel/compiler.h>
 
 #include <dev/char.h>
-#include <dev/ttybase.h>
+#include <dev/tty.h>
 #include <kernel/types.h>
 
 #include <bits/os/termio.h>  /* struct winsize */
@@ -64,11 +64,11 @@ AWREF(pty_slave_awref, pty_slave);
 
 struct pty_slave
 #ifdef __cplusplus
-    : ttybase_device
+    : ttydev
 #endif /* __cplusplus */
 {
 #ifndef __cplusplus
-	struct ttybase_device   ps_base;   /* The underlying base-tty */
+	struct ttydev   ps_base;   /* The underlying base-tty */
 #endif /* !__cplusplus */
 	struct ringbuffer       ps_obuf;   /* Output buffer (use the PTY master to read from this) */
 	WEAK struct winsize     ps_wsize;  /* Terminal window size. */
@@ -90,7 +90,7 @@ struct pty_master
 #define ttybase_isapty(self) \
 	((self)->t_term.t_oprint == &kernel_pty_oprinter)
 #define chrdev_ispty(self) \
-	(chrdev_isttybase(self) && ttybase_isapty((struct ttybase_device *)(self)))
+	(chrdev_istty(self) && ttybase_isapty((struct ttydev *)(self)))
 
 /* oprinter callback for `struct pty_slave' tty objects. */
 FUNDEF ssize_t LIBTERM_CC

@@ -53,6 +53,8 @@
 #include <kos/guid.h>
 
 #include <assert.h>
+#include <format-printer.h>
+#include <stdarg.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -1249,6 +1251,7 @@ done:
  *    the device number by 1 and re-generate the `fn_ino', then try to add it once again.
  *
  * This function initializes (before making `self' globally visible):
+ *  - self->_device_devnode_ _fdevnode_node_ _fnode_file_ mf_flags |= MFILE_FN_GLOBAL_REF; # and accompanying `++self->mf_refcnt'
  *  - self->_device_devnode_ _fdevnode_node_ fn_allnodes
  *  - self->_device_devnode_ _fdevnode_node_ fn_supent
  *  - self->dv_byname_node */
@@ -1336,7 +1339,12 @@ done_add2byname:
 	/* Insert into the all-nodes list. */
 	LIST_INSERT_HEAD(&fallnodes_list, self, fn_allnodes);
 
-done:
+	/* Create the global reference (if not created already). */
+	if (!(self->mf_flags & MFILE_FN_GLOBAL_REF)) {
+		self->mf_flags |= MFILE_FN_GLOBAL_REF;
+		++self->mf_refcnt; /* For `MFILE_FN_GLOBAL_REF' (in `fallnodes_list') */
+	}
+
 	/* Release all locks */
 	COMPILER_BARRIER();
 	_ramfs_dirdata_treelock_endread(&devfs.rs_dat);
@@ -1349,6 +1357,142 @@ done:
 	fallnodes_reap();
 	fsuper_nodes_reap(&devfs);
 	devfs_byname_reap();
+}
+
+
+struct fdevfsdirent_printer_data {
+	struct fdevfsdirent *fpd_ent; /* [0..fpd_len*][owned] entry. */
+	size_t               fpd_avl; /* Unused length. */
+	size_t               fpd_pos; /* Write offset. */
+};
+
+PRIVATE ssize_t FORMATPRINTER_CC
+fdevfsdirent_printer(void *arg, char const *__restrict text, size_t textlen) {
+	struct fdevfsdirent_printer_data *me;
+	me = (struct fdevfsdirent_printer_data *)arg;
+	if (textlen > me->fpd_avl) {
+		me->fpd_ent = (struct fdevfsdirent *)krealloc(me->fpd_ent,
+		                                              me->fpd_pos + textlen + 1,
+		                                              GFP_NORMAL);
+		me->fpd_avl = ((kmalloc_usable_size(me->fpd_ent) / sizeof(char)) - 1) - me->fpd_pos;
+	}
+	memcpy((char *)me->fpd_ent + me->fpd_pos, text, textlen, sizeof(char));
+	me->fpd_pos += textlen;
+	me->fpd_avl -= textlen;
+	return (ssize_t)textlen;
+}
+
+
+PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct fdevfsdirent *FCALL
+fdevfsdirent_vnewf(char const *__restrict format, va_list args)
+		THROWS(E_BADALLOC) {
+	struct fdevfsdirent_printer_data dat;
+	dat.fpd_ent = (struct fdevfsdirent *)kmalloc(offsetof(struct fdevfsdirent, fdd_dirent.fd_name) +
+	                                             (16 + 1) * sizeof(char), GFP_NORMAL);
+	dat.fpd_pos = offsetof(struct fdevfsdirent, fdd_dirent.fd_name);
+	dat.fpd_avl = ((kmalloc_usable_size(dat.fpd_ent) / sizeof(char)) - 1) - dat.fpd_pos;
+	TRY {
+		/* Print the format string into the directory entry. */
+		format_vprintf(&fdevfsdirent_printer, &dat, format, args);
+	} EXCEPT {
+		kfree(dat.fpd_ent);
+		RETHROW();
+	}
+
+	/* Free unused memory. */
+	if (dat.fpd_avl) {
+		struct fdevfsdirent *fin;
+		fin = (struct fdevfsdirent *)krealloc_nx(dat.fpd_ent,
+		                                         dat.fpd_pos + 1,
+		                                         GFP_NORMAL);
+		if likely(fin)
+			dat.fpd_ent = fin;
+	}
+
+	/* Make sure that the name isn't too long. */
+	dat.fpd_pos -= offsetof(struct fdevfsdirent, fdd_dirent.fd_name);
+	if unlikely(dat.fpd_pos > UINT16_MAX) {
+		kfree(dat.fpd_ent);
+		THROW(E_FSERROR_ILLEGAL_PATH);
+	}
+
+	/* Fill in generic fields of the directory entry. */
+	dat.fpd_ent->fdd_dirent.fd_namelen = (u16)dat.fpd_pos;
+	dat.fpd_ent->fdd_dirent.fd_refcnt  = 1;
+	dat.fpd_ent->fdd_dirent.fd_ops     = &fdevfsdirent_ops;
+	dat.fpd_ent->fdd_dirent.fd_hash = fdirent_hash(dat.fpd_ent->fdd_dirent.fd_name,
+	                                               dat.fpd_ent->fdd_dirent.fd_namelen);
+	dat.fpd_ent->fdd_dirent.fd_name[dat.fpd_pos] = '\0';
+
+	/* Rest of init is done by caller. */
+	return dat.fpd_ent;
+}
+
+PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct fdevfsdirent *VCALL
+fdevfsdirent_newf(char const *__restrict format, ...)
+		THROWS(E_BADALLOC) {
+	va_list args;
+	REF struct fdevfsdirent *result;
+	va_start(args, format);
+	TRY {
+		result = fdevfsdirent_vnewf(format, args);
+	} EXCEPT {
+		va_end(args);
+		RETHROW();
+	}
+	va_end(args);
+	return result;
+}
+
+
+
+/* Helper wrapper for `device_register()' that sets a custom device name, and initialize:
+ *  - self->_device_devnode_ _fdevnode_node_ _fnode_file_ mf_flags |= MFILE_FN_GLOBAL_REF;      # and accompanying `++self->mf_refcnt'
+ *  - self->_device_devnode_ _fdevnode_node_ fn_ino                 = devfs_devnode_makeino(fn_mode, dn_devno);
+ *  - self->_device_devnode_ _fdevnode_node_ fn_allnodes            = ...; # s.a. `device_register()'
+ *  - self->_device_devnode_ _fdevnode_node_ fn_supent              = ...; # s.a. `device_register()'
+ *  - self->_device_devnode_ dn_devno                               = devno;
+ *  - self->dv_byname_node                                          = ...; # s.a. `device_register()'
+ *  - self->dv_dirent                                               = MAKE_DEVICE_NAME(format, ...); */
+PUBLIC NONNULL((1)) void VCALL
+device_registerf(struct device *__restrict self, dev_t devno,
+                 char const *__restrict format, ...)
+		THROWS(E_BADALLOC, E_WOULDBLOCK) {
+	va_list args;
+	va_start(args, format);
+	TRY {
+		device_vregisterf(self, devno, format, args);
+	} EXCEPT {
+		va_end(args);
+		RETHROW();
+	}
+	va_end(args);
+}
+
+PUBLIC NONNULL((1)) void KCALL
+device_vregisterf(struct device *__restrict self, dev_t devno,
+                  char const *__restrict format, __builtin_va_list args)
+		THROWS(E_BADALLOC, E_WOULDBLOCK) {
+	struct fdevfsdirent *name;
+	assert(S_ISCHR(self->fn_mode) || S_ISBLK(self->fn_mode));
+	self->dn_devno = devno;
+	self->fn_ino   = devfs_devnode_makeino(self->fn_mode, devno);
+
+	/* Allocate device name based on format_printf() */
+	name = fdevfsdirent_vnewf(format, args);
+
+	/* Fill in missing fields of the directory entry. */
+	awref_init(&name->fdd_dev, self);
+	name->fdd_dirent.fd_ino  = self->fn_ino;
+	name->fdd_dirent.fd_type = IFTODT(self->fn_mode);
+
+	self->dv_dirent = name; /* Inherit reference */
+	TRY {
+		device_register(self);
+	} EXCEPT {
+		kfree(name);
+		RETHROW();
+	}
 }
 
 
@@ -1521,7 +1665,7 @@ NOTHROW(FCALL device_delete)(struct device *__restrict self) {
 
 	/* Delete global reference to the device. */
 	if (ATOMIC_FETCHAND(self->mf_flags, ~(MFILE_FN_GLOBAL_REF |
-	                                                                 MFILE_F_PERSISTENT)) &
+	                                      MFILE_F_PERSISTENT)) &
 	    MFILE_FN_GLOBAL_REF) {
 		decref_nokill(self);
 	}
@@ -1835,11 +1979,11 @@ do_dump_chrdev(struct chrdev *__restrict self,
                size_t longest_driver_name) {
 	char const *kind;
 	struct mfile_stream_ops const *ops;
-	if (chrdev_isttybase(self))                   /* TODO */
-		kind = ttybase_isapty((struct ttybase_device *)self) /* TODO */
+	if (chrdev_istty(self))                   /* TODO */
+		kind = ttybase_isapty((struct ttydev *)self) /* TODO */
 		       ? DBGSTR("pty")                               /* TODO */
 		       : DBGSTR("tty");                              /* TODO */
-	else if (chrdev_iskeyboard(self))             /* TODO */
+	else if (chrdev_iskbd(self))             /* TODO */
 		kind = DBGSTR("keyboard");                           /* TODO */
 	else if (chrdev_ismouse(self))                /* TODO */
 		kind = DBGSTR("mouse");                              /* TODO */

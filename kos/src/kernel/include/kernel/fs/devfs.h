@@ -124,7 +124,8 @@ __DEFINE_REFCOUNT_FUNCTIONS(struct device,
  * `devfs_byname_tree' and does `decref(dv_dirent)') */
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL device_v_destroy)(struct mfile *__restrict self);
-#define device_v_wrattr fnode_v_wrattr_noop
+#define device_v_wrattr  fnode_v_wrattr_noop
+#define device_v_changed fnode_v_changed
 
 
 
@@ -155,35 +156,35 @@ FUNDEF NOBLOCK WUNUSED struct timespec NOTHROW(KCALL realtime)(void);
  *  - self->_device_devnode_ _fdevnode_node_ _fnode_file_ mf_blockshift
  *  - self->_device_devnode_ _fdevnode_node_ _fnode_file_ mf_part_amask
  *  - self->_device_devnode_ _fdevnode_node_ _fnode_file_ mf_filesize
- *  - self->_device_devnode_ _fdevnode_node_ fn_allnodes
- *  - self->_device_devnode_ _fdevnode_node_ fn_supent
- *  - self->_device_devnode_ _fdevnode_node_ fn_ino  (as `devfs_devnode_makeino(fn_mode, dn_devno)')
- *  - self->_device_devnode_ _fdevnode_node_ fn_mode (with something or'd with S_IFCHR or S_IFBLK)
- *  - self->_device_devnode_ dn_devno
- *  - self->dv_driver
- *  - self->dv_dirent
- *  - self->dv_byname_node
+ *  - self->_device_devnode_ _fdevnode_node_ fn_allnodes  # s.a. `device_registerf()'
+ *  - self->_device_devnode_ _fdevnode_node_ fn_supent    # s.a. `device_registerf()'
+ *  - self->_device_devnode_ _fdevnode_node_ fn_ino       # s.a. `device_registerf()'
+ *  - self->_device_devnode_ _fdevnode_node_ fn_mode      # Something or'd with S_IFCHR or S_IFBLK
+ *  - self->_device_devnode_ dn_devno                     # s.a. `device_registerf()'
+ *  - self->dv_driver                                     # As `incref(drv_self)'
+ *  - self->dv_dirent                                     # s.a. `device_registerf()'
+ *  - self->dv_byname_node                                # s.a. `device_registerf()'
  * @param: struct device     *self:  Device to initialize.
  * @param: struct device_ops *ops:   Device operators. */
-#define _device_init(self, ops)                                                                         \
-	(_device_assert_ops_(ops) _fnode_init_common(_device_asdevnode(_fdevnode_asnode(self))),            \
+#define _device_init(self, ops)                                                                       \
+	(_device_assert_ops_(ops) _fnode_init_common(_device_asdevnode(_fdevnode_asnode(self))),          \
 	 (self)->_device_devnode_ _fdevnode_node_ _fnode_file_ mf_ops = &(ops)->do_node.dno_node.no_file, \
-	 (self)->_device_devnode_ _fdevnode_node_ _fnode_file_ mf_atime =                                   \
-	 (self)->_device_devnode_ _fdevnode_node_ _fnode_file_ mf_mtime =                                   \
-	 (self)->_device_devnode_ _fdevnode_node_ _fnode_file_ mf_ctime = realtime(),                       \
-	 (self)->_device_devnode_ _fdevnode_node_ fn_super              = incref(&_devfs_super),            \
-	 (self)->_device_devnode_ fn_nlink                              = 1,                                \
-	 (self)->_device_devnode_ fn_uid                                = 0,                                \
+	 (self)->_device_devnode_ _fdevnode_node_ _fnode_file_ mf_atime =                                 \
+	 (self)->_device_devnode_ _fdevnode_node_ _fnode_file_ mf_mtime =                                 \
+	 (self)->_device_devnode_ _fdevnode_node_ _fnode_file_ mf_ctime = realtime(),                     \
+	 (self)->_device_devnode_ _fdevnode_node_ fn_super              = incref(&_devfs_super),          \
+	 (self)->_device_devnode_ fn_nlink                              = 1,                              \
+	 (self)->_device_devnode_ fn_uid                                = 0,                              \
 	 (self)->_device_devnode_ fn_gid                                = 0)
-#define _device_cinit(self, ops)                                                                        \
-	(_device_assert_ops_(ops) _fnode_cinit_common(_device_asdevnode(_fdevnode_asnode(self))),           \
+#define _device_cinit(self, ops)                                                                      \
+	(_device_assert_ops_(ops) _fnode_cinit_common(_device_asdevnode(_fdevnode_asnode(self))),         \
 	 (self)->_device_devnode_ _fdevnode_node_ _fnode_file_ mf_ops = &(ops)->do_node.dno_node.no_file, \
-	 (self)->_device_devnode_ _fdevnode_node_ _fnode_file_ mf_atime =                                   \
-	 (self)->_device_devnode_ _fdevnode_node_ _fnode_file_ mf_mtime =                                   \
-	 (self)->_device_devnode_ _fdevnode_node_ _fnode_file_ mf_ctime = realtime(),                       \
-	 (self)->_device_devnode_ _fdevnode_node_ fn_super            = incref(&_devfs_super),              \
-	 (self)->_device_devnode_ fn_nlink                            = 1,                                  \
-	 __hybrid_assert((self)->_device_devnode_ fn_uid == 0),                                             \
+	 (self)->_device_devnode_ _fdevnode_node_ _fnode_file_ mf_atime =                                 \
+	 (self)->_device_devnode_ _fdevnode_node_ _fnode_file_ mf_mtime =                                 \
+	 (self)->_device_devnode_ _fdevnode_node_ _fnode_file_ mf_ctime = realtime(),                     \
+	 (self)->_device_devnode_ _fdevnode_node_ fn_super              = incref(&_devfs_super),          \
+	 (self)->_device_devnode_ fn_nlink                              = 1,                              \
+	 __hybrid_assert((self)->_device_devnode_ fn_uid == 0),                                           \
 	 __hybrid_assert((self)->_device_devnode_ fn_gid == 0))
 
 /* Finalize a partially initialized `struct device' (as initialized by `_device_init()') */
@@ -278,6 +279,7 @@ device_tryregister(struct device *__restrict self)
  *    the device number by 1 and re-generate the `fn_ino', then try to add it once again.
  *
  * This function initializes (before making `self' globally visible):
+ *  - self->_device_devnode_ _fdevnode_node_ _fnode_file_ mf_flags |= MFILE_FN_GLOBAL_REF; # and accompanying `++self->mf_refcnt'
  *  - self->_device_devnode_ _fdevnode_node_ fn_allnodes
  *  - self->_device_devnode_ _fdevnode_node_ fn_supent
  *  - self->dv_byname_node */
@@ -285,6 +287,36 @@ FUNDEF NONNULL((1)) void FCALL
 device_register(struct device *__restrict self)
 		THROWS(E_WOULDBLOCK);
 
+
+/* Helper wrapper for `device_register()' that sets a custom device name, and initialize:
+ *  - self->_device_devnode_ _fdevnode_node_ _fnode_file_ mf_flags |= MFILE_FN_GLOBAL_REF;      # and accompanying `++self->mf_refcnt'
+ *  - self->_device_devnode_ _fdevnode_node_ fn_ino                 = devfs_devnode_makeino(fn_mode, dn_devno);
+ *  - self->_device_devnode_ _fdevnode_node_ fn_allnodes            = ...; # s.a. `device_register()'
+ *  - self->_device_devnode_ _fdevnode_node_ fn_supent              = ...; # s.a. `device_register()'
+ *  - self->_device_devnode_ dn_devno                               = devno;
+ *  - self->dv_byname_node                                          = ...; # s.a. `device_register()'
+ *  - self->dv_dirent                                               = MAKE_DEVICE_NAME(format, ...); */
+FUNDEF NONNULL((1)) void VCALL
+device_registerf(struct device *__restrict self, dev_t devno,
+                 char const *__restrict format, ...)
+		THROWS(E_BADALLOC, E_WOULDBLOCK);
+FUNDEF NONNULL((1)) void KCALL
+device_vregisterf(struct device *__restrict self, dev_t devno,
+                  char const *__restrict format, __builtin_va_list args)
+		THROWS(E_BADALLOC, E_WOULDBLOCK);
+
+
+/* Allocate a new devfs directory entry from the given format arguments.
+ * The caller must still initialize:
+ *  - return->fdd_dev
+ *  - return->fdd_dirent.fd_ino
+ *  - return->fdd_dirent.fd_type */
+FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct fdevfsdirent *FCALL
+fdevfsdirent_vnewf(char const *__restrict format, __builtin_va_list args)
+		THROWS(E_BADALLOC);
+FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct fdevfsdirent *VCALL
+fdevfsdirent_newf(char const *__restrict format, ...)
+		THROWS(E_BADALLOC);
 
 
 /* Unregister a given device node from /dev/ and devfs's inode tree, and proceed

@@ -228,7 +228,7 @@ do_copy_and_check:
 /* Route a given IP packet.
  * @assume(packet_size >= 20); */
 PUBLIC NOBLOCK NONNULL((1, 2)) void KCALL
-ip_routepacket(struct nic_device *__restrict dev,
+ip_routepacket(struct nicdev *__restrict dev,
                void const *__restrict packet_data,
                size_t packet_size) {
 	struct iphdr *hdr;
@@ -576,7 +576,7 @@ datagram_complete_and_unlock:
  * @assume(packet->ip_hl * 4 <= packet_size);
  * @assume(packet_size >= 20); */
 PUBLIC NOBLOCK NONNULL((1, 2)) void KCALL
-ip_routedatagram(struct nic_device *__restrict dev,
+ip_routedatagram(struct nicdev *__restrict dev,
                  struct iphdr const *__restrict packet,
                  u16 packet_size) {
 	u16 iphdr_size, payload_len;
@@ -634,7 +634,7 @@ NOTHROW(KCALL iphdr_calculate_sum)(struct iphdr *__restrict self) {
 
 /* Add the ARP request response timeout to `timeout' */
 PRIVATE NOBLOCK NONNULL((1, 2)) void
-NOTHROW(KCALL nic_device_add_arp_response_timeout)(struct nic_device *__restrict self,
+NOTHROW(KCALL nic_device_add_arp_response_timeout)(struct nicdev *__restrict self,
                                                    ktime_t *__restrict timeout) {
 	(void)self;
 	/* XXX: This timeout should be a field of the NIC device... */
@@ -643,7 +643,7 @@ NOTHROW(KCALL nic_device_add_arp_response_timeout)(struct nic_device *__restrict
 
 
 struct ip_arp_and_datagram_job: async {
-	REF struct nic_device    *adj_dev;    /* [1..1][const] The associated network device. */
+	REF struct nicdev    *adj_dev;    /* [1..1][const] The associated network device. */
 	REF struct net_peeraddr  *adj_peer;   /* [1..1][const][valid_if(adj_arpc != 0)] The peer who's mac address we're in need of. */
 	REF struct nic_packet    *adj_gram;   /* [1..1][const][valid_if(adj_arpc != 0)] The IP datagram (with sufficient header space for an ethernet header) */
 	REF struct mman          *adj_grammm; /* [1..1][const][valid_if(adj_arpc != 0)] The VM in the context of which `adj_gram' must be sent */
@@ -656,11 +656,11 @@ struct ip_arp_and_datagram_job: async {
 };
 
 PRIVATE NONNULL((1)) void KCALL
-nic_device_send_arp_request(struct nic_device *__restrict self, be32 ip) {
+nic_device_send_arp_request(struct nicdev *__restrict self, be32 ip) {
 	REF struct nic_packet *areq;
 	areq = arp_makemacrequest(self, ip);
 	FINALLY_DECREF_UNLIKELY(areq);
-	nic_device_send_background(self, areq);
+	nicdev_send_background(self, areq);
 }
 
 
@@ -732,7 +732,7 @@ ip_arp_and_datagram_work(struct async *__restrict self) {
 			REF struct mman *oldmm;
 			oldmm = task_xchmman(me->adj_grammm);
 			TRY {
-				nic_device_send(me->adj_dev, me->adj_gram, &me->adj_done);
+				nicdev_send(me->adj_dev, me->adj_gram, &me->adj_done);
 			} EXCEPT {
 				task_setmman_inherit(oldmm);
 				RETHROW();
@@ -828,7 +828,7 @@ PRIVATE struct async_ops const ip_arp_and_datagram = {
  *   - ip_src    (Sender IP address (usually `dev->nd_addr.na_ip', or a broadcast IP))
  *   - ip_dst    (Target IP address) */
 PUBLIC NONNULL((1, 2, 3)) void KCALL
-ip_senddatagram(struct nic_device *__restrict dev,
+ip_senddatagram(struct nicdev *__restrict dev,
                 struct nic_packet *__restrict packet,
                 struct aio_handle *__restrict aio) {
 	struct iphdr *hdr;
@@ -876,7 +876,7 @@ ip_senddatagram(struct nic_device *__restrict dev,
 		memcpy(eth->h_source, dev->nd_addr.na_hwmac, ETH_ALEN);
 		eth->h_proto = htons(ETH_P_IP);
 		/* Send the packet. */
-		nic_device_send(dev, packet, aio);
+		nicdev_send(dev, packet, aio);
 		return;
 	}
 	{
@@ -893,7 +893,7 @@ ip_senddatagram(struct nic_device *__restrict dev,
 			RETHROW();
 		}
 		job = (struct ip_arp_and_datagram_job *)aj;
-		job->adj_dev    = (REF struct nic_device *)incref(dev);
+		job->adj_dev    = (REF struct nicdev *)incref(dev);
 		job->adj_peer   = peer; /* Inherit reference */
 		job->adj_gram   = incref(packet);
 		job->adj_grammm = incref(THIS_MMAN);
@@ -908,7 +908,7 @@ ip_senddatagram(struct nic_device *__restrict dev,
 
 
 struct ip_arp_and_datagrams_job: async {
-	REF struct nic_device         *adj_dev;    /* [1..1][const] The associated network device. */
+	REF struct nicdev         *adj_dev;    /* [1..1][const] The associated network device. */
 	REF struct net_peeraddr       *adj_peer;   /* [1..1][const][valid_if(adj_arpc != 0)] The peer who's mac address we're in need of. */
 	struct nic_packetlist          adj_gram;   /* [1..1][const][valid_if(adj_arpc != 0)] The IP datagram list (with sufficient header space for an ethernet header) */
 	REF struct mman               *adj_grammm; /* [1..1][const][valid_if(adj_arpc != 0)] The VM in the context of which `adj_gram' must be sent */
@@ -997,7 +997,7 @@ ip_arp_and_datagrams_work(struct async *__restrict self) {
 				for (i = 0; i < me->adj_gram.npl_cnt; ++i) {
 					struct aio_handle *hand;
 					hand = aio_multihandle_allochandle(&me->adj_done);
-					nic_device_send(me->adj_dev, me->adj_gram.npl_vec[i], hand);
+					nicdev_send(me->adj_dev, me->adj_gram.npl_vec[i], hand);
 				}
 			} EXCEPT {
 				task_setmman_inherit(oldmm);
@@ -1089,7 +1089,7 @@ PRIVATE struct async_ops const ip_arp_and_datagrams = {
  *   - ip_src    (Sender IP address (usually `dev->nd_addr.na_ip', or a broadcast IP))
  *   - ip_dst    (Target IP address) */
 PUBLIC NONNULL((1, 2, 3)) void KCALL
-ip_senddatagram_ex(struct nic_device *__restrict dev,
+ip_senddatagram_ex(struct nicdev *__restrict dev,
                    struct nic_packet_desc const *__restrict packet,
                    struct aio_handle *__restrict aio) {
 	struct async *aj;
@@ -1190,7 +1190,7 @@ ip_senddatagram_ex(struct nic_device *__restrict dev,
 		decref_unlikely(peer);
 		RETHROW();
 	}
-	job->adj_dev    = (REF struct nic_device *)incref(dev);
+	job->adj_dev    = (REF struct nicdev *)incref(dev);
 	job->adj_peer   = peer; /* Inherit reference */
 	job->adj_arptmo = ktime();
 	job->adj_grammm = incref(THIS_MMAN);

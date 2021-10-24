@@ -73,25 +73,25 @@ nic_packetlist_reserve(struct nic_packetlist *__restrict self,
 /* Allocate a new NIC packet and append it to the given packet list. */
 FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) struct nic_packet *KCALL
 nic_packetlist_newpacket(struct nic_packetlist *__restrict self,
-                         struct nic_device const *__restrict dev,
+                         struct nicdev const *__restrict dev,
                          USER CHECKED void const *payload, size_t payload_size,
                          size_t max_head_size, size_t max_tail_size)
 		THROWS(E_BADALLOC);
 FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) struct nic_packet *KCALL
 nic_packetlist_newpacketv(struct nic_packetlist *__restrict self,
-                          struct nic_device const *__restrict dev,
+                          struct nicdev const *__restrict dev,
                           struct iov_buffer const *__restrict payload,
                           size_t max_head_size, size_t max_tail_size)
 		THROWS(E_BADALLOC);
 FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) struct nic_packet *KCALL
 nic_packetlist_newpacketh(struct nic_packetlist *__restrict self,
-                          struct nic_device const *__restrict dev,
+                          struct nicdev const *__restrict dev,
                           size_t max_head_size, size_t max_tail_size)
 		THROWS(E_BADALLOC);
 /* @return: * : A buffer of `buffer_size' bytes */
 FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) void *KCALL
 nic_packetlist_newpacketk(struct nic_packetlist *__restrict self,
-                          struct nic_device const *__restrict dev,
+                          struct nicdev const *__restrict dev,
                           size_t buffer_size)
 		THROWS(E_BADALLOC);
 
@@ -99,21 +99,21 @@ nic_packetlist_newpacketk(struct nic_packetlist *__restrict self,
 
 /* Send all of the packets within the given packet-size. */
 FUNDEF NONNULL((1, 2, 3)) void KCALL
-nic_device_sendall(struct nic_device *__restrict self,
+nic_device_sendall(struct nicdev *__restrict self,
                    struct nic_packetlist const *__restrict packets,
                    struct aio_multihandle *__restrict aio);
 
 /* Same as `nic_device_sendall()', however handle _all_ exceptions as AIO-failures
  * WARNING:    This    function    may   still    clobber    exception   pointers! */
 FUNDEF NONNULL((1, 2, 3)) void
-NOTHROW(KCALL nic_device_sendall_nx)(struct nic_device *__restrict self,
+NOTHROW(KCALL nic_device_sendall_nx)(struct nicdev *__restrict self,
                                      struct nic_packetlist const *__restrict packets,
                                      struct aio_multihandle *__restrict aio);
 
 /* Send the given packet in the background (s.a. `aio_handle_async_alloc()')
  * NOTE:  Transmit   errors  get   logged,  but   are  silently   discarded. */
 FUNDEF NONNULL((1, 2)) void KCALL
-nic_device_sendall_background(struct nic_device *__restrict self,
+nic_device_sendall_background(struct nicdev *__restrict self,
                               struct nic_packetlist const *__restrict packets);
 
 
@@ -182,7 +182,7 @@ NOTHROW(KCALL nic_packet_desc_for_packet)(struct nic_packet_desc *__restrict sel
  * >> } */
 FUNDEF NONNULL((1, 2, 3)) size_t KCALL
 nic_packetlist_segments_ex(struct nic_packetlist *__restrict self,
-                           struct nic_device *__restrict dev,
+                           struct nicdev *__restrict dev,
                            struct nic_packet_desc const *__restrict packet,
                            size_t max_segment_payload_size,
                            size_t max_segment_head_size,
@@ -199,7 +199,7 @@ nic_packetlist_segments_ex(struct nic_packetlist *__restrict self,
  *                   is entirely empty, this will still be at least  1! */
 LOCAL NONNULL((1, 2, 3)) size_t KCALL
 nic_packetlist_segments(struct nic_packetlist *__restrict self,
-                        struct nic_device *__restrict dev,
+                        struct nicdev *__restrict dev,
                         struct nic_packet const *__restrict packet,
                         size_t max_segment_payload_size,
                         size_t max_segment_head_size,

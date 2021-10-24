@@ -77,17 +77,17 @@ struct video_device_ops {
 
 struct video_device
 #ifdef __cplusplus
-	: ansitty_device
+	: ansittydev
 #endif /* __cplusplus */
 {
 #ifndef __cplusplus
-	struct ansitty_device   vd_ansi;  /* The underling ansitty device */
+	struct ansittydev   vd_ansi;  /* The underling ansitty device */
 #endif /* !__cplusplus */
 	struct video_device_ops vd_ops;   /* Video device operations. */
 };
 
 #define video_device_fini(self) \
-	(ansitty_device_fini(self))
+	(ansittydev_v_fini(self))
 
 /* Generic video device ioctl() handler. */
 FUNDEF NONNULL((1)) syscall_slong_t KCALL
@@ -99,9 +99,9 @@ video_device_ioctl(struct chrdev *__restrict self, syscall_ulong_t cmd,
  * NOTE: `ops->ato_output' must be set to NULL when calling this  function.
  *       The internal routing of this callback to injecting keyboard output
  *       is done dynamically when the ANSI  TTY is connected to the  output
- *       channel of a `struct tty_device'
+ *       channel of a `struct mkttydev'
  * This function initializes the following operators:
- *   - cd_type.ct_write = &ansitty_device_write;  // Mustn't be re-assigned!
+ *   - cd_type.ct_write = &ansittydev_v_write;  // Mustn't be re-assigned!
  *   - cd_type.ct_fini  = &video_device_fini;     // Must be called by an override
  *   - cd_type.ct_ioctl = &video_device_ioctl;    // Must be called by an override
  * The following operators must still be defined by the caller:

@@ -43,21 +43,45 @@
 
 DECL_BEGIN
 
+#ifdef CONFIG_USE_NEW_FS
 PUBLIC NONNULL((1)) size_t KCALL
-ansitty_device_write(struct chrdev *__restrict self,
-                     USER CHECKED void const *src,
-                     size_t num_bytes, iomode_t UNUSED(mode)) THROWS(...) {
-	struct ansitty_device *me = (struct ansitty_device *)self;
+ansittydev_v_write(struct mfile *__restrict self,
+                   USER CHECKED void const *src,
+                   size_t num_bytes, iomode_t UNUSED(mode)) THROWS(...)
+#else /* CONFIG_USE_NEW_FS */
+PUBLIC NONNULL((1)) size_t KCALL
+ansittydev_v_write(struct chrdev *__restrict self,
+                   USER CHECKED void const *src,
+                   size_t num_bytes, iomode_t UNUSED(mode)) THROWS(...)
+#endif /* !CONFIG_USE_NEW_FS */
+{
+#ifdef CONFIG_USE_NEW_FS
+	struct ansittydev *me = mfile_asansitty(self);
+#else /* CONFIG_USE_NEW_FS */
+	struct ansittydev *me = (struct ansittydev *)self;
+#endif /* !CONFIG_USE_NEW_FS */
 #if !defined(NDEBUG) && 0
-	printk(KERN_DEBUG "[ansitty_device_write] %$q\n", num_bytes, src);
+	printk(KERN_DEBUG "[ansittydev_v_write] %$q\n", num_bytes, src);
 #endif
-	return (size_t)ansitty_printer(&me->at_ansi, (char const *)src, num_bytes);
+	return (size_t)ansitty_printer(&me->at_ansi, (USER CHECKED char const *)src, num_bytes);
 }
 
+
+#ifdef CONFIG_USE_NEW_FS
 PUBLIC NONNULL((1)) syscall_slong_t KCALL
-ansitty_device_ioctl(struct chrdev *__restrict self, syscall_ulong_t cmd,
-                     USER UNCHECKED void *arg, iomode_t UNUSED(mode)) THROWS(...) {
-	struct ansitty_device *me = (struct ansitty_device *)self;
+ansittydev_v_ioctl(struct mfile *__restrict self, syscall_ulong_t cmd,
+                   USER UNCHECKED void *arg, iomode_t UNUSED(mode)) THROWS(...)
+#else /* CONFIG_USE_NEW_FS */
+PUBLIC NONNULL((1)) syscall_slong_t KCALL
+ansittydev_v_ioctl(struct chrdev *__restrict self, syscall_ulong_t cmd,
+                   USER UNCHECKED void *arg, iomode_t UNUSED(mode)) THROWS(...)
+#endif /* !CONFIG_USE_NEW_FS */
+{
+#ifdef CONFIG_USE_NEW_FS
+	struct ansittydev *me = mfile_asansitty(self);
+#else /* CONFIG_USE_NEW_FS */
+	struct ansittydev *me = (struct ansittydev *)self;
+#endif /* !CONFIG_USE_NEW_FS */
 	switch (cmd) {
 
 	case TIOCGWINSZ:
@@ -108,12 +132,12 @@ ansitty_device_ioctl(struct chrdev *__restrict self, syscall_ulong_t cmd,
 	return 0;
 }
 
-PRIVATE NONNULL((1)) void LIBANSITTY_CC
-ansitty_device_output(struct ansitty *__restrict self,
-                      void const *data, size_t datalen) {
-	REF struct tty_device *output;
-	struct ansitty_device *me;
-	me = container_of(self, struct ansitty_device, at_ansi);
+PUBLIC NONNULL((1)) void LIBANSITTY_CC
+ansittydev_v_output(struct ansitty *__restrict self,
+                    void const *data, size_t datalen) {
+	REF struct mkttydev *output;
+	struct ansittydev *me;
+	me = container_of(self, struct ansittydev, at_ansi);
 	output = awref_get(&me->at_tty);
 	if (output) {
 		FINALLY_DECREF_UNLIKELY(output);
@@ -136,26 +160,38 @@ ansitty_device_output(struct ansitty *__restrict self,
 }
 
 
-PRIVATE NONNULL((1)) void LIBANSITTY_CC
-ansitty_device_setled(struct ansitty *__restrict self,
-                      uint8_t mask, uint8_t flag) {
-	REF struct tty_device *output;
-	struct ansitty_device *me;
-	me = container_of(self, struct ansitty_device, at_ansi);
+PUBLIC NONNULL((1)) void LIBANSITTY_CC
+ansittydev_v_setled(struct ansitty *__restrict self,
+                    uint8_t mask, uint8_t flag) {
+	REF struct mkttydev *output;
+	struct ansittydev *me;
+	me = container_of(self, struct ansittydev, at_ansi);
 	output = awref_get(&me->at_tty);
 	if (output) {
 		FINALLY_DECREF_UNLIKELY(output);
-		if (output->t_ihandle_typ == HANDLE_TYPE_CHRDEV &&
-		    chrdev_iskeyboard((struct chrdev *)output->t_ihandle_ptr)) {
-			struct keyboard_device *kbd;
+#ifdef CONFIG_USE_NEW_FS
+		if (output->mtd_ihandle_typ == HANDLE_TYPE_MFILE &&
+		    mfile_iskbd((struct mfile *)output->mtd_ihandle_ptr))
+#else /* CONFIG_USE_NEW_FS */
+		if (output->mtd_ihandle_typ == HANDLE_TYPE_CHRDEV &&
+		    chrdev_iskbd((struct chrdev *)output->mtd_ihandle_ptr))
+#endif /* !CONFIG_USE_NEW_FS */
+		{
+			struct kbddev *kbd;
 			uintptr_t new_leds;
-			kbd = (struct keyboard_device *)output->t_ihandle_ptr;
+#ifdef CONFIG_USE_NEW_FS
+			kbd = mfile_askbd((struct mfile *)output->mtd_ihandle_ptr);
+#else /* CONFIG_USE_NEW_FS */
+			kbd = (struct kbddev *)output->mtd_ihandle_ptr;
+#endif /* !CONFIG_USE_NEW_FS */
 			sync_write(&kbd->kd_leds_lock);
 			new_leds = (kbd->kd_leds & (mask | ~0xf)) | (flag & 0xf);
 			if (kbd->kd_leds != new_leds) {
-				if (kbd->kd_ops.ko_setleds) {
+				struct kbddev_ops const *ops;
+				ops = kbddev_getops(kbd);
+				if (ops->ko_setleds) {
 					TRY {
-						(*kbd->kd_ops.ko_setleds)(kbd, new_leds);
+						(*ops->ko_setleds)(kbd, new_leds);
 					} EXCEPT {
 						sync_endwrite(&kbd->kd_leds_lock);
 						RETHROW();
@@ -169,13 +205,13 @@ ansitty_device_setled(struct ansitty *__restrict self,
 }
 
 
-PRIVATE NONNULL((1, 2)) bool LIBANSITTY_CC
-ansitty_device_termios(struct ansitty *__restrict self,
-                       struct termios *__restrict oldios,
-                       struct termios const *newios) {
-	REF struct tty_device *output;
-	struct ansitty_device *me;
-	me = container_of(self, struct ansitty_device, at_ansi);
+PUBLIC NONNULL((1, 2)) bool LIBANSITTY_CC
+ansittydev_v_termios(struct ansitty *__restrict self,
+                     struct termios *__restrict oldios,
+                     struct termios const *newios) {
+	REF struct mkttydev *output;
+	struct ansittydev *me;
+	me = container_of(self, struct ansittydev, at_ansi);
 	output = awref_get(&me->at_tty);
 	if (!output) {
 		memset(oldios, 0, sizeof(*oldios));
@@ -189,19 +225,19 @@ ansitty_device_termios(struct ansitty *__restrict self,
 }
 
 
-
+#ifndef CONFIG_USE_NEW_FS
 /* Initialize a given ansitty device.
  * NOTE: `ops->ato_output' must be set to NULL when calling this  function.
  *       The internal routing of this callback to injecting keyboard output
  *       is done dynamically when the ANSI  TTY is connected to the  output
- *       channel of a `struct tty_device'
+ *       channel of a `struct mkttydev'
  * This function initializes the following operators:
- *   - cd_type.ct_write = &ansitty_device_write;  // Mustn't be re-assigned!
- *   - cd_type.ct_fini  = &ansitty_device_fini;   // Must be called by an override
- *   - cd_type.ct_ioctl = &ansitty_device_ioctl;  // Must be called by an override */
+ *   - cd_type.ct_write = &ansittydev_v_write;  // Mustn't be re-assigned!
+ *   - cd_type.ct_fini  = &ansittydev_v_fini;   // Must be called by an override
+ *   - cd_type.ct_ioctl = &ansittydev_v_ioctl;  // Must be called by an override */
 PUBLIC NOBLOCK NONNULL((1, 2)) void
-NOTHROW(KCALL ansitty_device_cinit)(struct ansitty_device *__restrict self,
-                                    struct ansitty_operators const *__restrict ops) {
+NOTHROW(KCALL ansittydev_cinit)(struct ansittydev *__restrict self,
+                                struct ansitty_operators const *__restrict ops) {
 	assert(self);
 	assert(ops);
 	assertf(!ops->ato_output, "Don't provided operator `ato_output'!");
@@ -209,13 +245,14 @@ NOTHROW(KCALL ansitty_device_cinit)(struct ansitty_device *__restrict self,
 	assertf(!ops->ato_termios, "Don't provided operator `ato_termios'!");
 	ansitty_init(&self->at_ansi, ops);
 	/* Provide standard operators. */
-	self->cd_type.ct_write = &ansitty_device_write;
-	self->cd_type.ct_ioctl = &ansitty_device_ioctl;
+	self->cd_type.ct_write = &ansittydev_v_write;
+	self->cd_type.ct_ioctl = &ansittydev_v_ioctl;
 	/* Override the TTY output operator to try to inject responses into the keyboard queue. */
-	self->at_ansi.at_ops.ato_output  = &ansitty_device_output;
-	self->at_ansi.at_ops.ato_setled  = &ansitty_device_setled;
-	self->at_ansi.at_ops.ato_termios = &ansitty_device_termios;
+	self->at_ansi.at_ops.ato_output  = &ansittydev_v_output;
+	self->at_ansi.at_ops.ato_setled  = &ansittydev_v_setled;
+	self->at_ansi.at_ops.ato_termios = &ansittydev_v_termios;
 }
+#endif /* !CONFIG_USE_NEW_FS */
 
 
 DECL_END

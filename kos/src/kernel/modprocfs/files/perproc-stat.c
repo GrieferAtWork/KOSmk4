@@ -23,7 +23,6 @@
 
 #include <kernel/compiler.h>
 
-#include <dev/tty.h>
 #include <kernel/mman.h>
 #include <kernel/mman/execinfo.h>
 #include <kernel/mman/mnode.h>
@@ -222,7 +221,7 @@ nogroup:
 	}
 	if (thread) {
 		REF struct task *session;
-		REF struct ttybase_device *ctty;
+		REF struct ttydev *ctty;
 		REF struct taskpid *fproc;
 		dev_t tty_devno;
 		u32 tty_devno_encoded;

@@ -25,9 +25,9 @@
 #ifndef GUARD_KERNEL_INCLUDE_SCHED_PID_H
 #include <sched/pid.h>
 #endif /* !GUARD_KERNEL_INCLUDE_SCHED_PID_H */
-#ifndef GUARD_KERNEL_INCLUDE_DEV_TTYBASE_H
-#include <dev/ttybase.h>
-#endif /* !GUARD_KERNEL_INCLUDE_DEV_TTYBASE_H */
+#ifndef GUARD_KERNEL_INCLUDE_DEV_TTY_H
+#include <dev/tty.h>
+#endif /* !GUARD_KERNEL_INCLUDE_DEV_TTY_H */
 
 #ifdef __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER
 #pragma GCC system_header
@@ -38,21 +38,21 @@ DECL_BEGIN
 #ifdef __CC__
 
 /* Return a reference to the controlling terminal of the calling/given process. */
-LOCAL WUNUSED REF struct ttybase_device *KCALL task_getctty(void) THROWS(E_WOULDBLOCK);
-LOCAL WUNUSED REF struct ttybase_device *NOTHROW(KCALL task_getctty_nx)(void);
-LOCAL WUNUSED REF struct ttybase_device *KCALL task_getctty_of(struct task *__restrict thread) THROWS(E_WOULDBLOCK);
-LOCAL WUNUSED REF struct ttybase_device *NOTHROW(KCALL task_getctty_of_nx)(struct task *__restrict thread);
+LOCAL WUNUSED REF struct ttydev *KCALL task_getctty(void) THROWS(E_WOULDBLOCK);
+LOCAL WUNUSED REF struct ttydev *NOTHROW(KCALL task_getctty_nx)(void);
+LOCAL WUNUSED REF struct ttydev *KCALL task_getctty_of(struct task *__restrict thread) THROWS(E_WOULDBLOCK);
+LOCAL WUNUSED REF struct ttydev *NOTHROW(KCALL task_getctty_of_nx)(struct task *__restrict thread);
 
 
-/* The  character  device made  available  under /dev/ttybase_device
+/* The  character  device made  available  under /dev/ttydev
  * This device implements all operators as direct aliasing callbacks
  * to  the TTY character device addressable through `task_getctty()' */
 DATDEF struct chrdev dev_tty;
 
 #ifndef __INTELLISENSE__
-LOCAL WUNUSED REF struct ttybase_device *KCALL
+LOCAL WUNUSED REF struct ttydev *KCALL
 task_getctty(void) THROWS(E_WOULDBLOCK) {
-	REF struct ttybase_device *result;
+	REF struct ttydev *result;
 	REF struct task *session_leader;
 	session_leader = task_getsessionleader();
 	if unlikely(!session_leader)
@@ -62,9 +62,9 @@ task_getctty(void) THROWS(E_WOULDBLOCK) {
 	return result;
 }
 
-LOCAL WUNUSED REF struct ttybase_device *
+LOCAL WUNUSED REF struct ttydev *
 NOTHROW(KCALL task_getctty_nx)(void) {
-	REF struct ttybase_device *result;
+	REF struct ttydev *result;
 	REF struct task *session_leader;
 	session_leader = task_getsessionleader_nx();
 	if unlikely(!session_leader)
@@ -74,9 +74,9 @@ NOTHROW(KCALL task_getctty_nx)(void) {
 	return result;
 }
 
-LOCAL WUNUSED REF struct ttybase_device *KCALL
+LOCAL WUNUSED REF struct ttydev *KCALL
 task_getctty_of(struct task *__restrict thread) THROWS(E_WOULDBLOCK) {
-	REF struct ttybase_device *result;
+	REF struct ttydev *result;
 	REF struct task *session_leader;
 	session_leader = task_getsessionleader_of(thread);
 	if unlikely(!session_leader)
@@ -86,9 +86,9 @@ task_getctty_of(struct task *__restrict thread) THROWS(E_WOULDBLOCK) {
 	return result;
 }
 
-LOCAL WUNUSED REF struct ttybase_device *
+LOCAL WUNUSED REF struct ttydev *
 NOTHROW(KCALL task_getctty_of_nx)(struct task *__restrict thread) {
-	REF struct ttybase_device *result;
+	REF struct ttydev *result;
 	REF struct task *session_leader;
 	session_leader = task_getsessionleader_of_nx(thread);
 	if unlikely(!session_leader)

@@ -821,7 +821,7 @@ aio_multihandle_generic_waitfor(struct aio_multihandle_generic *__restrict self,
  * from any async-operation such that the  operation will either succeed or  fail
  * at an arbitrary point in the future, potentially long after the caller started
  * the operation. To-be used as follows:
- * >> void nic_background_send(struct nic_device const *__restrict self,
+ * >> void nic_background_send(struct nicdev const *__restrict self,
  * >>                          struct nic_packet *__restrict packet) {
  * >>     struct aio_handle *aio;
  * >>     aio = aio_handle_async_alloc();

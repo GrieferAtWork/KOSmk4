@@ -47,7 +47,7 @@ struct udp_socket
 #ifndef __cplusplus
 	struct socket               us_sock;     /* The underlying socket. */
 #endif /* !__cplusplus */
-	WEAK REF struct nic_device *us_dev;      /* [0..1][lock(WRITE_ONCE)] The bound NIC device. */
+	WEAK REF struct nicdev *us_dev;      /* [0..1][lock(WRITE_ONCE)] The bound NIC device. */
 	WEAK uintptr_t              us_state;    /* UDP socket state (set of `UDP_SOCKET_STATE_*') */
 	WEAK struct in_addr         us_peerip;   /* [valid_if(UDP_SOCKET_STATE_F_HASPEER)] Peer IP */
 	WEAK be16                   us_peerport; /* [valid_if(UDP_SOCKET_STATE_F_HASPEER)] Peer port */

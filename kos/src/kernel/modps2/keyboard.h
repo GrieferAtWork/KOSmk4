@@ -73,11 +73,11 @@ enum {
 
 struct ps2_keyboard
 #ifdef __cplusplus
-    : keyboard_device
+    : kbddev
 #endif /* __cplusplus */
 {
 #ifndef __cplusplus
-	struct keyboard_device pk_keyboard; /* The underlying keyboard. */
+	struct kbddev pk_keyboard; /* The underlying keyboard. */
 #endif /* !__cplusplus */
 	ps2_portid_t           pk_portno;     /* [const] PS/2 port number. */
 	u8                     pk_state;      /* ISR-only: PS/2 keyboard state (one of `PS2_KEYBOARD_STATE_*'). */

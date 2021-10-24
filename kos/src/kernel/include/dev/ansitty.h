@@ -23,7 +23,7 @@
 #include <kernel/compiler.h>
 
 #include <dev/char.h>
-#include <dev/tty.h>
+#include <dev/mktty.h>
 
 #include <libansitty/ansitty.h>
 
@@ -31,50 +31,146 @@ DECL_BEGIN
 
 #ifdef __CC__
 
-#ifndef __tty_device_awref_defined
-#define __tty_device_awref_defined
-AWREF(tty_device_awref, tty_device);
-#endif /* !__tty_device_awref_defined */
+#ifndef __mkttydev_awref_defined
+#define __mkttydev_awref_defined
+AWREF(mkttydev_awref, mkttydev);
+#endif /* !__mkttydev_awref_defined */
 
-struct ansitty_device
-#ifdef __cplusplus
-	: chrdev
-#endif /* __cplusplus */
+#ifdef CONFIG_USE_NEW_FS
+struct ansittydev_ops {
+	struct chrdev_ops ato_cdev; /* Character device operators. */
+};
+#endif /* CONFIG_USE_NEW_FS */
+
+struct ansittydev
+#ifndef __WANT_FS_INLINE_STRUCTURES
+    : chrdev                       /* The underling character-device */
+#endif /* !__WANT_FS_INLINE_STRUCTURES */
 {
-#ifndef __cplusplus
-	struct chrdev at_cdev; /* The underling character-device */
-#endif /* !__cplusplus */
-	struct ansitty          at_ansi; /* Ansi TTY support. */
-	struct tty_device_awref at_tty;  /* [0..1] Weak reference to a connected TTY (used for injecting keyboard input) */
+#ifdef __WANT_FS_INLINE_STRUCTURES
+	struct chrdev         at_cdev; /* The underling character-device */
+#define _ansittydev_aschr(x) &(x)->at_cdev
+#define _ansittydev_chr_     at_cdev.
+#else /* __WANT_FS_INLINE_STRUCTURES */
+#define _ansittydev_aschr(x) x
+#define _ansittydev_chr_     /* nothing */
+#endif /* !__WANT_FS_INLINE_STRUCTURES */
+	struct ansitty        at_ansi; /* Ansi TTY support. */
+	struct mkttydev_awref at_tty;  /* [0..1] Weak reference to a connected TTY (used for injecting keyboard input) */
 };
 
-#define chrdev_isansitty(self)                               \
-	((self)->cd_heapsize >= sizeof(struct ansitty_device) && \
-	 (self)->cd_type.ct_write == &ansitty_device_write)
+
+#ifdef CONFIG_USE_NEW_FS
+
+/* Operator access */
+#define ansittydev_getops(self) \
+	((struct ansittydev_ops const *)__COMPILER_REQTYPE(struct ansittydev const *, self)->_ansittydev_chr_ _chrdev_dev_ _device_devnode_ _fdevnode_node_ _fnode_file_ mf_ops)
+#ifdef NDEBUG
+#define ___ansittydev_assert_ops_(ops) /* nothing */
+#else /* NDEBUG */
+#define ___ansittydev_assert_ops_(ops)                                           \
+	__hybrid_assert((ops)->ato_cdev.cdo_dev.do_node.dno_node.no_file.mo_stream), \
+	__hybrid_assert((ops)->ato_cdev.cdo_dev.do_node.dno_node.no_file.mo_stream->mso_write == &ansittydev_v_write),
+#endif /* !NDEBUG */
+#define _ansittydev_assert_ops_(ops) _chrdev_assert_ops_(&(ops)->ato_cdev) ___ansittydev_assert_ops_(ops)
+
+/* Helper macros */
+#define mfile_isansitty(self)   ((self)->mf_ops->mo_stream && (self)->mf_ops->mo_stream->mso_write == &ansittydev_v_write)
+#define mfile_asansitty(self)   ((struct ansittydev *)(self))
+#define fnode_isansitty(self)   mfile_isansitty(_fnode_asfile(self))
+#define fnode_asansitty(self)   mfile_asansitty(_fnode_asfile(self))
+#define devnode_isansitty(self) fnode_isansitty(_fdevnode_asnode(self))
+#define devnode_asansitty(self) fnode_asansitty(_fdevnode_asnode(self))
+#define device_isansitty(self)  devnode_isansitty(_device_asdevnode(self))
+#define device_asansitty(self)  devnode_asansitty(_device_asdevnode(self))
+#define chrdev_isansitty(self)  device_isansitty(_chrdev_asdev(self))
+#define chrdev_asansitty(self)  device_asansitty(_chrdev_asdev(self))
+
+/* Default ansitty operators. */
+#define ansittydev_v_destroy chrdev_v_destroy
+#define ansittydev_v_changed chrdev_v_changed
+#define ansittydev_v_wrattr  chrdev_v_wrattr
+FUNDEF NONNULL((1)) size_t KCALL /* NOTE: This read operator is _MANDATORY_ and may not be overwritten by sub-classes! */
+ansittydev_v_write(struct mfile *__restrict self,
+                   USER CHECKED void const *src,
+                   size_t num_bytes, iomode_t mode) THROWS(...);
+FUNDEF NONNULL((1)) syscall_slong_t KCALL
+ansittydev_v_ioctl(struct mfile *__restrict self, syscall_ulong_t cmd,
+                   USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
+
+/* Mandatory TTY operators for ansitty objects. (automatically installed) */
+FUNDEF NONNULL((1)) void LIBANSITTY_CC __ansittydev_v_output(struct ansitty *__restrict self, void const *data, size_t datalen) ASMNAME("ansittydev_v_output");
+FUNDEF NONNULL((1)) void LIBANSITTY_CC __ansittydev_v_setled(struct ansitty *__restrict self, uint8_t mask, uint8_t flag) ASMNAME("ansittydev_v_setled");
+FUNDEF NONNULL((1, 2)) __BOOL LIBANSITTY_CC __ansittydev_v_termios(struct ansitty *__restrict self, struct termios *__restrict oldios, struct termios const *newios) ASMNAME("ansittydev_v_termios");
+
+/* Initialize common+basic fields. The caller must still initialize:
+ *  - self->_ansittydev_chr_ _chrdev_dev_ _device_devnode_ _fdevnode_node_ _fnode_file_ mf_flags |= MFILE_FN_GLOBAL_REF;  # s.a. `device_registerf()'
+ *  - self->_ansittydev_chr_ _chrdev_dev_ _device_devnode_ _fdevnode_node_ fn_allnodes;  # s.a. `device_registerf()'
+ *  - self->_ansittydev_chr_ _chrdev_dev_ _device_devnode_ _fdevnode_node_ fn_supent;    # s.a. `device_registerf()'
+ *  - self->_ansittydev_chr_ _chrdev_dev_ _device_devnode_ _fdevnode_node_ fn_ino;       # s.a. `device_registerf()'
+ *  - self->_ansittydev_chr_ _chrdev_dev_ _device_devnode_ _fdevnode_node_ fn_mode;      # Something or'd with S_IFCHR
+ *  - self->_ansittydev_chr_ _chrdev_dev_ _device_devnode_ dn_devno;                     # s.a. `device_registerf()'
+ *  - self->_ansittydev_chr_ _chrdev_dev_ dv_driver;                                     # As `incref(drv_self)'
+ *  - self->_ansittydev_chr_ _chrdev_dev_ dv_dirent;                                     # s.a. `device_registerf()'
+ *  - self->_ansittydev_chr_ _chrdev_dev_ dv_byname_node;                                # s.a. `device_registerf()'
+ * @param: struct ansittydev        *self:    Character device to initialize.
+ * @param: struct ansittydev_ops    *ops:     Character device operators.
+ * @param: struct ansitty_operators *tty_ops: TTY operators. NOTE: `ato_output', `ato_setled' and `ato_termios' must _NOT_
+ *                                            be implemented; these operators are provided by the internal implementation! */
+#define _ansittydev_init(self, ops, tty_ops)                       \
+	(___ansittydev_assert_ops_(ops)                                \
+	 __hybrid_assert((tty_ops)->ato_output == __NULLPTR),          \
+	 __hybrid_assert((tty_ops)->ato_setled == __NULLPTR),          \
+	 __hybrid_assert((tty_ops)->ato_termios == __NULLPTR),         \
+	 _chrdev_init(_ansittydev_aschr(self), &(ops)->ato_cdev),      \
+	 ansitty_init(&(self)->at_ansi, tty_ops),                      \
+	 (self)->at_ansi.at_ops.ato_output  = &__ansittydev_v_output,  \
+	 (self)->at_ansi.at_ops.ato_setled  = &__ansittydev_v_setled,  \
+	 (self)->at_ansi.at_ops.ato_termios = &__ansittydev_v_termios, \
+	 awref_init(&(self)->at_tty, __NULLPTR))
+#define _ansittydev_cinit(self, ops, tty_ops)                      \
+	(___ansittydev_assert_ops_(ops)                                \
+	 __hybrid_assert((tty_ops)->ato_output == __NULLPTR),          \
+	 __hybrid_assert((tty_ops)->ato_setled == __NULLPTR),          \
+	 __hybrid_assert((tty_ops)->ato_termios == __NULLPTR),         \
+	 _chrdev_cinit(_ansittydev_aschr(self), &(ops)->ato_cdev),     \
+	 ansitty_init(&(self)->at_ansi, tty_ops),                      \
+	 (self)->at_ansi.at_ops.ato_output  = &__ansittydev_v_output,  \
+	 (self)->at_ansi.at_ops.ato_setled  = &__ansittydev_v_setled,  \
+	 (self)->at_ansi.at_ops.ato_termios = &__ansittydev_v_termios, \
+	 awref_cinit(&(self)->at_tty, __NULLPTR))
+/* Finalize a partially initialized `struct ansittydev' (as initialized by `_ansittydev_init()') */
+#define _ansittydev_fini(self) _chrdev_fini(_ansittydev_aschr(self))
+
+#else /* CONFIG_USE_NEW_FS */
+#define chrdev_isansitty(self)                           \
+	((self)->cd_heapsize >= sizeof(struct ansittydev) && \
+	 (self)->cd_type.ct_write == &ansittydev_v_write)
+
 
 FUNDEF NONNULL((1)) size_t KCALL
-ansitty_device_write(struct chrdev *__restrict self,
-                     USER CHECKED void const *src,
-                     size_t num_bytes, iomode_t mode) THROWS(...);
+ansittydev_v_write(struct chrdev *__restrict self,
+                   USER CHECKED void const *src,
+                   size_t num_bytes, iomode_t mode) THROWS(...);
 FUNDEF NONNULL((1)) syscall_slong_t KCALL
-ansitty_device_ioctl(struct chrdev *__restrict self, syscall_ulong_t cmd,
-                     USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
-#define ansitty_device_fini(self) (void)0 /* For now... */
+ansittydev_v_ioctl(struct chrdev *__restrict self, syscall_ulong_t cmd,
+                   USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
+#define ansittydev_v_fini(self) (void)0 /* For now... */
 
 
 /* Initialize a given ansitty device.
  * NOTE: `ops->ato_output' must be set to NULL when calling this  function.
  *       The internal routing of this callback to injecting keyboard output
  *       is done dynamically when the ANSI  TTY is connected to the  output
- *       channel of a `struct tty_device'
+ *       channel of a `struct mkttydev'
  * This function initializes the following operators:
- *   - cd_type.ct_write = &ansitty_device_write;  // Mustn't be re-assigned!
- *   - cd_type.ct_fini  = &ansitty_device_fini;   // Must be called by an override
- *   - cd_type.ct_ioctl = &ansitty_device_ioctl;  // Must be called by an override */
+ *   - cd_type.ct_write = &ansittydev_v_write;  // Mustn't be re-assigned!
+ *   - cd_type.ct_fini  = &ansittydev_v_fini;   // Must be called by an override
+ *   - cd_type.ct_ioctl = &ansittydev_v_ioctl;  // Must be called by an override */
 FUNDEF NOBLOCK NONNULL((1, 2)) void
-NOTHROW(KCALL ansitty_device_cinit)(struct ansitty_device *__restrict self,
-                                    struct ansitty_operators const *__restrict ops);
-
+NOTHROW(KCALL ansittydev_cinit)(struct ansittydev *__restrict self,
+                                struct ansitty_operators const *__restrict ops);
+#endif /* !CONFIG_USE_NEW_FS */
 
 #endif /* __CC__ */
 

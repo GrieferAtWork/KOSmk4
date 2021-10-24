@@ -45,7 +45,7 @@ PRIVATE NOBLOCK void
 NOTHROW(FCALL usb_keyboard_post)(struct usb_keyboard_device *__restrict self, u16 key) {
 	if (!key)
 		return; /* No-op */
-	if unlikely(!keyboard_device_putkey_nopr(self, key)) {
+	if unlikely(!kbddev_putkey_nopr(self, key)) {
 		printk(KERN_WARNING "[usb:%q] Keyboard buffer is full (dropping %#.4I16x)\n",
 		       self->cd_name, key);
 	}
@@ -432,7 +432,7 @@ NOTHROW(KCALL usb_keyboard_fini)(struct chrdev *__restrict self) {
 	keyboard_device_fini(me);
 }
 
-PRIVATE struct keyboard_device_ops const usb_keyboard_ops = {
+PRIVATE struct kbddev_ops const usb_keyboard_ops = {
 	/* .ko_setleds = */ NULL /* TODO */
 };
 
@@ -476,7 +476,7 @@ usb_keyboard_probe(struct usb_controller *__restrict self,
 
 	/* Allocate the keyboard device. */
 	result = CHRDEV_ALLOC(struct usb_keyboard_device);
-	keyboard_device_init(result, &usb_keyboard_ops);
+	kbddev_init(result, &usb_keyboard_ops);
 	result->cd_type.ct_fini = &usb_keyboard_fini;
 	FINALLY_DECREF_UNLIKELY(result);
 

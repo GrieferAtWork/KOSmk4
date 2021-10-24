@@ -1193,7 +1193,7 @@ badobj:
 
 
 PRIVATE struct obnote_entry const notes[] = {
-	{ "ansitty_device", &note_chrdev },
+	{ "ansittydev", &note_chrdev },
 	{ "blkdev", &note_block_device },
 	{ "block_device", &note_block_device },
 	{ "chrdev", &note_chrdev },
@@ -1204,7 +1204,7 @@ PRIVATE struct obnote_entry const notes[] = {
 	{ "fdirent", &note_fdirent },
 	{ "filehandle", &note_file },
 	/* TODO: `struct handle'                 (print the contents handle's /proc/self/fd-style link) */
-	{ "keyboard_device", &note_chrdev },
+	{ "kbddev", &note_chrdev },
 	{ "mbnode", &note_mnode },
 	{ "mfile", &note_mfile },
 	{ "mfutex", &note_mfutex },
@@ -1212,15 +1212,15 @@ PRIVATE struct obnote_entry const notes[] = {
 	{ "mnode", &note_mnode },
 	{ "module", &note_module },
 	{ "module_section", &note_module_section },
-	{ "mouse_device", &note_chrdev },
+	{ "mousedev", &note_chrdev },
 	{ "mpart", &note_mpart },
-	{ "nic_device", &note_chrdev },
+	{ "nicdev", &note_chrdev },
 	{ "path", &note_path },
 	{ "pty_master", &note_chrdev },
 	{ "pty_slave", &note_chrdev },
 	{ "task", &note_task },
 	{ "taskpid", &note_taskpid },
-	{ "ttybase_device", &note_chrdev },
+	{ "ttydev", &note_chrdev },
 	{ "userelf_module", &note_module },
 	{ "userelf_module_section", &note_module_section },
 };

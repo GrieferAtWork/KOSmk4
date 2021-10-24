@@ -42,7 +42,7 @@ DECL_BEGIN
 /* Route an incoming packet through the given NIC device.
  * @assume(packet_size >= ETH_ZLEN) */
 PUBLIC NOBLOCK NONNULL((1, 2)) void KCALL
-eth_routepacket(struct nic_device *__restrict dev,
+eth_routepacket(struct nicdev *__restrict dev,
                 void const *__restrict packet_data,
                 size_t packet_size) {
 	struct ethhdr *hdr;

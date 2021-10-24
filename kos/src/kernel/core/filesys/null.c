@@ -1094,7 +1094,7 @@ PRIVATE struct mfile_stream_ops const devtty_stream_ops = {
 			{                                                                       \
 				{                                                                   \
 					(void(KCALL *)(struct mfile *__restrict))(void *)(uintptr_t)-1, \
-					mo_newpart, mo_loadblocks, NULL, &fnode_v_changed, mo_stream,   \
+					mo_newpart, mo_loadblocks, NULL, &device_v_changed, mo_stream,  \
 					IF_VIO_ENABLED(mo_vio)                                          \
 				},                                                                  \
 				&device_v_wrattr                                                    \

@@ -25,7 +25,7 @@
 
 #include <kernel/compiler.h>
 
-#include <dev/ttybase.h>
+#include <dev/tty.h>
 #include <kernel/except.h>
 #include <kernel/handle-proto.h>
 #include <kernel/handle.h>
@@ -384,7 +384,7 @@ NOTHROW(KCALL this_taskgroup_fini)(struct task *__restrict self) {
 					decref(mygroup.tg_pgrp_session);
 			} else {
 				/* Session leader */
-				REF struct ttybase_device *mytty;
+				REF struct ttydev *mytty;
 				mytty = mygroup.tg_ctty.axr_obj;
 				if (mytty) {
 					/* Unbind the CTTY pointer.

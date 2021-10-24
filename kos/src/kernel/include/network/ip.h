@@ -87,7 +87,7 @@ struct ip_datagram {
 /* Route a given IP packet.
  * @assume(packet_size >= 20); */
 FUNDEF NOBLOCK NONNULL((1, 2)) void KCALL
-ip_routepacket(struct nic_device *__restrict dev,
+ip_routepacket(struct nicdev *__restrict dev,
                void const *__restrict packet_data,
                size_t packet_size);
 
@@ -95,7 +95,7 @@ ip_routepacket(struct nic_device *__restrict dev,
  * @assume(packet->ip_hl >= 5);
  * @assume(packet_size >= 20); */
 FUNDEF NOBLOCK NONNULL((1, 2)) void KCALL
-ip_routedatagram(struct nic_device *__restrict dev,
+ip_routedatagram(struct nicdev *__restrict dev,
                  struct iphdr const *__restrict packet,
                  u16 packet_size);
 
@@ -132,7 +132,7 @@ ip_routedatagram(struct nic_device *__restrict dev,
  *   - ip_src    (Sender IP address (usually `dev->nd_addr.na_ip', or a broadcast IP))
  *   - ip_dst    (Target IP address) */
 FUNDEF NONNULL((1, 2, 3)) void KCALL
-ip_senddatagram(struct nic_device *__restrict dev,
+ip_senddatagram(struct nicdev *__restrict dev,
                 struct nic_packet *__restrict packet,
                 struct aio_handle *__restrict aio);
 
@@ -162,7 +162,7 @@ struct nic_packet_desc;
  *   - ip_src    (Sender IP address (usually `dev->nd_addr.na_ip', or a broadcast IP))
  *   - ip_dst    (Target IP address) */
 FUNDEF NONNULL((1, 2, 3)) void KCALL
-ip_senddatagram_ex(struct nic_device *__restrict dev,
+ip_senddatagram_ex(struct nicdev *__restrict dev,
                    struct nic_packet_desc const *__restrict packet,
                    struct aio_handle *__restrict aio);
 

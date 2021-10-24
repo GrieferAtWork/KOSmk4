@@ -157,6 +157,7 @@ struct blkdev
 
 /* Default operators for block devices */
 #define blkdev_v_destroy device_v_destroy
+#define blkdev_v_changed device_v_changed
 #define blkdev_v_wrattr  device_v_wrattr
 
 /* Operators used for block device partitions */
@@ -225,14 +226,14 @@ DATDEF struct blkdev_ops const blkpart_ops;
  *  - self->_blkdev_dev_ _device_devnode_ _fdevnode_node_ _fnode_file_ mf_blockshift
  *  - self->_blkdev_dev_ _device_devnode_ _fdevnode_node_ _fnode_file_ mf_part_amask
  *  - self->_blkdev_dev_ _device_devnode_ _fdevnode_node_ _fnode_file_ mf_filesize  (to the total device size in bytes)
- *  - self->_blkdev_dev_ _device_devnode_ _fdevnode_node_ fn_allnodes
- *  - self->_blkdev_dev_ _device_devnode_ _fdevnode_node_ fn_supent
- *  - self->_blkdev_dev_ _device_devnode_ _fdevnode_node_ fn_ino  (as `devfs_devnode_makeino(S_IFBLK, dn_devno)')
- *  - self->_blkdev_dev_ _device_devnode_ _fdevnode_node_ fn_mode (with something or'd with S_IFBLK)
- *  - self->_blkdev_dev_ _device_devnode_ dn_devno
- *  - self->_blkdev_dev_ dv_driver
- *  - self->_blkdev_dev_ dv_dirent
- *  - self->_blkdev_dev_ dv_byname_node
+ *  - self->_blkdev_dev_ _device_devnode_ _fdevnode_node_ fn_allnodes  # s.a. `device_registerf()'
+ *  - self->_blkdev_dev_ _device_devnode_ _fdevnode_node_ fn_supent    # s.a. `device_registerf()'
+ *  - self->_blkdev_dev_ _device_devnode_ _fdevnode_node_ fn_ino       # s.a. `device_registerf()'
+ *  - self->_blkdev_dev_ _device_devnode_ _fdevnode_node_ fn_mode      # Something or'd with S_IFBLK
+ *  - self->_blkdev_dev_ _device_devnode_ dn_devno                     # s.a. `device_registerf()'
+ *  - self->_blkdev_dev_ dv_driver                                     # As `incref(drv_self)'
+ *  - self->_blkdev_dev_ dv_dirent                                     # s.a. `device_registerf()'
+ *  - self->_blkdev_dev_ dv_byname_node                                # s.a. `device_registerf()'
  *  - self->bd_rootinfo.br_ata_serial_no
  *  - self->bd_rootinfo.br_ata_fw_rev
  *  - self->bd_rootinfo.br_ata_model

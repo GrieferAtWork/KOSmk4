@@ -30,11 +30,11 @@ DECL_BEGIN
 
 struct usb_keyboard_device
 #ifdef __cplusplus
-	: keyboard_device
+	: kbddev
 #endif /* __cplusplus */
 {
 #ifndef __cplusplus
-	struct keyboard_device     uk_device;  /* The underlying keyboard. */
+	struct kbddev     uk_device;  /* The underlying keyboard. */
 #endif /* !__cplusplus */
 	REF struct usb_controller *uk_ctrl;    /* [1..1][const] The associated USB controller. */
 	REF struct usb_interface  *uk_intf;    /* [1..1][const] The used USB interface. */

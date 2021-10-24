@@ -3244,7 +3244,7 @@ driver_runfini_unbindglob(struct driver *__restrict self) {
 	/* TODO: Delete global hooks of `self':
 	 *   - blkdev_register()
 	 *   - chrdev_register()
-	 *   - nic_device_setdefault()
+	 *   - nicdev_setdefault()
 	 *   - register_filesystem_type()
 	 *   - fs_filesystems                       (All filesystem implemented by `self')
 	 *   - fs_filesystems                       (All filesystem using a block-device implemented by `self')

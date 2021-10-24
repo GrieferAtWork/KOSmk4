@@ -149,7 +149,7 @@ NOTHROW(KCALL process_pending_rpcs_fini)(struct process_pending_rpcs *__restrict
 #define THIS_PROCESS_RPCS \
 	FORTASK(task_getprocess(), this_taskgroup.tg_proc_rpcs)
 
-struct ttybase_device;
+struct ttydev;
 struct pending_rpc;
 
 LIST_HEAD(taskpid_list, REF taskpid);
@@ -160,7 +160,7 @@ LIST_HEAD(task_list, WEAK task);
 
 #ifndef __ttybase_device_axref_defined
 #define __ttybase_device_axref_defined
-AXREF(ttybase_device_axref, ttybase_device);
+AXREF(ttybase_device_axref, ttydev);
 #endif /* !__ttybase_device_axref_defined */
 
 
@@ -1260,11 +1260,11 @@ NOTHROW(KCALL task_getrootpid_of_s)(struct task const *__restrict thread) {
 
 DECL_END
 
-#ifdef GUARD_KERNEL_INCLUDE_DEV_TTYBASE_H
+#ifdef GUARD_KERNEL_INCLUDE_DEV_TTY_H
 #ifndef GUARD_KERNEL_INCLUDE_SCHED_PID_CTTY_H
 #include <sched/pid-ctty.h>
 #endif /* !GUARD_KERNEL_INCLUDE_SCHED_PID_CTTY_H */
-#endif /* GUARD_KERNEL_INCLUDE_DEV_TTYBASE_H */
+#endif /* GUARD_KERNEL_INCLUDE_DEV_TTY_H */
 
 
 #endif /* !GUARD_KERNEL_INCLUDE_SCHED_PID_H */

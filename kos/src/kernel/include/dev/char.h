@@ -24,6 +24,7 @@
 
 #ifdef CONFIG_USE_NEW_FS
 #include <kernel/fs/chrdev.h>
+#define chrdev_devno device_getdevno
 #else /* CONFIG_USE_NEW_FS */
 #include <kernel/types.h>
 

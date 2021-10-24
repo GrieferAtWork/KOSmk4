@@ -41,9 +41,7 @@ DECL_BEGIN
 
 #ifdef __CC__
 
-struct mouse_device;
-
-union mouse_buffer_state {
+union mousebuf_state {
 	WEAK uintptr_t bs_word; /* Atomic control word. */
 	struct {
 		uintptr_half_t s_start; /* Offset to the first used packet */
@@ -51,11 +49,19 @@ union mouse_buffer_state {
 	} bs_state;
 };
 
-struct mouse_buffer {
-	union mouse_buffer_state mb_bufstate; /* Buffer state */
-	WEAK mouse_packet_t      mb_buffer[CONFIG_MOUSE_BUFFER_SIZE]; /* Buffer of unread mouse inputs. */
-	struct sig               mb_avail;    /* Signal send for every packet added to the buffer. */
+struct mousebuf {
+	union mousebuf_state mb_bufstate;                         /* Buffer state */
+	WEAK mouse_packet_t  mb_buffer[CONFIG_MOUSE_BUFFER_SIZE]; /* Buffer of unread mouse inputs. */
+	struct sig           mb_avail;                            /* Signal send for every packet added to the buffer. */
 };
+
+#define mousebuf_init(self)           \
+	((self)->mb_bufstate.bs_word = 0, \
+	 sig_init(&(self)->mb_avail))
+#define mousebuf_cinit(self)                            \
+	(__hybrid_assert((self)->mb_bufstate.bs_word == 0), \
+	 sig_cinit(&(self)->mb_avail))
+
 
 struct mouse_state {
 	s32 ms_abs_x;   /* Absolute position in X. */
@@ -66,69 +72,170 @@ struct mouse_state {
 #define MOUSE_DEVICE_FLAG_NORMAL 0x0000 /* Normal mouse device flags. */
 #define MOUSE_DEVICE_FLAG_GENABS 0x0001 /* Generate absolute mouse packets. */
 
-struct mouse_device
-#ifdef __cplusplus
-	: chrdev
-#endif /* __cplusplus */
+#ifdef CONFIG_USE_NEW_FS
+struct mousedev_ops {
+	struct chrdev_ops mo_cdev; /* Character device operators. */
+};
+#endif /* CONFIG_USE_NEW_FS */
+
+
+struct mousedev
+#ifndef __WANT_FS_INLINE_STRUCTURES
+    : chrdev
+#endif /* !__WANT_FS_INLINE_STRUCTURES */
 {
-#ifndef __cplusplus
-	struct chrdev md_dev;   /* The underlying character device. */
-#endif /* !__cplusplus */
-	struct mouse_buffer     md_buf;   /* [lock(md_lock)] Mouse input buffer. */
-	struct mouse_state      md_state; /* [lock(md_lock)] Current mouse state at the head of the buffer of pending inputs. */
-	struct mouse_rect       md_rect;  /* [lock(md_lock)] Clip rectangle for absolute mouse positions. */
+#ifdef __WANT_FS_INLINE_STRUCTURES
+	struct chrdev        md_dev;   /* The underlying character device. */
+#define _mousedev_aschr(x) &(x)->md_dev
+#define _mousedev_chr_     md_dev.
+#else /* __WANT_FS_INLINE_STRUCTURES */
+#define _mousedev_aschr(x) x
+#define _mousedev_chr_     /* nothing */
+#endif /* !__WANT_FS_INLINE_STRUCTURES */
+	struct mousebuf      md_buf;   /* [lock(md_lock)] Mouse input buffer. */
+	struct mouse_state   md_state; /* [lock(md_lock)] Current mouse state at the head of the buffer of pending inputs. */
+	struct mouse_rect    md_rect;  /* [lock(md_lock)] Clip rectangle for absolute mouse positions. */
 #ifndef CONFIG_NO_SMP
-	struct atomic_rwlock    md_lock;  /* Preemption-lock for writing to `md_buf', `md_state' and `md_rect' */
+	struct atomic_rwlock md_lock;  /* Preemption-lock for writing to `md_buf', `md_state' and `md_rect' */
 #endif /* !CONFIG_NO_SMP */
-	WEAK uintptr_t          md_flags; /* Mouse device flags (Set of `MOUSE_DEVICE_FLAG_*') */
+	WEAK uintptr_t       md_flags; /* Mouse device flags (Set of `MOUSE_DEVICE_FLAG_*') */
 };
 
+#ifdef CONFIG_USE_NEW_FS
 
-#define chrdev_ismouse(self)                    \
-	((self)->cd_heapsize >= sizeof(struct mouse_device) && \
-	 (self)->cd_type.ct_read == &mouse_device_read)
+/* Operator access */
+#define mousedev_getops(self) \
+	((struct mousedev_ops const *)__COMPILER_REQTYPE(struct mousedev const *, self)->_mousedev_chr_ _chrdev_dev_ _device_devnode_ _fdevnode_node_ _fnode_file_ mf_ops)
+#ifdef NDEBUG
+#define ___mousedev_assert_ops_(ops) /* nothing */
+#else /* NDEBUG */
+#define ___mousedev_assert_ops_(ops)                                            \
+	__hybrid_assert((ops)->mo_cdev.cdo_dev.do_node.dno_node.no_file.mo_stream), \
+	__hybrid_assert((ops)->mo_cdev.cdo_dev.do_node.dno_node.no_file.mo_stream->mso_read == &mousedev_v_read),
+#endif /* !NDEBUG */
+#define _mousedev_assert_ops_(ops) _chrdev_assert_ops_(&(ops)->mo_cdev) ___mousedev_assert_ops_(ops)
+
+/* Helper macros */
+#define mfile_ismouse(self)   ((self)->mf_ops->mo_stream && (self)->mf_ops->mo_stream->mso_read == &mousedev_v_read)
+#define mfile_asmouse(self)   ((struct mousedev *)(self))
+#define fnode_ismouse(self)   mfile_ismouse(_fnode_asfile(self))
+#define fnode_asmouse(self)   mfile_asmouse(_fnode_asfile(self))
+#define devnode_ismouse(self) fnode_ismouse(_fdevnode_asnode(self))
+#define devnode_asmouse(self) fnode_asmouse(_fdevnode_asnode(self))
+#define device_ismouse(self)  devnode_ismouse(_device_asdevnode(self))
+#define device_asmouse(self)  devnode_asmouse(_device_asdevnode(self))
+#define chrdev_ismouse(self)  device_ismouse(_chrdev_asdev(self))
+#define chrdev_asmouse(self)  device_asmouse(_chrdev_asdev(self))
+
+/* Default mouse operators. */
+FUNDEF NONNULL((1)) size_t KCALL /* NOTE: This read operator is _MANDATORY_ and may not be overwritten by sub-classes! */
+mousedev_v_read(struct mfile *__restrict self, USER CHECKED void *dst,
+                size_t num_bytes, iomode_t mode) THROWS(...);
+FUNDEF NONNULL((1)) syscall_slong_t KCALL
+mousedev_v_ioctl(struct mfile *__restrict self, syscall_ulong_t cmd,
+                 USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
+FUNDEF NONNULL((1)) void KCALL
+mousedev_v_stat(struct mfile *__restrict self,
+                USER CHECKED struct stat *result) THROWS(...);
+FUNDEF NONNULL((1)) void KCALL
+mousedev_v_pollconnect(struct mfile *__restrict self,
+                       poll_mode_t what) THROWS(...);
+FUNDEF NONNULL((1)) poll_mode_t KCALL
+mousedev_v_polltest(struct mfile *__restrict self,
+                    poll_mode_t what) THROWS(...);
+
+#ifndef CONFIG_NO_SMP
+#define __mousedev_init_md_lock_(self)  atomic_rwlock_init(&(self)->md_lock),
+#define __mousedev_cinit_md_lock_(self) atomic_rwlock_cinit(&(self)->md_lock),
+#else /* !CONFIG_NO_SMP */
+#define __mousedev_init_md_lock_(self)  /* nothing */
+#define __mousedev_cinit_md_lock_(self) /* nothing */
+#endif /* CONFIG_NO_SMP */
+
+/* Initialize common+basic fields. The caller must still initialize:
+ *  - self->_mousedev_chr_ _chrdev_dev_ _device_devnode_ _fdevnode_node_ _fnode_file_ mf_flags |= MFILE_FN_GLOBAL_REF;  # s.a. `device_registerf()'
+ *  - self->_mousedev_chr_ _chrdev_dev_ _device_devnode_ _fdevnode_node_ fn_allnodes;  # s.a. `device_registerf()'
+ *  - self->_mousedev_chr_ _chrdev_dev_ _device_devnode_ _fdevnode_node_ fn_supent;    # s.a. `device_registerf()'
+ *  - self->_mousedev_chr_ _chrdev_dev_ _device_devnode_ _fdevnode_node_ fn_ino;       # s.a. `device_registerf()'
+ *  - self->_mousedev_chr_ _chrdev_dev_ _device_devnode_ _fdevnode_node_ fn_mode;      # Something or'd with S_IFCHR
+ *  - self->_mousedev_chr_ _chrdev_dev_ _device_devnode_ dn_devno;                     # s.a. `device_registerf()'
+ *  - self->_mousedev_chr_ _chrdev_dev_ dv_driver;                                     # As `incref(drv_self)'
+ *  - self->_mousedev_chr_ _chrdev_dev_ dv_dirent;                                     # s.a. `device_registerf()'
+ *  - self->_mousedev_chr_ _chrdev_dev_ dv_byname_node;                                # s.a. `device_registerf()'
+ *  - self->md_rect
+ * @param: struct mousedev     *self: Character device to initialize.
+ * @param: struct mousedev_ops *ops:  Character device operators. */
+#define _mousedev_init(self, ops)                          \
+	(___mousedev_assert_ops_(ops)                          \
+	 _chrdev_init(_mousedev_aschr(self), &(ops)->mo_cdev), \
+	 mousebuf_init(&(self)->md_buf),                       \
+	 (self)->md_state.ms_abs_x   = 0,                      \
+	 (self)->md_state.ms_abs_y   = 0,                      \
+	 (self)->md_state.ms_buttons = 0,                      \
+	 __mousedev_init_md_lock_(self)                        \
+	 (self)->md_flags = MOUSE_DEVICE_FLAG_NORMAL)
+#define _mousedev_cinit(self, ops)                          \
+	(___mousedev_assert_ops_(ops)                           \
+	 _chrdev_cinit(_mousedev_aschr(self), &(ops)->mo_cdev), \
+	 mousebuf_cinit(&(self)->md_buf),                       \
+	 __hybrid_assert((self)->md_state.ms_abs_x == 0),       \
+	 __hybrid_assert((self)->md_state.ms_abs_y == 0),       \
+	 __hybrid_assert((self)->md_state.ms_buttons == 0),     \
+	 __mousedev_cinit_md_lock_(self)                        \
+	 __hybrid_assert((self)->md_flags == MOUSE_DEVICE_FLAG_NORMAL))
+/* Finalize a partially initialized `struct mousedev' (as initialized by `_mousedev_init()') */
+#define _mousedev_fini(self) _chrdev_fini(_mousedev_aschr(self))
+
+#else /* CONFIG_USE_NEW_FS */
+
+#define chrdev_ismouse(self)                           \
+	((self)->cd_heapsize >= sizeof(struct mousedev) && \
+	 (self)->cd_type.ct_read == &mousedev_v_read)
 
 /* Initialize/finalize the given mouse device.
  * NOTE: Drivers that override  the `ct_fini' operator  of a given  mouse
- *       must ensure that `mouse_device_fini()' is still invoked by their
+ *       must ensure that `mousedev_v_fini()' is still invoked by their
  *       override.
  * NOTE: The following operators are intrinsically provided by mouse,
- *       get  initialized by `mouse_device_init()', and should not be
+ *       get  initialized by `mousedev_init()', and should not be
  *       overwritten:
  *         - ct_read
  *         - ct_ioctl
  *         - ct_stat
  *         - ct_poll */
-FUNDEF NOBLOCK void NOTHROW(KCALL mouse_device_init)(struct mouse_device *__restrict self);
-#define mouse_device_fini(self) (void)0 /* No-op (for now) */
+FUNDEF NOBLOCK NONNULL((1)) void
+NOTHROW(KCALL mousedev_init)(struct mousedev *__restrict self);
+#define mousedev_v_fini(self) (void)0 /* No-op (for now) */
 
 
 /* Mouse character device operators */
-FUNDEF NONNULL((1)) size_t KCALL mouse_device_read(struct chrdev *__restrict self, USER CHECKED void *dst, size_t num_bytes, iomode_t mode) THROWS(...);
-FUNDEF NONNULL((1)) syscall_slong_t KCALL mouse_device_ioctl(struct chrdev *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
-FUNDEF NONNULL((1)) void KCALL mouse_device_stat(struct chrdev *__restrict self, USER CHECKED struct stat *result) THROWS(...);
-FUNDEF NONNULL((1)) void KCALL mouse_device_pollconnect(struct chrdev *__restrict self, poll_mode_t what) THROWS(...);
-FUNDEF NONNULL((1)) poll_mode_t KCALL mouse_device_polltest(struct chrdev *__restrict self, poll_mode_t what) THROWS(...);
+FUNDEF NONNULL((1)) size_t KCALL mousedev_v_read(struct chrdev *__restrict self, USER CHECKED void *dst, size_t num_bytes, iomode_t mode) THROWS(...);
+FUNDEF NONNULL((1)) syscall_slong_t KCALL mousedev_v_ioctl(struct chrdev *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
+FUNDEF NONNULL((1)) void KCALL mousedev_v_stat(struct chrdev *__restrict self, USER CHECKED struct stat *result) THROWS(...);
+FUNDEF NONNULL((1)) void KCALL mousedev_v_pollconnect(struct chrdev *__restrict self, poll_mode_t what) THROWS(...);
+FUNDEF NONNULL((1)) poll_mode_t KCALL mousedev_v_polltest(struct chrdev *__restrict self, poll_mode_t what) THROWS(...);
+#endif /* !CONFIG_USE_NEW_FS */
+
 
 /* Read packets from a given mouse device buffer. */
-FUNDEF NOBLOCK mouse_packet_t NOTHROW(KCALL mouse_buffer_trygetpacket)(struct mouse_buffer *__restrict self);
-FUNDEF mouse_packet_t KCALL mouse_buffer_getpacket(struct mouse_buffer *__restrict self) THROWS(E_WOULDBLOCK);
+FUNDEF NOBLOCK NONNULL((1)) mouse_packet_t NOTHROW(KCALL mousebuf_trygetpacket)(struct mousebuf *__restrict self);
+FUNDEF NONNULL((1)) mouse_packet_t KCALL mousebuf_getpacket(struct mousebuf *__restrict self) THROWS(E_WOULDBLOCK);
 
 /* Generate mouse input packets
  * Note  that when generating event packets, the motion
  * packets should always be created before other events */
-FUNDEF bool KCALL mouse_device_motion(struct mouse_device *__restrict self, s32 relx, s32 rely);
-FUNDEF bool KCALL mouse_device_moveto(struct mouse_device *__restrict self, s32 absx, s32 absy);
-FUNDEF bool KCALL mouse_device_button(struct mouse_device *__restrict self, u32 mask, u32 flag);
-FUNDEF bool KCALL mouse_device_vwheel(struct mouse_device *__restrict self, s32 lines);
-FUNDEF bool KCALL mouse_device_hwheel(struct mouse_device *__restrict self, s32 rows);
-FUNDEF bool KCALL mouse_device_button_ex(struct mouse_device *__restrict self, u32 mask, u32 flag, u32 xflg, u32 *__restrict pold_buttons, u32 *__restrict pnew_buttons);
-FUNDEF NOBLOCK bool NOTHROW(KCALL mouse_device_motion_nopr)(struct mouse_device *__restrict self, s32 relx, s32 rely);
-FUNDEF NOBLOCK bool NOTHROW(KCALL mouse_device_moveto_nopr)(struct mouse_device *__restrict self, s32 absx, s32 absy);
-FUNDEF NOBLOCK bool NOTHROW(KCALL mouse_device_button_nopr)(struct mouse_device *__restrict self, u32 mask, u32 flag);
-FUNDEF NOBLOCK bool NOTHROW(KCALL mouse_device_vwheel_nopr)(struct mouse_device *__restrict self, s32 lines);
-FUNDEF NOBLOCK bool NOTHROW(KCALL mouse_device_hwheel_nopr)(struct mouse_device *__restrict self, s32 rows);
-FUNDEF NOBLOCK bool NOTHROW(KCALL mouse_device_button_ex_nopr)(struct mouse_device *__restrict self, u32 mask, u32 flag, u32 xflg, u32 *__restrict pold_buttons, u32 *__restrict pnew_buttons);
+FUNDEF NONNULL((1)) __BOOL KCALL mousedev_motion(struct mousedev *__restrict self, s32 relx, s32 rely);
+FUNDEF NONNULL((1)) __BOOL KCALL mousedev_moveto(struct mousedev *__restrict self, s32 absx, s32 absy);
+FUNDEF NONNULL((1)) __BOOL KCALL mousedev_button(struct mousedev *__restrict self, u32 mask, u32 flag);
+FUNDEF NONNULL((1)) __BOOL KCALL mousedev_vwheel(struct mousedev *__restrict self, s32 lines);
+FUNDEF NONNULL((1)) __BOOL KCALL mousedev_hwheel(struct mousedev *__restrict self, s32 rows);
+FUNDEF NONNULL((1)) __BOOL KCALL mousedev_button_ex(struct mousedev *__restrict self, u32 mask, u32 flag, u32 xflg, u32 *__restrict pold_buttons, u32 *__restrict pnew_buttons);
+FUNDEF NOBLOCK NONNULL((1)) __BOOL NOTHROW(KCALL mousedev_motion_nopr)(struct mousedev *__restrict self, s32 relx, s32 rely);
+FUNDEF NOBLOCK NONNULL((1)) __BOOL NOTHROW(KCALL mousedev_moveto_nopr)(struct mousedev *__restrict self, s32 absx, s32 absy);
+FUNDEF NOBLOCK NONNULL((1)) __BOOL NOTHROW(KCALL mousedev_button_nopr)(struct mousedev *__restrict self, u32 mask, u32 flag);
+FUNDEF NOBLOCK NONNULL((1)) __BOOL NOTHROW(KCALL mousedev_vwheel_nopr)(struct mousedev *__restrict self, s32 lines);
+FUNDEF NOBLOCK NONNULL((1)) __BOOL NOTHROW(KCALL mousedev_hwheel_nopr)(struct mousedev *__restrict self, s32 rows);
+FUNDEF NOBLOCK NONNULL((1)) __BOOL NOTHROW(KCALL mousedev_button_ex_nopr)(struct mousedev *__restrict self, u32 mask, u32 flag, u32 xflg, u32 *__restrict pold_buttons, u32 *__restrict pnew_buttons);
 
 #endif /* __CC__ */
 

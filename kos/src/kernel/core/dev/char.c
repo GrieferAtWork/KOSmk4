@@ -32,7 +32,7 @@
 #include <dev/keyboard.h>
 #include <dev/mouse.h>
 #include <dev/pty.h>
-#include <dev/ttybase.h>
+#include <dev/tty.h>
 #include <fs/node.h>
 #include <fs/ramfs.h>
 #include <fs/vfs.h>
@@ -849,11 +849,11 @@ do_dump_character_device(struct chrdev *__restrict self,
                          size_t max_device_namelen,
                          size_t max_driver_namelen) {
 	char const *kind;
-	if (chrdev_isttybase(self))
-		kind = ttybase_isapty((struct ttybase_device *)self)
+	if (chrdev_istty(self))
+		kind = ttybase_isapty((struct ttydev *)self)
 		       ? DBGSTR("pty")
 		       : DBGSTR("tty");
-	else if (chrdev_iskeyboard(self))
+	else if (chrdev_iskbd(self))
 		kind = DBGSTR("keyboard");
 	else if (chrdev_ismouse(self))
 		kind = DBGSTR("mouse");

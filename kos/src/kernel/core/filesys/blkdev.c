@@ -243,7 +243,7 @@ PUBLIC struct blkdev_ops const blkpart_ops = {
 					.mo_destroy    = &blkpart_v_destroy,
 					.mo_loadblocks = &blkpart_v_loadblocks,
 					.mo_saveblocks = &blkpart_v_saveblocks,
-					.mo_changed    = &fnode_v_changed,
+					.mo_changed    = &blkdev_v_changed,
 					.mo_stream     = &blkpart_stream_ops,
 				},
 				.no_wrattr = &blkdev_v_wrattr,

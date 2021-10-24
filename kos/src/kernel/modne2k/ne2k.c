@@ -891,7 +891,7 @@ tx_switch_to_idle:
 			me->nk_rx_nxt = hdr.ph_next;
 
 			/* Route the packet. */
-			nic_device_routepacket(me, packet, hdr.ph_count);
+			nicdev_routepacket(me, packet, hdr.ph_count);
 		}
 		/* Clear the RX-PENDING bit. */
 		ATOMIC_AND(me->nk_state.ns_flags, ~NE2K_FLAG_RXPEND);
@@ -1119,7 +1119,7 @@ PRIVATE struct aio_handle_type Ne2k_TxAioType = {
 
 
 PRIVATE void KCALL
-Ne2k_SendPacket(struct nic_device *__restrict self,
+Ne2k_SendPacket(struct nicdev *__restrict self,
                 struct nic_packet *__restrict packet,
                 /*out*/ struct aio_handle *__restrict aio) {
 	Ne2kDevice *me;
@@ -1211,7 +1211,7 @@ Ne2k_ApplyFlagsUnlocked(Ne2kDevice *__restrict self,
 }
 
 PRIVATE bool KCALL
-Ne2k_SetFlags(struct nic_device *__restrict self,
+Ne2k_SetFlags(struct nicdev *__restrict self,
               uintptr_t old_flags, uintptr_t new_flags) {
 	Ne2kDevice *me;
 	assert(!(new_flags & IFF_STATUS));
@@ -1242,7 +1242,7 @@ Ne2k_SetFlags(struct nic_device *__restrict self,
 }
 
 
-PRIVATE struct nic_device_ops const Ne2k_NICDeviceOps = {
+PRIVATE struct nicdev_ops const Ne2k_NICDeviceOps = {
 	/* .nd_send     = */ &Ne2k_SendPacket,
 	/* .nd_setflags = */ &Ne2k_SetFlags,
 };
@@ -1253,7 +1253,7 @@ NOTHROW(KCALL Ne2k_Fini)(struct chrdev *__restrict self) {
 	me = (Ne2kDevice *)self;
 	hisr_unregister(&Ne2k_InterruptHandler, me);
 	unregister_async_worker(&Ne2k_AsyncWorkerCallbacks, self);
-	nic_device_fini(me);
+	nicdev_v_fini(me);
 }
 
 
@@ -1313,7 +1313,7 @@ Ne2k_ProbePciDevice(struct pci_device *__restrict dev) THROWS(...) {
 	/* Construct the device. */
 	self = CHRDEV_ALLOC(Ne2kDevice);
 	FINALLY_DECREF_UNLIKELY(self);
-	nic_device_cinit(self, &Ne2k_NICDeviceOps);
+	nicdev_cinit(self, &Ne2k_NICDeviceOps);
 	sig_cinit(&self->nk_stidle);
 	sig_cinit(&self->nk_stpkld);
 	sig_cinit(&self->nk_uioint);
@@ -1368,7 +1368,7 @@ Ne2k_ProbePciDevice(struct pci_device *__restrict dev) THROWS(...) {
 
 	/* XXX: Collect a list of devices, then use some kind of config
 	 *      to determine which one should  be used as the  default! */
-	nic_device_setdefault(self);
+	nicdev_setdefault(self);
 
 #if 1 /* XXX: Remove me (only here for testing) */
 	{

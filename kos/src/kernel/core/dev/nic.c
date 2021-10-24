@@ -54,7 +54,7 @@ DECL_BEGIN
  * Reserve sufficient space for headers and footers of up to the specified
  * sizes to be included alongside the payload. */
 PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct nic_packet *KCALL
-nic_device_newpacket(struct nic_device const *__restrict self,
+nicdev_newpacket(struct nicdev const *__restrict self,
                      USER CHECKED void const *payload, size_t payload_size,
                      size_t max_head_size, size_t max_tail_size)
 		THROWS(E_BADALLOC) {
@@ -72,7 +72,7 @@ nic_device_newpacket(struct nic_device const *__restrict self,
 }
 
 PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) REF struct nic_packet *KCALL
-nic_device_newpacketv(struct nic_device const *__restrict self,
+nicdev_newpacketv(struct nicdev const *__restrict self,
                       struct iov_buffer const *__restrict payload,
                       size_t max_head_size, size_t max_tail_size)
 		THROWS(E_BADALLOC) {
@@ -100,7 +100,7 @@ nic_device_newpacketv(struct nic_device const *__restrict self,
 }
 
 PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct nic_packet *KCALL
-nic_device_newpacketh(struct nic_device const *__restrict self,
+nicdev_newpacketh(struct nicdev const *__restrict self,
                       size_t max_head_size, size_t max_tail_size)
 		THROWS(E_BADALLOC) {
 	REF struct nic_packet *result;
@@ -115,7 +115,7 @@ nic_device_newpacketh(struct nic_device const *__restrict self,
 }
 
 PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct nic_packet *KCALL
-nic_device_newpacketk_impl(struct nic_device const *__restrict self,
+nicdev_newpacketk_impl(struct nicdev const *__restrict self,
                            size_t buffer_size)
 		THROWS(E_BADALLOC) {
 	REF struct nic_packet *result;
@@ -137,18 +137,27 @@ NOTHROW(KCALL nic_packet_destroy)(struct nic_packet *__restrict self) {
 
 
 
+#ifdef CONFIG_USE_NEW_FS
 
+PUBLIC NOBLOCK NONNULL((1)) void
+NOTHROW(KCALL nicdev_v_destroy)(struct mfile *__restrict self) {
+	struct nicdev *me = mfile_asnic(self);
+	network_fini(&me->nd_net);
+	chrdev_v_destroy(self);
+}
+
+#else /* CONFIG_USE_NEW_FS */
 /* Initialize a given NIC device. */
 PUBLIC NOBLOCK NONNULL((1, 2)) void
-NOTHROW(KCALL nic_device_cinit)(struct nic_device *__restrict self,
-                                struct nic_device_ops const *__restrict ops) {
+NOTHROW(KCALL nicdev_cinit)(struct nicdev *__restrict self,
+                                struct nicdev_ops const *__restrict ops) {
 	assert(ops);
 	assert(ops->nd_send);
 	assert(ops->nd_setflags);
 	network_cinit(&self->nd_net);
-	memcpy(&self->nd_ops, ops, sizeof(struct nic_device_ops));
-	self->cd_type.ct_write = &nic_device_write;
-	self->cd_type.ct_fini  = &nic_device_fini;
+	memcpy(&self->nd_ops, ops, sizeof(struct nicdev_ops));
+	self->cd_type.ct_write = &nicdev_v_write;
+	self->cd_type.ct_fini  = &nicdev_v_fini;
 	/* Default-configure the nic's IP address to broadcast, so
 	 * we can already send/receive IP packets before acquiring
 	 * a proper IP address from DHCP or some other source. */
@@ -158,37 +167,40 @@ NOTHROW(KCALL nic_device_cinit)(struct nic_device *__restrict self,
 /* Default finalizer for NIC devices.
  * NOTE: Must be called by drivers when `cd_type.ct_fini' gets overwritten. */
 PUBLIC NOBLOCK NONNULL((1)) void
-NOTHROW(KCALL nic_device_fini)(struct chrdev *__restrict self) {
-	struct nic_device *me;
-	me = (struct nic_device *)self,
+NOTHROW(KCALL nicdev_v_fini)(struct chrdev *__restrict self) {
+	struct nicdev *me;
+	me = (struct nicdev *)self,
 	network_fini(&me->nd_net);
 }
+#endif /* !CONFIG_USE_NEW_FS */
 
 
 
-/* Same as `nic_device_send()', however handle _all_ exceptions as AIO-failures
+/* Same as `nicdev_send()', however handle _all_ exceptions as AIO-failures
+ *
  * WARNING: This function may still clobber exception pointers! */
 PUBLIC NONNULL((1, 2, 3)) void
-NOTHROW(KCALL nic_device_send_nx)(struct nic_device *__restrict self,
+NOTHROW(KCALL nicdev_send_nx)(struct nicdev *__restrict self,
                                   struct nic_packet *__restrict packet,
                                   /*out*/ struct aio_handle *__restrict aio) {
 	TRY {
-		nic_device_send(self, packet, aio);
+		nicdev_send(self, packet, aio);
 	} EXCEPT {
 		aio_handle_init_noop(aio, AIO_COMPLETION_FAILURE);
 	}
 }
 
 /* Send the given packet in the background (s.a. `aio_handle_async_alloc()')
+ *
  * NOTE: Transmit errors get logged, but are silently discarded. */
 PUBLIC NONNULL((1, 2)) void KCALL
-nic_device_send_background(struct nic_device *__restrict self,
+nicdev_send_background(struct nicdev *__restrict self,
                            struct nic_packet *__restrict packet) {
 	struct aio_handle *aio;
 	aio = aio_handle_async_alloc();
 	TRY {
 		/* NOTE: `aio' is inherited on success. */
-		nic_device_send(self, packet, aio);
+		nicdev_send(self, packet, aio);
 	} EXCEPT {
 		aio_handle_async_free(aio);
 		RETHROW();
@@ -197,22 +209,34 @@ nic_device_send_background(struct nic_device *__restrict self,
 
 
 /* Default write-operator for NIC devices. */
+#ifdef CONFIG_USE_NEW_FS
 PUBLIC NONNULL((1)) size_t KCALL
-nic_device_write(struct chrdev *__restrict self,
-                 USER CHECKED void const *src,
-                 size_t num_bytes, iomode_t UNUSED(mode))
-		THROWS(...) {
+nicdev_v_write(struct mfile *__restrict self,
+               USER CHECKED void const *src,
+               size_t num_bytes, iomode_t UNUSED(mode))
+		THROWS(...)
+#else /* CONFIG_USE_NEW_FS */
+PUBLIC NONNULL((1)) size_t KCALL
+nicdev_v_write(struct chrdev *__restrict self,
+               USER CHECKED void const *src,
+               size_t num_bytes, iomode_t UNUSED(mode))
+		THROWS(...)
+#endif /* !CONFIG_USE_NEW_FS */
+{
 	REF struct nic_packet *packet;
-	struct nic_device *me;
+#ifdef CONFIG_USE_NEW_FS
+	struct nicdev *me = mfile_asnic(self);
+#else /* CONFIG_USE_NEW_FS */
+	struct nicdev *me = (struct nicdev *)self;
+#endif /* !CONFIG_USE_NEW_FS */
 	struct aio_handle_generic aio;
-	me = (struct nic_device *)self;
 	aio_handle_generic_init(&aio);
 
 	/* Send a simple packet. */
-	packet = nic_device_newpacket(me, src, num_bytes, 0, 0);
+	packet = nicdev_newpacket(me, src, num_bytes, 0, 0);
 	{
 		FINALLY_DECREF_UNLIKELY(packet);
-		nic_device_send(me, packet, &aio);
+		nicdev_send(me, packet, &aio);
 	}
 
 	/* Wait for the send to finish. */
@@ -229,7 +253,7 @@ nic_device_write(struct chrdev *__restrict self,
 
 
 
-/* Allocate a buffer for a routable NIC packet for use with `nic_device_routepacket()'
+/* Allocate a buffer for a routable NIC packet for use with `nicdev_routepacket()'
  * @param: max_packet_size: The max packet size that the returned buffer must be able to hold.
  *                          The  guaranty  here is  that: `return->rp_size >= max_packet_size'
  *                          NOTE: Must be at least `ETH_ZLEN' */
@@ -266,7 +290,7 @@ NOTHROW(KCALL nic_rpacket_free)(struct nic_rpacket *__restrict self) {
  * @param: real_packet_size: The actual used packet size (`<= packet->rp_size')
  *                     NOTE: The caller must ensure that this is at least `ETH_ZLEN' */
 PUBLIC NOBLOCK NONNULL((1, 2)) void KCALL
-nic_device_routepacket(struct nic_device *__restrict self,
+nicdev_routepacket(struct nicdev *__restrict self,
                        /*inherit(always)*/ struct nic_rpacket *__restrict packet,
                        size_t real_packet_size) {
 	assert(real_packet_size <= packet->rp_size);
@@ -284,20 +308,20 @@ nic_device_routepacket(struct nic_device *__restrict self,
 
 #ifndef __nic_device_axref_defined
 #define __nic_device_axref_defined
-AXREF(nic_device_axref, nic_device);
+AXREF(nic_device_axref, nicdev);
 #endif /* !__nic_device_axref_defined */
 
 /* [0..1] The default NIC device. */
 PRIVATE struct nic_device_axref default_nic_device = AXREF_INIT(NULL);
 
 /* Get/set the the default NIC device. */
-PUBLIC WUNUSED REF struct nic_device *
-NOTHROW(KCALL nic_device_getdefault)(void) {
+PUBLIC WUNUSED REF struct nicdev *
+NOTHROW(KCALL nicdev_getdefault)(void) {
 	return axref_get(&default_nic_device);
 }
 
 PUBLIC NONNULL((1)) void
-NOTHROW(KCALL nic_device_setdefault)(struct nic_device *__restrict dev) {
+NOTHROW(KCALL nicdev_setdefault)(struct nicdev *__restrict dev) {
 	axref_set(&default_nic_device, dev);
 }
 
