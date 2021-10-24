@@ -33,6 +33,7 @@
 
 #include <kos/except.h>
 #include <kos/except/reason/inval.h>
+#include <kos/kernel/handle.h>
 
 DECL_BEGIN
 

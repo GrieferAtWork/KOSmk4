@@ -69,17 +69,19 @@ struct chrdev
  *  - self->_chrdev_dev_ dv_byname_node
  * @param: struct chrdev     *self: Character device to initialize.
  * @param: struct chrdev_ops *ops:  Character device operators. */
-#define _chrdev_init(self, ops)                                                                                \
-	(_device_init(_chrdev_asdev(self), &(ops)->cdo_dev),                                                       \
-	 (self)->_chrdev_dev_ _device_devnode_ _fdevnode_node_ _fnode_file_ mf_parts      = MFILE_PARTS_ANONYMOUS, \
-	 (self)->_chrdev_dev_ _device_devnode_ _fdevnode_node_ _fnode_file_ mf_blockshift = PAGESHIFT,             \
-	 (self)->_chrdev_dev_ _device_devnode_ _fdevnode_node_ _fnode_file_ mf_part_amask = PAGEMASK,              \
+#define _chrdev_init(self, ops)                                                                                       \
+	(_device_init(_chrdev_asdev(self), &(ops)->cdo_dev),                                                              \
+	 (self)->_chrdev_dev_ _device_devnode_ _fdevnode_node_ _fnode_file_ mf_parts             = MFILE_PARTS_ANONYMOUS, \
+	 (self)->_chrdev_dev_ _device_devnode_ _fdevnode_node_ _fnode_file_ mf_changed.slh_first = MFILE_PARTS_ANONYMOUS, \
+	 (self)->_chrdev_dev_ _device_devnode_ _fdevnode_node_ _fnode_file_ mf_blockshift        = PAGESHIFT,             \
+	 (self)->_chrdev_dev_ _device_devnode_ _fdevnode_node_ _fnode_file_ mf_part_amask        = PAGEMASK,              \
 	 atomic64_init(&(self)->_chrdev_dev_ _device_devnode_ _fdevnode_node_ _fnode_file_ mf_filesize, 0))
-#define _chrdev_cinit(self, ops)                                                                               \
-	(_device_cinit(_chrdev_asdev(self), &(ops)->cdo_dev),                                                      \
-	 (self)->_chrdev_dev_ _device_devnode_ _fdevnode_node_ _fnode_file_ mf_parts      = MFILE_PARTS_ANONYMOUS, \
-	 (self)->_chrdev_dev_ _device_devnode_ _fdevnode_node_ _fnode_file_ mf_blockshift = PAGESHIFT,             \
-	 (self)->_chrdev_dev_ _device_devnode_ _fdevnode_node_ _fnode_file_ mf_part_amask = PAGEMASK,              \
+#define _chrdev_cinit(self, ops)                                                                                      \
+	(_device_cinit(_chrdev_asdev(self), &(ops)->cdo_dev),                                                             \
+	 (self)->_chrdev_dev_ _device_devnode_ _fdevnode_node_ _fnode_file_ mf_parts             = MFILE_PARTS_ANONYMOUS, \
+	 (self)->_chrdev_dev_ _device_devnode_ _fdevnode_node_ _fnode_file_ mf_changed.slh_first = MFILE_PARTS_ANONYMOUS, \
+	 (self)->_chrdev_dev_ _device_devnode_ _fdevnode_node_ _fnode_file_ mf_blockshift        = PAGESHIFT,             \
+	 (self)->_chrdev_dev_ _device_devnode_ _fdevnode_node_ _fnode_file_ mf_part_amask        = PAGEMASK,              \
 	 atomic64_cinit(&(self)->_chrdev_dev_ _device_devnode_ _fdevnode_node_ _fnode_file_ mf_filesize, 0))
 
 /* Finalize a partially initialized `struct chrdev' (as initialized by `_chrdev_init()') */

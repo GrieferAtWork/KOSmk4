@@ -39,6 +39,7 @@
 #include <kernel/handle.h>
 #include <kernel/malloc.h>
 #include <kernel/mman.h>
+#include <kernel/mman/cache.h>
 #include <kernel/mman/event.h>
 #include <kernel/mman/flags.h>
 #include <kernel/mman/kram.h>

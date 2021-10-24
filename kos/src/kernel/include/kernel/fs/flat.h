@@ -223,6 +223,7 @@ struct fflatdirnode_xops {
 	 * This function must allocate+initialize the returned file:
 	 *  - return->_fnode_file_ mf_ops        = ...;                # As appropriate
 	 *  - return->_fnode_file_ mf_parts      = NULL;               # Or `MFILE_PARTS_ANONYMOUS' if that fits better. (Note that for `fflatdirnode's, this _MUST_ be `NULL')
+	 *  - return->_fnode_file_ mf_changed    = SLIST_INIT;         # Or `MFILE_PARTS_ANONYMOUS' if that fits better. (Note that for `fflatdirnode's, this _MUST_ be `NULL')
 	 *  - return->_fnode_file_ mf_blockshift = dir->mf_blockshift; # Probably...
 	 *  - return->_fnode_file_ mf_flags      = ... & (MFILE_F_READONLY | MFILE_F_NOUSRMMAP |    # directories require `MFILE_F_FIXEDFILESIZE', and should
 	 *                                                MFILE_F_NOUSRIO | MFILE_F_FIXEDFILESIZE | # probably also have `MFILE_F_NOUSRMMAP | MFILE_F_NOUSRIO'
@@ -398,7 +399,7 @@ fflatdirnode_v_rename(struct fdirnode *__restrict self,
 
 
 struct fflatdir_bucket {
-	struct fflatdirent *ffdb_ent; /* [0..1] Directory entry, internal-stub for deleted, or NULL for sentinel */
+	struct fflatdirent *ffdb_ent; /* [0..1] Directory entry, `fflatdirnode_deleted_dirent' for deleted, or NULL for sentinel */
 };
 
 
@@ -432,6 +433,9 @@ struct fflatdirdata {
 /* Empty hash-vector */
 DATDEF struct fflatdir_bucket const _fflatdir_empty_buckets[1] ASMNAME("fflatdir_empty_buckets");
 #define fflatdir_empty_buckets ((struct fflatdir_bucket *)_fflatdir_empty_buckets)
+
+/* Deleted directory entry marker for `struct fflatdir_bucket::ffdb_ent' */
+DATDEF struct fflatdirent fflatdirnode_deleted_dirent;
 
 #define fflatdirdata_init(self)                   \
 	(shared_rwlock_init(&(self)->fdd_lock),       \
@@ -608,6 +612,7 @@ struct fflatsuper_ops {
 	 * This function must allocate+initialize the returned node:
 	 *  - return->_fnode_file_ mf_ops        = ...;                # As appropriate
 	 *  - return->_fnode_file_ mf_parts      = NULL;               # Or `MFILE_PARTS_ANONYMOUS' if that fits better. (Note that for `fflatdirnode's, this _MUST_ be `NULL')
+	 *  - return->_fnode_file_ mf_changed    = SLIST_INIT;         # Or `MFILE_PARTS_ANONYMOUS' if that fits better. (Note that for `fflatdirnode's, this _MUST_ be `NULL')
 	 *  - return->_fnode_file_ mf_blockshift = dir->mf_blockshift; # Probably...
 	 *  - return->_fnode_file_ mf_flags      = ... & (MFILE_F_READONLY | MFILE_F_NOUSRMMAP |    # directories require `MFILE_F_FIXEDFILESIZE', and should
 	 *                                                MFILE_F_NOUSRIO | MFILE_F_FIXEDFILESIZE | # probably also have `MFILE_F_NOUSRMMAP | MFILE_F_NOUSRIO'
@@ -676,6 +681,8 @@ struct fflatsuper {
 	                        struct fflatsuper_ops, ffso_super.so_fdir.dno_node.no_file)
 
 /* Default operators for `struct fflatsuper'-derived superblocks. */
+FUNDEF NOBLOCK NONNULL((1)) void /* `kfree(fnode_asflatsuper(self));' */
+NOTHROW(KCALL fflatsuper_v_free)(struct fnode *__restrict self);
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL fflatsuper_v_destroy)(struct mfile *__restrict self);
 

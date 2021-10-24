@@ -127,21 +127,24 @@ struct chrdev;
  *      - always: MFILE_F_NOUSRIO;
  *      - always: MFILE_F_FIXEDFILESIZE;
  *   - flnknode:
- *      - always: mf_parts == MFILE_PARTS_ANONYMOUS; // iow: mfile_isanon(self);
+ *      - always: mf_parts             == MFILE_PARTS_ANONYMOUS; // iow: mfile_isanon(self);
+ *      - always: mf_changed.slh_first == MFILE_PARTS_ANONYMOUS; // iow: mfile_isanon(self);
  *      - always: MFILE_F_READONLY;
  *      - always: MFILE_F_FIXEDFILESIZE;
  *      - always: MFILE_F_NOUSRMMAP;
  *      - always: MFILE_F_NOUSRIO;
  *   - ffifonode:
  *      - always: mf_filesize == 0;
- *      - always: mf_parts == MFILE_PARTS_ANONYMOUS; // iow: mfile_isanon(self);
+ *      - always: mf_parts             == MFILE_PARTS_ANONYMOUS; // iow: mfile_isanon(self);
+ *      - always: mf_changed.slh_first == MFILE_PARTS_ANONYMOUS; // iow: mfile_isanon(self);
  *      - always: MFILE_F_READONLY;
  *      - always: MFILE_F_FIXEDFILESIZE;
  *      - always: MFILE_F_NOUSRMMAP;
  *      - always: MFILE_F_NOUSRIO;
  *   - fsocknode:
  *      - always: mf_filesize == 0;
- *      - always: mf_parts == MFILE_PARTS_ANONYMOUS; // iow: mfile_isanon(self);
+ *      - always: mf_parts             == MFILE_PARTS_ANONYMOUS; // iow: mfile_isanon(self);
+ *      - always: mf_changed.slh_first == MFILE_PARTS_ANONYMOUS; // iow: mfile_isanon(self);
  *      - always: MFILE_F_READONLY;
  *      - always: MFILE_F_FIXEDFILESIZE;
  *      - always: MFILE_F_NOUSRMMAP;
@@ -150,7 +153,8 @@ struct chrdev;
  *      - always: MFILE_F_FIXEDFILESIZE;
  *   - chrdev:
  *      - usually: mf_filesize == 0;
- *      - usually: mf_parts == MFILE_PARTS_ANONYMOUS; // iow: mfile_isanon(self);
+ *      - usually: mf_parts             == MFILE_PARTS_ANONYMOUS; // iow: mfile_isanon(self);
+ *      - usually: mf_changed.slh_first == MFILE_PARTS_ANONYMOUS; // iow: mfile_isanon(self);
  *      - usually: MFILE_F_NOUSRMMAP;
  *      - usually: MFILE_F_FIXEDFILESIZE;
  *   - fsuper:
@@ -160,18 +164,6 @@ struct chrdev;
  *      - always: MFILE_F_NOUSRIO;
  *      - always: MFILE_F_FIXEDFILESIZE;
  *      - always: fn_super == self;
- *
- *
- * Data model:
- *
- *               fnode  <------(REF_IF([*].mf_flags & MFILE_FN_GLOBAL_REF))------ GLOBAL:fallnodes_list
- *                | ^
- *                | |
- *             REF| |REF_IF([*].mf_flags & MFILE_F_PERSISTENT)
- *                | |
- *                v |
- *               fsuper <------(REF_IF([*].mf_flags & MFILE_FN_GLOBAL_REF))------ GLOBAL:fallsuper_list
- *
  */
 
 
@@ -180,6 +172,12 @@ struct fnode;
 
 struct fnode_ops {
 	struct mfile_ops no_file; /* MFile operators */
+
+	/* [0..1] Optional operator for freeing `self'
+	 * - Called at the end of `fnode_v_destroy()'
+	 * - When not defined, the system instead does `kfree(self)' */
+	NOBLOCK NONNULL((1)) void
+	/*NOTHROW*/ (KCALL *no_free)(struct fnode *__restrict self);
 
 	/* [1..1] Write modified file attributes to disk (must be implemented as no-op for RAM filesystems)
 	 * The following attributes must be saved by this function (note that in order to safely read these
@@ -384,6 +382,7 @@ NOTHROW(FCALL fnode_init_addtosuper_and_all)(struct fnode *__restrict self);
 
 /* Initialize common+basic fields. The caller must still initialize:
  *  - self->_fnode_file_ mf_parts
+ *  - self->_fnode_file_ mf_changed
  *  - self->_fnode_file_ mf_flags
  *  - self->_fnode_file_ mf_filesize
  *  - self->_fnode_file_ mf_atime
@@ -519,6 +518,8 @@ NOTHROW(FCALL fnode_delete)(struct fnode *__restrict self);
 /* Internal implementation of `fnode_delete()' (don't call this one
  * unless you know that you're doing; otherwise, you may cause race
  * conditions that can result in data corruption) */
+FUNDEF NOBLOCK WUNUSED NONNULL((1)) __BOOL
+NOTHROW(FCALL fnode_delete_strt)(struct fnode *__restrict self);
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL fnode_delete_impl)(/*inherit(always)*/ REF struct fnode *__restrict self);
 

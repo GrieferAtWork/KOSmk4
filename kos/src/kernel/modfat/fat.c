@@ -557,7 +557,7 @@ again:
 			max_io = super->ft_clustersize - cluster_offset;
 			/* Optimization: When reading  large amounts  of data,  check if  the
 			 *               underlying disk chunks were allocated consecutively.
-			 *               If they were, then we  can simply do one  continuous
+			 *               If they are,  then we can  simply do one  continuous
 			 *               read, processing more  than one cluster  at a  time. */
 			while (max_io < num_bytes) {
 				FatClusterIndex next_cluster;
@@ -628,10 +628,10 @@ again:
 			diskpos = FAT_CLUSTERADDR(super, cluster);
 			diskpos += cluster_offset;
 			max_io = super->ft_clustersize - cluster_offset;
-			/* Optimization: When reading  large amounts  of data,  check if  the
+			/* Optimization: When writing  large amounts  of data,  check if  the
 			 *               underlying disk chunks were allocated consecutively.
-			 *               If they were, then we  can simply do one  continuous
-			 *               read, processing more  than one cluster  at a  time. */
+			 *               If they are,  then we can  simply do one  continuous
+			 *               write, processing more than  one cluster at a  time. */
 			while (max_io < num_bytes) {
 				FatClusterIndex next_cluster;
 				next_cluster = Fat_GetFileCluster(me, cluster_number + 1, FAT_GETCLUSTER_MODE_FCREATE);
@@ -647,6 +647,8 @@ again:
 			if (max_io > num_bytes)
 				max_io = num_bytes;
 			if likely(dev->mf_blockshift <= super->ft_sectorshift) {
+				if unlikely(dev->mf_flags & MFILE_F_READONLY)
+					THROW(E_FSERROR_READONLY);
 				/* Can use unbuffered I/O */
 				blkdev_wrsectors_async(dev, diskpos, buf, max_io, aio);
 			} else {
@@ -754,6 +756,9 @@ again:
 				ent->fad_dos.f_clusterhi = HTOLE16((u16)(first_cluster >> 16));
 			}
 			ent->fad_dos.f_size = HTOLE32((u32)atomic64_read(&self->mf_filesize));
+			if (fnode_isdir(self)) /* Directories should have size=0 */
+				ent->fad_dos.f_size = HTOLE32(0);
+
 			/* Implement the read-only attribute. */
 			if (!(fmode & 0222))
 				ent->fad_dos.f_attr |= FAT_ATTR_READONLY;
@@ -850,58 +855,16 @@ NOTHROW(FCALL strlwrz)(char *__restrict str, size_t len) {
 		str[i] = tolower(str[i]);
 }
 
-PRIVATE u8 const dos8dot3_valid[256 / 8] = {
-/*[[[deemon
-import * from deemon;
-function is_valid(ch) {
-	if (ch <= 31 || ch == 127)
-		return false;
-	return string.chr(ch) !in "\"*+,/:;<=>?\\[]|.";
-}
-local valid_chars = [false] * 256;
-for (local x: [:256])
-	valid_chars[x] = is_valid(x);
-local valid_bits = [0] * (256 / 8);
-for (local x: [:256/8]) {
-	local mask = 0;
-	for (local y: [:8]) {
-		if (valid_chars[x*8+y])
-			mask = mask | (1 << y);
-	}
-	valid_bits[x] = mask;
-}
-for (local x: [:256/8]) {
-	if ((x % 8) == 0)
-		print("\t"),;
-	print("0x%.2I8x," % valid_bits[x]),;
-	if ((x % 8) == 7)
-		print;
-	else {
-		print(" "),;
-	}
-}
-]]]*/
-	0x00, 0x00, 0x00, 0x00, 0xfb, 0x23, 0xff, 0x03,
-	0xff, 0xff, 0xff, 0xc7, 0xff, 0xff, 0xff, 0x6f,
-	0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-	0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-/*[[[end]]]*/
-};
-#define dos8dot3_chok(ch) \
-	(dos8dot3_valid[((u8)(ch)) / 8] & (1 << (((u8)(ch)) % 8)))
-
-
-/* Check if the given string is a valid DOS 8.3 filename. */
-PRIVATE NONNULL((1)) bool
-NOTHROW(FCALL dos8dot3_dirent_strok)(char const *__restrict str, size_t len) {
+PRIVATE NONNULL((1, 2)) /*utf-8*/ char *
+NOTHROW(FCALL decode_latin1)(/*utf-8*/ char *__restrict dest,
+                             /*latin-1*/ char const *__restrict text,
+                             size_t len) {
 	size_t i;
-	for (i = 0; i < len; ++i) {
-		char ch = str[i];
-		if (!dos8dot3_chok(ch) && ch != '.')
-			return false;
-	}
-	return true;
+	for (i = 0; i < len; ++i)
+		dest = unicode_writeutf8(dest, (unsigned char)text[i]);
+	return dest;
 }
+
 
 
 PRIVATE WUNUSED struct fflatdirent *KCALL
@@ -1032,7 +995,7 @@ readnext:
 		pos -= sizeof(struct fat_dirent);
 	} else {
 		uint8_t usedname_len;
-		char usedname[13], *dstptr;
+		char usedname[11 * 2 + 2], *dstptr;
 		char fixedname[11], *srcptr;
 dos_8dot3:
 		memcpy(fixedname, ent.f_nameext, 11);
@@ -1051,32 +1014,20 @@ dos_8dot3:
 		srcptr = fixedname;
 		while (srcptr < fixedname + 8 && isspace(*srcptr))
 			++srcptr;
-		dstptr = (char *)mempcpy(dstptr, srcptr,
-		                         (size_t)((fixedname + 8) - srcptr),
-		                         sizeof(char));
+		dstptr = decode_latin1(dstptr, srcptr, (size_t)((fixedname + 8) - srcptr));
 		while (dstptr > usedname && isspace(dstptr[-1]))
 			--dstptr;
 		*dstptr++ = '.';
 		srcptr = fixedname + 8;
 		while (srcptr < fixedname + 11 && isspace(*srcptr))
 			++srcptr;
-		dstptr = (char *)mempcpy(dstptr, srcptr,
-		                         (size_t)((fixedname + 11) - srcptr),
-		                         sizeof(char));
+		dstptr = decode_latin1(dstptr, srcptr, (size_t)((fixedname + 11) - srcptr));
 		while (dstptr > usedname && isspace(dstptr[-1]))
 			--dstptr;
 		if (dstptr > usedname && dstptr[-1] == '.')
 			--dstptr;
 		*dstptr = 0;
 		usedname_len = (uint8_t)(dstptr - usedname);
-
-		/* Make sure there aren't any illegal characters */
-		if unlikely(!dos8dot3_dirent_strok(usedname, usedname_len)) {
-			printk(KERN_ERR "[fat] Illegal character in filename %$q (skipping entry)\n",
-			       (size_t)usedname_len, usedname);
-			pos += sizeof(struct fat_dirent);
-			goto readnext;
-		}
 
 		/* Check for entries that we're _supposed_ to skip over. */
 		if (usedname_len <= 2) {
@@ -1165,14 +1116,386 @@ dos_8dot3:
 	return &result->fad_ent;
 }
 
+
+PRIVATE u8 const Fat_AcceptedCharacters[128 / 4] = {
+/*[[[deemon
+import * from deemon;
+function isValid83(ord) {
+	if (ord >= "A".ord() && ord <= "Z".ord())
+		return true;
+	return ord in "!#$%&'()-@^_`{}~".ordinals;
+}
+function isValidLFN(ord) {
+	if (isValid83(ord))
+		return true;
+	if (ord >= "a".ord() && ord <= "z".ord())
+		return true;
+	if (ord in "+,.;=[]".ordinals)
+		return true;
+	return false;
+}
+
+local BITS_PER_CHAR = 2;
+
+function makeByte(i) {
+	local result = 0;
+	for (local x: [:(8 / BITS_PER_CHAR)]) {
+		local ord = (i * (8 / BITS_PER_CHAR) + x);
+		local mask = 0;
+		if (isValid83(ord))
+			mask |= 1;
+		if (isValidLFN(ord))
+			mask |= 2;
+		mask <<= x * BITS_PER_CHAR;
+		result |= mask;
+	}
+	return result;
+}
+
+for (local x: [:128/(8 / BITS_PER_CHAR)]) {
+	if ((x % 8) == 0)
+		print("\t"),;
+	print("0x%.2I8x," % makeByte(x)),;
+	if ((x % 8) == 7)
+		print;
+	else {
+		print(" "),;
+	}
+}
+]]]*/
+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+	0xcc, 0xff, 0x8f, 0x2e, 0x00, 0x00, 0x80, 0x08,
+	0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xbf, 0xf8,
+	0xab, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xea, 0x3c,
+/*[[[end]]]*/
+};
+#define Fat_IsAccepted83(ord) \
+	((char32_t)(ord) <= 127 && ((Fat_AcceptedCharacters[(ord) / 4] >> (((ord) % 4) * 2)) & 1))
+#define Fat_IsAcceptedLFN(ord) \
+	((char32_t)(ord) > 127 || ((Fat_AcceptedCharacters[(ord) / 4] >> (((ord) % 4) * 2)) & 2))
+
+
+PRIVATE NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) bool
+NOTHROW(FCALL FatDir_Contains83Filename)(FatDirNode const *__restrict self,
+                                         char const filename[8 + 3]) {
+	size_t i;
+	for (i = 0; i <= self->fdn_data.fdd_filesmask; ++i) {
+		struct fflatdirent *ent;
+		ent = self->fdn_data.fdd_fileslist[i].ffdb_ent;
+		if (ent == NULL || ent == &fflatdirnode_deleted_dirent)
+			continue; /* Unused slot */
+		assert(!fflatdirent_wasdeleted(ent));
+		if (memcmp(fflatdirent_asfat(ent)->fad_dos.f_nameext,
+		           filename, (8 + 3) * sizeof(char)) == 0)
+			return true;
+	}
+	return false;
+}
+
+LOCAL ATTR_PURE WUNUSED NONNULL((1)) u8
+NOTHROW(FCALL lfn_checksum)(char const dos83_name[8 + 3]) {
+	u8 result = 0;
+	unsigned int i;
+	for (i = 0; i < 8 + 3; ++i)
+		result = ((result & 1) << 7) + (result >> 1) + dos83_name[i];
+	return result;
+}
+
+/* The max # of `struct fat_dirent' possibly used for a single file entry. */
+#define FAT_DIRENT_PER_FILE_MAXCOUNT (LFN_SEQNUM_MAXCOUNT + 1)
+
+/* Generate FAT file entries and return the # generated. */
+PRIVATE NOBLOCK WUNUSED NONNULL((1, 2, 3, 4)) size_t KCALL
+Fat_GenerateFileEntries(struct fat_dirent files[FAT_DIRENT_PER_FILE_MAXCOUNT],
+                        FatDirNode *__restrict dir,
+                        struct fatdirent *__restrict ent,
+                        struct fnode *__restrict file)
+		THROWS(E_FSERROR_ILLEGAL_PATH, E_FSERROR_FILE_ALREADY_EXISTS) {
+	FatSuperblock *super = fsuper_asfat(file->fn_super);
+	FatClusterIndex first_cluster;
+	mode_t fmode;
+
+	/* Construct the DOS 8.3 directory entry. */
+	memset(ent->fad_dos.f_nameext, ' ', sizeof(ent->fad_dos.f_nameext));
+	ent->fad_dos.f_ntflags = NTFLAG_NONE;
+	ent->fad_dos.f_attr    = FAT_ATTR_ARCHIVE;
+	if (fnode_isdir(file))
+		ent->fad_dos.f_attr |= FAT_ATTR_DIRECTORY;
+	if (ent->fad_ent.fde_ent.fd_name[0] == '.')
+		ent->fad_dos.f_attr |= FAT_ATTR_HIDDEN;
+	mfile_tslock_acquire(file);
+	if (super->ft_features & FAT_FEATURE_UGID) {
+		ent->fad_dos.f_uid = (u8)file->fn_uid;
+		ent->fad_dos.f_gid = (u8)file->fn_gid;
+	} else {
+		FatFileATime_Encode(&ent->fad_dos.f_atime, &file->mf_atime);
+	}
+	FatFileMTime_Encode(&ent->fad_dos.f_mtime, &file->mf_mtime);
+	FatFileCTime_Encode(&ent->fad_dos.f_ctime, &file->mf_ctime);
+	fmode = file->fn_mode;
+	mfile_tslock_release(file);
+
+	if (!(fmode & 0222))
+		ent->fad_dos.f_attr |= FAT_ATTR_READONLY;
+	first_cluster = file->fn_fsdata->fn_clusterv[0];
+	ent->fad_dos.f_clusterlo = HTOLE16(first_cluster & 0xffff);
+	if (super->ft_features & FAT_FEATURE_ARB) {
+		u16 arb = 0;
+		/* Use the ARB to implement unix file permissions. */
+		if (!(fmode & S_IXUSR))
+			arb |= FAT_ARB_NO_OX; /* Disable: Execute by owner */
+		if (!(fmode & S_IWUSR))
+			arb |= FAT_ARB_NO_OW; /* Disable: Write by owner */
+		if (!(fmode & S_IRUSR))
+			arb |= FAT_ARB_NO_OR; /* Disable: Read by owner */
+		if (!(fmode & S_IXGRP))
+			arb |= FAT_ARB_NO_GX; /* Disable: Execute by group */
+		if (!(fmode & S_IWGRP))
+			arb |= FAT_ARB_NO_GW; /* Disable: Write by group */
+		if (!(fmode & S_IRGRP))
+			arb |= FAT_ARB_NO_GR; /* Disable: Read by group */
+		if (!(fmode & S_IXOTH))
+			arb |= FAT_ARB_NO_WX; /* Disable: Execute by world */
+		if (!(fmode & S_IWOTH))
+			arb |= FAT_ARB_NO_WW; /* Disable: Write by world */
+		if (!(fmode & S_IROTH))
+			arb |= FAT_ARB_NO_WR; /* Disable: Read by world */
+		if (!(fmode & 0222))
+			arb &= ~(FAT_ARB_NO_OW | FAT_ARB_NO_GW | FAT_ARB_NO_WW);
+		ent->fad_dos.f_arb = HTOLE16(arb);
+	} else {
+		/* 32-bit clusters */
+		ent->fad_dos.f_clusterhi = HTOLE16((u16)(first_cluster >> 16));
+	}
+
+	/* Figure out if `ent' can be encoded as a DOS 8.3 filename. */
+	if unlikely(ent->fad_ent.fde_ent.fd_namelen == 0)
+		THROW(E_FSERROR_ILLEGAL_PATH);
+	{
+		char const *reader, *rdend;
+		char *writer;
+		unsigned int flags = 0;
+#define HAVE_LOWER_BASE 0x01
+#define HAVE_UPPER_BASE 0x02
+#define HAVE_LOWER_EXT  0x04
+#define HAVE_UPPER_EXT  0x08
+		reader = ent->fad_ent.fde_ent.fd_name;
+		rdend  = reader + ent->fad_ent.fde_ent.fd_namelen;
+		writer = ent->fad_dos.f_nameext;
+		for (;;) {
+			char32_t ch;
+			ch = unicode_readutf8_n(&reader, rdend);
+			if (!ch) {
+				if (reader >= rdend)
+					break;
+				THROW(E_FSERROR_ILLEGAL_PATH);
+			}
+			if (writer >= COMPILER_ENDOF(ent->fad_dos.f_nameext))
+				goto need_lfn; /* Filename is too long */
+			if (ch >= 'A' && ch <= 'Z') {
+				unsigned int shift = 0;
+				if (writer >= ent->fad_dos.f_ext)
+					shift = 2;
+				if (flags & (HAVE_LOWER_BASE << shift))
+					goto need_lfn; /* Mixed case */
+				flags |= (HAVE_UPPER_BASE << shift);
+			} else if (ch >= 'a' && ch <= 'z') {
+				unsigned int shift = 0;
+				if (writer >= ent->fad_dos.f_ext)
+					shift = 2;
+				if (flags & (HAVE_UPPER_BASE << shift))
+					goto need_lfn; /* Mixed case */
+				ch += ('A' - 'a'); /* Convert to uppercase */
+				flags |= (HAVE_LOWER_BASE << shift);
+			} else if (ch == '.') {
+				if (writer >= ent->fad_dos.f_ext)
+					goto need_lfn; /* Multiple dots */
+				/* NOTE: The space-padding was already done. */
+				writer = ent->fad_dos.f_ext;
+				continue;
+			} else {
+				if (!Fat_IsAccepted83(ch))
+					goto need_lfn; /* Not accepted by 8.3 */
+			}
+			*writer++ = (char)(unsigned char)ch;
+			if (writer == ent->fad_dos.f_ext) {
+				/* Next character _must_ be end-of-name or '.' */
+				ch = unicode_readutf8_n(&reader, rdend);
+				if (!ch) {
+					if (reader >= rdend)
+						break;
+					THROW(E_FSERROR_ILLEGAL_PATH);
+				}
+				if (ch != '.')
+					goto need_lfn; /* Base name is too long. */
+			}
+		}
+		/* Finalize the DOS directory entry. */
+		if (flags & HAVE_LOWER_BASE)
+			ent->fad_dos.f_ntflags |= NTFLAG_LOWBASE;
+		if (flags & HAVE_LOWER_EXT)
+			ent->fad_dos.f_ntflags |= NTFLAG_LOWEXT;
+		/* Fix 0xe5 --> 0x05 */
+		if ((unsigned char)ent->fad_dos.f_nameext[0] == 0xe5)
+			ent->fad_dos.f_nameext[0] = (char)MARKER_IS0XE5;
+	} /* Scope... */
+	memcpy(&files[0], &ent->fad_dos, sizeof(struct fat_dirent));
+	return 1;
+	{
+		uint32_t cookie;
+		size_t i, matchsize;
+		size_t retry_hex, retry_dig;
+		char const *reader, *rdend;
+		char *writer;
+need_lfn:
+		cookie = 0;
+		/* Generate the 8.3 filename used for the LFN entry. */
+		memset(ent->fad_dos.f_nameext, ' ', sizeof(ent->fad_dos.f_nameext));
+		ent->fad_dos.f_ntflags = NTFLAG_NONE;
+
+retry_lfn:
+		/* Must generate  a long  filename, also  taking
+		 * the  value  of  'retry'  into  consideration.
+		 * Now for the hard part: The filename itself... */
+		retry_hex = (cookie / 9);
+		retry_dig = (cookie % 9);
+
+		/* The first 2 short characters always match the  first
+		 * 2 characters of the original base (in uppercase). If
+		 * no hex-range retries are needed, the first 6 match. */
+		matchsize = retry_hex ? 2 : 6;
+		reader = ent->fad_ent.fde_ent.fd_name;
+		rdend  = reader + ent->fad_ent.fde_ent.fd_namelen;
+		writer = ent->fad_dos.f_nameext;
+		for (i = 0; i < matchsize; ++i) {
+			char32_t ch;
+			ch = unicode_readutf8_n(&reader, rdend);
+			if (ch == '.') {
+				reader = rdend;
+			} else if (ch >= 'a' && ch <= 'Z') {
+				ch += ('A' - 'a');
+			}
+			if (!Fat_IsAccepted83(ch))
+				ch = '~';
+			*writer++ = (char)(unsigned char)ch;
+		}
+		if (retry_hex) {
+			PRIVATE char const xch[16] = {
+				'0', '1', '2', '3', '4', '5', '6', '7',
+				'8', '9', 'A', 'B', 'C', 'D', 'E', 'F'
+			};
+			/* Following the matching characters are 4 hex-chars
+			 * whenever  more than 9  retry attempts have failed
+			 * >> This multiplies the amount of available names by 0xffff */
+			*writer++ = xch[(retry_hex & 0xf000) >> 12];
+			*writer++ = xch[(retry_hex & 0x0f00) >> 8];
+			*writer++ = xch[(retry_hex & 0x00f0) >> 4];
+			*writer++ = xch[(retry_hex & 0x000f)];
+		}
+		assert(writer == ent->fad_dos.f_nameext + 6);
+		/* Following the shared name and the hex part is always a tilde '~' */
+		*writer++ = '~';
+		/* The last character then, is the non-hex digit (1..9) */
+		*writer++ = '1' + retry_dig;
+		/* Fix 0xe5 --> 0x05 */
+		if ((unsigned char)ent->fad_dos.f_nameext[0] == 0xe5)
+			ent->fad_dos.f_nameext[0] = (char)MARKER_IS0XE5;
+		/* If the 8.3 filename already exists, then try to generate another one. */
+		if unlikely(FatDir_Contains83Filename(dir, ent->fad_dos.f_nameext)) {
+			if unlikely(cookie >= (0xffff * 9))
+				THROW(E_FSERROR_FILE_ALREADY_EXISTS);
+			++cookie;
+			goto retry_lfn;
+		}
+	} /* Scope... */
+	{
+		char16_t lfn_name[LFN_SEQNUM_MAXCOUNT * LFN_NAME + UNICODE_UTF16_CURLEN - 1], *writer;
+		char const *reader, *rdend;
+		size_t i, lfn_length, result;
+		uint8_t checksum;
+
+		/* Generate the LFN filename */
+		reader = ent->fad_ent.fde_ent.fd_name;
+		rdend  = reader + ent->fad_ent.fde_ent.fd_namelen;
+		writer = lfn_name;
+		for (;;) {
+			char32_t ch;
+			ch = unicode_readutf8_n(&reader, rdend);
+			if (ch == 0) {
+				if (reader >= rdend)
+					break;
+				THROW(E_FSERROR_ILLEGAL_PATH);
+			}
+			if unlikely(!Fat_IsAcceptedLFN(ch))
+				THROW(E_FSERROR_ILLEGAL_PATH); /* Character isn't even allowed in LFN */
+			if unlikely(writer >= (lfn_name + LFN_SEQNUM_MAXCOUNT * LFN_NAME) - 1)
+				THROW(E_FSERROR_ILLEGAL_PATH); /* Filename too long */
+			writer = unicode_writeutf16_chk(writer, ch);
+			if unlikely(!writer)
+				THROW(E_FSERROR_ILLEGAL_PATH); /* Character cannot be encoded */
+		}
+		if unlikely(writer >= (lfn_name + LFN_SEQNUM_MAXCOUNT * LFN_NAME) - 1)
+			THROW(E_FSERROR_ILLEGAL_PATH); /* Filename too long */
+
+		/* Append trailing NUL character. */
+		*writer++ = 0;
+
+		lfn_length = (size_t)(writer - lfn_name);
+		assert(lfn_length <= LFN_SEQNUM_MAXCOUNT * LFN_NAME);
+#if __BYTE_ORDER__ != __ORDER_LITTLE_ENDIAN__
+		for (i = 0; i < lfn_length; ++i)
+			lfn_name[i] = (char16_t)(u16)HTOLE16((u16)lfn_name[i]);
+#endif /* __BYTE_ORDER__ != __ORDER_LITTLE_ENDIAN__ */
+		result = CEILDIV(lfn_length, LFN_NAME);
+		assert((result + 1) <= FAT_DIRENT_PER_FILE_MAXCOUNT);
+
+		/* Fill unused characters of the last file with `0xFFFF' */
+		memsetw(&lfn_name[lfn_length], 0xffff,
+		        (result * LFN_NAME) - lfn_length);
+
+		/* Calculate the checksum for the 8.3 filename. */
+		checksum = lfn_checksum(ent->fad_dos.f_nameext);
+
+		/* Fill in the LFN file entries. */
+		for (i = 0; i < result; ++i) {
+			/* LFN sequence entries are written in reverse order (for whatever reason...) */
+			size_t seqnum = (result - 1) - i;
+			size_t offset = seqnum * LFN_NAME;
+			memcpyw(files[i].lfn_name_1, &lfn_name[offset + 0], LFN_NAME1);
+			memcpyw(files[i].lfn_name_2, &lfn_name[offset + LFN_NAME1], LFN_NAME2);
+			memcpyw(files[i].lfn_name_3, &lfn_name[offset + LFN_NAME1 + LFN_NAME2], LFN_NAME3);
+			files[i].lfn_seqnum = LFN_SEQNUM_MIN + (u8)seqnum;
+			files[i].lfn_attr   = FAT_ATTR_LONGFILENAME;
+			files[i].lfn_type   = 0;
+			files[i].lfn_clus   = (le16)0;
+			files[i].lfn_csum   = checksum;
+		}
+
+		/* Set the first-physical-last-logical bit for the first LFN sequence entry. */
+		files[0].lfn_seqnum |= 0x40;
+
+		/* Append the trailing "normal" DOS 8.3 file entry. */
+		memcpy(&files[result], &ent->fad_dos, sizeof(struct fat_dirent));
+		++result;
+		return result;
+	} /* Scope... */
+}
+
+
 PRIVATE WUNUSED NONNULL((1, 2, 3)) bool KCALL
 FatDir_WriteDir(struct fflatdirnode *__restrict self,
-                struct fflatdirent *__restrict ent,
+                struct fflatdirent *__restrict ent_,
                 struct fnode *__restrict file,
                 bool at_end_of_dir)
 		THROWS(E_IOERROR, E_FSERROR_DISK_FULL, E_FSERROR_ILLEGAL_PATH) {
-	FatDirNode *me = fflatdirnode_asfat(self);
-	assert((ent->fde_pos % sizeof(struct fat_dirent)) == 0);
+	ino_t ino;
+	size_t num_files;
+	struct fat_dirent files[FAT_DIRENT_PER_FILE_MAXCOUNT];
+	REF struct fatdirent *oldent;
+	struct fatdirent *ent = fflatdirent_asfat(ent_);
+	FatDirNode *me        = fflatdirnode_asfat(self);
+	assert((ent->fad_ent.fde_pos % sizeof(struct fat_dirent)) == 0);
+	assert(file->fn_fsdata->fn_dir == me);
 
 	/* Deal with reserved positions (the "." and ".." entries).
 	 * NOTE: No need for atomic reads here, or worrying about
@@ -1185,19 +1508,50 @@ FatDir_WriteDir(struct fflatdirnode *__restrict self,
 	 * once `FatDir_ReadDir()' says it has been been).
 	 *
 	 * Furthermore, assuming that the directory doesn't contain
-	 * more than "." or ".." entry each, we can pretty much act
-	 * as though `fdn_1dot' and `fdn_2dot' were [const] at this
-	 * point! */
-	while (ent->fde_pos == me->fdn_1dot || ent->fde_pos == me->fdn_2dot) {
-		ent->fde_pos += sizeof(struct fat_dirent);
-		if (OVERFLOW_USUB(ent->fde_size, sizeof(struct fat_dirent), &ent->fde_size))
-			ent->fde_size = 0;
+	 * more than one "." or ".." entry each, we can pretty much
+	 * act as though `fdn_1dot' and `fdn_2dot' were [const]  at
+	 * this point! */
+	while (ent->fad_ent.fde_pos == me->fdn_1dot || ent->fad_ent.fde_pos == me->fdn_2dot) {
+		ent->fad_ent.fde_pos += sizeof(struct fat_dirent);
+		if (OVERFLOW_USUB(ent->fad_ent.fde_size, sizeof(struct fat_dirent), &ent->fad_ent.fde_size))
+			ent->fad_ent.fde_size = 0;
 	}
 
-	/* TODO: Write directory entries. */
-	/* TODO: Set `file->fn_ino = ABSOLUTE_ON_DISK_POS(ent);'. (also update the INO field of `ent') */
-	/* TODO: Set `file->fn_fsdata->fn_ent = ent' (possibly decref() the old value). */
-	/* TODO: Fill in `ent->fad_dos' */
+	/* Build directory entries. */
+	num_files = Fat_GenerateFileEntries(files, me, ent, file);
+
+	/* Check available space. */
+	{
+		bool spaceok;
+		size_t reqsize;
+		reqsize = num_files * sizeof(struct fat_dirent);
+		spaceok = ent->fad_ent.fde_size >= reqsize;
+		ent->fad_ent.fde_size = reqsize;
+		if (!spaceok)
+			return false; /* Insufficient buffer space. */
+	}
+
+	/* Write directory entries. */
+	ino = (ino_t)Fat_GetAbsDiskPos(me, ent->fad_ent.fde_pos);
+	mfile_write(me, files, num_files * sizeof(struct fat_dirent),
+	            ent->fad_ent.fde_pos);
+
+	/* Fill in INode numbers */
+	incref(ent);
+	mfile_tslock_acquire(file);
+	file->fn_ino = ino;
+	oldent = file->fn_fsdata->fn_ent; /* Inherit reference */
+	file->fn_fsdata->fn_ent = ent;    /* Inherit reference */
+	mfile_tslock_release(file);
+
+	/* Also fill in the directory entry's INode number */
+	ent->fad_ent.fde_ent.fd_ino = ino;
+
+	/* Drop reference from a possible old entry. */
+	xdecref_unlikely(oldent);
+
+	/* Success! */
+	return true;
 }
 
 PRIVATE NONNULL((1, 2)) void KCALL
@@ -1208,6 +1562,7 @@ FatDir_DeleteEnt(struct fflatdirnode *__restrict self,
 	pos_t ptr, end;
 	FatDirNode *me              = fflatdirnode_asfat(self);
 	struct fatdirent const *ent = fflatdirent_asfat(ent_);
+	assert(ent->fad_ent.fde_size != 0);
 	assert((ent->fad_ent.fde_size % sizeof(struct fat_dirent)) == 0);
 	ptr = fflatdirent_basaddr(&ent->fad_ent);
 	end = fflatdirent_endaddr(&ent->fad_ent);
@@ -1215,7 +1570,12 @@ FatDir_DeleteEnt(struct fflatdirnode *__restrict self,
 	/* Mark directory entries as deleted. */
 	for (; ptr < end; ptr += sizeof(struct fat_dirent)) {
 		static byte_t const marker[] = { MARKER_UNUSED };
+		/* TODO: Save deleted first byte at offset 0x0d
+		 * https://en.wikipedia.org/wiki/Design_of_the_FAT_file_system#Directory_entry */
 		mfile_write(self, marker, sizeof(marker), ptr);
+	}
+	if (at_end_of_dir) {
+		/* TODO: Free unused clusters. */
 	}
 }
 
@@ -1432,6 +1792,7 @@ PRIVATE struct fregnode_ops const Fat_RegOps = {
 			.mo_saveblocks = &Fat_SaveBlocks,
 			.mo_changed    = &fnode_v_changed,
 			.mo_stream     = NULL,
+			/* TODO: Truncate operator (call the underlying truncate before freeing out-of-bounds clusters) */
 		},
 		.no_wrattr = &Fat_WrAttr,
 	},
@@ -1547,7 +1908,13 @@ NOTHROW(KCALL FatSuper_Destroy)(struct mfile *__restrict self) {
 	mman_unmap_kram_and_kfree(me->ft_fat_table,
 	                          me->ft_fat_size,
 	                          me->ft_freefat);
+	decref(me->ft_fat_file);
 	fflatsuper_v_destroy(self);
+}
+
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(KCALL FatSuper_Free)(struct fnode *__restrict self) {
+	kfree(fnode_asfatsup(self));
 }
 
 PRIVATE ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) struct fnode *KCALL
@@ -1614,7 +1981,8 @@ FatDir_MkFile(struct fflatdirnode *__restrict self,
 	dat->fn_dir = mfile_asfatdir(incref(me));
 	shared_rwlock_init(&dat->fn_lock);
 
-	result->mf_parts      = NULL;
+	result->mf_parts = NULL;
+	SLIST_INIT(&result->mf_changed);
 	result->mf_blockshift = self->mf_blockshift;
 	result->fn_ino        = 0; /* Allocated later. */
 	return result;
@@ -1747,8 +2115,9 @@ FatSuper_MakeNode(struct fflatsuper *__restrict self,
 
 	/* Fill in remaining fields. */
 	result->mf_parts = NULL;
-	dat->fn_ent      = incref(ent);
-	dat->fn_dir      = mfile_asfatdir(incref(dir));
+	SLIST_INIT(&result->mf_changed);
+	dat->fn_ent = incref(ent);
+	dat->fn_dir = mfile_asfatdir(incref(dir));
 	shared_rwlock_init(&dat->fn_lock);
 	result->mf_blockshift = dir->mf_blockshift;
 	return result;
@@ -1799,6 +2168,16 @@ NOTHROW(KCALL FatSuper_TruncateCTime)(struct fsuper *__restrict UNUSED(self),
 	FatFileCTime_Decode(&ts, tms);
 }
 
+PRIVATE NONNULL((1)) void KCALL
+FatSuper_Sync(struct fsuper *__restrict self)
+		THROWS(E_IOERROR, ...) {
+	FatSuperblock *me = fsuper_asfat(self);
+	/* When using a custom file for accessing the FAT, that file must be synced */
+	if (me->ft_fat_file != me->ft_super.ffs_super.fs_dev)
+		mfile_sync(me->ft_fat_file);
+}
+
+
 PRIVATE struct fflatsuper_ops const Fat16_SuperOps = {
 	.ffso_makenode = &FatSuper_MakeNode,
 	.ffso_super = {
@@ -1807,6 +2186,7 @@ PRIVATE struct fflatsuper_ops const Fat16_SuperOps = {
 		.so_truncate_atime = &FatSuper_TruncateATime,
 		.so_truncate_mtime = &FatSuper_TruncateMTime,
 		.so_truncate_ctime = &FatSuper_TruncateCTime,
+		.so_sync           = &FatSuper_Sync,
 		.so_fdir = {
 			.dno_node = {
 				.no_file = {
@@ -1816,6 +2196,7 @@ PRIVATE struct fflatsuper_ops const Fat16_SuperOps = {
 					.mo_changed    = &fnode_v_changed,
 					.mo_stream     = &fdirnode_v_stream_ops,
 				},
+				.no_free   = &FatSuper_Free,
 				.no_wrattr = &fnode_v_wrattr_noop,
 			},
 			.dno_lookup = &fflatdirnode_v_lookup,
@@ -1843,6 +2224,7 @@ PRIVATE struct fflatsuper_ops const Fat32_SuperOps = {
 		.so_truncate_atime = &FatSuper_TruncateATime,
 		.so_truncate_mtime = &FatSuper_TruncateMTime,
 		.so_truncate_ctime = &FatSuper_TruncateCTime,
+		.so_sync           = &FatSuper_Sync,
 		.so_fdir = {
 			.dno_node = {
 				.no_file = {
@@ -1852,6 +2234,7 @@ PRIVATE struct fflatsuper_ops const Fat32_SuperOps = {
 					.mo_changed    = &fnode_v_changed,
 					.mo_stream     = &fdirnode_v_stream_ops,
 				},
+				.no_free   = &FatSuper_Free,
 				.no_wrattr = &fnode_v_wrattr_noop,
 			},
 			.dno_lookup = &fflatdirnode_v_lookup,
@@ -1971,6 +2354,56 @@ trimspecstring(char *__restrict buf, size_t size) {
 		buf[size] = '\0';
 	}
 }
+
+
+struct multifat_sync_file: mfile {
+	REF struct blkdev *mfsf_dev;              /* Underlying device. */
+	uint64_t           mfsf_fat_delta;        /* [const] Relative on-disk delta between different FAT copies. */
+	u8                 mfsf_fat_count;        /* [const] Total # of FAT copies. */
+	bool               mfsf_delta_is_aligned; /* [const] `true' if `mfsf_fat_delta' is aligned according to `mfsf_dev' */
+};
+
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(KCALL multifat_sync_file_destroy)(struct mfile *__restrict self) {
+	struct multifat_sync_file *me = (struct multifat_sync_file *)self;
+	decref_unlikely(me->mfsf_dev);
+	kfree(me);
+}
+
+PRIVATE NONNULL((1, 5)) void KCALL
+multifat_sync_file_loadblocks(struct mfile *__restrict self, pos_t addr,
+                              physaddr_t buf, size_t num_bytes,
+                              struct aio_multihandle *__restrict aio) {
+	struct multifat_sync_file *me = (struct multifat_sync_file *)self;
+	blkdev_rdsectors_async(me->mfsf_dev, addr, buf, num_bytes, aio);
+}
+
+PRIVATE NONNULL((1, 5)) void KCALL
+multifat_sync_file_saveblocks(struct mfile *__restrict self, pos_t addr,
+                              physaddr_t buf, size_t num_bytes,
+                              struct aio_multihandle *__restrict aio) {
+	u8 i;
+	struct multifat_sync_file *me = (struct multifat_sync_file *)self;
+	if (me->mfsf_dev->mf_flags & MFILE_F_READONLY)
+		THROW(E_FSERROR_READONLY);
+	/* The initial FAT is always properly aligned. */
+	blkdev_wrsectors_async(me->mfsf_dev, addr, buf, num_bytes, aio);
+	for (i = 1; i < me->mfsf_fat_count; ++i) {
+		addr += me->mfsf_fat_delta;
+		if likely(me->mfsf_delta_is_aligned) {
+			blkdev_wrsectors_async(me->mfsf_dev, addr, buf, num_bytes, aio);
+		} else {
+			/* oof... Have to use buffered I/O... */
+			mfile_write_p(me->mfsf_dev, buf, num_bytes, addr);
+		}
+	}
+}
+
+PRIVATE struct mfile_ops const multifat_sync_file_ops = {
+	.mo_destroy    = &multifat_sync_file_destroy,
+	.mo_loadblocks = &multifat_sync_file_loadblocks,
+	.mo_saveblocks = &multifat_sync_file_saveblocks,
+};
 
 
 
@@ -2130,19 +2563,57 @@ Fat_OpenFileSystem(struct ffilesys *__restrict filesys,
 		TRY {
 			result->ft_freefat = (struct mman_unmap_kram_job *)kmalloc(sizeof(struct mman_unmap_kram_job), GFP_NORMAL);
 			TRY {
-				result->ft_fat_table = mman_map(/* self:        */ &mman_kernel,
-				                                /* hint:        */ MHINT_GETADDR(KERNEL_MHINT_DEVICE),
-				                                /* num_bytes:   */ result->ft_fat_size,
-				                                /* prot:        */ PROT_READ | PROT_WRITE | PROT_SHARED,
-				                                /* flags:       */ MHINT_GETMODE(KERNEL_MHINT_DEVICE),
-				                                /* file:        */ dev,
-				                                /* file_fspath: */ NULL,
-				                                /* file_fsname: */ NULL,
-				                                /* file_pos:    */ FAT_SECTORADDR(result, result->ft_fat_start));
-				/* TODO: This file mapping only syncs to a single FAT!
-				 *       As such, syncing will appear inconsistent in other OSes when `self->ft_fat_count > 1'
-				 * The best solution for that scenario is probably to create a private struct mfile that
-				 * dispatches loadparts to the device,  and saveparts to each  of the FATs in  sequence. */
+				/* In case there are multiple FAT copies, modifications made to the FAT table must
+				 * be synced in multiple locations across  the block-device. For this purpose,  we
+				 * make use of a custom mem-file that does this job for us. */
+				if (result->ft_fat_count > 1) {
+					struct multifat_sync_file *fatfile;
+					uint64_t fat_delta;
+
+					/* Calculate the delta between different FAT copies. */
+					fat_delta = (uint64_t)result->ft_sec4fat << result->ft_sectorshift;
+
+					/* Allocate the sync file. */
+					fatfile = (struct multifat_sync_file *)kmalloc(sizeof(struct multifat_sync_file), GFP_NORMAL);
+
+					/* Initialize the mfile-portion of the sync file. */
+					_mfile_init(fatfile, &multifat_sync_file_ops, dev->mf_blockshift);
+					fatfile->mf_parts = NULL;
+					SLIST_INIT(&fatfile->mf_changed);
+					fatfile->mf_flags = MFILE_F_NORMAL;
+					atomic64_init(&fatfile->mf_filesize, (uint64_t)blkdev_getsize(dev));
+
+					/* Timestamps don't matter here; this file isn't exposed to user-space. */
+					DBG_memset(&fatfile->mf_atime, 0xcc, sizeof(fatfile->mf_atime));
+					DBG_memset(&fatfile->mf_mtime, 0xcc, sizeof(fatfile->mf_mtime));
+					DBG_memset(&fatfile->mf_ctime, 0xcc, sizeof(fatfile->mf_ctime));
+
+					/* Initialize custom fields. */
+					fatfile->mfsf_dev              = (REF struct blkdev *)incref(dev);
+					fatfile->mfsf_delta_is_aligned = ((fat_delta >> dev->mf_blockshift) << dev->mf_blockshift) == fat_delta;
+					fatfile->mfsf_fat_delta        = fat_delta;
+					fatfile->mfsf_fat_count        = result->ft_fat_count;
+
+					/* Use this custom file for mapping the FAT table. */
+					result->ft_fat_file = fatfile; /* Inherit reference */
+				} else {
+					result->ft_fat_file = incref(dev);
+				}
+				TRY {
+					/* Map the FAT table into memory. */
+					result->ft_fat_table = mman_map(/* self:        */ &mman_kernel,
+					                                /* hint:        */ MHINT_GETADDR(KERNEL_MHINT_DEVICE),
+					                                /* num_bytes:   */ result->ft_fat_size,
+					                                /* prot:        */ PROT_READ | PROT_WRITE | PROT_SHARED,
+					                                /* flags:       */ MHINT_GETMODE(KERNEL_MHINT_DEVICE),
+					                                /* file:        */ result->ft_fat_file,
+					                                /* file_fspath: */ NULL,
+					                                /* file_fsname: */ NULL,
+					                                /* file_pos:    */ FAT_SECTORADDR(result, result->ft_fat_start));
+				} EXCEPT {
+					decref_unlikely(result->ft_fat_file);
+					RETHROW();
+				}
 			} EXCEPT {
 				kfree(result->ft_freefat);
 				RETHROW();
@@ -2155,7 +2626,8 @@ Fat_OpenFileSystem(struct ffilesys *__restrict filesys,
 
 		/* Fill in mandatory superblock fields. */
 		/*result->ft_super.ffs_super.fs_root.mf_blockshift       = result->ft_sectorshift;*/ /* It's the same field! */
-		result->ft_super.ffs_super.fs_root.mf_parts              = NULL;
+		result->ft_super.ffs_super.fs_root.mf_parts = NULL;
+		SLIST_INIT(&result->ft_super.ffs_super.fs_root.mf_changed);
 		result->ft_super.ffs_super.fs_root.mf_flags              = MFILE_F_NORMAL;
 		result->ft_super.ffs_super.fs_root.fn_ino                = 0;
 		result->ft_super.ffs_super.fs_feat.sf_filesize_max       = (pos_t)UINT32_MAX;

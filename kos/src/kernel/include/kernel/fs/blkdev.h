@@ -211,11 +211,13 @@ DATDEF struct blkdev_ops const blkpart_ops;
 #define __blkdev_init_common(self, ops)                                                                   \
 	(_device_init(_blkdev_asdev(self), &(ops)->bdo_dev),                                                  \
 	 (self)->_blkdev_dev_ _device_devnode_ _fdevnode_node_ _fnode_file_ mf_flags = MFILE_F_FIXEDFILESIZE, \
-	 (self)->_blkdev_dev_ _device_devnode_ _fdevnode_node_ _fnode_file_ mf_parts = __NULLPTR)
-#define __blkdev_cinit_common(self, ops)                                                                  \
-	(_device_cinit(_blkdev_asdev(self), &(ops)->bdo_dev),                                                 \
-	 (self)->_blkdev_dev_ _device_devnode_ _fdevnode_node_ _fnode_file_ mf_flags = MFILE_F_FIXEDFILESIZE, \
-	 __hybrid_assert((self)->_blkdev_dev_ _device_devnode_ _fdevnode_node_ _fnode_file_ mf_parts == __NULLPTR))
+	 (self)->_blkdev_dev_ _device_devnode_ _fdevnode_node_ _fnode_file_ mf_parts = __NULLPTR,             \
+	 SLIST_INIT(&(self)->_blkdev_dev_ _device_devnode_ _fdevnode_node_ _fnode_file_ mf_changed))
+#define __blkdev_cinit_common(self, ops)                                                                        \
+	(_device_cinit(_blkdev_asdev(self), &(ops)->bdo_dev),                                                       \
+	 (self)->_blkdev_dev_ _device_devnode_ _fdevnode_node_ _fnode_file_ mf_flags = MFILE_F_FIXEDFILESIZE,       \
+	 __hybrid_assert((self)->_blkdev_dev_ _device_devnode_ _fdevnode_node_ _fnode_file_ mf_parts == __NULLPTR), \
+	 __hybrid_assert(SLIST_EMPTY(&(self)->_blkdev_dev_ _device_devnode_ _fdevnode_node_ _fnode_file_ mf_changed)))
 #define __blkdev_fini_common(self) _device_fini(_blkdev_asdev(self))
 
 

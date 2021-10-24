@@ -241,6 +241,11 @@ PUBLIC void KCALL fsuper_syncall(void)
 
 
 /* Default operators for `struct fsuper_ops' */
+PUBLIC NOBLOCK NONNULL((1)) void /* `kfree(fnode_assuper(self));' */
+NOTHROW(KCALL fsuper_v_free)(struct fnode *__restrict self) {
+	kfree(fnode_assuper(self));
+}
+
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL fsuper_v_destroy)(struct mfile *__restrict self) {
 	struct fsuper *me = mfile_assuper(self);

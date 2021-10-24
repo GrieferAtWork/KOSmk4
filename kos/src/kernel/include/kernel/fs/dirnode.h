@@ -434,7 +434,8 @@ struct fdirnode
  * @param: struct fsuper       *super: Associated superblock. */
 #define _fdirnode_init(self, ops, super)                                                                               \
 	(_fdirnode_assert_ops_(ops) _fnode_init_common(_fdirnode_asnode(self)),                                            \
-	 (self)->_fdirnode_node_ _fnode_file_ mf_parts = MFILE_PARTS_ANONYMOUS,                                            \
+	 (self)->_fdirnode_node_ _fnode_file_ mf_parts             = MFILE_PARTS_ANONYMOUS,                                \
+	 (self)->_fdirnode_node_ _fnode_file_ mf_changed.slh_first = MFILE_PARTS_ANONYMOUS,                                \
 	 (self)->_fdirnode_node_ _fnode_file_ mf_flags = (super)->fs_root._fdirnode_node_ _fnode_file_ mf_flags &          \
 	                                                 (MFILE_F_DELETED | MFILE_F_PERSISTENT |                           \
 	                                                  MFILE_F_READONLY | MFILE_F_NOATIME |                             \
@@ -450,7 +451,8 @@ struct fdirnode
 	 (self)->_fdirnode_node_ fn_super = incref(super))
 #define _fdirnode_cinit(self, ops, super)                                                                              \
 	(_fdirnode_assert_ops_(ops) _fnode_cinit_common(_fdirnode_asnode(self)),                                           \
-	 (self)->mf_parts                              = MFILE_PARTS_ANONYMOUS,                                            \
+	 (self)->_fdirnode_node_ _fnode_file_ mf_parts             = MFILE_PARTS_ANONYMOUS,                                \
+	 (self)->_fdirnode_node_ _fnode_file_ mf_changed.slh_first = MFILE_PARTS_ANONYMOUS,                                \
 	 (self)->_fdirnode_node_ _fnode_file_ mf_flags = (super)->fs_root._fdirnode_node_ _fnode_file_ mf_flags &          \
 	                                                 (MFILE_F_DELETED | MFILE_F_PERSISTENT |                           \
 	                                                  MFILE_F_READONLY | MFILE_F_NOATIME |                             \

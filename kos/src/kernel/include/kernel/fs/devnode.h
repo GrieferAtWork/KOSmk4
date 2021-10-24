@@ -80,6 +80,7 @@ fdevnode_v_open(struct mfile *__restrict self,
 
 /* Initialize common+basic fields. The caller must still initialize:
  *  - self->_fdevnode_node_ _fnode_file_ mf_parts
+ *  - self->_fdevnode_node_ _fnode_file_ mf_changed
  *  - self->_fdevnode_node_ _fnode_file_ mf_filesize
  *  - self->_fdevnode_node_ _fnode_file_ mf_atime
  *  - self->_fdevnode_node_ _fnode_file_ mf_mtime

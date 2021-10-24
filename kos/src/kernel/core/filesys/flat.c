@@ -1784,7 +1784,7 @@ NOTHROW(FCALL fflatdirdata_fini)(struct fflatdirdata *__restrict self) {
 #define CONFIG_FFLATDIR_FILESLIST_INITIAL_MASK 7
 #endif /* !CONFIG_FFLATDIR_FILESLIST_INITIAL_MASK */
 
-PRIVATE struct fflatdirent deleted_flat_dirent = {
+PUBLIC struct fflatdirent fflatdirnode_deleted_dirent = {
 	.fde_pos   = 0,
 	.fde_size  = 0,
 	.fde_bypos = TAILQ_ENTRY_UNBOUND_INITIALIZER,
@@ -1822,7 +1822,7 @@ NOTHROW(FCALL fflatdirnode_fileslist_removeent)(struct fflatdirnode *__restrict 
 		if (bucket->ffdb_ent == ent)
 			break;
 	}
-	bucket->ffdb_ent = &deleted_flat_dirent;
+	bucket->ffdb_ent = &fflatdirnode_deleted_dirent;
 	--self->fdn_data.fdd_filesused;
 }
 
@@ -1843,7 +1843,7 @@ NOTHROW(FCALL fflatdirnode_fileslist_insertent)(struct fflatdirnode *__restrict 
 			++self->fdn_data.fdd_filessize;
 			break;
 		}
-		if (pth == &deleted_flat_dirent)
+		if (pth == &fflatdirnode_deleted_dirent)
 			break; /* Re-use a previously deleted slot. */
 		assertf(!(pth->fde_ent.fd_hash == hash &&
 		          pth->fde_ent.fd_namelen == ent->fde_ent.fd_namelen &&
@@ -1873,7 +1873,7 @@ NOTHROW(FCALL fflatdirnode_fileslist_tryinsertent)(struct fflatdirnode *__restri
 			++self->fdn_data.fdd_filessize;
 			break;
 		}
-		if (pth == &deleted_flat_dirent)
+		if (pth == &fflatdirnode_deleted_dirent)
 			break; /* Re-use a previously deleted slot. */
 		if (pth->fde_ent.fd_hash == hash &&
 		    pth->fde_ent.fd_namelen == ent->fde_ent.fd_namelen &&
@@ -1898,7 +1898,7 @@ NOTHROW(FCALL fflatdirnode_fileslist_rehash_with)(struct fflatdirnode *__restric
 		struct fflatdirent *pth;
 		uintptr_t hash;
 		pth = self->fdn_data.fdd_fileslist[i].ffdb_ent;
-		if (!pth || pth == &deleted_flat_dirent)
+		if (!pth || pth == &fflatdirnode_deleted_dirent)
 			continue; /* Empty, or deleted. */
 		hash = fflatdirent_hashof(pth);
 		j = perturb = hash & new_mask;
@@ -1991,7 +1991,7 @@ fflatdirnode_fileslist_lookup(struct fflatdirnode *__restrict self,
 		if unlikely(memcmp(result->fde_ent.fd_name, info->flu_name,
 		                   info->flu_namelen * sizeof(char)) != 0)
 			continue; /* Wrong name */
-		if unlikely(result == &deleted_flat_dirent)
+		if unlikely(result == &fflatdirnode_deleted_dirent)
 			continue; /* Prevent any chance of *this* happening... */
 		/* Found it! */
 		return result;
@@ -2008,7 +2008,7 @@ fflatdirnode_fileslist_lookup(struct fflatdirnode *__restrict self,
 			if unlikely(memcasecmp(result->fde_ent.fd_name, info->flu_name,
 			                       info->flu_namelen * sizeof(char)) != 0)
 				continue; /* Wrong name */
-			if unlikely(result == &deleted_flat_dirent)
+			if unlikely(result == &fflatdirnode_deleted_dirent)
 				continue; /* Prevent any chance of *this* happening... */
 			/* Found it! */
 			return result;
@@ -2047,10 +2047,10 @@ fflatdirnode_fileslist_remove(struct fflatdirnode *__restrict self,
 		if unlikely(memcmp(result->fde_ent.fd_name, info->flu_name,
 		                   info->flu_namelen * sizeof(char)) != 0)
 			continue; /* Wrong name */
-		if unlikely(result == &deleted_flat_dirent)
+		if unlikely(result == &fflatdirnode_deleted_dirent)
 			continue; /* Prevent any chance of *this* happening... */
 		/* Found it! */
-		bucket->ffdb_ent = &deleted_flat_dirent;
+		bucket->ffdb_ent = &fflatdirnode_deleted_dirent;
 		--self->fdn_data.fdd_filesused;
 		return result;
 	}
@@ -2069,10 +2069,10 @@ fflatdirnode_fileslist_remove(struct fflatdirnode *__restrict self,
 			if unlikely(memcasecmp(result->fde_ent.fd_name, info->flu_name,
 			                       info->flu_namelen * sizeof(char)) != 0)
 				continue; /* Wrong name */
-			if unlikely(result == &deleted_flat_dirent)
+			if unlikely(result == &fflatdirnode_deleted_dirent)
 				continue; /* Prevent any chance of *this* happening... */
 			/* Found it! */
-			bucket->ffdb_ent = &deleted_flat_dirent;
+			bucket->ffdb_ent = &fflatdirnode_deleted_dirent;
 			--self->fdn_data.fdd_filesused;
 			return result;
 		}
@@ -2087,6 +2087,10 @@ fflatdirnode_fileslist_remove(struct fflatdirnode *__restrict self,
 
 
 /* Default operators for `struct fflatsuper'-derived superblocks. */
+PUBLIC NOBLOCK NONNULL((1)) void /* `kfree(fnode_asflatsuper(self));' */
+NOTHROW(KCALL fflatsuper_v_free)(struct fnode *__restrict self) {
+	kfree(fnode_asflatsuper(self));
+}
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL fflatsuper_v_destroy)(struct mfile *__restrict self) {
 	struct fflatsuper *me = mfile_asflatsuper(self);

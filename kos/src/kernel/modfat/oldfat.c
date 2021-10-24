@@ -1689,8 +1689,10 @@ Fat_GenerateFileEntries(struct fat_dirent *__restrict buffer,
 			}
 		}
 		if (retry_hex) {
-			PRIVATE char const xch[16] = { '0', '1', '2', '3', '4', '5', '6', '7',
-				                           '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };
+			PRIVATE char const xch[16] = {
+				'0', '1', '2', '3', '4', '5', '6', '7',
+				'8', '9', 'A', 'B', 'C', 'D', 'E', 'F'
+			};
 			/* Following the matching characters are 4 hex-chars
 			 * whenever  more than 9  retry attempts have failed
 			 * >> This multiplies the amount of available names by 0xffff */
@@ -1794,7 +1796,7 @@ NOTHROW(KCALL directory_has_dos83)(struct directory_node *__restrict self,
 	return false;
 }
 
-/* Same as `Fat_GenerateFileEntries()', but the givne `buffer' must be allocated
+/* Same as `Fat_GenerateFileEntries()', but the given `buffer' must be allocated
  * on the stack, and this function will automatically re-try when an 8.3 variant
  * of a long filename already exists. */
 PRIVATE NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3, 4, 5)) struct fat_dirent *

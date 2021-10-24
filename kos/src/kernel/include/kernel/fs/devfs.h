@@ -151,6 +151,7 @@ FUNDEF NOBLOCK WUNUSED struct timespec NOTHROW(KCALL realtime)(void);
 /* Initialize common+basic fields. The caller must still initialize:
  *  - self->_device_devnode_ _fdevnode_node_ _fnode_file_ mf_flags
  *  - self->_device_devnode_ _fdevnode_node_ _fnode_file_ mf_parts
+ *  - self->_device_devnode_ _fdevnode_node_ _fnode_file_ mf_changed
  *  - self->_device_devnode_ _fdevnode_node_ _fnode_file_ mf_blockshift
  *  - self->_device_devnode_ _fdevnode_node_ _fnode_file_ mf_part_amask
  *  - self->_device_devnode_ _fdevnode_node_ _fnode_file_ mf_filesize

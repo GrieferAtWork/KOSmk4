@@ -363,7 +363,10 @@ mfile_dosyncio(struct mfile *__restrict self,
                pos_t addr, physaddr_t buf, size_t num_bytes);
 
 struct mfile_ops {
-	/* [0..1] Finalize + free the given mem-file. */
+	/* [0..1] Finalize + free the given mem-file.
+	 * The caller will  have already finalized  all mfile-fields,  and
+	 * this operator is now supposed to finalize any sub-class fields,
+	 * as well as kfree(self). */
 	NOBLOCK NONNULL((1)) void
 	/*NOTHROW*/ (KCALL *mo_destroy)(struct mfile *__restrict self);
 
@@ -848,8 +851,8 @@ NOTHROW(mfile_changed)(struct mfile *__restrict self, uintptr_t what) {
 
 #ifdef CONFIG_USE_NEW_FS
 /* Initialize common fields. The caller must still initialize:
- *  - mf_ops,  mf_parts,  mf_part_amask,   mf_blockshift,
- *    mf_flags, mf_filesize, mf_atime, mf_mtime, mf_ctime */
+ *  - mf_ops, mf_parts, mf_changed, mf_part_amask, mf_blockshift,
+ *    mf_flags,   mf_filesize,   mf_atime,   mf_mtime,   mf_ctime */
 #define _mfile_init_common(self)           \
 	((self)->mf_refcnt = 1,                \
 	 atomic_rwlock_init(&(self)->mf_lock), \
@@ -864,7 +867,7 @@ NOTHROW(mfile_changed)(struct mfile *__restrict self, uintptr_t what) {
 	 __hybrid_assert((self)->mf_trunclock == 0))
 
 /* Initialize common+basic fields. The caller must still initialize:
- *  - mf_parts, mf_flags, mf_filesize, mf_atime, mf_mtime, mf_ctime */
+ *  - mf_parts, mf_changed, mf_flags, mf_filesize, mf_atime, mf_mtime, mf_ctime */
 #define _mfile_init(self, ops, block_shift) \
 	(_mfile_init_common(self),              \
 	 (self)->mf_ops = (ops),                \

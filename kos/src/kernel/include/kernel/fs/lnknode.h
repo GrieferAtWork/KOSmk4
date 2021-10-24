@@ -159,7 +159,8 @@ struct flnknode
  * @param: struct fsuper       *super:  Filesystem superblock. */
 #define _flnknode_init(self, ops, super)                                                                       \
 	(_flnknode_assert_ops_(ops) _fnode_init_common(_flnknode_asnode(self)),                                    \
-	 (self)->_flnknode_node_ _fnode_file_ mf_parts = MFILE_PARTS_ANONYMOUS,                                    \
+	 (self)->_flnknode_node_ _fnode_file_ mf_parts             = MFILE_PARTS_ANONYMOUS,                        \
+	 (self)->_flnknode_node_ _fnode_file_ mf_changed.slh_first = MFILE_PARTS_ANONYMOUS,                        \
 	 (self)->_flnknode_node_ _fnode_file_ mf_flags = ((super)->fs_root._fdirnode_node_ _fnode_file_ mf_flags & \
 	                                                  (MFILE_F_DELETED | MFILE_F_PERSISTENT |                  \
 	                                                   MFILE_F_NOATIME | MFILE_F_NOMTIME)) |                   \
@@ -171,7 +172,8 @@ struct flnknode
 	 (self)->_flnknode_node_ fn_super                   = incref(super))
 #define _flnknode_cinit(self, ops, super)                                                                      \
 	(_flnknode_assert_ops_(ops) _fnode_cinit_common(_flnknode_asnode(self)),                                   \
-	 (self)->_flnknode_node_ _fnode_file_ mf_parts = MFILE_PARTS_ANONYMOUS,                                    \
+	 (self)->_flnknode_node_ _fnode_file_ mf_parts             = MFILE_PARTS_ANONYMOUS,                        \
+	 (self)->_flnknode_node_ _fnode_file_ mf_changed.slh_first = MFILE_PARTS_ANONYMOUS,                        \
 	 (self)->_flnknode_node_ _fnode_file_ mf_flags = ((super)->fs_root._fdirnode_node_ _fnode_file_ mf_flags & \
 	                                                  (MFILE_F_DELETED | MFILE_F_PERSISTENT |                  \
 	                                                   MFILE_F_NOATIME | MFILE_F_NOMTIME)) |                   \

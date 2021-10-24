@@ -66,6 +66,7 @@ struct ffilesys {
 		 * This function must _ONLY_ initialize the following fields:
 		 *   - return->fs_root._fdirnode_node_ _fnode_file_ mf_ops        = ...;  # Fs-specific operators for superblocks
 		 *   - return->fs_root._fdirnode_node_ _fnode_file_ mf_parts      = ...;  # Properly with `NULL' (though `MFILE_PARTS_ANONYMOUS' and anything else is also OK)
+		 *   - return->fs_root._fdirnode_node_ _fnode_file_ mf_changed    = ...;  # Properly with `SLIST_INIT' (though `MFILE_PARTS_ANONYMOUS' and anything else is also OK)
 		 *   - return->fs_root._fdirnode_node_ _fnode_file_ mf_blockshift = ...;  # Address <=> block shift used by the filesystem
 		 *   - return->fs_root._fdirnode_node_ _fnode_file_ mf_flags      = ...;  # Set of `MFILE_F_READONLY | MFILE_FS_NOSUID | MFILE_FS_NOEXEC |
 		 *                                                                        #         MFILE_F_NOATIME | MFILE_F_NOMTIME | MFILE_F_PERSISTENT |

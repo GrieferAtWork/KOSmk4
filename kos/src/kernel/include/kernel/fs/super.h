@@ -112,7 +112,7 @@ struct fsuper_ops {
 
 	/* [0..1] Flush unwritten changes from fs-specific
 	 *        superblock buffers to disk and/or disk buffers */
-	ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct fnode *
+	NONNULL((1)) void
 	(KCALL *so_sync)(struct fsuper *__restrict self)
 			THROWS(E_IOERROR, ...);
 
@@ -249,6 +249,8 @@ FUNDEF NOBLOCK NONNULL((1)) __BOOL NOTHROW(FCALL fsuper_add2changed)(struct fsup
  *  - self->fs_feat.sf_rec_xfer_align
  *  - self->fs_feat.sf_name_max
  *  - self->fs_feat.sf_filesizebits
+ *  - self->fs_root._fdirnode_node_ _fnode_file_ mf_parts
+ *  - self->fs_root._fdirnode_node_ _fnode_file_ mf_changed
  *  - self->fs_root._fdirnode_node_ _fnode_file_ mf_flags:
  *     - Initialized to `MFILE_F_NOUSRMMAP | MFILE_F_NOUSRIO | MFILE_F_FIXEDFILESIZE'
  *       may need to be altered as appropriate.
@@ -279,12 +281,11 @@ FUNDEF NOBLOCK NONNULL((1)) __BOOL NOTHROW(FCALL fsuper_add2changed)(struct fsup
 	 LIST_INIT(&(self)->fs_changednodes),                                                         \
 	 LIST_ENTRY_UNBOUND_INIT(&(self)->fs_changedsuper),                                           \
 	 _fnode_init_common(_fdirnode_asnode(&(self)->fs_root)),                                      \
-	 (self)->fs_root._fdirnode_node_ _fnode_file_ mf_parts    = MFILE_PARTS_ANONYMOUS,            \
 	 (self)->fs_root._fdirnode_node_ _fnode_file_ mf_flags    = (MFILE_F_NOUSRMMAP |              \
 	                                                             MFILE_F_NOUSRIO |                \
 	                                                             MFILE_F_FIXEDFILESIZE),          \
 	 (self)->fs_root._fdirnode_node_ _fnode_file_ mf_ops      = &(ops)->so_fdir.dno_node.no_file, \
-	 (self)->fs_root._fdirnode_node_ _fnode_file_ mf_filesize = (pos_t)-1,                        \
+	 atomic64_init(&(self)->fs_root._fdirnode_node_ _fnode_file_ mf_filesize, (uint64_t)-1),      \
 	 (self)->fs_root._fdirnode_node_ fn_nlink                 = 1,                                \
 	 (self)->fs_root._fdirnode_node_ fn_super                 = (self),                           \
 	 (self)->fs_root._fdirnode_node_ fn_supent.rb_lhs         = __NULLPTR,                        \
@@ -303,12 +304,11 @@ FUNDEF NOBLOCK NONNULL((1)) __BOOL NOTHROW(FCALL fsuper_add2changed)(struct fsup
 	 __hybrid_assert(LIST_EMPTY(&(self)->fs_changednodes)),                                       \
 	 LIST_ENTRY_UNBOUND_INIT(&(self)->fs_changedsuper),                                           \
 	 _fnode_cinit_common(_fdirnode_asnode(&(self)->fs_root)),                                     \
-	 (self)->fs_root._fdirnode_node_ _fnode_file_ mf_parts    = MFILE_PARTS_ANONYMOUS,            \
 	 (self)->fs_root._fdirnode_node_ _fnode_file_ mf_flags    = (MFILE_F_NOUSRMMAP |              \
 	                                                             MFILE_F_NOUSRIO |                \
 	                                                             MFILE_F_FIXEDFILESIZE),          \
 	 (self)->fs_root._fdirnode_node_ _fnode_file_ mf_ops      = &(ops)->so_fdir.dno_node.no_file, \
-	 (self)->fs_root._fdirnode_node_ _fnode_file_ mf_filesize = (pos_t)-1,                        \
+	 atomic64_cinit(&(self)->fs_root._fdirnode_node_ _fnode_file_ mf_filesize, (uint64_t)-1),     \
 	 (self)->fs_root._fdirnode_node_ fn_nlink                 = 1,                                \
 	 (self)->fs_root._fdirnode_node_ fn_super                 = (self),                           \
 	 __hybrid_assert((self)->fs_root._fdirnode_node_ fn_supent.rb_lhs == __NULLPTR),              \
@@ -403,6 +403,8 @@ DEFINE_REFCOUNT_FUNCTIONS(struct fsuper, fs_root._fdirnode_node_ _fnode_file_ mf
 
 
 /* Default operators for `struct fsuper_ops' */
+FUNDEF NOBLOCK NONNULL((1)) void /* `kfree(fnode_assuper(self));' */
+NOTHROW(KCALL fsuper_v_free)(struct fnode *__restrict self);
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL fsuper_v_destroy)(struct mfile *__restrict self);
 

@@ -67,7 +67,6 @@ DATDEF struct flnknode_ops const ramfs_lnknode_ops;
 #define _ramfs_regnode_cinit       _fregnode_cinit
 #define _ramfs_regnode_fini        _fregnode_fini
 DATDEF struct fregnode_ops const ramfs_regnode_ops;
-#define ramfs_regnode_v_open    mnode_v_open
 #define ramfs_regnode_v_wrattr  fnode_v_wrattr_noop
 #define ramfs_regnode_v_destroy fnode_v_destroy
 
@@ -148,16 +147,18 @@ NOTHROW(KCALL ramfs_dirent_v_opennode)(struct fdirent *__restrict self, struct f
 struct ramfs_dirnode;
 struct ramfs_dirdata {
 	struct shared_rwlock          rdd_treelock; /* Lock for `rdd_tree' */
-	/* TODO: Get  rid  of `RAMFS_DIRDATA_TREE_DELETED'!
-	 * Instead, `ramfs_dirnode_v_unlink()' must set the
-	 * MFILE_F_DELETED  flag while still holding a lock
-	 * to `rdd_treelock', and  any piece  of code  that
-	 * wants to add new entries to this tree must first
-	 * check if `MFILE_F_DELETED' has already been set! */
-#define RAMFS_DIRDATA_TREE_DELETED ((REF struct ramfs_dirent *)-1)
-	RBTREE_ROOT(REF ramfs_dirent) rdd_tree;     /* [0..n][lock(rdd_treelock)] Files in this directory (using the filename as
-	                                             * key). Set of `RAMFS_DIRDATA_TREE_DELETED' when the directory was deleted. */
+	RBTREE_ROOT(REF ramfs_dirent) rdd_tree;     /* [0..n][lock(rdd_treelock)] Files in this directory (using the filename as key). */
 };
+
+#define ramfs_dirdata_init(self)                \
+	(shared_rwlock_init(&(self)->rdd_treelock), \
+	 (self)->rdd_tree = __NULLPTR)
+#define ramfs_dirdata_cinit(self)                \
+	(shared_rwlock_cinit(&(self)->rdd_treelock), \
+	 __hybrid_assert((self)->rdd_tree == __NULLPTR))
+FUNDEF NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL ramfs_dirdata_fini)(struct ramfs_dirdata *__restrict self);
+
 
 /* Helpers for accessing `rdd_treelock' */
 #define _ramfs_dirdata_treelock_reap(self)      (void)0
@@ -247,11 +248,9 @@ struct ramfs_dirnode
 /* Directory operators for `struct ramfs_dirnode' */
 DATDEF struct fdirnode_ops const ramfs_dirnode_ops;
 #define ramfs_dirnode_v_wrattr  fnode_v_wrattr_noop
-/* Because  directory can only be destroyed when they're
- * empty, we don't need a custom destroy function, since
- * the destruction of a fini-able `struct ramfs_dirdata'
- * is a no-op! */
-#define ramfs_dirnode_v_destroy fdirnode_v_destroy
+FUNDEF NOBLOCK NONNULL((1)) void
+NOTHROW(KCALL ramfs_dirnode_v_destroy)(struct mfile *__restrict self);
+#define ramfs_dirnode_v_open    fdirnode_v_open
 FUNDEF WUNUSED NONNULL((1, 2)) REF struct fdirent *KCALL
 ramfs_dirnode_v_lookup(struct fdirnode *__restrict self,
                        struct flookup_info *__restrict info);
@@ -316,13 +315,15 @@ struct ramfs_super
 
 
 DATDEF struct fsuper_ops const ramfs_super_ops;
-#define ramfs_super_v_destroy fsuper_v_destroy
-#define ramfs_super_v_wrattr  ramfs_dirnode_v_wrattr
-#define ramfs_super_v_lookup  ramfs_dirnode_v_lookup
-#define ramfs_super_v_enum    ramfs_dirnode_v_enum
-#define ramfs_super_v_mkfile  ramfs_dirnode_v_mkfile
-#define ramfs_super_v_unlink  ramfs_dirnode_v_unlink
-#define ramfs_super_v_rename  ramfs_dirnode_v_rename
+#define ramfs_super_v_free   fsuper_v_free
+FUNDEF NOBLOCK NONNULL((1)) void
+NOTHROW(KCALL ramfs_super_v_destroy)(struct mfile *__restrict self);
+#define ramfs_super_v_wrattr ramfs_dirnode_v_wrattr
+#define ramfs_super_v_lookup ramfs_dirnode_v_lookup
+#define ramfs_super_v_enum   ramfs_dirnode_v_enum
+#define ramfs_super_v_mkfile ramfs_dirnode_v_mkfile
+#define ramfs_super_v_unlink ramfs_dirnode_v_unlink
+#define ramfs_super_v_rename ramfs_dirnode_v_rename
 
 /* Top-level ram filesystem descriptor. */
 DATDEF struct ffilesys ramfs_filesys;

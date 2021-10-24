@@ -157,10 +157,19 @@ NOTHROW(FCALL fnode_v_changed)(struct mfile *__restrict self,
 }
 
 PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL fnode_free)(struct fnode *__restrict self) {
+	struct fnode_ops const *ops = fnode_getops(self);
+	if (ops->no_free) {
+		(*ops->no_free)(self);
+	} else {
+		kfree(self);
+	}
+}
+
+PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(LOCKOP_CC fnode_v_destroy_rmall_postlop)(struct postlockop *__restrict self) {
-	struct fnode *me = container_of(self, struct fnode, _mf_plop);
-	/* Destroy the underlying mem-file. */
-	mfile_destroy(_fnode_asfile(me));
+	/* Free the file-node */
+	fnode_free(container_of(self, struct fnode, _mf_plop));
 }
 
 PRIVATE NOBLOCK NONNULL((1)) struct postlockop *
@@ -216,8 +225,8 @@ again_unbind_allnodes:
 		}
 	}
 
-	/* Destroy the underlying mem-file. */
-	mfile_destroy(_fnode_asfile(me));
+	/* Free the file-node */
+	fnode_free(me);
 }
 
 PRIVATE NOBLOCK NONNULL((1, 2)) Tobpostlockop(fsuper) *
@@ -316,8 +325,8 @@ again_unbind_allnodes:
 		}
 	}
 
-	/* Destroy the underlying mem-file. */
-	mfile_destroy(_fnode_asfile(self));
+	/* Free the file-node */
+	fnode_free(self);
 }
 
 
@@ -1055,19 +1064,8 @@ again_lock_super:
 	fnode_delete_remove_from_byino_postlop(&self->_mf_fsuperplop, super); /* Inherit reference */
 }
 
-/* Perform all of the async work needed for deleting `self' as the result of `fn_nlink == 0'
- * This function will do the following (asynchronously if necessary)
- *  - Set flags: MFILE_F_DELETED,  MFILE_F_NOATIME,  MFILE_F_NOMTIME, MFILE_F_CHANGED,
- *               MFILE_F_ATTRCHANGED,  MFILE_F_FIXEDFILESIZE,   MFILE_FM_ATTRREADONLY,
- *               MFILE_F_NOUSRMMAP, MFILE_F_NOUSRIO, MFILE_FS_NOSUID, MFILE_FS_NOEXEC,
- *               MFILE_F_READONLY
- *    If `MFILE_F_DELETED' was already set, none of the below are done!
- *  - Unlink `self->fn_supent' (if bound)
- *  - Unlink `self->fn_changed' (if bound)
- *  - Unlink `self->fn_allnodes' (if bound)
- *  - Call `mfile_delete()' (technically `mfile_delete_impl()') */
-PUBLIC NOBLOCK NONNULL((1)) void
-NOTHROW(FCALL fnode_delete)(struct fnode *__restrict self) {
+PUBLIC NOBLOCK WUNUSED NONNULL((1)) bool
+NOTHROW(FCALL fnode_delete_strt)(struct fnode *__restrict self) {
 	uintptr_t old_flags;
 
 	/* Delete global reference to the file-node. */
@@ -1087,10 +1085,26 @@ NOTHROW(FCALL fnode_delete)(struct fnode *__restrict self) {
 	if (old_flags & MFILE_F_PERSISTENT)
 		ATOMIC_AND(self->mf_flags, ~MFILE_F_PERSISTENT); /* Also clear the PERSISTENT flag */
 	mfile_tslock_release(self);
+	return !(old_flags & MFILE_F_DELETED);
+}
 
-	if (old_flags & MFILE_F_DELETED)
+
+
+/* Perform all of the async work needed for deleting `self' as the result of `fn_nlink == 0'
+ * This function will do the following (asynchronously if necessary)
+ *  - Set flags: MFILE_F_DELETED,  MFILE_F_NOATIME,  MFILE_F_NOMTIME, MFILE_F_CHANGED,
+ *               MFILE_F_ATTRCHANGED,  MFILE_F_FIXEDFILESIZE,   MFILE_FM_ATTRREADONLY,
+ *               MFILE_F_NOUSRMMAP, MFILE_F_NOUSRIO, MFILE_FS_NOSUID, MFILE_FS_NOEXEC,
+ *               MFILE_F_READONLY
+ *    If `MFILE_F_DELETED' was already set, none of the below are done!
+ *  - Unlink `self->fn_supent' (if bound)
+ *  - Unlink `self->fn_changed' (if bound)
+ *  - Unlink `self->fn_allnodes' (if bound)
+ *  - Call `mfile_delete()' (technically `mfile_delete_impl()') */
+PUBLIC NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL fnode_delete)(struct fnode *__restrict self) {
+	if (!fnode_delete_strt(self))
 		return; /* Already deleted, or deletion already in progress. */
-
 	incref(self);
 	fnode_delete_impl(self);
 }

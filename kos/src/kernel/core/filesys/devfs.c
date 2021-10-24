@@ -331,8 +331,6 @@ unlock_byname_and_return_first_ramfs:
 				devfs_byname_endread();
 				/* Return the first file from the ramfs portion. */
 				ramfs_dirdata_treelock_read(&devfs.rs_dat);
-				assertf(devfs.rs_dat.rdd_tree != RAMFS_DIRDATA_TREE_DELETED,
-				        "The devfs root directory shouldn't be deletable");
 				first = devfs.rs_dat.rdd_tree;
 				if likely(first) {
 					while (first->rde_treenode.rb_lhs)
@@ -353,7 +351,6 @@ unlock_byname_and_return_first_ramfs:
 			/* Next node is the closest life entry with a name `>= me' */
 			me = ramfs_dirent_fixdeleted(me, ramfs_super_asdir(&devfs));
 		} else {
-			assert(devfs.rs_dat.rdd_tree != RAMFS_DIRDATA_TREE_DELETED);
 			/* Return a reference to the next node within the tree. */
 			me = ramfs_direnttree_nextnode(me);
 		}
@@ -586,7 +583,6 @@ again_acquire_lock_for_insert:
 			ramfs_dirdata_treelock_write(&devfs.rs_dat);
 			{
 				struct ramfs_dirent *old_dirent;
-				assert(devfs.rs_dat.rdd_tree != RAMFS_DIRDATA_TREE_DELETED);
 				old_dirent = ramfs_direnttree_locate(devfs.rs_dat.rdd_tree,
 				                                     new_dirent->rde_ent.fd_name,
 				                                     new_dirent->rde_ent.fd_namelen);
@@ -912,7 +908,6 @@ again_acquire_locks:
 			kfree(new_dirent);
 			RETHROW();
 		}
-		assert(devfs.rs_dat.rdd_tree != RAMFS_DIRDATA_TREE_DELETED);
 
 		/* Check if the file already exists. */
 		{
@@ -990,7 +985,7 @@ again_acquire_locks:
 			}
 
 			/* Check if the old directory has already been deleted. */
-			if unlikely(olddir->rdn_dat.rdd_tree == RAMFS_DIRDATA_TREE_DELETED) {
+			if unlikely(olddir->mf_flags & MFILE_F_DELETED) {
 				devfs_byname_endread();
 				ramfs_dirdata_treelock_endwrite(&olddir->rdn_dat);
 				ramfs_dirdata_treelock_endwrite(&devfs.rs_dat);
@@ -1048,13 +1043,14 @@ INTERN_CONST struct fsuper_ops const devfs_super_ops = {
 				.mo_destroy = (void (KCALL *)(struct mfile *__restrict))(void *)(uintptr_t)-1, /* Must never be called */
 				.mo_changed = &fnode_v_changed,
 			},
+			.no_free   = (void (KCALL *)(struct fnode *__restrict))(void *)(uintptr_t)-1, /* Must never be called */
 			.no_wrattr = &fnode_v_wrattr_noop,
 		},
-		.dno_lookup       = &devfs_root_v_lookup,
-		.dno_enum         = &devfs_root_v_enum,
-		.dno_mkfile       = &devfs_root_v_mkfile,
-		.dno_unlink       = &devfs_root_v_unlink,
-		.dno_rename       = &devfs_root_v_rename,
+		.dno_lookup = &devfs_root_v_lookup,
+		.dno_enum   = &devfs_root_v_enum,
+		.dno_mkfile = &devfs_root_v_mkfile,
+		.dno_unlink = &devfs_root_v_unlink,
+		.dno_rename = &devfs_root_v_rename,
 	},
 };
 

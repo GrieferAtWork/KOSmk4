@@ -38,6 +38,7 @@
 #include <kos/except.h>
 #include <kos/except/reason/fs.h>
 #include <kos/except/reason/inval.h>
+#include <kos/kernel/handle.h>
 
 #include <assert.h>
 #include <stddef.h>

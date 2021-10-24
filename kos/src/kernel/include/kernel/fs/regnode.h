@@ -78,6 +78,7 @@ struct fregnode
 #define _fregnode_init(self, ops, super)                                                                               \
 	(_fregnode_assert_ops_(ops) _fnode_init_common(_fregnode_asnode(self)),                                            \
 	 (self)->_fregnode_node_ _fnode_file_ mf_parts = __NULLPTR,                                                        \
+	 SLIST_INIT(&(self)->_fregnode_node_ _fnode_file_ mf_changed),                                                     \
 	 (self)->_fregnode_node_ _fnode_file_ mf_flags = (super)->fs_root._fdirnode_node_ _fnode_file_ mf_flags &          \
 	                                                 (MFILE_F_DELETED | MFILE_F_PERSISTENT |                           \
 	                                                  MFILE_F_READONLY | MFILE_F_NOATIME |                             \
@@ -89,6 +90,7 @@ struct fregnode
 #define _fregnode_cinit(self, ops, super)                                                                              \
 	(_fregnode_assert_ops_(ops) _fnode_cinit_common(_fregnode_asnode(self)),                                           \
 	 __hybrid_assert((self)->mf_parts == __NULLPTR),                                                                   \
+	 __hybrid_assert(SLIST_EMPTY(&(self)->mf_changed)),                                                                \
 	 (self)->_fregnode_node_ _fnode_file_ mf_flags = (super)->fs_root._fdirnode_node_ _fnode_file_ mf_flags &          \
 	                                                 (MFILE_F_DELETED | MFILE_F_PERSISTENT |                           \
 	                                                  MFILE_F_READONLY | MFILE_F_NOATIME |                             \

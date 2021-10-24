@@ -95,7 +95,8 @@ NOTHROW(KCALL fsocknode_v_destroy)(struct mfile *__restrict self);
 #define _fsocknode_init(self, ops, super)                                                                               \
 	(_fsocknode_assert_ops_(ops) _fnode_init_common(_fsocknode_asnode(self)),                                           \
 	 atomic64_init(&(self)->_fsocknode_node_ _fnode_file_ mf_filesize, 0),                                              \
-	 (self)->_fsocknode_node_ _fnode_file_ mf_parts = MFILE_PARTS_ANONYMOUS,                                            \
+	 (self)->_fsocknode_node_ _fnode_file_ mf_parts             = MFILE_PARTS_ANONYMOUS,                                \
+	 (self)->_fsocknode_node_ _fnode_file_ mf_changed.slh_first = MFILE_PARTS_ANONYMOUS,                                \
 	 (self)->_fsocknode_node_ _fnode_file_ mf_flags = ((super)->fs_root._fdirnode_node_ _fnode_file_ mf_flags &         \
 	                                                   (MFILE_F_DELETED | MFILE_F_PERSISTENT |                          \
 	                                                    MFILE_F_NOATIME | MFILE_F_NOMTIME)) |                           \
@@ -109,7 +110,8 @@ NOTHROW(KCALL fsocknode_v_destroy)(struct mfile *__restrict self);
 #define _fsocknode_cinit(self, ops, super)                                                                              \
 	(_fsocknode_assert_ops_(ops) _fnode_cinit_common(_fsocknode_asnode(self)),                                          \
 	 atomic64_cinit(&(self)->_fsocknode_node_ _fnode_file_ mf_filesize, 0),                                             \
-	 (self)->_fsocknode_node_ _fnode_file_ mf_parts = MFILE_PARTS_ANONYMOUS,                                            \
+	 (self)->_fsocknode_node_ _fnode_file_ mf_parts             = MFILE_PARTS_ANONYMOUS,                                \
+	 (self)->_fsocknode_node_ _fnode_file_ mf_changed.slh_first = MFILE_PARTS_ANONYMOUS,                                \
 	 (self)->_fsocknode_node_ _fnode_file_ mf_flags = ((super)->fs_root._fdirnode_node_ _fnode_file_ mf_flags &         \
 	                                                   (MFILE_F_DELETED | MFILE_F_PERSISTENT |                          \
 	                                                    MFILE_F_NOATIME | MFILE_F_NOMTIME)) |                           \
