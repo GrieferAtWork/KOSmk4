@@ -536,6 +536,9 @@ Fat_LoadBlocks(struct mfile *__restrict self, pos_t addr,
 	FatNodeData *dat     = me->fn_fsdata;
 	FatSuperblock *super = fsuper_asfat(me->fn_super);
 	struct blkdev *dev   = super->ft_super.ffs_super.fs_dev;
+	assertf((buf & (super->ft_sectorsize - 1)) == 0, "Unaligned `buf = %#" PRIx64 "'", (uint64_t)buf);
+	assertf((addr & (super->ft_sectorsize - 1)) == 0, "Unaligned `addr = %#" PRIx64 "'", (uint64_t)addr);
+	assertf((num_bytes & (super->ft_sectorsize - 1)) == 0, "Unaligned `num_bytes = %#" PRIxSIZ "'", num_bytes);
 	if unlikely(!num_bytes)
 		return;
 again:
@@ -610,6 +613,9 @@ Fat_SaveBlocks(struct mfile *__restrict self, pos_t addr,
 	FatNodeData *dat     = me->fn_fsdata;
 	FatSuperblock *super = fsuper_asfat(me->fn_super);
 	struct blkdev *dev   = super->ft_super.ffs_super.fs_dev;
+	assertf((buf & (super->ft_sectorsize - 1)) == 0, "Unaligned `buf = %#" PRIx64 "'", (uint64_t)buf);
+	assertf((addr & (super->ft_sectorsize - 1)) == 0, "Unaligned `addr = %#" PRIx64 "'", (uint64_t)addr);
+	assertf((num_bytes & (super->ft_sectorsize - 1)) == 0, "Unaligned `num_bytes = %#" PRIxSIZ "'", num_bytes);
 	if unlikely(!num_bytes)
 		return;
 again:

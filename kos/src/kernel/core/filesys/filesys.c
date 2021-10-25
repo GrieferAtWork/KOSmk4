@@ -113,7 +113,7 @@ ffilesys_open(struct ffilesys *__restrict self,
 		result->fs_root.fn_uid   = 0;
 		result->fs_root.fn_gid   = 0;
 		result->fs_root.fn_super = result;
-		DBG_memset(&result->fs_root.fn_changed, 0xcc, sizeof(result->fs_root.fn_changed));
+		LIST_ENTRY_UNBOUND_INIT(&result->fs_root.fn_changed);
 		result->fs_root.fn_supent.rb_lhs = NULL;
 		result->fs_root.fn_supent.rb_rhs = NULL;
 		LIST_ENTRY_UNBOUND_INIT(&result->fs_root.fn_allsuper); /* Must eventually be initialized by the caller */

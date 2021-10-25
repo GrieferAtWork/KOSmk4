@@ -261,18 +261,18 @@ NOTHROW(FCALL fnode_v_destroy)(struct mfile *__restrict self) {
 	/* Remove the node from its superblock's node-tree, as well
 	 * as  from the  global list  of all  nodes or superblocks. */
 	if (fnode_issuper(me)) {
-		struct fsuper *me = fnode_assuper(me);
-		if (LIST_ISBOUND(me, fs_root.fn_allsuper)) {
+		struct fsuper *super = fnode_assuper(me);
+		if (LIST_ISBOUND(super, fs_root.fn_allsuper)) {
 			/* Remove from `fallsuper_list' */
 			if (fallsuper_tryacquire()) {
-				assert(me->fs_root._fn_alllop.lo_func != &fnode_addtoall_lop);
-				if (LIST_ISBOUND(me, fs_root.fn_allsuper))
-					LIST_REMOVE(me, fs_root.fn_allsuper);
+				assert(super->fs_root._fn_alllop.lo_func != &fnode_addtoall_lop);
+				if (LIST_ISBOUND(super, fs_root.fn_allsuper))
+					LIST_REMOVE(super, fs_root.fn_allsuper);
 				fallsuper_release();
 			} else {
-				DBG_memset(me->fs_root._mf_lopX, 0xcc, sizeof(me->fs_root._mf_lopX));
-				me->fs_root._mf_lop.lo_func = &fnode_v_destroy_rmallsuper_lop;
-				lockop_enqueue(&fallsuper_lockops, &me->fs_root._mf_lop);
+				DBG_memset(super->fs_root._mf_lopX, 0xcc, sizeof(super->fs_root._mf_lopX));
+				super->fs_root._mf_lop.lo_func = &fnode_v_destroy_rmallsuper_lop;
+				lockop_enqueue(&fallsuper_lockops, &super->fs_root._mf_lop);
 				_fallsuper_reap();
 				return;
 			}

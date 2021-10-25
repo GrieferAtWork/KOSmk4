@@ -257,12 +257,16 @@ NOTHROW(KCALL fsuper_v_destroy)(struct mfile *__restrict self) {
 	assert(atomic_rwlock_canwrite(&me->fs_nodeslock));
 	assert(atomic_rwlock_canwrite(&me->fs_mountslock));
 	assert(atomic_lock_available(&me->fs_changednodes_lock));
-	assert(me->fs_changednodes.lh_first == NULL ||
-	       me->fs_changednodes.lh_first == FSUPER_NODES_DELETED);
-	assert(me->fs_nodes == NULL ||
-	       me->fs_nodes == FSUPER_NODES_DELETED);
-	assert(me->fs_mounts.lh_first == NULL);
-	assert(LIST_ISBOUND(me, fs_changedsuper));
+	assertf(me->fs_changednodes.lh_first == NULL ||
+	        me->fs_changednodes.lh_first == FSUPER_NODES_DELETED,
+	        "Nodes would have references");
+	assertf(me->fs_nodes == NULL ||
+	        me->fs_nodes == FSUPER_NODES_DELETED,
+	        "Nodes would have references");
+	assertf(me->fs_mounts.lh_first == NULL,
+	        "Mounting points would have references");
+	assertf(!LIST_ISBOUND(me, fs_changedsuper),
+	        "The changed-list would have a reference");
 
 	/* Drop references */
 	decref(me->fs_sys);

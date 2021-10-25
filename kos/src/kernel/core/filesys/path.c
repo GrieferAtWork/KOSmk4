@@ -360,7 +360,8 @@ NOTHROW(FCALL path_cldlist_rehash_with)(struct path *__restrict self,
 		}
 		dst->pb_path = pth; /* Rehash */
 	}
-	kfree(self->p_cldlist);
+	if (self->p_cldlist != path_empty_cldlist)
+		kfree(self->p_cldlist);
 	self->p_cldlist = new_list;
 	self->p_cldmask = new_mask;
 	self->p_cldsize = self->p_cldused; /* All deleted entries were removed... */
@@ -1236,10 +1237,13 @@ next_segment:
 			}
 			seg_len = (size_t)(upath - seg_str);
 			if (ch == '/' || ch == '\\') {
-				do {
-					ch = *upath++;
+				for (;;) {
+					ch = *upath;
 					COMPILER_READ_BARRIER();
-				} while (ch == '/' || ch == '\\');
+					if (ch != '/' && ch != '\\')
+						break;
+					++upath;
+				}
 
 				/* Skip the `ch == '\0'' check below if trailing slashes aren't ignored. */
 				if (!(atflags & AT_IGNORE_TRAILING_SLASHES))
@@ -1255,10 +1259,13 @@ next_segment:
 			}
 			seg_len = (size_t)(upath - seg_str);
 			if (ch == '/') {
-				do {
-					ch = *upath++;
+				for (;;) {
+					ch = *upath;
 					COMPILER_READ_BARRIER();
-				} while (ch == '/');
+					if (ch != '/')
+						break;
+					++upath;
+				}
 
 				/* Skip the `ch == '\0'' check below if trailing slashes aren't ignored. */
 				if (!(atflags & AT_IGNORE_TRAILING_SLASHES))

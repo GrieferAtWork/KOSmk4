@@ -147,9 +147,9 @@ again:
 	}
 
 	/* Do common auxiliary initialization for both the success- and retry paths. */
-	assertf(!(result->mf_flags & (MFILE_F_READONLY | MFILE_F_NOUSRMMAP |
-	                              MFILE_F_NOUSRIO | MFILE_F_FIXEDFILESIZE |
-	                              MFILE_FM_ATTRREADONLY)),
+	assertf(!(result->mf_flags & ~(MFILE_F_READONLY | MFILE_F_NOUSRMMAP |
+	                               MFILE_F_NOUSRIO | MFILE_F_FIXEDFILESIZE |
+	                               MFILE_FM_ATTRREADONLY)),
 	        "As per documentation, `ffso_makenode()' may only set these flags!");
 	result->mf_flags |= dir->mf_flags & (MFILE_F_READONLY | MFILE_F_NOATIME | MFILE_F_NOMTIME);
 	atomic_rwlock_init(&result->mf_lock);
@@ -310,14 +310,12 @@ fflatdirnode_v_lookup(struct fdirnode *__restrict self,
 	struct fflatdirnode *me = fdirnode_asflat(self);
 again:
 	fflatdirnode_read(me);
+again_search_locked:
 	TRY {
 		/* Look through the known cache of directory entries. */
 		result = fflatdirnode_fileslist_lookup(me, info);
-		if (result) {
-			incref(result);
-			fflatdirnode_endread(me);
-			return &result->fde_ent;
-		}
+		if (result != NULL)
+			goto incref_and_return_result;
 	} EXCEPT {
 		fflatdirnode_endread(me);
 		RETHROW();
@@ -328,6 +326,7 @@ again:
 		fflatdirnode_endread(me);
 		return NULL;
 	}
+again_readend_locked:
 
 	/* Read more entries. */
 	nextpos = 0;
@@ -404,7 +403,7 @@ handle_result_after_wrlock:
 	}
 
 	/* Fill in missing fields of `result' */
-	result->fde_ent.fd_refcnt = 2; /* +1: fdd_bypos, +1: return */
+	result->fde_ent.fd_refcnt = 1; /* +1: fdd_bypos */
 
 	/* Add the new directory entry to caches. */
 	if unlikely(!fflatdirnode_fileslist_tryinsertent(me, result)) {
@@ -451,8 +450,40 @@ handle_result_after_wrlock:
 		}
 	}
 
-	/* Release locks and we're done! */
-	fflatdirnode_endwrite(me);
+	/* Downgrade to a read-lock. */
+	fflatdirnode_downgrade(me);
+
+	/* If we lost the lock above, search through the entire cache once again. */
+	if (!upgrade_status)
+		goto again_search_locked;
+
+	/* In this case our lock was never lost, so we know that no additional
+	 * directory entries (except for `result') were added at any point. In
+	 * order to speed up finding a specific file, we can skip the  generic
+	 * search  path and only check if the entry we've just read is the one
+	 * that our caller is after. */
+	TRY {
+		/* NOTE: No need to lazy-init `info->flu_hash'; that has already been
+		 * done by the call `fflatdirnode_fileslist_lookup(me, info)' above. */
+		if (result->fde_ent.fd_namelen == info->flu_namelen &&
+		    (!(info->flu_flags & AT_DOSPATH)
+		     ? (result->fde_ent.fd_hash == info->flu_hash &&
+		        memcmp(info->flu_name, result->fde_ent.fd_name,
+		               result->fde_ent.fd_namelen * sizeof(char)) == 0)
+		     : (memcasecmp(info->flu_name, result->fde_ent.fd_name,
+		                   result->fde_ent.fd_namelen * sizeof(char)) == 0)))
+			goto incref_and_return_result;
+	} EXCEPT {
+		fflatdirnode_endread(me);
+		RETHROW();
+	}
+
+	/* Directly move on to reading the next entry (unless EOF got set) */
+	goto again_readend_locked;
+
+incref_and_return_result:
+	incref(result);
+	fflatdirnode_endread(me);
 	return &result->fde_ent;
 }
 

@@ -95,7 +95,7 @@ struct ffilesys {
 		 *   - return->fs_root._fdirnode_node_ fn_uid                     = 0;
 		 *   - return->fs_root._fdirnode_node_ fn_gid                     = 0;
 		 *   - return->fs_root._fdirnode_node_ fn_super                   = return;
-		 *   - return->fs_root._fdirnode_node_ fn_changed                 = <UNINIT>;
+		 *   - return->fs_root._fdirnode_node_ fn_changed                 = LIST_ENTRY_UNBOUND_INITIALIZER;
 		 *   - return->fs_root._fdirnode_node_ fn_supent.rb_lhs           = NULL;
 		 *   - return->fs_root._fdirnode_node_ fn_supent.rb_rhs           = NULL;
 		 *   - return->fs_root._fdirnode_node_ fn_allsuper                = ...;               // Caller will add to `fallsuper_list' once that should happen
