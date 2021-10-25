@@ -1649,6 +1649,8 @@ again:
 		/* load directory entries, or find the one most suitable for `oldpos' */
 next_next_ent:
 		ent = fflatdirnode_entafter(dir, oldpos);
+		if (!ent)
+			return 0; /* End-of-directory */
 	} else if (fflatdirent_wasdeleted_atomic(ent)) {
 		decref_unlikely(ent);
 		goto next_next_ent;
