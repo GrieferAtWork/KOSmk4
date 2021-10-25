@@ -1,6 +1,6 @@
 /*[[[magic
 local gcc_opt = options.setdefault("GCC.options", []);
-gcc_opt.removeif([](x) -> x.startswith("-O"));
+gcc_opt.removeif([](x) -> x.startswith("-O")); // TODO: Why are optimizations disabled here?
 ]]]*/
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
@@ -24,6 +24,7 @@ gcc_opt.removeif([](x) -> x.startswith("-O"));
 #ifndef GUARD_KERNEL_SRC_NETWORK_UNIX_SOCKET_C
 #define GUARD_KERNEL_SRC_NETWORK_UNIX_SOCKET_C 1
 #define _KOS_SOURCE 1
+#define _GNU_SOURCE 1
 
 #include <kernel/compiler.h>
 
@@ -49,6 +50,7 @@ gcc_opt.removeif([](x) -> x.startswith("-O"));
 
 #include <assert.h>
 #include <limits.h>
+#include <malloca.h>
 #include <stdalign.h>
 #include <stddef.h>
 #include <stdint.h>
@@ -525,16 +527,20 @@ UnixSocket_Bind(struct socket *__restrict self,
                 socklen_t addr_len)
 		THROWS(E_NET_ADDRESS_IN_USE, E_INVALID_ARGUMENT_UNEXPECTED_COMMAND,
 		       E_INVALID_ARGUMENT_BAD_STATE, E_BUFFER_TOO_SMALL) {
-	u32 fsmode;
 	size_t pathlen;
 	UnixSocket *me = (UnixSocket *)self;
 	USER CHECKED struct sockaddr_un *addr_un;
-	REF struct socket_node *bind_node;
 	REF struct path *bind_path;
-	REF struct fdirent *bind_name;
-	struct fs *f = THIS_FS;
+#ifdef CONFIG_USE_NEW_FS
+	char *nulterm_filename;
+	struct fmkfile_info mki;
+#else /* CONFIG_USE_NEW_FS */
+	u32 fsmode;
 	USER CHECKED char const *socket_filename_ptr;
 	u16 socket_filename_len;
+	REF struct fdirent *bind_name;
+	REF struct socket_node *bind_node;
+#endif /* !CONFIG_USE_NEW_FS */
 
 	addr_un = (USER CHECKED struct sockaddr_un *)addr;
 	/* We need  at  least  1  character  in  the  path-buffer.
@@ -554,19 +560,34 @@ UnixSocket_Bind(struct socket *__restrict self,
 			      fam, AF_INET);
 		}
 	}
+
 	/* Figure out the actual length of the given path. */
 	pathlen = strnlen(addr_un->sun_path,
 	                  addr_len -
 	                  offsetof(struct sockaddr_un, sun_path));
+
 	/* Traverse the path to the location where we should do the bind. */
-	fsmode    = ATOMIC_READ(f->f_mode.f_atflag);
-	bind_path = path_traversen(f,
+#ifdef CONFIG_USE_NEW_FS
+	nulterm_filename = (char *)malloca(pathlen + 1, sizeof(char));
+	RAII_FINALLY { freea(nulterm_filename); };
+	*(char *)mempcpy(nulterm_filename, addr_un->sun_path, pathlen, sizeof(char)) = '\0';
+
+	DBG_memset(&mki, 0xcc, sizeof(mki));
+	mki.mkf_flags = fs_atflags(0);
+	bind_path = path_traverse(AT_FDCWD, nulterm_filename,
+	                          &mki.mkf_name, &mki.mkf_namelen,
+	                          mki.mkf_flags);
+#else /* CONFIG_USE_NEW_FS */
+	fsmode    = ATOMIC_READ(THIS_FS->f_mode.f_atflag);
+	bind_path = path_traversen(THIS_FS,
 	                           addr_un->sun_path,
 	                           pathlen,
 	                           &socket_filename_ptr,
 	                           &socket_filename_len,
 	                           fsmode,
 	                           NULL);
+#endif /* !CONFIG_USE_NEW_FS */
+
 	/* Start the  binding process,  and ensure  that the  socket  isn't
 	 * already bound, or is currently being bound by some other thread. */
 	if unlikely(!ATOMIC_CMPXCH(me->us_node, NULL, (REF struct socket_node *)-1)) {
@@ -577,6 +598,20 @@ UnixSocket_Bind(struct socket *__restrict self,
 	/* At this point, we need to create a socket-file within `bind_path',
 	 * under   the   name   `socket_filename_ptr...+=socket_filename_len' */
 	TRY {
+#ifdef CONFIG_USE_NEW_FS
+		mki.mkf_hash          = FLOOKUP_INFO_HASH_UNSET;
+		mki.mkf_fmode         = S_IFSOCK | (0777 & ~THIS_FS->fs_umask);
+		mki.mkf_creat.c_owner = cred_getfsuid();
+		mki.mkf_creat.c_group = cred_getfsgid();
+		mki.mkf_creat.c_atime = realtime();
+		mki.mkf_creat.c_mtime = mki.mkf_creat.c_atime;
+		mki.mkf_creat.c_ctime = mki.mkf_creat.c_atime;
+
+		/* Create the new file */
+		if (fdirnode_mkfile(bind_path->p_dir, &mki) == FDIRNODE_MKFILE_EXISTS)
+			THROW(E_FSERROR_FILE_ALREADY_EXISTS);
+
+#else /* CONFIG_USE_NEW_FS */
 		REF struct directory_node *bind_path_dir;
 		sync_read(bind_path);
 		bind_path_dir = (REF struct directory_node *)incref(bind_path->p_inode);
@@ -586,9 +621,9 @@ UnixSocket_Bind(struct socket *__restrict self,
 			bind_node = (struct socket_node *)directory_mknod(bind_path_dir,
 			                                                  socket_filename_ptr,
 			                                                  socket_filename_len,
-			                                                  S_IFSOCK | (0777 & ~f->f_umask),
-			                                                  fs_getuid(f),
-			                                                  fs_getgid(f),
+			                                                  S_IFSOCK | (0777 & ~THIS_FS->f_umask),
+			                                                  fs_getuid(THIS_FS),
+			                                                  fs_getgid(THIS_FS),
 			                                                  (dev_t)0,
 			                                                  fsmode & FS_MODE_FDOSPATH ? DIRECTORY_MKNOD_FNOCASE
 			                                                                            : DIRECTORY_MKNOD_FNORMAL,
@@ -604,6 +639,7 @@ UnixSocket_Bind(struct socket *__restrict self,
 			RETHROW();
 		}
 		decref_unlikely(bind_path_dir);
+#endif /* !CONFIG_USE_NEW_FS */
 	} EXCEPT {
 		decref_unlikely(bind_path);
 		/* Switch back to indicating that the socket isn't bound. */
@@ -615,21 +651,28 @@ UnixSocket_Bind(struct socket *__restrict self,
 	 * to the binding context.
 	 * Note the order here: `us_node' _must_ be written last! */
 	me->us_nodepath = bind_path; /* Inherit reference */
+#ifdef CONFIG_USE_NEW_FS
+	me->us_nodename = mki.mkf_dent; /* Inherit reference */
+	COMPILER_WRITE_BARRIER();
+	me->us_node = mki.mkf_rsock; /* Inherit reference */
+	COMPILER_WRITE_BARRIER();
+#else /* CONFIG_USE_NEW_FS */
 	me->us_nodename = bind_name; /* Inherit reference */
 	COMPILER_WRITE_BARRIER();
 	me->us_node = bind_node; /* Inherit reference */
 	COMPILER_WRITE_BARRIER();
+#endif /* !CONFIG_USE_NEW_FS */
 }
 
 
 struct async_accept_wait: async {
-	WEAK REF UnixSocket        *aw_socket;    /* [1..1] The pointed-to socket. */
+	WEAK REF UnixSocket    *aw_socket;    /* [1..1] The pointed-to socket. */
 	/* NOTE: All of the following are [1..1] before
 	 * `UnixSocket_WaitForAccept_Work()' finishes the async job. */
-	REF struct unix_client     *aw_client;    /* [0..1] The client descriptor. */
-	REF struct socket_node     *aw_bind_node; /* [0..1] The socket to which to connect */
-	REF struct path            *aw_bind_path; /* [0..1] The path containing `ac_bind_node' */
-	REF struct fdirent *aw_bind_name; /* [0..1] The name of `ac_bind_node' */
+	REF struct unix_client *aw_client;    /* [0..1] The client descriptor. */
+	REF struct socket_node *aw_bind_node; /* [0..1] The socket to which to connect */
+	REF struct path        *aw_bind_path; /* [0..1] The path containing `ac_bind_node' */
+	REF struct fdirent     *aw_bind_name; /* [0..1] The name of `ac_bind_node' */
 };
 
 
@@ -749,7 +792,6 @@ UnixSocket_Connect(struct socket *__restrict self,
 		                E_NET_CONNECTION_REFUSED, E_NET_TIMEOUT,
 		                E_NET_UNREACHABLE, E_BUFFER_TOO_SMALL) {
 	size_t pathlen;
-	struct fs *f = THIS_FS;
 	UnixSocket *me = (UnixSocket *)self;
 	REF struct socket_node *bind_node;
 	REF struct path *bind_path;
@@ -783,15 +825,29 @@ UnixSocket_Connect(struct socket *__restrict self,
 	}
 	TRY {
 		/* Traverse the given path to find the associated socket. */
-		bind_node = (REF struct socket_node *)path_traversenfull(f,
+#ifdef CONFIG_USE_NEW_FS
+		{
+			char *nulterm_filename;
+			nulterm_filename = (char *)malloca(pathlen + 1, sizeof(char));
+			RAII_FINALLY { freea(nulterm_filename); };
+			*(char *)mempcpy(nulterm_filename, addr_un->sun_path, pathlen, sizeof(char)) = '\0';
+
+			/* Do the traversal. */
+			bind_node = (REF struct fsocknode *)path_traversefull(AT_FDCWD, nulterm_filename,
+			                                                      fs_atflags(0),
+			                                                      &bind_path, &bind_name);
+		}
+#else /* CONFIG_USE_NEW_FS */
+		bind_node = (REF struct socket_node *)path_traversenfull(THIS_FS,
 		                                                         addr_un->sun_path,
 		                                                         pathlen,
 		                                                         true,
-		                                                         f->f_mode.f_atflag,
+		                                                         THIS_FS->f_mode.f_atflag,
 		                                                         NULL,
 		                                                         &bind_path,
 		                                                         NULL,
 		                                                         &bind_name);
+#endif /* !CONFIG_USE_NEW_FS */
 		TRY {
 			struct async *job;
 			struct async_accept_wait *con;

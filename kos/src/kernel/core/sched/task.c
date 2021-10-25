@@ -33,6 +33,7 @@
 #include <kernel/heap.h>
 #include <kernel/mman.h>
 #include <kernel/mman/cache.h>
+#include <kernel/mman/mfile.h>
 #include <kernel/mman/mnode.h>
 #include <kernel/mman/mpart.h>
 #include <kernel/mman/phys.h> /* this_trampoline_node */

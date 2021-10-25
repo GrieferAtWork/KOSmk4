@@ -54,9 +54,9 @@
 DECL_BEGIN
 
 PRIVATE ssize_t LIBTERM_CC
-mktty_v_oprinter(struct terminal *__restrict term,
-                 void const *__restrict src,
-                 size_t num_bytes, iomode_t mode) {
+mkttydev_v_oprinter(struct terminal *__restrict term,
+                    void const *__restrict src,
+                    size_t num_bytes, iomode_t mode) {
 	size_t result;
 	struct mkttydev *me;
 	me = container_of(term, struct mkttydev, t_term);
@@ -386,10 +386,25 @@ typedef poll_mode_t (KCALL *phandle_polltest_function_t)(void *__restrict ptr, p
 
 #ifdef CONFIG_USE_NEW_FS
 
-/* Operators used by `struct mkttydev' */
-PUBLIC_CONST struct ttydev_ops const mkttydev_ops = {
-	/* TODO */
+PRIVATE struct mfile_stream_ops const mktty_stream_ops = {
+	.mso_read        = &ttydev_v_read,
+	.mso_write       = &ttydev_v_write,
+	.mso_ioctl       = &mkttydev_v_ioctl,
+	.mso_mmap        = &mkttydev_v_mmap,
+	.mso_stat        = &ttydev_v_stat,
+	.mso_pollconnect = &mkttydev_v_pollconnect,
+	.mso_polltest    = &mkttydev_v_polltest,
 };
+
+/* Operators used by `struct mkttydev' */
+PUBLIC_CONST struct ttydev_ops const mkttydev_ops = {{{{{
+	.no_file = {
+		.mo_destroy = &mkttydev_v_destroy,
+		.mo_changed = &ttydev_v_changed,
+		.mo_stream  = &mktty_stream_ops,
+	},
+	.no_wrattr = &ttydev_v_wrattr,
+}}}}};
 
 
 /* Create a new TTY device that connects the two given handles, such that
@@ -404,7 +419,7 @@ mkttydev_new(uintptr_half_t ihandle_typ, void *ihandle_ptr,
 		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT) {
 	struct mkttydev *result;
 	result = (struct mkttydev *)kmalloc(sizeof(struct mkttydev), GFP_NORMAL);
-	_ttydev_init(result, &mkttydev_ops, &mktty_v_oprinter);
+	_ttydev_init(result, &mkttydev_ops, &mkttydev_v_oprinter);
 	result->fn_mode   = S_IFCHR | 0644;
 	result->fn_uid    = cred_getfsuid();
 	result->fn_gid    = cred_getfsgid();
@@ -509,7 +524,7 @@ mkttydev_alloc(uintptr_half_t ihandle_typ, void *ihandle_ptr,
 	assert(ihandle_typ < HANDLE_TYPE_COUNT);
 	assert(ohandle_typ < HANDLE_TYPE_COUNT);
 	result = CHRDEV_ALLOC(struct mkttydev);
-	ttydev_cinit(result, &mktty_v_oprinter);
+	ttydev_cinit(result, &mkttydev_v_oprinter);
 	result->cd_type.ct_fini          = &mkttydev_v_fini;
 	result->cd_type.ct_pollconnect   = &mkttydev_v_pollconnect;
 	result->cd_type.ct_polltest      = &mkttydev_v_polltest;

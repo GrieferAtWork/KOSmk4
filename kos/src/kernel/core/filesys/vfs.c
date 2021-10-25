@@ -19,6 +19,7 @@
  */
 #ifndef GUARD_KERNEL_CORE_FILESYS_VFS_C
 #define GUARD_KERNEL_CORE_FILESYS_VFS_C 1
+#define _GNU_SOURCE 1
 
 #include <kernel/compiler.h>
 
@@ -35,6 +36,7 @@
 #include <assert.h>
 #include <fcntl.h>
 #include <limits.h>
+#include <sched.h>
 #include <stddef.h>
 
 DECL_BEGIN
@@ -211,6 +213,36 @@ PUBLIC struct fs fs_kernel = {
 		/*.f_atflag = */ 0,
 	}},
 };
+
+/* [1..1][lock(PRIVATE(THIS_TASK))] Filesystem controller for the current thread.
+ * Even  though this pointer can be modified by the thread itself, it must not be
+ * altered from within any kind of RPC. Lots of filesystem functionality  assumes
+ * that this pointer cannot changed over  the course of some operation.  However,
+ * it  is OK for this pointer to change  outside the context of any FS operation,
+ * such as a top-level system call.
+ *
+ * NOTE: Initialized to NULL. - Must be initialized before the task is started. */
+PUBLIC ATTR_PERTASK REF struct fs *this_fs = NULL;
+
+DEFINE_PERTASK_FINI(fini_this_fs);
+INTERN NOBLOCK NONNULL((1)) void
+NOTHROW(KCALL fini_this_fs)(struct task *__restrict self) {
+	xdecref(FORTASK(self, this_fs));
+}
+
+DEFINE_PERTASK_CLONE(clone_this_fs);
+INTERN NONNULL((1)) void KCALL
+clone_this_fs(struct task *__restrict new_thread, uintptr_t flags) {
+	struct fs *myfs = THIS_FS;
+	if (flags & CLONE_FS) {
+		incref(myfs); /* Re-use the same fs. */
+	} else {
+		/* Clone the old fs. */
+		myfs = fs_clone(myfs, (flags & CLONE_NEWNS) != 0);
+	}
+	assert(!FORTASK(new_thread, this_fs));
+	FORTASK(new_thread, this_fs) = myfs; /* Inherit reference */
+}
 
 
 

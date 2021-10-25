@@ -38,7 +38,7 @@
 
 DECL_BEGIN
 
-PRIVATE ATTR_USED ATTR_FREEDATA char const *kernel_root_partition = NULL;
+INTERN ATTR_FREEDATA char const *kernel_root_partition = NULL;
 DEFINE_KERNEL_COMMANDLINE_OPTION(kernel_root_partition, KERNEL_COMMANDLINE_OPTION_TYPE_STRING, "boot");
 
 /* Search criteria for KOS auto-detecting the KOS root partition

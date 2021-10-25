@@ -176,7 +176,7 @@ fdevfsdirent_v_opennode(struct fdirent *__restrict self,
 
 
 /* Operators for Instances of `struct fdevfsdirent' */
-PUBLIC struct fdirent_ops const fdevfsdirent_ops = {
+PUBLIC_CONST struct fdirent_ops const fdevfsdirent_ops = {
 	.fdo_destroy  = &fdevfsdirent_v_destroy,
 	.fdo_opennode = &fdevfsdirent_v_opennode,
 };
@@ -190,7 +190,7 @@ PUBLIC struct ffilesys devfs_filesys = {
 	.ffs_drv  = &drv_self,
 	{ .ffs_single = &devfs },
 	.ffs_flags = FFILESYS_F_SINGLE,
-	.ffs_name  = "devfs",
+	/* .ffs_name = */ "devfs",
 };
 
 
@@ -283,8 +283,8 @@ NOTHROW(KCALL devfs_root_direnum_v_fini)(struct fdirenum *__restrict self) {
 }
 
 
-PRIVATE NOBLOCK WUNUSED NONNULL((1)) struct device *
-NOTHROW(FCALL device_fixdeleted)(struct fdevfsdirent *__restrict self) {
+PRIVATE NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) struct device *
+NOTHROW(FCALL device_fixdeleted)(struct fdevfsdirent const *__restrict self) {
 	struct device *result = NULL;
 	struct device *root;
 	root = devfs_byname_tree;
@@ -366,7 +366,7 @@ unlock_byname_and_return_first_ramfs:
 
 PRIVATE NONNULL((1)) size_t KCALL
 devfs_root_direnum_v_readdir(struct fdirenum *__restrict self, USER CHECKED struct dirent *buf,
-                             size_t bufsize, readdir_mode_t readdir_mode, iomode_t mode)
+                             size_t bufsize, readdir_mode_t readdir_mode, iomode_t UNUSED(mode))
 		THROWS(...) {
 	ssize_t result;
 	REF struct fdirent *ent;
@@ -488,7 +488,7 @@ devfs_dirnode_v_rename(struct fdirnode *__restrict self,
 }
 
 
-PUBLIC struct fdirnode_ops const devfs_dirnode_ops = {
+PUBLIC_CONST struct fdirnode_ops const devfs_dirnode_ops = {
 	.dno_node = {
 		.no_file = {
 			.mo_destroy = &ramfs_dirnode_v_destroy,
@@ -545,7 +545,7 @@ again_lookup:
 	    info->mkf_hrdlnk.hl_node->mf_ops != &ramfs_devnode_ops.dno_node.no_file)
 		THROW(E_FSERROR_TOO_MANY_HARD_LINKS);
 
-create_ramfs_file:
+/*create_ramfs_file:*/
 	/* Allocate the new file-node */
 	new_node = ramfs_dirnode_mknode_frominfo(self, info);
 
@@ -1064,7 +1064,6 @@ INTERN_CONST struct fsuper_ops const devfs_super_ops = {
 PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(LOCKOP_CC device_v_destroy_postlop)(struct postlockop *__restrict self) {
 	struct device *me;
-	DEFINE_PUBLIC_SYMBOL(devfs_rootdir, &devfs.fs_root, sizeof(struct ramfs_dirnode));
 	me = container_of(self, struct device, _mf_plop);
 	decref_likely(me->dv_dirent);
 	fdevnode_v_destroy(me);
@@ -1124,16 +1123,6 @@ PUBLIC struct shared_rwlock devfs_byname_lock = SHARED_RWLOCK_INIT;
 PUBLIC struct lockop_slist devfs_byname_lops  = SLIST_HEAD_INITIALIZER(devfs_byname_lops);
 extern struct device _devfs_byname_tree__INIT[];
 PUBLIC RBTREE_ROOT(device) devfs_byname_tree = _devfs_byname_tree__INIT;
-
-/* Lock accessor helpers for `devfs_byname_lock' and `devfs_byname_tree' */
-PUBLIC NOBLOCK void NOTHROW(KCALL _devfs_byname_reap)(void) {
-#ifndef __INTELLISENSE__
-#define __LOCAL_self      (&devfs_byname_lops)
-#define __LOCAL_trylock() devfs_byname_trywrite()
-#define __LOCAL_unlock()  _devfs_byname_endwrite()
-#include <libc/template/lockop.h>
-#endif /* !__INTELLISENSE__ */
-}
 
 
 
@@ -1724,8 +1713,8 @@ device_lookup_byname(USER CHECKED char const *name,
 }
 
 
-PRIVATE NOBLOCK WUNUSED NONNULL((1, 2)) struct blkdev *
-NOTHROW(FCALL devfs_find_partguid)(struct fnode *__restrict root,
+PRIVATE NOBLOCK ATTR_PURE WUNUSED NONNULL((1, 2)) struct blkdev *
+NOTHROW(FCALL devfs_find_partguid)(struct fnode const *__restrict root,
                                    guid_t const *__restrict guid,
                                    struct blkdev *result) {
 again:
@@ -1943,6 +1932,14 @@ DBG_COMMAND(lsblk,
 	return 0;
 }
 
+DECL_END
+
+#include <dev/keyboard.h>
+#include <dev/mouse.h>
+#include <dev/pty.h>
+#include <dev/tty.h>
+
+DECL_BEGIN
 
 PRIVATE ATTR_DBGTEXT void KCALL
 do_dump_chrdev(struct chrdev *__restrict self,
@@ -1950,14 +1947,14 @@ do_dump_chrdev(struct chrdev *__restrict self,
                size_t longest_driver_name) {
 	char const *kind;
 	struct mfile_stream_ops const *ops;
-	if (chrdev_istty(self))                   /* TODO */
-		kind = ttydev_isptyslave((struct ttydev *)self) /* TODO */
-		       ? DBGSTR("pty")                               /* TODO */
-		       : DBGSTR("tty");                              /* TODO */
-	else if (chrdev_iskbd(self))             /* TODO */
-		kind = DBGSTR("keyboard");                           /* TODO */
-	else if (chrdev_ismouse(self))                /* TODO */
-		kind = DBGSTR("mouse");                              /* TODO */
+	if (chrdev_istty(self))
+		kind = ttydev_isptyslave((struct ttydev *)self)
+		       ? DBGSTR("pty")
+		       : DBGSTR("tty");
+	else if (chrdev_iskbd(self))
+		kind = DBGSTR("keyboard");
+	else if (chrdev_ismouse(self))
+		kind = DBGSTR("mouse");
 	else {
 		kind = DBGSTR("other");
 	}

@@ -338,7 +338,6 @@ next_chunk:
 
 again_service_io:
 	for (;;) {
-		AtaError_t error;
 		LOCAL_MAX_SECTORS_PER_TRANSFER_T part_sectors;
 		assert(!task_wasconnected());
 

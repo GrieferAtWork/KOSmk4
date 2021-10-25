@@ -20,21 +20,26 @@
 #ifndef GUARD_KERNEL_SRC_MEMORY_MMAN_MFILE_RW_C
 #define GUARD_KERNEL_SRC_MEMORY_MMAN_MFILE_RW_C 1
 #define _KOS_SOURCE 1
+#define _GNU_SOURCE 1
 
 #include <kernel/compiler.h>
 
 #ifdef CONFIG_USE_NEW_FS
+#include <kernel/iovec.h>
 #include <kernel/malloc.h>
 #include <kernel/memory.h>
 #include <kernel/mman/mfile.h>
 #include <kernel/mman/mpart-blkst.h>
 #include <kernel/mman/mpart.h>
+#include <sched/task.h>
 
 #include <hybrid/align.h>
+#include <hybrid/overflow.h>
 
 #include <kos/except.h>
 #include <kos/except/reason/io.h>
 
+#include <alloca.h>
 #include <assert.h>
 #include <stddef.h>
 #include <string.h>
@@ -150,7 +155,6 @@ NOTHROW(FCALL mfile_unlockinfo_cb)(struct unlockinfo *__restrict self) {
 }
 
 
-#if 0 /* ??? */
 struct mpart_truncate_undo_unlockinfo: unlockinfo {
 	struct mfile    *mtuu_file;      /* [1..1] ... */
 	struct mpart    *mtuu_part;      /* [1..1] ... */
@@ -164,7 +168,6 @@ NOTHROW(FCALL mpart_truncate_undo_unlockinfo_cb)(struct unlockinfo *__restrict s
 	mpart_truncate_restore(me->mtuu_part, me->mtuu_orig_size);
 	mfile_lock_endwrite(me->mtuu_file);
 }
-#endif
 
 
 /* Write the  physical  memory  contents
@@ -283,6 +286,201 @@ mfile_readallv_p(struct mfile *__restrict self,
 		num_bytes -= temp;
 		src_offset += temp;
 	}
+}
+
+
+PRIVATE WUNUSED size_t
+NOTHROW(FCALL get_stackbuf_size)(size_t num_bytes) {
+	size_t result;
+	result = get_stack_avail();
+	if (OVERFLOW_USUB(result, 1024 * sizeof(void *), &result))
+		result = 0;
+	if (result >= num_bytes) {
+		result = num_bytes;
+	} else {
+		if (result < 512)
+			result = 512;
+	}
+	return result;
+}
+
+/* Same as the above, but these use an intermediate (stack) buffer for  transfer.
+ * As such, these functions are called by the above when `memcpy_nopf()' produces
+ * transfer errors that cannot be resolved by `mman_prefault()' */
+PUBLIC NONNULL((1)) size_t KCALL
+_mfile_buffered_read(struct mfile *__restrict self, USER CHECKED void *dst,
+                     size_t num_bytes, pos_t filepos)
+		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...) {
+	size_t result      = 0;
+	size_t stkbuf_size = get_stackbuf_size(num_bytes);
+	byte_t *stkbuf     = (byte_t *)alloca(stkbuf_size);
+	for (;;) {
+		size_t temp, part;
+		part = num_bytes;
+		if (part > stkbuf_size)
+			part = stkbuf_size;
+		temp = mfile_read(self, stkbuf, part, filepos);
+		assert(temp <= part);
+		dst = mempcpy(dst, stkbuf, temp);
+		result += temp;
+		if (temp < part)
+			break;
+		num_bytes -= temp;
+		filepos += temp;
+	}
+	return result;
+}
+
+PUBLIC NONNULL((1)) size_t KCALL
+_mfile_buffered_write(struct mfile *__restrict self, USER CHECKED void const *src,
+                      size_t num_bytes, pos_t filepos)
+		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...) {
+	size_t result      = 0;
+	size_t stkbuf_size = get_stackbuf_size(num_bytes);
+	byte_t *stkbuf     = (byte_t *)alloca(stkbuf_size);
+	for (;;) {
+		size_t temp, part;
+		part = num_bytes;
+		if (part > stkbuf_size)
+			part = stkbuf_size;
+		src  = mempcpy(stkbuf, src, part);
+		temp = mfile_write(self, stkbuf, part, filepos);
+		assert(temp <= part);
+		result += temp;
+		if (temp < part)
+			break;
+		num_bytes -= temp;
+		filepos += temp;
+	}
+	return result;
+}
+
+PUBLIC NONNULL((1)) size_t KCALL
+_mfile_buffered_tailwrite(struct mfile *__restrict self,
+                          USER CHECKED void const *src,
+                          size_t num_bytes)
+		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...) {
+	size_t result      = 0;
+	size_t stkbuf_size = get_stackbuf_size(num_bytes);
+	byte_t *stkbuf     = (byte_t *)alloca(stkbuf_size);
+	for (;;) {
+		size_t temp, part;
+		part = num_bytes;
+		if (part > stkbuf_size)
+			part = stkbuf_size;
+		src = mempcpy(stkbuf, src, part);
+		temp = mfile_tailwrite(self, stkbuf, part);
+		assert(temp <= part);
+		result += temp;
+		if (temp < part)
+			break;
+		num_bytes -= temp;
+	}
+	return result;
+}
+
+PUBLIC NONNULL((1, 2)) size_t KCALL
+_mfile_buffered_readv(struct mfile *__restrict self, struct iov_buffer const *__restrict buf,
+                      size_t buf_offset, size_t num_bytes, pos_t filepos)
+		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...) {
+	size_t result = 0;
+	struct iov_entry ent;
+	IOV_BUFFER_FOREACH(ent, buf) {
+		size_t temp;
+		if (buf_offset) {
+			if (ent.ive_size >= buf_offset) {
+				buf_offset -= ent.ive_size;
+				continue;
+			}
+			ent.ive_base += buf_offset;
+			ent.ive_size -= buf_offset;
+			buf_offset = 0;
+		}
+		if (ent.ive_size > num_bytes)
+			ent.ive_size = num_bytes;
+		temp = _mfile_buffered_read(self, ent.ive_base, ent.ive_size, filepos);
+		result += temp;
+		if (temp < ent.ive_size)
+			break;
+		num_bytes -= temp;
+		filepos += temp;
+	}
+	return result;
+}
+
+PUBLIC NONNULL((1, 2)) size_t KCALL
+_mfile_buffered_writev(struct mfile *__restrict self, struct iov_buffer const *__restrict buf,
+                       size_t buf_offset, size_t num_bytes, pos_t filepos)
+		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...) {
+	size_t result = 0;
+	struct iov_entry ent;
+	IOV_BUFFER_FOREACH(ent, buf) {
+		size_t temp;
+		if (buf_offset) {
+			if (ent.ive_size >= buf_offset) {
+				buf_offset -= ent.ive_size;
+				continue;
+			}
+			ent.ive_base += buf_offset;
+			ent.ive_size -= buf_offset;
+			buf_offset = 0;
+		}
+		if (ent.ive_size > num_bytes)
+			ent.ive_size = num_bytes;
+		temp = _mfile_buffered_write(self, ent.ive_base, ent.ive_size, filepos);
+		result += temp;
+		if (temp < ent.ive_size)
+			break;
+		num_bytes -= temp;
+		filepos += temp;
+	}
+	return result;
+}
+
+PUBLIC NONNULL((1, 2)) size_t KCALL
+_mfile_buffered_tailwritev(struct mfile *__restrict self,
+                           struct iov_buffer const *__restrict buf,
+                           size_t buf_offset, size_t num_bytes)
+		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...) {
+	size_t result = 0;
+	struct iov_entry ent;
+	IOV_BUFFER_FOREACH(ent, buf) {
+		size_t temp;
+		if (buf_offset) {
+			if (ent.ive_size >= buf_offset) {
+				buf_offset -= ent.ive_size;
+				continue;
+			}
+			ent.ive_base += buf_offset;
+			ent.ive_size -= buf_offset;
+			buf_offset = 0;
+		}
+		if (ent.ive_size > num_bytes)
+			ent.ive_size = num_bytes;
+		temp = _mfile_buffered_tailwrite(self, ent.ive_base, ent.ive_size);
+		result += temp;
+		if (temp < ent.ive_size)
+			break;
+		num_bytes -= temp;
+	}
+	return result;
+}
+
+
+
+
+/* Change  the size of the given file. If the new size is smaller than
+ * the old size, mem-parts outside the new file's size-bounds are made
+ * anonymous. When the size is increased, the behavior is the same  as
+ * though  a  call `mfile_write(self, "", 1, new_size - 1)'  was made,
+ * only that no actual write to the file is performed. */
+PUBLIC NONNULL((1)) void FCALL
+mfile_truncate(struct mfile *__restrict self, pos_t new_size)
+		THROWS(E_WOULDBLOCK, E_BADALLOC) {
+	/* TODO */
+	(void)self;
+	(void)new_size;
+	THROW(E_NOT_IMPLEMENTED_TODO);
 }
 
 

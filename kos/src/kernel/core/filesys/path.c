@@ -254,7 +254,6 @@ NOTHROW(LOCKOP_CC path_remove_from_parent_lop)(Toblockop(path) *__restrict self,
  *                                    If this path was the last mounting point, also call `fsuper_delete()') */
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL path_destroy)(struct path *__restrict self) {
-	struct path *parent;
 	if (self->p_cldlist != PATH_CLDLIST_DELETED &&
 	    self->p_cldlist != path_empty_cldlist)
 		kfree(self->p_cldlist);
@@ -269,6 +268,8 @@ NOTHROW(FCALL path_destroy)(struct path *__restrict self) {
 		DBG_memset(&self->_p_vfs, 0xcc, sizeof(self->_p_vfs));
 		weakdecref(myvfs);
 	} else {
+		struct path *parent;
+
 		/* Remove the path from its parent's child list (possibly asynchronously) */
 		parent = self->p_parent;
 		DBG_memset(&self->p_parent, 0xcc, sizeof(self->p_parent));
@@ -294,7 +295,7 @@ NOTHROW(FCALL path_destroy)(struct path *__restrict self) {
 			decref_unlikely(parent);
 		}
 	}
-	path_remove_from_parent_postlop(&self->_p_pthplop, parent);
+	path_remove_from_parent_postlop(&self->_p_pthplop, /*parent*/ self);
 }
 
 

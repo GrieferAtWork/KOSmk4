@@ -107,6 +107,18 @@ PUBLIC struct ramfs_super devfs = {
 };
 
 
+/* Lock accessor helpers for `devfs_byname_lock' and `devfs_byname_tree' */
+PUBLIC NOBLOCK void NOTHROW(KCALL _devfs_byname_reap)(void) {
+	DEFINE_PUBLIC_SYMBOL(devfs_rootdir, &devfs.rs_sup.fs_root, sizeof(struct ramfs_dirnode));
+#ifndef __INTELLISENSE__
+#define __LOCAL_self      (&devfs_byname_lops)
+#define __LOCAL_trylock() devfs_byname_trywrite()
+#define __LOCAL_unlock()  _devfs_byname_endwrite()
+#include <libc/template/lockop.h>
+#endif /* !__INTELLISENSE__ */
+}
+
+
 DECL_END
 
 #endif /* !GUARD_KERNEL_CORE_FILESYS_DEVFSDEFS_C */

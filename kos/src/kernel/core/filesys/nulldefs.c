@@ -34,6 +34,7 @@ gcc_opt.remove("-g"); // Disable debug informations for this file!
 #include <kernel/fs/devfs.h>
 #include <kernel/fs/null.h>
 #include <kernel/fs/ramfs.h>
+#include <kernel/mman/driver.h>
 
 #include <kos/dev.h>
 #include <sys/io.h>
@@ -153,7 +154,7 @@ for (local i: [:#DEVICES]) {
 print("STATIC_ASSERT(offsetof(struct ramfs_dirnode, rdn_dir.dn_node) == 0);");
 print("STATIC_ASSERT(offsetof(struct device, dv_devnode.dn_node) == 0);");
 print("#undef __CCAST");
-print("#define __CCAST(T)");
+print("#define __CCAST(T) (uint64_t)");
 // Assert that our generated INO numbers are correct
 for (local name, st_mode, st_rdev: DEVICES) {
 	print("STATIC_ASSERT(devfs_devnode_makeino(", STMODE_MAP[st_mode & ~07777],
@@ -168,7 +169,7 @@ print("#define __CCAST");
 // Print directory entries.
 for (local name, st_mode, st_rdev: DEVICES) {
 	print("PRIVATE struct fdevfsdirent dirent_dev_", name, " = {");
-	print("	.fdd_dev   = AWREF_INIT(&dev_", name, "),");
+	print("	.fdd_dev = AWREF_INIT(&dev_", name, "),");
 	print("	.fdd_dirent = {");
 	print("		.fd_refcnt  = 2, /" "* +1: dirent_dev_", name, ", +1: dev_", name, ".dv_dirent *" "/");
 	print("		.fd_ops     = &fdevfsdirent_ops,");
@@ -234,6 +235,9 @@ for (local name, st_mode, st_rdev: DEVICES) {
 	")),");
 	print("				MFILE_INIT_mf_trunclock,");
 	print("				MFILE_INIT_mf_filesize(", DEVICE_SIZES.get(name, "0"), "),");
+	print("				MFILE_INIT_mf_atime(0, 0),");
+	print("				MFILE_INIT_mf_mtime(0, 0),");
+	print("				MFILE_INIT_mf_ctime(0, 0)");
 	print("			},");
 	print("			.fn_nlink = 1,");
 	print("			.fn_mode  = ", (st_mode & 07777).oct(), " | ", STMODE_MAP[st_mode & ~07777], ",");
@@ -270,7 +274,7 @@ for (local name, st_mode, st_rdev: DEVICES) {
 STATIC_ASSERT(offsetof(struct ramfs_dirnode, rdn_dir.dn_node) == 0);
 STATIC_ASSERT(offsetof(struct device, dv_devnode.dn_node) == 0);
 #undef __CCAST
-#define __CCAST(T)
+#define __CCAST(T) (uint64_t)
 STATIC_ASSERT(devfs_devnode_makeino(S_IFCHR, MKDEV(1, 1)) == (__FS_TYPE(ino))__SELECT_INO(UINT32_C(0x80000f), UINT64_C(0x80000f)));
 STATIC_ASSERT(devfs_devnode_makeino(S_IFCHR, MKDEV(1, 2)) == (__FS_TYPE(ino))__SELECT_INO(UINT32_C(0x800017), UINT64_C(0x800017)));
 STATIC_ASSERT(devfs_devnode_makeino(S_IFCHR, MKDEV(1, 3)) == (__FS_TYPE(ino))__SELECT_INO(UINT32_C(0x80001f), UINT64_C(0x80001f)));
@@ -284,7 +288,7 @@ STATIC_ASSERT(devfs_devnode_makeino(S_IFCHR, MKDEV(5, 0)) == (__FS_TYPE(ino))__S
 #undef __CCAST
 #define __CCAST
 PRIVATE struct fdevfsdirent dirent_dev_mem = {
-	.fdd_dev   = AWREF_INIT(&dev_mem),
+	.fdd_dev = AWREF_INIT(&dev_mem),
 	.fdd_dirent = {
 		.fd_refcnt  = 2, /* +1: dirent_dev_mem, +1: dev_mem.dv_dirent */
 		.fd_ops     = &fdevfsdirent_ops,
@@ -296,7 +300,7 @@ PRIVATE struct fdevfsdirent dirent_dev_mem = {
 	}
 };
 PRIVATE struct fdevfsdirent dirent_dev_kmem = {
-	.fdd_dev   = AWREF_INIT(&dev_kmem),
+	.fdd_dev = AWREF_INIT(&dev_kmem),
 	.fdd_dirent = {
 		.fd_refcnt  = 2, /* +1: dirent_dev_kmem, +1: dev_kmem.dv_dirent */
 		.fd_ops     = &fdevfsdirent_ops,
@@ -308,7 +312,7 @@ PRIVATE struct fdevfsdirent dirent_dev_kmem = {
 	}
 };
 PRIVATE struct fdevfsdirent dirent_dev_null = {
-	.fdd_dev   = AWREF_INIT(&dev_null),
+	.fdd_dev = AWREF_INIT(&dev_null),
 	.fdd_dirent = {
 		.fd_refcnt  = 2, /* +1: dirent_dev_null, +1: dev_null.dv_dirent */
 		.fd_ops     = &fdevfsdirent_ops,
@@ -320,7 +324,7 @@ PRIVATE struct fdevfsdirent dirent_dev_null = {
 	}
 };
 PRIVATE struct fdevfsdirent dirent_dev_port = {
-	.fdd_dev   = AWREF_INIT(&dev_port),
+	.fdd_dev = AWREF_INIT(&dev_port),
 	.fdd_dirent = {
 		.fd_refcnt  = 2, /* +1: dirent_dev_port, +1: dev_port.dv_dirent */
 		.fd_ops     = &fdevfsdirent_ops,
@@ -332,7 +336,7 @@ PRIVATE struct fdevfsdirent dirent_dev_port = {
 	}
 };
 PRIVATE struct fdevfsdirent dirent_dev_zero = {
-	.fdd_dev   = AWREF_INIT(&dev_zero),
+	.fdd_dev = AWREF_INIT(&dev_zero),
 	.fdd_dirent = {
 		.fd_refcnt  = 2, /* +1: dirent_dev_zero, +1: dev_zero.dv_dirent */
 		.fd_ops     = &fdevfsdirent_ops,
@@ -344,7 +348,7 @@ PRIVATE struct fdevfsdirent dirent_dev_zero = {
 	}
 };
 PRIVATE struct fdevfsdirent dirent_dev_full = {
-	.fdd_dev   = AWREF_INIT(&dev_full),
+	.fdd_dev = AWREF_INIT(&dev_full),
 	.fdd_dirent = {
 		.fd_refcnt  = 2, /* +1: dirent_dev_full, +1: dev_full.dv_dirent */
 		.fd_ops     = &fdevfsdirent_ops,
@@ -356,7 +360,7 @@ PRIVATE struct fdevfsdirent dirent_dev_full = {
 	}
 };
 PRIVATE struct fdevfsdirent dirent_dev_random = {
-	.fdd_dev   = AWREF_INIT(&dev_random),
+	.fdd_dev = AWREF_INIT(&dev_random),
 	.fdd_dirent = {
 		.fd_refcnt  = 2, /* +1: dirent_dev_random, +1: dev_random.dv_dirent */
 		.fd_ops     = &fdevfsdirent_ops,
@@ -368,7 +372,7 @@ PRIVATE struct fdevfsdirent dirent_dev_random = {
 	}
 };
 PRIVATE struct fdevfsdirent dirent_dev_urandom = {
-	.fdd_dev   = AWREF_INIT(&dev_urandom),
+	.fdd_dev = AWREF_INIT(&dev_urandom),
 	.fdd_dirent = {
 		.fd_refcnt  = 2, /* +1: dirent_dev_urandom, +1: dev_urandom.dv_dirent */
 		.fd_ops     = &fdevfsdirent_ops,
@@ -380,7 +384,7 @@ PRIVATE struct fdevfsdirent dirent_dev_urandom = {
 	}
 };
 PRIVATE struct fdevfsdirent dirent_dev_kmsg = {
-	.fdd_dev   = AWREF_INIT(&dev_kmsg),
+	.fdd_dev = AWREF_INIT(&dev_kmsg),
 	.fdd_dirent = {
 		.fd_refcnt  = 2, /* +1: dirent_dev_kmsg, +1: dev_kmsg.dv_dirent */
 		.fd_ops     = &fdevfsdirent_ops,
@@ -392,7 +396,7 @@ PRIVATE struct fdevfsdirent dirent_dev_kmsg = {
 	}
 };
 PRIVATE struct fdevfsdirent dirent_dev_tty = {
-	.fdd_dev   = AWREF_INIT(&dev_tty),
+	.fdd_dev = AWREF_INIT(&dev_tty),
 	.fdd_dirent = {
 		.fd_refcnt  = 2, /* +1: dirent_dev_tty, +1: dev_tty.dv_dirent */
 		.fd_ops     = &fdevfsdirent_ops,
@@ -438,6 +442,9 @@ PUBLIC struct device dev_mem = {
 				                    __SELECT_INO(0, 0)),
 				MFILE_INIT_mf_trunclock,
 				MFILE_INIT_mf_filesize((uint64_t)(physaddr_t)-1),
+				MFILE_INIT_mf_atime(0, 0),
+				MFILE_INIT_mf_mtime(0, 0),
+				MFILE_INIT_mf_ctime(0, 0)
 			},
 			.fn_nlink = 1,
 			.fn_mode  = 0640 | S_IFCHR,
@@ -486,6 +493,9 @@ PUBLIC struct device dev_kmem = {
 				                    __SELECT_INO(0, 0)),
 				MFILE_INIT_mf_trunclock,
 				MFILE_INIT_mf_filesize((uint64_t)(size_t)-1),
+				MFILE_INIT_mf_atime(0, 0),
+				MFILE_INIT_mf_mtime(0, 0),
+				MFILE_INIT_mf_ctime(0, 0)
 			},
 			.fn_nlink = 1,
 			.fn_mode  = 0640 | S_IFCHR,
@@ -534,6 +544,9 @@ PUBLIC struct device dev_null = {
 				                    __SELECT_INO(_MFILE_FN__RBRED, _MFILE_FN__RBRED)),
 				MFILE_INIT_mf_trunclock,
 				MFILE_INIT_mf_filesize(0),
+				MFILE_INIT_mf_atime(0, 0),
+				MFILE_INIT_mf_mtime(0, 0),
+				MFILE_INIT_mf_ctime(0, 0)
 			},
 			.fn_nlink = 1,
 			.fn_mode  = 0666 | S_IFCHR,
@@ -582,6 +595,9 @@ PUBLIC struct device dev_port = {
 				                    __SELECT_INO(0, 0)),
 				MFILE_INIT_mf_trunclock,
 				MFILE_INIT_mf_filesize((uint64_t)(port_t)-1),
+				MFILE_INIT_mf_atime(0, 0),
+				MFILE_INIT_mf_mtime(0, 0),
+				MFILE_INIT_mf_ctime(0, 0)
 			},
 			.fn_nlink = 1,
 			.fn_mode  = 0640 | S_IFCHR,
@@ -629,6 +645,9 @@ PUBLIC struct device dev_zero = {
 				                    __SELECT_INO(0, 0)),
 				MFILE_INIT_mf_trunclock,
 				MFILE_INIT_mf_filesize(0),
+				MFILE_INIT_mf_atime(0, 0),
+				MFILE_INIT_mf_mtime(0, 0),
+				MFILE_INIT_mf_ctime(0, 0)
 			},
 			.fn_nlink = 1,
 			.fn_mode  = 0666 | S_IFCHR,
@@ -678,6 +697,9 @@ PUBLIC struct device dev_full = {
 				                    __SELECT_INO(0, 0)),
 				MFILE_INIT_mf_trunclock,
 				MFILE_INIT_mf_filesize(0),
+				MFILE_INIT_mf_atime(0, 0),
+				MFILE_INIT_mf_mtime(0, 0),
+				MFILE_INIT_mf_ctime(0, 0)
 			},
 			.fn_nlink = 1,
 			.fn_mode  = 0666 | S_IFCHR,
@@ -726,6 +748,9 @@ PUBLIC struct device dev_random = {
 				                    __SELECT_INO(0, 0)),
 				MFILE_INIT_mf_trunclock,
 				MFILE_INIT_mf_filesize(0),
+				MFILE_INIT_mf_atime(0, 0),
+				MFILE_INIT_mf_mtime(0, 0),
+				MFILE_INIT_mf_ctime(0, 0)
 			},
 			.fn_nlink = 1,
 			.fn_mode  = 0666 | S_IFCHR,
@@ -775,6 +800,9 @@ PUBLIC struct device dev_urandom = {
 				                    __SELECT_INO(0, 0)),
 				MFILE_INIT_mf_trunclock,
 				MFILE_INIT_mf_filesize((uint64_t)-1),
+				MFILE_INIT_mf_atime(0, 0),
+				MFILE_INIT_mf_mtime(0, 0),
+				MFILE_INIT_mf_ctime(0, 0)
 			},
 			.fn_nlink = 1,
 			.fn_mode  = 0666 | S_IFCHR,
@@ -824,6 +852,9 @@ PUBLIC struct device dev_kmsg = {
 				                    __SELECT_INO(0, 0)),
 				MFILE_INIT_mf_trunclock,
 				MFILE_INIT_mf_filesize(0),
+				MFILE_INIT_mf_atime(0, 0),
+				MFILE_INIT_mf_mtime(0, 0),
+				MFILE_INIT_mf_ctime(0, 0)
 			},
 			.fn_nlink = 1,
 			.fn_mode  = 0644 | S_IFCHR,
@@ -873,6 +904,9 @@ PUBLIC struct device dev_tty = {
 				                    __SELECT_INO(0, 0)),
 				MFILE_INIT_mf_trunclock,
 				MFILE_INIT_mf_filesize(0),
+				MFILE_INIT_mf_atime(0, 0),
+				MFILE_INIT_mf_mtime(0, 0),
+				MFILE_INIT_mf_ctime(0, 0)
 			},
 			.fn_nlink = 1,
 			.fn_mode  = 0666 | S_IFCHR,

@@ -82,7 +82,7 @@ DECL_BEGIN
 
 
 /* No-op callback for `no_wrattr' (for RAM filesystems) */
-PUBLIC ATTR_CONST NONNULL((1)) void
+PUBLIC NONNULL((1)) void
 NOTHROW(KCALL fnode_v_wrattr_noop)(struct fnode *__restrict UNUSED(self)) {
 	/* Do nothing */
 }

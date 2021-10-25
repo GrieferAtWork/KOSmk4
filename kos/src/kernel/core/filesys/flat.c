@@ -1784,6 +1784,10 @@ NOTHROW(FCALL fflatdirdata_fini)(struct fflatdirdata *__restrict self) {
 #define CONFIG_FFLATDIR_FILESLIST_INITIAL_MASK 7
 #endif /* !CONFIG_FFLATDIR_FILESLIST_INITIAL_MASK */
 
+/* Work-around for compiler error:
+ * >> "initialization of flexible array member in a nested context"
+ *    (read: we were to lazy to program support for this into g++) */
+#if 0
 PUBLIC struct fflatdirent fflatdirnode_deleted_dirent = {
 	.fde_pos   = 0,
 	.fde_size  = 0,
@@ -1798,6 +1802,43 @@ PUBLIC struct fflatdirent fflatdirnode_deleted_dirent = {
 		/* .fd_name = */ "",
 	},
 };
+#else
+struct struct_fflatdirnode_deleted_dirent {
+	pos_t                                   fde_pos;
+	size_t                                  fde_size;
+	TAILQ_ENTRY(REF fflatdirent)            fde_bypos;
+	WEAK refcnt_t                           fd_refcnt;
+	struct fdirent_ops const               *fd_ops;
+	ino_t                                   fd_ino;
+	uintptr_t                               fd_hash;
+	u16                                     fd_namelen;
+	unsigned char                           fd_type;
+	COMPILER_FLEXIBLE_ARRAY(/*utf-8*/ char, fd_name);
+};
+static_assert(offsetof(struct struct_fflatdirnode_deleted_dirent, fde_pos) == offsetof(struct fflatdirent, fde_pos));
+static_assert(offsetof(struct struct_fflatdirnode_deleted_dirent, fde_size) == offsetof(struct fflatdirent, fde_size));
+static_assert(offsetof(struct struct_fflatdirnode_deleted_dirent, fde_bypos) == offsetof(struct fflatdirent, fde_bypos));
+static_assert(offsetof(struct struct_fflatdirnode_deleted_dirent, fd_refcnt) == offsetof(struct fflatdirent, fde_ent.fd_refcnt));
+static_assert(offsetof(struct struct_fflatdirnode_deleted_dirent, fd_ops) == offsetof(struct fflatdirent, fde_ent.fd_ops));
+static_assert(offsetof(struct struct_fflatdirnode_deleted_dirent, fd_ino) == offsetof(struct fflatdirent, fde_ent.fd_ino));
+static_assert(offsetof(struct struct_fflatdirnode_deleted_dirent, fd_hash) == offsetof(struct fflatdirent, fde_ent.fd_hash));
+static_assert(offsetof(struct struct_fflatdirnode_deleted_dirent, fd_namelen) == offsetof(struct fflatdirent, fde_ent.fd_namelen));
+static_assert(offsetof(struct struct_fflatdirnode_deleted_dirent, fd_type) == offsetof(struct fflatdirent, fde_ent.fd_type));
+static_assert(offsetof(struct struct_fflatdirnode_deleted_dirent, fd_name) == offsetof(struct fflatdirent, fde_ent.fd_name));
+DATDEF struct struct_fflatdirnode_deleted_dirent __fflatdirnode_deleted_dirent ASMNAME("fflatdirnode_deleted_dirent");
+PUBLIC struct struct_fflatdirnode_deleted_dirent __fflatdirnode_deleted_dirent = {
+	.fde_pos    = 0,
+	.fde_size   = 0,
+	.fde_bypos  = TAILQ_ENTRY_UNBOUND_INITIALIZER,
+	.fd_refcnt  = 1,
+	.fd_ops     = &fdirent_empty_ops,
+	.fd_ino     = 0,
+	.fd_hash    = FDIRENT_EMPTY_HASH,
+	.fd_namelen = 0,
+	.fd_type    = DT_UNKNOWN,
+	/* .fd_name = */ "",
+};
+#endif
 
 DATDEF struct fflatdir_bucket const _fflatdir_empty_buckets[1] ASMNAME("fflatdir_empty_buckets");
 PUBLIC_CONST struct fflatdir_bucket const _fflatdir_empty_buckets[1] = { { NULL } };

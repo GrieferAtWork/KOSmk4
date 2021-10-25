@@ -323,10 +323,12 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	kernel_initialize_commandline_options_stable();
 
 	/* Initialize builtin core drivers. */
+#ifndef CONFIG_USE_NEW_FS
 	kernel_initialize_devfs_driver();
+#endif /* !CONFIG_USE_NEW_FS */
 	pci_system_init();
 	kernel_initialize_ide_driver();
-	kernel_initialize_fat_driver();
+	kernel_initialize_fat_driver(); /* TODO: This can be done with static init! */
 
 	/* Load drivers provided by the bootloader */
 	x86_initialize_bootloader_drivers();
@@ -336,11 +338,15 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *       by  the   bootloader  are   themself  mapped   as  preserved   memory. */
 	minfo_release_preservations();
 
+#ifndef CONFIG_USE_NEW_FS
 	/* Initialize special builtin character devices (/dev/null, /dev/zero, etc.) */
 	kernel_initialize_null_devices();
+#endif /* !CONFIG_USE_NEW_FS */
 
+#ifndef CONFIG_USE_NEW_FS
 	/* Initialize the /dev/tty alias device */
 	kernel_initialize_ctty_device();
+#endif /* !CONFIG_USE_NEW_FS */
 
 	/* Initialize (load dependencies, apply relocations & call constructors)
 	 * all of the drivers provided by the bootloader. */

@@ -659,9 +659,9 @@ part_setcore:
 			decref_unlikely(part);
 			/* Must perform the operation while blocking. */
 #if defined(DEFINE_mfile_tailwrite)
-			result += _mfile_buffered_tailwrite(self, buffer, num_bytes, offset);
+			result += _mfile_buffered_tailwrite(self, buffer, num_bytes);
 #elif defined(DEFINE_mfile_tailwritev)
-			result += _mfile_buffered_tailwritev(self, buffer, buf_offset, num_bytes, offset);
+			result += _mfile_buffered_tailwritev(self, buffer, buf_offset, num_bytes);
 #else /* ... */
 #error "Invalid configuration"
 #endif /* !... */
@@ -814,7 +814,7 @@ restart_after_extendpart_tail:
 			struct mpart_truncate_undo_unlockinfo unlock;
 			reladdr = (mpart_reladdr_t)(offset - mpart_getminaddr(part));
 
-			unlock.ui_unlock = &mfile_unlockinfo_cb;
+			unlock.ui_unlock = &mpart_truncate_undo_unlockinfo_cb;
 			unlock.mtuu_file      = self;
 			unlock.mtuu_part      = part;
 			unlock.mtuu_orig_size = old_part_size;
@@ -860,9 +860,9 @@ restart_after_extendpart_tail:
 
 			/* Must perform the operation while blocking. */
 #if defined(DEFINE_mfile_tailwrite)
-			_mfile_buffered_tailwrite(self, buffer, num_bytes, offset);
+			_mfile_buffered_tailwrite(self, buffer, num_bytes);
 #elif defined(DEFINE_mfile_tailwritev)
-			_mfile_buffered_tailwritev(self, buffer, buf_offset, num_bytes, offset);
+			_mfile_buffered_tailwritev(self, buffer, buf_offset, num_bytes);
 #elif defined(DEFINE_mfile_write)
 			_mfile_buffered_write(self, buffer, num_bytes, offset);
 #elif defined(DEFINE_mfile_writev)

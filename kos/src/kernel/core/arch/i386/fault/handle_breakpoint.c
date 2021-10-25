@@ -30,6 +30,7 @@ opt.append("-Os");
 #include <kernel/compiler.h>
 
 #include <debugger/debugger.h>
+#include <fs/node.h>
 #include <fs/vfs.h>
 #include <kernel/debugtrap.h>
 #include <kernel/except.h>

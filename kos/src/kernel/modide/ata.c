@@ -325,9 +325,29 @@ NOTHROW(KCALL AioHandleChain_RemoveSpecific)(/*in|out*/ struct aio_handle **__re
 	return false;
 }
 
-/* Forward declaration... */
-PRIVATE NOBLOCK void
-NOTHROW(KCALL AtaBus_TryStartNextDmaOperation)(AtaBus *__restrict self);
+/* Forward declarations... */
+PRIVATE NOBLOCK void NOTHROW(KCALL AtaBus_TryStartNextDmaOperation)(AtaBus *__restrict self);
+PRIVATE NOBLOCK void NOTHROW(FCALL AtaBus_StartNextDmaOperation)(AtaBus *__restrict self);
+
+
+/* Implementation of the `RESTORE_ALL()' function from <kernel/aio.h> */
+PRIVATE NOBLOCK NOPREEMPT NONNULL((1, 2, 3)) void
+NOTHROW(KCALL AtaBus_RestorePendingAioHandles)(AtaBus *__restrict self,
+                                               struct aio_handle *first,
+                                               struct aio_handle *last) {
+	struct aio_handle *next;
+	do {
+		next = ATOMIC_READ(self->ab_aio_pending);
+		ATOMIC_WRITE(last->ah_next, next);
+	} while (!ATOMIC_CMPXCH_WEAK(self->ab_aio_pending,
+	                             next, first));
+#if 0 /* We have no AIO-avail signal, because we don't use an async-worker! */
+	if (!next)
+		sig_broadcast_nopr(&self->d_aio_avail);
+#endif
+}
+
+
 
 /* Remove a specific, given `handle' from the chain of pending handles of `self'.
  * The caller must have already cleared the command descriptor of `handle' before
@@ -454,23 +474,6 @@ hw_progress:
 }
 
 
-
-/* Implementation of the `RESTORE_ALL()' function from <kernel/aio.h> */
-PRIVATE NOBLOCK NOPREEMPT NONNULL((1, 2, 3)) void
-NOTHROW(KCALL AtaBus_RestorePendingAioHandles)(AtaBus *__restrict self,
-                                               struct aio_handle *first,
-                                               struct aio_handle *last) {
-	struct aio_handle *next;
-	do {
-		next = ATOMIC_READ(self->ab_aio_pending);
-		ATOMIC_WRITE(last->ah_next, next);
-	} while (!ATOMIC_CMPXCH_WEAK(self->ab_aio_pending,
-	                             next, first));
-#if 0 /* We have no AIO-avail signal, because we don't use an async-worker! */
-	if (!next)
-		sig_broadcast_nopr(&self->d_aio_avail);
-#endif
-}
 
 /* Select a pending AIO handle and try to start it.
  *

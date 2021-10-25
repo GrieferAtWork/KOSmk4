@@ -130,7 +130,12 @@ struct ATTR_PACKED fat_filemtime {
 #define fat_fileatime fat_filedate
 
 
-struct ATTR_PACKED fat_dirent {
+#ifdef CONFIG_USE_NEW_FS
+struct ATTR_PACKED ATTR_ALIGNED(4) fat_dirent
+#else /* CONFIG_USE_NEW_FS */
+struct ATTR_PACKED fat_dirent
+#endif /* !CONFIG_USE_NEW_FS */
+{
 	/* FAT directory file entry */
 	union ATTR_PACKED {
 		struct ATTR_PACKED {
@@ -316,12 +321,12 @@ struct fatdirent {
 typedef struct inode_data {
 	REF struct fatdirent *fn_ent; /* [0..1][lock(fn_dir->fdn_data.fdd_lock + _MFILE_F_SMP_TSLOCK)] Directory entry of this INode (or `NULL' for root directory) */
 	REF FatDirNode       *fn_dir; /* [0..1][lock(fn_dir->fdn_data.fdd_lock + _MFILE_F_SMP_TSLOCK)] Directory containing this INode (or `NULL' for root directory) */
-	union ATTR_PACKED {
-		struct ATTR_PACKED {
+	union {
+		struct {
 			pos_t              r16_rootpos;   /* [const] On-disk starting address of the root directory segment. (Aligned by `result->ft_sectorsize') */
 			u32                r16_rootsiz;   /* [const] Max size of the root-directory segment (in bytes) */
 		}                      fn16_root;     /* [valid_if(:ft_type != FAT32 && :self == :s_root)] */
-		struct ATTR_PACKED {
+		struct {
 			struct shared_rwlock fn_lock;     /* Lock for the vector of clusters. */
 			size_t               fn_clusterc; /* [!0][lock(fn_lock)] Amount of loaded cluster indices. */
 			FatClusterIndex     *fn_clusterv; /* [1..fn_clusterc][lock(fn_lock)]

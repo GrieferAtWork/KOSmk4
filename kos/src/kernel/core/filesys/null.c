@@ -490,6 +490,10 @@ devkmem_v_cmpxchq(struct vioargs *__restrict UNUSED(args), vio_addr_t addr,
 #endif /* LIBVIO_CONFIG_HAVE_QWORD || LIBVIO_CONFIG_HAVE_QWORD_CMPXCH */
 
 #ifdef LIBVIO_CONFIG_HAVE_XWORD_CMPXCH
+#if 1
+#define P_devkmem_v_cmpxchx NULL
+#else
+#define P_devkmem_v_cmpxchx (&devkmem_v_cmpxchx)
 PRIVATE NONNULL((1)) uint128_t LIBVIO_CC
 devkmem_v_cmpxchx(struct vioargs *__restrict UNUSED(args), vio_addr_t addr,
                   uint128_t oldvalue, uint128_t newvalue, bool UNUSED(atomic)) {
@@ -497,12 +501,13 @@ devkmem_v_cmpxchx(struct vioargs *__restrict UNUSED(args), vio_addr_t addr,
 	return ATOMIC_CMPXCH_VAL(*(uint128_t *)(uintptr_t)addr, oldvalue, newvalue);
 #endif /* !__INTELLISENSE__ */
 }
+#endif
 #endif /* LIBVIO_CONFIG_HAVE_XWORD_CMPXCH */
 
 PRIVATE struct vio_operators const devkmem_vio_ops = {
 	VIO_CALLBACK_INIT_READ(&devkmem_v_rdb, &devkmem_v_rdw, &devkmem_v_rdl, &devkmem_v_rdq),
 	VIO_CALLBACK_INIT_WRITE(&devkmem_v_wrb, &devkmem_v_wrw, &devkmem_v_wrl, &devkmem_v_wrq),
-	VIO_CALLBACK_INIT_CMPXCH(&devkmem_v_cmpxchb, &devkmem_v_cmpxchw, &devkmem_v_cmpxchl, &devkmem_v_cmpxchq, &devkmem_v_cmpxchx),
+	VIO_CALLBACK_INIT_CMPXCH(&devkmem_v_cmpxchb, &devkmem_v_cmpxchw, &devkmem_v_cmpxchl, &devkmem_v_cmpxchq, P_devkmem_v_cmpxchx),
 };
 #endif /* LIBVIO_CONFIG_ENABLED */
 
@@ -1076,6 +1081,15 @@ PRIVATE struct mfile_stream_ops const devtty_stream_ops = {
 	.mso_hop         = &devtty_v_hop,
 	.mso_tryas       = &devtty_v_tryas,
 };
+
+INTERN_CONST struct device_ops const dev_tty_ops = {{{
+	.no_file = {
+		.mo_destroy = (void(KCALL *)(struct mfile *__restrict))(void *)(uintptr_t)-1,
+		.mo_changed = &device_v_changed,
+		.mo_stream  = &devtty_stream_ops,
+	},
+	.no_wrattr = &device_v_wrattr
+}}};
 
 
 

@@ -156,27 +156,6 @@ NOTHROW(FCALL path_remove_from_recent)(struct path *__restrict self) {
 	}
 }
 
-/* Mark `self' as deleted before unlocking it and asynchronously removing it from the recent-cache. */
-PRIVATE NONNULL((1)) void
-NOTHROW(FCALL path_delete_and_unlock)(struct path *__restrict self) {
-	struct path_bucket *old_buckets;
-
-	/* Mark `self' as having been deleted. */
-	old_buckets = self->p_cldlist;
-	self->p_cldlist = PATH_CLDLIST_DELETED;
-	DBG_memset(&self->p_cldused, 0xcc, sizeof(self->p_cldused));
-	DBG_memset(&self->p_cldsize, 0xcc, sizeof(self->p_cldsize));
-	DBG_memset(&self->p_cldmask, 0xcc, sizeof(self->p_cldmask));
-	path_cldlock_endwrite(self);
-	if (old_buckets != PATH_CLDLIST_DELETED &&
-		old_buckets != path_empty_cldlist)
-		kfree(old_buckets);
-
-	/* Remove `self' from the recent-cache of the VFS. (Possibly through use of a LOP) */
-	path_remove_from_recent(self);
-}
-
-
 
 INTDEF struct path deleted_path; /* from "./path.c" */
 
@@ -573,7 +552,6 @@ fdirnode_exchange_paths(struct path *oldpath, struct path *newpath,
 		uintptr_t oldnamehash, newnamehash;
 		char const *oldname, *newname;
 		u16 oldnamelen, newnamelen;
-		REF struct path *blocking_path;
 
 		/* Load old/new name variables. */
 		oldnamehash = info->frn_oldent->fd_hash;

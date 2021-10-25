@@ -551,6 +551,7 @@ aio_handle_generic_poll(struct aio_handle_generic *__restrict self)
 	return aio_handle_generic_hascompleted(self);
 }
 
+#ifdef TRY
 LOCAL NONNULL((1)) bool KCALL
 aio_handle_generic_waitfor(struct aio_handle_generic *__restrict self,
                            ktime_t abs_timeout DFL(KTIME_INFINITE))
@@ -574,6 +575,7 @@ aio_handle_generic_waitfor(struct aio_handle_generic *__restrict self,
 	}
 	return true;
 }
+#endif /* TRY */
 
 
 
@@ -709,10 +711,12 @@ NOTHROW(KCALL aio_multihandle_done)(struct aio_multihandle *__restrict self);
 struct aio_multihandle_generic
 #ifdef __cplusplus
     : aio_multihandle
+#define _aio_multihandle_generic_base_ /* nothing */
 #endif /* __cplusplus */
 {
 #ifndef __cplusplus
 	struct aio_multihandle mg_base;   /* The underlying multi-handle. */
+#define _aio_multihandle_generic_base_ mg_base.
 #endif /* !__cplusplus */
 	struct sig             mg_signal; /* Signal broadcast upon completion. */
 };
@@ -723,7 +727,11 @@ NOTHROW(FCALL aio_multihandle_generic_func)(struct aio_multihandle *__restrict s
 
 LOCAL NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL aio_multihandle_generic_init)(struct aio_multihandle_generic *__restrict self) {
+#ifdef __cplusplus
 	aio_multihandle_init(self, &aio_multihandle_generic_func);
+#else /* __cplusplus */
+	aio_multihandle_init(&self->mg_base, &aio_multihandle_generic_func);
+#endif /* !__cplusplus */
 	sig_init(&self->mg_signal);
 }
 
@@ -731,19 +739,20 @@ NOTHROW(KCALL aio_multihandle_generic_init)(struct aio_multihandle_generic *__re
 	aio_multihandle_fini(self)
 
 /* NOTE: Returns `false' if `aio_multihandle_done' hasn't been called, yet. */
-#define aio_multihandle_generic_hascompleted(self)                                                 \
-	(((self)->am_status & (AIO_MULTIHANDLE_STATUS_ALLRUNNING | AIO_MULTIHANDLE_STATUS_RUNMASK)) == \
-	                       AIO_MULTIHANDLE_STATUS_ALLRUNNING)
+#define aio_multihandle_generic_hascompleted(self)                                                                                \
+	(((self)->_aio_multihandle_generic_base_ am_status & (AIO_MULTIHANDLE_STATUS_ALLRUNNING | AIO_MULTIHANDLE_STATUS_RUNMASK)) == \
+	 AIO_MULTIHANDLE_STATUS_ALLRUNNING)
 
 /* Check if the AIO operation failed, and propagate the error if it did. */
 LOCAL NONNULL((1)) void KCALL
 aio_multimultihandle_generic_checkerror(struct aio_multihandle_generic *__restrict self)
 		THROWS(E_IOERROR, ...) {
-	if unlikely((self->am_status & ~(AIO_MULTIHANDLE_STATUS_ALLRUNNING |
-	                                 AIO_MULTIHANDLE_STATUS_FAILED)) ==
+	if unlikely((self->_aio_multihandle_generic_base_ am_status & ~(AIO_MULTIHANDLE_STATUS_ALLRUNNING |
+	                                                                AIO_MULTIHANDLE_STATUS_FAILED)) ==
 	            AIO_COMPLETION_FAILURE) {
 		__libc_memcpy(&THIS_EXCEPTION_DATA,
-		              &self->am_error, sizeof(self->am_error));
+		              &self->_aio_multihandle_generic_base_ am_error,
+		              sizeof(self->_aio_multihandle_generic_base_ am_error));
 		error_throw_current();
 	}
 }
@@ -759,9 +768,11 @@ aio_multihandle_generic_connect(struct aio_multihandle_generic *__restrict self)
 LOCAL NONNULL((1)) void KCALL
 aio_multihandle_generic_checkerror(struct aio_multihandle_generic *__restrict self)
 		THROWS(E_IOERROR, ...) {
-	if unlikely((self->am_status & AIO_MULTIHANDLE_STATUS_STATUSMASK) ==
+	if unlikely((self->_aio_multihandle_generic_base_ am_status & AIO_MULTIHANDLE_STATUS_STATUSMASK) ==
 	           ((uintptr_t)AIO_COMPLETION_FAILURE << AIO_MULTIHANDLE_STATUS_STATUSSHFT)) {
-		__libc_memcpy(&THIS_EXCEPTION_DATA, &self->am_error, sizeof(self->am_error));
+		__libc_memcpy(&THIS_EXCEPTION_DATA,
+		              &self->_aio_multihandle_generic_base_ am_error,
+		              sizeof(self->_aio_multihandle_generic_base_ am_error));
 		error_throw_current();
 	}
 }
@@ -789,6 +800,7 @@ check_error_and_return_true:
 	return true;
 }
 
+#ifdef TRY
 LOCAL NONNULL((1)) bool KCALL
 aio_multihandle_generic_waitfor(struct aio_multihandle_generic *__restrict self,
                                 ktime_t abs_timeout DFL(KTIME_INFINITE))
@@ -812,6 +824,7 @@ aio_multihandle_generic_waitfor(struct aio_multihandle_generic *__restrict self,
 	}
 	return true;
 }
+#endif /* TRY */
 
 
 

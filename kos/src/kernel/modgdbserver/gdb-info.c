@@ -146,6 +146,15 @@ NOTHROW(FCALL GDBInfo_PrintThreadExecFile)(pformatprinter printer, void *arg,
 			              : (*printer)(arg, "?", 1);
 			xdecref_unlikely(path);
 			xdecref_unlikely(dent);
+#ifdef CONFIG_USE_NEW_FS
+		} else if (path) {
+			result = path_printent(path,
+			                       dent ? dent->fd_name : "?",
+			                       dent ? dent->fd_namelen : 1,
+			                       printer, arg);
+			decref_unlikely(path);
+			decref_unlikely(dent);
+#else /* CONFIG_USE_NEW_FS */
 		} else if (dent && path) {
 			result = path_printentex(path,
 			                         dent->de_name,
@@ -170,6 +179,7 @@ NOTHROW(FCALL GDBInfo_PrintThreadExecFile)(pformatprinter printer, void *arg,
 				}
 			}
 			decref_unlikely(path);
+#endif /* !CONFIG_USE_NEW_FS */
 		} else if (dent) {
 			result = (*printer)(arg,"/?/", 3);
 			if likely(result >= 0) {

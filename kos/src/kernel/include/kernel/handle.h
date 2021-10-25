@@ -736,12 +736,6 @@ handle_get_task(unsigned int fd)
 		THROWS(E_WOULDBLOCK, E_INVALID_HANDLE_FILE,
 		       E_INVALID_HANDLE_FILETYPE, E_PROCESS_EXITED);
 
-FUNDEF ATTR_RETNONNULL WUNUSED REF struct vfs *FCALL
-handle_get_vfs(unsigned int fd)
-		THROWS(E_WOULDBLOCK, E_INVALID_HANDLE_FILE,
-		       E_INVALID_HANDLE_FILETYPE);
-
-
 #define handle_get_mfile(fd)            ((REF struct mfile *)handle_getas(fd, HANDLE_TYPE_MFILE))
 #define handle_get_fdirent(fd)          ((REF struct fdirent *)handle_getas(fd, HANDLE_TYPE_FDIRENT))
 #define handle_get_path(fd)             ((REF struct path *)handle_getas(fd, HANDLE_TYPE_PATH))
@@ -821,11 +815,6 @@ FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct task *FCALL
 handle_as_task(/*inherit(on_success)*/ REF struct handle const *__restrict self)
 		THROWS(E_INVALID_HANDLE_FILETYPE, E_PROCESS_EXITED);
 
-FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct vfs *FCALL
-handle_as_vfs(/*inherit(on_success)*/ REF struct handle const *__restrict self)
-		THROWS(E_INVALID_HANDLE_FILETYPE);
-
-
 #define handle_as_mfile(self)            ((REF struct mfile *)handle_as(self, HANDLE_TYPE_MFILE))
 #define handle_as_fdirent(self)          ((REF struct fdirent *)handle_as(self, HANDLE_TYPE_FDIRENT))
 #define handle_as_path(self)             ((REF struct path *)handle_as(self, HANDLE_TYPE_PATH))
@@ -883,10 +872,6 @@ handle_as_super_relaxed(/*inherit(on_success)*/ REF struct handle const &__restr
 FUNDEF ATTR_RETNONNULL WUNUSED REF struct task *FCALL
 handle_as_task(/*inherit(on_success)*/ REF struct handle const &__restrict self)
 		THROWS(E_INVALID_HANDLE_FILETYPE, E_PROCESS_EXITED) ASMNAME("handle_as_task");
-
-FUNDEF ATTR_RETNONNULL WUNUSED REF struct vfs *FCALL
-handle_as_vfs(/*inherit(on_success)*/ REF struct handle const &__restrict self)
-		THROWS(E_INVALID_HANDLE_FILETYPE) ASMNAME("handle_as_vfs");
 } /* extern "C++" */
 #endif /* __cplusplus && !NO_CXX_HANDLE_AS_OVERLOADS */
 

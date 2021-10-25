@@ -81,6 +81,7 @@ NOTHROW(KCALL handle_typekind)(struct handle const *__restrict self) {
 		}
 		break;
 
+#ifndef CONFIG_USE_NEW_FS
 	case HANDLE_TYPE_BLKDEV:
 		if (blkdev_ispart((struct block_device *)self->h_data))
 			return HANDLE_TYPEKIND_BLKDEV_PARTITION;
@@ -102,11 +103,17 @@ NOTHROW(KCALL handle_typekind)(struct handle const *__restrict self) {
 		if (chrdev_ismouse(me))
 			return HANDLE_TYPEKIND_CHRDEV_MOUSE;
 	}	break;
+#endif /* !CONFIG_USE_NEW_FS */
 
 	case HANDLE_TYPE_PATH: {
 		struct path *me = (struct path *)self->h_data;
+#ifdef CONFIG_USE_NEW_FS
+		if (path_isroot(me))
+			return HANDLE_TYPEKIND_PATH_VFSROOT;
+#else /* CONFIG_USE_NEW_FS */
 		if (me->p_vfs == me)
 			return HANDLE_TYPEKIND_PATH_VFSROOT;
+#endif /* !CONFIG_USE_NEW_FS */
 	}	break;
 
 	case HANDLE_TYPE_MODULE: {
@@ -128,6 +135,7 @@ NOTHROW(KCALL handle_typekind)(struct handle const *__restrict self) {
 }
 
 
+#ifndef CONFIG_USE_NEW_FS
 LOCAL WUNUSED NONNULL((1, 2)) bool KCALL
 chrdev_datasize(struct chrdev *__restrict self,
                 pos_t *__restrict presult) {
@@ -146,6 +154,25 @@ chrdev_datasize(struct chrdev *__restrict self,
 	*presult = (pos_t)st.st_size;
 	return true;
 }
+#endif /* !CONFIG_USE_NEW_FS */
+
+#ifdef CONFIG_USE_NEW_FS
+LOCAL WUNUSED NONNULL((1)) pos_t KCALL
+mfile_datasize(struct mfile *__restrict self) {
+	pos_t result;
+	result = (pos_t)atomic64_read(&self->mf_filesize);
+	if (mfile_isanon(self))
+		result = 0;
+	if (self->mf_ops->mo_stream &&
+	    self->mf_ops->mo_stream->mso_stat) {
+		struct stat st;
+		st.st_size = (typeof(st.st_size))result;
+		(*self->mf_ops->mo_stream->mso_stat)(self, &st);
+		result = (pos_t)st.st_size;
+	}
+	return result;
+}
+#endif /* CONFIG_USE_NEW_FS */
 
 
 /* Try to determine the effective data size of the given handle (as returned by `FIOQSIZE')
@@ -158,6 +185,11 @@ handle_datasize(struct handle const *__restrict self,
 	switch (self->h_type) {
 
 	case HANDLE_TYPE_MFILE: {
+#ifdef CONFIG_USE_NEW_FS
+		struct mfile *me;
+		me    = (struct mfile *)self->h_data;
+		value = mfile_datasize(me);
+#else /* CONFIG_USE_NEW_FS */
 		struct inode *me;
 		me = (struct inode *)self->h_data;
 		if (!vm_datablock_isinode(me))
@@ -171,8 +203,10 @@ handle_datasize(struct handle const *__restrict self,
 			value = me->i_filesize;
 		}
 #endif /* !CONFIG_ATOMIC64_SUPPORT_ALWAYS */
+#endif /* !CONFIG_USE_NEW_FS */
 	}	break;
 
+#ifndef CONFIG_USE_NEW_FS
 	case HANDLE_TYPE_BLKDEV: {
 		struct blkdev *me;
 		me = (struct blkdev *)self->h_data;
@@ -185,6 +219,7 @@ handle_datasize(struct handle const *__restrict self,
 		me = (struct chrdev *)self->h_data;
 		return chrdev_datasize(me, presult);
 	}	break;
+#endif /* !CONFIG_USE_NEW_FS */
 
 	case HANDLE_TYPE_FDIRENT: {
 		struct fdirent *me;
@@ -196,6 +231,9 @@ handle_datasize(struct handle const *__restrict self,
 	case HANDLE_TYPE_DIRHANDLE: {
 		struct filehandle *me;
 		me = (struct filehandle *)self->h_data;
+#ifdef CONFIG_USE_NEW_FS
+		value = mfile_datasize(me->fh_file);
+#else /* CONFIG_USE_NEW_FS */
 		inode_loadattr(me->f_node);
 #ifdef CONFIG_ATOMIC64_SUPPORT_ALWAYS
 		value = ATOMIC_READ(me->f_node->i_filesize);
@@ -205,9 +243,15 @@ handle_datasize(struct handle const *__restrict self,
 			value = me->f_node->i_filesize;
 		}
 #endif /* !CONFIG_ATOMIC64_SUPPORT_ALWAYS */
+#endif /* !CONFIG_USE_NEW_FS */
 	}	break;
 
 	case HANDLE_TYPE_PATH: {
+#ifdef CONFIG_USE_NEW_FS
+		struct path *me;
+		me    = (struct path *)self->h_data;
+		value = mfile_datasize(me->p_dir);
+#else /* CONFIG_USE_NEW_FS */
 		struct path *me;
 		REF struct inode *node;
 		me = (struct path *)self->h_data;
@@ -224,6 +268,7 @@ handle_datasize(struct handle const *__restrict self,
 			value = node->i_filesize;
 		}
 #endif /* !CONFIG_ATOMIC64_SUPPORT_ALWAYS */
+#endif /* !CONFIG_USE_NEW_FS */
 	}	break;
 
 	case HANDLE_TYPE_MMAN:
@@ -264,11 +309,17 @@ handle_datasize(struct handle const *__restrict self,
 	case HANDLE_TYPE_FIFO_USER: {
 		struct fifo_user *me;
 		me    = (struct fifo_user *)self->h_data;
+#ifdef CONFIG_USE_NEW_FS
+		value = (pos_t)ATOMIC_READ(me->fu_fifo->ff_buffer.rb_avail);
+#else /* CONFIG_USE_NEW_FS */
 		value = (pos_t)ATOMIC_READ(me->fu_fifo->f_fifo.ff_buffer.rb_avail);
+#endif /* !CONFIG_USE_NEW_FS */
 	}	break;
 
 	default:
+#ifndef CONFIG_USE_NEW_FS
 badtype:
+#endif /* !CONFIG_USE_NEW_FS */
 		return false;
 	}
 	*presult = value;
@@ -284,6 +335,7 @@ handle_print(struct handle const *__restrict self,
 
 	case HANDLE_TYPE_MFILE: {
 		struct mfile *b = (struct mfile *)self->h_data;
+		/* TODO: Support for printing the full names of chr-/blk-devices */
 		if (vm_datablock_isinode(b)) {
 			result = format_printf(printer, arg,
 			                       "anon_inode:[inode:%" PRIuN(__SIZEOF_INO_T__) "]",
@@ -295,6 +347,7 @@ handle_print(struct handle const *__restrict self,
 		}
 	}	break;
 
+#ifndef CONFIG_USE_NEW_FS
 	case HANDLE_TYPE_BLKDEV:
 	case HANDLE_TYPE_CHRDEV: {
 		REF struct path *mount;
@@ -319,6 +372,7 @@ handle_print(struct handle const *__restrict self,
 			                       printer, arg);
 		}
 	}	break;
+#endif /* !CONFIG_USE_NEW_FS */
 
 	case HANDLE_TYPE_FDIRENT: {
 		struct fdirent *ent = (struct fdirent *)self->h_data;
@@ -326,7 +380,11 @@ handle_print(struct handle const *__restrict self,
 		                       ent->de_namelen, ent->de_name);
 	}	break;
 
-	case HANDLE_TYPE_FILEHANDLE: {
+	case HANDLE_TYPE_FILEHANDLE:
+#ifdef CONFIG_USE_NEW_FS
+	case HANDLE_TYPE_DIRHANDLE:
+#endif /* CONFIG_USE_NEW_FS */
+	{
 		struct filehandle *f = (struct filehandle *)self->h_data;
 		if (f->f_path && f->f_dirent) {
 			result = path_printent(f->f_path,
@@ -334,12 +392,28 @@ handle_print(struct handle const *__restrict self,
 			                       f->f_dirent->de_namelen,
 			                       printer, arg);
 		} else {
+#ifdef CONFIG_USE_NEW_FS
+			ino_t ino = 0;
+			if (mfile_isnode(f->fh_file)) {
+				struct fnode *node = mfile_asnode(f->fh_file);
+				mfile_tslock_acquire(node);
+				ino = node->fn_ino;
+				mfile_tslock_release(node);
+			}
 			result = format_printf(printer, arg,
-			                       "anon_inode:[file:inode:%" PRIuN(__SIZEOF_INO_T__) "]",
+			                       "anon_inode:[filehandle:"
+			                       "inode:%" PRIuN(__SIZEOF_INO_T__) "]",
+			                       ino);
+#else /* CONFIG_USE_NEW_FS */
+			result = format_printf(printer, arg,
+			                       "anon_inode:[filehandle:"
+			                       "inode:%" PRIuN(__SIZEOF_INO_T__) "]",
 			                       f->f_node->i_fileino);
+#endif /* !CONFIG_USE_NEW_FS */
 		}
 	}	break;
 
+#ifndef CONFIG_USE_NEW_FS
 	case HANDLE_TYPE_DIRHANDLE: {
 		struct dirhandle *f = (struct dirhandle *)self->h_data;
 		if (f->d_path && f->d_dirent) {
@@ -354,6 +428,7 @@ handle_print(struct handle const *__restrict self,
 			                       f->d_node->i_fileino);
 		}
 	}	break;
+#endif /* CONFIG_USE_NEW_FS */
 
 	case HANDLE_TYPE_PATH: {
 		struct path *p = (struct path *)self->h_data;
@@ -664,19 +739,6 @@ handle_get_task(unsigned int fd)
 	}
 }
 
-PUBLIC ATTR_RETNONNULL WUNUSED REF struct vfs *FCALL
-handle_get_vfs(unsigned int fd)
-		THROWS(E_WOULDBLOCK, E_INVALID_HANDLE_FILE,
-		       E_INVALID_HANDLE_FILETYPE) {
-	REF struct handle hnd;
-	hnd = handle_lookup(fd);
-	TRY {
-		return handle_as_vfs(&hnd);
-	} EXCEPT {
-		handle_getas_complete_except(fd);
-	}
-}
-
 
 
 /* Extended handle converted functions */
@@ -755,6 +817,24 @@ handle_as_dirnode(/*inherit(on_success)*/ REF struct handle const *__restrict se
 PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct superblock *FCALL
 handle_as_super(/*inherit(on_success)*/ REF struct handle const *__restrict self)
 		THROWS(E_INVALID_HANDLE_FILETYPE) {
+#ifdef CONFIG_USE_NEW_FS
+	/* Special case: The handle already has the correct typing */
+	if (self->h_type == HANDLE_TYPE_MFILE) {
+		struct mfile *mf = (struct mfile *)self->h_data;
+		if (mfile_issuper(mf))
+			return mfile_assuper(mf); /* inherit */
+	} else {
+		REF struct mfile *result;
+		result = (REF struct mfile *)_handle_tryas(*self, HANDLE_TYPE_MFILE);
+		if likely(result) {
+			if (mfile_issuper(result)) {
+				handle_decref(*self); /* inherit: on_success */
+				return mfile_assuper(result);
+			}
+			decref_unlikely(result);
+		}
+	}
+#else /* CONFIG_USE_NEW_FS */
 	REF struct superblock *result;
 	/* Special case: The handle already has the correct typing */
 	if (self->h_type == HANDLE_TYPE_MFILE) {
@@ -771,6 +851,7 @@ handle_as_super(/*inherit(on_success)*/ REF struct handle const *__restrict self
 			decref_unlikely(result);
 		}
 	}
+#endif /* !CONFIG_USE_NEW_FS */
 	throw_invalid_handle_type(self,
 	                          HANDLE_TYPE_MFILE,
 	                          HANDLE_TYPEKIND_MFILE_SUPERBLOCK);
@@ -907,32 +988,6 @@ handle_as_task(/*inherit(on_success)*/ REF struct handle const *__restrict self)
 	                          HANDLE_TYPE_TASK,
 	                          HANDLE_TYPEKIND_GENERIC);
 }
-
-PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct vfs *FCALL
-handle_as_vfs(/*inherit(on_success)*/ REF struct handle const *__restrict self)
-		THROWS(E_INVALID_HANDLE_FILETYPE) {
-	REF struct vfs *result;
-	/* Special case: The handle already has the correct typing */
-	if (self->h_type == HANDLE_TYPE_PATH) {
-		result = (REF struct vfs *)self->h_data;
-		if likely(result->p_vfs == result)
-			return result; /* inherit */
-	} else {
-		result = (REF struct vfs *)_handle_tryas(*self, HANDLE_TYPE_PATH);
-		if likely(result) {
-			if likely(result->p_vfs == result) {
-				decref_unlikely(self); /* inherit: on_success */
-				return result;
-			}
-			decref_unlikely(result);
-		}
-	}
-	throw_invalid_handle_type(self,
-	                          HANDLE_TYPE_PATH,
-	                          HANDLE_TYPEKIND_PATH_VFSROOT);
-}
-
-
 
 
 DECL_END

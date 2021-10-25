@@ -630,7 +630,8 @@ FUNDEF NONNULL((1)) size_t KCALL
 path_sprintent(struct path *__restrict self,
                USER CHECKED char const *dentry_name, u16 dentry_namelen,
                USER CHECKED char *buffer, size_t buflen,
-               atflag_t atflags DFL(0), struct path *root DFL(__NULLPTR)) THROWS(E_SEGFAULT);
+               atflag_t atflags DFL(AT_PATHPRINT_INCTRAIL),
+               struct path *root DFL(__NULLPTR)) THROWS(E_SEGFAULT);
 
 
 

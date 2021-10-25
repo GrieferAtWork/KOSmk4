@@ -25,6 +25,7 @@
 
 #include <dev/nic.h>
 #include <kernel/printk.h>
+#include <sched/task.h>
 
 #include <kos/net/printf.h>
 #include <netinet/in.h>
@@ -51,43 +52,49 @@ udp_routepacket(struct nicdev *__restrict dev,
 	payload_length = ntohs(packet->uh_ulen);
 	/* Ensure that the */
 	if unlikely(payload_length < sizeof(struct udphdr)) {
+		chrdev_getname_lock_acquire(dev);
 		printk(KERN_ERR "[udp:%s] udp packet udp.size=%" PRIu16 " from "
 		                "[" NET_PRINTF_IPADDRPORT_FMT "] to "
 		                "[" NET_PRINTF_IPADDRPORT_FMT "] "
 		                "is too small\n",
-		       dev->cd_name, payload_length,
+		       chrdev_getname(dev), payload_length,
 		       NET_PRINTF_IPADDRPORT_ARG(ip_header->ip_src.s_addr,
 		                                 ntohs(packet->uh_sport)),
 		       NET_PRINTF_IPADDRPORT_ARG(ip_header->ip_dst.s_addr,
 		                                 ntohs(packet->uh_dport)));
+		chrdev_getname_lock_release(dev);
 		return;
 	}
 	if unlikely(payload_length > packet_size) {
+		chrdev_getname_lock_acquire(dev);
 		printk(KERN_ERR "[udp:%s] udp packet udp.size=%" PRIu16 " from "
 		                "[" NET_PRINTF_IPADDRPORT_FMT "] to "
 		                "[" NET_PRINTF_IPADDRPORT_FMT "] "
 		                "exceeds ip.size=%" PRIu16 "\n",
-		       dev->cd_name, payload_length,
+		       chrdev_getname(dev), payload_length,
 		       NET_PRINTF_IPADDRPORT_ARG(ip_header->ip_src.s_addr,
 		                                 ntohs(packet->uh_sport)),
 		       NET_PRINTF_IPADDRPORT_ARG(ip_header->ip_dst.s_addr,
 		                                 ntohs(packet->uh_dport)),
 		       packet_size);
+		chrdev_getname_lock_release(dev);
 		return;
 	}
 	payload_length -= sizeof(struct udphdr);
 
 #if 1
+	chrdev_getname_lock_acquire(dev);
 	printk(KERN_TRACE "[udp:%s] Packet from "
 	                  "[" NET_PRINTF_IPADDRPORT_FMT "] to "
 	                  "[" NET_PRINTF_IPADDRPORT_FMT "]:\n"
 	                  "%$[hex:P]\n",
-	       dev->cd_name,
+	       chrdev_getname(dev),
 	       NET_PRINTF_IPADDRPORT_ARG(ip_header->ip_src.s_addr,
 	                                 ntohs(packet->uh_sport)),
 	       NET_PRINTF_IPADDRPORT_ARG(ip_header->ip_dst.s_addr,
 	                                 ntohs(packet->uh_dport)),
 	       payload_length, payload);
+	chrdev_getname_lock_release(dev);
 #endif
 	(void)dev;
 	(void)packet;

@@ -297,7 +297,6 @@ INTERN WUNUSED gdb_errno_t
 NOTHROW(KCALL GDBFs_Open)(char *filename,
                           gdb_oflag_t oflags, gdb_mode_t mode,
                           struct handle *__restrict result) {
-	REF struct inode *node;
 	/* Validate flags */
 	if unlikely(oflags & ~(GDB_O_ACCMODE | GDB_O_APPEND |
 	                       GDB_O_CREAT | GDB_O_TRUNC | GDB_O_EXCL)) {
@@ -352,6 +351,7 @@ NOTHROW(KCALL GDBFs_Open)(char *filename,
 		}
 
 #else /* CONFIG_USE_NEW_FS */
+		REF struct inode *node;
 		switch (oflags & GDB_O_ACCMODE) {
 		default:
 	/*	case GDB_O_RDONLY: */

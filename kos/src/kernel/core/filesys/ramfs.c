@@ -508,6 +508,33 @@ ramfs_dirdata_lookup(struct ramfs_dirnode const *__restrict self,
 }
 
 PUBLIC NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL ramfs_dirdata_droptree)(REF struct ramfs_dirent *__restrict tree) {
+	REF struct ramfs_dirent *lhs, *rhs;
+again:
+	lhs = tree->rde_treenode.rb_lhs;
+	rhs = tree->rde_treenode.rb_rhs;
+	ATOMIC_WRITE(tree->rde_treenode.rb_lhs, RAMFS_DIRENT_TREENODE_DELETED);
+	decref_unlikely(tree);
+	if (lhs) {
+		if (rhs)
+			ramfs_dirdata_droptree(rhs);
+		tree = lhs;
+		goto again;
+	}
+	if (rhs) {
+		tree = rhs;
+		goto again;
+	}
+}
+
+PUBLIC NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL ramfs_dirdata_fini)(struct ramfs_dirdata *__restrict self) {
+	if unlikely(self->rdd_tree != NULL)
+		ramfs_dirdata_droptree(self->rdd_tree);
+}
+
+
+PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL ramfs_dirnode_v_destroy)(struct mfile *__restrict self) {
 	struct ramfs_dirnode *me = (struct ramfs_dirnode *)mfile_asdir(self);
 	ramfs_dirdata_fini(&me->rdn_dat);

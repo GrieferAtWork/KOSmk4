@@ -51,6 +51,7 @@ DECL_BEGIN
 
 struct fdirent;
 struct fdirnode;
+struct dirent;
 
 struct fdirenum;
 struct fdirenum_ops {

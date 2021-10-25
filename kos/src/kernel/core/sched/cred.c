@@ -32,12 +32,13 @@
 #include <kernel/driver.h>
 #include <kernel/except.h>
 #include <kernel/malloc.h>
+#include <kernel/mman/nopf.h>
 #include <kernel/syscall.h>
 #include <kernel/types.h>
 #include <kernel/user.h>
-#include <kernel/mman/nopf.h>
 #include <sched/cpu.h> /* CONFIG_NO_SMP */
 #include <sched/cred.h>
+#include <sched/task.h>
 
 #include <hybrid/atomic.h>
 #include <hybrid/byteorder.h>
@@ -398,8 +399,14 @@ cred_onexec(struct inode *__restrict program_inode)
 	/* NOTE: Because we've unshared `self', we don't have to acquire a lock,
 	 *       since we  already  know  that no-one  can  modify  it  anymore! */
 	new_euid = self->c_euid;
+#ifdef CONFIG_USE_NEW_FS
 	if (!self->c_no_new_privs &&
-	    !(program_inode->i_super->s_flags & SUPERBLOCK_FNOSUID)) {
+	    !(program_inode->fn_super->fs_root.mf_flags & MFILE_FS_NOSUID))
+#else /* CONFIG_USE_NEW_FS */
+	if (!self->c_no_new_privs &&
+	    !(program_inode->i_super->s_flags & SUPERBLOCK_FNOSUID))
+#endif /* !CONFIG_USE_NEW_FS */
+	{
 		/* Check for set-user-id/set-group-id */
 		inode_loadattr(program_inode);
 		if (program_inode->i_filemode & S_ISUID) {

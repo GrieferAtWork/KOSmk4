@@ -82,7 +82,12 @@ PRIVATE DRIVER_FINI void KCALL GDBServer_Fini(void) {
 }
 
 PRIVATE ATTR_FREETEXT DRIVER_INIT void KCALL GDBServer_Init(void) {
-	if (!vfs_kernel.p_inode) {
+#ifdef CONFIG_USE_NEW_FS
+	if (!vfs_kernel.vf_root)
+#else /* CONFIG_USE_NEW_FS */
+	if (!vfs_kernel.p_inode)
+#endif /* !CONFIG_USE_NEW_FS */
+	{
 		/* TODO: If `modgdbserver' is  loaded as a  boot module, delay  initialization
 		 *       until after the root partition has been mounted. - That way, a remote
 		 *       gdb driver will be able to  immediately access the file system,  once

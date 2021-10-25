@@ -197,7 +197,7 @@ struct fnode_ops {
 
 
 /* No-op callback for `no_wrattr' (for RAM filesystems) */
-FUNDEF ATTR_CONST NONNULL((1)) void
+FUNDEF NONNULL((1)) void
 NOTHROW(KCALL fnode_v_wrattr_noop)(struct fnode *__restrict self);
 
 

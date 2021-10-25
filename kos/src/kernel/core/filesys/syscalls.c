@@ -852,8 +852,8 @@ sys_mount_impl(USER UNCHECKED char const *source,
 		FINALLY_DECREF_UNLIKELY(target_path);
 		if (path_ismount(target_path) && !(mountflags & MS_REMOUNT))
 			THROW(E_FSERROR_PATH_ALREADY_MOUNTED);
-		require(CAP_MOUNT);                         /* Require mounting rights. */
-		path_mount(target_path, fnode_asdir(node)); /* Mount the directory from the other node. */
+		require(CAP_MOUNT);                                          /* Require mounting rights. */
+		decref_unlikely(path_mount(target_path, fnode_asdir(node))); /* Mount the directory from the other node. */
 	} else if (mountflags & MS_REMOUNT) {
 		REF struct path *target_path;
 		struct fsuper *super;
@@ -879,7 +879,6 @@ sys_mount_impl(USER UNCHECKED char const *source,
 		REF struct ffilesys *type;
 		REF struct path *mount_location;
 		REF struct fsuper *super;
-		uintptr_t super_flags;
 		bool newsuper;
 		VALIDATE_FLAGSET(mountflags,
 		                 MS_RDONLY | MS_NOSUID | MS_NODEV | MS_NOEXEC | MS_SYNCHRONOUS |
@@ -957,7 +956,7 @@ sys_mount_impl(USER UNCHECKED char const *source,
 			/* Do the mount */
 			if (path_ismount(mount_location))
 				THROW(E_FSERROR_PATH_ALREADY_MOUNTED);
-			path_mount(mount_location, &super->fs_root);
+			decref_unlikely(path_mount(mount_location, &super->fs_root));
 
 			/* Set flags for multi-mounted superblocks. */
 			if (!newsuper)
@@ -1376,7 +1375,6 @@ DEFINE_SYSCALL1(errno_t, syncfs, fd_t, fd) {
 PRIVATE fd_t KCALL
 sys_openat_impl(fd_t dirfd, USER UNCHECKED char const *filename,
                 oflag_t oflags, mode_t mode) {
-	atflag_t atflags;
 	unsigned int result_fd;
 	REF struct handle result;
 	validate_readable(filename, 1);

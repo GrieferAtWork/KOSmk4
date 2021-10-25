@@ -128,6 +128,7 @@ struct handle_mmap_info;
 struct stat;
 struct path;
 struct fdirent;
+struct handle;
 
 #ifndef __fallocate_mode_t_defined
 #define __fallocate_mode_t_defined
@@ -641,7 +642,7 @@ struct mfile {
 #define MFILE_INIT_mf_parts(mf_parts)           mf_parts
 #define MFILE_INIT_mf_initdone                  SIG_INIT
 #define MFILE_INIT_mf_lockops                   SLIST_HEAD_INITIALIZER(~)
-#define MFILE_INIT_mf_changed(mf_changed)       mf_changed
+#define MFILE_INIT_mf_changed(mf_changed)       { mf_changed }
 #define MFILE_INIT_mf_blockshift(mf_blockshift) __hybrid_max_c2(PAGESIZE, (size_t)1 << (mf_blockshift)) - 1, mf_blockshift
 #define MFILE_INIT_mf_flags(mf_flags)           mf_flags
 #define MFILE_INIT_mf_trunclock                 0
@@ -683,9 +684,9 @@ struct mfile {
      defined(__WANT_MFILE__mf_mpplop) || defined(__WANT_MFILE__mf_compl) ||         \
      defined(__WANT_MFILE__mf_lopX))
 #ifdef __WANT_FS_INIT
-#define MFILE_INIT_mf_atime(mf_atime__tv_sec, mf_atime__tv_nsec) {{ { mf_atime__tv_sec, mf_atime__tv_nsec }
-#define MFILE_INIT_mf_mtime(mf_mtime__tv_sec, mf_mtime__tv_nsec)    { mf_mtime__tv_sec, mf_mtime__tv_nsec }
-#define MFILE_INIT_mf_ctime(mf_ctime__tv_sec, mf_ctime__tv_nsec)    { mf_ctime__tv_sec, mf_ctime__tv_nsec } }}
+#define MFILE_INIT_mf_atime(mf_atime__tv_sec, mf_atime__tv_nsec) {{ { .tv_sec = mf_atime__tv_sec, .tv_nsec = mf_atime__tv_nsec }
+#define MFILE_INIT_mf_mtime(mf_mtime__tv_sec, mf_mtime__tv_nsec)    { .tv_sec = mf_mtime__tv_sec, .tv_nsec = mf_mtime__tv_nsec }
+#define MFILE_INIT_mf_ctime(mf_ctime__tv_sec, mf_ctime__tv_nsec)    { .tv_sec = mf_ctime__tv_sec, .tv_nsec = mf_ctime__tv_nsec } }}
 #endif /* __WANT_FS_INIT */
 	union {
 		struct {
@@ -749,9 +750,9 @@ struct mfile {
 	};
 #else /* __WANT_MFILE__mf_... */
 #ifdef __WANT_FS_INIT
-#define MFILE_INIT_mf_atime(mf_atime__tv_sec, mf_atime__tv_nsec) { mf_atime__tv_sec, mf_atime__tv_nsec }
-#define MFILE_INIT_mf_mtime(mf_mtime__tv_sec, mf_mtime__tv_nsec) { mf_mtime__tv_sec, mf_mtime__tv_nsec }
-#define MFILE_INIT_mf_ctime(mf_ctime__tv_sec, mf_ctime__tv_nsec) { mf_ctime__tv_sec, mf_ctime__tv_nsec }
+#define MFILE_INIT_mf_atime(mf_atime__tv_sec, mf_atime__tv_nsec) { .tv_sec = mf_atime__tv_sec, .tv_nsec = mf_atime__tv_nsec }
+#define MFILE_INIT_mf_mtime(mf_mtime__tv_sec, mf_mtime__tv_nsec) { .tv_sec = mf_mtime__tv_sec, .tv_nsec = mf_mtime__tv_nsec }
+#define MFILE_INIT_mf_ctime(mf_ctime__tv_sec, mf_ctime__tv_nsec) { .tv_sec = mf_ctime__tv_sec, .tv_nsec = mf_ctime__tv_nsec }
 #endif /* __WANT_FS_INIT */
 	struct timespec               mf_atime;      /* [lock(_MFILE_F_SMP_TSLOCK)][const_if(MFILE_F_NOATIME)][valid_if(!MFILE_F_DELETED)]
 	                                              * Last-accessed timestamp. NOTE!!!  Becomes invalid when  `MFILE_F_DELETED' is  set!
@@ -1275,10 +1276,10 @@ FUNDEF NONNULL((1, 2)) void KCALL mfile_readallv_p(struct mfile *__restrict self
  * transfer errors that cannot be resolved by `mman_prefault()' */
 FUNDEF NONNULL((1)) size_t KCALL _mfile_buffered_read(struct mfile *__restrict self, USER CHECKED void *dst, size_t num_bytes, pos_t filepos) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
 FUNDEF NONNULL((1)) size_t KCALL _mfile_buffered_write(struct mfile *__restrict self, USER CHECKED void const *src, size_t num_bytes, pos_t filepos) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
-FUNDEF NONNULL((1)) size_t KCALL _mfile_buffered_tailwrite(struct mfile *__restrict self, USER CHECKED void const *src, size_t num_bytes, pos_t filepos) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
+FUNDEF NONNULL((1)) size_t KCALL _mfile_buffered_tailwrite(struct mfile *__restrict self, USER CHECKED void const *src, size_t num_bytes) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
 FUNDEF NONNULL((1, 2)) size_t KCALL _mfile_buffered_readv(struct mfile *__restrict self, struct iov_buffer const *__restrict buf, size_t buf_offset, size_t num_bytes, pos_t filepos) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
 FUNDEF NONNULL((1, 2)) size_t KCALL _mfile_buffered_writev(struct mfile *__restrict self, struct iov_buffer const *__restrict buf, size_t buf_offset, size_t num_bytes, pos_t filepos) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
-FUNDEF NONNULL((1, 2)) size_t KCALL _mfile_buffered_tailwritev(struct mfile *__restrict self, struct iov_buffer const *__restrict buf, size_t buf_offset, size_t num_bytes, pos_t filepos) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
+FUNDEF NONNULL((1, 2)) size_t KCALL _mfile_buffered_tailwritev(struct mfile *__restrict self, struct iov_buffer const *__restrict buf, size_t buf_offset, size_t num_bytes) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
 #endif /* CONFIG_USE_NEW_FS */
 
 /* Helpers for directly reading to/from VIO space. */

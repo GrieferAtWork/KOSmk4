@@ -64,6 +64,7 @@
 
 #include <alloca.h>
 #include <assert.h>
+#include <limits.h>
 #include <stddef.h>
 #include <string.h>
 
@@ -1505,6 +1506,21 @@ again:
 	result = axref_get(rtld_fsfile);
 	if (!result && !kernel_poisoned()) {
 		TRY {
+#ifdef CONFIG_USE_NEW_FS
+			REF struct path *root;
+			u32 remaining_symlinks;
+			vfs_rootlock_read(&vfs_kernel);
+			root = incref(vfs_kernel.vf_root);
+			vfs_rootlock_endread(&vfs_kernel);
+			FINALLY_DECREF_UNLIKELY(root);
+			remaining_symlinks = SYMLOOP_MAX;
+			/* Open the libdl file. (+1 because we want to be relative to the root) */
+			result = path_traversefull_ex(root, &remaining_symlinks, rtld_name->fd_name + 1);
+			if unlikely(!mfile_isreg(result)) {
+				decref_unlikely(result);
+				THROW(E_FSERROR);
+			}
+#else /* CONFIG_USE_NEW_FS */
 			result = path_traversefull_ex(/* filesystem:            */ &fs_kernel,
 			                              /* cwd:                   */ &vfs_kernel,
 			                              /* root:                  */ &vfs_kernel,
@@ -1515,6 +1531,7 @@ again:
 			                              /* pcontaining_path:      */ NULL,
 			                              /* pcontaining_directory: */ NULL,
 			                              /* pcontaining_dirent:    */ NULL);
+#endif /* !CONFIG_USE_NEW_FS */
 #ifndef CONFIG_USE_NEW_FS
 			if (!vm_datablock_isinode(result)) {
 				decref_unlikely(result);
@@ -1908,6 +1925,23 @@ not_an_elf_file:
 
 PRIVATE struct mfile_axref system_rtld_fsfile = AXREF_INIT(NULL);
 PRIVATE struct fdirent system_rtld_dirent = {
+#ifdef CONFIG_USE_NEW_FS
+	.fd_refcnt  = 1,
+	.fd_ops     = &fdirent_empty_ops,
+	.fd_ino     = 0,
+#ifdef __x86_64__
+	.fd_hash    = UINT64_C(0xce184917e2193010),
+#elif __SIZEOF_POINTER__ == 8
+	.fd_hash    = UINT64_C(0x75b4ce19e8e33a0b),
+#elif __SIZEOF_POINTER__ == 4
+	.fd_hash    = UINT32_C(0x6e321ca9),
+#else /* __SIZEOF_POINTER__ == ... */
+	.fd_hash    = 0,
+#endif /* __SIZEOF_POINTER__ != ... */
+	.fd_namelen = COMPILER_STRLEN(RTLD_LIBDL),
+	.fd_type    = DT_REG,
+	/* .fd_name = */ RTLD_LIBDL
+#else /* CONFIG_USE_NEW_FS */
 	.de_refcnt   = 1, /* +1: system_rtld_dirent */
 	.de_heapsize = offsetof(struct fdirent, de_name) + sizeof(RTLD_LIBDL),
 	.de_next     = NULL,
@@ -1927,11 +1961,27 @@ PRIVATE struct fdirent system_rtld_dirent = {
 	.de_namelen  = COMPILER_STRLEN(RTLD_LIBDL),
 	.de_type     = DT_REG,
 	RTLD_LIBDL
+#endif /* !CONFIG_USE_NEW_FS */
 };
 
 #ifdef __ARCH_HAVE_COMPAT
 PRIVATE struct mfile_axref compat_system_rtld_fsfile = AXREF_INIT(NULL);
 PRIVATE struct fdirent compat_system_rtld_dirent = {
+#ifdef CONFIG_USE_NEW_FS
+	.fd_refcnt  = 1,
+	.fd_ops     = &fdirent_empty_ops,
+	.fd_ino     = 0,
+#if __SIZEOF_POINTER__ == 8
+	.fd_hash    = UINT64_C(0x75b4ce19e8e33a0b),
+#elif __SIZEOF_POINTER__ == 4
+	.fd_hash    = UINT32_C(0x6e321ca9),
+#else /* __SIZEOF_POINTER__ == ... */
+	.fd_hash    = 0,
+#endif /* __SIZEOF_POINTER__ != ... */
+	.fd_namelen = COMPILER_STRLEN(COMPAT_RTLD_LIBDL),
+	.fd_type    = DT_REG,
+	/* .fd_name = */ COMPAT_RTLD_LIBDL
+#else /* CONFIG_USE_NEW_FS */
 	.de_refcnt   = 1, /* +1: compat_system_rtld_dirent */
 	.de_heapsize = offsetof(struct fdirent, de_name) + sizeof(COMPAT_RTLD_LIBDL),
 	.de_next     = NULL,
@@ -1949,6 +1999,7 @@ PRIVATE struct fdirent compat_system_rtld_dirent = {
 	.de_namelen  = COMPILER_STRLEN(COMPAT_RTLD_LIBDL),
 	.de_type     = DT_REG,
 	COMPAT_RTLD_LIBDL
+#endif /* !CONFIG_USE_NEW_FS */
 };
 #endif /* __ARCH_HAVE_COMPAT */
 
