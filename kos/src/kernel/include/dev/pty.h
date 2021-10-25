@@ -33,12 +33,7 @@
 
 #include <libbuffer/ringbuffer.h>
 
-/* PTY device numbers.
- * NOTE: These must only  be used for  drivers allocated by  `openpty()'.
- *       Any other  sub-system  making  use of,  or  extending  upon  PTY
- *       terminal drivers must implement its own device numbering system.
- * NOTE: To register a pty master/slave pair for `openpty()', use `pty_register' below.
- */
+/* PTY device numbers. */
 #define PTY_DEVCNT    256
 #define PTY_MASTER(n) MKDEV(2, n)
 #define PTY_SLAVE(n)  MKDEV(3, n)

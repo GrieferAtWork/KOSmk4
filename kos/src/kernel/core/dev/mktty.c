@@ -34,6 +34,7 @@
 #include <kernel/types.h>
 #include <kernel/user.h>
 #include <sched/async.h>
+#include <sched/cred.h>
 #include <sched/rpc-internal.h>
 #include <sched/rpc.h>
 #include <sched/signal.h>
@@ -66,37 +67,22 @@ mktty_v_oprinter(struct terminal *__restrict term,
 }
 
 
-PRIVATE NOBLOCK NONNULL((1)) void
-NOTHROW(KCALL mkttydev_v_fini)(struct chrdev *__restrict self) {
-	struct mkttydev *me;
-	me = (struct mkttydev *)self;
-	/* Stop the associated forwarding thread (if one is running) */
-	mkttydev_stopfwd(me);
-	if (me->mtd_ihandle_typ == HANDLE_TYPE_CHRDEV &&
-	    chrdev_iskbd((struct chrdev *)me->mtd_ihandle_ptr)) {
-		struct kbddev *idev;
-		idev = (struct kbddev *)me->mtd_ihandle_ptr;
-		awref_cmpxch(&idev->kd_tty, me, NULL);
-	}
-	if (me->mtd_ohandle_typ == HANDLE_TYPE_CHRDEV &&
-	    chrdev_isansitty((struct chrdev *)me->mtd_ohandle_ptr)) {
-		struct ansittydev *odev;
-		odev = (struct ansittydev *)me->mtd_ohandle_ptr;
-		/* Try to unbind this TTY from an ansi tty output device. */
-		awref_cmpxch(&odev->at_tty, me, NULL);
-	}
-	/* Drop references from input/output handles. */
-	(*handle_type_db.h_decref[me->mtd_ohandle_typ])(me->mtd_ohandle_ptr);
-	(*handle_type_db.h_decref[me->mtd_ihandle_typ])(me->mtd_ihandle_ptr);
-	ttydev_v_fini(self);
-}
 
-
-
+#ifdef CONFIG_USE_NEW_FS
+PRIVATE NONNULL((1)) void KCALL
+mkttydev_v_pollconnect(struct mfile *__restrict self,
+                       poll_mode_t what) THROWS(...)
+#else /* CONFIG_USE_NEW_FS */
 PUBLIC NONNULL((1)) void KCALL
-mkttydev_v_pollconnect(struct chrdev *__restrict self, poll_mode_t what) THROWS(...) {
-	struct mkttydev *me;
-	me = (struct mkttydev *)self;
+mkttydev_v_pollconnect(struct chrdev *__restrict self,
+                       poll_mode_t what) THROWS(...)
+#endif /* !CONFIG_USE_NEW_FS */
+{
+#ifdef CONFIG_USE_NEW_FS
+	struct mkttydev *me = mfile_asmktty(self);
+#else /* CONFIG_USE_NEW_FS */
+	struct mkttydev *me = (struct mkttydev *)self;
+#endif /* !CONFIG_USE_NEW_FS */
 	if (what & POLLINMASK) {
 		/* Poll the input buffer. */
 		terminal_pollconnect_iread(&me->t_term);
@@ -110,11 +96,23 @@ mkttydev_v_pollconnect(struct chrdev *__restrict self, poll_mode_t what) THROWS(
 	}
 }
 
+
+#ifdef CONFIG_USE_NEW_FS
 PUBLIC NONNULL((1)) poll_mode_t KCALL
-mkttydev_v_polltest(struct chrdev *__restrict self, poll_mode_t what) THROWS(...) {
+mkttydev_v_polltest(struct mfile *__restrict self,
+                    poll_mode_t what) THROWS(...)
+#else /* CONFIG_USE_NEW_FS */
+PUBLIC NONNULL((1)) poll_mode_t KCALL
+mkttydev_v_polltest(struct chrdev *__restrict self,
+                    poll_mode_t what) THROWS(...)
+#endif /* !CONFIG_USE_NEW_FS */
+{
+#ifdef CONFIG_USE_NEW_FS
+	struct mkttydev *me = mfile_asmktty(self);
+#else /* CONFIG_USE_NEW_FS */
+	struct mkttydev *me = (struct mkttydev *)self;
+#endif /* !CONFIG_USE_NEW_FS */
 	poll_mode_t result = 0;
-	struct mkttydev *me;
-	me = (struct mkttydev *)self;
 	if (what & POLLINMASK) {
 		/* Poll the input buffer, as well as the underlying input driver for reading. */
 		if (terminal_caniread(&me->t_term))
@@ -216,11 +214,21 @@ NOTHROW(KCALL mkttydev_stopfwd)(struct mkttydev *__restrict self) {
 
 
 
+#ifdef CONFIG_USE_NEW_FS
+PRIVATE NONNULL((1)) syscall_slong_t KCALL
+mkttydev_v_ioctl(struct mfile *__restrict self, syscall_ulong_t cmd,
+                 USER UNCHECKED void *arg, iomode_t mode) THROWS(...)
+#else /* CONFIG_USE_NEW_FS */
 PRIVATE NONNULL((1)) syscall_slong_t KCALL
 mkttydev_v_ioctl(struct chrdev *__restrict self, syscall_ulong_t cmd,
-              USER UNCHECKED void *arg, iomode_t mode) THROWS(...) {
-	struct mkttydev *me;
-	me = (struct mkttydev *)self;
+                 USER UNCHECKED void *arg, iomode_t mode) THROWS(...)
+#endif /* !CONFIG_USE_NEW_FS */
+{
+#ifdef CONFIG_USE_NEW_FS
+	struct mkttydev *me = mfile_asmktty(self);
+#else /* CONFIG_USE_NEW_FS */
+	struct mkttydev *me = (struct mkttydev *)self;
+#endif /* !CONFIG_USE_NEW_FS */
 	switch (cmd) {
 
 	/* TODO: KOS-specific ioctl()s to access the connected input/output devices. */
@@ -300,12 +308,24 @@ predict_output_device_command:
 }
 
 
+#ifdef CONFIG_USE_NEW_FS
+PRIVATE NONNULL((1, 2)) void KCALL
+mkttydev_v_mmap(struct mfile *__restrict self,
+                struct handle_mmap_info *__restrict info)
+		THROWS(...)
+#else /* CONFIG_USE_NEW_FS */
 PRIVATE NONNULL((1, 2)) void KCALL
 mkttydev_v_mmap(struct chrdev *__restrict self,
-             struct handle_mmap_info *__restrict info)
-		THROWS(...) {
-	struct mkttydev *me;
-	me = (struct mkttydev *)self;
+                struct handle_mmap_info *__restrict info)
+		THROWS(...)
+#endif /* !CONFIG_USE_NEW_FS */
+{
+#ifdef CONFIG_USE_NEW_FS
+	struct mkttydev *me = mfile_asmktty(self);
+#else /* CONFIG_USE_NEW_FS */
+	struct mkttydev *me = (struct mkttydev *)self;
+#endif /* !CONFIG_USE_NEW_FS */
+
 	/* mmap() may be implemented by the display handle (e.g. for direct framebuffer access),
 	 * so  forward  any  request  for  mapping  data  into  memory  to  it,  and  it  alone. */
 	(*handle_type_db.h_mmap[me->mtd_ohandle_typ])(me->mtd_ohandle_ptr, info);
@@ -314,37 +334,187 @@ mkttydev_v_mmap(struct chrdev *__restrict self,
 
 
 
-/* Create (but  don't register)  a new  TTY device  that connects  the two  given
- * handles, such that character-based keyboard input is taken from `ihandle_ptr',
- * and   ansi-compliant   display    output   is    written   to    `ohandle_ptr'
- * For   this   purpose,  special   handling   is  done   for   certain  handles:
- *   - ohandle_typ  ==   HANDLE_TYPE_CHRDEV   &&   chrdev_isansitty(ohandle_ptr):
- *     `((struct ansittydev *)ohandle_ptr)->at_tty' will be bound to the newly created tty  device
+#ifdef CONFIG_USE_NEW_FS
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(KCALL mkttydev_v_destroy)(struct mfile *__restrict self)
+#else /* CONFIG_USE_NEW_FS */
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(KCALL mkttydev_v_fini)(struct chrdev *__restrict self)
+#endif /* !CONFIG_USE_NEW_FS */
+{
+#ifdef CONFIG_USE_NEW_FS
+	struct mkttydev *me = mfile_asmktty(self);
+#else /* CONFIG_USE_NEW_FS */
+	struct mkttydev *me = (struct mkttydev *)self;
+#endif /* !CONFIG_USE_NEW_FS */
+
+	/* Stop the associated forwarding thread (if one is running) */
+	mkttydev_stopfwd(me);
+
+	if (me->mtd_ihandle_typ == HANDLE_TYPE_CHRDEV &&
+	    chrdev_iskbd((struct chrdev *)me->mtd_ihandle_ptr)) {
+		struct kbddev *idev;
+		idev = (struct kbddev *)me->mtd_ihandle_ptr;
+		awref_cmpxch(&idev->kd_tty, me, NULL);
+	}
+	if (me->mtd_ohandle_typ == HANDLE_TYPE_CHRDEV &&
+	    chrdev_isansitty((struct chrdev *)me->mtd_ohandle_ptr)) {
+		struct ansittydev *odev;
+		odev = (struct ansittydev *)me->mtd_ohandle_ptr;
+		/* Try to unbind this TTY from an ansi tty output device. */
+		awref_cmpxch(&odev->at_tty, me, NULL);
+	}
+
+	/* Drop references from input/output handles. */
+	(*handle_type_db.h_decref[me->mtd_ohandle_typ])(me->mtd_ohandle_ptr);
+	(*handle_type_db.h_decref[me->mtd_ihandle_typ])(me->mtd_ihandle_ptr);
+
+	/* Destroy the underlying TTY */
+#ifdef CONFIG_USE_NEW_FS
+	ttydev_v_destroy(self);
+#else /* CONFIG_USE_NEW_FS */
+	ttydev_v_fini(self);
+#endif /* !CONFIG_USE_NEW_FS */
+}
+
+
+typedef size_t (KCALL *phandle_read_function_t)(void *__restrict ptr, USER CHECKED void *, size_t, iomode_t) /*THROWS(...)*/;
+typedef size_t (KCALL *phandle_write_function_t)(void *__restrict ptr, USER CHECKED void const *, size_t, iomode_t) /*THROWS(...)*/;
+typedef void (KCALL *phandle_pollconnect_function_t)(void *__restrict ptr, poll_mode_t) /*THROWS(...)*/;
+typedef poll_mode_t (KCALL *phandle_polltest_function_t)(void *__restrict ptr, poll_mode_t) /*THROWS(...)*/;
+
+
+#ifdef CONFIG_USE_NEW_FS
+
+/* Operators used by `struct mkttydev' */
+PUBLIC_CONST struct ttydev_ops const mkttydev_ops = {
+	/* TODO */
+};
+
+
+/* Create a new TTY device that connects the two given handles, such that
+ * character-based keyboard input is taken from `ihandle_ptr', and  ansi-
+ * compliant display output is written to `ohandle_ptr'.
+ *
+ * NOTE: The TTY is created with data forwarding disabled. */
+PUBLIC ATTR_RETNONNULL REF struct mkttydev *KCALL
+mkttydev_new(uintptr_half_t ihandle_typ, void *ihandle_ptr,
+             uintptr_half_t ohandle_typ, void *ohandle_ptr,
+             USER CHECKED char const *name, size_t namelen)
+		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT) {
+	struct mkttydev *result;
+	result = (struct mkttydev *)kmalloc(sizeof(struct mkttydev), GFP_NORMAL);
+	_ttydev_init(result, &mkttydev_ops, &mktty_v_oprinter);
+	result->fn_mode   = S_IFCHR | 0644;
+	result->fn_uid    = cred_getfsuid();
+	result->fn_gid    = cred_getfsgid();
+	result->dv_driver = incref(&drv_self);
+
+	/* Fill in mkttydev-specific fields. */
+	result->mtd_ihandle_typ = ihandle_typ;
+	result->mtd_ohandle_typ = ohandle_typ;
+	result->mtd_ihandle_ptr = ihandle_ptr;
+	result->mtd_ohandle_ptr = ohandle_ptr;
+
+	/* Fill in short-circuit handle operators. */
+	result->mtd_ihandle_read        = handle_type_db.h_read[ihandle_typ];
+	result->mtd_ihandle_pollconnect = handle_type_db.h_pollconnect[ihandle_typ];
+	result->mtd_ihandle_polltest    = handle_type_db.h_polltest[ihandle_typ];
+	result->mtd_ohandle_write       = handle_type_db.h_write[ohandle_typ];
+
+	/* Optimize handle operators for MFILE-derived objects. */
+	if (ihandle_typ == HANDLE_TYPE_MFILE) {
+		struct mfile *in;
+		struct mfile_stream_ops const *stream;
+		in     = (struct mfile *)ihandle_ptr;
+		stream = in->mf_ops->mo_stream;
+		if (stream != NULL) {
+			if (stream->mso_read != NULL)
+				result->mtd_ihandle_read = (phandle_read_function_t)stream->mso_read;
+			if (stream->mso_pollconnect != NULL)
+				result->mtd_ihandle_pollconnect = (phandle_pollconnect_function_t)stream->mso_pollconnect;
+			if (stream->mso_polltest != NULL)
+				result->mtd_ihandle_polltest = (phandle_polltest_function_t)stream->mso_polltest;
+		}
+	}
+	if (ohandle_typ == HANDLE_TYPE_MFILE) {
+		struct mfile *out;
+		struct mfile_stream_ops const *stream;
+		out    = (struct mfile *)ohandle_ptr;
+		stream = out->mf_ops->mo_stream;
+		if (stream != NULL) {
+			if (stream->mso_write != NULL)
+				result->mtd_ohandle_write = (phandle_write_function_t)stream->mso_write;
+		}
+	}
+
+	/* incref() input and output handles, since we keep references to each. */
+	(*handle_type_db.h_incref[ihandle_typ])(ihandle_ptr);
+	(*handle_type_db.h_incref[ohandle_typ])(ohandle_ptr);
+
+	TRY {
+		/* Register the device */
+		device_registerf(result, MKDEV(DEV_MAJOR_AUTO, 0),
+		                 "%$s", namelen, name);
+	} EXCEPT {
+		(*handle_type_db.h_decref[ihandle_typ])(ihandle_ptr);
+		(*handle_type_db.h_decref[ohandle_typ])(ohandle_ptr);
+		decref_unlikely(&drv_self);
+		_ttydev_fini(result);
+		kfree(result);
+		RETHROW();
+	}
+
+	/* Try to bind  the new  TTY device to  an ANSI  TTY output  device.
+	 * Note  that a single  output device may  have multiple TTY drivers
+	 * associated with it, as is the case for the CTRL+ALT+F{1-12} TTYs. */
+	if (ohandle_typ == HANDLE_TYPE_MFILE && mfile_isansitty((struct mfile *)ohandle_ptr)) {
+		struct ansittydev *atty = (struct ansittydev *)ohandle_ptr;
+
+		/* When the output handle is an ansitty, then we must somehow register
+		 * that ansitty within the keyboard,  such that the keyboard can  call
+		 * into `ansitty_translate()' for the encoding of keyboard input  into
+		 * a CP-specific, encoded byte sequence! */
+		if (ihandle_typ == HANDLE_TYPE_MFILE && mfile_iskbd((struct mfile *)ihandle_ptr)) {
+			struct kbddev *kbd = mfile_askbd((struct mfile *)ihandle_ptr);
+			awref_cmpxch(&kbd->kd_tty, NULL, result);
+		}
+		awref_cmpxch(&atty->at_tty, NULL, result);
+	}
+	return result;
+}
+
+
+#else /* CONFIG_USE_NEW_FS */
+/* Create (but don't register) a new TTY device that connects the two given handles,
+ * such that character-based keyboard input  is taken from `ihandle_ptr', and  ansi-
+ * compliant display output is written to `ohandle_ptr'.
+ *
+ * For this purpose, special handling is done for certain handles:
+ *   - `ohandle_typ == HANDLE_TYPE_CHRDEV && chrdev_isansitty(ohandle_ptr)':
+ *     `((struct ansittydev *)ohandle_ptr)->at_tty' will  be bound  to the  newly created  tty  device
  *     (s.a.. `return'), such that its output gets injected as `terminal_iwrite(&return->t_term, ...)'
  *     When the returned tty device is destroyed, this link gets severed automatically.
  * Upon success, the caller should:
  *   - Initialize `return->cd_name'
  *   - Register the device using one of:
  *      - `chrdev_register(return, ...)'
- *      - `chrdev_register_auto(return)' */
+ *      - `chrdev_register_auto(return)'
+ * NOTE: The TTY is created with data forwarding disabled. */
 PUBLIC ATTR_RETNONNULL REF struct mkttydev *KCALL
 mkttydev_alloc(uintptr_half_t ihandle_typ, void *ihandle_ptr,
                uintptr_half_t ohandle_typ, void *ohandle_ptr)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, ...) {
-	typedef size_t (KCALL *phandle_read_function_t)(void *__restrict ptr, USER CHECKED void *, size_t, iomode_t) /*THROWS(...)*/;
-	typedef size_t (KCALL *phandle_write_function_t)(void *__restrict ptr, USER CHECKED void const *, size_t, iomode_t) /*THROWS(...)*/;
-	typedef void (KCALL *phandle_pollconnect_function_t)(void *__restrict ptr, poll_mode_t) /*THROWS(...)*/;
-	typedef poll_mode_t (KCALL *phandle_polltest_function_t)(void *__restrict ptr, poll_mode_t) /*THROWS(...)*/;
 	REF struct mkttydev *result;
 	assert(ihandle_typ < HANDLE_TYPE_COUNT);
 	assert(ohandle_typ < HANDLE_TYPE_COUNT);
 	result = CHRDEV_ALLOC(struct mkttydev);
 	ttydev_cinit(result, &mktty_v_oprinter);
-	result->cd_type.ct_fini        = &mkttydev_v_fini;
-	result->cd_type.ct_pollconnect = &mkttydev_v_pollconnect;
-	result->cd_type.ct_polltest    = &mkttydev_v_polltest;
-	result->cd_type.ct_ioctl       = &mkttydev_v_ioctl;
-	result->cd_type.ct_mmap        = &mkttydev_v_mmap;
+	result->cd_type.ct_fini          = &mkttydev_v_fini;
+	result->cd_type.ct_pollconnect   = &mkttydev_v_pollconnect;
+	result->cd_type.ct_polltest      = &mkttydev_v_polltest;
+	result->cd_type.ct_ioctl         = &mkttydev_v_ioctl;
+	result->cd_type.ct_mmap          = &mkttydev_v_mmap;
 	result->mtd_ihandle_typ          = ihandle_typ;
 	result->mtd_ohandle_typ          = ohandle_typ;
 	result->mtd_ihandle_ptr          = ihandle_ptr;
@@ -402,10 +572,17 @@ mkttydev_alloc(uintptr_half_t ihandle_typ, void *ihandle_ptr,
 	}
 	return result;
 }
+#endif /* !CONFIG_USE_NEW_FS */
 
 
 
 
+
+#ifdef CONFIG_USE_NEW_FS
+#define MKTTY_NAME_MAXLEN 64
+#else /* CONFIG_USE_NEW_FS */
+#define MKTTY_NAME_MAXLEN COMPILER_LENOF(((struct chrdev *)0)->cd_name)
+#endif /* !CONFIG_USE_NEW_FS */
 
 /************************************************************************/
 /* mktty()                                                              */
@@ -426,12 +603,13 @@ DEFINE_SYSCALL4(fd_t, mktty,
 		      reserved);
 	}
 	namelen = strlen(name);
-	if unlikely(namelen >= COMPILER_LENOF(((struct chrdev *)0)->cd_name)) {
+	if unlikely(namelen >= MKTTY_NAME_MAXLEN) {
 		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
 		      E_INVALID_ARGUMENT_CONTEXT_MKTTY_NAME,
 		      namelen,
-		      COMPILER_LENOF(((struct chrdev *)0)->cd_name));
+		      MKTTY_NAME_MAXLEN);
 	}
+
 	hkeyboard = handle_lookup((unsigned int)keyboard);
 	TRY {
 		hdisplay = handle_lookup((unsigned int)display);
@@ -452,8 +630,30 @@ DEFINE_SYSCALL4(fd_t, mktty,
 				      E_INVALID_HANDLE_OPERATION_WRITE,
 				      hdisplay.h_mode);
 			/* Construct the new TTY device. */
+#ifdef CONFIG_USE_NEW_FS
+			tty = mkttydev_new(hkeyboard.h_type, hkeyboard.h_data,
+			                   hdisplay.h_type, hdisplay.h_data,
+			                   name, namelen);
+			TRY {
+				struct handle htty;
+
+				/* Start forwarding input data. */
+				mkttydev_startfwd(tty);
+
+				/* Store the new TTY into a handle. */
+				htty.h_type = HANDLE_TYPE_CHRDEV;
+				htty.h_mode = IO_RDWR;
+				htty.h_data = tty;
+				result = handle_install(THIS_HANDLE_MANAGER, htty);
+			} EXCEPT {
+				mkttydev_stopfwd(tty);
+				device_delete(tty);
+				decref_unlikely(tty);
+				RETHROW();
+			}
+#else /* CONFIG_USE_NEW_FS */
 			tty = mkttydev_alloc(hkeyboard.h_type, hkeyboard.h_data,
-			                       hdisplay.h_type, hdisplay.h_data);
+			                     hdisplay.h_type, hdisplay.h_data);
 			TRY {
 				/* Assign a name to the new device. */
 				memcpy(tty->cd_name, name, namelen, sizeof(char));
@@ -477,6 +677,7 @@ DEFINE_SYSCALL4(fd_t, mktty,
 				decref_unlikely(tty);
 				RETHROW();
 			}
+#endif /* !CONFIG_USE_NEW_FS */
 		} EXCEPT {
 			decref(hdisplay);
 			RETHROW();
