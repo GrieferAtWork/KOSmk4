@@ -36,6 +36,36 @@
 
 DECL_BEGIN
 
+INTDEF NONNULL((1)) void KCALL /* From "./null.c" */
+nullfile_v_stat(struct mfile *__restrict UNUSED(self),
+                USER CHECKED struct stat *result);
+
+PRIVATE struct mfile_stream_ops const fsuper_unmounted_v_stream_ops = {
+	.mso_open = &ramfs_super_v_open,
+	.mso_stat = &nullfile_v_stat, /* stat() on unmounted root paths returns `boottime' timestamps! */
+};
+
+
+PRIVATE struct fsuper_ops const fsuper_unmounted_ops = {
+	.so_fdir = {
+		.dno_node = {
+			.no_file = {
+				.mo_destroy = &ramfs_super_v_destroy,
+				.mo_changed = &ramfs_super_v_changed,
+				.mo_stream  = &fsuper_unmounted_v_stream_ops,
+			},
+			.no_free   = &ramfs_super_v_free,
+			.no_wrattr = &ramfs_super_v_wrattr,
+		},
+		.dno_lookup = &ramfs_super_v_lookup,
+		.dno_enum   = &ramfs_super_v_enum,
+		.dno_mkfile = &ramfs_super_v_mkfile,
+		.dno_unlink = &ramfs_super_v_unlink,
+		.dno_rename = &ramfs_super_v_rename,
+	},
+};
+
+
 /* Special superblock (and directory) set for unmounted filesystem root paths.
  * Iow: this may  be set  in `struct path::p_dir'  for paths  that  are
  *      root dirs, as is the case when `struct path::p_parent == NULL'. */
@@ -71,7 +101,7 @@ PUBLIC struct ramfs_super fsuper_unmounted = {
 			.dn_node = {
 				.fn_file = {
 					MFILE_INIT_mf_refcnt(2), /* +1: fsuper_unmounted, +1: path_unmounted_root.p_dir */
-					MFILE_INIT_mf_ops(&ramfs_super_ops.so_fdir.dno_node.no_file),
+					MFILE_INIT_mf_ops(&fsuper_unmounted_ops.so_fdir.dno_node.no_file),
 					MFILE_INIT_mf_lock,
 					MFILE_INIT_mf_parts(MFILE_PARTS_ANONYMOUS),
 					MFILE_INIT_mf_initdone,
@@ -108,7 +138,7 @@ PUBLIC struct ramfs_super fsuper_unmounted = {
 };
 
 
-/* Opening an empty directory just re-opens the
+/* Opening  an empty directory just re-opens the
  * directory inside which it supposedly resides. */
 PRIVATE WUNUSED NONNULL((1, 2)) REF struct fnode *KCALL
 fdirent_empty_opennode(struct fdirent *__restrict UNUSED(self),

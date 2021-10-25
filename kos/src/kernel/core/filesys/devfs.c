@@ -1043,8 +1043,16 @@ again_acquire_locks:
 
 #define devfs_super_v_changed    ramfs_super_v_changed
 #define devfs_super_v_open       ramfs_super_v_open
-#define devfs_super_v_stream_ops ramfs_super_v_stream_ops
 #define devfs_super_v_wrattr     ramfs_super_v_wrattr
+
+INTDEF NONNULL((1)) void KCALL /* From "./null.c" */
+nullfile_v_stat(struct mfile *__restrict UNUSED(self),
+                USER CHECKED struct stat *result);
+
+PRIVATE struct mfile_stream_ops const devfs_super_v_stream_ops = {
+	.mso_open = &devfs_super_v_open,
+	.mso_stat = &nullfile_v_stat, /* stat("/dev") returns `boottime' timestamps! */
+};
 
 /* INTERN because needed in "./devfsdefs.c" */
 INTERN_CONST struct fsuper_ops const devfs_super_ops = {

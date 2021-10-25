@@ -35,6 +35,7 @@
 #include <kernel/mman/phys.h>
 #include <kernel/syslog.h>
 #include <sched/pid-ctty.h>
+#include <sched/tsc.h>
 
 #include <hybrid/atomic.h>
 
@@ -66,6 +67,24 @@ DECL_BEGIN
 #define interruptible_memcpy(dst, src, num_bytes)       (memcpy(dst, src, num_bytes), num_bytes)
 #define interruptible_insb(port, buf, num_bytes)        (insb(port, buf, num_bytes), num_bytes)
 #define interruptible_outsb(port, buf, num_bytes)       (outsb(port, buf, num_bytes), num_bytes)
+
+
+/************************************************************************/
+/* Common stat() operator (populated with `boottime')                   */
+/************************************************************************/
+
+INTERN NONNULL((1)) void KCALL /* `INTERN' because also re-used for pre-defined mounts */
+nullfile_v_stat(struct mfile *__restrict UNUSED(self),
+                USER CHECKED struct stat *result) {
+	result->st_atimespec.tv_sec  = (typeof(result->st_atimespec.tv_sec))boottime.tv_sec;
+	result->st_mtimespec.tv_sec  = (typeof(result->st_mtimespec.tv_sec))boottime.tv_sec;
+	result->st_ctimespec.tv_sec  = (typeof(result->st_ctimespec.tv_sec))boottime.tv_sec;
+	result->st_atimespec.tv_nsec = (typeof(result->st_atimespec.tv_nsec))boottime.tv_nsec;
+	result->st_mtimespec.tv_nsec = (typeof(result->st_mtimespec.tv_nsec))boottime.tv_nsec;
+	result->st_ctimespec.tv_nsec = (typeof(result->st_ctimespec.tv_nsec))boottime.tv_nsec;
+}
+
+
 
 
 /************************************************************************/
@@ -145,6 +164,7 @@ PRIVATE struct mfile_stream_ops const devmem_stream_ops = {
 	.mso_preadv  = &devmem_v_preadv,
 	.mso_pwrite  = &devmem_v_pwrite,
 	.mso_pwritev = &devmem_v_pwritev,
+	.mso_stat    = &nullfile_v_stat,
 };
 
 
@@ -223,6 +243,7 @@ PRIVATE struct mfile_stream_ops const devnull_stream_ops = {
 	.mso_pwrite  = &devnull_v_pwrite,
 	.mso_pwritev = &devnull_v_pwritev,
 	.mso_seek    = &devnull_v_seek,
+	.mso_stat    = &nullfile_v_stat,
 };
 
 
@@ -296,6 +317,7 @@ PRIVATE struct mfile_stream_ops const devzero_stream_ops = {
 	.mso_pwrite  = &devzero_v_pwrite,
 	.mso_pwritev = &devzero_v_pwritev,
 	.mso_seek    = &devzero_v_seek,
+	.mso_stat    = &nullfile_v_stat,
 };
 
 
@@ -351,6 +373,7 @@ PRIVATE struct mfile_stream_ops const devfull_stream_ops = {
 	.mso_pwrite  = &devfull_v_pwrite,
 	.mso_pwritev = &devfull_v_pwritev,
 	.mso_seek    = &devfull_v_seek,
+	.mso_stat    = &nullfile_v_stat,
 };
 
 
@@ -416,6 +439,7 @@ PRIVATE struct mfile_stream_ops const devkmem_stream_ops = {
 	.mso_preadv  = &devkmem_v_preadv,
 	.mso_pwrite  = &devkmem_v_pwrite,
 	.mso_pwritev = &devkmem_v_pwritev,
+	.mso_stat    = &nullfile_v_stat,
 };
 
 #ifdef LIBVIO_CONFIG_ENABLED
@@ -574,6 +598,7 @@ PRIVATE struct mfile_stream_ops const devport_stream_ops = {
 	.mso_preadv  = &devport_v_preadv,
 	.mso_pwrite  = &devport_v_pwrite,
 	.mso_pwritev = &devport_v_pwritev,
+	.mso_stat    = &nullfile_v_stat,
 };
 
 #ifdef LIBVIO_CONFIG_ENABLED
@@ -695,11 +720,14 @@ devrandom_v_polltest(struct mfile *__restrict UNUSED(self),
 }
 
 PRIVATE NONNULL((1)) void KCALL
-devrandom_v_stat(struct mfile *__restrict UNUSED(self),
+devrandom_v_stat(struct mfile *__restrict self,
                  USER CHECKED struct stat *result)
 		THROWS(...) {
 	/* Expose the # of available entropy bytes via stat. */
 	result->st_size = ATOMIC_READ(entropy_bits) / NBBY;
+
+	/* Forward to filling in timestamp information. */
+	nullfile_v_stat(self, result);
 }
 
 
@@ -799,6 +827,7 @@ PRIVATE struct mfile_stream_ops const devurandom_stream_ops = {
 	.mso_readv  = &devurandom_v_readv,
 	.mso_pread  = &devurandom_v_pread,
 	.mso_preadv = &devurandom_v_preadv,
+	.mso_stat   = &nullfile_v_stat,
 };
 
 #ifdef LIBVIO_CONFIG_ENABLED
@@ -869,6 +898,7 @@ devkmsg_v_writev(struct mfile *__restrict UNUSED(self),
 PRIVATE struct mfile_stream_ops const devkmsg_stream_ops = {
 	.mso_write  = &devkmsg_v_write,
 	.mso_writev = &devkmsg_v_writev,
+	.mso_stat   = &nullfile_v_stat,
 };
 
 
