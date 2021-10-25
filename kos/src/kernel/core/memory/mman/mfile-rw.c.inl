@@ -423,6 +423,7 @@ restart_after_extendpart:
 			mpart_destroy(part);
 			RETHROW();
 		}
+
 		/* Verify that nothing's changed in the mean time. */
 		if unlikely(mfile_isanon(self)) {
 destroy_new_part_and_try_again:

@@ -130,7 +130,7 @@ NOTHROW(KCALL device_v_destroy)(struct mfile *__restrict self);
 
 /* Helper macros. */
 #define device_isblk(self) S_ISBLK((self)->_device_devnode_ _fdevnode_node_ fn_mode)
-#define device_ischr(self) S_ISBLK((self)->_device_devnode_ _fdevnode_node_ fn_mode)
+#define device_ischr(self) S_ISCHR((self)->_device_devnode_ _fdevnode_node_ fn_mode)
 #define device_asblk(self) ((struct blkdev *)(self))
 #define device_aschr(self) ((struct chrdev *)(self))
 
@@ -155,6 +155,10 @@ NOTHROW(KCALL device_v_destroy)(struct mfile *__restrict self);
 #define device_getname_lock_release_br   mfile_tslock_release_br
 #define device_getname_lock_tryacquire   mfile_tslock_tryacquire
 
+/* Return a reference to the filename of `self' */
+FUNDEF NOBLOCK ATTR_PURE ATTR_RETNONNULL WUNUSED REF struct fdevfsdirent *
+NOTHROW(FCALL device_getdevfsfilename)(struct device *__restrict self);
+#define device_getfilename(self) (&device_getdevfsfilename(self)->fdd_dirent)
 
 #ifndef __realtime_defined
 #define __realtime_defined
@@ -353,6 +357,8 @@ NOTHROW(FCALL device_delete)(struct device *__restrict self);
  * @return: NULL: No such device. */
 FUNDEF WUNUSED REF struct device *FCALL
 device_lookup_byino(ino_t ino) THROWS(E_WOULDBLOCK);
+FUNDEF WUNUSED REF struct device *
+NOTHROW(FCALL device_lookup_byino_nx)(ino_t ino);
 
 /* Lookup a device within devfs, given its device type and device number.
  * @param: st_mode: Either `S_IFCHR' or `S_IFBLK'
@@ -360,6 +366,14 @@ device_lookup_byino(ino_t ino) THROWS(E_WOULDBLOCK);
  * @return: NULL: No such device. */
 #define device_lookup_bydev(st_mode, st_rdev) \
 	device_lookup_byino(devfs_devnode_makeino(st_mode, st_rdev))
+#define device_lookup_bydev_nx(st_mode, st_rdev) \
+	device_lookup_byino_nx(devfs_devnode_makeino(st_mode, st_rdev))
+
+/* Helpers to lookup block/character devices. */
+#define blkdev_lookup_bydev(st_rdev)    ((REF struct blkdev *)device_lookup_bydev(S_IFBLK, st_rdev))
+#define chrdev_lookup_bydev(st_rdev)    ((REF struct chrdev *)device_lookup_bydev(S_IFCHR, st_rdev))
+#define blkdev_lookup_bydev_nx(st_rdev) ((REF struct blkdev *)device_lookup_bydev_nx(S_IFBLK, st_rdev))
+#define chrdev_lookup_bydev_nx(st_rdev) ((REF struct chrdev *)device_lookup_bydev_nx(S_IFCHR, st_rdev))
 
 /* Lookup a device within devfs, given its name (and possibly type).
  * @param: name:    NUL-terminated device name string.

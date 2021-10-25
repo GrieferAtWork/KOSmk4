@@ -433,7 +433,7 @@ NOTHROW(FCALL path_cldlist_remove)(struct path *__restrict self,
 	assert(self->p_cldlist != path_empty_cldlist);
 	assert(self->p_cldused != 0);
 	assert(self->p_cldsize != 0);
-	assert((self->p_cldsize + 1) <= self->p_cldmask);
+	assert(self->p_cldsize <= self->p_cldmask);
 	hash = path_hashof(elem);
 	i = perturb = hash & self->p_cldmask;
 	for (;; path_hashnx(i, perturb)) {
@@ -459,7 +459,7 @@ NOTHROW(FCALL path_cldlist_remove_force)(struct path *__restrict self,
 	assert(self->p_cldlist != path_empty_cldlist);
 	assert(self->p_cldused != 0);
 	assert(self->p_cldsize != 0);
-	assert((self->p_cldsize + 1) <= self->p_cldmask);
+	assert(self->p_cldsize <= self->p_cldmask);
 	hash = path_hashof(elem);
 	i = perturb = hash & self->p_cldmask;
 	for (;; path_hashnx(i, perturb)) {
@@ -556,7 +556,7 @@ path_lookupchild_withlock(struct path *__restrict self,
 		THROW(E_FSERROR_DELETED, E_FILESYSTEM_DELETED_PATH);
 
 	/* Search through the hash-table. */
-	assert((self->p_cldsize + 1) <= self->p_cldmask);
+	assert(self->p_cldsize <= self->p_cldmask);
 	i = perturb = namehash & self->p_cldmask;
 	for (;; path_hashnx(i, perturb)) {
 		struct path *result;

@@ -24,6 +24,9 @@
 
 #ifdef CONFIG_USE_NEW_FS
 #include <kernel/fs/chrdev.h>
+
+#define chrdev_lookup               chrdev_lookup_bydev
+#define chrdev_lookup_nx            chrdev_lookup_bydev_nx
 #define chrdev_getdevno             device_getdevno
 #define chrdev_getname              device_getname
 #define chrdev_getname_lock_acquire device_getname_lock_acquire

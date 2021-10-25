@@ -775,7 +775,7 @@ NOTHROW(FCALL epoll_controller_intern_delmon)(struct epoll_controller *__restric
 	uintptr_t hash, i, perturb;
 	struct epoll_controller_ent *ent;
 	assert(self->ec_used);
-	assert((self->ec_size + 1) <= self->ec_mask);
+	assert(self->ec_size <= self->ec_mask);
 	hash = epoll_controller_hashof(monitor);
 	i = perturb = hash & self->ec_mask;
 	for (;; epoll_controller_hashnx(i, perturb)) {
@@ -828,7 +828,7 @@ NOTHROW(FCALL epoll_controller_intern_lookup)(struct epoll_controller *__restric
                                               void *handptr, uint32_t fd_key) {
 	uintptr_t hash, i, perturb;
 	struct epoll_controller_ent *ent;
-	assert((self->ec_size + 1) <= self->ec_mask);
+	assert(self->ec_size <= self->ec_mask);
 	hash = epoll_controller_hashof_ex(handptr, fd_key);
 	i = perturb = hash & self->ec_mask;
 	for (;; epoll_controller_hashnx(i, perturb)) {

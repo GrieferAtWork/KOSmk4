@@ -35,6 +35,7 @@ opt.removeif([](e) -> e.startswith("-O"));
 #include <hybrid/align.h>
 #include <hybrid/atomic.h>
 
+#include <kos/except.h>
 #include <kos/kernel/types.h>
 #include <kos/types.h>
 #include <sys/io.h>
@@ -480,9 +481,15 @@ vm86_io(vm86_state_t *__restrict UNUSED(self),
 	return result;
 }
 
-PRIVATE bool
+PRIVATE NONNULL((1)) bool
 NOTHROW_KERNEL(CC bios_interrupt)(vga_vm86_state_t *__restrict self, u8 intno) {
 	int error;
+
+	/* VM86 makes use of exceptions internally, and we might get here with
+	 * another exception  already set.  As such,  we need  to do  nesting. */
+	NESTED_EXCEPTION;
+
+	/* Fill in register state */
 	self->vv_vm86.vr_trans       = (vm86_translate_t)&vm86_translate;
 	self->vv_vm86.vr_io          = &vm86_io;
 	self->vv_vm86.vr_intr        = NULL;
@@ -490,10 +497,12 @@ NOTHROW_KERNEL(CC bios_interrupt)(vga_vm86_state_t *__restrict self, u8 intno) {
 	self->vv_vm86.vr_regs.vr_ss  = (VGA_VM86_SP & 0xf0000) >> 4;
 	self->vv_vm86.vr_regs.vr_eip = 0xffff;
 	self->vv_vm86.vr_regs.vr_cs  = 0xffff;
+
 	/* Generate a software interrupt */
 	error = vm86_intr(&self->vv_vm86, intno);
 	if (error != VM86_SUCCESS)
 		return false;
+
 	/* Execute VM86 code. */
 	error = vm86_exec(&self->vv_vm86);
 	return error == VM86_SUCCESS ||

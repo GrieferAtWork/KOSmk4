@@ -33,6 +33,7 @@
 #include <hw/disk/ata.h>
 
 #if 0
+#include <kernel/printk.h>
 #define ATA_VERBOSE(...) printk(KERN_DEBUG __VA_ARGS__)
 #else
 #define ATA_VERBOSE(...) (void)0

@@ -2368,12 +2368,10 @@ trimspecstring(char *__restrict buf, size_t size) {
 	while (size && FAT_ISSPACE(*buf)) {
 		--size;
 		memmovedown(buf, buf + 1, size, sizeof(char));
-		buf[size] = '\0';
 	}
-	while (size && FAT_ISSPACE(buf[size - 1])) {
+	while (size && FAT_ISSPACE(buf[size - 1]))
 		--size;
-		buf[size] = '\0';
-	}
+	buf[size] = '\0';
 }
 
 
@@ -2574,7 +2572,7 @@ Fat_OpenFileSystem(struct ffilesys *__restrict UNUSED(filesys),
 			result->ft_cluster_eof_marker = result->ft_cluster_eof;
 		/* XXX: Detect `FAT_FEATURE_UGID' */
 
-		memcpy(&result->ft_oem, disk->bpb.bpb_oem, 8, sizeof(char));
+		memcpy(&result->ft_oem, disk->bpb.bpb_oem, sizeof(disk->bpb.bpb_oem));
 		result->ft_fat_size = (size_t)result->ft_sec4fat << result->ft_sectorshift;
 		trimspecstring(result->ft_oem, 8);
 		trimspecstring(result->ft_label, 11);

@@ -376,7 +376,8 @@ struct fatdirnode: fflatdirnode {
 	uint32_t    fdn_1dot; /* [lock(ATOMIC && WRITE_ONCE)] Position of "." entry in directory stream (or `(uint32_t)-1' if unknown). */
 	uint32_t    fdn_2dot; /* [lock(ATOMIC && WRITE_ONCE)] Position of ".." entry in directory stream (or `(uint32_t)-1' if unknown). */
 };
-#define FatDirNode_AsSuper(self) ((FatSuperblock *)fflatdirnode_assuper((struct fflatdirnode *)(self)))
+#define FatDirNode_AsSuper(self) \
+	fflatsuper_asfat(fflatdirnode_assuper((struct fflatdirnode *)(self)))
 
 #ifdef CONFIG_FAT_CYGWIN_SYMLINKS
 typedef struct fatlnknode FatLnkNode;

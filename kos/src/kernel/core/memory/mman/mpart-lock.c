@@ -1865,17 +1865,20 @@ mpart_lock_acquire_and_setcore_load(struct mpart *__restrict self,
 	size_t loadbytes;
 again:
 	mpart_lock_acquire(self);
+
 	/* Check if the given address range is in-bounds. */
 	if (OVERFLOW_USUB(filepos, mpart_getminaddr(self), &reladdr))
 		goto unlock_and_err;
 	if (OVERFLOW_USUB(mpart_getmaxaddr(self), filepos, &loadbytes))
 		goto unlock_and_err;
+
 	/* Check: is the part already in the expected state? */
 	if (!MPART_ST_INCORE(self->mp_state)) {
 		mpart_setcore_data_init(&data);
 		TRY {
 			while (!mpart_setcore_or_unlock(self, NULL, &data)) {
 				mpart_lock_acquire(self);
+
 				/* Check if the given address range is in-bounds. */
 				if (OVERFLOW_USUB(filepos, mpart_getminaddr(self), &reladdr))
 					goto unlock_and_fini_data_err;
@@ -1891,6 +1894,7 @@ again:
 	++loadbytes;
 	if (loadbytes > max_load_bytes)
 		loadbytes = max_load_bytes;
+
 	/* As requested, ensure that the accessed address range is loaded. */
 	if (!mpart_load_or_unlock(self, NULL, reladdr, loadbytes))
 		goto again;

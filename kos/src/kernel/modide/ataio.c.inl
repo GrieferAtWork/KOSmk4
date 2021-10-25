@@ -19,11 +19,11 @@
  */
 #ifdef __INTELLISENSE__
 #include "ata.c"
-//#define DEFINE_AtaDrive_RdSectorsCHS
+//#define   DEFINE_AtaDrive_RdSectorsCHS
 //#define DEFINE_AtaDrive_RdSectorsLBA28
 //#define DEFINE_AtaDrive_RdSectorsLBA48
 #define DEFINE_AtaDrive_RdSectorsDMA
-//#define DEFINE_AtaDrive_WrSectorsCHS
+//#define   DEFINE_AtaDrive_WrSectorsCHS
 //#define DEFINE_AtaDrive_WrSectorsLBA28
 //#define DEFINE_AtaDrive_WrSectorsLBA48
 //#define DEFINE_AtaDrive_WrSectorsDMA
@@ -212,6 +212,7 @@ LOCAL_AtaDrive_IO(struct mfile *__restrict self, pos_t addr,
 	(void)aio; /* Unused (without DMA, we can't do async disk transfers) */
 
 	/* Convert absolute position/count into sector-based index/count */
+	assertf((buf & AtaDrive_GetSectorMask(me)) == 0, "Unaligned `buf = %#" PRIx64 "'", (uint64_t)buf);
 	assertf((addr & AtaDrive_GetSectorMask(me)) == 0, "Unaligned `addr = %#" PRIx64 "'", (uint64_t)addr);
 	assertf((num_bytes & AtaDrive_GetSectorMask(me)) == 0, "Unaligned `num_bytes = %#" PRIxSIZ "'", num_bytes);
 	lba         = (uint64_t)addr >> AtaDrive_GetSectorShift(me);
@@ -243,13 +244,18 @@ LOCAL_AtaDrive_IO(struct mfile *__restrict self, pos_t addr,
 	}
 #endif /* ATADRIVE_HAVE_PIO_IOSECTORS */
 
+	/* Must explicitly handle `num_sectors == 0'.
+	 * DMA with 0-sectors would instead do I/O on 0x10000 bytes. */
+	if unlikely(num_sectors == 0)
+		return;
+
 next_chunk:
 	/* Allocate an AIO handle. */
 	hand = aio_multihandle_allochandle(aio);
 	data = (AtaAIOHandleData *)hand->ah_data;
 
 	/* Figure out the max # of sectors to transfer */
-	part_sectors = (0xffff >> AtaDrive_GetSectorShift(me));
+	part_sectors = (0x10000 >> AtaDrive_GetSectorShift(me));
 	if likely(part_sectors > num_sectors)
 		part_sectors = num_sectors;
 
@@ -272,13 +278,13 @@ next_chunk:
 		                        state, newstate))
 			continue;
 		assert(bus->ab_aio_current == NULL);
-	
+
 		/* Directly fill in  the bus's PRD  buffer, rather than  creating
 		 * our own buffer that would later get copied ontop of the bus's. */
 		bus->ab_prdt[0].p_bufaddr = (PHYS uint32_t)buf;
 		bus->ab_prdt[0].p_bufsize = part_sectors << AtaDrive_GetSectorShift(me);
 		bus->ab_prdt[0].p_flags   = PRD_FLAST;
-	
+
 		ATA_VERBOSE("[ata] Setup initial dma\n");
 		aio_handle_init(hand, &AtaDrive_DmaAioHandleType);
 		data->hd_drive = (REF AtaDrive *)incref(me);
@@ -286,7 +292,7 @@ next_chunk:
 
 		/* Indicate that AIO has already been activated. */
 		data->hd_bufaddr = 0;
-	
+
 		/* Start  the DMA  operation, and  handle any  potential initialization failure.
 		 * NOTE: Do a direct start, since we've already initialized the PRD as in-place. */
 		bus->ab_aio_current = hand;
@@ -297,11 +303,11 @@ next_chunk:
 		return;
 	}
 
-	/* The bus isn't in  a ready state.  - Setup `hand'  as a pending  DMA
+	/* The bus isn't in a  ready state. - Setup  `hand' as a pending  DMA
 	 * operation, and schedule it for execution at a later point in time. */
 	data->hd_bufaddr = (PHYS uint32_t)buf;
 	data->hd_bufsize = part_sectors << AtaDrive_GetSectorShift(me);
-	
+
 	/* Initialize additional stuff... */
 	aio_handle_init(hand, &AtaDrive_DmaAioHandleType);
 	data->hd_drive = (REF AtaDrive *)incref(me);
@@ -325,10 +331,16 @@ next_chunk:
 	(void)aio; /* Unused (without DMA, we can't do async disk transfers) */
 
 	/* Convert absolute position/count into sector-based index/count */
+	assertf((buf & AtaDrive_GetSectorMask(me)) == 0, "Unaligned `buf = %#" PRIx64 "'", (uint64_t)buf);
 	assertf((addr & AtaDrive_GetSectorMask(me)) == 0, "Unaligned `addr = %#" PRIx64 "'", (uint64_t)addr);
 	assertf((num_bytes & AtaDrive_GetSectorMask(me)) == 0, "Unaligned `num_bytes = %#" PRIxSIZ "'", num_bytes);
 	lba         = (uint64_t)addr >> AtaDrive_GetSectorShift(me);
 	num_sectors = num_bytes >> AtaDrive_GetSectorShift(me);
+
+	/* Explicitly handle `num_sectors == 0'.
+	 * Below code should be able to deal with this on its own, but better be careful and not ~test~ the hardware. */
+	if unlikely(num_sectors == 0)
+		return;
 
 	/* Must operate while holding a bus-lock */
 	AtaBus_LockPIO(bus);

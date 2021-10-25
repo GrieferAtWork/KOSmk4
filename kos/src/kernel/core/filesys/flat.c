@@ -1854,7 +1854,7 @@ NOTHROW(FCALL fflatdirnode_fileslist_removeent)(struct fflatdirnode *__restrict 
 	assert(self->fdn_data.fdd_fileslist != fflatdir_empty_buckets);
 	assert(self->fdn_data.fdd_filesused != 0);
 	assert(self->fdn_data.fdd_filessize != 0);
-	assert((self->fdn_data.fdd_filessize + 1) <= self->fdn_data.fdd_filesmask);
+	assert(self->fdn_data.fdd_filessize <= self->fdn_data.fdd_filesmask);
 	hash = fflatdirent_hashof(ent);
 	i = perturb = hash & self->fdn_data.fdd_filesmask;
 	for (;; fflatdirent_hashnx(i, perturb)) {
@@ -1950,7 +1950,8 @@ NOTHROW(FCALL fflatdirnode_fileslist_rehash_with)(struct fflatdirnode *__restric
 		}
 		dst->ffdb_ent = pth; /* Rehash */
 	}
-	kfree(self->fdn_data.fdd_fileslist);
+	if (self->fdn_data.fdd_fileslist != fflatdir_empty_buckets)
+		kfree(self->fdn_data.fdd_fileslist);
 	self->fdn_data.fdd_fileslist = new_list;
 	self->fdn_data.fdd_filesmask = new_mask;
 	self->fdn_data.fdd_filessize = self->fdn_data.fdd_filesused; /* All deleted entries were removed... */
@@ -2018,7 +2019,7 @@ fflatdirnode_fileslist_lookup(struct fflatdirnode *__restrict self,
 	if (info->flu_hash == FLOOKUP_INFO_HASH_UNSET)
 		info->flu_hash = fdirent_hash(info->flu_name, info->flu_namelen);
 
-	assert((self->fdn_data.fdd_filessize + 1) <= self->fdn_data.fdd_filesmask);
+	assert(self->fdn_data.fdd_filessize <= self->fdn_data.fdd_filesmask);
 	i = perturb = info->flu_hash & self->fdn_data.fdd_filesmask;
 	for (;; fflatdirent_hashnx(i, perturb)) {
 		struct fflatdirent *result;
@@ -2072,7 +2073,7 @@ fflatdirnode_fileslist_remove(struct fflatdirnode *__restrict self,
 	if (info->flu_hash == FLOOKUP_INFO_HASH_UNSET)
 		info->flu_hash = fdirent_hash(info->flu_name, info->flu_namelen);
 
-	assert((self->fdn_data.fdd_filessize + 1) <= self->fdn_data.fdd_filesmask);
+	assert(self->fdn_data.fdd_filessize <= self->fdn_data.fdd_filesmask);
 	i = perturb = info->flu_hash & self->fdn_data.fdd_filesmask;
 	for (;; fflatdirent_hashnx(i, perturb)) {
 		struct fflatdir_bucket *bucket;

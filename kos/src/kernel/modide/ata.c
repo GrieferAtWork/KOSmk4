@@ -35,7 +35,9 @@
 #include <kernel/entropy.h>
 #include <kernel/except.h>
 #include <kernel/isr.h>
+#include <kernel/mman/flags.h>
 #include <kernel/mman/kram.h>
+#include <kernel/mman/map.h>
 #include <kernel/printk.h>
 #include <sched/cpu.h>
 #include <sched/task.h>
@@ -54,6 +56,7 @@
 #include <inttypes.h>
 #include <stdbool.h>
 #include <stddef.h>
+#include <stdint.h>
 #include <string.h>
 
 #include <libpciaccess/pciaccess.h>
@@ -193,7 +196,7 @@ NOTHROW(FCALL AtaBus_HW_ResetBusAndInitializeDMA)(AtaBus *__restrict self) {
 	AtaBus_HW_ResetBus(self);
 	/* Re-set the PRDT address. */
 	phys = pagedir_translate(self->ab_prdt);
-	assert(phys <= (physaddr_t)0xffffffff);
+	assert(phys <= (physaddr_t)UINT32_MAX);
 	outl(self->ab_dmaio + DMA_PRIMARY_PRDT, (u32)phys);
 }
 #define AtaBus_HW_ResetBusAuto(self) \
@@ -1179,7 +1182,7 @@ PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL AtaBus_Destroy)(struct refcountable *__restrict self) {
 	AtaBus *me = (AtaBus *)self;
 	if (me->ab_dmaio != (port_t)-1)
-		vpage_free_untraced(me->ab_prdt, 1);
+		mman_unmap_kram(me->ab_prdt, PAGESIZE);
 	_AtaBus_Free(me);
 }
 
@@ -1246,16 +1249,25 @@ AtaInit_InitializeDrive(struct ata_ports *__restrict ports,
 			bus->ab_timeout_DRQ = relktime_from_seconds(3);
 			bus->ab_timeout_dat = relktime_from_seconds(2);
 			if (bus->ab_dmaio != (port_t)-1) {
+				physaddr_t phys;
+				/* Allocate `ab_prdt' */
 				TRY {
 					/* Must allocate in 32-bit space (because the PRD register is only 32 bits large) */
-					gfp_t flags = GFP_LOCKED | GFP_PREFLT | GFP_MAP_32BIT;
-
-					/* Allocate `ab_prdt' */
-					bus->ab_prdt = (PAGEDIR_PAGEALIGNED AtaPRD *)vpage_alloc_untraced(1, 1, flags);
+					PAGEDIR_PAGEALIGNED void *addr;
+					addr = mman_map_kram(MHINT_GETADDR(KERNEL_MHINT_DEVICE), PAGESIZE,
+					                     gfp_from_mapflags(MHINT_GETMODE(KERNEL_MHINT_DEVICE)) |
+					                     GFP_LOCKED | GFP_PREFLT | GFP_MAP_32BIT);
+					/* Remember the address */
+					bus->ab_prdt = (PAGEDIR_PAGEALIGNED AtaPRD *)addr;
 				} EXCEPT {
 					kfree(bus);
 					RETHROW();
 				}
+
+				/* Tell the bus where the PRD is located. */
+				phys = pagedir_translate(bus->ab_prdt);
+				assert(phys <= (physaddr_t)UINT32_MAX);
+				outl(bus->ab_dmaio + DMA_PRIMARY_PRDT, (u32)phys);
 			}
 			TRY {
 				/* The BUS structure must be registered alongside an interrupt registration. */
@@ -1411,6 +1423,7 @@ got_identify_signal:
 			                                     ports->a_bus, ports->a_ctrl, ports->a_dma,
 			                                     drive_id == ATA_DRIVE_MASTER ? 'm' : 's');
 		}
+		drive->fn_ino = devfs_devnode_makeino(S_IFBLK, drive->dn_devno);
 
 		/* Register + repart the new drive. */
 		blkdev_repart_and_register(drive);
@@ -1451,7 +1464,7 @@ AtaInit_InitializeAta(struct ata_ports *__restrict ports,
                       bool is_default_ide) {
 	bool result;
 	REF AtaBus *bus = NULL;
-	RAII_FINALLY { decref_unlikely(bus); };
+	RAII_FINALLY { xdecref_unlikely(bus); };
 	result = AtaInit_TryInitializeDrive(ports, &bus, ATA_DRIVE_MASTER, is_primary_bus, is_default_ide);
 	result |= AtaInit_TryInitializeDrive(ports, &bus, ATA_DRIVE_SLAVE, is_primary_bus, is_default_ide);
 	return result;

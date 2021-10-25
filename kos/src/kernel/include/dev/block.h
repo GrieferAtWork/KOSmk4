@@ -25,9 +25,14 @@
 #ifdef CONFIG_USE_NEW_FS
 #include <kernel/fs/blkdev.h>
 
-#define blkdev_devno(self)       device_getdevno(self)
-#define blkdev_lookup(devno)     ((REF struct blkdev *)device_lookup_bydev(S_IFBLK, devno))
-#define blkdev_lookup_name(name) ((REF struct blkdev *)device_lookup_bystring(name, strlen(name), S_IFBLK))
+#define blkdev_devno(self)          device_getdevno(self)
+#define blkdev_lookup_name(name)    ((REF struct blkdev *)device_lookup_bystring(name, strlen(name), S_IFBLK))
+#define blkdev_lookup               blkdev_lookup_bydev
+#define blkdev_lookup_nx            blkdev_lookup_bydev_nx
+#define blkdev_getdevno             device_getdevno
+#define blkdev_getname              device_getname
+#define blkdev_getname_lock_acquire device_getname_lock_acquire
+#define blkdev_getname_lock_release device_getname_lock_release
 
 #else /* CONFIG_USE_NEW_FS */
 #include <kernel/paging.h>
@@ -260,6 +265,13 @@ FUNDEF NONNULL((1, 5)) void KCALL block_device_partition_write_phys(struct block
 FUNDEF NONNULL((1, 5)) void KCALL block_device_partition_readv_phys(struct block_device *__restrict self, struct iov_physbuffer *__restrict buf, size_t num_sectors, lba_t addr, /*out*/ struct aio_handle *__restrict aio) THROWS(E_IOERROR, E_BADALLOC,...);
 FUNDEF NONNULL((1, 5)) void KCALL block_device_partition_writev_phys(struct block_device *__restrict self, struct iov_physbuffer *__restrict buf, size_t num_sectors, lba_t addr, /*out*/ struct aio_handle *__restrict aio) THROWS(E_IOERROR, E_BADALLOC,...);
 FUNDEF NONNULL((1)) syscall_slong_t KCALL block_device_partition_ioctl(struct block_device *__restrict self, struct block_device *__restrict partition, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
+
+
+/* Returns the device number of `self', or `DEV_UNSET' if not set. */
+#define blkdev_getdevno(self) ((self)->bd_devlink.a_vaddr)
+#define blkdev_getname(self)  ((self)->bd_name)
+#define blkdev_getname_lock_acquire(self) do{do{}__WHILE0
+#define blkdev_getname_lock_release(self) }__WHILE0
 
 
 /* Destroy a given block device. */

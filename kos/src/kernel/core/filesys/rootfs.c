@@ -165,7 +165,8 @@ NOTHROW(KCALL kernel_initialize_rootfs)(void) {
 
 	/* Create the root mounting point descriptor. */
 	mount = _pathmount_alloc();
-	mount->p_refcnt = 2; /* +1: vfs_kernel.vf_root, +1: vfs_kernel.vf_mounts */
+	mount->p_refcnt = 4; /* +1: vfs_kernel.vf_root, +1: vfs_kernel.vf_mounts,
+	                      * +1: fs_kernel.fs_root, +1: fs_kernel.fs_cwd */
 	mount->p_flags  = PATH_F_ISMOUNT | PATH_F_ISROOT;
 	mount->_p_vfs   = weakincref(&vfs_kernel);
 	mount->p_name   = incref(&fdirent_empty);
@@ -178,7 +179,13 @@ NOTHROW(KCALL kernel_initialize_rootfs)(void) {
 	mount->p_cldmask = 0;
 	mount->p_cldlist = path_empty_cldlist;
 
-	/* Hook the mounting point */
+	/* Hook the mounting point
+	 *
+	 * NOTE: You could argue that we don't need to care about locks here,
+	 *       and  you might be right on that one. However, custom drivers
+	 *       may have already been loaded  at this point, and some  other
+	 *       thread may currently be doing  reads from FS structures,  in
+	 *       which case our writes cannot be unprotected. */
 again_acquire_locks:
 	fsuper_mounts_write(super);
 	if (!vfs_rootlock_trywrite(&vfs_kernel)) {
@@ -194,11 +201,26 @@ again_acquire_locks:
 		vfs_mountslock_release(&vfs_kernel);
 		goto again_acquire_locks;
 	}
+	if (!fs_pathlock_trywrite(&fs_kernel)) {
+		vfs_mountslock_release(&vfs_kernel);
+		fsuper_mounts_endwrite(super);
+		vfs_rootlock_endwrite(&vfs_kernel);
+		fs_pathlock_write(&fs_kernel);
+		fs_pathlock_endwrite(&fs_kernel);
+		goto again_acquire_locks;
+	}
+
+	/* Install hooks. */
 	LIST_INSERT_HEAD(&super->fs_mounts, mount, pm_fsmount);
 	LIST_INSERT_HEAD(&vfs_kernel.vf_mounts, mount, pm_vsmount); /* Inherit reference */
 	vfs_kernel.vf_root = mount;                                 /* Inherit reference */
-	vfs_mountslock_release(&vfs_kernel);
+	fs_kernel.fs_root  = mount;                                 /* Inherit reference */
+	fs_kernel.fs_cwd   = mount;                                 /* Inherit reference */
+
+	/* Release locks. */
 	fsuper_mounts_endwrite(super);
+	fs_pathlock_endwrite(&fs_kernel);
+	vfs_mountslock_release(&vfs_kernel);
 	vfs_rootlock_endwrite(&vfs_kernel);
 }
 

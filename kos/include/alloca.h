@@ -44,7 +44,13 @@
 
 #ifdef __USE_KOS
 #if __has_builtin(__builtin_alloca_with_align) || defined(__INTELLISENSE_GCC__)
-#define aligned_alloca(num_bytes, min_alignment) __builtin_alloca_with_align(num_bytes, min_alignment)
+/* Allocate on the stack with the given minimum alignment.
+ *
+ * Note that GCC's `__builtin_alloca_with_align()' uses  BIT-based
+ * alignment values (for whatever nonsensical reason), though this
+ * function is sane and takes BYTE-based alignments. */
+#define aligned_alloca(num_bytes, min_alignment) \
+	__builtin_alloca_with_align(num_bytes, (min_alignment) * 8)
 #endif /* __has_builtin(__builtin_alloca_with_align) || __INTELLISENSE_GCC__ */
 #endif /* __USE_KOS */
 

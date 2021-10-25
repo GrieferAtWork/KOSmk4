@@ -41,6 +41,7 @@
 #include <kernel/fs/super.h>
 #include <kernel/mman/driver.h>
 #include <kernel/paging.h>
+#include <kernel/printk.h>
 #include <sched/shared_rwlock.h>
 #include <sched/task.h>
 
@@ -1117,6 +1118,20 @@ NOTHROW(KCALL device_v_destroy)(struct mfile *__restrict self) {
 
 
 
+/* Return a reference to the filename of `self' */
+PUBLIC NOBLOCK ATTR_PURE ATTR_RETNONNULL WUNUSED REF struct fdevfsdirent *
+NOTHROW(FCALL device_getdevfsfilename)(struct device *__restrict self) {
+	REF struct fdevfsdirent *result;
+	device_getname_lock_acquire(self);
+	result = incref(self->dv_dirent);
+	device_getname_lock_release(self);
+	return result;
+}
+
+
+
+
+
 
 /* By-name lookup of devices in /dev/ */
 PUBLIC struct shared_rwlock devfs_byname_lock = SHARED_RWLOCK_INIT;
@@ -1124,6 +1139,21 @@ PUBLIC struct lockop_slist devfs_byname_lops  = SLIST_HEAD_INITIALIZER(devfs_byn
 extern struct device _devfs_byname_tree__INIT[];
 PUBLIC RBTREE_ROOT(device) devfs_byname_tree = _devfs_byname_tree__INIT;
 
+
+
+/* Log the event of a new device having gotten registered. */
+INTERN NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL devfs_log_new_device)(struct device *__restrict self) {
+	assert(self->fn_ino == devfs_devnode_makeino(self->fn_mode, self->dn_devno));
+	printk(KERN_TRACE "[devfs] New %s-device "
+	                  "%#" PRIxN(__SIZEOF_MAJOR_T__) ":"
+	                  "%#" PRIxN(__SIZEOF_MINOR_T__) ":"
+	                  "%q%s\n",
+	       device_ischr(self) ? "chr" : "blk",
+	       MAJOR(self->dn_devno), MINOR(self->dn_devno),
+	       self->dv_dirent->fdd_dirent.fd_name,
+	       self->dv_byname_node.rb_lhs == DEVICE_BYNAME_DELETED ? " [deleted]" : "");
+}
 
 
 
@@ -1169,6 +1199,7 @@ device_tryregister(struct device *__restrict self)
 	fsuper_nodes_insert(&devfs, self);
 	devfs_byname_insert(self);
 	LIST_INSERT_HEAD(&fallnodes_list, self, fn_allnodes);
+	devfs_log_new_device(self);
 
 	/* Indicate success */
 	result = DEVICE_TRYREGISTER_SUCCESS;
@@ -1316,6 +1347,7 @@ device_register(struct device *__restrict self)
 	}
 
 	/* Release all locks */
+	devfs_log_new_device(self);
 	_device_register_lock_release(true);
 }
 
@@ -1684,6 +1716,18 @@ device_lookup_byino(ino_t ino) THROWS(E_WOULDBLOCK) {
 	fsuper_nodes_endread(&devfs);
 	return result;
 }
+PUBLIC WUNUSED REF struct device *
+NOTHROW(FCALL device_lookup_byino_nx)(ino_t ino) {
+	REF struct device *result;
+	if (!fsuper_nodes_read_nx(&devfs))
+		return NULL;
+	result = (REF struct device *)fsuper_nodes_locate(&devfs, ino);
+	if (result && !tryincref(result))
+		result = NULL; /* Device already destroyed */
+	fsuper_nodes_endread(&devfs);
+	return result;
+}
+
 
 /* Lookup a device within devfs, given its name (and possibly type).
  * @param: name:    NUL-terminated device name string.

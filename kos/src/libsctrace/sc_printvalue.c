@@ -796,9 +796,19 @@ print_dev_blk(pformatprinter printer, void *arg, dev_t devno) {
 		dev = blkdev_lookup_nx(devno);
 		if (dev) {
 			ssize_t temp;
+#ifdef CONFIG_USE_NEW_FS
+			REF struct fdirent *name;
+			name = device_getfilename(dev);
+			decref_unlikely(dev);
+			FINALLY_DECREF_UNLIKELY(name);
+			temp = format_printf(printer, arg, ":\"/dev/%#$q\"",
+			                     (size_t)name->fd_namelen,
+			                     name->fd_name);
+#else /* CONFIG_USE_NEW_FS */
 			FINALLY_DECREF_UNLIKELY(dev);
 			temp = format_printf(printer, arg, ":\"/dev/%#q\"",
 			                     dev->bd_name);
+#endif /* !CONFIG_USE_NEW_FS */
 			if unlikely(temp < 0)
 				return temp;
 			result += temp;
@@ -826,9 +836,19 @@ print_dev_chr(pformatprinter printer, void *arg, dev_t devno) {
 		dev = chrdev_lookup_nx(devno);
 		if (dev) {
 			ssize_t temp;
+#ifdef CONFIG_USE_NEW_FS
+			REF struct fdirent *name;
+			name = device_getfilename(dev);
+			decref_unlikely(dev);
+			FINALLY_DECREF_UNLIKELY(name);
+			temp = format_printf(printer, arg, ":\"/dev/%#$q\"",
+			                     (size_t)name->fd_namelen,
+			                     name->fd_name);
+#else /* CONFIG_USE_NEW_FS */
 			FINALLY_DECREF_UNLIKELY(dev);
 			temp = format_printf(printer, arg, ":\"/dev/%#q\"",
 			                     dev->cd_name);
+#endif /* !CONFIG_USE_NEW_FS */
 			if unlikely(temp < 0)
 				return temp;
 			result += temp;

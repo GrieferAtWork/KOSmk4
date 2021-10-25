@@ -493,6 +493,8 @@ NOTHROW(FCALL set_pty_name_minor)(struct fdevfsdirent *__restrict name,
 	}
 }
 
+INTDEF NOBLOCK NONNULL((1)) void /* From "filesys/devfs.c" */
+NOTHROW(FCALL devfs_log_new_device)(struct device *__restrict self);
 
 PRIVATE NONNULL((1, 2)) void FCALL
 register_pty_pair(struct ptymaster *__restrict master,
@@ -570,6 +572,10 @@ register_pty_pair(struct ptymaster *__restrict master,
 			} else {
 				devfs_byname_insert(slave);
 			}
+
+			/* Log the creation of new device files. */
+			devfs_log_new_device(master);
+			devfs_log_new_device(slave);
 
 			/* Release locks. */
 			_device_register_lock_release(false);

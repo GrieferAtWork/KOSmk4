@@ -39,6 +39,7 @@
 #include <kernel/printk.h>
 #include <sched/task.h>
 
+#include <hybrid/align.h>
 #include <hybrid/atomic.h>
 #include <hybrid/byteorder.h>
 #include <hybrid/byteswap.h>
@@ -729,6 +730,7 @@ blkdev_makeparts_loadmbr(struct blkdev *__restrict self,
 		STATIC_ASSERT(PAGESIZE >= sizeof(struct mbr_sector));
 		mbr = (struct mbr_sector *)aligned_alloca(sizeof(struct mbr_sector),
 		                                          sizeof(struct mbr_sector));
+		DBG_memset(mbr, 0xcc, sizeof(struct mbr_sector));
 		blkdev_rdsectors(self, mbr_pos, pagedir_translate(mbr), sizeof(struct mbr_sector));
 	} else {
 		mbr = (struct mbr_sector *)alloca(sizeof(struct mbr_sector));
@@ -789,10 +791,9 @@ blkdev_makeparts(struct blkdev *__restrict self,
 #endif /* __SIZEOF_MINOR_T__ != ... */
 				size_t numlen, namlen;
 
-				part->bd_partinfo.bp_partno = index;
+				part->bd_partinfo.bp_partno = index++;
 				part->dn_devno = self->dn_devno + MKDEV(0, index);
 				part->fn_ino   = devfs_devnode_makeino(S_IFBLK, part->dn_devno);
-				++index;
 
 				/* Allocate and assign `part->dv_dirent' */
 				numlen = sprintf(numbuf, "%" PRIuN(__SIZEOF_MINOR_T__), index);
@@ -942,10 +943,12 @@ NOTHROW(FCALL device_unlink_from_globals)(struct device *__restrict self) {
 	_device_register_inuse_name((name)->fdd_dirent.fd_name, \
 	                            (name)->fdd_dirent.fd_namelen)
 
+INTDEF NOBLOCK NONNULL((1)) void /* From "./devfs.c" */
+NOTHROW(FCALL devfs_log_new_device)(struct device *__restrict self);
 
 /* Force-insert `self' into the devfs INode tree. (Caller must be holding locks) */
 PRIVATE NOBLOCK WUNUSED NONNULL((1)) void
-NOTHROW(FCALL devfs_insert_into_inode_tree)(struct device *__restrict self) {
+NOTHROW(FCALL devfs_insert_into_inode_tree)(struct blkdev *__restrict self) {
 	for (;;) {
 		struct fnode *existing;
 		assert(devfs.fs_nodes != FSUPER_NODES_DELETED);
@@ -958,6 +961,7 @@ NOTHROW(FCALL devfs_insert_into_inode_tree)(struct device *__restrict self) {
 			ATOMIC_WRITE(existing->fn_supent.rb_rhs, FSUPER_NODES_DELETED);
 			break;
 		}
+
 		/* Create a new device number */
 		++self->dn_devno;
 		assert(S_ISBLK(self->fn_mode));
@@ -1073,6 +1077,7 @@ blkdev_repart(struct blkdev *__restrict self)
 			dev->mf_flags |= MFILE_FN_GLOBAL_REF;
 			++dev->mf_refcnt; /* For `MFILE_FN_GLOBAL_REF' (in `fallnodes_list') */
 		}
+		devfs_log_new_device(dev);
 	}
 	self->bd_rootinfo.br_parts = newparts;
 
@@ -1135,6 +1140,7 @@ blkdev_repart_and_register(struct blkdev *__restrict self)
 	struct blkdev_makeparts_info info;
 	assert(LIST_EMPTY(&self->bd_rootinfo.br_parts));
 	assert(blkdev_isroot(self));
+	assert(self->fn_ino == devfs_devnode_makeino(S_IFBLK, self->dn_devno));
 
 	/* Construct new partitions and assign device IDs and names to partitions */
 	newparts = blkdev_makeparts(self, &info);
@@ -1186,8 +1192,10 @@ blkdev_repart_and_register(struct blkdev *__restrict self)
 		assert(!(dev->mf_flags & MFILE_FN_GLOBAL_REF));
 		dev->mf_flags |= MFILE_FN_GLOBAL_REF;
 		++dev->mf_refcnt; /* For `MFILE_FN_GLOBAL_REF' (in `fallnodes_list') */
+		devfs_log_new_device(dev);
 	}
 	self->bd_rootinfo.br_parts = newparts;
+	devfs_log_new_device(self);
 
 	/* Step #5: Release locks. */
 	_fallnodes_release();
