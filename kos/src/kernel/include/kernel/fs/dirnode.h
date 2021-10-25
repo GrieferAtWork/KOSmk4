@@ -473,6 +473,7 @@ struct fdirnode
 
 /* Default operators for `struct fdirnode_ops' */
 #define fdirnode_v_destroy fnode_v_destroy
+#define fdirnode_v_changed fnode_v_changed
 /* Constructs a wrapper object that implements readdir() (s.a. `dirhandle_new()') */
 struct handle;
 FUNDEF NONNULL((1, 2)) void KCALL

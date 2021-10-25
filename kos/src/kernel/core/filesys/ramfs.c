@@ -478,7 +478,8 @@ PUBLIC_CONST struct fdirnode_ops const ramfs_dirnode_ops = {
 	.dno_node = {
 		.no_file = {
 			.mo_destroy = &ramfs_dirnode_v_destroy,
-			.mo_changed = &fnode_v_changed,
+			.mo_changed = &ramfs_dirnode_v_changed,
+			.mo_stream  = &ramfs_dirnode_v_stream_ops,
 		},
 		.no_wrattr = &ramfs_dirnode_v_wrattr,
 	},
@@ -1133,7 +1134,8 @@ PUBLIC_CONST struct fsuper_ops const ramfs_super_ops = {
 		.dno_node = {
 			.no_file = {
 				.mo_destroy = &ramfs_super_v_destroy,
-				.mo_changed = &fnode_v_changed,
+				.mo_changed = &ramfs_super_v_changed,
+				.mo_stream  = &ramfs_super_v_stream_ops,
 			},
 			.no_free   = &ramfs_super_v_free,
 			.no_wrattr = &ramfs_super_v_wrattr,

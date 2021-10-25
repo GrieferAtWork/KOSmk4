@@ -246,10 +246,12 @@ struct ramfs_dirnode
 
 /* Directory operators for `struct ramfs_dirnode' */
 DATDEF struct fdirnode_ops const ramfs_dirnode_ops;
+#define ramfs_dirnode_v_changed fdirnode_v_changed
 #define ramfs_dirnode_v_wrattr  fnode_v_wrattr_noop
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL ramfs_dirnode_v_destroy)(struct mfile *__restrict self);
-#define ramfs_dirnode_v_open    fdirnode_v_open
+#define ramfs_dirnode_v_open       fdirnode_v_open
+#define ramfs_dirnode_v_stream_ops fdirnode_v_stream_ops
 FUNDEF WUNUSED NONNULL((1, 2)) REF struct fdirent *KCALL
 ramfs_dirnode_v_lookup(struct fdirnode *__restrict self,
                        struct flookup_info *__restrict info);
@@ -314,7 +316,10 @@ struct ramfs_super
 
 
 DATDEF struct fsuper_ops const ramfs_super_ops;
-#define ramfs_super_v_free   fsuper_v_free
+#define ramfs_super_v_free       fsuper_v_free
+#define ramfs_super_v_changed    ramfs_dirnode_v_changed
+#define ramfs_super_v_open       ramfs_dirnode_v_open
+#define ramfs_super_v_stream_ops ramfs_dirnode_v_stream_ops
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL ramfs_super_v_destroy)(struct mfile *__restrict self);
 #define ramfs_super_v_wrattr ramfs_dirnode_v_wrattr

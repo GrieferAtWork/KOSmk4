@@ -235,7 +235,7 @@ PUBLIC struct ffilesys devfs_filesys = {
 /* Lookup a device file by name, or fall back  to
  * searching the ramfs portion of the devfs root. */
 PRIVATE WUNUSED NONNULL((1, 2)) REF struct fdirent *KCALL
-devfs_root_v_lookup(struct fdirnode *__restrict self,
+devfs_super_v_lookup(struct fdirnode *__restrict self,
                     struct flookup_info *__restrict info) {
 	struct device *node;
 	assert(self == &devfs.fs_root);
@@ -464,7 +464,7 @@ PRIVATE struct fdirenum_ops const devfs_root_direnum_ops = {
 
 
 PRIVATE NONNULL((1)) void KCALL
-devfs_root_v_enum(struct fdirenum *__restrict result) {
+devfs_super_v_enum(struct fdirenum *__restrict result) {
 	struct devfs_root_direnum *rt;
 	REF struct fdirent *firstent;
 	assert(result->de_dir == &devfs.fs_root);
@@ -493,7 +493,8 @@ PUBLIC_CONST struct fdirnode_ops const devfs_dirnode_ops = {
 	.dno_node = {
 		.no_file = {
 			.mo_destroy = &ramfs_dirnode_v_destroy,
-			.mo_changed = &fnode_v_changed
+			.mo_changed = &ramfs_dirnode_v_changed,
+			.mo_stream  = &ramfs_dirnode_v_stream_ops,
 		},
 		.no_wrattr = &ramfs_dirnode_v_wrattr,
 	},
@@ -507,7 +508,7 @@ PUBLIC_CONST struct fdirnode_ops const devfs_dirnode_ops = {
 
 
 PRIVATE NONNULL((1, 2)) unsigned int KCALL
-devfs_root_v_mkfile(struct fdirnode *__restrict self,
+devfs_super_v_mkfile(struct fdirnode *__restrict self,
                     struct fmkfile_info *__restrict info)
 		THROWS(E_FSERROR_ILLEGAL_PATH, E_FSERROR_DISK_FULL,
 		       E_FSERROR_READONLY, E_FSERROR_TOO_MANY_HARD_LINKS,
@@ -522,7 +523,7 @@ devfs_root_v_mkfile(struct fdirnode *__restrict self,
 	{
 		REF struct fdirent *old_dirent;
 again_lookup:
-		old_dirent = devfs_root_v_lookup(self, &info->mkf_lookup_info);
+		old_dirent = devfs_super_v_lookup(self, &info->mkf_lookup_info);
 		if unlikely(old_dirent) {
 			REF struct fnode *oldnode;
 			TRY {
@@ -710,7 +711,7 @@ again_acquire_lock_for_insert:
 
 
 PRIVATE NONNULL((1, 2, 3)) unsigned int KCALL
-devfs_root_v_unlink(struct fdirnode *__restrict self,
+devfs_super_v_unlink(struct fdirnode *__restrict self,
                     struct fdirent *__restrict entry,
                     struct fnode *__restrict file)
 		THROWS(E_FSERROR_DIRECTORY_NOT_EMPTY,
@@ -755,7 +756,7 @@ devfs_root_v_unlink(struct fdirnode *__restrict self,
 
 
 PRIVATE NONNULL((1, 2)) unsigned int KCALL
-devfs_root_v_rename(struct fdirnode *__restrict self,
+devfs_super_v_rename(struct fdirnode *__restrict self,
                     struct frename_info *__restrict info)
 		THROWS(E_FSERROR_ILLEGAL_PATH, E_FSERROR_DISK_FULL,
 		       E_FSERROR_READONLY, E_FSERROR_DELETED) {
@@ -1040,22 +1041,28 @@ again_acquire_locks:
 }
 
 
+#define devfs_super_v_changed    ramfs_super_v_changed
+#define devfs_super_v_open       ramfs_super_v_open
+#define devfs_super_v_stream_ops ramfs_super_v_stream_ops
+#define devfs_super_v_wrattr     ramfs_super_v_wrattr
+
 /* INTERN because needed in "./devfsdefs.c" */
 INTERN_CONST struct fsuper_ops const devfs_super_ops = {
 	.so_fdir = {
 		.dno_node = {
 			.no_file = {
 				.mo_destroy = (void (KCALL *)(struct mfile *__restrict))(void *)(uintptr_t)-1, /* Must never be called */
-				.mo_changed = &fnode_v_changed,
+				.mo_changed = &devfs_super_v_changed,
+				.mo_stream  = &devfs_super_v_stream_ops,
 			},
 			.no_free   = (void (KCALL *)(struct fnode *__restrict))(void *)(uintptr_t)-1, /* Must never be called */
-			.no_wrattr = &fnode_v_wrattr_noop,
+			.no_wrattr = &devfs_super_v_wrattr,
 		},
-		.dno_lookup = &devfs_root_v_lookup,
-		.dno_enum   = &devfs_root_v_enum,
-		.dno_mkfile = &devfs_root_v_mkfile,
-		.dno_unlink = &devfs_root_v_unlink,
-		.dno_rename = &devfs_root_v_rename,
+		.dno_lookup = &devfs_super_v_lookup,
+		.dno_enum   = &devfs_super_v_enum,
+		.dno_mkfile = &devfs_super_v_mkfile,
+		.dno_unlink = &devfs_super_v_unlink,
+		.dno_rename = &devfs_super_v_rename,
 	},
 };
 
