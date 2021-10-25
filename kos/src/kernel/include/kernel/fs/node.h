@@ -124,56 +124,64 @@ struct chrdev;
  *
  * Assumptions/expectations in regards to the configuration of different filesystem classes:
  *   - fnode:
- *      - always: mo_changed == &fnode_v_changed;
+ *      - [X] mo_changed == &fnode_v_changed;
  *   - fregnode:
- *      - always: MFILE_F_DELETED || !mfile_isanon(self);
- *      - always: !MFILE_F_NOUSRMMAP;
- *      - always: !MFILE_F_NOUSRIO;
- *      - always: !MFILE_F_FIXEDFILESIZE;
+ *      - [W] MFILE_F_DELETED || !mfile_isanon(self);
+ *      - [W] !MFILE_F_NOUSRMMAP;
+ *      - [W] !MFILE_F_NOUSRIO;
+ *      - [W] !MFILE_F_FIXEDFILESIZE;
  *   - fdirnode:
- *      - always: mf_filesize == (pos_t)-1;
- *      - always: fn_nlink == 1;
- *      - always: MFILE_F_NOUSRMMAP;
- *      - always: MFILE_F_NOUSRIO;
- *      - always: MFILE_F_FIXEDFILESIZE;
+ *      - [W] MFILE_F_DELETED || mf_filesize == (pos_t)-1;
+ *      - [W] MFILE_F_DELETED || fn_nlink == 1;
+ *      - [W] MFILE_F_NOUSRMMAP;
+ *      - [W] MFILE_F_NOUSRIO;
+ *      - [W] MFILE_F_FIXEDFILESIZE;
  *   - flnknode:
- *      - always: mf_parts             == MFILE_PARTS_ANONYMOUS; // iow: mfile_isanon(self);
- *      - always: mf_changed.slh_first == MFILE_PARTS_ANONYMOUS; // iow: mfile_isanon(self);
- *      - always: MFILE_F_READONLY;
- *      - always: MFILE_F_FIXEDFILESIZE;
- *      - always: MFILE_F_NOUSRMMAP;
- *      - always: MFILE_F_NOUSRIO;
+ *      - [W] MFILE_F_READONLY;
+ *      - [W] MFILE_F_FIXEDFILESIZE;
+ *      - [W] MFILE_F_NOUSRMMAP;
+ *      - [W] MFILE_F_NOUSRIO;
  *   - ffifonode:
- *      - always: mf_filesize == 0;
- *      - always: mf_parts             == MFILE_PARTS_ANONYMOUS; // iow: mfile_isanon(self);
- *      - always: mf_changed.slh_first == MFILE_PARTS_ANONYMOUS; // iow: mfile_isanon(self);
- *      - always: MFILE_F_READONLY;
- *      - always: MFILE_F_FIXEDFILESIZE;
- *      - always: MFILE_F_NOUSRMMAP;
- *      - always: MFILE_F_NOUSRIO;
+ *      - [W] mf_filesize == 0;
+ *      - [W] mf_parts             == MFILE_PARTS_ANONYMOUS; // iow: mfile_isanon(self);
+ *      - [W] mf_changed.slh_first == MFILE_PARTS_ANONYMOUS; // iow: mfile_isanon(self);
+ *      - [W] MFILE_F_READONLY;
+ *      - [W] MFILE_F_FIXEDFILESIZE;
+ *      - [W] MFILE_F_NOUSRMMAP;
+ *      - [W] MFILE_F_NOUSRIO;
  *   - fsocknode:
- *      - always: mf_filesize == 0;
- *      - always: mf_parts             == MFILE_PARTS_ANONYMOUS; // iow: mfile_isanon(self);
- *      - always: mf_changed.slh_first == MFILE_PARTS_ANONYMOUS; // iow: mfile_isanon(self);
- *      - always: MFILE_F_READONLY;
- *      - always: MFILE_F_FIXEDFILESIZE;
- *      - always: MFILE_F_NOUSRMMAP;
- *      - always: MFILE_F_NOUSRIO;
+ *      - [W] mf_filesize == 0;
+ *      - [W] mf_parts             == MFILE_PARTS_ANONYMOUS; // iow: mfile_isanon(self);
+ *      - [W] mf_changed.slh_first == MFILE_PARTS_ANONYMOUS; // iow: mfile_isanon(self);
+ *      - [W] MFILE_F_READONLY;
+ *      - [W] MFILE_F_FIXEDFILESIZE;
+ *      - [W] MFILE_F_NOUSRMMAP;
+ *      - [W] MFILE_F_NOUSRIO;
  *   - blkdev:
- *      - always: MFILE_F_FIXEDFILESIZE;
- *   - chrdev:
- *      - usually: mf_filesize == 0;
- *      - usually: mf_parts             == MFILE_PARTS_ANONYMOUS; // iow: mfile_isanon(self);
- *      - usually: mf_changed.slh_first == MFILE_PARTS_ANONYMOUS; // iow: mfile_isanon(self);
- *      - usually: MFILE_F_NOUSRMMAP;
- *      - usually: MFILE_F_FIXEDFILESIZE;
+ *      - [X] MFILE_F_FIXEDFILESIZE;
+ *      - [X] mf_parts             != MFILE_PARTS_ANONYMOUS; // iow: !mfile_isanon(self);
+ *      - [X] mf_changed.slh_first != MFILE_PARTS_ANONYMOUS; // iow: !mfile_isanon(self);
+ *   - chrdev: (NOTE: The following [W] should really be understood as _very_ weak. There
+ *                    may be good reasons for  `chrdev's to break these  expectations...)
+ *      - [W] mf_filesize == 0;
+ *      - [W] mf_parts             == MFILE_PARTS_ANONYMOUS; // iow: mfile_isanon(self);
+ *      - [W] mf_changed.slh_first == MFILE_PARTS_ANONYMOUS; // iow: mfile_isanon(self);
+ *      - [W] MFILE_F_NOUSRMMAP;
+ *      - [W] MFILE_F_NOUSRIO;
+ *      - [W] MFILE_F_FIXEDFILESIZE;
  *   - fsuper:
- *      - always: mf_filesize == (pos_t)-1;
- *      - always: fn_nlink == 1;
- *      - always: MFILE_F_NOUSRMMAP;
- *      - always: MFILE_F_NOUSRIO;
- *      - always: MFILE_F_FIXEDFILESIZE;
- *      - always: fn_super == self;
+ *      - [W] MFILE_F_DELETED || mf_filesize == (pos_t)-1;
+ *      - [W] MFILE_F_DELETED || fn_nlink == 1;
+ *      - [W] MFILE_F_NOUSRMMAP;
+ *      - [W] MFILE_F_NOUSRIO;
+ *      - [W] MFILE_F_FIXEDFILESIZE;
+ *      - [X] fn_super == self;
+ *
+ * Legend:
+ *   [X]  eXlicitly enforced: this is a requirement that may not be validated
+ *   [W]  Weakly enforced: never asserted and  should not be relied upon.  You
+ *        may take this as a suggestion, but you may also deviate from it. But
+ *        if you do, things might get strange... (Not undefined; _unexpected_)
  */
 
 

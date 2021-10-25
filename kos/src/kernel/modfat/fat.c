@@ -2032,8 +2032,8 @@ FatSuper_MakeNode(struct fflatsuper *__restrict self,
 	case DT_REG: {
 		FatRegNode *node;
 		node = (FatRegNode *)kmalloc(sizeof(FatRegNode), GFP_NORMAL);
-		node->mf_ops        = &Fat_RegOps.rno_node.no_file;
-		node->mf_flags      = MFILE_F_NORMAL;
+		node->mf_ops    = &Fat_RegOps.rno_node.no_file;
+		node->mf_flags  = MFILE_F_NORMAL;
 		node->fn_fsdata = &node->frn_fdat;
 		result = node;
 	}	break;
@@ -2041,8 +2041,8 @@ FatSuper_MakeNode(struct fflatsuper *__restrict self,
 	case DT_DIR: {
 		FatDirNode *node;
 		node = (FatDirNode *)kmalloc(sizeof(FatDirNode), GFP_NORMAL);
-		node->mf_ops   = &Fat_DirOps.fdno_dir.dno_node.no_file;
-		node->mf_flags = MFILE_F_NOUSRIO | MFILE_F_NOUSRMMAP;
+		node->mf_ops    = &Fat_DirOps.fdno_dir.dno_node.no_file;
+		node->mf_flags  = MFILE_F_NOUSRIO | MFILE_F_NOUSRMMAP;
 		node->fn_fsdata = &node->fdn_fdat;
 		fflatdirdata_init(&node->fdn_data);
 		node->fdn_1dot = (uint32_t)-1;
@@ -2054,8 +2054,8 @@ FatSuper_MakeNode(struct fflatsuper *__restrict self,
 	case DT_LNK: {
 		FatLnkNode *node;
 		node = (FatLnkNode *)kmalloc(sizeof(FatLnkNode), GFP_NORMAL);
-		node->mf_ops   = &Fat_LnkOps.lno_node.no_file;
-		node->mf_flags = MFILE_F_NOUSRIO | MFILE_F_NOUSRMMAP;
+		node->mf_ops    = &Fat_LnkOps.lno_node.no_file;
+		node->mf_flags  = MFILE_F_NOUSRIO | MFILE_F_NOUSRMMAP;
 		node->fn_fsdata = &node->fln_fdat;
 		result = node;
 	}	break;
