@@ -544,18 +544,21 @@ NOTHROW(KCALL ramfs_dirnode_v_destroy)(struct mfile *__restrict self) {
 PUBLIC WUNUSED NONNULL((1, 2)) REF struct fdirent *KCALL
 ramfs_dirnode_v_lookup(struct fdirnode *__restrict self,
                        struct flookup_info *__restrict info) {
+	REF struct fdirent *ret = NULL;
 	struct ramfs_dirent *result;
 	struct ramfs_dirnode *me;
 	me = (struct ramfs_dirnode *)self;
 	ramfs_dirdata_treelock_read(&me->rdn_dat);
 	TRY {
-		result = xincref(ramfs_dirdata_lookup(me, info));
+		result = ramfs_dirdata_lookup(me, info);
 	} EXCEPT {
 		ramfs_dirdata_treelock_endread(&me->rdn_dat);
 		RETHROW();
 	}
+	if (result)
+		ret = incref(&result->rde_ent);
 	ramfs_dirdata_treelock_endread(&me->rdn_dat);
-	return &result->rde_ent;
+	return ret;
 }
 
 PUBLIC NONNULL((1)) void KCALL
