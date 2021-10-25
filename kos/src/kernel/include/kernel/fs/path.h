@@ -193,7 +193,7 @@ struct path {
 #define path_getsuper(self) ((self)->p_dir->_fdirnode_node_ fn_super)
 #define path_ismount(self)  ((self)->p_flags & PATH_F_ISMOUNT)
 #define path_asmount(self)  ((struct pathmount *)(self))
-#define path_isdrive(self)  ((self)->p_flags & PATH_F_ISDRIVE)
+#define path_isdrive(self)  ((self)->p_flags & PATH_F_ISDRIVE) /* Caller must be holding `_path_getvfs(self)->vf_driveslock' */
 #define path_isroot(self)   ((self)->p_flags & PATH_F_ISROOT)
 
 /* Helpers for working with the PLOCK (ParentLOCK) of paths. */
@@ -689,35 +689,13 @@ path_mount(struct path *__restrict self,
            struct fdirnode *__restrict dir)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, E_FSERROR_DELETED);
 
-/* Unmount the a given path `self', as well as all child-paths of
- * it which  may  also  be  mounting points.  This  is  done  by:
- *  - Acquire a lock to `self->p_parent->p_cldlock', or if `self' has
- *    not parent, a lock  to `self->_p_vfs->vf_rootlock'. If the  VFS
- *    has already been destroyed here, simply return `false'
- *  - Acquire locks to `self->p_cldlock', as well as any tryincref()-albe
- *    path  that is  recursively reachable  via the  list of child-paths.
- *  - For  every recursively reachable child (including `self'), clear + free its
- *    `p_cldlist' fields and set it to `PATH_CLDLIST_DELETED' to mark as deleted.
- *  - Remove all  recursively  reachable  children (including  `self'),  from  the
- *    recent-cache of `_path_getvfs(self)'. If the VFS has already been destroyed,
- *    simply skip the removal of elements from the recent cache (since that  cache
- *    has also been destroyed). In case one  of those children is also a  mounting
- *    point,  remove from the  mount list of `_path_getvfs(self)',  and in case of
- *    DOS drive roots, also remove from those tables. (Again if VFS was destroyed,
- *    instead assert that  no mounting points  exists, and none  of the paths  are
- *    part of any recent caches)
- *  - Release locks to all of the recursively reachable children, including `self'
- *  - When `self->p_parent != NULL', remove `self'  from its parent's list  of
- *    child paths. The return value of this value here is indicative of `self'
- *    having been found in this map.
- *  - When `self->p_parent == NULL', check if `self == self->_p_vfs->vf_root'.
- *    - If so, this function returns `true' and `self->_p_vfs->vf_root = ALLOC_UNMOUNTED_ROOT()'
- *    - If not, this function returns `false'
+/* Unmount the  a given  path `self',  as well  as  all
+ * child-paths of it which may also be mounting points.
  * @return: true:  `self' was unmounted.
  * @return: false: `self' had already been unmounted. */
 FUNDEF NONNULL((1)) __BOOL KCALL
 path_umount(struct pathmount *__restrict self)
-		THROWS(E_WOULDBLOCK);
+		THROWS(E_WOULDBLOCK, E_BADALLOC);
 
 
 

@@ -29,6 +29,7 @@
 #include <kernel/fs/dirnode.h>
 #include <kernel/fs/node.h>
 #include <kernel/fs/path.h>
+#include <kernel/fs/ramfs.h>
 #include <kernel/fs/vfs.h>
 #include <kernel/handle.h>
 #include <sched/task.h>
@@ -217,7 +218,8 @@ NOTHROW(FCALL path_tryincref_and_trylock_whole_tree)(struct path *__restrict sel
 	return NULL;
 }
 
-/* Release a lock as previously acquired by `path_tryincref_and_trylock_whole_tree()'. */
+/* Release a lock as previously acquired by `path_tryincref_and_trylock_whole_tree()'.
+ * At the same  time, mark all  paths which had  been locked as  having been  deleted. */
 PRIVATE NONNULL((1)) void
 NOTHROW(FCALL path_decref_and_delete_and_unlock_whole_tree)(struct path *__restrict self) {
 	size_t old_mask;
@@ -259,6 +261,30 @@ NOTHROW(FCALL path_decref_and_delete_and_unlock_whole_tree)(struct path *__restr
 		}
 		kfree(old_buckets);
 	}
+}
+
+
+/* Check if there is a mounting point that is reachable from  `self'.
+ * The caller must be holding lock to `self' and its entire sub-tree. */
+PRIVATE ATTR_PURE WUNUSED NONNULL((1)) bool
+NOTHROW(FCALL path_ismount_reachable_from)(struct path *__restrict self) {
+	size_t mask;
+	struct path_bucket *buckets;
+	if (path_ismount(self))
+		return true;
+	mask    = self->p_cldmask;
+	buckets = self->p_cldlist;
+	if (buckets != PATH_CLDLIST_DELETED) {
+		size_t i;
+		for (i = 0; i <= mask; ++i) {
+			struct path *child = buckets[i].pb_path;
+			if (child && child != &deleted_path && !wasdestroyed(child)) {
+				if (path_ismount_reachable_from(child))
+					return true;
+			}
+		}
+	}
+	return false;
 }
 
 
@@ -328,15 +354,6 @@ again_acquire_cldlock:
 				THROW(E_FSERROR_IS_A_DIRECTORY, E_FILESYSTEM_IS_A_DIRECTORY_UNLINK);
 			}
 
-			/* Check if it's a mounting point. */
-			if unlikely(path_ismount(existing_path)) {
-				path_cldlock_endwrite(self);
-				decref_unlikely(existing_path);
-
-				/* You'll have to use `path_umount()' */
-				THROW(E_FSERROR_IS_A_MOUNTING_POINT);
-			}
-
 			/* Ok: so this is where it gets a little bit complicated:
 			 *  - We have to acquire another lock to the child path
 			 *  - Then, while holding locks to both paths, invoke the
@@ -363,6 +380,22 @@ again_acquire_cldlock:
 				path_cldlock_write(blocking_path);
 				path_cldlock_endwrite(blocking_path);
 				goto again_acquire_cldlock;
+			}
+
+			/* Can't  remove a directory if it or one of its child-paths is a mounting
+			 * point. As far as the data model goes, we technically could do this, but
+			 * if we did, then that mounting point would still continue to exist,  yet
+			 * could no longer be reached or even umount'd (by-name) for that matter.
+			 *
+			 * The only way such a mounting would could still be accessed is if
+			 * the user had somehow kept a reference to some path apart of  it. */
+			if unlikely(path_ismount_reachable_from(existing_path)) {
+				path_decref_and_unlock_whole_tree(existing_path);
+				path_cldlock_endwrite(self);
+				decref_unlikely(existing_path);
+
+				/* You'll have to use `path_umount()' */
+				THROW(E_FSERROR_IS_A_MOUNTING_POINT);
 			}
 
 			/* Do the fs-level unlink (or rather: rmdir) */
@@ -1327,38 +1360,194 @@ path_mount(struct path *__restrict self,
 }
 
 
-/* Unmount the a given path `self', as well as all child-paths of
- * it which  may  also  be  mounting points.  This  is  done  by:
- *  - Acquire a lock to `self->p_parent->p_cldlock', or if `self' has
- *    not parent, a lock  to `self->_p_vfs->vf_rootlock'. If the  VFS
- *    has already been destroyed here, simply return `false'
- *  - Acquire locks to `self->p_cldlock', as well as any tryincref()-albe
- *    path  that is  recursively reachable  via the  list of child-paths.
- *  - For  every recursively reachable child (including `self'), clear + free its
- *    `p_cldlist' fields and set it to `PATH_CLDLIST_DELETED' to mark as deleted.
- *  - Remove all  recursively  reachable  children (including  `self'),  from  the
- *    recent-cache of `_path_getvfs(self)'. If the VFS has already been destroyed,
- *    simply skip the removal of elements from the recent cache (since that  cache
- *    has also been destroyed). In case one  of those children is also a  mounting
- *    point,  remove from the  mount list of `_path_getvfs(self)',  and in case of
- *    DOS drive roots, also remove from those tables. (Again if VFS was destroyed,
- *    instead assert that  no mounting points  exists, and none  of the paths  are
- *    part of any recent caches)
- *  - Release locks to all of the recursively reachable children, including `self'
- *  - When `self->p_parent != NULL', remove `self'  from its parent's list  of
- *    child paths. The return value of this value here is indicative of `self'
- *    having been found in this map.
- *  - When `self->p_parent == NULL', check if `self == self->_p_vfs->vf_root'.
- *    - If so, this function returns `true' and `self->_p_vfs->vf_root = ALLOC_UNMOUNTED_ROOT()'
- *    - If not, this function returns `false'
+
+
+/* Go through  all paths  starting at  `self' and  unlink `pm_vsmount'  for
+ * every mounting point encountered during this. The caller must be holding
+ * locks  to `self' and its entire sub-tree, as well as VFS->vf_mountslock.
+ *
+ * Additionally, also remove paths marked as `PATH_F_ISDRIVE' from the list
+ * of DOS drive roots. */
+PRIVATE NONNULL((1)) void
+NOTHROW(FCALL path_umount_subtree)(struct path *__restrict self) {
+	size_t mask;
+	struct path_bucket *buckets;
+
+	/* Remove mounting points from the VFS controller's mounting point list. */
+	if (path_ismount(self)) {
+		struct pathmount *me = path_asmount(self);
+		if (LIST_ISBOUND(me, pm_vsmount)) {
+			LIST_UNBIND(me, pm_vsmount);
+
+			/* Inherited from `pm_vsmount'; nokill
+			 * since caller still has a reference! */
+			decref_nokill(self);
+		}
+	}
+
+	/* Remove DOS drive roots from the DOS drive root table. */
+	if (path_isdrive(self)) {
+		unsigned int i;
+		struct vfs *pathvfs = _path_getvfs(self);
+		assert(!wasdestroyed(pathvfs));
+		assert(vfs_driveslock_writing(pathvfs));
+		for (i = 0; i < COMPILER_LENOF(pathvfs->vf_drives); ++i) {
+			if (pathvfs->vf_drives[i] != self)
+				continue; /* Some other path */
+			pathvfs->vf_drives[i] = NULL;
+
+			/* Inherited from `vf_drives';  nokill
+			 * since caller still has a reference! */
+			decref_nokill(self);
+		}
+	}
+
+	/* Recursively search all child-paths. */
+	mask    = self->p_cldmask;
+	buckets = self->p_cldlist;
+	if (buckets != PATH_CLDLIST_DELETED) {
+		size_t i;
+		for (i = 0; i <= mask; ++i) {
+			struct path *child = buckets[i].pb_path;
+			if (child && child != &deleted_path && !wasdestroyed(child))
+				path_umount_subtree(child);
+		}
+	}
+}
+
+/* Unmount the  a given  path `self',  as well  as  all
+ * child-paths of it which may also be mounting points.
  * @return: true:  `self' was unmounted.
  * @return: false: `self' had already been unmounted. */
 PUBLIC NONNULL((1)) bool KCALL
 path_umount(struct pathmount *__restrict self)
-		THROWS(E_WOULDBLOCK) {
-	/* TODO */
-	(void)self;
-	THROW(E_NOT_IMPLEMENTED_TODO);
+		THROWS(E_WOULDBLOCK, E_BADALLOC) {
+	bool result;
+	REF struct vfs *pathvfs;
+	REF struct path *blocking_path;
+	struct pathmount *replacement_mount = NULL;
+	assert(path_ismount(self));
+
+	/* Load the associated VFS controller. */
+	pathvfs = _path_getvfs(self);
+	if (!tryincref(pathvfs))
+		return false;
+	FINALLY_DECREF_UNLIKELY(pathvfs);
+	RAII_FINALLY { kfree(replacement_mount); };
+
+	/* Lock the entire file-tree described by `self' */
+again_acquire_locks:
+	blocking_path = path_tryincref_and_trylock_whole_tree(self);
+	if unlikely(blocking_path) {
+		FINALLY_DECREF_UNLIKELY(blocking_path);
+		path_cldlock_write(self);
+		path_cldlock_endwrite(self);
+		goto again_acquire_locks;
+	}
+
+	/* Acquire a lock to the VFS's mounting controller. */
+	if (!vfs_mountslock_tryacquire(pathvfs)) {
+		path_decref_and_unlock_whole_tree(self);
+		while (!vfs_mountslock_available(pathvfs))
+			task_yield();
+		goto again_acquire_locks;
+	}
+
+	/* Acquire a lock to the VFS's drive controller. (Since one of
+	 * the paths being deleted may have been used as a DOS  drive) */
+	if (!vfs_driveslock_trywrite(pathvfs)) {
+		vfs_mountslock_release(pathvfs);
+		path_decref_and_unlock_whole_tree(self);
+		while (!vfs_driveslock_canwrite(pathvfs))
+			task_yield();
+		goto again_acquire_locks;
+	}
+
+	/* When `self' is the absolute root-node of the whole filesystem,
+	 * then  we also need to acquire a  lock to the VFS's root field. */
+	if (path_isroot(self)) {
+		if (!vfs_rootlock_trywrite(pathvfs)) {
+			vfs_driveslock_endwrite(pathvfs);
+			vfs_mountslock_release(pathvfs);
+			path_decref_and_unlock_whole_tree(self);
+			while (!vfs_rootlock_canwrite(pathvfs))
+				task_yield();
+			goto again_acquire_locks;
+		}
+		/* If we're still the root path, replace said path with . */
+		if likely(pathvfs->vf_root == self) {
+			if (!replacement_mount) {
+				replacement_mount = (struct pathmount *)kmalloc_nx(sizeof(struct pathmount),
+				                                                   GFP_NORMAL | GFP_ATOMIC);
+				if (!replacement_mount) {
+					vfs_rootlock_endwrite(pathvfs);
+					vfs_driveslock_endwrite(pathvfs);
+					vfs_mountslock_release(pathvfs);
+					path_decref_and_unlock_whole_tree(self);
+					replacement_mount = (struct pathmount *)kmalloc(sizeof(struct pathmount), GFP_NORMAL);
+					goto again_acquire_locks;
+				}
+			}
+
+			/* Set-up `replacement_mount' for the purpose of replacing `self' */
+			replacement_mount->p_refcnt = 1; /* +1: `&pathvfs->vf_mounts' */
+			replacement_mount->p_flags  = PATH_F_ISMOUNT | PATH_F_ISROOT;
+			replacement_mount->_p_vfs   = pathvfs;             /* weakincref'd later. */
+			replacement_mount->p_name   = &fdirent_empty;      /* incref'd later. */
+			replacement_mount->p_dir    = &fdirnode_unmounted; /* incref'd later. */
+			TAILQ_ENTRY_UNBOUND_INIT(&replacement_mount->p_recent);
+			shared_rwlock_init(&replacement_mount->p_cldlock);
+			SLIST_INIT(&replacement_mount->p_cldlops);
+
+			/* Must also link into `fsuper_unmounted's list of mounting points. */
+			if (!fsuper_mounts_trywrite(&fsuper_unmounted)) {
+				vfs_rootlock_endwrite(pathvfs);
+				vfs_driveslock_endwrite(pathvfs);
+				vfs_mountslock_release(pathvfs);
+				path_decref_and_unlock_whole_tree(self);
+				while (!fsuper_mounts_canwrite(&fsuper_unmounted))
+					task_yield();
+				goto again_acquire_locks;
+			}
+			LIST_INSERT_HEAD(&fsuper_unmounted.fs_mounts, replacement_mount, pm_fsmount);
+			fsuper_mounts_endwrite(&fsuper_unmounted);
+
+			/* Insert the replacement mounting point into the mounts list. */
+			LIST_INSERT_HEAD(&pathvfs->vf_mounts, replacement_mount, pm_vsmount); /* Inherit reference */
+			incref(&fdirnode_unmounted); /* for `replacement_mount->p_dir' */
+			weakincref(pathvfs);         /* For `replacement_mount->_p_vfs' */
+			incref(&fdirent_empty);      /* For `replacement_mount->p_name' */
+			replacement_mount = NULL;    /* Prevent this one from being free'd */
+		}
+		vfs_rootlock_endwrite(pathvfs);
+	}
+
+	/* Eventually, we want to return indicative of the caller-given
+	 * path having been removed from  the VFS controller's list  of
+	 * mounting points. */
+	result = LIST_ISBOUND(self, pm_vsmount);
+
+	/* This is where the (first part of the) magic happens:
+	 *  - Go through all paths and remove them from the mounting point, and drive lists. */
+	path_umount_subtree(self);
+
+	/* Release locks */
+	vfs_driveslock_endwrite(pathvfs);
+	vfs_mountslock_release(pathvfs);
+
+	/* And this is the second part of the magic:
+	 *  - Mark all paths reachable from `self' as deleted, and remove
+	 *    each of  them  from  the  VFS  controller's  recent  cache.
+	 *  - Afterwards, decref() the path, at which point all VFS-related
+	 *    references to said path will have gone away, meaning that the
+	 *    only which which may still  keep the path alive are  external
+	 *    references.
+	 *    In case there are no  more references, path_destroy() is  called
+	 *    which in  turn removes  used-to-be  mounting points  from  super
+	 *    mounting point lists, and finally: if such a list becomes empty,
+	 *    `fsuper_delete()' is called,  which does  the fs-level  unmount! */
+	path_decref_and_delete_and_unlock_whole_tree(self);
+	return result;
 }
 
 
