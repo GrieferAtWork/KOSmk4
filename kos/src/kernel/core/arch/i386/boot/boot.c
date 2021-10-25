@@ -798,9 +798,6 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *       >> Translate exception 0x80:0x3,E_FSERROR_PATH_NOT_FOUND[0x1] into errno=-2
 	 *       messages... */
 
-	/* TODO: Sub-class of `fregnode': `printnode' (read-only file who's
-	 *       contents are generated on-demand by a pformatprinter) */
-
 	return state;
 }
 

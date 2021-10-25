@@ -356,7 +356,7 @@ NOTHROW(KCALL mfile_zero_loadblocks)(struct mfile *__restrict UNUSED(self),
                                      pos_t UNUSED(addr),
                                      physaddr_t buf, size_t num_bytes,
                                      struct aio_multihandle *__restrict UNUSED(aio)) {
-	memsetphys(buf, 0, num_bytes);
+	bzerophyscc(buf, num_bytes);
 }
 
 

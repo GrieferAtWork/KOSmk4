@@ -102,6 +102,12 @@ struct fregnode
 /* Finalize a partially initialized `struct fregnode' (as initialized by `_fregnode_init()') */
 #define _fregnode_fini(self) decref_nokill((self)->_fregnode_node_ fn_super)
 
+
+/* Default operators for `struct fdirnode_ops' */
+#define fregnode_v_destroy fnode_v_destroy
+#define fregnode_v_changed fnode_v_changed
+
+
 DECL_END
 #endif /* __CC__ */
 #endif /* CONFIG_USE_NEW_FS */

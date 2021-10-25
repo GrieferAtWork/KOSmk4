@@ -715,7 +715,7 @@ mpart_memload_and_unlock(struct mpart *__restrict self,
 				/* Limit the load-range by the size of the file, and zero-initialize
 				 * any memory that is being mapped beyond the end natural end of the
 				 * file. */
-				if (addr >= filesize) {
+				if unlikely(addr >= filesize) {
 					bzerophyscc(min_addr, num_bytes);
 				} else {
 					size_t load_bytes;

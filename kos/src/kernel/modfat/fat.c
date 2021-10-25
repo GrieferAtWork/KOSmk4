@@ -555,7 +555,7 @@ again:
 				goto waitfor_write_lock;
 			if (cluster >= super->ft_cluster_eof) {
 				/* Read all ZEROes after EOF. */
-				memsetphys(buf, 0, num_bytes);
+				bzerophyscc(buf, num_bytes);
 				return;
 			}
 			diskpos = FAT_CLUSTERADDR(super, cluster);
@@ -1888,7 +1888,7 @@ Fat16Root_LoadBlocks(struct mfile *__restrict self, pos_t addr,
 		maxio = 0;
 	if unlikely(num_bytes > maxio) {
 		/* Some part of the tail cannot be read. Instead, initialize to 0 */
-		memsetphys(buf + maxio, 0, num_bytes - maxio);
+		bzerophyscc(buf + maxio, num_bytes - maxio);
 		num_bytes = maxio;
 	}
 	addr += me->ft_fdat.fn16_root.r16_rootpos;

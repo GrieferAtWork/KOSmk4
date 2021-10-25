@@ -225,6 +225,7 @@ for (local name, st_mode, st_rdev: DEVICES) {
 	print("				MFILE_INIT_mf_flags(MFILE_FN_GLOBAL_REF | MFILE_F_ATTRCHANGED |");
 	print("				                    MFILE_F_CHANGED | MFILE_F_NOATIME |");
 	print("				                    MFILE_F_NOMTIME | MFILE_F_FIXEDFILESIZE |");
+	print("				                    MFILE_FM_ATTRREADONLY |");
 	local extFlags = DEVICE_EXTFLAGS.get(name);
 	if (extFlags !is none)
 		print("				                    ", extFlags, " |");
@@ -438,6 +439,7 @@ PUBLIC struct device dev_mem = {
 				MFILE_INIT_mf_flags(MFILE_FN_GLOBAL_REF | MFILE_F_ATTRCHANGED |
 				                    MFILE_F_CHANGED | MFILE_F_NOATIME |
 				                    MFILE_F_NOMTIME | MFILE_F_FIXEDFILESIZE |
+				                    MFILE_FM_ATTRREADONLY |
 				                    _MFILE_DEVFS_BYNAME_RED |
 				                    __SELECT_INO(0, 0)),
 				MFILE_INIT_mf_trunclock,
@@ -489,6 +491,7 @@ PUBLIC struct device dev_kmem = {
 				MFILE_INIT_mf_flags(MFILE_FN_GLOBAL_REF | MFILE_F_ATTRCHANGED |
 				                    MFILE_F_CHANGED | MFILE_F_NOATIME |
 				                    MFILE_F_NOMTIME | MFILE_F_FIXEDFILESIZE |
+				                    MFILE_FM_ATTRREADONLY |
 				                    NO_USER_IO_WITHOUT_VIO |
 				                    __SELECT_INO(0, 0)),
 				MFILE_INIT_mf_trunclock,
@@ -540,6 +543,7 @@ PUBLIC struct device dev_null = {
 				MFILE_INIT_mf_flags(MFILE_FN_GLOBAL_REF | MFILE_F_ATTRCHANGED |
 				                    MFILE_F_CHANGED | MFILE_F_NOATIME |
 				                    MFILE_F_NOMTIME | MFILE_F_FIXEDFILESIZE |
+				                    MFILE_FM_ATTRREADONLY |
 				                    MFILE_F_NOUSRMMAP | MFILE_F_NOUSRIO |
 				                    __SELECT_INO(_MFILE_FN__RBRED, _MFILE_FN__RBRED)),
 				MFILE_INIT_mf_trunclock,
@@ -591,6 +595,7 @@ PUBLIC struct device dev_port = {
 				MFILE_INIT_mf_flags(MFILE_FN_GLOBAL_REF | MFILE_F_ATTRCHANGED |
 				                    MFILE_F_CHANGED | MFILE_F_NOATIME |
 				                    MFILE_F_NOMTIME | MFILE_F_FIXEDFILESIZE |
+				                    MFILE_FM_ATTRREADONLY |
 				                    NO_USER_IO_WITHOUT_VIO |
 				                    __SELECT_INO(0, 0)),
 				MFILE_INIT_mf_trunclock,
@@ -642,6 +647,7 @@ PUBLIC struct device dev_zero = {
 				MFILE_INIT_mf_flags(MFILE_FN_GLOBAL_REF | MFILE_F_ATTRCHANGED |
 				                    MFILE_F_CHANGED | MFILE_F_NOATIME |
 				                    MFILE_F_NOMTIME | MFILE_F_FIXEDFILESIZE |
+				                    MFILE_FM_ATTRREADONLY |
 				                    __SELECT_INO(0, 0)),
 				MFILE_INIT_mf_trunclock,
 				MFILE_INIT_mf_filesize(0),
@@ -692,6 +698,7 @@ PUBLIC struct device dev_full = {
 				MFILE_INIT_mf_flags(MFILE_FN_GLOBAL_REF | MFILE_F_ATTRCHANGED |
 				                    MFILE_F_CHANGED | MFILE_F_NOATIME |
 				                    MFILE_F_NOMTIME | MFILE_F_FIXEDFILESIZE |
+				                    MFILE_FM_ATTRREADONLY |
 				                    MFILE_F_NOUSRMMAP | MFILE_F_NOUSRIO |
 				                    _MFILE_DEVFS_BYNAME_RED |
 				                    __SELECT_INO(0, 0)),
@@ -744,6 +751,7 @@ PUBLIC struct device dev_random = {
 				MFILE_INIT_mf_flags(MFILE_FN_GLOBAL_REF | MFILE_F_ATTRCHANGED |
 				                    MFILE_F_CHANGED | MFILE_F_NOATIME |
 				                    MFILE_F_NOMTIME | MFILE_F_FIXEDFILESIZE |
+				                    MFILE_FM_ATTRREADONLY |
 				                    NO_USER_IO_WITHOUT_VIO |
 				                    __SELECT_INO(0, 0)),
 				MFILE_INIT_mf_trunclock,
@@ -795,6 +803,7 @@ PUBLIC struct device dev_urandom = {
 				MFILE_INIT_mf_flags(MFILE_FN_GLOBAL_REF | MFILE_F_ATTRCHANGED |
 				                    MFILE_F_CHANGED | MFILE_F_NOATIME |
 				                    MFILE_F_NOMTIME | MFILE_F_FIXEDFILESIZE |
+				                    MFILE_FM_ATTRREADONLY |
 				                    NO_USER_IO_WITHOUT_VIO |
 				                    _MFILE_DEVFS_BYNAME_RED |
 				                    __SELECT_INO(0, 0)),
@@ -847,6 +856,7 @@ PUBLIC struct device dev_kmsg = {
 				MFILE_INIT_mf_flags(MFILE_FN_GLOBAL_REF | MFILE_F_ATTRCHANGED |
 				                    MFILE_F_CHANGED | MFILE_F_NOATIME |
 				                    MFILE_F_NOMTIME | MFILE_F_FIXEDFILESIZE |
+				                    MFILE_FM_ATTRREADONLY |
 				                    MFILE_F_NOUSRMMAP | MFILE_F_NOUSRIO |
 				                    _MFILE_DEVFS_BYNAME_RED |
 				                    __SELECT_INO(0, 0)),
@@ -899,6 +909,7 @@ PUBLIC struct device dev_tty = {
 				MFILE_INIT_mf_flags(MFILE_FN_GLOBAL_REF | MFILE_F_ATTRCHANGED |
 				                    MFILE_F_CHANGED | MFILE_F_NOATIME |
 				                    MFILE_F_NOMTIME | MFILE_F_FIXEDFILESIZE |
+				                    MFILE_FM_ATTRREADONLY |
 				                    MFILE_F_NOUSRMMAP | MFILE_F_NOUSRIO |
 				                    _MFILE_DEVFS_BYNAME_RED |
 				                    __SELECT_INO(0, 0)),
