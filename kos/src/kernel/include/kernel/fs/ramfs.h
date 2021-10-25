@@ -251,6 +251,7 @@ DATDEF struct fdirnode_ops const ramfs_dirnode_ops;
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL ramfs_dirnode_v_destroy)(struct mfile *__restrict self);
 #define ramfs_dirnode_v_open       fdirnode_v_open
+#define ramfs_dirnode_v_stat       fdirnode_v_stat
 #define ramfs_dirnode_v_stream_ops fdirnode_v_stream_ops
 FUNDEF WUNUSED NONNULL((1, 2)) REF struct fdirent *KCALL
 ramfs_dirnode_v_lookup(struct fdirnode *__restrict self,

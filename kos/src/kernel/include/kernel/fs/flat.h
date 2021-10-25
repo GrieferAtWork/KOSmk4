@@ -366,6 +366,10 @@ struct flatdirnode_ops {
 /* Default operators for `struct flatdirnode'-derived directories. */
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL flatdirnode_v_destroy)(struct mfile *__restrict self);
+#define flatdirnode_v_open       fdirnode_v_open
+#define flatdirnode_v_stat       fdirnode_v_stat
+#define flatdirnode_v_changed    fdirnode_v_changed
+#define flatdirnode_v_stream_ops fdirnode_v_stream_ops
 FUNDEF WUNUSED NONNULL((1, 2)) REF struct fdirent *KCALL
 flatdirnode_v_lookup(struct fdirnode *__restrict self,
                      struct flookup_info *__restrict info)

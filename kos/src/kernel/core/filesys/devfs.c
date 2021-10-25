@@ -1046,12 +1046,19 @@ again_acquire_locks:
 #define devfs_super_v_wrattr     ramfs_super_v_wrattr
 
 INTDEF NONNULL((1)) void KCALL /* From "./null.c" */
-nullfile_v_stat(struct mfile *__restrict UNUSED(self),
+nullfile_v_stat(struct mfile *__restrict self,
                 USER CHECKED struct stat *result);
+
+PRIVATE NONNULL((1)) void KCALL /* From "./null.c" */
+devfs_super_v_stat(struct mfile *__restrict self,
+                   USER CHECKED struct stat *result) {
+	fdirnode_v_stat(self, result); /* stat("/dev") has normal dir-based stat behavior */
+	nullfile_v_stat(self, result); /* stat("/dev") returns `boottime' timestamps! */
+}
 
 PRIVATE struct mfile_stream_ops const devfs_super_v_stream_ops = {
 	.mso_open = &devfs_super_v_open,
-	.mso_stat = &nullfile_v_stat, /* stat("/dev") returns `boottime' timestamps! */
+	.mso_stat = &devfs_super_v_stat,
 };
 
 /* INTERN because needed in "./devfsdefs.c" */

@@ -479,6 +479,9 @@ struct handle;
 FUNDEF NONNULL((1, 2)) void KCALL
 fdirnode_v_open(struct mfile *__restrict self, struct handle *__restrict hand,
                 struct path *access_path, struct fdirent *access_dent);
+FUNDEF NONNULL((1)) void KCALL /* Writes `st_blocks = 1;', `st_size = 1 << self->mf_blockshift;' */
+fdirnode_v_stat(struct mfile *__restrict self,
+                USER CHECKED struct stat *result) THROWS(...);
 
 /* Default stream operators for directories (using `fdirnode_v_open') */
 DATDEF struct mfile_stream_ops const fdirnode_v_stream_ops;
