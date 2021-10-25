@@ -128,7 +128,11 @@ NOTHROW(KCALL device_v_destroy)(struct mfile *__restrict self);
 #define device_v_wrattr  fnode_v_wrattr_noop
 #define device_v_changed fnode_v_changed
 
-
+/* Helper macros. */
+#define device_isblk(self) S_ISBLK((self)->_device_devnode_ _fdevnode_node_ fn_mode)
+#define device_ischr(self) S_ISBLK((self)->_device_devnode_ _fdevnode_node_ fn_mode)
+#define device_asblk(self) ((struct blkdev *)(self))
+#define device_aschr(self) ((struct chrdev *)(self))
 
 /* Return a pointer to device-node operators of `self' */
 #define device_getops(self) \

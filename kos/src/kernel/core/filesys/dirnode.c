@@ -69,7 +69,7 @@ fdirenum_feedent(USER CHECKED struct dirent *buf,
 		/* Fill in basic members of the user-buffer (CAUTION: E_SEGFAULT) */
 		buf->d_ino    = (typeof(buf->d_ino))feed_d_ino;
 		buf->d_type   = (typeof(buf->d_type))feed_d_type;
-		buf->d_namlen = (typeof(buf->d_ino))feed_d_namlen;
+		buf->d_namlen = (typeof(buf->d_namlen))feed_d_namlen;
 		bufsize -= offsetof(struct dirent, d_name);
 		if (bufsize >= (size_t)(feed_d_namlen + 1))
 			bufsize = (size_t)(feed_d_namlen + 1);
@@ -143,7 +143,7 @@ fdirnode_enum(struct fdirnode *__restrict self,
  * @throw: E_FSERROR_READONLY:              Read-only filesystem (or unsupported operation)
  * @throw: E_FSERROR_TOO_MANY_HARD_LINKS:   ...
  * @throw: E_FSERROR_UNSUPPORTED_OPERATION: The requested S_IFMT isn't supported.
- * @return: * : One of `FDIRNODE_MKFILE_*' **/
+ * @return: * : One of `FDIRNODE_MKFILE_*' * */
 PUBLIC WUNUSED NONNULL((1, 2)) unsigned int FCALL
 fdirnode_mkfile(struct fdirnode *__restrict self,
                 struct fmkfile_info *__restrict info)
@@ -154,6 +154,9 @@ fdirnode_mkfile(struct fdirnode *__restrict self,
 	ops = fdirnode_getops(self);
 	if unlikely(!ops->dno_mkfile)
 		THROW(E_FSERROR_READONLY);
+	/* TODO: If this throws `E_FSERROR_UNSUPPORTED_OPERATION' with context == 0,
+	 *       try to fill in the correct `E_FILESYSTEM_OPERATION_*' context based
+	 *       on `info->mkf_fmode'. */
 	return (*ops->dno_mkfile)(self, info);
 }
 

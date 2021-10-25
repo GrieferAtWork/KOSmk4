@@ -58,6 +58,9 @@ INTDEF FREE void NOTHROW(KCALL kernel_initialize_loaded_drivers)(void);
 INTDEF FREE void NOTHROW(KCALL kernel_initialize_devfs_driver)(void);
 INTDEF FREE void NOTHROW(KCALL kernel_initialize_ide_driver)(void);
 INTDEF FREE void NOTHROW(KCALL kernel_initialize_fat_driver)(void);
+#ifdef CONFIG_USE_NEW_FS
+INTDEF FREE void NOTHROW(KCALL kernel_initialize_rootfs)(void);
+#endif /* CONFIG_USE_NEW_FS */
 
 /* Initialize special builtin character devices (/dev/null, /dev/zero, etc.) */
 INTDEF FREE void NOTHROW(KCALL kernel_initialize_null_devices)(void);

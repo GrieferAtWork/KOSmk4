@@ -938,27 +938,9 @@ NOTHROW(FCALL device_unlink_from_globals)(struct device *__restrict self) {
 
 
 /* Check if a given filename is already in use in "/dev/". (Caller must be holding proper locks) */
-PRIVATE NOBLOCK WUNUSED NONNULL((1)) bool
-NOTHROW(FCALL devfs_root_nameused)(struct fdevfsdirent const *__restrict name) {
-	struct device *existing;
-	if (ramfs_direnttree_locate(devfs.rs_dat.rdd_tree,
-	                            name->fdd_dirent.fd_name,
-	                            name->fdd_dirent.fd_namelen))
-		return true; /* Another file with the same name already exists. */
-
-	/* Check for another device file */
-	existing = devfs_byname_locate(name->fdd_dirent.fd_name,
-	                               name->fdd_dirent.fd_namelen);
-	if (existing != NULL) {
-		if (!wasdestroyed(existing))
-			return true;
-
-		/* Existing device is currently being destroyed. (do the unlink for it) */
-		devfs_byname_removenode(existing);
-		existing->dv_byname_node.rb_lhs = DEVICE_BYNAME_DELETED;
-	}
-	return false;
-}
+#define devfs_root_nameused(name)                           \
+	_device_register_inuse_name((name)->fdd_dirent.fd_name, \
+	                            (name)->fdd_dirent.fd_namelen)
 
 
 /* Force-insert `self' into the devfs INode tree. (Caller must be holding locks) */
@@ -1180,7 +1162,7 @@ blkdev_repart_and_register(struct blkdev *__restrict self)
 	}
 	devfs_insert_into_inode_tree(self);
 	LIST_INSERT_HEAD(&fallnodes_list, self, fn_allnodes);
-	if (!(self->mf_flags & MFILE_FN_GLOBAL_REF)) {
+	if likely(!(self->mf_flags & MFILE_FN_GLOBAL_REF)) {
 		self->mf_flags |= MFILE_FN_GLOBAL_REF;
 		++self->mf_refcnt; /* For `MFILE_FN_GLOBAL_REF' (in `fallnodes_list') */
 	}

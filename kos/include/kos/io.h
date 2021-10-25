@@ -425,51 +425,50 @@ typedef unsigned int poll_mode_t; /* Set of `POLL*' */
                                  * The system is allowed to append an empty directory entry
                                  * (with  `d_namlen = 0' and `d_name[0] = '\0''; other fields are undefined).
                                  * If there isn't enough space for such an entry, no such entry will be emit.
-                                 * Since no  other  directory  entry  can ever  have  a  length  of  ZERO(0),
-                                 * this  allows  user-space  to  detect  end-of-directory  without  the  need
-                                 * of re-invoking  the  kreaddir()  system call  and  inspecting  its  return
-                                 * value for being equal to ZERO(0).
-                                 * However, that  check  is  still  required, as  this  flag  may  be  ignored
-                                 * for no  reason  immediately apparent  (if  the  EOF entry  can't  fit  into
-                                 * the buffer, there's  no way of  knowing if there's  a missing entry  that's
-                                 * supposed  to  go into  the buffer,  or if  it was  actually an  EOF entry).
-                                 * Additionally,  no  eof  entry  may  be  written  if  kreaddir()  is invoked
-                                 * on a directory handle who's stream position is at the end of the directory.
-                                 * For  usage, see  the example  below, as  well as `READDIR_MULTIPLE_ISEOF()' */
+                                 * Since no other  directory entry can  ever have a  length of ZERO(0),  this
+                                 * allows  user-space  to detect  end-of-directory  without the  need  of re-
+                                 * invoking  the kreaddir() system  call and inspecting  its return value for
+                                 * being equal to ZERO(0).
+                                 * However, that check is still required, as this flag may be ignored for no
+                                 * reason immediately apparent (if the EOF entry can't fit into the  buffer,
+                                 * there's  no way of knowing if there's  a missing entry that's supposed to
+                                 * go into the buffer, or if it was actually an EOF entry). Additionally, no
+                                 * EOF  entry may be written if kreaddir()  is invoked on a directory handle
+                                 * who's stream position is at the end of the directory.
+                                 * For usage, see the example below, as well as `READDIR_MULTIPLE_ISEOF()' */
 #define READDIR_MODEMASK 0x001f /* Mask for the kreaddir() mode. */
 #define READDIR_FLAGMASK 0xc000 /* Mask of known kreaddir() flags. */
 #define READDIR_MODEMAX  0x0003 /* Mask recognized mode ID. */
-#define READDIR_MULTIPLE 0x0003 /* Read as  many  directory  entries  as can  fit  into  the  buffer.
-                                 * If at least  one entry  could be  read, return  the combined  size
-                                 * of all read entries (in bytes) (in this case, `return <= bufsize')
-                                 * If  the  buffer  was  too   small  to  contain  the  next   entry,
-                                 * return  the   required  size   to   house  that   pending   entry,
-                                 * but don't  yield  it,  the same  way  `READDIR_DEFAULT'  wouldn't.
-                                 * To  enumerate  multiple  directories  in  some  buffer,  use   the
-                                 * macros below. */
+#define READDIR_MULTIPLE 0x0003 /* Read as many directory entries as can fit into the buffer. If at
+                                 * least one entry could be read,  return the combined size of  all
+                                 * read entries (in bytes) (in this case, `return <= bufsize').  If
+                                 * the buffer was too small to  contain the next entry, return  the
+                                 * required size to house that  pending entry, but don't yield  it,
+                                 * the  same way `READDIR_DEFAULT'  wouldn't. To enumerate multiple
+                                 * directories in some buffer, use the macros below. */
 #ifdef __CC__
 /* READDIR_MULTIPLE buffer helpers:
  * >> for (;;) {
- * >> 	char buffer[2048]; size_t bufsize;
- * >> 	struct dirent *iter = (struct dirent *)buffer;
- * >> 	// Read as many entries as our buffer can fit
- * >> 	bufsize = kreaddir(fd,iter,sizeof(buffer),
- * >> 	                   READDIR_MULTIPLE|
- * >> 	                   READDIR_WANTEOF);
- * >> 	if (!bufsize)
- * >> 		break; // End of directory
- * >> 	if (bufsize > sizeof(buffer)) {
- * >> 		printf("The next directory entry is too larger for the buffer\n");
- * >> 		break;
- * >> 	}
- * >> 	// Process successfully read entries
- * >> 	do {
- * >> 		// This check is only required when `READDIR_WANTEOF' is passed.
- * >> 		if (READDIR_MULTIPLE_ISEOF(iter))
- * >> 			goto done;
- * >> 		printf("Entry: %q\n",iter->d_name);
- * >> 		iter = READDIR_MULTIPLE_GETNEXT(iter);
- * >> 	} while (READDIR_MULTIPLE_ISVALID(iter,buffer,bufsize));
+ * >>     char buffer[2048]; size_t bufsize;
+ * >>     struct dirent *iter = (struct dirent *)buffer;
+ * >>     // Read as many entries as our buffer can fit
+ * >>     bufsize = kreaddir(fd, iter, sizeof(buffer),
+ * >>                        READDIR_MULTIPLE|
+ * >>                        READDIR_WANTEOF);
+ * >>     if (!bufsize)
+ * >>         break; // End of directory
+ * >>     if (bufsize > sizeof(buffer)) {
+ * >>         printf("The next directory entry larger than the buffer\n");
+ * >>         break;
+ * >>     }
+ * >>     // Process successfully read entries
+ * >>     do {
+ * >>         // This check is only required when `READDIR_WANTEOF' is passed.
+ * >>         if (READDIR_MULTIPLE_ISEOF(iter))
+ * >>             goto done;
+ * >>         printf("Entry: %q\n", iter->d_name);
+ * >>         iter = READDIR_MULTIPLE_GETNEXT(iter);
+ * >>     } while (READDIR_MULTIPLE_ISVALID(iter, buffer, bufsize));
  * >> }
  * >>done:
  */

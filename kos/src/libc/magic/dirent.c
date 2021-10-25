@@ -530,28 +530,27 @@ $ssize_t kreaddirf64($fd_t fd, struct dirent64 *buf, size_t bufsize,
                                  * The system is allowed to append an empty directory entry
                                  * (with  `d_namlen = 0' and `d_name[0] = '\0''; other fields are undefined).
                                  * If there isn't enough space for such an entry, no such entry will be emit.
-                                 * Since no  other  directory  entry  can ever  have  a  length  of  ZERO(0),
-                                 * this  allows  user-space  to  detect  end-of-directory  without  the  need
-                                 * of re-invoking  the  kreaddir()  system call  and  inspecting  its  return
-                                 * value for being equal to ZERO(0).
-                                 * However, that  check  is  still  required, as  this  flag  may  be  ignored
-                                 * for no  reason  immediately apparent  (if  the  EOF entry  can't  fit  into
-                                 * the buffer, there's  no way of  knowing if there's  a missing entry  that's
-                                 * supposed  to  go into  the buffer,  or if  it was  actually an  EOF entry).
-                                 * Additionally,  no  eof  entry  may  be  written  if  kreaddir()  is invoked
-                                 * on a directory handle who's stream position is at the end of the directory.
-                                 * For  usage, see  the example  below, as  well as `READDIR_MULTIPLE_ISEOF()' */
+                                 * Since no other  directory entry can  ever have a  length of ZERO(0),  this
+                                 * allows  user-space  to detect  end-of-directory  without the  need  of re-
+                                 * invoking  the kreaddir() system  call and inspecting  its return value for
+                                 * being equal to ZERO(0).
+                                 * However, that check is still required, as this flag may be ignored for no
+                                 * reason immediately apparent (if the EOF entry can't fit into the  buffer,
+                                 * there's  no way of knowing if there's  a missing entry that's supposed to
+                                 * go into the buffer, or if it was actually an EOF entry). Additionally, no
+                                 * EOF  entry may be written if kreaddir()  is invoked on a directory handle
+                                 * who's stream position is at the end of the directory.
+                                 * For usage, see the example below, as well as `READDIR_MULTIPLE_ISEOF()' */
 #define READDIR_MODEMASK 0x001f /* Mask for the kreaddir() mode. */
 #define READDIR_FLAGMASK 0xc000 /* Mask of known kreaddir() flags. */
 #define READDIR_MODEMAX  0x0003 /* Mask recognized mode ID. */
-#define READDIR_MULTIPLE 0x0003 /* Read as  many  directory  entries  as can  fit  into  the  buffer.
-                                 * If at least  one entry  could be  read, return  the combined  size
-                                 * of all read entries (in bytes) (in this case, `return <= bufsize')
-                                 * If  the  buffer  was  too   small  to  contain  the  next   entry,
-                                 * return  the   required  size   to   house  that   pending   entry,
-                                 * but don't  yield  it,  the same  way  `READDIR_DEFAULT'  wouldn't.
-                                 * To  enumerate  multiple  directories  in  some  buffer,  use   the
-                                 * macros below. */
+#define READDIR_MULTIPLE 0x0003 /* Read as many directory entries as can fit into the buffer. If at
+                                 * least one entry could be read,  return the combined size of  all
+                                 * read entries (in bytes) (in this case, `return <= bufsize').  If
+                                 * the buffer was too small to  contain the next entry, return  the
+                                 * required size to house that  pending entry, but don't yield  it,
+                                 * the  same way `READDIR_DEFAULT'  wouldn't. To enumerate multiple
+                                 * directories in some buffer, use the macros below. */
 #ifdef __CC__
 /* READDIR_MULTIPLE buffer helpers:
  * >> for (;;) {
@@ -561,9 +560,10 @@ $ssize_t kreaddirf64($fd_t fd, struct dirent64 *buf, size_t bufsize,
  * >>     bufsize = kreaddir(fd, iter, sizeof(buffer),
  * >>                        READDIR_MULTIPLE|
  * >>                        READDIR_WANTEOF);
- * >>     if (!bufsize) break; // End of directory
+ * >>     if (!bufsize)
+ * >>         break; // End of directory
  * >>     if (bufsize > sizeof(buffer)) {
- * >>         printf("The next directory entry is too larger for the buffer\n");
+ * >>         printf("The next directory entry larger than the buffer\n");
  * >>         break;
  * >>     }
  * >>     // Process successfully read entries
@@ -577,12 +577,13 @@ $ssize_t kreaddirf64($fd_t fd, struct dirent64 *buf, size_t bufsize,
  * >> }
  * >>done:
  */
-#define READDIR_MULTIPLE_GETNEXT(p) \
-   ((struct dirent *)(((uintptr_t)((p)->d_name+((p)->d_namlen+1))+ \
-                       (sizeof(__ino64_t)-1)) & ~(sizeof(__ino64_t)-1)))
-#define READDIR_MULTIPLE_ISVALID(p, buf, bufsize) \
-   (((__BYTE_TYPE__ *)((p)->d_name)) < ((__BYTE_TYPE__ *)(buf)+(bufsize)) && \
-    ((__BYTE_TYPE__ *)((p)->d_name+(p)->d_namlen)) < ((__BYTE_TYPE__ *)(buf)+(bufsize)))
+#define READDIR_MULTIPLE_GETNEXT(p)                                      \
+	((struct dirent *)(((uintptr_t)((p)->d_name + ((p)->d_namlen + 1)) + \
+	                    (sizeof(__ino64_t) - 1)) &                       \
+	                   ~(sizeof(__ino64_t) - 1)))
+#define READDIR_MULTIPLE_ISVALID(p, buf, bufsize)                               \
+	(((__BYTE_TYPE__ *)((p)->d_name)) < ((__BYTE_TYPE__ *)(buf) + (bufsize)) && \
+	 ((__BYTE_TYPE__ *)((p)->d_name + (p)->d_namlen)) < ((__BYTE_TYPE__ *)(buf) + (bufsize)))
 #define READDIR_MULTIPLE_ISEOF(p) ((p)->d_namlen == 0)
 #ifdef __USE_LARGEFILE64
 #define READDIR_MULTIPLE_GETNEXT64(p) ((struct dirent64 *)READDIR_MULTIPLE_GETNEXT(p))

@@ -185,6 +185,12 @@ DATDEF struct blkdev_ops const blkpart_ops;
 #define blkdev_ispart(self) (blkdev_getops(self) == &blkpart_ops)
 #define blkdev_isroot(self) (blkdev_getops(self) != &blkpart_ops)
 
+/* Helper macros. */
+#define mfile_isblkpart(self)    ((self)->mf_ops == &blkpart_ops.bdo_dev.do_node.dno_node.no_file)
+#define fnode_isblkpart(self)    ((self)->_fnode_file_ mf_ops == &blkpart_ops.bdo_dev.do_node.dno_node.no_file)
+#define fdevnode_isblkpart(self) ((self)->_fdevnode_node_ _fnode_file_ mf_ops == &blkpart_ops.bdo_dev.do_node.dno_node.no_file)
+#define device_isblkpart(self)   ((self)->_device_devnode_ _fdevnode_node_ _fnode_file_ mf_ops == &blkpart_ops.bdo_dev.do_node.dno_node.no_file)
+
 /* Return the sector shift/size/count of the block device. */
 #define blkdev_getsectorshift(self) ((self)->_blkdev_dev_ _device_devnode_ _fdevnode_node_ _fnode_file_ mf_blockshift)
 #define blkdev_getsectorsize(self)  ((size_t)1 << blkdev_getsectorshift(self))

@@ -656,7 +656,7 @@ struct pathmount
 
 
 /* Allocate mounting point paths */
-#define _pathmount_alloc() ((struct pathmount *)kmalloc(sizeof(struct pathmount)), GFP_NORMAL)
+#define _pathmount_alloc() ((struct pathmount *)kmalloc(sizeof(struct pathmount), GFP_NORMAL))
 #define _pathmount_free(p) kfree(p)
 
 #if 1 /* For now... */

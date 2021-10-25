@@ -358,6 +358,10 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	       (u8)boot_device.bdi_sub_partition,
 	       (u8)boot_device.bdi_sub_sub_partition);
 
+	/* Mount the root filesystem. */
+#ifdef CONFIG_USE_NEW_FS
+	kernel_initialize_rootfs();
+#else /* CONFIG_USE_NEW_FS */
 	/* Make sure that we've managed to detect a single, valid boot partition, or
 	 * that the user started the  kernel with a boot=... commandline  parameter. */
 	if unlikely(boot_partition == NULL)
@@ -369,6 +373,7 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *       After   all:   The    bootloader   may   have    loaded   additional    drivers... */
 	/* TODO: Move this mount() call into a different file. */
 	path_mount(THIS_VFS, "fat", boot_partition, SUPERBLOCK_FNORMAL, NULL, NULL, true);
+#endif /* !CONFIG_USE_NEW_FS */
 
 	/* Run self-tests. (if enabled) */
 #ifdef CONFIG_SELFTEST

@@ -1323,6 +1323,71 @@ waitfor_status_writelock:
 
 
 
+/* Replace `self' with a mounting point for `dir'. If appropriate, the
+ * caller is responsible for checking  for an existing mounting  point
+ * (by  use of `path_ismount(self)'), if such a case isn't allowed, as
+ * usually handled by throwing `E_FSERROR_PATH_ALREADY_MOUNTED'.
+ * @throw: E_FSERROR_DELETED:E_FILESYSTEM_DELETED_PATH:
+ *         `self' has a parent which has been marked as `PATH_CLDLIST_DELETED',
+ *         or `self' is a VFS root path who's VFS controller has been destroyed
+ *         or altered to point to some other path.
+ * @throw: E_FSERROR_DELETED:E_FILESYSTEM_DELETED_UNMOUNTED:
+ *         The superblock of `dir' indicate `FSUPER_MOUNTS_DELETED'
+ * @return: * : The  new  path  node  replacing   `self'  and  pointing  to   `dir'.
+ *              This path node is also referenced by `_path_getvfs(self)->vf_mounts'
+ *              and has replaced `self' within the filesystem hierarchy, though  any
+ *              path-relative filesystem operations that use some existing reference
+ *              to `self' will continue to operate  with the old path `self'  (since
+ *              the old path didn't get modified but replaced with a newly allocated
+ *              path). */
+PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) REF struct pathmount *KCALL
+path_mount(struct path *__restrict self,
+           struct fdirnode *__restrict dir)
+		THROWS(E_WOULDBLOCK, E_BADALLOC, E_FSERROR_DELETED) {
+	/* TODO */
+	(void)self;
+	(void)dir;
+	THROW(E_NOT_IMPLEMENTED_TODO);
+}
+
+
+/* Unmount the a given path `self', as well as all child-paths of
+ * it which  may  also  be  mounting points.  This  is  done  by:
+ *  - Acquire a lock to `self->p_parent->p_cldlock', or if `self' has
+ *    not parent, a lock  to `self->_p_vfs->vf_rootlock'. If the  VFS
+ *    has already been destroyed here, simply return `false'
+ *  - Acquire locks to `self->p_cldlock', as well as any tryincref()-albe
+ *    path  that is  recursively reachable  via the  list of child-paths.
+ *  - For  every recursively reachable child (including `self'), clear + free its
+ *    `p_cldlist' fields and set it to `PATH_CLDLIST_DELETED' to mark as deleted.
+ *  - Remove all  recursively  reachable  children (including  `self'),  from  the
+ *    recent-cache of `_path_getvfs(self)'. If the VFS has already been destroyed,
+ *    simply skip the removal of elements from the recent cache (since that  cache
+ *    has also been destroyed). In case one  of those children is also a  mounting
+ *    point,  remove from the  mount list of `_path_getvfs(self)',  and in case of
+ *    DOS drive roots, also remove from those tables. (Again if VFS was destroyed,
+ *    instead assert that  no mounting points  exists, and none  of the paths  are
+ *    part of any recent caches)
+ *  - Release locks to all of the recursively reachable children, including `self'
+ *  - When `self->p_parent != NULL', remove `self'  from its parent's list  of
+ *    child paths. The return value of this value here is indicative of `self'
+ *    having been found in this map.
+ *  - When `self->p_parent == NULL', check if `self == self->_p_vfs->vf_root'.
+ *    - If so, this function returns `true' and `self->_p_vfs->vf_root = ALLOC_UNMOUNTED_ROOT()'
+ *    - If not, this function returns `false'
+ * @return: true:  `self' was unmounted.
+ * @return: false: `self' had already been unmounted. */
+PUBLIC NONNULL((1)) bool KCALL
+path_umount(struct pathmount *__restrict self)
+		THROWS(E_WOULDBLOCK) {
+	/* TODO */
+	(void)self;
+	THROW(E_NOT_IMPLEMENTED_TODO);
+}
+
+
+
+
 
 
 
