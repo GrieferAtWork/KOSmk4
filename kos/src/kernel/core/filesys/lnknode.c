@@ -121,8 +121,8 @@ _fclnknode_alloc(struct fsuper *__restrict super, size_t text_length) THROWS(E_B
 	_mfile_init_common(result);
 	result->mf_parts             = MFILE_PARTS_ANONYMOUS;
 	result->mf_changed.slh_first = MFILE_PARTS_ANONYMOUS;
-	result->mf_flags = ((super)->fs_root.mf_flags & (MFILE_F_DELETED | MFILE_F_PERSISTENT |
-	                                                 MFILE_F_NOATIME | MFILE_F_NOMTIME)) |
+	result->mf_flags = (super->fs_root.mf_flags & (MFILE_F_DELETED | MFILE_F_PERSISTENT |
+                                                   MFILE_F_NOATIME | MFILE_F_NOMTIME)) |
 	                   (MFILE_F_READONLY | MFILE_F_FIXEDFILESIZE |
 	                    MFILE_F_NOUSRMMAP | MFILE_F_NOUSRIO);
 	result->mf_blockshift = (super)->fs_root.mf_blockshift;

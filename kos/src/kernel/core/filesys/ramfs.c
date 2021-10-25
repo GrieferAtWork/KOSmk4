@@ -634,8 +634,8 @@ ramfs_dirnode_mknode_frominfo(struct fdirnode *__restrict self,
 
 	case S_IFLNK:
 		result = _fclnknode_new(self->fn_super,
-		                          info->mkf_creat.c_symlink.s_text,
-		                          info->mkf_creat.c_symlink.s_size);
+		                        info->mkf_creat.c_symlink.s_text,
+		                        info->mkf_creat.c_symlink.s_size);
 		result->mf_ops = &ramfs_lnknode_ops.lno_node.no_file;
 		break;
 
@@ -729,7 +729,7 @@ ramfs_dirnode_v_mkfile(struct fdirnode *__restrict self,
 			/* Fill in other fields of the new directory entry. */
 			if (info->mkf_hash == FLOOKUP_INFO_HASH_UNSET) {
 				info->mkf_hash = fdirent_hash(new_dirent->rde_ent.fd_name,
-				                              new_dirent->rde_ent.fd_namelen);
+				                              info->mkf_namelen);
 			}
 			new_dirent->rde_ent.fd_refcnt  = 2; /* +1: info->mkf_dent, +1: me->rdn_dat.rdd_tree */
 			new_dirent->rde_ent.fd_ops     = &ramfs_dirent_ops;
@@ -968,7 +968,7 @@ ramfs_dirnode_v_rename(struct fdirnode *__restrict self,
 		/* Fill in other fields of the new directory entry. */
 		if (info->frn_hash == FLOOKUP_INFO_HASH_UNSET) {
 			info->frn_hash = fdirent_hash(new_dirent->rde_ent.fd_name,
-			                              new_dirent->rde_ent.fd_namelen);
+			                              info->frn_namelen);
 		}
 		new_dirent->rde_ent.fd_refcnt  = 2; /* +1: info->mkf_dent, +1: me->rdn_dat.rdd_tree */
 		new_dirent->rde_ent.fd_ops     = &ramfs_dirent_ops;
@@ -1106,7 +1106,7 @@ ramfs_open(struct ffilesys *__restrict UNUSED(filesys),
 	result->fs_root.mf_ops        = &ramfs_super_ops.so_fdir.dno_node.no_file;
 	result->fs_root.mf_parts      = NULL;
 	result->fs_root.mf_blockshift = PAGESHIFT;
-	result->fs_root.mf_flags      = MFILE_F_NORMAL;
+	result->fs_root.mf_flags      = MFILE_F_PERSISTENT;
 	result->fs_root.fn_ino        = (ino_t)skew_kernel_pointer(&result->fs_root);
 
 	/* Fill in filesystem features. */

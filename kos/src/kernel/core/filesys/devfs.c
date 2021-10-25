@@ -571,7 +571,7 @@ again_lookup:
 			/* Fill in other fields of the new directory entry. */
 			if (info->mkf_hash == FLOOKUP_INFO_HASH_UNSET) {
 				info->mkf_hash = fdirent_hash(new_dirent->rde_ent.fd_name,
-				                              new_dirent->rde_ent.fd_namelen);
+				                              info->mkf_namelen);
 			}
 			new_dirent->rde_ent.fd_refcnt  = 2; /* +1: info->mkf_dent, +1: devfs.rs_dat.rdd_tree */
 			new_dirent->rde_ent.fd_ops     = &ramfs_dirent_ops;
@@ -783,7 +783,7 @@ devfs_root_v_rename(struct fdirnode *__restrict self,
 			/* Fill in other fields of the new directory entry. */
 			if (info->frn_hash == FLOOKUP_INFO_HASH_UNSET) {
 				info->frn_hash = fdirent_hash(new_dirent->fdd_dirent.fd_name,
-				                              new_dirent->fdd_dirent.fd_namelen);
+				                              info->frn_namelen);
 			}
 			new_dirent->fdd_dirent.fd_refcnt  = 2; /* +1: info->mkf_dent, +1: devfile->dv_dirent */
 			new_dirent->fdd_dirent.fd_ops     = &ramfs_dirent_ops;
@@ -885,7 +885,7 @@ devfs_root_v_rename(struct fdirnode *__restrict self,
 			/* Fill in other fields of the new directory entry. */
 			if (info->frn_hash == FLOOKUP_INFO_HASH_UNSET) {
 				info->frn_hash = fdirent_hash(new_dirent->rde_ent.fd_name,
-				                              new_dirent->rde_ent.fd_namelen);
+				                              info->frn_namelen);
 			}
 			new_dirent->rde_ent.fd_refcnt  = 2; /* +1: info->mkf_dent, +1: me->rdn_dat.rdd_tree */
 			new_dirent->rde_ent.fd_ops     = &ramfs_dirent_ops;

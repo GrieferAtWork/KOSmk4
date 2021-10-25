@@ -1459,8 +1459,8 @@ DEFINE_SYSCALL4(ssize_t, frealpath4,
 			if unlikely(!me->fh_dirent)
 				goto bad_handle_type;
 			result = path_sprintent(me->fh_path, me->fh_dirent->fd_name,
-			                        me->fh_dirent->fd_namelen,
-			                        buf, buflen, atflags, root);
+			                        me->fh_dirent->fd_namelen, buf, buflen,
+			                        atflags | AT_PATHPRINT_INCTRAIL, root);
 		}	break;
 
 		case HANDLE_TYPE_PATH:
