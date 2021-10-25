@@ -81,36 +81,46 @@ struct chrdev;
 /* Filesystem/device type-tree:
  *
  * ```
- *   mfile
- *     |
- *     +---> fnode                                           (TODO: replacement for `struct inode')
- *             |
- *             +----> fregnode  (S_IFREG)                    (TODO: replacement for `struct regular_node')
- *             |
- *             +----> fdirnode  (S_IFDIR)                    (TODO: replacement for `struct directory_node')
- *             |        |
- *             |        +-----> fsuper                       (TODO: replacement for `struct superblock')
- *             |        |         |
- *             |        |         +-----> ramfs_super
- *             |        |
- *             |        +-----> ramfs_dirnode
- *             |
- *             +----> flnknode  (S_IFLNK)                    (TODO: replacement for `struct symlink_node')
- *             |        |
- *             |        +-----> fclnknode
- *             |
- *             +----> fdevnode  (S_IFBLK | S_IFCHR)
- *             |        |
- *             |        +-----> device                       Base class for device nodes within devfs
- *             |                  |
- *             |                  +-----> blkdev  (S_IFBLK)  (TODO: replacement for `struct block_device')
- *             |                  |
- *             |                  +-----> chrdev  (S_IFCHR)  (TODO: replacement for `struct chrdev')
- *             |
- *             +----> ffifonode (S_IFIFO)                    (TODO: replacement for `struct fifo_node')
- *             |
- *             +----> fsocknode (S_IFSOCK)                   (TODO: replacement for `struct socket_node')
+ *   mfile                                       # <kernel/mman/mfile.h>
+ *   └─> fnode                                   # <kernel/fs/node.h>
+ *       ├─> fregnode                            # <kernel/fs/regnode.h>: S_IFREG
+ *       │   └─> [...]
+ *       ├─> fdirnode                            # <kernel/fs/dirnode.h>: S_IFDIR
+ *       │   ├─> fsuper                          # <kernel/fs/super.h>
+ *       │   │   ├─> ramfs_super                 # <kernel/fs/ramfs.h>
+ *       │   │   │   └─> devfs_super             # <kernel/fs/devfs.h>
+ *       │   │   └─> fflatsuper                  # <kernel/fs/flat.h>
+ *       │   │       └─> [...]
+ *       │   ├─> ramfs_dirnode
+ *       │   └─> fflatdirnode                    # <kernel/fs/flat.h>
+ *       │       └─> [...]
+ *       ├─> flnknode                            # <kernel/fs/lnknode.h>: S_IFLNK
+ *       │   ├─> fclnknode                       # <kernel/fs/clnknode.h>
+ *       │   └─> [...]
+ *       ├─> fdevnode                            # <kernel/fs/devnode.h>: S_IFBLK, S_IFCHR
+ *       │   └─> device                          # <kernel/fs/devfs.h>:   Base class for device nodes within devfs
+ *       │       ├─> blkdev                      # <kernel/fs/blkdev.h>:  S_IFBLK  (including partitions)
+ *       │       │   └─> [...]
+ *       │       └─> chrdev                      # <kernel/fs/chrdev.h>:  S_IFCHR
+ *       │           ├─> ansittydev              # <dev/ansitty.h>
+ *       │           │   └─> videodev            # <dev/video.h>
+ *       │           │       └─> [...]
+ *       │           ├─> ttydev                  # <dev/tty.h>
+ *       │           │   ├─> mkttydev            # <dev/mktty.h>
+ *       │           │   └─> ptyslave            # <dev/pty.h>
+ *       │           ├─> ptymaster               # <dev/pty.h>
+ *       │           ├─> kbddev                  # <dev/keyboard.h>
+ *       │           │   └─> [...]
+ *       │           ├─> mousedev                # <dev/mouse.h>
+ *       │           └─> nicdev                  # <dev/nic.h>
+ *       │               └─> [...]
+ *       ├─> ffifonode                           # <kernel/fs/fifonode.h>: S_IFIFO
+ *       └─> fsocknode                           # <kernel/fs/socknode.h>: S_IFSOCK
  * ```
+ *
+ * [...]: This means that more sub-classes are known to be defined in  drivers
+ *        Note that this list may be incomplete, as drivers are able to create
+ *        subclasses at any point in the above tree.
  *
  * Assumptions/expectations in regards to the configuration of different filesystem classes:
  *   - fnode:
