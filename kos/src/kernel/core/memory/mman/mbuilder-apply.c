@@ -42,6 +42,7 @@
 
 #include <hybrid/atomic.h>
 
+#include <kos/except.h>
 #include <sys/wait.h>
 
 #include <assert.h>

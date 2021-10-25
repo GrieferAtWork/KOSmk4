@@ -131,7 +131,7 @@ PUBLIC struct fdirent fdirent_empty = {
 	.fd_hash    = FDIRENT_EMPTY_HASH,
 	.fd_namelen = 0,
 	.fd_type    = DT_DIR, /* == IFTODT(fsuper_unmounted.rs_sup.fs_root.dn_node.fn_mode) */
-	.fd_name    = "",
+	/* .fd_name = */ "",
 };
 
 

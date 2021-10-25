@@ -159,10 +159,7 @@ struct epoll_controller {
 	                                                  * a this lock while searching for handle monitors that may have  been
 	                                                  * raised in the mean time. */
 #ifdef CONFIG_HAVE_EPOLL_RPC
-	union {
-		Toblockop_slist(epoll_controller) ec_lops; /* Lock operations. */
-		struct oblockop_slist            _ec_lops; /* Lock operations. */
-	};
+	Toblockop_slist(epoll_controller) ec_lops;       /* Lock operations. */
 #endif /* CONFIG_HAVE_EPOLL_RPC */
 	WEAK struct epoll_handle_monitor *ec_raised;     /* [0..1][lock(APPEND(ATOMIC), CLEAR(ec_lock))]
 	                                                  * Singly linked list  of raised monitors  (chained via  `ehm_rnext').

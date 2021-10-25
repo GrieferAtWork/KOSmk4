@@ -200,7 +200,7 @@ NOTHROW(LOCKOP_CC fnode_v_destroy_rmallnodes_lop)(struct lockop *__restrict self
 
 PRIVATE NOBLOCK NONNULL((1, 2)) void
 NOTHROW(LOCKOP_CC fnode_v_destroy_rmsuper_postlop)(Tobpostlockop(fsuper) *__restrict self,
-                                                   struct fsuper *__restrict obj) {
+                                                   struct fsuper *__restrict UNUSED(obj)) {
 	struct fnode *me = container_of(self, struct fnode, _mf_fsuperplop);
 
 	/* Remove the node from the list of all nodes. */
@@ -253,14 +253,15 @@ NOTHROW(LOCKOP_CC fnode_v_destroy_rmsuper_lop)(Toblockop(fsuper) *__restrict sel
  * function must be called as the last thing done within the
  * sub-class destroy-operator. */
 PUBLIC NOBLOCK NONNULL((1)) void
-NOTHROW(FCALL fnode_v_destroy)(struct fnode *__restrict self) {
-	assertf(!(self->mf_flags & MFILE_FN_GLOBAL_REF),
+NOTHROW(FCALL fnode_v_destroy)(struct mfile *__restrict self) {
+	struct fnode *me = mfile_asnode(self);
+	assertf(!(me->mf_flags & MFILE_FN_GLOBAL_REF),
 	        "Then why are we being destroyed?");
 
 	/* Remove the node from its superblock's node-tree, as well
 	 * as  from the  global list  of all  nodes or superblocks. */
-	if (fnode_issuper(self)) {
-		struct fsuper *me = fnode_assuper(self);
+	if (fnode_issuper(me)) {
+		struct fsuper *me = fnode_assuper(me);
 		if (LIST_ISBOUND(me, fs_root.fn_allsuper)) {
 			/* Remove from `fallsuper_list' */
 			if (fallsuper_tryacquire()) {
@@ -277,24 +278,24 @@ NOTHROW(FCALL fnode_v_destroy)(struct fnode *__restrict self) {
 			}
 		}
 	} else {
-		REF struct fsuper *super = self->fn_super;
+		REF struct fsuper *super = me->fn_super;
 		/* Remove from the associated superblock's list of nodes. */
-		if (ATOMIC_READ(self->fn_supent.rb_rhs) != FSUPER_NODES_DELETED) {
+		if (ATOMIC_READ(me->fn_supent.rb_rhs) != FSUPER_NODES_DELETED) {
 			if (fsuper_nodes_trywrite(super)) {
 				COMPILER_READ_BARRIER();
-				if (self->fn_supent.rb_rhs != FSUPER_NODES_DELETED) {
-					assertf(self->_fn_suplop.olo_func != &fnode_add2sup_lop,
+				if (me->fn_supent.rb_rhs != FSUPER_NODES_DELETED) {
+					assertf(me->_fn_suplop.olo_func != &fnode_add2sup_lop,
 					        "The `fnode_add2sup_lop' function owns a reference to the node, "
 					        "and we only get here then the reference counter reaches 0, so "
 					        "there should be no way the object is still trying to async-add "
 					        "itself to the nodes list!");
 					assert(super->fs_nodes != FSUPER_NODES_DELETED);
-					fsuper_nodes_removenode(super, self);
+					fsuper_nodes_removenode(super, me);
 				}
 				fsuper_nodes_endwrite(super);
 			} else {
-				self->_mf_fsuperlop.olo_func = &fnode_v_destroy_rmsuper_lop;
-				oblockop_enqueue(&super->fs_nodeslockops, &self->_mf_fsuperlop);
+				me->_mf_fsuperlop.olo_func = &fnode_v_destroy_rmsuper_lop;
+				oblockop_enqueue(&super->fs_nodeslockops, &me->_mf_fsuperlop);
 				_fsuper_nodes_reap(super);
 				decref_unlikely(super);
 				return;
@@ -305,20 +306,20 @@ NOTHROW(FCALL fnode_v_destroy)(struct fnode *__restrict self) {
 		/* Remove the node from the list of all nodes. */
 again_unbind_allnodes:
 		COMPILER_READ_BARRIER();
-		if (LIST_ISBOUND(self, fn_allnodes)) {
+		if (LIST_ISBOUND(me, fn_allnodes)) {
 			if (fallnodes_tryacquire()) {
 				COMPILER_READ_BARRIER();
-				if unlikely(self->_fn_alllop.lo_func == &fnode_addtoall_lop) {
+				if unlikely(me->_fn_alllop.lo_func == &fnode_addtoall_lop) {
 					fallnodes_release(); /* This should reap & invoke fnode_addtoall_lop() */
 					goto again_unbind_allnodes;
 				}
-				if (LIST_ISBOUND(self, fn_allnodes))
-					LIST_REMOVE(self, fn_allnodes);
+				if (LIST_ISBOUND(me, fn_allnodes))
+					LIST_REMOVE(me, fn_allnodes);
 				fallnodes_release();
 			} else {
-				DBG_memset(self->_mf_lopX, 0xcc, sizeof(self->_mf_lopX));
-				self->_mf_lop.lo_func = &fnode_v_destroy_rmallnodes_lop;
-				lockop_enqueue(&fallnodes_lockops, &self->_mf_lop);
+				DBG_memset(me->_mf_lopX, 0xcc, sizeof(me->_mf_lopX));
+				me->_mf_lop.lo_func = &fnode_v_destroy_rmallnodes_lop;
+				lockop_enqueue(&fallnodes_lockops, &me->_mf_lop);
 				_fallnodes_reap();
 				return;
 			}
@@ -326,7 +327,7 @@ again_unbind_allnodes:
 	}
 
 	/* Free the file-node */
-	fnode_free(self);
+	fnode_free(me);
 }
 
 
@@ -376,7 +377,7 @@ NOTHROW(FCALL fnode_init_addtoall)(struct fnode *__restrict self) {
 
 PRIVATE NOBLOCK NONNULL((1, 2)) void
 NOTHROW(LOCKOP_CC destroy_node_from_super_postlop)(Tobpostlockop(fsuper) *__restrict self,
-                                                   struct fsuper *__restrict obj) {
+                                                   struct fsuper *__restrict UNUSED(obj)) {
 	struct fnode *me;
 	me = container_of(self, struct fnode, _mf_fsuperplop);
 	mfile_destroy(me);

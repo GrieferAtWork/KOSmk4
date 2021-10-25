@@ -33,6 +33,7 @@
 #include <dev/block.h>
 #include <dev/char.h>
 #include <fs/file.h>
+#include <fs/node.h>
 #include <fs/vfs.h>
 #include <kernel/driver.h>
 #include <kernel/except.h>
@@ -143,11 +144,16 @@ NOTHROW(KCALL note_task)(pformatprinter printer, void *arg,
 		if (dent) {
 			if (dent->de_refcnt == 0)
 				goto badobj;
-			if (dent->de_heapsize < offsetof(struct fdirent, de_name) +
-			                        (dent->de_namelen + 1) * sizeof(char))
-				goto badobj;
 			exec_name    = dent->de_name;
 			exec_namelen = dent->de_namelen;
+#ifdef CONFIG_USE_NEW_FS
+			if (!ADDR_ISKERN(dent->fd_ops))
+				goto badobj;
+#else /* CONFIG_USE_NEW_FS */
+			if (dent->de_heapsize < offsetof(struct fdirent, de_name) +
+			                        (exec_namelen + 1) * sizeof(char))
+				goto badobj;
+#endif /* !CONFIG_USE_NEW_FS */
 			if (exec_namelen > 16)
 				exec_namelen = 16;
 			readmem(exec_name, exec_namelen * sizeof(char));
@@ -231,6 +237,7 @@ badobj:
 }
 
 
+#ifndef CONFIG_USE_NEW_FS
 PRIVATE bool
 NOTHROW(FCALL verify_driver)(struct driver *__restrict me) {
 	TRY {
@@ -247,6 +254,7 @@ NOTHROW(FCALL verify_driver)(struct driver *__restrict me) {
 badobj:
 	return false;
 }
+#endif /* !CONFIG_USE_NEW_FS */
 
 PRIVATE NONNULL((1, 3, 4)) ssize_t
 NOTHROW(KCALL note_module)(pformatprinter printer, void *arg,
@@ -465,9 +473,14 @@ NOTHROW(KCALL note_fdirent)(pformatprinter printer, void *arg,
 			goto badobj;
 		dent_name    = me->de_name;
 		dent_namelen = me->de_namelen;
+#ifdef CONFIG_USE_NEW_FS
+		if (!ADDR_ISKERN(me->fd_ops))
+			goto badobj;
+#else /* CONFIG_USE_NEW_FS */
 		if (me->de_heapsize < offsetof(struct fdirent, de_name) +
 		                      (dent_namelen + 1) * sizeof(char))
 			goto badobj;
+#endif /* !CONFIG_USE_NEW_FS */
 		dent_type    = me->de_type;
 		if (me->de_hash != fdirent_hash(dent_name, dent_namelen))
 			goto badobj;
@@ -486,10 +499,12 @@ badobj:
 	return 0;
 }
 
+
+#ifndef CONFIG_USE_NEW_FS
 PRIVATE NONNULL((1, 3, 4)) ssize_t
 NOTHROW(KCALL note_chrdev)(pformatprinter printer, void *arg,
-                                     KERNEL CHECKED void const *pointer,
-                                     unsigned int *__restrict pstatus) {
+                           KERNEL CHECKED void const *pointer,
+                           unsigned int *__restrict pstatus) {
 	struct chrdev *me = (struct chrdev *)pointer;
 	char const *dev_name;
 	size_t dev_namelen;
@@ -535,6 +550,7 @@ badobj:
 	*pstatus = OBNOTE_PRINT_STATUS_BADOBJ;
 	return 0;
 }
+#endif /* !CONFIG_USE_NEW_FS */
 
 PRIVATE NONNULL((1, 3, 4)) ssize_t
 NOTHROW(KCALL note_cpu)(pformatprinter printer, void *arg,
@@ -570,6 +586,16 @@ NOTHROW(KCALL note_path_impl)(pformatprinter printer, void *arg,
 	TRY {
 		if (me->p_refcnt == 0)
 			goto badobj;
+#ifdef CONFIG_USE_NEW_FS
+		if (me->_p_vfs == NULL || !ADDR_ISKERN(me->_p_vfs))
+			goto badobj;
+		if (!path_isroot(me)) {
+			parent_path = me->p_parent;
+			if (!ADDR_ISKERN(parent_path))
+				goto badobj;
+		}
+		dent = me->p_name;
+#else /* CONFIG_USE_NEW_FS */
 		if (me->p_vfs == NULL || !ADDR_ISKERN(me->p_vfs))
 			goto badobj;
 		parent_path = me->p_parent;
@@ -580,6 +606,7 @@ NOTHROW(KCALL note_path_impl)(pformatprinter printer, void *arg,
 		if (me->p_vfs->p_refcnt == 0)
 			goto badobj;
 		dent = me->p_dirent;
+#endif /* !CONFIG_USE_NEW_FS */
 		if (!dent || !ADDR_ISKERN(dent))
 			goto badobj;
 	} EXCEPT {
@@ -979,6 +1006,9 @@ NOTHROW(KCALL note_mfile)(pformatprinter printer, void *arg,
 		ops = me->mf_ops;
 		if (!ADDR_ISKERN(ops))
 			goto badobj;
+#ifdef CONFIG_USE_NEW_FS
+		/* TODO: if it's a device file, extract the devfs filename. */
+#endif /* CONFIG_USE_NEW_FS */
 		if (!mfile_extract_name(me, &file_path, &file_dent, pstatus))
 			goto badobj;
 	} EXCEPT {
@@ -1191,6 +1221,10 @@ badobj:
 }
 
 
+#ifdef CONFIG_USE_NEW_FS
+#define note_chrdev       note_mfile
+#define note_block_device note_mfile
+#endif /* CONFIG_USE_NEW_FS */
 
 PRIVATE struct obnote_entry const notes[] = {
 	{ "ansittydev", &note_chrdev },

@@ -27,11 +27,11 @@
 //#define  DEFINE_mfile_tailread_p
 //#define   DEFINE_mfile_tailreadv
 //#define DEFINE_mfile_tailreadv_p
-#define       DEFINE_mfile_write
+//#define       DEFINE_mfile_write
 //#define     DEFINE_mfile_write_p
 //#define      DEFINE_mfile_writev
 //#define    DEFINE_mfile_writev_p
-//#define   DEFINE_mfile_tailwrite
+#define   DEFINE_mfile_tailwrite
 //#define DEFINE_mfile_tailwrite_p
 //#define DEFINE_mfile_tailwritev
 //#define DEFINE_mfile_tailwritev_p
@@ -659,13 +659,13 @@ part_setcore:
 			decref_unlikely(part);
 			/* Must perform the operation while blocking. */
 #if defined(DEFINE_mfile_tailwrite)
-			_mfile_buffered_tailwrite(self, buffer, num_bytes, offset);
+			result += _mfile_buffered_tailwrite(self, buffer, num_bytes, offset);
 #elif defined(DEFINE_mfile_tailwritev)
-			_mfile_buffered_tailwritev(self, buffer, buf_offset, num_bytes, offset);
+			result += _mfile_buffered_tailwritev(self, buffer, buf_offset, num_bytes, offset);
 #else /* ... */
 #error "Invalid configuration"
 #endif /* !... */
-			return;
+			return result;
 		}
 #endif /* !LOCAL_BUFFER_IS_PHYS */
 
@@ -744,7 +744,7 @@ part_setcore:
 	 * address range (since we know that the  accessed range lies above the file's  size) */
 #ifndef __OPTIMIZE_SIZE__
 	{
-		mpart_reladdr_t old_part_size, reladdr;
+		mpart_reladdr_t old_part_size;
 		struct mfile_extendpart_data extdat;
 		mfile_extendpart_data_init(&extdat);
 		extdat.mep_minaddr = newpart_minaddr;
@@ -1145,6 +1145,7 @@ done:
 #undef LOCAL_BUFFER_IS_IOVEC
 #undef LOCAL_ubuffer_t
 #undef LOCAL_buffer_t
+#undef LOCAL_buffer_ent_t
 #undef LOCAL_mpart_rw
 #undef LOCAL_mpart_rw_or_unlock
 #undef LOCAL_mfile_rw

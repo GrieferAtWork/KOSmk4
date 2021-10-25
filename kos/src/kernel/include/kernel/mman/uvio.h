@@ -307,7 +307,7 @@ struct uvio
 };
 
 /* The datablock type used by UVIO objects. */
-DATDEF struct mfile_ops const uvio_datablock_type;
+DATDEF struct mfile_ops const uvio_mfile_ops;
 
 /* VIO operator callbacks for UVIO datablocks. */
 DATDEF struct vio_operators const uvio_operators;

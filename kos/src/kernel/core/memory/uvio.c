@@ -37,6 +37,7 @@
 #include <kernel/types.h>
 #include <sched/pid.h>
 #include <sched/rwlock.h>
+#include <sched/tsc.h>
 
 #include <hybrid/atomic.h>
 
@@ -189,8 +190,8 @@ uvio_request(/*in|out*/ struct vioargs *__restrict args, vio_addr_t addr, u16 co
 	struct kernel_uvio_request *slot;
 	assert(!task_wasconnected());
 	self = (struct uvio *)args->va_file;
-	assert(self->mf_ops == &uvio_datablock_type);
-	assert(self->mf_vio == &uvio_operators);
+	assert(self->mf_ops == &uvio_mfile_ops);
+	assert(mfile_getvio(self) == &uvio_operators);
 
 	/* UVIO request have a _mandatory_ dependency on preemption being enabled.
 	 * If  preemption  were disabled,  `uvio_freerequest()'  could deadlock... */
@@ -924,12 +925,25 @@ NOTHROW(KCALL uvio_server_polltest)(struct mfile *__restrict self,
 
 
 /* The datablock type used by UVIO objects. */
-PUBLIC_CONST struct mfile_ops const uvio_datablock_type = {
+#ifdef CONFIG_USE_NEW_FS
+PRIVATE struct mfile_stream_ops const uvio_v_stream_ops = {
+	.mso_read        = &uvio_server_read,
+	.mso_write       = &uvio_server_write,
+	.mso_pollconnect = &uvio_server_pollconnect,
+	.mso_polltest    = &uvio_server_polltest,
+};
+PUBLIC_CONST struct mfile_ops const uvio_mfile_ops = {
+	.mo_stream = &uvio_v_stream_ops,
+	.mo_vio    = &uvio_operators,
+};
+#else /* CONFIG_USE_NEW_FS */
+PUBLIC_CONST struct mfile_ops const uvio_mfile_ops = {
 	.mo_stream_read        = &uvio_server_read,
 	.mo_stream_write       = &uvio_server_write,
 	.dt_handle_pollconnect = &uvio_server_pollconnect,
 	.dt_handle_polltest    = &uvio_server_polltest,
 };
+#endif /* !CONFIG_USE_NEW_FS */
 
 /* Construct a new UVIO object.
  * Note that UVIO is derived from `struct mfile', so the returned
@@ -938,8 +952,19 @@ PUBLIC REF struct uvio *KCALL uvio_create(void) THROWS(E_BADALLOC) {
 	REF struct uvio *result;
 	result = (REF struct uvio *)kmalloc(sizeof(struct uvio),
 	                                    GFP_NORMAL);
-	mfile_init(result, &uvio_datablock_type, PAGESHIFT);
+#ifdef CONFIG_USE_NEW_FS
+	_mfile_init(result, &uvio_mfile_ops, PAGESHIFT);
+	result->mf_parts = NULL;
+	SLIST_INIT(&result->mf_changed);
+	result->mf_flags = MFILE_F_NORMAL;
+	atomic64_init(&result->mf_filesize, 0);
+	result->mf_atime = realtime();
+	result->mf_mtime = result->mf_atime;
+	result->mf_ctime = result->mf_atime;
+#else /* CONFIG_USE_NEW_FS */
+	mfile_init(result, &uvio_mfile_ops, PAGESHIFT);
 	result->mf_vio = &uvio_operators;
+#endif /* !CONFIG_USE_NEW_FS */
 	sig_init(&result->uv_reqmore);
 	sig_init(&result->uv_reqdlvr);
 	sig_init(&result->uv_reqdone);

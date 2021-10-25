@@ -29,7 +29,9 @@
 #include <debugger/config.h>
 #ifdef CONFIG_HAVE_DEBUGGER
 
+#include <fs/node.h>
 #include <fs/vfs.h>
+#include <kernel/driver.h>
 #include <kernel/except.h>
 #include <kernel/mman.h>
 #include <kernel/mman/mnode.h>

@@ -251,6 +251,13 @@ NOTHROW(FCALL mfile_delete_withfilelock_ex)(REF struct mfile *__restrict file,
 PRIVATE NOBLOCK NONNULL((1, 2)) Tobpostlockop(mfile) *
 NOTHROW(FCALL mfile_delete_withfilelock)(Toblockop(mfile) *__restrict self,
                                          REF struct mfile *__restrict file);
+PRIVATE NOBLOCK NONNULL((1, 2)) void
+NOTHROW(FCALL mfile_decref_and_destroy_deadparts_postop)(Tobpostlockop(mfile) *__restrict self,
+                                                         struct mfile *__restrict file);
+PRIVATE NOBLOCK NONNULL((1, 2)) void
+NOTHROW(FCALL mfile_decref_postop)(Tobpostlockop(mfile) *__restrict self,
+                                   struct mfile *__restrict file);
+
 
 PRIVATE NOBLOCK NONNULL((1, 2)) Tobpostlockop(mpart) *
 NOTHROW(FCALL mfile_delete_withpartlock)(Toblockop(mpart) *__restrict self,

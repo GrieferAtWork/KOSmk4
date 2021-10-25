@@ -365,10 +365,8 @@ again_unbind_allnodes:
 PRIVATE NOBLOCK NONNULL((1, 2)) void
 NOTHROW(LOCKOP_CC fsuper_clearnodes_postlop)(Tobpostlockop(fsuper) *__restrict self,
                                              REF struct fsuper *__restrict me) {
-	REF struct fnode *nodes;
 	assert(self == &me->fs_root._mf_fsuperplop);
 	(void)self;
-	nodes = me->fs_root._mf_delfnodes;
 
 	/* Finalize deletion of all nodes which were still alive within the node-tree. */
 	while (me->fs_root._mf_delfnodes) {

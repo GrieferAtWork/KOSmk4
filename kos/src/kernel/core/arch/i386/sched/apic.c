@@ -31,6 +31,7 @@
 #include <kernel/malloc.h>
 #include <kernel/memory.h>
 #include <kernel/mman.h>
+#include <kernel/mman/mfile.h>
 #include <kernel/mman/mnode.h>
 #include <kernel/mman/mpart.h>
 #include <kernel/mman/phys.h>
@@ -55,6 +56,7 @@
 #include <hybrid/atomic.h>
 
 #include <asm/intrin.h>
+#include <kos/except.h>
 #include <kos/kernel/cpu-state.h>
 #include <kos/kernel/tss-compat.h>
 #include <kos/kernel/tss.h>

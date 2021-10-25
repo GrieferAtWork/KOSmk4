@@ -701,6 +701,21 @@ PRIVATE struct module_ops const kernel_module_ops = {
 
 PRIVATE ATTR_COLDRODATA char const kernel_driver_name[] = KERNEL_DRIVER_NAME;
 PRIVATE ATTR_COLDDATA struct fdirent kernel_driver_fsname = {
+#ifdef CONFIG_USE_NEW_FS
+	.fd_refcnt  = 1, /* +1: kernel_driver.d_module.md_fsname */
+	.fd_ops     = &fdirent_empty_ops,
+	.fd_ino     = 0,
+#if __SIZEOF_POINTER__ == 8
+	.fd_hash    = UINT64_C(0xe205ff2e0d3d550c),
+#elif __SIZEOF_POINTER__ == 4
+	.fd_hash    = UINT32_C(0x858bf1a8),
+#else /* __SIZEOF_POINTER__ == ... */
+	.fd_hash    = 0,
+#endif /* __SIZEOF_POINTER__ != ... */
+	.fd_namelen = COMPILER_STRLEN(KERNEL_DRIVER_FILENAME),
+	.fd_type    = DT_REG,
+	KERNEL_DRIVER_FILENAME
+#else /* CONFIG_USE_NEW_FS */
 	.de_refcnt   = 1, /* +1: kernel_driver.d_module.md_fsname */
 	.de_heapsize = offsetof(struct fdirent, de_name) + sizeof(KERNEL_DRIVER_FILENAME),
 	.de_next     = NULL,
@@ -718,6 +733,7 @@ PRIVATE ATTR_COLDDATA struct fdirent kernel_driver_fsname = {
 	.de_namelen  = COMPILER_STRLEN(KERNEL_DRIVER_FILENAME),
 	.de_type     = DT_REG,
 	KERNEL_DRIVER_FILENAME
+#endif /* !CONFIG_USE_NEW_FS */
 };
 
 PUBLIC struct driver kernel_driver = {
@@ -2667,7 +2683,12 @@ driver_runstate_init_deps(struct driver *__restrict self) {
 
 		/* Check  for  special case:  loading driver  dependencies before
 		 * the root filesystem has been mounted (i.e. bootloader drivers) */
-		if unlikely(!ATOMIC_READ(vfs_kernel.p_inode)) {
+#ifdef CONFIG_USE_NEW_FS
+		if unlikely(!ATOMIC_READ(vfs_kernel.vf_root))
+#else /* CONFIG_USE_NEW_FS */
+		if unlikely(!ATOMIC_READ(vfs_kernel.p_inode))
+#endif /* !CONFIG_USE_NEW_FS */
+		{
 			dependency = driver_fromname(filename);
 			if unlikely(!dependency) {
 				char const *name;
@@ -5498,13 +5519,21 @@ driver_loadmod_filename(USER CHECKED char const *driver_filename,
                         bool *pnew_driver_loaded)
 		THROWS(E_SEGFAULT, E_NOT_EXECUTABLE, E_BADALLOC, E_IOERROR, E_FSERROR) {
 	REF struct driver *result;
-	USER CHECKED char const *driver_name;
 	REF struct mfile *driver_file;
 	REF struct path *driver_path;
-	REF struct directory_node *driver_directory;
 	REF struct fdirent *driver_dentry;
-	u16 driver_namelen;
+
 	/* Open the specified file. */
+#ifdef CONFIG_USE_NEW_FS
+	driver_file = path_traversefull(AT_FDCWD, driver_filename, fs_atflags(0),
+	                                &driver_path, &driver_dentry);
+	FINALLY_DECREF(driver_path);
+	FINALLY_DECREF(driver_dentry);
+	FINALLY_DECREF(driver_file);
+#else /* CONFIG_USE_NEW_FS */
+	REF struct directory_node *driver_directory;
+	USER CHECKED char const *driver_name;
+	u16 driver_namelen;
 	driver_path = path_traverse(THIS_FS, driver_filename,
 	                            &driver_name, &driver_namelen,
 	                            FS_MODE_FNORMAL, NULL);
@@ -5522,6 +5551,7 @@ driver_loadmod_filename(USER CHECKED char const *driver_filename,
 	}
 	FINALLY_DECREF(driver_dentry);
 	FINALLY_DECREF(driver_file);
+#endif /* !CONFIG_USE_NEW_FS */
 
 	/* Verify that we're dealing with a regular file. */
 #ifdef CONFIG_USE_NEW_FS
@@ -5611,8 +5641,13 @@ path_equals_string(struct path *__restrict pth,
 		if unlikely((pth = pth->p_parent) == NULL)
 			goto nope;
 	}
-	if (path_is_root)
+	if (path_is_root) {
+#ifdef CONFIG_USE_NEW_FS
+		return pth == ATOMIC_READ(vfs_kernel.vf_root);
+#else /* CONFIG_USE_NEW_FS */
 		return pth == &vfs_kernel;
+#endif /* !CONFIG_USE_NEW_FS */
+	}
 	return pth == ATOMIC_READ(THIS_FS->f_cwd);
 nope:
 	return false;

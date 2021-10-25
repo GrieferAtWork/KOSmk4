@@ -41,7 +41,6 @@
 
 DECL_BEGIN
 
-#ifndef __OPTIMIZE_SIZE__
 PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL mchunkvec_truncate)(struct mchunkvec *__restrict self,
                                   physpagecnt_t total_pages) {
@@ -139,9 +138,6 @@ NOTHROW(FCALL mpart_truncate_undo)(struct mfile *__restrict file,
 	mfile_lockops_reap(file);
 }
 
-
-#endif /* !__OPTIMIZE_SIZE__ */
-
 struct mfile_unlockinfo: unlockinfo {
 	struct mfile *mfui_file; /* [1..1] The file to unlock. */
 };
@@ -153,6 +149,8 @@ NOTHROW(FCALL mfile_unlockinfo_cb)(struct unlockinfo *__restrict self) {
 	mfile_lock_endwrite(me->mfui_file);
 }
 
+
+#if 0 /* ??? */
 struct mpart_truncate_undo_unlockinfo: unlockinfo {
 	struct mfile    *mtuu_file;      /* [1..1] ... */
 	struct mpart    *mtuu_part;      /* [1..1] ... */
@@ -166,6 +164,8 @@ NOTHROW(FCALL mpart_truncate_undo_unlockinfo_cb)(struct unlockinfo *__restrict s
 	mpart_truncate_restore(me->mtuu_part, me->mtuu_orig_size);
 	mfile_lock_endwrite(me->mtuu_file);
 }
+#endif
+
 
 /* Write the  physical  memory  contents
  * of  `sec[start_offset...+=num_bytes]'

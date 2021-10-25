@@ -29,6 +29,7 @@
 #ifdef CONFIG_HAVE_DEBUGGER
 
 #include <debugger/debugger.h>
+#include <fs/node.h>
 #include <fs/vfs.h>
 #include <kernel/dmesg.h>
 #include <kernel/mman/execinfo.h>
@@ -197,12 +198,19 @@ dbg_dmesg_render_enum(void *arg, struct syslog_packet *__restrict packet,
 					ei = &FORMMAN(sender->t_mman, thismman_execinfo);
 					if (ei->mei_path && ei->mei_dent) {
 						dbg_pprinter_putuni(&printer, ':');
+#ifdef CONFIG_USE_NEW_FS
+						path_printent(ei->mei_path,
+						              ei->mei_dent->de_name,
+						              ei->mei_dent->de_namelen,
+						              &dbg_pprinter, &printer);
+#else /* CONFIG_USE_NEW_FS */
 						path_printentex(ei->mei_path,
 						                ei->mei_dent->de_name,
 						                ei->mei_dent->de_namelen,
 						                &dbg_pprinter, &printer,
 						                PATH_PRINT_MODE_NORMAL,
 						                &vfs_kernel);
+#endif /* !CONFIG_USE_NEW_FS */
 					}
 					decref_unlikely(sender);
 				}

@@ -23,8 +23,10 @@
 
 #include <kernel/compiler.h>
 
+#include <dev/char.h>
 #include <dev/nic.h>
 #include <kernel/printk.h>
+#include <sched/task.h>
 
 #include <kos/net/printf.h>
 #include <linux/if_ether.h>
@@ -48,15 +50,17 @@ eth_routepacket(struct nicdev *__restrict dev,
 	struct ethhdr *hdr;
 	hdr = (struct ethhdr *)packet_data;
 	assert(packet_size >= ETH_ZLEN);
+	chrdev_getname_lock_acquire(dev);
 	printk(KERN_TRACE "[eth:%s] Route eth packet ["
 	                  "dst=" NET_PRINTF_MACADDR_FMT ","
 	                  "src=" NET_PRINTF_MACADDR_FMT ","
 	                  "prot=%#.4" PRIx16 ","
 	                  "siz=%" PRIuSIZ "]\n",
-	       dev->cd_name,
+	       chrdev_getname(dev),
 	       NET_PRINTF_MACADDR_ARG(hdr->h_dest),
 	       NET_PRINTF_MACADDR_ARG(hdr->h_source),
 	       ntohs(hdr->h_proto), packet_size);
+	chrdev_getname_lock_release(dev);
 	switch (ntohs(hdr->h_proto)) {
 
 	case ETH_P_IP:
@@ -67,17 +71,20 @@ eth_routepacket(struct nicdev *__restrict dev,
 		arp_routepacket(dev, hdr + 1, packet_size - sizeof(*hdr));
 		break;
 
-	default:
+	default: {
+		chrdev_getname_lock_acquire(dev);
 		printk(KERN_WARNING "[eth:%s] Unrecognized eth packet ["
 		                    "dst=" NET_PRINTF_MACADDR_FMT ","
 		                    "src=" NET_PRINTF_MACADDR_FMT ","
 		                    "prot=%#.4" PRIx16 ","
 		                    "siz=%" PRIuSIZ "]\n",
-		       dev->cd_name,
+		       chrdev_getname(dev),
 		       NET_PRINTF_MACADDR_ARG(hdr->h_dest),
 		       NET_PRINTF_MACADDR_ARG(hdr->h_source),
 		       ntohs(hdr->h_proto), packet_size);
-		break;
+		chrdev_getname_lock_release(dev);
+	}	break;
+
 	}
 }
 

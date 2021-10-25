@@ -35,6 +35,7 @@
 
 #include <hybrid/atomic.h>
 
+#include <kos/except.h>
 #include <kos/io.h>
 #include <sys/stat.h>
 
@@ -280,8 +281,13 @@ LOCAL ATTR_PURE WUNUSED bool
 NOTHROW(KCALL GDBFs_HasMountedFileSystem)(void) {
 	if unlikely(!GDBFs.fi_fs)
 		return false; /* No filesystem loaded. */
+#ifdef CONFIG_USE_NEW_FS
+	if unlikely(!ATOMIC_READ(GDBFs.fi_fs->fs_vfs->vf_root))
+		return false; /* The root filesystem hasn't been mounted, yet. */
+#else /* CONFIG_USE_NEW_FS */
 	if unlikely(!ATOMIC_READ(GDBFs.fi_fs->f_vfs->p_inode))
 		return false; /* The root filesystem hasn't been mounted, yet. */
+#endif /* !CONFIG_USE_NEW_FS */
 	return true;
 }
 
@@ -316,21 +322,50 @@ NOTHROW(KCALL GDBFs_Open)(char *filename,
 	GDB_DEBUG("[gdb] vFile:open(%q, %#x, %#x)\n",
 	          filename, (unsigned int)oflags, (unsigned int)mode);
 	/* Set the I/O mode. */
-	switch (oflags & GDB_O_ACCMODE) {
-	default:
-/*	case GDB_O_RDONLY: */
-		result->h_mode = IO_RDONLY;
-		break;
-	case GDB_O_WRONLY:
-		result->h_mode = IO_WRONLY;
-		break;
-	case GDB_O_RDWR:
-		result->h_mode = IO_RDWR;
-		break;
-	}
-	if (oflags & GDB_O_APPEND)
-		result->h_mode |= IO_APPEND;
 	TRY {
+#ifdef CONFIG_USE_NEW_FS
+		oflag_t os_oflags;
+		if ((oflags & GDB_O_ACCMODE) == GDB_O_RDONLY) {
+			os_oflags = O_RDONLY;
+		} else if ((oflags & GDB_O_ACCMODE) == GDB_O_WRONLY) {
+			os_oflags = O_WRONLY;
+		} else if ((oflags & GDB_O_ACCMODE) == GDB_O_RDWR) {
+			os_oflags = O_RDWR;
+		} else {
+			return GDB_ErrnoEncode(EINVAL);
+		}
+		if (oflags & GDB_O_APPEND)
+			os_oflags |= O_APPEND;
+		if (oflags & GDB_O_CREAT)
+			os_oflags |= O_CREAT;
+		if (oflags & GDB_O_TRUNC)
+			os_oflags |= O_TRUNC;
+		if (oflags & GDB_O_EXCL)
+			os_oflags |= O_EXCL;
+
+		/* Open the file */
+		{
+			REF struct fs *saved_fs = PERTASK_GET(this_fs);
+			PERTASK_SET(this_fs, GDBFs.fi_fs);
+			RAII_FINALLY { PERTASK_SET(this_fs, saved_fs); };
+			*result = path_open(AT_FDROOT, filename, os_oflags, mode);
+		}
+
+#else /* CONFIG_USE_NEW_FS */
+		switch (oflags & GDB_O_ACCMODE) {
+		default:
+	/*	case GDB_O_RDONLY: */
+			result->h_mode = IO_RDONLY;
+			break;
+		case GDB_O_WRONLY:
+			result->h_mode = IO_WRONLY;
+			break;
+		case GDB_O_RDWR:
+			result->h_mode = IO_RDWR;
+			break;
+		}
+		if (oflags & GDB_O_APPEND)
+			result->h_mode |= IO_APPEND;
 		if (oflags & GDB_O_CREAT) {
 			REF struct directory_node *result_containing_directory;
 			REF struct path *dir;
@@ -432,6 +467,7 @@ do_check_truncate:
 		}	break;
 
 		}
+#endif /* !CONFIG_USE_NEW_FS */
 	} EXCEPT {
 		errno_t error;
 		error = error_as_errno(error_data());
@@ -453,6 +489,16 @@ NOTHROW(KCALL GDBFs_Unlink)(char *filename) {
 		char const *last_seg;
 		u16 last_seglen;
 		REF struct path *p;
+#ifdef CONFIG_USE_NEW_FS
+		atflag_t atflags;
+		REF struct fs *saved_fs = PERTASK_GET(this_fs);
+		PERTASK_SET(this_fs, GDBFs.fi_fs);
+		RAII_FINALLY { PERTASK_SET(this_fs, saved_fs); };
+		atflags = fs_atflags(0) | AT_REMOVEREG;
+		p       = path_traverse(AT_FDCWD, filename, &last_seg, &last_seglen, atflags);
+		FINALLY_DECREF_UNLIKELY(p);
+		path_remove(p, last_seg, last_seglen, atflags);
+#else /* CONFIG_USE_NEW_FS */
 		p = path_traverse(GDBFs.fi_fs,
 		                  filename,
 		                  &last_seg,
@@ -471,6 +517,7 @@ NOTHROW(KCALL GDBFs_Unlink)(char *filename) {
 			            NULL,
 			            NULL);
 		}
+#endif /* !CONFIG_USE_NEW_FS */
 	} EXCEPT {
 		errno_t error;
 		error = error_as_errno(error_data());
@@ -484,8 +531,7 @@ NOTHROW(KCALL GDBFs_Unlink)(char *filename) {
  * @param: pbuflen: [IN]  Available buffer size in `buf'
  *                  [OUT] Number of bytes written to `buf' */
 INTERN WUNUSED gdb_errno_t
-NOTHROW(KCALL GDBFs_Readlink)(char *filename,
-                              char *buf,
+NOTHROW(KCALL GDBFs_Readlink)(char *filename, char *buf,
                               size_t *__restrict pbuflen) {
 	/* Ensure that a filesystem has been loaded. */
 	if unlikely(!GDBFs_HasMountedFileSystem()) {
@@ -494,8 +540,26 @@ NOTHROW(KCALL GDBFs_Readlink)(char *filename,
 	}
 	GDB_DEBUG("[gdb] vFile:readlink(%q)\n", filename);
 	TRY {
-		REF struct symlink_node *link_node;
-		link_node = (REF struct symlink_node *)path_traversefull(GDBFs.fi_fs,
+#ifdef CONFIG_USE_NEW_FS
+		size_t avail, used;
+		REF struct flnknode *lnk;
+		REF struct fs *saved_fs = PERTASK_GET(this_fs);
+		PERTASK_SET(this_fs, GDBFs.fi_fs);
+		RAII_FINALLY { PERTASK_SET(this_fs, saved_fs); };
+		lnk = (REF struct flnknode *)path_traversefull(AT_FDCWD, filename, fs_atflags(0));
+		FINALLY_DECREF_UNLIKELY(lnk);
+		/* Check that the named INode is actually a symbolic link. */
+		if unlikely(!fnode_islnk(lnk))
+			return GDB_ENOENT; /* THROW(E_FSERROR_NOT_A_SYMBOLIC_LINK, E_FILESYSTEM_NOT_A_SYMBOLIC_LINK_READLINK); */
+		/* Read the contents of the symbolic link. */
+		avail = *pbuflen;
+		used  = flnknode_readlink(lnk, buf, avail);
+		if unlikely(used > avail)
+			used = avail; /* Posix semantics (ugh...) */
+		*pbuflen = used;
+#else /* CONFIG_USE_NEW_FS */
+		REF struct symlink_node *lnk;
+		lnk = (REF struct symlink_node *)path_traversefull(GDBFs.fi_fs,
 		                                                         filename,
 		                                                         false,
 		                                                         ATOMIC_READ(GDBFs.fi_fs->f_mode.f_atflag),
@@ -504,21 +568,22 @@ NOTHROW(KCALL GDBFs_Readlink)(char *filename,
 		                                                         NULL,
 		                                                         NULL);
 		/* Check that the named INode is actually a symbolic link. */
-		if (!INODE_ISLNK((struct inode *)link_node)) {
-			decref_unlikely(link_node);
+		if (!INODE_ISLNK((struct inode *)lnk)) {
+			decref_unlikely(lnk);
 			/* THROW(E_FSERROR_NOT_A_SYMBOLIC_LINK, E_FILESYSTEM_NOT_A_SYMBOLIC_LINK_READLINK); */
 			return GDB_ENOENT;
 		}
 		{
 			size_t avail, used;
-			FINALLY_DECREF_UNLIKELY((struct inode *)link_node);
+			FINALLY_DECREF_UNLIKELY((struct inode *)lnk);
 			/* Read the contents of the symbolic link. */
 			avail = *pbuflen;
-			used  = symlink_node_readlink(link_node, buf, avail);
+			used  = symlink_node_readlink(lnk, buf, avail);
 			if unlikely(used > avail)
 				used = avail; /* Posix semantics (ugh...) */
 			*pbuflen = used;
 		}
+#endif /* !CONFIG_USE_NEW_FS */
 	} EXCEPT {
 		errno_t error;
 		error = error_as_errno(error_data());

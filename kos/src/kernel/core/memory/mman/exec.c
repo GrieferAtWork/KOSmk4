@@ -33,6 +33,7 @@
 #include <kernel/mman/exec.h>
 #include <sched/rpc.h> /* task_serve() */
 
+#include <kos/except.h>
 #include <kos/except/reason/fs.h>
 #include <kos/except/reason/noexec.h>
 
@@ -156,6 +157,10 @@ INTERN ATTR_FREETEXT ATTR_RETNONNULL WUNUSED NONNULL((1)) struct icpustate *
 NOTHROW(KCALL kernel_initialize_exec_init)(struct icpustate *__restrict state) {
 	struct execargs args;
 	bzero(&args, sizeof(args)); /* For fields which we don't use */
+#ifdef CONFIG_USE_NEW_FS
+	args.ea_xnode = (REF struct regular_node *)path_traversefull(AT_FDCWD, kernel_init_binary, 0,
+	                                                             &args.ea_xpath, &args.ea_xdentry);
+#else /* CONFIG_USE_NEW_FS */
 	args.ea_xnode = (REF struct regular_node *)path_traversefull(THIS_FS,
 	                                                             kernel_init_binary,
 	                                                             true,
@@ -164,8 +169,13 @@ NOTHROW(KCALL kernel_initialize_exec_init)(struct icpustate *__restrict state) {
 	                                                             &args.ea_xpath,
 	                                                             NULL,
 	                                                             &args.ea_xdentry);
+#endif /* !CONFIG_USE_NEW_FS */
+
 	/* Can only execute regular files. */
-	/*vm_exec_assert_regular(args.ea_xnode);*/ /* TODO */
+#ifdef CONFIG_USE_NEW_FS
+	if unlikely(!fnode_isreg(args.ea_xnode))
+		THROW(E_NOT_EXECUTABLE_NOT_REGULAR);
+#endif /* CONFIG_USE_NEW_FS */
 
 	/* Fill in the remaining fields of `args' (which we make use of) */
 	args.ea_mman        = THIS_MMAN;

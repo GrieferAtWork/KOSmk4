@@ -54,18 +54,18 @@ __intellisense_lockop_template(struct lockop_slist *__restrict __LOCAL_self,
 #endif /* !__LOCAL_plo_link */
 
 #ifdef __LOCAL_obj
+#ifdef __LOCAL_type
+	Toblockop_slist(__LOCAL_type) __lops_list;
+	Tobpostlockop_slist(__LOCAL_type) __post_list;
+	Toblockop(__LOCAL_type) *__iter;
+#else /* __LOCAL_type */
 	struct oblockop_slist __lops_list;
+	struct obpostlockop_slist __post_list;
+	struct oblockop *__iter;
+#endif /* !__LOCAL_type */
 #else /* __LOCAL_obj */
 	struct lockop_slist __lops_list;
-#endif /* !__LOCAL_obj */
-#ifdef __LOCAL_obj
-	struct obpostlockop_slist __post_list;
-#else /* __LOCAL_obj */
 	struct postlockop_slist __post_list;
-#endif /* !__LOCAL_obj */
-#ifdef __LOCAL_obj
-	struct oblockop *__iter;
-#else /* __LOCAL_obj */
 	struct lockop *__iter;
 #endif /* !__LOCAL_obj */
 	if (!__LOCAL_trylock())
@@ -78,13 +78,15 @@ again_service_lops:
 	__iter = __lops_list.slh_first; /* SLIST_FIRST(&__lops_list) */
 	while (__iter != __NULLPTR) {
 #ifdef __LOCAL_obj
+#ifdef __LOCAL_type
+		Toblockop(__LOCAL_type) *__next;
+		Tobpostlockop(__LOCAL_type) *__later;
+#else /* __LOCAL_type */
 		struct oblockop *__next;
+		struct obpostlockop *__later;
+#endif /* !__LOCAL_type */
 #else /* __LOCAL_obj */
 		struct lockop *__next;
-#endif /* !__LOCAL_obj */
-#ifdef __LOCAL_obj
-		struct obpostlockop *__later;
-#else /* __LOCAL_obj */
 		struct postlockop *__later;
 #endif /* !__LOCAL_obj */
 		__next = __iter->__LOCAL_lo_link.sle_next; /* SLIST_NEXT(__iter, __LOCAL_lo_link) */
@@ -129,7 +131,11 @@ again_service_lops:
 	/* Run all enqueued __post_list-operations. */
 	while (__post_list.slh_first != __NULLPTR) { /* SLIST_EMPTY(&__post_list) */
 #ifdef __LOCAL_obj
+#ifdef __LOCAL_type
+		Tobpostlockop(__LOCAL_type) *__postop;
+#else /* __LOCAL_type */
 		struct obpostlockop *__postop;
+#endif /* !__LOCAL_type */
 #else /* __LOCAL_obj */
 		struct postlockop *__postop;
 #endif /* !__LOCAL_obj */
@@ -150,5 +156,6 @@ again_service_lops:
 
 #undef __LOCAL_trylock
 #undef __LOCAL_unlock
+#undef __LOCAL_type
 #undef __LOCAL_obj
 #undef __LOCAL_self

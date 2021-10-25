@@ -23,6 +23,7 @@
 
 #include <kernel/compiler.h>
 
+#include <dev/block.h>
 #include <fs/node.h>
 #include <kernel/aio.h>
 #include <kernel/except.h>
@@ -94,17 +95,19 @@ handle_mpart_stat(struct mpart *__restrict self,
 	size = mpart_getsize(self);
 	mpart_lock_release(self);
 	FINALLY_DECREF_UNLIKELY(file);
+
+	/* TODO: Better integration for `CONFIG_USE_NEW_FS' */
 	if (vm_datablock_isinode(file)) {
-		struct blkdev *dev;
-		struct inode *ino = (struct inode *)file;
-		dev = ino->i_super->s_device;
-		result->st_dev   = (__dev_t)(dev ? blkdev_devno(dev) : 0);
+		struct inode *ino  = (struct inode *)file;
+		struct blkdev *dev = ino->i_super->s_device;
+		dev_t devno        = dev ? blkdev_devno(dev) : 0;
+		result->st_dev   = (__dev_t)devno;
 		result->st_ino   = (__FS_TYPE(ino))ino->i_fileino;
 		result->st_mode  = (__mode_t)ino->i_filemode;
 		result->st_nlink = (__nlink_t)ino->i_filenlink;
 		result->st_uid   = (__uid_t)ino->i_fileuid;
 		result->st_gid   = (__gid_t)ino->i_filegid;
-		result->st_rdev  = (__dev_t)ino->i_filerdev;
+		result->st_rdev  = (__dev_t)devno;
 #ifdef __TIMESPEC64_HAVE_TV_PAD
 		/* Don't accidentally leak kernel data! */
 		{

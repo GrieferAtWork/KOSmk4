@@ -186,8 +186,6 @@ DATDEF struct blkdev_ops const blkpart_ops;
 #define blkdev_isroot(self) (blkdev_getops(self) != &blkpart_ops)
 
 /* Helper macros. */
-#define mfile_isblkpart(self)    ((self)->mf_ops == &blkpart_ops.bdo_dev.do_node.dno_node.no_file)
-#define fnode_isblkpart(self)    ((self)->_fnode_file_ mf_ops == &blkpart_ops.bdo_dev.do_node.dno_node.no_file)
 #define fdevnode_isblkpart(self) ((self)->_fdevnode_node_ _fnode_file_ mf_ops == &blkpart_ops.bdo_dev.do_node.dno_node.no_file)
 #define device_isblkpart(self)   ((self)->_device_devnode_ _fdevnode_node_ _fnode_file_ mf_ops == &blkpart_ops.bdo_dev.do_node.dno_node.no_file)
 

@@ -26,12 +26,15 @@
 #include <kernel/fs/path.h>
 #include <kernel/fs/vfs.h>
 
+/* struct path */
+#define p_dirent p_name
+
 /* struct vfs */
 #define v_drives_lock vf_driveslock
 #define v_drives      vf_drives
 
 /* struct fs */
-#define f_refcnt   fs_refcnt
+/*#define f_refcnt   fs_refcnt*/
 #define f_vfs      fs_vfs
 #define f_pathlock fs_pathlock
 #define f_root     fs_root

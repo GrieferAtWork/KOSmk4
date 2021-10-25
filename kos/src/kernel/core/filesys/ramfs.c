@@ -77,7 +77,7 @@
 DECL_BEGIN
 
 
-PUBLIC struct flnknode_ops const ramfs_lnknode_ops = {
+PUBLIC_CONST struct flnknode_ops const ramfs_lnknode_ops = {
 	.lno_node = {
 		.no_file = {
 			.mo_destroy = &ramfs_lnknode_v_destroy,
@@ -89,7 +89,7 @@ PUBLIC struct flnknode_ops const ramfs_lnknode_ops = {
 	.lno_linkstr  = &ramfs_lnknode_v_linkstr,
 };
 
-PUBLIC struct fregnode_ops const ramfs_regnode_ops = {
+PUBLIC_CONST struct fregnode_ops const ramfs_regnode_ops = {
 	.rno_node = {
 		.no_file = {
 			.mo_destroy = &ramfs_regnode_v_destroy,
@@ -102,7 +102,7 @@ PUBLIC struct fregnode_ops const ramfs_regnode_ops = {
 PRIVATE struct mfile_stream_ops const ramfs_devnode_stream_ops = {
 	.mso_open = &ramfs_devnode_v_open,
 };
-PUBLIC struct fdevnode_ops const ramfs_devnode_ops = {
+PUBLIC_CONST struct fdevnode_ops const ramfs_devnode_ops = {
 	.dno_node = {
 		.no_file = {
 			.mo_destroy = &ramfs_devnode_v_destroy,
@@ -124,7 +124,7 @@ PRIVATE struct mfile_stream_ops const ramfs_fifonode_stream_ops = {
 	.mso_stat     = &ramfs_fifonode_v_stat,
 	.mso_hop      = &ramfs_fifonode_v_hop,
 };
-PUBLIC struct ffifonode_ops const ramfs_fifonode_ops = {
+PUBLIC_CONST struct ffifonode_ops const ramfs_fifonode_ops = {
 	.fno_node = {
 		.no_file = {
 			.mo_destroy = &ramfs_fifonode_v_destroy,
@@ -139,7 +139,7 @@ PUBLIC struct ffifonode_ops const ramfs_fifonode_ops = {
 PRIVATE struct mfile_stream_ops const ramfs_socknode_stream_ops = {
 	.mso_open = &ramfs_socknode_v_open,
 };
-PUBLIC struct fsocknode_ops const ramfs_socknode_ops = {
+PUBLIC_CONST struct fsocknode_ops const ramfs_socknode_ops = {
 	.suno_node = {
 		.no_file = {
 			.mo_destroy = &ramfs_socknode_v_destroy,
@@ -153,7 +153,7 @@ PUBLIC struct fsocknode_ops const ramfs_socknode_ops = {
 
 
 /* Directory entry operators for instances of `ramfs_dirent' */
-PUBLIC struct fdirent_ops const ramfs_dirent_ops = {
+PUBLIC_CONST struct fdirent_ops const ramfs_dirent_ops = {
 	.fdo_destroy  = &ramfs_dirent_v_destroy,
 	.fdo_opennode = &ramfs_dirent_v_opennode,
 };
@@ -177,7 +177,7 @@ NOTHROW(KCALL ramfs_dirent_v_opennode)(struct fdirent *__restrict self,
 
 
 /* Directory enumeration operators for `struct ramfs_direnum' */
-PUBLIC struct fdirenum_ops const ramfs_direnum_ops = {
+PUBLIC_CONST struct fdirenum_ops const ramfs_direnum_ops = {
 	.deo_fini    = &ramfs_direnum_v_fini,
 	.deo_readdir = &ramfs_direnum_v_readdir,
 	.deo_seekdir = &ramfs_direnum_v_seekdir,
@@ -238,7 +238,7 @@ ramfs_dirent_next(struct ramfs_dirent *__restrict self,
 
 PUBLIC NONNULL((1)) size_t KCALL
 ramfs_direnum_v_readdir(struct fdirenum *__restrict self, USER CHECKED struct dirent *buf,
-                        size_t bufsize, readdir_mode_t readdir_mode, iomode_t mode)
+                        size_t bufsize, readdir_mode_t readdir_mode, iomode_t UNUSED(mode))
 		THROWS(...) {
 	ssize_t result;
 	REF struct ramfs_dirent *ent;
@@ -469,11 +469,12 @@ again:
 		root = root->rde_treenode.rb_rhs;
 		goto again;
 	}
+	return NULL;
 }
 
 
 /* Directory operators for `struct ramfs_dirnode' */
-PUBLIC struct fdirnode_ops const ramfs_dirnode_ops = {
+PUBLIC_CONST struct fdirnode_ops const ramfs_dirnode_ops = {
 	.dno_node = {
 		.no_file = {
 			.mo_destroy = &ramfs_dirnode_v_destroy,
@@ -488,9 +489,9 @@ PUBLIC struct fdirnode_ops const ramfs_dirnode_ops = {
 	.dno_rename = &ramfs_dirnode_v_rename,
 };
 
-PRIVATE WUNUSED NONNULL((1, 2)) struct ramfs_dirent *KCALL
-ramfs_dirdata_lookup(struct ramfs_dirnode *__restrict self,
-                     struct flookup_info *__restrict info) {
+PRIVATE ATTR_PURE WUNUSED NONNULL((1, 2)) struct ramfs_dirent *KCALL
+ramfs_dirdata_lookup(struct ramfs_dirnode const *__restrict self,
+                     struct flookup_info const *__restrict info) {
 	struct ramfs_dirent *result;
 	result = ramfs_direnttree_locate(self->rdn_dat.rdd_tree,
 	                                 info->flu_name,
@@ -1098,7 +1099,7 @@ ramfs_open(struct ffilesys *__restrict UNUSED(filesys),
 }
 
 
-PUBLIC struct fsuper_ops const ramfs_super_ops = {
+PUBLIC_CONST struct fsuper_ops const ramfs_super_ops = {
 	.so_fdir = {
 		.dno_node = {
 			.no_file = {
@@ -1131,7 +1132,7 @@ PUBLIC struct ffilesys ramfs_filesys = {
 	.ffs_drv  = &drv_self,
 	{ .ffs_open = &ramfs_open },
 	.ffs_flags = FFILESYS_F_NODEV,
-	.ffs_name  = "ramfs",
+	/* .ffs_name = */ "ramfs",
 };
 
 

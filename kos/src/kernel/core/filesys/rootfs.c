@@ -126,6 +126,7 @@ PRIVATE ATTR_FREETEXT ATTR_RETNONNULL WUNUSED REF struct blkdev *
 NOTHROW(KCALL kernel_get_root_partition)(void) {
 	REF struct blkdev *result;
 	unsigned int criteria;
+again:
 
 	/* Highest priority: kernel_root_partition (commandline option) */
 	if (kernel_root_partition) {
@@ -141,10 +142,12 @@ NOTHROW(KCALL kernel_get_root_partition)(void) {
 	for (criteria = 0; criteria < FIND_UNIQUE_BLKDEV_COUNT; ++criteria) {
 		result = find_unique_blkdev(criteria);
 		if (result)
-			return;
+			return result;
 	}
 
+	/* Fallback: cause kernel panic */
 	kernel_panic(FREESTR("Boot partition not found or ambiguous (reboot with `boot=...')"));
+	goto again;
 }
 
 INTERN ATTR_FREETEXT void

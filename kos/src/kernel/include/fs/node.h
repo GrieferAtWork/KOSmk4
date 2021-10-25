@@ -25,6 +25,7 @@
 #ifdef CONFIG_USE_NEW_FS
 #include <kernel/fs/blkdev.h>
 #include <kernel/fs/chrdev.h>
+#include <kernel/fs/devnode.h>
 #include <kernel/fs/dirnode.h>
 #include <kernel/fs/filesys.h>
 #include <kernel/fs/lnknode.h>
@@ -59,6 +60,7 @@
 #define i_filenlink                                                fn_nlink
 #define i_fileuid                                                  fn_uid
 #define i_filegid                                                  fn_gid
+#define i_filerdev                                                 dn_devno
 #define i_fileatime                                                _fnode_file_ mf_atime
 #define i_filemtime                                                _fnode_file_ mf_mtime
 #define i_filectime                                                _fnode_file_ mf_ctime
@@ -98,16 +100,19 @@
 
 /* struct superblock // struct fsuper */
 #define s_rootdir             fs_root
-#define s_type                fs_root._fdirnode_node_ _fnode_file_ mf_ops
+//#define s_type                fs_root._fdirnode_node_ _fnode_file_ mf_ops
 #define s_device              fs_dev
 #define s_driver              fs_sys->ffs_drv
-#define s_flags               fs_root._fdirnode_node_ _fnode_file_ mf_flags
+//#define s_flags               fs_root._fdirnode_node_ _fnode_file_ mf_flags
 #define s_features            fs_feat
 #define superblock_features   fsuperfeat
 #define SUPERBLOCK_FNORMAL    MFILE_F_NORMAL
 #define SUPERBLOCK_FNOMTIME   MFILE_F_NOMTIME
 #define SUPERBLOCK_FNOSUID    MFILE_FS_NOSUID
 #define SUPERBLOCK_FUNMOUNTED MFILE_F_DELETED
+
+#define superblock_syncall fsuper_syncall
+
 
 #else /* CONFIG_USE_NEW_FS */
 #include <dev/block.h>

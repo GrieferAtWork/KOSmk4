@@ -105,7 +105,7 @@ STATIC_ASSERT(AT_PATHPRINT_INCTRAIL != _AT_PATHPRINT_REACHABLE);
 
 PRIVATE NOBLOCK NONNULL((1, 2)) void
 NOTHROW(LOCKOP_CC path_remove_from_recent_postlop)(Tobpostlockop(vfs) *__restrict self,
-                                                   struct vfs *__restrict obj) {
+                                                   struct vfs *__restrict UNUSED(obj)) {
 	REF struct path *me;
 	me = container_of(self, struct path, _p_vfsplop);
 	decref(me);
@@ -204,14 +204,12 @@ NOTHROW(FCALL path_decref_and_unlock_whole_tree)(REF struct path *__restrict sel
  * @return: * : Reference to path that was blocking. */
 PRIVATE WUNUSED NONNULL((1)) REF struct path *
 NOTHROW(FCALL path_tryincref_and_trylock_whole_tree)(struct path *__restrict self) {
-	size_t i, mask;
 	struct path_bucket *buckets;
 	if (!path_cldlock_trywrite(self))
 		return incref(self);
-	mask    = self->p_cldmask;
 	buckets = self->p_cldlist;
 	if (buckets != PATH_CLDLIST_DELETED) {
-		size_t i;
+		size_t i, mask = self->p_cldmask;
 		for (i = 0; i <= mask; ++i) {
 			REF struct path *result;
 			struct path *child = buckets[i].pb_path;
@@ -560,9 +558,9 @@ NOTHROW(KCALL twopaths_release_locks)(struct path *a, struct path *b) {
 #define FDIRNODE_RENAME_IN_PATH_SUCCESS ((REF struct path *)FDIRNODE_RENAME_SUCCESS)
 #define FDIRNODE_RENAME_IN_PATH_EXISTS  ((REF struct path *)FDIRNODE_RENAME_EXISTS)
 #define FDIRNODE_RENAME_IN_PATH_DELETED ((REF struct path *)FDIRNODE_RENAME_DELETED)
-STATIC_ASSERT(!ADDR_ISKERN(FDIRNODE_RENAME_IN_PATH_SUCCESS));
-STATIC_ASSERT(!ADDR_ISKERN(FDIRNODE_RENAME_IN_PATH_EXISTS));
-STATIC_ASSERT(!ADDR_ISKERN(FDIRNODE_RENAME_IN_PATH_DELETED));
+STATIC_ASSERT(!ADDR_ISKERN(FDIRNODE_RENAME_SUCCESS));
+STATIC_ASSERT(!ADDR_ISKERN(FDIRNODE_RENAME_EXISTS));
+STATIC_ASSERT(!ADDR_ISKERN(FDIRNODE_RENAME_DELETED));
 
 PRIVATE WUNUSED NONNULL((1, 2, 3)) REF struct path *KCALL
 fdirnode_exchange_paths(struct path *oldpath, struct path *newpath,
@@ -611,7 +609,7 @@ fdirnode_exchange_paths(struct path *oldpath, struct path *newpath,
 				path_cldlist_rehash_before_insert(oldpath); /* Must move sub-path `newpath_subpath_with_newname' from `newpath' to `oldpath' */
 		}
 		/* Invoke the FS-level rename operation */
-		status = (REF struct path *)fdirnode_rename(newpath->p_dir, info);
+		status = (REF struct path *)(uintptr_t)fdirnode_rename(newpath->p_dir, info);
 	} EXCEPT {
 		if (oldpath_subpath_with_oldname)
 			path_cldlist_rehash_after_remove(newpath);
@@ -746,7 +744,7 @@ fdirnode_replace_paths(struct path *oldpath, struct path *newpath,
 
 		TRY {
 			/* Invoke the FS-level rename operation */
-			status = (REF struct path *)fdirnode_rename(newpath->p_dir, info);
+			status = (REF struct path *)(uintptr_t)fdirnode_rename(newpath->p_dir, info);
 		} EXCEPT {
 			if (ovrd_path) {
 				path_decref_and_unlock_whole_tree(ovrd_path);
@@ -1014,7 +1012,7 @@ fdirnode_rename_in_path(struct path *oldpath, struct path *newpath,
 		kfree(newname_copy);
 	} else {
 		/* Invoke the FS-level rename operation */
-		status = (REF struct path *)fdirnode_rename(newpath->p_dir, info);
+		status = (REF struct path *)(uintptr_t)fdirnode_rename(newpath->p_dir, info);
 	}
 
 	return (REF struct path *)status;

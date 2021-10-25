@@ -463,7 +463,7 @@ handle_result_after_wrlock:
  *    - If the read entry wasn't the last, release locks, destroy it, and return `false'
  *  - Append the new entry at the end of `self', and insert it into its hash-vector
  *  - Return `true', passing ownership of the (now write-)lock back to the caller.
- * @return: true:  Read-lock was upgraded & one more entry was added
+ * @return: true:  Read-lock was upgraded & one more entry was added (or EOF was set)
  * @return: false: Read-lock was released & nothing was read */
 PRIVATE NONNULL((1)) bool KCALL
 fflatdirnode_readdir_and_upgrade(struct fflatdirnode *__restrict self) {
@@ -512,7 +512,7 @@ fflatdirnode_readdir_and_upgrade(struct fflatdirnode *__restrict self) {
 handle_ent_after_wrlock:
 	if (!ent) {
 		self->fdn_data.fdd_flags |= FFLATDIR_F_EOF;
-		return;
+		return true;
 	}
 
 	/* Prepare the files hash-vector for the addition of another file. */
@@ -1596,7 +1596,7 @@ again_locked:
 
 PRIVATE NONNULL((1)) size_t KCALL
 fflatdirenum_v_readdir(struct fdirenum *__restrict self, USER CHECKED struct dirent *buf,
-                       size_t bufsize, readdir_mode_t readdir_mode, iomode_t mode)
+                       size_t bufsize, readdir_mode_t readdir_mode, iomode_t UNUSED(mode))
 		THROWS(...) {
 	ssize_t result;
 	pos_t oldpos, real_oldpos;
@@ -1795,7 +1795,7 @@ PUBLIC struct fflatdirent fflatdirnode_deleted_dirent = {
 		.fd_hash    = FDIRENT_EMPTY_HASH,
 		.fd_namelen = 0,
 		.fd_type    = DT_UNKNOWN,
-		.fd_name    = "",
+		/* .fd_name = */ "",
 	},
 };
 

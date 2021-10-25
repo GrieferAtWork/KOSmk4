@@ -235,7 +235,7 @@ PRIVATE struct mfile_stream_ops const blkpart_stream_ops = {
 };
 
 /* Operators used for block device partitions */
-PUBLIC struct blkdev_ops const blkpart_ops = {
+PUBLIC_CONST struct blkdev_ops const blkpart_ops = {
 	.bdo_dev = {
 		.do_node = {
 			.dno_node = {
@@ -383,7 +383,7 @@ blkdev_makeparts_loadefi(struct blkdev *__restrict self,
 		blkdev_rdsectors(self, efi_pos, pagedir_translate(efi), sizeof(struct mbr_sector));
 	} else {
 		efi = (struct efi_descriptor *)alloca(sizeof(struct efi_descriptor));
-		mfile_read(self, efi, sizeof(struct efi_descriptor), efi_pos);
+		mfile_readall(self, efi, sizeof(struct efi_descriptor), efi_pos);
 	}
 
 	/* Validate the EFI signature magic. */
@@ -460,7 +460,7 @@ blkdev_makeparts_loadefi(struct blkdev *__restrict self,
 				memcpy((byte_t *)&part + avail, (byte_t *)efi, missing);
 			}
 		} else {
-			mfile_read(self, &part, efi_entsize, efi_entbase);
+			mfile_readall(self, &part, efi_entsize, efi_entbase);
 		}
 
 		/* At this point, the partition in question was loaded into `part'.
@@ -613,10 +613,10 @@ blkdev_makeparts_from_mbr(struct blkdev *__restrict self,
 		if (mbr->mbr_part[i].pt.pt_sysid == MBR_SYSID_UNUSED)
 			continue; /* Unused partition */
 		if (mbr_partition_is48(&mbr->mbr_part[i])) {
-			lba_min = LETOH32(mbr->mbr_part[i].pt_48.pt_lbastart);
-			lba_min |= LETOH16(mbr->mbr_part[i].pt_48.pt_lbastarthi) << 32;
-			lba_cnt = LETOH32(mbr->mbr_part[i].pt_48.pt_lbasize);
-			lba_cnt |= LETOH16(mbr->mbr_part[i].pt_48.pt_lbasizehi) << 32;
+			lba_min = (uint64_t)LETOH32(mbr->mbr_part[i].pt_48.pt_lbastart);
+			lba_min |= (uint64_t)LETOH16(mbr->mbr_part[i].pt_48.pt_lbastarthi) << 32;
+			lba_cnt = (uint64_t)LETOH32(mbr->mbr_part[i].pt_48.pt_lbasize);
+			lba_cnt |= (uint64_t)LETOH16(mbr->mbr_part[i].pt_48.pt_lbasizehi) << 32;
 		} else {
 			lba_min = LETOH32(mbr->mbr_part[i].pt_32.pt_lbastart);
 			lba_cnt = LETOH32(mbr->mbr_part[i].pt_32.pt_lbasize);
@@ -732,7 +732,7 @@ blkdev_makeparts_loadmbr(struct blkdev *__restrict self,
 		blkdev_rdsectors(self, mbr_pos, pagedir_translate(mbr), sizeof(struct mbr_sector));
 	} else {
 		mbr = (struct mbr_sector *)alloca(sizeof(struct mbr_sector));
-		mfile_read(self, mbr, sizeof(struct mbr_sector), mbr_pos);
+		mfile_readall(self, mbr, sizeof(struct mbr_sector), mbr_pos);
 	}
 
 	/* Parse the MBR */
@@ -1169,7 +1169,6 @@ blkdev_repart_and_register(struct blkdev *__restrict self)
 
 	/* Register all of the new partitions */
 	LIST_FOREACH (dev, &newparts, bd_partinfo.bp_partlink) {
-		struct fdevfsdirent *name = dev->dv_dirent;
 		if (devfs_root_nameused(dev->dv_dirent)) {
 			DBG_memset(&dev->dv_byname_node, 0xcc, sizeof(dev->dv_byname_node));
 			dev->dv_byname_node.rb_lhs = DEVICE_BYNAME_DELETED;

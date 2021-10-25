@@ -300,7 +300,7 @@ NOTHROW(FCALL path_destroy)(struct path *__restrict self) {
 
 /* Empty hash-vector for `struct path::p_cldlist' */
 DATDEF struct path_bucket const _path_empty_cldlist[1] ASMNAME("path_empty_cldlist");
-PUBLIC struct path_bucket const _path_empty_cldlist[1] = { { NULL } };
+PUBLIC_CONST struct path_bucket const _path_empty_cldlist[1] = { { NULL } };
 
 
 /* Helper macros for working with `struct path::p_cldlock' */
@@ -309,6 +309,8 @@ NOTHROW(FCALL _path_cldlock_reap)(struct path *__restrict self) {
 #ifndef __INTELLISENSE__
 #define __LOCAL_self      (&self->p_cldlops)
 #define __LOCAL_obj       self
+#define __LOCAL_type      path
+#define __LOCAL_type      path
 #define __LOCAL_trylock() path_cldlock_trywrite(self)
 #define __LOCAL_unlock()  _path_cldlock_endwrite(self)
 #include <libc/template/lockop.h>
@@ -597,7 +599,7 @@ PUBLIC WUNUSED NONNULL((1)) REF struct path *KCALL
 path_lookupchildref_withlock(struct path *__restrict self,
                              /*utf-8*/ USER CHECKED char const *name,
                              u16 namelen, uintptr_t namehash,
-                             atflag_t atflags DFL(0))
+                             atflag_t atflags)
 		THROWS(E_FSERROR_DELETED, E_SEGFAULT) {
 	REF struct path *result;
 	result = path_lookupchild_withlock(self, name, namelen,
@@ -1675,7 +1677,6 @@ path_open_ex(struct path *cwd, u32 *__restrict premaining_symlinks,
 		result.h_mode = IO_FROM_OPENFLAG(oflags);
 	} else if (oflags & O_CREAT) {
 		REF struct filehandle *rhand;
-		REF struct mfile *file;
 		REF struct path *access_path;
 		struct fmkfile_info info;
 		VALIDATE_FLAGSET(oflags,

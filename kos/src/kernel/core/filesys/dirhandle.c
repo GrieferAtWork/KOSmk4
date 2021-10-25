@@ -320,7 +320,6 @@ handle_dirhandle_hop(struct dirhandle *__restrict self, syscall_ulong_t cmd,
 INTDEF NONNULL((1)) REF void *KCALL
 handle_dirhandle_tryas(struct dirhandle *__restrict self,
                        uintptr_half_t wanted_type) THROWS(E_WOULDBLOCK) {
-	REF struct fdirnode *dir;
 	switch (wanted_type) {
 	case HANDLE_TYPE_MFILE:
 		return incref(self->dh_enum.de_dir);

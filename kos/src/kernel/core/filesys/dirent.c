@@ -109,7 +109,8 @@ handle_fdirent_pread(struct fdirent *__restrict self,
 
 INTERN WUNUSED NONNULL((1, 2)) size_t KCALL
 handle_fdirent_preadv(struct fdirent *__restrict self,
-                      struct iov_buffer *__restrict dst, size_t num_bytes,
+                      struct iov_buffer *__restrict dst,
+                      size_t UNUSED(num_bytes),
                       pos_t addr, iomode_t mode) THROWS(...) {
 	size_t result = 0;
 	struct iov_entry ent;
@@ -149,7 +150,7 @@ handle_fdirent_stat(struct fdirent *__restrict self,
 	result->st_size = (typeof(result->st_size))self->fd_namelen;
 }
 
-INTERN WUNUSED NONNULL((1)) poll_mode_t KCALL
+INTERN ATTR_CONST WUNUSED NONNULL((1)) poll_mode_t KCALL
 handle_fdirent_polltest(struct fdirent *__restrict UNUSED(self),
                         poll_mode_t what) THROWS(...) {
 	return what & POLLINMASK;

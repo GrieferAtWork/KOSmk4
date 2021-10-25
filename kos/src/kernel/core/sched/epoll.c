@@ -470,8 +470,9 @@ epoll_controller_create(void) THROWS(E_BADALLOC) {
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL _epoll_controller_lock_reap)(struct epoll_controller *__restrict self) {
 #ifndef __INTELLISENSE__
-#define __LOCAL_self      (&self->_ec_lops)
-#define __LOCAL_obj       ((void *)self)
+#define __LOCAL_self      (&self->ec_lops)
+#define __LOCAL_obj       self
+#define __LOCAL_type      epoll_controller
 #define __LOCAL_trylock() epoll_controller_lock_tryacquire(self)
 #define __LOCAL_unlock()  _epoll_controller_lock_release(self)
 #include <libc/template/lockop.h>

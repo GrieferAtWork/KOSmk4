@@ -24,10 +24,14 @@
 
 #include <kernel/compiler.h>
 
+#include <fs/node.h>
 #include <fs/vfs.h>
+#include <kernel/driver-param.h>
+#include <kernel/driver.h>
 
 #include <hybrid/atomic.h>
 
+#include <kos/except.h>
 #include <kos/except/reason/noexec.h>
 
 #include <ctype.h>
@@ -133,6 +137,13 @@ shebang_exec(struct execargs *__restrict args) {
 			REF struct path /*           */ *interp_path;
 			REF struct fdirent /**/ *interp_dentry;
 			REF struct regular_node /*   */ *interp_node;
+#ifdef CONFIG_USE_NEW_FS
+			{
+				u32 lnks = ATOMIC_READ(THIS_FS->fs_lnkmax);
+				interp_node = (REF struct regular_node *)path_traversefull_ex(args->ea_xpath, &lnks, execfile, 0,
+				                                                              &interp_path, &interp_dentry);
+			}
+#else /* CONFIG_USE_NEW_FS */
 			{
 				struct fs *myfs = THIS_FS;
 				REF struct path *search_root;
@@ -155,13 +166,15 @@ shebang_exec(struct execargs *__restrict args) {
 				                                                              NULL,
 				                                                              &interp_dentry);
 			}
+#endif /* !CONFIG_USE_NEW_FS */
 			TRY {
 				char *inject_arg0, *inject_arg1;
 				size_t more_argc;
 				/* Assert that the specified node is a regular file. */
-#if 0 /* TODO */
-				vm_exec_assert_regular(interp_node);
-#endif
+#ifdef CONFIG_USE_NEW_FS
+				if unlikely(!fnode_isreg(interp_node))
+					THROW(E_NOT_EXECUTABLE_NOT_REGULAR);
+#endif /* CONFIG_USE_NEW_FS */
 
 				/* Check for execute permissions? */
 				inode_access(interp_node, R_OK | X_OK);
