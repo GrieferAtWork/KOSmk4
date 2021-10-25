@@ -239,14 +239,16 @@ NOTHROW(FCALL path_decref_and_delete_and_unlock_whole_tree)(struct path *__restr
 			if (child && wasdestroyed(child))
 				old_buckets[i].pb_path = NULL;
 		}
-		kfree(old_buckets);
 	}
 	DBG_memset(&self->p_cldused, 0xcc, sizeof(self->p_cldused));
 	DBG_memset(&self->p_cldsize, 0xcc, sizeof(self->p_cldsize));
 	DBG_memset(&self->p_cldmask, 0xcc, sizeof(self->p_cldmask));
 	path_cldlock_endwrite(self);
+
 	/* Remove `self' from the recent-cache of the VFS. (Possibly through use of a LOP) */
 	path_remove_from_recent(self);
+
+	/* Drop the reference we inherited from our caller. */
 	decref(self);
 
 	if (old_buckets != PATH_CLDLIST_DELETED &&
@@ -426,6 +428,7 @@ again_acquire_cldlock:
 			/* Mark `existing_path' (and its entire sub-tree) as having been deleted. */
 			if (pdeleted_dirent)
 				*pdeleted_dirent = incref(existing_path->p_name);
+			incref(existing_path); /* Because `path_decref_and_delete_and_unlock_whole_tree()' inherits a reference */
 			path_decref_and_delete_and_unlock_whole_tree(existing_path);
 
 			/* Write-back information about what got deleted (if requested) */
@@ -774,6 +777,7 @@ fdirnode_replace_paths(struct path *oldpath, struct path *newpath,
 		if (ovrd_path) {
 			path_cldlist_remove_force(newpath, ovrd_path);           /* Remove path that gets overwritten */
 			path_decref_and_delete_and_unlock_whole_tree(ovrd_path); /* Mark overwritten tree as deleted. */
+			ovrd_path = NULL; /* Inherited by `path_decref_and_delete_and_unlock_whole_tree()' (prevent decref below) */
 			if (!move_path)
 				path_cldlist_rehash_after_remove(newpath);
 		}
@@ -1332,36 +1336,6 @@ waitfor_status_writelock:
 
 
 
-/* Replace `self' with a mounting point for `dir'. If appropriate, the
- * caller is responsible for checking  for an existing mounting  point
- * (by  use of `path_ismount(self)'), if such a case isn't allowed, as
- * usually handled by throwing `E_FSERROR_PATH_ALREADY_MOUNTED'.
- * @throw: E_FSERROR_DELETED:E_FILESYSTEM_DELETED_PATH:
- *         `self' has a parent which has been marked as `PATH_CLDLIST_DELETED',
- *         or `self' is a VFS root path who's VFS controller has been destroyed
- *         or altered to point to some other path.
- * @throw: E_FSERROR_DELETED:E_FILESYSTEM_DELETED_UNMOUNTED:
- *         The superblock of `dir' indicate `FSUPER_MOUNTS_DELETED'
- * @return: * : The  new  path  node  replacing   `self'  and  pointing  to   `dir'.
- *              This path node is also referenced by `_path_getvfs(self)->vf_mounts'
- *              and has replaced `self' within the filesystem hierarchy, though  any
- *              path-relative filesystem operations that use some existing reference
- *              to `self' will continue to operate  with the old path `self'  (since
- *              the old path didn't get modified but replaced with a newly allocated
- *              path). */
-PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) REF struct pathmount *KCALL
-path_mount(struct path *__restrict self,
-           struct fdirnode *__restrict dir)
-		THROWS(E_WOULDBLOCK, E_BADALLOC, E_FSERROR_DELETED) {
-	/* TODO */
-	(void)self;
-	(void)dir;
-	THROW(E_NOT_IMPLEMENTED_TODO);
-}
-
-
-
-
 /* Go through  all paths  starting at  `self' and  unlink `pm_vsmount'  for
  * every mounting point encountered during this. The caller must be holding
  * locks  to `self' and its entire sub-tree, as well as VFS->vf_mountslock.
@@ -1433,15 +1407,18 @@ path_umount(struct pathmount *__restrict self)
 	if (!tryincref(pathvfs))
 		return false;
 	FINALLY_DECREF_UNLIKELY(pathvfs);
-	RAII_FINALLY { kfree(replacement_mount); };
+	RAII_FINALLY {
+		if unlikely(replacement_mount)
+			_pathmount_free(replacement_mount);
+	};
 
 	/* Lock the entire file-tree described by `self' */
 again_acquire_locks:
 	blocking_path = path_tryincref_and_trylock_whole_tree(self);
 	if unlikely(blocking_path) {
 		FINALLY_DECREF_UNLIKELY(blocking_path);
-		path_cldlock_write(self);
-		path_cldlock_endwrite(self);
+		path_cldlock_write(blocking_path);
+		path_cldlock_endwrite(blocking_path);
 		goto again_acquire_locks;
 	}
 
@@ -1477,14 +1454,16 @@ again_acquire_locks:
 		/* If we're still the root path, replace said path with . */
 		if likely(pathvfs->vf_root == self) {
 			if (!replacement_mount) {
-				replacement_mount = (struct pathmount *)kmalloc_nx(sizeof(struct pathmount),
-				                                                   GFP_NORMAL | GFP_ATOMIC);
-				if (!replacement_mount) {
+#ifdef _pathmount_alloc_atomic_nx
+				replacement_mount = _pathmount_alloc_atomic_nx();
+				if (!replacement_mount)
+#endif /* _pathmount_alloc_atomic_nx */
+				{
 					vfs_rootlock_endwrite(pathvfs);
 					vfs_driveslock_endwrite(pathvfs);
 					vfs_mountslock_release(pathvfs);
 					path_decref_and_unlock_whole_tree(self);
-					replacement_mount = (struct pathmount *)kmalloc(sizeof(struct pathmount), GFP_NORMAL);
+					replacement_mount = _pathmount_alloc();
 					goto again_acquire_locks;
 				}
 			}
@@ -1498,6 +1477,10 @@ again_acquire_locks:
 			TAILQ_ENTRY_UNBOUND_INIT(&replacement_mount->p_recent);
 			shared_rwlock_init(&replacement_mount->p_cldlock);
 			SLIST_INIT(&replacement_mount->p_cldlops);
+			replacement_mount->p_cldused = 0;
+			replacement_mount->p_cldsize = 0;
+			replacement_mount->p_cldmask = 0;
+			replacement_mount->p_cldlist = path_empty_cldlist;
 
 			/* Must also link into `fsuper_unmounted's list of mounting points. */
 			if (!fsuper_mounts_trywrite(&fsuper_unmounted)) {
@@ -1520,6 +1503,32 @@ again_acquire_locks:
 			replacement_mount = NULL;    /* Prevent this one from being free'd */
 		}
 		vfs_rootlock_endwrite(pathvfs);
+	} else {
+		REF struct path *parent;
+again_load_parent:
+		parent = path_getparent(self);
+		if (!path_cldlock_trywrite(parent)) {
+			vfs_driveslock_endwrite(pathvfs);
+			vfs_mountslock_release(pathvfs);
+			path_decref_and_unlock_whole_tree(self);
+			FINALLY_DECREF_UNLIKELY(parent);
+			path_cldlock_write(parent);
+			path_cldlock_endwrite(parent);
+			goto again_acquire_locks;
+		}
+		if unlikely(parent != self->p_parent) {
+			path_cldlock_endwrite(parent);
+			decref_unlikely(parent);
+			goto again_load_parent;
+		}
+
+		/* Remove `self' from `parent's child-list */
+		if (parent->p_cldlist != PATH_CLDLIST_DELETED) {
+			path_cldlist_remove_force(parent, self);
+			path_cldlist_rehash_after_remove(parent);
+		}
+		path_cldlock_endwrite(parent);
+		decref_unlikely(parent);
 	}
 
 	/* Eventually, we want to return indicative of the caller-given
@@ -1546,7 +1555,191 @@ again_acquire_locks:
 	 *    which in  turn removes  used-to-be  mounting points  from  super
 	 *    mounting point lists, and finally: if such a list becomes empty,
 	 *    `fsuper_delete()' is called,  which does  the fs-level  unmount! */
+	incref(self); /* Inherited by `path_decref_and_delete_and_unlock_whole_tree()' */
 	path_decref_and_delete_and_unlock_whole_tree(self);
+	return result;
+}
+
+
+
+
+/* Replace `self' with a mounting point for `dir'. If appropriate, the
+ * caller is responsible for checking  for an existing mounting  point
+ * (by  use of `path_ismount(self)'), if such a case isn't allowed, as
+ * usually handled by throwing `E_FSERROR_PATH_ALREADY_MOUNTED'.
+ * @throw: E_FSERROR_DELETED:E_FILESYSTEM_DELETED_PATH:
+ *         `self' has a parent which has been marked as `PATH_CLDLIST_DELETED',
+ *         or `self' is a VFS root path who's VFS controller has been destroyed
+ *         or altered to point to some other path.
+ * @throw: E_FSERROR_DELETED:E_FILESYSTEM_DELETED_UNMOUNTED:
+ *         The superblock of `dir' indicate `FSUPER_MOUNTS_DELETED'
+ * @return: * : The  new  path  node  replacing   `self'  and  pointing  to   `dir'.
+ *              This path node is also referenced by `_path_getvfs(self)->vf_mounts'
+ *              and has replaced `self' within the filesystem hierarchy, though  any
+ *              path-relative filesystem operations that use some existing reference
+ *              to `self' will continue to operate  with the old path `self'  (since
+ *              the old path didn't get modified but replaced with a newly allocated
+ *              path). */
+PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) REF struct pathmount *KCALL
+path_mount(struct path *__restrict self, struct fdirnode *__restrict dir)
+		THROWS(E_WOULDBLOCK, E_BADALLOC, E_FSERROR_DELETED) {
+	REF struct pathmount *result;
+	REF struct vfs *pathvfs;
+	REF struct path *parent = NULL;
+	struct fsuper *super    = dir->fn_super;
+
+	/* Load the associated VFS controller. */
+	pathvfs = _path_getvfs(self);
+	if (!tryincref(pathvfs))
+		THROW(E_FSERROR_DELETED, E_FILESYSTEM_DELETED_PATH);
+	FINALLY_DECREF_UNLIKELY(pathvfs);
+
+	/* Allocate the new mounting point path. */
+	result = _pathmount_alloc();
+
+	/* Fill in fields of the new mounting point. */
+	result->p_refcnt = 2; /* +1: return, +1: `path_cldlist_insert(parent, result);' / `pathvfs->vf_root' */
+	result->p_flags  = PATH_F_ISMOUNT;
+	result->p_name   = self->p_name; /* incref'd later */
+	result->p_dir    = dir;          /* incref'd later */
+	TAILQ_ENTRY_UNBOUND_INIT(&result->p_recent);
+	shared_rwlock_init(&result->p_cldlock);
+	SLIST_INIT(&result->p_cldlops);
+	result->p_cldused = 0;
+	result->p_cldsize = 0;
+	result->p_cldmask = 0;
+	result->p_cldlist = path_empty_cldlist;
+
+	TRY {
+		/* Acquire necessary locks:
+		 *  - path_tryincref_and_trylock_whole_tree(self);
+		 *  - vfs_mountslock_tryacquire(pathvfs);
+		 *  - vfs_driveslock_trywrite(pathvfs); // In case a DOS drive gets deleted
+		 *  - fsuper_mounts_trywrite(super)
+		 *  - path_isroot(self) ?        vfs_rootlock_trywrite(pathvfs)
+		 *                      : path_cldlock_trywrite(self->p_parent)
+		 */
+		REF struct path *blocking_path;
+
+		/* Lock the entire file-tree described by `self' */
+again_acquire_locks:
+		blocking_path = path_tryincref_and_trylock_whole_tree(self);
+		if unlikely(blocking_path) {
+			FINALLY_DECREF_UNLIKELY(blocking_path);
+			path_cldlock_write(blocking_path);
+			path_cldlock_endwrite(blocking_path);
+			goto again_acquire_locks;
+		}
+		if (!vfs_mountslock_tryacquire(pathvfs)) {
+			path_decref_and_unlock_whole_tree(self);
+			while (!vfs_mountslock_available(pathvfs))
+				task_yield();
+			goto again_acquire_locks;
+		}
+		if (!vfs_driveslock_trywrite(pathvfs)) {
+			vfs_mountslock_release(pathvfs);
+			path_decref_and_unlock_whole_tree(self);
+			while (!vfs_driveslock_canwrite(pathvfs))
+				task_yield();
+			goto again_acquire_locks;
+		}
+		if (!fsuper_mounts_trywrite(super)) {
+			vfs_driveslock_endwrite(pathvfs);
+			vfs_mountslock_release(pathvfs);
+			path_decref_and_unlock_whole_tree(self);
+			while (!fsuper_mounts_canwrite(super))
+				task_yield();
+			goto again_acquire_locks;
+		}
+		if unlikely(path_isroot(self)) {
+			parent = NULL;
+			if (!vfs_rootlock_trywrite(pathvfs)) {
+				fsuper_mounts_endwrite(super);
+				vfs_driveslock_endwrite(pathvfs);
+				vfs_mountslock_release(pathvfs);
+				path_decref_and_unlock_whole_tree(self);
+				while (!vfs_rootlock_canwrite(pathvfs))
+					task_yield();
+				goto again_acquire_locks;
+			}
+		} else {
+again_load_parent:
+			parent = path_getparent(self);
+			if (!path_cldlock_trywrite(parent)) {
+				fsuper_mounts_endwrite(super);
+				vfs_driveslock_endwrite(pathvfs);
+				vfs_mountslock_release(pathvfs);
+				path_decref_and_unlock_whole_tree(self);
+				FINALLY_DECREF_UNLIKELY(parent);
+				path_cldlock_write(parent);
+				path_cldlock_endwrite(parent);
+				goto again_acquire_locks;
+			}
+			if unlikely(parent != self->p_parent) {
+				path_cldlock_endwrite(parent);
+				decref_unlikely(parent);
+				goto again_load_parent;
+			}
+
+			/* Check if the parent path has been deleted. */
+			if unlikely(parent->p_cldlist == PATH_CLDLIST_DELETED) {
+				path_cldlock_endwrite(parent);
+				vfs_rootlock_endwrite(pathvfs);
+				fsuper_mounts_endwrite(super);
+				vfs_driveslock_endwrite(pathvfs);
+				vfs_mountslock_release(pathvfs);
+				path_decref_and_unlock_whole_tree(self);
+				decref_unlikely(parent);
+				THROW(E_FSERROR_DELETED, E_FILESYSTEM_DELETED_PATH);
+			}
+		}
+	} EXCEPT {
+		_pathmount_free(result);
+		RETHROW();
+	}
+	assert(!!path_isroot(self) == (parent == NULL));
+
+	/* Construct missing references */
+	incref(result->p_name);
+	incref(dir); /* For `result->p_dir' */
+
+	/* Delete any pre-existing mounting points reachable from `self' */
+	path_umount_subtree(self);
+
+	/* Hook the new mounting point within its superblock. */
+	LIST_INSERT_HEAD(&super->fs_mounts, result, pm_fsmount);
+
+	/* Hook the new mounting point within the VFS's list of mounting points. */
+	LIST_INSERT_HEAD(&pathvfs->vf_mounts, result, pm_vsmount);
+
+	if likely(parent) {
+		/* Replace `self' with `result' in the parent's child-list. */
+		path_cldlist_remove_force(parent, self);
+		path_cldlist_insert(parent, result);
+		path_cldlock_endwrite(parent);
+		result->p_parent = parent; /* Inherit reference */
+		incref(self); /* Inherited by `path_decref_and_delete_and_unlock_whole_tree()' below. */
+	} else {
+		result->p_flags |= PATH_F_ISROOT;
+		result->_p_vfs = weakincref(pathvfs);
+
+		/* Replace the VFS root path pointer with `result' */
+		assert(pathvfs->vf_root == self);
+		pathvfs->vf_root = result; /* Inherit reference (x2) */
+		vfs_rootlock_endwrite(pathvfs);
+	}
+
+	/* Release (remaining) locks. */
+	fsuper_mounts_endwrite(super);
+	vfs_driveslock_endwrite(pathvfs);
+	vfs_mountslock_release(pathvfs);
+
+	/* NOTE: This right  here also  marks all  paths reachable  from the  old
+	 *       path as having been deleted (since they're no longer reachable).
+	 * NOTE: This call also inherits the reference to `self' we received
+	 *       from  `path_cldlist_remove_force()'   /  `incref'd   above. */
+	path_decref_and_delete_and_unlock_whole_tree(self);
+
 	return result;
 }
 

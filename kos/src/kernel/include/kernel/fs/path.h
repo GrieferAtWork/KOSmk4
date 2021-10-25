@@ -657,8 +657,9 @@ struct pathmount
 
 
 /* Allocate mounting point paths */
-#define _pathmount_alloc() ((struct pathmount *)kmalloc(sizeof(struct pathmount), GFP_NORMAL))
-#define _pathmount_free(p) kfree(p)
+#define _pathmount_alloc_atomic_nx() ((struct pathmount *)kmalloc_nx(sizeof(struct pathmount), GFP_ATOMIC))
+#define _pathmount_alloc()           ((struct pathmount *)kmalloc(sizeof(struct pathmount), GFP_NORMAL))
+#define _pathmount_free(p)           kfree(p)
 
 #if 1 /* For now... */
 #define path_free(p) kfree(p)
@@ -685,8 +686,7 @@ struct pathmount
  *              the old path didn't get modified but replaced with a newly allocated
  *              path). */
 FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) REF struct pathmount *KCALL
-path_mount(struct path *__restrict self,
-           struct fdirnode *__restrict dir)
+path_mount(struct path *__restrict self, struct fdirnode *__restrict dir)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, E_FSERROR_DELETED);
 
 /* Unmount the  a given  path `self',  as well  as  all

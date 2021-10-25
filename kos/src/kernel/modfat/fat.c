@@ -2586,7 +2586,7 @@ Fat_OpenFileSystem(struct ffilesys *__restrict UNUSED(filesys),
 
 		/* Map the FAT table into memory. */
 		TRY {
-			result->ft_freefat = (struct mman_unmap_kram_job *)kmalloc(sizeof(struct mman_unmap_kram_job), GFP_NORMAL);
+			result->ft_freefat = mman_unmap_kram_cookie_alloc();
 			TRY {
 				/* In case there are multiple FAT copies, modifications made to the FAT table must
 				 * be synced in multiple locations across  the block-device. For this purpose,  we
@@ -2640,7 +2640,7 @@ Fat_OpenFileSystem(struct ffilesys *__restrict UNUSED(filesys),
 					RETHROW();
 				}
 			} EXCEPT {
-				kfree(result->ft_freefat);
+				mman_unmap_kram_cookie_free(result->ft_freefat);
 				RETHROW();
 			}
 		} EXCEPT {

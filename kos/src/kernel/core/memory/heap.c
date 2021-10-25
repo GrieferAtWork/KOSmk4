@@ -254,7 +254,7 @@ PRIVATE bool
 NOTHROW(KCALL quick_verify_mfree)(struct mfree *__restrict self) {
 	if __untraced(!IS_ALIGNED((uintptr_t)self, HEAP_ALIGNMENT))
 		goto bad;
-	TRY {
+	NESTED_TRY {
 		struct mfree **pself;
 		if __untraced(!IS_ALIGNED(self->mf_size, HEAP_ALIGNMENT))
 			goto bad;

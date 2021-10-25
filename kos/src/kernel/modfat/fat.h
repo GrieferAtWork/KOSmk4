@@ -446,7 +446,7 @@ struct fatsuper {
 	PFatSetFatIndirection   ft_fat_set;     /* [const][1..1] Write an entry to the FileAllocationTable. */
 	struct shared_rwlock    ft_fat_lock;    /* Lock for accessing the FileAllocationTable cache. */
 	void                   *ft_fat_table;   /* [lock(ft_fat_lock)][1..ft_fat_size][owned][const] Memory-mapping of the FAT table. */
-	struct mman_unmap_kram_job *ft_freefat; /* [1..1][owned][const] Used for unmapping `ft_fat_table' */
+	void                   *ft_freefat;     /* [1..1][owned][const] Used for unmapping `ft_fat_table' */
 	REF struct mfile       *ft_fat_file;    /* [1..1][const] The mem-file used to map `ft_fat_table'. */
 	FatClusterIndex         ft_free_pos;    /* [lock(ft_fat_lock)] Next cluster index that should be considered when search for free clusters. */
 	struct fflatsuper       ft_super;       /* Underlying superblock */

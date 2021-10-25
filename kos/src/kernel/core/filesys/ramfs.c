@@ -549,8 +549,7 @@ ramfs_dirnode_v_lookup(struct fdirnode *__restrict self,
 	me = (struct ramfs_dirnode *)self;
 	ramfs_dirdata_treelock_read(&me->rdn_dat);
 	TRY {
-		result = ramfs_dirdata_lookup(me, info);
-		xincref(&result->rde_ent);
+		result = xincref(ramfs_dirdata_lookup(me, info));
 	} EXCEPT {
 		ramfs_dirdata_treelock_endread(&me->rdn_dat);
 		RETHROW();
