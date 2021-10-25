@@ -300,15 +300,15 @@ typedef struct fatdirnode FatDirNode;
 
 
 struct fatdirent {
-	struct fat_dirent  fad_dos; /* [lock(:DIR->fdn_data.fdd_lock)] DOS directory  entry.
-	                             * This entry lives on-disk at `fatdirent_dosaddr(self)' */
-	struct fflatdirent fad_ent; /* Underlying directory entry. */
+	struct fat_dirent fad_dos; /* [lock(:DIR->fdn_data.fdd_lock)] DOS directory  entry.
+	                            * This entry lives on-disk at `fatdirent_dosaddr(self)' */
+	struct flatdirent fad_ent; /* Underlying directory entry. */
 };
-#define fdirent_asfat(self)     COMPILER_CONTAINER_OF(self, struct fatdirent, fad_ent.fde_ent)
-#define fflatdirent_asfat(self) COMPILER_CONTAINER_OF(self, struct fatdirent, fad_ent)
+#define fdirent_asfat(self)    COMPILER_CONTAINER_OF(self, struct fatdirent, fad_ent.fde_ent)
+#define flatdirent_asfat(self) COMPILER_CONTAINER_OF(self, struct fatdirent, fad_ent)
 
 /* Return the in-directory stream address where `fad_dos' lives. */
-#define fatdirent_dosaddr(self) (fflatdirent_endaddr(&(self)->fad_ent) - sizeof(struct fat_dirent))
+#define fatdirent_dosaddr(self) (flatdirent_endaddr(&(self)->fad_ent) - sizeof(struct fat_dirent))
 
 #define _fatdirent_alloc(namelen)                                                                \
 	((struct fatdirent *)kmalloc(__builtin_offsetof(struct fatdirent, fad_ent.fde_ent.fd_name) + \
@@ -371,13 +371,13 @@ struct fatregnode: fregnode {
 	FatNodeData frn_fdat; /* Fat node data. */
 };
 
-struct fatdirnode: fflatdirnode {
+struct fatdirnode: flatdirnode {
 	FatNodeData fdn_fdat; /* Fat node data. */
 	uint32_t    fdn_1dot; /* [lock(ATOMIC && WRITE_ONCE)] Position of "." entry in directory stream (or `(uint32_t)-1' if unknown). */
 	uint32_t    fdn_2dot; /* [lock(ATOMIC && WRITE_ONCE)] Position of ".." entry in directory stream (or `(uint32_t)-1' if unknown). */
 };
 #define FatDirNode_AsSuper(self) \
-	fflatsuper_asfat(fflatdirnode_assuper((struct fflatdirnode *)(self)))
+	flatsuper_asfat(flatdirnode_assuper((struct flatdirnode *)(self)))
 
 #ifdef CONFIG_FAT_CYGWIN_SYMLINKS
 typedef struct fatlnknode FatLnkNode;
@@ -387,18 +387,18 @@ struct fatlnknode: flnknode {
 #endif /* CONFIG_FAT_CYGWIN_SYMLINKS */
 
 #define fregnode_asfat(self)     ((FatRegNode *)(self))
-#define fflatdirnode_asfat(self) ((FatDirNode *)(self))
-#define fdirnode_asfat(self)     fflatdirnode_asfat(fdirnode_asflat(self))
+#define flatdirnode_asfat(self) ((FatDirNode *)(self))
+#define fdirnode_asfat(self)     flatdirnode_asfat(fdirnode_asflat(self))
 #define fdirnode_asfatsup(self)  FatDirNode_AsSuper(fdirnode_asfat(self))
 #ifdef CONFIG_FAT_CYGWIN_SYMLINKS
 #define flnknode_asfat(self)     ((FatLnkNode *)(self))
 #endif /* CONFIG_FAT_CYGWIN_SYMLINKS */
 #define fnode_asfatreg(self)   fregnode_asfat(fnode_asreg(self))
-#define fnode_asfatdir(self)   fflatdirnode_asfat(fnode_asflatdir(self))
+#define fnode_asfatdir(self)   flatdirnode_asfat(fnode_asflatdir(self))
 #define fnode_asfatlnk(self)   flnknode_asfat(fnode_aslnk(self))
 #define fnode_asfatsup(self)   FatDirNode_AsSuper(fnode_asfatdir(self))
 #define mfile_asfatreg(self)   fregnode_asfat(mfile_asreg(self))
-#define mfile_asfatdir(self)   fflatdirnode_asfat(mfile_asflatdir(self))
+#define mfile_asfatdir(self)   flatdirnode_asfat(mfile_asflatdir(self))
 #define mfile_asfatlnk(self)   flnknode_asfat(mfile_aslnk(self))
 #define mfile_asfatsup(self)   FatDirNode_AsSuper(mfile_asfatdir(self))
 
@@ -449,11 +449,11 @@ struct fatsuper {
 	void                   *ft_freefat;     /* [1..1][owned][const] Used for unmapping `ft_fat_table' */
 	REF struct mfile       *ft_fat_file;    /* [1..1][const] The mem-file used to map `ft_fat_table'. */
 	FatClusterIndex         ft_free_pos;    /* [lock(ft_fat_lock)] Next cluster index that should be considered when search for free clusters. */
-	struct fflatsuper       ft_super;       /* Underlying superblock */
+	struct flatsuper        ft_super;       /* Underlying superblock */
 	FatNodeData             ft_fdat;        /* Fat root directory node data. */
 };
-#define fflatsuper_asfat(self) COMPILER_CONTAINER_OF(self, FatSuperblock, ft_super)
-#define fsuper_asfat(self)     COMPILER_CONTAINER_OF(self, FatSuperblock, ft_super.ffs_super)
+#define flatsuper_asfat(self) COMPILER_CONTAINER_OF(self, FatSuperblock, ft_super)
+#define fsuper_asfat(self)    COMPILER_CONTAINER_OF(self, FatSuperblock, ft_super.ffs_super)
 
 
 /* Helpers for accessing `ft_fat_lock' */

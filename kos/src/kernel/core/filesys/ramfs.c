@@ -634,9 +634,9 @@ ramfs_dirnode_mknode_frominfo(struct fdirnode *__restrict self,
 	}	break;
 
 	case S_IFLNK:
-		result = _fclnknode_new(self->fn_super,
-		                        info->mkf_creat.c_symlink.s_text,
-		                        info->mkf_creat.c_symlink.s_size);
+		result = _clnknode_new(self->fn_super,
+		                       info->mkf_creat.c_symlink.s_text,
+		                       info->mkf_creat.c_symlink.s_size);
 		result->mf_ops = &ramfs_lnknode_ops.lno_node.no_file;
 		break;
 

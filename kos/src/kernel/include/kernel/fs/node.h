@@ -89,13 +89,13 @@ struct chrdev;
  *       │   ├─> fsuper                          # <kernel/fs/super.h>
  *       │   │   ├─> ramfs_super                 # <kernel/fs/ramfs.h>
  *       │   │   │   └─> devfs_super             # <kernel/fs/devfs.h>
- *       │   │   └─> fflatsuper                  # <kernel/fs/flat.h>
+ *       │   │   └─> flatsuper                   # <kernel/fs/flat.h>
  *       │   │       └─> [...]
  *       │   ├─> ramfs_dirnode
- *       │   └─> fflatdirnode                    # <kernel/fs/flat.h>
+ *       │   └─> flatdirnode                     # <kernel/fs/flat.h>
  *       │       └─> [...]
  *       ├─> flnknode                            # <kernel/fs/lnknode.h>: S_IFLNK
- *       │   ├─> fclnknode                       # <kernel/fs/clnknode.h>
+ *       │   ├─> clnknode                        # <kernel/fs/clnknode.h>
  *       │   └─> [...]
  *       ├─> fdevnode                            # <kernel/fs/devnode.h>: S_IFBLK, S_IFCHR
  *       │   └─> device                          # <kernel/fs/devfs.h>:   Base class for device nodes within devfs
@@ -205,9 +205,9 @@ struct fnode_ops {
 	 *  - self->fn_uid                      # Guarantied allowed by `fsuper_validuid()'
 	 *  - self->fn_gid                      # Guarantied allowed by `fsuper_validgid()'
 	 *  - self->_fnode_file_ mf_filesize    # Guarantied to be `<= fn_super->fs_feat.sf_filesize_max'
-	 *  - self->_fnode_file_ mf_atime       # Guarantied to be truncated via `fsuper_truncate_atime()'
-	 *  - self->_fnode_file_ mf_mtime       # Guarantied to be truncated via `fsuper_truncate_mtime()'
-	 *  - self->_fnode_file_ mf_ctime       # Guarantied to be truncated via `fsuper_truncate_ctime()' */
+	 *  - self->_fnode_file_ mf_atime       # Write to disk as would be truncated by `fsuper_truncate_atime()'
+	 *  - self->_fnode_file_ mf_mtime       # Write to disk as would be truncated by `fsuper_truncate_mtime()'
+	 *  - self->_fnode_file_ mf_ctime       # Write to disk as would be truncated by `fsuper_truncate_ctime()' */
 	NONNULL((1)) void
 	(KCALL *no_wrattr)(struct fnode *__restrict self)
 			THROWS(E_IOERROR, ...);

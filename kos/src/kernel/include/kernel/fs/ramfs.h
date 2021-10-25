@@ -45,17 +45,17 @@
 #ifdef __CC__
 DECL_BEGIN
 
-#define ramfs_lnknode            fclnknode /* Same type... */
-#define _ramfs_lnknode_lnode_    _fclnknode_lnode_
-#define _ramfs_lnknode_aslnknode _fclnknode_aslnknode
-#define _ramfs_lnknode_alloc     _fclnknode_alloc
-#define _ramfs_lnknode_new       _fclnknode_new
-#define _ramfs_lnknode_destroy   _fclnknode_destroy
+#define ramfs_lnknode            clnknode /* Same type... */
+#define _ramfs_lnknode_lnode_    _clnknode_lnode_
+#define _ramfs_lnknode_aslnknode _clnknode_aslnknode
+#define _ramfs_lnknode_alloc     _clnknode_alloc
+#define _ramfs_lnknode_new       _clnknode_new
+#define _ramfs_lnknode_destroy   _clnknode_destroy
 DATDEF struct flnknode_ops const ramfs_lnknode_ops;
-#define ramfs_lnknode_v_readlink fclnknode_v_readlink
-#define ramfs_lnknode_v_linkstr  fclnknode_v_linkstr
+#define ramfs_lnknode_v_readlink clnknode_v_readlink
+#define ramfs_lnknode_v_linkstr  clnknode_v_linkstr
 #define ramfs_lnknode_v_wrattr   fnode_v_wrattr_noop
-#define ramfs_lnknode_v_destroy  fclnknode_v_destroy
+#define ramfs_lnknode_v_destroy  clnknode_v_destroy
 
 
 #define ramfs_regnode              fregnode /* Same type... */

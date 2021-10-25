@@ -194,7 +194,7 @@ NOTHROW(KCALL fatdirent_v_destroy)(struct fdirent *__restrict self) {
 DEFINE_REFCOUNT_FUNCTIONS(struct fatdirent, fad_ent.fde_ent.fd_refcnt, __fatdirent_destroy)
 PRIVATE struct fdirent_ops const fatdirent_ops = {
 	.fdo_destroy  = &fatdirent_v_destroy,
-	.fdo_opennode = &fflatdirent_v_opennode,
+	.fdo_opennode = &flatdirent_v_opennode,
 };
 
 
@@ -702,9 +702,9 @@ Fat_WrAttr(struct fnode *__restrict self)
 	FINALLY_DECREF_UNLIKELY(ent);
 
 	/* Acquire a lock to the directory stream buffer. */
-	fflatdirnode_write(dir);
+	flatdirnode_write(dir);
 	TRY {
-		if likely(!fflatdirent_wasdeleted(&ent->fad_ent)) {
+		if likely(!flatdirent_wasdeleted(&ent->fad_ent)) {
 			FatClusterIndex first_cluster;
 			mode_t fmode;
 			struct timespec atm, mtm, ctm;
@@ -793,11 +793,11 @@ Fat_WrAttr(struct fnode *__restrict self)
 			            fatdirent_dosaddr(ent));
 		}
 	} EXCEPT {
-		fflatdirnode_endwrite(dir);
+		flatdirnode_endwrite(dir);
 		RETHROW();
 	}
 endwrite_and_return:
-	fflatdirnode_endwrite(dir);
+	flatdirnode_endwrite(dir);
 }
 
 
@@ -805,14 +805,14 @@ PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL FatReg_Destroy)(struct mfile *__restrict self) {
 	FatRegNode *me = mfile_asfatreg(self);
 	FatNodeData_Fini(&me->frn_fdat);
-	fflatdirnode_v_destroy(self);
+	flatdirnode_v_destroy(self);
 }
 
 PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL FatDir_Destroy)(struct mfile *__restrict self) {
 	FatDirNode *me = mfile_asfatdir(self);
 	FatNodeData_Fini(&me->fdn_fdat);
-	fflatdirnode_v_destroy(self);
+	flatdirnode_v_destroy(self);
 }
 
 #ifdef CONFIG_FAT_CYGWIN_SYMLINKS
@@ -820,7 +820,7 @@ PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL FatLnk_Destroy)(struct mfile *__restrict self) {
 	FatLnkNode *me = mfile_asfatlnk(self);
 	FatNodeData_Fini(&me->fln_fdat);
-	fflatdirnode_v_destroy(self);
+	flatdirnode_v_destroy(self);
 }
 
 PRIVATE byte_t const Fat_CygwinSymlinkMagic[] = { '!', '<', 's', 'y', 'm', 'l', 'i', 'n', 'k', '>' };
@@ -882,12 +882,12 @@ NOTHROW(FCALL decode_latin1)(/*utf-8*/ char *__restrict dest,
 #pragma GCC diagnostic ignored "-Waddress-of-packed-member"
 #endif /* __GNUC__ */
 
-PRIVATE WUNUSED struct fflatdirent *KCALL
-FatDir_ReadDir(struct fflatdirnode *__restrict self, pos_t pos)
+PRIVATE WUNUSED struct flatdirent *KCALL
+FatDir_ReadDir(struct flatdirnode *__restrict self, pos_t pos)
 		THROWS(E_BADALLOC, E_IOERROR) {
 	struct fatdirent *result;
 	struct fat_dirent ent;
-	FatDirNode *me = fflatdirnode_asfat(self);
+	FatDirNode *me = flatdirnode_asfat(self);
 	assert((pos % sizeof(struct fat_dirent)) == 0);
 
 	/* Read the next entry from disk. */
@@ -1216,12 +1216,12 @@ NOTHROW(FCALL FatDir_Contains83Filename)(FatDirNode const *__restrict self,
                                          char const filename[8 + 3]) {
 	size_t i;
 	for (i = 0; i <= self->fdn_data.fdd_filesmask; ++i) {
-		struct fflatdirent *ent;
+		struct flatdirent *ent;
 		ent = self->fdn_data.fdd_fileslist[i].ffdb_ent;
-		if (ent == NULL || ent == &fflatdirnode_deleted_dirent)
+		if (ent == NULL || ent == &flatdirnode_deleted_dirent)
 			continue; /* Unused slot */
-		assert(!fflatdirent_wasdeleted(ent));
-		if (memcmp(fflatdirent_asfat(ent)->fad_dos.f_nameext,
+		assert(!flatdirent_wasdeleted(ent));
+		if (memcmp(flatdirent_asfat(ent)->fad_dos.f_nameext,
 		           filename, (8 + 3) * sizeof(char)) == 0)
 			return true;
 	}
@@ -1519,8 +1519,8 @@ retry_lfn:
 
 
 PRIVATE WUNUSED NONNULL((1, 2, 3)) bool KCALL
-FatDir_WriteDir(struct fflatdirnode *__restrict self,
-                struct fflatdirent *__restrict ent_,
+FatDir_WriteDir(struct flatdirnode *__restrict self,
+                struct flatdirent *__restrict ent_,
                 struct fnode *__restrict file,
                 bool at_end_of_dir)
 		THROWS(E_IOERROR, E_FSERROR_DISK_FULL, E_FSERROR_ILLEGAL_PATH) {
@@ -1528,8 +1528,8 @@ FatDir_WriteDir(struct fflatdirnode *__restrict self,
 	size_t num_files;
 	struct fat_dirent files[FAT_DIRENT_PER_FILE_MAXCOUNT + 1];
 	REF struct fatdirent *oldent;
-	struct fatdirent *ent = fflatdirent_asfat(ent_);
-	FatDirNode *me        = fflatdirnode_asfat(self);
+	struct fatdirent *ent = flatdirent_asfat(ent_);
+	FatDirNode *me        = flatdirnode_asfat(self);
 	assert((ent->fad_ent.fde_pos % sizeof(struct fat_dirent)) == 0);
 	assert(file->fn_fsdata->fn_dir == me);
 
@@ -1598,17 +1598,17 @@ FatDir_WriteDir(struct fflatdirnode *__restrict self,
 }
 
 PRIVATE NONNULL((1, 2)) void KCALL
-FatDir_DeleteEnt(struct fflatdirnode *__restrict self,
-                 struct fflatdirent const *__restrict ent_,
+FatDir_DeleteEnt(struct flatdirnode *__restrict self,
+                 struct flatdirent const *__restrict ent_,
                  bool at_end_of_dir)
 		THROWS(E_IOERROR) {
 	pos_t ptr, end;
-	FatDirNode *me              = fflatdirnode_asfat(self);
-	struct fatdirent const *ent = fflatdirent_asfat(ent_);
+	FatDirNode *me              = flatdirnode_asfat(self);
+	struct fatdirent const *ent = flatdirent_asfat(ent_);
 	assert(ent->fad_ent.fde_size != 0);
 	assert((ent->fad_ent.fde_size % sizeof(struct fat_dirent)) == 0);
-	ptr = fflatdirent_basaddr(&ent->fad_ent);
-	end = fflatdirent_endaddr(&ent->fad_ent);
+	ptr = flatdirent_basaddr(&ent->fad_ent);
+	end = flatdirent_endaddr(&ent->fad_ent);
 
 	/* Mark directory entries as deleted. */
 	for (; ptr < end; ptr += sizeof(struct fat_dirent)) {
@@ -1623,12 +1623,12 @@ FatDir_DeleteEnt(struct fflatdirnode *__restrict self,
 }
 
 PRIVATE ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) struct fnode *KCALL
-FatDir_MkFile(struct fflatdirnode *__restrict self,
+FatDir_MkFile(struct flatdirnode *__restrict self,
               struct fmkfile_info const *__restrict info)
 		THROWS(E_BADALLOC, E_IOERROR, E_FSERROR_UNSUPPORTED_OPERATION);
 
-PRIVATE ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3)) struct fflatdirent *KCALL
-FatDir_MkEnt(struct fflatdirnode *__restrict UNUSED(self),
+PRIVATE ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3)) struct flatdirent *KCALL
+FatDir_MkEnt(struct flatdirnode *__restrict UNUSED(self),
              struct fmkfile_info const *__restrict info,
              struct fnode *__restrict UNUSED(file))
 		THROWS(E_BADALLOC, E_IOERROR) {
@@ -1663,16 +1663,16 @@ FatNode_GetFirstCluster(struct fnode *__restrict self)
 }
 
 PRIVATE NONNULL((1, 2, 3, 4)) void KCALL
-FatDir_AllocFile(struct fflatdirnode *__restrict self,
-                 struct fflatdirent *__restrict ent,
+FatDir_AllocFile(struct flatdirnode *__restrict self,
+                 struct flatdirent *__restrict ent,
                  struct fnode *__restrict file,
                  struct fmkfile_info const *__restrict info)
 		THROWS(E_BADALLOC, E_IOERROR) {
-	FatDirNode *me       = fflatdirnode_asfat(self);
+	FatDirNode *me       = flatdirnode_asfat(self);
 	FatNodeData *dat     = file->fn_fsdata;
 	FatSuperblock *super = fsuper_asfat(file->fn_super);
 	assert(dat->fn_dir == self);
-	assert(dat->fn_ent == fflatdirent_asfat(ent));
+	assert(dat->fn_ent == flatdirent_asfat(ent));
 	if (fnode_isdir(file)) {
 		/* Allocate template for `file'. */
 		struct fat_dirent hdr[3];
@@ -1739,16 +1739,16 @@ FatDir_AllocFile(struct fflatdirnode *__restrict self,
 }
 
 PRIVATE NONNULL((1, 2, 3)) void KCALL
-FatDir_DeleteFile(struct fflatdirnode *__restrict self,
-                  struct fflatdirent *__restrict deleted_ent,
+FatDir_DeleteFile(struct flatdirnode *__restrict self,
+                  struct flatdirent *__restrict deleted_ent,
                   struct fnode *__restrict file)
 		THROWS(E_IOERROR) {
-	FatDirNode *me       = fflatdirnode_asfat(self);
+	FatDirNode *me       = flatdirnode_asfat(self);
 	FatNodeData *dat     = file->fn_fsdata;
 	FatSuperblock *super = fsuper_asfat(me->fn_super);
 	FatClusterIndex *newvec;
 	assert(dat->fn_dir == me);
-	assert(dat->fn_ent == fflatdirent_asfat(deleted_ent));
+	assert(dat->fn_ent == flatdirent_asfat(deleted_ent));
 	FatNodeData_Write(dat);
 	assert(dat->fn_clusterc >= 1);
 	if (dat->fn_clusterv[0] < super->ft_cluster_eof) {
@@ -1781,23 +1781,23 @@ FatDir_DeleteFile(struct fflatdirnode *__restrict self,
 
 PRIVATE NONNULL((1, 2, 3, 4, 5)) void KCALL
 FatDir_DirentChanged(struct fnode *__restrict self,
-                     struct fflatdirnode *oldparent,
-                     struct fflatdirnode *newparent,
-                     struct fflatdirent *__restrict old_ent,
-                     struct fflatdirent *__restrict new_ent)
+                     struct flatdirnode *oldparent,
+                     struct flatdirnode *newparent,
+                     struct flatdirent *__restrict old_ent,
+                     struct flatdirent *__restrict new_ent)
 		THROWS(E_IOERROR) {
 	FatNodeData *dat = self->fn_fsdata;
-	assert(dat->fn_ent == fflatdirent_asfat(old_ent));
-	assert(dat->fn_dir == fflatdirnode_asfat(oldparent));
+	assert(dat->fn_ent == flatdirent_asfat(old_ent));
+	assert(dat->fn_dir == flatdirnode_asfat(oldparent));
 
 	/* Update saved meta-data values. */
 	incref(new_ent);
 	incref(newparent);
 	mfile_tslock_acquire(self);
-	dat->fn_ent = fflatdirent_asfat(new_ent);    /* Inherit reference */
-	dat->fn_dir = fflatdirnode_asfat(newparent); /* Inherit reference */
+	dat->fn_ent = flatdirent_asfat(new_ent);    /* Inherit reference */
+	dat->fn_dir = flatdirnode_asfat(newparent); /* Inherit reference */
 	mfile_tslock_release(self);
-	decref_nokill(fflatdirent_asfat(old_ent)); /* Old value of `dat->fn_ent' */
+	decref_nokill(flatdirent_asfat(old_ent)); /* Old value of `dat->fn_ent' */
 	decref_nokill(oldparent);                  /* Old value of `dat->fn_dir' */
 
 	if (fnode_isdir(self) && oldparent != newparent) {
@@ -1824,7 +1824,7 @@ PRIVATE struct fregnode_ops const Fat_RegOps = {
 		.no_wrattr = &Fat_WrAttr,
 	},
 };
-PRIVATE struct fflatdirnode_ops const Fat_DirOps = {
+PRIVATE struct flatdirnode_ops const Fat_DirOps = {
 	.fdno_dir = {
 		.dno_node = {
 			.no_file = {
@@ -1836,11 +1836,11 @@ PRIVATE struct fflatdirnode_ops const Fat_DirOps = {
 			},
 			.no_wrattr = &Fat_WrAttr,
 		},
-		.dno_lookup = &fflatdirnode_v_lookup,
-		.dno_enum   = &fflatdirnode_v_enum,
-		.dno_mkfile = &fflatdirnode_v_mkfile,
-		.dno_unlink = &fflatdirnode_v_unlink,
-		.dno_rename = &fflatdirnode_v_rename,
+		.dno_lookup = &flatdirnode_v_lookup,
+		.dno_enum   = &flatdirnode_v_enum,
+		.dno_mkfile = &flatdirnode_v_mkfile,
+		.dno_unlink = &flatdirnode_v_unlink,
+		.dno_rename = &flatdirnode_v_rename,
 	},
 	.fdno_flat = {
 		.fdnx_readdir       = &FatDir_ReadDir,
@@ -1936,7 +1936,7 @@ NOTHROW(KCALL FatSuper_Destroy)(struct mfile *__restrict self) {
 	                          me->ft_fat_size,
 	                          me->ft_freefat);
 	decref(me->ft_fat_file);
-	fflatsuper_v_destroy(self);
+	flatsuper_v_destroy(self);
 }
 
 PRIVATE NOBLOCK NONNULL((1)) void
@@ -1945,12 +1945,12 @@ NOTHROW(KCALL FatSuper_Free)(struct fnode *__restrict self) {
 }
 
 PRIVATE ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) struct fnode *KCALL
-FatDir_MkFile(struct fflatdirnode *__restrict self,
+FatDir_MkFile(struct flatdirnode *__restrict self,
               struct fmkfile_info const *__restrict info)
 		THROWS(E_BADALLOC, E_IOERROR, E_FSERROR_UNSUPPORTED_OPERATION) {
 	struct fnode *result;
 	FatSuperblock *super = fsuper_asfat(self->fn_super);
-	FatDirNode *me       = fflatdirnode_asfat(self);
+	FatDirNode *me       = flatdirnode_asfat(self);
 	FatNodeData *dat;
 
 	/* Allocate a new file-node with FAT operators */
@@ -1973,7 +1973,7 @@ FatDir_MkFile(struct fflatdirnode *__restrict self,
 		node->mf_flags = MFILE_F_NOUSRIO | MFILE_F_NOUSRMMAP;
 		atomic64_init(&node->mf_filesize, (uint64_t)-1);
 		node->fn_fsdata = &node->fdn_fdat;
-		fflatdirdata_init(&node->fdn_data);
+		flatdirdata_init(&node->fdn_data);
 		node->fdn_1dot = (uint32_t)-1;
 		node->fdn_2dot = (uint32_t)-1;
 		result = node;
@@ -2016,14 +2016,14 @@ FatDir_MkFile(struct fflatdirnode *__restrict self,
 }
 
 PRIVATE ATTR_RETNONNULL WUNUSED NONNULL((1)) struct fnode *KCALL
-FatSuper_MakeNode(struct fflatsuper *__restrict self,
-                  struct fflatdirent *__restrict ent_,
-                  struct fflatdirnode *__restrict dir_)
+FatSuper_MakeNode(struct flatsuper *__restrict self,
+                  struct flatdirent *__restrict ent_,
+                  struct flatdirnode *__restrict dir_)
 		THROWS(E_BADALLOC, E_IOERROR) {
 	struct fnode *result;
-	struct fatdirent *ent = fflatdirent_asfat(ent_);
-	FatDirNode *dir       = fflatdirnode_asfat(dir_);
-	FatSuperblock *super  = fflatsuper_asfat(self);
+	struct fatdirent *ent = flatdirent_asfat(ent_);
+	FatDirNode *dir       = flatdirnode_asfat(dir_);
+	FatSuperblock *super  = flatsuper_asfat(self);
 	FatNodeData *dat;
 
 	/* Allocate a new file-node with FAT operators */
@@ -2044,7 +2044,7 @@ FatSuper_MakeNode(struct fflatsuper *__restrict self,
 		node->mf_ops    = &Fat_DirOps.fdno_dir.dno_node.no_file;
 		node->mf_flags  = MFILE_F_NOUSRIO | MFILE_F_NOUSRMMAP;
 		node->fn_fsdata = &node->fdn_fdat;
-		fflatdirdata_init(&node->fdn_data);
+		flatdirdata_init(&node->fdn_data);
 		node->fdn_1dot = (uint32_t)-1;
 		node->fdn_2dot = (uint32_t)-1;
 		result = node;
@@ -2205,7 +2205,7 @@ FatSuper_Sync(struct fsuper *__restrict self)
 }
 
 
-PRIVATE struct fflatsuper_ops const Fat16_SuperOps = {
+PRIVATE struct flatsuper_ops const Fat16_SuperOps = {
 	.ffso_makenode = &FatSuper_MakeNode,
 	.ffso_super = {
 		.so_validuid       = &FatSuper_ValidUid,
@@ -2226,11 +2226,11 @@ PRIVATE struct fflatsuper_ops const Fat16_SuperOps = {
 				.no_free   = &FatSuper_Free,
 				.no_wrattr = &fnode_v_wrattr_noop,
 			},
-			.dno_lookup = &fflatdirnode_v_lookup,
-			.dno_enum   = &fflatdirnode_v_enum,
-			.dno_mkfile = &fflatdirnode_v_mkfile,
-			.dno_unlink = &fflatdirnode_v_unlink,
-			.dno_rename = &fflatdirnode_v_rename,
+			.dno_lookup = &flatdirnode_v_lookup,
+			.dno_enum   = &flatdirnode_v_enum,
+			.dno_mkfile = &flatdirnode_v_mkfile,
+			.dno_unlink = &flatdirnode_v_unlink,
+			.dno_rename = &flatdirnode_v_rename,
 		},
 	},
 	.ffso_flat = {
@@ -2243,7 +2243,7 @@ PRIVATE struct fflatsuper_ops const Fat16_SuperOps = {
 		.fdnx_deletefile = &FatDir_DeleteFile,
 	},
 };
-PRIVATE struct fflatsuper_ops const Fat32_SuperOps = {
+PRIVATE struct flatsuper_ops const Fat32_SuperOps = {
 	.ffso_makenode = &FatSuper_MakeNode,
 	.ffso_super = {
 		.so_validuid       = &FatSuper_ValidUid,
@@ -2264,11 +2264,11 @@ PRIVATE struct fflatsuper_ops const Fat32_SuperOps = {
 				.no_free   = &FatSuper_Free,
 				.no_wrattr = &fnode_v_wrattr_noop,
 			},
-			.dno_lookup = &fflatdirnode_v_lookup,
-			.dno_enum   = &fflatdirnode_v_enum,
-			.dno_mkfile = &fflatdirnode_v_mkfile,
-			.dno_unlink = &fflatdirnode_v_unlink,
-			.dno_rename = &fflatdirnode_v_rename,
+			.dno_lookup = &flatdirnode_v_lookup,
+			.dno_enum   = &flatdirnode_v_enum,
+			.dno_mkfile = &flatdirnode_v_mkfile,
+			.dno_unlink = &flatdirnode_v_unlink,
+			.dno_rename = &flatdirnode_v_rename,
 		},
 	},
 	.ffso_flat = {
@@ -2685,9 +2685,9 @@ Fat_OpenFileSystem(struct ffilesys *__restrict UNUSED(filesys),
 		                                            ? &Fat32_SuperOps.ffso_super.so_fdir.dno_node.no_file
 		                                            : &Fat16_SuperOps.ffso_super.so_fdir.dno_node.no_file;
 
-		/* Fill in fields relating to `fflatsuper' */
+		/* Fill in fields relating to `flatsuper' */
 		result->ft_super.ffs_features = FFLATSUPER_FEAT_WRITEDIR_CHANGES_INO;
-		fflatdirdata_init(&result->ft_super.ffs_rootdata);
+		flatdirdata_init(&result->ft_super.ffs_rootdata);
 	} EXCEPT {
 		kfree(result);
 		RETHROW();

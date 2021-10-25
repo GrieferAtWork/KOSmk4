@@ -228,11 +228,11 @@ FUNDEF NOBLOCK NONNULL((1)) __BOOL NOTHROW(FCALL fsuper_add2changed)(struct fsup
 /* Truncate the given `tms' to the near possible time value which
  * can be  encoded  within  filesystem-specific  data  structure. */
 #define fsuper_truncate_atime(self, tms) \
-	(void)(fsuper_getops(self)->so_truncate_atime && ((*fsuper_getops(self)->so_truncate_atime)(self, tms), 0))
+	(void)(!fsuper_getops(self)->so_truncate_atime || ((*fsuper_getops(self)->so_truncate_atime)(self, tms), 0))
 #define fsuper_truncate_mtime(self, tms) \
-	(void)(fsuper_getops(self)->so_truncate_mtime && ((*fsuper_getops(self)->so_truncate_mtime)(self, tms), 0))
+	(void)(!fsuper_getops(self)->so_truncate_mtime || ((*fsuper_getops(self)->so_truncate_mtime)(self, tms), 0))
 #define fsuper_truncate_ctime(self, tms) \
-	(void)(fsuper_getops(self)->so_truncate_ctime && ((*fsuper_getops(self)->so_truncate_ctime)(self, tms), 0))
+	(void)(!fsuper_getops(self)->so_truncate_ctime || ((*fsuper_getops(self)->so_truncate_ctime)(self, tms), 0))
 
 
 

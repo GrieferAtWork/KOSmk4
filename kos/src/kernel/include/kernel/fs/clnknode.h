@@ -32,35 +32,35 @@
 #ifdef __CC__
 DECL_BEGIN
 
-struct fclnknode
+struct clnknode
 #ifndef __WANT_FS_INLINE_STRUCTURES
     : flnknode                          /* Underlying symlink-node */
 #endif /* !__WANT_FS_INLINE_STRUCTURES */
 {
 #ifdef __WANT_FS_INLINE_STRUCTURES
 	struct flnknode         lnc_lnode;    /* Underlying symlink-node */
-#define _fclnknode_lnode_       lnc_lnode.
-#define _fclnknode_aslnknode(x) &(x)->lnc_lnode
+#define _clnknode_lnode_       lnc_lnode.
+#define _clnknode_aslnknode(x) &(x)->lnc_lnode
 #else /* __WANT_FS_INLINE_STRUCTURES */
-#define _fclnknode_lnode_       /* nothing */
-#define _fclnknode_aslnknode(x) x
+#define _clnknode_lnode_       /* nothing */
+#define _clnknode_aslnknode(x) x
 #endif /* !__cplusplus */
-	COMPILER_FLEXIBLE_ARRAY(char, lnc_text); /* [(_fclnknode_lnode_ _flnknode_node_ _fnode_file_ mf_fsize / sizeof(char)) + 1]
+	COMPILER_FLEXIBLE_ARRAY(char, lnc_text); /* [(_clnknode_lnode_ _flnknode_node_ _fnode_file_ mf_fsize / sizeof(char)) + 1]
 	                                          * NUL-terminated link constant-link node text. */
 };
 
 
 /************************************************************************/
-/* Default operators for `struct fclnknode'                             */
+/* Default operators for `struct clnknode'                             */
 /************************************************************************/
 FUNDEF WUNUSED NONNULL((1)) size_t KCALL
-fclnknode_v_readlink(struct flnknode *__restrict self,
-                     USER CHECKED /*utf-8*/ char *buf,
-                     size_t bufsize)
+clnknode_v_readlink(struct flnknode *__restrict self,
+                    USER CHECKED /*utf-8*/ char *buf,
+                    size_t bufsize)
 		THROWS(E_SEGFAULT);
 FUNDEF ATTR_CONST ATTR_RETNONNULL WUNUSED NONNULL((1)) char const *
-NOTHROW(KCALL fclnknode_v_linkstr)(struct flnknode *__restrict self);
-#define fclnknode_v_destroy fnode_v_destroy
+NOTHROW(KCALL clnknode_v_linkstr)(struct flnknode *__restrict self);
+#define clnknode_v_destroy fnode_v_destroy
 /************************************************************************/
 
 
@@ -71,26 +71,26 @@ NOTHROW(KCALL fclnknode_v_linkstr)(struct flnknode *__restrict self);
  * that _exactly_ `text_length' characters must still be initialized.
  *
  * The caller must still initialize:
- *  - return->_fclnknode_lnode_ _flnknode_node_ _fnode_file_ mf_ops     (using `fclnknode_v_*' operators)
- *  - return->_fclnknode_lnode_ _flnknode_node_ _fnode_file_ mf_atime
- *  - return->_fclnknode_lnode_ _flnknode_node_ _fnode_file_ mf_mtime
- *  - return->_fclnknode_lnode_ _flnknode_node_ _fnode_file_ mf_ctime
- *  - return->_fclnknode_lnode_ _flnknode_node_ fn_uid
- *  - return->_fclnknode_lnode_ _flnknode_node_ fn_gid
- *  - return->_fclnknode_lnode_ _flnknode_node_ fn_allnodes
- *  - return->_fclnknode_lnode_ _flnknode_node_ fn_supent
- *  - return->_fclnknode_lnode_ _flnknode_node_ fn_nlink
- *  - return->_fclnknode_lnode_ _flnknode_node_ fn_ino
- *  - return->_fclnknode_lnode_ _flnknode_node_ fn_mode (with something or'd with S_IFLNK)
+ *  - return->_clnknode_lnode_ _flnknode_node_ _fnode_file_ mf_ops     (using `clnknode_v_*' operators)
+ *  - return->_clnknode_lnode_ _flnknode_node_ _fnode_file_ mf_atime
+ *  - return->_clnknode_lnode_ _flnknode_node_ _fnode_file_ mf_mtime
+ *  - return->_clnknode_lnode_ _flnknode_node_ _fnode_file_ mf_ctime
+ *  - return->_clnknode_lnode_ _flnknode_node_ fn_uid
+ *  - return->_clnknode_lnode_ _flnknode_node_ fn_gid
+ *  - return->_clnknode_lnode_ _flnknode_node_ fn_allnodes
+ *  - return->_clnknode_lnode_ _flnknode_node_ fn_supent
+ *  - return->_clnknode_lnode_ _flnknode_node_ fn_nlink
+ *  - return->_clnknode_lnode_ _flnknode_node_ fn_ino
+ *  - return->_clnknode_lnode_ _flnknode_node_ fn_mode (with something or'd with S_IFLNK)
  *  - return->lnc_text[0 ... text_length-1]    (exactly `text_length' characters; trailing NUL was already initialized) */
-FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct fclnknode *FCALL
-_fclnknode_alloc(struct fsuper *__restrict super, size_t text_length) THROWS(E_BADALLOC);
+FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct clnknode *FCALL
+_clnknode_alloc(struct fsuper *__restrict super, size_t text_length) THROWS(E_BADALLOC);
 
-/* Helper-wrapper for `_fclnknode_alloc()' that will populate the
+/* Helper-wrapper for `_clnknode_alloc()' that will populate the
  * link-node with  `text_length' characters  copied from  `text'. */
-FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct fclnknode *FCALL
-_fclnknode_new(struct fsuper *__restrict super,
-               USER CHECKED char const *text, size_t text_length)
+FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct clnknode *FCALL
+_clnknode_new(struct fsuper *__restrict super,
+              USER CHECKED char const *text, size_t text_length)
 		THROWS(E_BADALLOC, E_SEGFAULT);
 
 
@@ -99,9 +99,9 @@ _fclnknode_new(struct fsuper *__restrict super,
 FUNDEF NOBLOCK void NOTHROW(KCALL __os_free)(VIRT void *ptr) ASMNAME("kfree");
 #endif /* !____os_free_defined */
 
-/* Destroy a partially initialized `struct fclnknode' (as returned by `_fclnknode_alloc()' and `_fclnknode_new()') */
-#define _fclnknode_destroy(self) \
-	(_flnknode_fini(_fclnknode_aslnknode(self)), __os_free(self))
+/* Destroy a partially initialized `struct clnknode' (as returned by `_clnknode_alloc()' and `_clnknode_new()') */
+#define _clnknode_destroy(self) \
+	(_flnknode_fini(_clnknode_aslnknode(self)), __os_free(self))
 
 DECL_END
 #endif /* __CC__ */

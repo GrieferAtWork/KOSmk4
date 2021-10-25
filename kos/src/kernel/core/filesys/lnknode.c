@@ -63,17 +63,17 @@ flnknode_v_readlink_default(struct flnknode *__restrict self,
 }
 
 /************************************************************************/
-/* Operators for `struct fclnknode'                                     */
+/* Operators for `struct clnknode'                                     */
 /************************************************************************/
 #ifndef __OPTIMIZE_SIZE__
 PUBLIC WUNUSED NONNULL((1)) size_t KCALL
-fclnknode_v_readlink(struct flnknode *__restrict self,
-                     USER CHECKED /*utf-8*/ char *buf,
-                     size_t bufsize)
+clnknode_v_readlink(struct flnknode *__restrict self,
+                    USER CHECKED /*utf-8*/ char *buf,
+                    size_t bufsize)
 		THROWS(E_SEGFAULT) {
-	struct fclnknode *me;
+	struct clnknode *me;
 	size_t result;
-	me     = (struct fclnknode *)self;
+	me     = (struct clnknode *)self;
 	result = (size_t)__atomic64_val(me->mf_filesize);
 	if (bufsize > result)
 		bufsize = result;
@@ -81,13 +81,13 @@ fclnknode_v_readlink(struct flnknode *__restrict self,
 	return result;
 }
 #else /* !__OPTIMIZE_SIZE__ */
-DEFINE_PUBLIC_ALIAS(fclnknode_v_readlink, flnknode_v_readlink_default);
+DEFINE_PUBLIC_ALIAS(clnknode_v_readlink, flnknode_v_readlink_default);
 #endif /* __OPTIMIZE_SIZE__ */
 
 PUBLIC ATTR_CONST ATTR_RETNONNULL WUNUSED NONNULL((1)) char const *
-NOTHROW(KCALL fclnknode_v_linkstr)(struct flnknode *__restrict self) {
-	struct fclnknode *me;
-	me = (struct fclnknode *)self;
+NOTHROW(KCALL clnknode_v_linkstr)(struct flnknode *__restrict self) {
+	struct clnknode *me;
+	me = (struct clnknode *)self;
 	return me->lnc_text;
 }
 /************************************************************************/
@@ -99,22 +99,22 @@ NOTHROW(KCALL fclnknode_v_linkstr)(struct flnknode *__restrict self) {
  * that _exactly_ `text_length' characters must still be initialized.
  *
  * The caller must still initialize:
- *  - return->_fclnknode_lnode_ _flnknode_node_ _fnode_file_ mf_ops
- *  - return->_fclnknode_lnode_ _flnknode_node_ _fnode_file_ mf_atime
- *  - return->_fclnknode_lnode_ _flnknode_node_ _fnode_file_ mf_mtime
- *  - return->_fclnknode_lnode_ _flnknode_node_ _fnode_file_ mf_ctime
- *  - return->_fclnknode_lnode_ _flnknode_node_ fn_uid
- *  - return->_fclnknode_lnode_ _flnknode_node_ fn_gid
- *  - return->_fclnknode_lnode_ _flnknode_node_ fn_allnodes
- *  - return->_fclnknode_lnode_ _flnknode_node_ fn_supent
- *  - return->_fclnknode_lnode_ _flnknode_node_ fn_nlink
- *  - return->_fclnknode_lnode_ _flnknode_node_ fn_ino
- *  - return->_fclnknode_lnode_ _flnknode_node_ fn_mode (with something or'd with S_IFLNK)
+ *  - return->_clnknode_lnode_ _flnknode_node_ _fnode_file_ mf_ops
+ *  - return->_clnknode_lnode_ _flnknode_node_ _fnode_file_ mf_atime
+ *  - return->_clnknode_lnode_ _flnknode_node_ _fnode_file_ mf_mtime
+ *  - return->_clnknode_lnode_ _flnknode_node_ _fnode_file_ mf_ctime
+ *  - return->_clnknode_lnode_ _flnknode_node_ fn_uid
+ *  - return->_clnknode_lnode_ _flnknode_node_ fn_gid
+ *  - return->_clnknode_lnode_ _flnknode_node_ fn_allnodes
+ *  - return->_clnknode_lnode_ _flnknode_node_ fn_supent
+ *  - return->_clnknode_lnode_ _flnknode_node_ fn_nlink
+ *  - return->_clnknode_lnode_ _flnknode_node_ fn_ino
+ *  - return->_clnknode_lnode_ _flnknode_node_ fn_mode (with something or'd with S_IFLNK)
  *  - return->lnc_text[0 ... text_length-1]    (exactly `text_length' characters; trailing NUL was already initialized) */
-PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct fclnknode *FCALL
-_fclnknode_alloc(struct fsuper *__restrict super, size_t text_length) THROWS(E_BADALLOC) {
-	REF struct fclnknode *result;
-	result = (struct fclnknode *)kmalloc(offsetof(struct fclnknode, lnc_text) +
+PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct clnknode *FCALL
+_clnknode_alloc(struct fsuper *__restrict super, size_t text_length) THROWS(E_BADALLOC) {
+	REF struct clnknode *result;
+	result = (struct clnknode *)kmalloc(offsetof(struct clnknode, lnc_text) +
 	                                     (text_length + 1) * sizeof(char),
 	                                     GFP_NORMAL);
 	/* Initialize all common fields. */
@@ -133,19 +133,19 @@ _fclnknode_alloc(struct fsuper *__restrict super, size_t text_length) THROWS(E_B
 	return result;
 }
 
-/* Helper-wrapper for `_fclnknode_alloc()' that will populate the
+/* Helper-wrapper for `_clnknode_alloc()' that will populate the
  * link-node with  `text_length' characters  copied from  `text'. */
-PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct fclnknode *FCALL
-_fclnknode_new(struct fsuper *__restrict super,
-               USER CHECKED char const *text, size_t text_length)
+PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct clnknode *FCALL
+_clnknode_new(struct fsuper *__restrict super,
+              USER CHECKED char const *text, size_t text_length)
 		THROWS(E_BADALLOC, E_SEGFAULT) {
-	REF struct fclnknode *result;
-	result = _fclnknode_alloc(super, text_length);
+	REF struct clnknode *result;
+	result = _clnknode_alloc(super, text_length);
 	/* Copy the given text into the clnknode's buffer. */
 	TRY {
 		memcpy(result->lnc_text, text, text_length);
 	} EXCEPT {
-		_fclnknode_destroy(result);
+		_clnknode_destroy(result);
 		RETHROW();
 	}
 	return result;
