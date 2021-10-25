@@ -776,7 +776,11 @@ DEFINE_SYSCALL5(errno_t, openpty,
 #endif /* !CONFIG_USE_NEW_FS */
 	}
 
+#ifdef CONFIG_USE_NEW_FS
+	temp.h_type = HANDLE_TYPE_MFILE;
+#else /* CONFIG_USE_NEW_FS */
 	temp.h_type = HANDLE_TYPE_CHRDEV;
+#endif /* !CONFIG_USE_NEW_FS */
 	temp.h_mode = IO_RDWR;
 	temp.h_data = master;
 	fdmaster    = handle_install(THIS_HANDLE_MANAGER, temp);

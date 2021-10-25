@@ -793,6 +793,11 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 
 	/* TODO: Get rid of `O_SYMLINK' */
 
+	/* TODO: Add `strerrorname_np(3)' and `strerrordesc_np(3)' to the kernel.
+	 *       If only for  the convenience  of including the  proper names  in
+	 *       >> Translate exception 0x80:0x3,E_FSERROR_PATH_NOT_FOUND[0x1] into errno=-2
+	 *       messages... */
+
 	return state;
 }
 

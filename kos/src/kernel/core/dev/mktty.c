@@ -351,6 +351,17 @@ NOTHROW(KCALL mkttydev_v_fini)(struct chrdev *__restrict self)
 	/* Stop the associated forwarding thread (if one is running) */
 	mkttydev_stopfwd(me);
 
+#ifdef CONFIG_USE_NEW_FS
+	if (me->mtd_ohandle_typ == HANDLE_TYPE_MFILE &&
+	    mfile_isansitty((struct mfile *)me->mtd_ohandle_ptr)) {
+		struct ansittydev *atty = mfile_asansitty((struct mfile *)me->mtd_ohandle_ptr);
+		if (me->mtd_ihandle_typ == HANDLE_TYPE_MFILE && mfile_iskbd((struct mfile *)me->mtd_ihandle_ptr)) {
+			struct kbddev *kbd = mfile_askbd((struct mfile *)me->mtd_ihandle_ptr);
+			awref_cmpxch(&kbd->kd_tty, me, NULL);
+		}
+		awref_cmpxch(&atty->at_tty, me, NULL);
+	}
+#else /* CONFIG_USE_NEW_FS */
 	if (me->mtd_ihandle_typ == HANDLE_TYPE_CHRDEV &&
 	    chrdev_iskbd((struct chrdev *)me->mtd_ihandle_ptr)) {
 		struct kbddev *idev;
@@ -364,6 +375,7 @@ NOTHROW(KCALL mkttydev_v_fini)(struct chrdev *__restrict self)
 		/* Try to unbind this TTY from an ansi tty output device. */
 		awref_cmpxch(&odev->at_tty, me, NULL);
 	}
+#endif /* !CONFIG_USE_NEW_FS */
 
 	/* Drop references from input/output handles. */
 	(*handle_type_db.h_decref[me->mtd_ohandle_typ])(me->mtd_ohandle_ptr);
@@ -484,7 +496,7 @@ mkttydev_new(uintptr_half_t ihandle_typ, void *ihandle_ptr,
 	 * Note  that a single  output device may  have multiple TTY drivers
 	 * associated with it, as is the case for the CTRL+ALT+F{1-12} TTYs. */
 	if (ohandle_typ == HANDLE_TYPE_MFILE && mfile_isansitty((struct mfile *)ohandle_ptr)) {
-		struct ansittydev *atty = (struct ansittydev *)ohandle_ptr;
+		struct ansittydev *atty = mfile_asansitty((struct mfile *)ohandle_ptr);
 
 		/* When the output handle is an ansitty, then we must somehow register
 		 * that ansitty within the keyboard,  such that the keyboard can  call
@@ -656,7 +668,7 @@ DEFINE_SYSCALL4(fd_t, mktty,
 				mkttydev_startfwd(tty);
 
 				/* Store the new TTY into a handle. */
-				htty.h_type = HANDLE_TYPE_CHRDEV;
+				htty.h_type = HANDLE_TYPE_MFILE;
 				htty.h_mode = IO_RDWR;
 				htty.h_data = tty;
 				result = handle_install(THIS_HANDLE_MANAGER, htty);
