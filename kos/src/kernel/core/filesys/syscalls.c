@@ -2051,7 +2051,7 @@ sys_freadlinkat_impl(fd_t dirfd, USER UNCHECKED char const *filename,
 	VALIDATE_FLAGSET(atflags, 0 | AT_READLINK_REQSIZE | AT_DOSPATH,
 	                 E_INVALID_ARGUMENT_CONTEXT_FREADLINKAT_FLAGS);
 	atflags = fs_atflags(atflags);
-	node    = path_traversefull(dirfd, filename, atflags);
+	node    = path_traversefull(dirfd, filename, atflags | AT_SYMLINK_NOFOLLOW);
 	{
 		FINALLY_DECREF_UNLIKELY(node);
 		fnode_access(node, R_OK);
