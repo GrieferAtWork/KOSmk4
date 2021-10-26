@@ -26,6 +26,7 @@
 #include <kernel/fs/dirent.h>
 #include <kernel/fs/filehandle.h>
 #include <kernel/handle-proto.h>
+#include <kernel/handle.h>
 #include <kernel/malloc.h>
 #include <kernel/mman/mfile.h>
 
@@ -34,6 +35,8 @@
 #include <kos/except.h>
 #include <kos/except/reason/inval.h>
 #include <kos/kernel/handle.h>
+
+#include <stddef.h>
 
 DECL_BEGIN
 
@@ -221,13 +224,18 @@ handle_filehandle_ioctl(struct filehandle *__restrict self, syscall_ulong_t cmd,
 
 INTERN NONNULL((1)) void KCALL
 handle_filehandle_truncate(struct filehandle *__restrict self, pos_t new_size) THROWS(...) {
-	return mfile_utruncate(self->fh_file, new_size);
+	mfile_utruncate(self->fh_file, new_size);
 }
 
 INTERN NONNULL((1, 2)) void KCALL
 handle_filehandle_mmap(struct filehandle *__restrict self,
                        struct handle_mmap_info *__restrict info) THROWS(...) {
-	return mfile_ummap(self->fh_file, info);
+	mfile_ummap(self->fh_file, info);
+	/* Supplement `info' with filesystem names from `self' */
+	if (info->hmi_fsname == NULL)
+		info->hmi_fsname = xincref(self->fh_dirent);
+	if (info->hmi_fspath == NULL)
+		info->hmi_fspath = xincref(self->fh_path);
 }
 
 INTERN NONNULL((1)) pos_t KCALL
