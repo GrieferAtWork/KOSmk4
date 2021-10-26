@@ -592,9 +592,13 @@ struct flatdirnode
  * @param: struct flatdirnode     *parent: Parent directory. */
 #define _flatdirnode_init(self, ops, parent)                                                 \
 	(_fdirnode_init(_flatdirnode_asdir(self), &(ops)->fdno_dir, _flatdirnode_asdir(parent)), \
+	 (self)->_flatdirnode_dir_ _fdirnode_node_ _fnode_file_ mf_parts = __NULLPTR,            \
+	 SLIST_INIT(&(self)->_flatdirnode_dir_ _fdirnode_node_ _fnode_file_ mf_changed),         \
 	 flatdirdata_init(&(self)->fdn_data))
-#define _flatdirnode_cinit(self, ops, super)                                                  \
-	(_fdirnode_cinit(_flatdirnode_asdir(self), &(ops)->fdno_dir, _flatdirnode_asdir(parent)), \
+#define _flatdirnode_cinit(self, ops, super)                                                           \
+	(_fdirnode_cinit(_flatdirnode_asdir(self), &(ops)->fdno_dir, _flatdirnode_asdir(parent)),          \
+	 __hybrid_assert((self)->_flatdirnode_dir_ _fdirnode_node_ _fnode_file_ mf_parts == __NULLPTR),    \
+	 __hybrid_assert(SLIST_EMPTY(&(self)->_flatdirnode_dir_ _fdirnode_node_ _fnode_file_ mf_changed)), \
 	 flatdirdata_cinit(&(self)->fdn_data))
 /* Finalize a partially initialized `struct flatdirnode' (as initialized by `_flatdirnode_init()') */
 #define _flatdirnode_fini(self) \

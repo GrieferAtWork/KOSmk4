@@ -134,9 +134,7 @@ handle_fdirent_readdir(struct fdirent *__restrict self,
                        USER CHECKED struct dirent *buf, size_t bufsize,
                        readdir_mode_t readdir_mode, iomode_t UNUSED(mode)) THROWS(...) {
 	ssize_t result;
-	result = fdirenum_feedent(buf, bufsize, readdir_mode,
-	                          self->fd_ino, self->fd_type,
-	                          self->fd_namelen, self->fd_name);
+	result = fdirenum_feedent(buf, bufsize, readdir_mode, self);
 	if (result < 0)
 		result = ~result;
 	return (size_t)result;

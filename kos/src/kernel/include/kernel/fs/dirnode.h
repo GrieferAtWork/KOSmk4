@@ -120,10 +120,16 @@ struct fdirenum {
  * @return: >= 0: Advance directory position to next entry and re-return this value.
  * @return: <  0: Keep current directory position and re-return bitwise inverse ('~') of this value. */
 FUNDEF WUNUSED ssize_t FCALL
+fdirenum_feedent_ex(USER CHECKED struct dirent *buf,
+                    size_t bufsize, readdir_mode_t readdir_mode,
+                    ino_t feed_d_ino, unsigned char feed_d_type,
+                    u16 feed_d_namlen, USER CHECKED char const *feed_d_name)
+		THROWS(E_SEGFAULT);
+/* Same as `fdirenum_feedent_ex()', but feed values from `ent' */
+FUNDEF WUNUSED NONNULL((4)) ssize_t FCALL
 fdirenum_feedent(USER CHECKED struct dirent *buf,
                  size_t bufsize, readdir_mode_t readdir_mode,
-                 ino_t feed_d_ino, unsigned char feed_d_type,
-                 u16 feed_d_namlen, USER CHECKED char const *feed_d_name)
+                 struct fdirent *__restrict ent)
 		THROWS(E_SEGFAULT);
 
 
@@ -397,11 +403,11 @@ struct fdirnode
 {
 #ifdef __WANT_FS_INLINE_STRUCTURES
 	struct fnode         dn_node;   /* Underlying file-node */
-#define _fdirnode_node_     dn_node.
 #define _fdirnode_asnode(x) &(x)->dn_node
+#define _fdirnode_node_     dn_node.
 #else /* __WANT_FS_INLINE_STRUCTURES */
-#define _fdirnode_node_     /* nothing */
 #define _fdirnode_asnode(x) x
+#define _fdirnode_node_     /* nothing */
 #endif /* !__WANT_FS_INLINE_STRUCTURES */
 };
 
@@ -414,12 +420,14 @@ struct fdirnode
 	_fnode_assert_ops_(&(ops)->dno_node)
 
 /* Check if a given `struct fdirnode *self' is a fsuper. */
-#define fdirnode_issuper(self)  (&(self)->_fdirnode_node_ fn_super->fs_root == (self))
-#define fdirnode_assuper(self)  __COMPILER_CONTAINER_OF(self, struct fsuper, fs_root)
+#define fdirnode_issuper(self) (&(self)->_fdirnode_node_ fn_super->fs_root == (self))
+#define fdirnode_assuper(self) __COMPILER_CONTAINER_OF(self, struct fsuper, fs_root)
 
 
 
 /* Initialize common+basic fields. The caller must still initialize:
+ *  - self->_fdirnode_node_ _fnode_file_ mf_parts
+ *  - self->_fdirnode_node_ _fnode_file_ mf_changed
  *  - self->_fdirnode_node_ _fnode_file_ mf_atime
  *  - self->_fdirnode_node_ _fnode_file_ mf_mtime
  *  - self->_fdirnode_node_ _fnode_file_ mf_ctime
@@ -435,8 +443,6 @@ struct fdirnode
  * @param: struct fsuper       *super: Associated superblock. */
 #define _fdirnode_init(self, ops, super)                                                                               \
 	(_fdirnode_assert_ops_(ops) _fnode_init_common(_fdirnode_asnode(self)),                                            \
-	 (self)->_fdirnode_node_ _fnode_file_ mf_parts             = MFILE_PARTS_ANONYMOUS,                                \
-	 (self)->_fdirnode_node_ _fnode_file_ mf_changed.slh_first = MFILE_PARTS_ANONYMOUS,                                \
 	 (self)->_fdirnode_node_ _fnode_file_ mf_flags = (super)->fs_root._fdirnode_node_ _fnode_file_ mf_flags &          \
 	                                                 (MFILE_F_DELETED | MFILE_F_PERSISTENT |                           \
 	                                                  MFILE_F_READONLY | MFILE_F_NOATIME |                             \
@@ -452,8 +458,6 @@ struct fdirnode
 	 (self)->_fdirnode_node_ fn_super = incref(super))
 #define _fdirnode_cinit(self, ops, super)                                                                              \
 	(_fdirnode_assert_ops_(ops) _fnode_cinit_common(_fdirnode_asnode(self)),                                           \
-	 (self)->_fdirnode_node_ _fnode_file_ mf_parts             = MFILE_PARTS_ANONYMOUS,                                \
-	 (self)->_fdirnode_node_ _fnode_file_ mf_changed.slh_first = MFILE_PARTS_ANONYMOUS,                                \
 	 (self)->_fdirnode_node_ _fnode_file_ mf_flags = (super)->fs_root._fdirnode_node_ _fnode_file_ mf_flags &          \
 	                                                 (MFILE_F_DELETED | MFILE_F_PERSISTENT |                           \
 	                                                  MFILE_F_READONLY | MFILE_F_NOATIME |                             \

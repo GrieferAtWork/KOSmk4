@@ -80,7 +80,7 @@ DEFINE_REFCOUNT_FUNCTIONS(struct fdirent, fd_refcnt, fdirent_destroy)
 FUNDEF ATTR_PURE WUNUSED NONNULL((1)) uintptr_t FCALL
 fdirent_hash(CHECKED USER /*utf-8*/ char const *__restrict text, u16 textlen)
 		THROWS(E_SEGFAULT);
-#define FDIRENT_EMPTY_HASH 0 /* == fdirent_hash("",0) */
+#define FDIRENT_EMPTY_HASH 0 /* == fdirent_hash("", 0) */
 
 #if __SIZEOF_POINTER__ == 4 && __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
 #define FDIRENT_HASH_INIT(le32, le64, be32, be64) __UINT32_C(le32)

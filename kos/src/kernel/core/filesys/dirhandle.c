@@ -129,8 +129,8 @@ again_dots:
 				mfile_tslock_release(mydir);
 
 				/* Feed the special "." entry */
-				result = fdirenum_feedent(buf, bufsize, readdir_mode,
-				                          ino, DT_DIR, 1, ".");
+				result = fdirenum_feedent_ex(buf, bufsize, readdir_mode,
+				                             ino, DT_DIR, 1, ".");
 				if (result < 0)
 					return (size_t)~result;
 				if (!ATOMIC_CMPXCH(self->dh_dots, dots, newdots))
@@ -159,8 +159,8 @@ again_dots:
 			}
 
 			/* Feed the special ".." entry */
-			result = fdirenum_feedent(buf, bufsize, readdir_mode,
-			                          ino, DT_DIR, 2, "..");
+			result = fdirenum_feedent_ex(buf, bufsize, readdir_mode,
+			                             ino, DT_DIR, 2, "..");
 			if (result < 0)
 				return (size_t)~result;
 			if (!ATOMIC_CMPXCH(self->dh_dots, dots, 2))

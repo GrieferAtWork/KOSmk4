@@ -80,9 +80,6 @@ fdevnode_v_open(struct mfile *__restrict self,
 
 
 /* Initialize common+basic fields. The caller must still initialize:
- *  - self->_fdevnode_node_ _fnode_file_ mf_parts
- *  - self->_fdevnode_node_ _fnode_file_ mf_changed
- *  - self->_fdevnode_node_ _fnode_file_ mf_filesize
  *  - self->_fdevnode_node_ _fnode_file_ mf_atime
  *  - self->_fdevnode_node_ _fnode_file_ mf_mtime
  *  - self->_fdevnode_node_ _fnode_file_ mf_ctime
@@ -99,20 +96,28 @@ fdevnode_v_open(struct mfile *__restrict self,
  * @param: struct fsuper       *super: Filesystem superblock. */
 #define _fdevnode_init(self, ops, super)                                                                               \
 	(_fdevnode_assert_ops_(ops) _fnode_init_common(_fdevnode_asnode(self)),                                            \
-	 (self)->_fdevnode_node_ _fnode_file_ mf_flags = (super)->fs_root._fdirnode_node_ _fnode_file_ mf_flags &          \
-	                                                 (MFILE_F_DELETED | MFILE_F_PERSISTENT |                           \
-	                                                  MFILE_F_READONLY | MFILE_F_NOATIME |                             \
-	                                                  MFILE_F_NOMTIME),                                                \
+	 (self)->_fdevnode_node_ _fnode_file_ mf_parts             = MFILE_PARTS_ANONYMOUS,                                \
+	 (self)->_fdevnode_node_ _fnode_file_ mf_changed.slh_first = MFILE_PARTS_ANONYMOUS,                                \
+	 atomic64_init(&(self)->_fdevnode_node_ _fnode_file_ mf_filesize, 0),                                              \
+	 (self)->_fdevnode_node_ _fnode_file_ mf_flags = ((super)->fs_root._fdirnode_node_ _fnode_file_ mf_flags &         \
+	                                                  (MFILE_F_DELETED | MFILE_F_PERSISTENT |                          \
+	                                                   MFILE_F_READONLY | MFILE_F_NOATIME |                            \
+	                                                   MFILE_F_NOMTIME)) |                                             \
+	                                                 MFILE_F_FIXEDFILESIZE,                                            \
 	 (self)->_fdevnode_node_ _fnode_file_ mf_ops        = &(ops)->dno_node.no_file,                                    \
 	 (self)->_fdevnode_node_ _fnode_file_ mf_blockshift = (super)->fs_root._fdirnode_node_ _fnode_file_ mf_blockshift, \
 	 (self)->_fdevnode_node_ _fnode_file_ mf_part_amask = (super)->fs_root._fdirnode_node_ _fnode_file_ mf_part_amask, \
 	 (self)->_fdevnode_node_ fn_super                   = incref(super))
 #define _fdevnode_cinit(self, ops, super)                                                                              \
 	(_fdevnode_assert_ops_(ops) _fnode_cinit_common(_fdevnode_asnode(self)),                                           \
-	 (self)->_fdevnode_node_ _fnode_file_ mf_flags = (super)->fs_root._fdirnode_node_ _fnode_file_ mf_flags &          \
-	                                                 (MFILE_F_DELETED | MFILE_F_PERSISTENT |                           \
-	                                                  MFILE_F_READONLY | MFILE_F_NOATIME |                             \
-	                                                  MFILE_F_NOMTIME),                                                \
+	 (self)->_fdevnode_node_ _fnode_file_ mf_parts             = MFILE_PARTS_ANONYMOUS,                                \
+	 (self)->_fdevnode_node_ _fnode_file_ mf_changed.slh_first = MFILE_PARTS_ANONYMOUS,                                \
+	 atomic64_cinit(&(self)->_fdevnode_node_ _fnode_file_ mf_filesize, 0),                                             \
+	 (self)->_fdevnode_node_ _fnode_file_ mf_flags = ((super)->fs_root._fdirnode_node_ _fnode_file_ mf_flags &         \
+	                                                  (MFILE_F_DELETED | MFILE_F_PERSISTENT |                          \
+	                                                   MFILE_F_READONLY | MFILE_F_NOATIME |                            \
+	                                                   MFILE_F_NOMTIME)) |                                             \
+	                                                 MFILE_F_FIXEDFILESIZE,                                            \
 	 (self)->_fdevnode_node_ _fnode_file_ mf_ops        = &(ops)->dno_node.no_file,                                    \
 	 (self)->_fdevnode_node_ _fnode_file_ mf_blockshift = (super)->fs_root._fdirnode_node_ _fnode_file_ mf_blockshift, \
 	 (self)->_fdevnode_node_ _fnode_file_ mf_part_amask = (super)->fs_root._fdirnode_node_ _fnode_file_ mf_part_amask, \

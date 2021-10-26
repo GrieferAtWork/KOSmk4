@@ -268,54 +268,54 @@ FUNDEF NOBLOCK NONNULL((1)) __BOOL NOTHROW(FCALL fsuper_add2changed)(struct fsup
  * @param: struct fsuper     *self: Directory node to initialize.
  * @param: struct fsuper_ops *ops:  Directory operators.
  * @param: struct ffilesys   *fsys: File system information. */
-#define _fsuper_init(self, ops, fsys)                                                             \
-	(_fsuper_assert_ops_(ops) /**/                                                                \
-	 ((self)->fs_nodes = _fdirnode_asnode(&(self)->fs_root)),                                     \
-	 atomic_rwlock_init(&(self)->fs_nodeslock),                                                   \
-	 SLIST_INIT(&(self)->fs_nodeslockops),                                                        \
-	 LIST_INIT(&(self)->fs_mounts),                                                               \
-	 atomic_rwlock_init(&(self)->fs_mountslock),                                                  \
-	 SLIST_INIT(&(self)->fs_mountslockops),                                                       \
-	 (self)->fs_sys = incref(fsys),                                                               \
-	 atomic_lock_init(&(self)->fs_changednodes_lock),                                             \
-	 SLIST_INIT(&(self)->fs_changednodes_lops),                                                   \
-	 LIST_INIT(&(self)->fs_changednodes),                                                         \
-	 LIST_ENTRY_UNBOUND_INIT(&(self)->fs_changedsuper),                                           \
-	 _fnode_init_common(_fdirnode_asnode(&(self)->fs_root)),                                      \
-	 (self)->fs_root._fdirnode_node_ _fnode_file_ mf_flags    = (MFILE_F_NOUSRMMAP |              \
-	                                                             MFILE_F_NOUSRIO |                \
-	                                                             MFILE_F_FIXEDFILESIZE),          \
-	 (self)->fs_root._fdirnode_node_ _fnode_file_ mf_ops      = &(ops)->so_fdir.dno_node.no_file, \
-	 atomic64_init(&(self)->fs_root._fdirnode_node_ _fnode_file_ mf_filesize, (uint64_t)-1),      \
-	 (self)->fs_root._fdirnode_node_ fn_nlink                 = 1,                                \
-	 (self)->fs_root._fdirnode_node_ fn_super                 = (self),                           \
-	 (self)->fs_root._fdirnode_node_ fn_supent.rb_lhs         = __NULLPTR,                        \
-	 (self)->fs_root._fdirnode_node_ fn_supent.rb_rhs         = __NULLPTR)
-#define _fsuper_cinit(self, ops, fsys)                                                            \
-	(_fsuper_assert_ops_(ops) /**/                                                                \
-	 ((self)->fs_nodes = _fdirnode_asnode(&(self)->fs_root)),                                     \
-	 atomic_rwlock_cinit(&(self)->fs_nodeslock),                                                  \
-	 __hybrid_assert(SLIST_EMPTY(&(self)->fs_nodeslockops)),                                      \
-	 __hybrid_assert(LIST_EMPTY(&(self)->fs_mounts)),                                             \
-	 atomic_rwlock_cinit(&(self)->fs_mountslock),                                                 \
-	 __hybrid_assert(SLIST_EMPTY(&(self)->fs_mountslockops)),                                     \
-	 (self)->fs_sys = incref(fsys),                                                               \
-	 atomic_lock_cinit(&(self)->fs_changednodes_lock),                                            \
-	 __hybrid_assert(SLIST_EMPTY(&(self)->fs_changednodes_lops)),                                 \
-	 __hybrid_assert(LIST_EMPTY(&(self)->fs_changednodes)),                                       \
-	 LIST_ENTRY_UNBOUND_INIT(&(self)->fs_changedsuper),                                           \
-	 _fnode_cinit_common(_fdirnode_asnode(&(self)->fs_root)),                                     \
-	 (self)->fs_root._fdirnode_node_ _fnode_file_ mf_flags    = (MFILE_F_NOUSRMMAP |              \
-	                                                             MFILE_F_NOUSRIO |                \
-	                                                             MFILE_F_FIXEDFILESIZE),          \
-	 (self)->fs_root._fdirnode_node_ _fnode_file_ mf_ops      = &(ops)->so_fdir.dno_node.no_file, \
-	 atomic64_cinit(&(self)->fs_root._fdirnode_node_ _fnode_file_ mf_filesize, (uint64_t)-1),     \
-	 (self)->fs_root._fdirnode_node_ fn_nlink                 = 1,                                \
-	 (self)->fs_root._fdirnode_node_ fn_super                 = (self),                           \
-	 __hybrid_assert((self)->fs_root._fdirnode_node_ fn_supent.rb_lhs == __NULLPTR),              \
+#define _fsuper_init(self, ops, fsys)                                                          \
+	(_fsuper_assert_ops_(ops) /**/                                                             \
+	 ((self)->fs_nodes = _fdirnode_asnode(&(self)->fs_root)),                                  \
+	 atomic_rwlock_init(&(self)->fs_nodeslock),                                                \
+	 SLIST_INIT(&(self)->fs_nodeslockops),                                                     \
+	 LIST_INIT(&(self)->fs_mounts),                                                            \
+	 atomic_rwlock_init(&(self)->fs_mountslock),                                               \
+	 SLIST_INIT(&(self)->fs_mountslockops),                                                    \
+	 (self)->fs_sys = incref(fsys),                                                            \
+	 atomic_lock_init(&(self)->fs_changednodes_lock),                                          \
+	 SLIST_INIT(&(self)->fs_changednodes_lops),                                                \
+	 LIST_INIT(&(self)->fs_changednodes),                                                      \
+	 LIST_ENTRY_UNBOUND_INIT(&(self)->fs_changedsuper),                                        \
+	 _fnode_init_common(_fdirnode_asnode(&(self)->fs_root)),                                   \
+	 (self)->fs_root._fdirnode_node_ _fnode_file_ mf_flags = (MFILE_F_NOUSRMMAP |              \
+	                                                          MFILE_F_NOUSRIO |                \
+	                                                          MFILE_F_FIXEDFILESIZE),          \
+	 (self)->fs_root._fdirnode_node_ _fnode_file_ mf_ops   = &(ops)->so_fdir.dno_node.no_file, \
+	 atomic64_init(&(self)->fs_root._fdirnode_node_ _fnode_file_ mf_filesize, (uint64_t)-1),   \
+	 (self)->fs_root._fdirnode_node_ fn_nlink         = 1,                                     \
+	 (self)->fs_root._fdirnode_node_ fn_super         = (self),                                \
+	 (self)->fs_root._fdirnode_node_ fn_supent.rb_lhs = __NULLPTR,                             \
+	 (self)->fs_root._fdirnode_node_ fn_supent.rb_rhs = __NULLPTR)
+#define _fsuper_cinit(self, ops, fsys)                                                         \
+	(_fsuper_assert_ops_(ops) /**/                                                             \
+	 ((self)->fs_nodes = _fdirnode_asnode(&(self)->fs_root)),                                  \
+	 atomic_rwlock_cinit(&(self)->fs_nodeslock),                                               \
+	 __hybrid_assert(SLIST_EMPTY(&(self)->fs_nodeslockops)),                                   \
+	 __hybrid_assert(LIST_EMPTY(&(self)->fs_mounts)),                                          \
+	 atomic_rwlock_cinit(&(self)->fs_mountslock),                                              \
+	 __hybrid_assert(SLIST_EMPTY(&(self)->fs_mountslockops)),                                  \
+	 (self)->fs_sys = incref(fsys),                                                            \
+	 atomic_lock_cinit(&(self)->fs_changednodes_lock),                                         \
+	 __hybrid_assert(SLIST_EMPTY(&(self)->fs_changednodes_lops)),                              \
+	 __hybrid_assert(LIST_EMPTY(&(self)->fs_changednodes)),                                    \
+	 LIST_ENTRY_UNBOUND_INIT(&(self)->fs_changedsuper),                                        \
+	 _fnode_cinit_common(_fdirnode_asnode(&(self)->fs_root)),                                  \
+	 (self)->fs_root._fdirnode_node_ _fnode_file_ mf_flags = (MFILE_F_NOUSRMMAP |              \
+	                                                          MFILE_F_NOUSRIO |                \
+	                                                          MFILE_F_FIXEDFILESIZE),          \
+	 (self)->fs_root._fdirnode_node_ _fnode_file_ mf_ops   = &(ops)->so_fdir.dno_node.no_file, \
+	 atomic64_cinit(&(self)->fs_root._fdirnode_node_ _fnode_file_ mf_filesize, (uint64_t)-1),  \
+	 (self)->fs_root._fdirnode_node_ fn_nlink = 1,                                             \
+	 (self)->fs_root._fdirnode_node_ fn_super = (self),                                        \
+	 __hybrid_assert((self)->fs_root._fdirnode_node_ fn_supent.rb_lhs == __NULLPTR),           \
 	 __hybrid_assert((self)->fs_root._fdirnode_node_ fn_supent.rb_rhs == __NULLPTR))
 
-/* Finalize a partially initialized `struct fsuper' (as initialized by `_fdirnode_init()') */
+/* Finalize a partially initialized `struct fsuper' (as initialized by `_fsuper_init()') */
 #define _fsuper_fini(self) \
 	(decref_nokill((self)->fs_sys))
 

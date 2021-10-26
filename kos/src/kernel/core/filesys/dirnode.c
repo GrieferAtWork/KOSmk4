@@ -58,10 +58,10 @@ DECL_BEGIN
  * @return: >= 0: Advance directory position to next entry and re-return this value.
  * @return: <  0: Keep current directory position and re-return bitwise inverse ('~') of this value. */
 PUBLIC WUNUSED ssize_t FCALL
-fdirenum_feedent(USER CHECKED struct dirent *buf,
-                 size_t bufsize, readdir_mode_t readdir_mode,
-                 ino_t feed_d_ino, unsigned char feed_d_type,
-                 u16 feed_d_namlen, USER CHECKED char const *feed_d_name)
+fdirenum_feedent_ex(USER CHECKED struct dirent *buf,
+                    size_t bufsize, readdir_mode_t readdir_mode,
+                    ino_t feed_d_ino, unsigned char feed_d_type,
+                    u16 feed_d_namlen, USER CHECKED char const *feed_d_name)
 		THROWS(E_SEGFAULT) {
 	size_t result;
 	result = ((offsetof(struct dirent, d_name)) +
@@ -80,6 +80,39 @@ fdirenum_feedent(USER CHECKED struct dirent *buf,
 
 		/* Copy the entry name to user-space (CAUTION: E_SEGFAULT) */
 		memcpy(buf->d_name, feed_d_name, bufsize, sizeof(char));
+		COMPILER_WRITE_BARRIER();
+		if ((readdir_mode & READDIR_MODEMASK) == READDIR_PEEK)
+			result ^= (size_t)-1; /* Don't yield */
+	} else {
+		if ((readdir_mode & READDIR_MODEMASK) != READDIR_CONTINUE)
+			result ^= (size_t)-1; /* Don't yield */
+	}
+	return result;
+}
+
+/* Same as `fdirenum_feedent_ex()', but feed values from `ent' */
+PUBLIC WUNUSED NONNULL((4)) ssize_t FCALL
+fdirenum_feedent(USER CHECKED struct dirent *buf,
+                 size_t bufsize, readdir_mode_t readdir_mode,
+                 struct fdirent *__restrict ent)
+		THROWS(E_SEGFAULT) {
+	size_t result;
+	result = ((offsetof(struct dirent, d_name)) +
+	          (ent->fd_namelen + 1) * sizeof(char));
+	if (bufsize >= offsetof(struct dirent, d_name)) {
+		/* Fill in basic members of the user-buffer (CAUTION: E_SEGFAULT) */
+		buf->d_ino    = (typeof(buf->d_ino))ent->fd_ino;
+		buf->d_type   = (typeof(buf->d_type))ent->fd_type;
+		buf->d_namlen = (typeof(buf->d_namlen))ent->fd_namelen;
+		bufsize -= offsetof(struct dirent, d_name);
+		if (bufsize >= (size_t)(ent->fd_namelen + 1))
+			bufsize = (size_t)(ent->fd_namelen + 1);
+		else if ((readdir_mode & READDIR_MODEMASK) == READDIR_DEFAULT) {
+			result ^= (size_t)-1; /* Don't yield */
+		}
+
+		/* Copy the entry name to user-space (CAUTION: E_SEGFAULT) */
+		memcpy(buf->d_name, ent->fd_name, bufsize, sizeof(char));
 		COMPILER_WRITE_BARRIER();
 		if ((readdir_mode & READDIR_MODEMASK) == READDIR_PEEK)
 			result ^= (size_t)-1; /* Don't yield */

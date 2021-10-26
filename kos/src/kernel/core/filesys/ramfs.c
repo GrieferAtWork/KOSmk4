@@ -251,11 +251,7 @@ again:
 		REF struct ramfs_dirent *next;
 		FINALLY_DECREF_UNLIKELY(ent);
 		/* Feed the entry to the user-buffer */
-		result = fdirenum_feedent(buf, bufsize, readdir_mode,
-		                          ent->rde_ent.fd_ino,
-		                          ent->rde_ent.fd_type,
-		                          ent->rde_ent.fd_namelen,
-		                          ent->rde_ent.fd_name);
+		result = fdirenum_feedent(buf, bufsize, readdir_mode, &ent->rde_ent);
 		if (result < 0)
 			return (size_t)~result; /* Don't advance directory position. */
 
@@ -612,6 +608,8 @@ ramfs_dirnode_mknode_frominfo(struct fdirnode *__restrict self,
 		struct ramfs_dirnode *node;
 		node = (struct ramfs_dirnode *)kmalloc(sizeof(struct ramfs_dirnode), GFP_NORMAL);
 		_fdirnode_init(node, &ramfs_dirnode_ops, self->fn_super);
+		node->mf_parts             = MFILE_PARTS_ANONYMOUS;
+		node->mf_changed.slh_first = MFILE_PARTS_ANONYMOUS;
 		ramfs_dirdata_init(&node->rdn_dat);
 		result = node;
 	}	break;
