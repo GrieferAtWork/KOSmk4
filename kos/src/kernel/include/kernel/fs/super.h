@@ -173,7 +173,8 @@ struct fsuper {
 	Toblockop_slist(fsuper)     fs_nodeslockops;  /* [lock(ATOMIC)] Pending lock-operations for `fs_nodeslock' */
 	struct pathmount_list       fs_mounts;        /* [0..n][lock(fs_mountslock)]  List of mounting points of this superblock.
 	                                               * When this list becomes empty, set to `FSUPER_MOUNTS_DELETED' followed by
-	                                               * `fsuper_delete()' being called. */
+	                                               * `fsuper_delete()' being called.
+	                                               * NOTE: Each of these is also holding another reference to `fs_sys->ffs_drv'! */
 #define FSUPER_MOUNTS_DELETED ((struct pathmount *)-1) /* Marker for deleted mounting point list */
 	struct atomic_rwlock        fs_mountslock;    /* Lock for `fs_mounts' */
 	Toblockop_slist(fsuper)     fs_mountslockops; /* [lock(ATOMIC)] Pending lock-operations for `fs_mountslock' */

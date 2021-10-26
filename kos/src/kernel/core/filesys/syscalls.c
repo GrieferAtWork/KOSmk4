@@ -888,6 +888,10 @@ sys_mount_impl(USER UNCHECKED char const *source,
 		                 MS_LAZYTIME | MS_ACTIVE | MS_NOUSER,
 		                 E_INVALID_ARGUMENT_CONTEXT_UMOUNT2_FLAGS);
 		if (!filesystemtype) {
+			/* NOTE: This right here (automatically determine filesystem type) is
+			 *       actually a KOS extension;  linux doesn't support doing  this
+			 *       and forces you to  try every fs-type /proc/filesystems  when
+			 *       wanting to do a typeless mount. */
 			type = NULL;
 		} else {
 			validate_readable(filesystemtype, 1);
@@ -897,33 +901,49 @@ sys_mount_impl(USER UNCHECKED char const *source,
 		}
 		/* Require mounting rights. */
 		require(CAP_MOUNT);
-		{
-			FINALLY_XDECREF_UNLIKELY(type);
-			if (type && type->ffs_flags & (FFILESYS_F_NODEV | FFILESYS_F_SINGLE)) {
-				super = ffilesys_open(type, NULL, (USER UNCHECKED char *)data);
+
+		/* IMPORTANT: `type' may only be decref'd _AFTER_ a mount has  happened.
+		 * When `type' is  `FFILESYS_F_SINGLE', then  the associated  superblock
+		 * may  be statically allocated within a secondary driver, in which case
+		 * holding a reference to a static structure is pretty much meaningless.
+		 *
+		 * However, reference counting control for `ffilesys' is actually backed
+		 * by the reference counter of  the underlying driver, meaning that  for
+		 * as long as we're holding an explicit reference to `type', it's always
+		 * guarantied that the driver won't unload before we're done here.
+		 *
+		 * HINT: Once a mounting point has been created (by `path_mount()'),  its
+		 *       existence will keep on holding an explicit reference to the same
+		 *       driver (`path->p_dir->fn_super->fs_sys->ffs_drv') for as long as
+		 *       the  path hasn't been  destroyed (!wasdestroyed()), meaning that
+		 *       until `path_mount()' got called, we  need to keep this  explicit
+		 *       reference around. */
+		FINALLY_XDECREF_UNLIKELY(type);
+
+		if (type && type->ffs_flags & (FFILESYS_F_NODEV | FFILESYS_F_SINGLE)) {
+			super = ffilesys_open(type, NULL, (USER UNCHECKED char *)data);
+		} else {
+			REF struct fnode *dev;
+			if unlikely(!source)
+				THROW(E_FSERROR_NO_BLOCK_DEVICE);
+			validate_readable(source, 1);
+			dev = path_traversefull(AT_FDCWD, source, atflags & ~AT_IGNORE_TRAILING_SLASHES);
+			if (fnode_isblkdev(dev)) {
+				/* Already the proper /dev/ device */
 			} else {
-				REF struct fnode *dev;
-				if unlikely(!source)
-					THROW(E_FSERROR_NO_BLOCK_DEVICE);
-				validate_readable(source, 1);
-				dev = path_traversefull(AT_FDCWD, source, atflags & ~AT_IGNORE_TRAILING_SLASHES);
-				if (fnode_isblkdev(dev)) {
-					/* Already the proper /dev/ device */
-				} else {
-					dev_t devno;
-					FINALLY_DECREF_UNLIKELY(dev);
-					if unlikely(!S_ISBLK(dev->fn_mode))
-						THROW(E_FSERROR_NOT_A_BLOCK_DEVICE);
-					devno = fnode_asdevnode(dev)->dn_devno;
-					dev   = device_lookup_bydev(S_IFBLK, devno);
-					if unlikely(!dev)
-						THROW(E_NO_DEVICE, E_NO_DEVICE_KIND_BLKDEV, devno);
-				}
+				dev_t devno;
 				FINALLY_DECREF_UNLIKELY(dev);
-				/* Open the superblock with the associated block-device. */
-				super = type ? ffilesys_open(type, fnode_asblkdev(dev), (USER UNCHECKED char *)data)
-				             : ffilesys_opendev(fnode_asblkdev(dev), (USER UNCHECKED char *)data);
+				if unlikely(!S_ISBLK(dev->fn_mode))
+					THROW(E_FSERROR_NOT_A_BLOCK_DEVICE);
+				devno = fnode_asdevnode(dev)->dn_devno;
+				dev   = device_lookup_bydev(S_IFBLK, devno);
+				if unlikely(!dev)
+					THROW(E_NO_DEVICE, E_NO_DEVICE_KIND_BLKDEV, devno);
 			}
+			FINALLY_DECREF_UNLIKELY(dev);
+			/* Open the superblock with the associated block-device. */
+			super = type ? ffilesys_open(type, fnode_asblkdev(dev), (USER UNCHECKED char *)data)
+			             : ffilesys_opendev(fnode_asblkdev(dev), (USER UNCHECKED char *)data);
 		}
 		if unlikely(!super)
 			THROW(E_FSERROR_WRONG_FILE_SYSTEM);

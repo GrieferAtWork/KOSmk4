@@ -649,8 +649,9 @@ struct pathmount
 #else /* !__cplusplus */
 #define _pathmount_path_ /* nothing */
 #endif /* __cplusplus */
-	LIST_ENTRY(pathmount)     pm_fsmount; /* [1..1][lock(path_getsuper(this)->fs_mountslock)]
-	                                       * Link entry in the associated superblock's list of mounting points. */
+	LIST_ENTRY(pathmount)     pm_fsmount; /* [1..1][lock(path_getsuper(this)->fs_mountslock)] Link entry in the
+	                                       * associated superblock's list  of mounting points.  This link  also
+	                                       * holds a reference to `self->p_dir->fn_super->fs_sys->ffs_drv'. */
 	LIST_ENTRY(REF pathmount) pm_vsmount; /* [0..1][lock(:VFS->vf_mountslock)]
 	                                       * Link entry in the list of mounting points defined by the owning VFS. */
 };

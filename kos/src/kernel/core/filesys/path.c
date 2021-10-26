@@ -35,6 +35,7 @@
 #include <kernel/fs/vfs.h>
 #include <kernel/handle.h>
 #include <kernel/malloc.h>
+#include <kernel/mman/driver.h>
 #include <kernel/personality.h>
 #include <sched/cred.h>
 #include <sched/tsc.h>
@@ -152,8 +153,13 @@ NOTHROW(LOCKOP_CC path_remove_from_supermounts_postlop)(Tobpostlockop(fsuper) *_
 
 	/* If needed, also delete the superblock. */
 	if (delsup) {
+		REF struct driver *drv;
 		fsuper_delete(delsup);
+		drv = delsup->fs_sys->ffs_drv;
 		decref(delsup);
+
+		/* This reference was originally held by `path_asmount(me)->pm_fsmount' */
+		decref_unlikely(drv);
 	}
 }
 
@@ -164,13 +170,19 @@ NOTHROW(LOCKOP_CC path_remove_from_supermounts_lop)(Toblockop(fsuper) *__restric
 	COMPILER_READ_BARRIER();
 	me->p_dir = NULL; /* Don't delete super by default */
 	if likely(LIST_ISBOUND(me, pm_fsmount)) {
-		LIST_UNBIND(me, pm_fsmount);
+		LIST_REMOVE(me, pm_fsmount);
+		DBG_memset(&me->pm_fsmount, 0xcc, sizeof(me->pm_fsmount));
 
 		/* Special handling for when the list of mounting points becomes empty. */
 		if (LIST_EMPTY(&obj->fs_mounts)) {
 			ATOMIC_WRITE(obj->fs_mounts.lh_first, FSUPER_MOUNTS_DELETED);
-			/* Delete the superblock (later) */
+			/* Delete the superblock & decref the backing driver (later) */
 			me->p_dir = (REF struct fdirnode *)incref(obj); /* Hacky temporary storage... */
+		} else {
+			/* This reference was originally held by `path_asmount(me)->pm_fsmount'
+			 * We  can use *_nokill  because other mounting  points still hold more
+			 * references. */
+			decref_nokill(obj->fs_sys->ffs_drv);
 		}
 	}
 	me->_p_supplop.oplo_func = &path_remove_from_supermounts_postlop;
@@ -205,16 +217,28 @@ NOTHROW(LOCKOP_CC path_remove_from_parent_postlop)(Tobpostlockop(path) *__restri
 			if (fsuper_mounts_trywrite(super)) {
 				COMPILER_READ_BARRIER();
 				if likely(LIST_ISBOUND(mount, pm_fsmount)) {
-					LIST_UNBIND(mount, pm_fsmount);
+					LIST_REMOVE(mount, pm_fsmount);
+					DBG_memset(&mount->pm_fsmount, 0xcc, sizeof(mount->pm_fsmount));
 
 					/* Special handling for when the list of mounting points becomes empty. */
 					if (LIST_EMPTY(&super->fs_mounts)) {
+						REF struct driver *drv;
 						ATOMIC_WRITE(super->fs_mounts.lh_first, FSUPER_MOUNTS_DELETED);
 						fsuper_mounts_endwrite(super);
 
 						/* Delete the superblock */
+						drv = super->fs_sys->ffs_drv;
 						fsuper_delete(super);
-						goto done_delmount;
+						decref_unlikely(dir);
+						/* This reference was originally held by `path_asmount(mount)->pm_fsmount' */
+						decref_unlikely(drv);
+						path_free(me);
+						return;
+					} else {
+						/* This reference was originally held by `path_asmount(mount)->pm_fsmount'
+						 * We  can  use *_nokill  because other  mounting  points still  hold more
+						 * references. */
+						decref_nokill(super->fs_sys->ffs_drv);
 					}
 				}
 				fsuper_mounts_endwrite(super);
@@ -229,7 +253,6 @@ NOTHROW(LOCKOP_CC path_remove_from_parent_postlop)(Tobpostlockop(path) *__restri
 			FSUPER_MOUNTS_DELETED;
 		}
 	}
-done_delmount:
 	decref_unlikely(dir);
 	path_free(me);
 }
@@ -1728,12 +1751,12 @@ again_deref_lnknode:
 						DBG_memset(&info.mkf_rnode, 0xcc, sizeof(info.mkf_rnode));
 						{
 							FINALLY_DECREF_UNLIKELY(info.mkf_dent);
-	
+
 							/* Decrement the remaining-links counter. */
 							if (!*premaining_symlinks)
 								THROW(E_FSERROR_TOO_MANY_SYMBOLIC_LINKS);
 							--*premaining_symlinks;
-	
+
 							/* Check for `lno_openlink' support */
 							lnknode_ops = flnknode_getops(lnknode);
 							if (lnknode_ops->lno_openlink &&

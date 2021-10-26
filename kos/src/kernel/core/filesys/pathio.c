@@ -32,6 +32,7 @@
 #include <kernel/fs/ramfs.h>
 #include <kernel/fs/vfs.h>
 #include <kernel/handle.h>
+#include <kernel/mman/driver.h>
 #include <sched/task.h>
 
 #include <kos/except.h>
@@ -1492,6 +1493,10 @@ again_acquire_locks:
 					task_yield();
 				goto again_acquire_locks;
 			}
+
+			/* Reference to `fsuper_unmounted.fs_sys->ffs_drv'
+			 * that is held by `replacement_mount->pm_fsmount' */
+			incref(&kernel_driver);
 			LIST_INSERT_HEAD(&fsuper_unmounted.fs_mounts, replacement_mount, pm_fsmount);
 			fsuper_mounts_endwrite(&fsuper_unmounted);
 
@@ -1708,6 +1713,9 @@ again_load_parent:
 
 	/* Hook the new mounting point within its superblock. */
 	LIST_INSERT_HEAD(&super->fs_mounts, result, pm_fsmount);
+
+	/* Reference held by `result->pm_fsmount' */
+	incref(super->fs_sys->ffs_drv);
 
 	/* Hook the new mounting point within the VFS's list of mounting points. */
 	LIST_INSERT_HEAD(&pathvfs->vf_mounts, result, pm_vsmount);

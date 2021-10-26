@@ -31,6 +31,7 @@
 #include <kernel/fs/super.h>
 #include <kernel/fs/vfs.h>
 #include <kernel/malloc.h>
+#include <kernel/mman/driver.h>
 #include <kernel/panic.h>
 
 #include <stddef.h>
@@ -178,6 +179,9 @@ NOTHROW(KCALL kernel_initialize_rootfs)(void) {
 	mount->p_cldsize = 0;
 	mount->p_cldmask = 0;
 	mount->p_cldlist = path_empty_cldlist;
+
+	/* This is the reference that will be held by `mount->pm_fsmount' */
+	incref(super->fs_sys->ffs_drv);
 
 	/* Hook the mounting point
 	 *

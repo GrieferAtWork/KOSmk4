@@ -127,8 +127,7 @@ struct ffilesys {
 		                  struct blkdev *dev, UNCHECKED USER char *args);
 
 		/* [1..1][valid_if(FFILESYS_F_SINGLE)]
-		 * Singleton instance of a superblock associated with this filesystem type.
-		 * _ONLY_ used for devfs */
+		 * Singleton instance of a superblock associated with this filesystem type. */
 		REF struct fsuper        *ffs_single;
 	};
 	uint8_t                       ffs_flags; /* Filesystem type flags (Set of `FFILESYS_F_*') */
@@ -164,10 +163,15 @@ DATDEF struct lockop_slist ffilesys_formats_lops;   /* Lock operations for `ffil
  * uninitialized by `ffs_open()' itself,  with the exception of  `fn_allsuper',
  * which is initialized as `LIST_ENTRY_UNBOUND_INIT()'.
  *
- * The returned superblock is _only_ visible to the caller, unless it's a  singleton
- * superblock  (`FFILESYS_F_SINGLE'; iow:  is `devfs'),  in which  case the returned
- * superblock is fully initialized and its fields must _NOT_ be modified willy-nilly
- * by the caller.
+ * The returned superblock is _only_ visible to the caller, unless it's a singleton
+ * superblock (`FFILESYS_F_SINGLE'), in which case the returned superblock is fully
+ * initialized and its fields must _NOT_ be modified willy-nilly by the caller.
+ *
+ * WARNING: To safely deal with driver references in the case of singleton superblocks,
+ *          the reference that is keeping `self'  alive (which is actually a  reference
+ *          to  the backing driver)  may only be dropped  _AFTER_ path_mount() was used
+ *          to mount the superblock (since the successful creation of a mounting  point
+ *          will be holding a driver reference via `pathmount::pm_fsmount').
  *
  * @return: * : isshared(return):  `FFILESYS_F_SINGLE' was set, and `return' must NOT
  *                                 be modified under a false assumption of you  being

@@ -83,7 +83,6 @@ PUBLIC struct ramfs_super devfs = {
 					                    MFILE_FM_ATTRREADONLY),
 					MFILE_INIT_mf_trunclock,
 					MFILE_INIT_mf_filesize((uint64_t)-1),
-					/* TODO: Have an initializer that copies `boottime' into these 3! */
 					MFILE_INIT_mf_atime(0, 0),
 					MFILE_INIT_mf_mtime(0, 0),
 					MFILE_INIT_mf_ctime(0, 0),
