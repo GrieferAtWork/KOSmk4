@@ -114,6 +114,7 @@ FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL ttydev_v_destroy)(struct mfile *__restrict self);
 #define ttydev_v_changed chrdev_v_changed
 #define ttydev_v_wrattr  chrdev_v_wrattr
+#define ttydev_v_tryas   chrdev_v_tryas
 FUNDEF NONNULL((1)) size_t KCALL /* NOTE: This read operator is _MANDATORY_ and may not be overwritten by sub-classes! */
 ttydev_v_read(struct mfile *__restrict self, USER CHECKED void *dst,
               size_t num_bytes, iomode_t mode) THROWS(...);

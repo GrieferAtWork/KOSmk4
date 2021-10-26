@@ -128,6 +128,10 @@ struct mousedev
 #define chrdev_asmouse(self)  device_asmouse(_chrdev_asdev(self))
 
 /* Default mouse operators. */
+#define mousedev_v_destroy chrdev_v_destroy
+#define mousedev_v_changed chrdev_v_changed
+#define mousedev_v_wrattr  chrdev_v_wrattr
+#define mousedev_v_tryas   chrdev_v_tryas
 FUNDEF NONNULL((1)) size_t KCALL /* NOTE: This read operator is _MANDATORY_ and may not be overwritten by sub-classes! */
 mousedev_v_read(struct mfile *__restrict self, USER CHECKED void *dst,
                 size_t num_bytes, iomode_t mode) THROWS(...);

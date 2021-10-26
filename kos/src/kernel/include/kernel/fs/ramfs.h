@@ -55,6 +55,7 @@ DATDEF struct flnknode_ops const ramfs_lnknode_ops;
 #define ramfs_lnknode_v_readlink clnknode_v_readlink
 #define ramfs_lnknode_v_linkstr  clnknode_v_linkstr
 #define ramfs_lnknode_v_wrattr   fnode_v_wrattr_noop
+#define ramfs_lnknode_v_changed  clnknode_v_changed
 #define ramfs_lnknode_v_destroy  clnknode_v_destroy
 
 
@@ -68,7 +69,8 @@ DATDEF struct flnknode_ops const ramfs_lnknode_ops;
 #define _ramfs_regnode_fini        _fregnode_fini
 DATDEF struct fregnode_ops const ramfs_regnode_ops;
 #define ramfs_regnode_v_wrattr  fnode_v_wrattr_noop
-#define ramfs_regnode_v_destroy fnode_v_destroy
+#define ramfs_regnode_v_changed fregnode_v_changed
+#define ramfs_regnode_v_destroy fregnode_v_destroy
 
 
 #define ramfs_devnode              fdevnode /* Same type... */
@@ -82,6 +84,7 @@ DATDEF struct fregnode_ops const ramfs_regnode_ops;
 DATDEF struct fdevnode_ops const ramfs_devnode_ops;
 #define ramfs_devnode_v_open    fdevnode_v_open
 #define ramfs_devnode_v_wrattr  fnode_v_wrattr_noop
+#define ramfs_devnode_v_changed fdevnode_v_changed
 #define ramfs_devnode_v_destroy fdevnode_v_destroy
 
 
@@ -103,6 +106,7 @@ DATDEF struct ffifonode_ops const ramfs_fifonode_ops;
 #define ramfs_fifonode_v_stat     ffifonode_v_stat
 #define ramfs_fifonode_v_hop      ffifonode_v_hop
 #define ramfs_fifonode_v_wrattr   fnode_v_wrattr_noop
+#define ramfs_fifonode_v_changed  ffifonode_v_changed
 #define ramfs_fifonode_v_destroy  ffifonode_v_destroy
 
 
@@ -117,6 +121,7 @@ DATDEF struct ffifonode_ops const ramfs_fifonode_ops;
 DATDEF struct fsocknode_ops const ramfs_socknode_ops;
 #define ramfs_socknode_v_open     fsocknode_v_open
 #define ramfs_socknode_v_wrattr   fnode_v_wrattr_noop
+#define ramfs_socknode_v_changed  fsocknode_v_changed
 #define ramfs_socknode_v_destroy  fsocknode_v_destroy
 
 

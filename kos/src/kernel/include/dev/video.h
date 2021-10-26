@@ -117,6 +117,7 @@ struct videodev
 #define videodev_v_changed ansittydev_v_changed
 #define videodev_v_wrattr  ansittydev_v_wrattr
 #define videodev_v_write   ansittydev_v_write
+#define videodev_v_tryas   ansittydev_v_tryas
 FUNDEF NONNULL((1)) syscall_slong_t KCALL
 videodev_v_ioctl(struct mfile *__restrict self, syscall_ulong_t cmd,
                  USER UNCHECKED void *arg, iomode_t mode) THROWS(...);

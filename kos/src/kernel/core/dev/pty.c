@@ -441,6 +441,7 @@ PRIVATE struct mfile_stream_ops const ptyslave_stream_ops = {
 	.mso_stat        = &ttydev_v_stat,
 	.mso_pollconnect = &ttydev_v_pollconnect,
 	.mso_polltest    = &ttydev_v_polltest,
+	.mso_tryas       = &ttydev_v_tryas,
 };
 PUBLIC_CONST struct ttydev_ops const ptyslave_ops = {{{{{
 	.no_file = {
@@ -459,6 +460,7 @@ PRIVATE struct mfile_stream_ops const ptymaster_stream_ops = {
 	.mso_stat        = &ptymaster_v_stat,
 	.mso_pollconnect = &ptymaster_v_pollconnect,
 	.mso_polltest    = &ptymaster_v_polltest,
+	.mso_tryas       = &chrdev_v_tryas,
 };
 PUBLIC_CONST struct chrdev_ops const ptymaster_ops = {{{{
 	.no_file = {

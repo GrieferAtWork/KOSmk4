@@ -406,6 +406,7 @@ PRIVATE struct mfile_stream_ops const mktty_stream_ops = {
 	.mso_stat        = &ttydev_v_stat,
 	.mso_pollconnect = &mkttydev_v_pollconnect,
 	.mso_polltest    = &mkttydev_v_polltest,
+	.mso_tryas       = &ttydev_v_tryas,
 };
 
 /* Operators used by `struct mkttydev' */

@@ -305,7 +305,7 @@ struct mfile_stream_ops {
 	 * never given as `HANDLE_TYPE_MFILE'.
 	 * @param: wanted_type: The requested handle type.
 	 * @return: NULL:       Cannot cast to `wanted_type'. */
-	NONNULL((1)) REF void *
+	WUNUSED NONNULL((1)) REF void *
 	(KCALL *mso_tryas)(struct mfile *__restrict self, uintptr_half_t wanted_type)
 			THROWS(...);
 };

@@ -60,7 +60,8 @@ clnknode_v_readlink(struct flnknode *__restrict self,
 		THROWS(E_SEGFAULT);
 FUNDEF ATTR_CONST ATTR_RETNONNULL WUNUSED NONNULL((1)) char const *
 NOTHROW(KCALL clnknode_v_linkstr)(struct flnknode *__restrict self);
-#define clnknode_v_destroy fnode_v_destroy
+#define clnknode_v_changed flnknode_v_changed
+#define clnknode_v_destroy flnknode_v_destroy
 /************************************************************************/
 
 

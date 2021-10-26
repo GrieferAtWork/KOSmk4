@@ -1544,6 +1544,7 @@ PRIVATE struct mfile_stream_ops const vga_stream_operators = {
 	.mso_write = &videodev_v_write,
 	.mso_ioctl = &VGA_Ioctl,
 	.mso_mmap  = &VGA_MMap,
+	.mso_tryas = &videodev_v_tryas,
 };
 PRIVATE struct videodev_ops const vga_operators = {
 	.vdf_tty = {{{{{

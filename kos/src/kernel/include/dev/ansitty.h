@@ -90,6 +90,7 @@ struct ansittydev
 #define ansittydev_v_destroy chrdev_v_destroy
 #define ansittydev_v_changed chrdev_v_changed
 #define ansittydev_v_wrattr  chrdev_v_wrattr
+#define ansittydev_v_tryas   chrdev_v_tryas
 FUNDEF NONNULL((1)) size_t KCALL /* NOTE: This read operator is _MANDATORY_ and may not be overwritten by sub-classes! */
 ansittydev_v_write(struct mfile *__restrict self,
                    USER CHECKED void const *src,

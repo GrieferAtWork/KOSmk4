@@ -59,9 +59,11 @@ struct chrdev
 	_device_assert_ops_(&(ops)->cdo_dev)
 
 /* Default operators for `struct chrdev' */
-#define chrdev_v_destroy device_v_destroy
-#define chrdev_v_changed device_v_changed
-#define chrdev_v_wrattr  device_v_wrattr
+#define chrdev_v_destroy    device_v_destroy
+#define chrdev_v_changed    device_v_changed
+#define chrdev_v_wrattr     device_v_wrattr
+#define chrdev_v_tryas      device_v_tryas
+#define chrdev_v_stream_ops device_v_stream_ops
 
 
 /* Initialize common+basic fields. The caller must still initialize:

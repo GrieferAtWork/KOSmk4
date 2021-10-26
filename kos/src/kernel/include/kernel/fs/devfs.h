@@ -126,7 +126,16 @@ __DEFINE_REFCOUNT_FUNCTIONS(struct device,
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL device_v_destroy)(struct mfile *__restrict self);
 #define device_v_wrattr  fnode_v_wrattr_noop
-#define device_v_changed fnode_v_changed
+#define device_v_changed fdevnode_v_changed
+/* Device files can be casted  into PATH and DIRENT  objects,
+ * returning the mounting point for /dev/ and the name of the
+ * device file. (Note that this even continues to work if the
+ * device file has been unlink(2)'d from /dev/!) */
+FUNDEF WUNUSED NONNULL((1)) REF void *KCALL
+device_v_tryas(struct mfile *__restrict self,
+               uintptr_half_t wanted_type) THROWS(...);
+/* Device stream operators (simply only devices `.mso_tryas = &device_v_tryas') */
+DATDEF struct mfile_stream_ops const device_v_stream_ops;
 
 /* Helper macros. */
 #define device_isblk(self) S_ISBLK((self)->_device_devnode_ _fdevnode_node_ fn_mode)
@@ -399,7 +408,7 @@ device_lookup_bypartguid(guid_t const *__restrict guid)
  *  #2: Pass `string' to `device_lookup_byname()', and re-return if non-NULL
  *  #3: if `!S_ISCHR(st_mode)' and `string' matches FORMAT_GUID_T, decode a
  *      GUID and make use of `device_lookup_bypartguid'.
- *  #4: if `st_mode != 0',  do `sscanf(string, "%u:%u")'  for a  MAJOR/MINOR
+ *  #4: if `st_mode != 0', do `sscanf(string, "%u:%u")' for a MAJOR/MINOR
  *      pair, construct a dev_t, and pass to `device_lookup_bydev()', and
  *      re-return if non-NULL
  *  #5: If all else failed, return `NULL' */

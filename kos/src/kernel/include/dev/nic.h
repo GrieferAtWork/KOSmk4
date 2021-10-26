@@ -251,6 +251,7 @@ FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL nicdev_v_destroy)(struct mfile *__restrict self);
 #define nicdev_v_changed chrdev_v_changed
 #define nicdev_v_wrattr  chrdev_v_wrattr
+#define nicdev_v_tryas   chrdev_v_tryas
 FUNDEF NONNULL((1)) size_t KCALL /* NOTE: This write operator is _MANDATORY_ and may not be overwritten by sub-classes! */
 nicdev_v_write(struct mfile *__restrict self,
                USER CHECKED void const *src,

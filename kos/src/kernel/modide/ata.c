@@ -1150,18 +1150,19 @@ DECL_BEGIN
 /************************************************************************/
 /* Operator tables                                                      */
 /************************************************************************/
-#define INITIALIZE_DRIVE_OPS(rd, wr)                \
-	{                                               \
-		.bdo_dev = {{{                              \
-			.no_file = {                            \
-				.mo_destroy    = &AtaDrive_Destroy, \
-				.mo_loadblocks = rd,                \
-				.mo_saveblocks = wr,                \
-				.mo_changed    = &blkdev_v_changed, \
-			},                                      \
-			.no_wrattr = &blkdev_v_wrattr           \
-		}}},                                        \
-		.bdo_sync = &AtaDrive_Sync,                 \
+#define INITIALIZE_DRIVE_OPS(rd, wr)                   \
+	{                                                  \
+		.bdo_dev = {{{                                 \
+			.no_file = {                               \
+				.mo_destroy    = &AtaDrive_Destroy,    \
+				.mo_loadblocks = rd,                   \
+				.mo_saveblocks = wr,                   \
+				.mo_changed    = &blkdev_v_changed,    \
+				.mo_stream     = &blkdev_v_stream_ops, \
+			},                                         \
+			.no_wrattr = &blkdev_v_wrattr              \
+		}}},                                           \
+		.bdo_sync = &AtaDrive_Sync,                    \
 	}
 PRIVATE struct blkdev_ops const AtaDrive_DmaOps   = INITIALIZE_DRIVE_OPS(&AtaDrive_RdSectorsDMA, &AtaDrive_WrSectorsDMA);
 PRIVATE struct blkdev_ops const AtaDrive_ChsOps   = INITIALIZE_DRIVE_OPS(&AtaDrive_RdSectorsCHS, &AtaDrive_WrSectorsCHS);

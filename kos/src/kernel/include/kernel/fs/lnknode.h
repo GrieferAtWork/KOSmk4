@@ -107,6 +107,8 @@ flnknode_v_readlink_default(struct flnknode *__restrict self,
                             USER CHECKED /*utf-8*/ char *buf,
                             size_t bufsize)
 			THROWS(E_SEGFAULT, E_IOERROR, ...);
+#define flnknode_v_changed fnode_v_changed
+#define flnknode_v_destroy fnode_v_destroy
 
 
 struct flnknode

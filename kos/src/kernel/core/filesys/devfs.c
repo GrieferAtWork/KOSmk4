@@ -35,10 +35,13 @@
 #include <kernel/fs/chrdev.h>
 #include <kernel/fs/devfs.h>
 #include <kernel/fs/devnode.h>
+#include <kernel/fs/dirent.h>
 #include <kernel/fs/filesys.h>
 #include <kernel/fs/node.h>
+#include <kernel/fs/path.h>
 #include <kernel/fs/ramfs.h>
 #include <kernel/fs/super.h>
+#include <kernel/fs/vfs.h>
 #include <kernel/mman/driver.h>
 #include <kernel/paging.h>
 #include <kernel/printk.h>
@@ -52,6 +55,7 @@
 #include <kos/except/reason/fs.h>
 #include <kos/except/reason/inval.h>
 #include <kos/guid.h>
+#include <kos/kernel/handle.h>
 
 #include <assert.h>
 #include <format-printer.h>
@@ -510,7 +514,7 @@ PUBLIC_CONST struct fdirnode_ops const devfs_dirnode_ops = {
 
 PRIVATE NONNULL((1, 2)) unsigned int KCALL
 devfs_super_v_mkfile(struct fdirnode *__restrict self,
-                    struct fmkfile_info *__restrict info)
+                     struct fmkfile_info *__restrict info)
 		THROWS(E_FSERROR_ILLEGAL_PATH, E_FSERROR_DISK_FULL,
 		       E_FSERROR_READONLY, E_FSERROR_TOO_MANY_HARD_LINKS,
 		       E_FSERROR_UNSUPPORTED_OPERATION) {
@@ -713,8 +717,8 @@ again_acquire_lock_for_insert:
 
 PRIVATE NONNULL((1, 2, 3)) unsigned int KCALL
 devfs_super_v_unlink(struct fdirnode *__restrict self,
-                    struct fdirent *__restrict entry,
-                    struct fnode *__restrict file)
+                     struct fdirent *__restrict entry,
+                     struct fnode *__restrict file)
 		THROWS(E_FSERROR_DIRECTORY_NOT_EMPTY,
 		       E_FSERROR_READONLY, E_FSERROR_DELETED) {
 	assert(self == &devfs.fs_root);
@@ -757,7 +761,7 @@ devfs_super_v_unlink(struct fdirnode *__restrict self,
 
 PRIVATE NONNULL((1, 2)) unsigned int KCALL
 devfs_super_v_rename(struct fdirnode *__restrict self,
-                    struct frename_info *__restrict info)
+                     struct frename_info *__restrict info)
 		THROWS(E_FSERROR_ILLEGAL_PATH, E_FSERROR_DISK_FULL,
 		       E_FSERROR_READONLY, E_FSERROR_DELETED) {
 	assert(self == &devfs.fs_root);
@@ -1139,6 +1143,40 @@ NOTHROW(KCALL device_v_destroy)(struct mfile *__restrict self) {
 	decref_likely(me->dv_dirent);
 	fdevnode_v_destroy(me);
 }
+
+
+/* Device files can be casted  into PATH and DIRENT  objects,
+ * returning the mounting point for /dev/ and the name of the
+ * device file. (Note that this even continues to work if the
+ * device file has been unlink(2)'d from /dev/!) */
+PUBLIC WUNUSED NONNULL((1)) REF void *KCALL
+device_v_tryas(struct mfile *__restrict self,
+               uintptr_half_t wanted_type) THROWS(...) {
+	struct device *me = mfile_asdevice(self);
+	switch (wanted_type) {
+
+	case HANDLE_TYPE_PATH:
+		return vfs_mount_location(THIS_VFS, &devfs.fs_root);
+
+	case HANDLE_TYPE_FDIRENT: {
+		REF struct fdirent *result;
+		device_getname_lock_acquire(me);
+		result = incref(&me->dv_dirent->fdd_dirent);
+		device_getname_lock_release(me);
+		return result;
+	}	break;
+
+	default:
+		break;
+	}
+	return NULL;
+}
+
+/* Device stream operators (simply only devices `.mso_tryas = &device_v_tryas') */
+PUBLIC_CONST struct mfile_stream_ops const device_v_stream_ops = {
+	.mso_tryas = &device_v_tryas,
+};
+
 
 
 

@@ -156,9 +156,11 @@ struct blkdev
 };
 
 /* Default operators for block devices */
-#define blkdev_v_destroy device_v_destroy
-#define blkdev_v_changed device_v_changed
-#define blkdev_v_wrattr  device_v_wrattr
+#define blkdev_v_destroy    device_v_destroy
+#define blkdev_v_changed    device_v_changed
+#define blkdev_v_wrattr     device_v_wrattr
+#define blkdev_v_tryas      device_v_tryas
+#define blkdev_v_stream_ops device_v_stream_ops
 
 /* Operators used for block device partitions */
 DATDEF struct blkdev_ops const blkpart_ops;

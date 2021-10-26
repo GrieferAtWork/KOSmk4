@@ -1550,6 +1550,7 @@ PUBLIC_CONST struct mfile_stream_ops const kbddev_v_stream_ops = {
 	.mso_stat        = &kbddev_v_stat,
 	.mso_pollconnect = &kbddev_v_pollconnect,
 	.mso_polltest    = &kbddev_v_polltest,
+	.mso_tryas       = &kbddev_v_tryas,
 };
 
 #else /* CONFIG_USE_NEW_FS */

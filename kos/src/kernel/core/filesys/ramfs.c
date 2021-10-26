@@ -81,7 +81,7 @@ PUBLIC_CONST struct flnknode_ops const ramfs_lnknode_ops = {
 	.lno_node = {
 		.no_file = {
 			.mo_destroy = &ramfs_lnknode_v_destroy,
-			.mo_changed = &fnode_v_changed,
+			.mo_changed = &ramfs_lnknode_v_changed,
 		},
 		.no_wrattr = &ramfs_lnknode_v_wrattr,
 	},
@@ -93,28 +93,28 @@ PUBLIC_CONST struct fregnode_ops const ramfs_regnode_ops = {
 	.rno_node = {
 		.no_file = {
 			.mo_destroy = &ramfs_regnode_v_destroy,
-			.mo_changed = &fnode_v_changed,
+			.mo_changed = &ramfs_regnode_v_changed,
 		},
 		.no_wrattr = &ramfs_regnode_v_wrattr,
 	},
 };
 
-PRIVATE struct mfile_stream_ops const ramfs_devnode_stream_ops = {
+PRIVATE struct mfile_stream_ops const ramfs_devnode_v_stream_ops = {
 	.mso_open = &ramfs_devnode_v_open,
 };
 PUBLIC_CONST struct fdevnode_ops const ramfs_devnode_ops = {
 	.dno_node = {
 		.no_file = {
 			.mo_destroy = &ramfs_devnode_v_destroy,
-			.mo_changed = &fnode_v_changed,
-			.mo_stream  = &ramfs_devnode_stream_ops,
+			.mo_changed = &ramfs_devnode_v_changed,
+			.mo_stream  = &ramfs_devnode_v_stream_ops,
 		},
 		.no_wrattr = &ramfs_devnode_v_wrattr,
 	},
 };
 
 
-PRIVATE struct mfile_stream_ops const ramfs_fifonode_stream_ops = {
+PRIVATE struct mfile_stream_ops const ramfs_fifonode_v_stream_ops = {
 	.mso_open     = &ramfs_fifonode_v_open,
 	.mso_read     = &ramfs_fifonode_v_read,
 	.mso_readv    = &ramfs_fifonode_v_readv,
@@ -128,23 +128,23 @@ PUBLIC_CONST struct ffifonode_ops const ramfs_fifonode_ops = {
 	.fno_node = {
 		.no_file = {
 			.mo_destroy = &ramfs_fifonode_v_destroy,
-			.mo_changed = &fnode_v_changed,
-			.mo_stream  = &ramfs_fifonode_stream_ops,
+			.mo_changed = &ramfs_fifonode_v_changed,
+			.mo_stream  = &ramfs_fifonode_v_stream_ops,
 		},
 		.no_wrattr = &ramfs_fifonode_v_wrattr,
 	},
 };
 
 
-PRIVATE struct mfile_stream_ops const ramfs_socknode_stream_ops = {
+PRIVATE struct mfile_stream_ops const ramfs_socknode_v_stream_ops = {
 	.mso_open = &ramfs_socknode_v_open,
 };
 PUBLIC_CONST struct fsocknode_ops const ramfs_socknode_ops = {
 	.suno_node = {
 		.no_file = {
 			.mo_destroy = &ramfs_socknode_v_destroy,
-			.mo_changed = &fnode_v_changed,
-			.mo_stream  = &ramfs_socknode_stream_ops,
+			.mo_changed = &ramfs_socknode_v_changed,
+			.mo_stream  = &ramfs_socknode_v_stream_ops,
 		},
 		.no_wrattr = &ramfs_socknode_v_wrattr,
 	},
