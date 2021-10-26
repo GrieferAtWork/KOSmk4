@@ -798,12 +798,6 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *       >> Translate exception 0x80:0x3,E_FSERROR_PATH_NOT_FOUND[0x1] into errno=-2
 	 *       messages... */
 
-	/* TODO: This crashes:
-	 * $ cd /dev
-	 * $ mv urandom foobar
-	 * $ ls                    # << The rename messed up some stuff...
-	 */
-
 	/* TODO: The gdbdriver server shouldn't directly modify this_fs; instead, use `task_setfs()' */
 
 	return state;

@@ -380,6 +380,7 @@ again:
 	{
 		REF struct fdirent *next;
 		FINALLY_DECREF_UNLIKELY(ent);
+
 		/* Feed the entry to the user-buffer */
 		result = fdirenum_feedent(buf, bufsize, readdir_mode,
 		                          ent->fd_ino,
@@ -483,7 +484,7 @@ devfs_dirnode_v_rename(struct fdirnode *__restrict self,
 		THROWS(E_FSERROR_ILLEGAL_PATH, E_FSERROR_DISK_FULL,
 		       E_FSERROR_READONLY, E_FSERROR_FILE_ALREADY_EXISTS,
 		       E_FSERROR_DELETED) {
-	if (info->frn_oldent->fd_ops != &ramfs_dirent_ops)
+	if (!fdirent_isramfs(info->frn_oldent))
 		THROW(E_FSERROR_READONLY);
 	return ramfs_dirnode_v_rename(self, info);
 }
@@ -570,7 +571,7 @@ again_lookup:
 			                 info->mkf_namelen, sizeof(char)) = '\0';
 
 			/* Fill in other fields of the new directory entry. */
-			if (info->mkf_hash == FLOOKUP_INFO_HASH_UNSET) {
+			if (info->mkf_hash == FLOOKUP_INFO_HASH_UNSET || ADDR_ISUSER(info->mkf_name)) {
 				info->mkf_hash = fdirent_hash(new_dirent->rde_ent.fd_name,
 				                              info->mkf_namelen);
 			}
@@ -720,9 +721,8 @@ devfs_super_v_unlink(struct fdirnode *__restrict self,
 	(void)self;
 
 	/* Check for device files. */
-	assert(entry->fd_ops == &ramfs_dirent_ops ||
-	       entry->fd_ops == &fdevfsdirent_ops);
-	if (entry->fd_ops == &fdevfsdirent_ops) {
+	assert(fdirent_isramfs(entry) || fdirent_isdevfs(entry));
+	if (fdirent_isdevfs(entry)) {
 		struct fdevfsdirent *real_entry;
 		struct device *real_file;
 		real_entry = container_of(entry, struct fdevfsdirent, fdd_dirent);
@@ -782,12 +782,12 @@ devfs_super_v_rename(struct fdirnode *__restrict self,
 			                 info->frn_namelen, sizeof(char)) = '\0';
 
 			/* Fill in other fields of the new directory entry. */
-			if (info->frn_hash == FLOOKUP_INFO_HASH_UNSET) {
+			if (info->frn_hash == FLOOKUP_INFO_HASH_UNSET || ADDR_ISUSER(info->frn_name)) {
 				info->frn_hash = fdirent_hash(new_dirent->fdd_dirent.fd_name,
 				                              info->frn_namelen);
 			}
 			new_dirent->fdd_dirent.fd_refcnt  = 2; /* +1: info->mkf_dent, +1: devfile->dv_dirent */
-			new_dirent->fdd_dirent.fd_ops     = &ramfs_dirent_ops;
+			new_dirent->fdd_dirent.fd_ops     = &fdevfsdirent_ops;
 			new_dirent->fdd_dirent.fd_hash    = info->frn_hash;
 			new_dirent->fdd_dirent.fd_ino     = devfile->fn_ino; /* INO numbers are constant here. */
 			new_dirent->fdd_dirent.fd_namelen = info->frn_namelen;
@@ -806,7 +806,7 @@ devfs_super_v_rename(struct fdirnode *__restrict self,
 		COMPILER_READ_BARRIER();
 		old_dirent = devfile->dv_dirent;
 		if unlikely(devfile->dv_byname_node.rb_lhs == DEVICE_BYNAME_DELETED || /* Deleted */
-		            &old_dirent->fdd_dirent != info->frn_oldent) {             /* Renamed */
+		            old_dirent != fdirent_asdevfs(info->frn_oldent)) {         /* Renamed */
 			devfs_byname_endwrite();
 			return FDIRNODE_RENAME_DELETED;
 		}
@@ -836,10 +836,13 @@ devfs_super_v_rename(struct fdirnode *__restrict self,
 					devfs_byname_endwrite();
 					THROW(E_NOT_IMPLEMENTED_TODO);
 				}
-			} else if (info->frn_repfile != NULL) {
-				devfs_byname_endwrite();
-				kfree(new_dirent);
-				return FDIRNODE_RENAME_EXISTS;
+			} else {
+				/* TODO: Must also check for ramfs files! */
+				if (info->frn_repfile != NULL) {
+					devfs_byname_endwrite();
+					kfree(new_dirent);
+					return FDIRNODE_RENAME_EXISTS;
+				}
 			}
 		}
 
@@ -872,7 +875,7 @@ devfs_super_v_rename(struct fdirnode *__restrict self,
 		struct ramfs_dirent *new_dirent;
 		struct ramfs_dirnode *olddir = (struct ramfs_dirnode *)info->frn_olddir;
 		struct ramfs_dirent *old_dirent;
-		assert(info->frn_oldent->fd_ops == &ramfs_dirent_ops);
+		assert(fdirent_isramfs(info->frn_oldent));
 
 		/* Allocate the new directory entry. */
 		new_dirent = (REF struct ramfs_dirent *)kmalloc(offsetof(struct ramfs_dirent, rde_ent.fd_name) +
@@ -884,7 +887,7 @@ devfs_super_v_rename(struct fdirnode *__restrict self,
 			                 info->frn_namelen, sizeof(char)) = '\0';
 
 			/* Fill in other fields of the new directory entry. */
-			if (info->frn_hash == FLOOKUP_INFO_HASH_UNSET) {
+			if (info->frn_hash == FLOOKUP_INFO_HASH_UNSET || ADDR_ISUSER(info->frn_name)) {
 				info->frn_hash = fdirent_hash(new_dirent->rde_ent.fd_name,
 				                              info->frn_namelen);
 			}
