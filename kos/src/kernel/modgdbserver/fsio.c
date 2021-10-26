@@ -344,9 +344,8 @@ NOTHROW(KCALL GDBFs_Open)(char *filename,
 
 		/* Open the file */
 		{
-			REF struct fs *saved_fs = PERTASK_GET(this_fs);
-			PERTASK_SET(this_fs, GDBFs.fi_fs);
-			RAII_FINALLY { PERTASK_SET(this_fs, saved_fs); };
+			REF struct fs *saved_fs = task_setfs(GDBFs.fi_fs);
+			RAII_FINALLY { decref_unlikely(task_setfs(saved_fs)); };
 			*result = path_open(AT_FDROOT, filename, os_oflags, mode);
 		}
 
@@ -491,9 +490,8 @@ NOTHROW(KCALL GDBFs_Unlink)(char *filename) {
 		REF struct path *p;
 #ifdef CONFIG_USE_NEW_FS
 		atflag_t atflags;
-		REF struct fs *saved_fs = PERTASK_GET(this_fs);
-		PERTASK_SET(this_fs, GDBFs.fi_fs);
-		RAII_FINALLY { PERTASK_SET(this_fs, saved_fs); };
+		REF struct fs *saved_fs = task_setfs(GDBFs.fi_fs);
+		RAII_FINALLY { decref_unlikely(task_setfs(saved_fs)); };
 		atflags = fs_atflags(0) | AT_REMOVEREG;
 		p       = path_traverse(AT_FDCWD, filename, &last_seg, &last_seglen, atflags);
 		FINALLY_DECREF_UNLIKELY(p);
@@ -543,9 +541,8 @@ NOTHROW(KCALL GDBFs_Readlink)(char *filename, char *buf,
 #ifdef CONFIG_USE_NEW_FS
 		size_t avail, used;
 		REF struct flnknode *lnk;
-		REF struct fs *saved_fs = PERTASK_GET(this_fs);
-		PERTASK_SET(this_fs, GDBFs.fi_fs);
-		RAII_FINALLY { PERTASK_SET(this_fs, saved_fs); };
+		REF struct fs *saved_fs = task_setfs(GDBFs.fi_fs);
+		RAII_FINALLY { decref_unlikely(task_setfs(saved_fs)); };
 		lnk = (REF struct flnknode *)path_traversefull(AT_FDCWD, filename, fs_atflags(0));
 		FINALLY_DECREF_UNLIKELY(lnk);
 		/* Check that the named INode is actually a symbolic link. */

@@ -231,9 +231,9 @@ DATDEF struct ffilesys devfs_filesys;
 
 /* By-name lookup of devices in /dev/ */
 struct shared_rwlock;
-DATDEF struct shared_rwlock devfs_byname_lock;    /* Lock for `devfs_byname_tree' */
-DATDEF struct lockop_slist devfs_byname_lops;     /* Lock operations for `devfs_byname_lock' */
-DATDEF RBTREE_ROOT(device) devfs_byname_tree; /* [0..n][lock(devfs_byname_lock)] By-name tree of device files. */
+DATDEF struct shared_rwlock devfs_byname_lock; /* Lock for `devfs_byname_tree' */
+DATDEF struct lockop_slist devfs_byname_lops;  /* Lock operations for `devfs_byname_lock' */
+DATDEF RBTREE_ROOT(device) devfs_byname_tree;  /* [0..n][lock(devfs_byname_lock)] By-name tree of device files. */
 
 /* Lock accessor helpers for `devfs_byname_lock' and `devfs_byname_tree' */
 FUNDEF NOBLOCK void NOTHROW(KCALL _devfs_byname_reap)(void);

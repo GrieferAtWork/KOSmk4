@@ -1008,9 +1008,7 @@ GDBFs_HandleCommand(char *command,
 				goto do_transmit;
 			}
 			ofs = GDBFs.fi_fs;
-			nfs = ATOMIC_READ(FORTASK(proc, this_fs));
-			if unlikely(!nfs || !tryincref(nfs))
-				nfs = incref(&fs_kernel);
+			nfs = task_getfs(proc);
 			GDBFs.fi_fs = nfs; /* Inherit reference */
 			decref_unlikely(ofs);
 			decref_unlikely(proc);
