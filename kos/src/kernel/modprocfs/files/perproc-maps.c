@@ -58,10 +58,17 @@ NOTHROW(FCALL nameof_special_datablock)(struct mfile *__restrict self) {
 	if (self == &compat_execabi_system_rtld_file.mrf_file)
 		return "[" COMPAT_RTLD_LIBDL "]";
 #endif /* __ARCH_HAVE_COMPAT */
+#ifdef CONFIG_USE_NEW_FS
+	if (self == &mfile_phys)
+		return "/dev/mem";
+	if (self == &mfile_zero)
+		return "/dev/zero";
+#else /* CONFIG_USE_NEW_FS */
 	if (self == &mfile_phys)
 		return "[/dev/mem]";
 	if (self == &mfile_zero)
 		return "[/dev/zero]";
+#endif /* !CONFIG_USE_NEW_FS */
 	if (self >= mfile_anon && self < COMPILER_ENDOF(mfile_anon))
 		return "[anon]";
 	if (self == &mfile_ndef)

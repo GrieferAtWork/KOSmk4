@@ -118,9 +118,9 @@ struct printnode
 
 
 /* Helper macros */
-#define regnode_asprintnode(self) ((struct printnode *)(self))
-#define fnode_asprintnode(self)   regnode_asprintnode(fnode_asreg(self))
-#define mfile_asprintnode(self)   regnode_asprintnode(mfile_asreg(self))
+#define fregnode_asprintnode(self) ((struct printnode *)(self))
+#define fnode_asprintnode(self)    fregnode_asprintnode(fnode_asreg(self))
+#define mfile_asprintnode(self)    fregnode_asprintnode(mfile_asreg(self))
 
 
 /* Initialize common+basic fields. The caller must still initialize:
@@ -143,7 +143,7 @@ struct printnode
 	 (self)->_printnode_reg_ _fregnode_node_ _fnode_file_ mf_changed.slh_first = MFILE_PARTS_ANONYMOUS,                        \
 	 (self)->_printnode_reg_ _fregnode_node_ _fnode_file_ mf_flags = ((super)->fs_root._fdirnode_node_ _fnode_file_ mf_flags & \
 	                                                                  (MFILE_F_DELETED | MFILE_F_NOATIME | MFILE_F_NOMTIME)) | \
-	                                                                 MFILE_F_READONLY | MFILE_FM_ATTRREADONLY,                 \
+	                                                                 MFILE_F_READONLY | MFILE_F_FIXEDFILESIZE,                 \
 	 (self)->_printnode_reg_ _fregnode_node_ _fnode_file_ mf_ops        = &(ops)->pno_reg.rno_node.no_file,                    \
 	 (self)->_printnode_reg_ _fregnode_node_ _fnode_file_ mf_blockshift = PAGESHIFT,                                           \
 	 (self)->_printnode_reg_ _fregnode_node_ _fnode_file_ mf_part_amask = PAGEMASK,                                            \
@@ -155,7 +155,7 @@ struct printnode
 	 (self)->_printnode_reg_ _fregnode_node_ _fnode_file_ mf_changed.slh_first = MFILE_PARTS_ANONYMOUS,                        \
 	 (self)->_printnode_reg_ _fregnode_node_ _fnode_file_ mf_flags = ((super)->fs_root._fdirnode_node_ _fnode_file_ mf_flags & \
 	                                                                  (MFILE_F_DELETED | MFILE_F_NOATIME | MFILE_F_NOMTIME)) | \
-	                                                                 MFILE_F_READONLY | MFILE_FM_ATTRREADONLY,                 \
+	                                                                 MFILE_F_READONLY | MFILE_F_FIXEDFILESIZE,                 \
 	 (self)->_printnode_reg_ _fregnode_node_ _fnode_file_ mf_ops        = &(ops)->pno_reg.rno_node.no_file,                    \
 	 (self)->_printnode_reg_ _fregnode_node_ _fnode_file_ mf_blockshift = PAGESHIFT,                                           \
 	 (self)->_printnode_reg_ _fregnode_node_ _fnode_file_ mf_part_amask = PAGEMASK,                                            \
@@ -165,7 +165,7 @@ struct printnode
 #define _printnode_fini(self) decref_nokill((self)->_printnode_reg_ fn_super)
 
 
-/* Default operators for `struct fdirnode_ops' */
+/* Default operators for `struct printnode_ops' */
 #define printnode_v_destroy fregnode_v_destroy
 #define printnode_v_changed fregnode_v_changed
 #define printnode_v_wrattr  fnode_v_wrattr_noop

@@ -1298,6 +1298,13 @@ something_changed:
 					actual_fpos   = mnode_getfileaddr(node);
 					if (expected_fpos != actual_fpos)
 						goto not_an_elf_file_phdrv_result_mmlock;
+#ifdef CONFIG_USE_NEW_FS
+				} else if (node_file >= &mfile_zero) {
+					/* Allow zero-memory  for .bss-style  mappings!
+					 * It used to  be that `mfile_zero'  is one  of
+					 * the `mfile_anon' files, but that's no longer
+					 * the case. */
+#endif /* CONFIG_USE_NEW_FS */
 				} else if (node_file >= mfile_anon && node_file < COMPILER_ENDOF(mfile_anon)) {
 					/* Allow zero-memory for .bss-style mappings! */
 				} else {
@@ -2131,7 +2138,13 @@ uem_trycreate(struct mman *__restrict self,
 	}
 
 	did_unlock = false;
-	if (file >= mfile_anon && file < COMPILER_ENDOF(mfile_anon)) {
+#ifdef CONFIG_USE_NEW_FS
+	if (file == &mfile_zero ||
+	    (file >= mfile_anon && file < COMPILER_ENDOF(mfile_anon)))
+#else /* CONFIG_USE_NEW_FS */
+	if (file >= mfile_anon && file < COMPILER_ENDOF(mfile_anon))
+#endif /* !CONFIG_USE_NEW_FS */
+	{
 		/* Special case: zero-initialized memory.
 		 * In this case, we may be dealing with a .bss segment
 		 * of a UserELF module, in which case we should try to

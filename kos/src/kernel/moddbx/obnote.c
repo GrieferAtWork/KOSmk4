@@ -778,15 +778,25 @@ NOTHROW(FCALL mfile_known_name)(struct mfile *__restrict self,
 	} else if (self == &mfile_dbgheap) {
 		result = "[dbgheap]";
 #endif /* CONFIG_DEBUG_HEAP */
+#ifdef CONFIG_USE_NEW_FS
+	} else if (self == &mfile_zero) {
+		result = "/dev/zero";
+#else /* CONFIG_USE_NEW_FS */
 	} else if (self == &mfile_zero) {
 		result = "[/dev/zero]";
+#endif /* !CONFIG_USE_NEW_FS */
 	} else if (self >= mfile_anon && self < COMPILER_ENDOF(mfile_anon)) {
 		result = buf;
 		sprintf(buf, "[/dev/zero:anon:%u]", (unsigned int)(self - mfile_anon));
 	} else if (self == &mfile_ndef) {
 		result = "[undef]";
+#ifdef CONFIG_USE_NEW_FS
+	} else if (self == &mfile_phys) {
+		result = "/dev/mem";
+#else /* CONFIG_USE_NEW_FS */
 	} else if (self == &mfile_phys) {
 		result = "[/dev/mem]";
+#endif /* !CONFIG_USE_NEW_FS */
 	} else if (ops >= mfile_anon_ops && ops < COMPILER_ENDOF(mfile_anon_ops)) {
 		result = buf;
 		sprintf(buf, "[?/dev/zero:anon:%u]", (unsigned int)(ops - mfile_anon_ops));

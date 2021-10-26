@@ -773,7 +773,7 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *       that this should only affect  the _NEXT_ stack-frame, as signal  frames
 	 *       are meant to be used for  interrupt/signal handlers, in which case  the
 	 *       return  PC may already point to the start of a function (as is the case
-	 *       when  a interrupt arrives during execution of a function's first instr,
+	 *       when an interrupt arrives during execution of a function's first instr,
 	 *       which then has to be restarted after the interrupt completes, which  is
 	 *       done  by having the interrupt return to  the start of said first instr,
 	 *       meaning that decrementing mustn't be done) */
@@ -803,6 +803,8 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 * $ mv urandom foobar
 	 * $ ls                    # << The rename messed up some stuff...
 	 */
+
+	/* TODO: The gdbdriver server shouldn't directly modify this_fs; instead, use `task_setfs()' */
 
 	return state;
 }
