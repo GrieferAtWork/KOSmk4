@@ -139,7 +139,7 @@ struct printnode
  * @param: struct fsuper        *super: Filesystem superblock. */
 #define _printnode_init(self, ops, super)                                                                                      \
 	(_printnode_assert_ops_(ops) _fnode_init_common(_fregnode_asnode(_printnode_asreg(self))),                                 \
-	 (self)->_printnode_reg_ _fregnode_node_ _fnode_file_ mf_parts             = __NULLPTR,                                    \
+	 (self)->_printnode_reg_ _fregnode_node_ _fnode_file_ mf_parts             = MFILE_PARTS_ANONYMOUS,                        \
 	 (self)->_printnode_reg_ _fregnode_node_ _fnode_file_ mf_changed.slh_first = MFILE_PARTS_ANONYMOUS,                        \
 	 (self)->_printnode_reg_ _fregnode_node_ _fnode_file_ mf_flags = ((super)->fs_root._fdirnode_node_ _fnode_file_ mf_flags & \
 	                                                                  (MFILE_F_DELETED | MFILE_F_NOATIME | MFILE_F_NOMTIME)) | \
@@ -151,7 +151,7 @@ struct printnode
 	 (self)->_printnode_reg_ _fregnode_node_ fn_super = incref(super))
 #define _printnode_cinit(self, ops, super)                                                                                     \
 	(_printnode_assert_ops_(ops) _fnode_cinit_common(_fregnode_asnode(_printnode_asreg(self))),                                \
-	 __hybrid_assert((self)->_printnode_reg_ _fregnode_node_ _fnode_file_ mf_parts == __NULLPTR),                              \
+	 (self)->_printnode_reg_ _fregnode_node_ _fnode_file_ mf_parts             = MFILE_PARTS_ANONYMOUS,                        \
 	 (self)->_printnode_reg_ _fregnode_node_ _fnode_file_ mf_changed.slh_first = MFILE_PARTS_ANONYMOUS,                        \
 	 (self)->_printnode_reg_ _fregnode_node_ _fnode_file_ mf_flags = ((super)->fs_root._fdirnode_node_ _fnode_file_ mf_flags & \
 	                                                                  (MFILE_F_DELETED | MFILE_F_NOATIME | MFILE_F_NOMTIME)) | \

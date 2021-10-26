@@ -466,8 +466,7 @@ struct pidns {
 
 #define PIDNS_FIRST_NONRESERVED_PID 2 /* First PID that isn't reserved. */
 
-/* When  `pn_nextpid'  >=  this value,  start  recycling PIDs.
- * This value can be controlled via `/proc/sys/kernel/pid_max' */
+/* `/proc/sys/kernel/pid_max': When `pn_nextpid' >= this value, start recycling PIDs. */
 DATDEF upid_t pid_recycle_threshold;
 
 /* Default value for `pid_recycle_threshold' */

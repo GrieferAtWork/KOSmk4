@@ -588,8 +588,10 @@ struct mfile_ops {
 /*      MFILE_F_                0x02000000  * ... Reserved: MS_LAZYTIME */
 /*efine MFILE_F_                0x04000000  * ... */
 /*efine MFILE_F_                0x08000000  * ... */
-/*efine MFILE_F_                0x10000000  * ... */
-/*efine MFILE_F_                0x20000000  * ... */
+#define MFILE_FM_FLEETING       0x10000000 /* [const] When set for fdirnode-derived nodes, don't recent-cache `struct path'
+                                            * objects created for the purpose of path  traversal. - This is used by  procfs
+                                            * for  per-process directories in  order to prevent them  being cached, as such
+                                            * folders can randomly disappear as the result of thread/process exits. */
 #define _MFILE_DEVFS_BYNAME_RED 0x20000000 /* [lock(devfs_byname_lock)] Internal flag: This file is a red node in the devfs by-name tree. */
 #define _MFILE_FN__RBRED        0x40000000 /* [lock(:fn_super->fs_nodeslock)] Internal flag: This file-node is a red node. */
 #ifndef CONFIG_NO_SMP

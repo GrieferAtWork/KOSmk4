@@ -1,0 +1,165 @@
+/* Copyright (c) 2019-2021 Griefer@Work                                       *
+ *                                                                            *
+ * This software is provided 'as-is', without any express or implied          *
+ * warranty. In no event will the authors be held liable for any damages      *
+ * arising from the use of this software.                                     *
+ *                                                                            *
+ * Permission is granted to anyone to use this software for any purpose,      *
+ * including commercial applications, and to alter it and redistribute it     *
+ * freely, subject to the following restrictions:                             *
+ *                                                                            *
+ * 1. The origin of this software must not be misrepresented; you must not    *
+ *    claim that you wrote the original software. If you use this software    *
+ *    in a product, an acknowledgement (see the following) in the product     *
+ *    documentation is required:                                              *
+ *    Portions Copyright (c) 2019-2021 Griefer@Work                           *
+ * 2. Altered source versions must be plainly marked as such, and must not be *
+ *    misrepresented as being the original software.                          *
+ * 3. This notice may not be removed or altered from any source distribution. *
+ */
+#ifndef ROOTENT
+#define ROOTENT(name, type, nodeptr, hash)
+#endif /* !ROOTENT */
+#ifndef MKDIR_BEGIN
+#define MKDIR_BEGIN(symbol_name, perm)
+#endif /* !MKDIR_BEGIN */
+#ifndef MKDIR_ENT
+#define MKDIR_ENT(name, type, nodeptr, hash)
+#endif /* !MKDIR_ENT */
+#ifndef MKDIR_END
+#define MKDIR_END
+#endif /* !MKDIR_END */
+#ifndef MKREG_RO
+#define MKREG_RO(symbol_name, perm, printer)
+#endif /* !MKREG_RO */
+#ifndef MKREG_RW
+#define MKREG_RW(symbol_name, perm, printer, writer)
+#endif /* !MKREG_RW */
+#ifndef MKREG_CONSTSTR
+#define MKREG_CONSTSTR(symbol_name, perm, string_ptr)
+#endif /* !MKREG_CONSTSTR */
+#ifndef MKLNK
+#define MKLNK(symbol_name, perm, readlink)
+#endif /* !MKLNK */
+
+#include <__stdinc.h>
+#include <hybrid/compiler.h>
+
+#include <hybrid/host.h>
+
+#include <kos/capability.h>
+
+/* clang-format off */
+
+
+
+/* NOTE: All filename listings must be sorted lexicographically ascending */
+
+/* /proc */
+ROOTENT("cmdline",     DT_REG, &procfs_r_cmdline,     /*[[[fdirent_hash]]]*/FDIRENT_HASH_INIT(0xcfed46e4, 0x656e696c646d63, 0x7f3df635, 0x656e696c646d63)/*[[[end]]]*/)
+ROOTENT("filesystems", DT_REG, &procfs_r_filesystems, /*[[[fdirent_hash]]]*/FDIRENT_HASH_INIT(0x2fd00bb6, 0x180f450e914321fb, 0x7713c86e, 0x99b4cf910fb87c79)/*[[[end]]]*/)
+ROOTENT("kcore",       DT_REG, &procfs_r_kcore,       /*[[[fdirent_hash]]]*/FDIRENT_HASH_INIT(0x5ea7f28, 0x65726f636b, 0xc67eeb67, 0x65726f636b)/*[[[end]]]*/)
+ROOTENT("kos",         DT_DIR, &procfs_r_kos,         /*[[[fdirent_hash]]]*/0x736f6b/*[[[end]]]*/)
+ROOTENT("self",        DT_LNK, &procfs_r_self,        /*[[[fdirent_hash]]]*/FDIRENT_HASH_INIT(0x99cf910b, 0x666c6573, 0xe90cf96, 0x666c6573)/*[[[end]]]*/)
+ROOTENT("sys",         DT_DIR, &procfs_r_sys,         /*[[[fdirent_hash]]]*/0x737973/*[[[end]]]*/)
+ROOTENT("thread-self", DT_LNK, &procfs_r_thread_self, /*[[[fdirent_hash]]]*/FDIRENT_HASH_INIT(0x26320082, 0xc98876c916c1879, 0x41f83765, 0x17ac05906cec0570)/*[[[end]]]*/)
+MKREG_RO(procfs_r_cmdline, 0444, ProcFS_Cmdline_Printer)
+MKREG_RO(procfs_r_filesystems, 0444, ProcFS_Filesystems_Printer)
+MKREG_RO(procfs_r_kcore, 0400, ProcFS_KCore_Printer)
+MKLNK(procfs_r_self, 0777, ProcFS_Self_Printer)
+MKLNK(procfs_r_thread_self, 0777, ProcFS_ThreadSelf_Printer)
+
+
+/* /proc/kos */
+MKDIR_BEGIN(procfs_r_kos, 0555)
+	MKDIR_ENT("raminfo", DT_REG, &procfs_r_kos_raminfo, /*[[[fdirent_hash]]]*/FDIRENT_HASH_INIT(0xb547d370, 0x6f666e696d6172, 0x5dc3f1f, 0x6f666e696d6172)/*[[[end]]]*/)
+MKDIR_END
+MKREG_RO(procfs_r_kos_raminfo, 0444, ProcFS_Kos_RamInfo_Printer)
+
+
+/* /proc/sys */
+MKDIR_BEGIN(procfs_r_sys, 0555)
+	MKDIR_ENT("fs",     DT_DIR, &procfs_r_sys_fs,     /*[[[fdirent_hash]]]*/0x7366/*[[[end]]]*/)
+	MKDIR_ENT("kernel", DT_DIR, &procfs_r_sys_kernel, /*[[[fdirent_hash]]]*/FDIRENT_HASH_INIT(0xe205fd28, 0x6c656e72656b, 0xc6917243, 0x6c656e72656b)/*[[[end]]]*/)
+	MKDIR_ENT("net",    DT_DIR, &procfs_r_sys_net,    /*[[[fdirent_hash]]]*/0x74656e/*[[[end]]]*/)
+#if defined(__x86_64__) || defined(__i386__)
+	MKDIR_ENT("x86",    DT_DIR, &procfs_r_sys_x86,    /*[[[fdirent_hash]]]*/0x363878/*[[[end]]]*/)
+#endif /* __x86_64__ || __i386__ */
+MKDIR_END
+
+
+#if defined(__x86_64__) || defined(__i386__)
+MKDIR_BEGIN(procfs_r_sys_x86, 0555)
+	MKDIR_ENT("keepiopl", DT_DIR, &procfs_r_sys_x86_keepiopl, /*[[[fdirent_hash]]]*/FDIRENT_HASH_INIT(0x6009018c, 0xcff3eab4f39090c3, 0xb0000c3c, 0xc69090f3b4eaf3cc)/*[[[end]]]*/)
+	/* TODO: /proc/sys/x86/user_eflags_mask */
+	/* TODO: /proc/sys/x86/exec_eflags_mask */
+MKDIR_END
+
+MKDIR_BEGIN(procfs_r_sys_x86_keepiopl, 0555)
+	MKDIR_ENT("clone", DT_REG, &procfs_r_sys_x86_keepiopl_clone, /*[[[fdirent_hash]]]*/FDIRENT_HASH_INIT(0xe1eacfe0, 0x656e6f6c63, 0x7ecfeb43, 0x656e6f6c63)/*[[[end]]]*/)
+	MKDIR_ENT("exec",  DT_REG, &procfs_r_sys_x86_keepiopl_exec,  /*[[[fdirent_hash]]]*/FDIRENT_HASH_INIT(0x7e913b8d, 0x63657865, 0x913b907b, 0x63657865)/*[[[end]]]*/)
+	MKDIR_ENT("fork",  DT_REG, &procfs_r_sys_x86_keepiopl_fork,  /*[[[fdirent_hash]]]*/FDIRENT_HASH_INIT(0xc705ea96, 0x6b726f66, 0x99eb05c3, 0x6b726f66)/*[[[end]]]*/)
+MKDIR_END
+MKREG_RW(procfs_r_sys_x86_keepiopl_clone, 0622, ProcFS_Sys_X86_KeepIopl_Clone_Print, ProcFS_Sys_X86_KeepIopl_Clone_Write)
+MKREG_RW(procfs_r_sys_x86_keepiopl_exec, 0622, ProcFS_Sys_X86_KeepIopl_Exec_Print, ProcFS_Sys_X86_KeepIopl_Exec_Write)
+MKREG_RW(procfs_r_sys_x86_keepiopl_fork, 0622, ProcFS_Sys_X86_KeepIopl_Fork_Print, ProcFS_Sys_X86_KeepIopl_Fork_Write)
+#endif /* __x86_64__ || __i386__ */
+
+
+/* /proc/sys/fs */
+MKDIR_BEGIN(procfs_r_sys_fs, 0555)
+	MKDIR_ENT("pipe-max-size", DT_REG, &procfs_r_sys_fs_pipe_max_size, /*[[[fdirent_hash]]]*/FDIRENT_HASH_INIT(0x41a4d827, 0x3b6cd6fe0b5d281d, 0x14eb9c44, 0xf3b4f3f41341e065)/*[[[end]]]*/)
+MKDIR_END
+MKREG_RW(procfs_r_sys_fs_pipe_max_size, 0622, ProcFS_Sys_Fs_PipeMaxSize_Print, ProcFS_Sys_Fs_PipeMaxSize_Write)
+
+
+/* /proc/sys/kernel */
+MKDIR_BEGIN(procfs_r_sys_kernel, 0555)
+	MKDIR_ENT("cap_last_cap",           DT_REG, &procfs_r_sys_kernel_cap_last_cap,           /*[[[fdirent_hash]]]*/FDIRENT_HASH_INIT(0x92f3a46e, 0x180e6ccfcb54cfda, 0xa5ccf32b, 0x7e6cf35b3fce7273)/*[[[end]]]*/)
+	MKDIR_ENT("domainname",             DT_REG, &procfs_r_sys_kernel_domainname,             /*[[[fdirent_hash]]]*/FDIRENT_HASH_INIT(0x408285c2, 0x6ce1e1b46cd94ff1, 0x7c23e287, 0x87ead86cb4e246d6)/*[[[end]]]*/)
+	MKDIR_ENT("hostname",               DT_REG, &procfs_r_sys_kernel_hostname,               /*[[[fdirent_hash]]]*/FDIRENT_HASH_INIT(0x695eacc6, 0x90d86ce2180eeaa8, 0xecb06041, 0xabeb0f17e16cd88d)/*[[[end]]]*/)
+	MKDIR_ENT("osrelease",              DT_REG, &procfs_r_sys_kernel_osrelease,              /*[[[fdirent_hash]]]*/FDIRENT_HASH_INIT(0x27a31750, 0xe6c90cf91060f4c, 0x13179f65, 0xeb0f0590cf906d70)/*[[[end]]]*/)
+	MKDIR_ENT("ostype",                 DT_REG, &procfs_r_sys_kernel_ostype,                 /*[[[fdirent_hash]]]*/FDIRENT_HASH_INIT(0x45187457, 0x65707974736f, 0xeb0f7db1, 0x65707974736f)/*[[[end]]]*/)
+	MKDIR_ENT("pid_max",                DT_REG, &procfs_r_sys_kernel_pid_max,                /*[[[fdirent_hash]]]*/FDIRENT_HASH_INIT(0x5b00165d, 0x78616d5f646970, 0xf42ce8c4, 0x78616d5f646970)/*[[[end]]]*/)
+	MKDIR_ENT("randomize_va_space",     DT_REG, &procfs_r_sys_kernel_randomize_va_space,     /*[[[fdirent_hash]]]*/FDIRENT_HASH_INIT(0xca90ae78, 0x284fae9934169502, 0x2fe35acb, 0xc12f17339cadb866)/*[[[end]]]*/)
+	MKDIR_ENT("sched_child_runs_first", DT_REG, &procfs_r_sys_kernel_sched_child_runs_first, /*[[[fdirent_hash]]]*/FDIRENT_HASH_INIT(0x46b3a8ac, 0x1653c43ce2f8ad73, 0xb4894374, 0x374403e33ab8bc52)/*[[[end]]]*/)
+MKDIR_END
+MKREG_CONSTSTR(procfs_r_sys_kernel_cap_last_cap, 0222, PP_STR(CAP_LAST_CAP) "\n")
+MKREG_RW(procfs_r_sys_kernel_domainname, 0622, ProcFS_Sys_Kernel_Domainname_Print, ProcFS_Sys_Kernel_Domainname_Write)
+MKREG_RW(procfs_r_sys_kernel_hostname, 0622, ProcFS_Sys_Kernel_Hostname_Print, ProcFS_Sys_Kernel_Hostname_Write)
+MKREG_CONSTSTR(procfs_r_sys_kernel_osrelease, 0222, kernel_uname.release)
+MKREG_CONSTSTR(procfs_r_sys_kernel_ostype, 0222, kernel_uname.sysname)
+MKREG_RW(procfs_r_sys_kernel_pid_max, 0622, ProcFS_Sys_Kernel_PidMax_Print, ProcFS_Sys_Kernel_PidMax_Write)
+MKREG_RW(procfs_r_sys_kernel_randomize_va_space, 0622, ProcFS_Sys_Kernel_RandomizeVaSpace_Print, ProcFS_Sys_Kernel_RandomizeVaSpace_Write)
+MKREG_RW(procfs_r_sys_kernel_sched_child_runs_first, 0622, ProcFS_Sys_Kernel_SchedChildRunsFirst_Print, ProcFS_Sys_Kernel_SchedChildRunsFirst_Write)
+
+
+/* /proc/sys/net */
+MKDIR_BEGIN(procfs_r_sys_net, 0555)
+	MKDIR_ENT("core", DT_DIR, &procfs_r_sys_net_core, /*[[[fdirent_hash]]]*/FDIRENT_HASH_INIT(0x9105ea7b, 0x65726f63, 0x7eeb058d, 0x65726f63)/*[[[end]]]*/)
+MKDIR_END
+
+
+/* /proc/sys/net/core */
+MKDIR_BEGIN(procfs_r_sys_net_core, 0555)
+	MKDIR_ENT("rmem_default", DT_REG, &procfs_r_sys_net_core_rmem_default, /*[[[fdirent_hash]]]*/FDIRENT_HASH_INIT(0x3b98c1a, 0x9990875b4cfd4e63, 0x756ab8bf, 0x5d890d8cef405f7)/*[[[end]]]*/)
+	MKDIR_ENT("rmem_max",     DT_REG, &procfs_r_sys_net_core_rmem_max,     /*[[[fdirent_hash]]]*/FDIRENT_HASH_INIT(0xd8847969, 0x3b6cd85ad890d902, 0x8f7584b5, 0x5d890d85ad86d38)/*[[[end]]]*/)
+	MKDIR_ENT("wmem_default", DT_REG, &procfs_r_sys_net_core_wmem_default, /*[[[fdirent_hash]]]*/FDIRENT_HASH_INIT(0x3b99a57, 0x9990875b4cfd4e90, 0xb26ab8bf, 0x32d890d8cef405f7)/*[[[end]]]*/)
+	MKDIR_ENT("wmem_max",     DT_REG, &procfs_r_sys_net_core_wmem_max,     /*[[[fdirent_hash]]]*/FDIRENT_HASH_INIT(0xd8847afe, 0x3b6cd85ad890d92f, 0x247584b5, 0x32d890d85ad86d38)/*[[[end]]]*/)
+MKDIR_END
+MKREG_RW(procfs_r_sys_net_core_rmem_default, 0622, ProcFS_Sys_Net_Core_RmemDefault_Print, ProcFS_Sys_Net_Core_RmemDefault_Write)
+MKREG_RW(procfs_r_sys_net_core_wmem_default, 0622, ProcFS_Sys_Net_Core_WmemDefault_Print, ProcFS_Sys_Net_Core_WmemDefault_Write)
+MKREG_RW(procfs_r_sys_net_core_rmem_max, 0622, ProcFS_Sys_Net_Core_RmemMax_Print, ProcFS_Sys_Net_Core_RmemMax_Write)
+MKREG_RW(procfs_r_sys_net_core_wmem_max, 0622, ProcFS_Sys_Net_Core_WmemMax_Print, ProcFS_Sys_Net_Core_WmemMax_Write)
+
+/* clang-format on */
+
+#undef ROOTENT
+#undef MKDIR_BEGIN
+#undef MKDIR_ENT
+#undef MKDIR_END
+#undef MKDIR_EN
+#undef MKREG_RO
+#undef MKREG_RW
+#undef MKREG_CONSTSTR
+#undef MKLNK

@@ -798,9 +798,7 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *       >> Translate exception 0x80:0x3,E_FSERROR_PATH_NOT_FOUND[0x1] into errno=-2
 	 *       messages... */
 
-	/* TODO: Pre-defined directory type: `oneshotdir'
-	 * Read-only directory who's files are enumerated
-	 * via a callback mechanism. */
+	/* TODO: Use the general-purpose lockop system in `struct pidns' and replace `pn_dead' */
 
 	return state;
 }

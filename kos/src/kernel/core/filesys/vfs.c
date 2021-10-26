@@ -24,6 +24,7 @@
 #include <kernel/compiler.h>
 
 #include <kernel/fs/path.h>
+#include <kernel/fs/dirnode.h>
 #include <kernel/fs/vfs.h>
 #include <kernel/malloc.h>
 #include <sched/task.h>
@@ -110,6 +111,13 @@ NOTHROW(FCALL vfs_recent)(struct vfs *__restrict path_vfs,
 			TAILQ_INSERT_HEAD(&path_vfs->vf_recent, self, p_recent);
 		}
 	} else {
+		/* Check if `self' may even  be added to the  cache.
+		 * For this purpose, `MFILE_FM_FLEETING' is  tested,
+		 * which is set for per-process folders of /proc  in
+		 * order to prevent these folders from being cached. */
+		if (self->p_dir->mf_flags & MFILE_FM_FLEETING)
+			goto done_unlock;
+
 		/* Add new path to recent cache. */
 		incref(self);
 		TAILQ_INSERT_HEAD(&path_vfs->vf_recent, self, p_recent);
@@ -154,6 +162,7 @@ NOTHROW(FCALL vfs_recent)(struct vfs *__restrict path_vfs,
 			++path_vfs->vf_recentcnt;
 		}
 	}
+done_unlock:
 	vfs_recentlock_release(path_vfs);
 done:
 	return self;

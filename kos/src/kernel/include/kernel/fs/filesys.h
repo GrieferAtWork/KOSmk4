@@ -132,7 +132,7 @@ struct ffilesys {
 	};
 	uint8_t                       ffs_flags; /* Filesystem type flags (Set of `FFILESYS_F_*') */
 	COMPILER_FLEXIBLE_ARRAY(char, ffs_name); /* [const] Name of the filesystem type (As passed to `mount' using
-	                                          *         the `-t' option, as well as appearing in `/dev/filesystems') */
+	                                          * the `-t' option, as  well as appearing in  `/proc/filesystems') */
 };
 
 #define ffilesys_destroy(self)   module_destroy((struct module *)(self)->ffs_drv)

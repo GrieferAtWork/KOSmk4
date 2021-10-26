@@ -18,45 +18,42 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 import * from deemon;
+import * from ..autom8;
+import * from ..fdirent_hash;
 
-@@Deemon re-implementation of the KOS @fdirent_hash() function
-@@Returns a pair of integers @(hash32: int, hash64: int) that
-@@map to the hash values in 32-bit and 64-bit environments
-class fdirent_hash {
-	this = default;
-	public member text: string;
+@@This module works in 1 of 2 ways:
+@@
+@@First method:
+@@>> "foo" /*[[[fdirent_hash]]]*/FDIRENT_HASH_INIT(...)/*[[[end]]]*/
+@@
+@@Second method:
+@@>> /*[[[fdirent_hash:A("foo", $$)]]]*/A("foo", FDIRENT_HASH_INIT(...))/*[[[end]]]*/
+function main(parser: Autom8Parser, body: string) {
+	local autoEnd = parser.text.find("/*[[[end]]]*/", parser.commentEnd);
+	if (autoEnd < 0)
+		parser.errAt(parser.commentStart, "Missing /*[[[end]]]*/ tag");
+	parser.newText << parser.text[parser.flushStart:parser.commentEnd+2];
+	parser.flushStart = autoEnd + 13;
+	body = body.strip();
+	if (!body) {
+		local lineEnd   = parser.commentStart;
+		local lineStart = parser.text.rfind("\n", 0, lineEnd) + 1;
+		local line = parser.text[lineStart:lineEnd];
+		if (line.count("\"") != 2)
+			throw Error("Unable to auto-determine hashable string in " + repr line);
+		local nameStart = line.index("\"") + 1;
+		local nameEnd = line.index("\"", nameStart);
+		local name = line[nameStart:nameEnd].decode("c-escape");
+		parser.newText << str(fdirent_hash(name));
+	} else {
+		if (!body.startswith(":"))
+			throw Error("Invalid warning directive: " + repr body);
+		body = body[1:].lstrip();
 
-	function getHash(sizeOfPointer: int, endian: string): int {
-		local result = 0;
-		for (local part: text.bytes().segments(sizeOfPointer)) {
-			if (#part == sizeOfPointer) {
-				result += int.frombytes(Bytes(part), byteorder: endian, signed: false);
-				result *= 9;
-			} else {
-				for (local i: [#part-1:-1,-1])
-					result += part[i] << (i * 8);
-			}
-		}
-		result &= (1 << (sizeOfPointer * 8)) - 1;
-		return result;
+		local nameStart = body.index("\"") + 1;
+		local nameEnd = body.index("\"", nameStart);
+		local name = body[nameStart:nameEnd].decode("c-escape");
+		parser.newText << body.replace("$$", str(fdirent_hash(name)));
 	}
-
-	operator str(): string {
-		local values = {
-			getHash(4, "little"),
-			getHash(8, "little"),
-			getHash(4, "big"),
-			getHash(8, "big"),
-		};
-		local common = values.first;
-		for (local x: values) {
-			if (common != x) {
-				return "FDIRENT_HASH_INIT({})".format({
-					", ".join(values.each.hex())
-				});
-			}
-		}
-		return common.hex();
-	}
+	parser.newText << "/*[[[end]]]*/";
 }
-
