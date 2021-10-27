@@ -633,6 +633,7 @@ handle_getas(unsigned int fd, uintptr_half_t wanted_type)
 	TRY {
 		return handle_as(hnd, wanted_type);
 	} EXCEPT {
+		decref_unlikely(hnd);
 		handle_getas_complete_except(fd);
 	}
 }
@@ -646,6 +647,7 @@ handle_get_fnode(unsigned int fd)
 	TRY {
 		return handle_as_fnode(hnd);
 	} EXCEPT {
+		decref_unlikely(hnd);
 		handle_getas_complete_except(fd);
 	}
 }
@@ -659,6 +661,7 @@ handle_get_regnode(unsigned int fd)
 	TRY {
 		return handle_as_regnode(&hnd);
 	} EXCEPT {
+		decref_unlikely(hnd);
 		handle_getas_complete_except(fd);
 	}
 }
@@ -672,6 +675,7 @@ handle_get_dirnode(unsigned int fd)
 	TRY {
 		return handle_as_dirnode(&hnd);
 	} EXCEPT {
+		decref_unlikely(hnd);
 		handle_getas_complete_except(fd);
 	}
 }
@@ -685,6 +689,7 @@ handle_get_super(unsigned int fd)
 	TRY {
 		return handle_as_super(&hnd);
 	} EXCEPT {
+		decref_unlikely(hnd);
 		handle_getas_complete_except(fd);
 	}
 }
@@ -698,6 +703,7 @@ handle_get_super_relaxed(unsigned int fd)
 	TRY {
 		return handle_as_super_relaxed(&hnd);
 	} EXCEPT {
+		decref_unlikely(hnd);
 		handle_getas_complete_except(fd);
 	}
 }
@@ -735,6 +741,7 @@ handle_get_task(unsigned int fd)
 	TRY {
 		return handle_as_task(&hnd);
 	} EXCEPT {
+		decref_unlikely(hnd);
 		handle_getas_complete_except(fd);
 	}
 }
