@@ -34,12 +34,14 @@ DECL_END
 #include <fs/vfs.h>
 #include <kernel/execabi.h> /* execabi_system_rtld_file */
 #include <kernel/fs/blkdev.h>
+#include <kernel/fs/constdir.h>
 #include <kernel/fs/lnknode.h>
 #include <kernel/fs/node.h>
 #include <kernel/fs/path.h>
 #include <kernel/fs/printnode.h>
 #include <kernel/fs/super.h>
 #include <kernel/fs/vfs.h>
+#include <kernel/handle.h>
 #include <kernel/mman.h>
 #include <kernel/mman/enum.h>
 #include <kernel/mman/execinfo.h>
@@ -58,6 +60,7 @@ DECL_END
 #include <compat/config.h>
 #include <kos/dev.h>
 #include <kos/except.h>
+#include <kos/except/reason/inval.h>
 #include <kos/except/reason/io.h>
 #include <kos/exec/peb.h>
 #include <kos/exec/rtld.h> /* RTLD_LIBDL */
@@ -82,9 +85,6 @@ DECL_END
 
 /**/
 #include "procfs.h"
-
-/**/
-#include <kernel/fs/constdir.h> /* TODO: REMOVE_ME */
 
 /* Per-process files (all of these have `REF struct taskpid *fn_fsdata') */
 
@@ -1012,33 +1012,192 @@ NOTHROW(KCALL procfs_perproc_v_destroy)(struct mfile *__restrict self);
 /************************************************************************/
 /* /proc/[pid]/fd                                                       */
 /************************************************************************/
+
+PRIVATE struct flnknode_ops const procfs_perproc_fdlnk_ops = {
+	/* TODO */
+};
+
 PRIVATE WUNUSED NONNULL((1, 2)) REF struct fdirent *KCALL
 procfs_perproc_fd_v_lookup(struct fdirnode *__restrict self,
                            struct flookup_info *__restrict info) {
 	struct taskpid *pid = self->fn_fsdata;
-
+	REF struct task *thread;
+	REF struct handle_manager *hm;
+	thread = taskpid_gettask(pid);
+	if (!thread)
+		return NULL;
+	hm = task_gethandlemanager(thread);
+	decref_unlikely(thread);
+	FINALLY_DECREF_UNLIKELY(hm);
 	/* TODO */
-	(void)pid;
 	(void)info;
-	COMPILER_IMPURE();
 
 	return NULL;
 }
 
+struct procfs_fd_enum {
+	FDIRENUM_HEADER
+	REF struct handle_manager *pfe_hman; /* [1..1][const] Handle manager being enumerated. */
+	unsigned int               pfe_fd;   /* Lower bound for next handle to enumerate. */
+};
+
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(KCALL procfs_fd_enum_v_fini)(struct fdirenum *__restrict self) {
+	struct procfs_fd_enum *me = (struct procfs_fd_enum *)self;
+	decref_unlikely(me->pfe_hman);
+}
+
+PRIVATE NONNULL((1)) size_t KCALL
+procfs_fd_enum_v_readdir(struct fdirenum *__restrict self, USER CHECKED struct dirent *buf,
+                         size_t bufsize, readdir_mode_t readdir_mode, iomode_t UNUSED(mode))
+		THROWS(...) {
+	unsigned int index, newindex;
+	ssize_t result;
+	struct procfs_fd_enum *me;
+	u16 namelen;
+#if __SIZEOF_INT__ == 4
+	char namebuf[sizeof("4294967295")];
+#elif __SIZEOF_INT__ == 8
+	char namebuf[sizeof("18446744073709551615")];
+#else /* __SIZEOF_INT__ == ... */
+#error "Unsupported sizeof(pid_t)"
+#endif /* __SIZEOF_INT__ != ... */
+	me = (struct procfs_fd_enum *)self;
+
+again:
+	/* Read current index. */
+	index = ATOMIC_READ(me->pfe_fd);
+
+	/* Find the next handle. */
+	newindex = handle_trynextfd(index, me->pfe_hman);
+	if (newindex == (unsigned int)-1)
+		return 0; /* End-of-directory */
+	namelen = (u16)sprintf(namebuf, "%u", newindex);
+	/* Feed directory entry. */
+	result = fdirenum_feedent_ex(buf, bufsize, readdir_mode,
+	                             procfs_perproc_ino(self->de_dir->fn_fsdata,
+	                                                &procfs_perproc_fdlnk_ops),
+	                             DT_LNK, namelen, namebuf);
+	if (result < 0)
+		return (size_t)~result; /* Don't advance directory position. */
+	/* Advance directory position. */
+	if (!ATOMIC_CMPXCH(me->pfe_fd, index, newindex + 1))
+		goto again;
+	return (size_t)result;
+}
+
+PRIVATE NOBLOCK ATTR_NOINLINE ATTR_PURE WUNUSED NONNULL((1)) unsigned int
+NOTHROW(FCALL handle_manager_get_max_linear_fd_plus_one)(struct handle_manager const *__restrict self) {
+	unsigned int result = self->hm_linear.hm_alloc;
+	while (result && self->hm_linear.hm_vector[result - 1].h_type == HANDLE_TYPE_UNDEFINED)
+		--result;
+	return result;
+}
+
+PRIVATE NOBLOCK ATTR_NOINLINE ATTR_PURE WUNUSED NONNULL((1)) unsigned int
+NOTHROW(FCALL handle_manager_get_max_hashvector_fd_plus_one)(struct handle_manager const *__restrict self) {
+	unsigned int result = 0;
+	unsigned int i, mask;
+	struct handle_hashent *map;
+	map  = self->hm_hashvector.hm_hashvec;
+	mask = self->hm_hashvector.hm_hashmsk;
+	for (i = 0; i <= mask; ++i) {
+		unsigned int fdno;
+		if (map[i].hh_handle_id == HANDLE_HASHENT_SENTINEL_ID)
+			continue;
+		fdno = map[i].hh_vector_index;
+		if (fdno != (unsigned int)-1) {
+			if (result <= fdno)
+				result = fdno + 1;
+		}
+	}
+	return result;
+}
+
+PRIVATE WUNUSED NONNULL((1)) unsigned int KCALL
+find_greatest_inuse_fd_plus_one(struct handle_manager *__restrict self) {
+	unsigned int result;
+	handle_manager_read(self);
+	if (self->hm_mode == HANDLE_MANAGER_MODE_LINEAR) {
+		result = handle_manager_get_max_linear_fd_plus_one(self);
+	} else {
+		result = handle_manager_get_max_hashvector_fd_plus_one(self);
+	}
+	handle_manager_endread(self);
+	return result;
+}
+
+PRIVATE NONNULL((1)) pos_t KCALL
+procfs_fd_enum_v_seekdir(struct fdirenum *__restrict self,
+                         off_t offset, unsigned int whence)
+		THROWS(...) {
+	unsigned int newpos;
+	struct procfs_fd_enum *me = (struct procfs_fd_enum *)self;
+	switch (whence) {
+	case SEEK_SET:
+#if __SIZEOF_POS_T__ > __SIZEOF_INT__
+		if unlikely((pos_t)offset >= UINT_MAX)
+			THROW(E_OVERFLOW);
+#endif /* __SIZEOF_POS_T__ > __SIZEOF_INT__ */
+		newpos = (unsigned int)(pos_t)offset;
+		ATOMIC_WRITE(me->pfe_fd, newpos);
+		break;
+
+	case SEEK_CUR: {
+		uintptr_t oldpos;
+		do {
+			oldpos = ATOMIC_READ(me->pfe_fd);
+			newpos = oldpos + (int)offset;
+			if unlikely(offset < 0 ? newpos > oldpos
+			                       : newpos < oldpos)
+				THROW(E_OVERFLOW);
+		} while (!ATOMIC_CMPXCH_WEAK(me->pfe_fd, oldpos, newpos));
+	}	break;
+
+	case SEEK_END: {
+		unsigned int dirsiz;
+		dirsiz = find_greatest_inuse_fd_plus_one(me->pfe_hman);
+		newpos = dirsiz + (int)offset;
+		if unlikely(offset < 0 ? newpos > dirsiz
+		                       : newpos < dirsiz)
+			THROW(E_OVERFLOW);
+		ATOMIC_WRITE(me->pfe_fd, newpos);
+	}	break;
+
+	default:
+		THROW(E_INVALID_ARGUMENT_UNKNOWN_COMMAND,
+		      E_INVALID_ARGUMENT_CONTEXT_LSEEK_WHENCE,
+		      whence);
+	}
+	return (pos_t)newpos;
+}
+
+PRIVATE struct fdirenum_ops const procfs_fd_enum_ops = {
+	.deo_fini    = &procfs_fd_enum_v_fini,
+	.deo_readdir = &procfs_fd_enum_v_readdir,
+	.deo_seekdir = &procfs_fd_enum_v_seekdir,
+};
+
 PRIVATE NONNULL((1)) void KCALL
 procfs_perproc_fd_v_enum(struct fdirenum *__restrict result) {
+	REF struct task *thread;
 	struct taskpid *pid = result->de_dir->fn_fsdata;
-
-	/* TODO */
-	(void)pid;
-	COMPILER_IMPURE();
-
-	struct constdirenum *ret = (struct constdirenum *)result;
-	/* Fill in enumerator info */
-	ret->de_ops    = &constdirenum_ops;
-	ret->cde_index = 0;
-	ret->cde_entc  = 0;
-	ret->cde_entv  = NULL;
+	struct procfs_fd_enum *rt;
+	thread = taskpid_gettask(pid);
+	if unlikely(!thread) {
+		struct constdirenum *ret = (struct constdirenum *)result;
+		/* Thread has already terminated. -> Set-up an empty directory */
+		ret->de_ops    = &constdirenum_ops;
+		ret->cde_index = 0;
+		ret->cde_entc  = 0;
+		ret->cde_entv  = NULL;
+		return;
+	}
+	rt = (struct procfs_fd_enum *)result;
+	rt->pfe_hman = task_gethandlemanager(thread);
+	decref_unlikely(thread);
+	rt->de_ops = &procfs_fd_enum_ops;
+	rt->pfe_fd = 0;
 }
 
 INTERN_CONST struct fdirnode_ops const procfs_pp_fd = {

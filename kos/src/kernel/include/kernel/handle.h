@@ -413,6 +413,32 @@ struct handle_manager {
 	};
 };
 
+/* Helpers for accessing `hm_lock' */
+#define _handle_manager_reap(self)      (void)0
+#define handle_manager_reap(self)       (void)0
+#define handle_manager_mustreap(self)   0
+#define handle_manager_write(self)      atomic_rwlock_write(&(self)->hm_lock)
+#define handle_manager_write_nx(self)   atomic_rwlock_write_nx(&(self)->hm_lock)
+#define handle_manager_trywrite(self)   atomic_rwlock_trywrite(&(self)->hm_lock)
+#define handle_manager_endwrite(self)   (atomic_rwlock_endwrite(&(self)->hm_lock), handle_manager_reap(self))
+#define _handle_manager_endwrite(self)  atomic_rwlock_endwrite(&(self)->hm_lock)
+#define handle_manager_read(self)       atomic_rwlock_read(&(self)->hm_lock)
+#define handle_manager_read_nx(self)    atomic_rwlock_read_nx(&(self)->hm_lock)
+#define handle_manager_tryread(self)    atomic_rwlock_tryread(&(self)->hm_lock)
+#define _handle_manager_endread(self)   atomic_rwlock_endread(&(self)->hm_lock)
+#define handle_manager_endread(self)    (void)(atomic_rwlock_endread(&(self)->hm_lock) && (handle_manager_reap(self), 0))
+#define _handle_manager_end(self)       atomic_rwlock_end(&(self)->hm_lock)
+#define handle_manager_end(self)        (void)(atomic_rwlock_end(&(self)->hm_lock) && (handle_manager_reap(self), 0))
+#define handle_manager_upgrade(self)    atomic_rwlock_upgrade(&(self)->hm_lock)
+#define handle_manager_upgrade_nx(self) atomic_rwlock_upgrade_nx(&(self)->hm_lock)
+#define handle_manager_tryupgrade(self) atomic_rwlock_tryupgrade(&(self)->hm_lock)
+#define handle_manager_downgrade(self)  atomic_rwlock_downgrade(&(self)->hm_lock)
+#define handle_manager_reading(self)    atomic_rwlock_reading(&(self)->hm_lock)
+#define handle_manager_writing(self)    atomic_rwlock_writing(&(self)->hm_lock)
+#define handle_manager_canread(self)    atomic_rwlock_canread(&(self)->hm_lock)
+#define handle_manager_canwrite(self)   atomic_rwlock_canwrite(&(self)->hm_lock)
+
+
 /* Destroy the given handle manager. */
 FUNDEF NOBLOCK void
 NOTHROW(KCALL handle_manager_destroy)(struct handle_manager *__restrict self);
@@ -492,6 +518,11 @@ FUNDEF NONNULL((2)) unsigned int FCALL
 handle_nextfd(unsigned int startfd,
               struct handle_manager *__restrict self)
 		THROWS(E_WOULDBLOCK, E_INVALID_HANDLE_FILE);
+/* Same as `handle_nextfd()', but return `(unsigned int)-1' instead of throwing `E_INVALID_HANDLE_FILE' */
+FUNDEF NONNULL((2)) unsigned int FCALL
+handle_trynextfd(unsigned int startfd,
+                 struct handle_manager *__restrict self)
+		THROWS(E_WOULDBLOCK);
 
 
 /* Modify the I/O-flags of a given file handle

@@ -1271,6 +1271,78 @@ throw_f_next_unallocated:
 	return result;
 }
 
+/* Same as `handle_nextfd()', but return `(unsigned int)-1' instead of throwing `E_INVALID_HANDLE_FILE' */
+PUBLIC NONNULL((2)) unsigned int FCALL
+handle_trynextfd(unsigned int startfd,
+                 struct handle_manager *__restrict self)
+		THROWS(E_WOULDBLOCK) {
+	unsigned int result;
+	sync_read(&self->hm_lock);
+	if (self->hm_mode == HANDLE_MANAGER_MODE_LINEAR) {
+		result = startfd;
+		for (;;) {
+			if unlikely(result >= self->hm_linear.hm_alloc) {
+throw_f_next_unallocated:
+				sync_endread(&self->hm_lock);
+				return (unsigned int)-1;
+			}
+			if (self->hm_linear.hm_vector[result].h_type != HANDLE_TYPE_UNDEFINED)
+				break; /* This one's in use! */
+			++result;
+		}
+	} else if (handle_manager_hashvector_isvalid(self, startfd)) {
+		/* Simple (and  pretty likely)  case: the  given FD  exists.
+		 * Given  the use case  of this fcntl  to iterate over one's
+		 * file descriptor table to find  open files, and given  the
+		 * possibility that `fd - 1' had already been tested before,
+		 * then it stands to reason  that some cluster of  allocated
+		 * files has a size that is greater than 1:
+		 * >> int fd = -1;
+		 * >> while ((fd = fcntl(fd + 1, F_NEXT)) >= 0) {
+		 * >>     printf("open fd: %d\n", fd);
+		 * >> }
+		 * Possible output:
+		 *    open fd: 0
+		 *    open fd: 1
+		 *    open fd: 2
+		 *    open fd: 3
+		 *    open fd: 4
+		 */
+		result = startfd;
+	} else {
+		unsigned int i, mask, max_fd;
+		struct handle_hashent *map;
+		/* The slow case: Must scan the entire hash-table to find:
+		 *  - The lowest valid handle `>= fd'
+		 *  - The greatest valid fd, period. (needed if we end up throwing an `E_INVALID_HANDLE_FILE')
+		 */
+		result = (unsigned int)-1;
+		max_fd = 0;
+		map  = self->hm_hashvector.hm_hashvec;
+		mask = self->hm_hashvector.hm_hashmsk;
+		/* Go through the FD table and  */
+		for (i = 0; i <= mask; ++i) {
+			unsigned int fdno;
+			if (map[i].hh_handle_id == HANDLE_HASHENT_SENTINEL_ID)
+				continue;
+			fdno = map[i].hh_vector_index;
+			if (fdno != (unsigned int)-1) {
+				if (max_fd <= fdno)
+					max_fd = fdno + 1;
+				if (fdno >= startfd && fdno < result)
+					result = fdno;
+			}
+		}
+		if unlikely(result == (unsigned int)-1) {
+			/* No valid handle found... */
+			result = max_fd;
+			goto throw_f_next_unallocated;
+		}
+	}
+	sync_endread(&self->hm_lock);
+	return result;
+}
+
 
 
 
