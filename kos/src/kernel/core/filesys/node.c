@@ -1089,6 +1089,29 @@ NOTHROW(FCALL fnode_delete_strt)(struct fnode *__restrict self) {
 	return !(old_flags & MFILE_F_DELETED);
 }
 
+PUBLIC NOBLOCK NOPREEMPT WUNUSED NONNULL((1)) __BOOL
+NOTHROW(FCALL fnode_delete_strt_with_tslock)(struct fnode *__restrict self) {
+	uintptr_t old_flags;
+
+	/* Delete global reference to the file-node. */
+	if (ATOMIC_FETCHAND(self->mf_flags, ~(MFILE_FN_GLOBAL_REF |
+	                                      MFILE_F_PERSISTENT)) &
+	    MFILE_FN_GLOBAL_REF) {
+		decref_nokill(self);
+	}
+
+	/* Mark the file as deleted (and make available use of the timestamp fields) */
+	old_flags = ATOMIC_FETCHOR(self->mf_flags,
+	                           MFILE_F_DELETED | MFILE_F_NOATIME | MFILE_F_NOMTIME |
+	                           MFILE_F_CHANGED | MFILE_F_ATTRCHANGED | MFILE_F_FIXEDFILESIZE |
+	                           MFILE_FM_ATTRREADONLY | MFILE_F_NOUSRMMAP | MFILE_F_NOUSRIO |
+	                           MFILE_FS_NOSUID | MFILE_FS_NOEXEC | MFILE_F_READONLY);
+	if (old_flags & MFILE_F_PERSISTENT)
+		ATOMIC_AND(self->mf_flags, ~MFILE_F_PERSISTENT); /* Also clear the PERSISTENT flag */
+	return !(old_flags & MFILE_F_DELETED);
+}
+
+
 
 
 /* Perform all of the async work needed for deleting `self' as the result of `fn_nlink == 0'

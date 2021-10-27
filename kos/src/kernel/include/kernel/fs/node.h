@@ -538,6 +538,8 @@ NOTHROW(FCALL fnode_delete)(struct fnode *__restrict self);
  * conditions that can result in data corruption) */
 FUNDEF NOBLOCK WUNUSED NONNULL((1)) __BOOL
 NOTHROW(FCALL fnode_delete_strt)(struct fnode *__restrict self);
+FUNDEF NOBLOCK NOPREEMPT WUNUSED NONNULL((1)) __BOOL
+NOTHROW(FCALL fnode_delete_strt_with_tslock)(struct fnode *__restrict self);
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL fnode_delete_impl)(/*inherit(always)*/ REF struct fnode *__restrict self);
 

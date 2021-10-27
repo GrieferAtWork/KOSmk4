@@ -783,10 +783,12 @@ struct mfile {
 #define mfile_trunclock_inc(self) \
 	__hybrid_atomic_inc((self)->mf_trunclock, __ATOMIC_ACQUIRE)
 #define mfile_trunclock_dec(self)                                        \
-	(__hybrid_atomic_decfetch((self)->mf_trunclock, __ATOMIC_RELEASE) || \
+	(__hybrid_assert((self)->mf_trunclock != 0),                         \
+	 __hybrid_atomic_decfetch((self)->mf_trunclock, __ATOMIC_RELEASE) || \
 	 (sig_broadcast(&(self)->mf_initdone), 0))
-#define mfile_trunclock_dec_nosignal(self) \
-	__hybrid_atomic_decfetch((self)->mf_trunclock, __ATOMIC_RELEASE)
+#define mfile_trunclock_dec_nosignal(self)       \
+	(__hybrid_assert((self)->mf_trunclock != 0), \
+	 __hybrid_atomic_dec((self)->mf_trunclock, __ATOMIC_RELEASE))
 
 #ifdef CONFIG_NO_SMP
 #define mfile_tslock_tryacquire(self)   1
@@ -1153,7 +1155,7 @@ struct mfile_extendpart_data {
  *  - @assume(mfile_addr_aligned(self, data->mep_maxaddr + 1));
  *  - @assume(WAS_CALLED(mfile_extendpart_data_init(data)));
  *  - @assume(self->mf_parts != MFILE_PARTS_ANONYMOUS);
- *  - @assume(mfile_addr_ceilalign(self, self->mf_filesize) >= data->mep_maxaddr + 1);
+ *  - @assume(mfile_addr_ceilalign(self, self->mf_filesize) >= data->mep_minaddr);
  *  - @assume(!mpart_tree_rlocate(self->mf_parts, data->mep_minaddr, data->mep_maxaddr));
  * Locking logic:
  *   in:                                         mfile_lock_reading(self) || mfile_lock_writing(self)

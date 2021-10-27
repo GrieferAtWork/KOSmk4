@@ -27,13 +27,13 @@
 //#define  DEFINE_mfile_tailread_p
 //#define   DEFINE_mfile_tailreadv
 //#define DEFINE_mfile_tailreadv_p
-//#define       DEFINE_mfile_write
-//#define     DEFINE_mfile_write_p
-//#define      DEFINE_mfile_writev
-//#define    DEFINE_mfile_writev_p
-#define   DEFINE_mfile_tailwrite
-//#define DEFINE_mfile_tailwrite_p
-//#define DEFINE_mfile_tailwritev
+#define       DEFINE_mfile_write
+//#define      DEFINE_mfile_write_p
+//#define       DEFINE_mfile_writev
+//#define     DEFINE_mfile_writev_p
+//#define    DEFINE_mfile_tailwrite
+//#define  DEFINE_mfile_tailwrite_p
+//#define   DEFINE_mfile_tailwritev
 //#define DEFINE_mfile_tailwritev_p
 #endif /* __INTELLISENSE__ */
 
@@ -255,13 +255,17 @@ again:
 #endif /* !__INTELLISENSE__ */
 #endif /* LOCAL_TAILIO */
 	REF struct mpart *part;
-	/* TODO: Handling for VIO */
 again:
 	if (!num_bytes)
 		goto done;
 	mfile_lock_read(self);
 	if unlikely(mfile_isanon(self)) {
 		mfile_lock_endread(self);
+#ifdef LIBVIO_CONFIG_ENABLED
+		if (self->mf_ops->mo_vio) {
+			/* TODO: Handling for VIO */
+		}
+#endif /* LIBVIO_CONFIG_ENABLED */
 		goto done;
 	}
 #ifdef LOCAL_WRITING
@@ -292,7 +296,7 @@ again:
 			/* Found a pre-existing part which we can do I/O on! */
 			mfile_trunclock_inc(self);
 			mfile_lock_endread(self);
-do_io_with_part:
+do_io_with_part_and_trunclock:
 			TRY {
 #ifdef LOCAL_BUFFER_IS_IOVEC
 				io_bytes = LOCAL_mpart_rw(part, buffer, buf_offset, io_bytes, offset);
@@ -352,7 +356,7 @@ again_extend_part:
 				if unlikely(mfile_isanon(self)) {
 					mfile_lock_endwrite(self);
 					mfile_extendpart_data_fini(&extdat);
-					goto done;
+					goto again;
 				}
 #ifdef LOCAL_WRITING
 				if unlikely(self->mf_flags & (MFILE_F_READONLY | MFILE_F_DELETED)) {
@@ -384,7 +388,7 @@ restart_after_extendpart:
 				mpart_lock_release(part);
 				mfile_trunclock_inc(self); /* Prevent `ftruncate(2)' until we're done */
 				mfile_lock_endwrite(self);
-				goto do_io_with_part;
+				goto do_io_with_part_and_trunclock;
 			}
 		}
 		mfile_lock_end(self);
@@ -437,25 +441,30 @@ destroy_new_part_and_try_again:
 		if unlikely(self->mf_flags & (MFILE_F_READONLY | MFILE_F_DELETED))
 			goto destroy_new_part_and_try_again;
 #endif /* LOCAL_WRITING */
-		if unlikely(mpart_tree_rlocate(self->mf_parts,
-		                               newpart_minaddr,
-		                               newpart_maxaddr) != NULL)
-			goto destroy_new_part_and_try_again;
-		if unlikely((pos_t)atomic64_read(&self->mf_filesize) < filesize)
-			goto destroy_new_part_and_try_again;
 
 		/* Do I/O with the newly created part. */
 		mfile_trunclock_inc(self);
+		if unlikely((pos_t)atomic64_read(&self->mf_filesize) < filesize) {
+			mfile_trunclock_dec(self);
+			goto destroy_new_part_and_try_again;
+		}
 		TRY {
+			REF struct mpart *rpart;
 			/* Try to merge the new part, and release a write-lock to `self'. */
-			part = mfile_insert_and_merge_part_and_unlock(self, part);
+			rpart = mfile_insert_and_merge_part_and_unlock(self, part);
+			if unlikely(!rpart) {
+				mfile_trunclock_dec(self);
+				goto destroy_new_part_and_try_again;
+			}
+			part = rpart;
 		} EXCEPT {
 			mfile_trunclock_dec(self);
 			RETHROW();
 		}
 
-		/* This one inherits a reference to `part' for us! */
-		goto do_io_with_part;
+		/* This one inherits a reference to `part' for us!
+		 * It also does the  `mfile_trunclock_dec(self);'. */
+		goto do_io_with_part_and_trunclock;
 	}
 #endif /* !LOCAL_TAILIO */
 
@@ -479,7 +488,7 @@ destroy_new_part_and_try_again:
 			mfile_lock_endread(self);
 
 			/* If we were able to write ~something~ up to this
-			 * point, then don't throw a disk-full exception. */
+			 * point,  then don't throw a disk-full exception. */
 			if (result != 0)
 				return result;
 
@@ -679,7 +688,9 @@ part_setcore:
 		/* Seeing how we're still holding  a write-lock to `self', we  know
 		 * that  no-one else (should)  have altered the  file's size in the
 		 * mean time, meaning that the append-write above truly was atomic! */
+		mfile_trunclock_inc(self);
 		atomic64_write(&self->mf_filesize, (u64)(offset + io_bytes));
+		mfile_trunclock_dec_nosignal(self); /* *_nosignal, because we broadcast unconditionally below. */
 		mfile_lock_endwrite(self);
 		decref_unlikely(part);
 
@@ -884,7 +895,9 @@ restart_after_extendpart_tail:
 		/* Seeing how we're still holding  a write-lock to `self', we  know
 		 * that  no-one else (should)  have altered the  file's size in the
 		 * mean time, meaning that the append-write above truly was atomic! */
+		mfile_trunclock_inc(self);
 		atomic64_write(&self->mf_filesize, (u64)(offset + io_bytes));
+		mfile_trunclock_dec_nosignal(self); /* *_nosignal, because we broadcast unconditionally below. */
 		mfile_lock_endwrite(self);
 		decref_unlikely(part);
 
@@ -1033,15 +1046,15 @@ extend_failed:
 		for (blki = minblk; blki <= maxblk; ++blki)
 			mpart_setblockstate(part, blki, MPART_BLOCK_ST_CHNG);
 #undef LOCAL_BUFFER_copy2phys
+
+		/* Re-acquire a lock to the file, so we can insert the new mem-part. */
+		mfile_lock_write(self);
 	} EXCEPT {
 		LIST_ENTRY_UNBOUND_INIT(&part->mp_allparts);
 		part->mp_refcnt = 0;
 		mpart_destroy(part);
 		RETHROW();
 	}
-
-	/* Re-acquire a lock to the file, so we can insert the new mem-part. */
-	mfile_lock_write(self);
 
 	/* Make sure that the file hasn't become anonymous. */
 	if unlikely(mfile_isanon(self))
@@ -1057,8 +1070,10 @@ extend_failed:
 		uintptr_t changes;
 		pos_t newsize, oldsize;
 		REF struct mpart *inserted_part;
+		mfile_trunclock_inc(self);
 		inserted_part = mfile_insert_and_merge_part_and_unlock(self, part);
 		if unlikely(!inserted_part) {
+			mfile_trunclock_dec(self);
 handle_part_insert_failure:
 			mfile_lock_endwrite(self);
 #ifndef LOCAL_BUFFER_IS_PHYS

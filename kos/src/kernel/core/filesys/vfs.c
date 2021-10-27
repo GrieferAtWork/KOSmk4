@@ -23,8 +23,8 @@
 
 #include <kernel/compiler.h>
 
-#include <kernel/fs/path.h>
 #include <kernel/fs/dirnode.h>
+#include <kernel/fs/path.h>
 #include <kernel/fs/vfs.h>
 #include <kernel/malloc.h>
 #include <sched/task.h>
@@ -217,9 +217,8 @@ PUBLIC struct fs fs_kernel = {
 	.fs_umask    = CONFIG_FS_UMASK_DEFAULT,
 	.fs_lnkmax   = SYMLOOP_MAX,
 	.fs_mode     = {{
-		/*.f_atmask = */ (AT_SYMLINK_NOFOLLOW | AT_NO_AUTOMOUNT |
-		                  AT_EMPTY_PATH | AT_SYMLINK_REGULAR | AT_DOSPATH),
-		/*.f_atflag = */ 0,
+		/*.f_atmask = */ (uint32_t)~0,
+		/*.f_atflag = */ (uint32_t)0,
 	}},
 };
 

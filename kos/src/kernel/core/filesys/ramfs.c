@@ -913,7 +913,7 @@ again:
 		ATOMIC_DEC(file->fn_nlink);
 		last_link_went_away = file->fn_nlink == 0;
 		if (last_link_went_away)
-			last_link_went_away = fnode_delete_strt(file);
+			last_link_went_away = fnode_delete_strt_with_tslock(file);
 		mfile_tslock_release(file);
 
 		/* Delete the file (make all mem-parts anonymous)

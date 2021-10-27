@@ -1341,14 +1341,19 @@ DEFINE_SYSCALL1(mode_t, umask, mode_t, mode) {
 /* fsmode()                                                             */
 /************************************************************************/
 #ifdef __ARCH_WANT_SYSCALL_FSMODE
+/* Mask of AT_* flags that can be force-enabled/disable by `fsmode(2)' */
+#define _AT_FLAGS_CHNG \
+	(AT_NO_AUTOMOUNT | AT_DOSPATH)
 DEFINE_SYSCALL1(uint64_t, fsmode, uint64_t, mode) {
 	struct fs *myfs = THIS_FS;
 	fs_mask_t new_mode;
 	new_mode.f_mode = mode;
-	new_mode.f_atmask &= ~FS_MODE_FALWAYS0MASK;
-	new_mode.f_atmask |= FS_MODE_FALWAYS1MASK;
-	new_mode.f_atflag &= ~FS_MODE_FALWAYS0FLAG;
-	new_mode.f_atflag |= FS_MODE_FALWAYS1FLAG;
+
+	/* Only very few AT_* flags can actually be force-enabled/disabled. */
+	new_mode.f_atmask |= ~_AT_FLAGS_CHNG;
+	new_mode.f_atflag &= _AT_FLAGS_CHNG;
+
+	/* Set the new filesystem mode. */
 	return atomic64_xch(&myfs->fs_mode.f_atom, new_mode.f_mode);
 }
 #endif /* __ARCH_WANT_SYSCALL_FSMODE */
