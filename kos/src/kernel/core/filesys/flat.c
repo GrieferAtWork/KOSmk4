@@ -1660,7 +1660,7 @@ next_next_ent:
 
 	/* Yield `ent' to user-space. */
 	FINALLY_DECREF_UNLIKELY(ent);
-	result = fdirenum_feedent(buf, bufsize, readdir_mode, &ent->fde_ent);
+	result = fdirenum_feedent_fast(buf, bufsize, readdir_mode, &ent->fde_ent);
 	if (result < 0)
 		return (size_t)~result;
 

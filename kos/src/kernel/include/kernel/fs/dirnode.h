@@ -126,10 +126,17 @@ fdirenum_feedent_ex(USER CHECKED struct dirent *buf,
                     u16 feed_d_namlen, USER CHECKED char const *feed_d_name)
 		THROWS(E_SEGFAULT);
 /* Same as `fdirenum_feedent_ex()', but feed values from `ent' */
-FUNDEF WUNUSED NONNULL((4)) ssize_t FCALL
+FUNDEF WUNUSED NONNULL((4, 5)) ssize_t FCALL
 fdirenum_feedent(USER CHECKED struct dirent *buf,
                  size_t bufsize, readdir_mode_t readdir_mode,
-                 struct fdirent *__restrict ent)
+                 struct fdirent *__restrict ent,
+                 struct fdirnode *__restrict dir)
+		THROWS(E_SEGFAULT);
+/* Same as `fdirenum_feedent()', but may only be used when `ent' doesn't implement `fdo_getino' */
+FUNDEF WUNUSED NONNULL((4)) ssize_t FCALL
+fdirenum_feedent_fast(USER CHECKED struct dirent *buf,
+                      size_t bufsize, readdir_mode_t readdir_mode,
+                      struct fdirent *__restrict ent)
 		THROWS(E_SEGFAULT);
 
 

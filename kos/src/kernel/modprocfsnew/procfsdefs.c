@@ -286,8 +286,9 @@ INTERN struct fsuper procfs_super = {
 				MFILE_INIT_mf_lockops,
 				MFILE_INIT_mf_changed(MFILE_PARTS_ANONYMOUS),
 				MFILE_INIT_mf_blockshift(PAGESHIFT),
-				MFILE_INIT_mf_flags(MFILE_FS_NOSUID | MFILE_FS_NOEXEC | MFILE_F_NOUSRMMAP |
-				                    MFILE_F_NOUSRIO | MFILE_F_PERSISTENT | MFILE_F_FIXEDFILESIZE),
+				MFILE_INIT_mf_flags(MFILE_FS_NOSUID | MFILE_FS_NOEXEC |
+				                    MFILE_F_NOUSRMMAP | MFILE_F_NOUSRIO |
+				                    MFILE_F_READONLY | MFILE_F_FIXEDFILESIZE),
 				MFILE_INIT_mf_trunclock,
 				MFILE_INIT_mf_filesize((uint64_t)-1),
 				MFILE_INIT_mf_atime(0, 0),
@@ -301,7 +302,7 @@ INTERN struct fsuper procfs_super = {
 			FNODE_INIT_fn_ino(0),
 			FNODE_INIT_fn_super(&procfs_super),
 			FNODE_INIT_fn_changed,
-			FNODE_INIT_fn_supent,
+			FNODE_INIT_fn_supent_EX({ NULL, FSUPER_NODES_DELETED }),
 			FNODE_INIT_fn_allnodes,
 		},
 	},

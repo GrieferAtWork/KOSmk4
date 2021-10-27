@@ -58,6 +58,8 @@ ProcFS_PerProc_FsLink_Printer(struct symlink_node *__restrict self,
 		                                   offsetof_path_from_fs));
 		sync_endread(&threadfs->f_pathlock);
 	}
+
+
 	{
 		FINALLY_DECREF_UNLIKELY(pth);
 		result = path_sprint(buf, bufsize, pth);

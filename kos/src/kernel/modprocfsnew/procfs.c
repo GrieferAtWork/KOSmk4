@@ -29,6 +29,8 @@
 #include <kernel/fs/filesys.h>
 #include <kernel/fs/super.h>
 #include <kernel/user.h>
+#include <sched/pid.h>
+#include <sched/task.h>
 #include <sched/tsc.h>
 
 #include <hybrid/atomic.h>
@@ -43,6 +45,7 @@
 #include <format-printer.h>
 #include <inttypes.h>
 #include <stddef.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unicode.h>
@@ -220,9 +223,10 @@ PRIVATE struct mfile_stream_ops const procfs_regfile_v_stream_ops = {
 INTERN_CONST struct printnode_ops const procfs_regfile_ops = {
 	.pno_reg = {{
 		.no_file = {
-			.mo_destroy = (void (KCALL *)(struct mfile *__restrict))(void *)(uintptr_t)-1,
-			.mo_changed = &printnode_v_changed,
-			.mo_stream  = &procfs_regfile_v_stream_ops,
+			.mo_destroy    = (void (KCALL *)(struct mfile *__restrict))(void *)(uintptr_t)-1,
+			.mo_loadblocks = &printnode_v_loadblocks,
+			.mo_changed    = &printnode_v_changed,
+			.mo_stream     = &procfs_regfile_v_stream_ops,
 		},
 		.no_free   = (void (KCALL *)(struct fnode *__restrict))(void *)(uintptr_t)-1,
 		.no_wrattr = &printnode_v_wrattr,
@@ -261,6 +265,7 @@ INTERN_CONST struct printnode_ops const procfs_txtfile_ops = {
 #include "procfs.def"
 
 /* NOTE: Files in this are sorted as lexicographically ascending. */
+#define PROCFS_ROOT_COUNT COMPILER_LENOF(procfs_root_files)
 PRIVATE struct fdirent *const procfs_root_files[] = {
 #define ROOTENT(name, type, nodeptr, hash) \
 	constdirent_asent(&PP_CAT2(procfs_root_dirent_, __LINE__)),
@@ -271,7 +276,7 @@ PRIVATE WUNUSED NONNULL((1)) REF struct fdirent *FCALL
 procfs_root_find_static_file(struct flookup_info *__restrict info) {
 	size_t lo, hi;
 	lo = 0;
-	hi = COMPILER_LENOF(procfs_root_files);
+	hi = PROCFS_ROOT_COUNT;
 	while (lo < hi) {
 		struct fdirent *entry;
 		size_t i;
@@ -291,7 +296,7 @@ procfs_root_find_static_file(struct flookup_info *__restrict info) {
 	/* If requested, also do another case-insensitive search. */
 	if (info->flu_flags & AT_DOSPATH) {
 		size_t i;
-		for (i = 0; i < COMPILER_LENOF(procfs_root_files); ++i) {
+		for (i = 0; i < PROCFS_ROOT_COUNT; ++i) {
 			struct fdirent *entry;
 			entry = procfs_root_files[i];
 			if (entry->fd_namelen != info->flu_namelen)
@@ -309,12 +314,57 @@ procfs_root_find_static_file(struct flookup_info *__restrict info) {
 PRIVATE WUNUSED NONNULL((1, 2)) REF struct fdirent *KCALL
 procfs_root_v_lookup(struct fdirnode *__restrict UNUSED(self),
                      struct flookup_info *__restrict info) {
-	/* TODO: Lookup PID */
+	char ch;
+
+	/* Evaluate running process PIDs */
+	if unlikely(info->flu_namelen == 0)
+		goto notapid;
+	ch = ATOMIC_READ(info->flu_name[0]);
+	if (ch >= '1' && ch <= '9') {
+		REF struct taskpid *pid;
+		upid_t pidno = (upid_t)(ch - '0');
+		size_t i;
+		for (i = 1; i < info->flu_namelen; ++i) {
+			ch = ATOMIC_READ(info->flu_name[i]);
+			if unlikely(!(ch >= '0' && ch <= '9'))
+				goto notapid;
+			pidno *= 10;
+			pidno += (upid_t)(ch - '0');
+		}
+		pid = pidns_trylookup(THIS_PIDNS, pidno);
+		if likely(pid) {
+			REF struct procfs_perproc_root_dirent *result;
+			result = (REF struct procfs_perproc_root_dirent *)kmalloc(offsetof(struct procfs_perproc_root_dirent,
+			                                                                   pprd_ent.fd_name) +
+			                                                          (info->flu_namelen + 1) * sizeof(char),
+			                                                          GFP_NORMAL);
+
+			/* Fill in the directory entry. */
+			result->pprd_pid            = pid; /* Inherit reference */
+			result->pprd_ent.fd_namelen = (u16)sprintf(result->pprd_ent.fd_name, "%" PRIuN(__SIZEOF_PID_T__), pidno);
+			assert(result->pprd_ent.fd_namelen == info->flu_namelen);
+			if (info->flu_hash == FLOOKUP_INFO_HASH_UNSET || ADDR_ISUSER(info->flu_name))
+				info->flu_hash = fdirent_hash(result->pprd_ent.fd_name, result->pprd_ent.fd_namelen);
+			result->pprd_ent.fd_hash   = info->flu_hash;
+			result->pprd_ent.fd_refcnt = 1; /* +1: return */
+			result->pprd_ent.fd_ops    = &procfs_perproc_root_dirent_ops;
+//			result->pprd_ent.fd_ino    = procfs_perproc_ino(pid, &procfs_perproc_root_ops); /* Not needed; we've got `fdo_getino()' */
+			result->pprd_ent.fd_type   = DT_DIR;
+			return &result->pprd_ent;
+		}
+	}
+notapid:
 	return procfs_root_find_static_file(info);
 }
 
-PRIVATE NONNULL((1)) void KCALL
-procfs_root_v_enum(struct fdirenum *__restrict result) {
+
+
+struct procfs_root_direnum {
+	FDIRENUM_HEADER
+	uintptr_t prd_index; /* [lock(ATOMIC)] Enumeration index.
+	                      * For entries `< PROCFS_ROOT_COUNT', index into `procfs_root_files'.
+	                      * Otherwise, `- PROCFS_ROOT_COUNT' is a lower bound for the UPID of
+	                      * the next thread that should be enumerated. */
 	/* TODO: On linux, processes are enumerated by PID (TGID),
 	 *       such that each read returns the process with  the
 	 *       lowest getpid() that is still > than any  process
@@ -323,8 +373,202 @@ procfs_root_v_enum(struct fdirenum *__restrict result) {
 	 * Problem is that our `struct pidns' isn't designed with
 	 * find-first-pid-greater-or-equal in mind, and doing so
 	 * with the current impl is an O(N) operation... */
-	(void)result;
-	THROW(E_NOT_IMPLEMENTED_TODO);
+};
+
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(KCALL procfs_root_direnum_v_fini)(struct fdirenum *__restrict UNUSED(self)) {
+	(void)0; /* no-op */
+}
+
+PRIVATE WUNUSED NONNULL((1)) REF struct taskpid *KCALL
+find_first_taskpid_greater_or_equal(struct pidns *__restrict ns,
+                                    upid_t pid) {
+	REF struct taskpid *result = NULL;
+	upid_t result_pid          = (upid_t)-1;
+	size_t i, ind;
+	pidns_read(ns);
+	ind = ns->pn_indirection;
+	/* TODO: This could be done sooo much better... (instead of needing to be an O(N) operation) */
+	for (i = 0; i <= ns->pn_mask; ++i) {
+		upid_t temp;
+		struct taskpid *tpid = ns->pn_list[i].pe_pid;
+		if (tpid == NULL || tpid == PIDNS_ENTRY_DELETED)
+			continue;
+		if (wasdestroyed(tpid))
+			continue;
+		temp = tpid->tp_pids[ind];
+		if (temp < pid)
+			continue; /* Too low... */
+		if (result_pid >= temp && tryincref(tpid)) {
+			REF struct task *pid;
+			pid = taskpid_gettask(tpid);
+			if (!pid) {
+				decref_unlikely(tpid);
+			} else if (!task_isprocessleader_p(pid)) {
+				decref_unlikely(pid);
+				decref_unlikely(tpid);
+			} else {
+				decref_unlikely(pid);
+				xdecref_unlikely(result);
+				result_pid = temp;
+				result     = tpid;
+			}
+		}
+	}
+	pidns_endread(ns);
+	return result;
+}
+
+PRIVATE NONNULL((1)) size_t KCALL
+procfs_root_direnum_ops_v_readdir(struct fdirenum *__restrict self, USER CHECKED struct dirent *buf,
+                                  size_t bufsize, readdir_mode_t readdir_mode, iomode_t UNUSED(mode))
+		THROWS(...) {
+	size_t index, newindex;
+	ssize_t result;
+	struct procfs_root_direnum *me;
+	me = (struct procfs_root_direnum *)self;
+
+again:
+	/* Read current index. */
+	index = ATOMIC_READ(me->prd_index);
+
+	/* Check for EOF */
+	if (index < PROCFS_ROOT_COUNT) {
+		/* Static files. */
+		struct fdirent *ent;
+		ent    = procfs_root_files[index];
+		result = fdirenum_feedent_fast(buf, bufsize, readdir_mode, ent);
+		if (result < 0)
+			return (size_t)~result; /* Don't advance directory position. */
+		newindex = index + 1;
+	} else {
+		REF struct taskpid *pid;
+		struct pidns *ns = THIS_PIDNS;
+		upid_t pid_id;
+		u16 namelen;
+#if __SIZEOF_PID_T__ == 4
+		char namebuf[sizeof("4294967295")];
+#elif __SIZEOF_PID_T__ == 8
+		char namebuf[sizeof("18446744073709551615")];
+#else /* __SIZEOF_PID_T__ == ... */
+#error "Unsupported sizeof(pid_t)"
+#endif /* __SIZEOF_PID_T__ != ... */
+
+		/* Lookup next taskpid entry. */
+		pid = find_first_taskpid_greater_or_equal(ns, (upid_t)(index - PROCFS_ROOT_COUNT));
+		if (!pid)
+			return 0; /* End-of-directory */
+		FINALLY_DECREF_UNLIKELY(pid);
+		pid_id  = pid->tp_pids[ns->pn_indirection];
+		namelen = (u16)sprintf(namebuf, "%" PRIuN(__SIZEOF_PID_T__), pid_id);
+
+		/* Feed directory entry. */
+		result = fdirenum_feedent_ex(buf, bufsize, readdir_mode,
+		                             procfs_perproc_ino(pid, &procfs_perproc_root_ops),
+		                             DT_DIR, namelen, namebuf);
+		if (result < 0)
+			return (size_t)~result; /* Don't advance directory position. */
+
+		/* Next time around, yield a process with a greater PID */
+		newindex = PROCFS_ROOT_COUNT + pid_id + 1;
+	}
+
+	/* Advance directory position. */
+	if (!ATOMIC_CMPXCH(me->prd_index, index, newindex))
+		goto again;
+	return (size_t)result;
+}
+
+
+PRIVATE WUNUSED upid_t KCALL find_greatest_inuse_pid(void) {
+	upid_t result = 0;
+	size_t i, ind;
+	struct pidns *ns = THIS_PIDNS;
+	pidns_read(ns);
+	ind = ns->pn_indirection;
+	/* TODO: This could be done sooo much better... (instead of needing to be an O(N) operation) */
+	for (i = 0; i <= ns->pn_mask; ++i) {
+		upid_t temp;
+		REF struct task *pid;
+		struct taskpid *tpid = ns->pn_list[i].pe_pid;
+		if (tpid == NULL || tpid == PIDNS_ENTRY_DELETED)
+			continue;
+		if (wasdestroyed(tpid))
+			continue;
+		pid = taskpid_gettask(tpid);
+		if (!pid)
+			continue;
+		if (task_isprocessleader_p(pid)) {
+			temp = tpid->tp_pids[ind];
+			if (result < temp)
+				result = temp;
+		}
+		decref_unlikely(pid);
+	}
+	pidns_endread(ns);
+	return result;
+}
+
+PRIVATE NONNULL((1)) pos_t KCALL
+procfs_root_direnum_ops_v_seekdir(struct fdirenum *__restrict self,
+                                  off_t offset, unsigned int whence)
+		THROWS(...) {
+	uintptr_t newpos;
+	struct procfs_root_direnum *me = (struct procfs_root_direnum *)self;
+	switch (whence) {
+	case SEEK_SET:
+#if __SIZEOF_POS_T__ > __SIZEOF_SIZE_T__
+		if unlikely((pos_t)offset >= SIZE_MAX)
+			THROW(E_OVERFLOW);
+#endif /* __SIZEOF_POS_T__ > __SIZEOF_SIZE_T__ */
+		newpos = (uintptr_t)(pos_t)offset;
+		ATOMIC_WRITE(me->prd_index, newpos);
+		break;
+
+	case SEEK_CUR: {
+		uintptr_t oldpos;
+		do {
+			oldpos = ATOMIC_READ(me->prd_index);
+			newpos = oldpos + (intptr_t)offset;
+			if unlikely(offset < 0 ? newpos > oldpos
+			                       : newpos < oldpos)
+				THROW(E_OVERFLOW);
+		} while (!ATOMIC_CMPXCH_WEAK(me->prd_index, oldpos, newpos));
+	}	break;
+
+	case SEEK_END: {
+		uintptr_t dirsiz;
+		/* The end of the directory is relative to the largest in-use PID */
+		dirsiz = (uintptr_t)find_greatest_inuse_pid() + 1;
+		dirsiz += PROCFS_ROOT_COUNT;
+		newpos = dirsiz + (intptr_t)offset;
+		if unlikely(offset < 0 ? newpos > dirsiz
+		                       : newpos < dirsiz)
+			THROW(E_OVERFLOW);
+		ATOMIC_WRITE(me->prd_index, newpos);
+	}	break;
+
+	default:
+		THROW(E_INVALID_ARGUMENT_UNKNOWN_COMMAND,
+		      E_INVALID_ARGUMENT_CONTEXT_LSEEK_WHENCE,
+		      whence);
+	}
+	return (pos_t)newpos;
+}
+
+
+PRIVATE struct fdirenum_ops const procfs_root_direnum_ops = {
+	.deo_fini    = &procfs_root_direnum_v_fini,
+	.deo_readdir = &procfs_root_direnum_ops_v_readdir,
+	.deo_seekdir = &procfs_root_direnum_ops_v_seekdir,
+};
+
+PRIVATE NONNULL((1)) void KCALL
+procfs_root_v_enum(struct fdirenum *__restrict result) {
+	struct procfs_root_direnum *rt;
+	rt = (struct procfs_root_direnum *)result;
+	rt->de_ops    = &procfs_root_direnum_ops;
+	rt->prd_index = 0;
 }
 
 
@@ -379,7 +623,7 @@ PRIVATE DRIVER_INIT void KCALL procfs_init(void) {
 
 	/* Assign the current time as timestamp value to all statically allocated files. */
 	initialize_timestamps(procfs_root_files,
-	                      COMPILER_LENOF(procfs_root_files),
+	                      PROCFS_ROOT_COUNT,
 	                      &now);
 
 	/* Fill in the inode value for the procfs root. */

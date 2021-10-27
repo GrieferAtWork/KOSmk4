@@ -22,6 +22,7 @@
 
 #include <kernel/compiler.h>
 
+#include <kernel/fs/dirent.h>
 #include <kernel/fs/printnode.h>
 #include <kernel/types.h>
 
@@ -87,11 +88,42 @@ struct procfs_txtfile
 };
 
 
+/************************************************************************/
+/* Root/static types                                                    */
+/************************************************************************/
 INTDEF struct fsuper procfs_super;
 INTDEF struct ffilesys procfs_filesys;
 INTDEF struct fsuper_ops const procfs_super_ops;      /* Operators for `procfs_super' */
 INTDEF struct printnode_ops const procfs_regfile_ops; /* Operators for `struct procfs_regfile' */
 INTDEF struct printnode_ops const procfs_txtfile_ops; /* Operators for `struct procfs_txtfile' */
+
+
+/************************************************************************/
+/* Per-process types                                                    */
+/************************************************************************/
+struct taskpid;
+struct procfs_perproc_root_dirent {
+	/* Directory entry for the PID number of a /proc/PID directory. */
+	REF struct taskpid *pprd_pid; /* [1..1][const] PID of the thread */
+	struct fdirent      pprd_ent; /* Underlying directory entry. */
+};
+#define fdirent_asperprocroot(self) COMPILER_CONTAINER_OF(self, struct procfs_perproc_root_dirent, pprd_ent)
+
+
+/* Operators for `procfs_perproc_root_dirent' */
+INTDEF struct fdirent_ops const procfs_perproc_root_dirent_ops;
+
+/* Operators for `/proc/[pid]/'
+ * NOTE: For this directory, `fn_fsdata' is a `REF struct taskpid *' [1..1] */
+INTDEF struct fdirnode_ops const procfs_perproc_root_ops;
+
+/* Calculate+return the INO of a given taskpid-pointer and INode operators table. */
+#define procfs_perproc_ino(struct_taskpid, node_ops)         \
+	(ino_t)((uintptr_t)skew_kernel_pointer(struct_taskpid) ^ \
+	        (uintptr_t)skew_kernel_pointer(node_ops))
+/************************************************************************/
+
+
 
 
 

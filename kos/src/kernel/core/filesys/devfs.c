@@ -386,7 +386,7 @@ again:
 		FINALLY_DECREF_UNLIKELY(ent);
 
 		/* Feed the entry to the user-buffer */
-		result = fdirenum_feedent(buf, bufsize, readdir_mode, ent);
+		result = fdirenum_feedent_fast(buf, bufsize, readdir_mode, ent);
 		if (result < 0)
 			return (size_t)~result; /* Don't advance directory position. */
 

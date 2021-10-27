@@ -94,8 +94,9 @@ constdirent_v_opennode(struct fdirent *__restrict self,
 /* Enumeration of `struct constdir' */
 struct constdirenum {
 	FDIRENUM_HEADER   /* Header */
-	size_t cde_index; /* [lock(ATOMIC)] Index  into  `fdirnode_asconst(de_dir)->cd_entv'
-	                   * `>= fdirnode_asconst(de_dir)->cd_entc' is used to indicate EOF. */
+	size_t                 cde_index; /* [lock(ATOMIC)] Index into `cde_entv'; `>= cde_entc' is used to indicate EOF. */
+	size_t                 cde_entc;  /* [const] # of directory entries to enumerate */
+	struct fdirent *const *cde_entv;  /* [1..1][const][0..cde_entc][const] Directory entries. */
 };
 
 /* Operators for `struct constdirenum' */

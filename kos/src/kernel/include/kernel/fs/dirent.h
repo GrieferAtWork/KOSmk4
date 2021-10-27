@@ -50,6 +50,12 @@ struct fdirent_ops {
 	WUNUSED NONNULL((1, 2)) REF struct fnode *
 	(KCALL *fdo_opennode)(struct fdirent *__restrict self,
 	                      struct fdirnode *__restrict dir);
+
+	/* [0..1] Optional override for dynamically calculated `fd_ino' values.
+	 * When this operator is defined, _IT_ must be used instead of `fd_ino' */
+	WUNUSED NONNULL((1, 2)) ino_t
+	(FCALL *fdo_getino)(struct fdirent *__restrict self,
+	                    struct fdirnode *__restrict dir);
 };
 
 struct fdirent {
@@ -60,8 +66,8 @@ struct fdirent {
 	 * doing this would require making use of non-constant struct offsets. */
 	WEAK refcnt_t                           fd_refcnt;   /* Reference counter. */
 	struct fdirent_ops const               *fd_ops;      /* [1..1][const] Operators. */
-	ino_t                                   fd_ino;      /* [const] INode number of this directory entry.
-	                                                      * WARNING: This value becomes invalid if the entry/file is deleted! */
+	ino_t                                   fd_ino;      /* [const][valid_if(fd_ops->fdo_getino == NULL)] INode number of this directory
+	                                                      * entry. WARNING: This  value becomes  invalid if the  entry/file is  deleted! */
 	uintptr_t                               fd_hash;     /* [const][== fdirent_hash(fd_name, fd_namelen)] Hash of this directory entry. */
 	u16                                     fd_namelen;  /* [const][!0] Length of the directory entry name (in characters). */
 	unsigned char                           fd_type;     /* [const] Directory entry type (one of `DT_*') */
@@ -73,6 +79,12 @@ DEFINE_REFCOUNT_FUNCTIONS(struct fdirent, fd_refcnt, fdirent_destroy)
 
 /* Open the node associated with this directory entry. */
 #define fdirent_opennode(self, dir) ((*(self)->fd_ops->fdo_opennode)(self, dir))
+
+/* Return the INode number of `self', potentially invoking the override operator. */
+#define fdirent_getino(self, dir)                                          \
+	((self)->fd_ops->fdo_getino ? (*(self)->fd_ops->fdo_getino)(self, dir) \
+	                            : (self)->fd_ino)
+
 
 /* Return the hash of a given directory entry name.
  * This function is used by various APIs related to file lookup.

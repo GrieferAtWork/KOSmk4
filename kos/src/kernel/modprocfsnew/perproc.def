@@ -1,0 +1,109 @@
+/* Copyright (c) 2019-2021 Griefer@Work                                       *
+ *                                                                            *
+ * This software is provided 'as-is', without any express or implied          *
+ * warranty. In no event will the authors be held liable for any damages      *
+ * arising from the use of this software.                                     *
+ *                                                                            *
+ * Permission is granted to anyone to use this software for any purpose,      *
+ * including commercial applications, and to alter it and redistribute it     *
+ * freely, subject to the following restrictions:                             *
+ *                                                                            *
+ * 1. The origin of this software must not be misrepresented; you must not    *
+ *    claim that you wrote the original software. If you use this software    *
+ *    in a product, an acknowledgement (see the following) in the product     *
+ *    documentation is required:                                              *
+ *    Portions Copyright (c) 2019-2021 Griefer@Work                           *
+ * 2. Altered source versions must be plainly marked as such, and must not be *
+ *    misrepresented as being the original software.                          *
+ * 3. This notice may not be removed or altered from any source distribution. *
+ */
+#ifndef ROOTENT
+#define ROOTENT(name, type, perm, fnode_ops_ptr, hash)
+#endif /* !ROOTENT */
+#ifndef MKDIR_BEGIN
+#define MKDIR_BEGIN(ops_symbol_name)
+#endif /* !MKDIR_BEGIN */
+#ifndef MKDIR_ENT
+#define MKDIR_ENT(name, type, perm, fnode_ops_ptr, hash)
+#endif /* !MKDIR_ENT */
+#ifndef MKDIR_END
+#define MKDIR_END
+#endif /* !MKDIR_END */
+#ifndef MKREG_RO
+#define MKREG_RO(ops_symbol_name, printer)
+#endif /* !MKREG_RO */
+#ifndef MKREG_RW
+#define MKREG_RW(ops_symbol_name, printer, writer)
+#endif /* !MKREG_RW */
+#ifndef MKLNK
+#define MKLNK(ops_symbol_name, readlink)
+#endif /* !MKLNK */
+
+#include <__stdinc.h>
+#include <hybrid/compiler.h>
+
+#include <hybrid/host.h>
+
+/* clang-format off */
+
+
+
+/* NOTE: All filename listings must be sorted lexicographically ascending */
+
+/* /proc/[PID] */
+ROOTENT("attr",      DT_DIR, 0555, &procfs_pp_attr,      /*[[[fdirent_hash]]]*/FDIRENT_HASH_INIT(0x6181769, 0x72747461, 0x6d181802, 0x72747461)/*[[[end]]]*/)
+ROOTENT("cmdline",   DT_REG, 0444, &procfs_pp_cmdline,   /*[[[fdirent_hash]]]*/FDIRENT_HASH_INIT(0xcfed46e4, 0x656e696c646d63, 0x7f3df635, 0x656e696c646d63)/*[[[end]]]*/)
+ROOTENT("cwd",       DT_LNK, 0777, &procfs_pp_cwd,       /*[[[fdirent_hash]]]*/0x647763/*[[[end]]]*/)
+ROOTENT("environ",   DT_REG, 0444, &procfs_pp_environ,   /*[[[fdirent_hash]]]*/FDIRENT_HASH_INIT(0xb59850ff, 0x6e6f7269766e65, 0x91509923, 0x6e6f7269766e65)/*[[[end]]]*/)
+ROOTENT("exe",       DT_LNK, 0777, &procfs_pp_exe,       /*[[[fdirent_hash]]]*/0x657865/*[[[end]]]*/)
+ROOTENT("fd",        DT_DIR, 0500, &procfs_pp_fd,        /*[[[fdirent_hash]]]*/0x6466/*[[[end]]]*/)
+ROOTENT("kos",       DT_DIR, 0555, &procfs_pp_kos,       /*[[[fdirent_hash]]]*/0x736f6b/*[[[end]]]*/)
+ROOTENT("map_files", DT_DIR, 0500, &procfs_pp_map_files, /*[[[fdirent_hash]]]*/FDIRENT_HASH_INIT(0xc35e8886, 0x90cfb4995af36d48, 0x35895e0f, 0xd86cf35a99b4d000)/*[[[end]]]*/)
+ROOTENT("maps",      DT_REG, 0444, &procfs_pp_maps,      /*[[[fdirent_hash]]]*/FDIRENT_HASH_INIT(0xef36cd5, 0x7370616d, 0xd86cf40b, 0x7370616d)/*[[[end]]]*/)
+ROOTENT("root",      DT_LNK, 0777, &procfs_pp_root,      /*[[[fdirent_hash]]]*/FDIRENT_HASH_INIT(0x17eaeb02, 0x746f6f72, 0x5eaeb14, 0x746f6f72)/*[[[end]]]*/)
+ROOTENT("stat",      DT_REG, 0444, &procfs_pp_stat,      /*[[[fdirent_hash]]]*/FDIRENT_HASH_INIT(0x176d180b, 0x74617473, 0xf176d14, 0x74617473)/*[[[end]]]*/)
+ROOTENT("task",      DT_DIR, 0555, &procfs_pp_task,      /*[[[fdirent_hash]]]*/FDIRENT_HASH_INIT(0xc70e6d14, 0x6b736174, 0x176d0ec3, 0x6b736174)/*[[[end]]]*/)
+#if defined(__x86_64__) || defined(__i386__)
+ROOTENT("x86",       DT_DIR, 0555, &procfs_pp_x86,       /*[[[fdirent_hash]]]*/0x363878/*[[[end]]]*/)
+#endif /* __x86_64__ || __i386__ */
+
+MKLNK(procfs_pp_cwd, ProcFS_PerProc_Cwd_Printer)
+MKLNK(procfs_pp_exe, ProcFS_PerProc_Exe_Printer)
+MKLNK(procfs_pp_root, ProcFS_PerProc_Root_Printer)
+MKREG_RO(procfs_pp_cmdline, ProcFS_PerProc_Cmdline_Printer)
+MKREG_RO(procfs_pp_environ, ProcFS_PerProc_Environ_Printer)
+MKREG_RO(procfs_pp_maps, ProcFS_PerProc_Maps_Printer)
+MKREG_RO(procfs_pp_stat, ProcFS_PerProc_Stat_Printer)
+
+
+/* /proc/[PID]/attr */
+MKDIR_BEGIN(procfs_pp_attr)
+	MKDIR_ENT("current", DT_REG, 0666, &procfs_pp_attr_current, /*[[[fdirent_hash]]]*/FDIRENT_HASH_INIT(0x67a8ee0, 0x746e6572727563, 0x7f957467, 0x746e6572727563)/*[[[end]]]*/)
+MKDIR_END
+MKREG_RO(procfs_pp_attr_current, ProcFS_PerProc_Attr_Current_Printer)
+
+/* /proc/[PID]/kos */
+MKDIR_BEGIN(procfs_pp_kos)
+	MKDIR_ENT("dcwd",   DT_DIR, 0555, &procfs_pp_kos_dcwd,   /*[[[fdirent_hash]]]*/FDIRENT_HASH_INIT(0x88327e84, 0x64776364, 0x877f3284, 0x64776364)/*[[[end]]]*/)
+	MKDIR_ENT("drives", DT_DIR, 0555, &procfs_pp_kos_drives, /*[[[fdirent_hash]]]*/FDIRENT_HASH_INIT(0x29b578e9, 0x736576697264, 0x8806288b, 0x736576697264)/*[[[end]]]*/)
+MKDIR_END
+
+#if defined(__x86_64__) || defined(__i386__)
+/* /proc/[PID]/x86 */
+MKDIR_BEGIN(procfs_pp_x86)
+	MKDIR_ENT("iopl", DT_REG, 0666, &procfs_pp_x86_iopl, /*[[[fdirent_hash]]]*/FDIRENT_HASH_INIT(0xcff3eab1, 0x6c706f69, 0xb4eaf3cc, 0x6c706f69)/*[[[end]]]*/)
+MKDIR_END
+MKREG_RW(procfs_pp_x86_iopl, ProcFS_PerProc_X86_Iopl_Print, ProcFS_PerProc_X86_Iopl_Write)
+#endif /* __x86_64__ || __i386__ */
+
+
+/* clang-format on */
+
+#undef ROOTENT
+#undef MKDIR_BEGIN
+#undef MKDIR_ENT
+#undef MKDIR_END
+#undef MKDIR_EN
+#undef MKREG_RO
+#undef MKREG_RW
+#undef MKLNK

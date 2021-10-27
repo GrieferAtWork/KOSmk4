@@ -91,7 +91,6 @@ constdirenum_v_readdir(struct fdirenum *__restrict self, USER CHECKED struct dir
 	size_t index;
 	ssize_t result;
 	struct constdirenum *me = (struct constdirenum *)self;
-	struct constdir *dir    = fdirnode_asconst(me->de_dir);
 	struct fdirent *ent;
 
 again:
@@ -99,12 +98,12 @@ again:
 	index = ATOMIC_READ(me->cde_index);
 
 	/* Check for EOF */
-	if (index >= dir->cd_entc)
+	if (index >= me->cde_entc)
 		return 0;
 
 	/* Emit entry. */
-	ent    = dir->cd_entv[index];
-	result = fdirenum_feedent(buf, bufsize, readdir_mode, ent);
+	ent    = me->cde_entv[index];
+	result = fdirenum_feedent(buf, bufsize, readdir_mode, ent, me->de_dir);
 	if (result < 0)
 		return (size_t)~result; /* Don't advance directory position. */
 
@@ -143,7 +142,7 @@ constdirenum_v_seekdir(struct fdirenum *__restrict self,
 
 	case SEEK_END: {
 		size_t dirsiz;
-		dirsiz = fdirnode_asconst(me->de_dir)->cd_entc;
+		dirsiz = me->cde_entc;
 		newpos = dirsiz + (ssize_t)offset;
 		if unlikely(offset < 0 ? newpos > dirsiz
 		                       : newpos < dirsiz)
@@ -206,10 +205,14 @@ constdir_v_lookup(struct fdirnode *__restrict self,
 
 PUBLIC NONNULL((1)) void KCALL
 constdir_v_enum(struct fdirenum *__restrict result) {
+	struct constdir *dir;
 	struct constdirenum *ret;
-	ret            = (struct constdirenum *)result;
+	ret = (struct constdirenum *)result;
+	dir = fdirnode_asconst(ret->de_dir);
 	ret->de_ops    = &constdirenum_ops;
 	ret->cde_index = 0;
+	ret->cde_entc  = dir->cd_entc;
+	ret->cde_entv  = dir->cd_entv;
 }
 
 /* Default operators for `struct constdir' (using the functions above) */

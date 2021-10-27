@@ -134,7 +134,9 @@ handle_fdirent_readdir(struct fdirent *__restrict self,
                        USER CHECKED struct dirent *buf, size_t bufsize,
                        readdir_mode_t readdir_mode, iomode_t UNUSED(mode)) THROWS(...) {
 	ssize_t result;
-	result = fdirenum_feedent(buf, bufsize, readdir_mode, self);
+	result = fdirenum_feedent_ex(buf, bufsize, readdir_mode,
+	                             self->fd_ops->fdo_getino ? 0 : self->fd_ino,
+	                             self->fd_type, self->fd_namelen, self->fd_name);
 	if (result < 0)
 		result = ~result;
 	return (size_t)result;
@@ -144,7 +146,9 @@ INTERN NONNULL((1)) void KCALL
 handle_fdirent_stat(struct fdirent *__restrict self,
                     USER CHECKED struct stat *result) THROWS(...) {
 	memset(result, 0, sizeof(*result));
-	result->st_ino  = (typeof(result->st_ino))self->fd_ino;
+	/* NOTE: In this case, we can't invoke the `fdo_getino' operator... :( */
+	if (self->fd_ops->fdo_getino == NULL)
+		result->st_ino = (typeof(result->st_ino))self->fd_ino;
 	result->st_size = (typeof(result->st_size))self->fd_namelen;
 }
 

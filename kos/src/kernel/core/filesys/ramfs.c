@@ -251,7 +251,7 @@ again:
 		REF struct ramfs_dirent *next;
 		FINALLY_DECREF_UNLIKELY(ent);
 		/* Feed the entry to the user-buffer */
-		result = fdirenum_feedent(buf, bufsize, readdir_mode, &ent->rde_ent);
+		result = fdirenum_feedent_fast(buf, bufsize, readdir_mode, &ent->rde_ent);
 		if (result < 0)
 			return (size_t)~result; /* Don't advance directory position. */
 
