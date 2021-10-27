@@ -882,8 +882,10 @@ handle_existing:
 	}
 
 	/* Check that we're able to write new entries. */
-	if unlikely(!ops->fdno_flat.fdnx_writedir)
+	if unlikely(!ops->fdno_flat.fdnx_writedir) {
+		fnode_access(me, W_OK);
 		THROW(E_FSERROR_READONLY);
+	}
 
 	/* Create the new node, or use the given one for hardlinks. */
 	if (info->mkf_fmode == 0) {
@@ -958,6 +960,9 @@ handle_existing:
 					/* Deal with `existing' */
 					goto handle_existing;
 				}
+
+				/* Ensure that we're allowed to make modifications to the directory. */
+				fnode_access(me, W_OK);
 
 				/* Prepare the directory hash-vector for the addition of a new element. */
 				flatdirnode_fileslist_rehash_before_insert(me);

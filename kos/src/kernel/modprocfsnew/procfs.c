@@ -55,6 +55,12 @@
 
 DECL_BEGIN
 
+#if !defined(NDEBUG) && !defined(NDEBUG_FINI)
+#define DBG_memset memset
+#else /* !NDEBUG && !NDEBUG_FINI */
+#define DBG_memset(...) (void)0
+#endif /* NDEBUG || NDEBUG_FINI */
+
 /************************************************************************/
 /* Helpers for printing/parsing user-space values.                      */
 /************************************************************************/
@@ -349,6 +355,7 @@ procfs_root_v_lookup(struct fdirnode *__restrict UNUSED(self),
 			result->pprd_ent.fd_refcnt = 1; /* +1: return */
 			result->pprd_ent.fd_ops    = &procfs_perproc_root_dirent_ops;
 //			result->pprd_ent.fd_ino    = procfs_perproc_ino(pid, &procfs_perproc_root_ops); /* Not needed; we've got `fdo_getino()' */
+			DBG_memset(&result->pprd_ent.fd_ino, 0xcc, sizeof(result->pprd_ent.fd_ino));
 			result->pprd_ent.fd_type   = DT_DIR;
 			return &result->pprd_ent;
 		}

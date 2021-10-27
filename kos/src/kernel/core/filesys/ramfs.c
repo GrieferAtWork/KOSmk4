@@ -726,7 +726,7 @@ ramfs_dirnode_v_mkfile(struct fdirnode *__restrict self,
 			                 info->mkf_namelen, sizeof(char)) = '\0';
 
 			/* Fill in other fields of the new directory entry. */
-			if (info->mkf_hash == FLOOKUP_INFO_HASH_UNSET) {
+			if (info->mkf_hash == FLOOKUP_INFO_HASH_UNSET || ADDR_ISUSER(info->mkf_name)) {
 				info->mkf_hash = fdirent_hash(new_dirent->rde_ent.fd_name,
 				                              info->mkf_namelen);
 			}
@@ -741,11 +741,13 @@ ramfs_dirnode_v_mkfile(struct fdirnode *__restrict self,
 			/* Insert the new file */
 again_acquire_lock_for_insert:
 			ramfs_dirdata_treelock_write(&me->rdn_dat);
-			if unlikely(me->mf_flags & MFILE_F_DELETED)
+			if unlikely(me->mf_flags & MFILE_F_DELETED) {
+				ramfs_dirdata_treelock_endwrite(&me->rdn_dat);
 				THROW(E_FSERROR_DELETED, E_FILESYSTEM_DELETED_PATH);
+			}
 			old_dirent = ramfs_direnttree_locate(me->rdn_dat.rdd_tree,
-			                                       new_dirent->rde_ent.fd_name,
-			                                       new_dirent->rde_ent.fd_namelen);
+			                                     new_dirent->rde_ent.fd_name,
+			                                     new_dirent->rde_ent.fd_namelen);
 			if (!old_dirent && (info->mkf_flags & AT_DOSPATH) && me->rdn_dat.rdd_tree) {
 				/* Do a case-insensitive search */
 				old_dirent = _ramfs_direnttree_caselocate(me->rdn_dat.rdd_tree,
@@ -761,6 +763,16 @@ again_acquire_lock_for_insert:
 				info->mkf_dent  = &old_dirent->rde_ent;
 				info->mkf_rnode = (REF struct fnode *)incref(old_dirent->rde_node);
 				return FDIRNODE_MKFILE_EXISTS;
+			}
+
+			/* Ensure that we've got write permissions for `me' */
+			TRY {
+				fnode_access(me, W_OK);
+			} EXCEPT {
+				ramfs_dirdata_treelock_endwrite(&me->rdn_dat);
+				kfree(new_dirent);
+				decref_likely(new_node);
+				RETHROW();
 			}
 
 			if ((info->mkf_fmode & S_IFMT) != 0) {

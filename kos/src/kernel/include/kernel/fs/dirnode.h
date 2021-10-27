@@ -292,6 +292,7 @@ struct fdirnode_ops {
 	 * @throw: E_FSERROR_READONLY:              Read-only filesystem
 	 * @throw: E_FSERROR_TOO_MANY_HARD_LINKS:   ...
 	 * @throw: E_FSERROR_UNSUPPORTED_OPERATION: The requested S_IFMT isn't supported.
+	 * @throw: E_FSERROR_ACCESS_DENIED:         The file didn't already exist, and caller doesn't have write-access to `self'
 	 * @return: * : One of `FDIRNODE_MKFILE_*'
 	 *
 	 * Implementation:
@@ -523,6 +524,7 @@ fdirnode_enum(struct fdirnode *__restrict self,
  * @throw: E_FSERROR_READONLY:              Read-only filesystem (or unsupported operation)
  * @throw: E_FSERROR_TOO_MANY_HARD_LINKS:   ...
  * @throw: E_FSERROR_UNSUPPORTED_OPERATION: The requested S_IFMT isn't supported.
+ * @throw: E_FSERROR_ACCESS_DENIED:         The file didn't already exist, and caller doesn't have write-access to `self'
  * @return: * : One of `FDIRNODE_MKFILE_*' */
 FUNDEF WUNUSED NONNULL((1, 2)) unsigned int KCALL
 fdirnode_mkfile(struct fdirnode *__restrict self,

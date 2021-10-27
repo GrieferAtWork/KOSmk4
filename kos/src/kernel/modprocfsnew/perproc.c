@@ -159,7 +159,8 @@ PRIVATE struct fnode const procfs_perproc_reg_template = {
 		MFILE_INIT_mf_changed(MFILE_PARTS_ANONYMOUS),
 		MFILE_INIT_mf_blockshift(PAGESHIFT),
 		MFILE_INIT_mf_flags(MFILE_FS_NOSUID | MFILE_FS_NOEXEC |
-		                    MFILE_F_READONLY | MFILE_F_FIXEDFILESIZE),
+		                    MFILE_F_READONLY | MFILE_F_FIXEDFILESIZE |
+		                    MFILE_FM_FLEETING),
 		MFILE_INIT_mf_trunclock,
 		MFILE_INIT_mf_filesize((uint64_t)-1),
 		MFILE_INIT_mf_atime(0, 0),
@@ -188,7 +189,8 @@ PRIVATE struct fnode const procfs_perproc_nomap_template = {
 		MFILE_INIT_mf_blockshift(PAGESHIFT),
 		MFILE_INIT_mf_flags(MFILE_FS_NOSUID | MFILE_FS_NOEXEC |
 		                    MFILE_F_NOUSRMMAP | MFILE_F_NOUSRIO |
-		                    MFILE_F_READONLY | MFILE_F_FIXEDFILESIZE),
+		                    MFILE_F_READONLY | MFILE_F_FIXEDFILESIZE |
+		                    MFILE_FM_FLEETING),
 		MFILE_INIT_mf_trunclock,
 		MFILE_INIT_mf_filesize((uint64_t)-1),
 		MFILE_INIT_mf_atime(0, 0),
@@ -204,6 +206,41 @@ PRIVATE struct fnode const procfs_perproc_nomap_template = {
 	FNODE_INIT_fn_changed,
 	FNODE_INIT_fn_supent_EX({ NULL, FSUPER_NODES_DELETED }),
 	FNODE_INIT_fn_allnodes,
+};
+
+/* Template for files from "/proc/[PID]/fd/[NO]" */
+INTDEF struct flnknode_ops const procfs_perproc_fdlnk_ops;
+INTERN_CONST struct flnknode const procfs_fdlnk_template = {
+	.ln_node = {
+		.fn_file = {
+			MFILE_INIT_mf_refcnt(1), /* Return value of creator */
+			MFILE_INIT_mf_ops(&procfs_perproc_fdlnk_ops.lno_node.no_file),
+			MFILE_INIT_mf_lock,
+			MFILE_INIT_mf_parts(MFILE_PARTS_ANONYMOUS),
+			MFILE_INIT_mf_initdone,
+			MFILE_INIT_mf_lockops,
+			MFILE_INIT_mf_changed(MFILE_PARTS_ANONYMOUS),
+			MFILE_INIT_mf_blockshift(PAGESHIFT),
+			MFILE_INIT_mf_flags(MFILE_FS_NOSUID | MFILE_FS_NOEXEC |
+			                    MFILE_F_NOUSRMMAP | MFILE_F_NOUSRIO |
+			                    MFILE_F_READONLY | MFILE_F_FIXEDFILESIZE |
+			                    MFILE_FM_FLEETING),
+			MFILE_INIT_mf_trunclock,
+			MFILE_INIT_mf_filesize(0),
+			MFILE_INIT_mf_atime(0, 0),
+			MFILE_INIT_mf_mtime(0, 0),
+			MFILE_INIT_mf_ctime(0, 0),
+		},
+		FNODE_INIT_fn_nlink(1),
+		FNODE_INIT_fn_mode(S_IFLNK | 0777),
+		FNODE_INIT_fn_uid(0),
+		FNODE_INIT_fn_gid(0),
+		FNODE_INIT_fn_ino(0),
+		FNODE_INIT_fn_super(&procfs_super),
+		FNODE_INIT_fn_changed,
+		FNODE_INIT_fn_supent_EX({ NULL, FSUPER_NODES_DELETED }),
+		FNODE_INIT_fn_allnodes,
+	},
 };
 
 

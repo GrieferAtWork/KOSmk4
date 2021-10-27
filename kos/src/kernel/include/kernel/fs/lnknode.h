@@ -82,10 +82,10 @@ struct flnknode_ops {
 	 *        this  symbolic link being the last component of the given path.
 	 *        When this operator returns `false', the behavior is the same as
 	 *        when it isn't provided at all.
-	 * This function should fill `result->h_data' and `result->h_type' with the
-	 * object which should be opened if the link `self' were dereferenced. When
-	 * this operator isn't implement or returns `false', use `lno_linkstr'  and
-	 * `lno_readlink'  to do a  normal filesystem path walk  to follow the link
+	 * This function should initialize `result->h_data' and `result->h_type' with
+	 * the  object which should  be opened if the  link `self' were dereferenced.
+	 * When this operator isn't implement  or returns `false', use  `lno_linkstr'
+	 * and `lno_readlink' to do a normal filesystem path walk to follow the  link
 	 * contents.
 	 *
 	 * This operator is mainly needed to implement the special dup()-behavior
@@ -112,18 +112,18 @@ flnknode_v_readlink_default(struct flnknode *__restrict self,
 
 
 struct flnknode
-#ifdef __cplusplus
+#ifndef __WANT_FS_INLINE_STRUCTURES
     : fnode                          /* Underlying file-node */
-#endif /* __cplusplus */
+#endif /* !__WANT_FS_INLINE_STRUCTURES */
 {
-#ifndef __cplusplus
+#ifdef __WANT_FS_INLINE_STRUCTURES
 	struct fnode         ln_node;    /* Underlying file-node */
 #define _flnknode_node_     ln_node.
 #define _flnknode_asnode(x) &(x)->ln_node
-#else /* !__cplusplus */
+#else /* __WANT_FS_INLINE_STRUCTURES */
 #define _flnknode_node_     /* nothing */
 #define _flnknode_asnode(x) x
-#endif /* __cplusplus */
+#endif /* !__WANT_FS_INLINE_STRUCTURES */
 };
 
 

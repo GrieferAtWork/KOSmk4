@@ -694,9 +694,11 @@ FUNDEF WUNUSED REF struct handle FCALL
 handle_lookupin(unsigned int fd, struct handle_manager *__restrict self)
 		THROWS(E_WOULDBLOCK, E_INVALID_HANDLE_FILE);
 
+#ifndef CONFIG_USE_NEW_FS
 FUNDEF WUNUSED bool FCALL
 handle_existsin(unsigned int fd, struct handle_manager *__restrict self)
 		THROWS(E_WOULDBLOCK, E_INVALID_HANDLE_FILE);
+#endif /* !CONFIG_USE_NEW_FS */
 
 /* Same as `handle_lookup()', but don't allow for symbolic handles. */
 FUNDEF WUNUSED REF struct handle FCALL

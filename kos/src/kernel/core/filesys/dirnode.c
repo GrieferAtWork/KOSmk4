@@ -221,6 +221,7 @@ fdirnode_enum(struct fdirnode *__restrict self,
  * @throw: E_FSERROR_READONLY:              Read-only filesystem (or unsupported operation)
  * @throw: E_FSERROR_TOO_MANY_HARD_LINKS:   ...
  * @throw: E_FSERROR_UNSUPPORTED_OPERATION: The requested S_IFMT isn't supported.
+ * @throw: E_FSERROR_ACCESS_DENIED:         The file didn't already exist, and caller doesn't have write-access to `self'
  * @return: * : One of `FDIRNODE_MKFILE_*' * */
 PUBLIC WUNUSED NONNULL((1, 2)) unsigned int FCALL
 fdirnode_mkfile(struct fdirnode *__restrict self,
@@ -230,8 +231,34 @@ fdirnode_mkfile(struct fdirnode *__restrict self,
 		       E_FSERROR_UNSUPPORTED_OPERATION) {
 	struct fdirnode_ops const *ops;
 	ops = fdirnode_getops(self);
-	if unlikely(!ops->dno_mkfile)
-		THROW(E_FSERROR_READONLY);
+	if unlikely(!ops->dno_mkfile) {
+		/* Check for an already-existing file. */
+		REF struct fdirent *ent;
+		REF struct fnode *node;
+again_lookup:
+		ent = fdirnode_lookup(self, &info->mkf_lookup_info);
+		if (!ent) {
+			/* If we don't have permissions to change files,
+			 * then don't throw READONLY, but ACCESS_DENIED. */
+			fnode_access(self, W_OK);
+
+			/* If we have permissions, then throw READONLY. */
+			THROW(E_FSERROR_READONLY);
+		}
+		TRY {
+			node = fdirent_opennode(ent, self);
+		} EXCEPT {
+			decref_unlikely(ent);
+			RETHROW();
+		}
+		if unlikely(!node) {
+			decref_unlikely(ent);
+			goto again_lookup;
+		}
+		info->mkf_dent  = ent;  /* Inherit reference */
+		info->mkf_rnode = node; /* Inherit reference */
+		return FDIRNODE_MKFILE_EXISTS;
+	}
 	/* TODO: If this throws `E_FSERROR_UNSUPPORTED_OPERATION' with context == 0,
 	 *       try to fill in the correct `E_FILESYSTEM_OPERATION_*' context based
 	 *       on `info->mkf_fmode'. */

@@ -117,9 +117,14 @@ INTDEF struct fdirent_ops const procfs_perproc_root_dirent_ops;
  * NOTE: For this directory, `fn_fsdata' is a `REF struct taskpid *' [1..1] */
 INTDEF struct fdirnode_ops const procfs_perproc_root_ops;
 
-/* Calculate+return the INO of a given taskpid-pointer and INode operators table. */
-#define procfs_perproc_ino(struct_taskpid, node_ops)         \
-	(ino_t)((uintptr_t)skew_kernel_pointer(struct_taskpid) ^ \
+/* Calculate+return the INO of a given taskpid-pointer and INode operators table.
+ * @param: context_object_ptr: Pointer an unique object  with a unique address  that
+ *                             identifies the current context (for per-thread files,
+ *                             this is  `struct taskpid';  for  fd-files,  it's  the
+ *                             handle data pointer, etc...)
+ */
+#define procfs_perproc_ino(context_object_ptr, node_ops)         \
+	(ino_t)((uintptr_t)skew_kernel_pointer(context_object_ptr) ^ \
 	        (uintptr_t)skew_kernel_pointer(node_ops))
 /************************************************************************/
 

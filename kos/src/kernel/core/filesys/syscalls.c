@@ -2875,14 +2875,14 @@ DEFINE_COMPAT_SYSCALL2(errno_t, statfs64,
  * timestamp to the given `node's last-accessed and last-modified
  * fields. */
 PRIVATE NONNULL((1)) void KCALL
-inode_request_arbitrary_timestamps(struct fnode *__restrict node) {
+fnode_request_arbitrary_timestamps(struct fnode *__restrict node) {
 	/* Caller must be owner, or have `CAP_FOWNER' */
 	if (ATOMIC_READ(node->fn_uid) != cred_getfsuid())
 		require(CAP_FOWNER); /* FIXME: This fails with EACCES, but POSIX wants EPERM... */
 }
 
 PRIVATE NONNULL((1)) void KCALL
-inode_request_current_timestamps(struct fnode *__restrict node) {
+fnode_request_current_timestamps(struct fnode *__restrict node) {
 	/* Caller must be owner, or have `CAP_DAC_OVERRIDE' or `CAP_FOWNER' */
 	if (!fnode_mayaccess(node, W_OK) && !capable(CAP_DAC_OVERRIDE))
 		THROW(E_FSERROR_ACCESS_DENIED);
@@ -2911,10 +2911,10 @@ DEFINE_SYSCALL2(errno_t, utime,
 		mtm.tv_sec  = (time_t)times->modtime;
 		mtm.tv_nsec = 0;
 		COMPILER_READ_BARRIER();
-		inode_request_arbitrary_timestamps(node);
+		fnode_request_arbitrary_timestamps(node);
 	} else {
 		/* Caller must be able to write to `node' */
-		inode_request_current_timestamps(node);
+		fnode_request_current_timestamps(node);
 		atm = mtm = realtime();
 	}
 	mfile_chtime(node, &atm, &mtm, NULL);
@@ -2938,10 +2938,10 @@ DEFINE_COMPAT_SYSCALL2(errno_t, utime,
 		mtm.tv_sec  = (time_t)times->modtime;
 		mtm.tv_nsec = 0;
 		COMPILER_READ_BARRIER();
-		inode_request_arbitrary_timestamps(node);
+		fnode_request_arbitrary_timestamps(node);
 	} else {
 		/* Caller must be able to write to `node' */
-		inode_request_current_timestamps(node);
+		fnode_request_current_timestamps(node);
 		if (!capable(CAP_DAC_OVERRIDE))
 		atm = mtm = realtime();
 	}
@@ -2974,10 +2974,10 @@ DEFINE_SYSCALL2(errno_t, utime_time64,
 		mtm.tv_sec  = (time_t)times->modtime;
 		mtm.tv_nsec = 0;
 		COMPILER_READ_BARRIER();
-		inode_request_arbitrary_timestamps(node);
+		fnode_request_arbitrary_timestamps(node);
 	} else {
 		/* Caller must be able to write to `node' */
-		inode_request_current_timestamps(node);
+		fnode_request_current_timestamps(node);
 		atm = mtm = realtime();
 	}
 	mfile_chtime(node, &atm, &mtm, NULL);
@@ -3002,10 +3002,10 @@ DEFINE_COMPAT_SYSCALL2(errno_t, utime64,
 		mtm.tv_sec  = (time_t)times->modtime;
 		mtm.tv_nsec = 0;
 		COMPILER_READ_BARRIER();
-		inode_request_arbitrary_timestamps(node);
+		fnode_request_arbitrary_timestamps(node);
 	} else {
 		/* Caller must be able to write to `node' */
-		inode_request_current_timestamps(node);
+		fnode_request_current_timestamps(node);
 		atm = mtm = realtime();
 	}
 	mfile_chtime(node, &atm, &mtm, NULL);
@@ -3033,10 +3033,10 @@ DEFINE_SYSCALL2(errno_t, utimes,
 		TIMEVAL_TO_TIMESPEC(&times[0], &atm);
 		TIMEVAL_TO_TIMESPEC(&times[1], &mtm);
 		COMPILER_READ_BARRIER();
-		inode_request_arbitrary_timestamps(node);
+		fnode_request_arbitrary_timestamps(node);
 	} else {
 		/* Caller must be able to write to `node' */
-		inode_request_current_timestamps(node);
+		fnode_request_current_timestamps(node);
 		atm = mtm = realtime();
 	}
 	mfile_chtime(node, &atm, &mtm, NULL);
@@ -3058,10 +3058,10 @@ DEFINE_COMPAT_SYSCALL2(errno_t, utimes,
 		TIMEVAL_TO_TIMESPEC(&times[0], &atm);
 		TIMEVAL_TO_TIMESPEC(&times[1], &mtm);
 		COMPILER_READ_BARRIER();
-		inode_request_arbitrary_timestamps(node);
+		fnode_request_arbitrary_timestamps(node);
 	} else {
 		/* Caller must be able to write to `node' */
-		inode_request_current_timestamps(node);
+		fnode_request_current_timestamps(node);
 		atm = mtm = realtime();
 	}
 	mfile_chtime(node, &atm, &mtm, NULL);
@@ -3091,10 +3091,10 @@ DEFINE_SYSCALL2(errno_t, utimes_time64,
 		TIMEVAL_TO_TIMESPEC(&times[0], &atm);
 		TIMEVAL_TO_TIMESPEC(&times[1], &mtm);
 		COMPILER_READ_BARRIER();
-		inode_request_arbitrary_timestamps(node);
+		fnode_request_arbitrary_timestamps(node);
 	} else {
 		/* Caller must be able to write to `node' */
-		inode_request_current_timestamps(node);
+		fnode_request_current_timestamps(node);
 		atm = mtm = realtime();
 	}
 	mfile_chtime(node, &atm, &mtm, NULL);
@@ -3124,10 +3124,10 @@ DEFINE_COMPAT_SYSCALL2(errno_t, utimes_time64,
 		TIMEVAL_TO_TIMESPEC(&times[0], &atm);
 		TIMEVAL_TO_TIMESPEC(&times[1], &mtm);
 		COMPILER_READ_BARRIER();
-		inode_request_arbitrary_timestamps(node);
+		fnode_request_arbitrary_timestamps(node);
 	} else {
 		/* Caller must be able to write to `node' */
-		inode_request_current_timestamps(node);
+		fnode_request_current_timestamps(node);
 		atm = mtm = realtime();
 	}
 	mfile_chtime(node, &atm, &mtm, NULL);
@@ -3174,10 +3174,10 @@ DEFINE_SYSCALL3(errno_t, futimesat, fd_t, dirfd,
 		TIMEVAL_TO_TIMESPEC(&times[0], &atm);
 		TIMEVAL_TO_TIMESPEC(&times[1], &mtm);
 		COMPILER_READ_BARRIER();
-		inode_request_arbitrary_timestamps(node);
+		fnode_request_arbitrary_timestamps(node);
 	} else {
 		/* Caller must be able to write to `node' */
-		inode_request_current_timestamps(node);
+		fnode_request_current_timestamps(node);
 		atm = mtm = realtime();
 	}
 	mfile_chtime(node, &atm, &mtm, NULL);
@@ -3198,10 +3198,10 @@ DEFINE_COMPAT_SYSCALL3(errno_t, futimesat, fd_t, dirfd,
 		TIMEVAL_TO_TIMESPEC(&times[0], &atm);
 		TIMEVAL_TO_TIMESPEC(&times[1], &mtm);
 		COMPILER_READ_BARRIER();
-		inode_request_arbitrary_timestamps(node);
+		fnode_request_arbitrary_timestamps(node);
 	} else {
 		/* Caller must be able to write to `node' */
-		inode_request_current_timestamps(node);
+		fnode_request_current_timestamps(node);
 		atm = mtm = realtime();
 	}
 	mfile_chtime(node, &atm, &mtm, NULL);
@@ -3230,10 +3230,10 @@ DEFINE_SYSCALL3(errno_t, futimesat_time64, fd_t, dirfd,
 		TIMEVAL_TO_TIMESPEC(&times[0], &atm);
 		TIMEVAL_TO_TIMESPEC(&times[1], &mtm);
 		COMPILER_READ_BARRIER();
-		inode_request_arbitrary_timestamps(node);
+		fnode_request_arbitrary_timestamps(node);
 	} else {
 		/* Caller must be able to write to `node' */
-		inode_request_current_timestamps(node);
+		fnode_request_current_timestamps(node);
 		atm = mtm = realtime();
 	}
 	mfile_chtime(node, &atm, &mtm, NULL);
@@ -3262,10 +3262,10 @@ DEFINE_COMPAT_SYSCALL3(errno_t, futimesat_time64, fd_t, dirfd,
 		TIMEVAL_TO_TIMESPEC(&times[0], &atm);
 		TIMEVAL_TO_TIMESPEC(&times[1], &mtm);
 		COMPILER_READ_BARRIER();
-		inode_request_arbitrary_timestamps(node);
+		fnode_request_arbitrary_timestamps(node);
 	} else {
 		/* Caller must be able to write to `node' */
-		inode_request_current_timestamps(node);
+		fnode_request_current_timestamps(node);
 		atm = mtm = realtime();
 	}
 	mfile_chtime(node, &atm, &mtm, NULL);
@@ -3354,11 +3354,11 @@ DEFINE_SYSCALL4(errno_t, utimensat, fd_t, dirfd,
 			if (pctm && pctm->tv_nsec == UTIME_NOW)
 				*pctm = now;
 		}
-		inode_request_arbitrary_timestamps(node);
+		fnode_request_arbitrary_timestamps(node);
 	} else {
 		/* Caller must be able to write to `node' */
 do_touch:
-		inode_request_current_timestamps(node);
+		fnode_request_current_timestamps(node);
 		atm = mtm = realtime();
 		patm = &atm;
 		pmtm = &mtm;
@@ -3416,11 +3416,11 @@ DEFINE_COMPAT_SYSCALL4(errno_t, utimensat, fd_t, dirfd,
 			if (pctm && pctm->tv_nsec == UTIME_NOW)
 				*pctm = now;
 		}
-		inode_request_arbitrary_timestamps(node);
+		fnode_request_arbitrary_timestamps(node);
 	} else {
 		/* Caller must be able to write to `node' */
 do_touch:
-		inode_request_current_timestamps(node);
+		fnode_request_current_timestamps(node);
 		atm = mtm = realtime();
 		patm = &atm;
 		pmtm = &mtm;
@@ -3487,11 +3487,11 @@ DEFINE_SYSCALL4(errno_t, utimensat_time64, fd_t, dirfd,
 			if (pctm && pctm->tv_nsec == UTIME_NOW)
 				*pctm = now;
 		}
-		inode_request_arbitrary_timestamps(node);
+		fnode_request_arbitrary_timestamps(node);
 	} else {
 		/* Caller must be able to write to `node' */
 do_touch:
-		inode_request_current_timestamps(node);
+		fnode_request_current_timestamps(node);
 		atm = mtm = realtime();
 		patm = &atm;
 		pmtm = &mtm;
@@ -3558,11 +3558,11 @@ DEFINE_COMPAT_SYSCALL4(errno_t, utimensat_time64, fd_t, dirfd,
 			if (pctm && pctm->tv_nsec == UTIME_NOW)
 				*pctm = now;
 		}
-		inode_request_arbitrary_timestamps(node);
+		fnode_request_arbitrary_timestamps(node);
 	} else {
 		/* Caller must be able to write to `node' */
 do_touch:
-		inode_request_current_timestamps(node);
+		fnode_request_current_timestamps(node);
 		atm = mtm = realtime();
 		patm = &atm;
 		pmtm = &mtm;

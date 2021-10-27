@@ -1719,7 +1719,6 @@ path_open_ex(struct path *cwd, u32 *__restrict premaining_symlinks,
 		access_path = path_traverse_ex(cwd, premaining_symlinks, filename,
 		                               &info.mkf_name, &info.mkf_namelen, atflags);
 		TRY {
-			fnode_access(access_path->p_dir, W_OK);
 			info.mkf_hash          = FLOOKUP_INFO_HASH_UNSET;
 			info.mkf_flags         = atflags;
 			info.mkf_fmode         = S_IFREG | mode;
@@ -1728,6 +1727,12 @@ path_open_ex(struct path *cwd, u32 *__restrict premaining_symlinks,
 			info.mkf_creat.c_atime = realtime();
 			info.mkf_creat.c_mtime = info.mkf_creat.c_atime;
 			info.mkf_creat.c_ctime = info.mkf_creat.c_atime;
+
+#if 0 /* This can't be asserted here and needs to happen while holding fs-specific
+       * locks, after having learned that  the file to-be created doesn't  already
+       * exist. */
+			fnode_access(access_path->p_dir, W_OK);
+#endif
 
 			/* Allocate the resulting file handle _before_ creating the file,
 			 * so  no file is created in the  event that the handle cannot be
@@ -1765,6 +1770,10 @@ again_deref_lnknode:
 								decref_unlikely(access_path);
 								kfree(rhand);
 								result.h_mode = IO_FROM_OPENFLAG(oflags);
+								if unlikely(oflags & O_EXCL) {
+									handle_decref(result);
+									THROW(E_FSERROR_FILE_ALREADY_EXISTS); /* create-exclusive */
+								}
 								return result;
 							}
 						} /* Scope... */
@@ -1782,7 +1791,7 @@ again_deref_lnknode:
 						assert(status == FDIRNODE_MKFILE_EXISTS);
 						TRY {
 							if (oflags & O_EXCL)
-								THROW(E_FSERROR_FILE_ALREADY_EXISTS); /* open-exclusive */
+								THROW(E_FSERROR_FILE_ALREADY_EXISTS); /* create-exclusive */
 							/* Clear a regular file if O_TRUNC was given. */
 							if ((oflags & O_TRUNC) && (oflags & O_ACCMODE) != O_RDONLY &&
 							    fnode_isreg(info.mkf_rnode))

@@ -646,6 +646,17 @@ again_acquire_lock_for_insert:
 				}
 			}
 
+			/* Ensure that we've got write permissions for `devfs.fs_root' */
+			TRY {
+				fnode_access(&devfs.fs_root, W_OK);
+			} EXCEPT {
+				ramfs_dirdata_treelock_endwrite(&devfs.rs_dat);
+				devfs_byname_endread();
+				kfree(new_dirent);
+				decref_likely(new_node);
+				RETHROW();
+			}
+
 			if ((info->mkf_fmode & S_IFMT) != 0) {
 				/* At this point, the following fields of `new_node' are still unbound:
 				 *  - new_node->fn_allnodes

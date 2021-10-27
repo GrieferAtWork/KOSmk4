@@ -1678,7 +1678,8 @@ handle_lookupin(unsigned int fd, struct handle_manager *__restrict self)
 	return result;
 }
 
-FUNDEF WUNUSED bool FCALL
+#ifndef CONFIG_USE_NEW_FS
+PUBLIC WUNUSED bool FCALL
 handle_existsin(unsigned int fd, struct handle_manager *__restrict self)
 		THROWS(E_WOULDBLOCK, E_INVALID_HANDLE_FILE) {
 	sync_read(&self->hm_lock);
@@ -1715,6 +1716,7 @@ nope:
 	sync_endread(&self->hm_lock);
 	return false;
 }
+#endif /* !CONFIG_USE_NEW_FS */
 
 PUBLIC WUNUSED REF struct handle FCALL
 handle_lookup_nosym(unsigned int fd)

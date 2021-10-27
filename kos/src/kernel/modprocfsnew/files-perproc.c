@@ -65,6 +65,7 @@ DECL_END
 #include <kos/exec/peb.h>
 #include <kos/exec/rtld.h> /* RTLD_LIBDL */
 
+#include <assert.h>
 #include <format-printer.h>
 #include <inttypes.h>
 #include <signal.h>
@@ -88,11 +89,17 @@ DECL_END
 
 /* Per-process files (all of these have `REF struct taskpid *fn_fsdata') */
 
+DECL_BEGIN
+
+#if !defined(NDEBUG) && !defined(NDEBUG_FINI)
+#define DBG_memset memset
+#else /* !NDEBUG && !NDEBUG_FINI */
+#define DBG_memset(...) (void)0
+#endif /* NDEBUG || NDEBUG_FINI */
+
 #define print(p, len) (*printer)(arg, p, len)
 #define printf(...)   format_printf(printer, arg, __VA_ARGS__)
 #define PRINT(str)    print(str, COMPILER_STRLEN(str))
-
-DECL_BEGIN
 
 /* Forward declarations (to cause compiler errors if laster declarations are incompatible) */
 #define MKREG_RO(ops_symbol_name, printer)     \
@@ -127,32 +134,15 @@ ProcFS_PerProc_FsSpecificPath_Printer(struct flnknode *__restrict self,
 	REF struct fs *threadfs;
 	REF struct path *thread_pth, *caller_root;
 	REF struct task *thread = taskpid_gettask(self->fn_fsdata);
-	if unlikely(!thread) {
-fallback:
+	if unlikely(!thread)
 		return snprintf(buf, bufsize, "/");
-	}
 	threadfs = task_getfs(thread);
 	decref_unlikely(thread);
 	{
 		FINALLY_DECREF_UNLIKELY(threadfs);
 		fs_pathlock_read(threadfs);
-		thread_pth = xincref(*(struct path **)((byte_t *)threadfs + struct_fs_offsetof_path));
+		thread_pth = incref(*(struct path **)((byte_t *)threadfs + struct_fs_offsetof_path));
 		fs_pathlock_endread(threadfs);
-		if unlikely(!thread_pth) {
-			/* This can happen for DOS drive with unset directories.
-			 *
-			 * In this case, we must try to print the drive root directory as
-			 * fallback. And if that one's also not found, we must print  "/" */
-			struct vfs *thread_vfs;
-			thread_vfs = threadfs->fs_vfs;
-			vfs_driveslock_read(thread_vfs);
-			thread_pth = xincref(*(struct path **)((byte_t *)thread_vfs->vf_drives +
-			                                       (struct_fs_offsetof_path -
-			                                        offsetof(struct fs, fs_dcwd))));
-			vfs_driveslock_endread(thread_vfs);
-			if unlikely(!thread_pth)
-				goto fallback;
-		}
 	}
 	FINALLY_DECREF_UNLIKELY(thread_pth);
 	caller_root = fs_getroot(THIS_FS);
@@ -1013,9 +1003,123 @@ NOTHROW(KCALL procfs_perproc_v_destroy)(struct mfile *__restrict self);
 /* /proc/[pid]/fd                                                       */
 /************************************************************************/
 
-PRIVATE struct flnknode_ops const procfs_perproc_fdlnk_ops = {
-	/* TODO */
+struct procfs_fd_lnknode: flnknode {
+//	REF void      *pfl_handdat; /* [1..1][const] Handle data pointer.
+//	                             * This one is actually stored in `fn_fsdata' */
+	uintptr_half_t pfl_handtyp; /* [const] Handle type (One of `HANDLE_TYPE_*') */
 };
+
+INTDEF NOBLOCK NONNULL((1)) void
+NOTHROW(KCALL procfs_fd_lnknode_v_destroy)(struct mfile *__restrict self) {
+	struct procfs_fd_lnknode *me;
+	me = (struct procfs_fd_lnknode *)mfile_aslnk(self);
+	assert(!LIST_ISBOUND(me, fn_allnodes));
+	assert(me->fn_supent.rb_rhs == FSUPER_NODES_DELETED);
+	assert(me->mf_parts == MFILE_PARTS_ANONYMOUS);
+	(*handle_type_db.h_decref[me->pfl_handtyp])(me->fn_fsdata);
+	kfree(me);
+}
+#define procfs_fd_lnknode_v_changed procfs_perproc_v_changed
+#define procfs_fd_lnknode_v_wrattr  procfs_perproc_v_wrattr
+#define procfs_fd_lnknode_v_free    procfs_perproc_v_free
+
+PRIVATE WUNUSED NONNULL((1)) size_t KCALL
+procfs_fd_lnknode_v_readlink(struct flnknode *__restrict self,
+                             USER CHECKED /*utf-8*/ char *buf,
+                             size_t bufsize)
+		THROWS(E_SEGFAULT, E_IOERROR, ...) {
+	struct handle hand;
+	struct procfs_fd_lnknode *me;
+	struct format_snprintf_data dat;
+	me = (struct procfs_fd_lnknode *)mfile_aslnk(self);
+	hand.h_mode   = IO_RDONLY; /* NOTE: This `IO_RDONLY' will go away once `handle_print()' becomes normal handle operator. */
+	hand.h_type   = me->pfl_handtyp;
+	hand.h_data   = me->fn_fsdata;
+	dat.sd_buffer = buf;
+	dat.sd_bufsiz = bufsize;
+	return (size_t)handle_print(&hand, &format_sprintf_printer, &dat);
+}
+
+PRIVATE WUNUSED NONNULL((1, 2, 3, 4)) bool KCALL
+procfs_fd_lnknode_v_openlink(struct flnknode *__restrict self,
+                             struct handle *__restrict result,
+                             struct path *__restrict UNUSED(access_path),
+                             struct fdirent *__restrict UNUSED(access_dent))
+		THROWS(E_IOERROR, E_BADALLOC, ...) {
+	struct procfs_fd_lnknode *me;
+	/* This is the function that implements the magic for open("/proc/[pid]/fd/[no]"),
+	 * such  that  such a  call  behaves as  a  dup(2), rather  than open(readlink())! */
+	me = (struct procfs_fd_lnknode *)mfile_aslnk(self);
+	result->h_data = me->fn_fsdata;
+	result->h_type = me->pfl_handtyp;
+	(*handle_type_db.h_incref[me->pfl_handtyp])(me->fn_fsdata);
+	return true;
+}
+
+
+INTERN_CONST struct flnknode_ops const procfs_perproc_fdlnk_ops = {
+	.lno_node = {
+		.no_file = {
+			.mo_destroy = &procfs_fd_lnknode_v_destroy,
+			.mo_changed = &procfs_fd_lnknode_v_changed,
+		},
+		.no_free   = &procfs_fd_lnknode_v_free,
+		.no_wrattr = &procfs_fd_lnknode_v_wrattr,
+	},
+	.lno_readlink = &procfs_fd_lnknode_v_readlink,
+	.lno_openlink = &procfs_fd_lnknode_v_openlink,
+};
+
+/* Template for files from  "/proc/[PID]/fd/[NO]"
+ * Has to be defined in "./perproc.c" because the
+ * static init needs  `__WANT_FS_INIT', which  we
+ * don't define. */
+INTDEF struct flnknode const procfs_fdlnk_template;
+
+
+struct procfs_fd_dirent {
+	REF void      *pfd_handptr; /* [1..1][const] Handle data pointer. */
+	uintptr_half_t pfd_handtyp; /* [const] Handle type (One of `HANDLE_TYPE_*') */
+	struct fdirent pfd_ent;     /* Underlying directory entry. */
+};
+#define fdirent_asfd(self) container_of(self, struct procfs_fd_dirent, pfd_ent)
+
+
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(KCALL procfs_fd_dirent_v_destroy)(struct fdirent *__restrict self) {
+	struct procfs_fd_dirent *me = fdirent_asfd(self);
+	(*handle_type_db.h_decref[me->pfd_handtyp])(me->pfd_handptr);
+	kfree(me);
+}
+
+PRIVATE WUNUSED NONNULL((1, 2)) REF struct fnode *KCALL
+procfs_fd_dirent_v_opennode(struct fdirent *__restrict self,
+                            struct fdirnode *__restrict UNUSED(dir)) {
+	struct procfs_fd_dirent *me = fdirent_asfd(self);
+	REF struct procfs_fd_lnknode *result;
+	result = (REF struct procfs_fd_lnknode *)kmalloc(sizeof(REF struct procfs_fd_lnknode), GFP_NORMAL);
+	memcpy(result, &procfs_fdlnk_template, sizeof(struct flnknode));
+	result->pfl_handtyp = me->pfd_handtyp;
+	result->fn_fsdata   = (REF struct taskpid *)me->pfd_handptr; /* Hack! */
+	result->fn_ino      = procfs_perproc_ino(me->pfd_handptr, &procfs_perproc_fdlnk_ops);
+	(*handle_type_db.h_incref[me->pfd_handtyp])(me->pfd_handptr);
+	return result;
+}
+
+PRIVATE WUNUSED NONNULL((1, 2)) ino_t FCALL
+procfs_fd_dirent_v_getino(struct fdirent *__restrict self,
+                          struct fdirnode *__restrict UNUSED(dir)) {
+	struct procfs_fd_dirent *me = fdirent_asfd(self);
+	return procfs_perproc_ino(me->pfd_handptr, &procfs_perproc_fdlnk_ops);
+}
+
+PRIVATE struct fdirent_ops const procfs_fd_dirent_ops = {
+	.fdo_destroy  = &procfs_fd_dirent_v_destroy,
+	.fdo_opennode = &procfs_fd_dirent_v_opennode,
+	.fdo_getino   = &procfs_fd_dirent_v_getino,
+};
+
+
 
 PRIVATE WUNUSED NONNULL((1, 2)) REF struct fdirent *KCALL
 procfs_perproc_fd_v_lookup(struct fdirnode *__restrict self,
@@ -1023,15 +1127,59 @@ procfs_perproc_fd_v_lookup(struct fdirnode *__restrict self,
 	struct taskpid *pid = self->fn_fsdata;
 	REF struct task *thread;
 	REF struct handle_manager *hm;
+	char ch;
+
 	thread = taskpid_gettask(pid);
 	if (!thread)
 		return NULL;
 	hm = task_gethandlemanager(thread);
 	decref_unlikely(thread);
 	FINALLY_DECREF_UNLIKELY(hm);
-	/* TODO */
-	(void)info;
 
+	/* Decode handle number */
+	if unlikely(info->flu_namelen == 0)
+		goto notanfd;
+	ch = ATOMIC_READ(info->flu_name[0]);
+	if ((ch >= '1' && ch <= '9') || (ch == '0' && info->flu_namelen == 1)) {
+		REF struct procfs_fd_dirent *result;
+		unsigned int fdno = (unsigned int)(ch - '0');
+		struct handle hand;
+		size_t i;
+
+		for (i = 1; i < info->flu_namelen; ++i) {
+			ch = ATOMIC_READ(info->flu_name[i]);
+			if unlikely(!(ch >= '0' && ch <= '9'))
+				goto notanfd;
+			fdno *= 10;
+			fdno += (unsigned int)(ch - '0');
+		}
+
+		/* Lookup the handle in question. */
+		hand = handle_trylookup(hm, fdno);
+		if (hand.h_type == HANDLE_TYPE_UNDEFINED)
+			return NULL; /* No such handle */
+
+		/* Allocate the new directory entry. */
+		result = (REF struct procfs_fd_dirent *)kmalloc(offsetof(struct procfs_fd_dirent, pfd_ent.fd_name) +
+		                                                (info->flu_namelen + 1) * sizeof(char),
+		                                                GFP_NORMAL);
+
+		/* Fill in the directory entry. */
+		result->pfd_handptr        = hand.h_data; /* Inherit reference */
+		result->pfd_handtyp        = hand.h_type;
+		result->pfd_ent.fd_namelen = (u16)sprintf(result->pfd_ent.fd_name, "%u", fdno);
+		assert(result->pfd_ent.fd_namelen == info->flu_namelen);
+		if (info->flu_hash == FLOOKUP_INFO_HASH_UNSET || ADDR_ISUSER(info->flu_name))
+			info->flu_hash = fdirent_hash(result->pfd_ent.fd_name, result->pfd_ent.fd_namelen);
+		result->pfd_ent.fd_hash   = info->flu_hash;
+		result->pfd_ent.fd_refcnt = 1; /* +1: return */
+		result->pfd_ent.fd_ops    = &procfs_fd_dirent_ops;
+//		result->pfd_ent.fd_ino    = procfs_perproc_ino(hand.h_data, &procfs_perproc_fdlnk_ops); /* Not needed; we've got `fdo_getino()' */
+		DBG_memset(&result->pfd_ent.fd_ino, 0xcc, sizeof(result->pfd_ent.fd_ino));
+		result->pfd_ent.fd_type   = DT_LNK;
+		return &result->pfd_ent;
+	}
+notanfd:
 	return NULL;
 }
 
