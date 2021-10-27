@@ -916,8 +916,7 @@ again:
 			last_link_went_away = fnode_delete_strt_with_tslock(file);
 		mfile_tslock_release(file);
 
-		/* Delete the file (make all mem-parts anonymous)
-		 * NOTE: This will */
+		/* Delete the file (make all mem-parts anonymous) */
 		if (last_link_went_away) {
 			incref(file);
 			fnode_delete_impl(file);

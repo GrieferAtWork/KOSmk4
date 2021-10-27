@@ -121,7 +121,7 @@ again_dots:
 				uintptr_t newdots;
 
 				/* Figure out of we should later skip the ".." entry. */
-				newdots = fdirnode_issuper(mydir) ? 1 : 2;
+				newdots = fdirnode_issuper(mydir) ? 2 : 1;
 
 				/* Read the directory's INode number. */
 				mfile_tslock_acquire(mydir);
