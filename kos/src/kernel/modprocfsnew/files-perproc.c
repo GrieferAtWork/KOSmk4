@@ -1060,7 +1060,7 @@ procfs_perproc_lnknode_v_stat(struct mfile *__restrict self,
 	struct flnknode *me            = mfile_aslnk(self);
 	struct flnknode_ops const *ops = flnknode_getops(me);
 	procfs_perproc_v_stat_common(self, result);
-	lnksize           = (*ops->lno_readlink)(me, NULL, 0); /* TODO */
+	lnksize           = (*ops->lno_readlink)(me, NULL, 0);
 	result->st_blocks = CEILDIV(lnksize, PAGESIZE);
 	result->st_size   = lnksize;
 }
