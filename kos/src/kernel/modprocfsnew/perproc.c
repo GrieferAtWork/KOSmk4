@@ -122,13 +122,13 @@ NOTHROW(KCALL procfs_perproc_v_destroy)(struct mfile *__restrict self) {
 }
 
 /* Operators for per-process directories */
-#define procfs_perproc_dir_v_free       procfs_perproc_v_free
-#define procfs_perproc_dir_v_destroy    procfs_perproc_v_destroy
-#define procfs_perproc_dir_v_changed    procfs_perproc_v_changed
-#define procfs_perproc_dir_v_wrattr     procfs_perproc_v_wrattr
-#define procfs_perproc_dir_v_stream_ops fdirnode_v_stream_ops
-#define procfs_perproc_dir_v_open       fdirnode_v_open
-#define procfs_perproc_dir_v_stat       fdirnode_v_stat
+#define procfs_perproc_dir_v_free    procfs_perproc_v_free
+#define procfs_perproc_dir_v_destroy procfs_perproc_v_destroy
+#define procfs_perproc_dir_v_changed procfs_perproc_v_changed
+#define procfs_perproc_dir_v_wrattr  procfs_perproc_v_wrattr
+INTDEF struct mfile_stream_ops const procfs_perproc_dir_v_stream_ops;
+#define procfs_perproc_dir_v_open fdirnode_v_open
+#define procfs_perproc_dir_v_stat fdirnode_v_stat
 
 
 
@@ -381,6 +381,13 @@ PRIVATE struct fdirent_ops const procfs_perproc_dirent_ops_nomap = {
 
 
 /* Define operator tables. */
+INTDEF struct mfile_stream_ops const procfs_perproc_printnode_v_stream_ops;
+INTDEF struct mfile_stream_ops const procfs_perproc_lnknode_v_stream_ops;
+INTDEF NONNULL((1)) void KCALL
+procfs_perproc_printnode_v_stat(struct mfile *__restrict self,
+                                USER CHECKED struct stat *result)
+		THROWS(...);
+
 #define MKDIR_BEGIN(ops_symbol_name)                                                   \
 	PRIVATE WUNUSED NONNULL((1, 2)) REF struct fdirent *KCALL                          \
 	__##ops_symbol_name##_v_lookup(struct fdirnode *__restrict UNUSED(self),           \
@@ -408,23 +415,23 @@ PRIVATE struct fdirent_ops const procfs_perproc_dirent_ops_nomap = {
 		.dno_lookup = &__##ops_symbol_name##_v_lookup,                                 \
 		.dno_enum   = &__##ops_symbol_name##_v_enum,                                   \
 	};
-#define MKREG_RO(ops_symbol_name, printer)                      \
-	INTDEF NONNULL((1, 2)) void KCALL                           \
-	printer(struct printnode *__restrict self,                  \
-	        pformatprinter printer_, void *arg,                 \
-	        size_t offset_hint);                                \
-	INTERN_CONST struct printnode_ops const ops_symbol_name = { \
-		.pno_reg = {{                                           \
-			.no_file = {                                        \
-				.mo_destroy    = &procfs_perproc_v_destroy,     \
-				.mo_loadblocks = &printnode_v_loadblocks,       \
-				.mo_changed    = &procfs_perproc_v_changed,     \
-				.mo_stream     = &printnode_v_stream_ops,       \
-			},                                                  \
-			.no_free   = &procfs_perproc_v_free,                \
-			.no_wrattr = &procfs_perproc_v_wrattr,              \
-		}},                                                     \
-		.pno_print = &printer,                                  \
+#define MKREG_RO(ops_symbol_name, printer)                               \
+	INTDEF NONNULL((1, 2)) void KCALL                                    \
+	printer(struct printnode *__restrict self,                           \
+	        pformatprinter printer_, void *arg,                          \
+	        size_t offset_hint);                                         \
+	INTERN_CONST struct printnode_ops const ops_symbol_name = {          \
+		.pno_reg = {{                                                    \
+			.no_file = {                                                 \
+				.mo_destroy    = &procfs_perproc_v_destroy,              \
+				.mo_loadblocks = &printnode_v_loadblocks,                \
+				.mo_changed    = &procfs_perproc_v_changed,              \
+				.mo_stream     = &procfs_perproc_printnode_v_stream_ops, \
+			},                                                           \
+			.no_free   = &procfs_perproc_v_free,                         \
+			.no_wrattr = &procfs_perproc_v_wrattr,                       \
+		}},                                                              \
+		.pno_print = &printer,                                           \
 	};
 #define MKREG_RW(ops_symbol_name, printer, writer)                             \
 	INTDEF NONNULL((1, 2)) void KCALL                                          \
@@ -438,7 +445,7 @@ PRIVATE struct fdirent_ops const procfs_perproc_dirent_ops_nomap = {
 		.mso_pread  = &printnode_v_pread,                                      \
 		.mso_preadv = &printnode_v_preadv,                                     \
 		.mso_pwrite = &writer,                                                 \
-		.mso_stat   = &printnode_v_stat,                                       \
+		.mso_stat   = &procfs_perproc_printnode_v_stat,                        \
 	};                                                                         \
 	INTERN_CONST struct printnode_ops const ops_symbol_name = {                \
 		.pno_reg = {{                                                          \
@@ -453,22 +460,23 @@ PRIVATE struct fdirent_ops const procfs_perproc_dirent_ops_nomap = {
 		}},                                                                    \
 		.pno_print = &printer,                                                 \
 	};
-#define MKLNK(ops_symbol_name, readlink)                       \
-	INTDEF WUNUSED NONNULL((1)) size_t KCALL                   \
-	readlink(struct flnknode *__restrict self,                 \
-	         USER CHECKED /*utf-8*/ char *buf,                 \
-	         size_t bufsize)                                   \
-			THROWS(E_SEGFAULT, E_IOERROR, ...);                \
-	INTERN_CONST struct flnknode_ops const ops_symbol_name = { \
-		.lno_node = {                                          \
-			.no_file = {                                       \
-				.mo_destroy = &procfs_perproc_v_destroy,       \
-				.mo_changed = &procfs_perproc_v_changed,       \
-			},                                                 \
-			.no_free   = &procfs_perproc_v_free,               \
-			.no_wrattr = &procfs_perproc_v_wrattr,             \
-		},                                                     \
-		.lno_readlink = &readlink,                             \
+#define MKLNK(ops_symbol_name, readlink)                            \
+	INTDEF WUNUSED NONNULL((1)) size_t KCALL                        \
+	readlink(struct flnknode *__restrict self,                      \
+	         USER CHECKED /*utf-8*/ char *buf,                      \
+	         size_t bufsize)                                        \
+			THROWS(E_SEGFAULT, E_IOERROR, ...);                     \
+	INTERN_CONST struct flnknode_ops const ops_symbol_name = {      \
+		.lno_node = {                                               \
+			.no_file = {                                            \
+				.mo_destroy = &procfs_perproc_v_destroy,            \
+				.mo_changed = &procfs_perproc_v_changed,            \
+				.mo_stream  = &procfs_perproc_lnknode_v_stream_ops, \
+			},                                                      \
+			.no_free   = &procfs_perproc_v_free,                    \
+			.no_wrattr = &procfs_perproc_v_wrattr,                  \
+		},                                                          \
+		.lno_readlink = &readlink,                                  \
 	};
 #include "perproc.def"
 

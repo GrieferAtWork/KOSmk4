@@ -51,9 +51,12 @@ DECL_END
 #include <kernel/mman/rw.h>
 #include <kernel/user.h>
 #include <sched/cpu.h>
+#include <sched/cred.h>
 #include <sched/pid.h>
 #include <sched/task.h>
+#include <sched/tsc.h>
 
+#include <hybrid/align.h>
 #include <hybrid/atomic.h>
 #include <hybrid/overflow.h>
 
@@ -64,6 +67,7 @@ DECL_END
 #include <kos/except/reason/io.h>
 #include <kos/exec/peb.h>
 #include <kos/exec/rtld.h> /* RTLD_LIBDL */
+#include <sys/stat.h>
 
 #include <assert.h>
 #include <format-printer.h>
@@ -989,14 +993,98 @@ ProcFS_PerProc_X86_Iopl_Write(struct mfile *__restrict self, USER CHECKED void c
 INTDEF NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL procfs_perproc_v_destroy)(struct mfile *__restrict self);
 
+PRIVATE NONNULL((1)) void KCALL
+procfs_perproc_v_stat_common(struct mfile *__restrict self,
+                             USER CHECKED struct stat *result)
+		THROWS(...) {
+	struct fnode *me        = mfile_asnode(self);
+	REF struct task *thread = taskpid_gettask(me->fn_fsdata);
+	/* Set timestamps based on thread times. */
+	if (thread) {
+		struct timespec ts;
+		REF struct cred *thread_cred;
+		FINALLY_DECREF_UNLIKELY(thread);
+
+		/* Creation-time: store the time when the thread was started. */
+		ts = task_getstarttime(thread);
+		result->st_ctimespec.tv_sec  = (typeof(result->st_ctimespec.tv_sec))ts.tv_sec;
+		result->st_ctimespec.tv_nsec = (typeof(result->st_ctimespec.tv_nsec))ts.tv_nsec;
+
+		/* Last-accessed + last-modified: store the last point in time when the thread got executed. */
+		ts = thread == THIS_TASK ? realtime() : ktime_to_timespec(FORTASK(thread, this_stoptime));
+		result->st_atimespec.tv_sec  = (typeof(result->st_atimespec.tv_sec))ts.tv_sec;
+		result->st_atimespec.tv_nsec = (typeof(result->st_atimespec.tv_nsec))ts.tv_nsec;
+		result->st_mtimespec.tv_sec  = (typeof(result->st_mtimespec.tv_sec))ts.tv_sec;
+		result->st_mtimespec.tv_nsec = (typeof(result->st_mtimespec.tv_nsec))ts.tv_nsec;
+
+		/* Fill uid/gid based on thread credentials. */
+		thread_cred = task_getcred(thread);
+		FINALLY_DECREF_UNLIKELY(thread_cred);
+		/* NOTE: Yes, we need to use the effective U/G-id here (linux does the same) */
+		result->st_uid = (typeof(result->st_uid))ATOMIC_READ(thread_cred->c_euid);
+		result->st_gid = (typeof(result->st_gid))ATOMIC_READ(thread_cred->c_egid);
+
+	} else {
+		/* Fallback: just write the current time... */
+		struct timespec now          = realtime();
+		result->st_atimespec.tv_sec  = (typeof(result->st_atimespec.tv_sec))now.tv_sec;
+		result->st_atimespec.tv_nsec = (typeof(result->st_atimespec.tv_nsec))now.tv_nsec;
+		result->st_mtimespec.tv_sec  = (typeof(result->st_mtimespec.tv_sec))now.tv_sec;
+		result->st_mtimespec.tv_nsec = (typeof(result->st_mtimespec.tv_nsec))now.tv_nsec;
+		result->st_ctimespec.tv_sec  = (typeof(result->st_ctimespec.tv_sec))now.tv_sec;
+		result->st_ctimespec.tv_nsec = (typeof(result->st_ctimespec.tv_nsec))now.tv_nsec;
+	}
+}
+
+INTERN NONNULL((1)) void KCALL
+procfs_perproc_dir_v_stat(struct mfile *__restrict self,
+                          USER CHECKED struct stat *result)
+		THROWS(...) {
+	procfs_perproc_v_stat_common(self, result);
+	fdirnode_v_stat(self, result);
+}
+
+INTERN NONNULL((1)) void KCALL
+procfs_perproc_printnode_v_stat(struct mfile *__restrict self,
+                                USER CHECKED struct stat *result)
+		THROWS(...) {
+	procfs_perproc_v_stat_common(self, result);
+	printnode_v_stat(self, result);
+}
+
+INTERN NONNULL((1)) void KCALL
+procfs_perproc_lnknode_v_stat(struct mfile *__restrict self,
+                              USER CHECKED struct stat *result)
+		THROWS(...) {
+	size_t lnksize;
+	struct flnknode *me            = mfile_aslnk(self);
+	struct flnknode_ops const *ops = flnknode_getops(me);
+	procfs_perproc_v_stat_common(self, result);
+	lnksize           = (*ops->lno_readlink)(me, NULL, 0); /* TODO */
+	result->st_blocks = CEILDIV(lnksize, PAGESIZE);
+	result->st_size   = lnksize;
+}
+
+INTERN_CONST struct mfile_stream_ops const procfs_perproc_lnknode_v_stream_ops = {
+	.mso_stat = &procfs_perproc_lnknode_v_stat,
+};
+
+INTERN_CONST struct mfile_stream_ops const procfs_perproc_printnode_v_stream_ops = {
+	.mso_pread  = &printnode_v_pread,
+	.mso_preadv = &printnode_v_preadv,
+	.mso_stat   = &procfs_perproc_printnode_v_stat,
+};
+
 /* Operators for per-process directories */
-#define procfs_perproc_dir_v_free       procfs_perproc_v_free
-#define procfs_perproc_dir_v_destroy    procfs_perproc_v_destroy
-#define procfs_perproc_dir_v_changed    procfs_perproc_v_changed
-#define procfs_perproc_dir_v_wrattr     procfs_perproc_v_wrattr
-#define procfs_perproc_dir_v_stream_ops fdirnode_v_stream_ops
-#define procfs_perproc_dir_v_open       fdirnode_v_open
-#define procfs_perproc_dir_v_stat       fdirnode_v_stat
+#define procfs_perproc_dir_v_free    procfs_perproc_v_free
+#define procfs_perproc_dir_v_destroy procfs_perproc_v_destroy
+#define procfs_perproc_dir_v_changed procfs_perproc_v_changed
+#define procfs_perproc_dir_v_wrattr  procfs_perproc_v_wrattr
+INTERN_CONST struct mfile_stream_ops const procfs_perproc_dir_v_stream_ops = {
+	.mso_open = &fdirnode_v_open,
+	.mso_stat = &procfs_perproc_dir_v_stat,
+};
+#define procfs_perproc_dir_v_open fdirnode_v_open
 
 
 /************************************************************************/
@@ -1004,8 +1092,7 @@ NOTHROW(KCALL procfs_perproc_v_destroy)(struct mfile *__restrict self);
 /************************************************************************/
 
 struct procfs_fd_lnknode: flnknode {
-//	REF void      *pfl_handdat; /* [1..1][const] Handle data pointer.
-//	                             * This one is actually stored in `fn_fsdata' */
+	REF void      *pfl_handdat; /* [1..1][const] Handle data pointer. */
 	uintptr_half_t pfl_handtyp; /* [const] Handle type (One of `HANDLE_TYPE_*') */
 };
 
@@ -1016,12 +1103,14 @@ NOTHROW(KCALL procfs_fd_lnknode_v_destroy)(struct mfile *__restrict self) {
 	assert(!LIST_ISBOUND(me, fn_allnodes));
 	assert(me->fn_supent.rb_rhs == FSUPER_NODES_DELETED);
 	assert(me->mf_parts == MFILE_PARTS_ANONYMOUS);
-	(*handle_type_db.h_decref[me->pfl_handtyp])(me->fn_fsdata);
+	(*handle_type_db.h_decref[me->pfl_handtyp])(me->pfl_handdat);
+	decref_unlikely(me->fn_fsdata);
 	kfree(me);
 }
-#define procfs_fd_lnknode_v_changed procfs_perproc_v_changed
-#define procfs_fd_lnknode_v_wrattr  procfs_perproc_v_wrattr
-#define procfs_fd_lnknode_v_free    procfs_perproc_v_free
+#define procfs_fd_lnknode_v_changed    procfs_perproc_v_changed
+#define procfs_fd_lnknode_v_wrattr     procfs_perproc_v_wrattr
+#define procfs_fd_lnknode_v_free       procfs_perproc_v_free
+#define procfs_fd_lnknode_v_stream_ops procfs_perproc_lnknode_v_stream_ops
 
 PRIVATE WUNUSED NONNULL((1)) size_t KCALL
 procfs_fd_lnknode_v_readlink(struct flnknode *__restrict self,
@@ -1034,10 +1123,10 @@ procfs_fd_lnknode_v_readlink(struct flnknode *__restrict self,
 	me = (struct procfs_fd_lnknode *)mfile_aslnk(self);
 	hand.h_mode   = IO_RDONLY; /* NOTE: This `IO_RDONLY' will go away once `handle_print()' becomes normal handle operator. */
 	hand.h_type   = me->pfl_handtyp;
-	hand.h_data   = me->fn_fsdata;
+	hand.h_data   = me->pfl_handdat;
 	dat.sd_buffer = buf;
 	dat.sd_bufsiz = bufsize;
-	return (size_t)handle_print(&hand, &format_sprintf_printer, &dat);
+	return (size_t)handle_print(&hand, &format_snprintf_printer, &dat);
 }
 
 PRIVATE WUNUSED NONNULL((1, 2, 3, 4)) bool KCALL
@@ -1050,9 +1139,9 @@ procfs_fd_lnknode_v_openlink(struct flnknode *__restrict self,
 	/* This is the function that implements the magic for open("/proc/[pid]/fd/[no]"),
 	 * such  that  such a  call  behaves as  a  dup(2), rather  than open(readlink())! */
 	me = (struct procfs_fd_lnknode *)mfile_aslnk(self);
-	result->h_data = me->fn_fsdata;
+	result->h_data = me->pfl_handdat;
 	result->h_type = me->pfl_handtyp;
-	(*handle_type_db.h_incref[me->pfl_handtyp])(me->fn_fsdata);
+	(*handle_type_db.h_incref[result->h_type])(result->h_data);
 	return true;
 }
 
@@ -1062,6 +1151,7 @@ INTERN_CONST struct flnknode_ops const procfs_perproc_fdlnk_ops = {
 		.no_file = {
 			.mo_destroy = &procfs_fd_lnknode_v_destroy,
 			.mo_changed = &procfs_fd_lnknode_v_changed,
+			.mo_stream  = &procfs_fd_lnknode_v_stream_ops,
 		},
 		.no_free   = &procfs_fd_lnknode_v_free,
 		.no_wrattr = &procfs_fd_lnknode_v_wrattr,
@@ -1078,9 +1168,10 @@ INTDEF struct flnknode const procfs_fdlnk_template;
 
 
 struct procfs_fd_dirent {
-	REF void      *pfd_handptr; /* [1..1][const] Handle data pointer. */
-	uintptr_half_t pfd_handtyp; /* [const] Handle type (One of `HANDLE_TYPE_*') */
-	struct fdirent pfd_ent;     /* Underlying directory entry. */
+	REF struct taskpid *pfd_thread;  /* [1..1][const] The thread being accessed. */
+	REF void           *pfd_handptr; /* [1..1][const] Handle data pointer. */
+	uintptr_half_t      pfd_handtyp; /* [const] Handle type (One of `HANDLE_TYPE_*') */
+	struct fdirent      pfd_ent;     /* Underlying directory entry. */
 };
 #define fdirent_asfd(self) container_of(self, struct procfs_fd_dirent, pfd_ent)
 
@@ -1089,6 +1180,7 @@ PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL procfs_fd_dirent_v_destroy)(struct fdirent *__restrict self) {
 	struct procfs_fd_dirent *me = fdirent_asfd(self);
 	(*handle_type_db.h_decref[me->pfd_handtyp])(me->pfd_handptr);
+	decref_unlikely(me->pfd_thread);
 	kfree(me);
 }
 
@@ -1100,7 +1192,8 @@ procfs_fd_dirent_v_opennode(struct fdirent *__restrict self,
 	result = (REF struct procfs_fd_lnknode *)kmalloc(sizeof(REF struct procfs_fd_lnknode), GFP_NORMAL);
 	memcpy(result, &procfs_fdlnk_template, sizeof(struct flnknode));
 	result->pfl_handtyp = me->pfd_handtyp;
-	result->fn_fsdata   = (REF struct taskpid *)me->pfd_handptr; /* Hack! */
+	result->pfl_handdat = me->pfd_handptr;
+	result->fn_fsdata   = incref(me->pfd_thread);
 	result->fn_ino      = procfs_perproc_ino(me->pfd_handptr, &procfs_perproc_fdlnk_ops);
 	(*handle_type_db.h_incref[me->pfd_handtyp])(me->pfd_handptr);
 	return result;
@@ -1167,6 +1260,7 @@ procfs_perproc_fd_v_lookup(struct fdirnode *__restrict self,
 		/* Fill in the directory entry. */
 		result->pfd_handptr        = hand.h_data; /* Inherit reference */
 		result->pfd_handtyp        = hand.h_type;
+		result->pfd_thread         = incref(pid);
 		result->pfd_ent.fd_namelen = (u16)sprintf(result->pfd_ent.fd_name, "%u", fdno);
 		assert(result->pfd_ent.fd_namelen == info->flu_namelen);
 		if (info->flu_hash == FLOOKUP_INFO_HASH_UNSET || ADDR_ISUSER(info->flu_name))

@@ -1044,7 +1044,7 @@ continue_readline_noauto:
 			dbg_print(DBGSTR("?)\n"));
 			continue;
 		}
-		TRY {
+		NESTED_TRY {
 			errorcode = dbg_commandhook_exec(cmd, argc, argv);
 		} EXCEPT {
 			error_print_into(&dbg_printer, NULL);
