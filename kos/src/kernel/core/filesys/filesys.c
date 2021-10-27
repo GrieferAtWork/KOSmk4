@@ -147,8 +147,11 @@ NOTHROW(FCALL incref_first_nondestroyed)(struct ffilesys *__restrict start) {
 	return start;
 }
 
-/* Return a reference to the filesystem type that comes after `prev' */
-PRIVATE WUNUSED REF struct ffilesys *FCALL
+/* Return a reference to the filesystem type that comes after `prev'
+ * When `prev == NULL', return the first filesystem type. Note  that
+ * when `prev' has been unloaded, this function will also return the
+ * first (still-registered) filesystem type. */
+PUBLIC WUNUSED REF struct ffilesys *FCALL
 ffilesys_next(struct ffilesys *prev) {
 	REF struct ffilesys *result;
 	atomic_lock_acquire(&ffilesys_formats_lock);

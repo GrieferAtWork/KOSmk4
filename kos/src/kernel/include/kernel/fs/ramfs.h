@@ -323,7 +323,7 @@ struct ramfs_super
 
 DATDEF struct fsuper_ops const ramfs_super_ops;
 #define ramfs_super_v_free       fsuper_v_free
-#define ramfs_super_v_changed    ramfs_dirnode_v_changed
+#define ramfs_super_v_changed    fsuper_v_changed
 #define ramfs_super_v_open       ramfs_dirnode_v_open
 #define ramfs_super_v_stream_ops ramfs_dirnode_v_stream_ops
 FUNDEF NOBLOCK NONNULL((1)) void

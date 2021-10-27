@@ -33,6 +33,7 @@ DECL_BEGIN
 
 struct fdevnode;
 struct fdevnode_ops {
+	/* TODO: Rename `dno_node' to `dvno_node' (prevent conflicts with `struct fdirnode_ops') */
 	struct fnode_ops dno_node; /* FNode operators */
 	/* More operators would go here... */
 };

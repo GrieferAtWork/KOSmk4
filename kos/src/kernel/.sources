@@ -137,7 +137,7 @@ BEGIN
 				"modprocfs/arch/" + XARCH + "/*.c"
 			}))
 		DEFINE_SIMPLE_DRIVER("usb")
-#elif 0
+#elif 1
 		BEGIN GROUP("mod.procfs") { COMPILE, LINK, MCOPY };
 			SET_OUTPUT("/os/drivers/procfs")
 			LD_FLAGS({ "-soname=procfs" })

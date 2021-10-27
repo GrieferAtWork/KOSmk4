@@ -22,6 +22,9 @@
 
 #include <kernel/compiler.h>
 
+#include <kernel/fs/printnode.h>
+#include <kernel/types.h>
+
 /*
  * Procfs API design:
  *
@@ -50,10 +53,99 @@
 
 DECL_BEGIN
 
-INTDEF struct fsuper_ops const procfs_super_ops;
+#ifndef __pformatprinter_defined
+#define __pformatprinter_defined
+typedef __pformatprinter pformatprinter;
+typedef __pformatgetc pformatgetc;
+typedef __pformatungetc pformatungetc;
+#endif /* !__pformatprinter_defined */
+
+
+struct procfs_regfile
+#ifndef __WANT_FS_INLINE_STRUCTURES
+    : printnode                /* Underlying print file */
+#endif /* !__WANT_FS_INLINE_STRUCTURES */
+{
+#ifdef __WANT_FS_INLINE_STRUCTURES
+	struct printnode prf_node; /* Underlying print file */
+#endif /* __WANT_FS_INLINE_STRUCTURES */
+	/* [1..1] Print callback. */
+	void (KCALL *prf_print)(pformatprinter printer, void *arg, size_t offset_hint);
+	/* [0..1] Write callback. (when NULL, file is read-only) */
+	void (KCALL *prf_write)(USER CHECKED void const *buf, size_t bufsize);
+};
+
+struct procfs_txtfile
+#ifndef __WANT_FS_INLINE_STRUCTURES
+    : printnode                /* Underlying print file */
+#endif /* !__WANT_FS_INLINE_STRUCTURES */
+{
+#ifdef __WANT_FS_INLINE_STRUCTURES
+	struct printnode ptf_node; /* Underlying print file */
+#endif /* __WANT_FS_INLINE_STRUCTURES */
+	char const *ptf_string; /* [1..1][const] The string that gets printed. */
+};
+
+
 INTDEF struct fsuper procfs_super;
 INTDEF struct ffilesys procfs_filesys;
-INTDEF struct fdirnode_ops const procfs_constdir_ops; /* Operators used for `struct constdir' under /proc */
+INTDEF struct fsuper_ops const procfs_super_ops;      /* Operators for `procfs_super' */
+INTDEF struct printnode_ops const procfs_regfile_ops; /* Operators for `struct procfs_regfile' */
+INTDEF struct printnode_ops const procfs_txtfile_ops; /* Operators for `struct procfs_txtfile' */
+
+
+
+/************************************************************************/
+/* Helpers for printing/parsing user-space values.                      */
+/************************************************************************/
+
+/* Print a string "0\n" or "1\n" depending on `value' */
+INTDEF NONNULL((1)) ssize_t FCALL ProcFS_PrintBool(pformatprinter printer, void *arg, bool value);
+INTDEF NONNULL((1)) ssize_t FCALL ProcFS_PrintU32(pformatprinter printer, void *arg, u32 value);
+INTDEF NONNULL((1)) ssize_t FCALL ProcFS_PrintU64(pformatprinter printer, void *arg, u64 value);
+
+/* Parse  a given user-space buffer from being  a string `0' or `1', which
+ * may optionally be surrounded by space characters that are automatically
+ * stripped prior to being parsed.
+ * If the buffer  contains anything other  than `[SPC]0|1[SPC]', then  a
+ * `E_INVALID_ARGUMENT_BAD_VALUE:E_INVALID_ARGUMENT_CONTEXT_BAD_INTEGER'
+ * exception is thrown.
+ * If the buffer has an incorrect length, then a `E_BUFFER_TOO_SMALL'
+ * exception is thrown instead. */
+INTDEF NONNULL((1)) bool FCALL
+ProcFS_ParseBool(USER CHECKED void const *buf, size_t bufsize)
+		THROWS(E_SEGFAULT, E_INVALID_ARGUMENT_BAD_VALUE, E_BUFFER_TOO_SMALL);
+INTDEF NONNULL((1)) u32 FCALL
+ProcFS_ParseU32(USER CHECKED void const *buf, size_t bufsize, u32 minval DFL(0), u32 maxval DFL((u32)-1))
+		THROWS(E_SEGFAULT, E_INVALID_ARGUMENT_BAD_VALUE, E_BUFFER_TOO_SMALL);
+INTDEF NONNULL((1)) u64 FCALL
+ProcFS_ParseU64(USER CHECKED void const *buf, size_t bufsize, u64 minval DFL(0), u64 maxval DFL((u64)-1))
+		THROWS(E_SEGFAULT, E_INVALID_ARGUMENT_BAD_VALUE, E_BUFFER_TOO_SMALL);
+
+#if __SIZEOF_SIZE_T__ >= 8
+#define ProcFS_ParseSize ProcFS_ParseU64
+#define ProcFS_PrintSize ProcFS_PrintU64
+#else /* __SIZEOF_SIZE_T__ >= 8 */
+#define ProcFS_ParseSize ProcFS_ParseU32
+#define ProcFS_PrintSize ProcFS_PrintU32
+#endif /* __SIZEOF_SIZE_T__ < 8 */
+
+#if __SIZEOF_INT__ >= 8
+#define ProcFS_ParseUInt ProcFS_ParseU64
+#define ProcFS_PrintUInt ProcFS_PrintU64
+#else /* __SIZEOF_INT__ >= 8 */
+#define ProcFS_ParseUInt ProcFS_ParseU32
+#define ProcFS_PrintUInt ProcFS_PrintU32
+#endif /* __SIZEOF_INT__ < 8 */
+
+#if __SIZEOF_PID_T__ >= 8
+#define ProcFS_ParseUPid ProcFS_ParseU64
+#define ProcFS_PrintUPid ProcFS_PrintU64
+#else /* __SIZEOF_PID_T__ >= 8 */
+#define ProcFS_ParseUPid ProcFS_ParseU32
+#define ProcFS_PrintUPid ProcFS_PrintU32
+#endif /* __SIZEOF_PID_T__ < 8 */
+
 
 DECL_END
 

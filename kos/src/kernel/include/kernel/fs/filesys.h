@@ -220,6 +220,12 @@ ffilesys_register(struct ffilesys *__restrict self)
 FUNDEF NONNULL((1)) __BOOL
 NOTHROW(FCALL ffilesys_unregister)(struct ffilesys *__restrict self);
 
+/* Return a reference to the filesystem type that comes after `prev'
+ * When `prev == NULL', return the first filesystem type. Note  that
+ * when `prev' has been unloaded, this function will also return the
+ * first (still-registered) filesystem type. */
+FUNDEF WUNUSED REF struct ffilesys *FCALL
+ffilesys_next(struct ffilesys *prev);
 
 DECL_END
 #endif /* __CC__ */

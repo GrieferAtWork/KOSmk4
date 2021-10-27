@@ -38,6 +38,7 @@ gcc_opt.remove("-fno-rtti");
 #include <kernel/fs/printnode.h>
 #include <kernel/fs/super.h>
 #include <kernel/mman/driver.h>
+#include <kernel/uname.h>
 
 #include <linux/magic.h>
 
@@ -54,12 +55,25 @@ gcc_opt.remove("-fno-rtti");
 DECL_BEGIN
 
 /* Create forward declarations. */
-#define ROOTENT(name, type, nodeptr, hash)            INTDEF struct constdirent PP_CAT2(procfs_root_dirent_, __LINE__);
-#define MKDIR_BEGIN(symbol_name, perm)                INTDEF struct constdir symbol_name;
-#define MKREG_RO(symbol_name, perm, printer)          INTDEF struct fnode symbol_name; /* TODO: Custom node type */
-#define MKREG_RW(symbol_name, perm, printer, writer)  INTDEF struct fnode symbol_name; /* TODO: Custom node type */
-#define MKREG_CONSTSTR(symbol_name, perm, string_ptr) INTDEF struct fnode symbol_name; /* TODO: Custom node type */
-#define MKLNK(symbol_name, perm, readlink)            INTDEF struct flnknode symbol_name;
+#define ROOTENT(name, type, nodeptr, hash) \
+	INTDEF struct constdirent PP_CAT2(procfs_root_dirent_, __LINE__);
+#define MKDIR_BEGIN(symbol_name, perm) \
+	INTDEF struct constdir symbol_name;
+#define MKREG_RO(symbol_name, perm, printer)                                          \
+	INTDEF void KCALL printer(pformatprinter printer, void *arg, size_t offset_hint); \
+	INTDEF struct procfs_regfile symbol_name;
+#define MKREG_RW(symbol_name, perm, printer, writer)                                  \
+	INTDEF void KCALL printer(pformatprinter printer, void *arg, size_t offset_hint); \
+	INTDEF void KCALL writer(USER CHECKED void const *buf, size_t bufsize);           \
+	INTDEF struct procfs_regfile symbol_name;
+#define MKREG_CONSTSTR(symbol_name, perm, string_ptr) \
+	INTDEF struct procfs_txtfile symbol_name;
+#define MKLNK(symbol_name, perm, readlink)            \
+	INTDEF WUNUSED NONNULL((1)) size_t KCALL          \
+	readlink(struct flnknode *__restrict self,        \
+	         USER CHECKED /*utf-8*/ char *buf,        \
+	         size_t bufsize) THROWS(E_SEGFAULT, ...); \
+	INTDEF struct flnknode symbol_name;
 #include "procfs.def"
 
 /* Construct directory entries and files. */
@@ -69,10 +83,114 @@ DECL_BEGIN
 #define MKDIR_ENT(name, type, nodeptr, hash)                       \
 	PRIVATE struct constdirent PP_CAT2(procfs_dirent_, __LINE__) = \
 	CONSTDIRENT_INIT((struct fnode *)(nodeptr), 0, type, name, hash);
-//TODO:#define MKREG_RO(symbol_name, perm, printer)          ...
-//TODO:#define MKREG_RW(symbol_name, perm, printer, writer)  ...
-//TODO:#define MKREG_CONSTSTR(symbol_name, perm, string_ptr) ...
-//TODO:#define MKLNK(symbol_name, perm, readlink)            ...
+#define __MKREG_IMPL(symbol_name, perm, printer, writer)                         \
+	INTERN struct procfs_regfile symbol_name = {                                 \
+		.prf_node = {{{                                                          \
+			.fn_file = {                                                         \
+				MFILE_INIT_mf_refcnt(2), /* +1: symbol_name, +1: <my dirent> */  \
+				MFILE_INIT_mf_ops(&procfs_regfile_ops.pno_reg.rno_node.no_file), \
+				MFILE_INIT_mf_lock,                                              \
+				MFILE_INIT_mf_parts(MFILE_PARTS_ANONYMOUS),                      \
+				MFILE_INIT_mf_initdone,                                          \
+				MFILE_INIT_mf_lockops,                                           \
+				MFILE_INIT_mf_changed(MFILE_PARTS_ANONYMOUS),                    \
+				MFILE_INIT_mf_blockshift(PAGESHIFT),                             \
+				MFILE_INIT_mf_flags(MFILE_FS_NOSUID | MFILE_FS_NOEXEC |          \
+				                    MFILE_F_READONLY | MFILE_F_FIXEDFILESIZE),   \
+				MFILE_INIT_mf_trunclock,                                         \
+				MFILE_INIT_mf_filesize((uint64_t)-1),                            \
+				MFILE_INIT_mf_atime(0, 0),                                       \
+				MFILE_INIT_mf_mtime(0, 0),                                       \
+				MFILE_INIT_mf_ctime(0, 0),                                       \
+			},                                                                   \
+			FNODE_INIT_fn_nlink(1),                                              \
+			FNODE_INIT_fn_mode(S_IFREG | (perm)),                                \
+			FNODE_INIT_fn_uid(0), /* root */                                     \
+			FNODE_INIT_fn_gid(0), /* root */                                     \
+			FNODE_INIT_fn_ino(0),                                                \
+			FNODE_INIT_fn_super(&procfs_super),                                  \
+			FNODE_INIT_fn_changed,                                               \
+			.fn_supent = { NULL, FSUPER_NODES_DELETED },                         \
+			FNODE_INIT_fn_allnodes,                                              \
+		}}},                                                                     \
+		.prf_print = printer,                                                    \
+		.prf_write = writer,                                                     \
+	};
+#define MKREG_RW(symbol_name, perm, printer, writer) __MKREG_IMPL(symbol_name, perm, &printer, &writer)
+#define MKREG_RO(symbol_name, perm, printer)         __MKREG_IMPL(symbol_name, perm, &printer, NULL)
+#define MKREG_CONSTSTR(symbol_name, perm, string_ptr)                            \
+	INTERN struct procfs_txtfile symbol_name = {                                 \
+		.ptf_node  = {{{                                                         \
+			.fn_file = {                                                         \
+				MFILE_INIT_mf_refcnt(2), /* +1: symbol_name, +1: <my dirent> */  \
+				MFILE_INIT_mf_ops(&procfs_txtfile_ops.pno_reg.rno_node.no_file), \
+				MFILE_INIT_mf_lock,                                              \
+				MFILE_INIT_mf_parts(MFILE_PARTS_ANONYMOUS),                      \
+				MFILE_INIT_mf_initdone,                                          \
+				MFILE_INIT_mf_lockops,                                           \
+				MFILE_INIT_mf_changed(MFILE_PARTS_ANONYMOUS),                    \
+				MFILE_INIT_mf_blockshift(PAGESHIFT),                             \
+				MFILE_INIT_mf_flags(MFILE_FS_NOSUID | MFILE_FS_NOEXEC |          \
+				                    MFILE_F_READONLY | MFILE_F_FIXEDFILESIZE),   \
+				MFILE_INIT_mf_trunclock,                                         \
+				MFILE_INIT_mf_filesize((uint64_t)-1),                            \
+				MFILE_INIT_mf_atime(0, 0),                                       \
+				MFILE_INIT_mf_mtime(0, 0),                                       \
+				MFILE_INIT_mf_ctime(0, 0),                                       \
+			},                                                                   \
+			FNODE_INIT_fn_nlink(1),                                              \
+			FNODE_INIT_fn_mode(S_IFREG | (perm)),                                \
+			FNODE_INIT_fn_uid(0), /* root */                                     \
+			FNODE_INIT_fn_gid(0), /* root */                                     \
+			FNODE_INIT_fn_ino(0),                                                \
+			FNODE_INIT_fn_super(&procfs_super),                                  \
+			FNODE_INIT_fn_changed,                                               \
+			.fn_supent = { NULL, FSUPER_NODES_DELETED },                         \
+			FNODE_INIT_fn_allnodes,                                              \
+		}}},                                                                     \
+		.ptf_string = string_ptr,                                                \
+	};
+#define MKLNK(symbol_name, perm, readlink)                                                     \
+	PRIVATE struct flnknode_ops const __##symbol_name##_ops = {                                \
+		.lno_node = {                                                                          \
+			.no_file = {                                                                       \
+				.mo_destroy = (void (KCALL *)(struct mfile *__restrict))(void *)(uintptr_t)-1, \
+				.mo_changed = &fnode_v_changed,                                                \
+			},                                                                                 \
+			.no_free   = (void (KCALL *)(struct fnode *__restrict))(void *)(uintptr_t)-1,      \
+			.no_wrattr = &fnode_v_wrattr_noop,                                                 \
+		},                                                                                     \
+		.lno_readlink = &readlink,                                                             \
+	};                                                                                         \
+	INTERN struct flnknode symbol_name = {{                                                    \
+		.fn_file = {                                                                           \
+			MFILE_INIT_mf_refcnt(2), /* +1: symbol_name, +1: <my dirent> */                    \
+			MFILE_INIT_mf_ops(&__##symbol_name##_ops.lno_node.no_file),                        \
+			MFILE_INIT_mf_lock,                                                                \
+			MFILE_INIT_mf_parts(MFILE_PARTS_ANONYMOUS),                                        \
+			MFILE_INIT_mf_initdone,                                                            \
+			MFILE_INIT_mf_lockops,                                                             \
+			MFILE_INIT_mf_changed(MFILE_PARTS_ANONYMOUS),                                      \
+			MFILE_INIT_mf_blockshift(PAGESHIFT),                                               \
+			MFILE_INIT_mf_flags(MFILE_FS_NOSUID | MFILE_FS_NOEXEC |                            \
+			                    MFILE_F_NOUSRMMAP | MFILE_F_NOUSRIO |                          \
+			                    MFILE_F_READONLY | MFILE_F_FIXEDFILESIZE),                     \
+			MFILE_INIT_mf_trunclock,                                                           \
+			MFILE_INIT_mf_filesize(0),                                                         \
+			MFILE_INIT_mf_atime(0, 0),                                                         \
+			MFILE_INIT_mf_mtime(0, 0),                                                         \
+			MFILE_INIT_mf_ctime(0, 0),                                                         \
+		},                                                                                     \
+		FNODE_INIT_fn_nlink(1),                                                                \
+		FNODE_INIT_fn_mode(S_IFLNK | (perm)),                                                  \
+		FNODE_INIT_fn_uid(0), /* root */                                                       \
+		FNODE_INIT_fn_gid(0), /* root */                                                       \
+		FNODE_INIT_fn_ino(0),                                                                  \
+		FNODE_INIT_fn_super(&procfs_super),                                                    \
+		FNODE_INIT_fn_changed,                                                                 \
+		.fn_supent = { NULL, FSUPER_NODES_DELETED },                                           \
+		FNODE_INIT_fn_allnodes,                                                                \
+	}};
 #include "procfs.def"
 
 
@@ -84,37 +202,38 @@ DECL_BEGIN
 #include "procfs.def"
 
 /* Construct directories. */
-#define MKDIR_BEGIN(symbol_name, perm)                                                             \
-	INTERN struct constdir symbol_name = {                                                         \
-		.cd_dir  = {{                                                                              \
-			.fn_file = {                                                                           \
-				MFILE_INIT_mf_refcnt(2), /* +1: symbol_name, +1: <my dirent> */                    \
-				MFILE_INIT_mf_ops(&procfs_constdir_ops.dno_node.no_file),                          \
-				MFILE_INIT_mf_lock,                                                                \
-				MFILE_INIT_mf_parts(MFILE_PARTS_ANONYMOUS),                                        \
-				MFILE_INIT_mf_initdone,                                                            \
-				MFILE_INIT_mf_lockops,                                                             \
-				MFILE_INIT_mf_changed(MFILE_PARTS_ANONYMOUS),                                      \
-				MFILE_INIT_mf_blockshift(PAGESHIFT),                                               \
-				MFILE_INIT_mf_flags(MFILE_FS_NOSUID | MFILE_FS_NOEXEC | MFILE_F_NOUSRMMAP |        \
-				                    MFILE_F_NOUSRIO | MFILE_F_PERSISTENT | MFILE_F_FIXEDFILESIZE), \
-				MFILE_INIT_mf_trunclock,                                                           \
-				MFILE_INIT_mf_filesize((uint64_t)-1),                                              \
-				MFILE_INIT_mf_atime(0, 0),                                                         \
-				MFILE_INIT_mf_mtime(0, 0),                                                         \
-				MFILE_INIT_mf_ctime(0, 0),                                                         \
-			},                                                                                     \
-			FNODE_INIT_fn_nlink(1),                                                                \
-			FNODE_INIT_fn_mode(S_IFDIR | (perm)),                                                  \
-			FNODE_INIT_fn_uid(0), /* root */                                                       \
-			FNODE_INIT_fn_gid(0), /* root */                                                       \
-			FNODE_INIT_fn_ino(0),                                                                  \
-			FNODE_INIT_fn_super(&procfs_super),                                                    \
-			FNODE_INIT_fn_changed,                                                                 \
-			.fn_supent = { NULL, FSUPER_NODES_DELETED },                                           \
-			FNODE_INIT_fn_allnodes,                                                                \
-		}},                                                                                        \
-		.cd_entc = __##symbol_name##_lenof_dir,                                                    \
+#define MKDIR_BEGIN(symbol_name, perm)                                          \
+	INTERN struct constdir symbol_name = {                                      \
+		.cd_dir  = {{                                                           \
+			.fn_file = {                                                        \
+				MFILE_INIT_mf_refcnt(2), /* +1: symbol_name, +1: <my dirent> */ \
+				MFILE_INIT_mf_ops(&constdir_ops.dno_node.no_file),              \
+				MFILE_INIT_mf_lock,                                             \
+				MFILE_INIT_mf_parts(MFILE_PARTS_ANONYMOUS),                     \
+				MFILE_INIT_mf_initdone,                                         \
+				MFILE_INIT_mf_lockops,                                          \
+				MFILE_INIT_mf_changed(MFILE_PARTS_ANONYMOUS),                   \
+				MFILE_INIT_mf_blockshift(PAGESHIFT),                            \
+				MFILE_INIT_mf_flags(MFILE_FS_NOSUID | MFILE_FS_NOEXEC |         \
+				                    MFILE_F_NOUSRMMAP | MFILE_F_NOUSRIO |       \
+				                    MFILE_F_READONLY | MFILE_F_FIXEDFILESIZE),  \
+				MFILE_INIT_mf_trunclock,                                        \
+				MFILE_INIT_mf_filesize((uint64_t)-1),                           \
+				MFILE_INIT_mf_atime(0, 0),                                      \
+				MFILE_INIT_mf_mtime(0, 0),                                      \
+				MFILE_INIT_mf_ctime(0, 0),                                      \
+			},                                                                  \
+			FNODE_INIT_fn_nlink(1),                                             \
+			FNODE_INIT_fn_mode(S_IFDIR | (perm)),                               \
+			FNODE_INIT_fn_uid(0), /* root */                                    \
+			FNODE_INIT_fn_gid(0), /* root */                                    \
+			FNODE_INIT_fn_ino(0),                                               \
+			FNODE_INIT_fn_super(&procfs_super),                                 \
+			FNODE_INIT_fn_changed,                                              \
+			.fn_supent = { NULL, FSUPER_NODES_DELETED },                        \
+			FNODE_INIT_fn_allnodes,                                             \
+		}},                                                                     \
+		.cd_entc = __##symbol_name##_lenof_dir,                                 \
 		{
 #define MKDIR_ENT(name, type, nodeptr, hash) \
 			constdirent_asent(&PP_CAT2(procfs_dirent_, __LINE__)),

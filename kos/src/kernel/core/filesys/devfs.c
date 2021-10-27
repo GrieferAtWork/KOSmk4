@@ -194,7 +194,7 @@ PUBLIC struct ffilesys devfs_filesys = {
 	.ffs_link = { .sle_next = &ramfs_filesys },
 	.ffs_drv  = &drv_self,
 	{ .ffs_single = &devfs },
-	.ffs_flags = FFILESYS_F_SINGLE,
+	.ffs_flags = FFILESYS_F_SINGLE | FFILESYS_F_NODEV,
 	/* .ffs_name = */ "devfs",
 };
 
