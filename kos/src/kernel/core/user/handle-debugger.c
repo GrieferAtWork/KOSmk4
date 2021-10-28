@@ -55,7 +55,7 @@ printhandle(unsigned int fd, struct handle const *__restrict hand) {
 	           hand->h_mode & IO_APPEND ? 'a' : '-',
 	           hand->h_mode & IO_NONBLOCK ? 'n' : '-',
 	           handle_typename(*hand));
-	handle_print(hand, &dbg_printer, NULL);
+	handle_printlink(*hand, &dbg_printer, NULL);
 	dbg_putc('\n');
 }
 

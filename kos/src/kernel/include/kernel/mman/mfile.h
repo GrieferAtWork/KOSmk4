@@ -32,6 +32,7 @@
 #include <hybrid/sequence/rbtree.h>
 #include <hybrid/sync/atomic-rwlock.h>
 
+#include <bits/crt/format-printer.h>
 #include <bits/os/timespec.h>
 #include <kos/lockop.h>
 
@@ -308,6 +309,11 @@ struct mfile_stream_ops {
 	WUNUSED NONNULL((1)) REF void *
 	(KCALL *mso_tryas)(struct mfile *__restrict self, uintptr_half_t wanted_type)
 			THROWS(...);
+
+	/* [0..1] Print the text which should appear under `readlink("/proc/[pid]/fd/[fdno]")' */
+	WUNUSED NONNULL((1, 2)) ssize_t
+	(KCALL *mso_printlink)(struct mfile *__restrict self, __pformatprinter printer, void *arg)
+			THROWS(E_WOULDBLOCK, ...);
 };
 
 /* Constructs a wrapper object that implements seeking, allowing normal reads/writes to
@@ -1349,6 +1355,7 @@ FUNDEF NONNULL((1)) void KCALL mfile_upollconnect(struct mfile *__restrict self,
 FUNDEF WUNUSED NONNULL((1)) poll_mode_t KCALL mfile_upolltest(struct mfile *__restrict self, poll_mode_t what) THROWS(...);
 FUNDEF NONNULL((1)) syscall_slong_t KCALL mfile_uhop(struct mfile *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
 FUNDEF NONNULL((1)) REF void *KCALL mfile_utryas(struct mfile *__restrict self, uintptr_half_t wanted_type) THROWS(E_WOULDBLOCK);
+FUNDEF NONNULL((1, 2)) ssize_t KCALL mfile_uprintlink(struct mfile *__restrict self, __pformatprinter printer, void *arg) THROWS(E_WOULDBLOCK, ...);
 #endif /* CONFIG_USE_NEW_FS */
 
 DECL_END

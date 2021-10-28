@@ -259,9 +259,6 @@ NOTHROW(KCALL ffifonode_v_destroy)(struct mfile *__restrict self);
 
 
 struct fifo_user {
-	/* TODO: Rename this structure to `struct fifohandle' */
-	/* TODO: Rename `HANDLE_TYPE_FIFO_USER' to `HANDLE_TYPE_FIFOHANDLE' */
-	/* TODO: Move this structure into its own file <kernel/fs/fifohandle.h> */
 	/* HANDLE:HANDLE_TYPE_FIFO_USER */
 	WEAK refcnt_t         fu_refcnt;  /* Reference counter */
 	REF struct ffifonode *fu_fifo;    /* [1..1][const] The associated fifo. */

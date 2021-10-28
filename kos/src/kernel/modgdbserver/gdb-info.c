@@ -568,7 +568,7 @@ NOTHROW(FCALL GDBInfo_PrintFdListEntry)(pformatprinter printer, void *arg,
 	PRINTF("</column>"
 	       "<column name=\"file descriptor\">%u</column>"
 	       "<column name=\"name\">", fdno);
-	DO(handle_print(hnd, printer, arg));
+	DO(handle_printlink(*hnd, printer, arg));
 	PRINT("</column>"
 	      "</item>");
 	return result;

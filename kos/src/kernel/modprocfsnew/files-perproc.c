@@ -1117,16 +1117,14 @@ procfs_fd_lnknode_v_readlink(struct flnknode *__restrict self,
                              USER CHECKED /*utf-8*/ char *buf,
                              size_t bufsize)
 		THROWS(E_SEGFAULT, E_IOERROR, ...) {
-	struct handle hand;
 	struct procfs_fd_lnknode *me;
 	struct format_snprintf_data dat;
 	me = (struct procfs_fd_lnknode *)mfile_aslnk(self);
-	hand.h_mode   = IO_RDONLY; /* NOTE: This `IO_RDONLY' will go away once `handle_print()' becomes normal handle operator. */
-	hand.h_type   = me->pfl_handtyp;
-	hand.h_data   = me->pfl_handdat;
 	dat.sd_buffer = buf;
 	dat.sd_bufsiz = bufsize;
-	return (size_t)handle_print(&hand, &format_snprintf_printer, &dat);
+	return (size_t)((*handle_type_db.h_printlink[me->pfl_handtyp])(me->pfl_handdat,
+	                                                               &format_snprintf_printer,
+	                                                               &dat));
 }
 
 PRIVATE WUNUSED NONNULL((1, 2, 3, 4)) bool KCALL

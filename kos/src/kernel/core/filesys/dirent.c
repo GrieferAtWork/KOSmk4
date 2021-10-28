@@ -32,6 +32,7 @@
 
 #include <sys/stat.h>
 
+#include <format-printer.h>
 #include <string.h>
 
 DECL_BEGIN
@@ -156,6 +157,16 @@ INTERN ATTR_CONST WUNUSED NONNULL((1)) poll_mode_t KCALL
 handle_fdirent_polltest(struct fdirent *__restrict UNUSED(self),
                         poll_mode_t what) THROWS(...) {
 	return what & POLLINMASK;
+}
+
+
+INTERN NONNULL((1, 2)) ssize_t KCALL
+handle_fdirent_printlink(struct fdirent *__restrict self,
+                         pformatprinter printer, void *arg)
+		THROWS(E_WOULDBLOCK, ...) {
+	return format_printf(printer, arg, "?/%$s",
+	                     (size_t)self->fd_namelen,
+	                     self->fd_name);
 }
 
 

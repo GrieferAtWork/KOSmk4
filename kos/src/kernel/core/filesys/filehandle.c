@@ -24,6 +24,8 @@
 
 #include <fs/vfs.h>
 #include <kernel/fs/dirent.h>
+#include <kernel/fs/dirhandle.h>
+#include <kernel/fs/fifonode.h>
 #include <kernel/fs/filehandle.h>
 #include <kernel/handle-proto.h>
 #include <kernel/handle.h>
@@ -36,6 +38,7 @@
 #include <kos/except/reason/inval.h>
 #include <kos/kernel/handle.h>
 
+#include <format-printer.h>
 #include <stddef.h>
 
 DECL_BEGIN
@@ -291,6 +294,35 @@ handle_filehandle_tryas(struct filehandle *__restrict self,
 	default: break;
 	}
 	return mfile_utryas(self->fh_file, wanted_type);
+}
+
+
+
+STATIC_ASSERT(offsetof(struct filehandle, fh_path) == offsetof(struct dirhandle, dh_path));
+STATIC_ASSERT(offsetof(struct filehandle, fh_dirent) == offsetof(struct dirhandle, dh_dirent));
+STATIC_ASSERT(offsetof(struct filehandle, fh_path) == offsetof(struct fifo_user, fu_path));
+STATIC_ASSERT(offsetof(struct filehandle, fh_dirent) == offsetof(struct fifo_user, fu_dirent));
+DEFINE_INTERN_ALIAS(handle_dirhandle_printlink, handle_filehandle_printlink);
+DEFINE_INTERN_ALIAS(handle_fifo_user_printlink, handle_filehandle_printlink);
+INTERN NONNULL((1, 2)) ssize_t KCALL
+handle_filehandle_printlink(struct filehandle *__restrict self,
+                            pformatprinter printer, void *arg)
+		THROWS(E_WOULDBLOCK, ...) {
+	if (self->fh_dirent) {
+		if (self->fh_path) {
+			REF struct path *root = fs_getroot(THIS_FS);
+			FINALLY_DECREF_UNLIKELY(root);
+			return path_printent(self->fh_path, self->fh_dirent->fd_name,
+			                     self->fh_dirent->fd_namelen, printer, arg,
+			                     AT_PATHPRINT_INCTRAIL, root);
+		}
+		if (self->fh_dirent->fd_name[0] == '/')
+			return (*printer)(arg, self->fh_dirent->fd_name, self->fh_dirent->fd_namelen);
+		return format_printf(printer, arg, "?/%$s",
+		                     (size_t)self->fh_dirent->fd_namelen,
+		                     self->fh_dirent->fd_name);
+	}
+	return mfile_uprintlink(self->fh_file, printer, arg);
 }
 
 

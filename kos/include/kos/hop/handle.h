@@ -106,7 +106,7 @@ struct hop_handle_stat /*[PREFIX(hs_)]*/ {
 /* Quick alias for `dup(fd)' + set the CLOEXEC+CLOFORK flag (`hop()' returns the new file handle) */
 #define HOP_HANDLE_DUP_CLOEXEC_CLOFORK HOP_CMD(0xffff, 0x000c)
 
-/* TODO: Wrapper for `handle_print()' */
+/* TODO: Wrapper for `handle_printlink()' */
 /* TODO: Wrapper for `handle_datasize()' */
 
 

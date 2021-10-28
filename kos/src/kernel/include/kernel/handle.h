@@ -221,6 +221,10 @@ struct handle_types {
 	 * The caller must ensure that `wanted_type' isn't already this handle's type. */
 	REF void *(NONNULL((1)) KCALL *h_tryas[HANDLE_TYPE_COUNT])(/*T*/ void *__restrict ptr, uintptr_half_t wanted_type)
 			/*THROWS(E_WOULDBLOCK)*/;
+
+	/* Print the text that should appear when doing `readlink("/proc/[pid]/fd/[fdno]")' */
+	ssize_t (NONNULL((1, 2)) KCALL *h_printlink[HANDLE_TYPE_COUNT])(/*T*/ void *__restrict ptr, __pformatprinter printer, void *arg)
+			/*THROWS(E_WOULDBLOCK, ...)*/;
 }
 #ifdef __INTELLISENSE__
 	const handle_type_db;
@@ -242,11 +246,6 @@ struct handle {
 FUNDEF NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) uintptr_half_t
 NOTHROW(KCALL handle_typekind)(struct handle const *__restrict self);
 
-/* Print the text that should result from `readlink("/proc/[pid]/fd/[fdno]")' */
-FUNDEF NONNULL((1, 2)) ssize_t KCALL
-handle_print(struct handle const *__restrict self,
-             __pformatprinter printer, void *arg);
-
 /* Try to determine the effective data size of the given handle (as returned by `FIOQSIZE')
  * @return: true:  The data size was stored in `*presult'.
  * @return: false: The data size could not be determined. */
@@ -257,7 +256,6 @@ handle_datasize(struct handle const *__restrict self,
 #ifdef __cplusplus
 extern "C++" {
 FUNDEF NOBLOCK ATTR_PURE WUNUSED uintptr_half_t NOTHROW(KCALL handle_typekind)(struct handle const &__restrict self) ASMNAME("handle_typekind");
-FUNDEF NONNULL((2)) ssize_t KCALL handle_print(struct handle const &__restrict self, __pformatprinter printer, void *arg) ASMNAME("handle_print");
 FUNDEF WUNUSED NONNULL((2)) __BOOL KCALL handle_datasize(struct handle const &__restrict self, pos_t *__restrict presult) ASMNAME("handle_datasize");
 } /* extern "C++" */
 #endif /* __cplusplus */
@@ -302,6 +300,7 @@ FUNDEF WUNUSED NONNULL((2)) __BOOL KCALL handle_datasize(struct handle const &__
 #define handle_polltest(self, what)                              HANDLE_FUNC(self, h_polltest)((self).h_data, what)
 #define handle_poll(self, what)                                  _handle_poll(&(self), what)
 #define _handle_tryas(self, wanted_type)                         HANDLE_FUNC(self, h_tryas)((self).h_data, wanted_type)
+#define handle_printlink(self, printer, arg)                     HANDLE_FUNC(self, h_printlink)((self).h_data, printer, arg)
 
 FORCELOCAL ATTR_ARTIFICIAL WUNUSED NONNULL((1)) poll_mode_t KCALL
 _handle_poll(struct handle *__restrict self, poll_mode_t what) {

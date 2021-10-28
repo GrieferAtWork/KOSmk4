@@ -245,9 +245,7 @@ ProcFS_PerProc_Fd_Entry_Readlink(struct symlink_node *__restrict self,
 		struct format_snprintf_data data;
 		data.sd_buffer = buf;
 		data.sd_bufsiz = bufsize;
-		result = (size_t)handle_print(&hnd,
-		                              &format_snprintf_printer,
-		                              &data);
+		result = (size_t)handle_printlink(hnd, &format_snprintf_printer, &data);
 	} EXCEPT {
 		decref_unlikely(hnd);
 		RETHROW();

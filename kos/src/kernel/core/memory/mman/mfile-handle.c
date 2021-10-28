@@ -36,6 +36,7 @@
 #include <kernel/handle.h>
 #include <kernel/iovec.h>
 #include <kernel/mman/mfile.h>
+#include <kernel/user.h>
 #include <sched/task.h>
 
 #include <hybrid/align.h>
@@ -47,6 +48,8 @@
 #include <sys/stat.h>
 
 #include <assert.h>
+#include <format-printer.h>
+#include <inttypes.h>
 #include <stddef.h>
 #include <string.h>
 
@@ -135,6 +138,7 @@ DEFINE_PUBLIC_ALIAS(mfile_upollconnect, handle_mfile_pollconnect);
 DEFINE_PUBLIC_ALIAS(mfile_upolltest, handle_mfile_polltest);
 DEFINE_PUBLIC_ALIAS(mfile_uhop, handle_mfile_hop);
 DEFINE_PUBLIC_ALIAS(mfile_utryas, handle_mfile_tryas);
+DEFINE_PUBLIC_ALIAS(mfile_uprintlink, handle_mfile_printlink);
 
 
 /* DATABLOCK HANDLE OPERATIONS */
@@ -819,6 +823,47 @@ handle_mfile_tryas(struct mfile *__restrict self,
 	return NULL;
 }
 
+INTERN NONNULL((1, 2)) ssize_t KCALL
+handle_mfile_printlink(struct mfile *__restrict self,
+                       pformatprinter printer, void *arg)
+		THROWS(E_WOULDBLOCK) {
+	struct mfile_stream_ops const *stream;
+	stream = self->mf_ops->mo_stream;
+	if (stream && stream->mso_printlink)
+		return (*stream->mso_printlink)(self, printer, arg);
+
+	/* Special handling for known special node types. */
+	if (mfile_isnode(self)) {
+		struct fnode *node = mfile_asnode(self);
+
+		/* Devfs device files. */
+		if (fnode_isdevice(node)) {
+			REF struct fdevfsdirent *devname;
+			REF struct path *devpath;
+			struct device *dev = fnode_asdevice(node);
+			device_getname_lock_acquire(dev);
+			devname = incref(dev->dv_dirent);
+			device_getname_lock_release(dev);
+			FINALLY_DECREF_UNLIKELY(devname);
+			devpath = vfs_mount_location(THIS_VFS, &devfs.fs_root);
+			if (devpath) {
+				REF struct path *root;
+				FINALLY_DECREF_UNLIKELY(devpath);
+				root = fs_getroot(THIS_FS);
+				FINALLY_DECREF_UNLIKELY(root);
+				return path_printent(devpath, devname->fdd_dirent.fd_name,
+				                     devname->fdd_dirent.fd_namelen, printer, arg,
+				                     AT_PATHPRINT_INCTRAIL, root);
+			}
+			return format_printf(printer, arg, "devfs:/%$s",
+			                     (size_t)devname->fdd_dirent.fd_namelen,
+			                     devname->fdd_dirent.fd_name);
+		}
+	}
+	return format_printf(printer, arg,
+	                     "anon_inode:[mfile:%" PRIuPTR "]",
+	                     skew_kernel_pointer(self));
+}
 
 DECL_END
 

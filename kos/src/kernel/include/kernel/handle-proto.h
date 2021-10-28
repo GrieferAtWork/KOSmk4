@@ -24,10 +24,19 @@
 
 #include <kernel/types.h>
 
+#include <bits/crt/format-printer.h>
 #include <kos/io.h>
 
 #if defined(__CC__) || defined(__DEEMON__)
 DECL_BEGIN
+
+#ifndef __pformatprinter_defined
+#define __pformatprinter_defined
+typedef __pformatprinter pformatprinter;
+typedef __pformatgetc pformatgetc;
+typedef __pformatungetc pformatungetc;
+#endif /* !__pformatprinter_defined */
+
 
 #ifdef __DEEMON__
 #define HANDLE_OPERATOR_PROTOTYPES                                                                            \
@@ -186,6 +195,12 @@ DECL_BEGIN
 		   ("uintptr_half_t", "wanted_type") },                                                               \
 		 "THROWS(E_WOULDBLOCK)",                                                                              \
 		 "return NULL;"),                                                                                     \
+		("printlink", "NONNULL((1, 2))", "ssize_t", "", "KCALL",                                              \
+		 { ("T *__restrict", "self"),                                                                         \
+		   ("pformatprinter", "printer"),                                                                     \
+		   ("void *", "arg") },                                                                               \
+		 "THROWS(E_WOULDBLOCK, ...)",                                                                         \
+		 "return handle_generic_printlink(self, {HANDLE_TYPE}, printer, arg);"),                              \
 	}
 #endif /* __DEEMON__ */
 
@@ -364,6 +379,7 @@ INTDEF NONNULL((1)) void KCALL handle_filehandle_pollconnect(struct filehandle *
 INTDEF WUNUSED NONNULL((1)) poll_mode_t KCALL handle_filehandle_polltest(struct filehandle *__restrict self, poll_mode_t what) THROWS(...);
 INTDEF NONNULL((1)) syscall_slong_t KCALL handle_filehandle_hop(struct filehandle *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
 INTDEF NONNULL((1)) REF void *KCALL handle_filehandle_tryas(struct filehandle *__restrict self, uintptr_half_t wanted_type) THROWS(E_WOULDBLOCK);
+INTDEF NONNULL((1, 2)) ssize_t KCALL handle_filehandle_printlink(struct filehandle *__restrict self, pformatprinter printer, void *arg) THROWS(E_WOULDBLOCK, ...);
 
 /* Handle operators for `HANDLE_TYPE_SOCKET' (`struct socket') */
 INTDEF NOBLOCK WUNUSED NONNULL((1)) refcnt_t NOTHROW(FCALL handle_socket_refcnt)(struct socket const *__restrict self);
@@ -394,6 +410,7 @@ INTDEF NONNULL((1)) void KCALL handle_socket_pollconnect(struct socket *__restri
 INTDEF WUNUSED NONNULL((1)) poll_mode_t KCALL handle_socket_polltest(struct socket *__restrict self, poll_mode_t what) THROWS(...);
 INTDEF NONNULL((1)) syscall_slong_t KCALL handle_socket_hop(struct socket *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
 INTDEF NONNULL((1)) REF void *KCALL handle_socket_tryas(struct socket *__restrict self, uintptr_half_t wanted_type) THROWS(E_WOULDBLOCK);
+INTDEF NONNULL((1, 2)) ssize_t KCALL handle_socket_printlink(struct socket *__restrict self, pformatprinter printer, void *arg) THROWS(E_WOULDBLOCK, ...);
 
 /* Handle operators for `HANDLE_TYPE_EPOLL' (`struct epoll_controller') */
 INTDEF NOBLOCK WUNUSED NONNULL((1)) refcnt_t NOTHROW(FCALL handle_epoll_refcnt)(struct epoll_controller const *__restrict self);
@@ -424,6 +441,7 @@ INTDEF NONNULL((1)) void KCALL handle_epoll_pollconnect(struct epoll_controller 
 INTDEF WUNUSED NONNULL((1)) poll_mode_t KCALL handle_epoll_polltest(struct epoll_controller *__restrict self, poll_mode_t what) THROWS(...);
 INTDEF NONNULL((1)) syscall_slong_t KCALL handle_epoll_hop(struct epoll_controller *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
 INTDEF NONNULL((1)) REF void *KCALL handle_epoll_tryas(struct epoll_controller *__restrict self, uintptr_half_t wanted_type) THROWS(E_WOULDBLOCK);
+INTDEF NONNULL((1, 2)) ssize_t KCALL handle_epoll_printlink(struct epoll_controller *__restrict self, pformatprinter printer, void *arg) THROWS(E_WOULDBLOCK, ...);
 
 /* Handle operators for `HANDLE_TYPE_PIPE' (`struct pipe') */
 INTDEF NOBLOCK WUNUSED NONNULL((1)) refcnt_t NOTHROW(FCALL handle_pipe_refcnt)(struct pipe const *__restrict self);
@@ -454,6 +472,7 @@ INTDEF NONNULL((1)) void KCALL handle_pipe_pollconnect(struct pipe *__restrict s
 INTDEF WUNUSED NONNULL((1)) poll_mode_t KCALL handle_pipe_polltest(struct pipe *__restrict self, poll_mode_t what) THROWS(...);
 INTDEF NONNULL((1)) syscall_slong_t KCALL handle_pipe_hop(struct pipe *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
 INTDEF NONNULL((1)) REF void *KCALL handle_pipe_tryas(struct pipe *__restrict self, uintptr_half_t wanted_type) THROWS(E_WOULDBLOCK);
+INTDEF NONNULL((1, 2)) ssize_t KCALL handle_pipe_printlink(struct pipe *__restrict self, pformatprinter printer, void *arg) THROWS(E_WOULDBLOCK, ...);
 
 /* Handle operators for `HANDLE_TYPE_PIPE_READER' (`struct pipe_reader') */
 INTDEF NOBLOCK WUNUSED NONNULL((1)) refcnt_t NOTHROW(FCALL handle_pipe_reader_refcnt)(struct pipe_reader const *__restrict self);
@@ -484,6 +503,7 @@ INTDEF NONNULL((1)) void KCALL handle_pipe_reader_pollconnect(struct pipe_reader
 INTDEF WUNUSED NONNULL((1)) poll_mode_t KCALL handle_pipe_reader_polltest(struct pipe_reader *__restrict self, poll_mode_t what) THROWS(...);
 INTDEF NONNULL((1)) syscall_slong_t KCALL handle_pipe_reader_hop(struct pipe_reader *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
 INTDEF NONNULL((1)) REF void *KCALL handle_pipe_reader_tryas(struct pipe_reader *__restrict self, uintptr_half_t wanted_type) THROWS(E_WOULDBLOCK);
+INTDEF NONNULL((1, 2)) ssize_t KCALL handle_pipe_reader_printlink(struct pipe_reader *__restrict self, pformatprinter printer, void *arg) THROWS(E_WOULDBLOCK, ...);
 
 /* Handle operators for `HANDLE_TYPE_PIPE_WRITER' (`struct pipe_writer') */
 INTDEF NOBLOCK WUNUSED NONNULL((1)) refcnt_t NOTHROW(FCALL handle_pipe_writer_refcnt)(struct pipe_writer const *__restrict self);
@@ -514,6 +534,7 @@ INTDEF NONNULL((1)) void KCALL handle_pipe_writer_pollconnect(struct pipe_writer
 INTDEF WUNUSED NONNULL((1)) poll_mode_t KCALL handle_pipe_writer_polltest(struct pipe_writer *__restrict self, poll_mode_t what) THROWS(...);
 INTDEF NONNULL((1)) syscall_slong_t KCALL handle_pipe_writer_hop(struct pipe_writer *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
 INTDEF NONNULL((1)) REF void *KCALL handle_pipe_writer_tryas(struct pipe_writer *__restrict self, uintptr_half_t wanted_type) THROWS(E_WOULDBLOCK);
+INTDEF NONNULL((1, 2)) ssize_t KCALL handle_pipe_writer_printlink(struct pipe_writer *__restrict self, pformatprinter printer, void *arg) THROWS(E_WOULDBLOCK, ...);
 
 /* Handle operators for `HANDLE_TYPE_FIFO_USER' (`struct fifo_user') */
 INTDEF NOBLOCK WUNUSED NONNULL((1)) refcnt_t NOTHROW(FCALL handle_fifo_user_refcnt)(struct fifo_user const *__restrict self);
@@ -544,6 +565,7 @@ INTDEF NONNULL((1)) void KCALL handle_fifo_user_pollconnect(struct fifo_user *__
 INTDEF WUNUSED NONNULL((1)) poll_mode_t KCALL handle_fifo_user_polltest(struct fifo_user *__restrict self, poll_mode_t what) THROWS(...);
 INTDEF NONNULL((1)) syscall_slong_t KCALL handle_fifo_user_hop(struct fifo_user *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
 INTDEF NONNULL((1)) REF void *KCALL handle_fifo_user_tryas(struct fifo_user *__restrict self, uintptr_half_t wanted_type) THROWS(E_WOULDBLOCK);
+INTDEF NONNULL((1, 2)) ssize_t KCALL handle_fifo_user_printlink(struct fifo_user *__restrict self, pformatprinter printer, void *arg) THROWS(E_WOULDBLOCK, ...);
 
 /* Handle operators for `HANDLE_TYPE_EVENTFD_FENCE' (`struct eventfd') */
 INTDEF NOBLOCK WUNUSED NONNULL((1)) refcnt_t NOTHROW(FCALL handle_eventfd_fence_refcnt)(struct eventfd const *__restrict self);
@@ -574,6 +596,7 @@ INTDEF NONNULL((1)) void KCALL handle_eventfd_fence_pollconnect(struct eventfd *
 INTDEF WUNUSED NONNULL((1)) poll_mode_t KCALL handle_eventfd_fence_polltest(struct eventfd *__restrict self, poll_mode_t what) THROWS(...);
 INTDEF NONNULL((1)) syscall_slong_t KCALL handle_eventfd_fence_hop(struct eventfd *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
 INTDEF NONNULL((1)) REF void *KCALL handle_eventfd_fence_tryas(struct eventfd *__restrict self, uintptr_half_t wanted_type) THROWS(E_WOULDBLOCK);
+INTDEF NONNULL((1, 2)) ssize_t KCALL handle_eventfd_fence_printlink(struct eventfd *__restrict self, pformatprinter printer, void *arg) THROWS(E_WOULDBLOCK, ...);
 
 /* Handle operators for `HANDLE_TYPE_EVENTFD_SEMA' (`struct eventfd') */
 INTDEF NOBLOCK WUNUSED NONNULL((1)) refcnt_t NOTHROW(FCALL handle_eventfd_sema_refcnt)(struct eventfd const *__restrict self);
@@ -604,6 +627,7 @@ INTDEF NONNULL((1)) void KCALL handle_eventfd_sema_pollconnect(struct eventfd *_
 INTDEF WUNUSED NONNULL((1)) poll_mode_t KCALL handle_eventfd_sema_polltest(struct eventfd *__restrict self, poll_mode_t what) THROWS(...);
 INTDEF NONNULL((1)) syscall_slong_t KCALL handle_eventfd_sema_hop(struct eventfd *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
 INTDEF NONNULL((1)) REF void *KCALL handle_eventfd_sema_tryas(struct eventfd *__restrict self, uintptr_half_t wanted_type) THROWS(E_WOULDBLOCK);
+INTDEF NONNULL((1, 2)) ssize_t KCALL handle_eventfd_sema_printlink(struct eventfd *__restrict self, pformatprinter printer, void *arg) THROWS(E_WOULDBLOCK, ...);
 
 /* Handle operators for `HANDLE_TYPE_SIGNALFD' (`struct signalfd') */
 INTDEF NOBLOCK WUNUSED NONNULL((1)) refcnt_t NOTHROW(FCALL handle_signalfd_refcnt)(struct signalfd const *__restrict self);
@@ -634,6 +658,7 @@ INTDEF NONNULL((1)) void KCALL handle_signalfd_pollconnect(struct signalfd *__re
 INTDEF WUNUSED NONNULL((1)) poll_mode_t KCALL handle_signalfd_polltest(struct signalfd *__restrict self, poll_mode_t what) THROWS(...);
 INTDEF NONNULL((1)) syscall_slong_t KCALL handle_signalfd_hop(struct signalfd *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
 INTDEF NONNULL((1)) REF void *KCALL handle_signalfd_tryas(struct signalfd *__restrict self, uintptr_half_t wanted_type) THROWS(E_WOULDBLOCK);
+INTDEF NONNULL((1, 2)) ssize_t KCALL handle_signalfd_printlink(struct signalfd *__restrict self, pformatprinter printer, void *arg) THROWS(E_WOULDBLOCK, ...);
 
 /* Handle operators for `HANDLE_TYPE_FUTEX' (`struct mfutex') */
 INTDEF NOBLOCK WUNUSED NONNULL((1)) refcnt_t NOTHROW(FCALL handle_futex_refcnt)(struct mfutex const *__restrict self);
@@ -664,6 +689,7 @@ INTDEF NONNULL((1)) void KCALL handle_futex_pollconnect(struct mfutex *__restric
 INTDEF WUNUSED NONNULL((1)) poll_mode_t KCALL handle_futex_polltest(struct mfutex *__restrict self, poll_mode_t what) THROWS(...);
 INTDEF NONNULL((1)) syscall_slong_t KCALL handle_futex_hop(struct mfutex *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
 INTDEF NONNULL((1)) REF void *KCALL handle_futex_tryas(struct mfutex *__restrict self, uintptr_half_t wanted_type) THROWS(E_WOULDBLOCK);
+INTDEF NONNULL((1, 2)) ssize_t KCALL handle_futex_printlink(struct mfutex *__restrict self, pformatprinter printer, void *arg) THROWS(E_WOULDBLOCK, ...);
 
 /* Handle operators for `HANDLE_TYPE_FUTEXFD' (`struct mfutexfd') */
 INTDEF NOBLOCK WUNUSED NONNULL((1)) refcnt_t NOTHROW(FCALL handle_futexfd_refcnt)(struct mfutexfd const *__restrict self);
@@ -694,6 +720,7 @@ INTDEF NONNULL((1)) void KCALL handle_futexfd_pollconnect(struct mfutexfd *__res
 INTDEF WUNUSED NONNULL((1)) poll_mode_t KCALL handle_futexfd_polltest(struct mfutexfd *__restrict self, poll_mode_t what) THROWS(...);
 INTDEF NONNULL((1)) syscall_slong_t KCALL handle_futexfd_hop(struct mfutexfd *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
 INTDEF NONNULL((1)) REF void *KCALL handle_futexfd_tryas(struct mfutexfd *__restrict self, uintptr_half_t wanted_type) THROWS(E_WOULDBLOCK);
+INTDEF NONNULL((1, 2)) ssize_t KCALL handle_futexfd_printlink(struct mfutexfd *__restrict self, pformatprinter printer, void *arg) THROWS(E_WOULDBLOCK, ...);
 
 /* Handle operators for `HANDLE_TYPE_DIRHANDLE' (`struct dirhandle') */
 INTDEF NOBLOCK WUNUSED NONNULL((1)) refcnt_t NOTHROW(FCALL handle_dirhandle_refcnt)(struct dirhandle const *__restrict self);
@@ -724,6 +751,7 @@ INTDEF NONNULL((1)) void KCALL handle_dirhandle_pollconnect(struct dirhandle *__
 INTDEF WUNUSED NONNULL((1)) poll_mode_t KCALL handle_dirhandle_polltest(struct dirhandle *__restrict self, poll_mode_t what) THROWS(...);
 INTDEF NONNULL((1)) syscall_slong_t KCALL handle_dirhandle_hop(struct dirhandle *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
 INTDEF NONNULL((1)) REF void *KCALL handle_dirhandle_tryas(struct dirhandle *__restrict self, uintptr_half_t wanted_type) THROWS(E_WOULDBLOCK);
+INTDEF NONNULL((1, 2)) ssize_t KCALL handle_dirhandle_printlink(struct dirhandle *__restrict self, pformatprinter printer, void *arg) THROWS(E_WOULDBLOCK, ...);
 
 /* Handle operators for `HANDLE_TYPE_MFILE' (`struct mfile') */
 INTDEF NOBLOCK WUNUSED NONNULL((1)) refcnt_t NOTHROW(FCALL handle_mfile_refcnt)(struct mfile const *__restrict self);
@@ -754,6 +782,7 @@ INTDEF NONNULL((1)) void KCALL handle_mfile_pollconnect(struct mfile *__restrict
 INTDEF WUNUSED NONNULL((1)) poll_mode_t KCALL handle_mfile_polltest(struct mfile *__restrict self, poll_mode_t what) THROWS(...);
 INTDEF NONNULL((1)) syscall_slong_t KCALL handle_mfile_hop(struct mfile *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
 INTDEF NONNULL((1)) REF void *KCALL handle_mfile_tryas(struct mfile *__restrict self, uintptr_half_t wanted_type) THROWS(E_WOULDBLOCK);
+INTDEF NONNULL((1, 2)) ssize_t KCALL handle_mfile_printlink(struct mfile *__restrict self, pformatprinter printer, void *arg) THROWS(E_WOULDBLOCK, ...);
 
 /* Handle operators for `HANDLE_TYPE_BLKDEV' (`struct blkdev') */
 INTDEF NOBLOCK WUNUSED NONNULL((1)) refcnt_t NOTHROW(FCALL handle_blkdev_refcnt)(struct blkdev const *__restrict self);
@@ -784,6 +813,7 @@ INTDEF NONNULL((1)) void KCALL handle_blkdev_pollconnect(struct blkdev *__restri
 INTDEF WUNUSED NONNULL((1)) poll_mode_t KCALL handle_blkdev_polltest(struct blkdev *__restrict self, poll_mode_t what) THROWS(...);
 INTDEF NONNULL((1)) syscall_slong_t KCALL handle_blkdev_hop(struct blkdev *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
 INTDEF NONNULL((1)) REF void *KCALL handle_blkdev_tryas(struct blkdev *__restrict self, uintptr_half_t wanted_type) THROWS(E_WOULDBLOCK);
+INTDEF NONNULL((1, 2)) ssize_t KCALL handle_blkdev_printlink(struct blkdev *__restrict self, pformatprinter printer, void *arg) THROWS(E_WOULDBLOCK, ...);
 
 /* Handle operators for `HANDLE_TYPE_FDIRENT' (`struct fdirent') */
 INTDEF NOBLOCK WUNUSED NONNULL((1)) refcnt_t NOTHROW(FCALL handle_fdirent_refcnt)(struct fdirent const *__restrict self);
@@ -814,6 +844,7 @@ INTDEF NONNULL((1)) void KCALL handle_fdirent_pollconnect(struct fdirent *__rest
 INTDEF WUNUSED NONNULL((1)) poll_mode_t KCALL handle_fdirent_polltest(struct fdirent *__restrict self, poll_mode_t what) THROWS(...);
 INTDEF NONNULL((1)) syscall_slong_t KCALL handle_fdirent_hop(struct fdirent *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
 INTDEF NONNULL((1)) REF void *KCALL handle_fdirent_tryas(struct fdirent *__restrict self, uintptr_half_t wanted_type) THROWS(E_WOULDBLOCK);
+INTDEF NONNULL((1, 2)) ssize_t KCALL handle_fdirent_printlink(struct fdirent *__restrict self, pformatprinter printer, void *arg) THROWS(E_WOULDBLOCK, ...);
 
 /* Handle operators for `HANDLE_TYPE_PATH' (`struct path') */
 INTDEF NOBLOCK WUNUSED NONNULL((1)) refcnt_t NOTHROW(FCALL handle_path_refcnt)(struct path const *__restrict self);
@@ -844,6 +875,7 @@ INTDEF NONNULL((1)) void KCALL handle_path_pollconnect(struct path *__restrict s
 INTDEF WUNUSED NONNULL((1)) poll_mode_t KCALL handle_path_polltest(struct path *__restrict self, poll_mode_t what) THROWS(...);
 INTDEF NONNULL((1)) syscall_slong_t KCALL handle_path_hop(struct path *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
 INTDEF NONNULL((1)) REF void *KCALL handle_path_tryas(struct path *__restrict self, uintptr_half_t wanted_type) THROWS(E_WOULDBLOCK);
+INTDEF NONNULL((1, 2)) ssize_t KCALL handle_path_printlink(struct path *__restrict self, pformatprinter printer, void *arg) THROWS(E_WOULDBLOCK, ...);
 
 /* Handle operators for `HANDLE_TYPE_FS' (`struct fs') */
 INTDEF NOBLOCK WUNUSED NONNULL((1)) refcnt_t NOTHROW(FCALL handle_fs_refcnt)(struct fs const *__restrict self);
@@ -874,6 +906,7 @@ INTDEF NONNULL((1)) void KCALL handle_fs_pollconnect(struct fs *__restrict self,
 INTDEF WUNUSED NONNULL((1)) poll_mode_t KCALL handle_fs_polltest(struct fs *__restrict self, poll_mode_t what) THROWS(...);
 INTDEF NONNULL((1)) syscall_slong_t KCALL handle_fs_hop(struct fs *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
 INTDEF NONNULL((1)) REF void *KCALL handle_fs_tryas(struct fs *__restrict self, uintptr_half_t wanted_type) THROWS(E_WOULDBLOCK);
+INTDEF NONNULL((1, 2)) ssize_t KCALL handle_fs_printlink(struct fs *__restrict self, pformatprinter printer, void *arg) THROWS(E_WOULDBLOCK, ...);
 
 /* Handle operators for `HANDLE_TYPE_MMAN' (`struct mman') */
 INTDEF NOBLOCK WUNUSED NONNULL((1)) refcnt_t NOTHROW(FCALL handle_mman_refcnt)(struct mman const *__restrict self);
@@ -904,6 +937,7 @@ INTDEF NONNULL((1)) void KCALL handle_mman_pollconnect(struct mman *__restrict s
 INTDEF WUNUSED NONNULL((1)) poll_mode_t KCALL handle_mman_polltest(struct mman *__restrict self, poll_mode_t what) THROWS(...);
 INTDEF NONNULL((1)) syscall_slong_t KCALL handle_mman_hop(struct mman *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
 INTDEF NONNULL((1)) REF void *KCALL handle_mman_tryas(struct mman *__restrict self, uintptr_half_t wanted_type) THROWS(E_WOULDBLOCK);
+INTDEF NONNULL((1, 2)) ssize_t KCALL handle_mman_printlink(struct mman *__restrict self, pformatprinter printer, void *arg) THROWS(E_WOULDBLOCK, ...);
 
 /* Handle operators for `HANDLE_TYPE_TASK' (`struct taskpid') */
 INTDEF NOBLOCK WUNUSED NONNULL((1)) refcnt_t NOTHROW(FCALL handle_task_refcnt)(struct taskpid const *__restrict self);
@@ -934,6 +968,7 @@ INTDEF NONNULL((1)) void KCALL handle_task_pollconnect(struct taskpid *__restric
 INTDEF WUNUSED NONNULL((1)) poll_mode_t KCALL handle_task_polltest(struct taskpid *__restrict self, poll_mode_t what) THROWS(...);
 INTDEF NONNULL((1)) syscall_slong_t KCALL handle_task_hop(struct taskpid *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
 INTDEF NONNULL((1)) REF void *KCALL handle_task_tryas(struct taskpid *__restrict self, uintptr_half_t wanted_type) THROWS(E_WOULDBLOCK);
+INTDEF NONNULL((1, 2)) ssize_t KCALL handle_task_printlink(struct taskpid *__restrict self, pformatprinter printer, void *arg) THROWS(E_WOULDBLOCK, ...);
 
 /* Handle operators for `HANDLE_TYPE_MODULE' (`struct module') */
 INTDEF NOBLOCK WUNUSED NONNULL((1)) refcnt_t NOTHROW(FCALL handle_module_refcnt)(struct module const *__restrict self);
@@ -964,6 +999,7 @@ INTDEF NONNULL((1)) void KCALL handle_module_pollconnect(struct module *__restri
 INTDEF WUNUSED NONNULL((1)) poll_mode_t KCALL handle_module_polltest(struct module *__restrict self, poll_mode_t what) THROWS(...);
 INTDEF NONNULL((1)) syscall_slong_t KCALL handle_module_hop(struct module *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
 INTDEF NONNULL((1)) REF void *KCALL handle_module_tryas(struct module *__restrict self, uintptr_half_t wanted_type) THROWS(E_WOULDBLOCK);
+INTDEF NONNULL((1, 2)) ssize_t KCALL handle_module_printlink(struct module *__restrict self, pformatprinter printer, void *arg) THROWS(E_WOULDBLOCK, ...);
 
 /* Handle operators for `HANDLE_TYPE_PIDNS' (`struct pidns') */
 INTDEF NOBLOCK WUNUSED NONNULL((1)) refcnt_t NOTHROW(FCALL handle_pidns_refcnt)(struct pidns const *__restrict self);
@@ -994,6 +1030,7 @@ INTDEF NONNULL((1)) void KCALL handle_pidns_pollconnect(struct pidns *__restrict
 INTDEF WUNUSED NONNULL((1)) poll_mode_t KCALL handle_pidns_polltest(struct pidns *__restrict self, poll_mode_t what) THROWS(...);
 INTDEF NONNULL((1)) syscall_slong_t KCALL handle_pidns_hop(struct pidns *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
 INTDEF NONNULL((1)) REF void *KCALL handle_pidns_tryas(struct pidns *__restrict self, uintptr_half_t wanted_type) THROWS(E_WOULDBLOCK);
+INTDEF NONNULL((1, 2)) ssize_t KCALL handle_pidns_printlink(struct pidns *__restrict self, pformatprinter printer, void *arg) THROWS(E_WOULDBLOCK, ...);
 
 /* Handle operators for `HANDLE_TYPE_DRIVER_LOADLIST' (`struct driver_loadlist') */
 INTDEF NOBLOCK WUNUSED NONNULL((1)) refcnt_t NOTHROW(FCALL handle_driver_loadlist_refcnt)(struct driver_loadlist const *__restrict self);
@@ -1024,6 +1061,7 @@ INTDEF NONNULL((1)) void KCALL handle_driver_loadlist_pollconnect(struct driver_
 INTDEF WUNUSED NONNULL((1)) poll_mode_t KCALL handle_driver_loadlist_polltest(struct driver_loadlist *__restrict self, poll_mode_t what) THROWS(...);
 INTDEF NONNULL((1)) syscall_slong_t KCALL handle_driver_loadlist_hop(struct driver_loadlist *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
 INTDEF NONNULL((1)) REF void *KCALL handle_driver_loadlist_tryas(struct driver_loadlist *__restrict self, uintptr_half_t wanted_type) THROWS(E_WOULDBLOCK);
+INTDEF NONNULL((1, 2)) ssize_t KCALL handle_driver_loadlist_printlink(struct driver_loadlist *__restrict self, pformatprinter printer, void *arg) THROWS(E_WOULDBLOCK, ...);
 
 /* Handle operators for `HANDLE_TYPE_CHRDEV' (`struct chrdev') */
 INTDEF NOBLOCK WUNUSED NONNULL((1)) refcnt_t NOTHROW(FCALL handle_chrdev_refcnt)(struct chrdev const *__restrict self);
@@ -1054,6 +1092,7 @@ INTDEF NONNULL((1)) void KCALL handle_chrdev_pollconnect(struct chrdev *__restri
 INTDEF WUNUSED NONNULL((1)) poll_mode_t KCALL handle_chrdev_polltest(struct chrdev *__restrict self, poll_mode_t what) THROWS(...);
 INTDEF NONNULL((1)) syscall_slong_t KCALL handle_chrdev_hop(struct chrdev *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
 INTDEF NONNULL((1)) REF void *KCALL handle_chrdev_tryas(struct chrdev *__restrict self, uintptr_half_t wanted_type) THROWS(E_WOULDBLOCK);
+INTDEF NONNULL((1, 2)) ssize_t KCALL handle_chrdev_printlink(struct chrdev *__restrict self, pformatprinter printer, void *arg) THROWS(E_WOULDBLOCK, ...);
 
 /* Handle operators for `HANDLE_TYPE_MPART' (`struct mpart') */
 INTDEF NOBLOCK WUNUSED NONNULL((1)) refcnt_t NOTHROW(FCALL handle_mpart_refcnt)(struct mpart const *__restrict self);
@@ -1084,6 +1123,7 @@ INTDEF NONNULL((1)) void KCALL handle_mpart_pollconnect(struct mpart *__restrict
 INTDEF WUNUSED NONNULL((1)) poll_mode_t KCALL handle_mpart_polltest(struct mpart *__restrict self, poll_mode_t what) THROWS(...);
 INTDEF NONNULL((1)) syscall_slong_t KCALL handle_mpart_hop(struct mpart *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
 INTDEF NONNULL((1)) REF void *KCALL handle_mpart_tryas(struct mpart *__restrict self, uintptr_half_t wanted_type) THROWS(E_WOULDBLOCK);
+INTDEF NONNULL((1, 2)) ssize_t KCALL handle_mpart_printlink(struct mpart *__restrict self, pformatprinter printer, void *arg) THROWS(E_WOULDBLOCK, ...);
 
 /* Handle operators for `HANDLE_TYPE_MODULE_SECTION' (`struct module_section') */
 INTDEF NOBLOCK WUNUSED NONNULL((1)) refcnt_t NOTHROW(FCALL handle_module_section_refcnt)(struct module_section const *__restrict self);
@@ -1114,6 +1154,7 @@ INTDEF NONNULL((1)) void KCALL handle_module_section_pollconnect(struct module_s
 INTDEF WUNUSED NONNULL((1)) poll_mode_t KCALL handle_module_section_polltest(struct module_section *__restrict self, poll_mode_t what) THROWS(...);
 INTDEF NONNULL((1)) syscall_slong_t KCALL handle_module_section_hop(struct module_section *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
 INTDEF NONNULL((1)) REF void *KCALL handle_module_section_tryas(struct module_section *__restrict self, uintptr_half_t wanted_type) THROWS(E_WOULDBLOCK);
+INTDEF NONNULL((1, 2)) ssize_t KCALL handle_module_section_printlink(struct module_section *__restrict self, pformatprinter printer, void *arg) THROWS(E_WOULDBLOCK, ...);
 
 /* Handle operators for `HANDLE_TYPE_REFCOUNTABLE' (`struct refcountable') */
 INTDEF NOBLOCK WUNUSED NONNULL((1)) refcnt_t NOTHROW(FCALL handle_refcountable_refcnt)(struct refcountable const *__restrict self);
@@ -1144,6 +1185,7 @@ INTDEF NONNULL((1)) void KCALL handle_refcountable_pollconnect(struct refcountab
 INTDEF WUNUSED NONNULL((1)) poll_mode_t KCALL handle_refcountable_polltest(struct refcountable *__restrict self, poll_mode_t what) THROWS(...);
 INTDEF NONNULL((1)) syscall_slong_t KCALL handle_refcountable_hop(struct refcountable *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
 INTDEF NONNULL((1)) REF void *KCALL handle_refcountable_tryas(struct refcountable *__restrict self, uintptr_half_t wanted_type) THROWS(E_WOULDBLOCK);
+INTDEF NONNULL((1, 2)) ssize_t KCALL handle_refcountable_printlink(struct refcountable *__restrict self, pformatprinter printer, void *arg) THROWS(E_WOULDBLOCK, ...);
 
 #endif /* __CC__ */
 #endif /* CONFIG_BUILDING_KERNEL_CORE */
