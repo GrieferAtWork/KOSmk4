@@ -266,8 +266,10 @@ printnode_v_loadblocks(struct mfile *__restrict self, pos_t addr,
 	struct printnode *me;
 #if __SIZEOF_POS_T__ > __SIZEOF_SIZE_T__
 	size_t io_max;
-	if unlikely(addr > (pos_t)SIZE_MAX)
-		return 0;
+	if unlikely(addr > (pos_t)SIZE_MAX) {
+		bzerophyscc(buf, num_bytes);
+		return;
+	}
 	io_max = ((size_t)SIZE_MAX - addr) + 1;
 	if unlikely(num_bytes > io_max) {
 		bzerophyscc(buf + io_max, num_bytes - io_max);

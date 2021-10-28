@@ -21,6 +21,8 @@
 #define GUARD_KERNEL_CORE_FILESYS_SYSCALLS_C 1
 #define _KOS_SOURCE 1
 #define _GNU_SOURCE 1
+#define _LARGEFILE64_SOURCE 1
+#define _TIME64_SOURCE 1
 
 #include <kernel/compiler.h>
 
@@ -57,6 +59,7 @@
 
 #include <hybrid/atomic.h>
 
+#include <bits/os/statfs-convert.h>
 #include <compat/config.h>
 #include <kos/compat/linux-stat-convert.h>
 #include <kos/compat/linux-stat.h>
@@ -75,6 +78,7 @@
 #include <malloca.h>
 #include <stddef.h>
 #include <string.h>
+#include <utime.h>
 
 #ifdef __ARCH_HAVE_COMPAT
 #include <compat/bits/os/stat-convert.h>
@@ -3321,7 +3325,7 @@ DEFINE_SYSCALL4(errno_t, utimensat, fd_t, dirfd,
 		if unlikely(atflags & AT_CHANGE_CTIME) {
 			ctm.tv_sec  = (time_t)times[2].tv_sec;
 			ctm.tv_nsec = (syscall_ulong_t)times[2].tv_nsec;
-			/* Specify CTMIE as OMIT is the same as not passing `AT_CHANGE_CTIME'! */
+			/* Specify CTIME as OMIT is the same as not passing `AT_CHANGE_CTIME'! */
 			if (ctm.tv_nsec != UTIME_OMIT) {
 				require(CAP_AT_CHANGE_CTIME);
 				pctm = &ctm;
@@ -3383,7 +3387,7 @@ DEFINE_COMPAT_SYSCALL4(errno_t, utimensat, fd_t, dirfd,
 		if unlikely(atflags & AT_CHANGE_CTIME) {
 			ctm.tv_sec  = (time_t)times[2].tv_sec;
 			ctm.tv_nsec = (syscall_ulong_t)times[2].tv_nsec;
-			/* Specify CTMIE as OMIT is the same as not passing `AT_CHANGE_CTIME'! */
+			/* Specify CTIME as OMIT is the same as not passing `AT_CHANGE_CTIME'! */
 			if (ctm.tv_nsec != UTIME_OMIT) {
 				require(CAP_AT_CHANGE_CTIME);
 				pctm = &ctm;
@@ -3454,7 +3458,7 @@ DEFINE_SYSCALL4(errno_t, utimensat_time64, fd_t, dirfd,
 		if unlikely(atflags & AT_CHANGE_CTIME) {
 			ctm.tv_sec  = (time_t)times[2].tv_sec;
 			ctm.tv_nsec = (syscall_ulong_t)times[2].tv_nsec;
-			/* Specify CTMIE as OMIT is the same as not passing `AT_CHANGE_CTIME'! */
+			/* Specify CTIME as OMIT is the same as not passing `AT_CHANGE_CTIME'! */
 			if (ctm.tv_nsec != UTIME_OMIT) {
 				require(CAP_AT_CHANGE_CTIME);
 				pctm = &ctm;
@@ -3525,7 +3529,7 @@ DEFINE_COMPAT_SYSCALL4(errno_t, utimensat_time64, fd_t, dirfd,
 		if unlikely(atflags & AT_CHANGE_CTIME) {
 			ctm.tv_sec  = (time_t)times[2].tv_sec;
 			ctm.tv_nsec = (syscall_ulong_t)times[2].tv_nsec;
-			/* Specify CTMIE as OMIT is the same as not passing `AT_CHANGE_CTIME'! */
+			/* Specify CTIME as OMIT is the same as not passing `AT_CHANGE_CTIME'! */
 			if (ctm.tv_nsec != UTIME_OMIT) {
 				require(CAP_AT_CHANGE_CTIME);
 				pctm = &ctm;

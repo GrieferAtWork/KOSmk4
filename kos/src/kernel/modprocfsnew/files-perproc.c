@@ -1199,9 +1199,9 @@ procfs_fd_dirent_v_opennode(struct fdirent *__restrict self,
 	return result;
 }
 
-PRIVATE WUNUSED NONNULL((1, 2)) ino_t FCALL
-procfs_fd_dirent_v_getino(struct fdirent *__restrict self,
-                          struct fdirnode *__restrict UNUSED(dir)) {
+PRIVATE ATTR_PURE WUNUSED NONNULL((1, 2)) ino_t
+NOTHROW(FCALL procfs_fd_dirent_v_getino)(struct fdirent *__restrict self,
+                                         struct fdirnode *__restrict UNUSED(dir)) {
 	struct procfs_fd_dirent *me = fdirent_asfd(self);
 	return procfs_perproc_ino(me->pfd_handptr, &procfs_perproc_fdlnk_ops);
 }

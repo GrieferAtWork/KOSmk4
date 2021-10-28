@@ -146,7 +146,7 @@ NOTHROW(FCALL fnode_add2changed)(struct fnode *__restrict self) {
 /* Mandatory callback for all types derived from `struct fnode',
  * for  use with `mf_ops->mo_changed'.  MUST NOT BE OVERWRITTEN! */
 PUBLIC NOBLOCK NONNULL((1)) void
-NOTHROW(FCALL fnode_v_changed)(struct mfile *__restrict self,
+NOTHROW(KCALL fnode_v_changed)(struct mfile *__restrict self,
                                uintptr_t old_flags,
                                uintptr_t UNUSED(new_flags)) {
 	struct fnode *me = mfile_asnode(self);
@@ -253,7 +253,7 @@ NOTHROW(LOCKOP_CC fnode_v_destroy_rmsuper_lop)(Toblockop(fsuper) *__restrict sel
  * function must be called as the last thing done within the
  * sub-class destroy-operator. */
 PUBLIC NOBLOCK NONNULL((1)) void
-NOTHROW(FCALL fnode_v_destroy)(struct mfile *__restrict self) {
+NOTHROW(KCALL fnode_v_destroy)(struct mfile *__restrict self) {
 	struct fnode *me = mfile_asnode(self);
 	assertf(!(me->mf_flags & MFILE_FN_GLOBAL_REF),
 	        "Then why are we being destroyed?");

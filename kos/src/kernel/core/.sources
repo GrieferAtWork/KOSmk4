@@ -19,7 +19,7 @@
  */
 
 #undef CONFIG_USE_NEW_FS
-#if 0 /* s.a. "kernel/compiler.h" */
+#if 1 /* s.a. "kernel/compiler.h" */
 #define CONFIG_USE_NEW_FS
 #endif
 

@@ -223,7 +223,7 @@ fdirnode_enum(struct fdirnode *__restrict self,
  * @throw: E_FSERROR_UNSUPPORTED_OPERATION: The requested S_IFMT isn't supported.
  * @throw: E_FSERROR_ACCESS_DENIED:         The file didn't already exist, and caller doesn't have write-access to `self'
  * @return: * : One of `FDIRNODE_MKFILE_*' * */
-PUBLIC WUNUSED NONNULL((1, 2)) unsigned int FCALL
+PUBLIC WUNUSED NONNULL((1, 2)) unsigned int KCALL
 fdirnode_mkfile(struct fdirnode *__restrict self,
                 struct fmkfile_info *__restrict info)
 		THROWS(E_FSERROR_ILLEGAL_PATH, E_FSERROR_DISK_FULL,
@@ -272,7 +272,7 @@ again_lookup:
  * @throw: E_FSERROR_DIRECTORY_NOT_EMPTY: `file' is a non-empty directory.
  * @throw: E_FSERROR_READONLY:            Read-only filesystem (or unsupported operation)
  * @return: * : One of `FDIRNODE_UNLINK_*' */
-PUBLIC WUNUSED NONNULL((1, 2)) unsigned int FCALL
+PUBLIC WUNUSED NONNULL((1, 2)) unsigned int KCALL
 fdirnode_unlink(struct fdirnode *__restrict self,
                 struct fdirent *__restrict entry,
                 struct fnode *__restrict file)
@@ -289,7 +289,7 @@ fdirnode_unlink(struct fdirnode *__restrict self,
  * @throw: E_FSERROR_DISK_FULL:    Disk full
  * @throw: E_FSERROR_READONLY:     Read-only filesystem
  * @return: * : One of `FDIRNODE_RENAME_*' */
-PUBLIC WUNUSED NONNULL((1, 2)) unsigned int FCALL
+PUBLIC WUNUSED NONNULL((1, 2)) unsigned int KCALL
 fdirnode_rename(struct fdirnode *__restrict self,
                 struct frename_info *__restrict info)
 		THROWS(E_FSERROR_ILLEGAL_PATH, E_FSERROR_DISK_FULL, E_FSERROR_READONLY) {

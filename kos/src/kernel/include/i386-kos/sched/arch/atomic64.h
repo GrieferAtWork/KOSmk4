@@ -84,7 +84,7 @@ NOTHROW(atomic64_read)(atomic64_t const *__restrict self) {
 }
 
 /* Atomically write a 64-bit data word to `self' */
-FORCELOCAL NOBLOCK ATTR_ARTIFICIAL ATTR_LEAF NONNULL((1)) void
+FORCELOCAL NOBLOCK ATTR_ARTIFICIAL NONNULL((1)) void
 NOTHROW(atomic64_write)(atomic64_t *__restrict self, u64 value) {
 	__register u32 __eax;
 	__register u32 __edx;
@@ -106,7 +106,7 @@ NOTHROW(atomic64_write)(atomic64_t *__restrict self, u64 value) {
 
 /* Atomically compare-exchange a 64-bit data word from `self' */
 #ifdef __OPTIMIZE__
-FORCELOCAL NOBLOCK ATTR_ARTIFICIAL ATTR_LEAF NONNULL((1)) u64
+FORCELOCAL NOBLOCK ATTR_ARTIFICIAL NONNULL((1)) u64
 NOTHROW(atomic64_cmpxch_val)(atomic64_t *__restrict self,
                              u64 oldval, u64 newval) {
 	/* >> __i386_atomic64_cmpxch
@@ -134,13 +134,13 @@ NOTHROW(atomic64_cmpxch_val)(atomic64_t *__restrict self,
 /* Because gcc refuses to properly compile the inline-assembly wrappers
  * when not  building  with  __OPTIMIZE__,  we need  to  link  a  C-ABI
  * compatible wrapper instead. (ugh...) */
-FUNDEF NOBLOCK ATTR_LEAF NONNULL((1)) u64
+FUNDEF NOBLOCK NONNULL((1)) u64
 NOTHROW(KCALL atomic64_cmpxch_val)(atomic64_t *__restrict self,
                                    u64 oldval, u64 newval);
 #endif /* !__OPTIMIZE__ */
 
 /* Atomically compare-exchange a 64-bit data word from `self' */
-FORCELOCAL NOBLOCK ATTR_ARTIFICIAL ATTR_LEAF NONNULL((1)) __BOOL
+FORCELOCAL NOBLOCK ATTR_ARTIFICIAL NONNULL((1)) __BOOL
 NOTHROW(atomic64_cmpxch)(atomic64_t *__restrict self,
                          u64 oldval, u64 newval) {
 	/* >> __i386_atomic64_cmpxch
@@ -173,7 +173,7 @@ NOTHROW(atomic64_cmpxch)(atomic64_t *__restrict self,
 }
 
 /* Atomically exchange a 64-bit data word from `self' */
-FORCELOCAL NOBLOCK ATTR_ARTIFICIAL ATTR_LEAF NONNULL((1)) u64
+FORCELOCAL NOBLOCK ATTR_ARTIFICIAL NONNULL((1)) u64
 NOTHROW(atomic64_xch)(atomic64_t *__restrict self,
                       u64 addend) {
 	__register u64 __eax_edx;
@@ -195,7 +195,7 @@ NOTHROW(atomic64_xch)(atomic64_t *__restrict self,
 }
 
 /* Atomically fetch-and-add a 64-bit data word from `self' */
-FORCELOCAL NOBLOCK ATTR_ARTIFICIAL ATTR_LEAF NONNULL((1)) u64
+FORCELOCAL NOBLOCK ATTR_ARTIFICIAL NONNULL((1)) u64
 NOTHROW(atomic64_fetchadd)(atomic64_t *__restrict self,
                            u64 addend) {
 	__register u64 __eax_edx;
@@ -221,7 +221,7 @@ NOTHROW(atomic64_fetchadd)(atomic64_t *__restrict self,
 }
 
 /* Atomically fetch-and-and a 64-bit data word from `self' */
-FORCELOCAL NOBLOCK ATTR_ARTIFICIAL ATTR_LEAF NONNULL((1)) u64
+FORCELOCAL NOBLOCK ATTR_ARTIFICIAL NONNULL((1)) u64
 NOTHROW(atomic64_fetchand)(atomic64_t *__restrict self,
                            u64 addend) {
 	__register u64 __eax_edx;
@@ -247,7 +247,7 @@ NOTHROW(atomic64_fetchand)(atomic64_t *__restrict self,
 }
 
 /* Atomically fetch-and-or a 64-bit data word from `self' */
-FORCELOCAL NOBLOCK ATTR_ARTIFICIAL ATTR_LEAF NONNULL((1)) u64
+FORCELOCAL NOBLOCK ATTR_ARTIFICIAL NONNULL((1)) u64
 NOTHROW(atomic64_fetchor)(atomic64_t *__restrict self,
                           u64 addend) {
 	__register u64 __eax_edx;
@@ -273,7 +273,7 @@ NOTHROW(atomic64_fetchor)(atomic64_t *__restrict self,
 }
 
 /* Atomically fetch-and-xor a 64-bit data word from `self' */
-FORCELOCAL NOBLOCK ATTR_ARTIFICIAL ATTR_LEAF NONNULL((1)) u64
+FORCELOCAL NOBLOCK ATTR_ARTIFICIAL NONNULL((1)) u64
 NOTHROW(atomic64_fetchxor)(atomic64_t *__restrict self,
                            u64 addend) {
 	__register u64 __eax_edx;
