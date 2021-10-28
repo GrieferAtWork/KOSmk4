@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb05a6618 */
+/* HASH CRC-32:0x58ccedd2 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -155,7 +155,9 @@ __LIBC void *(__VLIBCCALL MRemap)(void *__addr, size_t __old_len, size_t __new_l
 #endif /* __CRT_HAVE_MRemap */
 /* >> remap_file_pages(2) */
 __CDECLARE_VOID_OPT(,__THROWING,RemapFilePages,(void *__start, size_t __size, __STDC_INT_AS_UINT_T __prot, size_t __pgoff, __STDC_INT_AS_UINT_T __flags),(__start,__size,__prot,__pgoff,__flags))
-/* >> memfd_create(2) */
+/* >> memfd_create(2)
+ * @param: name:  Set `/proc/[pid]/fd/[return]' = "memfd:${name}"
+ * @param: flags: Set of `MFD_CLOEXEC | MFD_CLOFORK | MFD_ALLOW_SEALING | MFD_HUGETLB' */
 __CDECLARE_OPT(,__fd_t,__THROWING,MemFdCreate,(char const *__name, unsigned int __flags),(__name,__flags))
 /* >> mlock2(2) */
 __CDECLARE_VOID_OPT(,__THROWING,MLock2,(void const *__addr, size_t __length, unsigned int __flags),(__addr,__length,__flags))

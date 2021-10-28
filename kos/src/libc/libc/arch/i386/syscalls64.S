@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x434be1c4 */
+/* HASH CRC-32:0xd6ff5cb4 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3187,7 +3187,7 @@ INTERN_FUNCTION(libc_sys_getrandom)
 END(libc_sys_getrandom)
 DEFINE_PUBLIC_ALIAS(sys_getrandom, libc_sys_getrandom)
 
-/* @param: flags: Set of `MFD_CLOEXEC | MFD_ALLOW_SEALING' */
+/* @param: flags: Set of `MFD_CLOEXEC | MFD_CLOFORK | MFD_ALLOW_SEALING | MFD_HUGETLB' */
 /* fd_t memfd_create(char const *name, syscall_ulong_t flags) */
 INTERN_FUNCTION(libc_sys_memfd_create)
 	movq   $(0x13f), %rax
@@ -8088,7 +8088,7 @@ INTERN_FUNCTION(libc_sys_Xgetrandom)
 END(libc_sys_Xgetrandom)
 DEFINE_PUBLIC_ALIAS(sys_Xgetrandom, libc_sys_Xgetrandom)
 
-/* @param: flags: Set of `MFD_CLOEXEC | MFD_ALLOW_SEALING' */
+/* @param: flags: Set of `MFD_CLOEXEC | MFD_CLOFORK | MFD_ALLOW_SEALING | MFD_HUGETLB' */
 /* fd_t memfd_create(char const *name, syscall_ulong_t flags) */
 INTERN_FUNCTION(libc_sys_Xmemfd_create)
 	movq   $(0x13f), %rax

@@ -43,7 +43,7 @@
  *   As such, there are no  race conditions in regards  to
  *   paths going away and being replaced by some new same-
  *   pid process.
- * - Per-process nodes all have `MFILE_FM_FLEETING' set
+ * - Per-process nodes all have `MFILE_FN_FLEETING' set
  * - Per-process nodes all have `MFILE_FM_ATTRREADONLY' set
  *
  * TODO: Custom access checks  for per-process nodes  (since

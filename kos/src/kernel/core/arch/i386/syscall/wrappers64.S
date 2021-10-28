@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x12c8d3c0 */
+/* HASH CRC-32:0x433e3c1e */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -10216,7 +10216,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_getrandom)
 	.cfi_endproc
 END(__x86_asm64_syscall_getrandom)
 
-/* @param: flags: Set of `MFD_CLOEXEC | MFD_ALLOW_SEALING' */
+/* @param: flags: Set of `MFD_CLOEXEC | MFD_CLOFORK | MFD_ALLOW_SEALING | MFD_HUGETLB' */
 /* fd_t memfd_create(char const *name, syscall_ulong_t flags) */
 .section .text.x86.asm64_syscall.memfd_create
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_memfd_create)
@@ -22106,7 +22106,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getrandom)
 	.cfi_endproc
 END(__x86_asm32_int80_getrandom)
 
-/* @param: flags: Set of `MFD_CLOEXEC | MFD_ALLOW_SEALING' */
+/* @param: flags: Set of `MFD_CLOEXEC | MFD_CLOFORK | MFD_ALLOW_SEALING | MFD_HUGETLB' */
 /* fd_t memfd_create(char const *name, syscall_ulong_t flags) */
 .section .text.x86.asm32_syscall_int80.memfd_create
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_memfd_create)
@@ -28949,7 +28949,7 @@ DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_seccomp, __x86_asm32_int80_seccomp
 /* ssize_t getrandom(void *buf, size_t num_bytes, syscall_ulong_t flags) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_getrandom, __x86_asm32_int80_getrandom)
 
-/* @param: flags: Set of `MFD_CLOEXEC | MFD_ALLOW_SEALING' */
+/* @param: flags: Set of `MFD_CLOEXEC | MFD_CLOFORK | MFD_ALLOW_SEALING | MFD_HUGETLB' */
 /* fd_t memfd_create(char const *name, syscall_ulong_t flags) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_memfd_create, __x86_asm32_int80_memfd_create)
 
@@ -35146,7 +35146,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_getrandom)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_getrandom)
 
-/* @param: flags: Set of `MFD_CLOEXEC | MFD_ALLOW_SEALING' */
+/* @param: flags: Set of `MFD_CLOEXEC | MFD_CLOFORK | MFD_ALLOW_SEALING | MFD_HUGETLB' */
 /* fd_t memfd_create(char const *name, syscall_ulong_t flags) */
 .section .text.x86.asm32_syscall_sysrun32.memfd_create
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_memfd_create)

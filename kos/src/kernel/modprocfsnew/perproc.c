@@ -162,7 +162,7 @@ PRIVATE struct fnode const procfs_perproc_reg_template = {
 		MFILE_INIT_mf_blockshift(PAGESHIFT),
 		MFILE_INIT_mf_flags(MFILE_FS_NOSUID | MFILE_FS_NOEXEC |
 		                    MFILE_F_READONLY | MFILE_F_FIXEDFILESIZE |
-		                    MFILE_FM_FLEETING),
+		                    MFILE_FN_FLEETING),
 		MFILE_INIT_mf_trunclock,
 		MFILE_INIT_mf_filesize((uint64_t)-1),
 		MFILE_INIT_mf_atime(0, 0),
@@ -192,7 +192,7 @@ PRIVATE struct fnode const procfs_perproc_nomap_template = {
 		MFILE_INIT_mf_flags(MFILE_FS_NOSUID | MFILE_FS_NOEXEC |
 		                    MFILE_F_NOUSRMMAP | MFILE_F_NOUSRIO |
 		                    MFILE_F_READONLY | MFILE_F_FIXEDFILESIZE |
-		                    MFILE_FM_FLEETING),
+		                    MFILE_FN_FLEETING),
 		MFILE_INIT_mf_trunclock,
 		MFILE_INIT_mf_filesize((uint64_t)-1),
 		MFILE_INIT_mf_atime(0, 0),
@@ -226,7 +226,7 @@ INTERN_CONST struct flnknode const procfs_fdlnk_template = {
 			MFILE_INIT_mf_flags(MFILE_FS_NOSUID | MFILE_FS_NOEXEC |
 			                    MFILE_F_NOUSRMMAP | MFILE_F_NOUSRIO |
 			                    MFILE_F_READONLY | MFILE_F_FIXEDFILESIZE |
-			                    MFILE_FM_FLEETING),
+			                    MFILE_FN_FLEETING),
 			MFILE_INIT_mf_trunclock,
 			MFILE_INIT_mf_filesize(0),
 			MFILE_INIT_mf_atime(0, 0),

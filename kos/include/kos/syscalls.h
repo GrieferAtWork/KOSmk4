@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd351ad18 */
+/* HASH CRC-32:0x39cbe1fd */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -744,7 +744,7 @@ __CDECLARE_SC(,__errno_t,mbind,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 __CDECLARE_SC(,__errno_t,membarrier,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 #endif /* __CRT_HAVE_SC(membarrier) */
 #if __CRT_HAVE_SC(memfd_create)
-/* @param: flags: Set of `MFD_CLOEXEC | MFD_ALLOW_SEALING' */
+/* @param: flags: Set of `MFD_CLOEXEC | MFD_CLOFORK | MFD_ALLOW_SEALING | MFD_HUGETLB' */
 __CDECLARE_SC(,__fd_t,memfd_create,(char const *__name, __syscall_ulong_t __flags),(__name,__flags))
 #endif /* __CRT_HAVE_SC(memfd_create) */
 #if __CRT_HAVE_SC(migrate_pages)
@@ -2201,7 +2201,7 @@ __CDECLARE_XSC(,__errno_t,mbind,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 __CDECLARE_XSC(,__errno_t,membarrier,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 #endif /* __CRT_HAVE_XSC(membarrier) */
 #if __CRT_HAVE_XSC(memfd_create)
-/* @param: flags: Set of `MFD_CLOEXEC | MFD_ALLOW_SEALING' */
+/* @param: flags: Set of `MFD_CLOEXEC | MFD_CLOFORK | MFD_ALLOW_SEALING | MFD_HUGETLB' */
 __CDECLARE_XSC(,__fd_t,memfd_create,(char const *__name, __syscall_ulong_t __flags),(__name,__flags))
 #endif /* __CRT_HAVE_XSC(memfd_create) */
 #if __CRT_HAVE_XSC(migrate_pages)

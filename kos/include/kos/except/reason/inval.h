@@ -239,6 +239,8 @@ enum {
 	E_INVALID_ARGUMENT_CONTEXT_EPOLL_MOD_RPC,                      /* E_INVALID_ARGUMENT_BAD_STATE: Attempted to `EPOLL_CTL_MOD' an RPC monitor, which isn't allowed. */
 	E_INVALID_ARGUMENT_CONTEXT_CHOWN_UNSUPP_UID,                   /* E_INVALID_ARGUMENT_BAD_VALUE: The `uid' given to `chown(2)' cannot be encoded by the underlying filesystem. */
 	E_INVALID_ARGUMENT_CONTEXT_CHOWN_UNSUPP_GID,                   /* E_INVALID_ARGUMENT_BAD_VALUE: The `gid' given to `chown(2)' cannot be encoded by the underlying filesystem. */
+	E_INVALID_ARGUMENT_CONTEXT_MEMFD_CREATE_NAME_TOO_LONG,         /* E_INVALID_ARGUMENT_BAD_VALUE: the `name' given `memfd_create(2)' to longer than `249' bytes (excluding the trailing NUL) */
+	E_INVALID_ARGUMENT_CONTEXT_MEMFD_CREATE_FLAGS,                 /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Invalid flags passed to `memfd_create(2)'. */
 };
 #endif /* __CC__ */
 /*[[[AUTO]]]*/
@@ -453,6 +455,8 @@ enum {
 #define E_INVALID_ARGUMENT_CONTEXT_EPOLL_MOD_RPC                      E_INVALID_ARGUMENT_CONTEXT_EPOLL_MOD_RPC                      /* E_INVALID_ARGUMENT_BAD_STATE: Attempted to `EPOLL_CTL_MOD' an RPC monitor, which isn't allowed. */
 #define E_INVALID_ARGUMENT_CONTEXT_CHOWN_UNSUPP_UID                   E_INVALID_ARGUMENT_CONTEXT_CHOWN_UNSUPP_UID                   /* E_INVALID_ARGUMENT_BAD_VALUE: The `uid' given to `chown(2)' cannot be encoded by the underlying filesystem. */
 #define E_INVALID_ARGUMENT_CONTEXT_CHOWN_UNSUPP_GID                   E_INVALID_ARGUMENT_CONTEXT_CHOWN_UNSUPP_GID                   /* E_INVALID_ARGUMENT_BAD_VALUE: The `gid' given to `chown(2)' cannot be encoded by the underlying filesystem. */
+#define E_INVALID_ARGUMENT_CONTEXT_MEMFD_CREATE_NAME_TOO_LONG         E_INVALID_ARGUMENT_CONTEXT_MEMFD_CREATE_NAME_TOO_LONG         /* E_INVALID_ARGUMENT_BAD_VALUE: the `name' given `memfd_create(2)' to longer than `249' bytes (excluding the trailing NUL) */
+#define E_INVALID_ARGUMENT_CONTEXT_MEMFD_CREATE_FLAGS                 E_INVALID_ARGUMENT_CONTEXT_MEMFD_CREATE_FLAGS                 /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Invalid flags passed to `memfd_create(2)'. */
 #else /* __COMPILER_PREFERR_ENUMS */
 #define E_INVALID_ARGUMENT_CONTEXT_GENERIC                            0   /* Generic context */
 #define E_INVALID_ARGUMENT_CONTEXT_SETFD_FD_FLAG                      1   /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Unknown `FD_*' flag passed to `F_SETFD' */
@@ -664,6 +668,8 @@ enum {
 #define E_INVALID_ARGUMENT_CONTEXT_EPOLL_MOD_RPC                      188 /* E_INVALID_ARGUMENT_BAD_STATE: Attempted to `EPOLL_CTL_MOD' an RPC monitor, which isn't allowed. */
 #define E_INVALID_ARGUMENT_CONTEXT_CHOWN_UNSUPP_UID                   189 /* E_INVALID_ARGUMENT_BAD_VALUE: The `uid' given to `chown(2)' cannot be encoded by the underlying filesystem. */
 #define E_INVALID_ARGUMENT_CONTEXT_CHOWN_UNSUPP_GID                   190 /* E_INVALID_ARGUMENT_BAD_VALUE: The `gid' given to `chown(2)' cannot be encoded by the underlying filesystem. */
+#define E_INVALID_ARGUMENT_CONTEXT_MEMFD_CREATE_NAME_TOO_LONG         191 /* E_INVALID_ARGUMENT_BAD_VALUE: the `name' given `memfd_create(2)' to longer than `249' bytes (excluding the trailing NUL) */
+#define E_INVALID_ARGUMENT_CONTEXT_MEMFD_CREATE_FLAGS                 192 /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Invalid flags passed to `memfd_create(2)'. */
 #endif /* !__COMPILER_PREFERR_ENUMS */
 /*[[[end]]]*/
 

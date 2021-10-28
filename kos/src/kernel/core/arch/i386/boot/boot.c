@@ -778,8 +778,6 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *       done  by having the interrupt return to  the start of said first instr,
 	 *       meaning that decrementing mustn't be done) */
 
-	/* TODO: Implement support for sys_memfd_create(2) */
-
 	/* TODO: Use the general-purpose lockop system in `struct pidns' and replace `pn_dead' */
 
 	/* TODO: Re-write `struct heap' with lockop support */

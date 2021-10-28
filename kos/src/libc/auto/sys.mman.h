@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4496b676 */
+/* HASH CRC-32:0x3c9cbb00 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -83,7 +83,9 @@ INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_posix_madvise)(void *addr, siz
 INTDEF void *NOTHROW_NCX(VLIBDCALL libd_mremap)(void *addr, size_t old_len, size_t new_len, __STDC_INT_AS_UINT_T flags, ...);
 /* >> remap_file_pages(2) */
 INTDEF int NOTHROW_NCX(LIBDCALL libd_remap_file_pages)(void *start, size_t size, __STDC_INT_AS_UINT_T prot, size_t pgoff, __STDC_INT_AS_UINT_T flags);
-/* >> memfd_create(2) */
+/* >> memfd_create(2)
+ * @param: name:  Set `/proc/[pid]/fd/[return]' = "memfd:${name}"
+ * @param: flags: Set of `MFD_CLOEXEC | MFD_CLOFORK | MFD_ALLOW_SEALING | MFD_HUGETLB' */
 INTDEF fd_t NOTHROW_NCX(LIBDCALL libd_memfd_create)(char const *name, unsigned int flags);
 /* >> mlock2(2) */
 INTDEF int NOTHROW_NCX(LIBDCALL libd_mlock2)(void const *addr, size_t length, unsigned int flags);

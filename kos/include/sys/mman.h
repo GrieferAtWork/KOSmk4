@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbbc97041 */
+/* HASH CRC-32:0xb1dc1a5d */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -524,6 +524,14 @@
 #define MFD_HUGETLB __MFD_HUGETLB
 #endif /* !MFD_HUGETLB && __MFD_HUGETLB */
 
+#ifdef __USE_KOS
+/* Close-on-fork */
+#if !defined(MFD_CLOFORK) && defined(__MFD_CLOFORK)
+#define MFD_CLOFORK __MFD_CLOFORK
+#endif /* !MFD_CLOFORK && __MFD_CLOFORK */
+#endif /* __USE_KOS */
+
+
 
 /************************************************************************/
 /* Flags for `mlock2()'                                                 */
@@ -703,7 +711,9 @@ __LIBC void *__NOTHROW_NCX(__VLIBCCALL mremap)(void *__addr, size_t __old_len, s
 #endif /* __CRT_HAVE_mremap */
 /* >> remap_file_pages(2) */
 __CDECLARE_OPT(,int,__NOTHROW_NCX,remap_file_pages,(void *__start, size_t __size, __STDC_INT_AS_UINT_T __prot, size_t __pgoff, __STDC_INT_AS_UINT_T __flags),(__start,__size,__prot,__pgoff,__flags))
-/* >> memfd_create(2) */
+/* >> memfd_create(2)
+ * @param: name:  Set `/proc/[pid]/fd/[return]' = "memfd:${name}"
+ * @param: flags: Set of `MFD_CLOEXEC | MFD_CLOFORK | MFD_ALLOW_SEALING | MFD_HUGETLB' */
 __CDECLARE_OPT(,__fd_t,__NOTHROW_NCX,memfd_create,(char const *__name, unsigned int __flags),(__name,__flags))
 /* >> mlock2(2) */
 __CDECLARE_OPT(,int,__NOTHROW_NCX,mlock2,(void const *__addr, size_t __length, unsigned int __flags),(__addr,__length,__flags))

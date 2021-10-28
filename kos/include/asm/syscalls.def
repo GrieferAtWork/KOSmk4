@@ -715,8 +715,8 @@ signalfd:(fd_t fd, [tostr(STRUCT_SIGSET:sigmasksize)] struct __sigset_struct con
 signalfd4:(fd_t fd, [tostr(STRUCT_SIGSET:sigmasksize)] struct __sigset_struct const *sigmask,
            size_t sigmasksize, [tostr(SIGNALFD4_FLAGS)] syscall_ulong_t flags) -> errno_t;
 
-@@@param: flags: Set of `MFD_CLOEXEC | MFD_ALLOW_SEALING'
-memfd_create:(char const *name, [tostr(MEMFD_CREATE_FLAGS)] syscall_ulong_t flags) -> fd_t; /* UNIMPLEMENTED! */
+@@@param: flags: Set of `MFD_CLOEXEC | MFD_CLOFORK | MFD_ALLOW_SEALING | MFD_HUGETLB'
+memfd_create:(char const *name, [tostr(MEMFD_CREATE_FLAGS)] syscall_ulong_t flags) -> fd_t;
 
 @@Construct   a   user-vio-fd  object   supporting  mmap(2),   with  actual
 @@memory  accesses  being dispatched  by  adding them  as  pending requests

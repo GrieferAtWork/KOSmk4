@@ -531,6 +531,14 @@
 #define MFD_HUGETLB __MFD_HUGETLB
 #endif /* !MFD_HUGETLB && __MFD_HUGETLB */
 
+#ifdef __USE_KOS
+/* Close-on-fork */
+#if !defined(MFD_CLOFORK) && defined(__MFD_CLOFORK)
+#define MFD_CLOFORK __MFD_CLOFORK
+#endif /* !MFD_CLOFORK && __MFD_CLOFORK */
+#endif /* __USE_KOS */
+
+
 
 /************************************************************************/
 /* Flags for `mlock2()'                                                 */
@@ -799,6 +807,8 @@ int remap_file_pages(void *start, size_t size,
                      __STDC_INT_AS_UINT_T flags);
 
 @@>> memfd_create(2)
+@@@param: name:  Set `/proc/[pid]/fd/[return]' = "memfd:${name}"
+@@@param: flags: Set of `MFD_CLOEXEC | MFD_CLOFORK | MFD_ALLOW_SEALING | MFD_HUGETLB'
 $fd_t memfd_create(char const *name, unsigned int flags);
 
 @@>> mlock2(2)

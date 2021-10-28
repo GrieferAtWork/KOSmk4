@@ -131,9 +131,12 @@
 #endif /* __KOS_VERSION__ >= 400 */
 #endif /* __KOS__ */
 
-#define __MFD_CLOEXEC       0x1 /* Close-on-exec */
-#define __MFD_ALLOW_SEALING 0x2 /* Allow use of `F_ADD_SEALS' and `F_GET_SEALS' (when not given, `F_SEAL_SEAL' is set on creation) */
-#define __MFD_HUGETLB       0x4 /* ... */
+#define __MFD_CLOEXEC       0x0000001 /* Close-on-exec */
+#define __MFD_ALLOW_SEALING 0x0000002 /* Allow use of `F_ADD_SEALS' and `F_GET_SEALS' (when not given, `F_SEAL_SEAL' is set on creation) */
+#define __MFD_HUGETLB       0x0000004 /* ... */
+#ifdef __KOS__
+#define __MFD_CLOFORK       0x1000000 /* Close-on-fork */
+#endif /* __KOS__ */
 
 #define __MLOCK_ONFAULT 0x1 /* Delegate population of locked memory until the first access. */
 

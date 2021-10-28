@@ -293,8 +293,10 @@ NOTHROW_NCX(LIBCCALL libc_remap_file_pages)(void *start,
 }
 /*[[[end:libc_remap_file_pages]]]*/
 
-/*[[[head:libc_memfd_create,hash:CRC-32=0x7ab68fd3]]]*/
-/* >> memfd_create(2) */
+/*[[[head:libc_memfd_create,hash:CRC-32=0xced4048f]]]*/
+/* >> memfd_create(2)
+ * @param: name:  Set `/proc/[pid]/fd/[return]' = "memfd:${name}"
+ * @param: flags: Set of `MFD_CLOEXEC | MFD_CLOFORK | MFD_ALLOW_SEALING | MFD_HUGETLB' */
 INTERN ATTR_SECTION(".text.crt.system.mman") fd_t
 NOTHROW_NCX(LIBCCALL libc_memfd_create)(char const *name,
                                         unsigned int flags)

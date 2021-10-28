@@ -112,10 +112,10 @@ NOTHROW(FCALL vfs_recent)(struct vfs *__restrict path_vfs,
 		}
 	} else {
 		/* Check if `self' may even  be added to the  cache.
-		 * For this purpose, `MFILE_FM_FLEETING' is  tested,
+		 * For this purpose, `MFILE_FN_FLEETING' is  tested,
 		 * which is set for per-process folders of /proc  in
 		 * order to prevent these folders from being cached. */
-		if (self->p_dir->mf_flags & MFILE_FM_FLEETING)
+		if (self->p_dir->mf_flags & MFILE_FN_FLEETING)
 			goto done_unlock;
 
 		/* Add new path to recent cache. */

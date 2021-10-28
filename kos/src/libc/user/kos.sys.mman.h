@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3c32fe7c */
+/* HASH CRC-32:0x55bac541 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -70,7 +70,9 @@ INTDEF NONNULL((1)) void (LIBCCALL libc_PosixMAdvise)(void *addr, size_t len, __
 INTDEF void *(VLIBCCALL libc_MRemap)(void *addr, size_t old_len, size_t new_len, __STDC_INT_AS_UINT_T flags, ...) THROWS(...);
 /* >> remap_file_pages(2) */
 INTDEF void (LIBCCALL libc_RemapFilePages)(void *start, size_t size, __STDC_INT_AS_UINT_T prot, size_t pgoff, __STDC_INT_AS_UINT_T flags) THROWS(...);
-/* >> memfd_create(2) */
+/* >> memfd_create(2)
+ * @param: name:  Set `/proc/[pid]/fd/[return]' = "memfd:${name}"
+ * @param: flags: Set of `MFD_CLOEXEC | MFD_CLOFORK | MFD_ALLOW_SEALING | MFD_HUGETLB' */
 INTDEF fd_t (LIBCCALL libc_MemFdCreate)(char const *name, unsigned int flags) THROWS(...);
 /* >> mlock2(2) */
 INTDEF void (LIBCCALL libc_MLock2)(void const *addr, size_t length, unsigned int flags) THROWS(...);

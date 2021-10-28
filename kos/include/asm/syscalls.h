@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc8bee20b */
+/* HASH CRC-32:0xd73dd07f */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -702,7 +702,7 @@
 #define __NR_seccomp                0x115 /* errno_t seccomp(int TODO_PROTOTYPE) */
 /* @param: flags: Set of `0 | GRND_RANDOM | GRND_NONBLOCK' */
 #define __NR_getrandom              0x116 /* ssize_t getrandom(void *buf, size_t num_bytes, syscall_ulong_t flags) */
-/* @param: flags: Set of `MFD_CLOEXEC | MFD_ALLOW_SEALING' */
+/* @param: flags: Set of `MFD_CLOEXEC | MFD_CLOFORK | MFD_ALLOW_SEALING | MFD_HUGETLB' */
 #define __NR_memfd_create           0x117 /* fd_t memfd_create(char const *name, syscall_ulong_t flags) */
 #define __NR_bpf                    0x118 /* errno_t bpf(int TODO_PROTOTYPE) */
 /* Replace the calling  process with  the application  image referred  to by  `path' /  `file'

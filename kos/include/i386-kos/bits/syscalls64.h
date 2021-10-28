@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3597e0b5 */
+/* HASH CRC-32:0x42ea651f */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -886,7 +886,7 @@
 #define SYS_seccomp                  __NR_seccomp                  /* errno_t seccomp(int TODO_PROTOTYPE) */
 /* @param: flags: Set of `0 | GRND_RANDOM | GRND_NONBLOCK' */
 #define SYS_getrandom                __NR_getrandom                /* ssize_t getrandom(void *buf, size_t num_bytes, syscall_ulong_t flags) */
-/* @param: flags: Set of `MFD_CLOEXEC | MFD_ALLOW_SEALING' */
+/* @param: flags: Set of `MFD_CLOEXEC | MFD_CLOFORK | MFD_ALLOW_SEALING | MFD_HUGETLB' */
 #define SYS_memfd_create             __NR_memfd_create             /* fd_t memfd_create(char const *name, syscall_ulong_t flags) */
 #define SYS_kexec_file_load          __NR_kexec_file_load          /* errno_t kexec_file_load(int TODO_PROTOTYPE) */
 #define SYS_bpf                      __NR_bpf                      /* errno_t bpf(int TODO_PROTOTYPE) */

@@ -594,7 +594,7 @@ struct mfile_ops {
 /*      MFILE_F_                0x02000000  * ... Reserved: MS_LAZYTIME */
 /*efine MFILE_F_                0x04000000  * ... */
 /*efine MFILE_F_                0x08000000  * ... */
-#define MFILE_FM_FLEETING       0x10000000 /* [const] When set for fdirnode-derived nodes, don't recent-cache `struct path'
+#define MFILE_FN_FLEETING       0x10000000 /* [const] When set for fdirnode-derived nodes, don't recent-cache `struct path'
                                             * objects created for the purpose of path  traversal. - This is used by  procfs
                                             * for  per-process directories in  order to prevent them  being cached, as such
                                             * folders can randomly disappear as the result of thread/process exits. */
