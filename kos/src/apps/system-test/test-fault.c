@@ -26,7 +26,7 @@
 
 #include <hybrid/host.h>
 
-#if defined(__x86_64__) || defined(__i386__)
+#if 0
 #include <hybrid/atomic.h>
 #include <hybrid/typecore.h> /* __REGISTER_TYPE__ */
 

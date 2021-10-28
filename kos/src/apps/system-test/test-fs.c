@@ -161,7 +161,7 @@ PRIVATE void testPath(char const *path) {
 	assertFileText(dfd, "test", "F1\n");
 
 	/* Now rename the file */
-	assertf(renameat(dfd, "test", dfd, "test2") == 0, "%m");
+	assertf(renameat2(dfd, "test", dfd, "test2", AT_RENAME_NOREPLACE) == 0, "%m");
 
 	/* The open should now fail. */
 	fd = openat(dfd, "test", O_RDONLY);
@@ -184,9 +184,9 @@ PRIVATE void testPath(char const *path) {
 	assertFileText(dfd, "test", "F2\n");
 
 	/* At this point, a rename should fail with EEXIST */
-	assert(renameat(dfd, "test", dfd, "test2") == -1);
+	assert(renameat2(dfd, "test", dfd, "test2", AT_RENAME_NOREPLACE) == -1);
 	assertf(errno == EEXIST, "%m");
-	assert(renameat(dfd, "test2", dfd, "test") == -1);
+	assert(renameat2(dfd, "test2", dfd, "test", AT_RENAME_NOREPLACE) == -1);
 	assertf(errno == EEXIST, "%m");
 
 	/* Try to delete `test2' and re-attempt the rename */
@@ -201,7 +201,7 @@ PRIVATE void testPath(char const *path) {
 	assertf(errno == ENOENT, "%m");
 
 	/* Now try the rename once again */
-	assertf(renameat(dfd, "test", dfd, "test2") == 0, "%m");
+	assertf(renameat2(dfd, "test", dfd, "test2", AT_RENAME_NOREPLACE) == 0, "%m");
 
 	/* Verify the contents of the "test2" file */
 	assertFileText(dfd, "test2", "F2\n");

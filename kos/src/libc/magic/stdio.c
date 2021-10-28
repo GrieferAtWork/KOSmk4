@@ -238,6 +238,32 @@ __SYSDECL_BEGIN
 #endif /* __IOV_MAX == -1 */
 #endif /* !IOV_MAX */
 
+#ifdef __USE_GNU
+#if !defined(RENAME_NOREPLACE) && defined(__RENAME_NOREPLACE)
+#define RENAME_NOREPLACE __RENAME_NOREPLACE /* Don't overwrite target */
+#endif /* !RENAME_NOREPLACE && __RENAME_NOREPLACE */
+#if !defined(RENAME_EXCHANGE) && defined(__RENAME_EXCHANGE)
+#define RENAME_EXCHANGE  __RENAME_EXCHANGE  /* Exchange source and dest */
+#endif /* !RENAME_EXCHANGE && __RENAME_EXCHANGE */
+#if !defined(RENAME_WHITEOUT) && defined(__RENAME_WHITEOUT)
+#define RENAME_WHITEOUT  __RENAME_WHITEOUT  /* Whiteout source */
+#endif /* !RENAME_WHITEOUT && __RENAME_WHITEOUT */
+#endif /* __USE_GNU */
+
+#ifdef __USE_KOS
+#if !defined(AT_RENAME_NOREPLACE) && defined(__RENAME_NOREPLACE)
+#define AT_RENAME_NOREPLACE __RENAME_NOREPLACE /* Don't overwrite target */
+#endif /* !AT_RENAME_NOREPLACE && __RENAME_NOREPLACE */
+#if !defined(AT_RENAME_EXCHANGE) && defined(__RENAME_EXCHANGE)
+#define AT_RENAME_EXCHANGE  __RENAME_EXCHANGE  /* Exchange source and dest */
+#endif /* !AT_RENAME_EXCHANGE && __RENAME_EXCHANGE */
+#if !defined(AT_RENAME_WHITEOUT) && defined(__RENAME_WHITEOUT)
+#define AT_RENAME_WHITEOUT  __RENAME_WHITEOUT  /* Whiteout source */
+#endif /* !AT_RENAME_WHITEOUT && __RENAME_WHITEOUT */
+#if !defined(AT_RENAME_MOVETODIR) && defined(__RENAME_MOVETODIR)
+#define AT_RENAME_MOVETODIR __RENAME_MOVETODIR /* If `newpath' is a directory, move `oldpath' into it. */
+#endif /* !AT_RENAME_MOVETODIR && __RENAME_MOVETODIR */
+#endif /* __USE_KOS */
 
 
 #ifdef __CC__
@@ -1582,10 +1608,10 @@ __STDC_INT_AS_SSIZE_T dprintf($fd_t fd, [[nonnull]] char const *__restrict forma
 %
 %#ifdef __USE_ATFILE
 @@>> renameat(2)
-[[cp, userimpl, requires_function(frenameat), section(".text.crt{|.dos}.fs.modify")]]
+[[cp, userimpl, requires_function(renameat2), section(".text.crt{|.dos}.fs.modify")]]
 int renameat($fd_t oldfd, [[nonnull]] char const *oldname,
              $fd_t newfd, [[nonnull]] char const *newname_or_path) {
-	return frenameat(oldfd, oldname, newfd, newname_or_path, 0);
+	return renameat2(oldfd, oldname, newfd, newname_or_path, 0);
 }
 
 %
@@ -1594,16 +1620,26 @@ int renameat($fd_t oldfd, [[nonnull]] char const *oldname,
 @@Remove a file or directory `filename' relative to a given base directory `dirfd'
 [[cp, section(".text.crt{|.dos}.fs.modify")]]
 int removeat($fd_t dirfd, [[nonnull]] char const *filename);
-
-@@>> frenameat(2)
-@@@param flags: Set of `0 | AT_DOSPATH'
-[[cp, section(".text.crt{|.dos}.fs.modify")]]
-int frenameat($fd_t oldfd, [[nonnull]] char const *oldname,
-              $fd_t newfd, [[nonnull]] char const *newname_or_path,
-              $atflag_t flags);
-
 %#endif /* __USE_KOS */
 %#endif /* __USE_ATFILE */
+
+
+%#ifdef __USE_GNU
+@@>> renameat2(2)
+@@@param flags: Set of `0 | AT_RENAME_NOREPLACE | AT_RENAME_EXCHANGE |
+@@                      AT_RENAME_WHITEOUT | AT_RENAME_MOVETODIR | AT_DOSPATH'
+@@NOTE: For portability, use the following names:
+@@  - `AT_RENAME_NOREPLACE' --> `RENAME_NOREPLACE'
+@@  - `AT_RENAME_EXCHANGE'  --> `RENAME_EXCHANGE'
+@@  - `AT_RENAME_WHITEOUT'  --> `RENAME_WHITEOUT'
+[[cp, section(".text.crt{|.dos}.fs.modify")]]
+int renameat2($fd_t oldfd, [[nonnull]] char const *oldname,
+              $fd_t newfd, [[nonnull]] char const *newname_or_path,
+              $atflag_t flags);
+%#endif /* __USE_GNU */
+
+
+
 
 %
 %#ifdef __USE_MISC

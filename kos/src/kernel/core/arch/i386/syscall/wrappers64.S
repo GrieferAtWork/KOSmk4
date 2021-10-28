@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb9fb11d0 */
+/* HASH CRC-32:0x3d00187c */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -10127,8 +10127,8 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_sched_getattr)
 	.cfi_endproc
 END(__x86_asm64_syscall_sched_getattr)
 
-/* @param: flags: Set of `RENAME_EXCHANGE | RENAME_NOREPLACE | RENAME_WHITEOUT' */
-/* errno_t renameat2(fd_t olddirfd, char const *oldpath, fd_t newdirfd, char const *newpath, syscall_ulong_t flags) */
+/* @param: flags: Set of `0 | AT_RENAME_NOREPLACE | AT_RENAME_EXCHANGE | AT_RENAME_WHITEOUT | AT_RENAME_MOVETODIR | AT_DOSPATH' */
+/* errno_t renameat2(fd_t olddirfd, char const *oldpath, fd_t newdirfd, char const *newpath, atflag_t flags) */
 .section .text.x86.asm64_syscall.renameat2
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_renameat2)
 	.cfi_startproc simple
@@ -11351,38 +11351,6 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_fsymlinkat)
 	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_fsymlinkat)
-
-/* @param: flags: Set of `0 | AT_DOSPATH' */
-/* errno_t frenameat(fd_t oldfd, char const *oldname, fd_t newfd, char const *newname_or_path, atflag_t flags) */
-.section .text.x86.asm64_syscall.frenameat
-INTERN_WEAK_FUNCTION(__x86_asm64_syscall_frenameat)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm64_syscall
-	.cfi_lsda 0, 0xfffffffffffffef8
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %rsp, 0
-	pushq_cfi_r %rcx
-	pushq_cfi_r %rdx
-	pushq_cfi_r %rsi
-	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
-	movq   %r10, %rcx
-	EXTERN(sys_frenameat)
-	call   sys_frenameat
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
-	popq_cfi_r %rdi
-	popq_cfi_r %rsi
-	popq_cfi_r %rdx
-	popq_cfi_r %rcx
-	X86_IRET_BUT_PREFER_SYSRET64
-	.cfi_endproc
-END(__x86_asm64_syscall_frenameat)
 
 /* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
 /* errno_t kfstatat(fd_t dirfd, char const *filename, struct __kos_statx64 *statbuf, atflag_t flags) */
@@ -22068,8 +22036,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_sched_getattr)
 	.cfi_endproc
 END(__x86_asm32_int80_sched_getattr)
 
-/* @param: flags: Set of `RENAME_EXCHANGE | RENAME_NOREPLACE | RENAME_WHITEOUT' */
-/* errno_t renameat2(fd_t olddirfd, char const *oldpath, fd_t newdirfd, char const *newpath, syscall_ulong_t flags) */
+/* @param: flags: Set of `0 | AT_RENAME_NOREPLACE | AT_RENAME_EXCHANGE | AT_RENAME_WHITEOUT | AT_RENAME_MOVETODIR | AT_DOSPATH' */
+/* errno_t renameat2(fd_t olddirfd, char const *oldpath, fd_t newdirfd, char const *newpath, atflag_t flags) */
 .section .text.x86.asm32_syscall_int80.renameat2
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_renameat2)
 	.cfi_startproc simple
@@ -24402,35 +24370,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fsymlinkat)
 	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_fsymlinkat)
-
-/* @param: flags: Set of `0 | AT_DOSPATH' */
-/* errno_t frenameat(fd_t oldfd, char const *oldname, fd_t newfd, char const *newname_or_path, atflag_t flags) */
-.section .text.x86.asm32_syscall_int80.frenameat
-INTERN_WEAK_FUNCTION(__x86_asm32_int80_frenameat)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm32_int80
-	.cfi_lsda 0, 0xfffffed2
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %rsp, 0
-	pushq_cfi_r %rcx
-	pushq_cfi_r %rdx
-	pushq_cfi_r %rsi
-	pushq_cfi_r %rdi
-	movzlq %edi, %r8 /* ARG4 = REG4 */
-	movslq %edx, %rdx /* ARG2 = REG2 */
-	movzlq %esi, %rsi /* ARG1 = REG3 */
-	movzlq %ecx, %rcx /* ARG3 = REG1 */
-	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
-	movslq %ebx, %rdi /* ARG0 = REG0 */
-	EXTERN(sys32_frenameat)
-	call   sys32_frenameat
-	popq_cfi_r %rdi
-	popq_cfi_r %rsi
-	popq_cfi_r %rdx
-	popq_cfi_r %rcx
-	intr_exit
-	.cfi_endproc
-END(__x86_asm32_int80_frenameat)
 
 /* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
 /* errno_t kfstatat(fd_t dirfd, char const *filename, struct __kos_statx32 *statbuf, atflag_t flags) */
@@ -28978,8 +28917,8 @@ DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_sched_setattr, __x86_asm32_int80_s
 /* errno_t sched_getattr(int TODO_PROTOTYPE) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_sched_getattr, __x86_asm32_int80_sched_getattr)
 
-/* @param: flags: Set of `RENAME_EXCHANGE | RENAME_NOREPLACE | RENAME_WHITEOUT' */
-/* errno_t renameat2(fd_t olddirfd, char const *oldpath, fd_t newdirfd, char const *newpath, syscall_ulong_t flags) */
+/* @param: flags: Set of `0 | AT_RENAME_NOREPLACE | AT_RENAME_EXCHANGE | AT_RENAME_WHITEOUT | AT_RENAME_MOVETODIR | AT_DOSPATH' */
+/* errno_t renameat2(fd_t olddirfd, char const *oldpath, fd_t newdirfd, char const *newpath, atflag_t flags) */
 .section .text.x86.asm32_syscall_sysenter.renameat2
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_renameat2)
 	.cfi_startproc simple
@@ -29983,43 +29922,6 @@ END(__x86_asm32_sysenter_freadlinkat)
 /* @param: flags: Set of `0 | AT_DOSPATH' */
 /* errno_t fsymlinkat(char const *link_text, fd_t tofd, char const *target_path, atflag_t flags) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_fsymlinkat, __x86_asm32_int80_fsymlinkat)
-
-/* @param: flags: Set of `0 | AT_DOSPATH' */
-/* errno_t frenameat(fd_t oldfd, char const *oldname, fd_t newfd, char const *newname_or_path, atflag_t flags) */
-.section .text.x86.asm32_syscall_sysenter.frenameat
-INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_frenameat)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
-	.cfi_lsda 0, 0xfffffed2
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %rsp, 0
-	pushq_cfi_r %rcx
-	pushq_cfi_r %rdx
-	pushq_cfi_r %rsi
-	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
-	movzlq 0(%ebp), %r8 /* ARG4 = 0(%ebp) */
-	movslq %edx, %rdx /* ARG2 = REG2 */
-	movzlq %esi, %rsi /* ARG1 = REG3 */
-	movzlq %ecx, %rcx /* ARG3 = REG1 */
-	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
-	movslq %ebx, %rdi /* ARG0 = REG0 */
-	EXTERN(sys32_frenameat)
-	call   sys32_frenameat
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
-	popq_cfi_r %rdi
-	popq_cfi_r %rsi
-	popq_cfi_r %rdx
-	popq_cfi_r %rcx
-	X86_IRET_BUT_PREFER_SYSRET32
-	.cfi_endproc
-END(__x86_asm32_sysenter_frenameat)
 
 /* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
 /* errno_t kfstatat(fd_t dirfd, char const *filename, struct __kos_statx32 *statbuf, atflag_t flags) */
@@ -35222,8 +35124,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_sched_getattr)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_sched_getattr)
 
-/* @param: flags: Set of `RENAME_EXCHANGE | RENAME_NOREPLACE | RENAME_WHITEOUT' */
-/* errno_t renameat2(fd_t olddirfd, char const *oldpath, fd_t newdirfd, char const *newpath, syscall_ulong_t flags) */
+/* @param: flags: Set of `0 | AT_RENAME_NOREPLACE | AT_RENAME_EXCHANGE | AT_RENAME_WHITEOUT | AT_RENAME_MOVETODIR | AT_DOSPATH' */
+/* errno_t renameat2(fd_t olddirfd, char const *oldpath, fd_t newdirfd, char const *newpath, atflag_t flags) */
 .section .text.x86.asm32_syscall_sysrun32.renameat2
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_renameat2)
 	.cfi_startproc
@@ -36425,21 +36327,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_fsymlinkat)
 	jmp    sys32_fsymlinkat
 	.cfi_endproc
 END(__x86_asm32_sysrun32_fsymlinkat)
-
-/* @param: flags: Set of `0 | AT_DOSPATH' */
-/* errno_t frenameat(fd_t oldfd, char const *oldname, fd_t newfd, char const *newname_or_path, atflag_t flags) */
-.section .text.x86.asm32_syscall_sysrun32.frenameat
-INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_frenameat)
-	.cfi_startproc
-	movzlq 32(%rdi), %r8
-	movzlq 24(%rdi), %rcx
-	movzlq 16(%rdi), %rdx
-	movzlq 8(%rdi), %rsi
-	movzlq 0(%rdi), %rdi
-	EXTERN(sys32_frenameat)
-	jmp    sys32_frenameat
-	.cfi_endproc
-END(__x86_asm32_sysrun32_frenameat)
 
 /* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
 /* errno_t kfstatat(fd_t dirfd, char const *filename, struct __kos_statx32 *statbuf, atflag_t flags) */

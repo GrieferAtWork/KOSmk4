@@ -1971,7 +1971,6 @@
 #define __CRT_HAVE_freelocale
 #define __CRT_HAVE_freezero
 #define __CRT_HAVE_fremovexattr
-#define __CRT_HAVE_frenameat
 #define __CRT_HAVE_freopen
 #define __CRT_HAVE_freopen64
 #define __CRT_HAVE_freopen64_unlocked
@@ -3227,6 +3226,7 @@
 #define __CRT_HAVE_remquol
 #define __CRT_HAVE_rename
 #define __CRT_HAVE_renameat
+#define __CRT_HAVE_renameat2
 #define __CRT_HAVE_resolvepath
 #define __CRT_HAVE_revoke
 #define __CRT_HAVE_rewind
@@ -3713,7 +3713,6 @@
 #define __CRT_HAVE_sys_Xfrealpath4
 #define __CRT_HAVE_sys_Xfrealpathat
 #define __CRT_HAVE_sys_Xfremovexattr
-#define __CRT_HAVE_sys_Xfrenameat
 #define __CRT_HAVE_sys_Xfsconfig
 #define __CRT_HAVE_sys_Xfsetxattr
 #define __CRT_HAVE_sys_Xfsmode
@@ -4206,7 +4205,6 @@
 #define __CRT_HAVE_sys_frealpath4
 #define __CRT_HAVE_sys_frealpathat
 #define __CRT_HAVE_sys_fremovexattr
-#define __CRT_HAVE_sys_frenameat
 #define __CRT_HAVE_sys_fsconfig
 #define __CRT_HAVE_sys_fsetxattr
 #define __CRT_HAVE_sys_fsmode

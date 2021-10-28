@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x475487f7 */
+/* HASH CRC-32:0xeb60c5 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -106,7 +106,6 @@
 #define __CRT_HAVE_sys_frealpath4
 #define __CRT_HAVE_sys_frealpathat
 #define __CRT_HAVE_sys_fremovexattr
-#define __CRT_HAVE_sys_frenameat
 #define __CRT_HAVE_sys_fsconfig
 #define __CRT_HAVE_sys_fsetxattr
 #define __CRT_HAVE_sys_fsmode
@@ -600,7 +599,6 @@
 #define __CRT_HAVE_sys_Xfrealpath4
 #define __CRT_HAVE_sys_Xfrealpathat
 #define __CRT_HAVE_sys_Xfremovexattr
-#define __CRT_HAVE_sys_Xfrenameat
 #define __CRT_HAVE_sys_Xfsconfig
 #define __CRT_HAVE_sys_Xfsetxattr
 #define __CRT_HAVE_sys_Xfsmode

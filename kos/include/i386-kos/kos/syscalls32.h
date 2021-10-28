@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x59e88f9a */
+/* HASH CRC-32:0xfd555e4c */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -701,10 +701,6 @@ __CDECLARE_SC(,__ssize_t,frealpathat,(__fd_t __dirfd, char const *__filename, ch
 #if __CRT_HAVE_SC(fremovexattr)
 __CDECLARE_SC(,__errno_t,fremovexattr,(__fd_t __fd, char const *__name),(__fd,__name))
 #endif /* __CRT_HAVE_SC(fremovexattr) */
-#if __CRT_HAVE_SC(frenameat)
-/* @param: flags: Set of `0 | AT_DOSPATH' */
-__CDECLARE_SC(,__errno_t,frenameat,(__fd_t __oldfd, char const *__oldname, __fd_t __newfd, char const *__newname_or_path, __atflag_t __flags),(__oldfd,__oldname,__newfd,__newname_or_path,__flags))
-#endif /* __CRT_HAVE_SC(frenameat) */
 #if __CRT_HAVE_SC(fsconfig)
 __CDECLARE_SC(,__errno_t,fsconfig,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 #endif /* __CRT_HAVE_SC(fsconfig) */
@@ -1782,8 +1778,8 @@ __CDECLARE_SC(,__errno_t,rename,(char const *__oldname, char const *__newname_or
 __CDECLARE_SC(,__errno_t,renameat,(__fd_t __oldfd, char const *__oldname, __fd_t __newfd, char const *__newname_or_path),(__oldfd,__oldname,__newfd,__newname_or_path))
 #endif /* __CRT_HAVE_SC(renameat) */
 #if __CRT_HAVE_SC(renameat2)
-/* @param: flags: Set of `RENAME_EXCHANGE | RENAME_NOREPLACE | RENAME_WHITEOUT' */
-__CDECLARE_SC(,__errno_t,renameat2,(__fd_t __olddirfd, char const *__oldpath, __fd_t __newdirfd, char const *__newpath, __syscall_ulong_t __flags),(__olddirfd,__oldpath,__newdirfd,__newpath,__flags))
+/* @param: flags: Set of `0 | AT_RENAME_NOREPLACE | AT_RENAME_EXCHANGE | AT_RENAME_WHITEOUT | AT_RENAME_MOVETODIR | AT_DOSPATH' */
+__CDECLARE_SC(,__errno_t,renameat2,(__fd_t __olddirfd, char const *__oldpath, __fd_t __newdirfd, char const *__newpath, __atflag_t __flags),(__olddirfd,__oldpath,__newdirfd,__newpath,__flags))
 #endif /* __CRT_HAVE_SC(renameat2) */
 #if __CRT_HAVE_SC(request_key)
 __CDECLARE_SC(,__errno_t,request_key,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
@@ -3248,10 +3244,6 @@ __CDECLARE_XSC(,__ssize_t,frealpathat,(__fd_t __dirfd, char const *__filename, c
 #if __CRT_HAVE_XSC(fremovexattr)
 __CDECLARE_XSC(,__errno_t,fremovexattr,(__fd_t __fd, char const *__name),(__fd,__name))
 #endif /* __CRT_HAVE_XSC(fremovexattr) */
-#if __CRT_HAVE_XSC(frenameat)
-/* @param: flags: Set of `0 | AT_DOSPATH' */
-__CDECLARE_XSC(,__errno_t,frenameat,(__fd_t __oldfd, char const *__oldname, __fd_t __newfd, char const *__newname_or_path, __atflag_t __flags),(__oldfd,__oldname,__newfd,__newname_or_path,__flags))
-#endif /* __CRT_HAVE_XSC(frenameat) */
 #if __CRT_HAVE_XSC(fsconfig)
 __CDECLARE_XSC(,__errno_t,fsconfig,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 #endif /* __CRT_HAVE_XSC(fsconfig) */
@@ -4329,8 +4321,8 @@ __CDECLARE_XSC(,__errno_t,rename,(char const *__oldname, char const *__newname_o
 __CDECLARE_XSC(,__errno_t,renameat,(__fd_t __oldfd, char const *__oldname, __fd_t __newfd, char const *__newname_or_path),(__oldfd,__oldname,__newfd,__newname_or_path))
 #endif /* __CRT_HAVE_XSC(renameat) */
 #if __CRT_HAVE_XSC(renameat2)
-/* @param: flags: Set of `RENAME_EXCHANGE | RENAME_NOREPLACE | RENAME_WHITEOUT' */
-__CDECLARE_XSC(,__errno_t,renameat2,(__fd_t __olddirfd, char const *__oldpath, __fd_t __newdirfd, char const *__newpath, __syscall_ulong_t __flags),(__olddirfd,__oldpath,__newdirfd,__newpath,__flags))
+/* @param: flags: Set of `0 | AT_RENAME_NOREPLACE | AT_RENAME_EXCHANGE | AT_RENAME_WHITEOUT | AT_RENAME_MOVETODIR | AT_DOSPATH' */
+__CDECLARE_XSC(,__errno_t,renameat2,(__fd_t __olddirfd, char const *__oldpath, __fd_t __newdirfd, char const *__newpath, __atflag_t __flags),(__olddirfd,__oldpath,__newdirfd,__newpath,__flags))
 #endif /* __CRT_HAVE_XSC(renameat2) */
 #if __CRT_HAVE_XSC(request_key)
 __CDECLARE_XSC(,__errno_t,request_key,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))

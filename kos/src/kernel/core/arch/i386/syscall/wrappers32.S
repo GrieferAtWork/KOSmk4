@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd8a433f1 */
+/* HASH CRC-32:0xd50c0dc3 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -13481,8 +13481,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_sched_getattr)
 	.cfi_endproc
 END(__x86_asm32_int80_sched_getattr)
 
-/* @param: flags: Set of `RENAME_EXCHANGE | RENAME_NOREPLACE | RENAME_WHITEOUT' */
-/* errno_t renameat2(fd_t olddirfd, char const *oldpath, fd_t newdirfd, char const *newpath, syscall_ulong_t flags) */
+/* @param: flags: Set of `0 | AT_RENAME_NOREPLACE | AT_RENAME_EXCHANGE | AT_RENAME_WHITEOUT | AT_RENAME_MOVETODIR | AT_DOSPATH' */
+/* errno_t renameat2(fd_t olddirfd, char const *oldpath, fd_t newdirfd, char const *newpath, atflag_t flags) */
 .section .text.x86.asm32_syscall_int80.renameat2
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_renameat2)
 	.cfi_startproc simple
@@ -16924,48 +16924,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fsymlinkat)
 	iret
 	.cfi_endproc
 END(__x86_asm32_int80_fsymlinkat)
-
-/* @param: flags: Set of `0 | AT_DOSPATH' */
-/* errno_t frenameat(fd_t oldfd, char const *oldname, fd_t newfd, char const *newname_or_path, atflag_t flags) */
-.section .text.x86.asm32_syscall_int80.frenameat
-INTERN_WEAK_FUNCTION(__x86_asm32_int80_frenameat)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm32_int80
-	.cfi_lsda 0, 0xfffffed2
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %esp, 0
-	pushl_cfi %ds
-	.cfi_restore_iret_ds_or_offset -4
-	pushl_cfi %es
-	.cfi_restore_iret_es_or_offset -8
-	pushl_cfi %fs
-	.cfi_restore_iret_fs_or_offset -12
-	movw   $(SEGMENT_USER_DATA_RPL), %ax
-	movw   %ax, %ds
-	movw   %ax, %es
-	movw   $(SEGMENT_KERNEL_FSBASE), %ax
-	movw   %ax, %fs
-	pushl_cfi_r %edi  /* Arg #4 */
-	pushl_cfi_r %esi  /* Arg #3 */
-	pushl_cfi_r %edx  /* Arg #2 */
-	pushl_cfi_r %ecx  /* Arg #1 */
-	pushl_cfi_r %ebx  /* Arg #0 */
-	EXTERN(sys_frenameat)
-	call   sys_frenameat
-	popl_cfi_r %ebx
-	popl_cfi_r %ecx
-	popl_cfi_r %edx
-	addl   $(8), %esp
-	.cfi_adjust_cfa_offset -8
-	popl_cfi %fs
-	.cfi_restore_iret_fs
-	popl_cfi %es
-	.cfi_restore_iret_es
-	popl_cfi %ds
-	.cfi_restore_iret_ds
-	iret
-	.cfi_endproc
-END(__x86_asm32_int80_frenameat)
 
 /* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
 /* errno_t kfstatat(fd_t dirfd, char const *filename, struct __kos_statx32 *statbuf, atflag_t flags) */
@@ -33169,8 +33127,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_sched_getattr)
 	.cfi_endproc
 END(__x86_asm32_sysenter_sched_getattr)
 
-/* @param: flags: Set of `RENAME_EXCHANGE | RENAME_NOREPLACE | RENAME_WHITEOUT' */
-/* errno_t renameat2(fd_t olddirfd, char const *oldpath, fd_t newdirfd, char const *newpath, syscall_ulong_t flags) */
+/* @param: flags: Set of `0 | AT_RENAME_NOREPLACE | AT_RENAME_EXCHANGE | AT_RENAME_WHITEOUT | AT_RENAME_MOVETODIR | AT_DOSPATH' */
+/* errno_t renameat2(fd_t olddirfd, char const *oldpath, fd_t newdirfd, char const *newpath, atflag_t flags) */
 .section .text.x86.asm32_syscall_sysenter.renameat2
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_renameat2)
 	.cfi_startproc simple
@@ -36644,50 +36602,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_fsymlinkat)
 	X86_IRET_BUT_PREFER_SYSEXIT
 	.cfi_endproc
 END(__x86_asm32_sysenter_fsymlinkat)
-
-/* @param: flags: Set of `0 | AT_DOSPATH' */
-/* errno_t frenameat(fd_t oldfd, char const *oldname, fd_t newfd, char const *newname_or_path, atflag_t flags) */
-.section .text.x86.asm32_syscall_sysenter.frenameat
-INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_frenameat)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
-	.cfi_lsda 0, 0xfffffed2
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %esp, 0
-	pushl_cfi %ds
-	.cfi_restore_iret_ds_or_offset -4
-	pushl_cfi %es
-	.cfi_restore_iret_es_or_offset -8
-	pushl_cfi %fs
-	.cfi_restore_iret_fs_or_offset -12
-	movw   $(SEGMENT_USER_DATA_RPL), %ax
-	movw   %ax, %ds
-	movw   %ax, %es
-	movw   $(SEGMENT_KERNEL_FSBASE), %ax
-	movw   %ax, %fs
-	cmpl   $(KERNELSPACE_BASE), %ebp
-	jae    __asm32_bad_sysenter_extension
-	pushl_cfi   0(%ebp)  /* Arg #4 (WARNING: SEGFAULT!) */
-	pushl_cfi_r %esi  /* Arg #3 */
-	pushl_cfi_r %edx  /* Arg #2 */
-	pushl_cfi_r %ecx  /* Arg #1 */
-	pushl_cfi_r %ebx  /* Arg #0 */
-	EXTERN(sys_frenameat)
-	call   sys_frenameat
-	popl_cfi_r %ebx
-	popl_cfi_r %ecx
-	popl_cfi_r %edx
-	addl   $(8), %esp
-	.cfi_adjust_cfa_offset -8
-	popl_cfi %fs
-	.cfi_restore_iret_fs
-	popl_cfi %es
-	.cfi_restore_iret_es
-	popl_cfi %ds
-	.cfi_restore_iret_ds
-	X86_IRET_BUT_PREFER_SYSEXIT
-	.cfi_endproc
-END(__x86_asm32_sysenter_frenameat)
 
 /* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
 /* errno_t kfstatat(fd_t dirfd, char const *filename, struct __kos_statx32 *statbuf, atflag_t flags) */

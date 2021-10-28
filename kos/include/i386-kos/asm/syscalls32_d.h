@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb4d0a73 */
+/* HASH CRC-32:0xe27f8b41 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -796,8 +796,8 @@
 #define __NR32_finit_module                 0x15e                  /* errno_t finit_module(fd_t fd, char const *uargs, syscall_ulong_t flags) */
 #define __NR32_sched_setattr                0x15f                  /* errno_t sched_setattr(int TODO_PROTOTYPE) */
 #define __NR32_sched_getattr                0x160                  /* errno_t sched_getattr(int TODO_PROTOTYPE) */
-/* @param: flags: Set of `RENAME_EXCHANGE | RENAME_NOREPLACE | RENAME_WHITEOUT' */
-#define __NR32_renameat2                    0x161                  /* errno_t renameat2(fd_t olddirfd, char const *oldpath, fd_t newdirfd, char const *newpath, syscall_ulong_t flags) */
+/* @param: flags: Set of `0 | AT_RENAME_NOREPLACE | AT_RENAME_EXCHANGE | AT_RENAME_WHITEOUT | AT_RENAME_MOVETODIR | AT_DOSPATH' */
+#define __NR32_renameat2                    0x161                  /* errno_t renameat2(fd_t olddirfd, char const *oldpath, fd_t newdirfd, char const *newpath, atflag_t flags) */
 #define __NR32_seccomp                      0x162                  /* errno_t seccomp(int TODO_PROTOTYPE) */
 /* @param: flags: Set of `0 | GRND_RANDOM | GRND_NONBLOCK' */
 #define __NR32_getrandom                    0x163                  /* ssize_t getrandom(void *buf, size_t num_bytes, syscall_ulong_t flags) */
@@ -1089,8 +1089,6 @@
 #define __NR32_freadlinkat                  __UINT32_C(0xfffffecf) /* ssize_t freadlinkat(fd_t dirfd, char const *path, char *buf, size_t buflen, atflag_t flags) */
 /* @param: flags: Set of `0 | AT_DOSPATH' */
 #define __NR32_fsymlinkat                   __UINT32_C(0xfffffed0) /* errno_t fsymlinkat(char const *link_text, fd_t tofd, char const *target_path, atflag_t flags) */
-/* @param: flags: Set of `0 | AT_DOSPATH' */
-#define __NR32_frenameat                    __UINT32_C(0xfffffed2) /* errno_t frenameat(fd_t oldfd, char const *oldname, fd_t newfd, char const *newname_or_path, atflag_t flags) */
 /* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
 #define __NR32_kfstatat                     __UINT32_C(0xfffffed4) /* errno_t kfstatat(fd_t dirfd, char const *filename, struct __kos_statx32 *statbuf, atflag_t flags) */
 #define __NR32_futimesat64                  __UINT32_C(0xfffffed5) /* errno_t futimesat64(fd_t dirfd, char const *filename, struct timevalx32_64 const[2] times) */
@@ -2055,7 +2053,6 @@
 #define __NR32RM_fallocate64                  0
 #define __NR32RM_freadlinkat                  0
 #define __NR32RM_fsymlinkat                   0
-#define __NR32RM_frenameat                    0
 #define __NR32RM_kfstatat                     0
 #define __NR32RM_futimesat64                  0
 #define __NR32RM_fmknodat                     0
@@ -2263,7 +2260,6 @@
 #define __NR32CP_preadvf
 #define __NR32CP_freadlinkat
 #define __NR32CP_fsymlinkat
-#define __NR32CP_frenameat
 #define __NR32CP_kfstatat
 #define __NR32CP_futimesat64
 #define __NR32CP_fmknodat
@@ -2744,7 +2740,6 @@
 #define __NR32RC_fallocate64                  6 /* __NR32AC_fallocate64 + 2 */
 #define __NR32RC_freadlinkat                  5
 #define __NR32RC_fsymlinkat                   4
-#define __NR32RC_frenameat                    5
 #define __NR32RC_kfstatat                     4
 #define __NR32RC_futimesat64                  3
 #define __NR32RC_fmknodat                     5

@@ -1075,14 +1075,10 @@ rmdir:(char const *path) -> errno_t;
              [tostr(FILENAME)] char const *newname_or_path) -> errno_t;
 [cp] renameat:(fd_t oldfd, [tostr(FILENAME:oldfd)] char const *oldname,
                fd_t newfd, [tostr(FILENAME:newfd)] char const *newname_or_path) -> errno_t;
-@@@param: flags: Set of `0 | AT_DOSPATH'
-[cp] frenameat:(fd_t oldfd, [tostr(FILENAME:oldfd)] char const *oldname,
-                fd_t newfd, [tostr(FILENAME:newfd)] char const *newname_or_path,
-                [tostr(ATFLAG__DOSPATH)] atflag_t flags) -> errno_t;
-@@@param: flags: Set of `RENAME_EXCHANGE | RENAME_NOREPLACE | RENAME_WHITEOUT'
+@@@param: flags: Set of `0 | AT_RENAME_NOREPLACE | AT_RENAME_EXCHANGE | AT_RENAME_WHITEOUT | AT_RENAME_MOVETODIR | AT_DOSPATH'
 [cp] renameat2:(fd_t olddirfd, [tostr(FILENAME:olddirfd)] char const *oldpath,
                 fd_t newdirfd, [tostr(FILENAME:newdirfd)] char const *newpath,
-                [tostr(RENAMEAT2_FLAGS)] syscall_ulong_t flags) -> errno_t; /* UNIMPLEMENTED! */
+                [tostr(RENAMEAT2_FLAGS)] atflag_t flags) -> errno_t; /* UNIMPLEMENTED! */
 
 %[startgroup]
 truncate:([tostr(FILENAME)] char const *filename, syscall_ulong_t length) -> errno_t;

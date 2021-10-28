@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xae3557d9 */
+/* HASH CRC-32:0x4f4da3ba */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -393,7 +393,6 @@
 #define __NRAC_preadvf                  5
 #define __NRAC_freadlinkat              5
 #define __NRAC_fsymlinkat               4
-#define __NRAC_frenameat                5
 #define __NRAC_kfstatat                 4
 #define __NRAC_fmknodat                 5
 #define __NRAC_fmkdirat                 4
@@ -802,7 +801,6 @@
 #define __NRRT_preadvf                  (ssize_t, __ssize_t)
 #define __NRRT_freadlinkat              (ssize_t, __ssize_t)
 #define __NRRT_fsymlinkat               (errno_t, __errno_t)
-#define __NRRT_frenameat                (errno_t, __errno_t)
 #define __NRRT_kfstatat                 (errno_t, __errno_t)
 #define __NRRT_fmknodat                 (errno_t, __errno_t)
 #define __NRRT_fmkdirat                 (errno_t, __errno_t)
@@ -1578,7 +1576,7 @@
 #define __NRAT1_renameat2                (char const *, char const *)
 #define __NRAT2_renameat2                (fd_t, __fd_t)
 #define __NRAT3_renameat2                (char const *, char const *)
-#define __NRAT4_renameat2                (syscall_ulong_t, __syscall_ulong_t)
+#define __NRAT4_renameat2                (atflag_t, __atflag_t)
 #define __NRAT0_seccomp                  (int, int)
 #define __NRAT0_getrandom                (void *, void *)
 #define __NRAT1_getrandom                (size_t, __size_t)
@@ -1651,11 +1649,6 @@
 #define __NRAT1_fsymlinkat               (fd_t, __fd_t)
 #define __NRAT2_fsymlinkat               (char const *, char const *)
 #define __NRAT3_fsymlinkat               (atflag_t, __atflag_t)
-#define __NRAT0_frenameat                (fd_t, __fd_t)
-#define __NRAT1_frenameat                (char const *, char const *)
-#define __NRAT2_frenameat                (fd_t, __fd_t)
-#define __NRAT3_frenameat                (char const *, char const *)
-#define __NRAT4_frenameat                (atflag_t, __atflag_t)
 #define __NRAT0_kfstatat                 (fd_t, __fd_t)
 #define __NRAT1_kfstatat                 (char const *, char const *)
 #define __NRAT2_kfstatat                 (struct __kos_statx64 *, struct __kos_statx64 *)
@@ -2116,7 +2109,7 @@
 #define __NRAM_finit_module(a, b, c, d, e, f)             (__fd_t)a, (char const *)b, (__syscall_ulong_t)c
 #define __NRAM_sched_setattr(a, b, c, d, e, f)            (int)a
 #define __NRAM_sched_getattr(a, b, c, d, e, f)            (int)a
-#define __NRAM_renameat2(a, b, c, d, e, f)                (__fd_t)a, (char const *)b, (__fd_t)c, (char const *)d, (__syscall_ulong_t)e
+#define __NRAM_renameat2(a, b, c, d, e, f)                (__fd_t)a, (char const *)b, (__fd_t)c, (char const *)d, (__atflag_t)e
 #define __NRAM_seccomp(a, b, c, d, e, f)                  (int)a
 #define __NRAM_getrandom(a, b, c, d, e, f)                (void *)a, (__size_t)b, (__syscall_ulong_t)c
 #define __NRAM_memfd_create(a, b, c, d, e, f)             (char const *)a, (__syscall_ulong_t)b
@@ -2155,7 +2148,6 @@
 #define __NRAM_preadvf(a, b, c, d, e, f)                  (__fd_t)a, (struct __iovecx64 const *)b, (__size_t)c, (__uint64_t)d, (__iomode_t)e
 #define __NRAM_freadlinkat(a, b, c, d, e, f)              (__fd_t)a, (char const *)b, (char *)c, (__size_t)d, (__atflag_t)e
 #define __NRAM_fsymlinkat(a, b, c, d, e, f)               (char const *)a, (__fd_t)b, (char const *)c, (__atflag_t)d
-#define __NRAM_frenameat(a, b, c, d, e, f)                (__fd_t)a, (char const *)b, (__fd_t)c, (char const *)d, (__atflag_t)e
 #define __NRAM_kfstatat(a, b, c, d, e, f)                 (__fd_t)a, (char const *)b, (struct __kos_statx64 *)c, (__atflag_t)d
 #define __NRAM_fmknodat(a, b, c, d, e, f)                 (__fd_t)a, (char const *)b, (__mode_t)c, (__dev_t)d, (__atflag_t)e
 #define __NRAM_fmkdirat(a, b, c, d, e, f)                 (__fd_t)a, (char const *)b, (__mode_t)c, (__atflag_t)d
@@ -2564,7 +2556,6 @@
 #define __NRAP_preadvf(a, b, c, d, e)                     (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e
 #define __NRAP_freadlinkat(a, b, c, d, e)                 (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e
 #define __NRAP_fsymlinkat(a, b, c, d)                     (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
-#define __NRAP_frenameat(a, b, c, d, e)                   (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e
 #define __NRAP_kfstatat(a, b, c, d)                       (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
 #define __NRAP_fmknodat(a, b, c, d, e)                    (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e
 #define __NRAP_fmkdirat(a, b, c, d)                       (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d

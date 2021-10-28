@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x30f9cd58 */
+/* HASH CRC-32:0x4b45869b */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,13 +22,13 @@
 #define __local_rename_defined
 #include <__crt.h>
 #include <asm/os/fcntl.h>
-#if defined(__AT_FDCWD) && (defined(__CRT_HAVE_renameat) || defined(__CRT_HAVE_frenameat))
+#if defined(__AT_FDCWD) && (defined(__CRT_HAVE_renameat) || defined(__CRT_HAVE_renameat2))
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_renameat_defined
 #define __local___localdep_renameat_defined
 #ifdef __CRT_HAVE_renameat
 __CREDIRECT(__ATTR_NONNULL((2, 4)),int,__NOTHROW_RPC,__localdep_renameat,(__fd_t __oldfd, char const *__oldname, __fd_t __newfd, char const *__newname_or_path),renameat,(__oldfd,__oldname,__newfd,__newname_or_path))
-#elif defined(__CRT_HAVE_frenameat)
+#elif defined(__CRT_HAVE_renameat2)
 __NAMESPACE_LOCAL_END
 #include <libc/local/stdio/renameat.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -46,7 +46,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_rename_defined
 #define __localdep_rename __LIBC_LOCAL_NAME(rename)
 #endif /* !__local___localdep_rename_defined */
-#else /* __AT_FDCWD && (__CRT_HAVE_renameat || __CRT_HAVE_frenameat) */
+#else /* __AT_FDCWD && (__CRT_HAVE_renameat || __CRT_HAVE_renameat2) */
 #undef __local_rename_defined
-#endif /* !__AT_FDCWD || (!__CRT_HAVE_renameat && !__CRT_HAVE_frenameat) */
+#endif /* !__AT_FDCWD || (!__CRT_HAVE_renameat && !__CRT_HAVE_renameat2) */
 #endif /* !__local_rename_defined */

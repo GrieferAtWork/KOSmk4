@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x86e3aeb */
+/* HASH CRC-32:0xf3915cc6 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -699,8 +699,8 @@
 #define __NR_finit_module           0x111 /* errno_t finit_module(fd_t fd, char const *uargs, syscall_ulong_t flags) */
 #define __NR_sched_setattr          0x112 /* errno_t sched_setattr(int TODO_PROTOTYPE) */
 #define __NR_sched_getattr          0x113 /* errno_t sched_getattr(int TODO_PROTOTYPE) */
-/* @param: flags: Set of `RENAME_EXCHANGE | RENAME_NOREPLACE | RENAME_WHITEOUT' */
-#define __NR_renameat2              0x114 /* errno_t renameat2(fd_t olddirfd, char const *oldpath, fd_t newdirfd, char const *newpath, syscall_ulong_t flags) */
+/* @param: flags: Set of `0 | AT_RENAME_NOREPLACE | AT_RENAME_EXCHANGE | AT_RENAME_WHITEOUT | AT_RENAME_MOVETODIR | AT_DOSPATH' */
+#define __NR_renameat2              0x114 /* errno_t renameat2(fd_t olddirfd, char const *oldpath, fd_t newdirfd, char const *newpath, atflag_t flags) */
 #define __NR_seccomp                0x115 /* errno_t seccomp(int TODO_PROTOTYPE) */
 /* @param: flags: Set of `0 | GRND_RANDOM | GRND_NONBLOCK' */
 #define __NR_getrandom              0x116 /* ssize_t getrandom(void *buf, size_t num_bytes, syscall_ulong_t flags) */

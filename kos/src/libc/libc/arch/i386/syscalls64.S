@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb8ab3479 */
+/* HASH CRC-32:0x8bbbf694 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3164,8 +3164,8 @@ INTERN_FUNCTION(libc_sys_sched_getattr)
 END(libc_sys_sched_getattr)
 DEFINE_PUBLIC_ALIAS(sys_sched_getattr, libc_sys_sched_getattr)
 
-/* @param: flags: Set of `RENAME_EXCHANGE | RENAME_NOREPLACE | RENAME_WHITEOUT' */
-/* errno_t renameat2(fd_t olddirfd, char const *oldpath, fd_t newdirfd, char const *newpath, syscall_ulong_t flags) */
+/* @param: flags: Set of `0 | AT_RENAME_NOREPLACE | AT_RENAME_EXCHANGE | AT_RENAME_WHITEOUT | AT_RENAME_MOVETODIR | AT_DOSPATH' */
+/* errno_t renameat2(fd_t olddirfd, char const *oldpath, fd_t newdirfd, char const *newpath, atflag_t flags) */
 INTERN_FUNCTION(libc_sys_renameat2)
 	movq   $(0x13c), %rax
 	movq   %rcx, %r10
@@ -3530,16 +3530,6 @@ INTERN_FUNCTION(libc_sys_fsymlinkat)
 	ret
 END(libc_sys_fsymlinkat)
 DEFINE_PUBLIC_ALIAS(sys_fsymlinkat, libc_sys_fsymlinkat)
-
-/* @param: flags: Set of `0 | AT_DOSPATH' */
-/* errno_t frenameat(fd_t oldfd, char const *oldname, fd_t newfd, char const *newname_or_path, atflag_t flags) */
-INTERN_FUNCTION(libc_sys_frenameat)
-	movq   $(0xfffffffffffffef8), %rax
-	movq   %rcx, %r10
-	syscall
-	ret
-END(libc_sys_frenameat)
-DEFINE_PUBLIC_ALIAS(sys_frenameat, libc_sys_frenameat)
 
 /* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
 /* errno_t kfstatat(fd_t dirfd, char const *filename, struct __kos_statx64 *statbuf, atflag_t flags) */
@@ -8073,8 +8063,8 @@ INTERN_FUNCTION(libc_sys_Xsched_getattr)
 END(libc_sys_Xsched_getattr)
 DEFINE_PUBLIC_ALIAS(sys_Xsched_getattr, libc_sys_Xsched_getattr)
 
-/* @param: flags: Set of `RENAME_EXCHANGE | RENAME_NOREPLACE | RENAME_WHITEOUT' */
-/* errno_t renameat2(fd_t olddirfd, char const *oldpath, fd_t newdirfd, char const *newpath, syscall_ulong_t flags) */
+/* @param: flags: Set of `0 | AT_RENAME_NOREPLACE | AT_RENAME_EXCHANGE | AT_RENAME_WHITEOUT | AT_RENAME_MOVETODIR | AT_DOSPATH' */
+/* errno_t renameat2(fd_t olddirfd, char const *oldpath, fd_t newdirfd, char const *newpath, atflag_t flags) */
 INTERN_FUNCTION(libc_sys_Xrenameat2)
 	movq   $(0x13c), %rax
 	movq   %rcx, %r10
@@ -8517,18 +8507,6 @@ INTERN_FUNCTION(libc_sys_Xfsymlinkat)
 	ret
 END(libc_sys_Xfsymlinkat)
 DEFINE_PUBLIC_ALIAS(sys_Xfsymlinkat, libc_sys_Xfsymlinkat)
-
-/* @param: flags: Set of `0 | AT_DOSPATH' */
-/* errno_t frenameat(fd_t oldfd, char const *oldname, fd_t newfd, char const *newname_or_path, atflag_t flags) */
-INTERN_FUNCTION(libc_sys_Xfrenameat)
-	movq   $(0xfffffffffffffef8), %rax
-	movq   %rcx, %r10
-	std /* Enable exceptions */
-	syscall
-	cld /* Disable exceptions */
-	ret
-END(libc_sys_Xfrenameat)
-DEFINE_PUBLIC_ALIAS(sys_Xfrenameat, libc_sys_Xfrenameat)
 
 /* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
 /* errno_t kfstatat(fd_t dirfd, char const *filename, struct __kos_statx64 *statbuf, atflag_t flags) */

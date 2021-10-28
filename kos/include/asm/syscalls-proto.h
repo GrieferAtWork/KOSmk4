@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x581b7777 */
+/* HASH CRC-32:0x3fbfdad */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1286,7 +1286,7 @@
 #define __NRAT1_renameat2              (char const *, char const *)
 #define __NRAT2_renameat2              (fd_t, __fd_t)
 #define __NRAT3_renameat2              (char const *, char const *)
-#define __NRAT4_renameat2              (syscall_ulong_t, __syscall_ulong_t)
+#define __NRAT4_renameat2              (atflag_t, __atflag_t)
 #define __NRAT0_seccomp                (int, int)
 #define __NRAT0_getrandom              (void *, void *)
 #define __NRAT1_getrandom              (size_t, __size_t)
@@ -1680,7 +1680,7 @@
 #define __NRAM_finit_module(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)           (__fd_t)a, (char const *)b, (__syscall_ulong_t)c
 #define __NRAM_sched_setattr(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)          (int)a
 #define __NRAM_sched_getattr(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)          (int)a
-#define __NRAM_renameat2(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)              (__fd_t)a, (char const *)b, (__fd_t)c, (char const *)d, (__syscall_ulong_t)e
+#define __NRAM_renameat2(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)              (__fd_t)a, (char const *)b, (__fd_t)c, (char const *)d, (__atflag_t)e
 #define __NRAM_seccomp(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)                (int)a
 #define __NRAM_getrandom(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)              (void *)a, (__size_t)b, (__syscall_ulong_t)c
 #define __NRAM_memfd_create(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)           (char const *)a, (__syscall_ulong_t)b

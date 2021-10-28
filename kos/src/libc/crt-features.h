@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa257f4b2 */
+/* HASH CRC-32:0xffcf8a4e */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1033,7 +1033,6 @@
 #define __CRT_HAVE_DOS$freelocale
 #define __CRT_HAVE_DOS$freezero
 #define __CRT_HAVE_DOS$fremovexattr
-#define __CRT_HAVE_DOS$frenameat
 #define __CRT_HAVE_DOS$freopen
 #define __CRT_HAVE_DOS$freopen64
 #define __CRT_HAVE_DOS$freopen64_unlocked
@@ -2118,6 +2117,7 @@
 #define __CRT_HAVE_DOS$remquol
 #define __CRT_HAVE_DOS$rename
 #define __CRT_HAVE_DOS$renameat
+#define __CRT_HAVE_DOS$renameat2
 #define __CRT_HAVE_DOS$resolvepath
 #define __CRT_HAVE_DOS$revoke
 #define __CRT_HAVE_DOS$rewind
@@ -4192,7 +4192,6 @@
 #define __CRT_HAVE_freelocale
 #define __CRT_HAVE_freezero
 #define __CRT_HAVE_fremovexattr
-#define __CRT_HAVE_frenameat
 #define __CRT_HAVE_freopen
 #define __CRT_HAVE_freopen64
 #define __CRT_HAVE_freopen64_unlocked
@@ -5438,6 +5437,7 @@
 #define __CRT_HAVE_remquol
 #define __CRT_HAVE_rename
 #define __CRT_HAVE_renameat
+#define __CRT_HAVE_renameat2
 #define __CRT_HAVE_resolvepath
 #define __CRT_HAVE_revoke
 #define __CRT_HAVE_rewind

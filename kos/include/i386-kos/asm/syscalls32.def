@@ -881,7 +881,7 @@ select64 = selectx32_64;
 -0x0000012b:futimesat64
 -0x0000012c:kfstatat
 /*x0000012d:...*/
--0x0000012e:frenameat
+/*x0000012e:...*/
 /*x0000012f:...*/
 -0x00000130:fsymlinkat
 -0x00000131:freadlinkat

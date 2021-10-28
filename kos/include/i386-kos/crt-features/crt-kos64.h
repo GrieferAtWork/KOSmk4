@@ -1812,7 +1812,6 @@
 #define __CRT_HAVE_freelocale
 #define __CRT_HAVE_freezero
 #define __CRT_HAVE_fremovexattr
-#define __CRT_HAVE_frenameat
 #define __CRT_HAVE_freopen
 #define __CRT_HAVE_freopen64
 #define __CRT_HAVE_freopen64_unlocked
@@ -3068,6 +3067,7 @@
 #define __CRT_HAVE_remquol
 #define __CRT_HAVE_rename
 #define __CRT_HAVE_renameat
+#define __CRT_HAVE_renameat2
 #define __CRT_HAVE_resolvepath
 #define __CRT_HAVE_revoke
 #define __CRT_HAVE_rewind
@@ -3543,7 +3543,6 @@
 #define __CRT_HAVE_sys_Xfrealpath4
 #define __CRT_HAVE_sys_Xfrealpathat
 #define __CRT_HAVE_sys_Xfremovexattr
-#define __CRT_HAVE_sys_Xfrenameat
 #define __CRT_HAVE_sys_Xfsconfig
 #define __CRT_HAVE_sys_Xfsetxattr
 #define __CRT_HAVE_sys_Xfsmode
@@ -3942,7 +3941,6 @@
 #define __CRT_HAVE_sys_frealpath4
 #define __CRT_HAVE_sys_frealpathat
 #define __CRT_HAVE_sys_fremovexattr
-#define __CRT_HAVE_sys_frenameat
 #define __CRT_HAVE_sys_fsconfig
 #define __CRT_HAVE_sys_fsetxattr
 #define __CRT_HAVE_sys_fsmode
@@ -6270,7 +6268,6 @@
 #define __CRT_HAVE_KOS$freelocale
 #define __CRT_HAVE_KOS$freezero
 #define __CRT_HAVE_KOS$fremovexattr
-#define __CRT_HAVE_KOS$frenameat
 #define __CRT_HAVE_KOS$freopen
 #define __CRT_HAVE_KOS$freopen64
 #define __CRT_HAVE_KOS$freopen64_unlocked
@@ -7326,6 +7323,7 @@
 #define __CRT_HAVE_KOS$remquol
 #define __CRT_HAVE_KOS$rename
 #define __CRT_HAVE_KOS$renameat
+#define __CRT_HAVE_KOS$renameat2
 #define __CRT_HAVE_KOS$resolvepath
 #define __CRT_HAVE_KOS$revoke
 #define __CRT_HAVE_KOS$rewind
@@ -9681,7 +9679,6 @@
 #define __CRT_HAVE_DOS$freelocale
 #define __CRT_HAVE_DOS$freezero
 #define __CRT_HAVE_DOS$fremovexattr
-#define __CRT_HAVE_DOS$frenameat
 #define __CRT_HAVE_DOS$freopen
 #define __CRT_HAVE_DOS$freopen64
 #define __CRT_HAVE_DOS$freopen64_unlocked
@@ -10737,6 +10734,7 @@
 #define __CRT_HAVE_DOS$remquol
 #define __CRT_HAVE_DOS$rename
 #define __CRT_HAVE_DOS$renameat
+#define __CRT_HAVE_DOS$renameat2
 #define __CRT_HAVE_DOS$resolvepath
 #define __CRT_HAVE_DOS$revoke
 #define __CRT_HAVE_DOS$rewind

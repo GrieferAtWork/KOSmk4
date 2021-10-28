@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb920dbb */
+/* HASH CRC-32:0x62319112 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -124,7 +124,7 @@ __NAMESPACE_STD_USING(rename)
  * Rename  a given file `oldname' to `newname_or_path', or in the event
  * that `newname_or_path' refers to a directory, place the file within. */
 __CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,rename,(char const *__oldname, char const *__newname_or_path),(__oldname,__newname_or_path))
-#elif defined(__AT_FDCWD) && (defined(__CRT_HAVE_renameat) || defined(__CRT_HAVE_frenameat))
+#elif defined(__AT_FDCWD) && (defined(__CRT_HAVE_renameat) || defined(__CRT_HAVE_renameat2))
 #include <libc/local/stdio/rename.h>
 /* >> rename(2)
  * Rename  a given file `oldname' to `newname_or_path', or in the event

@@ -1046,10 +1046,10 @@ DEFINE_SYSCALL2(errno_t, link,
 
 
 /************************************************************************/
-/* frenameat(), renameat(), rename()                                    */
+/* renameat2(), renameat(), rename()                                    */
 /************************************************************************/
 #ifdef __ARCH_WANT_SYSCALL_FRENAMEAT
-DEFINE_SYSCALL5(errno_t, frenameat,
+DEFINE_SYSCALL5(errno_t, renameat2,
                 fd_t, olddirfd, USER UNCHECKED char const *, oldpath,
                 fd_t, newdirfd, USER UNCHECKED char const *, newpath,
                 atflag_t, flags) {
@@ -1065,8 +1065,10 @@ DEFINE_SYSCALL5(errno_t, frenameat,
 	REF struct path *newpath_cwd;
 	REF struct path *root;
 	VALIDATE_FLAGSET(flags,
-	                 0 | AT_DOSPATH,
+	                 0 | AT_DOSPATH | __RENAME_NOREPLACE | __RENAME_EXCHANGE |
+	                 __RENAME_WHITEOUT | __RENAME_MOVETODIR,
 	                 E_INVALID_ARGUMENT_CONTEXT_RENAMEAT2_FLAGS);
+	flags &= AT_DOSPATH; /* Other flags aren't supposed by the old FS (CONFIG_USE_NEW_FS) */
 	validate_readable(oldpath, 1);
 	validate_readable(newpath, 1);
 	fsmode = fs_getmode_for(f, flags);
@@ -1172,7 +1174,7 @@ have_paths:
 DEFINE_SYSCALL4(errno_t, renameat,
                 fd_t, olddirfd, USER UNCHECKED char const *, oldpath,
                 fd_t, newdirfd, USER UNCHECKED char const *, newpath) {
-	return sys_frenameat(olddirfd, oldpath,
+	return sys_renameat2(olddirfd, oldpath,
 	                     newdirfd, newpath, 0);
 }
 #endif /* __ARCH_WANT_SYSCALL_RENAMEAT */
@@ -1181,7 +1183,7 @@ DEFINE_SYSCALL4(errno_t, renameat,
 DEFINE_SYSCALL2(errno_t, rename,
                 USER UNCHECKED char const *, oldpath,
                 USER UNCHECKED char const *, newpath) {
-	return sys_frenameat(AT_FDCWD, oldpath,
+	return sys_renameat2(AT_FDCWD, oldpath,
 	                     AT_FDCWD, newpath, 0);
 }
 #endif /* __ARCH_WANT_SYSCALL_RENAME */

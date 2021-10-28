@@ -935,7 +935,7 @@ ramfs_dirnode_v_rename(struct fdirnode *__restrict self,
 	struct ramfs_dirnode *me     = (struct ramfs_dirnode *)self;
 	struct ramfs_dirnode *olddir = (struct ramfs_dirnode *)info->frn_olddir;
 	struct ramfs_dirent *old_dirent;
-	assert(info->frn_dent->fd_ops == &ramfs_dirent_ops);
+	assert(info->frn_oldent->fd_ops == &ramfs_dirent_ops);
 	if (info->frn_flags & AT_RENAME_EXCHANGE)
 		THROW(E_NOT_IMPLEMENTED_TODO); /* TODO */
 

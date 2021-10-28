@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9c1cc176 */
+/* HASH CRC-32:0x90861d6a */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -83,7 +83,6 @@
 #define __NR3264COMPAT_frealpath4               1(frealpath4)
 #define __NR3264COMPAT_frealpathat              1(frealpathat)
 #define __NR3264COMPAT_fremovexattr             1(fremovexattr)
-#define __NR3264COMPAT_frenameat                1(frenameat)
 #define __NR3264COMPAT_fsconfig                 1(fsconfig)
 #define __NR3264COMPAT_fsetxattr                1(fsetxattr)
 #define __NR3264COMPAT_fsmode                   1(fsmode)

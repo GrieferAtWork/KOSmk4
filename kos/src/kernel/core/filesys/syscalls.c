@@ -621,7 +621,7 @@ DEFINE_SYSCALL2(errno_t, link,
 
 
 /************************************************************************/
-/* frenameat(), renameat(), rename()                                    */
+/* renameat2(), renameat(), rename()                                    */
 /************************************************************************/
 #if (defined(__ARCH_WANT_SYSCALL_FRENAMEAT) || \
      defined(__ARCH_WANT_SYSCALL_RENAMEAT) ||  \
@@ -664,19 +664,10 @@ sys_renameat2_impl(fd_t olddirfd, USER UNCHECKED char const *oldpath,
 DEFINE_SYSCALL5(errno_t, renameat2,
                 fd_t, olddirfd, USER UNCHECKED char const *, oldpath,
                 fd_t, newdirfd, USER UNCHECKED char const *, newpath,
-                syscall_ulong_t, atflags) {
-	return sys_renameat2_impl(olddirfd, oldpath, newdirfd, newpath, atflags);
-}
-#endif /* __ARCH_WANT_SYSCALL_RENAMEAT2 */
-
-#ifdef __ARCH_WANT_SYSCALL_FRENAMEAT
-DEFINE_SYSCALL5(errno_t, frenameat,
-                fd_t, olddirfd, USER UNCHECKED char const *, oldpath,
-                fd_t, newdirfd, USER UNCHECKED char const *, newpath,
                 atflag_t, atflags) {
 	return sys_renameat2_impl(olddirfd, oldpath, newdirfd, newpath, atflags);
 }
-#endif /* __ARCH_WANT_SYSCALL_FRENAMEAT */
+#endif /* __ARCH_WANT_SYSCALL_RENAMEAT2 */
 
 #ifdef __ARCH_WANT_SYSCALL_RENAMEAT
 DEFINE_SYSCALL4(errno_t, renameat,

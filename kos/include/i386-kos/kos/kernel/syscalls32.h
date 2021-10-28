@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x165856cc */
+/* HASH CRC-32:0x5eb3a970 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -107,7 +107,6 @@
 #define __ARCH_WANT_SYSCALL_FREALPATH4
 #define __ARCH_WANT_SYSCALL_FREALPATHAT
 #define __ARCH_WANT_SYSCALL_FREMOVEXATTR
-#define __ARCH_WANT_SYSCALL_FRENAMEAT
 #define __ARCH_WANT_SYSCALL_FSCONFIG
 #define __ARCH_WANT_SYSCALL_FSETXATTR
 #define __ARCH_WANT_SYSCALL_FSMODE

@@ -1688,6 +1688,58 @@ INTERN ATTR_SECTION(".text.crt.FILE.unlocked.write.utility") int
 /*[[[end:libc_flushall_unlocked]]]*/
 
 
+/*[[[head:libc_rename,hash:CRC-32=0xc8bce13c]]]*/
+/* >> rename(2)
+ * Rename  a given file `oldname' to `newname_or_path', or in the event
+ * that `newname_or_path' refers to a directory, place the file within. */
+INTERN ATTR_SECTION(".text.crt.fs.modify") NONNULL((1, 2)) int
+NOTHROW_RPC(LIBCCALL libc_rename)(char const *oldname,
+                                  char const *newname_or_path)
+/*[[[body:libc_rename]]]*/
+{
+	errno_t result;
+	result = sys_rename(oldname, newname_or_path);
+	return libc_seterrno_syserr(result);
+}
+/*[[[end:libc_rename]]]*/
+
+/*[[[head:libc_renameat,hash:CRC-32=0x8856fbf3]]]*/
+/* >> renameat(2) */
+INTERN ATTR_SECTION(".text.crt.fs.modify") NONNULL((2, 4)) int
+NOTHROW_RPC(LIBCCALL libc_renameat)(fd_t oldfd,
+                                    char const *oldname,
+                                    fd_t newfd,
+                                    char const *newname_or_path)
+/*[[[body:libc_renameat]]]*/
+{
+	errno_t result;
+	result = sys_renameat(oldfd, oldname, newfd, newname_or_path);
+	return libc_seterrno_syserr(result);
+}
+/*[[[end:libc_renameat]]]*/
+
+/*[[[head:libc_renameat2,hash:CRC-32=0x8335016b]]]*/
+/* >> renameat2(2)
+ * @param flags: Set of `0 | AT_RENAME_NOREPLACE | AT_RENAME_EXCHANGE |
+ *                       AT_RENAME_WHITEOUT | AT_RENAME_MOVETODIR | AT_DOSPATH'
+ * NOTE: For portability, use the following names:
+ *   - `AT_RENAME_NOREPLACE' --> `RENAME_NOREPLACE'
+ *   - `AT_RENAME_EXCHANGE'  --> `RENAME_EXCHANGE'
+ *   - `AT_RENAME_WHITEOUT'  --> `RENAME_WHITEOUT' */
+INTERN ATTR_SECTION(".text.crt.fs.modify") NONNULL((2, 4)) int
+NOTHROW_RPC(LIBCCALL libc_renameat2)(fd_t oldfd,
+                                     char const *oldname,
+                                     fd_t newfd,
+                                     char const *newname_or_path,
+                                     atflag_t flags)
+/*[[[body:libc_renameat2]]]*/
+{
+	errno_t result;
+	result = sys_renameat2(oldfd, oldname, newfd, newname_or_path, flags);
+	return libc_seterrno_syserr(result);
+}
+/*[[[end:libc_renameat2]]]*/
+
 /*[[[head:libc_removeat,hash:CRC-32=0xb1a4dbad]]]*/
 /* >> removeat(3)
  * Remove a file or directory `filename' relative to a given base directory `dirfd' */
@@ -3327,70 +3379,6 @@ NOTHROW_NCX(LIBCCALL libc_tempnam)(char const *dir,
 /*[[[end:libc_tempnam]]]*/
 
 
-
-
-
-
-
-
-
-
-/*[[[head:libc_rename,hash:CRC-32=0xc8bce13c]]]*/
-/* >> rename(2)
- * Rename  a given file `oldname' to `newname_or_path', or in the event
- * that `newname_or_path' refers to a directory, place the file within. */
-INTERN ATTR_SECTION(".text.crt.fs.modify") NONNULL((1, 2)) int
-NOTHROW_RPC(LIBCCALL libc_rename)(char const *oldname,
-                                  char const *newname_or_path)
-/*[[[body:libc_rename]]]*/
-{
-	errno_t result;
-	result = sys_rename(oldname, newname_or_path);
-	return libc_seterrno_syserr(result);
-}
-/*[[[end:libc_rename]]]*/
-
-/*[[[head:libc_renameat,hash:CRC-32=0x8856fbf3]]]*/
-/* >> renameat(2) */
-INTERN ATTR_SECTION(".text.crt.fs.modify") NONNULL((2, 4)) int
-NOTHROW_RPC(LIBCCALL libc_renameat)(fd_t oldfd,
-                                    char const *oldname,
-                                    fd_t newfd,
-                                    char const *newname_or_path)
-/*[[[body:libc_renameat]]]*/
-{
-	errno_t result;
-	result = sys_renameat(oldfd,
-	                      oldname,
-	                      newfd,
-	                      newname_or_path);
-	return libc_seterrno_syserr(result);
-}
-/*[[[end:libc_renameat]]]*/
-
-/*[[[head:libc_frenameat,hash:CRC-32=0x706c2a1a]]]*/
-/* >> frenameat(2)
- * @param flags: Set of `0 | AT_DOSPATH' */
-INTERN ATTR_SECTION(".text.crt.fs.modify") NONNULL((2, 4)) int
-NOTHROW_RPC(LIBCCALL libc_frenameat)(fd_t oldfd,
-                                     char const *oldname,
-                                     fd_t newfd,
-                                     char const *newname_or_path,
-                                     atflag_t flags)
-/*[[[body:libc_frenameat]]]*/
-{
-	errno_t result;
-	result = sys_frenameat(oldfd,
-	                       oldname,
-	                       newfd,
-	                       newname_or_path,
-	                       flags);
-	return libc_seterrno_syserr(result);
-}
-/*[[[end:libc_frenameat]]]*/
-
-
-
 /*[[[head:libc__rmtmp,hash:CRC-32=0xbda88955]]]*/
 INTERN ATTR_SECTION(".text.crt.dos.FILE.utility") int
 NOTHROW_RPC(LIBCCALL libc__rmtmp)(void)
@@ -3629,7 +3617,7 @@ DEFINE_INTERN_ALIAS(libc_ferror_unlocked, libc_ferror);
 
 
 
-/*[[[start:exports,hash:CRC-32=0x815dd6e0]]]*/
+/*[[[start:exports,hash:CRC-32=0x9017737c]]]*/
 DEFINE_PUBLIC_ALIAS(remove, libc_remove);
 DEFINE_PUBLIC_ALIAS(rename, libc_rename);
 DEFINE_PUBLIC_ALIAS(tmpnam, libc_tmpnam);
@@ -3682,7 +3670,7 @@ DEFINE_PUBLIC_ALIAS(fsetpos, libc_fsetpos);
 DEFINE_PUBLIC_ALIAS(_IO_fsetpos, libc_fsetpos);
 DEFINE_PUBLIC_ALIAS(renameat, libc_renameat);
 DEFINE_PUBLIC_ALIAS(removeat, libc_removeat);
-DEFINE_PUBLIC_ALIAS(frenameat, libc_frenameat);
+DEFINE_PUBLIC_ALIAS(renameat2, libc_renameat2);
 DEFINE_PUBLIC_ALIAS(tmpnam_r, libc_tmpnam_r);
 #ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_fflush_nolock, libc_fflush_unlocked);

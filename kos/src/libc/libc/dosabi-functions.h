@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x75245032 */
+/* HASH CRC-32:0x3fa2db84 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1265,7 +1265,7 @@ DFUN(".text.crt.dos.unicode.static.format.printf", libd_vsnprintf, libc_vsnprint
 DFUN(".text.crt.dos.io.write", libd_vdprintf, libc_vdprintf, TD, 3, TIn(__SIZEOF_FD_T__), TP, TP)
 DFUN(".text.crt.dos.fs.modify", libd_renameat, libc_renameat, TD, 4, TIn(__SIZEOF_FD_T__), TP, TIn(__SIZEOF_FD_T__), TP)
 DFUN(".text.crt.dos.fs.modify", libd_removeat, libc_removeat, TD, 2, TIn(__SIZEOF_FD_T__), TP)
-DFUN(".text.crt.dos.fs.modify", libd_frenameat, libc_frenameat, TD, 5, TIn(__SIZEOF_FD_T__), TP, TIn(__SIZEOF_FD_T__), TP, TIn(__SIZEOF_ATFLAG_T__))
+DFUN(".text.crt.dos.fs.modify", libd_renameat2, libc_renameat2, TD, 5, TIn(__SIZEOF_FD_T__), TP, TIn(__SIZEOF_FD_T__), TP, TIn(__SIZEOF_ATFLAG_T__))
 DFUN(".text.crt.dos.fs.utility", libd_tmpnam_r, libc_tmpnam_r, TP, 1, TP)
 DFUN(".text.crt.dos.FILE.locked.read.utility", libd_setbuffer, libc_setbuffer, TV, 3, TP, TP, TI)
 DFUN(".text.crt.dos.FILE.locked.read.utility", libd_setlinebuf, libc_setlinebuf, TV, 1, TP)

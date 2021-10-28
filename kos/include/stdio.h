@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc3f0ce78 */
+/* HASH CRC-32:0xf4ffc6d3 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -336,6 +336,32 @@ __SYSDECL_BEGIN
 #endif /* __IOV_MAX == -1 */
 #endif /* !IOV_MAX */
 
+#ifdef __USE_GNU
+#if !defined(RENAME_NOREPLACE) && defined(__RENAME_NOREPLACE)
+#define RENAME_NOREPLACE __RENAME_NOREPLACE /* Don't overwrite target */
+#endif /* !RENAME_NOREPLACE && __RENAME_NOREPLACE */
+#if !defined(RENAME_EXCHANGE) && defined(__RENAME_EXCHANGE)
+#define RENAME_EXCHANGE  __RENAME_EXCHANGE  /* Exchange source and dest */
+#endif /* !RENAME_EXCHANGE && __RENAME_EXCHANGE */
+#if !defined(RENAME_WHITEOUT) && defined(__RENAME_WHITEOUT)
+#define RENAME_WHITEOUT  __RENAME_WHITEOUT  /* Whiteout source */
+#endif /* !RENAME_WHITEOUT && __RENAME_WHITEOUT */
+#endif /* __USE_GNU */
+
+#ifdef __USE_KOS
+#if !defined(AT_RENAME_NOREPLACE) && defined(__RENAME_NOREPLACE)
+#define AT_RENAME_NOREPLACE __RENAME_NOREPLACE /* Don't overwrite target */
+#endif /* !AT_RENAME_NOREPLACE && __RENAME_NOREPLACE */
+#if !defined(AT_RENAME_EXCHANGE) && defined(__RENAME_EXCHANGE)
+#define AT_RENAME_EXCHANGE  __RENAME_EXCHANGE  /* Exchange source and dest */
+#endif /* !AT_RENAME_EXCHANGE && __RENAME_EXCHANGE */
+#if !defined(AT_RENAME_WHITEOUT) && defined(__RENAME_WHITEOUT)
+#define AT_RENAME_WHITEOUT  __RENAME_WHITEOUT  /* Whiteout source */
+#endif /* !AT_RENAME_WHITEOUT && __RENAME_WHITEOUT */
+#if !defined(AT_RENAME_MOVETODIR) && defined(__RENAME_MOVETODIR)
+#define AT_RENAME_MOVETODIR __RENAME_MOVETODIR /* If `newpath' is a directory, move `oldpath' into it. */
+#endif /* !AT_RENAME_MOVETODIR && __RENAME_MOVETODIR */
+#endif /* __USE_KOS */
 
 
 #ifdef __CC__
@@ -488,7 +514,7 @@ __CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,rename,(char const *__oldnam
 __NAMESPACE_STD_END
 #include <asm/os/fcntl.h>
 __NAMESPACE_STD_BEGIN
-#if defined(__AT_FDCWD) && (defined(__CRT_HAVE_renameat) || defined(__CRT_HAVE_frenameat))
+#if defined(__AT_FDCWD) && (defined(__CRT_HAVE_renameat) || defined(__CRT_HAVE_renameat2))
 __NAMESPACE_STD_END
 #include <libc/local/stdio/rename.h>
 __NAMESPACE_STD_BEGIN
@@ -496,9 +522,9 @@ __NAMESPACE_STD_BEGIN
  * Rename  a given file `oldname' to `newname_or_path', or in the event
  * that `newname_or_path' refers to a directory, place the file within. */
 __NAMESPACE_LOCAL_USING_OR_IMPL(rename, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) int __NOTHROW_RPC(__LIBCCALL rename)(char const *__oldname, char const *__newname_or_path) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(rename))(__oldname, __newname_or_path); })
-#else /* __AT_FDCWD && (__CRT_HAVE_renameat || __CRT_HAVE_frenameat) */
+#else /* __AT_FDCWD && (__CRT_HAVE_renameat || __CRT_HAVE_renameat2) */
 #undef __std_rename_defined
-#endif /* !__AT_FDCWD || (!__CRT_HAVE_renameat && !__CRT_HAVE_frenameat) */
+#endif /* !__AT_FDCWD || (!__CRT_HAVE_renameat && !__CRT_HAVE_renameat2) */
 #endif /* !... */
 #endif /* !__std_rename_defined */
 /* >> tmpnam(3), tmpnam_r(3) */
@@ -2229,7 +2255,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(dprintf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_L
 #ifdef __CRT_HAVE_renameat
 /* >> renameat(2) */
 __CDECLARE(__ATTR_NONNULL((2, 4)),int,__NOTHROW_RPC,renameat,(__fd_t __oldfd, char const *__oldname, __fd_t __newfd, char const *__newname_or_path),(__oldfd,__oldname,__newfd,__newname_or_path))
-#elif defined(__CRT_HAVE_frenameat)
+#elif defined(__CRT_HAVE_renameat2)
 #include <libc/local/stdio/renameat.h>
 /* >> renameat(2) */
 __NAMESPACE_LOCAL_USING_OR_IMPL(renameat, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2, 4)) int __NOTHROW_RPC(__LIBCCALL renameat)(__fd_t __oldfd, char const *__oldname, __fd_t __newfd, char const *__newname_or_path) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(renameat))(__oldfd, __oldname, __newfd, __newname_or_path); })
@@ -2239,11 +2265,18 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(renameat, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_
 /* >> removeat(3)
  * Remove a file or directory `filename' relative to a given base directory `dirfd' */
 __CDECLARE_OPT(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,removeat,(__fd_t __dirfd, char const *__filename),(__dirfd,__filename))
-/* >> frenameat(2)
- * @param flags: Set of `0 | AT_DOSPATH' */
-__CDECLARE_OPT(__ATTR_NONNULL((2, 4)),int,__NOTHROW_RPC,frenameat,(__fd_t __oldfd, char const *__oldname, __fd_t __newfd, char const *__newname_or_path, __atflag_t __flags),(__oldfd,__oldname,__newfd,__newname_or_path,__flags))
 #endif /* __USE_KOS */
 #endif /* __USE_ATFILE */
+#ifdef __USE_GNU
+/* >> renameat2(2)
+ * @param flags: Set of `0 | AT_RENAME_NOREPLACE | AT_RENAME_EXCHANGE |
+ *                       AT_RENAME_WHITEOUT | AT_RENAME_MOVETODIR | AT_DOSPATH'
+ * NOTE: For portability, use the following names:
+ *   - `AT_RENAME_NOREPLACE' --> `RENAME_NOREPLACE'
+ *   - `AT_RENAME_EXCHANGE'  --> `RENAME_EXCHANGE'
+ *   - `AT_RENAME_WHITEOUT'  --> `RENAME_WHITEOUT' */
+__CDECLARE_OPT(__ATTR_NONNULL((2, 4)),int,__NOTHROW_RPC,renameat2,(__fd_t __oldfd, char const *__oldname, __fd_t __newfd, char const *__newname_or_path, __atflag_t __flags),(__oldfd,__oldname,__newfd,__newname_or_path,__flags))
+#endif /* __USE_GNU */
 
 #ifdef __USE_MISC
 #ifdef __CRT_HAVE_tmpnam_r

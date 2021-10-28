@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa2039ebe */
+/* HASH CRC-32:0x57787fbe */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -393,7 +393,6 @@
 #define __NR64AC_preadvf                  5
 #define __NR64AC_freadlinkat              5
 #define __NR64AC_fsymlinkat               4
-#define __NR64AC_frenameat                5
 #define __NR64AC_kfstatat                 4
 #define __NR64AC_fmknodat                 5
 #define __NR64AC_fmkdirat                 4
@@ -802,7 +801,6 @@
 #define __NR64RT_preadvf                  (ssize_t, __ssize_t)
 #define __NR64RT_freadlinkat              (ssize_t, __ssize_t)
 #define __NR64RT_fsymlinkat               (errno_t, __errno_t)
-#define __NR64RT_frenameat                (errno_t, __errno_t)
 #define __NR64RT_kfstatat                 (errno_t, __errno_t)
 #define __NR64RT_fmknodat                 (errno_t, __errno_t)
 #define __NR64RT_fmkdirat                 (errno_t, __errno_t)
@@ -1578,7 +1576,7 @@
 #define __NR64AT1_renameat2                (char const *, char const *)
 #define __NR64AT2_renameat2                (fd_t, __fd_t)
 #define __NR64AT3_renameat2                (char const *, char const *)
-#define __NR64AT4_renameat2                (syscall_ulong_t, __syscall_ulong_t)
+#define __NR64AT4_renameat2                (atflag_t, __atflag_t)
 #define __NR64AT0_seccomp                  (int, int)
 #define __NR64AT0_getrandom                (void *, void *)
 #define __NR64AT1_getrandom                (size_t, __size_t)
@@ -1651,11 +1649,6 @@
 #define __NR64AT1_fsymlinkat               (fd_t, __fd_t)
 #define __NR64AT2_fsymlinkat               (char const *, char const *)
 #define __NR64AT3_fsymlinkat               (atflag_t, __atflag_t)
-#define __NR64AT0_frenameat                (fd_t, __fd_t)
-#define __NR64AT1_frenameat                (char const *, char const *)
-#define __NR64AT2_frenameat                (fd_t, __fd_t)
-#define __NR64AT3_frenameat                (char const *, char const *)
-#define __NR64AT4_frenameat                (atflag_t, __atflag_t)
 #define __NR64AT0_kfstatat                 (fd_t, __fd_t)
 #define __NR64AT1_kfstatat                 (char const *, char const *)
 #define __NR64AT2_kfstatat                 (struct __kos_statx64 *, struct __kos_statx64 *)
@@ -2116,7 +2109,7 @@
 #define __NR64AM_finit_module(a, b, c, d, e, f)             (__fd_t)a, (char const *)b, (__syscall_ulong_t)c
 #define __NR64AM_sched_setattr(a, b, c, d, e, f)            (int)a
 #define __NR64AM_sched_getattr(a, b, c, d, e, f)            (int)a
-#define __NR64AM_renameat2(a, b, c, d, e, f)                (__fd_t)a, (char const *)b, (__fd_t)c, (char const *)d, (__syscall_ulong_t)e
+#define __NR64AM_renameat2(a, b, c, d, e, f)                (__fd_t)a, (char const *)b, (__fd_t)c, (char const *)d, (__atflag_t)e
 #define __NR64AM_seccomp(a, b, c, d, e, f)                  (int)a
 #define __NR64AM_getrandom(a, b, c, d, e, f)                (void *)a, (__size_t)b, (__syscall_ulong_t)c
 #define __NR64AM_memfd_create(a, b, c, d, e, f)             (char const *)a, (__syscall_ulong_t)b
@@ -2155,7 +2148,6 @@
 #define __NR64AM_preadvf(a, b, c, d, e, f)                  (__fd_t)a, (struct __iovecx64 const *)b, (__size_t)c, (__uint64_t)d, (__iomode_t)e
 #define __NR64AM_freadlinkat(a, b, c, d, e, f)              (__fd_t)a, (char const *)b, (char *)c, (__size_t)d, (__atflag_t)e
 #define __NR64AM_fsymlinkat(a, b, c, d, e, f)               (char const *)a, (__fd_t)b, (char const *)c, (__atflag_t)d
-#define __NR64AM_frenameat(a, b, c, d, e, f)                (__fd_t)a, (char const *)b, (__fd_t)c, (char const *)d, (__atflag_t)e
 #define __NR64AM_kfstatat(a, b, c, d, e, f)                 (__fd_t)a, (char const *)b, (struct __kos_statx64 *)c, (__atflag_t)d
 #define __NR64AM_fmknodat(a, b, c, d, e, f)                 (__fd_t)a, (char const *)b, (__mode_t)c, (__dev_t)d, (__atflag_t)e
 #define __NR64AM_fmkdirat(a, b, c, d, e, f)                 (__fd_t)a, (char const *)b, (__mode_t)c, (__atflag_t)d
@@ -2564,7 +2556,6 @@
 #define __NR64AP_preadvf(a, b, c, d, e)                     (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e
 #define __NR64AP_freadlinkat(a, b, c, d, e)                 (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e
 #define __NR64AP_fsymlinkat(a, b, c, d)                     (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
-#define __NR64AP_frenameat(a, b, c, d, e)                   (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e
 #define __NR64AP_kfstatat(a, b, c, d)                       (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
 #define __NR64AP_fmknodat(a, b, c, d, e)                    (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e
 #define __NR64AP_fmkdirat(a, b, c, d)                       (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d

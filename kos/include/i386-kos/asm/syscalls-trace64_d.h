@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdb086e1e */
+/* HASH CRC-32:0x2c7c6c65 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -821,11 +821,6 @@
 #define __NR64AN1_fsymlinkat               tofd
 #define __NR64AN2_fsymlinkat               target_path
 #define __NR64AN3_fsymlinkat               flags
-#define __NR64AN0_frenameat                oldfd
-#define __NR64AN1_frenameat                oldname
-#define __NR64AN2_frenameat                newfd
-#define __NR64AN3_frenameat                newname_or_path
-#define __NR64AN4_frenameat                flags
 #define __NR64AN0_kfstatat                 dirfd
 #define __NR64AN1_kfstatat                 filename
 #define __NR64AN2_kfstatat                 statbuf
@@ -2206,14 +2201,6 @@
 #define __NR64ATL2_fsymlinkat               1                                                                    /* target_path -> tofd */ 
 #define __NR64ATR3_fsymlinkat               SC_REPR_ATFLAG__DOSPATH                                              /* flags */ 
 #define __NR64RTR_fsymlinkat                SC_REPR_ERRNO_T                                                      /* return */
-#define __NR64ATR0_frenameat                SC_REPR_FD_T                                                         /* oldfd */ 
-#define __NR64ATR1_frenameat                SC_REPR_FILENAME                                                     /* oldname */ 
-#define __NR64ATL1_frenameat                0                                                                    /* oldname -> oldfd */ 
-#define __NR64ATR2_frenameat                SC_REPR_FD_T                                                         /* newfd */ 
-#define __NR64ATR3_frenameat                SC_REPR_FILENAME                                                     /* newname_or_path */ 
-#define __NR64ATL3_frenameat                2                                                                    /* newname_or_path -> newfd */ 
-#define __NR64ATR4_frenameat                SC_REPR_ATFLAG__DOSPATH                                              /* flags */ 
-#define __NR64RTR_frenameat                 SC_REPR_ERRNO_T                                                      /* return */
 #define __NR64ATR0_kfstatat                 SC_REPR_FD_T                                                         /* dirfd */ 
 #define __NR64ATR1_kfstatat                 SC_REPR_FILENAME                                                     /* filename */ 
 #define __NR64ATL1_kfstatat                 0                                                                    /* filename -> dirfd */ 

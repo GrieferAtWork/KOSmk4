@@ -789,8 +789,6 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *       that  can be implemented on a per-handle basis to facilitate the strings to which symlinks under
 	 *       /proc/[pid]/fd/[fileno] expand when read. */
 
-	/* TODO: Get rid of the `sys_frenameat' system call (`sys_renameat2()' should be used instead) */
-
 	/* TODO: Get rid of `O_SYMLINK' */
 
 	/* TODO: Get rid of `AT_SYMLINK_REGULAR' */

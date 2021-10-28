@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8bb8c9c3 */
+/* HASH CRC-32:0x6de82358 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -991,11 +991,6 @@
 #define __NR32AN1_fsymlinkat                   tofd
 #define __NR32AN2_fsymlinkat                   target_path
 #define __NR32AN3_fsymlinkat                   flags
-#define __NR32AN0_frenameat                    oldfd
-#define __NR32AN1_frenameat                    oldname
-#define __NR32AN2_frenameat                    newfd
-#define __NR32AN3_frenameat                    newname_or_path
-#define __NR32AN4_frenameat                    flags
 #define __NR32AN0_kfstatat                     dirfd
 #define __NR32AN1_kfstatat                     filename
 #define __NR32AN2_kfstatat                     statbuf
@@ -2678,14 +2673,6 @@
 #define __NR32ATL2_fsymlinkat                   1                                                                    /* target_path -> tofd */ 
 #define __NR32ATR3_fsymlinkat                   SC_REPR_ATFLAG__DOSPATH                                              /* flags */ 
 #define __NR32RTR_fsymlinkat                    SC_REPR_ERRNO_T                                                      /* return */
-#define __NR32ATR0_frenameat                    SC_REPR_FD_T                                                         /* oldfd */ 
-#define __NR32ATR1_frenameat                    SC_REPR_FILENAME                                                     /* oldname */ 
-#define __NR32ATL1_frenameat                    0                                                                    /* oldname -> oldfd */ 
-#define __NR32ATR2_frenameat                    SC_REPR_FD_T                                                         /* newfd */ 
-#define __NR32ATR3_frenameat                    SC_REPR_FILENAME                                                     /* newname_or_path */ 
-#define __NR32ATL3_frenameat                    2                                                                    /* newname_or_path -> newfd */ 
-#define __NR32ATR4_frenameat                    SC_REPR_ATFLAG__DOSPATH                                              /* flags */ 
-#define __NR32RTR_frenameat                     SC_REPR_ERRNO_T                                                      /* return */
 #define __NR32ATR0_kfstatat                     SC_REPR_FD_T                                                         /* dirfd */ 
 #define __NR32ATR1_kfstatat                     SC_REPR_FILENAME                                                     /* filename */ 
 #define __NR32ATL1_kfstatat                     0                                                                    /* filename -> dirfd */ 

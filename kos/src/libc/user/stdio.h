@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x16664ae1 */
+/* HASH CRC-32:0xb4172a36 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -106,9 +106,14 @@ INTDEF NONNULL((2, 4)) int NOTHROW_RPC(LIBCCALL libc_renameat)(fd_t oldfd, char 
 /* >> removeat(3)
  * Remove a file or directory `filename' relative to a given base directory `dirfd' */
 INTDEF NONNULL((2)) int NOTHROW_RPC(LIBCCALL libc_removeat)(fd_t dirfd, char const *filename);
-/* >> frenameat(2)
- * @param flags: Set of `0 | AT_DOSPATH' */
-INTDEF NONNULL((2, 4)) int NOTHROW_RPC(LIBCCALL libc_frenameat)(fd_t oldfd, char const *oldname, fd_t newfd, char const *newname_or_path, atflag_t flags);
+/* >> renameat2(2)
+ * @param flags: Set of `0 | AT_RENAME_NOREPLACE | AT_RENAME_EXCHANGE |
+ *                       AT_RENAME_WHITEOUT | AT_RENAME_MOVETODIR | AT_DOSPATH'
+ * NOTE: For portability, use the following names:
+ *   - `AT_RENAME_NOREPLACE' --> `RENAME_NOREPLACE'
+ *   - `AT_RENAME_EXCHANGE'  --> `RENAME_EXCHANGE'
+ *   - `AT_RENAME_WHITEOUT'  --> `RENAME_WHITEOUT' */
+INTDEF NONNULL((2, 4)) int NOTHROW_RPC(LIBCCALL libc_renameat2)(fd_t oldfd, char const *oldname, fd_t newfd, char const *newname_or_path, atflag_t flags);
 /* >> tmpnam(3), tmpnam_r(3) */
 INTDEF WUNUSED NONNULL((1)) char *NOTHROW_NCX(LIBCCALL libc_tmpnam_r)(char *buf);
 /* >> fflush_unlocked(3)

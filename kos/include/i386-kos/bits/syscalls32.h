@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7b7c4c80 */
+/* HASH CRC-32:0x1cf4d94 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -799,8 +799,8 @@
 #define SYS_finit_module                 __NR_finit_module                 /* errno_t finit_module(fd_t fd, char const *uargs, syscall_ulong_t flags) */
 #define SYS_sched_setattr                __NR_sched_setattr                /* errno_t sched_setattr(int TODO_PROTOTYPE) */
 #define SYS_sched_getattr                __NR_sched_getattr                /* errno_t sched_getattr(int TODO_PROTOTYPE) */
-/* @param: flags: Set of `RENAME_EXCHANGE | RENAME_NOREPLACE | RENAME_WHITEOUT' */
-#define SYS_renameat2                    __NR_renameat2                    /* errno_t renameat2(fd_t olddirfd, char const *oldpath, fd_t newdirfd, char const *newpath, syscall_ulong_t flags) */
+/* @param: flags: Set of `0 | AT_RENAME_NOREPLACE | AT_RENAME_EXCHANGE | AT_RENAME_WHITEOUT | AT_RENAME_MOVETODIR | AT_DOSPATH' */
+#define SYS_renameat2                    __NR_renameat2                    /* errno_t renameat2(fd_t olddirfd, char const *oldpath, fd_t newdirfd, char const *newpath, atflag_t flags) */
 #define SYS_seccomp                      __NR_seccomp                      /* errno_t seccomp(int TODO_PROTOTYPE) */
 /* @param: flags: Set of `0 | GRND_RANDOM | GRND_NONBLOCK' */
 #define SYS_getrandom                    __NR_getrandom                    /* ssize_t getrandom(void *buf, size_t num_bytes, syscall_ulong_t flags) */
@@ -1092,8 +1092,6 @@
 #define SYS_freadlinkat                  __NR_freadlinkat                  /* ssize_t freadlinkat(fd_t dirfd, char const *path, char *buf, size_t buflen, atflag_t flags) */
 /* @param: flags: Set of `0 | AT_DOSPATH' */
 #define SYS_fsymlinkat                   __NR_fsymlinkat                   /* errno_t fsymlinkat(char const *link_text, fd_t tofd, char const *target_path, atflag_t flags) */
-/* @param: flags: Set of `0 | AT_DOSPATH' */
-#define SYS_frenameat                    __NR_frenameat                    /* errno_t frenameat(fd_t oldfd, char const *oldname, fd_t newfd, char const *newname_or_path, atflag_t flags) */
 /* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
 #define SYS_kfstatat                     __NR_kfstatat                     /* errno_t kfstatat(fd_t dirfd, char const *filename, struct __kos_statx32 *statbuf, atflag_t flags) */
 #define SYS_futimesat64                  __NR_futimesat64                  /* errno_t futimesat64(fd_t dirfd, char const *filename, struct timevalx32_64 const[2] times) */
