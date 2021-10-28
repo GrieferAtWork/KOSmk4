@@ -144,11 +144,20 @@ done:
 }
 #endif /* __ARCH_HAVE_COMPAT */
 
+#ifdef CONFIG_USE_NEW_FS
 LOCAL ATTR_RETNONNULL WUNUSED NONNULL((1)) struct mbnode *KCALL
-create_bss_overlap_mbnode(struct regular_node *__restrict exec_node,
+create_bss_overlap_mbnode(struct mfile *__restrict exec_file,
                           pos_t file_data_offset,
                           size_t bss_start_page_offset,
-                          size_t bss_num_bytes) {
+                          size_t bss_num_bytes)
+#else /* CONFIG_USE_NEW_FS */
+LOCAL ATTR_RETNONNULL WUNUSED NONNULL((1)) struct mbnode *KCALL
+create_bss_overlap_mbnode(struct regular_node *__restrict exec_file,
+                          pos_t file_data_offset,
+                          size_t bss_start_page_offset,
+                          size_t bss_num_bytes)
+#endif /* !CONFIG_USE_NEW_FS */
+{
 	struct mbnode *node;
 	struct mpart *part;
 	physpage_t overlap_page;
@@ -163,9 +172,15 @@ create_bss_overlap_mbnode(struct regular_node *__restrict exec_node,
 				THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, PAGESIZE);
 			TRY {
 				/* Load the overlapping file data into memory. */
-				inode_readall_phys(exec_node, physpage2addr(overlap_page),
+#ifdef CONFIG_USE_NEW_FS
+				mfile_readall_p(exec_file, physpage2addr(overlap_page),
+				                bss_start_page_offset,
+				                file_data_offset);
+#else /* CONFIG_USE_NEW_FS */
+				inode_readall_phys(exec_file, physpage2addr(overlap_page),
 				                   bss_start_page_offset,
 				                   file_data_offset);
+#endif /* !CONFIG_USE_NEW_FS */
 				/* Check if we must zero-initialize the BSS portion. */
 				if (!page_iszero(overlap_page)) {
 					/* Zero-initialize the BSS portion */

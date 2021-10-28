@@ -61,11 +61,17 @@ find_eol(char *line, size_t len) {
 /* ABI exec function for #! */
 INTERN WUNUSED NONNULL((1)) unsigned int FCALL
 shebang_exec(struct execargs *__restrict args) {
+	char *ext_header;
+
+	/* shebang can't be used without an execution path! */
+	if unlikely(!args->ea_xpath)
+		return EXECABI_EXEC_NOTBIN;
+
 	/* Syntax: `#! <path-relative-to(exec_path)>[ <optional_argument>] LF'
 	 *            ^                              ^                    ^
 	 *            Optional                       Mandatory            Optional
 	 *            whitespace                     whitespace           whitespace */
-	char *ext_header = NULL;
+	ext_header = NULL;
 
 	/* Check for simple case: the linefeed is already apart of the pre-loaded `exec_header' */
 	TRY {
@@ -81,7 +87,7 @@ shebang_exec(struct execargs *__restrict args) {
 			ext_header = (char *)kmalloc(CONFIG_SHEBANG_INTERPRETER_LINE_MAX, GFP_NORMAL);
 			ptr        = (char *)mempcpy(ext_header, args->ea_header + 2, CONFIG_EXECABI_MAXHEADER - 2);
 #define MAX_EXTSIZE (CONFIG_SHEBANG_INTERPRETER_LINE_MAX - (CONFIG_EXECABI_MAXHEADER - 2))
-			extlen = inode_read(args->ea_xnode, ptr, MAX_EXTSIZE, (pos_t)(CONFIG_EXECABI_MAXHEADER - 2));
+			extlen = inode_read(args->ea_xfile, ptr, MAX_EXTSIZE, (pos_t)(CONFIG_EXECABI_MAXHEADER - 2));
 			if (extlen < MAX_EXTSIZE)
 				memset(ptr + extlen, 0, MAX_EXTSIZE - extlen);
 #undef MAX_EXTSIZE
@@ -136,14 +142,15 @@ shebang_exec(struct execargs *__restrict args) {
 			/* Load the interpreter program. */
 			REF struct path /*           */ *interp_path;
 			REF struct fdirent /**/ *interp_dentry;
-			REF struct regular_node /*   */ *interp_node;
 #ifdef CONFIG_USE_NEW_FS
+			REF struct fnode *interp_node;
 			{
 				u32 lnks = ATOMIC_READ(THIS_FS->fs_lnkmax);
-				interp_node = (REF struct regular_node *)path_traversefull_ex(args->ea_xpath, &lnks, execfile, 0,
-				                                                              &interp_path, &interp_dentry);
+				interp_node = path_traversefull_ex(args->ea_xpath, &lnks, execfile, 0,
+				                                   &interp_path, &interp_dentry);
 			}
 #else /* CONFIG_USE_NEW_FS */
+			REF struct regular_node /*   */ *interp_node;
 			{
 				struct fs *myfs = THIS_FS;
 				REF struct path *search_root;
@@ -170,9 +177,14 @@ shebang_exec(struct execargs *__restrict args) {
 			TRY {
 				char *inject_arg0, *inject_arg1;
 				size_t more_argc;
-				/* Assert that the specified node is a regular file. */
+
+				/* In order to allow for execution, the file itself must support mmaping.
+				 * It's not OK if the file can be mmap'd indirectly, or if mmap has been
+				 * disabled for the file. */
 #ifdef CONFIG_USE_NEW_FS
-				if unlikely(!fnode_isreg(interp_node))
+				if unlikely((interp_node->mf_ops->mo_stream &&
+				             interp_node->mf_ops->mo_stream->mso_mmap) ||
+				            (interp_node->mf_flags & MFILE_F_NOUSRMMAP))
 					THROW(E_NOT_EXECUTABLE_NOT_REGULAR);
 #endif /* CONFIG_USE_NEW_FS */
 
@@ -232,11 +244,11 @@ shebang_exec(struct execargs *__restrict args) {
 
 			/* Replace the exec-path with that of the interpreter. */
 			decref_unlikely(args->ea_xpath);
-			decref_unlikely(args->ea_xdentry);
-			decref_unlikely(args->ea_xnode);
+			xdecref_unlikely(args->ea_xdentry);
+			decref_unlikely(args->ea_xfile);
 			args->ea_xpath   = interp_path;   /* Inherit reference */
 			args->ea_xdentry = interp_dentry; /* Inherit reference */
-			args->ea_xnode   = interp_node;   /* Inherit reference */
+			args->ea_xfile   = interp_node;   /* Inherit reference */
 		}
 #undef HAS_OPTIONAL_ARGUMENT
 	} EXCEPT {

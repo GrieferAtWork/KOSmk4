@@ -3209,7 +3209,7 @@ kernel_do_execveat_impl(/*in|out*/ struct execargs *__restrict args) {
 	/* Upon success, run onexec callbacks (which will clear all CLOEXEC handles). */
 	run_permman_onexec();
 #ifndef CONFIG_EVERYONE_IS_ROOT
-	cred_onexec(args->ea_xnode);
+	cred_onexec(args->ea_xfile);
 #endif /* !CONFIG_EVERYONE_IS_ROOT */
 }
 
@@ -3344,7 +3344,7 @@ kernel_execveat(fd_t dirfd,
 	                 AT_EMPTY_PATH | AT_SYMLINK_NOFOLLOW | AT_DOSPATH,
 	                 E_INVALID_ARGUMENT_CONTEXT_EXECVEAT_FLAGS);
 	memset(&args, 0, sizeof(args));
-	args.ea_xnode = (REF struct regular_node *)path_traversefull_at(f,
+	args.ea_xfile = (REF struct regular_node *)path_traversefull_at(f,
 	                                                                (unsigned int)dirfd,
 	                                                                pathname,
 	                                                                !(flags & AT_SYMLINK_NOFOLLOW),
@@ -3356,11 +3356,11 @@ kernel_execveat(fd_t dirfd,
 	TRY {
 		/* Assert that the specified node is a regular file. */
 #if 0 /* TODO */
-		vm_exec_assert_regular(args.ea_xnode);
+		vm_exec_assert_regular(args.ea_xfile);
 #endif
 
 		/* Check for execute permissions? */
-		inode_access(args.ea_xnode, R_OK | X_OK);
+		inode_access(args.ea_xfile, R_OK | X_OK);
 
 		/* Fill in exec arguments. */
 		args.ea_argv = argv;

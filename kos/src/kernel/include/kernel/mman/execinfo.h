@@ -27,15 +27,23 @@
 #ifdef __CC__
 DECL_BEGIN
 
+#ifdef CONFIG_USE_NEW_FS
+struct mfile;
+#else /* CONFIG_USE_NEW_FS */
 struct inode;
+#endif /* !CONFIG_USE_NEW_FS */
 struct fdirent;
 struct path;
 
 struct mexecinfo {
-	REF struct inode           *mei_node; /* [0..1][lock(:THIS_MMAN->mm_lock)] Exec INode */
+#ifdef CONFIG_USE_NEW_FS
+	REF struct mfile   *mei_file; /* [0..1][lock(:THIS_MMAN->mm_lock)] Exec INode */
+#else /* CONFIG_USE_NEW_FS */
+	REF struct inode   *mei_file; /* [0..1][lock(:THIS_MMAN->mm_lock)] Exec INode */
+#endif /* !CONFIG_USE_NEW_FS */
 	REF struct fdirent *mei_dent; /* [0..1][lock(:THIS_MMAN->mm_lock)] Exec directory entry */
-	REF struct path            *mei_path; /* [0..1][lock(:THIS_MMAN->mm_lock)] Exec path */
-	USER CHECKED void          *mei_peb;  /* [?..1][lock(:THIS_MMAN->mm_lock)] PEB base address. */
+	REF struct path    *mei_path; /* [0..1][lock(:THIS_MMAN->mm_lock)] Exec path */
+	USER CHECKED void  *mei_peb;  /* [?..1][lock(:THIS_MMAN->mm_lock)] PEB base address. */
 #ifdef __ARCH_HAVE_COMPAT
 	bool mei_peb_iscompat; /* [lock(:THIS_MMAN->mm_lock)] True if the PEB is in compatibility mode. */
 #endif /* __ARCH_HAVE_COMPAT */

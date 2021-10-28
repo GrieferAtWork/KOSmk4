@@ -2541,7 +2541,7 @@ DBG_COMMAND(lslib,
 	struct mfile *exec_file;
 	struct mman *mm;
 	mm        = dbg_current->t_mman;
-	exec_file = FORMMAN(mm, thismman_execinfo).mei_node;
+	exec_file = FORMMAN(mm, thismman_execinfo).mei_file;
 	dbg_print(DBGSTR("name                            loadaddr minaddr  maxaddr\n"));
 	for (mod = mman_module_first_nx(mm); mod;) {
 		ssize_t len;

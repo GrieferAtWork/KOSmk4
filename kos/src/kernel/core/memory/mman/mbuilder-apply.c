@@ -436,7 +436,7 @@ again:
 		memcpy(&oldinfo, &FORMMAN(target, thismman_execinfo), sizeof(struct mexecinfo));
 		if (execinfo) {
 			memcpy(&FORMMAN(target, thismman_execinfo), execinfo, sizeof(struct mexecinfo));
-			xincref(execinfo->mei_node);
+			xincref(execinfo->mei_file);
 			xincref(execinfo->mei_dent);
 			xincref(execinfo->mei_path);
 		} else {
@@ -448,7 +448,7 @@ again:
 
 		/* Drop references _after_ releasing the mman lock,
 		 * thus improving efficiency. */
-		xdecref(oldinfo.mei_node);
+		xdecref(oldinfo.mei_file);
 		xdecref(oldinfo.mei_dent);
 		xdecref(oldinfo.mei_path);
 	} else {

@@ -41,6 +41,7 @@
 
 #include <elf.h>
 #include <stddef.h>
+#include <stdio.h>
 #include <string.h>
 
 #ifdef __x86_64__
@@ -102,7 +103,7 @@ INTERN struct icpustate *KCALL
 elfexec_init_rtld(struct icpustate *__restrict user_state,
                   struct path *__restrict exec_path,
                   struct fdirent *__restrict exec_dentry,
-                  struct regular_node *__restrict UNUSED(exec_node),
+                  struct mfile *__restrict UNUSED(exec_file),
                   KERNEL Elf64_Ehdr const *__restrict ehdr,
                   KERNEL Elf64_Phdr const *__restrict phdr_vec, Elf64_Half phdr_cnt,
                   void *application_loadaddr, void *linker_loadaddr,
@@ -151,13 +152,23 @@ elfexec_init_rtld(struct icpustate *__restrict user_state,
 	for (;;) {
 		size_t reqlen;
 #ifdef CONFIG_USE_NEW_FS
-		REF struct path *myroot = fs_getroot(THIS_FS);
-		FINALLY_DECREF_UNLIKELY(myroot);
-		reqlen = path_sprintent(exec_path,
-		                        exec_dentry->fd_name,
-		                        exec_dentry->fd_namelen,
-		                        (USER char *)user_state_sp - buflen,
-		                        buflen, AT_PATHPRINT_INCTRAIL, myroot);
+		if (exec_path && exec_dentry) {
+			REF struct path *myroot = fs_getroot(THIS_FS);
+			FINALLY_DECREF_UNLIKELY(myroot);
+			reqlen = path_sprintent(exec_path,
+			                        exec_dentry->fd_name,
+			                        exec_dentry->fd_namelen,
+			                        (USER char *)user_state_sp - buflen,
+			                        buflen, AT_PATHPRINT_INCTRAIL, myroot);
+		} else if (exec_dentry) {
+			reqlen = snprintf((USER char *)user_state_sp - buflen, buflen,
+			                  "%$s", (size_t)exec_dentry->fd_namelen,
+			                  exec_dentry->fd_name);
+		} else {
+			reqlen = 1;
+			if (buflen)
+				((USER char *)user_state_sp - buflen)[0] = '\0';
+		}
 #else /* CONFIG_USE_NEW_FS */
 		reqlen = path_sprintent((USER char *)user_state_sp - buflen,
 		                        buflen,
@@ -270,11 +281,11 @@ elfexec_init_entry32(struct icpustate *__restrict user_state,
 
 
 /* Initialize the RTLD user-space library for runtime linking. */
-INTERN ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3, 4, 5, 6)) struct icpustate *KCALL
+INTERN ATTR_RETNONNULL WUNUSED NONNULL((1, 4, 5, 6)) struct icpustate *KCALL
 elfexec_init_rtld32(struct icpustate *__restrict user_state,
-                    struct path *__restrict exec_path,
-                    struct fdirent *__restrict exec_dentry,
-                    struct regular_node *__restrict UNUSED(exec_node),
+                    struct path *exec_path,
+                    struct fdirent *exec_dentry,
+                    struct mfile *__restrict UNUSED(exec_file),
                     KERNEL Elf32_Ehdr const *__restrict ehdr,
                     KERNEL Elf32_Phdr const *__restrict phdr_vec, Elf32_Half phdr_cnt,
                     void *application_loadaddr, void *linker_loadaddr,
@@ -337,13 +348,23 @@ elfexec_init_rtld32(struct icpustate *__restrict user_state,
 	for (;;) {
 		size_t reqlen;
 #ifdef CONFIG_USE_NEW_FS
-		REF struct path *myroot = fs_getroot(THIS_FS);
-		FINALLY_DECREF_UNLIKELY(myroot);
-		reqlen = path_sprintent(exec_path,
-		                        exec_dentry->fd_name,
-		                        exec_dentry->fd_namelen,
-		                        (USER char *)user_state_sp - buflen,
-		                        buflen, AT_PATHPRINT_INCTRAIL, myroot);
+		if (exec_path && exec_dentry) {
+			REF struct path *myroot = fs_getroot(THIS_FS);
+			FINALLY_DECREF_UNLIKELY(myroot);
+			reqlen = path_sprintent(exec_path,
+			                        exec_dentry->fd_name,
+			                        exec_dentry->fd_namelen,
+			                        (USER char *)user_state_sp - buflen,
+			                        buflen, AT_PATHPRINT_INCTRAIL, myroot);
+		} else if (exec_dentry) {
+			reqlen = snprintf((USER char *)user_state_sp - buflen, buflen,
+			                  "%$s", (size_t)exec_dentry->fd_namelen,
+			                  exec_dentry->fd_name);
+		} else {
+			reqlen = 1;
+			if (buflen)
+				((USER char *)user_state_sp - buflen)[0] = '\0';
+		}
 #else /* CONFIG_USE_NEW_FS */
 		reqlen = path_sprintent((USER char *)user_state_sp - buflen,
 		                        buflen,

@@ -608,7 +608,7 @@ again:
 			old_execinfo = &FORMMAN(ft.ft_oldmm, thismman_execinfo);
 			new_execinfo = &FORMMAN(ft.ft_newmm, thismman_execinfo);
 			memcpy(new_execinfo, old_execinfo, sizeof(struct mexecinfo));
-			xincref(new_execinfo->mei_node);
+			xincref(new_execinfo->mei_file);
 			xincref(new_execinfo->mei_dent);
 			xincref(new_execinfo->mei_path);
 		}

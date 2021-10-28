@@ -2243,55 +2243,63 @@ kernel_do_execveat_impl(/*in|out*/ struct execargs *__restrict args) {
 	/* Upon success, run onexec callbacks (which will clear all CLOEXEC handles). */
 	run_permman_onexec();
 #ifndef CONFIG_EVERYONE_IS_ROOT
-	cred_onexec(args->ea_xnode);
+	cred_onexec(args->ea_xfile);
 #endif /* !CONFIG_EVERYONE_IS_ROOT */
 }
 
 PRIVATE void KCALL
 kernel_do_execveat(/*in|out*/ struct execargs *__restrict args) {
-	if (kernel_debugtrap_enabled()) {
+	if (kernel_debugtrap_enabled() && args->ea_xdentry) {
 		/* Trigger an EXEC debug trap. */
-		char *buf, *dst;
-		size_t reglen;
-		reglen = (size_t)path_printent(args->ea_xpath,
-		                               args->ea_xdentry->fd_name,
-		                               args->ea_xdentry->fd_namelen,
-		                               &format_length,
-		                               NULL);
-		/* Allocate  the  register  buffer  beforehand,  so  this
-		 * allocation failing can still be handled by user-space.
-		 * NOTE: We  always  allocate this  buffer on  the heap,  since  file paths  can get  quite long,
-		 *       an being  as far  to the  bottom of  the  kernel stack  as we  are, it  could be  a  bit
-		 *       risky to allocate a huge stack-based structure when we still have to call `mman_exec()',
-		 *       even when using `malloca()' (but maybe I'm just overlay cautios...) */
-		buf = (char *)kmalloc((reglen + 1) * sizeof(char), GFP_NORMAL);
-		TRY {
-			dst = buf;
-			/* FIXME: If  the process  uses chroot()  between this  and the previous
-			 *        printent() call, then we may write past the end of the buffer!
-			 * Solution: Use `path_printentex()' and pass the same pre-loaded root-path
-			 *           during every invocation! */
-			path_printent(args->ea_xpath,
-			              args->ea_xdentry->fd_name,
-			              args->ea_xdentry->fd_namelen,
-			              &format_sprintf_printer,
-			              &dst);
-			assert(dst == buf + reglen);
-			*dst = '\0';
-			/* Execute the specified program. */
-			kernel_do_execveat_impl(args);
-			{
-				struct debugtrap_reason r;
-				r.dtr_signo  = SIGTRAP;
-				r.dtr_reason = DEBUGTRAP_REASON_EXEC;
-				r.dtr_strarg = buf;
-				args->ea_state = kernel_debugtrap_r(args->ea_state, &r);
+		if (args->ea_xpath) {
+			char *buf, *dst;
+			size_t reglen;
+			reglen = (size_t)path_printent(args->ea_xpath,
+			                               args->ea_xdentry->fd_name,
+			                               args->ea_xdentry->fd_namelen,
+			                               &format_length,
+			                               NULL);
+			/* Allocate  the  register  buffer  beforehand,  so  this
+			 * allocation failing can still be handled by user-space.
+			 * NOTE: We  always  allocate this  buffer on  the heap,  since  file paths  can get  quite long,
+			 *       an being  as far  to the  bottom of  the  kernel stack  as we  are, it  could be  a  bit
+			 *       risky to allocate a huge stack-based structure when we still have to call `mman_exec()',
+			 *       even when using `malloca()' (but maybe I'm just overlay cautios...) */
+			buf = (char *)kmalloc((reglen + 1) * sizeof(char), GFP_NORMAL);
+			TRY {
+				dst = buf;
+				/* FIXME: If  the process  uses chroot()  between this  and the previous
+				 *        printent() call, then we may write past the end of the buffer!
+				 * Solution: Use `path_printentex()' and pass the same pre-loaded root-path
+				 *           during every invocation! */
+				path_printent(args->ea_xpath,
+				              args->ea_xdentry->fd_name,
+				              args->ea_xdentry->fd_namelen,
+				              &format_sprintf_printer,
+				              &dst);
+				assert(dst == buf + reglen);
+				*dst = '\0';
+				/* Execute the specified program. */
+				kernel_do_execveat_impl(args);
+				{
+					struct debugtrap_reason r;
+					r.dtr_signo    = SIGTRAP;
+					r.dtr_reason   = DEBUGTRAP_REASON_EXEC;
+					r.dtr_strarg   = buf;
+					args->ea_state = kernel_debugtrap_r(args->ea_state, &r);
+				}
+			} EXCEPT {
+				kfree(buf);
+				RETHROW();
 			}
-		} EXCEPT {
 			kfree(buf);
-			RETHROW();
+		} else {
+			struct debugtrap_reason r;
+			r.dtr_signo    = SIGTRAP;
+			r.dtr_reason   = DEBUGTRAP_REASON_EXEC;
+			r.dtr_strarg   = args->ea_xdentry->fd_name;
+			args->ea_state = kernel_debugtrap_r(args->ea_state, &r);
 		}
-		kfree(buf);
 	} else {
 		/* Execute the specified program. */
 		kernel_do_execveat_impl(args);
@@ -2384,44 +2392,43 @@ kernel_execveat(fd_t dirfd,
 
 		/* Convert  the handle into  the 3 relevant  objects. If any of
 		 * these conversions fail, then the given handle can't be used. */
+		args.ea_xdentry = (REF struct fdirent *)handle_tryas_noinherit(hand, HANDLE_TYPE_FDIRENT);
 		TRY {
-			args.ea_xnode = (REF struct fregnode *)handle_as_fnode(hand);
+			args.ea_xpath = (REF struct path *)handle_tryas_noinherit(hand, HANDLE_TYPE_PATH);
 			TRY {
-				args.ea_xpath = handle_as_path(hand);
-				TRY {
-					args.ea_xdentry = handle_as_fdirent(hand);
-				} EXCEPT {
-					decref_unlikely(args.ea_xpath);
-					RETHROW();
-				}
+				args.ea_xfile = handle_as_mfile(hand); /* This inherits `hand' on success */
 			} EXCEPT {
-				decref_unlikely(args.ea_xnode);
+				xdecref_unlikely(args.ea_xpath);
 				RETHROW();
 			}
 		} EXCEPT {
+			xdecref_unlikely(args.ea_xdentry);
 			decref_unlikely(hand);
 			RETHROW();
 		}
-		decref_unlikely(hand);
 	} else {
-		REF struct fnode *node;
-		atflags = fs_atflags(atflags);
-		node    = path_traversefull(dirfd, pathname, atflags, &args.ea_xpath, &args.ea_xdentry);
-
-		/* Remember the node (the isreg check if done below). */
-		args.ea_xnode = (REF struct fregnode *)node;
+		args.ea_xfile = path_traversefull(dirfd, pathname, fs_atflags(atflags),
+		                                  &args.ea_xpath, &args.ea_xdentry);
 	}
 	TRY {
-		/* Assert that the specified node is a regular file. */
-		if unlikely(!fnode_isreg(args.ea_xnode))
+		/* In order to allow for execution, the file itself must support mmaping.
+		 * It's not OK if the file can be mmap'd indirectly, or if mmap has been
+		 * disabled for the file. */
+		if unlikely((args.ea_xfile->mf_ops->mo_stream &&
+		             args.ea_xfile->mf_ops->mo_stream->mso_mmap) ||
+		            (args.ea_xfile->mf_flags & MFILE_F_NOUSRMMAP))
 			THROW(E_NOT_EXECUTABLE_NOT_REGULAR);
 
-		if unlikely(args.ea_xnode->fn_super->fs_root.mf_flags & MFILE_FS_NOEXEC)
-			THROW(E_NOT_EXECUTABLE_NOEXEC); /* XXX: Some other exception for this case? */
-
-		/* Check for execute permissions? */
-		if (!fnode_mayaccess(args.ea_xnode, R_OK | X_OK))
-			THROW(E_NOT_EXECUTABLE_NOEXEC);
+		/* For filesystem nodes there are a couple of additional checks. */
+		if (mfile_isnode(args.ea_xfile)) {
+			struct fnode *node = mfile_asnode(args.ea_xfile);
+			if unlikely(node->fn_super->fs_root.mf_flags & MFILE_FS_NOEXEC)
+				THROW(E_NOT_EXECUTABLE_NOEXEC); /* XXX: Some other exception for this case? */
+	
+			/* Check for execute permissions? */
+			if (!fnode_mayaccess(node, R_OK | X_OK))
+				THROW(E_NOT_EXECUTABLE_NOEXEC);
+		}
 
 		/* Fill in exec arguments. */
 		args.ea_argv = argv;

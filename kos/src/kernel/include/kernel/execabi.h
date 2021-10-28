@@ -120,7 +120,9 @@ struct icpustate;
 struct mman;
 struct path;
 struct fdirent;
+#ifndef CONFIG_USE_NEW_FS
 struct regular_node;
+#endif /* !CONFIG_USE_NEW_FS */
 
 struct execargs {
 	struct mman                *ea_mman;        /* [1..1] The mman into which to map the executable.
@@ -132,11 +134,15 @@ struct execargs {
 	                                             *        that proper execution of the loaded binary is possible.
 	                                             * Note however that  in the  case of a  dynamic binary,  a dynamic  linker
 	                                             * may be injected to perform dynamic linking whilst already in user-space. */
-	REF struct path            *ea_xpath;       /* [1..1] Filesystem path for the directory inside of which `ea_xnode' is located. */
-	REF struct fdirent         *ea_xdentry;     /* [1..1] Directory entry containing the filename of `ea_xnode'. */
-	REF struct regular_node    *ea_xnode;       /* [1..1] The filesystem node which should be loaded as an executable binary. */
+	REF struct path            *ea_xpath;       /* [0..1] Filesystem path for the directory inside of which `ea_xfile' is located. */
+	REF struct fdirent         *ea_xdentry;     /* [0..1] Directory entry containing the filename of `ea_xfile'. */
+#ifdef CONFIG_USE_NEW_FS
+	REF struct mfile           *ea_xfile;       /* [1..1] The filesystem node which should be loaded as an executable binary. */
+#else /* CONFIG_USE_NEW_FS */
+	REF struct regular_node    *ea_xfile;       /* [1..1] The filesystem node which should be loaded as an executable binary. */
+#endif /* !CONFIG_USE_NEW_FS */
 	byte_t                      ea_header[CONFIG_EXECABI_MAXHEADER];
-	                                            /* The first `CONFIG_EXECABI_MAXHEADER' bytes of `ea_xnode'. Of this  buffer,
+	                                            /* The first `CONFIG_EXECABI_MAXHEADER' bytes of `ea_xfile'. Of this  buffer,
 	                                             * the leading `ea_magsiz' bytes are known to be equal to `ea_magic'. If  the
 	                                             * executable file is smaller than `CONFIG_EXECABI_MAXHEADER', trailing bytes
 	                                             * are simply zero-initialized. */
@@ -187,7 +193,7 @@ struct execabi {
 /* Return codes for `ea_exec' */
 #define EXECABI_EXEC_SUCCESS 0 /* Success. */
 #define EXECABI_EXEC_NOTBIN  1 /* File doesn't belong to this ABI. (Even though the magic header was correct) */
-#define EXECABI_EXEC_RESTART 2 /* Restart execution with an updated `ea_xnode' (used to implement #!-scripts) */
+#define EXECABI_EXEC_RESTART 2 /* Restart execution with an updated `ea_xfile' (used to implement #!-scripts) */
 
 
 struct execabis_struct {

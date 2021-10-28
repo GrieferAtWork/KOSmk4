@@ -67,7 +67,7 @@ LOCAL_FUNC(elf_exec_impl)(/*in|out*/ struct execargs *__restrict args)
 			LOCAL_ElfW(Half) i;
 			linker_base = (UNCHECKED void *)-1;
 			/* Read the program segment header table into memory. */
-			inode_readall(args->ea_xnode,
+			inode_readall(args->ea_xfile,
 			              phdr_vector,
 			              ehdr->e_phnum * sizeof(LOCAL_ElfW(Phdr)),
 			              (pos_t)ehdr->e_phoff);
@@ -115,7 +115,7 @@ LOCAL_FUNC(elf_exec_impl)(/*in|out*/ struct execargs *__restrict args)
 						TRY {
 							mbuilder_map(&builder, loadaddr, fil_bytes, prot,
 							             MAP_FIXED | MAP_FIXED_NOREPLACE,
-							             args->ea_xnode,
+							             args->ea_xfile,
 							             args->ea_xpath,
 							             args->ea_xdentry,
 							             (pos_t)(phdr_vector[i].p_offset & ~PAGEMASK));
@@ -167,7 +167,7 @@ err_overlap:
 								      E_NOT_EXECUTABLE_FAULTY_FORMAT_ELF,
 								      E_NOT_EXECUTABLE_FAULTY_REASON_ELF_SEGMENTOVERLAP);
 							}
-							overlap_node = create_bss_overlap_mbnode(args->ea_xnode,
+							overlap_node = create_bss_overlap_mbnode(args->ea_xfile,
 							                                         (pos_t)(phdr_vector[i].p_offset +
 							                                                 phdr_vector[i].p_filesz -
 							                                                 bss_start_offset),
@@ -281,7 +281,7 @@ done_PT_LOAD_bss:
 			 * terminate all threads using it except for the caller. */
 			{
 				struct mexecinfo ei;
-				ei.mei_node = args->ea_xnode;
+				ei.mei_file = args->ea_xfile;
 				ei.mei_dent = args->ea_xdentry;
 				ei.mei_path = args->ea_xpath;
 				ei.mei_peb  = peb_base;
@@ -317,7 +317,7 @@ done_PT_LOAD_bss:
 					args->ea_state = LOCAL_FUNC(elfexec_init_rtld)(/* user_state:           */ args->ea_state,
 					                                               /* exec_path:            */ args->ea_xpath,
 					                                               /* exec_dentry:          */ args->ea_xdentry,
-					                                               /* exec_node:            */ args->ea_xnode,
+					                                               /* exec_node:            */ args->ea_xfile,
 					                                               /* ehdr:                 */ ehdr,
 					                                               /* phdr_vec:             */ phdr_vector,
 					                                               /* phdr_cnt:             */ ehdr->e_phnum,

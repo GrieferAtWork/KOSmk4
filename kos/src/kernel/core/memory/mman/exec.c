@@ -59,7 +59,7 @@ DECL_BEGIN
  * @param: args:             Exec arguments.
  * @throw: E_BADALLOC:       Insufficient memory.
  * @throw: E_SEGFAULT:       The given `ea_argv', `ea_envp', or one of their pointed-to strings is faulty.
- * @throw: E_NOT_EXECUTABLE: The given `ea_xnode' was not recognized as an acceptable binary. */
+ * @throw: E_NOT_EXECUTABLE: The given `ea_xfile' was not recognized as an acceptable binary. */
 PUBLIC NONNULL((1)) void KCALL
 mman_exec(/*in|out*/ struct execargs *__restrict args)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT,
@@ -72,7 +72,7 @@ again_loadheader:
 	TRY {
 		size_t read_bytes;
 		/* Load the file header. */
-		read_bytes = inode_read(args->ea_xnode, args->ea_header, sizeof(args->ea_header), 0);
+		read_bytes = inode_read(args->ea_xfile, args->ea_header, sizeof(args->ea_header), 0);
 		if unlikely(read_bytes < CONFIG_EXECABI_MAXHEADER)
 			memset(args->ea_header + read_bytes, 0, CONFIG_EXECABI_MAXHEADER - read_bytes);
 	} EXCEPT {
@@ -158,10 +158,10 @@ NOTHROW(KCALL kernel_initialize_exec_init)(struct icpustate *__restrict state) {
 	struct execargs args;
 	bzero(&args, sizeof(args)); /* For fields which we don't use */
 #ifdef CONFIG_USE_NEW_FS
-	args.ea_xnode = (REF struct regular_node *)path_traversefull(AT_FDCWD, kernel_init_binary, 0,
-	                                                             &args.ea_xpath, &args.ea_xdentry);
+	args.ea_xfile = path_traversefull(AT_FDCWD, kernel_init_binary, 0,
+	                                  &args.ea_xpath, &args.ea_xdentry);
 #else /* CONFIG_USE_NEW_FS */
-	args.ea_xnode = (REF struct regular_node *)path_traversefull(THIS_FS,
+	args.ea_xfile = (REF struct regular_node *)path_traversefull(THIS_FS,
 	                                                             kernel_init_binary,
 	                                                             true,
 	                                                             FS_MODE_FNORMAL,
@@ -171,9 +171,13 @@ NOTHROW(KCALL kernel_initialize_exec_init)(struct icpustate *__restrict state) {
 	                                                             &args.ea_xdentry);
 #endif /* !CONFIG_USE_NEW_FS */
 
-	/* Can only execute regular files. */
+	/* In order to allow for execution, the file itself must support mmaping.
+	 * It's not OK if the file can be mmap'd indirectly, or if mmap has been
+	 * disabled for the file. */
 #ifdef CONFIG_USE_NEW_FS
-	if unlikely(!fnode_isreg(args.ea_xnode))
+	if unlikely((args.ea_xfile->mf_ops->mo_stream &&
+	             args.ea_xfile->mf_ops->mo_stream->mso_mmap) ||
+	            (args.ea_xfile->mf_flags & MFILE_F_NOUSRMMAP))
 		THROW(E_NOT_EXECUTABLE_NOT_REGULAR);
 #endif /* CONFIG_USE_NEW_FS */
 

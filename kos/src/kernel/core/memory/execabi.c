@@ -91,9 +91,9 @@ NOTHROW(FCALL execargs_fini)(struct execargs *__restrict self) {
 			kfree(self->ea_argv_inject[i]);
 		kfree(self->ea_argv_inject);
 	}
-	decref_unlikely(self->ea_xpath);
-	decref_unlikely(self->ea_xdentry);
-	decref_unlikely(self->ea_xnode);
+	xdecref_unlikely(self->ea_xpath);
+	xdecref_unlikely(self->ea_xdentry);
+	decref_unlikely(self->ea_xfile);
 }
 
 

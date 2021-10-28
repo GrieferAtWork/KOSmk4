@@ -316,11 +316,11 @@ struct file_creds {
 	bool           fc_effective;   /* ... */
 };
 
-/* Try to load file credentials from `program_inode' */
+/* Try to load file credentials from `program_file' */
 PRIVATE WUNUSED NONNULL((1, 2)) bool KCALL
-inode_get_file_creds(struct inode *__restrict program_inode,
+inode_get_file_creds(struct mfile *__restrict program_file,
                      struct file_creds *__restrict result) {
-	(void)program_inode;
+	(void)program_file;
 	(void)result;
 	COMPILER_IMPURE();
 	/* TODO */
@@ -381,9 +381,16 @@ NOTHROW(FCALL cred_restore_special_fsuid_caps)(struct cred *__restrict self) {
 DEFINE_CMDLINE_FLAG_VAR(boot_no_file_caps, "no_file_caps");
 
 /* Update program credentials as has to be done as part of an exec() system call. */
+#ifdef CONFIG_USE_NEW_FS
 INTERN void FCALL
-cred_onexec(struct inode *__restrict program_inode)
-		THROWS(E_BADALLOC) {
+cred_onexec(struct mfile *__restrict program_file)
+		THROWS(E_BADALLOC)
+#else /* CONFIG_USE_NEW_FS */
+INTERN void FCALL
+cred_onexec(struct inode *__restrict program_file)
+		THROWS(E_BADALLOC)
+#endif /* !CONFIG_USE_NEW_FS */
+{
 	uid_t new_euid;
 	struct cred *self = THIS_CRED;
 	/* Unshare credentials if more the reference counter indicates that we must do so. */
@@ -400,17 +407,34 @@ cred_onexec(struct inode *__restrict program_inode)
 	 *       since we  already  know  that no-one  can  modify  it  anymore! */
 	new_euid = self->c_euid;
 #ifdef CONFIG_USE_NEW_FS
-	if (!self->c_no_new_privs &&
-	    !(program_inode->fn_super->fs_root.mf_flags & MFILE_FS_NOSUID))
+	if (!self->c_no_new_privs && mfile_isnode(program_file) &&
+	    !(mfile_asnode(program_file)->fn_super->fs_root.mf_flags & MFILE_FS_NOSUID))
 #else /* CONFIG_USE_NEW_FS */
 	if (!self->c_no_new_privs &&
-	    !(program_inode->i_super->s_flags & SUPERBLOCK_FNOSUID))
+	    !(program_file->i_super->s_flags & SUPERBLOCK_FNOSUID))
 #endif /* !CONFIG_USE_NEW_FS */
 	{
 		/* Check for set-user-id/set-group-id */
-		inode_loadattr(program_inode);
-		if (program_inode->i_filemode & S_ISUID) {
-			new_euid = program_inode->i_fileuid;
+		mode_t program_mode;
+		uid_t program_uid;
+		gid_t program_gid;
+#ifdef CONFIG_USE_NEW_FS
+		struct fnode *node;
+		node = mfile_asnode(program_file);
+		mfile_tslock_acquire(node);
+		program_mode = node->fn_mode;
+		program_uid  = node->fn_uid;
+		program_gid  = node->fn_gid;
+		mfile_tslock_release(node);
+#else /* CONFIG_USE_NEW_FS */
+		inode_loadattr(program_file);
+		program_mode = program_file->i_filemode;
+		program_uid  = program_file->i_fileuid;
+		program_gid  = program_file->i_filegid;
+#endif /* !CONFIG_USE_NEW_FS */
+
+		if (program_mode & S_ISUID) {
+			new_euid = program_uid;
 			/* Handle special credentials transitions that happen as part of UID changes. */
 			if (!(self->c_securebits & SECBIT_NO_SETUID_FIXUP)) {
 				/* Check for transition to/from root-mode */
@@ -442,12 +466,13 @@ cred_onexec(struct inode *__restrict program_inode)
 			self->c_fsuid = new_euid;
 			bzero(&self->c_cap_ambient, sizeof(self->c_cap_ambient));
 		}
-		if ((program_inode->i_filemode & (S_ISGID | S_IXGRP)) == (S_ISGID | S_IXGRP)) {
-			self->c_egid  = program_inode->i_filegid;
-			self->c_fsgid = program_inode->i_filegid;
+		if ((program_mode & (S_ISGID | S_IXGRP)) == (S_ISGID | S_IXGRP)) {
+			self->c_egid  = program_gid;
+			self->c_fsgid = program_gid;
 			bzero(&self->c_cap_ambient, sizeof(self->c_cap_ambient));
 		}
 	}
+
 	/* Check for exec-as-root */
 	if ((self->c_ruid == 0 || new_euid == 0) && !(self->c_securebits & SECBIT_NOROOT)) {
 		credcap_orset(&self->c_cap_permitted,
@@ -463,8 +488,8 @@ normal_program_without_caps:
 		memcpy(&self->c_cap_effective, &self->c_cap_ambient, sizeof(self->c_cap_effective));
 	} else {
 		struct file_creds fcreds;
-		/* Try to load credentials from the given `program_inode' */
-		if (!inode_get_file_creds(program_inode, &fcreds))
+		/* Try to load credentials from the given `program_file' */
+		if (!inode_get_file_creds(program_file, &fcreds))
 			goto normal_program_without_caps;
 		/* Transform thread credentials by use of the program's file credentials. */
 		bzero(&self->c_cap_ambient, sizeof(self->c_cap_ambient));

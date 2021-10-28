@@ -41,7 +41,7 @@ DECL_BEGIN
 struct icpustate;
 struct path;
 struct fdirent;
-struct regular_node;
+struct mfile;
 
 /* Initialize user-space for program execution. */
 #ifndef CONFIG_EXEC_ARCH_HEADER_DEFINES_ELFEXEC_INIT_ENTRY
@@ -54,11 +54,11 @@ elfexec_init_entry(struct icpustate *__restrict user_state,
 
 /* Initialize the RTLD user-space library for runtime linking. */
 #ifndef CONFIG_EXEC_ARCH_HEADER_DEFINES_ELFEXEC_INIT_RTLD
-INTDEF ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3, 4, 5, 6)) struct icpustate *KCALL
+INTDEF ATTR_RETNONNULL WUNUSED NONNULL((1, 4, 5, 6)) struct icpustate *KCALL
 elfexec_init_rtld(struct icpustate *__restrict user_state,
-                  struct path *__restrict exec_path,
-                  struct fdirent *__restrict exec_dentry,
-                  struct regular_node *__restrict exec_node,
+                  struct path *exec_path,
+                  struct fdirent *exec_dentry,
+                  struct mfile *__restrict exec_file,
                   KERNEL ElfW(Ehdr) const *__restrict ehdr,
                   KERNEL ElfW(Phdr) const *__restrict phdr_vec,
                   ElfW(Half) phdr_cnt,
@@ -81,11 +81,11 @@ compat_elfexec_init_entry(struct icpustate *__restrict user_state,
 
 /* Initialize the RTLD user-space library for runtime linking. */
 #ifndef CONFIG_EXEC_ARCH_HEADER_DEFINES_COMPAT_ELFEXEC_INIT_RTLD
-INTDEF ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3, 4, 5, 6)) struct icpustate *KCALL
+INTDEF ATTR_RETNONNULL WUNUSED NONNULL((1, 4, 5, 6)) struct icpustate *KCALL
 compat_elfexec_init_rtld(struct icpustate *__restrict user_state,
-                         struct path *__restrict exec_path,
-                         struct fdirent *__restrict exec_dentry,
-                         struct regular_node *__restrict exec_node,
+                         struct path *exec_path,
+                         struct fdirent *exec_dentry,
+                         struct mfile *__restrict exec_file,
                          KERNEL COMPAT_ElfW(Ehdr) const *__restrict ehdr,
                          KERNEL COMPAT_ElfW(Phdr) const *__restrict phdr_vec,
                          COMPAT_ElfW(Half) phdr_cnt,

@@ -65,7 +65,7 @@ DECL_BEGIN
 
 /* MMan exec() information */
 PUBLIC ATTR_PERMMAN struct mexecinfo thismman_execinfo = {
-	.mei_node = NULL,
+	.mei_file = NULL,
 	.mei_dent = NULL,
 	.mei_path = NULL,
 	.mei_peb  = NULL,
@@ -191,7 +191,7 @@ NOTHROW(FCALL mman_destroy)(struct mman *__restrict self) {
 	}
 
 	/* Finalize `thismman_execinfo' */
-	xdecref(FORMMAN(self, thismman_execinfo).mei_node);
+	xdecref(FORMMAN(self, thismman_execinfo).mei_file);
 	xdecref(FORMMAN(self, thismman_execinfo).mei_dent);
 	xdecref(FORMMAN(self, thismman_execinfo).mei_path);
 
