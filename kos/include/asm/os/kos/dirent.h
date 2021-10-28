@@ -35,6 +35,7 @@
 #define __DT_LNK     10 /* Symbolic link              (s.a. `S_ISLNK()', `S_IFMT & S_IFLNK') */
 #define __DT_SOCK    12 /* Socket file                (s.a. `S_ISSOCK()', `S_IFMT & S_IFSOCK') */
 #define __DT_WHT     14 /* Mounting point? */
+#define __DT_CNT     16 /* Max possible # of different file type IDs. */
 
 #define __IFTODT(mode)    (((mode) & 0xf000) >> 12)
 #define __DTTOIF(dirtype) ((dirtype) << 12)

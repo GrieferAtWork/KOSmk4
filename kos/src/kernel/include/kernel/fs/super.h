@@ -46,23 +46,40 @@
 DECL_BEGIN
 
 /* Convert flags:
- *    - MFILE_F_READONLY  -->  ST_RDONLY
- *    - MFILE_FS_NOSUID   -->  ST_NOSUID
- *    - MFILE_FS_NOEXEC   -->  ST_NOEXEC
- *    - MFILE_F_NOATIME   -->  ST_NOATIME */
-#if (MFILE_F_READONLY == __ST_RDONLY && \
-     MFILE_FS_NOSUID == __ST_NOSUID &&  \
-     MFILE_FS_NOEXEC == __ST_NOEXEC &&  \
-     MFILE_F_NOATIME == __ST_NOATIME)
+ *    - MFILE_F_READONLY    --> ST_RDONLY
+ *    - MFILE_FS_NOSUID     --> ST_NOSUID
+ *    - MFILE_FS_NOEXEC     --> ST_NOEXEC
+ *    - MFILE_F_NOATIME     --> ST_NOATIME
+ *    - MFILE_FN_NODIRATIME --> ST_NODIRATIME
+ *    - MFILE_F_RELATIME    --> ST_RELATIME */
+#if (MFILE_F_READONLY == __ST_RDONLY &&        \
+     MFILE_FS_NOSUID == __ST_NOSUID &&         \
+     MFILE_FS_NOEXEC == __ST_NOEXEC &&         \
+     MFILE_F_NOATIME == __ST_NOATIME &&        \
+     MFILE_FN_NODIRATIME == __ST_NODIRATIME && \
+     MFILE_F_RELATIME == __ST_RELATIME)
 #define statvfs_flags_from_mfile_flags(mfile_flags)        \
 	((mfile_flags) & (MFILE_F_READONLY | MFILE_FS_NOSUID | \
-	                  MFILE_FS_NOEXEC | MFILE_F_NOATIME))
-#else /* ... */
+	                  MFILE_FS_NOEXEC | MFILE_F_NOATIME |  \
+	                  MFILE_FN_NODIRATIME | MFILE_F_RELATIME))
+#elif (MFILE_F_READONLY == __ST_RDONLY && \
+       MFILE_FS_NOSUID == __ST_NOSUID &&  \
+       MFILE_FS_NOEXEC == __ST_NOEXEC &&  \
+       MFILE_F_NOATIME == __ST_NOATIME && \
+       MFILE_FN_NODIRATIME == __ST_NODIRATIME)
 #define statvfs_flags_from_mfile_flags(mfile_flags)         \
-	((((mfile_flags)&MFILE_F_READONLY) ? __ST_RDONLY : 0) | \
-	 (((mfile_flags)&MFILE_FS_NOSUID) ? __ST_NOSUID : 0) |  \
-	 (((mfile_flags)&MFILE_FS_NOEXEC) ? __ST_NOEXEC : 0) |  \
-	 (((mfile_flags)&MFILE_F_NOATIME) ? __ST_NOATIME : 0))
+	(((mfile_flags) & (MFILE_F_READONLY | MFILE_FS_NOSUID | \
+	                   MFILE_FS_NOEXEC | MFILE_F_NOATIME |  \
+	                   MFILE_FN_NODIRATIME)) |              \
+	 ((mfile_flags)&MFILE_F_RELATIME ? __ST_RELATIME : 0))
+#else /* ... */
+#define statvfs_flags_from_mfile_flags(mfile_flags)                \
+	((((mfile_flags)&MFILE_F_READONLY) ? __ST_RDONLY : 0) |        \
+	 (((mfile_flags)&MFILE_FS_NOSUID) ? __ST_NOSUID : 0) |         \
+	 (((mfile_flags)&MFILE_FS_NOEXEC) ? __ST_NOEXEC : 0) |         \
+	 (((mfile_flags)&MFILE_F_NOATIME) ? __ST_NOATIME : 0) |        \
+	 (((mfile_flags)&MFILE_FN_NODIRATIME) ? __ST_NODIRATIME : 0) | \
+	 (((mfile_flags)&MFILE_F_RELATIME) ? __ST_RELATIME : 0))
 #endif /* !... */
 
 

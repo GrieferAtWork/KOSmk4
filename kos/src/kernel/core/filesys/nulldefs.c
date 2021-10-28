@@ -46,7 +46,7 @@ gcc_opt.remove("-g"); // Disable debug informations for this file!
 
 DECL_BEGIN
 
-/* NOTE: Don't  set `MFILE_FM_ATTRREADONLY' for these files, even though
+/* NOTE: Don't  set `MFILE_FN_ATTRREADONLY' for these files, even though
  *       they've got a custom stat operator that overrides the timestamp
  *       values.
  *

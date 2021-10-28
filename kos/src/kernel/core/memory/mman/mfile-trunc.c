@@ -331,8 +331,8 @@ handle_newsize_ge_oldsize:
 	 *  #8:  Remove all mem-parts from the part-tree which have a min-address that
 	 *       is `>= aligned_new_size'. Because of the split, it is guaranted  that
 	 *       there isn't any part that overlaps with `aligned_new_size'.
-	 *  #9:  Make all of the removed mem-parts anonymous any release the
-	 *       lock still held for each of them before decref()-ing  each.
+	 *  #9:  Make all of the removed mem-parts anonymous and release the
+	 *       lock still held on each  of them before decref()-ing  each.
 	 *  #10: Release locks + references from all of the remaining mem-
 	 *       parts which still remain  apart of the file's  part-tree.
 	 *  #11: Release the write-lock `mfile_lock_endwrite(self);'
@@ -554,8 +554,8 @@ after_file_size_changed:
 		if (!part)
 			break;
 
-		/* Step #9: Make all of the removed mem-parts anonymous any release the
-		 *          lock still held for each of them before decref()-ing  each. */
+		/* Step #9: Make all of the removed mem-parts anonymous and release the
+		 *          lock still held on each  of them before decref()-ing  each. */
 
 		/* Mark this mem-part as anonymous.
 		 * This is why we had to ensure that none of the parts above the truncation

@@ -771,20 +771,27 @@ super_set_mount_flags(struct fsuper *__restrict self,
 	do {
 		old_flags = ATOMIC_READ(self->fs_root.mf_flags);
 		new_flags = old_flags & ~(MFILE_F_NOATIME | MFILE_FS_NOEXEC |
-		                          MFILE_FS_NOSUID | MFILE_F_READONLY);
+		                          MFILE_FS_NOSUID | MFILE_F_READONLY |
+		                          MFILE_FN_NODIRATIME | MFILE_F_STRICTATIME |
+		                          MFILE_F_LAZYTIME | MFILE_F_RELATIME);
 		if (mountflags & MS_NOATIME)
-			new_flags |= MFILE_F_NOATIME;
+			new_flags |= MFILE_F_NOATIME | MFILE_FN_NODIRATIME;
+		if (mountflags & MS_NODIRATIME)
+			new_flags |= MFILE_FN_NODIRATIME;
+		if (mountflags & MS_STRICTATIME)
+			new_flags |= MFILE_F_STRICTATIME;
+		if (mountflags & MS_LAZYTIME)
+			new_flags |= MFILE_F_LAZYTIME;
 		if (mountflags & MS_NOEXEC)
 			new_flags |= MFILE_FS_NOEXEC;
 		if (mountflags & MS_NOSUID)
 			new_flags |= MFILE_FS_NOSUID;
 		if (mountflags & MS_RDONLY)
 			new_flags |= MFILE_F_READONLY;
-		/* TODO: MS_LAZYTIME */
+		if (mountflags & MS_RELATIME)
+			new_flags |= MFILE_F_RELATIME;
 		/* TODO: MS_MANDLOCK */
 		/* TODO: MS_NODEV */
-		/* TODO: MS_NODIRATIME */
-		/* TODO: MS_RELATIME */
 		/* TODO: MS_SYNCHRONOUS */
 		/* TODO: MS_DIRSYNC */
 	} while (!ATOMIC_CMPXCH_WEAK(self->fs_root.mf_flags,
@@ -855,11 +862,12 @@ sys_mount_impl(USER UNCHECKED char const *source,
 		struct fsuper *super;
 		/* Modify an existing mounting point. */
 		if (mountflags & ~(MS_LAZYTIME | MS_MANDLOCK | MS_NOATIME | MS_NODEV | MS_NODIRATIME | MS_NOEXEC |
-		                   MS_NOSUID | MS_RELATIME | MS_RDONLY | MS_SYNCHRONOUS | MS_DIRSYNC | MS_REMOUNT)) {
+		                   MS_NOSUID | MS_RELATIME | MS_RDONLY | MS_SYNCHRONOUS | MS_DIRSYNC | MS_REMOUNT |
+		                   MS_STRICTATIME)) {
 			THROW(E_INVALID_ARGUMENT_UNKNOWN_FLAG, E_INVALID_ARGUMENT_CONTEXT_UMOUNT2_FLAGS,
 			      mountflags,
 			      ~(MS_LAZYTIME | MS_MANDLOCK | MS_NOATIME | MS_NODEV | MS_NODIRATIME | MS_NOEXEC |
-			        MS_NOSUID | MS_RELATIME | MS_RDONLY | MS_SYNCHRONOUS | MS_DIRSYNC),
+			        MS_NOSUID | MS_RELATIME | MS_RDONLY | MS_SYNCHRONOUS | MS_DIRSYNC | MS_STRICTATIME),
 			      MS_REMOUNT);
 		}
 		target_path = path_traverse_r(AT_FDCWD, target, NULL, NULL, atflags);

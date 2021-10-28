@@ -108,10 +108,13 @@ PUBLIC struct ramfs_super fsuper_unmounted = {
 					MFILE_INIT_mf_lockops,
 					MFILE_INIT_mf_changed(MFILE_PARTS_ANONYMOUS),
 					MFILE_INIT_mf_blockshift(PAGESHIFT),
-					MFILE_INIT_mf_flags(MFILE_FS_NOSUID | MFILE_FS_NOEXEC | MFILE_F_NOATIME |
-					                    MFILE_F_NOUSRMMAP | MFILE_F_NOUSRIO | MFILE_F_NOMTIME |
-					                    MFILE_F_FIXEDFILESIZE | MFILE_FM_ATTRREADONLY | MFILE_F_DELETED |
-					                    MFILE_F_CHANGED | MFILE_F_ATTRCHANGED | MFILE_F_READONLY),
+					MFILE_INIT_mf_flags(MFILE_FS_NOSUID | MFILE_FS_NOEXEC |
+					                    MFILE_F_NOATIME | MFILE_FN_NODIRATIME |
+					                    MFILE_F_NOUSRMMAP | MFILE_F_NOUSRIO |
+					                    MFILE_F_NOMTIME | MFILE_F_FIXEDFILESIZE |
+					                    MFILE_FN_ATTRREADONLY | MFILE_F_DELETED |
+					                    MFILE_F_CHANGED | MFILE_F_ATTRCHANGED |
+					                    MFILE_F_READONLY),
 					MFILE_INIT_mf_trunclock,
 					MFILE_INIT_mf_filesize((uint64_t)-1),
 					/* TODO: Have an initializer that copies `boottime' into these 3! */

@@ -96,6 +96,33 @@ struct flnknode_ops {
 	                      struct path *__restrict access_path,
 	                      struct fdirent *__restrict access_dent)
 			THROWS(E_IOERROR, E_BADALLOC, ...);
+
+	/* [0..1] Similar to `lno_openlink()', but represents an optional optimization
+	 * used during path traversal by directly returning the path+name+file  triple
+	 * to which a given symbolic link expands.
+	 * For example, "/proc/[PID]/exe" implements this operator as:
+	 * >> *presult_path   = incref(FORTASK(thread, thismman_execinfo).mei_path);
+	 * >> *presult_dirent = incref(FORTASK(thread, thismman_execinfo).mei_dent);
+	 * >> return incref(FORTASK(thread, thismman_execinfo).mei_file);
+	 * NOTE: Even after this function returns with success, the caller must still
+	 *       check  that `*presult_path' is reachable from `fs_getroot(THIS_FS)'!
+	 * @return: NULL: Same as not implementing this operator (use normal semantics) */
+	WUNUSED NONNULL((1, 2, 3, 4)) REF struct fnode *
+	(KCALL *lno_expandlink)(struct flnknode *__restrict self,
+	                        /*out[1..1]_opt*/ REF struct path **presult_path,
+	                        /*out[1..1]_opt*/ REF struct fdirent **presult_dirent,
+	                        /*in|out*/ u32 *__restrict premaining_symlinks)
+			THROWS(E_IOERROR, E_BADALLOC, ...);
+
+	/* [0..1] Yet another operator similar to `lno_expandlink()', but this operator
+	 * is  mainly meant to speed up old-style  openat() emulation via use of procfs
+	 * per-proc fd: `openat(42, "foo")' --> `open("/proc/self/fd/42/foo")'.
+	 * @return: NULL: Same as not implementing this operator (use normal semantics) */
+	WUNUSED NONNULL((1, 2)) REF struct path *
+	(KCALL *lno_walklink)(struct flnknode *__restrict self,
+	                      /*in|out*/ u32 *__restrict premaining_symlinks)
+			THROWS(E_IOERROR, E_BADALLOC, ...);
+
 };
 
 

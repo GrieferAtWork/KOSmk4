@@ -507,7 +507,7 @@ NOTHROW(FCALL fnode_init_addtosuper_and_all)(struct fnode *__restrict self) {
  * The new file mode is calculated as `(old_mode & perm_mask) | perm_flag', before  being
  * masked by what the underlying filesystem is capable of representing.
  * @return: * : The old file mode
- * @throw: E_FSERROR_READONLY:    The `MFILE_FM_ATTRREADONLY' flag is (or was) set.
+ * @throw: E_FSERROR_READONLY:    The `MFILE_FN_ATTRREADONLY' flag is (or was) set.
  * @throw: E_INSUFFICIENT_RIGHTS: `check_permissions' is true and you're not allowed to do this. */
 PUBLIC NONNULL((1)) mode_t KCALL
 fnode_chmod(struct fnode *__restrict self, mode_t perm_mask,
@@ -516,7 +516,7 @@ fnode_chmod(struct fnode *__restrict self, mode_t perm_mask,
 	mode_t old_mode, new_mode;
 
 	/* Check if file attributes may be modified. */
-	if unlikely(self->mf_flags & MFILE_FM_ATTRREADONLY)
+	if unlikely(self->mf_flags & MFILE_FN_ATTRREADONLY)
 		THROW(E_FSERROR_READONLY);
 
 	/* Only these bits can be modified at all! */
@@ -581,7 +581,7 @@ again_check_permissions:
 
 /* Change the owner and group of the given file. NOTE: either attribute is only
  * altered when  `owner != (uid_t)-1'  and  `group != (gid_t)-1'  respectively.
- * @throw: E_FSERROR_READONLY:    The `MFILE_FM_ATTRREADONLY' flag is (or was) set.
+ * @throw: E_FSERROR_READONLY:    The `MFILE_FN_ATTRREADONLY' flag is (or was) set.
  * @throw: E_INSUFFICIENT_RIGHTS: `check_permissions' is true and you're not allowed to do this.
  * @throw: E_INVALID_ARGUMENT_BAD_VALUE:E_INVALID_ARGUMENT_CONTEXT_CHOWN_UNSUPP_UID:uid: [...]
  * @throw: E_INVALID_ARGUMENT_BAD_VALUE:E_INVALID_ARGUMENT_CONTEXT_CHOWN_UNSUPP_GID:gid: [...] */
@@ -596,7 +596,7 @@ fnode_chown(struct fnode *__restrict self, uid_t owner, gid_t group,
 	gid_t old_group, new_group;
 
 	/* Check if file attributes may be modified. */
-	if unlikely(self->mf_flags & MFILE_FM_ATTRREADONLY)
+	if unlikely(self->mf_flags & MFILE_FN_ATTRREADONLY)
 		THROW(E_FSERROR_READONLY);
 
 	/* Verify that the filesystem allows the given owner/group */
@@ -694,14 +694,14 @@ again_read_old_values:
 
 /* Change all non-NULL the timestamp that are given.
  * @throw: E_FSERROR_DELETED:E_FILESYSTEM_DELETED_FILE: The `MFILE_F_DELETED' is set.
- * @throw: E_FSERROR_READONLY: The `MFILE_FM_ATTRREADONLY' flag is (or was) set. */
+ * @throw: E_FSERROR_READONLY: The `MFILE_FN_ATTRREADONLY' flag is (or was) set. */
 PUBLIC NONNULL((1)) void KCALL
 mfile_chtime(struct mfile *__restrict self,
              struct timespec const *new_atime,
              struct timespec const *new_mtime,
              struct timespec const *new_ctime)
 		THROWS(E_FSERROR_READONLY) {
-	if unlikely(self->mf_flags & MFILE_FM_ATTRREADONLY)
+	if unlikely(self->mf_flags & MFILE_FN_ATTRREADONLY)
 		THROW(E_FSERROR_READONLY);
 	mfile_tslock_acquire(self);
 	/* Check if the file was deleted. (If it was,
@@ -1079,10 +1079,10 @@ NOTHROW(FCALL fnode_delete_strt)(struct fnode *__restrict self) {
 	/* Mark the file as deleted (and make available use of the timestamp fields) */
 	mfile_tslock_acquire(self);
 	old_flags = ATOMIC_FETCHOR(self->mf_flags,
-	                           MFILE_F_DELETED | MFILE_F_NOATIME | MFILE_F_NOMTIME |
-	                           MFILE_F_CHANGED | MFILE_F_ATTRCHANGED | MFILE_F_FIXEDFILESIZE |
-	                           MFILE_FM_ATTRREADONLY | MFILE_F_NOUSRMMAP | MFILE_F_NOUSRIO |
-	                           MFILE_FS_NOSUID | MFILE_FS_NOEXEC | MFILE_F_READONLY);
+	                           MFILE_F_DELETED | MFILE_F_NOATIME | MFILE_FN_NODIRATIME |
+	                           MFILE_F_NOMTIME | MFILE_F_CHANGED | MFILE_F_ATTRCHANGED |
+	                           MFILE_F_FIXEDFILESIZE | MFILE_FN_ATTRREADONLY |
+	                           MFILE_F_NOUSRMMAP | MFILE_F_NOUSRIO | MFILE_F_READONLY);
 	if (old_flags & MFILE_F_PERSISTENT)
 		ATOMIC_AND(self->mf_flags, ~MFILE_F_PERSISTENT); /* Also clear the PERSISTENT flag */
 	mfile_tslock_release(self);
@@ -1102,10 +1102,10 @@ NOTHROW(FCALL fnode_delete_strt_with_tslock)(struct fnode *__restrict self) {
 
 	/* Mark the file as deleted (and make available use of the timestamp fields) */
 	old_flags = ATOMIC_FETCHOR(self->mf_flags,
-	                           MFILE_F_DELETED | MFILE_F_NOATIME | MFILE_F_NOMTIME |
-	                           MFILE_F_CHANGED | MFILE_F_ATTRCHANGED | MFILE_F_FIXEDFILESIZE |
-	                           MFILE_FM_ATTRREADONLY | MFILE_F_NOUSRMMAP | MFILE_F_NOUSRIO |
-	                           MFILE_FS_NOSUID | MFILE_FS_NOEXEC | MFILE_F_READONLY);
+	                           MFILE_F_DELETED | MFILE_F_NOATIME | MFILE_FN_NODIRATIME |
+	                           MFILE_F_NOMTIME | MFILE_F_CHANGED | MFILE_F_ATTRCHANGED |
+	                           MFILE_F_FIXEDFILESIZE | MFILE_FN_ATTRREADONLY |
+	                           MFILE_F_NOUSRMMAP | MFILE_F_NOUSRIO | MFILE_F_READONLY);
 	if (old_flags & MFILE_F_PERSISTENT)
 		ATOMIC_AND(self->mf_flags, ~MFILE_F_PERSISTENT); /* Also clear the PERSISTENT flag */
 	return !(old_flags & MFILE_F_DELETED);
@@ -1116,10 +1116,10 @@ NOTHROW(FCALL fnode_delete_strt_with_tslock)(struct fnode *__restrict self) {
 
 /* Perform all of the async work needed for deleting `self' as the result of `fn_nlink == 0'
  * This function will do the following (asynchronously if necessary)
- *  - Set flags: MFILE_F_DELETED,  MFILE_F_NOATIME,  MFILE_F_NOMTIME, MFILE_F_CHANGED,
- *               MFILE_F_ATTRCHANGED,  MFILE_F_FIXEDFILESIZE,   MFILE_FM_ATTRREADONLY,
- *               MFILE_F_NOUSRMMAP, MFILE_F_NOUSRIO, MFILE_FS_NOSUID, MFILE_FS_NOEXEC,
- *               MFILE_F_READONLY
+ *  - Set flags: MFILE_F_DELETED | MFILE_F_NOATIME | MFILE_FN_NODIRATIME |
+ *               MFILE_F_NOMTIME | MFILE_F_CHANGED | MFILE_F_ATTRCHANGED |
+ *               MFILE_F_FIXEDFILESIZE    |    MFILE_FN_ATTRREADONLY     |
+ *               MFILE_F_NOUSRMMAP |  MFILE_F_NOUSRIO  |  MFILE_F_READONLY
  *    If `MFILE_F_DELETED' was already set, none of the below are done!
  *  - Unlink `self->fn_supent' (if bound)
  *  - Unlink `self->fn_changed' (if bound)

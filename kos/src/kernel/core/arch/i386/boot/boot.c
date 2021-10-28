@@ -778,6 +778,33 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *       done  by having the interrupt return to  the start of said first instr,
 	 *       meaning that decrementing mustn't be done) */
 
+	/* TODO: Figure out when `struct mfile::mf_atime' needs to be updated.
+	 *  - Every time read(2) is called?
+	 *  - Only when open(2)-ing the file?
+	 *  - And what about mmap(2)?
+	 *  - Path traversal when the directory doesn't have `MS_NODIRATIME' set.
+	 * Also:
+	 *  - MS_STRICTATIME -- what exactly does this one do?
+	 *  - MS_LAZYTIME    -- I do get this one, but it might be kind-of hard for KOS to support
+	 * Idea: Add to `struct fsuper': `uintptr_t fs_filexflags'
+	 *       When  adding nodes to  the super's node-tree, do:
+	 *       >> `node->mf_flags |= super->fs_filexflags;'
+	 */
+
+	/* TODO: `MFILE_F_NOATIME' and `MFILE_F_NOMTIME' can only be inherited from
+	 *       the associated superblock _AFTER_ acquiring `fsuper_nodes_write()'
+	 *       for the purpose of adding the node to the superblock. */
+
+	/* TODO: Properly implement the system for changing superblock flags (as can
+	 *       be done by `mount(2)'). Note that some of the flags need to cascade
+	 *       down to every  file-node of the  superblock (`MFILE_F_NOATIME'  and
+	 *       `MFILE_F_NOMTIME'),  which  may  only  be  done  (atomically) while
+	 *       enumerating the super's node-tree and holding `fsuper_nodes_read()' */
+
+	/* TODO: Add procfs file `/proc/mounts' */
+
+	/* TODO: Implement the (currently) stubbed per-proc special directories in procfs */
+
 	/* TODO: Use the general-purpose lockop system in `struct pidns' and replace `pn_dead' */
 
 	/* TODO: Re-write `struct heap' with lockop support */

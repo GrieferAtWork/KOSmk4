@@ -761,6 +761,43 @@ path_walklink(struct path *__restrict self,
 	struct flnknode_ops const *ops;
 	ops = flnknode_getops(lnk);
 
+	/* If defined, try to make use of `lno_walklink'.
+	 * - To reiterate the documentation of `lno_walklink':
+	 *   for "/proc/[PID]/fd/[FDNO]",  this returns  paths
+	 *   as would also be used during `openat(2)'. */
+	if (ops->lno_walklink) {
+		result = (*ops->lno_walklink)(lnk, premaining_symlinks);
+		if (result) {
+			/* Verify that `result' is still  reachable from the current POSIX  root.
+			 * You  might argue that this doesn't need to be done, but I would beg to
+			 * differ, since you  could still  get here  when trying  to use  another
+			 * process's file table to access directories that supposed to be hidden.
+			 *
+			 * Of  course, at the point point where  you can access some other proc's
+			 * file descriptor table, you could also just open() such a file and then
+			 * use that file with the openat()  system calls, but don't forget:  this
+			 * operator isn't  just for  /proc/[PID]/fd/[FDNO] (which  is private  to
+			 * the  owning process; iow:  mode_t: 0400), but  also for other per-proc
+			 * directories like `/proc/[PID]/cwd',  which _ARENT_ process-private  as
+			 * far as I know... */
+			REF struct path *root;
+			bool is_visible;
+			TRY {
+				root = fs_getroot(THIS_FS);
+			} EXCEPT {
+				decref_unlikely(result);
+				RETHROW();
+			}
+			is_visible = path_isdescendantof(result, root);
+			decref_unlikely(root);
+			if likely(is_visible)
+				return result;
+
+			/* Path isn't visible -> do normal symlink expansion! */
+			decref_unlikely(result);
+		}
+	}
+
 	/* Direct link text access */
 	if (ops->lno_linkstr != NULL) {
 		char const *str = (*ops->lno_linkstr)(lnk);
@@ -814,6 +851,14 @@ path_expandchild(struct path *__restrict self, u32 *__restrict premaining_symlin
 
 	/* First up: check if we've got EXEC permissions. */
 	fnode_access(self->p_dir, R_OK | X_OK);
+
+	/* TODO: Optional per-directory operator: `dno_expandchild' that can
+	 * be implemented by certain directories to directly return the path
+	 * objects for named children.
+	 *
+	 * Could be used by procfs to forgo the creation of temporary files
+	 * during per-process path traversal. */
+
 
 	/* Do a normal lookup for child nodes. */
 	{
@@ -918,18 +963,48 @@ path_readlink_and_walknode(struct path *__restrict self,
 }
 
 /* Walk a given symlink */
-PRIVATE ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3)) REF struct fnode *KCALL
+PRIVATE ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3, 4, 5)) REF struct fnode *KCALL
 path_walklinknode(struct path *__restrict self,
                   u32 *__restrict premaining_symlinks,
                   struct flnknode *__restrict lnk,
-                  /*out[1..1]_opt*/ REF struct path **presult_path,
-                  /*out[1..1]_opt*/ REF struct fdirent **presult_dirent,
+                  /*out[1..1]_opt*/ REF struct path **__restrict presult_path,
+                  /*out[1..1]_opt*/ REF struct fdirent **__restrict presult_dirent,
                   atflag_t atflags)
 		THROWS(E_IOERROR, E_BADALLOC, ...) {
 	REF struct fnode *result;
 	size_t bufsize;
 	struct flnknode_ops const *ops;
 	ops = flnknode_getops(lnk);
+
+	/* If defined, try to make use of `lno_expandlink'.
+	 * - To reiterate the documentation of `lno_expandlink':
+	 *   for "/proc/[PID]/exe", this returns info from `thismman_execinfo' */
+	if (ops->lno_expandlink) {
+		result = (*ops->lno_expandlink)(lnk, presult_path, presult_dirent,
+		                                premaining_symlinks);
+		if (result) {
+			/* Verify that `*presult_path' is reachable from `fs_getroot()' */
+			REF struct path *root;
+			bool is_visible;
+			TRY {
+				root = fs_getroot(THIS_FS);
+			} EXCEPT {
+				decref_unlikely(*presult_path);
+				decref_unlikely(*presult_dirent);
+				decref_unlikely(result);
+				RETHROW();
+			}
+			is_visible = path_isdescendantof(*presult_path, root);
+			decref_unlikely(root);
+			if likely(is_visible)
+				return result;
+
+			/* Fallback: if the path isn't visible, do a normal link expansion. */
+			decref_unlikely(*presult_path);
+			decref_unlikely(*presult_dirent);
+			decref_unlikely(result);
+		}
+	}
 
 	/* Direct link text access */
 	if (ops->lno_linkstr != NULL) {
@@ -1035,18 +1110,40 @@ again_lookup_dent:
 
 	/* Deal with symlink nodes (in case we're supposed to expand them) */
 	if (fnode_islnk(result) && !(atflags & AT_SYMLINK_NOFOLLOW)) {
-		REF struct flnknode *lnk = fnode_aslnk(result);
-		decref_unlikely(dent);
-		FINALLY_DECREF_UNLIKELY(lnk);
+		REF struct flnknode *lnk;
+		incref(self);
+		do {
+			FINALLY_DECREF_UNLIKELY(self);
+			lnk = fnode_aslnk(result);
+			decref_unlikely(dent);
+			FINALLY_DECREF_UNLIKELY(lnk);
 
-		/* Check that we're allowed to walk a symlink. */
-		if unlikely(*premaining_symlinks == 0)
-			THROW(E_FSERROR_TOO_MANY_SYMBOLIC_LINKS);
-		--*premaining_symlinks;
+			/* Check that we're allowed to walk a symlink. */
+			if unlikely(*premaining_symlinks == 0)
+				THROW(E_FSERROR_TOO_MANY_SYMBOLIC_LINKS);
+			--*premaining_symlinks;
 
-		return path_walklinknode(self, premaining_symlinks, lnk,
-		                         presult_path, presult_dirent,
-		                         atflags & AT_NO_AUTOMOUNT);
+			/* NOTE: Set `AT_SYMLINK_NOFOLLOW' to prevent stack-recursive
+			 *       expansion of symbolic links in the last element.  To
+			 *       preserve stack space, we must just do that locally! */
+			result = path_walklinknode(self, premaining_symlinks, lnk,
+			                           (REF struct path **)&self, &dent,
+			                           (atflags & AT_NO_AUTOMOUNT) |
+			                           AT_SYMLINK_NOFOLLOW);
+		} while (fnode_islnk(result));
+
+		/* Write-back results. */
+		if (presult_path)
+			*presult_path = self; /* Inherit reference */
+		else {
+			decref_unlikely(self);
+		}
+		if (presult_dirent)
+			*presult_dirent = dent; /* Inherit reference */
+		else {
+			decref_unlikely(dent);
+		}
+		return result;
 	}
 
 	/* Default case: return the pointed-to node. */

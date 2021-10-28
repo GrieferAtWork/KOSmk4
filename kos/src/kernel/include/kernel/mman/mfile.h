@@ -522,12 +522,12 @@ struct mfile_ops {
  *  0x00000040                         ST_MANDLOCK         MS_MANDLOCK
  *  0x00000080                                             MS_DIRSYNC
  *  0x00000400  MFILE_F_NOATIME        ST_NOATIME          MS_NOATIME
- *  0x00000800                         ST_NODIRATIME       MS_NODIRATIME
+ *  0x00000800  MFILE_FN_NODIRATIME    ST_NODIRATIME       MS_NODIRATIME
  *  0x00010000                                             MS_POSIXACL
  *  0x00020000                                             MS_UNBINDABLE
- *  0x00200000                                             MS_RELATIME
- *  0x01000000                                             MS_STRICTATIME
- *  0x02000000                                             MS_LAZYTIME
+ *  0x00200000  MFILE_F_RELATIME                           MS_RELATIME
+ *  0x01000000  MFILE_F_STRICTATIME                        MS_STRICTATIME
+ *  0x02000000  MFILE_F_LAZYTIME                           MS_LAZYTIME
  * ```
  */
 
@@ -560,12 +560,12 @@ struct mfile_ops {
                                             * This flag is set before `mo_changed()' is invoked, which also won't
                                             * be  invoked again until  this flag has been  cleared, which is done
                                             * as part of a call to `mfile_sync()' */
-#define MFILE_F_NOATIME         0x00000400 /* [lock(_MFILE_F_SMP_TSLOCK)][const_if(MFILE_F_DELETED)] Don't modify the value of `mf_atime' */
-/*      MFILE_F_                0x00000800  * ... Reserved: MS_NODIRATIME */
+#define MFILE_F_NOATIME         0x00000400 /* [lock(ATOMIC)][const_if(MFILE_F_DELETED)] Don't modify the value of `mf_atime' */
+#define MFILE_FN_NODIRATIME     0x00000800 /* [lock(ATOMIC)][const_if(MFILE_F_DELETED)] Don't update `mf_atime' during path traversal */
 #define MFILE_F_NOUSRMMAP       0x00001000 /* [lock(ATOMIC)] Disallow user-space from mmap(2)-ing this file. (doesn't affect `mso_mmap') */
 #define MFILE_F_NOUSRIO         0x00002000 /* [lock(ATOMIC)] Disallow  user-space  from  pread(2)-ing or  pwrite(2)-ing  this file.
                                             * Doesn't affect `mso_pread' and `mso_pwrite'; only `mfile_read()' and `mfile_write()'. */
-#define MFILE_F_NOMTIME         0x00004000 /* [lock(_MFILE_F_SMP_TSLOCK)][const_if(MFILE_F_DELETED)] Don't modify the value of `mf_mtime' */
+#define MFILE_F_NOMTIME         0x00004000 /* [lock(ATOMIC)][const_if(MFILE_F_DELETED)] Don't modify the value of `mf_mtime' */
 /*efine MFILE_F_                0x00008000  * ... */
 /*      MFILE_F_                0x00010000  * ... Reserved: MS_POSIXACL */
 /*      MFILE_F_                0x00020000  * ... Reserved: MS_UNBINDABLE */
@@ -585,13 +585,16 @@ struct mfile_ops {
                                             * operations on the same file. Note however that you can still  use
                                             * `mfile_truncate()' to change the size  of a VIO-file, so-long  as
                                             * it doesn't have this flag set! */
-#define MFILE_FM_ATTRREADONLY   0x00100000 /* [lock(ATOMIC)] fnode-specific: `chmod(2)', `chown(2)' and `utime(2)'
+#define MFILE_FN_ATTRREADONLY   0x00100000 /* [lock(ATOMIC)] fnode-specific: `chmod(2)', `chown(2)' and `utime(2)'
                                             *                                should fail with `E_FSERROR_READONLY' */
-/*      MFILE_F_                0x00200000  * ... Reserved: MS_RELATIME */
+#define MFILE_F_RELATIME        0x00200000 /* [lock(ATOMIC)][const_if(MFILE_F_DELETED)] Only  relevant when  `MFILE_F_NOATIME'
+                                            * isn't set: the last-accessed timestamp is only changed to the current realtime()
+                                            * when  `OLD(mf_atime) < mf_mtime'. As such,  atime can only  be used to determine
+                                            * accessed-after-last-modified when this flag has been set. */
 /*efine MFILE_F_                0x00400000  * ... */
 /*efine MFILE_F_                0x00800000  * ... */
-/*      MFILE_F_                0x01000000  * ... Reserved: MS_STRICTATIME */
-/*      MFILE_F_                0x02000000  * ... Reserved: MS_LAZYTIME */
+#define MFILE_F_STRICTATIME     0x01000000 /* [lock(ATOMIC)] Strict last-accessed timestamps ??? */
+#define MFILE_F_LAZYTIME        0x02000000 /* [lock(ATOMIC)] Lazy timestamps ??? */
 /*efine MFILE_F_                0x04000000  * ... */
 /*efine MFILE_F_                0x08000000  * ... */
 #define MFILE_FN_FLEETING       0x10000000 /* [const] When set for fdirnode-derived nodes, don't recent-cache `struct path'

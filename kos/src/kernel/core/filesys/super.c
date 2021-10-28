@@ -298,10 +298,13 @@ NOTHROW(FCALL mfile_begin_delete)(struct mfile *__restrict self) {
 	/* Mark the device as deleted (and make available use of the file fields) */
 	mfile_tslock_acquire(self);
 	old_flags = ATOMIC_FETCHOR(self->mf_flags,
-	                           MFILE_F_DELETED | MFILE_F_NOATIME | MFILE_F_NOMTIME |
-	                           MFILE_F_CHANGED | MFILE_F_ATTRCHANGED | MFILE_F_FIXEDFILESIZE |
-	                           MFILE_FM_ATTRREADONLY | MFILE_F_NOUSRMMAP | MFILE_F_NOUSRIO |
-	                           MFILE_FS_NOSUID | MFILE_FS_NOEXEC | MFILE_F_READONLY);
+	                           MFILE_F_DELETED | MFILE_F_NOATIME |
+	                           MFILE_F_NOMTIME | MFILE_FN_NODIRATIME |
+	                           MFILE_F_CHANGED | MFILE_F_ATTRCHANGED |
+	                           MFILE_F_FIXEDFILESIZE | MFILE_FN_ATTRREADONLY |
+	                           MFILE_F_NOUSRMMAP | MFILE_F_NOUSRIO |
+	                           MFILE_FS_NOSUID | MFILE_FS_NOEXEC |
+	                           MFILE_F_READONLY);
 	if (old_flags & MFILE_F_PERSISTENT)
 		ATOMIC_AND(self->mf_flags, ~MFILE_F_PERSISTENT); /* Also clear the PERSISTENT flag */
 	mfile_tslock_release(self);

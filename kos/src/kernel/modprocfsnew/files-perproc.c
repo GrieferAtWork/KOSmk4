@@ -223,6 +223,7 @@ ProcFS_PerProc_Exe_Printer(struct flnknode *__restrict self,
 	                      /*fs_atflags(0) | */ AT_PATHPRINT_INCTRAIL,
 	                      caller_root);
 }
+/* TODO: open("/proc/pid/exe") can be optimized here */
 
 
 

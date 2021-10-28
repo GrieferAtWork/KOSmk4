@@ -451,7 +451,7 @@ NOTHROW(KCALL fnode_v_destroy)(struct mfile *__restrict self);
  * The new file mode is calculated as `(old_mode & perm_mask) | perm_flag', before  being
  * masked by what the underlying filesystem is capable of representing.
  * @return: * : The old file mode
- * @throw: E_FSERROR_READONLY:    The `MFILE_FM_ATTRREADONLY' flag is (or was) set.
+ * @throw: E_FSERROR_READONLY:    The `MFILE_FN_ATTRREADONLY' flag is (or was) set.
  * @throw: E_INSUFFICIENT_RIGHTS: `check_permissions' is true and you're not allowed to do this. */
 FUNDEF NONNULL((1)) mode_t KCALL
 fnode_chmod(struct fnode *__restrict self, mode_t perm_mask,
@@ -460,7 +460,7 @@ fnode_chmod(struct fnode *__restrict self, mode_t perm_mask,
 
 /* Change the owner and group of the given file. NOTE: either attribute is only
  * altered when  `owner != (uid_t)-1'  and  `group != (gid_t)-1'  respectively.
- * @throw: E_FSERROR_READONLY:    The `MFILE_FM_ATTRREADONLY' flag is (or was) set.
+ * @throw: E_FSERROR_READONLY:    The `MFILE_FN_ATTRREADONLY' flag is (or was) set.
  * @throw: E_INSUFFICIENT_RIGHTS: `check_permissions' is true and you're not allowed to do this.
  * @throw: E_INVALID_ARGUMENT_BAD_VALUE:E_INVALID_ARGUMENT_CONTEXT_CHOWN_UNSUPP_UID:uid: [...]
  * @throw: E_INVALID_ARGUMENT_BAD_VALUE:E_INVALID_ARGUMENT_CONTEXT_CHOWN_UNSUPP_GID:gid: [...] */
@@ -473,7 +473,7 @@ fnode_chown(struct fnode *__restrict self, uid_t owner, gid_t group,
 
 /* Change all non-NULL the timestamp that are given.
  * @throw: E_FSERROR_DELETED:E_FILESYSTEM_DELETED_FILE: The `MFILE_F_DELETED' is set.
- * @throw: E_FSERROR_READONLY: The `MFILE_FM_ATTRREADONLY' flag is (or was) set. */
+ * @throw: E_FSERROR_READONLY: The `MFILE_FN_ATTRREADONLY' flag is (or was) set. */
 PUBLIC NONNULL((1)) void KCALL
 mfile_chtime(struct mfile *__restrict self,
              struct timespec const *new_atime,
@@ -521,10 +521,10 @@ fnode_access(struct fnode *__restrict self, unsigned int type)
 
 /* Perform all of the async work needed for deleting `self' as the result of `fn_nlink == 0'
  * This function will do the following (asynchronously if necessary)
- *  - Set flags: MFILE_F_DELETED,  MFILE_F_NOATIME,  MFILE_F_NOMTIME, MFILE_F_CHANGED,
- *               MFILE_F_ATTRCHANGED,  MFILE_F_FIXEDFILESIZE,   MFILE_FM_ATTRREADONLY,
- *               MFILE_F_NOUSRMMAP, MFILE_F_NOUSRIO, MFILE_FS_NOSUID, MFILE_FS_NOEXEC,
- *               MFILE_F_READONLY
+ *  - Set flags: MFILE_F_DELETED | MFILE_F_NOATIME | MFILE_FN_NODIRATIME |
+ *               MFILE_F_NOMTIME | MFILE_F_CHANGED | MFILE_F_ATTRCHANGED |
+ *               MFILE_F_FIXEDFILESIZE    |    MFILE_FN_ATTRREADONLY     |
+ *               MFILE_F_NOUSRMMAP |  MFILE_F_NOUSRIO  |  MFILE_F_READONLY
  *    If `MFILE_F_DELETED' was already set, none of the below are done!
  *  - Unlink `self->fn_supent' (if bound)
  *  - Unlink `self->fn_changed' (if bound)

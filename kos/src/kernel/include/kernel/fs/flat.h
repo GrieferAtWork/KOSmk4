@@ -227,7 +227,7 @@ struct flatdirnode_xops {
 	 *  - return->_fnode_file_ mf_blockshift = dir->mf_blockshift; # Probably...
 	 *  - return->_fnode_file_ mf_flags      = ... & (MFILE_F_READONLY | MFILE_F_NOUSRMMAP |    # directories require `MFILE_F_FIXEDFILESIZE', and should
 	 *                                                MFILE_F_NOUSRIO | MFILE_F_FIXEDFILESIZE | # probably also have `MFILE_F_NOUSRMMAP | MFILE_F_NOUSRIO'
-	 *                                                MFILE_FM_ATTRREADONLY);
+	 *                                                MFILE_FN_ATTRREADONLY);
 	 *  - return->_fnode_file_ mf_filesize   = S_ISDIR(info->mkf_fmode) ? (pos_t)-1 : (pos_t)...;
 	 *  - return->fn_ino                     = <unallocated>;      # FS-specific, inode number for non-allocated files (later allocated in `fdnx_allocfile' or `fdnx_writedir')
 	 *  - return->fn_fsdata                  = ...;                # Optional...
@@ -624,7 +624,7 @@ struct flatsuper_ops {
 	 *  - return->_fnode_file_ mf_blockshift = dir->mf_blockshift; # Probably...
 	 *  - return->_fnode_file_ mf_flags      = ... & (MFILE_F_READONLY | MFILE_F_NOUSRMMAP |    # directories require `MFILE_F_FIXEDFILESIZE', and should
 	 *                                                MFILE_F_NOUSRIO | MFILE_F_FIXEDFILESIZE | # probably also have `MFILE_F_NOUSRMMAP | MFILE_F_NOUSRIO'
-	 *                                                MFILE_FM_ATTRREADONLY);
+	 *                                                MFILE_FN_ATTRREADONLY);
 	 *  - return->_fnode_file_ mf_filesize   = ...;                # As read from disk
 	 *  - return->_fnode_file_ mf_atime      = ...;                # As read from disk
 	 *  - return->_fnode_file_ mf_mtime      = ...;                # As read from disk

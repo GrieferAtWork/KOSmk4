@@ -95,8 +95,7 @@ DECL_BEGIN
 				MFILE_INIT_mf_lockops,                                           \
 				MFILE_INIT_mf_changed(MFILE_PARTS_ANONYMOUS),                    \
 				MFILE_INIT_mf_blockshift(PAGESHIFT),                             \
-				MFILE_INIT_mf_flags(MFILE_FS_NOSUID | MFILE_FS_NOEXEC |          \
-				                    MFILE_F_READONLY | MFILE_F_FIXEDFILESIZE),   \
+				MFILE_INIT_mf_flags(MFILE_F_READONLY | MFILE_F_FIXEDFILESIZE),   \
 				MFILE_INIT_mf_trunclock,                                         \
 				MFILE_INIT_mf_filesize((uint64_t)-1),                            \
 				MFILE_INIT_mf_atime(0, 0),                                       \
@@ -130,8 +129,7 @@ DECL_BEGIN
 				MFILE_INIT_mf_lockops,                                           \
 				MFILE_INIT_mf_changed(MFILE_PARTS_ANONYMOUS),                    \
 				MFILE_INIT_mf_blockshift(PAGESHIFT),                             \
-				MFILE_INIT_mf_flags(MFILE_FS_NOSUID | MFILE_FS_NOEXEC |          \
-				                    MFILE_F_READONLY | MFILE_F_FIXEDFILESIZE),   \
+				MFILE_INIT_mf_flags(MFILE_F_READONLY | MFILE_F_FIXEDFILESIZE),   \
 				MFILE_INIT_mf_trunclock,                                         \
 				MFILE_INIT_mf_filesize((uint64_t)-1),                            \
 				MFILE_INIT_mf_atime(0, 0),                                       \
@@ -172,8 +170,7 @@ DECL_BEGIN
 			MFILE_INIT_mf_lockops,                                                             \
 			MFILE_INIT_mf_changed(MFILE_PARTS_ANONYMOUS),                                      \
 			MFILE_INIT_mf_blockshift(PAGESHIFT),                                               \
-			MFILE_INIT_mf_flags(MFILE_FS_NOSUID | MFILE_FS_NOEXEC |                            \
-			                    MFILE_F_NOUSRMMAP | MFILE_F_NOUSRIO |                          \
+			MFILE_INIT_mf_flags(MFILE_F_NOUSRMMAP | MFILE_F_NOUSRIO |                          \
 			                    MFILE_F_READONLY | MFILE_F_FIXEDFILESIZE),                     \
 			MFILE_INIT_mf_trunclock,                                                           \
 			MFILE_INIT_mf_filesize(0),                                                         \
@@ -214,8 +211,7 @@ DECL_BEGIN
 				MFILE_INIT_mf_lockops,                                          \
 				MFILE_INIT_mf_changed(MFILE_PARTS_ANONYMOUS),                   \
 				MFILE_INIT_mf_blockshift(PAGESHIFT),                            \
-				MFILE_INIT_mf_flags(MFILE_FS_NOSUID | MFILE_FS_NOEXEC |         \
-				                    MFILE_F_NOUSRMMAP | MFILE_F_NOUSRIO |       \
+				MFILE_INIT_mf_flags(MFILE_F_NOUSRMMAP | MFILE_F_NOUSRIO |       \
 				                    MFILE_F_READONLY | MFILE_F_FIXEDFILESIZE),  \
 				MFILE_INIT_mf_trunclock,                                        \
 				MFILE_INIT_mf_filesize((uint64_t)-1),                           \

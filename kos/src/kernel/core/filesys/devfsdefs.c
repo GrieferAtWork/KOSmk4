@@ -77,10 +77,10 @@ PUBLIC struct ramfs_super devfs = {
 					MFILE_INIT_mf_lockops,
 					MFILE_INIT_mf_changed(MFILE_PARTS_ANONYMOUS),
 					MFILE_INIT_mf_blockshift(PAGESHIFT),
-					MFILE_INIT_mf_flags(MFILE_FS_NOSUID | MFILE_FN_GLOBAL_REF | MFILE_FS_NOEXEC |
-					                    MFILE_F_NOATIME | MFILE_F_NOUSRMMAP | MFILE_F_NOUSRIO |
-					                    MFILE_F_NOMTIME | MFILE_F_PERSISTENT | MFILE_F_FIXEDFILESIZE |
-					                    MFILE_FM_ATTRREADONLY),
+					MFILE_INIT_mf_flags(MFILE_FS_NOSUID | MFILE_FS_NOEXEC |
+					                    MFILE_FN_GLOBAL_REF | MFILE_F_NOUSRMMAP |
+					                    MFILE_F_NOUSRIO | MFILE_F_PERSISTENT |
+					                    MFILE_F_FIXEDFILESIZE | MFILE_FN_ATTRREADONLY),
 					MFILE_INIT_mf_trunclock,
 					MFILE_INIT_mf_filesize((uint64_t)-1),
 					MFILE_INIT_mf_atime(0, 0),

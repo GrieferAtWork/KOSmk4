@@ -149,7 +149,7 @@ again:
 	/* Do common auxiliary initialization for both the success- and retry paths. */
 	assertf(!(result->mf_flags & ~(MFILE_F_READONLY | MFILE_F_NOUSRMMAP |
 	                               MFILE_F_NOUSRIO | MFILE_F_FIXEDFILESIZE |
-	                               MFILE_FM_ATTRREADONLY)),
+	                               MFILE_FN_ATTRREADONLY)),
 	        "As per documentation, `ffso_makenode()' may only set these flags!");
 	result->mf_flags |= dir->mf_flags & (MFILE_F_READONLY | MFILE_F_NOATIME | MFILE_F_NOMTIME);
 	atomic_rwlock_init(&result->mf_lock);
