@@ -620,8 +620,8 @@ pty_alloc(REF struct ptymaster **__restrict p_master,
 			slave->fn_gid   = master->fn_gid;
 
 			/* Link the slave and master against each other. */
-			awref_cinit(&slave->ps_master, master);
-			awref_cinit(&master->pm_slave, slave);
+			awref_init(&slave->ps_master, master);
+			awref_init(&master->pm_slave, slave);
 
 			/* Load user-space provided initializers. */
 			if (termp != NULL)
