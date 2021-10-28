@@ -35,10 +35,15 @@ DECL_END
 #include <kernel/execabi.h> /* execabi_system_rtld_file */
 #include <kernel/fs/blkdev.h>
 #include <kernel/fs/constdir.h>
+#include <kernel/fs/devfs.h>
+#include <kernel/fs/dirhandle.h>
+#include <kernel/fs/fifohandle.h>
+#include <kernel/fs/filehandle.h>
 #include <kernel/fs/lnknode.h>
 #include <kernel/fs/node.h>
 #include <kernel/fs/path.h>
 #include <kernel/fs/printnode.h>
+#include <kernel/fs/ramfs.h>
 #include <kernel/fs/super.h>
 #include <kernel/fs/vfs.h>
 #include <kernel/handle.h>
@@ -128,12 +133,116 @@ DECL_BEGIN
 #include "perproc.def"
 
 
+/* Common operators for all per-process files. */
+#define procfs_perproc_v_changed fnode_v_changed
+#define procfs_perproc_v_wrattr  fnode_v_wrattr_noop
+#define procfs_perproc_v_free    (*((void(KCALL *)(struct fnode *__restrict))(void *)(uintptr_t)-1))
+INTDEF NOBLOCK NONNULL((1)) void
+NOTHROW(KCALL procfs_perproc_v_destroy)(struct mfile *__restrict self);
+
+PRIVATE NONNULL((1)) void KCALL
+procfs_perproc_v_stat_common(struct mfile *__restrict self,
+                             USER CHECKED struct stat *result)
+		THROWS(...) {
+	struct fnode *me        = mfile_asnode(self);
+	REF struct task *thread = taskpid_gettask(me->fn_fsdata);
+	/* Set timestamps based on thread times. */
+	if (thread) {
+		struct timespec ts;
+		REF struct cred *thread_cred;
+		FINALLY_DECREF_UNLIKELY(thread);
+
+		/* Creation-time: store the time when the thread was started. */
+		ts = task_getstarttime(thread);
+		result->st_ctimespec.tv_sec  = (typeof(result->st_ctimespec.tv_sec))ts.tv_sec;
+		result->st_ctimespec.tv_nsec = (typeof(result->st_ctimespec.tv_nsec))ts.tv_nsec;
+
+		/* Last-accessed + last-modified: store the last point in time when the thread got executed. */
+		ts = thread == THIS_TASK ? realtime() : ktime_to_timespec(FORTASK(thread, this_stoptime));
+		result->st_atimespec.tv_sec  = (typeof(result->st_atimespec.tv_sec))ts.tv_sec;
+		result->st_atimespec.tv_nsec = (typeof(result->st_atimespec.tv_nsec))ts.tv_nsec;
+		result->st_mtimespec.tv_sec  = (typeof(result->st_mtimespec.tv_sec))ts.tv_sec;
+		result->st_mtimespec.tv_nsec = (typeof(result->st_mtimespec.tv_nsec))ts.tv_nsec;
+
+		/* Fill uid/gid based on thread credentials. */
+		thread_cred = task_getcred(thread);
+		FINALLY_DECREF_UNLIKELY(thread_cred);
+		/* NOTE: Yes, we need to use the effective U/G-id here (linux does the same) */
+		result->st_uid = (typeof(result->st_uid))ATOMIC_READ(thread_cred->c_euid);
+		result->st_gid = (typeof(result->st_gid))ATOMIC_READ(thread_cred->c_egid);
+
+	} else {
+		/* Fallback: just write the current time... */
+		struct timespec now          = realtime();
+		result->st_atimespec.tv_sec  = (typeof(result->st_atimespec.tv_sec))now.tv_sec;
+		result->st_atimespec.tv_nsec = (typeof(result->st_atimespec.tv_nsec))now.tv_nsec;
+		result->st_mtimespec.tv_sec  = (typeof(result->st_mtimespec.tv_sec))now.tv_sec;
+		result->st_mtimespec.tv_nsec = (typeof(result->st_mtimespec.tv_nsec))now.tv_nsec;
+		result->st_ctimespec.tv_sec  = (typeof(result->st_ctimespec.tv_sec))now.tv_sec;
+		result->st_ctimespec.tv_nsec = (typeof(result->st_ctimespec.tv_nsec))now.tv_nsec;
+	}
+}
+
+INTERN NONNULL((1)) void KCALL
+procfs_perproc_dir_v_stat(struct mfile *__restrict self,
+                          USER CHECKED struct stat *result)
+		THROWS(...) {
+	procfs_perproc_v_stat_common(self, result);
+	fdirnode_v_stat(self, result);
+}
+
+INTERN NONNULL((1)) void KCALL
+procfs_perproc_printnode_v_stat(struct mfile *__restrict self,
+                                USER CHECKED struct stat *result)
+		THROWS(...) {
+	procfs_perproc_v_stat_common(self, result);
+	printnode_v_stat(self, result);
+}
+
+INTERN NONNULL((1)) void KCALL
+procfs_perproc_lnknode_v_stat(struct mfile *__restrict self,
+                              USER CHECKED struct stat *result)
+		THROWS(...) {
+	size_t lnksize;
+	struct flnknode *me            = mfile_aslnk(self);
+	struct flnknode_ops const *ops = flnknode_getops(me);
+	procfs_perproc_v_stat_common(self, result);
+	lnksize           = (*ops->lno_readlink)(me, NULL, 0);
+	result->st_blocks = CEILDIV(lnksize, PAGESIZE);
+	result->st_size   = lnksize;
+}
+
+INTERN_CONST struct mfile_stream_ops const procfs_perproc_lnknode_v_stream_ops = {
+	.mso_stat = &procfs_perproc_lnknode_v_stat,
+};
+
+INTERN_CONST struct mfile_stream_ops const procfs_perproc_printnode_v_stream_ops = {
+	.mso_pread  = &printnode_v_pread,
+	.mso_preadv = &printnode_v_preadv,
+	.mso_stat   = &procfs_perproc_printnode_v_stat,
+};
+
+/* Operators for per-process directories */
+#define procfs_perproc_dir_v_free    procfs_perproc_v_free
+#define procfs_perproc_dir_v_destroy procfs_perproc_v_destroy
+#define procfs_perproc_dir_v_changed procfs_perproc_v_changed
+#define procfs_perproc_dir_v_wrattr  procfs_perproc_v_wrattr
+INTERN_CONST struct mfile_stream_ops const procfs_perproc_dir_v_stream_ops = {
+	.mso_open = &fdirnode_v_open,
+	.mso_stat = &procfs_perproc_dir_v_stat,
+};
+#define procfs_perproc_dir_v_open fdirnode_v_open
+
+
+
+
+
 /* Helper for printing `struct fs' member paths. */
 PRIVATE WUNUSED NONNULL((1)) size_t KCALL
-ProcFS_PerProc_FsSpecificPath_Printer(struct flnknode *__restrict self,
-                                      USER CHECKED /*utf-8*/ char *buf,
-                                      size_t bufsize,
-                                      ptrdiff_t struct_fs_offsetof_path)
+ProcFS_PerProc_FsSpecificPath_ReadLink(struct flnknode *__restrict self,
+                                       USER CHECKED /*utf-8*/ char *buf,
+                                       size_t bufsize,
+                                       ptrdiff_t struct_fs_offsetof_path)
 		THROWS(E_SEGFAULT, ...) {
 	REF struct fs *threadfs;
 	REF struct path *thread_pth, *caller_root;
@@ -155,6 +264,28 @@ ProcFS_PerProc_FsSpecificPath_Printer(struct flnknode *__restrict self,
 	                   fs_atflags(0), caller_root);
 }
 
+#ifndef __OPTIMIZE_SIZE__
+PRIVATE WUNUSED NONNULL((1)) REF struct path *KCALL
+ProcFS_PerProc_FsSpecificPath_WalkLink(struct flnknode *__restrict self,
+                                       ptrdiff_t struct_fs_offsetof_path)
+		THROWS(E_SEGFAULT, ...) {
+	REF struct fs *threadfs;
+	REF struct task *thread = taskpid_gettask(self->fn_fsdata);
+	REF struct path *result;
+	if unlikely(!thread)
+		return NULL;
+	threadfs = task_getfs(thread);
+	decref_unlikely(thread);
+	{
+		FINALLY_DECREF_UNLIKELY(threadfs);
+		fs_pathlock_read(threadfs);
+		result = incref(*(struct path **)((byte_t *)threadfs + struct_fs_offsetof_path));
+		fs_pathlock_endread(threadfs);
+	}
+	return result;
+}
+#endif /* !__OPTIMIZE_SIZE__ */
+
 
 
 
@@ -162,33 +293,81 @@ ProcFS_PerProc_FsSpecificPath_Printer(struct flnknode *__restrict self,
 /************************************************************************/
 /* /proc/[PID]/cwd                                                      */
 /************************************************************************/
-INTERN WUNUSED NONNULL((1)) size_t KCALL
-ProcFS_PerProc_Cwd_Printer(struct flnknode *__restrict self,
-                           USER CHECKED /*utf-8*/ char *buf,
-                           size_t bufsize)
+PRIVATE WUNUSED NONNULL((1)) size_t KCALL
+procfs_pp_cwd_v_readlink(struct flnknode *__restrict self,
+                         USER CHECKED /*utf-8*/ char *buf,
+                         size_t bufsize)
 		THROWS(E_SEGFAULT, ...) {
-	return ProcFS_PerProc_FsSpecificPath_Printer(self, buf, bufsize, offsetof(struct fs, fs_cwd));
+	return ProcFS_PerProc_FsSpecificPath_ReadLink(self, buf, bufsize, offsetof(struct fs, fs_cwd));
 }
+
+#ifndef __OPTIMIZE_SIZE__
+PRIVATE WUNUSED NONNULL((1, 2)) REF struct path *KCALL
+procfs_pp_cwd_v_walklink(struct flnknode *__restrict self,
+                         /*in|out*/ u32 *__restrict UNUSED(premaining_symlinks)) {
+	return ProcFS_PerProc_FsSpecificPath_WalkLink(self, offsetof(struct fs, fs_cwd));
+}
+#endif /* !__OPTIMIZE_SIZE__ */
+
+INTERN_CONST struct flnknode_ops const procfs_pp_cwd = {
+	.lno_node = {
+		.no_file = {
+			.mo_destroy = &procfs_perproc_v_destroy,
+			.mo_changed = &procfs_perproc_v_changed,
+			.mo_stream  = &procfs_perproc_lnknode_v_stream_ops,
+		},
+		.no_free   = &procfs_perproc_v_free,
+		.no_wrattr = &procfs_perproc_v_wrattr,
+	},
+	.lno_readlink = &procfs_pp_cwd_v_readlink,
+#ifndef __OPTIMIZE_SIZE__
+	.lno_walklink = &procfs_pp_cwd_v_walklink, /* Optimization operator! */
+#endif /* !__OPTIMIZE_SIZE__ */
+};
 
 
 
 /************************************************************************/
 /* /proc/[PID]/root                                                     */
 /************************************************************************/
-INTERN WUNUSED NONNULL((1)) size_t KCALL
-ProcFS_PerProc_Root_Printer(struct flnknode *__restrict self,
-                            USER CHECKED /*utf-8*/ char *buf,
-                            size_t bufsize)
+PRIVATE WUNUSED NONNULL((1)) size_t KCALL
+procfs_pp_root_v_readlink(struct flnknode *__restrict self,
+                          USER CHECKED /*utf-8*/ char *buf,
+                          size_t bufsize)
 		THROWS(E_SEGFAULT, ...) {
-	return ProcFS_PerProc_FsSpecificPath_Printer(self, buf, bufsize, offsetof(struct fs, fs_root));
+	return ProcFS_PerProc_FsSpecificPath_ReadLink(self, buf, bufsize, offsetof(struct fs, fs_root));
 }
+
+#ifndef __OPTIMIZE_SIZE__
+PRIVATE WUNUSED NONNULL((1, 2)) REF struct path *KCALL
+procfs_pp_root_v_walklink(struct flnknode *__restrict self,
+                          /*in|out*/ u32 *__restrict UNUSED(premaining_symlinks)) {
+	return ProcFS_PerProc_FsSpecificPath_WalkLink(self, offsetof(struct fs, fs_root));
+}
+#endif /* !__OPTIMIZE_SIZE__ */
+
+INTERN_CONST struct flnknode_ops const procfs_pp_root = {
+	.lno_node = {
+		.no_file = {
+			.mo_destroy = &procfs_perproc_v_destroy,
+			.mo_changed = &procfs_perproc_v_changed,
+			.mo_stream  = &procfs_perproc_lnknode_v_stream_ops,
+		},
+		.no_free   = &procfs_perproc_v_free,
+		.no_wrattr = &procfs_perproc_v_wrattr,
+	},
+	.lno_readlink = &procfs_pp_root_v_readlink,
+#ifndef __OPTIMIZE_SIZE__
+	.lno_walklink = &procfs_pp_root_v_walklink, /* Optimization operator! */
+#endif /* !__OPTIMIZE_SIZE__ */
+};
 
 
 
 /************************************************************************/
 /* /proc/[PID]/exe                                                      */
 /************************************************************************/
-INTERN WUNUSED NONNULL((1)) size_t KCALL
+PRIVATE WUNUSED NONNULL((1)) size_t KCALL
 ProcFS_PerProc_Exe_Printer(struct flnknode *__restrict self,
                            USER CHECKED /*utf-8*/ char *buf,
                            size_t bufsize)
@@ -208,12 +387,17 @@ ProcFS_PerProc_Exe_Printer(struct flnknode *__restrict self,
 		exec_path = xincref(FORMMAN(thread_mm, thismman_execinfo).mei_path);
 		mman_lock_endread(thread_mm);
 	}
-	if unlikely(!exec_dent || !exec_path) {
-		xdecref_unlikely(exec_dent);
+	if unlikely(!exec_dent) {
 		xdecref_unlikely(exec_path);
-		THROW(E_PROCESS_EXITED, taskpid_getpid_s(self->fn_fsdata));
+		THROW(E_FSERROR_FILE_NOT_FOUND);
 	}
 	FINALLY_DECREF_UNLIKELY(exec_dent);
+	if unlikely(!exec_path) {
+		return snprintf(buf, bufsize, "%s%$s",
+		                exec_dent->fd_name[0] == '/' ? "" : "?/",
+		                (size_t)exec_dent->fd_namelen,
+		                exec_dent->fd_name);
+	}
 	FINALLY_DECREF_UNLIKELY(exec_path);
 	caller_root = fs_getroot(THIS_FS);
 	return path_sprintent(exec_path, exec_dent->fd_name,
@@ -223,7 +407,55 @@ ProcFS_PerProc_Exe_Printer(struct flnknode *__restrict self,
 	                      /*fs_atflags(0) | */ AT_PATHPRINT_INCTRAIL,
 	                      caller_root);
 }
-/* TODO: open("/proc/pid/exe") can be optimized here */
+
+#ifndef __OPTIMIZE_SIZE__
+PRIVATE WUNUSED NONNULL((1, 2, 3, 4)) REF struct fnode *KCALL
+ProcFS_PerProc_Exe_ExpandLink(struct flnknode *__restrict self,
+                              /*out[1..1]_opt*/ REF struct path **presult_path,
+                              /*out[1..1]_opt*/ REF struct fdirent **presult_dirent,
+                              /*in|out*/ u32 *__restrict UNUSED(premaining_symlinks))
+		THROWS(E_IOERROR, E_BADALLOC, ...) {
+	REF struct task *thread;
+	REF struct mman *thread_mm;
+	REF struct fnode *result;
+	thread = taskpid_gettask(self->fn_fsdata);
+	if (!thread)
+		return NULL;
+	thread_mm = task_getmman(thread);
+	decref_unlikely(thread);
+	{
+		FINALLY_DECREF_UNLIKELY(thread_mm);
+		mman_lock_read(thread_mm);
+		if (!FORMMAN(thread_mm, thismman_execinfo).mei_dent ||
+		    !FORMMAN(thread_mm, thismman_execinfo).mei_path ||
+		    !FORMMAN(thread_mm, thismman_execinfo).mei_file) {
+			mman_lock_endread(thread_mm);
+			return NULL;
+		}
+		*presult_dirent = incref(FORMMAN(thread_mm, thismman_execinfo).mei_dent);
+		*presult_path   = incref(FORMMAN(thread_mm, thismman_execinfo).mei_path);
+		result          = mfile_asnode(incref(FORMMAN(thread_mm, thismman_execinfo).mei_file));
+		mman_lock_endread(thread_mm);
+	}
+	return result;
+}
+#endif /* !__OPTIMIZE_SIZE__ */
+
+INTERN_CONST struct flnknode_ops const procfs_pp_exe = {
+	.lno_node = {
+		.no_file = {
+			.mo_destroy = &procfs_perproc_v_destroy,
+			.mo_changed = &procfs_perproc_v_changed,
+			.mo_stream  = &procfs_perproc_lnknode_v_stream_ops,
+		},
+		.no_free   = &procfs_perproc_v_free,
+		.no_wrattr = &procfs_perproc_v_wrattr,
+	},
+	.lno_readlink   = &ProcFS_PerProc_Exe_Printer,
+#ifndef __OPTIMIZE_SIZE__
+	.lno_expandlink = &ProcFS_PerProc_Exe_ExpandLink, /* Optimization operator! */
+#endif /* !__OPTIMIZE_SIZE__ */
+};
 
 
 
@@ -987,107 +1219,6 @@ ProcFS_PerProc_X86_Iopl_Write(struct mfile *__restrict self, USER CHECKED void c
 /* Special file types (with custom implementations)                     */
 /************************************************************************/
 
-/* Common operators for all per-process files. */
-#define procfs_perproc_v_changed fnode_v_changed
-#define procfs_perproc_v_wrattr  fnode_v_wrattr_noop
-#define procfs_perproc_v_free    (*((void(KCALL *)(struct fnode *__restrict))(void *)(uintptr_t)-1))
-INTDEF NOBLOCK NONNULL((1)) void
-NOTHROW(KCALL procfs_perproc_v_destroy)(struct mfile *__restrict self);
-
-PRIVATE NONNULL((1)) void KCALL
-procfs_perproc_v_stat_common(struct mfile *__restrict self,
-                             USER CHECKED struct stat *result)
-		THROWS(...) {
-	struct fnode *me        = mfile_asnode(self);
-	REF struct task *thread = taskpid_gettask(me->fn_fsdata);
-	/* Set timestamps based on thread times. */
-	if (thread) {
-		struct timespec ts;
-		REF struct cred *thread_cred;
-		FINALLY_DECREF_UNLIKELY(thread);
-
-		/* Creation-time: store the time when the thread was started. */
-		ts = task_getstarttime(thread);
-		result->st_ctimespec.tv_sec  = (typeof(result->st_ctimespec.tv_sec))ts.tv_sec;
-		result->st_ctimespec.tv_nsec = (typeof(result->st_ctimespec.tv_nsec))ts.tv_nsec;
-
-		/* Last-accessed + last-modified: store the last point in time when the thread got executed. */
-		ts = thread == THIS_TASK ? realtime() : ktime_to_timespec(FORTASK(thread, this_stoptime));
-		result->st_atimespec.tv_sec  = (typeof(result->st_atimespec.tv_sec))ts.tv_sec;
-		result->st_atimespec.tv_nsec = (typeof(result->st_atimespec.tv_nsec))ts.tv_nsec;
-		result->st_mtimespec.tv_sec  = (typeof(result->st_mtimespec.tv_sec))ts.tv_sec;
-		result->st_mtimespec.tv_nsec = (typeof(result->st_mtimespec.tv_nsec))ts.tv_nsec;
-
-		/* Fill uid/gid based on thread credentials. */
-		thread_cred = task_getcred(thread);
-		FINALLY_DECREF_UNLIKELY(thread_cred);
-		/* NOTE: Yes, we need to use the effective U/G-id here (linux does the same) */
-		result->st_uid = (typeof(result->st_uid))ATOMIC_READ(thread_cred->c_euid);
-		result->st_gid = (typeof(result->st_gid))ATOMIC_READ(thread_cred->c_egid);
-
-	} else {
-		/* Fallback: just write the current time... */
-		struct timespec now          = realtime();
-		result->st_atimespec.tv_sec  = (typeof(result->st_atimespec.tv_sec))now.tv_sec;
-		result->st_atimespec.tv_nsec = (typeof(result->st_atimespec.tv_nsec))now.tv_nsec;
-		result->st_mtimespec.tv_sec  = (typeof(result->st_mtimespec.tv_sec))now.tv_sec;
-		result->st_mtimespec.tv_nsec = (typeof(result->st_mtimespec.tv_nsec))now.tv_nsec;
-		result->st_ctimespec.tv_sec  = (typeof(result->st_ctimespec.tv_sec))now.tv_sec;
-		result->st_ctimespec.tv_nsec = (typeof(result->st_ctimespec.tv_nsec))now.tv_nsec;
-	}
-}
-
-INTERN NONNULL((1)) void KCALL
-procfs_perproc_dir_v_stat(struct mfile *__restrict self,
-                          USER CHECKED struct stat *result)
-		THROWS(...) {
-	procfs_perproc_v_stat_common(self, result);
-	fdirnode_v_stat(self, result);
-}
-
-INTERN NONNULL((1)) void KCALL
-procfs_perproc_printnode_v_stat(struct mfile *__restrict self,
-                                USER CHECKED struct stat *result)
-		THROWS(...) {
-	procfs_perproc_v_stat_common(self, result);
-	printnode_v_stat(self, result);
-}
-
-INTERN NONNULL((1)) void KCALL
-procfs_perproc_lnknode_v_stat(struct mfile *__restrict self,
-                              USER CHECKED struct stat *result)
-		THROWS(...) {
-	size_t lnksize;
-	struct flnknode *me            = mfile_aslnk(self);
-	struct flnknode_ops const *ops = flnknode_getops(me);
-	procfs_perproc_v_stat_common(self, result);
-	lnksize           = (*ops->lno_readlink)(me, NULL, 0);
-	result->st_blocks = CEILDIV(lnksize, PAGESIZE);
-	result->st_size   = lnksize;
-}
-
-INTERN_CONST struct mfile_stream_ops const procfs_perproc_lnknode_v_stream_ops = {
-	.mso_stat = &procfs_perproc_lnknode_v_stat,
-};
-
-INTERN_CONST struct mfile_stream_ops const procfs_perproc_printnode_v_stream_ops = {
-	.mso_pread  = &printnode_v_pread,
-	.mso_preadv = &printnode_v_preadv,
-	.mso_stat   = &procfs_perproc_printnode_v_stat,
-};
-
-/* Operators for per-process directories */
-#define procfs_perproc_dir_v_free    procfs_perproc_v_free
-#define procfs_perproc_dir_v_destroy procfs_perproc_v_destroy
-#define procfs_perproc_dir_v_changed procfs_perproc_v_changed
-#define procfs_perproc_dir_v_wrattr  procfs_perproc_v_wrattr
-INTERN_CONST struct mfile_stream_ops const procfs_perproc_dir_v_stream_ops = {
-	.mso_open = &fdirnode_v_open,
-	.mso_stat = &procfs_perproc_dir_v_stat,
-};
-#define procfs_perproc_dir_v_open fdirnode_v_open
-
-
 /************************************************************************/
 /* /proc/[pid]/fd                                                       */
 /************************************************************************/
@@ -1144,6 +1275,100 @@ procfs_fd_lnknode_v_openlink(struct flnknode *__restrict self,
 	return true;
 }
 
+#ifndef __OPTIMIZE_SIZE__
+PRIVATE WUNUSED NONNULL((1, 2, 3, 4)) REF struct fnode *KCALL
+procfs_fd_lnknode_v_expandlink(struct flnknode *__restrict self,
+                               /*out[1..1]_opt*/ REF struct path **__restrict presult_path,
+                               /*out[1..1]_opt*/ REF struct fdirent **__restrict presult_dirent,
+                               /*in|out*/ u32 *__restrict UNUSED(premaining_symlinks))
+		THROWS(E_IOERROR, E_BADALLOC, ...) {
+	struct procfs_fd_lnknode *me;
+	/* This is the function that implements the magic for open("/proc/[pid]/fd/[no]"),
+	 * such  that  such a  call  behaves as  a  dup(2), rather  than open(readlink())! */
+	me = (struct procfs_fd_lnknode *)mfile_aslnk(self);
+
+	/* Certain handles  types  which  are  known  to
+	 * reference path+name+file triples are checked. */
+	switch (me->pfl_handtyp) {
+
+	case HANDLE_TYPE_FILEHANDLE:
+	case HANDLE_TYPE_FIFOHANDLE: {
+		struct filehandle *hand;
+		STATIC_ASSERT(offsetof(struct filehandle, fh_path) == offsetof(struct fifohandle, fu_path));
+		STATIC_ASSERT(offsetof(struct filehandle, fh_dirent) == offsetof(struct fifohandle, fu_dirent));
+		hand = (struct filehandle *)me->pfl_handdat;
+		if (hand->fh_path && hand->fh_dirent && mfile_isnode(hand->fh_file)) {
+			*presult_path   = incref(hand->fh_path);
+			*presult_dirent = incref(hand->fh_dirent);
+			return mfile_asnode(incref(hand->fh_file));
+		}
+	}	break;
+
+	case HANDLE_TYPE_DIRHANDLE: {
+		struct dirhandle *hand;
+		hand = (struct dirhandle *)me->pfl_handdat;
+		if (hand->dh_path && hand->dh_dirent) {
+			*presult_path   = incref(hand->dh_path);
+			*presult_dirent = incref(hand->dh_dirent);
+			return mfile_asdir(incref(hand->dh_enum.de_dir));
+		}
+	}	break;
+
+	case HANDLE_TYPE_MFILE: {
+		/* Device handles are known  to be relative to  the
+		 * devfs root (so-long as they've not been deleted) */
+		if (mfile_isdevice((struct mfile *)me->fn_fsdata)) {
+			struct device *dev;
+			dev = mfile_asdevice((struct mfile *)me->fn_fsdata);
+			devfs_byname_read();
+			if (dev->dv_byname_node.rb_lhs == DEVICE_BYNAME_DELETED) {
+				devfs_byname_endread();
+				break;
+			}
+			*presult_dirent = incref(&dev->dv_dirent->fdd_dirent);
+			devfs_byname_endread();
+			/* The associated path is the mounting point for devfs in the current VFS */
+			TRY {
+				*presult_path = vfs_mount_location(THIS_VFS, &devfs.fs_root);
+			} EXCEPT {
+				decref_unlikely(*presult_dirent);
+				RETHROW();
+			}
+			return mfile_asnode(incref(dev));
+		}
+	}	break;
+
+	case HANDLE_TYPE_PATH: {
+		/* This case is somewhat special, in that we need to return information
+		 * about the path's parent+name+dir to  construct a valid data  triple. */
+		struct path *pth = (struct path *)me->pfl_handdat;
+		if (!path_isroot(pth)) {
+			*presult_path   = path_getparent(pth);
+			*presult_dirent = incref(pth->p_name);
+			return mfile_asnode(incref(pth->p_dir));
+		}
+	}	break;
+
+	default:
+		break;
+	}
+	return NULL;
+}
+
+/* This operator is called when user-space does `open("/proc/[pid]/fd/[fdno]/foo/bar/foobar")',
+ * in with case we're  to return the path  to-be used as basis  for the "foo/bar/foobar"  tail. */
+PRIVATE WUNUSED NONNULL((1, 2)) REF struct path *KCALL
+procfs_fd_lnknode_v_walklink(struct flnknode *__restrict self,
+                             /*in|out*/ u32 *__restrict UNUSED(premaining_symlinks))
+		THROWS(E_IOERROR, E_BADALLOC, ...) {
+	struct procfs_fd_lnknode *me;
+	me = (struct procfs_fd_lnknode *)mfile_aslnk(self);
+	if (me->pfl_handtyp == HANDLE_TYPE_PATH)
+		return incref((struct path *)me->pfl_handdat);
+	return NULL;
+}
+#endif /* !__OPTIMIZE_SIZE__ */
+
 
 INTERN_CONST struct flnknode_ops const procfs_perproc_fdlnk_ops = {
 	.lno_node = {
@@ -1155,8 +1380,12 @@ INTERN_CONST struct flnknode_ops const procfs_perproc_fdlnk_ops = {
 		.no_free   = &procfs_fd_lnknode_v_free,
 		.no_wrattr = &procfs_fd_lnknode_v_wrattr,
 	},
-	.lno_readlink = &procfs_fd_lnknode_v_readlink,
-	.lno_openlink = &procfs_fd_lnknode_v_openlink,
+	.lno_readlink   = &procfs_fd_lnknode_v_readlink,
+	.lno_openlink   = &procfs_fd_lnknode_v_openlink,
+#ifndef __OPTIMIZE_SIZE__
+	.lno_expandlink = &procfs_fd_lnknode_v_expandlink, /* Optimization operator! */
+	.lno_walklink   = &procfs_fd_lnknode_v_walklink,   /* Optimization operator! */
+#endif /* !__OPTIMIZE_SIZE__ */
 };
 
 /* Template for files from  "/proc/[PID]/fd/[NO]"

@@ -137,6 +137,9 @@ INTDEF struct mfile_stream_ops const procfs_perproc_dir_v_stream_ops;
 /************************************************************************/
 /* Special file types (with custom implementations)                     */
 /************************************************************************/
+INTDEF struct flnknode_ops const procfs_pp_exe;
+INTDEF struct flnknode_ops const procfs_pp_cwd;
+INTDEF struct flnknode_ops const procfs_pp_root;
 INTDEF struct fdirnode_ops const procfs_pp_fd;
 INTDEF struct fdirnode_ops const procfs_pp_map_files;
 INTDEF struct fdirnode_ops const procfs_pp_task;

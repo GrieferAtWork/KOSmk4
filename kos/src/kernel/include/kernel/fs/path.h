@@ -232,7 +232,7 @@ NOTHROW(path_plock_acquire_nopr)(struct path *__restrict self) {
 	}	__WHILE0
 #endif /* !__INTELLISENSE__ */
 
-LOCAL ATTR_RETNONNULL WUNUSED REF struct path *
+LOCAL NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct path *
 NOTHROW(path_getparent)(struct path *__restrict self) {
 	REF struct path *result;
 	path_plock_acquire(self);

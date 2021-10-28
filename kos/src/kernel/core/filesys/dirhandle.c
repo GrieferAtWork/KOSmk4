@@ -41,6 +41,7 @@
 #include <kos/kernel/handle.h>
 
 #include <assert.h>
+#include <format-printer.h>
 #include <stddef.h>
 
 DECL_BEGIN
@@ -330,6 +331,27 @@ handle_dirhandle_tryas(struct dirhandle *__restrict self,
 	default: break;
 	}
 	return mfile_utryas(self->dh_enum.de_dir, wanted_type);
+}
+
+INTERN NONNULL((1, 2)) ssize_t KCALL
+handle_dirhandle_printlink(struct dirhandle *__restrict self,
+                           pformatprinter printer, void *arg)
+		THROWS(E_WOULDBLOCK, ...) {
+	if (self->dh_dirent) {
+		if (self->dh_path) {
+			REF struct path *root = fs_getroot(THIS_FS);
+			FINALLY_DECREF_UNLIKELY(root);
+			return path_printent(self->dh_path, self->dh_dirent->fd_name,
+			                     self->dh_dirent->fd_namelen, printer, arg,
+			                     AT_PATHPRINT_INCTRAIL, root);
+		}
+		if (self->dh_dirent->fd_name[0] == '/')
+			return (*printer)(arg, self->dh_dirent->fd_name, self->dh_dirent->fd_namelen);
+		return format_printf(printer, arg, "?/%$s",
+		                     (size_t)self->dh_dirent->fd_namelen,
+		                     self->dh_dirent->fd_name);
+	}
+	return mfile_uprintlink(self->dh_enum.de_dir, printer, arg);
 }
 
 

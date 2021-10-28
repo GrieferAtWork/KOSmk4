@@ -298,11 +298,8 @@ handle_filehandle_tryas(struct filehandle *__restrict self,
 
 
 
-STATIC_ASSERT(offsetof(struct filehandle, fh_path) == offsetof(struct dirhandle, dh_path));
-STATIC_ASSERT(offsetof(struct filehandle, fh_dirent) == offsetof(struct dirhandle, dh_dirent));
 STATIC_ASSERT(offsetof(struct filehandle, fh_path) == offsetof(struct fifohandle, fu_path));
 STATIC_ASSERT(offsetof(struct filehandle, fh_dirent) == offsetof(struct fifohandle, fu_dirent));
-DEFINE_INTERN_ALIAS(handle_dirhandle_printlink, handle_filehandle_printlink);
 DEFINE_INTERN_ALIAS(handle_fifohandle_printlink, handle_filehandle_printlink);
 INTERN NONNULL((1, 2)) ssize_t KCALL
 handle_filehandle_printlink(struct filehandle *__restrict self,

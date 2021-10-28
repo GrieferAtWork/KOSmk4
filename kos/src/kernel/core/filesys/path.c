@@ -750,22 +750,38 @@ path_readlink_and_walk(struct path *__restrict self,
 	return result;
 }
 
+
+/* Check if `self' is visible from `fs_getroot(THIS_FS)' */
+PRIVATE WUNUSED NONNULL((1)) bool FCALL
+is_path_visible(struct path *__restrict self) THROWS(E_WOULDBLOCK) {
+	REF struct path *root;
+	bool result;
+	root   = fs_getroot(THIS_FS);
+	result = path_isdescendantof(self, root);
+	decref_unlikely(root);
+	return result;
+}
+
+
 /* Walk a given symlink */
 PRIVATE ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3)) REF struct path *KCALL
-path_walklink(struct path *__restrict self,
+path_walklink(/*inherit(always)*/ REF struct path *__restrict self,
               u32 *__restrict premaining_symlinks,
-              struct flnknode *__restrict lnk, atflag_t atflags)
+              /*inherit(always)*/ REF struct flnknode *__restrict lnk, atflag_t atflags)
 		THROWS(E_IOERROR, E_BADALLOC, ...) {
 	REF struct path *result;
 	size_t bufsize;
 	struct flnknode_ops const *ops;
+again:
+	FINALLY_DECREF_UNLIKELY(self);
+	FINALLY_DECREF_UNLIKELY(lnk);
 	ops = flnknode_getops(lnk);
 
 	/* If defined, try to make use of `lno_walklink'.
 	 * - To reiterate the documentation of `lno_walklink':
 	 *   for "/proc/[PID]/fd/[FDNO]",  this returns  paths
 	 *   as would also be used during `openat(2)'. */
-	if (ops->lno_walklink) {
+	if (ops->lno_walklink != NULL) {
 		result = (*ops->lno_walklink)(lnk, premaining_symlinks);
 		if (result) {
 			/* Verify that `result' is still  reachable from the current POSIX  root.
@@ -780,21 +796,77 @@ path_walklink(struct path *__restrict self,
 			 * the  owning process; iow:  mode_t: 0400), but  also for other per-proc
 			 * directories like `/proc/[PID]/cwd',  which _ARENT_ process-private  as
 			 * far as I know... */
-			REF struct path *root;
-			bool is_visible;
 			TRY {
-				root = fs_getroot(THIS_FS);
+				if (is_path_visible(result))
+					return result;
 			} EXCEPT {
 				decref_unlikely(result);
 				RETHROW();
 			}
-			is_visible = path_isdescendantof(result, root);
-			decref_unlikely(root);
-			if likely(is_visible)
-				return result;
 
 			/* Path isn't visible -> do normal symlink expansion! */
 			decref_unlikely(result);
+		}
+	}
+
+	/* We can also try  to use this  operator, in which  case we need  to
+	 * construct a child-path of the expanded file (if it's a directory),
+	 * or traverse it as another symlink  (if it's another one of  those) */
+	if (ops->lno_expandlink != NULL) {
+		REF struct fnode *open_node;
+		REF struct path *open_path;
+		REF struct fdirent *open_dirent;
+		open_node = (*ops->lno_expandlink)(lnk, &open_path, &open_dirent,
+		                                   premaining_symlinks);
+		if (open_node != NULL) {
+			FINALLY_DECREF_UNLIKELY(open_dirent);
+			TRY {
+				if (is_path_visible(open_path)) {
+					if (fnode_islnk(open_node)) {
+						/* Check that we're allowed to walk a symlink. */
+						if unlikely(*premaining_symlinks == 0)
+							THROW(E_FSERROR_TOO_MANY_SYMBOLIC_LINKS);
+						--*premaining_symlinks;
+						lnk  = fnode_aslnk(open_node); /* Inherit reference */
+						self = open_path;              /* Inherit reference */
+						goto again;
+					}
+					if (fnode_isdir(open_node)) {
+						/* Try to find `open_dirent' within `open_path' */
+						REF struct path *result;
+						struct fdirnode *dir;
+						dir    = fnode_asdir(open_node);
+						result = path_lookupchild(open_path,
+						                          open_dirent->fd_name,
+						                          open_dirent->fd_namelen,
+						                          open_dirent->fd_hash, 0);
+						if (result != NULL) {
+							if likely(result->p_dir == dir) {
+								decref_unlikely(open_node);
+								decref_unlikely(open_path);
+								return result; /* Inherit reference */
+							}
+							decref_unlikely(result);
+						} else {
+							/* Create the missing child-path. */
+							result = path_makechild(self, atflags, dir, open_dirent);
+							decref_unlikely(open_node);
+							decref_unlikely(open_path);
+							return result;
+						}
+					}
+
+					/* Neither a symlink, or a directory.
+					 *
+					 * But still fallthru to the fallback readlink+traverse handling! */
+				}
+			} EXCEPT {
+				decref_unlikely(open_node);
+				decref_unlikely(open_path);
+				RETHROW();
+			}
+			decref_unlikely(open_node);
+			decref_unlikely(open_path);
 		}
 	}
 
@@ -905,16 +977,17 @@ again_lookup_dent:
 
 	/* Check for symbolic links. */
 	if (fnode_islnk(node)) {
-		FINALLY_DECREF_UNLIKELY(node);
 
 		/* Check that we're allowed to walk a symlink. */
-		if unlikely(*premaining_symlinks == 0)
+		if unlikely(*premaining_symlinks == 0) {
+			decref_unlikely(node);
 			THROW(E_FSERROR_TOO_MANY_SYMBOLIC_LINKS);
+		}
 		--*premaining_symlinks;
 
 		/* Walk a symbolic link. */
-		return path_walklink(self, premaining_symlinks,
-		                     fnode_aslnk(node),
+		return path_walklink(incref(self), premaining_symlinks,
+		                     fnode_aslnk(node), /* inherit:node */
 		                     atflags & AT_NO_AUTOMOUNT);
 	}
 
@@ -984,20 +1057,15 @@ path_walklinknode(struct path *__restrict self,
 		                                premaining_symlinks);
 		if (result) {
 			/* Verify that `*presult_path' is reachable from `fs_getroot()' */
-			REF struct path *root;
-			bool is_visible;
 			TRY {
-				root = fs_getroot(THIS_FS);
+				if (is_path_visible(*presult_path))
+					return result;
 			} EXCEPT {
 				decref_unlikely(*presult_path);
 				decref_unlikely(*presult_dirent);
 				decref_unlikely(result);
 				RETHROW();
 			}
-			is_visible = path_isdescendantof(*presult_path, root);
-			decref_unlikely(root);
-			if likely(is_visible)
-				return result;
 
 			/* Fallback: if the path isn't visible, do a normal link expansion. */
 			decref_unlikely(*presult_path);
@@ -1851,6 +1919,7 @@ again_deref_lnknode:
 						lnknode = fnode_aslnk(info.mkf_rnode); /* Inherit reference */
 						FINALLY_DECREF_UNLIKELY(lnknode);
 						DBG_memset(&info.mkf_rnode, 0xcc, sizeof(info.mkf_rnode));
+
 						{
 							FINALLY_DECREF_UNLIKELY(info.mkf_dent);
 
@@ -1874,6 +1943,68 @@ again_deref_lnknode:
 								return result;
 							}
 						} /* Scope... */
+
+						/* We can also make use of the `lno_expandlink' operator (if it's defined)
+						 * This  is  essentially the  optimization  for `open("/proc/[PID]/exe")'. */
+						if (lnknode_ops->lno_expandlink != NULL) {
+							REF struct fnode *open_file;
+							REF struct path *open_path;
+							REF struct fdirent *open_dirent;
+							open_file = (*lnknode_ops->lno_expandlink)(lnknode, &open_path, &open_dirent,
+							                                           premaining_symlinks);
+							if (open_file != NULL) {
+								bool isvisible;
+								TRY {
+									if unlikely(oflags & O_EXCL)
+										THROW(E_FSERROR_FILE_ALREADY_EXISTS); /* create-exclusive */
+									isvisible = is_path_visible(open_path);
+								} EXCEPT {
+									decref_unlikely(open_path);
+									decref_unlikely(open_dirent);
+									decref_unlikely(open_file);
+									RETHROW();
+								}
+								if (isvisible) {
+									struct mfile_stream_ops const *stream;
+									/* Check if we were really supposed to open the file via a FILEHANDLE. */
+									stream = open_file->mf_ops->mo_stream;
+									if (!stream ||
+									    stream->mso_open == &mfile_v_open ||
+									    (!stream->mso_read && !stream->mso_readv &&
+									     !stream->mso_write && !stream->mso_writev)) {
+										/* Yes: open the file via the already-created filehandle */
+										decref_unlikely(access_path);
+										info.mkf_rnode = open_file;   /* Inherit reference */
+										info.mkf_dent  = open_dirent; /* Inherit reference */
+										access_path    = open_path;   /* Inherit reference */
+										goto open_created_file;
+									}
+									FINALLY_DECREF_UNLIKELY(open_file);
+									FINALLY_DECREF_UNLIKELY(open_path);
+									FINALLY_DECREF_UNLIKELY(open_dirent);
+
+									/* Must invoke a custom open operator. */
+									result.h_mode = IO_FROM_OPENFLAG(oflags);
+									result.h_type = HANDLE_TYPE_MFILE;
+									result.h_data = incref(open_file);
+									TRY {
+										mfile_open(open_file, &result, open_path, open_dirent);
+										/* Clear a regular file if O_TRUNC was given. */
+										if ((oflags & O_TRUNC) && (oflags & O_ACCMODE) != O_RDONLY && fnode_isreg(open_file))
+											mfile_utruncate(open_file, 0);
+									} EXCEPT {
+										decref(result);
+										RETHROW();
+									}
+									decref_unlikely(access_path);
+									kfree(rhand);
+									return result;
+								} /* if (isvisible) */
+								decref_unlikely(open_path);
+								decref_unlikely(open_dirent);
+								decref_unlikely(open_file);
+							} /* if (open_file != NULL) */
+						}     /* if (lnknode_ops->lno_expandlink != NULL) */
 
 						/* Create the pointed-to file. */
 						status = create_symlink_target(access_path, premaining_symlinks, lnknode, &info,
@@ -1910,6 +2041,7 @@ again_deref_lnknode:
 		}
 
 		/* Fill in the new access handle. */
+open_created_file:
 		rhand->fh_refcnt = 1;
 		rhand->fh_file   = info.mkf_rnode; /* Inherit reference */
 		rhand->fh_path   = access_path;    /* Inherit reference */
@@ -1973,6 +2105,37 @@ again_handle_traversed_file:
 				result.h_mode = IO_FROM_OPENFLAG(oflags);
 				return result;
 			}
+
+			/* We can also make use of the `lno_expandlink' operator (if it's defined)
+			 * This  is  essentially the  optimization  for `open("/proc/[PID]/exe")'. */
+			if (lnknode_ops->lno_expandlink != NULL) {
+				REF struct fnode *open_file;
+				REF struct path *open_path;
+				REF struct fdirent *open_dirent;
+				open_file = (*lnknode_ops->lno_expandlink)(lnknode, &open_path, &open_dirent,
+				                                           premaining_symlinks);
+				if (open_file != NULL) {
+					FINALLY_DECREF_UNLIKELY(open_file);
+					FINALLY_DECREF_UNLIKELY(open_path);
+					FINALLY_DECREF_UNLIKELY(open_dirent);
+					if (is_path_visible(open_path)) {
+						/* Must invoke a custom open operator. */
+						result.h_mode = IO_FROM_OPENFLAG(oflags);
+						result.h_type = HANDLE_TYPE_MFILE;
+						result.h_data = incref(open_file);
+						TRY {
+							mfile_open(open_file, &result, open_path, open_dirent);
+							/* Clear a regular file if O_TRUNC was given. */
+							if ((oflags & O_TRUNC) && (oflags & O_ACCMODE) != O_RDONLY && fnode_isreg(open_file))
+								mfile_utruncate(open_file, 0);
+						} EXCEPT {
+							decref(result);
+							RETHROW();
+						}
+						return result;
+					} /* if (isvisible) */
+				}     /* if (open_file != NULL) */
+			}         /* if (lnknode_ops->lno_expandlink != NULL) */
 
 			/* Do normal expansion of symlink nodes. */
 			file = path_walklinknode(access_path, premaining_symlinks,

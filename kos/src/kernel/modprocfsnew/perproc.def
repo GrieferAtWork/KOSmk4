@@ -67,9 +67,6 @@ ROOTENT("task",      DT_DIR, 0555, &procfs_pp_task,      /*[[[fdirent_hash]]]*/F
 ROOTENT("x86",       DT_DIR, 0555, &procfs_pp_x86,       /*[[[fdirent_hash]]]*/0x363878/*[[[end]]]*/)
 #endif /* __x86_64__ || __i386__ */
 
-MKLNK(procfs_pp_cwd, ProcFS_PerProc_Cwd_Printer)
-MKLNK(procfs_pp_exe, ProcFS_PerProc_Exe_Printer)
-MKLNK(procfs_pp_root, ProcFS_PerProc_Root_Printer)
 MKREG_RO(procfs_pp_cmdline, ProcFS_PerProc_Cmdline_Printer)
 MKREG_RO(procfs_pp_environ, ProcFS_PerProc_Environ_Printer)
 MKREG_RO(procfs_pp_maps, ProcFS_PerProc_Maps_Printer)
