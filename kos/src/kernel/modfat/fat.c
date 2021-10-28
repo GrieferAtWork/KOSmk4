@@ -456,7 +456,6 @@ create_more_clusters_already_locked:
 	assert(result == dat->fn_clusterv[nth_cluster]);
 	assert(result < super->ft_cluster_eof);
 	assert(result != FAT_CLUSTER_UNUSED);
-	sync_endwrite(&super->ft_fat_lock);
 	if (!(mode & FAT_GETCLUSTER_MODE_WRLOCK))
 		FatNodeData_Downgrade(dat);
 	return result;
@@ -1795,7 +1794,7 @@ PRIVATE NONNULL((1, 2, 3, 4, 5)) void KCALL
 FatDir_DirentChanged(struct fnode *__restrict self,
                      struct flatdirnode *oldparent,
                      struct flatdirnode *newparent,
-                     struct flatdirent *__restrict old_ent,
+                     struct flatdirent *__restrict UNUSED(old_ent),
                      struct flatdirent *__restrict new_ent)
 		THROWS(E_IOERROR) {
 	FatNodeData *dat = self->fn_fsdata;
