@@ -862,7 +862,7 @@ flatdirnode_v_mkfile(struct fdirnode *__restrict self,
 	 * In case it doesn't already exist, this *should* also pre-load the entire dir,
 	 * though that cache may be dropped before we get to add the new file below. */
 again_lookup_existing:
-	existing = flatdirnode_v_lookup(self, &info->mkf_lookup_info);
+	existing = flatdirnode_v_lookup(me, &info->mkf_lookup_info);
 	if (existing) {
 handle_existing:
 		TRY {
@@ -905,7 +905,7 @@ handle_existing:
 
 		/* Initialize missing fields as per the specs. */
 		node->mf_flags |= MFILE_FN_GLOBAL_REF;
-		self->mf_flags |= me->mf_flags & (MFILE_F_READONLY | MFILE_F_NOATIME | MFILE_F_NOMTIME);
+		node->mf_flags |= me->mf_flags & (MFILE_F_READONLY | MFILE_F_NOATIME | MFILE_F_NOMTIME);
 		node->mf_refcnt     = 2; /* +1: MFILE_FN_GLOBAL_REF, +1: info->mkf_rnode */
 		node->mf_lock       = ATOMIC_RWLOCK_INIT;
 		node->mf_initdone   = SIG_INIT;
@@ -924,7 +924,7 @@ handle_existing:
 		node->fn_changed    = LIST_ENTRY_UNBOUND_INITIALIZER;
 		DBG_memset(&node->fn_supent, 0xcc, sizeof(node->fn_supent)); /* Initialized later */
 		node->fn_supent.rb_rhs = FSUPER_NODES_DELETED;               /* Loaded later... */
-		LIST_ENTRY_UNBOUND_INIT(&self->fn_allnodes);
+		LIST_ENTRY_UNBOUND_INIT(&node->fn_allnodes);
 	}
 	TRY {
 		/* Construct the new directory entry. */
