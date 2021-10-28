@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8f73804d */
+/* HASH CRC-32:0x8bc339f2 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -162,9 +162,17 @@ __SYSDECL_BEGIN
 #endif /* !O_ASYNC && __O_ASYNC */
 
 #ifdef __USE_KOS
-#if !defined(O_ANYTHING) && defined(__O_ANYTHING)
+/* Open anything directly (as best as possible). (file, directory or symlink)
+ * KOS: Open a file, directory or symlink directly.
+ * DOS: Open a file or directory directly.
+ * GLC: Open a file or directory directly. */
+#ifndef O_ANYTHING
+#ifdef __O_ANYTHING
 #define O_ANYTHING __O_ANYTHING
-#endif /* !O_ANYTHING && __O_ANYTHING */
+#else /* __O_ANYTHING */
+#define O_ANYTHING 0
+#endif /* !__O_ANYTHING */
+#endif /* !O_ANYTHING */
 #endif /* __USE_KOS */
 
 #if !defined(O_FSYNC) && defined(__O_SYNC)
@@ -184,9 +192,8 @@ __SYSDECL_BEGIN
 #define O_DIRECTORY __O_DIRECTORY
 #endif /* !O_DIRECTORY && __O_DIRECTORY */
 
-/* Throw an `E_FSERROR_IS_A_SYMBOLIC_LINK:E_FILESYSTEM_IS_A_SYMBOLIC_LINK_OPEN' (-ELOOP) exception  when
- * the final path component of an open() system call turns out to be a symbolic link, unless `O_SYMLINK'
- * is given, in which case the link itself is opened. */
+/* Throw an `E_FSERROR_IS_A_SYMBOLIC_LINK:E_FILESYSTEM_IS_A_SYMBOLIC_LINK_OPEN'  exception
+ * when the final path component of an open() system call turns out to be a symbolic link. */
 #if !defined(O_NOFOLLOW) && defined(__O_NOFOLLOW)
 #define O_NOFOLLOW __O_NOFOLLOW
 #endif /* !O_NOFOLLOW && __O_NOFOLLOW */
@@ -209,13 +216,6 @@ __SYSDECL_BEGIN
 #if !defined(O_DOSPATH) && defined(__O_DOSPATH)
 #define O_DOSPATH __O_DOSPATH
 #endif /* !O_DOSPATH && __O_DOSPATH */
-
-/* Open a symlink itself, rather than dereferencing it. (This flag implies `O_NOFOLLOW')
- * NOTE: When  combined  with `O_EXCL',  throw  an `E_FSERROR_NOT_A_SYMBOLIC_LINK:
- *       E_FILESYSTEM_NOT_A_SYMBOLIC_LINK_OPEN' if the file isn't a symbolic link. */
-#if !defined(O_SYMLINK) && defined(__O_SYMLINK)
-#define O_SYMLINK __O_SYMLINK
-#endif /* !O_SYMLINK && __O_SYMLINK */
 #endif /* __USE_KOS */
 
 #if defined(__USE_GNU) || defined(__USE_BSD)

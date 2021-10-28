@@ -107,11 +107,7 @@ DEFINE_TEST(open_anon_inode) {
 	/* By passing O_NOFOLLOW, we can explicitly suppress the custom
 	 * follow-last-path-component behavior of  procfs fd files,  at
 	 * which point  we'd once  again be  trying to  open a  symlink
-	 * directly. (Note  that this  call would  succeed if  we  were
-	 * to also  pass O_SYMLINK,  however at  that point  this  call
-	 * would  return  a  handle to  a  procfs `struct symlink_node'
-	 * object of type  `ProcFS_PerProc_Fd_Entry_Type', rather  than
-	 * the pointed-to object) */
+	 * directly. */
 	sprintf(pathbuf, "/proc/self/fd/%d", rw[0]);
 	dupres = open(pathbuf, O_RDONLY | O_NOFOLLOW);
 	/* ELOOP is the result of `E_FSERROR_IS_A_SYMBOLIC_LINK' */

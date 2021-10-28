@@ -892,7 +892,7 @@ struct handle;
  * WARNING: This function does _NOT_ fill in `return.h_mode'
  * @param: oflags: Set of `O_NOCTTY | O_TRUNC | O_APPEND | O_NONBLOCK |
  *                         O_DIRECTORY | O_CREAT | O_EXCL | O_NOATIME |
- *                         O_PATH   |  O_TMPFILE  |  O_SYMLINK  |  O_*'
+ *                         O_PATH   |  O_TMPFILE  |  O_*'
  * @param: fsmode: Set of `0 | FS_MODE_FDOSPATH | FS_MODE_FEMPTY_PATH |
  *                         FS_MODE_FSYMLINK_NOFOLLOW' */
 FUNDEF WUNUSED NONNULL((1, 2, 3)) REF struct handle KCALL
@@ -908,7 +908,7 @@ fs_open_ex(struct fs *__restrict filesystem,
  * WARNING: This function does _NOT_ fill in `return.h_mode'
  * @param: oflags: Set of `O_NOCTTY | O_TRUNC | O_APPEND | O_NONBLOCK |
  *                         O_DIRECTORY | O_CREAT | O_EXCL | O_NOATIME |
- *                         O_PATH | O_TMPFILE | O_SYMLINK | O_DOSPATH |
+ *                         O_PATH | O_TMPFILE | O_DOSPATH |
  *                         O_NOFOLLOW | O_*' */
 FUNDEF WUNUSED NONNULL((1)) REF struct handle KCALL
 fs_open(struct fs *__restrict filesystem, unsigned int dirfd,

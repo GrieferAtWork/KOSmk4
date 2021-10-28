@@ -52,22 +52,17 @@
 #endif /* !__KOS__ */
 #define __O_DIRECTORY       0x0010000 /* Throw an `E_FSERROR_NOT_A_DIRECTORY:E_FILESYSTEM_NOT_A_DIRECTORY_OPEN' exception when the final
                                        * path component of  an open()  system call turns  out to  be something other  than a  directory. */
-#define __O_NOFOLLOW        0x0020000 /* Throw an `E_FSERROR_IS_A_SYMBOLIC_LINK:E_FILESYSTEM_IS_A_SYMBOLIC_LINK_OPEN'  exception when  the
-                                       * final path component of an open() system call turns out to be a symbolic link, unless `O_SYMLINK'
-                                       * is given, in which case the link itself is opened. */
+#define __O_NOFOLLOW        0x0020000 /* Throw an `E_FSERROR_IS_A_SYMBOLIC_LINK:E_FILESYSTEM_IS_A_SYMBOLIC_LINK_OPEN'  exception
+                                       * when the final path component of an open() system call turns out to be a symbolic link. */
 #define __O_NOATIME         0x0040000 /* Don't update last-accessed time stamps. */
 #define __O_CLOEXEC         0x0080000 /* Close the file during exec() */
 #define __O_PATH            0x0200000 /* Open a path for *at system calls. */
 #define __O_TMPFILE        (0x0400000 | __O_DIRECTORY) /* Open a temporary file */
 #ifdef __KOS__
 #define __O_CLOFORK         0x1000000 /* Close the handle when the file descriptors are unshared (s.a. `CLONE_FILES') */
-#define __O_SYMLINK         0x2000000 /* Open a symlink itself, rather than dereferencing it. (This flag implies `O_NOFOLLOW')
-                                       * NOTE: When  combined  with `O_EXCL',  throw  an `E_FSERROR_NOT_A_SYMBOLIC_LINK:
-                                       *       E_FILESYSTEM_NOT_A_SYMBOLIC_LINK_OPEN' if the file isn't a symbolic link. */
 #define __O_DOSPATH         0x4000000 /* Interpret  '\\'  as  '/',  and   ignore  casing  during  path   resolution.
                                        * Additionally,   recognize  DOS  mounting   points,  and  interpret  leading
                                        * slashes as relative to the closest DOS mounting point. (s.a.: `AT_DOSPATH') */
-#define __O_ANYTHING __O_SYMLINK
 #endif /* __KOS__ */
 
 #endif /* !_ASM_OS_KOS_OFLAGS_H */

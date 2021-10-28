@@ -576,9 +576,6 @@
                                                                        * A symbolic link was expected when something else was found */
 #endif /* !E_FSERROR_NOT_A_SYMBOLIC_LINK */
 /*[[[end]]]*/
-#ifndef E_FILESYSTEM_NOT_A_SYMBOLIC_LINK_OPEN
-#define E_FILESYSTEM_NOT_A_SYMBOLIC_LINK_OPEN     0x0001 /* Thrown as the result of `open(path, O_SYMLINK | O_EXCL)', where `path' isn't a symbolic link */
-#endif /* !E_FILESYSTEM_NOT_A_SYMBOLIC_LINK_OPEN */
 #ifndef E_FILESYSTEM_NOT_A_SYMBOLIC_LINK_READLINK
 #define E_FILESYSTEM_NOT_A_SYMBOLIC_LINK_READLINK 0x0002 /* Thrown as the result of using `readlink(path)', where `path' isn't a symbolic link */
 #endif /* !E_FILESYSTEM_NOT_A_SYMBOLIC_LINK_READLINK */

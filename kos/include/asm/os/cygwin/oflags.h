@@ -54,9 +54,8 @@
 #define __O_TEXT       0x0020000 /* ??? */
 #define __O_CLOEXEC    0x0040000 /* Close the file during exec() */
 #define __O_DIRECT     0x0080000 /* ??? */
-#define __O_NOFOLLOW   0x0100000 /* Throw an `E_FSERROR_IS_A_SYMBOLIC_LINK:E_FILESYSTEM_IS_A_SYMBOLIC_LINK_OPEN'  exception when  the
-                                  * final path component of an open() system call turns out to be a symbolic link, unless `O_SYMLINK'
-                                  * is given, in which case the link itself is opened. */
+#define __O_NOFOLLOW   0x0100000 /* Throw an `E_FSERROR_IS_A_SYMBOLIC_LINK:E_FILESYSTEM_IS_A_SYMBOLIC_LINK_OPEN'  exception
+                                  * when the final path component of an open() system call turns out to be a symbolic link. */
 #define __O_DIRECTORY  0x0200000 /* Throw an `E_FSERROR_NOT_A_DIRECTORY:E_FILESYSTEM_NOT_A_DIRECTORY_OPEN' exception when the final
                                   * path component of  an open()  system call turns  out to  be something other  than a  directory. */
 #define __O_EXECSRCH   0x0400000 /* ??? */

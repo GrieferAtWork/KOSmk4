@@ -961,7 +961,6 @@ PRIVATE struct {
 	{ O_PATH,      "O_PATH" },
 	{ O_TMPFILE,   "O_TMPFILE" },
 	{ O_CLOFORK,   "O_CLOFORK" },
-	{ O_SYMLINK,   "O_SYMLINK" },
 	{ O_DOSPATH,   "O_DOSPATH" },
 };
 
@@ -977,7 +976,7 @@ print_oflag_t_impl(pformatprinter printer, void *arg,
 		              O_DSYNC | O_ASYNC | O_DIRECT | O_LARGEFILE |
 		              O_DIRECTORY | O_NOFOLLOW | O_NOATIME |
 		              O_CLOEXEC | O_PATH | O_TMPFILE |
-		              O_CLOFORK | O_SYMLINK | O_DOSPATH)
+		              O_CLOFORK | O_DOSPATH)
 	};
 	if (force_accmode || (oflags & O_ACCMODE) != 0) {
 		/* Print the access mode */

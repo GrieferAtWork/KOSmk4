@@ -1482,7 +1482,6 @@ struct open_option const open_options[] = {
 	{ "cloexec", OPEN_EXFLAG_FNORMAL, O_CLOEXEC, O_CLOEXEC },
 	{ "clofork", OPEN_EXFLAG_FNORMAL, O_CLOFORK, O_CLOFORK },
 	{ "dospath", OPEN_EXFLAG_FNORMAL, O_DOSPATH, O_DOSPATH },
-	{ "symlink", OPEN_EXFLAG_FNORMAL, O_SYMLINK, O_SYMLINK },
 	{ "tmpfile", OPEN_EXFLAG_FNORMAL, O_TMPFILE, O_TMPFILE },
 	{ "xread", OPEN_EXFLAG_FNORMAL, O_XREAD, O_XREAD },
 	{ "xwrite", OPEN_EXFLAG_FNORMAL, O_XWRITE, O_XWRITE },

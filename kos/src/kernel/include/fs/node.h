@@ -910,8 +910,7 @@ inode_file_pwritev_with_pwrite(struct inode *__restrict self,
 #define INODE_FATTRLOADED  0x0008 /* [lock(WRITE_ONCE)] The node's attributes have been loaded. */
 #define INODE_FDIRLOADED   0x0010 /* [lock(WRITE_ONCE)] The entires of a directory INode has been fully loaded. */
 #define INODE_FLNK_DONT_FOLLOW_FINAL_LINK 0x2000 /* - Don't follow the symlink of this INode if it's the final link of some given path.
-                                                  * - Skip the `if (!(oflags & O_SYMLINK)) THROW(E_FSERROR_IS_A_SYMBOLIC_LINK);' check during open.
-                                                  * This   flag   is  used   to  implement   open()   for  procfs's   `/proc/[pid]/fd/[no]'  files. */
+                                                  * This flag is  used to  implement open() for  procfs's `/proc/[pid]/fd/[no]'  files. */
 #define INODE_FSUPERDEL    0x4000 /* Set  alongside  `INODE_FDELETED'  when the  INode  was closed  because  of the
                                    * superblock being  unmounted,  when  `superblock_set_unmounted()'  was  called.
                                    * If `superblock_set_unmounted()' then fails to synchronize outstanding changes,

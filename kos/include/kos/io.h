@@ -318,12 +318,6 @@ typedef unsigned int poll_mode_t; /* Set of `POLL*' */
 #if !defined(O_ASYNC) && defined(__O_ASYNC)
 #define O_ASYNC     __O_ASYNC     /* ??? */
 #endif /* !O_ASYNC && __O_ASYNC */
-#if !defined(O_ANYTHING) && defined(__O_ANYTHING)
-#define O_ANYTHING  __O_ANYTHING  /* Open anything directly (as best as possible). (file, directory or symlink)
-                                   * KOS: Open a file, directory or symlink directly.
-                                   * DOS: Open a file or directory directly.
-                                   * GLC: Open a file or directory directly. */
-#endif /* !O_ANYTHING && __O_ANYTHING */
 #if !defined(O_LARGEFILE) && defined(__O_LARGEFILE)
 #define O_LARGEFILE __O_LARGEFILE /* Ignored... */
 #endif /* !O_LARGEFILE && __O_LARGEFILE */
@@ -332,9 +326,8 @@ typedef unsigned int poll_mode_t; /* Set of `POLL*' */
                                    * final path component of  an open() system  call turns out  to be something  other than a  directory. */
 #endif /* !O_DIRECTORY && __O_DIRECTORY */
 #if !defined(O_NOFOLLOW) && defined(__O_NOFOLLOW)
-#define O_NOFOLLOW  __O_NOFOLLOW  /* Throw an `E_FSERROR_IS_A_SYMBOLIC_LINK:E_FILESYSTEM_IS_A_SYMBOLIC_LINK_OPEN' (-ELOOP) exception  when
-                                   * the final path component of an open() system call turns out to be a symbolic link, unless `O_SYMLINK'
-                                   * is given, in which case the link itself is opened. */
+#define O_NOFOLLOW  __O_NOFOLLOW  /* Throw an `E_FSERROR_IS_A_SYMBOLIC_LINK:E_FILESYSTEM_IS_A_SYMBOLIC_LINK_OPEN'  exception
+                                   * when the final path component of an open() system call turns out to be a symbolic link. */
 #endif /* !O_NOFOLLOW && __O_NOFOLLOW */
 #if !defined(O_CLOEXEC) && defined(__O_CLOEXEC)
 #define O_CLOEXEC   __O_CLOEXEC   /* Close the file during exec() */
@@ -347,11 +340,6 @@ typedef unsigned int poll_mode_t; /* Set of `POLL*' */
                                    * Additionally,   recognize  DOS  mounting   points,  and  interpret  leading
                                    * slashes as relative to the closest DOS mounting point. (s.a.: `AT_DOSPATH') */
 #endif /* !O_DOSPATH && __O_DOSPATH */
-#if !defined(O_SYMLINK) && defined(__O_SYMLINK)
-#define O_SYMLINK   __O_SYMLINK   /* Open a symlink itself, rather than dereferencing it. (This flag implies `O_NOFOLLOW')
-                                   * NOTE: When  combined  with `O_EXCL',  throw  an `E_FSERROR_NOT_A_SYMBOLIC_LINK:
-                                   *       E_FILESYSTEM_NOT_A_SYMBOLIC_LINK_OPEN' if the file isn't a symbolic link. */
-#endif /* !O_SYMLINK && __O_SYMLINK */
 #if !defined(O_DIRECT) && defined(__O_DIRECT)
 #define O_DIRECT    __O_DIRECT    /* ??? */
 #endif /* !O_DIRECT && __O_DIRECT */

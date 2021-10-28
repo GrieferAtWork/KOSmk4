@@ -785,8 +785,6 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *       the  same as `pidfd_open(42)'. Iow: support is provided by allowing the
 	 *       handled returned by open("/proc/42") to be castable to HANDLE_TYPE_TASK */
 
-	/* TODO: Get rid of `O_SYMLINK' */
-
 	/* TODO: Get rid of `AT_SYMLINK_REGULAR' */
 
 	/* TODO: Add `strerrorname_np(3)' and `strerrordesc_np(3)' to the kernel.

@@ -45,14 +45,6 @@
 #endif /* !... */
 #endif /* !... */
 
-/* Open anything directly (as best as possible). (file, directory or symlink)
- * KOS: Open a file, directory or symlink directly.
- * DOS: Open a file or directory directly.
- * GLC: Open a file or directory directly. */
-#ifndef __O_ANYTHING
-#define __O_ANYTHING 0
-#endif /* !__O_ANYTHING */
-
 #ifndef __O_LARGEFILE
 #define __O_LARGEFILE 0 /* Assume native supported (if necessary CRT functions are available) */
 #endif /* !__O_LARGEFILE */

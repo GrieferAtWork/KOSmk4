@@ -2101,7 +2101,7 @@ DEFINE_SYSCALL4(fd_t, openat, fd_t, dirfd,
 		mode &= 07777;
 	}
 	fsmode = (fsmode_t)0;
-	if (oflags & (O_NOFOLLOW | O_SYMLINK))
+	if (oflags & O_NOFOLLOW)
 		fsmode |= (fsmode_t)AT_SYMLINK_NOFOLLOW;
 	if (oflags & O_DOSPATH)
 		fsmode |= (fsmode_t)AT_DOSPATH;
@@ -2118,14 +2118,14 @@ DEFINE_SYSCALL4(fd_t, openat, fd_t, dirfd,
 		if (oflags & ~(O_ACCMODE | O_APPEND | O_NONBLOCK | O_SYNC |
 		               O_DSYNC | O_ASYNC | O_DIRECT | O_LARGEFILE |
 		               O_DIRECTORY | O_NOFOLLOW | O_NOATIME | O_CLOEXEC |
-		               O_CLOFORK | O_PATH | O_SYMLINK | O_DOSPATH)) {
+		               O_CLOFORK | O_PATH | O_DOSPATH)) {
 			THROW(E_INVALID_ARGUMENT_UNKNOWN_FLAG,
 			      E_INVALID_ARGUMENT_CONTEXT_OPEN_OFLAG,
 			      oflags,
 			      ~(O_ACCMODE | O_APPEND | O_NONBLOCK | O_SYNC |
 			        O_DSYNC | O_ASYNC | O_DIRECT | O_LARGEFILE |
 			        O_DIRECTORY | O_NOFOLLOW | O_NOATIME | O_CLOEXEC |
-			        O_CLOFORK | O_PATH | O_SYMLINK | O_DOSPATH),
+			        O_CLOFORK | O_PATH | O_DOSPATH),
 			      O_PATH | (oflags & O_DIRECTORY));
 		}
 	} else {
@@ -2133,13 +2133,13 @@ DEFINE_SYSCALL4(fd_t, openat, fd_t, dirfd,
 			if (oflags & ~(O_ACCMODE | O_NOCTTY | O_TRUNC | O_APPEND | O_NONBLOCK |
 			               O_SYNC | O_DSYNC | O_ASYNC | O_DIRECT | O_LARGEFILE |
 			               O_DIRECTORY | O_NOFOLLOW | O_NOATIME | O_CLOEXEC |
-			               O_CLOFORK | O_PATH | O_TMPFILE | O_SYMLINK | O_DOSPATH)) {
+			               O_CLOFORK | O_PATH | O_TMPFILE | O_DOSPATH)) {
 				THROW(E_INVALID_ARGUMENT_UNKNOWN_FLAG,
 				      E_INVALID_ARGUMENT_CONTEXT_OPEN_OFLAG,
 				      oflags,
 				      ~(O_ACCMODE | O_APPEND | O_NONBLOCK | O_SYNC | O_DSYNC |
 				        O_ASYNC | O_DIRECT | O_LARGEFILE | O_DIRECTORY | O_NOFOLLOW |
-				        O_NOATIME | O_CLOEXEC | O_CLOFORK | O_PATH | O_SYMLINK | O_DOSPATH),
+				        O_NOATIME | O_CLOEXEC | O_CLOFORK | O_PATH | O_DOSPATH),
 				      O_DIRECTORY);
 			}
 		} else {
@@ -2147,7 +2147,7 @@ DEFINE_SYSCALL4(fd_t, openat, fd_t, dirfd,
 			                 O_ACCMODE | O_CREAT | O_EXCL | O_NOCTTY | O_TRUNC | O_APPEND |
 			                 O_NONBLOCK | O_SYNC | O_DSYNC | O_ASYNC | O_DIRECT | O_LARGEFILE |
 			                 O_DIRECTORY | O_NOFOLLOW | O_NOATIME | O_CLOEXEC | O_CLOFORK |
-			                 O_PATH | O_TMPFILE | O_SYMLINK | O_DOSPATH,
+			                 O_PATH | O_TMPFILE | O_DOSPATH,
 			                 E_INVALID_ARGUMENT_CONTEXT_OPEN_OFLAG);
 		}
 	}

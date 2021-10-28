@@ -201,7 +201,7 @@ NOTHROW(KCALL handle_isdirectory)(struct handle self) {
  * WARNING: This function does _NOT_ fill in `return.h_mode'
  * @param: oflags: Set of `O_NOCTTY | O_TRUNC | O_APPEND | O_NONBLOCK |
  *                         O_DIRECTORY | O_CREAT | O_EXCL | O_NOATIME |
- *                         O_PATH   |  O_TMPFILE  |  O_SYMLINK  |  O_*'
+ *                         O_PATH   |  O_TMPFILE  |  O_*'
  * @param: fsmode: Set of `0 | AT_SYMLINK_NOFOLLOW | FS_MODE_FDOSPATH |
  *                         FS_MODE_FEMPTY_PATH | FS_MODE_FSYMLINK_NOFOLLOW' */
 PUBLIC WUNUSED NONNULL((1, 2, 3)) REF struct handle KCALL
@@ -393,14 +393,6 @@ check_result_inode_for_symlink:
 				 *                   open the pointed-to  symbolic link. This  is similar to  how
 				 *                   the O_PATH flag also bypasses a majority of path processing,
 				 *                   any simply always returns a `HANDLE_TYPE_PATH' object. */
-				if (oflags & O_SYMLINK)
-					goto open_result_inode;
-				/* The resulting INode is a symbolic link.
-				 * -> This is where KOS's `O_SYMLINK' extension comes into play:
-				 *   - When `O_SYMLINK' is given, then the symbolic link is opened
-				 *     as a regular file.
-				 *   - When `O_SYMLINK' isn't given, throw an `E_FSERROR_IS_A_SYMBOLIC_LINK'
-				 *     exception   with   `E_FILESYSTEM_IS_A_SYMBOLIC_LINK_OPEN'    context. */
 				if (!(result_inode->i_flags & INODE_FLNK_DONT_FOLLOW_FINAL_LINK)) {
 					THROW(E_FSERROR_IS_A_SYMBOLIC_LINK,
 					      E_FILESYSTEM_IS_A_SYMBOLIC_LINK_OPEN);
@@ -416,11 +408,6 @@ check_result_inode_for_symlink:
 						THROW(E_FSERROR_TOO_MANY_SYMBOLIC_LINKS);
 				}
 			} else {
-				/* Special case: O_SYMLINK | O_EXCL must cause  an exception if the  named
-				 *               file ended up being something other than a symbolic link! */
-				if ((oflags & (O_CREAT | O_SYMLINK | O_EXCL)) == (O_SYMLINK | O_EXCL))
-					THROW(E_FSERROR_NOT_A_SYMBOLIC_LINK,
-					      E_FILESYSTEM_NOT_A_SYMBOLIC_LINK_OPEN);
 			}
 			if (result_inode->i_type->it_attr.a_open) {
 				/* Invoke a custom open-file callback. */
@@ -610,7 +597,7 @@ open_result_inode:
  * WARNING: This function does _NOT_ fill in `return.h_mode'
  * @param: oflags: Set of `O_NOCTTY | O_TRUNC | O_APPEND | O_NONBLOCK |
  *                         O_DIRECTORY | O_CREAT | O_EXCL | O_NOATIME |
- *                         O_PATH | O_TMPFILE | O_SYMLINK | O_DOSPATH |
+ *                         O_PATH | O_TMPFILE | O_DOSPATH |
  *                         O_NOFOLLOW | O_*' */
 PUBLIC WUNUSED NONNULL((1)) REF struct handle KCALL
 fs_open(struct fs *__restrict filesystem, unsigned int dirfd,
@@ -621,7 +608,7 @@ fs_open(struct fs *__restrict filesystem, unsigned int dirfd,
 	fsmode_t fsmode;
 	/* Figure out how we want to access the filesystem. */
 	fsmode = (fsmode_t)0;
-	if (oflags & (O_NOFOLLOW | O_SYMLINK))
+	if (oflags & O_NOFOLLOW)
 		fsmode |= (fsmode_t)AT_SYMLINK_NOFOLLOW;
 	if (oflags & O_DOSPATH)
 		fsmode |= (fsmode_t)AT_DOSPATH;
