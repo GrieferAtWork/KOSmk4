@@ -856,6 +856,8 @@ NOTHROW(KCALL cmdline_backlog_next)(void) {
 
 PUBLIC ATTR_DBGTEXT void KCALL
 dbg_main(uintptr_t show_welcome) {
+	NESTED_EXCEPTION;
+
 	/* Reset the backlog */
 	cmdline_backlog[0]  = '\0';
 	cmdline_latest      = 0;
@@ -1044,7 +1046,7 @@ continue_readline_noauto:
 			dbg_print(DBGSTR("?)\n"));
 			continue;
 		}
-		NESTED_TRY {
+		TRY {
 			errorcode = dbg_commandhook_exec(cmd, argc, argv);
 		} EXCEPT {
 			error_print_into(&dbg_printer, NULL);
