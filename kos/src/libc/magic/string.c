@@ -48,6 +48,9 @@
 
 %(auto_source){
 #include "../user/stdio.h"
+#ifndef __KERNEL__
+#include "../libc/errno.h"
+#endif /* !__KERNEL__ */
 }
 %(auto_header){
 /* Bind optimized variants  of various string  functions,
@@ -988,7 +991,7 @@ char *strerror_l(int errnum, $locale_t locale) {
 }
 
 [[decl_include("<bits/types.h>")]]
-[[wunused, ATTR_COLD, crt_dos_variant, guard]]
+[[wunused, ATTR_COLD, guard, crt_dos_variant]]
 [[nonnull, section(".text.crt{|.dos}.string.memory.strsignal")]]
 [[decl_include("<bits/types.h>")]]
 char *strsignal($signo_t signo) {
@@ -1021,11 +1024,9 @@ strndup([[nonnull]] char const *__restrict str, $size_t max_chars)
 }
 
 
-%{
-#endif /* __USE_XOPEN2K8 */
-
-#if defined(__USE_XOPEN_EXTENDED) || defined(__USE_XOPEN2K8) || defined(__USE_DOS)
-}
+%#endif /* __USE_XOPEN2K8 */
+%
+%#if defined(__USE_XOPEN_EXTENDED) || defined(__USE_XOPEN2K8) || defined(__USE_DOS)
 
 [[crtbuiltin, impl_include("<hybrid/typecore.h>")]]
 [[dos_only_export_alias("_strdup"), export_alias("__strdup")]]
@@ -1039,11 +1040,10 @@ strdup([[nonnull]] char const *__restrict string)
 		memcpy(result, string, resultsize);
 	return result;
 }
-%{
-#endif /* __USE_XOPEN_EXTENDED || __USE_XOPEN2K8 || __USE_DOS */
 
-#ifdef __USE_POSIX
-}
+%#endif /* __USE_XOPEN_EXTENDED || __USE_XOPEN2K8 || __USE_DOS */
+%
+%#ifdef __USE_POSIX
 
 [[ATTR_LEAF, export_alias("strtok_s", "__strtok_r")]]
 char *strtok_r([[nullable]] char *str,
@@ -1362,30 +1362,47 @@ int strncasecmp_l([[nonnull]] char const *s1,
 	return strncasecmp(s1, s2, maxlen);
 }
 
-[[const, wunused, nothrow, crt_dos_variant]]
-[[userimpl, decl_include("<bits/types.h>"), impl_prefix(
-#ifndef ___local_sys_errlist_defined
+[[const, wunused, nothrow, kernel]]
+[[decl_include("<bits/types.h>"), impl_prefix(
+@@pp_ifndef __BUILDING_LIBC@@
+@@pp_ifndef ___local_sys_errlist_defined@@
 #define ___local_sys_errlist_defined
-#if defined(__CRT_HAVE__sys_errlist) && defined(__CRT_HAVE__sys_nerr)
+@@pp_if defined(__CRT_HAVE__sys_errlist) && defined(__CRT_HAVE__sys_nerr)@@
 #ifndef @_sys_errlist@
 __LIBC char const *const @_sys_errlist@[];
 #endif /* !_sys_errlist */
 #ifndef @_sys_nerr@
 __LIBC int @_sys_nerr@;
 #endif /* !_sys_nerr */
-#elif defined(__CRT_HAVE___sys_errlist) && defined(__CRT_HAVE___sys_nerr)
+@@pp_elif defined(__CRT_HAVE___sys_errlist) && defined(__CRT_HAVE___sys_nerr)@@
 __LIBC __ATTR_WUNUSED __ATTR_CONST char const *const *(__LIBCCALL @__sys_errlist@)(void);
 __LIBC __ATTR_WUNUSED __ATTR_CONST int *(__LIBCCALL @__sys_nerr@)(void);
-#else /* ... */
+@@pp_else@@
 #undef ___local_sys_errlist_defined
-#endif /* !... */
-#endif /* !___local_sys_errlist_defined */
-), section(".text.crt{|.dos}.errno")]]
+@@pp_endif@@
+@@pp_endif@@
+@@pp_endif@@
+), section(".text.crt{|.dos}.errno"), impl_include("<asm/os/errno.h>")]]
+[[crt_dos_variant({
+impl: {
+	char const *result;
+	result = libd_strerrorname_np(errnum);
+	if (result)
+		result = strend(result) + 1;
+	return result;
+}
+})]]
 char const *strerrordesc_np($errno_t errnum) {
-@@pp_if defined(__CRT_HAVE__sys_errlist) && defined(__CRT_HAVE__sys_nerr)@@
+@@pp_if !defined(__BUILDING_LIBC) && defined(__CRT_HAVE__sys_errlist) && defined(__CRT_HAVE__sys_nerr)@@
 	return (unsigned int)errnum < (unsigned int)@_sys_nerr@ ? @_sys_errlist@[errnum] : NULL;
-@@pp_elif defined(__CRT_HAVE___sys_errlist) && defined(__CRT_HAVE___sys_nerr)@@
+@@pp_elif !defined(__BUILDING_LIBC) && defined(__CRT_HAVE___sys_errlist) && defined(__CRT_HAVE___sys_nerr)@@
 	return (unsigned int)errnum < (unsigned int)*@__sys_nerr@() ? @__sys_errlist@()[errnum] : NULL;
+@@pp_elif defined(__BUILDING_LIBC) || !defined(__CRT_HAVE_strerrorname_np) || defined(__CRT_KOS)@@
+	char const *result;
+	result = strerrorname_np(errnum);
+	if (result)
+		result = strend(result) + 1;
+	return result;
 @@pp_else@@
 	char const *result;
 	switch (errnum) {
@@ -1825,438 +1842,780 @@ char const *strerrordesc_np($errno_t errnum) {
 @@pp_endif@@
 }
 
-[[decl_include("<bits/types.h>")]]
+[[decl_include("<bits/types.h>"), kernel]]
 [[const, wunused, nothrow, section(".text.crt{|.dos}.errno")]]
-[[userimpl, crt_dos_variant, impl_include("<libc/errno.h>")]]
+[[impl_include("<asm/os/errno.h>")]]
+[[crt_dos_variant({
+impl: {
+	/* Special handling for a hand full of errno
+	 * values that don't  have KOS  equivalents. */
+	switch (errnum) {
+	case DOS_STRUNCATE:
+		return "STRUNCATE\0" "Truncated";
+	case DOS_EOTHER:
+		return "EOTHER\0" "Other";
+	default:
+		break;
+	}
+	errnum = libd_errno_dos2kos(errnum);
+	return libc_strerrorname_np(errnum);
+}
+})]]
 char const *strerrorname_np($errno_t errnum) {
+@@pp_if defined(__KOS__) || defined(__linux__)@@
+/*[[[deemon
+import * from deemon;
+@@Mapping for id -> (kosName, comment)
+local kosErrnoMappings: {int: (string, string)} = Dict();
+local inside = false;
+with (local fp = File.open("../../../include/asm/os/kos/errno.h")) {
+	for (local l: fp) {
+		l = l.strip();
+		if (l == "/" "*[[[begin]]]*" "/")
+			inside = true;
+		if (l == "/" "*[[[end]]]*" "/")
+			inside = false;
+		if (!inside)
+			continue;
+		local name, value, comment;
+		try {
+			name, value, comment = l.scanf(" # define __%[^ ] %[^/ ] /" "* %[^]")...;
+		} catch (...) {
+			continue;
+		}
+		comment = comment.partition("*" "/")[0].strip();
+		while (comment.startswith("["))
+			comment = comment.partition("]")[2].lstrip();
+		value = int(value.strip());
+		if (value in kosErrnoMappings)
+			continue;
+		kosErrnoMappings[value] = (name, comment);
+	}
+}
+local emax = kosErrnoMappings.keys > ...;
+print("#define HAVE_KOS_ERRNO_VALUES");
+for (local ids: kosErrnoMappings.keys.sorted().segments(4)) {
+	print("@@pp_if ", " || ".join(for (local id: ids)
+		"!defined({0}) || {0} != {1}".format({ kosErrnoMappings[id].first, id })),
+		"@@");
+	print("#undef HAVE_KOS_ERRNO_VALUES");
+	print("@@pp_endif@@");
+}
+kosErrnoMappings[0] = ("EOK", "Success");
+print("@@pp_ifdef HAVE_KOS_ERRNO_VALUES@@");
+print("	static char const errno_strtab[] =");
+local strtab_offsets: {int: int} = Dict();
+local currentOffset = 0;
+for (local i: [:emax + 1]) {
+	local name, comment = kosErrnoMappings.get(i)...;
+	if (name is none)
+		continue;
+	name += "\0";
+	comment += "\0";
+	print("\t", repr(name + comment));
+	strtab_offsets[i] = currentOffset;
+	currentOffset += #name;
+	currentOffset += #comment;
+}
+print("	\"\";");
+for (local i: [:emax + 1]) {
+	if (kosErrnoMappings.get(i) is none)
+		strtab_offsets[i] = currentOffset;
+}
+local sizeofStrTab = currentOffset;
+local usedOffsetType = "uint8_t";
+if (sizeofStrTab > 0xffff)
+	usedOffsetType = "uint32_t";
+else if (sizeofStrTab > 0xff)
+	usedOffsetType = "uint16_t";
+print("	static ", usedOffsetType, " errno_offsets[", (emax + 1), "] = {");
+for (local i: [:emax + 1].segments(16))
+	print("\t\t", ", ".join(for (local x: i) strtab_offsets[x]), ",");
+print("	};");
+]]]*/
+#define HAVE_KOS_ERRNO_VALUES
+@@pp_if !defined(EPERM) || EPERM != 1 || !defined(ENOENT) || ENOENT != 2 || !defined(ESRCH) || ESRCH != 3 || !defined(EINTR) || EINTR != 4@@
+#undef HAVE_KOS_ERRNO_VALUES
+@@pp_endif@@
+@@pp_if !defined(EIO) || EIO != 5 || !defined(ENXIO) || ENXIO != 6 || !defined(E2BIG) || E2BIG != 7 || !defined(ENOEXEC) || ENOEXEC != 8@@
+#undef HAVE_KOS_ERRNO_VALUES
+@@pp_endif@@
+@@pp_if !defined(EBADF) || EBADF != 9 || !defined(ECHILD) || ECHILD != 10 || !defined(EAGAIN) || EAGAIN != 11 || !defined(ENOMEM) || ENOMEM != 12@@
+#undef HAVE_KOS_ERRNO_VALUES
+@@pp_endif@@
+@@pp_if !defined(EACCES) || EACCES != 13 || !defined(EFAULT) || EFAULT != 14 || !defined(ENOTBLK) || ENOTBLK != 15 || !defined(EBUSY) || EBUSY != 16@@
+#undef HAVE_KOS_ERRNO_VALUES
+@@pp_endif@@
+@@pp_if !defined(EEXIST) || EEXIST != 17 || !defined(EXDEV) || EXDEV != 18 || !defined(ENODEV) || ENODEV != 19 || !defined(ENOTDIR) || ENOTDIR != 20@@
+#undef HAVE_KOS_ERRNO_VALUES
+@@pp_endif@@
+@@pp_if !defined(EISDIR) || EISDIR != 21 || !defined(EINVAL) || EINVAL != 22 || !defined(ENFILE) || ENFILE != 23 || !defined(EMFILE) || EMFILE != 24@@
+#undef HAVE_KOS_ERRNO_VALUES
+@@pp_endif@@
+@@pp_if !defined(ENOTTY) || ENOTTY != 25 || !defined(ETXTBSY) || ETXTBSY != 26 || !defined(EFBIG) || EFBIG != 27 || !defined(ENOSPC) || ENOSPC != 28@@
+#undef HAVE_KOS_ERRNO_VALUES
+@@pp_endif@@
+@@pp_if !defined(ESPIPE) || ESPIPE != 29 || !defined(EROFS) || EROFS != 30 || !defined(EMLINK) || EMLINK != 31 || !defined(EPIPE) || EPIPE != 32@@
+#undef HAVE_KOS_ERRNO_VALUES
+@@pp_endif@@
+@@pp_if !defined(EDOM) || EDOM != 33 || !defined(ERANGE) || ERANGE != 34 || !defined(EDEADLK) || EDEADLK != 35 || !defined(ENAMETOOLONG) || ENAMETOOLONG != 36@@
+#undef HAVE_KOS_ERRNO_VALUES
+@@pp_endif@@
+@@pp_if !defined(ENOLCK) || ENOLCK != 37 || !defined(ENOSYS) || ENOSYS != 38 || !defined(ENOTEMPTY) || ENOTEMPTY != 39 || !defined(ELOOP) || ELOOP != 40@@
+#undef HAVE_KOS_ERRNO_VALUES
+@@pp_endif@@
+@@pp_if !defined(ENOMSG) || ENOMSG != 42 || !defined(EIDRM) || EIDRM != 43 || !defined(ECHRNG) || ECHRNG != 44 || !defined(EL2NSYNC) || EL2NSYNC != 45@@
+#undef HAVE_KOS_ERRNO_VALUES
+@@pp_endif@@
+@@pp_if !defined(EL3HLT) || EL3HLT != 46 || !defined(EL3RST) || EL3RST != 47 || !defined(ELNRNG) || ELNRNG != 48 || !defined(EUNATCH) || EUNATCH != 49@@
+#undef HAVE_KOS_ERRNO_VALUES
+@@pp_endif@@
+@@pp_if !defined(ENOCSI) || ENOCSI != 50 || !defined(EL2HLT) || EL2HLT != 51 || !defined(EBADE) || EBADE != 52 || !defined(EBADR) || EBADR != 53@@
+#undef HAVE_KOS_ERRNO_VALUES
+@@pp_endif@@
+@@pp_if !defined(EXFULL) || EXFULL != 54 || !defined(ENOANO) || ENOANO != 55 || !defined(EBADRQC) || EBADRQC != 56 || !defined(EBADSLT) || EBADSLT != 57@@
+#undef HAVE_KOS_ERRNO_VALUES
+@@pp_endif@@
+@@pp_if !defined(EBFONT) || EBFONT != 59 || !defined(ENOSTR) || ENOSTR != 60 || !defined(ENODATA) || ENODATA != 61 || !defined(ETIME) || ETIME != 62@@
+#undef HAVE_KOS_ERRNO_VALUES
+@@pp_endif@@
+@@pp_if !defined(ENOSR) || ENOSR != 63 || !defined(ENONET) || ENONET != 64 || !defined(ENOPKG) || ENOPKG != 65 || !defined(EREMOTE) || EREMOTE != 66@@
+#undef HAVE_KOS_ERRNO_VALUES
+@@pp_endif@@
+@@pp_if !defined(ENOLINK) || ENOLINK != 67 || !defined(EADV) || EADV != 68 || !defined(ESRMNT) || ESRMNT != 69 || !defined(ECOMM) || ECOMM != 70@@
+#undef HAVE_KOS_ERRNO_VALUES
+@@pp_endif@@
+@@pp_if !defined(EPROTO) || EPROTO != 71 || !defined(EMULTIHOP) || EMULTIHOP != 72 || !defined(EDOTDOT) || EDOTDOT != 73 || !defined(EBADMSG) || EBADMSG != 74@@
+#undef HAVE_KOS_ERRNO_VALUES
+@@pp_endif@@
+@@pp_if !defined(EOVERFLOW) || EOVERFLOW != 75 || !defined(ENOTUNIQ) || ENOTUNIQ != 76 || !defined(EBADFD) || EBADFD != 77 || !defined(EREMCHG) || EREMCHG != 78@@
+#undef HAVE_KOS_ERRNO_VALUES
+@@pp_endif@@
+@@pp_if !defined(ELIBACC) || ELIBACC != 79 || !defined(ELIBBAD) || ELIBBAD != 80 || !defined(ELIBSCN) || ELIBSCN != 81 || !defined(ELIBMAX) || ELIBMAX != 82@@
+#undef HAVE_KOS_ERRNO_VALUES
+@@pp_endif@@
+@@pp_if !defined(ELIBEXEC) || ELIBEXEC != 83 || !defined(EILSEQ) || EILSEQ != 84 || !defined(ERESTART) || ERESTART != 85 || !defined(ESTRPIPE) || ESTRPIPE != 86@@
+#undef HAVE_KOS_ERRNO_VALUES
+@@pp_endif@@
+@@pp_if !defined(EUSERS) || EUSERS != 87 || !defined(ENOTSOCK) || ENOTSOCK != 88 || !defined(EDESTADDRREQ) || EDESTADDRREQ != 89 || !defined(EMSGSIZE) || EMSGSIZE != 90@@
+#undef HAVE_KOS_ERRNO_VALUES
+@@pp_endif@@
+@@pp_if !defined(EPROTOTYPE) || EPROTOTYPE != 91 || !defined(ENOPROTOOPT) || ENOPROTOOPT != 92 || !defined(EPROTONOSUPPORT) || EPROTONOSUPPORT != 93 || !defined(ESOCKTNOSUPPORT) || ESOCKTNOSUPPORT != 94@@
+#undef HAVE_KOS_ERRNO_VALUES
+@@pp_endif@@
+@@pp_if !defined(EOPNOTSUPP) || EOPNOTSUPP != 95 || !defined(EPFNOSUPPORT) || EPFNOSUPPORT != 96 || !defined(EAFNOSUPPORT) || EAFNOSUPPORT != 97 || !defined(EADDRINUSE) || EADDRINUSE != 98@@
+#undef HAVE_KOS_ERRNO_VALUES
+@@pp_endif@@
+@@pp_if !defined(EADDRNOTAVAIL) || EADDRNOTAVAIL != 99 || !defined(ENETDOWN) || ENETDOWN != 100 || !defined(ENETUNREACH) || ENETUNREACH != 101 || !defined(ENETRESET) || ENETRESET != 102@@
+#undef HAVE_KOS_ERRNO_VALUES
+@@pp_endif@@
+@@pp_if !defined(ECONNABORTED) || ECONNABORTED != 103 || !defined(ECONNRESET) || ECONNRESET != 104 || !defined(ENOBUFS) || ENOBUFS != 105 || !defined(EISCONN) || EISCONN != 106@@
+#undef HAVE_KOS_ERRNO_VALUES
+@@pp_endif@@
+@@pp_if !defined(ENOTCONN) || ENOTCONN != 107 || !defined(ESHUTDOWN) || ESHUTDOWN != 108 || !defined(ETOOMANYREFS) || ETOOMANYREFS != 109 || !defined(ETIMEDOUT) || ETIMEDOUT != 110@@
+#undef HAVE_KOS_ERRNO_VALUES
+@@pp_endif@@
+@@pp_if !defined(ECONNREFUSED) || ECONNREFUSED != 111 || !defined(EHOSTDOWN) || EHOSTDOWN != 112 || !defined(EHOSTUNREACH) || EHOSTUNREACH != 113 || !defined(EALREADY) || EALREADY != 114@@
+#undef HAVE_KOS_ERRNO_VALUES
+@@pp_endif@@
+@@pp_if !defined(EINPROGRESS) || EINPROGRESS != 115 || !defined(ESTALE) || ESTALE != 116 || !defined(EUCLEAN) || EUCLEAN != 117 || !defined(ENOTNAM) || ENOTNAM != 118@@
+#undef HAVE_KOS_ERRNO_VALUES
+@@pp_endif@@
+@@pp_if !defined(ENAVAIL) || ENAVAIL != 119 || !defined(EISNAM) || EISNAM != 120 || !defined(EREMOTEIO) || EREMOTEIO != 121 || !defined(EDQUOT) || EDQUOT != 122@@
+#undef HAVE_KOS_ERRNO_VALUES
+@@pp_endif@@
+@@pp_if !defined(ENOMEDIUM) || ENOMEDIUM != 123 || !defined(EMEDIUMTYPE) || EMEDIUMTYPE != 124 || !defined(ECANCELED) || ECANCELED != 125 || !defined(ENOKEY) || ENOKEY != 126@@
+#undef HAVE_KOS_ERRNO_VALUES
+@@pp_endif@@
+@@pp_if !defined(EKEYEXPIRED) || EKEYEXPIRED != 127 || !defined(EKEYREVOKED) || EKEYREVOKED != 128 || !defined(EKEYREJECTED) || EKEYREJECTED != 129 || !defined(EOWNERDEAD) || EOWNERDEAD != 130@@
+#undef HAVE_KOS_ERRNO_VALUES
+@@pp_endif@@
+@@pp_if !defined(ENOTRECOVERABLE) || ENOTRECOVERABLE != 131 || !defined(ERFKILL) || ERFKILL != 132 || !defined(EHWPOISON) || EHWPOISON != 133@@
+#undef HAVE_KOS_ERRNO_VALUES
+@@pp_endif@@
+@@pp_ifdef HAVE_KOS_ERRNO_VALUES@@
+	static char const errno_strtab[] =
+	"EOK\0Success\0"
+	"EPERM\0Operation not permitted\0"
+	"ENOENT\0No such file or directory\0"
+	"ESRCH\0No such process\0"
+	"EINTR\0Interrupted system call\0"
+	"EIO\0I/O error\0"
+	"ENXIO\0No such device or address\0"
+	"E2BIG\0Argument list too long\0"
+	"ENOEXEC\0Exec format error\0"
+	"EBADF\0Bad file number\0"
+	"ECHILD\0No child processes\0"
+	"EAGAIN\0Try again\0"
+	"ENOMEM\0Out of memory\0"
+	"EACCES\0Permission denied\0"
+	"EFAULT\0Bad address\0"
+	"ENOTBLK\0Block device required\0"
+	"EBUSY\0Device or resource busy\0"
+	"EEXIST\0File exists\0"
+	"EXDEV\0Cross-device link\0"
+	"ENODEV\0No such device\0"
+	"ENOTDIR\0Not a directory\0"
+	"EISDIR\0Is a directory\0"
+	"EINVAL\0Invalid argument\0"
+	"ENFILE\0File table overflow\0"
+	"EMFILE\0Too many open files\0"
+	"ENOTTY\0Not a typewriter\0"
+	"ETXTBSY\0Text file busy\0"
+	"EFBIG\0File too large\0"
+	"ENOSPC\0No space left on device\0"
+	"ESPIPE\0Illegal seek\0"
+	"EROFS\0Read-only file system\0"
+	"EMLINK\0Too many links\0"
+	"EPIPE\0Broken pipe\0"
+	"EDOM\0Math argument out of domain of func\0"
+	"ERANGE\0Math result not representable\0"
+	"EDEADLK\0Resource deadlock would occur\0"
+	"ENAMETOOLONG\0File name too long\0"
+	"ENOLCK\0No record locks available\0"
+	"ENOSYS\0Function not implemented\0"
+	"ENOTEMPTY\0Directory not empty\0"
+	"ELOOP\0Too many symbolic links encountered\0"
+	"ENOMSG\0No message of desired type\0"
+	"EIDRM\0Identifier removed\0"
+	"ECHRNG\0Channel number out of range\0"
+	"EL2NSYNC\0Level 2 not synchronized\0"
+	"EL3HLT\0Level 3 halted\0"
+	"EL3RST\0Level 3 reset\0"
+	"ELNRNG\0Link number out of range\0"
+	"EUNATCH\0Protocol driver not attached\0"
+	"ENOCSI\0No CSI structure available\0"
+	"EL2HLT\0Level 2 halted\0"
+	"EBADE\0Invalid exchange\0"
+	"EBADR\0Invalid request descriptor\0"
+	"EXFULL\0Exchange full\0"
+	"ENOANO\0No anode\0"
+	"EBADRQC\0Invalid request code\0"
+	"EBADSLT\0Invalid slot\0"
+	"EBFONT\0Bad font file format\0"
+	"ENOSTR\0Device not a stream\0"
+	"ENODATA\0No data available\0"
+	"ETIME\0Timer expired\0"
+	"ENOSR\0Out of streams resources\0"
+	"ENONET\0Machine is not on the network\0"
+	"ENOPKG\0Package not installed\0"
+	"EREMOTE\0Object is remote\0"
+	"ENOLINK\0Link has been severed\0"
+	"EADV\0Advertise error\0"
+	"ESRMNT\0Srmount error\0"
+	"ECOMM\0Communication error on send\0"
+	"EPROTO\0Protocol error\0"
+	"EMULTIHOP\0Multihop attempted\0"
+	"EDOTDOT\0RFS specific error\0"
+	"EBADMSG\0Not a data message\0"
+	"EOVERFLOW\0Value too large for defined data type\0"
+	"ENOTUNIQ\0Name not unique on network\0"
+	"EBADFD\0File descriptor in bad state\0"
+	"EREMCHG\0Remote address changed\0"
+	"ELIBACC\0Can not access a needed shared library\0"
+	"ELIBBAD\0Accessing a corrupted shared library\0"
+	"ELIBSCN\0.lib section in a.out corrupted\0"
+	"ELIBMAX\0Attempting to link in too many shared libraries\0"
+	"ELIBEXEC\0Cannot exec a shared library directly\0"
+	"EILSEQ\0Illegal byte sequence\0"
+	"ERESTART\0Interrupted system call should be restarted\0"
+	"ESTRPIPE\0Streams pipe error\0"
+	"EUSERS\0Too many users\0"
+	"ENOTSOCK\0Socket operation on non-socket\0"
+	"EDESTADDRREQ\0Destination address required\0"
+	"EMSGSIZE\0Message too long\0"
+	"EPROTOTYPE\0Protocol wrong type for socket\0"
+	"ENOPROTOOPT\0Protocol not available\0"
+	"EPROTONOSUPPORT\0Protocol not supported\0"
+	"ESOCKTNOSUPPORT\0Socket type not supported\0"
+	"EOPNOTSUPP\0Operation not supported on transport endpoint\0"
+	"EPFNOSUPPORT\0Protocol family not supported\0"
+	"EAFNOSUPPORT\0Address family not supported by protocol\0"
+	"EADDRINUSE\0Address already in use\0"
+	"EADDRNOTAVAIL\0Cannot assign requested address\0"
+	"ENETDOWN\0Network is down\0"
+	"ENETUNREACH\0Network is unreachable\0"
+	"ENETRESET\0Network dropped connection because of reset\0"
+	"ECONNABORTED\0Software caused connection abort\0"
+	"ECONNRESET\0Connection reset by peer\0"
+	"ENOBUFS\0No buffer space available\0"
+	"EISCONN\0Transport endpoint is already connected\0"
+	"ENOTCONN\0Transport endpoint is not connected\0"
+	"ESHUTDOWN\0Cannot send after transport endpoint shutdown\0"
+	"ETOOMANYREFS\0Too many references: cannot splice\0"
+	"ETIMEDOUT\0Connection timed out\0"
+	"ECONNREFUSED\0Connection refused\0"
+	"EHOSTDOWN\0Host is down\0"
+	"EHOSTUNREACH\0No route to host\0"
+	"EALREADY\0Operation already in progress\0"
+	"EINPROGRESS\0Operation now in progress\0"
+	"ESTALE\0Stale file handle\0"
+	"EUCLEAN\0Structure needs cleaning\0"
+	"ENOTNAM\0Not a XENIX named type file\0"
+	"ENAVAIL\0No XENIX semaphores available\0"
+	"EISNAM\0Is a named type file\0"
+	"EREMOTEIO\0Remote I/O error\0"
+	"EDQUOT\0Quota exceeded\0"
+	"ENOMEDIUM\0No medium found\0"
+	"EMEDIUMTYPE\0Wrong medium type\0"
+	"ECANCELED\0Operation canceled\0"
+	"ENOKEY\0Required key not available\0"
+	"EKEYEXPIRED\0Key has expired\0"
+	"EKEYREVOKED\0Key has been revoked\0"
+	"EKEYREJECTED\0Key was rejected by service\0"
+	"EOWNERDEAD\0Owner died\0"
+	"ENOTRECOVERABLE\0State not recoverable\0"
+	"ERFKILL\0Operation not possible due to RF-kill\0"
+	"EHWPOISON\0Memory page has hardware error\0"
+	"";
+	static uint16_t errno_offsets[134] = {
+		0, 12, 42, 75, 97, 127, 141, 173, 202, 228, 250, 276, 293, 314, 339, 358,
+		388, 418, 437, 461, 483, 507, 529, 553, 580, 607, 631, 654, 675, 706, 726, 754,
+		776, 794, 835, 872, 910, 942, 975, 1007, 1037, 4167, 1079, 1113, 1138, 1173, 1207, 1229,
+		1250, 1282, 1319, 1353, 1375, 1398, 1431, 1452, 1468, 1497, 4167, 1518, 1546, 1573, 1599, 1619,
+		1650, 1687, 1716, 1741, 1771, 1792, 1813, 1847, 1869, 1898, 1925, 1952, 2000, 2036, 2072, 2103,
+		2150, 2195, 2235, 2291, 2338, 2367, 2420, 2448, 2470, 2510, 2552, 2578, 2620, 2655, 2694, 2736,
+		2793, 2836, 2890, 2924, 2970, 2995, 3030, 3084, 3130, 3166, 3200, 3248, 3293, 3349, 3397, 3428,
+		3460, 3483, 3513, 3552, 3590, 3615, 3648, 3684, 3722, 3750, 3777, 3799, 3825, 3855, 3884, 3918,
+		3946, 3979, 4020, 4042, 4080, 4126,
+	};
+/*[[[end]]]*/
+	char const *result;
+	if ((unsigned int)errnum >= COMPILER_LENOF(errno_offsets))
+		return NULL;
+	result = &errno_strtab[errno_offsets[errnum]];
+	if (!*result)
+		result = NULL;
+	return result;
+@@pp_else@@
 	char const *result;
 	switch (errnum) {
 
 @@pp_ifdef EPERM@@
-	case EPERM:           result = "EPERM"; break;
+	case EPERM:           result = "EPERM\0Operation not permitted"; break;
 @@pp_endif@@
 @@pp_ifdef ENOENT@@
-	case ENOENT:          result = "ENOENT"; break;
+	case ENOENT:          result = "ENOENT\0No such file or directory"; break;
 @@pp_endif@@
 @@pp_ifdef ESRCH@@
-	case ESRCH:           result = "ESRCH"; break;
+	case ESRCH:           result = "ESRCH\0No such process"; break;
 @@pp_endif@@
 @@pp_ifdef EINTR@@
-	case EINTR:           result = "EINTR"; break;
+	case EINTR:           result = "EINTR\0Interrupted system call"; break;
 @@pp_endif@@
 @@pp_ifdef EIO@@
-	case EIO:             result = "EIO"; break;
+	case EIO:             result = "EIO\0I/O error"; break;
 @@pp_endif@@
 @@pp_ifdef ENXIO@@
-	case ENXIO:           result = "ENXIO"; break;
+	case ENXIO:           result = "ENXIO\0No such device or address"; break;
 @@pp_endif@@
 @@pp_ifdef E2BIG@@
-	case E2BIG:           result = "E2BIG"; break;
+	case E2BIG:           result = "E2BIG\0Argument list too long"; break;
 @@pp_endif@@
 @@pp_ifdef ENOEXEC@@
-	case ENOEXEC:         result = "ENOEXEC"; break;
+	case ENOEXEC:         result = "ENOEXEC\0Exec format error"; break;
 @@pp_endif@@
 @@pp_ifdef EBADF@@
-	case EBADF:           result = "EBADF"; break;
+	case EBADF:           result = "EBADF\0Bad file number"; break;
 @@pp_endif@@
 @@pp_ifdef ECHILD@@
-	case ECHILD:          result = "ECHILD"; break;
+	case ECHILD:          result = "ECHILD\0No child processes"; break;
 @@pp_endif@@
 @@pp_ifdef EAGAIN@@
-	case EAGAIN:          result = "EAGAIN"; break;
+	case EAGAIN:          result = "EAGAIN\0Try again"; break;
 @@pp_endif@@
 @@pp_ifdef ENOMEM@@
-	case ENOMEM:          result = "ENOMEM"; break;
+	case ENOMEM:          result = "ENOMEM\0Out of memory"; break;
 @@pp_endif@@
 @@pp_ifdef EACCES@@
-	case EACCES:          result = "EACCES"; break;
+	case EACCES:          result = "EACCES\0Permission denied"; break;
 @@pp_endif@@
 @@pp_ifdef EFAULT@@
-	case EFAULT:          result = "EFAULT"; break;
+	case EFAULT:          result = "EFAULT\0Bad address"; break;
 @@pp_endif@@
 @@pp_ifdef EBUSY@@
-	case EBUSY:           result = "EBUSY"; break;
+	case EBUSY:           result = "EBUSY\0Device or resource busy"; break;
 @@pp_endif@@
 @@pp_ifdef EEXIST@@
-	case EEXIST:          result = "EEXIST"; break;
+	case EEXIST:          result = "EEXIST\0File exists"; break;
 @@pp_endif@@
 @@pp_ifdef EXDEV@@
-	case EXDEV:           result = "EXDEV"; break;
+	case EXDEV:           result = "EXDEV\0Cross-device link"; break;
 @@pp_endif@@
 @@pp_ifdef ENODEV@@
-	case ENODEV:          result = "ENODEV"; break;
+	case ENODEV:          result = "ENODEV\0No such device"; break;
 @@pp_endif@@
 @@pp_ifdef ENOTDIR@@
-	case ENOTDIR:         result = "ENOTDIR"; break;
+	case ENOTDIR:         result = "ENOTDIR\0Not a directory"; break;
 @@pp_endif@@
 @@pp_ifdef EISDIR@@
-	case EISDIR:          result = "EISDIR"; break;
+	case EISDIR:          result = "EISDIR\0Is a directory"; break;
 @@pp_endif@@
 @@pp_ifdef ENFILE@@
-	case ENFILE:          result = "ENFILE"; break;
+	case ENFILE:          result = "ENFILE\0File table overflow"; break;
 @@pp_endif@@
 @@pp_ifdef EMFILE@@
-	case EMFILE:          result = "EMFILE"; break;
+	case EMFILE:          result = "EMFILE\0Too many open files"; break;
 @@pp_endif@@
 @@pp_ifdef ENOTTY@@
-	case ENOTTY:          result = "ENOTTY"; break;
+	case ENOTTY:          result = "ENOTTY\0Not a typewriter"; break;
 @@pp_endif@@
 @@pp_ifdef EFBIG@@
-	case EFBIG:           result = "EFBIG"; break;
+	case EFBIG:           result = "EFBIG\0File too large"; break;
 @@pp_endif@@
 @@pp_ifdef ENOSPC@@
-	case ENOSPC:          result = "ENOSPC"; break;
+	case ENOSPC:          result = "ENOSPC\0No space left on device"; break;
 @@pp_endif@@
 @@pp_ifdef ESPIPE@@
-	case ESPIPE:          result = "ESPIPE"; break;
+	case ESPIPE:          result = "ESPIPE\0Illegal seek"; break;
 @@pp_endif@@
 @@pp_ifdef EROFS@@
-	case EROFS:           result = "EROFS"; break;
+	case EROFS:           result = "EROFS\0Read-only file system"; break;
 @@pp_endif@@
 @@pp_ifdef EMLINK@@
-	case EMLINK:          result = "EMLINK"; break;
+	case EMLINK:          result = "EMLINK\0Too many links"; break;
 @@pp_endif@@
 @@pp_ifdef EPIPE@@
-	case EPIPE:           result = "EPIPE"; break;
+	case EPIPE:           result = "EPIPE\0Broken pipe"; break;
 @@pp_endif@@
 @@pp_ifdef EDOM@@
-	case EDOM:            result = "EDOM"; break;
+	case EDOM:            result = "EDOM\0Math argument out of domain of func"; break;
 @@pp_endif@@
 @@pp_ifdef ENAMETOOLONG@@
-	case ENAMETOOLONG:    result = "ENAMETOOLONG"; break;
+	case ENAMETOOLONG:    result = "ENAMETOOLONG\0File name too long"; break;
 @@pp_endif@@
 @@pp_ifdef ENOLCK@@
-	case ENOLCK:          result = "ENOLCK"; break;
+	case ENOLCK:          result = "ENOLCK\0No record locks available"; break;
 @@pp_endif@@
 @@pp_ifdef ENOSYS@@
-	case ENOSYS:          result = "ENOSYS"; break;
+	case ENOSYS:          result = "ENOSYS\0Function not implemented"; break;
 @@pp_endif@@
 @@pp_ifdef ENOTEMPTY@@
-	case ENOTEMPTY:       result = "ENOTEMPTY"; break;
+	case ENOTEMPTY:       result = "ENOTEMPTY\0Directory not empty"; break;
 @@pp_endif@@
 @@pp_ifdef EINVAL@@
-	case EINVAL:          result = "EINVAL"; break;
+	case EINVAL:          result = "EINVAL\0Invalid argument"; break;
 @@pp_endif@@
 @@pp_ifdef ERANGE@@
-	case ERANGE:          result = "ERANGE"; break;
+	case ERANGE:          result = "ERANGE\0Math result not representable"; break;
 @@pp_endif@@
 @@pp_ifdef EILSEQ@@
-	case EILSEQ:          result = "EILSEQ"; break;
+	case EILSEQ:          result = "EILSEQ\0Illegal byte sequence"; break;
 @@pp_endif@@
 @@pp_ifdef EDEADLOCK@@
-	case EDEADLOCK:       result = "EDEADLOCK"; break;
+	case EDEADLOCK:       result = "EDEADLOCK\0Resource deadlock would occur"; break;
 @@pp_endif@@
 @@pp_ifdef EADDRINUSE@@
-	case EADDRINUSE:      result = "EADDRINUSE"; break;
+	case EADDRINUSE:      result = "EADDRINUSE\0Address already in use"; break;
 @@pp_endif@@
 @@pp_ifdef EADDRNOTAVAIL@@
-	case EADDRNOTAVAIL:   result = "EADDRNOTAVAIL"; break;
+	case EADDRNOTAVAIL:   result = "EADDRNOTAVAIL\0Cannot assign requested address"; break;
 @@pp_endif@@
 @@pp_ifdef EAFNOSUPPORT@@
-	case EAFNOSUPPORT:    result = "EAFNOSUPPORT"; break;
+	case EAFNOSUPPORT:    result = "EAFNOSUPPORT\0Address family not supported by protocol"; break;
 @@pp_endif@@
 @@pp_ifdef EALREADY@@
-	case EALREADY:        result = "EALREADY"; break;
+	case EALREADY:        result = "EALREADY\0Operation already in progress"; break;
 @@pp_endif@@
 @@pp_ifdef EBADMSG@@
-	case EBADMSG:         result = "EBADMSG"; break;
+	case EBADMSG:         result = "EBADMSG\0Not a data message"; break;
 @@pp_endif@@
 @@pp_ifdef ECANCELED@@
-	case ECANCELED:       result = "ECANCELED"; break;
+	case ECANCELED:       result = "ECANCELED\0Operation Canceled"; break;
 @@pp_endif@@
 @@pp_ifdef ECONNABORTED@@
-	case ECONNABORTED:    result = "ECONNABORTED"; break;
+	case ECONNABORTED:    result = "ECONNABORTED\0Software caused connection abort"; break;
 @@pp_endif@@
 @@pp_ifdef ECONNREFUSED@@
-	case ECONNREFUSED:    result = "ECONNREFUSED"; break;
+	case ECONNREFUSED:    result = "ECONNREFUSED\0Connection refused"; break;
 @@pp_endif@@
 @@pp_ifdef ECONNRESET@@
-	case ECONNRESET:      result = "ECONNRESET"; break;
+	case ECONNRESET:      result = "ECONNRESET\0Connection reset by peer"; break;
 @@pp_endif@@
 @@pp_ifdef EDESTADDRREQ@@
-	case EDESTADDRREQ:    result = "EDESTADDRREQ"; break;
+	case EDESTADDRREQ:    result = "EDESTADDRREQ\0Destination address required"; break;
 @@pp_endif@@
 @@pp_ifdef EHOSTUNREACH@@
-	case EHOSTUNREACH:    result = "EHOSTUNREACH"; break;
+	case EHOSTUNREACH:    result = "EHOSTUNREACH\0No route to host"; break;
 @@pp_endif@@
 @@pp_ifdef EIDRM@@
-	case EIDRM:           result = "EIDRM"; break;
+	case EIDRM:           result = "EIDRM\0Identifier removed"; break;
 @@pp_endif@@
 @@pp_ifdef EINPROGRESS@@
-	case EINPROGRESS:     result = "EINPROGRESS"; break;
+	case EINPROGRESS:     result = "EINPROGRESS\0Operation now in progress"; break;
 @@pp_endif@@
 @@pp_ifdef EISCONN@@
-	case EISCONN:         result = "EISCONN"; break;
+	case EISCONN:         result = "EISCONN\0Transport endpoint is already connected"; break;
 @@pp_endif@@
 @@pp_ifdef ELOOP@@
-	case ELOOP:           result = "ELOOP"; break;
+	case ELOOP:           result = "ELOOP\0Too many symbolic links encountered"; break;
 @@pp_endif@@
 @@pp_ifdef EMSGSIZE@@
-	case EMSGSIZE:        result = "EMSGSIZE"; break;
+	case EMSGSIZE:        result = "EMSGSIZE\0Message too long"; break;
 @@pp_endif@@
 @@pp_ifdef ENETDOWN@@
-	case ENETDOWN:        result = "ENETDOWN"; break;
+	case ENETDOWN:        result = "ENETDOWN\0Network is down"; break;
 @@pp_endif@@
 @@pp_ifdef ENETRESET@@
-	case ENETRESET:       result = "ENETRESET"; break;
+	case ENETRESET:       result = "ENETRESET\0Network dropped connection because of reset"; break;
 @@pp_endif@@
 @@pp_ifdef ENETUNREACH@@
-	case ENETUNREACH:     result = "ENETUNREACH"; break;
+	case ENETUNREACH:     result = "ENETUNREACH\0Network is unreachable"; break;
 @@pp_endif@@
 @@pp_ifdef ENOBUFS@@
-	case ENOBUFS:         result = "ENOBUFS"; break;
+	case ENOBUFS:         result = "ENOBUFS\0No buffer space available"; break;
 @@pp_endif@@
 @@pp_ifdef ENODATA@@
-	case ENODATA:         result = "ENODATA"; break;
+	case ENODATA:         result = "ENODATA\0No data available"; break;
 @@pp_endif@@
 @@pp_ifdef ENOLINK@@
-	case ENOLINK:         result = "ENOLINK"; break;
+	case ENOLINK:         result = "ENOLINK\0Link has been severed"; break;
 @@pp_endif@@
 @@pp_ifdef ENOMSG@@
-	case ENOMSG:          result = "ENOMSG"; break;
+	case ENOMSG:          result = "ENOMSG\0No message of desired type"; break;
 @@pp_endif@@
 @@pp_ifdef ENOPROTOOPT@@
-	case ENOPROTOOPT:     result = "ENOPROTOOPT"; break;
+	case ENOPROTOOPT:     result = "ENOPROTOOPT\0Protocol not available"; break;
 @@pp_endif@@
 @@pp_ifdef ENOSR@@
-	case ENOSR:           result = "ENOSR"; break;
+	case ENOSR:           result = "ENOSR\0Out of streams resources"; break;
 @@pp_endif@@
 @@pp_ifdef ENOSTR@@
-	case ENOSTR:          result = "ENOSTR"; break;
+	case ENOSTR:          result = "ENOSTR\0Device not a stream"; break;
 @@pp_endif@@
 @@pp_ifdef ENOTCONN@@
-	case ENOTCONN:        result = "ENOTCONN"; break;
+	case ENOTCONN:        result = "ENOTCONN\0Transport endpoint is not connected"; break;
 @@pp_endif@@
 @@pp_ifdef ENOTRECOVERABLE@@
-	case ENOTRECOVERABLE: result = "ENOTRECOVERABLE"; break;
+	case ENOTRECOVERABLE: result = "ENOTRECOVERABLE\0State not recoverable"; break;
 @@pp_endif@@
 @@pp_ifdef ENOTSOCK@@
-	case ENOTSOCK:        result = "ENOTSOCK"; break;
+	case ENOTSOCK:        result = "ENOTSOCK\0Socket operation on non-socket"; break;
 @@pp_endif@@
 @@pp_ifdef ENOTSUP@@
-	case ENOTSUP:         result = "ENOTSUP"; break;
+	case ENOTSUP:         result = "ENOTSUP\0Not supported"; break;
 @@pp_endif@@
 @@pp_ifdef EOPNOTSUPP@@
-	case EOPNOTSUPP:      result = "EOPNOTSUPP"; break;
+	case EOPNOTSUPP:      result = "EOPNOTSUPP\0Operation not supported on transport endpoint"; break;
 @@pp_endif@@
 @@pp_ifdef EOTHER@@
-	case EOTHER:          result = "EOTHER"; break;
+	case EOTHER:          result = "EOTHER\0Other"; break;
 @@pp_endif@@
 @@pp_ifdef EOVERFLOW@@
-	case EOVERFLOW:       result = "EOVERFLOW"; break;
+	case EOVERFLOW:       result = "EOVERFLOW\0Value too large for defined data type"; break;
 @@pp_endif@@
 @@pp_ifdef EOWNERDEAD@@
-	case EOWNERDEAD:      result = "EOWNERDEAD"; break;
+	case EOWNERDEAD:      result = "EOWNERDEAD\0Owner died"; break;
 @@pp_endif@@
 @@pp_ifdef EPROTO@@
-	case EPROTO:          result = "EPROTO"; break;
+	case EPROTO:          result = "EPROTO\0Protocol error"; break;
 @@pp_endif@@
 @@pp_ifdef EPROTONOSUPPORT@@
-	case EPROTONOSUPPORT: result = "EPROTONOSUPPORT"; break;
+	case EPROTONOSUPPORT: result = "EPROTONOSUPPORT\0Protocol not supported"; break;
 @@pp_endif@@
 @@pp_ifdef EPROTOTYPE@@
-	case EPROTOTYPE:      result = "EPROTOTYPE"; break;
+	case EPROTOTYPE:      result = "EPROTOTYPE\0Protocol wrong type for socket"; break;
 @@pp_endif@@
 @@pp_ifdef ETIME@@
-	case ETIME:           result = "ETIME"; break;
+	case ETIME:           result = "ETIME\0Timer expired"; break;
 @@pp_endif@@
 @@pp_ifdef ETIMEDOUT@@
-	case ETIMEDOUT:       result = "ETIMEDOUT"; break;
+	case ETIMEDOUT:       result = "ETIMEDOUT\0Connection timed out"; break;
 @@pp_endif@@
 @@pp_ifdef ETXTBSY@@
-	case ETXTBSY:         result = "ETXTBSY"; break;
+	case ETXTBSY:         result = "ETXTBSY\0Text file busy"; break;
 @@pp_endif@@
 @@pp_ifdef EFTYPE@@
-	case EFTYPE:          result = "EFTYPE"; break;
+	case EFTYPE:          result = "EFTYPE\0Inappropriate file type or format"; break;
 @@pp_endif@@
 @@pp_ifdef ENMFILE@@
-	case ENMFILE:         result = "ENMFILE"; break;
+	case ENMFILE:         result = "ENMFILE\0No more files"; break;
 @@pp_endif@@
 @@pp_ifdef EPFNOSUPPORT@@
-	case EPFNOSUPPORT:    result = "EPFNOSUPPORT"; break;
+	case EPFNOSUPPORT:    result = "EPFNOSUPPORT\0Protocol family not supported"; break;
 @@pp_endif@@
 @@pp_ifdef EHOSTDOWN@@
-	case EHOSTDOWN:       result = "EHOSTDOWN"; break;
+	case EHOSTDOWN:       result = "EHOSTDOWN\0Host is down"; break;
 @@pp_endif@@
 @@pp_ifdef ETOOMANYREFS@@
-	case ETOOMANYREFS:    result = "ETOOMANYREFS"; break;
+	case ETOOMANYREFS:    result = "ETOOMANYREFS\0Too many references: cannot splice"; break;
 @@pp_endif@@
 @@pp_ifdef EDQUOT@@
-	case EDQUOT:          result = "EDQUOT"; break;
+	case EDQUOT:          result = "EDQUOT\0Quota exceeded"; break;
 @@pp_endif@@
 @@pp_ifdef ESTALE@@
-	case ESTALE:          result = "ESTALE"; break;
+	case ESTALE:          result = "ESTALE\0Stale file handle"; break;
 @@pp_endif@@
 @@pp_ifdef ENOSHARE@@
-	case ENOSHARE:        result = "ENOSHARE"; break;
+	case ENOSHARE:        result = "ENOSHARE\0No such host or network path"; break;
 @@pp_endif@@
 @@pp_ifdef ECASECLASH@@
-	case ECASECLASH:      result = "ECASECLASH"; break;
+	case ECASECLASH:      result = "ECASECLASH\0Filename exists with different case"; break;
 @@pp_endif@@
 @@pp_ifdef ENOTBLK@@
-	case ENOTBLK:         result = "ENOTBLK"; break;
+	case ENOTBLK:         result = "ENOTBLK\0Block device required"; break;
 @@pp_endif@@
 @@pp_ifdef ECHRNG@@
-	case ECHRNG:          result = "ECHRNG"; break;
+	case ECHRNG:          result = "ECHRNG\0Channel number out of range"; break;
 @@pp_endif@@
 @@pp_ifdef EL2NSYNC@@
-	case EL2NSYNC:        result = "EL2NSYNC"; break;
+	case EL2NSYNC:        result = "EL2NSYNC\0Level 2 not synchronized"; break;
 @@pp_endif@@
 @@pp_ifdef EL3HLT@@
-	case EL3HLT:          result = "EL3HLT"; break;
+	case EL3HLT:          result = "EL3HLT\0Level 3 halted"; break;
 @@pp_endif@@
 @@pp_ifdef EL3RST@@
-	case EL3RST:          result = "EL3RST"; break;
+	case EL3RST:          result = "EL3RST\0Level 3 reset"; break;
 @@pp_endif@@
 @@pp_ifdef ELNRNG@@
-	case ELNRNG:          result = "ELNRNG"; break;
+	case ELNRNG:          result = "ELNRNG\0Link number out of range"; break;
 @@pp_endif@@
 @@pp_ifdef EUNATCH@@
-	case EUNATCH:         result = "EUNATCH"; break;
+	case EUNATCH:         result = "EUNATCH\0Protocol driver not attached"; break;
 @@pp_endif@@
 @@pp_ifdef ENOCSI@@
-	case ENOCSI:          result = "ENOCSI"; break;
+	case ENOCSI:          result = "ENOCSI\0No CSI structure available"; break;
 @@pp_endif@@
 @@pp_ifdef EL2HLT@@
-	case EL2HLT:          result = "EL2HLT"; break;
+	case EL2HLT:          result = "EL2HLT\0Level 2 halted"; break;
 @@pp_endif@@
 @@pp_ifdef EBADE@@
-	case EBADE:           result = "EBADE"; break;
+	case EBADE:           result = "EBADE\0Invalid exchange"; break;
 @@pp_endif@@
 @@pp_ifdef EBADR@@
-	case EBADR:           result = "EBADR"; break;
+	case EBADR:           result = "EBADR\0Invalid request descriptor"; break;
 @@pp_endif@@
 @@pp_ifdef EXFULL@@
-	case EXFULL:          result = "EXFULL"; break;
+	case EXFULL:          result = "EXFULL\0Exchange full"; break;
 @@pp_endif@@
 @@pp_ifdef ENOANO@@
-	case ENOANO:          result = "ENOANO"; break;
+	case ENOANO:          result = "ENOANO\0No anode"; break;
 @@pp_endif@@
 @@pp_ifdef EBADRQC@@
-	case EBADRQC:         result = "EBADRQC"; break;
+	case EBADRQC:         result = "EBADRQC\0Invalid request code"; break;
 @@pp_endif@@
 @@pp_ifdef EBADSLT@@
-	case EBADSLT:         result = "EBADSLT"; break;
+	case EBADSLT:         result = "EBADSLT\0Invalid slot"; break;
 @@pp_endif@@
 @@pp_ifdef EBFONT@@
-	case EBFONT:          result = "EBFONT"; break;
+	case EBFONT:          result = "EBFONT\0Bad font file fmt"; break;
 @@pp_endif@@
 @@pp_ifdef ENONET@@
-	case ENONET:          result = "ENONET"; break;
+	case ENONET:          result = "ENONET\0Machine is not on the network"; break;
 @@pp_endif@@
 @@pp_ifdef ENOPKG@@
-	case ENOPKG:          result = "ENOPKG"; break;
+	case ENOPKG:          result = "ENOPKG\0Package not installed"; break;
 @@pp_endif@@
 @@pp_ifdef EREMOTE@@
-	case EREMOTE:         result = "EREMOTE"; break;
+	case EREMOTE:         result = "EREMOTE\0The object is remote"; break;
 @@pp_endif@@
 @@pp_ifdef EADV@@
-	case EADV:            result = "EADV"; break;
+	case EADV:            result = "EADV\0Advertise error"; break;
 @@pp_endif@@
 @@pp_ifdef ESRMNT@@
-	case ESRMNT:          result = "ESRMNT"; break;
+	case ESRMNT:          result = "ESRMNT\0Srmount error"; break;
 @@pp_endif@@
 @@pp_ifdef ECOMM@@
-	case ECOMM:           result = "ECOMM"; break;
+	case ECOMM:           result = "ECOMM\0Communication error on send"; break;
 @@pp_endif@@
 @@pp_ifdef ELBIN@@
-	case ELBIN:           result = "ELBIN)"; break;
+	case ELBIN:           result = "ELBIN\0Inode is remote (not really error)"; break;
 @@pp_endif@@
 @@pp_ifdef EDOTDOT@@
-	case EDOTDOT:         result = "EDOTDOT)"; break;
+	case EDOTDOT:         result = "EDOTDOT\0Cross mount point (not really error)"; break;
 @@pp_endif@@
 @@pp_ifdef ENOTUNIQ@@
-	case ENOTUNIQ:        result = "ENOTUNIQ"; break;
+	case ENOTUNIQ:        result = "ENOTUNIQ\0Given log. name not unique"; break;
 @@pp_endif@@
 @@pp_ifdef EBADFD@@
-	case EBADFD:          result = "EBADFD"; break;
+	case EBADFD:          result = "EBADFD\0f.d. invalid for this operation"; break;
 @@pp_endif@@
 @@pp_ifdef EREMCHG@@
-	case EREMCHG:         result = "EREMCHG"; break;
+	case EREMCHG:         result = "EREMCHG\0Remote address changed"; break;
 @@pp_endif@@
 @@pp_ifdef ELIBACC@@
-	case ELIBACC:         result = "ELIBACC"; break;
+	case ELIBACC:         result = "ELIBACC\0Can't access a needed shared lib"; break;
 @@pp_endif@@
 @@pp_ifdef ELIBBAD@@
-	case ELIBBAD:         result = "ELIBBAD"; break;
+	case ELIBBAD:         result = "ELIBBAD\0Accessing a corrupted shared lib"; break;
 @@pp_endif@@
 @@pp_ifdef ELIBSCN@@
-	case ELIBSCN:         result = "ELIBSCN"; break;
+	case ELIBSCN:         result = ".ELIBSCN\0lib section in a.out corrupted"; break;
 @@pp_endif@@
 @@pp_ifdef ELIBMAX@@
-	case ELIBMAX:         result = "ELIBMAX"; break;
+	case ELIBMAX:         result = "ELIBMAX\0Attempting to link in too many libs"; break;
 @@pp_endif@@
 @@pp_ifdef ELIBEXEC@@
-	case ELIBEXEC:        result = "ELIBEXEC"; break;
+	case ELIBEXEC:        result = "ELIBEXEC\0Attempting to exec a shared library"; break;
 @@pp_endif@@
 @@pp_ifdef ESHUTDOWN@@
-	case ESHUTDOWN:       result = "ESHUTDOWN"; break;
+	case ESHUTDOWN:       result = "ESHUTDOWN\0Can't send after socket shutdown"; break;
 @@pp_endif@@
 @@pp_ifdef ESOCKTNOSUPPORT@@
-	case ESOCKTNOSUPPORT: result = "ESOCKTNOSUPPORT"; break;
+	case ESOCKTNOSUPPORT: result = "ESOCKTNOSUPPORT\0Socket type not supported"; break;
 @@pp_endif@@
 @@pp_ifdef EPROCLIM@@
-	case EPROCLIM:        result = "EPROCLIM"; break;
+	case EPROCLIM:        result = "EPROCLIM\0Process limit reached"; break;
 @@pp_endif@@
 @@pp_ifdef EUSERS@@
-	case EUSERS:          result = "EUSERS"; break;
+	case EUSERS:          result = "EUSERS\0Too many users"; break;
 @@pp_endif@@
 @@pp_ifdef ENOMEDIUM@@
-	case ENOMEDIUM:       result = "ENOMEDIUM)"; break;
+	case ENOMEDIUM:       result = "ENOMEDIUM\0No medium (in tape drive)"; break;
 @@pp_endif@@
 @@pp_ifdef ESTRPIPE@@
-	case ESTRPIPE:        result = "ESTRPIPE"; break;
+	case ESTRPIPE:        result = "ESTRPIPE\0Streams pipe error"; break;
 @@pp_endif@@
 @@pp_ifdef EMULTIHOP@@
-	case EMULTIHOP:       result = "EMULTIHOP"; break;
+	case EMULTIHOP:       result = "EMULTIHOP\0Multihop attempted"; break;
 @@pp_endif@@
 @@pp_ifdef ERESTART@@
-	case ERESTART:        result = "ERESTART"; break;
+	case ERESTART:        result = "ERESTART\0Interrupted system call should be restarted"; break;
 @@pp_endif@@
 @@pp_ifdef EUCLEAN@@
-	case EUCLEAN:         result = "EUCLEAN"; break;
+	case EUCLEAN:         result = "EUCLEAN\0Structure needs cleaning"; break;
 @@pp_endif@@
 @@pp_ifdef ENOTNAM@@
-	case ENOTNAM:         result = "ENOTNAM"; break;
+	case ENOTNAM:         result = "ENOTNAM\0Not a XENIX named type file"; break;
 @@pp_endif@@
 @@pp_ifdef ENAVAIL@@
-	case ENAVAIL:         result = "ENAVAIL"; break;
+	case ENAVAIL:         result = "ENAVAIL\0No XENIX semaphores available"; break;
 @@pp_endif@@
 @@pp_ifdef EISNAM@@
-	case EISNAM:          result = "EISNAM"; break;
+	case EISNAM:          result = "EISNAM\0Is a named type file"; break;
 @@pp_endif@@
 @@pp_ifdef EREMOTEIO@@
-	case EREMOTEIO:       result = "EREMOTEIO"; break;
+	case EREMOTEIO:       result = "EREMOTEIO\0Remote I/O error"; break;
 @@pp_endif@@
 @@pp_ifdef EMEDIUMTYPE@@
-	case EMEDIUMTYPE:     result = "EMEDIUMTYPE"; break;
+	case EMEDIUMTYPE:     result = "EMEDIUMTYPE\0Wrong medium type"; break;
 @@pp_endif@@
 @@pp_ifdef ENOKEY@@
-	case ENOKEY:          result = "ENOKEY"; break;
+	case ENOKEY:          result = "ENOKEY\0Required key not available"; break;
 @@pp_endif@@
 @@pp_ifdef EKEYEXPIRED@@
-	case EKEYEXPIRED:     result = "EKEYEXPIRED"; break;
+	case EKEYEXPIRED:     result = "EKEYEXPIRED\0Key has expired"; break;
 @@pp_endif@@
 @@pp_ifdef EKEYREVOKED@@
-	case EKEYREVOKED:     result = "EKEYREVOKED"; break;
+	case EKEYREVOKED:     result = "EKEYREVOKED\0Key has been revoked"; break;
 @@pp_endif@@
 @@pp_ifdef EKEYREJECTED@@
-	case EKEYREJECTED:    result = "EKEYREJECTED"; break;
+	case EKEYREJECTED:    result = "EKEYREJECTED\0Key was rejected by service"; break;
 @@pp_endif@@
 @@pp_ifdef ERFKILL@@
-	case ERFKILL:         result = "ERFKILL"; break;
+	case ERFKILL:         result = "ERFKILL\0Operation not possible due to RF-kill"; break;
 @@pp_endif@@
 @@pp_ifdef EHWPOISON@@
-	case EHWPOISON:       result = "EHWPOISON"; break;
+	case EHWPOISON:       result = "EHWPOISON\0Memory page has hardware error"; break;
 @@pp_endif@@
 @@pp_if defined(STRUNCATE) && (!defined(ERANGE) || STRUNCATE != ERANGE)@@
-	case STRUNCATE:       result = "STRUNCATE"; break;
+	case STRUNCATE:       result = "STRUNCATE\0Truncated"; break;
 @@pp_endif@@
 @@pp_if defined(EWOULDBLOCK) && (!defined(EAGAIN) || EWOULDBLOCK != EAGAIN)@@
-	case EWOULDBLOCK:     result = "EWOULDBLOCK"; break;
+	case EWOULDBLOCK:     result = "EWOULDBLOCK\0Operation would block"; break;
 @@pp_endif@@
 @@pp_if defined(EDEADLK) && (!defined(EDEADLOCK) || EDEADLOCK != EDEADLK)@@
-	case EDEADLK:         result = "EDEADLK"; break;
+	case EDEADLK:         result = "EDEADLK\0Resource deadlock would occur"; break;
 @@pp_endif@@
 
 	default:
@@ -2264,6 +2623,7 @@ char const *strerrorname_np($errno_t errnum) {
 		break;
 	}
 	return result;
+@@pp_endif@@
 }
 
 @@>> sigabbrev_np(3)

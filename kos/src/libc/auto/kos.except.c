@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xca6fc869 */
+/* HASH CRC-32:0x7761eb8c */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1146,26 +1146,16 @@ NOTHROW_NCX(LIBKCALL libc_error_print_short_description)(pformatprinter printer,
 		goto done;
 	{
 		char const *name;
-#ifndef __KERNEL__
 		char const *errno_name; /* XXX: Also print in kernel-space? */
-#endif /* !__KERNEL__ */
 		name = libc_error_name(data->e_code);
-#ifndef __KERNEL__
 		errno_name = libc_strerrorname_np(libc_error_as_errno(data));
-#endif /* !__KERNEL__ */
 		if (name) {
-#ifdef __KERNEL__
-			temp = libc_format_printf(printer, arg,
-			                     FMT(" [" AC_WHITE("%s") "]", " [%s]"),
-			                     name);
-#else /* __KERNEL__ */
 			temp = libc_format_printf(printer, arg,
 			                     FMT(" [" AC_WHITE("%s") "%s" AC_WHITE("%s") "]",
 			                         " [%s%s%s]"),
 			                     name,
 			                     errno_name ? "," : "",
 			                     errno_name ? errno_name : "");
-#endif /* !__KERNEL__ */
 			if unlikely(temp < 0)
 				goto err;
 			result += temp;

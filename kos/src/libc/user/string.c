@@ -145,95 +145,6 @@ NOTHROW_NCX(LIBCCALL libc_memrmem0)(void const *haystack, size_t haystacklen,
 }
 
 
-PRIVATE ATTR_SECTION(".rodata.crt.errno")
-struct ATTR_PACKED strerror_names_db_struct {
-#define E(id, message)                          \
-	char name_##id[sizeof(#id) / sizeof(char)]; \
-	char mesg_##id[sizeof(message) / sizeof(char)];
-#include "../libc/sys_errlist.def"
-#undef E
-} const strerror_names_db = {
-#define E(id, message)      \
-	/* .name_##id = */ #id, \
-	/* .mesg_##id = */ message,
-#include "../libc/sys_errlist.def"
-#undef E
-};
-
-typedef u16 strerror_offset_t;
-STATIC_ASSERT(sizeof(strerror_names_db) <= 0x10000);
-
-PRIVATE ATTR_SECTION(".rodata.crt.errno")
-strerror_offset_t const strerror_offsets_db[__ECOUNT] = {
-#define E(id, message) offsetof(struct strerror_names_db_struct, name_##id),
-#include "../libc/sys_errlist.def"
-#undef E
-};
-
-
-/*[[[head:libd_strerrordesc_np,hash:CRC-32=0x41080b08]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.errno") ATTR_CONST WUNUSED char const *
-NOTHROW(LIBDCALL libd_strerrordesc_np)(errno_t errnum)
-/*[[[body:libd_strerrordesc_np]]]*/
-{
-	char const *result;
-	result = libd_strerrorname_np(errnum);
-	if (result)
-		result = strend(result) + 1;
-	return result;
-}
-/*[[[end:libd_strerrordesc_np]]]*/
-
-/*[[[head:libc_strerrordesc_np,hash:CRC-32=0x729e185c]]]*/
-INTERN ATTR_SECTION(".text.crt.errno") ATTR_CONST WUNUSED char const *
-NOTHROW(LIBCCALL libc_strerrordesc_np)(errno_t errnum)
-/*[[[body:libc_strerrordesc_np]]]*/
-{
-	char const *result;
-	result = libc_strerrorname_np(errnum);
-	if (result)
-		result = strend(result) + 1;
-	return result;
-}
-/*[[[end:libc_strerrordesc_np]]]*/
-
-/*[[[head:libd_strerrorname_np,hash:CRC-32=0xa93cd2d]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.errno") ATTR_CONST WUNUSED char const *
-NOTHROW(LIBDCALL libd_strerrorname_np)(errno_t errnum)
-/*[[[body:libd_strerrorname_np]]]*/
-{
-	/* Special handling for a hand full of errno
-	 * values that don't  have KOS  equivalents. */
-	switch (errnum) {
-	case DOS_STRUNCATE:
-		return "STRUNCATE\0" "Truncated";
-	case DOS_EOTHER:
-		return "EOTHER\0" "Other";
-	default:
-		break;
-	}
-	errnum = libd_errno_dos2kos(errnum);
-	return libc_strerrorname_np(errnum);
-}
-/*[[[end:libd_strerrorname_np]]]*/
-
-/*[[[head:libc_strerrorname_np,hash:CRC-32=0x3905de79]]]*/
-INTERN ATTR_SECTION(".text.crt.errno") ATTR_CONST WUNUSED char const *
-NOTHROW(LIBCCALL libc_strerrorname_np)(errno_t errnum)
-/*[[[body:libc_strerrorname_np]]]*/
-{
-	char const *result;
-	if ((unsigned int)errnum >= COMPILER_LENOF(strerror_offsets_db))
-		return NULL;
-	result = (char const *)((byte_t const *)&strerror_names_db +
-	                        strerror_offsets_db[(unsigned int)errnum]);
-	return result;
-}
-/*[[[end:libc_strerrorname_np]]]*/
-
-
-
-
 
 PRIVATE ATTR_SECTION(".rodata.crt.errno")
 struct ATTR_PACKED strsignal_names_db_struct {
@@ -326,11 +237,7 @@ NOTHROW(LIBCCALL libc_sigdescr_np)(signo_t signum)
 
 
 
-/*[[[start:exports,hash:CRC-32=0x97e41b3f]]]*/
-DEFINE_PUBLIC_ALIAS(DOS$strerrordesc_np, libd_strerrordesc_np);
-DEFINE_PUBLIC_ALIAS(strerrordesc_np, libc_strerrordesc_np);
-DEFINE_PUBLIC_ALIAS(DOS$strerrorname_np, libd_strerrorname_np);
-DEFINE_PUBLIC_ALIAS(strerrorname_np, libc_strerrorname_np);
+/*[[[start:exports,hash:CRC-32=0xa60227ea]]]*/
 DEFINE_PUBLIC_ALIAS(DOS$signalname, libd_sigabbrev_np);
 DEFINE_PUBLIC_ALIAS(DOS$sigabbrev_np, libd_sigabbrev_np);
 DEFINE_PUBLIC_ALIAS(signalname, libc_sigabbrev_np);

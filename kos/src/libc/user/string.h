@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x73997c6d */
+/* HASH CRC-32:0x77d1a7ec */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,10 +31,6 @@
 DECL_BEGIN
 
 #ifndef __KERNEL__
-INTDEF ATTR_CONST WUNUSED char const *NOTHROW(LIBDCALL libd_strerrordesc_np)(errno_t errnum);
-INTDEF ATTR_CONST WUNUSED char const *NOTHROW(LIBCCALL libc_strerrordesc_np)(errno_t errnum);
-INTDEF ATTR_CONST WUNUSED char const *NOTHROW(LIBDCALL libd_strerrorname_np)(errno_t errnum);
-INTDEF ATTR_CONST WUNUSED char const *NOTHROW(LIBCCALL libc_strerrorname_np)(errno_t errnum);
 /* >> sigabbrev_np(3)
  * Return the name of a given signal, without the leading `SIG*' prefix.
  * If the  given  `signum'  isn't  recognized,  return  `NULL'  instead. */

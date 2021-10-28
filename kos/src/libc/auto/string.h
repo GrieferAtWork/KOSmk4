@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x79fdae10 */
+/* HASH CRC-32:0x7788f6d */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -803,6 +803,14 @@ INTDEF ATTR_PURE WUNUSED NONNULL((1, 2)) int NOTHROW_NCX(LIBDCALL libd_strncasec
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 INTDEF ATTR_PURE WUNUSED NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc_strncasecmp_l)(char const *s1, char const *s2, size_t maxlen, locale_t locale);
+INTDEF ATTR_CONST WUNUSED char const *NOTHROW(LIBDCALL libd_strerrordesc_np)(errno_t errnum);
+#endif /* !__KERNEL__ */
+INTDEF ATTR_CONST WUNUSED char const *NOTHROW(LIBCCALL libc_strerrordesc_np)(errno_t errnum);
+#ifndef __KERNEL__
+INTDEF ATTR_CONST WUNUSED char const *NOTHROW(LIBDCALL libd_strerrorname_np)(errno_t errnum);
+#endif /* !__KERNEL__ */
+INTDEF ATTR_CONST WUNUSED char const *NOTHROW(LIBCCALL libc_strerrorname_np)(errno_t errnum);
+#ifndef __KERNEL__
 INTDEF ATTR_COLD ATTR_RETNONNULL NONNULL((2)) char *NOTHROW_NCX(LIBDCALL libd_strerror_r)(errno_t errnum, char *buf, size_t buflen);
 INTDEF ATTR_COLD ATTR_RETNONNULL NONNULL((2)) char *NOTHROW_NCX(LIBCCALL libc_strerror_r)(errno_t errnum, char *buf, size_t buflen);
 #endif /* !__KERNEL__ */

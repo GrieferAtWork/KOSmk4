@@ -1409,26 +1409,16 @@ $ssize_t error_print_short_description([[nonnull]] $pformatprinter printer, void
 		goto done;
 	{
 		char const *name;
-@@pp_ifndef __KERNEL__@@
 		char const *errno_name; /* XXX: Also print in kernel-space? */
-@@pp_endif@@
 		name = error_name(data->@e_code@);
-@@pp_ifndef __KERNEL__@@
 		errno_name = strerrorname_np(error_as_errno(data));
-@@pp_endif@@
 		if (name) {
-@@pp_ifdef __KERNEL__@@
-			temp = format_printf(printer, arg,
-			                     FMT(" [" @AC_WHITE@("%s") "]", " [%s]"),
-			                     name);
-@@pp_else@@
 			temp = format_printf(printer, arg,
 			                     FMT(" [" @AC_WHITE@("%s") "%s" @AC_WHITE@("%s") "]",
 			                         " [%s%s%s]"),
 			                     name,
 			                     errno_name ? "," : "",
 			                     errno_name ? errno_name : "");
-@@pp_endif@@
 			if unlikely(temp < 0)
 				goto err;
 			result += temp;

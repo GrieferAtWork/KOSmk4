@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbd0802f0 */
+/* HASH CRC-32:0x716cb744 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,6 +22,31 @@
 #define __local_strerrordesc_np_defined
 #include <__crt.h>
 #include <bits/types.h>
+__NAMESPACE_LOCAL_BEGIN
+#ifndef __local___localdep_strend_defined
+#define __local___localdep_strend_defined
+#ifdef __CRT_HAVE_strend
+__CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_strend,(char const *__restrict __str),strend,(__str))
+#else /* __CRT_HAVE_strend */
+__NAMESPACE_LOCAL_END
+#include <libc/local/string/strend.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_strend __LIBC_LOCAL_NAME(strend)
+#endif /* !__CRT_HAVE_strend */
+#endif /* !__local___localdep_strend_defined */
+#ifndef __local___localdep_strerrorname_np_defined
+#define __local___localdep_strerrorname_np_defined
+#ifdef __CRT_HAVE_strerrorname_np
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,char const *,__NOTHROW,__localdep_strerrorname_np,(__errno_t __errnum),strerrorname_np,(__errnum))
+#else /* __CRT_HAVE_strerrorname_np */
+__NAMESPACE_LOCAL_END
+#include <libc/local/string/strerrorname_np.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_strerrorname_np __LIBC_LOCAL_NAME(strerrorname_np)
+#endif /* !__CRT_HAVE_strerrorname_np */
+#endif /* !__local___localdep_strerrorname_np_defined */
+__NAMESPACE_LOCAL_END
+#ifndef __BUILDING_LIBC
 #ifndef ___local_sys_errlist_defined
 #define ___local_sys_errlist_defined
 #if defined(__CRT_HAVE__sys_errlist) && defined(__CRT_HAVE__sys_nerr)
@@ -38,6 +63,8 @@ __LIBC __ATTR_WUNUSED __ATTR_CONST int *(__LIBCCALL __sys_nerr)(void);
 #undef ___local_sys_errlist_defined
 #endif /* !... */
 #endif /* !___local_sys_errlist_defined */
+#endif /* !__BUILDING_LIBC */
+#include <asm/os/errno.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(strerrordesc_np) __ATTR_CONST __ATTR_WUNUSED char const *
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(strerrordesc_np))(__errno_t __errnum) {
@@ -45,6 +72,12 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(strerrordesc_np))(__errno_t __errnum) {
 	return (unsigned int)__errnum < (unsigned int)_sys_nerr ? _sys_errlist[__errnum] : __NULLPTR;
 #elif defined(__CRT_HAVE___sys_errlist) && defined(__CRT_HAVE___sys_nerr)
 	return (unsigned int)__errnum < (unsigned int)*__sys_nerr() ? __sys_errlist()[__errnum] : __NULLPTR;
+#elif !defined(__CRT_HAVE_strerrorname_np) || defined(__CRT_KOS)
+	char const *__result;
+	__result = (__NAMESPACE_LOCAL_SYM __localdep_strerrorname_np)(__errnum);
+	if (__result)
+		__result = (__NAMESPACE_LOCAL_SYM __localdep_strend)(__result) + 1;
+	return __result;
 #else /* ... */
 	char const *__result;
 	switch (__errnum) {

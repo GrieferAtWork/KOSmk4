@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc170b47d */
+/* HASH CRC-32:0x427e1be2 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -111,26 +111,16 @@ __NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(error_print_short_description))(__pfo
 		goto __done;
 	{
 		char const *__name;
-#ifndef __KERNEL__
 		char const *__errno_name; /* XXX: Also print in kernel-space? */
-#endif /* !__KERNEL__ */
 		__name = (__NAMESPACE_LOCAL_SYM __localdep_error_name)(__data->e_code);
-#ifndef __KERNEL__
 		__errno_name = (__NAMESPACE_LOCAL_SYM __localdep_strerrorname_np)((__NAMESPACE_LOCAL_SYM __localdep_error_as_errno)(__data));
-#endif /* !__KERNEL__ */
 		if (__name) {
-#ifdef __KERNEL__
-			__temp = (__NAMESPACE_LOCAL_SYM __localdep_format_printf)(__printer, __arg,
-			                     __FMT(" [" AC_WHITE("%s") "]", " [%s]"),
-			                     __name);
-#else /* __KERNEL__ */
 			__temp = (__NAMESPACE_LOCAL_SYM __localdep_format_printf)(__printer, __arg,
 			                     __FMT(" [" AC_WHITE("%s") "%s" AC_WHITE("%s") "]",
 			                         " [%s%s%s]"),
 			                     __name,
 			                     __errno_name ? "," : "",
 			                     __errno_name ? __errno_name : "");
-#endif /* !__KERNEL__ */
 			if __unlikely(__temp < 0)
 				goto __err;
 			__result += __temp;

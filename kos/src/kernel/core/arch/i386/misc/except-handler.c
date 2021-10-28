@@ -20,6 +20,7 @@
 #ifndef GUARD_KERNEL_CORE_ARCH_I386_MISC_EXCEPT_HANDLER_C
 #define GUARD_KERNEL_CORE_ARCH_I386_MISC_EXCEPT_HANDLER_C 1
 #define _KOS_SOURCE 1
+#define _GNU_SOURCE 1
 
 #include <kernel/compiler.h>
 
@@ -41,6 +42,7 @@
 
 #include <inttypes.h>
 #include <stddef.h>
+#include <string.h>
 
 #ifdef __x86_64__
 #include <kos/bits/except-handler64.h>
@@ -76,8 +78,12 @@ NOTHROW(FCALL log_userexcept_errno_propagate)(struct icpustate const *__restrict
 		}
 		printk(KERN_TRACE "]");
 	}
-	printk(KERN_TRACE " into errno=%d\n",
-	       negative_errno_value);
+	name = strerrorname_np(-negative_errno_value);
+	if (name) {
+		printk(KERN_TRACE " into errno=-%s\n", name);
+	} else {
+		printk(KERN_TRACE " into errno=%d\n", negative_errno_value);
+	}
 }
 
 LOCAL NOBLOCK NONNULL((1, 2, 3)) void
