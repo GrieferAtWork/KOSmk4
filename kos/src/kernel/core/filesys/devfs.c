@@ -631,8 +631,16 @@ again_acquire_lock_for_insert:
 				}
 				if (existing_device) {
 					if unlikely(!tryincref(existing_device)) {
+						if (!devfs_byname_tryupgrade()) {
+							ramfs_dirdata_treelock_endwrite(&devfs.rs_dat);
+							devfs_byname_endread();
+							devfs_byname_write();
+							devfs_byname_endwrite();
+							goto again_acquire_lock_for_insert;
+						}
 						devfs_byname_removenode(existing_device);
 						existing_device->dv_byname_node.rb_lhs = DEVICE_BYNAME_DELETED;
+						devfs_byname_downgrade();
 					} else {
 						/* Special case: file already exists. */
 						ramfs_dirdata_treelock_endwrite(&devfs.rs_dat);
@@ -652,8 +660,6 @@ again_acquire_lock_for_insert:
 			} EXCEPT {
 				ramfs_dirdata_treelock_endwrite(&devfs.rs_dat);
 				devfs_byname_endread();
-				kfree(new_dirent);
-				decref_likely(new_node);
 				RETHROW();
 			}
 
@@ -941,6 +947,7 @@ again_acquire_locks:
 				                                        new_dirent->rde_ent.fd_namelen);
 			}
 			if (existing) {
+				devfs_byname_endread();
 				if (info->frn_repfile != existing->rde_node) {
 					info->frn_dent    = incref(&existing->rde_ent);
 					info->frn_repfile = mfile_asnode(incref(existing->rde_node));
@@ -954,6 +961,7 @@ again_acquire_locks:
 			} else if (info->frn_repfile != NULL) {
 				ramfs_dirdata_treelock_endwrite(&devfs.rs_dat);
 				info->frn_repfile = NULL;
+				info->frn_dent    = NULL;
 				return FDIRNODE_RENAME_EXISTS;
 			}
 		}
@@ -969,22 +977,41 @@ again_acquire_locks:
 			if (existing_device) {
 				if (info->frn_repfile != existing_device) {
 					if (!tryincref(existing_device)) {
+						if (!devfs_byname_tryupgrade()) {
+							devfs_byname_endread();
+							ramfs_dirdata_treelock_endwrite(&devfs.rs_dat);
+							TRY {
+								devfs_byname_write();
+							} EXCEPT {
+								kfree(new_dirent);
+								RETHROW();
+							}
+							devfs_byname_endwrite();
+							goto again_acquire_locks;
+						}
 						devfs_byname_removenode(existing_device);
 						existing_device->dv_byname_node.rb_lhs = DEVICE_BYNAME_DELETED;
+						devfs_byname_downgrade();
 					} else {
+						ramfs_dirdata_treelock_endwrite(&devfs.rs_dat);
+						info->frn_dent    = incref(&existing_device->dv_dirent->fdd_dirent);
 						info->frn_repfile = existing_device; /* Inherit reference */
-						devfs_byname_endwrite();
+						devfs_byname_endread();
 						kfree(new_dirent);
 						return FDIRNODE_RENAME_EXISTS;
 					}
 				} else {
 					/* TODO: Remove `existing_device' */
-					devfs_byname_endwrite();
+					devfs_byname_endread();
+					ramfs_dirdata_treelock_endwrite(&devfs.rs_dat);
 					THROW(E_NOT_IMPLEMENTED_TODO);
 				}
 			} else if (info->frn_repfile != NULL) {
-				devfs_byname_endwrite();
+				devfs_byname_endread();
+				ramfs_dirdata_treelock_endwrite(&devfs.rs_dat);
 				kfree(new_dirent);
+				info->frn_repfile = NULL;
+				info->frn_dent    = NULL;
 				return FDIRNODE_RENAME_EXISTS;
 			}
 		}
@@ -1811,18 +1838,15 @@ device_lookup_byname(USER CHECKED char const *name,
 	if unlikely(namelen > UINT16_MAX)
 		return NULL; /* No device could have this long a name. */
 	devfs_byname_read();
-	TRY {
-		result = devfs_byname_locate(name, namelen);
-	} EXCEPT {
+	RAII_FINALLY {
 		devfs_byname_endread();
-		RETHROW();
-	}
+	};
+	result = devfs_byname_locate(name, namelen);
 	if (result && st_mode != 0 &&
 	    (result->fn_mode & S_IFMT) != (st_mode & S_IFMT))
 		result = NULL; /* Wrong mode */
 	if (result && !tryincref(result))
 		result = NULL; /* Device already destroyed */
-	devfs_byname_endread();
 	return result;
 }
 
