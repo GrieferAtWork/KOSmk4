@@ -665,7 +665,7 @@ NOTHROW(KCALL heap_unmap_kram)(struct heap *__restrict self,
 	 * - This is intended and further  strengthens heap validation by  allowing
 	 *   it to notice when some piece of code accidentally accessed a heap page
 	 *   that has yet to be allocated (this can happen in buffer overruns where
-	 *   the overrun only did a read from unallocated memory, which is harder
+	 *   the overrun only did a read  from unallocated memory, which is  harder
 	 *   to detect, but still just as illegal)
 	 * - Problem is: us  accessing these mappings  here obviously also  causes
 	 *   these pages to be allocated, and subsequently filled with 0xAAAAAAAA,
@@ -692,7 +692,9 @@ NOTHROW(KCALL heap_unmap_kram)(struct heap *__restrict self,
 	 *   the heap  to prevent  it from  being destroyed  prematurely. (Though  heap
 	 *   destruction isn't a concept that already exists...) */
 
-	/* TODO */
+	/* TODO: Do this properly (currently we use a work-around where mfile_dbgheap
+	 *       behaves differently  if  called  from  `mman_unmap_mpart_subregion')
+	 *       s.a. `_TASK_FDBGHEAPDMEM' */
 	(void)self;
 
 	mman_unmap_kram(addr, num_bytes, flags);

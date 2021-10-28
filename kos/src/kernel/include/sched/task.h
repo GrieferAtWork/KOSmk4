@@ -90,7 +90,7 @@ DECL_BEGIN
 #define TASK_FCRITICAL     __UINT32_C(0x08000000) /* [lock(PRIVATE(THIS_TASK))] The thread is critical, and any attempting to task_exit() it causes kernel panic. */
 /*      TASK_F             __UINT32_C(0x10000000)  * ... */
 /*      TASK_F             __UINT32_C(0x20000000)  * ... */
-/*      TASK_F             __UINT32_C(0x40000000)  * ... */
+#define _TASK_FDBGHEAPDMEM __UINT32_C(0x40000000) /* [lock(PRIVATE(THIS_TASK))] Hacky workaround for how `mfile_dbgheap' operates (this can only go away once the heap system gets re-written) */
 #define TASK_FKERNTHREAD   __UINT32_C(0x80000000) /* [const] The thread is running exclusively in kernel-space, and can never return to user-space. */
 
 

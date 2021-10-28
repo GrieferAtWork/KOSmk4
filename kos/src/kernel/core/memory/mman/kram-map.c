@@ -30,6 +30,7 @@
 #include <kernel/mman/mpart.h>
 #include <kernel/mman/phys-access.h>
 #include <kernel/mman/phys.h>
+#include <sched/task.h>
 
 #include <hybrid/align.h>
 
@@ -52,19 +53,20 @@ mfile_dbgheap_loadblocks(struct mfile *__restrict UNUSED(self),
                          struct aio_multihandle *__restrict UNUSED(aio)) {
 	PHYS_VARS;
 	byte_t *map;
+	uint32_t pattern = DEBUGHEAP_FRESH_MEMORY;
+	if (PERTASK_GET(this_task.t_flags) & _TASK_FDBGHEAPDMEM)
+		pattern = DEBUGHEAP_NO_MANS_LAND;
 	assert(IS_ALIGNED(buf, PAGESIZE));
 	assert(IS_ALIGNED(num_bytes, PAGESIZE));
 	IF_PHYS_IDENTITY(buf, num_bytes, {
-		memsetl(PHYS_TO_IDENTITY(buf),
-		        DEBUGHEAP_FRESH_MEMORY,
-		        num_bytes / 4);
+		memsetl(PHYS_TO_IDENTITY(buf), pattern, num_bytes / 4);
 		return;
 	});
 	if unlikely(!num_bytes)
 		return;
 	map = phys_pushpage(buf);
 	for (;;) {
-		memsetl(map, DEBUGHEAP_FRESH_MEMORY, PAGESIZE / 4);
+		memsetl(map, pattern, PAGESIZE / 4);
 		if (num_bytes <= PAGESIZE)
 			break;
 		num_bytes -= PAGESIZE;
@@ -73,7 +75,6 @@ mfile_dbgheap_loadblocks(struct mfile *__restrict UNUSED(self),
 	}
 	phys_pop();
 }
-
 
 PUBLIC_CONST struct mfile_ops const mfile_dbgheap_ops = {
 	.mo_loadblocks = &mfile_dbgheap_loadblocks,

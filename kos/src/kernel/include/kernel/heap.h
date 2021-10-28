@@ -26,12 +26,11 @@
 
 #include <hybrid/__bit.h>
 #include <hybrid/sequence/list.h>
+#include <hybrid/sequence/rbtree.h>
 #include <hybrid/sync/atomic-lock.h>
 #include <hybrid/typecore.h>
 
 #include "malloc-defs.h"
-
-#include <hybrid/sequence/rbtree.h>
 
 DECL_BEGIN
 
@@ -116,7 +115,7 @@ LIST_HEAD(mfree_list, mfree);
 
 struct heap {
 	struct atomic_lock        h_lock;       /* Lock for this heap. */
-	RBTREE_ROOT(mfree)        h_addr;       /* [lock(h_lock)][0..1] Heap sorted by address. */
+	LLRBTREE_ROOT(mfree)      h_addr;       /* [lock(h_lock)][0..1] Heap sorted by address. */
 	struct mfree_list         h_size[HEAP_BUCKET_COUNT];
 	                                        /* [lock(h_lock)][0..1][*] Heap sorted by free range size. */
 	WEAK size_t               h_overalloc;  /* Amount (in bytes) by which to over-allocate memory in heaps.

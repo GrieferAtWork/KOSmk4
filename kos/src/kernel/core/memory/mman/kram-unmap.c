@@ -541,24 +541,34 @@ NOTHROW(FCALL mman_unmap_mpart_subregion)(struct mnode *__restrict node,
 		tail_endaddr = (byte_t *)mnode_getendaddr(node);
 
 #ifdef CONFIG_DEBUG_HEAP
-		if (node->mn_part->mp_file == &mfile_dbgheap)
+		if (node->mn_part->mp_file == &mfile_dbgheap) {
+			pflag_t was;
+			/* Super-ugly, hacky work-around because the heap system can't
+			 * be made compatible  with lockops without  a full  re-write.
+			 *
+			 * s.a.: `heap_unmap_kram()' */
 			heap_validate_all();
-#endif /* CONFIG_DEBUG_HEAP */
-
-		/* We  keep the lazy initialization of hinted nodes simple, and let
-		 * the #PF handler to most of the work. As such, all we really have
-		 * to  do is  ensure that every  page from the  tail-range has been
-		 * accessed at least once. */
-		do {
-			__asm__ __volatile__("" : : "r" (*tail_minaddr));
-			tail_minaddr += PAGESIZE;
-		} while (tail_minaddr < tail_endaddr);
-
-#ifdef CONFIG_DEBUG_HEAP
-		/* This right here could fail without special handling `heap_unmap_kram()' */
-		if (node->mn_part->mp_file == &mfile_dbgheap)
+			was = PREEMPTION_PUSHOFF();
+			ATOMIC_OR(THIS_TASK->t_flags, _TASK_FDBGHEAPDMEM);
+			do {
+				__asm__ __volatile__("" : : "r" (*tail_minaddr));
+				tail_minaddr += PAGESIZE;
+			} while (tail_minaddr < tail_endaddr);
+			PREEMPTION_POP(was);
+			ATOMIC_AND(THIS_TASK->t_flags, ~_TASK_FDBGHEAPDMEM);
 			heap_validate_all();
+		} else
 #endif /* CONFIG_DEBUG_HEAP */
+		{
+			/* We  keep the lazy initialization of hinted nodes simple, and let
+			 * the #PF handler to most of the work. As such, all we really have
+			 * to  do is  ensure that every  page from the  tail-range has been
+			 * accessed at least once. */
+			do {
+				__asm__ __volatile__("" : : "r" (*tail_minaddr));
+				tail_minaddr += PAGESIZE;
+			} while (tail_minaddr < tail_endaddr);
+		}
 
 #ifndef CONFIG_NO_SMP
 		/* Make sure that any other CPU is still initializing hinted pages,
