@@ -117,6 +117,8 @@ PUBLIC NOBLOCK NOPREEMPT NONNULL((1)) void
 NOTHROW(FCALL aio_multihandle_generic_func_)(struct aio_multihandle_generic *__restrict self,
                                              unsigned int UNUSED(status)) {
 	sig_broadcast_nopr(&self->mg_signal);
+	/* Release the multihandle. */
+	aio_multihandle_release(self);
 }
 
 
@@ -198,6 +200,13 @@ NOTHROW(KCALL aio_multihandle_fini)(struct aio_multihandle *__restrict self) {
 		kfree(iter);
 		iter = next;
 	}
+
+#ifndef CONFIG_NO_SMP
+	/* Make sure that no other thread is still inside of `am_func' */
+	while (!(ATOMIC_READ(self->am_status) & AIO_MULTIHANDLE_STATUS_RELEASED))
+		task_tryyield_or_pause();
+#endif /* !CONFIG_NO_SMP */
+
 	DBG_memset(&self->am_func, 0xcc, sizeof(self->am_func));
 	DBG_memset(&self->am_status, 0xcc, sizeof(self->am_status));
 	DBG_memset(&self->am_error, 0xcc, sizeof(self->am_error));

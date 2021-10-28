@@ -580,9 +580,6 @@ aio_handle_generic_waitfor(struct aio_handle_generic *__restrict self,
 
 
 
-/* TODO: Re-write `struct aio_multihandle'. As it stands  right
- *       now, there is a lot of inconsistency within the API... */
-
 
 struct aio_multihandle;
 struct ATTR_ALIGNED(AIO_HANDLE_ALIGNMENT) aio_handle_multiple
@@ -613,6 +610,7 @@ typedef NOBLOCK NOPREEMPT NONNULL((1)) void
 #define AIO_MULTIHANDLE_IVECLIMIT  2    /* Max number of inline-allocated handles. */
 #define AIO_MULTIHANDLE_XVECLIMIT  8    /* Max number of heap-allocated handles per extension. */
 
+#define AIO_MULTIHANDLE_STATUS_RELEASED   0x20000000 /* FLAG: The multi-handle was released. */
 #define AIO_MULTIHANDLE_STATUS_FAILED     0x40000000 /* FLAG: Set once if an operation unrelated to I/O failed. */
 #define AIO_MULTIHANDLE_STATUS_ALLRUNNING 0x80000000 /* FLAG: Set once all commands have been issued. */
 #define AIO_MULTIHANDLE_STATUS_STATUSMASK 0x0f000000 /* Mask for the most significant run status. */
@@ -635,6 +633,16 @@ struct aio_multihandle {
 	                                       /* Small inline vector for the first couple of handles. */
 	/* ... Additional data can go here. */
 };
+
+/* Must be called from `aio_multihandle_init::func' in order
+ * to release the  multi-handle and allow  it to be  free'd.
+ *
+ * This is the multihandle analog for `aio_handle_release()' */
+#define aio_multihandle_release(self)                    \
+	(__hybrid_atomic_or((self)->am_status,               \
+	                    AIO_MULTIHANDLE_STATUS_RELEASED, \
+	                    __ATOMIC_SEQ_CST))
+
 
 /* Initialize the given AIO multi-handle */
 LOCAL NOBLOCK NONNULL((1, 2)) void
