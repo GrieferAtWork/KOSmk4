@@ -1351,15 +1351,15 @@ again:
 
 			/* Invoke `fdnx_direntchanged' if directories were renamed */
 			TRY {
-				call_update_dirent(fnode_asflatdir(ofile), od, nd, oldent, new_oent);
+				call_update_dirent(ofile, od, nd, oldent, new_oent);
 			} EXCEPT {
 				{
 					NESTED_EXCEPTION;
-					call_update_dirent(fnode_asflatdir(nfile), nd, od, newent, new_nent);
+					call_update_dirent(nfile, nd, od, newent, new_nent);
 				}
 				RETHROW();
 			}
-			call_update_dirent(fnode_asflatdir(nfile), nd, od, newent, new_nent);
+			call_update_dirent(nfile, nd, od, newent, new_nent);
 		} EXCEPT {
 			release_locks_for_rename(nd, od);
 			RETHROW();
@@ -1487,6 +1487,8 @@ again:
 					TRY {
 						(*ops->fdno_flat.fdnx_deletefile)(nd, existing, info->frn_repfile);
 					} EXCEPT {
+						/* Add the new entry to directory hash-vector. */
+						flatdirnode_fileslist_insertent(nd, newent);
 						{
 							FINALLY_DECREF_UNLIKELY(newent);
 							{
@@ -1497,11 +1499,11 @@ again:
 								} EXCEPT {
 									{
 										NESTED_EXCEPTION;
-										call_update_dirent(fnode_asflatdir(info->frn_file), od, nd, oldent, newent);
+										call_update_dirent(info->frn_file, od, nd, oldent, newent);
 									}
 									RETHROW();
 								}
-								call_update_dirent(fnode_asflatdir(info->frn_file), od, nd, oldent, newent);
+								call_update_dirent(info->frn_file, od, nd, oldent, newent);
 							}
 						}
 						RETHROW();
@@ -1509,6 +1511,9 @@ again:
 				}
 			}
 		}
+
+		/* Add the new entry to directory hash-vector. */
+		flatdirnode_fileslist_insertent(nd, newent);
 
 		/* Remove `oldent' from `od' on the fs-level */
 		TRY {
@@ -1518,12 +1523,12 @@ again:
 				FINALLY_DECREF_UNLIKELY(newent);
 				{
 					NESTED_EXCEPTION;
-					call_update_dirent(fnode_asflatdir(info->frn_file), od, nd, oldent, newent);
+					call_update_dirent(info->frn_file, od, nd, oldent, newent);
 				}
 			}
 			RETHROW();
 		}
-		call_update_dirent(fnode_asflatdir(info->frn_file), od, nd, oldent, newent);
+		call_update_dirent(info->frn_file, od, nd, oldent, newent);
 		info->frn_dent = &newent->fde_ent; /* Inherit reference */
 	} EXCEPT {
 		release_locks_for_rename(nd, od);

@@ -691,6 +691,7 @@ Fat_WrAttr(struct fnode *__restrict self)
 	REF struct fatdirent *ent;
 	REF FatDirNode *dir;
 
+again:
 	mfile_tslock_acquire(self);
 	assert(dat->fn_ent && dat->fn_dir);
 	dir = dat->fn_dir;
@@ -703,6 +704,15 @@ Fat_WrAttr(struct fnode *__restrict self)
 
 	/* Acquire a lock to the directory stream buffer. */
 	flatdirnode_write(dir);
+
+	/* Re-check that nothing's changed (and `dir' is still correct) */
+	mfile_tslock_acquire(self);
+	if unlikely(dir != dat->fn_dir || ent != dat->fn_ent) {
+		mfile_tslock_release_br(self);
+		goto again;
+	}
+	mfile_tslock_release(self);
+
 	TRY {
 		if likely(!flatdirent_wasdeleted(&ent->fad_ent)) {
 			FatClusterIndex first_cluster;
@@ -1159,7 +1169,9 @@ import * from deemon;
 function isValid83(ord) {
 	if (ord >= "A".ord() && ord <= "Z".ord())
 		return true;
-	return ord in "!#$%&'()-@^_`{}~".ordinals;
+	if (ord >= "0".ord() && ord <= "9".ord())
+		return true;
+	return ord in " !#$%&'()-@^_`{}~".ordinals;
 }
 function isValidLFN(ord) {
 	if (isValid83(ord))
@@ -1200,7 +1212,7 @@ for (local x: [:128/(8 / BITS_PER_CHAR)]) {
 }
 ]]]*/
 	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-	0xcc, 0xff, 0x8f, 0x2e, 0x00, 0x00, 0x80, 0x08,
+	0xcf, 0xff, 0x8f, 0x2e, 0xff, 0xff, 0x8f, 0x08,
 	0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xbf, 0xf8,
 	0xab, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xea, 0x3c,
 /*[[[end]]]*/
@@ -1787,18 +1799,15 @@ FatDir_DirentChanged(struct fnode *__restrict self,
                      struct flatdirent *__restrict new_ent)
 		THROWS(E_IOERROR) {
 	FatNodeData *dat = self->fn_fsdata;
-	assert(dat->fn_ent == flatdirent_asfat(old_ent));
+	assert(dat->fn_ent == flatdirent_asfat(new_ent)); /* New entry was already set by `FatDir_WriteDir()' */
 	assert(dat->fn_dir == flatdirnode_asfat(oldparent));
 
 	/* Update saved meta-data values. */
-	incref(new_ent);
 	incref(newparent);
 	mfile_tslock_acquire(self);
-	dat->fn_ent = flatdirent_asfat(new_ent);    /* Inherit reference */
 	dat->fn_dir = flatdirnode_asfat(newparent); /* Inherit reference */
 	mfile_tslock_release(self);
-	decref_nokill(flatdirent_asfat(old_ent)); /* Old value of `dat->fn_ent' */
-	decref_nokill(oldparent);                  /* Old value of `dat->fn_dir' */
+	decref_nokill(oldparent); /* Old value of `dat->fn_dir' */
 
 	if (fnode_isdir(self) && oldparent != newparent) {
 		/* TODO: Re-write the parent-cluster value within the directory header (the ".." entry) */
