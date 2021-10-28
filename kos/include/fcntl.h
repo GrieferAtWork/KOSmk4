@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2de3254c */
+/* HASH CRC-32:0x8f73804d */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1545,12 +1545,10 @@ __CVREDIRECT(,__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,fcntl,(__fd_t __fd, __STDC_INT
  * file  access  permissions with  which  the file  should  be opened.
  * On KOS, the returned handle can be anything, but is usually one of:
  *   - HANDLE_TYPE_PATH:       When `O_PATH' was given
- *   - HANDLE_TYPE_BLKDEV:     For `S_IFBLK' files
- *   - HANDLE_TYPE_CHRDEV:     For `S_IFCHR' files (in this case, `O_NOCTTY' gains meaning)
- *   - HANDLE_TYPE_FIFO_USER:  For `S_IFIFO' files
- *   - HANDLE_TYPE_MFILE:      For `S_IFLNK' files (only when `O_SYMLINK' was given)
- *   - HANDLE_TYPE_DIRHANDLE:  For `S_IFDIR' files from special one-shot directories
- *   - HANDLE_TYPE_FILEHANDLE: For `S_IFREG' and `S_IFDIR' (~normal~) files
+ *   - HANDLE_TYPE_FILEHANDLE: For `S_IFREG' regular files
+ *   - HANDLE_TYPE_FIFOHANDLE: For `S_IFIFO' pipe files
+ *   - HANDLE_TYPE_DIRHANDLE:  For `S_IFDIR' directories
+ *   - HANDLE_TYPE_MFILE:      The actual filesystem object (including device files)
  *   - *:                      Certain filesystem names can literally return anything, such
  *                             as `/proc/self/fd/1234',  which  is  more  like  `dup(1234)' */
 __LIBC __ATTR_WUNUSED __ATTR_NONNULL((1)) __fd_t __NOTHROW_RPC(__VLIBCCALL open)(char const *__filename, __oflag_t __oflags, ...) __CASMNAME_SAME("open");
@@ -1561,12 +1559,10 @@ __LIBC __ATTR_WUNUSED __ATTR_NONNULL((1)) __fd_t __NOTHROW_RPC(__VLIBCCALL open)
  * file  access  permissions with  which  the file  should  be opened.
  * On KOS, the returned handle can be anything, but is usually one of:
  *   - HANDLE_TYPE_PATH:       When `O_PATH' was given
- *   - HANDLE_TYPE_BLKDEV:     For `S_IFBLK' files
- *   - HANDLE_TYPE_CHRDEV:     For `S_IFCHR' files (in this case, `O_NOCTTY' gains meaning)
- *   - HANDLE_TYPE_FIFO_USER:  For `S_IFIFO' files
- *   - HANDLE_TYPE_MFILE:      For `S_IFLNK' files (only when `O_SYMLINK' was given)
- *   - HANDLE_TYPE_DIRHANDLE:  For `S_IFDIR' files from special one-shot directories
- *   - HANDLE_TYPE_FILEHANDLE: For `S_IFREG' and `S_IFDIR' (~normal~) files
+ *   - HANDLE_TYPE_FILEHANDLE: For `S_IFREG' regular files
+ *   - HANDLE_TYPE_FIFOHANDLE: For `S_IFIFO' pipe files
+ *   - HANDLE_TYPE_DIRHANDLE:  For `S_IFDIR' directories
+ *   - HANDLE_TYPE_MFILE:      The actual filesystem object (including device files)
  *   - *:                      Certain filesystem names can literally return anything, such
  *                             as `/proc/self/fd/1234',  which  is  more  like  `dup(1234)' */
 __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,open,(char const *__filename, __oflag_t __oflags),_open,(__filename,__oflags),__oflags,1,(__mode_t))
@@ -1577,12 +1573,10 @@ __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,open,(char 
  * file  access  permissions with  which  the file  should  be opened.
  * On KOS, the returned handle can be anything, but is usually one of:
  *   - HANDLE_TYPE_PATH:       When `O_PATH' was given
- *   - HANDLE_TYPE_BLKDEV:     For `S_IFBLK' files
- *   - HANDLE_TYPE_CHRDEV:     For `S_IFCHR' files (in this case, `O_NOCTTY' gains meaning)
- *   - HANDLE_TYPE_FIFO_USER:  For `S_IFIFO' files
- *   - HANDLE_TYPE_MFILE:      For `S_IFLNK' files (only when `O_SYMLINK' was given)
- *   - HANDLE_TYPE_DIRHANDLE:  For `S_IFDIR' files from special one-shot directories
- *   - HANDLE_TYPE_FILEHANDLE: For `S_IFREG' and `S_IFDIR' (~normal~) files
+ *   - HANDLE_TYPE_FILEHANDLE: For `S_IFREG' regular files
+ *   - HANDLE_TYPE_FIFOHANDLE: For `S_IFIFO' pipe files
+ *   - HANDLE_TYPE_DIRHANDLE:  For `S_IFDIR' directories
+ *   - HANDLE_TYPE_MFILE:      The actual filesystem object (including device files)
  *   - *:                      Certain filesystem names can literally return anything, such
  *                             as `/proc/self/fd/1234',  which  is  more  like  `dup(1234)' */
 __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,open,(char const *__filename, __oflag_t __oflags),__open,(__filename,__oflags),__oflags,1,(__mode_t))
@@ -1593,12 +1587,10 @@ __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,open,(char 
  * file  access  permissions with  which  the file  should  be opened.
  * On KOS, the returned handle can be anything, but is usually one of:
  *   - HANDLE_TYPE_PATH:       When `O_PATH' was given
- *   - HANDLE_TYPE_BLKDEV:     For `S_IFBLK' files
- *   - HANDLE_TYPE_CHRDEV:     For `S_IFCHR' files (in this case, `O_NOCTTY' gains meaning)
- *   - HANDLE_TYPE_FIFO_USER:  For `S_IFIFO' files
- *   - HANDLE_TYPE_MFILE:      For `S_IFLNK' files (only when `O_SYMLINK' was given)
- *   - HANDLE_TYPE_DIRHANDLE:  For `S_IFDIR' files from special one-shot directories
- *   - HANDLE_TYPE_FILEHANDLE: For `S_IFREG' and `S_IFDIR' (~normal~) files
+ *   - HANDLE_TYPE_FILEHANDLE: For `S_IFREG' regular files
+ *   - HANDLE_TYPE_FIFOHANDLE: For `S_IFIFO' pipe files
+ *   - HANDLE_TYPE_DIRHANDLE:  For `S_IFDIR' directories
+ *   - HANDLE_TYPE_MFILE:      The actual filesystem object (including device files)
  *   - *:                      Certain filesystem names can literally return anything, such
  *                             as `/proc/self/fd/1234',  which  is  more  like  `dup(1234)' */
 __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,open,(char const *__filename, __oflag_t __oflags),open64,(__filename,__oflags),__oflags,1,(__mode_t))
@@ -1609,12 +1601,10 @@ __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,open,(char 
  * file  access  permissions with  which  the file  should  be opened.
  * On KOS, the returned handle can be anything, but is usually one of:
  *   - HANDLE_TYPE_PATH:       When `O_PATH' was given
- *   - HANDLE_TYPE_BLKDEV:     For `S_IFBLK' files
- *   - HANDLE_TYPE_CHRDEV:     For `S_IFCHR' files (in this case, `O_NOCTTY' gains meaning)
- *   - HANDLE_TYPE_FIFO_USER:  For `S_IFIFO' files
- *   - HANDLE_TYPE_MFILE:      For `S_IFLNK' files (only when `O_SYMLINK' was given)
- *   - HANDLE_TYPE_DIRHANDLE:  For `S_IFDIR' files from special one-shot directories
- *   - HANDLE_TYPE_FILEHANDLE: For `S_IFREG' and `S_IFDIR' (~normal~) files
+ *   - HANDLE_TYPE_FILEHANDLE: For `S_IFREG' regular files
+ *   - HANDLE_TYPE_FIFOHANDLE: For `S_IFIFO' pipe files
+ *   - HANDLE_TYPE_DIRHANDLE:  For `S_IFDIR' directories
+ *   - HANDLE_TYPE_MFILE:      The actual filesystem object (including device files)
  *   - *:                      Certain filesystem names can literally return anything, such
  *                             as `/proc/self/fd/1234',  which  is  more  like  `dup(1234)' */
 __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,open,(char const *__filename, __oflag_t __oflags),__open64,(__filename,__oflags),__oflags,1,(__mode_t))
@@ -1626,12 +1616,10 @@ __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,open,(char 
  * file  access  permissions with  which  the file  should  be opened.
  * On KOS, the returned handle can be anything, but is usually one of:
  *   - HANDLE_TYPE_PATH:       When `O_PATH' was given
- *   - HANDLE_TYPE_BLKDEV:     For `S_IFBLK' files
- *   - HANDLE_TYPE_CHRDEV:     For `S_IFCHR' files (in this case, `O_NOCTTY' gains meaning)
- *   - HANDLE_TYPE_FIFO_USER:  For `S_IFIFO' files
- *   - HANDLE_TYPE_MFILE:      For `S_IFLNK' files (only when `O_SYMLINK' was given)
- *   - HANDLE_TYPE_DIRHANDLE:  For `S_IFDIR' files from special one-shot directories
- *   - HANDLE_TYPE_FILEHANDLE: For `S_IFREG' and `S_IFDIR' (~normal~) files
+ *   - HANDLE_TYPE_FILEHANDLE: For `S_IFREG' regular files
+ *   - HANDLE_TYPE_FIFOHANDLE: For `S_IFIFO' pipe files
+ *   - HANDLE_TYPE_DIRHANDLE:  For `S_IFDIR' directories
+ *   - HANDLE_TYPE_MFILE:      The actual filesystem object (including device files)
  *   - *:                      Certain filesystem names can literally return anything, such
  *                             as `/proc/self/fd/1234',  which  is  more  like  `dup(1234)' */
 #ifdef __cplusplus
@@ -1675,12 +1663,10 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(creat, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUN
  * file  access  permissions with  which  the file  should  be opened.
  * On KOS, the returned handle can be anything, but is usually one of:
  *   - HANDLE_TYPE_PATH:       When `O_PATH' was given
- *   - HANDLE_TYPE_BLKDEV:     For `S_IFBLK' files
- *   - HANDLE_TYPE_CHRDEV:     For `S_IFCHR' files (in this case, `O_NOCTTY' gains meaning)
- *   - HANDLE_TYPE_FIFO_USER:  For `S_IFIFO' files
- *   - HANDLE_TYPE_MFILE:      For `S_IFLNK' files (only when `O_SYMLINK' was given)
- *   - HANDLE_TYPE_DIRHANDLE:  For `S_IFDIR' files from special one-shot directories
- *   - HANDLE_TYPE_FILEHANDLE: For `S_IFREG' and `S_IFDIR' (~normal~) files
+ *   - HANDLE_TYPE_FILEHANDLE: For `S_IFREG' regular files
+ *   - HANDLE_TYPE_FIFOHANDLE: For `S_IFIFO' pipe files
+ *   - HANDLE_TYPE_DIRHANDLE:  For `S_IFDIR' directories
+ *   - HANDLE_TYPE_MFILE:      The actual filesystem object (including device files)
  *   - *:                      Certain filesystem names can literally return anything, such
  *                             as `/proc/self/fd/1234',  which  is  more  like  `dup(1234)' */
 __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,open64,(char const *__filename, __oflag_t __oflags),open,(__filename,__oflags),__oflags,1,(__mode_t))
@@ -1691,12 +1677,10 @@ __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,open64,(cha
  * file  access  permissions with  which  the file  should  be opened.
  * On KOS, the returned handle can be anything, but is usually one of:
  *   - HANDLE_TYPE_PATH:       When `O_PATH' was given
- *   - HANDLE_TYPE_BLKDEV:     For `S_IFBLK' files
- *   - HANDLE_TYPE_CHRDEV:     For `S_IFCHR' files (in this case, `O_NOCTTY' gains meaning)
- *   - HANDLE_TYPE_FIFO_USER:  For `S_IFIFO' files
- *   - HANDLE_TYPE_MFILE:      For `S_IFLNK' files (only when `O_SYMLINK' was given)
- *   - HANDLE_TYPE_DIRHANDLE:  For `S_IFDIR' files from special one-shot directories
- *   - HANDLE_TYPE_FILEHANDLE: For `S_IFREG' and `S_IFDIR' (~normal~) files
+ *   - HANDLE_TYPE_FILEHANDLE: For `S_IFREG' regular files
+ *   - HANDLE_TYPE_FIFOHANDLE: For `S_IFIFO' pipe files
+ *   - HANDLE_TYPE_DIRHANDLE:  For `S_IFDIR' directories
+ *   - HANDLE_TYPE_MFILE:      The actual filesystem object (including device files)
  *   - *:                      Certain filesystem names can literally return anything, such
  *                             as `/proc/self/fd/1234',  which  is  more  like  `dup(1234)' */
 __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,open64,(char const *__filename, __oflag_t __oflags),_open,(__filename,__oflags),__oflags,1,(__mode_t))
@@ -1707,12 +1691,10 @@ __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,open64,(cha
  * file  access  permissions with  which  the file  should  be opened.
  * On KOS, the returned handle can be anything, but is usually one of:
  *   - HANDLE_TYPE_PATH:       When `O_PATH' was given
- *   - HANDLE_TYPE_BLKDEV:     For `S_IFBLK' files
- *   - HANDLE_TYPE_CHRDEV:     For `S_IFCHR' files (in this case, `O_NOCTTY' gains meaning)
- *   - HANDLE_TYPE_FIFO_USER:  For `S_IFIFO' files
- *   - HANDLE_TYPE_MFILE:      For `S_IFLNK' files (only when `O_SYMLINK' was given)
- *   - HANDLE_TYPE_DIRHANDLE:  For `S_IFDIR' files from special one-shot directories
- *   - HANDLE_TYPE_FILEHANDLE: For `S_IFREG' and `S_IFDIR' (~normal~) files
+ *   - HANDLE_TYPE_FILEHANDLE: For `S_IFREG' regular files
+ *   - HANDLE_TYPE_FIFOHANDLE: For `S_IFIFO' pipe files
+ *   - HANDLE_TYPE_DIRHANDLE:  For `S_IFDIR' directories
+ *   - HANDLE_TYPE_MFILE:      The actual filesystem object (including device files)
  *   - *:                      Certain filesystem names can literally return anything, such
  *                             as `/proc/self/fd/1234',  which  is  more  like  `dup(1234)' */
 __LIBC __ATTR_WUNUSED __ATTR_NONNULL((1)) __fd_t __NOTHROW_RPC(__VLIBCCALL open64)(char const *__filename, __oflag_t __oflags, ...) __CASMNAME_SAME("open64");
@@ -1723,12 +1705,10 @@ __LIBC __ATTR_WUNUSED __ATTR_NONNULL((1)) __fd_t __NOTHROW_RPC(__VLIBCCALL open6
  * file  access  permissions with  which  the file  should  be opened.
  * On KOS, the returned handle can be anything, but is usually one of:
  *   - HANDLE_TYPE_PATH:       When `O_PATH' was given
- *   - HANDLE_TYPE_BLKDEV:     For `S_IFBLK' files
- *   - HANDLE_TYPE_CHRDEV:     For `S_IFCHR' files (in this case, `O_NOCTTY' gains meaning)
- *   - HANDLE_TYPE_FIFO_USER:  For `S_IFIFO' files
- *   - HANDLE_TYPE_MFILE:      For `S_IFLNK' files (only when `O_SYMLINK' was given)
- *   - HANDLE_TYPE_DIRHANDLE:  For `S_IFDIR' files from special one-shot directories
- *   - HANDLE_TYPE_FILEHANDLE: For `S_IFREG' and `S_IFDIR' (~normal~) files
+ *   - HANDLE_TYPE_FILEHANDLE: For `S_IFREG' regular files
+ *   - HANDLE_TYPE_FIFOHANDLE: For `S_IFIFO' pipe files
+ *   - HANDLE_TYPE_DIRHANDLE:  For `S_IFDIR' directories
+ *   - HANDLE_TYPE_MFILE:      The actual filesystem object (including device files)
  *   - *:                      Certain filesystem names can literally return anything, such
  *                             as `/proc/self/fd/1234',  which  is  more  like  `dup(1234)' */
 __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,open64,(char const *__filename, __oflag_t __oflags),__open64,(__filename,__oflags),__oflags,1,(__mode_t))
@@ -1740,12 +1720,10 @@ __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,open64,(cha
  * file  access  permissions with  which  the file  should  be opened.
  * On KOS, the returned handle can be anything, but is usually one of:
  *   - HANDLE_TYPE_PATH:       When `O_PATH' was given
- *   - HANDLE_TYPE_BLKDEV:     For `S_IFBLK' files
- *   - HANDLE_TYPE_CHRDEV:     For `S_IFCHR' files (in this case, `O_NOCTTY' gains meaning)
- *   - HANDLE_TYPE_FIFO_USER:  For `S_IFIFO' files
- *   - HANDLE_TYPE_MFILE:      For `S_IFLNK' files (only when `O_SYMLINK' was given)
- *   - HANDLE_TYPE_DIRHANDLE:  For `S_IFDIR' files from special one-shot directories
- *   - HANDLE_TYPE_FILEHANDLE: For `S_IFREG' and `S_IFDIR' (~normal~) files
+ *   - HANDLE_TYPE_FILEHANDLE: For `S_IFREG' regular files
+ *   - HANDLE_TYPE_FIFOHANDLE: For `S_IFIFO' pipe files
+ *   - HANDLE_TYPE_DIRHANDLE:  For `S_IFDIR' directories
+ *   - HANDLE_TYPE_MFILE:      The actual filesystem object (including device files)
  *   - *:                      Certain filesystem names can literally return anything, such
  *                             as `/proc/self/fd/1234',  which  is  more  like  `dup(1234)' */
 #ifdef __cplusplus
@@ -1789,12 +1767,10 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(creat64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_W
  * file  access  permissions with  which  the file  should  be opened.
  * On KOS, the returned handle can be anything, but is usually one of:
  *   - HANDLE_TYPE_PATH:       When `O_PATH' was given
- *   - HANDLE_TYPE_BLKDEV:     For `S_IFBLK' files
- *   - HANDLE_TYPE_CHRDEV:     For `S_IFCHR' files (in this case, `O_NOCTTY' gains meaning)
- *   - HANDLE_TYPE_FIFO_USER:  For `S_IFIFO' files
- *   - HANDLE_TYPE_MFILE:      For `S_IFLNK' files (only when `O_SYMLINK' was given)
- *   - HANDLE_TYPE_DIRHANDLE:  For `S_IFDIR' files from special one-shot directories
- *   - HANDLE_TYPE_FILEHANDLE: For `S_IFREG' and `S_IFDIR' (~normal~) files
+ *   - HANDLE_TYPE_FILEHANDLE: For `S_IFREG' regular files
+ *   - HANDLE_TYPE_FIFOHANDLE: For `S_IFIFO' pipe files
+ *   - HANDLE_TYPE_DIRHANDLE:  For `S_IFDIR' directories
+ *   - HANDLE_TYPE_MFILE:      The actual filesystem object (including device files)
  *   - *:                      Certain filesystem names can literally return anything, such
  *                             as `/proc/self/fd/1234',  which  is  more  like  `dup(1234)' */
 __LIBC __ATTR_WUNUSED __ATTR_NONNULL((2)) __fd_t __NOTHROW_RPC(__VLIBCCALL openat)(__fd_t __dirfd, char const *__filename, __oflag_t __oflags, ...) __CASMNAME_SAME("openat");
@@ -1805,12 +1781,10 @@ __LIBC __ATTR_WUNUSED __ATTR_NONNULL((2)) __fd_t __NOTHROW_RPC(__VLIBCCALL opena
  * file  access  permissions with  which  the file  should  be opened.
  * On KOS, the returned handle can be anything, but is usually one of:
  *   - HANDLE_TYPE_PATH:       When `O_PATH' was given
- *   - HANDLE_TYPE_BLKDEV:     For `S_IFBLK' files
- *   - HANDLE_TYPE_CHRDEV:     For `S_IFCHR' files (in this case, `O_NOCTTY' gains meaning)
- *   - HANDLE_TYPE_FIFO_USER:  For `S_IFIFO' files
- *   - HANDLE_TYPE_MFILE:      For `S_IFLNK' files (only when `O_SYMLINK' was given)
- *   - HANDLE_TYPE_DIRHANDLE:  For `S_IFDIR' files from special one-shot directories
- *   - HANDLE_TYPE_FILEHANDLE: For `S_IFREG' and `S_IFDIR' (~normal~) files
+ *   - HANDLE_TYPE_FILEHANDLE: For `S_IFREG' regular files
+ *   - HANDLE_TYPE_FIFOHANDLE: For `S_IFIFO' pipe files
+ *   - HANDLE_TYPE_DIRHANDLE:  For `S_IFDIR' directories
+ *   - HANDLE_TYPE_MFILE:      The actual filesystem object (including device files)
  *   - *:                      Certain filesystem names can literally return anything, such
  *                             as `/proc/self/fd/1234',  which  is  more  like  `dup(1234)' */
 __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2)),__fd_t,__NOTHROW_RPC,openat,(__fd_t __dirfd, char const *__filename, __oflag_t __oflags),openat64,(__dirfd,__filename,__oflags),__oflags,1,(__mode_t))
@@ -1822,12 +1796,10 @@ __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2)),__fd_t,__NOTHROW_RPC,openat,(__f
  * file  access  permissions with  which  the file  should  be opened.
  * On KOS, the returned handle can be anything, but is usually one of:
  *   - HANDLE_TYPE_PATH:       When `O_PATH' was given
- *   - HANDLE_TYPE_BLKDEV:     For `S_IFBLK' files
- *   - HANDLE_TYPE_CHRDEV:     For `S_IFCHR' files (in this case, `O_NOCTTY' gains meaning)
- *   - HANDLE_TYPE_FIFO_USER:  For `S_IFIFO' files
- *   - HANDLE_TYPE_MFILE:      For `S_IFLNK' files (only when `O_SYMLINK' was given)
- *   - HANDLE_TYPE_DIRHANDLE:  For `S_IFDIR' files from special one-shot directories
- *   - HANDLE_TYPE_FILEHANDLE: For `S_IFREG' and `S_IFDIR' (~normal~) files
+ *   - HANDLE_TYPE_FILEHANDLE: For `S_IFREG' regular files
+ *   - HANDLE_TYPE_FIFOHANDLE: For `S_IFIFO' pipe files
+ *   - HANDLE_TYPE_DIRHANDLE:  For `S_IFDIR' directories
+ *   - HANDLE_TYPE_MFILE:      The actual filesystem object (including device files)
  *   - *:                      Certain filesystem names can literally return anything, such
  *                             as `/proc/self/fd/1234',  which  is  more  like  `dup(1234)' */
 #ifdef __cplusplus
@@ -1849,12 +1821,10 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(openat, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WU
  * file  access  permissions with  which  the file  should  be opened.
  * On KOS, the returned handle can be anything, but is usually one of:
  *   - HANDLE_TYPE_PATH:       When `O_PATH' was given
- *   - HANDLE_TYPE_BLKDEV:     For `S_IFBLK' files
- *   - HANDLE_TYPE_CHRDEV:     For `S_IFCHR' files (in this case, `O_NOCTTY' gains meaning)
- *   - HANDLE_TYPE_FIFO_USER:  For `S_IFIFO' files
- *   - HANDLE_TYPE_MFILE:      For `S_IFLNK' files (only when `O_SYMLINK' was given)
- *   - HANDLE_TYPE_DIRHANDLE:  For `S_IFDIR' files from special one-shot directories
- *   - HANDLE_TYPE_FILEHANDLE: For `S_IFREG' and `S_IFDIR' (~normal~) files
+ *   - HANDLE_TYPE_FILEHANDLE: For `S_IFREG' regular files
+ *   - HANDLE_TYPE_FIFOHANDLE: For `S_IFIFO' pipe files
+ *   - HANDLE_TYPE_DIRHANDLE:  For `S_IFDIR' directories
+ *   - HANDLE_TYPE_MFILE:      The actual filesystem object (including device files)
  *   - *:                      Certain filesystem names can literally return anything, such
  *                             as `/proc/self/fd/1234',  which  is  more  like  `dup(1234)' */
 __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2)),__fd_t,__NOTHROW_RPC,openat64,(__fd_t __dirfd, char const *__filename, __oflag_t __oflags),openat,(__dirfd,__filename,__oflags),__oflags,1,(__mode_t))
@@ -1865,12 +1835,10 @@ __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2)),__fd_t,__NOTHROW_RPC,openat64,(_
  * file  access  permissions with  which  the file  should  be opened.
  * On KOS, the returned handle can be anything, but is usually one of:
  *   - HANDLE_TYPE_PATH:       When `O_PATH' was given
- *   - HANDLE_TYPE_BLKDEV:     For `S_IFBLK' files
- *   - HANDLE_TYPE_CHRDEV:     For `S_IFCHR' files (in this case, `O_NOCTTY' gains meaning)
- *   - HANDLE_TYPE_FIFO_USER:  For `S_IFIFO' files
- *   - HANDLE_TYPE_MFILE:      For `S_IFLNK' files (only when `O_SYMLINK' was given)
- *   - HANDLE_TYPE_DIRHANDLE:  For `S_IFDIR' files from special one-shot directories
- *   - HANDLE_TYPE_FILEHANDLE: For `S_IFREG' and `S_IFDIR' (~normal~) files
+ *   - HANDLE_TYPE_FILEHANDLE: For `S_IFREG' regular files
+ *   - HANDLE_TYPE_FIFOHANDLE: For `S_IFIFO' pipe files
+ *   - HANDLE_TYPE_DIRHANDLE:  For `S_IFDIR' directories
+ *   - HANDLE_TYPE_MFILE:      The actual filesystem object (including device files)
  *   - *:                      Certain filesystem names can literally return anything, such
  *                             as `/proc/self/fd/1234',  which  is  more  like  `dup(1234)' */
 __LIBC __ATTR_WUNUSED __ATTR_NONNULL((2)) __fd_t __NOTHROW_RPC(__VLIBCCALL openat64)(__fd_t __dirfd, char const *__filename, __oflag_t __oflags, ...) __CASMNAME_SAME("openat64");
@@ -1882,12 +1850,10 @@ __LIBC __ATTR_WUNUSED __ATTR_NONNULL((2)) __fd_t __NOTHROW_RPC(__VLIBCCALL opena
  * file  access  permissions with  which  the file  should  be opened.
  * On KOS, the returned handle can be anything, but is usually one of:
  *   - HANDLE_TYPE_PATH:       When `O_PATH' was given
- *   - HANDLE_TYPE_BLKDEV:     For `S_IFBLK' files
- *   - HANDLE_TYPE_CHRDEV:     For `S_IFCHR' files (in this case, `O_NOCTTY' gains meaning)
- *   - HANDLE_TYPE_FIFO_USER:  For `S_IFIFO' files
- *   - HANDLE_TYPE_MFILE:      For `S_IFLNK' files (only when `O_SYMLINK' was given)
- *   - HANDLE_TYPE_DIRHANDLE:  For `S_IFDIR' files from special one-shot directories
- *   - HANDLE_TYPE_FILEHANDLE: For `S_IFREG' and `S_IFDIR' (~normal~) files
+ *   - HANDLE_TYPE_FILEHANDLE: For `S_IFREG' regular files
+ *   - HANDLE_TYPE_FIFOHANDLE: For `S_IFIFO' pipe files
+ *   - HANDLE_TYPE_DIRHANDLE:  For `S_IFDIR' directories
+ *   - HANDLE_TYPE_MFILE:      The actual filesystem object (including device files)
  *   - *:                      Certain filesystem names can literally return anything, such
  *                             as `/proc/self/fd/1234',  which  is  more  like  `dup(1234)' */
 #ifdef __cplusplus

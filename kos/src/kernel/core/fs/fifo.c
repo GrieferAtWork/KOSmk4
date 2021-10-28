@@ -49,7 +49,7 @@
 
 DECL_BEGIN
 
-DEFINE_HANDLE_REFCNT_FUNCTIONS(fifo_user, struct fifo_user);
+DEFINE_HANDLE_REFCNT_FUNCTIONS(fifohandle, struct fifohandle);
 
 INTDEF syscall_slong_t KCALL
 ringbuffer_pipe_hop(struct ringbuffer *__restrict self,
@@ -62,7 +62,7 @@ ringbuffer_pipe_hop(struct ringbuffer *__restrict self,
  *    - HANDLE_TYPE_MFILE   (When describing a `struct fifo_node *')
  *    - HANDLE_TYPE_FILEHANDLE
  *    - HANDLE_TYPE_DIRHANDLE
- *    - HANDLE_TYPE_FIFO_USER
+ *    - HANDLE_TYPE_FIFOHANDLE
  * This hop-backend implements command codes normally reserved for pipe
  * objects, thus allowing user-space to  make use of pipe hop  commands
  * with FIFO objects. */
@@ -133,7 +133,7 @@ fifo_hop(struct fifo_node *__restrict self, syscall_ulong_t cmd,
 
 #define fifo_buffer(user) (&(user)->fu_fifo->f_fifo.ff_buffer)
 INTERN WUNUSED NONNULL((1)) size_t KCALL
-handle_fifo_user_read(struct fifo_user *__restrict self,
+handle_fifohandle_read(struct fifohandle *__restrict self,
                       USER CHECKED void *dst,
                       size_t num_bytes, iomode_t mode)
 		THROWS(...) {
@@ -180,7 +180,7 @@ done:
 }
 
 INTERN WUNUSED NONNULL((1)) size_t KCALL
-handle_fifo_user_write(struct fifo_user *__restrict self,
+handle_fifohandle_write(struct fifohandle *__restrict self,
                        USER CHECKED void const *src,
                        size_t num_bytes, iomode_t mode)
 		THROWS(...) {
@@ -238,7 +238,7 @@ done:
 }
 
 INTERN WUNUSED NONNULL((1, 2)) size_t KCALL
-handle_fifo_user_readv(struct fifo_user *__restrict self,
+handle_fifohandle_readv(struct fifohandle *__restrict self,
                        struct iov_buffer *__restrict dst,
                        size_t num_bytes, iomode_t mode)
 		THROWS(...) {
@@ -294,7 +294,7 @@ again_read_ent:
 
 
 INTERN WUNUSED NONNULL((1, 2)) size_t KCALL
-handle_fifo_user_writev(struct fifo_user *__restrict self,
+handle_fifohandle_writev(struct fifohandle *__restrict self,
                         struct iov_buffer *__restrict src,
                         size_t num_bytes, iomode_t mode)
 		THROWS(...) {
@@ -363,7 +363,7 @@ again_write_ent:
 }
 
 INTERN NONNULL((1)) void KCALL
-handle_fifo_user_truncate(struct fifo_user *__restrict self,
+handle_fifohandle_truncate(struct fifohandle *__restrict self,
                           pos_t new_size)
 		THROWS(...) {
 	ringbuffer_setwritten(fifo_buffer(self),
@@ -371,7 +371,7 @@ handle_fifo_user_truncate(struct fifo_user *__restrict self,
 }
 
 INTERN NONNULL((1)) void KCALL
-handle_fifo_user_stat(struct fifo_user *__restrict self,
+handle_fifohandle_stat(struct fifohandle *__restrict self,
                       USER CHECKED struct stat *result)
 		THROWS(...) {
 	size_t size;
@@ -385,7 +385,7 @@ handle_fifo_user_stat(struct fifo_user *__restrict self,
 }
 
 INTERN NONNULL((1)) void KCALL
-handle_fifo_user_pollconnect(struct fifo_user *__restrict self,
+handle_fifohandle_pollconnect(struct fifohandle *__restrict self,
                              poll_mode_t what)
 		THROWS(...) {
 	struct ringbuffer *rb = fifo_buffer(self);
@@ -396,7 +396,7 @@ handle_fifo_user_pollconnect(struct fifo_user *__restrict self,
 }
 
 INTERN WUNUSED NONNULL((1)) poll_mode_t KCALL
-handle_fifo_user_polltest(struct fifo_user *__restrict self,
+handle_fifohandle_polltest(struct fifohandle *__restrict self,
                           poll_mode_t what)
 		THROWS(...) {
 	poll_mode_t result = 0;
@@ -409,7 +409,7 @@ handle_fifo_user_polltest(struct fifo_user *__restrict self,
 }
 
 INTERN NONNULL((1)) syscall_slong_t KCALL
-handle_fifo_user_hop(struct fifo_user *__restrict self,
+handle_fifohandle_hop(struct fifohandle *__restrict self,
                      syscall_ulong_t cmd,
                      USER UNCHECKED void *arg, iomode_t mode)
 		THROWS(...) {
@@ -422,7 +422,7 @@ handle_fifo_user_hop(struct fifo_user *__restrict self,
 
 
 PUBLIC NOBLOCK NONNULL((1)) void
-NOTHROW(FCALL fifo_user_destroy)(struct fifo_user *__restrict self) {
+NOTHROW(FCALL fifohandle_destroy)(struct fifohandle *__restrict self) {
 	REF struct fifo_node *fifo;
 	fifo = self->fu_fifo;
 	if (IO_CANREAD(self->fu_accmode)) {
@@ -445,13 +445,13 @@ NOTHROW(FCALL fifo_user_destroy)(struct fifo_user *__restrict self) {
  *       `fu_dirent'   directly   after  calling   this  function.
  * @param: iomode: Set of `IO_ACCMODE | IO_NONBLOCK'
  * @throw: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_OPEN_FIFO_WRITER_NO_READERS: [...] */
-PUBLIC ATTR_MALLOC ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct fifo_user *FCALL
-fifo_user_create(struct fifo_node *__restrict self, iomode_t iomode)
+PUBLIC ATTR_MALLOC ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct fifohandle *FCALL
+fifohandle_new(struct fifo_node *__restrict self, iomode_t iomode)
 		THROWS(E_BADALLOC, E_WOULDBLOCK, E_INVALID_ARGUMENT_BAD_STATE) {
-	REF struct fifo_user *result;
+	REF struct fifohandle *result;
 	assert(!task_wasconnected());
 	assert((iomode & ~(IO_ACCMODE | IO_NONBLOCK)) == 0);
-	result = (REF struct fifo_user *)kmalloc(sizeof(struct fifo_user),
+	result = (REF struct fifohandle *)kmalloc(sizeof(struct fifohandle),
 	                                         GFP_NORMAL);
 	/* Register a new reader/writer/both */
 	TRY {

@@ -37,6 +37,8 @@
 #include <fs/ramfs.h>
 #include <fs/special-node.h>
 #include <fs/vfs.h>
+#include <kernel/fs/fifohandle.h>
+#include <kernel/fs/fifonode.h>
 #include <kernel/handle.h>
 #include <kernel/mman/driver.h>
 #include <kernel/mman/module.h>
@@ -306,9 +308,9 @@ handle_datasize(struct handle const *__restrict self,
 		value = (pos_t)me->dll_count;
 	}	break;
 
-	case HANDLE_TYPE_FIFO_USER: {
-		struct fifo_user *me;
-		me    = (struct fifo_user *)self->h_data;
+	case HANDLE_TYPE_FIFOHANDLE: {
+		struct fifohandle *me;
+		me    = (struct fifohandle *)self->h_data;
 #ifdef CONFIG_USE_NEW_FS
 		value = (pos_t)ATOMIC_READ(me->fu_fifo->ff_buffer.rb_avail);
 #else /* CONFIG_USE_NEW_FS */

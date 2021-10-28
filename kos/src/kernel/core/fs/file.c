@@ -1019,14 +1019,14 @@ DEFINE_INTERN_ALIAS(handle_dirhandle_truncate, handle_filehandle_truncate);
 
 /* Alias the handle_filehandle_tryas() to some other handle types. */
 DEFINE_INTERN_ALIAS(handle_dirhandle_tryas, handle_filehandle_tryas);
-DEFINE_INTERN_ALIAS(handle_fifo_user_tryas, handle_filehandle_tryas);
+DEFINE_INTERN_ALIAS(handle_fifohandle_tryas, handle_filehandle_tryas);
 
 STATIC_ASSERT(offsetof(struct filehandle, f_node) == offsetof(struct dirhandle, d_node));
 STATIC_ASSERT(offsetof(struct filehandle, f_path) == offsetof(struct dirhandle, d_path));
 STATIC_ASSERT(offsetof(struct filehandle, f_dirent) == offsetof(struct dirhandle, d_dirent));
-STATIC_ASSERT(offsetof(struct filehandle, f_node) == offsetof(struct fifo_user, fu_fifo));
-STATIC_ASSERT(offsetof(struct filehandle, f_path) == offsetof(struct fifo_user, fu_path));
-STATIC_ASSERT(offsetof(struct filehandle, f_dirent) == offsetof(struct fifo_user, fu_dirent));
+STATIC_ASSERT(offsetof(struct filehandle, f_node) == offsetof(struct fifohandle, fu_fifo));
+STATIC_ASSERT(offsetof(struct filehandle, f_path) == offsetof(struct fifohandle, fu_path));
+STATIC_ASSERT(offsetof(struct filehandle, f_dirent) == offsetof(struct fifohandle, fu_dirent));
 
 /* This is the most-used handle converter function,
  * since most  open()  calls  return  FILE-objects. */

@@ -785,12 +785,6 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *       the  same as `pidfd_open(42)'. Iow: support is provided by allowing the
 	 *       handled returned by open("/proc/42") to be castable to HANDLE_TYPE_TASK */
 
-	/* TODO: Rename `struct fifo_user' to `struct fifohandle' */
-
-	/* TODO: Rename `HANDLE_TYPE_FIFO_USER' to `HANDLE_TYPE_FIFOHANDLE' */
-
-	/* TODO: Move `struct fifo_user' from <kerenl/fs/fifonode.h> into its own file <kernel/fs/fifohandle.h> */
-
 	/* TODO: Get rid of `O_SYMLINK' */
 
 	/* TODO: Get rid of `AT_SYMLINK_REGULAR' */

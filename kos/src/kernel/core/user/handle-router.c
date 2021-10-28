@@ -344,7 +344,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_PIPE]            =  "pipe",
 		[HANDLE_TYPE_PIPE_READER]     =  "pipe_reader",
 		[HANDLE_TYPE_PIPE_WRITER]     =  "pipe_writer",
-		[HANDLE_TYPE_FIFO_USER]       =  "fifo_user",
+		[HANDLE_TYPE_FIFOHANDLE]      =  "fifohandle",
 		[HANDLE_TYPE_EVENTFD_FENCE]   =  "eventfd_fence",
 		[HANDLE_TYPE_EVENTFD_SEMA]    =  "eventfd_sema",
 		[HANDLE_TYPE_SIGNALFD]        =  "signalfd",
@@ -374,7 +374,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_PIPE]            = (refcnt_t (FCALL *)(void const *__restrict))&handle_pipe_refcnt,
 		[HANDLE_TYPE_PIPE_READER]     = (refcnt_t (FCALL *)(void const *__restrict))&handle_pipe_reader_refcnt,
 		[HANDLE_TYPE_PIPE_WRITER]     = (refcnt_t (FCALL *)(void const *__restrict))&handle_pipe_writer_refcnt,
-		[HANDLE_TYPE_FIFO_USER]       = (refcnt_t (FCALL *)(void const *__restrict))&handle_fifo_user_refcnt,
+		[HANDLE_TYPE_FIFOHANDLE]      = (refcnt_t (FCALL *)(void const *__restrict))&handle_fifohandle_refcnt,
 		[HANDLE_TYPE_EVENTFD_FENCE]   = (refcnt_t (FCALL *)(void const *__restrict))&handle_eventfd_fence_refcnt,
 		[HANDLE_TYPE_EVENTFD_SEMA]    = (refcnt_t (FCALL *)(void const *__restrict))&handle_eventfd_sema_refcnt,
 		[HANDLE_TYPE_SIGNALFD]        = (refcnt_t (FCALL *)(void const *__restrict))&handle_signalfd_refcnt,
@@ -404,7 +404,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_PIPE]            = (void (FCALL *)(void *__restrict))&handle_pipe_incref,
 		[HANDLE_TYPE_PIPE_READER]     = (void (FCALL *)(void *__restrict))&handle_pipe_reader_incref,
 		[HANDLE_TYPE_PIPE_WRITER]     = (void (FCALL *)(void *__restrict))&handle_pipe_writer_incref,
-		[HANDLE_TYPE_FIFO_USER]       = (void (FCALL *)(void *__restrict))&handle_fifo_user_incref,
+		[HANDLE_TYPE_FIFOHANDLE]      = (void (FCALL *)(void *__restrict))&handle_fifohandle_incref,
 		[HANDLE_TYPE_EVENTFD_FENCE]   = (void (FCALL *)(void *__restrict))&handle_eventfd_fence_incref,
 		[HANDLE_TYPE_EVENTFD_SEMA]    = (void (FCALL *)(void *__restrict))&handle_eventfd_sema_incref,
 		[HANDLE_TYPE_SIGNALFD]        = (void (FCALL *)(void *__restrict))&handle_signalfd_incref,
@@ -434,7 +434,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_PIPE]            = (void (FCALL *)(REF void *__restrict))&handle_pipe_decref,
 		[HANDLE_TYPE_PIPE_READER]     = (void (FCALL *)(REF void *__restrict))&handle_pipe_reader_decref,
 		[HANDLE_TYPE_PIPE_WRITER]     = (void (FCALL *)(REF void *__restrict))&handle_pipe_writer_decref,
-		[HANDLE_TYPE_FIFO_USER]       = (void (FCALL *)(REF void *__restrict))&handle_fifo_user_decref,
+		[HANDLE_TYPE_FIFOHANDLE]      = (void (FCALL *)(REF void *__restrict))&handle_fifohandle_decref,
 		[HANDLE_TYPE_EVENTFD_FENCE]   = (void (FCALL *)(REF void *__restrict))&handle_eventfd_fence_decref,
 		[HANDLE_TYPE_EVENTFD_SEMA]    = (void (FCALL *)(REF void *__restrict))&handle_eventfd_sema_decref,
 		[HANDLE_TYPE_SIGNALFD]        = (void (FCALL *)(REF void *__restrict))&handle_signalfd_decref,
@@ -464,7 +464,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_PIPE]            = (__BOOL (FCALL *)(void *__restrict))&handle_pipe_tryincref,
 		[HANDLE_TYPE_PIPE_READER]     = (__BOOL (FCALL *)(void *__restrict))&handle_pipe_reader_tryincref,
 		[HANDLE_TYPE_PIPE_WRITER]     = (__BOOL (FCALL *)(void *__restrict))&handle_pipe_writer_tryincref,
-		[HANDLE_TYPE_FIFO_USER]       = (__BOOL (FCALL *)(void *__restrict))&handle_fifo_user_tryincref,
+		[HANDLE_TYPE_FIFOHANDLE]      = (__BOOL (FCALL *)(void *__restrict))&handle_fifohandle_tryincref,
 		[HANDLE_TYPE_EVENTFD_FENCE]   = (__BOOL (FCALL *)(void *__restrict))&handle_eventfd_fence_tryincref,
 		[HANDLE_TYPE_EVENTFD_SEMA]    = (__BOOL (FCALL *)(void *__restrict))&handle_eventfd_sema_tryincref,
 		[HANDLE_TYPE_SIGNALFD]        = (__BOOL (FCALL *)(void *__restrict))&handle_signalfd_tryincref,
@@ -494,7 +494,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_PIPE]            = (WEAK REF void *(FCALL *)(void *__restrict))&handle_pipe_weakgetref,
 		[HANDLE_TYPE_PIPE_READER]     = (WEAK REF void *(FCALL *)(void *__restrict))&handle_pipe_reader_weakgetref,
 		[HANDLE_TYPE_PIPE_WRITER]     = (WEAK REF void *(FCALL *)(void *__restrict))&handle_pipe_writer_weakgetref,
-		[HANDLE_TYPE_FIFO_USER]       = (WEAK REF void *(FCALL *)(void *__restrict))&handle_fifo_user_weakgetref,
+		[HANDLE_TYPE_FIFOHANDLE]      = (WEAK REF void *(FCALL *)(void *__restrict))&handle_fifohandle_weakgetref,
 		[HANDLE_TYPE_EVENTFD_FENCE]   = (WEAK REF void *(FCALL *)(void *__restrict))&handle_eventfd_fence_weakgetref,
 		[HANDLE_TYPE_EVENTFD_SEMA]    = (WEAK REF void *(FCALL *)(void *__restrict))&handle_eventfd_sema_weakgetref,
 		[HANDLE_TYPE_SIGNALFD]        = (WEAK REF void *(FCALL *)(void *__restrict))&handle_signalfd_weakgetref,
@@ -524,7 +524,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_PIPE]            = (REF void *(FCALL *)(void *__restrict))&handle_pipe_weaklckref,
 		[HANDLE_TYPE_PIPE_READER]     = (REF void *(FCALL *)(void *__restrict))&handle_pipe_reader_weaklckref,
 		[HANDLE_TYPE_PIPE_WRITER]     = (REF void *(FCALL *)(void *__restrict))&handle_pipe_writer_weaklckref,
-		[HANDLE_TYPE_FIFO_USER]       = (REF void *(FCALL *)(void *__restrict))&handle_fifo_user_weaklckref,
+		[HANDLE_TYPE_FIFOHANDLE]      = (REF void *(FCALL *)(void *__restrict))&handle_fifohandle_weaklckref,
 		[HANDLE_TYPE_EVENTFD_FENCE]   = (REF void *(FCALL *)(void *__restrict))&handle_eventfd_fence_weaklckref,
 		[HANDLE_TYPE_EVENTFD_SEMA]    = (REF void *(FCALL *)(void *__restrict))&handle_eventfd_sema_weaklckref,
 		[HANDLE_TYPE_SIGNALFD]        = (REF void *(FCALL *)(void *__restrict))&handle_signalfd_weaklckref,
@@ -554,7 +554,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_PIPE]            = (void (FCALL *)(WEAK REF void *__restrict))&handle_pipe_weakdecref,
 		[HANDLE_TYPE_PIPE_READER]     = (void (FCALL *)(WEAK REF void *__restrict))&handle_pipe_reader_weakdecref,
 		[HANDLE_TYPE_PIPE_WRITER]     = (void (FCALL *)(WEAK REF void *__restrict))&handle_pipe_writer_weakdecref,
-		[HANDLE_TYPE_FIFO_USER]       = (void (FCALL *)(WEAK REF void *__restrict))&handle_fifo_user_weakdecref,
+		[HANDLE_TYPE_FIFOHANDLE]      = (void (FCALL *)(WEAK REF void *__restrict))&handle_fifohandle_weakdecref,
 		[HANDLE_TYPE_EVENTFD_FENCE]   = (void (FCALL *)(WEAK REF void *__restrict))&handle_eventfd_fence_weakdecref,
 		[HANDLE_TYPE_EVENTFD_SEMA]    = (void (FCALL *)(WEAK REF void *__restrict))&handle_eventfd_sema_weakdecref,
 		[HANDLE_TYPE_SIGNALFD]        = (void (FCALL *)(WEAK REF void *__restrict))&handle_signalfd_weakdecref,
@@ -584,7 +584,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_PIPE]            = (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, iomode_t))&handle_pipe_read,
 		[HANDLE_TYPE_PIPE_READER]     = (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, iomode_t))&handle_pipe_reader_read,
 		[HANDLE_TYPE_PIPE_WRITER]     = (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, iomode_t))&handle_pipe_writer_read,
-		[HANDLE_TYPE_FIFO_USER]       = (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, iomode_t))&handle_fifo_user_read,
+		[HANDLE_TYPE_FIFOHANDLE]      = (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, iomode_t))&handle_fifohandle_read,
 		[HANDLE_TYPE_EVENTFD_FENCE]   = (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, iomode_t))&handle_eventfd_fence_read,
 		[HANDLE_TYPE_EVENTFD_SEMA]    = (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, iomode_t))&handle_eventfd_sema_read,
 		[HANDLE_TYPE_SIGNALFD]        = (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, iomode_t))&handle_signalfd_read,
@@ -614,7 +614,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_PIPE]            = (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, iomode_t))&handle_pipe_write,
 		[HANDLE_TYPE_PIPE_READER]     = (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, iomode_t))&handle_pipe_reader_write,
 		[HANDLE_TYPE_PIPE_WRITER]     = (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, iomode_t))&handle_pipe_writer_write,
-		[HANDLE_TYPE_FIFO_USER]       = (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, iomode_t))&handle_fifo_user_write,
+		[HANDLE_TYPE_FIFOHANDLE]      = (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, iomode_t))&handle_fifohandle_write,
 		[HANDLE_TYPE_EVENTFD_FENCE]   = (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, iomode_t))&handle_eventfd_fence_write,
 		[HANDLE_TYPE_EVENTFD_SEMA]    = (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, iomode_t))&handle_eventfd_sema_write,
 		[HANDLE_TYPE_SIGNALFD]        = (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, iomode_t))&handle_signalfd_write,
@@ -644,7 +644,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_PIPE]            = (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, pos_t, iomode_t))&handle_pipe_pread,
 		[HANDLE_TYPE_PIPE_READER]     = (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, pos_t, iomode_t))&handle_pipe_reader_pread,
 		[HANDLE_TYPE_PIPE_WRITER]     = (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, pos_t, iomode_t))&handle_pipe_writer_pread,
-		[HANDLE_TYPE_FIFO_USER]       = (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, pos_t, iomode_t))&handle_fifo_user_pread,
+		[HANDLE_TYPE_FIFOHANDLE]      = (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, pos_t, iomode_t))&handle_fifohandle_pread,
 		[HANDLE_TYPE_EVENTFD_FENCE]   = (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, pos_t, iomode_t))&handle_eventfd_fence_pread,
 		[HANDLE_TYPE_EVENTFD_SEMA]    = (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, pos_t, iomode_t))&handle_eventfd_sema_pread,
 		[HANDLE_TYPE_SIGNALFD]        = (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, pos_t, iomode_t))&handle_signalfd_pread,
@@ -674,7 +674,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_PIPE]            = (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, pos_t, iomode_t))&handle_pipe_pwrite,
 		[HANDLE_TYPE_PIPE_READER]     = (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, pos_t, iomode_t))&handle_pipe_reader_pwrite,
 		[HANDLE_TYPE_PIPE_WRITER]     = (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, pos_t, iomode_t))&handle_pipe_writer_pwrite,
-		[HANDLE_TYPE_FIFO_USER]       = (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, pos_t, iomode_t))&handle_fifo_user_pwrite,
+		[HANDLE_TYPE_FIFOHANDLE]      = (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, pos_t, iomode_t))&handle_fifohandle_pwrite,
 		[HANDLE_TYPE_EVENTFD_FENCE]   = (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, pos_t, iomode_t))&handle_eventfd_fence_pwrite,
 		[HANDLE_TYPE_EVENTFD_SEMA]    = (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, pos_t, iomode_t))&handle_eventfd_sema_pwrite,
 		[HANDLE_TYPE_SIGNALFD]        = (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, pos_t, iomode_t))&handle_signalfd_pwrite,
@@ -704,7 +704,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_PIPE]            = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_pipe_readv,
 		[HANDLE_TYPE_PIPE_READER]     = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_pipe_reader_readv,
 		[HANDLE_TYPE_PIPE_WRITER]     = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_pipe_writer_readv,
-		[HANDLE_TYPE_FIFO_USER]       = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_fifo_user_readv,
+		[HANDLE_TYPE_FIFOHANDLE]      = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_fifohandle_readv,
 		[HANDLE_TYPE_EVENTFD_FENCE]   = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_eventfd_fence_readv,
 		[HANDLE_TYPE_EVENTFD_SEMA]    = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_eventfd_sema_readv,
 		[HANDLE_TYPE_SIGNALFD]        = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_signalfd_readv,
@@ -734,7 +734,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_PIPE]            = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_pipe_writev,
 		[HANDLE_TYPE_PIPE_READER]     = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_pipe_reader_writev,
 		[HANDLE_TYPE_PIPE_WRITER]     = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_pipe_writer_writev,
-		[HANDLE_TYPE_FIFO_USER]       = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_fifo_user_writev,
+		[HANDLE_TYPE_FIFOHANDLE]      = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_fifohandle_writev,
 		[HANDLE_TYPE_EVENTFD_FENCE]   = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_eventfd_fence_writev,
 		[HANDLE_TYPE_EVENTFD_SEMA]    = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_eventfd_sema_writev,
 		[HANDLE_TYPE_SIGNALFD]        = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_signalfd_writev,
@@ -764,7 +764,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_PIPE]            = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_pipe_preadv,
 		[HANDLE_TYPE_PIPE_READER]     = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_pipe_reader_preadv,
 		[HANDLE_TYPE_PIPE_WRITER]     = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_pipe_writer_preadv,
-		[HANDLE_TYPE_FIFO_USER]       = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_fifo_user_preadv,
+		[HANDLE_TYPE_FIFOHANDLE]      = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_fifohandle_preadv,
 		[HANDLE_TYPE_EVENTFD_FENCE]   = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_eventfd_fence_preadv,
 		[HANDLE_TYPE_EVENTFD_SEMA]    = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_eventfd_sema_preadv,
 		[HANDLE_TYPE_SIGNALFD]        = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_signalfd_preadv,
@@ -794,7 +794,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_PIPE]            = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_pipe_pwritev,
 		[HANDLE_TYPE_PIPE_READER]     = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_pipe_reader_pwritev,
 		[HANDLE_TYPE_PIPE_WRITER]     = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_pipe_writer_pwritev,
-		[HANDLE_TYPE_FIFO_USER]       = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_fifo_user_pwritev,
+		[HANDLE_TYPE_FIFOHANDLE]      = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_fifohandle_pwritev,
 		[HANDLE_TYPE_EVENTFD_FENCE]   = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_eventfd_fence_pwritev,
 		[HANDLE_TYPE_EVENTFD_SEMA]    = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_eventfd_sema_pwritev,
 		[HANDLE_TYPE_SIGNALFD]        = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_signalfd_pwritev,
@@ -824,7 +824,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_PIPE]            = (size_t (KCALL *)(void *__restrict, USER CHECKED struct dirent *, size_t, readdir_mode_t, iomode_t))&handle_pipe_readdir,
 		[HANDLE_TYPE_PIPE_READER]     = (size_t (KCALL *)(void *__restrict, USER CHECKED struct dirent *, size_t, readdir_mode_t, iomode_t))&handle_pipe_reader_readdir,
 		[HANDLE_TYPE_PIPE_WRITER]     = (size_t (KCALL *)(void *__restrict, USER CHECKED struct dirent *, size_t, readdir_mode_t, iomode_t))&handle_pipe_writer_readdir,
-		[HANDLE_TYPE_FIFO_USER]       = (size_t (KCALL *)(void *__restrict, USER CHECKED struct dirent *, size_t, readdir_mode_t, iomode_t))&handle_fifo_user_readdir,
+		[HANDLE_TYPE_FIFOHANDLE]      = (size_t (KCALL *)(void *__restrict, USER CHECKED struct dirent *, size_t, readdir_mode_t, iomode_t))&handle_fifohandle_readdir,
 		[HANDLE_TYPE_EVENTFD_FENCE]   = (size_t (KCALL *)(void *__restrict, USER CHECKED struct dirent *, size_t, readdir_mode_t, iomode_t))&handle_eventfd_fence_readdir,
 		[HANDLE_TYPE_EVENTFD_SEMA]    = (size_t (KCALL *)(void *__restrict, USER CHECKED struct dirent *, size_t, readdir_mode_t, iomode_t))&handle_eventfd_sema_readdir,
 		[HANDLE_TYPE_SIGNALFD]        = (size_t (KCALL *)(void *__restrict, USER CHECKED struct dirent *, size_t, readdir_mode_t, iomode_t))&handle_signalfd_readdir,
@@ -854,7 +854,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_PIPE]            = (pos_t (KCALL *)(void *__restrict, off_t, unsigned int))&handle_pipe_seek,
 		[HANDLE_TYPE_PIPE_READER]     = (pos_t (KCALL *)(void *__restrict, off_t, unsigned int))&handle_pipe_reader_seek,
 		[HANDLE_TYPE_PIPE_WRITER]     = (pos_t (KCALL *)(void *__restrict, off_t, unsigned int))&handle_pipe_writer_seek,
-		[HANDLE_TYPE_FIFO_USER]       = (pos_t (KCALL *)(void *__restrict, off_t, unsigned int))&handle_fifo_user_seek,
+		[HANDLE_TYPE_FIFOHANDLE]      = (pos_t (KCALL *)(void *__restrict, off_t, unsigned int))&handle_fifohandle_seek,
 		[HANDLE_TYPE_EVENTFD_FENCE]   = (pos_t (KCALL *)(void *__restrict, off_t, unsigned int))&handle_eventfd_fence_seek,
 		[HANDLE_TYPE_EVENTFD_SEMA]    = (pos_t (KCALL *)(void *__restrict, off_t, unsigned int))&handle_eventfd_sema_seek,
 		[HANDLE_TYPE_SIGNALFD]        = (pos_t (KCALL *)(void *__restrict, off_t, unsigned int))&handle_signalfd_seek,
@@ -884,7 +884,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_PIPE]            = (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_pipe_ioctl,
 		[HANDLE_TYPE_PIPE_READER]     = (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_pipe_reader_ioctl,
 		[HANDLE_TYPE_PIPE_WRITER]     = (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_pipe_writer_ioctl,
-		[HANDLE_TYPE_FIFO_USER]       = (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_fifo_user_ioctl,
+		[HANDLE_TYPE_FIFOHANDLE]      = (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_fifohandle_ioctl,
 		[HANDLE_TYPE_EVENTFD_FENCE]   = (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_eventfd_fence_ioctl,
 		[HANDLE_TYPE_EVENTFD_SEMA]    = (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_eventfd_sema_ioctl,
 		[HANDLE_TYPE_SIGNALFD]        = (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_signalfd_ioctl,
@@ -914,7 +914,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_PIPE]            = (void (KCALL *)(void *__restrict, pos_t))&handle_pipe_truncate,
 		[HANDLE_TYPE_PIPE_READER]     = (void (KCALL *)(void *__restrict, pos_t))&handle_pipe_reader_truncate,
 		[HANDLE_TYPE_PIPE_WRITER]     = (void (KCALL *)(void *__restrict, pos_t))&handle_pipe_writer_truncate,
-		[HANDLE_TYPE_FIFO_USER]       = (void (KCALL *)(void *__restrict, pos_t))&handle_fifo_user_truncate,
+		[HANDLE_TYPE_FIFOHANDLE]      = (void (KCALL *)(void *__restrict, pos_t))&handle_fifohandle_truncate,
 		[HANDLE_TYPE_EVENTFD_FENCE]   = (void (KCALL *)(void *__restrict, pos_t))&handle_eventfd_fence_truncate,
 		[HANDLE_TYPE_EVENTFD_SEMA]    = (void (KCALL *)(void *__restrict, pos_t))&handle_eventfd_sema_truncate,
 		[HANDLE_TYPE_SIGNALFD]        = (void (KCALL *)(void *__restrict, pos_t))&handle_signalfd_truncate,
@@ -944,7 +944,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_PIPE]            = (void (KCALL *)(void *__restrict, struct handle_mmap_info *__restrict))&handle_pipe_mmap,
 		[HANDLE_TYPE_PIPE_READER]     = (void (KCALL *)(void *__restrict, struct handle_mmap_info *__restrict))&handle_pipe_reader_mmap,
 		[HANDLE_TYPE_PIPE_WRITER]     = (void (KCALL *)(void *__restrict, struct handle_mmap_info *__restrict))&handle_pipe_writer_mmap,
-		[HANDLE_TYPE_FIFO_USER]       = (void (KCALL *)(void *__restrict, struct handle_mmap_info *__restrict))&handle_fifo_user_mmap,
+		[HANDLE_TYPE_FIFOHANDLE]      = (void (KCALL *)(void *__restrict, struct handle_mmap_info *__restrict))&handle_fifohandle_mmap,
 		[HANDLE_TYPE_EVENTFD_FENCE]   = (void (KCALL *)(void *__restrict, struct handle_mmap_info *__restrict))&handle_eventfd_fence_mmap,
 		[HANDLE_TYPE_EVENTFD_SEMA]    = (void (KCALL *)(void *__restrict, struct handle_mmap_info *__restrict))&handle_eventfd_sema_mmap,
 		[HANDLE_TYPE_SIGNALFD]        = (void (KCALL *)(void *__restrict, struct handle_mmap_info *__restrict))&handle_signalfd_mmap,
@@ -974,7 +974,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_PIPE]            = (pos_t (KCALL *)(void *__restrict, fallocate_mode_t, pos_t, pos_t))&handle_pipe_allocate,
 		[HANDLE_TYPE_PIPE_READER]     = (pos_t (KCALL *)(void *__restrict, fallocate_mode_t, pos_t, pos_t))&handle_pipe_reader_allocate,
 		[HANDLE_TYPE_PIPE_WRITER]     = (pos_t (KCALL *)(void *__restrict, fallocate_mode_t, pos_t, pos_t))&handle_pipe_writer_allocate,
-		[HANDLE_TYPE_FIFO_USER]       = (pos_t (KCALL *)(void *__restrict, fallocate_mode_t, pos_t, pos_t))&handle_fifo_user_allocate,
+		[HANDLE_TYPE_FIFOHANDLE]      = (pos_t (KCALL *)(void *__restrict, fallocate_mode_t, pos_t, pos_t))&handle_fifohandle_allocate,
 		[HANDLE_TYPE_EVENTFD_FENCE]   = (pos_t (KCALL *)(void *__restrict, fallocate_mode_t, pos_t, pos_t))&handle_eventfd_fence_allocate,
 		[HANDLE_TYPE_EVENTFD_SEMA]    = (pos_t (KCALL *)(void *__restrict, fallocate_mode_t, pos_t, pos_t))&handle_eventfd_sema_allocate,
 		[HANDLE_TYPE_SIGNALFD]        = (pos_t (KCALL *)(void *__restrict, fallocate_mode_t, pos_t, pos_t))&handle_signalfd_allocate,
@@ -1004,7 +1004,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_PIPE]            = (void (KCALL *)(void *__restrict))&handle_pipe_sync,
 		[HANDLE_TYPE_PIPE_READER]     = (void (KCALL *)(void *__restrict))&handle_pipe_reader_sync,
 		[HANDLE_TYPE_PIPE_WRITER]     = (void (KCALL *)(void *__restrict))&handle_pipe_writer_sync,
-		[HANDLE_TYPE_FIFO_USER]       = (void (KCALL *)(void *__restrict))&handle_fifo_user_sync,
+		[HANDLE_TYPE_FIFOHANDLE]      = (void (KCALL *)(void *__restrict))&handle_fifohandle_sync,
 		[HANDLE_TYPE_EVENTFD_FENCE]   = (void (KCALL *)(void *__restrict))&handle_eventfd_fence_sync,
 		[HANDLE_TYPE_EVENTFD_SEMA]    = (void (KCALL *)(void *__restrict))&handle_eventfd_sema_sync,
 		[HANDLE_TYPE_SIGNALFD]        = (void (KCALL *)(void *__restrict))&handle_signalfd_sync,
@@ -1034,7 +1034,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_PIPE]            = (void (KCALL *)(void *__restrict))&handle_pipe_datasync,
 		[HANDLE_TYPE_PIPE_READER]     = (void (KCALL *)(void *__restrict))&handle_pipe_reader_datasync,
 		[HANDLE_TYPE_PIPE_WRITER]     = (void (KCALL *)(void *__restrict))&handle_pipe_writer_datasync,
-		[HANDLE_TYPE_FIFO_USER]       = (void (KCALL *)(void *__restrict))&handle_fifo_user_datasync,
+		[HANDLE_TYPE_FIFOHANDLE]      = (void (KCALL *)(void *__restrict))&handle_fifohandle_datasync,
 		[HANDLE_TYPE_EVENTFD_FENCE]   = (void (KCALL *)(void *__restrict))&handle_eventfd_fence_datasync,
 		[HANDLE_TYPE_EVENTFD_SEMA]    = (void (KCALL *)(void *__restrict))&handle_eventfd_sema_datasync,
 		[HANDLE_TYPE_SIGNALFD]        = (void (KCALL *)(void *__restrict))&handle_signalfd_datasync,
@@ -1064,7 +1064,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_PIPE]            = (void (KCALL *)(void *__restrict, USER CHECKED struct stat *))&handle_pipe_stat,
 		[HANDLE_TYPE_PIPE_READER]     = (void (KCALL *)(void *__restrict, USER CHECKED struct stat *))&handle_pipe_reader_stat,
 		[HANDLE_TYPE_PIPE_WRITER]     = (void (KCALL *)(void *__restrict, USER CHECKED struct stat *))&handle_pipe_writer_stat,
-		[HANDLE_TYPE_FIFO_USER]       = (void (KCALL *)(void *__restrict, USER CHECKED struct stat *))&handle_fifo_user_stat,
+		[HANDLE_TYPE_FIFOHANDLE]      = (void (KCALL *)(void *__restrict, USER CHECKED struct stat *))&handle_fifohandle_stat,
 		[HANDLE_TYPE_EVENTFD_FENCE]   = (void (KCALL *)(void *__restrict, USER CHECKED struct stat *))&handle_eventfd_fence_stat,
 		[HANDLE_TYPE_EVENTFD_SEMA]    = (void (KCALL *)(void *__restrict, USER CHECKED struct stat *))&handle_eventfd_sema_stat,
 		[HANDLE_TYPE_SIGNALFD]        = (void (KCALL *)(void *__restrict, USER CHECKED struct stat *))&handle_signalfd_stat,
@@ -1094,7 +1094,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_PIPE]            = (void (KCALL *)(void *__restrict, poll_mode_t))&handle_pipe_pollconnect,
 		[HANDLE_TYPE_PIPE_READER]     = (void (KCALL *)(void *__restrict, poll_mode_t))&handle_pipe_reader_pollconnect,
 		[HANDLE_TYPE_PIPE_WRITER]     = (void (KCALL *)(void *__restrict, poll_mode_t))&handle_pipe_writer_pollconnect,
-		[HANDLE_TYPE_FIFO_USER]       = (void (KCALL *)(void *__restrict, poll_mode_t))&handle_fifo_user_pollconnect,
+		[HANDLE_TYPE_FIFOHANDLE]      = (void (KCALL *)(void *__restrict, poll_mode_t))&handle_fifohandle_pollconnect,
 		[HANDLE_TYPE_EVENTFD_FENCE]   = (void (KCALL *)(void *__restrict, poll_mode_t))&handle_eventfd_fence_pollconnect,
 		[HANDLE_TYPE_EVENTFD_SEMA]    = (void (KCALL *)(void *__restrict, poll_mode_t))&handle_eventfd_sema_pollconnect,
 		[HANDLE_TYPE_SIGNALFD]        = (void (KCALL *)(void *__restrict, poll_mode_t))&handle_signalfd_pollconnect,
@@ -1124,7 +1124,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_PIPE]            = (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_pipe_polltest,
 		[HANDLE_TYPE_PIPE_READER]     = (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_pipe_reader_polltest,
 		[HANDLE_TYPE_PIPE_WRITER]     = (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_pipe_writer_polltest,
-		[HANDLE_TYPE_FIFO_USER]       = (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_fifo_user_polltest,
+		[HANDLE_TYPE_FIFOHANDLE]      = (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_fifohandle_polltest,
 		[HANDLE_TYPE_EVENTFD_FENCE]   = (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_eventfd_fence_polltest,
 		[HANDLE_TYPE_EVENTFD_SEMA]    = (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_eventfd_sema_polltest,
 		[HANDLE_TYPE_SIGNALFD]        = (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_signalfd_polltest,
@@ -1154,7 +1154,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_PIPE]            = (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_pipe_hop,
 		[HANDLE_TYPE_PIPE_READER]     = (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_pipe_reader_hop,
 		[HANDLE_TYPE_PIPE_WRITER]     = (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_pipe_writer_hop,
-		[HANDLE_TYPE_FIFO_USER]       = (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_fifo_user_hop,
+		[HANDLE_TYPE_FIFOHANDLE]      = (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_fifohandle_hop,
 		[HANDLE_TYPE_EVENTFD_FENCE]   = (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_eventfd_fence_hop,
 		[HANDLE_TYPE_EVENTFD_SEMA]    = (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_eventfd_sema_hop,
 		[HANDLE_TYPE_SIGNALFD]        = (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_signalfd_hop,
@@ -1184,7 +1184,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_PIPE]            = (REF void *(KCALL *)(void *__restrict, uintptr_half_t))&handle_pipe_tryas,
 		[HANDLE_TYPE_PIPE_READER]     = (REF void *(KCALL *)(void *__restrict, uintptr_half_t))&handle_pipe_reader_tryas,
 		[HANDLE_TYPE_PIPE_WRITER]     = (REF void *(KCALL *)(void *__restrict, uintptr_half_t))&handle_pipe_writer_tryas,
-		[HANDLE_TYPE_FIFO_USER]       = (REF void *(KCALL *)(void *__restrict, uintptr_half_t))&handle_fifo_user_tryas,
+		[HANDLE_TYPE_FIFOHANDLE]      = (REF void *(KCALL *)(void *__restrict, uintptr_half_t))&handle_fifohandle_tryas,
 		[HANDLE_TYPE_EVENTFD_FENCE]   = (REF void *(KCALL *)(void *__restrict, uintptr_half_t))&handle_eventfd_fence_tryas,
 		[HANDLE_TYPE_EVENTFD_SEMA]    = (REF void *(KCALL *)(void *__restrict, uintptr_half_t))&handle_eventfd_sema_tryas,
 		[HANDLE_TYPE_SIGNALFD]        = (REF void *(KCALL *)(void *__restrict, uintptr_half_t))&handle_signalfd_tryas,
@@ -1214,7 +1214,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_PIPE]            = (ssize_t (KCALL *)(void *__restrict, pformatprinter, void *))&handle_pipe_printlink,
 		[HANDLE_TYPE_PIPE_READER]     = (ssize_t (KCALL *)(void *__restrict, pformatprinter, void *))&handle_pipe_reader_printlink,
 		[HANDLE_TYPE_PIPE_WRITER]     = (ssize_t (KCALL *)(void *__restrict, pformatprinter, void *))&handle_pipe_writer_printlink,
-		[HANDLE_TYPE_FIFO_USER]       = (ssize_t (KCALL *)(void *__restrict, pformatprinter, void *))&handle_fifo_user_printlink,
+		[HANDLE_TYPE_FIFOHANDLE]      = (ssize_t (KCALL *)(void *__restrict, pformatprinter, void *))&handle_fifohandle_printlink,
 		[HANDLE_TYPE_EVENTFD_FENCE]   = (ssize_t (KCALL *)(void *__restrict, pformatprinter, void *))&handle_eventfd_fence_printlink,
 		[HANDLE_TYPE_EVENTFD_SEMA]    = (ssize_t (KCALL *)(void *__restrict, pformatprinter, void *))&handle_eventfd_sema_printlink,
 		[HANDLE_TYPE_SIGNALFD]        = (ssize_t (KCALL *)(void *__restrict, pformatprinter, void *))&handle_signalfd_printlink,
@@ -1444,38 +1444,38 @@ handle_pipe_writer_printlink(struct pipe_writer *__restrict self, pformatprinter
 	return handle_generic_printlink(self, HANDLE_TYPE_PIPE_WRITER, printer, arg);
 }
 
-/* Weakly define operators for `HANDLE_TYPE_FIFO_USER' (`struct fifo_user') */
-DEFINE_INTERN_WEAK_ALIAS(handle_fifo_user_refcnt, handle_undefined_refcnt);
-DEFINE_INTERN_WEAK_ALIAS(handle_fifo_user_incref, handle_undefined_incref);
-DEFINE_INTERN_WEAK_ALIAS(handle_fifo_user_decref, handle_undefined_decref);
-DEFINE_INTERN_WEAK_ALIAS(handle_fifo_user_tryincref, handle_undefined_tryincref);
-DEFINE_INTERN_WEAK_ALIAS(handle_fifo_user_weakgetref, handle_undefined_weakgetref);
-DEFINE_INTERN_WEAK_ALIAS(handle_fifo_user_weaklckref, handle_undefined_weaklckref);
-DEFINE_INTERN_WEAK_ALIAS(handle_fifo_user_weakdecref, handle_undefined_weakdecref);
-DEFINE_INTERN_WEAK_ALIAS(handle_fifo_user_read, handle_undefined_read);
-DEFINE_INTERN_WEAK_ALIAS(handle_fifo_user_write, handle_undefined_write);
-DEFINE_INTERN_WEAK_ALIAS(handle_fifo_user_pread, handle_undefined_pread);
-DEFINE_INTERN_WEAK_ALIAS(handle_fifo_user_pwrite, handle_undefined_pwrite);
-DEFINE_INTERN_WEAK_ALIAS(handle_fifo_user_readv, handle_undefined_readv);
-DEFINE_INTERN_WEAK_ALIAS(handle_fifo_user_writev, handle_undefined_writev);
-DEFINE_INTERN_WEAK_ALIAS(handle_fifo_user_preadv, handle_undefined_preadv);
-DEFINE_INTERN_WEAK_ALIAS(handle_fifo_user_pwritev, handle_undefined_pwritev);
-DEFINE_INTERN_WEAK_ALIAS(handle_fifo_user_readdir, handle_undefined_readdir);
-DEFINE_INTERN_WEAK_ALIAS(handle_fifo_user_seek, handle_undefined_seek);
-DEFINE_INTERN_WEAK_ALIAS(handle_fifo_user_ioctl, handle_undefined_ioctl);
-DEFINE_INTERN_WEAK_ALIAS(handle_fifo_user_truncate, handle_undefined_truncate);
-DEFINE_INTERN_WEAK_ALIAS(handle_fifo_user_mmap, handle_undefined_mmap);
-DEFINE_INTERN_WEAK_ALIAS(handle_fifo_user_allocate, handle_undefined_allocate);
-DEFINE_INTERN_WEAK_ALIAS(handle_fifo_user_sync, handle_undefined_sync);
-DEFINE_INTERN_WEAK_ALIAS(handle_fifo_user_datasync, handle_undefined_datasync);
-DEFINE_INTERN_WEAK_ALIAS(handle_fifo_user_stat, handle_undefined_stat);
-DEFINE_INTERN_WEAK_ALIAS(handle_fifo_user_pollconnect, handle_undefined_pollconnect);
-DEFINE_INTERN_WEAK_ALIAS(handle_fifo_user_polltest, handle_undefined_polltest);
-DEFINE_INTERN_WEAK_ALIAS(handle_fifo_user_hop, handle_undefined_hop);
-DEFINE_INTERN_WEAK_ALIAS(handle_fifo_user_tryas, handle_undefined_tryas);
-INTERN NONNULL((1, 2)) ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fifo_user.printlink") ssize_t KCALL
-handle_fifo_user_printlink(struct fifo_user *__restrict self, pformatprinter printer, void *arg) THROWS(E_WOULDBLOCK, ...) {
-	return handle_generic_printlink(self, HANDLE_TYPE_FIFO_USER, printer, arg);
+/* Weakly define operators for `HANDLE_TYPE_FIFOHANDLE' (`struct fifohandle') */
+DEFINE_INTERN_WEAK_ALIAS(handle_fifohandle_refcnt, handle_undefined_refcnt);
+DEFINE_INTERN_WEAK_ALIAS(handle_fifohandle_incref, handle_undefined_incref);
+DEFINE_INTERN_WEAK_ALIAS(handle_fifohandle_decref, handle_undefined_decref);
+DEFINE_INTERN_WEAK_ALIAS(handle_fifohandle_tryincref, handle_undefined_tryincref);
+DEFINE_INTERN_WEAK_ALIAS(handle_fifohandle_weakgetref, handle_undefined_weakgetref);
+DEFINE_INTERN_WEAK_ALIAS(handle_fifohandle_weaklckref, handle_undefined_weaklckref);
+DEFINE_INTERN_WEAK_ALIAS(handle_fifohandle_weakdecref, handle_undefined_weakdecref);
+DEFINE_INTERN_WEAK_ALIAS(handle_fifohandle_read, handle_undefined_read);
+DEFINE_INTERN_WEAK_ALIAS(handle_fifohandle_write, handle_undefined_write);
+DEFINE_INTERN_WEAK_ALIAS(handle_fifohandle_pread, handle_undefined_pread);
+DEFINE_INTERN_WEAK_ALIAS(handle_fifohandle_pwrite, handle_undefined_pwrite);
+DEFINE_INTERN_WEAK_ALIAS(handle_fifohandle_readv, handle_undefined_readv);
+DEFINE_INTERN_WEAK_ALIAS(handle_fifohandle_writev, handle_undefined_writev);
+DEFINE_INTERN_WEAK_ALIAS(handle_fifohandle_preadv, handle_undefined_preadv);
+DEFINE_INTERN_WEAK_ALIAS(handle_fifohandle_pwritev, handle_undefined_pwritev);
+DEFINE_INTERN_WEAK_ALIAS(handle_fifohandle_readdir, handle_undefined_readdir);
+DEFINE_INTERN_WEAK_ALIAS(handle_fifohandle_seek, handle_undefined_seek);
+DEFINE_INTERN_WEAK_ALIAS(handle_fifohandle_ioctl, handle_undefined_ioctl);
+DEFINE_INTERN_WEAK_ALIAS(handle_fifohandle_truncate, handle_undefined_truncate);
+DEFINE_INTERN_WEAK_ALIAS(handle_fifohandle_mmap, handle_undefined_mmap);
+DEFINE_INTERN_WEAK_ALIAS(handle_fifohandle_allocate, handle_undefined_allocate);
+DEFINE_INTERN_WEAK_ALIAS(handle_fifohandle_sync, handle_undefined_sync);
+DEFINE_INTERN_WEAK_ALIAS(handle_fifohandle_datasync, handle_undefined_datasync);
+DEFINE_INTERN_WEAK_ALIAS(handle_fifohandle_stat, handle_undefined_stat);
+DEFINE_INTERN_WEAK_ALIAS(handle_fifohandle_pollconnect, handle_undefined_pollconnect);
+DEFINE_INTERN_WEAK_ALIAS(handle_fifohandle_polltest, handle_undefined_polltest);
+DEFINE_INTERN_WEAK_ALIAS(handle_fifohandle_hop, handle_undefined_hop);
+DEFINE_INTERN_WEAK_ALIAS(handle_fifohandle_tryas, handle_undefined_tryas);
+INTERN NONNULL((1, 2)) ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fifohandle.printlink") ssize_t KCALL
+handle_fifohandle_printlink(struct fifohandle *__restrict self, pformatprinter printer, void *arg) THROWS(E_WOULDBLOCK, ...) {
+	return handle_generic_printlink(self, HANDLE_TYPE_FIFOHANDLE, printer, arg);
 }
 
 /* Weakly define operators for `HANDLE_TYPE_EVENTFD_FENCE' (`struct eventfd') */

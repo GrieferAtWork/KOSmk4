@@ -24,6 +24,7 @@
 
 #include <fs/vfs.h>
 #include <kernel/fs/dirent.h>
+#include <kernel/fs/fifohandle.h>
 #include <kernel/fs/fifonode.h>
 #include <kernel/handle-proto.h>
 #include <kernel/handle.h>
@@ -37,7 +38,7 @@
 #include <kos/except.h>
 #include <kos/except/reason/inval.h>
 #include <kos/hop/pipe.h>
-#include <kos/kernel/handle.h> /* HANDLE_TYPE_FIFO_USER */
+#include <kos/kernel/handle.h> /* HANDLE_TYPE_FIFOHANDLE */
 #include <sys/stat.h>
 
 #include <assert.h>
@@ -46,7 +47,7 @@
 DECL_BEGIN
 
 /* Default operator for opening ffifonode files. This will construct
- * a  `struct fifo_user' (HANDLE_TYPE_FIFO_USER) object and write it
+ * a  `struct fifohandle' (HANDLE_TYPE_FIFOHANDLE) object and write it
  * back to `hand'. */
 PUBLIC NONNULL((1, 2)) void KCALL
 ffifonode_v_open(struct mfile *__restrict self,
@@ -55,14 +56,14 @@ ffifonode_v_open(struct mfile *__restrict self,
                  struct fdirent *access_dent)
 		THROWS(E_BADALLOC, E_WOULDBLOCK, E_INVALID_ARGUMENT_BAD_STATE) {
 	struct ffifonode *me;
-	REF struct fifo_user *obj;
+	REF struct fifohandle *obj;
 	assert(hand->h_data == self);
 	me  = mfile_asfifo(self);
-	obj = fifo_user_create(me, hand->h_mode, access_path, access_dent);
+	obj = fifohandle_new(me, hand->h_mode, access_path, access_dent);
 
 	/* Write-back the new object */
 	hand->h_data = obj; /* Inherit reference */
-	hand->h_type = HANDLE_TYPE_FIFO_USER;
+	hand->h_type = HANDLE_TYPE_FIFOHANDLE;
 
 	/* Old reference from `hand->h_data' */
 	decref_nokill(self);
@@ -337,20 +338,20 @@ ffifonode_v_hop(struct mfile *__restrict self, syscall_ulong_t cmd,
 	case HOP_PIPE_CREATE_READER: {
 		struct handle temp;
 		require(CAP_PIPE_CREATE_WRAPPERS);
-		temp.h_type = HANDLE_TYPE_FIFO_USER;
+		temp.h_type = HANDLE_TYPE_FIFOHANDLE;
 		temp.h_mode = (mode & ~IO_ACCMODE) | IO_RDONLY;
-		temp.h_data = fifo_user_create(me, temp.h_mode, NULL, NULL);
-		FINALLY_DECREF_UNLIKELY((REF struct fifo_user *)temp.h_data);
+		temp.h_data = fifohandle_new(me, temp.h_mode, NULL, NULL);
+		FINALLY_DECREF_UNLIKELY((REF struct fifohandle *)temp.h_data);
 		return handle_installhop((USER UNCHECKED struct hop_openfd *)arg, temp);
 	}	break;
 
 	case HOP_PIPE_CREATE_WRITER: {
 		struct handle temp;
 		require(CAP_PIPE_CREATE_WRAPPERS);
-		temp.h_type = HANDLE_TYPE_FIFO_USER;
+		temp.h_type = HANDLE_TYPE_FIFOHANDLE;
 		temp.h_mode = (mode & ~IO_ACCMODE) | IO_WRONLY;
-		temp.h_data = fifo_user_create(me, temp.h_mode, NULL, NULL);
-		FINALLY_DECREF_UNLIKELY((REF struct fifo_user *)temp.h_data);
+		temp.h_data = fifohandle_new(me, temp.h_mode, NULL, NULL);
+		FINALLY_DECREF_UNLIKELY((REF struct fifohandle *)temp.h_data);
 		return handle_installhop((USER UNCHECKED struct hop_openfd *)arg, temp);
 	}	break;
 
@@ -368,199 +369,6 @@ NOTHROW(KCALL ffifonode_v_destroy)(struct mfile *__restrict self) {
 	/* Finalize the FIFO buffer. */
 	ringbuffer_fini(&me->ff_buffer);
 	fnode_v_destroy(self);
-}
-
-
-
-/************************************************************************/
-/* HANDLE_TYPE_FIFO_USER                                                */
-/************************************************************************/
-DEFINE_HANDLE_REFCNT_FUNCTIONS(fifo_user, struct fifo_user);
-
-/* Handle operators */
-INTERN WUNUSED NONNULL((1)) size_t KCALL
-handle_fifo_user_read(struct fifo_user *__restrict self, USER CHECKED void *dst,
-                      size_t num_bytes, iomode_t mode) THROWS(...) {
-	return ffifonode_v_read(self->fu_fifo, dst, num_bytes, mode);
-}
-
-INTERN WUNUSED NONNULL((1)) size_t KCALL
-handle_fifo_user_write(struct fifo_user *__restrict self, USER CHECKED void const *src,
-                       size_t num_bytes, iomode_t mode) THROWS(...) {
-	return ffifonode_v_write(self->fu_fifo, src, num_bytes, mode);
-}
-
-INTERN WUNUSED NONNULL((1, 2)) size_t KCALL
-handle_fifo_user_readv(struct fifo_user *__restrict self,
-                       struct iov_buffer *__restrict dst,
-                       size_t num_bytes, iomode_t mode) THROWS(...) {
-	return ffifonode_v_readv(self->fu_fifo, dst, num_bytes, mode);
-}
-
-INTERN WUNUSED NONNULL((1, 2)) size_t KCALL
-handle_fifo_user_writev(struct fifo_user *__restrict self,
-                        struct iov_buffer *__restrict src,
-                        size_t num_bytes, iomode_t mode) THROWS(...) {
-	return ffifonode_v_writev(self->fu_fifo, src, num_bytes, mode);
-}
-
-INTERN NONNULL((1)) syscall_slong_t KCALL
-handle_fifo_user_ioctl(struct fifo_user *__restrict self, syscall_ulong_t cmd,
-                       USER UNCHECKED void *arg, iomode_t mode) THROWS(...) {
-	return mfile_uioctl(self->fu_fifo, cmd, arg, mode);
-}
-
-INTERN NONNULL((1)) void KCALL
-handle_fifo_user_truncate(struct fifo_user *__restrict self,
-                          pos_t new_size) THROWS(...) {
-	ffifonode_v_truncate(self->fu_fifo, new_size);
-}
-
-INTERN NONNULL((1)) void KCALL
-handle_fifo_user_stat(struct fifo_user *__restrict self,
-                      USER CHECKED struct stat *result) THROWS(...) {
-	mfile_ustat(self->fu_fifo, result);
-}
-
-INTERN NONNULL((1)) void KCALL
-handle_fifo_user_pollconnect(struct fifo_user *__restrict self,
-                             poll_mode_t what) THROWS(...) {
-	struct ringbuffer *rb = &self->fu_fifo->ff_buffer;
-	if (what & POLLINMASK)
-		ringbuffer_pollconnect_read(rb);
-	if (what & POLLOUTMASK)
-		ringbuffer_pollconnect_write(rb);
-}
-
-INTERN WUNUSED NONNULL((1)) poll_mode_t KCALL
-handle_fifo_user_polltest(struct fifo_user *__restrict self,
-                          poll_mode_t what) {
-	poll_mode_t result = 0;
-	struct ringbuffer *rb = &self->fu_fifo->ff_buffer;
-	if ((what & POLLINMASK) && ringbuffer_canread(rb))
-		result |= POLLINMASK;
-	if ((what & POLLOUTMASK) && ringbuffer_canwrite(rb))
-		result |= POLLOUTMASK;
-	return result;
-}
-
-INTERN NONNULL((1)) syscall_slong_t KCALL
-handle_fifo_user_hop(struct fifo_user *__restrict self, syscall_ulong_t cmd,
-                     USER UNCHECKED void *arg, iomode_t mode) THROWS(...) {
-	return ffifonode_v_hop(self->fu_fifo, cmd, arg, mode);
-}
-
-INTERN NONNULL((1)) REF void *KCALL
-handle_fifo_user_tryas(struct fifo_user *__restrict self,
-                       uintptr_half_t wanted_type)
-		THROWS(E_WOULDBLOCK) {
-	switch (wanted_type) {
-	case HANDLE_TYPE_MFILE: return incref(self->fu_fifo);
-	case HANDLE_TYPE_FDIRENT: return xincref(self->fu_dirent);
-	case HANDLE_TYPE_PATH: return xincref(self->fu_path);
-	default: break;
-	}
-	return mfile_utryas(self->fu_fifo, wanted_type);
-}
-
-
-/* Object destructor */
-PUBLIC NOBLOCK NONNULL((1)) void
-NOTHROW(FCALL fifo_user_destroy)(struct fifo_user *__restrict self) {
-	REF struct ffifonode *fifo;
-	fifo = self->fu_fifo;
-	if (IO_CANREAD(self->fu_accmode)) {
-		if (ATOMIC_FETCHDEC(fifo->ff_rdcnt) == 1)
-			sig_broadcast(&fifo->ff_buffer.rb_nfull);
-	}
-	if (IO_CANWRITE(self->fu_accmode)) {
-		if (ATOMIC_FETCHDEC(fifo->ff_wrcnt) == 1)
-			sig_broadcast(&fifo->ff_buffer.rb_nempty);
-	}
-	decref(fifo);
-	xdecref(self->fu_dirent);
-	xdecref(self->fu_path);
-	kfree(self);
-}
-
-/* Create a reader/writer for the given fifo `self'
- * NOTE: If  applicable,  the  caller  should  fill  in `fu_path'
- *       and/or `fu_dirent' directly after calling this function.
- * @param: iomode: Set of `IO_ACCMODE | IO_NONBLOCK' (other bits are silently ignored)
- * @throw: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_OPEN_FIFO_WRITER_NO_READERS: [...] */
-PUBLIC ATTR_MALLOC ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct fifo_user *FCALL
-fifo_user_create(struct ffifonode *__restrict self, iomode_t iomode,
-                 struct path *access_path, struct fdirent *access_dent)
-		THROWS(E_BADALLOC, E_WOULDBLOCK, E_INVALID_ARGUMENT_BAD_STATE) {
-	REF struct fifo_user *result;
-	assert(!task_wasconnected());
-	assert((iomode & ~(IO_ACCMODE | IO_NONBLOCK)) == 0);
-	result = (REF struct fifo_user *)kmalloc(sizeof(struct fifo_user),
-	                                         GFP_NORMAL);
-	/* Register a new reader/writer/both */
-	TRY {
-		switch (iomode & IO_ACCMODE) {
-
-		case IO_RDONLY:
-			for (;;) {
-				if (ATOMIC_READ(self->ff_wrcnt) != 0)
-					break;
-				/* Opening a fifo as non-blocking for reading always succeeds. */
-				if (iomode & IO_NONBLOCK)
-					break;
-				task_connect_for_poll(&self->ff_buffer.rb_nempty);
-				if (ATOMIC_READ(self->ff_wrcnt) != 0) {
-					task_disconnectall();
-					break;
-				}
-				/* Wait for writers to show up */
-				task_waitfor();
-			}
-			if (ATOMIC_FETCHINC(self->ff_rdcnt) == 0)
-				sig_broadcast(&self->ff_buffer.rb_nfull);
-			break;
-
-		case IO_WRONLY:
-			for (;;) {
-				if (ATOMIC_READ(self->ff_rdcnt) != 0)
-					break;
-				/* POSIX says that without any readers, opening a FIFO in
-				 * non-block mode should have us throw some kind of error
-				 * that will result in `ENXIO' */
-				if (iomode & IO_NONBLOCK) {
-					THROW(E_INVALID_ARGUMENT_BAD_STATE,
-					      E_INVALID_ARGUMENT_CONTEXT_OPEN_FIFO_WRITER_NO_READERS);
-				}
-				task_connect_for_poll(&self->ff_buffer.rb_nfull);
-				if (ATOMIC_READ(self->ff_rdcnt) != 0) {
-					task_disconnectall();
-					break;
-				}
-				/* Wait for readers to show up */
-				task_waitfor();
-			}
-			if (ATOMIC_FETCHINC(self->ff_wrcnt) == 0)
-				sig_broadcast(&self->ff_buffer.rb_nempty);
-			break;
-
-		default:
-			if (ATOMIC_FETCHINC(self->ff_rdcnt) == 0)
-				sig_broadcast(&self->ff_buffer.rb_nfull);
-			if (ATOMIC_FETCHINC(self->ff_wrcnt) == 0)
-				sig_broadcast(&self->ff_buffer.rb_nempty);
-			break;
-		}
-	} EXCEPT {
-		kfree(result);
-		RETHROW();
-	}
-	/* Fill in fields of the new FIFO user object. */
-	result->fu_refcnt  = 1;
-	result->fu_fifo    = (REF struct ffifonode *)incref(self);
-	result->fu_accmode = iomode & IO_ACCMODE;
-	result->fu_path    = xincref(access_path);
-	result->fu_dirent  = xincref(access_dent);
-	return result;
 }
 
 

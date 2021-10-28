@@ -2335,9 +2335,9 @@ DEFINE_SYSCALL4(ssize_t, frealpath4,
 			}
 		}	break;
 
-		case HANDLE_TYPE_FIFO_USER: {
-			struct fifo_user *me;
-			me = (struct fifo_user *)hnd.h_data;
+		case HANDLE_TYPE_FIFOHANDLE: {
+			struct fifohandle *me;
+			me = (struct fifohandle *)hnd.h_data;
 			if unlikely(!me->fu_path)
 				goto bad_handle_type;
 			if unlikely(!me->fu_dirent)

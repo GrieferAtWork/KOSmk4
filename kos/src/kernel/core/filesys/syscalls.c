@@ -34,6 +34,7 @@
 #include <kernel/fs/dirent.h>
 #include <kernel/fs/dirhandle.h>
 #include <kernel/fs/dirnode.h>
+#include <kernel/fs/fifohandle.h>
 #include <kernel/fs/filehandle.h>
 #include <kernel/fs/filesys.h>
 #include <kernel/fs/node.h>
@@ -1467,11 +1468,11 @@ DEFINE_SYSCALL4(ssize_t, frealpath4,
 
 		case HANDLE_TYPE_FILEHANDLE:
 		case HANDLE_TYPE_DIRHANDLE:
-		case HANDLE_TYPE_FIFO_USER: {
+		case HANDLE_TYPE_FIFOHANDLE: {
 			STATIC_ASSERT(offsetof(struct filehandle, fh_path) == offsetof(struct dirhandle, dh_path));
 			STATIC_ASSERT(offsetof(struct filehandle, fh_dirent) == offsetof(struct dirhandle, dh_dirent));
-			STATIC_ASSERT(offsetof(struct filehandle, fh_path) == offsetof(struct fifo_user, fu_path));
-			STATIC_ASSERT(offsetof(struct filehandle, fh_dirent) == offsetof(struct fifo_user, fu_dirent));
+			STATIC_ASSERT(offsetof(struct filehandle, fh_path) == offsetof(struct fifohandle, fu_path));
+			STATIC_ASSERT(offsetof(struct filehandle, fh_dirent) == offsetof(struct fifohandle, fu_dirent));
 			struct filehandle *me;
 			me = (struct filehandle *)hand.h_data;
 			if unlikely(!me->fh_path)

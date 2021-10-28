@@ -163,8 +163,8 @@ struct path;
 struct fdirent;
 struct handle;
 
-/* Default operator for opening ffifonode files. This will construct
- * a  `struct fifo_user' (HANDLE_TYPE_FIFO_USER) object and write it
+/* Default operator for opening ffifonode files. This will  construct
+ * a `struct fifohandle' (HANDLE_TYPE_FIFOHANDLE) object and write it
  * back to `hand'. */
 FUNDEF NONNULL((1, 2)) void KCALL
 ffifonode_v_open(struct mfile *__restrict self,
@@ -254,32 +254,6 @@ NOTHROW(KCALL ffifonode_v_destroy)(struct mfile *__restrict self);
 
 /* Finalize a partially initialized `struct ffifonode' (as initialized by `_ffifonode_init()') */
 #define _ffifonode_fini(self) decref_nokill((self)->_ffifonode_node_ fn_super)
-
-
-
-
-struct fifo_user {
-	/* HANDLE:HANDLE_TYPE_FIFO_USER */
-	WEAK refcnt_t         fu_refcnt;  /* Reference counter */
-	REF struct ffifonode *fu_fifo;    /* [1..1][const] The associated fifo. */
-	REF struct path      *fu_path;    /* [0..1][const] The path from which `fr_fifo' was opened. */
-	REF struct fdirent   *fu_dirent;  /* [0..1][const] The directory entry associated with `fr_fifo' that was used to open the fifo. */
-	iomode_t              fu_accmode; /* [const] Original I/O mode with which this fifo user was opened (masked by IO_ACCMODE). */
-};
-
-FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL fifo_user_destroy)(struct fifo_user *__restrict self);
-DEFINE_REFCOUNT_FUNCTIONS(struct fifo_user, fu_refcnt, fifo_user_destroy)
-
-/* Create a reader/writer for the given fifo `self'
- * NOTE: If  applicable,  the  caller  should  fill  in `fu_path'
- *       and/or `fu_dirent' directly after calling this function.
- * @param: iomode: Set of `IO_ACCMODE | IO_NONBLOCK' (other bits are silently ignored)
- * @throw: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_OPEN_FIFO_WRITER_NO_READERS: [...] */
-FUNDEF ATTR_MALLOC ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct fifo_user *FCALL
-fifo_user_create(struct ffifonode *__restrict self, iomode_t iomode,
-                 struct path *access_path, struct fdirent *access_dent)
-		THROWS(E_BADALLOC, E_WOULDBLOCK, E_INVALID_ARGUMENT_BAD_STATE);
-
 
 DECL_END
 #endif /* __CC__ */

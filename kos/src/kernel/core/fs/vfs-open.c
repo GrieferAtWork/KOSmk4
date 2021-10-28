@@ -516,15 +516,15 @@ check_result_inode_for_symlink:
 
 				case S_IFIFO: {
 					struct fifo_node *fn;
-					REF struct fifo_user *user;
+					REF struct fifohandle *user;
 					STATIC_ASSERT(IO_ACCMODE == O_ACCMODE);
 					STATIC_ASSERT(IO_NONBLOCK == O_NONBLOCK);
 					fn   = (struct fifo_node *)result_inode;
-					user = fifo_user_create(fn, (iomode_t)(oflags & (O_ACCMODE | O_NONBLOCK)));
+					user = fifohandle_new(fn, (iomode_t)(oflags & (O_ACCMODE | O_NONBLOCK)));
 					user->fu_path   = result_containing_path;   /* Inherit reference */
 					user->fu_dirent = result_containing_dirent; /* Inherit reference */
 					COMPILER_WRITE_BARRIER();
-					result.h_type = HANDLE_TYPE_FIFO_USER;
+					result.h_type = HANDLE_TYPE_FIFOHANDLE;
 					result.h_data = user;
 					decref_unlikely(result_containing_directory);
 					decref_nokill(result_inode); /* Nokill, because one ref exists in `user->fu_fifo' */

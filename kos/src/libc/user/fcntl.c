@@ -72,19 +72,17 @@ NOTHROW(LIBCCALL oflag_dos2kos)(oflag_t dos_oflags) {
 
 
 
-/*[[[head:libd_open,hash:CRC-32=0xa46391b0]]]*/
+/*[[[head:libd_open,hash:CRC-32=0xb84beca8]]]*/
 /* >> open(2), open64(2), openat(2), openat64(2)
  * Open  a  new  file  handle  to  the  file  specified  by `filename'
  * When  `oflags & O_CREAT',   then  `mode'   specifies  the   initial
  * file  access  permissions with  which  the file  should  be opened.
  * On KOS, the returned handle can be anything, but is usually one of:
  *   - HANDLE_TYPE_PATH:       When `O_PATH' was given
- *   - HANDLE_TYPE_BLKDEV:     For `S_IFBLK' files
- *   - HANDLE_TYPE_CHRDEV:     For `S_IFCHR' files (in this case, `O_NOCTTY' gains meaning)
- *   - HANDLE_TYPE_FIFO_USER:  For `S_IFIFO' files
- *   - HANDLE_TYPE_MFILE:      For `S_IFLNK' files (only when `O_SYMLINK' was given)
- *   - HANDLE_TYPE_DIRHANDLE:  For `S_IFDIR' files from special one-shot directories
- *   - HANDLE_TYPE_FILEHANDLE: For `S_IFREG' and `S_IFDIR' (~normal~) files
+ *   - HANDLE_TYPE_FILEHANDLE: For `S_IFREG' regular files
+ *   - HANDLE_TYPE_FIFOHANDLE: For `S_IFIFO' pipe files
+ *   - HANDLE_TYPE_DIRHANDLE:  For `S_IFDIR' directories
+ *   - HANDLE_TYPE_MFILE:      The actual filesystem object (including device files)
  *   - *:                      Certain filesystem names can literally return anything, such
  *                             as `/proc/self/fd/1234',  which  is  more  like  `dup(1234)' */
 INTERN ATTR_SECTION(".text.crt.dos.io.access") WUNUSED NONNULL((1)) fd_t
@@ -126,19 +124,17 @@ NOTHROW_RPC(VLIBDCALL libd_open)(char const *filename,
 }
 /*[[[end:libd_open]]]*/
 
-/*[[[head:libc_open,hash:CRC-32=0xd6a045bd]]]*/
+/*[[[head:libc_open,hash:CRC-32=0x66528cb7]]]*/
 /* >> open(2), open64(2), openat(2), openat64(2)
  * Open  a  new  file  handle  to  the  file  specified  by `filename'
  * When  `oflags & O_CREAT',   then  `mode'   specifies  the   initial
  * file  access  permissions with  which  the file  should  be opened.
  * On KOS, the returned handle can be anything, but is usually one of:
  *   - HANDLE_TYPE_PATH:       When `O_PATH' was given
- *   - HANDLE_TYPE_BLKDEV:     For `S_IFBLK' files
- *   - HANDLE_TYPE_CHRDEV:     For `S_IFCHR' files (in this case, `O_NOCTTY' gains meaning)
- *   - HANDLE_TYPE_FIFO_USER:  For `S_IFIFO' files
- *   - HANDLE_TYPE_MFILE:      For `S_IFLNK' files (only when `O_SYMLINK' was given)
- *   - HANDLE_TYPE_DIRHANDLE:  For `S_IFDIR' files from special one-shot directories
- *   - HANDLE_TYPE_FILEHANDLE: For `S_IFREG' and `S_IFDIR' (~normal~) files
+ *   - HANDLE_TYPE_FILEHANDLE: For `S_IFREG' regular files
+ *   - HANDLE_TYPE_FIFOHANDLE: For `S_IFIFO' pipe files
+ *   - HANDLE_TYPE_DIRHANDLE:  For `S_IFDIR' directories
+ *   - HANDLE_TYPE_MFILE:      The actual filesystem object (including device files)
  *   - *:                      Certain filesystem names can literally return anything, such
  *                             as `/proc/self/fd/1234',  which  is  more  like  `dup(1234)' */
 INTERN ATTR_SECTION(".text.crt.io.access") WUNUSED NONNULL((1)) fd_t
@@ -197,19 +193,17 @@ NOTHROW_RPC(LIBCCALL libc_creat)(char const *filename,
 }
 /*[[[end:libc_creat]]]*/
 
-/*[[[head:libd_openat,hash:CRC-32=0xb1fbbac3]]]*/
+/*[[[head:libd_openat,hash:CRC-32=0x2e83545b]]]*/
 /* >> open(2), open64(2), openat(2), openat64(2)
  * Open  a  new  file  handle  to  the  file  specified  by `filename'
  * When  `oflags & O_CREAT',   then  `mode'   specifies  the   initial
  * file  access  permissions with  which  the file  should  be opened.
  * On KOS, the returned handle can be anything, but is usually one of:
  *   - HANDLE_TYPE_PATH:       When `O_PATH' was given
- *   - HANDLE_TYPE_BLKDEV:     For `S_IFBLK' files
- *   - HANDLE_TYPE_CHRDEV:     For `S_IFCHR' files (in this case, `O_NOCTTY' gains meaning)
- *   - HANDLE_TYPE_FIFO_USER:  For `S_IFIFO' files
- *   - HANDLE_TYPE_MFILE:      For `S_IFLNK' files (only when `O_SYMLINK' was given)
- *   - HANDLE_TYPE_DIRHANDLE:  For `S_IFDIR' files from special one-shot directories
- *   - HANDLE_TYPE_FILEHANDLE: For `S_IFREG' and `S_IFDIR' (~normal~) files
+ *   - HANDLE_TYPE_FILEHANDLE: For `S_IFREG' regular files
+ *   - HANDLE_TYPE_FIFOHANDLE: For `S_IFIFO' pipe files
+ *   - HANDLE_TYPE_DIRHANDLE:  For `S_IFDIR' directories
+ *   - HANDLE_TYPE_MFILE:      The actual filesystem object (including device files)
  *   - *:                      Certain filesystem names can literally return anything, such
  *                             as `/proc/self/fd/1234',  which  is  more  like  `dup(1234)' */
 INTERN ATTR_SECTION(".text.crt.dos.io.access") WUNUSED NONNULL((2)) fd_t
@@ -242,19 +236,17 @@ NOTHROW_RPC(VLIBDCALL libd_openat)(fd_t dirfd,
 }
 /*[[[end:libd_openat]]]*/
 
-/*[[[head:libc_openat,hash:CRC-32=0xbcf5dee0]]]*/
+/*[[[head:libc_openat,hash:CRC-32=0xe0670da2]]]*/
 /* >> open(2), open64(2), openat(2), openat64(2)
  * Open  a  new  file  handle  to  the  file  specified  by `filename'
  * When  `oflags & O_CREAT',   then  `mode'   specifies  the   initial
  * file  access  permissions with  which  the file  should  be opened.
  * On KOS, the returned handle can be anything, but is usually one of:
  *   - HANDLE_TYPE_PATH:       When `O_PATH' was given
- *   - HANDLE_TYPE_BLKDEV:     For `S_IFBLK' files
- *   - HANDLE_TYPE_CHRDEV:     For `S_IFCHR' files (in this case, `O_NOCTTY' gains meaning)
- *   - HANDLE_TYPE_FIFO_USER:  For `S_IFIFO' files
- *   - HANDLE_TYPE_MFILE:      For `S_IFLNK' files (only when `O_SYMLINK' was given)
- *   - HANDLE_TYPE_DIRHANDLE:  For `S_IFDIR' files from special one-shot directories
- *   - HANDLE_TYPE_FILEHANDLE: For `S_IFREG' and `S_IFDIR' (~normal~) files
+ *   - HANDLE_TYPE_FILEHANDLE: For `S_IFREG' regular files
+ *   - HANDLE_TYPE_FIFOHANDLE: For `S_IFIFO' pipe files
+ *   - HANDLE_TYPE_DIRHANDLE:  For `S_IFDIR' directories
+ *   - HANDLE_TYPE_MFILE:      The actual filesystem object (including device files)
  *   - *:                      Certain filesystem names can literally return anything, such
  *                             as `/proc/self/fd/1234',  which  is  more  like  `dup(1234)' */
 INTERN ATTR_SECTION(".text.crt.io.access") WUNUSED NONNULL((2)) fd_t

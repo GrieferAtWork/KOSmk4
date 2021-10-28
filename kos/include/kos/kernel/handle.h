@@ -58,7 +58,7 @@
 #define HANDLE_TYPE_PIPE            0x0004 /* `struct pipe' */
 #define HANDLE_TYPE_PIPE_READER     0x0005 /* `struct pipe_reader' */
 #define HANDLE_TYPE_PIPE_WRITER     0x0006 /* `struct pipe_writer' */
-#define HANDLE_TYPE_FIFO_USER       0x0007 /* `struct fifo_user' */
+#define HANDLE_TYPE_FIFOHANDLE      0x0007 /* `struct fifohandle' */
 #define HANDLE_TYPE_EVENTFD_FENCE   0x0008 /* `struct eventfd' (without `EFD_SEMAPHORE') */
 #define HANDLE_TYPE_EVENTFD_SEMA    0x0009 /* `struct eventfd' (with `EFD_SEMAPHORE') */
 #define HANDLE_TYPE_SIGNALFD        0x000a /* `struct signalfd' */

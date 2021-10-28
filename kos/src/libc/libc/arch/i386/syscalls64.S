@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8bbbf694 */
+/* HASH CRC-32:0x434be1c4 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -60,12 +60,10 @@ DEFINE_PUBLIC_ALIAS(sys_write, libc_sys_write)
  * file  access  permissions with  which  the file  should  be opened.
  * On KOS, the returned handle can be anything, but is usually one of:
  *   - HANDLE_TYPE_PATH:       When `O_PATH' was given
- *   - HANDLE_TYPE_BLKDEV:     For `S_IFBLK' files
- *   - HANDLE_TYPE_CHRDEV:     For `S_IFCHR' files (in this case, `O_NOCTTY' gains meaning)
- *   - HANDLE_TYPE_FIFO_USER:  For `S_IFIFO' files
- *   - HANDLE_TYPE_MFILE:      For `S_IFLNK' files (only when `O_SYMLINK' was given)
- *   - HANDLE_TYPE_DIRHANDLE:  For `S_IFDIR' files from special one-shot directories
- *   - HANDLE_TYPE_FILEHANDLE: For `S_IFREG' and `S_IFDIR' (~normal~) files
+ *   - HANDLE_TYPE_FILEHANDLE: For `S_IFREG' regular files
+ *   - HANDLE_TYPE_FIFOHANDLE: For `S_IFIFO' pipe files
+ *   - HANDLE_TYPE_DIRHANDLE:  For `S_IFDIR' directories
+ *   - HANDLE_TYPE_MFILE:      The actual filesystem object (including device files)
  *   - *:                      Certain filesystem names can literally return anything, such
  *                             as `/proc/self/fd/1234',  which  is  more  like  `dup(1234)' */
 /* fd_t open(char const *filename, oflag_t oflags, mode_t mode) */
@@ -2546,12 +2544,10 @@ DEFINE_PUBLIC_ALIAS(sys_migrate_pages, libc_sys_migrate_pages)
  * file  access  permissions with  which  the file  should  be opened.
  * On KOS, the returned handle can be anything, but is usually one of:
  *   - HANDLE_TYPE_PATH:       When `O_PATH' was given
- *   - HANDLE_TYPE_BLKDEV:     For `S_IFBLK' files
- *   - HANDLE_TYPE_CHRDEV:     For `S_IFCHR' files (in this case, `O_NOCTTY' gains meaning)
- *   - HANDLE_TYPE_FIFO_USER:  For `S_IFIFO' files
- *   - HANDLE_TYPE_MFILE:      For `S_IFLNK' files (only when `O_SYMLINK' was given)
- *   - HANDLE_TYPE_DIRHANDLE:  For `S_IFDIR' files from special one-shot directories
- *   - HANDLE_TYPE_FILEHANDLE: For `S_IFREG' and `S_IFDIR' (~normal~) files
+ *   - HANDLE_TYPE_FILEHANDLE: For `S_IFREG' regular files
+ *   - HANDLE_TYPE_FIFOHANDLE: For `S_IFIFO' pipe files
+ *   - HANDLE_TYPE_DIRHANDLE:  For `S_IFDIR' directories
+ *   - HANDLE_TYPE_MFILE:      The actual filesystem object (including device files)
  *   - *:                      Certain filesystem names can literally return anything, such
  *                             as `/proc/self/fd/1234',  which  is  more  like  `dup(1234)' */
 /* fd_t openat(fd_t dirfd, char const *filename, oflag_t oflags, mode_t mode) */
@@ -4355,12 +4351,10 @@ DEFINE_PUBLIC_ALIAS(sys_Xwrite, libc_sys_Xwrite)
  * file  access  permissions with  which  the file  should  be opened.
  * On KOS, the returned handle can be anything, but is usually one of:
  *   - HANDLE_TYPE_PATH:       When `O_PATH' was given
- *   - HANDLE_TYPE_BLKDEV:     For `S_IFBLK' files
- *   - HANDLE_TYPE_CHRDEV:     For `S_IFCHR' files (in this case, `O_NOCTTY' gains meaning)
- *   - HANDLE_TYPE_FIFO_USER:  For `S_IFIFO' files
- *   - HANDLE_TYPE_MFILE:      For `S_IFLNK' files (only when `O_SYMLINK' was given)
- *   - HANDLE_TYPE_DIRHANDLE:  For `S_IFDIR' files from special one-shot directories
- *   - HANDLE_TYPE_FILEHANDLE: For `S_IFREG' and `S_IFDIR' (~normal~) files
+ *   - HANDLE_TYPE_FILEHANDLE: For `S_IFREG' regular files
+ *   - HANDLE_TYPE_FIFOHANDLE: For `S_IFIFO' pipe files
+ *   - HANDLE_TYPE_DIRHANDLE:  For `S_IFDIR' directories
+ *   - HANDLE_TYPE_MFILE:      The actual filesystem object (including device files)
  *   - *:                      Certain filesystem names can literally return anything, such
  *                             as `/proc/self/fd/1234',  which  is  more  like  `dup(1234)' */
 /* fd_t open(char const *filename, oflag_t oflags, mode_t mode) */
@@ -7327,12 +7321,10 @@ DEFINE_PUBLIC_ALIAS(sys_Xmigrate_pages, libc_sys_Xmigrate_pages)
  * file  access  permissions with  which  the file  should  be opened.
  * On KOS, the returned handle can be anything, but is usually one of:
  *   - HANDLE_TYPE_PATH:       When `O_PATH' was given
- *   - HANDLE_TYPE_BLKDEV:     For `S_IFBLK' files
- *   - HANDLE_TYPE_CHRDEV:     For `S_IFCHR' files (in this case, `O_NOCTTY' gains meaning)
- *   - HANDLE_TYPE_FIFO_USER:  For `S_IFIFO' files
- *   - HANDLE_TYPE_MFILE:      For `S_IFLNK' files (only when `O_SYMLINK' was given)
- *   - HANDLE_TYPE_DIRHANDLE:  For `S_IFDIR' files from special one-shot directories
- *   - HANDLE_TYPE_FILEHANDLE: For `S_IFREG' and `S_IFDIR' (~normal~) files
+ *   - HANDLE_TYPE_FILEHANDLE: For `S_IFREG' regular files
+ *   - HANDLE_TYPE_FIFOHANDLE: For `S_IFIFO' pipe files
+ *   - HANDLE_TYPE_DIRHANDLE:  For `S_IFDIR' directories
+ *   - HANDLE_TYPE_MFILE:      The actual filesystem object (including device files)
  *   - *:                      Certain filesystem names can literally return anything, such
  *                             as `/proc/self/fd/1234',  which  is  more  like  `dup(1234)' */
 /* fd_t openat(fd_t dirfd, char const *filename, oflag_t oflags, mode_t mode) */

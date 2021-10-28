@@ -34,6 +34,8 @@
 #include <fs/special-node.h>
 #include <fs/vfs.h>
 #include <kernel/except.h>
+#include <kernel/fs/fifohandle.h>
+#include <kernel/fs/fifonode.h>
 #include <kernel/handle.h>
 #include <kernel/malloc.h>
 #include <kernel/mman/event.h>
@@ -2373,9 +2375,9 @@ handle_fcntl(struct handle_manager *__restrict self,
 				struct pipe *me;
 				me = (struct pipe *)temp.h_data;
 				rb = &me->p_buffer;
-			} else if (temp.h_type == HANDLE_TYPE_FIFO_USER) {
-				struct fifo_user *me;
-				me = (struct fifo_user *)temp.h_data;
+			} else if (temp.h_type == HANDLE_TYPE_FIFOHANDLE) {
+				struct fifohandle *me;
+				me = (struct fifohandle *)temp.h_data;
 #ifdef CONFIG_USE_NEW_FS
 				rb = &me->fu_fifo->ff_buffer;
 #else /* CONFIG_USE_NEW_FS */
@@ -2416,9 +2418,9 @@ handle_fcntl(struct handle_manager *__restrict self,
 				struct pipe *me;
 				me = (struct pipe *)temp.h_data;
 				rb = &me->p_buffer;
-			} else if (temp.h_type == HANDLE_TYPE_FIFO_USER) {
-				struct fifo_user *me;
-				me = (struct fifo_user *)temp.h_data;
+			} else if (temp.h_type == HANDLE_TYPE_FIFOHANDLE) {
+				struct fifohandle *me;
+				me = (struct fifohandle *)temp.h_data;
 #ifdef CONFIG_USE_NEW_FS
 				rb = &me->fu_fifo->ff_buffer;
 #else /* CONFIG_USE_NEW_FS */

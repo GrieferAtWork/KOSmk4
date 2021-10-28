@@ -149,7 +149,7 @@ struct fifo {
  *    - HANDLE_TYPE_MFILE   (When describing a `struct fifo_node *')
  *    - HANDLE_TYPE_FILEHANDLE
  *    - HANDLE_TYPE_DIRHANDLE
- *    - HANDLE_TYPE_FIFO_USER
+ *    - HANDLE_TYPE_FIFOHANDLE
  * This hop-backend implements command codes normally reserved for pipe
  * objects, thus allowing user-space to  make use of pipe hop  commands
  * with FIFO objects. */
@@ -160,8 +160,8 @@ fifo_hop(struct fifo_node *__restrict self, syscall_ulong_t cmd,
 
 
 
-struct fifo_user {
-	/* HANDLE:HANDLE_TYPE_FIFO_USER */
+struct fifohandle {
+	/* HANDLE:HANDLE_TYPE_FIFOHANDLE */
 	WEAK refcnt_t               fu_refcnt;  /* Reference counter */
 	REF struct fifo_node       *fu_fifo;    /* [1..1][const] The associated fifo. */
 	REF struct path            *fu_path;    /* [0..1][const] The path from which `fr_fifo' was opened. */
@@ -169,16 +169,16 @@ struct fifo_user {
 	iomode_t                    fu_accmode; /* [const] Original I/O mode with which this fifo user was opened (masked by IO_ACCMODE). */
 };
 
-FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL fifo_user_destroy)(struct fifo_user *__restrict self);
-DEFINE_REFCOUNT_FUNCTIONS(struct fifo_user, fu_refcnt, fifo_user_destroy)
+FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL fifohandle_destroy)(struct fifohandle *__restrict self);
+DEFINE_REFCOUNT_FUNCTIONS(struct fifohandle, fu_refcnt, fifohandle_destroy)
 
 /* Create a reader/writer for the given `pipe'
  * NOTE: If applicable, the caller should fill in `fu_path' and/or
  *       `fu_dirent'   directly   after  calling   this  function.
  * @param: iomode: Set of `IO_ACCMODE | IO_NONBLOCK'
  * @throw: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_OPEN_FIFO_WRITER_NO_READERS: [...] */
-FUNDEF ATTR_MALLOC ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct fifo_user *FCALL
-fifo_user_create(struct fifo_node *__restrict self, iomode_t iomode)
+FUNDEF ATTR_MALLOC ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct fifohandle *FCALL
+fifohandle_new(struct fifo_node *__restrict self, iomode_t iomode)
 		THROWS(E_BADALLOC, E_WOULDBLOCK, E_INVALID_ARGUMENT_BAD_STATE);
 
 #endif /* __CC__ */
