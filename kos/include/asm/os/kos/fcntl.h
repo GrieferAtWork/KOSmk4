@@ -108,7 +108,6 @@
 #define __AT_EMPTY_PATH        0x1000 /* Allow empty relative pathname. */
 #ifdef __KOS__
 #if __KOS_VERSION__ >= 300
-#define __AT_SYMLINK_REGULAR   0x2000 /* Treat symbolic links similar to like regular files and throw an `ERROR_FS_TOO_MANY_LINKS' error during the first encounter. */
 #define __AT_CHANGE_CTIME      0x0200 /* For use with `utimensat' and friends: Take `struct timespec[3]', where the 3rd entry
                                        * (when not equal to  `UTIME_OMIT') is used to  override the file creation  timestamp.
                                        * NOTE: Passing this flag when the 3rd  timespec isn't set to `UTIME_OMIT'  requires

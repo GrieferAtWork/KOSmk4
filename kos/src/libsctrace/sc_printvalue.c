@@ -1061,7 +1061,6 @@ PRIVATE struct {
 	{ AT_SYMLINK_FOLLOW,   "AT_SYMLINK_FOLLOW" },
 	{ AT_NO_AUTOMOUNT,     "AT_NO_AUTOMOUNT" },
 	{ AT_EMPTY_PATH,       "AT_EMPTY_PATH" },
-	{ AT_SYMLINK_REGULAR,  "AT_SYMLINK_REGULAR" },
 	{ AT_REMOVEREG,        "AT_REMOVEREG" },
 	{ AT_ALTPATH,          "AT_ALTPATH" },
 	{ AT_DOSPATH,          "AT_DOSPATH" },
@@ -1079,8 +1078,8 @@ print_atflag_t_impl(pformatprinter printer, void *arg,
 	atflag_t valid_mask;
 	valid_mask = (AT_SYMLINK_NOFOLLOW | AT_REMOVEDIR |
 	              AT_SYMLINK_FOLLOW | AT_NO_AUTOMOUNT |
-	              AT_EMPTY_PATH | AT_SYMLINK_REGULAR |
-	              AT_REMOVEREG | AT_ALTPATH | AT_DOSPATH);
+	              AT_EMPTY_PATH | AT_REMOVEREG | AT_ALTPATH |
+	              AT_DOSPATH);
 	if (nameof_AT_READLINK_REQSIZE)
 		valid_mask |= AT_READLINK_REQSIZE;
 	for (i = 0; i < COMPILER_LENOF(atflag_names); ++i) {

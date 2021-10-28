@@ -66,7 +66,6 @@ DECL_BEGIN
 	 (x) == AT_REMOVEDIR ||        \
 	 (x) == AT_EACCESS ||          \
 	 (x) == AT_SYMLINK_FOLLOW ||   \
-	 (x) == AT_SYMLINK_REGULAR ||  \
 	 (x) == AT_CHANGE_CTIME ||     \
 	 (x) == AT_READLINK_REQSIZE || \
 	 (x) == AT_ALTPATH)

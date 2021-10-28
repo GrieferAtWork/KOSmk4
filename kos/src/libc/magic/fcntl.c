@@ -988,12 +988,6 @@ enum __pid_type {
 #endif /* __USE_GNU || __USE_KOS_KERNEL */
 
 #if defined(__USE_KOS) || defined(__USE_KOS_KERNEL)
-/* Treat symbolic links similar to  like regular files and  throw
- * an `ERROR_FS_TOO_MANY_LINKS' error during the first encounter. */
-#if !defined(AT_SYMLINK_REGULAR) && defined(__AT_SYMLINK_REGULAR)
-#define AT_SYMLINK_REGULAR __AT_SYMLINK_REGULAR
-#endif /* !AT_SYMLINK_REGULAR && __AT_SYMLINK_REGULAR */
-
 /* For use with `utimensat' and friends: Take `struct timespec[3]', where the 3rd entry
  * (when not equal to  `UTIME_OMIT') is used to  override the file creation  timestamp.
  * NOTE: Passing this flag when the 3rd  timespec isn't set to `UTIME_OMIT'  requires
