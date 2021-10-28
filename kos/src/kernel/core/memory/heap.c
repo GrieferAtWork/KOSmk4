@@ -199,8 +199,8 @@ NOTHROW(KCALL find_modified_address)(byte_t *start, u32 pattern, size_t num_byte
 	while (num_bytes > 4) {
 		if __untraced(!((uintptr_t)start & PAGEMASK)) {
 			for (;;) {
-#ifdef ARCH_PAGEDIR_HAVE_CHANGED
 				/* If supported by the host, speed this up using page directory dirty bits. */
+#ifdef ARCH_PAGEDIR_HAVE_CHANGED
 				if (pagedir_haschanged(start)) {
 					pagedir_unsetchanged(start);
 					break;
@@ -293,6 +293,7 @@ NOTHROW(KCALL heap_validate_all)(void) {
 PUBLIC NOBLOCK ATTR_NOINLINE NONNULL((1)) void
 NOTHROW(KCALL heap_validate)(struct heap *__restrict self) {
 	unsigned int i;
+
 	/* If we're already poisoned, then there's no point in trying to look for more errors.
 	 * -> We're already screwed, and our caller probably knows that. But we may not be
 	 *    screwed  badly enough to  actually cause our  caller's operation to break... */
@@ -360,6 +361,7 @@ NOTHROW(KCALL heap_validate)(struct heap *__restrict self) {
 			        (uintptr_t)&iter->mf_szchk,
 			        MFREE_MIN(iter), MFREE_MAX(iter),
 			        mfree_get_checksum(iter), iter->mf_szchk);
+
 			/* Verify memory of this node. */
 			expected_data    = iter->mf_flags & MFREE_FZERO ? 0 : DEBUGHEAP_NO_MANS_LAND;
 			faulting_address = find_modified_address(iter->mf_data, expected_data,
@@ -443,8 +445,10 @@ NOTHROW(KCALL heap_insert_node_unlocked)(struct heap *__restrict self,
 	struct mfree **pslot, *slot;
 	size_t num_bytes = node->mf_size;
 	HEAP_ASSERTF(node->mf_size, "Empty node at %p", node);
+
 	/* Insert the node into the address and size trees. */
 	mfree_tree_insert(&self->h_addr, node);
+
 	/* Figure out where the free-slot should go in the chain of free ranges. */
 	pslot = LIST_PFIRST(&self->h_size[HEAP_BUCKET_OF(num_bytes)]);
 	while ((slot = *pslot) != NULL && MFREE_SIZE(slot) < num_bytes)
@@ -505,6 +509,7 @@ NOTHROW(KCALL heap_serve_pending)(struct heap *__restrict self,
 		next       = pend->hpf_next;
 		pend_size  = pend->hpf_size;
 		pend_flags = pend->hpf_flags;
+
 		/* Bring the pending free block back into a consistent state! */
 		if (pend_flags & GFP_CALLOC)
 			memset(pend, 0, sizeof(struct heap_pending_free));
@@ -513,7 +518,7 @@ NOTHROW(KCALL heap_serve_pending)(struct heap *__restrict self,
 			mempatl(pend, DEBUGHEAP_NO_MANS_LAND,
 			        sizeof(struct heap_pending_free));
 		}
-#endif
+#endif /* CONFIG_DEBUG_HEAP */
 		still_locked = heap_free_raw_and_unlock_impl(self, pend, pend_size, pend_flags);
 		if (!still_locked) {
 			/* Try to re-acquire the lock. */
@@ -637,6 +642,65 @@ NOTHROW(KCALL heap_free_raw)(struct heap *__restrict self,
 	}
 }
 
+
+#ifdef CONFIG_DEBUG_HEAP
+/* Wrapper  for `mman_unmap_kram()' that handles the special case
+ * of unmapping parts of a HINTED debug-heap mapping that has yet
+ * to be fully initialized. */
+PRIVATE NOBLOCK NONNULL((1, 2)) void
+NOTHROW(KCALL heap_unmap_kram)(struct heap *__restrict self,
+                               PAGEDIR_PAGEALIGNED void *addr,
+                               size_t num_bytes, gfp_t flags) {
+	if (flags & GFP_CALLOC) {
+		/* For zero-init memory, we don't have the flux-problem. */
+		mman_unmap_kram(addr, num_bytes, flags);
+		return;
+	}
+
+	/* Memory allocated from mfile_dbgheap is in a sort-of flux as
+	 * to what it contains so-long as it hasn't been accessed yet.
+	 * - Once accessed, it will be populated with 0xAAAAAAAA words.
+	 * - While not allocated, heap validation acts as though such
+	 *   pages still contained 0xDEADBEEF.
+	 * - This is intended and further  strengthens heap validation by  allowing
+	 *   it to notice when some piece of code accidentally accessed a heap page
+	 *   that has yet to be allocated (this can happen in buffer overruns where
+	 *   the overrun only did a read from unallocated memory, which is harder
+	 *   to detect, but still just as illegal)
+	 * - Problem is: us  accessing these mappings  here obviously also  causes
+	 *   these pages to be allocated, and subsequently filled with 0xAAAAAAAA,
+	 *   which in turn causes the next `heap_validate_all();' to fail...
+	 *
+	 * Solution:
+	 * - The heap system must check when kram_unmap-ing a region, if that region
+	 *   is followed by  HINTED pages. If  so, _it_ must  already to the  access
+	 *   (while  still holding a  lock to the heap,  thus preventing anyone from
+	 *   noticing the incorrectly initialized memory), then proceed to  memset()
+	 *   it 0xDEADBEEF so  that us  touching all of  those pages  a second  time
+	 *   won't end with them being left at 0xAAAAAAAA!
+	 * - This can be implemented with a lockop on the kernel mman which then does
+	 *   another lockop on the originating heap. Once both locks are held, lookup
+	 *   the  mnode and  force-init all trailing  HINTED pages still  part of the
+	 *   same node as  the last page  that is being  freed. After the  force-init
+	 *   memset() to 0xDEADBEEF.
+	 *   If  at any point it is noticed that the mnode ends after the range to-be
+	 *   freed, or if said mnode isn't HINTED, then stop trying to also acquire a
+	 *   lock to the originating heap.
+	 * - For  this to be 100% safe, `heap' objects  either need to be set such that
+	 *   drivers aren't allowed to create more (bad idea), or be reference counted,
+	 *   such that the lock-heap-and-kernel-mman function  can hold a reference  to
+	 *   the heap  to prevent  it from  being destroyed  prematurely. (Though  heap
+	 *   destruction isn't a concept that already exists...) */
+
+	/* TODO */
+	(void)self;
+
+	mman_unmap_kram(addr, num_bytes, flags);
+}
+#else /* CONFIG_DEBUG_HEAP */
+#define heap_unmap_kram(self, addr, num_bytes, flags) \
+	mman_unmap_kram(addr, num_bytes, flags)
+#endif /* !CONFIG_DEBUG_HEAP */
 
 
 
@@ -762,6 +826,7 @@ NOTHROW(KCALL heap_free_raw_and_unlock_impl)(struct heap *__restrict self,
 			}
 #endif /* CONFIG_DEBUG_HEAP */
 		}
+
 		/* No high-slot. Just re-insert our new, bigger node. */
 		new_slot = slot;
 		goto load_new_slot;
@@ -773,8 +838,8 @@ NOTHROW(KCALL heap_free_raw_and_unlock_impl)(struct heap *__restrict self,
 		gfp_t slot_flags;
 		size_t slot_size;
 		LIST_REMOVE(slot, mf_lsize);
-		/* Extend this node below. */
 
+		/* Extend this node below. */
 #ifndef CONFIG_DEBUG_HEAP
 		slot_flags = slot->mf_flags & flags;
 		slot_size  = slot->mf_size;
@@ -815,6 +880,7 @@ NOTHROW(KCALL heap_free_raw_and_unlock_impl)(struct heap *__restrict self,
 #endif /* !CONFIG_HEAP_TRACE_DANGLE */
 		}
 #endif /* CONFIG_DEBUG_HEAP */
+
 		/* Re-insert our new, bigger node. */
 		goto load_new_slot;
 	}
@@ -823,6 +889,7 @@ NOTHROW(KCALL heap_free_raw_and_unlock_impl)(struct heap *__restrict self,
 	new_slot           = (struct mfree *)ptr;
 	new_slot->mf_size  = num_bytes;
 	new_slot->mf_flags = flags & MFREE_FMASK;
+
 load_new_slot:
 #ifdef CONFIG_DEBUG_HEAP
 #ifdef CONFIG_HEAP_TRACE_DANGLE
@@ -830,6 +897,7 @@ load_new_slot:
 	HEAP_SUB_DANGLE(self, dandle_size);
 #endif /* CONFIG_HEAP_TRACE_DANGLE */
 #endif /* CONFIG_DEBUG_HEAP */
+
 	if (!(flags & GFP_NOMMAP) &&
 	    new_slot->mf_size >= self->h_freethresh) {
 		/*  When a slot grows larger than `self->h_freethresh' and
@@ -840,6 +908,7 @@ load_new_slot:
 		if (free_minaddr < free_endaddr) {
 			void *old_hint, *hkeep, *tkeep;
 			size_t hkeep_size, tkeep_size;
+
 			/* Figure out the header and tail which we can't release. */
 			hkeep      = (void *)MFREE_MIN(new_slot);
 			tkeep      = free_endaddr;
@@ -853,6 +922,7 @@ load_new_slot:
 			tkeep_size = (size_t)((byte_t *)MFREE_END(new_slot) - (byte_t *)tkeep);
 			flags &= ~GFP_CALLOC;
 			flags |= new_slot->mf_flags;
+
 			/* Ensure that the keep-segments are large enough. */
 			if unlikely(hkeep_size && hkeep_size < HEAP_MINSIZE) {
 				hkeep_size += PAGESIZE;
@@ -899,7 +969,7 @@ load_new_slot:
 				heap_free_raw(self, tkeep, tkeep_size, flags);
 
 			/* Release full pages back to the system. */
-			mman_unmap_kram(free_minaddr,
+			heap_unmap_kram(self, free_minaddr,
 			                (size_t)((byte_t *)free_endaddr -
 			                         (byte_t *)free_minaddr),
 			                flags & GFP_CALLOC);
@@ -924,6 +994,7 @@ load_new_slot:
 	}
 do_load_new_slot:
 	mfree_set_checksum(new_slot);
+
 	/* Insert the node into the address and size trees. */
 	heap_insert_node_unlocked(self, new_slot);
 	heap_validate_all_after_free();
@@ -953,6 +1024,7 @@ NOTHROW(KCALL heap_free_untraced)(struct heap *__restrict self,
 	HEAP_ASSERTF(IS_ALIGNED(num_bytes, HEAP_ALIGNMENT),
 	             "Invalid heap_free(): Unaligned free size %" PRIuSIZ " (%#" PRIxSIZ ")",
 	             num_bytes, num_bytes);
+
 	/* Reset debug information. */
 #ifdef CONFIG_DEBUG_HEAP
 	if (!(flags & GFP_CALLOC))
@@ -984,6 +1056,7 @@ NOTHROW(KCALL heap_truncate_untraced)(struct heap *__restrict self,
 		new_size = HEAP_MINSIZE;
 	if unlikely(new_size >= old_size)
 		goto return_old_size;
+
 	/* Free trailing memory. */
 	free_bytes = old_size - new_size;
 	if (free_bytes >= HEAP_MINSIZE) {
@@ -1013,8 +1086,9 @@ NOTHROW(KCALL heap_trim)(struct heap *__restrict self, size_t threshold) {
 	threshold = CEIL_ALIGN(threshold, PAGESIZE);
 	if (!threshold)
 		threshold = PAGESIZE;
-again:
+
 	/* Search all buckets for free data blocks of at least `threshold' bytes. */
+again:
 	iter = &self->h_size[HEAP_BUCKET_OF(threshold)];
 	end  = COMPILER_ENDOF(self->h_size);
 	if (!heap_acquirelock_nx(self, GFP_NORMAL))
@@ -1025,6 +1099,7 @@ again:
 		size_t head_keep, tail_keep;
 		void *tail_pointer;
 		u8 free_flags;
+
 		/* Search this bucket. */
 		chain = LIST_FIRST(iter);
 		while (chain &&
@@ -1035,21 +1110,25 @@ again:
 			chain = LIST_NEXT(chain, mf_lsize);
 		if (!chain)
 			continue;
+
 		/* Figure out how much we can actually return to the core. */
 		free_minaddr = (void *)CEIL_ALIGN(MFREE_BEGIN(chain), PAGESIZE);
 		free_endaddr = (void *)FLOOR_ALIGN(MFREE_END(chain), PAGESIZE);
 		if unlikely(free_minaddr >= free_endaddr)
 			continue; /* Even though the range is large enough, due to alignment it doesn't span a whole page */
+
 		/* Figure out how much memory must be kept in the
 		 * head and tail portions of the free data block. */
 		head_keep = (size_t)((byte_t *)free_minaddr - (byte_t *)MFREE_BEGIN(chain));
 		tail_keep = (size_t)((byte_t *)MFREE_END(chain) - (byte_t *)free_endaddr);
+
 		/* Make sure that data blocks that cannot be freed are still
 		 * large enough to remain representable as their own blocks. */
 		if (head_keep && head_keep < HEAP_MINSIZE)
 			continue;
 		if (tail_keep && tail_keep < HEAP_MINSIZE)
 			continue;
+
 		/* Remove this chain entry. */
 		mfree_tree_removenode(&self->h_addr, chain);
 		LIST_REMOVE(chain, mf_lsize);
@@ -1074,7 +1153,7 @@ again:
 			heap_free_raw(self, tail_pointer, tail_keep, free_flags);
 
 		/* Release full pages in-between back to the core. */
-		mman_unmap_kram(free_minaddr,
+		heap_unmap_kram(self, free_minaddr,
 		                (size_t)((byte_t *)free_endaddr -
 		                         (byte_t *)free_minaddr),
 		                free_flags & GFP_CALLOC);
@@ -1194,6 +1273,7 @@ NOTHROW(KCALL heap_free_underallocation)(struct heap *__restrict self,
 #if 1
 		uintptr_t underallocation_end;
 		underallocation_end = (uintptr_t)underallocation_base + num_free_bytes;
+
 		/* Check  if the  under allocation  starts at  a new page.
 		 * If it doesn't, then we can assume that some other mfree
 		 * exists for the area below, meaning that the first  page
@@ -1229,6 +1309,7 @@ NOTHROW(KCALL heap_free_underallocation)(struct heap *__restrict self,
 				}
 			}
 		}
+
 		/* Must clear all data before the start of `underallocation_end',  and
 		 * within the same page, if `underallocation_end' isn't located at the
 		 * start of a page. */

@@ -26,6 +26,7 @@
 #include <kernel/types.h>
 
 #include <hybrid/host.h> /* __ARCH_STACK_GROWS_DOWNWARDS */
+#include <hybrid/sequence/list.h>
 
 #include <asm/os/mman.h>       /* __MAP_FAILED */
 #include <kos/kernel/paging.h> /* KERNEL_MHINT_HEAP */

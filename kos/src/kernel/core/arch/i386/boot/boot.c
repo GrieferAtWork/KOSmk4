@@ -802,6 +802,12 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 
 	/* TODO: Use the general-purpose lockop system in `struct pidns' and replace `pn_dead' */
 
+	/* TODO: Add lockop support to `struct heap' */
+
+	/* TODO: Re-write `kram-unmap.c' to support all types of file mappings, as well as
+	 *       to make use of lockops  in heap structures for  the purpose of doing  new
+	 *       allocations needed for unmapping memory. */
+
 	return state;
 }
 

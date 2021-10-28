@@ -979,16 +979,7 @@ NOTHROW_NX(KCALL FUNC(vpage_realloc_untraced))(VIRT /*page-aligned*/ void *old_b
 		if unlikely(result == CORE_PAGE_MALLOC_ERROR)
 			return NULL;
 #endif /* HEAP_NX */
-		TRY {
-			memcpy(result, old_base, old_pages, PAGESIZE);
-		} EXCEPT {
-			mman_unmap_kram(result, new_pages * PAGESIZE, GFP_NORMAL);
-#ifdef HEAP_NX
-			return NULL;
-#else /* HEAP_NX */
-			RETHROW();
-#endif /* !HEAP_NX */
-		}
+		memcpy(result, old_base, old_pages, PAGESIZE);
 		mman_unmap_kram(old_base, old_pages * PAGESIZE,
 		                free_flags & GFP_CALLOC);
 	}
