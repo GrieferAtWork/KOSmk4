@@ -32,6 +32,7 @@
 #include <kernel/mman/mpart.h>
 #include <kernel/mman/phys.h>
 #include <sched/task.h>
+#include <sched/tsc.h>
 
 #include <hybrid/align.h>
 #include <hybrid/atomic.h>
@@ -445,14 +446,21 @@ NOTHROW(FCALL mfile_add_changed_part)(struct mfile *__restrict self,
 		} while (!ATOMIC_CMPXCH_WEAK(self->mf_changed.slh_first,
 		                             next, part));
 
-		/* If defined, invoke the part-changed callback of the file. */
+		/* Mark the file as changed (and update the last-modified timestamp). */
 #ifdef CONFIG_USE_NEW_FS
 		{
-			uintptr_t old_flags, new_flags;
-			old_flags = ATOMIC_FETCHOR(self->mf_flags, MFILE_F_CHANGED);
-			new_flags = old_flags | MFILE_F_CHANGED;
-			if (old_flags != new_flags && self->mf_ops->mo_changed)
-				(*self->mf_ops->mo_changed)(self, old_flags, new_flags);
+			uintptr_t changes = MFILE_F_CHANGED;
+			if (!(self->mf_flags & MFILE_F_NOMTIME)) {
+				struct timespec now = realtime();
+				mfile_tslock_acquire(self);
+				COMPILER_READ_BARRIER();
+				if (!(self->mf_flags & (MFILE_F_NOMTIME | MFILE_F_DELETED))) {
+					self->mf_mtime = now;
+					changes |= MFILE_F_ATTRCHANGED;
+				}
+				mfile_tslock_release(self);
+			}
+			mfile_changed(self, changes);
 		}
 #else /* CONFIG_USE_NEW_FS */
 		if (self->mf_ops->mo_changed != NULL)

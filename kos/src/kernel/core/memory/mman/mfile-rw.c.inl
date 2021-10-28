@@ -46,6 +46,7 @@
 #include <misc/unlockinfo.h>
 #include <sched/signal.h>
 #include <sched/task.h>
+#include <sched/tsc.h>
 
 #include <hybrid/atomic.h>
 #include <hybrid/overflow.h>
@@ -410,14 +411,12 @@ restart_after_extendpart:
 		part->mp_flags |= MPART_F_GLOBAL_REF;
 
 		/* Mark the part as persistent if our file is, too. */
-#ifdef CONFIG_USE_NEW_FS
 #if MFILE_F_PERSISTENT == MPART_F_PERSISTENT
 		part->mp_flags |= self->mf_flags & MPART_F_PERSISTENT;
 #else /* MFILE_F_PERSISTENT == MPART_F_PERSISTENT */
 		if (self->mf_flags & MFILE_F_PERSISTENT)
 			part->mp_flags |= MPART_F_PERSISTENT;
 #endif /* MFILE_F_PERSISTENT != MPART_F_PERSISTENT */
-#endif /* CONFIG_USE_NEW_FS */
 
 		TRY {
 			mfile_lock_write(self);
@@ -690,6 +689,7 @@ part_setcore:
 		 * mean time, meaning that the append-write above truly was atomic! */
 		mfile_trunclock_inc(self);
 		atomic64_write(&self->mf_filesize, (u64)(offset + io_bytes));
+		mfile_changed(self, MFILE_F_ATTRCHANGED); /* Set the attributes-changed flag. */
 		mfile_trunclock_dec_nosignal(self); /* *_nosignal, because we broadcast unconditionally below. */
 		mfile_lock_endwrite(self);
 		decref_unlikely(part);
@@ -897,6 +897,7 @@ restart_after_extendpart_tail:
 		 * mean time, meaning that the append-write above truly was atomic! */
 		mfile_trunclock_inc(self);
 		atomic64_write(&self->mf_filesize, (u64)(offset + io_bytes));
+		mfile_changed(self, MFILE_F_ATTRCHANGED); /* Set the attributes-changed flag. */
 		mfile_trunclock_dec_nosignal(self); /* *_nosignal, because we broadcast unconditionally below. */
 		mfile_lock_endwrite(self);
 		decref_unlikely(part);
@@ -959,14 +960,12 @@ extend_failed:
 	part->mp_flags |= MPART_F_GLOBAL_REF | MPART_F_CHANGED;
 
 	/* Mark the part as persistent if our file is, too. */
-#ifdef CONFIG_USE_NEW_FS
 #if MFILE_F_PERSISTENT == MPART_F_PERSISTENT
 	part->mp_flags |= self->mf_flags & MPART_F_PERSISTENT;
 #else /* MFILE_F_PERSISTENT == MPART_F_PERSISTENT */
 	if (self->mf_flags & MFILE_F_PERSISTENT)
 		part->mp_flags |= MPART_F_PERSISTENT;
 #endif /* MFILE_F_PERSISTENT != MPART_F_PERSISTENT */
-#endif /* CONFIG_USE_NEW_FS */
 
 	/* Make sure that the part has been allocated. Afterwards, copy the
 	 * caller-provided buffer into the correct offset within the  part.
@@ -1132,15 +1131,20 @@ handle_part_insert_failure:
 		mfile_trunclock_dec_nosignal(self);
 		/* Always broadcast because we've just increased the file's size! */
 		sig_broadcast(&self->mf_initdone);
-		if (changes != 0) {
-			uintptr_t old_flags, new_flags;
-			/* Atomically mark `self' as changed, and check which (if
-			 * any)  of  the  changed-bits hadn't  already  been set. */
-			old_flags = ATOMIC_FETCHOR(self->mf_flags, changes);
-			new_flags = old_flags | changes;
-			if (old_flags != new_flags && self->mf_ops->mo_changed)
-				(*self->mf_ops->mo_changed)(self, old_flags, new_flags);
+
+		/* Update the last-modified timestamp. */
+		if (!(self->mf_flags & MFILE_F_NOMTIME)) {
+			struct timespec now = realtime();
+			mfile_tslock_acquire(self);
+			COMPILER_READ_BARRIER();
+			if (!(self->mf_flags & (MFILE_F_NOMTIME | MFILE_F_DELETED))) {
+				self->mf_mtime = now;
+				changes |= MFILE_F_ATTRCHANGED;
+			}
+			mfile_tslock_release(self);
 		}
+
+		mfile_changed(self, changes);
 		result += num_bytes;
 	} /* Scope.... */
 
