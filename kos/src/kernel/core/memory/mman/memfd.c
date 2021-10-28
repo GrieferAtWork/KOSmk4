@@ -27,6 +27,7 @@
 
 #include <kernel/except.h>
 #include <kernel/fs/dirent.h>
+#include <kernel/fs/filehandle.h>
 #include <kernel/handle.h>
 #include <kernel/malloc.h>
 #include <kernel/mman/memfd.h>
@@ -166,6 +167,17 @@ memfd_new(USER CHECKED char const *name)
 }
 
 
+/* Wrapper  for `memfd_new()' that  packages the memfd  inside of a filehandle,
+ * thus allowing all of the normal read(2) / write(2) operations on it as well. */
+PRIVATE ATTR_RETNONNULL WUNUSED REF struct filehandle *FCALL
+memfd_new_with_filehandle(USER CHECKED char const *name)
+		THROWS(E_SEGFAULT, E_BADALLOC, E_INVALID_ARGUMENT_BAD_VALUE) {
+	REF struct memfd *mfd = memfd_new(name);
+	FINALLY_DECREF_UNLIKELY(mfd);
+	return filehandle_new(mfd, NULL, NULL);
+}
+
+
 DEFINE_SYSCALL2(fd_t, memfd_create,
                 USER UNCHECKED char const *, name,
                 syscall_ulong_t, flags) {
@@ -180,13 +192,13 @@ DEFINE_SYSCALL2(fd_t, memfd_create,
 	                 E_INVALID_ARGUMENT_CONTEXT_MEMFD_CREATE_FLAGS);
 
 	/* Construct the new mem-fd object. */
-	hand.h_type = HANDLE_TYPE_MFILE;
+	hand.h_type = HANDLE_TYPE_FILEHANDLE;
 	hand.h_mode = IO_RDWR;
 	if (flags & MFD_CLOEXEC)
 		hand.h_mode |= IO_CLOEXEC;
 	if (flags & MFD_CLOFORK)
 		hand.h_mode |= IO_CLOFORK;
-	hand.h_data = memfd_new(name);
+	hand.h_data = memfd_new_with_filehandle(name);
 	FINALLY_DECREF_UNLIKELY((REF struct mfile *)hand.h_data);
 
 	/* Install the new handle. */
