@@ -780,11 +780,6 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 
 	/* TODO: Implement support for sys_memfd_create(2) */
 
-	/* TODO: Add the handle_tryas operator to `mfile_stream_ops'. This operators can
-	 *       then be used to implement support for linux's open("/proc/42") behaving
-	 *       the  same as `pidfd_open(42)'. Iow: support is provided by allowing the
-	 *       handled returned by open("/proc/42") to be castable to HANDLE_TYPE_TASK */
-
 	/* TODO: Add `strerrorname_np(3)' and `strerrordesc_np(3)' to the kernel.
 	 *       If only for  the convenience  of including the  proper names  in
 	 *       >> Translate exception 0x80:0x3,E_FSERROR_PATH_NOT_FOUND[0x1] into errno=-2

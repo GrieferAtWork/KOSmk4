@@ -40,6 +40,8 @@ DECL_END
 #include <kernel/user.h>
 #include <sched/pid.h>
 
+#include <kos/kernel/handle.h>
+
 #include <assert.h>
 #include <stddef.h>
 #include <stdint.h>
@@ -511,6 +513,28 @@ procfs_perproc_root_v_enum(struct fdirenum *__restrict result) {
 	                         result);
 }
 
+
+PRIVATE WUNUSED NONNULL((1)) REF void *KCALL
+procfs_perproc_root_v_tryas(struct mfile *__restrict self,
+                            uintptr_half_t wanted_type)
+		THROWS(...) {
+	struct fdirnode *me = mfile_asdir(self);
+
+	/* Allow file nodes for `/proc/[PID]' (and only that one)
+	 * to be casted into the underlying taskpid object,  thus
+	 * mirroring linux's pidfd_open(42) <=>  open("/proc/42")
+	 * behavior. */
+	if (wanted_type == HANDLE_TYPE_TASK)
+		return incref(me->dn_node.fn_fsdata);
+	return NULL;
+}
+
+PRIVATE struct mfile_stream_ops const procfs_perproc_root_v_stream_ops = {
+	.mso_open  = &fdirnode_v_open,
+	.mso_stat  = &procfs_perproc_dir_v_stat,
+	.mso_tryas = &procfs_perproc_root_v_tryas,
+};
+
 /* Operators for `/proc/[pid]/'
  * NOTE: For this directory, `fn_fsdata' is a `REF struct taskpid *' [1..1] */
 INTERN_CONST struct fdirnode_ops const procfs_perproc_root_ops = {
@@ -518,11 +542,11 @@ INTERN_CONST struct fdirnode_ops const procfs_perproc_root_ops = {
 		.no_file = {
 			.mo_destroy = &procfs_perproc_dir_v_destroy,
 			.mo_changed = &procfs_perproc_dir_v_changed,
-			.mo_stream  = &procfs_perproc_dir_v_stream_ops,
+			.mo_stream  = &procfs_perproc_root_v_stream_ops,
 		},
 		.no_free   = &procfs_perproc_dir_v_free,
 		.no_wrattr = &procfs_perproc_dir_v_wrattr,
-		/* TODO: Operators to override `uid' and `gid', as are used for permission checks,
+		/* TODO: Operators to override `uid' and `gid', as are used for permission  checks,
 		 *       and are exposed to user-space via `stat' (we want to use cred_* values for
 		 *       these)
 		 * The same also goes for all of the other operator tables above! (grep this file for `no_wrattr') */
