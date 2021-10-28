@@ -618,6 +618,7 @@ pty_alloc(REF struct ptymaster **__restrict p_master,
 			master->fn_gid  = cred_getfsgid();
 			slave->fn_uid   = master->fn_uid;
 			slave->fn_gid   = master->fn_gid;
+			ringbuffer_init(&slave->ps_obuf);
 
 			/* Link the slave and master against each other. */
 			awref_init(&slave->ps_master, master);
