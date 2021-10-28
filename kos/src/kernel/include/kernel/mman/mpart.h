@@ -1122,7 +1122,7 @@ NOTHROW(FCALL mpart_changed)(struct mpart *__restrict self,
  *                at the time the request was made. The caller should handle
  *                this case by re-checking for a missing part, and  creating
  *                that part if it cannot be found.
- * @return: * :   A reference to a part that begins at `self->mp_minaddr + offset' */
+ * @return: * :   A reference to a part that begins at `offset' */
 FUNDEF NONNULL((1)) REF struct mpart *FCALL
 mpart_split(struct mpart *__restrict self,
             PAGEDIR_PAGEALIGNED pos_t offset)
