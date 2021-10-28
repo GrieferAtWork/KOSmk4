@@ -663,7 +663,8 @@ struct mfile {
 	                                              *                                                // By acquiring a write-lock to `mf_lock' and waiting for `mf_trunclock == 0',
 	                                              *                                                // one  must  be  able  to   prevent  `mf_filesize'  from  changing  at   all!
 	                                              *       DECREMENT: WRLOCK(mf_lock) && mf_trunclock == 0 &&
-	                                              *                  mpart_lock_acquired(ALL(mf_parts)))]
+	                                              *                  (mfile_addr_ceilalign(OLDVALUE) == mfile_addr_ceilalign(NEWVALUE) ||
+	                                              *                   mpart_lock_acquired(ALL(mf_parts))))]
 	                                              * [const_if(MFILE_F_FIXEDFILESIZE || MFILE_F_DELETED)] // Also cannot be lowered when `mf_trunclock != 0'
 	                                              * [valid_if(!mfile_isanon(self))] File size field.
 	                                              * Attempting  to  construct new  mem-parts above  this address

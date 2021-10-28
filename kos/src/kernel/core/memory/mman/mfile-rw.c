@@ -466,24 +466,6 @@ _mfile_buffered_tailwritev(struct mfile *__restrict self,
 	return result;
 }
 
-
-
-
-/* Change  the size of the given file. If the new size is smaller than
- * the old size, mem-parts outside the new file's size-bounds are made
- * anonymous. When the size is increased, the behavior is the same  as
- * though  a  call `mfile_write(self, "", 1, new_size - 1)'  was made,
- * only that no actual write to the file is performed. */
-PUBLIC NONNULL((1)) void FCALL
-mfile_truncate(struct mfile *__restrict self, pos_t new_size)
-		THROWS(E_WOULDBLOCK, E_BADALLOC) {
-	/* TODO */
-	(void)self;
-	(void)new_size;
-	THROW(E_NOT_IMPLEMENTED_TODO);
-}
-
-
 DECL_END
 #endif /* CONFIG_USE_NEW_FS */
 
