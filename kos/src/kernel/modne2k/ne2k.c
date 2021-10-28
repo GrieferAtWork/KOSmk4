@@ -40,11 +40,14 @@
 
 #include <hw/bus/pci.h>
 #include <hw/net/ne2k.h>
+#include <kos/dev.h>
 #include <kos/except/reason/io.h>
 #include <linux/if_ether.h>
+#include <netinet/in.h>
 #include <sys/io.h>
 
 #include <assert.h>
+#include <inttypes.h>
 #include <stddef.h>
 #include <stdio.h>
 #include <string.h>
@@ -1122,9 +1125,8 @@ PRIVATE void KCALL
 Ne2k_SendPacket(struct nicdev *__restrict self,
                 struct nic_packet *__restrict packet,
                 /*out*/ struct aio_handle *__restrict aio) {
-	Ne2kDevice *me;
+	Ne2kDevice *me = nicdev_asne2k(self);
 	Ne2kAIOHandleData *aio_data;
-	me       = (Ne2kDevice *)self;
 	aio_data = Ne2kAIOHandleData_Of(aio);
 	/* Fill in AIO data fields required for sending the packet. */
 	aio_data->pd_payloadmm = incref(THIS_MMAN);
@@ -1213,10 +1215,9 @@ Ne2k_ApplyFlagsUnlocked(Ne2kDevice *__restrict self,
 PRIVATE bool KCALL
 Ne2k_SetFlags(struct nicdev *__restrict self,
               uintptr_t old_flags, uintptr_t new_flags) {
-	Ne2kDevice *me;
+	Ne2kDevice *me = nicdev_asne2k(self);
 	assert(!(new_flags & IFF_STATUS));
 	assert((old_flags & IFF_CONST) == (new_flags & IFF_CONST));
-	me = (Ne2kDevice *)self;
 	if unlikely(ATOMIC_READ(self->nd_ifflags) != old_flags)
 		return false;
 	/* Acquire the UIO lock. */
@@ -1242,19 +1243,43 @@ Ne2k_SetFlags(struct nicdev *__restrict self,
 }
 
 
+
+#ifdef CONFIG_USE_NEW_FS
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(KCALL Ne2k_Destroy)(struct mfile *__restrict self)
+#else /* CONFIG_USE_NEW_FS */
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(KCALL Ne2k_Fini)(struct chrdev *__restrict self)
+#endif /* !CONFIG_USE_NEW_FS */
+{
+#ifdef CONFIG_USE_NEW_FS
+	Ne2kDevice *me = mfile_asne2k(self);
+#else /* CONFIG_USE_NEW_FS */
+	Ne2kDevice *me = (Ne2kDevice *)self;
+#endif /* !CONFIG_USE_NEW_FS */
+	hisr_unregister(&Ne2k_InterruptHandler, me);
+	unregister_async_worker(&Ne2k_AsyncWorkerCallbacks, self);
+#ifdef CONFIG_USE_NEW_FS
+	nicdev_v_destroy(me);
+#else /* CONFIG_USE_NEW_FS */
+	nicdev_v_fini(me);
+#endif /* !CONFIG_USE_NEW_FS */
+}
+
 PRIVATE struct nicdev_ops const Ne2k_NICDeviceOps = {
+#ifdef CONFIG_USE_NEW_FS
+	.nd_cdev = {{{{
+		.no_file = {
+			.mo_destroy = &Ne2k_Destroy,
+			.mo_changed = &nicdev_v_changed,
+			.mo_stream  = &nicdev_v_stream_ops,
+		},
+		.no_wrattr = &nicdev_v_wrattr,
+	}}}},
+#endif /* CONFIG_USE_NEW_FS */
 	.nd_send     = &Ne2k_SendPacket,
 	.nd_setflags = &Ne2k_SetFlags,
 };
-
-PRIVATE NOBLOCK NONNULL((1)) void
-NOTHROW(KCALL Ne2k_Fini)(struct chrdev *__restrict self) {
-	Ne2kDevice *me;
-	me = (Ne2kDevice *)self;
-	hisr_unregister(&Ne2k_InterruptHandler, me);
-	unregister_async_worker(&Ne2k_AsyncWorkerCallbacks, self);
-	nicdev_v_fini(me);
-}
 
 
 
@@ -1311,60 +1336,94 @@ Ne2k_ProbePciDevice(struct pci_device *__restrict dev) THROWS(...) {
 	NE2K_DEBUG("[ne2k] PROM:\n%$[hex]\n", sizeof(prom), prom);
 
 	/* Construct the device. */
+#ifdef CONFIG_USE_NEW_FS
+	self = (REF Ne2kDevice *)kmalloc(sizeof(Ne2kDevice), GFP_CALLOC);
+	_nicdev_cinit(self, &Ne2k_NICDeviceOps);
+	self->fn_mode   = S_IFCHR | 0644;
+	self->dv_driver = incref(&drv_self);
+	TRY
+#else /* CONFIG_USE_NEW_FS */
 	self = CHRDEV_ALLOC(Ne2kDevice);
 	FINALLY_DECREF_UNLIKELY(self);
 	nicdev_cinit(self, &Ne2k_NICDeviceOps);
-	sig_cinit(&self->nk_stidle);
-	sig_cinit(&self->nk_stpkld);
-	sig_cinit(&self->nk_uioint);
-	self->nk_state.ns_state = NE2K_STATE_UIO_NOINT;
-	self->nk_state.ns_flags = NE2K_FLAG_NORMAL;
 	self->cd_type.ct_fini = &Ne2k_Fini;
-	self->nk_pcidev = dev;
-	self->nk_iobase = iobase;
-	memcpy(self->nd_addr.na_hwmac, prom, ETH_ALEN);
-	self->nd_ifflags   = IFF_BROADCAST | IFF_MULTICAST;
-	self->nk_tx_start  = 64;
-	self->nk_tx_end    = 70;
-	self->nk_rx_start  = 70;
-	self->nk_rx_end    = 128;
-
-	/* set-up IRQ handling. */
-	hisr_register_at(X86_INTERRUPT_PIC1_BASE + dev->pd_irq, /* TODO: Non-portable */
-	                 &Ne2k_InterruptHandler, self);
-
-	/* Reset the NIC */
-	Ne2k_ResetCard(self->nk_iobase);
-	self->nk_rx_nxt = self->nk_rx_start;
-
-	/* Switch to OFF-mode. (the IF can be enabled via `Ne2k_SetFlags()') */
-#ifdef NDEBUG
-	ATOMIC_WRITE(self->nk_state.ns_state, NE2K_STATE_OFF);
-#else /* NDEBUG */
+#endif /* !CONFIG_USE_NEW_FS */
 	{
-		uintptr_half_t old_state;
-		old_state = ATOMIC_XCH(self->nk_state.ns_state, NE2K_STATE_OFF);
-		assert(old_state == NE2K_STATE_UIO_NOINT);
-	}
+		sig_cinit(&self->nk_stidle);
+		sig_cinit(&self->nk_stpkld);
+		sig_cinit(&self->nk_uioint);
+		self->nk_state.ns_state = NE2K_STATE_UIO_NOINT;
+		self->nk_state.ns_flags = NE2K_FLAG_NORMAL;
+		self->nk_pcidev = dev;
+		self->nk_iobase = iobase;
+		memcpy(self->nd_addr.na_hwmac, prom, ETH_ALEN);
+		self->nd_ifflags   = IFF_BROADCAST | IFF_MULTICAST;
+		self->nk_tx_start  = 64;
+		self->nk_tx_end    = 70;
+		self->nk_rx_start  = 70;
+		self->nk_rx_end    = 128;
+
+		/* set-up IRQ handling. */
+		hisr_register_at(X86_INTERRUPT_PIC1_BASE + dev->pd_irq, /* TODO: Non-portable */
+		                 &Ne2k_InterruptHandler, self);
+
+		/* Reset the NIC */
+		Ne2k_ResetCard(self->nk_iobase);
+		self->nk_rx_nxt = self->nk_rx_start;
+
+		/* Switch to OFF-mode. (the IF can be enabled via `Ne2k_SetFlags()') */
+#ifdef NDEBUG
+		ATOMIC_WRITE(self->nk_state.ns_state, NE2K_STATE_OFF);
+#else /* NDEBUG */
+		{
+			uintptr_half_t old_state;
+			old_state = ATOMIC_XCH(self->nk_state.ns_state, NE2K_STATE_OFF);
+			assert(old_state == NE2K_STATE_UIO_NOINT);
+		}
 #endif /* !NDEBUG */
 
-	/* Register the async-worker */
+		/* Register the async-worker */
 #ifdef NDEBUG
-	register_async_worker(&Ne2k_AsyncWorkerCallbacks, self);
+		register_async_worker(&Ne2k_AsyncWorkerCallbacks, self);
 #else /* NDEBUG */
-	{
-		bool ok;
-		ok = register_async_worker(&Ne2k_AsyncWorkerCallbacks, self);
-		assert(ok);
-	}
+		{
+			bool ok;
+			ok = register_async_worker(&Ne2k_AsyncWorkerCallbacks, self);
+			assert(ok);
+		}
 #endif /* !NDEBUG */
 
-	{
-		static unsigned int n = 0; /* XXX: Better naming */
-		sprintf(self->cd_name, "ne2k%u", n++);
-	}
+#ifdef CONFIG_USE_NEW_FS
+		/* Register device. */
+		TRY {
+			device_registerf(self, MKDEV(DEV_MAJOR_AUTO, 0),
+			                 "ne2k.pci.%" PRIx32,
+			                 dev->pd_addr);
+		} EXCEPT {
+			unregister_async_worker(&Ne2k_AsyncWorkerCallbacks, self);
+			RETHROW();
+		}
+#else /* CONFIG_USE_NEW_FS */
+		{
+			static unsigned int n = 0; /* XXX: Better naming */
+			sprintf(self->cd_name, "ne2k%u", n++);
+		}
 
-	chrdev_register_auto(self);
+		self->fn_mode          = S_IFCHR | 0644;
+		self->dv_driver        = incref(&drv_self);
+		chrdev_register_auto(self);
+#endif /* !CONFIG_USE_NEW_FS */
+	}
+#ifdef CONFIG_USE_NEW_FS
+	EXCEPT {
+		decref_nokill(&drv_self);
+		_nicdev_fini(self);
+		kfree(self);
+		RETHROW();
+	}
+	FINALLY_DECREF_UNLIKELY(self);
+#endif /* CONFIG_USE_NEW_FS */
+
 
 	/* XXX: Collect a list of devices, then use some kind of config
 	 *      to determine which one should  be used as the  default! */

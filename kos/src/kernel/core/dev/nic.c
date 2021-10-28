@@ -251,6 +251,13 @@ nicdev_v_write(struct chrdev *__restrict self,
 	return num_bytes;
 }
 
+#ifdef CONFIG_USE_NEW_FS
+PUBLIC struct mfile_stream_ops const nicdev_v_stream_ops = {
+	.mso_write = &nicdev_v_write,
+	.mso_tryas = &nicdev_v_tryas,
+};
+#endif /* CONFIG_USE_NEW_FS */
+
 
 
 /* Allocate a buffer for a routable NIC packet for use with `nicdev_routepacket()'
