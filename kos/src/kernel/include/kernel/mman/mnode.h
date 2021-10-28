@@ -462,7 +462,7 @@ NOTHROW(FCALL mnode_clear_write)(struct mnode *__restrict self);
  * NOTE: Unlike with `mnode_clear_write', when calling this function,
  *       the caller must ensure that:
  *        - !wasdestroyed(mm)
- *        - !mman_lock_acquired(mm)
+ *        - mman_lock_acquired(mm)
  *        - self->mn_part != NULL
  *        - LIST_ISBOUND(self, mn_writable)
  * Also note that the caller is responsible to sync `mm' before unlocking it! */

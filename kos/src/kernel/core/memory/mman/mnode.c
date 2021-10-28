@@ -229,18 +229,18 @@ NOTHROW(FCALL mnode_clear_write)(struct mnode *__restrict self) {
  * NOTE: Unlike with `mnode_clear_write', when calling this function,
  *       the caller must ensure that:
  *        - !wasdestroyed(mm)
- *        - !mman_lock_acquired(mm)
+ *        - mman_lock_acquired(mm)
  *        - self->mn_part != NULL
  *        - LIST_ISBOUND(self, mn_writable)
  * Also note that the caller is responsible to sync `mm' before unlocking it! */
 PUBLIC NOBLOCK NONNULL((1, 2)) unsigned int
 NOTHROW(FCALL mnode_clear_write_locked_p)(struct mnode *__restrict self,
-                                        struct mman *__restrict mm) {
+                                          struct mman *__restrict mm) {
 	pagedir_phys_t pdir;
 	void *addr;
 	size_t size;
 	assert(!wasdestroyed(mm));
-	assert(!mman_lock_acquired(mm));
+	assert(mman_lock_acquired(mm));
 	assert(self->mn_part != NULL);
 	assert(LIST_ISBOUND(self, mn_writable));
 	assertf(self->mn_flags & MNODE_F_PWRITE,
