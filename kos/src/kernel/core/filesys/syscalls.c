@@ -1545,10 +1545,9 @@ DEFINE_SYSCALL5(ssize_t, frealpathat,
 		if (atflags & AT_ALTPATH)
 			atflags ^= AT_DOSPATH;
 		/* Print the path */
-		result = path_sprintent(containing_path,
-		                        containing_dentry->fd_name,
-		                        containing_dentry->fd_namelen,
-		                        buf, buflen, atflags, root);
+		result = path_sprintent(containing_path, containing_dentry->fd_name,
+		                        containing_dentry->fd_namelen, buf, buflen,
+		                        atflags | AT_PATHPRINT_INCTRAIL, root);
 	}
 	/* Throw a buffer error if the caller doesn't want the required size */
 	if (result > buflen && !(atflags & AT_READLINK_REQSIZE))
