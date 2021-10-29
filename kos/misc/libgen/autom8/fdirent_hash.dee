@@ -44,7 +44,12 @@ function main(parser: Autom8Parser, body: string) {
 		local nameStart = line.index("\"") + 1;
 		local nameEnd = line.index("\"", nameStart);
 		local name = line[nameStart:nameEnd].decode("c-escape");
-		parser.newText << str(fdirent_hash(name));
+		parser.newText << fdirent_hash(name);
+	} else if (body.startswith("(") && body.endswith(")")) {
+		body = body[1:-1].strip();
+		if (!body.startswith("\"") && !body.endswith("\""))
+			throw Error("Invalid warning directive: " + repr body);
+		parser.newText << fdirent_hash(body[1:-1].decode("c-escape"));
 	} else {
 		if (!body.startswith(":"))
 			throw Error("Invalid warning directive: " + repr body);

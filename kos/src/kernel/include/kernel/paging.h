@@ -382,7 +382,7 @@ NOTHROW(FCALL pagedir_unprepare)(PAGEDIR_PAGEALIGNED VIRT void *addr,
  * which are aligned by at least `PAGEDIR_MAPHINT_ALIGNMENT' bytes can
  * be specified as hints.
  *   - Use of this function requires a prior call to `pagedir_prepare()'!
- *   - Memory mappings  defined  in  `mman_kernel' to  be  non-blocking  have
+ *   - Memory  mappings  defined  in  `mman_kernel'  as  `MNODE_F_MHINT' have
  *     their mapping hint set to the address of the associated `struct mnode' */
 #ifndef ARCH_PAGEDIR_ARCHHEADER_DEFINES_PAGEDIR_MAPHINT
 FUNDEF NOBLOCK void
@@ -564,11 +564,6 @@ NOTHROW(FCALL pagedir_sync)(PAGEDIR_PAGEALIGNED VIRT void *addr,
                             PAGEDIR_PAGEALIGNED size_t num_bytes);
 #endif /* __OMIT_PAGING_CONSTANT_P_WRAPPERS */
 #endif /* !ARCH_PAGEDIR_ARCHHEADER_DEFINES_PAGEDIR_SYNC */
-
-
-#if !defined(CONFIG_NO_SMP) && defined(CONFIG_MAX_CPU_COUNT) && (CONFIG_MAX_CPU_COUNT + 0) <= 1
-#define CONFIG_NO_SMP 1
-#endif /* !CONFIG_NO_SMP && CONFIG_MAX_CPU_COUNT <= 1 */
 
 
 #ifndef CONFIG_NO_SMP

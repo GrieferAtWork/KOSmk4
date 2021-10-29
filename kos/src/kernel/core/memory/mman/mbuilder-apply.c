@@ -203,12 +203,14 @@ NOTHROW(FCALL mbuilder_apply_impl)(struct mbuilder *__restrict self,
 		}
 	}
 
-	/* In compatibility-mode, there is a chance that `thismman_kernel_reservation'
-	 * was resized to  span a  larger region  of memory  in order  to simulate  an
-	 * address  space   that  may   be  found   on  the   emulated   architecture.
-	 * This  happens  mainly  as  the   result  of  attempting  to  access   ukern
-	 * at   an  address  that   should  have  been   apart  of  kernel-space,  but
-	 * wasn't   because   kernel-space    was   actually   allocated    elsewhere:
+	/* In  compatibility-mode, there is  a chance that `thismman_kernel_reservation'
+	 * was resized to span a larger region of memory in order to simulate an address
+	 * space that may be found on the emulated architecture.
+	 *
+	 * This happens mainly as the result of attempting to access ukern at an address
+	 * that  should have been apart of kernel-space, but wasn't because kernel-space
+	 * was actually allocated elsewhere:
+	 *
 	 * >> PF_HANDLER:
 	 * >>     if (ATTEMTED_TO_ACCESS_UNMAPPED_ADDRESS) {
 	 * >> #if !defined(CONFIG_NO_USERKERN_SEGMENT) && defined(__ARCH_HAVE_COMPAT)
@@ -321,6 +323,7 @@ mbuilder_termthreads_or_unlock(struct mbuilder *__restrict self,
 		struct pending_rpc *rpc;
 		if (thread == caller)
 			continue; /* Skip this one! */
+
 		rpc = *p_rpc_desc;
 		if (rpc == NULL) {
 			/* Try to allocate another RPC descriptor w/o blocking. */
@@ -338,9 +341,11 @@ mbuilder_termthreads_or_unlock(struct mbuilder *__restrict self,
 				rpc->pr_flags         = RPC_CONTEXT_KERN;
 				rpc->pr_kern.k_func   = &killthread_for_exec_rpc;
 				*p_rpc_desc = rpc;
+
 				/* We lost the locks, so we can't continue to enumerate threads */
 				return false;
 			}
+
 			/* Set the next-link to NULL. */
 			rpc->pr_link.sle_next = NULL;
 			rpc->pr_flags         = RPC_CONTEXT_KERN;
@@ -373,10 +378,8 @@ mbuilder_termthreads_or_unlock(struct mbuilder *__restrict self,
 
 
 
-/* Slightly   simplified   version   of   `mbuilder_apply_or_unlock()'
- * that should be called while not already holding any locks, and will
- * automatically acquire necessary locks, do the requested calls,  and
- * finally release all locks acquired,  and still held at that  point.
+/* Apply memory mappings  mapped within `self'  into `target', overriding  all
+ * already-existing mappings, while also perform a set of `additional_actions'
  * @param: additional_actions: Additional actions to be atomically performed
  *                             alongside  the  setting of  the  new mem-node
  *                             mappings (set of `MBUILDER_APPLY_AA_*') */
@@ -406,8 +409,8 @@ again:
 	/* Delete all user-space mappings within the specified target mman.
 	 * All of the newly created mappings  are simply going to be  bound
 	 * lazily, as they get accessed.
-	 * NOTE: Outside of SMP, or when `MBUILDER_APPLY_AA_TERMTHREADS' is given, we
-	 *       can unmap user-space  without having  to keep on  syncing the  mman! */
+	 * NOTE: Outside of SMP, or when `MBUILDER_APPLY_AA_TERMTHREADS' is given,
+	 *       we  can unmap user-space without having to do SMP TLB shootdowns. */
 #ifndef CONFIG_NO_SMP
 	if (!(additional_actions & MBUILDER_APPLY_AA_TERMTHREADS)) {
 		if (target == THIS_MMAN)

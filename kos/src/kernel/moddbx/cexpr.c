@@ -3309,11 +3309,13 @@ got_symbol_type:
 				    expr.v_module->cm_module->md_fspath == NULL &&
 				    expr.v_module->cm_module->md_fsname != NULL) {
 					struct fdirent *dent = expr.v_module->cm_module->md_fsname;
-					if ((dent->de_namelen == COMPILER_STRLEN(RTLD_LIBDL) &&
+					if ((dent->de_hash == _RTLD_LIBDL_HASH &&
+					     dent->de_namelen == COMPILER_STRLEN(RTLD_LIBDL) &&
 					     memcmp(dent->de_name, RTLD_LIBDL, sizeof(RTLD_LIBDL)) == 0)
 #ifdef __ARCH_HAVE_COMPAT
 					    ||
-					    (dent->de_namelen == COMPILER_STRLEN(COMPAT_RTLD_LIBDL) &&
+					    (dent->de_hash == _COMPAT_RTLD_LIBDL_HASH &&
+					     dent->de_namelen == COMPILER_STRLEN(COMPAT_RTLD_LIBDL) &&
 					     memcmp(dent->de_name, COMPAT_RTLD_LIBDL, sizeof(COMPAT_RTLD_LIBDL)) == 0)
 #endif /* __ARCH_HAVE_COMPAT */
 					    ) {

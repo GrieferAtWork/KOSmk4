@@ -25,6 +25,7 @@
 /* On x86_64, RTLD paths are somewhat different due to multiarch */
 #ifdef __x86_64__
 #define COMPAT_RTLD_LIBDL        "/lib/libdl.so"
+#define _COMPAT_RTLD_LIBDL_HASH /*[[[fdirent_hash("/lib/libdl.so")]]]*/FDIRENT_HASH_INIT(0x6e321ca9, 0x75b4ce19e8e33a0b, 0x94d3128e, 0xaacfb4e31dfe20d6)/*[[[end]]]*/
 #define COMPAT_RTLD_LIBRARY_PATH "/usr/lib:/lib"
 #define COMPAT_RTLD_LIB          "lib"
 #define COMPAT_RTLD_PLATFORM     "i386"

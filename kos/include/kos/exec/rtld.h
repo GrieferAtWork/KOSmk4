@@ -26,8 +26,18 @@
 
 /* Absolute path of the libdl driver itself. */
 #ifndef RTLD_LIBDL
-#define RTLD_LIBDL "/" RTLD_LIB "/libdl.so"
-#endif /* !RTLD_LIBDL */
+#ifdef RTLD_LIB
+#error "Arch defined `RTLD_LIB', but not `RTLD_LIBDL'"
+#endif /* RTLD_LIB */
+#ifdef _RTLD_LIBDL_HASH
+#error "Arch defined `_RTLD_LIBDL_HASH', but not `RTLD_LIBDL'"
+#endif /* _RTLD_LIBDL_HASH */
+#define RTLD_LIB         "lib"
+#define RTLD_LIBDL       "/lib/libdl.so"
+#define _RTLD_LIBDL_HASH /*[[[fdirent_hash("/lib/libdl.so")]]]*/FDIRENT_HASH_INIT(0x6e321ca9, 0x75b4ce19e8e33a0b, 0x94d3128e, 0xaacfb4e31dfe20d6)/*[[[end]]]*/
+#elif !defined(_RTLD_LIBDL_HASH)
+#error "Arch defined `RTLD_LIBDL', but not `_RTLD_LIBDL_HASH'"
+#endif /* ... */
 
 /* Default for `LD_LIBRARY_PATH' */
 #ifndef RTLD_LIBRARY_PATH

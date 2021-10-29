@@ -1934,15 +1934,7 @@ PRIVATE struct fdirent system_rtld_dirent = {
 	.fd_refcnt  = 1,
 	.fd_ops     = &fdirent_empty_ops,
 	.fd_ino     = 0,
-#ifdef __x86_64__
-	.fd_hash    = UINT64_C(0xce184917e2193010),
-#elif __SIZEOF_POINTER__ == 8
-	.fd_hash    = UINT64_C(0x75b4ce19e8e33a0b),
-#elif __SIZEOF_POINTER__ == 4
-	.fd_hash    = UINT32_C(0x6e321ca9),
-#else /* __SIZEOF_POINTER__ == ... */
-	.fd_hash    = 0,
-#endif /* __SIZEOF_POINTER__ != ... */
+	.fd_hash    = _RTLD_LIBDL_HASH,
 	.fd_namelen = COMPILER_STRLEN(RTLD_LIBDL),
 	.fd_type    = DT_REG,
 	/* .fd_name = */ RTLD_LIBDL
@@ -1954,15 +1946,7 @@ PRIVATE struct fdirent system_rtld_dirent = {
 	.de_fsdata   = {},
 	.de_pos      = 0,
 	.de_ino      = 0,
-#ifdef __x86_64__
-	.de_hash     = UINT64_C(0xce184917e2193010),
-#elif __SIZEOF_POINTER__ == 8
-	.de_hash     = UINT64_C(0x75b4ce19e8e33a0b),
-#elif __SIZEOF_POINTER__ == 4
-	.de_hash     = UINT32_C(0x6e321ca9),
-#else /* __SIZEOF_POINTER__ == ... */
-	.de_hash     = 0,
-#endif /* __SIZEOF_POINTER__ != ... */
+	.de_hash     = _RTLD_LIBDL_HASH,
 	.de_namelen  = COMPILER_STRLEN(RTLD_LIBDL),
 	.de_type     = DT_REG,
 	RTLD_LIBDL
@@ -1976,13 +1960,7 @@ PRIVATE struct fdirent compat_system_rtld_dirent = {
 	.fd_refcnt  = 1,
 	.fd_ops     = &fdirent_empty_ops,
 	.fd_ino     = 0,
-#if __SIZEOF_POINTER__ == 8
-	.fd_hash    = UINT64_C(0x75b4ce19e8e33a0b),
-#elif __SIZEOF_POINTER__ == 4
-	.fd_hash    = UINT32_C(0x6e321ca9),
-#else /* __SIZEOF_POINTER__ == ... */
-	.fd_hash    = 0,
-#endif /* __SIZEOF_POINTER__ != ... */
+	.fd_hash    = _COMPAT_RTLD_LIBDL_HASH,
 	.fd_namelen = COMPILER_STRLEN(COMPAT_RTLD_LIBDL),
 	.fd_type    = DT_REG,
 	/* .fd_name = */ COMPAT_RTLD_LIBDL
@@ -1994,13 +1972,7 @@ PRIVATE struct fdirent compat_system_rtld_dirent = {
 	.de_fsdata   = {},
 	.de_pos      = 0,
 	.de_ino      = 0,
-#if __SIZEOF_POINTER__ == 8
-	.de_hash     = UINT64_C(0x75b4ce19e8e33a0b),
-#elif __SIZEOF_POINTER__ == 4
-	.de_hash     = UINT32_C(0x6e321ca9),
-#else /* __SIZEOF_POINTER__ == ... */
-	.de_hash     = 0,
-#endif /* __SIZEOF_POINTER__ != ... */
+	.de_hash     = _COMPAT_RTLD_LIBDL_HASH,
 	.de_namelen  = COMPILER_STRLEN(COMPAT_RTLD_LIBDL),
 	.de_type     = DT_REG,
 	COMPAT_RTLD_LIBDL

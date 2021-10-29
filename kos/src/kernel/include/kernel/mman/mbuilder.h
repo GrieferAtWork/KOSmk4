@@ -211,12 +211,12 @@ struct mbuilder
 #endif /* __cplusplus */
 {
 #ifndef __cplusplus
-	struct mbuilder_norpc     _mb_base;
+	struct mbuilder_norpc   _mb_base;
 #define __mbuilder_asnorpc(self) (&(self)->_mb_base)
-#define __mbuilder_base _mb_base.
+#define __mbuilder_base_         _mb_base.
 #else /* !__cplusplus */
 #define __mbuilder_asnorpc /* nothing */
-#define __mbuilder_base    /* nothing */
+#define __mbuilder_base_   /* nothing */
 #endif /* __cplusplus */
 #ifdef __INTELLISENSE__
 	struct mnode            *mb_oldmap;   /* [0..n][owned] Old mem-node tree of the target mman. */
@@ -378,8 +378,8 @@ mbuilder_termthreads_or_unlock(struct mbuilder *__restrict self,
 		THROWS(E_BADALLOC, E_WOULDBLOCK);
 
 
-/* Apply memory mappings mapped within `self' into `target', overriding
- * all already-existing mappings
+/* Apply memory mappings  mapped within `self'  into `target', overriding  all
+ * already-existing mappings, while also perform a set of `additional_actions'
  * @param: additional_actions: Additional actions to be atomically performed
  *                             alongside  the  setting of  the  new mem-node
  *                             mappings (set of `MBUILDER_APPLY_AA_*') */
