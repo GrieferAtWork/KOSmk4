@@ -50,6 +50,7 @@ DECL_END
 #include <kernel/mman.h>
 #include <kernel/mman/enum.h>
 #include <kernel/mman/execinfo.h>
+#include <kernel/mman/memfd.h>
 #include <kernel/mman/mfile.h>
 #include <kernel/mman/mnode.h>
 #include <kernel/mman/ramfile.h>
@@ -738,22 +739,11 @@ PRIVATE NOBLOCK WUNUSED NONNULL((1)) char const *
 NOTHROW(FCALL nameof_special_file)(struct mfile *__restrict self) {
 	/* The libdl program hard-coded into the kernel. */
 	if (self == &execabi_system_rtld_file.mrf_file)
-		return "[" RTLD_LIBDL "]";
+		return RTLD_LIBDL;
 #ifdef __ARCH_HAVE_COMPAT
 	if (self == &compat_execabi_system_rtld_file.mrf_file)
-		return "[" COMPAT_RTLD_LIBDL "]";
+		return COMPAT_RTLD_LIBDL;
 #endif /* __ARCH_HAVE_COMPAT */
-#ifdef CONFIG_USE_NEW_FS
-	if (self == &mfile_phys)
-		return "/dev/mem";
-	if (self == &mfile_zero)
-		return "/dev/zero";
-#else /* CONFIG_USE_NEW_FS */
-	if (self == &mfile_phys)
-		return "[/dev/mem]";
-	if (self == &mfile_zero)
-		return "[/dev/zero]";
-#endif /* !CONFIG_USE_NEW_FS */
 	if (self >= mfile_anon && self < COMPILER_ENDOF(mfile_anon))
 		return "[anon]";
 	if (self == &mfile_ndef)
@@ -805,45 +795,57 @@ maps_printer_cb(void *maps_arg, struct mmapinfo *__restrict info) {
 	           info->mmi_offset,
 	           MAJOR(dev), MINOR(dev), ino) < 0)
 		goto err;
-	if (info->mmi_fspath) {
-		char const *filename;
-		u16 filename_len;
-		if likely(info->mmi_fsname) {
-			filename     = info->mmi_fsname->fd_name;
-			filename_len = info->mmi_fsname->fd_namelen;
+	if (info->mmi_fsname) {
+		if (info->mmi_fspath) {
+			if (!ctx->pd_root) {
+				ctx->pd_atflags = fs_atflags(0) | AT_PATHPRINT_INCTRAIL;
+				ctx->pd_root    = fs_getroot(THIS_FS);
+			}
+			path_printent(info->mmi_fspath, info->mmi_fsname->fd_name,
+			              info->mmi_fsname->fd_namelen, printer, arg,
+			              ctx->pd_atflags, ctx->pd_root);
+		} else if (info->mmi_fsname->fd_name[0] == '/') {
+			print(info->mmi_fsname->fd_name,
+			      info->mmi_fsname->fd_namelen);
 		} else {
-			static char const str_unknown[] = "[unknown]";
-			filename     = str_unknown;
-			filename_len = COMPILER_STRLEN(str_unknown);
+			printf("?/%$#q",
+			       (size_t)info->mmi_fsname->fd_namelen,
+			       info->mmi_fsname->fd_name);
 		}
-		if (!ctx->pd_root) {
-			ctx->pd_atflags = fs_atflags(0) | AT_PATHPRINT_INCTRAIL;
-			ctx->pd_root    = fs_getroot(THIS_FS);
-		}
-		if (path_printent(info->mmi_fspath, filename,
-		                  filename_len, printer, arg,
-		                  ctx->pd_atflags, ctx->pd_root) < 0)
-			goto err;
-	} else if (info->mmi_fsname) {
-		ssize_t error;
-		if (info->mmi_fsname->fd_name[0] == '/') {
-			error = print(info->mmi_fsname->fd_name,
-			              info->mmi_fsname->fd_namelen);
+	} else if (info->mmi_file) {
+		/* Check if it's a device file (in which case we can extract the filename). */
+		if (mfile_isdevice(info->mmi_file)) {
+			REF struct path *devfs_mount;
+			struct devdirent *name;
+			struct device *dev = mfile_asdevice(info->mmi_file);
+			device_getname_lock_acquire(dev);
+			name = incref(dev->dv_dirent);
+			device_getname_lock_release(dev);
+			FINALLY_DECREF_UNLIKELY(name);
+			devfs_mount = vfs_mount_location(THIS_VFS, &devfs.fs_root);
+			if (devfs_mount) {
+				if (!ctx->pd_root) {
+					ctx->pd_atflags = fs_atflags(0) | AT_PATHPRINT_INCTRAIL;
+					ctx->pd_root    = fs_getroot(THIS_FS);
+				}
+				FINALLY_DECREF_UNLIKELY(devfs_mount);
+				path_printent(devfs_mount, name->dd_dirent.fd_name,
+				              name->dd_dirent.fd_namelen, printer, arg,
+				              ctx->pd_atflags, ctx->pd_root);
+			} else {
+				printf("devfs:/%$s",
+				       (size_t)name->dd_dirent.fd_namelen,
+				       name->dd_dirent.fd_name);
+			}
 		} else {
-			error = printf("[%$#q]",
-			               (size_t)info->mmi_fsname->fd_namelen,
-			               info->mmi_fsname->fd_name);
-		}
-		if unlikely(error < 0)
-			goto err;
-	} else {
-		/* Check for special names for certain files. */
-		if (info->mmi_file) {
+			/* Lastly, there are a couple of special files for which we know names. */
 			char const *special_name;
 			special_name = nameof_special_file(info->mmi_file);
 			if (special_name) {
-				if (print(special_name, strlen(special_name)) < 0)
-					goto err;
+				print(special_name, strlen(special_name));
+			} else {
+				/* For everything else, just print the /proc/[pid]/fd/[fdno] link text. */
+				mfile_uprintlink(info->mmi_file, printer, arg);
 			}
 		}
 	}
@@ -1325,7 +1327,7 @@ procfs_fd_lnknode_v_expandlink(struct flnknode *__restrict self,
 				devfs_byname_endread();
 				break;
 			}
-			*presult_dirent = incref(&dev->dv_dirent->fdd_dirent);
+			*presult_dirent = incref(&dev->dv_dirent->dd_dirent);
 			devfs_byname_endread();
 			/* The associated path is the mounting point for devfs in the current VFS */
 			TRY {
@@ -1333,6 +1335,10 @@ procfs_fd_lnknode_v_expandlink(struct flnknode *__restrict self,
 			} EXCEPT {
 				decref_unlikely(*presult_dirent);
 				RETHROW();
+			}
+			if unlikely(!*presult_path) {
+				decref_unlikely(*presult_dirent);
+				break;
 			}
 			return mfile_asnode(incref(dev));
 		}
