@@ -906,7 +906,7 @@ ProcFS_PerProc_Maps_Printer(struct printnode *__restrict self,
 	pd.pd_printer = printer;
 	pd.pd_arg     = arg;
 	pd.pd_root    = NULL;
-	RAII_FINALLY { decref_unlikely(pd.pd_root); };
+	RAII_FINALLY { xdecref_unlikely(pd.pd_root); };
 
 	/* Enumerate nodes and print the maps-file. */
 	mman_enum_userspace(threadmm, &maps_printer_cb, &pd);
