@@ -126,6 +126,7 @@ again:
 			mfault_fini(&mf);
 			RETHROW();
 		}
+
 		/* (re-)map the faulted address range. */
 		{
 			u16 perm;

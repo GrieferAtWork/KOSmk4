@@ -197,33 +197,30 @@ LOCAL_task_enum_onheap(task_enum_cb_t cb, void *arg,
                        LOCAL_EXTRA__PARAM)
 		THROWS(E_BADALLOC, E_WOULDBLOCK, ...) {
 	ssize_t result;
+	size_t new_buflen;
 	REF struct task **buf;
 	buf = (REF struct task **)kmalloc(buflen * sizeof(REF struct task *),
 	                                  GFP_NORMAL);
-	TRY {
-		/* Enumerate threads, and keep on increasing the
-		 * buffer size if the buffer continues to be too
-		 * small. */
-		size_t new_buflen;
-		for (;;) {
-			new_buflen = LOCAL_task_list(buf, buflen LOCAL_EXTRA__ARGS);
-			if (new_buflen <= buflen)
-				break; /* Got it! */
-			/* Allocate a larger buffer. */
-			buf = (REF struct task **)krealloc(buf,
-			                                   new_buflen *
-			                                   sizeof(REF struct task *),
-			                                   GFP_NORMAL);
-			/* Use the new (larger) buffer length. */
-			buflen = new_buflen;
-		}
-		/* Enumerate threads, and inherit all of the references we've been given. */
-		result = enum_task_list_and_decref(buf, buflen, cb, arg);
-	} EXCEPT {
-		kfree(buf);
-		RETHROW();
+	RAII_FINALLY { kfree(buf); };
+
+	/* Enumerate threads, and keep on increasing the
+	 * buffer size if the buffer continues to be too
+	 * small. */
+	for (;;) {
+		new_buflen = LOCAL_task_list(buf, buflen LOCAL_EXTRA__ARGS);
+		if (new_buflen <= buflen)
+			break; /* Got it! */
+		/* Allocate a larger buffer. */
+		buf = (REF struct task **)krealloc(buf,
+		                                   new_buflen *
+		                                   sizeof(REF struct task *),
+		                                   GFP_NORMAL);
+		/* Use the new (larger) buffer length. */
+		buflen = new_buflen;
 	}
-	kfree(buf);
+
+	/* Enumerate threads, and inherit all of the references we've been given. */
+	result = enum_task_list_and_decref(buf, buflen, cb, arg);
 	return result;
 }
 #else /* NO_TASKPID_BUFFER */
@@ -251,19 +248,16 @@ LOCAL_task_enum_onheap(task_enum_cb_t cb, void *arg,
 		THROWS(E_BADALLOC, E_WOULDBLOCK, ...) {
 	ssize_t result;
 	task_list_buffer_alloc_heap_buffers(buf);
-	TRY {
-		/* Enumerate threads, and keep on increasing the
-		 * buffer size if the buffer continues to be too
-		 * small. */
-		while (!LOCAL_task_list(buf LOCAL_EXTRA__ARGS))
-			task_list_buffer_realloc_heap_buffers(buf);
-		/* Enumerate threads, and inherit all of the references we've been given. */
-		result = task_list_buffer_enum_and_decref(buf, cb, arg);
-	} EXCEPT {
-		task_list_buffer_free_heap_buffers(buf);
-		RETHROW();
-	}
-	task_list_buffer_free_heap_buffers(buf);
+	RAII_FINALLY { task_list_buffer_free_heap_buffers(buf); };
+
+	/* Enumerate threads, and keep on increasing the
+	 * buffer size if the buffer continues to be too
+	 * small. */
+	while (!LOCAL_task_list(buf LOCAL_EXTRA__ARGS))
+		task_list_buffer_realloc_heap_buffers(buf);
+
+	/* Enumerate threads, and inherit all of the references we've been given. */
+	result = task_list_buffer_enum_and_decref(buf, cb, arg);
 	return result;
 }
 #endif /* !NO_TASKPID_BUFFER */

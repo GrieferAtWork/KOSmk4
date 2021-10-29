@@ -989,66 +989,62 @@ NOTHROW(KCALL cvalue_cfiexpr_readwrite)(struct cvalue_cfiexpr const *__restrict 
 						return DBX_EFAULT;
 					pagedir_set(req_pdir);
 				}
-				TRY {
-					/* TODO: Proper user-space  support for  `unwind_emulator_t::ue_tlsbase'
-					 *       When used by the expression, then we mustn't rely on the native
-					 *       TLS-base  calculation function from libunwind, but must instead
-					 *       make use of `usermod_get_user_tls_base()' from above. */
-#ifdef __ARCH_HAVE_COMPAT
-					if (dbg_current_iscompat()) {
-						struct unwind_getreg_compat_data compat_getreg_data;
-						unwind_getreg_compat_data_init(&compat_getreg_data, &dbg_getreg,
-						                               (void *)(uintptr_t)DBG_REGLEVEL_VIEW);
-						if (write) {
-							struct unwind_setreg_compat_data compat_setreg_data;
-							unwind_setreg_compat_data_init(&compat_setreg_data, &dbg_setreg,
-							                               (void *)(uintptr_t)DBG_REGLEVEL_VIEW);
-							error = debuginfo_location_setvalue(&self->v_expr,
-							                                    cmodule_unwind_emulator_sections(mod),
-							                                    &unwind_getreg_compat, &compat_getreg_data,
-							                                    &unwind_setreg_compat, &compat_setreg_data, &cu,
-							                                    (uintptr_t)pc - module_getloadaddr(mod->cm_module),
-							                                    module_getloadaddr(mod->cm_module),
-							                                    buf, buflen, &num_accessed_bits, &self->v_framebase,
-							                                    self->v_objaddr, self->v_addrsize, self->v_ptrsize);
-						} else {
-							error = debuginfo_location_getvalue(&self->v_expr,
-							                                    cmodule_unwind_emulator_sections(mod),
-							                                    &unwind_getreg_compat, &compat_getreg_data, &cu,
-							                                    (uintptr_t)pc - module_getloadaddr(mod->cm_module),
-							                                    module_getloadaddr(mod->cm_module),
-							                                    buf, buflen, &num_accessed_bits, &self->v_framebase,
-							                                    self->v_objaddr, self->v_addrsize, self->v_ptrsize);
-						}
-					} else
-#endif /* __ARCH_HAVE_COMPAT */
-					{
-						if (write) {
-							error = debuginfo_location_setvalue(&self->v_expr,
-							                                    cmodule_unwind_emulator_sections(mod),
-							                                    &dbg_getreg, (void *)(uintptr_t)DBG_REGLEVEL_VIEW,
-							                                    &dbg_setreg, (void *)(uintptr_t)DBG_REGLEVEL_VIEW, &cu,
-							                                    (uintptr_t)pc - module_getloadaddr(mod->cm_module),
-							                                    module_getloadaddr(mod->cm_module),
-							                                    buf, buflen, &num_accessed_bits, &self->v_framebase,
-							                                    self->v_objaddr, self->v_addrsize, self->v_ptrsize);
-						} else {
-							error = debuginfo_location_getvalue(&self->v_expr,
-							                                    cmodule_unwind_emulator_sections(mod),
-							                                    &dbg_getreg, (void *)(uintptr_t)DBG_REGLEVEL_VIEW, &cu,
-							                                    (uintptr_t)pc - module_getloadaddr(mod->cm_module),
-							                                    module_getloadaddr(mod->cm_module),
-							                                    buf, buflen, &num_accessed_bits, &self->v_framebase,
-							                                    self->v_objaddr, self->v_addrsize, self->v_ptrsize);
-						}
-					}
-				} EXCEPT {
+				RAII_FINALLY {
 					if (old_pdir != req_pdir)
 						pagedir_set(old_pdir);
-					RETHROW();
+				};
+				/* TODO: Proper user-space  support for  `unwind_emulator_t::ue_tlsbase'
+				 *       When used by the expression, then we mustn't rely on the native
+				 *       TLS-base  calculation function from libunwind, but must instead
+				 *       make use of `usermod_get_user_tls_base()' from above. */
+#ifdef __ARCH_HAVE_COMPAT
+				if (dbg_current_iscompat()) {
+					struct unwind_getreg_compat_data compat_getreg_data;
+					unwind_getreg_compat_data_init(&compat_getreg_data, &dbg_getreg,
+					                               (void *)(uintptr_t)DBG_REGLEVEL_VIEW);
+					if (write) {
+						struct unwind_setreg_compat_data compat_setreg_data;
+						unwind_setreg_compat_data_init(&compat_setreg_data, &dbg_setreg,
+						                               (void *)(uintptr_t)DBG_REGLEVEL_VIEW);
+						error = debuginfo_location_setvalue(&self->v_expr,
+						                                    cmodule_unwind_emulator_sections(mod),
+						                                    &unwind_getreg_compat, &compat_getreg_data,
+						                                    &unwind_setreg_compat, &compat_setreg_data, &cu,
+						                                    (uintptr_t)pc - module_getloadaddr(mod->cm_module),
+						                                    module_getloadaddr(mod->cm_module),
+						                                    buf, buflen, &num_accessed_bits, &self->v_framebase,
+						                                    self->v_objaddr, self->v_addrsize, self->v_ptrsize);
+					} else {
+						error = debuginfo_location_getvalue(&self->v_expr,
+						                                    cmodule_unwind_emulator_sections(mod),
+						                                    &unwind_getreg_compat, &compat_getreg_data, &cu,
+						                                    (uintptr_t)pc - module_getloadaddr(mod->cm_module),
+						                                    module_getloadaddr(mod->cm_module),
+						                                    buf, buflen, &num_accessed_bits, &self->v_framebase,
+						                                    self->v_objaddr, self->v_addrsize, self->v_ptrsize);
+					}
+				} else
+#endif /* __ARCH_HAVE_COMPAT */
+				{
+					if (write) {
+						error = debuginfo_location_setvalue(&self->v_expr,
+						                                    cmodule_unwind_emulator_sections(mod),
+						                                    &dbg_getreg, (void *)(uintptr_t)DBG_REGLEVEL_VIEW,
+						                                    &dbg_setreg, (void *)(uintptr_t)DBG_REGLEVEL_VIEW, &cu,
+						                                    (uintptr_t)pc - module_getloadaddr(mod->cm_module),
+						                                    module_getloadaddr(mod->cm_module),
+						                                    buf, buflen, &num_accessed_bits, &self->v_framebase,
+						                                    self->v_objaddr, self->v_addrsize, self->v_ptrsize);
+					} else {
+						error = debuginfo_location_getvalue(&self->v_expr,
+						                                    cmodule_unwind_emulator_sections(mod),
+						                                    &dbg_getreg, (void *)(uintptr_t)DBG_REGLEVEL_VIEW, &cu,
+						                                    (uintptr_t)pc - module_getloadaddr(mod->cm_module),
+						                                    module_getloadaddr(mod->cm_module),
+						                                    buf, buflen, &num_accessed_bits, &self->v_framebase,
+						                                    self->v_objaddr, self->v_addrsize, self->v_ptrsize);
+					}
 				}
-				if (old_pdir != req_pdir)
-					pagedir_set(old_pdir);
 			}
 		}
 	} EXCEPT {

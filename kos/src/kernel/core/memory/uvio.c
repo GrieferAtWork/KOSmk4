@@ -209,17 +209,13 @@ again:
 got_free_slot:
 		/* Found (and allocated) a free slot.
 		 * Now use this slot for the request. */
-		TRY {
-			uvio_request_impl(self, slot, args,
-			                  addr, command,
-			                  argv_result);
-		} EXCEPT {
+		RAII_FINALLY {
 			/* Always mark the slot as free before returning! */
 			uvio_freerequest(self, reqid);
-			RETHROW();
-		}
-		/* Always mark the slot as free before returning! */
-		uvio_freerequest(self, reqid);
+		};
+		uvio_request_impl(self, slot, args,
+		                  addr, command,
+		                  argv_result);
 		return;
 	}
 	/* Wait for more slots to become available. */

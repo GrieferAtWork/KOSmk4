@@ -1440,7 +1440,11 @@ task_raisesignalprocessgroup(struct task *__restrict target,
 		RETHROW();
 	}
 	pointer_set_init(&ps);
-	TRY {
+	RAII_FINALLY {
+		taskref_pointer_set_fini(&ps);
+		decref_unlikely(pgroup);
+	};
+	{
 		REF struct task *pending_delivery_procv[8];
 		size_t pending_delivery_procc;
 		bool there_are_more_procs;
@@ -1544,13 +1548,7 @@ load_more_threads:
 		}
 		if (there_are_more_procs)
 			goto load_more_threads;
-	} EXCEPT {
-		taskref_pointer_set_fini(&ps);
-		decref_unlikely(pgroup);
-		RETHROW();
 	}
-	taskref_pointer_set_fini(&ps);
-	decref_unlikely(pgroup);
 	return result;
 }
 
@@ -2443,13 +2441,8 @@ signal_waitfor(CHECKED USER sigset_t const *uthese,
 				assert(rpc->pr_flags & RPC_CONTEXT_SIGNAL);
 				result = rpc->pr_psig.si_signo;
 				/* Copy signal information to userspace */
-				TRY {
-					memcpy(uinfo, &rpc->pr_psig, sizeof(siginfo_t));
-				} EXCEPT {
-					pending_rpc_free(rpc);
-					RETHROW();
-				}
-				pending_rpc_free(rpc);
+				RAII_FINALLY { pending_rpc_free(rpc); };
+				memcpy(uinfo, &rpc->pr_psig, sizeof(siginfo_t));
 				return result;
 			}
 

@@ -232,117 +232,112 @@ again_no_prefault:
 	} else {
 		struct mfault mf;
 		__mfault_init(&mf);
-		TRY {
+		RAII_FINALLY { mfault_fini(&mf); };
 again_prefault:
-			/* Go over all nodes within the given address range, and
-			 * trigger a read-fault for  all read-only nodes, and  a
-			 * write-fault for all read/write ones.
-			 * This  way, and because we're currently holding locks
-			 * to everything that can somehow affect how/when stuff
-			 * gets to be MLOCK'd /  MUNLOCK'd, all of these  nodes
-			 * will still be locked into memory once we get  around
-			 * to actually setting the MLOCK flags below! */
-			mman_lock_acquire(self);
+		/* Go over all nodes within the given address range, and
+		 * trigger a read-fault for  all read-only nodes, and  a
+		 * write-fault for all read/write ones.
+		 * This  way, and because we're currently holding locks
+		 * to everything that can somehow affect how/when stuff
+		 * gets to be MLOCK'd /  MUNLOCK'd, all of these  nodes
+		 * will still be locked into memory once we get  around
+		 * to actually setting the MLOCK flags below! */
+		mman_lock_acquire(self);
 
-			/* Load the requested address range. */
-			mrangelock_aq_init(&rl, self, minaddr, maxaddr);
+		/* Load the requested address range. */
+		mrangelock_aq_init(&rl, self, minaddr, maxaddr);
 
-			/* If need be, ensure that the range is complete. */
-			if (!(flags & MLOCK_IFMAPPED) &&
-			    !mrangelock_aq_continuous_or_unlock(&rl, self, minaddr, maxaddr))
-				goto again_prefault;
+		/* If need be, ensure that the range is complete. */
+		if (!(flags & MLOCK_IFMAPPED) &&
+		    !mrangelock_aq_continuous_or_unlock(&rl, self, minaddr, maxaddr))
+			goto again_prefault;
 
-			if likely(rl.mrl_nodes.mm_min) {
-				do {
-					u16 perm;
-					byte_t const *fault_minaddr, *fault_maxaddr;
-					fault_minaddr = (byte_t const *)mnode_getminaddr(rl.mrl_nodes.mm_min);
-					fault_maxaddr = (byte_t const *)mnode_getmaxaddr(rl.mrl_nodes.mm_min);
-					if (fault_minaddr < minaddr)
-						fault_minaddr = minaddr;
-					if (fault_maxaddr > maxaddr)
-						fault_maxaddr = maxaddr;
+		if likely(rl.mrl_nodes.mm_min) {
+			do {
+				u16 perm;
+				byte_t const *fault_minaddr, *fault_maxaddr;
+				fault_minaddr = (byte_t const *)mnode_getminaddr(rl.mrl_nodes.mm_min);
+				fault_maxaddr = (byte_t const *)mnode_getmaxaddr(rl.mrl_nodes.mm_min);
+				if (fault_minaddr < minaddr)
+					fault_minaddr = minaddr;
+				if (fault_maxaddr > maxaddr)
+					fault_maxaddr = maxaddr;
 
-					/* If there is a backing part to this node, then fault it! */
-					if ((mf.mfl_part = rl.mrl_nodes.mm_min->mn_part) != NULL) {
-						mf.mfl_mman  = self;
-						mf.mfl_addr  = (void *)fault_minaddr;
-						mf.mfl_size  = (size_t)(fault_maxaddr - fault_minaddr) + 1;
-						mf.mfl_flags = MMAN_FAULT_F_NORMAL;
-						mf.mfl_node  = rl.mrl_nodes.mm_min;
-						if (rl.mrl_nodes.mm_min->mn_flags & MNODE_F_PWRITE)
-							mf.mfl_flags = MMAN_FAULT_F_NORMAL | MMAN_FAULT_F_WRITE;
+				/* If there is a backing part to this node, then fault it! */
+				if ((mf.mfl_part = rl.mrl_nodes.mm_min->mn_part) != NULL) {
+					mf.mfl_mman  = self;
+					mf.mfl_addr  = (void *)fault_minaddr;
+					mf.mfl_size  = (size_t)(fault_maxaddr - fault_minaddr) + 1;
+					mf.mfl_flags = MMAN_FAULT_F_NORMAL;
+					mf.mfl_node  = rl.mrl_nodes.mm_min;
+					if (rl.mrl_nodes.mm_min->mn_flags & MNODE_F_PWRITE)
+						mf.mfl_flags = MMAN_FAULT_F_NORMAL | MMAN_FAULT_F_WRITE;
 
-						/* Fault this node. */
-						if (!mfault_or_unlock(&mf))
-							goto again_prefault;
+					/* Fault this node. */
+					if (!mfault_or_unlock(&mf))
+						goto again_prefault;
 
-						/* Re-initialize internal fields  of the memfault  controller.
-						 * A successful call  to `mfault_or_unlock()' normally  leaves
-						 * these fields in an undefined state, such that `mfault_fini'
-						 * doesn't normally have to be called in this case.
-						 *
-						 * However, because we may need to use the  fault-controller
-						 * once again, and because we're still inside a TRY...EXCEPT
-						 * block that will call  `mfault_fini()' if an exception  is
-						 * thrown, we have to re-initialize to ensure consistency! */
-						__mfault_init(&mf);
+					/* Re-initialize internal fields  of the memfault  controller.
+					 * A successful call  to `mfault_or_unlock()' normally  leaves
+					 * these fields in an undefined state, such that `mfault_fini'
+					 * doesn't normally have to be called in this case.
+					 *
+					 * However, because we may need to use the  fault-controller
+					 * once again, and because we're still inside a RAII_FINALLY
+					 * block that will call  `mfault_fini()' if an exception  is
+					 * thrown, we have to re-initialize to ensure consistency! */
+					__mfault_init(&mf);
 
-						/* Re-map the freshly faulted memory. */
-						if unlikely(mf.mfl_node->mn_flags & MNODE_F_MPREPARED) {
-							perm = mpart_mmap_node_p(mf.mfl_part, self->mm_pagedir_p,
-							                         mf.mfl_addr, mf.mfl_size,
-							                         mf.mfl_offs, mf.mfl_node);
-						} else {
-							if unlikely(!pagedir_prepare_p(self->mm_pagedir_p, mf.mfl_addr, mf.mfl_size)) {
-								mpart_lock_release(mf.mfl_part);
-								mman_lock_release(self);
-								THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, PAGESIZE);
-							}
-							perm = mpart_mmap_node_p(mf.mfl_part, self->mm_pagedir_p,
-							                         mf.mfl_addr, mf.mfl_size,
-							                         mf.mfl_offs, mf.mfl_node);
-							pagedir_unprepare_p(self->mm_pagedir_p, mf.mfl_addr, mf.mfl_size);
+					/* Re-map the freshly faulted memory. */
+					if unlikely(mf.mfl_node->mn_flags & MNODE_F_MPREPARED) {
+						perm = mpart_mmap_node_p(mf.mfl_part, self->mm_pagedir_p,
+						                         mf.mfl_addr, mf.mfl_size,
+						                         mf.mfl_offs, mf.mfl_node);
+					} else {
+						if unlikely(!pagedir_prepare_p(self->mm_pagedir_p, mf.mfl_addr, mf.mfl_size)) {
+							mpart_lock_release(mf.mfl_part);
+							mman_lock_release(self);
+							THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, PAGESIZE);
 						}
-
-						/* Upon success, `mfault_or_unlock()'  will have acquired  a
-						 * lock to the associated part. We will actually be  needing
-						 * this lock later, and we will re-acquire it at that point.
-						 *
-						 * But  until then, our lock to `self' will prevent the now-
-						 * faulted backing data of `mf.mfl_part' from being unloaded
-						 * again, since anyone trying to do so would have to acquire
-						 * our mman-lock first (which  we won't release until  after
-						 * we've  re-acquired  the part-lock  if everything  goes to
-						 * plan) */
-						mpart_lock_release(mf.mfl_part);
-
-						/* If write-access was granted, add the node to the list of writable nodes. */
-						if ((perm & PAGEDIR_PROT_WRITE) && !LIST_ISBOUND(mf.mfl_node, mn_writable))
-						    LIST_INSERT_HEAD(&self->mm_writable, mf.mfl_node, mn_writable);
+						perm = mpart_mmap_node_p(mf.mfl_part, self->mm_pagedir_p,
+						                         mf.mfl_addr, mf.mfl_size,
+						                         mf.mfl_offs, mf.mfl_node);
+						pagedir_unprepare_p(self->mm_pagedir_p, mf.mfl_addr, mf.mfl_size);
 					}
 
-					/* If we've gone through  all nodes within the  requested
-					 * address range (and all of them have now been faulted),
-					 * then we can stop trying to search for more nodes. */
-					if (fault_maxaddr >= maxaddr)
-						break;
+					/* Upon success, `mfault_or_unlock()'  will have acquired  a
+					 * lock to the associated part. We will actually be  needing
+					 * this lock later, and we will re-acquire it at that point.
+					 *
+					 * But  until then, our lock to `self' will prevent the now-
+					 * faulted backing data of `mf.mfl_part' from being unloaded
+					 * again, since anyone trying to do so would have to acquire
+					 * our mman-lock first (which  we won't release until  after
+					 * we've  re-acquired  the part-lock  if everything  goes to
+					 * plan) */
+					mpart_lock_release(mf.mfl_part);
 
-					/* Find the next-greater node above `fault_maxaddr' */
-					mman_mappings_minmaxlocate(self, fault_maxaddr + 1,
-					                           maxaddr, &rl.mrl_nodes);
-				} while (rl.mrl_nodes.mm_min);
+					/* If write-access was granted, add the node to the list of writable nodes. */
+					if ((perm & PAGEDIR_PROT_WRITE) && !LIST_ISBOUND(mf.mfl_node, mn_writable))
+					    LIST_INSERT_HEAD(&self->mm_writable, mf.mfl_node, mn_writable);
+				}
 
-				/* Because the actual node distribution may have changed
-				 * while we were faulting memory above, we must  re-load
-				 * the range of nodes with which we wish to work! */
-				mman_mappings_minmaxlocate(self, minaddr, maxaddr, &rl.mrl_nodes);
-			}
-		} EXCEPT {
-			mfault_fini(&mf);
-			RETHROW();
+				/* If we've gone through  all nodes within the  requested
+				 * address range (and all of them have now been faulted),
+				 * then we can stop trying to search for more nodes. */
+				if (fault_maxaddr >= maxaddr)
+					break;
+
+				/* Find the next-greater node above `fault_maxaddr' */
+				mman_mappings_minmaxlocate(self, fault_maxaddr + 1,
+				                           maxaddr, &rl.mrl_nodes);
+			} while (rl.mrl_nodes.mm_min);
+
+			/* Because the actual node distribution may have changed
+			 * while we were faulting memory above, we must  re-load
+			 * the range of nodes with which we wish to work! */
+			mman_mappings_minmaxlocate(self, minaddr, maxaddr, &rl.mrl_nodes);
 		}
-		mfault_fini(&mf);
 	}
 
 	/* Split mem-nodes if necessary. */

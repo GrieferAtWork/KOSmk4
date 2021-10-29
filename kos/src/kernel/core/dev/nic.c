@@ -240,14 +240,9 @@ nicdev_v_write(struct chrdev *__restrict self,
 	}
 
 	/* Wait for the send to finish. */
-	TRY {
-		aio_handle_generic_waitfor(&aio);
-		aio_handle_generic_checkerror(&aio);
-	} EXCEPT {
-		aio_handle_generic_fini(&aio);
-		RETHROW();
-	}
-	aio_handle_generic_fini(&aio);
+	RAII_FINALLY { aio_handle_generic_fini(&aio); };
+	aio_handle_generic_waitfor(&aio);
+	aio_handle_generic_checkerror(&aio);
 	return num_bytes;
 }
 
@@ -303,13 +298,8 @@ nicdev_routepacket(struct nicdev *__restrict self,
 	assert(real_packet_size <= packet->rp_size);
 	assert(real_packet_size >= ETH_ZLEN);
 	/* XXX: Option to have the routing be done asynchronously! */
-	TRY {
-		eth_routepacket(self, packet->rp_data, real_packet_size);
-	} EXCEPT {
-		nic_rpacket_free(packet); /* Always inherit `packet' */
-		RETHROW();
-	}
-	nic_rpacket_free(packet);
+	RAII_FINALLY { nic_rpacket_free(packet); }; /* Always inherit `packet' */
+	eth_routepacket(self, packet->rp_data, real_packet_size);
 }
 
 

@@ -1523,13 +1523,8 @@ fdevfsdirent_newf(char const *__restrict format, ...)
 	va_list args;
 	REF struct fdevfsdirent *result;
 	va_start(args, format);
-	TRY {
-		result = fdevfsdirent_vnewf(format, args);
-	} EXCEPT {
-		va_end(args);
-		RETHROW();
-	}
-	va_end(args);
+	RAII_FINALLY { va_end(args); };
+	result = fdevfsdirent_vnewf(format, args);
 	return result;
 }
 
@@ -1549,13 +1544,8 @@ device_registerf(struct device *__restrict self, dev_t devno,
 		THROWS(E_BADALLOC, E_WOULDBLOCK) {
 	va_list args;
 	va_start(args, format);
-	TRY {
-		device_vregisterf(self, devno, format, args);
-	} EXCEPT {
-		va_end(args);
-		RETHROW();
-	}
-	va_end(args);
+	RAII_FINALLY { va_end(args); };
+	device_vregisterf(self, devno, format, args);
 }
 
 PUBLIC NONNULL((1)) void KCALL

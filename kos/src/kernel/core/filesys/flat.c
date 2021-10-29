@@ -291,15 +291,11 @@ PRIVATE NONNULL((1, 2)) void KCALL
 flatdirnode_delete_entry(struct flatdirnode *__restrict self,
                          struct flatdirent const *__restrict ent,
                          bool at_end_of_dir) {
-	TRY {
-		(*flatdirnode_getops(self)->fdno_flat.fdnx_deleteent)(self, ent, at_end_of_dir);
-	} EXCEPT {
+	RAII_FINALLY {
 		if (at_end_of_dir)
 			flatdirnode_anon_parts_after(self, flatdirent_endaddr(ent));
-		RETHROW();
-	}
-	if (at_end_of_dir)
-		flatdirnode_anon_parts_after(self, flatdirent_endaddr(ent));
+	};
+	(*flatdirnode_getops(self)->fdno_flat.fdnx_deleteent)(self, ent, at_end_of_dir);
 }
 
 PUBLIC WUNUSED NONNULL((1, 2)) REF struct fdirent *KCALL

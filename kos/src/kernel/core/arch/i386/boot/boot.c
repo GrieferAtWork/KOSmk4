@@ -813,6 +813,22 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *       to make use of lockops  in heap structures for  the purpose of doing  new
 	 *       allocations needed for unmapping memory. */
 
+	/* TODO: mfile_write() and mfile_truncate() need to throw something convertible
+	 *       to  `EFBIG' when the  file size would  exceed the fs-specific maximum.
+	 *       Right now they throw E_FSERROR_DISK_FULL, which is non-compliant! */
+
+	/* TODO: mfile_truncate() needs some  kind of fs-level  operator for the  purpose
+	 *       of deallocating file data beyond a certain point within the file stream.
+	 * e.g.: On FAT, truncate the cluster chain to a certain length.
+	 * XXX:  I  think the  solution here would  be to override  streams-truncate on the
+	 *       fs-layer, acquire fs-specific locks (which already need to be non-atomic),
+	 *       prepare for  fs-specific  truncation,  do  `mfile_truncate',  do  the  fs-
+	 *       specific truncation, then release locks. */
+
+	/* TODO: What our mfiles implement as `mo_loadblocks' / `mo_saveblocks', linux
+	 *       also supports via the `O_DIRECT' flag. As such, we should add support
+	 *       for that flag! */
+
 	return state;
 }
 

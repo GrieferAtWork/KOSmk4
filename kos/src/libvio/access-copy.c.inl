@@ -67,31 +67,26 @@ libvio_copytovio_from_phys(struct vioargs *__restrict args,
 		return;
 	vbuf = phys_pushaddr(buf);
 
-	/* Try-catch is required, because VIO access may throw exceptions. */
-	TRY {
-		for (;;) {
-			size_t page_bytes;
-			page_bytes = PAGESIZE - ((uintptr_t)vbuf & PAGEMASK);
-			if (page_bytes > num_bytes)
-				page_bytes = num_bytes;
-			/* Copy memory. */
+	/* FINALLY is required, because VIO access may throw exceptions. */
+	RAII_FINALLY { phys_pop(); };
+	for (;;) {
+		size_t page_bytes;
+		page_bytes = PAGESIZE - ((uintptr_t)vbuf & PAGEMASK);
+		if (page_bytes > num_bytes)
+			page_bytes = num_bytes;
+		/* Copy memory. */
 #ifdef DEFINE_IO_READ
-			libvio_copyfromvio(args, offset, vbuf, page_bytes);
+		libvio_copyfromvio(args, offset, vbuf, page_bytes);
 #elif defined(DEFINE_IO_WRITE)
-			libvio_copytovio(args, offset, vbuf, page_bytes);
+		libvio_copytovio(args, offset, vbuf, page_bytes);
 #endif /* ... */
-			if (page_bytes >= num_bytes)
-				break;
-			num_bytes -= page_bytes;
-			buf += page_bytes;
-			offset += page_bytes;
-			vbuf = phys_loadpage(buf);
-		}
-	} EXCEPT {
-		phys_pop();
-		RETHROW();
+		if (page_bytes >= num_bytes)
+			break;
+		num_bytes -= page_bytes;
+		buf += page_bytes;
+		offset += page_bytes;
+		vbuf = phys_loadpage(buf);
 	}
-	phys_pop();
 }
 
 

@@ -127,39 +127,35 @@ DEFINE_SYSCALL3(errno_t, ioperm,
 	 * Access to said vector is directly granted so-long as we keep the TASK_FKEEPCORE flag set. */
 	caller           = THIS_TASK;
 	old_thread_flags = ATOMIC_FETCHOR(caller->t_flags, TASK_FKEEPCORE);
-	TRY {
-		COMPILER_READ_BARRIER();
-		me  = caller->t_cpu;
-		iob = &FORCPU(me, thiscpu_x86_iob[0]);
-		/* Ensure that the caller is allowed hardware port access.
-		 * This essentially enforces that:
-		 *  - Anyone is allowed to disable ports (or keep them enabled)
-		 *  - As such, we must only throw an insufficient-rights exception
-		 *    if the calling  thread doesn't have  permissions to turn  on
-		 *    permissions for some specific port. */
-#ifndef CONFIG_EVERYONE_IS_ROOT
-		if (turn_on && !capable(CAP_SYS_RAWIO)) {
-			u32 i, end = (u32)(u16)from + (u32)(u16)num;
-			for (i = (u32)(u16)from; i < end; ++i) {
-				if (!iob_isenabled(iob, i))
-					THROW(E_INSUFFICIENT_RIGHTS, CAP_SYS_RAWIO);
-			}
-		} else
-#endif /* !CONFIG_EVERYONE_IS_ROOT */
-		{
-			/* Update bits for the given range. */
-			iob_setrange(iob,
-			             (u16)from,
-			             (u16)from + (u16)num - 1,
-			             turn_on != 0);
-		}
-	} EXCEPT {
+	RAII_FINALLY {
 		if (!(old_thread_flags & TASK_FKEEPCORE))
 			ATOMIC_AND(caller->t_flags, ~TASK_FKEEPCORE);
-		RETHROW();
+	};
+	COMPILER_READ_BARRIER();
+	me  = caller->t_cpu;
+	iob = &FORCPU(me, thiscpu_x86_iob[0]);
+	/* Ensure that the caller is allowed hardware port access.
+	 * This essentially enforces that:
+	 *  - Anyone is allowed to disable ports (or keep them enabled)
+	 *  - As such, we must only throw an insufficient-rights exception
+	 *    if the calling  thread doesn't have  permissions to turn  on
+	 *    permissions for some specific port. */
+#ifndef CONFIG_EVERYONE_IS_ROOT
+	if (turn_on && !capable(CAP_SYS_RAWIO)) {
+		u32 i, end = (u32)(u16)from + (u32)(u16)num;
+		for (i = (u32)(u16)from; i < end; ++i) {
+			if (!iob_isenabled(iob, i))
+				THROW(E_INSUFFICIENT_RIGHTS, CAP_SYS_RAWIO);
+		}
+	} else
+#endif /* !CONFIG_EVERYONE_IS_ROOT */
+	{
+		/* Update bits for the given range. */
+		iob_setrange(iob,
+		             (u16)from,
+		             (u16)from + (u16)num - 1,
+		             turn_on != 0);
 	}
-	if (!(old_thread_flags & TASK_FKEEPCORE))
-		ATOMIC_AND(caller->t_flags, ~TASK_FKEEPCORE);
 	return -EOK;
 }
 

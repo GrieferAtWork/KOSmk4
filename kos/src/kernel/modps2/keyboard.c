@@ -419,13 +419,9 @@ ps2_keyboard_setleds(struct kbddev *__restrict self,
 	if (new_leds & KEYBOARD_LED_CAPSLOCK)
 		new_ps2_leds |= PS2_KEYBOARD_CMD_SETLED_CAPSLOCK;
 	sync_write(&me->pk_cmdlock);
-	TRY {
-		ps2_keyboard_send_command_byte_and_wait_for_ack(me, PS2_KEYBOARD_CMD_SETLED);
-		ps2_keyboard_send_command_byte_and_wait_for_ack(me, new_ps2_leds);
-	} EXCEPT {
-		sync_endwrite(&me->pk_cmdlock);
-		RETHROW();
-	}
+	RAII_FINALLY { sync_endwrite(&me->pk_cmdlock); };
+	ps2_keyboard_send_command_byte_and_wait_for_ack(me, PS2_KEYBOARD_CMD_SETLED);
+	ps2_keyboard_send_command_byte_and_wait_for_ack(me, new_ps2_leds);
 }
 
 

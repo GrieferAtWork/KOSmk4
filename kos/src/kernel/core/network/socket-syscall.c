@@ -507,6 +507,7 @@ DEFINE_SYSCALL3(ssize_t, sendmsg, fd_t, sockfd,
 		      HANDLE_TYPEKIND_GENERIC, subkind);
 	}
 	{
+		size_t iov_total;
 		struct iov_buffer iov;
 		struct iov_entry *iov_vec;
 		struct ancillary_message control, *pcontrol = NULL;
@@ -517,62 +518,56 @@ DEFINE_SYSCALL3(ssize_t, sendmsg, fd_t, sockfd,
 			control.am_control    = msg.msg_control;
 			control.am_controllen = msg.msg_controllen;
 		}
-		iov_vec = (struct iov_entry *)malloca(msg.msg_iovlen *
-		                                             sizeof(struct iov_entry));
+		iov_vec = (struct iov_entry *)malloca(msg.msg_iovlen, sizeof(struct iov_entry));
+		RAII_FINALLY { freea(iov_vec); };
 		iov.iv_entv = iov_vec;
-		TRY {
-			size_t iov_total = 0;
-			/* Load the IO-vector */
-			if unlikely(!msg.msg_iovlen) {
-				/* Special case: Empty packet. */
-				iov.iv_entc         = 1;
-				iov.iv_entv         = &iov.iv_head;
-				iov.iv_head.ive_base = NULL;
-				iov.iv_head.ive_size = 0;
-				iov.iv_last         = 0;
-			} else {
-				size_t iov_i;
-				for (iov_i = 0; iov_i < msg.msg_iovlen; ++iov_i) {
-					struct iovec vec;
-					COMPILER_READ_BARRIER();
-					vec.iov_base = msg.msg_iov[iov_i].iov_base;
-					vec.iov_len  = msg.msg_iov[iov_i].iov_len;
-					COMPILER_READ_BARRIER();
-					validate_readable(vec.iov_base, vec.iov_len);
-					if (OVERFLOW_UADD(iov_total, vec.iov_len, &iov_total))
-						THROW(E_OVERFLOW); /* XXX: On x86, this could be done with `add+into' */
-					iov_vec[iov_i].ive_base = (USER CHECKED byte_t *)vec.iov_base;
-					iov_vec[iov_i].ive_size = vec.iov_len;
-				}
-				iov.iv_entc         = msg.msg_iovlen;
-				iov.iv_entv         = iov_vec;
-				iov.iv_head.ive_base = iov_vec[0].ive_base;
-				iov.iv_head.ive_size = iov_vec[0].ive_size;
-				iov.iv_last         = iov_vec[msg.msg_iovlen - 1].ive_size;
+		iov_total = 0;
+		/* Load the IO-vector */
+		if unlikely(!msg.msg_iovlen) {
+			/* Special case: Empty packet. */
+			iov.iv_entc         = 1;
+			iov.iv_entv         = &iov.iv_head;
+			iov.iv_head.ive_base = NULL;
+			iov.iv_head.ive_size = 0;
+			iov.iv_last         = 0;
+		} else {
+			size_t iov_i;
+			for (iov_i = 0; iov_i < msg.msg_iovlen; ++iov_i) {
+				struct iovec vec;
+				COMPILER_READ_BARRIER();
+				vec.iov_base = msg.msg_iov[iov_i].iov_base;
+				vec.iov_len  = msg.msg_iov[iov_i].iov_len;
+				COMPILER_READ_BARRIER();
+				validate_readable(vec.iov_base, vec.iov_len);
+				if (OVERFLOW_UADD(iov_total, vec.iov_len, &iov_total))
+					THROW(E_OVERFLOW); /* XXX: On x86, this could be done with `add+into' */
+				iov_vec[iov_i].ive_base = (USER CHECKED byte_t *)vec.iov_base;
+				iov_vec[iov_i].ive_size = vec.iov_len;
 			}
-			/* Actually send the packet! */
-			if (msg.msg_namelen) {
-				result = socket_sendtov((struct socket *)sock.h_data,
-				                        &iov,
-				                        iov_total,
-				                        msg.msg_name,
-				                        msg.msg_namelen,
-				                        pcontrol,
-				                        msg_flags,
-				                        sock.h_mode);
-			} else {
-				result = socket_sendv((struct socket *)sock.h_data,
-				                      &iov,
-				                      iov_total,
-				                      pcontrol,
-				                      msg_flags,
-				                      sock.h_mode);
-			}
-		} EXCEPT {
-			freea(iov_vec);
-			RETHROW();
+			iov.iv_entc         = msg.msg_iovlen;
+			iov.iv_entv         = iov_vec;
+			iov.iv_head.ive_base = iov_vec[0].ive_base;
+			iov.iv_head.ive_size = iov_vec[0].ive_size;
+			iov.iv_last         = iov_vec[msg.msg_iovlen - 1].ive_size;
 		}
-		freea(iov_vec);
+		/* Actually send the packet! */
+		if (msg.msg_namelen) {
+			result = socket_sendtov((struct socket *)sock.h_data,
+			                        &iov,
+			                        iov_total,
+			                        msg.msg_name,
+			                        msg.msg_namelen,
+			                        pcontrol,
+			                        msg_flags,
+			                        sock.h_mode);
+		} else {
+			result = socket_sendv((struct socket *)sock.h_data,
+			                      &iov,
+			                      iov_total,
+			                      pcontrol,
+			                      msg_flags,
+			                      sock.h_mode);
+		}
 	}
 	return (ssize_t)result;
 }
@@ -605,6 +600,7 @@ DEFINE_COMPAT_SYSCALL3(ssize_t, sendmsg, fd_t, sockfd,
 		      HANDLE_TYPEKIND_GENERIC, subkind);
 	}
 	{
+		size_t iov_total;
 		struct iov_buffer iov;
 		struct iov_entry *iov_vec;
 		struct ancillary_message control, *pcontrol = NULL;
@@ -616,62 +612,56 @@ DEFINE_COMPAT_SYSCALL3(ssize_t, sendmsg, fd_t, sockfd,
 			control.am_controllen     = msg.msg_controllen;
 			msg_flags |= MSG_CMSG_COMPAT;
 		}
-		iov_vec = (struct iov_entry *)malloca(msg.msg_iovlen *
-		                                             sizeof(struct iov_entry));
+		iov_vec = (struct iov_entry *)malloca(msg.msg_iovlen, sizeof(struct iov_entry));
+		RAII_FINALLY { freea(iov_vec); };
 		iov.iv_entv = iov_vec;
-		TRY {
-			size_t iov_total = 0;
-			/* Load the IO-vector */
-			if unlikely(!msg.msg_iovlen) {
-				/* Special case: Empty packet. */
-				iov.iv_entc         = 1;
-				iov.iv_entv         = &iov.iv_head;
-				iov.iv_head.ive_base = NULL;
-				iov.iv_head.ive_size = 0;
-				iov.iv_last         = 0;
-			} else {
-				size_t iov_i;
-				for (iov_i = 0; iov_i < msg.msg_iovlen; ++iov_i) {
-					struct iovec vec;
-					COMPILER_READ_BARRIER();
-					vec.iov_base = msg.msg_iov[iov_i].iov_base;
-					vec.iov_len  = msg.msg_iov[iov_i].iov_len;
-					COMPILER_READ_BARRIER();
-					compat_validate_readable(vec.iov_base, vec.iov_len);
-					if (OVERFLOW_UADD(iov_total, vec.iov_len, &iov_total))
-						THROW(E_OVERFLOW); /* XXX: On x86, this could be done with `add+into' */
-					iov_vec[iov_i].ive_base = (USER CHECKED byte_t *)vec.iov_base;
-					iov_vec[iov_i].ive_size = vec.iov_len;
-				}
-				iov.iv_entc         = msg.msg_iovlen;
-				iov.iv_entv         = iov_vec;
-				iov.iv_head.ive_base = iov_vec[0].ive_base;
-				iov.iv_head.ive_size = iov_vec[0].ive_size;
-				iov.iv_last         = iov_vec[msg.msg_iovlen - 1].ive_size;
+		iov_total = 0;
+		/* Load the IO-vector */
+		if unlikely(!msg.msg_iovlen) {
+			/* Special case: Empty packet. */
+			iov.iv_entc         = 1;
+			iov.iv_entv         = &iov.iv_head;
+			iov.iv_head.ive_base = NULL;
+			iov.iv_head.ive_size = 0;
+			iov.iv_last         = 0;
+		} else {
+			size_t iov_i;
+			for (iov_i = 0; iov_i < msg.msg_iovlen; ++iov_i) {
+				struct iovec vec;
+				COMPILER_READ_BARRIER();
+				vec.iov_base = msg.msg_iov[iov_i].iov_base;
+				vec.iov_len  = msg.msg_iov[iov_i].iov_len;
+				COMPILER_READ_BARRIER();
+				compat_validate_readable(vec.iov_base, vec.iov_len);
+				if (OVERFLOW_UADD(iov_total, vec.iov_len, &iov_total))
+					THROW(E_OVERFLOW); /* XXX: On x86, this could be done with `add+into' */
+				iov_vec[iov_i].ive_base = (USER CHECKED byte_t *)vec.iov_base;
+				iov_vec[iov_i].ive_size = vec.iov_len;
 			}
-			/* Actually send the packet! */
-			if (msg.msg_namelen) {
-				result = socket_sendtov((struct socket *)sock.h_data,
-				                        &iov,
-				                        iov_total,
-				                        msg.msg_name,
-				                        msg.msg_namelen,
-				                        pcontrol,
-				                        msg_flags,
-				                        sock.h_mode);
-			} else {
-				result = socket_sendv((struct socket *)sock.h_data,
-				                      &iov,
-				                      iov_total,
-				                      pcontrol,
-				                      msg_flags,
-				                      sock.h_mode);
-			}
-		} EXCEPT {
-			freea(iov_vec);
-			RETHROW();
+			iov.iv_entc         = msg.msg_iovlen;
+			iov.iv_entv         = iov_vec;
+			iov.iv_head.ive_base = iov_vec[0].ive_base;
+			iov.iv_head.ive_size = iov_vec[0].ive_size;
+			iov.iv_last         = iov_vec[msg.msg_iovlen - 1].ive_size;
 		}
-		freea(iov_vec);
+		/* Actually send the packet! */
+		if (msg.msg_namelen) {
+			result = socket_sendtov((struct socket *)sock.h_data,
+			                        &iov,
+			                        iov_total,
+			                        msg.msg_name,
+			                        msg.msg_namelen,
+			                        pcontrol,
+			                        msg_flags,
+			                        sock.h_mode);
+		} else {
+			result = socket_sendv((struct socket *)sock.h_data,
+			                      &iov,
+			                      iov_total,
+			                      pcontrol,
+			                      msg_flags,
+			                      sock.h_mode);
+		}
 	}
 	return (ssize_t)result;
 }
@@ -716,11 +706,11 @@ DEFINE_SYSCALL4(ssize_t, sendmmsg, fd_t, sockfd,
 			control.am_control    = msg.msg_control;
 			control.am_controllen = msg.msg_controllen;
 		}
-		iov_vec = (struct iov_entry *)malloca(msg.msg_iovlen *
-		                                             sizeof(struct iov_entry));
-		iov.iv_entv = iov_vec;
-		TRY {
+		iov_vec = (struct iov_entry *)malloca(msg.msg_iovlen, sizeof(struct iov_entry));
+		{
 			size_t iov_total = 0;
+			RAII_FINALLY { freea(iov_vec); };
+			iov.iv_entv = iov_vec;
 			/* Load the IO-vector */
 			if unlikely(!msg.msg_iovlen) {
 				/* Special case: Empty packet. */
@@ -773,17 +763,12 @@ DEFINE_SYSCALL4(ssize_t, sendmmsg, fd_t, sockfd,
 				 *               than the first  one, then  the related  error
 				 *               is discarded, and the number of messages that
 				 *               were sent successfully  is returned  instead. */
-				if (i != 0) {
-					freea(iov_vec);
+				error_class_t cls = error_class();
+				if (i != 0 && !ERRORCLASS_ISRTLPRIORITY(cls))
 					goto done;
-				}
 				RETHROW();
 			}
-		} EXCEPT {
-			freea(iov_vec);
-			RETHROW();
-		}
-		freea(iov_vec);
+		} /* Scope... */
 		/* Write-back the amount of data that got sent. */
 		COMPILER_WRITE_BARRIER();
 		vmessages[i].msg_len = (u32)result;
@@ -834,11 +819,11 @@ DEFINE_COMPAT_SYSCALL4(ssize_t, sendmmsg, fd_t, sockfd,
 			control.am_control_compat = msg.msg_control;
 			control.am_controllen     = msg.msg_controllen;
 		}
-		iov_vec = (struct iov_entry *)malloca(msg.msg_iovlen *
-		                                             sizeof(struct iov_entry));
-		iov.iv_entv = iov_vec;
-		TRY {
+		iov_vec = (struct iov_entry *)malloca(msg.msg_iovlen, sizeof(struct iov_entry));
+		{
 			size_t iov_total = 0;
+			RAII_FINALLY { freea(iov_vec); };
+			iov.iv_entv = iov_vec;
 			/* Load the IO-vector */
 			if unlikely(!msg.msg_iovlen) {
 				/* Special case: Empty packet. */
@@ -891,17 +876,12 @@ DEFINE_COMPAT_SYSCALL4(ssize_t, sendmmsg, fd_t, sockfd,
 				 *               than the first  one, then  the related  error
 				 *               is discarded, and the number of messages that
 				 *               were sent successfully  is returned  instead. */
-				if (i != 0) {
-					freea(iov_vec);
+				error_class_t cls = error_class();
+				if (i != 0 && !ERRORCLASS_ISRTLPRIORITY(cls))
 					goto done;
-				}
 				RETHROW();
 			}
-		} EXCEPT {
-			freea(iov_vec);
-			RETHROW();
 		}
-		freea(iov_vec);
 		/* Write-back the amount of data that got sent. */
 		COMPILER_WRITE_BARRIER();
 		vmessages[i].msg_len = (u32)result;
@@ -1040,6 +1020,7 @@ DEFINE_SYSCALL3(ssize_t, recvmsg, fd_t, sockfd,
 		      HANDLE_TYPEKIND_GENERIC, subkind);
 	}
 	{
+		size_t iov_total;
 		struct socket *me = (struct socket *)sock.h_data;
 		struct iov_buffer iov;
 		struct iov_entry *iov_vec;
@@ -1055,63 +1036,58 @@ DEFINE_SYSCALL3(ssize_t, recvmsg, fd_t, sockfd,
 			control.am_controllen  = msg.msg_controllen;
 			control.am_controlused = (USER CHECKED size_t *)&message->msg_controllen; /* Write-back */
 		}
-		iov_vec = (struct iov_entry *)malloca(msg.msg_iovlen *
-		                                             sizeof(struct iov_entry));
+		iov_vec = (struct iov_entry *)malloca(msg.msg_iovlen, sizeof(struct iov_entry));
+		RAII_FINALLY { freea(iov_vec); };
 		iov.iv_entv = iov_vec;
-		TRY {
-			size_t iov_total = 0;
-			/* Load the IO-vector */
-			if unlikely(!msg.msg_iovlen) {
-				/* Special case: Empty packet. */
-				iov.iv_entc         = 1;
-				iov.iv_entv         = &iov.iv_head;
-				iov.iv_head.ive_base = NULL;
-				iov.iv_head.ive_size = 0;
-				iov.iv_last         = 0;
-			} else {
-				size_t iov_i;
-				for (iov_i = 0; iov_i < msg.msg_iovlen; ++iov_i) {
-					struct iovec vec;
-					COMPILER_READ_BARRIER();
-					vec.iov_base = msg.msg_iov[iov_i].iov_base;
-					vec.iov_len  = msg.msg_iov[iov_i].iov_len;
-					COMPILER_READ_BARRIER();
-					validate_writable(vec.iov_base, vec.iov_len);
-					if (OVERFLOW_UADD(iov_total, vec.iov_len, &iov_total))
-						THROW(E_OVERFLOW); /* XXX: On x86, this could be done with `add+into' */
-					iov_vec[iov_i].ive_base = (USER CHECKED byte_t *)vec.iov_base;
-					iov_vec[iov_i].ive_size = vec.iov_len;
-				}
-				iov.iv_entc         = msg.msg_iovlen;
-				iov.iv_entv         = iov_vec;
-				iov.iv_head.ive_base = iov_vec[0].ive_base;
-				iov.iv_head.ive_size = iov_vec[0].ive_size;
-				iov.iv_last         = iov_vec[msg.msg_iovlen - 1].ive_size;
+		iov_total   = 0;
+
+		/* Load the IO-vector */
+		if unlikely(!msg.msg_iovlen) {
+			/* Special case: Empty packet. */
+			iov.iv_entc         = 1;
+			iov.iv_entv         = &iov.iv_head;
+			iov.iv_head.ive_base = NULL;
+			iov.iv_head.ive_size = 0;
+			iov.iv_last         = 0;
+		} else {
+			size_t iov_i;
+			for (iov_i = 0; iov_i < msg.msg_iovlen; ++iov_i) {
+				struct iovec vec;
+				COMPILER_READ_BARRIER();
+				vec.iov_base = msg.msg_iov[iov_i].iov_base;
+				vec.iov_len  = msg.msg_iov[iov_i].iov_len;
+				COMPILER_READ_BARRIER();
+				validate_writable(vec.iov_base, vec.iov_len);
+				if (OVERFLOW_UADD(iov_total, vec.iov_len, &iov_total))
+					THROW(E_OVERFLOW); /* XXX: On x86, this could be done with `add+into' */
+				iov_vec[iov_i].ive_base = (USER CHECKED byte_t *)vec.iov_base;
+				iov_vec[iov_i].ive_size = vec.iov_len;
 			}
-			/* Actually receive the packet! */
-			if (msg.msg_namelen) {
-				result = socket_recvfromv(/* self:          */ me,
-				                          /* buf:           */ &iov,
-				                          /* bufsize:       */ iov_total,
-				                          /* addr:          */ msg.msg_name,
-				                          /* addr_len:      */ msg.msg_namelen,
-				                          /* preq_addr_len: */ &message->msg_namelen,
-				                          /* presult_flags: */ &message->msg_flags,
-				                          /* msg_control:   */ pcontrol,
-				                          /* msg_flags:     */ msg_flags);
-			} else {
-				result = socket_recvv(/* self:          */ me,
-				                      /* buf:           */ &iov,
-				                      /* bufsize:       */ iov_total,
-				                      /* presult_flags: */ &message->msg_flags,
-				                      /* msg_control:   */ pcontrol,
-				                      /* msg_flags:     */ msg_flags);
-			}
-		} EXCEPT {
-			freea(iov_vec);
-			RETHROW();
+			iov.iv_entc         = msg.msg_iovlen;
+			iov.iv_entv         = iov_vec;
+			iov.iv_head.ive_base = iov_vec[0].ive_base;
+			iov.iv_head.ive_size = iov_vec[0].ive_size;
+			iov.iv_last         = iov_vec[msg.msg_iovlen - 1].ive_size;
 		}
-		freea(iov_vec);
+		/* Actually receive the packet! */
+		if (msg.msg_namelen) {
+			result = socket_recvfromv(/* self:          */ me,
+			                          /* buf:           */ &iov,
+			                          /* bufsize:       */ iov_total,
+			                          /* addr:          */ msg.msg_name,
+			                          /* addr_len:      */ msg.msg_namelen,
+			                          /* preq_addr_len: */ &message->msg_namelen,
+			                          /* presult_flags: */ &message->msg_flags,
+			                          /* msg_control:   */ pcontrol,
+			                          /* msg_flags:     */ msg_flags);
+		} else {
+			result = socket_recvv(/* self:          */ me,
+			                      /* buf:           */ &iov,
+			                      /* bufsize:       */ iov_total,
+			                      /* presult_flags: */ &message->msg_flags,
+			                      /* msg_control:   */ pcontrol,
+			                      /* msg_flags:     */ msg_flags);
+		}
 	}
 	return (ssize_t)result;
 }
@@ -1144,6 +1120,7 @@ DEFINE_COMPAT_SYSCALL3(ssize_t, recvmsg, fd_t, sockfd,
 		      HANDLE_TYPEKIND_GENERIC, subkind);
 	}
 	{
+		size_t iov_total;
 		struct socket *me = (struct socket *)sock.h_data;
 		struct iov_buffer iov;
 		struct iov_entry *iov_vec;
@@ -1159,63 +1136,58 @@ DEFINE_COMPAT_SYSCALL3(ssize_t, recvmsg, fd_t, sockfd,
 			control.am_controlused_compat = &message->msg_controllen; /* Write-back */
 			msg_flags |= MSG_CMSG_COMPAT;
 		}
-		iov_vec = (struct iov_entry *)malloca(msg.msg_iovlen *
-		                                             sizeof(struct iov_entry));
+		iov_vec = (struct iov_entry *)malloca(msg.msg_iovlen, sizeof(struct iov_entry));
+		RAII_FINALLY { freea(iov_vec); };
 		iov.iv_entv = iov_vec;
-		TRY {
-			size_t iov_total = 0;
-			/* Load the IO-vector */
-			if unlikely(!msg.msg_iovlen) {
-				/* Special case: Empty packet. */
-				iov.iv_entc         = 1;
-				iov.iv_entv         = &iov.iv_head;
-				iov.iv_head.ive_base = NULL;
-				iov.iv_head.ive_size = 0;
-				iov.iv_last         = 0;
-			} else {
-				size_t iov_i;
-				for (iov_i = 0; iov_i < msg.msg_iovlen; ++iov_i) {
-					struct iovec vec;
-					COMPILER_READ_BARRIER();
-					vec.iov_base = msg.msg_iov[iov_i].iov_base;
-					vec.iov_len  = msg.msg_iov[iov_i].iov_len;
-					COMPILER_READ_BARRIER();
-					compat_validate_writable(vec.iov_base, vec.iov_len);
-					if (OVERFLOW_UADD(iov_total, vec.iov_len, &iov_total))
-						THROW(E_OVERFLOW); /* XXX: On x86, this could be done with `add+into' */
-					iov_vec[iov_i].ive_base = (USER CHECKED byte_t *)vec.iov_base;
-					iov_vec[iov_i].ive_size = vec.iov_len;
-				}
-				iov.iv_entc         = msg.msg_iovlen;
-				iov.iv_entv         = iov_vec;
-				iov.iv_head.ive_base = iov_vec[0].ive_base;
-				iov.iv_head.ive_size = iov_vec[0].ive_size;
-				iov.iv_last         = iov_vec[msg.msg_iovlen - 1].ive_size;
+		iov_total   = 0;
+
+		/* Load the IO-vector */
+		if unlikely(!msg.msg_iovlen) {
+			/* Special case: Empty packet. */
+			iov.iv_entc         = 1;
+			iov.iv_entv         = &iov.iv_head;
+			iov.iv_head.ive_base = NULL;
+			iov.iv_head.ive_size = 0;
+			iov.iv_last         = 0;
+		} else {
+			size_t iov_i;
+			for (iov_i = 0; iov_i < msg.msg_iovlen; ++iov_i) {
+				struct iovec vec;
+				COMPILER_READ_BARRIER();
+				vec.iov_base = msg.msg_iov[iov_i].iov_base;
+				vec.iov_len  = msg.msg_iov[iov_i].iov_len;
+				COMPILER_READ_BARRIER();
+				compat_validate_writable(vec.iov_base, vec.iov_len);
+				if (OVERFLOW_UADD(iov_total, vec.iov_len, &iov_total))
+					THROW(E_OVERFLOW); /* XXX: On x86, this could be done with `add+into' */
+				iov_vec[iov_i].ive_base = (USER CHECKED byte_t *)vec.iov_base;
+				iov_vec[iov_i].ive_size = vec.iov_len;
 			}
-			/* Actually send the packet! */
-			if (msg.msg_namelen) {
-				result = socket_recvfromv(/* self:          */ me,
-				                          /* buf:           */ &iov,
-				                          /* bufsize:       */ iov_total,
-				                          /* addr:          */ msg.msg_name,
-				                          /* addr_len:      */ msg.msg_namelen,
-				                          /* preq_addr_len: */ &message->msg_namelen,
-				                          /* presult_flags: */ &message->msg_flags,
-				                          /* msg_control:   */ pcontrol,
-				                          /* msg_flags:     */ msg_flags);
-			} else {
-				result = socket_recvv(/* self:          */ me,
-				                      /* buf:           */ &iov,
-				                      /* bufsize:       */ iov_total,
-				                      /* presult_flags: */ &message->msg_flags,
-				                      /* msg_control:   */ pcontrol,
-				                      /* msg_flags:     */ msg_flags);
-			}
-		} EXCEPT {
-			freea(iov_vec);
-			RETHROW();
+			iov.iv_entc         = msg.msg_iovlen;
+			iov.iv_entv         = iov_vec;
+			iov.iv_head.ive_base = iov_vec[0].ive_base;
+			iov.iv_head.ive_size = iov_vec[0].ive_size;
+			iov.iv_last         = iov_vec[msg.msg_iovlen - 1].ive_size;
 		}
-		freea(iov_vec);
+		/* Actually send the packet! */
+		if (msg.msg_namelen) {
+			result = socket_recvfromv(/* self:          */ me,
+			                          /* buf:           */ &iov,
+			                          /* bufsize:       */ iov_total,
+			                          /* addr:          */ msg.msg_name,
+			                          /* addr_len:      */ msg.msg_namelen,
+			                          /* preq_addr_len: */ &message->msg_namelen,
+			                          /* presult_flags: */ &message->msg_flags,
+			                          /* msg_control:   */ pcontrol,
+			                          /* msg_flags:     */ msg_flags);
+		} else {
+			result = socket_recvv(/* self:          */ me,
+			                      /* buf:           */ &iov,
+			                      /* bufsize:       */ iov_total,
+			                      /* presult_flags: */ &message->msg_flags,
+			                      /* msg_control:   */ pcontrol,
+			                      /* msg_flags:     */ msg_flags);
+		}
 	}
 	return (ssize_t)result;
 }
@@ -1273,11 +1245,11 @@ sys_recvmmsg_impl(fd_t sockfd,
 			control.am_controllen  = msg.msg_controllen;
 			control.am_controlused = (USER CHECKED size_t *)&vmessages[i].msg_hdr.msg_controllen; /* Write-back */
 		}
-		iov_vec = (struct iov_entry *)malloca(msg.msg_iovlen *
-		                                             sizeof(struct iov_entry));
-		iov.iv_entv = iov_vec;
-		TRY {
+		iov_vec = (struct iov_entry *)malloca(msg.msg_iovlen, sizeof(struct iov_entry));
+		{
+			RAII_FINALLY { freea(iov_vec); };
 			size_t iov_total = 0;
+			iov.iv_entv = iov_vec;
 			/* Load the IO-vector */
 			if unlikely(!msg.msg_iovlen) {
 				/* Special case: Empty packet. */
@@ -1333,20 +1305,12 @@ sys_recvmmsg_impl(fd_t sockfd,
 				 *               than the first  one, then  the related  error
 				 *               is discarded, and the number of messages that
 				 *               were sent successfully  is returned  instead. */
-				if (i != 0) {
-					error_class_t cls = error_class();
-					if (ERRORCLASS_ISRTLPRIORITY(cls))
-						RETHROW();
-					freea(iov_vec);
+				error_class_t cls = error_class();
+				if (i != 0 && !ERRORCLASS_ISRTLPRIORITY(cls))
 					goto done;
-				}
 				RETHROW();
 			}
-		} EXCEPT {
-			freea(iov_vec);
-			RETHROW();
 		}
-		freea(iov_vec);
 		/* Write-back the amount of data that got sent. */
 		COMPILER_WRITE_BARRIER();
 		vmessages[i].msg_len = (typeof(vmessages[i].msg_len))result;
@@ -1460,9 +1424,10 @@ compat_sys_recvmmsg_impl(fd_t sockfd,
 		}
 		iov_vec = (struct iov_entry *)malloca(msg.msg_iovlen *
 		                                             sizeof(struct iov_entry));
-		iov.iv_entv = iov_vec;
-		TRY {
+		{
+			RAII_FINALLY { freea(iov_vec); };
 			size_t iov_total = 0;
+			iov.iv_entv      = iov_vec;
 			/* Load the IO-vector */
 			if unlikely(!msg.msg_iovlen) {
 				/* Special case: Empty packet. */
@@ -1518,20 +1483,12 @@ compat_sys_recvmmsg_impl(fd_t sockfd,
 				 *               than the first  one, then  the related  error
 				 *               is discarded, and the number of messages that
 				 *               were sent successfully  is returned  instead. */
-				if (i != 0) {
-					error_class_t cls = error_class();
-					if (ERRORCLASS_ISRTLPRIORITY(cls))
-						RETHROW();
-					freea(iov_vec);
+				error_class_t cls = error_class();
+				if (i != 0 && ERRORCLASS_ISRTLPRIORITY(cls))
 					goto done;
-				}
 				RETHROW();
 			}
-		} EXCEPT {
-			freea(iov_vec);
-			RETHROW();
 		}
-		freea(iov_vec);
 		/* Write-back the amount of data that got sent. */
 		COMPILER_WRITE_BARRIER();
 		vmessages[i].msg_len = (typeof(vmessages[i].msg_len))result;

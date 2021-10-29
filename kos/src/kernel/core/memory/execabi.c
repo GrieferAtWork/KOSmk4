@@ -128,14 +128,11 @@ again:
 		return false;
 	}
 	/* Extend the list of supported ABIs. */
-	TRY {
-		new_abis = (REF struct execabis_struct *)kmalloc(offsetof(struct execabis_struct, eas_abis) +
-		                                                 (old_abis->eas_count + 1) * sizeof(struct execabi),
-		                                                 GFP_NORMAL);
-	} EXCEPT {
-		decref_unlikely(old_abis);
-		RETHROW();
-	}
+	FINALLY_DECREF(old_abis);
+	new_abis = (REF struct execabis_struct *)kmalloc(offsetof(struct execabis_struct, eas_abis) +
+	                                                 (old_abis->eas_count + 1) * sizeof(struct execabi),
+	                                                 GFP_NORMAL);
+
 	/* Copy existing ABIs. */
 	memcpy(new_abis->eas_abis, old_abis->eas_abis,
 	       old_abis->eas_count, sizeof(struct execabi));
@@ -150,11 +147,9 @@ again:
 
 	/* Atomically load the new ABI descriptor. */
 	if (!arref_cmpxch_inherit_new(&execabis, old_abis, new_abis)) {
-		decref_unlikely(old_abis);
 		destroy(new_abis);
 		goto again;
 	}
-	decref_unlikely(old_abis);
 	return true;
 }
 
@@ -172,19 +167,12 @@ again:
 		if (old_abis->eas_abis[i].ea_driver == self)
 			++abi_count;
 	}
-	if (abi_count == 0) {
-		/* No ABIs defined by this driver. */
-		decref_unlikely(old_abis);
-		return false;
-	}
-	TRY {
-		new_abis = (REF struct execabis_struct *)kmalloc((old_abis->eas_count - abi_count) *
-		                                                 sizeof(struct execabi),
-		                                                 GFP_NORMAL);
-	} EXCEPT {
-		decref_unlikely(old_abis);
-		RETHROW();
-	}
+	FINALLY_DECREF(old_abis);
+	if (abi_count == 0)
+		return false; /* No ABIs defined by this driver. */
+	new_abis = (REF struct execabis_struct *)kmalloc((old_abis->eas_count - abi_count) *
+	                                                 sizeof(struct execabi),
+	                                                 GFP_NORMAL);
 	new_abis->eas_refcnt = 1;
 	new_abis->eas_count  = old_abis->eas_count - abi_count;
 	/* Copy only ABIs defined by other drivers into `new_abis' */
@@ -209,11 +197,9 @@ again:
 
 	/* Atomically load the new ABI descriptor. */
 	if (!arref_cmpxch_inherit_new(&execabis, old_abis, new_abis)) {
-		decref_unlikely(old_abis);
 		destroy(new_abis);
 		goto again;
 	}
-	decref_unlikely(old_abis);
 	return true;
 }
 

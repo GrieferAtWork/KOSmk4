@@ -425,8 +425,10 @@ again_lock_mman:
 					userexcept_sysret_inject_self();
 					RETHROW();
 				}
+
 				/* Restore our old kernel-space signal mask. */
 				arref_set_inherit(maskref, old_sigmask);
+
 				/* Re-enable userprocmask-mode. */
 				ATOMIC_OR(caller->t_flags, TASK_FUSERPROCMASK);
 

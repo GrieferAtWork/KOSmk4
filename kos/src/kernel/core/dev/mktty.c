@@ -620,6 +620,7 @@ DEFINE_SYSCALL4(fd_t, mktty,
                 USER UNCHECKED char const *, name,
                 fd_t, keyboard, fd_t, display,
                 syscall_ulong_t, reserved) {
+	REF struct mkttydev *tty;
 	unsigned int result;
 	struct handle hkeyboard;
 	struct handle hdisplay;
@@ -638,82 +639,74 @@ DEFINE_SYSCALL4(fd_t, mktty,
 		      MKTTY_NAME_MAXLEN);
 	}
 
-	hkeyboard = handle_lookup((unsigned int)keyboard);
-	TRY {
+	{
+		hkeyboard = handle_lookup((unsigned int)keyboard);
+		RAII_FINALLY { decref_unlikely(hkeyboard); };
 		hdisplay = handle_lookup((unsigned int)display);
-		TRY {
-			REF struct mkttydev *tty;
-			/* Ensure that the caller has permission to:
-			 *   - Read from the keyboard
-			 *   - Write from to the display
-			 */
-			if (!IO_CANREAD(hkeyboard.h_mode))
-				THROW(E_INVALID_HANDLE_OPERATION,
-				      (unsigned int)keyboard,
-				      E_INVALID_HANDLE_OPERATION_READ,
-				      hkeyboard.h_mode);
-			if (!IO_CANWRITE(hdisplay.h_mode))
-				THROW(E_INVALID_HANDLE_OPERATION,
-				      (unsigned int)display,
-				      E_INVALID_HANDLE_OPERATION_WRITE,
-				      hdisplay.h_mode);
-			/* Construct the new TTY device. */
+		RAII_FINALLY { decref_unlikely(hdisplay); };
+		/* Ensure that the caller has permission to:
+		 *   - Read from the keyboard
+		 *   - Write from to the display
+		 */
+		if (!IO_CANREAD(hkeyboard.h_mode))
+			THROW(E_INVALID_HANDLE_OPERATION,
+			      (unsigned int)keyboard,
+			      E_INVALID_HANDLE_OPERATION_READ,
+			      hkeyboard.h_mode);
+		if (!IO_CANWRITE(hdisplay.h_mode))
+			THROW(E_INVALID_HANDLE_OPERATION,
+			      (unsigned int)display,
+			      E_INVALID_HANDLE_OPERATION_WRITE,
+			      hdisplay.h_mode);
+
+		/* Construct the new TTY device. */
 #ifdef CONFIG_USE_NEW_FS
-			tty = mkttydev_new(hkeyboard.h_type, hkeyboard.h_data,
-			                   hdisplay.h_type, hdisplay.h_data,
-			                   name, namelen);
-			TRY {
-				struct handle htty;
-
-				/* Start forwarding input data. */
-				mkttydev_startfwd(tty);
-
-				/* Store the new TTY into a handle. */
-				htty.h_type = HANDLE_TYPE_MFILE;
-				htty.h_mode = IO_RDWR;
-				htty.h_data = tty;
-				result = handle_install(THIS_HANDLE_MANAGER, htty);
-			} EXCEPT {
-				mkttydev_stopfwd(tty);
-				device_delete(tty);
-				decref_unlikely(tty);
-				RETHROW();
-			}
+		tty = mkttydev_new(hkeyboard.h_type, hkeyboard.h_data,
+		                   hdisplay.h_type, hdisplay.h_data,
+		                   name, namelen);
 #else /* CONFIG_USE_NEW_FS */
-			tty = mkttydev_alloc(hkeyboard.h_type, hkeyboard.h_data,
-			                     hdisplay.h_type, hdisplay.h_data);
-			TRY {
-				/* Assign a name to the new device. */
-				memcpy(tty->cd_name, name, namelen, sizeof(char));
-				assert(tty->cd_name[namelen] == '\0');
-				/* Register the device, and add it to the devfs. */
-				chrdev_register_auto(tty);
-				TRY {
-					struct handle htty;
-					/* Start forwarding input data. */
-					mkttydev_startfwd(tty);
-					/* Store the new TTY into a handle. */
-					htty.h_type = HANDLE_TYPE_CHRDEV;
-					htty.h_mode = IO_RDWR;
-					htty.h_data = tty;
-					result = handle_install(THIS_HANDLE_MANAGER, htty);
-				} EXCEPT {
-					chrdev_unregister(tty);
-					RETHROW();
-				}
-			} EXCEPT {
-				decref_unlikely(tty);
-				RETHROW();
-			}
+		tty = mkttydev_alloc(hkeyboard.h_type, hkeyboard.h_data,
+		                     hdisplay.h_type, hdisplay.h_data);
 #endif /* !CONFIG_USE_NEW_FS */
-		} EXCEPT {
-			decref(hdisplay);
-			RETHROW();
-		}
+	}
+	FINALLY_DECREF_UNLIKELY(tty);
+#ifdef CONFIG_USE_NEW_FS
+	TRY {
+		struct handle htty;
+
+		/* Start forwarding input data. */
+		mkttydev_startfwd(tty);
+
+		/* Store the new TTY into a handle. */
+		htty.h_type = HANDLE_TYPE_MFILE;
+		htty.h_mode = IO_RDWR;
+		htty.h_data = tty;
+		result = handle_install(THIS_HANDLE_MANAGER, htty);
 	} EXCEPT {
-		decref(hkeyboard);
+		mkttydev_stopfwd(tty);
+		device_delete(tty);
 		RETHROW();
 	}
+#else /* CONFIG_USE_NEW_FS */
+	/* Assign a name to the new device. */
+	memcpy(tty->cd_name, name, namelen, sizeof(char));
+	assert(tty->cd_name[namelen] == '\0');
+	/* Register the device, and add it to the devfs. */
+	chrdev_register_auto(tty);
+	TRY {
+		struct handle htty;
+		/* Start forwarding input data. */
+		mkttydev_startfwd(tty);
+		/* Store the new TTY into a handle. */
+		htty.h_type = HANDLE_TYPE_CHRDEV;
+		htty.h_mode = IO_RDWR;
+		htty.h_data = tty;
+		result = handle_install(THIS_HANDLE_MANAGER, htty);
+	} EXCEPT {
+		chrdev_unregister(tty);
+		RETHROW();
+	}
+#endif /* !CONFIG_USE_NEW_FS */
 	return (fd_t)result;
 }
 #endif /* __ARCH_WANT_SYSCALL_MKTTY */

@@ -500,15 +500,10 @@ Ne2k_UploadPacket(port_t dataport,
 #define PRINT_SEGMENT(p, s) Ne2k_PrintData(&d, p, s)
 	{
 		REF struct mman *oldmm;
+		/* The payload must be printed from the perspective of `payload_mm'! */
 		oldmm = task_xchmman(payload_mm);
-		TRY {
-			/* The payload must be printed from the perspective of `payload_mm'! */
-			nic_packet_print(self, PRINT_SEGMENT);
-		} EXCEPT {
-			task_setmman_inherit(oldmm);
-			RETHROW();
-		}
-		task_setmman_inherit(oldmm);
+		RAII_FINALLY { task_setmman_inherit(oldmm); };
+		nic_packet_print(self, PRINT_SEGMENT);
 	}
 #undef PRINT_SEGMENT
 	if unlikely(d.nup_hashalf) {

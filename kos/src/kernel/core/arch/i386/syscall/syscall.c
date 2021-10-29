@@ -29,6 +29,7 @@
 #include <kernel/coredump.h>
 #include <kernel/debugtrap.h>
 #include <kernel/except.h>
+#include <kernel/mman/phys.h>
 #include <kernel/panic.h>
 #include <kernel/printk.h>
 #include <kernel/syscall-properties.h>
@@ -36,15 +37,14 @@
 #include <kernel/syscall.h>
 #include <kernel/types.h>
 #include <kernel/user.h>
-#include <kernel/mman/phys.h>
 #include <kernel/x86/cpuid.h>
 #include <kernel/x86/idt.h>
 #include <kernel/x86/syscall-tables.h>
 #include <sched/cpu.h>
-#include <sched/mutex.h>
 #include <sched/pid.h>
 #include <sched/posix-signal.h>
 #include <sched/rpc.h>
+#include <sched/shared_lock.h>
 #include <sched/task.h>
 #include <sched/x86/tss.h>
 
@@ -120,9 +120,7 @@ NOTHROW(FCALL __asm32_bad_sysenter_extension_impl)(struct icpustate *__restrict 
 
 #ifndef CONFIG_NO_SYSCALL_TRACING
 INTERN ATTR_COLDBSS bool syscall_tracing_enabled = false;
-PRIVATE ATTR_COLDBSS struct mutex syscall_tracing_lock = MUTEX_INIT;
-DEFINE_DBG_BZERO_OBJECT(syscall_tracing_lock);
-
+PRIVATE ATTR_COLDBSS struct shared_lock syscall_tracing_lock = SHARED_LOCK_INIT;
 
 #ifndef CONFIG_NO_SMP
 PRIVATE NOBLOCK NONNULL((1, 2)) struct icpustate *
@@ -188,12 +186,12 @@ PUBLIC bool KCALL arch_syscall_tracing_setenabled(bool enable, bool nx) {
 	bool result;
 	struct idt_segment newsyscall;
 	void const *addr;
-	if (!sync_trywrite(&syscall_tracing_lock)) {
+	if (!shared_lock_tryacquire(&syscall_tracing_lock)) {
 		if (nx)
 			return false;
-		sync_write(&syscall_tracing_lock);
+		shared_lock_acquire(&syscall_tracing_lock);
 	}
-	FINALLY_ENDWRITE(&syscall_tracing_lock);
+	RAII_FINALLY { shared_lock_release(&syscall_tracing_lock); };
 
 	addr = enable ? (void const *)&x86_syscall32_int80_traced
 	              : (void const *)&x86_syscall32_int80;

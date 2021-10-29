@@ -320,13 +320,10 @@ er_bad_addr_alignment:
 	fm.mfm_prot  = prot;
 	fm.mfm_flags = flags;
 	SLIST_MOVE(&fm.mfm_flist, &self->_mb_fnodes);
-	TRY {
+	{
+		RAII_FINALLY { SLIST_MOVE(&self->_mb_fnodes, &fm.mfm_flist); };
 		_mfile_map_init(&fm);
-	} EXCEPT {
-		SLIST_MOVE(&self->_mb_fnodes, &fm.mfm_flist);
-		RETHROW();
 	}
-	SLIST_MOVE(&self->_mb_fnodes, &fm.mfm_flist);
 
 	/* Convert the node list into a `struct mbnode' */
 	fmnode = (struct mbnode *)SLIST_FIRST(&fm.mfm_nodes);
@@ -486,13 +483,10 @@ er_bad_addr_alignment:
 			fm.mfm_prot  = prot;
 			fm.mfm_flags = flags;
 			SLIST_MOVE(&fm.mfm_flist, &self->_mb_fnodes);
-			TRY {
+			{
+				RAII_FINALLY { SLIST_MOVE(&self->_mb_fnodes, &fm.mfm_flist); };
 				_mfile_map_init(&fm);
-			} EXCEPT {
-				SLIST_MOVE(&self->_mb_fnodes, &fm.mfm_flist);
-				RETHROW();
 			}
-			SLIST_MOVE(&self->_mb_fnodes, &fm.mfm_flist);
 
 			/* Convert the node list into a `struct mbnode' */
 			fmnode = (struct mbnode *)SLIST_FIRST(&fm.mfm_nodes);

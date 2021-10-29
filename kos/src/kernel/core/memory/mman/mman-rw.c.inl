@@ -139,21 +139,17 @@ mman_memset(struct mman *__restrict self,
 #elif defined(LOCAL_IS_WRITING) && defined(LOCAL_IS_NOPF)
 			error = memcpy_nopf(addr, buf, num_bytes);
 #endif /* ... */
-#else /* LOCAL_IS_NOPF */
-			TRY {
-#if defined(LOCAL_IS_MEMSET)
-				memset(addr, byte, num_bytes);
-#elif defined(LOCAL_IS_READING)
-				memcpy(buf, addr, num_bytes);
-#elif defined(LOCAL_IS_WRITING)
-				memcpy(addr, buf, num_bytes);
-#endif /* ... */
-			} EXCEPT {
-				task_setmman_inherit(oldmm);
-				RETHROW();
-			}
-#endif /* !LOCAL_IS_NOPF */
 			task_setmman_inherit(oldmm);
+#else /* LOCAL_IS_NOPF */
+			RAII_FINALLY { task_setmman_inherit(oldmm); };
+#if defined(LOCAL_IS_MEMSET)
+			memset(addr, byte, num_bytes);
+#elif defined(LOCAL_IS_READING)
+			memcpy(buf, addr, num_bytes);
+#elif defined(LOCAL_IS_WRITING)
+			memcpy(addr, buf, num_bytes);
+#endif /* ... */
+#endif /* !LOCAL_IS_NOPF */
 		}
 	}
 #ifndef LOCAL_IS_MEMSET

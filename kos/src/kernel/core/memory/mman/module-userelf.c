@@ -451,8 +451,12 @@ uems_getaddr_inflate(struct userelf_module_section *__restrict self,
 			RETHROW();
 		}
 	}
-	TRY {
+	{
 		UM_ElfW_Chdr *chdr;
+		RAII_FINALLY {
+			if (src_data_freeme_cookie)
+				mman_unmap_kram_and_kfree(src_data, self->ms_size, src_data_freeme_cookie);
+		};
 		chdr = (UM_ElfW_Chdr *)src_data;
 		if unlikely(UM_field(mod, *chdr, .ch_type) != ELFCOMPRESS_ZLIB)
 			THROW(E_INVALID_ARGUMENT);
@@ -510,13 +514,7 @@ uems_getaddr_inflate(struct userelf_module_section *__restrict self,
 			mman_unmap_kram(dst_data, dst_size);
 			RETHROW();
 		}
-	} EXCEPT {
-		if (src_data_freeme_cookie)
-			mman_unmap_kram_and_kfree(src_data, self->ms_size, src_data_freeme_cookie);
-		RETHROW();
 	}
-	if (src_data_freeme_cookie)
-		mman_unmap_kram_and_kfree(src_data, self->ms_size, src_data_freeme_cookie);
 	ATOMIC_WRITE(self->ums_inflsize, dst_size);
 	ATOMIC_CMPXCH(self->ums_infladdr, (KERNEL byte_t *)-1, dst_data);
 	*psize = dst_size;

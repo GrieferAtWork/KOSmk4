@@ -394,13 +394,8 @@ syscall_trace(struct rpc_syscall_info const *__restrict info) {
 		obj = sct_entry_getref(entry);
 		if likely(obj) {
 			/* Invoke the callback. */
-			TRY {
-				(*entry->te_callback)(obj, info);
-			} EXCEPT {
-				sct_entry_decref_obj(entry, obj);
-				RETHROW();
-			}
-			sct_entry_decref_obj(entry, obj);
+			RAII_FINALLY { sct_entry_decref_obj(entry, obj); };
+			(*entry->te_callback)(obj, info);
 		} else if (ATOMIC_READ(entry->te_object) == NULL) {
 			/* Try to truncate the table to get rid of unused entries. */
 			sct_table_truncate(table);

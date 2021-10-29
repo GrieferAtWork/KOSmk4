@@ -576,13 +576,8 @@ datagram_complete_and_unlock:
 			assert(dg == &dev->nd_net.n_ipgrams.nid_list[i]);
 			network_ip_datagrams_delete(&dev->nd_net.n_ipgrams, i);
 			sync_endwrite(&dev->nd_net.n_ipgrams.nid_lock);
-			TRY {
-				ip_routedatagram(dev, datagram, datagram_len);
-			} EXCEPT {
-				kfree(datagram);
-				RETHROW();
-			}
-			kfree(datagram);
+			RAII_FINALLY { kfree(datagram); };
+			ip_routedatagram(dev, datagram, datagram_len);
 			return;
 		}
 	}
@@ -753,13 +748,8 @@ ip_arp_and_datagram_work(struct async *__restrict self) {
 		{
 			REF struct mman *oldmm;
 			oldmm = task_xchmman(me->adj_grammm);
-			TRY {
-				nicdev_send(me->adj_dev, me->adj_gram, &me->adj_done);
-			} EXCEPT {
-				task_setmman_inherit(oldmm);
-				RETHROW();
-			}
-			task_setmman_inherit(oldmm);
+			RAII_FINALLY { task_setmman_inherit(oldmm); };
+			nicdev_send(me->adj_dev, me->adj_gram, &me->adj_done);
 		}
 
 		/* Drop reference and switch to wait-for-transmit-complete mode. */
@@ -1015,17 +1005,12 @@ ip_arp_and_datagrams_work(struct async *__restrict self) {
 		TRY {
 			REF struct mman *oldmm;
 			oldmm = task_xchmman(me->adj_grammm);
-			TRY {
-				for (i = 0; i < me->adj_gram.npl_cnt; ++i) {
-					struct aio_handle *hand;
-					hand = aio_multihandle_allochandle(&me->adj_done);
-					nicdev_send(me->adj_dev, me->adj_gram.npl_vec[i], hand);
-				}
-			} EXCEPT {
-				task_setmman_inherit(oldmm);
-				RETHROW();
+			RAII_FINALLY { task_setmman_inherit(oldmm); };
+			for (i = 0; i < me->adj_gram.npl_cnt; ++i) {
+				struct aio_handle *hand;
+				hand = aio_multihandle_allochandle(&me->adj_done);
+				nicdev_send(me->adj_dev, me->adj_gram.npl_vec[i], hand);
 			}
-			task_setmman_inherit(oldmm);
 		} EXCEPT {
 			aio_multihandle_cancel(&me->adj_done);
 			RETHROW();

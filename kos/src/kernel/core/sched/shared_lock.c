@@ -17,55 +17,35 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_SRC_SCHED_SHARED_RWLOCK_C
-#define GUARD_KERNEL_SRC_SCHED_SHARED_RWLOCK_C 1
-#define _KOS_SOURCE 1
+#ifndef GUARD_KERNEL_SRC_SCHED_SHARED_LOCK_C
+#define GUARD_KERNEL_SRC_SCHED_SHARED_LOCK_C 1
 
 #include <kernel/compiler.h>
 
+#include <sched/shared_lock.h>
+
 #include <hybrid/atomic.h>
-#include <sched/shared_rwlock.h>
 
 #include <assert.h>
 #include <stdbool.h>
 
 DECL_BEGIN
 
-PUBLIC NOCONNECT NONNULL((1)) bool FCALL
-shared_rwlock_read(struct shared_rwlock *__restrict self,
-                   ktime_t abs_timeout)
-		THROWS(E_WOULDBLOCK) {
-	assert(!task_wasconnected());
-	while (!shared_rwlock_tryread(self)) {
-		TASK_POLL_BEFORE_CONNECT({
-			if (shared_rwlock_tryread(self))
-				goto success;
-		});
-		task_connect(&self->sl_rdwait);
-		if unlikely(shared_rwlock_tryread(self)) {
-			task_disconnectall();
-			break;
-		}
-		if (!task_waitfor(abs_timeout))
-			return false;
-	}
-success:
-	COMPILER_READ_BARRIER();
-	return true;
-}
-
-PUBLIC NOCONNECT NONNULL((1)) bool FCALL
-shared_rwlock_write(struct shared_rwlock *__restrict self,
+/* Acquire a lock to the given shared_lock, and block until `abs_timeout' or indefinitely.
+ * @return: true:  Successfully acquired a lock.
+ * @return: false: The given `abs_timeout' has expired. */
+PUBLIC NONNULL((1)) bool KCALL
+shared_lock_acquire(struct shared_lock *__restrict self,
                     ktime_t abs_timeout)
-		THROWS(E_WOULDBLOCK) {
+		THROWS(E_WOULDBLOCK, ...) {
 	assert(!task_wasconnected());
-	while (!shared_rwlock_trywrite(self)) {
+	while (!shared_lock_tryacquire(self)) {
 		TASK_POLL_BEFORE_CONNECT({
-			if (shared_rwlock_trywrite(self))
+			if (shared_lock_tryacquire(self))
 				goto success;
 		});
-		task_connect(&self->sl_wrwait);
-		if unlikely(shared_rwlock_trywrite(self)) {
+		task_connect(&self->sl_sig);
+		if unlikely(shared_lock_tryacquire(self)) {
 			task_disconnectall();
 			break;
 		}
@@ -77,39 +57,22 @@ success:
 	return true;
 }
 
-PUBLIC NOCONNECT NONNULL((1)) bool
-NOTHROW(FCALL shared_rwlock_read_nx)(struct shared_rwlock *__restrict self,
-                                     ktime_t abs_timeout) {
-	assert(!task_wasconnected());
-	while (!shared_rwlock_tryread(self)) {
-		TASK_POLL_BEFORE_CONNECT({
-			if (shared_rwlock_tryread(self))
-				goto success;
-		});
-		task_connect(&self->sl_rdwait);
-		if unlikely(shared_rwlock_tryread(self)) {
-			task_disconnectall();
-			break;
-		}
-		if (!task_waitfor_nx(abs_timeout))
-			return false;
-	}
-success:
-	COMPILER_READ_BARRIER();
-	return true;
-}
-
-PUBLIC NOCONNECT NONNULL((1)) bool
-NOTHROW(FCALL shared_rwlock_write_nx)(struct shared_rwlock *__restrict self,
+/* Acquire a lock to the given shared_lock, and block until `abs_timeout' or indefinitely.
+ * @return: true:  Successfully acquired a lock.
+ * @return: false: The given `abs_timeout' has expired.
+ * @return: false: Preemption was disabled, and the operation would have blocked.
+ * @return: false: There are pending X-RPCs that could not be serviced. */
+PUBLIC WUNUSED NONNULL((1)) bool
+NOTHROW(KCALL shared_lock_acquire_nx)(struct shared_lock *__restrict self,
                                       ktime_t abs_timeout) {
 	assert(!task_wasconnected());
-	while (!shared_rwlock_trywrite(self)) {
+	while (!shared_lock_tryacquire(self)) {
 		TASK_POLL_BEFORE_CONNECT({
-			if (shared_rwlock_trywrite(self))
+			if (shared_lock_tryacquire(self))
 				goto success;
 		});
-		task_connect(&self->sl_wrwait);
-		if unlikely(shared_rwlock_trywrite(self)) {
+		task_connect(&self->sl_sig);
+		if unlikely(shared_lock_tryacquire(self)) {
 			task_disconnectall();
 			break;
 		}
@@ -120,8 +83,7 @@ success:
 	COMPILER_BARRIER();
 	return true;
 }
-
 
 DECL_END
 
-#endif /* !GUARD_KERNEL_SRC_SCHED_SHARED_RWLOCK_C */
+#endif /* !GUARD_KERNEL_SRC_SCHED_SHARED_LOCK_C */

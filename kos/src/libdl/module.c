@@ -65,22 +65,18 @@ INTDEF NONNULL((1)) void CC
 dlmodule_finalizers_run(struct dlmodule_finalizers *__restrict self)
 		THROWS(...) {
 	size_t count;
+	/* Ensure that only a single thread may invoke finalizers.
+	 * NOTE: Yes this lock being left dangling is intentional! */
 	atomic_rwlock_read(&self->df_lock);
 	count = ATOMIC_XCH(self->df_size, 0);
-	/* Ensure that only a single thread may invoke finalizers. */
 	if (count) {
-		TRY {
-			do {
-				struct dlmodule_finalizer *ent;
-				--count;
-				ent = &self->df_list[count];
-				(*ent->df_func)(ent->df_arg);
-			} while (count);
-		} EXCEPT {
-			free(self->df_list);
-			RETHROW();
-		}
-		free(self->df_list);
+		RAII_FINALLY { free(self->df_list); };
+		do {
+			struct dlmodule_finalizer *ent;
+			--count;
+			ent = &self->df_list[count];
+			(*ent->df_func)(ent->df_arg);
+		} while (count);
 	}
 }
 

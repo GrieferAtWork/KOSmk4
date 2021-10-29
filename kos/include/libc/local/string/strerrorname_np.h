@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xad479af6 */
+/* HASH CRC-32:0xa94ed62d */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,7 +26,6 @@
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(strerrorname_np) __ATTR_CONST __ATTR_WUNUSED char const *
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(strerrorname_np))(__errno_t __errnum) {
-#if defined(__KOS__) || defined(__linux__)
 /*[[[deemon
 import * from deemon;
 @@Mapping for id -> (kosName, comment)
@@ -794,6 +793,4 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_strerrorname_np_defined
 #define __localdep_strerrorname_np __LIBC_LOCAL_NAME(strerrorname_np)
 #endif /* !__local___localdep_strerrorname_np_defined */
-#else /* __KOS__ || __linux__ */
-#undef __local_strerrorname_np_defined
-#endif /* !__KOS__ && !__linux__ */
+#endif /* !__local_strerrorname_np_defined */

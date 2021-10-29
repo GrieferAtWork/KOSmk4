@@ -75,8 +75,8 @@ struct shared_rwlock {
 
 LOCAL NOBLOCK NONNULL((1)) __BOOL NOTHROW(FCALL shared_rwlock_tryread)(struct shared_rwlock *__restrict self);
 LOCAL NOBLOCK NONNULL((1)) __BOOL NOTHROW(FCALL shared_rwlock_trywrite)(struct shared_rwlock *__restrict self);
-FUNDEF NOCONNECT NONNULL((1)) void FCALL shared_rwlock_read(struct shared_rwlock *__restrict self, ktime_t abs_timeout DFL(KTIME_INFINITE)) THROWS(E_WOULDBLOCK);
-FUNDEF NOCONNECT NONNULL((1)) void FCALL shared_rwlock_write(struct shared_rwlock *__restrict self, ktime_t abs_timeout DFL(KTIME_INFINITE)) THROWS(E_WOULDBLOCK);
+FUNDEF NOCONNECT NONNULL((1)) __BOOL FCALL shared_rwlock_read(struct shared_rwlock *__restrict self, ktime_t abs_timeout DFL(KTIME_INFINITE)) THROWS(E_WOULDBLOCK);
+FUNDEF NOCONNECT NONNULL((1)) __BOOL FCALL shared_rwlock_write(struct shared_rwlock *__restrict self, ktime_t abs_timeout DFL(KTIME_INFINITE)) THROWS(E_WOULDBLOCK);
 FUNDEF NOCONNECT NONNULL((1)) __BOOL NOTHROW(FCALL shared_rwlock_read_nx)(struct shared_rwlock *__restrict self, ktime_t abs_timeout DFL(KTIME_INFINITE));
 FUNDEF NOCONNECT NONNULL((1)) __BOOL NOTHROW(FCALL shared_rwlock_write_nx)(struct shared_rwlock *__restrict self, ktime_t abs_timeout DFL(KTIME_INFINITE));
 

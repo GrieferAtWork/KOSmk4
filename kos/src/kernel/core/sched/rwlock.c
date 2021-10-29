@@ -864,8 +864,7 @@ wait_for_unshare:
 					                                            (caller_has_lock ? 1 : 0))));
 					return false;
 				}
-			}
-			EXCEPT {
+			} EXCEPT {
 				/* Something went wrong. - Re-acquire the read-lock
 				 * (if  we  had  one),  switch  back  to read-mode. */
 				do {

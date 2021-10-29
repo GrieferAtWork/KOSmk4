@@ -267,20 +267,16 @@ enum_locals_at_with_debug_sections_impl(void const *absolute_pc,
 		return 0; /* Nothing here! */
 	/* Lock debug sections into memory. */
 	debug_sections_lock(mod, &sections, &dl_sections);
-	TRY {
-		_locals_current_module_loadaddr = module_getloadaddr(mod);
-		module_relative_pc = (uintptr_t)absolute_pc - _locals_current_module_loadaddr;
-		/* Enumerate variables with debug sections. */
-		result = debuginfo_enum_locals(di_debug_sections_as_di_enum_locals_sections(&sections),
-		                               module_relative_pc, callback, arg);
-	} EXCEPT {
+	RAII_FINALLY {
+		/* Unlock data. */
 		debug_sections_unlock(&dl_sections);
 		module_decref_unlikely(mod);
-		RETHROW();
-	}
-	/* Unlock data. */
-	debug_sections_unlock(&dl_sections);
-	module_decref_unlikely(mod);
+	};
+	_locals_current_module_loadaddr = module_getloadaddr(mod);
+	module_relative_pc = (uintptr_t)absolute_pc - _locals_current_module_loadaddr;
+	/* Enumerate variables with debug sections. */
+	result = debuginfo_enum_locals(di_debug_sections_as_di_enum_locals_sections(&sections),
+	                               module_relative_pc, callback, arg);
 	return result;
 }
 
@@ -301,17 +297,11 @@ enum_locals_at_with_debug_sections(void const *absolute_pc,
 		result = 0;
 	} else {
 		/* Switch to the foreign VM, so we can directly access user-space memory. */
-		REF struct mman *oldmm;
-		oldmm = task_xchmman(required_mm);
-		TRY {
-			result = enum_locals_at_with_debug_sections_impl(absolute_pc,
-			                                                 callback,
-			                                                 arg);
-		} EXCEPT {
-			task_setmman_inherit(oldmm);
-			RETHROW();
-		}
-		task_setmman_inherit(oldmm);
+		REF struct mman *oldmm = task_xchmman(required_mm);
+		RAII_FINALLY { task_setmman_inherit(oldmm); };
+		result = enum_locals_at_with_debug_sections_impl(absolute_pc,
+		                                                 callback,
+		                                                 arg);
 	}
 	return result;
 }

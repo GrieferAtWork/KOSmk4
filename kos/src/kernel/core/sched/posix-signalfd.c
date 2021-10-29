@@ -127,7 +127,8 @@ handle_signalfd_read(struct signalfd *__restrict self,
 		usi = (USER CHECKED struct signalfd_siginfo *)dst;
 
 		/* Fill in the user-space signalfd info buffer. */
-		TRY {
+		{
+			RAII_FINALLY { pending_rpc_free(rpc); };
 			COMPILER_WRITE_BARRIER();
 			usi->ssi_signo   = rpc->pr_psig.si_signo;
 			usi->ssi_errno   = rpc->pr_psig.si_errno;
@@ -147,11 +148,7 @@ handle_signalfd_read(struct signalfd *__restrict self,
 			usi->ssi_addr    = (u64)(uintptr_t)rpc->pr_psig.si_addr;
 			memset(usi->__pad, 0, sizeof(usi->__pad));
 			COMPILER_WRITE_BARRIER();
-		} EXCEPT {
-			pending_rpc_free(rpc);
-			RETHROW();
 		}
-		pending_rpc_free(rpc);
 
 		result += sizeof(struct signalfd_siginfo);
 		num_bytes -= sizeof(struct signalfd_siginfo);
@@ -198,54 +195,50 @@ handle_signalfd_polltest(struct signalfd *__restrict self,
 PRIVATE ATTR_NOINLINE void KCALL
 update_signalfd(unsigned int fd,
                 USER CHECKED sigset_t const *sigmask) {
+	struct signalfd *sfd;
+	sigset_t newmask;
 	struct handle hnd = handle_lookup(fd);
-	TRY {
-		struct signalfd *sfd;
-		sigset_t newmask;
-		/* Make sure that it's a SIGNALFD handle. */
-		if (hnd.h_type != HANDLE_TYPE_SIGNALFD) {
-			THROW(E_INVALID_HANDLE_FILETYPE,
-			      fd,
-			      HANDLE_TYPE_SIGNALFD,
-			      hnd.h_type,
-			      handle_typekind(&hnd),
-			      HANDLE_TYPEKIND_GENERIC);
-		}
-		sfd = (struct signalfd *)hnd.h_data;
-		COMPILER_BARRIER();
-		memcpy(&newmask, sigmask, sizeof(sigset_t));
-		COMPILER_BARRIER();
+	RAII_FINALLY { decref_unlikely(hnd); };
 
-		/* Always remove  SIGKILL and  SIGSTOP from  the new  mask
-		 * before applying it, thus ensuring  that at no point  in
-		 * time a signalfd descriptor exists that would be capable
-		 * of handling these 2 signal. */
-		sigdelset(&newmask, SIGKILL);
-		sigdelset(&newmask, SIGSTOP);
-		COMPILER_BARRIER();
-		memcpy(&sfd->sf_mask, &newmask, sizeof(sigset_t));
-
-		/* The online documentation does not specify if a  thread
-		 * currently waiting on  a signalfd should  wake up  when
-		 * the mask changes. Especially considering that doing so
-		 * would require an additional signal to be added to  the
-		 * `struct signalfd' just for the purpose of listening to
-		 * mask changes.
-		 * However,  looking  at  the  linux  kernel  source,  it  seems
-		 * to  do  something  in-between of  not  doing it  at  all, and
-		 * doing  it  correctly, by  simply  waking up  any  thread that
-		 * is  currently waiting  for the  signal queues  of the calling
-		 * thread, meaning that the wakeup wouldn't work if the signalfd
-		 * was shared between processes,  with one process updating  the
-		 * mask  not  actually causing  the  other to  get  the message.
-		 * Oh well... Just mirror what linux does... */
-		sig_broadcast(&PERTASK(this_rpcs_sig));
-		sig_broadcast(&THIS_PROCESS_RPCS.ppr_more);
-	} EXCEPT {
-		decref(hnd);
-		RETHROW();
+	/* Make sure that it's a SIGNALFD handle. */
+	if (hnd.h_type != HANDLE_TYPE_SIGNALFD) {
+		THROW(E_INVALID_HANDLE_FILETYPE,
+		      fd,
+		      HANDLE_TYPE_SIGNALFD,
+		      hnd.h_type,
+		      handle_typekind(&hnd),
+		      HANDLE_TYPEKIND_GENERIC);
 	}
-	decref(hnd);
+	sfd = (struct signalfd *)hnd.h_data;
+	COMPILER_BARRIER();
+	memcpy(&newmask, sigmask, sizeof(sigset_t));
+	COMPILER_BARRIER();
+
+	/* Always remove  SIGKILL and  SIGSTOP from  the new  mask
+	 * before applying it, thus ensuring  that at no point  in
+	 * time a signalfd descriptor exists that would be capable
+	 * of handling these 2 signal. */
+	sigdelset(&newmask, SIGKILL);
+	sigdelset(&newmask, SIGSTOP);
+	COMPILER_BARRIER();
+	memcpy(&sfd->sf_mask, &newmask, sizeof(sigset_t));
+
+	/* The online documentation does not specify if a  thread
+	 * currently waiting on  a signalfd should  wake up  when
+	 * the mask changes. Especially considering that doing so
+	 * would require an additional signal to be added to  the
+	 * `struct signalfd' just for the purpose of listening to
+	 * mask changes.
+	 * However,  looking  at  the  linux  kernel  source,  it  seems
+	 * to  do  something  in-between of  not  doing it  at  all, and
+	 * doing  it  correctly, by  simply  waking up  any  thread that
+	 * is  currently waiting  for the  signal queues  of the calling
+	 * thread, meaning that the wakeup wouldn't work if the signalfd
+	 * was shared between processes,  with one process updating  the
+	 * mask  not  actually causing  the  other to  get  the message.
+	 * Oh well... Just mirror what linux does... */
+	sig_broadcast(&PERTASK(this_rpcs_sig));
+	sig_broadcast(&THIS_PROCESS_RPCS.ppr_more);
 }
 
 DEFINE_SYSCALL4(fd_t, signalfd4, fd_t, fd,

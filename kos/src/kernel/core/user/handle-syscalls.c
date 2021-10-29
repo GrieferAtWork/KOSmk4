@@ -103,13 +103,8 @@ DEFINE_SYSCALL1(fd_t, dup, fd_t, fd) {
 	struct handle hand;
 	hand = handle_lookup((unsigned int)fd);
 	hand.h_mode &= ~(IO_CLOEXEC | IO_CLOFORK);
-	TRY {
-		result = handle_install(THIS_HANDLE_MANAGER, hand);
-	} EXCEPT {
-		decref(hand);
-		RETHROW();
-	}
-	decref(hand);
+	RAII_FINALLY { decref_unlikely(hand); };
+	result = handle_install(THIS_HANDLE_MANAGER, hand);
 	return result;
 }
 #endif /* __ARCH_WANT_SYSCALL_DUP */
@@ -146,13 +141,8 @@ DEFINE_SYSCALL3(fd_t, dup3, fd_t, oldfd, fd_t, newfd, oflag_t, flags) {
 	hand = handle_lookup((unsigned int)oldfd);
 	hand.h_mode &= ~(IO_CLOEXEC | IO_CLOFORK);
 	hand.h_mode |= IO_HANDLE_FTO_OPENFLAG(flags);
-	TRY {
-		handle_installinto_sym((unsigned int)newfd, hand);
-	} EXCEPT {
-		decref(hand);
-		RETHROW();
-	}
-	decref(hand);
+	RAII_FINALLY { decref_unlikely(hand); };
+	handle_installinto_sym((unsigned int)newfd, hand);
 	return newfd;
 }
 #endif /* __ARCH_WANT_SYSCALL_DUP3 */
@@ -323,6 +313,7 @@ DEFINE_SYSCALL3(syscall_slong_t, ioctl,
 	struct handle hand;
 	syscall_slong_t result;
 	hand = handle_lookup((unsigned int)fd);
+	RAII_FINALLY { decref_unlikely(hand); };
 	TRY {
 		result = handle_ioctl(hand,
 		                      command,
@@ -336,16 +327,13 @@ DEFINE_SYSCALL3(syscall_slong_t, ioctl,
 					goto done;
 			} EXCEPT {
 				ioctl_complete_exception_info((unsigned int)fd);
-				decref(hand);
 				RETHROW();
 			}
 		}
 		ioctl_complete_exception_info((unsigned int)fd);
-		decref(hand);
 		RETHROW();
 	}
 done:
-	decref(hand);
 	return result;
 }
 #endif /* __ARCH_WANT_SYSCALL_IOCTL */
@@ -361,6 +349,7 @@ DEFINE_SYSCALL4(syscall_slong_t, ioctlf,
 	                 IO_USERF_MASK,
 	                 E_INVALID_ARGUMENT_CONTEXT_IOCTLF_MODE);
 	hand = handle_lookup((unsigned int)fd);
+	RAII_FINALLY { decref_unlikely(hand); };
 	TRY {
 		result = handle_ioctlf(hand,
 		                       command,
@@ -375,16 +364,13 @@ DEFINE_SYSCALL4(syscall_slong_t, ioctlf,
 					goto done;
 			} EXCEPT {
 				ioctl_complete_exception_info((unsigned int)fd);
-				decref(hand);
 				RETHROW();
 			}
 		}
 		ioctl_complete_exception_info((unsigned int)fd);
-		decref(hand);
 		RETHROW();
 	}
 done:
-	decref(hand);
 	return result;
 }
 #endif /* __ARCH_WANT_SYSCALL_IOCTLF */
@@ -400,16 +386,11 @@ done:
 DEFINE_SYSCALL2(errno_t, ftruncate, fd_t, fd, syscall_ulong_t, length) {
 	struct handle hand;
 	hand = handle_lookup((unsigned int)fd);
-	TRY {
-		if unlikely(!IO_CANWRITE(hand.h_mode))
-			THROW(E_INVALID_HANDLE_OPERATION, fd, E_INVALID_HANDLE_OPERATION_TRUNC, hand.h_mode);
-		handle_truncate(hand, (pos_t)length);
-	} EXCEPT {
-		decref(hand);
-		RETHROW();
-	}
-	decref(hand);
-	return 0;
+	RAII_FINALLY { decref_unlikely(hand); };
+	if unlikely(!IO_CANWRITE(hand.h_mode))
+		THROW(E_INVALID_HANDLE_OPERATION, fd, E_INVALID_HANDLE_OPERATION_TRUNC, hand.h_mode);
+	handle_truncate(hand, (pos_t)length);
+	return -EOK;
 }
 #endif /* __ARCH_WANT_SYSCALL_FTRUNCATE */
 
@@ -417,16 +398,11 @@ DEFINE_SYSCALL2(errno_t, ftruncate, fd_t, fd, syscall_ulong_t, length) {
 DEFINE_SYSCALL2(errno_t, ftruncate64, fd_t, fd, uint64_t, length) {
 	struct handle hand;
 	hand = handle_lookup((unsigned int)fd);
-	TRY {
-		if unlikely(!IO_CANWRITE(hand.h_mode))
-			THROW(E_INVALID_HANDLE_OPERATION, fd, E_INVALID_HANDLE_OPERATION_TRUNC, hand.h_mode);
-		handle_truncate(hand, (pos_t)length);
-	} EXCEPT {
-		decref(hand);
-		RETHROW();
-	}
-	decref(hand);
-	return 0;
+	RAII_FINALLY { decref_unlikely(hand); };
+	if unlikely(!IO_CANWRITE(hand.h_mode))
+		THROW(E_INVALID_HANDLE_OPERATION, fd, E_INVALID_HANDLE_OPERATION_TRUNC, hand.h_mode);
+	handle_truncate(hand, (pos_t)length);
+	return -EOK;
 }
 #endif /* __ARCH_WANT_SYSCALL_FTRUNCATE64 */
 
@@ -444,17 +420,9 @@ DEFINE_SYSCALL4(errno_t, fallocate,
                 syscall_ulong_t, length) {
 	struct handle hand;
 	hand = handle_lookup((unsigned int)fd);
-	TRY {
-		handle_allocate(hand,
-		                mode,
-		                (pos_t)offset,
-		                (pos_t)length);
-	} EXCEPT {
-		decref(hand);
-		RETHROW();
-	}
-	decref(hand);
-	return 0;
+	RAII_FINALLY { decref_unlikely(hand); };
+	handle_allocate(hand, mode, (pos_t)offset, (pos_t)length);
+	return -EOK;
 }
 #endif /* __ARCH_WANT_SYSCALL_FALLOCATE */
 
@@ -464,17 +432,9 @@ DEFINE_SYSCALL4(errno_t, fallocate64,
                 uint64_t, offset, uint64_t, length) {
 	struct handle hand;
 	hand = handle_lookup((unsigned int)fd);
-	TRY {
-		handle_allocate(hand,
-		                mode,
-		                (pos_t)offset,
-		                (pos_t)length);
-	} EXCEPT {
-		decref(hand);
-		RETHROW();
-	}
-	decref(hand);
-	return 0;
+	RAII_FINALLY { decref_unlikely(hand); };
+	handle_allocate(hand, mode, (pos_t)offset, (pos_t)length);
+	return -EOK;
 }
 #endif /* __ARCH_WANT_SYSCALL_FALLOCATE64 */
 
@@ -506,13 +466,8 @@ DEFINE_SYSCALL3(syscall_slong_t, lseek,
 	pos_t result;
 	struct handle hand;
 	hand = handle_lookup((unsigned int)fd);
-	TRY {
-		result = handle_seek(hand, (off_t)offset, whence);
-	} EXCEPT {
-		decref(hand);
-		RETHROW();
-	}
-	decref(hand);
+	RAII_FINALLY { decref_unlikely(hand); };
+	result = handle_seek(hand, (off_t)offset, whence);
 	return (syscall_slong_t)result;
 }
 #endif /* __ARCH_WANT_SYSCALL_LSEEK */
@@ -524,15 +479,8 @@ DEFINE_SYSCALL3(int64_t, lseek64,
 	pos_t result;
 	struct handle hand;
 	hand = handle_lookup((unsigned int)fd);
-	TRY {
-		result = handle_seek(hand,
-		                     (off_t)offset,
-		                     whence);
-	} EXCEPT {
-		decref(hand);
-		RETHROW();
-	}
-	decref(hand);
+	RAII_FINALLY { decref_unlikely(hand); };
+	result = handle_seek(hand, (off_t)offset, whence);
 	return (int64_t)result;
 }
 #endif /* __ARCH_WANT_SYSCALL_LSEEK64 */
@@ -580,15 +528,10 @@ DEFINE_SYSCALL3(ssize_t, read, fd_t, fd,
 	struct handle hand;
 	validate_writable(buf, bufsize);
 	hand = handle_lookup((unsigned int)fd);
-	TRY {
-		if unlikely(!IO_CANREAD(hand.h_mode))
-			THROW(E_INVALID_HANDLE_OPERATION, fd, E_INVALID_HANDLE_OPERATION_READ, hand.h_mode);
-		result = handle_read(hand, buf, bufsize);
-	} EXCEPT {
-		decref(hand);
-		RETHROW();
-	}
-	decref(hand);
+	RAII_FINALLY { decref_unlikely(hand); };
+	if unlikely(!IO_CANREAD(hand.h_mode))
+		THROW(E_INVALID_HANDLE_OPERATION, fd, E_INVALID_HANDLE_OPERATION_READ, hand.h_mode);
+	result = handle_read(hand, buf, bufsize);
 	return (ssize_t)result;
 }
 #endif /* __ARCH_WANT_SYSCALL_READ */
@@ -600,15 +543,10 @@ DEFINE_SYSCALL3(ssize_t, write, fd_t, fd,
 	struct handle hand;
 	validate_readable(buf, bufsize);
 	hand = handle_lookup((unsigned int)fd);
-	TRY {
-		if unlikely(!IO_CANWRITE(hand.h_mode))
-			THROW(E_INVALID_HANDLE_OPERATION, fd, E_INVALID_HANDLE_OPERATION_WRITE, hand.h_mode);
-		result = handle_write(hand, buf, bufsize);
-	} EXCEPT {
-		decref(hand);
-		RETHROW();
-	}
-	decref(hand);
+	RAII_FINALLY { decref_unlikely(hand); };
+	if unlikely(!IO_CANWRITE(hand.h_mode))
+		THROW(E_INVALID_HANDLE_OPERATION, fd, E_INVALID_HANDLE_OPERATION_WRITE, hand.h_mode);
+	result = handle_write(hand, buf, bufsize);
 	return (ssize_t)result;
 }
 #endif /* __ARCH_WANT_SYSCALL_WRITE */
@@ -624,18 +562,11 @@ DEFINE_SYSCALL4(ssize_t, readf,
 	                 E_INVALID_ARGUMENT_CONTEXT_READF_MODE);
 	validate_writable(buf, bufsize);
 	hand = handle_lookup((unsigned int)fd);
-	TRY {
-		if unlikely(!IO_CANREAD(hand.h_mode))
-			THROW(E_INVALID_HANDLE_OPERATION, fd, E_INVALID_HANDLE_OPERATION_READ, hand.h_mode);
-		result = handle_readf(hand,
-		                      buf,
-		                      bufsize,
-		                      (hand.h_mode & ~IO_USERF_MASK) | mode);
-	} EXCEPT {
-		decref(hand);
-		RETHROW();
-	}
-	decref(hand);
+	RAII_FINALLY { decref_unlikely(hand); };
+	if unlikely(!IO_CANREAD(hand.h_mode))
+		THROW(E_INVALID_HANDLE_OPERATION, fd, E_INVALID_HANDLE_OPERATION_READ, hand.h_mode);
+	result = handle_readf(hand, buf, bufsize,
+	                      (hand.h_mode & ~IO_USERF_MASK) | mode);
 	return (ssize_t)result;
 }
 #endif /* __ARCH_WANT_SYSCALL_READF */
@@ -651,18 +582,11 @@ DEFINE_SYSCALL4(ssize_t, writef,
 	                 E_INVALID_ARGUMENT_CONTEXT_WRITEF_MODE);
 	validate_readable(buf, bufsize);
 	hand = handle_lookup((unsigned int)fd);
-	TRY {
-		if unlikely(!IO_CANWRITE(hand.h_mode))
-			THROW(E_INVALID_HANDLE_OPERATION, fd, E_INVALID_HANDLE_OPERATION_WRITE, hand.h_mode);
-		result = handle_writef(hand,
-		                       buf,
-		                       bufsize,
-		                       (hand.h_mode & ~IO_USERF_MASK) | mode);
-	} EXCEPT {
-		decref(hand);
-		RETHROW();
-	}
-	decref(hand);
+	RAII_FINALLY { decref_unlikely(hand); };
+	if unlikely(!IO_CANWRITE(hand.h_mode))
+		THROW(E_INVALID_HANDLE_OPERATION, fd, E_INVALID_HANDLE_OPERATION_WRITE, hand.h_mode);
+	result = handle_writef(hand, buf, bufsize,
+	                       (hand.h_mode & ~IO_USERF_MASK) | mode);
 	return (ssize_t)result;
 }
 #endif /* __ARCH_WANT_SYSCALL_WRITEF */
@@ -682,18 +606,10 @@ DEFINE_SYSCALL4(ssize_t, pread64, fd_t, fd,
 	struct handle hand;
 	validate_writable(buf, bufsize);
 	hand = handle_lookup((unsigned int)fd);
-	TRY {
-		if unlikely(!IO_CANREAD(hand.h_mode))
-			THROW(E_INVALID_HANDLE_OPERATION, fd, E_INVALID_HANDLE_OPERATION_READ, hand.h_mode);
-		result = handle_pread(hand,
-		                      buf,
-		                      bufsize,
-		                      (pos_t)offset);
-	} EXCEPT {
-		decref(hand);
-		RETHROW();
-	}
-	decref(hand);
+	RAII_FINALLY { decref_unlikely(hand); };
+	if unlikely(!IO_CANREAD(hand.h_mode))
+		THROW(E_INVALID_HANDLE_OPERATION, fd, E_INVALID_HANDLE_OPERATION_READ, hand.h_mode);
+	result = handle_pread(hand, buf, bufsize, (pos_t)offset);
 	return (ssize_t)result;
 }
 #endif /* __ARCH_WANT_SYSCALL_PREAD64 */
@@ -706,18 +622,10 @@ DEFINE_SYSCALL4(ssize_t, pwrite64, fd_t, fd,
 	struct handle hand;
 	validate_readable(buf, bufsize);
 	hand = handle_lookup((unsigned int)fd);
-	TRY {
-		if unlikely(!IO_CANWRITE(hand.h_mode))
-			THROW(E_INVALID_HANDLE_OPERATION, fd, E_INVALID_HANDLE_OPERATION_WRITE, hand.h_mode);
-		result = handle_pwrite(hand,
-		                       buf,
-		                       bufsize,
-		                       (pos_t)offset);
-	} EXCEPT {
-		decref(hand);
-		RETHROW();
-	}
-	decref(hand);
+	RAII_FINALLY { decref_unlikely(hand); };
+	if unlikely(!IO_CANWRITE(hand.h_mode))
+		THROW(E_INVALID_HANDLE_OPERATION, fd, E_INVALID_HANDLE_OPERATION_WRITE, hand.h_mode);
+	result = handle_pwrite(hand, buf, bufsize, (pos_t)offset);
 	return (ssize_t)result;
 }
 #endif /* __ARCH_WANT_SYSCALL_PWRITE64 */
@@ -733,19 +641,11 @@ DEFINE_SYSCALL5(ssize_t, pread64f,
 	                 E_INVALID_ARGUMENT_CONTEXT_PREADF_MODE);
 	validate_writable(buf, bufsize);
 	hand = handle_lookup((unsigned int)fd);
-	TRY {
-		if unlikely(!IO_CANREAD(hand.h_mode))
-			THROW(E_INVALID_HANDLE_OPERATION, fd, E_INVALID_HANDLE_OPERATION_READ, hand.h_mode);
-		result = handle_preadf(hand,
-		                       buf,
-		                       bufsize,
-		                       (pos_t)offset,
-		                       (hand.h_mode & ~IO_USERF_MASK) | mode);
-	} EXCEPT {
-		decref(hand);
-		RETHROW();
-	}
-	decref(hand);
+	RAII_FINALLY { decref_unlikely(hand); };
+	if unlikely(!IO_CANREAD(hand.h_mode))
+		THROW(E_INVALID_HANDLE_OPERATION, fd, E_INVALID_HANDLE_OPERATION_READ, hand.h_mode);
+	result = handle_preadf(hand, buf, bufsize, (pos_t)offset,
+	                       (hand.h_mode & ~IO_USERF_MASK) | mode);
 	return (ssize_t)result;
 }
 #endif /* __ARCH_WANT_SYSCALL_PREAD64F */
@@ -761,19 +661,11 @@ DEFINE_SYSCALL5(ssize_t, pwrite64f,
 	                 E_INVALID_ARGUMENT_CONTEXT_PWRITEF_MODE);
 	validate_readable(buf, bufsize);
 	hand = handle_lookup((unsigned int)fd);
-	TRY {
-		if unlikely(!IO_CANWRITE(hand.h_mode))
-			THROW(E_INVALID_HANDLE_OPERATION, fd, E_INVALID_HANDLE_OPERATION_WRITE, hand.h_mode);
-		result = handle_pwritef(hand,
-		                        buf,
-		                        bufsize,
-		                        (pos_t)offset,
-		                        (hand.h_mode & ~IO_USERF_MASK) | mode);
-	} EXCEPT {
-		decref(hand);
-		RETHROW();
-	}
-	decref(hand);
+	RAII_FINALLY { decref_unlikely(hand); };
+	if unlikely(!IO_CANWRITE(hand.h_mode))
+		THROW(E_INVALID_HANDLE_OPERATION, fd, E_INVALID_HANDLE_OPERATION_WRITE, hand.h_mode);
+	result = handle_pwritef(hand, buf, bufsize, (pos_t)offset,
+	                        (hand.h_mode & ~IO_USERF_MASK) | mode);
 	return (ssize_t)result;
 }
 #endif /* __ARCH_WANT_SYSCALL_PWRITE64F */
@@ -794,40 +686,30 @@ DEFINE_SYSCALL3(ssize_t, readv, fd_t, fd,
 	struct iov_buffer dst;
 	validate_readablem(iov, count, sizeof(*iov));
 	hand = handle_lookup((unsigned int)fd);
-	TRY {
-		if unlikely(!IO_CANREAD(hand.h_mode))
-			THROW(E_INVALID_HANDLE_OPERATION, fd, E_INVALID_HANDLE_OPERATION_READ, hand.h_mode);
-		if unlikely(!count)
-			result = 0;
-		else {
-			dst.iv_entc = count;
-			dst.iv_entv = (struct iov_entry *)malloca(count *
-			                                                 sizeof(struct iov_entry));
-			TRY {
-				size_t i;
-				for (i = 0, num_bytes = 0; i < count; ++i) {
-					((struct iov_entry *)dst.iv_entv)[i].ive_base = (USER CHECKED byte_t *)ATOMIC_READ(iov[i].iov_base);
-					((struct iov_entry *)dst.iv_entv)[i].ive_size = ATOMIC_READ(iov[i].iov_len);
-					validate_writable(((struct iov_entry *)dst.iv_entv)[i].ive_base,
-					                  ((struct iov_entry *)dst.iv_entv)[i].ive_size);
-					num_bytes += ((struct iov_entry *)dst.iv_entv)[i].ive_size;
-				}
-				dst.iv_head = dst.iv_entv[0];
-				dst.iv_last = dst.iv_entv[count - 1].ive_size;
-				result = handle_readv(hand,
-				                      &dst,
-				                      num_bytes);
-			} EXCEPT {
-				freea((void *)dst.iv_entv);
-				RETHROW();
-			}
-			freea((void *)dst.iv_entv);
+	RAII_FINALLY { decref_unlikely(hand); };
+	if unlikely(!IO_CANREAD(hand.h_mode))
+		THROW(E_INVALID_HANDLE_OPERATION, fd, E_INVALID_HANDLE_OPERATION_READ, hand.h_mode);
+	if unlikely(!count) {
+		result = 0;
+	} else {
+		size_t i;
+		struct iov_entry *entries;
+		entries = (struct iov_entry *)malloca(count, sizeof(struct iov_entry));
+		RAII_FINALLY { freea(entries); };
+		dst.iv_entc = count;
+		dst.iv_entv = entries;
+		for (i = 0, num_bytes = 0; i < count; ++i) {
+			entries[i].ive_base = (USER CHECKED byte_t *)ATOMIC_READ(iov[i].iov_base);
+			entries[i].ive_size = ATOMIC_READ(iov[i].iov_len);
+			validate_writable(entries[i].ive_base, entries[i].ive_size);
+			num_bytes += entries[i].ive_size;
 		}
-	} EXCEPT {
-		decref(hand);
-		RETHROW();
+		dst.iv_head = entries[0];
+		dst.iv_last = entries[count - 1].ive_size;
+
+		/* Do the read */
+		result = handle_readv(hand, &dst, num_bytes);
 	}
-	decref(hand);
 	return (ssize_t)result;
 }
 #endif /* __ARCH_WANT_SYSCALL_PREADV */
@@ -841,40 +723,30 @@ DEFINE_SYSCALL3(ssize_t, writev, fd_t, fd,
 	struct iov_buffer dst;
 	validate_readablem(iov, count, sizeof(*iov));
 	hand = handle_lookup((unsigned int)fd);
-	TRY {
-		if unlikely(!IO_CANWRITE(hand.h_mode))
-			THROW(E_INVALID_HANDLE_OPERATION, fd, E_INVALID_HANDLE_OPERATION_WRITE, hand.h_mode);
-		if unlikely(!count)
-			result = 0;
-		else {
-			dst.iv_entc = count;
-			dst.iv_entv = (struct iov_entry *)malloca(count *
-			                                                 sizeof(struct iov_entry));
-			TRY {
-				size_t i;
-				for (i = 0, num_bytes = 0; i < count; ++i) {
-					((struct iov_entry *)dst.iv_entv)[i].ive_base = (USER CHECKED byte_t *)ATOMIC_READ(iov[i].iov_base);
-					((struct iov_entry *)dst.iv_entv)[i].ive_size = ATOMIC_READ(iov[i].iov_len);
-					validate_readable(((struct iov_entry *)dst.iv_entv)[i].ive_base,
-					                  ((struct iov_entry *)dst.iv_entv)[i].ive_size);
-					num_bytes += ((struct iov_entry *)dst.iv_entv)[i].ive_size;
-				}
-				dst.iv_head = dst.iv_entv[0];
-				dst.iv_last = dst.iv_entv[count - 1].ive_size;
-				result = handle_writev(hand,
-				                       &dst,
-				                       num_bytes);
-			} EXCEPT {
-				freea((void *)dst.iv_entv);
-				RETHROW();
-			}
-			freea((void *)dst.iv_entv);
+	RAII_FINALLY { decref_unlikely(hand); };
+	if unlikely(!IO_CANWRITE(hand.h_mode))
+		THROW(E_INVALID_HANDLE_OPERATION, fd, E_INVALID_HANDLE_OPERATION_WRITE, hand.h_mode);
+	if unlikely(!count) {
+		result = 0;
+	} else {
+		size_t i;
+		struct iov_entry *entries;
+		entries = (struct iov_entry *)malloca(count, sizeof(struct iov_entry));
+		RAII_FINALLY { freea(entries); };
+		dst.iv_entc = count;
+		dst.iv_entv = entries;
+		for (i = 0, num_bytes = 0; i < count; ++i) {
+			entries[i].ive_base = (USER CHECKED byte_t *)ATOMIC_READ(iov[i].iov_base);
+			entries[i].ive_size = ATOMIC_READ(iov[i].iov_len);
+			validate_readable(entries[i].ive_base, entries[i].ive_size);
+			num_bytes += entries[i].ive_size;
 		}
-	} EXCEPT {
-		decref(hand);
-		RETHROW();
+		dst.iv_head = entries[0];
+		dst.iv_last = entries[count - 1].ive_size;
+
+		/* Do the write */
+		result = handle_writev(hand, &dst, num_bytes);
 	}
-	decref(hand);
 	return (ssize_t)result;
 }
 #endif /* __ARCH_WANT_SYSCALL_PWRITEV */
@@ -888,40 +760,30 @@ DEFINE_COMPAT_SYSCALL3(ssize_t, readv, fd_t, fd,
 	struct iov_buffer dst;
 	compat_validate_readablem(iov, count, sizeof(*iov));
 	hand = handle_lookup((unsigned int)fd);
-	TRY {
-		if unlikely(!IO_CANREAD(hand.h_mode))
-			THROW(E_INVALID_HANDLE_OPERATION, fd, E_INVALID_HANDLE_OPERATION_READ, hand.h_mode);
-		if unlikely(!count)
-			result = 0;
-		else {
-			dst.iv_entc = count;
-			dst.iv_entv = (struct iov_entry *)malloca(count *
-			                                                 sizeof(struct iov_entry));
-			TRY {
-				size_t i;
-				for (i = 0, num_bytes = 0; i < count; ++i) {
-					((struct iov_entry *)dst.iv_entv)[i].ive_base = (USER CHECKED byte_t *)(void *)ATOMIC_READ(*(compat_uintptr_t *)&iov[i].iov_base);
-					((struct iov_entry *)dst.iv_entv)[i].ive_size = ATOMIC_READ(iov[i].iov_len);
-					compat_validate_writable(((struct iov_entry *)dst.iv_entv)[i].ive_base,
-					                         ((struct iov_entry *)dst.iv_entv)[i].ive_size);
-					num_bytes += ((struct iov_entry *)dst.iv_entv)[i].ive_size;
-				}
-				dst.iv_head = dst.iv_entv[0];
-				dst.iv_last = dst.iv_entv[count - 1].ive_size;
-				result = handle_readv(hand,
-				                      &dst,
-				                      num_bytes);
-			} EXCEPT {
-				freea((void *)dst.iv_entv);
-				RETHROW();
-			}
-			freea((void *)dst.iv_entv);
+	RAII_FINALLY { decref_unlikely(hand); };
+	if unlikely(!IO_CANREAD(hand.h_mode))
+		THROW(E_INVALID_HANDLE_OPERATION, fd, E_INVALID_HANDLE_OPERATION_READ, hand.h_mode);
+	if unlikely(!count)
+		result = 0;
+	else {
+		size_t i;
+		struct iov_entry *entries;
+		entries = (struct iov_entry *)malloca(count, sizeof(struct iov_entry));
+		RAII_FINALLY { freea(entries); };
+		dst.iv_entc = count;
+		dst.iv_entv = entries;
+		for (i = 0, num_bytes = 0; i < count; ++i) {
+			entries[i].ive_base = (USER CHECKED byte_t *)(void *)ATOMIC_READ(*(compat_uintptr_t const *)&iov[i].iov_base);
+			entries[i].ive_size = ATOMIC_READ(iov[i].iov_len);
+			compat_validate_writable(entries[i].ive_base, entries[i].ive_size);
+			num_bytes += entries[i].ive_size;
 		}
-	} EXCEPT {
-		decref(hand);
-		RETHROW();
+		dst.iv_head = entries[0];
+		dst.iv_last = entries[count - 1].ive_size;
+
+		/* Do the read */
+		result = handle_readv(hand, &dst, num_bytes);
 	}
-	decref(hand);
 	return (ssize_t)result;
 }
 #endif /* __ARCH_WANT_COMPAT_SYSCALL_PREADV */
@@ -935,40 +797,30 @@ DEFINE_COMPAT_SYSCALL3(ssize_t, writev, fd_t, fd,
 	struct iov_buffer dst;
 	compat_validate_readablem(iov, count, sizeof(*iov));
 	hand = handle_lookup((unsigned int)fd);
-	TRY {
-		if unlikely(!IO_CANWRITE(hand.h_mode))
-			THROW(E_INVALID_HANDLE_OPERATION, fd, E_INVALID_HANDLE_OPERATION_WRITE, hand.h_mode);
-		if unlikely(!count)
-			result = 0;
-		else {
-			dst.iv_entc = count;
-			dst.iv_entv = (struct iov_entry *)malloca(count *
-			                                                 sizeof(struct iov_entry));
-			TRY {
-				size_t i;
-				for (i = 0, num_bytes = 0; i < count; ++i) {
-					((struct iov_entry *)dst.iv_entv)[i].ive_base = (USER CHECKED byte_t *)(void *)ATOMIC_READ(*(compat_uintptr_t *)&iov[i].iov_base);
-					((struct iov_entry *)dst.iv_entv)[i].ive_size = ATOMIC_READ(iov[i].iov_len);
-					compat_validate_readable(((struct iov_entry *)dst.iv_entv)[i].ive_base,
-					                         ((struct iov_entry *)dst.iv_entv)[i].ive_size);
-					num_bytes += ((struct iov_entry *)dst.iv_entv)[i].ive_size;
-				}
-				dst.iv_head = dst.iv_entv[0];
-				dst.iv_last = dst.iv_entv[count - 1].ive_size;
-				result = handle_writev(hand,
-				                       &dst,
-				                       num_bytes);
-			} EXCEPT {
-				freea((void *)dst.iv_entv);
-				RETHROW();
-			}
-			freea((void *)dst.iv_entv);
+	RAII_FINALLY { decref_unlikely(hand); };
+	if unlikely(!IO_CANWRITE(hand.h_mode))
+		THROW(E_INVALID_HANDLE_OPERATION, fd, E_INVALID_HANDLE_OPERATION_WRITE, hand.h_mode);
+	if unlikely(!count) {
+		result = 0;
+	} else {
+		size_t i;
+		struct iov_entry *entries;
+		entries = (struct iov_entry *)malloca(count, sizeof(struct iov_entry));
+		RAII_FINALLY { freea(entries); };
+		dst.iv_entc = count;
+		dst.iv_entv = entries;
+		for (i = 0, num_bytes = 0; i < count; ++i) {
+			entries[i].ive_base = (USER CHECKED byte_t *)(void *)ATOMIC_READ(*(compat_uintptr_t *)&iov[i].iov_base);
+			entries[i].ive_size = ATOMIC_READ(iov[i].iov_len);
+			compat_validate_readable(entries[i].ive_base, entries[i].ive_size);
+			num_bytes += entries[i].ive_size;
 		}
-	} EXCEPT {
-		decref(hand);
-		RETHROW();
+		dst.iv_head = entries[0];
+		dst.iv_last = entries[count - 1].ive_size;
+
+		/* Do the write */
+		result = handle_writev(hand, &dst, num_bytes);
 	}
-	decref(hand);
 	return (ssize_t)result;
 }
 #endif /* __ARCH_WANT_COMPAT_SYSCALL_PWRITEV */
@@ -989,41 +841,30 @@ DEFINE_SYSCALL4(ssize_t, preadv, fd_t, fd,
 	struct iov_buffer dst;
 	validate_readablem(iov, count, sizeof(*iov));
 	hand = handle_lookup((unsigned int)fd);
-	TRY {
-		if unlikely(!IO_CANREAD(hand.h_mode))
-			THROW(E_INVALID_HANDLE_OPERATION, fd, E_INVALID_HANDLE_OPERATION_READ, hand.h_mode);
-		if unlikely(!count)
-			result = 0;
-		else {
-			dst.iv_entc = count;
-			dst.iv_entv = (struct iov_entry *)malloca(count *
-			                                                 sizeof(struct iov_entry));
-			TRY {
-				size_t i;
-				for (i = 0, num_bytes = 0; i < count; ++i) {
-					((struct iov_entry *)dst.iv_entv)[i].ive_base = (USER CHECKED byte_t *)ATOMIC_READ(iov[i].iov_base);
-					((struct iov_entry *)dst.iv_entv)[i].ive_size = ATOMIC_READ(iov[i].iov_len);
-					validate_writable(((struct iov_entry *)dst.iv_entv)[i].ive_base,
-					                  ((struct iov_entry *)dst.iv_entv)[i].ive_size);
-					num_bytes += ((struct iov_entry *)dst.iv_entv)[i].ive_size;
-				}
-				dst.iv_head = dst.iv_entv[0];
-				dst.iv_last = dst.iv_entv[count - 1].ive_size;
-				result = handle_preadv(hand,
-				                       &dst,
-				                       num_bytes,
-				                       (pos_t)offset);
-			} EXCEPT {
-				freea((void *)dst.iv_entv);
-				RETHROW();
-			}
-			freea((void *)dst.iv_entv);
+	RAII_FINALLY { decref_unlikely(hand); };
+	if unlikely(!IO_CANREAD(hand.h_mode))
+		THROW(E_INVALID_HANDLE_OPERATION, fd, E_INVALID_HANDLE_OPERATION_READ, hand.h_mode);
+	if unlikely(!count) {
+		result = 0;
+	} else {
+		size_t i;
+		struct iov_entry *entries;
+		entries = (struct iov_entry *)malloca(count, sizeof(struct iov_entry));
+		RAII_FINALLY { freea(entries); };
+		dst.iv_entc = count;
+		dst.iv_entv = entries;
+		for (i = 0, num_bytes = 0; i < count; ++i) {
+			entries[i].ive_base = (USER CHECKED byte_t *)ATOMIC_READ(iov[i].iov_base);
+			entries[i].ive_size = ATOMIC_READ(iov[i].iov_len);
+			validate_writable(entries[i].ive_base, entries[i].ive_size);
+			num_bytes += entries[i].ive_size;
 		}
-	} EXCEPT {
-		decref(hand);
-		RETHROW();
+		dst.iv_head = entries[0];
+		dst.iv_last = entries[count - 1].ive_size;
+
+		/* Do the read */
+		result = handle_preadv(hand, &dst, num_bytes, (pos_t)offset);
 	}
-	decref(hand);
 	return (ssize_t)result;
 }
 #endif /* __ARCH_WANT_SYSCALL_PREADV */
@@ -1037,41 +878,30 @@ DEFINE_SYSCALL4(ssize_t, pwritev, fd_t, fd,
 	struct iov_buffer dst;
 	validate_readablem(iov, count, sizeof(*iov));
 	hand = handle_lookup((unsigned int)fd);
-	TRY {
-		if unlikely(!IO_CANWRITE(hand.h_mode))
-			THROW(E_INVALID_HANDLE_OPERATION, fd, E_INVALID_HANDLE_OPERATION_WRITE, hand.h_mode);
-		if unlikely(!count)
-			result = 0;
-		else {
-			dst.iv_entc = count;
-			dst.iv_entv = (struct iov_entry *)malloca(count *
-			                                                 sizeof(struct iov_entry));
-			TRY {
-				size_t i;
-				for (i = 0, num_bytes = 0; i < count; ++i) {
-					((struct iov_entry *)dst.iv_entv)[i].ive_base = (USER CHECKED byte_t *)ATOMIC_READ(iov[i].iov_base);
-					((struct iov_entry *)dst.iv_entv)[i].ive_size = ATOMIC_READ(iov[i].iov_len);
-					validate_readable(((struct iov_entry *)dst.iv_entv)[i].ive_base,
-					                  ((struct iov_entry *)dst.iv_entv)[i].ive_size);
-					num_bytes += ((struct iov_entry *)dst.iv_entv)[i].ive_size;
-				}
-				dst.iv_head = dst.iv_entv[0];
-				dst.iv_last = dst.iv_entv[count - 1].ive_size;
-				result = handle_pwritev(hand,
-				                        &dst,
-				                        num_bytes,
-				                        (pos_t)offset);
-			} EXCEPT {
-				freea((void *)dst.iv_entv);
-				RETHROW();
-			}
-			freea((void *)dst.iv_entv);
+	RAII_FINALLY { decref_unlikely(hand); };
+	if unlikely(!IO_CANWRITE(hand.h_mode))
+		THROW(E_INVALID_HANDLE_OPERATION, fd, E_INVALID_HANDLE_OPERATION_WRITE, hand.h_mode);
+	if unlikely(!count) {
+		result = 0;
+	} else {
+		size_t i;
+		struct iov_entry *entries;
+		entries = (struct iov_entry *)malloca(count, sizeof(struct iov_entry));
+		RAII_FINALLY { freea(entries); };
+		dst.iv_entc = count;
+		dst.iv_entv = entries;
+		for (i = 0, num_bytes = 0; i < count; ++i) {
+			entries[i].ive_base = (USER CHECKED byte_t *)ATOMIC_READ(iov[i].iov_base);
+			entries[i].ive_size = ATOMIC_READ(iov[i].iov_len);
+			validate_readable(entries[i].ive_base, entries[i].ive_size);
+			num_bytes += entries[i].ive_size;
 		}
-	} EXCEPT {
-		decref(hand);
-		RETHROW();
+		dst.iv_head = entries[0];
+		dst.iv_last = entries[count - 1].ive_size;
+
+		/* Do the write */
+		result = handle_pwritev(hand, &dst, num_bytes, (pos_t)offset);
 	}
-	decref(hand);
 	return (ssize_t)result;
 }
 #endif /* __ARCH_WANT_SYSCALL_PWRITEV */
@@ -1085,41 +915,30 @@ DEFINE_COMPAT_SYSCALL4(ssize_t, preadv, fd_t, fd,
 	struct iov_buffer dst;
 	compat_validate_readablem(iov, count, sizeof(*iov));
 	hand = handle_lookup((unsigned int)fd);
-	TRY {
-		if unlikely(!IO_CANREAD(hand.h_mode))
-			THROW(E_INVALID_HANDLE_OPERATION, fd, E_INVALID_HANDLE_OPERATION_READ, hand.h_mode);
-		if unlikely(!count)
-			result = 0;
-		else {
-			dst.iv_entc = count;
-			dst.iv_entv = (struct iov_entry *)malloca(count *
-			                                                 sizeof(struct iov_entry));
-			TRY {
-				size_t i;
-				for (i = 0, num_bytes = 0; i < count; ++i) {
-					((struct iov_entry *)dst.iv_entv)[i].ive_base = (USER CHECKED byte_t *)(void *)ATOMIC_READ(*(compat_uintptr_t *)&iov[i].iov_base);
-					((struct iov_entry *)dst.iv_entv)[i].ive_size = ATOMIC_READ(iov[i].iov_len);
-					compat_validate_writable(((struct iov_entry *)dst.iv_entv)[i].ive_base,
-					                         ((struct iov_entry *)dst.iv_entv)[i].ive_size);
-					num_bytes += ((struct iov_entry *)dst.iv_entv)[i].ive_size;
-				}
-				dst.iv_head = dst.iv_entv[0];
-				dst.iv_last = dst.iv_entv[count - 1].ive_size;
-				result = handle_preadv(hand,
-				                       &dst,
-				                       num_bytes,
-				                       (pos_t)offset);
-			} EXCEPT {
-				freea((void *)dst.iv_entv);
-				RETHROW();
-			}
-			freea((void *)dst.iv_entv);
+	RAII_FINALLY { decref_unlikely(hand); };
+	if unlikely(!IO_CANREAD(hand.h_mode))
+		THROW(E_INVALID_HANDLE_OPERATION, fd, E_INVALID_HANDLE_OPERATION_READ, hand.h_mode);
+	if unlikely(!count) {
+		result = 0;
+	} else {
+		size_t i;
+		struct iov_entry *entries;
+		entries = (struct iov_entry *)malloca(count, sizeof(struct iov_entry));
+		RAII_FINALLY { freea(entries); };
+		dst.iv_entc = count;
+		dst.iv_entv = entries;
+		for (i = 0, num_bytes = 0; i < count; ++i) {
+			entries[i].ive_base = (USER CHECKED byte_t *)(void *)ATOMIC_READ(*(compat_uintptr_t *)&iov[i].iov_base);
+			entries[i].ive_size = ATOMIC_READ(iov[i].iov_len);
+			compat_validate_writable(entries[i].ive_base, entries[i].ive_size);
+			num_bytes += entries[i].ive_size;
 		}
-	} EXCEPT {
-		decref(hand);
-		RETHROW();
+		dst.iv_head = entries[0];
+		dst.iv_last = entries[count - 1].ive_size;
+
+		/* Do the read */
+		result = handle_preadv(hand, &dst, num_bytes, (pos_t)offset);
 	}
-	decref(hand);
 	return (ssize_t)result;
 }
 #endif /* __ARCH_WANT_COMPAT_SYSCALL_PREADV */
@@ -1133,41 +952,30 @@ DEFINE_COMPAT_SYSCALL4(ssize_t, pwritev, fd_t, fd,
 	struct iov_buffer dst;
 	compat_validate_readablem(iov, count, sizeof(*iov));
 	hand = handle_lookup((unsigned int)fd);
-	TRY {
-		if unlikely(!IO_CANWRITE(hand.h_mode))
-			THROW(E_INVALID_HANDLE_OPERATION, fd, E_INVALID_HANDLE_OPERATION_WRITE, hand.h_mode);
-		if unlikely(!count)
-			result = 0;
-		else {
-			dst.iv_entc = count;
-			dst.iv_entv = (struct iov_entry *)malloca(count *
-			                                                 sizeof(struct iov_entry));
-			TRY {
-				size_t i;
-				for (i = 0, num_bytes = 0; i < count; ++i) {
-					((struct iov_entry *)dst.iv_entv)[i].ive_base = (USER CHECKED byte_t *)(void *)ATOMIC_READ(*(compat_uintptr_t *)&iov[i].iov_base);
-					((struct iov_entry *)dst.iv_entv)[i].ive_size = ATOMIC_READ(iov[i].iov_len);
-					compat_validate_readable(((struct iov_entry *)dst.iv_entv)[i].ive_base,
-					                         ((struct iov_entry *)dst.iv_entv)[i].ive_size);
-					num_bytes += ((struct iov_entry *)dst.iv_entv)[i].ive_size;
-				}
-				dst.iv_head = dst.iv_entv[0];
-				dst.iv_last = dst.iv_entv[count - 1].ive_size;
-				result = handle_pwritev(hand,
-				                        &dst,
-				                        num_bytes,
-				                        (pos_t)offset);
-			} EXCEPT {
-				freea((void *)dst.iv_entv);
-				RETHROW();
-			}
-			freea((void *)dst.iv_entv);
+	RAII_FINALLY { decref_unlikely(hand); };
+	if unlikely(!IO_CANWRITE(hand.h_mode))
+		THROW(E_INVALID_HANDLE_OPERATION, fd, E_INVALID_HANDLE_OPERATION_WRITE, hand.h_mode);
+	if unlikely(!count) {
+		result = 0;
+	} else {
+		size_t i;
+		struct iov_entry *entries;
+		entries = (struct iov_entry *)malloca(count, sizeof(struct iov_entry));
+		RAII_FINALLY { freea(entries); };
+		dst.iv_entc = count;
+		dst.iv_entv = entries;
+		for (i = 0, num_bytes = 0; i < count; ++i) {
+			entries[i].ive_base = (USER CHECKED byte_t *)(void *)ATOMIC_READ(*(compat_uintptr_t const *)&iov[i].iov_base);
+			entries[i].ive_size = ATOMIC_READ(iov[i].iov_len);
+			compat_validate_readable(entries[i].ive_base, entries[i].ive_size);
+			num_bytes += entries[i].ive_size;
 		}
-	} EXCEPT {
-		decref(hand);
-		RETHROW();
+		dst.iv_head = entries[0];
+		dst.iv_last = entries[count - 1].ive_size;
+
+		/* Do the write */
+		result = handle_pwritev(hand, &dst, num_bytes, (pos_t)offset);
 	}
-	decref(hand);
 	return (ssize_t)result;
 }
 #endif /* __ARCH_WANT_COMPAT_SYSCALL_PWRITEV */
@@ -1183,14 +991,9 @@ DEFINE_COMPAT_SYSCALL4(ssize_t, pwritev, fd_t, fd,
 DEFINE_SYSCALL1(errno_t, fsync, fd_t, fd) {
 	struct handle hand;
 	hand = handle_lookup((unsigned int)fd);
-	TRY {
-		handle_sync(hand);
-	} EXCEPT {
-		decref(hand);
-		RETHROW();
-	}
-	decref(hand);
-	return 0;
+	RAII_FINALLY { decref_unlikely(hand); };
+	handle_sync(hand);
+	return -EOK;
 }
 #endif /* __ARCH_WANT_SYSCALL_FSYNC */
 
@@ -1198,14 +1001,9 @@ DEFINE_SYSCALL1(errno_t, fsync, fd_t, fd) {
 DEFINE_SYSCALL1(errno_t, fdatasync, fd_t, fd) {
 	struct handle hand;
 	hand = handle_lookup((unsigned int)fd);
-	TRY {
-		handle_datasync(hand);
-	} EXCEPT {
-		decref(hand);
-		RETHROW();
-	}
-	decref(hand);
-	return 0;
+	RAII_FINALLY { decref_unlikely(hand); };
+	handle_datasync(hand);
+	return -EOK;
 }
 #endif /* __ARCH_WANT_SYSCALL_FDATASYNC */
 
@@ -1453,63 +1251,58 @@ DEFINE_SYSCALL4(ssize_t, kreaddir,
 	                 E_INVALID_ARGUMENT_CONTEXT_KREADDIR_MODE);
 	validate_writable(buf, bufsize);
 	hand = handle_lookup((unsigned int)fd);
-	TRY {
-		if unlikely(!IO_CANREAD(hand.h_mode))
-			THROW(E_INVALID_HANDLE_OPERATION, fd, E_INVALID_HANDLE_OPERATION_READ, hand.h_mode);
-		if ((mode & READDIR_MODEMASK) == READDIR_MULTIPLE) {
-			size_t partial, alignoff;
-			result = 0;
-			mode &= ~(READDIR_MODEMASK);
+	RAII_FINALLY { decref_unlikely(hand); };
+	if unlikely(!IO_CANREAD(hand.h_mode))
+		THROW(E_INVALID_HANDLE_OPERATION, fd, E_INVALID_HANDLE_OPERATION_READ, hand.h_mode);
+	if ((mode & READDIR_MODEMASK) == READDIR_MULTIPLE) {
+		size_t partial, alignoff;
+		result = 0;
+		mode &= ~(READDIR_MODEMASK);
 #if READDIR_DEFAULT != 0
-			mode |= READDIR_DEFAULT;
+		mode |= READDIR_DEFAULT;
 #endif /* READDIR_DEFAULT != 0 */
-			for (;;) {
-				partial = handle_readdir(hand, buf, bufsize, (readdir_mode_t)mode);
-				if (!partial) {
-					/* Append an EOF directory entry. */
-					if ((mode & READDIR_WANTEOF) && result != 0 &&
-					    (bufsize >= COMPILER_OFFSETOF(struct dirent, d_name) + 1)) {
-						buf->d_namlen  = 0;
-						buf->d_name[0] = '\0';
-						result += COMPILER_OFFSETOF(struct dirent, d_name) + 1;
-					}
-					break; /* End of directory. */
+		for (;;) {
+			partial = handle_readdir(hand, buf, bufsize, (readdir_mode_t)mode);
+			if (!partial) {
+				/* Append an EOF directory entry. */
+				if ((mode & READDIR_WANTEOF) && result != 0 &&
+				    (bufsize >= COMPILER_OFFSETOF(struct dirent, d_name) + 1)) {
+					buf->d_namlen  = 0;
+					buf->d_name[0] = '\0';
+					result += COMPILER_OFFSETOF(struct dirent, d_name) + 1;
 				}
-				if (partial > bufsize) {
-					/* User-space buffer has been used up.
-					 * If this is the first entry that was read, return its required size. */
-					if (!result)
-						result = partial;
+				break; /* End of directory. */
+			}
+			if (partial > bufsize) {
+				/* User-space buffer has been used up.
+				 * If this is the first entry that was read, return its required size. */
+				if (!result)
+					result = partial;
+				break;
+			}
+			/* Move the buffer past this entry. */
+			buf = (USER struct dirent *)((byte_t *)buf + partial);
+			bufsize -= partial;
+			result += partial;
+			/* Align the buffer by INodes (8 bytes). */
+			alignoff = (uintptr_t)buf & (sizeof(ino64_t) - 1);
+			if (alignoff) {
+				alignoff = sizeof(ino64_t) - alignoff;
+				if (bufsize < alignoff)
 					break;
-				}
-				/* Move the buffer past this entry. */
-				buf = (USER struct dirent *)((byte_t *)buf + partial);
-				bufsize -= partial;
-				result += partial;
-				/* Align the buffer by INodes (8 bytes). */
-				alignoff = (uintptr_t)buf & (sizeof(ino64_t) - 1);
-				if (alignoff) {
-					alignoff = sizeof(ino64_t) - alignoff;
-					if (bufsize < alignoff)
-						break;
-					buf = (USER struct dirent *)((byte_t *)buf + alignoff);
-					bufsize -= alignoff;
-					result += alignoff;
-				}
+				buf = (USER struct dirent *)((byte_t *)buf + alignoff);
+				bufsize -= alignoff;
+				result += alignoff;
 			}
-		} else {
-			if ((mode & READDIR_MODEMASK) > READDIR_MODEMAX) {
-				THROW(E_INVALID_ARGUMENT_UNKNOWN_COMMAND,
-				      E_INVALID_ARGUMENT_CONTEXT_KREADDIR_MODE,
-				      mode & READDIR_MODEMASK);
-			}
-			result = handle_readdir(hand, buf, bufsize, (readdir_mode_t)mode);
 		}
-	} EXCEPT {
-		decref(hand);
-		RETHROW();
+	} else {
+		if ((mode & READDIR_MODEMASK) > READDIR_MODEMAX) {
+			THROW(E_INVALID_ARGUMENT_UNKNOWN_COMMAND,
+			      E_INVALID_ARGUMENT_CONTEXT_KREADDIR_MODE,
+			      mode & READDIR_MODEMASK);
+		}
+		result = handle_readdir(hand, buf, bufsize, (readdir_mode_t)mode);
 	}
-	decref(hand);
 	return (ssize_t)result;
 }
 #endif /* __ARCH_WANT_SYSCALL_KREADDIR */
@@ -1529,65 +1322,60 @@ DEFINE_SYSCALL5(ssize_t, kreaddirf,
 	                 E_INVALID_ARGUMENT_CONTEXT_KREADDIRF_IOMODE);
 	validate_writable(buf, bufsize);
 	hand = handle_lookup((unsigned int)fd);
-	TRY {
-		if unlikely(!IO_CANREAD(hand.h_mode))
-			THROW(E_INVALID_HANDLE_OPERATION, fd, E_INVALID_HANDLE_OPERATION_READ, hand.h_mode);
-		if ((mode & READDIR_MODEMASK) == READDIR_MULTIPLE) {
-			size_t partial, alignoff;
-			result = 0;
-			mode &= ~(READDIR_MODEMASK);
+	RAII_FINALLY { decref_unlikely(hand); };
+	if unlikely(!IO_CANREAD(hand.h_mode))
+		THROW(E_INVALID_HANDLE_OPERATION, fd, E_INVALID_HANDLE_OPERATION_READ, hand.h_mode);
+	if ((mode & READDIR_MODEMASK) == READDIR_MULTIPLE) {
+		size_t partial, alignoff;
+		result = 0;
+		mode &= ~(READDIR_MODEMASK);
 #if READDIR_DEFAULT != 0
-			mode |= READDIR_DEFAULT;
-#endif
-			for (;;) {
-				partial = handle_readdirf(hand, buf, bufsize, (readdir_mode_t)mode,
-				                          (hand.h_mode & ~IO_USERF_MASK) | iomode);
-				if (!partial) {
-					/* Append an EOF directory entry. */
-					if ((mode & READDIR_WANTEOF) && result != 0 &&
-					    (bufsize >= COMPILER_OFFSETOF(struct dirent, d_name) + 1)) {
-						buf->d_namlen  = 0;
-						buf->d_name[0] = '\0';
-						result += COMPILER_OFFSETOF(struct dirent, d_name) + 1;
-					}
-					break; /* End of directory. */
+		mode |= READDIR_DEFAULT;
+#endif /* READDIR_DEFAULT != 0 */
+		for (;;) {
+			partial = handle_readdirf(hand, buf, bufsize, (readdir_mode_t)mode,
+			                          (hand.h_mode & ~IO_USERF_MASK) | iomode);
+			if (!partial) {
+				/* Append an EOF directory entry. */
+				if ((mode & READDIR_WANTEOF) && result != 0 &&
+				    (bufsize >= COMPILER_OFFSETOF(struct dirent, d_name) + 1)) {
+					buf->d_namlen  = 0;
+					buf->d_name[0] = '\0';
+					result += COMPILER_OFFSETOF(struct dirent, d_name) + 1;
 				}
-				if (partial > bufsize) {
-					/* User-space buffer has been used up.
-					 * If this is the first entry that was read, return its required size. */
-					if (!result)
-						result = partial;
+				break; /* End of directory. */
+			}
+			if (partial > bufsize) {
+				/* User-space buffer has been used up.
+				 * If this is the first entry that was read, return its required size. */
+				if (!result)
+					result = partial;
+				break;
+			}
+			/* Move the buffer past this entry. */
+			buf = (USER struct dirent *)((byte_t *)buf + partial);
+			bufsize -= partial;
+			result += partial;
+			/* Align the buffer by INodes (8 bytes). */
+			alignoff = (uintptr_t)buf & (sizeof(ino64_t) - 1);
+			if (alignoff) {
+				alignoff = sizeof(ino64_t) - alignoff;
+				if (bufsize < alignoff)
 					break;
-				}
-				/* Move the buffer past this entry. */
-				buf = (USER struct dirent *)((byte_t *)buf + partial);
-				bufsize -= partial;
-				result += partial;
-				/* Align the buffer by INodes (8 bytes). */
-				alignoff = (uintptr_t)buf & (sizeof(ino64_t) - 1);
-				if (alignoff) {
-					alignoff = sizeof(ino64_t) - alignoff;
-					if (bufsize < alignoff)
-						break;
-					buf = (USER struct dirent *)((byte_t *)buf + alignoff);
-					bufsize -= alignoff;
-					result += alignoff;
-				}
+				buf = (USER struct dirent *)((byte_t *)buf + alignoff);
+				bufsize -= alignoff;
+				result += alignoff;
 			}
-		} else {
-			if ((mode & READDIR_MODEMASK) > READDIR_MODEMAX) {
-				THROW(E_INVALID_ARGUMENT_UNKNOWN_COMMAND,
-				      E_INVALID_ARGUMENT_CONTEXT_KREADDIR_MODE,
-				      mode & READDIR_MODEMASK);
-			}
-			result = handle_readdirf(hand, buf, bufsize, (readdir_mode_t)mode,
-			                         (hand.h_mode & ~IO_USERF_MASK) | iomode);
 		}
-	} EXCEPT {
-		decref(hand);
-		RETHROW();
+	} else {
+		if ((mode & READDIR_MODEMASK) > READDIR_MODEMAX) {
+			THROW(E_INVALID_ARGUMENT_UNKNOWN_COMMAND,
+			      E_INVALID_ARGUMENT_CONTEXT_KREADDIR_MODE,
+			      mode & READDIR_MODEMASK);
+		}
+		result = handle_readdirf(hand, buf, bufsize, (readdir_mode_t)mode,
+		                         (hand.h_mode & ~IO_USERF_MASK) | iomode);
 	}
-	decref(hand);
 	return (ssize_t)result;
 }
 #endif /* __ARCH_WANT_SYSCALL_KREADDIRF */
@@ -2938,15 +2726,10 @@ DEFINE_SYSCALL5(syscall_slong_t, kcmp,
 		REF struct handle hand1;
 		REF struct handle hand2;
 		hand1 = kcmp_get_handle_from_pid(pid1, (unsigned int)idx1);
-		TRY {
-			hand2  = kcmp_get_handle_from_pid(pid2, (unsigned int)idx2);
-			result = kcmp_pointer(hand1.h_data, hand2.h_data);
-			decref_unlikely(hand2);
-		} EXCEPT {
-			decref_unlikely(hand1);
-			RETHROW();
-		}
-		decref_unlikely(hand1);
+		RAII_FINALLY { decref_unlikely(hand1); };
+		hand2  = kcmp_get_handle_from_pid(pid2, (unsigned int)idx2);
+		result = kcmp_pointer(hand1.h_data, hand2.h_data);
+		decref_unlikely(hand2);
 	}	break;
 
 	case KCMP_VM: {

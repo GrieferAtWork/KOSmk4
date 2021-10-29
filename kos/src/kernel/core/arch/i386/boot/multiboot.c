@@ -176,6 +176,7 @@ PRIVATE ATTR_FREEBSS size_t x86_boot_driver_size = 0;    /* Size of boot driver 
 
 PRIVATE ATTR_FREETEXT void KCALL
 load_bootloader_driver2(PHYS u32 blob_addr, size_t blob_size, char *cmdline) {
+	REF struct driver *drv;
 	void *blob;
 	size_t aligned_blob_size;
 	aligned_blob_size = blob_size + (blob_addr & PAGEMASK);
@@ -187,31 +188,26 @@ load_bootloader_driver2(PHYS u32 blob_addr, size_t blob_size, char *cmdline) {
 	                    aligned_blob_size,
 	                    MHINT_GETMODE(KERNEL_MHINT_TEMPORARY) |
 	                    MAP_PREPARED | MAP_NOMERGE);
-	TRY {
-		REF struct driver *drv;
-
-		/* Map the driver blob into virtual memory. */
-		pagedir_map(blob,
-		            aligned_blob_size,
-		            (physaddr_t)(blob_addr & ~PAGEMASK),
-		            PAGEDIR_PROT_READ);
-
-		/* Load the mapped driver blob as a driver module.
-		 * NOTE: We  pass  the  `DRIVER_INSMOD_FLAG_NOINIT'  flag  so-as  to allow
-		 *       the driver to be initialized (and have its dependencies be bound)
-		 *       once all drivers specified by  the boot loader have been  loaded.
-		 *    -> That way,  driver dependencies  can be  loaded in  the same  manner,
-		 *       thus not relying on file-system drivers not having any dependencies. */
-		drv = driver_loadmod_blob((byte_t *)blob + (blob_addr & PAGEMASK),
-		                          blob_size, cmdline);
-
-		/* Drop the reference returned by driver_insmod_blob() */
-		decref(drv);
-	} EXCEPT {
+	RAII_FINALLY {
 		mman_unmap(&mman_kernel, blob, aligned_blob_size);
-		RETHROW();
-	}
-	mman_unmap(&mman_kernel, blob, aligned_blob_size);
+	};
+	/* Map the driver blob into virtual memory. */
+	pagedir_map(blob,
+	            aligned_blob_size,
+	            (physaddr_t)(blob_addr & ~PAGEMASK),
+	            PAGEDIR_PROT_READ);
+
+	/* Load the mapped driver blob as a driver module.
+	 * NOTE: We  pass  the  `DRIVER_INSMOD_FLAG_NOINIT'  flag  so-as  to allow
+	 *       the driver to be initialized (and have its dependencies be bound)
+	 *       once all drivers specified by  the boot loader have been  loaded.
+	 *    -> That way,  driver dependencies  can be  loaded in  the same  manner,
+	 *       thus not relying on file-system drivers not having any dependencies. */
+	drv = driver_loadmod_blob((byte_t *)blob + (blob_addr & PAGEMASK),
+	                          blob_size, cmdline);
+
+	/* Drop the reference returned by driver_insmod_blob() */
+	decref(drv);
 }
 
 PRIVATE ATTR_FREETEXT void KCALL
@@ -222,21 +218,16 @@ load_bootloader_driver(PHYS u32 blob_addr, size_t blob_size,
 	} else {
 		char *cmdline;
 		cmdline = (char *)malloca((cmdline_maxsize + 1) * sizeof(char));
-		TRY {
-			/* Copy the commandline into our buffer. */
-			copyfromphys(cmdline,
-			             (physaddr_t)cmdline_addr,
-			             cmdline_maxsize);
-			cmdline[cmdline_maxsize] = '\0';
-			/* Load the driver blob. */
-			load_bootloader_driver2(blob_addr,
-			                        blob_size,
-			                        cmdline);
-		} EXCEPT {
-			freea(cmdline);
-			RETHROW();
-		}
-		freea(cmdline);
+		RAII_FINALLY { freea(cmdline); };
+		/* Copy the commandline into our buffer. */
+		copyfromphys(cmdline,
+		             (physaddr_t)cmdline_addr,
+		             cmdline_maxsize);
+		cmdline[cmdline_maxsize] = '\0';
+		/* Load the driver blob. */
+		load_bootloader_driver2(blob_addr,
+		                        blob_size,
+		                        cmdline);
 	}
 }
 

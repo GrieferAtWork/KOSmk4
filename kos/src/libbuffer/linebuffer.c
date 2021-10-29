@@ -119,17 +119,13 @@ liblinebuffer_rewrite(struct linebuffer *__restrict self,
 		atomic_lock_release(&self->lb_lock);
 	} else {
 		atomic_lock_release(&self->lb_lock);
-		TRY {
-			result = liblinebuffer_write(self,
-			                             capture->lc_base,
-			                             capture->lc_size);
-		} EXCEPT {
+		RAII_FINALLY {
 			HEAP_FREE(capture->lc_base,
 			          capture->lc_alloc);
-			RETHROW();
-		}
-		HEAP_FREE(capture->lc_base,
-		          capture->lc_alloc);
+		};
+		result = liblinebuffer_write(self,
+		                             capture->lc_base,
+		                             capture->lc_size);
 	}
 	DBG_memset(capture, 0xcc, sizeof(*capture));
 	return result;

@@ -575,16 +575,12 @@ epoll_loop:
 			}
 			epoll_controller_lock_release(self);
 			/* Wait for `error' to become available. */
-			TRY {
-				while (!mutex_poll_unlikely(&error->ec_lock))
-					task_waitfor();
-			} EXCEPT {
+			RAII_FINALLY {
 				task_disconnectall();
 				decref_unlikely(error);
-				RETHROW();
-			}
-			task_disconnectall();
-			decref_unlikely(error);
+			};
+			while (!mutex_poll_unlikely(&error->ec_lock))
+				task_waitfor();
 			goto again;
 		}
 		/* At  this point  we know that  `self' isn't already  being monitored by
@@ -1619,80 +1615,70 @@ next_monitor:
 				/* A chain of monitors that must be re-appended at
 				 * the  end  of  the  chain  of  raised  monitors. */
 				struct epoll_handle_monitor *reraise_monitors = NULL;
-				TRY {
-					do {
-						struct epoll_handle_monitor *next;
-						next = result_events->ehm_rnext;
-						/* Do one of the following:
-						 * >> if (EPOLLONESHOT) {
-						 *     - Do nothing. The monitor should still remain, but should
-						 *       not actually be active. Linux docs state that the  user
-						 *       must use EPOLL_CTL_MOD to re-arm the monitor.
-						 * >> } else if (EPOLLET) {
-						 *   - Blindly re-connect `result_events' to its associated handle in
-						 *     order  to wait for the next rising-edge event, even though the
-						 *     handle itself (should) still be raised right now.
-						 * >> } else {
-						 *   - Append `result_events' at the end of the `ec_raised' queue, such
-						 *     that it gets re-checked for raised channels during the next call
-						 *     to `epoll_controller_trywait()'
-						 *   - The  `ec_raised' should still  be relatively small/entirely empty,
-						 *     since we've just  cleared it further  above (of course:  unrelated
-						 *     monitors may have been raised in the mean time, but this re-insert
-						 *     should still  be a  relatively fast  operation, especially  if  we
-						 *     combine the set of )
-						 * >> } */
-						assert(!sig_multicompletion_wasconnected(&result_events->ehm_comp));
-						assert(result_events->ehm_raised != 0);
-						if (result_events->ehm_events & EPOLLONESHOT) {
-							if (has_personality(KP_EPOLL_DELETE_ONESHOT)) {
-do_destroy_result_event:
-								epoll_controller_intern_delmon_and_maybe_rehash(self, result_events);
-								epoll_handle_monitor_destroy(result_events);
-							} else {
-								/* Mark the monitor as no longer raised. */
-								ATOMIC_WRITE(result_events->ehm_raised, 0);
-							}
-						} else if (result_events->ehm_events & EPOLLET) {
-							/* For this to work, we have to re-acquire a (strong) reference
-							 * to the associated handle. Note  however that this can  still
-							 * fail  at this point,  but we can easily  handle that case by
-							 * jumping to the `EPOLLONESHOT' handler. */
-							REF void *monitor_handptr;
-							monitor_handptr = epoll_handle_monitor_weaklckref(result_events);
-							if unlikely(!monitor_handptr)
-								goto do_destroy_result_event;
-							ATOMIC_WRITE(result_events->ehm_raised, 0);
-							TRY {
-								epoll_handle_monitor_pollconnect(result_events, monitor_handptr, &epoll_completion);
-							} EXCEPT {
-								epoll_handle_monitor_handle_decref(result_events, monitor_handptr);
-								RETHROW();
-							}
-							epoll_handle_monitor_handle_decref(result_events, monitor_handptr);
-						} else {
-							/* Re-raise this monitor, so it gets checked for pending  channels
-							 * once again the next time around (this is done for monitors that
-							 * continuously produce events for as long as they remain raised),
-							 * which is the default unless `EPOLLONESHOT' or `EPOLLET' is set. */
-							/* NOTE: This insert once again reverses the monitor order  from
-							 *       least-recently-raised to most-recently-raised, which is
-							 *       intended, as the raised-chain is sorted in that manner! */
-							result_events->ehm_rnext = reraise_monitors;
-							reraise_monitors         = result_events;
-						}
-						result_events = next;
-					} while (result_events != next_monitor);
-					assert(result_events == next_monitor);
-				} EXCEPT {
+				RAII_FINALLY {
 					/* Re-insert raised monitors into the raised-queue */
 					if (reraise_monitors)
 						epoll_controller_requeue_events_at_back_of_chain(self, reraise_monitors);
-					RETHROW();
-				}
-				/* Re-insert raised monitors into the raised-queue */
-				if (reraise_monitors)
-					epoll_controller_requeue_events_at_back_of_chain(self, reraise_monitors);
+				};
+				do {
+					struct epoll_handle_monitor *next;
+					next = result_events->ehm_rnext;
+					/* Do one of the following:
+					 * >> if (EPOLLONESHOT) {
+					 *     - Do nothing. The monitor should still remain, but should
+					 *       not actually be active. Linux docs state that the  user
+					 *       must use EPOLL_CTL_MOD to re-arm the monitor.
+					 * >> } else if (EPOLLET) {
+					 *   - Blindly re-connect `result_events' to its associated handle in
+					 *     order  to wait for the next rising-edge event, even though the
+					 *     handle itself (should) still be raised right now.
+					 * >> } else {
+					 *   - Append `result_events' at the end of the `ec_raised' queue, such
+					 *     that it gets re-checked for raised channels during the next call
+					 *     to `epoll_controller_trywait()'
+					 *   - The  `ec_raised' should still  be relatively small/entirely empty,
+					 *     since we've just  cleared it further  above (of course:  unrelated
+					 *     monitors may have been raised in the mean time, but this re-insert
+					 *     should still  be a  relatively fast  operation, especially  if  we
+					 *     combine the set of )
+					 * >> } */
+					assert(!sig_multicompletion_wasconnected(&result_events->ehm_comp));
+					assert(result_events->ehm_raised != 0);
+					if (result_events->ehm_events & EPOLLONESHOT) {
+						if (has_personality(KP_EPOLL_DELETE_ONESHOT)) {
+do_destroy_result_event:
+							epoll_controller_intern_delmon_and_maybe_rehash(self, result_events);
+							epoll_handle_monitor_destroy(result_events);
+						} else {
+							/* Mark the monitor as no longer raised. */
+							ATOMIC_WRITE(result_events->ehm_raised, 0);
+						}
+					} else if (result_events->ehm_events & EPOLLET) {
+						/* For this to work, we have to re-acquire a (strong) reference
+						 * to the associated handle. Note  however that this can  still
+						 * fail  at this point,  but we can easily  handle that case by
+						 * jumping to the `EPOLLONESHOT' handler. */
+						REF void *monitor_handptr;
+						monitor_handptr = epoll_handle_monitor_weaklckref(result_events);
+						if unlikely(!monitor_handptr)
+							goto do_destroy_result_event;
+						ATOMIC_WRITE(result_events->ehm_raised, 0);
+						RAII_FINALLY { epoll_handle_monitor_handle_decref(result_events, monitor_handptr); };
+						epoll_handle_monitor_pollconnect(result_events, monitor_handptr, &epoll_completion);
+					} else {
+						/* Re-raise this monitor, so it gets checked for pending  channels
+						 * once again the next time around (this is done for monitors that
+						 * continuously produce events for as long as they remain raised),
+						 * which is the default unless `EPOLLONESHOT' or `EPOLLET' is set. */
+						/* NOTE: This insert once again reverses the monitor order  from
+						 *       least-recently-raised to most-recently-raised, which is
+						 *       intended, as the raised-chain is sorted in that manner! */
+						result_events->ehm_rnext = reraise_monitors;
+						reraise_monitors         = result_events;
+					}
+					result_events = next;
+				} while (result_events != next_monitor);
+				assert(result_events == next_monitor);
 			} /* Scope */
 		}     /* if (result_events != NULL) */
 	} EXCEPT {
@@ -1936,51 +1922,46 @@ DEFINE_SYSCALL4(errno_t, epoll_ctl,
 	self = handle_get_epoll_controller(epfd);
 	FINALLY_DECREF_UNLIKELY(self);
 	fd_handle = handle_lookup(fd);
-	TRY {
-		switch (op) {
+	RAII_FINALLY { decref_unlikely(fd_handle); };
+	switch (op) {
 
-		case EPOLL_CTL_ADD:
-			validate_readable(info, sizeof(*info));
-			if (!epoll_controller_addmonitor(self, &fd_handle, (uint32_t)fd, info))
-				result = -EEXIST; /* TODO: Use an exception for this! */
-			break;
+	case EPOLL_CTL_ADD:
+		validate_readable(info, sizeof(*info));
+		if (!epoll_controller_addmonitor(self, &fd_handle, (uint32_t)fd, info))
+			result = -EEXIST; /* TODO: Use an exception for this! */
+		break;
 
-		case EPOLL_CTL_MOD:
-			validate_readable(info, sizeof(*info));
-			if (!epoll_controller_modmonitor(self, &fd_handle, (uint32_t)fd, info))
-				result = -ENOENT; /* TODO: Use an exception for this! */
-			break;
+	case EPOLL_CTL_MOD:
+		validate_readable(info, sizeof(*info));
+		if (!epoll_controller_modmonitor(self, &fd_handle, (uint32_t)fd, info))
+			result = -ENOENT; /* TODO: Use an exception for this! */
+		break;
 
-		case EPOLL_CTL_DEL:
-			if (!epoll_controller_delmonitor(self, &fd_handle, (uint32_t)fd))
-				result = -ENOENT; /* TODO: Use an exception for this! */
-			break;
+	case EPOLL_CTL_DEL:
+		if (!epoll_controller_delmonitor(self, &fd_handle, (uint32_t)fd))
+			result = -ENOENT; /* TODO: Use an exception for this! */
+		break;
 
 #ifdef CONFIG_HAVE_EPOLL_RPC
-		case EPOLL_CTL_RPC_PROG: {
-			struct epoll_event eventinfo;
-			USER CHECKED struct epoll_rpc_program const *program;
-			validate_readable(info, sizeof(*info));
-			memcpy(&eventinfo, info, sizeof(struct epoll_event));
-			validate_readable(eventinfo.data.ptr, sizeof(struct epoll_rpc_program));
-			program = (USER CHECKED struct epoll_rpc_program const *)eventinfo.data.ptr;
-			/* Create the RPC monitor. */
-			if (!epoll_create_rpc_monitor(self, &fd_handle, (uint32_t)fd,
-			                              eventinfo.events, program))
-				result = -EEXIST; /* TODO: Use an exception for this! */
-		}	break;
+	case EPOLL_CTL_RPC_PROG: {
+		struct epoll_event eventinfo;
+		USER CHECKED struct epoll_rpc_program const *program;
+		validate_readable(info, sizeof(*info));
+		memcpy(&eventinfo, info, sizeof(struct epoll_event));
+		validate_readable(eventinfo.data.ptr, sizeof(struct epoll_rpc_program));
+		program = (USER CHECKED struct epoll_rpc_program const *)eventinfo.data.ptr;
+		/* Create the RPC monitor. */
+		if (!epoll_create_rpc_monitor(self, &fd_handle, (uint32_t)fd,
+		                              eventinfo.events, program))
+			result = -EEXIST; /* TODO: Use an exception for this! */
+	}	break;
 #endif /* CONFIG_HAVE_EPOLL_RPC */
 
-		default:
-			THROW(E_INVALID_ARGUMENT_UNKNOWN_COMMAND,
-			      E_INVALID_ARGUMENT_CONTEXT_EPOLL_CTL_OP,
-			      op);
-		}
-	} EXCEPT {
-		decref(fd_handle);
-		RETHROW();
+	default:
+		THROW(E_INVALID_ARGUMENT_UNKNOWN_COMMAND,
+		      E_INVALID_ARGUMENT_CONTEXT_EPOLL_CTL_OP,
+		      op);
 	}
-	decref(fd_handle);
 	return result;
 }
 #endif /* __ARCH_WANT_SYSCALL_EPOLL_CTL */

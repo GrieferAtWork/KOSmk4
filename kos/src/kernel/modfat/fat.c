@@ -231,18 +231,13 @@ INTERN NONNULL((1)) void KCALL
 Fat_DeleteClusterChain(FatSuperblock *__restrict self,
                        FatClusterIndex first_delete_index) {
 	FatSuper_FatLockWrite(self);
-	TRY {
-		while (first_delete_index < self->ft_cluster_eof &&
-		       first_delete_index != FAT_CLUSTER_UNUSED) {
-			FatClusterIndex next = Fat_GetFatIndirection(self, first_delete_index);
-			Fat_SetFatIndirection(self, first_delete_index, FAT_CLUSTER_UNUSED);
-			first_delete_index = next;
-		}
-	} EXCEPT {
-		FatSuper_FatLockEndWrite(self);
-		RETHROW();
+	RAII_FINALLY { FatSuper_FatLockEndWrite(self); };
+	while (first_delete_index < self->ft_cluster_eof &&
+	       first_delete_index != FAT_CLUSTER_UNUSED) {
+		FatClusterIndex next = Fat_GetFatIndirection(self, first_delete_index);
+		Fat_SetFatIndirection(self, first_delete_index, FAT_CLUSTER_UNUSED);
+		first_delete_index = next;
 	}
-	FatSuper_FatLockEndWrite(self);
 }
 
 
@@ -350,8 +345,6 @@ Fat_GetFileCluster(struct fnode *__restrict self,
 						                                            GFP_NORMAL);
 						if likely(new_vector)
 							dat->fn_clusterv = new_vector;
-						if (!(mode & FAT_GETCLUSTER_MODE_WRLOCK))
-							FatNodeData_Downgrade(dat);
 						return result;
 					}
 					if (nth_cluster < dat->fn_clusterc) {
@@ -387,67 +380,62 @@ create_more_clusters_already_locked:
 	TRY {
 		preallocate_cluster_vector_entries(self, dat, super, nth_cluster + 1);
 		FatSuper_FatLockWrite(super);
-		TRY {
-			assert(dat->fn_clusterv[dat->fn_clusterc - 1] >= super->ft_cluster_eof);
-			assert((kmalloc_usable_size(dat->fn_clusterv) / sizeof(FatClusterIndex)) >= nth_cluster + 1);
-			/* Create more clusters. */
-			for (;;) {
-				result = Fat_FindFreeCluster(super);
-				assert(result != FAT_CLUSTER_UNUSED);
-				/* Mark the new cluster as allocated. */
-				Fat_SetFatIndirection(super, result,
-				                      super->ft_cluster_eof_marker);
+		RAII_FINALLY { FatSuper_FatLockEndWrite(super); };
+		assert(dat->fn_clusterv[dat->fn_clusterc - 1] >= super->ft_cluster_eof);
+		assert((kmalloc_usable_size(dat->fn_clusterv) / sizeof(FatClusterIndex)) >= nth_cluster + 1);
+		/* Create more clusters. */
+		for (;;) {
+			result = Fat_FindFreeCluster(super);
+			assert(result != FAT_CLUSTER_UNUSED);
+			/* Mark the new cluster as allocated. */
+			Fat_SetFatIndirection(super, result,
+			                      super->ft_cluster_eof_marker);
+			TRY {
+				/* Initialize new clusters with all zeroes for new files. */
+				if (fnode_isreg(self))
+					zero_initialize_cluster(super, result);
+				assert(super->ft_cluster_eof_marker != FAT_CLUSTER_UNUSED);
+				dat->fn_clusterv[dat->fn_clusterc - 1] = result;
+				dat->fn_clusterv[dat->fn_clusterc] = super->ft_cluster_eof_marker;
+				++dat->fn_clusterc;
 				TRY {
-					/* Initialize new clusters with all zeroes for new files. */
-					if (fnode_isreg(self))
-						zero_initialize_cluster(super, result);
-					assert(super->ft_cluster_eof_marker != FAT_CLUSTER_UNUSED);
-					dat->fn_clusterv[dat->fn_clusterc - 1] = result;
-					dat->fn_clusterv[dat->fn_clusterc] = super->ft_cluster_eof_marker;
-					++dat->fn_clusterc;
-					TRY {
-						if (dat->fn_clusterc == 2) {
-							/* The pointer  to  the  first  cluster is  stored  in  the  INode.
-							 * Since we've just written that pointer, mark the node as changed. */
-							if (!(mode & FAT_GETCLUSTER_MODE_FNCHNGE))
-								mfile_changed(self, MFILE_F_ATTRCHANGED);
-						} else {
-							/* Link the previous cluster onto the new one */
-							assert(dat->fn_clusterc >= 3);
-							/* -3: PREV_CLUSTER */
-							/* -2: THIS_CLUSTER */
-							/* -1: fat->ft_cluster_eof_marker */
-							Fat_SetFatIndirection(super,
-							                      dat->fn_clusterv[dat->fn_clusterc - 3],
-							                      result);
-						}
-					} EXCEPT {
-						--dat->fn_clusterc;
-						assert(dat->fn_clusterv[dat->fn_clusterc - 1] == result);
-						assert(super->ft_cluster_eof_marker != FAT_CLUSTER_UNUSED);
-						dat->fn_clusterv[dat->fn_clusterc - 1] = super->ft_cluster_eof_marker;
-						RETHROW();
+					if (dat->fn_clusterc == 2) {
+						/* The pointer  to  the  first  cluster is  stored  in  the  INode.
+						 * Since we've just written that pointer, mark the node as changed. */
+						if (!(mode & FAT_GETCLUSTER_MODE_FNCHNGE))
+							mfile_changed(self, MFILE_F_ATTRCHANGED);
+					} else {
+						/* Link the previous cluster onto the new one */
+						assert(dat->fn_clusterc >= 3);
+						/* -3: PREV_CLUSTER */
+						/* -2: THIS_CLUSTER */
+						/* -1: fat->ft_cluster_eof_marker */
+						Fat_SetFatIndirection(super,
+						                      dat->fn_clusterv[dat->fn_clusterc - 3],
+						                      result);
 					}
 				} EXCEPT {
-					/* Free the new cluster on error. */
-					{
-						NESTED_EXCEPTION;
-						Fat_SetFatIndirection(super, result, FAT_CLUSTER_UNUSED);
-					}
+					--dat->fn_clusterc;
+					assert(dat->fn_clusterv[dat->fn_clusterc - 1] == result);
+					assert(super->ft_cluster_eof_marker != FAT_CLUSTER_UNUSED);
+					dat->fn_clusterv[dat->fn_clusterc - 1] = super->ft_cluster_eof_marker;
 					RETHROW();
 				}
-				if (nth_cluster < dat->fn_clusterc - 1) {
-					/* The requested cluster was reached */
-					assert(nth_cluster == dat->fn_clusterc - 2);
-					assert(result == dat->fn_clusterv[nth_cluster]);
-					break;
+			} EXCEPT {
+				/* Free the new cluster on error. */
+				{
+					NESTED_EXCEPTION;
+					Fat_SetFatIndirection(super, result, FAT_CLUSTER_UNUSED);
 				}
+				RETHROW();
 			}
-		} EXCEPT {
-			FatSuper_FatLockEndWrite(super);
-			RETHROW();
+			if (nth_cluster < dat->fn_clusterc - 1) {
+				/* The requested cluster was reached */
+				assert(nth_cluster == dat->fn_clusterc - 2);
+				assert(result == dat->fn_clusterv[nth_cluster]);
+				break;
+			}
 		}
-		FatSuper_FatLockEndWrite(super);
 	} EXCEPT {
 		if (!(mode & FAT_GETCLUSTER_MODE_WRLOCK))
 			FatNodeData_Downgrade(dat);
@@ -493,13 +481,10 @@ Fat_GetAbsDiskPos(struct fnode *__restrict self, pos_t pos) THROWS(...) {
 	if (fnode_has_fat_clusters(self)) {
 		for (;;) {
 			FatNodeData_Read(dat);
-			TRY {
+			{
+				RAII_FINALLY { FatNodeData_EndRead(dat); };
 				result = Fat_GetAbsDiskPosWithClusters(self, pos, FAT_GETCLUSTER_MODE_FCREATE);
-			} EXCEPT {
-				FatNodeData_EndRead(dat);
-				RETHROW();
 			}
-			FatNodeData_EndRead(dat);
 			if (result != 0)
 				break;
 
@@ -542,7 +527,8 @@ Fat_LoadBlocks(struct mfile *__restrict self, pos_t addr,
 		return;
 again:
 	FatNodeData_Read(dat);
-	TRY {
+	{
+		RAII_FINALLY { FatNodeData_EndRead(dat); };
 		for (;;) {
 			FatClusterIndex cluster;
 			pos_t diskpos;
@@ -591,14 +577,9 @@ again:
 			addr += max_io;
 			buf += max_io;
 		}
-	} EXCEPT {
-		FatNodeData_EndRead(dat);
-		RETHROW();
 	}
-	FatNodeData_EndRead(dat);
 	return;
 waitfor_write_lock:
-	FatNodeData_EndRead(dat);
 	FatNodeData_Write(dat);
 	FatNodeData_EndWrite(dat);
 	goto again;
@@ -623,7 +604,8 @@ again:
 	 *      cluster indices (if said vector needs to be modified, this
 	 *      lock is later upgraded as necessary) */
 	FatNodeData_Read(dat);
-	TRY {
+	{
+		RAII_FINALLY { FatNodeData_EndRead(dat); };
 		for (;;) {
 			FatClusterIndex cluster;
 			pos_t diskpos;
@@ -669,14 +651,9 @@ again:
 			addr += max_io;
 			buf += max_io;
 		}
-	} EXCEPT {
-		FatNodeData_EndRead(dat);
-		RETHROW();
 	}
-	FatNodeData_EndRead(dat);
 	return;
 waitfor_write_lock:
-	FatNodeData_EndRead(dat);
 	FatNodeData_Write(dat);
 	FatNodeData_EndWrite(dat);
 	goto again;
@@ -703,6 +680,7 @@ again:
 
 	/* Acquire a lock to the directory stream buffer. */
 	flatdirnode_write(dir);
+	RAII_FINALLY { flatdirnode_endwrite(dir); };
 
 	/* Re-check that nothing's changed (and `dir' is still correct) */
 	mfile_tslock_acquire(self);
@@ -712,101 +690,94 @@ again:
 	}
 	mfile_tslock_release(self);
 
-	TRY {
-		if likely(!flatdirent_wasdeleted(&ent->fad_ent)) {
-			FatClusterIndex first_cluster;
-			mode_t fmode;
-			struct timespec atm, mtm, ctm;
-			gid_t gid;
-			uid_t uid;
+	if likely(!flatdirent_wasdeleted(&ent->fad_ent)) {
+		FatClusterIndex first_cluster;
+		mode_t fmode;
+		struct timespec atm, mtm, ctm;
+		gid_t gid;
+		uid_t uid;
 
-			/* Load file attributes */
-			mfile_tslock_acquire(self);
-			fmode = self->fn_mode;
-			atm   = self->mf_atime;
-			mtm   = self->mf_mtime;
-			ctm   = self->mf_ctime;
-			gid   = self->fn_gid;
-			uid   = self->fn_uid;
-			mfile_tslock_release(self);
+		/* Load file attributes */
+		mfile_tslock_acquire(self);
+		fmode = self->fn_mode;
+		atm   = self->mf_atime;
+		mtm   = self->mf_mtime;
+		ctm   = self->mf_ctime;
+		gid   = self->fn_gid;
+		uid   = self->fn_uid;
+		mfile_tslock_release(self);
 
-			/* Check if loaded attributes are valid */
-			if unlikely(ATOMIC_READ(self->mf_flags) & MFILE_F_DELETED)
-				goto endwrite_and_return;
+		/* Check if loaded attributes are valid */
+		if unlikely(ATOMIC_READ(self->mf_flags) & MFILE_F_DELETED)
+			return;
 
-			/* Update the contents of `ent->fad_dos' */
-			first_cluster = dat->fn_clusterv[0];
+		/* Update the contents of `ent->fad_dos' */
+		first_cluster = dat->fn_clusterv[0];
 
-			/* Copy basic file data. */
-			ent->fad_dos.f_clusterlo = HTOLE16(first_cluster & 0xffff);
-			if (super->ft_features & FAT_FEATURE_ARB) {
-				u16 arb = 0;
-				/* Use the ARB to implement unix file permissions. */
-				if (!(fmode & S_IXUSR))
-					arb |= FAT_ARB_NO_OX; /* Disable: Execute by owner */
-				if (!(fmode & S_IWUSR))
-					arb |= FAT_ARB_NO_OW; /* Disable: Write by owner */
-				if (!(fmode & S_IRUSR))
-					arb |= FAT_ARB_NO_OR; /* Disable: Read by owner */
+		/* Copy basic file data. */
+		ent->fad_dos.f_clusterlo = HTOLE16(first_cluster & 0xffff);
+		if (super->ft_features & FAT_FEATURE_ARB) {
+			u16 arb = 0;
+			/* Use the ARB to implement unix file permissions. */
+			if (!(fmode & S_IXUSR))
+				arb |= FAT_ARB_NO_OX; /* Disable: Execute by owner */
+			if (!(fmode & S_IWUSR))
+				arb |= FAT_ARB_NO_OW; /* Disable: Write by owner */
+			if (!(fmode & S_IRUSR))
+				arb |= FAT_ARB_NO_OR; /* Disable: Read by owner */
 
-				if (!(fmode & S_IXGRP))
-					arb |= FAT_ARB_NO_GX; /* Disable: Execute by group */
-				if (!(fmode & S_IWGRP))
-					arb |= FAT_ARB_NO_GW; /* Disable: Write by group */
-				if (!(fmode & S_IRGRP))
-					arb |= FAT_ARB_NO_GR; /* Disable: Read by group */
+			if (!(fmode & S_IXGRP))
+				arb |= FAT_ARB_NO_GX; /* Disable: Execute by group */
+			if (!(fmode & S_IWGRP))
+				arb |= FAT_ARB_NO_GW; /* Disable: Write by group */
+			if (!(fmode & S_IRGRP))
+				arb |= FAT_ARB_NO_GR; /* Disable: Read by group */
 
-				if (!(fmode & S_IXOTH))
-					arb |= FAT_ARB_NO_WX; /* Disable: Execute by world */
-				if (!(fmode & S_IWOTH))
-					arb |= FAT_ARB_NO_WW; /* Disable: Write by world */
-				if (!(fmode & S_IROTH))
-					arb |= FAT_ARB_NO_WR; /* Disable: Read by world */
-				if (!(fmode & 0222)) {
-					/* Preserve ARB flags  for write permissions  if those  can
-					 * already be represented through use of the READONLY flag. */
-					arb &= ~(FAT_ARB_NO_OW | FAT_ARB_NO_GW | FAT_ARB_NO_WW);
-					arb |= LETOH16(ent->fad_dos.f_arb) & (FAT_ARB_NO_OW | FAT_ARB_NO_GW | FAT_ARB_NO_WW);
-				}
-				ent->fad_dos.f_arb = HTOLE16(arb);
-			} else {
-				/* 32-bit clusters */
-				ent->fad_dos.f_clusterhi = HTOLE16((u16)(first_cluster >> 16));
+			if (!(fmode & S_IXOTH))
+				arb |= FAT_ARB_NO_WX; /* Disable: Execute by world */
+			if (!(fmode & S_IWOTH))
+				arb |= FAT_ARB_NO_WW; /* Disable: Write by world */
+			if (!(fmode & S_IROTH))
+				arb |= FAT_ARB_NO_WR; /* Disable: Read by world */
+			if (!(fmode & 0222)) {
+				/* Preserve ARB flags  for write permissions  if those  can
+				 * already be represented through use of the READONLY flag. */
+				arb &= ~(FAT_ARB_NO_OW | FAT_ARB_NO_GW | FAT_ARB_NO_WW);
+				arb |= LETOH16(ent->fad_dos.f_arb) & (FAT_ARB_NO_OW | FAT_ARB_NO_GW | FAT_ARB_NO_WW);
 			}
-			ent->fad_dos.f_size = HTOLE32((u32)atomic64_read(&self->mf_filesize));
-			if (fnode_isdir(self)) /* Directories should have size=0 */
-				ent->fad_dos.f_size = HTOLE32(0);
-
-			/* Implement the read-only attribute. */
-			if (!(fmode & 0222))
-				ent->fad_dos.f_attr |= FAT_ATTR_READONLY;
-
-			if (super->ft_features & FAT_FEATURE_UGID) {
-				/* UID/GID support */
-				ent->fad_dos.f_uid = (u8)uid;
-				ent->fad_dos.f_gid = (u8)gid;
-			} else {
-				/* Last-access timestamp support */
-				FatFileATime_Encode(&ent->fad_dos.f_atime, &atm);
-			}
-
-			/* Convert timestamps. */
-			FatFileMTime_Encode(&ent->fad_dos.f_mtime, &mtm);
-			FatFileCTime_Encode(&ent->fad_dos.f_ctime, &ctm);
-
-			/* Set the ARCHIVE flag to indicate a file that has been modified. */
-			ent->fad_dos.f_attr |= FAT_ATTR_ARCHIVE;
-
-			/* Write `ent->fad_dos' back into the directory stream. */
-			mfile_write(dir, &ent->fad_dos, sizeof(struct fat_dirent),
-			            fatdirent_dosaddr(ent));
+			ent->fad_dos.f_arb = HTOLE16(arb);
+		} else {
+			/* 32-bit clusters */
+			ent->fad_dos.f_clusterhi = HTOLE16((u16)(first_cluster >> 16));
 		}
-	} EXCEPT {
-		flatdirnode_endwrite(dir);
-		RETHROW();
+		ent->fad_dos.f_size = HTOLE32((u32)atomic64_read(&self->mf_filesize));
+		if (fnode_isdir(self)) /* Directories should have size=0 */
+			ent->fad_dos.f_size = HTOLE32(0);
+
+		/* Implement the read-only attribute. */
+		if (!(fmode & 0222))
+			ent->fad_dos.f_attr |= FAT_ATTR_READONLY;
+
+		if (super->ft_features & FAT_FEATURE_UGID) {
+			/* UID/GID support */
+			ent->fad_dos.f_uid = (u8)uid;
+			ent->fad_dos.f_gid = (u8)gid;
+		} else {
+			/* Last-access timestamp support */
+			FatFileATime_Encode(&ent->fad_dos.f_atime, &atm);
+		}
+
+		/* Convert timestamps. */
+		FatFileMTime_Encode(&ent->fad_dos.f_mtime, &mtm);
+		FatFileCTime_Encode(&ent->fad_dos.f_ctime, &ctm);
+
+		/* Set the ARCHIVE flag to indicate a file that has been modified. */
+		ent->fad_dos.f_attr |= FAT_ATTR_ARCHIVE;
+
+		/* Write `ent->fad_dos' back into the directory stream. */
+		mfile_write(dir, &ent->fad_dos, sizeof(struct fat_dirent),
+		            fatdirent_dosaddr(ent));
 	}
-endwrite_and_return:
-	flatdirnode_endwrite(dir);
 }
 
 
@@ -1658,13 +1629,10 @@ FatNode_GetFirstCluster(struct fnode *__restrict self)
 	FatClusterIndex result;
 	for (;;) {
 		FatNodeData_Read(dat);
-		TRY {
+		{
+			RAII_FINALLY { FatNodeData_EndRead(dat); };
 			result = Fat_GetFileCluster(self, 0, FAT_GETCLUSTER_MODE_FCREATE);
-		} EXCEPT {
-			FatNodeData_EndRead(dat);
-			RETHROW();
 		}
-		FatNodeData_EndRead(dat);
 		if likely(result != FAT_GETFILECLUSTER_NEED_WRLOCK)
 			break;
 		FatNodeData_Write(dat);

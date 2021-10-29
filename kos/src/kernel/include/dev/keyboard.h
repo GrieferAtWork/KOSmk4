@@ -26,7 +26,7 @@
 #include <dev/char.h>
 #include <dev/mktty.h>
 #include <kernel/types.h>
-#include <sched/mutex.h>
+#include <sched/shared_lock.h>
 #include <sched/signal.h>
 
 #include <kos/aref.h>
@@ -130,11 +130,23 @@ struct kbddev
 	uintptr_t             kd_mods;       /* [lock(kd_map_lock)] Currently active keyboard modifiers (Set of `KEYMOD_*'). */
 	byte_t                kd_pend[32];   /* [0..kd_pendsz][lock(kd_map_lock)] Pending data to-be returned by `kbddev_v_read()' */
 	size_t                kd_pendsz;     /* [lock(kd_map_lock)] # of pending bytes in `kd_pendsz' */
-	struct mutex          kd_leds_lock;  /* Lock for updating `kd_leds' */
+	struct shared_lock    kd_leds_lock;  /* Lock for updating `kd_leds' */
 	uintptr_t             kd_leds;       /* [lock(kd_leds)] Set of currently lit LEDs (when modified, `ko_setled' must be called). */
 	struct mkttydev_awref kd_tty;        /* [0..1] Weak reference to a connected TTY (used for encoding keyboard
 	                                      * input  with  `ansitty_translate()',  when an  ansitty  is connected) */
 };
+
+/* Helper macros for `struct kbddev::kd_leds_lock' */
+#define _kbddev_leds_reap(self)      (void)0
+#define kbddev_leds_reap(self)       (void)0
+#define kbddev_leds_mustreap(self)   0
+#define kbddev_leds_tryacquire(self) shared_lock_tryacquire(&(self)->kd_leds_lock)
+#define kbddev_leds_acquire(self)    shared_lock_acquire(&(self)->kd_leds_lock)
+#define kbddev_leds_acquire_nx(self) shared_lock_acquire_nx(&(self)->kd_leds_lock)
+#define _kbddev_leds_release(self)   shared_lock_release(&(self)->kd_leds_lock)
+#define kbddev_leds_release(self)    (shared_lock_release(&(self)->kd_leds_lock), kbddev_leds_reap(self))
+#define kbddev_leds_acquired(self)   shared_lock_acquired(&(self)->kd_leds_lock)
+#define kbddev_leds_available(self)  shared_lock_available(&(self)->kd_leds_lock)
 
 
 #ifdef CONFIG_USE_NEW_FS
@@ -218,7 +230,7 @@ DATDEF struct mfile_stream_ops const kbddev_v_stream_ops;
 	 (self)->kd_map_extsiz = 0,                          \
 	 (self)->kd_mods       = 0,                          \
 	 (self)->kd_pendsz     = 0,                          \
-	 mutex_init(&(self)->kd_leds_lock),                  \
+	 shared_lock_init(&(self)->kd_leds_lock),            \
 	 (self)->kd_leds = 0,                                \
 	 awref_init(&(self)->kd_tty, __NULLPTR))
 #define _kbddev_cinit(self, ops)                          \
@@ -231,7 +243,7 @@ DATDEF struct mfile_stream_ops const kbddev_v_stream_ops;
 	 __hybrid_assert((self)->kd_map_extsiz == 0),         \
 	 __hybrid_assert((self)->kd_mods == 0),               \
 	 __hybrid_assert((self)->kd_pendsz == 0),             \
-	 mutex_cinit(&(self)->kd_leds_lock),                  \
+	 shared_lock_cinit(&(self)->kd_leds_lock),            \
 	 __hybrid_assert((self)->kd_leds == 0),               \
 	 awref_cinit(&(self)->kd_tty, __NULLPTR))
 /* Finalize a partially initialized `struct kbddev' (as initialized by `_kbddev_init()') */

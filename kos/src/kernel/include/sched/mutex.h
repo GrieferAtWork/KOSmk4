@@ -29,14 +29,6 @@
 #include <hybrid/__assert.h>
 #include <hybrid/__atomic.h>
 
-/* TODO: Add a new sync type `struct shared_lock' that is basically a mutex,
- *       but  doesn't allow for recursive acquisition, but on the other hand
- *       allows for implicit ownership passing between different threads.
- *
- * Once added, go through all uses of `struct mutex' and see if recursive
- * acquisition is actually needed in each case. If no, change those  uses
- * to `struct shared_lock' */
-
 #ifdef __CC__
 DECL_BEGIN
 

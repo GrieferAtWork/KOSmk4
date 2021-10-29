@@ -544,13 +544,10 @@ path_lookupchild(struct path *__restrict self,
 		THROWS(E_FSERROR_DELETED, E_WOULDBLOCK, E_SEGFAULT) {
 	REF struct path *result;
 	path_cldlock_read(self);
-	TRY {
-		result = path_lookupchild_withlock(self, name, namelen,
-		                                   namehash, atflags);
-	} EXCEPT {
-		path_cldlock_endread(self);
-		RETHROW();
-	}
+	RAII_FINALLY { path_cldlock_endread(self); };
+	result = path_lookupchild_withlock(self, name, namelen,
+	                                   namehash, atflags);
+
 	/* Try to get a reference to the path. */
 	if (result != NULL) {
 		if (tryincref(result)) {
@@ -563,7 +560,6 @@ path_lookupchild(struct path *__restrict self,
 			result = NULL;
 		}
 	}
-	path_cldlock_endread(self);
 	return result;
 }
 
@@ -689,6 +685,7 @@ path_makechild(struct path *__restrict self, atflag_t atflags,
 		if unlikely(existing != NULL) {
 			if (!tryincref(existing)) {
 				/* Race condition: another thread must have created it in the mean time... */
+				path_cldlock_endwrite(self);
 				_path_free(result);
 				decref_unlikely(dir);
 				decref_unlikely(dent);
@@ -724,30 +721,23 @@ path_readlink_and_walk(struct path *__restrict self,
                        struct flnknode *__restrict lnk,
                        size_t *__restrict pbufsize, atflag_t atflags)
 		THROWS(E_IOERROR, E_BADALLOC, ...) {
-	REF struct path *result;
 	size_t reqsize, bufsize;
 	char *buf;
 	bufsize = *pbufsize;
 	buf     = (char *)malloca(bufsize);
-	TRY {
-		reqsize = flnknode_readlink(lnk, buf, bufsize);
-		if (reqsize >= bufsize) {
-			/* Need more space */
-			*pbufsize = reqsize + 1;
-			return NULL;
-		}
-
-		/* NUL-terminate buffer. */
-		buf[reqsize] = '\0';
-
-		/* Do the walk */
-		result = path_traverse_ex(self, premaining_symlinks, buf, NULL, NULL, atflags);
-	} EXCEPT {
-		freea(buf);
-		RETHROW();
+	RAII_FINALLY { freea(buf); };
+	reqsize = flnknode_readlink(lnk, buf, bufsize);
+	if (reqsize >= bufsize) {
+		/* Need more space */
+		*pbufsize = reqsize + 1;
+		return NULL;
 	}
-	freea(buf);
-	return result;
+
+	/* NUL-terminate buffer. */
+	buf[reqsize] = '\0';
+
+	/* Do the walk */
+	return path_traverse_ex(self, premaining_symlinks, buf, NULL, NULL, atflags);
 }
 
 
@@ -1008,31 +998,24 @@ path_readlink_and_walknode(struct path *__restrict self,
                            /*out[1..1]_opt*/ REF struct fdirent **presult_dirent,
                            atflag_t atflags)
 		THROWS(E_IOERROR, E_BADALLOC, ...) {
-	REF struct fnode *result;
 	size_t reqsize, bufsize;
 	char *buf;
 	bufsize = *pbufsize;
 	buf     = (char *)malloca(bufsize);
-	TRY {
-		reqsize = flnknode_readlink(lnk, buf, bufsize);
-		if (reqsize >= bufsize) {
-			/* Need more space */
-			*pbufsize = reqsize + 1;
-			return NULL;
-		}
-
-		/* NUL-terminate buffer. */
-		buf[reqsize] = '\0';
-
-		/* Do the walk */
-		result = path_traversefull_ex(self, premaining_symlinks, buf,
-		                              atflags, presult_path, presult_dirent);
-	} EXCEPT {
-		freea(buf);
-		RETHROW();
+	RAII_FINALLY { freea(buf); };
+	reqsize = flnknode_readlink(lnk, buf, bufsize);
+	if (reqsize >= bufsize) {
+		/* Need more space */
+		*pbufsize = reqsize + 1;
+		return NULL;
 	}
-	freea(buf);
-	return result;
+
+	/* NUL-terminate buffer. */
+	buf[reqsize] = '\0';
+
+	/* Do the walk */
+	return path_traversefull_ex(self, premaining_symlinks, buf,
+	                            atflags, presult_path, presult_dirent);
 }
 
 /* Walk a given symlink */
@@ -1741,31 +1724,24 @@ create_symlink_target_with_bufsiz(struct path *__restrict symlink_path,
                                   struct fmkfile_info *__restrict creat_info,
                                   REF struct path **__restrict presult_path,
                                   size_t *__restrict pbufsize, atflag_t atflags) {
-	unsigned int result;
 	size_t reqsize, bufsize;
 	char *buf;
 	bufsize = *pbufsize;
 	buf     = (char *)malloca(bufsize);
-	TRY {
-		reqsize = flnknode_readlink(lnk, buf, bufsize);
-		if (reqsize >= bufsize) {
-			/* Need more space */
-			*pbufsize = reqsize + 1;
-			return CREATE_SYMLINK_TARGET_WITH_BUFSIZ_MORE;
-		}
-
-		/* NUL-terminate buffer. */
-		buf[reqsize] = '\0';
-
-		/* Do the walk */
-		result = create_symlink_target_with_text(symlink_path, premaining_symlinks,
-		                                         buf, creat_info, presult_path, atflags);
-	} EXCEPT {
-		freea(buf);
-		RETHROW();
+	RAII_FINALLY { freea(buf); };
+	reqsize = flnknode_readlink(lnk, buf, bufsize);
+	if (reqsize >= bufsize) {
+		/* Need more space */
+		*pbufsize = reqsize + 1;
+		return CREATE_SYMLINK_TARGET_WITH_BUFSIZ_MORE;
 	}
-	freea(buf);
-	return result;
+
+	/* NUL-terminate buffer. */
+	buf[reqsize] = '\0';
+
+	/* Do the walk */
+	return create_symlink_target_with_text(symlink_path, premaining_symlinks,
+	                                       buf, creat_info, presult_path, atflags);
 }
 
 

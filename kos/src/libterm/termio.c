@@ -469,13 +469,8 @@ libterminal_flush_icanon(struct terminal *__restrict self, iomode_t mode)
 	KERNEL_SELECT(size_t, ssize_t) result;
 	struct linecapture cap;
 	linebuffer_capture(&self->t_canon, &cap);
-	TRY {
-		result = libterminal_do_iwrite_direct(self, cap.lc_base, cap.lc_size, mode);
-	} EXCEPT {
-		linebuffer_release(&self->t_canon, &cap);
-		RETHROW();
-	}
-	linebuffer_release(&self->t_canon, &cap);
+	RAII_FINALLY { linebuffer_release(&self->t_canon, &cap); };
+	result = libterminal_do_iwrite_direct(self, cap.lc_base, cap.lc_size, mode);
 	return result;
 }
 
@@ -1323,13 +1318,8 @@ libterminal_flush_obuf(struct terminal *__restrict self,
 	ssize_t result;
 	struct linecapture cap;
 	linebuffer_capture(&self->t_opend, &cap);
-	TRY {
-		result = libterminal_do_owrite_nostop_nobuf(self, cap.lc_base, cap.lc_size, mode, lflag);
-	} EXCEPT {
-		linecapture_fini(&cap);
-		RETHROW();
-	}
-	linecapture_fini(&cap);
+	RAII_FINALLY { linecapture_fini(&cap); };
+	result = libterminal_do_owrite_nostop_nobuf(self, cap.lc_base, cap.lc_size, mode, lflag);
 	return result;
 }
 
@@ -1339,13 +1329,8 @@ libterminal_flush_ibuf(struct terminal *__restrict self,
 	ssize_t result;
 	struct linecapture cap;
 	linebuffer_capture(&self->t_ipend, &cap);
-	TRY {
-		result = libterminal_do_iwrite(self, cap.lc_base, cap.lc_size, mode, iflag);
-	} EXCEPT {
-		linecapture_fini(&cap);
-		RETHROW();
-	}
-	linecapture_fini(&cap);
+	RAII_FINALLY { linecapture_fini(&cap); };
+	result = libterminal_do_iwrite(self, cap.lc_base, cap.lc_size, mode, iflag);
 	return result;
 }
 

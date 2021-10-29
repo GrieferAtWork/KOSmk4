@@ -204,63 +204,53 @@ PRIVATE void KCALL usb_probe_identify_unknown(PUSB_INTERFACE_PROBE func) {
 		return; /* Recursion within the same thread. */
 	if (!func)
 		probes = arref_get(&probe_interface);
-	TRY {
-		for (;;) {
-			chain = ATOMIC_READ(usb_unknowns);
-			if (chain == USB_UNKNOWNS_CLOSED)
-				goto done; /* No-op after finalize */
-			if (chain == NULL)
-				goto done; /* Nothing to enumerate */
-			if (ATOMIC_CMPXCH_WEAK(usb_unknowns, chain, NULL))
-				break;
-		}
-		TRY {
-			piter = &chain;
-again_piter:
-			for (; (iter = *piter) != NULL;
-			     piter = &iter->uui_next) {
-				bool was_found;
-				if (func) {
-					assert(!probes);
-					was_found = (*func)(iter->uui_ctrl,
-					                    iter->uui_intf,
-					                    iter->uui_endpc,
-					                    iter->uui_endpv);
-				} else {
-					/* Scan using all defined probes. */
-					size_t i;
-					assert(probes);
-					was_found = false;
-					for (i = 0; i < probes->upv_count; ++i) {
-						was_found = (*probes->upv_elem[i].c_intf)(iter->uui_ctrl,
-						                                          iter->uui_intf,
-						                                          iter->uui_endpc,
-						                                          iter->uui_endpv);
-						if (was_found)
-							break;
-					}
-				}
-				if (was_found) {
-					/* Found one! (remove from the list to-be restored later) */
-					*piter = iter->uui_next;
-					/* Drop the chain reference from the removed element. */
-					decref_likely(iter);
-					goto again_piter;
-				}
-			}
-		} EXCEPT {
-			usb_unknowns_appendall(chain);
-			RETHROW();
-		}
-		usb_unknowns_appendall(chain);
-	} EXCEPT {
+	RAII_FINALLY {
 		usb_probe_unknown_release();
 		xdecref_unlikely(probes);
-		RETHROW();
+	};
+	for (;;) {
+		chain = ATOMIC_READ(usb_unknowns);
+		if (chain == USB_UNKNOWNS_CLOSED)
+			return; /* No-op after finalize */
+		if (chain == NULL)
+			return; /* Nothing to enumerate */
+		if (ATOMIC_CMPXCH_WEAK(usb_unknowns, chain, NULL))
+			break;
 	}
-done:
-	usb_probe_unknown_release();
-	xdecref_unlikely(probes);
+	RAII_FINALLY { usb_unknowns_appendall(chain); };
+	piter = &chain;
+again_piter:
+	for (; (iter = *piter) != NULL;
+	     piter = &iter->uui_next) {
+		bool was_found;
+		if (func) {
+			assert(!probes);
+			was_found = (*func)(iter->uui_ctrl,
+			                    iter->uui_intf,
+			                    iter->uui_endpc,
+			                    iter->uui_endpv);
+		} else {
+			/* Scan using all defined probes. */
+			size_t i;
+			assert(probes);
+			was_found = false;
+			for (i = 0; i < probes->upv_count; ++i) {
+				was_found = (*probes->upv_elem[i].c_intf)(iter->uui_ctrl,
+				                                          iter->uui_intf,
+				                                          iter->uui_endpc,
+				                                          iter->uui_endpv);
+				if (was_found)
+					break;
+			}
+		}
+		if (was_found) {
+			/* Found one! (remove from the list to-be restored later) */
+			*piter = iter->uui_next;
+			/* Drop the chain reference from the removed element. */
+			decref_likely(iter);
+			goto again_piter;
+		}
+	}
 }
 
 
@@ -588,17 +578,12 @@ usb_controller_transfer_sync(struct usb_controller *__restrict self,
 	struct aio_handle_generic aio;
 	aio_handle_generic_init(&aio);
 	usb_controller_transfer(self, tx, &aio);
-	TRY {
-		aio_handle_generic_waitfor(&aio);
-		aio_handle_generic_checkerror(&aio);
-	} EXCEPT {
-		aio_handle_generic_fini(&aio);
-		RETHROW();
-	}
+	RAII_FINALLY { aio_handle_generic_fini(&aio); };
+	aio_handle_generic_waitfor(&aio);
+	aio_handle_generic_checkerror(&aio);
 	assert(aio.ah_type);
 	assert(aio.ah_type->ht_retsize != NULL);
 	result = (*aio.ah_type->ht_retsize)(&aio);
-	aio_handle_generic_fini(&aio);
 	return result;
 }
 
@@ -669,17 +654,14 @@ usb_controller_request_sync(struct usb_controller *__restrict self,
 	struct aio_handle_generic aio;
 	aio_handle_generic_init(&aio);
 	usb_controller_request(self, endp, request, buf, &aio);
-	TRY {
+	{
+		RAII_FINALLY { aio_handle_generic_fini(&aio); };
 		aio_handle_generic_waitfor(&aio);
 		aio_handle_generic_checkerror(&aio);
-	} EXCEPT {
-		aio_handle_generic_fini(&aio);
-		RETHROW();
+		assert(aio.ah_type);
+		assert(aio.ah_type->ht_retsize != NULL);
+		result = (*aio.ah_type->ht_retsize)(&aio);
 	}
-	assert(aio.ah_type);
-	assert(aio.ah_type->ht_retsize != NULL);
-	result = (*aio.ah_type->ht_retsize)(&aio);
-	aio_handle_generic_fini(&aio);
 	/* The return value must be larger than the request made, since
 	 * the request didn't have the SHORT flag set, and therefor had
 	 * to have been transferred in full. */

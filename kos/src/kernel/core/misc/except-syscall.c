@@ -410,9 +410,7 @@ load_userprocmask_into_kernelspace(USER CHECKED struct userprocmask *ctl) {
 	old_sigset = ATOMIC_READ(ctl->pm_sigmask);
 	validate_readable(old_sigset, sizeof(sigset_t));
 	kernel_mask = sigmask_kernel_getwr();
-	TRY {
-		memcpy(&kernel_mask->sm_mask, old_sigset, sizeof(sigset_t));
-	} EXCEPT {
+	RAII_FINALLY {
 		/* Make sure  that  SIGKILL  and  SIGSTOP  are  never  masked
 		 * Note  however that we  don't need to check  for them to be
 		 * pending, since our thread is still in `TASK_FUSERPROCMASK'
@@ -420,10 +418,8 @@ load_userprocmask_into_kernelspace(USER CHECKED struct userprocmask *ctl) {
 		 * using our thread's kernel signal mask! */
 		sigdelset(&kernel_mask->sm_mask, SIGKILL);
 		sigdelset(&kernel_mask->sm_mask, SIGSTOP);
-		RETHROW();
-	}
-	sigdelset(&kernel_mask->sm_mask, SIGKILL);
-	sigdelset(&kernel_mask->sm_mask, SIGSTOP);
+	};
+	memcpy(&kernel_mask->sm_mask, old_sigset, sizeof(sigset_t));
 }
 #endif /* CONFIG_HAVE_USERPROCMASK */
 

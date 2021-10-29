@@ -61,19 +61,18 @@ DECL_BEGIN
  * @return: 0 :         Some portion of the specified address range(s) doesn't actually map to a VM node.
  * @return: 0 :         Some portion of the specified address range(s) maps to a VM node reservation (no associated data part).
  * @return: 0 :         Some portion of the specified address range(s) maps to VIO memory, meaning there is no underlying physical memory.
- * @return: 0 :         [mman_startdma[v]] The equivalent `mman_startdma[v]' would have thrown an exception
  * @return: <= lockcnt: The number of used DMA locks (SUCCESS)
  * @return: >  lockcnt: The number of _REQUIRED_ DMA locks (FAILURE) (All locks that may have already been acqured will have already been released) */
 PUBLIC NONNULL((1, 2, 4)) size_t KCALL
 mman_startdma(struct mman *__restrict self, mdma_range_callback_t prange,
               void *cookie, struct mdmalock *__restrict lockvec, size_t lockcnt,
-              UNCHECKED void *addr, size_t num_bytes, __BOOL for_writing)
+              UNCHECKED void *addr, size_t num_bytes, bool for_writing)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, ...)
 #elif defined(DEFINE_mman_startdmav)
 PUBLIC NONNULL((1, 2, 4, 6)) size_t KCALL
 mman_startdmav(struct mman *__restrict self, mdma_range_callback_t prange,
                void *cookie, struct mdmalock *__restrict lockvec, size_t lockcnt,
-               struct iov_buffer const *__restrict addr_v, __BOOL for_writing)
+               struct iov_buffer const *__restrict addr_v, bool for_writing)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, ...)
 #define LOCAL_IS_VECTOR
 #elif defined(DEFINE_mman_enumdma)
@@ -185,16 +184,13 @@ again_lookup_part_locked:
 				 * range have their  state set  to `MPART_BLOCK_ST_LOAD'  for
 				 * reads, and `MPART_BLOCK_ST_CHNG' for writes.
 				 *
-				 * XXX: It would be cool to have optimization for writes, such that
-				 *      DMA operations which target whole, previously uninitialized
-				 *      blocks  (MPART_BLOCK_ST_NDEF),  didn't have  to  load those
-				 *      blocks   prior  to  the   DMA  operation  being  performed.
-				 *      For one,  this would  require a  differentiation between  a
-				 *      successful   and  a  failed  write-related  DMA  operation.
-				 *      The  problem  with this  is  that this  would  also require
-				 *      the  extension  of `struct mdmalock',  but that  would then
-				 *      require  a  re-write of  `AtaAIOHandleData' or  an increase
-				 *      of `AIO_HANDLE_DRIVER_POINTER_COUNT'...
+				 * XXX: It would be cool to have optimization for writes,  such
+				 *      that DMA  operations  which  target  whole,  previously
+				 *      uninitialized blocks (MPART_BLOCK_ST_NDEF), didn't have
+				 *      to load those blocks prior  to the DMA operation  being
+				 *      performed.
+				 *      For  one, this would require a differentiation between
+				 *      a successful and a failed write-related DMA operation.
 				 *
 				 * For reference: `mpart_write()' uses `mpart_lock_acquire_and_setcore_unsharecow()',
 				 *                which doesn't ensure that accessed blocks have been loaded,  whilst
@@ -246,8 +242,9 @@ again_lookup_part_locked:
 			++result;
 #define LOCAL_dma_lock (&lockvec[result - 1])
 #else /* !LOCAL_IS_ENUM */
-			dma_lock.mdl_part = mf.mfl_part;
 #define LOCAL_dma_lock (&dma_lock)
+			dma_lock.mdl_part = mf.mfl_part;
+			RAII_FINALLY { mman_dmalock_release(LOCAL_dma_lock); };
 #endif /* !LOCAL_IS_ENUM */
 
 			/* Account for everything that will be enumerated. */
@@ -262,12 +259,7 @@ again_lookup_part_locked:
 				if (pl.mppl_size > mf.mfl_size)
 					pl.mppl_size = mf.mfl_size;
 #ifdef LOCAL_IS_ENUM
-				TRY {
-					ok = (*prange)(cookie, pl.mppl_addr, pl.mppl_size, LOCAL_dma_lock);
-				} EXCEPT {
-					decref_unlikely(mf.mfl_part);
-					RETHROW();
-				}
+				ok = (*prange)(cookie, pl.mppl_addr, pl.mppl_size, LOCAL_dma_lock);
 #else /* LOCAL_IS_ENUM */
 				ok = (*prange)(cookie, pl.mppl_addr, pl.mppl_size, LOCAL_dma_lock);
 #endif /* !LOCAL_IS_ENUM */
@@ -286,10 +278,6 @@ again_lookup_part_locked:
 				mf.mfl_size -= pl.mppl_size;
 			}
 #undef LOCAL_dma_lock
-
-#ifdef LOCAL_IS_ENUM
-			decref_unlikely(mf.mfl_part);
-#endif /* LOCAL_IS_ENUM */
 		}
 	}
 #ifndef LOCAL_IS_ENUM

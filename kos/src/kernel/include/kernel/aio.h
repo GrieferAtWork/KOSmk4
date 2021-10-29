@@ -704,14 +704,9 @@ NOTHROW(KCALL aio_multihandle_done)(struct aio_multihandle *__restrict self);
  * >>     aio_multihandle_fail(&multihandle);
  * >> }
  * >> aio_multihandle_done(&multihandle);
- * >> TRY {
- * >>     aio_multihandle_generic_waitfor(&multihandle);
- * >>     aio_multihandle_generic_checkerror(&multihandle);
- * >> } EXCEPT {
- * >>     aio_multihandle_generic_fini(&multihandle);
- * >>     RETHROW();
- * >> }
- * >> aio_multihandle_generic_fini(&multihandle);
+ * >> RAII_FINALLY { aio_multihandle_generic_fini(&multihandle); };
+ * >> aio_multihandle_generic_waitfor(&multihandle);
+ * >> aio_multihandle_generic_checkerror(&multihandle);
  */
 
 /* Generic  multi-handle  that  is  capable  of  being  used  as  a  signal   source.

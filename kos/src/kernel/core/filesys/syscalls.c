@@ -1410,15 +1410,10 @@ sys_openat_impl(fd_t dirfd, USER UNCHECKED char const *filename,
 
 	/* Do the open */
 	result = path_open(dirfd, filename, oflags, mode);
+	RAII_FINALLY { decref(result); };
 
 	/* Install the new handle. */
-	TRY {
-		result_fd = handle_install(THIS_HANDLE_MANAGER, result);
-	} EXCEPT {
-		decref(result);
-		RETHROW();
-	}
-	decref(result);
+	result_fd = handle_install(THIS_HANDLE_MANAGER, result);
 	return (fd_t)result_fd;
 }
 #endif /* open... */
@@ -1471,7 +1466,8 @@ DEFINE_SYSCALL4(ssize_t, frealpath4,
 	root = fs_getroot(THIS_FS);
 	FINALLY_DECREF_UNLIKELY(root);
 	hand = handle_lookup((unsigned int)fd);
-	TRY {
+	{
+		RAII_FINALLY { decref_unlikely(hand); };
 		switch (hand.h_type) {
 
 		case HANDLE_TYPE_FILEHANDLE:
@@ -1517,11 +1513,7 @@ bad_handle_type:
 			      handle_typekind(&hand));
 			break;
 		}
-	} EXCEPT {
-		decref(hand);
-		RETHROW();
 	}
-	decref(hand);
 	/* Throw a buffer error if the caller doesn't want the required size */
 	if (result > buflen && !(atflags & AT_READLINK_REQSIZE))
 		THROW(E_BUFFER_TOO_SMALL, result, buflen);
@@ -1595,15 +1587,10 @@ system_fstatat(fd_t dirfd,
 
 LOCAL errno_t KCALL
 system_fstat(fd_t fd, USER CHECKED struct stat *statbuf) {
-	struct handle hnd;
-	hnd = handle_lookup((unsigned int)fd);
-	TRY {
-		handle_stat(hnd, statbuf);
-	} EXCEPT {
-		decref(hnd);
-		RETHROW();
-	}
-	decref(hnd);
+	struct handle hand;
+	hand = handle_lookup((unsigned int)fd);
+	RAII_FINALLY { decref_unlikely(hand); };
+	handle_stat(hand, statbuf);
 	return -EOK;
 }
 
@@ -2274,33 +2261,29 @@ kernel_do_execveat(/*in|out*/ struct execargs *__restrict args) {
 			 *       risky to allocate a huge stack-based structure when we still have to call `mman_exec()',
 			 *       even when using `malloca()' (but maybe I'm just overlay cautios...) */
 			buf = (char *)kmalloc((reglen + 1) * sizeof(char), GFP_NORMAL);
-			TRY {
-				dst = buf;
-				/* FIXME: If  the process  uses chroot()  between this  and the previous
-				 *        printent() call, then we may write past the end of the buffer!
-				 * Solution: Use `path_printentex()' and pass the same pre-loaded root-path
-				 *           during every invocation! */
-				path_printent(args->ea_xpath,
-				              args->ea_xdentry->fd_name,
-				              args->ea_xdentry->fd_namelen,
-				              &format_sprintf_printer,
-				              &dst);
-				assert(dst == buf + reglen);
-				*dst = '\0';
-				/* Execute the specified program. */
-				kernel_do_execveat_impl(args);
-				{
-					struct debugtrap_reason r;
-					r.dtr_signo    = SIGTRAP;
-					r.dtr_reason   = DEBUGTRAP_REASON_EXEC;
-					r.dtr_strarg   = buf;
-					args->ea_state = kernel_debugtrap_r(args->ea_state, &r);
-				}
-			} EXCEPT {
-				kfree(buf);
-				RETHROW();
+			RAII_FINALLY { kfree(buf); };
+
+			dst = buf;
+			/* FIXME: If  the process  uses chroot()  between this  and the previous
+			 *        printent() call, then we may write past the end of the buffer!
+			 * Solution: Use `path_printentex()' and pass the same pre-loaded root-path
+			 *           during every invocation! */
+			path_printent(args->ea_xpath,
+			              args->ea_xdentry->fd_name,
+			              args->ea_xdentry->fd_namelen,
+			              &format_sprintf_printer,
+			              &dst);
+			assert(dst == buf + reglen);
+			*dst = '\0';
+			/* Execute the specified program. */
+			kernel_do_execveat_impl(args);
+			{
+				struct debugtrap_reason r;
+				r.dtr_signo    = SIGTRAP;
+				r.dtr_reason   = DEBUGTRAP_REASON_EXEC;
+				r.dtr_strarg   = buf;
+				args->ea_state = kernel_debugtrap_r(args->ea_state, &r);
 			}
-			kfree(buf);
 		} else {
 			struct debugtrap_reason r;
 			r.dtr_signo    = SIGTRAP;

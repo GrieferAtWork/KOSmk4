@@ -462,19 +462,15 @@ VGA_DoSetPalette(VGA *__restrict UNUSED(self),
                  size_t color_count)
 		THROWS(E_WOULDBLOCK) {
 	unsigned int i = 0;
-	TRY {
-		vga_w(VGA_PEL_MSK, 0xff);
-		vga_w(VGA_PEL_IW, 0x00);
-		for (; i < color_count * 3; ++i)
-			vga_w(VGA_PEL_D, ((u8 *)pal)[i] >> 2);
-	} EXCEPT {
+	RAII_FINALLY {
 		/* Must complete the operation. - VGA wouldn't understand otherwise. */
 		for (; i < 768; ++i)
 			vga_w(VGA_PEL_D, 0);
-		RETHROW();
-	}
-	for (; i < 768; ++i)
-		vga_w(VGA_PEL_D, 0);
+	};
+	vga_w(VGA_PEL_MSK, 0xff);
+	vga_w(VGA_PEL_IW, 0x00);
+	for (; i < color_count * 3; ++i)
+		vga_w(VGA_PEL_D, ((u8 *)pal)[i] >> 2);
 }
 
 INTERN void KCALL
@@ -483,13 +479,8 @@ VGA_SetPalette(VGA *__restrict self,
                size_t color_count)
 		THROWS(E_WOULDBLOCK) {
 	sync_write(&self->v_lock);
-	TRY {
-		VGA_DoSetPalette(self, pal, color_count);
-	} EXCEPT {
-		sync_endwrite(&self->v_lock);
-		RETHROW();
-	}
-	sync_endwrite(&self->v_lock);
+	FINALLY_ENDWRITE(&self->v_lock);
+	VGA_DoSetPalette(self, pal, color_count);
 }
 
 INTERN void KCALL
@@ -499,21 +490,16 @@ VGA_GetPalette(VGA *__restrict self,
 		THROWS(E_WOULDBLOCK) {
 	unsigned int i = 0;
 	sync_write(&self->v_lock);
-	TRY {
-		vga_w(VGA_PEL_MSK, 0xff);
-		vga_w(VGA_PEL_IR, 0x00);
-		for (; i < color_count * 3; ++i)
-			((u8 *)pal)[i] = vga_r(VGA_PEL_D) << 2;
-	} EXCEPT {
+	RAII_FINALLY {
 		/* Must complete the operation. - VGA wouldn't understand otherwise. */
 		for (; i < 768; ++i)
 			vga_r(VGA_PEL_D);
 		sync_endwrite(&self->v_lock);
-		RETHROW();
-	}
-	for (; i < 768; ++i)
-		vga_r(VGA_PEL_D);
-	sync_endwrite(&self->v_lock);
+	};
+	vga_w(VGA_PEL_MSK, 0xff);
+	vga_w(VGA_PEL_IR, 0x00);
+	for (; i < color_count * 3; ++i)
+		((u8 *)pal)[i] = vga_r(VGA_PEL_D) << 2;
 }
 
 INTERN void KCALL
@@ -541,12 +527,7 @@ VGA_DoSetFont(VGA *__restrict self,
 	vga_wgfx(VGA_GFX_DATA_ROTATE, (old_gfx_data_rotate & VGA_GR03_FRESERVED) | 0x00);
 	vga_wgfx(VGA_GFX_MISC, (old_gfx_misc & VGA_GR06_FRESERVED) |
 	                       (VGA_GR06_FGRAPHICS_MODE | VGA_GR06_FMM_64K));
-	TRY {
-		for (i = 0; i < 256; ++i) {
-			memcpy(dst, &font->vf_blob[i], 16);
-			dst += 32;
-		}
-	} EXCEPT {
+	RAII_FINALLY {
 		vga_wseq(VGA_SEQ_PLANE_WRITE, old_seq_plane_write);
 		vga_wseq(VGA_SEQ_MEMORY_MODE, old_seq_memory_mode);
 		vga_wgfx(VGA_GFX_PLANE_READ, old_gfx_plane_read);
@@ -556,17 +537,11 @@ VGA_DoSetFont(VGA *__restrict self,
 		vga_wgfx(VGA_GFX_BIT_MASK, old_gfx_bit_mask);
 		vga_wgfx(VGA_GFX_DATA_ROTATE, old_gfx_data_rotate);
 		vga_wgfx(VGA_GFX_MISC, old_gfx_misc);
-		RETHROW();
+	};
+	for (i = 0; i < 256; ++i) {
+		memcpy(dst, &font->vf_blob[i], 16);
+		dst += 32;
 	}
-	vga_wseq(VGA_SEQ_PLANE_WRITE, old_seq_plane_write);
-	vga_wseq(VGA_SEQ_MEMORY_MODE, old_seq_memory_mode);
-	vga_wgfx(VGA_GFX_PLANE_READ, old_gfx_plane_read);
-	vga_wgfx(VGA_GFX_MODE, old_gfx_mode);
-	vga_wgfx(VGA_GFX_SR_ENABLE, old_gfx_sr_enable);
-	vga_wgfx(VGA_GFX_SR_VALUE, old_gfx_sr_value);
-	vga_wgfx(VGA_GFX_BIT_MASK, old_gfx_bit_mask);
-	vga_wgfx(VGA_GFX_DATA_ROTATE, old_gfx_data_rotate);
-	vga_wgfx(VGA_GFX_MISC, old_gfx_misc);
 }
 
 INTERN void KCALL
@@ -586,24 +561,17 @@ VGA_DoGetFont(VGA *__restrict self,
 	vga_wgfx(VGA_GFX_MODE, (old_gfx_mode & VGA_GR05_FRESERVED) | 0x00);
 	vga_wgfx(VGA_GFX_MISC, (old_gfx_misc & VGA_GR06_FRESERVED) |
 	                       (VGA_GR06_FGRAPHICS_MODE | VGA_GR06_FMM_64K));
-	TRY {
-		for (i = 0; i < 256; ++i) {
-			memcpy(&font->vf_blob[i], src, 16);
-			src += 32;
-		}
-	} EXCEPT {
+	RAII_FINALLY {
 		vga_wseq(VGA_SEQ_PLANE_WRITE, old_seq_plane_write);
 		vga_wseq(VGA_SEQ_MEMORY_MODE, old_seq_memory_mode);
 		vga_wgfx(VGA_GFX_PLANE_READ, old_gfx_plane_read);
 		vga_wgfx(VGA_GFX_MODE, old_gfx_mode);
 		vga_wgfx(VGA_GFX_MISC, old_gfx_misc);
-		RETHROW();
+	};
+	for (i = 0; i < 256; ++i) {
+		memcpy(&font->vf_blob[i], src, 16);
+		src += 32;
 	}
-	vga_wseq(VGA_SEQ_PLANE_WRITE, old_seq_plane_write);
-	vga_wseq(VGA_SEQ_MEMORY_MODE, old_seq_memory_mode);
-	vga_wgfx(VGA_GFX_PLANE_READ, old_gfx_plane_read);
-	vga_wgfx(VGA_GFX_MODE, old_gfx_mode);
-	vga_wgfx(VGA_GFX_MISC, old_gfx_misc);
 }
 
 
@@ -788,15 +756,11 @@ PRIVATE void KCALL flash_current_line_pause(void) THROWS(E_WOULDBLOCK, ...) {
 		struct task_connections con;
 		task_pushconnections(&con);
 		assert(!task_wasconnected());
-		TRY {
-			do_flash_screen_pause();
-		} EXCEPT {
+		RAII_FINALLY {
 			assert(!task_wasconnected());
 			task_popconnections();
-			RETHROW();
-		}
-		assert(!task_wasconnected());
-		task_popconnections();
+		};
+		do_flash_screen_pause();
 	} else {
 		do_flash_screen_pause();
 	}
@@ -1155,76 +1119,71 @@ VGA_EnableGraphicsMode(VGA *__restrict self,
 		oldfont = (struct vga_font *)kmalloc(sizeof(struct vga_font),
 		                                     GFP_NORMAL | GFP_LOCKED | GFP_PREFLT);
 	}
-	TRY {
+	RAII_FINALLY { kfree(oldfont); };
 again:
-		sync_write_both(self);
-		if (!(self->v_state & VGA_STATE_FGRAPHICS)) {
-			u16 *textbuf;
-			size_t textsize;
-			ptrdiff_t diff;
-			textsize = self->v_textsizex * self->v_textsizey * 2;
-			textbuf = (u16 *)kmalloc_nx(textsize, GFP_ATOMIC | GFP_LOCKED | GFP_PREFLT);
-			if unlikely(!textbuf) {
-				size_t new_textsize;
-				sync_endwrite_both(self);
-				textbuf = (u16 *)kmalloc(textsize, GFP_NORMAL | GFP_LOCKED | GFP_PREFLT);
-				TRY {
-					sync_write_both(self);
-				} EXCEPT {
-					kfree(textbuf);
-					RETHROW();
-				}
-				new_textsize = self->v_textsizex * self->v_textsizey * 2;
-				if unlikely(self->v_state & VGA_STATE_FGRAPHICS) {
-					sync_endwrite_both(self);
-					kfree(textbuf);
-					return;
-				}
-				if unlikely(new_textsize != textsize) {
-					u16 *newbuf;
-					if (new_textsize > textsize) {
-						kfree(textbuf);
-						goto again;
-					}
-					newbuf = (u16 *)krealloc_nx(textbuf, new_textsize,
-					                            GFP_ATOMIC | GFP_LOCKED | GFP_PREFLT);
-					if likely(newbuf)
-						textbuf = newbuf;
-					textsize = new_textsize;
-				}
+	sync_write_both(self);
+	if (!(self->v_state & VGA_STATE_FGRAPHICS)) {
+		u16 *textbuf;
+		size_t textsize;
+		ptrdiff_t diff;
+		textsize = self->v_textsizex * self->v_textsizey * 2;
+		textbuf = (u16 *)kmalloc_nx(textsize, GFP_ATOMIC | GFP_LOCKED | GFP_PREFLT);
+		if unlikely(!textbuf) {
+			size_t new_textsize;
+			sync_endwrite_both(self);
+			textbuf = (u16 *)kmalloc(textsize, GFP_NORMAL | GFP_LOCKED | GFP_PREFLT);
+			TRY {
+				sync_write_both(self);
+			} EXCEPT {
+				kfree(textbuf);
+				RETHROW();
 			}
-			/* Save the current screen contents. */
-			memcpy(textbuf, self->v_textbase, textsize);
-			diff = (intptr_t)textbuf - (intptr_t)self->v_textbase;
-			assert(!self->v_savedfont);
-#define REL(x) ((x) = (__typeof__(x))(uintptr_t)((intptr_t)(x) + diff))
-			REL(self->v_textbase);
-			REL(self->v_text2line);
-			REL(self->v_textlline);
-			REL(self->v_textend);
-			REL(self->v_textptr);
-			REL(self->v_scrlbase);
-			REL(self->v_scrl2lin);
-			REL(self->v_scrlllin);
-			REL(self->v_scrlend);
-#undef REL
-			if (oldfont)
-				VGA_DoGetFont(self, oldfont);
-			VGA_DoSetMode(self, mode);
-			VGA_DoSetPalette(self, pal, color_count);
-			self->v_savedfont = oldfont;
-			oldfont           = NULL;
-			self->v_state |= VGA_STATE_FGRAPHICS;
-		} else {
-			VGA_DoSetMode(self, mode);
-			VGA_DoSetPalette(self, pal, color_count);
+			new_textsize = self->v_textsizex * self->v_textsizey * 2;
+			if unlikely(self->v_state & VGA_STATE_FGRAPHICS) {
+				sync_endwrite_both(self);
+				kfree(textbuf);
+				return;
+			}
+			if unlikely(new_textsize != textsize) {
+				u16 *newbuf;
+				if (new_textsize > textsize) {
+					kfree(textbuf);
+					goto again;
+				}
+				newbuf = (u16 *)krealloc_nx(textbuf, new_textsize,
+				                            GFP_ATOMIC | GFP_LOCKED | GFP_PREFLT);
+				if likely(newbuf)
+					textbuf = newbuf;
+				textsize = new_textsize;
+			}
 		}
-		sync_endwrite_both(self);
-	} EXCEPT {
-		kfree(oldfont);
-		RETHROW();
+		/* Save the current screen contents. */
+		memcpy(textbuf, self->v_textbase, textsize);
+		diff = (intptr_t)textbuf - (intptr_t)self->v_textbase;
+		assert(!self->v_savedfont);
+#define REL(x) ((x) = (__typeof__(x))(uintptr_t)((intptr_t)(x) + diff))
+		REL(self->v_textbase);
+		REL(self->v_text2line);
+		REL(self->v_textlline);
+		REL(self->v_textend);
+		REL(self->v_textptr);
+		REL(self->v_scrlbase);
+		REL(self->v_scrl2lin);
+		REL(self->v_scrlllin);
+		REL(self->v_scrlend);
+#undef REL
+		if (oldfont)
+			VGA_DoGetFont(self, oldfont);
+		VGA_DoSetMode(self, mode);
+		VGA_DoSetPalette(self, pal, color_count);
+		self->v_savedfont = oldfont;
+		oldfont           = NULL; /* Prevent it from being free'd */
+		self->v_state |= VGA_STATE_FGRAPHICS;
+	} else {
+		VGA_DoSetMode(self, mode);
+		VGA_DoSetPalette(self, pal, color_count);
 	}
-	kfree(oldfont);
+	sync_endwrite_both(self);
 }
 
 PRIVATE void KCALL
@@ -1470,28 +1429,23 @@ VGA_GetPal(struct videodev *__restrict self,
 		count = 256;
 	i = 0;
 	sync_write(&me->v_lock);
-	TRY {
-		vga_w(VGA_PEL_MSK, 0xff);
-		vga_w(VGA_PEL_IR, 0x00);
-		for (; i < count; ++i) {
-			u8 r, g, b;
-			vd_color_t color;
-			r     = vga_r(VGA_PEL_D) << 2;
-			g     = vga_r(VGA_PEL_D) << 2;
-			b     = vga_r(VGA_PEL_D) << 2;
-			color = VIDEO_COLOR_RGB(r, g, b);
-			ATOMIC_WRITE(pal->vdp_pal[i], color);
-		}
-	} EXCEPT {
+	RAII_FINALLY {
 		/* Must complete the operation. - VGA wouldn't understand otherwise. */
 		for (i *= 3; i < 768; ++i)
 			vga_r(VGA_PEL_D);
 		sync_endwrite(&me->v_lock);
-		RETHROW();
+	};
+	vga_w(VGA_PEL_MSK, 0xff);
+	vga_w(VGA_PEL_IR, 0x00);
+	for (; i < count; ++i) {
+		u8 r, g, b;
+		vd_color_t color;
+		r     = vga_r(VGA_PEL_D) << 2;
+		g     = vga_r(VGA_PEL_D) << 2;
+		b     = vga_r(VGA_PEL_D) << 2;
+		color = VIDEO_COLOR_RGB(r, g, b);
+		ATOMIC_WRITE(pal->vdp_pal[i], color);
 	}
-	for (i *= 3; i < 768; ++i)
-		vga_r(VGA_PEL_D);
-	sync_endwrite(&me->v_lock);
 }
 
 PRIVATE void KCALL
@@ -1516,25 +1470,20 @@ VGA_SetPal(struct videodev *__restrict self,
 	}
 	i = 0;
 	sync_write(&me->v_lock);
-	TRY {
-		vga_w(VGA_PEL_MSK, 0xff);
-		vga_w(VGA_PEL_IW, 0x00);
-		for (; i < count; ++i) {
-			vd_color_t color = ATOMIC_READ(pal->vdp_pal[i]);
-			vga_w(VGA_PEL_D, VIDEO_COLOR_GET_RED(color) >> 2);
-			vga_w(VGA_PEL_D, VIDEO_COLOR_GET_GREEN(color) >> 2);
-			vga_w(VGA_PEL_D, VIDEO_COLOR_GET_BLUE(color) >> 2);
-		}
-	} EXCEPT {
+	RAII_FINALLY {
 		/* Must complete the operation. - VGA wouldn't understand otherwise. */
 		for (i *= 3; i < 768; ++i)
 			vga_w(VGA_PEL_D, 0);
 		sync_endwrite(&me->v_lock);
-		RETHROW();
+	};
+	vga_w(VGA_PEL_MSK, 0xff);
+	vga_w(VGA_PEL_IW, 0x00);
+	for (; i < count; ++i) {
+		vd_color_t color = ATOMIC_READ(pal->vdp_pal[i]);
+		vga_w(VGA_PEL_D, VIDEO_COLOR_GET_RED(color) >> 2);
+		vga_w(VGA_PEL_D, VIDEO_COLOR_GET_GREEN(color) >> 2);
+		vga_w(VGA_PEL_D, VIDEO_COLOR_GET_BLUE(color) >> 2);
 	}
-	for (i *= 3; i < 768; ++i)
-		vga_w(VGA_PEL_D, 0);
-	sync_endwrite(&me->v_lock);
 }
 
 

@@ -59,15 +59,13 @@ libservice_buffer_malloc(struct service *__restrict self, size_t num_bytes)
 	was = PREEMPTION_PUSHOFF();
 #ifdef LOCAL_DEFINE_NOEXCEPT
 	buf = libservice_shmbuf_alloc_nopr_nx(self, num_bytes);
+	PREEMPTION_POP(was);
 #else /* LOCAL_DEFINE_NOEXCEPT */
-	TRY {
+	{
+		RAII_FINALLY { PREEMPTION_POP(was); };
 		buf = libservice_shmbuf_alloc_nopr(self, num_bytes);
-	} EXCEPT {
-		PREEMPTION_POP(was);
-		RETHROW();
 	}
 #endif /* !LOCAL_DEFINE_NOEXCEPT */
-	PREEMPTION_POP(was);
 	assert(libservice_shmbuf_get_total_size(service_buf_getptr(buf)) >= num_bytes);
 	DBG_memset(service_buf_getptr(buf), 0xcc, libservice_shmbuf_get_usable_size(service_buf_getptr(buf)));
 	return service_buf_getptr(buf);
@@ -156,17 +154,15 @@ libservice_buffer_realloc(struct service *__restrict self, void *ptr, size_t num
 #ifdef LOCAL_DEFINE_NOEXCEPT
 			buf = libservice_shmbuf_alloc_nopr_nx(self, num_bytes);
 #else /* LOCAL_DEFINE_NOEXCEPT */
-			TRY {
-				buf = libservice_shmbuf_alloc_nopr(self, num_bytes);
-			} EXCEPT {
-				PREEMPTION_POP(was);
-				RETHROW();
-			}
+			RAII_FINALLY { PREEMPTION_POP(was); };
+			buf = libservice_shmbuf_alloc_nopr(self, num_bytes);
 #endif /* !LOCAL_DEFINE_NOEXCEPT */
 			assert(libservice_shmbuf_get_total_size(service_buf_getptr(buf)) >= num_bytes);
 			memcpy(service_buf_getptr(buf), ptr, oldsize);
 			libservice_shmbuf_freeat_nopr(self, shm, libservice_shmbuf_get_base_addr(ptr), oldsize);
+#ifdef LOCAL_DEFINE_NOEXCEPT
 			PREEMPTION_POP(was);
+#endif /* LOCAL_DEFINE_NOEXCEPT */
 			return service_buf_getptr(buf);
 		}
 	}

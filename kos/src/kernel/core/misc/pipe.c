@@ -427,15 +427,10 @@ handle_pipe_hop(struct pipe *__restrict self,
 		temp.h_type = HANDLE_TYPE_PIPE_READER;
 		temp.h_mode = (mode & ~IO_ACCMODE) | IO_RDONLY;
 		ATOMIC_INC(self->p_rdcnt); /* Prevent the PIPE from being closed on error */
-		TRY {
-			temp.h_data = pipe_reader_create(self);
-			FINALLY_DECREF((struct pipe_reader *)temp.h_data);
-			result = handle_installhop((USER UNCHECKED struct hop_openfd *)arg, temp);
-		} EXCEPT {
-			ATOMIC_DEC(self->p_rdcnt);
-			RETHROW();
-		}
-		ATOMIC_DEC(self->p_rdcnt);
+		RAII_FINALLY { ATOMIC_DEC(self->p_rdcnt); };
+		temp.h_data = pipe_reader_create(self);
+		FINALLY_DECREF((struct pipe_reader *)temp.h_data);
+		result = handle_installhop((USER UNCHECKED struct hop_openfd *)arg, temp);
 		return result;
 	}	break;
 
@@ -446,15 +441,10 @@ handle_pipe_hop(struct pipe *__restrict self,
 		temp.h_type = HANDLE_TYPE_PIPE_WRITER;
 		temp.h_mode = (mode & ~IO_ACCMODE) | IO_WRONLY;
 		ATOMIC_INC(self->p_wrcnt); /* Prevent the PIPE from being closed on error */
-		TRY {
-			temp.h_data = pipe_writer_create(self);
-			FINALLY_DECREF((struct pipe_writer *)temp.h_data);
-			result = handle_installhop((USER UNCHECKED struct hop_openfd *)arg, temp);
-		} EXCEPT {
-			ATOMIC_DEC(self->p_wrcnt);
-			RETHROW();
-		}
-		ATOMIC_DEC(self->p_wrcnt);
+		RAII_FINALLY { ATOMIC_DEC(self->p_wrcnt); };
+		temp.h_data = pipe_writer_create(self);
+		FINALLY_DECREF((struct pipe_writer *)temp.h_data);
+		result = handle_installhop((USER UNCHECKED struct hop_openfd *)arg, temp);
 		return result;
 	}	break;
 

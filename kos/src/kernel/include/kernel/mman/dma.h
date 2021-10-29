@@ -74,7 +74,6 @@ NOTHROW(mman_dmalock_release)(struct mdmalock *__restrict self);
  * @return: 0 :         Some portion of the specified address range(s) doesn't actually map to a VM node.
  * @return: 0 :         Some portion of the specified address range(s) maps to a VM node reservation (no associated data part).
  * @return: 0 :         Some portion of the specified address range(s) maps to VIO memory, meaning there is no underlying physical memory.
- * @return: 0 :         [mman_startdma[v]] The equivalent `mman_startdma[v]' would have thrown an exception
  * @return: <= lockcnt: The number of used DMA locks (SUCCESS)
  * @return: >  lockcnt: The number of _REQUIRED_ DMA locks (FAILURE) (All locks that may have already been acqured will have already been released) */
 FUNDEF NONNULL((1, 2, 4)) size_t KCALL

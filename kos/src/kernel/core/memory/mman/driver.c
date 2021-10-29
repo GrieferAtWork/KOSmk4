@@ -441,8 +441,12 @@ driver_section_getaddr_inflate(struct driver_section *__restrict self,
 			RETHROW();
 		}
 	}
-	TRY {
+	{
 		ElfW(Chdr) *chdr;
+		RAII_FINALLY {
+			if (src_data_freeme_cookie)
+				mman_unmap_kram_and_kfree(src_data, self->ds_sect.ms_size, src_data_freeme_cookie);
+		};
 		chdr = (ElfW(Chdr) *)src_data;
 		if unlikely(chdr->ch_type != ELFCOMPRESS_ZLIB)
 			THROW(E_INVALID_ARGUMENT);
@@ -500,13 +504,7 @@ driver_section_getaddr_inflate(struct driver_section *__restrict self,
 			mman_unmap_kram(dst_data, dst_size);
 			RETHROW();
 		}
-	} EXCEPT {
-		if (src_data_freeme_cookie)
-			mman_unmap_kram_and_kfree(src_data, self->ds_sect.ms_size, src_data_freeme_cookie);
-		RETHROW();
 	}
-	if (src_data_freeme_cookie)
-		mman_unmap_kram_and_kfree(src_data, self->ds_sect.ms_size, src_data_freeme_cookie);
 	ATOMIC_WRITE(self->ds_inflsize, dst_size);
 	ATOMIC_CMPXCH(self->ds_infladdr, (KERNEL byte_t *)-1, dst_data);
 	*psize = dst_size;
@@ -1486,7 +1484,7 @@ driver_argcash_resolve(struct driver *__restrict self,
 	USER CHECKED char const *uname, *unameend;
 	USER CHECKED char const *utype, *utypeend;
 	USER CHECKED char const *udefl, *udeflend;
-	char *kname, *kdefl;
+	char *kname;
 	uintptr_half_t arg_type;
 	uintptr_half_t arg_size;
 
@@ -1624,22 +1622,20 @@ badtype:
 	}
 	kname = (char *)malloca(((size_t)(unameend - uname) + 1) * sizeof(char));
 	*(char *)mempcpy(kname, uname, (size_t)(unameend - uname), sizeof(char)) = '\0';
-	kdefl = NULL;
-	TRY {
+	{
+		char *kdefl;
+		kdefl = NULL;
+		RAII_FINALLY {
+			if (kdefl)
+				freea(kdefl);
+			freea(kname);
+		};
 		if (udefl < udeflend) {
 			kdefl = (char *)malloca(((size_t)(udeflend - udefl) + 1) * sizeof(char));
 			*(char *)mempcpy(kdefl, udefl, (size_t)(udeflend - udefl), sizeof(char)) = '\0';
 		}
 		entry = driver_argcash_lookup(self, arg_type, arg_size, kname, kdefl);
-	} EXCEPT {
-		if (kdefl)
-			freea(kdefl);
-		freea(kname);
-		RETHROW();
 	}
-	if (kdefl)
-		freea(kdefl);
-	freea(kname);
 	/* Write-back information from the argcash entry. */
 	info->dsi_addr = entry->dace_data;
 	info->dsi_size = entry->dace_size;
@@ -5480,21 +5476,18 @@ driver_loadmod_file(struct mfile *__restrict driver_file,
 			mman_unmap_kram_cookie_free(unmap_cookie);
 			RETHROW();
 		}
-		TRY {
-			/* Create a driver from the file mapping. */
-			result = driver_create((byte_t const *)tempmap,
-			                       (size_t)tempmap_size,
-			                       driver_file, driver_path,
-			                       driver_dentry, driver_cmdline,
-			                       pnew_driver_loaded);
-		} EXCEPT {
+		RAII_FINALLY {
+			/* Delete the temporary mapping created above. */
 			mman_unmap_kram_and_kfree(tempmap, (size_t)tempmap_size,
 			                          unmap_cookie);
-			RETHROW();
-		}
-		/* Delete the temporary mapping created above. */
-		mman_unmap_kram_and_kfree(tempmap, (size_t)tempmap_size,
-		                          unmap_cookie);
+		};
+
+		/* Create a driver from the file mapping. */
+		result = driver_create((byte_t const *)tempmap,
+		                       (size_t)tempmap_size,
+		                       driver_file, driver_path,
+		                       driver_dentry, driver_cmdline,
+		                       pnew_driver_loaded);
 	}
 	return result;
 }
@@ -5742,7 +5735,7 @@ driver_loadmod_file_in_path(char const *__restrict path, size_t pathlen,
                             bool create_new_drivers)
 		THROWS(E_SEGFAULT, E_NOT_EXECUTABLE, E_BADALLOC, E_IOERROR, E_FSERROR) {
 	REF struct driver *result;
-	char *buf;
+	char *buf, *p;
 	/* Strip leading/trailing slashes from strings. */
 	while (pathlen && path[pathlen - 1] == '/')
 		--pathlen;
@@ -5751,25 +5744,20 @@ driver_loadmod_file_in_path(char const *__restrict path, size_t pathlen,
 		--driver_namelen;
 	}
 	buf = (char *)malloca((pathlen + driver_namelen + 2) * sizeof(char));
-	TRY {
-		char *p;
-		/* Construct the filename  */
-		p = (char *)mempcpy(buf, path, pathlen, sizeof(char));
-		*p++ = '/';
-		p = (char *)mempcpy(p, driver_name, driver_namelen, sizeof(char));
-		*p++ = '\0';
-		if (create_new_drivers) {
-			/* Second-phase (actually load new drivers) */
-			result = driver_loadmod_filename(buf, driver_cmdline,
-			                                 pnew_driver_loaded);
-		} else {
-			result = driver_fromfilename(buf);
-		}
-	} EXCEPT {
-		freea(buf);
-		RETHROW();
+	RAII_FINALLY { freea(buf); };
+
+	/* Construct the filename  */
+	p = (char *)mempcpy(buf, path, pathlen, sizeof(char));
+	*p++ = '/';
+	p = (char *)mempcpy(p, driver_name, driver_namelen, sizeof(char));
+	*p++ = '\0';
+	if (create_new_drivers) {
+		/* Second-phase (actually load new drivers) */
+		result = driver_loadmod_filename(buf, driver_cmdline,
+		                                 pnew_driver_loaded);
+	} else {
+		result = driver_fromfilename(buf);
 	}
-	freea(buf);
 	return result;
 }
 

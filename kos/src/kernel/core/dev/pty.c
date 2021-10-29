@@ -213,17 +213,14 @@ again_read:
 				THROW(E_WOULDBLOCK_WAITFORSIGNAL); /* No data available. */
 		} else {
 			/* Must not keep a reference to the slave while sleeping! */
-			TRY {
+			{
+				FINALLY_DECREF_UNLIKELY(slave);
 				if (ringbuffer_pollread_unlikely(&slave->ps_obuf)) {
 					task_disconnectall();
 					goto again_read;
 				}
-			} EXCEPT {
-				decref_unlikely(slave);
-				RETHROW();
 			}
 			/* Wait for something to happen without holding a reference to the slave! */
-			decref_unlikely(slave);
 			task_waitfor();
 			goto again_getslave;
 		}
@@ -277,7 +274,8 @@ again_write:
 				THROW(E_WOULDBLOCK_WAITFORSIGNAL);
 		} else {
 			/* Must not keep a reference to the slave while sleeping! */
-			TRY {
+			{
+				FINALLY_DECREF_UNLIKELY(slave);
 #define connect_to_slave_ps_obuf_ex(cb) ringbuffer_pollconnect_write_ex(&slave->ps_obuf, cb)
 				if (terminal_polliwrite_unlikely(&slave->t_term,
 				                                 ringbuffer_canwrite(&slave->ps_obuf),
@@ -286,12 +284,8 @@ again_write:
 					goto again_write;
 				}
 #undef connect_to_slave_ps_obuf_ex
-			} EXCEPT {
-				decref_unlikely(slave);
-				RETHROW();
 			}
 			/* Wait for something to happen without holding a reference to the slave! */
-			decref_unlikely(slave);
 			task_waitfor();
 			goto again_getslave;
 		}

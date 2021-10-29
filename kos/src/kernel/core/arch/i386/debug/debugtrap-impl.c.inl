@@ -98,17 +98,12 @@ sys_debugtrap64_impl(struct icpustate *__restrict return_state,
 			if (namelen > MAXLEN)
 				THROW(E_BUFFER_TOO_SMALL, MAXLEN, namelen);
 			namebuf = (char *)malloca((namelen + 1) * sizeof(char));
-			TRY {
-				memcpy(namebuf, reason.dtr_strarg, namelen, sizeof(char));
-				namebuf[namelen]  = '\0';
-				reason.dtr_strarg = namebuf;
-				return_state = IFELSE3264(sys_do_debugtrap32_impl(return_state, ustate, &reason),
-				                          sys_do_debugtrap64_impl(return_state, ustate, &reason));
-			} EXCEPT {
-				freea(namebuf);
-				RETHROW();
-			}
-			freea(namebuf);
+			RAII_FINALLY { freea(namebuf); };
+			memcpy(namebuf, reason.dtr_strarg, namelen, sizeof(char));
+			namebuf[namelen]  = '\0';
+			reason.dtr_strarg = namebuf;
+			return_state = IFELSE3264(sys_do_debugtrap32_impl(return_state, ustate, &reason),
+			                          sys_do_debugtrap64_impl(return_state, ustate, &reason));
 			goto done;
 		}	break;
 

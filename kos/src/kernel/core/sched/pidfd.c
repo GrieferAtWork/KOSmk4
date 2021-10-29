@@ -111,17 +111,12 @@ DEFINE_SYSCALL3(fd_t, pidfd_getfd,
 		 *      alias for `open("/proc/[PID]/cwd")'... */
 		foreign_handle = handle_lookupin((unsigned int)foreign_fd, handman);
 	}
-	TRY {
-		foreign_handle.h_mode &= ~IO_CLOFORK;
-		foreign_handle.h_mode |= IO_CLOEXEC;
-		/* Install the handle into our own table. */
-		result = handle_install(THIS_HANDLE_MANAGER,
-		                        foreign_handle);
-	} EXCEPT {
-		decref_unlikely(foreign_handle);
-		RETHROW();
-	}
-	decref_unlikely(foreign_handle);
+	RAII_FINALLY { decref_unlikely(foreign_handle); };
+	foreign_handle.h_mode &= ~IO_CLOFORK;
+	foreign_handle.h_mode |= IO_CLOEXEC;
+	/* Install the handle into our own table. */
+	result = handle_install(THIS_HANDLE_MANAGER,
+	                        foreign_handle);
 	return (fd_t)result;
 }
 #endif /* __ARCH_WANT_SYSCALL_PIDFD_GETFD */

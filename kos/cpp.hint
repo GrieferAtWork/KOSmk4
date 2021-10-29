@@ -1010,11 +1010,17 @@
 #define __untraced
 
 #define TRY
+#define __TRY
 #define NESTED_TRY
+#define __NESTED_TRY
 #define UNNESTED_TRY
+#define __UNNESTED_TRY
 #define EXCEPT
+#define __EXCEPT
 #define RETHROW() throw
 #define THROW(...) error_throw(0)
+#define RAII_FINALLY
+#define __RAII_FINALLY
 
 #define __FS_TYPE(x)      x##_t
 #define __FS_ALTTYPE(x)   x##_t

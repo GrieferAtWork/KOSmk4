@@ -1900,16 +1900,11 @@ copy_next_tx:
 			aio_handle_generic_init(&aio);
 			/* perform the transfer using our buffer copies. */
 			uhci_transfer(self, tx_firstcopy, &aio);
-			TRY {
-				aio_handle_generic_waitfor(&aio);
-				aio_handle_generic_checkerror(&aio);
-			} EXCEPT {
-				aio_handle_generic_fini(&aio);
-				RETHROW();
-			}
+			RAII_FINALLY { aio_handle_generic_fini(&aio); };
+			aio_handle_generic_waitfor(&aio);
+			aio_handle_generic_checkerror(&aio);
 			assert(aio.ah_type == &uhci_aio_type);
 			result = uhci_aio_retsize(&aio);
-			aio_handle_generic_fini(&aio);
 		}
 		/* Transfer input data buffers to their target locations. */
 		tx_copy = tx_firstcopy;
@@ -2765,7 +2760,9 @@ uhci_handle_resume_detect(struct uhci_controller *__restrict self) {
 	 * -> Check for changes in port attachments. */
 	ATOMIC_AND(self->uc_flags, ~UHCI_CONTROLLER_FLAG_RESDECT);
 	sync_write(&self->uc_lock);
-	TRY {
+	{
+		RAII_FINALLY { uhci_controller_endwrite(self); };
+
 		/* Check if the FGR command flag was set.
 		 * If it was, wait for 20ms and clear it. */
 		cmd = uhci_rdw(self, UHCI_USBCMD);
@@ -2782,11 +2779,7 @@ uhci_handle_resume_detect(struct uhci_controller *__restrict self) {
 			         UHCI_USBCMD_RS | UHCI_USBCMD_CF |
 			         UHCI_USBCMD_MAXP);
 		}
-	} EXCEPT {
-		uhci_controller_endwrite(self);
-		RETHROW();
 	}
-	uhci_controller_endwrite(self);
 	uhci_chk_port_changes(self);
 }
 
@@ -2927,9 +2920,9 @@ uhci_controller_reset_port_and_probe(struct uhci_controller *__restrict self,
 		sync_endwrite(&self->uc_disclock);
 		RETHROW();
 	}
-	if (status & UHCI_PORTSC_PED)
+	if (status & UHCI_PORTSC_PED) {
 		uhci_controller_device_attached(self, portno, status);
-	else {
+	} else {
 		sync_endwrite(&self->uc_disclock);
 	}
 }

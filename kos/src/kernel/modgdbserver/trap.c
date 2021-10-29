@@ -167,16 +167,12 @@ do_print_message_in_nonstop_mode:
 				/* Got the GDB context lock! */
 				if unlikely(ATOMIC_READ(GDBServer_Features) & GDB_SERVER_FEATURE_NONSTOP)
 					goto do_print_message_in_nonstop_mode;
-				TRY {
-					num_printed = GDBServer_PrintMessageInAllStopMode(reason->dtr_strarg,
-					                                                  reason->dtr_signo);
-				} EXCEPT {
+				RAII_FINALLY {
 					ATOMIC_WRITE(GDBServer_Host, NULL);
 					sig_broadcast(&GDBServer_HostUnlocked);
-					RETHROW();
-				}
-				ATOMIC_WRITE(GDBServer_Host, NULL);
-				sig_broadcast(&GDBServer_HostUnlocked);
+				};
+				num_printed = GDBServer_PrintMessageInAllStopMode(reason->dtr_strarg,
+				                                                  reason->dtr_signo);
 			}
 		}
 		/* Write back the number of actually written bytes. */

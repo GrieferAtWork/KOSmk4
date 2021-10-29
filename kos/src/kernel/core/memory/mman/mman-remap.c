@@ -547,10 +547,6 @@ again_lock_mman:
 				      orig_new_size);
 			}
 
-			TRY {
-			} EXCEPT {
-				RETHROW();
-			}
 			if ((flags & (MREMAP_FIXED | MREMAP_FIXED_NOREPLACE)) ==
 			    /*    */ (MREMAP_FIXED | MREMAP_FIXED_NOREPLACE)) {
 				/* Check if there's already a mapping here... */

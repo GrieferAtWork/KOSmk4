@@ -546,15 +546,10 @@ ramfs_dirnode_v_lookup(struct fdirnode *__restrict self,
 	struct ramfs_dirnode *me;
 	me = (struct ramfs_dirnode *)self;
 	ramfs_dirdata_treelock_read(&me->rdn_dat);
-	TRY {
-		result = ramfs_dirdata_lookup(me, info);
-	} EXCEPT {
-		ramfs_dirdata_treelock_endread(&me->rdn_dat);
-		RETHROW();
-	}
-	if (result)
+	RAII_FINALLY { ramfs_dirdata_treelock_endread(&me->rdn_dat); };
+	result = ramfs_dirdata_lookup(me, info);
+	if (result != NULL)
 		ret = incref(&result->rde_ent);
-	ramfs_dirdata_treelock_endread(&me->rdn_dat);
 	return ret;
 }
 
@@ -942,8 +937,9 @@ ramfs_dirnode_v_rename(struct fdirnode *__restrict self,
 #ifndef __OPTIMIZE_SIZE__
 	/* Check for an existing file before doing any allocations */
 	ramfs_dirdata_treelock_read(&me->rdn_dat);
-	TRY {
+	{
 		struct ramfs_dirent *existing;
+		RAII_FINALLY { ramfs_dirdata_treelock_endread(&me->rdn_dat); };
 		if unlikely(me->mf_flags & MFILE_F_DELETED)
 			THROW(E_FSERROR_DELETED, E_FILESYSTEM_DELETED_PATH);
 		existing = ramfs_dirdata_lookup(me, &info->frn_lookup_info);
@@ -951,19 +947,13 @@ ramfs_dirnode_v_rename(struct fdirnode *__restrict self,
 			if (info->frn_repfile != existing->rde_node) {
 				info->frn_dent    = incref(&existing->rde_ent);
 				info->frn_repfile = mfile_asnode(incref(existing->rde_node));
-				ramfs_dirdata_treelock_endread(&me->rdn_dat);
 				return FDIRNODE_RENAME_EXISTS;
 			}
 		} else if (info->frn_repfile != NULL) {
-			ramfs_dirdata_treelock_endread(&me->rdn_dat);
 			info->frn_repfile = NULL;
 			return FDIRNODE_RENAME_EXISTS;
 		}
-	} EXCEPT {
-		ramfs_dirdata_treelock_endread(&me->rdn_dat);
-		RETHROW();
 	}
-	ramfs_dirdata_treelock_endread(&me->rdn_dat);
 #endif /* !__OPTIMIZE_SIZE__ */
 
 	/* Allocate the new directory entry. */

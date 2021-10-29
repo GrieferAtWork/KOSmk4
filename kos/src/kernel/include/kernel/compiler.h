@@ -472,8 +472,10 @@ __NAMESPACE_INT_END
 
 #define SCOPED_READLOCK(lock)   __NAMESPACE_INT_SYM _sync_reader< __typeof__(*(lock)) > __COMPILER_UNIQUE(__rlock)(*(lock))
 #define SCOPED_WRITELOCK(lock)  __NAMESPACE_INT_SYM _sync_writer< __typeof__(*(lock)) > __COMPILER_UNIQUE(__wlock)(*(lock))
+#define SCOPED_LOCK             SCOPED_WRITELOCK
 #define FINALLY_ENDREAD(lock)   __NAMESPACE_INT_SYM _finally_endread< __typeof__(*(lock)) > __COMPILER_UNIQUE(__ferlock)(*(lock))
 #define FINALLY_ENDWRITE(lock)  __NAMESPACE_INT_SYM _finally_endwrite< __typeof__(*(lock)) > __COMPILER_UNIQUE(__fewlock)(*(lock))
+#define FINALLY_RELEASE         FINALLY_ENDWRITE
 
 #define __DEFINE_SYNC_PROXY(T, field)                                                                                                                                          \
 	extern "C++" {                                                                                                                                                             \

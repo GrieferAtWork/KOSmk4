@@ -135,15 +135,9 @@ libdl_dltlsaddr2(USER DlModule *self, USER struct tls_segment *seg) THROWS(E_SEG
 			 *      we're using lazy allocations) */
 			atomic_rwlock_endwrite(&seg->ts_exlock);
 			/* Invoke TLS finalizers. */
-			if (self->dm_tls_fini) {
-				TRY {
-					(*self->dm_tls_fini)(self->dm_tls_arg, extab->te_data);
-				} EXCEPT {
-					free(extab);
-					RETHROW();
-				}
-			}
-			free(extab);
+			RAII_FINALLY { free(extab); };
+			if (self->dm_tls_fini)
+				(*self->dm_tls_fini)(self->dm_tls_arg, extab->te_data);
 			return newtab->te_data;
 		}
 	}

@@ -224,17 +224,14 @@ again:
 		struct task_connections cons;
 		task_connect(&self->mf_initdone);
 		task_pushconnections(&cons);
-		TRY {
+		{
+			RAII_FINALLY { task_popconnections(); };
 #ifdef LOCAL_BUFFER_IS_IOVEC
 			result = LOCAL_mfile_normrw(self, buffer, buf_offset, num_bytes, offset);
 #else /* LOCAL_BUFFER_IS_IOVEC */
 			result = LOCAL_mfile_normrw(self, buffer, num_bytes, offset);
 #endif /* !LOCAL_BUFFER_IS_IOVEC */
-		} EXCEPT {
-			task_popconnections();
-			RETHROW();
 		}
-		task_popconnections();
 		if likely(result == 0) {
 			task_waitfor();
 			goto again;
@@ -298,19 +295,17 @@ again:
 			mfile_trunclock_inc(self);
 			mfile_lock_endread(self);
 do_io_with_part_and_trunclock:
-			TRY {
+			{
+				RAII_FINALLY {
+					decref_unlikely(part);
+					mfile_trunclock_dec(self);
+				};
 #ifdef LOCAL_BUFFER_IS_IOVEC
 				io_bytes = LOCAL_mpart_rw(part, buffer, buf_offset, io_bytes, offset);
 #else /* LOCAL_BUFFER_IS_IOVEC */
 				io_bytes = LOCAL_mpart_rw(part, buffer, io_bytes, offset);
 #endif /* !LOCAL_BUFFER_IS_IOVEC */
-			} EXCEPT {
-				decref_unlikely(part);
-				mfile_trunclock_dec(self);
-				RETHROW();
 			}
-			decref_unlikely(part);
-			mfile_trunclock_dec(self);
 			LOCAL_buffer_advance(io_bytes);
 			num_bytes -= io_bytes;
 			offset += io_bytes;

@@ -192,13 +192,8 @@ _async_worker_v_connect(struct async *__restrict self) {
 	obj = aworker_getref(me);
 	if (!obj)
 		return KTIME_NONBLOCK;
-	TRY {
-		result = (*aworker_getops(me)->awo_connect)(obj);
-	} EXCEPT {
-		aworker_decref_obj(me, obj);
-		RETHROW();
-	}
-	aworker_decref_obj(me, obj);
+	RAII_FINALLY { aworker_decref_obj(me, obj); };
+	result = (*aworker_getops(me)->awo_connect)(obj);
 	return result;
 }
 
@@ -210,13 +205,8 @@ _async_worker_v_test(struct async *__restrict self) {
 	obj = aworker_getref(me);
 	if (!obj)
 		return true;
-	TRY {
-		result = (*aworker_getops(me)->awo_test)(obj);
-	} EXCEPT {
-		aworker_decref_obj(me, obj);
-		RETHROW();
-	}
-	aworker_decref_obj(me, obj);
+	RAII_FINALLY { aworker_decref_obj(me, obj); };
+	result = (*aworker_getops(me)->awo_test)(obj);
 	return result;
 }
 
@@ -228,13 +218,8 @@ _async_worker_v_work(struct async *__restrict self) {
 	obj = aworker_getref(me);
 	if (!obj)
 		return ASYNC_FINISHED;
-	TRY {
-		result = (*aworker_getops(me)->awo_work)(obj);
-	} EXCEPT {
-		aworker_decref_obj(me, obj);
-		RETHROW();
-	}
-	aworker_decref_obj(me, obj);
+	RAII_FINALLY { aworker_decref_obj(me, obj); };
+	result = (*aworker_getops(me)->awo_work)(obj);
 	return result;
 }
 
@@ -248,13 +233,8 @@ _async_worker_v_time(struct async *__restrict self) {
 	obj = aworker_getref(me);
 	if (!obj)
 		return ASYNC_FINISHED;
-	TRY {
-		result = (*aworker_getops(me)->awo_time)(obj);
-	} EXCEPT {
-		aworker_decref_obj(me, obj);
-		RETHROW();
-	}
-	aworker_decref_obj(me, obj);
+	RAII_FINALLY { aworker_decref_obj(me, obj); };
+	result = (*aworker_getops(me)->awo_time)(obj);
 	return result;
 }
 
@@ -267,13 +247,8 @@ _async_worker_v_cancel(struct async *__restrict self) {
 	obj = aworker_getref(me);
 	if (!obj)
 		return;
-	TRY {
-		(*aworker_getops(me)->awo_cancel)(obj);
-	} EXCEPT {
-		aworker_decref_obj(me, obj);
-		RETHROW();
-	}
-	aworker_decref_obj(me, obj);
+	RAII_FINALLY { aworker_decref_obj(me, obj); };
+	(*aworker_getops(me)->awo_cancel)(obj);
 }
 
 

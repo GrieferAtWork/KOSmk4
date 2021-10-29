@@ -184,22 +184,16 @@ ansittydev_v_setled(struct ansitty *__restrict self,
 #else /* CONFIG_USE_NEW_FS */
 			kbd = (struct kbddev *)output->mtd_ihandle_ptr;
 #endif /* !CONFIG_USE_NEW_FS */
-			sync_write(&kbd->kd_leds_lock);
+			kbddev_leds_acquire(kbd);
+			RAII_FINALLY { kbddev_leds_release(kbd); };
 			new_leds = (kbd->kd_leds & (mask | ~0xf)) | (flag & 0xf);
 			if (kbd->kd_leds != new_leds) {
 				struct kbddev_ops const *ops;
 				ops = kbddev_getops(kbd);
-				if (ops->ko_setleds) {
-					TRY {
-						(*ops->ko_setleds)(kbd, new_leds);
-					} EXCEPT {
-						sync_endwrite(&kbd->kd_leds_lock);
-						RETHROW();
-					}
-				}
+				if (ops->ko_setleds != NULL)
+					(*ops->ko_setleds)(kbd, new_leds);
 				kbd->kd_leds = new_leds;
 			}
-			sync_endwrite(&kbd->kd_leds_lock);
 		}
 	}
 }

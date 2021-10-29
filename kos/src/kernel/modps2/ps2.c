@@ -362,80 +362,75 @@ NOTHROW(KCALL early_poll_outport)(u8 *__restrict presult) {
 }
 
 PRIVATE ATTR_FREETEXT DRIVER_INIT void KCALL ps2_init(void) {
+	u8 data;
 	ps2_portid_t portno;
 	memset(ps2_probe_data_buffer, 0, sizeof(ps2_probe_data_buffer));
 	ps2_probe_install_handlers(ps2_probe_data_buffer);
-	TRY {
-		u8 data;
+	RAII_FINALLY { ps2_probe_delete_handlers(ps2_probe_data_buffer); };
 
-		/* Configure the PS/2 controller. */
-		ps2_write_cmd(PS2_CONTROLLER_DISABLE_PORT1);
-		ps2_write_cmd(PS2_CONTROLLER_DISABLE_PORT2);
-		inb_p(PS2_DATA); /* Make sure that there is no dangling data */
+	/* Configure the PS/2 controller. */
+	ps2_write_cmd(PS2_CONTROLLER_DISABLE_PORT1);
+	ps2_write_cmd(PS2_CONTROLLER_DISABLE_PORT2);
+	inb_p(PS2_DATA); /* Make sure that there is no dangling data */
 
-		/* Workaround: If the  controller is  configured to  have interrupts  enabled
-		 *             for  either PORT1 or  PORT2, then instead of  us being able to
-		 *             read  command data  in the  following call,  the response byte
-		 *             will have already been read by `ps2_probe_handle_interrupt()',
-		 *             such that the following line will cause an exception
-		 *             `E_IOERROR_TIMEOUT:E_IOERROR_SUBSYSTEM_HID'   to   be   thrown.
-		 *             The problem here is that the bit  that can tell us if the  PS/2
-		 *             controller is able to trigger interrupts right now is contained
-		 *             in the very byte which we're trying to extract from the  thing.
-		 * Solution:   Configure the probe controller to accept interrupt data while
-		 *             simultaneously polling the port ourself.
-		 *             This gives us 3 different paths to success:
-		 *               #1: We manage to read the port ourself and interrupts were disabled.
-		 *               #2: We manage to read the port ourself and interrupts were enabled,
-		 *                   and  the device  did send an  interrupt that was  entered as an
-		 *                   Unhandled interrupt.
-		 *               #3: We don't manage to read the port ourself, but we do notice that
-		 *                   one  of  the  probe  controllers  has  received  a  data  byte. */
-		{
-			unsigned int i;
-			for (i = 0; i < PS2_PORTCOUNT; ++i)
-				ps2_probe_data_buffer[i].pd_state = PS2_PROBE_STATE_DATA_0;
-		}
-		COMPILER_BARRIER();
-		ps2_write_cmd(PS2_CONTROLLER_RRAM(0));
-		COMPILER_BARRIER();
-		if (!early_poll_outport(&data)) {
-			/* Setup a timeout. */
-			struct timespec timeout;
-			timeout = realtime();
-			timeout.add_milliseconds(ps2_outfull_timeout);
-			while (!early_poll_outport(&data)) {
-				if unlikely(realtime() > timeout)
-					THROW(E_IOERROR_TIMEOUT, E_IOERROR_SUBSYSTEM_HID);
-				task_tryyield_or_pause();
-			}
-		}
-
-		/* Set up the PS/2 device configuration. */
-		data |= (PS2_CONTROLLER_CFG_PORT1_IRQ |
-		         PS2_CONTROLLER_CFG_PORT2_IRQ |
-		         PS2_CONTROLLER_CFG_SYSTEMFLAG);
-		data &= ~(PS2_CONTROLLER_CFG_PORT1_TRANSLATE);
-		ps2_write_cmd(PS2_CONTROLLER_WRAM(0));
-		ps2_write_cmddata((u8)data);
-		ps2_write_cmd(PS2_CONTROLLER_ENABLE_PORT2);
-		ps2_write_cmd(PS2_CONTROLLER_ENABLE_PORT1);
-
-		/* Try to probe PS/2 ports. */
-		for (portno = 0; portno < PS2_PORTCOUNT; ++portno) {
-			TRY {
-				ps2_probe_port(ps2_probe_data_buffer, portno);
-			} EXCEPT {
-				if (!was_thrown(E_IOERROR))
-					RETHROW();
-				error_printf("probing ps/2 port #%u", portno + 1);
-			}
-		}
-	} EXCEPT {
-		ps2_probe_delete_handlers(ps2_probe_data_buffer);
-		RETHROW();
+	/* Workaround: If the  controller is  configured to  have interrupts  enabled
+	 *             for  either PORT1 or  PORT2, then instead of  us being able to
+	 *             read  command data  in the  following call,  the response byte
+	 *             will have already been read by `ps2_probe_handle_interrupt()',
+	 *             such that the following line will cause an exception
+	 *             `E_IOERROR_TIMEOUT:E_IOERROR_SUBSYSTEM_HID'   to   be   thrown.
+	 *             The problem here is that the bit  that can tell us if the  PS/2
+	 *             controller is able to trigger interrupts right now is contained
+	 *             in the very byte which we're trying to extract from the  thing.
+	 * Solution:   Configure the probe controller to accept interrupt data while
+	 *             simultaneously polling the port ourself.
+	 *             This gives us 3 different paths to success:
+	 *               #1: We manage to read the port ourself and interrupts were disabled.
+	 *               #2: We manage to read the port ourself and interrupts were enabled,
+	 *                   and  the device  did send an  interrupt that was  entered as an
+	 *                   Unhandled interrupt.
+	 *               #3: We don't manage to read the port ourself, but we do notice that
+	 *                   one  of  the  probe  controllers  has  received  a  data  byte. */
+	{
+		unsigned int i;
+		for (i = 0; i < PS2_PORTCOUNT; ++i)
+			ps2_probe_data_buffer[i].pd_state = PS2_PROBE_STATE_DATA_0;
 	}
-	ps2_probe_delete_handlers(ps2_probe_data_buffer);
+	COMPILER_BARRIER();
+	ps2_write_cmd(PS2_CONTROLLER_RRAM(0));
+	COMPILER_BARRIER();
+	if (!early_poll_outport(&data)) {
+		/* Setup a timeout. */
+		struct timespec timeout;
+		timeout = realtime();
+		timeout.add_milliseconds(ps2_outfull_timeout);
+		while (!early_poll_outport(&data)) {
+			if unlikely(realtime() > timeout)
+				THROW(E_IOERROR_TIMEOUT, E_IOERROR_SUBSYSTEM_HID);
+			task_tryyield_or_pause();
+		}
+	}
+
+	/* Set up the PS/2 device configuration. */
+	data |= (PS2_CONTROLLER_CFG_PORT1_IRQ |
+	         PS2_CONTROLLER_CFG_PORT2_IRQ |
+	         PS2_CONTROLLER_CFG_SYSTEMFLAG);
+	data &= ~(PS2_CONTROLLER_CFG_PORT1_TRANSLATE);
+	ps2_write_cmd(PS2_CONTROLLER_WRAM(0));
+	ps2_write_cmddata((u8)data);
+	ps2_write_cmd(PS2_CONTROLLER_ENABLE_PORT2);
+	ps2_write_cmd(PS2_CONTROLLER_ENABLE_PORT1);
+
+	/* Try to probe PS/2 ports. */
+	for (portno = 0; portno < PS2_PORTCOUNT; ++portno) {
+		TRY {
+			ps2_probe_port(ps2_probe_data_buffer, portno);
+		} EXCEPT {
+			if (!was_thrown(E_IOERROR))
+				RETHROW();
+			error_printf("probing ps/2 port #%u", portno + 1);
+		}
+	}
 }
 
 

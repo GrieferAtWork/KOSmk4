@@ -444,25 +444,20 @@ copyfromphys(USER CHECKED void *dst,
 	        "copyfromphys(dst: %p, src: %" PRIpN(__SIZEOF_PHYSADDR_T__) ", %" PRIuSIZ "): "
 	        "`dst' buffer cannot be apart of the caller's trampoline",
 	        dst, src, num_bytes);
-	UNNESTED_TRY {
-		for (;;) {
-			size_t avail;
-			avail = PAGESIZE - ((uintptr_t)map & PAGEMASK);
-			if (avail > num_bytes)
-				avail = num_bytes;
-			memcpy(dst, map, avail);
-			if (avail >= num_bytes)
-				break;
-			dst = (byte_t *)dst + avail;
-			src += avail;
-			num_bytes -= avail;
-			map = phys_loadpage(src);
-		}
-	} EXCEPT {
-		phys_pop();
-		RETHROW();
+	RAII_FINALLY { phys_pop(); };
+	for (;;) {
+		size_t avail;
+		avail = PAGESIZE - ((uintptr_t)map & PAGEMASK);
+		if (avail > num_bytes)
+			avail = num_bytes;
+		memcpy(dst, map, avail);
+		if (avail >= num_bytes)
+			break;
+		dst = (byte_t *)dst + avail;
+		src += avail;
+		num_bytes -= avail;
+		map = phys_loadpage(src);
 	}
-	phys_pop();
 }
 
 PUBLIC void KCALL
@@ -483,25 +478,20 @@ copytophys(PHYS physaddr_t dst,
 	        "copytophys(dst: %" PRIpN(__SIZEOF_PHYSADDR_T__) ", src: %p, %" PRIuSIZ "): "
 	        "`src' buffer cannot be apart of the caller's trampoline",
 	        dst, src, num_bytes);
-	UNNESTED_TRY {
-		for (;;) {
-			size_t avail;
-			avail = PAGESIZE - ((uintptr_t)map & PAGEMASK);
-			if (avail > num_bytes)
-				avail = num_bytes;
-			memcpy(map, src, avail);
-			if (avail >= num_bytes)
-				break;
-			dst += avail;
-			src = (byte_t *)src + avail;
-			num_bytes -= avail;
-			map = phys_loadpage(dst);
-		}
-	} EXCEPT {
-		phys_pop();
-		RETHROW();
+	RAII_FINALLY { phys_pop(); };
+	for (;;) {
+		size_t avail;
+		avail = PAGESIZE - ((uintptr_t)map & PAGEMASK);
+		if (avail > num_bytes)
+			avail = num_bytes;
+		memcpy(map, src, avail);
+		if (avail >= num_bytes)
+			break;
+		dst += avail;
+		src = (byte_t *)src + avail;
+		num_bytes -= avail;
+		map = phys_loadpage(dst);
 	}
-	phys_pop();
 }
 
 PUBLIC NOBLOCK void
@@ -718,13 +708,8 @@ copyfromphys_onepage(USER CHECKED void *dst,
 	        "copyfromphys_onepage(dst: %p, src: %" PRIpN(__SIZEOF_PHYSADDR_T__) ", %" PRIuSIZ "): "
 	        "`dst' buffer cannot be apart of the caller's trampoline",
 	        dst, src, num_bytes);
-	UNNESTED_TRY {
-		memcpy(dst, map, num_bytes);
-	} EXCEPT {
-		phys_pop();
-		RETHROW();
-	}
-	phys_pop();
+	RAII_FINALLY { phys_pop(); };
+	memcpy(dst, map, num_bytes);
 }
 
 PUBLIC void KCALL
@@ -744,13 +729,8 @@ copytophys_onepage(PHYS physaddr_t dst,
 	        "copytophys_onepage(dst: %" PRIpN(__SIZEOF_PHYSADDR_T__) ", src: %p, %" PRIuSIZ "): "
 	        "`src' buffer cannot be apart of the caller's trampoline",
 	        dst, src, num_bytes);
-	UNNESTED_TRY {
-		memcpy(map, src, num_bytes);
-	} EXCEPT {
-		phys_pop();
-		RETHROW();
-	}
-	phys_pop();
+	RAII_FINALLY { phys_pop(); };
+	memcpy(map, src, num_bytes);
 }
 
 PUBLIC NOBLOCK void
@@ -871,13 +851,8 @@ copypagefromphys(USER CHECKED void *dst,
 	        "copypagefromphys(dst: %p, src: %" PRIpN(__SIZEOF_PHYSADDR_T__) "): "
 	        "`dst' buffer cannot be apart of the caller's trampoline",
 	        dst, src);
-	UNNESTED_TRY {
-		memcpy(dst, map, PAGESIZE);
-	} EXCEPT {
-		phys_pop();
-		RETHROW();
-	}
-	phys_pop();
+	RAII_FINALLY { phys_pop(); };
+	memcpy(dst, map, PAGESIZE);
 }
 
 PUBLIC void KCALL
@@ -896,13 +871,8 @@ copypagetophys(PAGEDIR_PAGEALIGNED PHYS physaddr_t dst,
 	        "copypagetophys(dst: %" PRIpN(__SIZEOF_PHYSADDR_T__) ", src: %p): "
 	        "`src' buffer cannot be apart of the caller's trampoline",
 	        dst, src);
-	UNNESTED_TRY {
-		memcpy(map, src, PAGESIZE);
-	} EXCEPT {
-		phys_pop();
-		RETHROW();
-	}
-	phys_pop();
+	RAII_FINALLY { phys_pop(); };
+	memcpy(map, src, PAGESIZE);
 }
 
 PUBLIC void KCALL
@@ -925,21 +895,16 @@ copypagesfromphys(USER CHECKED void *dst,
 	        "copypagesfromphys(dst: %p, src: %" PRIpN(__SIZEOF_PHYSADDR_T__) ", %" PRIuSIZ "): "
 	        "`dst' buffer cannot be apart of the caller's trampoline",
 	        dst, src, num_bytes);
-	UNNESTED_TRY {
-		for (;;) {
-			memcpy(dst, map, PAGESIZE);
-			num_bytes -= PAGESIZE;
-			if (!num_bytes)
-				break;
-			dst = (byte_t *)dst + PAGESIZE;
-			src += PAGESIZE;
-			map = phys_loadpage(src);
-		}
-	} EXCEPT {
-		phys_pop();
-		RETHROW();
+	RAII_FINALLY { phys_pop(); };
+	for (;;) {
+		memcpy(dst, map, PAGESIZE);
+		num_bytes -= PAGESIZE;
+		if (!num_bytes)
+			break;
+		dst = (byte_t *)dst + PAGESIZE;
+		src += PAGESIZE;
+		map = phys_loadpage(src);
 	}
-	phys_pop();
 }
 
 PUBLIC void KCALL
@@ -962,21 +927,16 @@ copypagestophys(PAGEDIR_PAGEALIGNED PHYS physaddr_t dst,
 	        "copypagestophys(dst: %" PRIpN(__SIZEOF_PHYSADDR_T__) ", src: %p, %" PRIuSIZ "): "
 	        "`src' buffer cannot be apart of the caller's trampoline",
 	        dst, src, num_bytes);
-	UNNESTED_TRY {
-		for (;;) {
-			memcpy(map, src, PAGESIZE);
-			num_bytes -= PAGESIZE;
-			if (!num_bytes)
-				break;
-			src = (byte_t const *)src + PAGESIZE;
-			dst += PAGESIZE;
-			map = phys_loadpage(dst);
-		}
-	} EXCEPT {
-		phys_pop();
-		RETHROW();
+	RAII_FINALLY { phys_pop(); };
+	for (;;) {
+		memcpy(map, src, PAGESIZE);
+		num_bytes -= PAGESIZE;
+		if (!num_bytes)
+			break;
+		src = (byte_t const *)src + PAGESIZE;
+		dst += PAGESIZE;
+		map = phys_loadpage(dst);
 	}
-	phys_pop();
 }
 
 PUBLIC NOBLOCK void

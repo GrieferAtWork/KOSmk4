@@ -994,37 +994,28 @@ fdirnode_rename_in_path(struct path *oldpath, struct path *newpath,
 		/* Special case: we may need to shift around path caches. */
 		char *newname_copy         = NULL;
 		char const *orig_info_name = info->frn_name;
-		TRY {
-			if (!ADDR_ISKERN(orig_info_name)) {
-				/* Prevent problems relating to user-space changing backing memory. */
-				newname_copy = (char *)kmalloc((info->frn_namelen + 1) * sizeof(char), GFP_NORMAL);
-				*(char *)mempcpy(newname_copy, orig_info_name, info->frn_namelen, sizeof(char)) = '\0';
-				info->frn_name = newname_copy;
-				info->frn_hash = fdirent_hash(newname_copy, info->frn_namelen);
-			} else if (info->frn_hash == FLOOKUP_INFO_HASH_UNSET) {
-				info->frn_hash = fdirent_hash(info->frn_name, info->frn_namelen);
-			}
-			if (info->frn_flags & AT_RENAME_EXCHANGE) {
-				/* do cache transformations for: exchange path */
-				incref(info->frn_oldent);
-				TRY {
-					status = fdirnode_exchange_paths(oldpath, newpath, info);
-				} EXCEPT {
-					decref_unlikely(info->frn_oldent);
-					RETHROW();
-				}
-				decref_unlikely(info->frn_oldent);
-			} else {
-				/* do cache transformations for: replace path */
-				status = fdirnode_replace_paths(oldpath, newpath, info);
-			}
-		} EXCEPT {
+		RAII_FINALLY {
 			info->frn_name = orig_info_name;
 			kfree(newname_copy);
-			RETHROW();
+		};
+		if (!ADDR_ISKERN(orig_info_name)) {
+			/* Prevent problems relating to user-space changing backing memory. */
+			newname_copy = (char *)kmalloc((info->frn_namelen + 1) * sizeof(char), GFP_NORMAL);
+			*(char *)mempcpy(newname_copy, orig_info_name, info->frn_namelen, sizeof(char)) = '\0';
+			info->frn_name = newname_copy;
+			info->frn_hash = fdirent_hash(newname_copy, info->frn_namelen);
+		} else if (info->frn_hash == FLOOKUP_INFO_HASH_UNSET) {
+			info->frn_hash = fdirent_hash(info->frn_name, info->frn_namelen);
 		}
-		info->frn_name = orig_info_name;
-		kfree(newname_copy);
+		if (info->frn_flags & AT_RENAME_EXCHANGE) {
+			/* do cache transformations for: exchange path */
+			incref(info->frn_oldent);
+			FINALLY_DECREF_UNLIKELY(info->frn_oldent);
+			status = fdirnode_exchange_paths(oldpath, newpath, info);
+		} else {
+			/* do cache transformations for: replace path */
+			status = fdirnode_replace_paths(oldpath, newpath, info);
+		}
 	} else {
 		/* Invoke the FS-level rename operation */
 		status = (REF struct path *)(uintptr_t)fdirnode_rename(newpath->p_dir, info);

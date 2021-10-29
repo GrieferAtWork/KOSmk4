@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf08dce07 */
+/* HASH CRC-32:0xb434357b */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1285,7 +1285,6 @@ NOTHROW(LIBDCALL libd_strerrorname_np)(errno_t errnum) {
 #endif /* !__KERNEL__ */
 INTERN ATTR_SECTION(".text.crt.errno") ATTR_CONST WUNUSED char const *
 NOTHROW(LIBCCALL libc_strerrorname_np)(errno_t errnum) {
-
 /*[[[deemon
 import * from deemon;
 @@Mapping for id -> (kosName, comment)

@@ -1370,38 +1370,28 @@ kmalloc_leaks_gather(void) {
 	gc_find_reachable();
 
 	result = NULL;
-#ifdef CONFIG_USE_SLAB_ALLOCATORS
-	TRY
-#endif /* CONFIG_USE_SLAB_ALLOCATORS */
-	{
-#ifdef CONFIG_USE_SLAB_ALLOCATORS
-		/* Gather memory leaks from slabs.
-		 * NOTE: This right here may cause new memory to be allocated. */
-		gc_gather_unreachable_slabs(&result);
-#endif /* CONFIG_USE_SLAB_ALLOCATORS */
-
-		/* Gather leaks from trace nodes. */
-		/* Because of how removing nodes  from an RB-tree works, the  act
-		 * of removing a node may cause the tree structure to be altered,
-		 * such that  we'll be  unable to  hit all  (potentially  leaked)
-		 * nodes during a single pass. As such, we must keep on  scanning
-		 * the tree until  it's become  empty (unlikely) or  until we  no
-		 * longer find any more leaks. */
-		while (nodes && gc_gather_unreachable_nodes(nodes, &result))
-			;
-	}
-#ifdef CONFIG_USE_SLAB_ALLOCATORS
-	EXCEPT {
-		gc_slab_reset_reach();
-		RETHROW();
-	}
-#endif /* CONFIG_USE_SLAB_ALLOCATORS */
 
 	/* Clear the  is-reachable bits  from all  of
 	 * the different slabs that could be reached. */
 #ifdef CONFIG_USE_SLAB_ALLOCATORS
-	gc_slab_reset_reach();
+	RAII_FINALLY { gc_slab_reset_reach(); };
 #endif /* CONFIG_USE_SLAB_ALLOCATORS */
+
+#ifdef CONFIG_USE_SLAB_ALLOCATORS
+	/* Gather memory leaks from slabs.
+	 * NOTE: This right here may cause new memory to be allocated. */
+	gc_gather_unreachable_slabs(&result);
+#endif /* CONFIG_USE_SLAB_ALLOCATORS */
+
+	/* Gather leaks from trace nodes. */
+	/* Because of how removing nodes  from an RB-tree works, the  act
+	 * of removing a node may cause the tree structure to be altered,
+	 * such that  we'll be  unable to  hit all  (potentially  leaked)
+	 * nodes during a single pass. As such, we must keep on  scanning
+	 * the tree until  it's become  empty (unlikely) or  until we  no
+	 * longer find any more leaks. */
+	while (nodes && gc_gather_unreachable_nodes(nodes, &result))
+		;
 
 	return result;
 }
@@ -1789,16 +1779,8 @@ kmalloc_leaks(void) THROWS(E_WOULDBLOCK) {
 	size_t result;
 	kmalloc_leak_t leaks;
 	leaks = kmalloc_leaks_collect();
-	TRY {
-		kmalloc_leaks_print(leaks,
-		                    &syslog_printer,
-		                    SYSLOG_LEVEL_RAW,
-		                    &result);
-	} EXCEPT {
-		kmalloc_leaks_discard(leaks);
-		RETHROW();
-	}
-	kmalloc_leaks_discard(leaks);
+	RAII_FINALLY { kmalloc_leaks_discard(leaks); };
+	kmalloc_leaks_print(leaks, &syslog_printer, SYSLOG_LEVEL_RAW, &result);
 	return result;
 }
 

@@ -326,56 +326,40 @@ libda_disasm_print_symbol(struct disassembler *__restrict self,
 				di_addr2line_sections_t dbg_sect;
 				di_addr2line_dl_sections_t dl_sect;
 				REF module_t *symbol_module;
+				uintptr_t loadaddr;
+				uintptr_t symbol_offset;
 				symbol_module = module_fromaddr_nx(symbol_addr);
 				if (!symbol_module)
 					goto generic_print_symbol_addr;
-				TRY {
-					if (debug_addr2line_sections_lock(symbol_module, &dbg_sect, &dl_sect) !=
-					    DEBUG_INFO_ERROR_SUCCESS) {
-						module_decref_unlikely(symbol_module);
-						goto generic_print_symbol_addr;
-					}
-					TRY {
-						uintptr_t loadaddr;
-						uintptr_t symbol_offset;
-						loadaddr = module_getloadaddr(symbol_module);
-						if (debug_addr2line(&dbg_sect, &a2l_info,
-						                    (uintptr_t)symbol_addr - loadaddr,
-						                    DEBUG_ADDR2LINE_LEVEL_SOURCE,
-						                    DEBUG_ADDR2LINE_FNORMAL) != DEBUG_INFO_ERROR_SUCCESS) {
-							module_decref_unlikely(symbol_module);
-							debug_addr2line_sections_unlock(&dl_sect);
-							goto generic_print_symbol_addr;
-						}
-						if (!a2l_info.al_rawname)
-							a2l_info.al_rawname = a2l_info.al_name;
-						if (a2l_info.al_rawname && !*a2l_info.al_rawname)
-							a2l_info.al_rawname = NULL;
-						disasm_print(self, "<", 1);
-						if (a2l_info.al_rawname) {
-							disasm_printf(self, "%s", a2l_info.al_rawname);
-						} else {
-							/* If we can't determine the symbol's name, generate one using its address. */
-							disasm_printf(self, "sym_%.*p",
-							              address_width(self->d_target),
-							              a2l_info.al_symstart + loadaddr);
-						}
-						/* Include the symbol offset (if non-zero) */
-						symbol_offset = (uintptr_t)((byte_t *)symbol_addr -
-						                            (byte_t *)(a2l_info.al_symstart + loadaddr));
-						if (symbol_offset != 0)
-							disasm_printf(self, "+%#" PRIxPTR, symbol_offset);
-						disasm_print(self, ">", 1);
-					} EXCEPT {
-						debug_addr2line_sections_unlock(&dl_sect);
-						RETHROW();
-					}
-					debug_addr2line_sections_unlock(&dl_sect);
-				} EXCEPT {
-					module_decref_unlikely(symbol_module);
-					RETHROW();
+				RAII_FINALLY { module_decref_unlikely(symbol_module); };
+				if (debug_addr2line_sections_lock(symbol_module, &dbg_sect, &dl_sect) != DEBUG_INFO_ERROR_SUCCESS)
+					goto generic_print_symbol_addr;
+				RAII_FINALLY { debug_addr2line_sections_unlock(&dl_sect); };
+				loadaddr = module_getloadaddr(symbol_module);
+				if (debug_addr2line(&dbg_sect, &a2l_info,
+				                    (uintptr_t)symbol_addr - loadaddr,
+				                    DEBUG_ADDR2LINE_LEVEL_SOURCE,
+				                    DEBUG_ADDR2LINE_FNORMAL) != DEBUG_INFO_ERROR_SUCCESS)
+					goto generic_print_symbol_addr;
+				if (!a2l_info.al_rawname)
+					a2l_info.al_rawname = a2l_info.al_name;
+				if (a2l_info.al_rawname && !*a2l_info.al_rawname)
+					a2l_info.al_rawname = NULL;
+				disasm_print(self, "<", 1);
+				if (a2l_info.al_rawname) {
+					disasm_printf(self, "%s", a2l_info.al_rawname);
+				} else {
+					/* If we can't determine the symbol's name, generate one using its address. */
+					disasm_printf(self, "sym_%.*p",
+					              address_width(self->d_target),
+					              a2l_info.al_symstart + loadaddr);
 				}
-				module_decref_unlikely(symbol_module);
+				/* Include the symbol offset (if non-zero) */
+				symbol_offset = (uintptr_t)((byte_t *)symbol_addr -
+				                            (byte_t *)(a2l_info.al_symstart + loadaddr));
+				if (symbol_offset != 0)
+					disasm_printf(self, "+%#" PRIxPTR, symbol_offset);
+				disasm_print(self, ">", 1);
 			} else
 generic_print_symbol_addr:
 #endif /* CONFIG_LOOKUP_SYMBOL_NAME */

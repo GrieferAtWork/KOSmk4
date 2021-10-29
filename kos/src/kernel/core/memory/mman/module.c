@@ -631,59 +631,53 @@ unwind_userspace_with_section(struct module *__restrict mod, void const *absolut
 	unsigned int result;
 	REF struct mman *oldmm;
 	REF struct mman *newmm = mod->md_mman;
+	unwind_fde_t fde;
 	if (!tryincref(newmm))
 		return UNWIND_NO_FRAME;
 	/* Must switch VM to the one of `mod' in order to get user-space memory
 	 * into the expected  state for  the unwind  handler to  do its  thing. */
-	oldmm = task_xchmman(newmm);
-	TRY {
-		unwind_fde_t fde;
-		/* NOTE: We  use the  user-space's mapping  of the  .eh_frame section here,
-		 *       since `.eh_frame' often uses  pointer encodings that are  relative
-		 *       to the .eh_frame-section itself, meaning that in order to properly
-		 *       decode the contained  information, its mapping  must be placed  at
-		 *       the correct location.
-		 * Another alternative to fixing this would be to add a load-offset argument
-		 * to `dwarf_decode_pointer()', as well as recursively all of the  eh_frame-
-		 * related functions that somehow make use  of it, where this argument  then
-		 * describes the offset from the .eh_frame that was loaded, towards the  one
-		 * that would actually exist for user-space.
-		 * However the added complexity isn't worth it for this one special  case,
-		 * and since we already have to switch VM to the user-space's one in order
-		 * to restore registers that were spilled onto the stack, we might as well
-		 * also  make use of  the actual `.eh_frame' section  (assuming that it is
-		 * where it should be) */
-		fde.f_tbase = module_get_tbase(mod);
-		fde.f_dbase = module_get_dbase(mod);
-		if (is_debug_frame) {
-			result = unwind_fde_scan_df(eh_frame_data,
-			                            eh_frame_data + eh_frame_size,
-			                            absolute_pc, &fde,
-			                            module_sizeof_pointer(mod));
-		} else {
-			result = unwind_fde_scan(eh_frame_data,
-			                         eh_frame_data + eh_frame_size,
-			                         absolute_pc, &fde,
-			                         module_sizeof_pointer(mod));
-		}
-		if (result == UNWIND_SUCCESS) {
-			/* Found the FDE. - Now to execute it's program! */
-			unwind_cfa_state_t cfa;
-			result = unwind_fde_exec(&fde, &cfa, absolute_pc);
-			if unlikely(result == UNWIND_SUCCESS) {
-				/* And finally: Apply register modifications. */
-				result = unwind_cfa_apply(&cfa, &fde, absolute_pc,
-				                          reg_getter, reg_getter_arg,
-				                          reg_setter, reg_setter_arg);
-			}
-		}
-	} EXCEPT {
-		task_setmman_inherit(oldmm);
-		decref_unlikely(newmm);
-		RETHROW();
+	oldmm = task_xchmman_inherit(newmm);
+	RAII_FINALLY { task_setmman_inherit(oldmm); };
+
+	/* NOTE: We  use the  user-space's mapping  of the  .eh_frame section here,
+	 *       since `.eh_frame' often uses  pointer encodings that are  relative
+	 *       to the .eh_frame-section itself, meaning that in order to properly
+	 *       decode the contained  information, its mapping  must be placed  at
+	 *       the correct location.
+	 * Another alternative to fixing this would be to add a load-offset argument
+	 * to `dwarf_decode_pointer()', as well as recursively all of the  eh_frame-
+	 * related functions that somehow make use  of it, where this argument  then
+	 * describes the offset from the .eh_frame that was loaded, towards the  one
+	 * that would actually exist for user-space.
+	 * However the added complexity isn't worth it for this one special  case,
+	 * and since we already have to switch VM to the user-space's one in order
+	 * to restore registers that were spilled onto the stack, we might as well
+	 * also  make use of  the actual `.eh_frame' section  (assuming that it is
+	 * where it should be) */
+	fde.f_tbase = module_get_tbase(mod);
+	fde.f_dbase = module_get_dbase(mod);
+	if (is_debug_frame) {
+		result = unwind_fde_scan_df(eh_frame_data,
+		                            eh_frame_data + eh_frame_size,
+		                            absolute_pc, &fde,
+		                            module_sizeof_pointer(mod));
+	} else {
+		result = unwind_fde_scan(eh_frame_data,
+		                         eh_frame_data + eh_frame_size,
+		                         absolute_pc, &fde,
+		                         module_sizeof_pointer(mod));
 	}
-	task_setmman_inherit(oldmm);
-	decref_unlikely(newmm);
+	if (result == UNWIND_SUCCESS) {
+		/* Found the FDE. - Now to execute it's program! */
+		unwind_cfa_state_t cfa;
+		result = unwind_fde_exec(&fde, &cfa, absolute_pc);
+		if unlikely(result == UNWIND_SUCCESS) {
+			/* And finally: Apply register modifications. */
+			result = unwind_cfa_apply(&cfa, &fde, absolute_pc,
+			                          reg_getter, reg_getter_arg,
+			                          reg_setter, reg_setter_arg);
+		}
+	}
 	return result;
 }
 

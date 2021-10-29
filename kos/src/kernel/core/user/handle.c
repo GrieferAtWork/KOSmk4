@@ -2230,57 +2230,37 @@ handle_fcntl(struct handle_manager *__restrict self,
 	struct handle temp;
 	switch (cmd) {
 
-	case F_DUPFD:
+	case F_DUPFD: {
 		temp = handle_lookupin(fd, self);
-		TRY {
-			temp.h_mode &= ~(IO_CLOEXEC | IO_CLOFORK);
-			result = handle_install(self, temp);
-		} EXCEPT {
-			decref_unlikely(temp);
-			RETHROW();
-		}
-		decref_unlikely(temp);
-		break;
+		RAII_FINALLY { decref_unlikely(temp); };
+		temp.h_mode &= ~(IO_CLOEXEC | IO_CLOFORK);
+		result = handle_install(self, temp);
+	}	break;
 
-	case F_DUPFD_CLOEXEC:
+	case F_DUPFD_CLOEXEC: {
 		temp = handle_lookupin(fd, self);
-		TRY {
-			temp.h_mode &= ~(IO_CLOEXEC | IO_CLOFORK);
-			temp.h_mode |= IO_CLOEXEC;
-			result = handle_install(self, temp);
-		} EXCEPT {
-			decref_unlikely(temp);
-			RETHROW();
-		}
-		decref_unlikely(temp);
-		break;
+		RAII_FINALLY { decref_unlikely(temp); };
+		temp.h_mode &= ~(IO_CLOEXEC | IO_CLOFORK);
+		temp.h_mode |= IO_CLOEXEC;
+		result = handle_install(self, temp);
+	}	break;
 
-	case F_DUP2FD:
+	case F_DUP2FD: {
 		result = (syscall_ulong_t)arg;
 		temp   = handle_lookupin(fd, self);
-		TRY {
-			temp.h_mode &= ~(IO_CLOEXEC | IO_CLOFORK);
-			handle_installinto_sym((unsigned int)result, temp);
-		} EXCEPT {
-			decref_unlikely(temp);
-			RETHROW();
-		}
-		decref_unlikely(temp);
-		break;
+		RAII_FINALLY { decref_unlikely(temp); };
+		temp.h_mode &= ~(IO_CLOEXEC | IO_CLOFORK);
+		handle_installinto_sym((unsigned int)result, temp);
+	}	break;
 
-	case F_DUP2FD_CLOEXEC:
+	case F_DUP2FD_CLOEXEC: {
 		result = (syscall_ulong_t)arg;
 		temp   = handle_lookupin(fd, self);
-		TRY {
-			temp.h_mode &= ~(IO_CLOEXEC | IO_CLOFORK);
-			temp.h_mode |= IO_CLOEXEC;
-			handle_installinto_sym((unsigned int)result, temp);
-		} EXCEPT {
-			decref_unlikely(temp);
-			RETHROW();
-		}
-		decref_unlikely(temp);
-		break;
+		RAII_FINALLY { decref_unlikely(temp); };
+		temp.h_mode &= ~(IO_CLOEXEC | IO_CLOFORK);
+		temp.h_mode |= IO_CLOEXEC;
+		handle_installinto_sym((unsigned int)result, temp);
+	}	break;
 
 	case F_GETFD: {
 		struct handle *p;
@@ -2361,84 +2341,74 @@ handle_fcntl(struct handle_manager *__restrict self,
 	//TODO:case F_GETLEASE:
 	//TODO:case F_NOTIFY:
 
-	case F_SETPIPE_SZ:
+	case F_SETPIPE_SZ: {
+		struct ringbuffer *rb;
+		size_t newsize;
 		temp = handle_lookupin(fd, self);
-		TRY {
-			struct ringbuffer *rb;
-			size_t newsize;
-			if (temp.h_type == HANDLE_TYPE_PIPE_READER ||
-			    temp.h_type == HANDLE_TYPE_PIPE_WRITER) {
-				struct pipe_reader *me;
-				me = (struct pipe_reader *)temp.h_data;
-				rb = &me->pr_pipe->p_buffer;
-			} else if (temp.h_type == HANDLE_TYPE_PIPE) {
-				struct pipe *me;
-				me = (struct pipe *)temp.h_data;
-				rb = &me->p_buffer;
-			} else if (temp.h_type == HANDLE_TYPE_FIFOHANDLE) {
-				struct fifohandle *me;
-				me = (struct fifohandle *)temp.h_data;
+		RAII_FINALLY { decref_unlikely(temp); };
+		if (temp.h_type == HANDLE_TYPE_PIPE_READER ||
+		    temp.h_type == HANDLE_TYPE_PIPE_WRITER) {
+			struct pipe_reader *me;
+			me = (struct pipe_reader *)temp.h_data;
+			rb = &me->pr_pipe->p_buffer;
+		} else if (temp.h_type == HANDLE_TYPE_PIPE) {
+			struct pipe *me;
+			me = (struct pipe *)temp.h_data;
+			rb = &me->p_buffer;
+		} else if (temp.h_type == HANDLE_TYPE_FIFOHANDLE) {
+			struct fifohandle *me;
+			me = (struct fifohandle *)temp.h_data;
 #ifdef CONFIG_USE_NEW_FS
-				rb = &me->fu_fifo->ff_buffer;
+			rb = &me->fu_fifo->ff_buffer;
 #else /* CONFIG_USE_NEW_FS */
-				rb = &me->fu_fifo->f_fifo.ff_buffer;
+			rb = &me->fu_fifo->f_fifo.ff_buffer;
 #endif /* !CONFIG_USE_NEW_FS */
-			} else {
-				THROW(E_INVALID_HANDLE_FILETYPE, fd,
-				      HANDLE_TYPE_PIPE, temp.h_type,
-				      HANDLE_TYPEKIND_GENERIC,
-				      handle_typekind(&temp));
-			}
-			newsize = (size_t)arg;
-			if unlikely(newsize < 1) {
-				/* Linux requires PAGESIZE here... */
-				THROW(E_INVALID_ARGUMENT_BAD_VALUE,
-				      E_INVALID_ARGUMENT_CONTEXT_BAD_PIPE_BUFFER_SIZE,
-				      newsize);
-			}
-			ringbuffer_set_pipe_limit(rb, newsize);
-		} EXCEPT {
-			decref_unlikely(temp);
-			RETHROW();
+		} else {
+			THROW(E_INVALID_HANDLE_FILETYPE, fd,
+			      HANDLE_TYPE_PIPE, temp.h_type,
+			      HANDLE_TYPEKIND_GENERIC,
+			      handle_typekind(&temp));
 		}
-		decref_unlikely(temp);
+		newsize = (size_t)arg;
+		if unlikely(newsize < 1) {
+			/* Linux requires PAGESIZE here... */
+			THROW(E_INVALID_ARGUMENT_BAD_VALUE,
+			      E_INVALID_ARGUMENT_CONTEXT_BAD_PIPE_BUFFER_SIZE,
+			      newsize);
+		}
+		ringbuffer_set_pipe_limit(rb, newsize);
 		result = 0;
-		break;
+	}	break;
 
-	case F_GETPIPE_SZ:
+	case F_GETPIPE_SZ: {
+		struct ringbuffer *rb;
 		temp = handle_lookupin(fd, self);
-		TRY {
-			struct ringbuffer *rb;
-			if (temp.h_type == HANDLE_TYPE_PIPE_READER ||
-			    temp.h_type == HANDLE_TYPE_PIPE_WRITER) {
-				struct pipe_reader *me;
-				me = (struct pipe_reader *)temp.h_data;
-				rb = &me->pr_pipe->p_buffer;
-			} else if (temp.h_type == HANDLE_TYPE_PIPE) {
-				struct pipe *me;
-				me = (struct pipe *)temp.h_data;
-				rb = &me->p_buffer;
-			} else if (temp.h_type == HANDLE_TYPE_FIFOHANDLE) {
-				struct fifohandle *me;
-				me = (struct fifohandle *)temp.h_data;
+		RAII_FINALLY { decref_unlikely(temp); };
+		if (temp.h_type == HANDLE_TYPE_PIPE_READER ||
+		    temp.h_type == HANDLE_TYPE_PIPE_WRITER) {
+			struct pipe_reader *me;
+			me = (struct pipe_reader *)temp.h_data;
+			rb = &me->pr_pipe->p_buffer;
+		} else if (temp.h_type == HANDLE_TYPE_PIPE) {
+			struct pipe *me;
+			me = (struct pipe *)temp.h_data;
+			rb = &me->p_buffer;
+		} else if (temp.h_type == HANDLE_TYPE_FIFOHANDLE) {
+			struct fifohandle *me;
+			me = (struct fifohandle *)temp.h_data;
 #ifdef CONFIG_USE_NEW_FS
-				rb = &me->fu_fifo->ff_buffer;
+			rb = &me->fu_fifo->ff_buffer;
 #else /* CONFIG_USE_NEW_FS */
-				rb = &me->fu_fifo->f_fifo.ff_buffer;
+			rb = &me->fu_fifo->f_fifo.ff_buffer;
 #endif /* !CONFIG_USE_NEW_FS */
-			} else {
-				THROW(E_INVALID_HANDLE_FILETYPE, fd,
-				      HANDLE_TYPE_PIDNS, temp.h_type,
-				      HANDLE_TYPEKIND_GENERIC,
-				      handle_typekind(&temp));
-			}
-			result = ATOMIC_READ(rb->rb_limit);
-		} EXCEPT {
-			decref_unlikely(temp);
-			RETHROW();
+		} else {
+			THROW(E_INVALID_HANDLE_FILETYPE, fd,
+			      HANDLE_TYPE_PIDNS, temp.h_type,
+			      HANDLE_TYPEKIND_GENERIC,
+			      handle_typekind(&temp));
 		}
-		decref_unlikely(temp);
-		break;
+		result = ATOMIC_READ(rb->rb_limit);
+	}	break;
 
 	case F_NEXT:
 		/* Find the first valid FD >= the given one. */

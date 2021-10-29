@@ -76,13 +76,9 @@ mfile_dosyncio(struct mfile *__restrict self,
 	} EXCEPT {
 		aio_multihandle_fail(&hand);
 	}
-	TRY {
-		aio_multihandle_generic_waitfor(&hand);
-		aio_multihandle_generic_checkerror(&hand);
-	} EXCEPT {
-		aio_multihandle_generic_fini(&hand);
-		RETHROW();
-	}
+	RAII_FINALLY { aio_multihandle_generic_fini(&hand); };
+	aio_multihandle_generic_waitfor(&hand);
+	aio_multihandle_generic_checkerror(&hand);
 }
 
 

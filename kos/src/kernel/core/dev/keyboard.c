@@ -359,7 +359,7 @@ sync_leds(struct kbddev *__restrict self)
 		newled = (oldled & ~KEYMOD_LEDMASK) | (curmod & KEYMOD_LEDMASK);
 		if (oldled == newled)
 			break;
-		if (!sync_trywrite(&self->kd_leds_lock))
+		if (!kbddev_leds_tryacquire(self))
 			break; /* Some other thread must already be syncing LEDs, or
 			        * is  deliberately  setting some  custom  LED values */
 		COMPILER_READ_BARRIER();
@@ -371,7 +371,7 @@ sync_leds(struct kbddev *__restrict self)
 				TRY {
 					(*ops->ko_setleds)(self, newled);
 				} EXCEPT {
-					sync_endwrite(&self->kd_leds_lock);
+					kbddev_leds_release(self);
 					if (!was_thrown(E_IOERROR))
 						RETHROW();
 					error_printf("syncing keyboard leds");
@@ -379,10 +379,10 @@ sync_leds(struct kbddev *__restrict self)
 				}
 			}
 			self->kd_leds = newled;
-			sync_endwrite(&self->kd_leds_lock);
+			kbddev_leds_release(self);
 			break;
 		}
-		sync_endwrite(&self->kd_leds_lock);
+		kbddev_leds_release(self);
 	}
 }
 
@@ -1124,21 +1124,16 @@ kbddev_v_ioctl(struct chrdev *__restrict self,
 		COMPILER_READ_BARRIER();
 		new_mods = *(u32 const *)arg;
 		COMPILER_READ_BARRIER();
-		sync_write(&me->kd_leds_lock);
+		kbddev_leds_acquire(me);
+		RAII_FINALLY { kbddev_leds_release(me); };
 		if (me->kd_leds != new_mods) {
 			struct kbddev_ops const *ops;
 			ops = kbddev_getops(me);
 			if (ops->ko_setleds) {
-				TRY {
-					(*ops->ko_setleds)(me, new_mods);
-				} EXCEPT {
-					sync_endwrite(&me->kd_leds_lock);
-					RETHROW();
-				}
+				(*ops->ko_setleds)(me, new_mods);
 			}
 			me->kd_leds = new_mods;
 		}
-		sync_endwrite(&me->kd_leds_lock);
 	}	break;
 
 	case KBDIO_MASKLED: {
@@ -1152,23 +1147,20 @@ kbddev_v_ioctl(struct chrdev *__restrict self,
 		led_flag = ATOMIC_READ(data->lm_flag);
 		led_fxor = ATOMIC_READ(data->lm_fxor);
 		COMPILER_READ_BARRIER();
-		sync_write(&me->kd_leds_lock);
-		old_leds = me->kd_leds;
-		new_mods = ((old_leds & led_mask) | led_flag) ^ led_fxor;
-		if (old_leds != new_mods) {
-			struct kbddev_ops const *ops;
-			ops = kbddev_getops(me);
-			if (ops->ko_setleds) {
-				TRY {
+		{
+			kbddev_leds_acquire(me);
+			RAII_FINALLY { kbddev_leds_release(me); };
+			old_leds = me->kd_leds;
+			new_mods = ((old_leds & led_mask) | led_flag) ^ led_fxor;
+			if (old_leds != new_mods) {
+				struct kbddev_ops const *ops;
+				ops = kbddev_getops(me);
+				if (ops->ko_setleds) {
 					(*ops->ko_setleds)(me, new_mods);
-				} EXCEPT {
-					sync_endwrite(&me->kd_leds_lock);
-					RETHROW();
 				}
+				me->kd_leds = new_mods;
 			}
-			me->kd_leds = new_mods;
 		}
-		sync_endwrite(&me->kd_leds_lock);
 		COMPILER_WRITE_BARRIER();
 		data->lm_oldled = old_leds;
 		data->lm_newled = new_mods;
@@ -1433,22 +1425,16 @@ continue_copy_keymap:
 		if unlikely(new_leds & ~((K_SCROLLLOCK | K_NUMLOCK | K_CAPSLOCK) << 8))
 			THROW(E_INVALID_ARGUMENT_BAD_VALUE,
 			      E_INVALID_ARGUMENT_CONTEXT_GENERIC, new_leds >> 8);
-		sync_write(&me->kd_leds_lock);
+		kbddev_leds_acquire(me);
+		RAII_FINALLY { kbddev_leds_release(me); };
 		new_leds |= me->kd_leds & ~((K_SCROLLLOCK | K_NUMLOCK | K_CAPSLOCK) << 8);
 		if (me->kd_leds != new_leds) {
 			struct kbddev_ops const *ops;
 			ops = kbddev_getops(me);
-			if (ops->ko_setleds) {
-				TRY {
-					(*ops->ko_setleds)(me, new_leds);
-				} EXCEPT {
-					sync_endwrite(&me->kd_leds_lock);
-					RETHROW();
-				}
-			}
+			if (ops->ko_setleds != NULL)
+				(*ops->ko_setleds)(me, new_leds);
 			me->kd_leds = new_leds;
 		}
-		sync_endwrite(&me->kd_leds_lock);
 	}	break;
 
 	case KDGKBTYPE:
@@ -1583,7 +1569,7 @@ NOTHROW(KCALL kbddev_init)(struct kbddev *__restrict self,
 	self->kd_flags |= KEYBOARD_DEVICE_FLAG_DBGF12;
 #endif /* !CONFIG_NO_DEBUGGER && KEYBOARD_DEVICE_FLAG_DBGF12 */
 	keymap_init_en_US(&self->kd_map);
-	mutex_cinit(&self->kd_leds_lock);
+	shared_lock_cinit(&self->kd_leds_lock);
 	atomic_rwlock_cinit(&self->kd_map_lock);
 }
 

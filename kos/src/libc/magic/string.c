@@ -1862,7 +1862,6 @@ impl: {
 }
 })]]
 char const *strerrorname_np($errno_t errnum) {
-@@pp_if defined(__KOS__) || defined(__linux__)@@
 /*[[[deemon
 import * from deemon;
 @@Mapping for id -> (kosName, comment)

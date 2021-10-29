@@ -318,14 +318,9 @@ again:
 do_blocking_connect:
 		aio_handle_generic_init(&aio);
 		(*self->sk_ops->so_connect)(self, addr, addr_len, &aio);
-		TRY {
-			aio_handle_generic_waitfor(&aio);
-			aio_handle_generic_checkerror(&aio);
-		} EXCEPT {
-			aio_handle_generic_fini(&aio);
-			RETHROW();
-		}
-		aio_handle_generic_fini(&aio);
+		RAII_FINALLY { aio_handle_generic_fini(&aio); };
+		aio_handle_generic_waitfor(&aio);
+		aio_handle_generic_checkerror(&aio);
 	}
 	return SOCKET_CONNECT_COMPLETED;
 }
@@ -676,21 +671,15 @@ connect_and_send_work(struct async *__restrict self) {
 	aio_handle_generic_init(&me->cas_aio);
 	TRY {
 		REF struct mman *oldmm;
-		oldmm = task_xchmman(me->cas_bufmm);
-		decref_nokill(me->cas_bufmm);
+		oldmm = task_xchmman_inherit(me->cas_bufmm);
+		RAII_FINALLY { task_setmman_inherit(oldmm); };
 		me->cas_bufmm = NULL;
-		TRY {
-			(*me->cas_socket->sk_ops->so_sendv)(me->cas_socket,
-			                                    &me->cas_buffer,
-			                                    me->cas_bufsize,
-			                                    me->cas_pcontrol,
-			                                    me->cas_msgflags,
-			                                    &me->cas_aio);
-		} EXCEPT {
-			task_setmman_inherit(oldmm);
-			RETHROW();
-		}
-		task_setmman_inherit(oldmm);
+		(*me->cas_socket->sk_ops->so_sendv)(me->cas_socket,
+		                                    &me->cas_buffer,
+		                                    me->cas_bufsize,
+		                                    me->cas_pcontrol,
+		                                    me->cas_msgflags,
+		                                    &me->cas_aio);
 	} EXCEPT {
 		aio_handle_init_noop(&me->cas_aio, AIO_COMPLETION_FAILURE);
 		decref_unlikely(me->cas_socket);
@@ -987,74 +976,69 @@ socket_recvfrom_peer(struct socket *__restrict self,
 	struct sockaddr *peer_have = (struct sockaddr *)&_peer_have;
 	socklen_t peer_want_len, peer_have_len;
 	peer_want_len = sizeof(_peer_want);
-	TRY {
-again_get_wanted_peer_name:
-		peer_want_len = socket_getpeername(self, peer_want, peer_want_len);
-		if unlikely(peer_want_len > sizeof(_peer_want)) {
-			/* Need even more memory... */
-			if (peer_want == (struct sockaddr *)&_peer_want)
-				peer_want = NULL;
-			if (peer_have == (struct sockaddr *)&_peer_have)
-				peer_have = NULL;
-			peer_want = (struct sockaddr *)krealloc(peer_want, peer_want_len, GFP_NORMAL);
-			peer_have = (struct sockaddr *)krealloc(peer_have, peer_want_len, GFP_NORMAL);
-			goto again_get_wanted_peer_name;
-		}
-		/* Now to actually implement the call! */
-again_receive:
-		if (buf->iv_entc == 1 && self->sk_ops->so_recvfrom) {
-			assert(bufsize == buf->iv_head.ive_size);
-			assert(bufsize == buf->iv_last);
-			assert(bufsize == buf->iv_entv[0].ive_size);
-			assert(buf->iv_head.ive_base == buf->iv_entv[0].ive_base);
-			/* Prefer the simplified normal receive buffer. */
-			result = (*self->sk_ops->so_recvfrom)(self,
-			                                      buf->iv_head.ive_base,
-			                                      bufsize,
-			                                      peer_have,
-			                                      peer_want_len,
-			                                      &peer_have_len,
-			                                      presult_flags,
-			                                      msg_control,
-			                                      msg_flags,
-			                                      abs_timeout);
-		} else {
-			assertf(self->sk_ops->so_recvfromv,
-			        "At least one of `so_recvv' or `so_recvfromv' "
-			        "has to be implemented by every socket type");
-			/* Vectored receive buffer. */
-			result = (*self->sk_ops->so_recvfromv)(self,
-			                                       buf,
-			                                       bufsize,
-			                                       peer_have,
-			                                       peer_want_len,
-			                                       &peer_have_len,
-			                                       presult_flags,
-			                                       msg_control,
-			                                       msg_flags,
-			                                       abs_timeout);
-		}
-		/* Skip the address-match check if the socket implementation indicates EOF
-		 * Although technically, EOF shouldn't  be possible for a  connection-less
-		 * socket like the one we seem to be dealing with here... */
-		if (result != 0) {
-			/* Check if the peer addresses match. */
-			if (peer_have_len != peer_want_len)
-				goto again_receive;
-			if (memcmp(peer_have, peer_want, peer_want_len) != 0)
-				goto again_receive;
-		}
-	} EXCEPT {
+	RAII_FINALLY {
 		if (peer_want != (struct sockaddr *)&_peer_want)
 			kfree(peer_want);
 		if (peer_have != (struct sockaddr *)&_peer_have)
 			kfree(peer_have);
-		RETHROW();
+	};
+again_get_wanted_peer_name:
+	peer_want_len = socket_getpeername(self, peer_want, peer_want_len);
+	if unlikely(peer_want_len > sizeof(_peer_want)) {
+		/* Need even more memory... */
+		if (peer_want == (struct sockaddr *)&_peer_want)
+			peer_want = NULL;
+		if (peer_have == (struct sockaddr *)&_peer_have)
+			peer_have = NULL;
+		peer_want = (struct sockaddr *)krealloc(peer_want, peer_want_len, GFP_NORMAL);
+		peer_have = (struct sockaddr *)krealloc(peer_have, peer_want_len, GFP_NORMAL);
+		goto again_get_wanted_peer_name;
 	}
-	if (peer_want != (struct sockaddr *)&_peer_want)
-		kfree(peer_want);
-	if (peer_have != (struct sockaddr *)&_peer_have)
-		kfree(peer_have);
+
+	/* Now to actually implement the call! */
+again_receive:
+	if (buf->iv_entc == 1 && self->sk_ops->so_recvfrom) {
+		assert(bufsize == buf->iv_head.ive_size);
+		assert(bufsize == buf->iv_last);
+		assert(bufsize == buf->iv_entv[0].ive_size);
+		assert(buf->iv_head.ive_base == buf->iv_entv[0].ive_base);
+		/* Prefer the simplified normal receive buffer. */
+		result = (*self->sk_ops->so_recvfrom)(self,
+		                                      buf->iv_head.ive_base,
+		                                      bufsize,
+		                                      peer_have,
+		                                      peer_want_len,
+		                                      &peer_have_len,
+		                                      presult_flags,
+		                                      msg_control,
+		                                      msg_flags,
+		                                      abs_timeout);
+	} else {
+		assertf(self->sk_ops->so_recvfromv,
+		        "At least one of `so_recvv' or `so_recvfromv' "
+		        "has to be implemented by every socket type");
+		/* Vectored receive buffer. */
+		result = (*self->sk_ops->so_recvfromv)(self,
+		                                       buf,
+		                                       bufsize,
+		                                       peer_have,
+		                                       peer_want_len,
+		                                       &peer_have_len,
+		                                       presult_flags,
+		                                       msg_control,
+		                                       msg_flags,
+		                                       abs_timeout);
+	}
+	/* Skip the address-match check if the socket implementation indicates EOF
+	 * Although technically, EOF shouldn't  be possible for a  connection-less
+	 * socket like the one we seem to be dealing with here... */
+	if (result != 0) {
+		/* Check if the peer addresses match. */
+		if (peer_have_len != peer_want_len)
+			goto again_receive;
+		if (memcmp(peer_have, peer_want, peer_want_len) != 0)
+			goto again_receive;
+	}
 	return result;
 }
 
