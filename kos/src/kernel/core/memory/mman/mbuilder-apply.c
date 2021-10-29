@@ -434,11 +434,10 @@ again:
 		 * TLB (since it may still contain entries relevant to  the
 		 * old state of user-space)
 		 *
-		 * Since we're only talking user-space here, it's enough to
-		 * sync  it alone (as  opposed to ding `pagedir_syncall()') */
+		 * Since we're only talking user-space here, it's enough  to
+		 * sync _it_ alone (as opposed to doing `pagedir_syncall()') */
 		pagedir_syncall_user();
 	}
-
 
 	/* Do the actual job of applying the new node-tree, as
 	 * well as clearing the  mman's page directory of  all
