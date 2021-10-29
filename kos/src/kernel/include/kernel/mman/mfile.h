@@ -1000,9 +1000,12 @@ DEFINE_REFCOUNT_FUNCTIONS(struct mfile, mf_refcnt, mfile_destroy)
 #define mfile_isanon(self) ((self)->mf_parts == MFILE_PARTS_ANONYMOUS)
 
 /* Floor- or ceil-align a given `addr' such that it may describe the start/end of a mem-part. */
-#define mfile_addr_flooralign(self, addr) (pos_t)((uint64_t)(addr) & ~(self)->mf_part_amask)
-#define mfile_addr_ceilalign(self, addr)  (pos_t)(((uint64_t)(addr) + (self)->mf_part_amask) & ~(self)->mf_part_amask)
+#define mfile_addr_flooralign(self, addr) (pos_t)((uint64_t)(addr) & ~(uint64_t)(self)->mf_part_amask)
+#define mfile_addr_ceilalign(self, addr)  (pos_t)(((uint64_t)(addr) + (self)->mf_part_amask) & ~(uint64_t)(self)->mf_part_amask)
 #define mfile_addr_aligned(self, addr)    (((uint64_t)(addr) & (self)->mf_part_amask) == 0)
+#define mfile_size_flooralign(self, size) ((size) & ~(self)->mf_part_amask)
+#define mfile_size_ceilalign(self, size)  (((size) + (self)->mf_part_amask) & ~(self)->mf_part_amask)
+#define mfile_size_aligned(self, size)    (((size) & (self)->mf_part_amask) == 0)
 
 /* Reap lock operations of `self' */
 #define _mfile_lockops_reap(self)    _oblockop_reap_atomic_rwlock(&(self)->mf_lockops, &(self)->mf_lock, self)

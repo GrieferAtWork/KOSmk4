@@ -696,7 +696,7 @@ handle_mfile_stat(struct mfile *__restrict self,
 	st_size = (pos_t)atomic64_read(&self->mf_filesize);
 	if (mfile_isanon(self))
 		st_size = 0;
-	st_blksize = (blksize_t)(self->mf_part_amask + 1);
+	st_blksize = (blksize_t)self->mf_part_amask + 1;
 
 	memcpy(&st_atimespec, &self->mf_atime, sizeof(struct timespec));
 	memcpy(&st_mtimespec, &self->mf_mtime, sizeof(struct timespec));

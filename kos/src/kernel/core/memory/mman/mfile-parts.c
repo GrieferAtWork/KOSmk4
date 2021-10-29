@@ -335,7 +335,7 @@ makeanon:
 	{
 		pos_t filsiz = (pos_t)atomic64_read(&self->mf_filesize);
 		if (!OVERFLOW_UADD(filsiz, self->mf_part_amask, &filsiz)) {
-			filsiz &= ~self->mf_part_amask;
+			filsiz &= ~(pos_t)self->mf_part_amask;
 			if likely(filsiz >= self->mf_part_amask) {
 				if unlikely(addr >= filsiz) {
 					mfile_lock_endread(self);
@@ -413,7 +413,7 @@ again_extend_part:
 			{
 				pos_t filsiz = (pos_t)atomic64_read(&self->mf_filesize);
 				if (!OVERFLOW_UADD(filsiz, self->mf_part_amask, &filsiz)) {
-					filsiz &= ~self->mf_part_amask;
+					filsiz &= ~(pos_t)self->mf_part_amask;
 					if likely(filsiz >= self->mf_part_amask) {
 						if unlikely(addr >= filsiz) {
 							mfile_lock_endwrite(self);
@@ -494,7 +494,7 @@ again_extend_part:
 		pos_t filsiz = (pos_t)atomic64_read(&self->mf_filesize);
 		if (filsiz < (loadmax + 1) || loadmax == (pos_t)-1) {
 			if (!OVERFLOW_UADD(filsiz, self->mf_part_amask, &filsiz)) {
-				filsiz &= ~self->mf_part_amask;
+				filsiz &= ~(pos_t)self->mf_part_amask;
 				--filsiz;
 				if unlikely(filsiz < loadmax)
 					goto startover;

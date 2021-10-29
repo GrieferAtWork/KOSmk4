@@ -400,7 +400,7 @@ directly_modify_file_size:
 		        "have overflowed in the same manner...");
 		goto directly_modify_file_size;
 	}
-	aligned_new_size &= ~self->mf_part_amask;
+	aligned_new_size = mfile_addr_flooralign(self, aligned_new_size);
 
 	if (OVERFLOW_UADD(old_size, self->mf_part_amask, &aligned_old_size)) {
 		/* In this case, we're guarantied that `aligned_old_size' would differ  from
@@ -408,7 +408,7 @@ directly_modify_file_size:
 		 * if we're unable to properly calculate `aligned_old_size' (since it  can't
 		 * be represented) */
 	} else {
-		aligned_old_size &= ~self->mf_part_amask;
+		aligned_old_size = mfile_addr_flooralign(self, aligned_old_size);
 		assertf(aligned_old_size >= aligned_new_size,
 		        "But we already know that `old_size >= new_size', so how can this be?");
 
@@ -478,7 +478,7 @@ again_reacquire_after_split:
 					THROW(E_FSERROR_READONLY);
 				}
 				if (!OVERFLOW_UADD(old_size, self->mf_part_amask, &aligned_old_size)) {
-					aligned_old_size &= ~self->mf_part_amask;
+					aligned_old_size = mfile_addr_flooralign(self, aligned_old_size);
 					assert(aligned_old_size >= aligned_new_size);
 					if (aligned_old_size == aligned_new_size) {
 						decref_unlikely(mpart_merge(overlapping_part));

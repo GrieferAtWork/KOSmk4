@@ -729,7 +729,7 @@ again:
 				pos_t filesize;
 				filesize = (pos_t)atomic64_read(&file->mf_filesize);
 				if (!OVERFLOW_UADD(filesize, file->mf_part_amask, &filesize)) {
-					filesize &= ~file->mf_part_amask;
+					filesize = mfile_addr_flooralign(file, filesize);
 					/* Limit the write-back address range by the size of the file,
 					 * or do nothing if the entirety of said range lies outside of
 					 * the file's effective bounds. */

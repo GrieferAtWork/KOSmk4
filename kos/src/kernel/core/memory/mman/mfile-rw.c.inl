@@ -316,7 +316,7 @@ do_io_with_part_and_trunclock:
 		newpart_minaddr = offset;
 		newpart_maxaddr = offset + io_bytes - 1;
 		assert(newpart_maxaddr < filesize);
-		newpart_minaddr &= ~self->mf_part_amask;
+		newpart_minaddr = mfile_addr_flooralign(self, newpart_minaddr);
 		newpart_maxaddr = mfile_addr_ceilalign(self, newpart_maxaddr + 1) - 1;
 		assert(newpart_minaddr <= newpart_maxaddr);
 		assert(!mpart_tree_locate(self->mf_parts, newpart_minaddr));
@@ -516,10 +516,10 @@ handle_write_impossible_too_big:
 			goto handle_write_impossible_too_big;
 		}
 	}
-	newpart_minaddr &= ~self->mf_part_amask;
+	newpart_minaddr = mfile_addr_flooralign(self, newpart_minaddr);
 	if unlikely(OVERFLOW_UADD(newpart_maxaddr + 1, self->mf_part_amask, &newpart_maxaddr))
 		newpart_maxaddr = 0; /* Results in (pos_t)-1 after the `&=' and `-=' below */
-	newpart_maxaddr &= ~self->mf_part_amask;
+	newpart_maxaddr &= ~(pos_t)self->mf_part_amask;
 	newpart_maxaddr -= 1;
 	assert(newpart_minaddr <= newpart_maxaddr);
 
@@ -810,8 +810,7 @@ restart_after_extendpart_tail:
 
 		/* Figure out what must have been the part's original size. */
 		old_part_size = (size_t)(filesize - mpart_getminaddr(part));
-		old_part_size = old_part_size + self->mf_part_amask;
-		old_part_size = old_part_size & ~self->mf_part_amask;
+		old_part_size = mfile_size_ceilalign(self, old_part_size);
 
 		/* Figure out how much we can write to the (now extended) part. */
 		io_bytes = (size_t)(mpart_getendaddr(part) - offset);

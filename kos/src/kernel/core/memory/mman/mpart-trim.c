@@ -1231,7 +1231,7 @@ again_enum_nodes:
 	if (node->mn_partoff != 0 &&
 	    node->mn_partoff > self->mp_file->mf_part_amask) {
 		PAGEDIR_PAGEALIGNED mpart_reladdr_t lstrip;
-		lstrip = node->mn_partoff & ~self->mp_file->mf_part_amask;
+		lstrip = node->mn_partoff & ~(mpart_reladdr_t)self->mp_file->mf_part_amask;
 		assert(lstrip);
 		mpart_lstrip(self, lstrip);
 		assert(node->mn_partoff <= self->mp_file->mf_part_amask);
@@ -1306,8 +1306,8 @@ again_check_next_inside_current:
 		if (node_endaddr < next_basaddr) {
 			/* Align addresses by the mandatory file alignment. */
 			node_endaddr += self->mp_file->mf_part_amask;
-			node_endaddr &= ~self->mp_file->mf_part_amask;
-			next_basaddr &= ~self->mp_file->mf_part_amask;
+			node_endaddr &= ~(mpart_reladdr_t)self->mp_file->mf_part_amask;
+			next_basaddr &= ~(mpart_reladdr_t)self->mp_file->mf_part_amask;
 			if (node_endaddr < next_basaddr) {
 				/* Split the mem-part at the start of the  hole.
 				 * Once this succeeds, we'll loop back around to
@@ -1334,8 +1334,8 @@ again_check_next_inside_current:
 		assert(node_endaddr <= part_endaddr);
 		assert((part_endaddr & self->mp_file->mf_part_amask) == 0);
 		if (node_endaddr < part_endaddr) {
-			node_endaddr += self->mp_file->mf_part_amask;
-			node_endaddr &= ~self->mp_file->mf_part_amask;
+			node_endaddr += (mpart_reladdr_t)self->mp_file->mf_part_amask;
+			node_endaddr &= ~(mpart_reladdr_t)self->mp_file->mf_part_amask;
 			assert(node_endaddr <= part_endaddr);
 			if (node_endaddr < part_endaddr) {
 				/* rstrip() the last `part_endaddr - node_endaddr' bytes of `self' */

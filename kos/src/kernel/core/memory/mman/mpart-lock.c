@@ -888,7 +888,8 @@ mpart_load_or_unlock(struct mpart *__restrict self,
 			if (!mfile_isanon(file)) {
 				pos_t filesize = (pos_t)atomic64_read(&file->mf_filesize);
 				if (!OVERFLOW_UADD(filesize, file->mf_part_amask, &filesize)) {
-					filesize &= ~file->mf_part_amask;
+					filesize = mfile_addr_flooralign(file, filesize);
+
 					/* NOTE: The file size may increase in the mean time, but that's actually
 					 *       ok: We're currently holding exclusive locks to all of the blocks
 					 *       that  we're going to initialize next (s.a. MPART_BLOCK_ST_INIT).
