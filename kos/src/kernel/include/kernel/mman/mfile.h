@@ -95,9 +95,9 @@ typedef unsigned int poll_mode_t; /* Set of `POLL*' */
  * - MFILE_F_FIXEDFILESIZE:
  *    - mfile_truncate()   (throws: E_INVALID_ARGUMENT_CONTEXT_FIXED_LENGTH_FILE)
  *    - mfile_tailread()   (for offsets >= mf_filesize: blocks forever)
- *    - mfile_tailwrite()  (THROW(E_FSERROR_DISK_FULL))
+ *    - mfile_tailwrite()  (THROW(E_FSERROR_FILE_TOO_BIG))
  *    - mfile_read()       (for offsets >= mf_filesize: returns `0')
- *    - mfile_write()      (for offsets >= mf_filesize: THROW(E_FSERROR_DISK_FULL))
+ *    - mfile_write()      (for offsets >= mf_filesize: THROW(E_FSERROR_FILE_TOO_BIG))
  *    - Combine with `mf_filesize = 0' to disable all conventional file  access.
  *      If this is done, note that you can still override the file's size-value,
  *      as returned by `stat(2)' by implementing `mf_ops->mo_stream->mso_stat'!
@@ -688,7 +688,7 @@ struct mfile {
 	                                              * NOTE: When `mfile_isnode(self)', then this field can never grow larger
 	                                              *       than    `mfile_asnode(self)->fn_super->fs_feat.sf_filesize_max'!
 	                                              * Attempting to expand the size beyond this boundary must result in an
-	                                              * `E_FSERROR_DISK_FULL' exceptions being thrown. */
+	                                              * `E_FSERROR_FILE_TOO_BIG' exceptions being thrown. */
 #if (defined(__WANT_MFILE__mf_lop) || defined(__WANT_MFILE__mf_plop) ||             \
      defined(__WANT_MFILE__mf_mflop) || defined(__WANT_MFILE__mf_mplop) ||          \
      defined(__WANT_MFILE__mf_fsuperlop) || defined(__WANT_MFILE__mf_fsuperplop) || \
@@ -1262,7 +1262,7 @@ mfile_insert_and_merge_part_and_unlock(struct mfile *__restrict self,
  *       In  this case, return the # of bytes that could still be written before
  *       the limit is reached, but if this would end up being `0' bytes (because
  *       the initial file-offset was already `> sf_filesize_max'), then an error
- *       `E_FSERROR_DISK_FULL' is thrown instead. */
+ *       `E_FSERROR_FILE_TOO_BIG' is thrown instead. */
 #ifdef CONFIG_USE_NEW_FS
 FUNDEF WUNUSED NONNULL((1)) size_t KCALL mfile_read(struct mfile *__restrict self, USER CHECKED void *dst, size_t num_bytes, pos_t src_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
 FUNDEF WUNUSED NONNULL((1)) size_t KCALL mfile_read_p(struct mfile *__restrict self, physaddr_t dst, size_t num_bytes, pos_t src_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, ...);

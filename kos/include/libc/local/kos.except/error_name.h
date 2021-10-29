@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4aceb74 */
+/* HASH CRC-32:0x8ffe1ae3 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -153,7 +153,7 @@ __non_linear_prefix:
 	switch(__err_class) {
 
 	case 0x0080: {
-		static char const __e_0080h_linear_0000h_001ah[] =
+		static char const __e_0080h_linear_0000h_001bh[] =
 		"E_FSERROR\0E_FSERROR_DELETED\0E_FSERROR_FILE_NOT_FOUND\0E_FSERROR_P"
 		"ATH_NOT_FOUND\0E_FSERROR_ILLEGAL_PATH\0E_FSERROR_NOT_A_DIRECTORY\0E"
 		"_FSERROR_TOO_MANY_SYMBOLIC_LINKS\0E_FSERROR_ACCESS_DENIED\0E_FSERR"
@@ -165,11 +165,11 @@ __non_linear_prefix:
 		"CE\0E_FSERROR_WRONG_FILE_SYSTEM\0E_FSERROR_UNKNOWN_FILE_SYSTEM\0E_F"
 		"SERROR_CORRUPTED_FILE_SYSTEM\0E_FSERROR_DEVICE_ALREADY_MOUNTED\0E_"
 		"FSERROR_PATH_ALREADY_MOUNTED\0E_FSERROR_NOT_A_MOUNTING_POINT\0E_FS"
-		"ERROR_IS_A_MOUNTING_POINT";
+		"ERROR_IS_A_MOUNTING_POINT\0E_FSERROR_FILE_TOO_BIG";
 		static char const __e_0080h_linear_0100h_0100h[] =
 		"E_FSERROR_UNSUPPORTED_OPERATION";
-		if (__err_subclass <= 0x001a) {
-			__result = __e_0080h_linear_0000h_001ah;
+		if (__err_subclass <= 0x001b) {
+			__result = __e_0080h_linear_0000h_001bh;
 			__subclass_offset = __err_subclass;
 		} else if (__err_subclass >= 0x0100 && __err_subclass <= 0x0100) {
 			__result = __e_0080h_linear_0100h_0100h;
@@ -279,7 +279,7 @@ __non_linear_prefix:
 	switch(__err_class) {
 
 	case 0x0080: {
-		static char const __e_0080h_linear_0000h_001ah[] =
+		static char const __e_0080h_linear_0000h_001bh[] =
 		"E_FSERROR\0E_FSERROR_DELETED\0E_FSERROR_FILE_NOT_FOUND\0E_FSERROR_P"
 		"ATH_NOT_FOUND\0E_FSERROR_ILLEGAL_PATH\0E_FSERROR_NOT_A_DIRECTORY\0E"
 		"_FSERROR_TOO_MANY_SYMBOLIC_LINKS\0E_FSERROR_ACCESS_DENIED\0E_FSERR"
@@ -291,11 +291,11 @@ __non_linear_prefix:
 		"CE\0E_FSERROR_WRONG_FILE_SYSTEM\0E_FSERROR_UNKNOWN_FILE_SYSTEM\0E_F"
 		"SERROR_CORRUPTED_FILE_SYSTEM\0E_FSERROR_DEVICE_ALREADY_MOUNTED\0E_"
 		"FSERROR_PATH_ALREADY_MOUNTED\0E_FSERROR_NOT_A_MOUNTING_POINT\0E_FS"
-		"ERROR_IS_A_MOUNTING_POINT";
+		"ERROR_IS_A_MOUNTING_POINT\0E_FSERROR_FILE_TOO_BIG";
 		static char const __e_0080h_linear_0100h_0100h[] =
 		"E_FSERROR_UNSUPPORTED_OPERATION";
-		if (__err_subclass <= 0x001a) {
-			__result = __e_0080h_linear_0000h_001ah;
+		if (__err_subclass <= 0x001b) {
+			__result = __e_0080h_linear_0000h_001bh;
 			__subclass_offset = __err_subclass;
 		} else if (__err_subclass >= 0x0100 && __err_subclass <= 0x0100) {
 			__result = __e_0080h_linear_0100h_0100h;

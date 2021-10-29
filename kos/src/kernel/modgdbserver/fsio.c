@@ -547,7 +547,7 @@ NOTHROW(KCALL GDBFs_Readlink)(char *filename, char *buf,
 		FINALLY_DECREF_UNLIKELY(lnk);
 		/* Check that the named INode is actually a symbolic link. */
 		if unlikely(!fnode_islnk(lnk))
-			return GDB_ENOENT; /* THROW(E_FSERROR_NOT_A_SYMBOLIC_LINK, E_FILESYSTEM_NOT_A_SYMBOLIC_LINK_READLINK); */
+			return GDB_ENOENT; /* THROW(E_FSERROR_NOT_A_SYMBOLIC_LINK); */
 		/* Read the contents of the symbolic link. */
 		avail = *pbuflen;
 		used  = flnknode_readlink(lnk, buf, avail);
@@ -567,7 +567,7 @@ NOTHROW(KCALL GDBFs_Readlink)(char *filename, char *buf,
 		/* Check that the named INode is actually a symbolic link. */
 		if (!INODE_ISLNK((struct inode *)lnk)) {
 			decref_unlikely(lnk);
-			/* THROW(E_FSERROR_NOT_A_SYMBOLIC_LINK, E_FILESYSTEM_NOT_A_SYMBOLIC_LINK_READLINK); */
+			/* THROW(E_FSERROR_NOT_A_SYMBOLIC_LINK); */
 			return GDB_ENOENT;
 		}
 		{

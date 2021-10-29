@@ -571,15 +571,8 @@
 #endif /* !E_FSERROR_IS_A_DIRECTORY */
 #ifndef E_FSERROR_NOT_A_SYMBOLIC_LINK
 #define E_FSERROR_NOT_A_SYMBOLIC_LINK             (E_FSERROR, 0x000c) /* [errno(ENOENT), msg("Expected a symbolic link")]
-                                                                       * [fld(action_context: uintptr_t, "The context in which a filesystem component was required to be a\n"
-                                                                       *                                 "symlink, but was one (One of `E_FILESYSTEM_NOT_A_SYMBOLIC_LINK_*')")]
                                                                        * A symbolic link was expected when something else was found */
 #endif /* !E_FSERROR_NOT_A_SYMBOLIC_LINK */
-/*[[[end]]]*/
-#ifndef E_FILESYSTEM_NOT_A_SYMBOLIC_LINK_READLINK
-#define E_FILESYSTEM_NOT_A_SYMBOLIC_LINK_READLINK 0x0002 /* Thrown as the result of using `readlink(path)', where `path' isn't a symbolic link */
-#endif /* !E_FILESYSTEM_NOT_A_SYMBOLIC_LINK_READLINK */
-/*[[[begin]]]*/
 #ifndef E_FSERROR_IS_A_SYMBOLIC_LINK
 #define E_FSERROR_IS_A_SYMBOLIC_LINK              (E_FSERROR, 0x000d) /* [errno(ELOOP), msg("Did not expect a symbolic link")]
                                                                        * [fld(action_context: uintptr_t, "The context in which a filesystem component was required to not be\n"
@@ -588,10 +581,10 @@
 #endif /* !E_FSERROR_IS_A_SYMBOLIC_LINK */
 /*[[[end]]]*/
 #ifndef E_FILESYSTEM_IS_A_SYMBOLIC_LINK_OPEN
-#define E_FILESYSTEM_IS_A_SYMBOLIC_LINK_OPEN 0x0001 /* Thrown as the result of `open(path,O_NOFOLLOW)', where `path' refers to a symbolic link */
+#define E_FILESYSTEM_IS_A_SYMBOLIC_LINK_OPEN 1 /* Thrown as the result of `open(path, O_NOFOLLOW)', where `path' refers to a symbolic link */
 #endif /* !E_FILESYSTEM_IS_A_SYMBOLIC_LINK_OPEN */
 #ifndef E_FILESYSTEM_IS_A_SYMBOLIC_LINK_EXEC
-#define E_FILESYSTEM_IS_A_SYMBOLIC_LINK_EXEC 0x0002 /* Thrown as the result of `exec(path,AT_SYMLINK_NOFOLLOW)', where `path' refers to a symbolic link */
+#define E_FILESYSTEM_IS_A_SYMBOLIC_LINK_EXEC 2 /* Thrown as the result of `exec(path, AT_SYMLINK_NOFOLLOW)', where `path' refers to a symbolic link */
 #endif /* !E_FILESYSTEM_IS_A_SYMBOLIC_LINK_EXEC */
 /*[[[begin]]]*/
 #ifndef E_FSERROR_FILE_ALREADY_EXISTS
@@ -646,6 +639,10 @@
 #define E_FSERROR_IS_A_MOUNTING_POINT             (E_FSERROR, 0x001a) /* [errno(ENOTDIR), msg("Path is a mounting point")]
                                                                        * Attempted to rmdir() or rename() a mounting point */
 #endif /* !E_FSERROR_IS_A_MOUNTING_POINT */
+#ifndef E_FSERROR_FILE_TOO_BIG
+#define E_FSERROR_FILE_TOO_BIG                    (E_FSERROR, 0x001b) /* [errno(EFBIG), msg("File would become too large")]
+                                                                       * Attempted to write() or truncate() a file beyond its fs-imposed limit. */
+#endif /* !E_FSERROR_FILE_TOO_BIG */
 #ifndef E_FSERROR_UNSUPPORTED_OPERATION
 #define E_FSERROR_UNSUPPORTED_OPERATION           (E_FSERROR, 0x0100) /* [msg("Unsupported filesystem operation")]
                                                                        * [errno(($operation_id == E_FILESYSTEM_OPERATION_SEEK || $operation_id == E_FILESYSTEM_OPERATION_PREAD ||

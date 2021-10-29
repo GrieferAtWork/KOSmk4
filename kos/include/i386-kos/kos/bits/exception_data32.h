@@ -230,7 +230,6 @@ struct __exception_fserror_data32 {
 #undef f_path_not_found
 #undef f_not_a_directory
 #undef f_is_a_directory
-#undef f_not_a_symbolic_link
 #undef f_is_a_symbolic_link
 #undef f_unsupported_operation
 
@@ -253,11 +252,6 @@ struct __exception_fserror_data32 {
 		} f_is_a_directory; /* E_FSERROR_IS_A_DIRECTORY */
 
 		struct {
-			__UINT32_TYPE__ /*uintptr_t*/ nasl_action_context; /* The context in which a filesystem component was required to be a
-			                                                    * symlink, but was one (One of `E_FILESYSTEM_NOT_A_SYMBOLIC_LINK_*') */
-		} f_not_a_symbolic_link; /* E_FSERROR_NOT_A_SYMBOLIC_LINK */
-
-		struct {
 			__UINT32_TYPE__ /*uintptr_t*/ iasl_action_context; /* The context in which a filesystem component was required to not be
 			                                                    * a symlink, but was one (One of `E_FILESYSTEM_IS_A_SYMBOLIC_LINK_*') */
 		} f_is_a_symbolic_link; /* E_FSERROR_IS_A_SYMBOLIC_LINK */
@@ -273,7 +267,6 @@ struct __exception_fserror_data32 {
 #define f_path_not_found        _f_classes.f_path_not_found
 #define f_not_a_directory       _f_classes.f_not_a_directory
 #define f_is_a_directory        _f_classes.f_is_a_directory
-#define f_not_a_symbolic_link   _f_classes.f_not_a_symbolic_link
 #define f_is_a_symbolic_link    _f_classes.f_is_a_symbolic_link
 #define f_unsupported_operation _f_classes.f_unsupported_operation
 #endif /* !__COMPILER_HAVE_TRANSPARENT_UNION */

@@ -242,7 +242,7 @@ again:
 #else /* defined(LOCAL_READING) && defined(LOCAL_TAILIO) */
 	size_t result = 0;
 	PAGEDIR_PAGEALIGNED pos_t newpart_minaddr;
-	PAGEDIR_PAGEALIGNED pos_t newpart_maxaddr;
+	pos_t newpart_maxaddr; /* Aligned at .+1 */
 	size_t io_bytes;
 	pos_t filesize;
 #ifdef LOCAL_TAILIO
@@ -470,14 +470,15 @@ destroy_new_part_and_try_again:
 	/* Make sure that we're allowed to alter the size of the file. */
 	if unlikely(self->mf_flags & MFILE_F_FIXEDFILESIZE) {
 		mfile_lock_endread(self);
-		THROW(E_FSERROR_DISK_FULL);
+		THROW(E_FSERROR_FILE_TOO_BIG);
 	}
 
 	/* Make sure that the file won't grow too large. */
 	if (mfile_isnode(self)) {
 		pos_t max_file_size;
 		max_file_size = mfile_asnode(self)->fn_super->fs_feat.sf_filesize_max;
-		if (offset > max_file_size) {
+		if (offset >= max_file_size) {
+handle_write_impossible_too_big:
 			/* Impossible to write anything at this point! */
 			mfile_lock_endread(self);
 
@@ -486,22 +487,40 @@ destroy_new_part_and_try_again:
 			if (result != 0)
 				return result;
 
-			/* If nothing was written, throw a disk-full exception. */
-			THROW(E_FSERROR_DISK_FULL);
+			/* If nothing was written, throw a file-too-big exception. */
+			THROW(E_FSERROR_FILE_TOO_BIG);
 		}
 
 		/* Don't writ more than what can fit within the fs-specific disk limits. */
 		max_file_size -= offset;
-		if (num_bytes > (size_t)max_file_size)
+		assert(max_file_size != 0);
+		if ((pos_t)num_bytes > max_file_size)
 			num_bytes = (size_t)max_file_size;
+		assert(num_bytes != 0);
 	}
-
 
 	/* Figure out the address range of the missing part. */
 	newpart_minaddr = offset;
-	newpart_maxaddr = offset + num_bytes - 1;
+	if unlikely(OVERFLOW_UADD(offset, num_bytes - 1, &newpart_maxaddr)) {
+		/* Even without a filesystem-specific limit, there is still a
+		 * hard-limit  to how large a file can grow, which is imposed
+		 * by the # of bits that fit into `pos_t'.
+		 *
+		 * If the last address which the caller wants to write would
+		 * overflow, then clamp the allowed I/O range to what can be
+		 * represented. */
+		newpart_maxaddr = (pos_t)-1;
+		num_bytes       = (size_t)(((pos_t)-1) - offset);
+		if unlikely(num_bytes == 0) {
+			/* This can happen when `offset == (pos_t)-1' */
+			goto handle_write_impossible_too_big;
+		}
+	}
 	newpart_minaddr &= ~self->mf_part_amask;
-	newpart_maxaddr = mfile_addr_ceilalign(self, newpart_maxaddr + 1) - 1;
+	if unlikely(OVERFLOW_UADD(newpart_maxaddr + 1, self->mf_part_amask, &newpart_maxaddr))
+		newpart_maxaddr = 0; /* Results in (pos_t)-1 after the `&=' and `-=' below */
+	newpart_maxaddr &= ~self->mf_part_amask;
+	newpart_maxaddr -= 1;
 	assert(newpart_minaddr <= newpart_maxaddr);
 
 	/* Because the max-valid end address  of the last allocated  mem-part

@@ -559,6 +559,11 @@ for (local name: classes.keys.sorted()) {
 			result = ENOTDIR;
 			break;
 @@pp_endif@@
+@@pp_if defined(EFBIG)@@
+		case @ERROR_SUBCLASS@(@ERROR_CODEOF@(@E_FSERROR_FILE_TOO_BIG@)):
+			result = EFBIG;
+			break;
+@@pp_endif@@
 @@pp_if defined(ESPIPE) && defined(EINVAL) && defined(ENOTDIR) && defined(ENODEV) && defined(EROFS) && defined(EPERM)@@
 		case @ERROR_SUBCLASS@(@ERROR_CODEOF@(@E_FSERROR_UNSUPPORTED_OPERATION@)):
 			result = (self->@e_args@.@e_fserror@.@f_unsupported_operation@.@uo_operation_id@ == @E_FILESYSTEM_OPERATION_SEEK@ || self->@e_args@.@e_fserror@.@f_unsupported_operation@.@uo_operation_id@ == @E_FILESYSTEM_OPERATION_PREAD@ ||
@@ -1146,7 +1151,7 @@ non_linear_prefix:
 	switch(err_class) {
 
 	case 0x0080: {
-		static char const e_0080h_linear_0000h_001ah[] =
+		static char const e_0080h_linear_0000h_001bh[] =
 		"E_FSERROR\0E_FSERROR_DELETED\0E_FSERROR_FILE_NOT_FOUND\0E_FSERROR_P"
 		"ATH_NOT_FOUND\0E_FSERROR_ILLEGAL_PATH\0E_FSERROR_NOT_A_DIRECTORY\0E"
 		"_FSERROR_TOO_MANY_SYMBOLIC_LINKS\0E_FSERROR_ACCESS_DENIED\0E_FSERR"
@@ -1158,11 +1163,11 @@ non_linear_prefix:
 		"CE\0E_FSERROR_WRONG_FILE_SYSTEM\0E_FSERROR_UNKNOWN_FILE_SYSTEM\0E_F"
 		"SERROR_CORRUPTED_FILE_SYSTEM\0E_FSERROR_DEVICE_ALREADY_MOUNTED\0E_"
 		"FSERROR_PATH_ALREADY_MOUNTED\0E_FSERROR_NOT_A_MOUNTING_POINT\0E_FS"
-		"ERROR_IS_A_MOUNTING_POINT";
+		"ERROR_IS_A_MOUNTING_POINT\0E_FSERROR_FILE_TOO_BIG";
 		static char const e_0080h_linear_0100h_0100h[] =
 		"E_FSERROR_UNSUPPORTED_OPERATION";
-		if (err_subclass <= 0x001a) {
-			result = e_0080h_linear_0000h_001ah;
+		if (err_subclass <= 0x001b) {
+			result = e_0080h_linear_0000h_001bh;
 			subclass_offset = err_subclass;
 		} else if (err_subclass >= 0x0100 && err_subclass <= 0x0100) {
 			result = e_0080h_linear_0100h_0100h;
@@ -1272,7 +1277,7 @@ non_linear_prefix:
 	switch(err_class) {
 
 	case 0x0080: {
-		static char const e_0080h_linear_0000h_001ah[] =
+		static char const e_0080h_linear_0000h_001bh[] =
 		"E_FSERROR\0E_FSERROR_DELETED\0E_FSERROR_FILE_NOT_FOUND\0E_FSERROR_P"
 		"ATH_NOT_FOUND\0E_FSERROR_ILLEGAL_PATH\0E_FSERROR_NOT_A_DIRECTORY\0E"
 		"_FSERROR_TOO_MANY_SYMBOLIC_LINKS\0E_FSERROR_ACCESS_DENIED\0E_FSERR"
@@ -1284,11 +1289,11 @@ non_linear_prefix:
 		"CE\0E_FSERROR_WRONG_FILE_SYSTEM\0E_FSERROR_UNKNOWN_FILE_SYSTEM\0E_F"
 		"SERROR_CORRUPTED_FILE_SYSTEM\0E_FSERROR_DEVICE_ALREADY_MOUNTED\0E_"
 		"FSERROR_PATH_ALREADY_MOUNTED\0E_FSERROR_NOT_A_MOUNTING_POINT\0E_FS"
-		"ERROR_IS_A_MOUNTING_POINT";
+		"ERROR_IS_A_MOUNTING_POINT\0E_FSERROR_FILE_TOO_BIG";
 		static char const e_0080h_linear_0100h_0100h[] =
 		"E_FSERROR_UNSUPPORTED_OPERATION";
-		if (err_subclass <= 0x001a) {
-			result = e_0080h_linear_0000h_001ah;
+		if (err_subclass <= 0x001b) {
+			result = e_0080h_linear_0000h_001bh;
 			subclass_offset = err_subclass;
 		} else if (err_subclass >= 0x0100 && err_subclass <= 0x0100) {
 			result = e_0080h_linear_0100h_0100h;

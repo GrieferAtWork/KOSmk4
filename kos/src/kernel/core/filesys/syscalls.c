@@ -2071,8 +2071,7 @@ sys_freadlinkat_impl(fd_t dirfd, USER UNCHECKED char const *filename,
 		FINALLY_DECREF_UNLIKELY(node);
 		fnode_access(node, R_OK);
 		if (!fnode_islnk(node)) {
-			THROW(E_FSERROR_NOT_A_SYMBOLIC_LINK,
-			      E_FILESYSTEM_NOT_A_SYMBOLIC_LINK_READLINK);
+			THROW(E_FSERROR_NOT_A_SYMBOLIC_LINK);
 		}
 		/* Read the contents of the symbolic link. */
 		result = flnknode_readlink(fnode_aslnk(node), buf, buflen);

@@ -239,12 +239,12 @@ mfile_ensure_no_ST_INIT_for_parts_above_or_unlock_and_decref(struct mfile *__res
  * though  a  call `mfile_write(self, "", 1, new_size - 1)'  was made,
  * only that no actual write to the file is performed.
  *
- * @throw: E_FSERROR_READONLY:  The `MFILE_F_FIXEDFILESIZE' flag was set.
- * @throw: E_FSERROR_DISK_FULL: `new_size' is greater than the fs-specific limit. */
+ * @throw: E_FSERROR_READONLY:     The `MFILE_F_FIXEDFILESIZE' flag was set.
+ * @throw: E_FSERROR_FILE_TOO_BIG: `new_size' is greater than the fs-specific limit. */
 PUBLIC NONNULL((1)) void FCALL
 mfile_truncate(struct mfile *__restrict self, pos_t new_size)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, E_FSERROR_READONLY,
-		       E_FSERROR_DISK_FULL) {
+		       E_FSERROR_FILE_TOO_BIG) {
 	pos_t old_size;
 	pos_t aligned_old_size;
 	pos_t aligned_new_size;
@@ -303,7 +303,7 @@ handle_newsize_ge_oldsize:
 		 * trying to increase a file beyond the logical limits of the
 		 * underlying physical medium. */
 		if unlikely(new_size > node->fn_super->fs_feat.sf_filesize_max)
-			THROW(E_FSERROR_DISK_FULL);
+			THROW(E_FSERROR_FILE_TOO_BIG);
 	}
 
 	/* The complicated case: need to _reduce_ the file size:

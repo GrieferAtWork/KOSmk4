@@ -3002,8 +3002,7 @@ DEFINE_SYSCALL5(ssize_t, freadlinkat,
 		FINALLY_DECREF_UNLIKELY((struct inode *)link_node);
 		/* Check that the named INode is actually a symbolic link. */
 		if (!INODE_ISLNK((struct inode *)link_node))
-			THROW(E_FSERROR_NOT_A_SYMBOLIC_LINK,
-			      E_FILESYSTEM_NOT_A_SYMBOLIC_LINK_READLINK);
+			THROW(E_FSERROR_NOT_A_SYMBOLIC_LINK);
 		/* Read the contents of the symbolic link. */
 		result = symlink_node_readlink(link_node,
 		                               buf,
@@ -3049,8 +3048,7 @@ DEFINE_SYSCALL4(ssize_t, readlinkat,
 		FINALLY_DECREF_UNLIKELY((struct inode *)link_node);
 		/* Check that the named INode is actually a symbolic link. */
 		if (!INODE_ISLNK((struct inode *)link_node))
-			THROW(E_FSERROR_NOT_A_SYMBOLIC_LINK,
-			      E_FILESYSTEM_NOT_A_SYMBOLIC_LINK_READLINK);
+			THROW(E_FSERROR_NOT_A_SYMBOLIC_LINK);
 		/* Read the contents of the symbolic link. */
 		result = symlink_node_readlink(link_node,
 		                               buf,
@@ -3083,8 +3081,7 @@ DEFINE_SYSCALL3(ssize_t, readlink,
 		FINALLY_DECREF_UNLIKELY((struct inode *)link_node);
 		/* Check that the named INode is actually a symbolic link. */
 		if (!INODE_ISLNK((struct inode *)link_node))
-			THROW(E_FSERROR_NOT_A_SYMBOLIC_LINK,
-			      E_FILESYSTEM_NOT_A_SYMBOLIC_LINK_READLINK);
+			THROW(E_FSERROR_NOT_A_SYMBOLIC_LINK);
 		/* Read the contents of the symbolic link. */
 		result = symlink_node_readlink(link_node,
 		                               buf,

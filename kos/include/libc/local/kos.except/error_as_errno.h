@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x301e1317 */
+/* HASH CRC-32:0x2ce8aa67 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -323,6 +323,11 @@ for (local name: classes.keys.sorted()) {
 			__result = __ENOTDIR;
 			break;
 #endif /* __ENOTDIR */
+#ifdef __EFBIG
+		case ERROR_SUBCLASS(ERROR_CODEOF(E_FSERROR_FILE_TOO_BIG)):
+			__result = __EFBIG;
+			break;
+#endif /* __EFBIG */
 #if defined(__ESPIPE) && defined(__EINVAL) && defined(__ENOTDIR) && defined(__ENODEV) && defined(__EROFS) && defined(__EPERM)
 		case ERROR_SUBCLASS(ERROR_CODEOF(E_FSERROR_UNSUPPORTED_OPERATION)):
 			__result = (__self->e_args.e_fserror.f_unsupported_operation.uo_operation_id == E_FILESYSTEM_OPERATION_SEEK || __self->e_args.e_fserror.f_unsupported_operation.uo_operation_id == E_FILESYSTEM_OPERATION_PREAD ||
