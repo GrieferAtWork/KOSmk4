@@ -607,7 +607,7 @@ handle_mfile_mmap(struct mfile *__restrict self,
 			struct device *dev = mfile_asdevice(self);
 			devfs_byname_read();
 			if (dev->dv_byname_node.rb_lhs != DEVICE_BYNAME_DELETED)
-				info->hmi_fsname = incref(&dev->dv_dirent->fdd_dirent);
+				info->hmi_fsname = incref(&dev->dv_dirent->dd_dirent);
 			devfs_byname_endread();
 		}
 		if (!info->hmi_fspath)
@@ -838,7 +838,7 @@ handle_mfile_printlink(struct mfile *__restrict self,
 
 		/* Devfs device files. */
 		if (fnode_isdevice(node)) {
-			REF struct fdevfsdirent *devname;
+			REF struct devdirent *devname;
 			REF struct path *devpath;
 			struct device *dev = fnode_asdevice(node);
 			device_getname_lock_acquire(dev);
@@ -851,13 +851,13 @@ handle_mfile_printlink(struct mfile *__restrict self,
 				FINALLY_DECREF_UNLIKELY(devpath);
 				root = fs_getroot(THIS_FS);
 				FINALLY_DECREF_UNLIKELY(root);
-				return path_printent(devpath, devname->fdd_dirent.fd_name,
-				                     devname->fdd_dirent.fd_namelen, printer, arg,
+				return path_printent(devpath, devname->dd_dirent.fd_name,
+				                     devname->dd_dirent.fd_namelen, printer, arg,
 				                     AT_PATHPRINT_INCTRAIL, root);
 			}
 			return format_printf(printer, arg, "devfs:/%$s",
-			                     (size_t)devname->fdd_dirent.fd_namelen,
-			                     devname->fdd_dirent.fd_name);
+			                     (size_t)devname->dd_dirent.fd_namelen,
+			                     devname->dd_dirent.fd_name);
 		}
 	}
 	return format_printf(printer, arg,

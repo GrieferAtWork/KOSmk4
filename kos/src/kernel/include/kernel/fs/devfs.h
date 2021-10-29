@@ -65,16 +65,16 @@ struct device_ops {
 AWREF(device_awref, device);
 
 /* Directory entry descriptor for /dev/ device files */
-struct fdevfsdirent {
-	struct device_awref fdd_dev;    /* [0..1] Weak reference to associated devfs node. */
-	struct fdirent      fdd_dirent; /* Underlying directory entry. */
+struct devdirent {
+	struct device_awref dd_dev;    /* [0..1] Weak reference to associated devfs node. */
+	struct fdirent      dd_dirent; /* Underlying directory entry. */
 };
 
-/* Operators for Instances of `struct fdevfsdirent' */
-DATDEF struct fdirent_ops const fdevfsdirent_ops;
+/* Operators for Instances of `struct devdirent' */
+DATDEF struct fdirent_ops const devdirent_ops;
 
-#define fdevfsdirent_destroy(self) fdirent_destroy(&(self)->fdd_dirent)
-DEFINE_REFCOUNT_FUNCTIONS(struct fdevfsdirent, fdd_dirent.fd_refcnt, fdevfsdirent_destroy)
+#define devdirent_destroy(self) fdirent_destroy(&(self)->dd_dirent)
+DEFINE_REFCOUNT_FUNCTIONS(struct devdirent, dd_dirent.fd_refcnt, devdirent_destroy)
 
 
 
@@ -104,7 +104,7 @@ struct device
 	 * >> decref(somedev);
 	 * >> // At this point, the device will lazily unload itself. */
 	REF struct driver       *dv_driver;      /* [1..1][const] The kernel driver implementing this device. */
-	REF struct fdevfsdirent *dv_dirent;      /* [1..1][lock(:devfs_byname_lock + _MFILE_F_SMP_TSLOCK)][const_if(wasdestroyed(this))]
+	REF struct devdirent *dv_dirent;      /* [1..1][lock(:devfs_byname_lock + _MFILE_F_SMP_TSLOCK)][const_if(wasdestroyed(this))]
 	                                          * Device directory entry (including its name) */
 	RBTREE_NODE(device)      dv_byname_node; /* [lock(:devfs_byname_lock)] By-name tree of devfs devices.
 	                                          * When `.rb_lhs == DEVICE_BYNAME_DELETED', then this  entry
@@ -151,8 +151,8 @@ DATDEF struct mfile_stream_ops const device_v_stream_ops;
 
 /* Return a pointer to the name of the given devfs device node.
  * NOTE: The caller must be holding a lock to `devfs_byname_lock' or `_MFILE_F_SMP_TSLOCK'! */
-#define device_getname(self)    ((self)->dv_dirent->fdd_dirent.fd_name)
-#define device_getnamelen(self) ((self)->dv_dirent->fdd_dirent.fd_namelen)
+#define device_getname(self)    ((self)->dv_dirent->dd_dirent.fd_name)
+#define device_getnamelen(self) ((self)->dv_dirent->dd_dirent.fd_namelen)
 #define device_getdevno(self)   ((self)->_device_devnode_ dn_devno)
 
 /* Helpers for acquiring a non-blocking SMP-lock for `device_getname()' */
@@ -165,9 +165,9 @@ DATDEF struct mfile_stream_ops const device_v_stream_ops;
 #define device_getname_lock_tryacquire   mfile_tslock_tryacquire
 
 /* Return a reference to the filename of `self' */
-FUNDEF NOBLOCK ATTR_PURE ATTR_RETNONNULL WUNUSED REF struct fdevfsdirent *
+FUNDEF NOBLOCK ATTR_PURE ATTR_RETNONNULL WUNUSED REF struct devdirent *
 NOTHROW(FCALL device_getdevfsfilename)(struct device *__restrict self);
-#define device_getfilename(self) (&device_getdevfsfilename(self)->fdd_dirent)
+#define device_getfilename(self) (&device_getdevfsfilename(self)->dd_dirent)
 
 #ifndef __realtime_defined
 #define __realtime_defined
@@ -343,14 +343,14 @@ device_vregisterf(struct device *__restrict self, dev_t devno,
 
 /* Allocate a new devfs directory entry from the given format arguments.
  * The caller must still initialize:
- *  - return->fdd_dev
- *  - return->fdd_dirent.fd_ino
- *  - return->fdd_dirent.fd_type */
-FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct fdevfsdirent *FCALL
-fdevfsdirent_vnewf(char const *__restrict format, __builtin_va_list args)
+ *  - return->dd_dev
+ *  - return->dd_dirent.fd_ino
+ *  - return->dd_dirent.fd_type */
+FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct devdirent *FCALL
+devdirent_vnewf(char const *__restrict format, __builtin_va_list args)
 		THROWS(E_BADALLOC);
-FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct fdevfsdirent *VCALL
-fdevfsdirent_newf(char const *__restrict format, ...)
+FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct devdirent *VCALL
+devdirent_newf(char const *__restrict format, ...)
 		THROWS(E_BADALLOC);
 
 

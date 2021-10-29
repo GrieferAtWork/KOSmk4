@@ -1413,26 +1413,26 @@ got_identify_signal:
 		/* Assign the devno & devfs filename for the device. */
 		{
 			dev_t devno;
-			REF struct fdevfsdirent *name;
+			REF struct devdirent *name;
 			if (is_default_ide) {
 				devno = MKDEV(is_primary_bus ? 3 : 22, drive_id == ATA_DRIVE_MASTER ? 0 : 64);
-				name  = fdevfsdirent_newf("hd%c", (is_primary_bus ? 'a' : 'c') + (drive_id == ATA_DRIVE_MASTER ? 0 : 1));
+				name  = devdirent_newf("hd%c", (is_primary_bus ? 'a' : 'c') + (drive_id == ATA_DRIVE_MASTER ? 0 : 1));
 			} else {
 				devno = MKDEV(DEV_MAJOR_AUTO, 0);
-				name  = fdevfsdirent_newf("hdX"
-				                          "%" PRIxN(__SIZEOF_PORT_T__) "."
-				                          "%" PRIxN(__SIZEOF_PORT_T__) "."
-				                          "%" PRIxN(__SIZEOF_PORT_T__) "."
-				                          "%c",
-				                          ports->a_bus, ports->a_ctrl, ports->a_dma,
-				                          drive_id == ATA_DRIVE_MASTER ? 'm' : 's');
+				name  = devdirent_newf("hdX"
+				                       "%" PRIxN(__SIZEOF_PORT_T__) "."
+				                       "%" PRIxN(__SIZEOF_PORT_T__) "."
+				                       "%" PRIxN(__SIZEOF_PORT_T__) "."
+				                       "%c",
+				                       ports->a_bus, ports->a_ctrl, ports->a_dma,
+				                       drive_id == ATA_DRIVE_MASTER ? 'm' : 's');
 			}
 			/* Initialize device fields relating to devfs integration. */
 			drive->dn_devno         = devno;
 			drive->dv_dirent        = name; /* Inherit reference */
 			drive->fn_ino           = devfs_devnode_makeino(S_IFBLK, devno);
-			name->fdd_dirent.fd_ino = drive->fn_ino;
-			awref_init(&name->fdd_dev, drive);
+			name->dd_dirent.fd_ino = drive->fn_ino;
+			awref_init(&name->dd_dev, drive);
 		}
 
 		/* Register + repart the new drive. */

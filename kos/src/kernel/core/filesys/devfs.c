@@ -106,7 +106,7 @@ devfs_byname_locate(USER CHECKED char const *name, u16 namelen)
 		THROWS(E_SEGFAULT) {
 	struct device *root = devfs_byname_tree;
 	while (root) {
-		int cmp = strcmpz(root->dv_dirent->fdd_dirent.fd_name,
+		int cmp = strcmpz(root->dv_dirent->dd_dirent.fd_name,
 		                  name, namelen);
 		if (cmp > 0) {
 			root = root->dv_byname_node.rb_lhs;
@@ -126,11 +126,11 @@ devfs_byname_caselocate_in(struct device *__restrict root,
                            USER CHECKED char const *name,
                            u16 namelen)
 		THROWS(E_SEGFAULT) {
-	struct fdevfsdirent *dent;
+	struct devdirent *dent;
 again:
 	dent = root->dv_dirent;
-	if (dent->fdd_dirent.fd_namelen == namelen &&
-	    memcasecmp(dent->fdd_dirent.fd_name, name, namelen * sizeof(char)) == 0)
+	if (dent->dd_dirent.fd_namelen == namelen &&
+	    memcasecmp(dent->dd_dirent.fd_name, name, namelen * sizeof(char)) == 0)
 		return root;
 	if (root->dv_byname_node.rb_lhs) {
 		if (root->dv_byname_node.rb_rhs) {
@@ -163,27 +163,27 @@ devfs_byname_caselocate(USER CHECKED char const *name, u16 namelen)
 
 	/* [1..1] Destroy callback. */
 PRIVATE NOBLOCK NONNULL((1)) void
-NOTHROW(KCALL fdevfsdirent_v_destroy)(struct fdirent *__restrict self) {
-	struct fdevfsdirent *me;
-	me = container_of(self, struct fdevfsdirent, fdd_dirent);
+NOTHROW(KCALL devdirent_v_destroy)(struct fdirent *__restrict self) {
+	struct devdirent *me;
+	me = container_of(self, struct devdirent, dd_dirent);
 	kfree(me);
 }
 
 PRIVATE WUNUSED NONNULL((1, 2)) REF struct fnode *KCALL
-fdevfsdirent_v_opennode(struct fdirent *__restrict self,
+devdirent_v_opennode(struct fdirent *__restrict self,
                         struct fdirnode *__restrict dir) {
-	struct fdevfsdirent *me;
+	struct devdirent *me;
 	assert(dir == &devfs.fs_root);
 	(void)dir;
-	me = container_of(self, struct fdevfsdirent, fdd_dirent);
-	return (REF struct fnode *)awref_get(&me->fdd_dev);
+	me = container_of(self, struct devdirent, dd_dirent);
+	return (REF struct fnode *)awref_get(&me->dd_dev);
 }
 
 
-/* Operators for Instances of `struct fdevfsdirent' */
-PUBLIC_CONST struct fdirent_ops const fdevfsdirent_ops = {
-	.fdo_destroy  = &fdevfsdirent_v_destroy,
-	.fdo_opennode = &fdevfsdirent_v_opennode,
+/* Operators for Instances of `struct devdirent' */
+PUBLIC_CONST struct fdirent_ops const devdirent_ops = {
+	.fdo_destroy  = &devdirent_v_destroy,
+	.fdo_opennode = &devdirent_v_opennode,
 };
 
 
@@ -215,8 +215,8 @@ PUBLIC struct ffilesys devfs_filesys = {
  * created  either. Only the root directory, and  any dynamically created sub-directory is usable
  * for the purpose of RAMFS.
  *
- * Enumeration here is done in O(N) by walking `devfs.fs_nodes'. The additional complexity
- * of adding individual trees/maps for each of these would be too great, though information about
+ * Enumeration here is  done in O(N)  by walking `devfs.fs_nodes'.  The additional complexity  of
+ * adding individual trees/maps for each  of these would be  too great, though information  about
  * what  filenames appear in these folders must still  be stored on a per-device basis. Also note
  * that some of those folders contain more than just partitions; namely: the actual root devices.
  *
@@ -225,7 +225,7 @@ PUBLIC struct ffilesys devfs_filesys = {
  *       one more namespace for special directories like root, and another for dynamic files as
  *       those described above!
  *
- * NOTE: All of these special INodes actually _DONT_ appear in `devfs.fs_nodes'! This  can
+ * NOTE: All of  these  special INodes  actually  _DONT_  appear in  `devfs.fs_nodes'!  This  can
  *       be achieved because INode access within the new fs is not done via `super_opennode' with
  *       the  associated inode number,  but instead via `fdirent_opennode()',  which hides all of
  *       the association details for fdirent->fnode mapping from prying eyes. Technically, it  is
@@ -251,7 +251,7 @@ devfs_super_v_lookup(struct fdirnode *__restrict self,
 		node = devfs_byname_caselocate(info->flu_name, info->flu_namelen);
 	if (node) {
 		REF struct fdirent *result;
-		result = incref(&node->dv_dirent->fdd_dirent);
+		result = incref(&node->dv_dirent->dd_dirent);
 		devfs_byname_endread();
 		return result;
 	}
@@ -269,14 +269,14 @@ AXREF(fdirent_axref, fdirent);
 
 struct devfs_root_direnum {
 	FDIRENUM_HEADER
-	struct fdirent_axref drd_next; /* [0..1][lock(ATOMIC)] Next directory  entry to  enumerate.
-	                                * Either  a  `struct ramfs_dirent' (ramfs_dirent_ops)  or a
-	                                * `struct fdevfsdirent' (fdevfsdirent_ops). The 2 directory
-	                                * data sources `devfs_byname_tree'  and `devfs.rs_dat'  are
+	struct fdirent_axref drd_next; /* [0..1][lock(ATOMIC)] Next directory entry to enumerate.
+	                                * Either a  `struct ramfs_dirent'  (ramfs_dirent_ops)  or
+	                                * a `struct devdirent' (devdirent_ops).  The 2  directory
+	                                * data sources `devfs_byname_tree' and `devfs.rs_dat' are
 	                                * enumerated in succession (in that same order) */
 };
-#define fdirent_isdevfs(self) ((self)->fd_ops == &fdevfsdirent_ops)
-#define fdirent_asdevfs(self) container_of(self, struct fdevfsdirent, fdd_dirent)
+#define fdirent_isdevfs(self) ((self)->fd_ops == &devdirent_ops)
+#define fdirent_asdevfs(self) container_of(self, struct devdirent, dd_dirent)
 #define fdirent_isramfs(self) ((self)->fd_ops == &ramfs_dirent_ops)
 #define fdirent_asramfs(self) container_of(self, struct ramfs_dirent, rde_ent)
 
@@ -289,14 +289,14 @@ NOTHROW(KCALL devfs_root_direnum_v_fini)(struct fdirenum *__restrict self) {
 
 
 PRIVATE NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) struct device *
-NOTHROW(FCALL device_fixdeleted)(struct fdevfsdirent const *__restrict self) {
+NOTHROW(FCALL device_fixdeleted)(struct devdirent const *__restrict self) {
 	struct device *result = NULL;
 	struct device *root;
 	root = devfs_byname_tree;
 	while (root) {
-		int cmp = strcmpz(root->dv_dirent->fdd_dirent.fd_name,
-		                  self->fdd_dirent.fd_name,
-		                  self->fdd_dirent.fd_namelen);
+		int cmp = strcmpz(root->dv_dirent->dd_dirent.fd_name,
+		                  self->dd_dirent.fd_name,
+		                  self->dd_dirent.fd_namelen);
 		if (cmp >= 0) {
 			result = root;
 			root   = root->dv_byname_node.rb_lhs;
@@ -314,23 +314,23 @@ devfs_root_next(struct fdirent *__restrict self)
 		THROWS(...) {
 	REF struct fdirent *result = NULL;
 	if (fdirent_isdevfs(self)) {
-		struct fdevfsdirent *me;
+		struct devdirent *me;
 		REF struct device *curr;
 		me = fdirent_asdevfs(self);
 		devfs_byname_read();
-		curr = awref_get(&me->fdd_dev);
+		curr = awref_get(&me->dd_dev);
 		if (curr == NULL) {
 			struct device *next;
 			next = device_fixdeleted(me);
 			if (next == NULL)
 				goto unlock_byname_and_return_first_ramfs;
-			result = incref(&next->dv_dirent->fdd_dirent);
+			result = incref(&next->dv_dirent->dd_dirent);
 			devfs_byname_endread();
 		} else {
 			struct device *next;
 			next = devfs_bynametree_nextnode(curr);
 			if (next != NULL) {
-				result = incref(&next->dv_dirent->fdd_dirent);
+				result = incref(&next->dv_dirent->dd_dirent);
 				devfs_byname_endread();
 			} else {
 				struct ramfs_dirent *first;
@@ -427,7 +427,7 @@ devfs_root_first_dirent(void) {
 	if likely(node) {
 		while (node->dv_byname_node.rb_lhs)
 			node = node->dv_byname_node.rb_lhs;
-		firstent = incref(&node->dv_dirent->fdd_dirent);
+		firstent = incref(&node->dv_dirent->dd_dirent);
 		devfs_byname_endread();
 	} else {
 		devfs_byname_endread();
@@ -644,7 +644,7 @@ again_acquire_lock_for_insert:
 					} else {
 						/* Special case: file already exists. */
 						ramfs_dirdata_treelock_endwrite(&devfs.rs_dat);
-						info->mkf_dent = incref(&existing_device->dv_dirent->fdd_dirent);
+						info->mkf_dent = incref(&existing_device->dv_dirent->dd_dirent);
 						devfs_byname_endread();
 						info->mkf_rnode = existing_device;
 						kfree(new_dirent);
@@ -740,9 +740,9 @@ devfs_super_v_unlink(struct fdirnode *__restrict self,
 	/* Check for device files. */
 	assert(fdirent_isramfs(entry) || fdirent_isdevfs(entry));
 	if (fdirent_isdevfs(entry)) {
-		struct fdevfsdirent *real_entry;
+		struct devdirent *real_entry;
 		struct device *real_file;
-		real_entry = container_of(entry, struct fdevfsdirent, fdd_dirent);
+		real_entry = container_of(entry, struct devdirent, dd_dirent);
 		real_file  = fnode_asdevice(file);
 		if (real_file->dv_byname_node.rb_lhs == DEVICE_BYNAME_DELETED)
 			return FDIRNODE_UNLINK_DELETED;
@@ -755,8 +755,8 @@ devfs_super_v_unlink(struct fdirnode *__restrict self,
 		}
 		devfs_byname_removenode(real_file);
 		real_file->dv_byname_node.rb_lhs = DEVICE_BYNAME_DELETED;
-		assert(awref_ptr(&real_entry->fdd_dev) == real_file);
-		awref_clear(&real_entry->fdd_dev); /* Disconnect the directory entry from the device file. */
+		assert(awref_ptr(&real_entry->dd_dev) == real_file);
+		awref_clear(&real_entry->dd_dev); /* Disconnect the directory entry from the device file. */
 		devfs_byname_endwrite();
 
 #if 0 /* No: user-space shouldn't have this power; Only ~true~ hardware device-disappeared,
@@ -784,32 +784,32 @@ devfs_super_v_rename(struct fdirnode *__restrict self,
 		THROW(E_NOT_IMPLEMENTED_TODO); /* TODO */
 	if (fdirent_isdevfs(info->frn_oldent)) {
 		/* Rename device files */
-		REF struct fdevfsdirent *old_dirent;
-		REF struct fdevfsdirent *new_dirent;
+		REF struct devdirent *old_dirent;
+		REF struct devdirent *new_dirent;
 		struct device *devfile;
 		assert(info->frn_olddir == &devfs.fs_root);
 		assert(fnode_isdevice(info->frn_file));
 		devfile    = fnode_asdevice(info->frn_file);
-		new_dirent = (REF struct fdevfsdirent *)kmalloc(offsetof(struct fdevfsdirent, fdd_dirent.fd_name) +
+		new_dirent = (REF struct devdirent *)kmalloc(offsetof(struct devdirent, dd_dirent.fd_name) +
 		                                                (info->frn_namelen + 1) * sizeof(char),
 		                                                GFP_NORMAL);
 		TRY {
 			/* Fill in the new directory entry. */
-			*(char *)mempcpy(new_dirent->fdd_dirent.fd_name, info->frn_name,
+			*(char *)mempcpy(new_dirent->dd_dirent.fd_name, info->frn_name,
 			                 info->frn_namelen, sizeof(char)) = '\0';
 
 			/* Fill in other fields of the new directory entry. */
 			if (info->frn_hash == FLOOKUP_INFO_HASH_UNSET || ADDR_ISUSER(info->frn_name)) {
-				info->frn_hash = fdirent_hash(new_dirent->fdd_dirent.fd_name,
+				info->frn_hash = fdirent_hash(new_dirent->dd_dirent.fd_name,
 				                              info->frn_namelen);
 			}
-			new_dirent->fdd_dirent.fd_refcnt  = 2; /* +1: info->mkf_dent, +1: devfile->dv_dirent */
-			new_dirent->fdd_dirent.fd_ops     = &fdevfsdirent_ops;
-			new_dirent->fdd_dirent.fd_hash    = info->frn_hash;
-			new_dirent->fdd_dirent.fd_ino     = devfile->fn_ino; /* INO numbers are constant here. */
-			new_dirent->fdd_dirent.fd_namelen = info->frn_namelen;
-			new_dirent->fdd_dirent.fd_type    = IFTODT(devfile->fn_mode);
-			awref_init(&new_dirent->fdd_dev, devfile);
+			new_dirent->dd_dirent.fd_refcnt  = 2; /* +1: info->mkf_dent, +1: devfile->dv_dirent */
+			new_dirent->dd_dirent.fd_ops     = &devdirent_ops;
+			new_dirent->dd_dirent.fd_hash    = info->frn_hash;
+			new_dirent->dd_dirent.fd_ino     = devfile->fn_ino; /* INO numbers are constant here. */
+			new_dirent->dd_dirent.fd_namelen = info->frn_namelen;
+			new_dirent->dd_dirent.fd_type    = IFTODT(devfile->fn_mode);
+			awref_init(&new_dirent->dd_dev, devfile);
 
 			/* Lock the by-name tree */
 			devfs_byname_write();
@@ -831,11 +831,11 @@ devfs_super_v_rename(struct fdirnode *__restrict self,
 		/* Check if another device file with the same name already exists. */
 		{
 			struct device *existing_device;
-			existing_device = devfs_byname_locate(new_dirent->fdd_dirent.fd_name,
-			                                      new_dirent->fdd_dirent.fd_namelen);
+			existing_device = devfs_byname_locate(new_dirent->dd_dirent.fd_name,
+			                                      new_dirent->dd_dirent.fd_namelen);
 			if (!existing_device && (info->frn_flags & AT_DOSPATH)) {
-				existing_device = devfs_byname_caselocate(new_dirent->fdd_dirent.fd_name,
-				                                          new_dirent->fdd_dirent.fd_namelen);
+				existing_device = devfs_byname_caselocate(new_dirent->dd_dirent.fd_name,
+				                                          new_dirent->dd_dirent.fd_namelen);
 			}
 			if (existing_device) {
 				if (info->frn_repfile != existing_device) {
@@ -880,14 +880,14 @@ devfs_super_v_rename(struct fdirnode *__restrict self,
 		/* Clear the back-link from `old_dirent' to the device file in question.
 		 * As far as the directory entry  should be concerned, it's device  file
 		 * has been deleted. */
-		awref_clear(&old_dirent->fdd_dev);
+		awref_clear(&old_dirent->dd_dev);
 
 		/* Inherited  from  `devfile->dv_dirent'  (nokill  because
 		 * the caller still has a reference in `info->frn_oldent') */
 		decref_nokill(old_dirent);
 
 		/* Write-back results. */
-		info->frn_dent = &new_dirent->fdd_dirent; /* Inherit reference */
+		info->frn_dent = &new_dirent->dd_dirent; /* Inherit reference */
 	} else {
 		struct ramfs_dirent *new_dirent;
 		struct ramfs_dirnode *olddir = (struct ramfs_dirnode *)info->frn_olddir;
@@ -994,7 +994,7 @@ again_acquire_locks:
 						devfs_byname_downgrade();
 					} else {
 						ramfs_dirdata_treelock_endwrite(&devfs.rs_dat);
-						info->frn_dent    = incref(&existing_device->dv_dirent->fdd_dirent);
+						info->frn_dent    = incref(&existing_device->dv_dirent->dd_dirent);
 						info->frn_repfile = existing_device; /* Inherit reference */
 						devfs_byname_endread();
 						kfree(new_dirent);
@@ -1156,7 +1156,7 @@ NOTHROW(KCALL device_v_destroy)(struct mfile *__restrict self) {
 	decref_unlikely(me->dv_driver);
 
 	/* Clear the weak reference held by our /dev/-directory entry. */
-	awref_clear(&me->dv_dirent->fdd_dev);
+	awref_clear(&me->dv_dirent->dd_dev);
 
 	/* Must remove `me' from `devfs_byname_tree' */
 	if (ATOMIC_READ(me->dv_byname_node.rb_lhs) != DEVICE_BYNAME_DELETED) {
@@ -1195,7 +1195,7 @@ device_v_tryas(struct mfile *__restrict self,
 	case HANDLE_TYPE_FDIRENT: {
 		REF struct fdirent *result;
 		device_getname_lock_acquire(me);
-		result = incref(&me->dv_dirent->fdd_dirent);
+		result = incref(&me->dv_dirent->dd_dirent);
 		device_getname_lock_release(me);
 		return result;
 	}	break;
@@ -1216,9 +1216,9 @@ PUBLIC_CONST struct mfile_stream_ops const device_v_stream_ops = {
 
 
 /* Return a reference to the filename of `self' */
-PUBLIC NOBLOCK ATTR_PURE ATTR_RETNONNULL WUNUSED REF struct fdevfsdirent *
+PUBLIC NOBLOCK ATTR_PURE ATTR_RETNONNULL WUNUSED REF struct devdirent *
 NOTHROW(FCALL device_getdevfsfilename)(struct device *__restrict self) {
-	REF struct fdevfsdirent *result;
+	REF struct devdirent *result;
 	device_getname_lock_acquire(self);
 	result = incref(self->dv_dirent);
 	device_getname_lock_release(self);
@@ -1248,7 +1248,7 @@ NOTHROW(FCALL devfs_log_new_device)(struct device *__restrict self) {
 	                  "%q%s\n",
 	       device_ischr(self) ? "chr" : "blk",
 	       MAJOR(self->dn_devno), MINOR(self->dn_devno),
-	       self->dv_dirent->fdd_dirent.fd_name,
+	       self->dv_dirent->dd_dirent.fd_name,
 	       self->dv_byname_node.rb_lhs == DEVICE_BYNAME_DELETED ? " [deleted]" : "");
 }
 
@@ -1280,8 +1280,8 @@ device_tryregister(struct device *__restrict self)
 	_device_register_lock_acquire(true);
 
 	/* With all required locks held, check if this device already exists. */
-	if (_device_register_inuse_name(self->dv_dirent->fdd_dirent.fd_name,
-	                                self->dv_dirent->fdd_dirent.fd_namelen)) {
+	if (_device_register_inuse_name(self->dv_dirent->dd_dirent.fd_name,
+	                                self->dv_dirent->dd_dirent.fd_namelen)) {
 		result = DEVICE_TRYREGISTER_EXISTS_NAME;
 		goto done;
 	}
@@ -1417,8 +1417,8 @@ device_register(struct device *__restrict self)
 	_device_register_lock_acquire(true);
 
 	/* With all required locks held, check if this device already exists. */
-	if unlikely(_device_register_inuse_name(self->dv_dirent->fdd_dirent.fd_name,
-	                                        self->dv_dirent->fdd_dirent.fd_namelen)) {
+	if unlikely(_device_register_inuse_name(self->dv_dirent->dd_dirent.fd_name,
+	                                        self->dv_dirent->dd_dirent.fd_namelen)) {
 		self->dv_byname_node.rb_lhs = DEVICE_BYNAME_DELETED;
 	} else {
 		devfs_byname_insert(self); /* Add to the by-name tree. */
@@ -1449,18 +1449,18 @@ device_register(struct device *__restrict self)
 }
 
 
-struct fdevfsdirent_printer_data {
-	struct fdevfsdirent *fpd_ent; /* [0..fpd_len*][owned] entry. */
+struct devdirent_printer_data {
+	struct devdirent *fpd_ent; /* [0..fpd_len*][owned] entry. */
 	size_t               fpd_avl; /* Unused length. */
 	size_t               fpd_pos; /* Write offset. */
 };
 
 PRIVATE ssize_t FORMATPRINTER_CC
-fdevfsdirent_printer(void *arg, char const *__restrict text, size_t textlen) {
-	struct fdevfsdirent_printer_data *me;
-	me = (struct fdevfsdirent_printer_data *)arg;
+devdirent_printer(void *arg, char const *__restrict text, size_t textlen) {
+	struct devdirent_printer_data *me;
+	me = (struct devdirent_printer_data *)arg;
 	if (textlen > me->fpd_avl) {
-		me->fpd_ent = (struct fdevfsdirent *)krealloc(me->fpd_ent,
+		me->fpd_ent = (struct devdirent *)krealloc(me->fpd_ent,
 		                                              me->fpd_pos + textlen + 1,
 		                                              GFP_NORMAL);
 		me->fpd_avl = ((kmalloc_usable_size(me->fpd_ent) / sizeof(char)) - 1) - me->fpd_pos;
@@ -1472,17 +1472,17 @@ fdevfsdirent_printer(void *arg, char const *__restrict text, size_t textlen) {
 }
 
 
-PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct fdevfsdirent *FCALL
-fdevfsdirent_vnewf(char const *__restrict format, va_list args)
+PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct devdirent *FCALL
+devdirent_vnewf(char const *__restrict format, va_list args)
 		THROWS(E_BADALLOC) {
-	struct fdevfsdirent_printer_data dat;
-	dat.fpd_ent = (struct fdevfsdirent *)kmalloc(offsetof(struct fdevfsdirent, fdd_dirent.fd_name) +
+	struct devdirent_printer_data dat;
+	dat.fpd_ent = (struct devdirent *)kmalloc(offsetof(struct devdirent, dd_dirent.fd_name) +
 	                                             (16 + 1) * sizeof(char), GFP_NORMAL);
-	dat.fpd_pos = offsetof(struct fdevfsdirent, fdd_dirent.fd_name);
+	dat.fpd_pos = offsetof(struct devdirent, dd_dirent.fd_name);
 	dat.fpd_avl = ((kmalloc_usable_size(dat.fpd_ent) / sizeof(char)) - 1) - dat.fpd_pos;
 	TRY {
 		/* Print the format string into the directory entry. */
-		format_vprintf(&fdevfsdirent_printer, &dat, format, args);
+		format_vprintf(&devdirent_printer, &dat, format, args);
 	} EXCEPT {
 		kfree(dat.fpd_ent);
 		RETHROW();
@@ -1490,8 +1490,8 @@ fdevfsdirent_vnewf(char const *__restrict format, va_list args)
 
 	/* Free unused memory. */
 	if (dat.fpd_avl) {
-		struct fdevfsdirent *fin;
-		fin = (struct fdevfsdirent *)krealloc_nx(dat.fpd_ent,
+		struct devdirent *fin;
+		fin = (struct devdirent *)krealloc_nx(dat.fpd_ent,
 		                                         dat.fpd_pos + 1,
 		                                         GFP_NORMAL);
 		if likely(fin)
@@ -1499,32 +1499,32 @@ fdevfsdirent_vnewf(char const *__restrict format, va_list args)
 	}
 
 	/* Make sure that the name isn't too long. */
-	dat.fpd_pos -= offsetof(struct fdevfsdirent, fdd_dirent.fd_name);
+	dat.fpd_pos -= offsetof(struct devdirent, dd_dirent.fd_name);
 	if unlikely(dat.fpd_pos > UINT16_MAX) {
 		kfree(dat.fpd_ent);
 		THROW(E_FSERROR_ILLEGAL_PATH);
 	}
 
 	/* Fill in generic fields of the directory entry. */
-	dat.fpd_ent->fdd_dirent.fd_namelen = (u16)dat.fpd_pos;
-	dat.fpd_ent->fdd_dirent.fd_refcnt  = 1;
-	dat.fpd_ent->fdd_dirent.fd_ops     = &fdevfsdirent_ops;
-	dat.fpd_ent->fdd_dirent.fd_hash = fdirent_hash(dat.fpd_ent->fdd_dirent.fd_name,
-	                                               dat.fpd_ent->fdd_dirent.fd_namelen);
-	dat.fpd_ent->fdd_dirent.fd_name[dat.fpd_pos] = '\0';
+	dat.fpd_ent->dd_dirent.fd_namelen = (u16)dat.fpd_pos;
+	dat.fpd_ent->dd_dirent.fd_refcnt  = 1;
+	dat.fpd_ent->dd_dirent.fd_ops     = &devdirent_ops;
+	dat.fpd_ent->dd_dirent.fd_hash = fdirent_hash(dat.fpd_ent->dd_dirent.fd_name,
+	                                               dat.fpd_ent->dd_dirent.fd_namelen);
+	dat.fpd_ent->dd_dirent.fd_name[dat.fpd_pos] = '\0';
 
 	/* Rest of init is done by caller. */
 	return dat.fpd_ent;
 }
 
-PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct fdevfsdirent *VCALL
-fdevfsdirent_newf(char const *__restrict format, ...)
+PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct devdirent *VCALL
+devdirent_newf(char const *__restrict format, ...)
 		THROWS(E_BADALLOC) {
 	va_list args;
-	REF struct fdevfsdirent *result;
+	REF struct devdirent *result;
 	va_start(args, format);
 	RAII_FINALLY { va_end(args); };
-	result = fdevfsdirent_vnewf(format, args);
+	result = devdirent_vnewf(format, args);
 	return result;
 }
 
@@ -1552,18 +1552,18 @@ PUBLIC NONNULL((1)) void KCALL
 device_vregisterf(struct device *__restrict self, dev_t devno,
                   char const *__restrict format, __builtin_va_list args)
 		THROWS(E_BADALLOC, E_WOULDBLOCK) {
-	struct fdevfsdirent *name;
+	struct devdirent *name;
 	assert(S_ISCHR(self->fn_mode) || S_ISBLK(self->fn_mode));
 	self->dn_devno = devno;
 	self->fn_ino   = devfs_devnode_makeino(self->fn_mode, devno);
 
 	/* Allocate device name based on format_printf() */
-	name = fdevfsdirent_vnewf(format, args);
+	name = devdirent_vnewf(format, args);
 
 	/* Fill in missing fields of the directory entry. */
-	awref_init(&name->fdd_dev, self);
-	name->fdd_dirent.fd_ino  = self->fn_ino;
-	name->fdd_dirent.fd_type = IFTODT(self->fn_mode);
+	awref_init(&name->dd_dev, self);
+	name->dd_dirent.fd_ino  = self->fn_ino;
+	name->dd_dirent.fd_type = IFTODT(self->fn_mode);
 
 	self->dv_dirent = name; /* Inherit reference */
 	TRY {
@@ -1892,7 +1892,7 @@ device_lookup_bypartguid(guid_t const *__restrict guid)
  *  #2: Pass `string' to `device_lookup_byname()', and re-return if non-NULL
  *  #3: if `!S_ISCHR(st_mode)' and `string' matches FORMAT_GUID_T, decode a
  *      GUID and make use of `device_lookup_bypartguid'.
- *  #4: if `st_mode != 0',  do `sscanf(string, "%u:%u")'  for a  MAJOR/MINOR
+ *  #4: if `st_mode != 0', do `sscanf(string, "%u:%u")' for a MAJOR/MINOR
  *      pair, construct a dev_t, and pass to `device_lookup_bydev()', and
  *      re-return if non-NULL
  *  #5: If all else failed, return `NULL' */
@@ -2013,7 +2013,7 @@ again:
 	if (fnode_isdevice(self) && (self->fn_mode & S_IFMT) == mode) {
 		struct device *me = fnode_asdevice(self);
 		size_t namelen;
-		namelen = me->dv_dirent->fdd_dirent.fd_namelen;
+		namelen = me->dv_dirent->dd_dirent.fd_namelen;
 		if (*pmax_device_namelen < namelen)
 			*pmax_device_namelen = namelen;
 		namelen = strlen(me->dv_driver->d_name);
@@ -2091,7 +2091,7 @@ do_dump_chrdev(struct chrdev *__restrict self,
 	                  "%-3.2" PRIxN(__SIZEOF_MINOR_T__) "  "
 	                  "%*-s  %-8s  "),
 	           (unsigned int)longest_device_name,
-	           self->dv_dirent->fdd_dirent.fd_name,
+	           self->dv_dirent->dd_dirent.fd_name,
 	           (unsigned int)MAJOR(self->dn_devno),
 	           (unsigned int)MINOR(self->dn_devno),
 	           (unsigned int)longest_driver_name,

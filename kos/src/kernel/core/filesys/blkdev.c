@@ -767,7 +767,7 @@ blkdev_makeparts(struct blkdev *__restrict self,
 	if likely(blkdev_getsectorcount(self) != 0) {
 		TRY {
 			struct blkdev *part;
-			struct fdevfsdirent *bname;
+			struct devdirent *bname;
 			minor_t index;
 
 			/* Load+parse the MBR */
@@ -780,7 +780,7 @@ blkdev_makeparts(struct blkdev *__restrict self,
 			bname = self->dv_dirent;
 			index = 0;
 			LIST_FOREACH (part, &result, bd_partinfo.bp_partlink) {
-				REF struct fdevfsdirent *devname;
+				REF struct devdirent *devname;
 				char *writer;
 #if __SIZEOF_MINOR_T__ == 4
 				char numbuf[sizeof("4294967295")];
@@ -797,30 +797,30 @@ blkdev_makeparts(struct blkdev *__restrict self,
 
 				/* Allocate and assign `part->dv_dirent' */
 				numlen = sprintf(numbuf, "%" PRIuN(__SIZEOF_MINOR_T__), index);
-				namlen = bname->fdd_dirent.fd_namelen + numlen;
+				namlen = bname->dd_dirent.fd_namelen + numlen;
 
-				devname = (REF struct fdevfsdirent *)kmalloc(offsetof(struct fdevfsdirent,
-				                                                      fdd_dirent.fd_name) +
-				                                             (namlen + 1) * sizeof(char),
-				                                             GFP_NORMAL);
-				awref_init(&devname->fdd_dev, part);
-				devname->fdd_dirent.fd_refcnt  = 1; /* +1: part->dv_dirent */
-				devname->fdd_dirent.fd_ops     = &fdevfsdirent_ops;
-				devname->fdd_dirent.fd_ino     = part->fn_ino;
-				devname->fdd_dirent.fd_namelen = (u16)namlen;
-				devname->fdd_dirent.fd_type    = DT_BLK;
+				devname = (REF struct devdirent *)kmalloc(offsetof(struct devdirent,
+				                                                   dd_dirent.fd_name) +
+				                                          (namlen + 1) * sizeof(char),
+				                                          GFP_NORMAL);
+				awref_init(&devname->dd_dev, part);
+				devname->dd_dirent.fd_refcnt  = 1; /* +1: part->dv_dirent */
+				devname->dd_dirent.fd_ops     = &devdirent_ops;
+				devname->dd_dirent.fd_ino     = part->fn_ino;
+				devname->dd_dirent.fd_namelen = (u16)namlen;
+				devname->dd_dirent.fd_type    = DT_BLK;
 
 				/* Put together the name. */
-				writer = devname->fdd_dirent.fd_name;
-				writer = (char *)mempcpy(writer, bname->fdd_dirent.fd_name,
-				                         bname->fdd_dirent.fd_namelen, sizeof(char));
+				writer = devname->dd_dirent.fd_name;
+				writer = (char *)mempcpy(writer, bname->dd_dirent.fd_name,
+				                         bname->dd_dirent.fd_namelen, sizeof(char));
 				writer = (char *)mempcpy(writer, numbuf, numlen, sizeof(char));
 				/* NUL-terminate */
 				*writer = '\0';
 
 				/* Calculate the hash for the name. */
-				devname->fdd_dirent.fd_hash = fdirent_hash(devname->fdd_dirent.fd_name,
-				                                           devname->fdd_dirent.fd_namelen);
+				devname->dd_dirent.fd_hash = fdirent_hash(devname->dd_dirent.fd_name,
+				                                          devname->dd_dirent.fd_namelen);
 
 				/* Inherit reference */
 				part->dv_dirent = devname;
@@ -939,9 +939,9 @@ NOTHROW(FCALL device_unlink_from_globals)(struct device *__restrict self) {
 
 
 /* Check if a given filename is already in use in "/dev/". (Caller must be holding proper locks) */
-#define devfs_root_nameused(name)                           \
-	_device_register_inuse_name((name)->fdd_dirent.fd_name, \
-	                            (name)->fdd_dirent.fd_namelen)
+#define devfs_root_nameused(name)                          \
+	_device_register_inuse_name((name)->dd_dirent.fd_name, \
+	                            (name)->dd_dirent.fd_namelen)
 
 INTDEF NOBLOCK NONNULL((1)) void /* From "./devfs.c" */
 NOTHROW(FCALL devfs_log_new_device)(struct device *__restrict self);
@@ -970,7 +970,7 @@ NOTHROW(FCALL devfs_insert_into_inode_tree)(struct blkdev *__restrict self) {
 		/* Also update the INO value stored in the associated  dirent.
 		 * This is still thread-safe since the dirent hasn't been made
 		 * globally visible, yet. */
-		self->dv_dirent->fdd_dirent.fd_ino = self->fn_ino;
+		self->dv_dirent->dd_dirent.fd_ino = self->fn_ino;
 	}
 
 	/* Do the actual insert */

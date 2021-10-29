@@ -254,7 +254,7 @@ PRIVATE bool
 NOTHROW(KCALL quick_verify_mfree)(struct mfree *__restrict self) {
 	if __untraced(!IS_ALIGNED((uintptr_t)self, HEAP_ALIGNMENT))
 		goto bad;
-	NESTED_TRY {
+	UNNESTED_TRY {
 		struct mfree **pself;
 		if __untraced(!IS_ALIGNED(self->mf_size, HEAP_ALIGNMENT))
 			goto bad;
@@ -301,6 +301,12 @@ NOTHROW(KCALL heap_validate)(struct heap *__restrict self) {
 		return;
 	if (!sync_tryread(&self->h_lock))
 		return;
+
+	/* Exception nesting is needed because of the `TRY' (`UNNESTED_TRY') in `quick_verify_mfree()'
+	 * We do the nesting here  so the overhead is  O(1), rather than scaling  with the # of  calls
+	 * being made to `quick_verify_mfree()' */
+	NESTED_EXCEPTION;
+
 	for (i = 0; i < COMPILER_LENOF(self->h_size); ++i) {
 		struct mfree **piter, *iter;
 		for (piter = LIST_PFIRST(&self->h_size[i]); (iter = *piter) != NULL;

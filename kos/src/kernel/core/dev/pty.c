@@ -468,24 +468,24 @@ PUBLIC_CONST struct chrdev_ops const ptymaster_ops = {{{{
 
 /* Set the given `minor' to-be referenced by `name' */
 PRIVATE NONNULL((1)) void
-NOTHROW(FCALL set_pty_name_minor)(struct fdevfsdirent *__restrict name,
+NOTHROW(FCALL set_pty_name_minor)(struct devdirent *__restrict name,
                                   minor_t minor) {
 	if (minor >= PTY_DEVCNT) {
 		/* KOS-specific, extended PTY device. */
 		STATIC_ASSERT(MINORBITS / 4 == 5);
-		sprintf(name->fdd_dirent.fd_name + 3,
+		sprintf(name->dd_dirent.fd_name + 3,
 		        "X%.5" PRIxN(__SIZEOF_MINOR_T__), minor);
-		name->fdd_dirent.fd_namelen = 9;
+		name->dd_dirent.fd_namelen = 9;
 	} else {
 		/* Old (BSD-style) PTY master/slave device names. */
 		char temp = 'p' + (minor / 16);
 		if (temp > 'z')
 			temp = 'a' + (temp - 'z');
-		name->fdd_dirent.fd_name[3] = temp;
+		name->dd_dirent.fd_name[3] = temp;
 		minor %= 16;
-		name->fdd_dirent.fd_name[4] = minor >= 10 ? 'a' + (minor - 10) : '0' + minor;
-		name->fdd_dirent.fd_name[5] = '\0';
-		name->fdd_dirent.fd_namelen = 5;
+		name->dd_dirent.fd_name[4] = minor >= 10 ? 'a' + (minor - 10) : '0' + minor;
+		name->dd_dirent.fd_name[5] = '\0';
+		name->dd_dirent.fd_namelen = 5;
 	}
 }
 
@@ -496,7 +496,7 @@ PRIVATE NONNULL((1, 2)) void FCALL
 register_pty_pair(struct ptymaster *__restrict master,
                   struct ptyslave *__restrict slave)
 		THROWS(E_BADALLOC, E_WOULDBLOCK) {
-	REF struct fdevfsdirent *master_name, *slave_name;
+	REF struct devdirent *master_name, *slave_name;
 	/* KOS Extension: Since we allocate '20' bits for minor device numbers,
 	 *                it's actually possible  to get _much_  more than  256
 	 *                pty devices in KOS (1048576 to be exact).
@@ -507,9 +507,9 @@ register_pty_pair(struct ptymaster *__restrict master,
 	 * SLAVE:  /dev/ttyX12345
 	 * NOTE: The 12345 is the hex value of the minor device number, using lower-case letters. */
 	STATIC_ASSERT(MINORBITS / 4 == 5);
-	master_name = fdevfsdirent_newf("ptyX.....");
+	master_name = devdirent_newf("ptyX.....");
 	TRY {
-		slave_name = fdevfsdirent_newf("ttyX.....");
+		slave_name = devdirent_newf("ttyX.....");
 		TRY {
 			minor_t min;
 			/* Mark the 2 devices such that they're _NOT_ part of the all-nodes list.
@@ -522,8 +522,8 @@ register_pty_pair(struct ptymaster *__restrict master,
 			assert(!(slave->mf_flags & MFILE_FN_GLOBAL_REF));
 
 			/* Link directory entries with PTY devices. */
-			awref_init(&master_name->fdd_dev, master);
-			awref_init(&slave_name->fdd_dev, slave);
+			awref_init(&master_name->dd_dev, master);
+			awref_init(&slave_name->dd_dev, slave);
 			master->dv_dirent = master_name; /* Inherit reference */
 			slave->dv_dirent  = slave_name;  /* Inherit reference */
 
@@ -556,14 +556,14 @@ register_pty_pair(struct ptymaster *__restrict master,
 			set_pty_name_minor(slave_name, min);
 
 			/* Only register within the filesystem if the name isn't already in use. */
-			if unlikely(_device_register_inuse_name(master_name->fdd_dirent.fd_name,
-			                                        master_name->fdd_dirent.fd_namelen)) {
+			if unlikely(_device_register_inuse_name(master_name->dd_dirent.fd_name,
+			                                        master_name->dd_dirent.fd_namelen)) {
 				master->dv_byname_node.rb_lhs = DEVICE_BYNAME_DELETED;
 			} else {
 				devfs_byname_insert(master);
 			}
-			if unlikely(_device_register_inuse_name(slave_name->fdd_dirent.fd_name,
-			                                        slave_name->fdd_dirent.fd_namelen)) {
+			if unlikely(_device_register_inuse_name(slave_name->dd_dirent.fd_name,
+			                                        slave_name->dd_dirent.fd_namelen)) {
 				slave->dv_byname_node.rb_lhs = DEVICE_BYNAME_DELETED;
 			} else {
 				devfs_byname_insert(slave);
@@ -762,12 +762,12 @@ DEFINE_SYSCALL5(errno_t, openpty,
 	FINALLY_DECREF_UNLIKELY(slave);
 	if (name) {
 #ifdef CONFIG_USE_NEW_FS
-		REF struct fdevfsdirent *devname;
+		REF struct devdirent *devname;
 		device_getname_lock_acquire(master);
 		devname = incref(master->dv_dirent);
 		device_getname_lock_release(master);
 		FINALLY_DECREF_UNLIKELY(devname);
-		sprintf(name, "/dev/%s", devname->fdd_dirent.fd_name);
+		sprintf(name, "/dev/%s", devname->dd_dirent.fd_name);
 #else /* CONFIG_USE_NEW_FS */
 		sprintf(name, "/dev/%s", master->cd_name);
 #endif /* !CONFIG_USE_NEW_FS */
