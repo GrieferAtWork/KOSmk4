@@ -35,6 +35,7 @@
 #include <kernel/paging.h>
 #include <kernel/user.h>
 #include <sched/task.h>
+#include <sched/tsc.h>
 
 #include <hybrid/atomic.h>
 
@@ -1108,6 +1109,9 @@ ramfs_open(struct ffilesys *__restrict UNUSED(filesys),
 	result->fs_root.mf_blockshift = PAGESHIFT;
 	result->fs_root.mf_flags      = MFILE_F_PERSISTENT;
 	result->fs_root.fn_ino        = (ino_t)skew_kernel_pointer(&result->fs_root);
+	result->fs_root.mf_atime      = realtime();
+	result->fs_root.mf_mtime      = result->fs_root.mf_atime;
+	result->fs_root.mf_ctime      = result->fs_root.mf_atime;
 
 	/* Fill in filesystem features. */
 	result->fs_feat.sf_filesize_max       = (pos_t)-1;

@@ -2644,6 +2644,9 @@ Fat_OpenFileSystem(struct ffilesys *__restrict UNUSED(filesys),
 		result->ft_super.ffs_super.fs_feat.sf_name_max           = LFN_SEQNUM_MAXCOUNT * LFN_NAME;
 		result->ft_super.ffs_super.fs_feat.sf_filesizebits       = 32;
 		result->ft_super.ffs_super.fs_root.fn_fsdata             = &result->ft_fdat;
+		result->ft_super.ffs_super.fs_root.mf_atime              = realtime();
+		result->ft_super.ffs_super.fs_root.mf_mtime              = result->ft_super.ffs_super.fs_root.mf_atime;
+		result->ft_super.ffs_super.fs_root.mf_ctime              = result->ft_super.ffs_super.fs_root.mf_atime;
 
 		/* Special case for when uid/gid support is available. */
 		if (result->ft_features & FAT_FEATURE_UGID) {
@@ -2654,7 +2657,6 @@ Fat_OpenFileSystem(struct ffilesys *__restrict UNUSED(filesys),
 		if (!(result->ft_features & FAT_FEATURE_NO_CYGWIN_SYMLINK))
 			result->ft_super.ffs_super.fs_feat.sf_symlink_max = (pos_t)FAT_SYMLINK_FILE_TEXTLEN(UINT32_MAX);
 #endif /* CONFIG_FAT_CYGWIN_SYMLINKS */
-
 
 		/* Select root directory operators. */
 		result->ft_super.ffs_super.fs_root.mf_ops = result->ft_type == FAT32

@@ -72,6 +72,9 @@ struct ffilesys {
 		 *                                                                        #         MFILE_F_NOATIME | MFILE_F_NOMTIME | MFILE_FN_NODIRATIME |
 		 *                                                                        #         MFILE_F_STRICTATIME | MFILE_F_LAZYTIME |
 		 *                                                                        #         MFILE_F_PERSISTENT | MFILE_FN_ATTRREADONLY'
+		 *   - return->fs_root._fdirnode_node_ _fnode_file_ mf_atime      = realtime(); # Probably...
+		 *   - return->fs_root._fdirnode_node_ _fnode_file_ mf_mtime      = realtime(); # Probably...
+		 *   - return->fs_root._fdirnode_node_ _fnode_file_ mf_ctime      = realtime(); # Probably...
 		 *   - return->fs_root._fdirnode_node_ fn_ino                     = ...;  # Special INode number used for the fs-root
 		 *   - return->fs_feat                                            = ...;  # Filesystem feature information
 		 *   - *                                                                  # Any field added by a sub-class of `struct fsuper'
@@ -89,9 +92,6 @@ struct ffilesys {
 		 *   - return->fs_root._fdirnode_node_ _fnode_file_ mf_flags |= MFILE_F_NOUSRMMAP | MFILE_F_NOUSRIO | MFILE_F_FIXEDFILESIZE;     # Unconditionally set
 		 *   - return->fs_root._fdirnode_node_ _fnode_file_ mf_trunclock  = 0;
 		 *   - return->fs_root._fdirnode_node_ _fnode_file_ mf_filesize   = (pos_t)-1;
-		 *   - return->fs_root._fdirnode_node_ _fnode_file_ mf_atime      = realtime();
-		 *   - return->fs_root._fdirnode_node_ _fnode_file_ mf_mtime      = realtime();
-		 *   - return->fs_root._fdirnode_node_ _fnode_file_ mf_ctime      = realtime();
 		 *   - return->fs_root._fdirnode_node_ fn_nlink                   = 1;
 		 *   - return->fs_root._fdirnode_node_ fn_mode                    = S_IFDIR | 0777;
 		 *   - return->fs_root._fdirnode_node_ fn_uid                     = 0;
