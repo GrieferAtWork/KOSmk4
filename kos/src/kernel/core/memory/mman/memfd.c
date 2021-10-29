@@ -118,7 +118,7 @@ PRIVATE struct fdirent_ops const memfd_name_ops = {
 
 	/* Same as `fdo_opennode': shouldn't ever be invocable, so assign a bad
 	 * pointer. */
-	.fdo_getino = (ino_t (KCALL *)(struct fdirent *__restrict,
+	.fdo_getino = (ino_t (FCALL *)(struct fdirent *__restrict,
 	                               struct fdirnode *__restrict))
 	              (void *)(uintptr_t)-1,
 };
