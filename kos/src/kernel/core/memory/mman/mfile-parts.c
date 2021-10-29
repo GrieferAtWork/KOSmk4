@@ -59,7 +59,6 @@ DECL_BEGIN
  *  - @assume(mfile_addr_aligned(self, data->mep_maxaddr + 1));
  *  - @assume(WAS_CALLED(mfile_extendpart_data_init(data)));
  *  - @assume(self->mf_parts != MFILE_PARTS_ANONYMOUS);
- *  - @assume(mfile_addr_ceilalign(self, self->mf_filesize) >= data->mep_minaddr);
  *  - @assume(!mpart_tree_rlocate(self->mf_parts, data->mep_minaddr, data->mep_maxaddr));
  * Locking logic:
  *   in:                                         mfile_lock_reading(self) || mfile_lock_writing(self)
@@ -94,17 +93,6 @@ mfile_extendpart_or_unlock(struct mfile *__restrict self,
 	assert(mfile_addr_aligned(self, data->mep_minaddr));
 	assert(mfile_addr_aligned(self, data->mep_maxaddr + 1));
 	assert(self->mf_parts != MFILE_PARTS_ANONYMOUS);
-#ifdef CONFIG_USE_NEW_FS
-#ifndef NDEBUG
-	{
-		pos_t filsiz = (pos_t)atomic64_read(&self->mf_filesize);
-		if (!OVERFLOW_UADD(filsiz, self->mf_part_amask, &filsiz)) {
-			filsiz &= ~self->mf_part_amask;
-			assert(filsiz >= data->mep_minaddr);
-		}
-	}
-#endif /* !NDEBUG */
-#endif /* CONFIG_USE_NEW_FS */
 	assert(!mpart_tree_rlocate(self->mf_parts, data->mep_minaddr, data->mep_maxaddr));
 
 	/* TODO */

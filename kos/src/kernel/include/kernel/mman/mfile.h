@@ -1165,7 +1165,6 @@ struct mfile_extendpart_data {
  *  - @assume(mfile_addr_aligned(self, data->mep_maxaddr + 1));
  *  - @assume(WAS_CALLED(mfile_extendpart_data_init(data)));
  *  - @assume(self->mf_parts != MFILE_PARTS_ANONYMOUS);
- *  - @assume(mfile_addr_ceilalign(self, self->mf_filesize) >= data->mep_minaddr);
  *  - @assume(!mpart_tree_rlocate(self->mf_parts, data->mep_minaddr, data->mep_maxaddr));
  * Locking logic:
  *   in:                                         mfile_lock_reading(self) || mfile_lock_writing(self)

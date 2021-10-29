@@ -865,7 +865,7 @@ restart_after_extendpart_tail:
 			/* No need to  fiddle with unsharing  copy-on-write! The area  we're
 			 * trying to write to has only been added by us right now, and since
 			 * we've yet to release our lock to the part, we also know that said
-			 * area can't possibly */
+			 * area can't possibly be shared with anyone! */
 
 			/* Now that the part has been forced into the expected state,
 			 * do  the  actual  write  via   `LOCAL_mpart_rw_or_unlock()' */
@@ -883,20 +883,24 @@ restart_after_extendpart_tail:
 		if (io_bytes == (size_t)-1) {
 			/* Undo, and repeat the entire call with buffered memory access! */
 			mpart_truncate_undo(self, part, old_part_size);
+			mpart_truncate_restore(part, old_part_size);
+			mpart_lock_release(part);
+			mfile_lock_end(self);
+			decref_unlikely(part);
 
 			/* Must perform the operation while blocking. */
 #if defined(DEFINE_mfile_tailwrite)
-			_mfile_buffered_tailwrite(self, buffer, num_bytes);
+			result += _mfile_buffered_tailwrite(self, buffer, num_bytes);
 #elif defined(DEFINE_mfile_tailwritev)
-			_mfile_buffered_tailwritev(self, buffer, buf_offset, num_bytes);
+			result += _mfile_buffered_tailwritev(self, buffer, buf_offset, num_bytes);
 #elif defined(DEFINE_mfile_write)
-			_mfile_buffered_write(self, buffer, num_bytes, offset);
+			result += _mfile_buffered_write(self, buffer, num_bytes, offset);
 #elif defined(DEFINE_mfile_writev)
-			_mfile_buffered_writev(self, buffer, buf_offset, num_bytes, offset);
+			result += _mfile_buffered_writev(self, buffer, buf_offset, num_bytes, offset);
 #else /* ... */
 #error "Invalid configuration"
 #endif /* !... */
-			goto extend_undo;
+			return result;
 		}
 #endif /* !LOCAL_BUFFER_IS_PHYS */
 

@@ -825,9 +825,6 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *       also supports via the `O_DIRECT' flag. As such, we should add support
 	 *       for that flag! */
 
-	/* TODO: Add a system-test for memfd_create and trying to write to that file at
-	 *       an offset of `(pos_t)-1' (to  make sure that overflow clamping  works) */
-
 	return state;
 }
 

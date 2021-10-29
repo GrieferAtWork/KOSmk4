@@ -71,6 +71,13 @@
 #define OS_PAGESIZE getpagesize()
 #endif /* !__ARCH_PAGESIZE */
 
+#ifndef __NR_unlink
+#define sys_unlink(file) sys_unlinkat(AT_FDCWD, file, 0)
+#endif /* !__NR_unlink */
+#ifndef __NR_rmdir
+#define sys_rmdir(path) sys_unlinkat(AT_FDCWD, path, AT_REMOVEDIR)
+#endif /* !__NR_rmdir */
+
 DECL_BEGIN
 
 INTERN ATTR_SECTION(".bss.crt.fs.environ")
@@ -123,8 +130,7 @@ INTERN ATTR_SECTION(".text.crt.io.access") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_pipe)(fd_t pipedes[2])
 /*[[[body:libc_pipe]]]*/
 {
-	errno_t error;
-	error = sys_pipe(pipedes);
+	errno_t error = sys_pipe(pipedes);
 	return libc_seterrno_syserr(error);
 }
 /*[[[end:libc_pipe]]]*/
@@ -346,8 +352,7 @@ INTERN ATTR_SECTION(".text.crt.sched.access") WUNUSED pid_t
 NOTHROW_NCX(LIBCCALL libc_fork)(void)
 /*[[[body:libc_fork]]]*/
 {
-	pid_t result;
-	result = sys_fork();
+	pid_t result = sys_fork();
 	return libc_seterrno_syserr(result);
 }
 /*[[[end:libc_fork]]]*/
@@ -389,7 +394,7 @@ INTERN ATTR_SECTION(".text.crt.io.tty") WUNUSED char *
 NOTHROW_RPC(LIBCCALL libc_ttyname)(fd_t fd)
 /*[[[body:libc_ttyname]]]*/
 {
-	if unlikely(libc_ttyname_r(fd, ttyname_buffer, sizeof(ttyname_buffer)))
+	if unlikely(libc_ttyname_r(fd, ttyname_buffer, sizeof(ttyname_buffer)) != 0)
 		return NULL;
 	return ttyname_buffer;
 }
@@ -566,8 +571,7 @@ NOTHROW_RPC(LIBCCALL libc_link)(char const *from,
                                 char const *to)
 /*[[[body:libc_link]]]*/
 {
-	errno_t result;
-	result = sys_link(from, to);
+	errno_t result = sys_link(from, to);
 	return libc_seterrno_syserr(result);
 }
 /*[[[end:libc_link]]]*/
@@ -586,8 +590,7 @@ NOTHROW_RPC(LIBCCALL libc_read)(fd_t fd,
                                 size_t bufsize)
 /*[[[body:libc_read]]]*/
 {
-	ssize_t result;
-	result = sys_read(fd, buf, bufsize);
+	ssize_t result = sys_read(fd, buf, bufsize);
 	return libc_seterrno_syserr(result);
 }
 /*[[[end:libc_read]]]*/
@@ -606,30 +609,10 @@ NOTHROW_RPC(LIBCCALL libc_write)(fd_t fd,
                                  size_t bufsize)
 /*[[[body:libc_write]]]*/
 {
-	ssize_t result;
-	result = sys_write(fd, buf, bufsize);
+	ssize_t result = sys_write(fd, buf, bufsize);
 	return libc_seterrno_syserr(result);
 }
 /*[[[end:libc_write]]]*/
-
-/*[[[head:libc_lseek,hash:CRC-32=0x7c8c5d75]]]*/
-/* >> lseek(2), lseek64(2)
- * Change the position of the file read/write pointer within a file referred to by `fd' */
-INTERN ATTR_SECTION(".text.crt.io.seek") off_t
-NOTHROW_NCX(LIBCCALL libc_lseek)(fd_t fd,
-                                 off_t offset,
-                                 __STDC_INT_AS_UINT_T whence)
-/*[[[body:libc_lseek]]]*/
-{
-	off_t result;
-#ifdef __NR_lseek
-	result = sys_lseek(fd, (int32_t)offset, whence);
-#else /* __NR_lseek */
-	result = sys_lseek64(fd, (int64_t)offset, whence);
-#endif /* !__NR_lseek */
-	return libc_seterrno_syserr(result);
-}
-/*[[[end:libc_lseek]]]*/
 
 /*[[[head:libc_dup2,hash:CRC-32=0x7ac90214]]]*/
 /* >> dup2(2)
@@ -640,8 +623,7 @@ NOTHROW_NCX(LIBCCALL libc_dup2)(fd_t oldfd,
                                 fd_t newfd)
 /*[[[body:libc_dup2]]]*/
 {
-	fd_t result;
-	result = sys_dup2(oldfd, newfd);
+	fd_t result = sys_dup2(oldfd, newfd);
 	return libc_seterrno_syserr(result);
 }
 /*[[[end:libc_dup2]]]*/
@@ -654,8 +636,7 @@ INTERN ATTR_SECTION(".text.crt.io.access") WUNUSED fd_t
 NOTHROW_NCX(LIBCCALL libc_dup)(fd_t fd)
 /*[[[body:libc_dup]]]*/
 {
-	fd_t result;
-	result = sys_dup(fd);
+	fd_t result = sys_dup(fd);
 	return libc_seterrno_syserr(result);
 }
 /*[[[end:libc_dup]]]*/
@@ -667,8 +648,7 @@ INTERN ATTR_SECTION(".text.crt.io.access") int
 NOTHROW_NCX(LIBCCALL libc_close)(fd_t fd)
 /*[[[body:libc_close]]]*/
 {
-	errno_t result;
-	result = sys_close(fd);
+	errno_t result = sys_close(fd);
 	return libc_seterrno_syserr(result);
 }
 /*[[[end:libc_close]]]*/
@@ -682,8 +662,7 @@ NOTHROW_RPC(LIBCCALL libc_access)(char const *file,
                                   __STDC_INT_AS_UINT_T type)
 /*[[[body:libc_access]]]*/
 {
-	errno_t result;
-	result = sys_access(file, (syscall_ulong_t)(unsigned int)type);
+	errno_t result = sys_access(file, (syscall_ulong_t)(unsigned int)type);
 	return libc_seterrno_syserr(result);
 }
 /*[[[end:libc_access]]]*/
@@ -695,8 +674,7 @@ INTERN ATTR_SECTION(".text.crt.fs.basic_property") NONNULL((1)) int
 NOTHROW_RPC(LIBCCALL libc_chdir)(char const *path)
 /*[[[body:libc_chdir]]]*/
 {
-	errno_t result;
-	result = sys_chdir(path);
+	errno_t result = sys_chdir(path);
 	return libc_seterrno_syserr(result);
 }
 /*[[[end:libc_chdir]]]*/
@@ -769,12 +747,7 @@ INTERN ATTR_SECTION(".text.crt.fs.modify") NONNULL((1)) int
 NOTHROW_RPC(LIBCCALL libc_unlink)(char const *file)
 /*[[[body:libc_unlink]]]*/
 {
-	errno_t result;
-#ifdef __NR_unlink
-	result = sys_unlink(file);
-#else /* __NR_unlink */
-	result = sys_unlinkat(AT_FDCWD, file, 0);
-#endif /* !__NR_unlink */
+	errno_t result = sys_unlink(file);
 	return libc_seterrno_syserr(result);
 }
 /*[[[end:libc_unlink]]]*/
@@ -786,12 +759,7 @@ INTERN ATTR_SECTION(".text.crt.fs.modify") NONNULL((1)) int
 NOTHROW_RPC(LIBCCALL libc_rmdir)(char const *path)
 /*[[[body:libc_rmdir]]]*/
 {
-	errno_t result;
-#ifdef __NR_rmdir
-	result = sys_rmdir(path);
-#else /* __NR_rmdir */
-	result = sys_unlinkat(AT_FDCWD, path, AT_REMOVEDIR);
-#endif /* !__NR_rmdir */
+	errno_t result = sys_rmdir(path);
 	return libc_seterrno_syserr(result);
 }
 /*[[[end:libc_rmdir]]]*/
@@ -866,12 +834,7 @@ NOTHROW_RPC(LIBCCALL libc_linkat)(fd_t fromfd,
                                   atflag_t flags)
 /*[[[body:libc_linkat]]]*/
 {
-	errno_t result;
-	result = sys_linkat(fromfd,
-	                    from,
-	                    tofd,
-	                    to,
-	                    flags);
+	errno_t result = sys_linkat(fromfd, from, tofd, to, flags);
 	return libc_seterrno_syserr(result);
 }
 /*[[[end:libc_linkat]]]*/
@@ -886,10 +849,7 @@ NOTHROW_RPC(LIBCCALL libc_symlinkat)(char const *link_text,
                                      char const *target_path)
 /*[[[body:libc_symlinkat]]]*/
 {
-	errno_t result;
-	result = sys_symlinkat(link_text,
-	                       tofd,
-	                       target_path);
+	errno_t result = sys_symlinkat(link_text, tofd, target_path);
 	return libc_seterrno_syserr(result);
 }
 /*[[[end:libc_symlinkat]]]*/
@@ -910,11 +870,7 @@ NOTHROW_RPC(LIBCCALL libc_readlinkat)(fd_t dfd,
                                       size_t buflen)
 /*[[[body:libc_readlinkat]]]*/
 {
-	errno_t result;
-	result = sys_readlinkat(dfd,
-	                        path,
-	                        buf,
-	                        buflen);
+	errno_t result = sys_readlinkat(dfd, path, buf, buflen);
 	return libc_seterrno_syserr(result);
 }
 /*[[[end:libc_readlinkat]]]*/
@@ -928,13 +884,29 @@ NOTHROW_RPC(LIBCCALL libc_unlinkat)(fd_t dfd,
                                     atflag_t flags)
 /*[[[body:libc_unlinkat]]]*/
 {
-	errno_t result;
-	result = sys_unlinkat(dfd,
-	                      name,
-	                      flags);
+	errno_t result = sys_unlinkat(dfd, name, flags);
 	return libc_seterrno_syserr(result);
 }
 /*[[[end:libc_unlinkat]]]*/
+
+/*[[[head:libc_lseek,hash:CRC-32=0x7c8c5d75]]]*/
+/* >> lseek(2), lseek64(2)
+ * Change the position of the file read/write pointer within a file referred to by `fd' */
+INTERN ATTR_SECTION(".text.crt.io.seek") off_t
+NOTHROW_NCX(LIBCCALL libc_lseek)(fd_t fd,
+                                 off_t offset,
+                                 __STDC_INT_AS_UINT_T whence)
+/*[[[body:libc_lseek]]]*/
+{
+	off_t result;
+#ifdef __NR_lseek
+	result = sys_lseek(fd, (__off32_t)offset, whence);
+#else /* __NR_lseek */
+	result = sys_lseek64(fd, (int64_t)(__off64_t)offset, whence);
+#endif /* !__NR_lseek */
+	return libc_seterrno_syserr(result);
+}
+/*[[[end:libc_lseek]]]*/
 
 /*[[[head:libc_lseek64,hash:CRC-32=0x2815d5fb]]]*/
 #if __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
@@ -948,10 +920,7 @@ NOTHROW_NCX(LIBCCALL libc_lseek64)(fd_t fd,
                                    __STDC_INT_AS_UINT_T whence)
 /*[[[body:libc_lseek64]]]*/
 {
-	off64_t result;
-	result = sys_lseek64(fd,
-	                     offset,
-	                     whence);
+	off64_t result = sys_lseek64(fd, (int64_t)offset, whence);
 	return libc_seterrno_syserr(result);
 }
 #endif /* MAGIC:alias */
@@ -968,11 +937,7 @@ NOTHROW_RPC(LIBCCALL libc_pread)(fd_t fd,
                                  __PIO_OFFSET offset)
 /*[[[body:libc_pread]]]*/
 {
-	ssize_t result;
-	result = sys_pread64(fd,
-	                     buf,
-	                     bufsize,
-	                     (uint64_t)(uint32_t)offset);
+	ssize_t result = sys_pread64(fd, buf, bufsize, (uint64_t)(__pos32_t)offset);
 	return libc_seterrno_syserr(result);
 }
 /*[[[end:libc_pread]]]*/
@@ -988,11 +953,7 @@ NOTHROW_RPC(LIBCCALL libc_pwrite)(fd_t fd,
                                   __PIO_OFFSET offset)
 /*[[[body:libc_pwrite]]]*/
 {
-	ssize_t result;
-	result = sys_pwrite64(fd,
-	                      buf,
-	                      bufsize,
-	                      (uint64_t)(uint32_t)offset);
+	ssize_t result = sys_pwrite64(fd, buf, bufsize, (uint64_t)(__pos32_t)offset);
 	return libc_seterrno_syserr(result);
 }
 /*[[[end:libc_pwrite]]]*/
@@ -1011,11 +972,7 @@ NOTHROW_RPC(LIBCCALL libc_pread64)(fd_t fd,
                                    __PIO_OFFSET64 offset)
 /*[[[body:libc_pread64]]]*/
 {
-	ssize_t result;
-	result = sys_pread64(fd,
-	                     buf,
-	                     bufsize,
-	                     (uint64_t)offset);
+	ssize_t result = sys_pread64(fd, buf, bufsize, (uint64_t)(__pos64_t)offset);
 	return libc_seterrno_syserr(result);
 }
 #endif /* MAGIC:alias */
@@ -1035,11 +992,7 @@ NOTHROW_RPC(LIBCCALL libc_pwrite64)(fd_t fd,
                                     __PIO_OFFSET64 offset)
 /*[[[body:libc_pwrite64]]]*/
 {
-	ssize_t result;
-	result = sys_pwrite64(fd,
-	                      buf,
-	                      bufsize,
-	                      (uint64_t)offset);
+	ssize_t result = sys_pwrite64(fd, buf, bufsize, (uint64_t)(__pos64_t)offset);
 	return libc_seterrno_syserr(result);
 }
 #endif /* MAGIC:alias */
@@ -1051,9 +1004,7 @@ NOTHROW_NCX(LIBCCALL libc_pipe2)(fd_t pipedes[2],
                                  oflag_t flags)
 /*[[[body:libc_pipe2]]]*/
 {
-	errno_t result;
-	result = sys_pipe2(pipedes,
-	                   flags);
+	errno_t result = sys_pipe2(pipedes, flags);
 	return libc_seterrno_syserr(result);
 }
 /*[[[end:libc_pipe2]]]*/
@@ -1065,10 +1016,7 @@ NOTHROW_NCX(LIBCCALL libc_dup3)(fd_t oldfd,
                                 oflag_t flags)
 /*[[[body:libc_dup3]]]*/
 {
-	fd_t result;
-	result = sys_dup3(oldfd,
-	                  newfd,
-	                  flags);
+	fd_t result = sys_dup3(oldfd, newfd, flags);
 	return libc_seterrno_syserr(result);
 }
 /*[[[end:libc_dup3]]]*/
@@ -1271,8 +1219,7 @@ INTERN ATTR_SECTION(".text.crt.fs.basic_property") int
 NOTHROW_RPC(LIBCCALL libc_fchdir)(fd_t fd)
 /*[[[body:libc_fchdir]]]*/
 {
-	errno_t result;
-	result = sys_fchdir(fd);
+	errno_t result = sys_fchdir(fd);
 	return libc_seterrno_syserr(result);
 }
 /*[[[end:libc_fchdir]]]*/
@@ -1287,8 +1234,7 @@ INTERN ATTR_SECTION(".text.crt.sched.user") WUNUSED pid_t
 NOTHROW_NCX(LIBCCALL libc_getpgid)(pid_t pid)
 /*[[[body:libc_getpgid]]]*/
 {
-	pid_t result;
-	result = sys_getpgid(pid);
+	pid_t result = sys_getpgid(pid);
 	return libc_seterrno_syserr(result);
 }
 /*[[[end:libc_getpgid]]]*/
@@ -1301,8 +1247,7 @@ INTERN ATTR_SECTION(".text.crt.sched.process") WUNUSED pid_t
 NOTHROW_NCX(LIBCCALL libc_getsid)(pid_t pid)
 /*[[[body:libc_getsid]]]*/
 {
-	pid_t result;
-	result = sys_getsid(pid);
+	pid_t result = sys_getsid(pid);
 	return libc_seterrno_syserr(result);
 }
 /*[[[end:libc_getsid]]]*/
@@ -1339,9 +1284,7 @@ NOTHROW_NCX(LIBCCALL libc_truncate)(char const *file,
                                     __PIO_OFFSET length)
 /*[[[body:libc_truncate]]]*/
 {
-	errno_t result;
-	result = sys_truncate(file,
-	                      (uint32_t)length);
+	errno_t result = sys_truncate(file, (__pos32_t)length);
 	return libc_seterrno_syserr(result);
 }
 /*[[[end:libc_truncate]]]*/
@@ -1357,9 +1300,7 @@ NOTHROW_NCX(LIBCCALL libc_truncate64)(char const *file,
                                       __PIO_OFFSET64 length)
 /*[[[body:libc_truncate64]]]*/
 {
-	errno_t result;
-	result = sys_truncate64(file,
-	                        (uint64_t)length);
+	errno_t result = sys_truncate64(file, (uint64_t)(__pos64_t)length);
 	return libc_seterrno_syserr(result);
 }
 #endif /* MAGIC:alias */
@@ -1584,8 +1525,7 @@ NOTHROW_RPC(LIBCCALL libc_symlink)(char const *link_text,
                                    char const *target_path)
 /*[[[body:libc_symlink]]]*/
 {
-	errno_t result;
-	result = sys_symlink(link_text, target_path);
+	errno_t result = sys_symlink(link_text, target_path);
 	return libc_seterrno_syserr(result);
 }
 /*[[[end:libc_symlink]]]*/
@@ -1606,8 +1546,7 @@ NOTHROW_RPC(LIBCCALL libc_readlink)(char const *path,
                                     size_t buflen)
 /*[[[body:libc_readlink]]]*/
 {
-	ssize_t result;
-	result = sys_readlink(path, buf, buflen);
+	ssize_t result = sys_readlink(path, buf, buflen);
 	return libc_seterrno_syserr(result);
 }
 /*[[[end:libc_readlink]]]*/
@@ -1643,8 +1582,7 @@ NOTHROW_NCX(LIBCCALL libc_sethostname)(char const *name,
                                        size_t len)
 /*[[[body:libc_sethostname]]]*/
 {
-	errno_t result;
-	result = sys_sethostname(name, len);
+	errno_t result = sys_sethostname(name, len);
 	return libc_seterrno_syserr(result);
 }
 /*[[[end:libc_sethostname]]]*/
@@ -1680,8 +1618,7 @@ NOTHROW_NCX(LIBCCALL libc_setdomainname)(char const *name,
                                          size_t len)
 /*[[[body:libc_setdomainname]]]*/
 {
-	errno_t result;
-	result = sys_setdomainname(name, len);
+	errno_t result = sys_setdomainname(name, len);
 	return libc_seterrno_syserr(result);
 }
 /*[[[end:libc_setdomainname]]]*/
@@ -1826,8 +1763,7 @@ INTERN ATTR_SECTION(".text.crt.fs.utility") NONNULL((1)) int
 NOTHROW_RPC(LIBCCALL libc_chroot)(char const *__restrict path)
 /*[[[body:libc_chroot]]]*/
 {
-	errno_t result;
-	result = sys_chroot(path);
+	errno_t result = sys_chroot(path);
 	return libc_seterrno_syserr(result);
 }
 /*[[[end:libc_chroot]]]*/
@@ -1841,8 +1777,7 @@ NOTHROW_NCX(LIBCCALL libc_ftruncate)(fd_t fd,
                                      __PIO_OFFSET length)
 /*[[[body:libc_ftruncate]]]*/
 {
-	errno_t result;
-	result = sys_ftruncate(fd, (uint32_t)length);
+	errno_t result = sys_ftruncate(fd, (__pos32_t)length);
 	return libc_seterrno_syserr(result);
 }
 /*[[[end:libc_ftruncate]]]*/
@@ -1858,8 +1793,7 @@ NOTHROW_NCX(LIBCCALL libc_ftruncate64)(fd_t fd,
                                        __PIO_OFFSET64 length)
 /*[[[body:libc_ftruncate64]]]*/
 {
-	errno_t result;
-	result = sys_ftruncate64(fd, (uint64_t)length);
+	errno_t result = sys_ftruncate64(fd, (uint64_t)(__pos64_t)length);
 	return libc_seterrno_syserr(result);
 }
 #endif /* MAGIC:alias */
